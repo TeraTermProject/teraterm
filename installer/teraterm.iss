@@ -139,10 +139,12 @@ Name: {userstartup}\Collector; Filename: {app}\collector\collector.exe; WorkingD
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
 [INI]
+Filename: {app}\teraterm.ini; Section: Tera Term; Key: PasteDialogSize; String: 330,220; Flags: createkeyifdoesntexist; Components: TeraTerm
+Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: PasteDialogSize; String: 330,220; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: TTXKanjiMenu; Key: UseOneSetting; String: off; Flags: createkeyifdoesntexist; Components: Additional_Plugins/TTXKanjiMenu
 Filename: {userdocs}\teraterm.ini; Section: TTXKanjiMenu; Key: UseOneSetting; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: Additional_Plugins/TTXKanjiMenu
-Filename: {app}\teraterm.ini; Section: TTSSH; Key: ForwardAgent; String: off; Flags: createkeyifdoesntexist; Components: TTSSH
-Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: ForwardAgent; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
+Filename: {app}\teraterm.ini; Section: TTSSH; Key: ForwardAgent; String: 0; Flags: createkeyifdoesntexist; Components: TTSSH
+Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: ForwardAgent; String: 0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
 Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableBoldAttrColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
 Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableBoldAttrColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableBlinkAttrColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
