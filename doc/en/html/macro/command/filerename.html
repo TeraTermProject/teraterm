@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filerename</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filerename</h1>
+
+<p>
+Renames a file.
+</p>
+
+<pre class="macro-syntax">
+filerename &lt;file1&gt; &lt;file2&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Renames &lt;file1&gt; to &lt;file2&gt;.<br>
+&lt;file1&gt; and &lt;file2&gt; must not be same.<br>
+If the file is renamed successfully, the system variable "result" is set to 0. Otherwise, "result" is set to non-zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+filerename 'test.dat' test2.dat'
+</pre>
+
+</body>
+</html>

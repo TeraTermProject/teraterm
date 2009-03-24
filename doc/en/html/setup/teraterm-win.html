@@ -1,0 +1,550 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Window (Tera Term setup file)</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1><a name="autocopy">Disabling auto text copying</a></h1>
+
+<p>
+If you select text by mouse, it is copied to the clipboard at the same time. To disable the auto text copying, edit the AutoTextCopy line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+AutoTextCopy=off
+</pre>
+
+<pre>
+Default:
+AutoTextCopy=on
+</pre>
+
+
+<h1><a name="delimiter">Delimiters of a word selected by double clicking</a></h1>
+
+<p>
+You can select a word by double clicking it with the left mouse button. You can specify delimiter characters for the word selection by editing the DelimList line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+DelimList=&lt;delimiter characters&gt;
+</pre>
+
+<p>
+For example:
+</p>
+
+<pre>
+DelimList=&lt;&gt;()[]
+</pre>
+
+<p>
+specifies 6 delimiter characters "&lt;", "&gt;", "(", ")", "[" and "]".
+Note that the space and "$" characters should be specified as "$20" and "$24":
+</p>
+
+<pre>
+DelimList=$20    ; space character
+</pre>
+
+<pre>
+Default:
+DelimList=$20!"#$24%&amp;'()*+,-./:;&lt;=&gt;?@[\]^`{|}~
+</pre>
+
+<p>
+In the DelimList line, only singe-byte code characters can be specified. Double-byte code characters (Japanese kanji) are regarded as delimiters. You can make them be non-delimiters by editing the DelimDBCS line like the following:
+</p>
+
+<pre>
+DelimDBCS=off
+</pre>
+
+<pre>
+Default:
+DelimDBCS=on
+</pre>
+
+<p>
+If you prefer the word selection behavior of earlier Tera Term versions, specify like the following:
+</p>
+
+<pre>
+DelimList=$20
+DelimDBCS=off
+</pre>
+
+
+<h1><a name="popup">Disabling the pop-up menu</a></h1>
+
+<p>
+When the menu bar is hidden, clicking the left mouse button while pressing the Ctrl key causes the pop-up menu to appear. To disable the pop-up menu, edit the EnablePopupMenu line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+EnablePopupMenu=off
+</pre>
+
+<pre>
+Default:
+EnablePopupMenu=on
+</pre>
+
+
+<h1><a name="menubar">Hiding the "Show menu bar" command</a></h1>
+
+<p>
+When the menu bar is hidden, the "Show menu bar" command appears in the system menu. To hide the "Show menu bar" command, edit the EnableShowMenu line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+EnableShowMenu=off
+</pre>
+
+<pre>
+Default:
+EnableShowMenu=on
+</pre>
+
+
+<h1><a name="lang">Disabling the language mode selection</a></h1>
+
+<p>
+To disable the language mode selection in the [Setup] General dialog box, edit the LanguageSelection line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+LanguageSelection=off
+</pre>
+
+<pre>
+Default:
+LanguageSelection=on
+</pre>
+
+
+<h1><a name="scrollbuf">Maximum scroll buffer size</a></h1>
+
+<p>
+You can change the maximum scroll buffer size, which can be specified in the [Setup] Window dialog box, by editing the MaxBuffSize line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+MaxBuffSize=&lt;number of lines&gt;
+    (should be less than or equal to 500000)
+</pre>
+
+<p>
+Note: Tera Term consumes &lt;scroll buffer size&gt; * &lt;terminal width&gt; * 5 bytes of memory for the scroll buffer.
+</p>
+
+<pre>
+Default:
+MaxBuffSize=10000
+</pre>
+
+
+<h1><a name="blink">Nonblinking cursor</a></h1>
+
+<p>
+You can make the cursor nonblinking by editing the NonblinkingCursor line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+NonblinkingCursor=on
+</pre>
+
+<pre>
+Default:
+NonblinkingCursor=off
+</pre>
+
+
+<h1><a name="scrollline">Maximum number of lines to move in a jump scrolling</a></h1>
+
+<p>
+To change the maximum number of lines to move in a jump scrolling, edit the ScrollThreshold line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ScrollThreshold=&lt;number of lines&gt;
+</pre>
+
+<pre>
+Default:
+ScrollThreshold=12
+</pre>
+
+
+<h1><a name="textselect">Disabling text selection when the window is activated by mouse</a></h1>
+
+<p>
+When the window is inactive, you can activate the window by clicking the text area of window. In the default setup, the text selection is started by this mouse clicking at the same time. To disable the text selection when the window is activated by mouse, edit the SelectOnActive line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+SelectOnActivate=off
+</pre>
+
+<pre>
+Default:
+SelectOnActivate=on
+</pre>
+
+
+<h1><a name="title">Title format</a></h1>
+
+<p>
+To change the title format, edit the TitleFormat line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<p>
+You can change the key code for the left mouse button by editing the TEKGINMouseCode line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TitleFormat=&lt;format ID&gt;
+</pre>
+
+<p>
+&lt;format ID&gt; is a integer value. It is treated as bit string.
+</p>
+
+<table>
+ <tr>
+  <td>1st bit (1)</td>
+  <td>Displays tcp hostname or serial port number</td>
+ </tr>
+ <tr>
+  <td>2nd bit (2)</td>
+  <td>Displays session No.</td>
+ </tr>
+ <tr>
+   <td>3rd bit (4)</td>
+   <td>Displays VT/TEK</td>
+  </tr>
+ <tr>
+   <td>4th bit (8)</td>
+   <td>Displays &lt;host/port&gt; first</td>
+  </tr>
+ <tr>
+  <td>5th bit (16)</td>
+  <td>Displays TCP port number</td>
+ </tr>
+ <tr>
+  <td>6th bit (32)</td>
+  <td>Displays the baud rate of serial port</td>
+ </tr>
+</table>
+
+<p>
+Examples of &lt;format ID&gt; are shown as follows.
+</p>
+
+<pre>
+Format ID   Title format
+0           &lt;title&gt;
+1           &lt;title&gt; - &lt;host/port&gt;
+2           &lt;title&gt; (session no.)
+3           &lt;title&gt; - &lt;host/port&gt; (session no.)
+4           &lt;title&gt; VT/TEK
+5           &lt;title&gt; - &lt;host/port&gt; VT/TEK
+6           &lt;title&gt; (session no.) VT/TEK
+7           &lt;title&gt; - &lt;host/port&gt; (session no.) VT/TEK
+13          &lt;host/port&gt; - &lt;title&gt; VT/TEK
+29          &lt;host:tcpport/port&gt; - &lt;title&gt; VT/TEK
+45          &lt;host/port:baud&gt; - &lt;title&gt; VT/TEK
+61          &lt;host:tcpport/port:baud&gt; - &lt;title&gt; VT/TEK
+</pre>
+
+<pre>
+Default:
+TitleFormat=5
+</pre>
+
+
+<h1><a name="color">Actual colors of "white" and "black" colored text</a></h1>
+
+<p>
+The escape sequences "&lt;ESC&gt;[37m" and "&lt;ESC&gt;[30m" make the text color white and black, respectively. Similarly, the escape sequences "&lt;ESC&gt;[47m" and "&lt;ESC&gt;[40m" make the background color white and black, respectively.
+</p>
+
+<p>
+Some applications assume that the screen background is black (like real VT100 terminal), and expect that white colored text is visible. However, the default background color of Tera Term is white, and therefore white colored text is invisible.
+</p>
+
+<p>
+If you edit the UseTextColor line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+UseTextColor=on
+</pre>
+
+<p>
+the actual color of "white" colored text (background) becomes a color for "Text" specified in the [Setup] Window dialog box. Similarly, the actual colors for "black" text (background) becomes a color for "Background".
+</p>
+
+<pre>
+Default:
+UseTextColor=off
+</pre>
+
+
+<h1><a name="space">Space between characters (lines)</a></h1>
+
+<p>
+To change space between characters (lines), edit the VTFontSpace line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+VTFontSpace=&lt;dx1&gt;,&lt;dx2&gt;,&lt;dy1&gt;,&lt;dy2&gt;
+</pre>
+
+<pre>
+Where:
+  &lt;dx1&gt;  Left side space for each character in pixels.
+  &lt;dx2&gt;  Right side space for each character in pixels.
+  &lt;dy1&gt;  Space above each line in pixels.
+  &lt;dy2&gt;  Space below each line in pixels.
+</pre>
+
+<pre>
+Example:
+VTFontSpace=0,1,0,0    1 pixel of right side space for each character.
+VTFontSpace=0,0,1,0    1 pixel of space above each line.
+</pre>
+
+<pre>
+Default:
+VTFontSpace=0,0,0,0
+</pre>
+
+
+<h1><a name="window">Hiding the [Window] menu</a></h1>
+
+<p>
+To hide the [Window] menu, edit the WindowMenu line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+WindowMenu=off
+</pre>
+
+<pre>
+Default:
+WindowMenu=on
+</pre>
+
+
+<h1><a name="eterm">Eterm lookfeel window</a></h1>
+
+<p>
+To specify the detailed settings for Eterm lookfeel window, edit the [Tera Term] section of the setup file like the following:
+</p>
+
+<table>
+  <tr>
+    <th>BGSPIPath</th>
+    <td>On / Off</td>
+    <td>This option can specify Susie plugin path to load the image. Susie is Japanese free software.</td>
+  </tr>
+  <tr>
+    <th>BGFastSizeMove</th>
+    <td>folder name</td>
+    <td>This option enables Tera Term window moving and resizing to more faster. This feature is valid in Windows dragging mode.</td>
+  </tr>
+  <tr>
+    <th>BGFlickerlessMove</th>
+    <td>On / Off</td>
+    <td>This option can reduce the flicker of window moving.</td>
+  </tr>
+  <tr>
+    <th>BGUseAlphaBlendAPI</th>
+    <td>On / Off</td>
+    <td>For debug. Tera Term does not use AlphaBlend API when this option is off.</td>
+  </tr>
+  <tr>
+    <th>BGNoFrame</th>
+    <td>On / Off</td>
+    <td>Tera Term window is without frame when this option is on and HideTitle option is on.
+        If so, you can resize window with Alt + Shift + LeftDrag.</td>
+  </tr>
+  <tr>
+    <th>BGThemeFile</th>
+    <td>file name</td>
+    <td>You can specify the theme file.<br>
+        Tera Term will randomly select one of files when the theme file is specify with wildcard.</td>
+  </tr>
+</table>
+
+<pre>
+Default:
+BGUseAlphaBlendAPI = On
+BGSPIPath = plugin
+BGFastSizeMove = On
+BGFlickerlessMove = On
+BGNoFrame = Off
+BGThemeFile = theme\*.ini
+</pre>
+
+<h2>Config of theme file</h2>
+
+<table>
+  <tr>
+    <th>BGReverseTextTone</th>
+    <td>0 - 255</td>
+    <td>The transparency value of the reverse text.</td>
+  </tr>
+  <tr>
+    <th>BGPictureFile</th>
+    <td>file name</td>
+    <td>You can specify the image file name merging with the wall paper.<br>
+        Tera Term will randomly select one of files when the wild card is specified.<br>
+        Please specify the relative path from the thema file when you want to use the relative path.<br>
+        The kind of file that Tera Term can load is depend the plugin stored in BGSPIPath.<br>
+        Tera Term can load the bitmap file when there is not plugin.<br>
+    </td>
+  </tr>
+  <tr>
+    <th>BGPicturePattern</th>
+    <td>Stretch<br>
+        Tile<br>
+        Center<br>
+        FitWidth<br>
+        FitHeight<br>
+        AutoFit</td>
+    <td>You can specify the painting method of the image file.<br>
+        Both FitWidth and FitHeight can expand or recude  the image while the aspect ratio of the image preserves.<br>
+        AutoFit can exchange FitWidth for FitHeight not to generate the space between the window and the image.
+    </td>
+  </tr>
+  <tr>
+    <th>BGPictureBaseColor</th>
+    <td>R, G, B</td>
+    <td>This color can paint between the image file and the window.</td>
+  </tr>
+  <tr>
+    <th>BGPictureTone</th>
+    <td>0 - 255</td>
+    <td>The transparency value of the image file.</td>
+  </tr>
+  <tr>
+    <th>BGFadeTone</th>
+    <td>0 - 255</td>
+    <td>This option can enable the whole background to fade.</td>
+  </tr>
+  <tr>
+    <th>BGFadeColor</th>
+    <td>R, G, B</td>
+    <td>This option can configure the fade color.</td>
+  </tr>
+  <tr>
+    <th>VTFore, Red ...</th>
+    <td>R, G, B</td>
+    <td>This option can configure the text color.</td>
+  </tr>
+</table>
+
+
+<h1><a name="maximize">How to scroll the screen when the window size is maximized</a></h1>
+<p>
+You can specify how to scroll the screen when the window size is maximized.<br>
+If the screen is scrolled with the maximized window size, the screen image may be disrupted in some case. Therefore, the screen of maximized window size will be scrolled by using a different method  than a usual way by default. However, there may be a minor side effect such as flickering or being slowed down.<br>
+If a line of MaximizedBugTweak in [Tera Term] section of a setup file is modified as follows, a usual method will be used even the window size is maximized to avoid such side effects. However, as described above, the screen image may be disrupted.
+</p>
+
+<pre>
+MaximizedBugTweak=off
+</pre>
+
+<pre>
+Default:
+MaximizedBugTweak=on
+</pre>
+
+
+<h1><a name="killfocus">Display the cursor even if the window comes out of focus</a></h1>
+<p>
+Tera Term will display the cursor even if the window comes out of focus.<br>
+If you want to disable this option, modify a line of KillFocusCursor in [Tera Term] section of setup file as follows.
+</p>
+
+<pre>
+KillFocusCursor=off
+</pre>
+
+<pre>
+Default:
+KillFocusCursor=on
+</pre>
+
+
+<h1><a name="savevtwinpos">Save the window position</a></h1>
+<p>
+Tera Term does not save the window position when "Save setup" was called.<br>
+If you enable this position, current window position is saved to a specified setup file.
+</p>
+
+<p>
+Also if this option is enabled, current window position and terminal size are saved to the current setup file when VT window was closed.
+</p>
+
+<pre>
+SaveVTWinPos=on
+</pre>
+
+<pre>
+Default:
+SaveVTWinPos=off
+</pre>
+
+
+<h1><a name="WindowIcon">Change the window icon</a></h1>
+<p>
+Tera Term executable program includes "VT window" icon, "TEK window" icon, and some other icons.
+If you change the value of VTIcon or TEKIcon, the displaying icon of VT window or TEK window is changed.
+</p>
+
+<p>
+For example, to use old icon for VT window, specify like the following:
+</p>
+
+<pre>
+VTIcon=VT_CLASSIC
+</pre>
+
+<p>
+Following icon names are available:
+</p>
+
+<table>
+<thead>
+  <tr><th>Icon name</th>       <th>Icon</th></tr>
+</thead>
+
+<tbody>
+  <tr><td>TTERM</td>         <td><img src="../image/tterm.png"></td></tr>
+  <tr><td>VT</td>            <td><img src="../image/vt.png"></td></tr>
+  <tr><td>TEK</td>           <td><img src="../image/tek.png"></td></tr>
+  <tr><td>TTERM_CLASSIC</td> <td><img src="../image/tt_classic.png"></td></tr>
+  <tr><td>VT_CLASSIC</td>    <td><img src="../image/vt_classic.png"></td></tr>
+  <tr><td>CYGTERM</td>       <td><img src="../image/cygterm.png"></td></tr>
+  <tr><td>Default</td>       <td>Default("VT" at VT window, "TEK" at TEK window)</td></tr>
+</tbody>
+</table>
+
+<pre>
+Default:
+VTIcon=Default
+TEKIcon=Default
+</pre>
+
+
+</body>
+</html>

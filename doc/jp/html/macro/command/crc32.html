@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>crc32</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>crc32</h1>
+
+<p>
+CRC-32を計算する。
+</p>
+
+<pre class="macro-syntax">
+crc32 &lt;intvar&gt; &lt;string&gt;
+crc32file &lt;intvar&gt; &lt;filename&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+引数の文字列およびファイルからCRC(Cyclic Redundancy Checking)を計算する。多項式（右回り）は以下のとおり。
+<br><br>
+
+100000100110000010001110110110111 (x<sup>32</sup>+x<sup>26</sup>+x<sup>23</sup>+x<sup>22</sup>+x<sup>16</sup>+x<sup>12</sup>+x<sup>11</sup>+x<sup>10</sup>+x<sup>8</sup>+x<sup>7</sup>+x<sup>5</sup>+x<sup>4</sup>+x<sup>2</sup>+x<sup>1</sup>+x<sup>0</sup>)
+<br><br>
+
+計算結果は intvar 変数に数値として格納される。<br>
+crc32file でファイルが開けなかった場合は、result 変数に -1 が格納される。
+</p>
+
+CRCアルゴリズムの実装（C言語）を以下に示す。このアルゴリズムは、EthernetのFCS(Frame Check Sequence)に適用されている。
+<pre>
+<code>
+#define CRCPOLY2 0xEDB88320UL  /* 左右逆転 */
+
+static unsigned long crc2(int n, unsigned char c[])
+{
+	int i, j;
+	unsigned long r;
+
+	r = 0xFFFFFFFFUL;
+	for (i = 0; i < n; i++) {
+		r ^= c[i];
+		for (j = 0; j < CHAR_BIT; j++)
+			if (r & 1) r = (r >> 1) ^ CRCPOLY2;
+			else       r >>= 1;
+	}
+	return r ^ 0xFFFFFFFFUL;
+}
+</code></pre>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+str = 'this is a test string to be CRC32ed'
+crc32 crc str
+
+; Display CRC32 result asHEX
+sprintf '0x%08X' crc
+messagebox inputstr 'CRC32 = '
+
+crc32file crc 'foo.bin'
+if result = -1 then
+    messagebox 'file open error' 'CRC32 = '
+else
+    sprintf '0x%08X' crc
+    messagebox inputstr 'CRC32 = '
+endif
+</pre>
+
+</body>
+</html>

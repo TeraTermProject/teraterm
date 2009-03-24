@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>SSH Forwarding（[Setup] メニュー）</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH Forwarding（[Setup] メニュー）</h1>
+
+    <h2>"TTSSH: Forwarding" ダイアログボックス</h2>
+    <p>
+      SSH 通信を使ってポート転送を行う設定ができます。<br/>
+      SSH 経由で暗号化して、既存のプロトコルをセキュアな通信を行わせる場合に指定します。
+    </p>
+
+    <h3>Port Forwarding</h3>
+    <dl>
+      <dt>Add...</dt>
+      <dd>
+        Forward する方向、ポート番号を指定して一覧に追加します。
+      </dd>
+
+      <dt>Edit...</dt>
+      <dd>
+        選択された Forwarding の設定を編集します。
+      </dd>
+
+      <dt>Remove...</dt>
+      <dd>
+        選択された Forwarding の設定を削除します。
+      </dd>
+
+      <dt>Local ports a&ccept connections from other hosts</dt>
+      <dd>
+        ローカルのポートは、他のホストからの接続を受け入れる。この設定が有効でないと、各ポート転送ごとの設定も有効にならない。
+      </dd>
+    </dl>
+
+    <h3>X Forwarding</h3>
+    <dl>
+      <dt>Display remote X application on local X server</dt>
+      <dd>
+        このチェックボックスをオンにすると、サーバ上の X クライアントとPC上の X サーバの間の通信が暗号化されます。
+      </dd>
+    </dl>
+
+
+    <h2>"TTSSH: Forwarding Edit" ダイアログボックス</h2>
+    <p>
+      各転送設定を編集する。
+    </p>
+
+    <h3>local forwarding</h3>
+    <dl>
+      <dt>Forward local port</dt>
+      <dd>
+        転送するローカル側のポート番号
+      </dd>
+
+      <dt>to remote machine</dt>
+      <dd>
+        転送先のホスト名
+      </dd>
+
+      <dt>port</dt>
+      <dd>
+        転送先のポート番号
+      <dd>
+      </dd>
+
+      <dt>A&ccept connections from other hosts</dt>
+      <dd>
+        他のホストからの接続を受け入れる。
+      </dd>
+    </dl>
+
+    <h3>remote forwarding</h3>
+    <dl>
+      <dt>forward remote server port</dt>
+      <dd>
+        転送するリモート側のポート番号
+      </dd>
+
+      <dt>to local machine</dt>
+      <dd>
+        転送先のホスト名
+      </dd>
+
+      <dt>port</dt>
+      <dd>
+        転送先のポート番号
+      </dd>
+    </dl>
+
+  </body>
+</html>

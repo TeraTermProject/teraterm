@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Identifiers and reserved words</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Identifiers and reserved words</h1>
+
+<h2>1) Variable identifiers</h2>
+
+<p>
+The first character must be an alphabetic (A-Z, a-z) or an underscore character "_". Subsequent characters can be alphabetic, underscore or numeric (0-9). Variable identifiers are not case sensitive. The maximum length is 32.
+</p>
+
+<pre>
+Example:
+    VARIABLE
+    _flag
+</pre>
+
+<h2>2) Label identifiers</h2>
+
+<p>
+Label identifiers consist of alphabetic, underscore or numeric characters, and are not case sensitive. The maximum length is 32.
+</p>
+
+<pre>
+Example:
+    label1
+    100
+</pre>
+
+<h2>3) Reserved words</h2>
+
+<p>
+The following words are reserved:
+</p>
+
+<pre>
+[Command]
+    bplusrecv, bplussend, changedir... (see the <A HREF="../command/index.html">command list</A>)
+
+[Operator]
+    and, not, or, xor
+
+[System variable]
+    groupmatchstr1, groupmatchstr2, groupmatchstr3, groupmatchstr4, groupmatchstr5,
+    groupmatchstr6, groupmatchstr7, groupmatchstr8, groupmatchstr9, inputstr,
+    matchstr, param2, param3, param4, param5, param6, param7, param8, param9,
+    result, timeout
+</pre>
+
+</BODY>
+</HTML>
+

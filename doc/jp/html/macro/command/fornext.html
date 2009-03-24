@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>for, next</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>for, next</h1>
+
+<p>
+繰り返す。
+</p>
+
+<pre class="macro-syntax">
+for &lt;intvar&gt; &lt;first&gt; &lt;last&gt;<br>
+  ...<br>
+  ...<br>
+next
+</pre>
+
+<h2>解説</h2>
+
+<p>
+"for" と "next" の間のコマンドを、整数変数 &lt;intvar&gt; の値が &lt;last&gt; と等しくなるまで、繰りかえす。<br>
+&lt;intvar&gt; の初期値は &lt;first&gt; 。もし &lt;last&gt; が &lt;fast&gt; より大きい場合、&lt;intvar&gt; は "next" 行に来るたびに 1 足される。もし &lt;last&gt; が &lt;fast&gt; より小さい場合、&lt;intvar&gt; は "next" 行にくるたびに 1 引かれる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 10回繰り返す。
+for i 1 10
+  sendln 'abc'
+next
+
+; 5回繰り返す。
+for i 5 1
+  sendln 'abc'
+next
+</pre>
+
+</body>
+</html>

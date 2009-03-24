@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filereadln</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filereadln</h1>
+
+<p>
+Reads a line from file.
+</p>
+
+<pre class="macro-syntax">
+filereadln &lt;file handle&gt; &lt;strvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Reads a line from the file specified by &lt;file handle&gt;.<br>
+The line is written into the string variable &lt;strvar&gt;.<br>
+The file pointer is moved to the beginning of the next line.<br>
+If the file pointer reaches the end of the file while reading the line, the system variable "result" is set to 1. Otherwise, "result" is set to zero.<br>
+
+When a line only includes a new line, the string variable is empty and "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Open a file.
+fileopen fhandle 'test.txt' 0
+
+:loop
+; Read a line from the file.
+<strong>filereadln</strong> fhandle line
+if result goto fclose
+; Display the line.
+messagebox line 'test.txt'
+; Repeat until the end of the file.
+goto loop
+
+:fclose
+; Close the file.
+fileclose fhandle
+</pre>
+
+</body>
+</html>

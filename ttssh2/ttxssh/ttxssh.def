@@ -1,0 +1,6 @@
+LIBRARY	"ttxssh"
+
+EXPORTS
+	TTXScpSendfile @1
+	TTXScpReceivefile @2
+	

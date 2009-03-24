@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>logpause</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>logpause</h1>
+
+<p>
+Tera Term のログを一時中断する。
+</p>
+
+<pre class="macro-syntax">
+logpause
+</pre>
+
+<h2>解説</h2>
+
+<p>
+中断している間に受信された文字はログファイルに書き込まれない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+prompt = '$'
+
+cygconnect
+wait prompt
+
+; ユーザ名を取得
+getenv 'USERNAME' username
+; 日時を取得
+gettime timestr "%Y%m%d-%H%M%S"
+
+; ログファイル名に日時とユーザ名を入れる。
+sprintf2 filename 'd:\console_%s_%s.log' username timestr
+;messagebox filename 'filename'
+
+logopen filename 0 0
+logwrite 'Log start'#13#10
+sendln 'cal'
+wait prompt
+; ログ停止
+logpause
+; 以下のコマンドはログ採取されない
+sendln 'date'
+wait prompt
+; ログ再開
+logstart
+sendln 'uptime'
+wait prompt
+logwrite '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'#13#10
+logclose
+
+exit
+</pre>
+
+</body>
+</html>

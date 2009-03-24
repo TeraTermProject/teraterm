@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>変数</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>変数</h1>
+
+<b>1) ユーザー変数</b>
+
+<p>
+ユーザーにより定義される。型および値は初めて値が代入されたときに決まる。いったん型が決まると違う型の値を代入することはできない。
+</p>
+
+<b>2) システム変数</b>
+
+<p>
+あらかじめ型と値が定義され、特定のコマンドと共に使用される。
+</p>
+
+<table border="2">
+  <tr>
+    <th>名前</th>
+    <th>型</th>
+    <th>初期値</th>
+    <th>システム変数を使用するコマンド</th>
+  </tr>
+  <tr>
+    <td>groupmatchstr1 ... groupmatchstr9</td>
+    <td>文字列</td>
+    <td>""</td>
+    <td><a href="../command/waitregex.html">waitregex</a></td>
+  </tr>
+  <tr>
+    <td>inputstr</td>
+    <td>文字列</td>
+    <td>""</td>
+    <td><a href="../command/recvln.html">recvln</a>,
+        <a href="../command/waitln.html">waitln</a>,
+        <a href="../command/waitn.html">waitn</a>,
+        <a href="../command/waitrecv.html">waitrecv</a>,
+        <a href="../command/waitregex.html">waitregex</a>,
+        <a href="../command/sprintf.html">sprintf</a>,
+        <a href="../command/passwordbox.html">passwordbox</a>,
+        <a href="../command/filenamebox.html">filenamebox</a>,
+        <a href="../command/inputbox.html">inputbox</a></td>
+  </tr>
+  <tr>
+    <td>matchstr</td>
+    <td>文字列</td>
+    <td>""</td>
+    <td><a href="../command/waitregex.html">waitregex</a></td>
+  </tr>
+  <tr>
+    <td>param2 ... param9</td>
+    <td>文字列</td>
+    <td>*1</td>
+    <td>*1</td>
+  </tr>
+  <tr>
+    <td>result</td>
+    <td>整数</td>
+    <td>0</td>
+    <td><a href="../command/bplusrecv.html">bplusrecv</a>,
+        <a href="../command/bplussend.html">bplussend</a>,
+        <a href="../command/connect.html">connect</a>,
+        <a href="../command/cygconnect.html">cygconnect</a>,
+        <a href="../command/kmtfinish.html">kmtfinish</a>,
+        <a href="../command/kmtget.html">kmtget</a>,
+        <a href="../command/kmtrecv.html">kmtrecv</a>,
+        <a href="../command/kmtsend.html">kmtsend</a>,
+        <a href="../command/logopen.html">logopen</a>,
+        <a href="../command/quickvanrecv.html">quickvanrecv</a>,
+        <a href="../command/quickvansend.html">quickvansend</a>,
+        <a href="../command/recvln.html">recvln</a>,
+        <a href="../command/testlink.html">testlink</a>,
+        <a href="../command/wait.html">wait</a>,
+        <a href="../command/waitevent.html">waitevent</a>,
+        <a href="../command/waitln.html">waitln</a>,
+        <a href="../command/waitn.html">waitn</a>,
+        <a href="../command/waitrecv.html">waitrecv</a>,
+        <a href="../command/waitregex.html">waitregex</a>,
+        <a href="../command/xmodemrecv.html">xmodemrecv</a>,
+        <a href="../command/xmodemsend.html">xmodemsend</a>,
+        <a href="../command/zmodemrecv.html">zmodemrecv</a>,
+        <a href="../command/zmodemsend.html">zmodemsend</a>,
+        <a href="../command/sprintf.html">sprintf</a>,
+        <a href="../command/str2int.html">str2int</a>,
+        <a href="../command/strcompare.html">strcompare</a>,
+        <a href="../command/strlen.html">strlen</a>,
+        <a href="../command/strmatch.html">strmatch</a>,
+        <a href="../command/strscan.html">strscan</a>,
+        <a href="../command/fileconcat.html">fileconcat</a>,
+        <a href="../command/filecopy.html">filecopy</a>,
+        <a href="../command/filecreate.html">filecreate</a>,
+        <a href="../command/filedelete.html">filedelete</a>,
+        <a href="../command/fileread.html">fileread</a>,
+        <a href="../command/filereadln.html">filereadln</a>,
+        <a href="../command/filerename.html">filerename</a>,
+        <a href="../command/filesearch.html">filesearch</a>,
+        <a href="../command/filestrseek.html">filestrseek</a>,
+        <a href="../command/filestrseek2.html">filestrseek2</a>,
+        <a href="../command/findoperations.html">findfirst</a>,
+        <a href="../command/findoperations.html">findnext</a>,
+        <a href="../command/clipb2var.html">clipb2var</a>,
+        <a href="../command/crc32.html">crc32file</a>,
+        <a href="../command/getdate.html">getdate</a>,
+        <a href="../command/gettime.html">gettime</a>,
+        <a href="../command/getver.html">getver</a>,
+        <a href="../command/ifdefined.html">ifdefined</a>,
+        <a href="../command/var2clipb.html">var2clipb</a>,
+        <a href="../command/yesnobox.html">yesnobox</a></td>
+  </tr>
+  <tr>
+    <td>timeout</td>
+    <td>整数</td>
+    <td>0</td>
+    <td><a href="../command/recvln.html">recvln</a>,
+        <a href="../command/wait.html">wait</a>,
+        <a href="../command/waitevent.html">waitevent</a>,
+        <a href="../command/waitln.html">waitln</a>,
+        <a href="../command/waitrecv.html">waitrecv</a>,
+        <a href="../command/waitregex.html">waitregex</a></td>
+  </tr>
+  <tr>
+    <td>mtimeout *2</td>
+    <td>整数</td>
+    <td>0</td>
+    <td><a href="../command/recvln.html">recvln</a>,
+        <a href="../command/wait.html">wait</a>,
+        <a href="../command/waitevent.html">waitevent</a>,
+        <a href="../command/waitn.html">waitn</a>,
+        <a href="../command/waitln.html">waitln</a>,
+        <a href="../command/waitrecv.html">waitrecv</a>,
+        <a href="../command/waitregex.html">waitregex</a></td>
+  </tr>
+</table>
+
+<p>
+*1 MACRO 起動時のコマンドラインパラメータの2 ～ 9番目がシステム変数 param2 ～ param9 の初期値となる。1番目の文字列はマクロファイル名。<A HREF="../commandline.html">"コマンドライン"</A> 参照。<br>
+*2 精度は 50 msec 程度。
+</p>
+
+</BODY>
+</HTML>

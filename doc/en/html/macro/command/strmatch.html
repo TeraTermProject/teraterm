@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strmatch</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strmatch</h1>
+
+<p>
+Matches the target string with the regular expression.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strmatch &lt;target string&gt; &lt;string with regular expression&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Supports <a href="../../reference/RE.txt">Oniguruma Regular Expressions</a>.<br>
+This command searches the &lt;target string&gt; with the &lt;string with regular expression&gt;.<br>
+
+The "strmatch" command returns one of the following values in the system variable "result":
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Meaning</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Not matched.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Matched offset(1origin).</td>
+ </tr>
+</table>
+
+<p>
+The first matched pattern is stored in the system variable "matchstr".<br>
+Group matched patterns of regular expressions are stored in 9 system variables from "groupmatchstr1" to "groupmatchstr9".
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strmatch 'Tera Term' '(UTF-[789]).*'
+int2str s result
+messagebox s 'result'
+messagebox matchstr 'matchstr'
+messagebox groupmatchstr1 'groupmatchstr1'
+messagebox groupmatchstr2 'groupmatchstr2'
+messagebox groupmatchstr3 'groupmatchstr3'
+messagebox groupmatchstr4 'groupmatchstr4'
+</pre>
+
+</body>
+</html>

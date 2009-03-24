@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>TTSSH known_hosts ファイル</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>TTSSH known_hosts ファイル</h1>
+
+<p>
+known_hostsファイルの書式は以下のとおりです。
+</p>
+
+<pre>
+  書式:
+    ホスト名  キー種別  ホスト公開鍵
+    
+    #  コメント
+    !  否定
+
+   例:
+    192.168.1.2 ssh-rsa AAAAB3NzaC1...nXIDE=
+    192.168.1.2 ssh-dss AAAAB3NzaC1...nXIDE=
+    192.168.1.2 1024 35 13032138...794461 
+    #192.168.1.3 ssh-rsa AAAAB3NzaC1...nXIDE=
+    192.168.1.2 1024 35 13032138...794461 
+    *.example.com,!mail.example.com ssh-rsa AAAAB3NzaC1...nXIDE=
+</pre>
+
+</BODY>
+</HTML>

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>rotateleft</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>rotateleft</h1>
+
+<p>
+Rotates (circular shifts) to left.
+</p>
+
+<pre class="macro-syntax">
+rotateleft &lt;intvar&gt; &lt;intval&gt; &lt;count&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Rotates (circular shifts) &lt;intval&gt; &lt;count&gt; digits to left, and returns it in the integer variable &lt;intvar&gt;.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+rotateleft b $80000000 4
+sprintf '0x%08x' b
+messagebox inputstr '0x00000008'
+</pre>
+
+</body>
+</html>

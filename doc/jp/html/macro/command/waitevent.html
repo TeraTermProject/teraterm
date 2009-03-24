@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>waitevent</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>waitevent</h1>
+
+<p>
+イベントを待つ。
+</p>
+
+<pre class="macro-syntax">
+waitevent &lt;events&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;events&gt; で指定されるイベントが発生するまで MACRO を停止させる。&lt;events&gt; は以下のイベント識別子の組み合わせ。
+</p>
+
+<table>
+ <tr>
+  <th>イベント</th>
+  <th>イベント識別子</th>
+ </tr>
+ <tr>
+  <td>timeout</td>
+  <td>1</td>
+ </tr>
+ <tr>
+  <td>unlink</td>
+  <td>2</td>
+ </tr>
+ <tr>
+  <td>disconnection</td>
+  <td>4</td>
+ </tr>
+ <tr>
+  <td>connection</td>
+  <td>8</td>
+ </tr>
+</table>
+
+<p>
+システム変数 timeout か mtimeout が 0 より大きい場合、&lt;timeout&gt;.&lt;mtimeout&gt; 秒の時間がすぎると(タイムアウト)イベントが発生する。タイムアウトの値が 0 以下の場合は、タイムアウトは発生しない。
+</p>
+
+<p>
+unlink イベントは Tera Term が閉じられたときに発生する。
+</p>
+
+<p>
+disconnection (または connection) イベントは、Tera Term とホストの間の通信が閉じられた(開かれた)時に発生する。
+</p>
+
+<p>
+これらのコマンドは実際に発生したイベントの識別子をシステム変数 result に格納する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; disconnection イベントを待つ
+waitevent 4
+; unlink または connection イベントを待つ
+waitevent 2 or 8
+; unlink イベント発生
+if result=2 goto label1
+; connection イベント発生
+if result=8 goto label2
+</pre>
+
+</body>
+</html>

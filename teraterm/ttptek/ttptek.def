@@ -1,0 +1,22 @@
+EXPORTS
+  TEKInit @1
+  TEKResizeWindow @2
+  TEKChangeCaret @3
+  TEKDestroyCaret @4
+  TEKParse @5
+  TEKReportGIN @6
+  TEKPaint @7
+  TEKWMLButtonDown @8
+  TEKWMLButtonUp @9
+  TEKWMMouseMove @10
+  TEKWMSize @11
+  TEKCMCopy @12
+  TEKCMCopyScreen @13
+
+  TEKPrint @14
+  TEKClearScreen @15
+  TEKSetupFont @16
+  TEKResetWin @17
+  TEKRestoreSetup @18
+  TEKEnd @19
+

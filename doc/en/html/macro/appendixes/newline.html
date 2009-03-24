@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>About new-line characters</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>About new-line characters</h1>
+
+<p>
+New-line characters (CR or CR+LF) received from the host are converted to CR+LF pairs by Tera Term, and then Tera Term sends them to MACRO.<br>
+You should use the pair (CR+LF) as a new-line character to send to Tera Term.<br>
+ASCII code 13 (decimal) is for CR, and 10 is for LF.
+</p>
+
+<p>Example:</p>
+<table>
+  <tr>
+    <td><code class="syntax">send 'abc'#13#10</code></td>
+    <td>Same as the statement "<code>sendln 'abc'</code>". The actual new-line character to be sent to the host is determined by Tera Term.</td>
+  </tr>
+
+  <tr>
+    <td><code class="syntax">wait #10'abc' 'def'#13</code></td>
+    <td>Waits for a line beginning with "abc" or a line ending with "def".</td>
+  </tr>
+
+  <tr>
+    <td><code class="syntax">logwrite 'abc'#13#10</code></td>
+    <td>Writes line "abc" to the log file.</td>
+  </tr>
+</table>
+</body>
+</html>

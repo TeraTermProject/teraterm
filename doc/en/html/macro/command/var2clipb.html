@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>var2clipb</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>var2clipb</h1>
+
+<p>
+Copys the text data to clipboard.
+</p>
+
+<pre class="macro-syntax">
+var2clipb &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Copys &lt;string&gt; to clipboard.<br>
+The "var2clipb" command returns one of the following values in the system variable "result":
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Meaning</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Could not open the clipboard.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Copying to clipboard is successful.</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+var2clipb 'Tera Term 4.46'
+clipb2var data
+messagebox data 'clipboard data'
+</pre>
+
+</body>
+</html>

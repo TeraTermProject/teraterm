@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Miscellaneous (Tera Term setup file)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="beep">Beep sound on connection</a></h1>
+
+<p>
+To enable a beep sound which is made when a TCP/IP connection is established and when the connection is terminated, edit the BeepOnConnect line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+BeepOnConnect=on
+</pre>
+
+<pre>
+Default:
+BeepOnConnect=off
+</pre>
+
+
+<h1><a name="macro">Executing a macro on startup</a></h1>
+
+<p>
+A macro can be executed automatically when Tera Term is started. You can specify the macro filename by using the command line option "
+/M=&lt;macro file&gt;" or by editing the StartupMacro line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+StartupMacro=&lt;macro file&gt;
+</pre>
+
+<pre>
+Default:
+StartupMacro=
+</pre>
+
+
+<h1><a name="UILang">User interafece language file</a></h1>
+
+<p>
+To switch the display language, specify user interface language file that includes message.
+</p>
+
+<pre>
+UILanguageFile=lang\Japanese.lng
+</pre>
+
+<pre>
+Default:
+UILanguageFile=
+</pre>
+
+
+<h1><a name="broadcast">Number for the history of broadcast command</a></h1>
+
+<p>
+If you configure the number for the history of broadcast command, you need to setup MaxBroadcatHistory entry in the 'teraterm.ini' file. See example of this value below.
+</p>
+
+<pre>
+MaxBroadcatHistory=200
+</pre>
+
+<pre>
+Default:
+MaxBroadcatHistory=99
+</pre>
+
+
+<h1><a name="mousewheel">Mouse wheel action in application cursor mode</a></h1>
+
+<p>
+Basically, Tera Term window scrolls up and scrolls down when a user rotates the mouse wheel. However, Tera Term would send key sequences of up and down cursor when the application cursor mode is enabled by starting vi or less command.
+</p>
+
+<p>
+To disable this feature, edit the TranslateWheelToCursor line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TranslateWheelToCursor=off
+</pre>
+
+<p>
+If a user wants to disable this feature while pushing the control key, edit the DisableWheelToCursorByCtrl line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+DisableWheelToCursorByCtrl=on
+</pre>
+
+<pre>
+Default:
+TranslateWheelToCursor=on
+DisableWheelToCursorByCtrl=on
+</pre>
+
+
+<h1><a name="hostdlg">Showing "New Connection" dialog on startup</a></h1>
+
+<p>
+Tera Term shows "New Connection" dialog on startup.<br>
+If you do not want to show this dialog, please change HostDialogOnStartup entry of [Tera Term] section as follows.
+</p>
+
+<pre>
+HostDialogOnStartup=off
+</pre>
+
+<pre>
+Default:
+HostDialogOnStartup=on
+</pre>
+
+
+<h1><a name="DisablePasteMouseMButton">Enable paste by clicking the middle button of mouse</a></h1>
+
+<p>
+In order to enable paste by clicking the middle button of mouse, change the DisablePasteMouseMButton line at [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+DisablePasteMouseMButton=off
+</pre>
+
+<pre>
+Default:
+DisablePasteMouseMButton=on
+</pre>
+
+
+</BODY>
+</HTML>

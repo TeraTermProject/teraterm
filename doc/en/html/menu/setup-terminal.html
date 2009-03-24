@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Terminal ([Setup] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Terminal ([Setup] menu)</h1>
+
+    <h2>"Terminal setup" dialog box</h2>
+    <dl>
+      <dt>Terminal size</dt>
+      <dd>
+	The logical size of the terminal (numbers of columns and lines).
+	Note that the window size (real screen size) is not necessarily
+	equal to the terminal size.
+      </dd>
+
+      <dt>Term size = win size</dt>
+      <dd>
+	Forces the terminal size to be always equal to the window size.
+      </dd>
+
+      <dt>Auto window resize</dt>
+      <dd>
+	When the terminal size is changed, resizes the window to the
+	terminal size.
+      </dd>
+
+      <dt>New-line (receive)</dt>
+      <dd>
+	If the CR+LF option is selected, received CR ($0D) characters are
+	converted to CR+LF ($0D $0A) pairs.
+      </dd>
+
+      <dt>New-line (transmit)</dt>
+      <dd>
+	If the CR+LF option is selected, CR ($0D) characters to be sent are
+	converted to CR+LF ($0D $0A) pairs before they are actually sent.
+      </dd>
+
+      <dt>Terminal ID</dt>
+      <dd>
+	Terminal ID to be reported to the host when the host requests it.
+	Note that the terminal ID is not identical to the telnet terminal
+	type. To change the telnet terminal type, use the
+	<a href="setup-tcpip.html">[Setup] TCP/IP</a> command.
+      </dd>
+
+      <dt>Local echo</dt>
+      <dd>
+	Enables local echoing of characters sent.
+      </dd>
+
+      <dt>Answerback</dt>
+      <dd>
+	The string to be answered back to the host, when the ENQ ($05)
+	character is received. Each non-printable character in the string
+	can be expressed as a "$" and ASCII code in two-character hex number.
+	For example, the string "ABC&lt;CR&gt;&lt;LF&gt;" is expressed as
+	the following:
+	<p class="indent1">
+	  ABC$0D$0A
+	</p>
+      </dd>
+
+      <dt>Auto switch (VT&lt;-&gt;TEK)</dt>
+      <dd>
+	Enables auto switching between VT and TEK emulations.
+      </dd>
+    </dl>
+    <p>
+      <a href="setup-terminalr.html">Help for Russian mode</a>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,120 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "file_res.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// ì˙ñ{åÍ resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "file_res.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    """\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // ì˙ñ{åÍ resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// âpåÍ (ïƒçë) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_GETFNDLG DIALOGEX 20, 20, 150, 59
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tera Term: Kermit Get"
+FONT 10, "System", 0, 0, 0x0
+BEGIN
+    RTEXT           "&Filename:",IDC_FILENAME,12,13,47,10
+    EDITTEXT        IDC_GETFN,62,11,72,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,12,36,34,14
+    PUSHBUTTON      "Cancel",IDCANCEL,54,36,40,14
+    PUSHBUTTON      "&Help",IDC_GETFNHELP,101,36,34,14
+END
+
+IDD_XOPT DIALOGEX 0, 0, 300, 30
+STYLE DS_SETFONT | DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Option",IDC_XOPT,5,2,290,25
+    CONTROL         "Check&sum",IDC_XOPTCHECK,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,10,70,16
+    CONTROL         "&CRC",IDC_XOPTCRC,"Button",BS_AUTORADIOBUTTON,80,10,50,16
+    CONTROL         "1&K",IDC_XOPT1K,"Button",BS_AUTORADIOBUTTON,130,10,50,16
+    CONTROL         "&Binary",IDC_XOPTBIN,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,180,10,60,16
+END
+
+IDD_FOPT DIALOGEX 0, 0, 300, 46
+STYLE DS_SETFONT | DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Option",IDC_FOPT,5,2,290,40
+    CONTROL         "&Binary",IDC_FOPTBIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,10,60,16
+    CONTROL         "&Append",IDC_FOPTAPPEND,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,90,10,60,16
+    CONTROL         "&Plain text",IDC_PLAINTEXT,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,170,10,80,16
+    CONTROL         "&Timestamp",IDC_TIMESTAMP,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,24,80,16
+    CONTROL         "Hide &dialog",IDC_HIDEDIALOG,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,90,24,113,16
+END
+
+#endif    // âpåÍ (ïƒçë) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

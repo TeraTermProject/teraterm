@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>scprecv</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>scprecv</h1>
+
+<p>
+Receives a file from the remote host with the SCP protocol.
+</p>
+
+<pre class="macro-syntax">
+scprecv &lt;remote filename&gt; [&lt;local filename&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to receive the remote file &lt;remote filename&gt; to the host with the SCP(Secure Copy Protocol) protocol. 
+If the local file &lt;local filename&gt; is omitted, the file &lt;remote filename&gt; would be copied in the current directory of the local host.
+Tera Term does not pause until the end of the file transfer.<br>
+
+Also, the 2GB over file does not work.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+connect '192.168.3.2:22 /ssh /2 /auth=password /user=hoge /passwd=fuga'
+wait '$'
+scprecv 'usr/bin/ls.exe'
+scprecv 'sample.bin' 'd:\hoge.bin'
+</pre>
+
+</body>
+</html>

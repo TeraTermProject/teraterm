@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>setdlgpos</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setdlgpos</h1>
+
+<p>
+ダイアログボックスの位置を設定する。
+</p>
+
+<pre class="macro-syntax">
+setdlgpos &lt;x&gt; &lt;y&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+<a href="inputbox.html">"inputbox"</a>, <a href="messagebox.html">"messagebox"</a>, <a href="passwordbox.html">"passwordbox"</a>, <a href="statusbox.html">"statusbox"</a> コマンドで表示されるダイアログボックスの初期位置を変更する。<br>
+また、ステータスダイアログボックスが表示されている場合、setdlgpos コマンドはそのダイアログボックスを移動させる。<br>
+&lt;x&gt; と &lt;y&gt; は画面の座標 (x,y) を表わす。原点 (0,0) は画面の左上の隅の位置。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 左上の隅にダイアログボックス
+setdlgpos 0 0
+messagebox 'Message' 'Title'
+
+; ステータスダイアログボックスを開く
+setdlgpos 0 200
+statusbox 'Message' 'Title'
+
+; ステータスダイアログボックスを移動
+for i 0 200
+  setdlgpos i 200
+next
+</pre>
+
+</body>
+</html>

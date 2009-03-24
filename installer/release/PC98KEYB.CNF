@@ -1,0 +1,186 @@
+; Sample of KEYBOARD.CNF for the NEC PC-9801 keyboard (Windows 3.1/95).
+; See KEYCODE.TXT for the description of the format.
+;
+[VT editor keypad]
+;Up arrow key
+Up=58
+;Down arrow key
+Down=61
+;Right arrow key
+Right=60
+;Left arrow key
+Left=59
+;Ctrl + Shift + INS key
+Find=1592
+;INS key
+Insert=56
+;DEL key
+Remove=57
+;Ctrl + Shift + ROLL UP key
+Select=1590
+;ROLL UP key
+Prev=54
+;ROLL DOWN key
+Next=55
+
+[VT numeric keypad]
+;Num pad 0 key
+Num0=78
+;Num pad 1 key
+Num1=74
+;Num pad 2 key
+Num2=75
+;Num pad 3 key
+Num3=76
+;Num pad 4 key
+Num4=70
+;Num pad 5 key
+Num5=71
+;Num pad 6 key
+Num6=72
+;Num pad 7 key
+Num7=66
+;Num pad 8 key
+Num8=67
+;Num pad 9 key
+Num9=68
+;Num pad '*'key
+NumMinus=69
+;Num pad '+'key
+NumComma=73
+;Num pad '.' key
+NumPeriod=80
+;Num pad '=' key
+NumEnter=77
+;HOME CLR key
+PF1=62
+;HELP key
+PF2=63
+;Num pad '-'key
+PF3=64
+;Num pad '/'key
+PF4=65
+
+[VT function keys]
+Hold=off
+Print=off
+Break=off
+;F6 key
+F6=103
+;F7 key
+F7=104
+;F8 key
+F8=105
+;F9 key
+F9=106
+;F10 key
+F10=107
+;Shift + F1 key
+F11=610
+;Shift + F2 key
+F12=611
+;Shift + F3 key
+F13=612
+;Shift + F4 key
+F14=613
+;Shift + F5 key
+Help=614
+;Shift + F6 key
+Do=615
+;Shift + F7 key
+F17=616
+;Shift + F8 key
+F18=617
+;Shift + F9 key
+F19=618
+;Shift + F10 key
+F20=619
+;Ctrl + F6 key
+UDK6=1127
+;Ctrl + F7 key
+UDK7=1128
+;Ctrl + F8 key
+UDK8=1129
+;Ctrl + F9 key
+UDK9=1130
+;Ctrl + F10 key
+UDK10=1131
+;Ctrl + Shift + F1 key
+UDK11=1634
+;Ctrl + Shift + F2 key
+UDK12=1635
+;Ctrl + Shift + F3 key
+UDK13=1636
+;Ctrl + Shift + F4 key
+UDK14=1637
+;Ctrl + Shift + F5 key
+UDK15=1638
+;Ctrl + Shift + F6 key
+UDK16=1639
+;Ctrl + Shift + F7 key
+UDK17=1640
+;Ctrl + Shift + F8 key
+UDK18=1641
+;Ctrl + Shift + F9 key
+UDK19=1642
+;Ctrl + Shift + F10 key
+UDK20=1643
+
+[X function keys]
+; F1 key
+XF1=98
+; F2 key
+XF2=99
+; F3 key
+XF3=100
+; F4 key
+XF4=101
+; F5 key
+XF5=102
+
+[Shortcut keys]
+;Ctrl + INS
+EditCopy=1080
+;Shift + INS
+EditPaste=568
+EditPasteCR=off
+EditCLS=off
+EditCLB=off
+ControlOpenTEK=off
+ControlCloseTEK=off
+; Ctrl + up-arrow
+LineUp=1082
+; Ctrl + down-arrow
+LineDown=1085
+; Ctrl + ROLL-DOWN
+PageUp=1079
+; Ctrl + ROLL-UP
+PageDown=1078
+; Ctrl + HOME-CLR
+BuffTop=1086
+; Ctrl + HELP
+BuffBottom=1087
+; Ctrl + Tab
+NextWin=1039
+; Ctrl + Shift + Tab
+PrevWin=1551
+LocalEcho=off
+ScrollLock=off
+
+;Example of user key definitions.
+;[User keys]
+;	Ctrl + F1 key: character string
+;User1=1122,0,telnet myhost
+;
+;	Ctrl + F2 key: control characters
+;User2=1123,0,$0D$0A
+;
+;	Ctrl + F3 key: CR character with new-line code conversion (CR -> CR/CR+LF)
+;User3=1124,1,$0D
+;
+;	Ctrl + F4 key: Executing a macro file
+;User4=1125,2,test.ttl
+;
+;	Ctrl + F5 key: Executing a menu command
+;User5=1126,3,50110
+[User keys]

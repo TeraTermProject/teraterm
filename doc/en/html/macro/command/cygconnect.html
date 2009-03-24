@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>cygconnect</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>cygconnect</h1>
+
+<p>
+Connects to Cygwin.
+</p>
+
+<pre class="macro-syntax">
+cygconnect [&lt;command line parameters&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+If MACRO is not linked to Tera Term, this command runs Tera Term that is connected to cygwin, and links it to MACRO.
+&lt;command line parameters&gt; is passed to CygTerm. See "<a href="../../commandline/cygterm.html">CygTerm command line</a>" for the format of &lt;command line parameters&gt;.
+</p>
+
+<p>
+If MACRO has already been linked to Tera Term and Tera Term is not connected to the host, this command close Tera Term and runs new Tera Term that is connected to cygwin, and links it to MACRO.
+</p>
+
+<p>
+If MACRO has already been linked to Tera Term and Tera Term has already been connected to the host, this command is ignored.
+</p>
+
+<p>
+As a result of this command, the system variable "result" is set to one of the following values depending on the link and connection status:
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Status</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Link to Tera Term has not been made.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Connection to the host has not been made, but link to Tera Term has been made.</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>Both connection and link have been made.</td>
+ </tr>
+</table>
+
+<p>
+To test the current link and connect status before executing the "cygconnect" command, use the "<a href="testlink.html">testlink</a>" command.
+</p>
+
+<p>
+Communication commands except "<a href="connect.html">connect</a>", "cygconnect" and "<a href="testlink.html">testlink</a>" can not be executed before the link is established.
+</p>
+
+<h2>Examples</h2>
+
+<pre class="macro-example">
+; connects to cygwin.
+cygconnect
+
+; change directory to C:\ and runs Tera Term that is connected to cygwin.
+cygconnect '-d C:\ -nocd -nols'
+</pre>
+
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="connect.html">connect</a>"</li>
+ <li>"<a href="closett.html">closett</a>"</li>
+ <li>"<a href="disconnect.html">disconnect</a>"</li>
+ <li>"<a href="testlink.html">testlink</a>"</li>
+ <li>"<a href="unlink.html">unlink</a>"</li>
+ <li><a href="http://www.cygwin.com/">Cygwin Information and Installation</a></li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>call</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>call</h1>
+
+<p>
+サブルーチンをコールする。
+</p>
+
+<pre class="macro-syntax">
+call &lt;label&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;label&gt; 行から始まるサブルーチンをコールする。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+messagebox "I'm in main." "test"
+; ":sub" へ飛ぶ。
+<strong>call sub</strong>
+messagebox "Now I'm in main" "test"
+end
+
+; サブルーチンの始まり。
+:sub
+messagebox "Now I'm in sub" "test"
+; メインルーチンへもどる。
+return
+</pre>
+
+</body>
+</html>

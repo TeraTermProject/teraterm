@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>break</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>break</h1>
+
+<p>
+ループから抜ける。
+</p>
+
+<pre class="macro-syntax">
+break
+</pre>
+
+<h2>解説</h2>
+
+<p>
+"for" や "while" のループから抜ける。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+for i 1 10
+  yesnobox 'ループから抜けますか?' 'Tera Term'
+  if result <strong>break</strong>
+next
+
+while 1
+  recvln
+  strcompare inputstr "OK"
+  if result=0 then
+    <strong>break</strong>
+  else
+    sendln "abc..."
+  endif
+endwhile
+</pre>
+
+</body>
+</html>

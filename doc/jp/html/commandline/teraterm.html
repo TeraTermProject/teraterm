@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Tera Term Pro コマンドライン</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+
+<h1>Tera Term Pro コマンドライン</h1>
+
+<p>
+Tera Term Pro を起動するときのコマンドライン(ショートカットのリンク先)の形式
+</p>
+
+<pre class="syntax">
+TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] ]
+         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E]
+         [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
+         [/H] [/I] [/K=&lt;keyboard setup file&gt;]
+         [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
+         [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;]
+         [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/T=&lt;telnet flag&gt;]
+         [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
+         [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
+         [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
+         [;&lt;comment&gt;]
+</pre>
+
+
+<h2 id="options">オプション</h2>
+
+<dl>
+  <dt id="host">&lt;host&gt;</dt>
+  <dd>ホスト名または IP アドレス</dd>
+
+  <dt>&lt;host&gt;:&lt;TCP port#&gt;</dt>
+  <dd>TCP ポート番号つき &lt;host&gt;<br>
+      &lt;host&gt; と &lt;TCP port#&gt; の間に":"が置かれる。</dd>
+
+  <dt>&lt;host&gt; &lt;TCP port#&gt;</dt>
+  <dd>TCP ポート番号つき &lt;host&gt;<br>
+      &lt;host&gt; と &lt;TCP port#&gt; の間に1個以上の空白文字が置かれる。<br>
+      &lt;host&gt; のすぐ後にくる数字は TCP ポート番号とみなされる。</dd>
+
+  <dt>telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/]</dt>
+  <dd>URL形式 - telnetハンドラ用<br>
+      TCP ポート番号および末尾の / は省略可能。<br>
+      TCP ポート番号が省略された場合は23となる。(設定ファイルのTCPPortの値は無視される)
+  </dd>
+
+  <dt id="b">/B</dt>
+  <dd>Telnet バイナリオプション</dd>
+
+  <dt id="baud">/BAUD=&lt;baud rate&gt;</dt>
+  <dd>
+    シリアルポートのボーレートを指定します。
+    Tera Termが対応していないボーレートが指定された場合、
+    このオプション自体が無視されます。
+  </dd>
+
+  <dt id="c">/C=&lt;serial port#&gt;</dt>
+  <dd>シリアルポート
+      <ul>
+        <li><span class="syntax">/C=1</span> COM1</li>
+        <li><span class="syntax">/C=2</span> COM2</li>
+        <li><span class="syntax">/C=3</span> COM3</li>
+        <li>:</li>
+        <li><span class="syntax">/C=256</span> COM256</li>
+      </ul></dd>
+
+  <dt id="duplicate">/DUPLICATE</dt>
+  <dd>使用禁止（セッションの複製で内部で使われる）</dd>
+
+  <dt id="ds">/DS</dt>
+  <dd>起動時に "New connection" ダイアログを表示しない</dd>
+
+  <dt id="e">/E</dt>
+  <dd>TCPLocalEcho/TCPCRSend の設定を無効にする</dd>
+
+  <dt id="f">/F=&lt;setup file&gt;</dt>
+  <dd>設定ファイル<br>
+      <span class="syntax">/F=TERATERM.INI</span> (省略時)<br>
+      ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
+
+  <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
+  <dd>ファイル転送用ディレクトリ</dd>
+
+  <dt id="h">/H</dt>
+  <dd>タイトルバーを隠す</dd>
+
+  <dt id="i">/I</dt>
+  <dd>起動時にアイコン状態にする</dd>
+
+  <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
+  <dd>キーボード設定ファイル<br>
+      <span class="syntax">/K=KEYBOARD.CNF</span> (省略時)<br>
+      ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
+
+  <dt id="kr">/KR=&lt;kanji code (receive)&gt;</dt>
+  <dd>漢字コード (受信)
+      <ul>
+        <li><span class="syntax">/KR=SJIS</span></li>
+        <li><span class="syntax">/KR=EUC</span></li>
+        <li><span class="syntax">/KR=JIS</span></li>
+        <li><span class="syntax">/KR=UTF8</span> UTF-8(正規化形式 C: Windows, Linux)</li>
+        <li><span class="syntax">/KR=UTF8m</span> UTF-8(正規化形式 D: Mac OS X)</li>
+      </ul></dd>
+
+  <dt id="kt">/KT=&lt;kanji code (transmit)&gt;</dt>
+  <dd>漢字コード (送信)
+      <ul>
+        <li><span class="syntax">/KR=SJIS</span></li>
+        <li><span class="syntax">/KR=EUC</span></li>
+        <li><span class="syntax">/KR=JIS</span></li>
+        <li><span class="syntax">/KR=UTF8</span></li>
+      </ul></dd>
+
+  <dt id="l">/L=&lt;log file&gt;</dt>
+  <dd>起動時にログを開始</dd>
+
+  <dt id="la">/LA=&lt;language&gt;</dt>
+  <dd>言語モード
+      <ul>
+        <li><span class="syntax">/LA=E</span> 英語</li>
+        <li><span class="syntax">/LA=J</span> 日本語</li>
+        <li><span class="syntax">/LA=R</span> ロシア語</li>
+      </ul></dd>
+
+  <dt id="m">/M=&lt;macro file&gt;</dt>
+  <dd>起動時にマクロを実行<br>
+      ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
+
+  <dt id="p">/P=&lt;TCP port#&gt;</dt>
+  <dd>TCP ポート番号</dd>
+
+  <dt id="r">/R=&lt;replay file&gt;</dt>
+  <dd>ファイルを再生</dd>
+
+  <dt id="t">/T=&lt;telnet flag&gt;</dt>
+  <dd><ul>
+        <li><span class="syntax">/T=1</span> Telnet プロトコルを使用</li>
+        <li><span class="syntax">/T=0</span> Telnet プロトコルを不使用</li>
+      </ul></dd>
+
+  <dt id="tekicon">/TEKICON=&lt;icon name&gt;</dt>
+  <dd>TEKウインドウのウインドウアイコンを指定する。icon nameには、設定ファイルの<a href="../setup/teraterm-win.html#WindowIcon">TEKIcon設定</a>と同じ物が使用できる。</dd>
+
+  <dt id="timeout">/TIMEOUT=&lt;connecting timeout value&gt;</dt>
+  <dd>接続中の処理をキャンセルするまでの時間（秒単位）</dd>
+
+  <dt id="v">/V</dt>
+  <dd>ウィンドウが見えない状態で起動</dd>
+
+  <dt id="vticon">/VTICON=&lt;icon name&gt;</dt>
+  <dd>VTウインドウのウインドウアイコンを指定する。icon nameには、設定ファイルの<a href="../setup/teraterm-win.html#WindowIcon">VTIcon設定</a>と同じ物が使用できる。</dd>
+
+  <dt id="w">/W="&lt;window title&gt;"</dt>
+  <dd>ウィンドウのタイトル</dd>
+
+  <dt id="x">/X=&lt;window position (x)&gt;</dt>
+  <dd>ウィンドウの位置(水平)</dd>
+
+  <dt id="y">/Y=&lt;window position (y)&gt;</dt>
+  <dd>ウィンドウの位置(垂直)</dd>
+
+  <dt id="comment">;&lt;comment&gt;</dt>
+  <dd>コメント。コマンドラインの最後に置く必要がある。</dd>
+</dl>
+
+
+<h2 id="example">例</h2>
+
+<pre>
+TTERMPRO
+TTERMPRO myhost.mydomain
+TTERMPRO myhost.mydomain:23
+TTERMPRO myhost.mydomain 23
+TTERMPRO 111.111.11.11
+TTERMPRO myhost.mydomain /T=0 /P=7
+TTERMPRO /C=1
+TTERMPRO /F=TELNET.INI
+TTERMPRO foohost.foodomain /F=FOOHOST.INI
+TTERMPRO /C=2 /BAUD=9600 /F=MYSETUP.INI
+TTERMPRO /K=MYKEY.CNF /W="My host"
+TTERMPRO /R=README.TXT ; replay a file
+TTERMPRO myhost /B /X=100 /Y=50
+</pre>
+
+
+<h2 id="default">省略時の値</h2>
+
+<p>
+以下の省略時の値は Tera Term 設定ファイルに保存されています。
+</p>
+
+<pre>
+&lt;TCP port#&gt;
+/B
+&lt;baud rate&gt;
+&lt;serial port#&gt;
+&lt;file transfer directory&gt;
+/H
+&lt;kanji code (receive)&gt;
+&lt;kanji code (transmit)&gt;
+&lt;language&gt;
+&lt;macro file&gt;
+&lt;telnet flag&gt;
+&lt;icon name&gt;
+&lt;window title&gt;
+&lt;window pos (x)&gt;
+&lt;window pos (y)&gt;
+</pre>
+
+
+<h2 id="notes">注</h2>
+
+<p>
+&lt;telnet flag&gt; が 1 で、かつ &lt;TCP port#&gt; が 23 のときだけ、Tera Term から自発的に telnet の option negotiation を開始します。それ以外の場合でも Tera Term はホストから送られてきた telnet コマンドに応答することができます。
+</p>
+
+
+<h2 id="refs">参照</h2>
+
+<p>
+<a href="../usage/tips/not_port23.html">Telnet 用ポート番号 / 非 telnet 接続用の端末設定</a>
+</p>
+
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Log and replay functions</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Log and replay functions</h1>
+
+<p>
+You can save the host data to the file if you use Tera Term logging function.
+</p>
+
+<h2>Log to the file</h2>
+
+<p>
+You can log characters received from the host. Execute the [File] Log command to start logging.
+</p>
+
+<p>
+Do in the following commands:
+</p>
+
+<ol>
+  <li>Do <A HREF="../../menu/file.html">[File] Log</A> command.</li>
+  <li>"Tera Term: Log" dialog box will be shown.
+<p>
+Input the saving file name to `File Name:'.<br>
+All host data will be written to the file if you check `Binary' option.<br>
+KANJI, CR and LF codes are converted to host character code, written to the file if you uncheck `Binary' option. However, the escape sequences are not written to the file. <br>
+The host data will append the file if you check `Append' option.<br>
+The host data will overwrite the file if you uncheck `Append' option.<br>
+</p></li>
+  <li>Push OK button, "Tera Term: Log" icon will be shown. And logging will start. </li>
+  <li>Push Close or Pause button on the logging dialog box if you finish the logging or temporarily stop. Pause button will change into Start button if you push Pause button, the logging will restart.</li>
+</ol>
+
+<p>
+To browse log files, which contain escape sequences, it is convenient to use the replay function of Tera Term. To replay a log file.
+</p>
+
+<h2>Replay the log file</h2>
+
+<p>
+Run Tera Term with command line in the following:
+</p>
+
+<pre>
+TTERMPRO /R=&lt;log file name&gt;
+</pre>
+
+<p>
+Tera Term analyzes the specified log file and understands the escape sequence datas.
+If so, the contents of log file will be displayed in Tera Term window as if the characters were received from the host.
+We call this function 'replay log'.
+</p>
+
+<p>
+And also,
+you can also use 'Host:' on the <A HREF="../../menu/file.html">[File] New connection</A> command.
+
+</p>
+
+<pre>
+/R=&lt;log file name&gt;
+</pre>
+
+</BODY>
+</HTML>

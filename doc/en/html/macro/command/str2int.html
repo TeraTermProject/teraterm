@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>str2int</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>str2int</h1>
+
+<p>
+Converts a string to integer value.
+</p>
+
+<pre class="macro-syntax">
+str2int &lt;intvar&gt; &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Converts the &lt;string&gt; to its numeric value. The value is returned in the integer variable &lt;intvar&gt;.<br>
+You can specify the &lt;string&gt as a format of decimal and hexadecimal number.
+</p>
+
+<pre>
+A decimal number     - 123, 0009
+A hexadecimal number - 0x7b, $7b
+</pre>
+
+<p>
+If the string is converted successfully, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+str2int val '123'
+; val=123, result=1
+
+str2int val '123abc'
+; val=123, result=1
+
+str2int val '0009'
+; val=9,   result=1
+
+str2int val 'abc'
+; val=0,   result=0
+
+hexnum='0x456FE3'
+str2int val hexnum
+sprintf '%d %x' val val
+messagebox inputstr 'test'
+; val=4550627, result=1
+</pre>
+
+</body>
+</html>

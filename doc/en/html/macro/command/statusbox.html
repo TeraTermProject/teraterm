@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>statusbox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>statusbox</h1>
+
+<p>
+Displays the status dialog box.
+</p>
+
+<pre class="macro-syntax">
+statusbox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Displays the status dialog box if it has not been displayed yet.<br>
+Changes the message to &lt;message&gt; and title to &lt;title&gt;.
+</p>
+
+<p>
+The "<a href="setdlgpos.html">setdlgpos</a>" command changes the position of status dialog box.<br>
+The "<a href="closebox.html">closesbox</a>" command closes the status dialog box.
+</p>
+
+<p>
+If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+If &lt;special&gt; is not specified then 1 is used.
+</p>
+
+<table>
+ <tr>
+  <th>input</th>
+  <th>output</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>line feed</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>tab</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Set the initial position.
+setdlgpos 200 200
+; Display the status dialog box.
+statusbox 'Message' 'Title'
+pause 3
+; Move the dialog box.
+setdlgpos 0 0
+pause 3
+; Move the dialog box.
+closesbox
+</pre>
+
+
+<pre class="macro-example">
+; infinite loop while displying the counter
+step = 0
+while 1
+  call show_step
+  sendln 'echo do something'
+  wait '$'
+  pause 2
+endwhile
+exit
+
+:show_step
+step = step + 1
+int2str s step
+statusbox s 'counter'
+return
+</pre>
+
+</body>
+</html>

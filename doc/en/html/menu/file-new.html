@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>New connection ([File] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>New connection ([File] menu)</h1>
+    <p>
+      Connects to a new host or a serial port.
+      If the connection is already open, opens a new Tera Term window.
+    </p>
+
+    <h2>"New connection" dialog box</h2>
+
+    <h3>TCP/IP</h3>
+    <dl>
+      <dt>Host</dt>
+      <dd>
+	Enter the host name or IP address, or select one from the host list.
+	To edit the host list, use the
+	<a href="setup-tcpip.html">[Setup] TCP/IP</a> command.
+	You can enter not only the host name or address, but also the
+	<a href="../commandline/teraterm.html">command line parameters</a>
+	like the following:
+
+    <pre>
+    myhost.mydomain                     Host name only.
+    myhost.mydomain:23                  Host name with a port number.
+    foohost.foodomain /F=FOOHOST.INI    Host name &amp; setup file name.
+    /C=1                                Specifies the serial port connection.
+    /R=LOG.DAT                          Replays the log file.
+    </pre>
+      </dd>
+
+      <dt>Telnet</dt>
+      <dd>
+	Enables the telnet protocol. Usually, you should select this
+	option.
+      </dd>
+
+      <dt>TCP port#</dt>
+      <dd>
+	Normally, you should use the TCP port number 23 for the telnet
+	protocol.
+      </dd>
+    </dl>
+
+    <p class="indent1">
+      Note:<br>
+      Only if &lt;telnet flag&gt; is on and &lt;TCP port#&gt; is 23,
+      Tera Term starts spontaneously sending telnet commands to the host
+      for the option negotiation when the TCP/IP connection is established.
+      In any cases, Tera Term can respond to telnet commands sent by the host.
+    </p>
+
+    <p class="indent1">
+      See also:<br>
+      <a href="../usage/tips/not_port23.html">Telnet port number / Terminal setup for non-telnet connection</a>
+    </p>
+
+    <h3>Serial</h3>
+    <dl>
+      <dt>Port</dt>
+      <dd>
+	Select a port from the list.
+      </dd>
+    </dl>
+  </body>
+</html>

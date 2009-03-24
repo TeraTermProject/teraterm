@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getdate</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getdate</h1>
+
+<p>
+現在の日付を得る。
+</p>
+
+<pre class="macro-syntax">
+getdate &lt;strvar&gt; [&lt;format&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+現在の日付を文字列変数 &lt;strvar&gt; に &lt;format&gt; に従った形式で格納する。書式は <a href="http://msdn2.microsoft.com/ja-jp/library/fe06s4ak(VS.80).aspx">strftime</a> と同じ物が使える。<br>
+formatが省略された場合、格納される形式は"YYYY-MM-DD"となる。(&lt;format&gt; に %Y-%m-%d を指定したのと同じ)<br>
+</p>
+
+<p>
+formatが指定されたgetdateは、同じformatが指定されたgettimeと動作が等しくなる。
+</p>
+
+<p>
+formatが指定された場合、このコマンドの実行結果はシステム変数 result に格納される。
+formatが指定されなかった場合は、変数 result の値は変更されない。
+変数 result の値の意味は以下のとおり。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>値</th>
+      <th>意味</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>
+	正常に値が &lt;strvar&gt; に格納された。
+      </td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td>
+	生成された文字列の長さが上限(255文字)を超えた等の理由で、&lt;strvar&gt; への値の格納が正常に行われなかった。
+      </td>
+    </tr>
+
+    <tr>
+      <td>2</td>
+      <td>
+	&lt;format&gt; の指定が不正である。
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+;現在の日付をdatestrに格納。形式はYYYY-MM-DD。
+getdate datestr
+
+;現在の日時を元にしてログファイル名を生成し、変数logfileに格納。
+;形式はlog-YYYYMMDD-HHMMSS.txt
+getdate logfile "log-%Y%m%d-%H%M%S.txt"
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="gettime.html">gettime</a></li>
+  <li><a href="http://msdn2.microsoft.com/ja-jp/library/fe06s4ak(VS.80).aspx">strftime (MSDNライブラリ)</a></li>
+</ul>
+
+</body>
+</html>

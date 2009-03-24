@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>TTSSH command line</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+
+<h1>TTSSH command line</h1>
+
+<p>
+You can use the following command line parameters on TTSSH.
+</p>
+
+
+<h2>Options</h2>
+
+<dl>
+  <dt id="hostname">&lt;username&gt;@&lt;host&gt;[:&lt;#TCP port&gt;]</dt>
+  <dd>A user can specify the user name in front of atmark.</dd>
+
+  <dt id="host-url">&lt;scheem&gt;://[&lt;username&gt[:&lt;password&gt;]@]&lt;host&gt;[:&lt;TCP port&gt;][/]</dt>
+  <dd>A user can the URL format.<br>
+      A user can specify ssh, ssh1, ssh2, slogin, slogin1 and slogin2 at the &lt;scheem&gt;.<br>
+      If the port number is not specified, 22 is used as the port number and then TCPPort value in teraterm.ini file is ignored.</dd>
+
+  <dt id="f">/f=&lt;file&gt;</dt>
+  <dd>
+    read teraterm.ini(file)<br>
+    If this value is not a full path, it is understood as a relative path from ttssh.dll.
+  </dd>
+
+  <dt id="ssh-f">/ssh-f=&lt;file&gt;</dt>
+  <dd>
+    read teraterm.ini(file)<br>
+    If this value is not a full path, it is understood as a relative path from ttssh.dll.
+  </dd>
+
+  <dt id="ssh-consume">/ssh-consume=&lt;file&gt;</dt>
+  <dd>
+    After teraterm.ini file is read, it is erased.<br>
+    If this value is not a full path, it is understood as a relative path from ttssh.dll.
+  </dd>
+
+  <dt id="t">/t=&lt;value&gt;</dt>
+  <dd><ul>
+        <li><span class="syntax">value=2</span> SSH is enabled</li>
+        <li><span class="syntax">value=excluding 2</span> SSH is disable</li>
+      </ul></dd>
+
+  <dt id="nossh">/nossh</dt>
+  <dd>disable SSH connection</dd>
+
+  <dt id="telnet">/telnet</dt>
+  <dd>disable SSH connection</dd>
+
+  <dt id="1">/1</dt>
+  <dd>connect to server with SSH1 protocol</dd>
+
+  <dt id="ssh1">/ssh1</dt>
+  <dd>connect to server with SSH1 protocol</dd>
+
+  <dt id="2">/2</dt>
+  <dd>connect to server with SSH2 protocol</dd>
+
+  <dt id="ssh2">/ssh2</dt>
+  <dd>connect to server with SSH2 protocol</dd>
+
+  <dt id="ssh-autologin">/ssh-autologin</dt>
+  <dd>try to autologin with empty password</dd>
+
+  <dt id="ssh-autologon">/ssh-autologon</dt>
+  <dd>try to autologin with empty password</dd>
+
+  <dt id="auth">/auth=&lt;mode&gt;</dt>
+  <dd>try to autologin with the authentication method that is sepcified by &lt;mode&gt;.
+      <ul>
+        <li><span class="syntax">password</span> Password Authentication</li>
+        <li><span class="syntax">publickey</span> Public Key Authentication</li>
+        <li><span class="syntax">challenge</span> Challenge/Response(Keyboard-interactive) Authentication</li>
+        <li><span class="syntax">pageant</span> Public Key Authentication with Pageant</li>
+      </ul></dd>
+
+  <dt id="user">/user=&lt;username&gt;</dt>
+  <dd>your username is specified</dd>
+
+  <dt id="passwd">/passwd=&lt;password&gt;</dt>
+  <dd>your password is specified</dd>
+
+  <dt id="keyfile">/keyfile=&lt;file&gt;</dt>
+  <dd>
+    your private key file is specified<br>
+    When the file name is not the absolute path, the file is identified as the relative path.
+  </dd>
+
+  <dt id="ask4passwd">/ask4passwd</dt>
+  <dd>
+    disable autologin and ask for password<br>
+    '/auth=&lt;mode&gt;' means only authentication method
+  </dd>
+
+  <dt id="ssh-l">/ssh-L&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;[:1]</dt>
+  <dd>port-fowarding from local port(&lt;port1&gt;) to remote side host(&lt;host&gt;) port(&lt;port2&gt;)<br>
+      if ':1' exists after the port number of remote side, this setting accepts connection from other hosts.</dd>
+
+  <dt id="ssh-r">/ssh-R&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
+  <dd>port-fowarding from remote port(&lt;port1&gt;) to local side host(&lt;host&gt;) port(&lt;port2&gt;)</dd>
+
+  <dt id="ssh-x">/ssh-X</dt>
+  <dd>X11 port-fowarding</dd>
+
+  <dt id="ssh-acceptall">/ssh-acceptall</dt>
+  <dd>Local forward ports accept connections from other hosts</dd>
+
+  <dt id="ssh-noagent">/ssh-A</dt>
+  <dd>enable agent forwarding</dd>
+
+  <dt id="ssh-agent">/ssh-a</dt>
+  <dd>disable agent forwarding</dd>
+
+  <dt id="ssh-v">/ssh-v</dt>
+  <dd>setup the log level to VERBOSE mode</dd>
+</dl>
+
+
+<h2 id="example1">Example</h2>
+
+<pre>
+ttermpro.exe server1:22 /ssh /ssh-L30025:smtpsrv1:25 /ssh-L30110:pop3srv1:110
+ttermpro.exe server2:22 /ssh /ssh-X
+ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest
+ttermpro.exe server4:22 /ssh /2 /auth=publickey /user=admin /keyfile=pathofkeyfile /ask4passwd
+ttermpro.exe ssh://user:password@server5/ /auth=password
+</pre>
+
+
+<h2 id="example2">Example: Pageant collaboration</h2>
+
+<p>
+Setup <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">Pageant</a> in the startup folder.
+</p>
+
+<pre>
+C:\usr\pageant.exe c:\usr\Identity.ppk
+</pre>
+
+<p>
+How to connect with the public key authentication by using Pageant is shown as follows.
+</p>
+
+<pre>
+ttermpro.exe shell.sourceforge.jp:22 /ssh /auth=pageant /user=yutaka
+</pre>
+
+</body>
+</html>

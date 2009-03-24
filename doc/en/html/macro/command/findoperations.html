@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>findfirst, findnext, findclose</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>findfirst</h1>
+
+<p>
+Searches for the first file matching a string.
+</p>
+
+<pre class="macro-syntax">
+findfirst &lt;dir handle&gt; &lt;file name&gt; &lt;strvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+The findfirst command searches for the first file matching the specified file name &lt;file name&gt;.<br>
+If the file is found, this command returns the directory handle in &lt;dir handle&gt;, returns the first file name in &lt;strvar&gt; and sets the system variable "result" to 1.<br>
+Otherwise, &lt;dir handle&gt;, &lt;strvar&gt; and "result" are set to  -1, "" and 0, respectively.<br>
+If the findfirst command find the first file successfully, the directory handle can be used for the findnext command to search for the next file matching the specified &lt;file name&gt;.<br>
+<strong>The directory handle should be released by the findclose command.</strong>
+</p>
+
+
+<h1>findnext</h1>
+
+<p>
+Searches for the next file matching a string.
+</p>
+
+<pre class="macro-syntax">
+findnext &lt;dir handle&gt; &lt;strvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+The findnext command searches for the next file matching the file name specified in the findfirst command.<br>
+The integer value &lt;dir handle&gt; should be the directory handle returned by the findfirst command.<br>
+If the next file is found, the file name is returned in &lt;strvar&gt; and "result" is set to 1.<br>
+Otherwise, &lt;strvar&gt; and "result" are set to "" and 0, respectively.
+</p>
+
+
+<h1>findclose</h1>
+
+<p>
+Releases a directory handle.
+</p>
+
+<pre class="macro-syntax">
+findclose &lt;dir handle&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+The findclose command releases the directory handle &lt;dir handle&gt; returned by the findfirst command.<br>
+This command should be executed if the findfirst command is executed successfully.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+findfirst dh '*.txt' filename
+
+while result
+messagebox filename '*.txt'
+findnext dh filename
+endwhile
+
+findclose dh
+</pre>
+
+</body>
+</html>

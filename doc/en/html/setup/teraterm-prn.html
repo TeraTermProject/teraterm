@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Printing (Tera Term setup file)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="delay">Delay of path-through printing</a></h1>
+
+<p>
+You can set the delay of pass-through printng. A pass-through sequence is initiated by ESC[5i and terminated by ESC[4i. The received data between ESC[5i and ESC[4i are printed when the delay time has passed since Tera Term received ESC[4i. If the second ESC[5i is received before the delay of the first pass-through sequence has passed, the first and second printing data are combined and printed at once after the delay of the second sequence has passed. Namely, multiple consecutive sequences with intervals less than the delay are treated as one printing sequence. To change the delay of pass-through printing, edit the PassThruDelay line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+PassThruDelay=&lt;delay in sec&gt;
+</pre>
+
+<pre>
+Default:
+PassThruDelay=3
+</pre>
+
+
+<h1><a name="direct">Path-through printing directly to a port</a></h1>
+
+<p>
+You can send the data of pass-through printing to a port by editing the PassThruPort line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+PassThruPort=&lt;port&gt;
+</pre>
+
+<p>
+The &lt;port&gt; string specifies a port to which data is sent. The format of &lt;port&gt; string is the same as that of the MS-DOS "mode" command. If no port is specified, Tera Term prints the data by using Windows printing functions.
+</p>
+
+<pre>
+Example:
+  PassThruPort=LPT1
+  PassThruPort=COM2: 9600,n,8,1,x
+</pre>
+
+<pre>
+Default:
+PassThruPort=
+</pre>
+
+<p>
+For Russian mode, you should see also <a href="#russfont">Russian code set of the printer font</a>
+</p>
+
+
+<h1><a name="formfeed">Disabling the form-feed in the path-through printing</a></h1>
+
+<p>
+You can disable the form-feed (moving to the next paper) which is caused by an FF character in the pass-through printing. To do this, edit the PrnConvFF line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+PrnConvFF=on
+</pre>
+
+<p>
+Then, the FF character causes the carriage-return and line-feed instead of the form-feed.
+</p>
+
+<p>
+Note: This option is ignored for the <a href="#direct">direct pass-through printing</a>.
+</p>
+
+<pre>
+Default:
+PrnConvFF=off
+</pre>
+
+
+<h1><a name="font">Printer font</a></h1>
+
+<p>
+In the default setup, the font used for printing is the same as one for displaying text on the screen. You can specify a font for printing, by doing the following procedure:
+</p>
+
+<ol>
+ <li>Change the font for displaying text by using the [Setup] Font command and print text.</li>
+ <li>If you find a nice font for printing, save the current setup to the setup file by using the [Setup] Save setup command.</li>
+ <li>In the [Tera Term] section of the setup file, copy parameters of the VTFont line (for example "Terminal,0,13,1") to the PrnFont line.</li>
+ <li>Restore the font for displaying text.</li>
+</ol>
+
+<pre>
+Example:
+PrnFont=Terminal,0,13,1
+</pre>
+
+<pre>
+Default:
+PrnFont=
+</pre>
+
+<p>
+For Russian mode, you should see also <a href="#russfont">Russian code set of the printer font</a>
+</p>
+
+
+<h1><a name="margin">Page margins</a></h1>
+
+<p>
+You can specify the left, right, top and bottom margins of a page for printing by editing the PrnMargin line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+PrnMargin=&lt;left&gt;,&lt;right&gt;,&lt;top&gt;,&lt;bottom&gt;
+</pre>
+
+<p>
+These margins should be specified in unit of 1/100 inches.
+</p>
+
+<pre>
+Default:
+PrnMargin=50,50,50,50
+</pre>
+
+
+<h1><a name="scale">Scaling factors for printing</a></h1>
+
+<p>
+When a printed image is too small or too large, usually you can enlarge or shrink the image by changing the scaling factor in the "Printer" section of Control Panel. If the printer driver does not support scaling, you can specify scaling factors for horizontal and vertical directions. To specify scaling factors, edit the VTPPI and TEKPPI lines in the [Tera Term] section of the setup file:
+</p>
+
+<pre>
+VTPPI=&lt;x(horizontal), y(vertical); pixels per inch)&gt;    ; for the VT window
+TEKPPI=&lt;x(horizontal), y(vertical); pixels per inch)&gt;   ; for the TEK window
+</pre>
+
+<p>
+The scaling factors should be specified in unit of pixels per inch. If the printed image is too small (large), increase (decrease) the scaling factors. If at least one of the specified factor is zero, Tera Term takes the default scaling factors from the printer driver.
+</p>
+
+<pre>
+Example:
+VTPPI=300,300
+TEKPPI=300,300
+</pre>
+
+<pre>
+Default:
+VTPPI=0,0
+TEKPPI=0,0
+</pre>
+
+
+<h1><a name="russfont">Russian code set of the printer font (Russian mode only)</a></h1>
+
+<p>
+When you specify a <a href="#font">printer font</a> or a <a href="#direct">printer device</a>, you should specify also the character set for the printer font or device. Otherwise, Russian characters may not be printed correctly. To specify the character set, edit the RussPrint line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+RussFont=&lt;char set&gt;
+</pre>
+
+<pre>
+where &lt;char set&gt; should be one of the following:
+  Windows
+  KOI8-R
+  CP-866
+  ISO-8859-5
+</pre>
+
+<pre>
+Default:
+RussPrint=Windows
+</pre>
+
+
+</BODY>
+</HTML>

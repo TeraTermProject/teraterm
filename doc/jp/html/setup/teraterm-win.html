@@ -1,0 +1,566 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>ウィンドウ (Tera Term 設定ファイル)</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1><a name="autocopy">自動的な文字列コピーをしない</a></h1>
+
+<p>
+マウスで文字列を選択すると、同時にそれがクリップボードにコピーされます。この自動的な文字列コピーをしないようにするには、設定ファイルの [Tera Term] セクションの AutoTextCopy 行を以下のように変更してください。
+</p>
+
+<pre>
+AutoTextCopy=off
+</pre>
+
+<pre>
+省略時:
+AutoTextCopy=on
+</pre>
+
+
+<h1><a name="delimiter">ダブルクリックによる単語選択の区切り文字</a></h1>
+
+<p>
+左マウスボタンで単語をダブルクリックすると、その単語を選択することができます。設定ファイルの [Tera Term] セクションの DelimList 行を以下のように変更することによって単語の区切り文字を指定することができます。
+</p>
+
+<pre>
+DelimList=&lt;delimiter characters&gt;
+</pre>
+
+<p>
+例えば、
+</p>
+
+<pre>
+DelimList=&lt;&gt;()[]
+</pre>
+
+<p>
+は6つの区切り文字 "&lt;", "&gt;", "(", ")", "[", "]" を指定します。
+ただし、スペース文字と "$" はそれぞれ、"$20", "$24" という形式で指定しなければなりません。
+</p>
+
+<pre>
+DelimList=$20    ; スペース文字
+</pre>
+
+<pre>
+省略時:
+DelimList=$20!"#$24%&amp;'()*+,-./:;&lt;=&gt;?@[\]^`{|}~
+</pre>
+
+<p>
+この "DelimList" 行には、1バイトコード文字(いわゆる半角文字)しか指定できません。2バイトコード文字(いわゆる全角文字)は区切り文字として取り扱われます。2バイトコード文字を区切り文字としないようにするには、DelimDBCS 行を以下のように変更してください。
+</p>
+
+<pre>
+DelimDBCS=off
+</pre>
+
+<pre>
+省略時:
+DelimDBCS=on
+</pre>
+
+<p>
+以前のバージョンの Tera Term と単語選択の仕方を同じにするには、
+</p>
+
+<pre>
+DelimList=$20
+DelimDBCS=off
+</pre>
+
+<p>
+としてください。
+</p>
+
+
+<h1><a name="popup">ポップアップメニューを使用不可にする</a></h1>
+
+<p>
+メニューバーが表示されていないとき、Ctrl キーを押しながらマウス左ボタンを押すと、ポップアップメニューが現れます。ポップアップメニューが現れないようにするには、設定ファイルの [Tera Term] セクションの EnablePopupMenu 行を以下のように変更してください。
+</p>
+
+<pre>
+EnablePopupMenu=off
+</pre>
+
+<pre>
+省略時:
+EnablePopupMenu=on
+</pre>
+
+
+<h1><a name="menubar">"Show menu bar" コマンドを隠す</a></h1>
+
+<p>
+メニューバーが表示されていないとき、システムメニューに "Show menu bar" コマンドが現れます。この "Show menu bar" コマンドが現れないようにするには、設定ファイルの [Tera Term] セクションの EnableShowMenu 行を以下のように変更してください。
+</p>
+
+<pre>
+EnableShowMenu=off
+</pre>
+
+<pre>
+省略時:
+EnableShowMenu=on
+</pre>
+
+
+<h1><a name="lang">言語モードの選択を不可にする</a></h1>
+
+<p>
+[Setup] General ダイアログボックスで言語モード (Language) の選択ができないようにするには、設定ファイルの [Tera Term] セクションの LanguageSelection 行を、
+</p>
+
+<pre>
+LanguageSelection=off
+</pre>
+
+<p>
+のように変更してください。
+</p>
+
+<pre>
+省略時:
+LanguageSelection=on
+</pre>
+
+
+<h1><a name="scrollbuf">スクロールバッファーの最大行数</a></h1>
+
+<p>
+[Setup] Window ダイアログボックスで指定可能なスクロールバッファーの最大行数を変更するには、設定ファイルの [Tera Term] セクションの MaxBuffSize 行を、
+</p>
+
+<pre>
+MaxBuffSize=&lt;number of lines&gt;
+    (500000 以下)
+</pre>
+
+<p>
+のように変更してください。
+</p>
+
+<p>
+注: Tera Term は &lt;スクロールバッファの行数&gt; * &lt;terminal width&gt; * 5 バイト分のメモリをスクロールバッファーのために使用します。
+</p>
+
+<pre>
+省略時:
+MaxBuffSize=10000
+</pre>
+
+
+<h1><a name="blink">点滅しないカーソル</a></h1>
+
+<p>
+カーソルを点滅させないようにするには、設定ファイルの [Tera Term] セクションにの NonblinkingCursor 行を、
+</p>
+
+<pre>
+NonblinkingCursor=on
+</pre>
+
+<p>
+のように変更してください。
+</p>
+
+<pre>
+省略時:
+NonblinkingCursor=off
+</pre>
+
+
+<h1><a name="scrollline">一度にスクロールする最大の行数を設定する</a></h1>
+
+<p>
+VT window では画面のスクロールを速くするために、一度に複数行スクロールすることがあります。一度にスクロールする最大の行数を設定するには、設定ファイルの [Tera Term] セクションの ScrollThreshold 行を、
+</p>
+
+<pre>
+ScrollThreshold=&lt;number of lines&gt;
+</pre>
+
+<p>
+のように変更してください。
+</p>
+
+<pre>
+省略時:
+ScrollThreshold=12
+</pre>
+
+
+<h1><a name="textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a></h1>
+
+<p>
+非選択状態のウィンドウの文字領域をマウスでクリックすることによってウィンドウ選択することができます。初期設定では、このマウスクリックによって同時に文字の選択も開始されます。マウスでウィンドウを選択した時の文字の選択を禁止するには、設定ファイルの [Tera Term] セクションの SelectOnActivate 行を、
+</p>
+
+<pre>
+SelectOnActivate=off
+</pre>
+
+<p>
+のように変更してください。
+</p>
+
+<pre>
+省略時:
+SelectOnActivate=on
+</pre>
+
+
+<h1><a name="title">タイトルの形式</a></h1>
+
+<p>
+タイトルの形式を変えるには設定ファイルの [Tera Term] セクションの TitleFormat 行を以下のように変更してください。
+</p>
+
+<pre>
+TitleFormat=&lt;format ID&gt;
+</pre>
+
+<p>
+&lt;format ID&gt; には整数値を指定する。プログラムにより、ビット列として扱われる。
+</p>
+
+<table>
+ <tr>
+  <td>1ビット目 (1)</td>
+  <td>TCP ホスト名もしくはシリアルポート番号を表示する</td>
+ </tr>
+ <tr>
+  <td>2ビット目 (2)</td>
+  <td>セッション番号を表示する</td>
+ </tr>
+ <tr>
+   <td>3ビット目 (4)</td>
+   <td>VT/TEK を表示する</td>
+  </tr>
+ <tr>
+   <td>4ビット目 (8)</td>
+   <td>&lt;host/port&gt; を先に表示する</td>
+  </tr>
+ <tr>
+  <td>5ビット目 (16)</td>
+  <td>TCP ポート番号を表示する</td>
+ </tr>
+ <tr>
+  <td>6ビット目 (32)</td>
+  <td>シリアルポートのボーレートを表示する</td>
+ </tr>
+</table>
+
+<p>
+以下に &lt;format ID&gt; の例を示します。
+</p>
+
+<pre>
+Format ID   タイトルの形式
+0           &lt;title&gt;
+1           &lt;title&gt; - &lt;host/port&gt;
+2           &lt;title&gt; (session no.)
+3           &lt;title&gt; - &lt;host/port&gt; (session no.)
+4           &lt;title&gt; VT/TEK
+5           &lt;title&gt; - &lt;host/port&gt; VT/TEK
+6           &lt;title&gt; (session no.) VT/TEK
+7           &lt;title&gt; - &lt;host/port&gt; (session no.) VT/TEK
+13          &lt;host/port&gt; - &lt;title&gt; VT/TEK
+29          &lt;host:tcpport/port&gt; - &lt;title&gt; VT/TEK
+45          &lt;host/port:baud&gt; - &lt;title&gt; VT/TEK
+61          &lt;host:tcpport/port:baud&gt; - &lt;title&gt; VT/TEK
+</pre>
+
+<pre>
+省略時:
+TitleFormat=5
+</pre>
+
+
+<h1><a name="color">白色および黒色属性の文字の実際の色</a></h1>
+
+<p>
+エスケープシーケンス "&lt;ESC&gt;[37m" と"&lt;ESC&gt;[30m" は文字色をそれぞれ白と黒にします。同様にエスケープシーケンス "&lt;ESC&gt;[47m" と"&lt;ESC&gt;[40m" は背景色をそれぞれ白と黒にします。
+</p>
+
+<p>
+いくつかのアプリケーションでは背景色が(本物の VT100 端末のように)黒であると仮定して、白色の文字が見えるものと期待していることがあります。しかし、Tera Term の背景色の初期値は白であるため白色の文字は見えません。設定ファイルの [Tera Term] セクションの UseTextColor 行を、
+</p>
+
+<pre>
+UseTextColor=on
+</pre>
+
+<p>
+のように変更すると、"白色"の文字(背景)の実際の色を [Setup] Window ダイアログボックスで指定される "Text" の色にします。同様に、"黒色"の文字(背景)の実際の色を "Background" の色にします。
+</p>
+
+<pre>
+省略時:
+UseTextColor=off
+</pre>
+
+
+<h1><a name="space">文字(行)間にすきまをあける</a></h1>
+
+<p>
+文字(行)間にすきまをあけるには、設定ファイルの [Tera Term] セクションの VTFontSpace 行を以下のように変更してください。
+</p>
+
+<pre>
+VTFontSpace=&lt;dx1&gt;,&lt;dx2&gt;,&lt;dy1&gt;,&lt;dy2&gt;
+</pre>
+
+<pre>
+ただし、
+  &lt;dx1&gt;  は各文字の左側にあけるすきま。
+  &lt;dx2&gt;  は各文字の右側にあけるすきま。
+  &lt;dy1&gt;  は各行の上側にあけるすきま。
+  &lt;dy2&gt;  は各行の下側にあけるすきま。
+  単位はいずれも、画素。
+</pre>
+
+<pre>
+例:
+VTFontSpace=0,1,0,0    各文字の右側に1画素分のすきまをあける。
+VTFontSpace=0,0,1,0    各行の上側に1画素分のすきまをあける。
+</pre>
+
+<pre>
+省略時:
+VTFontSpace=0,0,0,0
+</pre>
+
+
+<h1><a name="window">[Window] メニューを隠す</a></h1>
+
+<p>
+[Window] メニューを隠すには、設定ファイルの [Tera Term] セクションの WindowMenu 行を以下のように変更してください。
+</p>
+
+<pre>
+WindowMenu=off
+</pre>
+
+<pre>
+省略時:
+WindowMenu=on
+</pre>
+
+
+<h1><a name="eterm">Eterm風半透明ウィンドウ</a></h1>
+
+<p>
+Eterm風半透明ウィンドウの詳細設定をします。
+</p>
+
+<table>
+  <tr>
+    <th>BGSPIPath</th>
+    <td>On / Off</td>
+    <td>画像を読み込むのに用いる、Susie Plugin が格納されているフォルダを指定します。</td>
+  </tr>
+  <tr>
+    <th>BGFastSizeMove</th>
+    <td>フォルダ名</td>
+    <td>ウィンドウの移動、サイズ変更を高速に行います。Windows が「ドラッグ中にウィンドウの内容を表示する」場合に有効です。</td>
+  </tr>
+  <tr>
+    <th>BGFlickerlessMove</th>
+    <td>On / Off</td>
+    <td>ウィンドウが移動した際のちらつきを抑えます。</td>
+  </tr>
+  <tr>
+    <th>BGUseAlphaBlendAPI</th>
+    <td>On / Off</td>
+    <td>Off にすると、API の AlphaBlend を使いません。デバッグ用です。</td>
+  </tr>
+  <tr>
+    <th>BGNoFrame</th>
+    <td>On / Off</td>
+    <td>On にすると、HideTitle = On の時、全く枠の無いウィンドウになります。<br>
+        この時、Alt + Shift + 左ドラッグでウィンドウサイズを変更できます。</td>
+  </tr>
+  <tr>
+    <th>BGThemeFile</th>
+    <td>ファイル名</td>
+    <td>テーマファイルを指定します。<br>
+        ファイル名にワイルドカードが指定された場合、一致するファイルからランダムに一つ選びます。</td>
+  </tr>
+</table>
+
+<pre>
+省略時:
+BGUseAlphaBlendAPI = On
+BGSPIPath = plugin
+BGFastSizeMove = On
+BGFlickerlessMove = On
+BGNoFrame = Off
+BGThemeFile = theme\*.ini
+</pre>
+
+<h2>テーマファイル内の設定</h2>
+
+<table>
+  <tr>
+    <th>BGReverseTextTone</th>
+    <td>0 - 255</td>
+    <td>反転テキストの透明度</td>
+  </tr>
+  <tr>
+    <th>BGPictureFile</th>
+    <td>ファイル名</td>
+    <td>壁紙と合成する画像ファイル名を指定します。<br>
+        ファイル名にワイルドカードが指定された場合、一致するファイルからランダムに一つ選びます。<br>
+        相対パスを利用する場合は、テーマファイルからの相対パスを指定してください。<br>
+        読み込めるファイルの種類は、BGSPIPath に格納されたプラグインによります。<br>
+        ビットマップはプラグインが無くても読み込めます。
+    </td>
+  </tr>
+  <tr>
+    <th>BGPicturePattern</th>
+    <td>Stretch<br>
+        Tile<br>
+        Center<br>
+        FitWidth<br>
+        FitHeight<br>
+        AutoFit</td>
+    <td>画像ファイルの描画方法を指定します。<br>
+        FitWidth、FitHeight は画像のアスペクト比を維持したまま、画像を拡大縮小します。<br>
+        AutoFit は、ウィンドウと画像の間に隙間ができないように、FitWidth と FitHeight を切り替えます。
+    </td>
+  </tr>
+  <tr>
+    <th>BGPictureBaseColor</th>
+    <td>R, G, B</td>
+    <td>画像とウィンドウの間に隙間ができた場合、この色で塗られます。</td>
+  </tr>
+  <tr>
+    <th>BGPictureTone</th>
+    <td>0 - 255</td>
+    <td>画像ファイルの透明度</td>
+  </tr>
+  <tr>
+    <th>BGFadeTone</th>
+    <td>0 - 255</td>
+    <td>背景全体をフェードします。</td>
+  </tr>
+  <tr>
+    <th>BGFadeColor</th>
+    <td>R, G, B</td>
+    <td>フェードしたときの色を指定します。</td>
+  </tr>
+  <tr>
+    <th>VTFore や Red など</th>
+    <td>R, G, B</td>
+    <td>テキストの色を設定します。</td>
+  </tr>
+</table>
+
+
+<h1><a name="maximize">ウィンドウ最大化時の画面スクロール方法</a></h1>
+<p>
+ウィンドウ最大化時の画面スクロール方法を指定します。<br>
+ウィンドウ最大化時に通常のウィンドウ表示時と同じ方法でスクロールを行うと、環境によっては表示が乱れる事があるため、初期値ではウィンドウ最大化時には別の方法でスクロールを行います。ただし、通常のウィンドウ表示に比べて表示がちらついたり、スクロールが遅くなる場合があります。<br>
+設定ファイルの [Tera Term] セクションの MaximizedBugTweak 行を以下のように変更すると、ウィンドウ最大化時にも通常のウィンドウ表示時と同じ方法でスクロールを行うようになるので、画面のちらつきやスクロール速度が改善されます。ただし、前述したように表示が一部乱れる事があります。
+</p>
+
+<pre>
+MaximizedBugTweak=off
+</pre>
+
+<pre>
+省略時:
+MaximizedBugTweak=on
+</pre>
+
+
+<h1><a name="killfocus">フォーカスが外れた時にもカーソルを表示する</a></h1>
+<p>
+Tera Term は、ウィンドウのフォーカスが外れた時にもカーソルを表示します。<br>
+この機能を無効にするには、設定ファイルの [Tera Term] セクションの KillFocusCursor 行を以下のように変更してください。
+</p>
+
+<pre>
+KillFocusCursor=off
+</pre>
+
+<pre>
+省略時:
+KillFocusCursor=on
+</pre>
+
+
+<h1><a name="savevtwinpos">ウィンドウ位置を保存する</a></h1>
+<p>
+Tera Term は、"Save setup" を実行したときにはウィンドウの位置を保存しません。<br>
+この設定が on になっていると、設定ファイルの保存時にウィンドウの位置を保存します。
+</p>
+
+<p>
+また、この設定が on になっていると、VTウィンドウを閉じたときにもウィンドウの位置と端末のサイズを保存します。
+</p>
+
+<pre>
+SaveVTWinPos=on
+</pre>
+
+<pre>
+省略時:
+SaveVTWinPos=off
+</pre>
+
+
+<h1><a name="WindowIcon">ウィンドウアイコンを変更する</a></h1>
+<p>
+Tera Termの実行ファイルには、VTウィンドウやTEKウィンドウのウィンドウアイコン等で使われている他にも、いくつかアイコンが含まれています。
+設定ファイルの[Tera Term]セクションのVTIcon, TEKIcon行を変更する事によって、VTウィンドウおよびTEKウィンドウのウィンドウアイコンにこれらのアイコンを使用する事が出来ます。
+</p>
+
+<p>
+例えば、VTウィンドウのアイコンに以前のアイコンを使いたい場合は、以下のように指定してください。
+</p>
+
+<pre>
+VTIcon=VT_CLASSIC
+</pre>
+
+<p>
+アイコン名には、以下が使用できます。
+</p>
+
+<table>
+<thead>
+  <tr><th>アイコン名</th>	<th>アイコン</th></tr>
+</thead>
+
+<tbody>
+  <tr><td>TTERM</td>         <td><img src="../image/tterm.png"></td></tr>
+  <tr><td>VT</td>            <td><img src="../image/vt.png"></td></tr>
+  <tr><td>TEK</td>           <td><img src="../image/tek.png"></td></tr>
+  <tr><td>TTERM_CLASSIC</td> <td><img src="../image/tt_classic.png"></td></tr>
+  <tr><td>VT_CLASSIC</td>    <td><img src="../image/vt_classic.png"></td></tr>
+  <tr><td>CYGTERM</td>       <td><img src="../image/cygterm.png"></td></tr>
+  <tr><td>Default</td>       <td>標準設定(VTウィンドウはVT, TEKウィンドウはTEK)</td></tr>
+</tbody>
+</table>
+
+<pre>
+省略時:
+VTIcon=Default
+TEKIcon=Default
+</pre>
+
+</body>
+</html>

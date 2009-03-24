@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>waitevent</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>waitevent</h1>
+
+<p>
+Waits an event.
+</p>
+
+<pre class="macro-syntax">
+waitevent &lt;events&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Pauses until one of the events specified by &lt;events&gt; occurs. &lt;events&gt; can be combination of the following event identifiers.
+</p>
+
+<table>
+ <tr>
+  <th>Event</th>
+  <th>Event identifier</th>
+ </tr>
+ <tr>
+  <td>timeout</td>
+  <td>1</td>
+ </tr>
+ <tr>
+  <td>unlink</td>
+  <td>2</td>
+ </tr>
+ <tr>
+  <td>disconnection</td>
+  <td>4</td>
+ </tr>
+ <tr>
+  <td>connection</td>
+  <td>8</td>
+ </tr>
+</table>
+
+<p>
+The timeout event occurs when &lt;timeout&gt;.&lt;mtimeout&gt; seconds have passed. &lt;timeout&gt; is the value of the system variable "timeout". &lt;mtimeout&gt; is the value of the system variable "mtimeout". If timeout is less than or equal to zero, this event never occurs.
+</p>
+
+<p>
+The unlink event occurs when Tera Term is closed.
+</p>
+
+<p>
+The disconnection (connection) event occurs when the communication between Tera Term and the host is closed (opend).
+</p>
+
+<p>
+These commands return the identifier of the actual event in the system variable "result".
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Wait the disconnection event
+waitevent 4
+; Wait the unlink or connection events
+waitevent 2 or 8
+; The unlink event occured
+if result=2 goto label1
+; The connection event occured
+if result=8 goto label2
+</pre>
+
+</body>
+</html>

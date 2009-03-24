@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>gettime</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>gettime</h1>
+
+<p>
+Gets current time.
+</p>
+
+<pre class="macro-syntax">
+gettime &lt;strvar&gt; [&lt;format&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Returns the current time in the string variable &lt;strvar&gt;, with the default format "HH:MM:SS".
+The user can specify the format same as <a href="http://msdn2.microsoft.com/en-us/library/fe06s4ak(VS.80).aspx">strftime</a>. And also, the default format equals "%H:%M:%S" at the &lt;format&gt; argument.
+</p>
+
+<p>
+The behavior of the gettime command specified with the format equals the getdate command specified with the same format.
+</p>
+
+<p>
+This command returns one of the following values in the system variable "result":
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>
+	 Normal success. &lt;strvar&gt; is stored.
+      </td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td>
+	Error. &lt;strvar&gt; is not stored because a length of the generated string exceeds the upper limit -255 characters-.
+      </td>
+    </tr>
+
+    <tr>
+      <td>2</td>
+      <td>
+	Error. &lt;format&gt; is invalid.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+;Stores the current time to "timestr" variable with HH:MM:SS format.
+gettime timestr
+
+;Stores the current date with the user format to "logfile" variable. 
+;The format is log-YYYYMMDD-HHMMSS.txt.
+gettime logfile "log-%Y%m%d-%H%M%S.txt"
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="getdate.html">getdate</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/fe06s4ak(VS.80).aspx">strftime (MSDN Library)</a></li>
+</ul>
+
+</body>
+</html>

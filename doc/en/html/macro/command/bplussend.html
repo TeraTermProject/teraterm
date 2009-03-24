@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>bplussend</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>bplusrecv</h1>
+
+<p>
+Sends a file to the host with the B-Plus protocol.
+</p>
+
+<pre class="macro-syntax">
+bplussend &lt;filename&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to send the file &lt;filename&gt; to the host with the B-Plus protocol.
+Pauses until the end of the file transfer.
+If the file is transferred successfully, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+bplussend 'readme.txt'
+</pre>
+
+</body>
+</html>

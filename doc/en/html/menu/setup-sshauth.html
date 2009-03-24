@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>SSH Authentication([Setup] Menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH Authentication([Setup] Menu)</h1>
+
+    <h2>"TTSSH: Authentication Setup" Dialog box</h2>
+    <dl>
+      <dt>User name</dt>
+      <dd>
+        Specify user name to be used for SSH connection.
+      </dd>
+
+      <dt>Use plain passwd to log in</dt>
+      <dd>
+        Specify Password if a password authentication is used.
+      </dd>
+
+      <dt>Use RSA/DSA key to login</dt>
+      <dd>
+        Choose an authentication method using RSA/DSA key which are previosuly generated.
+      </dd>
+
+      <dt>Use rhost to login (SSH1)</dt>
+      <dd>
+        Specify if rhost connection is allowed by Host.
+      </dd>
+
+      <dt>
+        Use challenge/response to log in (SSH1:TIS, SSH2:keyboard-interactive)
+      </dt>
+      <dd>
+        Choose if Challneg/Response authentication is available.<br>
+        keyboard-interactive is used for SSH2 connection and if used, Password itself won't be sent over the communication path (If using an usula password authentication, Password itself will be sent in encrypted form).
+      </dd>
+
+      <dt>
+        Use Pageant
+      </dt>
+      <dd>
+        Choose an authentication method using RSA/DSA key with Pageant.<br>
+        TTSSH does not handle a private key file.
+      </dd>
+
+      <dt>
+        Check the supported authentication methods before login (SSH2)
+      </dt>
+      <dd>
+        Modified to confirm the available authentication method for the server prior to login and invalidate unsupported method.<br>
+        Modified to access the server by using only user name in background when displaying authentication dialog. In order for this feature to work, user name must be identified when a connection request is started. If user name is specified in a default user name or in a command line, it will be used.<br>
+        If a focus is lost after user name is entered, a content of user name field is used and it can't be changed afterward. This is due to SSH2 specification.
+    </dl>
+  </body>
+</html>

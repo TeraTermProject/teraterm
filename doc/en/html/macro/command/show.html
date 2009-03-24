@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>show</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>show</h1>
+
+<p>
+Changes the displaying of MACRO dialog box.
+</p>
+
+<pre class="macro-syntax">
+show &lt;show flag&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Minimizes MACRO, if &lt;show flag&gt; is zero.<br>
+Restores MACRO, if &lt;show flag&gt; is greater than zero.<br>
+Hides MACRO, if &lt;show flag&gt; is less than zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Minimize MACRO.
+show 0
+
+; Restore MACRO.
+show 1
+
+; Hide MACRO.
+show -1
+</pre>
+
+</body>
+</html>

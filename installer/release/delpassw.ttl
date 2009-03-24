@@ -1,0 +1,8 @@
+; Sample macro for Tera Term
+;  Delete a password in the password file
+
+yesnobox 'Do you really want to delete your password?' 'Tera Term'
+if result then
+  delpassword 'password.dat' 'mypassword'
+  messagebox 'Password is deleted.' 'Tera Term'
+endif

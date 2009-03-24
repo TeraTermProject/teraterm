@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>showtt</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>showtt</h1>
+
+<p>
+Tera Term ウインドウの表示状態を変更する。
+</p>
+
+<pre class="macro-syntax">
+showtt &lt;show flag&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;show flag&gt; が-1の場合、 Tera Term の VT ウインドウを隠す。<br>
+&lt;show flag&gt; が0の場合、 Tera Term  の VT ウインドウを最小化する。<br>
+&lt;show flag&gt; が1の場合、 Tera Term の VT ウインドウを元の大きさに戻す。<br>
+&lt;show flag&gt; が2の場合、 Tera Term の TEK ウインドウを隠す。<br>
+&lt;show flag&gt; が3の場合、 Tera Term の TEK ウインドウを最小化する。<br>
+&lt;show flag&gt; が4の場合、 Tera Term の TEK ウインドウを開く、または元の大きさに戻す。<br>
+&lt;show flag&gt; が5の場合、 Tera Term の TEK ウインドウを閉じる。<br>
+&lt;show flag&gt; が6の場合、 ログウィンドウを隠す。<br>
+&lt;show flag&gt; が7の場合、 ログウィンドウを最小化する。<br>
+&lt;show flag&gt; が8の場合、 ログウィンドウを元の大きさに戻す。<br>
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; Tera Term を最小化
+showtt 0
+
+; Tera Term を元の大きさに戻す
+showtt 1
+
+; Tera Term を隠す
+showtt -1
+
+showtt 7    ;Minimize log window 
+showtt 8    ;Restore log window 
+showtt 6    ;Hide log window
+</pre>
+
+</body>
+</html>

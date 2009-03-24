@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>fileseek</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>fileseek</h1>
+
+<p>
+ファイルポインタを移動する。
+</p>
+
+<pre class="macro-syntax">
+fileseek &lt;file handle&gt; &lt;offset&gt; &lt;origin&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイルハンドル &lt;file handle&gt; で指定されるファイルのファイルポインタを移動する。<br>
+移動後のファイルポインタは下記のようになる。
+</p>
+
+<table>
+ <tr>
+  <th>&lt;origin&gt;</th>
+  <td>0</td>
+  <td>ファイルの最初から &lt;offset&gt; バイト</td>
+ </tr>
+ <tr>
+  <th>&lt;origin&gt;</th>
+  <td>1</td>
+  <td>現在の位置から &lt;offset&gt; バイト</td>
+ </tr>
+ <tr>
+  <th>&lt;origin&gt;</th>
+  <td>2</td>
+  <td>ファイルの最後から &lt;offset&gt; バイト</td>
+ </tr>
+</table>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; ファイルの最初へ移動
+fileseek fhandle 0 0
+
+; 現在の位置から 10 バイト先へ移動
+fileseek fhandle 10 1
+
+; ファイルの最後へ移動
+fileseek fhandle 0 2
+
+; ファイルの最後から 10 バイト前の位置へ移動
+fileseek fhandle 0-10 2
+</pre>
+
+</body>
+</html>

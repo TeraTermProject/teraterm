@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>yesnobox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>yesnobox</h1>
+
+<p>
+Displays a dialog box, and ask Yes or No to user.
+</p>
+
+<pre class="macro-syntax">
+yesnobox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Displays a dialog box with the &lt;message&gt;, &lt;title&gt;, "Yes" button and "No" button.
+</p>
+
+<p>
+If the user clicks on the "Yes" button, the system variable "result" is set to 1. If the user clicks on the "No" button, "result" is set to zero.
+</p>
+
+<p>
+If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+If &lt;special&gt; is not specified then 1 is used.
+</p>
+
+<table>
+ <tr>
+  <th>input</th>
+  <th>output</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>line feed</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>tab</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+:retry
+;;; do something ;;;
+yesnobox 'Try again?' 'Tera Term'
+if result goto retry
+end
+</pre>
+
+</body>
+</html>

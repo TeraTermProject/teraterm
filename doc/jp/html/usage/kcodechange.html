@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>漢字コードの自動制御</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>漢字コードの自動制御</h1>
+
+<p>制御シーケンスで送受信漢字コードを変更出来るようにする</p>
+
+<h2>機能</h2>
+
+<p>
+TTXKcodeChange プラグインを入れると、リモート側から制御シーケンスを使用して送受信漢字コードの設定が変更出来るようになります。<br>
+以下の制御シーケンスをサポートしています。
+</p>
+
+<dl>
+  <dt>&lt;OSC&gt;5963;Pt&lt;ST&gt;</dt>
+  <dt>&lt;OSC&gt;5963;Pt&lt;BEL&gt;</dt>
+  <dd>設定用シーケンス</dd>
+  <dd>Ptは Key=Value の形式で指定し、;で区切る事で複数指定する事もできます。現在のところ、以下のKeyが使えます。
+  <pre>
+KT  -- 送信漢字コード
+       Valueとして SJIS, EUC, JIS, UTF8 を受け付けます。
+KR  -- 受信漢字コード
+       Valueとして SJIS, EUC, JIS, UTF8, UTF8m を受け付けます。
+</pre>
+  </dd>
+</dl>
+
+<dl>
+  <dt>&lt;OSC&gt;5964;Pt&lt;ST&gt;</dt>
+  <dt>&lt;OSC&gt;5964;Pt&lt;BEL&gt;</dt>
+  <dd>問い合わせ用シーケンス</dd>
+  <dd>Ptには問い合わせる設定を指定します。;で区切る事で複数指定する事もできます。問い合わせに対して、以下の形式の応答を返します。
+  <pre>
+Key=Value;[Key=Value;...]<CR>
+</pre>
+  </dd>
+</dl>
+
+<h2>使用例</h2>
+
+<p>ログインシェルがzshの時の設定例です。</p>
+
+<pre>
+[.zloginの記述]
+echo -n "\e]5964;kt;kr\a"              # KT/KRの設定を問い合わせる
+read -t 1 TT_ORG_KCODE                 # 応答を待つ(タイムアウト:1秒)
+if [ $? -eq 0 ]; then
+  echo -n "\e]5963;kr=euc;kt=euc\a"    # 応答があったなら設定を変更する
+fi
+
+[.zlogoutの記述]
+# .zloginで漢字コードの設定が保存されていたら、その設定に戻す。
+if [ " ${TT_ORG_KCODE}" != " " ]; then
+  echo -n "\e]5963;${TT_ORG_KCODE}\a"
+fi
+</pre>
+
+<h2>解説</h2>
+
+<p>
+受信データのフックのサンプルです。<br>
+受信データを監視し、対応している制御シーケンスだった場合は設定の変更を行います。<br>
+問い合わせに対する応答は、送信バッファを直接書き換えるという少々強引な方法を取っています。<br><br>
+
+このプラグインを改造すれば、他の設定も制御シーケンスで変更出来るようになるかもしれません。
+</p>
+
+<h2>バグ</h2>
+
+<ul>
+  <li>制御シーケンスのパース部分は少々いい加減です。</li>
+  <li>使用している制御シーケンスのパラメータ番号の選び方が安易です。</li>
+  <li>将来的にこの機能はTera Term本体に組み込まれるかもしれません。</li>
+  <li>シリアル接続で使用するには、Tera Term 4.60以降が必要です。</li>
+  <li>送信バッファの空きが少ない場合、問い合わせに対する応答が途中で切れる場合があります。</li>
+</ul>
+
+</body>
+</html>

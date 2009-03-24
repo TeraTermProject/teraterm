@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>settitle</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>unlink</h1>
+
+<p>
+Terminates the link between the current Tera Term window and MACRO.
+</p>
+
+<pre class="macro-syntax">
+unlink
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+MACRO enters the unlinked state and can not control the Tera Term window any more.<br>
+In the unlinked state, the "connect" command can open a new Tera Term window and link MACRO to it.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; open a Tera Term window and link MACRO to it
+connect 'host'
+
+; terminate the link
+unlink
+
+; open another Tera Term window and link MACRO to it
+connect 'host2'
+</pre>
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="closett.html">closett</a>"</li>
+ <li>"<a href="connect.html">connect</a>"</li>
+ <li>"<a href="cygconnect.html">cygconnect</a>"</li>
+ <li>"<a href="disconnect.html">disconnect</a>"</li>
+ <li>"<a href="testlink.html">testlink</a>"</li>
+</ul>
+
+</body>
+</html>

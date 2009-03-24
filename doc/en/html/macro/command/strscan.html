@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strscan</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strscan</h1>
+
+<p>
+Searches for substring in string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strscan &lt;string&gt; &lt;substring&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Searches for &lt;substring&gt; in &lt;string&gt;.<br>
+If &lt;substring&gt; is found, its position(1-origin) is returned in the system variable "result".<br>
+If &lt;string&gt; contains more than one occurrence of &lt;substring&gt;, the position of the first one is returned. If &lt;substring&gt; is not found, "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strscan 'tera term' 'term'
+; result = 6
+int2str valstr result
+messagebox valstr 'result'
+</pre>
+
+<pre class="macro-example">
+; Converts a hex string to a hexadecimal and binary value
+basenum='0060E3da'
+base=16
+call base2dec
+int2str sdec decnum
+messagebox sdec 'decnum'
+base=2
+call dec2base
+messagebox basenum 'basenum'
+end
+
+:dec2base
+basenum=''
+tmp=decnum      ;modified so not destructive of decnum
+while tmp>0
+   strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
+   strconcat basedig basenum
+   basenum=basedig
+   tmp=tmp/base
+endwhile
+return
+
+:base2dec
+decnum=0
+strlen basenum
+len=result
+for i 1 len
+   strcopy basenum i 1 basedig
+   decnum=decnum*base
+   strscan '0123456789ABCDEFabcdef' basedig
+   if result>16 result=result-6      ;take care of lower case
+   decnum=decnum+result-1
+next
+return
+</pre>
+
+
+<pre class="macro-example">
+; Network IP calculation from IP and Subnet mask
+ip='192.168.1.189'
+subnet='255.255.255.248'
+ 
+sip=subnet      ;find number of significant bits
+call ip2bin
+strconcat bip '0' ;ensure there is at least one 0 to find
+strscan bip '0'
+bits=result-1
+messagebox bits 'bits'
+ 
+sip=ip          ;calculate first address in subnet
+call ip2bin
+strlen bip
+strcopy bip 1 bits bip
+while result-bits>0
+    strconcat bip '0'
+    result=result-1
+endwhile
+call bin2ip
+messagebox sip 'net'
+end
+ 
+:bin2ip     ;convert binary ip to decimal number format with dots
+sip=''
+base=2
+do
+    strcopy bip 1 8 basenum
+    call base2dec
+    int2str sdec decnum
+    strconcat sip sdec
+    strcopy bip 9 999 bip
+    strlen bip
+    if result>0 strconcat sip '.'
+loop while result>0
+return
+ 
+:ip2bin     ;converts ip number to binary and removes dots
+base=2
+bip=''
+do
+    str2int decnum sip
+    call dec2base
+    strlen basenum  ;fill in any missing leading zeros
+    strcopy '00000000' 1 8-result stmp
+    strconcat bip stmp
+    strconcat bip basenum
+    strscan sip '.'
+    strcopy sip result+1 999 sip
+loop while result>0
+return
+ 
+:dec2base   ;converts a decimal number to any base
+basenum=''
+tmp=decnum ;modified so not destructive of decnum
+while tmp>0
+    strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
+    strconcat basedig basenum
+    basenum=basedig
+    tmp=tmp/base
+    endwhile
+return
+ 
+:base2dec   ;converts a number in any base to a decimal number
+decnum=0
+strlen basenum
+len=result
+for tmp 1 len
+    strcopy basenum tmp 1 basedig
+    strscan '0123456789ABCDEFabcdef' basedig
+    if result=0 break   ;if not a num char, stop conversion
+    if result>16 result=result-6 ;take care of lower case
+    decnum=decnum*base
+    decnum=decnum+result-1
+next
+return
+</pre>
+
+
+
+</body>
+</html>

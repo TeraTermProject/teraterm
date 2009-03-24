@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>callmenu</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>callmenu</h1>
+
+<p>
+Executes a menu of window.
+</p>
+
+<pre class="macro-syntax">
+callmenu &lt;menu ID&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Executes the menu that was specified by &lt;menu ID&gt;. See <a href="../../reference/keycode.txt">Keycode</a> about IDs.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; select displaying screen.
+callmenu 50280
+
+; copy to the clipboard.
+callmenu 50210
+</pre>
+
+
+<pre class="macro-example">
+; This macro captures a screen contents and write it to a file. Refer to screencapture.ttl.
+; Configuration
+
+appendmode = 1        ; 0 or 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+getdate header #13#10"======== %Y-%m-%d %H:%M:%S ==========================================="#13#10#13#10
+
+if appendmode=0 then
+	getdate filename "screencapture_%Y%m%d-%H%M%S.txt"
+	fileopen fp filename 0
+else
+	fileopen fp 'screencapture.txt' 1
+endif
+	
+if result &lt;&gt; 0 end
+
+;select screen
+callmenu 50280
+
+mpause 500
+
+filewrite fp header
+
+offset = 0
+do
+	clipb2var buff offset
+	if result>0 filewrite fp buff
+	offset = offset + 1
+loop while result = 2
+
+fileclose fp
+
+;reset selection
+callmenu 50270
+
+end
+</pre>
+
+
+<pre class="macro-example">
+; Select one of Kanji codes. On ahead, should install the TTX Kanji Menu.
+;callmenu 54010  ; [KanjiCode] Recv: Shift_JIS
+;callmenu 54110  ; [KanjiCode] Send: Shift_JIS
+;callmenu 54011  ; [KanjiCode] Recv: EUC-JP
+;callmenu 54111  ; [KanjiCode] Send: EUC-JP
+;callmenu 54012  ; [KanjiCode] Recv: JIS
+;callmenu 54112  ; [KanjiCode] Send: JIS
+callmenu 54013  ; [KanjiCode] Recv: UTF-8
+callmenu 54113  ; [KanjiCode] Send: UTF-8
+;callmenu 54014  ; [KanjiCode] Recv: UTF-8m
+</pre>
+
+
+</body>
+</html>

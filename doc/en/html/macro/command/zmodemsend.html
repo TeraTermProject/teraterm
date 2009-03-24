@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>zmodemsend</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>zmodemsend</h1>
+
+<p>
+Sends a file from the host with the ZMODEM protocol.
+</p>
+
+<pre class="macro-syntax">
+zmodemsend &lt;filename&gt; &lt;binary flag&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to send the file &lt;filename&gt; to the host with the ZMODEM protocol. Pauses until the end of the file transfer.<br>
+If the file is transferred successfully, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
+</p>
+
+<p>
+If the file is a binary file, &lt;binary flag&gt; must be non-zero.<br>
+If the file is a text file, &lt;binary flag&gt; must be zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+zmodem 'readme.txt' 0
+</pre>
+
+</body>
+</html>

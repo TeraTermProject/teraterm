@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>waitn</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>waitn</h1>
+
+<p>
+Waits for the given number of bytes to be put into TeraTerm macro received buffer.
+</p>
+
+<pre class="macro-syntax">
+waitn &lt;received byte count&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Pauses until the given number of bytes are received from the host, or until the timeout occurs.
+</p>
+
+<p>
+If the system variable "timeout" or "mtimeout" is greater than zero, the timeout occurs when &lt;timeout&gt;.&lt;mtimeout&gt; seconds have passed. If the timeout is less than or equal to zero, the timeout never occurs.
+</p>
+
+<p>
+These commands return one of the following values in the system variable "result":
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Meaning</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Timeout. No data has received.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Otherwise(TBD)</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; The timeout limit is 30 sec.
+timeout = 30
+
+; Clear the received buffer.
+flushrecv
+
+; Wait for more than 255 bytes.
+waitn 255
+</pre>
+
+</body>
+</html>

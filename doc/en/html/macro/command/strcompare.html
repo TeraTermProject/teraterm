@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strcompare</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strcompare</h1>
+
+<p>
+Compares two strings.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strcompare &lt;string1&gt; &lt;string2&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Compares two strings. Depending on the relation between them, one of the following result code is returned in the system variable "result":
+</p>
+
+<table>
+ <tr>
+  <th>Relation</th>
+  <th>Result</th>
+ </tr>
+ <tr>
+  <td>&lt;string1&gt; &lt; &lt;string2&gt;</td>
+  <td>-1</td>
+ </tr>
+ <tr>
+  <td>&lt;string1&gt; = &lt;string2&gt;</td>
+  <td>0</td>
+ </tr>
+ <tr>
+  <td>&lt;string1&gt; &gt; &lt;string2&gt;</td>
+  <td>1</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; result = -1
+strcompare 'abc' 'def'
+
+strcompare command 'next'
+if result=0 goto label
+strcompare command 'end'
+if result=0 end
+</pre>
+
+</body>
+</html>

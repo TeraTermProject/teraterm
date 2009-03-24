@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>sendmulticast</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendmulticast</h1>
+
+<p>
+Sends the data to the multicast host.
+</p>
+
+<pre class="macro-syntax">
+sendmulticast &lt;multicastname&gt; &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to sends characters to the multicast host specified by &lt;multicastname&gt; argument. Beforehand, the name of terminal identification must be configured by using <a href="setmulticastname.html">setmulticastname</a> command.<br>
+If &lt;data&gt; is a string, the string is sent to the host. <br>
+If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the character is sent to the host.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; TerminalA
+setmulticastname 'screen1'
+; Do not receive any strings.
+</pre>
+
+<pre class="macro-example">
+; TerminalB
+setmulticastname 'screen2'
+; The 'violin' string will be sent by the TerminalD.
+</pre>
+
+<pre class="macro-example">
+; TerminalC
+setmulticastname 'screen2'
+; The 'violin' string will be sent by the TerminalD.
+</pre>
+
+<pre class="macro-example">
+; TerminalD
+setmulticastname 'screen3'
+sendmulticast 'screen2' 'violin' 13 10     ; Multicast transmission
+; Do not receive any strings.
+</pre>
+
+</body>
+</html>

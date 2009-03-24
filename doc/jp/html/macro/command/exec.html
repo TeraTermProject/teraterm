@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>exec</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>exec</h1>
+
+<p>
+アプリケーションを起動する。
+</p>
+
+<pre class="macro-syntax">
+exec &lt;command line&gt; [&lt;show&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+コマンドライン文字列 &lt;command line&gt; に従い、アプリケーションを起動する。
+</p>
+
+showパラメータには以下の文字列を指定することができる。
+<pre>
+hide
+minimize
+maximize
+show ;default parameters when no show command specified. 
+</pre>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 「メモ帳」を起動
+exec 'notepad readme.txt'
+
+; 「メモ帳」を最大化表示で起動
+exec 'notepad readme.txt' 'maximize'
+</pre>
+
+<pre class="macro-example">
+; バッチファイルを起動する
+tmp='cmd /c c:\upload.bat '
+strconcat tmp username1 
+strconcat tmp ' '
+strconcat tmp userpass1 
+strconcat tmp ' '
+strconcat tmp address
+messagebox tmp 'exec'
+exec tmp
+</pre>
+
+</body>
+</html>

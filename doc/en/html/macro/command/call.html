@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>call</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>call</h1>
+
+<p>
+Calls a subroutine.
+</p>
+
+<pre class="macro-syntax">
+call &lt;label&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Calls a subroutine beginning with the &lt;label&gt; line.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+messagebox "I'm in main." "test"
+; Jump to ":sub".
+<strong>call sub</strong>
+messagebox "Now I'm in main" "test"
+end
+
+; Start of the subroutine.
+:sub
+messagebox "Now I'm in sub" "test"
+; Go back to the main routine.
+return
+</pre>
+
+</body>
+</html>

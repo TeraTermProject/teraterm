@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>ログの取り方、ログの再生機能</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>ログの取り方、ログの再生機能</h1>
+
+<p>
+ログ (log) 機能をつかうと、ホストから送られてきた文字をファイルに保存することができます。
+</p>
+
+<h2>ログの取りかた</h2>
+
+<p>
+以下の手順にしたがってください。
+</p>
+
+<ol>
+  <li><A HREF="../../menu/file.html">[File] Log</A>コマンドを実行する。</li>
+  <li>"Tera Term: Log" ダイアログボックスが現れる。
+<p>
+保存するファイルのファイル名を File Name: に入力する。<br>
+Binary を選択すると、ホストから送られた文字はすべてファイルに書き込まれる。<br>
+Binary を選択しないと、漢字、改行コードは変換されて書き込まれる。エスケープシーケンスは書き込まれない。<br>
+Append を選択すると、ファイルがすでに存在する場合、追加して書き込まれる。<br>
+Append を選択しないと、ファイルがすでに存在する場合、上書きされる。
+</p></li>
+  <li>OKボタンを押すと、"Tera Term: Log" というアイコンが現れ、ログが開始される。ログを取っている間も、一部の機能を除いて普通に Tera Term を使用することができる。</li>
+  <li>ログを終了したり、中断したい場合は、アイコンを(ダブル)クリックしてダイアログボックスを表示させ、Close または Pause ボタンを押す。Pause ボタンを押すと Start ボタンに変わるので、それを押すとログが再開される。</li>
+</ol>
+
+<p>
+保存したファイルは、「メモ帳」等のエディタで見ることができますが、エスケープシーケンス等を含んだファイルは、
+ログの再生機能を使って見ると便利です。
+</p>
+
+<h2>ログの再生のしかた</h2>
+
+<p>
+コマンドラインを、
+</p>
+
+<pre>
+TTERMPRO /R=&lt;ログファイル名&gt;
+</pre>
+
+<p>
+のように指定して Tera Term を実行します。すると、あたかもホストから文字が送られてきたかのように、ログファイルを再生することができます。
+</p>
+
+<p>
+または、<A HREF="../../menu/file.html">[File] New connection</A>で Host: の所に
+</p>
+
+<pre>
+/R=&lt;ログファイル名&gt;
+</pre>
+
+<p>
+と入力しても、ログファイルが再生できます。
+</p>
+
+</BODY>
+</HTML>

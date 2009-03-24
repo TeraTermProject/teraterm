@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>fileconcat</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>fileconcat</h1>
+
+<p>
+ファイルの内容を別のファイルに追加する。
+</p>
+
+<pre class="macro-syntax">
+fileconcat &lt;file1&gt; &lt;file2&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;file2&gt; の内容をファイル &lt;file1&gt; の最後に追加する。<br>
+&lt;file1&gt; と &lt;file2&gt; は違うファイルでなければならない。<br>
+&lt;file2&gt; の追加が成功した場合、システム変数 result に 0 が格納される。それ以外の場合, result に 0 以外が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+fileconcat 'test.dat' test2.dat'
+</pre>
+
+</body>
+</html>

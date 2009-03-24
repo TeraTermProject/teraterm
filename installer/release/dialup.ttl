@@ -1,0 +1,69 @@
+; Sample macro for Tera Term
+;  Dial-up login
+
+; open Tera Term
+;   command line = 'TERATERM /C=1' (COM1 port)
+connect '/C=1'
+
+DialPrefix = 'ATD'
+
+; set phone number, username, and password
+PhoneNumber = '0000000000'
+UsernamePrompt = 'Username:'
+Username = 'MYNAME'
+PasswordPrompt = 'Password:'
+; get password from file
+getpassword 'password.dat' 'mypassword' Password
+
+; initialize modem (see the manual for your modem)
+sendln  'ATZ'
+wait 'OK'
+
+; dial up
+
+:dial
+send   DialPrefix
+sendln PhoneNumber
+
+; set timeout (30 sec)
+timeout = 30
+
+; wait for strings from modem
+wait 'CONNECT' 'BUSY' 'NO CARRIER'
+
+; pause 2 sec
+pause 2
+
+; timeout?
+if result=0 goto error
+
+; 'CONNECT'?
+if result=1 goto conn
+
+; 'BUSY'?
+if result=2 goto redial
+
+; 'NO CARRIER'
+if result=3 goto error
+
+; error. stop macro
+:error
+messagebox 'Dialing error!' 'Tera Term'
+end
+
+:redial
+yesnobox 'Busy! Try again?' 'Tera Term'
+if result goto dial
+end
+
+; connect!
+:conn
+
+; login
+wait   UsernamePrompt
+sendln Username
+
+wait   PasswordPrompt
+sendln Password
+
+; OK, auto login complete.

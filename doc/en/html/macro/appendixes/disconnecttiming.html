@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Notice: re-connecting soon after disconnection</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>NOTICE: Immediately re-connect the server after disconnection</h1>
+<p>
+When a user immediately connects to the server after disconnection, a problem will occurs. Refer to below code.
+</p>
+
+<pre class="macro-example">
+; Sending the exit command to disconnect the remote host.
+sendln "exit"
+
+; Re-connect the remote host.
+connect "server"
+</pre>
+
+<p>
+This macro script will do not work in most cases.<br>
+
+When a user sends the exit command, it will take a few minutes to disconnect the server. So, a time lag will occur.<br>
+If a user uses the connect command while the time lag occurs, the connect command will become successful because the local host still connects to the remote host.<br>
+</p>
+
+<p>
+To fix this problem, use the connect command after finish the disconnection. See below code.
+</p>
+
+<pre class="macro-example">
+; Sends the exit command and prompts the server disconnection.
+sendln "exit"
+
+do
+	; Waits 10 msec.
+	mpause 10
+	; Confirms the connection status.
+	testlink
+; Repeats if TeraTerm connects the server. See <a href="../command/testlink.html">result is 2</a>.
+loop while result = 2
+
+; Re-connects a new connection.
+connect "server"
+</pre>
+
+<p>
+Also, when <a href="../../menu/setup-tcpip.html#autowinclose">Auto window close</a> configuration is enabled, a user uses the unlink command. Refer to in the following code:
+</p>
+
+<pre class="macro-example">
+; Sends the exit command and prompts the server disconnection.
+sendln "exit"
+
+; Unlinks TeraTerm.
+unlink
+
+; Re-connects a new connection.
+connect "server"
+</pre>
+
+</body>
+</html>

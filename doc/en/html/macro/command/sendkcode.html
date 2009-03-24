@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>sendkcode</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendkcode</h1>
+
+<p>
+Creates a full path name.
+</p>
+
+<pre class="macro-syntax">
+sendkcode &lt;key code&gt; &lt;repeat count&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to perform a function defined for pressing a key or key combination.<br>
+The key or key combination is specified by its &lt;key code&gt;, which is defined by KEYCODE.EXE. The function is performed &lt;repeat count&gt; times.<br>
+</p>
+
+<p>
+Usually the function means sending a character string to the host. The function can be defined in the keyboard setup file of Tera Term.<br>
+See <a href="../../reference/keycode.txt">KEYCODE.TXT</a>.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Simulate pressing the down-arrow key three times.
+; The key code of the down-arrow key is 336 for the IBM PC keyboard.
+sendkcode 336 3
+</pre>
+
+</body>
+</html>

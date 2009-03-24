@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>do, loop</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>do, loop</h1>
+
+<p>
+Repeats.
+</p>
+
+<pre class="macro-syntax">
+do [ { while | until } &lt;int&gt; (option)]<br>
+  ...<br>
+  ...<br>
+loop [ { while | until } &lt;int&gt; (option)]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Repeats the statements between 'do' and 'loop' according to condition as follows.
+If 'while' specified, repeats while &lt;int&gt; is non-zero.
+If 'until' specified, repeats while &lt;int&gt; is zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Repeat ten times.
+i = 10
+do while i&gt;0
+    i = i - 1
+loop
+</pre>
+
+<pre class="macro-example">
+; Send clipboard content.
+offset = 0
+do
+    clipb2var buff offset
+    if buff > 0 send buff
+    offset = offset + 1
+loop while result = 2
+</pre>
+
+</body>
+</html>

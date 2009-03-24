@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>if, then, elseif, else, endif</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>if, then, elseif, else, endif</h1>
+
+<p>
+Conditional branching
+</p>
+
+<h2>1) Format 1</h2>
+
+<pre class="macro-syntax">
+if &lt;int&gt; &lt;statement&gt;
+</pre>
+
+<h3>Remarks</h3>
+
+<p>
+Executes a &lt;statement&gt;, if &lt;int&gt; is non-zero.
+</p>
+
+<h3>Example</h3>
+
+<pre class="macro-example">
+; If A&gt;1, jump to ':label'.
+if A&gt;1 goto label
+
+; If result&lt;&gt;0, assign 0 to A.
+if result A=0
+</pre>
+
+
+<h2>2) Format 2</h2>
+
+<pre class="macro-syntax">
+if &lt;int 1&gt; then
+  ...
+  (Statements for the case:  &lt;int 1&gt; is true (non-zero).)
+  ...
+[elseif &lt;int 2&gt; then]
+  ...
+  (Statements for the case:  &lt;int 1&gt; is false (zero) and &lt;int 2&gt; is true.)
+  ...
+[elseif &lt;int N&gt; then]
+  ...
+  (Statements for the case:  &lt;int 1&gt;, &lt;int 2&gt;,... and &lt;int N-1&gt; are all false, and &lt;int N&gt; is true.)
+  ...
+[else]
+  ...
+  (Statements for the case:  all the conditions above are false (zero).)
+  ...
+endif
+</pre>
+
+<h3>Remarks</h3>
+
+<p>
+'if' and 'elseif' statements must end with 'then'.<br>
+'elseif' and 'else' can be omitted.<br>
+'endif' can not be omitted.
+</p>
+
+<h3>Example</h3>
+
+<pre class="macro-example">
+if a=1 then
+  b = 1
+  c = 2
+  d = 3
+endif
+
+if i&lt;0 then
+  i=0
+else
+  i=i+1
+endif
+
+if i=1 then
+  c = '1'
+elseif i=2 then
+  c = '2'
+elseif i=3 then
+  c = '3'
+else
+  c = '?'
+endif
+</pre>
+
+</body>
+</html>

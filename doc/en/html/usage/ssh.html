@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>SSH connection</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH connection</h1>
+
+    <p>
+      Description of SSH connection which is a feature of Tera Term.
+    </p>
+
+    <h2>Prerequisite</h2>
+
+    <p>
+      SSH is composed of two protocols, namely SSH1 and SSH2. Be careful that SSH2 is NOT upward compatible of SSH1. These protocols should be chosen carefully according to the host to be connected. Tera Term supports both protocols.    </p>
+
+    <p>
+      There are several ways of connection of SSH as follows      <ul>
+	<li>Password authentication</li>
+	<li>Key-pair (Public Key and Private key) authentication</li>
+	<li>rhosts authentication for SSH1</li>
+	<li>challenge/response (SSH1), keyboard-interactive (SSH2) authentication</li>
+      </ul>
+      In this document, we will describe Password authentication and Key-pair authentication which would be most widely used.    </p>
+
+    <h2>Procedure of connection</h2>
+
+    <p>
+      When Tera Term is activated, the following dialog will let you choose login procedure.
+    </p>
+    <div class="img"><img src="../image/NewConnection.png" alt="connection dialog"></div>
+    <p>
+      When using SSH, you should change SSH version in a default parameter. Make sure that it is synchronized to the host to be connected.
+    </p>
+
+    <p>
+      Once connected, then you will be prompted to select authentication method in a dialog.    </p>
+    <div class="img"><img src="../image/Authentication.png" alt="Authentication method"></div>
+    <p>
+      If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.<br>
+      When using Key-pair authentication, check [RSA/DSA key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.
+    </p>
+
+    <h2>Generating Key</h2>
+
+    <p>
+     Here, we will describe how to generate Public/Private key.  To generate key, select [Setup]
+menu and choose [SSH KeyGenerator...].
+    </p>
+    <div class="img"><img src="../image/SelectKeyGenerator.png" alt="Choosing key generation"></div>
+    <p>
+      Then you will see a dialog of key generation. 
+    </p>
+    <div class="img"><img src="../image/KeyGenerator.png" alt="Key generation dialog"></div>
+    <p>
+      [Key type] is to select key types - [RSA1] for SSH1 protocol and [RSA] or [DSA] for SSH2 protocol should be chosen respectively. After choosing key type, you will be prompted for pass phrase by clicking [Generate] button. Type in pass phrase (like a password, but it can include blank and usually much longer than password). Then click [Save public key]
+button, [Save private key] button to save these keys. File name cen be left as default if you don't need. At the completion, click [Cancel] to finish this process.
+    </p>
+
+    <p>
+For this file, when it is saved as default, all files which have an extension of [pub] (public key) will be stored in the specified location in the server (usually, it is (home dir)/.ssh/authorized_keys). All files which have NOT an extension are recognized as private key and you have to specify it at login.
+ </p>
+
+    <p>
+      <em>Note: </em>Since Private key should not be disclosed to other party, please be careful to make it secret. Please makre that it is NOT sent to server by accident.
+    </p>
+
+  </body>
+</html>

@@ -1,0 +1,14 @@
+EXPORTS
+  SetupTerminal @1
+  SetupWin @2
+  SetupKeyboard @3
+  SetupSerialPort @4
+  SetupTCPIP @5
+  GetHostName @6
+  ChangeDirectory @7
+  AboutDialog @8
+  ChooseFontDlg @9
+  SetupGeneral @10
+  WindowWindow @11
+
+  TTDLGSetUILanguageFile @12

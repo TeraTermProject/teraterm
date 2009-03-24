@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>VT100 の PF1-PF4 キー</TITLE>
+<link rel="stylesheet" href="../../style.css" type="text/css">
+<META http-equiv="Content-Style-Type" content="text/css">
+</HEAD>
+<BODY>
+
+<h1>VT100 の PF1-PF4 キー</h1>
+
+<p>
+キーボードの初期設定では VT100 の PF1-PF4 キーの機能はテンキーの一番上の列の４つのキー (IBM/PC の場合 "Num Lock", "/", "*", "-" ; PC98 の場合 "HOME CLR", "HELP" "-", "/")に割り当てられています。これを F1-F4 キーに割り当てるように変更するには以下のようにキーボード設定ファイル KEYBOARD.CNF を書き換えてください。詳しくは、<A HREF="../../reference/keycode.txt">KEYCODE.TXT</A>を読んでください。
+</p>
+
+<p>
+以下は IBM-PC キーボードの場合(PC98 の場合は KEYCODE.EXE を使用してキーコードを調べてください)。
+</p>
+
+<pre>
+[Numeric keypad]
+PF1=59
+PF2=60
+PF3=61
+PF4=62
+; 59-62 は F1-F4 key のキーコード
+
+[X function keys]
+XF1=off
+XF2=off
+XF3=off
+XF4=off
+; キーコード 59-62 を二重使用しないようにするため XF1-XF4 を "off" にする。
+</pre>
+
+</BODY>
+</HTML>

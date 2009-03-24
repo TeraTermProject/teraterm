@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>exec</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>exec</h1>
+
+<p>
+Runs an application.
+</p>
+
+<pre class="macro-syntax">
+exec &lt;command line&gt; [&lt;show&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Runs an application specified by &lt;command line&gt;.
+</p>
+
+<pre>
+here show command: 
+hide
+minimize
+maximize
+show ;default parameters when no show command specified. 
+</pre>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Run "Notepad".
+exec 'notepad readme.txt'
+
+; Run "Notepad" and maximize the application.
+exec 'notepad readme.txt' 'maximize'
+</pre>
+
+<pre class="macro-example">
+; Launch a batch file.
+tmp='cmd /c c:\upload.bat '
+strconcat tmp username1 
+strconcat tmp ' '
+strconcat tmp userpass1 
+strconcat tmp ' '
+strconcat tmp address
+messagebox tmp 'exec'
+exec tmp
+</pre>
+
+</body>
+</html>

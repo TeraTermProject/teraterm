@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strscan</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strscan</h1>
+
+<p>
+部分文字列の位置を返す
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strscan &lt;string&gt; &lt;substring&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列 &lt;string&gt; の中に、 部分文字列  &lt;substring&gt; が含まれているかどうか調べる。<br>
+もし、  &lt;substring&gt; が見つかった場合、その位置（1オリジン）がシステム変数 result に格納される。<br>
+&lt;substring&gt; が複数含まれている場合、最初のものの位置が格納される。もし、 &lt;substring&gt; が見つからなかった場合、 result に0が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strscan 'tera term' 'term'
+; result の値は6
+int2str valstr result
+messagebox valstr 'result'
+</pre>
+
+<pre class="macro-example">
+; 16進文字列を16進および2進へ変換する
+basenum='0060E3da'
+base=16
+call base2dec
+int2str sdec decnum
+messagebox sdec 'decnum'
+base=2
+call dec2base
+messagebox basenum 'basenum'
+end
+
+:dec2base
+basenum=''
+tmp=decnum      ;modified so not destructive of decnum
+while tmp>0
+   strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
+   strconcat basedig basenum
+   basenum=basedig
+   tmp=tmp/base
+endwhile
+return
+
+:base2dec
+decnum=0
+strlen basenum
+len=result
+for i 1 len
+   strcopy basenum i 1 basedig
+   decnum=decnum*base
+   strscan '0123456789ABCDEFabcdef' basedig
+   if result>16 result=result-6      ;take care of lower case
+   decnum=decnum+result-1
+next
+return
+</pre>
+
+
+<pre class="macro-example">
+; IPアドレスのネットワークアドレスとサブネットマスクを求める
+ip='192.168.1.189'
+subnet='255.255.255.248'
+ 
+sip=subnet      ;find number of significant bits
+call ip2bin
+strconcat bip '0' ;ensure there is at least one 0 to find
+strscan bip '0'
+bits=result-1
+messagebox bits 'bits'
+ 
+sip=ip          ;calculate first address in subnet
+call ip2bin
+strlen bip
+strcopy bip 1 bits bip
+while result-bits>0
+    strconcat bip '0'
+    result=result-1
+endwhile
+call bin2ip
+messagebox sip 'net'
+end
+ 
+:bin2ip     ;convert binary ip to decimal number format with dots
+sip=''
+base=2
+do
+    strcopy bip 1 8 basenum
+    call base2dec
+    int2str sdec decnum
+    strconcat sip sdec
+    strcopy bip 9 999 bip
+    strlen bip
+    if result>0 strconcat sip '.'
+loop while result>0
+return
+ 
+:ip2bin     ;converts ip number to binary and removes dots
+base=2
+bip=''
+do
+    str2int decnum sip
+    call dec2base
+    strlen basenum  ;fill in any missing leading zeros
+    strcopy '00000000' 1 8-result stmp
+    strconcat bip stmp
+    strconcat bip basenum
+    strscan sip '.'
+    strcopy sip result+1 999 sip
+loop while result>0
+return
+ 
+:dec2base   ;converts a decimal number to any base
+basenum=''
+tmp=decnum ;modified so not destructive of decnum
+while tmp>0
+    strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
+    strconcat basedig basenum
+    basenum=basedig
+    tmp=tmp/base
+    endwhile
+return
+ 
+:base2dec   ;converts a number in any base to a decimal number
+decnum=0
+strlen basenum
+len=result
+for tmp 1 len
+    strcopy basenum tmp 1 basedig
+    strscan '0123456789ABCDEFabcdef' basedig
+    if result=0 break   ;if not a num char, stop conversion
+    if result>16 result=result-6 ;take care of lower case
+    decnum=decnum*base
+    decnum=decnum+result-1
+next
+return
+</pre>
+
+
+</body>
+</html>

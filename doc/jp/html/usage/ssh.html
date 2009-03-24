@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <TITLE>SSH 接続</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH 接続</h1>
+
+    <p>
+      Tera Term の特徴とも言える SSH 接続について解説します。
+    </p>
+
+    <h2>前提知識</h2>
+
+    <p>
+      SSH には SSH1、SSH2 の2種類のプロトコルがあります。SSH2 は SSH1 の上位互換ではないので注意が必要です。接続するホストに応じて適切に選択する必要があります。Tera Term は両方のバージョンに対応しています。
+    </p>
+
+    <p>
+      また、SSH の接続方法には
+      <ul>
+	<li>パスワード認証</li>
+	<li>公開鍵と秘密鍵（キー・ペア）による認証</li>
+	<li>SSH1 における rhosts 認証</li>
+	<li>challenge/response (SSH1), keyboard-interactive (SSH2) 認証</li>
+      </ul>
+      がありますが、ここでは需要が多いと思われるパスワード認証とキー・ペア認証について触れたいと思います。
+    </p>
+
+    <h2>接続の手順</h2>
+
+    <p>
+      Tera Term を起動すると、下図のようなダイアログによりログイン方法を選ぶことができます。
+    </p>
+    <div class="img"><img src="../image/NewConnection.png" alt="接続ダイアログ"></div>
+    <p>
+      SSH で接続する場合、デフォルトから変更する箇所は「SSH version」です。接続先のサーバにあわせて選択してください。
+    </p>
+
+    <p>
+      接続すると、今度は認証方法を選択するダイアログが現れます。
+    </p>
+    <div class="img"><img src="../image/Authentication.png" alt="認証方法"></div>
+    <p>
+      ここで、パスワード認証を使用する場合は「Use plain password to log in」にチェックがついていることを確認し、ユーザ名とパスワードを入力します。これらが正しければ無事ログインできます。<br>
+      キー・ペア認証を用いる場合は、上から2番目の「Use RSA/DSA key to log in」にチェックをつけ、「Private key file:」ボタンを押して秘密キーのファイルを指定します。その後ユーザ名と秘密キーのパスフレーズを入力してログインします。
+    </p>
+
+    <h2>キーの生成</h2>
+
+    <p>
+      ここで、キー・ペア認証に用いる公開鍵・秘密鍵の生成方法を説明します。鍵ファイルを生成するには [Setup] メニューから「SSH KeyGenerator...」を選択します。
+    </p>
+    <div class="img"><img src="../image/SelectKeyGenerator.png" alt="キー生成を選択"></div>
+    <p>
+      選択すると、鍵の生成ダイアログが現れます。<br>
+    </p>
+    <div class="img"><img src="../image/KeyGenerator.png" alt="キー生成ダイアログ"></div>
+    <p>
+      「Key type」でキーの種類を選べますが、SSH1 プロトコルで使用する場合には「RSA1」を、SSH2 プロトコルで使用する場合には「RSA」または「DSA」を選択します。選択後、「Generate」ボタンを押すとパスフレーズの入力を催されますので、キーのパスフレーズ（パスワードのようなもの。ただし空白を含んでもいいし、一般にパスワードよりも長い物が指定可能）を入力します。入力した後は、「Save public key」ボタン、「Save private key」ボタンを押してキーを保存します。ファイル名は必要がなければデフォルトのままで構いません。保存が終わったら「Cancel」で終了します。
+    </p>
+
+    <p>
+      このキー・ファイルの使用方法ですが、デフォルトで保存した場合、拡張子が「pub」となっているファイル（「公開鍵」）の内容を、サーバの指定の場所に保管します。（一般的には (home dir)/.ssh/authorized_keys に内容を追加します。）また、拡張子が付いていないファイルは「秘密鍵」となり、ログイン時に指定する事となります。
+    </p>
+
+    <p>
+      <em>注意</em>：秘密鍵（private key）は第三者に絶対に知られてはいけないため、管理を厳重に行うようにしてください。また、誤ってサーバへ転送してしまわないようにしてください。
+    </p>
+
+  </body>
+</html>

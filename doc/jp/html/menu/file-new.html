@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>New Connection ([File] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>New Connection ([File] メニュー)</h1>
+    <p>
+      新しいホストまたはシリアルポートに接続します。
+      すでに接続されているときは、別の Tera Term セッションを起動します。
+    </p>
+
+    <h2>"New connection" ダイアログボックス</h2>
+
+    <h3>TCP/IP</h3>
+    <dl>
+      <dt>Host</dt>
+      <dd>
+	接続するホスト名または IP address をキーボードで入力して指定するか、
+	リストの中から選択してください。リストを編集するには
+	<a href="setup-tcpip.html">[Setup] TCP/IP</a> を使ってください。
+	また、ホスト名だけでなく以下のような、
+	<a href="../commandline/teraterm.html">コマンドライン</a>
+	文字列を指定することもできます。
+
+    <pre>
+    myhost.mydomain                     通常はホスト名または IP address だけ
+    myhost.mydomain:23                  ホスト名とポート番号
+    foohost.foodomain /F=FOOHOST.INI    ホスト名+設定ファイル名を指定
+    /C=1                                シリアルポートを指定することも可能
+    /R=LOG.DAT                          ホストやポートに接続せずに、ログファイルの内容を再生
+    </pre>
+      </dd>
+
+      <dt>Telnet</dt>
+      <dd>
+	Telnet プロトコルを使用します。通常は選択してください。
+      </dd>
+
+      <dt>TCP port#</dt>
+      <dd>
+	Telnet を使用する場合、通常は23にしてください。
+      </dd>
+    </dl>
+
+    <p class="indent1">
+      注:<br>
+      Telnet が選択されて、かつ TCP port# が 23 のときだけ、Tera Term
+      から自発的に telnet の option negotiation を開始します。
+      それ以外の場合でも Tera Term はホストから送られてきた telnet
+      コマンドに応答することができます。
+    </p>
+
+    <p class="indent1">
+      参照:<br>
+      <a href="../usage/tips/not_port23.html">Telnet 用ポート番号 / 非 telnet 接続用の端末設定</a>
+    </p>
+
+    <h3>Serial</h3>
+    <dl>
+      <dt>Port</dt>
+      <dd>
+	接続するシリアルポートをリストの中から選択してください。
+      </dd>
+    </dl>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strlen</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strlen</h1>
+
+<p>
+Returns a length of string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strlen &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Returns the length of &lt;string&gt; in the system variable "result".<br>
+The length does not include the null-terminate character. Also, the length counts in terms of bytes.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strlen Txcnt
+if result>0 then
+	logwrite Txcnt
+else
+	messagebox 'Txcnt is NULL' 'error'
+endif
+</pre>
+
+</body>
+</html>

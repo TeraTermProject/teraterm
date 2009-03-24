@@ -1,0 +1,276 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winres.h>
+#include <winnt.rh>
+#include <winuser.rh>
+#include <commctrl.rh>
+#ifndef IDC_STATIC
+#define IDC_STATIC -1
+#endif
+#ifndef ES_NUMBER
+#define ES_NUMBER           0x2000L
+#endif
+#ifndef UDS_HOTTRACK
+#define UDS_HOTTRACK        0x0100
+#endif
+#ifndef VS_VERSION_INFO
+#define VS_VERSION_INFO     1
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <winres.h>\r\n"
+    "#include <winnt.rh>\r\n"
+    "#include <winuser.rh>\r\n"
+    "#include <commctrl.rh>\r\n"
+    "#ifndef IDC_STATIC\r\n"
+    "#define IDC_STATIC -1\r\n"
+    "#endif\r\n"
+    "#ifndef ES_NUMBER\r\n"
+    "#define ES_NUMBER           0x2000L\r\n"
+    "#endif\r\n"
+    "#ifndef UDS_HOTTRACK\r\n"
+    "#define UDS_HOTTRACK        0x0100\r\n"
+    "#endif\r\n"
+    "#ifndef VS_VERSION_INFO\r\n"
+    "#define VS_VERSION_INFO     1\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,15
+ PRODUCTVERSION 1,0,0,15
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "Comments", "プロキシ経由での通信をサポートするプラグイン。"
+            VALUE "CompanyName", "TeraTerm Project, 蛭子屋本舗"
+            VALUE "FileDescription", "プロキシプラグイン"
+            VALUE "FileVersion", "1, 0, 0, 15"
+            VALUE "InternalName", "TTProxy"
+            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2008, Copyright (C) 2003-2006 蛭子屋本舗"
+            VALUE "OriginalFilename", "TTXProxy.dll"
+            VALUE "ProductName", "蛭子屋本舗プロキシプラグイン集"
+            VALUE "ProductVersion", "1, 0, 0, 15"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 英語 (米国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,15
+ PRODUCTVERSION 1,0,0,15
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Plug-in that supports communication by way of proxy"
+            VALUE "CompanyName", "TeraTerm Project, Yebisuya Hompo"
+            VALUE "FileDescription", "Proxy plug-in"
+            VALUE "FileVersion", "1, 0, 0, 15"
+            VALUE "InternalName", "TTProxy"
+            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2008, Copyright (C) 2003-2006 Yebisuya Hompo"
+            VALUE "OriginalFilename", "TTXProxy.dll"
+            VALUE "ProductName", "Proxy plug-in collection of Yebisuya Hompo"
+            VALUE "ProductVersion", "1, 0, 0, 15"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTION_SETTING DIALOGEX 0, 0, 215, 239
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Other Setup"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "Common setup",IDC_GRP_COMMON,8,7,199,52
+    LTEXT           "Connection &Timeout",IDC_TIMEOUT_LABEL,15,23,85,8
+    EDITTEXT        IDC_TIMEOUT,109,20,48,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_TIMEOUT,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,190,21,9,14
+    LTEXT           "seconds",IDC_TIMEOUT_SECONDS,163,23,25,8
+    LTEXT           "Proxy connection &log",IDC_LOGFILE_LABEL,15,42,85,8
+    EDITTEXT        IDC_LOGFILE,109,40,48,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Re&fer...",IDC_REFER,162,40,37,14
+    GROUPBOX        "SOCKS proxy setup",IDC_GRP_SOCKS,9,63,199,31
+    LTEXT           "Name &Resolving",IDC_RESOLVE_LABEL,16,77,85,8
+    COMBOBOX        IDC_RESOLVE,109,75,90,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "TELNET Proxy setup",IDC_GRP_TELNET,9,101,199,109
+    LTEXT           "&Hostname prompt",IDC_HOSTNAME_LABEL,16,115,100,8
+    EDITTEXT        IDC_HOSTNAME,124,113,75,14,ES_AUTOHSCROLL
+    LTEXT           "&Username prompt",IDC_USERNAME_LABEL,16,135,100,8
+    EDITTEXT        IDC_USERNAME,124,131,75,14,ES_AUTOHSCROLL
+    LTEXT           "&Pasword prompt",IDC_PASSWORD_LABEL,16,153,100,8
+    EDITTEXT        IDC_PASSWORD,124,151,75,14,ES_AUTOHSCROLL
+    LTEXT           "&Connected message",IDC_CONNECTED_LABEL,16,173,100,8
+    EDITTEXT        IDC_CONNECTED,124,169,75,14,ES_AUTOHSCROLL
+    LTEXT           "&Error message",IDC_ERROR_LABEL,16,191,100,8
+    EDITTEXT        IDC_ERROR,124,189,75,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,83,217,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,149,217,50,14
+END
+
+IDD_SETTING DIALOGEX 0, 0, 159, 187
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Proxy Setup"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "URL",IDC_URL_LABEL,7,11,50,8
+    EDITTEXT        IDC_URL,64,7,88,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "&Type",IDC_TYPE_LEBEL,7,31,50,8
+    COMBOBOX        IDC_TYPE,64,29,88,87,CBS_DROPDOWNLIST | WS_TABSTOP
+    LTEXT           "&Hostname",IDC_HOSTNAME_LABEL,7,53,50,8
+    EDITTEXT        IDC_HOSTNAME,64,50,88,14,ES_AUTOHSCROLL
+    LTEXT           "Port &number",IDC_PORT_LABEL,7,76,50,8
+    EDITTEXT        IDC_PORT,64,73,88,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "&Username",IDC_USERNAME_LABEL,7,99,50,8
+    EDITTEXT        IDC_USERNAME,64,96,88,14,ES_AUTOHSCROLL
+    LTEXT           "&Password",IDC_PASSWORD_LABEL,7,122,50,8
+    EDITTEXT        IDC_PASSWORD,64,119,88,14,ES_PASSWORD | ES_AUTOHSCROLL
+    PUSHBUTTON      "&Other setup...",IDC_OPTIONS,53,142,99,14
+    DEFPUSHBUTTON   "OK",IDOK,44,166,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,102,166,50,14
+END
+
+IDD_ABOUTDIALOG DIALOGEX 0, 0, 226, 87
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About TTProxy"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "TTProxy\n%s, %d.%d.%d.%d\nCopyright (C) 2006-2008 TeraTerm Project\nTeraTerm Project: http://ttssh2.sourceforge.jp/\nCopyright (C) 2003-2006 %s\n%s: http://yebisuya.dip.jp/Software/TTProxy/",IDC_VERSION,7,7,212,52
+    DEFPUSHBUTTON   "OK",IDOK,82,63,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_OPTION_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 208
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 232
+    END
+
+    IDD_SETTING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 180
+    END
+
+    IDD_ABOUTDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 219
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 78
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 英語 (米国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+

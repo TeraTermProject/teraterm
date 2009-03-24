@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>filestrseek</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filestrseek</h1>
+
+<p>
+文字列をファイルの先頭から末尾に向かって検索する。
+</p>
+
+<pre class="macro-syntax">
+filestrseek &lt;file handle&gt; &lt;string&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイルハンドル &lt;file handle&gt; で指定されるファイルから、文字列 &lt;string&gt; を検索する。<br>
+検索は現在のファイルポインタの位置から開始する。検索はファイルの終わりの方に向かって行われる。逆方向の検索には "<a href="filestrseek2.html">filestrseek2</a>" コマンドを使用する。<br>
+&lt;string&gt; が見つかった場合、ファイルポインタは  &lt;string&gt; の次の文字の位置になり、システム変数 result に 1 が格納される。<br>
+&lt;string&gt; が見つからなかった場合、ファイルポインタは移動せず、システム変数 result に 0 が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+fileopen fhandle 'teraterm.log' 0
+
+; ファイル "teraterm.log" から文字列 "abc" を検索し、
+filestrseek fhandle 'abc'
+if result=0 goto not_found
+; "abc" の次の文字からその行の終わりまでを読み込む
+filereadln fhandle str
+
+:not_found
+fileclose fhandle
+</pre>
+
+</body>
+</html>

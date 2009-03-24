@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>send</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>send</h1>
+
+<p>
+Sends data.
+</p>
+
+<pre class="macro-syntax">
+send &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to send characters to the host.<br>
+If &lt;data&gt; is a string, the string is sent to the host. <br>
+If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the character is sent to the host.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+send 'ABC'
+
+; Send "ABC". (ASCII code of the character "A" is 65.)
+send  65 66 67
+myname='Tera Term'
+send 'My name is ' myname '.'
+</pre>
+
+<p>
+See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Expressions and operators</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Expressions and operators</h1>
+
+<p>
+Expressions consist of constants, variables, operators, and parentheses. Constants and variables must be of the integer type. The value of an expression is also an integer. <br>
+The value of a relational expression (formed using relational operators) is 1, 
+if it is true, or 0 if false.
+</p>
+
+<p>
+The following are operators:
+</p>
+
+<table border="1">
+  <tr>
+    <th>Precedence</th>
+    <th>Operators</th>
+    <th>Category</th>
+    <th>Note</th>
+  </tr>
+
+  <tr>
+    <td rowspan="4">1, high</td>
+    <td>not ~</td>
+    <td>bitwise negation</td>
+    <td>"~" is available in version 4.53 or later</td>
+  </tr>
+  <tr>
+    <td>!</td>
+    <td>logical negation</td>
+    <td>available in version 4.53 or later</td>
+  </tr>
+  <tr>
+    <td>+</td>
+    <td>plus unary</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>minus unary</td>
+    <td>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td rowspan="3">2</td>
+    <td>*</td>
+    <td>multiplication</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>/</td>
+    <td>division</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>%</td>
+    <td>remainder</td>
+    <td>the value of expression A % B is the remainder of A / B.</td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">3</td>
+    <td>+</td>
+    <td>addition</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>subtraction</td>
+    <td>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">4</td>
+    <td>&gt;&gt; &lt;&lt;</td>
+    <td>arithmetic shift</td>
+    <td>available in version 4.54 or later</td>
+  </tr>
+  <tr>
+    <td>&gt;&gt;&gt;</td>
+    <td>logical shift</td>
+    <td>available in version 4.54 or later</td>
+  </tr>
+
+  <tr>
+    <td rowspan="1">5</td>
+    <td>and &amp;</td>
+    <td>bitwise conjunction</td>
+    <td>"&amp" is available in version 4.53 or later</td>
+  </tr>
+
+  <tr>
+    <td rowspan="1">6</td>
+    <td>xor ^</td>
+    <td>bitwise exclusive disjunction</td>
+    <td>"^" is available in version 4.53 or later.</td>
+  </tr>
+
+  <tr>
+    <td rowspan="1">7</td>
+    <td>or |</td>
+    <td>bitwise disjunction</td>
+    <td>"|" is available in version 4.53 or later.</td>
+  </tr>
+
+  <tr>
+    <td>8</td>
+    <td>&lt; &gt; &lt;= &gt;=</td>
+    <td>relational</td>
+    <td>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td>9</td>
+    <td>= == &lt;&gt; !=</td>
+    <td>relational</td>
+    <td>"==" and "!=" are available in version 4.54 or later.</td>
+  </tr>
+
+  <tr>
+    <td>10</td>
+    <td>&amp;&amp;</td>
+    <td>logical conjunction</td>
+    <td>version 4.53 or later.</td>
+  </tr>
+
+  <tr>
+    <td>11, low</td>
+    <td>||</td>
+    <td>logical disjunction</td>
+    <td>version 4.53 or later.</td>
+  </tr>
+</table>
+<p>
+"and", "or", "xor" and "not" are bitwise operator, not logical operator.
+</p>
+
+<pre>
+Example:
+    1 + 1
+    4 - 2 * 3      The value is -2.
+    15 % 10        The value is 5.
+    3 * (A + 2)    A is an integer variable.
+    A and not B
+    A &lt;= B         A and B are integer variables. The value is 1,
+                   if the expression is true, or 0 if false.
+</pre>
+
+</body>
+</html>

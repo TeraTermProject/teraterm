@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Keyboard ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Keyboard ([Setup] メニュー)</h1>
+
+    <h2>"Keyboard setup" ダイアログボックス</h2>
+    <dl>
+      <dt>Transmit DEL by:</dt>
+      <dd>
+	<dl>
+	  <dt>Backspace key</dt>
+	  <dd>
+	    このオプションが選択されると backspace キーを押した時に DEL 文字
+	    (ASCII $7F) が送出されます。
+	    選択されないと BS 文字 (ASCII $08) が送出されます。<br>
+	    また、このオプションが選択された(選択されない)時でも
+	    Ctrl+Backspace で BS (DEL) 文字を送出できます。
+	  </dd>
+
+	  <dt><a name="delkey">Delete key</a></dt>
+	  <dd>
+	    このオプションが選択されると Delete (Del) キーを押した時に
+	    DEL 文字が送出されます。
+	    このオプションが選択されない場合、Delete キーの機能は
+	    <a href="../setup/keyboard.html">キーボード設定ファイル</a>
+	    により決定されます。
+	  </dd>
+	</dl>
+      </dd>
+
+      <dt>Meta key</dt>
+      <dd>
+	Alt キーをメタ・キー (meta key) として使います。
+	例えば、Alt+A を押すと、ESC A を送出します。
+	メタ・キーモードでは、ショートカット・キーは一部を除いて使用できなくなります。
+      </dd>
+
+      <dt>Disabled mode:</dt>
+      <dd>
+	<dl>
+	  <dt>Application Keypad</dt>
+	  <dd>
+	    アプリケーションキーパッドモードを無効にします。<br>
+	    アプリケーションキーパッドモードを無効にすると、
+	    なにかの拍子でアプリケーションキーパッドモードに移行してしまい
+	    数値キーパッドが使えなくなるというトラブルを防ぐ事ができます。
+	    しかし、アプリケーションキーパッドモードを使用している
+	    アプリケーションでは不具合が起きるかもしれません。
+	  </dd>
+
+	  <dt>Application Cursor</dt>
+	  <dd>
+	    アプリケーションカーソルモードを無効にします。
+	  </dd>
+	</dl>
+      </dd>
+    </dl>
+
+    <p>
+      <A HREF="../setup/keyboard.html">キーボード設定ファイル</A>
+      を書きかえることで自由にキー設定を変更することができます。
+    </p>
+
+    <p>
+      <a href="setup-keyboardr.html">ロシア語モードのヘルプ</a>
+    </p>
+  </body>
+</html>

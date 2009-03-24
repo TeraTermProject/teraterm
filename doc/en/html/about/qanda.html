@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Frequently asked questions</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Frequently asked questions</h1>
+
+<p>
+Please read this page carefully before you contact the author.
+</p>
+
+<h2>[About Tera Term]</h2>
+
+<p>
+<span class="qanda">Q.</span> Where can I find the latest version?<br>
+<span class="qanda">A.</span> You can find it at the following sites:<br>
+<a href="http://ttssh2.sourceforge.jp/">http://ttssh2.sourceforge.jp/</a><br>
+Note: These sites may be changed in future.
+</p>
+
+<p>
+<span class="qanda">Q.</span> When will the next version be released?<br>
+<span class="qanda">A.</span> See Tera Term home page.
+</p>
+
+
+<h2>[Basic usage]</h2>
+<p>
+<span class="qanda">Q.</span> I can not connect to a host.<br>
+<span class="qanda">A.</span> Please check the following things:
+</p>
+<ul>
+ <li>Network configuration of your PC. See Control Panel.</li>
+ <li>Can you use other network applications such as WWW browsers and ftp  <li>clients?</li>
+ <li>Is the host name or IP address correct?</li>
+ <li>Can you connect to the host from other machines?</li>
+</ul>
+<p>
+Please do not ask the author how to configure network properties. Please read books and magazines or ask the network administrator.
+</p>
+
+<p>
+<span class="qanda">Q.</span> How do I connect to a host with dial-up TCP/IP (PPP)?<br>
+<span class="qanda">A.</span> Before you run Tera Term, establish the PPP connection. In the case of Win 95, you should use "Dial-Up Networking".<br>
+After the dial-up (PPP) connection is established, run Tera Term. Enter the host name or IP address at the <a href="../menu/file-new.html">[File] New connection</a> dialog box. If you don't know the name or IP address of the host, ask the network administrator.<br>
+In the case of PPP connection, the serial port is controlled by the PPP connection utility. Serial port functions of Tera Term are for non-PPP connections and nothing to do with the PPP connection.
+</p>
+
+<p>
+<span class="qanda">Q.</span> Tera Term automatically closes when I logout a telnet host. How to disable closing?<br>
+<span class="qanda">A.</span> Turn "Auto window close" off in the <a href="../menu/setup-tcpip.html">[Setup] TCP/IP</a> dialog box.
+</p>
+
+<p>
+<span class="qanda">Q.</span> I want to connect to a telnet host, but a serial port is always opened when Tera Term is started.<br>
+<span class="qanda">A.</span> Set "Default port" to "TCP/IP" in the <a href="../menu/setup-general.html">[Setup] General</a> dialog box.
+</p>
+
+<p>
+<span class="qanda">Q.</span> I edit TERATERM.INI but the change is not effective. What is wrong?<br>
+<span class="qanda">A.</span> If you edit TERATERM.INI while Tera Term sessions are running, the change does not become effective immediately even for sessions opened after the change was made. This is because information of TERATERM.INI is loaded into memory when the first Tera Term session is started and information is kept in memory while at least one Tera Term session is running. To refresh information in memory, execute the "<a href="../menu/setup-restore.html">[Setup] Restore setup</a>" command or close all Tera Term sessions. You don't need to do so for setup files which do not have the name TERATERM.INI.
+</p>
+
+<h2>[Keyboard]</h2>
+<p>
+<span class="qanda">Q.</span> How to set the Backspace or Delete key to work for the backspace function.<br>
+<span class="qanda">A.</span> For the Backspace key, turn "Backspace key" on or off in the <a href="../menu/setup-keyboard.html">[Setup] Keyboard</a> dialog box. For the Delete key, turn "Delete key" on (this may not work in some hosts).
+</p>
+
+<p>
+<span class="qanda">Q.</span> How to use numeric keys in normal way?<br>
+<span class="qanda">Q.</span> I can not enter "/", "*", "-" and "+" by using the numeric keypad.<br>
+<span class="qanda">A.</span> See <a href="../usage/tips/about_tenkey.html">"Numeric keypad"</a>.
+</p>
+
+<p>
+<span class="qanda">Q.</span> How to use F1-F4 keys as VT100 PF1-PF4 keys?<br>
+<span class="qanda">A.</span> See <a href="../usage/tips/pf1-pf4key_vt100.html">"PF1-PF4 keys of VT100"</a>.
+</p>
+
+<p>
+<span class="qanda">Q.</span> F1 (or whatever) key does not work. How to configure the keyboard?<br>
+<span class="qanda">A.</span> In most cases, I can not answer this kind of question because I don't know how the key works. If you know what character (string) should be sent or what function should be performed by pressing the key, you can make the key work by editing the keyboard setup file. Read <a href="../reference/keycode.txt">KEYCODE.TXT</a>.
+</p>
+
+<p>
+<span class="qanda">Q.</span> How to change the keyboard shortcut for the <a href="../menu/edit.html">[Edit] Paste (Copy)</a> command to Ctrl+V (Ctrl+C)?<br>
+<span class="qanda">A.</span> See <a href="../usage/tips/user-shortcutkey.html">"User shortcut keys"</a> and <a href="../reference/keycode.txt">KEYCODE.TXT</a>.
+</p>
+
+<h2>[Miscellaneous]</h2>
+<span class="qanda">Q.</span> What is "Tera Term extension interface"?<br>
+<span class="qanda">A.</span> It is the interface between Tera Term and add-on modules. An add-on module is provided as a DLL which can hook Tera Term user interface functions, setup functions and Winsock functions. At the point of Mar 1998, no add-on module has been developed. Projects of developing add-on modules which support ssh and SSL are in progress. See Tera Term home page for currently available add-on modules.
+</p>
+
+<p>
+<span class="qanda">Q.</span> Line drawing characters ("Tera Special" font characters) are not displayed properly.<br>
+<span class="qanda">A.</span> Remove the "Tera Special" font from "Fonts" of Control Panel, restart the system and reinstall the "Tera Special" font manually at "Fonts" of Control Panel.
+</p>
+
+<p>
+<span class="qanda">Q.</span> When line drawing characters are displayed, a "line" character does not match with an "angle" character smoothly.<br>
+<span class="qanda">A.</span> Tera Term provides the original font "Tera Special" font to display line drawing characters. The font is scaled to fit the size of normal character font. Depending on the scaling factor, this mismatch problem may occur. Please find a good choice of font and size for normal characters which does not cause this problem.
+</p>
+
+<p>
+<span class="qanda">Q.</span> Why number of fonts in the list of <a href="../setup-font.html">[Setup] Font</a> dialog box is so small?<br>
+<span class="qanda">Q.</span> Why I can not select the "Times" font at the <a href="../setup-font.html">[Setup] Font</a> dialog box?<br>
+<span class="qanda">A.</span> Tera Term uses only fixed-pitch fonts such as "Terminal" and "Courier" because characters should be displayed with equal spacing in order to emulate the VT terminal properly. Displaying proportional font characters with equal spacing is in principle possible but it makes program complicated and slow. So Tera Term does not use proportional fonts.
+</p>
+
+<p>
+<span class="qanda">Q.</span> How to change the behavior of text selection by mouse double clicking?<br>
+<span class="qanda">A.</span> See "Delimiters of a word selected by double clicking".
+</p>
+
+<p>
+<span class="qanda">Q.</span> The "at" command of Windows NT does not work for executing Tera Term.<br>
+<span class="qanda">A.</span> Specify "/interactive" option.
+</p>
+
+
+</BODY>
+</HTML>

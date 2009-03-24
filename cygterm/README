@@ -1,0 +1,390 @@
+
+                CygTerm+ - yet another Cygwin console
+
+                Using Cygwin with a terminal emulator.
+                
+                Copyright (c) 2006-2008 TeraTerm Project
+                http://ttssh2.sourceforge.jp/
+
+                Based on CygTerm by Original developer:
+                Copyright (C) 2000-2006 NSym
+
+                nsym@dd.iij4u.or.jp
+
+      (English) http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/index-e.html
+
+     (Japanese) http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/index.html
+
+
+// P R E F A C E //
+
+    This is an experiment trying to substitute a terminal emulator for the
+    DOS window as Cygwin console.  However, assume that it is carried out 
+    without the mechanism of remote login.  In other words, it doesn't use
+    `inetd', `in.telnetd' or `login'.
+
+// I D E A //
+
+    Invoking a terminal emulator and Cygwin shell, and relaying their I/O.
+    One simple solution is just to implement a program to do this.
+
+// S P E C I F I C A T I O N //
+
+    1. When this program is run, a terminal emulator starts, and a shell
+       prompt appears there, it can be used for Cygwin console.
+
+    2. The terminal emulator and the shell have to be selectable.
+
+    3. Screen control of the shell side has to work correctly and follow
+       window resizing of the terminal emulator.
+
+// D E S I G N //
+
+    Details of cygterm.exe
+
+      [1] Prepare a listener socket to wait for a TELNET connection.
+          Find out an unused TCP port number to assign to the socket from a
+          specified range.
+
+      [2] Invoke a terminal emulator in another thread.
+          Then specify IP address `127.0.0.1' and the port number [1] in the
+          command line arguments.
+
+      [3] Accept the connection from the terminal emulator.
+          Refuse it except a connection from `127.0.0.1' in security.
+
+      [4] Do fork(), and in the child process, invoke a shell under PTY
+          (pseudo terminal) slave side.
+
+      [5] Relay I/O between the TELNET connection socket [3] and the PTY
+          master side of [4].
+
+    Support for TELNET protocol (options negotiation)
+
+        Receive the notification of terminal-type from a terminal emulator,
+        and apply it to the environment variable TERM on a shell.
+
+        Receive the notification of terminal-size from a terminal emulator,
+        and apply it to window size of PTY.
+
+        [Ref. RFC854 TELNET PROTOCOL SPECIFICATION]
+
+    cygterm.exe is implemented as an window-less Win32 application.
+
+// S O U R C E //
+
+    README       -  this file
+    README-j     -  original README in Japanese
+    Makefile     -  MAKEFILE for installation
+    cygterm.cc   -  program source code
+    cygterm.cfg  -  configuration file
+
+    * CygTerm is a free software distributed under the terms of the GNU
+      General Public License (GPL) published by Free Software Foundation.
+      See http://www.gnu.org/copyleft/gpl.html.
+
+      Note: Any program including non-GPL program can invoke the CygTerm
+            executable (cygterm.exe) and communicate with it. 
+
+// I N S T A L L //
+
+    Do `make install' under Cygwin.
+
+    * Be sure to specify the install directory by BINDIR in Makefile
+      in advance.  cygterm.exe and cygterm.cfg are installed in BINDIR.
+      cygterm.cfg is not overwritten.
+
+// C O N F I G U R A T I O N //
+
+    cygterm.cfg is a configuration file.  This includes definitions for the
+    command lines of a terminal emulator and a shell, and several parameters.
+    cygterm.cfg is loaded from the same directory cygterm.exe exists in.
+
+      An example of cygterm.cfg
+      +-----------------------------------------------------------------------
+      | TERM = C:\program files\ttermpro\ttermpro.exe %s %d /KR=SJIS /KT=SJIS
+      | TERM_TYPE = vt100
+      | PORT_START = 20000
+      | PORT_RANGE = 40
+      | SHELL = /bin/bash
+      | ENV_1 = MAKE_MODE=unix
+      | ENV_2 = HOME=/home
+      |   :         : 
+
+    TERM
+    ----
+        This is the command line to execute a terminal emulaitor.
+        Specify the full path to the command if it isn't in Windows search path.
+        This needs to be described `%s' and `%d' for the host and port number.
+
+    TERM_TYPE
+    ---------
+        This terminal type is adopted when the terminal emulator did not give
+        a terminal type. (default: vt100)  Then this value is set to the
+        environment variable TERM on a shell.
+
+    PORT_START
+    ----------
+        This is the minimum TCP port number allowed for use. (default: 20000)
+
+    PORT_RANGE
+    ----------
+        This is the maximum number of TCP ports allowed for use. (default: 40)
+
+        cygterm.exe looks for an unused port number between PORT_START and
+        PORT_START+PORT_RANGE, and therefore can be run concurrently as many
+        as this number.
+
+    SHELL
+    -----
+        This is the command line to execute a shell in Cygwin side (normally
+        /bin/bash). (default: get from /etc/passwd)
+        Specify the full path to the shell or keyword "AUTO".
+
+    LOGIN_SHELL
+    -----------
+        If this parameter is set to yes, shell is invoked as a login shell.
+        (default: no)
+
+    HOME_CHDIR
+    ----------
+        If this parameter is set to yes, current directory is changed to home
+        directory before invoke a shell. (default: no)
+
+    SOCKET_TIMEOUT
+    --------------
+        Specify the timeout of socket for waiting telnet connection from
+        Tera Term. (default: 5secs)
+
+    SSH_AGENT_PROXY
+    ---------------
+        If this parameter is set to yes, cygterm provides ssh-agent proxy.
+        (default: no)
+
+    ENV_X
+    -----
+        This is the environment variable to be set when starting the shell.
+        It should be of the form `name=value' (like putenv).  It is possible to
+        give as many environment variables as needed by beginning with "ENV_".
+
+// U S A G E //
+
+    Command Line Options
+
+        cygterm.exe [-t 'terminal-emulator'] [-p port-number] [-dumb]
+                    [-s 'shell'] [-ls | -nols] [-cd | -nocd] [-a | -A]
+                    [-v 'env-var' ...] [-d 'directory] [-o 'option']
+
+    -t 'terminal-emulator'
+            Specify the command line of a terminal emulator to execute.
+            This format is the same as TERM in the configuration file.
+            The command line should be enclosed in quotes to include spaces.
+
+    -p port-number
+            Instead of executing a terminal emulator, try connection to this
+            port number of localhost.  It is considered another program uses
+            `-p' option to use Cygwin via cygterm.exe
+
+    -dumb
+            Suppress the TELNET options negotiation.  And ignore any TELNET
+            commands sent from terminal side.  The environment variable
+            TERM is set to `dumb' on the shell side.
+
+    -s 'shell'
+            Specify the command line of a shell on Cygwin to execute.
+            This format is the same as SHELL in the configuration file.
+            The command line should be enclosed in quotes to include spaces.
+            Any command can be spedicied even if a non-shell command.
+
+    -ls
+            Execute a shell as a login shell.
+
+    -nols
+            Execute a shell as a normal (not login) shell.
+
+    -cd
+            The current directory is moved to the user home directory and
+            the shell is invoked.
+
+    -nocd
+            The shell is invoked without changing the current directory.
+
+    -A
+            Enable ssh-agent forwarding support.
+
+    -a
+            Disable ssh-agent forwarding support.
+
+    -v 'env-var'
+            Specify the environment variable to be set when starting the shell.
+            This format is the same as ENV_X in the configuration file.
+            The expression should be enclosed in quotes to include spaces.
+            One or more `-v' options are available.
+
+    -d 'directory'
+            The current directory is moved to the specified directory and
+            the shell is invoked.
+
+    -o 'parameter'
+            Additional parameter for terminal-emulator.
+
+    The terminal emulator or connection port number, and the shell on Cygwin,
+    these need to be specified at least.  If these are given on the command
+    line, cygterm.exe can be run without configuration file cygterm.cfg.
+
+    cygterm.exe is an Win32 application which uses cygwin1.dll.  It can be run
+    from Cygwin command line or a shortcut on Windows.
+
+    * It is necessary the Windows environment variable PATH includes a
+      directory path of cygwin1.dll (normally Cygwin-root\bin) to be run
+      from Windows.
+
+// N O T E S //
+
+    * Attention in Tera Term
+
+        If your terminal emulator is Tera Term be careful not to save [Setup]
+        [Save setup] in the situation that it was started by cygterm.exe.
+        Otherwise telnet port number of TCP/IP is saved but 23 you will be
+        confused by connection failure when you normally run Tera Term to do
+        telnet.  In that case it will be recovered by saving the setting 
+        with specifying TCP/IP Port# 23.
+
+// T E S T E D  O N //
+
+    As of 2008-Nov, CygTerm+ has been tested in the following environments.
+
+        WindowsXP SP3 + Cygwin 1.5.25-15
+
+        Terminal emulator:
+                Tera Term Pro 2.3
+                Tera Term 4.60
+                PuTTY 0.60
+        Shell:
+                bash 3.2.39
+                zsh 4.3.4
+
+// C H A N G E S //
+v1.07_16 2008/11/21 (by doda)
+        * The option that enables ssh-agent proxy support is changed from '-a' to '-A'.
+        * Added '-a' option that disables ssh-agent proxy support.
+
+v1.07_15 2008/11/01 (by doda)
+        * Added ssh-agent proxy support.
+
+v1.07_14 2007/12/17 (by doda)
+        * Added '-o' option that is specifies the additional parameters for terminal-emulator.
+
+v1.07_13 2007/08/03 (by maya)
+        * Added '-d' option that is specifies the start directory.
+
+v1.07_12 2007/06/10 (by doda)
+        * Add 'SOCKET_TIMEOUT' entry which the timeout value of socket for waiting telnet connection in cygterm.cfg file.
+
+v1.07_11 2007/01/31 (import from cygterm v1.07)
+        * Avoid WinMainCRTStartup() redefinition error with gcc 3.4.
+        * Give an output gap for keyboard interrupt.
+
+v1.06_11 2006/09/29 (by maya)
+        * Stopped using HOME from environment variable and /etc/passwd.
+          CygTerm passes HOME which is set by Cygwin. See also /etc/profile
+        * Changed the priority of config files.
+          command line arguments > ~/.cygtermrc > /etc/cygterm.conf > cygterm.cfg > /etc/passwd
+
+v1.06_10 2006/09/28 (by doda)
+        * Use getlogin() instead of environment variable USERNAME to get user name.
+
+v1.06_09 2006/09/25 (by doda)
+        * Get shell information from /etc/passwd if SHELL parameter is not specified.
+
+v1.06_08 2006/08/30 (by maya)
+        * Changed the priority of config files. cygterm.cfg is top priority config file.
+
+v1.06_07 2006/08/19 (by maya)
+        * Use `HOME' environment variable for changing home directory if the variable will be set.
+
+v1.06_06 2006/08/18 (by doda)
+        * Limit a parameter length of both '-s' and '-t' option.
+
+v1.06_05 2006/08/18 (by maya)
+        * Create mutex object for running check by installer.
+
+v1.06_04 2006/08/15 (by doda)
+        * Add 'LOGIN_SHELL' entry which the shell is invoked as the login shell in cygterm.cfg file.
+          LOGIN_SHELL: yes | no
+
+v1.06_03 2006/08/15 (by doda)
+        * Add 'HOME_CHDIR' entry which home directory is changed in cygterm.cfg file.
+          HOME_CHDIR: yes | no
+
+v1.06_02 2006/02/09 (by babydamons@yahoo.co.jp)
+        * Generated CygTerm's ICON by "DotWork 2.50".
+          "DotWork 2.50" is available at http://www5a.biglobe.ne.jp/~suuta/.
+          Special Thanks to "suuta at hamal dot freemal dot ne dot jp"
+
+        * Makefile was changed, "clean" target was changed to don't remove cygterm.ico.
+
+v1.06_01 2006/02/08 (by babydamons@yahoo.co.jp)
+        * The following configuration file reading was supported:
+            + /etc/cygterm.conf
+            + ~/.cygtermrc
+
+        * Shell is invoked with user's home-directory.
+
+        * Get account configuration from /etc/passwd by getpwnam(3),
+          getting account name from USERNAME environment by getenv(3).
+
+        * Makefile was changed, default build is with icon executable.
+
+v1.06 2004/01/24
+        * The following command line options were added:
+            -t 'terminal-emulator' (specifies the terminal emulator)
+            -p port-number (specifies the port# to connect)
+            -dumb (specifies dumb terminal mode)
+            -s 'shell' (specifies the shell)
+            -v 'env-var' (specifies environment variables)
+
+        * Fixed to fail in `make install' if BINDIR was not found.
+
+        * cygterm.cc and README.txt were changed to English version.
+
+v1.05 2003/01/14
+        * Fixed to transmit Ctrl+SPACE (NUL).
+          The NUL character was not able to be transmitted even if Ctrl+SPACE
+          was typed, because it was ignored simply as an way to handle the
+          newline CR+NUL.
+
+v1.04 2002/12/08
+        * Changed to display error messages for failure to execute a terminal
+          emulator or a shell.
+
+        * Makefile was changed.
+          + do not overwrite cygterm.cfg when `make install'.
+          + add the gcc option -fno-exceptions against the GCC-3 link error.
+
+v1.03 2002/07/24
+        * Fixed to convert terminal type into lower-case when cygterm received
+          it from a terminal emulator.  Because some upper-case values such as
+          `ANSI' `VT100' of the environment variable TERM might not be found
+          in terminfo depending on the kind of terminal emulator.
+          (Windows 2000 telnet.exe, etc)
+
+v1.02 2002/07/22
+        * Fix to be able to start a terminal emulator even if it was a console
+          application.  (Windows 2000 telnet.exe, etc)
+          There was a mistake in calling CreateProcess().
+
+        * Fixed to suppress duplicate newline on a shell by canceling LF when
+          a terminal emulator sent CR+LF.  (Windows 98 telnet.exe, etc)
+
+        * Embedded the version number in cygterm.exe executable code.
+          How to check: $ strings cygterm.exe | grep version
+
+v1.01 2002/07/19
+        * Fixed that cygterm did not work with zsh or tcsh. 
+          Input was blocked when zsh or tcsh started, because the approach to
+          open the pseudo terminal was not good.
+
+v1.00 2000/12/17
+        * The initial version was released.
+

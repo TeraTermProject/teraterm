@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>show</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>show</h1>
+
+<p>
+MACRO ダイアログの表示状態を変更する。
+</p>
+
+<pre class="macro-syntax">
+show &lt;show flag&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;show flag&gt; が0の場合、MACRO を最小化する。<br>
+&lt;show flag&gt; が0より大きい場合、MACRO を元の大きさに戻す。<br>
+&lt;show flag&gt; が0より小さい場合、MACRO を隠す。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; MACRO を最小化
+show 0
+
+; MACRO を元の大きさに戻す
+show 1
+
+; MACRO を隠す
+show -1
+</pre>
+
+</body>
+</html>

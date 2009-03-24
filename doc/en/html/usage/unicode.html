@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Unicode</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Unicode</h1>
+
+<p>
+To use UTF-8, changed from English to Japanese under Setup->General menu and select "Terminal" from the Tera Term Pro "Setup" menu. Inside the dialog-box, select "UTF-8" from "Kanji(receive)" or "Kanji(transmit)". There is no need to restart Tera Term Pro to activate these configuration changes.
+When "UTF8" is specified with '/KT' or '/KR' option in the command line, UTF-8 encoding/decoding can be used during transmitting and receiving of data.
+</p>
+
+<p>
+Actually, Tera Term does not support completely Unicode language because the internal design is based on MBCS(Multiple Byte Character Set). So, the Unicode characters are two-step conversion as follows.
+
+<pre>
+UTF-8 <-----> Unicode(UTF-16LE) <-----> MBCS
+        (1)                       (2)
+</pre>
+
+(1): Tera Term can not support the surrogate pair, the combining character and the decomposed form because the application does not convert UTF-8 byte sequence over three bytes. <br>
+(2): A user must specify the codepage to convert the characters between Unicode and MBCS. The codepage is the enhanced character set by Microsoft, the number differs from one country to another.<br>
+Also, a user can only use the localazied language on the localized Windows. As an example, a language other than Japanese will be indecipherable characters on Japanese-language version of Windows. Likewise, Japanese language can not been shown on English-language version of Windows.</p>
+
+<p>
+To enable Unicode character sets with the localized language, you have to set properly the locale and codepage parameters in the 'teraterm.ini' file. See example of these values below.
+</p>
+
+<pre>
+----------------------
+; Locale for Unicode
+Locale = japanese
+
+; CodePage for Unicode
+CodePage = 932
+----------------------
+</pre>
+
+<p>
+Check the following web-sites to learn more about setting of locale and codepage in Tera Term:<br>
+<A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore98/html/_crt_language_strings.asp">http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore98/html/_crt_language_strings.asp</A><br>
+<A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/intl/unicode_81rn.asp">http://msdn.microsoft.com/library/default.asp?url=/library/en-us/intl/unicode_81rn.asp</A>
+</p>
+
+<pre>
+  [Example of WindowsXP Simplified Chinese]
+  -----------------------------------------
+    ; Locale for Unicode
+    Locale = chs
+    
+    ; CodePage for Unicode
+    CodePage = 936
+  -----------------------------------------
+</pre>
+
+<pre>
+  [Example of WindowsXP USA]
+  -----------------------------------------
+    ; Locale for Unicode
+    Locale = american
+    
+    ; CodePage for Unicode
+    CodePage = 65001
+  -----------------------------------------
+</pre>
+
+
+<p>
+[NOTE] for Mac OS X users<br>
+For Mac OS X(HFS+) use "UTF-8m" encoding. Currently it only supports receiving mode.<br>
+To use this mode specify "UTF8m" as the value of the command line parameter '/KR'.
+</p>
+
+<p>
+[NOTE] Language Strings for Locale
+</p>
+<pre>
+Primary         Sublanguage     String
+---------------+--------------+-------------------------------------------------------
+Chinese         Chinese         "chinese"
+Chinese         Chinese         (simplified) "chinese-simplified" or "chs"
+Chinese         Chinese         (traditional) "chinese-traditional" or "cht"
+Czech           Czech           "csy" or "czech"
+Danish          Danish          "dan"or "danish"
+Dutch           Dutch           (Belgian) "belgian", "dutch-belgian", or "nlb"
+Dutch           Dutch           (default) "dutch" or "nld"
+English         English         (Australian) "australian", "ena", or "english-aus"
+English         English         (Canadian) "canadian", "enc", or "english-can"
+English         English         (default) "english"
+English         English         (New Zealand) "english-nz" or "enz"
+English         English         (UK) "eng", "english-uk", or "uk"
+English         English         (USA) "american", "american english", "american-english", "english-american", "english-us", "english-usa", "enu", "us", or "usa"
+Finnish         Finnish         "fin" or "finnish"
+French          French          (Belgian) "frb" or "french-belgian"
+French          French          (Canadian) "frc" or "french-canadian"
+French          French          (default) "fra"or "french"
+French          French          (Swiss) "french-swiss" or "frs"
+German          German          (Austrian) "dea" or "german-austrian"
+German          German          (default) "deu" or "german"
+German          German          (Swiss) "des", "german-swiss", or "swiss"
+Greek           Greek           "ell" or "greek"
+Hungarian       Hungarian       "hun" or "hungarian"
+Icelandic       Icelandic       "icelandic" or "isl"
+Italian         Italian         (default) "ita" or "italian"
+Italian         Italian         (Swiss) "italian-swiss" or "its"
+Japanese        Japanese        "japanese" or "jpn"
+Korean          Korean          "kor" or "korean"
+Norwegian       Norwegian       (Bokmal) "nor" or "norwegian-bokmal"
+Norwegian       Norwegian       (default) "norwegian"
+Norwegian       Norwegian       (Nynorsk) "non" or "norwegian-nynorsk"
+Polish          Polish          "plk" or "polish"
+Portuguese      Portuguese      (Brazil) "portuguese-brazilian" or "ptb"
+Portuguese      Portuguese      (default) "portuguese" or "ptg"
+Russian         Russian         (default) "rus" or "russian"
+Slovak          Slovak          "sky" or "slovak"
+Spanish         Spanish         (default) "esp" or "spanish"
+Spanish         Spanish         (Mexican) "esm" or "spanish-mexican"
+Spanish         Spanish         (Modern) "esn" or "spanish-modern"
+Swedish         Swedish         "sve" or "swedish"
+Turkish         Turkish         "trk" or "turkish"
+</pre>
+
+<p>
+[NOTE] Code-Page Identifiers
+</p>
+<pre>
+Identifier      Name
+037             IBM EBCDIC - U.S./Canada
+437             OEM - United States
+500             IBM EBCDIC - International
+708             Arabic - ASMO 708
+709             Arabic - ASMO 449+, BCON V4
+710             Arabic - Transparent Arabic
+720             Arabic - Transparent ASMO
+737             OEM - Greek (formerly 437G)
+775             OEM - Baltic
+850             OEM - Multilingual Latin I
+852             OEM - Latin II
+855             OEM - Cyrillic (primarily Russian)
+857             OEM - Turkish
+858             OEM - Multlingual Latin I + Euro symbol
+860             OEM - Portuguese
+861             OEM - Icelandic
+862             OEM - Hebrew
+863             OEM - Canadian-French
+864             OEM - Arabic
+865             OEM - Nordic
+866             OEM - Russian
+869             OEM - Modern Greek
+870             IBM EBCDIC - Multilingual/ROECE (Latin-2)
+874             ANSI/OEM - Thai (same as 28605, ISO 8859-15)
+875             IBM EBCDIC - Modern Greek
+932             ANSI/OEM - Japanese, Shift-JIS
+936             ANSI/OEM - Simplified Chinese (PRC, Singapore)
+949             ANSI/OEM - Korean (Unified Hangeul Code)
+950             ANSI/OEM - Traditional Chinese (Taiwan; Hong Kong SAR, PRC)
+1026            IBM EBCDIC - Turkish (Latin-5)
+1047            IBM EBCDIC - Latin 1/Open System
+1140            IBM EBCDIC - U.S./Canada (037 + Euro symbol)
+1141            IBM EBCDIC - Germany (20273 + Euro symbol)
+1142            IBM EBCDIC - Denmark/Norway (20277 + Euro symbol)
+1143            IBM EBCDIC - Finland/Sweden (20278 + Euro symbol)
+1144            IBM EBCDIC - Italy (20280 + Euro symbol)
+1145            IBM EBCDIC - Latin America/Spain (20284 + Euro symbol)
+1146            IBM EBCDIC - United Kingdom (20285 + Euro symbol)
+1147            IBM EBCDIC - France (20297 + Euro symbol)
+1148            IBM EBCDIC - International (500 + Euro symbol)
+1149            IBM EBCDIC - Icelandic (20871 + Euro symbol)
+1200            Unicode UCS-2 Little-Endian (BMP of ISO 10646)
+1201            Unicode UCS-2 Big-Endian
+1250            ANSI - Central European
+1251            ANSI - Cyrillic
+1252            ANSI - Latin I
+1253            ANSI - Greek
+1254            ANSI - Turkish
+1255            ANSI - Hebrew
+1256            ANSI - Arabic
+1257            ANSI - Baltic
+1258            ANSI/OEM - Vietnamese
+1361            Korean (Johab)
+10000           MAC - Roman
+10001           MAC - Japanese
+10002           MAC - Traditional Chinese (Big5)
+10003           MAC - Korean
+10004           MAC - Arabic
+10005           MAC - Hebrew
+10006           MAC - Greek I
+10007           MAC - Cyrillic
+10008           MAC - Simplified Chinese (GB 2312)
+10010           MAC - Romania
+10017           MAC - Ukraine
+10021           MAC - Thai
+10029           MAC - Latin II
+10079           MAC - Icelandic
+10081           MAC - Turkish
+10082           MAC - Croatia
+12000           Unicode UCS-4 Little-Endian
+12001           Unicode UCS-4 Big-Endian
+20000           CNS - Taiwan
+20001           TCA - Taiwan
+20002           Eten - Taiwan
+20003           IBM5550 - Taiwan
+20004           TeleText - Taiwan
+20005           Wang - Taiwan
+20105           IA5 IRV International Alphabet No. 5 (7-bit)
+20106           IA5 German (7-bit)
+20107           IA5 Swedish (7-bit)
+20108           IA5 Norwegian (7-bit)
+20127           US-ASCII (7-bit)
+20261           T.61
+20269           ISO 6937 Non-Spacing Accent
+20273           IBM EBCDIC - Germany
+20277           IBM EBCDIC - Denmark/Norway
+20278           IBM EBCDIC - Finland/Sweden
+20280           IBM EBCDIC - Italy
+20284           IBM EBCDIC - Latin America/Spain
+20285           IBM EBCDIC - United Kingdom
+20290           IBM EBCDIC - Japanese Katakana Extended
+20297           IBM EBCDIC - France
+20420           IBM EBCDIC - Arabic
+20423           IBM EBCDIC - Greek
+20424           IBM EBCDIC - Hebrew
+20833           IBM EBCDIC - Korean Extended
+20838           IBM EBCDIC - Thai
+20866           Russian - KOI8-R
+20871           IBM EBCDIC - Icelandic
+20880           IBM EBCDIC - Cyrillic (Russian)
+20905           IBM EBCDIC - Turkish
+20924           IBM EBCDIC - Latin-1/Open System (1047 + Euro symbol)
+20932           JIS X 0208-1990 &amp; 0121-1990
+20936           Simplified Chinese (GB2312)
+21025           IBM EBCDIC - Cyrillic (Serbian, Bulgarian)
+21027           Extended Alpha Lowercase
+21866           Ukrainian (KOI8-U)
+28591           ISO 8859-1 Latin I
+28592           ISO 8859-2 Central Europe
+28593           ISO 8859-3 Latin 3
+28594           ISO 8859-4 Baltic
+28595           ISO 8859-5 Cyrillic
+28596           ISO 8859-6 Arabic
+28597           ISO 8859-7 Greek
+28598           ISO 8859-8 Hebrew
+28599           ISO 8859-9 Latin 5
+28605           ISO 8859-15 Latin 9
+29001           Europa 3
+38598           ISO 8859-8 Hebrew
+50220           ISO 2022 Japanese with no halfwidth Katakana
+50221           ISO 2022 Japanese with halfwidth Katakana
+50222           ISO 2022 Japanese JIS X 0201-1989
+50225           ISO 2022 Korean
+50227           ISO 2022 Simplified Chinese
+50229           ISO 2022 Traditional Chinese
+50930           Japanese (Katakana) Extended
+50931           US/Canada and Japanese
+50933           Korean Extended and Korean
+50935           Simplified Chinese Extended and Simplified Chinese
+50936           Simplified Chinese
+50937           US/Canada and Traditional Chinese
+50939           Japanese (Latin) Extended and Japanese
+51932           EUC - Japanese
+51936           EUC - Simplified Chinese
+51949           EUC - Korean
+51950           EUC - Traditional Chinese
+52936           HZ-GB2312 Simplified Chinese
+54936           Windows XP: GB18030 Simplified Chinese (4 Byte)
+57002           ISCII Devanagari
+57003           ISCII Bengali
+57004           ISCII Tamil
+57005           ISCII Telugu
+57006           ISCII Assamese
+57007           ISCII Oriya
+57008           ISCII Kannada
+57009           ISCII Malayalam
+57010           ISCII Gujarati
+57011           ISCII Punjabi
+65000           Unicode UTF-7
+65001           Unicode UTF-8
+</pre>
+
+</BODY>
+</HTML>

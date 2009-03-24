@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>getver</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getver</h1>
+
+<p>
+Get the version of Tera Term.
+</p>
+
+<pre class="macro-syntax">
+getver &lt;strvar&gt; [&lt;version&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Returns the version of Tera Term in the string variable &lt;strvar&gt;.
+</p>
+
+<p>
+If &lt;version&gt; is specified, &lt;version&gt; is compared with the version of running Tera Term and the result is stored in the system variable "result". If &lt;version&gt; is not specified, the system variable "result" is not changed. The meaning of "result" is as follows.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>-2</td>
+      <td>
+	Error. &lt;version&gt; is invalid.
+      </td>
+    </tr>
+    
+    <tr>
+      <td>-1</td>
+      <td>
+	Tera Term version is older than &lt;version&gt;.
+      </td>
+    </tr>
+    
+    <tr>
+      <td>0</td>
+      <td>
+	Tera Term version is equal to &lt;version&gt;.
+      </td>
+    </tr>
+    
+    <tr>
+      <td>1</td>
+      <td>
+	Tera Term version is newer than &lt;version&gt;.
+      </td>
+    </tr>
+    
+  </tbody>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+getver version
+
+getver version '4.56'
+if result >= 0 then
+  callmenu 50280
+  callmenu 50210
+  callmenu 50270
+endif
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>切断後すぐに接続する場合の注意点</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>切断後すぐに接続する場合の注意点</h1>
+<p>
+ホストとの接続を終了後、すぐにconnectコマンドで新しい接続を開始する場合、以下のような問題が発生する場合がある。例えば、
+</p>
+
+<pre class="macro-example">
+; exitコマンドを送って、ホストとの接続を終了する。
+sendln "exit"
+
+; 新しい接続を開始する。
+connect "server"
+</pre>
+
+<p>
+このマクロは大抵の場合はうまく動かない。<br>
+sendln "exit"でexitコマンドを送ってからホストが接続を切断してくるのに少しタイムラグが発生する。<br>
+マクロはこのタイムラグの間に次のconnectコマンドを実行する。<br>
+しかしホストとの接続がまだ終了していないため、connectコマンドは既に接続しているとみなして何も行わない。
+</p>
+
+<p>
+この問題を回避するには、以下のようにホストとの接続が終了したのを確認してからconnectコマンドを実行するようにする。
+</p>
+
+<pre class="macro-example">
+; exitコマンドを送って、ホストとの接続を終了する。
+sendln "exit"
+
+do
+	; 10ミリ秒待つ
+	mpause 10
+	; 接続状態を確認する
+	testlink
+; まだホストと接続されている(<a href="../command/testlink.html">resultが2</a>)ならばループを繰り返す
+loop while result = 2
+
+; 新しい接続を開始する。
+connect "server"
+</pre>
+
+<p>
+また、<a href="../../menu/setup-tcpip.html#autowinclose">切断後自動的にウィンドウを閉じる設定</a>の場合、以下のようにunlinkコマンドでTera Termを切り離してもよい。
+</p>
+
+<pre class="macro-example">
+; exitコマンドを送って、ホストとの接続を終了する。
+sendln "exit"
+
+; Tera Termを切り離す
+unlink
+
+; 新しい接続を開始する。
+connect "server"
+</pre>
+
+</body>
+</html>

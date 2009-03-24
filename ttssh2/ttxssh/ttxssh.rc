@@ -1,0 +1,512 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// âpåÍ (ïƒçë) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTDIALOG DIALOGEX 0, 0, 263, 276
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About TTSSH"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,132,248,27
+    DEFPUSHBUTTON   "OK",IDOK,106,254,50,14
+    LTEXT           "Includes:\r\nTTSSH 1.5.4 (Robert O'Callahan roc+tt@cs.cmu.edu), 1998-1999\r\nIPv6 extention version 0.81 (kato@win6.jp), 2000-2003\r\nSSH2 support (Tera Term Project), 2004-2009",IDC_INCLUDES,6,36,248,34
+    LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,106,248,26
+    ICON            "",IDC_TTSSH_ICON,234,7,21,20
+    EDITTEXT        IDC_ABOUTTEXT,6,161,248,87,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Tera Term Project:     http://ttssh2.sourceforge.jp/",IDC_WEBSITES,6,88,248,13,SS_SUNKEN
+    LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
+    LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
+    LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,145,15
+    LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,181,8
+END
+
+IDD_SSHAUTH DIALOGEX 0, 0, 309, 262
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "SSH Authentication"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "Logging in to %s",IDC_SSHAUTHBANNER,6,3,166,10
+    LTEXT           "Authentication required.",IDC_SSHAUTHBANNER2,6,16,296,10
+    RTEXT           "User &name:",IDC_SSHUSERNAMELABEL,13,31,57,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_SSHUSERNAME,75,29,145,12,ES_AUTOHSCROLL
+    RTEXT           "&Passphrase:",IDC_SSHPASSWORDCAPTION,14,48,56,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_SSHPASSWORD,75,46,145,12,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "Remember password on &memory",IDC_REMEMBER_PASSWORD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,61,132,10
+    CONTROL         "F&orward agent",IDC_FORWARD_AGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,74,132,10
+    CONTROL         "Use p&lain password to log in",IDC_SSHUSEPASSWORD,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,94,219,10
+    CONTROL         "Use &RSA/DSA key to log in",IDC_SSHUSERSA,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,122,98,10
+    CONTROL         "Use r&hosts to log in (SSH1)",IDC_SSHUSERHOSTS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,149,99,10
+    CONTROL         "Use challenge/response to log in (SSH1:&TIS, SSH2:keyboard-interactive)",IDC_SSHUSETIS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,193,276,10
+    CONTROL         "Use P&ageant",IDC_SSHUSEPAGEANT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,219,276,10
+    PUSHBUTTON      "Private &key file:",IDC_CHOOSERSAFILE,117,120,58,14,WS_GROUP
+    EDITTEXT        IDC_RSAFILENAME,179,121,118,13,ES_AUTOHSCROLL
+    RTEXT           "Local &user name:",IDC_LOCALUSERNAMELABEL,120,150,91,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_LOCALUSERNAME,214,148,82,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Host private key &file:",IDC_CHOOSEHOSTRSAFILE,92,164,73,14
+    EDITTEXT        IDC_HOSTRSAFILENAME,169,164,127,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,96,242,50,14,WS_GROUP
+    PUSHBUTTON      "&Disconnect",IDCANCEL,162,242,50,14
+    GROUPBOX        "",IDC_STATIC,6,85,296,25
+    GROUPBOX        "",IDC_STATIC,6,113,296,25
+    GROUPBOX        "",IDC_STATIC,6,140,296,42
+    GROUPBOX        "",IDC_STATIC,6,184,296,25
+    GROUPBOX        "",IDC_STATIC,6,210,296,25
+END
+
+IDD_HOSTDLG DIALOGEX 20, 20, 227, 128
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Tera Term: New connection"
+FONT 10, "System", 0, 0, 0x0
+BEGIN
+    RTEXT           "Hos&t:",IDC_HOSTNAMELABEL,47,10,35,8,NOT WS_GROUP
+    COMBOBOX        IDC_HOSTNAME,85,8,133,54,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "Hist&ory",IDC_HISTORY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,85,22,54,8
+    RTEXT           "Service:",IDC_SERVICELABEL,45,34,37,8,NOT WS_GROUP
+    CONTROL         "Te&lnet",IDC_HOSTTELNET,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,85,34,44,8
+    CONTROL         "&SSH",IDC_HOSTSSH,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,85,46,28,8
+    CONTROL         "Other",IDC_HOSTOTHER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,85,58,38,8
+    RTEXT           "TCP &port#:",IDC_HOSTTCPPORTLABEL,134,30,51,8,NOT WS_GROUP
+    EDITTEXT        IDC_HOSTTCPPORT,188,28,30,12,ES_NUMBER | WS_GROUP
+    RTEXT           "SSH &version:",IDC_SSH_VERSION_LABEL,115,46,61,8
+    COMBOBOX        IDC_SSH_VERSION,179,45,39,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "Proto&col:",IDC_HOSTTCPPROTOCOLLABEL,129,63,46,8
+    COMBOBOX        IDC_HOSTTCPPROTOCOL,178,62,40,43,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "Po&rt:",IDC_HOSTCOMLABEL,48,89,34,8,NOT WS_GROUP
+    COMBOBOX        IDC_HOSTCOM,85,87,133,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,55,109,32,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,95,109,40,14
+    PUSHBUTTON      "&Help",IDC_HOSTHELP,143,109,36,14
+    GROUPBOX        "",-1,4,0,219,78
+    GROUPBOX        "",-1,4,79,219,24
+    CONTROL         "TCP/&IP",IDC_HOSTTCPIP,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,8,10,40,8
+    CONTROL         "S&erial",IDC_HOSTSERIAL,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,8,89,37,8
+END
+
+IDD_SSHSETUP DIALOGEX 0, 0, 223, 255
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: Setup"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "None",IDC_COMPRESSNONE,85,4,18,8
+    LTEXT           "Highest",IDC_COMPRESSHIGH,175,4,25,8
+    RTEXT           "&Compression level:",IDC_COMPRESSLABEL,11,12,68,13
+    CONTROL         "Slider1",IDC_SSHCOMPRESSIONLEVEL,"msctls_trackbar32",TBS_AUTOTICKS | WS_GROUP | WS_TABSTOP,85,12,107,20
+    GROUPBOX        "&Preferred cipher order",IDC_CIPHERORDER,17,33,187,98
+    LISTBOX         IDC_SSHCIPHERPREFS,31,45,159,60,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    PUSHBUTTON      "Move &Up",IDC_SSHMOVECIPHERUP,43,110,58,13,WS_GROUP
+    PUSHBUTTON      "Move &Down",IDC_SSHMOVECIPHERDOWN,117,110,58,13
+    GROUPBOX        "SSH Known Hosts",IDC_KNOWNHOSTS,7,138,209,52
+    PUSHBUTTON      "Read/&write file:",IDC_CHOOSEREADWRITEFILE,14,149,63,14
+    EDITTEXT        IDC_READWRITEFILENAME,83,150,126,13,ES_AUTOHSCROLL | WS_GROUP
+    PUSHBUTTON      "&Read-only files:",IDC_CHOOSEREADONLYFILE,14,167,63,14
+    EDITTEXT        IDC_READONLYFILENAME,83,168,126,13,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "HeartBeat(&keep-alive)",IDC_HEARTBEATLABEL,17,196,83,8
+    EDITTEXT        IDC_HEARTBEAT_EDIT,102,194,26,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    LTEXT           "sec.(0 to turn off)",IDC_HEARTBEATLABEL2,134,196,77,8
+    CONTROL         "Enable &agent forwarding",IDC_FORWARDAGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,210,187,10
+    DEFPUSHBUTTON   "OK",IDOK,49,239,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,119,239,50,14
+    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,17,224,187,12
+END
+
+IDD_SSHUNKNOWNHOST DIALOGEX 0, 0, 215, 242
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SECURITY WARNING"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "There is no entry for the server ""#####################################"" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.",IDC_HOSTWARNING,15,7,184,41
+    LTEXT           "If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,26
+    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,75,176,8
+    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,51,222,50,14,WS_GROUP
+    PUSHBUTTON      "&Disconnect",IDCANCEL,117,222,50,14,WS_GROUP
+    EDITTEXT        IDC_FINGER_PRINT,15,86,179,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_FP_RANDOMART,14,105,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    CONTROL         "&Add this machine and its key to the known hosts list",IDC_ADDTOKNOWNHOSTS,
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,207,181,13
+END
+
+IDD_SSHDIFFERENTHOST DIALOGEX 0, 0, 215, 242
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SECURITY WARNING"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,184,43
+    LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,24
+    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,75,176,8
+    DEFPUSHBUTTON   "&Disconnect",IDCANCEL,115,222,50,14,WS_GROUP
+    EDITTEXT        IDC_FINGER_PRINT,15,86,179,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_FP_RANDOMART,14,105,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    CONTROL         "&Replace the exist key with this new key",IDC_ADDTOKNOWNHOSTS,
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,34,207,153,13
+    PUSHBUTTON      "&Continue",IDC_CONTINUE,49,222,50,14,WS_GROUP
+END
+
+IDD_SSHAUTHSETUP DIALOGEX 0, 0, 309, 228
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: Authentication Setup"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "Select defaults for authentication:",IDC_SSHAUTHBANNER,6,7,166,10
+    LTEXT           "User &name:",IDC_SSHUSERNAMELABEL,13,24,57,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_SSHUSERNAME,75,22,145,12,ES_AUTOHSCROLL
+    CONTROL         "Use p&lain password to log in",IDC_SSHUSEPASSWORD,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,45,120,10
+    CONTROL         "Use &RSA/DSA key to log in",IDC_SSHUSERSA,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,73,100,10
+    CONTROL         "Use r&hosts to log in (SSH1)",IDC_SSHUSERHOSTS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,100,99,10
+    CONTROL         "Use challenge/response to log in (SSH1:&TIS, SSH2:keyboard-interactive)",IDC_SSHUSETIS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,144,278,10
+    CONTROL         "Use P&ageant",IDC_SSHUSEPAGEANT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,171,278,10
+    PUSHBUTTON      "Private &key file:",IDC_CHOOSERSAFILE,117,72,58,14,WS_GROUP
+    EDITTEXT        IDC_RSAFILENAME,179,73,118,13,ES_AUTOHSCROLL
+    RTEXT           "Local &user name:",IDC_LOCALUSERNAMELABEL,118,100,91,8,0,WS_EX_RIGHT
+    EDITTEXT        IDC_LOCALUSERNAME,214,99,82,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Host private key &file:",IDC_CHOOSEHOSTRSAFILE,92,114,73,14
+    EDITTEXT        IDC_HOSTRSAFILENAME,169,115,127,13,ES_AUTOHSCROLL
+    CONTROL         "&Check the enabled authentication methods before login (SSH2)",IDC_CHECKAUTH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,192,281,10
+    DEFPUSHBUTTON   "OK",IDOK,96,207,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,162,207,50,14
+    GROUPBOX        "",IDC_STATIC,6,36,296,25
+    GROUPBOX        "",IDC_STATIC,6,64,296,25
+    GROUPBOX        "",IDC_STATIC,6,91,296,42
+    GROUPBOX        "",IDC_STATIC,6,135,296,25
+    GROUPBOX        "",IDC_STATIC,6,162,296,25
+END
+
+IDD_SSHFWDSETUP DIALOGEX 0, 0, 309, 197
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: Forwarding Setup"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "&Port Forwarding",IDC_PORTFORWARD,6,7,296,132
+    LISTBOX         IDC_SSHFWDLIST,17,20,275,76,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Add...",IDC_ADD,63,105,50,14,WS_GROUP
+    PUSHBUTTON      "&Edit...",IDC_EDIT,129,105,50,14
+    PUSHBUTTON      "&Remove",IDC_REMOVE,195,105,50,14
+    CONTROL         "Local ports a&ccept connections from other hosts",IDC_CHECKIDENTITY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,124,272,10
+    CONTROL         "Display remote &X applications on local X server",IDC_SSHFWDX11,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,154,248,14
+    DEFPUSHBUTTON   "OK",IDOK,86,176,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,173,176,50,14
+    GROUPBOX        "X Forwarding",IDC_XFORWARD,6,144,296,27
+END
+
+IDD_SSHFWDEDIT DIALOGEX 0, 0, 309, 156
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "SSH Port Forwarding"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "Select direction for forwarded port:",IDD_SSHFWDBANNER,6,8,176,11,NOT WS_GROUP
+    COMBOBOX        IDC_SSHLTRFROMPORT,122,31,56,126,CBS_DROPDOWN | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "to remote &machine",IDC_SSHFWDLOCALTOREMOTE_HOST,23,48,73,15,NOT WS_GROUP
+    EDITTEXT        IDC_SSHLTRTOHOST,98,48,80,13,ES_AUTOHSCROLL
+    RTEXT           "&port",IDC_SSHFWDLOCALTOREMOTE_PORT,184,50,32,11,NOT WS_GROUP
+    COMBOBOX        IDC_SSHLTRTOPORT,219,48,56,136,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "A&ccept connections from other hosts",IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,64,267,10
+    COMBOBOX        IDC_SSHRTLFROMPORT,122,90,56,135,CBS_DROPDOWN | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "to local m&achine",IDC_SSHFWDREMOTETOLOCAL_HOST,23,108,73,15,NOT WS_GROUP
+    EDITTEXT        IDC_SSHRTLTOHOST,98,108,80,13,ES_AUTOHSCROLL
+    RTEXT           "p&ort",IDC_SSHFWDREMOTETOLOCAL_PORT,184,109,32,11,NOT WS_GROUP
+    COMBOBOX        IDC_SSHRTLTOPORT,219,108,56,124,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,96,135,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,162,135,50,14
+    GROUPBOX        "",IDC_STATIC,6,21,296,58
+    GROUPBOX        "",IDC_STATIC,6,81,296,46
+    CONTROL         "Forward &local port",IDC_SSHFWDLOCALTOREMOTE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,32,108,10
+    CONTROL         "Forward &remote server port",IDC_SSHFWDREMOTETOLOCAL,
+                    "Button",BS_AUTORADIOBUTTON,13,91,108,10
+END
+
+IDD_SSHTISAUTH DIALOGEX 0, 0, 216, 109
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "SSH Authentication Challenge"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_SSHPASSWORD,13,69,188,12,ES_PASSWORD | ES_AUTOHSCROLL | WS_GROUP
+    DEFPUSHBUTTON   "OK",IDOK,50,88,50,14,WS_GROUP
+    PUSHBUTTON      "&Disconnect",IDCANCEL,116,88,50,14
+    LTEXT           "Logging in to %s",IDC_SSHAUTHBANNER,6,7,166,10
+    LTEXT           "",IDC_SSHAUTHBANNER2,6,16,203,48
+END
+
+IDD_SSHKEYGEN DIALOGEX 0, 0, 256, 124
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: Key Generator"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&Generate",IDOK,199,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,199,24,50,14
+    GROUPBOX        "Key type",IDC_KEYTYPE,11,7,104,26
+    CONTROL         "RS&A1",IDC_RSA1_TYPE,"Button",BS_AUTORADIOBUTTON,17,18,30,10
+    CONTROL         "&RSA",IDC_RSA_TYPE,"Button",BS_AUTORADIOBUTTON,52,18,25,10
+    CONTROL         "&DSA",IDC_DSA_TYPE,"Button",BS_AUTORADIOBUTTON,82,18,25,10
+    RTEXT           "Key &Bits:",IDC_KEYBITS_LABEL,120,18,40,10,NOT WS_GROUP
+    EDITTEXT        IDC_KEYBITS,165,16,25,12,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
+    LTEXT           "",IDC_KEYGEN_PROGRESS_LABEL,40,40,172,8
+    RTEXT           "Key passphrase:",IDC_KEY_LABEL,14,58,80,8
+    RTEXT           "Confirm passphrase:",IDC_CONFIRM_LABEL,14,76,80,8
+    EDITTEXT        IDC_KEY_EDIT,100,56,108,12,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_CONFIRM_EDIT,100,74,108,12,ES_PASSWORD | ES_AUTOHSCROLL
+    PUSHBUTTON      "Save publi&c key",IDC_SAVE_PUBLIC_KEY,49,96,68,14
+    PUSHBUTTON      "Save &private key",IDC_SAVE_PRIVATE_KEY,133,96,68,14
+END
+
+IDD_SSHSCP DIALOGEX 0, 0, 279, 125
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: Secure File Copy"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "&From:",IDC_STATIC,10,8,20,8
+    EDITTEXT        IDC_SENDFILE_EDIT,35,7,156,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SENDFILE_SELECT,196,7,14,14
+    LTEXT           "To:    remote host home directory",IDC_STATIC,18,25,173,8
+    LTEXT           "You can drag the file to this window.",IDC_FILE_PROGRESS,44,43,128,11,0,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "&Send",IDOK,222,7,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,222,24,50,14
+    PUSHBUTTON      "SFTP Test",IDC_SFTP_TEST,222,45,50,14,NOT WS_VISIBLE
+    LTEXT           "-----------------------------------------------------------------------------------------------------------",IDC_DUMMY_LINE,7,63,265,8
+    LTEXT           "Fr&om:",IDC_STATIC,7,81,20,8
+    EDITTEXT        IDC_RECVFILE,37,78,154,14,ES_AUTOHSCROLL
+    LTEXT           "To: ",IDC_RECV_TO_DIRECTORY,15,100,187,8
+    PUSHBUTTON      "&Receive",IDC_RECV,222,77,50,14
+END
+
+IDD_SSHSCP_PROGRESS DIALOGEX 0, 0, 166, 82
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: SCP sending file"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,39,52,73,14
+    LTEXT           "0%",IDC_PROGRESS,7,29,141,10
+    EDITTEXT        IDC_FILENAME,45,7,114,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Filename:",IDC_FN_STATIC,7,7,32,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 254
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 268
+    END
+
+    IDD_SSHAUTH, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 302
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 256
+    END
+
+    IDD_HOSTDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 223
+        BOTTOMMARGIN, 123
+    END
+
+    IDD_SSHSETUP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 253
+    END
+
+    IDD_SSHUNKNOWNHOST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 208
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 236
+    END
+
+    IDD_SSHDIFFERENTHOST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 208
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 135
+    END
+
+    IDD_SSHAUTHSETUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 221
+    END
+
+    IDD_SSHFWDSETUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 190
+    END
+
+    IDD_SSHFWDEDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 149
+    END
+
+    IDD_SSHTISAUTH, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 209
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 102
+    END
+
+    IDD_SSHKEYGEN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 249
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 117
+    END
+
+    IDD_SSHSCP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 272
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 118
+    END
+
+    IDD_SSHSCP_PROGRESS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 159
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 75
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SECURETT            ICON                    "ttsecure.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,50,0,0
+ PRODUCTVERSION 2,50,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "TTXSSH"
+            VALUE "FileVersion", "2, 50, 0, 0"
+            VALUE "InternalName", "TTXSSH"
+            VALUE "LegalCopyright", "(C)2004-2009 TeraTerm Project, (C)1998-1999 Robert O'Callahan"
+            VALUE "OriginalFilename", "TTXSSH.dll"
+            VALUE "ProductName", "TTSSH"
+            VALUE "ProductVersion", "2, 50, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // âpåÍ (ïƒçë) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

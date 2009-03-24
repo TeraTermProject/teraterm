@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <TITLE>Additional settings([Setup] Menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings([Setup] Menu)</h1>
+
+    <h2>"General" Tab</h2>
+    <dl>
+      <dt>EnableClickableURL</dt>
+      <dd>
+	Launches the web browser by clicking URL string.
+      </dd>
+
+      <dt>DisableAcceleratorSendBreak</dt>
+      <dd>
+	Disables accelerator key of send break.
+      </dd>
+
+      <dt>AcceptBroadcast</dt>
+      <dd>
+	Accept the broadcast command.
+      </dd>
+
+      <dt>MouseWheelScrollLine</dt>
+      <dd>
+	Configures the mouse wheel scroll line.
+      </dd>
+
+      <dt>AutoScrollOnlyInBottomLine</dt>
+      <dd>
+	Stop auto scrolling except when the bottom line is displayed.
+      </dd>
+
+      <dt>Accept Mouse Event Tracking</dt>
+      <dd>
+	Tera Term would send the escape sequence of the mouse operation when VT window is changed to the mouse tracking mode by the host application.<br>
+	However, TERM environment variable should be "xterm" type.
+      </dd>
+
+      <dt>Disable Mouse Event Tracking when Control is pressed</dt>
+      <dd>
+        The mouse tracking mode is enabled, TeraTerm does not send the mouse operation while the control key is pressed.
+      </dd>
+
+      <dt>Accept Window Title Change Request</dt>
+      <dd>
+        Configures whether a user accepts the window title changing.
+        <dl>
+          <dt>off</dt>
+          <dd>Do not accept it.</dd>
+          <dt>overwrite</dt>
+          <dd>Accept it, and then display only the window tile.</dd>
+          <dt>ahead</dt>
+          <dd>Accept it, and then insert the window title before the canonical title.</dd>
+          <dt>last</dt>
+          <dd>Accept it, and then insert the window title after the canonical title.</dd>
+        </dl>
+      </dd>
+
+    </dl>
+
+    <h2>"Copy and Paste" Tab</h2>
+    <dl>
+      <dt><a name="continuedline">EnableContinuedLineCopy</a></dt>
+      <dd>
+	Concatenates current line with the next line including word
+	characters when the whole line is stepped over.
+      </dd>
+
+      <dt>DisableMouseRButtonPaste</dt>
+      <dd>
+	Disables pasting clipboard data when mouse right button is clicked.
+      </dd>
+
+      <dt>ConfirmMouseRButtonPaste</dt>
+      <dd>
+	Displays popup menu and confirm pasting clipboard data when mouse
+	right button is clicked.
+      </dd>
+
+      <dt>SelectOnlyByLButton</dt>
+      <dd>
+	Enable selection by mouse drag only with left button.
+      </dd>
+
+      <dt>ConfirmChangePaste</dt>
+      <dd>
+	When the Clipboard includes CR/LF, the confirmation
+	dialog can be shown to paste by right-click or Alt+V.
+	This is a foolproof way.
+      </dd>
+
+      <dt>Delimiter Characters</dt>
+      <dd>
+	Inludes delimiter characters for the word selection.
+      </dd>
+
+    </dl>
+
+    <h2>"Visual" tab</h2>
+    <dl>
+      <dt>AlphaBlend</dt>
+      <dd>
+	You can setup the value of transparency. The range of transparency
+	is from 0 to 255. The more transparency reduces the value, the more
+	window transparency is blinding.
+      </dd>
+
+      <dt>Eterm lookfeel</dt>
+      <dd>
+	Tera Term window looks like Eterm-lookfeel background transparency.
+      </dd>
+    </dl>
+
+    <p>
+      See also <a href="../usage/transparent.html">Background transparency</a>.
+    </p>
+
+    <dl>
+      <dt>MouseCursor</dt>
+      <dd>
+	Mouse cursor can have one of the 4 shapes listed below:
+<pre>
+ARROW = standard arrow cursor
+IBEAM = ibeam cursor(default)
+CROSS = cross cursor
+HAND  = hand cursor
+</pre>
+      </dd>
+
+      <dt>ANSI color</dt>
+      <dd>Specifies the RGB value of the color for PC style and aixterm style 16 colors mode.</dd>
+
+      <dt>Enable Bold attribute color</dt>
+      <dt>Enable Blink attribute color</dt>
+      <dt>Enable Reverse attribute color</dt>
+      <dt>Enable URL attribute color</dt>
+      <dt>Enable ANSI color</dt>
+      <dd>
+        Enables each color attributes and color setting.<br>
+	If ANSI color is disabled, 16 colors and 256 colors modes are also disabled.
+      </dd>
+
+    </dl>
+
+    <h2>"Log" tab</h2>
+    <dl>
+      <dt>View Log Editor</dt>
+      <dd>
+	Specify the editor that is used for display log file
+      </dd>
+
+      <dt>Default Log File Name(strftime format)</dt>
+      <dd>
+	Specify default log file name. It can include a format of strftime.
+<pre>
+SYNOPSIS:
+&h	Host name(or empty when not connecting)
+%a	Abbreviated weekday name
+%A	Full weekday name
+%b	Abbreviated month name
+%B	Full month name
+%c	Date and time representation appropriate for locale
+%d	Day of month as decimal number (01 - 31)
+%H	Hour in 24-hour format (00 - 23)
+%I	Hour in 12-hour format (01 - 12)
+%j	Day of year as decimal number (001 - 366)
+%m	Month as decimal number (01 - 12)
+%M	Minute as decimal number (00 -  59)
+%p	Current locale's A.M./P.M. indicator for 12-hour clock
+%S	Second as decimal number (00 - 59)
+%U	Week of year as decimal number, with Sunday as first day of week (00 - 53)
+%w	Weekday as decimal number (0 - 6; Sunday is 0)
+%W	Week of year as decimal number, with Monday as first day of week (00 - 53)
+%x	Date representation for current locale
+%X	Time representation for current locale
+%y	Year without century, as decimal number (00 - 99)
+%Y	Year with century, as decimal number
+%z, %Z	Either the time-zone name or time zone abbreviation, depending on registry settings;
+	no characters if time zone is unknown
+%%	Percent sign
+</pre>
+      </dd>
+
+      <dt>Default Log Save Folder</dt>
+      <dd>
+	Specify default path to save log file. It is used when the log file name is not a full path.
+      </dd>
+
+      <dt>Auto start logging</dt>
+      <dd>
+    Start logging automaticaly when connecting. Default Log File Name is used for log file name.
+      </dd>
+    </dl>
+
+    <h2>"Cygwin" tab</h2>
+    <dl>
+      <dt>Cygwin Install Path</dt>
+      <dd>
+	Specify the install directory of Cygwin.
+      </dd>
+
+      <dt>CygTerm</dt>
+      <dd>
+	Configure CygTerm settings.
+      </dd>
+    </dl>
+  </body>
+</html>

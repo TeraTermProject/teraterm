@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>scpsend</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>scpsend</h1>
+
+<p>
+SCPプロトコルでファイルを送信する。
+</p>
+
+<pre class="macro-syntax">
+scpsend &lt;filename&gt; [&lt;destination filename&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;filename&gt; を SCP(Secure Copy Protocol) プロトコルで送信する。
+転送先を省略した場合は、ファイルはリモートホストのホームディレクトリへコピーされる。
+送信が終わるのを待たずに、次のコマンドを実行することができる。<br>
+
+なお、2GBを超えるファイルを扱うことはできない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+connect '192.168.3.2:22 /ssh /2 /auth=password /user=hoge /passwd=fuga'
+wait '$'
+scpsend 'C:\usr\cvs\doc\en\teraterm.chm'
+scpsend 'C:\usr\cvs\doc\en\teraterm.chm' 'tmp/foo.chm'
+</pre>
+
+</body>
+</html>

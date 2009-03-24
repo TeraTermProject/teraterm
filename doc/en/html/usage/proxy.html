@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Connecting through Proxy</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Connecting through Proxy</h1>
+
+    <p>
+      Description of Proxy connection using Tera Term</p>
+
+    <h2>Prerequisite</h2>
+
+    <p>
+      Proxy is a technology which can be used to connect to outisde where Internet environment and LAN are separated as shown in the following
+    </p>
+    <div class="img"><img src="../image/connection.png" alt="Proxy connection"></div>
+    <p>
+      There are various types of Proxy for this purpose and Tera Term supports the following types of Proxy
+    </p>
+
+    <ul>
+      <li>HTTP(for SSH1,SSH2 )</li>
+      <li>TELNET(for telnet)</li>
+      <li>SOCKS4</li>
+      <li>SOCKS5</li>
+    </ul>
+
+    <h2>How to configure</h2>
+
+    <h3>Setup procedure</h3>
+
+    <p>
+      To configure, select [Setup] menu, then choose [Proxy].
+    </p>
+    <div class="img"><img src="../image/Proxy.png" alt="Proxy"></div>
+    <p>
+      Then [Proxy Setup] dialog will appear. Specify the type of proxy in [Type], Hostname (or IP address) of Proxy server in [Hostname], Proxy port number in [Port number] and click [OK]. [Username] and [Password] can be used only when Proxy needs an authentication. 
+    </p>
+    <div class="img"><img src="../image/ProxySetup.png" alt="Proxy setup"></div>
+    <p>
+      Now, you are ready - try to connect.
+    </p>
+  </body>
+</html>

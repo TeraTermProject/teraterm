@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>Quick-VAN のヒント</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Quick-VAN のヒント</h1>
+
+<p>
+Quick-VAN は、PC-VAN という BBS で用いられているファイル転送プロトコルです。Quick-VAN は、7 bit 回線では使用できません。
+</p>
+
+<h2>シリアルポートの場合</h2>
+
+<div class="indent1">
+<p>
+Data が 7 bit だと、 Quick-VAN が使えません。[Setup] Serial port で Data を 8 bit にしてください。モデム(ホスト)側の設定も同じにしてください。
+</p>
+</div>
+
+<h2>Telnet の場合</h2>
+
+<div class="indent1">
+<p>
+PC-VAN に接続する場合は、必ずバイナリオプションを指定してください (1995年12月現在)。バイナリオプションで接続するには、
+</p>
+<ul class="no-marker">
+  <li class="description">コマンドラインに /B オプションをつけるか、</li>
+  <li class="description">Tera Term 設定ファイルを書き換えてください。<br>
+→ Telnet のバイナリオプション</li>
+</ul>
+</div>
+
+<p>
+また、次の設定をすると転送速度が改善する場合があります。<br>
+→ Quick-VAN の window size
+</p>
+
+<p>
+どうしても正常に転送できない場合は、ホスト側の Quick-VAN コマンドを正しく指定していることを確認した上で、
+Quick-VAN のログを取り、作者に送ってください。
+</p>
+
+<p>
+参考: <A HREF="forwarding-files.html">中間ホストを経由してホストに接続した場合のファイル転送</A>
+</p>
+
+</BODY>
+</HTML>

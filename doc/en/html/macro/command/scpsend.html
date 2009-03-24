@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>scpsend</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>scpsend</h1>
+
+<p>
+Sends a file from the host with the SCP protocol.
+</p>
+
+<pre class="macro-syntax">
+scpsend &lt;filename&gt; [&lt;destination filename&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to send the file &lt;filename&gt; to the host with the SCP(Secure Copy Protocol) protocol. 
+If the file &lt;destination filename&gt; is omitted, the file &lt;filename&gt; would be copied in the home directory of the remote host.
+Tera Term does not pause until the end of the file transfer.<br>
+
+Also, the 2GB over file does not work.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+connect '192.168.3.2:22 /ssh /2 /auth=password /user=hoge /passwd=fuga'
+wait '$'
+scpsend 'C:\usr\cvs\doc\en\teraterm.chm'
+scpsend 'C:\usr\cvs\doc\en\teraterm.chm' 'tmp/foo.chm'
+</pre>
+
+</body>
+</html>

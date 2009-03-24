@@ -1,0 +1,190 @@
+; Sample of KEYBOARD.CNF for the IBM-PC/AT 101-key keyboard.
+; See KEYCODE.TXT for the description of the format.
+;
+; This file based on IBMKEYB.CNF
+; 1. send the symbol of each key top "as-is" at editor keypad.
+;
+[VT editor keypad]
+;Up arrow key
+Up=328
+;Down arrow key
+Down=336
+;Right arrow key
+Right=333
+;Left arrow key
+Left=331
+;Insert key
+Insert=338
+;Home key
+Find=327
+;PageUp key
+Prev=329
+;Delete key
+Remove=339
+;End key
+Select=335
+;PageDown key
+Next=337
+
+[VT numeric keypad]
+;Num pad 0 key
+Num0=82
+;Num pad 1 key
+Num1=79
+;Num pad 2 key
+Num2=80
+;Num pad 3 key
+Num3=81
+;Num pad 4 key
+Num4=75
+;Num pad 5 key
+Num5=76
+;Num pad 6 key
+Num6=77
+;Num pad 7 key
+Num7=71
+;Num pad 8 key
+Num8=72
+;Num pad 9 key
+Num9=73
+;Ctrl + Num pad '+' key
+NumMinus=1102
+;Num pad '+' key
+NumComma=78
+;Num pad '.' key
+NumPeriod=83
+;Num pad Enter key
+NumEnter=284
+;Num pad NumLock key
+PF1=325
+;Num pad '/' key
+PF2=309
+;Num pad '*' key
+PF3=55
+;Num pad '-' key
+PF4=74
+
+[VT function keys]
+Hold=off
+Print=off
+Break=off
+;F6 key
+F6=64
+;F7 key
+F7=65
+;F8 key
+F8=66
+;F9 key
+F9=67
+;F10 key
+F10=68
+;F11 key
+F11=87
+;F12 key
+F12=88
+;Shift + F3 key
+F13=573
+;Shift + F4 key
+F14=574
+;Shift + F5 key
+Help=575
+;Shift + F6 key
+Do=576
+;Shift + F7 key
+F17=577
+;Shift + F8 key
+F18=578
+;Shift + F9 key
+F19=579
+;Shift + F10 key
+F20=580
+;Ctrl + F6 key
+UDK6=1088
+;Ctrl + F7 key
+UDK7=1089
+;Ctrl + F8 key
+UDK8=1090
+;Ctrl + F9 key
+UDK9=1091
+;Ctrl + F10 key
+UDK10=1092
+;Ctrl + F11 key
+UDK11=1111
+;Ctrl + F12 key
+UDK12=1112
+;Ctrl + Shift + F3 key
+UDK13=1597
+;Ctrl + Shift + F4 key
+UDK14=1598
+;Ctrl + Shift + F5 key
+UDK15=1599
+;Ctrl + Shift + F6 key
+UDK16=1600
+;Ctrl + Shift + F7 key
+UDK17=1601
+;Ctrl + Shift + F8 key
+UDK18=1602
+;Ctrl + Shift + F9 key
+UDK19=1603
+;Ctrl + Shift + F10 key
+UDK20=1604
+
+[X function keys]
+; F1 key
+XF1=59
+; F2 key
+XF2=60
+; F3 key
+XF3=61
+; F4 key
+XF4=62
+; F5 key
+XF5=63
+
+[Shortcut keys]
+; Ctrl + Insert
+EditCopy=1362
+; Shift + Insert
+EditPaste=850
+EditPasteCR=off
+EditCLS=off
+EditCLB=off
+ControlOpenTEK=off
+ControlCloseTEK=off
+; Ctrl + up-arrow
+LineUp=1352
+; Ctrl + down-arrow
+LineDown=1360
+; Ctrl + PageUp
+PageUp=1353
+; Ctrl + PageDown
+PageDown=1361
+; Ctrl + Home
+BuffTop=1351
+; Ctrl + End
+BuffBottom=1359
+; Ctrl + Tab
+NextWin=1039
+; Ctrl + Shift + Tab
+PrevWin=1551
+LocalEcho=off
+; ScrollLock
+ScrollLock=70
+
+;Example of user key definitions.
+;[User keys]
+;	Ctrl + F1 key: character string
+;User1=1083,0,telnet myhost
+;
+;	Ctrl + F2 key: control characters
+;User2=1084,0,$0D$0A
+;
+;	Ctrl + F3 key: CR character with new-line code conversion (CR -> CR/CR+LF)
+;User3=1085,1,$0D
+;
+;	Ctrl + F4 key: Executing a macro file
+;User4=1086,2,test.ttl
+;
+;	Ctrl + F5 key: Executing a menu command
+;User5=1087,3,50110
+[User keys]

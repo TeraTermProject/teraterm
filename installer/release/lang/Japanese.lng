@@ -1,0 +1,912 @@
+[Tera Term]
+DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
+DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+
+MENU_FILE=ファイル(&F)
+MENU_FILE_NEW=新しい接続(&N)...\tAlt+N
+MENU_FILE_DUPLICATE=セッションの複製(&U)\tAlt+D
+MENU_FILE_GYGWIN=Cygwin接続(&G)\tAlt+G
+MENU_FILE_LOG=ログ(&L)...
+MENU_FILE_COMMENTLOG=ログにコメントを付加(&O)...
+MENU_FILE_VIEWLOG=ログを表示(&V)
+MENU_FILE_SHOWLOGDIALOG=ログダイアログを表示(&W)...
+MENU_FILE_SENDFILE=ファイル送信(&S)...
+MENU_FILE_CHANGEDIR=ディレクトリを変更(&C)...
+MENU_FILE_REPLAYLOG=ログを再生(&R)...
+MENU_FILE_LOGMETT=Log&MeTT
+MENU_FILE_PRINT=印刷(&P)...\tAlt+P
+MENU_FILE_DISCONNECT=接続断(&D)\tAlt+I
+MENU_FILE_EXIT=終了(&X)\tAlt+Q
+
+MENU_TRANS=転送(&T)
+MENU_TRANS_KERMIT_RCV=受信(&R)
+MENU_TRANS_KERMIT_GET=取得(&G)...
+MENU_TRANS_KERMIT_SEND=送信(&S)...
+MENU_TRANS_KERMIT_FINISH=終了(&F)
+MENU_TRANS_X_RCV=受信(&R)...
+MENU_TRANS_X_SEND=送信(&S)...
+MENU_TRANS_Z_RCV=受信(&R)
+MENU_TRANS_Z_SEND=送信(&S)...
+MENU_TRANS_BP_RCV=受信(&R)
+MENU_TRANS_BP_SEND=送信(&S)...
+MENU_TRANS_QV_RCV=受信(&R)
+MENU_TRANS_QV_SEND=送信(&S)...
+
+MENU_EDIT=編集(&E)
+MENU_EDIT_COPY=コピー(&C)\tAlt+C
+MENU_EDIT_COPYTABLE=テーブルをコピー(&T)
+MENU_EDIT_PASTE=貼り付け(&P)\tAlt+V
+MENU_EDIT_PASTECR=貼り付け<C&R>\tAlt+R
+MENU_EDIT_CLSCREEN=画面クリア(&S)
+MENU_EDIT_CLBUFFER=バッファのクリア(&B)
+MENU_EDIT_CANCELSELECT=選択を解除(&L)
+MENU_EDIT_SELECTSCREEN=表示画面を選択(&E)
+MENU_EDIT_SELECTALL=全て選択(&A)
+
+MENU_SETUP=設定(&S)
+MENU_SETUP_TERMINAL=端末(&T)...
+MENU_SETUP_WINDOW=ウィンドウ(&W)...
+MENU_SETUP_FONT=フォント(&F)...
+MENU_SETUP_KEYBOARD=キーボード(&K)...
+MENU_SETUP_SERIALPORT=シリアルポート(&E)...
+MENU_SETUP_TCPIP=T&CP/IP...
+MENU_SETUP_GENERAL=全般(&G)...
+MENU_SETUP_ADDITION=その他の設定(&D)...
+MENU_SETUP_SAVE=設定の保存(&S)...
+MENU_SETUP_RESTORE=設定の読み込み(&R)...
+MENU_SETUP_LOADKEYMAP=キーマップ読み込み(&L)...
+
+MENU_CONTROL=コントロール(&O)
+MENU_CONTROL_RESET=端末リセット(&R)
+MENU_CONTROL_RESETTITLE=リモートタイトルリセット(&E)
+MENU_CONTROL_AREYOUTHERE=AYT送信(&T)\tAlt+T
+MENU_CONTROL_SENDBREAK=ブレーク送信(&S)\tAlt+B
+MENU_CONTROL_RESETPORT=ポートのリセット(&P)
+MENU_CONTROL_BROADCAST=ブロードキャストコマンド(&B)
+MENU_CONTROL_OPENTEK=TEKウィンドウを開く(&O)
+MENU_CONTROL_CLOSETEK=TEKウィンドウを閉じる(&C)
+MENU_CONTROL_MACRO=マクロ(&M)
+
+MENU_WINDOW=ウィンドウ(&W)
+MENU_WINDOW_WINDOW=ウィンドウ(&W)
+
+MENU_HELP=ヘルプ(&H)
+MENU_HELP_INDEX=目次(&I)
+MENU_HELP_ABOUT=Tera Termについて(&A)...
+
+MENU_SHOW_MENUBAR=メニューバー表示(&B)
+
+
+TEKMENU_FILE=ファイル(&F)
+TEKMENU_FILE_PRINT=印刷(&P)...\tAlt+P
+TEKMENU_FILE_EXIT=終了(&X)\tAlt+Q
+
+TEKMENU_EDIT=編集(&E)
+TEKMENU_EDIT_COPY=コピー(&C)\tAlt+C
+TEKMENU_EDIT_COPYSCREEN=画面のコピー(&S)
+TEKMENU_EDIT_PASTE=貼り付け(&P)\tAlt+V
+TEKMENU_EDIT_PASTECR=貼り付け<C&R>\tAlt+R
+TEKMENU_EDIT_CLSCREEN=画面のクリア(&L)
+
+TEKMENU_SETUP=設定(&S)
+TEKMENU_SETUP_WINDOW=ウィンドウ(&W)...
+TEKMENU_SETUP_FONT=フォント(&F)...
+
+TEKMENU_VTWIN=VT-ウィンドウ(&O)
+
+TEKMENU_WINDOW=ウィンドウ(&W)
+
+TEKMENU_HELP=ヘルプ(&H)
+TEKMENU_HELP_INDEX=目次(&I)
+TEKMENU_HELP_USING=ヘルプの使い方(&H)
+TEKMENU_HELP_ABOUT=Tera Term について(&A)...
+
+TEKMENU_SHOW_MENUBAR=メニューバー表示(&B)
+
+; ttermpro
+; filesys.cpp
+MSG_COMMENT_LOG_OPEN_ERROR=ログファイルを開けません
+
+; ttime.c
+MSG_USE_IME_ERROR=Can't use IME
+
+; ttplug.c
+MSG_LOAD_EXT_ERROR=Cannot load extension %s (%d)
+
+; ttwinman.c
+DLG_MAIN_TITLE_CONNECTING=[接続中...]
+DLG_MAIN_TITLE_DISCONNECTED=[未接続]
+
+; vtwin.cpp
+MSG_DISCONNECT_CONF=切断しますか？
+MSG_DANDD_CONF=ファイル転送を行いますか？
+MSG_DANDD_CONF_TITLE=Tera Term: ファイル ドラッグ&ドロップ
+MSG_EXEC_TT_ERROR=Tera Term を実行できません (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=Cygwin ディレクトリが見つかりません
+MSG_CYGTERM_ENV_ALLOC_ERROR=環境変数用のメモリが確保できません
+MSG_EXEC_CYGTERM_ERROR=Cygterm が実行できません
+MSG_EXEC_TTMENU_ERROR=TeraTerm Menu が実行できません (%d)
+MSG_EXEC_LOGMETT_ERROR=LogMeTT が実行できません. (%d)
+MSG_VIEW_LOGFILE_ERROR=ログファイルを表示できません (%d)
+FILEDLG_OPEN_LOGFILE_TITLE=バイナリモードで記録された再生するログファイルを選択してください
+FILEDLG_OPEN_LOGFILE_FILTER=すべてのファイル(*.*)\0*.*\0\0
+DIRDLG_CYGTERM_DIR_TITLE=Cygwin ディレクトリを選択してください
+MSG_CYGTERM_CONF_WRITEFILE_ERROR=CygTerm 設定ファイルに書込みできません (%d).
+MSG_CYGTERM_CONF_REMOVEFILE_ERROR=古い CygTerm 設定ファイルを削除できません (%d).
+MSG_CYGTERM_CONF_RENAMEFILE_ERROR=CygTerm 設定ファイルの名前を変更できません (%d).
+FILEDLG_SELECT_LOGVIEW_APP_TITLE=Tera Term: エディタを指定
+FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_SELECT_LOGDIR_TITLE=ログフォルダを選択してください
+MSG_LOGFILE_INVALID_CHAR_ERROR=ログファイル名に無効な文字が含まれています
+MSG_LOGFILE_TOOLONG_ERROR=ログファイル名が長すぎます
+MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI に書き込み権限がありません
+
+DLG_TABSHEET_TITLE=Tera Term: その他の設定
+DLG_TABSHEET_TITLE_GENERAL=全般
+DLG_TABSHEET_TITLE_COPYPASTE=コピーと貼り付け
+DLG_TABSHEET_TITLE_VISUAL=表示
+DLG_TABSHEET_TITLE_LOG=ログ
+DLG_TABSHEET_TITLE_CYGWIN=Cygwin
+
+DLG_TAB_GENERAL_CLICKURL=クリッカブルURLを有効にする(&E)
+DLG_TAB_GENERAL_DISABLESENDBREAK=ブレーク送信のアクセラレータキーを無効にする(&S)
+DLG_TAB_GENERAL_ACCEPTBROADCAST=ブロードキャストを受け入れる(&B)
+DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=ホイールのスクロール行数(&W)
+DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=最下行でだけ自動スクロールする(&A)
+DLG_TAB_GENERAL_ACCEPT_MOUSE_EVENT_TRACKING=マウスイベント通知要求を受け入れる(&M)
+DLG_TAB_GENERAL_DISABLE_MOUSE_TRACKING_CTRL=Controlキーを押している間はマウスイベントを通知しない(&D)
+DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING=ウィンドウタイトルの変更要求を受け入れる(&T)
+DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_OFF=無効
+DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_OVERWRITE=上書き
+DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_AHEAD=前に追加
+DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_LAST=後に追加
+
+DLG_TAB_COPYPASTE_CONTINUE=継続行コピーを有効にする(&L)
+DLG_TAB_COPYPASTE_MOUSEPASTE=右クリックでの貼り付けを無効にする(&D)
+DLG_TAB_COPYPASTE_CONFIRMPASTE=右クリックでの貼り付けを確認する(&C)
+DLG_TAB_COPYPASTE_SELECTLBUTTON=左クリックでのみ選択を開始する(&O)
+DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=危険なクリップボードの貼り付けを確認する(&P)
+DLG_TAB_COPYPASTE_DELIMITER=区切り文字(&I)
+
+DLG_TAB_VISUAL_ALHPA=半透明度(&A)
+DLG_TAB_VISUAL_ETERM=&Eterm風にする
+DLG_TAB_VISUAL_MOUSE=マウスカーソル(&M)
+DLG_TAB_VISUAL_RED=赤(&R)
+DLG_TAB_VISUAL_GREEN=緑(&G)
+DLG_TAB_VISUAL_BLUE=青(&B)
+DLG_TAB_VISUAL_BOLD=高輝度属性色を有効にする(&O)
+DLG_TAB_VISUAL_BLINK=点滅属性色を有効にする(&L)
+DLG_TAB_VISUAL_REVERSE=反転属性色を有効にする(&V)
+DLG_TAB_VISUAL_URL=URL属性色を有効にする(&U)
+DLG_TAB_VISUAL_ANSI=ANSIカラーを有効にする(&N)
+
+DLG_TAB_LOG_EDITOR=ログ表示用エディタ(&E)
+DLG_TAB_LOG_FILENAME=標準ログファイル名(strftimeフォーマット可) (&F)
+DLG_TAB_LOG_FILEPATH=標準のログ保存先フォルダ(&S)
+DLG_TAB_LOG_AUTOSTART=自動的にログ採取を開始する(&A)
+
+DLG_TAB_CYGWIN_PATH=Cygwinインストール先のパス(&P)
+
+DLG_COMMENT_TITLE=ログにコメントを付加
+
+DLG_BROADCAST_TITLE=Tera Term: コマンドのブロードキャスト
+DLG_BROADCAST_HISTORY=ヒストリ
+DLG_BROADCAST_PARENTONLY=このプロセスのみに送信
+DLG_BROADCAST_ENTER=Enterキー
+DLG_BROADCAST_SUBMIT=送信
+DLG_BROADCAT_REALTIME=リアルタイム
+
+DLG_PRNABORT_PRINTING=印刷中
+
+DLG_PROT_FIELNAME=ファイル名:
+DLG_PROT_PROTO=プロトコル:
+DLG_PROT_PACKET=パケット#:
+DLG_PROT_TRANS=転送済容量:
+
+DLG_FILETRANS_FILENAME=ファイル名:
+DLG_FILETRANS_FULLPATH=フルパス:
+DLG_FILETRANS_TRNAS=転送済容量:
+DLG_FILETRANS_START=スタート(&S)
+DLG_FILETRANS_PAUSE=中断(&S)
+
+; commonlib.c
+MSG_WINSOCK_ERROR=Winsock が使えません
+MSG_INVALID_HOST_ERROR=無効なホスト
+MSG_CANTOEPN_ERROR=%sが開けません
+MSG_CANTOEPN_FILE_ERROR=ファイルが開けません
+MSG_COMM_REFUSE_ERROR=接続が拒否されました
+MSG_COMM_REACH_ERROR=ネットワークに到達できません
+MSG_COMM_TIMEOUT_ERROR=接続がタイムアウトしました
+MSG_COMM_CONNECT_ERROR=ホストに接続できません
+MSG_CREATE_THREAD_ERROR=スレッドが作成できません
+
+; ttpdlg
+; ttdlg.c
+DLG_ABOUT_TITLE=Tera Term について
+
+DLG_DIR_TITLE=Tera Term: ディレクトリ変更
+DLG_DIR_CURRENT=現在:
+DLG_DIR_NEW=新規(&N):
+DLG_SELECT_DIR_TITLE=新しいディレクトリを選択してください
+
+DLG_FONT_TITLE=Tera Term: フォントの設定
+DLG_FONT_FONT=フォント(&F):
+DLG_FONT_SIZE=サイズ(&S):
+DLG_FONT_BOLD=太字を有効(&B)
+DLG_FONT_CHARSET=文字セット(&C):
+DLG_FONT_SAMPLE=サンプル
+
+DLG_GEN_TITLE=Tera Term: 全般設定
+DLG_GEN_PORT=標準のポート(&P):
+DLG_GEN_LANG=言語(&L):
+
+DLG_HOST_TITLE=Tera Term: 新しい接続
+DLG_HOST_TCPIPHOST=ホスト(&O):
+DLG_HOST_TCPIPPORT=TCPポート#(&P):
+DLG_HOST_TCPIPPROTOCOL=プロトコル(&L):
+DLG_HOST_SERIAL=シリアル(&S)
+DLG_HOST_SERIALPORT=ポート(&R):
+
+DLG_KEYB_TITLE=Tera Term: キーボードの設定
+DLG_KEYB_TRANSMIT=DELを送信するキー:
+DLG_KEYB_BS=&Backspace キー
+DLG_KEYB_DEL=&Delete キー
+DLG_KEYB_KEYB=キーボード(&K):
+DLG_KEYB_META=&Meta キー
+DLG_KEYB_DISABLE=無効化するモード
+DLG_KEYB_APPKEY=アプリケーションキーパッド(&A)
+DLG_KEYB_APPCUR=アプリケーションカーソル(&C)
+
+DLG_SERIAL_TITLE=Tera Term: シリアルポート 設定
+DLG_SERIAL_PORT=ポート(&P):
+DLG_SERIAL_BAUD=ボー・レート(&B):
+DLG_SERIAL_DATA=データ(&D):
+DLG_SERIAL_PARITY=パリティ(&A):
+DLG_SERIAL_STOP=ストップ(&S):
+DLG_SERIAL_FLOW=フロー制御(&F):
+DLG_SERIAL_DELAY=送信遅延
+DLG_SERIAL_DELAYCHAR=ミリ秒/字(&C)
+DLG_SERIAL_DELAYLINE=ミリ秒/行(&L)
+
+DLG_TCPIP_TITLE=Tera Term: TCP/IP 設定
+DLG_TCPIP_HOSTLIST=ホストリスト(&L)
+DLG_TCPIP_ADD=追加(&A)
+DLG_TCPIP_UP=上へ(&U)
+DLG_TCPIP_REMOVE=削除(&R)
+DLG_TCPIP_DOWN=下へ(&D)
+DLG_TCPIP_HISTORY=履歴(&I)
+DLG_TCPIP_KEEPALIVE=&Keep-alive
+DLG_TCPIP_KEEPALIVE_SEC=秒(0指定で無効)
+DLG_TCPIP_AUTOCLOSE=自動的にウィンドウを閉じる(&W)
+DLG_TCPIP_PORT=ポート#(&P):
+DLG_TCPIP_TELNET=T&elnet
+DLG_TCPIP_TERMTYPE=端末タイプ(&T):
+
+DLG_TERM_TITLE=Tera Term: 端末の設定
+DLG_TERM_WIDTHLABEL=端末サイズ(&T):
+DLG_TERM_ISWIN== ウィンドウサイズ(&S):
+DLG_TERM_RESIZE=自動的に調整(&W):
+DLG_TERM_NEWLINE=改行コード
+DLG_TERM_CRRCV=受信(&R):
+DLG_TERM_CRSEND=送信(&M):
+DLG_TERM_ID=端末ID(&I):
+DLG_TERM_LOCALECHO=ローカルエコー(&L):
+DLG_TERM_ANSBACK=応答(&A):
+DLG_TERM_AUTOSWITCH=自動切り替え(VT<->TEK)(&U):
+DLG_TERM_KANJI=漢字-受信(&K)
+DLG_TERM_KANA=&7bit カタカナ
+DLG_TERM_KANJISEND=漢字-送信(&J)
+DLG_TERM_KANASEND=7&bit カタカナ
+DLG_TERM_KIN=漢字イン(&N):
+DLG_TERM_KOUT=漢字アウト(&O):
+DLG_TERM_LOCALE=ロケール:
+DLG_TERM_CODEPAGE=言語コード:
+DLG_TERM_RUSSCHARSET=文字セット
+DLG_TERM_RUSSHOST=ホスト(&O):
+DLG_TERM_RUSSCLIENT=クライアント(&C):
+
+DLG_WIN_TITLE=Tera Term: ウィンドウの設定
+DLG_WIN_TITLELABEL=タイトル(&T):
+DLG_WIN_CURSOR=カーソルの形
+DLG_WIN_BLOCK=四角(&L):
+DLG_WIN_VERT=垂直線(&V):
+DLG_WIN_HORZ=下線(&O):
+DLG_WIN_HIDETITLE=タイトルバーを隠す(&I):
+DLG_WIN_HIDEMENU=メニューバーを隠す(&M):
+DLG_WIN_COLOREMU=カラーエミュレーション(&C):
+DLG_WIN_PCBOLD16=&16色モード(PC形式):
+DLG_WIN_AIXTERM16=1&6色モード(aixterm形式):
+DLG_WIN_XTERM256=&256色モード(xterm形式):
+DLG_WIN_SCROLL1=スクロールバッファ(&S):
+DLG_WIN_SCROLL3=行(&N)
+DLG_WIN_COLOR=カラー
+DLG_WIN_TEXT=文字(&X)
+DLG_WIN_BG=背景(&K)
+DLG_WIN_ATTRIB=属性(&A)
+DLG_WIN_REVERSE=反転(&E)
+DLG_WIN_R=赤(&R):
+DLG_WIN_G=緑(&G):
+DLG_WIN_B=青(&B):
+DLG_WIN_ALWAYSBG=常に標準の背景色を使う(&U)
+DLG_WIN_NORMAL=標準
+DLG_WIN_BOLD=太字
+DLG_WIN_BLINK=点滅
+DLG_WIN_REVERSEATTR=反転
+
+DLG_WINLIST_TITLE=Tera Term: ウィンドウのリスト
+DLG_WINLIST_LABEL=ウィンドウ(&W):
+DLG_WINLIST_OPEN=開く(&O)
+DLG_WINLSIT_CLOSEWIN=閉じる(&C)
+
+MSG_FIND_DIR_ERROR=ディレクトリが見つかりません
+
+; ttpfile
+; ttfile.c
+DLG_FOPT=オプション
+DLG_FOPT_BINARY=バイナリ(&B)
+DLG_FOPT_APPEND=追記(&A)
+DLG_FOPT_PLAIN=プレーンテキスト(&P)
+DLG_FOPT_TIMESTAMP=タイムスタンプ(&T)
+DLG_FOPT_HIDEDIALOG=ダイアログを非表示(&D)
+
+DLG_XOPT=オプション
+DLG_XOPT_CHECKSUM=チェックサム(&S)
+DLG_XOPT_CRC=&CRC
+DLG_XOPT_1K=1&K
+DLG_XOPT_BINARY=バイナリ(&B)
+
+FILEDLG_KEYBOARD_FILTER=キーボード設定ファイル (*.cnf)\0*.cnf\0\0
+FILEDLG_SETUP_FILTER=設定ファイル (*.ini)\0*.ini\0\0
+FILEDLG_SAVE_SETUP_TITLE=Tera Term: 設定の保存
+FILEDLG_RESTORE_SETUP_TITLE=Tera Term: 設定の読み込み
+FILEDLG_LOAD_KEYMAP_TITLE=Tera Term:キーマップの読み込み
+FILEDLG_ALL_FILTER=すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_USER_FILTER_NAME=ユーザ定義
+
+DLG_GETFN_TITLE=Tera Term: Kermit 取得
+DLG_GETFN_FILENAME=ファイル名(&F):
+
+; ttftypes.h
+FILEDLG_TRANS_TITLE_LOG=ログ
+FILEDLG_TRANS_TITLE_SENDFILE=ファイル送信
+FILEDLG_TRANS_TITLE_KMTRCV=Kermit受信
+FILEDLG_TRANS_TITLE_KMTGET=Kermit取得
+FILEDLG_TRANS_TITLE_KMTSEND=Kermit送信
+FILEDLG_TRANS_TITLE_KMTFIN=Kermit終了
+FILEDLG_TRANS_TITLE_XRCV=XMODEM受信
+FILEDLG_TRANS_TITLE_XSEND=XMODEM送信
+FILEDLG_TRANS_TITLE_ZRCV=ZMODEM受信
+FILEDLG_TRANS_TITLE_ZSEND=ZMODEM送信
+FILEDLG_TRANS_TITLE_BPRCV=B-Plus受信
+FILEDLG_TRANS_TITLE_BPSEND=B-Plus送信
+FILEDLG_TRANS_TITLE_QVRCV=Quick-VAN受信
+FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN送信
+
+; dlg clipboard
+DLG_CLIPBOARD_TITLE=Tera Term: クリップボードの確認
+DLG_CLIPBOARD_INFO=クリップボードは現在ロックされています。
+
+; ttptek
+; tttek.c
+MSG_TEK_PRINT_ERROR=Printer dose not support graphics
+
+; ttpmacro
+FILEDLG_OPEN_MACRO_TITLE=MACRO: マクロを開く
+FILEDLG_OPEN_MACRO_FILTER=マクロファイル (*.ttl)\0*.ttl\0\0
+
+BTN_PAUSE=中断(&P)
+BTN_START=開始(&S)
+BTN_END=終了(&E)
+BTN_YES=はい(&Y)
+BTN_NO=いいえ(&N)
+BTN_STOP=マクロ停止(&S)
+BTN_CONTINUE=続行(&C)
+
+; common
+MSG_ERROR=エラー
+MSG_TT_ERROR=Tera Term: エラー
+
+BTN_OK=OK
+BTN_CANCEL=キャンセル
+BTN_CLOSE=閉じる(&C)
+BTN_HELP=ヘルプ(&H)
+
+; help
+HELPFILE=teratermj.chm
+MSG_OPENHELP_ERROR=HTMLヘルプ(%s)を開けません.
+
+
+[TTSSH]
+; font
+DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
+
+; menu
+MENU_ABOUT=&TTSSHについて...
+MENU_SSH=SS&H...
+MENU_SSH_AUTH=SSH認証(&A)...
+MENU_SSH_FORWARD=SSH転送(&O)...
+MENU_SSH_KEYGEN=SSH鍵生成(&N)...
+
+; dlg about
+DLG_ABOUT_TITLE=TTSSHについて
+DLG_ABOUT_SERVERID=サーバID:
+DLG_ABOUT_PROTOCOL=プロトコルのバージョン:
+DLG_ABOUT_ENCRYPTION=暗号化方式:
+DLG_ABOUT_SERVERKEY=サーバ鍵:
+DLG_ABOUT_AUTH=認証方式:
+DLG_ABOUT_COMP=圧縮状況:
+DLG_ABOUT_CLIENTID=クライアントID:
+DLG_ABOUT_HOSTKEY=ホスト鍵:
+DLG_ABOUT_TOSERVER=" TTSSH→サーバ,"
+DLG_ABOUT_FROMSERVER=" サーバ→TTSSH"
+DLG_ABOUT_COMPDELAY=遅延圧縮状況:
+DLG_ABOUT_CIPHER_INFO=%s でサーバへ, %s でサーバから
+DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key
+DLG_ABOUT_KEY_NONE=None
+DLG_ABOUT_COMP_INFO=レベル %d; 圧縮比 %.1f (%ld:%ld)
+DLG_ABOUT_COMP_INFO2=レベル %d
+DLG_ABOUT_COMP_NONE=なし
+DLG_ABOUT_COMP_UPDOWN=アップロード %s; ダウンロード %s
+DLG_ABOUT_AUTH_INFO=ユーザー '%s', %s認証
+
+; dlg auth
+DLG_AUTH_TITLE=SSH認証
+DLG_AUTH_TITLE_FAILED=SSH認証を再試行中
+DLG_AUTH_BANNER=ログイン中: %s
+DLG_AUTH_BANNER2=認証が必要です.
+DLG_AUTH_BANNER2_FAILED=認証に失敗しました. 再試行してください.
+DLG_AUTH_USERNAME=ユーザ名(&N):
+DLG_AUTH_PASSWORD=パスフレーズ(&P):
+DLG_AUTH_REMEMBER_PASSWORD=パスワードを記憶する(&M)
+DLG_AUTH_FWDAGENT=エージェント転送する(&O)
+DLG_AUTH_METHOD_PASSWORD=プレインテキストを使う(&L)
+DLG_AUTH_METHOD_RSA=&RSA/DSA鍵を使う
+DLG_AUTH_METHOD_RHOST=r&hosts(SSH1)を使う
+DLG_AUTH_METHOD_CHALLENGE1=チャレンジレスポンス認証を使う(&TIS)
+DLG_AUTH_METHOD_CHALLENGE2=チャレンジレスポンス認証を使う(キーボードインタラクティブ)(&C)
+DLG_AUTH_METHOD_PAGEANT=P&ageantを使う
+DLG_AUTH_PRIVATEKEY=秘密鍵(&K):
+DLG_AUTH_LOCALUSER=ローカルのユーザ名(&U):
+DLG_AUTH_HOST_PRIVATEKEY=ホスト鍵(&F):
+MSG_PAGEANT_NOTFOUND=Pageant が見つかりません.
+MSG_PAGEANT_NOKEY=Pageant に有効な鍵が登録されていません.
+
+; dlg auth setup
+DLG_AUTHSETUP_TITLE=TTSSH: 認証設定
+DLG_AUTHSETUP_BANNER=通常使用する認証方式:
+DLG_AUTHSETUP_USERNAME=ユーザ名(&N):
+DLG_AUTHSETUP_METHOD_PASSWORD=プレインテキストを使う(&L)
+DLG_AUTHSETUP_METHOD_RSA=&RSA/DSA鍵を使う
+DLG_AUTHSETUP_METHOD_RHOST=r&hostsを使う(SSH1)
+DLG_AUTHSETUP_METHOD_CHALLENGE=チャレンジレスポンス認証を使う(SSH1:TIS, SSH2:キーボードインタラクティブ)(&T)
+DLG_AUTHSETUP_METHOD_PAGEANT=P&ageantを使う
+DLG_AUTHSETUP_PRIVATEKEY=秘密鍵(&K):
+DLG_AUTHSETUP_LOCALUSER=ローカルのユーザ名(&U):
+DLG_AUTHSETUP_HOST_PRIVATEKEY=ホスト鍵(&F):
+DLG_AUTHSETUP_CHECKAUTH=ログイン前にサーバで有効な認証方式を確認する (SSH2)(&C)
+
+FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA秘密鍵ファイルの選択
+FILEDLG_OPEN_PRIVATEKEY_FILTER=秘密鍵ファイル\0identity;id_rsa;id_dsa\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0すべてのファイル(*.*)\0*.*\0\0
+MSG_KEYSPECIFY_ERROR=RSA/DSA秘密鍵の含まれるファイルを指定してください
+MSG_READKEY_ERROR=SSH2秘密鍵の読み込みに失敗しました\n%s
+MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts 認証は標準の認証方式ではないため, 認証に失敗するかもしれません.\nRhosts 認証をTTSSH で使用するには, Rhosts 認証を標準に設定後TTSSH を再起動し, 接続前に設定メニューから"SSH 認証..." を選択して下さい.
+MSG_NOAUTHMETHOD_ERROR=サーバはTTSSH が提供する認証オプションをサポートしていません.\n接続は閉じられます.
+
+; dlg diff host
+DLG_DIFFERENTHOST_TITLE=セキュリティ警告
+DLG_DIFFERENTHOST_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
+DLG_DIFFERENTHOST_WARNING2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
+DLG_DIFFERENTHOST_FINGERPRINT=サーバ側のホスト鍵指紋:
+DLG_DIFFERENTHOST_REPLACE=既存の鍵を, 新しい鍵で上書きする(&R)
+
+; dlg fwd edit
+DLG_FWD_TITLE=SSHポート転送
+DLG_FWD_BANNER=ポート転送を行う向きの選択:
+DLG_FWD_LOCAL_PORT=ローカルのポート(&L)
+DLG_FWD_LOCAL_REMOTE=リモート側ホスト(&M)
+DLG_FWD_LOCAL_REMOTE_PORT=ポート(&P)
+DLG_FWD_LOCAL_CHECKIDENTITY=他のホストからの接続を受け入れる(&C)
+DLG_FWD_REMOTE_PORT=リモートサーバのポート(&R)
+DLG_FWD_REMOTE_LOCAL=ローカル側ホスト(&A)
+DLG_FWD_REMOTE_LOCAL_PORT=ポート(&O)
+
+MSG_SAME_SERVERPORT_ERROR=同一リモートポートに 2つ以上の転送は設定できません (%d).
+MSG_SAME_LOCALPORT_ERROR=同一ローカルポートに 2つ以上の転送は設定できません (%d).
+MSG_UNSPECIFYIED_FWD_ERROR1=このSSHセッションが始まったとき, 次の転送は指定されませんでした:\n\n
+MSG_UNSPECIFYIED_FWDS_ERROR1=このSSHセッションが始まったとき, 次の転送は指定されませんでした:\n\n
+MSG_UNSPECIFYIED_FWD_ERROR2=\nSSHプロトコルの規制のために, この転送は, 現在のSSHセッションで動作しません. \n設定を保存して, 新しいSSH セッションを開始すれば, 転送が有効になります.
+MSG_UNSPECIFYIED_FWDS_ERROR2=\nSSHプロトコルの規制のために, これらの転送は, 現在のSSHセッションで動作しません. \n設定を保存して, 新しいSSH セッションを開始すれば, 転送が有効になります.
+MSG_INVALID_PORT_ERROR="%s" は無効なポート番号です. \nポート名を一覧から選択するか, 1 から 65535の間で指定してください.
+
+; dlg fwd setup
+DLG_FWDSETUP_TITLE=TTSSH: ポート転送設定
+DLG_FWDSETUP_LIST=ポート転送(&P)
+DLG_FWDSETUP_ADD=追加(&A)...
+DLG_FWDSETUP_EDIT=編集(&E)...
+DLG_FWDSETUP_REMOVE=削除(&R)
+DLG_FWDSETUP_CHECKIDENTITY=ローカルのポートは他のホストからの接続を受け入れる(&C)
+DLD_FWDSETUP_X=Xクライアントアプリケーションの転送
+DLG_FWDSETUP_XAPP=リモートの(&X)アプリケーションをローカルのXサーバに表示する
+
+MSG_FWD_REMOTE_XSERVER=リモートX サーバ
+MSG_FWD_REMOTE_XSCREEN=X サーバ (画面 %d)
+MSG_FWD_REMOTE=リモートの %s からローカル側ホスト "%s" のポート %s
+MSG_FWD_LOCAL=ローカルの %s から リモート側ホスト "%s" のポート %s
+MSG_FWD_X=リモートのXアプリケーションからローカルのXサーバ
+
+; dlg host
+DLG_HOST_TITLE=Tera Term: 新しい接続
+DLG_HOST_TCPIPHOST=ホスト(&T):
+DLG_HOST_TCPIPHISTORY=ヒストリ(&O)
+DLG_HOST_TCPIPSERVICE=サービス:
+DLG_HOST_TCPIPOTHER=その他
+DLG_HOST_TCPIPPORT=TCPポート#(&P):
+DLG_HOST_TCPIPSSHVERSION=SSHバージョン(&V):
+DLG_HOST_TCPIPPROTOCOL=プロトコル(&C):
+DLG_HOST_SERIAL=シリアル(&E)
+DLG_HOST_SERIALPORT=ポート(&R):
+DLG_HOST_HELP=ヘルプ(&H)
+
+MSG_TCPPORT_NAN_ERROR=TCPポート番号には数値を入力してください.
+
+; dlg keygen
+DLG_KEYGEN_TITLE=TTSSH: 鍵生成
+DLG_KEYGEN_KEYTYPE=鍵の種類
+DLG_KEYGEN_PASSPHRASE=鍵のパスフレーズ:
+DLG_KEYGEN_PASSPHRASE2=パスフレーズの確認:
+DLG_KEYGEN_SAVEPUBLIC=公開鍵の保存(&C)
+DLG_KEYGEN_SAVEPRIVATE=秘密鍵の保存(&P)
+DLG_KEYGEN_GENERATE=生成(&G)
+DLG_KEYGEN_BITS=ビット数(&B):
+
+MSG_KEYBITS_MIN_ERROR=鍵のビット数が小さすぎます.
+MSG_KEYGEN_GENERATING=鍵を生成しています。
+MSG_KEYGEN_GENERATED=鍵を生成しました。
+
+FILEDLG_SAVE_PUBLICKEY_TITLE=公開鍵の保存先:
+FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0すべてのファイル(*.*)\0*.*\0\0
+MSG_SAVE_KEY_OPENFILE_ERROR=鍵ファイルを開けません
+MSG_SAVE_KEY_WRITEFILE_ERROR=鍵ファイルに書き込めません
+MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=パスフレーズが一致しません
+MSG_SAVE_PRIVATEKEY_EMPTY_WARN=空のパスフレーズを使用しますか？
+FILEDLG_SAVE_PRIVATEKEY_TITLE=秘密鍵の保存先:
+FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0すべてのファイル(*.*)\0*.*\0\0
+
+; dlg setup
+DLG_SSHSETUP_TITLE=TTSSH: 設定
+DLG_SSHSETUP_COMPRESS=圧縮レベル(&C):
+DLG_SSHSETUP_COMPRESS_NONE=なし
+DLG_SSHSETUP_COMPRESS_HIGHEST=最高
+DLG_SSHSETUP_CHIPER=優先するアルゴリズムの順(&P)
+DLG_SSHSETUP_CHIPER_UP=上へ(&U)
+DLG_SSHSETUP_CHIPER_DOWN=下へ(&D)
+DLG_SSHSETUP_CIPHER_BORDER=<以下の暗号アルゴリズムは使用されません>
+DLG_SSHSETUP_KNOWNHOST=SSH Known Hosts
+DLG_SSHSETUP_KNOWNHOST_RW=読み書き(&W):
+DLG_SSHSETUP_KNOWNHOST_RO=読み取り専用(&R):
+DLG_SSHSETUP_HEARTBEAT=ハートビート(&keep-alive)
+DLG_SSHSETUP_HEARTBEAT_UNIT=秒(0を指定すると無効)
+DLG_SSHSETUP_FORWARDAGENT=エージェント転送を有効にする(&A)
+DLG_SSHSETUP_NOTICE=いずれの変更も次回のセッション以降有効になります.
+
+FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=読み書き用knownhostsファイルを選択してください
+FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=追加する読み取り専用knownhostsファイルを選択してください
+
+; dlg tis
+DLG_TIS_TITLE=SSH 認証チャレンジ
+DLG_TIS_BANNER=ログイン中: %s
+
+; dlg unknown host
+DLG_UNKNONWHOST_TITLE=セキュリティ警告
+DLG_UNKNOWNHOST_WARNINIG=known hostsリストにサーバ"#####################################"のエントリはありません. 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください！
+DLG_UNKNOWNHOST_WARNINIG2=known hostsリストのこのホストを追加して続行すると, 次回からこの警告は出なくなります.
+DLG_UNKNOWNHOST_FINGERPRINT=サーバ側のホスト鍵指紋:
+DLG_UNKNOWNHOST_ADD=このホストをknown hostsリストに追加する(&A)
+
+; crypt.c
+MSG_AES128_ENCRYPT_ERROR1=AES128/192/256暗号化エラー(1): bytes %d (%d)
+MSG_AES128_ENCRYPT_ERROR2=AES128/192/256暗号化エラー(2)
+MSG_AES128_DECRYPT_ERROR1=AES128/192/256復号エラー(1): bytes %d (%d)
+MSG_AES128_DECRYPT_ERROR2=AES128/192/256復号エラー(2)
+MSG_3DESCBC_ENCRYPT_ERROR1=3DES-CBC暗号化エラー(1): bytes %d (%d)
+MSG_3DESCBC_ENCRYPT_ERROR2=3DES-CBC暗号化エラー(2)
+MSG_3DESCBC_DECRYPT_ERROR1=3DES-CBC復号エラー(1): bytes %d (%d)
+MSG_3DESCBC_DECRYPT_ERROR2=3DES-CBC復号エラー(2)
+MSG_BLOWFISH_ENCRYPT_ERROR1=Blowfish暗号化エラー(1): bytes %d (%d)
+MSG_BLOWFISH_ENCRYPT_ERROR2=Blowfish暗号化エラー(2)
+MSG_BLOWFISH_DECRYPT_ERROR1=Blowfish復号エラー(1): bytes %d (%d)
+MSG_BLOWFISH_DECRYPT_ERROR2=Blowfish復号エラー(2)
+MSG_ARCFOUR_ENCRYPT_ERROR1=Arcfour暗号化エラー(1): bytes %d (%d)
+MSG_ARCFOUR_ENCRYPT_ERROR2=Arcfour暗号化エラー(2)
+MSG_ARCFOUR_DECRYPT_ERROR1=Arcfour復号エラー(1): bytes %d (%d)
+MSG_ARCFOUR_DECRYPT_ERROR2=Arcfour復号エラー(2)
+MSG_CAST128_ENCRYPT_ERROR1=CAST128暗号化エラー(1): bytes %d (%d)
+MSG_CAST128_ENCRYPT_ERROR2=CAST128暗号化エラー(2)
+MSG_CAST128_DECRYPT_ERROR1=CAST128復号エラー(1): bytes %d (%d)
+MSG_CAST128_DECRYPT_ERROR2=CAST128復号エラー(2)
+MSG_CIPHER_INIT_ERROR=暗号初期化エラー(%d)
+MSG_RSAKEY_SETUP_ERROR=RSA 鍵設定エラー
+MSG_UNAVAILABLE_CIPHERS_ERROR=このサーバはTTSSH 暗号アルゴリズムをサポートしていません.\nTTSSHとサーバ間のセキュアな接続を確立できません.\n接続を閉じます.
+MSG_CHIPHER_NONE_ERROR=このプログラムで使用可能な暗号化アルゴリズムと, サーバーが理解可能な暗号化アルゴリズムが異なっています. \nこのサーバーと通信するためには, 利用可能な暗号化アルゴリズムを増やさなければなりません. \nTTSSH セットアップダイアログボックス内を変更し, Tera Term を再起動してください.\n接続を閉じます.
+MSG_RASKEY_TOOWEAK_ERROR=サーバ RSA 鍵が極めて脆弱です. 安全な接続を確立できません.
+MSG_CIPHER_NOTSELECTED_ERROR=暗号アルゴリズムが未選択です
+
+; fwd.c
+MSG_FWD_LOCAL_CHANNEL_ERROR=サーバーは, 存在しない転送チャンネルを操ろうとしました.\nEither the server has a bug or is hostile. You should close this connection.
+MSG_FWD_REQUEST_ERROR=転送接続待ち受け中に通信エラーが発生しました.\n待ち受けポートを閉じます.
+MSG_FWD_REFUSED_ERROR=接続は拒否されました (おそらくサービス停止中です)
+MSG_FWD_NETDOWN_ERROR=転送先マシンに接続できません (おそらくネットワークの問題です)
+MSG_FWD_MACHINEDOWN_ERROR=転送先マシンに接続できません (おそらくマシンがダウンしています)
+MSG_FWD_ADDRNOTFOUTD_ERROR=マシンにアドレスがありません
+MSG_FWD_CONNECT_ERROR=転送接続を確立できませんでした
+MSG_FWD_CHANNEL_ERROR=通信エラー %s forwarded local %s.\n%s (コード %d).\n転送接続を終了します.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=サーバはこのマシンに転送を試みました.\n%s 上のXサーバへの接続を要求しました (画面 %d). \n転送接続を終了します.
+MSG_FWD_CHANNEL_OPEN_ERROR=サーバはこのマシンに転送を試みました.\n%s への接続を要求しました (ポート %s).\n%s.\n転送接続を終了します.
+DLG_FWDMON_TITLE=TTSSH ポート転送モニタ
+MSG_FWD_HOSTILE_ATTACK_ERROR=IP 番号 %s のホストが, ローカルポート %d に転送接続を試みました.\n悪意のある攻撃の場合があります.
+MSG_FWD_SOCKET_ERROR=ポート転送に必要ないくつかのソケットの初期化に失敗しました.\nいくつかのポート転送サービスは利用できません.\n(エラー番号 %d)
+MSG_FWD_DUPLICATE_ERROR=TTSSH 内部エラー: 重複した種類/ポートの指定が存在したため, ポート転送設定ができませんでした
+MSG_FWD_DENIED_HANDLE_ERROR=サーバはこのマシンに転送を試みました.\nマシン %s 上のポート%s への接続を要求しました.\n要求処理中にエラーが発生したため, 拒否されました.
+MSG_FWD_DENIED_ERROR=サーバはこのマシンに転送を試みました.\nマシン %s 上のポート%s への接続を要求しました.\nTTSSH に該当する転送設定が存在しないため, 要求を拒否しました.
+MSG_FWD_DENIED_X_ERROR=サーバはこのマシンに転送を試みました.\nローカルのX サーバへの接続を要求しました.\nTTSSH に該当する転送設定が存在しないため, 要求を拒否しました.
+MSG_FWD_DENIED_BY_SERVER_ERROR=ローカルマシン上のプログラムは転送先ポートに接続しました.\n転送要求はサーバ側で拒否されました. 接続を閉じます.
+MSG_FWD_COMM_ERROR=ローカルポートに転送データを送信中, 通信エラーが発生しました.\n転送接続を閉じます.
+
+; hosts.c
+MSG_HOSTS_READ_ENOENT_ERROR=known_hosts 読み込み中にエラーが発生しました. \n指定されたファイル名は存在しません.
+MSG_HOSTS_READ_ERROR=known_hosts 読み込み中にエラーが発生しました.
+MSG_HOSTS_ALLOC_ERROR=known_hosts 読み込み中にメモリ不足になりました.
+MSG_HOSTS_HOSTNAME_INVALID_ERROR=ホスト名に無効な文字が含まれています.\nセッションを閉じます.
+MSG_HOSTS_HOSTNAME_EMPTY_ERROR=ホスト名が空です.\nセッションを閉じます.
+MSG_HOSTS_FILE_UNSPECIFY_ERROR=known-hosts が指定されなかったので, ホストとその鍵を加えることができません.\nTera Termを再起動して, TTSSH セットアップダイアログボックスで読込み・書込みknown-hosts を指定してください.
+MSG_HOSTS_WRITE_EACCES_ERROR=ホスト鍵の書き込み中にエラーが発生しました.\nknown-hosts の書き込み権限がありません.
+MSG_HOSTS_WRITE_ERROR=ホスト鍵の書き込み中にエラーが発生しました.\nホスト鍵を書き込めません.
+
+; keyfiles.c
+MSG_KEYFILES_READ_ENOENT_ERROR=鍵の読み込み中にエラーが発生しました.\n指定されたファイル名は存在しません.
+MSG_KEYFILES_READ_ERROR=鍵の読み込み中にエラーが発生しました.
+MSG_KEYFILES_READ_ALLOC_ERROR=鍵の読み込み中にメモリ不足になりました.
+MSG_KEYFILES_PRIVATEKEY_NOTCONTAIN_ERROR=指定された鍵はSSH 秘密鍵ではありません.
+MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR=指定された鍵ファイルは無効な秘密鍵です.
+MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR=入力されたパスフレーズでは鍵ファイルを復号できません.\nこのファイルは適切な鍵長ではありません.
+MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR=入力されたパスフレーズでは鍵ファイルを復号できません.\nTTSSH はこの暗号方式に対応していません.
+MSG_KEYFILES_PASSPHRASE_EMPTY_ERROR=入力されたパスフレーズでは鍵ファイルを復号できません.\n自動ログインをするにはパスフレーズ無しの鍵ファイルを生成してください.\n注意: 鍵の盗難には十分ご注意ください.
+MSG_KEYFILES_PASSPHRASE_ERROR=入力されたパスフレーズでは鍵ファイルを復号できません.\nパスフレーズに誤りがあります.
+MSG_KEYFILES_CRYPTOLIB_ERROR=暗号ライブラリにエラーがあります.\n指定された鍵は無効です.
+
+; pkt.c
+MSG_PKT_OVERSIZED_ERROR=サーバから巨大なパケットを受信しました; 切断します.
+
+; ssh.c
+MSG_SSH_INVALID_COMPDATA_ERROR=受信パケット中の圧縮データが無効です.
+MSG_SSH_TRUNCATED_PKT_ERROR=欠損パケットを受信しました (%ld > %d) @ grab_payload()
+MSG_SSH_TRUNCATED_PKT_LIM_ERROR=欠損パケットを受信しました (%ld > %d) @ grab_payload_limited()
+MSG_SSH_COREINS_ERROR='CORE 挿入攻撃' を検出しました. 接続を中断します.
+MSG_SSH_CORRUPTDATA_ERROR=欠損データを検出しました. 切断します.
+MSG_SSH_DECOMPRESS_ERROR=内部エラー: パケットの復号に失敗しました. \nバグ報告をお願いします.
+MSG_SSH_SEND_PKT_ERROR=SSH パケットを送信中に通信エラーが発生しました. \n切断します. (%s:%d)
+MSG_SSH_COMP_ERROR=パケットデータを圧縮中にエラーが発生しました. \n切断します.
+MSG_SSH_UNABLE_FWD_ERROR=\n転送できないポートへの転送を行おうとしたため, サーバから切断されました. \n既に同じサーバ上の同一ポートで転送を行っている場合に発生します.
+MSG_SSH_SERVER_DISCON_ERROR=サーバに次の理由で切断されました.  '%s'.%s
+MSG_SSH_SERVER_DISCON_NORES_ERROR=サーバから切断されました (切断理由はありません). %s
+MSG_SSH_VERSION_ERROR=サーバのプロトコルバージョンが不明です.
+MSG_SSH_SEND_ID_ERROR=SSH ID 文字列送信中にエラーが発生しました. \n切断します.
+MSG_SSH_UNEXP_MSG2_ERROR=現在のステージでは想定外のSSH2 メッセージ(%d) です. (%d)
+MSG_SSH_UNEXP_MSG_ERROR=想定外の種別のパケットを受信しました: %d
+MSG_SSH_ALLOC_TERMINAL_ERROR=サーバは仮想端末を割り当てることができません. 端末に問題が生じる場合があります.
+MSG_SSH_SETUP_COMP_ERROR=圧縮設定中にエラーが発生しました. \n切断します.
+MSG_SSH_DECRYPT_RSA_ERROR=RSA 復号中にエラーが発生しました. \n鍵ファイルが誤り, または破損している場合があります.
+MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=内部エラー: サポート外の認証方法
+MSG_SSH_AUTH_FAILURE_ERROR=SSH2自動ログインエラー: ユーザー認証が失敗しました.
+MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nサーバでサポートされていない認証方法です.
+MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE を受信しました. \nチャネル [%d]: 理由: %s(%d) メッセージ: %s
+MSG_SSH_NO_FREE_CHANNEL=新しいチャネルを開けません. チャネルがすべて使用中です.
+
+; ttxssh.c
+MSG_UNKNOWN_OPTION_ERROR=無効なコマンドラインオプション: %s
+
+; x11util.c
+MSG_X_AUTH_ERROR=リモートのX アプリケーションから無効な認証データを受信しました. \nX セッションは無効になっています.
+
+MSG_CREATEWINDOW_KEYGEN_ERROR=鍵生成ダイアログボックスを開けません.
+MSG_CREATEWINDOW_ABOUT_ERROR=情報ダイアログボックスを開けません.
+MSG_CREATEWINDOW_SETUP_ERROR=TTSSH 設定ダイアログボックスを開けません.
+MSG_CREATEWINDOW_FWDSETUP_ERROR=SSH ポート転送設定ダイアログボックスを開けません.
+MSG_CREATEWINDOW_FWDEDIT_ERROR=SSH ポート転送編集ダイアログボックスを開けません.
+MSG_CREATEWINDOW_AUTH_ERROR=認証ダイアログボックスを開けません.\n接続を閉じました.
+MSG_CREATEWINDOW_AUTHSETUP_ERROR=認証設定ダイアログボックスを開けません.
+MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=ダイアログボックスを開けません: エラー %d
+
+MSG_WARNING=警告
+MSG_ERROR=エラー
+MSG_TTSSH_ERROR=TTSSHエラー
+MSG_NONFAITAL_ERROR=Tera Term: 致命的でないエラー
+
+BTN_OK=OK
+BTN_CANCEL=キャンセル
+BTN_DISCONNECT=接続断(&D)
+BTN_CONTINUE=続行(&C)
+
+
+[TTProxy]
+DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+
+NEMU_SETUP=プロキシ(&P)...
+MENU_ABOUT=TT&Proxyについて...
+
+DLG_SETUP_TITLE=プロキシの設定
+DLG_SETUP_URL=URL表現
+DLG_SETUP_TYPE=種類(&T)
+DLG_SETUP_HOST=ホスト名(&H)
+DLG_SETUP_PORT=ポート番号(&N)
+DLG_SETUP_USER=ユーザ名(&U)
+DLG_SETUP_PASS=パスワード(&P)
+DLG_SETUP_OTHER=その他の設定(&O)...
+
+DLG_OTHER_TITLE=その他の設定
+DLG_OTHER_COMMON=共通の設定
+DLG_OTHER_TIMEOUT=接続タイムアウト(&T)
+DLG_OTHER_SECOND=秒
+DLG_OTHER_LOG=プロキシとの通信ログ(&L)
+DLG_OTHER_REFER=参照(&F)...
+DLG_OTHER_SOCKS=SOCKSプロキシの設定
+DLG_OTHER_RESOLV=名前解決(&R)
+DLG_OTHER_RESOLV_AUTO=自動的に判断する
+DLG_OTHER_RESOLV_REMOTE=プロキシ側で解決する
+DLG_OTHER_RESOLV_LOCAL=ローカルで解決する
+DLG_OTHER_TELNET=TELNETプロキシの設定
+DLG_OTHER_HOST=ホスト名入力プロンプト(&H)
+DLG_OTHER_USER=ユーザー名入力プロンプト(&U)
+DLG_OTHER_PASS=パスワード入力プロンプト(&P)
+DLG_OTHER_CONNECT=接続成功メッセージ(&C)
+DLG_OTHER_ERROR=接続失敗メッセージ(&E)
+
+DLG_ABOUT_TITLE=TTProxyについて
+DLG_ABOUT_EXTENTION=Tera Term proxy拡張
+DLG_ABOUT_YEBISUYA=蛭子屋本舗
+DLG_ABOUT_HOMEPAGE=TTProxyホームページ
+
+MSG_EMPTY_HOSTNAME=プロキシのホスト名を指定してください。
+MSG_ILLEGAL_PORT=ポート番号には正の整数を指定してください。
+MSG_EMPTY_PARAMETER=すべてのパラメータは必須項目です。\n何か入力してください。
+MSG_PROXY_UNAUTHORIZED=プロキシの認証に失敗しました。
+MSG_PROXY_BAD_REQUEST=プロキシの設定により接続できません。
+MSG_TYPE_NONE=プロキシを使用しない
+MSG_LOGFILE_SELECT=ログファイルの選択
+MSG_UNABLE_TO_GET_ISSUER_CERT=発行者証明書が見つかりません。
+MSG_UNABLE_TO_GET_CRL=証明書のCRLが見つかりません。
+MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE=証明書の署名が復号化できません。
+MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE=CRLの署名が復号化できません。
+MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY=発行者の公開鍵が復号できません。
+MSG_CERT_SIGNATURE_FAILURE=証明書の署名が不正です。
+MSG_CRL_SIGNATURE_FAILURE=CRLの署名が不正です。
+MSG_CERT_NOT_YET_VALID=証明書がまだ有効になっていません。
+MSG_CERT_HAS_EXPIRED=証明書が有効期限切れです。
+MSG_CRL_NOT_YET_VALID=CRLがまだ有効になっていません。
+MSG_CRL_HAS_EXPIRED=CRLが有効期限切れです。
+MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD=証明書のnotBeforeフィールドの書式が不正です。
+MSG_ERROR_IN_CERT_NOT_AFTER_FIELD=証明書のnotAfterフィールドの書式が不正です。
+MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD=CRLのlastUpdateフィールドの書式が不正です。
+MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD=CRLのnextUpdateフィールドの書式が不正です。
+MSG_OUT_OF_MEM=メモリが不足しています。
+MSG_DEPTH_ZERO_SELF_SIGNED_CERT=自己署名の証明書です。
+MSG_SELF_SIGNED_CERT_IN_CHAIN=証明書チェインに自己署名の証明書があります。
+MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY=ローカルの発行者証明書が見つかりません
+MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE=最初の証明書が検証できません
+MSG_CERT_CHAIN_TOO_LONG=証明書チェインが長すぎます。
+MSG_CERT_REVOKED=廃止された証明書です。
+MSG_INVALID_CA=無効なCA証明書です。
+MSG_PATH_LENGTH_EXCEEDED=パスの長さが制約長を超えています。
+MSG_INVALID_PURPOSE=証明書の目的外利用です。
+MSG_CERT_UNTRUSTED=証明書は信頼されていません。
+MSG_CERT_REJECTED=証明書が拒絶されています。
+MSG_SUBJECT_ISSUER_MISMATCH=所有者と発行者が一致しません
+MSG_AKID_SKID_MISMATCH=機関と所有者の鍵識別子が一致しません。
+MSG_AKID_ISSUER_SERIAL_MISMATCH=機関と発行者のシリアル番号が一致しません。
+MSG_KEYUSAGE_NO_CERTSIGN=証明書への署名を行なう権限がありません。
+MSG_APPLICATION_VERIFICATION=アプリケーションでの検証に失敗しました。
+MSG_UNMATCH_COMMON_NAME=証明書のホスト名と一致しません
+MSG_UNABLE_TO_GET_COMMON_NAME=証明書のホスト名が見つかりません
+
+BTN_OK=OK
+BTN_CANCEL=キャンセル
+
+
+[TTMenu]
+DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+
+MENU_LISTCONFIG=リスト編集
+MENU_SETTING=設定
+MENU_ICON=大きいアイコンで表示
+MENU_FONT=フォントを指定
+MENU_LEFTPOPUP=左クリックでリスト表示
+MENU_HOTKEY=リスト表示ホットキー(Ctl+Alt+M)
+MENU_VERSION=バージョン情報
+MENU_EXEC=実行
+MENU_CLOSE=終了
+MENU_NOTRAY=(なし)
+
+DLG_ABOUT_TITLE=バージョン情報
+DLG_ABOUT_APPNAME=支援ツール
+
+DLG_CONFIG_TITLE=リスト編集
+DLG_CONFIG_ITEM=リスト項目
+DLG_CONFIG_CONFIG=設定内容
+DLG_CONFIG_NAME=登録名
+DLG_CONFIG_PATTERN=起動の種類
+DLG_CONFIG_AUTO=自動ログイン
+DLG_CONFIG_HOST=ホスト名
+DLG_CONFIG_USER=ユーザ名
+DLG_CONFIG_PASS=パスワード
+DLG_CONFIG_MACRO=マクロファイルを指定して実行
+DLG_CONFIG_LAUNCH=起動のみ
+DLG_CONFIG_STARTUP=起動時に実行
+DLG_CONFIG_SSH=ttsshを使う
+DLG_CONFIG_KEYFILE=鍵ファイル
+DLG_CONFIG_CHALLENGE=チャレンジレスポンス認証
+DLG_CONFIG_PAGEANT=Pageantを使う
+DLG_CONFIG_DETAIL=詳細設定
+
+DLG_ETC_TITLE=詳細設定
+DLG_ETC_APP=起動アプリ
+DLG_ETC_OPTION=オプション
+DLG_ETC_CONFIG=Tera Term設定ファイル(「起動のみ」以外)
+DLG_ETC_AUTO=自動ログイン用設定項目
+DLG_ETC_LOGFILE=ログファイル
+DLG_ETC_PROMPT=プロンプト
+DLG_ETC_USER=ユーザ名
+DLG_ETC_PASS=パスワード
+
+MSG_ERROR_READREG=レジストリからのデータ読み出しに失敗しました。\n
+MSG_ERROR_MAKETTL=ttpmenu.TTLの作成に失敗しました。\n
+MSG_ERROR_LAUNCH=アプリケーションの実行に失敗しました。\n
+MSG_ERROR_NOREGNAME=登録名を入力して下さい。
+MSG_ERROR_INVALIDREGNAME=登録名に"\\"は使用できません。
+MSG_ERROR_NOHOST=ホスト名を入力して下さい。
+MSG_ERROR_NOMACRO=マクロファイル名を入力して下さい。
+MSG_ERROR_CHECKFILE=ファイル[%s]のチェックに失敗しました。\n
+MSG_ERROR_SAVEREG=レジストリへの保存に失敗しました。\n
+MSG_ERROR_OPENREG=レジストリを開けませんでした。\n
+MSG_ERROR_SELECTREG=削除する登録を選択して下さい。
+MSG_ERROR_GETDELETEREG=削除する登録の取得に失敗しました。
+MSG_ERROR_DELETEREG=レジストリの削除に失敗しました。\n
+MSG_ERROR_WINCLASS=ウィンドウクラスの登録に失敗しました。\n
+
+FILEDLG_MACRO_TITLE=マクロファイルを指定
+FILEDLG_MACRO_FILTER=マクロファイル(*.ttl)\0*.ttl\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_KEY_TITLE=秘密鍵を指定
+FILEDLG_KEY_FILTER=秘密鍵ファイル\0identity;id_rsa;id_dsa\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0all(*.*)\0*.*\0\0
+FILEDLG_TERATERM_TITLE=Tera Termを指定
+FILEDLG_TERATERM_FILTER=実行ファイル(*.exe)\0*.exe\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_INI_TITLE=設定ファイルを指定
+FILEDLG_INI_FILTER=設定ファイル(*.ini)\0*.ini\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_LOG_TITLE=ログファイルを指定
+FILEDLG_LOG_FILTER=ログファイル(*.log)\0*.log\0すべてのファイル(*.*)\0*.*\0\0
+
+BTN_OK=OK
+BTN_CANCEL=キャンセル
+BTN_DEFAULT=デフォルト
+
+
+[TTXKanjiMenu]
+MENU_KANJI=漢字コード(&K)
+MENU_RECV_SJIS=受信: &Shift_JIS
+MENU_RECV_EUCJP=受信: &EUC-JP
+MENU_RECV_JIS=受信: &JIS
+MENU_RECV_UTF8=受信: &UTF-8
+MENU_RECV_UTF8m=受信: UTF-8&m
+MENU_SEND_SJIS=送信: S&hift_JIS
+MENU_SEND_EUCJP=送信: EU&C-JP
+MENU_SEND_JIS=送信: J&IS
+MENU_SEND_UTF8=送信: U&TF-8
+MENU_USE_ONE_SETTING=送受信両方を変更(&o)
+MENU_SJIS=送受信: &Shift_JIS
+MENU_EUCJP=送受信: &EUC-JP
+MENU_JIS=送受信: &JIS
+MENU_UTF8=送受信: &UTF-8
+MENU_UTF8m=受信: UTF-8&m/送信: UTF-8

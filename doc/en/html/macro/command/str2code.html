@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>str2code</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>str2code</h1>
+
+<p>
+Converts string to ASCII code value.
+</p>
+
+<pre class="macro-syntax">
+str2code &lt;intvar&gt; &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+If the &lt;string&gt; consists of one character, this function copies the ASCII code for the character to the integer variable &lt;intvar&gt;.<br>
+If the length of &lt;string&gt; is longer than one, this function converts &lt;string&gt; to its ASCII code sequence and copies it to &lt;intvar&gt;. The variable &lt;intvar&gt; can store 4 ASCII codes at maximum.<br>
+If the length of &lt;string&gt; is longer than 4, the last 4 bytes of ASCII code sequence is copied to &lt;intvar&gt;.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+str2code val 'A'
+; val=65 (ASCII code for "A")
+
+str2code val 'AB'
+; val=65*256+66
+</pre>
+
+</body>
+</html>

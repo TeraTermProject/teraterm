@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>TTProxy command line</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>TTProxy command line</h1>
+
+<h2>Format</h2>
+<p>
+You can use the following command line parameters on TTProxy.
+</p>
+
+<pre class="syntax">
+-proxy=protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport
+protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
+</pre>
+
+<dl>
+  <dt id="protocol">protocol</dt>
+  <dd>Proxy type<br>Supported proxy types are followings:
+    <ul>
+      <li>http</li>
+      <li>telnet</li>
+      <li>socks4</li>
+      <li>socks5</li>
+      <li>ssl</li>
+      <li>http+ssl</li>
+      <li>telnet+ssl</li>
+      <li>socks4+ssl</li>
+      <li>socks5+ssl</li>
+    </ul></dd>
+
+  <dt id="proxyserver">proxyserver</dt>
+  <dd>Proxy server host</dd>
+
+  <dt id="proxyport">proxyport</dt>
+  <dd>Proxy server port</dd>
+
+  <dt id="realhost">realhost</dt>
+  <dd>Server host that you want to connect</dd>
+
+  <dt id="user">user</dt>
+  <dd>User name for proxy authentication</dd>
+
+  <dt id="password">password</dt>
+  <dd>Password for proxy authentication</dd>
+</dl>
+
+<h2 id="example">Example</h2>
+<pre>
+ttermpro.exe -proxy=socks5://user:pass@proxy:1080 sshserver /ssh
+ttermpro.exe -proxy=telnet://proxy:8023 telnetserver:23 /nossh
+ttermpro.exe http+ssl://proxy:8080/sshserver /ssh
+</pre>
+
+<h2 id="notes">Note</h2>
+<p>
+The following style is invalid.
+</p>
+<pre>
+protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost:portnumber
+</pre>
+
+<p>
+The following style isn't supported. This style conflicts with Tera Term parameter style "telnet://server&lt;:port&gt;".
+</p>
+<pre>
+protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport
+</pre>
+
+</body>
+</html>

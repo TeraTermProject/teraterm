@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Send file ([File] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Send file ([File] メニュー)</h1>
+    <p>
+      ファイルを送信します。
+    </p>
+
+    <h2>"Send file" ダイアログボックス(送信前のファイル名指定)</h2>
+    <dl>
+      <dt>File Name</dt>
+      <dd>
+	送信するファイルのファイル名を入力または選択してください。
+	すでに存在するファイルでなければなりません。
+      </dd>
+
+      <dt>Binary</dt>
+      <dd>
+	ファイルの内容をそのまま送信したい場合は選択してください。
+	選択しない場合は、漢字コード、改行文字が変換されて送信され、
+	TAB ($09), LF ($0A), CR ($0D)以外の制御文字は送信されません。
+      </dd>
+    </dl>
+
+    <h2>"Send file" ダイアログボックス(送信中)</h2>
+    <dl>
+      <dt>Close</dt>
+      <dd>
+	Close ボタンを押すとファイルの送信を中止します。
+      </dd>
+
+      <dt>Pause/Start</dt>
+      <dd>
+	Pause ボタンを押すとファイルの送信を一時中断します。
+	このとき Pause ボタンは Start ボタンに変化します。
+	その後 Start ボタンを押すと送信を再開します。
+      </dd>
+    </dl>
+  </body>
+</html>

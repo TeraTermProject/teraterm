@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>changedir</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>changedir</h1>
+
+<p>
+Changes the current directory.
+</p>
+
+<pre class="macro-syntax">
+changedir &lt;path&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Changes the current directory for Tera Term to &lt;path&gt;.
+</p>
+
+<p>
+<strong>Note:</strong> the <a href="setdir.html">setdir</a> command changes the current directory for MACRO. File names specified for the communication commands (e.g. kmtsend) are based on the current directory for Tera Term. File names specified for other commands (e.g. fileopen) are based on the current directory for MACRO.
+</p>
+
+<p>
+<strong>Complement:</strong> You must specify a fullpath name to the communication commands (e.g. sendfile, kmtsend) because these commands are not affected by `changedir' command.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+changedir 'c:\'
+sendfile 'd:\source\code.dat' 1
+</pre>
+
+</body>
+</html>

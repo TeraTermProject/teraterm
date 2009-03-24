@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>makepath</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>makepath</h1>
+
+<p>
+Creates a full path name.
+</p>
+
+<pre class="macro-syntax">
+makepath &lt;strvar&gt; &lt;dir&gt; &lt;name&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Creates the full path name from the directory name &lt;dir&gt; and file name &lt;name&gt;. The full path name is stored in the string variable &lt;strvar&gt;.<br>
+If necessary, '\' is inserted between &lt;dir&gt; and &lt;name&gt;.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+makepath path 'c:\teraterm' 'test.txt'
+; path = "c:\teraterm\test.txt"
+</pre>
+
+</body>
+</html>

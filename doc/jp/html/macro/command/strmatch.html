@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strmatch</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strmatch</h1>
+
+<p>
+正規表現によるパターンマッチングを行う。
+</p>
+
+<pre class="macro-syntax">
+strmatch &lt;target string&gt; &lt;string with regular expression&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+<a href="../../reference/RE.txt">Oniguruma の正規表現</a> が使用できる。<br>
+&lt;target string&gt;引数に指定された文字列を、正規表現 &lt;string with regular expression&gt; によるパターンに合致するかどうかを調べる。<br>
+このコマンドの実行結果はシステム変数 result , matchstr , groupmatchstr に格納される。変数 result の値の意味は以下のとおり。
+</p>
+
+<table>
+ <tr>
+  <th>値</th>
+  <th>意味</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>マッチしなかった</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>マッチした位置（1オリジン）</td>
+ </tr>
+</table>
+
+<p>
+変数 matchstr には最初にマッチしたパターンが格納される。<br>
+変数 groupmatchstr1～groupmatchstr9 にはグループマッチしたパターンが格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strmatch 'Tera Term' '(UTF-[789]).*'
+int2str s result
+messagebox s 'result'
+messagebox matchstr 'matchstr'
+messagebox groupmatchstr1 'groupmatchstr1'
+messagebox groupmatchstr2 'groupmatchstr2'
+messagebox groupmatchstr3 'groupmatchstr3'
+messagebox groupmatchstr4 'groupmatchstr4'
+</pre>
+
+</body>
+</html>

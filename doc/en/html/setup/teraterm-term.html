@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Terminal emulation (Tera Term setup file)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="backwrap">Back wrap</a></h1>
+
+<p>
+If you enables the back wrap, the cursor at the beginning of a line moves back to the end of previous line when a BS character is received. To enable the back wrap, edit the BackWrap line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+BackWrap=on
+</pre>
+
+<pre>
+Default:
+BackWrap=off
+</pre>
+
+
+<h1><a name="beep">The motion receiving BEL character</a></h1>
+
+<p>
+Tera Term will sound the beep when the BEL character(ASCII $07) receives.
+</p>
+
+<p>
+You can disable the beep sound for the BEL character by editing the Beep line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+Beep=off
+</pre>
+
+<p>
+Also, the terminal screen will flush instead of souding the beep in the following configuration.
+</p>
+
+<pre>
+Beep=visual
+</pre>
+
+<pre>
+Default:
+Beep=on
+</pre>
+
+
+<h1><a name="C1">Disabling the C1 (ASCII $80-$9F) control characters</a></h1>
+
+<p>
+If you choose the Terminal ID to be "VT2XX" or "VT3XX" in the [Setup] Terminal dialog box, characters in range of ASCII $80-$9F are interpreted as the C1 control characters.
+</p>
+
+<p>
+You can disable this interpretation and make these characters visible on the screen (if you are using a font which supports these characters), by editing the Accept8BitCtrl line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+Accept8BitCtrl=off
+</pre>
+
+<pre>
+Default:
+Accept8BitCtrl=on
+</pre>
+
+<h1><a name="C1send">Send C1 (ASCII $80-$9F) control characters</a></h1>
+
+<p>
+When sending C1 control characters, Tera Term uses equivalent 7-bit sequences.
+<p>
+
+<p>
+To send C1 control characters as single 8-bit characters, edit the Send8BitCtrl line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+Send8BitCtrl=on
+</pre>
+
+<p>
+Note: This setting is used only as default setting. Host can change this setting by S7C1T / S8C1T / DECSCL control sequence.
+</p>
+
+<pre>
+Default:
+Send8BitCtrl=off
+</pre>
+
+
+<h1><a name="displayall">Displaying all received characters</a></h1>
+
+<p>
+To display all received characters (including control characters) on the screen, edit the Debug line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+Debug=on
+</pre>
+
+<p>
+If you press Shift+Esc, Tera Term enters the debug mode, in which all received characters are displayed on the screen. If you press Shift+Esc again in the debug mode, Tera Term returns to the normal mode.
+</p>
+
+<p>
+In the debug mode, received characters are displayed by the following way:
+</p>
+
+<pre>
+ASCII code of the character    Displaying form
+$00 - $1F                      ^@ - ^_
+$20 - $7E                      normal character
+$7F                            &lt;DEL&gt;
+$80 - $FF                      MSB of the ASCII code is turned to be 0 and displayed by
+                               the same way as one for $00-$7F characters,
+                               except that text is displayed in the reversed color.
+</pre>
+
+<pre>
+Default:
+Debug=off
+</pre>
+
+
+<h1><a name="statusline">Disabling the status line</a></h1>
+
+<p>
+To disable the status line functions of VT terminal, edit the EnableStatusLine line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+EnableStatusLine=off
+</pre>
+
+<p>
+Then, escape sequences for the status line functions are ignored.
+</p>
+
+<pre>
+Default:
+EnableStatusLine=on
+</pre>
+
+
+<h1><a name="tekgin">Mouse code in TEK GIN report</a></h1>
+
+<p>
+In TEK GIN mode, the cross hair cursor appears in the TEK window. When you press a key or click the left mouse button, the key code (ASCII code) is sent with the the coordinate of the cursor.
+</p>
+
+<p>
+You can change the key code for the left mouse button by editing the TEKGINMouseCode line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TEKGINMouseCode=&lt;key code&gt;
+</pre>
+
+<pre>
+Default:
+TEKGINMouseCode=32
+(ASCII code 32 corresponds to the space character.)
+</pre>
+
+
+<h1><a name="vttab">Displaying tab at end of line like VT terminal</a></h1>
+
+<p>
+If you set 'on', the behavior of tab at end-of-line is the same as VT/PuTTY/xterm. The tab doesn't cause automatic linefeed.<br>
+If you set 'off', the behavior of tab at end-of-line is the same as FreeBSD console(syscons). The tab causes automatic linefeed. (it is not compatible with VT)
+</p>
+
+<pre>
+VTCompatTab=on
+</pre>
+
+<pre>
+Default:
+VTCompatTab=off
+</pre>
+
+
+<h1><a name="ScrollWindowClearScreen">Scroll down the current buffer when the screen is clear</a></h1>
+
+<p>
+&lt;ESC&gt;[J (Erase Below) escape sequence equals &lt;ESC&gt;[2J (Erase All) when the current cursor is top left (0, 0).<br>
+A user can configure whether the current buffer scrolls down when the screen is clear.
+</p>
+
+<p>
+If this configuration value is on, the current buffer will scroll down as well as &lt;ESC&gt;[2J escape sequenc.<br>
+If this configuration value is off, the current buffer will not scroll down. Instead, some buffers from the cursor position to the end of the screen.
+</p>
+
+<pre>
+Default:
+ScrollWindowClearScreen=on
+</pre>
+
+
+<h1><a name="UnknownUnicodeCharacterAsWide">Display unsupported Unicode character as wide character</a></h1>
+
+<p>
+When the received KANJI code is UTF-8 or UTF-8m, a user can configure the behavior of the Unicode characters which Tera Term does not support as the pure Unicode.<br>
+  
+If this configuration value is on, the unsupported Unicode character is displayed as "??".<br>
+If this configuration value is off, the unsupported Unicode character is displayed as "?".
+</p>
+
+<pre>
+Default:
+UnknownUnicodeCharacterAsWide=off
+</pre>
+
+
+<h1><a name="UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a></h1>
+
+<p>
+Tera Term in Japanese mode will display a ruled line and some symbols as 2-cloumns wide. However, some host applications may assume these characters will be displayed as 1-column wide character which results in incorrect display image.<br> 
+In addition, a ruler may be displayed by using +-| and some unsupproted characters may be displayed as ?? in English mode.<br> 
+Tera Term can be configured to display these charcaters by similar code of DEC sepcial characters (if any exists) to minimize the incorrect display iamge.<br> 
+However this feature causes a side effect that characters selected by mouse will be copied as different characters in a clipboard.<br> 
+This configuration takes effect only when received Kanji code are either UTF-8 or UTF-8. 
+</p>
+
+<p>
+Some mapping characters are categorized into several groups and you can specify each group to be converted or not.<br>
+If a user configures this option, please specify the sum value of the converting character at UnicodeToDecSpMapping entry.
+</p>
+
+<pre>
+Type A: Rule marks
+Value: 1
+  Box drawings (U+2500-U+257F)
+</pre>
+
+<pre>
+Type B: The character that is displayd "??" up to version 4.58 
+(it includes undisplayed characters in English environment).
+
+Value: 2
+  Bullet (U+2022)
+  Hyphenation point (U+2027)
+  Light shade (25%) (U+2591)
+  Medium shade (50%) (U+2592)
+  Dark shade (75%) (U+2593)
+  Black small square (U+25AA)
+  Black vertical rectangle (U+25AE)
+  Black verty small square (U+2B1D)
+</pre>
+
+<pre>
+Type C: The character that is displayd as bullet(wide character) 
+in Japanese environment, and is displayed as Middle dot in English environment.<br>
+NOTICE: A user is recommended to not specifying this option unless in Japanese environment.
+
+Value: 4
+  Middle dot (U+00B7)
+  One dot leader (U+2024)
+  Bullet operator (U+2219)
+</pre>
+
+<pre>
+Default:
+# Type A and B
+UnicodeToDecSpMapping=3
+</pre>
+
+
+<h1><a name="StrictKeyMapping">Mapping of the function key</a></h1>
+
+<p>
+A use can change the default action of the function key and the editor keypad from Tera Term 4.62. When a user can use this feature, the key sequence like as the VT termianl sends to the server without the keyboard configuration file.
+</p>
+
+<p>
+If a user disables the function key action in the keyboard configuration file and sends nothing to the server, please change the StrictKeyMapping entry in teraterm.ini file in the following:
+</p>
+
+<pre>
+StrictKeyMapping=on
+</pre>
+
+<pre>
+The default value:
+StrictKeyMapping=off
+</pre>
+
+
+</BODY>
+</HTML>

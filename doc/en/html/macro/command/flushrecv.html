@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>flushrecv</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>flushrecv</h1>
+
+<p>
+Clears received characters in the buffer of MACRO.
+</p>
+
+<pre class="macro-syntax">
+flushrecv
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Characters received from the host are transferred to MACRO. MACRO stores the characters in the buffer.<br>
+Character-reading commands, such as the "<a href="wait.html">wait</a>" command, read out them from the buffer.<br>
+Characters in the buffer are kept until character-reading commands process them or the buffer overflows or the flushrecv command clears the buffer.<br>
+</p>
+
+<p>
+The "flushrecv" command can be used to avoid unexpected results of character-reading commands caused by old characters in the buffer.
+</p>
+
+Refer to <a href="setsync.html">setsync</a>.
+
+
+</body>
+</html>

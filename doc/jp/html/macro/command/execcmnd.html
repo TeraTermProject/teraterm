@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>execcmnd</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>execcmnd</h1>
+
+<p>
+TTL コマンド を実行する。
+</p>
+
+<pre class="macro-syntax">
+execcmnd &lt;statement&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列 &lt;statement&gt; が表現する TTL コマンド を実行する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; コマンド "send 'abc'" を実行。
+execcmnd "send 'abc'"
+; 変数aに1を代入する
+execcmnd "a=1"
+</pre>
+
+<pre class="macro-example">
+for x 1 10      ;creates variables arr1 thru arr10 and assigns them 1 thru 10
+  tmp='arr'
+  int2str ix x
+  strconcat tmp ix
+  strconcat tmp '='
+  strconcat tmp ix
+  execcmnd tmp
+next
+
+messagebox arr1 'variable1'
+messagebox arr2 'variable2'
+messagebox arr3 'variable3'
+messagebox arr4 'variable4'
+messagebox arr5 'variable5'
+messagebox arr6 'variable6'
+messagebox arr7 'variable7'
+messagebox arr8 'variable8'
+messagebox arr9 'variable9'
+messagebox arr10 'variable10'
+messagebox arr11 'variable11'  ; syntax error
+</pre>
+
+</body>
+</html>

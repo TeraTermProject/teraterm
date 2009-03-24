@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>logopen</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>logopen</h1>
+
+<p>
+Causes Tera Term to start logging.
+</p>
+
+<pre class="macro-syntax">
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt;]]]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Received characters are written to the file &lt;filename&gt;.<br>
+When the file does not include \ character, the file is saved at the TeraTerm current directory. If a user want to change the directory, use the <a href="changedir.html">changedir</a> macro command.
+</p>
+
+<p>
+If &lt;binary flag&gt; is zero, received new-line characters are converted (CR -&gt; CR/CRLF) and escape sequences are stripped out.<br>
+If &lt;binary flag&gt; is non-zero, received characters are written without any modifications.
+</p>
+
+<p>
+If &lt;append flag&gt; is non-zero and the file &lt;filename&gt; already exists, received characters are appended to it.<br>
+If &lt;append flag&gt; is zero and the file &lt;filename&gt; already exists, the file is overwritten.
+</p>
+
+<p>
+If &lt;plain text flag&gt; is not 0, ASCII non-printable characters are not written into log.<br>
+If &lt;timestamp flag&gt; is not 0, a timestamp is added on top of log.<br>
+If &lt;hide dialog flag&gt; is not 0, "Log" dialog box is not displayed.
+</p>
+
+<p>
+If a log file is successfully opened, the system variable "result" is set to 0. Otherwise, the "result" is set to 1. <em>(version 4.62 or later)</em>	
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+connect '/C=1'
+
+; get a user name
+getenv 'USERNAME' username
+; get the date and time
+gettime timestr "%Y%m%d-%H%M%S"
+
+; add the user name and the timestamp to the log file name
+sprintf2 filename 'console_%s_%s.log' username timestr
+
+; change the current directory
+changedir 'C:\Documents and Settings\yutaka\desktop'
+
+logopen filename 0 0
+logwrite 'Log start'#13#10
+logwrite '*****************************************************'#13#10
+logclose
+
+exit
+</pre>
+
+</body>
+</html>

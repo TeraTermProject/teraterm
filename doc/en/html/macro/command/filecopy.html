@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filecopy</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filecopy</h1>
+
+<p>
+Copies a file.
+</p>
+
+<pre class="macro-syntax">
+filecopy &lt;file1&gt; &lt;file2&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Copies file &lt;file1&gt; to file &lt;file2&gt;.<br>
+If &lt;file2&gt; already exists, it is overwritten. &lt;file1&gt; and &lt;file2&gt; must not be same.<br>
+If the file is deleted successfully, the system variable "result" is set to 0. Otherwise, "result" is set to non-zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+filecopy 'test.dat' 'test2.dat'
+</pre>
+
+</body>
+</html>

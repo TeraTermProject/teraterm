@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>code2str</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>code2str</h1>
+
+<p>
+Converts ASCII code value to its string expression.
+</p>
+
+<pre class="macro-syntax">
+code2str &lt;strvar&gt; &lt;ASCII code&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+If the integer value &lt;ASCII code&gt; is 1-255, this command copies a character with the &lt;ASCII code&gt; to the string variable &lt;strvar&gt;.<br>
+This command converts an ASCII code sequence expressed by &lt;ASCII code&gt; to a character string and copies it to &lt;strvar&gt;.<br>
+The non-zero highest-order byte of &lt;ASCII code&gt; is regarded as the first byte of the ASCII code sequence.<br>
+If &lt;ASCII code&gt; is zero, &lt;strvar&gt;.is set to null (""). The maximum length of the character string is 4
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; The character "A" is stored in the variable "str".
+; The ASCII code for "A" is $41.
+code2str str $41
+
+; The character string "AB" is stored in the variable "str".
+; The ASCII code $41 is for "A" and $42 for "B".
+code2str str $4142
+</pre>
+
+</body>
+</html>

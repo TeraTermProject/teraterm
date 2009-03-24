@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>TCP/IP ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>TCP/IP ([Setup] メニュー)</h1>
+
+    <h2>"TCP/IP setup" ダイアログボックス</h2>
+    <dl>
+      <dt><a name="hostlist">Host list</a></dt>
+      <dd>
+	<a href="file-new.html">[File] New connection</a>
+	を実行した時に現れるダイアログボックスのホストリストが編集できます。
+	ホスト名または IP address をリストに加えることができます。
+	よく接続するホストをこのリストに登録しておくと便利です。<br>
+	また、ホスト名だけでなく以下のような
+	<a href="../commandline/teraterm.html">コマンドライン</a>
+	文字列をリストに登録することもできます。
+
+      <pre>
+      myhost.mydomain                     通常はホスト名または IP address だけ
+      myhost.mydomain:23                  ホスト名とポート番号
+      foohost.foodomain /F=FOOHOST.INI    ホスト名+設定ファイル名を指定
+      /C=1                                シリアルポートを指定することも可能
+      /R=LOG.DAT                          ホストやポートに接続せずに、ログファイルの内容を再生
+      </pre>
+
+	<dl>
+	  <dt><a name="history">History</a></dt>
+	  <dd>
+	    このオプションを選択すると、<a href="file-new.html">[File] New connection</a>
+	    ダイアログボックスで入力されたホスト名がホストリストの先頭に追加されます。
+	  </dd>
+	</dl>
+      </dd>
+
+      <dt><a name="autowinclose">Auto window close</a></dt>
+      <dd>
+	このオプションを選択すると、ホストとの接続が切れたとき自動的に
+	Tera Term を終了します。
+      </dd>
+
+      <dt><a name="tcpport">TCP port#</a></dt>
+      <dd>
+	ポート番号。Telnet を使用するときは、通常23にします。
+      </dd>
+
+      <dt><a name="telnet">Telnet</a></dt>
+      <dd>
+	Telnet プロトコルを使用します。通常は選択してください。
+      </dd>
+
+      <dt><a name="keepalive">Keep alive</a></dt>
+      <dd>
+	一定間隔で Telnet サーバに対して、NOP(IAC NOP: 255 241)を送信します。キープアライブ（ハートビート）機能とも呼ばれます。0で当該機能は無効となります。デフォルトは300秒（5分）です。
+      </dd>
+
+      <dt><a name="termtype">Terminal type</a></dt>
+      <dd>
+	Telnet プロトコルで接続したときホストに報告する terminal type。<br>
+	TermTypeを"xterm"に設定することにより、ANSIカラーに対応しているvim6などでカラー表示をさせることができます。これはオリジナルからある機能です。<br>
+    Windows の Telnet サーバは "xterm" を正しく受け付けないので、"vt100" か "ANSI" を指定してください。
+      </dd>
+    </dl>
+  </body>
+</html>

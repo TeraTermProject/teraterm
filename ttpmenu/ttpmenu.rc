@@ -1,0 +1,253 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+TTERM_ICON              ICON                    "teraterm.ico"
+ICON_LEFT               ICON                    "left.ico"
+ICON_RIGHT              ICON                    "right.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+TTERM_MENU MENU 
+BEGIN
+    POPUP "MENU"
+    BEGIN
+        MENUITEM "List Configuration",          ID_TMENU_ADD
+        POPUP "Setting"
+        BEGIN
+            MENUITEM "showing large icon",          ID_ICON
+            MENUITEM "specifying font",             ID_FONT
+            MENUITEM "showing list by left-click",  ID_LEFTPOPUP
+            MENUITEM "showing list hotkey(Ctl+Alt+M)", ID_HOTKEY
+        END
+        MENUITEM "Version ",                    ID_VERSION
+        MENUITEM SEPARATOR
+        MENUITEM "Execute",                     ID_EXEC
+        MENUITEM SEPARATOR
+        MENUITEM "Quit",                        ID_TMENU_CLOSE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DIALOG_CONFIG DIALOGEX 0, 0, 299, 257
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "List Cofiguration"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    LTEXT           "List Item",LBL_LIST,8,4,116,12,SS_CENTERIMAGE | SS_SUNKEN
+    LISTBOX         LIST_HOST,7,18,116,232,LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "",BUTTON_SET,132,64,20,20,BS_ICON
+    PUSHBUTTON      "",BUTTON_DELETE,132,128,20,20,BS_ICON
+    GROUPBOX        "Configuration",GRP_CONFIG,157,1,135,249
+    CTEXT           "Name",LBL_ENTRY,164,16,32,12,SS_CENTERIMAGE | SS_SUNKEN
+    EDITTEXT        EDIT_ENTRY,202,16,83,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "details",BUTTON_ETC,168,181,44,16
+    CONTROL         "autologin",RADIO_LOGIN,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER | WS_GROUP,168,52,108,16
+    CTEXT           "Host Name",LBL_HOST,176,68,40,12,SS_CENTERIMAGE | SS_SUNKEN | NOT WS_GROUP
+    EDITTEXT        EDIT_HOST,220,68,56,12,ES_AUTOHSCROLL
+    CONTROL         "User Name",CHECK_USER,"Button",BS_AUTOCHECKBOX | BS_CENTER | BS_VCENTER | BS_PUSHLIKE | WS_TABSTOP,176,84,40,12
+    EDITTEXT        EDIT_USER,220,84,56,12,ES_AUTOHSCROLL
+    CONTROL         "Password",CHECK_PASSWORD,"Button",BS_AUTOCHECKBOX | BS_CENTER | BS_VCENTER | BS_PUSHLIKE | WS_TABSTOP,176,100,40,12
+    EDITTEXT        EDIT_PASSWORD,220,100,56,12,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "specified macro file",RADIO_MACRO,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,168,118,114,12
+    EDITTEXT        EDIT_MACRO,176,130,84,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "....",BUTTON_MACRO,264,130,12,12
+    CONTROL         "launch only",RADIO_DIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,168,148,108,12
+    CONTROL         "use SSH",CHECK_TTSSH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,190,65,8
+    GROUPBOX        "Launch Pattern",GRP_LAUNCH,164,40,121,127
+    CONTROL         "kick at starting",CHECK_STARTUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,177,64,8
+    EDITTEXT        IDC_KEYFILE_PATH,211,204,58,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Keyfile",IDC_KEYFILE_LABEL,169,207,37,8
+    PUSHBUTTON      "...",IDC_KEYFILE_BUTTON,273,204,12,14,WS_DISABLED
+    CONTROL         "use Challenge",IDC_CHALLENGE_CHECK,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,170,222,115,10
+    CONTROL         "use Pageant",IDC_PAGEANT_CHECK,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,170,236,115,10
+END
+
+DIALOG_ETC DIALOGEX 0, 0, 214, 177
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Configuration Details"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,75,156,42,14
+    PUSHBUTTON      "Cancel",IDCANCEL,165,156,42,14
+    CTEXT           "Application",LBL_TTMPATH,8,8,44,12,SS_CENTERIMAGE | SS_SUNKEN
+    EDITTEXT        EDIT_TTMPATH,56,8,132,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "....",BUTTON_TTMPATH,192,8,12,12
+    EDITTEXT        EDIT_INITFILE,12,56,172,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "....",BUTTON_INITFILE,188,56,12,12
+    CTEXT           "User Name",LBL_PROMPT_USER,16,124,40,12,SS_CENTERIMAGE | SS_SUNKEN
+    CTEXT           "Password",LBL_PROMPT_PASS,108,124,40,12,SS_CENTERIMAGE | SS_SUNKEN
+    EDITTEXT        EDIT_PROMPT_USER,60,124,44,12,ES_AUTOHSCROLL
+    EDITTEXT        EDIT_PROMPT_PASS,152,124,44,12,ES_AUTOHSCROLL
+    CTEXT           "Option",LBL_OPTION,8,24,44,12,SS_CENTERIMAGE | SS_SUNKEN
+    EDITTEXT        EDIT_OPTION,56,24,148,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Default",BUTTON_DEFAULT,120,156,42,14
+    GROUPBOX        "Configuration for autologin",GRP_AUTOLOGIN,8,84,199,68
+    GROUPBOX        "TeraTerm Configuration File(except launching)",GRP_INITFILE,8,44,196,32
+    EDITTEXT        EDIT_LOG,60,96,124,12,ES_AUTOHSCROLL
+    CTEXT           "log file",LBL_LOG,12,96,44,12,SS_CENTERIMAGE | SS_SUNKEN
+    PUSHBUTTON      "....",BUTTON_LOG,188,96,12,12
+    GROUPBOX        "Prompt",GRP_PROMPT,12,112,188,32
+END
+
+DIALOG_VERSION DIALOGEX 0, 0, 169, 89
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Version Information"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,61,69,44,14
+    CTEXT           "Tera Term %s\r\nTeraTerm Menu Version %d.%02d",IDC_VERSION,20,9,124,19
+    LTEXT           "Includes:\nversion 0.94r2\nCopyright(C) 1997-2003 S.Hayakawa\r\nCopyright(C) 2004-2007 TeraTerm Project",IDC_INCLUDE,13,31,150,35
+    ICON            TTERM_ICON,STATIC_ICON,4,8,21,20
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    DIALOG_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 292
+        TOPMARGIN, 1
+        BOTTOMMARGIN, 250
+    END
+
+    DIALOG_ETC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 170
+    END
+
+    DIALOG_VERSION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 85
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,8,0,0
+ PRODUCTVERSION 1,8,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "Comments", "TeraTerm支援ツール"
+            VALUE "CompanyName", "TeraTerm Project, Shinpei Hayakawa"
+            VALUE "FileDescription", "TeraTerm Menu"
+            VALUE "FileVersion", "1, 8, 0, 0"
+            VALUE "InternalName", "ttpmenu"
+            VALUE "LegalCopyright", "Copyright (C) 2004-2007 TeraTerm Project, 1997-2003 Shinpei Hayakawa"
+            VALUE "OriginalFilename", "ttpmenu.exe"
+            VALUE "ProductName", "TeraTerm Menu"
+            VALUE "ProductVersion", "1, 8, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

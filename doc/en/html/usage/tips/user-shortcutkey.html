@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=charset=iso-8859-1">
+<TITLE>User shortcut keys</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>User shortcut keys</h1>
+
+<p>
+You can define shortcut keys for the following functions by editing items in the [Shortcut keys] and [VT function keys] sections of the <A HREF="../../setup/keyboard.html">keyboard setup file</A> see also <A HREF="../../reference/keycode.txt">KEYCODE.TXT</A>):
+</p>
+
+<pre>
+[Shortcut keys]
+Item in the         Function                                Default key
+<HR>
+EditCopy            [Edit] Copy command *1)                 Ctrl+Insert
+EditPaste           [Edit] Paste command *1)                Shift+ nsert
+EditPasteCR         [Edit] Paste&lt;CR&gt; command *1)            none
+EditCLS             [Edit] Clear screen command             none
+EditCLB             [Edit] Clear buffer command             none
+ControlOpenTEK      [Control] Open TEK command              none
+ControlCloseTEK     [Control] Close TEK command             none
+LineUp              Scrolls up screen by 1 line             Ctrl+Up-arrow
+LineDown            Scrolls down screen by 1 line           Ctrl+Down-arrow
+PageUp              Scrolls up screen by 1 page             Ctrl+PageUp
+PageDown            Scrolls down screen by 1 page           Ctrl+PageDown
+BuffTop             Scrolls screen to buffer top            Ctrl+Home
+BuffBottom          Scrolls screen to buffer bottom         Ctrl+End
+NextWin             Moves to the next Tera Term window      Ctrl+Tab
+PrevWin             Moves to the previous Tera Term window  Ctrl+Shift+Tab
+LocalEcho           Toggles the local echo status           none
+
+
+[VT function keys]
+Item in the         Function                                Default key
+<HR>
+Hold                Locks/unlocks the port for receiving    none
+Print               [File] Print command *1)                none
+Break               Sends a break signal *1)                none
+</pre>
+
+<p>
+*1) <A HREF="../keyboard.html">System shortcut keys</A> are assigned for these functions.
+</p>
+
+<p>
+If you want to assign Ctrl+V for the [Edit] Paste command, edit the EditPaste item in the [Shortcut keys] section of the keyboard setup file:
+</p>
+
+<pre>
+EditPaste=1071
+</pre>
+
+<p>
+(In the case of IBM PC/AT keyboard)
+</p>
+
+<p>
+You can also define user shortcut keys for all menu commands by using user keys at the [User keys] section.
+</p>
+
+</BODY>
+</HTML>

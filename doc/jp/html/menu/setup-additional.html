@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Additional settings（[Setup] メニュー）</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings（[Setup] メニュー）</h1>
+
+    <h2>"General" タブ</h2>
+    <dl>
+      <dt>EnableClickableURL</dt>
+      <dd>
+	URL をダブルクリックしたときにブラウザを起動する機能を有効にします。
+      </dd>
+
+      <dt>DisableAcceleratorSendBreak</dt>
+      <dd>
+	Alt-B で break を送信する機能を無効にします。
+      </dd>
+
+      <dt>AcceptBroadcast</dt>
+      <dd>
+	ブロードキャストコマンドを受け入れます。
+      </dd>
+
+      <dt>MouseWheelScrollLine</dt>
+      <dd>
+	マウスホイールによるスクロール行数を設定します。
+      </dd>
+
+      <dt>AutoScrollOnlyInBottomLine</dt>
+      <dd>
+	最下行を表示していない状態では自動的にスクロールしないようにします。
+      </dd>
+
+      <dt>Accept Mouse Event Tracking</dt>
+      <dd>
+        ホスト側のアプリケーションによって、VT window がマウストラッキングモードに変更された場合、Tera Term はマウス操作をホストへ報告するようになります。<br>
+        マウストラッキングモードはxtermの拡張機能ですので、TERM環境変数が"xterm"以外だとホスト側のアプリケーションはこの機能を使わないかもしれません。
+      </dd>
+
+      <dt>Disable Mouse Event Tracking when Control is pressed</dt>
+      <dd>
+        マウストラッキングモード時、Controlキーが押されている間はマウス操作を通知しないようにします。
+      </dd>
+
+      <dt>Accept Window Title Change Request</dt>
+      <dd>
+        リモートからのウィンドウタイトル変更要求を受け入れるかを設定します。
+        <dl>
+          <dt>off</dt>
+          <dd>受け入れない</dd>
+          <dt>overwrite</dt>
+          <dd>受け入れ、リモートからのウインドウタイトルのみを表示する</dd>
+          <dt>ahead</dt>
+          <dd>受け入れ、リモートからのウインドウタイトルを標準のタイトルの前に追加する</dd>
+          <dt>last</dt>
+          <dd>受け入れ、リモートからのウインドウタイトルを標準のタイトルの後ろに追加する</dd>
+        </dl>
+      </dd>
+
+    </dl>
+
+    <h2>"Copy and Paste" タブ</h2>
+    <dl>
+      <dt><a name="continuedline">EnableContinuedLineCopy</a></dt>
+      <dd>
+	継続している行を改行せずにコピーする機能を有効にします。
+      </dd>
+
+      <dt>DisableMouseRButtonPaste</dt>
+      <dd>
+	右クリックでクリップボードの内容を貼り付ける機能を無効にします。
+      </dd>
+
+      <dt>ConfirmMouseRButtonPaste</dt>
+      <dd>
+	右クリックでクリップボードの内容を貼り付けるとき、
+	ポップアップメニューで確認する機能を有効にします。
+      </dd>
+
+      <dt>SelectOnlyByLButton</dt>
+      <dd>
+	マウスドラッグによる選択を、左ボタンでのみ有効にする。
+      </dd>
+
+      <dt>ConfirmChangePaste</dt>
+      <dd>
+	クリップボードに改行コード(CR/LF)を含む場合、マウスの右クリックおよびAlt+Vで
+	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
+	誤操作により、端末へ予期せぬコマンド投入を防ぐことができます。
+      </dd>
+
+      <dt>Delimiter Characters</dt>
+      <dd>
+	単語選択の区切り文字を設定します。
+      </dd>
+
+    </dl>
+
+    <h2>"Visual" タブ</h2>
+    <dl>
+      <dt>AlphaBlend</dt>
+      <dd>
+	透明度は0～255の範囲で指定することができ、
+	値を小さくするほど透明度は強くなります。
+      </dd>
+
+      <dt>Eterm lookfeel</dt>
+      <dd>
+	Eterm風の半透明ウィンドウを使用することができます。
+      </dd>
+    </dl>
+
+    <p>
+      詳しくは「<a href="../usage/transparent.html">透過ウインドウ</a>」
+      を参照してください。
+    </p>
+
+    <dl>
+      <dt>MouseCursor</dt>
+      <dd>
+	マウスカーソルの種別を設定することができます。
+<pre>
+ARROW = 標準の矢印カーソル
+IBEAM = アイビーム（縦線）カーソル（デフォルト）
+CROSS = 十字カーソル
+HAND  = ハンドカーソル
+</pre>
+      </dd>
+
+      <dt>ANSI color</dt>
+      <dd>PC形式およびaixterm形式の16色モードで使用する色のRGB値を設定します。</dd>
+
+      <dt>Enable Bold attribute color</dt>
+      <dt>Enable Blink attribute color</dt>
+      <dt>Enable Reverse attribute color</dt>
+      <dt>Enable URL attribute color</dt>
+      <dt>Enable ANSI color</dt>
+      <dd>
+        それぞれの色属性および色設定を有効にします。<br>
+	もしANSI colorを無効にした場合、16色および256色モードも無効になります。
+      </dd>
+
+    </dl>
+
+    <h2>"Log" タブ</h2>
+    <dl>
+      <dt>View Log Editor</dt>
+      <dd>
+	ログを表示するエディタを指定します。
+      </dd>
+
+      <dt>Default Log File Name(strftime format)</dt>
+      <dd>
+	標準のログファイル名を指定します。strftime の書式が使用できます。
+<pre>
+書式:
+&h	ホスト名。未接続の場合は空。
+%a	曜日の省略形。
+%A	曜日の正式名。
+%b	月の省略形。
+%B	月の正式名。
+%c	ロケールに対応する日付と時刻の表現。
+%d	10 進数で表す月の日付 (01 ～ 31)。
+%H	24 時間表記の時間 (00 ～ 23)。
+%I	12 時間表記の時間 (01 ～ 12)。
+%j	10 進数で表す年初からの日数 (001 ～ 366)。
+%m	10 進数で表す月 (01 ～ 12)。
+%M	10 進数で表す分 (00 ～ 59)。
+%p	現在のロケールの午前/午後。
+%S	10 進数で表す秒 (00 ～ 59)。
+%U	10 進数で表す週の通し番号。日曜日を週の最初の日とする (00 ～ 53)。
+%w	10 進数で表す曜日 (0 ～ 6、日曜日が 0)。
+%W	10 進数で表す週の通し番号。月曜日を週の最初の日とする (00 ～ 53)。
+%x	現在のロケールの日付表現。
+%X	現在のロケールの時刻表現。
+%y	10 進数で表す西暦の下 2 桁 (00 ～ 99)。
+%Y	10 進数で表す 4 桁の西暦。
+%z, %Z	レジストリの設定に応じて、タイム ゾーンの名前または省略形を指定します。
+	タイム ゾーンが不明な場合は指定しません。
+%%	パーセント記号。
+</pre>
+      </dd>
+
+      <dt>Default Log Save Folder</dt>
+      <dd>
+	標準のログ保存先を指定します。ログファイルがフルパスで指定されなかったときに使用されます。
+      </dd>
+
+      <dt>Auto start logging</dt>
+      <dd>
+    接続時に自動的にログ採取を開始する機能を有効にします。ログファイル名には、標準のログファイル名が使用されます。
+      </dd>
+    </dl>
+
+    <h2>"Cygwin" タブ</h2>
+    <dl>
+      <dt>Cygwin Install Path</dt>
+      <dd>
+	Cygwin のインストール先を指定します。
+      </dd>
+
+      <dt>CygTerm</dt>
+      <dd>
+	CygTerm の設定をします。
+      </dd>
+    </dl>
+  </body>
+</html>

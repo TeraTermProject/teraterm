@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>式と演算子</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>式と演算子</h1>
+
+<p>
+式は、定数、変数、演算子、カッコで表現する。定数と変数は整数型のみ。<br>
+結果も整数型。関係演算子を用いた式の結果の値は、真のとき 1、偽のとき 0となる。
+</p>
+
+<p>
+演算子の優先順位による分類は以下のとおり
+</p>
+
+<table border="1">
+  <tr>
+    <th>優先順位</th>
+    <th>演算子</th>
+    <th>種類</th>
+    <th>注</th>
+  </tr>
+
+  <tr>
+    <td rowspan="4">1(最高)</td>
+    <td>not ~</td>
+    <td>ビット否定演算子</td>
+    <td>"~" はバージョン 4.53 以降で利用可</td>
+  </tr>
+  <tr>
+    <td>!</td>
+    <td>論理否定演算子</td>
+    <td>バージョン 4.53 以降で利用可</td>
+  </tr>
+  <tr>
+    <td>+</td>
+    <td>正の単項演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>負の単項演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td rowspan="3">2</td>
+    <td>*</td>
+    <td>乗算演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>/</td>
+    <td>除算演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>%</td>
+    <td>余剰演算子</td>
+    <td>A % B の値は A / B の余り</td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">3</td>
+    <td>+</td>
+    <td>加算演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>減算演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td rowspan="2">4</td>
+    <td>&gt;&gt; &lt;&lt;</td>
+    <td>算術ビットシフト演算子</td>
+    <td>バージョン 4.54 以降で利用可</td>
+  </tr>
+  <tr>
+    <td>&gt;&gt;&gt;</td>
+    <td>論理ビットシフト演算子</td>
+    <td>バージョン 4.54 以降で利用可</td>
+  </tr>
+
+  <tr>
+    <td rowspan="1">5</td>
+    <td>and &amp;</td>
+    <td>ビット毎論理積演算子</td>
+    <td>"&amp;" はバージョン 4.53 以降で利用可</td>
+  </tr>
+
+  <tr>
+    <td rowspan="1">6</td>
+    <td>xor ^</td>
+    <td>ビット毎排他的論理和演算子</td>
+    <td>"^" はバージョン 4.53 以降で利用可</td>
+  </tr>
+
+  <tr>
+    <td rowspan="1">7</td>
+    <td>or |</td>
+    <td>ビット毎論理和演算子</td>
+    <td>"|" はバージョン 4.53 以降で利用可</td>
+  </tr>
+
+  <tr>
+    <td>8</td>
+    <td>&lt; &gt; &lt;= &gt;=</td>
+    <td>関係演算子</td>
+    <td>&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td>9</td>
+    <td>= == &lt;&gt; !=</td>
+    <td>関係演算子</td>
+    <td>"==" と "!=" はバージョン 4.54 以降で利用可</td>
+  </tr>
+
+  <tr>
+    <td>10</td>
+    <td>&amp;&amp;</td>
+    <td>論理積演算子</td>
+    <td>バージョン 4.53 以降で利用可</td>
+  </tr>
+
+  <tr>
+    <td>11(最低)</td>
+    <td>||</td>
+    <td>論理和演算子</td>
+    <td>バージョン 4.53 以降で利用可</td>
+  </tr>
+</table>
+<p>
+and, or, xor, not はビット演算子です。(論理演算子ではありません)
+</p>
+
+<pre>
+例:
+    1 + 1
+    4 - 2 * 3      この式の値は-2
+    15 % 10        この式の値は5
+    3 * (A + 2)    A は整数型の変数
+    A and not B
+    A &lt;= B         A, B は整数型の変数。
+                   結果の値は真のとき1、偽のとき0
+</pre>
+
+</body>
+</html>

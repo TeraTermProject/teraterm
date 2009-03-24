@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Serial port ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Serial port ([Setup] メニュー)</h1>
+
+    <h2>"Serial port setup" ダイアログボックス</h2>
+    <dl>
+      <dt>Port</dt>
+      <dd>
+	使用するポート。
+      </dd>
+
+      <dt>Data, Stop, Baud rate, Flow control, Parity</dt>
+      <dd>
+	シリアルポートのパラメターです。
+	接続するモデム等の設定にあわせてください。
+	<p>
+	  注: Data を 7 にすると、XMODEM, ZMODEM, B-PLUS, Quick-VAN
+	  によるファイル転送はできません。
+	  また Flow control を Xon/Xoff にすると、XMODEM, Quick-VAN
+	  によるファイル転送はできません。
+	</p>
+      </dd>
+
+      <dt>Transmit delay</dt>
+      <dd>
+	Tera Term が文字(行)を送出したあと次の文字(行)を送出するまでの待ち時間。
+	単位はミリ秒です。1文字(行)ごとの待ち時間を設定できます。<br>
+	Tera Term から大量の文字を送出したときにモデムやホストが文字を取りこぼす場合には適当な待ち時間を設定してみてください。
+      </dd>
+    </dl>
+  </body>
+</html>

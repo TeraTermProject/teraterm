@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>定数の形式</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>定数の形式</h1>
+
+<h2>1) 整数型定数</h2>
+
+<p>
+10進数または "$" で始まる16進数で表現する。
+</p>
+
+<pre>
+例:
+    123
+    -11
+    $3a
+    $10F
+</pre>
+
+<p>
+<A HREF="../appendixes/negative.html">負の整数定数についての注意</A>
+</p>
+
+
+<h2>2) 文字列型定数</h2>
+
+<p>
+文字列型定数を表現する方法は2つ。
+</p>
+
+<p>
+a) 値となる文字列の両端を ' か " で囲む(両端とも同じ文字で)。文字列値を構成する文字は表示可能で囲み文字と異なる文字ならば何でもよい。
+</p>
+
+<pre>
+例:
+    'Hello, world'
+    "I can't do that"
+    "漢字も可能"
+</pre>
+
+<p>
+b) 1文字を ASCII (または JIS ローマ字、Shift-JIS) コード(10進数または$で始まる16進数)で表現し、先頭に "#" をつける。
+ASCII コード 0 の文字 (NUL) は文字列定数に含めることができない。
+</p>
+
+<pre>
+例:
+    #65     文字 "A"
+    #$41    文字 "A"
+    #13     CR 文字
+</pre>
+
+<p>
+<A HREF="../appendixes/ascii.html">ASCII コード表</A> 
+</p>
+
+<p>
+a) と b) は組み合わせることが可能。
+</p>
+
+<pre>
+例:
+    'cat readme.txt'#13#10
+    abc'#$0d#$0a'def'#$0d#$0a'ghi'
+</pre>
+
+
+</BODY>
+</HTML>
+

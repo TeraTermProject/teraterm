@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filenamebox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filenamebox</h1>
+
+<p>
+Displays a dialog box prompting user to input a string.
+</p>
+
+<pre class="macro-syntax">
+filenamebox &lt;title&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+The &lt;title&gt; is displayed as the dialog box title. The string entered by the user is returned in the system variable "inputstr".
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+filenamebox 'title'
+messagebox inputstr 'title' 0
+</pre>
+
+</body>
+</html>

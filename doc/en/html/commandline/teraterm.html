@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Tera Term command line</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+
+<h1>Tera Term command line</h1>
+
+<pre class="syntax">
+TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] ]
+         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E]
+         [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
+         [/H] [/I] [/K=&lt;keyboard setup file&gt;]
+         [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
+         [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;]
+         [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/T=&lt;telnet flag&gt;]
+         [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
+         [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
+         [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
+         [;&lt;comment&gt;]
+</pre>
+
+
+<h2 id="options">Options</h2>
+
+<dl>
+  <dt id="host">&lt;host&gt;</dt>
+  <dd>Host name or IP address.</dd>
+
+  <dt>&lt;host&gt;:&lt;TCP port#&gt;</dt>
+  <dd>&lt;host&gt; with a TCP port number.<br>
+      ":" is placed between &lt;host&gt; and &lt;TCP port#&gt;.</dd>
+
+  <dt>&lt;host&gt; &lt;TCP port#&gt;</dt>
+  <dd>&lt;host&gt; with a TCP port number.<br>
+      Space character(s) between &lt;host&gt; and &lt;TCP port#&gt;.<br>
+      Number just after &lt;host&gt; is interpreted as a port number.</dd>
+
+  <dt>telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/]</dt>
+  <dd>URL style - for telnet handler<br>
+      TCP port number and "/" at the end are optional.<br>
+      If TCP port number is omitted, use 23. (TCPPort setting in setup file is ignored.)
+  </dd>
+
+  <dt id="b">/B</dt>
+  <dd>Telnet binary option.</dd>
+
+  <dt id="baud">/BAUD=&lt;baud rate&gt;</dt>
+  <dd>
+    baud rate of serial port.
+    If the baud rate not supported by Tera Term is specified, this option is ignored.
+  </dd>
+
+  <dt id="c">/C=&lt;serial port#&gt;</dt>
+  <dd>Serial port
+      <ul>
+        <li><span class="syntax">/C=1</span> COM1</li>
+        <li><span class="syntax">/C=2</span> COM2</li>
+        <li><span class="syntax">/C=3</span> COM3</li>
+        <li>:</li>
+        <li><span class="syntax">/C=256</span> COM256</li>
+      </ul></dd>
+
+  <dt id="duplicate">/DUPLICATE</dt>
+  <dd>Internal use(must not specify this option)</dd>
+
+  <dt id="ds">/DS</dt>
+  <dd>Disable displaying the "New connection" dialog on startup</dd>
+
+  <dt id="e">/E</dt>
+  <dd>Disable TCPLocalEcho and TCPCRSend option</dd>
+
+  <dt id="f">/F=&lt;setup file&gt;</dt>
+  <dd>Setup file<br>
+      <span class="syntax">/F=TERATERM.INI</span> (default)<br>
+      If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
+
+  <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
+  <dd>File transfer directory</dd>
+
+  <dt id="h">/H</dt>
+  <dd>Hide title bar.</dd>
+
+  <dt id="i">/I</dt>
+  <dd>Start Tera Term in iconized state.</dd>
+
+  <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
+  <dd>Keyboard setup file<br>
+      <span class="syntax">/K=KEYBOARD.CNF</span> (default)<br>
+      If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
+
+  <dt id="kr">/KR=&lt;kanji code (receive)&gt;</dt>
+  <dd>Note: Japanese mode only
+      <ul>
+        <li><span class="syntax">/KR=SJIS</span></li>
+        <li><span class="syntax">/KR=EUC</span></li>
+        <li><span class="syntax">/KR=JIS</span></li>
+        <li><span class="syntax">/KR=UTF8</span> UTF-8(Normalization Form C: Windows, Linux)</li>
+        <li><span class="syntax">/KR=UTF8m</span> UTF-8(Normalization Form D: Mac OS X)</li>
+      </ul></dd>
+
+  <dt id="kt">/KT=&lt;kanji code (transmit)&gt;</dt>
+  <dd>Note: Japanese mode only
+      <ul>
+        <li><span class="syntax">/KR=SJIS</span></li>
+        <li><span class="syntax">/KR=EUC</span></li>
+        <li><span class="syntax">/KR=JIS</span></li>
+        <li><span class="syntax">/KR=UTF8</span></li>
+      </ul></dd>
+
+  <dt id="l">/L=&lt;log file&gt;</dt>
+  <dd>Start Tera Term with logging.</dd>
+
+  <dt id="la">/LA=&lt;language&gt;</dt>
+  <dd>Language mode.
+      <ul>
+        <li><span class="syntax">/LA=E</span> English</li>
+        <li><span class="syntax">/LA=J</span> Japanese</li>
+        <li><span class="syntax">/LA=R</span> Russian</li>
+      </ul></dd>
+
+  <dt id="m">/M=&lt;macro file&gt;</dt>
+  <dd>Start Tera Term with macro.<br>
+      If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
+
+  <dt id="p">/P=&lt;TCP port#&gt;</dt>
+  <dd>TCP port number</dd>
+
+  <dt id="r">/R=&lt;replay file&gt;</dt>
+  <dd>Replay file</dd>
+
+  <dt id="t">/T=&lt;telnet flag&gt;</dt>
+  <dd><ul>
+        <li><span class="syntax">/T=1</span> Enable telnet</li>
+        <li><span class="syntax">/T=0</span> Disable telnet</li>
+      </ul></dd>
+
+  <dt id="tekicon">/TEKICON=&lt;icon name&gt;</dt>
+  <dd>TEK window icon. Could be specify the same value of <a href="../setup/teraterm-win.html#WindowIcon">TEKIcon of setup file</a>.</dd>
+
+  <dt id="timeout">/TIMEOUT=&lt;connecting timeout value&gt;</dt>
+  <dd>Could be specified per seconds.</dd>
+
+  <dt id="v">/V</dt>
+  <dd>Start Tera Term in hidden (invisible) state.</dd>
+
+  <dt id="vticon">/VTICON=&lt;icon name&gt;</dt>
+  <dd>VT window icon. Could be specify the same value of <a href="../setup/teraterm-win.html#WindowIcon">VTIcon of setup file</a>.</dd>
+
+  <dt id="w">/W="&lt;window title&gt;"</dt>
+  <dd>Window title</dd>
+
+  <dt id="x">/X=&lt;window position (x)&gt;</dt>
+  <dd>Windows position (horizontal)</dd>
+
+  <dt id="y">/Y=&lt;window position (y)&gt;</dt>
+  <dd>Windows position (vertical)</dd>
+
+  <dt id="comment">;&lt;comment&gt;</dt>
+  <dd>Comment. Should be last in the command line.</dd>
+</dl>
+
+
+<h2 id="example">Examples</h2>
+
+<pre>
+TTERMPRO
+TTERMPRO myhost.mydomain
+TTERMPRO myhost.mydomain:23
+TTERMPRO myhost.mydomain 23
+TTERMPRO 111.111.11.11
+TTERMPRO myhost.mydomain /T=0 /P=7
+TTERMPRO /C=1
+TTERMPRO /F=TELNET.INI
+TTERMPRO foohost.foodomain /F=FOOHOST.INI
+TTERMPRO /C=2 /BAUD=9600 /F=MYSETUP.INI
+TTERMPRO /K=MYKEY.CNF /W="My host"
+TTERMPRO /R=README.TXT ; replay a file
+TTERMPRO myhost /B /X=100 /Y=50
+</pre>
+
+
+<h2 id="default">Default values</h2>
+
+<p>
+Following default values are stored in the Tera Term setup file:
+</p>
+
+<pre>
+&lt;TCP port#&gt;
+/B
+&lt;baud rate&gt;
+&lt;serial port#&gt;
+&lt;file transfer directory&gt;
+/H
+&lt;kanji code (receive)&gt;
+&lt;kanji code (transmit)&gt;
+&lt;language&gt;
+&lt;macro file&gt;
+&lt;telnet flag&gt;
+&lt;icon name&gt;
+&lt;window title&gt;
+&lt;window pos (x)&gt;
+&lt;window pos (y)&gt;
+</pre>
+
+
+<h2 id="notes">Note</h2>
+
+<p>
+Only if &lt;telnet flag&gt; is 1 (on) and &lt;TCP port#&gt; is 23, Tera Term starts spontaneously sending telnet commands to the host for the option negotiation when the TCP/IP connection is established. In any cases, Tera Term can respond to telnet commands sent by the host.
+</p>
+
+
+<h2 id="refs">See also</h2>
+
+<p>
+<a href="../usage/tips/not_port23.html">Telnet port number / Terminal setup for non-telnet connection</a>
+</p>
+
+
+</body>
+</html>

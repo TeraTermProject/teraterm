@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>SSH([Setup] Menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH([Setup] Menu)</h1>
+
+    <h2>"TTSSH: Setup" Dialog box</h2>
+    <dl>
+      <dt>Compression level</dt>
+      <dd>
+	Specify the level of compression for transmission. The more right,
+	the more compression is done (note: it may degrade the throughout
+	with a high speed link such as ADSL or FTTH).
+      </dd>
+
+      <dt>Prefered cihper order</dt>
+      <dd>
+	Specify the type of encryption for SSH with the order.<br>
+	&lt;ciphers below this line are disabled&gt;
+      </dd>
+
+      <dt>SSH Known Hosts</dt>
+      <dd>
+	Specify the file which includes a name of Host connected via SSH
+	(and Public key for Host).
+      </dd>
+
+      <dt>HeartBeat (keep-alive)</dt>
+      <dd>
+	A Keep-alive packet is sent ona regular basis to maintain the
+	connection (particularly useful under NAT). If 0 is specified,
+	this feature is disabled.
+      </dd>
+
+      <dt>Enable agent forwarding</dt>
+      <dd>
+      The SSH agent forwarding is enabled using by the Pageant application.
+      </dd>
+    </dl>
+  </body>
+</html>
