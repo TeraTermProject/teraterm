@@ -51,6 +51,7 @@ typedef struct {
 	struct timeval wait;
 	char openfn[MAX_PATH];
 	char origTitle[TitleBuffSize];
+	char origOLDTitle[TitleBuffSize];
 } TInstVar;
 
 static TInstVar FAR * pvar;
@@ -61,6 +62,21 @@ static TInstVar InstVar;
 #define GetSetupMenu(menu)	GetSubMenuByChildID(menu, ID_SETUP_TERMINAL)
 #define GetControlMenu(menu)	GetSubMenuByChildID(menu, ID_CONTROL_RESETTERMINAL)
 #define GetHelpMenu(menu)	GetSubMenuByChildID(menu, ID_HELP_ABOUT)
+
+void RestoreOLDTitle() {
+	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origOLDTitle, _TRUNCATE);
+	pvar->ChangeTitle = TRUE;
+	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
+}
+
+void ChangeTitleStatus() {
+  char tbuff[TitleBuffSize];
+  
+  _snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, "Speed: %d, Pause: %s", pvar->speed, pvar->pause ? "ON": "OFF");
+  strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), tbuff, _TRUNCATE);
+  pvar->ChangeTitle = TRUE;
+  SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
+}
 
 HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   int i, j, items, subitems, cur_id;
@@ -97,9 +113,12 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 }
 
 void RestoreTitle() {
+	ChangeTitleStatus ();
+/*
 	strncpy_s(pvar->ts->Title, sizeof(pvar->ts->Title), pvar->origTitle, _TRUNCATE);
 	pvar->ChangeTitle = TRUE;
 	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
+*/
 }
 
 void ChangeTitle(char *title) {
@@ -113,7 +132,7 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 	static struct recheader prh = { 0, 0, 0 };
 	static unsigned int lbytes;
 	static char ibuff[BUFFSIZE];
-	static BOOL title_changed = FALSE;
+	static BOOL title_changed = FALSE, first_title_changed = FALSE;
 
 	int b[3], rsize;
 	struct recheader h;
@@ -129,6 +148,11 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 
 	if (!pvar->enable) {
 		return pvar->origPReadFile(fh, obuff, oblen, rbytes, rol);
+	}
+
+	if (!first_title_changed) {
+		ChangeTitleStatus ();
+		first_title_changed = TRUE;
 	}
 
 	if (prh.len == 0 && lbytes == 0) {
@@ -150,7 +174,7 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 		if (prh.tv.tv_sec != 0) {
 			pvar->wait = tvshift(tvdiff(prh.tv, h.tv), pvar->speed);
 			if (pvar->maxwait != 0 && pvar->wait.tv_sec >= pvar->maxwait) {
-				char tbuff[50];
+				char tbuff[TitleBuffSize];
 				_snprintf_s(tbuff, sizeof(tbuff), _TRUNCATE, "%d.%06d secs idle. trim to %d secs.",
 				pvar->wait.tv_sec, pvar->wait.tv_usec, pvar->maxwait);
 				pvar->wait.tv_sec = pvar->maxwait;
@@ -211,20 +235,23 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 	char tmpbuff[2048];
 	unsigned int spos, dpos;
 	char *ptr;
+	BOOL speed_changed = FALSE;
 
 	ptr = (char *)buff;
 	*wbytes = 0;
 
-	for (spos = dpos = 0; *ptr && spos < len; spos++, ptr++) {
+	for (spos = dpos = 0; spos < len; spos++, ptr++) {
 		switch (*ptr) {
 		  case '1':
 			pvar->speed = 0;
+			speed_changed = TRUE;
 			break;
 		  case 'f':
 		  case 'F':
 		  case '+':
 			if (pvar->speed < 8) {
 				pvar->speed++;
+				speed_changed = TRUE;
 			}
 			break;
 		  case 's':
@@ -232,11 +259,13 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 		  case '-':
 			if (pvar->speed > -8) {
 				pvar->speed--;
+				speed_changed = TRUE;
 			}
 			break;
 		  case 'p':
 		  case 'P':
 			pvar->pause = !(pvar->pause);
+			speed_changed = TRUE;
 			break;
 		  case ' ':
 		  case '.':
@@ -249,9 +278,13 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 		}
 	}
 
-	if (dpos > 0) {
-		return pvar->origPWriteFile(fh, tmpbuff, dpos, wbytes, wol);
+	if (speed_changed) {
+		ChangeTitleStatus ();
 	}
+	if (dpos > 0) {
+		pvar->origPWriteFile(fh, tmpbuff, dpos, wbytes, wol);
+	}
+	*wbytes = len;
 	return TRUE;
 }
 
@@ -261,6 +294,8 @@ static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
 		pvar->origPWriteFile = *hooks->PWriteFile;
 		*hooks->PReadFile = TTXReadFile;
 		*hooks->PWriteFile = TTXWriteFile;
+
+		strncpy_s(pvar->origOLDTitle, sizeof(pvar->origOLDTitle), pvar->ts->Title, _TRUNCATE);
 	}
 }
 
@@ -271,7 +306,7 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
 	if (pvar->origPWriteFile) {
 		*hooks->PWriteFile = pvar->origPWriteFile;
 	}
-
+	RestoreOLDTitle();
 	pvar->enable = FALSE;
 }
 
@@ -369,6 +404,7 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 			ofn.lpstrDefExt = "tty";
 			// ofn.lpstrTitle = "";
 			ofn.Flags = OFN_FILEMUSTEXIST;
+			
 			if (GetOpenFileName(&ofn)) {
 				pvar->ReplaceHostDlg = TRUE;
 				// Call New-Connection dialog
