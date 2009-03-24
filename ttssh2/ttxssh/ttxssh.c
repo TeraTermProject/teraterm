@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <mbstring.h>
 
 #include "resource.h"
 #include <commctrl.h>
@@ -1653,7 +1654,7 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 		optlen = strlen(option);
 
 		// 最初の':'の前の文字が数字だった場合、それをsshプロトコルバージョンとみなす
-		p = strchr(option, ':');
+		p = _mbschr(option, ':');
 		switch (*(p-1)) {
 		case '1':
 			pvar->settings.ssh_protocol_version = 1;
@@ -1667,15 +1668,15 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 		p += 3;
 
 		// path part を切り捨てる
-		if ((p2 = strchr(p, '/')) != NULL) {
+		if ((p2 = _mbschr(p, '/')) != NULL) {
 			*p2 = 0;
 		}
 
 		// '@'があった場合、それより前はユーザ情報
-		if ((p2 = strchr(p, '@')) != NULL) {
+		if ((p2 = _mbschr(p, '@')) != NULL) {
 			*p2 = 0;
 			// ':'以降はパスワード
-			if ((p3 = strchr(p, ':')) != NULL) {
+			if ((p3 = _mbschr(p, ':')) != NULL) {
 				*p3 = 0;
 				percent_decode(pvar->ssh2_password, sizeof(pvar->ssh2_password), p3 + 1);
 				pvar->ssh2_autologin = 1;
@@ -1694,9 +1695,9 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 		// ポート指定が無い時は":22"を足す
 #ifndef NO_INET6
 		if (option[0] == '[' && option[hostlen-1] == ']' ||     // IPv6 raw address without port
-		    option[0] != '[' && strchr(option, ':') == NULL) {  // hostname or IPv4 raw address without port
+		    option[0] != '[' && _mbschr(option, ':') == NULL) { // hostname or IPv4 raw address without port
 #else
-		if (strchr(option, ':') == NULL) {
+		if (_mbschr(option, ':') == NULL) {
 #endif							/* NO_INET6 */
 			memcpy_s(option+hostlen, optlen-hostlen, ":22", 3);
 			hostlen += 3;
@@ -1709,7 +1710,7 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 
 		return OPTION_REPLACE;
 	}
-	else if (strchr(option, '@') != NULL) {
+	else if (_mbschr(option, '@') != NULL) {
 		//
 		// user@host 形式のサポート
 		//   取り合えずsshでのみサポートの為、ユーザ名はttssh内で潰す。
@@ -1718,7 +1719,7 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 		//   Tera Term本体で処理するようにする予定。
 		//
 		char *p;
-		p = strchr(option, '@');
+		p = _mbschr(option, '@');
 		*p = 0;
 
 		strncpy_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), option, _TRUNCATE);
