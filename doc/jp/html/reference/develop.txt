@@ -90,16 +90,16 @@
   ビルドにはVisual Studio 2005 Standard Edition以上が必要です（Visual Studio 2005 Express Editionは不可）。
 
   1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
-  2. Onigurumaのソースコード(http://www.geocities.jp/kosako3/oniguruma/)を teraterm\source\oniguruma ディレクトリに展開する。
+  2. Onigurumaのソースコード(http://www.geocities.jp/kosako3/oniguruma/)を libs\oniguruma ディレクトリの中に展開する。
 
        - 自動で行う場合
        スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-       コマンドプロンプト上から teraterm\source ディレクトリに移動する。
+       コマンドプロンプト上から libs ディレクトリに移動する。
        buildoniguruma.bat を実行する。
 
        - 手動で行う場合
        スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-       コマンドプロンプト上から teraterm\source\oniguruma ディレクトリに移動する。
+       コマンドプロンプト上から libs\oniguruma ディレクトリに移動する。
        コマンドプロンプトから以下の入力を行い、Onigurumaをビルドする（onig_s.libがリンクされる）。
        (1) copy win32\Makefile Makefile
        (2) copy win32\config.h config.h
@@ -159,16 +159,17 @@
 
   1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
 
-  2. zlibのソースコード(http://www.zlib.net/)を ttssh2\zlib ディレクトリに展開する。
-     Release では zlib\projects\visualc6\Win32_LIB_Release\zlib.lib がリンクされることになる（コンパイルオプションに /MT が指定されていること）。
-     Debug では zlib\projects\visualc6\Win32_LIB_Release\zlibd.lib がリンクされることになる（コンパイルオプションに /MTd が指定されていること）。
+  2. zlibのソースコード(http://www.zlib.net/)を libs\zlib ディレクトリの中に展開する。
+      + スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+      + コマンドプロンプト上から libs ディレクトリに移動する。
+      + buildzlib.bat を実行する。
 
-  3. OpenSSLのソースコード(http://www.openssl.org/)を ttssh2\openssl ディレクトリに展開する。OpenSSLをビルドする（以下参照）。
+  3. OpenSSLのソースコード(http://www.openssl.org/)を libs\openssl ディレクトリの中に展開する。OpenSSLをビルドする（以下参照）。
      Release では openssl\out32\libeay32.lib が、Debug では openssl\out32.dbg\libeay32.lib がリンクされることになる。
 
       - 自動で行う場合
       + スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-      + コマンドプロンプト上から ttssh2 ディレクトリに移動する。
+      + コマンドプロンプト上から libs ディレクトリに移動する。
       + buildopenssl.bat を実行する。
 
       - 手動で行う場合
@@ -187,7 +188,7 @@
           (ttssh2フォルダに戻ります。)
         詳細については、OpenSSLのドキュメントを参照してください。
 
-  4. PuTTYのソースコード(http://www.chiark.greenend.org.uk/~sgtatham/putty/)を ttssh2\putty ディレクトリに展開する。
+  4. PuTTYのソースコード(http://www.chiark.greenend.org.uk/~sgtatham/putty/)を libs\putty ディレクトリの中に展開する。
   5. ttssh2\ttssh.sln をVisual Studioで開く
   6. ソリューションをビルドする
   7. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される

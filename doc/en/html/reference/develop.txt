@@ -84,16 +84,16 @@ Example: adding a TTSSH menu under File menu
   And you should use Visual Studio 2005 Standard Edition later version to build Tera Term because Tera Term program links MFC library (Visual Studio 2005 Express Edition can't be used).
 
   1. Checkout Tera Term source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
-  2. Download 'Oniguruma' source code(http://www.geocities.jp/kosako3/oniguruma/) and extract at 'teraterm\source\oniguruma' directory.
+  2. Download 'Oniguruma' source code(http://www.geocities.jp/kosako3/oniguruma/) and extract into 'libs\oniguruma' directory.
 
        - Automatic procedure of build is following step:
        Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-       Move 'teraterm\source' directory on the command prompt.
+       Move 'libs' directory on the command prompt.
        Run buildoniguruma.bat.
 
        - Manual procedure of build is following step:
        Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-       Move 'teraterm\source\oniguruma' directory on the command prompt.
+       Move 'libs\oniguruma' directory on the command prompt.
        And input the following command lines to build 'Oniguruma' regular expression library(links to onig_s.lib).
        (1) copy win32\Makefile Makefile
        (2) copy win32\config.h config.h
@@ -153,16 +153,17 @@ Example: adding a TTSSH menu under File menu
 
   1. Checkout TTSSH source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
 
-  2. Extract zlib source code(http://www.zlib.net/) to ttssh2\zlib directory.
-     The build target is 'Release' and TTSSH links to zlib\projects\visualc6\Win32_LIB_Release\zlib.lib (compile option /MT must be specified).
-     The build target is 'Debug' and TTSSH links to  zlib\projects\visualc6\Win32_LIB_Release\zlibd.lib (compile option /MTd must be specified).
+  2. Extract zlib source code(http://www.zlib.net/) into libs\zlib directory.
+      + Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+      + Move 'lib' directory on the command prompt.
+      + Run buildzlib.bat.
 
-  3. Extract OpenSSL source code(http://www.openssl.org/) to ttssh2\openssl directory.
+  3. Extract OpenSSL source code(http://www.openssl.org/) into libs\openssl directory.
       Build OpenSSL in the following step(Release:TTSSH links to openssl\out32\libeay32.lib, Debug:openssl\out32.dbg\libeay32.lib):
 
       - Build OpenSSL automatically.
       + Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-      + Move 'ttssh2' directory on the command prompt.
+      + Move 'libs' directory on the command prompt.
       + Run buildopenssl.bat.
 
       - Build OpenSSL manually.
@@ -181,7 +182,7 @@ Example: adding a TTSSH menu under File menu
           (Now you are back in ttssh2 folder.)
         See the instruction in the OpenSSL documentation for details.
 
-  5. Extract PuTTY source code(http://www.chiark.greenend.org.uk/~sgtatham/putty/) to ttssh2\putty directory.
+  5. Extract PuTTY source code(http://www.chiark.greenend.org.uk/~sgtatham/putty/) into libs\putty directory.
   5. Open ttssh2\ttssh.sln with Visual Studio.
   6. Build TTSSH solution.
   7. TTSSH DLL will be generated in ttssh2\ttxssh directory if the building is successful.

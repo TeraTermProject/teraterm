@@ -39,8 +39,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\windows;.\"
-				PreprocessorDefinitions="_WINDOWS"
+				AdditionalIncludeDirectories="..\..\libs\putty;..\..\libs\putty\windows"
+				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -101,8 +101,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\windows;.\"
-				PreprocessorDefinitions="_WINDOWS"
+				AdditionalIncludeDirectories="..\..\libs\putty;..\..\libs\putty\windows"
+				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -144,55 +144,55 @@
 			Name="Putty Files"
 			>
 			<File
-				RelativePath=".\INT64.H"
+				RelativePath="..\..\libs\putty\INT64.H"
 				>
 			</File>
 			<File
-				RelativePath=".\MISC.C"
+				RelativePath="..\..\libs\putty\MISC.C"
 				>
 			</File>
 			<File
-				RelativePath=".\MISC.H"
+				RelativePath="..\..\libs\putty\MISC.H"
 				>
 			</File>
 			<File
-				RelativePath=".\NETWORK.H"
+				RelativePath="..\..\libs\putty\NETWORK.H"
 				>
 			</File>
 			<File
-				RelativePath=".\PUTTY.H"
+				RelativePath="..\..\libs\putty\PUTTY.H"
 				>
 			</File>
 			<File
-				RelativePath=".\PUTTYMEM.H"
+				RelativePath="..\..\libs\putty\PUTTYMEM.H"
 				>
 			</File>
 			<File
-				RelativePath=".\puttyps.h"
+				RelativePath="..\..\libs\putty\puttyps.h"
 				>
 			</File>
 			<File
-				RelativePath=".\SSH.H"
+				RelativePath="..\..\libs\putty\SSH.H"
 				>
 			</File>
 			<File
-				RelativePath=".\SSHBN.C"
+				RelativePath="..\..\libs\putty\SSHBN.C"
 				>
 			</File>
 			<File
-				RelativePath=".\TREE234.H"
+				RelativePath="..\..\libs\putty\TREE234.H"
 				>
 			</File>
 			<File
-				RelativePath=".\WINDOWS\WINHELP.H"
+				RelativePath="..\..\libs\putty\WINDOWS\WINHELP.H"
 				>
 			</File>
 			<File
-				RelativePath=".\WINDOWS\WINPGNTC.C"
+				RelativePath="..\..\libs\putty\WINDOWS\WINPGNTC.C"
 				>
 			</File>
 			<File
-				RelativePath=".\WINDOWS\WINSTUFF.H"
+				RelativePath="..\..\libs\putty\WINDOWS\WINSTUFF.H"
 				>
 			</File>
 		</Filter>
