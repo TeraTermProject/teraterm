@@ -49,7 +49,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../teraterm/teraterm,../teraterm/common,YCL/include,../ttssh2/openssl/inc32"
+				AdditionalIncludeDirectories="../teraterm/teraterm;../teraterm/common;YCL/include;../libs/openssl/inc32"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TTX_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -151,7 +151,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../teraterm/teraterm,../teraterm/common,YCL/include,../ttssh2/openssl/inc32"
+				AdditionalIncludeDirectories="../teraterm/teraterm;../teraterm/common;YCL/include;../libs/openssl/inc32"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TTX_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

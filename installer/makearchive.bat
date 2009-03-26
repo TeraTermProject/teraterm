@@ -15,7 +15,7 @@ if "%1"=="debug" SET debug=yes
 if "%1"=="plugins" SET plugins=yes
 
 rem SVNƒŠƒrƒWƒ‡ƒ“
-perl make_svn_revision.pl
+rem perl make_svn_revision.pl
 
 CALL makechm.bat
 CALL build.bat %1
