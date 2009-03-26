@@ -64,10 +64,10 @@ copy /y ..\doc\en\teraterm.chm %dst%
 
 copy /y release\*.* %dst%
 copy /y release\EDITOR.CNF %dst%\KEYBOARD.CNF
-xcopy /s /e /y /i release\theme %dst%\theme
-xcopy /s /e /y /i release\plugin %dst%\plugin
-xcopy /s /e /y /i release\Collector %dst%\Collector
-xcopy /s /e /y /i release\lang %dst%\lang
+xcopy /s /e /y /i /exclude:archive-exclude.txt release\theme %dst%\theme
+xcopy /s /e /y /i /exclude:archive-exclude.txt release\plugin %dst%\plugin
+xcopy /s /e /y /i /exclude:archive-exclude.txt release\Collector %dst%\Collector
+xcopy /s /e /y /i /exclude:archive-exclude.txt release\lang %dst%\lang
 del /f %dst%\lang\English.lng
 
 perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
