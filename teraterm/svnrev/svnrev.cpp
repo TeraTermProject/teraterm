@@ -55,7 +55,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		printf("#define SVNVERSION %d\n", revision);
 	}
 	else {
-		printf("#undef SVNVERSION"\n);
+		printf("#undef SVNVERSION\n");
 	}
 
 	return nRetCode;
