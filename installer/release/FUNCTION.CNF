@@ -68,15 +68,15 @@ Hold=off
 Print=off
 Break=off
 ;F6 key
-;F6=64
+F6=off
 ;F7 key
-;F7=65
+F7=off
 ;F8 key
-;F8=66
+F8=off
 ;F9 key
-;F9=67
+F9=off
 ;F10 key
-;F10=68
+F10=off
 ;F11 key
 F11=87
 ;F12 key
@@ -130,15 +130,15 @@ UDK20=1604
 
 [X function keys]
 ; F1 key
-;XF1=59
+XF1=off
 ; F2 key
-;XF2=60
+XF2=off
 ; F3 key
-;XF3=61
+XF3=off
 ; F4 key
-;XF4=62
+XF4=off
 ; F5 key
-;XF5=63
+XF5=off
 
 [Shortcut keys]
 ; Ctrl + Insert
@@ -207,5 +207,3 @@ User8=66,0,$1BOl
 User9=67,0,$1BOw
 ; F10
 User10=68,0,$1BOx
-
-
