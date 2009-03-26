@@ -214,35 +214,38 @@ Example: adding a TTSSH menu under File menu
       http://www.logmett.com/forum/viewforum.php?f=5
 
   2. Increase the software version and modify date.
-       ttermpro.rc
-       ttxssh.rc
-       ttmacro.rc // only modifying
-       ttpmenu.rc // only modifying
-       TTProxy.rc // only modifying
-       ttxkanjimenu.rc // only modifying
-       teraterm.iss
-       html/about/hisotry.html
+     Increment the version of VS_VERSION_INFO while release process.
+     - ttermpro.rc
+     - ttxssh.rc
+     - ttmacro.rc // only modifying
+     - ttpmenu.rc // only modifying
+     - TTProxy.rc // only modifying
+     - ttxkanjimenu.rc // only modifying
+     - teraterm.iss
+     - html/about/hisotry.html
 
        Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.
 
        Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
 
-  3. Evaluate executable program file.
+  3. Create SVN tag.
+       The naming rule is `teraterm-version'(ex. teraterm-4_62).
+
+  4. Re-checkout from svn tag.
+
+  5. Evaluate executable program file.
        - Rebuild Tera Term program
        - Make installer package
          Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
        - Test Tera Term installation and evaluate it.
 
-  4. Create SVN tag.
-       The naming rule is `teraterm-version'(ex. teraterm-4_62).
+  6. Update SourceForge.jp project site.
 
-  5. Update SourceForge.jp project site.
+  7. Update SourceForge.jp project home page.
 
-  6. Update SourceForge.jp project home page.
+  8. Announce release to mailing list(in Japan).
 
-  7. Announce release to mailing list(in Japan).
-
-  8. Announce release to forum(in Canada).
+  9. Announce release to forum(in Canada).
        (1) Announcements http://logmett.com/forum/viewforum.php?f=5
            Create new topic in `Announcements' entry.
            Change the type of previous Announcement from Announcement to Normal.

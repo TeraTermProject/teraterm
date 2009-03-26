@@ -238,23 +238,26 @@
      パッチがコミットされると即リリース扱いになり、リリース日はその日付となる。
      これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
 
-  3. 動作確認をする
+  3. SVN のタグを作成する。
+     タグ名は「teraterm-バージョン」。たとえば、v4.62ならば"teraterm-4_62"。
+
+  4. リリース用のタグでチェックアウトし直す。
+
+  5. 動作確認をする
        プログラムをコンパイルし直す
        インストーラを作成する
          ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
        インストールおよび実行をテストする
 
-  4. SVN のタグを作成する。タグ名は「teraterm-バージョン」。たとえば、v4.62ならば"teraterm-4_62"。
-
-  5. SourceForge.jp を更新する
+  6. SourceForge.jp を更新する
        [ダウンロード]-[管理]-[新規作成]
          変更履歴を入力してリリースを作成する
 
-  6. プロジェクトページを更新する
+  7. プロジェクトページを更新する
 
-  7. メーリングリストにアナウンスする
+  8. メーリングリストにアナウンスする
 
-  8. フォーラムに告知する
+  9. フォーラムに告知する
        (1) Announcements http://logmett.com/forum/viewforum.php?f=5
            Announcements に新規投稿する。種類は Announcement
            一つ前の Announcement の種類を Normal に変更する

@@ -25,7 +25,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		CString cs;
 		int format = -1;
 		
-		// [root dir]\.svn\entries
+		// [top of source tree]\.svn\entries
 		ret = csf.Open("..\\..\\.svn\\entries", CFile::modeRead);
 		if (ret == FALSE) {
 			nRetCode = 1;
