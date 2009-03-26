@@ -25,7 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(OutDir)\svnrev.exe &gt; $(InputDir)svnversion.h"
+				CommandLine="$(OutDir)\svnrev.exe &gt; &quot;$(InputDir)svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -126,7 +126,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(OutDir)\svnrev.exe &gt; $(InputDir)svnversion.h"
+				CommandLine="$(OutDir)\svnrev.exe &gt; &quot;$(InputDir)svnversion.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

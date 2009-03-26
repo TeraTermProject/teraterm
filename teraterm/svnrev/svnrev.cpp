@@ -51,11 +51,11 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		}
 	}
 
-	if (revision > 0) {
-		printf("#define SVNVERSION %d", revision);
+	if (nRetCode == 0) {
+		printf("#define SVNVERSION %d\n", revision);
 	}
 	else {
-		printf("#undef SVNVERSION");
+		printf("#undef SVNVERSION"\n);
 	}
 
 	return nRetCode;
