@@ -37,7 +37,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			csf.ReadString(cs);
 			format = atoi(cs);
 
-			if (format == 8 || format == 9 || format == 9) {
+			if (format == 8 || format == 9 || format == 10) {
 				// skip line 2 name, 3 kind
 				csf.ReadString(cs);
 				csf.ReadString(cs);
@@ -51,7 +51,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		}
 	}
 
-	if (nRetCode == 0) {
+	if (revision > 0) {
 		printf("#define SVNVERSION %d", revision);
 	}
 	else {
