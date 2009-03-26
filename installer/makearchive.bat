@@ -14,8 +14,10 @@ SET plugins=no
 if "%1"=="debug" SET debug=yes
 if "%1"=="plugins" SET plugins=yes
 
-rem SVNリビジョン
-rem perl make_svn_revision.pl
+rem "rebuild"を指定しない場合でも、SVNリビジョンを更新する。
+pushd ..\teraterm\release
+svnrev.exe > ..\ttpdlg\svnversion.h
+popd
 
 CALL makechm.bat
 CALL build.bat %1
