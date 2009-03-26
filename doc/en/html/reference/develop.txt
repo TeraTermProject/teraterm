@@ -79,37 +79,35 @@ Example: adding a TTSSH menu under File menu
    ... doc/LANG/teraterm.hhp
 
 
+* How to build Libraries
+  1. PuTTY (used by TTSSH)
+     (1) Extract putty source into libs/putty directory.
+
+  2. Oniguruma (used by Tera Term Macro)
+     (1) Extract oniguruma source into libs/oniguruma directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run buildoniguruma.bat.
+
+  3. OpenSSL (used by TTSSH and TTProxy)
+     (1) Extract openssl source into libs/openssl directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run ディレクトリに移動し、buildopenssl.bat.
+
+  4. Zlib (used by TTSSH)
+     (1) Extract zlib source into libs/zlib directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run ディレクトリに移動し、buildzlib.bat.
+
+
 * How to build Tera Term
   To build Tera Term source code is shown in the following step:
   And you should use Visual Studio 2005 Standard Edition later version to build Tera Term because Tera Term program links MFC library (Visual Studio 2005 Express Edition can't be used).
 
   1. Checkout Tera Term source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
-  2. Download 'Oniguruma' source code(http://www.geocities.jp/kosako3/oniguruma/) and extract into 'libs\oniguruma' directory.
-
-       - Automatic procedure of build is following step:
-       Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-       Move 'libs' directory on the command prompt.
-       Run buildoniguruma.bat.
-
-       - Manual procedure of build is following step:
-       Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-       Move 'libs\oniguruma' directory on the command prompt.
-       And input the following command lines to build 'Oniguruma' regular expression library(links to onig_s.lib).
-       (1) copy win32\Makefile Makefile
-       (2) copy win32\config.h config.h
-       (3) Open Makefile and append /MT at end of CFLAGS line.
-       (4) copy Makefile Makefile.debug
-       (5) Open Makefile.debug and modify CFLAG line from /MT to /MTd.
-           And modify libname to debug\$(libbase)_s.lib.
-       (6) mkdir debug
-       (7) nmake -f Makefile.debug
-       (8) nmake clean
-       (9) nmake
-
-  3. Open teraterm\visualc\ttermpro.sln with Visual Studio.
+  2. Open teraterm\visualc\ttermpro.sln with Visual Studio.
      The linefeed code of .sln file must be "CR+LF".
-  4. Build Tera Term solution.
-  5. Tera Term execution program will be generated in teraterm\visualc\bin directory if the building is successful.
+  3. Build Tera Term solution.
+  4. Tera Term execution program will be generated in teraterm\visualc\bin directory if the building is successful.
 
 
 * How to build TeraTerm Menu
@@ -152,40 +150,9 @@ Example: adding a TTSSH menu under File menu
       + #define IDC_STATIC -1
 
   1. Checkout TTSSH source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
-
-  2. Extract zlib source code(http://www.zlib.net/) into libs\zlib directory.
-      + Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-      + Move 'lib' directory on the command prompt.
-      + Run buildzlib.bat.
-
-  3. Extract OpenSSL source code(http://www.openssl.org/) into libs\openssl directory.
-      Build OpenSSL in the following step(Release:TTSSH links to openssl\out32\libeay32.lib, Debug:openssl\out32.dbg\libeay32.lib):
-
-      - Build OpenSSL automatically.
-      + Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-      + Move 'libs' directory on the command prompt.
-      + Run buildopenssl.bat.
-
-      - Build OpenSSL manually.
-      + Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-      + cd openssl
-      + perl Configure VC-WIN32
-          (Yes, you need perl to build OpenSSL!)
-      + Open ms\do_ms.bat and append the following line at the next line of 'ms\nt.mak' line.
-        "perl util\mk1mf.pl no-asm debug VC-WIN32 >ms\ntd.mak"
-      + ms\do_ms
-      + Open ms\nt.mak and modify CFLAG line from /MD to /MT.
-      + Open ms\ntd.mak and modify CFLAG line from /MDd to /MTd.
-      + nmake -f ms\nt.mak
-      + nmake -f ms\ntd.mak
-      + cd ..
-          (Now you are back in ttssh2 folder.)
-        See the instruction in the OpenSSL documentation for details.
-
-  5. Extract PuTTY source code(http://www.chiark.greenend.org.uk/~sgtatham/putty/) into libs\putty directory.
-  5. Open ttssh2\ttssh.sln with Visual Studio.
-  6. Build TTSSH solution.
-  7. TTSSH DLL will be generated in ttssh2\ttxssh directory if the building is successful.
+  2. Open ttssh2\ttssh.sln with Visual Studio.
+  3. Build TTSSH solution.
+  4. TTSSH DLL will be generated in ttssh2\ttxssh directory if the building is successful.
 
 
 * How to build CygTerm

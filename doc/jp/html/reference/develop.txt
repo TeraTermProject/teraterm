@@ -85,37 +85,35 @@
    ... doc/LANG/teraterm.hhp
 
 
+■ ライブラリのビルド方法
+  1. PuTTY (used by TTSSH)
+     (1) putty のソースを libs/putty の中に展開する。
+
+  2. Oniguruma (used by Tera Term Macro)
+     (1) oniguruma のソースを libs/oniguruma の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma.bat を実行する。
+
+  3. OpenSSL (used by TTSSH and TTProxy)
+     (1) openssl のソースを libs/openssl の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl.bat を実行する。
+
+  4. Zlib (used by TTSSH)
+     (1) zlib のソースを libs/zlib の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildzlib.bat を実行する。
+
+
 ■ Tera Termのビルド方法
   Tera Termのビルド方法について以下に示します。
   ビルドにはVisual Studio 2005 Standard Edition以上が必要です（Visual Studio 2005 Express Editionは不可）。
 
   1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
-  2. Onigurumaのソースコード(http://www.geocities.jp/kosako3/oniguruma/)を libs\oniguruma ディレクトリの中に展開する。
-
-       - 自動で行う場合
-       スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-       コマンドプロンプト上から libs ディレクトリに移動する。
-       buildoniguruma.bat を実行する。
-
-       - 手動で行う場合
-       スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-       コマンドプロンプト上から libs\oniguruma ディレクトリに移動する。
-       コマンドプロンプトから以下の入力を行い、Onigurumaをビルドする（onig_s.libがリンクされる）。
-       (1) copy win32\Makefile Makefile
-       (2) copy win32\config.h config.h
-       (3) Makefile をエディタで開いて、CFLAGS の行に /MT を追加する
-       (4) copy Makefile Makefile.debug
-       (5) Makefile.debug をエディタで開いて、CFLAGS の行の /MT を /MTd に変更する
-           また、libname を debug\$(libbase)_s.lib に変更する
-       (6) mkdir debug
-       (7) nmake -f Makefile.debug
-       (8) nmake clean
-       (9) nmake
-
-  3. teraterm\visualc\ttermpro.sln をVisual Studioで開く。
+  2. teraterm\visualc\ttermpro.sln をVisual Studioで開く。
      .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。
-  4. ソリューションをビルドする
-  5. ビルドに成功するとteraterm ディレクトリに実行プログラムが生成される
+  3. ソリューションをビルドする
+  4. ビルドに成功するとteraterm ディレクトリに実行プログラムが生成される
 
 
 ■ TeraTerm Menuのビルド方法
@@ -158,40 +156,9 @@
       + #define IDC_STATIC -1
 
   1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
-
-  2. zlibのソースコード(http://www.zlib.net/)を libs\zlib ディレクトリの中に展開する。
-      + スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-      + コマンドプロンプト上から libs ディレクトリに移動する。
-      + buildzlib.bat を実行する。
-
-  3. OpenSSLのソースコード(http://www.openssl.org/)を libs\openssl ディレクトリの中に展開する。OpenSSLをビルドする（以下参照）。
-     Release では openssl\out32\libeay32.lib が、Debug では openssl\out32.dbg\libeay32.lib がリンクされることになる。
-
-      - 自動で行う場合
-      + スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-      + コマンドプロンプト上から libs ディレクトリに移動する。
-      + buildopenssl.bat を実行する。
-
-      - 手動で行う場合
-      + スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-      + cd openssl
-      + perl Configure VC-WIN32
-          (そうです、OpenSSLをビルドするにはperlが必要です!)
-      + ms\do_ms.bat をエディタで開いて、ms\nt.mak の次の行に下記の内容を追記する
-        perl util\mk1mf.pl no-asm debug VC-WIN32 >ms\ntd.mak
-      + ms\do_ms
-      + ms\nt.mak をエディタで開いて、CFLAG行の /MD を /MT に変更する
-      + ms\ntd.mak をエディタで開いて、CFLAG行の /MDd を /MTd に変更する
-      + nmake -f ms\nt.mak
-      + nmake -f ms\ntd.mak
-      + cd ..
-          (ttssh2フォルダに戻ります。)
-        詳細については、OpenSSLのドキュメントを参照してください。
-
-  4. PuTTYのソースコード(http://www.chiark.greenend.org.uk/~sgtatham/putty/)を libs\putty ディレクトリの中に展開する。
-  5. ttssh2\ttssh.sln をVisual Studioで開く
-  6. ソリューションをビルドする
-  7. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される
+  2. ttssh2\ttssh.sln をVisual Studioで開く
+  3. ソリューションをビルドする
+  4. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される
 
 
 ■ CygTermのビルド方法
@@ -214,7 +181,6 @@
   2. TTXSamples\TTXSamples.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると TTXSamples ディレクトリにDLLが生成される
-
   各TTXの詳細については、プロジェクト内のReadMe-ja.txtを参照してください。
 
 
