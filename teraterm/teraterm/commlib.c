@@ -157,24 +157,7 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
   memset(&dcb,0,sizeof(DCB));
   dcb.DCBlength = sizeof(DCB);
-  switch (ts->Baud) {
-    case IdBaud110: dcb.BaudRate = 110; break;
-    case IdBaud300: dcb.BaudRate = 300; break;
-    case IdBaud600: dcb.BaudRate = 600; break;
-    case IdBaud1200: dcb.BaudRate = 1200; break;
-    case IdBaud2400: dcb.BaudRate = 2400; break;
-    case IdBaud4800: dcb.BaudRate = 4800; break;
-    case IdBaud9600: dcb.BaudRate = 9600; break;
-    case IdBaud14400: dcb.BaudRate = 14400; break;
-    case IdBaud19200: dcb.BaudRate = 19200; break;
-    case IdBaud38400: dcb.BaudRate = 38400; break;
-    case IdBaud57600: dcb.BaudRate = 57600; break;
-    case IdBaud115200: dcb.BaudRate = 115200; break;
-	// add (2005.11.30 yutaka)
-    case IdBaud230400: dcb.BaudRate = 230400; break;
-    case IdBaud460800: dcb.BaudRate = 460800; break;
-    case IdBaud921600: dcb.BaudRate = 921600; break;
-  }
+  dcb.BaudRate = GetCommSerialBaudRate(ts->Baud);
   dcb.fBinary = TRUE;
   switch (ts->Parity) {
     case IdParityEven:
