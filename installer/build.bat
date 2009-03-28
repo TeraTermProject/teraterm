@@ -1,5 +1,11 @@
 set BUILD=build
 if "%1" == "rebuild" (set BUILD=rebuild)
+
+rem ライブラリをコンパイル
+pushd ..\libs
+CALL buildall.bat
+popd
+
 if "%BUILD%" == "rebuild" goto build
 
 rem "rebuild"を指定しない場合、SVNリビジョンを更新する。
