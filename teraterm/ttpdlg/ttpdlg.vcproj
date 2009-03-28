@@ -177,11 +177,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib onig_s.lib ttpcmn.lib"
+				AdditionalDependencies="Version.lib onig_sd.lib ttpcmn.lib"
 				OutputFile="..\Debug/ttpdlg.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\libs\oniguruma\debug;..\debug"
+				AdditionalLibraryDirectories="..\..\libs\oniguruma;..\debug"
 				ModuleDefinitionFile=".\ttpdlg.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\Debug/ttpdlg.pdb"
