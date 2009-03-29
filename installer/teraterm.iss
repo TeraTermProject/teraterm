@@ -99,6 +99,7 @@ Source: ..\TTXSamples\release\TTXttyplay.dll; DestDir: {app}\; Components: Addit
 Source: ..\TTXSamples\release\TTXKcodeChange.dll; DestDir: {app}\; Components: Additional_Plugins/TTXKcodeChange; Flags: ignoreversion
 Source: ..\TTXSamples\release\TTXViewMode.dll; DestDir: {app}\; Components: Additional_Plugins/TTXViewMode; Flags: ignoreversion
 Source: ..\TTXSamples\release\TTXAlwaysOnTop.dll; DestDir: {app}\; Components: Additional_Plugins/TTXAlwaysOnTop; Flags: ignoreversion
+Source: ..\TTXSamples\release\TTXRecurringCommand.dll; DestDir: {app}\; Components: Additional_Plugins/TTXRecurringCommand; Flags: ignoreversion
 
 [Types]
 Name: standard; Description: {cm:type_standard}
@@ -123,6 +124,7 @@ Name: Additional_Plugins/TTXKcodeChange; Description: TTXKcodeChange ({cm:comp_T
 Name: Additional_Plugins/TTXKcodeChange; Description: TTXKcodeChange ({cm:comp_TTXKcodeChange}); Types: full; Languages: ja
 Name: Additional_Plugins/TTXViewMode; Description: TTXViewMode ({cm:comp_TTXViewMode}); Types: full
 Name: Additional_Plugins/TTXAlwaysOnTop; Description: TTXAlwaysOnTop ({cm:comp_TTXAlwaysOnTop}); Types: full
+Name: Additional_Plugins/TTXRecurringCommand; Description: TTXRecurringCommand ({cm:comp_TTXRecurringCommand}); Types: full; Languages: 
 
 [Icons]
 Name: {group}\Tera Term; Filename: {app}\ttermpro.exe; WorkingDir: {app}; IconFilename: {app}\ttermpro.exe; IconIndex: 0; Components: TeraTerm; Flags: createonlyiffileexists
@@ -398,6 +400,8 @@ en.comp_TTXViewMode=View-only mode can be used
 ja.comp_TTXViewMode=表示専用モードにすることができる
 en.comp_TTXAlwaysOnTop=Always On Top can be used
 ja.comp_TTXAlwaysOnTop=常に最前面に表示できるようにする
+en.comp_TTXRecurringCommand=Recurring Command can be used
+ja.comp_TTXRecurringCommand=定期的に文字列を送信する
 
 [Code]
 var
