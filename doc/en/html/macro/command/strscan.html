@@ -83,78 +83,37 @@ return
 ip='192.168.1.189'
 subnet='255.255.255.248'
  
-sip=subnet      ;find number of significant bits
-call ip2bin
-strconcat bip '0' ;ensure there is at least one 0 to find
-strscan bip '0'
-bits=result-1
+bits=0          ;calculate bits
+tsub=subnet
+bitstr='128 192 224 240 248 252 254 255'
+do
+    str2int itsub tsub
+    for i 0 7
+        strcopy bitstr i*4+1 3 stmp
+        str2int tmp stmp
+        if itsub>=tmp bits=bits+1
+    next        
+    strscan tsub '.'
+    strcopy tsub result+1 999 tsub
+loop while result>0
 messagebox bits 'bits'
  
-sip=ip          ;calculate first address in subnet
-call ip2bin
-strlen bip
-strcopy bip 1 bits bip
-while result-bits>0
-    strconcat bip '0'
-    result=result-1
-endwhile
-call bin2ip
-messagebox sip 'net'
-end
- 
-:bin2ip     ;convert binary ip to decimal number format with dots
-sip=''
-base=2
+oip=''          ;calculate first address in subnet
+tip=ip
+tsub=subnet
 do
-    strcopy bip 1 8 basenum
-    call base2dec
-    int2str sdec decnum
-    strconcat sip sdec
-    strcopy bip 9 999 bip
-    strlen bip
-    if result>0 strconcat sip '.'
+    str2int itip tip
+    str2int itsub tsub
+    ioip=itip & itsub
+    int2str soip ioip
+    strconcat oip soip
+    strscan tip '.'
+    strcopy tip result+1 999 tip
+    strscan tsub '.'
+    strcopy tsub result+1 999 tsub
+    if result>0 strconcat oip '.'
 loop while result>0
-return
- 
-:ip2bin     ;converts ip number to binary and removes dots
-base=2
-bip=''
-do
-    str2int decnum sip
-    call dec2base
-    strlen basenum  ;fill in any missing leading zeros
-    strcopy '00000000' 1 8-result stmp
-    strconcat bip stmp
-    strconcat bip basenum
-    strscan sip '.'
-    strcopy sip result+1 999 sip
-loop while result>0
-return
- 
-:dec2base   ;converts a decimal number to any base
-basenum=''
-tmp=decnum ;modified so not destructive of decnum
-while tmp>0
-    strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
-    strconcat basedig basenum
-    basenum=basedig
-    tmp=tmp/base
-    endwhile
-return
- 
-:base2dec   ;converts a number in any base to a decimal number
-decnum=0
-strlen basenum
-len=result
-for tmp 1 len
-    strcopy basenum tmp 1 basedig
-    strscan '0123456789ABCDEFabcdef' basedig
-    if result=0 break   ;if not a num char, stop conversion
-    if result>16 result=result-6 ;take care of lower case
-    decnum=decnum*base
-    decnum=decnum+result-1
-next
-return
+messagebox oip 'net'
 </pre>
 
 
