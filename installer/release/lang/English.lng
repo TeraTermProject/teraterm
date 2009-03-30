@@ -910,3 +910,7 @@ MENU_EUCJP=Recv/Send: &EUC-JP
 MENU_JIS=Recv/Send: &JIS
 MENU_UTF8=Recv/Send: &UTF-8
 MENU_UTF8m=Recv: UTF-8&m/Send: UTF-8
+
+
+[TTXAlwaysOnTop]
+MENU_ALWAYSONTOP=&Always on top

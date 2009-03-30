@@ -910,3 +910,7 @@ MENU_EUCJP=送受信: &EUC-JP
 MENU_JIS=送受信: &JIS
 MENU_UTF8=送受信: &UTF-8
 MENU_UTF8m=受信: UTF-8&m/送信: UTF-8
+
+
+[TTXAlwaysOnTop]
+MENU_ALWAYSONTOP=常に最前面に表示(&A)

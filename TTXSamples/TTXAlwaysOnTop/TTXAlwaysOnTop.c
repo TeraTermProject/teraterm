@@ -2,12 +2,16 @@
 #include "tttypes.h"
 #include "ttplugin.h"
 #include "tt_res.h"
+#include "i18n.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <Windows.h>
 
 #include "compat_w95.h"
+
+#define IniSection "TTXAlwaysOnTop"
 
 #define ORDER 5800
 #define ID_MENU_BASE      55000
@@ -19,6 +23,7 @@
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
 typedef struct {
+  PTTSet ts;
   HMENU ControlMenu;
   BOOL ontop;
 } TInstVar;
@@ -53,6 +58,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
 }
 
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+  pvar->ts = ts;
   pvar->ontop = FALSE;
 }
 
@@ -63,8 +69,11 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
   if (pvar->ontop) {
     flag |= MF_CHECKED;
   }
+
+  GetI18nStr(IniSection, "MENU_ALWAYSONTOP", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
+             "&Always on top", pvar->ts->UILanguageFile);
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO,
-		flag, ID_MENU_BASE, "&Always on top");
+		flag, ID_MENU_BASE, pvar->ts->UIMsg);
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO,
 		MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
