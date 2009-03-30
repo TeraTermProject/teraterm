@@ -3257,6 +3257,9 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
       switch (MouseReportMode) {
 	case IdMouseTrackBtnEvent: /* not supported yet */
 	case IdMouseTrackAllEvent: /* not supported yet */
+	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier | 32, x, y);
+	  break;
+
 	case IdMouseTrackDECELR: /* not supported yet */
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	case IdMouseTrackX10: /* nothing to do */
