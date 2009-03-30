@@ -3,7 +3,7 @@
   Windows XP Professional
 - Compiler
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
-  Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 98 and Me.
+  Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 95, 98 and Me.
 - Installer
   Inno Setup 5.2.3 (http://www.jrsoftware.org/isinfo.php)
   ISTool 5.2.1 (http://www.istool.org/)
@@ -25,10 +25,10 @@
   svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk
 
 - Should not edit checkout file in copying directory.
-  The other modification code may be deleted in CVS server when you commit checkout file. Also, fix it carefully when the conflicting occurs.
+  The other modification code may be deleted in SVN server when you commit checkout file. Also, fix it carefully when the conflicting occurs.
 
 - Should not have opened checkout file.
-  CVS commit procedure may be failure while checkout file will have been opened.
+  SVN commit procedure may be failure while checkout file will have been opened.
 
 
 * Naming rule to add menu ID

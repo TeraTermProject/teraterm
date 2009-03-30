@@ -3,7 +3,7 @@
   Windows XP Professional
 - コンパイラ
   Visual Studio 2005 SP1 (Standard Edition 以上)
-  注: Visual Studio 2008 でコンパイルした実行ファイルは Windows NT 4.0, 98, Me で動きません。
+  注: Visual Studio 2008 でコンパイルした実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
   Windows Server 2003 R2 Platform SDK
   注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
   注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
@@ -31,7 +31,7 @@
   コミットしたときに別の人の修正を削除してしまうことがあります。
 
 - アップデート・コミット時の注意
-  cvsの処理が失敗することがあるので、ファイルをエディタ等で開いたままで行わないでください。
+  svnの処理が失敗することがあるので、ファイルをエディタ等で開いたままで行わないでください。
 
 
 ■ メニューID追加時の命名規則
