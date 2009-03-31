@@ -2109,6 +2109,38 @@ void CSSetAttr()
     }
   }
 
+  void CSSpace(BYTE b) {
+    switch (b) {
+      case 'q':
+        if (NParam > 0) {
+          if (Param[1] < 0) Param[1] = 0;
+          switch (Param[1]) {
+            case 0:
+            case 1:
+              ts.CursorShape = IdBlkCur;
+              ts.NonblinkingCursor = FALSE;
+              break;
+            case 2:
+              ts.CursorShape = IdBlkCur;
+              ts.NonblinkingCursor = TRUE;
+              break;
+            case 3:
+              ts.CursorShape = IdHCur;
+              ts.NonblinkingCursor = FALSE;
+              break;
+            case 4:
+              ts.CursorShape = IdHCur;
+              ts.NonblinkingCursor = TRUE;
+              break;
+	    default:
+	      return;
+          }
+	  ChangeCaret();
+        }
+        break;
+    }
+  }
+
 void PrnParseCS(BYTE b) // printer mode
 {
   ParseMode = ModeFirst;
@@ -2201,6 +2233,8 @@ void ParseCS(BYTE b) /* b is the final char */
     /* one intermediate char */
     case 1:
       switch (IntChar[1]) {
+        /* intermediate char = ' ' */
+	case ' ': CSSpace(b); break;
 	/* intermediate char = '!' */
 	case '!': CSExc(b); break;
 	/* intermediate char = '"' */
