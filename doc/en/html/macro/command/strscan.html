@@ -81,39 +81,24 @@ return
 <pre class="macro-example">
 ; Network IP calculation from IP and Subnet mask
 ip='192.168.1.189'
-subnet='255.255.255.248'
- 
-bits=0          ;calculate bits
-tsub=subnet
-bitstr='128 192 224 240 248 252 254 255'
+sn='255.255.255.248'
+bits=0          ;calculate bits & first address in sn
+bitstr='000 128 192 224 240 248 252 254 255'    ;lookup table for # bits
 do
-    str2int itsub tsub
-    for i 0 7
-        strcopy bitstr i*4+1 3 stmp
-        str2int tmp stmp
-        if itsub>=tmp bits=bits+1
-    next        
-    strscan tsub '.'
-    strcopy tsub result+1 999 tsub
+    str2int isn sn
+    int2str stmp isn
+    strscan bitstr stmp     ;use lookup table to find bits
+    bits=bits+(result-1)/4  
+    str2int tmp ip      ;find net by bitwise AND of ip and mask
+    sprintf2 net '%s%d' net tmp&isn
+    strscan sn '.'
+    strcopy sn result+1 999 sn
+    strscan ip '.'
+    strcopy ip result+1 999 ip
+    if result>0 strconcat net '.'           
 loop while result>0
 messagebox bits 'bits'
- 
-oip=''          ;calculate first address in subnet
-tip=ip
-tsub=subnet
-do
-    str2int itip tip
-    str2int itsub tsub
-    ioip=itip & itsub
-    int2str soip ioip
-    strconcat oip soip
-    strscan tip '.'
-    strcopy tip result+1 999 tip
-    strscan tsub '.'
-    strcopy tsub result+1 999 tsub
-    if result>0 strconcat oip '.'
-loop while result>0
-messagebox oip 'net'
+messagebox net 'net'
 </pre>
 
 
