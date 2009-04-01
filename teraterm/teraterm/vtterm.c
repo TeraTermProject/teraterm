@@ -1471,6 +1471,14 @@ void CSScreenErase()
 	ts.CRSend = IdCRLF;
 	cv.CRSend = IdCRLF;
 	break;
+      case 33:
+	ts.NonblinkingCursor = TRUE;
+	ChangeCaret();
+	break;
+      case 34:
+	ts.CursorShape = IdHCur;
+	ChangeCaret();
+	break;
     }
   }
 
@@ -1508,6 +1516,14 @@ void CSScreenErase()
 	LFMode = FALSE;
 	ts.CRSend = IdCR;
 	cv.CRSend = IdCR;
+	break;
+      case 33:
+	ts.NonblinkingCursor = FALSE;
+	ChangeCaret();
+	break;
+      case 34:
+	ts.CursorShape = IdBlkCur;
+	ChangeCaret();
 	break;
     }
   }
