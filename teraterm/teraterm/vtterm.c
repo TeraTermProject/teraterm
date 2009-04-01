@@ -2132,6 +2132,14 @@ void CSSetAttr()
               ts.CursorShape = IdHCur;
               ts.NonblinkingCursor = TRUE;
               break;
+            case 5:
+              ts.CursorShape = IdVCur;
+              ts.NonblinkingCursor = FALSE;
+              break;
+            case 6:
+              ts.CursorShape = IdVCur;
+              ts.NonblinkingCursor = TRUE;
+              break;
 	    default:
 	      return;
           }
