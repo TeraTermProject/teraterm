@@ -1,6 +1,6 @@
 cd oniguruma
 
-rem if exist "Makefile" goto build
+if exist "Makefile" goto build
 
 copy win32\config.h config.h
 perl -e "open(IN,'win32\Makefile');while(<IN>){s|CFLAGS =|CFLAGS = /MT|;print $_;}close(IN);" > Makefile
