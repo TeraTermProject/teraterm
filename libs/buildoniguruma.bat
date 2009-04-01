@@ -10,8 +10,9 @@ perl -e "open(IN,'win32\Makefile');while(<IN>){s|CFLAGS = -O2|CFLAGS = /MTd -Od|
 if exist onig_sd.lib goto build_release
 nmake -f Makefile.debug clean
 nmake -f Makefile.debug
+move onig_sd.lib sample\
 nmake clean
-move debug\onig_s.lib .\onig_sd.lib
+move sample\onig_sd.lib .\
 
 :build_release
 nmake
