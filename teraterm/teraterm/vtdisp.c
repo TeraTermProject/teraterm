@@ -1974,6 +1974,7 @@ void ChangeCaret()
     T = GetCaretBlinkTime() * 2 / 3;
     SetTimer(HVTWin,IdCaretTimer,T,NULL);
   }
+  InvalidateRect(HVTWin,NULL,TRUE);
 }
 
 // WM_KILLFOCUS‚³‚ê‚½‚Æ‚«‚ÌƒJ[ƒ\ƒ‹‚ğ©•ª‚Å•`‚­
