@@ -543,6 +543,12 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdBaud460800 14
 #define IdBaud921600 15
 
+// index + 1 == IdBaudXXX �ƂȂ邱�ƁB
+static PCHAR far BaudList[] =
+	{"110","300","600","1200","2400","4800","9600",
+	 "14400","19200","38400","57600","115200",
+	 "230400", "460800", "921600", NULL};
+
   /* Parity ID */
 #define IdParityEven 1
 #define IdParityOdd  2

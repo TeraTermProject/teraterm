@@ -23,12 +23,6 @@
 static PCHAR far TermList[] =
 	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	"VT320", "VT382", NULL };
-// expansion (2005.11.30 yutaka)
-static PCHAR BaudList[] =
-	{ "110", "300", "600", "1200", "2400", "4800", "9600",
-	"14400", "19200", "38400", "57600", "115200",
-	"230400", "460800", "921600", NULL
-};
 
 static PCHAR far RussList[] =
 	{ "Windows", "KOI8-R", "CP-866", "ISO-8859-5", NULL };

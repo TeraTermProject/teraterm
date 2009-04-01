@@ -1188,11 +1188,6 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-// ボーレートの上限を拡張した (2005.11.30 yutaka)
-static PCHAR far BaudList[] =
-	{"110","300","600","1200","2400","4800","9600",
-	 "14400","19200","38400","57600","115200",
-	 "230400", "460800", "921600", NULL};
 static PCHAR far DataList[] = {"7 bit","8 bit",NULL};
 static PCHAR far ParityList[] = {"even","odd","none",NULL};
 static PCHAR far StopList[] = {"1 bit","2 bit",NULL};

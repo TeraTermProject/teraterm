@@ -1011,31 +1011,13 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 
 int GetCommSerialBaudRate(int id)
 {
-	switch (id) {
-		case IdBaud110:
-			return 110;
-		case IdBaud300:
-		case IdBaud600:
-		case IdBaud1200:
-		case IdBaud2400:
-		case IdBaud4800:
-		case IdBaud9600:
-			return 300 << (id - IdBaud110 -1);
-		case IdBaud14400:
-			return 14400;
-		case IdBaud19200:
-			return 19200;
-		case IdBaud38400:
-			return 38400;
-		case IdBaud57600:
-		case IdBaud115200:
-		case IdBaud230400:
-		case IdBaud460800:
-		case IdBaud921600:
-			return 57600 << (id - IdBaud38400 -1);
-	}
+	char *ch;
+	int val;
 
-	return 0;
+	// id-1‚ªƒŠƒXƒg‚Ìindex‚Æ‚È‚éB
+	ch = BaudList[id - 1];
+	val = atoi(ch);
+	return (val);
 }
 
 BOOL PrnOpen(PCHAR DevName)
