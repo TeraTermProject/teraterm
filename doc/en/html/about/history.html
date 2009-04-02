@@ -24,13 +24,20 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.63">2009.3.25 (Ver 4.63 not-released)</a></h3>
+<h3><a name="teraterm_4.63">2009.4.3 (Ver 4.63 not-released)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the `wait4all' macro command.</li>
       <li>added a Subversion(SVN) revision number on the version dialog.</li>
-      <li>added support of DECSCUSR (Set Cursor Style) control sequence.</li>
+      <li>added support of DECSCUSR (Set Cursor Style) control sequence.<br>
+        Add the below configuration in the ~/.vimrc file for vim editor.
+        <pre>
+         set t_SI=^[[3\ q
+         set t_EI=^[[1\ q
+         NOTE: Input ^[ by using Control-V Control-[.
+        </pre>
+      </li>
     </ul></li>
 
   <li>Misc
