@@ -41,6 +41,10 @@ logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text
 <p>
 &lt;plain text flag&gt; が 0 以外の場合、ASCII 非表示文字をログに書き込まない。<br>
 &lt;timestamp flag&gt; が 0 以外の場合、ログの行頭に時刻を追加する。<br>
+ただし、&lt;binary flag&gt; が 以外の場合、&lt;plain text flag&gt;, &lt;timestamp flag&gt; は両方とも無視される。<em>(バージョン 4.61以降)</em>
+</p>
+
+<p>
 &lt;hide dialog flag&gt; が 0 以外の場合、ログ転送のダイアログを表示しない。
 </p>
 
