@@ -1826,13 +1826,13 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteOnOff(Section, "Beep", FName, ts->Beep);
 	switch (ts->Beep) {
 	case IdBeepOff:
-		WritePrivateProfileString(Section, "Beep", "Off", FName);
+		WritePrivateProfileString(Section, "Beep", "off", FName);
 		break;
 	case IdBeepOn:
-		WritePrivateProfileString(Section, "Beep", "On", FName);
+		WritePrivateProfileString(Section, "Beep", "on", FName);
 		break;
 	case IdBeepVisual:
-		WritePrivateProfileString(Section, "Beep", "Visual", FName);
+		WritePrivateProfileString(Section, "Beep", "visual", FName);
 		break;
 	}
 
