@@ -41,11 +41,15 @@ If &lt;append flag&gt; is zero and the file &lt;filename&gt; already exists, the
 <p>
 If &lt;plain text flag&gt; is not 0, ASCII non-printable characters are not written into log.<br>
 If &lt;timestamp flag&gt; is not 0, a timestamp is added on top of log.<br>
+If &lt;binary flag&gt; is non-zero, &lt;plain text flag&gt; and &lt;timestamp flag&gt; is ignored.<em>(version 4.61 or later)</em>
+</p>
+
+<p>
 If &lt;hide dialog flag&gt; is not 0, "Log" dialog box is not displayed.
 </p>
 
 <p>
-If a log file is successfully opened, the system variable "result" is set to 0. Otherwise, the "result" is set to 1. <em>(version 4.62 or later)</em>	
+If a log file is successfully opened, the system variable "result" is set to 0. Otherwise, the "result" is set to 1. <em>(version 4.62 or later)</em>
 </p>
 
 <h2>Example</h2>
