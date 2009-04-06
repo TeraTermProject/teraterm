@@ -2167,7 +2167,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// DisableMenuSendBreak
 	WriteOnOff(Section, "DisableMenuSendBreak", FName,
-	           ts->DisableAcceleratorMenu);
+	           ts->DisableMenuSendBreak);
 
 	// ClearScreenOnCloseConnection
 	WriteOnOff(Section, "ClearScreenOnCloseConnection", FName,
