@@ -1251,11 +1251,15 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->Wait4allMacroCommand =
 		GetOnOff(Section, "Wait4allMacroCommand", FName, FALSE);
 
-	// added DisableAcceleratorMenu (2009.4.6 maya)
-	ts->DisableAcceleratorMenu =
-		GetOnOff(Section, "DisableAcceleratorMenu", FName, FALSE);
+	// added DisableMenuSendBreak (2009.4.6 maya)
+	ts->DisableMenuSendBreak =
+		GetOnOff(Section, "DisableMenuSendBreak", FName, FALSE);
 
-	// added DisableAcceleratorMenu (2009.4.6 maya)
+	// added ClearScreenOnCloseConnection (2009.4.6 maya)
+	ts->ClearScreenOnCloseConnection =
+		GetOnOff(Section, "ClearScreenOnCloseConnection", FName, FALSE);
+
+	// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
 	ts->DisableAcceleratorDuplicateSession =
 		GetOnOff(Section, "DisableAcceleratorDuplicateSession", FName, FALSE);
 }
@@ -2161,8 +2165,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteOnOff(Section, "Wait4allMacroCommand", FName,
 	           ts->Wait4allMacroCommand);
 
-	// DisableAcceleratorMenu
-	WriteOnOff(Section, "DisableAcceleratorMenu", FName,
+	// DisableMenuSendBreak
+	WriteOnOff(Section, "DisableMenuSendBreak", FName,
 	           ts->DisableAcceleratorMenu);
 
 	// ClearScreenOnCloseConnection

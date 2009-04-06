@@ -450,7 +450,7 @@ struct tttset {
 	WORD DisableWheelToCursorByCtrl;
 	WORD StrictKeyMapping;
 	WORD Wait4allMacroCommand;
-	WORD DisableAcceleratorMenu;
+	WORD DisableMenuSendBreak;
 	WORD ClearScreenOnCloseConnection;
 	WORD DisableAcceleratorDuplicateSession;
 };

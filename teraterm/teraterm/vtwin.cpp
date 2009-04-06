@@ -1302,7 +1302,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	{
 		if (cv.Ready &&
 		    (SendVar==NULL) && (FileVar==NULL)) {
-			if (ts.DisableAcceleratorMenu) {
+			if (ts.DisableMenuSendBreak) {
 				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {

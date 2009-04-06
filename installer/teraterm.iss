@@ -145,8 +145,8 @@ Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorDuplica
 Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorDuplicateSession; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: Tera Term; Key: ClearScreenOnCloseConnection; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
 Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ClearScreenOnCloseConnection; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorMenu; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorMenu; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
+Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableMenuSendBreak; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
+Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableMenuSendBreak; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: Tera Term; Key: PasteDialogSize; String: 330,220; Flags: createkeyifdoesntexist; Components: TeraTerm
 Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: PasteDialogSize; String: 330,220; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: TTXKanjiMenu; Key: UseOneSetting; String: off; Flags: createkeyifdoesntexist; Components: Additional_Plugins/TTXKanjiMenu
