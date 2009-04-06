@@ -452,6 +452,7 @@ struct tttset {
 	WORD Wait4allMacroCommand;
 	WORD DisableAcceleratorMenu;
 	WORD ClearScreenOnCloseConnection;
+	WORD DisableAcceleratorDuplicateSession;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -889,6 +890,7 @@ typedef TMap far *PMap;
  *   added tttset.Wait4allMacroCommand.
  *   added tttset.DisableAcceleratorMenu.
  *   added tttset.ClearScreenOnCloseConnection.
+ *   added tttset.DisableAcceleratorDuplicateSession.
  *
  * - At version 4.62, ttset_memfilemap was replaced with ttset_memfilemap_10.
  *   added tttset.DisableMouseTrackingByCtrl.

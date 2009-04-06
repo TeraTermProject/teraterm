@@ -1254,6 +1254,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// added DisableAcceleratorMenu (2009.4.6 maya)
 	ts->DisableAcceleratorMenu =
 		GetOnOff(Section, "DisableAcceleratorMenu", FName, FALSE);
+
+	// added DisableAcceleratorMenu (2009.4.6 maya)
+	ts->DisableAcceleratorDuplicateSession =
+		GetOnOff(Section, "DisableAcceleratorDuplicateSession", FName, FALSE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2164,6 +2168,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// ClearScreenOnCloseConnection
 	WriteOnOff(Section, "ClearScreenOnCloseConnection", FName,
 	           ts->ClearScreenOnCloseConnection);
+
+	// DisableAcceleratorDuplicateSession
+	WriteOnOff(Section, "DisableAcceleratorDuplicateSession", FName,
+	           ts->DisableAcceleratorDuplicateSession);
 }
 
 #define VTEditor "VT editor keypad"

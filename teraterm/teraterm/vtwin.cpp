@@ -1542,6 +1542,11 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			case ID_ACC_DISCONNECT:
 				OnFileDisconnect();
 				return TRUE;
+			case ID_FILE_DUPLICATESESSION:
+				// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
+				if (!ts.DisableAcceleratorDuplicateSession)
+					OnControlSendBreak();
+				return TRUE;
 		}
 		if (ActiveWin==IdVT) {
 			switch (wID) {
