@@ -1302,7 +1302,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	{
 		if (cv.Ready &&
 		    (SendVar==NULL) && (FileVar==NULL)) {
-			EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_ENABLED);
+			if (ts.DisableAcceleratorMenu) {
+				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_GRAYED);
+			}
+			else {
+				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_ENABLED);
+			}
 			if (cv.PortType==IdSerial)
 				EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_ENABLED);
 			else

@@ -1250,6 +1250,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// added Wait4allMacroCommand (2009.3.23 yutaka)
 	ts->Wait4allMacroCommand =
 		GetOnOff(Section, "Wait4allMacroCommand", FName, FALSE);
+
+	// added DisableAcceleratorMenu (2009.4.6 maya)
+	ts->DisableAcceleratorMenu =
+		GetOnOff(Section, "DisableAcceleratorMenu", FName, FALSE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2152,6 +2156,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Wait4allMacroCommand
 	WriteOnOff(Section, "Wait4allMacroCommand", FName,
 	           ts->Wait4allMacroCommand);
+
+	// DisableAcceleratorMenu
+	WriteOnOff(Section, "DisableAcceleratorMenu", FName,
+	           ts->DisableAcceleratorMenu);
 }
 
 #define VTEditor "VT editor keypad"
