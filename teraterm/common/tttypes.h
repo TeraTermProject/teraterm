@@ -451,6 +451,7 @@ struct tttset {
 	WORD StrictKeyMapping;
 	WORD Wait4allMacroCommand;
 	WORD DisableAcceleratorMenu;
+	WORD ClearScreenOnCloseConnection;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -887,6 +888,7 @@ typedef TMap far *PMap;
  * - At version 4.63, ttset_memfilemap was replaced with ttset_memfilemap_11.
  *   added tttset.Wait4allMacroCommand.
  *   added tttset.DisableAcceleratorMenu.
+ *   added tttset.ClearScreenOnCloseConnection.
  *
  * - At version 4.62, ttset_memfilemap was replaced with ttset_memfilemap_10.
  *   added tttset.DisableMouseTrackingByCtrl.

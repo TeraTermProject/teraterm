@@ -2592,8 +2592,12 @@ void CVTWindow::OnTimer(UINT nIDEvent)
 				::IsWindowEnabled(HVTWin) &&
 				((HTEKWin==NULL) || ::IsWindowEnabled(HTEKWin)) )
 				OnClose();
-			else
+			else {
 				ChangeTitle();
+				if (ts.ClearScreenOnCloseConnection) {
+					OnEditClearScreen();
+				}
+			}
 			break;
 		case IdPrnStartTimer:
 			PrnFileStart();

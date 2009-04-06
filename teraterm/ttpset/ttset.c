@@ -2160,6 +2160,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// DisableAcceleratorMenu
 	WriteOnOff(Section, "DisableAcceleratorMenu", FName,
 	           ts->DisableAcceleratorMenu);
+
+	// ClearScreenOnCloseConnection
+	WriteOnOff(Section, "ClearScreenOnCloseConnection", FName,
+	           ts->ClearScreenOnCloseConnection);
 }
 
 #define VTEditor "VT editor keypad"
