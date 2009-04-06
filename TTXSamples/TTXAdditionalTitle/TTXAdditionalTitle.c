@@ -253,7 +253,7 @@ static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
 
   strncpy_s(pvar->orig_title, sizeof(pvar->orig_title), pvar->ts->Title, _TRUNCATE);
 
-  GetPrivateProfileString(INISECTION, "AddMode", "Off", buff, sizeof(buff), fn);
+  GetPrivateProfileString(INISECTION, "AddMode", "off", buff, sizeof(buff), fn);
   if (_stricmp(buff, "top") == 0) {
     pvar->add_mode = ADD_TOP;
     pvar->ts->AcceptTitleChangeRequest = FALSE;
@@ -277,13 +277,13 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
   WritePrivateProfileString(INISECTION, "AdditionalTitle", pvar->add_title, fn);
   switch (pvar->add_mode) {
     case ADD_NONE:
-      WritePrivateProfileString(INISECTION, "AddMode", "Off", fn);
+      WritePrivateProfileString(INISECTION, "AddMode", "off", fn);
       break;
     case ADD_TOP:
-      WritePrivateProfileString(INISECTION, "AddMode", "Top", fn);
+      WritePrivateProfileString(INISECTION, "AddMode", "top", fn);
       break;
     case ADD_BOTTOM:
-      WritePrivateProfileString(INISECTION, "AddMode", "Bottom", fn);
+      WritePrivateProfileString(INISECTION, "AddMode", "bottom", fn);
       break;
     default:
       ; // not reached

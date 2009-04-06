@@ -111,7 +111,7 @@ static void PASCAL FAR TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
 	/* Call original ReadIniFile */
 	pvar->origReadIniFile(fn, ts);
 
-	GetPrivateProfileString(IniSection, "UseOneSetting", "Off", buff, sizeof(buff), fn);
+	GetPrivateProfileString(IniSection, "UseOneSetting", "off", buff, sizeof(buff), fn);
 	if (_stricmp(buff, "on") == 0) {
 		pvar->UseOneSetting = TRUE;
 		if (pvar->ts->KanjiCode == IdUTF8m) {
@@ -128,7 +128,7 @@ static void PASCAL FAR TTXKanjiMenuWriteIniFile(PCHAR fn, PTTSet ts) {
 	/* Call original WriteIniFile */
 	pvar->origWriteIniFile(fn, ts);
 
-	WritePrivateProfileString(IniSection, "UseOneSetting", pvar->UseOneSetting?"On":"Off", fn);
+	WritePrivateProfileString(IniSection, "UseOneSetting", pvar->UseOneSetting?"on":"off", fn);
 
 	return;
 }

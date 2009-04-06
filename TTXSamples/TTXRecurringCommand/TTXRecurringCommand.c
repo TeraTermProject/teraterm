@@ -305,7 +305,7 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 
 	pvar->origWriteIniFile(fn, ts);
 
-	WritePrivateProfileString(SECTION, "Enable", pvar->enable?"On":"Off", fn);
+	WritePrivateProfileString(SECTION, "Enable", pvar->enable?"on":"off", fn);
 
 	WritePrivateProfileString(SECTION, "Command", pvar->orgCommand, fn);
 
