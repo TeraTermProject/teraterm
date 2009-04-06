@@ -1545,7 +1545,7 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			case ID_FILE_DUPLICATESESSION:
 				// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
 				if (!ts.DisableAcceleratorDuplicateSession)
-					OnControlSendBreak();
+					OnDuplicateSession();
 				return TRUE;
 		}
 		if (ActiveWin==IdVT) {
