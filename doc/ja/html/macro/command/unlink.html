@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>unlink</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>unlink</h1>
+
+<p>
+現在の Tera Term ウインドウと MACRO の間のリンクを断つ。
+</p>
+
+<pre class="macro-syntax">
+unlink
+</pre>
+
+<h2>解説</h2>
+
+<p>
+このコマンド以降、MACRO は非リンク状態になり、その Tera Term ウインドウを制御できなくなる。<br>
+非リンク状態では、connect コマンドによって新しい Tera Term ウィンドウを開き、MACRO をそれにリンクさせることができる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; Tera Term ウインドウを開き、それにリンクする
+connect 'host'
+
+; リンクを断つ
+unlink
+
+; 別の Tera Term ウィンドウを開き、それにリンクする
+connect 'host2'
+</pre>
+
+<h2>参照</h2>
+
+<ul>
+ <li>"<a href="closett.html">closett</a>"</li>
+ <li>"<a href="connect.html">connect</a>"</li>
+ <li>"<a href="cygconnect.html">cygconnect</a>"</li>
+ <li>"<a href="disconnect.html">disconnect</a>"</li>
+ <li>"<a href="testlink.html">testlink</a>"</li>
+ <li><a href="../appendixes/disconnecttiming.html">切断後すぐに接続する場合の注意点</a></li>
+</ul>
+
+</body>
+</html>

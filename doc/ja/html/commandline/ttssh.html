@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>TTSSH コマンドライン</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+
+<h1>TTSSH command line</h1>
+
+<p>
+TTSSHでは以下のコマンドラインオプションが使用できます。
+</p>
+
+
+<h2>オプション</h2>
+
+<dl>
+  <dt id="hostname">&lt;username&gt;@&lt;host&gt;[:&lt;#TCP port&gt;]</dt>
+  <dd>ホスト名指定ではTera Term本体が対応している形式の他に、ttssh拡張としてユーザ名付きも使えます。</dd>
+
+  <dt id="host-url">&lt;scheem&gt;://[&lt;username&gt[:&lt;password&gt;]@]&lt;host&gt;[:&lt;TCP port&gt;][/]</dt>
+  <dd>URL形式も拡張されます。<br>
+      &lt;scheem&gt;には、ssh, ssh1, ssh2, slogin, slogin1, slogin2が使えます。<br>
+      ポート番号が指定されなかった場合は22が使われます。(設定ファイルのTCPPortの値は無視されます)</dd>
+
+  <dt id="f">/f=&lt;file&gt;</dt>
+  <dd>
+    teraterm.iniファイル(file)を読み込む<br>
+    ファイル名が絶対パスでないときは、ttssh.dll からの相対パスと見なされます。
+  </dd>
+
+  <dt id="ssh-f">/ssh-f=&lt;file&gt;</dt>
+  <dd>
+    teraterm.iniファイル(file)を読み込む<br>
+    ファイル名が絶対パスでないときは、ttssh.dll からの相対パスと見なされます。
+  </dd>
+
+  <dt id="ssh-consume">/ssh-consume=&lt;file&gt;</dt>
+  <dd>
+    teraterm.iniファイル(file)の読み込み後、当該ファイルを削除する。<br>
+    ファイル名が絶対パスでないときは、ttssh.dll からの相対パスと見なされます。
+  </dd>
+
+  <dt id="t">/t=&lt;value&gt;</dt>
+  <dd><ul>
+        <li><span class="syntax">value=2</span> SSH を有効にする</li>
+        <li><span class="syntax">value=2以外</span> SSH を無効にする</li>
+      </ul></dd>
+
+  <dt id="nossh">/nossh</dt>
+  <dd>SSH 接続を無効にする</dd>
+
+  <dt id="telnet">/telnet</dt>
+  <dd>SSH 接続を無効にする</dd>
+
+  <dt id="1">/1</dt>
+  <dd>SSH1 で接続する</dd>
+
+  <dt id="ssh1">/ssh1</dt>
+  <dd>SSH1 で接続する</dd>
+
+  <dt id="2">/2</dt>
+  <dd>SSH2 で接続する</dd>
+
+  <dt id="ssh2">/ssh2</dt>
+  <dd>SSH2 で接続する</dd>
+
+  <dt id="ssh-autologin">/ssh-autologin</dt>
+  <dd>空のパスワードでの自動ログインを試みる</dd>
+
+  <dt id="ssh-autologon">/ssh-autologon</dt>
+  <dd>空のパスワードでの自動ログインを試みる</dd>
+
+  <dt id="auth">/auth=&lt;mode&gt;</dt>
+  <dd>&lt;mode&gt; で指定された認証方式で自動ログインを試みる
+      <ul>
+        <li><span class="syntax">password</span> パスワード認証</li>
+        <li><span class="syntax">publickey</span> 公開鍵認証</li>
+        <li><span class="syntax">challenge</span> チャレンジレスポンス(キーボードインタラクティブ)認証</li>
+        <li><span class="syntax">pageant</span> Pageant を用いた公開鍵認証</li>
+      </ul></dd>
+
+  <dt id="user">/user=&lt;username&gt;</dt>
+  <dd>ユーザ名を指定する</dd>
+
+  <dt id="passwd">/passwd=&lt;password&gt;</dt>
+  <dd>パスワードを指定する</dd>
+
+  <dt id="keyfile">/keyfile=&lt;file&gt;</dt>
+  <dd>
+    秘密鍵を指定する<br>
+    ファイル名が絶対パスでないときは、ttssh.dll からの相対パスと見なされます。
+  </dd>
+
+  <dt id="ask4passwd">/ask4passwd</dt>
+  <dd>
+    自動ログインをせず、パスワードを聞く<br>
+    /auth=&lt;mode&gt; は、認証方式のみを意味するようになる
+  </dd>
+
+  <dt id="ssh-l">/ssh-L&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;[:1]</dt>
+  <dd>ローカルポート(&lt;port1&gt;)からリモート側ホスト(&lt;host&gt;)のポート(&lt;port2&gt;)へポートフォワーディングする<br>
+      リモート側のポート番号のあとに":1"がある場合、この転送設定において他のホストからの接続を受け入れる</dd>
+
+  <dt id="ssh-r">/ssh-R&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
+  <dd>リモートポート(&lt;port1&gt;)からローカル側ホスト(&lt;host&gt;)のポート(&lt;port2&gt;)へポートフォワーディングする</dd>
+
+  <dt id="ssh-x">/ssh-X</dt>
+  <dd>X11をポートフォワーディングする</dd>
+
+  <dt id="ssh-acceptall">/ssh-acceptall</dt>
+  <dd>ローカルの転送ポートは、他のホストからの接続を受け入れる</dd>
+
+  <dt id="ssh-noagent">/ssh-A</dt>
+  <dd>エージェント転送を有効にする</dd>
+
+  <dt id="ssh-agent">/ssh-a</dt>
+  <dd>エージェント転送を無効にする</dd>
+
+  <dt id="ssh-v">/ssh-v</dt>
+  <dd>ログレベルを VERBOSE モードにする</dd>
+</dl>
+
+
+<h2 id="example1">例</h2>
+
+<pre>
+ttermpro.exe server1:22 /ssh /ssh-L30025:smtpsrv1:25 /ssh-L30110:pop3srv1:110
+ttermpro.exe server2:22 /ssh /ssh-X
+ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest
+ttermpro.exe server4:22 /ssh /2 /auth=publickey /user=admin /keyfile=pathofkeyfile /ask4passwd
+ttermpro.exe ssh://user:password@server5/ /auth=password
+</pre>
+
+
+<h2 id="example2">例: Pageantとの連携</h2>
+
+<p>
+<a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">Pageant</a>をスタートアップフォルダへ設置させます。
+</p>
+
+<pre>
+C:\usr\pageant.exe c:\usr\Identity.ppk
+</pre>
+
+<p>
+Tera TermからPageantを利用して、公開鍵認証による接続をするには以下のようにします。
+</p>
+
+<pre>
+ttermpro.exe shell.sourceforge.jp:22 /ssh /auth=pageant /user=yutaka
+</pre>
+
+</body>
+</html>

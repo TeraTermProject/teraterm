@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>quickvansend</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>quickvansend</h1>
+
+<p>
+Quick-VAN プロトコルでファイルを送信する。
+</p>
+
+<pre class="macro-syntax">
+quickvansend &lt;filename&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;filename&gt; を Quick-VAN プロトコルで送信する。<br>
+送信が終わるまで次のコマンドは実行されない。<br>
+ファイルが正しく転送された場合、システム変数 result に1が格納される。それ以外の場合、 result に0が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+quickvansend 'readme.txt'
+</pre>
+
+</body>
+</html>

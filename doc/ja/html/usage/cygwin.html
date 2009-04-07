@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Cygwin接続</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Cygwin接続</h1>
+
+<p>
+ローカルの Cygwin 環境に Tera Term から接続できます。<br>
+<a href="http://www.cygwin.com/">Cygwin</A> は、Windows 上で Linux のような環境を提供するソフトウェアです。<br>
+Cygwin は、オープンソースソフトウェアです。
+</p>
+
+<p>
+ローカルのCygwinへ接続することができます。内部でCygtermを利用しています。<br>
+Fileメニューから「Cygwin connection」を選択する、もしくはAlt+Gを押下すると、Cygwinへ接続します。<br>
+あらかじめ、teraterm.iniファイルの[Tera Term]セクションに、Cygwinのインストールパスを設定しておく必要があります。<br>
+フォーマットは「ドライブ名：￥ディレクトリ」です。
+</p>
+
+<pre>
+----------------------------
+; Cygwin install path
+CygwinDirectory = c:\cygwin
+----------------------------
+</pre>
+
+<p>
+※注意：<br>
+cygtermがうまく起動しない場合は、cygtermをビルドし直してください。<br>
+最新のソースコードは <a href="http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/ttssh2/cygterm/">sourceforge.jp の ViewCVS</a> からダウンロードできます。
+</p>
+
+<p>
+cygterm.exe から起動された状態で設定保存 [Setup][Save setup] を行わないよう注意してください。TCP/IP設定の Telnetポート番号が 23 以外で保存され、通常の Telnet目的の実行時に接続できず、慌てることになってしまいます。<br>
+TCP/IP Port# に 23 を指定して設定保存し直せば元に戻ります。
+</p>
+
+
+</body>
+</html>

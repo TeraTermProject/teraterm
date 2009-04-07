@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>SSH Authentication（[Setup] メニュー）</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH Authentication（[Setup] メニュー）</h1>
+
+    <h2>"TTSSH: Authentication Setup" ダイアログボックス</h2>
+    <dl>
+      <dt>User name</dt>
+      <dd>
+        SSH 接続で用いるユーザ名を指定します。
+      </dd>
+
+      <dt>Use plain passwd to log in</dt>
+      <dd>
+        パスワード認証を用いる場合に指定します。
+      </dd>
+
+      <dt>Use RSA/DSA key to login</dt>
+      <dd>
+        あらかじめ作成した RSA/DSA 鍵を用いた認証方法を選択します。
+      </dd>
+
+      <dt>Use rhost to login (SSH1)</dt>
+      <dd>
+        ホストの設定で rhost が利用できる場合に選択します。
+      </dd>
+
+      <dt>
+        Use challenge/response to log in (SSH1:TIS, SSH2:keyboard-interactive)
+      </dt>
+      <dd>
+        チャレンジ/レスポンス認証を用いる場合に指定します。<br>
+        SSH2 接続の場合では keyboard-interactive が使用されます。この場合、通信路にはパスワードそのものは流れません。（通常のパスワード認証の場合は、暗号化された上でパスワードそのものが流れます。）
+      </dd>
+
+      <dt>
+        Use Pageant
+      </dt>
+      <dd>
+        Pageant と通信して RSA/DSA 鍵を用いた認証をする場合に指定します。<br>
+        TTSSH は秘密鍵ファイルを扱いません。
+      </dd>
+
+      <dt>
+        Check the supported authentication methods before login (SSH2)
+      </dt>
+      <dd>
+        ログイン前にサーバで有効な認証方式を確認し、サポートされていない認証方式を無効にする。<br>
+        認証ダイアログの表示と同時に、バックグラウンドでユーザ名のみを使用してサーバにアクセスする。このためには接続開始時にユーザ名が確定している必要がある。デフォルトユーザ名またはコマンドラインによるユーザ名がある場合はこれが使用される。<br>
+        また、ユーザ名を入力したあとフォーカスを失った場合は、ユーザ名への入力内容が使用され、その後ユーザ名の変更はできなくなる。これは SSH2 の仕様のため。
+      </dd>
+    </dl>
+  </body>
+</html>

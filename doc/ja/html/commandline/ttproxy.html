@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>TTProxy コマンドライン</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>TTProxy コマンドライン</h1>
+
+<h2>形式</h2>
+<p>
+TTProxy では、以下のコマンドラインパラメータが使用できます。
+</p>
+
+<pre class="syntax">
+-proxy=protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport
+protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
+</pre>
+
+<dl>
+  <dt id="protocol">protocol</dt>
+  <dd>プロキシのプロトコル<br>以下の種類が使用可能です。
+    <ul>
+      <li>http</li>
+      <li>telnet</li>
+      <li>socks4</li>
+      <li>socks5</li>
+      <li>ssl</li>
+      <li>http+ssl</li>
+      <li>telnet+ssl</li>
+      <li>socks4+ssl</li>
+      <li>socks5+ssl</li>
+    </ul></dd>
+
+  <dt id="proxyserver">proxyserver</dt>
+  <dd>プロキシサーバ</dd>
+
+  <dt id="proxyport">proxyport</dt>
+  <dd>プロキシサーバのポート番号</dd>
+
+  <dt id="realhost">realhost</dt>
+  <dd>実際に接続したいサーバ</dd>
+
+  <dt id="user">user</dt>
+  <dd>プロキシで認証が必要な場合のユーザ名</dd>
+
+  <dt id="password">password</dt>
+  <dd>プロキシで認証が必要な場合のパスワード</dd>
+</dl>
+
+<h2 id="example">使用例</h2>
+<pre>
+ttermpro.exe -proxy=socks5://user:pass@proxy:1080 sshserver /ssh
+ttermpro.exe -proxy=telnet://proxy:8023 telnetserver:23 /nossh
+ttermpro.exe http+ssl://proxy:8080/sshserver /ssh
+</pre>
+
+<h2 id="notes">注意</h2>
+<p>
+以下の形式は使用できません。
+</p>
+<pre>
+protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost:ポート番号
+</pre>
+
+<p>
+Tera Term が処理する telnet://server&lt;:port&gt; 形式のパラメータと競合するため、プロキシサーバを指定するために以下の形式を使用することはできなくなりました。
+</p>
+<pre>
+protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strscan</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strscan</h1>
+
+<p>
+部分文字列の位置を返す
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strscan &lt;string&gt; &lt;substring&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列 &lt;string&gt; の中に、 部分文字列  &lt;substring&gt; が含まれているかどうか調べる。<br>
+もし、  &lt;substring&gt; が見つかった場合、その位置（1オリジン）がシステム変数 result に格納される。<br>
+&lt;substring&gt; が複数含まれている場合、最初のものの位置が格納される。もし、 &lt;substring&gt; が見つからなかった場合、 result に0が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strscan 'tera term' 'term'
+; result の値は6
+int2str valstr result
+messagebox valstr 'result'
+</pre>
+
+<pre class="macro-example">
+; 16進文字列を16進および2進へ変換する
+basenum='0060E3da'
+base=16
+call base2dec
+int2str sdec decnum
+messagebox sdec 'decnum'
+base=2
+call dec2base
+messagebox basenum 'basenum'
+end
+
+:dec2base
+basenum=''
+tmp=decnum      ;modified so not destructive of decnum
+while tmp>0
+   strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
+   strconcat basedig basenum
+   basenum=basedig
+   tmp=tmp/base
+endwhile
+return
+
+:base2dec
+decnum=0
+strlen basenum
+len=result
+for i 1 len
+   strcopy basenum i 1 basedig
+   decnum=decnum*base
+   strscan '0123456789ABCDEFabcdef' basedig
+   if result>16 result=result-6      ;take care of lower case
+   decnum=decnum+result-1
+next
+return
+</pre>
+
+
+<pre class="macro-example">
+; IPアドレスのネットワークアドレスとサブネットマスクを求める
+ip='192.168.1.189'
+sn='255.255.255.248'
+bits=0          ;calculate bits & first address in sn
+bitstr='000 128 192 224 240 248 252 254 255'    ;lookup table for # bits
+do
+    str2int isn sn
+    int2str stmp isn
+    strscan bitstr stmp     ;use lookup table to find bits
+    bits=bits+(result-1)/4  
+    str2int tmp ip      ;find net by bitwise AND of ip and mask
+    sprintf2 net '%s%d' net tmp&isn
+    strscan sn '.'
+    strcopy sn result+1 999 sn
+    strscan ip '.'
+    strcopy ip result+1 999 ip
+    if result>0 strconcat net '.'           
+loop while result>0
+messagebox bits 'bits'
+messagebox net 'net'
+</pre>
+
+
+</body>
+</html>

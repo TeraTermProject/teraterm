@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Window ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Window ([Setup] メニュー)</h1>
+
+    <h2>"Window setup" ダイアログボックス</h2>
+    <dl>
+      <dt>Title</dt>
+      <dd>
+	ウインドウのタイトル。
+      </dd>
+
+      <dt>Cursor shape</dt>
+      <dd>
+	カーソルの形。Block, Vertical line, Horizontal line の3つから選べます。
+      </dd>
+
+      <dt>Hide title bar</dt>
+      <dd>
+	タイトルバーとメニューバーを消します。
+	ウィンドウを移動させるには Alt
+	キーを押しながら左マウスボタンでウィンドウをドラッグしてください。<br>
+	ウインドウを最小化させるには Alt キーを押しながら右マウスボタンを押してください。
+	Ctrl キーを押しながら左マウスボタンを押すとポップアップメニューが現れます。
+      </dd>
+
+      <dt>Hide menu bar</dt>
+      <dd>
+	メニューバーを消します。
+	Ctrl キーを押しながら左マウスボタンを押すとポップアップメニューが現れます。
+      </dd>
+
+      <dt>16 Colors (PC style)</dt>
+      <dd>
+	PC形式の16色モードに対応します。
+	このモードでは、Bold(強調)/Blink(点滅)属性が文字/背景色の属性の一部として使用され、
+	エスケープシーケンスにより指定可能な文字/背景色が8色から16色に増えます。
+      </dd>
+
+      <dt>16 Colors (aixterm style)</dt>
+      <dd>
+	aixterm形式の16色モードに対応します。このモードでは、
+	エスケープシーケンスにより指定可能な文字/背景色が8色から16色に増えます。<br>
+	注:このモードの背景色を色番号9に変更するシーケンス(&lt;CSI&gt;100m)は、
+	rxvt形式の文字/背景色のリセットのシーケンスと衝突しています。そのため、
+	このモードを有効にすると、&lt;CSI&gt;100mの動作が今までと違うものになります。
+        &lt;CSI&gt;100mが今まで通り文字/背景色のリセットとして動作して欲しい場合は、
+	このモードをOffにしてください。
+      </dd>
+
+      <dt>256 Colors (xterm style)</dt>
+      <dd>
+	xterm形式の256色モードに対応します。このモードでは、
+	エスケープシーケンスにより指定可能な文字/背景色が8色から256色に増えます。
+	また、エスケープシーケンスによる色テーブルの変更が行えるようになります。
+      </dd>
+
+      <dt>Scroll buffer</dt>
+      <dd>
+	スクロールバッファーを使用可能にします。
+	また、スクロールバッファの行数が設定できます。
+	行数は 10000 以上には設定できません。
+	メモリが足りない場合は適当に減らされます。<br>
+	「<a href="../setup/teraterm-term.html#linebuf">ラインバッファ</a>」も参照してください。
+      </dd>
+
+      <dt>Color</dt>
+      <dd>
+	<dl>
+	  <dt>Text</dt>
+	  <dd>
+	    文字の色
+	  </dd>
+
+	  <dt>Background</dt>
+	  <dd>
+	    背景の色
+	  </dd>
+
+	  <dt>Attribute</dt>
+	  <dd>
+	    色を設定したい文字の属性 (Normal, Bold, Blink, Reverse, URL)<br>
+        注：現在 URL 属性を表示する機能は無効になっています。
+	  </dd>
+
+	  <dt>Reverse</dt>
+	  <dd>
+	    文字の色と背景の色を交換します。
+	  </dd>
+
+	  <dt>R, G, B</dt>
+	  <dd>
+	    指定した文字属性の色のRGB値を指定します。
+	  </dd>
+
+	  <dt>Always use Normal text's BG</td>
+	  <dd>
+	    Onにすると、Bold, Blink, URL属性の背景色の設定は無視され、
+	    Normalの背景色が使われるようになります。
+	  </dd>
+	</dl>
+      </dd>
+    </dl>
+  </body>
+</html>

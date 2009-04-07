@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>通信 (Tera Term 設定ファイル)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="maxport">シリアルポート番号の最大値</a></h1>
+
+<p>
+[File] New connection および [Setup] Serial port ダイアログボックスで表示されるシリアルポート番号の最大値 (COMn の最大値 n) を指定するには、設定ファイルの [Tera Term] セクションの MaxComPort 行を、
+</p>
+
+<pre>
+MaxComPort=&lt;シリアルポート番号の最大値&gt;
+</pre>
+
+<p>
+のように変更してください。たとえ実際に使用可能なポート番号の最大値が4より小さくても、3以下の値は指定できません。
+</p>
+
+<pre>
+省略時:
+MaxComPort=4
+</pre>
+
+
+<h1><a name="clearcom">シリアルポートのバッファをクリアしない</a></h1>
+
+<p>
+Tera Termの初期設定ではシリアルポートを開く時にシリアルポートのバッファの内容を消去します。
+</p>
+
+<p>
+設定ファイルの [Tera Term] セクションの ClearComBuffOnOpen 行を、
+</p>
+
+<pre>
+ClearComBuffOnOpen=off
+</pre>
+
+<p>
+のように変更すると、シリアルポートを開くときにバッファをクリアしません。
+</p>
+
+<pre>
+省略時:
+ClearComBuffOnOpen=on
+</pre>
+
+
+<h1><a name="confirm">TCP/IP 回線切断の確認をしない</a></h1>
+
+<p>
+Unix 等のホストに telnet でログインしている状態で、回線を強制的に切断すると、プロセスが残ったままになることがあります。やむを得ない場合を除き、正しい方法でログアウトするようにしてください。
+</p>
+
+<p>
+Tera Term の初期設定では TCP/IP 接続時に システムメニューの「閉じる」コマンドまたは [File] メニューの Exit コマンドで回線を強制的に切断するときに、"Disconnect ?" というメッセージを表示してユーザーに確認をします。
+</p>
+
+<p>
+設定ファイルの [Tera Term] セクションの ConfirmDisconnect 行を、
+</p>
+
+<pre>
+ConfirmDisconnect=off
+</pre>
+
+<p>
+のように変更すると、回線を強制切断するときにユーザーに確認をしません。
+</p>
+
+<pre>
+省略時:
+ConfirmDisconnect=on
+</pre>
+
+
+<h1><a name="telbin">Telnet のバイナリオプション</a></h1>
+
+<p>
+ホストに telnet 接続し、ファイル転送 (XMODEM 等)で CR 文字を送出する場合、Tera Term の初期設定では CR+NUL ($0D $00) に変換してから送出します。バイナリオプションで telnet 接続すると、このような変換はおこないません。
+</p>
+
+<p>
+設定ファイルの [Tera Term] セクションの TelBin 行を、
+</p>
+
+<pre>
+TelBin=on
+</pre>
+
+<p>
+のように変更すると、Telnet 接続するときバイナリオプションを用います(ホストが対応していれば)。
+</p>
+
+<p>
+また、設定ファイルは書き換えずに、<a href="../commandline/teraterm.html">コマンドライン</a>に /B オプションをつけても、バイナリオプションを指定できます。
+</p>
+
+<pre>
+省略時:
+TelBin=off
+</pre>
+
+
+<h1><a name="telecho">Telnet のエコーオプション</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの TelEcho 行を、
+</p>
+
+<pre>
+TelEcho=on
+</pre>
+
+<p>
+のように変更すると、Tera Term はホストのエコー(リモートエコー)の状態を [Setup] Terminal ダイアログボックスで設定される "Local echo" の状態に応じて変更することを試みます。もし、 "Local echo" が on (off) ならば、Tera Term はリモートエコーを off (on) にすることを試み、ホストと Tera Term で二重エコーしたり、エコーをまったくしない状態になることを防ごうとします。この機能はホストが telnet のエコーオプションに対応していないと働きません。
+</p>
+
+<pre>
+省略時:
+TelEcho=off
+</pre>
+
+
+<h1><a name="tellog">Telnet のログ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの TelLog 行を、
+</p>
+
+<pre>
+TelLog=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間の telnet の option negotiation の内容をファイル TELNET.LOG に記録します。
+</p>
+
+<pre>
+省略時:
+TelLog=off
+</pre>
+
+
+<h1><a name="port/nontelnet">Telnet 用ポート番号 / 非 telnet TCP/IP 接続用の端末設定</a></h1>
+
+<h2><a name="port">Telnet 用ポート番号</a></h2>
+
+<p>
+<a href="../commandline/teraterm.html">コマンドライン</a>、または <a href="../menu/file-new.html">[File] New connection</a> ダイアログボックスでは、TCP/IP 接続に使用される TCP ポート番号 (&lt;TCP port#&gt;) と telnet フラグ (&lt;telnet flag&gt;) を指定することができます。コマンドラインでこれらのパラメーターが省略された場合は、Tera Term 設定ファイルに書かれている設定値が使用されます。
+</p>
+
+<p>
+&lt;telnet flag&gt; が 1 (on) で、かつ &lt;TCP port#&gt; が 23 の場合だけ、Tera Term はホストに接続した直後に、自発的に telnet コマンドをホストに送信し option negotiation を開始します。
+</p>
+
+<p>
+この telnet のための特別なポート番号 23 は、設定ファイルの [Tera Term] セクションの TelPort 行で以下のように変更することができます。
+</p>
+
+<pre>
+TelPort=&lt;telnet port#&gt;
+</pre>
+
+<pre>
+省略時:
+TelPort=23
+</pre>
+
+<p>
+&lt;telnet flag&gt; と &lt;TCP port#&gt; が何であれ Tera Term はホストから送られてきた telnet コマンドに応答することができます。(但し、<a href="#detecttelnet">TelAutoDetect</a>がoffの時は除きます。)
+</p>
+
+<h2><a name="nontelnet">非 telnet TCP/IP 接続用の端末設定</a></h2>
+
+<p>
+Telnet プロトコルに対応していないホスト(通常 23 以外のポート番号を使用)に TCP/IP 接続する場合、ローカルエコーを on に、送信する改行コードを CR+LF にする必要がある場合があります。設定ファイルの [Tera Term] セクションの TCPLocalEcho と TCPCRSend 行を、
+</p>
+
+<pre>
+TCPLocalEcho=on
+TCPCRSend=CRLF    (CR も指定可能)
+</pre>
+
+<p>
+のように変更すると、&lt;telnet flag&gt; が 0 (off) の場合、または &lt;TCP port#&gt; が &lt;telnet port#&gt; でない場合に、接続直後に、ローカルエコーを on に、送信改行コードを CR+LF に自動的に変更します。それ以外の場合は [Setup] Terminal での設定値が使用されます。これらのオプションによって、一つの設定ファイルで telnet 接続と非 telnet 接続の両方に対応することが可能となります。
+</p>
+
+<pre>
+省略時:
+TCPLocalEcho=off
+; (このオプションは使わず、常に
+; [Setup] Terminal の設定値が使用される)
+TCPCRSend=
+; (このオプションは使わず、常に
+; [Setup] Terminal の設定値が使用される)
+</pre>
+
+<h2><a name="detecttelnet">Telnetコマンド自動検出の無効化</a></h2>
+
+<p>
+非 Telnet 接続時でも、Tera Term はホストから送られてきた telnet コマンドに応答し、以降の通信を Telnet 接続として扱うようになります。<br>
+しかし、Tera Term 側から文字'0xFF'を送ってそれがエコーバックされた時に、そのエコーバックされた文字列を telnet コマンドとみなしてしまい、以降の通信が Telnet 接続として扱われてしまう事があります。 
+</p>
+
+<p>
+設定ファイルの [Tera Term] セクションの TelAutoDetect 行を、
+</p>
+
+<pre>
+TelAutoDetect=off
+</pre>
+
+<p>
+のように変更すると、相手からtelnetコマンドが送られて来てもtelnetコマンドとして扱わないようになります。
+</p>
+
+<pre>
+省略時:
+TelAutoDetect=on
+</pre>
+
+</BODY>
+</HTML>

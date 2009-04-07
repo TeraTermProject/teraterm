@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>ユーザー・ショートカット・キー</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>ユーザー・ショートカット・キー</h1>
+
+<p>
+<A HREF="../../setup/keyboard.html">キーボード設定ファイルの</A>[Shortcut keys] と [VT function keys] セクションの項目を書き換えると、以下のショートカット・キーを自分の好きなキーに割り当てることができます。詳しくは、<A HREF="../../reference/keycode.txt">KEYCODE.TXT</A>を読んでください。
+</p>
+
+<pre>
+[Shortcut keys]
+セクションの項目    機能                                初期設定
+<HR>
+EditCopy            [Edit] Copy コマンド*1)             Ctrl+Insert
+EditPaste           [Edit] Paste コマンド *1)           Shift+ nsert
+EditPasteCR         [Edit] Paste&lt;CR&gt; コマンド *1)       なし
+EditCLS             [Edit] Clear screen コマンド        なし
+EditCLB             [Edit] Clear buffer コマンド        なし
+ControlOpenTEK      [Control] Open TEK コマンド         なし
+ControlCloseTEK     [Control] Close TEK コマンド        なし
+LineUp              一行スクロールアップ                Ctrl+↑
+LineDown            一行スクロールダウン                Ctrl+↓
+PageUp              一ページスクロールアップ            Ctrl+PageUp
+PageDown            一ページスクロールダウン            Ctrl+PageDown
+BuffTop             バッファの先頭へスクロール          Ctrl+Home
+BuffBottom          バッファの最後へスクロール          Ctrl+End
+NextWin             次の Tera Term ウィンドウへ移動     Ctrl+Tab
+PrevWin             前の Tera Term ウィンドウへ移動     Ctrl+Shift+Tab
+LocalEcho           ローカルエコーを on/off にする。    なし
+
+
+[VT function keys]
+セクションの項目    機能                                初期設定
+<HR>
+Hold                受信ポートをロック/ロック解除       なし
+Print               [File] Print コマンド *1)           なし
+Break               ブレーク信号送出 *1)                なし
+</pre>
+
+<p>
+*1) これらの機能には<A HREF="../keyboard.html">システム・ショートカット・キー</A>が割り当てられています。
+</p>
+
+<p>
+例えば、Ctrl+V を [Edit] Paste に割り当てたい場合は、キーボード設定ファイルの [Shortcut keys] セクションで、
+</p>
+
+<pre>
+EditPaste=1071
+</pre>
+
+<p>
+としてください (IBM PC/AT キーボードの場合)。
+</p>
+
+<p>
+また [User keys] セクションでは、ユーザーキーを使ってすべてのメニューコマンドに対してショートカット・キーを設定することができます
+</p>
+
+</BODY>
+</HTML>

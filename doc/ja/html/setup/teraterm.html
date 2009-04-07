@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Tera Term 設定ファイル</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Tera Term 設定ファイル</h1>
+
+<p>
+起動時または、<a href="../menu/setup-restore.html">[Setup] Restore setup</a>を実行したとき、設定ファイルの内容にしたがい Tera Term が初期化されます。<br>
+<a href="../commandline/teraterm.html">コマンドライン</a>で設定ファイル名を指定することができます。ファイル名の拡張子を省略した場合は、".INI"であるとみなされます。<br>
+コマンドラインでファイル名を指定しない場合、"My Documents" に TERATERM.INI が存在すれば "My Documents" の TERATERM.INI が読み込まれ、存在しない場合は ttermpro.exe と同じディレクトリの TERATERM.INI が読み込まれます。
+</p>
+
+<p>
+現在の設定を設定ファイルに保存するには、<a href="../menu/setup-save.html">[Setup] Save setup</a>を実行してください。
+</p>
+
+<h2>Tera Term 設定ファイルの特別オプション</h2>
+
+<p>
+以下の設定をするには、ユーザーは Tera Term 設定ファイルを直接編集しなければなりません。
+</p>
+
+<h3>ターミナルエミュレーション</h3>
+<ul>
+ <li><a href="teraterm-term.html#backwrap">バック・ラップ (back wrap)</a></li>
+ <li><a href="teraterm-term.html#beep">BEL 文字受信時の動作</a></li>
+ <li><a href="teraterm-term.html#C1">C1 制御文字($80-$9F)を使用しない</a></li>
+ <li><a href="teraterm-term.html#C1send">C1 制御文字($80-$9F)を送信に使用する</a></li>
+ <li><a href="teraterm-term.html#kout">JIS 漢字送出の時、正しくない "kanji-out" シーケンス ^[(H を使用可能にする</a></li>
+ <li><a href="teraterm-term.html#kctrl">2バイト文字(漢字)の1バイト目と2バイト目の間に制御文字等が入った場合、1バイト目を無効にする</a></li>
+ <li><a href="teraterm-term.html#displayall">受信した文字をすべて表示するようにする</a></li>
+ <li><a href="teraterm-term.html#statusline">ステータスラインを使用不可にする</a></li>
+ <li><a href="teraterm-term.html#tekgin">TEK GIN report のマウスコードの値を設定する</a></li>
+ <li><a href="teraterm-term.html#vttab">行末のタブ表示を VT 端末互換にする</a></li>
+ <li><a href="teraterm-term.html#ScrollWindowClearScreen">画面クリア時にカレントバッファをスクロールアウトさせるかどうか設定する</a></li>
+ <li><a href="teraterm-term.html#UnknownUnicodeCharacterAsWide">対応していないUnicodeの文字をワイド文字として扱うか設定する</a></li>
+ <li><a href="teraterm-term.html#UnicodeDecSpMapping">UnicodeからDEC特殊文字へのマッピングを設定する</a></li>
+ <li><a href="teraterm-term.html#StrictKeyMapping">ファンクションキー等のデフォルトの動作</a></li>
+</ul>
+
+<h3>ウィンドウ</h3>
+<ul>
+ <li><a href="teraterm-win.html#autocopy">自動的な文字列コピーをしない</a></li>
+ <li><a href="teraterm-win.html#delimiter">ダブルクリックによる単語選択の区切り文字</a></li>
+ <li><a href="teraterm-win.html#popup">ポップアップメニューを使用不可にする</a></li>
+ <li><a href="teraterm-win.html#menubar">"Show menu bar" コマンドを隠す</a></li>
+ <li><a href="teraterm-win.html#lang">言語モードの選択を不可にする</a></li>
+ <li><a href="teraterm-win.html#scrollbuf">スクロールバッファーの最大行数</a></li>
+ <li><a href="teraterm-win.html#blink">点滅しないカーソル</a></li>
+ <li><a href="teraterm-win.html#scrollline">一度にスクロールする最大の行数を設定する</a></li>
+ <li><a href="teraterm-win.html#textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a></li>
+ <li><a href="teraterm-win.html#title">タイトルの形式</a></li>
+ <li><a href="teraterm-win.html#color">白色および黒色属性の文字の実際の色</a></li>
+ <li><a href="teraterm-win.html#space">文字(行)間にすきまをあける</a></li>
+ <li><a href="teraterm-win.html#window">[Window] メニューを隠す</a></li>
+ <li><a href="teraterm-win.html#eterm">Eterm風半透明ウィンドウ</a></li>
+ <li><a href="teraterm-win.html#maximize">ウィンドウ最大化時のスクロール方法</a></li>
+ <li><a href="teraterm-win.html#killfocus">フォーカスが外れた時にもカーソルを表示する</a></li>
+ <li><a href="teraterm-win.html#savevtwinpos">ウィンドウ位置を保存する</a></li>
+ <li><a href="teraterm-win.html#WindowIcon">ウィンドウアイコンを変更する</a></li>
+</ul>
+
+<h3>通信</h3>
+<ul>
+ <li><a href="teraterm-com.html#maxport">シリアルポート番号の最大値</a></li>
+ <li><a href="teraterm-com.html#clearcom">シリアルポートのバッファをクリアしない</a></li>
+ <li><a href="teraterm-com.html#confirm">TCP/IP 回線切断の確認をしない</a></li>
+ <li><a href="teraterm-com.html#telbin">Telnet のバイナリオプション</a></li>
+ <li><a href="teraterm-com.html#telecho">Telnet のエコーオプション</a></li>
+ <li><a href="teraterm-com.html#tellog">Telnet のログ</a></li>
+ <li><a href="teraterm-com.html#port/nontelnet">Telnet 用ポート番号 / 非 telnet 接続用端末設定</a></li>
+</ul>
+
+<h3>ファイル転送</h3>
+<ul>
+ <li><a href="teraterm-trans.html#rename">受信したファイルの名前を自動的に変更して上書きを避ける</a></li>
+ <li><a href="teraterm-trans.html#bpauto">B-Plus 受信の自動起動</a></li>
+ <li><a href="teraterm-trans.html#bpesc">B-Plus ですべての制御文字をエスケープする</a></li>
+ <li><a href="teraterm-trans.html#bplog">B-Plus のログ</a></li>
+ <li><a href="teraterm-trans.html#kmlog">Kermit のログ</a></li>
+ <li><a href="teraterm-trans.html#qvlog">Quick-VAN のログ</a></li>
+ <li><a href="teraterm-trans.html#qvwinsize">Quick-VAN のウィンドウサイズ</a></li>
+ <li><a href="teraterm-trans.html#xmlog">XMODEM のログ</a></li>
+ <li><a href="teraterm-trans.html#xmodemrecv">XMODEM の受信コマンド</a></li>
+ <li><a href="teraterm-trans.html#zmauto">ZMODEM 受信の自動起動</a></li>
+ <li><a href="teraterm-trans.html#zmparam">ZMODEM 送信の設定</a></li>
+ <li><a href="teraterm-trans.html#zmesc">ZMODEM ですべての制御文字をエスケープする</a></li>
+ <li><a href="teraterm-trans.html#zmlog">ZMODEM のログ</a></li>
+ <li><a href="teraterm-trans.html#zmodemrecv">ZMODEM の受信コマンド</a></li>
+ <li><a href="teraterm-trans.html#filter">送信ダイアログのファイル名フィルタ</a></li>
+ <li><a href="teraterm-trans.html#draganddrop">ドラッグ&ドロップによるファイル送信の確認</a></li>
+</ul>
+
+<h3>印刷</h3>
+<ul>
+ <li><a href="teraterm-prn.html#delay">エスケープシーケンスによる印刷の遅延</a></li>
+ <li><a href="teraterm-prn.html#direct">エスケープシーケンスによる印刷で直接ポートに出力</a></li>
+ <li><a href="teraterm-prn.html#formfeed">エスケープシーケンスによる印刷時の改ページを禁止する</a></li>
+ <li><a href="teraterm-prn.html#font">プリンタフォントの指定</a></li>
+ <li><a href="teraterm-prn.html#margin">ページ余白の指定</a></li>
+ <li><a href="teraterm-prn.html#scale">印刷の倍率</a></li>
+</ul>
+
+<h3>その他</h3>
+<ul>
+ <li><a href="teraterm-misc.html#beep">接続時のビープ音</a></li>
+ <li><a href="teraterm-misc.html#IME">IME (日本語入力システム)に関する設定</a></li>
+ <li><a href="teraterm-misc.html#macro">起動時にマクロを実行</a></li>
+ <li><a href="teraterm-misc.html#UILang">ユーザインタフェースの言語ファイル</a></li>
+ <li><a href="teraterm-misc.html#broadcast">ブロードキャストコマンドの履歴の保存数</a></li>
+ <li><a href="teraterm-misc.html#mousewheel">アプリケーションカーソルモード時のマウスホイールの動作</a></li>
+ <li><a href="teraterm-misc.html#hostdlg">起動時の "New Connection" ダイアログの表示</a></li>
+ <li><a href="teraterm-misc.html#DisablePasteMouseMButton">マウスの中ボタンによる貼り付けを有効にする</a></li>
+ <li><a href="teraterm-misc.html#DisableMenuSendBreak">メニューの Send break を無効にする</a></li>
+ <li><a href="teraterm-misc.html#ClearScreenOnCloseConnection">切断時に画面をクリアする</a></li>
+ <li><a href="teraterm-misc.html#DisableAcceleratorDuplicateSession">Duplicate session のアクセラレータキーを無効にする</a></li>
+</ul>
+
+</body>
+</html>

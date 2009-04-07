@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>if, then, elseif, else, endif</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>if, then, elseif, else, endif</h1>
+
+<p>
+条件分岐
+</p>
+
+<h2>1) 書式1</h2>
+
+<pre class="macro-syntax">
+if &lt;int&gt; &lt;statement&gt;
+</pre>
+
+<h3>解説</h3>
+
+<p>
+もし  &lt;int&gt; が0以外ならば、コマンド &lt;statement&gt; を実行する。
+</p>
+
+<h3>例</h3>
+
+<pre class="macro-example">
+; もし A&gt;1 ならば、':label' へ飛ぶ。
+if A&gt;1 goto label
+
+; もし result&lt;&gt;0 ならば、A に0を代入。
+if result A=0
+</pre>
+
+
+<h2>2) 書式2</h2>
+
+<pre class="macro-syntax">
+if &lt;int 1&gt; then
+  ...
+  (&lt;int 1&gt; が真(0以外)の場合に実行されるコマンド)
+  ...
+[elseif &lt;int 2&gt; then]
+  ...
+  (&lt;int 1&gt; が偽(0)で、&lt;int 2&gt;が真の場合に実行されるコマンド)
+  ...
+[elseif &lt;int N&gt; then]
+  ...
+  (&lt;int 1&gt;, &lt;int 2&gt;,.., &lt;int N-1&gt; がすべて偽で、&lt;int N&gt; が真の場合に実行されるコマンド)
+  ...
+[else]
+  ...
+  (上の条件すべてが偽の場合に実行されるコマンド)
+  ...
+endif
+</pre>
+
+<h3>解説</h3>
+
+<p>
+'then' は 'if' と 'elseif' 行の最後になければならない。<br>
+'elseif' と 'else' はなくてもよい。<br>
+'endif' は必ず必要。
+</p>
+
+<h3>例</h3>
+
+<pre class="macro-example">
+if a=1 then
+  b = 1
+  c = 2
+  d = 3
+endif
+
+if i&lt;0 then
+  i=0
+else
+  i=i+1
+endif
+
+if i=1 then
+  c = '1'
+elseif i=2 then
+  c = '2'
+elseif i=3 then
+  c = '3'
+else
+  c = '?'
+endif
+</pre>
+
+</body>
+</html>

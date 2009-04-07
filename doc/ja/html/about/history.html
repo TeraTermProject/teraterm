@@ -1,0 +1,2024 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>改版履歴</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>改版履歴</h1>
+
+<ul>
+ <li><a href="#teraterm">Tera Term</a></li>
+ <li><a href="#ttssh">TTSSH</a></li>
+ <li><a href="#cygterm">CygTerm+</a></li>
+ <li><a href="#ttproxy">TTProxy</a></li>
+ <li><a href="#ttmenu">TeraTerm Menu</a></li>
+ <li><a href="#kanjimenu">TTX KanjiMenu</a></li>
+</ul>
+
+<hr>
+
+<h2><a name="teraterm">Tera Term</a></h2>
+
+<h3><a name="teraterm_4.63">2009.4.3 (Ver 4.63 not-released)</a></h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、`wait4all'マクロコマンドが有効となる。</li>
+      <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
+      <li>DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル)制御シーケンスに対応した。<br>
+        vimの場合、~/.vimrc に以下のように追加する。
+        <pre>
+         set t_SI=^[[3\ q
+         set t_EI=^[[1\ q
+         注: ^[ はControl-V Control-[で入力する
+        </pre>
+      </li>
+      <li>メニューの Send break を無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
+      <li>切断時に画面をクリアできるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ClearScreenOnCloseConnection">ClearScreenOnCloseConnectionu</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
+      <li>Duplicate session のアクセラレータキーを無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
+    </ul></li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_2.51">SSH2対応TTSSH(2.51)</a>へ差し替えた</li>
+    </ul></li>
+
+</ul>
+
+
+<h3><a name="teraterm_4.62">2009.3.22 (Ver 4.62)</a></h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>Controlキーを押している間はマウスイベント通知を無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に DisableMouseTrackingByCtrl エントリを追加した。デフォルトはon。</li>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li>アプリケーションカーソルモードを無効にしている場合は、マウスホイール - カーソルキー変換も無効にするようにした。</li>
+      <li>Controlキーを押している間はマウスホイール - カーソルキー変換を無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#mousewheel">DisableWheelToCursorByCtrl</a> エントリを追加した。デフォルトはon。</li>
+        </ul></li>
+      <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>から"Eterm lookfeel"をチェックできないようにした。Eterm lookfeel機能を有効にするには、teraterm.ini を直接編集すること。</li>
+      <li>Windows7β(build7000)において、非表示状態にあるフォントがフォント選択ダイアログにリストアップされるようにした。</li>
+      <li>反転属性の色を指定出来るようにした。
+        <ul>
+          <li>teraterm.ini に VTReverseColor エントリを追加した。<br>注: アップグレードインストール時は互換性のためこの機能は無効にされています。有効にする場合は、後述のEnableReverseAttrColorをonに設定してください。</li>
+        </ul></li>
+      <li>高輝度,点滅および反転属性の色と、ANSIカラー表示を無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に EnableBoldAttrColor, EnableBlinkAttrColor, EnableReverseAttrColor, EnableURLColor, EnableANSIColor エントリを追加した。デフォルトは、EnableReverseAttrColorはoff、それ以外はon。</li>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li>teraterm.ini の <a href="../menu/setup-additional.html">ConfirmChangePaste</a>（改行を含むデータの貼り付けを確認する） はデフォルトで on とした。</li>
+      <li>EDITOR.CNF をインストーラパッケージに新規追加した。</li>
+      <li>キーボード設定ファイルが無い時のエディタキーパッドおよびファンクションキーの動作を変更し、対応するVTキーのシーケンスを送出するようにした。
+        <ul>
+          <li>tearterm.ini に <a href="../setup/teraterm-term.html#StrictKeyMapping">StrictKeyMapping</a> エントリを追加した。デフォルトはoff。</li>
+        </ul></li>
+      <li>バージョンダイアログに、ビルド環境(Visual C++)のバージョンとビルドタイムを表示するようにした。</li>
+      <li>マクロコマンド "<a href="../macro/command/sprintf2.html">sprintf2</a>" を新規追加した。</li>
+      <li>マクロコマンド "<a href="../macro/command/waitn.html">waitn</a>" を新規追加した。p3g4asus氏に感謝します。</li>
+      <li>マクロコマンド "<a href="../macro/command/logopen.html">logopen</a>" で、result に結果を格納するようにした。</li>
+      <li>マクロ変数に"<a href="../macro/syntax/variables.html">mtimeout</a>"を新規追加した。wait系マクロは、「timeout * 1000 + mtimeout」ミリ秒待つようになる。精度は 50 msec 程度。</li>
+      <li>マクロコマンド "<a href="../macro/command/sendbroadcast.html">sendbroadcast</a>" を新規追加した。</li>
+      <li>マクロコマンド "<a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a>" を新規追加した。</li>
+      <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" を新規追加した。</li>
+      <li>マクロコマンド "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" を新規追加した。</li>
+    </ul></li>
+  <li>バグ修正
+    <ul>
+      <li>cygwin接続時、環境変数PATHが1024バイトで切られるのを修正した。</li>
+      <li>Visual Studio上でマクロのデバッグができるように、DDEトランザクション通信に暫定処置（ワークアラウンド）を加えた。</li>
+      <li><a href="../macro/command/connect.html">connect</a>マクロコマンドにおいて、<a href="../commandline/teraterm.html#ds">/DS</a>コマンドラインオプションを指定した時にconnectコマンドが終了しないバグを修正した。</li>
+      <li>ログウィンドウを非表示に指定した時、一瞬ログウィンドウが表示されていたのを表示されないようにした。</li>
+      <li>リバースビデオモード(DECSCNMがon)の時、Window Setupダイアログでの文字/背景色設定が正しく動かないのを修正した。</li>
+      <li>リバースビデオモード(DECSCNMがon)の時、設定の保存/読み込みで文字/背景色が正しく保存/復元されないのを修正した。</li>
+    </ul></li>
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_2.50">SSH2対応TTSSH(2.50)</a>へ差し替えた</li>
+      <li><a href="#kanjimenu_0.1.5">TTX KanjiMenu Plugin(0.1.5)</a>へ差し替えた。</li>
+      <li>Windows 95 のサポートを復活した</li>
+      <li>Windows 7β(build7000) の暫定サポート</li>
+    </ul></li>
+</ul>
+
+<h3><a name="teraterm_4.61">2008.12.16 (Ver 4.61)</a></h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>ログ保存時に Binary フラグが有効なときは、Plain text と Timestamp フラグを無効にするようにした。</li>
+      <li><a href="../menu/setup-additional.html">リモートからのウィンドウタイトル</a>の表示方法を追加した。標準のタイトルの前または後に表示できるようにした。</li>
+      <li><a href="../menu/setup-additional.html">"Additional settings" ダイアログ</a>で、"Delimitter Characters" 設定を "General" タブから "Copy and Paste" タブへ移動した。</li>
+      <li>"New connection" ダイアログを表示しない <a href="../commandline/teraterm.html">/DS</a> コマンドラインオプションを追加した。</li>
+      <li>設定の保存時、新規ファイルを指定した場合もコメントや各設定の位置関係が保存されるようにした。</li>
+      <li>英国環境等でDEC特殊文字の表示後に英小文字等が正しく表示されない問題への対応として、UK文字セットの指示をUS-ASCIIの指示として扱うようにした。</li>
+      <li>マクロコマンド '<a href="../macro/command/gethostname.html">gethostname</a>' を追加した。</li>
+    </ul></li>
+  <li>バグ修正
+    <ul>
+      <li>文字属性に関する以下の問題を修正した。すべて4.58でのエンバグ。
+        <ul>
+          <li>消去領域に高輝度,下線,点滅,反転属性を適用していた。</li>
+          <li>「編集」メニューの「画面消去」「バッファ消去」で、現在の背景色で消去していた。</li>
+          <li>ED(Erase in Display:ただし画面全体の消去(2J)を除く),EL(Erase in Line)等で、消去後の表示とバッファの内容が同期していない事があった。</li>
+          <li>DECALN(DEC Screen Alignment Test)での表示に文字属性を適用していた。</li>
+        </ul></li>
+      <li>マクロで、変数名およびラベルに使えないはずの文字が使えていたのを修正した。</li>
+      <li><a href="../macro/command/filestrseek2.html">filestrseek2</a>マクロコマンドにおいて、ファイルの1バイト目が合致すると、ファイルポインタが負数になってしまうバグを修正した。</li>
+      <li><a href="../macro/command/logopen.html">logopen</a>マクロコマンドにおいて、ファイル名に \ が含まれない場合、ルートディレクトリ直下へ保存されるようになっていたため、カレントディレクトリに保存されるようにした。</a>
+      <li><a href="../macro/command/gettitle.html">gettitle</a>マクロコマンドにおいて、ウィンドウタイトルの長さが32バイト以上の時に31バイト目までしか取得できない問題を修正した。</li>
+      <li><a href="../macro/command/strmatch.html">strmatch</a>マクロコマンドが使えなくなっていたのを修正した。</li>
+    </ul></li>
+  <li>その他
+    <ul>
+      <li>インストーラを修正した。
+        <ul>
+          <li>sshプロトコル(ssh://)を ttermpro.exe に関連付けできるようにした。</li>
+          <li>Additional Plugins にプラグインを追加した。</li>
+          <li>TTXKanjiMenu を、Additional Plugins に移動した。</li>
+          <li>cygterm+ のソースを同梱するようにした。</li>
+        </ul></li>
+      <li><a href="#ttssh_2.49">SSH2対応TTSSH(2.49)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.07_16">CygTerm+ 1.07_16</a>へ差し替えた</li>
+    </ul></li>
+</ul>
+
+<h3><a name="teraterm_4.60">2008.9.23 (Ver 4.60)</a></h3>
+<ul class="history">
+      <li>CHT(前方タブ移動),CBT(後方タブ移動)制御シーケンスに対応した。一部のアプリケーションでの表示の崩れが改善される。</li>
+      <li>ビジュアルベルに対応した。BEL文字を受信した時に、Beepを鳴らす代わりに画面をフラッシュさせる事ができる。
+        <ul>
+          <li>teraterm.iniの<a href="../setup/teraterm-term.html#beep">Beep</a>エントリを拡張し、On/Offの他にVisualを受け付けるようにした。</li>
+        </ul></li>
+      <li>韓国語(KS5601)へ対応した。Keonsoon Hwang氏に感謝します。</li>
+      <li>ログファイルが開けない場合、エラーメッセージ表示するようにした。ただし、logopenマクロの場合は何も表示しない。</li>
+      <li>リモートからのウィンドウタイトル変更要求を受け入れるか設定できるようにした。
+        <ul>
+          <li>teraterm.ini に AcceptTitleChangeRequest エントリを追加した。デフォルトはon。</li>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li><a href="../menu/setup-additional.html">ConfirmChangePaste</a> の確認ダイアログのサイズを変更できるようにした。
+      <li><a href="../menu/setup-additional.html">ConfirmChangePaste</a> の確認ダイアログのサイズを保存できるようにした。
+        <ul>
+          <li>teraterm.ini に PasteDialogSize エントリを追加した。デフォルトは330x230。</li>
+        </ul></li>
+      <li>ウィンドウのリサイズ中に、リサイズ後の縦横サイズをツールチップで表示するようにした。</li>
+      <li>ファイル送信およびファイル転送時のダイアログに、可能ならばプログレスバーを表示するようにした。</li>
+      <li>SSH2 接続でテキストを貼り付けた場合に送信するデータが欠けることがあるため、500バイト貼り付ける度に 10ms 待つ workaround を追加した。</li>
+      <li>マクロコマンド"messagebox", "yesnobox"をキャンセルしたときに、マクロの実行を停止できるようにした。</li>
+      <li>シリアル接続の入出力をフックするためのTera Term Extension(TTX)用インタフェースを追加した。</li>
+      <li>マクロコマンド '<a href="../macro/command/crc32.html">crc32</a>', '<a href="../macro/command/crc32.html">crc32file</a>' を追加した。</li>
+      <li>マクロコマンド '<a href="../macro/command/getttdir.html">getttdir</a>' を追加した。</li>
+      <li>Duplicate Session によるTELNETおよびSSHの複製が、port22,23以外だとできない問題を修正した。</li>
+      <li>Windows 98/Me で、接続時に Terminal size の行数が不正に減る問題を修正した。</li>
+      <li>Windows Vista の Aero 環境で、Alt+Tab キーでウィンドウを切り替えをしたときに表示されるアイコンが 16x16 になる問題を修正した。</li>
+      <li><a href="#ttssh_2.48">SSH2対応TTSSH(2.48)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.59">2008.6.25 (Ver 4.59)</h3>
+<ul class="history">
+      <li>パッケージ名を「UTF-8 TeraTerm Pro with TTSSH2」から「Tera Term」に改名した。
+        <ul>
+          <li>アンインストール・新規インストールでの導入をおすすめします。</li>
+        </ul></li>
+      <li>動作する OS 一覧に Windows XP x64・Windows Vista・Windows Server 2008 を追加した。</li>
+      <li>Tera Term アイコン(teraterm.ico, vt.ico)とマクロアイコン(ttmacro.ico)を新しくした。坂本龍彦氏に感謝します。</li>
+      <li>前回のリリースでマウスの中ボタンのクリックによる貼り付けを削除したが、元に戻した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisablePasteMouseMButton">DisablePasteMouseMButton</a> を追加した。デフォルトはon。</li>
+         </ul></li>
+      <li>Additional settings を変更した。
+        <ul>
+          <li><a href="../menu/setup-additional.html">ConfirmChangePaste</a> （改行コードを含むクリップボードデータの貼り付けを確認する）オプションを追加した。</li>
+          <li><a href="../menu/setup-additional.html">MouseEventTracking</a> オプションを追加した。</li>
+          <li>General タブの項目の一部を、新設した "Copy and Paste" タブに移動した。</li>
+          <li>開いているタブの内容しか保存されない問題を修正した。</li>
+          <li>cygterm.cfg がない状態で保存するとファイルが新規作成されず、エラーメッセージが表示される問題を修正した。</li>
+          <li>デフォルトのログファイル名が入力されていなかった場合に、不正なエラーメッセージを表示する問題を修正した。</li>
+        </ul></li>
+      <li>'Paste&lt;CR&gt;' メニューが選択されたときにも確認ダイアログを表示するようにした。</li>
+      <li>マウスホイールによるスクロール行数を設定できるようにした。
+        <ul>
+          <li>teraterm.ini に MouseWheelScrollLine エントリを追加した。デフォルトは3。</li>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>にエディットコントロールを追加した。</li>
+        </ul></li>
+      <li>以前読み込んだ .ttl ファイルのディレクトリを記憶するようにした。</li>
+      <li>LogMeTT.exe が存在しない場合、[File] メニューに [LogMeTT] を表示しないようにした。</li>
+      <li>ScrollLockキーを KEYBOARD.CNF ファイルで設定できるようにした。
+        <ul>
+          <li>KEYBOARD.CNF に ScrollLock エントリを追加した。デフォルトは70。</li>
+        </ul></li>
+      <li>&lt;ESC&gt;[Jによる画面クリア時にカレントバッファをスクロールアウトさせるようにするかどうかを、設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#ScrollWindowClearScreen">ScrollWindowClearScreen</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>最下行でだけ自動スクロールさせるようにした（何か表示されるときにスクロールバックをリセットしない）。ただし、なにかキー入力(CTRLやSHIFTなどの制御キーは除く)を行った時はスクロールバックをリセットする。Salarm氏に感謝します。
+        <ul>
+          <li>teraterm.ini に AutoScrollOnlyInBottomLine エントリを追加した。デフォルトはon。</li>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li>対応していないUnicodeの文字をワイド文字として扱うか設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#UnknownUnicodeCharacterAsWide">UnknownUnicodeCharacterAsWide</a> エントリを追加した。デフォルトはoff。</li>
+        </ul></li>
+      <li>受信漢字コードがUTF-8またはUTF-8mの時、罫線や一部の記号をDEC特殊文字の近い文字で代替表示できるようにした。代替表示される文字は幾つかの種類に分類され、種類毎に変換するか設定できる。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#UnicodeDecSpMapping">UnicodeToDecSpMapping</a> エントリを追加した。デフォルトは3。</li>
+        </ul></li>
+      <li>送信するファイルの選択時に、<a href="../setup/teraterm-trans.html#filter">FileSendFilter</a>で指定されたファイルが存在する場合にはデフォルトのファイル名に設定するようにした。</li>
+      <li>X/ZMODEMのログファイルに、16進ダンプのASCII表示を追加した。
+        <ul>
+          <li>teraterm.ini に YmodemLog エントリを追加した。デフォルトはoff。現時点ではYMODEMは未サポート。</li>
+        </ul></li>
+      <li>マクロコマンド '<a href="../macro/command/strmatch.html">strmatch</a>' を追加した。</li>
+      <li>マクロコマンド '<a href="../macro/command/setrts.html">setrts</a>','<a href="../macro/command/setdtr.html">setdtr</a>' を追加した。</li>
+      <li>ブロードキャストコマンドにおいて、連続送信される WM_COPYDATA を正しく処理できるようにした。Salarm氏に感謝します。</li>
+      <li>VTウィンドウおよびTEKウィンドウのウィンドウアイコンを変更できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowIcon">VTIcon</a>, <a href="../setup/teraterm-win.html#WindowIcon">TEKIcon</a> を追加した。デフォルトは"Default"。</li>
+          <li><a href="../commandline/teraterm.html#vticon">/VTICON</a>, <a href="../commandline/teraterm.html#tekicon">/TEKICON</a>コマンドラインオプションを追加した。</li>
+      <li>CygTermで起動されるVTウィンドウのアイコンがCygTermのものになるようにした。(新規インストール時のみ)<br>
+          アップグレードインストール時に同様の設定にしたい場合は、cygterm.cfgを編集してTERM設定に/VTIcon=CygTermを追加してください。</li>
+        </ul></li>
+      <li>ConfirmChangePaste の確認ダイアログを、マウスカーソルではなくキャレットの位置に表示するようにした。</li>
+      <li>Mouse Tracking Mode 時もダブルクリックによる単語選択を有効にした。</li>
+      <li>New Connection ダイアログのホスト名履歴の保存数を 99 から 200 に変更した。</li>
+      <li>インストーラを修正した。
+        <ul>
+          <li>cyglaunch のショートカットをスタートメニューに追加するようにした。</li>
+          <li>cyglaunch のショートカットをクイック起動に追加できるようにした。</li>
+          <li>.ttl ファイルを ttpmacro.exe に関連付けできるようにした。</li>
+          <li>telnet プロトコルを ttermpro.exe に関連付けできるようにした。</li>
+          <li>teraterm.ini の FileDir がインストール先になるようにした。</li>
+        </ul></li>
+      <li>VT ウィンドウで、Window list ダイアログが出ない問題を修正した。</li>
+      <li>内部で LogMeTT.exe, cygterm.exe, cygterm.cfg をフルパスで指定していなかったため、ファイル選択などにより ttermpro.exe のカレントディレクトリが変更されたときに正しく動かなくなる問題を修正した。</li>
+      <li>teraterm.ini の XModemRcvCommand のデフォルトが空になっていなかった問題を修正した。</li>
+      <li>マウス操作の通知で、不正な位置を通知する事があったのを修正した。</li>
+      <li>ttermpro.exeに /C= と /M= が指定された場合に、シリアル接続できない問題を修正した。</li>
+      <li>受信漢字コードがUTF-8またはUTF-8mの時、C1制御文字を使用した制御シーケンスが正しく扱えないのを修正した。</li>
+      <li>受信漢字コードがSJISの時、制御シーケンスによるウィンドウタイトル変更で、一部の漢字が使えないのを修正した。</li>
+      <li>"New Connection" ダイアログで/F=オプションで設定ファイルを指定した時、背景色やANSI Color等の設定が正しく反映されないのを修正した。</li>
+      <li>Eterm lookfeelがOnの時、"Additional Settings" ダイアログでOKボタンを押した後にウィンドウ表示が正しく更新されなくなるのを修正した。</li>
+      <li>マルチディスプレイ環境で最大化すると、必ずプライマリモニタに最大化される問題を修正した。</li>
+      <li>マルチディスプレイ環境で最大化すると、隣のディスプレイにウィンドウの端がはみ出る問題を修正した。</li>
+      <li><a href="../setup/teraterm-misc.html#broadcast">MaxBroadcatHistory</a> に 100 以上を指定しても 99 件までしか保存されない問題を修正した。</li>
+      <li><a href="#ttssh_2.47">SSH2対応TTSSH(2.47)</a>へ差し替えた</li>
+      <li><a href="#ttmenu_1.08">TeraTerm Menu(1.08)</a>へ差し替えた</li>
+      <li>LogMeTT 2.9.4へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.58">2008.2.29 (Ver 4.58)</h3>
+<ul class="history">
+      <li>アプリケーションカーソルモード時、マウスホイールの回転をカーソルキーとして送信できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#mousewheel">TranslateWheelToCursor</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>起動時に "New Connection" ダイアログを表示するかどうか設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#hostdlg">HostDialogOnStartup</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>マウス操作の通知に対応した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#mousetrack">MouseEventTracking</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>Broadcast Commandにリアルタイムモードを追加した。TeraTermウィンドウにすべてのキー入力を送ることができるため、vi操作などが可能となる。<a href="http://www.vector.co.jp/soft/win95/net/se276622.html">TeraTerm Proアシスタント</a>に近い機能。
+        <ul>
+          <li>Broadcast Commandダイアログに"Realtime mode"チェックボックスを追加。デフォルトはon。</li>
+          <li>TeraTermウィンドウを選択可能なリストボックスを追加した。ダブルクリックでアイテムの全選択および全解除が可能（トグル）。</li>
+          <li>Broadcast CommandダイアログをTeraTermの真上へ配置するようにした。</li>
+        </ul></li>
+      <li>フォーカスが外れたときにもカーソルを描画するようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-win.html#killfocus">KillFocusCursor</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>ログ記録時に <a href="../menu/file-log.html">"Log" 転送ダイアログを表示するかどうか</a>設定できるようにした。</li>
+      <li>ウィンドウへのドラッグ＆ドロップによるファイル送信において、SCP(Secure Copy Protocol)を選択できるようにした。</li>
+      <li>Font linking 誤動作のパッチを追加した。naoh氏に感謝します。</li>
+      <li>マウスの右クリックおよびAlt+Vでクリップボードの内容を貼り付けるときに、改行コードが含まれていたら、確認ダイアログを出現させるようにした。誤操作により、端末へ予期せぬコマンド投入を防ぐことができる。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ConfirmChangePaste">ConfirmChangePaste</a> を追加した。デフォルトはoff。</li>
+        </ul></li>
+      <li>ウィンドウの位置を保存するオプションを追加した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-win.html#savevtwinpos">SaveVTWinPos</a> を追加した。デフォルトは off。</li>
+        </ul></li>
+      <li>TermType のデフォルト値を "vt100" から "xterm" に変更した。
+        <ul>
+          <li>TELNET/SSHで通知されるTERM環境変数が"xterm"になる。</li>
+        </ul></li>
+      <li>マウスの中ボタンのクリックによる貼り付けを無効にした。</li>
+      <li>フォルダ選択ダイアログで、既存の設定値が初期ディレクトリになるようにした。</li>
+      <li>ウィンドウの最大幅を300字から500字に拡張した。</li>
+      <li>xterm形式の256色モードおよびaixterm形式の16色モードに対応した。
+        <ul>
+          <li>teraterm.ini に Xterm256Color および Aixterm16Color エントリを追加した。</li>
+          <li>teraterm.ini の FullColor エントリを PcBoldColor エントリに名称変更した。</li>
+          <li><a href="../menu/setup-window.html">ウィンドウ設定ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li>行削除/画面削除された領域や、スクロール等で新しく表示された行の背景色を、標準の背景色から現在の背景色に変更した。</li>
+      <li>言語ファイルにドイツ語(German.lng)を追加した。Alexander Wiechert氏に感謝します。</li>
+      <li>ウィンドウの最大化で文字欠けになる現象への暫定処置を追加した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-win.html#maximize">MaximizedBugTweak</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>リバースビデオ制御シーケンス(DECSCNM)が正しく働かないのを修正した。</li>
+      <li>ウィンドウを最大化した状態で、teraterm.iniへ保存を行うと、最大化時のTerminalSizeが保存されていたバグを修正した。</li>
+      <li>ファイル名をチェックするルーチンで、0x5C や 0x7C などを含むマルチバイト文字を不正な文字と判定する問題を修正した。</li>
+      <li>ポートタイプが"serial"の場合、TeraTermの起動時に自動接続しないバグを修正した。Steven Yang氏に感謝します。cf. <a href="http://www.neocom.ca/forum/viewtopic.php?t=748">TeraTerm com auto connect bug</a></li>
+      <li>ANSI Color 設定の変更が即座に反映されないのを修正した。</li>
+      <li>エスケープシーケンスによるタイトル文字列変更後、余計な'\'が表示される場合があるのを修正した。</li>
+      <li>マクロコマンド '<a href="../macro/command/getver.html">getver</a>' を追加した。</li>
+      <li>マクロコマンド '<a href="../macro/command/setbaud.html">setbaud</a>' を追加した。Steven Yang氏に感謝します。</li>
+      <li>マクロコマンド '<a href="../macro/command/showtt.html">showtt</a>' に3つのパラメータ(6, 7, 8)を追加した。Steven Yang氏に感謝します。</li>
+      <li>マクロコマンド '<a href="../macro/command/exec.html">exec</a>' に2つめのパラメータを追加した。Steven Yang氏に感謝します。</li>
+      <li>'<a href="../macro/command/logopen.html">logopen</a>' マクロコマンドに、&lt;plain text flag&gt;, &lt;timestamp flag&gt;, &lt;hide dialog flag&gt; オプションを追加した。</li>
+      <li>'<a href="../macro/command/getdate.html">getdate</a>', '<a href="../macro/command/gettime.html">gettime</a>' マクロコマンドで、書式を指定しなかった場合は <a href="../macro/syntax/variables.html">result</a> に値をセットしないようにした。(バージョン4.56以前との互換性のため)</li>
+      <li><a href="#ttssh_2.46">SSH2対応TTSSH(2.46)</a>へ差し替えた</li>
+      <li><a href="#ttproxy_1.0.0.15">TTProxy(1.0.0.15)</a>へ差し替えた</li>
+      <li><a href="#kanjimenu_0.1.4">TTX KanjiMenu Plugin(0.1.4)</a>へ差し替えた。</li>
+      <li><a href="../reference/sourcecode.html">ソースコード解説</a>の執筆を開始した。</li>
+</ul>
+
+<h3><a name="teraterm_4.57">2008.1.15 (Ver 4.57)</h3>
+<ul class="history">
+      <li><a href="../macro/commandline.html">マクロのコマンドラインパラメータ</a>に param4 から param9 を追加した。</li>
+      <li>Additional settings ダイアログを ESC キーでキャンセルできるようにした。</li>
+      <li>Additional settings ダイアログを Enter キーで確定できるようにした。</li>
+      <li>ZMODEMのファイル送信時に、タイムスタンプとパーミッション（0644）もいっしょに送るようにした。
+        <ul>
+          <li>ZMODEM受信コマンドを teraterm.ini の <a href="../setup/teraterm-trans.html#zmodemrecv">ZmodemRcvCommand</a> で指定できるようにした。デフォルトは"rz"。
+        </ul></li>
+      <li>XMODEMのファイル送信前に、「rx ファイル名」コマンドを送れるようにした。
+        <ul>
+          <li>XMODEM受信コマンドを teraterm.ini の <a href="../setup/teraterm-trans.html#xmodemrecv">XmodemRcvCommand</a> で指定できるようにした。デフォルトは""。
+        </ul></li>
+      <li>マクロコマンド '<a href="../macro/command/cygconnect.html">cygconnect</a>' を追加した。</li>
+      <li>マクロコマンド '<a href="../macro/command/getdate.html">getdate</a>, <a href="../macro/command/gettime.html">gettime</a> で、書式を指定できるようにした。</li>
+      <li>マクロコマンド '<a href="../macro/command/scpsend.html">scpsend</a>' を追加した。</li>
+      <li>マクロコマンド '<a href="../macro/command/scprecv.html">scpsrecv</a>' を追加した。</li>
+      <li>ファイルのドラッグアンドドロップ時に確認するかどうかを選択できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> を追加した。デフォルトはon。</li>
+        </ul></li>
+      <li><a href="../setup/teraterm-trans.html#draganddrop">SelectOnlyByLButton</a> が on の状態で、別のアプリケーションでクリップボードのコピーしたデータを、TeraTerm側でペーストしようとした場合、TeraTermに選択状態のバッファがあると、そのバッファの内容がペーストされてしまう問題を修正した。</li>
+      <li><a href="../setup/teraterm-trans.html#filter">FileSendFilter</a> が設定されていると、ファイルダイアログの拡張子フィルタが正しく動作しない問題を修正した。</li>
+      <li>ZMODEMによるファイル送信時に、すでにサーバ側に同一ファイルが存在した場合、ファイルハンドルの二重クローズをしていたバグを修正した。</li>
+      <li>telnet キープアライブ処理が thread-safe になっていなかった問題を修正した。</li>
+      <li><a href="../menu/setup-terminal.html">Terminal Setup</a> の New-line (transmit) が空欄になる問題を修正した。</li>
+      <li>Dell の USB キーボードで矢印キーが効かないことがある問題に対応した。<br> cf. <a href="http://www.neocom.ca/forum/viewtopic.php?p=2565">http://www.neocom.ca/forum/viewtopic.php?p=2565</a></li>
+      <li><a href="#ttssh_2.45">SSH2対応TTSSH(2.45)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.07_14">CygTerm+ 1.07_14</a>へ差し替えた</li>
+      <li>Oniguruma 5.9.1へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.56">2007.12.4 (Ver 4.56)</h3>
+<ul class="history">
+      <li>アプリケーションキーパッド/カーソルモードを無効にできるようにした。アプリケーションキーパッド/カーソルモードについては、「<a href="../usage/tips/appkeypad.html">キーパッドモードについて</a>」を参照してください。
+        <ul>
+          <li>teraterm.ini に DisableAppKeypad および DisableAppCursor エントリを追加した。</li>
+          <li><a href="../menu/setup-keyboard.html">キーボード設定ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li>COMポートを開く時に、バッファをクリアするか制御できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#clearcom">ClearComBuffOnOpen</a> エントリを追加した。onでバッファクリア（TeraTerm2.3互換）、offでクリアしない。デフォルトはon。</li>
+        </ul></li>
+      <li>New connection ダイアログの Host ドロップダウンで、Ctrl+u ショートカットキーをサポートした。「カーソルから左端までの文字列を削除」に対応する。</li>
+      <li>シリアルポートのボーレートを指定する<a href="../commandline/teraterm.html">コマンドラインオプション</a> /BAUD を追加した。</li>
+      <li>C1制御文字を8ビット文字で送信できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#C1send">Send8BitCtrl</a> エントリを追加した。デフォルトはoff。</li>
+          <li>S7C1T/S8C1T制御シーケンスに対応した。</li>
+          <li>DECSCL制御シーケンスによるC1制御モードの変更に対応した。</li>
+        </ul></li>
+      <li>KAM(キーボードロック), DECNKM(数値キーパッドモード変更)制御シーケンスに対応した。</li>
+      <li>Fileメニュー配下の"<a href="../menu/file-chdir.html">Change directory</a>"において、"New dir"にフォルダを選択するダイアログから選択できるようにした。</li>
+      <li>マウスドラッグによる選択を、左ボタンでのみ有効にする機能を追加した。
+        <ul>
+          <li>teraterm.ini に SelectOnlyByLButton エントリを追加した。デフォルトは on。</li>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>にチェックボックスを追加した。</li>
+        </ul></li>
+      <li>UTF-8エンコーディングにおいて、単独の合成用濁点(U+3099)/合成用半濁点(U+309A)を、濁点(U+309B)/半濁点(U+309C)として表示するようにした。</li>
+      <li>マクロコマンド <a href="../macro/command/clipb2var.html">clipb2var</a>で、クリップボードのテキストデータの256バイト目以降を取得できるようにした。
+        <ul>
+          <li>クリップボードのデータのコピー開始位置をコマンドの引数で指定できるようにした。</li>
+          <li>クリップボードのデータが長くてコピーしたデータが途中で切り捨てられた場合は、<a href="../macro/syntax/variables.html">result</a>に2をセットするようにした。</li>
+        </ul></li>
+      <li>マクロコマンド <a href="../macro/command/doloop.html">do - loop</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/until.html">until - enduntil</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/callmenu.html">callmenu</a> を新規追加した。
+        <ul>
+          <li>サンプルマクロ screencapture.ttl を追加した。
+        </ul></li>
+      <li>Telnetコマンドの自動検出を無効化できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#detecttelnet">TelAutoDetect</a>エントリを追加した。デフォルトはon。</li>
+        </ul></li>
+      <li>メニューから選択領域を解除できるようにした。<a href="../menu/edit.html">編集メニュー</a>配下に「選択を解除」を追加した。主にマクロから呼ばれて使われる事を想定しています。</li>
+      <li>ログ採取のファイル選択ダイアログにおいて、「標準のログ保存先フォルダ」が存在するならそこを初期フォルダにするようにした。</li>
+      <li>ウィンドウの透明度を 255 に変更できない問題を修正した。</li>
+      <li>サーバから送信されるタイトル文字列の末尾 1 文字が削られる問題を修正した。</li>
+      <li>New connection ダイアログから Telnet 接続を開始したとき、TCPLocalEcho/TCPCRSend の設定が使用されてしまうことがある問題を修正した。</li>
+      <li><a href="../menu/setup-additional.html#continuedline">継続行連結コピー</a>を有効に設定している時、<a href="../menu/edit.html#copytable">テーブルをコピー</a>が正しく動作しない場合がある問題を修正した。</li>
+      <li><a href="../menu/setup-keyboard.html#delkey">DeleteキーでDELを送信する</a>設定で Num Lock の状態が Off の時、数値キーパッドの"."でDELが送信されていたのを修正した。</li>
+      <li>マクロの <a href="../macro/command/wait.html">wait</a> コマンドが長い文字列を待てなくなっていたのを修正した。4.54でのエンバグ。</li>
+      <li><a href="../menu/setup-window.html">ウィンドウの設定ダイアログ</a>のカラー設定で、値が15以下の時にPageUpキーを押すと255になるのを修正した。</li>
+      <li>COMポート番号を強制付け替えした場合に、レジストリに残っている古いFriendlyNameが表示されてしまう問題を修正した。パッチ作成に感謝します＞xoxo氏</li>
+      <li>TEKウィンドウの<a href="../menutek/setup-window.html">ウィンドウの設定ダイアログ</a>で、“常に標準の背景色を使う”チェックボックスを表示しないようにした。</li>
+      <li>TEKウィンドウの<a href="../menutek/setup-font.html">フォント設定ダイアログ</a>で、ユーザインタフェイスにメッセージファイルのデータを使っていなかったのを修正した。</li>
+      <li><a href="#ttssh_2.44">SSH2対応TTSSH(2.44)</a>へ差し替えた</li>
+      <li><a href="#ttmenu_1.07">TeraTerm Menu(1.07)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.55">2007.10.14 (Ver 4.55)</h3>
+<ul class="history">
+      <li>アプリケーションエラーが発生したときに、スタックトレースとレジスタ情報をメッセージボックスに表示させるようにした。メッセージボックスの内容は CTRL+C でクリップボードへコピーできる（Windows2000以降）。</li>
+      <li>New connection ダイアログの Host ドロップダウンで、Ctrl+d, Ctrl+k ショートカットキーをサポートした。それぞれ「一文字削除」「行末まで削除」に対応する。</li>
+      <li>シリアル接続のCOM最大ポートを256まで拡張した。</li>
+      <li>フォントの Bold style 設定のデフォルト値を On に変更した。</li>
+      <li>getdir マクロコマンドでクラッシュする問題を修正した。</li>
+      <li>ログファイル名に strftime のフォーマットを指定したときに展開されない問題を修正した。</li>
+      <li><a href="#ttssh_2.43">SSH2対応TTSSH(2.43)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.54">2007.9.30 (Ver 4.54)</h3>
+<ul class="history">
+      <li>バッファの画面表示部分の選択をできるようにした。編集メニュー配下に「表示画面を選択」を追加した。</li>
+      <li>COMポートのDevice descriptionを接続ダイアログに表示するようにした。</li>
+      <li>telnetキープアライブ機能を追加した。
+        <ul>
+          <li>一定時間パケットの送信を行わなかった時、TELNET NOPコマンドを送信する。</li>
+          <li>teraterm.iniの設定パラメータTelKeepAliveIntervalを追加。デフォルトは300(秒)。0でOFF。</li>
+          <li>TCP/IP setupダイアログにキープアライブ設定用項目を追加した。</li>
+        </ul></li>
+      <li>接続断のアクセラレータキーとして Alt+I を追加した。</li>
+      <li>マクロの演算子にシフト演算子 &gt;&gt;, &lt;&lt;, &gt;&gt;&gt; を追加した。</li>
+      <li>マクロの<a href="../macro/syntax/expressions.html">演算子の優先度</a>を変更した。
+        <ul><pre>
+新:
+優先度  演算子
+1       not ~ ! +(単項) -(単項)
+2       * / %
+3       + -
+4       &gt;&gt; &lt;&lt; &gt;&gt;&gt;
+5       and &amp;
+6       xor ^
+7       or |
+8       &lt; &gt; &lt;= &gt;=
+9       = == &lt;&gt; !=
+10      &amp;&amp;
+11      ||
+
+旧:
+優先度  演算子
+1       not ~ ! +(単項) -(単項)
+2       * / %
+2       and &amp;
+3       + -
+3       or xor | ^
+4       = &lt;&gt; &lt; &gt; &lt;= &gt;=
+5       &amp;&amp;
+6       ||</pre></ul></li>
+      <li>マクロコマンド <a href="../macro/command/rotateleft.html">rotateleft</a>, <a href="../macro/command/rotateright.html">rotateright</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/setenv.html">setenv</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/filenamebox.html">filenamebox</a> を新規追加した。</li>
+      <li><s>シリアル接続のCOM最大ポートを200まで拡張した。</s></li>
+      <li>ログ採取のファイル選択ダイアログにおいて、初期フォルダを決め打ちしないようにした。</li>
+      <li>New connection ダイアログの Host ドロップダウンで、Ctrl+p, Ctrl+n, Ctrl+b, Ctrl+f, Ctrl+a, Ctrl+e ショートカットキーをサポートした。それぞれ↑, ↓, ←, →, Home, End キーに対応する。</li>
+      <li>設定ファイルの保存時に VTPos と TEKPos を保存しないようにした。</li>
+      <li>ブロードキャストコマンドの履歴の保存先を broadcast.log に変更した。</li>
+      <li>ブロードキャストコマンドの履歴の保存数を設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#broadcast">MaxBroadcatHistory</a> エントリを追加した。</li>
+        </ul></li>
+      <li>マクロコマンド <a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/yesnobox.html">yesnobox</a>, <a href="../macro/command/inputbox.html">inputbox</a>, <a href="../macro/command/passwordbox.html">passwordbox</a>, <a href="../macro/command/statusbox.html">statusbox</a> に、'\n' と '\t' を特殊文字として解釈するかどうかを制御する引数を追加した。</li>
+      <li>初回のウィンドウのサイズ変更ができないことがある問題を修正した。</li>
+      <li>編集メニューの“全て選択”で、最終行の改行が選択されない問題を修正した。</li>
+      <li>Windows Vistaでマウスホイールが効かない問題を修正した。</li>
+      <li>repeatを使わないターゲットに対して、Kermit処理が失敗するバグを修正した。Anders Larsen氏に感謝します。</li>
+      <li>内部で使用している文字列系関数のセキュアバージョンへの全置換を実施。
+        <ul>
+          <li>ビルドオプションから _CRT_SECURE_NO_DEPRECATE を削除した。</li>
+        </ul></li>
+      <li><a href="#ttssh_2.42">SSH2対応TTSSH(2.42)</a>へ差し替えた</li>
+      <li><a href="#ttmenu_1.06">TeraTerm Menu(1.06)</a>へ差し替えた</li>
+      <li><a href="#ttproxy_1.0.0.14">TTProxy(1.0.0.14)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.53">2007.8.8 (Ver 4.53)</h3>
+<ul class="history">
+      <li>ログファイル名中の &h を、接続中のホスト名に変換する機能を追加した。</li>
+      <li>標準のログ保存先を指定できるようにした。
+        <ul>
+          <li>teraterm.ini に LogDefaultPath エントリを追加した。</li>
+          <li>Additional Settings タブにエディットコントロールを追加した。</li>
+        </ul></li>
+      <li>接続時に自動的にログ採取を開始できるようにした。
+        <ul>
+          <li>teraterm.ini に LogAutoStart エントリを追加した。</li>
+          <li>Additional Settings タブにチェックボックスを追加した。</li>
+        </ul></li>
+      <li>ファイル送信ダイアログでファイル名フィルタをかけられるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-trans.html#filter">FileSendFilter</a> エントリを追加した。</li>
+        </ul></li>
+      <li>行末のタブを次の行に自動改行するようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#vttab">VTCompatTab</a> エントリを追加した。行末タブの扱いをvt100/xterm風にする。デフォルトはoff。</li>
+        </ul></li>
+      <li><s>シリアル接続のCOM最大ポートを200まで拡張した。</s></li>
+      <li><a href="../setup/teraterm-win.html#title">タイトルバー</a>に TCP ポート番号とシリアルポートのボーレートを表示できるようにした。</li>
+      <li>URLクリッカブルへのEmacs対応。行末が \ である場合、URL構成文字として削除するようにした。</li>
+      <li>マクロコマンド <a href="../macro/command/tolower.html">tolower</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/toupper.html">toupper</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/break.html">break</a> を新規追加した。</li>
+      <li>マクロコマンド <a href="../macro/command/inputbox.html">inputbox</a> に引数を追加した。この新しい引数にデフォルト文字列を渡すことができる。</li>
+      <li>マクロの演算子に論理演算子 &amp;&amp;, ||, ! およびビット演算子 &amp;, |, ^, ~ を追加した。なお、and, or, xor, notはビット演算子である（TeraTermオリジナル仕様）。</li>
+      <li>エクスプローラに"Cygterm Here"コンテキストメニューを追加できるようにした。エクスプローラの任意のディレクトリから CygTerm を起動できる。
+        <ul>
+          <li>環境変数PATHへ X:\cygwin\bin を追加することなく、CygTermを起動することができる"cyglaunch.exe"を同梱した。</li>
+        </ul></li>
+      <li>HTMLヘルプのオーナーが常にデスクトップになるように変更した。</li>
+      <li>空のマクロファイルを include してもエラーとしないようにした。</li>
+      <li>cygterm.cfg を保存する時、コメントや未知の設定も残すようにした。</li>
+      <li>利用可能なCOMポートがない時、新しい接続ダイアログでシリアルポートを無効にした。</li>
+      <li>hlp 形式のヘルプ(ttermpj.hlp)を削除した。</li>
+      <li>タイムスタンプ付きログで1KBごとに不要な改行が入るバグを修正。Gentaro氏に感謝します。</li>
+      <li>ttpmacro.exeに256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で落ちるバグを修正した。</li>
+      <li>マクロファイルに 256 バイトを越える長い行があると、BOF(Buffer Over Flow)で落ちるバグを修正した。</li>
+      <li>マクロ実行中に、サーバからの受信データをマクロへDDE送信しないことがある問題への対処を追加した。</li>
+      <li>マクロコマンド var2clipb で、不正にメモリを解放していた問題を修正した。</li>
+      <li>teraterm.ini の CRReceive に "LF" が保存・読み込みできない問題を修正した。</li>
+      <li>ウィンドウの幅を120ドット（XPのLUNAスタイルでは94ドット）より小さくすると、ウィンドウサイズを変更できなくなる事がある問題を修正した。TeraTerm 2.3オリジナルバグ。</li>
+      <li>statusbox で、既存の statusbox にメッセージを表示したときに '\n' が改行にならない問題を修正した。</li>
+      <li>いくつかのマクロで、渡されたファイル名が ':' で始まっている場合にエラーとならないことがある問題を修正した。</li>
+      <li>マクロで、"a &lt; b &lt; c" のような式の評価が行えない問題を修正した。</li>
+      <li>pause マクロコマンドを実行中に、マクロプログラムのコントロールウィンドウを操作できなくなる問題を修正した。</li>
+      <li><a href="#kanjimenu_0.1.3">TTX KanjiMenu Plugin 0.1.3</a>(ttxkanjimenu.dll)を追加した。原直(Hara Sunao)氏に感謝します。</li>
+      <li><a href="#ttssh_2.41">SSH2対応TTSSH(2.41)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.07_13">CygTerm+ 1.07_13</a>へ差し替えた</li>
+      <li>LogMeTT 2.9.2へ差し替えた</li>
+      <li>Oniguruma 5.9.0へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.52">2007.5.7 (Ver 4.52)</h3>
+<ul class="history">
+      <li>マクロの yesnobox のボタンが両方とも OK になっていた問題を修正した。</li>
+      <li>Additional settings のマウスカーソルとANSIカラーの設定を Visual タブに移動した。</li>
+      <li>右クリックによる貼り付けをする前に、ユーザに問い合わせできるようにした。
+        <ul>
+          <li>teraterm.ini に ConfirmPasteMouseRButton エントリを追加した。</li>
+          <li>Additional Settings タブにチェックボックスを追加した。</li>
+        </ul></li>
+      <li>Send break のアクセラレータキーを無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に DisableAcceleratorSendBreak エントリを追加した。</li>
+          <li>Additional Settings タブにチェックボックスを追加した。</li>
+        </ul></li>
+
+      <li>Broadcastダイアログに"ParentOnly"チェックボックスを追加した。
+          Broadcastダイアログからの送信対象を親Windowのみにすることができる。
+          パッチ作成に感謝します＞337氏</li>
+      <li>Broadcastダイアログからの送信を無視可能にするオプションを追加した。
+        <ul>
+          <li>teraterm.ini に AcceptBroadcast エントリを追加した。</li>
+          <li>Additional Settings タブにチェックボックスを追加した。</li>
+        </ul></li>
+
+      <li>接続が SSH または Cygwin のときは、TCPLocalEchoおよびTCPCRSendオプションの設定を使わないようにした。
+        <ul>
+          <li>/E コマンドラインオプションを追加した。</li>
+        </ul></li>
+      <li>Additional settings ダイアログから cygterm.cfg を保存したとき、LOGIN_SHELL と HOME_CHDIR が消去される問題を修正した。</li>
+      <li>Windows NT 4.0 においていくつかのファイル選択ダイアログが出ない問題を修正した。</li>
+      <li>マクロコマンド sprintf を新規追加した。</li>
+      <li>マクロコマンド str2int において、16進の変換ができるようにした。</li>
+      <li><a href="#ttssh_2.40">SSH2対応TTSSH(2.40)</a>へ差し替えた</li>
+      <li><a href="#ttproxy_1.0.0.13">TTProxy(1.0.0.13)</a>へ差し替えた</li>
+      <li>LogMeTT 2.9.1へ差し替えた
+        <ul>
+          <li>スタンドアロンの TeraTerm マクロエディタ TTLEditor が追加された</li>
+        </ul></li>
+      <li>Oniguruma 5.7.0へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.51">2007.3.10 (Ver 4.51)</h3>
+<ul class="history">
+      <li>Windows98/NT4.0 においていくつかのファイル選択ダイアログが出ない問題を修正した。</li>
+      <li>マクロの pause コマンドの待ち時間に 1 秒程度の遅延があったので修正した。</li>
+      <li>My Documents に teraterm.ini がある場合、それを読み込むようにした。</li>
+      <li>ダブルクリックされた単語が行を越えていた場合、EnableContinuedLineCopy が有効なら続けて選択されるようにした。</li>
+      <li>Broadcast Command の履歴を保存できるようにした。</li>
+      <li>New ConnectionおよびSerial port setupのダイアログで、使用可能なシリアルポートのみを表示するようにした</li>
+
+      <li>ユーザインターフェイスのメッセージを読み込めるようにした。
+        <ul>
+          <li>日本語メッセージファイルを同梱した。</li>
+          <li>teraterm.ini に UILanguageFile エントリを追加した。</a>
+        </ul></li>
+      <li><a href="#ttssh_2.39">SSH2対応TTSSH(2.39)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.07_11">CygTerm+ 1.07_11</a>へ差し替えた</li>
+      <li><a href="#ttproxy_1.0.0.12">TTProxy(1.0.0.12)</a>へ差し替えた</li>
+      <li><a href="#ttmenu_1.05">TeraTerm Menu(1.05)</a>へ差し替えた</li>
+      <li>Oniguruma 5.5.3へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.50">2007.1.22 (Ver 4.50)</h3>
+<ul class="history">
+      <li>Visual Studio 2005 Standard Edition(+SP1)でリビルドした</li>
+      <li>ログ採取中のマクロが停止する問題（TeraTerm 2.3オリジナルバグ）を修正した。<br>
+          ログバッファとDDEバッファのインデックスの整合が取れずに、本体からマクロへデータが送れていなかったのが原因。</li>
+      <li>ログファイル名がフルパスでないときに落ちるバグを修正した。</li>
+      <li>EnableContinuedLineCopyが有効の場合に画面右端での改行がログに記録されないバグを修正した。</li>
+      <li>F1-F10キーを有効にしたキーボード設定ファイル FUNCTION.CNF を追加した。</li>
+      <li>Fileメニュー配下に、ログ再生を行う"Replay Log.."を追加した。</li>
+      <li>接続中の処理を一定時間後にキャンセルできるようにした。
+        <ul>
+          <li>teraterm.ini へ ConnectingTimeout エントリを追加。</li>
+          <li>ttermpro.exeに "/timeout=" オプションを追加した。</li>
+        </ul>
+        デフォルト値は0で何もしない（Windows TCP/IPスタックの実装に依存）。</li>
+      <li>Terminal setupダイアログの New-line の Receive に "LF" を追加した。<br>
+          受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、CR+LFとして扱うようにする。<br>
+          cf. http://www.neocom.ca/forum/viewtopic.php?t=216</li>
+      <li><a href="#ttssh_2.38">SSH2対応TTSSH(2.38)</a>へ差し替えた</li>
+      <li><a href="#ttproxy_1.0.0.10">TTProxy(1.0.0.10)</a>へ差し替えた</li>
+      <li>Oniguruma 5.5.2へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.49">2006.11.20 (Ver 4.49)</h3>
+<ul class="history">
+      <li>TeraTerm本体（DDEサーバ）側でのDDEメッセージ XTYP_POKE の処理において、不正な返値をTeraTermマクロ（DDEクライアント）へ返していたバグを修正した。</li>
+      <li>マクロ通信において、XTYP_POKEメッセージにおけるビジー処理を行うようにした。</li>
+      <li>ScrollLockキーをサポートした</li>
+      <li>XMODEM-1Kの送信時に、相手がCRCではなくchecksumを要求するときに対応した。パッチ作成に感謝します＞Mark Deneen</li>
+      <li>HTMLヘルプを更新した</li>
+      <li>初回インストール時に、teraterm.ini の Language/Locale/CodePage/VTFont/TEKFont セクションをインストーラから設定するように変更した。</li>
+      <li><a href="#ttssh_2.37">SSH2対応TTSSH(2.37)</a>へ差し替えた</li>
+      <li>Oniguruma 4.5.1へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.48">2006.11.1 (Ver 4.48)</h3>
+<ul class="history">
+      <li>マクロコマンド 'fileread' を追加した。指定したバイト数だけファイルからの読み込みが可能となる。</li>
+      <li><a href="#ttssh_2.36">SSH2対応TTSSH(2.36)</a>へ差し替えた</li>
+      <li>Oniguruma 4.4.6へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.47">2006.10.28 (Ver 4.47)</h3>
+<ul class="history">
+      <li>Fileメニューのアクセラレータキーを重複しないようにした。</li>
+      <li>同期モードでのマクロ実行において、DDEバッファがフルになった場合にCPU使用率が100%となる現象を回避するようにした。</li>
+      <li>sendln後の無条件100ミリ秒のスリープを解除した。</li>
+      <li>マクロ(ttpmacro.exe)のバッファサイズを4KBから16KBへ拡張子した。また、TeraTermへの同期要求タイミングを変更した。</li>
+      <li><a href="#ttssh_2.35">SSH2対応TTSSH(2.35)</a>へ差し替えた</li>
+      <li>LogMeTT 2.8.6へ差し替えた</li>
+      <li>Oniguruma 4.4.5へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.46">2006.10.9 (Ver 4.46)</h3>
+<ul class="history">
+      <li>Windows Vista で teraterm.ini の保存先のデフォルトがデスクトップになるのを修正した。</li>
+      <li>マクロコマンド 'clipb2var' を追加した。クリップボードからデータのコピーが可能となる。</li>
+      <li>マクロコマンド 'var2clipb' を追加した。クリップボードへのデータのコピーが可能となる。</li>
+      <li>最初のウィンドウで、接続ダイアログの /L= パラメータが使用されないバグを修正した。</li>
+      <li>マクロコマンド 'ifdefined' を追加した。このコマンドは変数の型を返します。</li>
+      <li>HTMLヘルプを更新した</li>
+      <li><a href="#ttssh_2.34">SSH2対応TTSSH(2.34)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.06_11">CygTerm+ 1.06_11</a>へ差し替えた</li>
+      <li>Oniguruma 4.4.4へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.45">2006.9.16 (Ver 4.45)</h3>
+<ul class="history">
+      <li>デフォルトのログファイル名を指定できるようにした。
+        <ul>
+          <li>エディットコントロールを "Additional settings" ダイアログに追加した。</li>
+          <li>teraterm.ini ファイルに LogDefaultName エントリを追加した。</li>
+          <li>ファイル名に strftime のフォーマットを使えるようにした。
+<pre>
+書式:
+%a	曜日の省略形。
+%A	曜日の正式名。
+%b	月の省略形。
+%B	月の正式名。
+%c	ロケールに対応する日付と時刻の表現。
+%d	10 進数で表す月の日付 (01 ～ 31)。
+%H	24 時間表記の時間 (00 ～ 23)。
+%I	12 時間表記の時間 (01 ～ 12)。
+%j	10 進数で表す年初からの日数 (001 ～ 366)。
+%m	10 進数で表す月 (01 ～ 12)。
+%M	10 進数で表す分 (00 ～ 59)。
+%p	現在のロケールの午前/午後。
+%S	10 進数で表す秒 (00 ～ 59)。
+%U	10 進数で表す週の通し番号。日曜日を週の最初の日とする (00 ～ 53)。
+%w	10 進数で表す曜日 (0 ～ 6、日曜日が 0)。
+%W	10 進数で表す週の通し番号。月曜日を週の最初の日とする (00 ～ 53)。
+%x	現在のロケールの日付表現。
+%X	現在のロケールの時刻表現。
+%y	10 進数で表す西暦の下 2 桁 (00 ～ 99)。
+%Y	10 進数で表す 4 桁の西暦。
+%z, %Z	レジストリの設定に応じて、タイム ゾーンの名前または省略形を指定します。
+	タイム ゾーンが不明な場合は指定しません。
+%%	パーセント記号。
+</pre>
+          </li>
+        </ul></li>
+      <li>/M コマンドラインパラメータが指定されている場合、TeraTerm 起動時に自動的にシリアルポートへ接続しないようにした。</li>
+      <li>HTMLヘルプを更新した</li>
+      <li><a href="#ttssh_2.33">SSH2対応TTSSH(2.33)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.06_08">CygTerm+ 1.06_08</a>へ差し替えた</li>
+      <li>Oniguruma 4.4.1へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.44">2006.8.19 (Ver 4.44)</h3>
+<ul class="history">
+      <li>Windows98/NT4.0 において ttpmacro.exe が起動直後に終了してしまう問題を修正した。</li>
+      <li>ttermpro.exe, ttpmacro.exe, ttpmenu.exe, keycode.exe, cygterm.exeに mutex を追加した。</li>
+      <li>インストーラを InnoSetup へ変更した</li>
+      <li>HTMLヘルプを更新した</li>
+      <li><a href="#ttssh_2.32">SSH2対応TTSSH(2.32)</a>へ差し替えた</li>
+      <li><a href="#cygterm_1.06_06">CygTerm+ 1.06_06</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.43">2006.8.4 (Ver 4.43)</h3>
+<ul class="history">
+      <li>いくつかの変数がシステム変数に使われていたので、ユーザが使えるマクロ変数が256個になるようにした。</li>
+      <li>マクロの inputbox のダイアログを、メッセージの長さに合わせて広げるようにした。</li>
+      <li>マクロのダイアログボックスに渡される "\n" が改行とみなされるようにした。</li>
+      <li>マクロの messagebox のダイアログサイズを変更できるようにした</li>
+      <li>接続先ホストが 'telnet://' で始まってポート番号の指定がない場合、ポート番号 23 を設定するようにした。</li>
+      <li><a href="#ttssh_2.31">SSH2対応TTSSH(2.31)</a>へ差し替えた</li>
+      <li>TTProxyを2006/8/3版へ差し替えた。蛭子屋氏に感謝します。</li>
+</ul>
+
+<h3><a name="teraterm_4.42">2006.7.26 (Ver 4.42)</h3>
+<ul class="history">
+      <li>TeraTermアイコン(teraterm.ico, vt.ico)を新しくした。坂本龍彦氏に感謝します。</li>
+      <li>SSH2対応TTSSH(2.30)へ差し替えた</li>
+      <li>LogMeTT 2.8.5へ差し替えた</li>
+      <li>Collectorのリソース英文漏れの修正を行った</li>
+</ul>
+
+<h3><a name="teraterm_4.41">2006.7.24 (Ver 4.41)</h3>
+<ul class="history">
+      <li>ログに時刻を記録する機能を追加した。また、teraterm.iniに LogTimestamp エントリを追加した。</li>
+      <li>上書きインストール時に、前回のインストールフォルダがデフォルトで指定されるようにした。</li>
+      <li>Collectorのリソース英文漏れの修正を行った</li>
+      <li>Oniguruma 4.2.0へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.40">2006.7.19 (Ver 4.40)</h3>
+<ul class="history">
+      <li>ttermpro.exeとttpmacro.exeのバージョン情報を更新した</li>
+      <li>HTMLヘルプを更新した</li>
+      <li>LogMeTT 2.8.4へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.39">2006.7.1 (Ver 4.39)</h3>
+<ul class="history">
+      <li>UTF-8の2バイト文字の直後に1バイト文字(ASCII)が来る場合、文字化けとなっていたバグを修正した（例：´)）。</li>
+      <li>Copyright表記を変更した</li>
+</ul>
+
+<h3><a name="teraterm_4.38">2006.6.23 (Ver 4.38)</h3>
+<ul class="history">
+      <li><a href="#ttssh_2.28">SSH2対応TTSSH(2.28)</a>へ差し替えた</li>
+      <li>HTMLヘルプを更新した</li>
+</ul>
+
+<h3><a name="teraterm_4.37">2006.6.18 (Ver 4.37)</h3>
+<ul class="history">
+      <li>タイトルに日本語を入力すると、文字化けするバグを修正した。パッチ作成に感謝します＞永田氏</li>
+      <li><a href="#ttssh_2.27">SSH2対応TTSSH(2.27)</a>へ差し替えた</li>
+      <li>Collectorのリソース英文漏れの修正を行った</li>
+</ul>
+
+<h3><a name="teraterm_4.36">2006.6.11 (Ver 4.36)</h3>
+<ul class="history">
+      <li><a href="#ttssh_2.26">SSH2対応TTSSH(2.26)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.35b">2006.5.25 (Ver 4.35b)</h3>
+<ul class="history">
+      <li>タブ化ソフト「Collector 3.2.3」を英語化し、同梱した。収録許可をいただいた高橋弘氏に感謝します。</li>
+</ul>
+
+<h3><a name="teraterm_4.35a">2006.5.7 (Ver 4.35a)</h3>
+<ul class="history">
+      <li><a href="#ttssh_2.25">SSH2対応TTSSH(2.25)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.35">2006.4.7 (Ver 4.35)</h3>
+<ul class="history">
+      <li>HTMLヘルプファイルのオーナーをデスクトップへ変更した</li>
+      <li><a href="#ttssh_2.24">SSH2対応TTSSH(2.24)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.34">2006.4.4 (Ver 4.34)</h3>
+<ul class="history">
+      <li><a href="#ttssh_2.23">SSH2対応TTSSH(2.23)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.33">2006.4.1 (Ver 4.33)</h3>
+<ul class="history">
+      <li>半透明化を行わない場合に画面がちらつかないようにした。</li>
+</ul>
+
+<h3><a name="teraterm_4.32">2006.3.30 (Ver 4.32)</h3>
+<ul class="history">
+      <li><a href="#ttssh_2.22">SSH2対応TTSSH(2.22)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.31">2006.3.28 (Ver 4.31)</h3>
+<ul class="history">
+      <li>Additional settingsダイアログにおけるウィンドウの半透明変更を即座に反映させるようにした。</li>
+      <li>文字の背景色をスクリーンの背景色と一致させるパッチのバグを修正した。パッチ作成に感謝します＞337氏</li>
+      <li>VisualStyleが有効となるようにした</li>
+      <li>VT windowでの1ミリ秒スリープを削除した</li>
+      <li>ヘルプファイルを .hlp から .chm へ変更した</li>
+      <li><a href="#ttssh_2.21">SSH2対応TTSSH(2.21)</a>へ差し替えた</li>
+      <li>LogMeTT 2.8.3へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.30">2006.3.6 (Ver 4.30)</h3>
+<ul class="history">
+      <li>ttpmacro.exeのバージョン情報を更新した</li>
+      <li><a href="#ttssh_2.20">SSH2対応TTSSH(2.20)</a>へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.29">2006.3.3 (Ver 4.29)</h3>
+<ul class="history">
+      <li>文字の背景色をスクリーンの背景色と一致させるようにした。
+        <ul>
+          <li>Window setupダイアログに"Always use Normal text's BG"チェックボックスを追加した。</li>
+          <li>teraterm.iniにUseNormalBGColorエントリを追加した。</li>
+        </ul>
+        パッチ作成に感謝します＞337氏</li>
+      <li>Windows9x上においてインストーラから起動されるバッチファイルがうまく動かないバグを修正した。白井隆氏に感謝します。</li>
+</ul>
+
+<h3><a name="teraterm_4.28">2006.2.24 (Ver 4.28)</h3>
+<ul class="history">
+      <li>コンパイラを Visual Studio 2005 Standard Edition に切り替えた。</li>
+      <li>stricmp()を_stricmp()へ置換した</li>
+      <li>strnicmp()を_strnicmp()へ置換した</li>
+      <li>strdup()を_strdup()へ置換した</li>
+      <li>chdir()を_chdir()へ置換した</li>
+      <li>getcwd()を_getcwd()へ置換した</li>
+      <li>strupr()を_strupr()へ置換した</li>
+      <li>time_tの64ビット化にともなう警告メッセージを抑止した</li>
+      <li>Window setupでのカラー変更がリアルタイムに行われるようにした。</li>
+      <li>マクロ動作の高速化のため、マクロウィンドウへのコマンド表示をウェイト系に限定した。</li>
+      <li><a href="#ttssh_2.20">SSH2対応TTSSH(2.19)</a>へ差し替えた</li>
+      <li>TeraTerm Menu 1.04へ差し替えた
+        <ul>
+          <li>VS2005でビルドエラーとなる問題を修正した</li>
+          <li>EXEファイルのバージョン情報を更新した</li>
+        </ul></li>
+      <li>Oniguruma 4.0.1へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.27">2006.2.11 (Ver 4.27)</h3>
+<ul class="history">
+      <li>マクロで使用できる変数の個数を128から256へ、ラベルの個数を256から512へ拡張した。</li>
+      <li>TEK windowをアクティブにした状態で pause マクロを使用すると、CPU使用率が100%となる現象への暫定対処を施した(workaround)。</li>
+      <li>Fileメニューから TeraTerm Menu を削除した。</li>
+      <li>Broadcast Command使用時にウィンドウがちらつく動作を改善した。</li>
+      <li>Setupメニューのアクセラレータキーを変更した。</li>
+      <li>マクロコマンド 'mpause' を追加した。ミリ秒単位での休止が可能となる。</li>
+      <li>サンプルマクロ mpause.ttl を追加した。</li>
+      <li>マクロコマンド 'random' を追加した。乱数の生成が可能となる。</li>
+      <li>サンプルマクロ random.ttl を追加した。</li>
+      <li><a href="#cygterm_1.06_02">CygTerm 1.06_02</a>へ差し替えた。BabyDaemon氏に感謝します。</li>
+</ul>
+
+<h3><a name="teraterm_4.26">2006.1.21 (Ver 4.26)</h3>
+<ul class="history">
+      <li>ウィンドウへのドラッグ＆ドロップでファイル送信する前に、問い合わせダイアログを出すようにした。</li>
+      <li>LogMeTT 2.8.1へ差し替えた</li>
+      <li>Oniguruma 3.9.1へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.25">2005.12.13 (Ver 4.25)</h3>
+<ul class="history">
+      <li>設定内容がteraterm.ini以外のファイル名で保存できないバグを修正した。</li>
+</ul>
+
+<h3><a name="teraterm_4.24">2005.12.1 (Ver 4.24)</h3>
+<ul class="history">
+      <li>シリアル接続のCOM最大ポートを99まで拡張した。</li>
+      <li>シリアル接続のボーレートに230400, 460800, 921600を追加した。</li>
+      <li>LogMeTT 2.7.4へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.23">2005.11.3 (Ver 4.23)</h3>
+<ul class="history">
+      <li>teraterm.iniを保存するときに書き込みできるかどうかの判別を追加した。</li>
+      <li>TCP/IP setupダイアログの"Term type"を常に有効とするようにした。</li>
+</ul>
+
+<h3><a name="teraterm_4.22">2005.10.21 (Ver 4.22)</h3>
+<ul class="history">
+      <li>システム変数 'groupmatchstr1'～'groupmatchstr9' を追加した。正規表現でグループマッチしたパターンが格納される。</li>
+      <li>Cygwin接続の複製ができるようにした</li>
+      <li>Mac OS X向けUTF-8において、濁点が正しく表示されないことがある問題を修正した。</li>
+      <li><a href="#ttssh_2.18">SSH2対応TTSSH(2.18)</a>へ差し替えた</li>
+      <li>TeraTerm Menuをマルチモニタ環境で使用すると、ポップアップメニューが正しいモニタに表示されないバグを修正した（TeraTerm Menu 1.03）。</li>
+      <li>LogMeTT 2.7.2へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.21">2005.10.7 (Ver 4.21)</h3>
+<ul class="history">
+      <li>スクロールレンジを 16bit から 32bit へ拡張した</li>
+      <li>マクロコマンド 'waitregex' を追加した。正規表現を使った文字列の wait が可能となる。</li>
+      <li>システム変数 'matchstr' を追加した。正規表現でマッチしたパターンが格納される。</li>
+      <li>サンプルマクロ wait_regex.ttl を追加した。</li>
+      <li>正規表現ライブラリ Oniguruma のバージョンをバージョン情報に追加した</li>
+</ul>
+
+<h3><a name="teraterm_4.20">2005.9.5 (Ver 4.20)</h3>
+<ul class="history">
+      <li><a href="#ttssh_2.17">SSH2対応TTSSH(2.17)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_4.19">2005.8.27 (Ver 4.19)</h3>
+<ul class="history">
+      <li>macroの除算結果が不正となるバグを修正した。白井隆氏に感謝します。</li>
+      <li>ttpmacro.exeのプロセス優先度は、ログ採取中も下げないようにした。</li>
+      <li>LogMeTT 2.6.1へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.18">2005.7.24 (Ver 4.18)</h3>
+<ul class="history">
+      <li>マクロ実行中のダイアログに行番号と内容を表示するようにした。</li>
+      <li>Mac OS X向けUTF-8において、濁点が正しく表示されないことがある問題を修正した。</li>
+      <li>LogMeTT 2.5.6へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.17">2005.5.29 (Ver 4.17)</h3>
+<ul class="history">
+      <li>&lt;ESC&gt;[J(Clear screen from cursor-position up to end)処理時において、カーソルが左上隅を指している場合にのみ、カレントバッファをスクロールアウトさせるようにした。</li>
+</ul>
+
+<h3><a name="teraterm_4.16">2005.5.28 (Ver 4.16)</h3>
+<ul class="history">
+      <li>ログ種別のplain textの情報をteraterm.iniに LogTypePlainText として残すようにした。</li>
+      <li>CygTermの設定を Additional settings ダイアログに追加した。</li>
+      <li>ブロック選択のキーバインドを Shift+MouseDrag から Alt+MouseDrag へ変更した。</li>
+      <li>ページをまたぐテキスト選択（選択済みテキスト領域の伸縮）をサポートした。選択範囲の開始位置は左クリック、終了位置はShift + 左クリックで指定する。</li>
+      <li>&lt;ESC&gt;[Jによる画面クリア時にカレントバッファをスクロールアウトさせるようにした。</li>
+      <li>マクロ使用時にCPU使用率が100%となる現象への暫定処置を施した（sendln後に無条件に100ミリ秒のスリープを追加）。</li>
+</ul>
+
+<h3><a name="teraterm_4.15">2005.4.24 (Ver 4.15)</h3>
+<ul class="history">
+      <li>ALT + Enterキー（トグル）押下でウィンドウを最大化できるようにした。</li>
+      <li>Eterm lookfeel alphablendの設定内容を teraterm.ini へ保存するようにした。</li>
+      <li>Eterm lookfeel alphablendのon/offを Additional settings ダイアログ上から設定できるようにした。</li>
+      <li>Windows98においてフォントがインストールされない問題を修正した。Boris氏に感謝します。</li>
+      <li>ライセンス文を追加した</li>
+      <li>マクロヘルプファイル（英語版）を更新した。Boris氏に感謝します。</li>
+      <li>LogMeTT 2.4.4へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.14">2005.4.9 (Ver 4.14)</h3>
+<ul class="history">
+      <li>URL文字列をダブルクリックするとブラウザが起動するしかけを追加した。monkey magic氏に感謝します。teraterm.iniにURLColor, EnableClickableUrlを追加。</li>
+      <li>エスケープシーケンス（ESC[39m:foreground color reset, ESC[49m:background color reset）をサポートした。これによりscreen上でw3mを使用した場合、色が戻らない現象が改善される。岩本氏に感謝します。</li>
+      <li>Additional settingsでのマウスカーソル種別を設定時に変更されるようにした。</li>
+      <li>バージョン情報ダイアログのURLをダブルクリックすると、ブラウザが起動されるようにした。</li>
+      <li>制限事項「SSHに対する"Duplicate session"では常にSSH2での接続を試みる」を解除した。</li>
+      <li>"Duplicate session"においてSSH自動ログインを行うようにした。</li>
+      <li>LogMeTT 2.4.3へ差し替えた</li>
+</ul>
+
+<h3><a name="teraterm_4.13">2005.3.31 (Ver 4.13)</h3>
+<ul class="history">
+      <li>2つめ以降のTeraTermプロセスにおいて、バージョン情報が正しく取得されない問題へ対処した。</li>
+      <li>マウスの右ボタン押下でのペーストを禁止する設定を teraterm.ini(DisablePasteMouseRButton) および Additional settings に追加した。</li>
+      <li>ZMODEMの送信において、ファイルサイズが20MBを超えるとクラッシュする問題へ対処した。Thorsten Behrens氏に感謝します。</li>
+      <li>LogMeTT 2.4.2へ差し替え。</li>
+</ul>
+
+<h3><a name="teraterm_4.12">2005.3.13 (Ver 4.12)</h3>
+<ul class="history">
+      <li>ttermpro.exeのバージョン情報が古いままだったので修正した。</li>
+      <li>全角文字（日本語）が行末をまたぐ場合、上方へスクロールしてしまう問題へ対処した（岩本氏パッチ）。</li>
+      <li>タイトルバーに日本語を設定する場合、Shift_JIS(CP932)へ変換するようにした（EUC-JPのみに対応）。</li>
+      <li>LogMeTT 2.1.2へ差し替え。</li>
+</ul>
+
+<h3><a name="teraterm_4.11">2005.2.22 (Ver 4.11)</h3>
+<ul class="history">
+      <li>ログ採取中に File -&gt; log がグレイ表示にならない問題へ対処した。</li>
+      <li>Eterm風透過ウィンドウ機能を追加した。AKASI氏に感謝します。</li>
+      <li>VisualStyle(WindowsXP)に対応させた</li>
+      <li>TitleFormatにformat ID=13を新規追加した</li>
+      <li>キャプション表示において、COM5以上の表示に対応した。</li>
+      <li>ログファイルの種別に"plain text"を追加した。当該オプションを有効にすると、ログファイルにASCII非表示文字を採取しないようになる。ただし、例外キャラクタ(HT, CR, LF)は採取対象。</li>
+      <li>TTProxy(2004/1/22版)の新規追加。蛭子屋双六氏に感謝します。</li>
+      <li>LogMeTT 2.02βの新規追加。Boris氏に感謝します。</li>
+      <li>LogMeInを削除した</li>
+      <li>Additional settingsをtab control化した</li>
+      <li>ログ採取時のデフォルト名を"teraterm.log"に変更した</li>
+</ul>
+
+<h3><a name="teraterm_4.10">2005.1.30 (Ver 4.10)</h3>
+<ul class="history">
+      <li>最大化ボタンを有効にした</li>
+      <li>TeraTerm Menu, LogMeInのアクセラレータキーを削除した</li>
+      <li>ログ採取時のデフォルト名(log_YYYYMMDD_HHMMSS.txt)を設定するようにした</li>
+      <li>Broadcast commandメニューをControl menu配下に追加した。</li>
+      <li>バージョンダイアログにホームページのURLを追加した。</li>
+      <li>"Save setup"ダイアログの初期ファイルディレクトリを、読み込まれたteraterm.iniがある箇所へ固定するよう変更した。</li>
+      <li>"File"配下に"View Log"メニューを追加した。</li>
+      <li>"Additional settings"に"View Log Editor"ボックスを追加した。</li>
+      <li>teraterm.iniの[Tera Term]セクションに、"ViewlogEditor"エントリを追加した。</li>
+      <li><a href="#ttssh_1.08">SSH2対応TTSSH(1.08)</a>へ差し替え</li>
+      <li>TeraTerm Menu 1.02へ差し替え。
+        <ul>
+          <li>デフォルトオプションに漢字コード(/KT=UTF8 /KR=UTF8)を追加した。</li>
+          <li>SSH自動ログインにおいて、ユーザパラメータを指定できるようにした。</li>
+          <li>SSH自動ログインにおいて、マクロの指定を削除した。</li>
+          <li>SSH自動ログインにおいて、秘密鍵ファイルの指定をできるようにした。</li>
+        </ul></li>
+</ul>
+
+<h3><a name="teraterm_2.09">2005.1.10 (Ver 2.09)</h3>
+<ul class="history">
+      <li>マルチディスプレイ環境において、ウィンドウのリサイズを行うと、プライマリディスプレイへ戻ってしまう現象に対処。パッチ作成に感謝します＞安藤弦彦氏</li>
+</ul>
+
+<h3><a name="teraterm_2.08">2005.1.6 (Ver 2.08)</h3>
+<ul class="history">
+      <li>ログ採取のダイアログをオープンダイアログからセーブダイアログへ変更した</li>
+      <li>"Save setup"ダイアログの初期ファイルディレクトリをプログラム本体がある箇所へ固定した</li>
+      <li><a href="#ttssh_1.07">SSH2対応TTSSH(1.07)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07h">2005.1.5 (Ver 2.07h)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.06">SSH2対応TTSSH(1.06)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07g">2004.12.27 (Ver 2.07g)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.05">SSH2対応TTSSH(1.05)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07f">2004.12.23 (Ver 2.07f)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.04">SSH2対応TTSSH(1.04)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07e">2004.12.18 (Ver 2.07e)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.03">SSH2対応TTSSH(1.03)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07d">2004.12.16 (Ver 2.07d)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.02">SSH2対応TTSSH(1.02)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07c">2004.12.15 (Ver 2.07c)</h3>
+<ul class="history">
+      <li>フォントのファイル属性の見直し</li>
+      <li>インストール時にTeraTerm関連のプロセスを殺すようにした</li>
+</ul>
+
+<h3><a name="teraterm_2.07b">2004.12.14 (Ver 2.07b)</h3>
+<ul class="history">
+      <li>teraterm.iniのスクロールバッファの初期値を 20000 へ変更。</li>
+      <li>フォントのインストール時に、ファイル属性を ReadOnly にするようにした。</li>
+      <li>TeraTerm Menu 1.01へ差し替え。ttermpro.exeの初期フォルダパスをカレントディレクトリに変更。</li>
+</ul>
+
+<h3><a name="teraterm_2.07a">2004.12.11 (Ver 2.07a)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.01">SSH2対応TTSSH(1.01)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.07">2004.12.8 (Ver 2.07)</h3>
+<ul class="history">
+      <li>"External setup"をsetup menu配下へ"Additional settings"として移動</li>
+      <li>File menuに"Duplicate session"を追加（/DUPLICATEオプションを追加）</li>
+      <li>ttpmacro.exeのプロセス優先度は、ログ採取中のみに下げるようにした。</li>
+      <li>行が連結している場合は、ログファイルに改行コードを含めないようにした（EnableContinuedLineCopy機能が有効の場合のみ）。</li>
+      <li>スクロールバッファの最大ライン数を400000までに拡張した。</li>
+      <li><a href="#ttssh_1.00">SSH2対応TTSSH(1.00)</a>へ差し替え</li>
+      <li>LogMeIn 1.21を同梱した。収録許可をBoris氏よりいただきました。感謝します。</li>
+      <li>TeraTerm Menu 0.94r2(+SSH2 support 1.00)を同梱した。収録許可を早川様よりいただきました。感謝します。</li>
+      <li>その他細かいバグ修正</li>
+</ul>
+
+<h3><a name="teraterm_2.06">2004.11.6 (Ver 2.06)</h3>
+<ul class="history">
+      <li>DEC特殊フォントによる罫線描画時にゴミが残る問題を修正した。これにより、UTF-8環境では日本語以外の言語には未対応となる。また、BOLD styleを使用すると、文字列の右端が切れなくなる。</li>
+      <li>2つめ以降のTeraTermの起動時にもディスクから teraterm.ini を読むようにした。</li>
+      <li>エクスプローラからのディレクトリのドラッグ＆ドロップに対応した。</li>
+      <li>READMEをBoris Maisuradze氏に英文化していただきました。感謝します。</li>
+</ul>
+
+<h3><a name="teraterm_2.05a">2004.10.25 (Ver 2.05a)</h3>
+<ul class="history">
+      <li><a href="#ttssh_1.00alpha4">SSH2対応TTSSH(1.00 alpha4)</a>へ差し替え</li>
+</ul>
+
+<h3><a name="teraterm_2.05">2004.10.11 (Ver 2.05)</h3>
+<ul class="history">
+      <li>MFC7.1 runtimeを同梱した</li>
+      <li>環境変数 TERATERM_EXTENSIONS の設定有無に関わらず、常に TTSSH をロードするようにした。</li>
+      <li>半角カナのUTF-8化が漏れていたのを修正した</li>
+      <li>INIファイルにおいてTTSSHが有効になっていると、Cygtermがうまく起動されない問題への対処（/nosshオプションを追加）。</li>
+      <li><a href="#ttssh_1.00alpha2">SSH2対応TTSSH(1.00 alpha2)</a>を同梱した</li>
+</ul>
+
+<h3><a name="teraterm_2.04a">2004.9.29 (Ver 2.04a)</h3>
+<ul class="history">
+      <li>配布形式をパッチからバイナリへ変更した。<br>
+          TeraTerm原作者（寺西様）より許可をいただきました。感謝します。</li>
+</ul>
+
+<h3><a name="teraterm_2.04">2004.9.5 (Ver 2.04)</h3>
+<ul class="history">
+      <li>ログ採取中のマクロ実行が停止することがある問題への対処</li>
+      <li>UTF-8化以降に追加した機能をGUIから設定できるようにした（Edit - External setupを追加）</li>
+      <li>ANSI Colorの設定内容をiniファイルへ保存するようにした</li>
+</ul>
+
+<h3><a name="teraterm_2.03">2004.8.6 (Ver 2.03)</h3>
+<ul class="history">
+      <li>Cygwin接続のアクセラレータキーに"Alt + G"を割り当てた</li>
+      <li>ログ採取ダイアログにファイル名のフルパス表示を追加した</li>
+      <li>ログ採取中にファイルへコメントを追加できるようにした</li>
+      <li>SetLayeredWindowAttributes() APIを静的リンクから動的ロードへ変更した（NT4.0対応）。</li>
+      <li>差分ファイル作成ツールを WDiff から udm へ変更した</li>
+</ul>
+
+<h3><a name="teraterm_2.02">2004.4.12 (Ver 2.02)</h3>
+<ul class="history">
+      <li>Mac OS X(HFS+)向けUTF-8をサポート</li>
+      <li>日本語以外の言語表示をサポート（ロケールとコードページ設定の追加）</li>
+      <li>日本語以外の言語入力をサポート（imm32.libをリンク）</li>
+      <li>BOM(Byte Order Mark)を削除するようにした</li>
+      <li>その他細かいバグフィックス</li>
+</ul>
+
+<h3><a name="teraterm_2.00a">2004.3.19 (Ver 2.00a)</h3>
+<ul class="history">
+      <li>READMEの記述を修正</li>
+      <li>READMEの英文化</li>
+</ul>
+
+<h3><a name="teraterm_2.00">2004.3.18 (Ver 2.00)</h3>
+<ul class="history">
+      <li>ベースソースをオリジナルからIPv6版へ変更した。</li>
+      <li>半透明ウィンドウに対応した</li>
+      <li>Cygwin接続に対応した</li>
+      <li>バッファの全選択をできるようにした</li>
+      <li>マウスカーソルの種別を設定できるようにした</li>
+      <li>WinSock1.1から2.2へ切り替えた</li>
+      <li>その他細かいバグフィックス</li>
+</ul>
+
+<h3><a name="teraterm_1.02">2004.3.13 (Ver 1.02)</h3>
+<ul class="history">
+      <li>ホスト名の最大長を80へ戻した</li>
+      <li>送信にもUTF-8対応した</li>
+</ul>
+
+<h3><a name="teraterm_1.01a">2004.3.9 (Ver 1.01a)</h3>
+<ul class="history">
+      <li>SSHの利用に関する記述をREADMEに記載。</li>
+      <li>SSHはTTSSH 1.5.4 + IPv6 0.81にて動作確認を行った。</li>
+</ul>
+
+<h3><a name="teraterm_1.01">2004.3.6 (Ver 1.01)</h3>
+<ul class="history">
+      <li>ホイールマウスに対応した</li>
+      <li>/KR オプションに"UTF8"を追加した</li>
+      <li>UTF-8変換機能の強化（テーブル引きを追加）</li>
+      <li>ホスト名の最大長を80から1024へ拡張</li>
+</ul>
+
+<h3><a name="teraterm_1.00">2004.3.2 (Ver 1.00)</h3>
+<ul class="history">
+      <li>初公開</li>
+</ul>
+
+
+<h2><a name="ttssh">TTSSH</a></h2>
+
+<h3><a name="ttssh_2.51">2009.3.29 (Ver 2.51 not-released)</a></h3>
+<ul class="history">
+  <li>その他
+    <ul>
+      <li>OpenSSL 0.9.8kへ差し替えた</li>
+    </ul></li>
+</ul>
+
+
+<h3><a name="ttssh_2.50">2009.3.22 (Ver 2.50)</a></h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>ssh:// URLの取り扱いを一部変更した。
+        <ul>
+          <li>URLにポート指定が含まれていない場合、ポート22に接続するようにした。</li>
+          <li>ユーザ名,パスワードのパーセントエンコーディングをデコードするようにした。</li>
+        </ul></li>
+      <li>"New Connection"ダイアログのホスト名やコマンドラインで、user@host形式のユーザ名指定を行えるようにした。</li>
+      <li>SSH SCPメニューにショートカットキー(&H)を追加した。</li>
+      <li>SSH鍵生成ダイアログで、鍵のビット数を指定できるようにした。</li>
+      <li>SSH鍵生成ダイアログで、鍵生成中に進捗状況を表示するようにした。</li>
+      <li>SSH鍵生成ダイアログで、鍵生成中に発生したイベントを破棄するようにした。</li>
+    </ul></li>
+  <li>バグ修正
+    <ul>
+      <li>SCPを連続して行うと、SSH2_MSG_CHANNEL_FAILURE 受信時にアプリケーションが終了してしまう問題へ対処した。</li>
+      <li>SSH KeyGenerator ダイアログで、生成した鍵の保存時にアプリケーションが落ちることがある問題を修正した。</li>
+      <li>Windows 95 で About TTSSH ダイアログを表示するとアプリケーションが落ちることがある問題を修正した。</li>
+      <li>ホスト鍵確認ダイアログから認証ダイアログに戻ったときに、コマンドラインで渡された認証方式がデフォルトの認証方式で上書きされることがある問題を修正した。</li>
+    </ul></li>
+  <li>その他
+    <ul>
+      <li>OpenSSL 0.9.8jへ差し替えた</li>
+    </ul></li>
+</ul>
+
+<h3><a name="ttssh_2.49">2008.12.16 (Ver 2.49)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>SSH2 の共通鍵暗号方式に AES128-CTR, AES192-CTR, AES256-CTR, Arcfour, Arcfour128, Arcfour256, CAST128-CBC を追加した。セキュリティ対応: <a href="http://jvn.jp/niscc/CPNI-957037/">CPNI-957037</a>
+        <ul>
+          <li>teraterm.ini の CipherOrder エントリに"&lt;", "=", "&gt;", "?", "@", "A", "B" を追加した。</li>
+        </ul></li>
+      <li>エージェント転送をサポートした。
+        <ul>
+          <li><a href="../menu/setup-ssh.html">SSH Setup ダイアログ</a>にチェックボックスを追加した。</li>
+          <li><a href="../menu/setup-sshauth.html">SSH Authentication ダイアログ</a>にチェックボックスを追加した。</li>
+          <li><a href="../commandline/ttssh.html">/ssh-A, /ssh-a</a> コマンドラインオプションを追加した。</li>
+        </ul></li>
+    </ul></li>
+  <li>バグ修正
+    <ul>
+      <li>SSH1接続時にアプリケーションエラーで落ちる問題を修正した。2.48でのエンバグ。</li>
+      <li>SSH2 接続で CheckAuthListFirst が有効な場合に、有効な認証メソッドが返ってくる前に接続ダイアログの OK ボタンを押すと接続が終了する問題を修正した。</li>
+      <li>DISPLAY 環境変数が設定されている場合に X 転送が開始できない問題を修正した。</li>
+      <li>新規接続ダイアログにおいて、Historyチェックボックスの有効化・無効化を行っていなかった問題を修正した。</li>
+      <li>SCPファイル送信で、ファイル名にスペースや一部の記号が含まれていると、送信できなかったり誤ったファイル名で送信される問題を修正した。</li>
+    </ul></li>
+</ul>
+
+<h3><a name="ttssh_2.48">2008.9.23 (Ver 2.48)</h3>
+<ul class="history">
+      <li>OpenSSH 5.1で追加された VisualHostKey を追加した。</li>
+      <li>teraterm.iniの LogLevel に"200"を追加した。SSH送受信のRAWパケットデータを採取できる。</li>
+      <li>SSH2 RSA 接続で、サーバの鍵が短すぎるときのエラーメッセージを変更した。</li>
+      <li>Windows Vista で ssh_known_hosts に保存されているホスト鍵を置換しようとするとフリーズする問題を修正した。</li>
+      <li>OpenSSL 0.9.8iへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.47">2008.6.25 (Ver 2.47)</h3>
+<ul class="history">
+      <li>SSH SCPダイアログにファイル受信先を表示するようにした。</li>
+      <li>ssh_known_hosts ファイルのポート番号指定に対応した。</li>
+      <li>TTSSH アイコン(ttsecure.ico)を新しくした。坂本龍彦氏に感謝します。</li>
+      <li>メモリリークを修正した。</li>
+      <li>SCPファイル送信後に、ファイルがロックされることがある問題へ対処した。</li>
+      <li>OpenSSL 0.9.8hへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.46">2008.2.29 (Ver 2.46)</h3>
+<ul class="history">
+      <li>バージョンを含まない Protocol Version Exchange 行をスキップする処理を追加した（RFC4253対応）。</li>
+      <li>SSH SCPダイアログにおいて、ファイル受信用ユーザインターフェイスを追加した。
+       <ul>
+         <li>ファイル受信先は "ファイル転送のためのディレクトリ" に固定</li>
+         <li>受信ファイル名は直接入力</li>
+       </ul></li>
+
+      <li><a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">Pageant</a>(an SSH authentication agent for PuTTY, PSCP and Plink) を使用した公開鍵認証に対応した。
+        <ul>
+          <li>コマンドラインオプションの /auth に pageant を追加した。</li>
+        </ul></li>
+      <li>"SECURITY WARNING" ダイアログをキャンセルするとアプリケーションエラーとなる問題の workaround を削除した。</li>
+
+</ul>
+
+<h3><a name="ttssh_2.45">2008.1.15 (Ver 2.45)</h3>
+<ul class="history">
+      <li>SCP(Secure Copy Protocol)によるファイル送信機能を実装した。Fileメニュー配下に"SSH SCP"を追加。
+       <ul>
+         <li>ファイル送信先はホームディレクトリに固定</li>
+         <li>ファイル受信は未サポート</li>
+         <li>SSH2に対応。SSH1は未サポート</li>
+         <li>SFTP(SSH File Transfer Protocol)は未サポート</li>
+       </ul></li>
+      <li>パケット送信処理にTCPコネクション切断の誤検出をする問題を修正した。TTSSH 1.01で搭載したハートビートスレッドが thread-safe ではなかったのが原因。</li>
+      <li>New Connection ダイアログのホスト名に /ssh1, /ssh2 が含まれている場合、SSH 接続が無効になる問題を修正した。</li>
+      <li>デフォルトユーザ名を指定しておらず、認証方式を challenge にしており、/ask4passwd を指定している場合、SSH2_MSG_SERVICE_REQUEST を2回送信してしまう問題を修正した。</li>
+      <li>CheckAuthListFirst が off で、認証方式を challenge にしており、/ask4passwd を指定している場合、TIS 認証ダイアログが自動的に出現しない問題を修正した。</li>
+      <li>CheckAuthListFirst が on で、ユーザ名を送信できる状態になる前にユーザ名を入力してフォーカスを外した場合、OKボタンを押したあとに認証が行われない問題を修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.44">2007.12.4 (Ver 2.44)</h3>
+<ul class="history">
+      <li>SSH2 の共通鍵暗号方式に AES192, AES256, Blowfish を追加した。
+        <ul>
+          <li>teraterm.ini の CipherOrder エントリに"9", ":", ";"を追加した。</li>
+        </ul></li>
+      <li>SSH2のポート転送(local-to-remote)において、サーバ側のウィンドウサイズ(remote_window)に余裕がない場合に、遅延送信を行うようにした。xtermやemacsがXmingのX11上で動かない現象が改善される。</li>
+      <li>サポートされていない認証方式を無効にする機能を変更した。
+        <ul>
+          <li>"CheckAuthListFirst" のデフォルトを Off にした。</li>
+          <li>"SSH Authentication" ダイアログからチェックボックスで設定できるようにした。</li>
+        </ul></li>
+      <li>ローカルからの SSH forwarding 接続で、他のホストからの接続を受け入れる機能を変更した。
+        <ul>
+          <li>"SSH Forwarding" ダイアログからチェックボックスで設定できるようにした。</li>
+          <li>"/ssh-acceptall" コマンドラインオプションで設定できるようにした。</li>
+          <li>"SSH Forwarding" ダイアログから、各転送設定ごとに許可できるようにした。</li>
+        </ul></li>
+      <li>"New connection" ダイアログの Host で指定された文字列に " /ssh", " /nossh", " /telnet" があった場合、ラジオボタンによる SSH の有効/無効より優先するようにした。</li>
+      <li>サーバがサポートする暗号方式をひとつもサポートしていない場合に落ちる問題を修正した。</li>
+      <li>SSH2パケットが"Bad packet length"になってしまう問題を修正した。TTSSH 2.42でのデグレード。
+        <ul>
+          <li><s>パケット送信処理にTCPコネクション切断の誤検出をしないようにした。</s></li>
+        </ul></li>
+      <li>SSH2ポート転送(local-to-remote)において、大きなサイズのパケットをサーバから受信した場合に、ローカルクライアントへの送信が失敗する問題を修正した。TTSSHオリジナルバグ。</li>
+      <li>OpenSSL 0.9.8gへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.43">2007.10.14 (Ver 2.43)</h3>
+<ul class="history">
+      <li>自動ログインの認証方式にチャレンジレスポンス(キーボードインタラクティブ)を追加した。
+        <ul>
+          <li>コマンドラインオプションの /auth に challenge を追加した。</li>
+        </ul></li>
+      <li>認証を試行する前に、サポートされていない認証方式を無効にする機能を追加した。
+        <ul>
+          <li>teraterm.ini の TTSSH セクションに "CheckAuthListFirst" エントリを追加した。デフォルトは On。</li>
+        </ul></li>
+      <li>known_hostsファイルへ公開鍵を追記もしくは置換する際、known_hostsダイアログでのユーザの問い合わせを確認してから、サーバ通信を再開するようにした。これによりknown_hostsの確認を待たずに、サーバへユーザ情報を送ってしまう問題を回避する。</li>
+      <li>New connection ダイアログの Host ドロップダウンで、Ctrl+d, Ctrl+k ショートカットキーをサポートした。それぞれ「一文字削除」「行末まで削除」に対応する。</li>
+      <li>OpenSSL 0.9.8fへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.42">2007.9.30 (Ver 2.42)</h3>
+<ul class="history">
+      <li>New connection ダイアログで使用中のシリアルポートを表示しないようにした。</li>
+      <li>パスワード認証を選択しているときに keyboard-interactive 認証を使用するのをやめた。これに伴い、Authentication Setup ダイアログの keyboard-interactive チェックボックスを削除した。keyboard-interactive 認証を使用するためには、challange/response を選択する必要がある。</li>
+      <li>New connection ダイアログの Host ドロップダウンで、Ctrl+p, Ctrl+n, Ctrl+b, Ctrl+f, Ctrl+a, Ctrl+e ショートカットキーをサポートした。それぞれ↑, ↓, ←, →, Home, End キーに対応する。</li>
+      <li>パケット送信処理にTCPコネクション切断の誤検出をしないようにした。</li>
+      <li>内部で使用している文字列系関数のセキュアバージョンへの全置換を実施。
+        <ul>
+          <li>ビルドオプションから _CRT_SECURE_NO_DEPRECATE を削除した。</li>
+        </ul></li>
+</ul>
+
+<h3><a name="ttssh_2.41">2007.8.8 (Ver 2.41)</h3>
+<ul class="history">
+      <li>keyboard-interactive認証が失敗したあとのパスワード認証の無条件トライを止めるようにした。</li>
+      <li>利用可能なCOMポートがない時、新しい接続ダイアログでシリアルポートの選択を無効化した。</li>
+      <li>すでにソケットが開かれているためにポートフォワードを開始できないとき、ポップアップでエラーを表示しないようにした。</li>
+      <li>コマンドライン入力におけるBOF(Buffer Over Flow)への対処を追加した。</li>
+      <li>リモート側からの SSH ポートフォワード接続が失敗したときに SSH 接続が切断される問題を修正した。</li>
+      <li>SSH のチャネルが開けないときにソケットが開いたままになる問題を修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.40">2007.5.7 (Ver 2.40)</h3>
+<ul class="history">
+      <li>keyfile パラメータも、ダブルクォートされたファイル名を認識するようにした。</li>
+      <li>プレインパスワード認証と一緒にキーボードインタラクティブ認証を使用するように設定している時、SSH認証ダイアログでプレインパスワード認証がrhosts認証と表示されるのを修正した。</li>
+      <li>ポートフォワーディングにおいてチャネルクローズした際に、SSH2チャネル構造体の解放が漏れていたバグを修正した。</li>
+      <li>チャネルが開けなかったときにクラッシュしていたのを修正した。</li>
+      <li>ユーザ認証リストをサーバから取得するようにし、パスワード認証でのログイン時に、ユーザ認証リストに"password"がなければ、keyboard-interactive認証でのログインを試みるようにした。</li>
+</ul>
+
+<h3><a name="ttssh_2.39">2007.3.10 (Ver 2.39)</h3>
+<ul class="history">
+      <li>パケット送信関数が失敗した場合、WSAGetLastError()がWSABASEERR(10000)未満であれば、成功したものと見なすようにした。</li>
+      <li>SSH2 鍵のパスフレーズを間違えた場合、パスフレーズダイアログにフォーカスするようにした。</li>
+      <li>OpenSSL 0.9.8eへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.38">2007.1.22 (Ver 2.38)</h3>
+<ul class="history">
+      <li>Cisco ルータの送信する SSH2_MSG_IGNORE のデータが不正なようなので、何も処理しないようにした。</li>
+      <li>パケット送信処理にTCPコネクション切断の誤検出をしないようにした。</li>
+</ul>
+
+<h3><a name="ttssh_2.37">2006.11.20 (Ver 2.37)</h3>
+<ul class="history">
+      <li>Extreme Networksスイッチにおいて共通鍵生成で失敗する現象に対するworkaround(SSH_BUG_SIGBLOB)を追加した。</li>
+</ul>
+
+<h3><a name="ttssh_2.36">2006.11.1 (Ver 2.36)</h3>
+<ul class="history">
+      <li>MACとパケット圧縮を有効にするタイミングを SSH2_MSG_NEWKEYS の送受信時に変更することにより、Tectia serverへつながらない問題を修正した。</li>
+      <li>SSH2_MSG_CHANNEL_EXTENDED_DATA のパケットを処理することにより、Windows上のTectia serverから標準エラー出力が送られたときに異常終了する問題を修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.35">2006.10.28 (Ver 2.35)</h3>
+<ul class="history">
+      <li>ttermpro.exeの/Fパラメータで指定されたファイルからTTSSHの設定が読まれなくなっていたのを修正した。2.34でエンバグしました。</li>
+      <li>SSHで接続中にNew connectionダイアログからtelnet接続できないのを修正した。2.34でエンバグしました。</li>
+      <li>KEX_DH_GRP1_SHA1 or KEX_DH_GRP14_SHA1における不正なメモリ解放を修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.34">2006.10.09 (Ver 2.34)</h3>
+<ul class="history">
+      <li>/ssh1, /ssh2, /telnet オプションを追加した。</li>
+      <li>/ask4passwd オプションを追加した。</li>
+      <li>ポートフォワードしているウィンドウから新規接続するとエラーが出る問題を修正した。</li>
+      <li>コマンドラインパラメータ名の大文字小文字を区別していなかったのを修正した。</li>
+      <li>スペースを含むファイル名を認識するよう修正した。</li>
+      <li>OpenSSL 0.9.8dへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.33">2006.9.16 (Ver 2.33)</h3>
+<ul class="history">
+      <li>コマンドラインパラメータにおいて、ダブルクォーテーションで囲まれたファイル名を正しく認識するようにした。</li>
+      <li>パスワードはユーザ認証後に破棄するようにした。</li>
+      <li>OpenSSL 0.9.8cへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.32">2006.8.9 (Ver 2.32)</h3>
+<ul class="history">
+      <li>タイトルバーのアイコンに小さいアイコンが使用されていなかったのを修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.31">2006.8.5 (Ver 2.31)</h3>
+<ul class="history">
+      <li>ユーザのパスワードを認証後もメモリ上に保持するかどうかを決めるチェックボックスを認証ダイアログに追加した。それにともない、teraterm.ini ファイルのTTSSHセクションに"RememberPassword"エントリを追加した。</li>
+</ul>
+
+<h3><a name="ttssh_2.30">2006.7.26 (Ver 2.30)</h3>
+<ul class="history">
+      <li>TTSSHアイコン(ttsecure.ico)を新しくした。坂本龍彦氏に感謝します。</li>
+</ul>
+
+<h3><a name="ttssh_2.29">2006.6.29 (Ver 2.29)</h3>
+<ul class="history">
+      <li>TTSSHのsetupダイアログの変更内容が次回接続時から反映されるようにした。パッチ作成に感謝します＞永田氏</li>
+      <li>ssh_known_filesファイルを常にTeraTermインストールディレクトリへ保存するようにした。パッチ作成に感謝します＞永田氏</li>
+      <li>Copyright表記を変更した</li>
+</ul>
+
+<h3><a name="ttssh_2.28">2006.6.23 (Ver 2.28)</h3>
+<ul class="history">
+      <li>SSH2遅延パケット圧縮（OpenSSH 4.2以降）をサポートした。パッチ作成に感謝します＞永田氏</li>
+</ul>
+
+<h3><a name="ttssh_2.27">2006.6.14 (Ver 2.27)</h3>
+<ul class="history">
+      <li>OpenSSH 4.3以降で遅延パケット圧縮が設定されている場合、従来のパケット圧縮を有効にした状態でのサーバへの接続ができないバグを修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.26">2006.6.11 (Ver 2.26)</h3>
+<ul class="history">
+      <li>SSH Port Forward の編集画面で Alt + キーが効かないバグを修正した。パッチ作成に感謝します＞永田氏</li>
+      <li>SSH Port Forward の編集画面で、TeraTermが未接続状態の場合、ポート番号不正を即座にメッセージボックスが表示されないバグを修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.25">2006.5.7 (Ver 2.25)</h3>
+<ul class="history">
+      <li>OpenSSL 0.9.8bへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.24">2006.4.7 (Ver 2.24)</h3>
+<ul class="history">
+      <li>HP-UXにおいてX11 fowardingが失敗した場合に、SSH2セッションが切断されないようにした。</li>
+</ul>
+
+<h3><a name="ttssh_2.23">2006.4.4 (Ver 2.23)</h3>
+<ul class="history">
+      <li>known_hostsファイルにおいてキー種別の異なる同一ホストのエントリがあった場合、古いキーを削除するユーザダイアログオプションを追加した。パッチ作成に感謝します＞永田氏</li>
+</ul>
+
+<h3><a name="ttssh_2.22">2006.3.29 (Ver 2.22)</h3>
+<ul class="history">
+      <li>known_hostsファイルにキー種別の異なる同一ホストのエントリがあると、アプリケーションエラーとなるバグを修正した。</li>
+</ul>
+
+<h3><a name="ttssh_2.21">2006.3.27 (Ver 2.21)</h3>
+<ul class="history">
+      <li>SSH2のknown_hosts対応を追加した。</li>
+      <li>known_hostsダイアログにサーバの fingerprint を表示するようにした</li>
+</ul>
+
+<h3><a name="ttssh_2.20">2006.3.6 (Ver 2.20)</h3>
+<ul class="history">
+      <li>SSH2ウィンドウ制御の見直しにより、スループットを向上させた。</li>
+</ul>
+
+<h3><a name="ttssh_2.19">2006.2.24 (Ver 2.19)</h3>
+<ul class="history">
+      <li>コンパイラを Visual Studio 2005 Standard Edition に切り替えた。</li>
+      <li>stricmp()を_stricmp()へ置換した</li>
+      <li>strdup()を_strdup()へ置換した</li>
+      <li>authorized_keysファイルの"command="をサポートした</li>
+      <li>OpenSSL 0.9.8b snapshotへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.18">2005.10.21 (Ver 2.18)</h3>
+<ul class="history">
+      <li>接続ダイアログに History チェックボックスを追加した。</li>
+      <li>OpenSSL 0.9.8aへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.17">2005.9.5 (Ver 2.17)</h3>
+<ul class="history">
+      <li>SSH自動ログイン時に認証ダイアログを /I オプション使用時にのみ最小化するようにした。</li>
+</ul>
+
+<h3><a name="ttssh_2.16">2005.8.27 (Ver 2.16)</h3>
+<ul class="history">
+      <li>SSH自動ログイン時に認証ダイアログを最小化するようにした。高橋智雄氏に感謝します。</li>
+      <li>zlib 1.2.3へ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.15">2005.7.24 (Ver 2.15)</h3>
+<ul class="history">
+      <li>SSH2ポートフォワーディングをサポートした。</li>
+      <li>SSH2パケット圧縮をサポートした。</li>
+      <li>SSH2接続時にTTY情報(VERASE)を渡すようにした。</li>
+      <li>SSH1接続で一度ユーザ認証に失敗すると、その後認証ができなくなるバグを修正。</li>
+      <li>接続ダイアログ上で Alt+P や Alt+C などのアクセラレータキーが効かないバグを修正。</li>
+      <li>OpenSSL 0.9.8へ差し替えた</li>
+      <li>zlib 1.2.2にsecurity fix(CAN-2005-2096)を追加。</li>
+</ul>
+
+<h3><a name="ttssh_2.14">2005.5.28 (Ver 2.14)</h3>
+<ul class="history">
+      <li>秘密鍵ファイルダイアログに3ファイルフィルタを追加した。</li>
+      <li>zlibのバージョンをバージョン情報に追加した。</li>
+</ul>
+
+<h3><a name="ttssh_2.13">2005.4.24 (Ver 2.13)</h3>
+<ul class="history">
+      <li>キー作成ダイアログを追加した（Setup - SSH KeyGenerator）。</li>
+      <li>OpenSSL 0.9.7gへ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_2.12">2005.4.9 (Ver 2.12)</h3>
+<ul class="history">
+      <li>SSH2チャネルルックアップ機構を追加</li>
+      <li>キー再作成時にアプリケーションエラーとなるバグを修正（2.10でのデグレード）。</li>
+      <li>"Duplicate session"においてSSH自動ログインを行うようにした。</li>
+</ul>
+
+<h3><a name="ttssh_2.11">2005.3.31 (Ver 2.11)</h3>
+<ul class="history">
+      <li>SSH2認証ダイアログの Use challenge/response to log in にアクセラレータキーを割り当てた。</li>
+      <li>シリアルポートを開いた状態からAlt-Nで新規接続を開こうとしたとき、フォーカスを当てるようにした。</li>
+      <li>SSHログファイル(TTSSH.LOG)の採取データを増加した</li>
+      <li>NetScreen(HITACHI) workaround対応。SSH2_MSG_CHANNEL_REQUEST送信時において、wantconfirmをfalseにした（サーバからのリプライを期待しない）。</li>
+      <li>OpenSSL 0.9.7fへ差し替えた</li>
+
+</ul>
+
+<h3><a name="ttssh_2.10">2005.3.13 (Ver 2.10)</h3>
+<ul class="history">
+       <li>ttxssh.dllのバージョン情報が古いままだったので修正した。</li>
+       <li>SSH client ID(SSH-2.0-TTSSH/X.XX Win32)にバージョン情報を含めるようにした。</li>
+       <li>Tru64 UNIX workaroundを追加。Miguel氏に感謝します。</li>
+       <li>SSH2 log dump機構を追加した</li>
+       <li>SSH server IDにCR+LFが含まれていた場合、CRの除去ができていなかったバグを修正。</li>
+       <li>すでにログイン処理を行っている場合は、SSH2_MSG_SERVICE_REQUESTの送信は行わないようにした。</li>
+       <li>パスワード認証の前に行うkeyboard-interactiveメソッドで、デフォルト設定値([TTSSH] KeyboardInteractive)を無効(0)にした。OpenSSH 4.0では無効なメソッドを使用するとコネクションが切られてしまうため。また、認証ダイアログのラベル名を設定の有無により変更するようにした。</li>
+       <li>SSH2（keyboard-interactive認証）接続においてchallenge/response loginに対応した。</li>
+</ul>
+
+<h3><a name="ttssh_1.09">2005.2.22 (Ver 1.09)</h3>
+<ul class="history">
+      <li>ドットで始まるディレクトリにあるSSH2秘密鍵ファイルが読み込めない問題へ対処した。</li>
+      <li>HeartBeat(keep-alive), SSH2 keyboard-interactiveの設定をTTSSHのダイアログ上から行えるようにした。</li>
+</ul>
+
+<h3><a name="ttssh_1.08">2005.1.30 (Ver 1.08)</h3>
+<ul class="history">
+      <li>keyboard-interactive認証をサポートした。それにともない、teraterm.ini ファイルのTTSSHセクションの"KeyboardInteractive"エントリを追加した。</li>
+      <li>バージョンダイアログにホームページのURL・OpenSSLバージョンを追加した。</li>
+      <li>SSH2認証ダイアログで、rhostsおよびTISがグレーになる前に、Enterキーを押下すると、アプリケーションエラーとなる現象に対処した。</li>
+      <li>公開鍵認証自動ログインをサポート。/auth=publickey, /keyfileコマンドラインオプションを追加。</li>
+</ul>
+
+<h3><a name="ttssh_1.07">2005.1.6 (Ver 1.07)</h3>
+<ul class="history">
+      <li>telnet接続時にターミナルサイズ変更を行うと、アプリケーションエラーとなるバグを修正（1.06でのデグレード）。</li>
+</ul>
+
+<h3><a name="ttssh_1.06">2005.1.5 (Ver 1.06)</h3>
+<ul class="history">
+      <li>ターミナルサイズ変更に対応した。</li>
+      <li>キー再作成時にアプリケーションエラーとなるバグを修正（1.05でのデグレード）。</li>
+</ul>
+
+<h3><a name="ttssh_1.05">2004.12.27 (Ver 1.05)</h3>
+<ul class="history">
+      <li>'Auto window close'が無効の場合、切断後の接続ができない問題を修正した。</li>
+      <li>SSH2 KEX処理のメモリリークを修正した。</li>
+      <li>SSH2秘密鍵読み込み失敗時のエラーメッセージ出力を強化した。</li>
+</ul>
+
+<h3><a name="ttssh_1.04">2004.12.23 (Ver 1.04)</h3>
+<ul class="history">
+      <li>公開鍵認証をサポート</li>
+</ul>
+
+<h3><a name="ttssh_1.03">2004.12.18 (Ver 1.03)</h3>
+<ul class="history">
+      <li>パケット受信時におけるHMACチェックを追加</li>
+      <li>メッセージ認証アルゴリズムに HMAC-MD5 を追加</li>
+      <li>KEXにおけるRSAおよびDSSのkey verify処理を追加</li>
+</ul>
+
+<h3><a name="ttssh_1.02">2004.12.16 (Ver 1.02)</h3>
+<ul class="history">
+      <li>SSH自動ログインにおいて、まれにアプリケーションエラーとなる現象へ対処した。</li>
+      <li>SSH1接続時の"SECURITY WARNING"ダイアログで、キャンセルするとアプリケーションエラーとなる現象へ対処した。</li>
+</ul>
+
+<h3><a name="ttssh_1.01">2004.12.11 (Ver 1.01)</h3>
+<ul class="history">
+      <li>SSHハートビート（キープアライブ）機能を追加した。<br>
+          ハートビート間隔は、 teraterm.ini ファイルのTTSSHセクションの"HeartBeat"エントリで設定可能（デフォルトは60秒）。</li>
+</ul>
+
+<h3><a name="ttssh_1.00">2004.12.8 (Ver 1.00)</h3>
+<ul class="history">
+      <li>SSH1/SSH2自動ログインをサポート（password認証のみ）。/auth, /username, /passwdオプションを追加。</li>
+      <li>SSHのデフォルトバージョンを SSH2 に変更した</li>
+      <li>接続ダイアログのtab orderを修正した。</li>
+      <li>接続ダイアログの起動時、ホスト名にフォーカスが当たるようにした。</li>
+      <li>SSH2自動ログイン・サンプルマクロ(ssh2login.ttl)を同梱した</li>
+</ul>
+
+<h3><a name="ttssh_1.00beta1">2004.11.7 (Ver 1.00 beta1)</h3>
+<ul class="history">
+      <li>暗号アルゴリズム AES128 をサポートした</li>
+      <li>KEXアルゴリズム diffie-hellman-group14-sha1 (OpenSSH 3.9以降)をサポートした</li>
+      <li>KEXアルゴリズム diffie-hellman-group-exchange-sha1 をサポートした</li>
+      <li>ホストキーアルゴリズム ssh-dss をサポートした</li>
+      <li>バージョン情報ダイアログにSSH2情報を出力するようにした</li>
+      <li>OpenSSL 0.9.7eへ差し替えた</li>
+      <li>READMEをBoris Maisuradze氏に英文化していただきました。感謝します。</li>
+</ul>
+
+<h3><a name="ttssh_1.00alpha4">2004.10.25 (Ver 1.00 alpha4)</h3>
+<ul class="history">
+      <li>ウィンドウサイズ制御の不具合を修正した。</li>
+      <li>データ通信確立後のDH鍵再作成に対応した。</li>
+      <li>その他細かいバグフィックス</li>
+</ul>
+
+<h3><a name="ttssh_1.00alpha3">2004.10.17 (Ver 1.00 alpha3)</h3>
+<ul class="history">
+      <li>ウィンドウサイズ制御処理を追加した</li>
+      <li>コネクションを切断する際、サーバ側へ SSH2_MSG_CHANNEL_CLOSE を送るようにした。</li>
+      <li>terminal typeが環境変数TERMへ渡されるようにした</li>
+</ul>
+
+<h3><a name="ttssh_1.00alpha2">2004.10.11 (Ver 1.00 alpha2)</h3>
+<ul class="history">
+      <li>SSH1をサポートした</li>
+      <li>SSH sessionが切断されるバグ（"Oversized packet received from server"と表示されて、コネクションが切れる問題）を修正した</li>
+      <li>/1, /2 オプションの追加</li>
+      <li>teraterm.ini ファイルにSSH protocol versionのエントリを追加した</li>
+</ul>
+
+<h3><a name="ttssh_1.00alpha1a">2004.8.8 (Ver 1.00 alpha1a)</h3>
+<ul class="history">
+      <li>DLLをrelease build版へ差し替えた</li>
+</ul>
+
+<h3><a name="ttssh_1.00alpha1">2004.8.5 (Ver 1.00 alpha1)</h3>
+<ul class="history">
+      <li>初公開</li>
+</ul>
+
+
+<h2><a name="cygterm">CygTerm+</a></h2>
+
+<h3><a name="cygterm_1.07_16">v1.07_16 2008/11/21 (by doda)</a></h3>
+<ul class="history">
+      <li>ssh認証エージェント転送機能を有効にするオプションを '-a' から '-A' に変更した。</li>
+      <li>ssh認証エージェント転送機能を無効にする '-a' オプションを追加した。</li>
+</ul>
+
+<h3><a name="cygterm_1.07_15">v1.07_15 2008/11/01 (by doda)</h3>
+<ul class="history">
+      <li>ssh認証エージェント転送機能を追加した。OpenSSHのssh認証エージェントに対応したプログラムが、CygTerm+を通してPageantにアクセスできるようになる。
+      <ul>
+        <li>ssh認証エージェント転送機能を有効にする '-a' オプションを追加した。</li>
+      </ul></li>
+</ul>
+
+<h3><a name="cygterm_1.07_14">v1.07_14 2007/12/17 (by doda)</h3>
+<ul class="history">
+      <li>ターミナルエミュレータに追加オプションを指定する '-o' オプションを追加した。</li>
+</ul>
+
+<h3><a name="cygterm_1.07_13">v1.07_13 2007/08/03 (by maya)</h3>
+<ul class="history">
+      <li>開始ディレクトリを指定する '-d' オプションを追加した。</li>
+</ul>
+
+<h3><a name="cygterm_1.07_12">v1.07_12 2007/06/10 (by doda)</h3>
+<ul class="history">
+      <li>telnet接続の待ち受け時間を設定するオプション SOCKET_TIMEOUT を追加した。</li>
+</ul>
+
+<h3><a name="cygterm_1.07_11">v1.07_11 2007/01/31 (import from cygterm v1.07)</h3>
+<ul class="history">
+      <li>gcc 3.4 での WinMainCRTStartup() 再定義エラー回避</li>
+      <li>連続出力時でもキーボード割り込みが入るように。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_11">v1.06_11 2006/09/29 (by maya)</h3>
+<ul class="history">
+      <li>環境変数と /etc/passwd の HOME を使わないようにした。<br>
+          Cygwin によってセットされた HOME が利用される。関連項目 /etc/profile</li>
+      <li>設定ファイルの優先順位を変更した。<br>
+          コマンドライン引数 &gt; ~/.cygtermrc &gt; /etc/cygterm.conf &gt; cygterm.cfg &gt; /etc/passwd</li>
+</ul>
+
+<h3><a name="cygterm_1.06_10">v1.06_10 2006/09/28 (by doda)</h3>
+<ul class="history">
+      <li>ユーザ名を得るのに、環境変数USERNAMEの代わりにgetlogin()を使うようにした。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_09">v1.06_09 2006/09/25 (by doda)</h3>
+<ul class="history">
+      <li>SHELLが設定されていない場合は、/etc/passwdからシェルの情報を得るようにした。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_08">v1.06_08 2006/08/30 (by maya)</h3>
+<ul class="history">
+      <li>cygterm.cfg を設定ファイルの中で最優先されるようにした。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_07">v1.06_07 2006/08/19 (by maya)</h3>
+<ul class="history">
+      <li>Windows の 環境変数 HOME が設定されていれば使うようにした。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_06">v1.06_06 2006/08/18 (by doda)</h3>
+<ul class="history">
+      <li>-sと-tオプションのパラメータの長さを制限した。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_05">v1.06_05 2006/08/18 (by maya)</h3>
+<ul class="history">
+      <li>インストーラから起動チェックをするため、mutex を作成した。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_04">v1.06_04 2006/08/15 (by doda)</h3>
+<ul class="history">
+      <li>シェルをログインシェルとして呼び出すオプション LOGIN_SHELL を追加した。<br>
+          LOGIN_SHELL: yes | no</li>
+</ul>
+
+<h3><a name="cygterm_1.06_03">v1.06_03 2006/08/15 (by doda)</h3>
+<ul class="history">
+      <li>ホームディレクトリで起動するのを選択するオプション HOME_CHDIR を追加した。<br>
+          HOME_CHDIR: yes | no</li>
+</ul>
+
+<h3><a name="cygterm_1.06_02">v1.06_02 2006/02/09 (by babydamons@yahoo.co.jp)</h3>
+<ul class="history">
+      <li>CygTermのアイコンが作成されました。（"DotWork 2.50"にて作成）<br>
+          DotWork 2.50" は右記のURLより入手可能です。 http://www5a.biglobe.ne.jp/~suuta/.<br>
+          すばらしいソフトウェアを公開していただき、"suuta at hamal dot freemal dot ne dot jp"に感謝致します。</li>
+      <li>Makefileが修正されました。"clean"ターゲットでcygterm.icoを削除しないように。</li>
+</ul>
+
+<h3><a name="cygterm_1.06_01">v1.06_01 2006/02/08 (by babydamons@yahoo.co.jp)</h3>
+<ul class="history">
+      <li>TeraTerm Project へインポートした。</li>
+      <li>以下の設定ファイルの読み込みをサポート:
+        <ul>
+          <li>/etc/cygterm.conf</li>
+          <li>~/.cygtermrc</li>
+        </ul></li>
+      <li>シェルがユーザのホームディレクトリで起動されるように。</li>
+      <li>アカウントの設定情報を/etc/passwdからgetpwnam(3)で読み込むように。<br>
+          アカウント名は環境変数USERNAMEからgetenv(3)で取得してます。</li>
+      <li>Makefile修正：ディフォルトでアイコンつきの.exeをビルドします。</li>
+</ul>
+
+<h3><a name="cygterm_1.06">v1.06 2004/01/24</h3>
+<ul class="history">
+      <li>コマンドライン・オプションを追加。
+        <ul>
+          <li>-t 'terminal-emulator' (ターミナル・エミュレータ指定)</li>
+          <li>-p port-number (接続先ポート番号指定)</li>
+          <li>-dumb (ダムターミナル指定)</li>
+          <li>-s 'shell' (シェル指定)</li>
+          <li>-v 'env-var' (環境変数指定)</li>
+        </ul></li>
+      <li>Makefile修正
+        <ul>
+          <li>make install で BINDIR が存在しなければエラーになるように。</li>
+        </ul></li>
+      <li>ソースファイル英文化 (cygterm.cc, README.txt)</li>
+</ul>
+
+<h3><a name="cygterm_1.05">v1.05 2003/01/14</h3>
+<ul class="history">
+      <li>Ctrl+SPACE(NUL)が送信できるように修正。<br>
+          改行コード CR+NUL を処理する方法として単純に NUL文字を無視していたため、Ctrl+SPACE 押下時でも NUL が送信されなかった。</li>
+</ul>
+
+<h3><a name="cygterm_1.04">v1.04 2002/12/08</h3>
+<ul class="history">
+      <li>ターミナル・エミュレータおよびシェルの起動に失敗したときにエラーメッセージを表示するようにした。</li>
+      <li>Makefile修正
+        <ul>
+          <li>make install で cygterm.cfg を上書きしないように。</li>
+          <li>gccオプションに -fno-exceptions を追加、GCC-3のリンクエラー回避。</li>
+        </ul></li>
+</ul>
+
+<h3><a name="cygterm_1.03">v1.03 2002/07/24</h3>
+<ul class="history">
+      <li>ターミナル・エミュレータが通知してくるターミナルタイプに、大文字が含まれていれば、それを小文字に変換するように修正。<br>
+          ターミナル・エミュレータによっては環境変数 TERM の値が 'ANSI' 'VT100' のように大文字になり terminfo にマッチしないため。(Windows 2000 telnet.exe 等)</li>
+</ul>
+
+<h3><a name="cygterm_1.02">v1.02 2002/07/22</h3>
+<ul class="history">
+      <li>ターミナル・エミュレータがコンソール・アプリケーションのときに起動できなかったのを修正。(Windows 2000 telnet.exe 等)<br>
+          CreateProcess()呼出しミス。</li>
+      <li>ターミナル・エミュレータから CR+LF が送られてきたら LF は転送しないようにし、改行が２回発生するのを修正。(Windows 98 telnet.exe 等)</li>
+      <li>バージョン番号を cygterm.exe に埋め込むようにした。<br>
+          確認方法は $ strings cygterm.exe | grep version</li>
+</ul>
+
+<h3><a name="cygterm_1.01">v1.01 2002/07/19</h3>
+<ul class="history">
+      <li>zsh, tcsh で動作しなかったのを修正。擬似端末のオープン方法が悪く、zsh, tcsh では起動とともに入力がブロックされた。</li>
+</ul>
+
+<h3><a name="cygterm_1.00">v1.00 2000/12/17</h3>
+<ul class="history">
+      <li>初期バージョン完成</li>
+</ul>
+
+
+<h2><a name="ttproxy">TTProxy</a></h2>
+
+<h3><a name="ttproxy_1.0.0.15">2008.2.29 (Ver 1.0.0.15)</a></h3>
+<ul class="history">
+      <li>32767を超えるポート番号が扱えない問題を修正した。</li>
+      <li>設定ダイアログで、プロキシ形式が NONE の場合に OK ボタンを押すと、ホスト名がないと警告が出てダイアログが閉じられない問題を修正した。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.14">2007.9.30 (Ver 1.0.0.14)</h3>
+<ul class="history">
+      <li>ユーザインターフェイスのメッセージを読み込めるようにした。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.13">2007.5.7 (Ver 1.0.0.13)</h3>
+<ul class="history">
+      <li>"protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport" 形式のパラメータをサポートしないようにした。<br>
+          TeraTerm パラメータの "telnet://server&lt;:port&gt;" 形式と競合するため。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.12">2007.3.8 (Ver 1.0.0.12)</h3>
+<ul class="history">
+      <li>英語以外の Windows で日本語リソースが使用されていたのを修正した。</li>
+      <li>日本語 Windows で無条件に日本語リソースが使用されていたのを修正した。<br>
+          98/Me/Vista では SetThreadLocale が無効なので使用しないようにした。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.11">2007.2.6 (Ver 1.0.0.11)</h3>
+<ul class="history">
+      <li>URL デコードとエンコードに失敗していた。<br>
+          ホスト名・ユーザ名・パスワードに [-\.0-9A-Z_a-z] の範囲外の文字が含まれていた場合、TeraTerm の "New connection" ダイアログから接続できない問題を修正した。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.10">2006.12.12 (Ver 1.0.0.10)</h3>
+<ul class="history">
+      <li>TeraTerm のダイアログの言語を使用して SetThreadLocale するのをやめた。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.9">2006.11.23 (Ver 1.0.0.9)</h3>
+<ul class="history">
+      <li>TeraTerm のコマンドラインパラメータに telnet://host 形式を指定した場合に刺さるバグを回避した。<br>
+          プロキシの接続先ポート番号が 0 の場合は、制御を TeraTerm に戻すようにした。</li>
+</ul>
+
+<h3><a name="ttproxy_1.0.0.8">2006.8.1 (Ver 1.0.0.8)</h3>
+<ul class="history">
+      <li>原作者の蛭子屋双六さんに許諾を得て、ソースをインポートした。</li>
+</ul>
+
+
+<h2><a name="ttmenu">TeraTerm Menu</a></h2>
+
+<h3><a name="ttmenu_1.08">2008.6.25 (Ver 1.08)</a></h3>
+<ul class="history">
+      <li>Pageant に対応した。</li>
+      <li>TeraTermアイコン(teraterm.ico)を新しくした。坂本龍彦氏に感謝します。</li>
+</ul>
+
+<h3><a name="ttmenu_1.07">2007.12.4 (Ver 1.07)</h3>
+<ul class="history">
+      <li>TeraTerm Menuの設定を .ini ファイルへ保存できるようにした。.iniファイルを使う場合は、"ttpmenu.exe"があるディレクトリに"ttpmenu.ini"（0バイトで可）を設置する。パッチ作成に感謝します＞まつも氏。</li>
+      <li>keyboard-interactive認証(/challenge)へ対応させた。</li>
+      <li>メッセージファイルがないときにファイルダイアログの拡張子フィルタが正しく動作しない問題を修正した。</li>
+      <li>アプリケーションを相対パスで指定しているとき、起動しないことがある問題を修正した。</li>
+</ul>
+
+<h3><a name="ttmenu_1.06">2007.9.30 (Ver 1.06)</h3>
+<ul class="history">
+      <li>ユーザインターフェイスのメッセージを読み込めるようにした。</li>
+</ul>
+
+<h3><a name="ttmenu_1.05">2007.3.10 (Ver 1.05)</h3>
+<ul class="history">
+      <li>Windows Vista で、ポップアップメニューが正しい位置に表示されない問題を修正した。</li>
+</ul>
+
+<h3><a name="ttmenu_1.04">2006.2.24 (Ver 1.04)</h3>
+<ul class="history">
+      <li>VS2005でビルドエラーとなる問題を修正した</li>
+</ul>
+
+<h3><a name="ttmenu_1.03">2005.1.30 (Ver 1.03)</h3>
+<ul class="history">
+      <li>TeraTerm Menuをマルチモニタ環境で使用すると、ポップアップメニューが正しいモニタに表示されないバグを修正した。</li>
+</ul>
+
+<h3><a name="ttmenu_1.02">2005.1.30 (Ver 1.02)</h3>
+<ul class="history">
+      <li>オプションに漢字コード(/KT=UTF8 /KR=UTF8)を追加した。</li>
+      <li>SSH自動ログインにおいて、ユーザパラメータを指定できるようにした。</li>
+      <li>SSH自動ログインにおいて、マクロの指定を削除した。</li>
+      <li>SSH自動ログインにおいて、秘密鍵ファイルの指定をできるようにした。</li>
+</ul>
+
+<h3><a name="ttmenu_1.01">2004.12.14 (Ver 1.01)</h3>
+<ul class="history">
+      <li>ttermpro.exeの初期フォルダパスをカレントディレクトリに変更。</li>
+</ul>
+
+<h3><a name="ttmenu_0.94r2">2004.12.8 (Ver 0.94r2)</h3>
+<ul class="history">
+      <li>TeraTerm Menu 0.94r2(+SSH2 support 1.00)を同梱した。収録許可を早川様よりいただきました。感謝します。</li>
+</ul>
+
+
+<h2><a name="kanjimenu">TTX KanjiMenu</a></h2>
+
+<h3><a name="kanjimenu_0.1.5">2009.3.22 (Ver 0.1.5)</a></h3>
+<ul class="history">
+      <li>送受信両方を同時に変更できるようにした。
+        <ul>
+          <li>teraterm.ini に UseOneSetting エントリを追加した。デフォルトはoff。</li>
+        </ul></li>
+      <li>Windows 95 でメニューが表示されない問題を修正した。</li>
+</ul>
+
+<h3><a name="kanjimenu_0.1.4">2008.2.29 (Ver 0.1.4)</a></h3>
+<ul class="history">
+      <li>"Recv: UTF-8m" を選択できない問題を修正した。</li>
+</ul>
+
+<h3><a name="kanjimenu_0.1.3">2007.8.8 (Ver 0.1.3)</h3>
+<ul class="history">
+      <li>Win98/Me/NT4.0 で起動エラーが出るため、LIBCMT.LIB をスタティックリンクするようにした。</li>
+      <li>共有変数への漢字コード設定時に範囲チェックを追加した。</li>
+      <li>Language 設定が Japanese のときのみ表示されるように変更した。</li>
+</ul>
+
+<h3><a name="kanjimenu_0.1.2">2007.5.25 (Ver 0.1.2)</h3>
+<ul class="history">
+      <li>原作者の原直さんに許諾を得て、ソースをインポートした。</li>
+</ul>
+
+</body>
+</html>

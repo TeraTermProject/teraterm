@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>logopen</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>logopen</h1>
+
+<p>
+Tera Term のログを開始する。
+</p>
+
+<pre class="macro-syntax">
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt;]]]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;filename&gt; に受信した文字が書き込まれる。ログを開始したあとも次のコマンドは実行される。<br>
+ファイル名に \ を含まない場合、Tera Termのカレントディレクトリに作成される。当該ディレクトリを変更するには <a href="changedir.html">changedir</a> マクロを使用する。
+</p>
+
+<p>
+&lt;binary flag&gt; の値が0のとき、受信した漢字、改行文字は変換されてファイルに書き込まれ、エスケープシーケンスは書き込まれない。<br>
+&lt;binary flag&gt; の値が0以外のとき、受信した文字をすべてそのままファイルに書き込む。
+</p>
+
+<p>
+&lt;append flag&gt; の値が0以外で、ファイル &lt;filename&gt; がすでに存在する場合、そのファイルに追加して書き込む。<br>
+&lt;append flag&gt; の値が0で、ファイル &lt;filename&gt; がすでに存在する場合、そのファイルは上書きされる。
+</p>
+
+<p>
+&lt;plain text flag&gt; が 0 以外の場合、ASCII 非表示文字をログに書き込まない。<br>
+&lt;timestamp flag&gt; が 0 以外の場合、ログの行頭に時刻を追加する。<br>
+ただし、&lt;binary flag&gt; が 以外の場合、&lt;plain text flag&gt;, &lt;timestamp flag&gt; は両方とも無視される。<em>(バージョン 4.61以降)</em>
+</p>
+
+<p>
+&lt;hide dialog flag&gt; が 0 以外の場合、ログ転送のダイアログを表示しない。
+</p>
+
+<p>
+ログファイルを開けた場合、result に 0 が格納される。開けなかった場合は 1 が格納される。<em>(バージョン 4.62 以降)</em>
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+connect '/C=1'
+
+; ユーザ名を取得
+getenv 'USERNAME' username
+; 日時を取得
+gettime timestr "%Y%m%d-%H%M%S"
+
+; ログファイル名に日時とユーザ名を入れる。
+sprintf2 filename 'console_%s_%s.log' username timestr
+
+; カレントディレクトリを変更する
+changedir 'C:\Documents and Settings\yutaka\デスクトップ'
+
+logopen filename 0 0
+logwrite 'Log start'#13#10
+logwrite '*****************************************************'#13#10
+logclose
+
+exit
+</pre>
+
+</body>
+</html>

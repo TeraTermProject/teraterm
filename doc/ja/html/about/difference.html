@@ -1,0 +1,727 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Tera Term Pro 2.3との差分</title>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+
+<body>
+
+<h1>Tera Term Pro 2.3との差分</h1>
+
+<p>
+Tera Term(Tera Term 4.58)とTera Term Pro 2.3との機能差分について以下に示します。
+</p>
+
+<h2>機能差分一覧</h2>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="20%">項目</th>
+	<th width="30%">Tera Term Pro 2.3</th>
+	<th width="30%">Tera Term</th>
+</tr>
+
+<tr>
+	<td>ソースコード</td>
+	<td>開示</td>
+	<td>開示</td>
+</tr>
+
+<tr>
+	<td>開発環境</td>
+	<td>Visual C++ 5.0 / Watcom C/C++ 11.0</td>
+	<td>Visual Studio 2005[*1]</td>
+</tr>
+
+<tr>
+	<td>ライセンス</td>
+	<td>プロプライエタリ[*2]</td>
+	<td>修正BSDライセンス[*3]</td>
+</tr>
+
+<tr>
+	<td>アイコン</td>
+	<td><img src="../image/teraterm.png" alt="Tera Term" width="32" height="32">[*4]</td>
+	<td><img src="../image/teraterm_new.png" alt="Tera Term" width="32" height="32">[*4]</td>
+</tr>
+
+<tr>
+	<td>TTSSHアイコン</td>
+	<td><img src="../image/ttsecure.png" alt="TTSSH" width="32" height="32"></td>
+	<td><img src="../image/ttsecure_new.png" alt="TTSSH" width="32" height="32">[*4]</td>
+</tr>
+
+<tr>
+	<td>最大COMポート</td>
+	<td>16</td>
+	<td>256</td>
+</tr>
+
+<tr>
+	<td>シリアルボーレート</td>
+	<td>110～115200</td>
+	<td>110～921600</td>
+</tr>
+
+<tr>
+	<td>プラグイン組み込み</td>
+	<td>環境変数"TERATERM_EXTENSIONS"の設定が必要</td>
+	<td>設定不要</td>
+</tr>
+
+<tr>
+	<td>リンクライブラリ</td>
+	<td>SSLeay, zlib</td>
+	<td>OpenSSL, zlib, Oniguruma, PuTTY</td>
+</tr>
+
+<tr>
+	<td>TTSSH</td>
+	<td>SSH 1.5</td>
+	<td>SSH 1.5 and 2</td>
+</tr>
+
+<tr>
+	<td>サポートSSHプロトコル</td>
+	<td>シェル、ポート転送、X11転送</td>
+	<td>シェル、ポート転送、X11転送、SCP</td>
+</tr>
+
+<tr>
+	<td>未サポートSSHプロトコル</td>
+	<td>SFTP, SCP</td>
+	<td>SFTP</td>
+</tr>
+
+<tr>
+	<td>SSH共通鍵暗号アルゴリズム</td>
+	<td>3DES, DES, Blowfish</td>
+	<td>3DES-CBC, Blowfish, AES128, AES192, AES256</td>
+</tr>
+
+<tr>
+	<td>SSHパケット圧縮</td>
+	<td>Yes</td>
+	<td>Yes。SSH2遅延パケット圧縮もサポート。</td>
+</tr>
+
+<tr>
+	<td>Pageant[*5]との連携</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>日本語文字コード</td>
+	<td>EUC-JP/Shift_JIS/JIS</td>
+	<td>EUC-JP/Shift_JIS/JIS/UTF-8/UTF-8 MAC</td>
+</tr>
+
+<tr>
+	<td>Unicode</td>
+	<td>未サポート</td>
+	<td>単一言語サポート[*6]</td>
+</tr>
+
+<tr>
+	<td>IPv6</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>半透明ウィンドウ</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>ハートビート[*7]</td>
+	<td>No</td>
+	<td>telnet, SSH1 and 2</td>
+</tr>
+
+<tr>
+	<td>ウィンドウの最大化</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>スクロールロックキー</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>右クリックの禁止</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>オンラインヘルプ</td>
+	<td>WinHelp</td>
+	<td>HtmlHelp</td>
+</tr>
+
+<tr>
+	<td>クリッカブルURL</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>ホイールマウス</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>国際化対応</td>
+	<td>No</td>
+	<td>Yes[*8]</td>
+</tr>
+
+<tr>
+	<td>プロキシ</td>
+	<td>No</td>
+	<td>Yes[*9](HTTP, TELNET, SOCKS4, SOCKS5, SSL, HTTP+SSL, TELNET+SSL, SOCKS4+SSL, SOCKS5+SSL)</td>
+</tr>
+
+<tr>
+	<td>xterm 256色モード</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+</table>
+
+<p></p>
+
+<ul>
+  <li>[*1] 一部MFC(C++)を使用しているため、Express Editionではビルドができない。</li>
+  <li>[*2] 改造版 Tera Term を不特定多数の人に配布する場合には作者（寺西高氏）の許可が必要。ただし、プラグインは除く。いかなる場合においても金銭的利益を得るためにTera Termを配布するには作者（寺西高氏）の許可が必要。</li>
+  <li>[*3] <a href="http://www.opensource.org/licenses/bsd-license.php">修正BSDライセンス</a>に準拠する。</li>
+  <li>[*4] アイコンの制作は坂本龍彦氏による。</li>
+  <li>[*5] PuTTYやWinSCPなどで使われる<a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">SSH認証エージェント</a></li>
+  <li>[*6] 内部でUnicode(UCS-2)とMBCSとの相互変換を行っているため、多言語同時表示は不可。すなわち、日本語版Windows上で日本語以外の言語を表示することはできない。ロケール設定により、中国語版Windows上でUTF-8による中国語を扱うことは可能。</li>
+  <li>[*7] NAT環境において一定時間通信がないと、ルータが通信経路テーブルをクリアしてしまうために、SSHセッションが切断されてしまうという現象に対して、ハートビート機能により現象を回避することができる。</li>
+  <li>[*8] 言語ファイル(lang\*.lng)によりメニューやメッセージの表示言語を切り替えることができる。切り替えの有効化にはTera Termの再起動が必要。</li>
+  <li>[*9] <a href="http://yebisuya.dip.jp/Software/TTProxy/">TTProxy</a>を使用。</li>
+</ul>
+
+<p>
+そのほかの細かな新機能について以下に示します。
+</p>
+
+<ul>
+  <li>ANSIカラー色変更&行連結機能</li>
+  <li>マウスカーソルの種別変更</li>
+  <li>ログファイルへのコメント追加</li>
+  <li>Broadcast command機能</li>
+  <li>バッファの全選択</li>
+  <li>ホスト名の最大長拡張</li>
+  <li>TeraTerm Menu, LogMeTTの同梱</li>
+  <li>セッションの複製</li>
+  <li>スクロールバッファの最大長拡張</li>
+  <li>エクスプローラからのディレクトリのドラッグ&ドロップに対応</li>
+  <li>2つめ以降のTera Termの起動時にもディスクから teraterm.ini を読む</li>
+  <li>VisualStyle(WindowsXP)対応</li>
+  <li>新しいタイトルフォーマット</li>
+  <li>ログ採取の新しいタイプを追加</li>
+  <li>デフォルトログファイル名（strftimeフォーマット使用可）</li>
+  <li>SSH認証鍵作成ウィザード</li>
+  <li>CygTermダイアログ設定</li>
+  <li>Collectorによるタブ化</li>
+  <li>&lt;ESC&gt;[Jによる画面クリア時にカレントバッファをスクロールアウト</li>
+  <li>ログ再生メニューの追加</li>
+  <li>改行コード LF のサポート</li>
+  <li>バッファの画面表示部分の選択</li>
+  <li>接続ダイアログのHostドロップダウンにbash styleショートカットキー(C-u, C-d, C-k, C-p, C-n, C-b, C-f, C-a, C-a)を追加</li>
+</ul>
+
+<hr>
+
+<h2>修正されたオリジナルバグ</h2>
+
+<ol>
+  <li>ウィンドウの幅を84ドット（XPのLUNAスタイルでは94ドット）より小さくすると、ウィンドウサイズを変更できなくなることがある。</li>
+  <li>行末のタブが次の行に自動改行されない。</li>
+  <li>ttpmacro.exeに256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で落ちる。 </li>
+  <li>マクロファイルに 256 バイトを越える長い行があると、BOF(Buffer Over Flow)で落ちる。 </li>
+  <li>マクロ実行中に、サーバからの受信データをマクロへDDE送信しないことがある（setsyncコマンドによる同期はttermpro.exeとttpmacro.exe間のDDE通信のみに適用されるため）。 </li>
+  <li>マクロの pause コマンドの待ち時間に 1 秒程度の遅延が発生することがある。</li>
+  <li>ログ採取中のマクロの実行処理が停止することがある。</li>
+  <li>マクロ実行中にCPU使用率が100%となることがある。</li>
+  <li>マクロの除算結果が不正となる。</li>
+  <li>ZMODEMの送信において、ファイルサイズが20MBを超えるとクラッシュする。</li>
+</ol>
+
+<hr>
+
+<h2>新しいショートカットキー</h2>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">キー</th>
+	<th width="70%">機能</th>
+</tr>
+
+<tr>
+	<td>ScrollLock</td>
+	<td>Tera Termウィンドウのスクロールロック/ロック解除（トグル）</td>
+</tr>
+
+<tr>
+	<td>Alt + Enter</td>
+	<td>ウィンドウの最大化（トグル）</td>
+</tr>
+
+<tr>
+	<td>Alt + D</td>
+	<td>セッションの複製（SSH, telnetのみ）</td>
+</tr>
+
+<tr>
+	<td>Alt + G</td>
+	<td>Cygwin接続</td>
+</tr>
+
+<tr>
+	<td>左クリック → Shift+左クリック</td>
+	<td>ページをまたぐテキスト選択、選択済みテキスト領域の伸縮</td>
+</tr>
+
+<tr>
+	<td>Shift + マウスドラッグ</td>
+	<td>廃止（ページをまたぐテキスト選択サポートのため）</td>
+</tr>
+
+<tr>
+	<td>Alt + マウスドラッグ</td>
+	<td>ブロック選択</td>
+</tr>
+
+</table>
+
+
+<hr>
+
+<h2>新設されたマクロコマンド</h2>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">コマンド</th>
+	<th width="70%">機能</th>
+</tr>
+
+<tr>
+	<td>connect</td>
+	<td>SSHによる自動ログイン用パラメータを追加。</td>
+</tr>
+
+<tr>
+	<td>waitregex</td>
+	<td>waitlnコマンドの正規表現バージョン。1つの行に対するパターンマッチを正規表現で行うことができる。</td>
+</tr>
+
+<tr>
+	<td>ifdefined</td>
+	<td>変数のタイプを調べることができる。</td>
+</tr>
+
+<tr>
+	<td>mpause</td>
+	<td>ミリ秒単位でのスリープを行う。</td>
+</tr>
+
+<tr>
+	<td>sprintf</td>
+	<td>C言語のprintfライクに書式指定の文字列を生成できる。</td>
+</tr>
+
+<tr>
+	<td>str2int</td>
+	<td>16進の文字列も数値へ変換できるようにした。</td>
+</tr>
+
+<tr>
+	<td>fileread</td>
+	<td>ファイルから指定したバイト数のデータを読み込む。</td>
+</tr>
+
+<tr>
+	<td>clipb2var</td>
+	<td>クリップボードからデータを読み出す。</td>
+</tr>
+
+<tr>
+	<td>var2clipb</td>
+	<td>クリップボードへデータを書き出す。</td>
+</tr>
+
+<tr>
+	<td>random</td>
+	<td>乱数を生成する。</td>
+</tr>
+
+<tr>
+	<td>tolower</td>
+	<td>アルファベットを小文字にする。</td>
+</tr>
+
+<tr>
+	<td>toupper</td>
+	<td>アルファベットを大文字にする。</td>
+</tr>
+
+<tr>
+	<td>break</td>
+	<td>forやwhileループから抜ける。</td>
+</tr>
+
+<tr>
+	<td>inputbox</td>
+	<td>デフォルト文字列を指定できるようにした。</td>
+</tr>
+
+<tr>
+	<td>rotateleft</td>
+	<td>左方向にビットローテートする。</td>
+</tr>
+
+<tr>
+	<td>rotateright</td>
+	<td>右方向にビットローテートする。</td>
+</tr>
+
+<tr>
+	<td>setenv</td>
+	<td>環境変数の設定および変更。</td>
+</tr>
+
+<tr>
+	<td>filenamebox</td>
+	<td>ファイル名を選択するダイアログボックスを開く。</td>
+</tr>
+
+<tr>
+	<td>do - loop</td>
+	<td>ループ制御</td>
+</tr>
+
+<tr>
+	<td>until - enduntil</td>
+	<td>ループ制御</td>
+</tr>
+
+<tr>
+	<td>callmenu</td>
+	<td>Tera Termウインドウのメニューを呼び出す。</td>
+</tr>
+
+<tr>
+	<td>cygconnect</td>
+	<td>Cygwinへ接続する。</td>
+</tr>
+
+<tr>
+	<td>scpsend</td>
+	<td>SCPプロトコルでファイルを送信する。</td>
+</tr>
+
+<tr>
+	<td>scprecv</td>
+	<td>SCPプロトコルでファイルを受信する。 </td>
+</tr>
+
+<tr>
+	<td>getver</td>
+	<td>Tera Termのバージョンを取得する。 </td>
+</tr>
+
+<tr>
+	<td>setbaud</td>
+	<td>シリアルポートのボーレートを変更する。 </td>
+</tr>
+
+</table>
+
+
+<hr>
+
+<h2>新設されたteraterm.iniのエントリ</h2>
+
+<p>
+"Tera Term"セクションについて以下に示します。
+</p>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">エントリ</th>
+	<th width="70%">意味</th>
+</tr>
+
+
+<tr>
+	<td>UILanguageFile</td>
+	<td>I18N向けの言語ファイルの指定。デフォルトはEnglish。 </td>
+</tr>
+
+<tr>
+	<td>ConnectingTimeout</td>
+	<td>TCP接続状態で、切断するまでのタイムアウト時間（秒）。Tera Termの/timeoutコマンドラインオプションでも変更可能。 </td>
+</tr>
+
+<tr>
+	<td>DisablePasteMouseRButton</td>
+	<td>マウスの右クリックでのペーストを禁止する。 </td>
+</tr>
+
+<tr>
+	<td>ConfirmPasteMouseRButton</td>
+	<td>マウスの右クリックでのペースト前に問い合わせダイアログを表示する。 </td>
+</tr>
+
+<tr>
+	<td>DisableAcceleratorSendBreak</td>
+	<td>シリアルコンソールにおいて Alt+B によるBreak送信を無効にする。 </td>
+</tr>
+
+<tr>
+	<td>ANSIColor</td>
+	<td>16色のカラーテーブルの設定情報。 </td>
+</tr>
+
+<tr>
+	<td>EnableContinuedLineCopy</td>
+	<td>行連結機能を有効にする。 </td>
+</tr>
+
+<tr>
+	<td>MouseCursor</td>
+	<td>マウスカーソルの種別を変更する。 </td>
+</tr>
+
+<tr>
+	<td>AlphaBlend</td>
+	<td>ウィンドウの半透明度を設定する。 </td>
+</tr>
+
+<tr>
+	<td>CygwinDirectory</td>
+	<td>Cygwinのインストール先を指定する。 </td>
+</tr>
+
+<tr>
+	<td>ViewlogEditor</td>
+	<td>ログを開くエディタを指定する。 </td>
+</tr>
+
+<tr>
+	<td>Locale</td>
+	<td>Unicodeを扱うためのOSのロケールを指定する。 </td>
+</tr>
+
+<tr>
+	<td>CodePage</td>
+	<td>Unicodeを扱うためのOSのコードページを指定する。 </td>
+</tr>
+
+<tr>
+	<td>UseNormalBGColor</td>
+	<td>文字の背景色をスクリーンの背景色と一致させる。 </td>
+</tr>
+
+<tr>
+	<td>KanjiReceive</td>
+	<td>"UTF-8"と"UTF-8m"の追加。 </td>
+</tr>
+
+<tr>
+	<td>KanjiSend</td>
+	<td>"UTF-8"の追加。UTF-8-MACでは送信時はNFCでよいので"UTF-8m"は不要。 </td>
+</tr>
+
+<tr>
+	<td>URLColor</td>
+	<td>クリッカブルURLの強調表示の色。実際には動作しない。 </td>
+</tr>
+
+<tr>
+	<td>EnableClickableUrl</td>
+	<td>クリッカブルURLを有効にする。 </td>
+</tr>
+
+<tr>
+	<td>LogTypePlainText</td>
+	<td>ログ採取のファイル形式を plain text （制御コードを含まない）にする。 </td>
+</tr>
+
+<tr>
+	<td>LogTimestamp</td>
+	<td>ログ採取時に行の先頭に、採取時のOSのタイムスタンプを挿入する。 </td>
+</tr>
+
+<tr>
+	<td>LogDefaultName</td>
+	<td>ログ採取時のデフォルトのファイル名を設定する。<a href="http://msdn2.microsoft.com/ja-jp/library/fe06s4ak(VS.80).aspx">strftime</a>形式も使用可能。 </td>
+</tr>
+
+<tr>
+	<td>LogDefaultPath</td>
+	<td>ログ採取時のデフォルトパス名を設定する。 </td>
+</tr>
+
+<tr>
+	<td>LogAutoStart</td>
+	<td>接続時に自動的にログ採取を行う。 </td>
+</tr>
+
+<tr>
+	<td>BroadcastCommandHistory</td>
+	<td>Broadcast Commandのコマンド履歴をteraterm.iniへ保存する。 </td>
+</tr>
+
+<tr>
+	<td>AcceptBroadcast</td>
+	<td>"off"の場合、Broadcast Commandダイアログを呼び出したウィンドウにはコマンドを送出しない。 </td>
+</tr>
+
+<tr>
+	<td>TitleFormat</td>
+	<td>フォーマットIDに"13", "29", "45", "61"を追加。 </td>
+</tr>
+
+<tr>
+	<td>FileSendFilter</td>
+	<td>送信ダイアログのファイル名フィルタを設定する。 </td>
+</tr>
+
+<tr>
+	<td>VTCompatTab</td>
+	<td>行末のタブ表示を VT 端末互換にする。 </td>
+</tr>
+
+<tr>
+	<td>MaxBroadcatHistory</td>
+	<td>ブロードキャストコマンドの履歴の保存数</td>
+</tr>
+
+<tr>
+	<td>DisableAppKeypad, DisableAppCursor</td>
+	<td>アプリケーションキーパッド/カーソルモードを無効にできるようにした。</td>
+</tr>
+
+<tr>
+	<td>ClearComBuffOnOpen</td>
+	<td>シリアルポートのバッファをクリアしない。</td>
+</tr>
+
+<tr>
+	<td>Send8BitCtrl</td>
+	<td>C1 制御文字 ($80-$9F) を送信に使用する。</td>
+</tr>
+
+<tr>
+	<td>SelectOnlyByLButton</td>
+	<td>マウスドラッグによる選択を、左ボタンでのみ有効にする。</td>
+</tr>
+
+<tr>
+	<td>TelAutoDetect</td>
+	<td>Telnetコマンド自動検出の無効化</td>
+</tr>
+
+<tr>
+	<td>ZmodemRcvCommand</td>
+	<td>ZMODEM の受信コマンド</td>
+</tr>
+
+<tr>
+	<td>XmodemRcvCommand</td>
+	<td>XMODEM の受信コマンド</td>
+</tr>
+
+<tr>
+	<td>ConfirmFileDragAndDrop</td>
+	<td>ドラッグ&ドロップによるファイル送信の確認</td>
+</tr>
+
+<tr>
+	<td>TranslateWheelToCursor</td>
+	<td>アプリケーションカーソルモード時のマウスホイールの動作</td>
+</tr>
+
+<tr>
+	<td>HostDialogOnStartup</td>
+	<td>起動時の "New Connection" ダイアログの表示</td>
+</tr>
+
+<tr>
+	<td>MouseEventTracking</td>
+	<td>マウス操作の通知</td>
+</tr>
+
+<tr>
+	<td>KillFocusCursor</td>
+	<td>フォーカスが外れた時にもカーソルを表示する</td>
+</tr>
+
+<tr>
+	<td>ConfirmChangePaste</td>
+	<td>改行を含むクリップボードのペースト時に確認ダイアログを表示する</td>
+</tr>
+
+<tr>
+	<td>MaximizedBugTweak</td>
+	<td>ウィンドウ最大化時の画面スクロール方法</td>
+</tr>
+
+</table>
+
+<p>
+"TTSSH"セクションについて以下に示します。
+</p>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">エントリ</th>
+	<th width="70%">意味</th>
+</tr>
+
+<tr>
+	<td>CipherOrder</td>
+	<td>3DES-CBCの"7"、AES128の"8"、AES192の"9"、AES256の":"、Blowfish(SSH2)の";"を追加。</td>
+</tr>
+
+<tr>
+	<td>ProtocolVersion</td>
+	<td>SSHプロトコルバージョン</td>
+</tr>
+
+<tr>
+	<td>HeartBeat</td>
+	<td>キープアライブ（ハートビート）間隔</td>
+</tr>
+
+<tr>
+	<td>RememberPassword</td>
+	<td>パスワードをメモリ上へ保持するかどうか。</td>
+</tr>
+
+<tr>
+	<td>CheckAuthListFirst</td>
+	<td>認証を試行する前に、サポートされていない認証方式を無効にする。</td>
+</tr>
+
+</table>
+
+
+</body>
+</html>

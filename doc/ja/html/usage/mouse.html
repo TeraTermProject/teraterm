@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org//TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>マウス</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>マウス</h1>
+
+<h2>
+VT window
+</h2>
+
+<dl>
+<dt>ホイールマウス</dt>
+<dd>オリジナルのTera Termではホイールマウスが効きませんが、本プログラムではホイールボタンを使ってスクロールバーを上下させることができます。また、アプリケーションカーソルモード時(viやless等を使用時)には、ホイールの回転を上下のカーソルキーとして送信する事ができます。</dd>
+
+<dt>左ボタンでドラッグ</dt>
+<dd>文字列を選択し、それをクリップボードにコピーする。</dd>
+
+<dt>Alt キーを押しながら左ボタンでドラッグ</dt>
+<dd>長方形の領域内の文字を選択し、それをクリップボードにコピーする。</dd>
+
+<dt>左ボタンをダブルクリック</dt>
+<dd>1語選択し、それをクリップボードにコピーする。</dd>
+
+<dt>左ボタンをトリプルクリック</dt>
+<dd>1行選択し、それをクリップボードにコピーする。</dd>
+
+<dt>右ボタンでドラッグ</dt>
+<dd>文字列を選択し、それをクリップボードにコピーし、さらにそれをホストへ送出する。<br>
+    <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> および <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> が無効のときに動作する。</dd>
+
+<dt>右ボタンをクリック</dt>
+<dd>クリップボードの中の文字列をホストへ送出する。<br>
+    <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> が無効のときに動作する。</dd>
+
+<dt>タイトルバーの上で左ボタンをダブルクリック</dt>
+<dd>ウインドウサイズ(ウインドウの実際の大きさ)がターミナルサイズ(端末の論理的な画面の大きさ)と異なるとき、ウィンドウサイズをターミナルサイズと同じになるように変更します。その後、もう一度タイトルバーをダブルクリックすると、もとのウインドウサイズに戻ります。</dd>
+
+<dt>Ctrl キーを押しながら左ボタンをクリック</dt>
+<dd>メニューバーがなければ、ポップアップメニューが現れます。メニューバーを隠すには、<A HREF="../menu/setup-window.html">[Setup] Window</A> で Hide menu bar を選択してください。</dd>
+
+<dt>Alt キーを押しながら左ボタンでウィンドウをドラッグ</dt>
+<dd>タイトルバーがない場合、ウィンドウを移動します。タイトルバーを隠すには、<A HREF="../menu/setup-window.html">[Setup] Window</A> で Hide title bar を選択してください。</dd>
+
+<dt>Alt キーを押しながら右ボタンをクリック</dt>
+<dd>タイトルバーがない場合、ウィンドウを最小化します。</dd>
+
+<dt>ファイルをドラッグし、ウィンドウにドロップ</dt>
+<dd><a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> が off の場合には、ファイルを送信します。漢字コード、改行コードは変換されます。<br>
+    ConfirmFileDragAndDrop が on の場合には、メッセージボックスが表示されます。"Send file" を選択すると、ファイルを送信します。漢字コード、改行コードは変換されます。SSH2 接続の場合には、選択肢に "SCP" が現れます。選択すると　SCP でファイルを送信します。</dd>
+
+<dt>中ボタンでドラッグ・中ボタンをクリック</dt>
+<dd>これらのアクションはサポートされなくなりました。</dd>
+</dl>
+
+<h2>
+TEK window
+</h2>
+
+<dl>
+<dt>左ボタンでドラッグ</dt>
+<dd>画像を選択します。</dd>
+
+<dt>右ボタンをクリック</dt>
+<dd>VT window と同じ。</dd>
+
+<dt>Ctrlキーを押しながら左ボタンを押す</dt>
+<dd>VT window と同じ。</dd>
+
+</dl>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+■ 開発環境
+- OS
+  Windows XP Professional
+- コンパイラ
+  Visual Studio 2005 SP1 (Standard Edition 以上)
+  注: Visual Studio 2008 でコンパイルした実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
+  Windows Server 2003 R2 Platform SDK
+  注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
+  注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
+- インストーラ
+  Inno Setup 5.2.3 (http://www.jrsoftware.org/isinfo.php)
+  ISTool 5.2.1 (http://www.istool.org/)
+  Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
+- その他
+  ActivePerl 5.8 以上
+    OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
+
+
+■ ライブラリ
+- oniguruma 5.9.1 (http://www.geocities.jp/kosako3/oniguruma/)
+- openssl 0.9.8k (http://www.openssl.org/)
+- zlib 1.2.3 (http://www.zlib.net/)
+- PuTTY 0.60 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+
+
+■ SVN コミッターへの注意
+- SVN リポジトリは一般向けとは違い、以下の通りです。
+  svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk
+
+- ファイルを別のディレクトリで編集しないでください。
+  コミットしたときに別の人の修正を削除してしまうことがあります。
+
+- アップデート・コミット時の注意
+  svnの処理が失敗することがあるので、ファイルをエディタ等で開いたままで行わないでください。
+
+
+■ メニューID追加時の命名規則
+
+1桁目は 5
+
+2桁目は
+  Tera Term VT ウィンドウなら  0
+  Tera Term TEK ウィンドウなら 1
+  TTSSH なら                   2
+  TTProxy なら                 3
+  TTXKanjiMenu なら            4
+
+3桁目は
+  [File] メニューなら    1
+  [Edit] メニューなら    2
+  [Setup] メニューなら   3
+  [Control] メニューなら 4
+  [Window] メニューなら  8
+  [Help] メニューなら    9
+
+
+例：File配下にTTSSHのメニューを追加する
+
+#define ID_SSHSCPMENU       52110
+
+
+■ マクロコマンド追加時の作業リスト
+  Tera Termマクロを新設するときの作業手順について、以下に示します。
+
+１．ソースコードの修正
+-- コマンドの内部 ID を採番する（「内部 ID」は"helpid.h"にも使用される）
+   ... teraterm/ttmacro/ttmparse.h
+-- コマンド名を走査して内部 ID に変換する
+   ... CheckReservedWord@teraterm/ttmacro/ttmparse.c
+-- コマンドの内部 ID から実際に処理をする関数を呼ぶ
+   ... ExecCmnd@teraterm/ttmacro/ttl.c
+-- 処理する関数を作る
+
+２． ヘルプ(言語ごと)
+-- コマンドのヘルプを作る
+   ... doc/LANG/html/macro/command/hogefunc.html
+-- コマンド一覧ページに追加する
+   ... doc/LANG/html/macro/command/index.html
+-- ヘルプトピックに追加する
+   ... doc/LANG/teraterm.hhc
+-- ヘルプページのコンテキスト ID を採番する
+   値は コマンドの内部 ID + 92000
+   ... teraterm/common/helpid.h
+-- コンテキスト ID と呼び出すファイルのエイリアスを作成する
+   ... doc/LANG/teraterm.hhp
+
+
+■ ライブラリのビルド方法
+  1. PuTTY (used by TTSSH)
+     (1) putty のソースを libs/putty の中に展開する。
+
+  2. Oniguruma (used by Tera Term Macro)
+     (1) oniguruma のソースを libs/oniguruma の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma.bat を実行する。
+
+  3. OpenSSL (used by TTSSH and TTProxy)
+     (1) openssl のソースを libs/openssl の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl.bat を実行する。
+
+  4. Zlib (used by TTSSH)
+     (1) zlib のソースを libs/zlib の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildzlib.bat を実行する。
+
+
+■ Tera Termのビルド方法
+  Tera Termのビルド方法について以下に示します。
+  ビルドにはVisual Studio 2005 Standard Edition以上が必要です（Visual Studio 2005 Express Editionは不可）。
+
+  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
+  2. teraterm\visualc\ttermpro.sln をVisual Studioで開く。
+     .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。
+  3. ソリューションをビルドする
+  4. ビルドに成功するとteraterm ディレクトリに実行プログラムが生成される
+
+
+■ TeraTerm Menuのビルド方法
+  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  2. ttpmenu\ttpmenu.sln をVisual Studioで開く
+  3. ソリューションをビルドする
+  4. ビルドに成功すると ttpmenu ディレクトリに ttpmenu.exe が生成される
+
+
+■ TTXKanjiMenuのビルド方法
+  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  2. TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く
+  3. ソリューションをビルドする
+  4. ビルドに成功すると TTXKanjiMenu ディレクトリに ttxkanjimenu.dll が生成される
+
+
+■ TTProxyのビルド方法
+  TTProxyのビルド方法について以下に示します。
+  ビルドにはVisual Studio 2005(VC++8.0)が必要です。
+
+  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  2. TTProxy\TTProxy.sln をVisual Studioで開く
+  3. ソリューションをビルドする
+  4. ビルドに成功すると TTProxy ディレクトリにDLLが生成される
+
+
+■ TTSSHのビルド方法
+  TTSSHのビルド方法について以下に示します。
+  ビルドにはVisual Studio 2005(VC++8.0)、ActivePerlが必要です。
+
+  * TTSSH単体のビルドは VS2005 Express Edition でも可能です。ttpcmn.libをリンクするため、Tera Termのビルドを事前に行っておく必要があります。VS2005 Express EditionではTera Termのビルドはできませんが、ttpcmn.libは作成することができます。
+
+  * VS2008 Express Editionでビルドすると、.rcファイルで下記のエラーが発生します。
+      .\ttxssh.rc(10) : fatal error RC1015: cannot open include file 'afxres.h'.
+
+    本現象を回避するには、.rcファイルをテキストエディタで開き、afxres.hのincludeを削除し、新規に2行を追加します。
+
+      - #include "afxres.h"
+      + #include <windows.h>
+      + #define IDC_STATIC -1
+
+  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
+  2. ttssh2\ttssh.sln をVisual Studioで開く
+  3. ソリューションをビルドする
+  4. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される
+
+
+■ CygTermのビルド方法
+  CygTermのビルド方法について以下に示します。
+
+   1. Cygwin(http://www.cygwin.com/)をインストールする
+   2. Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
+      # cd cygterm
+   3. CygTermをコンパイルする
+      # make
+
+
+■ TTXSamplesのビルド方法
+  リポジトリのTTXSamplesに Tera Term Extension (TTX)のサンプルがあります。
+  TTXを作る際の参考にしてください。
+  TTXSamplesのビルドにはVisual Studio 2005(VC++8.0)が必要です。
+  Tera Term本体とは違い、Express Editionでもビルド可能です。
+
+  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  2. TTXSamples\TTXSamples.sln をVisual Studioで開く
+  3. ソリューションをビルドする
+  4. ビルドに成功すると TTXSamples ディレクトリにDLLが生成される
+  各TTXの詳細については、プロジェクト内のReadMe-ja.txtを参照してください。
+
+
+■ ヘルプファイルのビルド方法
+  ヘルプファイルのビルド方法について以下に示します。
+
+  1. HTML Help Workshopを以下のサイトから入手しインストールする。
+     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/hwMicrosoftHTMLHelpDownloads.asp
+
+  2. コマンドプロンプトからバッチファイルを起動し、必要なファイルをコピーする。
+     > cd teraterm\insatller
+     > convtext.bat
+
+  3. FileのOpenから doc\en\teraterm.hhp および doc\jp\teratermj.hhp を開く
+
+  4. FileのCompileでヘルプファイルをコンパイルする
+
+
+■ リリースの方法
+  リリースの方法について以下に示します。
+
+  1. 依存ライブラリ、ツール、インポート元の最新版をチェックする。
+    Visual Studio
+      http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
+    Inno Setup
+      http://www.jrsoftware.org/isdl.php
+      http://www.jrsoftware.org/files/istrans/
+    Oniguruma
+      http://www.geocities.jp/kosako3/oniguruma/
+    OpenSSL
+      http://www.openssl.org/
+    zlib
+      http://www.zlib.net/
+    PuTTY
+      http://www.chiark.greenend.org.uk/~sgtatham/putty/
+    CygTerm
+      http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
+    LogMeTT
+      http://www.logmett.com/forum/viewforum.php?f=5
+
+  2. バージョンを上げ、日付を変更する
+     リリース作業時に、バージョンを一つインクリメントする。
+     リリースされる前にバージョン番号が上がったファイルが出回るのを避けるため。
+     バグレポートなどで混乱の元になりそうなので、リリースまではバージョン番号を上げないこと。
+     - ttermpro.rc
+     - ttxssh.rc
+     - ttmacro.rc // 変更時のみ
+     - ttpmenu.rc // 変更時のみ
+     - TTProxy.rc // 変更時のみ
+     - ttxkanjimenu.rc // 変更時のみ
+     - teraterm.iss
+     - html/about/hisotry.html
+
+     CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。
+     パッチがコミットされると即リリース扱いになり、リリース日はその日付となる。
+     これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
+
+  3. SVN のタグを作成する。
+     タグ名は「teraterm-バージョン」。たとえば、v4.62ならば"teraterm-4_62"。
+
+  4. リリース用のタグでチェックアウトし直す。
+
+  5. 動作確認をする
+       プログラムをコンパイルし直す
+       インストーラを作成する
+         ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
+       インストールおよび実行をテストする
+
+  6. SourceForge.jp を更新する
+       [ダウンロード]-[管理]-[新規作成]
+         変更履歴を入力してリリースを作成する
+
+  7. プロジェクトページを更新する
+
+  8. メーリングリストにアナウンスする
+
+  9. フォーラムに告知する
+       (1) Announcements http://logmett.com/forum/viewforum.php?f=5
+           Announcements に新規投稿する。種類は Announcement
+           一つ前の Announcement の種類を Normal に変更する
+           Announcement は三個残すことになっているので、三つ前の Announcement を削除する
+
+       (2) Tera Term Changelog http://logmett.com/forum/viewtopic.php?f=5&t=3
+           今回の変更を追加する
+
+       (3) TTSSH Changelog http://logmett.com/forum/viewtopic.php?f=5&t=29
+           今回の変更を追加する
+
+  9. スナップショットを削除する

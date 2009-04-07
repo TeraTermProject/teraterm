@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>statusbox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>statusbox</h1>
+
+<p>
+ステータスダイアログボックスを表示する。
+</p>
+
+<pre class="macro-syntax">
+statusbox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ステータスダイアログボックスが表示されていない場合、それを表示する。<br>
+ダイアログボックスのメッセージを &lt;message&gt; に、タイトルを &lt;title&gt; に変える。
+</p>
+
+<p>
+"<a href="setdlgpos.html">setdlgpos</a>" コマンドはステータスダイアログボックスの位置を変える。<br>
+"<a href="closesbox.html">closesbox</a>" コマンドはステータスダイアログボックスを閉じる。
+</p>
+
+<p>
+&lt;special&gt; が 0 でない場合は、&lt;message&gt; に含まれる以下の文字列は特殊文字として扱われます。<br>
+&lt;special&gt; が指定されない場合は 1 が使用されます。
+</p>
+
+<table>
+ <tr>
+  <th>入力</th>
+  <th>出力</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>改行</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>タブ</td>
+ </tr>
+</table>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 表示位置を指定
+setdlgpos 200 200
+; ダイアログボックスを表示
+statusbox 'Message' 'Title'
+pause 3
+; ダイアログボックスを移動
+setdlgpos 0 0
+pause 3
+; ダイアログボックスを閉じる
+closesbox
+</pre>
+
+
+<pre class="macro-example">
+; カウンタを表示しながらループする
+step = 0
+while 1
+  call show_step
+  sendln 'echo do something'
+  wait '$'
+  pause 2
+endwhile
+exit
+
+:show_step
+step = step + 1
+int2str s step
+statusbox s 'counter'
+return
+</pre>
+
+</body>
+</html>

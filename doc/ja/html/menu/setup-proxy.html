@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Proxy（[Setup] メニュー）</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Proxy（[Setup] メニュー）</h1>
+
+    <h2>"Proxy Setup" ダイアログボックス</h2>
+    <dl>
+      <dt>Type</dt>
+      <dd>
+	プロキシのタイプを設定します。
+	<ul>
+	  <li>Winthout Proxy：プロキシを使用しません。</li>
+	  <li>HTTP：HTTP プロキシを使用します。</li>
+	  <li>TELNET：TELNET プロキシを使用します。</li>
+	  <li>SOCKS4：SOCKS4 プロキシを使用します。</li>
+	  <li>SOCKS5：SOCKS5 プロキシを使用します。</li>
+	</ul>
+      </dd>
+
+      <dt>Hostname</dt>
+      <dd>
+	プロキシサーバを指定します。
+      </dd>
+
+      <dt>Port number</dt>
+      <dd>
+	プロキシサーバのポート番号を指定します。
+      </dd>
+
+      <dt>Username</dt>
+      <dd>
+	プロキシサーバの利用に認証が必要な場合、そのユーザ名を指定します。
+      </dd>
+
+      <dt>Passwd</dt>
+      <dd>
+	プロキシサーバの利用に認証が必要な場合、そのパスワードを指定します。
+      </dd>
+
+      <dt>Other setup</dt>
+      <dd>
+	"Other Setup" メニューに移ります。
+      </dd>
+    </dl>
+
+    <h2>"Other Setup" メニュー</h2>
+
+    <h3>Common setup</h3>
+    <dl>
+      <dt>Connection Timeout</dt>
+      <dd>
+	プロキシとの通信（接続維持用の通信を含む。）
+	がここで指定した秒数だけ途絶えたら接続を切ります。
+      </dd>
+
+      <dt>Proxy connection log</dt>
+      <dd>
+	プロキシとの通信を指定したファイルに記録します。
+      </dd>
+    </dl>
+
+    <h3>SOCKS proxy setup</h3>
+    <p>
+      Name で名前解決の方法を指定します。
+    </p>
+
+    <dl>
+      <dt>auto resolve</dt>
+      <dd>
+	自動
+      </dd>
+
+      <dt>resolve remote</dt>
+      <dd>
+	SOCKS サーバ側で名前解決します。
+      </dd>
+
+      <dt>resolve local</dt>
+      <dd>
+	Tera Term が動いている PC で名前解決します。
+      </dd>
+    </dl>
+
+    <h3>TELNET Proxy setup</h3>
+    <p>
+      TELNET プロキシに関する設定を行います。
+    </p>
+
+    <dl>
+      <dt>Hostname prompt</dt>
+      <dd>
+	ホスト名の入力を催すプロキシ側のプロンプトを指定します。
+      </dd>
+
+      <dt>Username prompt</dt>
+      <dd>
+	ユーザ名の入力を催すプロキシ側のプロンプトを指定します。
+      </dd>
+
+      <dt>Passwd</dt>
+      <dd>
+	パスワードの入力を催すプロキシ側のプロンプトを指定します。
+      </dd>
+
+      <dt>Connected</dt>
+      <dd>
+	接続完了のメッセージを指定します。
+      </dd>
+
+      <dt>Error message</dt>
+      <dd>
+	プロキシ側からのエラーメッセージの表示を指定します。
+      </dd>
+    </dl>
+  </body>
+</html>

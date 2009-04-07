@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>clipb2var</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>clipb2var</h1>
+
+<p>
+クリップボードのテキストデータをコピーする。
+</p>
+
+<pre class="macro-syntax">
+clipb2var &lt;strvar&gt; [&lt;offset&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+クリップボードのテキストデータを &lt;strvar&gt; へ代入する。<br>
+<a href="../syntax/types.html#String">文字列変数の最大長の制限</a>を受けるため、クリップボードのテキストデータが長すぎた場合は256バイト目以降が切り捨てられる。<br>
+&lt;offset&gt;を指定すると、offset*255+1文字目以降の内容が代入される。
+</p>
+
+<p>
+このコマンドの実行結果はシステム変数 result に格納される。変数 result の値の意味は以下のとおり。
+</p>
+
+<table>
+<tr>
+  <th>値</th>
+  <th>意味</th>
+</tr>
+
+<tr>
+  <td>0</td>
+  <td>クリップボードを開けなかった。またはテキストデータではなかった。またはoffsetの値が適切ではなかった。</td>
+</tr>
+
+<tr>
+  <td>1</td>
+  <td>&lt;strvar&gt; への代入に成功した。</td>
+</tr>
+
+<tr>
+  <td>2</td>
+  <td>&lt;strvar&gt; への代入は行われたが、入りきらなかった部分は切り捨てられた。offsetの値を増やして再度clipb2varコマンドを実行する事で、切り捨てられた部分にアクセスできる。</td>
+</tr>
+
+<tr>
+  <td>3</td>
+  <td>クリップボードの内容を記憶しておくためのメモリの確保に失敗した。この場合でも先頭から最大255バイトは変数に代入されるが、offsetを増やして再度clipb2varコマンドを実行しても切り捨てられた部分にはアクセスできない。</td>
+</tr>
+</table>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+clipb2var data
+messagebox data 'clipboard data'
+</pre>
+
+<pre class="macro-example">
+; クリップボードの内容をファイル(clipboard.txt)に書き出す
+fileopen fp 'clipboard.txt' 0
+if result &lt;&gt; 0 end
+
+offset = 0
+do
+    clipb2var buff offset
+    if result &gt; 0 filewrite fp buff
+    offset = offset + 1
+loop while result = 2
+
+fileclose fp
+</pre>
+
+</body>
+</html>

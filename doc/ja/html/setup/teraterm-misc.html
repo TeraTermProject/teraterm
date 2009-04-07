@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>その他 (Tera Term 設定ファイル)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="beep">接続時のビープ音</a></h1>
+
+<p>
+TCP/IP 接続が確立した時とその接続が切れた時にビープ音を鳴らすには、設定ファイルの [Tera Term] セクションの BeepOnConnect 行を以下のように変更してください。
+</p>
+
+<pre>
+BeepOnConnect=on
+</pre>
+
+<pre>
+省略時:
+BeepOnConnect=off
+</pre>
+
+
+<h1><a name="IME">IME (日本語入力システム)に関する設定</a></h1>
+
+<p>
+IME のインライン入力をしないようにするには、設定ファイルの [Tera Term] セクションの IMEInline 行を以下のように変更してください。
+</p>
+<pre>
+IMEInline=off
+</pre>
+
+<pre>
+省略時:
+IMEInline=on
+</pre>
+
+<p>
+IME に関する何らかの不具合のため Tera Term が IME を制御しないようにするには、設定ファイルの [Tera Term] セクションの IME 行を以下のように変更してください。
+</p>
+
+<pre>
+IME=off
+</pre>
+
+<pre>
+省略時:
+IME=on
+</pre>
+
+
+<h1><a name="macro">起動時にマクロを実行</a></h1>
+
+<p>
+Tera Term 起動時にマクロを自動的に実行することができます。マクロファイル名はコマンドラインオプション "/M=<macro file>" を使うか、設定ファイルの [Tera Term] セクションの StartupMacro 行を以下のように変更することによって指定できます。
+</p>
+
+<pre>
+StartupMacro=&lt;macro file&gt;
+</pre>
+
+<pre>
+省略時:
+StartupMacro=
+</pre>
+
+
+<h1><a name="UILang">ユーザインタフェースの言語ファイル</a></h1>
+
+<p>
+ユーザインタフェースのメッセージが含まれたファイルを指定すると、表示される言語を切り換えることができます。
+</p>
+
+<pre>
+UILanguageFile=lang\Japanese.lng
+</pre>
+
+<pre>
+省略時:
+UILanguageFile=
+</pre>
+
+
+<h1><a name="broadcast">ブロードキャストコマンドの履歴の保存数</a></h1>
+
+<p>
+ブロードキャストコマンドの履歴の保存数を設定をしたい場合、MaxBroadcatHistory エントリを設定します。以下に例を示します。
+</p>
+
+<pre>
+MaxBroadcatHistory=200
+</pre>
+
+<pre>
+省略時:
+MaxBroadcatHistory=99
+</pre>
+
+
+<h1><a name="mousewheel">アプリケーションカーソルモード時のマウスホイールの動作</a></h1>
+
+<p>
+マウスのホイールを回転させた時は通常はスクロールバーが上下しますが、アプリケーションカーソルモード(viやless等を起動すると通常はこのモードになります)時にはスクロールバーは動かさず、かわりに上または下カーソルキーのシーケンスを送信します。
+</p>
+
+<p>
+この機能を無効にしてアプリケーションカーソルモードでもマウスホイールの回転でスクロールバーを動かしたい場合は、設定ファイルの [Tera Term] セクションの TranslateWheelToCursor 行を以下のように変更してください。
+</p>
+
+<pre>
+TranslateWheelToCursor=off
+</pre>
+
+<p>
+また、コントロールキーを押している間のみこの機能を無効にしたい場合は、設定ファイルの [Tera Term] セクションの DisableWheelToCursorByCtrl 行を以下のように変更してください。
+</p>
+
+<pre>
+DisableWheelToCursorByCtrl=on
+</pre>
+
+<pre>
+省略時:
+TranslateWheelToCursor=on
+DisableWheelToCursorByCtrl=on
+</pre>
+
+
+<h1><a name="hostdlg">起動時の "New Connection" ダイアログの表示</a></h1>
+
+<p>
+Tera Term は起動時に "New Connection" ダイアログを表示します。<br>
+これを表示したくない場合は、設定ファイルの [Tera Term] セクションの HostDialogOnStartup 行を以下のように変更してください。
+</p>
+
+<pre>
+HostDialogOnStartup=off
+</pre>
+
+<pre>
+省略時:
+HostDialogOnStartup=on
+</pre>
+
+
+<h1><a name="DisablePasteMouseMButton">マウスの中ボタンによる貼り付けを有効にする</a></h1>
+
+<p>
+中ボタンをクリックしたときに貼り付けを有効にするには、設定ファイルの [Tera Term] セクションの DisablePasteMouseMButton 行を以下のように変更してください。
+</p>
+
+<pre>
+DisablePasteMouseMButton=off
+</pre>
+
+<pre>
+省略時:
+DisablePasteMouseMButton=on
+</pre>
+
+
+<h1><a name="DisableMenuSendBreak">メニューの Send break を無効にする</a></h1>
+
+<p>
+メニューの "Send break" を無効にするには、設定ファイルの [Tera Term] セクションの DisableAcceleratorMenu 行を以下のように変更してください。
+</p>
+
+<pre>
+DisableAcceleratorMenu=on
+</pre>
+
+<pre>
+省略時:
+DisableAcceleratorMenu=off
+</pre>
+
+
+<h1><a name="ClearScreenOnCloseConnection">切断時に画面をクリアする</a></h1>
+
+<p>
+切断時に画面をクリアするには、設定ファイルの [Tera Term] セクションの ClearScreenOnCloseConnection 行を以下のように変更してください。
+</p>
+
+<pre>
+ClearScreenOnCloseConnection=on
+</pre>
+
+<pre>
+省略時:
+ClearScreenOnCloseConnection=off
+</pre>
+
+
+<h1><a name="DisableAcceleratorDuplicateSession">Duplicate session のアクセラレータキーを無効にする</a></h1>
+
+<p>
+Duplicate session のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの DisableAcceleratorDuplicateSession 行を以下のように変更してください。
+</p>
+
+<pre>
+DisableAcceleratorDuplicateSession=on
+</pre>
+
+<pre>
+省略時:
+DisableAcceleratorDuplicateSession=off
+</pre>
+
+
+</BODY>
+</HTML>
