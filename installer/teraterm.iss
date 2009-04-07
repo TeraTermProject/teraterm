@@ -37,7 +37,7 @@ Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm
 Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isPowerUsersMore
 Source: ..\doc\en\teraterm.chm; DestDir: {app}; Components: TeraTerm
-Source: ..\doc\jp\teratermj.chm; DestDir: {app}; Components: TeraTerm
+Source: ..\doc\ja\teratermj.chm; DestDir: {app}; Components: TeraTerm
 Source: release\license.txt; DestDir: {app}; Components: TeraTerm
 Source: release\FUNCTION.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\IBMKEYB.CNF; DestDir: {app}; Components: TeraTerm

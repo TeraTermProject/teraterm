@@ -18,11 +18,11 @@
 $macroidfile = '..\teraterm\ttpmacro\ttmparse.h';
 $helpidfile = '..\teraterm\common\helpid.h';
 $encmdfile = '..\doc\en\html\macro\command';
-$jpcmdfile = '..\doc\jp\html\macro\command';
+$jacmdfile = '..\doc\ja\html\macro\command';
 $enhhcfile = '..\doc\en\teraterm.hhc';
-$jphhcfile = '..\doc\jp\teraterm.hhc';
+$jahhcfile = '..\doc\ja\teraterm.hhc';
 $enhhpfile = '..\doc\en\teraterm.hhp';
-$jphhpfile = '..\doc\jp\teraterm.hhp';
+$jahhpfile = '..\doc\ja\teraterm.hhp';
 $keyfile = 'release\keyfile.ini';
 
 if ($#ARGV != -1) {
@@ -57,8 +57,8 @@ exit(0);
 #; TODO
 #; en/teraterm.hhcにリンク挿入
 #; en/teraterm.hhpにalias追加
-#; jp/teraterm.hhcにリンク挿入
-#; jp/teraterm.hhpにalias追加
+#; ja/teraterm.hhcにリンク挿入
+#; ja/teraterm.hhpにalias追加
 
 sub do_main {
 	my($macro) = @_;
@@ -163,7 +163,7 @@ sub do_main {
 		print "マクロコマンドの英語版説明文($s)がありません\n";
 	}
 	
-	$s = "$jpcmdfile\\$macro.html";
+	$s = "$jacmdfile\\$macro.html";
 	if (!(-e $s)) {
 		print "マクロコマンドの日本語版説明文($s)がありません\n";
 	}
@@ -175,7 +175,7 @@ sub do_main {
 		print "$s ファイルに $pat へのリンクがありません\n";
 	}
 	
-	$s = "$jpcmdfile\\index.html";
+	$s = "$jacmdfile\\index.html";
 	$pat = "$macro.html";
 	$ret = read_keyword($s, $pat);
 	if ($ret eq '') {
@@ -190,9 +190,9 @@ sub do_main {
 	}
 
 	$pat = "$macro.html";
-	$ret = read_keyword($jphhcfile, $pat);
+	$ret = read_keyword($jahhcfile, $pat);
 	if ($ret eq '') {
-		print "$jphhcfile ファイルに $pat へのリンクがありません\n";
+		print "$jahhcfile ファイルに $pat へのリンクがありません\n";
 	}
 	
 	
@@ -203,9 +203,9 @@ sub do_main {
 	}
 
 	$pat = "$macro.html";
-	$ret = read_keyword($jphhpfile, $pat);
+	$ret = read_keyword($jahhpfile, $pat);
 	if ($ret eq '') {
-		print "$jphhpfile ファイルに $pat へのALIASリンクがありません\n";
+		print "$jahhpfile ファイルに $pat へのALIASリンクがありません\n";
 	}
 
 }

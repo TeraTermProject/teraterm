@@ -56,7 +56,7 @@ if exist TTXResizeWin.dll ren TTXResizeWin.dll _TTXResizeWin.dll
 popd
 )
 
-copy /y ..\doc\jp\teratermj.chm %dst%
+copy /y ..\doc\ja\teratermj.chm %dst%
 copy /y ..\doc\en\teraterm.chm %dst%
 
 copy /y release\*.* %dst%
