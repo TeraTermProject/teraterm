@@ -3298,8 +3298,12 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
     case IdMouseEventBtnUp:
       switch (MouseReportMode) {
 	case IdMouseTrackVT200:
+	  len = MakeMouseReportStr(Report, sizeof Report, 3 | modifier, x, y);
+	  break;
+
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
+	  MouseReport(IdMouseEventMove, Button, Xpos, Ypos);
 	  len = MakeMouseReportStr(Report, sizeof Report, 3 | modifier, x, y);
 	  break;
 
