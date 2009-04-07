@@ -1808,10 +1808,16 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts,
 				continue;
 			}
 			if ((option[0] == '-' || option[0] == '/') &&
-			    (MATCH_STR(option + 1, "ssh-f=") == 0 ||
-			     MATCH_STR(option + 1, "ssh-consume=") == 0 ||
-			     MATCH_STR_I(option + 1, "f=") == 0 ||
-			     MATCH_STR(option + 1, "keyfile=") == 0)) {
+			    (MATCH_STR(option + 1, "ssh-f=") == 0 ||       // ttssh option
+			     MATCH_STR(option + 1, "ssh-consume=") == 0 || // ttssh option
+			     MATCH_STR_I(option + 1, "f=") == 0 ||         // Tera Term option
+			     MATCH_STR_I(option + 1, "fd=") == 0 ||        // Tera Term option
+			     MATCH_STR_I(option + 1, "k=") == 0 ||         // Tera Term option
+			     MATCH_STR_I(option + 1, "l=") == 0 ||         // Tera Term option
+			     MATCH_STR_I(option + 1, "m=") == 0 ||         // Tera Term option
+			     MATCH_STR_I(option + 1, "r=") == 0 ||         // Tera Term option
+			     MATCH_STR_I(option + 1, "w=") == 0 ||         // Tera Term option
+			     MATCH_STR(option + 1, "keyfile=") == 0)) {	   // ttssh option
 				if (param[i] == '"') {
 					inQuotes = TRUE;
 				}
