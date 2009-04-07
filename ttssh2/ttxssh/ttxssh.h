@@ -53,7 +53,7 @@ See LICENSE.TXT for the license.
 #include <crtdbg.h>
 
 #include "i18n.h"
-
+#include "ttlib.h"
 
 typedef struct _TInstVar FAR * PTInstVar;
 

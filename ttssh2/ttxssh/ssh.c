@@ -8044,7 +8044,6 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 		buffer_free(msg);
 
 		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_WINDOW_ADJUST was sent at do_SSH2_adjust_window_size().", LOG_LEVEL_SSHDUMP);
-		OutputDebugPrintf("remote_id:%d local_id:%d\n", c->remote_id, c->self_id);
 		// クライアントのwindow sizeを増やす
 		c->local_window = c->local_window_max;
 	}
