@@ -63,16 +63,7 @@ Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: release\LogMeTT_license.txt; DestDir: {app}; Components: LogMeTT
-Source: release\LogMeTT_README.txt; DestDir: {app}; Components: LogMeTT
-Source: release\LogMeTTc.exe; DestDir: {app}; Components: LogMeTT; Flags: ignoreversion
-Source: release\LogMeTT.exe; DestDir: {app}; Components: LogMeTT; Flags: ignoreversion
-Source: release\logmett.chm; DestDir: {app}; Components: LogMeTT
-Source: release\runltt.exe; DestDir: {app}; Components: LogMeTT
-Source: release\KeyFile.ini; DestDir: {app}; Components: LogMeTT
-Source: release\TTLEdit.exe; DestDir: {app}; Components: LogMeTT; Flags: ignoreversion
-Source: release\SynComp.pro; DestDir: {app}; Components: LogMeTT
-Source: release\ttmacro.tpl; DestDir: {app}; Components: LogMeTT
+Source: ..\libs\logmett\setup295.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -337,9 +328,12 @@ Name: sshassoc; Description: {cm:task_sshassoc}; Components: TTSSH; Flags: unche
 
 [Run]
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
-Filename: {app}\LogMeTT.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_logmett}; Components: LogMeTT
+Filename: {tmp}\setup295.exe; Components: LogMeTT
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
 Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
+
+[UninstallRun]
+Filename: {app}\uninstall.exe; Components: LogMeTT
 
 [CustomMessages]
 en.task_desktopicon=Create Tera Term shortcut to &Desktop
@@ -369,11 +363,9 @@ ja.type_full=フルインストール
 ja.type_compact=コンパクトインストール
 ja.type_custom=カスタムインストール
 en.launch_teraterm=Launch &Tera Term
-en.launch_logmett=Launch &LogMeTT
 en.launch_ttmenu=Launch TeraTerm &Menu
 en.launch_collector=Launch &Collector
 ja.launch_teraterm=今すぐ &Tera Term を実行する
-ja.launch_logmett=今すぐ &LogMeTT を実行する
 ja.launch_ttmenu=今すぐ TeraTerm &Menu を実行する
 ja.launch_collector=今すぐ &Collector を実行する
 en.msg_language_caption=Select Language
@@ -810,4 +802,5 @@ Name: {app}\libeay.txt; Type: files
 
 [_ISToolPreCompile]
 Name: makechm.bat
-Name: build.bat; Parameters: rebuild
+; Name: build.bat; Parameters: rebuild
+Name: build.bat
