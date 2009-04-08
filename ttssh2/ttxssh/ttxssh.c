@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "util.h"
 #include "ssh.h"
 #include "ttcommon.h"
+#include "ttlib.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -3062,6 +3063,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
 	static char sendfile[MAX_PATH] = "";
+	static char recvdir[MAX_PATH] = "";
 	HWND hWnd;
 	HDROP hDrop;
 	UINT uFileNo;
@@ -3073,8 +3075,10 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		DragAcceptFiles(dlg, TRUE);
 
 		// SCPファイル受信先を表示する
-		_snprintf_s(szFileName, sizeof(szFileName), _TRUNCATE, "To:     %s", pvar->ts->FileDir);
-		SendMessage(GetDlgItem(dlg, IDC_RECV_TO_DIRECTORY), WM_SETTEXT, 0, (LPARAM)szFileName);
+		if (recvdir[0] == '\0') {
+			_snprintf_s(recvdir, MAX_PATH, _TRUNCATE, "%s", pvar->ts->FileDir);
+		}
+		SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
 
 #ifdef SFTP_DEBUG
 		ShowWindow(GetDlgItem(dlg, IDC_SFTP_TEST), SW_SHOW);
@@ -3131,6 +3135,12 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			}
 			}
 			return TRUE;
+		case IDC_RECVDIR_SELECT | (BN_CLICKED << 16):
+			{
+			doSelectFolder(dlg, recvdir, MAX_PATH, "Choose destination directory");
+			SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
+			}
+			return TRUE;
 		}
 
 		switch (LOWORD(wParam)) {
@@ -3153,7 +3163,14 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			hWnd = GetDlgItem(dlg, IDC_RECVFILE);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(szFileName), (LPARAM)szFileName);
 			if (szFileName[0] != '\0') {
-				SSH_start_scp_receive(pvar, szFileName);
+				char recvpath[MAX_PATH] = "";
+				char* fn = strrchr(szFileName, '/');
+				if (fn && fn[1] == '\0') {
+					return FALSE;
+				}
+				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_GETTEXT, sizeof(recvdir), (LPARAM)recvdir);
+				_snprintf_s(recvpath, MAX_PATH, _TRUNCATE, "%s\\%s", recvdir, fn ? (fn + 1) : szFileName);
+				SSH_scp_transaction(pvar, szFileName, recvpath, FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;
 			}

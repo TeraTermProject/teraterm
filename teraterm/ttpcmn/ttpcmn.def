@@ -39,3 +39,6 @@ EXPORTS
   GetI18nLogfont @41
   
   OutputDebugPrintf @49
+  
+  is_NT4 @50
+  doSelectFolder @51

@@ -126,6 +126,7 @@
 #define IDC_SENDFILE_SELECT             1090
 #define IDC_FILE_PROGRESS               1092
 #define IDC_FILENAME                    1093
+#define IDC_RECVDIR_SELECT              1093
 #define IDC_PROGRESS                    1094
 #define IDC_FN_STATIC                   1095
 #define IDC_RECVFILE                    1096
@@ -136,6 +137,7 @@
 #define IDC_LOCALUSERNAMELABEL          1100
 #define IDC_RECV_TO_DIRECTORY           1100
 #define IDC_LOCALUSERNAME               1101
+#define IDC_RECVFILE_TO                 1101
 #define IDC_CHOOSEHOSTRSAFILE           1102
 #define IDC_HOSTRSAFILENAME             1103
 #define IDC_EDIT3                       1103

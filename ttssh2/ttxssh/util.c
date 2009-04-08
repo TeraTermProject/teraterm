@@ -252,16 +252,3 @@ int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PTIns
 
 	return TRUE;
 }
-
-BOOL is_NT4()
-{
-	OSVERSIONINFO osvi;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-	    osvi.dwMajorVersion == 4) {
-		return TRUE;
-	}
-	return FALSE;
-}
