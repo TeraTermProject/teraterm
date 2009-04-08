@@ -1899,6 +1899,7 @@ void CSSetAttr()
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackX10;
 	    break;
+	  case 12: ts.NonblinkingCursor = FALSE; ChangeCaret(); break;
 	  case 19: PrintEX = TRUE; break;
 	  case 25: DispEnableCaret(TRUE); break; // cursor on
 	  case 38:
@@ -2000,6 +2001,7 @@ void CSSetAttr()
 	  case 7: AutoWrapMode = FALSE; break;
 	  case 8: AutoRepeatMode = FALSE; break;
 	  case 9: MouseReportMode = IdMouseTrackNone; break;
+	  case 12: ts.NonblinkingCursor = TRUE; ChangeCaret(); break;
 	  case 19: PrintEX = FALSE; break;
 	  case 25: DispEnableCaret(FALSE); break; // cursor off
 	  case 59:
