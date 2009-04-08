@@ -3277,6 +3277,12 @@ void DispSetWinPos()
 #endif
 }
 
+void DispMoveWindow(int x, int y) {
+	SetWindowPos(HVTWin, 0, x, y, 0, 0, SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+	DispSetWinPos();
+	return;
+}
+
 void DispSetActive(BOOL ActiveFlag)
 {
   Active = ActiveFlag;

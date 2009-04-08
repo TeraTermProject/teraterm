@@ -1750,6 +1750,11 @@ void CSSetAttr()
     char Report[16];
 
     switch (Param[1]) {
+      case 3:
+	if (NParam < 2) Param[2] = 0;
+	if (NParam < 3) Param[3] = 0;
+	DispMoveWindow(Param[2], Param[3]);
+	break;
       case 8: /* set terminal size */
 	if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
 	if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;
