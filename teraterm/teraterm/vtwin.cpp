@@ -3850,6 +3850,7 @@ void CVTWindow::OnSetupTerminal()
 void CVTWindow::OnSetupWindow()
 {
 	BOOL Ok;
+	char orgTitle[TitleBuffSize];
 
 	HelpId = HlpSetupWindow;
 	ts.VTFlag = 1;
@@ -3857,6 +3858,8 @@ void CVTWindow::OnSetupWindow()
 
 	if (! LoadTTDLG())
 		return;
+
+	strncpy_s(orgTitle, sizeof(orgTitle), ts.Title, _TRUNCATE);
 	Ok = (*SetupWin)(HVTWin, &ts);
 	FreeTTDLG();
 
@@ -3867,6 +3870,12 @@ void CVTWindow::OnSetupWindow()
 		BGInitialize();
 		BGSetupPrimary(TRUE);
 #endif
+
+		// タイトルが変更されていたら、リモートタイトルをクリアする
+		if (strcmp(orgTitle, ts.Title) != 0) {
+			cv.TitleRemote[0] = '\0';
+		}
+
 		ChangeWin();
 	}
 
