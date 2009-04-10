@@ -3872,7 +3872,8 @@ void CVTWindow::OnSetupWindow()
 #endif
 
 		// タイトルが変更されていたら、リモートタイトルをクリアする
-		if (strcmp(orgTitle, ts.Title) != 0) {
+		if ((ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) &&
+		    (strcmp(orgTitle, ts.Title) != 0)) {
 			cv.TitleRemote[0] = '\0';
 		}
 

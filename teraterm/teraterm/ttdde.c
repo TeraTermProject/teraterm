@@ -586,7 +586,9 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdSetTitle:
 		strncpy_s(ts.Title, sizeof(ts.Title),ParamFileName, _TRUNCATE);
-		cv.TitleRemote[0] = '\0';
+		if (ts.AcceptTitleChangeRequest == IdTitleChangeRequestOverwrite) {
+			cv.TitleRemote[0] = '\0';
+		}
 		ChangeTitle();
 		break;
 	case CmdShowTT:
