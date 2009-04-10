@@ -80,6 +80,7 @@ void DispSetANSIColor(int num, COLORREF color);
 COLORREF DispGetANSIColor(int num);
 void DispSetCurCharAttr(TCharAttr Attr);
 void DispMoveWindow(int x, int y);
+void DispShowWindow(int mode);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

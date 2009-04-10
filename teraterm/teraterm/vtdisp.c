@@ -3355,3 +3355,7 @@ void DispSetCurCharAttr(TCharAttr Attr) {
 #endif  // ALPHABLEND_TYPE2
   }
 }
+
+void DispShowWindow(int mode) {
+	ShowWindow(HVTWin, mode);
+}
