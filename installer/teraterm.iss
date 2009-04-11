@@ -1,10 +1,15 @@
 #define AppName "Tera Term"
 #define AppVer "4.62"
+#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
 AppCopyright=TeraTerm Project
 AppName={#AppName}
+#ifndef snapshot
 AppVerName={#AppName} {#AppVer}
+#else
+AppVerName={#AppName} {#AppVer}+ snapshot-{#snapshot}
+#endif
 LicenseFile=release\license.txt
 DefaultDirName={pf}\teraterm
 DefaultGroupName={#AppName}
@@ -12,7 +17,11 @@ ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
 AppMutex=TeraTermProAppMutex, TeraTermProMacroAppMutex, TeraTermProKeycodeAppMutex, TeraTermMenuAppMutex, CygTermAppMutex
+#ifndef snapshot
 OutputBaseFilename=teraterm-{#AppVer}
+#else
+OutputBaseFilename=teraterm-{#snapshot}
+#endif
 PrivilegesRequired=none
 
 [Languages]
