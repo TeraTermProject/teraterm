@@ -289,6 +289,7 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 {
 	char uimsg[MAX_UIMSG];
 	CButton *btn, *btn2;
+	char buf[64];
 
 	CPropertyPage::OnInitDialog();
 
@@ -302,6 +303,9 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_CONFIRM_CHANGE_PASTE, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_DELIMITER, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_DELIM_LIST, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_PASTEDELAY_LABEL, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_PASTEDELAY_EDIT, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_PASTEDELAY_LABEL2, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgCopypasteFont = NULL;
@@ -325,6 +329,12 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_DELIMITER, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_DELIMITER", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_DELIMITER, ts.UIMsg);
+	GetDlgItemText(IDC_PASTEDELAY_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_COPYPASTE_PASTEDELAY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_PASTEDELAY_LABEL, ts.UIMsg);
+	GetDlgItemText(IDC_PASTEDELAY_LABEL2, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_COPYPASTE_PASTEDELAY2", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_PASTEDELAY_LABEL2, ts.UIMsg);
 
 	// (1)Enable continued-line copy
 	btn = (CButton *)GetDlgItem(IDC_LINECOPY);
@@ -354,6 +364,9 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	// (6)delimiter characters
 	SetDlgItemText(IDC_DELIM_LIST, ts.DelimList);
 
+	// (7)PasteDelayPerLine
+	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
+	SetDlgItemText(IDC_PASTEDELAY_EDIT, buf);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
@@ -383,6 +396,8 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 void CCopypastePropPageDlg::OnOK()
 {
 	CButton *btn;
+	char buf[64];
+	int val;
 
 	// (1)
 	btn = (CButton *)GetDlgItem(IDC_LINECOPY);
@@ -406,6 +421,12 @@ void CCopypastePropPageDlg::OnOK()
 
 	// (6)
 	GetDlgItemText(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
+
+	// (7)
+	GetDlgItemText(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
+	val = atoi(buf);
+	if (val > 0) 
+		ts.PasteDelayPerLine = val;
 }
 
 

@@ -1262,6 +1262,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
 	ts->DisableAcceleratorDuplicateSession =
 		GetOnOff(Section, "DisableAcceleratorDuplicateSession", FName, FALSE);
+
+	// added PasteDelayPerLine (2009.4.12 maya)
+	ts->PasteDelayPerLine =
+		GetPrivateProfileInt(Section, "PasteDelayPerLine", 10, FName);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2176,6 +2180,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// DisableAcceleratorDuplicateSession
 	WriteOnOff(Section, "DisableAcceleratorDuplicateSession", FName,
 	           ts->DisableAcceleratorDuplicateSession);
+
+	// added PasteDelayPerLine (2009.4.12 maya)
+	WriteInt(Section, "PasteDelayPerLine", FName,
+	         ts->PasteDelayPerLine);
 }
 
 #define VTEditor "VT editor keypad"

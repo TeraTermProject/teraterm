@@ -453,6 +453,7 @@ struct tttset {
 	WORD DisableMenuSendBreak;
 	WORD ClearScreenOnCloseConnection;
 	WORD DisableAcceleratorDuplicateSession;
+	int PasteDelayPerLine;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -891,6 +892,7 @@ typedef TMap far *PMap;
  *   added tttset.DisableAcceleratorMenu.
  *   added tttset.ClearScreenOnCloseConnection.
  *   added tttset.DisableAcceleratorDuplicateSession.
+ *   added tttset.PasteDelayPerLine.
  *
  * - At version 4.62, ttset_memfilemap was replaced with ttset_memfilemap_10.
  *   added tttset.DisableMouseTrackingByCtrl.

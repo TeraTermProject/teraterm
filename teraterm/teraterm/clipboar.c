@@ -140,7 +140,6 @@ void CBSend()
 {
   int c;
   BOOL EndFlag;
-  int SendBytes = 0;
 
   if (CBMemHandle==NULL) return;
 
@@ -163,8 +162,11 @@ void CBSend()
   if (CBMemPtr==NULL) return;
   
   do {
-    if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a))
+    if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
       CBMemPtr2++;
+      // added PasteDelayPerLine (2009.4.12 maya)
+      Sleep(ts.PasteDelayPerLine);
+    }
 
     EndFlag = (CBMemPtr[CBMemPtr2]==0);
     if (! EndFlag)
@@ -205,15 +207,6 @@ void CBSend()
       {
 	c = CommTextEcho(&cv,(PCHAR)&CBByte,1);
 	CBRetryEcho = (c==0);
-      }
-
-      // SSH2 で大きいデータを貼り付けたときにエコーバックが欠けることが
-      // あるので、500 バイト送信するごとに 10ms(この値に根拠はない) 待つ
-      // workaround (2008.8.22 maya)
-      SendBytes++;
-      if (SendBytes > 500) {
-        SendBytes = 0;
-        Sleep(10);
       }
     }
     else
