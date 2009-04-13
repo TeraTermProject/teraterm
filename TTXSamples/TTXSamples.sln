@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXCommandLineOpt", "TTXCom
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXRecurringCommand", "TTXRecurringCommand\TTXRecurringCommand.vcproj", "{3C656364-FAEA-41D2-B227-52187D3C2529}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTXShowCommandLine", "TTXShowCommandLine\TTXShowCommandLine.vcproj", "{80ED9927-27F9-473A-802C-FB10DEB5ECC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -90,6 +92,10 @@ Global
 		{3C656364-FAEA-41D2-B227-52187D3C2529}.Debug|Win32.Build.0 = Debug|Win32
 		{3C656364-FAEA-41D2-B227-52187D3C2529}.Release|Win32.ActiveCfg = Release|Win32
 		{3C656364-FAEA-41D2-B227-52187D3C2529}.Release|Win32.Build.0 = Release|Win32
+		{80ED9927-27F9-473A-802C-FB10DEB5ECC6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{80ED9927-27F9-473A-802C-FB10DEB5ECC6}.Debug|Win32.Build.0 = Debug|Win32
+		{80ED9927-27F9-473A-802C-FB10DEB5ECC6}.Release|Win32.ActiveCfg = Release|Win32
+		{80ED9927-27F9-473A-802C-FB10DEB5ECC6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
