@@ -1751,15 +1751,21 @@ void CSSetAttr()
 
     switch (Param[1]) {
       case 1: // De-iconify window
-	DispShowWindow(SW_RESTORE);
+	DispShowWindow(WINDOW_RESTORE);
 	break;
       case 2: // Iconify window
-	DispShowWindow(SW_MINIMIZE);
+	DispShowWindow(WINDOW_MINIMIZE);
 	break;
       case 3: // set window position
 	if (NParam < 2) Param[2] = 0;
 	if (NParam < 3) Param[3] = 0;
 	DispMoveWindow(Param[2], Param[3]);
+	break;
+      case 5:
+	DispShowWindow(WINDOW_RAISE);
+	break;
+      case 6:
+	DispShowWindow(WINDOW_LOWER);
 	break;
       case 8: /* set terminal size */
 	if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
@@ -1768,10 +1774,10 @@ void CSSetAttr()
 	break;
       case 9: // Maximize/Restore window
 	if (NParam < 2 || Param[2] == 0) {
-	  DispShowWindow(SW_RESTORE);
+	  DispShowWindow(WINDOW_RESTORE);
 	}
 	else {
-	  DispShowWindow(SW_MAXIMIZE);
+	  DispShowWindow(WINDOW_MAXIMIZE);
 	}
 	break;
       case 14: /* get window size??? */

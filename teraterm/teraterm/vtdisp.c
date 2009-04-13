@@ -3357,5 +3357,21 @@ void DispSetCurCharAttr(TCharAttr Attr) {
 }
 
 void DispShowWindow(int mode) {
-	ShowWindow(HVTWin, mode);
+	switch (mode) {
+	  case WINDOW_MINIMIZE:
+		ShowWindow(HVTWin, SW_MINIMIZE);
+		break;
+	  case WINDOW_MAXIMIZE:
+		ShowWindow(HVTWin, SW_MAXIMIZE);
+		break;
+	  case WINDOW_RESTORE:
+		ShowWindow(HVTWin, SW_RESTORE);
+		break;
+	  case WINDOW_RAISE:
+		SetWindowPos(HVTWin, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		break;
+	  case WINDOW_LOWER:
+		SetWindowPos(HVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		break;
+	}
 }

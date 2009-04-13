@@ -100,6 +100,12 @@ extern TCharAttr DefCharAttr;
 #define SCROLL_POS	6
 #define SCROLL_TOP	7
 
+#define WINDOW_MINIMIZE 1
+#define WINDOW_MAXIMIZE 2
+#define WINDOW_RESTORE  3
+#define WINDOW_RAISE    4
+#define WINDOW_LOWER    5
+
 #ifdef __cplusplus
 }
 #endif
