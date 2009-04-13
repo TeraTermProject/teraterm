@@ -1540,20 +1540,20 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 				MessageBox(NULL, buf, "TTSSH", MB_OK | MB_ICONEXCLAMATION);
 			}
 
-			return OPTION_CLEAR;
-
 		// ttermpro.exe の /T= 指定の流用なので、大文字も許す (2006.10.19 maya)
 		} else if (MATCH_STR_I(option + 1, "t=") == 0) {
 			if (strcmp(option + 3, "2") == 0) {
 				pvar->settings.Enabled = 1;
-				return OPTION_CLEAR;
+				return OPTION_CLEAR;	// /t=2はttssh側での拡張なので消す
 			} else {
 				pvar->settings.Enabled = 0;
+				return OPTION_NONE;	// Tera Term側で解釈するので消さない
 			}
 
 		// ttermpro.exe の /F= 指定でも TTSSH の設定を読む (2006.10.11 maya)
 		} else if (MATCH_STR_I(option + 1, "f=") == 0) {
 			read_ssh_options_from_user_file(pvar, option + 3);
+			return OPTION_NONE;	// Tera Term側でも解釈する必要があるので消さない
 
 		// /1 および /2 オプションの新規追加 (2004.10.3 yutaka)
 		} else if (MATCH_STR(option + 1, "1") == 0) {
@@ -1627,12 +1627,16 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			pvar->ask4passwd = 1;
 
 		}
+		else {	// Other (not ttssh) option
+			return OPTION_NONE;	// ttsshのオプションではないので消さない
+		}
 
 		// パスワードを聞く場合は自動ログインが無効になる
 		// /auth は認証メソッドの指定としては利用される (2006.9.18 maya)
 		if (pvar->ask4passwd == 1) {
 			pvar->ssh2_autologin = 0;
 		}
+		return OPTION_CLEAR;
 
 	}
 	else if ((MATCH_STR_I(option, "ssh://") == 0) ||
