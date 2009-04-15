@@ -736,8 +736,15 @@ void BuffEraseCharsInLine(int XStart, int Count)
   memset(&(AttrLineBG[XStart]),CurCharAttr.Back,Count);
 
 #ifndef NO_COPYLINE_FIX
-  if (LineContinued)
-    BuffLineContinued(TRUE);
+  if (ts.EnableContinuedLineCopy) {
+    if (LineContinued) {
+      BuffLineContinued(TRUE);
+    }
+    
+    if (XStart + Count >= NumOfColumns) {
+      AttrBuff[NextLinePtr(LinePtr)] &= ~AttrLineContinued;
+    }
+  }
 #endif /* NO_COPYLINE_FIX */
 
   DispEraseCharsInLine(XStart, Count);
@@ -2920,9 +2927,9 @@ void BuffLineContinued(BOOL mode)
 {
 	if (ts.EnableContinuedLineCopy) {
 		if (mode) {
-			AttrLine[0] = AttrLine[0] | AttrLineContinued;
+			AttrLine[0] |= AttrLineContinued;
 		} else {
-			AttrLine[0] = AttrLine[0] & (~AttrLineContinued);
+			AttrLine[0] &= ~AttrLineContinued;
 		}
 	}
 }
