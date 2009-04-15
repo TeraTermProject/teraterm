@@ -718,6 +718,13 @@ void BuffEraseCharsInLine(int XStart, int Count)
 //  XStart: start position of erasing
 //  Count: number of characters to be erased
 {
+#ifndef NO_COPYLINE_FIX
+  BOOL LineContinued=FALSE;
+
+  if (ts.EnableContinuedLineCopy && XStart == 0 && (AttrLine[0] & AttrLineContinued))
+    LineContinued = TRUE;
+#endif /* NO_COPYLINE_FIX */
+
   if (ts.Language==IdJapanese)
     EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 
@@ -727,6 +734,11 @@ void BuffEraseCharsInLine(int XStart, int Count)
   memset(&(AttrLine2[XStart]),CurCharAttr.Attr2,Count);
   memset(&(AttrLineFG[XStart]),CurCharAttr.Fore,Count);
   memset(&(AttrLineBG[XStart]),CurCharAttr.Back,Count);
+
+#ifndef NO_COPYLINE_FIX
+  if (LineContinued)
+    BuffLineContinued(TRUE);
+#endif /* NO_COPYLINE_FIX */
 
   DispEraseCharsInLine(XStart, Count);
 }
@@ -1359,6 +1371,12 @@ void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 {
   int XStart;
 
+#ifndef NO_COPYLINE_FIX
+  if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] & AttrLineContinued)) {
+    Attr.Attr |= AttrLineContinued;
+  }
+#endif /* NO_COPYLINE_FIX */
+
   if (ts.Language==IdJapanese)
   {
     EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
@@ -1420,6 +1438,12 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 //   Insert: Insert flag
 {
   int XStart;
+
+#ifndef NO_COPYLINE_FIX
+  if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] | AttrLineContinued)) {
+    Attr.Attr |= AttrLineContinued;
+  }
+#endif /* NO_COPYLINE_FIX */
 
   EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 
@@ -2892,11 +2916,15 @@ void ShowStatusLine(int Show)
 }
 
 #ifndef NO_COPYLINE_FIX
-void SetLineContinued()
+void BuffLineContinued(BOOL mode)
 {
-    if (ts.EnableContinuedLineCopy) {
-	  AttrLine[0] = AttrLine[0] | AttrLineContinued;
-    }
+	if (ts.EnableContinuedLineCopy) {
+		if (mode) {
+			AttrLine[0] = AttrLine[0] | AttrLineContinued;
+		} else {
+			AttrLine[0] = AttrLine[0] & (~AttrLineContinued);
+		}
+	}
 }
 #endif /* NO_COPYLINE_FIX */
 

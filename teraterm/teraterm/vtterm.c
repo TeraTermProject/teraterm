@@ -342,6 +342,10 @@ void LineFeed(BYTE b, BOOL logFlag)
 	else if (CursorY < NumOfLines-StatusLine-1)
 		MoveCursor(CursorX,CursorY+1);
 
+#ifndef NO_COPYLINE_FIX
+	ClearLineContinued();
+#endif /* NO_COPYLINE_FIX */
+
 	if (LFMode) CarriageReturn(logFlag);
 }
 
