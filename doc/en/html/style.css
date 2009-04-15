@@ -122,6 +122,14 @@ th {
 	text-align: left;
 }
 
+del {
+	text-decoration: line-through;
+}
+
+.cite {
+	font-size: smaller;
+}
+
 /*
 td code.syntax {
 	margin-right: 2em;
