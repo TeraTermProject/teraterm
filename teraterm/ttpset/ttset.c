@@ -1266,6 +1266,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// added PasteDelayPerLine (2009.4.12 maya)
 	ts->PasteDelayPerLine =
 		GetPrivateProfileInt(Section, "PasteDelayPerLine", 10, FName);
+	{
+		int tmp = min(max(0, ts->PasteDelayPerLine), 5000);
+		ts->PasteDelayPerLine = tmp;
+	}
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)

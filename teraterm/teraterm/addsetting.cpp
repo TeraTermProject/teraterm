@@ -425,8 +425,7 @@ void CCopypastePropPageDlg::OnOK()
 	// (7)
 	GetDlgItemText(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
 	val = atoi(buf);
-	if (val > 0) 
-		ts.PasteDelayPerLine = val;
+	ts.PasteDelayPerLine = min(max(0, val), 5000);
 }
 
 
