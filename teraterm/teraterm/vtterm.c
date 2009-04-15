@@ -1459,23 +1459,25 @@ void CSScreenErase()
   void CS_h_Mode()
   {
     switch (Param[1]) {
-      case 2: KeybEnabled = FALSE; break;
-      case 4: InsertMode = TRUE; break;
-      case 12:
+      case 2:	// KAM
+        KeybEnabled = FALSE; break;
+      case 4:	// IRM
+        InsertMode = TRUE; break;
+      case 12:	// SRM
 	ts.LocalEcho = 0;
 	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
 	  TelChangeEcho();
 	break;
-      case 20:
+      case 20:	// LF/NL
 	LFMode = TRUE;
 	ts.CRSend = IdCRLF;
 	cv.CRSend = IdCRLF;
 	break;
-      case 33:
+      case 33:	// WYSTCURM
 	ts.NonblinkingCursor = TRUE;
 	ChangeCaret();
 	break;
-      case 34:
+      case 34:	// WYULCURM
 	ts.CursorShape = IdHCur;
 	ChangeCaret();
 	break;
@@ -1505,23 +1507,25 @@ void CSScreenErase()
   void CS_l_Mode()
   {
     switch (Param[1]) {
-      case 2: KeybEnabled = TRUE; break;
-      case 4: InsertMode = FALSE; break;
-      case 12:
+      case 2:	// KAM
+        KeybEnabled = TRUE; break;
+      case 4:	// IRM
+        InsertMode = FALSE; break;
+      case 12:	// SRM
 	ts.LocalEcho = 1;
 	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
 	  TelChangeEcho();
 	break;
-      case 20:
+      case 20:	// LF/NL
 	LFMode = FALSE;
 	ts.CRSend = IdCR;
 	cv.CRSend = IdCR;
 	break;
-      case 33:
+      case 33:	// WYSTCURM
 	ts.NonblinkingCursor = FALSE;
 	ChangeCaret();
 	break;
-      case 34:
+      case 34:	// WYULCURM
 	ts.CursorShape = IdBlkCur;
 	ChangeCaret();
 	break;
@@ -1535,10 +1539,11 @@ void CSScreenErase()
 
     switch (Param[1]) {
       case 5:
+	/* Device Status Report -> Ready */
 	if (Send8BitMode)
-	  CommBinaryOut(&cv,"\2330n",3); /* Device Status Report -> Ready */
+	  CommBinaryOut(&cv,"\2330n",3);
 	else
-	  CommBinaryOut(&cv,"\033[0n",4); /* Device Status Report -> Ready */
+	  CommBinaryOut(&cv,"\033[0n",4);
 	break;
       case 6:
 	/* Cursor Position Report */
@@ -1761,13 +1766,13 @@ void CSSetAttr()
 	if (NParam < 3) Param[3] = 0;
 	DispMoveWindow(Param[2], Param[3]);
 	break;
-      case 5:
+      case 5: // Raise window
 	DispShowWindow(WINDOW_RAISE);
 	break;
-      case 6:
+      case 6: // Lower window
 	DispShowWindow(WINDOW_LOWER);
 	break;
-      case 7:
+      case 7: // Refresh window
 	DispShowWindow(WINDOW_REFRESH);
 	break;
       case 8: /* set terminal size */
@@ -1803,7 +1808,7 @@ void CSSetAttr()
   void CSGT(BYTE b)
   {
     switch (b) {
-      case 'c': /* second terminal report */
+      case 'c': /* second terminal report (Secondary DA) */
 	if (Send8BitMode)
 	  CommBinaryOut(&cv,"\233>32;10;2c",11); /* VT382 */
 	else
@@ -2241,48 +2246,67 @@ void ParseCS(BYTE b) /* b is the final char */
 	/* no private parameter */
 	case 0:
 	  switch (b) {
-	    case '@': CSInsertCharacter(); break;
-	    case 'A': CSCursorUp(); break;
-	    case 'B': CSCursorDown(); break;
-	    case 'C': CSCursorRight(); break;
-	    case 'D': CSCursorLeft(); break;
-	    case 'E': CSCursorDown1(); break;
-	    case 'F': CSCursorUp1(); break;
-	    case 'G': CSMoveToColumnN(); break;
-	    case 'H': CSMoveToXY(); break;
-	    case 'I': CSForwardTab(); break;		// CHT
-	    case 'J': CSScreenErase(); break;
-	    case 'K': CSLineErase(); break;
-	    case 'L': CSInsertLine(); break;
-	    case 'M': CSDeleteNLines(); break;
-	    case 'P': CSDeleteCharacter(); break;
-	    case 'S': CSScrollUP(); break;		// SU
-	    case 'T': CSScrollDown(); break;		// SD
-	    case 'X': CSEraseCharacter(); break;
-	    case 'Z': CSBackwardTab(); break;		// CBT
-	    case '`': CSMoveToColumnN(); break;
-	    case 'a': CSCursorRight(); break;
-	    case 'c': AnswerTerminalType(); break;
-	    case 'd': CSMoveToLineN(); break;
-	    case 'e': CSCursorUp(); break;
-	    case 'f': CSMoveToXY(); break;
-	    case 'g': CSDeleteTabStop(); break;
-	    case 'h': CS_h_Mode(); break;
-	    case 'i': CS_i_Mode(); break;
-	    case 'l': CS_l_Mode(); break;
-	    case 'm': CSSetAttr(); break;
-	    case 'n': CS_n_Mode(); break;
-	    case 'r': CSSetScrollRegion(); break;
-	    case 's': SaveCursor(); break;
-	    case 't': CSSunSequence(); break;
-	    case 'u': RestoreCursor(); break;
+	    // ISO/IEC 6429 / ECMA-48 Sequence
+	    case '@': CSInsertCharacter(); break;       // ICH
+	    case 'A': CSCursorUp(); break;              // CUU
+	    case 'B': CSCursorDown(); break;            // CUD
+	    case 'C': CSCursorRight(); break;           // CUF
+	    case 'D': CSCursorLeft(); break;            // CUB
+	    case 'E': CSCursorDown1(); break;           // CNL
+	    case 'F': CSCursorUp1(); break;             // CPL
+	    case 'G': CSMoveToColumnN(); break;         // CHA
+	    case 'H': CSMoveToXY(); break;              // CUP
+	    case 'I': CSForwardTab(); break;            // CHT
+	    case 'J': CSScreenErase(); break;           // ED
+	    case 'K': CSLineErase(); break;             // EL
+	    case 'L': CSInsertLine(); break;            // IL
+	    case 'M': CSDeleteNLines(); break;          // DL
+//	    case 'N': break;				// EF   -- Not support
+//	    case 'O': break;				// EA   -- Not support
+	    case 'P': CSDeleteCharacter(); break;       // DCH
+//	    case 'Q': break;				// SEE  -- Not support
+//	    case 'R': break;				// CPR  -- Not support
+	    case 'S': CSScrollUP(); break;              // SU
+	    case 'T': CSScrollDown(); break;            // SD
+//	    case 'U': break;				// NP   -- Not support
+//	    case 'V': break;				// PP   -- Not support
+//	    case 'W': break;				// CTC  -- Not support
+	    case 'X': CSEraseCharacter(); break;        // ECH
+//	    case 'Y': break;				// CVT  -- Not support
+	    case 'Z': CSBackwardTab(); break;           // CBT
+//	    caes '[': break;                            // SRS  -- Not support
+//	    caes '\\': break;                           // PTX  -- Not support
+//	    caes ']': break;                            // SDS  -- Not support
+//	    caes '^': break;                            // SIMD -- Not support
+	    case '`': CSMoveToColumnN(); break;         // HPA
+	    case 'a': CSCursorRight(); break;           // HPR
+//	    caes 'b': break;                            // REP  -- Not support
+	    case 'c': AnswerTerminalType(); break;      // DA
+	    case 'd': CSMoveToLineN(); break;           // VPA
+	    case 'e': CSCursorUp(); break;              // VPR
+	    case 'f': CSMoveToXY(); break;              // HVP
+	    case 'g': CSDeleteTabStop(); break;         // TBC
+	    case 'h': CS_h_Mode(); break;               // SM
+	    case 'i': CS_i_Mode(); break;               // MC
+//	    caes 'b': break;                            // HPB  -- Not support
+//	    caes 'b': break;                            // VPB  -- Not support
+	    case 'l': CS_l_Mode(); break;               // RM
+	    case 'm': CSSetAttr(); break;               // SGR
+	    case 'n': CS_n_Mode(); break;               // DSR
+//	    caes 'o': break;                            // DAQ  -- Not support
+
+	    // Private Sequence
+	    case 'r': CSSetScrollRegion(); break;       // DECSTBM
+	    case 's': SaveCursor(); break;              // SCP (Save cursor (ANSI.SYS/SCO?))
+	    case 't': CSSunSequence(); break;           // DECSLPP / Window manipulation(dtterm?)
+	    case 'u': RestoreCursor(); break;           // RCP (Restore cursor (ANSI.SYS/SCO))
 	  } /* of case Prv=0 */
 	  break;
 	/* private parameter = '>' */
 	case '>': CSGT(b); break;
 	/* private parameter = '?' */
 	case '?': CSQuest(b); break;
-      }
+      } /* end of siwtch (Prv) */
       break;
     /* one intermediate char */
     case 1:
