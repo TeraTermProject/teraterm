@@ -4158,50 +4158,69 @@ void SSH2_send_kexinit(PTInstVar pvar)
 }
 
 
-static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
+static void choose_SSH2_proposal(char *server_proposal,
+                                 char *my_proposal,
+                                 char *dest,
+                                 int dest_len)
 {
-	char tmp[1024], *ptr;
+	char tmp_cli[1024], *ptr_cli, *ctc_cli;
+	char tmp_svr[1024], *ptr_svr, *ctc_svr;
 	SSHCipher cipher = SSH_CIPHER_NONE;
 
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, my_proposal);
-	ptr = strtok(tmp, ","); // not thread-safe
-	while (ptr != NULL) {
+	strncpy_s(tmp_cli, sizeof(tmp_cli), my_proposal, _TRUNCATE);
+	ptr_cli = strtok_s(tmp_cli, ",", &ctc_cli);
+	while (ptr_cli != NULL) {
 		// server_proposalにはサーバのproposalがカンマ文字列で格納されている
-		if (strstr(server_proposal, ptr)) { // match
-			break;
+		strncpy_s(tmp_svr, sizeof(tmp_svr), server_proposal, _TRUNCATE);
+		ptr_svr = strtok_s(tmp_svr, ",", &ctc_svr);
+		while (ptr_svr != NULL) {
+			if (strcmp(ptr_svr, ptr_cli) == 0) { // match
+				goto found;
+			}
+			ptr_svr = strtok_s(NULL, ",", &ctc_svr);
 		}
-		ptr = strtok(NULL, ",");
+		ptr_cli = strtok_s(NULL, ",", &ctc_cli);
 	}
 
-	// サーバの proposal に、クライアントの proposal がひとつも
-	// 含まれていない場合 (2007.10.17 maya)
-	if (ptr == NULL) {
-		return (cipher);
+found:
+	if (ptr_cli != NULL) {
+		strncpy_s(dest, dest_len, ptr_cli, _TRUNCATE);
 	}
+	else {
+		strncpy_s(dest, dest_len, "", _TRUNCATE);
+	}
+}
 
-	if (strstr(ptr, "3des-cbc")) {
+static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
+{
+	SSHCipher cipher = SSH_CIPHER_NONE;
+	char str_cipher[16];
+
+	choose_SSH2_proposal(server_proposal, my_proposal, str_cipher, sizeof(str_cipher));
+
+	if (strcmp(str_cipher, "3des-cbc") == 0) {
 		cipher = SSH2_CIPHER_3DES_CBC;
-	} else if (strstr(ptr, "aes128-cbc")) {
+	} else if (strcmp(str_cipher, "aes128-cbc") == 0) {
 		cipher = SSH2_CIPHER_AES128_CBC;
-	} else if (strstr(ptr, "aes192-cbc")) {
+	} else if (strcmp(str_cipher, "aes192-cbc") == 0) {
 		cipher = SSH2_CIPHER_AES192_CBC;
-	} else if (strstr(ptr, "aes256-cbc")) {
+	} else if (strcmp(str_cipher, "aes256-cbc") == 0) {
 		cipher = SSH2_CIPHER_AES256_CBC;
-	} else if (strstr(ptr, "blowfish-cbc")) {
+	} else if (strcmp(str_cipher, "blowfish-cbc") == 0) {
 		cipher = SSH2_CIPHER_BLOWFISH_CBC;
-	} else if (strstr(ptr, "aes128-ctr")) {
+	} else if (strcmp(str_cipher, "aes128-ctr") == 0) {
 		cipher = SSH2_CIPHER_AES128_CTR;
-	} else if (strstr(ptr, "aes192-ctr")) {
+	} else if (strcmp(str_cipher, "aes192-ctr") == 0) {
 		cipher = SSH2_CIPHER_AES192_CTR;
-	} else if (strstr(ptr, "aes256-ctr")) {
+	} else if (strcmp(str_cipher, "aes256-ctr") == 0) {
 		cipher = SSH2_CIPHER_AES256_CTR;
-	} else if (strstr(ptr, "arcfour128")) {
+	} else if (strcmp(str_cipher, "arcfour128") == 0) {
 		cipher = SSH2_CIPHER_ARCFOUR128;
-	} else if (strstr(ptr, "arcfour256")) {
+	} else if (strcmp(str_cipher, "arcfour256") == 0) {
 		cipher = SSH2_CIPHER_ARCFOUR256;
-	} else if (strstr(ptr, "arcfour")) {
+	} else if (strcmp(str_cipher, "arcfour") == 0) {
 		cipher = SSH2_CIPHER_ARCFOUR;
-	} else if (strstr(ptr, "cast128-cbc")) {
+	} else if (strcmp(str_cipher, "cast128-cbc") == 0) {
 		cipher = SSH2_CIPHER_CAST128_CBC;
 	}
 
@@ -4211,21 +4230,14 @@ static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_pr
 
 static enum hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my_proposal)
 {
-	char tmp[1024], *ptr;
 	enum hmac_type type = HMAC_UNKNOWN;
+	char str_hmac[16];
 
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, my_proposal);
-	ptr = strtok(tmp, ","); // not thread-safe
-	while (ptr != NULL) {
-		// server_proposalにはサーバのproposalがカンマ文字列で格納されている
-		if (strstr(server_proposal, ptr)) { // match
-			break;
-		}
-		ptr = strtok(NULL, ",");
-	}
-	if (strstr(ptr, "hmac-sha1")) {
+	choose_SSH2_proposal(server_proposal, my_proposal, str_hmac, sizeof(str_hmac));
+
+	if (strcmp(str_hmac, "hmac-sha1") == 0) {
 		type = HMAC_SHA1;
-	} else if (strstr(ptr, "hmac-md5")) {
+	} else if (strcmp(str_hmac, "hmac-md5") == 0) {
 		type = HMAC_MD5;
 	}
 
@@ -4233,10 +4245,10 @@ static enum hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my
 }
 
 
-static int choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
+static enum compression_algorithm choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
 {
-	char tmp[1024], *ptr, *q, *index;
-	int ret = COMP_UNKNOWN;
+	enum compression_algorithm type = COMP_UNKNOWN;
+	char str_comp[20];
 
 	// OpenSSH 4.3では遅延パケット圧縮("zlib@openssh.com")が新規追加されているため、
 	// マッチしないように修正した。
@@ -4245,32 +4257,18 @@ static int choose_SSH2_compression_algorithm(char *server_proposal, char *my_pro
 	// 遅延パケット圧縮に対応。
 	// (2006.6.23 maya)
 
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, my_proposal);
-	ptr = strtok(tmp, ","); // not thread-safe
-	while (ptr != NULL) {
-		// server_proposalにはサーバのproposalがカンマ文字列で格納されている
-		for (index = server_proposal; index < server_proposal + strlen(server_proposal) ; index++) {
-			if (q = strstr(index, ptr)) { // match
-				q = q + strlen(ptr);
-				if (*q == '\0' || *q == ',')  // 単語の区切りであればマッチ
-					goto found;
-				index = q;  // pointer update
-			}
-		}
-		ptr = strtok(NULL, ",");
-	}
+	choose_SSH2_proposal(server_proposal, my_proposal, str_comp, sizeof(str_comp));
 
-found:
 	// support of "Compression delayed" (2006.6.23 maya)
-	if (strstr(ptr, "zlib@openssh.com")) {
-		ret = COMP_DELAYED;
-	} else if (strstr(ptr, "zlib")) {
-		ret = COMP_ZLIB; // packet compression enabled
-	} else if (strstr(ptr, "none")) {
-		ret = COMP_NONE; // packet compression disabled
+	if (strcmp(str_comp, "zlib@openssh.com") == 0) {
+		type = COMP_DELAYED;
+	} else if (strcmp(str_comp, "zlib") == 0) {
+		type = COMP_ZLIB; // packet compression enabled
+	} else if (strcmp(str_comp, "none") == 0) {
+		type = COMP_NONE; // packet compression disabled
 	}
 
-	return (ret);
+	return (type);
 }
 
 // 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する。
@@ -4348,7 +4346,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	int offset = 0;
 	char *msg = NULL;
 	char tmp[1024+512];
-	char *ptr;
+	char str_kextype[40];
+	char str_keytype[10];
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEXINIT was received.", LOG_LEVEL_VERBOSE);
 
@@ -4414,30 +4413,22 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// 先頭から自分の myproposal[] と比較を行い、最初にマッチしたものがKEXアルゴリズムとして
 	// 選択される。(2004.10.30 yutaka)
 	pvar->kex_type = -1;
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, myproposal[PROPOSAL_KEX_ALGS]);
-	ptr = strtok(tmp, ","); // not thread-safe
-	while (ptr != NULL) {
-		// buf[]にはサーバのproposalがカンマ文字列で格納されている
-		if (strstr(buf, ptr)) { // match
-			break;
-		}
-		ptr = strtok(NULL, ",");
-	}
-	if (ptr == NULL) { // not match
+	choose_SSH2_proposal(buf, myproposal[PROPOSAL_KEX_ALGS],str_kextype, sizeof(str_kextype));
+	if (strlen(str_kextype) == 0) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
 	}
-	if (strstr(ptr, KEX_DH14)) {
+	if (strcmp(str_kextype, KEX_DH14) == 0) {
 		pvar->kex_type = KEX_DH_GRP14_SHA1;
-	} else if (strstr(ptr, KEX_DH1)) {
+	} else if (strcmp(str_kextype, KEX_DH1) == 0) {
 		pvar->kex_type = KEX_DH_GRP1_SHA1;
-	} else if (strstr(ptr, KEX_DHGEX)) {
+	} else if (strcmp(str_kextype, KEX_DHGEX) == 0) {
 		pvar->kex_type = KEX_DH_GEX_SHA1;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", ptr);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", str_kextype);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// ホストキーアルゴリズムチェック
@@ -4449,31 +4440,22 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	buf[i] = 0;
 	offset += size;
 	pvar->hostkey_type = -1;
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-	            myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS]);
-	ptr = strtok(tmp, ","); // not thread-safe
-	while (ptr != NULL) {
-		// buf[]にはサーバのproposalがカンマ文字列で格納されている
-		if (strstr(buf, ptr)) { // match
-			break;
-		}
-		ptr = strtok(NULL, ",");
-	}
-	if (ptr == NULL) { // not match
+	choose_SSH2_proposal(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS], str_keytype, sizeof(str_keytype));
+	if (strlen(str_keytype) == 0) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown host KEY type: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
 	}
-	if (strstr(ptr, "ssh-rsa")) {
+	if (strcmp(str_keytype, "ssh-rsa") == 0) {
 		pvar->hostkey_type = KEY_RSA;
-	} else if (strstr(ptr, "ssh-dss")) {
+	} else if (strcmp(str_keytype, "ssh-dss") == 0) {
 		pvar->hostkey_type = KEY_DSA;
-	} else 	if (strstr(ptr, "rsa1")) {
+	} else if (strcmp(str_keytype, "rsa1") == 0) {
 		pvar->hostkey_type = KEY_RSA1;
-	} else if (strstr(ptr, "rsa")) {
+	} else if (strcmp(str_keytype, "rsa") == 0) {
 		pvar->hostkey_type = KEY_RSA;
-	} else if (strstr(ptr, "dsa")) {
+	} else if (strcmp(str_keytype, "dsa") == 0) {
 		pvar->hostkey_type = KEY_DSA;
 	}
 #if 0
@@ -4487,7 +4469,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 #endif
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "server host key algorithm: %s", ptr);
+	            "server host key algorithm: %s", str_keytype);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// クライアント -> サーバ暗号アルゴリズムチェック
