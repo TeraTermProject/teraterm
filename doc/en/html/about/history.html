@@ -38,10 +38,10 @@
          NOTE: Input ^[ by using Control-V Control-[.
         </pre>
       </li>
-      <!--li>複数行の貼り付け時、改行ごとに遅延する時間を設定できるようにした。The default is 10(msec).
+      <li>added configuring the delay time per a carriage return when a user pastes multiple lines. The default is 10 msec.
         <ul>
-          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>で設定値を変更できるようにした。</li>
-        </ul></li-->
+          <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+        </ul></li>
       <li>added a new optional setting that can disable the menu for "Duplicate session".
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> in the teraterm.ini file. The default is off.</li>
@@ -1235,14 +1235,14 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <!--li>SCP のファイル受信フォルダを選択できるようにした。</li-->
+      <li>added a user can select a folder receiving a file on the SCP dialog.</li>
     </ul>
   </li>
-  <!-- li>Bug fixes
+  <li>Bug fixes
       <ul>
-        <li>接続先ホスト名に一部の漢字が使えないのを修正した。</li>
-        <li>Tera Termの/FD=, /K=, /M=, /L=, /R=, /W=オプションで値に空白が含まれる場合、正しく取り扱えない事があるのを修正した。</li>
-    </ul></li -->
+        <li>Some Japanese characters can not use in the host name.</li>
+        <li>TTSSH does not work when the command line option(/FD=, /K=, /M=, /L=, /R=, /W=) includes the space character.</li>
+    </ul></li>
 
   <li>Misc
     <ul>
