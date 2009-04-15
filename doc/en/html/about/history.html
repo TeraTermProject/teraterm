@@ -30,7 +30,7 @@
     <ul>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the `wait4all' macro command.</li>
       <li>added a Subversion(SVN) revision number on the version dialog.</li>
-      <li>added support for DECSCUSR (Set Cursor Style), WYSTCURM (Wyse Steady Cursor Mode) and WYULCURM (Wyse Underline Cursor Mode) control sequences.<br>
+      <li>added support for DECSCUSR (Set Cursor Style), WYSTCURM (Wyse Steady Cursor Mode), WYULCURM (Wyse Underline Cursor Mode) <!-- and AT&amp;T 610のカーソル点滅 --> control sequences.<br>
         Add the below configuration in the ~/.vimrc file for vim editor.
         <pre>
          set t_SI=^[[3\ q
@@ -54,7 +54,13 @@
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
+      <!-- li>dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュに対応した。</li -->
     </ul></li>
+
+  <!-- li>Bug fixes
+    <ul>
+      <li>AcceptTitleChangeRequestがoverwriteの時、リモートからのウィンドウタイトル変更要求を受けた後にマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルの変更が出来なくなるのを修正した。</li>
+    </ul></li -->
 
   <li>Misc
     <ul>

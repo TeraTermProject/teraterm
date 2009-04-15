@@ -30,7 +30,7 @@
     <ul>
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、`wait4all'マクロコマンドが有効となる。</li>
       <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
-      <li>DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル)制御シーケンスに対応した。<br>
+      <li>DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに対応した。<br>
         vimの場合、~/.vimrc に以下のように追加する。
         <pre>
          set t_SI=^[[3\ q
@@ -54,6 +54,12 @@
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
+      <li>dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュに対応した。</li>
+    </ul></li>
+
+  <li>バグ修正
+    <ul>
+      <li>AcceptTitleChangeRequestがoverwriteの時、リモートからのウィンドウタイトル変更要求を受けた後にマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルの変更が出来なくなるのを修正した。</li>
     </ul></li>
 
   <li>その他
