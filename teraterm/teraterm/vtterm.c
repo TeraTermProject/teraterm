@@ -1767,6 +1767,9 @@ void CSSetAttr()
       case 6:
 	DispShowWindow(WINDOW_LOWER);
 	break;
+      case 7:
+	DispShowWindow(WINDOW_REFRESH);
+	break;
       case 8: /* set terminal size */
 	if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
 	if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;

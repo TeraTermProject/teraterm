@@ -3373,5 +3373,8 @@ void DispShowWindow(int mode) {
 	  case WINDOW_LOWER:
 		SetWindowPos(HVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 		break;
+	  case WINDOW_REFRESH:
+	  	InvalidateRect(HVTWin, NULL, FALSE);
+		break;
 	}
 }
