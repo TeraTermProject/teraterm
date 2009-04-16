@@ -1750,16 +1750,25 @@ void BuffScrollNLines(int n)
   {
     WinOrgY = WinOrgY-n;
     /* 最下行でだけ自動スクロールする */
-	if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
-		NewOrgY = WinOrgY;
-	}
+    if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
+      NewOrgY = WinOrgY;
+    }
     BuffScroll(n,CursorBottom);
     DispCountScroll(n);
   }
   else if ((CursorTop==0) && (CursorY<=CursorBottom))
   {
-    BuffScroll(n,CursorBottom);
-    DispScrollNLines(WinOrgY,CursorBottom,n);
+    /* 最下行でだけ自動スクロールする */
+    if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
+      /* スクロールさせない場合の処理 */
+      WinOrgY = WinOrgY-n;
+      NewOrgY = WinOrgY;
+      BuffScroll(n,CursorBottom);
+      DispCountScroll(n);
+    } else {
+      BuffScroll(n,CursorBottom);
+      DispScrollNLines(WinOrgY,CursorBottom,n);
+    }
   }
   else if ((CursorTop<=CursorY) && (CursorY<=CursorBottom))
   {
