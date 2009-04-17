@@ -81,7 +81,7 @@ BEGIN
     EDITTEXT        IDC_SSHUSERNAME,75,29,145,12,ES_AUTOHSCROLL
     RTEXT           "&Passphrase:",IDC_SSHPASSWORDCAPTION,14,48,56,8,0,WS_EX_RIGHT
     EDITTEXT        IDC_SSHPASSWORD,75,46,145,12,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "Remember password on &memory",IDC_REMEMBER_PASSWORD,
+    CONTROL         "Remember password in &memory",IDC_REMEMBER_PASSWORD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,61,132,10
     CONTROL         "F&orward agent",IDC_FORWARD_AGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,74,132,10
     CONTROL         "Use p&lain password to log in",IDC_SSHUSEPASSWORD,
