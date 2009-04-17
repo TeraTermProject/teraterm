@@ -1974,7 +1974,7 @@ void ChangeCaret()
     T = GetCaretBlinkTime() * 2 / 3;
     SetTimer(HVTWin,IdCaretTimer,T,NULL);
   }
-  InvalidateRect(HVTWin,NULL,TRUE);
+  UpdateCaretPosition(TRUE);
 }
 
 // WM_KILLFOCUSされたときのカーソルを自分で描く
@@ -2035,7 +2035,10 @@ void CaretKillFocus(BOOL show)
 //
 // CaretOff()の直後に呼ぶこと。CaretOff()内から呼ぶと、無限再帰呼び出しとなり、
 // stack overflowになる。
-void UpdateCaretKillFocus(BOOL enforce)
+//
+// カーソル形状変更時(ChangeCaret)にも呼ぶことにしたため、関数名変更 -- 2009/04/17 doda.
+//
+void UpdateCaretPosition(BOOL enforce)
 {
   int CaretX, CaretY;
   RECT rc;
@@ -2043,7 +2046,7 @@ void UpdateCaretKillFocus(BOOL enforce)
   CaretX = (CursorX-WinOrgX)*FontWidth;
   CaretY = (CursorY-WinOrgY)*FontHeight;
 
-  if (ts.KillFocusCursor == 0)
+  if (!enforce && !ts.KillFocusCursor)
 	  return;
 
   // Eterm lookfeelの場合は何もしない
@@ -3290,7 +3293,7 @@ void DispSetActive(BOOL ActiveFlag)
   {
 	  if (IsCaretOn()) {
 		CaretKillFocus(FALSE);
-		UpdateCaretKillFocus(TRUE);  // アクティブ時は無条件に再描画する
+		UpdateCaretPosition(TRUE);  // アクティブ時は無条件に再描画する
 	  }
 
     SetFocus(HVTWin);
