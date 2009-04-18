@@ -64,7 +64,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 	pvar->cv = cv;
 	pvar->origReadIniFile = NULL;
 	pvar->origWriteIniFile = NULL;
-	pvar->UseOneSetting = FALSE;
+	pvar->UseOneSetting = TRUE;
 }
 
 static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
@@ -111,8 +111,11 @@ static void PASCAL FAR TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
 	/* Call original ReadIniFile */
 	pvar->origReadIniFile(fn, ts);
 
-	GetPrivateProfileString(IniSection, "UseOneSetting", "off", buff, sizeof(buff), fn);
-	if (_stricmp(buff, "on") == 0) {
+	GetPrivateProfileString(IniSection, "UseOneSetting", "on", buff, sizeof(buff), fn);
+	if (_stricmp(buff, "off") == 0) {
+		pvar->UseOneSetting = FALSE;
+	}
+	else {
 		pvar->UseOneSetting = TRUE;
 		if (pvar->ts->KanjiCode == IdUTF8m) {
 			pvar->ts->KanjiCodeSend = IdUTF8;
