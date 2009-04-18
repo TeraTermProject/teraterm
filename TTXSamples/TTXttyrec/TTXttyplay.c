@@ -221,6 +221,7 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 			else {
 				memcpy(obuff, ibuff, oblen);
 				lbytes -= oblen;
+				memcpy(ibuff, ibuff+oblen, lbytes);
 				*rbytes = oblen;
 			}
 			return TRUE;
