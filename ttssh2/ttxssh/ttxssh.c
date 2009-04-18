@@ -1684,7 +1684,6 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			if ((p3 = _mbschr(p, ':')) != NULL) {
 				*p3 = 0;
 				percent_decode(pvar->ssh2_password, sizeof(pvar->ssh2_password), p3 + 1);
-				pvar->ssh2_autologin = 1;
 			}
 			percent_decode(pvar->ssh2_username, sizeof(pvar->ssh2_username), p);
 			// p ‚ª host part ‚Ìæ“ª('@'‚ÌŸ‚Ì•¶š)‚ğ·‚·‚æ‚¤‚É‚·‚é
