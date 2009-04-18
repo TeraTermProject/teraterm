@@ -4245,9 +4245,9 @@ static enum hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my
 }
 
 
-static enum compression_algorithm choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
+static enum compression_type choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
 {
-	enum compression_algorithm type = COMP_UNKNOWN;
+	enum compression_type type = COMP_UNKNOWN;
 	char str_comp[20];
 
 	// OpenSSH 4.3では遅延パケット圧縮("zlib@openssh.com")が新規追加されているため、

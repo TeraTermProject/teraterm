@@ -203,8 +203,8 @@ typedef struct _TInstVar {
 	SSHCipher stoc_cipher;
 	enum hmac_type ctos_hmac;
 	enum hmac_type stoc_hmac;
-	enum compression_algorithm ctos_compression;
-	enum compression_algorithm stoc_compression;
+	enum compression_type ctos_compression;
+	enum compression_type stoc_compression;
 	int we_need;
 	int key_done;
 	int rekeying;
