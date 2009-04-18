@@ -196,7 +196,7 @@ enum channel_type {
 #define KEX_DHGEX   "diffie-hellman-group-exchange-sha1"
 
 // support of "Compression delayed" (2006.6.23 maya)
-enum compression_algorithm {
+enum compression_type {
 	COMP_NONE,
 	COMP_ZLIB,
 	COMP_DELAYED,
