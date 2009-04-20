@@ -15,8 +15,9 @@ typedef struct {
 	PTTSet ts;
 	PComVar cv;
 	Tsend origPsend;
-	char buff[BUFF_SIZE];
+	BOOL enable;
 	int buff_used;
+	char buff[BUFF_SIZE];
 } TInstVar;
 
 typedef TInstVar FAR * PTInstVar;
@@ -31,42 +32,82 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 	pvar->cv = cv;
 	pvar->origPsend = NULL;
 	pvar->buff_used = 0;
+	pvar->enable = TRUE;
 }
 
 //
 //  TTXSend -- ƒL[“ü—Íˆ—
 //
 static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags) {
-	int i, wlen;
+	int i, j, wlen;
 
-	if (len > 0) {
-		for (i=0; i<len; i++) {
-			switch (buf[i]) {
-			case '\n':
-				if (pvar->buff_used < BUFF_SIZE)
-					pvar->buff[pvar->buff_used++] = '\n';
+	if (len > 0 && pvar->enable) {
+		if (pvar->cv->isSSH || pvar->cv->TelFlag) {
+			for (i=0; i<10; i++) {
 				wlen = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
-				if (wlen > 0 && wlen < pvar->buff_used) {
-					pvar->buff_used -= wlen;
-					memmove(pvar->buff, &(pvar->buff[wlen]), pvar->buff_used);
+				if (wlen < pvar->buff_used) {
+					if (wlen > 0) {
+						pvar->buff_used -= wlen;
+						memmove(pvar->buff, &(pvar->buff[wlen]), pvar->buff_used);
+					}
 				}
 				else {
-					pvar->buff_used = 0;
+					break;
 				}
-				break;
-			case 0x08: // ^H
-				if (pvar->buff_used > 0)
-					pvar->buff_used--;
-				break;
-			case 0x15: // ^U
-				pvar->buff_used = 0;
-				break;
-			default:
-				if (pvar->buff_used < BUFF_SIZE)
-					pvar->buff[pvar->buff_used++] = buf[i];
-				break;
+			}
+			pvar->enable = FALSE;
+			return pvar->origPsend(s, buf, len, flags);
+		}
+		else {
+			for (i=0; i<len; i++) {
+				switch (buf[i]) {
+				case '\n':
+					if (pvar->buff_used < BUFF_SIZE)
+						pvar->buff[pvar->buff_used++] = '\n';
+					wlen = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
+					pvar->buff_used -= wlen;
+					if (wlen > 0 && wlen < pvar->buff_used) {
+						memmove(pvar->buff, &(pvar->buff[wlen]), pvar->buff_used);
+					}
+					break;
+				case 0x08: // ^H
+					if (pvar->buff_used > 0)
+						pvar->buff_used--;
+					break;
+				case 0x15: // ^U
+					pvar->buff_used = 0;
+					break;
+				case 0xff: // IAC
+					for (j=0; j<10; j++) {
+						wlen = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
+						if (wlen < pvar->buff_used) {
+							if (wlen > 0) {
+								pvar->buff_used -= wlen;
+								memmove(pvar->buff, &(pvar->buff[wlen]), pvar->buff_used);
+							}
+						}
+						else {
+							break;
+						}
+					}
+					if (i < pvar->buff_used) {
+						wlen = i;
+					}
+					else {
+						wlen = i - pvar->buff_used;
+					}
+					pvar->enable = FALSE;
+					return wlen + pvar->origPsend(s, buf + wlen, len - wlen, flags);
+				default:
+					if (pvar->buff_used < BUFF_SIZE)
+						pvar->buff[pvar->buff_used++] = buf[i];
+					break;
+				}
 			}
 		}
+	}
+	else {
+		return pvar->origPsend(s, buf, len, flags);
 	}
 
 	return len;
