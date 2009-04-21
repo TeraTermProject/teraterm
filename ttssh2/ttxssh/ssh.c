@@ -8133,7 +8133,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 
 	do {
 		// Cancelボタンが押下されたらウィンドウが消える。
-		if (IsWindowVisible(hWnd) == 0)
+		if (IsWindow(hWnd) == 0)
 			goto cancel_abort;
 
 		// ファイルから読み込んだデータはかならずサーバへ送信する。
@@ -8257,7 +8257,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 
 	for (;;) {
 		// Cancelボタンが押下されたらウィンドウが消える。
-		if (IsWindowVisible(hWnd) == 0)
+		if (IsWindow(hWnd) == 0)
 			goto cancel_abort;
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) != 0) {
