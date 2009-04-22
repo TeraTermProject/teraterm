@@ -7277,30 +7277,20 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		pvar->ssh2_authlist = cstring; // 不要になったらフリーすること
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "method list from server: %s", cstring);
 		notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
-#if 0
-		if (!pvar->session_settings.CheckAuthListFirst ||
-		    pvar->ssh2_autologin == 1) {
-			// まず none で試行して返ってきたところなので、実際のログイン処理へ
-			do_SSH2_authrequest(pvar);
-		}
-		else {
-			// TIS 用に OK を押すタイマーを仕掛ける
-			if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
-			    pvar->auth_state.auth_dialog != NULL) {
-				SendMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDOK, 0);
-			}
-		}
-#else
-		// ひとまず none で試行して返ってきたところなので、実際のログイン処理へ
+
 		if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
-		    (pvar->ask4passwd || pvar->ssh2_autologin) &&
+		    pvar->ask4passwd &&
+		    pvar->session_settings.CheckAuthListFirst &&
 		    pvar->auth_state.auth_dialog != NULL) {
+			// challenge で ask4passwd のとき、認証メソッド一覧を自動取得した後
+			// 自動的に TIS ダイアログを出すために OK を押す
 			SendMessage(pvar->auth_state.auth_dialog, WM_COMMAND, IDOK, 0);
 		}
 		else {
+			// ひとまず none で試行して返ってきたところなので、実際のログイン処理へ
 			do_SSH2_authrequest(pvar);
 		}
-#endif
+
 		return TRUE;
 	}
 

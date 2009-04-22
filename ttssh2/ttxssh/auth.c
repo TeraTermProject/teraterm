@@ -230,6 +230,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(dlg);
 
+	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
 		UTIL_get_lang_msg("DLG_AUTH_BANNER2_FAILED", pvar, "Authentication failed. Please retry.");
@@ -239,110 +240,17 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 		default_method = pvar->auth_state.failed_method;
 	}
 
-	// ホスト確認ダイアログから抜けたとき=ウィンドウがアクティブになったとき
-	// に SetFocus が実行され、コマンドラインで渡された認証方式が上書きされて
-	// しまうので、自動ログイン有効時は SetFocus しない (2009.1.31 maya)
-	if (!pvar->ssh2_autologin) {
-		set_auth_options_status(dlg, auth_types_to_control_IDs[default_method]);
-
-		if (default_method == SSH_AUTH_TIS) {
-			/* we disabled the password control, so fix the focus */
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSETIS));
-		}
-		else if (default_method == SSH_AUTH_PAGEANT) {
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSEPAGEANT));
-		}
+	// パスワードを覚えておくチェックボックスにはデフォルトで有効とする (2006.8.3 yutaka)
+	if (pvar->ts_SSH->remember_password) {
+		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_CHECKED, 0);
+	} else {
+		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_UNCHECKED, 0);
 	}
 
-	if (pvar->auth_state.user != NULL) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
-		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
-		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
-	} else if (pvar->session_settings.DefaultUserName[0] != 0) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME,
-		               pvar->session_settings.DefaultUserName);
-	}
+	// ForwardAgent の設定を反映する (2008.12.4 maya)
+	CheckDlgButton(dlg, IDC_FORWARD_AGENT, pvar->settings.ForwardAgent);
 
-	SetDlgItemText(dlg, IDC_RSAFILENAME,
-	               pvar->session_settings.DefaultRSAPrivateKeyFile);
-	SetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
-	               pvar->session_settings.DefaultRhostsHostPrivateKeyFile);
-	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
-	               pvar->session_settings.DefaultRhostsLocalUserName);
-
-	update_server_supported_types(pvar, dlg);
-
-	// SSH2 autologin 
-	// ユーザ、パスワード、認証メソッドを自動設定して、一定時間後にOKボタンを押下する。
-	// 
-	// (2004.12.1 yutaka)
-	// (2005.1.26 yutaka) 公開鍵認証サポート
-	// 自動ログインでないときは、自動設定はするが変更可能 (2006.9.18 maya)
-#if 0
-	if (pvar->ssh2_autologin == 1) {
-#endif
-		if (strlen(pvar->ssh2_username) > 0) {
-			SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->ssh2_username);
-		}
-		if (pvar->ssh2_autologin == 1) {
-			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
-			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
-		}
-
-		SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
-		if (pvar->ssh2_autologin == 1) {
-			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
-			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
-		}
-
-		// '/I' 指定があるときのみ最小化する (2005.9.5 yutaka)
-		if (pvar->ts->Minimize) {
-			//20050822追加 start T.Takahashi
-			ShowWindow(dlg,SW_MINIMIZE);
-			//20050822追加 end T.Takahashi
-		}
-
-		if (pvar->ssh2_authmethod == SSH_AUTH_PASSWORD) {
-			CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPASSWORD);
-
-		} else if (pvar->ssh2_authmethod == SSH_AUTH_RSA) {
-			CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSERSA);
-
-			SetDlgItemText(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
-			if (pvar->ssh2_autologin == 1) {
-				EnableWindow(GetDlgItem(dlg, IDC_CHOOSERSAFILE), FALSE);
-				EnableWindow(GetDlgItem(dlg, IDC_RSAFILENAME), FALSE);
-			}
-
-		// /auth=challenge を追加 (2007.10.5 maya)
-		} else if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
-			CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSETIS);
-			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
-			SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
-
-		// /auth=pageant を追加
-		} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
-			CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPAGEANT);
-			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
-			SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
-
-		} else {
-			// TODO
-
-		}
-
-		GetDlgItemText(dlg, IDC_SSHUSERNAME, uimsg, sizeof(uimsg));
-		if (uimsg[0] == 0) {
-			SetFocus(GetDlgItem(dlg, IDC_SSHUSERNAME));
-		}
-		else if (pvar->ask4passwd == 1) {
-			SetFocus(GetDlgItem(dlg, IDC_SSHPASSWORD));
-		}
-#if 0
-	}
-#endif
-
-#if 1
+	// SSH バージョンによって TIS のラベルを書き換え
 	if (pvar->settings.ssh_protocol_version == 1) {
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
 		                  "Use challenge/response to log in(&TIS)");
@@ -352,17 +260,95 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 		                  "Use &challenge/response to log in(keyboard-interactive)");
 		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
 	}
-#endif
 
-	// パスワードを覚えておくチェックボックスにはデフォルトで有効とする (2006.8.3 yutaka)
-	if (pvar->ts_SSH->remember_password) {
-		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_CHECKED, 0);
-	} else {
-		SendMessage(GetDlgItem(dlg, IDC_REMEMBER_PASSWORD), BM_SETCHECK, BST_UNCHECKED, 0);
+	if (pvar->auth_state.user != NULL) {
+		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
+		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
+	}
+	if (strlen(pvar->ssh2_username) > 0) {
+		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->ssh2_username);
+		if (pvar->ssh2_autologin == 1) {
+			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
+		}
+	}
+	else if (pvar->session_settings.DefaultUserName[0] != 0) {
+		SetDlgItemText(dlg, IDC_SSHUSERNAME,
+		               pvar->session_settings.DefaultUserName);
 	}
 
-	// settings から現在の設定を持ってくる (2008.12.4 maya)
-	CheckDlgButton(dlg, IDC_FORWARD_AGENT, pvar->settings.ForwardAgent);
+	if (strlen(pvar->ssh2_password) > 0) {
+		SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+		if (pvar->ssh2_autologin == 1) {
+			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
+		}
+	}
+
+	SetDlgItemText(dlg, IDC_RSAFILENAME,
+	               pvar->session_settings.DefaultRSAPrivateKeyFile);
+	SetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
+	               pvar->session_settings.DefaultRhostsHostPrivateKeyFile);
+	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
+	               pvar->session_settings.DefaultRhostsLocalUserName);
+
+	if (pvar->ssh2_authmethod == SSH_AUTH_PASSWORD) {
+		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPASSWORD);
+
+	} else if (pvar->ssh2_authmethod == SSH_AUTH_RSA) {
+		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSERSA);
+
+		SetDlgItemText(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
+		if (pvar->ssh2_autologin == 1) {
+			EnableWindow(GetDlgItem(dlg, IDC_CHOOSERSAFILE), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_RSAFILENAME), FALSE);
+		}
+
+	// /auth=challenge を追加 (2007.10.5 maya)
+	} else if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
+		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSETIS);
+		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
+		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+
+	// /auth=pageant を追加
+	} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
+		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPAGEANT);
+		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
+		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
+
+	} else {
+		// デフォルトの認証メソッドをダイアログに反映
+		set_auth_options_status(dlg, auth_types_to_control_IDs[default_method]);
+
+		update_server_supported_types(pvar, dlg);
+
+		// ホスト確認ダイアログから抜けたとき=ウィンドウがアクティブになったとき
+		// に SetFocus が実行され、コマンドラインで渡された認証方式が上書きされて
+		// しまうので、自動ログイン有効時は SetFocus しない (2009.1.31 maya)
+		if (default_method == SSH_AUTH_TIS) {
+			/* we disabled the password control, so fix the focus */
+			SetFocus(GetDlgItem(dlg, IDC_SSHUSETIS));
+		}
+		else if (default_method == SSH_AUTH_PAGEANT) {
+			SetFocus(GetDlgItem(dlg, IDC_SSHUSEPAGEANT));
+		}
+
+	}
+
+	if (GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) == 0) {
+		SetFocus(GetDlgItem(dlg, IDC_SSHUSERNAME));
+	}
+	else if (pvar->ask4passwd == 1) {
+		SetFocus(GetDlgItem(dlg, IDC_SSHPASSWORD));
+	}
+
+	// '/I' 指定があるときのみ最小化する (2005.9.5 yutaka)
+	if (pvar->ts->Minimize) {
+		//20050822追加 start T.Takahashi
+		ShowWindow(dlg,SW_MINIMIZE);
+		//20050822追加 end T.Takahashi
+	}
 }
 
 static char FAR *alloc_control_text(HWND ctl)
@@ -638,9 +624,9 @@ BOOL autologin_sent_none;
 static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                    LPARAM lParam)
 {
-	const int IDC_TIMER1 = 300; // 自動ログイン
-	const int IDC_TIMER2 = 301; // サポートされているメソッドをチェック
-	const int IDC_TIMER3 = 302; // チャレンジレスポンス
+	const int IDC_TIMER1 = 300; // 自動ログインが有効なとき
+	const int IDC_TIMER2 = 301; // サポートされているメソッドを自動チェック(CheckAuthListFirst)
+	const int IDC_TIMER3 = 302; // challenge で ask4passwd でCheckAuthListFirst が FALSE のとき
 	const int autologin_timeout = 10; // ミリ秒
 	PTInstVar pvar;
 	LOGFONT logfont;
@@ -696,10 +682,11 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			    GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) > 0) {
 				SetTimer(dlg, IDC_TIMER2, autologin_timeout, 0);
 			}
-			// /auth=challenge が指定されていてユーザ名が確定していない
-			// ということはないと思われるので、OK ボタンを押して
-			// TIS auth ダイアログを出す
-			else {
+			// /auth=challenge と /ask4passwd が指定されていてユーザ名が確定している
+			// 場合は、OK ボタンを押して TIS auth ダイアログを出す
+			else if (pvar->ssh2_authmethod == SSH_AUTH_TIS &&
+			         pvar->ask4passwd &&
+			         GetWindowTextLength(GetDlgItem(dlg, IDC_SSHUSERNAME)) > 0) {
 				SetTimer(dlg, IDC_TIMER3, autologin_timeout, 0);
 			}
 		}
@@ -716,22 +703,33 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				    pvar->session_settings.CheckAuthListFirst &&
 				    !pvar->tryed_ssh2_authlist) {
 					if (!autologin_sent_none) {
+						autologin_sent_none = TRUE;
+
 						// ダイアログのユーザ名を取得する
 						if (pvar->auth_state.user == NULL) {
 							pvar->auth_state.user =
 								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 						}
 
-						// AuthList が帰ってきていないと IDOK を押しても
-						// 進まないので、認証メソッド none を送る (2008.10.12 maya)
+						// CheckAuthListFirst が TRUE のときは AuthList が帰ってきていないと
+						// IDOK を押しても進まないので、認証メソッド none を送る (2008.10.12 maya)
 						do_SSH2_userauth(pvar);
-						autologin_sent_none = TRUE;
 					}
 					//else {
 					//	none を送ってから帰ってくるまで待つ
 					//}
 				}
 				else {
+					// SSH1 のとき
+					// または CheckAuthListFirst が FALSE のとき
+					// または CheckAuthListFirst TRUE で、authlist が帰ってきたあと
+
+					// ダイアログのユーザ名を取得する
+					if (pvar->auth_state.user == NULL) {
+						pvar->auth_state.user =
+							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+					}
+
 					KillTimer(dlg, IDC_TIMER1);
 					SendMessage(dlg, WM_COMMAND, IDOK, 0);
 				}
@@ -753,17 +751,16 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 					// ユーザ名を変更させない
 					EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 
-					// none を送る
+					// 認証メソッド none を送る
 					do_SSH2_userauth(pvar);
 
-					// TIS 用に OK を押すタイマーを仕掛けるのは
-					// 認証に失敗したあとにしないと
+					// TIS 用に OK を押すのは認証に失敗したあとにしないと
 					// Unexpected SSH2 message になる。
 				}
 			}
 			else if (SSHv1(pvar)) {
 				KillTimer(dlg, IDC_TIMER2);
-				// TIS 用に OK を押すタイマーを仕掛ける
+				// TIS 用に OK を押す
 				if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
 					SendMessage(dlg, WM_COMMAND, IDOK, 0);
 				}
@@ -841,7 +838,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 					// ユーザ名を変更させない
 					EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 
-					// none を送る
+					// 認証メソッド none を送る
 					do_SSH2_userauth(pvar);
 					return TRUE;
 				}
