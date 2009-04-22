@@ -723,7 +723,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 						}
 
 						// AuthList が帰ってきていないと IDOK を押しても
-						// 進まないので、none を送る (2008.10.12 maya)
+						// 進まないので、認証メソッド none を送る (2008.10.12 maya)
 						do_SSH2_userauth(pvar);
 						autologin_sent_none = TRUE;
 					}
