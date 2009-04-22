@@ -30,7 +30,7 @@
     <ul>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the `wait4all' macro command.</li>
       <li>added a Subversion(SVN) revision number on the version dialog.</li>
-      <li>added support for DECSCUSR (Set Cursor Style), WYSTCURM (Wyse Steady Cursor Mode), WYULCURM (Wyse Underline Cursor Mode) <!-- and AT&amp;T 610のカーソル点滅 --> control sequences.<br>
+      <li>added support for DECSCUSR (Set Cursor Style), WYSTCURM (Wyse Steady Cursor Mode), WYULCURM (Wyse Underline Cursor Mode) and AT&amp;T 610 cursor blinking control sequences.<br>
         Add the below configuration in the ~/.vimrc file for vim editor.
         <pre>
          set t_SI=^[[3\ q
@@ -54,13 +54,13 @@
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
-      <!-- li>dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュに対応した。</li -->
+      <li>added support for the position moving, the minimization, the maximization, the most front, the most back and the refresh control sequences regarding the dtterm window operation.</li>
     </ul></li>
 
-  <!-- li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>AcceptTitleChangeRequestがoverwriteの時、リモートからのウィンドウタイトル変更要求を受けた後にマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルの変更が出来なくなるのを修正した。</li>
-    </ul></li -->
+      <li>The <a href="../macro/command/settitle.html">settitle</a> macro does not work after accepting the changing request of the window title, when the AcceptTitleChangeRequest is overwrite.</li>
+    </ul></li>
 
   <li>Misc
     <ul>
@@ -1248,7 +1248,7 @@ SYNOPSIS:
       <ul>
         <li>Some Japanese characters can not use in the host name.</li>
         <li>TTSSH does not work when the command line option(/FD=, /K=, /M=, /L=, /R=, /W=) includes the space character.</li>
-      <!--li>SSH2 の鍵交換で、アルゴリズムネゴシエーションに失敗することがあるのを修正した。</li-->
+      <li>The crypto algorithm negotiation would be failure when the SSH2 key exchanges.</li>
         <li>SCP transfer does not halt when the SCP window is minimized.</li>
     </ul></li>
 
