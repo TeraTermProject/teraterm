@@ -716,6 +716,12 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				    pvar->session_settings.CheckAuthListFirst &&
 				    !pvar->tryed_ssh2_authlist) {
 					if (!autologin_sent_none) {
+						// ダイアログのユーザ名を取得する
+						if (pvar->auth_state.user == NULL) {
+							pvar->auth_state.user =
+								alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
+						}
+
 						// AuthList が帰ってきていないと IDOK を押しても
 						// 進まないので、none を送る (2008.10.12 maya)
 						do_SSH2_userauth(pvar);

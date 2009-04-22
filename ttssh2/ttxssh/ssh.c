@@ -6861,11 +6861,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	}
 
 	// ペイロードの構築
-	if (pvar->ssh2_autologin == 1) { // SSH2自動ログイン
-		username = pvar->ssh2_username;
-	} else {
-		username = pvar->auth_state.user;  // ユーザ名
-	}
+	username = pvar->auth_state.user;  // ユーザ名
 	buffer_put_string(msg, username, strlen(username));
 
 	if (!pvar->tryed_ssh2_authlist) { // "none"メソッドの送信
@@ -7492,11 +7488,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_PK_OK was received.", LOG_LEVEL_VERBOSE);
 
-		if (pvar->ssh2_autologin == 1) { // SSH2自動ログイン
-			username = pvar->ssh2_username;
-		} else {
-			username = pvar->auth_state.user;  // ユーザ名
-		}
+		username = pvar->auth_state.user;  // ユーザ名
 
 		// 署名するデータを作成
 		signbuf = buffer_init();
