@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\teraterm\debug\ttpcmn.lib"
+				AdditionalDependencies="..\..\teraterm\release\ttpcmn.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
