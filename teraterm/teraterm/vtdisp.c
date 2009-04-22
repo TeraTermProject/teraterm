@@ -1359,7 +1359,7 @@ void BGOnSettingChange(void)
   BGPreloadSrc(&BGSrc2);
 
   BGSetupPrimary(TRUE);
-  InvalidateRect(HVTWin,0,FALSE);
+  InvalidateRect(HVTWin, NULL, FALSE);
 }
 
 //-->
@@ -3276,7 +3276,7 @@ void DispSetWinPos()
 
 #ifdef ALPHABLEND_TYPE2
    if(BGEnable)
-   	InvalidateRect(HVTWin,0,FALSE);
+   	InvalidateRect(HVTWin, NULL, FALSE);
 #endif
 }
 
