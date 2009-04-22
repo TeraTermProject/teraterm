@@ -1447,7 +1447,7 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
   int XStart;
 
 #ifndef NO_COPYLINE_FIX
-  if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] | AttrLineContinued)) {
+  if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] & AttrLineContinued)) {
     Attr.Attr |= AttrLineContinued;
   }
 #endif /* NO_COPYLINE_FIX */
