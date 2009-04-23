@@ -723,6 +723,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 					// SSH1 のとき
 					// または CheckAuthListFirst が FALSE のとき
 					// または CheckAuthListFirst TRUE で、authlist が帰ってきたあと
+					KillTimer(dlg, IDC_TIMER1);
 
 					// ダイアログのユーザ名を取得する
 					if (pvar->auth_state.user == NULL) {
@@ -730,16 +731,15 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 							alloc_control_text(GetDlgItem(dlg, IDC_SSHUSERNAME));
 					}
 
-					KillTimer(dlg, IDC_TIMER1);
 					SendMessage(dlg, WM_COMMAND, IDOK, 0);
 				}
 			}
 		}
 		else if (wParam == IDC_TIMER2) {
 			// authlist を得るため
-			if (SSHv2(pvar)) {
-				if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
-				    (pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
+			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
+			    (pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
+				if (SSHv2(pvar)) {
 					KillTimer(dlg, IDC_TIMER2);
 
 					// ダイアログのユーザ名を取得する
@@ -757,29 +757,29 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 					// TIS 用に OK を押すのは認証に失敗したあとにしないと
 					// Unexpected SSH2 message になる。
 				}
-			}
-			else if (SSHv1(pvar)) {
-				KillTimer(dlg, IDC_TIMER2);
-				// TIS 用に OK を押す
-				if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
-					SendMessage(dlg, WM_COMMAND, IDOK, 0);
-				}
-				// SSH1 では none を送らない
-			}
-			// プロトコルバージョン確定前は何もしない
-		}
-		else if (wParam == IDC_TIMER3) {
-			if (SSHv2(pvar) || SSHv1(pvar)) {
-				// TIS 用に OK を押すタイマーを仕掛ける
-				if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
-					if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
-					    (pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
-						KillTimer(dlg, IDC_TIMER3);
+				else if (SSHv1(pvar)) {
+					KillTimer(dlg, IDC_TIMER2);
+
+					// TIS 用に OK を押す
+					if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
 						SendMessage(dlg, WM_COMMAND, IDOK, 0);
 					}
+					// SSH1 では認証メソッド none を送らない
 				}
+				// プロトコルバージョン確定前は何もしない
 			}
-			// プロトコルバージョン確定前は何もしない
+		}
+		else if (wParam == IDC_TIMER3) {
+			if (!(pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) &&
+			    (pvar->ssh_state.status_flags & STATUS_HOST_OK)) {
+				if (SSHv2(pvar) || SSHv1(pvar)) {
+					KillTimer(dlg, IDC_TIMER3);
+
+					// TIS 用に OK を押す
+					SendMessage(dlg, WM_COMMAND, IDOK, 0);
+				}
+				// プロトコルバージョン確定前は何もしない
+			}
 		}
 		return FALSE;
 
