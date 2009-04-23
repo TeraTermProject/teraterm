@@ -79,7 +79,7 @@ static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	if (ret) {
 		if (orgRecvCode == pvar->ts->KanjiCode && orgSendCode != pvar->ts->KanjiCodeSend) {
 			// 送信コードのみ変更した場合は送信コードに合わせる
-			// ただし、送信:UTF-8 && 受信: UTF-8mの場合は対象外
+			// ただし、送信:UTF-8 && 受信:UTF-8m の場合は対象外
 			if (pvar->ts->KanjiCodeSend != IdUTF8 || pvar->ts->KanjiCode != IdUTF8m) {
 				pvar->ts->KanjiCode = pvar->ts->KanjiCodeSend;
 			}
