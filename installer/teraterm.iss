@@ -325,6 +325,15 @@ Root: HKCU; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType:
 Root: HKCR; Subkey: slogin\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsclearvalue; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: slogin\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+; Associate with .TTY
+Root: HKCU; Subkey: Software\Classes\.tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCU; Subkey: Software\Classes\TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCR; Subkey: .tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCR; Subkey: TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCR; Subkey: TTYRecordFile\DefaultIcon; ValueType: string; ValueData: {app}\ttermpro.exe,0; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
+Root: HKCR; Subkey: TTYRecordFile\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" /R=""%1"" /TTYPLAY"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 
 [Tasks]
 Name: desktopicon; Description: {cm:task_desktopicon}; Components: TeraTerm
@@ -336,6 +345,7 @@ Name: quickcyglaunch; Description: {cm:task_quickcyglaunch}; Components: cygterm
 Name: macroassoc; Description: {cm:task_macroassoc}; Components: TeraTerm; Flags: unchecked
 Name: telnetassoc; Description: {cm:task_telnetassoc}; Components: TeraTerm; Flags: unchecked
 Name: sshassoc; Description: {cm:task_sshassoc}; Components: TTSSH; Flags: unchecked
+Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_Plugins/TTXttyrec; Flags: unchecked
 
 [Run]
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
@@ -356,6 +366,7 @@ en.task_quickcyglaunch=Create cyg&launch shortcut to Quick Launch
 en.task_macroassoc=Associate .&ttl file to ttpmacro.exe
 en.task_telnetassoc=Associate t&elnet protocol to ttermpro.exe
 en.task_sshassoc=Associate &ssh protocol to ttermpro.exe
+en.task_ttyplayassoc=Associate .tty file to tterm&pro.exe
 ja.task_desktopicon=デスクトップに Tera Term のショートカットを作る(&D)
 ja.task_quicklaunchicon=クイック起動に Tera Term のショートカットを作る(&Q)
 ja.task_startupttmenuicon=スタートアップに TeraTerm &Menu のショートカットを作る
@@ -365,6 +376,7 @@ ja.task_quickcyglaunch=クイック起動に cyg&launch のショートカットを作る
 ja.task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
 ja.task_telnetassoc=t&elnet プロトコルを ttermpro.exe に関連付ける
 ja.task_sshassoc=&ssh プロトコルを ttermpro.exe に関連付ける
+ja.task_ttyplayassoc=.tty ファイルを ttermpro.exe に関連付ける
 en.type_standard=Standard installation
 en.type_full=Full installation
 en.type_compact=Compact installation
