@@ -47,6 +47,7 @@ typedef struct {
 	int maxwait;
 	int speed;
 	BOOL pause;
+	BOOL nowait;
 	struct timeval last;
 	struct timeval wait;
 	char openfn[MAX_PATH];
@@ -110,6 +111,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
 	pvar->pause = FALSE;
+	pvar->nowait = FALSE;
 }
 
 void RestoreTitle() {
@@ -186,10 +188,12 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 		prh = h;
 	}
 
-	gettimeofday(&curtime, NULL);
+	if (!pvar->nowait) {
+		gettimeofday(&curtime, NULL);
+		tdiff = tvdiff(pvar->last, curtime);
+	}
 
-	tdiff = tvdiff(pvar->last, curtime);
-	if (tdiff.tv_sec > pvar->wait.tv_sec ||
+	if (pvar->nowait || tdiff.tv_sec > pvar->wait.tv_sec ||
 	  (tdiff.tv_sec == pvar->wait.tv_sec && tdiff.tv_usec >= pvar->wait.tv_usec)) {
 		if (title_changed) {
 			RestoreTitle();
@@ -370,7 +374,10 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 
 	next = Param;
 	while (next = GetParam(buff, sizeof(buff), next)) {
-		if (_strnicmp(buff, "/TTYPLAY", 9) == 0 || _strnicmp(buff, "/TP", 4) == 0) {
+		if (_strnicmp(buff, "/ttyplay-nowait", 16) == 0 || _strnicmp(buff, "/tpnw", 6) == 0) {
+			pvar->nowait = TRUE;
+		}
+		else if (_strnicmp(buff, "/TTYPLAY", 9) == 0 || _strnicmp(buff, "/TP", 4) == 0) {
 			pvar->enable = TRUE;
 		}
 	}
