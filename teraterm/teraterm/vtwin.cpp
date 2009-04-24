@@ -4215,16 +4215,21 @@ extern "C"
 void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf, int buflen)
 {
 	int i;
+	int count;
 	HWND hd;
 	COPYDATASTRUCT cds;
 
 	// すべてのTera Termにメッセージとデータを送る
-	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
+	count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+	for (i = 0 ; i < count ; i++) { 
 		if (parent_only) {
 			hd = GetParent(hWnd);
 			i = MAXNWIN;		// 337: 強引かつ直値 :P
 		} else {
-			hd = GetNthWin(i);
+			// リストボックスで選択されているか
+			if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
+				hd = GetNthWin(i);
+			}
 		}
 		if (hd == NULL)
 			break;
@@ -4459,7 +4464,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_LF), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_PARENT_ONLY), TRUE);
-					EnableWindow(GetDlgItem(hWnd, IDC_LIST), FALSE);  // false
+					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				}
 				return TRUE;
 			}
