@@ -8099,6 +8099,17 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 	return TRUE;
 }
 
+static int is_canceled_window(HWND hd)
+{
+	// 最小化されているときは、キャンセルではない。
+	if (IsIconic(hd))
+		return 0;
+	// ウィンドウが見えなくなったら、キャンセルされた。
+	if (IsWindowVisible(hd) == 0)
+		return 1;
+	return 0;
+}
+
 static unsigned __stdcall ssh_scp_thread(void FAR * p)
 {
 	Channel_t *c = (Channel_t *)p;
@@ -8115,7 +8126,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 
 	do {
 		// Cancelボタンが押下されたらウィンドウが消える。
-		if (IsWindow(hWnd) == 0)
+		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
 		// ファイルから読み込んだデータはかならずサーバへ送信する。
@@ -8239,7 +8250,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 
 	for (;;) {
 		// Cancelボタンが押下されたらウィンドウが消える。
-		if (IsWindow(hWnd) == 0)
+		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) != 0) {
