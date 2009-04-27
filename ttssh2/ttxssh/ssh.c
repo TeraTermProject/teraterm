@@ -8080,6 +8080,7 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 
 				case IDCANCEL:
 					EndDialog(hWnd, 0);
+					DestroyWindow(hWnd);
 					return TRUE;
 				default:
 					return FALSE;
@@ -8105,7 +8106,7 @@ static int is_canceled_window(HWND hd)
 	if (IsIconic(hd))
 		return 0;
 	// ウィンドウが見えなくなったら、キャンセルされた。
-	if (IsWindowVisible(hd) == 0)
+	if (IsWindow(hd) == 0)
 		return 1;
 	return 0;
 }
