@@ -465,7 +465,7 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		}
 		
-		strncat_s(msg, sizeof(msg), "\r\n", _TRUNCATE);
+		strncat_s(msg, sizeof(msg), "\n", _TRUNCATE);
 	}
 
 	/* å„èàóù */
