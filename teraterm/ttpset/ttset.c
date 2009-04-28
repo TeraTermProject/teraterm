@@ -2842,12 +2842,20 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			strncpy_s(ts->LogFN, sizeof(ts->LogFN), Temp2, _TRUNCATE);
 		}
 		else if (_strnicmp(Temp, "/LA=", 4) == 0) {	/* language */
-			if (_strnicmp(&Temp[4], "E", 1) == 0)
-				ts->Language = IdEnglish;
-			else if (_strnicmp(&Temp[4], "J", 1) == 0)
-				ts->Language = IdJapanese;
-			else if (_strnicmp(&Temp[4], "R", 1) == 0)
-				ts->Language = IdRussian;
+			switch (Temp[4]) {
+			  case 'E':
+			  case 'e':
+				ts->Language = IdEnglish; break;
+			  case 'J':
+			  case 'j':
+				ts->Language = IdJapanese; break;
+			  case 'K':
+			  case 'k':
+				ts->Language = IdKorean; break;
+			  case 'R':
+			  case 'r':
+				ts->Language = IdRussian; break;
+			}
 		}
 		else if (_strnicmp(Temp, "/M=", 3) == 0) {	/* macro filename */
 			if ((Temp[3] == 0) || (Temp[3] == '*'))
