@@ -1924,29 +1924,29 @@ void ChangeFont()
 
 void ResetIME()
 {
-  /* reset language for communication */
-  cv.Language = ts.Language;
+	/* reset language for communication */
+	cv.Language = ts.Language;
 
-  /* reset IME */
-  if ((ts.Language==IdJapanese) || (ts.Language==IdKorean)) //HKS
-  {
-    if (ts.UseIME==0)
-      FreeIME();
-    else if (! LoadIME())
-      ts.UseIME = 0;
-
-	if (ts.UseIME>0)
+	/* reset IME */
+	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean)) //HKS
 	{
-		if (ts.IMEInline>0)
-			SetConversionLogFont(&VTlf);
-		else
-			SetConversionWindow(HVTWin,-1,0);
-	}
-  }
-  else
-    FreeIME();
+		if (ts.UseIME==0)
+			FreeIME();
+		else if (! LoadIME())
+			ts.UseIME = 0;
 
-  if (IsCaretOn()) CaretOn();
+		if (ts.UseIME>0)
+		{
+			if (ts.IMEInline>0)
+				SetConversionLogFont(&VTlf);
+			else
+				SetConversionWindow(HVTWin,-1,0);
+		}
+	}
+	else
+		FreeIME();
+
+	if (IsCaretOn()) CaretOn();
 }
 
 void ChangeCaret()
@@ -2072,68 +2072,68 @@ void UpdateCaretPosition(BOOL enforce)
 void CaretOn()
 // Turn on the cursor
 {
-  int CaretX, CaretY, H;
+	int CaretX, CaretY, H;
 
-  if (ts.KillFocusCursor == 0 && !Active)
-	  return;
+	if (ts.KillFocusCursor == 0 && !Active)
+		return;
 
-  CaretX = (CursorX-WinOrgX)*FontWidth;
-  CaretY = (CursorY-WinOrgY)*FontHeight;
+	CaretX = (CursorX-WinOrgX)*FontWidth;
+	CaretY = (CursorY-WinOrgY)*FontHeight;
 
-  if ((ts.Language==IdJapanese) &&
-	  CanUseIME() && (ts.IMEInline>0))
-	/* set IME conversion window pos. & font */
-	SetConversionWindow(HVTWin,CaretX,CaretY);
+	if ((ts.Language==IdJapanese) &&
+	    CanUseIME() && (ts.IMEInline>0))
+		/* set IME conversion window pos. & font */
+		SetConversionWindow(HVTWin,CaretX,CaretY);
 
-  if (! CaretEnabled) return;
+	if (! CaretEnabled) return;
 
-  if (Active) {
-	  if (ts.CursorShape!=IdVCur)
-	  {
-		if (ts.CursorShape==IdHCur)
-		{
-		 CaretY = CaretY+FontHeight-CurWidth;
-		 H = CurWidth;
+	if (Active) {
+		if (ts.CursorShape!=IdVCur) {
+			if (ts.CursorShape==IdHCur) {
+				CaretY = CaretY+FontHeight-CurWidth;
+				H = CurWidth;
+			}
+			else {
+				H = FontHeight;
+			}
+
+			DestroyCaret();
+			if (CursorOnDBCS) {
+				/* double width caret */
+				CreateCaret(HVTWin, 0, FontWidth*2, H);
+			}
+			else {
+				/* single width caret */
+				CreateCaret(HVTWin, 0, FontWidth, H);
+			}
+			CaretStatus = 1;
 		}
-		else H = FontHeight;
+		SetCaretPos(CaretX,CaretY);
+	}
 
-		DestroyCaret();
-		if (CursorOnDBCS)
-		  CreateCaret(HVTWin, 0, FontWidth*2, H); /* double width caret */
-		else
-		  CreateCaret(HVTWin, 0, FontWidth, H); /* single width caret */
-		CaretStatus = 1;
-	  }
-
-	  SetCaretPos(CaretX,CaretY);
-  }
-
-  while (CaretStatus > 0)
-  {
-	  if (! Active) {
-		  CaretKillFocus(TRUE);
-	  } else {
-	      ShowCaret(HVTWin);
-	  }
-    CaretStatus--;
-  }
-
+	while (CaretStatus > 0) {
+		if (! Active) {
+			CaretKillFocus(TRUE);
+		} else {
+			ShowCaret(HVTWin);
+		}
+		CaretStatus--;
+	}
 }
 
 void CaretOff()
 {
-  if (ts.KillFocusCursor == 0 && !Active)
-	  return;
+	if (ts.KillFocusCursor == 0 && !Active)
+		return;
 
-  if (CaretStatus == 0)
-  {
-	  if (! Active) {
-		CaretKillFocus(FALSE);
-	  } else {
-	    HideCaret(HVTWin);
-	  }
-    CaretStatus++;
-  }
+	if (CaretStatus == 0) {
+		if (! Active) {
+			CaretKillFocus(FALSE);
+		} else {
+			HideCaret(HVTWin);
+		}
+		CaretStatus++;
+	}
 }
 
 void DispDestroyCaret()
@@ -3288,23 +3288,25 @@ void DispMoveWindow(int x, int y) {
 
 void DispSetActive(BOOL ActiveFlag)
 {
-  Active = ActiveFlag;
-  if (Active)
-  {
-	  if (IsCaretOn()) {
-		CaretKillFocus(FALSE);
-		UpdateCaretPosition(TRUE);  // アクティブ時は無条件に再描画する
-	  }
+	Active = ActiveFlag;
+	if (Active) {
+		if (IsCaretOn()) {
+			CaretKillFocus(FALSE);
+			// アクティブ時は無条件に再描画する
+			UpdateCaretPosition(TRUE);
+		}
 
-    SetFocus(HVTWin);
-    ActiveWin = IdVT;
-  }
-  else {
-    if ((ts.Language==IdJapanese) &&
-        CanUseIME())
-      /* position & font of conv. window -> default */
-      SetConversionWindow(HVTWin,-1,0);
-  }
+		SetFocus(HVTWin);
+		ActiveWin = IdVT;
+	}
+	else {
+		if ((ts.Language==IdJapanese) &&
+		    CanUseIME())
+		{
+			/* position & font of conv. window -> default */
+			SetConversionWindow(HVTWin,-1,0);
+		}
+	}
 }
 
 int TCharAttrCmp(TCharAttr a, TCharAttr b)
