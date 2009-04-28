@@ -287,7 +287,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, (ts->KanjiCode==IdUTF8)? 2:1);
 			SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, (ts->KanjiCodeSend==IdUTF8)? 2:1);
 
-			// ロケ?ル用テキスト?ックス
+			// ロケール用テキストボックス
 			SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 			SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
