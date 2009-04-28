@@ -2881,14 +2881,19 @@ BOOL FAR PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	int i;
 
-	if (ts->Language==IdJapanese) // Japanese mode
+	switch (ts->Language) {
+	case IdJapanese: // Japanese mode
 		i = IDD_TERMDLGJ;
-	else if (ts->Language==IdRussian) // Russian mode
-		i = IDD_TERMDLGR;
-	else if (ts->Language==IdKorean) // Korean mode //HKS
+		break;
+	case IdKorean: // Russian mode
 		i = IDD_TERMDLGK;
-	else
+		break;
+	case IdRussian: // Korean mode //HKS
+		i = IDD_TERMDLGR;
+		break;
+	default:  // English mode
 		i = IDD_TERMDLG;
+	}
 
 	return
 		(BOOL)DialogBoxParam(hInst,

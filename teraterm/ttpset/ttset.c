@@ -1282,14 +1282,20 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "Version", "2.3", FName);
 
 	/* Language */
-	if (ts->Language == IdJapanese)
+	switch (ts->Language) {
+	case IdJapanese:
 		strncpy_s(Temp, sizeof(Temp), "Japanese", _TRUNCATE);
-	else if (ts->Language == IdRussian)
-		strncpy_s(Temp, sizeof(Temp), "Russian", _TRUNCATE);
-	else if (ts->Language == IdKorean) //HKS
-		strncpy_s(Temp, sizeof(Temp), "Korean", _TRUNCATE);
-	else
-		strncpy_s(Temp, sizeof(Temp), "English", _TRUNCATE);
+		break;
+	case IdKorean:
+	  	strncpy_s(Temp, sizeof(Temp), "Korean",   _TRUNCATE);
+		break;
+	case IdRussian:
+	  	strncpy_s(Temp, sizeof(Temp), "Russian",  _TRUNCATE);
+		break;
+	default:
+	  	strncpy_s(Temp, sizeof(Temp), "English",  _TRUNCATE);
+	}
+
 	WritePrivateProfileString(Section, "Language", Temp, FName);
 
 	/* Port type */

@@ -1433,9 +1433,7 @@ void CVTWindow::RestoreSetup()
 /* called by the [Setup] Terminal command */
 void CVTWindow::SetupTerm()
 {
-	if (ts.Language==IdJapanese)
-		ResetCharSet();
-	if (ts.Language==IdKorean)  // HKS
+	if (ts.Language==IdJapanese || ts.Language==IdKorean)
 		ResetCharSet();
 	cv.CRSend = ts.CRSend;
 
