@@ -99,7 +99,7 @@ static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 }
 
 static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
-	if (pvar->UseOneSetting) {
+	if (pvar->UseOneSetting && pvar->ts->Language == IdJapanese) {
 		pvar->origSetupTermDlg = *hooks->SetupTerminal;
 		*hooks->SetupTerminal = TTXKanjiMenuSetupTerminal;
 	}
@@ -117,11 +117,13 @@ static void PASCAL FAR TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
 	}
 	else {
 		pvar->UseOneSetting = TRUE;
-		if (pvar->ts->KanjiCode == IdUTF8m) {
-			pvar->ts->KanjiCodeSend = IdUTF8;
-		}
-		else {
-			pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
+		if (pvar->ts->Language == IdJapanese) {
+			if (pvar->ts->KanjiCode == IdUTF8m) {
+				pvar->ts->KanjiCodeSend = IdUTF8;
+			}
+			else {
+				pvar->ts->KanjiCodeSend = pvar->ts->KanjiCode;
+			}
 		}
 	}
 	return;
