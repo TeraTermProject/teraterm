@@ -132,6 +132,10 @@ void RestoreNewLine(PCHAR Text)
 					buf[j] = '\v';
 					i++;
 					break;
+				case 'e':
+					buf[j] = '\033';
+					i++;
+					break;
 				case '0':
 					buf[j] = '\0';
 					i++;
