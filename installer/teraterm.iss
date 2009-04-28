@@ -541,6 +541,19 @@ begin
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,128', iniFile);
     end;
+  $12: // Korean
+    begin
+      if Length(Language) = 0 then
+        SetIniString('Tera Term', 'Language', 'Korean', iniFile);
+      if Length(Locale) = 0 then
+        SetIniString('Tera Term', 'Locale', 'korean', iniFile);
+      if CodePage = 0 then
+        SetIniInt('Tera Term', 'CodePage', 949, iniFile);
+      if Length(VTFont) = 0 then
+        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
+      if Length(TEKFont) = 0 then
+        SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,255', iniFile);
+    end;
   $19: // Russian
     begin
       if Length(Language) = 0 then
