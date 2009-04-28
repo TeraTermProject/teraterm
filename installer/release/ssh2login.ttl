@@ -1,5 +1,5 @@
 ; sample macro of Tera Term
-; 
+;
 ; File: ssh2login.ttl
 ; Description: auto login with SSH2 protocol
 ; Environment: generic

@@ -1,5 +1,5 @@
 ; sample macro of Tera Term
-; 
+;
 ; File: mpause.ttl
 ; Description: wait command in each millisecond
 ; Environment: generic

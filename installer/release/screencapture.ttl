@@ -6,10 +6,10 @@
 ; Update: 2007/11/25, 12/5, 2008/01/30
 ; Author: IWAMOTO Kouichi (doda), Yutaka Hirata
 ; Tips:
-;   It is recommended that you will add in the following entry 
-;   in `KEYBOARD.CNF' file because you can capture your screen 
+;   It is recommended that you will add in the following entry
+;   in `KEYBOARD.CNF' file because you can capture your screen
 ;   at one's fingertrips.
-; 
+;
 ;   [User keys]
 ;   ;Shift + F12
 ;   User1=600,2,screencapture.ttl
@@ -30,7 +30,7 @@ if appendmode=0 then
 else
 	fileopen fp 'screencapture.txt' 1
 endif
-	
+
 if result <> 0 end
 
 ;select screen
@@ -63,7 +63,7 @@ gettime StrTime
 strcopy StrDate 1 4 DateY  ;YYYY
 strcopy StrDate 6 2 DateM  ;     MM
 strcopy StrDate 9 2 DateD  ;        DD
-  
+
                            ;1234567890
                            ;HH:MM:SS
 strcopy StrTime 1 2 TimeH  ;HH

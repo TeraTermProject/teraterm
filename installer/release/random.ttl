@@ -1,5 +1,5 @@
 ; sample macro of Tera Term
-; 
+;
 ; File: random.ttl
 ; Description: generate the random value
 ; Environment: generic

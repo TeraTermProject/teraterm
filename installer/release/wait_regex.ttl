@@ -1,5 +1,5 @@
 ; sample macro of Tera Term
-; 
+;
 ; File: wait_regex.ttl
 ; Description: wait command with regular expression
 ; Environment: generic
