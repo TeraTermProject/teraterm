@@ -2885,8 +2885,8 @@ BOOL FAR PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 		i = IDD_TERMDLGJ;
 	else if (ts->Language==IdRussian) // Russian mode
 		i = IDD_TERMDLGR;
-    else if (ts->Language==IdKorean) // Korean mode //HKS
-	    i = IDD_TERMDLGK;
+	else if (ts->Language==IdKorean) // Korean mode //HKS
+		i = IDD_TERMDLGK;
 	else
 		i = IDD_TERMDLG;
 

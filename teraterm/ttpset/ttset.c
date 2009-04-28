@@ -231,7 +231,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		case LANG_RUSSIAN:
 			ts->Language = IdRussian;
 			break;
-        case LANG_KOREAN:	// HKS
+		case LANG_KOREAN:	// HKS
 			ts->Language = IdKorean; 
 			break; 
 		default:

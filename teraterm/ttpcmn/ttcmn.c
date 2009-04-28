@@ -1458,9 +1458,8 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 
 	if (cv->Language==IdJapanese)
 		return TextOutJP(cv,B,C);
-    if (cv->Language==IdKorean)		// HKS
-       return TextOutKR(cv,B,C);
-
+	if (cv->Language==IdKorean)		// HKS
+		return TextOutKR(cv,B,C);
 
 	Full = FALSE;
 	i = 0;
