@@ -361,7 +361,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				BOOL ret;
 
 				ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-		        if(ts->KanjiCode==2)
+				if(ts->KanjiCode==2)
 				   ts->KanjiCode=IdUTF8;
 				ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
 				if(ts->KanjiCodeSend==2)
