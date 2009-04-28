@@ -112,6 +112,26 @@ void RestoreNewLine(PCHAR Text)
 					buf[j] = '\t';
 					i++;
 					break;
+				case 'a':
+					buf[j] = '\a';
+					i++;
+					break;
+				case 'b':
+					buf[j] = '\b';
+					i++;
+					break;
+				case 'f':
+					buf[j] = '\f';
+					i++;
+					break;
+				case 'r':
+					buf[j] = '\r';
+					i++;
+					break;
+				case 'v':
+					buf[j] = '\v';
+					i++;
+					break;
 				case '0':
 					buf[j] = '\0';
 					i++;
