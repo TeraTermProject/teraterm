@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
@@ -31,8 +32,8 @@ typedef struct {
 	int interval;
 	BOOL enable;
 	int cmdLen;
-	char command[50];
-	char orgCommand[50];
+	unsigned char command[50];
+	unsigned char orgCommand[50];
 } TInstVar;
 
 typedef TInstVar FAR * PTInstVar;
@@ -87,18 +88,18 @@ WORD GetOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, BOOL Default)
 // \n, \t等を展開する。
 // common/ttlib.c:RestoreNewLine()がベース。
 //
-void RestoreNewLine(PCHAR Text)
+void UnEscapeStr(BYTE *Text)
 {
-	unsigned int i, j=0;
+	unsigned int i, j=0, k;
 	size_t size;
-	char *buf;
+	unsigned char *buf;
 
 	size = strlen(Text);
 	buf = malloc(size+1);
 
 	memset(buf, 0, size+1);
 	for (i=0; i<size; i++) {
-		if (Text[i] == '\\' && i<size ) {
+		if (Text[i] == '\\') {
 			switch (Text[i+1]) {
 				case '\\':
 					buf[j] = '\\';
@@ -136,9 +137,43 @@ void RestoreNewLine(PCHAR Text)
 					buf[j] = '\033';
 					i++;
 					break;
+				case 'x':
+					if (isxdigit(Text[i+2]) && isxdigit(Text[i+3])) {
+						i+=2;
+						// buf[j] = ((Text[i]|0x20) - (isalpha(Text[i])?'a'-10:'0')) << 4;
+						if (isalpha(Text[i]))
+							buf[j] = (Text[i]|0x20) - 'a' + 10;
+						else
+							buf[j] = Text[i] - '0';
+						buf[j] <<= 4;
+
+						i++;
+						// buf[j] += ((Text[i]|0x20) - (isalpha(Text[i])?'a'-10:'0'));
+						if (isalpha(Text[i]))
+							buf[j] += (Text[i]|0x20) - 'a' + 10;
+						else
+							buf[j] += Text[i] - '0';
+					}
+					else {
+						buf[j++] = '\\';
+						buf[j] = 'x';
+						i++;
+					}
+					break;
 				case '0':
-					buf[j] = '\0';
-					i++;
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+					buf[j] = 0;
+					for (k=0; k<3; k++, i++) {
+						if (Text[i+1] < '0' || Text[i+1] > '7')
+							break;
+						buf[j] = (buf[j] << 3) + Text[i+1] - '0';
+					}
 					break;
 				default:
 					buf[j] = '\\';
@@ -311,7 +346,7 @@ static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
 
 	GetPrivateProfileString(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), fn);
 	strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
-	RestoreNewLine(pvar->command);
+	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
 
 	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, fn);
@@ -383,7 +418,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 
 			GetDlgItemText(dlg, IDC_COMMAND, pvar->orgCommand, sizeof(pvar->orgCommand));
 			strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
-			RestoreNewLine(pvar->command);
+			UnEscapeStr(pvar->command);
 			pvar->cmdLen = (int)strlen(pvar->command);
 
 			if (pvar->cv->Ready) {
