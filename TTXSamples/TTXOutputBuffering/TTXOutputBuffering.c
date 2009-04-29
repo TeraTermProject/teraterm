@@ -36,25 +36,39 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 }
 
 //
+//  flush_buffer -- ラインバッファのフラッシュ
+//	フラッシュ仕切れなかったバイト数を返す。
+//
+int flush_buffer(SOCKET s, int flags) {
+	int i, len;
+
+	for (i=0; i<10; i++) {
+		len = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
+		if (len < pvar->buff_used) {
+			if (len > 0) {
+				pvar->buff_used -= len;
+				memmove(pvar->buff, &(pvar->buff[len]), pvar->buff_used);
+			}
+		}
+		else {
+			pvar->buff_used = 0;
+			break;
+		}
+	}
+	len = pvar->buff_used;
+	pvar->buff_used = 0;
+	return len;
+}
+
+//
 //  TTXSend -- キー入力処理
 //
 static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags) {
-	int i, j, wlen;
+	int i, wlen, left_len;
 
 	if (len > 0 && pvar->enable) {
 		if (pvar->cv->isSSH || pvar->cv->TelFlag) {
-			for (i=0; i<10; i++) {
-				wlen = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
-				if (wlen < pvar->buff_used) {
-					if (wlen > 0) {
-						pvar->buff_used -= wlen;
-						memmove(pvar->buff, &(pvar->buff[wlen]), pvar->buff_used);
-					}
-				}
-				else {
-					break;
-				}
-			}
+			flush_buffer(s, flags);
 			pvar->enable = FALSE;
 			return pvar->origPsend(s, buf, len, flags);
 		}
@@ -78,23 +92,12 @@ static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags)
 					pvar->buff_used = 0;
 					break;
 				case 0xff: // IAC
-					for (j=0; j<10; j++) {
-						wlen = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
-						if (wlen < pvar->buff_used) {
-							if (wlen > 0) {
-								pvar->buff_used -= wlen;
-								memmove(pvar->buff, &(pvar->buff[wlen]), pvar->buff_used);
-							}
-						}
-						else {
-							break;
-						}
-					}
-					if (i < pvar->buff_used) {
-						wlen = i;
+					left_len = flush_buffer(s, flags);
+					if (i < left_len) {
+						wlen = 0;
 					}
 					else {
-						wlen = i - pvar->buff_used;
+						wlen = i - left_len;
 					}
 					pvar->enable = FALSE;
 					return wlen + pvar->origPsend(s, buf + wlen, len - wlen, flags);
