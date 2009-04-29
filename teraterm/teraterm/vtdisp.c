@@ -2080,10 +2080,12 @@ void CaretOn()
 	CaretX = (CursorX-WinOrgX)*FontWidth;
 	CaretY = (CursorY-WinOrgY)*FontHeight;
 
-	if ((ts.Language==IdJapanese) &&
+	if ((ts.Language==IdJapanese || ts.Language==IdKorean) &&
 	    CanUseIME() && (ts.IMEInline>0))
+	{
 		/* set IME conversion window pos. & font */
 		SetConversionWindow(HVTWin,CaretX,CaretY);
+	}
 
 	if (! CaretEnabled) return;
 
@@ -3300,7 +3302,7 @@ void DispSetActive(BOOL ActiveFlag)
 		ActiveWin = IdVT;
 	}
 	else {
-		if ((ts.Language==IdJapanese) &&
+		if ((ts.Language==IdJapanese || ts.Language==IdKorean) &&
 		    CanUseIME())
 		{
 			/* position & font of conv. window -> default */
