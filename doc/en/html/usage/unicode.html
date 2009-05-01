@@ -44,9 +44,11 @@ CodePage = 932
 
 <p>
 Check the following web-sites to learn more about setting of locale and codepage in Tera Term:<br>
-<A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore98/html/_crt_language_strings.asp">http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore98/html/_crt_language_strings.asp</A><br>
-<A HREF="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/intl/unicode_81rn.asp">http://msdn.microsoft.com/library/default.asp?url=/library/en-us/intl/unicode_81rn.asp</A>
 </p>
+<ul>
+  <li><a href="http://msdn.microsoft.com/en-us/library/39cwe7zf.aspx">Language Strings</a></li>
+  <li><a href="http://msdn.microsoft.com/en-us/library/dd317756.aspx">Code Page Identifiers (Windows)</a></li>
+</ul>
 
 <pre>
   [Example of WindowsXP Simplified Chinese]
@@ -77,211 +79,425 @@ For Mac OS X(HFS+) use "UTF-8m" encoding. Currently it only supports receiving m
 To use this mode specify "UTF8m" as the value of the command line parameter '/KR'.
 </p>
 
-<p>
-[NOTE] Language Strings for Locale
-</p>
-<pre>
-Primary         Sublanguage     String
----------------+--------------+-------------------------------------------------------
-Chinese         Chinese         "chinese"
-Chinese         Chinese         (simplified) "chinese-simplified" or "chs"
-Chinese         Chinese         (traditional) "chinese-traditional" or "cht"
-Czech           Czech           "csy" or "czech"
-Danish          Danish          "dan"or "danish"
-Dutch           Dutch           (Belgian) "belgian", "dutch-belgian", or "nlb"
-Dutch           Dutch           (default) "dutch" or "nld"
-English         English         (Australian) "australian", "ena", or "english-aus"
-English         English         (Canadian) "canadian", "enc", or "english-can"
-English         English         (default) "english"
-English         English         (New Zealand) "english-nz" or "enz"
-English         English         (UK) "eng", "english-uk", or "uk"
-English         English         (USA) "american", "american english", "american-english", "english-american", "english-us", "english-usa", "enu", "us", or "usa"
-Finnish         Finnish         "fin" or "finnish"
-French          French          (Belgian) "frb" or "french-belgian"
-French          French          (Canadian) "frc" or "french-canadian"
-French          French          (default) "fra"or "french"
-French          French          (Swiss) "french-swiss" or "frs"
-German          German          (Austrian) "dea" or "german-austrian"
-German          German          (default) "deu" or "german"
-German          German          (Swiss) "des", "german-swiss", or "swiss"
-Greek           Greek           "ell" or "greek"
-Hungarian       Hungarian       "hun" or "hungarian"
-Icelandic       Icelandic       "icelandic" or "isl"
-Italian         Italian         (default) "ita" or "italian"
-Italian         Italian         (Swiss) "italian-swiss" or "its"
-Japanese        Japanese        "japanese" or "jpn"
-Korean          Korean          "kor" or "korean"
-Norwegian       Norwegian       (Bokmal) "nor" or "norwegian-bokmal"
-Norwegian       Norwegian       (default) "norwegian"
-Norwegian       Norwegian       (Nynorsk) "non" or "norwegian-nynorsk"
-Polish          Polish          "plk" or "polish"
-Portuguese      Portuguese      (Brazil) "portuguese-brazilian" or "ptb"
-Portuguese      Portuguese      (default) "portuguese" or "ptg"
-Russian         Russian         (default) "rus" or "russian"
-Slovak          Slovak          "sky" or "slovak"
-Spanish         Spanish         (default) "esp" or "spanish"
-Spanish         Spanish         (Mexican) "esm" or "spanish-mexican"
-Spanish         Spanish         (Modern) "esn" or "spanish-modern"
-Swedish         Swedish         "sve" or "swedish"
-Turkish         Turkish         "trk" or "turkish"
-</pre>
+<h3>[NOTE] Language Strings for Locale</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Primary language</th>
+      <th>Sublanguage</th>
+      <th>Language string</th>
+    </tr>
+  </thead>
 
-<p>
-[NOTE] Code-Page Identifiers
-</p>
-<pre>
-Identifier      Name
-037             IBM EBCDIC - U.S./Canada
-437             OEM - United States
-500             IBM EBCDIC - International
-708             Arabic - ASMO 708
-709             Arabic - ASMO 449+, BCON V4
-710             Arabic - Transparent Arabic
-720             Arabic - Transparent ASMO
-737             OEM - Greek (formerly 437G)
-775             OEM - Baltic
-850             OEM - Multilingual Latin I
-852             OEM - Latin II
-855             OEM - Cyrillic (primarily Russian)
-857             OEM - Turkish
-858             OEM - Multlingual Latin I + Euro symbol
-860             OEM - Portuguese
-861             OEM - Icelandic
-862             OEM - Hebrew
-863             OEM - Canadian-French
-864             OEM - Arabic
-865             OEM - Nordic
-866             OEM - Russian
-869             OEM - Modern Greek
-870             IBM EBCDIC - Multilingual/ROECE (Latin-2)
-874             ANSI/OEM - Thai (same as 28605, ISO 8859-15)
-875             IBM EBCDIC - Modern Greek
-932             ANSI/OEM - Japanese, Shift-JIS
-936             ANSI/OEM - Simplified Chinese (PRC, Singapore)
-949             ANSI/OEM - Korean (Unified Hangeul Code)
-950             ANSI/OEM - Traditional Chinese (Taiwan; Hong Kong SAR, PRC)
-1026            IBM EBCDIC - Turkish (Latin-5)
-1047            IBM EBCDIC - Latin 1/Open System
-1140            IBM EBCDIC - U.S./Canada (037 + Euro symbol)
-1141            IBM EBCDIC - Germany (20273 + Euro symbol)
-1142            IBM EBCDIC - Denmark/Norway (20277 + Euro symbol)
-1143            IBM EBCDIC - Finland/Sweden (20278 + Euro symbol)
-1144            IBM EBCDIC - Italy (20280 + Euro symbol)
-1145            IBM EBCDIC - Latin America/Spain (20284 + Euro symbol)
-1146            IBM EBCDIC - United Kingdom (20285 + Euro symbol)
-1147            IBM EBCDIC - France (20297 + Euro symbol)
-1148            IBM EBCDIC - International (500 + Euro symbol)
-1149            IBM EBCDIC - Icelandic (20871 + Euro symbol)
-1200            Unicode UCS-2 Little-Endian (BMP of ISO 10646)
-1201            Unicode UCS-2 Big-Endian
-1250            ANSI - Central European
-1251            ANSI - Cyrillic
-1252            ANSI - Latin I
-1253            ANSI - Greek
-1254            ANSI - Turkish
-1255            ANSI - Hebrew
-1256            ANSI - Arabic
-1257            ANSI - Baltic
-1258            ANSI/OEM - Vietnamese
-1361            Korean (Johab)
-10000           MAC - Roman
-10001           MAC - Japanese
-10002           MAC - Traditional Chinese (Big5)
-10003           MAC - Korean
-10004           MAC - Arabic
-10005           MAC - Hebrew
-10006           MAC - Greek I
-10007           MAC - Cyrillic
-10008           MAC - Simplified Chinese (GB 2312)
-10010           MAC - Romania
-10017           MAC - Ukraine
-10021           MAC - Thai
-10029           MAC - Latin II
-10079           MAC - Icelandic
-10081           MAC - Turkish
-10082           MAC - Croatia
-12000           Unicode UCS-4 Little-Endian
-12001           Unicode UCS-4 Big-Endian
-20000           CNS - Taiwan
-20001           TCA - Taiwan
-20002           Eten - Taiwan
-20003           IBM5550 - Taiwan
-20004           TeleText - Taiwan
-20005           Wang - Taiwan
-20105           IA5 IRV International Alphabet No. 5 (7-bit)
-20106           IA5 German (7-bit)
-20107           IA5 Swedish (7-bit)
-20108           IA5 Norwegian (7-bit)
-20127           US-ASCII (7-bit)
-20261           T.61
-20269           ISO 6937 Non-Spacing Accent
-20273           IBM EBCDIC - Germany
-20277           IBM EBCDIC - Denmark/Norway
-20278           IBM EBCDIC - Finland/Sweden
-20280           IBM EBCDIC - Italy
-20284           IBM EBCDIC - Latin America/Spain
-20285           IBM EBCDIC - United Kingdom
-20290           IBM EBCDIC - Japanese Katakana Extended
-20297           IBM EBCDIC - France
-20420           IBM EBCDIC - Arabic
-20423           IBM EBCDIC - Greek
-20424           IBM EBCDIC - Hebrew
-20833           IBM EBCDIC - Korean Extended
-20838           IBM EBCDIC - Thai
-20866           Russian - KOI8-R
-20871           IBM EBCDIC - Icelandic
-20880           IBM EBCDIC - Cyrillic (Russian)
-20905           IBM EBCDIC - Turkish
-20924           IBM EBCDIC - Latin-1/Open System (1047 + Euro symbol)
-20932           JIS X 0208-1990 &amp; 0121-1990
-20936           Simplified Chinese (GB2312)
-21025           IBM EBCDIC - Cyrillic (Serbian, Bulgarian)
-21027           Extended Alpha Lowercase
-21866           Ukrainian (KOI8-U)
-28591           ISO 8859-1 Latin I
-28592           ISO 8859-2 Central Europe
-28593           ISO 8859-3 Latin 3
-28594           ISO 8859-4 Baltic
-28595           ISO 8859-5 Cyrillic
-28596           ISO 8859-6 Arabic
-28597           ISO 8859-7 Greek
-28598           ISO 8859-8 Hebrew
-28599           ISO 8859-9 Latin 5
-28605           ISO 8859-15 Latin 9
-29001           Europa 3
-38598           ISO 8859-8 Hebrew
-50220           ISO 2022 Japanese with no halfwidth Katakana
-50221           ISO 2022 Japanese with halfwidth Katakana
-50222           ISO 2022 Japanese JIS X 0201-1989
-50225           ISO 2022 Korean
-50227           ISO 2022 Simplified Chinese
-50229           ISO 2022 Traditional Chinese
-50930           Japanese (Katakana) Extended
-50931           US/Canada and Japanese
-50933           Korean Extended and Korean
-50935           Simplified Chinese Extended and Simplified Chinese
-50936           Simplified Chinese
-50937           US/Canada and Traditional Chinese
-50939           Japanese (Latin) Extended and Japanese
-51932           EUC - Japanese
-51936           EUC - Simplified Chinese
-51949           EUC - Korean
-51950           EUC - Traditional Chinese
-52936           HZ-GB2312 Simplified Chinese
-54936           Windows XP: GB18030 Simplified Chinese (4 Byte)
-57002           ISCII Devanagari
-57003           ISCII Bengali
-57004           ISCII Tamil
-57005           ISCII Telugu
-57006           ISCII Assamese
-57007           ISCII Oriya
-57008           ISCII Kannada
-57009           ISCII Malayalam
-57010           ISCII Gujarati
-57011           ISCII Punjabi
-65000           Unicode UTF-7
-65001           Unicode UTF-8
-</pre>
+  <tbody>
+    <tr>
+      <td>Chinese</td>
+      <td>Chinese</td>
+      <td>"chinese"</td>
+    </tr>
+
+    <tr>
+      <td>Chinese</td>
+      <td>Chinese (simplified)</td>
+      <td>"chinese-simplified" or "chs"</td>
+    </tr>
+
+    <tr>
+      <td>Chinese</td>
+      <td>Chinese (traditional)</td>
+      <td>"chinese-traditional" or "cht"</td>
+    </tr>
+
+    <tr>
+      <td>Czech</td>
+      <td>Czech</td>
+      <td>"csy" or "czech"</td>
+    </tr>
+
+    <tr>
+      <td>Danish</td>
+      <td>Danish</td>
+      <td>"dan" or "danish"</td>
+    </tr>
+
+    <tr>
+      <td>Dutch</td>
+      <td>Dutch (default)</td>
+      <td>"dutch" or "nld"</td>
+    </tr>
+
+    <tr>
+      <td>Dutch</td>
+      <td>Dutch (Belgium)</td>
+      <td>"belgian", "dutch-belgian", or "nlb"</td>
+    </tr>
+
+    <tr>
+      <td>English</td>
+      <td>English (default)</td>
+      <td>"english"</td>
+    </tr>
+
+    <tr>
+      <td>English</td>
+      <td>English (Australia)</td>
+      <td>"australian", "ena", or "english-aus"</td>
+    </tr>
+
+    <tr>
+      <td>English</td>
+      <td>English (Canada)</td>
+      <td>"canadian", "enc", or "english-can"</td>
+    </tr>
+
+    <tr>
+      <td>English</td>
+      <td>English (New Zealand)</td>
+      <td>"english-nz" or "enz"</td>
+    </tr>
+
+    <tr>
+      <td>English</td>
+      <td>English (United Kingdom)</td>
+      <td>"eng", "english-uk", or "uk"</td>
+    </tr>
+
+    <tr>
+      <td>English</td>
+      <td>English (United States)</td>
+      <td>"american", "american english", "american-english", "english-american", "english-us", "english-usa", "enu", "us", or "usa"</td>
+    </tr>
+
+    <tr>
+      <td>Finnish</td>
+      <td>Finnish</td>
+      <td>"fin" or "finnish"</td>
+    </tr>
+
+    <tr>
+      <td>French</td>
+      <td>French (default)</td>
+      <td>"fra" or "french"</td>
+    </tr>
+
+    <tr>
+      <td>French</td>
+      <td>French (Belgium)</td>
+      <td>"frb" or "french-belgian"</td>
+    </tr>
+
+    <tr>
+      <td>French</td>
+      <td>French (Canada)</td>
+      <td>"frc" or "french-canadian"</td>
+    </tr>
+
+    <tr>
+      <td>French</td>
+      <td>French (Switzerland)</td>
+      <td>"french-swiss" or "frs"</td>
+    </tr>
+
+    <tr>
+      <td>German</td>
+      <td>German (default)</td>
+      <td>"deu" or "german"</td>
+    </tr>
+
+    <tr>
+      <td>German</td>
+      <td>German (Austria)</td>
+      <td>"dea" or "german-austrian"</td>
+    </tr>
+
+    <tr>
+      <td>German</td>
+      <td>German (Switzerland)</td>
+      <td>"des", "german-swiss", or "swiss"</td>
+    </tr>
+
+    <tr>
+      <td>Greek</td>
+      <td>Greek</td>
+      <td>"ell" or "greek"</td>
+    </tr>
+
+    <tr>
+      <td>Hungarian</td>
+      <td>Hungarian</td>
+      <td>"hun" or "hungarian"</td>
+    </tr>
+
+    <tr>
+      <td>Icelandic</td>
+      <td>Icelandic</td>
+      <td>"icelandic" or "isl"</td>
+    </tr>
+
+    <tr>
+      <td>Italian</td>
+      <td>Italian (default)</td>
+      <td>"ita" or "italian"</td>
+    </tr>
+
+    <tr>
+      <td>Italian</td>
+      <td>Italian (Switzerland)</td>
+      <td>"italian-swiss" or "its"</td>
+    </tr>
+
+    <tr>
+      <td>Japanese</td>
+      <td>Japanese</td>
+      <td>"japanese" or "jpn"</td>
+    </tr>
+
+    <tr>
+      <td>Korean</td>
+      <td>Korean</td>
+      <td>"kor" or "korean"</td>
+    </tr>
+
+    <tr>
+      <td>Norwegian</td>
+      <td>Norwegian (default)</td>
+      <td>"norwegian"</td>
+    </tr>
+
+    <tr>
+      <td>Norwegian</td>
+      <td>Norwegian (Bokmal)</td>
+      <td>"nor" or "norwegian-bokmal"</td>
+    </tr>
+
+    <tr>
+      <td>Norwegian</td>
+      <td>Norwegian (Nynorsk)</td>
+      <td>"non" or "norwegian-nynorsk"</td>
+    </tr>
+
+    <tr>
+      <td>Polish</td>
+      <td>Polish</td>
+      <td>"plk" or "polish"</td>
+    </tr>
+
+    <tr>
+      <td>Portuguese</td>
+      <td>Portuguese (default)</td>
+      <td>"portuguese" or "ptg"</td>
+    </tr>
+
+    <tr>
+      <td>Portuguese</td>
+      <td>Portuguese (Brazil)</td>
+      <td>"portuguese-brazilian" or "ptb"</td>
+    </tr>
+
+    <tr>
+      <td>Russian</td>
+      <td>Russian (default)</td>
+      <td>"rus" or "russian"</td>
+    </tr>
+
+    <tr>
+      <td>Slovak</td>
+      <td>Slovak</td>
+      <td>"sky" or "slovak"</td>
+    </tr>
+
+    <tr>
+      <td>Spanish</td>
+      <td>Spanish (default)</td>
+      <td>"esp" or "spanish"</td>
+    </tr>
+
+    <tr>
+      <td>Spanish</td>
+      <td>Spanish (Mexico)</td>
+      <td>"esm" or "spanish-mexican"</td>
+    </tr>
+
+    <tr>
+      <td>Spanish</td>
+      <td>Spanish (Modern)</td>
+      <td>"esn" or "spanish-modern"</td>
+    </tr>
+
+    <tr>
+      <td>Swedish</td>
+      <td>Swedish</td>
+      <td>"sve" or "swedish"</td>
+    </tr>
+
+    <tr>
+      <td>Turkish</td>
+      <td>Turkish</td>
+      <td>"trk" or "turkish"</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>[NOTE] Code-Page Identifiers</h3>
+<table>
+<thead>
+  <tr><th>Identifier</th>	<th>Name</th></tr>
+</thead>
+<tbody>
+  <tr><td>037</td>	<td>IBM EBCDIC US-Canada</td></tr>
+  <tr><td>437</td>	<td>OEM United States</td></tr>
+  <tr><td>500</td>	<td>IBM EBCDIC International</td></tr>
+  <tr><td>708</td>	<td>Arabic (ASMO 708)</td></tr>
+  <tr><td>709</td>	<td>Arabic (ASMO-449+, BCON V4)</td></tr>
+  <tr><td>710</td>	<td>Arabic - Transparent Arabic</td></tr>
+  <tr><td>720</td>	<td>Arabic (Transparent ASMO); Arabic (DOS)</td></tr>
+  <tr><td>737</td>	<td>OEM Greek (formerly 437G); Greek (DOS)</td></tr>
+  <tr><td>775</td>	<td>OEM Baltic; Baltic (DOS)</td></tr>
+  <tr><td>850</td>	<td>OEM Multilingual Latin 1; Western European (DOS)</td></tr>
+  <tr><td>852</td>	<td>OEM Latin 2; Central European (DOS)</td></tr>
+  <tr><td>855</td>	<td>OEM Cyrillic (primarily Russian)</td></tr>
+  <tr><td>857</td>	<td>OEM Turkish; Turkish (DOS)</td></tr>
+  <tr><td>858</td>	<td>OEM Multilingual Latin 1 + Euro symbol</td></tr>
+  <tr><td>860</td>	<td>OEM Portuguese; Portuguese (DOS)</td></tr>
+  <tr><td>861</td>	<td>OEM Icelandic; Icelandic (DOS)</td></tr>
+  <tr><td>862</td>	<td>OEM Hebrew; Hebrew (DOS)</td></tr>
+  <tr><td>863</td>	<td>OEM French Canadian; French Canadian (DOS)</td></tr>
+  <tr><td>864</td>	<td>OEM Arabic; Arabic (864)</td></tr>
+  <tr><td>865</td>	<td>OEM Nordic; Nordic (DOS)</td></tr>
+  <tr><td>866</td>	<td>OEM Russian; Cyrillic (DOS)</td></tr>
+  <tr><td>869</td>	<td>OEM Modern Greek; Greek, Modern (DOS)</td></tr>
+  <tr><td>870</td>	<td>IBM EBCDIC Multilingual/ROECE (Latin 2); IBM EBCDIC Multilingual Latin 2</td></tr>
+  <tr><td>874</td>	<td>ANSI/OEM Thai (same as 28605, ISO 8859-15); Thai (Windows)</td></tr>
+  <tr><td>875</td>	<td>IBM EBCDIC Greek Modern</td></tr>
+  <tr><td>932</td>	<td>ANSI/OEM Japanese; Japanese (Shift-JIS)</td></tr>
+  <tr><td>936</td>	<td>ANSI/OEM Simplified Chinese (PRC, Singapore); Chinese Simplified (GB2312)</td></tr>
+  <tr><td>949</td>	<td>ANSI/OEM Korean (Unified Hangul Code)</td></tr>
+  <tr><td>950</td>	<td>ANSI/OEM Traditional Chinese (Taiwan; Hong Kong SAR, PRC); Chinese Traditional (Big5)</td></tr>
+  <tr><td>1026</td>	<td>IBM EBCDIC Turkish (Latin 5)</td></tr>
+  <tr><td>1047</td>	<td>IBM EBCDIC Latin 1/Open System</td></tr>
+  <tr><td>1140</td>	<td>IBM EBCDIC US-Canada (037 + Euro symbol); IBM EBCDIC (US-Canada-Euro)</td></tr>
+  <tr><td>1141</td>	<td>IBM EBCDIC Germany (20273 + Euro symbol); IBM EBCDIC (Germany-Euro)</td></tr>
+  <tr><td>1142</td>	<td>IBM EBCDIC Denmark-Norway (20277 + Euro symbol); IBM EBCDIC (Denmark-Norway-Euro)</td></tr>
+  <tr><td>1143</td>	<td>IBM EBCDIC Finland-Sweden (20278 + Euro symbol); IBM EBCDIC (Finland-Sweden-Euro)</td></tr>
+  <tr><td>1144</td>	<td>IBM EBCDIC Italy (20280 + Euro symbol); IBM EBCDIC (Italy-Euro)</td></tr>
+  <tr><td>1145</td>	<td>IBM EBCDIC Latin America-Spain (20284 + Euro symbol); IBM EBCDIC (Spain-Euro)</td></tr>
+  <tr><td>1146</td>	<td>IBM EBCDIC United Kingdom (20285 + Euro symbol); IBM EBCDIC (UK-Euro)</td></tr>
+  <tr><td>1147</td>	<td>IBM EBCDIC France (20297 + Euro symbol); IBM EBCDIC (France-Euro)</td></tr>
+  <tr><td>1148</td>	<td>IBM EBCDIC International (500 + Euro symbol); IBM EBCDIC (International-Euro)</td></tr>
+  <tr><td>1149</td>	<td>IBM EBCDIC Icelandic (20871 + Euro symbol); IBM EBCDIC (Icelandic-Euro)</td></tr>
+  <tr><td>1200</td>	<td>Unicode UTF-16, little endian byte order (BMP of ISO 10646); available only to managed applications</td></tr>
+  <tr><td>1201</td>	<td>Unicode UTF-16, big endian byte order; available only to managed applications</td></tr>
+  <tr><td>1250</td>	<td>ANSI Central European; Central European (Windows)</td></tr>
+  <tr><td>1251</td>	<td>ANSI Cyrillic; Cyrillic (Windows)</td></tr>
+  <tr><td>1252</td>	<td>ANSI Latin 1; Western European (Windows)</td></tr>
+  <tr><td>1253</td>	<td>ANSI Greek; Greek (Windows)</td></tr>
+  <tr><td>1254</td>	<td>ANSI Turkish; Turkish (Windows)</td></tr>
+  <tr><td>1255</td>	<td>ANSI Hebrew; Hebrew (Windows)</td></tr>
+  <tr><td>1256</td>	<td>ANSI Arabic; Arabic (Windows)</td></tr>
+  <tr><td>1257</td>	<td>ANSI Baltic; Baltic (Windows)</td></tr>
+  <tr><td>1258</td>	<td>ANSI/OEM Vietnamese; Vietnamese (Windows)</td></tr>
+  <tr><td>1361</td>	<td>Korean (Johab)</td></tr>
+  <tr><td>10000</td>	<td>MAC Roman; Western European (Mac)</td></tr>
+  <tr><td>10001</td>	<td>Japanese (Mac)</td></tr>
+  <tr><td>10002</td>	<td>MAC Traditional Chinese (Big5); Chinese Traditional (Mac)</td></tr>
+  <tr><td>10003</td>	<td>Korean (Mac)</td></tr>
+  <tr><td>10004</td>	<td>Arabic (Mac)</td></tr>
+  <tr><td>10005</td>	<td>Hebrew (Mac)</td></tr>
+  <tr><td>10006</td>	<td>Greek (Mac)</td></tr>
+  <tr><td>10007</td>	<td>Cyrillic (Mac)</td></tr>
+  <tr><td>10008</td>	<td>MAC Simplified Chinese (GB 2312); Chinese Simplified (Mac)</td></tr>
+  <tr><td>10010</td>	<td>Romanian (Mac)</td></tr>
+  <tr><td>10017</td>	<td>Ukrainian (Mac)</td></tr>
+  <tr><td>10021</td>	<td>Thai (Mac)</td></tr>
+  <tr><td>10029</td>	<td>MAC Latin 2; Central European (Mac)</td></tr>
+  <tr><td>10079</td>	<td>Icelandic (Mac)</td></tr>
+  <tr><td>10081</td>	<td>Turkish (Mac)</td></tr>
+  <tr><td>10082</td>	<td>Croatian (Mac)</td></tr>
+  <tr><td>12000</td>	<td>Unicode UTF-32, little endian byte order; available only to managed applications</td></tr>
+  <tr><td>12001</td>	<td>Unicode UTF-32, big endian byte order; available only to managed applications</td></tr>
+  <tr><td>20000</td>	<td>CNS Taiwan; Chinese Traditional (CNS)</td></tr>
+  <tr><td>20001</td>	<td>TCA Taiwan</td></tr>
+  <tr><td>20002</td>	<td>Eten Taiwan; Chinese Traditional (Eten)</td></tr>
+  <tr><td>20003</td>	<td>IBM5550 Taiwan</td></tr>
+  <tr><td>20004</td>	<td>TeleText Taiwan</td></tr>
+  <tr><td>20005</td>	<td>Wang Taiwan</td></tr>
+  <tr><td>20105</td>	<td>IA5 (IRV International Alphabet No. 5, 7-bit); Western European (IA5)</td></tr>
+  <tr><td>20106</td>	<td>IA5 German (7-bit)</td></tr>
+  <tr><td>20107</td>	<td>IA5 Swedish (7-bit)</td></tr>
+  <tr><td>20108</td>	<td>IA5 Norwegian (7-bit)</td></tr>
+  <tr><td>20127</td>	<td>US-ASCII (7-bit)</td></tr>
+  <tr><td>20261</td>	<td>T.61</td></tr>
+  <tr><td>20269</td>	<td>ISO 6937 Non-Spacing Accent</td></tr>
+  <tr><td>20273</td>	<td>IBM EBCDIC Germany</td></tr>
+  <tr><td>20277</td>	<td>IBM EBCDIC Denmark-Norway</td></tr>
+  <tr><td>20278</td>	<td>IBM EBCDIC Finland-Sweden</td></tr>
+  <tr><td>20280</td>	<td>IBM EBCDIC Italy</td></tr>
+  <tr><td>20284</td>	<td>IBM EBCDIC Latin America-Spain</td></tr>
+  <tr><td>20285</td>	<td>IBM EBCDIC United Kingdom</td></tr>
+  <tr><td>20290</td>	<td>IBM EBCDIC Japanese Katakana Extended</td></tr>
+  <tr><td>20297</td>	<td>IBM EBCDIC France</td></tr>
+  <tr><td>20420</td>	<td>IBM EBCDIC Arabic</td></tr>
+  <tr><td>20423</td>	<td>IBM EBCDIC Greek</td></tr>
+  <tr><td>20424</td>	<td>IBM EBCDIC Hebrew</td></tr>
+  <tr><td>20833</td>	<td>IBM EBCDIC Korean Extended</td></tr>
+  <tr><td>20838</td>	<td>IBM EBCDIC Thai</td></tr>
+  <tr><td>20866</td>	<td>Russian (KOI8-R); Cyrillic (KOI8-R)</td></tr>
+  <tr><td>20871</td>	<td>IBM EBCDIC Icelandic</td></tr>
+  <tr><td>20880</td>	<td>IBM EBCDIC Cyrillic Russian</td></tr>
+  <tr><td>20905</td>	<td>IBM EBCDIC Turkish</td></tr>
+  <tr><td>20924</td>	<td>IBM EBCDIC Latin 1/Open System (1047 + Euro symbol)</td></tr>
+  <tr><td>20932</td>	<td>Japanese (JIS 0208-1990 and 0121-1990)</td></tr>
+  <tr><td>20936</td>	<td>Simplified Chinese (GB2312); Chinese Simplified (GB2312-80)</td></tr>
+  <tr><td>20949</td>	<td>Korean Wansung</td></tr>
+  <tr><td>21025</td>	<td>IBM EBCDIC Cyrillic Serbian-Bulgarian</td></tr>
+  <tr><td>21027</td>	<td>(deprecated)</td></tr>
+  <tr><td>21866</td>	<td>Ukrainian (KOI8-U); Cyrillic (KOI8-U)</td></tr>
+  <tr><td>28591</td>	<td>ISO 8859-1 Latin 1; Western European (ISO)</td></tr>
+  <tr><td>28592</td>	<td>ISO 8859-2 Central European; Central European (ISO)</td></tr>
+  <tr><td>28593</td>	<td>ISO 8859-3 Latin 3</td></tr>
+  <tr><td>28594</td>	<td>ISO 8859-4 Baltic</td></tr>
+  <tr><td>28595</td>	<td>ISO 8859-5 Cyrillic</td></tr>
+  <tr><td>28596</td>	<td>ISO 8859-6 Arabic</td></tr>
+  <tr><td>28597</td>	<td>ISO 8859-7 Greek</td></tr>
+  <tr><td>28598</td>	<td>ISO 8859-8 Hebrew; Hebrew (ISO-Visual)</td></tr>
+  <tr><td>28599</td>	<td>ISO 8859-9 Turkish</td></tr>
+  <tr><td>28603</td>	<td>ISO 8859-13 Estonian</td></tr>
+  <tr><td>28605</td>	<td>ISO 8859-15 Latin 9</td></tr>
+  <tr><td>29001</td>	<td>Europa 3</td></tr>
+  <tr><td>38598</td>	<td>ISO 8859-8 Hebrew; Hebrew (ISO-Logical)</td></tr>
+  <tr><td>50220</td>	<td>ISO 2022 Japanese with no halfwidth Katakana; Japanese (JIS)</td></tr>
+  <tr><td>50221</td>	<td>ISO 2022 Japanese with halfwidth Katakana; Japanese (JIS-Allow 1 byte Kana)</td></tr>
+  <tr><td>50222</td>	<td>ISO 2022 Japanese JIS X 0201-1989; Japanese (JIS-Allow 1 byte Kana - SO/SI)</td></tr>
+  <tr><td>50225</td>	<td>ISO 2022 Korean</td></tr>
+  <tr><td>50227</td>	<td>ISO 2022 Simplified Chinese; Chinese Simplified (ISO 2022)</td></tr>
+  <tr><td>50229</td>	<td>ISO 2022 Traditional Chinese</td></tr>
+  <tr><td>50930</td>	<td>EBCDIC Japanese (Katakana) Extended</td></tr>
+  <tr><td>50931</td>	<td>EBCDIC US-Canada and Japanese</td></tr>
+  <tr><td>50933</td>	<td>EBCDIC Korean Extended and Korean</td></tr>
+  <tr><td>50935</td>	<td>EBCDIC Simplified Chinese Extended and Simplified Chinese</td></tr>
+  <tr><td>50936</td>	<td>EBCDIC Simplified Chinese</td></tr>
+  <tr><td>50937</td>	<td>EBCDIC US-Canada and Traditional Chinese</td></tr>
+  <tr><td>50939</td>	<td>EBCDIC Japanese (Latin) Extended and Japanese</td></tr>
+  <tr><td>51932</td>	<td>EUC Japanese</td></tr>
+  <tr><td>51936</td>	<td>EUC Simplified Chinese; Chinese Simplified (EUC)</td></tr>
+  <tr><td>51949</td>	<td>EUC Korean</td></tr>
+  <tr><td>51950</td>	<td>EUC Traditional Chinese</td></tr>
+  <tr><td>52936</td>	<td>HZ-GB2312 Simplified Chinese; Chinese Simplified (HZ)</td></tr>
+  <tr><td>54936</td>	<td>Windows XP and later: GB18030 Simplified Chinese (4 byte); Chinese Simplified (GB18030)</td></tr>
+  <tr><td>57002</td>	<td>ISCII Devanagari</td></tr>
+  <tr><td>57003</td>	<td>ISCII Bengali</td></tr>
+  <tr><td>57004</td>	<td>ISCII Tamil</td></tr>
+  <tr><td>57005</td>	<td>ISCII Telugu</td></tr>
+  <tr><td>57006</td>	<td>ISCII Assamese</td></tr>
+  <tr><td>57007</td>	<td>ISCII Oriya</td></tr>
+  <tr><td>57008</td>	<td>ISCII Kannada</td></tr>
+  <tr><td>57009</td>	<td>ISCII Malayalam</td></tr>
+  <tr><td>57010</td>	<td>ISCII Gujarati</td></tr>
+  <tr><td>57011</td>	<td>ISCII Punjabi</td></tr>
+  <tr><td>65000</td>	<td>Unicode (UTF-7)</td></tr>
+  <tr><td>65001</td>	<td>Unicode (UTF-8)</td></tr>
+  </tbody>
+  </table>
 
 </BODY>
 </HTML>
