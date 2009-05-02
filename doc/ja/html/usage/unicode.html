@@ -19,12 +19,14 @@ UTF-8‰»‚ğs‚¤‚É‚ÍATera Term Pro‚ÌuSetupvƒƒjƒ…[‚©‚çuGeneralv‚ğ‘I‚ÑALangua
 
 <p>
 Œ»ó‚ÌTera Term‚Í“à•”İŒv‚ªUnicode‘Î‰‚É‚È‚Á‚Ä‚¨‚ç‚¸AˆÈ‰º‚É¦‚·‚æ‚¤‚É•¶šƒR[ƒh‚Í“ñ’i•ÏŠ·‚É‚È‚Á‚Ä‚¢‚Ü‚·B
+</p>
 
 <pre>
 UTF-8 <-----> Unicode(UTF-16LE) <-----> MBCS
         (1)                       (2)
 </pre>
 
+<p>
 (1)‚É‚¨‚¢‚ÄAUTF-8‚Í3ƒoƒCƒg‚Ü‚Å‚µ‚©•ÏŠ·‚µ‚Ä‚¢‚È‚¢‚½‚ßAƒTƒƒQ[ƒgƒyƒA(surrogate pair)‚âŒ‹‡•¶š(combining character)A‡¬Ï‚İ•¶š(decomposed form)‚È‚Ç‚É‚Í‘Î‰‚µ‚Ä‚¢‚Ü‚¹‚ñB<br>
 (2)‚É‚¨‚¢‚ÄAUnicode‚ÆMBCS(Multiple Byte Character Set)‚Ì‘ŠŒİ•ÏŠ·‚ğs‚¤‚½‚ß‚ÉAƒR[ƒhƒy[ƒW‚Ìw’è‚ª•K—v‚Å‚·BƒR[ƒhƒy[ƒW‚ÍMicrosoft‚ªŠg’£‚µ‚½•¶šƒZƒbƒg‚ğ•\‚·”’l‚Ì‚±‚Æ‚ÅA‘‚²‚Æ‚É‚æ‚è•t‚¢‚Ä‚¢‚é”Ô†‚Ì‚±‚Æ‚Å‚·B<br>
 ‚ä‚¦‚ÉAƒ[ƒJƒ‰ƒCƒY‚³‚ê‚½Windowsã‚Å‚ÍAƒ[ƒJƒ‰ƒCƒY‚³‚ê‚½Œ¾Œê‚µ‚©ˆµ‚¤‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñB‚½‚Æ‚¦‚ÎA“ú–{Œê”ÅWindows‚Å‚Í“ú–{ŒêˆÈŠO‚ÌŒ¾Œê‚Í•¶š‰»‚¯‚µ‚Ü‚·B“¯—l‚ÉA‰pŒê”ÅWindows‚Å‚Í“ú–{Œê‚Íˆµ‚¦‚Ü‚¹‚ñB
@@ -35,13 +37,11 @@ Unicode‚É‚æ‚éƒ[ƒJƒ‰ƒCƒYŒ¾Œê‚ğˆµ‚¦‚é‚æ‚¤‚É‚·‚é‚½‚ß‚É‚ÍAteraterm.iniƒtƒ@ƒCƒ‹‚Éƒ
 </p>
 
 <pre>
-----------------------
 ; Locale for Unicode
 Locale = japanese
 
 ; CodePage for Unicode
 CodePage = 932
-----------------------
 </pre>
 
 <p>
@@ -52,36 +52,32 @@ CodePage = 932
   <li><a href="http://msdn.microsoft.com/en-us/library/dd317756.aspx">Code Page Identifiers (Windows)</a></li>
 </ul>
 
+<h4>İ’è—á: WindowsXP ŠÈ‘Ìš’†‘Œê</h4>
 <pre>
-  [Example of WindowsXP Simplified Chinese]
-  -----------------------------------------
-    ; Locale for Unicode
-    Locale = chs
-    
-    ; CodePage for Unicode
-    CodePage = 936
-  -----------------------------------------
+; Locale for Unicode
+Locale = chs
+
+; CodePage for Unicode
+CodePage = 936
 </pre>
 
+<h4>İ’è—á: WindowsXP •Ä‘</h4>
 <pre>
-  [Example of WindowsXP USA]
-  -----------------------------------------
-    ; Locale for Unicode
-    Locale = american
-    
-    ; CodePage for Unicode
-    CodePage = 65001
-  -----------------------------------------
+; Locale for Unicode
+Locale = american
+
+; CodePage for Unicode
+CodePage = 65001
 </pre>
 
 
+<h3>¦’ˆÓ: Mac OS X</h3>
 <p>
-¦’ˆÓFMac OS X<br>
 yUTF-8mz‚ÍMac OS X(HFS+)Œü‚¯‚ÌƒGƒ“ƒR[ƒfƒBƒ“ƒOw’è‚Å‚·BóM‚Ì‚İ‚ÌƒTƒ|[ƒg‚Å‚·B<br>
 u/KRvƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Å‚Í"UTF8m"‚ğw’è‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·B
 </p>
 
-<h3>[NOTE] Language Strings for Locale</h3>
+<h3>Ql: Language Strings for Locale</h3>
 <table>
   <thead>
     <tr>
@@ -340,7 +336,7 @@ CodePage = 932
   </tbody>
 </table>
 
-<h3>[NOTE] Code-Page Identifiers</h3>
+<h3>Ql: Code-Page Identifiers</h3>
 <table>
 <thead>
   <tr><th>Identifier</th>	<th>Name</th></tr>

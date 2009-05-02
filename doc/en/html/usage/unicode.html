@@ -18,63 +18,60 @@ When "UTF8" is specified with '/KT' or '/KR' option in the command line, UTF-8 e
 
 <p>
 Actually, Tera Term does not support completely Unicode language because the internal design is based on MBCS(Multiple Byte Character Set). So, the Unicode characters are two-step conversion as follows.
+</p>
 
 <pre>
 UTF-8 <-----> Unicode(UTF-16LE) <-----> MBCS
         (1)                       (2)
 </pre>
 
+<p>
 (1): Tera Term can not support the surrogate pair, the combining character and the decomposed form because the application does not convert UTF-8 byte sequence over three bytes. <br>
 (2): A user must specify the codepage to convert the characters between Unicode and MBCS. The codepage is the enhanced character set by Microsoft, the number differs from one country to another.<br>
-Also, a user can only use the localazied language on the localized Windows. As an example, a language other than Japanese will be indecipherable characters on Japanese-language version of Windows. Likewise, Japanese language can not been shown on English-language version of Windows.</p>
+Also, a user can only use the localazied language on the localized Windows. As an example, a language other than Japanese will be indecipherable characters on Japanese-language version of Windows. Likewise, Japanese language can not been shown on English-language version of Windows.
+</p>
 
 <p>
 To enable Unicode character sets with the localized language, you have to set properly the locale and codepage parameters in the 'teraterm.ini' file. See example of these values below.
 </p>
 
 <pre>
-----------------------
 ; Locale for Unicode
 Locale = japanese
 
 ; CodePage for Unicode
 CodePage = 932
-----------------------
 </pre>
 
 <p>
-Check the following web-sites to learn more about setting of locale and codepage in Tera Term:<br>
+Check the following web-sites to learn more about setting of locale and codepage in Tera Term:
 </p>
 <ul>
   <li><a href="http://msdn.microsoft.com/en-us/library/39cwe7zf.aspx">Language Strings</a></li>
   <li><a href="http://msdn.microsoft.com/en-us/library/dd317756.aspx">Code Page Identifiers (Windows)</a></li>
 </ul>
 
+<h4>Example of WindowsXP Simplified Chinese</h4>
 <pre>
-  [Example of WindowsXP Simplified Chinese]
-  -----------------------------------------
-    ; Locale for Unicode
-    Locale = chs
-    
-    ; CodePage for Unicode
-    CodePage = 936
-  -----------------------------------------
+; Locale for Unicode
+Locale = chs
+
+; CodePage for Unicode
+CodePage = 936
 </pre>
 
+<h4>Example of WindowsXP USA</h4>
 <pre>
-  [Example of WindowsXP USA]
-  -----------------------------------------
-    ; Locale for Unicode
-    Locale = american
-    
-    ; CodePage for Unicode
-    CodePage = 65001
-  -----------------------------------------
+; Locale for Unicode
+Locale = american
+
+; CodePage for Unicode
+CodePage = 65001
 </pre>
 
 
+<h3>[NOTE] for Mac OS X users</h3>
 <p>
-[NOTE] for Mac OS X users<br>
 For Mac OS X(HFS+) use "UTF-8m" encoding. Currently it only supports receiving mode.<br>
 To use this mode specify "UTF8m" as the value of the command line parameter '/KR'.
 </p>
