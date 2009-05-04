@@ -3754,15 +3754,23 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		}
 
 		if (_access(c->scp.localfilefull, 0x00) == 0) {
-			char buf[80];
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file exists. (%d)", c->scp.localfilefull, GetLastError());
-			MessageBox(NULL, buf, "TTSSH: file error", MB_OK | MB_ICONERROR);
-			goto error;
+			char buf[512];
+			int dlgresult;
+			if (_access(c->scp.localfilefull, 0x02) == -1) { // 0x02 == writable
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file is read only.", c->scp.localfilefull);
+				MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
+				goto error;
+			}
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file exists. (%d)\noverwrite it?", c->scp.localfilefull, GetLastError());
+			dlgresult = MessageBox(NULL, buf, "TTSSH: confirm", MB_YESNO | MB_ICONERROR);
+			if (dlgresult == IDNO) {
+				goto error;
+			}
 		}
 
 		fp = fopen(c->scp.localfilefull, "wb");
 		if (fp == NULL) {
-			char buf[80];
+			char buf[512];
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "fopen: %d", GetLastError());
 			MessageBox(NULL, buf, "TTSSH: file open write error", MB_OK | MB_ICONERROR);
 			goto error;
