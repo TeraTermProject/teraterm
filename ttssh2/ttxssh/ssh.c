@@ -3709,7 +3709,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		goto error;
 	}
 
-	if (direction == TOLOCAL) {  // copy local to remote
+	if (direction == TOREMOTE) {  // copy local to remote
 		fp = fopen(sendfile, "rb");
 		if (fp == NULL) {
 			char buf[80];
@@ -3806,7 +3806,7 @@ error:
 
 int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile)
 {
-	return SSH_scp_transaction(pvar, sendfile, dstfile, TOLOCAL);
+	return SSH_scp_transaction(pvar, sendfile, dstfile, TOREMOTE);
 }
 
 int SSH_start_scp_receive(PTInstVar pvar, char *filename)
@@ -7753,7 +7753,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	if (c->type == TYPE_SCP) {
 		char sbuf[MAX_PATH + 30];
-		if (c->scp.dir == TOLOCAL) {
+		if (c->scp.dir == TOREMOTE) {
 			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -t %s", c->scp.remotefile);
 
 		} else {		
@@ -8184,7 +8184,7 @@ abort:
 }
 
 
-static void SSH2_scp_tolocal(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
+static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
 	if (c->scp.state == SCP_INIT) {
 		char buf[128];
@@ -8387,9 +8387,9 @@ static void SSH2_scp_response(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		if (SSH2_scp_fromremote(pvar, c, data, buflen) == FALSE)
 			goto error;
 
-	} else	if (c->scp.dir == TOLOCAL) {
+	} else	if (c->scp.dir == TOREMOTE) {
 		if (buflen == 1 && data[0] == '\0') {  // OK
-			SSH2_scp_tolocal(pvar, c, data, buflen);
+			SSH2_scp_toremote(pvar, c, data, buflen);
 		} else {
 			goto error;
 		}

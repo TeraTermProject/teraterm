@@ -397,7 +397,7 @@ enum fp_rep {
 };
 
 enum scp_dir {
-	TOLOCAL, FROMREMOTE,
+	TOREMOTE, FROMREMOTE,
 };
 
 /* The packet handler returns TRUE to keep the handler in place,
