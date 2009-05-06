@@ -27,8 +27,8 @@ UTF-8 <-----> Unicode(UTF-16LE) <-----> MBCS
 </pre>
 
 <p>
-(1)において、UTF-8は3バイトまでしか変換していないため、サロゲートペア(surrogate pair)や結合文字(combining character)、合成済み文字(decomposed form)などには対応していません。<br>
-(2)において、UnicodeとMBCS(Multiple Byte Character Set)の相互変換を行うために、コードページの指定が必要です。コードページはMicrosoftが拡張した文字セットを表す数値のことで、国ごとにより付いている番号のことです。<br>
+(1)において、UTF-8は3バイトまでしか変換していないため、サロゲートペア(surrogate pair)や結合文字(combining character)<!--、分解形式(decomposed form)-->などには対応していません。<br>
+(2)において、UnicodeとMBCS(Multiple Byte Character Set)の相互変換を行うために、コードページの指定が必要です。コードページはMicrosoftが拡張した文字セットを表す数値のことで、言語(文字セット)ごとに付いている番号のことです。<br>
 ゆえに、ローカライズされたWindows上では、ローカライズされた言語しか扱うことができません。たとえば、日本語版Windowsでは日本語以外の言語は文字化けします。同様に、英語版Windowsでは日本語は扱えません。
 </p>
 
