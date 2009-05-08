@@ -57,15 +57,23 @@
       <li>dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュに対応した。</li>
       <li>BroadcastCommand（非Realtime mode）において、リストボックスで選択された端末に対してのみ、メッセージを送信するようにした。</li>
       <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、韓国語モードを指定できるようにした。</li>
+      <li>IMEのインライン変換を韓国語モードでも行えるようにした。</li>
     </ul></li>
 
   <li>バグ修正
     <ul>
       <li>AcceptTitleChangeRequestがoverwriteの時、リモートからのウィンドウタイトル変更要求を受けた後にマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルの変更が出来なくなるのを修正した。</li>
+      <li>最下行でのみ自動スクロールする機能がうまく働かない場合があるのを修正した。</li>
+      <li>継続行コピーがうまく働かない場合があるのを修正した。</li>
+      <li>漢字で始まる行が常に継続行となってしまっていたのを修正した。</li>
     </ul></li>
 
   <li>その他
     <ul>
+      <li>インストーラを修正した。
+        <ul>
+          <li>拡張子.ttyをTera Term (TTXttyplay)に関連付け出来るようにした。</li>
+        </ul></li>
       <li><a href="#ttssh_2.51">SSH2対応TTSSH(2.51)</a>へ差し替えた</li>
       <li>LogMeTT 2.9.5へ差し替えた</li>
       <li>Windows 7 RC(Build7100) の暫定サポート</li>
@@ -1247,6 +1255,8 @@
   <li>変更
     <ul>
       <li>SCP のファイル受信フォルダを選択できるようにした。</li>
+      <li>SCP のファイル受信時に、同名ファイルがあった場合に上書き確認するようにした。</li>
+      <li><a href="../commandline/ttssh.html#auth">自動ログイン</a>時に<a href="../commandline/ttssh.html#user">ユーザ名</a>が指定されていない場合、<a href="../menu/setup-sshauth.html">デフォルトのユーザ名</a>を使うようにした。</li>
     </ul>
   </li>
   <li>バグ修正

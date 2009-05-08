@@ -57,15 +57,23 @@
       <li>added support for the position moving, the minimization, the maximization, the most front, the most back and the refresh control sequences regarding the dtterm window operation.</li>
       <li>Changed the BroadcastCommand functional specification. When the BroadcastCommand is not the realtime mode, a user cand send a message at the selected window in the listbox.</li>
       <!-- li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、韓国語モードを指定できるようにした。</li -->
+      <!--li><li>IMEのインライン変換を韓国語モードでも行えるようにした。</li></li-->
     </ul></li>
 
   <li>Bug fixes
     <ul>
       <li>The <a href="../macro/command/settitle.html">settitle</a> macro does not work after accepting the changing request of the window title, when the AcceptTitleChangeRequest is overwrite.</li>
+      <!--li>最下行でのみ自動スクロールする機能がうまく働かない場合があるのを修正した。</li-->
+      <!--li>継続行コピーがうまく働かない場合があるのを修正した。</li-->
+      <!--li>漢字で始まる行が常に継続行となってしまっていたのを修正した。</li-->
     </ul></li>
 
   <li>Misc
     <ul>
+      <li>Modified Tera Term installer script
+        <ul>
+          <li>linked .ttl file to the ttpmacro.exe(TTXttyplay) program.</li>
+        </ul></li>
       <li>upgraded TTSSH version supporting SSH2 to <a href="#ttssh_2.51">2.51</a></li>
       <li>upgraded LogMeTT to 2.9.5</li>
       <li>added limited support for Microsoft Windows 7 RC(Build7100).</li>
@@ -1245,6 +1253,8 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>added a user can select a folder receiving a file on the SCP dialog.</li>
+      <!--li>SCP のファイル受信時に、同名ファイルがあった場合に上書き確認するようにした。</li-->
+      <!--li><a href="../commandline/ttssh.html#auth">自動ログイン</a>時に<a href="../commandline/ttssh.html#user">ユーザ名</a>が指定されていない場合、<a href="../menu/setup-sshauth.html">デフォルトのユーザ名</a>を使うようにした。</li-->
     </ul>
   </li>
   <li>Bug fixes
