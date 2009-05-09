@@ -897,6 +897,7 @@ BTN_DEFAULT=Default
 
 [TTXKanjiMenu]
 MENU_KANJI=&KanjiCode
+MENU_KANJI_K=Coding(&K)
 MENU_RECV_SJIS=Recv: &Shift_JIS
 MENU_RECV_EUCJP=Recv: &EUC-JP
 MENU_RECV_JIS=Recv: &JIS
@@ -914,7 +915,7 @@ MENU_EUCJP=Recv/Send: &EUC-JP
 MENU_JIS=Recv/Send: &JIS
 MENU_UTF8=Recv/Send: &UTF-8
 MENU_UTF8m=Recv: UTF-8&m/Send: UTF-8
-MENU_SJIS=Recv/Send: &KS5601
+MENU_KS5601=Recv/Send: &KS5601
 
 
 [TTXAlwaysOnTop]
