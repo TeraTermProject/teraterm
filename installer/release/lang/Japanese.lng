@@ -231,13 +231,6 @@ DLG_DIR_CURRENT=現在:
 DLG_DIR_NEW=新規(&N):
 DLG_SELECT_DIR_TITLE=新しいディレクトリを選択してください
 
-DLG_FONT_TITLE=Tera Term: フォントの設定
-DLG_FONT_FONT=フォント(&F):
-DLG_FONT_SIZE=サイズ(&S):
-DLG_FONT_BOLD=太字を有効(&B)
-DLG_FONT_CHARSET=文字セット(&C):
-DLG_FONT_SAMPLE=サンプル
-
 DLG_GEN_TITLE=Tera Term: 全般設定
 DLG_GEN_PORT=標準のポート(&P):
 DLG_GEN_LANG=言語(&L):
@@ -306,6 +299,7 @@ DLG_TERM_CODEPAGE=言語コード:
 DLG_TERM_RUSSCHARSET=文字セット
 DLG_TERM_RUSSHOST=ホスト(&O):
 DLG_TERM_RUSSCLIENT=クライアント(&C):
+DLG_TERM_RUSSFONT=フォント(&F):
 
 DLG_WIN_TITLE=Tera Term: ウィンドウの設定
 DLG_WIN_TITLELABEL=タイトル(&T):
@@ -313,6 +307,7 @@ DLG_WIN_CURSOR=カーソルの形
 DLG_WIN_BLOCK=四角(&L):
 DLG_WIN_VERT=垂直線(&V):
 DLG_WIN_HORZ=下線(&O):
+DLG_WIN_BOLD=太字を有効(&D)
 DLG_WIN_HIDETITLE=タイトルバーを隠す(&I):
 DLG_WIN_HIDEMENU=メニューバーを隠す(&M):
 DLG_WIN_COLOREMU=カラーエミュレーション(&C):

@@ -231,13 +231,6 @@ DLG_DIR_CURRENT=Current dir:
 DLG_DIR_NEW=&New dir:
 DLG_SELECT_DIR_TITLE=Select new directory
 
-DLG_FONT_TITLE=Tera Term: Font setup
-DLG_FONT_FONT=&Font:
-DLG_FONT_SIZE=&Size:
-DLG_FONT_BOLD=Enable &bold style
-DLG_FONT_CHARSET=Font &char set:
-DLG_FONT_SAMPLE=Sample
-
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=Default &port:
 DLG_GEN_LANG=&Language:
@@ -306,6 +299,7 @@ DLG_TERM_CODEPAGE=CodePage:
 DLG_TERM_RUSSCHARSET=Character set
 DLG_TERM_RUSSHOST=H&ost:
 DLG_TERM_RUSSCLIENT=&Client:
+DLG_TERM_RUSSFONT=&Font:
 
 DLG_WIN_TITLE=Tera Term: Window setup
 DLG_WIN_TITLELABEL=&Title:
@@ -313,6 +307,7 @@ DLG_WIN_CURSOR=Cursor shape
 DLG_WIN_BLOCK=B&lock
 DLG_WIN_VERT=&Vertical line
 DLG_WIN_HORZ=H&orizontal line
+DLG_WIN_BOLD=Enable bol&d font
 DLG_WIN_HIDETITLE=H&ide title bar
 DLG_WIN_HIDEMENU=Hide &menu bar
 DLG_WIN_COLOREMU=&Color emulation

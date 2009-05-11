@@ -34,7 +34,6 @@ HlpSetupTerminal=html\menu\setup-terminal.html
 HlpSetupTerminalRuss=html\menu\setup-terminalr.html
 HlpSetupWindow=html\menu\setup-window.html
 HlpSetupFont=html\menu\setup-font.html
-HlpSetupFontRuss=html\menu\setup-fontr.html
 HlpSetupKeyboard=html\menu\setup-keyboard.html
 HlpSetupKeyboardRuss=html\menu\setup-keyboardr.html
 HlpSetupSerialPort=html\menu\setup-serialport.html

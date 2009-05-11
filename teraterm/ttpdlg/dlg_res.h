@@ -110,10 +110,7 @@
 #define IDC_DIRNEW                      702
 #define IDC_DIRHELP                     799
 #define IDD_ABOUTDLG                    800
-#define IDD_FONTDLG                     900
 #define IDC_FONTBOLD                    901
-#define IDC_FONTCHARSET1                902
-#define IDC_FONTCHARSET2                903
 #define IDD_GENDLG                      1000
 #define IDC_GENPORT                     1001
 #define IDC_GENLANGLABEL                1002
@@ -139,7 +136,6 @@
 #define IDC_INLUCDE_LABEL               1036
 #define IDC_TT23_LABEL                  1037
 #define IDC_TT23DATE_LABEL              1038
-#define IDC_FONTHELP                    1038
 #define IDC_AUTHOR_LABEL                1039
 #define IDC_TT_ICON                     1040
 #define IDC_DIRCURRENT_LABEL            1041
@@ -174,13 +170,10 @@
 #define IDC_SELECT_DIR                  1070
 #define IDC_BUILDTIME                   1071
 #define IDC_BUILDTOOL                   1072
-#define IDC_SAMPLE                      1073
-#define IDC_FONTLABEL                   1088
-#define IDC_SIZELABEL                   1090
+#define IDC_TERMRUSSFONTLABEL           1075
+#define IDC_TERMRUSSFONT                1076
 #define IDC_GENHELP                     1099
 #define IDD_TERMDLG                     1100
-#define IDC_FONT                        1136
-#define IDC_FONTSIZE                    1138
 #define IDD_WINLISTDLG                  1200
 #define IDC_WINLISTLIST                 1201
 #define IDC_WINLISTCLOSE                1202
@@ -196,7 +189,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1074
+#define _APS_NEXT_CONTROL_VALUE         1077
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

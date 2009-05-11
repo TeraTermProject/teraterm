@@ -230,13 +230,6 @@ DLG_DIR_CURRENT=Aktuell:
 DLG_DIR_NEW=&Neu:
 DLG_SELECT_DIR_TITLE=Neues Verzeichniss wählen
 
-DLG_FONT_TITLE=Schriftart einstellen
-DLG_FONT_FONT=Schriftart
-DLG_FONT_SIZE=Größe
-DLG_FONT_BOLD=fettschreiben
-DLG_FONT_CHARSET=Font &char set:
-DLG_FONT_SAMPLE=Bespiel
-
 DLG_GEN_TITLE=Tera Grundeinstellungen
 DLG_GEN_PORT=Standard Port
 DLG_GEN_LANG=Sprache
@@ -305,6 +298,7 @@ DLG_TERM_CODEPAGE=CodePage:
 DLG_TERM_RUSSCHARSET=Character set
 DLG_TERM_RUSSHOST=H&ost:
 DLG_TERM_RUSSCLIENT=&Client:
+DLG_TERM_RUSSFONT=&Font:
 
 DLG_WIN_TITLE=Fenster Einstellungen
 DLG_WIN_TITLELABEL=Titel
@@ -312,6 +306,7 @@ DLG_WIN_CURSOR=Cursor Aussehen
 DLG_WIN_BLOCK=Block
 DLG_WIN_VERT=Vertikale Linie
 DLG_WIN_HORZ=Horizontale Linie
+DLG_WIN_BOLD=fettschreiben
 DLG_WIN_HIDETITLE=verstecke Titelleiste
 DLG_WIN_HIDEMENU=verstecke Menüleiste
 DLG_WIN_COLOREMU=&Color emulation

@@ -10,6 +10,7 @@
 #include <io.h>
 #include <direct.h>
 #include <commdlg.h>
+#include <Dlgs.h>
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -33,7 +34,6 @@ static HANDLE hInst;
 
 static HFONT DlgAboutFont;
 static HFONT DlgDirFont;
-static HFONT DlgFontFont;
 static HFONT DlgGenFont;
 static HFONT DlgHostFont;
 static HFONT DlgKeybFont;
@@ -127,6 +127,8 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(Dialog, IDC_TERMRUSSHOST, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMRUSSFONTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMRUSSFONT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 			}
 		}
 		else {
@@ -211,6 +213,9 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(Dialog, IDC_TERMRUSSCLIENTLABEL, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_TERM_RUSSCLIENT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_TERMRUSSCLIENTLABEL, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_RUSSFONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg);
 		}
 
 		SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
@@ -281,6 +286,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		{
 			SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
 			SetDropDownList(Dialog,IDC_TERMRUSSCLIENT,RussList,ts->RussClient);
+			SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
 		}
 		else if (ts->Language==IdKorean) // HKS
 		{
@@ -355,6 +361,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			{
 				ts->RussHost = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST);
 				ts->RussClient = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT);
+				ts->RussFont = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT);
 			}
 			else if (ts->Language==IdKorean) // HKS
 			{
@@ -532,6 +539,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(Dialog, IDC_WINBLOCK, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_WINVERT, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_WINHORZ, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_FONTBOLD, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_WINHIDETITLE, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_WINHIDEMENU, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_WINCOLOREMU, WM_SETFONT, (WPARAM)DlgWinFont, MAKELPARAM(TRUE,0));
@@ -579,6 +587,9 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(Dialog, IDC_WINHORZ, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_WIN_HORZ", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_WINHORZ, uimsg);
+			GetDlgItemText(Dialog, IDC_FONTBOLD, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_WIN_BOLD", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_FONTBOLD, uimsg);
 			GetDlgItemText(Dialog, IDC_WINHIDETITLE, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_WIN_HIDETITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_WINHIDETITLE, uimsg);
@@ -738,6 +749,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				ShowDlgItem(Dialog,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 				SetRB(Dialog,ts->UseNormalBGColor,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 #endif
+				SetRB(Dialog, ts->EnableBold, IDC_FONTBOLD,IDC_FONTBOLD);
 			}
 			else {
 				for (i = 0 ; i <=1 ; i++) {
@@ -916,6 +928,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 								}
 							}
 #endif
+							GetRB(Dialog,&ts->EnableBold,IDC_FONTBOLD,IDC_FONTBOLD);
 						}
 						else {
 							for (i = 0 ; i <= 1 ; i++) {
@@ -2959,95 +2972,11 @@ BOOL FAR PASCAL AboutDialog(HWND WndParent)
 
 BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
-	LPCHOOSEFONT cf;
-	PTTSet ts;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font;
-
 	switch (Message) {
 		case WM_INITDIALOG:
-			cf = (LPCHOOSEFONT)lParam;
-			ts = (PTTSet)(cf->lCustData);
-			SetWindowLong(Dialog, DWL_USER, (LPARAM)ts);
-
-			font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-			GetObject(font, sizeof(LOGFONT), &logfont);
-			if (get_lang_font("DLG_SYSTEM_FONT", Dialog, &logfont, &DlgFontFont, UILanguageFile)) {
-				SendDlgItemMessage(Dialog, IDC_FONTLABEL, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_FONT, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_SIZELABEL, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_FONTSIZE, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_FONTBOLD, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_FONTCHARSET1, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_FONTCHARSET2, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_SAMPLE, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDCANCEL, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_FONTHELP, WM_SETFONT, (WPARAM)DlgFontFont, MAKELPARAM(TRUE,0));
-			}
-			else {
-				DlgFontFont = NULL;
-			}
-
-			GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_FONT_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetWindowText(Dialog, uimsg);
-			GetDlgItemText(Dialog, IDC_FONTLABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_FONT_FONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_FONTLABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_SIZELABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_FONT_SIZE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_SIZELABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_FONTBOLD, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_FONT_BOLD", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_FONTBOLD, uimsg);
-			GetDlgItemText(Dialog, IDC_FONTCHARSET1, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_FONT_CHARSET", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_FONTCHARSET1, uimsg);
-			GetDlgItemText(Dialog, IDC_SAMPLE, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_FONT_SAMPLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_SAMPLE, uimsg);
-			GetDlgItemText(Dialog, IDOK, uimsg2, sizeof(uimsg2));
-			get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDOK, uimsg);
-			GetDlgItemText(Dialog, IDCANCEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDCANCEL, uimsg);
-			GetDlgItemText(Dialog, IDC_FONTHELP, uimsg2, sizeof(uimsg2));
-			get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_FONTHELP, uimsg);
-
-			if (ts != NULL && ts->VTFlag) {
-				ShowDlgItem(Dialog,IDC_FONTBOLD,IDC_FONTBOLD);
-				SetRB(Dialog,ts->EnableBold,IDC_FONTBOLD,IDC_FONTBOLD);
-				if (ts->Language==IdRussian) {
-					ShowDlgItem(Dialog,IDC_FONTCHARSET1,IDC_FONTCHARSET2);
-					SetDropDownList(Dialog,IDC_FONTCHARSET2,RussList,ts->RussFont);
-				}
-			}
-			SetFocus(GetDlgItem(Dialog,1136));
+			EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
+			SetFocus(GetDlgItem(Dialog,cmb1));
 			break;
-
-		case WM_COMMAND:
-			switch (LOWORD(wParam)) {
-				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
-					if (ts!=NULL && ts->VTFlag>0) {
-						GetRB(Dialog,&ts->EnableBold,IDC_FONTBOLD,IDC_FONTBOLD);
-						if (ts->Language==IdRussian)
-							ts->RussFont = (WORD)GetCurSel(Dialog, IDC_FONTCHARSET2);
-					}
-					if (DlgFontFont != NULL) {
-						DeleteObject(DlgFontFont);
-					}
-					break;
-				case IDCANCEL:
-					if (DlgFontFont != NULL) {
-						DeleteObject(DlgFontFont);
-					}
-					break;
-			}
 	}
 	return FALSE;
 }
@@ -3062,14 +2991,9 @@ BOOL FAR PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 	cf.hwndOwner = WndParent;
 	cf.lpLogFont = LogFont;
 	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
-	           CF_FIXEDPITCHONLY | CF_SHOWHELP | CF_ENABLETEMPLATE |
-	           CF_NOSCRIPTSEL | CF_NOVERTFONTS;
-	if (ts!=NULL) {
-		cf.Flags = cf.Flags | CF_ENABLEHOOK;
-		cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
-		cf.lCustData = (DWORD)ts;
-	}
-	cf.lpTemplateName = MAKEINTRESOURCE(IDD_FONTDLG);
+	           CF_FIXEDPITCHONLY | CF_SHOWHELP | CF_NOVERTFONTS |
+	           CF_ENABLEHOOK;
+	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;
 	Ok = ChooseFont(&cf);
