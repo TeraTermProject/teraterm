@@ -749,6 +749,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				ShowDlgItem(Dialog,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 				SetRB(Dialog,ts->UseNormalBGColor,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 #endif
+				ShowDlgItem(Dialog, IDC_FONTBOLD, IDC_FONTBOLD);
 				SetRB(Dialog, ts->EnableBold, IDC_FONTBOLD,IDC_FONTBOLD);
 			}
 			else {
