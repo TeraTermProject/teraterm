@@ -208,6 +208,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->PortFlag = 0;			// Port flags
 	ts->TelPort = 23;
 
+	ts->DisableTCPEchoCR = FALSE;
+
 	/* Version number */
 /*  GetPrivateProfileString(Section,"Version","",
 			  Temp,sizeof(Temp),FName); */
