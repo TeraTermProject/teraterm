@@ -76,8 +76,9 @@ static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags)
 			for (i=0; i<len; i++) {
 				switch (buf[i]) {
 				case '\n':
+				case '\r':
 					if (pvar->buff_used < BUFF_SIZE)
-						pvar->buff[pvar->buff_used++] = '\n';
+						pvar->buff[pvar->buff_used++] = buf[i];
 					wlen = pvar->origPsend(s, pvar->buff, pvar->buff_used, flags);
 					pvar->buff_used -= wlen;
 					if (wlen > 0 && wlen < pvar->buff_used) {
