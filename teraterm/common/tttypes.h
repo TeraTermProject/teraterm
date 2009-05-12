@@ -454,6 +454,7 @@ struct tttset {
 	WORD ClearScreenOnCloseConnection;
 	WORD DisableAcceleratorDuplicateSession;
 	int PasteDelayPerLine;
+	WORD FontScaling;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

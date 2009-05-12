@@ -2469,8 +2469,43 @@ void CVTWindow::OnSize(UINT nType, int cx, int cy)
 		ResizeWindow(R.left,R.top,w,h,cx,cy);
 	}
 	else {
-		w = cx / FontWidth;
-		h = cy / FontHeight;
+		if (ts.FontScaling) {
+			int NewFontWidth, NewFontHeight;
+			BOOL FontChanged = FALSE;
+
+			NewFontWidth = cx / ts.TerminalWidth;
+			NewFontHeight = cy / ts.TerminalHeight;
+
+			if (NewFontWidth - ts.FontDW < 3) {
+				NewFontWidth = ts.FontDW + 3;
+			}
+			if (NewFontWidth != FontWidth) {
+				ts.VTFontSize.x = ts.FontDW - NewFontWidth;
+				FontWidth = NewFontWidth;
+				FontChanged = TRUE;
+			}
+
+			if (NewFontHeight - ts.FontDH < 3) {
+				NewFontHeight = ts.FontDH + 3;
+			}
+			if (NewFontHeight != FontHeight) {
+				ts.VTFontSize.y = ts.FontDH - NewFontHeight;
+				FontHeight = NewFontHeight;
+				FontChanged = TRUE;
+			}
+
+			w = ts.TerminalWidth;
+			h = ts.TerminalHeight;
+
+			if (FontChanged) {
+				ChangeFont();
+			}
+		}
+		else {
+			w = cx / FontWidth;
+			h = cy / FontHeight;
+		}
+
 		HideStatusLine();
 		BuffChangeWinSize(w,h);
 	}

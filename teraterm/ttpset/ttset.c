@@ -1272,6 +1272,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		int tmp = min(max(0, ts->PasteDelayPerLine), 5000);
 		ts->PasteDelayPerLine = tmp;
 	}
+
+	// Font scaling -- test
+	ts->FontScaling = GetOnOff(Section, "FontScaling", FName, FALSE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
