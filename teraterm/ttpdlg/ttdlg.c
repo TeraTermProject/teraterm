@@ -78,354 +78,368 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	HFONT font;
 
 	switch (Message) {
-	case WM_INITDIALOG:
-		ts = (PTTSet)lParam;
-		SetWindowLong(Dialog, DWL_USER, lParam);
+		case WM_INITDIALOG:
+			ts = (PTTSet)lParam;
+			SetWindowLong(Dialog, DWL_USER, lParam);
 
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_SYSTEM_FONT", Dialog, &logfont, &DlgTermFont, UILanguageFile)) {
-			SendDlgItemMessage(Dialog, IDC_TERMWIDTHLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMWIDTH, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMX, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMHEIGHT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMISWIN, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMRESIZE, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMNEWLINE, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMCRRCVLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMCRRCV, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMCRSENDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMCRSEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMIDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMID, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMLOCALECHO, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMANSBACKTEXT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMANSBACK, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMAUTOSWITCH, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDCANCEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERMHELP, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+			font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
+			GetObject(font, sizeof(LOGFONT), &logfont);
+			if (get_lang_font("DLG_SYSTEM_FONT", Dialog, &logfont, &DlgTermFont, UILanguageFile)) {
+				SendDlgItemMessage(Dialog, IDC_TERMWIDTHLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMWIDTH, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMX, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMHEIGHT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMISWIN, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMRESIZE, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMNEWLINE, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMCRRCVLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMCRRCV, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMCRSENDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMCRSEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMIDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMID, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMLOCALECHO, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMANSBACKTEXT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMANSBACK, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMAUTOSWITCH, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDCANCEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERMHELP, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				if (ts->Language==IdJapanese) {
+					SendDlgItemMessage(Dialog, IDC_TERMKANJILABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANJI, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANA, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANJISENDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANJISEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANASEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKINTEXT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKIN, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKOUTTEXT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKOUT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_LOCALE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				}
+				if (ts->Language==IdRussian) {
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSCHARSET, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSHOSTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSHOST, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSFONTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMRUSSFONT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				}
+			}
+			else {
+				DlgTermFont = NULL;
+			}
+
+			GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetWindowText(Dialog, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMWIDTHLABEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_WIDTHLABEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMWIDTHLABEL, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMISWIN, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_ISWIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMISWIN, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMRESIZE, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_RESIZE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMRESIZE, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMNEWLINE, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_NEWLINE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMNEWLINE, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMCRRCVLABEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_CRRCV", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMCRRCVLABEL, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMCRSENDLABEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_CRSEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMCRSENDLABEL, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMIDLABEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_ID", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMIDLABEL, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMLOCALECHO, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_LOCALECHO", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMLOCALECHO, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMANSBACKTEXT, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_ANSBACK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMANSBACKTEXT, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMAUTOSWITCH, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_TERM_AUTOSWITCH", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMAUTOSWITCH, uimsg);
+			GetDlgItemText(Dialog, IDOK, uimsg2, sizeof(uimsg2));
+			get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDOK, uimsg);
+			GetDlgItemText(Dialog, IDCANCEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDCANCEL, uimsg);
+			GetDlgItemText(Dialog, IDC_TERMHELP, uimsg2, sizeof(uimsg2));
+			get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_TERMHELP, uimsg);
+			if ( ts->Language==IdJapanese ) {
+				GetDlgItemText(Dialog, IDC_TERMKANJILABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_KANJI", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKANJILABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMKANA, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_KANA", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKANA, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMKANJISENDLABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_KANJISEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKANJISENDLABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMKANASEND, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_KANASEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKANASEND, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMKINTEXT, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_KIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKINTEXT, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMKOUTTEXT, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_KOUT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKOUTTEXT, uimsg);
+				GetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_LOCALE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_CODEPAGE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg);
+			}
+			else if ( ts->Language==IdRussian ) {
+				GetDlgItemText(Dialog, IDC_TERMRUSSCHARSET, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_RUSSCHARSET", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMRUSSCHARSET, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMRUSSHOSTLABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_RUSSHOST", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMRUSSHOSTLABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMRUSSCLIENTLABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_RUSSCLIENT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMRUSSCLIENTLABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_RUSSFONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg);
+			}
+
+			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
+			SendDlgItemMessage(Dialog, IDC_TERMWIDTH, EM_LIMITTEXT,3, 0);
+
+			SetDlgItemInt(Dialog,IDC_TERMHEIGHT,ts->TerminalHeight,FALSE);
+			SendDlgItemMessage(Dialog, IDC_TERMHEIGHT, EM_LIMITTEXT,3, 0);
+
+			SetRB(Dialog,ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);
+			SetRB(Dialog,ts->AutoWinResize,IDC_TERMRESIZE,IDC_TERMRESIZE);
+			if ( ts->TermIsWin>0 )
+				DisableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
+
+			SetDropDownList(Dialog, IDC_TERMCRRCV, NLListRcv, ts->CRReceive); // add 'LF' (2007.1.21 yutaka)
+			SetDropDownList(Dialog, IDC_TERMCRSEND, NLList, ts->CRSend);
+
+			if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
+				if ((ts->TerminalID>=1) &&
+					(ts->TerminalID<=9)) {
+					w = TermJ_Term[ts->TerminalID-1];
+				}
+				else {
+					w = 1;
+				}
+				SetDropDownList(Dialog, IDC_TERMID, TermList, w);
+			}
+			else {
+				SetDropDownList(Dialog, IDC_TERMID, TermListJ, ts->TerminalID);
+			}
+
+			SetRB(Dialog,ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
+
+			if ((ts->FTFlag & FT_BPAUTO)!=0) {
+				DisableDlgItem(Dialog,IDC_TERMANSBACKTEXT,IDC_TERMANSBACK);
+			}
+			else {
+				Str2Hex(ts->Answerback,Temp,ts->AnswerbackLen,
+					sizeof(Temp)-1,FALSE);
+				SetDlgItemText(Dialog, IDC_TERMANSBACK, Temp);
+				SendDlgItemMessage(Dialog, IDC_TERMANSBACK, EM_LIMITTEXT,
+					sizeof(Temp) - 1, 0);
+			}
+
+			SetRB(Dialog,ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
+
 			if (ts->Language==IdJapanese) {
-				SendDlgItemMessage(Dialog, IDC_TERMKANJILABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKANJI, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKANA, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKANJISENDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKANJISEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKANASEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKINTEXT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKIN, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKOUTTEXT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMKOUT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_LOCALE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				SetDropDownList(Dialog, IDC_TERMKANJI, KanjiList, ts->KanjiCode);
+				if ( ts->KanjiCode!=IdJIS ) {
+					DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
+				}
+				SetRB(Dialog,ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
+				SetDropDownList(Dialog, IDC_TERMKANJISEND, KanjiListSend, ts->KanjiCodeSend);
+				if ( ts->KanjiCodeSend!=IdJIS ) {
+					DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
+				}
+				SetRB(Dialog,ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
+				SetDropDownList(Dialog,IDC_TERMKIN,KanjiInList,ts->KanjiIn);
+				if ((ts->TermFlag & TF_ALLOWWRONGSEQUENCE)!=0) {
+					SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList2,ts->KanjiOut);
+				}
+				else {
+					SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList,ts->KanjiOut);
+				}
+
+				// ロケール用テキストボックス
+				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
+				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
+
+				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
+				//SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, EM_LIMITTEXT, 16, 0);
+
 			}
-			if (ts->Language==IdRussian) {
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSCHARSET, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSHOSTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSHOST, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSFONTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(Dialog, IDC_TERMRUSSFONT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+			else if (ts->Language==IdRussian) {
+				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
+				SetDropDownList(Dialog,IDC_TERMRUSSCLIENT,RussList,ts->RussClient);
+				SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
 			}
-		}
-		else {
-			DlgTermFont = NULL;
-		}
+			else if (ts->Language==IdKorean) { // HKS
+				SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, (ts->KanjiCode==IdUTF8)? 2:1);
+				SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, (ts->KanjiCodeSend==IdUTF8)? 2:1);
 
-		GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetWindowText(Dialog, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMWIDTHLABEL, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_WIDTHLABEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMWIDTHLABEL, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMISWIN, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_ISWIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMISWIN, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMRESIZE, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_RESIZE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMRESIZE, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMNEWLINE, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_NEWLINE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMNEWLINE, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMCRRCVLABEL, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_CRRCV", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMCRRCVLABEL, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMCRSENDLABEL, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_CRSEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMCRSENDLABEL, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMIDLABEL, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_ID", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMIDLABEL, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMLOCALECHO, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_LOCALECHO", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMLOCALECHO, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMANSBACKTEXT, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_ANSBACK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMANSBACKTEXT, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMAUTOSWITCH, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_TERM_AUTOSWITCH", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMAUTOSWITCH, uimsg);
-		GetDlgItemText(Dialog, IDOK, uimsg2, sizeof(uimsg2));
-		get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDOK, uimsg);
-		GetDlgItemText(Dialog, IDCANCEL, uimsg2, sizeof(uimsg2));
-		get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDCANCEL, uimsg);
-		GetDlgItemText(Dialog, IDC_TERMHELP, uimsg2, sizeof(uimsg2));
-		get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TERMHELP, uimsg);
-		if ( ts->Language==IdJapanese ) {
-			GetDlgItemText(Dialog, IDC_TERMKANJILABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_KANJI", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMKANJILABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMKANA, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_KANA", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMKANA, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMKANJISENDLABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_KANJISEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMKANJISENDLABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMKANASEND, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_KANASEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMKANASEND, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMKINTEXT, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_KIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMKINTEXT, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMKOUTTEXT, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_KOUT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMKOUTTEXT, uimsg);
-			GetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_LOCALE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_CODEPAGE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg);
-		}
-		else if ( ts->Language==IdRussian ) {
-			GetDlgItemText(Dialog, IDC_TERMRUSSCHARSET, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_RUSSCHARSET", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMRUSSCHARSET, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMRUSSHOSTLABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_RUSSHOST", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMRUSSHOSTLABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMRUSSCLIENTLABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_RUSSCLIENT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMRUSSCLIENTLABEL, uimsg);
-			GetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_TERM_RUSSFONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg);
-		}
+				// ロケール用テキストボックス
+				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
+				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
-		SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
-		SendDlgItemMessage(Dialog, IDC_TERMWIDTH, EM_LIMITTEXT,3, 0);
+				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
+				//SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, EM_LIMITTEXT, 16, 0);
 
-		SetDlgItemInt(Dialog,IDC_TERMHEIGHT,ts->TerminalHeight,FALSE);
-		SendDlgItemMessage(Dialog, IDC_TERMHEIGHT, EM_LIMITTEXT,3, 0);
-
-		SetRB(Dialog,ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);
-		SetRB(Dialog,ts->AutoWinResize,IDC_TERMRESIZE,IDC_TERMRESIZE);
-		if ( ts->TermIsWin>0 )
-			DisableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
-
-		SetDropDownList(Dialog, IDC_TERMCRRCV, NLListRcv, ts->CRReceive); // add 'LF' (2007.1.21 yutaka)
-		SetDropDownList(Dialog, IDC_TERMCRSEND, NLList, ts->CRSend);
-
-		if ( ts->Language!=IdJapanese ) /* non-Japanese mode */
-		{
-			if ((ts->TerminalID>=1) &&
-				(ts->TerminalID<=9))
-				w = TermJ_Term[ts->TerminalID-1];
-			else
-				w = 1;
-			SetDropDownList(Dialog, IDC_TERMID, TermList, w);
-		}
-		else
-			SetDropDownList(Dialog, IDC_TERMID, TermListJ, ts->TerminalID);
-
-		SetRB(Dialog,ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
-
-		if ((ts->FTFlag & FT_BPAUTO)!=0)
-			DisableDlgItem(Dialog,IDC_TERMANSBACKTEXT,IDC_TERMANSBACK);
-		else {
-			Str2Hex(ts->Answerback,Temp,ts->AnswerbackLen,
-				sizeof(Temp)-1,FALSE);
-			SetDlgItemText(Dialog, IDC_TERMANSBACK, Temp);
-			SendDlgItemMessage(Dialog, IDC_TERMANSBACK, EM_LIMITTEXT,
-				sizeof(Temp) - 1, 0);
-		}
-
-		SetRB(Dialog,ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
-
-		if (ts->Language==IdJapanese)
-		{
-			SetDropDownList(Dialog, IDC_TERMKANJI, KanjiList, ts->KanjiCode);
-			if ( ts->KanjiCode!=IdJIS )
-				DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
-			SetRB(Dialog,ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
-			SetDropDownList(Dialog, IDC_TERMKANJISEND, KanjiListSend, ts->KanjiCodeSend);
-			if ( ts->KanjiCodeSend!=IdJIS )
-				DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
-			SetRB(Dialog,ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
-			SetDropDownList(Dialog,IDC_TERMKIN,KanjiInList,ts->KanjiIn);
-			if ((ts->TermFlag & TF_ALLOWWRONGSEQUENCE)!=0)
-				SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList2,ts->KanjiOut);
-			else
-				SetDropDownList(Dialog,IDC_TERMKOUT,KanjiOutList,ts->KanjiOut);
-
-			// ロケール用テキストボックス
-			SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
-			SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
-
-			SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
-			//SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, EM_LIMITTEXT, 16, 0);
-
-		}
-		else if (ts->Language==IdRussian)
-		{
-			SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
-			SetDropDownList(Dialog,IDC_TERMRUSSCLIENT,RussList,ts->RussClient);
-			SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
-		}
-		else if (ts->Language==IdKorean) // HKS
-		{
-			SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, (ts->KanjiCode==IdUTF8)? 2:1);
-			SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, (ts->KanjiCodeSend==IdUTF8)? 2:1);
-
-			// ロケール用テキストボックス
-			SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
-			SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
-
-			SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
-			//SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, EM_LIMITTEXT, 16, 0);
-
-		}
-		return TRUE;
-
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) {
-	case IDOK:
-		ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
-
-		if ( ts!=NULL )
-		{
-			ts->TerminalWidth = GetDlgItemInt(Dialog,IDC_TERMWIDTH,NULL,FALSE);
-			if ( ts->TerminalWidth<1 ) ts->TerminalWidth = 1;
-			if ( ts->TerminalWidth>500 ) ts->TerminalWidth = 500;
-
-			ts->TerminalHeight = GetDlgItemInt(Dialog,IDC_TERMHEIGHT,NULL,FALSE);
-			if ( ts->TerminalHeight<1 ) ts->TerminalHeight = 1;
-			if ( ts->TerminalHeight>500 ) ts->TerminalHeight = 500;
-
-			GetRB(Dialog,&ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);
-			GetRB(Dialog,&ts->AutoWinResize,IDC_TERMRESIZE,IDC_TERMRESIZE);
-
-			ts->CRReceive = (WORD)GetCurSel(Dialog, IDC_TERMCRRCV);
-			ts->CRSend = (WORD)GetCurSel(Dialog, IDC_TERMCRSEND);
-
-			w = (WORD)GetCurSel(Dialog, IDC_TERMID);
-			if ( ts->Language!=IdJapanese ) /* non-Japanese mode */
-			{
-				if ((w==0) || (w>6)) w = 1;
-				w = Term_TermJ[w-1];
 			}
-			ts->TerminalID = w;
+			return TRUE;
 
-			GetRB(Dialog,&ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
+		case WM_COMMAND:
+			switch (LOWORD(wParam)) {
+				case IDOK:
+					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
 
-			if ((ts->FTFlag & FT_BPAUTO)==0)
-			{
-				GetDlgItemText(Dialog, IDC_TERMANSBACK,Temp,sizeof(Temp));
-				ts->AnswerbackLen =
-					Hex2Str(Temp,ts->Answerback,sizeof(ts->Answerback));
+					if ( ts!=NULL ) {
+						ts->TerminalWidth = GetDlgItemInt(Dialog,IDC_TERMWIDTH,NULL,FALSE);
+						if ( ts->TerminalWidth<1 ) {
+							ts->TerminalWidth = 1;
+						}
+						if ( ts->TerminalWidth>500 ) {
+							ts->TerminalWidth = 500;
+						}
+
+						ts->TerminalHeight = GetDlgItemInt(Dialog,IDC_TERMHEIGHT,NULL,FALSE);
+						if ( ts->TerminalHeight<1 ) {
+							ts->TerminalHeight = 1;
+						}
+						if ( ts->TerminalHeight>500 ) {
+							ts->TerminalHeight = 500;
+						}
+
+						GetRB(Dialog,&ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);
+						GetRB(Dialog,&ts->AutoWinResize,IDC_TERMRESIZE,IDC_TERMRESIZE);
+
+						ts->CRReceive = (WORD)GetCurSel(Dialog, IDC_TERMCRRCV);
+						ts->CRSend = (WORD)GetCurSel(Dialog, IDC_TERMCRSEND);
+
+						w = (WORD)GetCurSel(Dialog, IDC_TERMID);
+						if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
+							if ((w==0) || (w>6)) w = 1;
+							w = Term_TermJ[w-1];
+						}
+						ts->TerminalID = w;
+
+						GetRB(Dialog,&ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
+
+						if ((ts->FTFlag & FT_BPAUTO)==0) {
+							GetDlgItemText(Dialog, IDC_TERMANSBACK,Temp,sizeof(Temp));
+							ts->AnswerbackLen = Hex2Str(Temp,ts->Answerback,sizeof(ts->Answerback));
+						}
+
+						GetRB(Dialog,&ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
+
+						if (ts->Language==IdJapanese) {
+							BOOL ret;
+
+							ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
+							GetRB(Dialog,&ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
+							ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
+							GetRB(Dialog,&ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
+							ts->KanjiIn = (WORD)GetCurSel(Dialog, IDC_TERMKIN);
+							ts->KanjiOut = (WORD)GetCurSel(Dialog, IDC_TERMKOUT);
+
+							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
+							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
+						}
+						else if (ts->Language==IdRussian) {
+							ts->RussHost = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST);
+							ts->RussClient = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT);
+							ts->RussFont = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT);
+						}
+						else if (ts->Language==IdKorean) { // HKS
+							BOOL ret;
+
+							ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
+							if(ts->KanjiCode==2) {
+								ts->KanjiCode=IdUTF8;
+							}
+							ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
+							if(ts->KanjiCodeSend==2) {
+								ts->KanjiCodeSend=IdUTF8;
+							}
+							ts->JIS7KatakanaSend=0;
+							ts->JIS7Katakana=0;
+							ts->KanjiIn = 0;
+							ts->KanjiOut = 0;
+
+							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
+							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
+							if(ts->CodePage==932) {
+								ts->Language = IdJapanese;
+							}
+						}
+
+					}
+					EndDialog(Dialog, 1);
+					if (DlgTermFont != NULL) {
+						DeleteObject(DlgTermFont);
+					}
+					return TRUE;
+
+				case IDCANCEL:
+					EndDialog(Dialog, 0);
+					if (DlgTermFont != NULL) {
+						DeleteObject(DlgTermFont);
+					}
+					return TRUE;
+
+				case IDC_TERMISWIN:
+					GetRB(Dialog,&w,IDC_TERMISWIN,IDC_TERMISWIN);
+					if ( w==0 ) {
+						EnableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
+					}
+					else {
+						DisableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
+					}
+					break;
+
+				case IDC_TERMKANJI:
+					w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
+					if (w==IdJIS) {
+						EnableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
+					}
+					else {
+						DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
+						}
+					break;
+
+				case IDC_TERMKANJISEND:
+					w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
+					if (w==IdJIS) {
+						EnableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
+					}
+					else {
+						DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
+					}
+					break;
+
+				case IDC_TERMHELP:
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					break;
 			}
-
-			GetRB(Dialog,&ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
-
-			if (ts->Language==IdJapanese)
-			{
-				BOOL ret;
-
-				ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-				GetRB(Dialog,&ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
-				ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
-				GetRB(Dialog,&ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
-				ts->KanjiIn = (WORD)GetCurSel(Dialog, IDC_TERMKIN);
-				ts->KanjiOut = (WORD)GetCurSel(Dialog, IDC_TERMKOUT);
-
-				GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
-				ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
-			}
-			else if (ts->Language==IdRussian)
-			{
-				ts->RussHost = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST);
-				ts->RussClient = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT);
-				ts->RussFont = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT);
-			}
-			else if (ts->Language==IdKorean) // HKS
-			{
-				BOOL ret;
-
-				ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-				if(ts->KanjiCode==2)
-				   ts->KanjiCode=IdUTF8;
-				ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
-				if(ts->KanjiCodeSend==2)
-				   ts->KanjiCodeSend=IdUTF8;
-				ts->JIS7KatakanaSend=0;
-				ts->JIS7Katakana=0;
-				ts->KanjiIn = 0;
-				ts->KanjiOut = 0;
-
-				GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
-				ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
-				if(ts->CodePage==932)
-				  ts->Language = IdJapanese;
-			}
-
-		}
-		EndDialog(Dialog, 1);
-		if (DlgTermFont != NULL) {
-			DeleteObject(DlgTermFont);
-		}
-		return TRUE;
-
-	case IDCANCEL:
-		EndDialog(Dialog, 0);
-		if (DlgTermFont != NULL) {
-			DeleteObject(DlgTermFont);
-		}
-		return TRUE;
-
-	case IDC_TERMISWIN:
-		GetRB(Dialog,&w,IDC_TERMISWIN,IDC_TERMISWIN);
-		if ( w==0 )
-			EnableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
-		else
-			DisableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
-		break;
-
-	case IDC_TERMKANJI:
-		w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-		if (w==IdJIS)
-			EnableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
-		else
-			DisableDlgItem(Dialog,IDC_TERMKANA,IDC_TERMKANA);
-		break;
-
-	case IDC_TERMKANJISEND:
-		w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
-		if (w==IdJIS)
-			EnableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
-		else
-			DisableDlgItem(Dialog,IDC_TERMKANASEND,IDC_TERMKOUT);
-		break;
-
-	case IDC_TERMHELP:
-		PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
-		break;
-		}
 	}
 	return FALSE;
 }
@@ -501,17 +515,19 @@ void RestoreVar(HWND Dialog, PTTSet ts, int *IAttr, int *IOffset)
 	WORD w;
 
 	GetRB(Dialog,&w,IDC_WINTEXT,IDC_WINBACK);
-	if (w==2)
+	if (w==2) {
 		*IOffset = 3;
-	else
+	}
+	else {
 		*IOffset = 0;
-	if ((ts!=NULL) && (ts->VTFlag>0))
-	{
+	}
+	if ((ts!=NULL) && (ts->VTFlag>0)) {
 		*IAttr = GetCurSel(Dialog,IDC_WINATTR);
 		if (*IAttr>0) (*IAttr)--;
 	}
-	else
+	else {
 		*IAttr = 0;
+	}
 }
 
 BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -670,8 +686,10 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				SendDlgItemMessage(Dialog, IDC_WINSCROLL2, EM_LIMITTEXT, 6, 0);
 
-				if ( ts->EnableScrollBuff==0 )
+				if ( ts->EnableScrollBuff==0 ) {
 					DisableDlgItem(Dialog,IDC_WINSCROLL2,IDC_WINSCROLL3);
+				}
+
 				for (i = 0 ; i <= 1 ; i++) {
 					if (ts->ColorFlag & CF_REVERSEVIDEO) {
 						//
@@ -792,20 +810,26 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						DC = GetDC(Dialog);
 						if (ts->VTFlag>0) {
 							GetRB(Dialog,&i,IDC_WINCOLOREMU,IDC_WINCOLOREMU);
-							if (i!=0)
+							if (i!=0) {
 								ts->ColorFlag |= CF_PCBOLD16;
-							else
+							}
+							else {
 								ts->ColorFlag &= ~(WORD)CF_PCBOLD16;
+							}
 							GetRB(Dialog,&i,IDC_WINAIXTERM16,IDC_WINAIXTERM16);
-							if (i!=0)
+							if (i!=0) {
 								ts->ColorFlag |= CF_AIXTERM16;
-							else
+							}
+							else {
 								ts->ColorFlag &= ~(WORD)CF_AIXTERM16;
+							}
 							GetRB(Dialog,&i,IDC_WINXTERM256,IDC_WINXTERM256);
-							if (i!=0)
+							if (i!=0) {
 								ts->ColorFlag |= CF_XTERM256;
-							else
+							}
+							else {
 								ts->ColorFlag &= ~(WORD)CF_XTERM256;
+							}
 							GetRB(Dialog,&ts->EnableScrollBuff,IDC_WINSCROLL1,IDC_WINSCROLL1);
 							if ( ts->EnableScrollBuff>0 ) {
 								ts->ScrollBuffSize =
@@ -960,75 +984,86 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				case IDC_WINHIDETITLE:
 					GetRB(Dialog,&i,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
-					if (i>0)
+					if (i>0) {
 						DisableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
-					else
+					}
+					else {
 						EnableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
+					}
 					break;
 
 				case IDC_WINSCROLL1:
-					if ( ts==NULL )
+					if ( ts==NULL ) {
 						return TRUE;
+					}
 					GetRB(Dialog,&i,IDC_WINSCROLL1,IDC_WINSCROLL1);
-					if ( i>0 )
+					if ( i>0 ) {
 						EnableDlgItem(Dialog,IDC_WINSCROLL2,IDC_WINSCROLL3);
-					else
+					}
+					else {
 						DisableDlgItem(Dialog,IDC_WINSCROLL2,IDC_WINSCROLL3);
+					}
 					break;
 
 				case IDC_WINTEXT:
-					if ( ts==NULL )
+					if ( ts==NULL ) {
 						return TRUE;
+					}
 					IOffset = 0;
 					ChangeSB(Dialog,ts,IAttr,IOffset);
 					break;
 
 				case IDC_WINBACK:
-					if ( ts==NULL )
+					if ( ts==NULL ) {
 						return TRUE;
+					}
 					IOffset = 3;
 					ChangeSB(Dialog,ts,IAttr,IOffset);
 					break;
 
 				case IDC_WINREV:
-				if ( ts==NULL )
-					return TRUE;
-				i = ts->TmpColor[IAttr][0];
-				ts->TmpColor[IAttr][0] = ts->TmpColor[IAttr][3];
-				ts->TmpColor[IAttr][3] = i;
-				i = ts->TmpColor[IAttr][1];
-				ts->TmpColor[IAttr][1] = ts->TmpColor[IAttr][4];
-				ts->TmpColor[IAttr][4] = i;
-				i = ts->TmpColor[IAttr][2];
-				ts->TmpColor[IAttr][2] = ts->TmpColor[IAttr][5];
-				ts->TmpColor[IAttr][5] = i;
+					if ( ts==NULL ) {
+						return TRUE;
+					}
+					i = ts->TmpColor[IAttr][0];
+					ts->TmpColor[IAttr][0] = ts->TmpColor[IAttr][3];
+					ts->TmpColor[IAttr][3] = i;
+					i = ts->TmpColor[IAttr][1];
+					ts->TmpColor[IAttr][1] = ts->TmpColor[IAttr][4];
+					ts->TmpColor[IAttr][4] = i;
+					i = ts->TmpColor[IAttr][2];
+					ts->TmpColor[IAttr][2] = ts->TmpColor[IAttr][5];
+					ts->TmpColor[IAttr][5] = i;
 
-				ChangeSB(Dialog,ts,IAttr,IOffset);
-				break;
+					ChangeSB(Dialog,ts,IAttr,IOffset);
+					break;
 
 				case IDC_WINATTR:
-				if ( ts!=NULL )
-					ChangeSB(Dialog,ts,IAttr,IOffset);
-				break;
+					if ( ts!=NULL ) {
+						ChangeSB(Dialog,ts,IAttr,IOffset);
+					}
+					break;
 
 				case IDC_WINHELP:
-				PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
-				break;
+					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
+					break;
 			}
 			break;
 
 		case WM_PAINT:
 			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
-			if ( ts==NULL )
+			if ( ts==NULL ) {
 				return TRUE;
+			}
 			RestoreVar(Dialog,ts,&IAttr,&IOffset);
 			DispSample(Dialog,ts,IAttr);
 			break;
 
 		case WM_HSCROLL:
 			ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
-			if (ts==NULL)
+			if (ts==NULL) {
 				return TRUE;
+			}
 			RestoreVar(Dialog,ts,&IAttr,&IOffset);
 			HRed = GetDlgItem(Dialog, IDC_WINREDBAR);
 			HGreen = GetDlgItem(Dialog, IDC_WINGREENBAR);
@@ -1036,33 +1071,43 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			Wnd = (HWND)lParam;
 			ScrollCode = LOWORD(wParam);
 			NewPos = HIWORD(wParam);
-			if ( Wnd == HRed )
+			if ( Wnd == HRed ) {
 				i = IOffset;
-			else if ( Wnd == HGreen )
+			}
+			else if ( Wnd == HGreen ) {
 				i = IOffset + 1;
-			else if ( Wnd == HBlue )
+			}
+			else if ( Wnd == HBlue ) {
 				i = IOffset + 2;
-			else
+			}
+			else {
 				return TRUE;
+			}
 			pos = ts->TmpColor[IAttr][i];
 			switch (ScrollCode) {
 				case SB_BOTTOM:
 					pos = 255;
 					break;
 				case SB_LINEDOWN:
-					if (pos<255) pos++;
+					if (pos<255) {
+						pos++;
+					}
 					break;
 				case SB_LINEUP:
-					if (pos>0) pos--;
+					if (pos>0) {
+						pos--;
+					}
 					break;
 				case SB_PAGEDOWN:
 					pos += 16;
 					break;
 				case SB_PAGEUP:
-					if (pos < 16)
+					if (pos < 16) {
 						pos = 0;
-					else
+					}
+					else {
 						pos -= 16;
+					}
 					break;
 				case SB_THUMBPOSITION:
 					pos = NewPos;
@@ -1076,8 +1121,9 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				default:
 					return TRUE;
 			}
-			if (pos > 255)
+			if (pos > 255) {
 				pos = 255;
+			}
 			ts->TmpColor[IAttr][i] = pos;
 			SetScrollPos(Wnd,SB_CTL,pos,TRUE);
 			ChangeColor(Dialog,ts,IAttr,IOffset);
@@ -1160,8 +1206,7 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetRB(Dialog,ts->MetaKey,IDC_KEYBMETA,IDC_KEYBMETA);
 			SetRB(Dialog,ts->DisableAppKeypad,IDC_KEYBAPPKEY,IDC_KEYBAPPKEY);
 			SetRB(Dialog,ts->DisableAppCursor,IDC_KEYBAPPCUR,IDC_KEYBAPPCUR);
-			if (ts->Language==IdRussian)
-			{
+			if (ts->Language==IdRussian) {
 				ShowDlgItem(Dialog,IDC_KEYBKEYBTEXT,IDC_KEYBKEYB);
 				SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
 			}
@@ -1171,8 +1216,7 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam)) {
 				case IDOK:
 					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
-					if ( ts!=NULL )
-					{
+					if ( ts!=NULL ) {
 						GetRB(Dialog,&ts->BSKey,IDC_KEYBBS,IDC_KEYBBS);
 						ts->BSKey++;
 						GetRB(Dialog,&ts->DelKey,IDC_KEYBDEL,IDC_KEYBDEL);
@@ -1322,8 +1366,9 @@ BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
 					                   0, (LPARAM)Temp);
 				}
-				if (ts->ComPort<=ts->MaxComPort)
+				if (ts->ComPort<=ts->MaxComPort) {
 					w = ts->ComPort-1;
+				}
 
 			}
 			SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w, 0);
@@ -1494,31 +1539,23 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
 				GetPrivateProfileString("Hosts",EntName,"",
 				                        TempHost,sizeof(TempHost),ts->SetupFName);
-				if (strlen(TempHost) > 0)
+				if (strlen(TempHost) > 0) {
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING,
 					                   0, (LPARAM)TempHost);
+				}
 				i++;
 			} while ((i <= MAXHOSTLIST) && (strlen(TempHost)>0));
 
 			/* append a blank item to the bottom */
 			TempHost[0] = 0;
-			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING,
-			                   0, (LPARAM)TempHost);
-
+			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, (LPARAM)TempHost);
 			SetRB(Dialog,ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
-
 			SetRB(Dialog,ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
-
 			SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TCPPort,FALSE);
-
 			SetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,ts->TelKeepAliveInterval,FALSE);
-
 			SetRB(Dialog,ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-
 			SetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType);
-
-			SendDlgItemMessage(Dialog, IDC_TCPIPTERMTYPE, EM_LIMITTEXT,
-				 sizeof(ts->TermType)-1, 0);
+			SendDlgItemMessage(Dialog, IDC_TCPIPTERMTYPE, EM_LIMITTEXT, sizeof(ts->TermType)-1, 0);
 
 			// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
 			EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
@@ -1533,32 +1570,29 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						WritePrivateProfileString("Hosts",NULL,NULL,ts->SetupFName);
 
 						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
-						if (Index==(UINT)LB_ERR)
+						if (Index==(UINT)LB_ERR) {
 							Index = 0;
-						else
+						}
+						else {
 							Index--;
-						if (Index>MAXHOSTLIST)
+						}
+						if (Index>MAXHOSTLIST) {
 							Index = MAXHOSTLIST;
-
+						}
 						for (i = 1 ; i <= Index ; i++) {
 							SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
 							                   i-1, (LPARAM)TempHost);
 							_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%i", i);
 							WritePrivateProfileString("Hosts",EntName,TempHost,ts->SetupFName);
 						}
-
 						GetRB(Dialog,&ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
-
 						GetRB(Dialog,&ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
-
 						ts->TCPPort = GetDlgItemInt(Dialog,IDC_TCPIPPORT,&Ok,FALSE);
-						if (! Ok)
+						if (! Ok) {
 							ts->TCPPort = ts->TelPort;
-
+						}
 						ts->TelKeepAliveInterval = GetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,&Ok,FALSE);
-
 						GetRB(Dialog,&ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-
 						GetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType,
 						               sizeof(ts->TermType));
 					}
@@ -1578,10 +1612,12 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				case IDC_TCPIPHOST:
 					if (HIWORD(wParam)==EN_CHANGE) {
 						GetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
-						if (strlen(TempHost)==0)
+						if (strlen(TempHost)==0) {
 							DisableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
-						else
-						EnableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
+						}
+						else {
+							EnableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
+						}
 					}
 					break;
 
@@ -1589,8 +1625,9 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					GetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
 					if (strlen(TempHost)>0) {
 						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL,0,0);
-						if (Index==(UINT)LB_ERR)
+						if (Index==(UINT)LB_ERR) {
 							Index = 0;
+						}
 
 						SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
 						                   Index, (LPARAM)TempHost);
@@ -1604,18 +1641,23 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					if (HIWORD(wParam)==LBN_SELCHANGE) {
 						i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
 						Index = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
-						if ((i<=1) || (Index==(UINT)LB_ERR) || (Index==i-1))
+						if ((i<=1) || (Index==(UINT)LB_ERR) || (Index==i-1)) {
 							DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPDOWN);
+						}
 						else {
 							EnableDlgItem(Dialog,IDC_TCPIPREMOVE,IDC_TCPIPREMOVE);
-							if (Index==0)
+							if (Index==0) {
 								DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-						else
-							EnableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-						if (Index>=i-2)
-							DisableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
-						else
-							EnableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
+							}
+							else {
+								EnableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
+							}
+							if (Index>=i-2) {
+								DisableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
+							}
+							else {
+								EnableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
+							}
 						}
 					}
 					break;
@@ -1624,29 +1666,37 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				case IDC_TCPIPDOWN:
 					i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
 					Index = SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETCURSEL, 0, 0);
-					if (Index==(UINT)LB_ERR)
+					if (Index==(UINT)LB_ERR) {
 						return TRUE;
-					if (LOWORD(wParam)==IDC_TCPIPDOWN)
+					}
+					if (LOWORD(wParam)==IDC_TCPIPDOWN) {
 						Index++;
-					if ((Index==0) || (Index>=i-1))
+					}
+					if ((Index==0) || (Index>=i-1)) {
 						return TRUE;
+					}
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
 					                   Index, (LPARAM)TempHost);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
 					                   Index, 0);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
 					                   Index-1, (LPARAM)TempHost);
-					if (LOWORD(wParam)==IDC_TCPIPUP)
+					if (LOWORD(wParam)==IDC_TCPIPUP) {
 						Index--;
+					}
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_SETCURSEL,Index,0);
-					if (Index==0)
+					if (Index==0) {
 						DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-					else
+					}
+					else {
 						EnableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPUP);
-					if (Index>=i-2)
+					}
+					if (Index>=i-2) {
 						DisableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
-					else
+					}
+					else {
 						EnableDlgItem(Dialog,IDC_TCPIPDOWN,IDC_TCPIPDOWN);
+					}
 					SetFocus(GetDlgItem(Dialog, IDC_TCPIPLIST));
 					break;
 
@@ -1654,8 +1704,9 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					i = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
 					Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL, 0, 0);
 					if ((Index==(UINT)LB_ERR) ||
-					    (Index==i-1))
+						(Index==i-1)) {
 						return TRUE;
+					}
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
 					                   Index, (LPARAM)TempHost);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
@@ -1670,11 +1721,11 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					if (w==1) {
 						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
 						ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
-						if (ts!=NULL)
+						if (ts!=NULL) {
 							SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TelPort,FALSE);
+						}
 					}
-					else 
-					{
+					else {
 						// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
 						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
 					}
@@ -1866,18 +1917,19 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_HOSTHELP, uimsg);
 
-			if ( GetHNRec->PortType==IdFile )
+			if ( GetHNRec->PortType==IdFile ) {
 				GetHNRec->PortType = IdTCPIP;
-
+			}
 
 			i = 1;
 			do {
 				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
 				GetPrivateProfileString("Hosts",EntName,"",
 				                        TempHost,sizeof(TempHost),GetHNRec->SetupFN);
-				if ( strlen(TempHost) > 0 )
+				if ( strlen(TempHost) > 0 ) {
 					SendDlgItemMessage(Dialog, IDC_HOSTNAME, CB_ADDSTRING,
 					                   0, (LPARAM)TempHost);
+				}
 				i++;
 			} while ((i <= MAXHOSTLIST) && (strlen(TempHost)>0));
 
@@ -1928,12 +1980,12 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
 					                   0, (LPARAM)EntName);
 					j++;
-					if (GetHNRec->ComPort==ComPortTable[i])
+					if (GetHNRec->ComPort==ComPortTable[i]) {
 						w = j;
+					}
 				}
 			} else {
-				for (i=1; i<=GetHNRec->MaxComPort ;i++)
-				{
+				for (i=1; i<=GetHNRec->MaxComPort ;i++) {
 					// 使用中のポートは表示しない
 					if (CheckCOMFlag(i) == 1) {
 						continue;
@@ -1942,12 +1994,14 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
 					                   0, (LPARAM)EntName);
 					j++;
-					if (GetHNRec->ComPort==i)
+					if (GetHNRec->ComPort==i) {
 						w = j;
+					}
 				}
 			}
-			if (j>0)
+			if (j>0) {
 				SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_SETCURSEL,w-1,0);
+			}
 			else { /* All com ports are already used */
 				GetHNRec->PortType = IdTCPIP;
 				DisableDlgItem(Dialog,IDC_HOSTSERIAL,IDC_HOSTSERIAL);
@@ -1955,11 +2009,13 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 			SetRB(Dialog,GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
 
-			if ( GetHNRec->PortType==IdTCPIP )
+			if ( GetHNRec->PortType==IdTCPIP ) {
 				DisableDlgItem(Dialog,IDC_HOSTCOMLABEL,IDC_HOSTCOM);
+			}
 #ifndef INET6
-			else
+			else {
 				DisableDlgItem(Dialog,IDC_HOSTNAMELABEL,IDC_HOSTTCPPORT);
+			}
 #else
 			else {
 				DisableDlgItem(Dialog,IDC_HOSTNAMELABEL,IDC_HOSTTCPPORT);
@@ -1978,13 +2034,17 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						char afstr[BUFSIZ];
 #endif /* NO_INET6 */
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
-						if ( GetHNRec->PortType==IdTCPIP )
+						if ( GetHNRec->PortType==IdTCPIP ) {
 							GetDlgItemText(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
-						else
+						}
+						else {
 							GetHNRec->HostName[0] = 0;
+						}
 						GetRB(Dialog,&GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
 						i = GetDlgItemInt(Dialog,IDC_HOSTTCPPORT,&Ok,FALSE);
-						if (Ok) GetHNRec->TCPPort = i;
+						if (Ok) {
+							GetHNRec->TCPPort = i;
+						}
 #ifndef NO_INET6
 #define getaf(str) \
 	((strcmp((str), "IPv6") == 0) ? AF_INET6 : \
@@ -2003,8 +2063,9 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 #else
 							GetHNRec->ComPort = atoi(&EntName[3]);
 #endif
-							if (GetHNRec->ComPort > GetHNRec->MaxComPort)
+							if (GetHNRec->ComPort > GetHNRec->MaxComPort) {
 								GetHNRec->ComPort = 1;
+							}
 						}
 						else {
 							GetHNRec->ComPort = 1;
@@ -2043,11 +2104,11 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				case IDC_HOSTTELNET:
 					GetRB(Dialog,&i,IDC_HOSTTELNET,IDC_HOSTTELNET);
-					if ( i==1 )
-					{
+					if ( i==1 ) {
 						GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWL_USER);
-						if ( GetHNRec!=NULL )
+						if ( GetHNRec!=NULL ) {
 							SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TelPort,FALSE);
+						}
 					}
 					break;
 
@@ -2064,8 +2125,9 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							lbl = (char *)calloc(len+1, sizeof(char));
 							SendMessage(hostcom, CB_GETLBTEXT, i, (LPARAM)lbl);
 							GetTextExtentPoint32(TmpDC, lbl, len, &s);
-							if (s.cx > max_len)
+							if (s.cx > max_len) {
 								max_len = s.cx;
+							}
 							free(lbl);
 						}
 						SendMessage(hostcom, CB_SETDROPPEDWIDTH,
@@ -2170,7 +2232,9 @@ BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			WH = R.bottom-R.top;
 			GetClientRect(Dialog,&R);
 			CW = R.right-R.left;
-			if (D.x+DW < CW) DW = CW-D.x;
+			if (D.x+DW < CW) {
+				DW = CW-D.x;
+			}
 			WW = WW + D.x+DW - CW;
 
 			// resize current dir text
@@ -2186,7 +2250,9 @@ BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			D.y = R.top;
 			ScreenToClient(Dialog,&D);
 			DW = R.right-R.left;
-			if (DW<s.cx) DW = s.cx;
+			if (DW<s.cx) {
+				DW = s.cx;
+			}
 			MoveWindow(HDir,D.x,D.y,DW,R.bottom-R.top,TRUE);
 			// select dir button
 			HSel = GetDlgItem(Dialog, IDC_SELECT_DIR);
@@ -2279,15 +2345,15 @@ static void get_file_version(char *exefile, int *major, int *minor, int *release
 		goto error;
 	}
 
-	ret = VerQueryValue(buf,
-			"\\VarFileInfo\\Translation", 
-			(LPVOID *)&lplgcode, &unLen);
-	if (ret == FALSE)
+	ret = VerQueryValue(buf, "\\VarFileInfo\\Translation", 
+	                    (LPVOID *)&lplgcode, &unLen);
+	if (ret == FALSE) {
 		goto error;
+	}
 
 	for (i = 0 ; i < (int)(unLen / sizeof(LANGANDCODEPAGE)) ; i++) {
-		_snprintf_s(fmt, sizeof(fmt), _TRUNCATE, "\\StringFileInfo\\%04x%04x\\FileVersion", 
-			lplgcode[i].wLanguage, lplgcode[i].wCodePage);
+		_snprintf_s(fmt, sizeof(fmt), _TRUNCATE, "\\StringFileInfo\\%04x%04x\\FileVersion",
+		            lplgcode[i].wLanguage, lplgcode[i].wCodePage);
 		VerQueryValue(buf, fmt, &pbuf, &unLen);
 		if (unLen > 0) { // get success
 			int n, a, b, c, d;
@@ -2340,49 +2406,49 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 #if 0
 	case WM_SETCURSOR:
 		{
-		// カーソル形状変更
-		HCURSOR hc;
+			// カーソル形状変更
+			HCURSOR hc;
 
-		hc = (HCURSOR)LoadImage(NULL,
-				MAKEINTRESOURCE(IDC_HAND),
-				IMAGE_CURSOR,
-				0,
-				0,
-				LR_DEFAULTSIZE | LR_SHARED);
-		if (hc != NULL) {
-			SetClassLongPtr(hWnd, GCLP_HCURSOR, (LONG_PTR)hc);
-		}
-		return (LRESULT)0;
+			hc = (HCURSOR)LoadImage(NULL,
+					MAKEINTRESOURCE(IDC_HAND),
+					IMAGE_CURSOR,
+					0,
+					0,
+					LR_DEFAULTSIZE | LR_SHARED);
+			if (hc != NULL) {
+				SetClassLongPtr(hWnd, GCLP_HCURSOR, (LONG_PTR)hc);
+			}
+			return (LRESULT)0;
 		}
 #endif
 
 	case WM_LBUTTONDBLCLK:
 		{
-		char url[128];
+			char url[128];
 
-		// get URL
-		SendMessage(hWnd, WM_GETTEXT , sizeof(url), (LPARAM)url);
-		// kick WWW browser
-	    ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+			// get URL
+			SendMessage(hWnd, WM_GETTEXT , sizeof(url), (LPARAM)url);
+			// kick WWW browser
+			ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
 		}
 		break;
 
 	case WM_MOUSEMOVE:
 		{
-		BOOL bHilighted;
-		pt.x = LOWORD( lParam );
-		pt.y = HIWORD( lParam );
-		GetClientRect( hWnd, &rc );
-		bHilighted = PtInRect( &rc, pt );
+			BOOL bHilighted;
+			pt.x = LOWORD( lParam );
+			pt.y = HIWORD( lParam );
+			GetClientRect( hWnd, &rc );
+			bHilighted = PtInRect( &rc, pt );
 
-		if (parent->mouseover != bHilighted) {
-			parent->mouseover = bHilighted;
-			InvalidateRect( hWnd, NULL, TRUE );
-			if (parent->timer_done == 0) {
-				parent->timer_done = 1;
-				SetTimer( hWnd, 1, 200, NULL );
+			if (parent->mouseover != bHilighted) {
+				parent->mouseover = bHilighted;
+				InvalidateRect( hWnd, NULL, TRUE );
+				if (parent->timer_done == 0) {
+					parent->timer_done = 1;
+					SetTimer( hWnd, 1, 200, NULL );
+				}
 			}
-		}
 
 		}
 		break;
@@ -2393,12 +2459,9 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 			HCURSOR hc;
 			//SetCapture(hWnd);
 
-			hc = (HCURSOR)LoadImage(NULL,
-					MAKEINTRESOURCE(IDC_HAND),
-					IMAGE_CURSOR,
-					0,
-					0,
-					LR_DEFAULTSIZE | LR_SHARED);
+			hc = (HCURSOR)LoadImage(NULL, MAKEINTRESOURCE(IDC_HAND),
+			                        IMAGE_CURSOR, 0, 0,
+			                        LR_DEFAULTSIZE | LR_SHARED);
 
 			SetSystemCursor(CopyCursor(hc), 32512 /* OCR_NORMAL */);    // 矢印
 			SetSystemCursor(CopyCursor(hc), 32513 /* OCR_IBEAM */);     // Iビーム
@@ -2414,8 +2477,9 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		GetCursorPos( &pt );
 		ScreenToClient( hWnd, &pt );
 		GetClientRect( hWnd, &rc );
-		if( !PtInRect( &rc, pt ) )
+		if( !PtInRect( &rc, pt ) ) {
 			SendMessage( hWnd, WM_MOUSEMOVE, 0, MAKELONG( pt.x, pt.y ) );
+		}
 		break;
 
 	case WM_PAINT: 
@@ -2471,8 +2535,9 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 	case WM_DESTROY:
 		// 後始末
 		SetWindowLongPtr( hWnd, GWLP_WNDPROC, (LONG_PTR)parent->proc );
-		if( parent->font != NULL )
+		if( parent->font != NULL ) {
 			DeleteObject( parent->font );
+		}
 
 		// マウスカーソルを元に戻す。
 		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
@@ -2491,8 +2556,9 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 
 	//SetCapture(hWnd);
 
-	if (!IsWindow(hWnd))
+	if (!IsWindow(hWnd)) {
 		return;
+	}
 
 	// 親のプロシージャをサブクラスから参照できるように、ポインタを登録しておく。
 	lptr = SetWindowLongPtr( hWnd, GWLP_USERDATA, (LONG_PTR)parent );
@@ -2504,8 +2570,9 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 	GetObject( hFont, sizeof(lf), &lf );
 	lf.lfUnderline = TRUE;
 	parent->font = hFont = CreateFontIndirect( &lf ); // 不要になったら削除すること
-	if (hFont != NULL)
+	if (hFont != NULL) {
 		SendMessage( hWnd, WM_SETFONT, (WPARAM)hFont, (LPARAM)FALSE );
+	}
 
 	parent->hWnd = hWnd;
 	parent->timer_done = 0;
@@ -2527,141 +2594,141 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	HFONT font;
 
 	switch (Message) {
-	case WM_INITDIALOG:
+		case WM_INITDIALOG:
 
-		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_SYSTEM_FONT", Dialog, &logfont, &DlgAboutFont, UILanguageFile)) {
-			SendDlgItemMessage(Dialog, IDC_TT_PRO, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TT_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_INLUCDE_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_ONIGURUMA_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TT23_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TT23DATE_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TERANISHI_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_PROJECT_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_RIGHTS_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_AUTHOR_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_AUTHOR_URL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_FORUM_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_FORUM_URL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_BUILDTIME, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_BUILDTOOL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-		}
-		else {
-			DlgAboutFont = NULL;
-		}
-
-		// アイコンを動的にセット
-		{
-			int fuLoad = LR_DEFAULTCOLOR;
-			HICON hicon;
-
-			if (is_NT4()) {
-				fuLoad = LR_VGACOLOR;
+			font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
+			GetObject(font, sizeof(LOGFONT), &logfont);
+			if (get_lang_font("DLG_SYSTEM_FONT", Dialog, &logfont, &DlgAboutFont, UILanguageFile)) {
+				SendDlgItemMessage(Dialog, IDC_TT_PRO, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TT_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_INLUCDE_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_ONIGURUMA_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TT23_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TT23DATE_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_TERANISHI_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_PROJECT_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_RIGHTS_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_AUTHOR_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_AUTHOR_URL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_FORUM_LABEL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_FORUM_URL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_BUILDTIME, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_BUILDTOOL, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+			}
+			else {
+				DlgAboutFont = NULL;
 			}
 
-			hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
-			                  IMAGE_ICON, 32, 32, fuLoad);
-			SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
-		}
+			// アイコンを動的にセット
+			{
+				int fuLoad = LR_DEFAULTCOLOR;
+				HICON hicon;
 
-		GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetWindowText(Dialog, uimsg);
+				if (is_NT4()) {
+					fuLoad = LR_VGACOLOR;
+				}
 
-		// Tera Termのバージョンを設定する (2005.2.28 yutaka)
-		// __argv[0]では WinExec() したプロセスから参照できないようなので削除。(2005.3.14 yutaka)
-		get_file_version("ttermpro.exe", &a, &b, &c, &d);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", a, b);
+				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
+								  IMAGE_ICON, 32, 32, fuLoad);
+				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
+			}
+
+			GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetWindowText(Dialog, uimsg);
+
+			// Tera Termのバージョンを設定する (2005.2.28 yutaka)
+			// __argv[0]では WinExec() したプロセスから参照できないようなので削除。(2005.3.14 yutaka)
+			get_file_version("ttermpro.exe", &a, &b, &c, &d);
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", a, b);
 #ifdef SVNVERSION
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
-		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-#endif
-		SendMessage(GetDlgItem(Dialog, IDC_TT_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
-
-		// Onigurumaのバージョンを設定する 
-		// バージョンの取得は onig_version() を呼び出すのが適切だが、そのためだけにライブラリを
-		// リンクしたくなかったので、以下のようにした。Onigurumaのバージョンが上がった場合、
-		// ビルドエラーとなるかもしれない。
-		// (2005.10.8 yutaka)
-		// ライブラリをリンクし、正規の手順でバージョンを得ることにした。
-		// (2006.7.24 yutaka)
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
-		SendMessage(GetDlgItem(Dialog, IDC_ONIGURUMA_LABEL), WM_SETTEXT, 0, (LPARAM)buf);
-
-		// ビルドしたときに使われたVisual C++のバージョンを設定する。(2009.3.3 yutaka)
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using Microsoft Visual C++");
-#ifdef _MSC_FULL_VER
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
-			(_MSC_FULL_VER / 10000000) - 6,
-			(_MSC_FULL_VER / 100000) % 100);
-		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-		if (_MSC_FULL_VER % 100000) {
-			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " build %d",
-				_MSC_FULL_VER % 100000);
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
-		}
-#elif defined(_MSC_VER)
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
-			(_MSC_VER / 100) - 6,
-			_MSC_VER % 100);
-		strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #endif
-		SendMessage(GetDlgItem(Dialog, IDC_BUILDTOOL), WM_SETTEXT, 0, (LPARAM)buf);
+			SendMessage(GetDlgItem(Dialog, IDC_TT_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
-		// ビルドタイムを設定する。(2009.3.4 yutaka)
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Build time: %s %s", __DATE__, __TIME__);
-		SendMessage(GetDlgItem(Dialog, IDC_BUILDTIME), WM_SETTEXT, 0, (LPARAM)buf);
+			// Onigurumaのバージョンを設定する 
+			// バージョンの取得は onig_version() を呼び出すのが適切だが、そのためだけにライブラリを
+			// リンクしたくなかったので、以下のようにした。Onigurumaのバージョンが上がった場合、
+			// ビルドエラーとなるかもしれない。
+			// (2005.10.8 yutaka)
+			// ライブラリをリンクし、正規の手順でバージョンを得ることにした。
+			// (2006.7.24 yutaka)
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
+			SendMessage(GetDlgItem(Dialog, IDC_ONIGURUMA_LABEL), WM_SETTEXT, 0, (LPARAM)buf);
 
-		// static text のサイズを変更 (2007.4.16 maya)
-		hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
-		hdc = GetDC(hwnd);
-		SelectObject(hdc, DlgAboutFont);
-		GetDlgItemText(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
-		dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
-		w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
-		h = HIWORD(dwExt);
-		GetWindowRect(hwnd, &r);
-		point.x = r.left;
-		point.y = r.top;
-		ScreenToClient(Dialog, &point);
-		MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
+			// ビルドしたときに使われたVisual C++のバージョンを設定する。(2009.3.3 yutaka)
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using Microsoft Visual C++");
+#ifdef _MSC_FULL_VER
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
+				(_MSC_FULL_VER / 10000000) - 6,
+				(_MSC_FULL_VER / 100000) % 100);
+			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+			if (_MSC_FULL_VER % 100000) {
+				_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " build %d",
+					_MSC_FULL_VER % 100000);
+				strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+			}
+#elif defined(_MSC_VER)
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
+				(_MSC_VER / 100) - 6,
+				_MSC_VER % 100);
+			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#endif
+			SendMessage(GetDlgItem(Dialog, IDC_BUILDTOOL), WM_SETTEXT, 0, (LPARAM)buf);
 
-		hwnd = GetDlgItem(Dialog, IDC_FORUM_URL);
-		hdc = GetDC(hwnd);
-		SelectObject(hdc, DlgAboutFont);
-		GetDlgItemText(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
-		dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
-		w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
-		h = HIWORD(dwExt);
-		GetWindowRect(hwnd, &r);
-		point.x = r.left;
-		point.y = r.top;
-		ScreenToClient(Dialog, &point);
-		MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
+			// ビルドタイムを設定する。(2009.3.4 yutaka)
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Build time: %s %s", __DATE__, __TIME__);
+			SendMessage(GetDlgItem(Dialog, IDC_BUILDTIME), WM_SETTEXT, 0, (LPARAM)buf);
 
-		// static textをサブクラス化する。ただし、tabstop, notifyプロパティを有効にしておかないと
-		// メッセージが拾えない。(2005.4.5 yutaka)
-		do_subclass_window(GetDlgItem(Dialog, IDC_AUTHOR_URL), &author_url_class);
-		do_subclass_window(GetDlgItem(Dialog, IDC_FORUM_URL), &forum_url_class);
-		return TRUE;
+			// static text のサイズを変更 (2007.4.16 maya)
+			hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
+			hdc = GetDC(hwnd);
+			SelectObject(hdc, DlgAboutFont);
+			GetDlgItemText(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
+			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
+			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
+			h = HIWORD(dwExt);
+			GetWindowRect(hwnd, &r);
+			point.x = r.left;
+			point.y = r.top;
+			ScreenToClient(Dialog, &point);
+			MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
 
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) {
-		case IDOK:
-			EndDialog(Dialog, 1);
+			hwnd = GetDlgItem(Dialog, IDC_FORUM_URL);
+			hdc = GetDC(hwnd);
+			SelectObject(hdc, DlgAboutFont);
+			GetDlgItemText(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
+			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
+			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
+			h = HIWORD(dwExt);
+			GetWindowRect(hwnd, &r);
+			point.x = r.left;
+			point.y = r.top;
+			ScreenToClient(Dialog, &point);
+			MoveWindow(hwnd, point.x, point.y, w, h, TRUE);
+
+			// static textをサブクラス化する。ただし、tabstop, notifyプロパティを有効にしておかないと
+			// メッセージが拾えない。(2005.4.5 yutaka)
+			do_subclass_window(GetDlgItem(Dialog, IDC_AUTHOR_URL), &author_url_class);
+			do_subclass_window(GetDlgItem(Dialog, IDC_FORUM_URL), &forum_url_class);
 			return TRUE;
 
-		case IDCANCEL:
-			EndDialog(Dialog, 0);
-			return TRUE;
-		}
-		if (DlgAboutFont != NULL) {
-			DeleteObject(DlgAboutFont);
-		}
-		break;
+		case WM_COMMAND:
+			switch (LOWORD(wParam)) {
+				case IDOK:
+					EndDialog(Dialog, 1);
+					return TRUE;
+
+				case IDCANCEL:
+					EndDialog(Dialog, 0);
+					return TRUE;
+			}
+			if (DlgAboutFont != NULL) {
+				DeleteObject(DlgAboutFont);
+			}
+			break;
 	}
 	return FALSE;
 }
@@ -2717,20 +2784,23 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(Dialog, IDC_GENHELP, uimsg);
 
 			SendDlgItemMessage(Dialog, IDC_GENPORT, CB_ADDSTRING,
-							   0, (LPARAM)"TCP/IP");
+			                   0, (LPARAM)"TCP/IP");
 			for (w=1;w<=ts->MaxComPort;w++) {
 				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
 				SendDlgItemMessage(Dialog, IDC_GENPORT, CB_ADDSTRING,
-								   0, (LPARAM)Temp);
+				                   0, (LPARAM)Temp);
 			}
 			if (ts->PortType==IdSerial) {
-				if (ts->ComPort <= ts->MaxComPort)
+				if (ts->ComPort <= ts->MaxComPort) {
 					w = ts->ComPort;
-				else
+				}
+				else {
 					w = 1; // COM1
+				}
 			}
-			else
+			else {
 				w = 0; // TCP/IP
+			}
 			SendDlgItemMessage(Dialog, IDC_GENPORT, CB_SETCURSEL,w,0);
 
 			if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
@@ -2749,10 +2819,12 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							ts->PortType = IdSerial;
 							ts->ComPort = w-1;
 						}
-						else
+						else {
 							ts->PortType = IdTCPIP;
-						if ((ts->MenuFlag & MF_NOLANGUAGE)==0)
+						}
+						if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
 							ts->Language = (WORD)GetCurSel(Dialog, IDC_GENLANG);
+						}
 					}
 
 					// TTXKanjiMenu のために、OK 押下時にメニュー再描画の
@@ -2834,8 +2906,9 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 				case IDOK:
 					n = SendDlgItemMessage(Dialog,IDC_WINLISTLIST,
 					LB_GETCURSEL, 0, 0);
-					if (n!=CB_ERR)
+					if (n!=CB_ERR) {
 						SelectWin(n);
+					}
 					EndDialog(Dialog, 1);
 					if (DlgWinlistFont != NULL) {
 						DeleteObject(DlgWinlistFont);
@@ -2850,15 +2923,17 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 					return TRUE;
 
 				case IDC_WINLISTLIST:
-					if (HIWORD(wParam)==LBN_DBLCLK)
+					if (HIWORD(wParam)==LBN_DBLCLK) {
 						PostMessage(Dialog,WM_COMMAND,IDOK,0);
+					}
 					break;
 
 				case IDC_WINLISTCLOSE:
 					n = SendDlgItemMessage(Dialog,IDC_WINLISTLIST,
 					LB_GETCURSEL, 0, 0);
-					if (n==CB_ERR)
+					if (n==CB_ERR) {
 						break;
+					}
 					Hw = GetNthWin(n);
 					if (Hw!=GetParent(Dialog)) {
 						if (! IsWindowEnabled(Hw)) {
@@ -2874,8 +2949,9 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 					}
 					else {
 						Close = (PBOOL)GetWindowLong(Dialog,DWL_USER);
-						if (Close!=NULL)
+						if (Close!=NULL) {
 							*Close = TRUE;
+						}
 						EndDialog(Dialog, 1);
 						if (DlgWinlistFont != NULL) {
 							DeleteObject(DlgWinlistFont);

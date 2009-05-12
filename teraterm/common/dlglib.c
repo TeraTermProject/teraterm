@@ -45,10 +45,12 @@ void SetRB(HWND HDlg, int R, int FirstId, int LastId)
 	HWND HControl;
 	DWORD Style;
 
-	if ( R<1 )
+	if ( R<1 ) {
 		return;
-	if ( FirstId+R-1 > LastId )
+	}
+	if ( FirstId+R-1 > LastId ) {
 		return;
+	}
 	HControl = GetDlgItem(HDlg, FirstId + R - 1);
 	SendMessage(HControl, BM_SETCHECK, 1, 0);
 	Style = GetClassLong(HControl, GCL_STYLE);
@@ -60,12 +62,12 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
 	int i;
 
 	*R = 0;
-	for (i = FirstId ; i <= LastId ; i++)
-		if (SendDlgItemMessage(HDlg, i, BM_GETCHECK, 0, 0) != 0)
-		{
+	for (i = FirstId ; i <= LastId ; i++) {
+		if (SendDlgItemMessage(HDlg, i, BM_GETCHECK, 0, 0) != 0) {
 			*R = i - FirstId + 1;
 			return;
 		}
+	}
 }
 
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num)
@@ -99,10 +101,12 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	double Num; 
 	char NumStr[10]; 
 
-	if (b==0) 
+	if (b==0) {
 		Num = 100.0; 
-	else 
+	}
+	else {
 		Num = 100.0 * (double)a / (double)b; 
+	}
 	_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%3.1f%%",Num); 
 	SetDlgItemText(HDlg, id_Item, NumStr); 
 
@@ -130,10 +134,12 @@ LONG GetCurSel(HWND HDlg, int Id_Item)
 	LONG n;
 
 	n = SendDlgItemMessage(HDlg, Id_Item, CB_GETCURSEL, 0, 0);
-	if (n==CB_ERR)
+	if (n==CB_ERR) {
 		n = 0;
-	else
+	}
+	else {
 		n++;
+	}
 
 	return n;
 }

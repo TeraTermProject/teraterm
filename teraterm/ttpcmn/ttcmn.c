@@ -72,17 +72,20 @@ BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
 		FirstInstance = FALSE;
 		return TRUE;
 	}
-	else
+	else {
 		return FALSE;
+	}
 }
 
 void PASCAL FAR ChangeDefaultSet(PTTSet ts, PKeyMap km)
 {
 	if ((ts!=NULL) &&
-	    (_stricmp(ts->SetupFName, pm->ts.SetupFName) == 0))
+		(_stricmp(ts->SetupFName, pm->ts.SetupFName) == 0)) {
 		memcpy(&(pm->ts),ts,sizeof(TTTSet));
-	if (km!=NULL)
+	}
+	if (km!=NULL) {
 		memcpy(&(pm->km),km,sizeof(TKeyMap));
+	}
 }
 
 void PASCAL FAR GetDefaultSet(PTTSet ts)
@@ -96,11 +99,13 @@ WORD PASCAL FAR GetKeyCode(PKeyMap KeyMap, WORD Scan)
 {
 	WORD Key;
 
-	if (KeyMap==NULL)
+	if (KeyMap==NULL) {
 		KeyMap = &(pm->km);
+	}
 	Key = IdKeyMax;
-	while ((Key>0) && (KeyMap->Map[Key-1] != Scan))
+	while ((Key>0) && (KeyMap->Map[Key-1] != Scan)) {
 		Key--;
+	}
 	return Key;
 }
 
@@ -112,8 +117,9 @@ void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 	MSG Msg;
 	char Temp[201];
 
-	if (KeyMap==NULL)
+	if (KeyMap==NULL) {
 		KeyMap = &(pm->km);
+	}
 
 	*Type = IdBinary;  // key type
 	*Len = 0;
@@ -781,11 +787,13 @@ int FAR PASCAL RegWin(HWND HWinVT, HWND HWinTEK)
 		return 0;
 	}
 	pm->WinList[pm->NWin++] = HWinVT;
-	if (pm->NWin==1)
+	if (pm->NWin==1) {
 		return 1;
-	else
+	}
+	else {
 		return (int)(SendMessage(pm->WinList[pm->NWin-2],
-		             WM_USER_GETSERIALNO,0,0)+1);
+		                         WM_USER_GETSERIALNO,0,0)+1);
+	}
 }
 
 void FAR PASCAL UnregWin(HWND HWin)
@@ -793,14 +801,18 @@ void FAR PASCAL UnregWin(HWND HWin)
 	int i, j;
 
 	i = 0;
-	while ((i<pm->NWin) && (pm->WinList[i]!=HWin))
+	while ((i<pm->NWin) && (pm->WinList[i]!=HWin)) {
 		i++;
-	if (pm->WinList[i]!=HWin)
+	}
+	if (pm->WinList[i]!=HWin) {
 		return;
-	for (j=i ; j<pm->NWin-1 ; j++)
+	}
+	for (j=i ; j<pm->NWin-1 ; j++) {
 		pm->WinList[j] = pm->WinList[j+1];
-	if (pm->NWin>0)
+	}
+	if (pm->NWin>0) {
 		pm->NWin--;
+	}
 }
 
 void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
@@ -829,11 +841,13 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 			GetWindowText(Hw,&Temp[3],sizeof(Temp)-4);
 			AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_1+i,Temp);
 			i++;
-			if (i>8)
+			if (i>8) {
 				i = pm->NWin;
+			}
 		}
-		else
+		else {
 			UnregWin(Hw);
+		}
 	}
 	get_lang_msg("MENU_WINDOW_WINDOW", buf, buflen, "&Window", langFile);
 	if (VTFlag == 1) {
@@ -858,12 +872,13 @@ void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList)
 			GetWindowText(Hw,Temp,sizeof(Temp)-1);
 			SendDlgItemMessage(HDlg, IList, LB_ADDSTRING,
 			                   0, (LONG)Temp);
-			if (Hw==HWin) 
-				SendDlgItemMessage(HDlg, IList, LB_SETCURSEL,
-				                  i,0);
+			if (Hw==HWin) {
+				SendDlgItemMessage(HDlg, IList, LB_SETCURSEL, i,0);
+			}
 		}
-		else
+		else {
 			UnregWin(Hw);
+		}
 	}
 }
 
@@ -880,37 +895,45 @@ void FAR PASCAL SelectNextWin(HWND HWin, int Next)
 	int i;
 
 	i = 0;
-	while ((i<pm->NWin) && (pm->WinList[i]!=HWin))
+	while ((i<pm->NWin) && (pm->WinList[i]!=HWin)) {
 		i++;
-	if (pm->WinList[i]!=HWin)
+	}
+	if (pm->WinList[i]!=HWin) {
 		return;
+	}
 	i = i + Next;
-	if (i >= pm->NWin)
+	if (i >= pm->NWin) {
 		i = 0;
-	else if (i<0)
+	}
+	else if (i<0) {
 		i = pm->NWin-1;
+	}
 	SelectWin(i);
 }
 
 HWND FAR PASCAL GetNthWin(int n)
 {
-	if (n<pm->NWin)
+	if (n<pm->NWin) {
 		return pm->WinList[n];
-	else
+	}
+	else {
 		return NULL;
+	}
 }
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 {
-	if ( ! cv->Ready )
+	if ( ! cv->Ready ) {
 		return 0;
+	}
 
 	if ( cv->InBuffCount>0 ) {
 		*b = cv->InBuff[cv->InPtr];
 		cv->InPtr++;
 		cv->InBuffCount--;
-		if ( cv->InBuffCount==0 )
+		if ( cv->InBuffCount==0 ) {
 			cv->InPtr = 0;
+		}
 		return 1;
 	}
 	else {
@@ -921,46 +944,54 @@ int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 
 void PASCAL FAR CommInsert1Byte(PComVar cv, BYTE b)
 {
-	if ( ! cv->Ready )
+	if ( ! cv->Ready ) {
 		return;
+	}
 
-	if (cv->InPtr == 0)
+	if (cv->InPtr == 0) {
 		memmove(&(cv->InBuff[1]),&(cv->InBuff[0]),cv->InBuffCount);
-	else
+	}
+	else {
 		cv->InPtr--;
+	}
 	cv->InBuff[cv->InPtr] = b;
 	cv->InBuffCount++;
 
-	if (cv->HBinBuf!=0 )
+	if (cv->HBinBuf!=0 ) {
 		cv->BinSkip++;
+	}
 }
 
 void Log1Bin(PComVar cv, BYTE b)
 {
-	if (((cv->FilePause & OpLog)!=0) || cv->ProtoFlag)
+	if (((cv->FilePause & OpLog)!=0) || cv->ProtoFlag) {
 		return;
+	}
 	if (cv->BinSkip > 0) {
 		cv->BinSkip--;
 		return;
 	}
 	cv->BinBuf[cv->BinPtr] = b;
 	cv->BinPtr++;
-	if (cv->BinPtr>=InBuffSize)
+	if (cv->BinPtr>=InBuffSize) {
 		cv->BinPtr = cv->BinPtr-InBuffSize;
+	}
 	if (cv->BCount>=InBuffSize) {
 		cv->BCount = InBuffSize;
 		cv->BStart = cv->BinPtr;
 	}
-	else
+	else {
 		cv->BCount++;
+	}
 }
 
 int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b)
 {
 	int c;
 
-	if ( ! cv->Ready )
+	if ( ! cv->Ready ) {
 		return 0;
+	}
 
 	if ((cv->HLogBuf!=NULL) &&
 	    ((cv->LCount>=InBuffSize-10) ||
@@ -973,17 +1004,22 @@ int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b)
 	}
 
 	if ((cv->HBinBuf!=NULL) &&
-	    (cv->BCount>=InBuffSize-10))
+	    (cv->BCount>=InBuffSize-10)) {
 		return 0;
+	}
 
-	if ( cv->TelMode )
+	if ( cv->TelMode ) {
 		c = 0;
-	else
+	}
+	else {
 		c = CommReadRawByte(cv,b);
+	}
 
 	if ((c==1) && cv->TelCRFlag) {
 		cv->TelCRFlag = FALSE;
-		if (*b==0) c = 0;
+		if (*b==0) {
+			c = 0;
+		}
 	}
 
 	if ( c==1 ) {
@@ -992,25 +1028,29 @@ int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b)
 			if ( *b != 0xFF ) {
 				cv->TelMode = TRUE;
 				CommInsert1Byte(cv,*b);
-				if ( cv->HBinBuf!=0 )
+				if ( cv->HBinBuf!=0 ) {
 					cv->BinSkip--;
+				}
 				c = 0;
 			}
 		}
 		else if ((cv->PortType==IdTCPIP) && (*b==0xFF)) {
-			if (!cv->TelFlag && cv->TelAutoDetect)  /* TTPLUG */
+			if (!cv->TelFlag && cv->TelAutoDetect) { /* TTPLUG */
 				cv->TelFlag = TRUE;
+			}
 			if (cv->TelFlag) {
 				cv->IACFlag = TRUE;
 				c = 0;
 			}
 		}
-		else if (cv->TelFlag && ! cv->TelBinRecv && (*b==0x0D))
+		else if (cv->TelFlag && ! cv->TelBinRecv && (*b==0x0D)) {
 			cv->TelCRFlag = TRUE;
+		}
 	}
 
-	if ( (c==1) && (cv->HBinBuf!=0) )
+	if ( (c==1) && (cv->HBinBuf!=0) ) {
 		Log1Bin(cv, *b);
+	}
 
 	return c;
 }
@@ -1019,13 +1059,16 @@ int FAR PASCAL CommRawOut(PComVar cv, PCHAR B, int C)
 {
 	int a;
 
-	if ( ! cv->Ready )
+	if ( ! cv->Ready ) {
 		return C;
+	}
 
-	if (C > OutBuffSize - cv->OutBuffCount)
+	if (C > OutBuffSize - cv->OutBuffCount) {
 		a = OutBuffSize - cv->OutBuffCount;
-	else
+	}
+	else {
 		a = C;
+	}
 	if ( cv->OutPtr > 0 ) {
 		memmove(&(cv->OutBuff[0]),&(cv->OutBuff[cv->OutPtr]),cv->OutBuffCount);
 		cv->OutPtr = 0;
@@ -1040,8 +1083,9 @@ int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
 	int a, i, Len;
 	char d[3];
 
-	if ( ! cv->Ready )
+	if ( ! cv->Ready ) {
 		return C;
+	}
 
 	i = 0;
 	a = 1;
@@ -1066,8 +1110,9 @@ int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
 			CommRawOut(cv,d,Len);
 			a = 1;
 		}
-		else
+		else {
 			a = 0;
+		}
 
 		i = i + a;
 	}
@@ -1131,10 +1176,12 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 
 			} else {
 
-				if (cv->KanjiCodeSend == IdEUC)
+				if (cv->KanjiCodeSend == IdEUC) {
 					K = SJIS2EUC(K);
-				else if (cv->KanjiCodeSend != IdSJIS)
+				}
+				else if (cv->KanjiCodeSend != IdSJIS) {
 					K = SJIS2JIS(K);
+				}
 
 				if ((cv->SendCode==IdKatakana) &&
 				    (cv->KanjiCodeSend==IdJIS) &&
@@ -1158,20 +1205,23 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 			    (cv->KanjiCodeSend==IdJIS)) {
 				TempStr[0] = 0x1B;
 				TempStr[1] = '$';
-				if (cv->KanjiIn == IdKanjiInB)
+				if (cv->KanjiIn == IdKanjiInB) {
 					TempStr[2] = 'B';
-				else
+				}
+				else {
 					TempStr[2] = '@';
+				}
 				TempLen = 3;
 			}
-			else TempLen = 0;
+			else {
+				TempLen = 0;
+			}
 		}
 		else {
 			KanjiFlagNew = FALSE;
 
 			if ((cv->SendCode==IdKanji) &&
-				(cv->KanjiCodeSend==IdJIS))
-			{
+			    (cv->KanjiCodeSend==IdJIS)) {
 				TempStr[0] = 0x1B;
 				TempStr[1] = '(';
 				switch (cv->KanjiOut) {
@@ -1186,7 +1236,9 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 				}
 				TempLen = 3;
 			}
-			else TempLen = 0;
+			else {
+				TempLen = 0;
+			}
 
 			if ((0xa0<d) && (d<0xe0)) {
 				SendCodeNew = IdKatakana;
@@ -1227,10 +1279,12 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 					TempLen++;
 				}
 				if ((cv->KanjiCodeSend==IdJIS) &&
-				    (cv->JIS7KatakanaSend==1))
+					(cv->JIS7KatakanaSend==1)) {
 					TempStr[TempLen] = d & 0x7f;
-				else
+				}
+				else {
 					TempStr[TempLen] = d;
+				}
 				TempLen++;
 
 				// 半角カナはUnicodeでは2バイトになる (2004.10.4 yutaka)
@@ -1300,13 +1354,16 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 
 			} else {
 
-				if (cv->KanjiCodeSend == IdEUC) K = K;
-				else if (cv->KanjiCodeSend != IdSJIS) K = K;
+				if (cv->KanjiCodeSend == IdEUC) {
+					K = K;
+				}
+				else if (cv->KanjiCodeSend != IdSJIS) {
+					K = K;
+				}
 
 				if ((cv->SendCode==IdKatakana) &&
-					(cv->KanjiCodeSend==IdJIS) &&
-					(cv->JIS7KatakanaSend==1))
-				{
+				    (cv->KanjiCodeSend==IdJIS) &&
+				    (cv->JIS7KatakanaSend==1)) {
 					TempStr[TempLen] = SI;
 					TempLen++;
 				}
@@ -1323,43 +1380,49 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 			SendCodeNew = IdKanji;
 
 			if ((cv->SendCode!=IdKanji) &&
-				(cv->KanjiCodeSend==IdJIS))
-			{
+			    (cv->KanjiCodeSend==IdJIS)) {
 				TempStr[0] = 0x1B;
 				TempStr[1] = '$';
-				if (cv->KanjiIn == IdKanjiInB)
+				if (cv->KanjiIn == IdKanjiInB) {
 					TempStr[2] = 'B';
-				else
+				}
+				else {
 					TempStr[2] = '@';
+				}
 				TempLen = 3;
 			}
-			else TempLen = 0;
+			else {
+				TempLen = 0;
+			}
 		}
 		else {
 			KanjiFlagNew = FALSE;
 
 			if ((cv->SendCode==IdKanji) &&
-				(cv->KanjiCodeSend==IdJIS))
-			{
+			    (cv->KanjiCodeSend==IdJIS)) {
 				TempStr[0] = 0x1B;
 				TempStr[1] = '(';
 				switch (cv->KanjiOut) {
-				case IdKanjiOutJ: TempStr[2] = 'J'; break;
-				case IdKanjiOutH: TempStr[2] = 'H'; break;
-				default:
-					TempStr[2] = 'B';
+					case IdKanjiOutJ:
+						TempStr[2] = 'J';
+						break;
+					case IdKanjiOutH:
+						TempStr[2] = 'H';
+						break;
+					default:
+						TempStr[2] = 'B';
 				}
 				TempLen = 3;
 			}
-			else TempLen = 0;
+			else {
+				TempLen = 0;
+			}
 
-			if ((0xa0<d) && (d<0xe0))
-			{
+			if ((0xa0<d) && (d<0xe0)) {
 				SendCodeNew = IdKatakana;
 				if ((cv->SendCode!=IdKatakana) &&
-					(cv->KanjiCodeSend==IdJIS) &&
-					(cv->JIS7KatakanaSend==1))
-				{
+				    (cv->KanjiCodeSend==IdJIS) &&
+				    (cv->JIS7KatakanaSend==1)) {
 					TempStr[TempLen] = SO;
 					TempLen++;
 				}
@@ -1367,43 +1430,39 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 			else {
 				SendCodeNew = IdASCII;
 				if ((cv->SendCode==IdKatakana) &&
-					(cv->KanjiCodeSend==IdJIS) &&
-					(cv->JIS7KatakanaSend==1))
-				{
+				    (cv->KanjiCodeSend==IdJIS) &&
+				    (cv->JIS7KatakanaSend==1)) {
 					TempStr[TempLen] = SI;
 					TempLen++;
 				}
 			}
 
-			if (d==0x0d)
-			{
+			if (d==0x0d) {
 				TempStr[TempLen] = 0x0d;
 				TempLen++;
-				if (cv->CRSend==IdCRLF)
-				{
+				if (cv->CRSend==IdCRLF) {
 					TempStr[TempLen] = 0x0a;
 					TempLen++;
 				}
 				else if ((cv->CRSend==IdCR) &&
-					cv->TelFlag && ! cv->TelBinSend)
-				{
+				    cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen] = 0;
 					TempLen++;
 				}
 			}
-			else if ((d>=0xa1) && (d<=0xe0))
-			{
+			else if ((d>=0xa1) && (d<=0xe0)) {
 				/* Katakana */
-				if (cv->KanjiCodeSend==IdEUC)
-				{
+				if (cv->KanjiCodeSend==IdEUC) {
 					TempStr[TempLen] = (char)0x8E;
 					TempLen++;
 				}
 				if ((cv->KanjiCodeSend==IdJIS) &&
-					(cv->JIS7KatakanaSend==1))
+					(cv->JIS7KatakanaSend==1)) {
 					TempStr[TempLen] = d & 0x7f;
-				else
+				}
+				else {
 					TempStr[TempLen] = d;
+				}
 				TempLen++;
 
 				// 半角カナはUnicodeでは2バイトになる (2004.10.4 yutaka)
@@ -1416,24 +1475,21 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 			else {
 				TempStr[TempLen] = d;
 				TempLen++;
-				if (cv->TelFlag && (d==0xff))
-				{
+				if (cv->TelFlag && (d==0xff)) {
 					TempStr[TempLen] = (char)0xff;
 					TempLen++;
 				}
 			}
 		} // if (cv->SendKanjiFlag) else if ... else ... end
 
-		if (TempLen == 0)
-		{
+		if (TempLen == 0) {
 			i++;
 			cv->SendCode = SendCodeNew;
 			cv->SendKanjiFlag = KanjiFlagNew;
 		}
 		else {
 			Full = OutBuffSize-cv->OutBuffCount-TempLen < 0;
-			if (! Full)
-			{
+			if (! Full) {
 				i++;
 				cv->SendCode = SendCodeNew;
 				cv->SendKanjiFlag = KanjiFlagNew;
@@ -1453,13 +1509,16 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 	BYTE d;
 	BOOL Full;
 
-	if (! cv->Ready )
+	if (! cv->Ready ) {
 		return C;
+	}
 
-	if (cv->Language==IdJapanese)
+	if (cv->Language==IdJapanese) {
 		return TextOutJP(cv,B,C);
-	if (cv->Language==IdKorean)		// HKS
+	}
+	if (cv->Language==IdKorean) { // HKS
 		return TextOutKR(cv,B,C);
+	}
 
 	Full = FALSE;
 	i = 0;
@@ -1572,10 +1631,12 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 				OutputTextUTF8(K, TempStr, &TempLen, cv);
 			}
 			else {
-				if (cv->KanjiCodeEcho == IdEUC)
+				if (cv->KanjiCodeEcho == IdEUC) {
 					K = SJIS2EUC(K);
-				else if (cv->KanjiCodeEcho != IdSJIS)
+				}
+				else if (cv->KanjiCodeEcho != IdSJIS) {
 					K = SJIS2JIS(K);
+				}
 
 				if ((cv->EchoCode==IdKatakana) &&
 				    (cv->KanjiCodeEcho==IdJIS) &&
@@ -1598,14 +1659,17 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 			    (cv->KanjiCodeEcho==IdJIS)) {
 				TempStr[0] = 0x1B;
 				TempStr[1] = '$';
-				if (cv->KanjiIn == IdKanjiInB)
+				if (cv->KanjiIn == IdKanjiInB) {
 					TempStr[2] = 'B';
-				else
+				}
+				else {
 					TempStr[2] = '@';
+				}
 				TempLen = 3;
 			}
-			else
+			else {
 				TempLen = 0;
+			}
 		}
 		else {
 			KanjiFlagNew = FALSE;
@@ -1656,7 +1720,7 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 					TempLen++;
 				}
 				else if ((cv->CRSend==IdCR) &&
-						 cv->TelFlag && ! cv->TelBinSend) {
+				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen] = 0;
 					TempLen++;
 				}
@@ -1668,10 +1732,12 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 					TempLen++;
 				}
 				if ((cv->KanjiCodeEcho==IdJIS) &&
-				    (cv->JIS7KatakanaEcho==1))
+					(cv->JIS7KatakanaEcho==1)) {
 					TempStr[TempLen] = d & 0x7f;
-				else
+				}
+				else {
 					TempStr[TempLen] = d;
+				}
 				TempLen++;
 			}
 			else {
@@ -1712,16 +1778,18 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 	BYTE d;
 	BOOL Full;
 
-	if ( ! cv->Ready )
+	if ( ! cv->Ready ) {
 		return C;
+	}
 
 	if ( (cv->InPtr>0) && (cv->InBuffCount>0) ) {
 		memmove(cv->InBuff,&(cv->InBuff[cv->InPtr]),cv->InBuffCount);
 		cv->InPtr = 0;
 	}
 
-	if (cv->Language==IdJapanese)
+	if (cv->Language==IdJapanese) {
 		return TextEchoJP(cv,B,C);
+	}
 
 	Full = FALSE;
 	i = 0;
@@ -1744,8 +1812,9 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 		}
 		else {
 			if ((cv->Language==IdRussian) &&
-			    (d>=128))
+				(d>=128)) {
 				d = RussConv(cv->RussClient,cv->RussHost,d);
+			}
 			TempStr[TempLen] = d;
 			TempLen++;
 			if (cv->TelFlag && (d==0xff)) {
@@ -1790,8 +1859,9 @@ static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDe
 	bRet =
 		SetupDiClassGuidsFromName(_T("PORTS"), (LPGUID) & ClassGuid, 1,
 		                          &dwRequiredSize);
-	if (!bRet)
+	if (!bRet) {
 		goto cleanup;
+	}
 
 // Get class devices
 	// COMポート番号を強制付け替えした場合に、現在のものではなく、レジストリに残っている
@@ -1803,7 +1873,7 @@ static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDe
 // Enumerate devices
 		dwMemberIndex = 0;
 		while (SetupDiEnumDeviceInfo
-			   (DeviceInfoSet, dwMemberIndex++, &DeviceInfoData)) {
+		       (DeviceInfoSet, dwMemberIndex++, &DeviceInfoData)) {
 			TCHAR szFriendlyName[MAX_PATH];
 			TCHAR szPortName[MAX_PATH];
 			//TCHAR szMessage[MAX_PATH];
@@ -1863,7 +1933,7 @@ static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDe
 		}
 	}
 
-  cleanup:
+cleanup:
 // Destroy device info list
 	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
 }
@@ -1893,9 +1963,11 @@ int PASCAL DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 
 		for (i=0; i<comports-1; i++) {
 			min = i;
-			for (j=i+1; j<comports; j++)
-				if (ComPortTable[min] > ComPortTable[j])
+			for (j=i+1; j<comports; j++) {
+				if (ComPortTable[min] > ComPortTable[j]) {
 					min = j;
+				}
+			}
 			if (min != i) {
 				s = ComPortTable[i];
 				ComPortTable[i] = ComPortTable[min];
@@ -1939,16 +2011,17 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process initialization */
 			DoCover_IsDebuggerPresent();
 			hInst = hInstance;
-			HMap = CreateFileMapping(
-				(HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE,
-				0, sizeof(TMap), TT_FILEMAPNAME);
-			if (HMap == NULL)
+			HMap = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE,
+			                         0, sizeof(TMap), TT_FILEMAPNAME);
+			if (HMap == NULL) {
 				return FALSE;
+			}
 			FirstInstance = (GetLastError() != ERROR_ALREADY_EXISTS);
 
 			pm = (PMap)MapViewOfFile(HMap,FILE_MAP_WRITE,0,0,0);
-			if (pm == NULL)
+			if (pm == NULL) {
 				return FALSE;
+			}
 			break;
 		case DLL_PROCESS_DETACH:
 			/* do process cleanup */

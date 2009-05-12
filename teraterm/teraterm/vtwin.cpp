@@ -218,15 +218,17 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 
 	if (g_hmodUser32 == NULL) {
 		g_hmodUser32 = LoadLibrary("user32.dll");
-		if (g_hmodUser32 == NULL)
+		if (g_hmodUser32 == NULL) {
 			return FALSE;
+		}
 
 		g_pSetLayeredWindowAttributes =
 			(func)GetProcAddress(g_hmodUser32, "SetLayeredWindowAttributes");
 	}
 
-	if (g_pSetLayeredWindowAttributes == NULL)
+	if (g_pSetLayeredWindowAttributes == NULL) {
 		return FALSE;
+	}
 
 	return g_pSetLayeredWindowAttributes(hwnd, crKey, 
 	                                     bAlpha, dwFlags);
@@ -246,9 +248,9 @@ extern "C" void SetMouseCursor(char *cursor)
 			break;
 		}
 	}
-	if (name == NULL)
+	if (name == NULL) {
 		return;
-
+	}
 
 	hc = (HCURSOR)LoadImage(NULL, MAKEINTRESOURCE(name), IMAGE_CURSOR,
 	                        0, 0, LR_DEFAULTSIZE | LR_SHARED);
@@ -359,8 +361,9 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 
 	/* シンボル情報格納用バッファの初期化 */
 	gptr = GlobalAlloc(GMEM_FIXED, 10000);
-	if (gptr == NULL)
+	if (gptr == NULL) {
 		goto error;
+	}
 	pSym = (PIMAGEHLP_SYMBOL)GlobalLock(gptr);
 	ZeroMemory(pSym, sizeof(IMAGEHLP_SYMBOL));
 	pSym->SizeOfStruct = 10000;
@@ -499,7 +502,7 @@ CVTWindow::CVTWindow()
   ::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-  	// 例外ハンドラのフック (2007.9.30 yutaka)
+	// 例外ハンドラのフック (2007.9.30 yutaka)
 	SetUnhandledExceptionFilter(ApplicationFaultHandler);
 
 	TTXInit(&ts, &cv); /* TTPLUG */
@@ -546,7 +549,9 @@ CVTWindow::CVTWindow()
 			}
 			FreeTTSET();
 			/* store default sets in TTCMN */
-			if (tempkm!=NULL) free(tempkm);
+			if (tempkm!=NULL) {
+				free(tempkm);
+			}
 		}
 
 	}
@@ -555,8 +560,9 @@ CVTWindow::CVTWindow()
 	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
 	// 落ちるバグを修正。(2007.6.12 maya)
 	Param = GetCommandLine();
-	if (LoadTTSET())
+	if (LoadTTSET()) {
 		(*ParseParam)(Param, &ts, &(TopicName[0]));
+	}
 	FreeTTSET();
 
 	// duplicate sessionの指定があるなら、共有メモリからコピーする (2004.12.7 yutaka)
@@ -627,8 +633,9 @@ CVTWindow::CVTWindow()
 	RegisterClass(&wc);
 	LoadAccelTable(MAKEINTRESOURCE(IDR_ACC));
 
-	if (ts.VTPos.x==CW_USEDEFAULT)
+	if (ts.VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
+	}
 	else {
 		rect.left = ts.VTPos.x;
 		rect.top = ts.VTPos.y;
@@ -684,8 +691,9 @@ CVTWindow::CVTWindow()
 	/* Reset Terminal */
 	ResetTerminal();
 
-	if ((ts.PopupMenu>0) || (ts.HideTitle>0))
+	if ((ts.PopupMenu>0) || (ts.HideTitle>0)) {
 		::PostMessage(HVTWin,WM_USER_CHANGEMENU,0,0);
+	}
 
 	ChangeFont();
 
@@ -706,9 +714,10 @@ CVTWindow::CVTWindow()
 		Startup();
 		return;
 	}
-	 CmdShow = SW_SHOWDEFAULT;
-	if (ts.Minimize>0)
+	CmdShow = SW_SHOWDEFAULT;
+	if (ts.Minimize>0) {
 		CmdShow = SW_SHOWMINIMIZED;
+	}
 	ShowWindow(CmdShow);
 	ChangeCaret();
 }
@@ -1293,10 +1302,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	else if (SubMenu == SetupMenu)
 		if (cv.Ready &&
 		    ((cv.PortType==IdTCPIP) || (cv.PortType==IdFile)) ||
-		    (SendVar!=NULL) || (FileVar!=NULL) || Connecting)
+			(SendVar!=NULL) || (FileVar!=NULL) || Connecting) {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_GRAYED);
-		else
+		}
+		else {
 			EnableMenuItem(SetupMenu,ID_SETUP_SERIALPORT,MF_BYCOMMAND | MF_ENABLED);
+		}
 
 	else if (SubMenu == ControlMenu)
 	{
@@ -1308,30 +1319,38 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 			else {
 				EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_ENABLED);
 			}
-			if (cv.PortType==IdSerial)
+			if (cv.PortType==IdSerial) {
 				EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_ENABLED);
-			else
+			}
+			else {
 				EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_GRAYED);
+			}
 		}
 		else {
 			EnableMenuItem(ControlMenu,ID_CONTROL_SENDBREAK,MF_BYCOMMAND | MF_GRAYED);
 			EnableMenuItem(ControlMenu,ID_CONTROL_RESETPORT,MF_BYCOMMAND | MF_GRAYED);
 		}
 
-		if (cv.Ready && cv.TelFlag && (FileVar==NULL))
+		if (cv.Ready && cv.TelFlag && (FileVar==NULL)) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_AREYOUTHERE,MF_BYCOMMAND | MF_ENABLED);
-		else
+		}
+		else {
 			EnableMenuItem(ControlMenu,ID_CONTROL_AREYOUTHERE,MF_BYCOMMAND | MF_GRAYED);
+		}
 
-		if (HTEKWin==0)
+		if (HTEKWin==0) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_CLOSETEK,MF_BYCOMMAND | MF_GRAYED);
-		else
+		}
+		else {
 			EnableMenuItem(ControlMenu,ID_CONTROL_CLOSETEK,MF_BYCOMMAND | MF_ENABLED);
+		}
 
-		if ((ConvH!=0) || (FileVar!=NULL))
+		if ((ConvH!=0) || (FileVar!=NULL)) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_GRAYED);
-		else
+		}
+		else {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_ENABLED);
+		}
 
 	}
 	else if (SubMenu == WinMenu)
@@ -1406,8 +1425,9 @@ void CVTWindow::RestoreSetup()
 	char TempDir[MAXPATHLEN];
 	char TempName[MAXPATHLEN];
 
-	if ( strlen(ts.SetupFName)==0 )
+	if ( strlen(ts.SetupFName)==0 ) {
 		return;
+	}
 
 	ExtractFileName(ts.SetupFName,TempName,sizeof(TempName));
 	ExtractDirName(ts.SetupFName,TempDir);
@@ -1417,10 +1437,11 @@ void CVTWindow::RestoreSetup()
 
 	strncpy_s(ts.SetupFName, sizeof(ts.SetupFName),TempDir, _TRUNCATE);
 	AppendSlash(ts.SetupFName,sizeof(ts.SetupFName));
-  strncat_s(ts.SetupFName,sizeof(ts.SetupFName),TempName,_TRUNCATE);
+	strncat_s(ts.SetupFName,sizeof(ts.SetupFName),TempName,_TRUNCATE);
 
-	if (LoadTTSET())
+	if (LoadTTSET()) {
 		(*ReadIniFile)(ts.SetupFName,&ts);
+	}
 	FreeTTSET();
 
 #if 0
@@ -1441,8 +1462,9 @@ void CVTWindow::SetupTerm()
 	cv.RussHost = ts.RussHost;
 	cv.RussClient = ts.RussClient;
 
-	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0)) {
 		TelChangeEcho();
+	}
 
 	if ((ts.TerminalWidth!=NumOfColumns) ||
 	    (ts.TerminalHeight!=NumOfLines-StatusLine)) {
@@ -1454,8 +1476,9 @@ void CVTWindow::SetupTerm()
 	}
 	else if ((ts.TermIsWin>0) &&
 	         ((ts.TerminalWidth!=WinWidth) ||
-	          (ts.TerminalHeight!=WinHeight-StatusLine)))
+	          (ts.TerminalHeight!=WinHeight-StatusLine))) {
 		BuffChangeWinSize(ts.TerminalWidth,ts.TerminalHeight+StatusLine);
+	}
 }
 
 void CVTWindow::Startup()
@@ -1469,8 +1492,9 @@ void CVTWindow::Startup()
 		ts.MacroFN[0] = 0;
 	}
 	else {// start connection
-		if (TopicName[0]!=0)
+		if (TopicName[0]!=0) {
 			cv.NoMsg=1; /* suppress error messages */
+		}
 		::PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
 	}
 }
@@ -1582,10 +1606,12 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		return TRUE;
 	}
 	else {
-		if (TTXProcessCommand(HVTWin, wID))
+		if (TTXProcessCommand(HVTWin, wID)) {
 			return TRUE;
-		else /* TTPLUG */
+		}
+		else { /* TTPLUG */
 			return CFrameWnd::OnCommand(wParam, lParam);
+		}
 	}
 }
 
@@ -1599,8 +1625,9 @@ void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	unsigned int i;
 	char Code;
 
-	if (!KeybEnabled || (TalkStatus!=IdTalkKeyb))
+	if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) {
 		return;
+	}
 
 	if ((ts.MetaKey>0) && AltKey()) {
 		::PostMessage(HVTWin,WM_SYSCHAR,nChar,MAKELONG(nRepCnt,nFlags));
@@ -1609,13 +1636,15 @@ void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	Code = nChar;
 
 	if ((ts.Language==IdRussian) &&
-	    ((BYTE)Code>=128))
+		((BYTE)Code>=128)) {
 		Code = (char)RussConv(ts.RussKeyb,ts.RussClient,(BYTE)Code);
+	}
 
 	for (i=1 ; i<=nRepCnt ; i++) {
 		CommTextOut(&cv,&Code,1);
-		if (ts.LocalEcho>0)
+		if (ts.LocalEcho>0) {
 			CommTextEcho(&cv,&Code,1);
+		}
 	}
 
 	/* 最下行でだけ自動スクロールする設定の場合
@@ -1658,8 +1687,9 @@ void CVTWindow::OnClose()
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    ! CloseTT &&
 	    (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
-	     MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL))
+	     MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL)) {
 		return;
+	}
 
 	FileTransEnd(0);
 	ProtoEnd();
@@ -1680,8 +1710,9 @@ void CVTWindow::OnDestroy()
 
 	EndDDE();
 
-	if (cv.TelFlag)
+	if (cv.TelFlag) {
 		EndTelnet();
+	}
 	CommClose(&cv);
 
 	OpenHelp(HVTWin,HH_CLOSE_ALL,0);
@@ -1689,13 +1720,14 @@ void CVTWindow::OnDestroy()
 	FreeIME();
 	FreeTTSET();
 	do { }
-		while (FreeTTDLG());
+	while (FreeTTDLG());
 
 	do { }
-		while (FreeTTFILE());
+	while (FreeTTFILE());
 
-	if (HTEKWin != NULL)
+	if (HTEKWin != NULL) {
 		::DestroyWindow(HTEKWin);
+	}
 
 	EndDisp();
 
@@ -1962,22 +1994,24 @@ void CVTWindow::OnKillFocus(CWnd* pNewWnd)
 	FocusReport(FALSE);
 	CFrameWnd::OnKillFocus(pNewWnd);
 
-	if (IsCaretOn()) 
+	if (IsCaretOn()) {
 		CaretKillFocus(TRUE);
+	}
 }
 
 void CVTWindow::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-	if (LButton || MButton || RButton)
+	if (LButton || MButton || RButton) {
 		return;
+	}
 
 	DblClkX = point.x;
 	DblClkY = point.y;
 
-
 	if (! MouseReport(IdMouseEventBtnDown, IdLeftButton, DblClkX, DblClkY) &&
-	    BuffUrlDblClk(DblClkX, DblClkY)) // ブラウザ呼び出しの場合は何もしない。 (2005.4.3 yutaka)
+		BuffUrlDblClk(DblClkX, DblClkY)) { // ブラウザ呼び出しの場合は何もしない。 (2005.4.3 yutaka)
 		return;
+	}
 
 	BuffDblClk(DblClkX, DblClkY);
 
@@ -2004,8 +2038,9 @@ void CVTWindow::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	MouseReport(IdMouseEventBtnUp, IdLeftButton, point.x, point.y);
 
-	if (! LButton)
+	if (! LButton) {
 		return;
+	}
 
 	ButtonUp(FALSE);
 }
@@ -2025,14 +2060,17 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 
 	mousereport = MouseReport(IdMouseEventBtnUp, IdMiddleButton, point.x, point.y);
 
-	if (! MButton)
+	if (! MButton) {
 		return;
+	}
 
 	// added DisablePasteMouseMButton (2008.3.2 maya)
-	if (ts.DisablePasteMouseMButton)
+	if (ts.DisablePasteMouseMButton) {
 		ButtonUp(FALSE);
-	else
+	}
+	else {
 		ButtonUp(TRUE);
+	}
 }
 
 int CVTWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
@@ -2054,15 +2092,18 @@ void CVTWindow::OnMouseMove(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (DblClk)
+	if (DblClk) {
 		i = 2;
-	else if (TplClk)
+	}
+	else if (TplClk) {
 		i = 3;
-	else
+	}
+	else {
 		i = 1;
+	}
 
 	if (!ts.SelectOnlyByLButton ||
-		(ts.SelectOnlyByLButton && LButton) ) {
+	    (ts.SelectOnlyByLButton && LButton) ) {
 		// SelectOnlyByLButton == TRUE のときは、左ボタンダウン時のみ選択する (2007.11.21 maya)
 		BuffChangeSelect(point.x, point.y,i);
 	}
@@ -2095,7 +2136,7 @@ BOOL CVTWindow::OnMouseWheel(
 		return TRUE;
 
 	if (ts.TranslateWheelToCursor && AppliCursorMode && !ts.DisableAppCursor &&
-            !(ControlKey() && ts.DisableWheelToCursorByCtrl)) {
+	    !(ControlKey() && ts.DisableWheelToCursorByCtrl)) {
 		if (zDelta < 0) {
 			KeyDown(HVTWin, VK_DOWN, line, MapVirtualKey(VK_DOWN, 0) | 0x100);
 			KeyUp(VK_DOWN);
@@ -2119,18 +2160,21 @@ BOOL CVTWindow::OnMouseWheel(
 
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 {
-	if (! Minimized && (nHitTest == HTCAPTION))
+	if (! Minimized && (nHitTest == HTCAPTION)) {
 		DispRestoreWinSize();
-	else
+	}
+	else {
 		CFrameWnd::OnNcLButtonDblClk(nHitTest,point);
+	}
 }
 
 void CVTWindow::OnNcRButtonDown(UINT nHitTest, CPoint point)
 {
 	if ((nHitTest==HTCAPTION) &&
 	    (ts.HideTitle>0) &&
-	    AltKey())
+		AltKey()) {
 		::CloseWindow(HVTWin); /* iconize */
+	}
 }
 
 void CVTWindow::OnPaint()
@@ -2182,7 +2226,9 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 
 	mousereport = MouseReport(IdMouseEventBtnUp, IdRightButton, point.x, point.y);
 
-	if (! RButton) return;
+	if (! RButton) {
+		return;
+	}
 
 	// 右ボタン押下でのペーストを禁止する (2005.3.16 yutaka)
 	if (ts.DisablePasteMouseRButton || mousereport) {
@@ -2211,76 +2257,76 @@ static HWND tip_wnd = NULL;
 static int tip_enabled = 0;
 
 static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
-				       WPARAM wParam, LPARAM lParam)
+                                       WPARAM wParam, LPARAM lParam)
 {
 
 	switch (nMsg) {
-	  case WM_ERASEBKGND:
-		  return TRUE;
+		case WM_ERASEBKGND:
+			return TRUE;
 
-	  case WM_PAINT:
-		  {
-			  HBRUSH hbr;
-			  HGDIOBJ holdbr;
-			  RECT cr;
-			  int wtlen;
-			  LPTSTR wt;
-			  HDC hdc;
+		case WM_PAINT:
+			{
+				HBRUSH hbr;
+				HGDIOBJ holdbr;
+				RECT cr;
+				int wtlen;
+				LPTSTR wt;
+				HDC hdc;
 
-			  PAINTSTRUCT ps;
-			  hdc = BeginPaint(hWnd, &ps);
+				PAINTSTRUCT ps;
+				hdc = BeginPaint(hWnd, &ps);
 
-			  SelectObject(hdc, tip_font);
-			  SelectObject(hdc, GetStockObject(BLACK_PEN));
+				SelectObject(hdc, tip_font);
+				SelectObject(hdc, GetStockObject(BLACK_PEN));
 
-			  hbr = CreateSolidBrush(tip_bg);
-			  holdbr = SelectObject(hdc, hbr);
+				hbr = CreateSolidBrush(tip_bg);
+				holdbr = SelectObject(hdc, hbr);
 
-			  GetClientRect(hWnd, &cr);
-			  Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
+				GetClientRect(hWnd, &cr);
+				Rectangle(hdc, cr.left, cr.top, cr.right, cr.bottom);
 
-			  wtlen = GetWindowTextLength(hWnd);
-			  wt = (LPTSTR) malloc((wtlen + 1) * sizeof(TCHAR));
-			  GetWindowText(hWnd, wt, wtlen + 1);
+				wtlen = GetWindowTextLength(hWnd);
+				wt = (LPTSTR) malloc((wtlen + 1) * sizeof(TCHAR));
+				GetWindowText(hWnd, wt, wtlen + 1);
 
-			  SetTextColor(hdc, tip_text);
-			  SetBkColor(hdc, tip_bg);
+				SetTextColor(hdc, tip_text);
+				SetBkColor(hdc, tip_bg);
 
-			  TextOut(hdc, cr.left + 3, cr.top + 3, wt, wtlen);
+				TextOut(hdc, cr.left + 3, cr.top + 3, wt, wtlen);
 
-			  free(wt);
+				free(wt);
 
-			  SelectObject(hdc, holdbr);
-			  DeleteObject(hbr);
+				SelectObject(hdc, holdbr);
+				DeleteObject(hbr);
 
-			  EndPaint(hWnd, &ps);
-		  }
-		  return 0;
+				EndPaint(hWnd, &ps);
+			}
+			return 0;
 
-	  case WM_NCHITTEST:
-		  return HTTRANSPARENT;
+		case WM_NCHITTEST:
+			return HTTRANSPARENT;
 
-	  case WM_DESTROY:
-		  DeleteObject(tip_font);
-		  tip_font = NULL;
-		  break;
+		case WM_DESTROY:
+			DeleteObject(tip_font);
+			tip_font = NULL;
+			break;
 
-	  case WM_SETTEXT:
-		  {
-			  LPCTSTR str = (LPCTSTR) lParam;
-			  SIZE sz;
-			  HDC hdc = CreateCompatibleDC(NULL);
+		case WM_SETTEXT:
+			{
+				LPCTSTR str = (LPCTSTR) lParam;
+				SIZE sz;
+				HDC hdc = CreateCompatibleDC(NULL);
 
-			  SelectObject(hdc, tip_font);
-			  GetTextExtentPoint32(hdc, str, _tcslen(str), &sz);
+				SelectObject(hdc, tip_font);
+				GetTextExtentPoint32(hdc, str, _tcslen(str), &sz);
 
-			  SetWindowPos(hWnd, NULL, 0, 0, sz.cx + 6, sz.cy + 6,
-				  SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
-			  InvalidateRect(hWnd, NULL, FALSE);
+				SetWindowPos(hWnd, NULL, 0, 0, sz.cx + 6, sz.cy + 6,
+				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+				InvalidateRect(hWnd, NULL, FALSE);
 
-			  DeleteDC(hdc);
-		  }
-		  break;
+				DeleteDC(hdc);
+			}
+			break;
 	}
 
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
@@ -2352,12 +2398,14 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		GetWindowRect(src, &wr);
 
 		ix = wr.left;
-		if (ix < 16)
+		if (ix < 16) {
 			ix = 16;
+		}
 
 		iy = wr.top - sz.cy;
-		if (iy < 16)
+		if (iy < 16) {
 			iy = 16;
+		}
 
 		/* Create the tip window */
 
@@ -2404,7 +2452,9 @@ void CVTWindow::OnSize(UINT nType, int cx, int cy)
 		Startup();
 		return;
 	}
-	if (Minimized || DontChangeSize) return;
+	if (Minimized || DontChangeSize) {
+		return;
+	}
 
 	if (nType == SIZE_MAXIMIZED) {
 		ts.TerminalOldWidth = ts.TerminalWidth;
@@ -2414,8 +2464,9 @@ void CVTWindow::OnSize(UINT nType, int cx, int cy)
 	::GetWindowRect(HVTWin,&R);
 	w = R.right - R.left;
 	h = R.bottom - R.top;
-	if (AdjustSize)
+	if (AdjustSize) {
 		ResizeWindow(R.left,R.top,w,h,cx,cy);
+	}
 	else {
 		w = cx / FontWidth;
 		h = cy / FontHeight;
@@ -2438,7 +2489,7 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 {
 	int nWidth;
 	int nHeight;
-    RECT cr, wr;
+	RECT cr, wr;
 	int extra_width, extra_height;
 	int w, h;
 
@@ -2504,11 +2555,13 @@ void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 		SwitchMenu();
 	}
 	else if (((nID & 0xfff0)==SC_CLOSE) && (cv.PortType==IdTCPIP) &&
-	         cv.Open && ! cv.Ready && (cv.ComPort>0))
+	         cv.Open && ! cv.Ready && (cv.ComPort>0)) {
 		// now getting host address (see CommOpen() in commlib.c)
 		::PostMessage(HVTWin,WM_SYSCOMMAND,nID,lParam);
-	else
+	}
+	else {
 		CFrameWnd::OnSysCommand(nID,lParam);
+	}
 }
 
 void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -2516,19 +2569,23 @@ void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	if ((nChar==VK_F10) ||
 	    (ts.MetaKey>0) &&
 	    ((MainMenu==NULL) || (nChar!=VK_MENU)) &&
-	    ((nFlags & 0x2000) != 0))
+		((nFlags & 0x2000) != 0)) {
 		KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff);
 		// OnKeyDown(nChar,nRepCnt,nFlags);
-	else
+	}
+	else {
 		CFrameWnd::OnSysKeyDown(nChar,nRepCnt,nFlags);
+	}
 }
 
 void CVTWindow::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (nChar==VK_F10)
+	if (nChar==VK_F10) {
 		OnKeyUp(nChar,nRepCnt,nFlags);
-	else
+	}
+	else {
 		CFrameWnd::OnSysKeyUp(nChar,nRepCnt,nFlags);
+	}
 }
 
 void CVTWindow::OnTimer(UINT nIDEvent)
@@ -2542,8 +2599,9 @@ void CVTWindow::OnTimer(UINT nIDEvent)
 			T = GetCaretBlinkTime();
 			SetCaretBlinkTime(T);
 		}
-		else
+		else {
 			::KillTimer(HVTWin,IdCaretTimer);
+		}
 		return;
 	}
 	else if (nIDEvent==IdScrollTimer) {
@@ -2551,8 +2609,9 @@ void CVTWindow::OnTimer(UINT nIDEvent)
 		::ScreenToClient(HVTWin,&Point);
 		DispAutoScroll(Point);
 		if ((Point.x < 0) || (Point.x >= ScreenWidth) ||
-		    (Point.y < 0) || (Point.y >= ScreenHeight))
+			(Point.y < 0) || (Point.y >= ScreenHeight)) {
 			::PostMessage(HVTWin,WM_MOUSEMOVE,MK_LBUTTON,MAKELONG(Point.x,Point.y));
+		}
 		return;
 	}
 	else if (nIDEvent == IdCancelConnectTimer) {
@@ -2582,19 +2641,22 @@ void CVTWindow::OnTimer(UINT nIDEvent)
 				break;
 			}
 			cv.Ready = FALSE;
-			if (cv.TelFlag)
+			if (cv.TelFlag) {
 				EndTelnet();
+			}
 			PortType = cv.PortType;
 			CommClose(&cv);
 			SetDdeComReady(0);
 			if ((PortType==IdTCPIP) &&
-				((ts.PortFlag & PF_BEEPONCONNECT) != 0))
+				((ts.PortFlag & PF_BEEPONCONNECT) != 0)) {
 				MessageBeep(0);
+			}
 			if ((PortType==IdTCPIP) &&
 				(ts.AutoWinClose>0) &&
 				::IsWindowEnabled(HVTWin) &&
-				((HTEKWin==NULL) || ::IsWindowEnabled(HTEKWin)) )
+				((HTEKWin==NULL) || ::IsWindowEnabled(HTEKWin)) ) {
 				OnClose();
+			}
 			else {
 				ChangeTitle();
 				if (ts.ClearScreenOnCloseConnection) {
@@ -2617,15 +2679,30 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	SCROLLINFO si;
 
 	switch (nSBCode) {
-	case SB_BOTTOM: Func = SCROLL_BOTTOM; break;
-	case SB_ENDSCROLL: return;
-	case SB_LINEDOWN: Func = SCROLL_LINEDOWN; break;
-	case SB_LINEUP: Func = SCROLL_LINEUP; break;
-	case SB_PAGEDOWN: Func = SCROLL_PAGEDOWN; break;
-	case SB_PAGEUP: Func = SCROLL_PAGEUP; break;
+	case SB_BOTTOM:
+		Func = SCROLL_BOTTOM;
+		break;
+	case SB_ENDSCROLL:
+		return;
+	case SB_LINEDOWN:
+		Func = SCROLL_LINEDOWN;
+		break;
+	case SB_LINEUP:
+		Func = SCROLL_LINEUP;
+		break;
+	case SB_PAGEDOWN:
+		Func = SCROLL_PAGEDOWN;
+		break;
+	case SB_PAGEUP:
+		Func = SCROLL_PAGEUP;
+		break;
 	case SB_THUMBPOSITION:
-	case SB_THUMBTRACK: Func = SCROLL_POS; break;
-	case SB_TOP: Func = SCROLL_TOP; break;
+	case SB_THUMBTRACK:
+		Func = SCROLL_POS;
+		break;
+	case SB_TOP:
+		Func = SCROLL_TOP;
+		break;
 	default:
 		return;
 	}
@@ -2645,8 +2722,9 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 LONG CVTWindow::OnWindowPosChanging(UINT wParam, LONG lParam)
 {
 #ifdef ALPHABLEND_TYPE2
-	if(BGEnable && BGNoCopyBits)
+	if(BGEnable && BGNoCopyBits) {
 		((WINDOWPOS*)lParam)->flags |= SWP_NOCOPYBITS;
+	}
 #endif
 
 	return CFrameWnd::DefWindowProc(WM_WINDOWPOSCHANGING,wParam,lParam);
@@ -2691,10 +2769,12 @@ LONG CVTWindow::OnIMEComposition(UINT wParam, LONG lParam)
 	char *mbstr;
 	int mlen;
 
-	if (CanUseIME())
+	if (CanUseIME()) {
 		hstr = GetConvString(wParam, lParam);
-	else
+	}
+	else {
 		hstr = NULL;
+	}
 
 	if (hstr!=NULL) {
 		//lpstr = (LPSTR)GlobalLock(hstr);
@@ -2702,8 +2782,9 @@ LONG CVTWindow::OnIMEComposition(UINT wParam, LONG lParam)
 		if (lpstr!=NULL) {
 			mlen = wcstombs(NULL, lpstr, 0);
 			mbstr = (char *)malloc(sizeof(char) * (mlen + 1));
-			if (mbstr == NULL)
+			if (mbstr == NULL) {
 				goto skip;
+			}
 			Len = wcstombs(mbstr, lpstr, mlen + 1);
 
 			// add this string into text buffer of application
@@ -2711,15 +2792,20 @@ LONG CVTWindow::OnIMEComposition(UINT wParam, LONG lParam)
 			if (Len==1) {
 				switch (mbstr[0]) {
 				case 0x20:
-					if (ControlKey()) mbstr[0] = 0; /* Ctrl-Space */
+					if (ControlKey()) {
+						mbstr[0] = 0; /* Ctrl-Space */
+					}
 					break;
 				case 0x5c: // Ctrl-\ support for NEC-PC98
-					if (ControlKey()) mbstr[0] = 0x1c;
+					if (ControlKey()) {
+						mbstr[0] = 0x1c;
+					}
 					break;
 				}
 			}
-			if (ts.LocalEcho>0)
+			if (ts.LocalEcho>0) {
 				CommTextEcho(&cv,mbstr,Len);
+			}
 			CommTextOut(&cv,mbstr,Len);
 
 			free(mbstr);
@@ -2729,8 +2815,7 @@ skip:
 		GlobalFree(hstr);
 		return 0;
 	}
-	return CFrameWnd::DefWindowProc
-		(WM_IME_COMPOSITION,wParam,lParam);
+	return CFrameWnd::DefWindowProc(WM_IME_COMPOSITION,wParam,lParam);
 }
 
 LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
@@ -2798,12 +2883,15 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 			SelectNextWin(HVTWin,-1);
 			break;
 		case IdCmdLocalEcho:
-			if (ts.LocalEcho==0)
+			if (ts.LocalEcho==0) {
 				ts.LocalEcho = 1;
-			else
+			}
+			else {
 				ts.LocalEcho = 0;
-			if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+			}
+			if (cv.Ready && cv.TelFlag && (ts.TelEcho>0)) {
 				TelChangeEcho();
+			}
 			break;
 		case IdCmdDisconnect: // called by TTMACRO
 			OnFileDisconnect();
@@ -2827,8 +2915,9 @@ LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
 
 // TTXKanjiMenu のために、メニューが表示されていても
 // 再描画するようにした。 (2007.7.14 maya)
-	if (Show != (MainMenu!=NULL))
+	if (Show != (MainMenu!=NULL)) {
 		AdjustSize = TRUE;
+	}
 
 	if (MainMenu!=NULL) {
 		DestroyMenu(MainMenu);
@@ -2836,12 +2925,14 @@ LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
 	}
 
 	if (! Show) {
-		if (WinMenu!=NULL)
+		if (WinMenu!=NULL) {
 			DestroyMenu(WinMenu);
+		}
 		WinMenu = NULL;
 	}
-	else
+	else {
 		InitMenu(&MainMenu);
+	}
 
 	::SetMenu(HVTWin, MainMenu);
 	::DrawMenuBar(HVTWin);
@@ -2886,8 +2977,9 @@ LONG CVTWindow::OnChangeTBar(UINT wParam, LONG lParam)
 	Style = GetWindowLong (HVTWin, GWL_STYLE);
 	ExStyle = GetWindowLong (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
-	if (TBar == (ts.HideTitle==0))
+	if (TBar == (ts.HideTitle==0)) {
 		return 0;
+	}
 
 #ifndef WINDOW_MAXMIMUM_ENABLED
 	if (ts.HideTitle>0)
@@ -2902,8 +2994,8 @@ LONG CVTWindow::OnChangeTBar(UINT wParam, LONG lParam)
 	                      WS_MINIMIZEBOX | WS_MAXIMIZEBOX) | WS_BORDER | WS_POPUP;
 
 #ifdef ALPHABLEND_TYPE2
-	if(BGNoFrame) {
-		Style   &= ~(WS_THICKFRAME | WS_BORDER);
+		if(BGNoFrame) {
+			Style   &= ~(WS_THICKFRAME | WS_BORDER);
 			ExStyle &= ~WS_EX_CLIENTEDGE;
 		}else{
 			ExStyle |=  WS_EX_CLIENTEDGE;
@@ -2959,16 +3051,19 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 {
 	CommStart(&cv,lParam,&ts);
 #ifndef NO_INET6
-	if (ts.PortType == IdTCPIP && cv.RetryWithOtherProtocol == TRUE)
+	if (ts.PortType == IdTCPIP && cv.RetryWithOtherProtocol == TRUE) {
 		Connecting = TRUE;
-	else
+	}
+	else {
 		Connecting = FALSE;
+	}
 #else
 	Connecting = FALSE;
 #endif /* NO_INET6 */
 	ChangeTitle();
-	if (! cv.Ready)
+	if (! cv.Ready) {
 		return 0;
+	}
 
 	/* Auto start logging (2007.5.31 maya) */
 	if (ts.LogAutoStart && ts.LogFN[0]==0) {
@@ -2982,8 +3077,9 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 	}
 
 	if ((ts.PortType==IdTCPIP) &&
-	    ((ts.PortFlag & PF_BEEPONCONNECT) != 0))
+	    ((ts.PortFlag & PF_BEEPONCONNECT) != 0)) {
 		MessageBeep(0);
+	}
 
 	if (cv.PortType==IdTCPIP) {
 		InitTelnet();
@@ -3030,23 +3126,27 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 				ts.CRSend = ts.TCPCRSend;
 				cv.CRSend = ts.TCPCRSend;
 			}
-			if (ts.TCPLocalEcho>0)
+			if (ts.TCPLocalEcho>0) {
 				ts.LocalEcho = ts.TCPLocalEcho;
+			}
 		}
 	}
 
 	if (DDELog || FileLog) {
 		if (! CreateLogBuf()) {
-			if (DDELog)
+			if (DDELog) {
 				EndDDE();
-			if (FileLog)
+			}
+			if (FileLog) {
 				FileTransEnd(OpLog);
+			}
 		}
 	}
 
 	if (BinLog) {
-		if (! CreateBinBuf())
+		if (! CreateBinBuf()) {
 			FileTransEnd(OpLog);
+		}
 	}
 
 	SetDdeComReady(1);
@@ -3077,8 +3177,9 @@ LONG CVTWindow::OnCommStart(UINT wParam, LONG lParam)
 LONG CVTWindow::OnDdeEnd(UINT wParam, LONG lParam)
 {
 	EndDDE();
-	if (CloseTT)
+	if (CloseTT) {
 		OnClose();
+	}
 	return 0;
 }
 
@@ -3140,8 +3241,10 @@ void CVTWindow::OnFileNewConnection()
 	strncpy_s(Command, sizeof(Command),"ttermpro ", _TRUNCATE);
 	GetHNRec.HostName = &Command[9];
 
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
+
 	if ((*GetHostName)(HVTWin,&GetHNRec)) {
 		if ((GetHNRec.PortType==IdTCPIP) &&
 		    (ts.HistoryList>0) &&
@@ -3215,8 +3318,9 @@ void CVTWindow::OnFileNewConnection()
 		}
 	}
 	else {/* canceled */
-		if (! cv.Ready)
-		SetDdeComReady(0);
+		if (! cv.Ready) {
+			SetDdeComReady(0);
+		}
 	}
 
 	FreeTTDLG();
@@ -3418,8 +3522,8 @@ void CVTWindow::OnLogMeInLaunch()
 
 void CVTWindow::OnFileLog()
 {
-  HelpId = HlpFileLog;
-  LogStart();
+	HelpId = HlpFileLog;
+	LogStart();
 }
 
 
@@ -3675,8 +3779,9 @@ void CVTWindow::OnFileQVSend()
 void CVTWindow::OnFileChangeDir()
 {
 	HelpId = HlpFileChangeDir;
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
 	(*ChangeDirectory)(HVTWin,ts.FileDir);
 	FreeTTDLG();
 }
@@ -3689,15 +3794,19 @@ void CVTWindow::OnFilePrint()
 
 void CVTWindow::OnFileDisconnect()
 {
-	if (! cv.Ready)
+	if (! cv.Ready) {
 		return;
+	}
+
 	get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
 	             "Disconnect?", ts.UILanguageFile);
 	if ((cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
-	                  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL))
+	                  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL)) {
 		return;
+	}
+
 	::PostMessage(HVTWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 }
 
@@ -3748,10 +3857,12 @@ void CVTWindow::OnEditClearScreen()
 {
 	LockBuffer();
 	BuffClearScreen();
-	if ((StatusLine>0) && (CursorY==NumOfLines-1))
+	if ((StatusLine>0) && (CursorY==NumOfLines-1)) {
 		MoveCursor(0,CursorY);
-	else
+	}
+	else {
 		MoveCursor(0,0);
+	}
 	BuffUpdateScroll();
 	BuffSetCaretWidth();
 	UnlockBuffer();
@@ -3833,16 +3944,20 @@ void CVTWindow::OnSetupTerminal()
 {
 	BOOL Ok;
 
-	if (ts.Language==IdRussian)
+	if (ts.Language==IdRussian) {
 		HelpId = HlpSetupTerminalRuss;
-	else
+	}
+	else {
 		HelpId = HlpSetupTerminal;
-	if (! LoadTTDLG())
+	}
+	if (! LoadTTDLG()) {
 		return;
+	}
 	Ok = (*SetupTerminal)(HVTWin, &ts);
 	FreeTTDLG();
-	if (Ok)
+	if (Ok) {
 		SetupTerm();
+	}
 }
 
 void CVTWindow::OnSetupWindow()
@@ -3854,8 +3969,9 @@ void CVTWindow::OnSetupWindow()
 	ts.VTFlag = 1;
 	ts.SampleFont = VTFont[0];
 
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
 
 	strncpy_s(orgTitle, sizeof(orgTitle), ts.Title, _TRUNCATE);
 	Ok = (*SetupWin)(HVTWin, &ts);
@@ -3882,10 +3998,12 @@ void CVTWindow::OnSetupWindow()
 
 void CVTWindow::OnSetupFont()
 {
-	if (ts.Language==IdRussian)
+	if (ts.Language==IdRussian) {
 		HelpId = HlpSetupFontRuss;
-	else
+	}
+	else {
 		HelpId = HlpSetupFont;
+	}
 	DispSetupFontDlg();
 }
 
@@ -3893,17 +4011,21 @@ void CVTWindow::OnSetupKeyboard()
 {
 	BOOL Ok;
 
-	if (ts.Language==IdRussian)
+	if (ts.Language==IdRussian) {
 		HelpId = HlpSetupKeyboardRuss;
-	else
+	}
+	else {
 		HelpId = HlpSetupKeyboard;
-	if (! LoadTTDLG()) return;
+	}
+	if (! LoadTTDLG()) {
+		return;
+	}
 	Ok = (*SetupKeyboard)(HVTWin, &ts);
 	FreeTTDLG();
 
 	if (Ok) {
-//	    ResetKeypadMode(TRUE);
-	    if ((ts.Language==IdJapanese) || (ts.Language==IdKorean)) //HKS
+//		ResetKeypadMode(TRUE);
+		if ((ts.Language==IdJapanese) || (ts.Language==IdKorean)) //HKS
 		ResetIME();
 	}
 }
@@ -3912,8 +4034,9 @@ void CVTWindow::OnSetupSerialPort()
 {
 	BOOL Ok;
 	HelpId = HlpSetupSerialPort;
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
 	Ok = (*SetupSerialPort)(HVTWin, &ts);
 	FreeTTDLG();
 
@@ -3923,19 +4046,22 @@ void CVTWindow::OnSetupSerialPort()
 				CommClose(&cv);
 				CommOpen(HVTWin,&ts,&cv);
 			}
-			else
+			else {
 				CommResetSerial(&ts, &cv, ts.ClearComBuffOnOpen);
+			}
 		}
-		else
+		else {
 			CommOpen(HVTWin,&ts,&cv);
+		}
 	}
 }
 
 void CVTWindow::OnSetupTCPIP()
 {
 	HelpId = HlpSetupTCPIP;
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
 	if ((*SetupTCPIP)(HVTWin, &ts)) {
 		TelUpdateKeepAliveInterval();
 	}
@@ -3945,10 +4071,10 @@ void CVTWindow::OnSetupTCPIP()
 void CVTWindow::OnSetupGeneral()
 {
 	HelpId = HlpSetupGeneral;
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
-	if ((*SetupGeneral)(HVTWin,&ts))
-	{
+	}
+	if ((*SetupGeneral)(HVTWin,&ts)) {
 		ResetCharSet();
 		ResetIME();
 	}
@@ -3962,11 +4088,15 @@ void CVTWindow::OnSetupSave()
 	int ret;
 
 	strncpy_s(TmpSetupFN, sizeof(TmpSetupFN),ts.SetupFName, _TRUNCATE);
-	if (! LoadTTFILE()) return;
+	if (! LoadTTFILE()) {
+		return;
+	}
 	HelpId = HlpSetupSave;
 	Ok = (*GetSetupFname)(HVTWin,GSF_SAVE,&ts);
 	FreeTTFILE();
-	if (! Ok) return;
+	if (! Ok) {
+		return;
+	}
 
 	// 書き込みできるかの判別を追加 (2005.11.3 yutaka)
 	if ((ret = _access(ts.SetupFName, 0x02)) != 0) {
@@ -4018,12 +4148,14 @@ void CVTWindow::OnSetupRestore()
 	BOOL Ok;
 
 	HelpId = HlpSetupRestore;
-	if (! LoadTTFILE())
+	if (! LoadTTFILE()) {
 		return;
+	}
 	Ok = (*GetSetupFname)(HVTWin,GSF_RESTORE,&ts);
 	FreeTTFILE();
-	if (Ok)
+	if (Ok) {
 		RestoreSetup();
+	}
 }
 
 void CVTWindow::OnSetupLoadKeyMap()
@@ -4031,12 +4163,14 @@ void CVTWindow::OnSetupLoadKeyMap()
 	BOOL Ok;
 
 	HelpId = HlpSetupLoadKeyMap;
-	if (! LoadTTFILE())
+	if (! LoadTTFILE()) {
 		return;
+	}
 	Ok = (*GetSetupFname)(HVTWin,GSF_LOADKEY,&ts);
 	FreeTTFILE();
-	if (! Ok)
+	if (! Ok) {
 		return;
+	}
 
 	// load key map
 	SetKeyMap();
@@ -4068,8 +4202,9 @@ void CVTWindow::OnControlResetRemoteTitle()
 
 void CVTWindow::OnControlAreYouThere()
 {
-	if (cv.Ready && (cv.PortType==IdTCPIP))
+	if (cv.Ready && (cv.PortType==IdTCPIP)) {
 		TelSendAYT();
+	}
 }
 
 void CVTWindow::OnControlSendBreak()
@@ -4101,9 +4236,10 @@ void ApplyBoradCastCommandHisotry(HWND Dialog, char *historyfile)
 		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Command%d", i);
 		GetPrivateProfileString("BroadcastCommands",EntName,"",
 		                        Command,sizeof(Command), historyfile);
-		if (strlen(Command) > 0)
+		if (strlen(Command) > 0) {
 			SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
 			                   0, (LPARAM)Command);
+		}
 		i++;
 	} while ((i <= ts.MaxBroadcatHistory) && (strlen(Command)>0));
 
@@ -4191,10 +4327,11 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 
 	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
 		hd = GetNthWin(i);
-		if (hd == NULL)
+		if (hd == NULL) {
 			break;
+		}
 
-        GetWindowText(hd, szWindowText, 256);
+		GetWindowText(hd, szWindowText, 256);
 		SendMessage(hWnd, LB_INSERTSTRING, -1, (LPARAM)szWindowText);
 	}
 
@@ -4229,8 +4366,9 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 				hd = GetNthWin(i);
 			}
 		}
-		if (hd == NULL)
+		if (hd == NULL) {
 			break;
+		}
 
 		ZeroMemory(&cds, sizeof(cds));
 		cds.dwData = IPC_BROADCAST_COMMAND;
@@ -4276,16 +4414,18 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 	nlen = strlen(name) + 1;
 	msglen = nlen + buflen;
 	msg = (char *)malloc(msglen);
-	if (msg == NULL)
+	if (msg == NULL) {
 		goto error;
+	}
 	strcpy_s(msg, msglen, name);
 	memcpy(msg + nlen, buf, buflen);
 
 	// すべてのTera Termにメッセージとデータを送る
 	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
 		hd = GetNthWin(i);
-		if (hd == NULL)
+		if (hd == NULL) {
 			break;
+		}
 
 		ZeroMemory(&cds, sizeof(cds));
 		cds.dwData = IPC_MULTICAST_COMMAND;
@@ -4474,44 +4614,44 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 						ret = GetDlgItemText(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
 						if (ret == 0) { // error
 							memset(buf, 0, sizeof(buf));
-					}
-
-					// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
-					history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
-					if (history) {
-						GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
-						if (LoadTTSET()) {
-							(*AddValueToList)(historyfile, buf, "BroadcastCommands", "Command",
-							                  ts.MaxBroadcatHistory);
-							FreeTTSET();
 						}
-						ApplyBoradCastCommandHisotry(hWnd, historyfile);
-						ts.BroadcastCommandHistory = TRUE;
-					}
-					else {
-						ts.BroadcastCommandHistory = FALSE;
-					}
-					checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
-					if (checked & BST_CHECKED) { // 改行コードあり
-						if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-							strncat_s(buf, sizeof(buf), "\r\n", _TRUNCATE);
 
-						} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-							strncat_s(buf, sizeof(buf), "\r", _TRUNCATE);
-
-						} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_LF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
-							strncat_s(buf, sizeof(buf), "\n", _TRUNCATE);
-
-						} else {
-							strncat_s(buf, sizeof(buf), "\r", _TRUNCATE);
-
+						// ブロードキャストコマンドの履歴を保存 (2007.3.3 maya)
+						history = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_GETCHECK, 0, 0);
+						if (history) {
+							GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
+							if (LoadTTSET()) {
+								(*AddValueToList)(historyfile, buf, "BroadcastCommands", "Command",
+												  ts.MaxBroadcatHistory);
+								FreeTTSET();
+							}
+							ApplyBoradCastCommandHisotry(hWnd, historyfile);
+							ts.BroadcastCommandHistory = TRUE;
 						}
-					}
+						else {
+							ts.BroadcastCommandHistory = FALSE;
+						}
+						checked = SendMessage(GetDlgItem(hWnd, IDC_ENTERKEY_CHECK), BM_GETCHECK, 0, 0);
+						if (checked & BST_CHECKED) { // 改行コードあり
+							if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CRLF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
+								strncat_s(buf, sizeof(buf), "\r\n", _TRUNCATE);
 
-					// 337: 2007/03/20 チェックされていたら親ウィンドウにのみ送信
-					checked = SendMessage(GetDlgItem(hWnd, IDC_PARENT_ONLY), BM_GETCHECK, 0, 0);
+							} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_CR), BM_GETCHECK, 0, 0) & BST_CHECKED) {
+								strncat_s(buf, sizeof(buf), "\r", _TRUNCATE);
 
-					SendAllBroadcastMessage(HVTWin, hWnd, checked, buf, strlen(buf));
+							} else if (SendMessage(GetDlgItem(hWnd, IDC_RADIO_LF), BM_GETCHECK, 0, 0) & BST_CHECKED) {
+								strncat_s(buf, sizeof(buf), "\n", _TRUNCATE);
+
+							} else {
+								strncat_s(buf, sizeof(buf), "\r", _TRUNCATE);
+
+							}
+						}
+
+						// 337: 2007/03/20 チェックされていたら親ウィンドウにのみ送信
+						checked = SendMessage(GetDlgItem(hWnd, IDC_PARENT_ONLY), BM_GETCHECK, 0, 0);
+
+						SendAllBroadcastMessage(HVTWin, hWnd, checked, buf, strlen(buf));
 					}
 
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
@@ -4545,18 +4685,21 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 						max = ListBox_GetCount(BroadcastWindowList);
 						n = 0;
 						for (i = 0 ; i < max ; i++) {
-							if (ListBox_GetSel(BroadcastWindowList, i))
+							if (ListBox_GetSel(BroadcastWindowList, i)) {
 								n++;
+							}
 						}
 						
 						if (max == 2) {  // エントリが2個の場合は常に全選択とする。
 							flag = TRUE;
 
 						} else {
-							if (n >= max - 1) // all select
+							if (n >= max - 1) { // all select
 								flag = FALSE;
-							else
+							}
+							else {
 								flag = TRUE;
+							}
 
 						}
 
@@ -4593,22 +4736,25 @@ void CVTWindow::OnControlBroadcastCommand(void)
 	RECT prc, rc;
 	LONG x, y;
 
-	if (hDlgWnd != NULL)
+	if (hDlgWnd != NULL) {
 		goto activate;
+	}
 
 	hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
 	                       HVTWin, (DLGPROC)BroadcastCommandDlgProc);
 
-	if (hDlgWnd == NULL)
+	if (hDlgWnd == NULL) {
 		return;
+	}
 
 	// ダイアログをウィンドウの真上に配置する (2008.1.25 yutaka)
 	GetWindowRect(&prc);
 	::GetWindowRect(hDlgWnd, &rc);
 	x = prc.left;
 	y = prc.top - (rc.bottom - rc.top);
-	if (y < 0)
+	if (y < 0) {
 		y = 0;
+	}
 	::SetWindowPos(hDlgWnd, NULL, x, y,  0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
 activate:;
@@ -4623,11 +4769,13 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 	int buflen, msglen, nlen;
 	int sending = 0;
 
-	if (!cv.Ready)
+	if (!cv.Ready) {
 		return 0;
+	}
 
-	if (!ts.AcceptBroadcast)	// 337: 2007/03/20
+	if (!ts.AcceptBroadcast) { // 337: 2007/03/20
 		return 0;
+	}
 
 	// 未送信データがある場合は先に送信する
 	// データ量が多い場合は送信しきれない可能性がある
@@ -4676,16 +4824,18 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 
 void CVTWindow::OnControlOpenTEK()
 {
-  OpenTEK();
+	OpenTEK();
 }
 
 void CVTWindow::OnControlCloseTEK()
 {
 	if ((HTEKWin==NULL) ||
-	    ! ::IsWindowEnabled(HTEKWin))
+		! ::IsWindowEnabled(HTEKWin)) {
 		MessageBeep(0);
-	else
+	}
+	else {
 		::DestroyWindow(HTEKWin);
+	}
 }
 
 void CVTWindow::OnControlMacro()
@@ -4698,12 +4848,14 @@ void CVTWindow::OnWindowWindow()
 	BOOL Close;
 
 	HelpId = HlpWindowWindow;
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
 	(*WindowWindow)(HVTWin,&Close);
 	FreeTTDLG();
-	if (Close)
+	if (Close) {
 		OnClose();
+	}
 }
 
 void CVTWindow::OnHelpIndex()
@@ -4713,8 +4865,9 @@ void CVTWindow::OnHelpIndex()
 
 void CVTWindow::OnHelpAbout()
 {
-	if (! LoadTTDLG())
+	if (! LoadTTDLG()) {
 		return;
+	}
 	(*AboutDialog)(HVTWin);
 	FreeTTDLG();
 }

@@ -49,20 +49,20 @@ CTeraApp theApp;
 // CTeraApp initialization
 BOOL CTeraApp::InitInstance()
 {
-  // インストーラで実行を検出するために mutex を作成する (2006.8.12 maya)
-  // 2重起動防止のためではないので、特に返り値は見ない
-  HANDLE hMutex;
-  hMutex = CreateMutex(NULL, TRUE, "TeraTermProAppMutex");
+	// インストーラで実行を検出するために mutex を作成する (2006.8.12 maya)
+	// 2重起動防止のためではないので、特に返り値は見ない
+	HANDLE hMutex;
+	hMutex = CreateMutex(NULL, TRUE, "TeraTermProAppMutex");
 
-  hInst = m_hInstance;
-  m_pMainWnd = new CVTWindow();
-  pVTWin = m_pMainWnd;
-  return TRUE;
+	hInst = m_hInstance;
+	m_pMainWnd = new CVTWindow();
+	pVTWin = m_pMainWnd;
+	return TRUE;
 }
 
 int CTeraApp::ExitInstance()
 {
-  return CWinApp::ExitInstance();
+	return CWinApp::ExitInstance();
 }
 
 // Tera Term main engine
@@ -117,8 +117,9 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 						// 現象への暫定対処。(2006.2.6 yutaka)
 						Sleep(1);
 					}
-					else
+					else {
 						Change = IdVT;
+					}
 					break;
 
 				default:
@@ -126,31 +127,45 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 				}
 
 				switch (Change) {
-				case IdVT: VTActivate(); break;
-				case IdTEK: ((CVTWindow*)pVTWin)->OpenTEK(); break;
+					case IdVT:
+						VTActivate();
+						break;
+					case IdTEK:
+						((CVTWindow*)pVTWin)->OpenTEK();
+						break;
 				}
 			}
 		}
 
 		if (cv.LogBuf!=NULL)
 		{
-			if (FileLog) LogToFile();
-			if (DDELog && AdvFlag) DDEAdv();
+			if (FileLog) {
+				LogToFile();
+			}
+			if (DDELog && AdvFlag) {
+				DDEAdv();
+			}
 			GlobalUnlock(cv.HLogBuf);
 			cv.LogBuf = NULL;
 		}
 
 		if (cv.BinBuf!=NULL)
 		{
-			if (BinLog) LogToFile();
+			if (BinLog) {
+				LogToFile();
+			}
 			GlobalUnlock(cv.HBinBuf);
 			cv.BinBuf = NULL;
 		}
 
 		/* Talker */
 		switch (TalkStatus) {
-		case IdTalkCB: CBSend(); break; /* clip board */
-		case IdTalkFile: FileSend(); break; /* file */
+		case IdTalkCB:
+			CBSend();
+			break; /* clip board */
+		case IdTalkFile:
+			FileSend();
+			break; /* file */
 		}
 
 		/* Receiver */
@@ -167,19 +182,22 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 	}
 
 	if (cv.Ready &&
-		(cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) ||
-		(cv.LCount>0) || (cv.BCount>0) || (cv.DCount>0)) )
+	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.LCount>0) || (cv.BCount>0) || (cv.DCount>0)) ) {
 		Busy = 2;
-	else
+	}
+	else {
 		Busy--;
+	}
 
 	return (Busy>0);
 }
 
 BOOL CTeraApp::PreTranslateMessage(MSG* pMsg)
 {
-  if (ts.MetaKey>0)
-    return FALSE; /* ignore accelerator keys */
-  else
-    return CWinApp::PreTranslateMessage(pMsg);
+	if (ts.MetaKey>0) {
+		return FALSE; /* ignore accelerator keys */
+	}
+	else {
+		return CWinApp::PreTranslateMessage(pMsg);
+	}
 }

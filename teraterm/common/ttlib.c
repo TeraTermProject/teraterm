@@ -107,9 +107,10 @@ void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt)
 	Temp[j] = 0;
 
 	if ((NumOfDots==0) &&
-	    (DefExt!=NULL))
+	    (DefExt!=NULL)) {
 		/* add the default extension */
 		strncat_s(Temp,sizeof(Temp),DefExt,_TRUNCATE);
+	}
 
 	strncpy_s(FileName,destlen,Temp,_TRUNCATE);
 }
@@ -119,8 +120,9 @@ void AppendSlash(PCHAR Path, int destlen)
 {
 	if (strcmp(CharPrev((LPCTSTR)Path,
 	           (LPCTSTR)(&Path[strlen(Path)])),
-	           "\\") != 0)
+	           "\\") != 0) {
 		strncat_s(Path,destlen,"\\",_TRUNCATE);
+	}
 }
 
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP)
@@ -146,15 +148,19 @@ void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP)
 			if (j < MaxHexLen-2) {
 				Hex[j] = '$';
 				j++;
-				if (b<=0x9f)
+				if (b<=0x9f) {
 					Hex[j] = (char)((b >> 4) + 0x30);
-				else
+				}
+				else {
 					Hex[j] = (char)((b >> 4) + 0x37);
+				}
 				j++;
-				if ((b & 0x0f) <= 0x9)
+				if ((b & 0x0f) <= 0x9) {
 					Hex[j] = (char)((b & 0x0f) + 0x30);
-				else
+				}
+				else {
 					Hex[j] = (char)((b & 0x0f) + 0x37);
+				}
 				j++;
 			}
 		}
@@ -164,14 +170,18 @@ void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP)
 
 BYTE ConvHexChar(BYTE b)
 {
-	if ((b>='0') && (b<='9'))
+	if ((b>='0') && (b<='9')) {
 		return (b - 0x30);
-	else if ((b>='A') && (b<='F'))
+	}
+	else if ((b>='A') && (b<='F')) {
 		return (b - 0x37);
-	else if ((b>='a') && (b<='f'))
+	}
+	else if ((b>='a') && (b<='f')) {
 		return (b - 0x57);
-	else
+	}
+	else {
 		return 0;
+	}
 }
 
 int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen)
@@ -186,16 +196,20 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen)
 		b = Hex[i];
 		if (b=='$') {
 			i++;
-			if (i < imax)
+			if (i < imax) {
 				c = Hex[i];
-			else
+			}
+			else {
 				c = 0x30;
+			}
 			b = ConvHexChar(c) << 4;
 			i++;
-			if (i < imax)
+			if (i < imax) {
 				c = Hex[i];
-			else
+			}
+			else {
 				c = 0x30;
+			}
 			b = b + ConvHexChar(c);
 		};
 
@@ -203,8 +217,9 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen)
 		j++;
 		i++;
 	}
-	if (j<MaxLen)
+	if (j<MaxLen) {
 		Str[j] = 0;
+	}
 
 	return j;
 }
@@ -221,8 +236,9 @@ long GetFSize(PCHAR FName)
 {
 	struct _stat st;
 
-	if (_stat(FName,&st)==-1)
+	if (_stat(FName,&st)==-1) {
 		return 0;
+	}
 	return (long)st.st_size;
 }
 
@@ -240,10 +256,12 @@ void QuoteFName(PCHAR FName)
 {
 	int i;
 
-	if (FName[0]==0)
+	if (FName[0]==0) {
 		return;
-	if (strchr(FName,' ')==NULL)
+	}
+	if (strchr(FName,' ')==NULL) {
 		return;
+	}
 	i = strlen(FName);
 	memmove(&(FName[1]),FName,i);
 	FName[0] = '\"';
@@ -474,8 +492,9 @@ void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName
 	int DirLen, FNPos;
 
 	FName[0] = 0;
-	if ( ! GetFileNamePos(Temp,&DirLen,&FNPos) )
+	if ( ! GetFileNamePos(Temp,&DirLen,&FNPos) ) {
 		return;
+	}
 	FitFileName(&Temp[FNPos],templen - FNPos,DefExt);
 	if ( DirLen==0 ) {
 		strncpy_s(FName,destlen,HomeDir,_TRUNCATE);
@@ -535,8 +554,9 @@ void GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
 	k = 0;
 	do {
 		c = Source[j];
-		if ( c==',' )
+		if ( c==',' ) {
 			i++;
+		}
 		j++;
 		if ( (i==Nth) && (c!=',') && (k<Size-1) ) {
 			Dest[k] = c;
@@ -552,8 +572,9 @@ void GetNthNum(PCHAR Source, int Nth, int far *Num)
 	char T[15];
 
 	GetNthString(Source,Nth,sizeof(T),T);
-	if (sscanf(T, "%d", Num) != 1)
+	if (sscanf(T, "%d", Num) != 1) {
 		*Num = 0;
+	}
 }
 
 void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen)

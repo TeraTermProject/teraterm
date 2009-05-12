@@ -140,17 +140,22 @@ WORD FAR PASCAL JIS2SJIS(WORD KCode)
 	n1 = (KCode-0x2121) / 0x200;
 	n2 = (KCode-0x2121) % 0x200;
 
-	if (n1<=0x1e)
+	if (n1<=0x1e) {
 		SJIS = 0x8100 + n1*256;
-	else
+	}
+	else {
 		SJIS = 0xC100 + n1*256;
+	}
 
-	if (n2<=0x3e)
+	if (n2<=0x3e) {
 		return (SJIS + n2 + 0x40);
-	else if ((n2>=0x3f) && (n2<=0x5d))
+	}
+	else if ((n2>=0x3f) && (n2<=0x5d)) {
 		return (SJIS + n2 + 0x41);
-	else
+	}
+	else {
 		return (SJIS + n2 - 0x61);
+	}
 }
 
 /* Russian charset conversion table by Andrey Nikiforov 19971114 */
@@ -307,8 +312,9 @@ BYTE FAR PASCAL RussConv(int cin, int cout, BYTE b)
 // cin: input character set (IdWindows/IdKOI8/Id866/IdISO)
 // cin: output character set (IdWindows/IdKOI8/Id866/IdISO)
 {
-	if (b<128)
+	if (b<128) {
 		return b;
+	}
 	return cpconv[cin-1][cout-1][b-128];
 }
 
@@ -319,10 +325,13 @@ void FAR PASCAL RussConvStr(int cin, int cout, PCHAR Str, int count)
 {
 	int i;
 
-	if (count<=0)
+	if (count<=0) {
 		return;
+	}
 
-	for (i=0; i<=count-1; i++)
-		if ((BYTE)Str[i]>=128)
+	for (i=0; i<=count-1; i++) {
+		if ((BYTE)Str[i]>=128) {
 			Str[i] = (char)cpconv[cin-1][cout-1][(BYTE)Str[i]-128];
+		}
+	}
 }
