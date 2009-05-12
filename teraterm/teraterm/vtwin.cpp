@@ -3999,12 +3999,7 @@ void CVTWindow::OnSetupWindow()
 
 void CVTWindow::OnSetupFont()
 {
-	if (ts.Language==IdRussian) {
-		HelpId = HlpSetupFontRuss;
-	}
-	else {
-		HelpId = HlpSetupFont;
-	}
+	HelpId = HlpSetupFont;
 	DispSetupFontDlg();
 }
 

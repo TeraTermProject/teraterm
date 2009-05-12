@@ -21,7 +21,6 @@
 #define HlpSetupTerminalRuss    14
 #define HlpSetupWindow          15
 #define HlpSetupFont            16
-#define HlpSetupFontRuss        17
 #define HlpSetupKeyboard        18
 #define HlpSetupKeyboardRuss    19
 #define HlpSetupSerialPort      20
