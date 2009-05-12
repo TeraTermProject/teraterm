@@ -2288,6 +2288,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_HEARTBEATLABEL2, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_HEARTBEAT_UNIT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_HEARTBEATLABEL2, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_REMEMBERPASSWORD, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_PASSWORD", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_REMEMBERPASSWORD, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_FORWARDAGENT, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_FORWARDAGENT, pvar->ts->UIMsg);
@@ -2342,6 +2345,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 		SetDlgItemText(dlg, IDC_HEARTBEAT_EDIT, buf);
 	}
 
+	if (pvar->settings.remember_password) {
+		CheckDlgButton(dlg, IDC_REMEMBERPASSWORD, TRUE);
+	}
 	if (pvar->settings.ForwardAgent) {
 		CheckDlgButton(dlg, IDC_FORWARDAGENT, TRUE);
 	}
@@ -2483,6 +2489,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 		i = 60;
 	pvar->settings.ssh_heartbeat_overtime = i;
 
+	pvar->settings.remember_password = IsDlgButtonChecked(dlg, IDC_REMEMBERPASSWORD);
 	pvar->settings.ForwardAgent = IsDlgButtonChecked(dlg, IDC_FORWARDAGENT);
 }
 
@@ -2610,6 +2617,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_HEARTBEATLABEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HEARTBEAT_EDIT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HEARTBEATLABEL2, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_REMEMBERPASSWORD, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FORWARDAGENT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));

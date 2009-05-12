@@ -153,6 +153,7 @@
 #define IDC_SSHUSETIS                   1204
 #define IDC_SSHUSEPAGEANT               1205
 #define IDC_SSHUSETIS2                  1206
+#define IDC_REMEMBERPASSWORD            1207
 
 // Next default values for new objects
 // 
@@ -160,7 +161,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        108
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1105
+#define _APS_NEXT_CONTROL_VALUE         1208
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
