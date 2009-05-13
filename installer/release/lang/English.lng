@@ -588,6 +588,7 @@ DLG_SSHSETUP_KNOWNHOST_RW=Read/&write file:
 DLG_SSHSETUP_KNOWNHOST_RO=&Read-only files:
 DLG_SSHSETUP_HEARTBEAT=HeartBeat(&keep-alive)
 DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 to turn off)
+DLG_SSHSETUP_PASSWORD=Remember password on &memory
 DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_NOTICE=All options take effect the next time a session is started.
 
