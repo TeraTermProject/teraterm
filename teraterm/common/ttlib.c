@@ -800,8 +800,8 @@ int List2KanjiCode(int lang, int list)
 	};
 	lang--;
 	list--;
-	if (list < 1) {
-		list = 1;
+	if (list < 0) {
+		list = 0;
 	}
 	return Table[lang][list];
 }
