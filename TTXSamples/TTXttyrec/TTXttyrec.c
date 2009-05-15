@@ -20,16 +20,20 @@
 #define ORDER 6000
 #define ID_MENUITEM 55301
 
+#define INISECTION "ttyrec"
+
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
 typedef struct {
   PTTSet ts;
   PComVar cv;
+  PReadIniFile origReadIniFile;
   Trecv origPrecv;
   TReadFile origPReadFile;
   HANDLE fh;
-  BOOL record;
   HMENU FileMenu;
+  BOOL record;
+  BOOL rec_stsize;
 } TInstVar;
 
 struct recheader {
@@ -66,47 +70,80 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
+BOOL GetOnOff(PCHAR sect, PCHAR key, PCHAR fn, BOOL def) {
+  char buff[4];
+
+  GetPrivateProfileString(sect, key, "", buff, sizeof(buff), fn);
+
+  if (def) {
+    if (_stricmp(buff, "off") == 0) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+  else {
+    if (_stricmp(buff, "on") == 0) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+}
+
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->origPrecv = NULL;
   pvar->origPReadFile = NULL;
   pvar->fh = INVALID_HANDLE_VALUE;
+  pvar->rec_stsize = FALSE;
   pvar->record = FALSE;
 }
 
-int PASCAL FAR TTXrecv(SOCKET s, char FAR *buff, int len, int flags) {
-  struct recheader h;
+static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+  (pvar->origReadIniFile)(fn, ts);
+  pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, FALSE);
+}
+
+void WriteData(HANDLE fh, char *buff, int len) {
+  struct timeval t;
   int b[3], w;
 
-  h.len = pvar->origPrecv(s, buff, len, flags);
-  if (pvar->record && h.len > 0) {
-    gettimeofday(&h.tv, NULL);
-    b[0] = h.tv.tv_sec;
-    b[1] = h.tv.tv_usec;
-    b[2] = h.len;
-    WriteFile(pvar->fh, b, sizeof(b), &w, NULL);
-    WriteFile(pvar->fh, buff, h.len, &w, NULL);
+  gettimeofday(&t, NULL);
+  b[0] = t.tv_sec;
+  b[1] = t.tv_usec;
+  b[2] = len;
+  WriteFile(pvar->fh, b, sizeof(b), &w, NULL);
+  WriteFile(pvar->fh, buff, len, &w, NULL);
+
+  return;
+}
+
+static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR *hooks) {
+  pvar->origReadIniFile = *hooks->ReadIniFile;
+  *hooks->ReadIniFile = TTXReadIniFile;
+}
+
+int PASCAL FAR TTXrecv(SOCKET s, char FAR *buff, int len, int flags) {
+  int rlen;
+
+  rlen = pvar->origPrecv(s, buff, len, flags);
+  if (pvar->record && rlen > 0) {
+    WriteData(pvar->fh, buff, rlen);
   }
-  return h.len;
+  return rlen;
 }
 
 BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVERLAPPED rol) {
-  struct recheader h;
-  int b[3], w;
-
   if (!pvar->origPReadFile(fh, buff, len, rbytes, rol))
     return FALSE;
 
   if (pvar->record && *rbytes > 0) {
-    gettimeofday(&h.tv, NULL);
-    b[0] = h.tv.tv_sec;
-    b[1] = h.tv.tv_usec;
-    b[2] = *rbytes;
-    WriteFile(pvar->fh, b, sizeof(b), &w, NULL);
-    WriteFile(pvar->fh, buff, *rbytes, &w, NULL);
-  };
-
+    WriteData(pvar->fh, buff, *rbytes);
+  }
   return TRUE;
 }
 
@@ -159,6 +196,8 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
 static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
   OPENFILENAME ofn;
   char fname[MAX_PATH];
+  char buff[20];
+
   fname[0] = '\0';
 
   if (cmd==ID_MENUITEM) {
@@ -189,6 +228,11 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 	if (pvar->fh != INVALID_HANDLE_VALUE) {
 	  pvar->record = TRUE;
 	  CheckMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_CHECKED);
+	  if (pvar->rec_stsize) {
+	    _snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
+	                pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
+	    WriteData(pvar->fh, buff, strlen(buff));
+	  }
 	}
       }
     }
@@ -210,7 +254,7 @@ static TTXExports Exports = {
 
   TTXInit,
   NULL, // TTXGetUIHooks,
-  NULL, // TTXGetSetupHooks,
+  TTXGetSetupHooks,
   TTXOpenTCP,
   TTXCloseTCP,
   NULL, // TTXSetWinSize,
