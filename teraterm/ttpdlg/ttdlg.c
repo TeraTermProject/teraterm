@@ -64,7 +64,7 @@ static PCHAR far RussList2[] = {"Windows","KOI8-R",NULL};
 static PCHAR far LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
 
 // HKS
-static PCHAR far KoreanList[] = {"KS5601", "UTF-8", NULL};
+static PCHAR far KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
 static PCHAR far KoreanListSend[] = {"KS5601", "UTF-8", NULL};
 
 // UTF-8
@@ -135,7 +135,11 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSFONTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSFONT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				}
-				else if (ts->Language==IdUtf8) {
+				else if (ts->Language==IdUtf8 || ts->Language==IdKorean) {
+					SendDlgItemMessage(Dialog, IDC_TERMKANJILABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANJI, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANJISENDLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_TERMKANJISEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_LOCALE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
@@ -228,7 +232,13 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				get_lang_msg("DLG_TERM_RUSSFONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 				SetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg);
 			}
-			else if (ts->Language==IdUtf8) {
+			else if (ts->Language==IdUtf8 || ts->Language==IdKorean) {
+				GetDlgItemText(Dialog, IDC_TERMKANJILABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERMK_KANJI", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKANJILABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_TERMKANJISENDLABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERMK_KANJISEND", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_TERMKANJISENDLABEL, uimsg);
 				GetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg2, sizeof(uimsg2));
 				get_lang_msg("DLG_TERM_LOCALE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 				SetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg);
@@ -311,8 +321,8 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SetDropDownList(Dialog,IDC_TERMRUSSFONT,RussList,ts->RussFont);
 			}
 			else if (ts->Language==IdKorean) { // HKS
-				SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, (ts->KanjiCode==IdUTF8)? 2:1);
-				SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, (ts->KanjiCodeSend==IdUTF8)? 2:1);
+				SetDropDownList(Dialog, IDC_TERMKANJI, KoreanList, KanjiCode2List(ts->Language,ts->KanjiCode));
+				SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
 
 				// ロケール用テキストボックス
 				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
@@ -322,7 +332,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			}
 			else if (ts->Language==IdUtf8) {
 				SetDropDownList(Dialog, IDC_TERMKANJI, Utf8List, KanjiCode2List(ts->Language,ts->KanjiCode));
-				SetDropDownList(Dialog, IDC_TERMKANJISEND, Utf8ListSend, KanjiCode2List(ts->Language,ts->KanjiCode));
+				SetDropDownList(Dialog, IDC_TERMKANJISEND, Utf8ListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
 
 				// ロケール用テキストボックス
 				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
@@ -394,29 +404,8 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							ts->RussClient = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT);
 							ts->RussFont = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT);
 						}
-						else if (ts->Language==IdKorean) { // HKS
-							BOOL ret;
-
-							ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-							if(ts->KanjiCode==2) {
-								ts->KanjiCode=IdUTF8;
-							}
-							ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
-							if(ts->KanjiCodeSend==2) {
-								ts->KanjiCodeSend=IdUTF8;
-							}
-							ts->JIS7KatakanaSend=0;
-							ts->JIS7Katakana=0;
-							ts->KanjiIn = 0;
-							ts->KanjiOut = 0;
-
-							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
-							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
-							if(ts->CodePage==932) {
-								ts->Language = IdJapanese;
-							}
-						}
-						else if (ts->Language==IdUtf8) {
+						else if (ts->Language==IdKorean || // HKS
+						         ts->Language==IdUtf8) {
 							BOOL ret;
 							WORD listId;
 

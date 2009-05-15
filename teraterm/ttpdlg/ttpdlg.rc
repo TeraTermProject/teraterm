@@ -55,12 +55,12 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-// äÿçëåÍ resources
+// âpåÍ (ïƒçë) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
-LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
-#pragma code_page(949)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 #endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 // Dialog
 //
 
-IDD_TERMDLGK DIALOGEX 20, 20, 245, 158
+IDD_TERMDLGK DIALOGEX 20, 20, 245, 145
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Tera Term: Terminal setup"
 FONT 10, "System", 0, 0, 0x0
@@ -90,36 +90,18 @@ BEGIN
     LTEXT           "&Answerback:",IDC_TERMANSBACKTEXT,9,82,44,10,NOT WS_GROUP
     EDITTEXT        IDC_TERMANSBACK,55,80,61,12,ES_AUTOHSCROLL | WS_GROUP
     CONTROL         "A&uto switch (VT<->TEK)",IDC_TERMAUTOSWITCH,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,123,80,110,12
-    GROUPBOX        "Coding (receive)",IDC_TERMKANJILABEL,7,96,65,40
-    COMBOBOX        IDC_TERMKANJI,11,107,39,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Coding (transmit)",IDC_TERMKANJISENDLABEL,77,96,158,40
-    COMBOBOX        IDC_TERMKANJISEND,84,107,40,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Coding (r&eceive)",IDC_TERMKANJILABEL,7,96,110,27
+    COMBOBOX        IDC_TERMKANJI,13,107,39,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Coding (tra&nsmit)",IDC_TERMKANJISENDLABEL,122,96,113,27
+    COMBOBOX        IDC_TERMKANJISEND,128,107,40,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,198,10,40,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,198,30,40,14
     PUSHBUTTON      "&Help",IDC_TERMHELP,198,54,40,14
-    RTEXT           "locale:",IDC_LOCALE_LABEL,12,142,38,8
-    EDITTEXT        IDC_LOCALE_EDIT,52,140,63,13,ES_AUTOHSCROLL
-    RTEXT           "CodePage:",IDC_CODEPAGE_LABEL,132,142,39,8
-    EDITTEXT        IDC_CODEPAGE_EDIT,173,140,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "locale:",IDC_LOCALE_LABEL,12,129,38,8
+    EDITTEXT        IDC_LOCALE_EDIT,52,127,63,13,ES_AUTOHSCROLL
+    RTEXT           "CodePage:",IDC_CODEPAGE_LABEL,132,129,39,8
+    EDITTEXT        IDC_CODEPAGE_EDIT,173,127,40,14,ES_AUTOHSCROLL | ES_NUMBER
 END
-
-#endif    // äÿçëåÍ resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// âpåÍ (ïƒçë) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
 
 IDD_TERMDLGJ DIALOGEX 20, 20, 245, 158
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU

@@ -781,7 +781,7 @@ int KanjiCode2List(int lang, int kcode)
 		{1, 2, 3, 4, 5}, /* English (dummy) */
 		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
 		{1, 2, 3, 4, 5}, /* Russian (dummy) */
-		{1, 1, 1, 2, 2}, /* Korean */
+		{1, 1, 1, 2, 3}, /* Korean */
 		{1, 1, 1, 1, 2}, /* Utf8 */
 	};
 	lang--;
@@ -795,7 +795,7 @@ int List2KanjiCode(int lang, int list)
 		{1, 2, 3, 4, 5}, /* English (dummy) */
 		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
 		{1, 2, 3, 4, 5}, /* Russian (dummy) */
-		{1, 4, 4, 1, 1}, /* Korean */
+		{1, 4, 5, 1, 1}, /* Korean */
 		{4, 5, 4, 4, 4}, /* Utf8 */
 	};
 	lang--;
