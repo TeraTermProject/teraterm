@@ -2723,7 +2723,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 
 void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 {
-	int i, pos, c;
+	int i, pos, c, param_top;
 #ifdef NO_INET6
 	BYTE b;
 #endif							/* NO_INET6 */
@@ -2738,7 +2738,6 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	WORD ParamBaud = IdBaudNone;
 	BOOL HostNameFlag = FALSE;
 	BOOL JustAfterHost = FALSE;
-	WORD DisableTCPEchoCR = FALSE;
 
 	ts->HostName[0] = 0;
 	ts->KeyCnfFN[0] = 0;
@@ -2756,6 +2755,24 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	i = 0;
 	/* the first term shuld be executable filename of Tera Term */
 	NextParam(Param, &i, Temp, sizeof(Temp));
+	param_top = i;
+
+	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
+		if (_strnicmp(Temp, "/F=", 3) == 0) {	/* setup filename */
+			Dequote(&Temp[3], Temp2);
+			if (strlen(Temp2) > 0) {
+				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".INI", Temp,
+				          sizeof(Temp));
+				if (_stricmp(ts->SetupFName, Temp) != 0) {
+					strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Temp,
+					          _TRUNCATE);
+					ReadIniFile(ts->SetupFName, ts);
+				}
+			}
+		}
+	}
+
+	i = param_top;
 	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
 		if (HostNameFlag) {
 			JustAfterHost = TRUE;
@@ -2786,19 +2803,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		}
 		// TCPLocalEcho/TCPCRSend ‚ð–³Œø‚É‚·‚é (maya 2007.4.25)
 		else if (_strnicmp(Temp, "/E", 2) == 0) {
-			DisableTCPEchoCR = TRUE;
-		}
-		else if (_strnicmp(Temp, "/F=", 3) == 0) {	/* setup filename */
-			Dequote(&Temp[3], Temp2);
-			if (strlen(Temp2) > 0) {
-				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".INI", Temp,
-				          sizeof(Temp));
-				if (_stricmp(ts->SetupFName, Temp) != 0) {
-					strncpy_s(ts->SetupFName, sizeof(ts->SetupFName), Temp,
-					          _TRUNCATE);
-					ReadIniFile(ts->SetupFName, ts);
-				}
-			}
+			ts->DisableTCPEchoCR = TRUE;
 		}
 		else if (_strnicmp(Temp, "/FD=", 4) == 0) {	/* file transfer directory */
 			Dequote(&Temp[4], Temp2);
@@ -3004,11 +3009,6 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		break;
 	case IdFile:
 		ts->PortType = IdFile;
-	}
-
-	// TCPLocalEcho/TCPCRSend ‚ð–³Œø‚É‚·‚é (maya 2007.4.25)
-	if (DisableTCPEchoCR == TRUE) {
-		ts->DisableTCPEchoCR = TRUE;
 	}
 }
 
