@@ -225,6 +225,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->Language = IdEnglish;
 	else if (_stricmp(Temp,"Korean") == 0) // HKS
 		ts->Language = IdKorean;
+	else if (_stricmp(Temp,"UTF-8") == 0)
+		ts->Language = IdUtf8;
 	else {
 		switch (PRIMARYLANGID(GetSystemDefaultLangID())) {
 		case LANG_JAPANESE:
@@ -325,6 +327,11 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->KanjiCode = IdUTF8m;
 	else
 		ts->KanjiCode = IdSJIS;
+	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
+	{
+		WORD KanjiCode = ts->KanjiCode;
+		ts->KanjiCode = KanjiCodeTranslate(ts->Language,KanjiCode);
+	}
 
 	/* Katakana (receive) */
 	GetPrivateProfileString(Section, "KatakanaReceive", "",
@@ -345,6 +352,11 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->KanjiCodeSend = IdUTF8;
 	else
 		ts->KanjiCodeSend = IdSJIS;
+	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
+	{
+		WORD KanjiCodeSend = ts->KanjiCodeSend;
+		ts->KanjiCodeSend = KanjiCodeTranslate(ts->Language,KanjiCodeSend);
+	}
 
 	/* Katakana (receive) */
 	GetPrivateProfileString(Section, "KatakanaSend", "",
@@ -1296,6 +1308,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		break;
 	case IdRussian:
 	  	strncpy_s(Temp, sizeof(Temp), "Russian",  _TRUNCATE);
+		break;
+	case IdUtf8:
+	  	strncpy_s(Temp, sizeof(Temp), "UTF-8",  _TRUNCATE);
 		break;
 	default:
 	  	strncpy_s(Temp, sizeof(Temp), "English",  _TRUNCATE);
@@ -2865,6 +2880,9 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			  case 'R':
 			  case 'r':
 				ts->Language = IdRussian; break;
+			  case 'U':
+			  case 'u':
+				ts->Language = IdUtf8; break;
 			}
 		}
 		else if (_strnicmp(Temp, "/M=", 3) == 0) {	/* macro filename */
@@ -2957,6 +2975,15 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		JustAfterHost = FALSE;
+	}
+
+	// Language が変更されたかもしれないので、
+	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
+	{
+		WORD KanjiCode = ts->KanjiCode;
+		WORD KanjiCodeSend = ts->KanjiCodeSend;
+		ts->KanjiCode = KanjiCodeTranslate(ts->Language,KanjiCode);
+		ts->KanjiCodeSend = KanjiCodeTranslate(ts->Language,KanjiCodeSend);
 	}
 
 	if ((DDETopic != NULL) && (DDETopic[0] != 0))

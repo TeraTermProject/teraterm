@@ -67,6 +67,11 @@ static PCHAR far LocaleList[] = {"japanese","chinese", "chinese-simplified", "ch
 static PCHAR far KoreanList[] = {"KS5601", "UTF-8", NULL};
 static PCHAR far KoreanListSend[] = {"KS5601", "UTF-8", NULL};
 
+// UTF-8
+static PCHAR far Utf8List[] = {"UTF-8", "UTF-8m", NULL};
+static PCHAR far Utf8ListSend[] = {"UTF-8", NULL};
+
+
 BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
@@ -121,7 +126,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				}
-				if (ts->Language==IdRussian) {
+				else if (ts->Language==IdRussian) {
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSCHARSET, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSHOSTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSHOST, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
@@ -129,6 +134,12 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSCLIENT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSFONTLABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSFONT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+				}
+				else if (ts->Language==IdUtf8) {
+					SendDlgItemMessage(Dialog, IDC_LOCALE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
+					SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				}
 			}
 			else {
@@ -217,6 +228,14 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				get_lang_msg("DLG_TERM_RUSSFONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 				SetDlgItemText(Dialog, IDC_TERMRUSSFONTLABEL, uimsg);
 			}
+			else if (ts->Language==IdUtf8) {
+				GetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_LOCALE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg);
+				GetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg2, sizeof(uimsg2));
+				get_lang_msg("DLG_TERM_CODEPAGE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+				SetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg);
+			}
 
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
 			SendDlgItemMessage(Dialog, IDC_TERMWIDTH, EM_LIMITTEXT,3, 0);
@@ -285,8 +304,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
 				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
-				//SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, EM_LIMITTEXT, 16, 0);
-
 			}
 			else if (ts->Language==IdRussian) {
 				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
@@ -302,8 +319,16 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
 				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
-				//SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, EM_LIMITTEXT, 16, 0);
+			}
+			else if (ts->Language==IdUtf8) {
+				SetDropDownList(Dialog, IDC_TERMKANJI, Utf8List, KanjiCode2List(ts->Language,ts->KanjiCode));
+				SetDropDownList(Dialog, IDC_TERMKANJISEND, Utf8ListSend, KanjiCode2List(ts->Language,ts->KanjiCode));
 
+				// ロケール用テキストボックス
+				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
+				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
+
+				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
 			}
 			return TRUE;
 
@@ -390,6 +415,23 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							if(ts->CodePage==932) {
 								ts->Language = IdJapanese;
 							}
+						}
+						else if (ts->Language==IdUtf8) {
+							BOOL ret;
+							WORD listId;
+
+							listId = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
+							ts->KanjiCode = List2KanjiCode(ts->Language,listId);
+							listId = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
+							ts->KanjiCodeSend = List2KanjiCode(ts->Language,listId);
+
+							ts->JIS7KatakanaSend=0;
+							ts->JIS7Katakana=0;
+							ts->KanjiIn = 0;
+							ts->KanjiOut = 0;
+
+							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
+							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
 						}
 
 					}
@@ -2733,7 +2775,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-static PCHAR far LangList[] = {"English","Japanese","Russian","Korean",NULL};
+static PCHAR far LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
 
 BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -2823,7 +2865,18 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							ts->PortType = IdTCPIP;
 						}
 						if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
-							ts->Language = (WORD)GetCurSel(Dialog, IDC_GENLANG);
+							WORD language = (WORD)GetCurSel(Dialog, IDC_GENLANG);
+
+							// Language が変更されたとき、
+							// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
+							if (language != ts->Language) {
+								WORD KanjiCode = ts->KanjiCode;
+								WORD KanjiCodeSend = ts->KanjiCodeSend;
+								ts->KanjiCode = KanjiCodeTranslate(language,KanjiCode);
+								ts->KanjiCodeSend = KanjiCodeTranslate(language,KanjiCodeSend);
+							}
+
+							ts->Language = language;
 						}
 					}
 
@@ -2975,10 +3028,11 @@ BOOL FAR PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 	case IdJapanese: // Japanese mode
 		i = IDD_TERMDLGJ;
 		break;
-	case IdKorean: // Russian mode
+	case IdKorean: // Korean mode //HKS
+	case IdUtf8:   // UTF-8 mode
 		i = IDD_TERMDLGK;
 		break;
-	case IdRussian: // Korean mode //HKS
+	case IdRussian: // Russian mode
 		i = IDD_TERMDLGR;
 		break;
 	default:  // English mode

@@ -148,6 +148,7 @@ typedef TCharAttr *PCharAttr;
 #define IdJapanese 2
 #define IdRussian  3
 #define IdKorean   4  //HKS
+#define IdUtf8     5
 
 // log flags (used in ts.LogFlag) 
 #define LOG_TEL 1

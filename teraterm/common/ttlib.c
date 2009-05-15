@@ -767,3 +767,55 @@ int get_OPENFILENAME_SIZE()
 	//return OPENFILENAME_SIZE_VERSION_400;
 	return 76;
 }
+
+// convert table for KanjiCodeID and ListID
+// cf. KanjiList,KanjiListSend
+//     KoreanList,KoreanListSend
+//     Utf8List,Utf8ListSend
+//     IdSJIS, IdEUC, IdJIS, IdUTF8, IdUTF8m
+//     IdEnglish, IdJapanese, IdRussian, IdKorean, IdUtf8
+/* KanjiCode2List(Language,KanjiCodeID) returns ListID */
+int KanjiCode2List(int lang, int kcode)
+{
+	int Table[5][5] = {
+		{1, 2, 3, 4, 5}, /* English (dummy) */
+		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
+		{1, 2, 3, 4, 5}, /* Russian (dummy) */
+		{1, 1, 1, 2, 2}, /* Korean */
+		{1, 1, 1, 1, 2}, /* Utf8 */
+	};
+	lang--;
+	kcode--;
+	return Table[lang][kcode];
+}
+/* List2KanjiCode(Language,ListID) returns KanjiCodeID */
+int List2KanjiCode(int lang, int list)
+{
+	int Table[5][5] = {
+		{1, 2, 3, 4, 5}, /* English (dummy) */
+		{1, 2, 3, 4, 5}, /* Japanese(dummy) */
+		{1, 2, 3, 4, 5}, /* Russian (dummy) */
+		{1, 4, 4, 1, 1}, /* Korean */
+		{4, 5, 4, 4, 4}, /* Utf8 */
+	};
+	lang--;
+	list--;
+	if (list < 1) {
+		list = 1;
+	}
+	return Table[lang][list];
+}
+/* KanjiCodeTranslate(Language(dest), KanjiCodeID(source)) returns KanjiCodeID */
+int KanjiCodeTranslate(int lang, int kcode)
+{
+	int Table[5][5] = {
+		{1, 2, 3, 4, 5}, /* to English (dummy) */
+		{1, 2, 3, 4, 5}, /* to Japanese(dummy) */
+		{1, 2, 3, 4, 5}, /* to Russian (dummy) */
+		{1, 1, 1, 4, 5}, /* to Korean */
+		{4, 4, 4, 4, 5}, /* to Utf8 */
+	};
+	lang--;
+	kcode--;
+	return Table[lang][kcode];
+}

@@ -41,6 +41,9 @@ void doSelectFolder(HWND hWnd, char *path, int pathlen, char *msg);
 void OutputDebugPrintf(char *fmt, ...);
 BOOL is_NT4();
 int get_OPENFILENAME_SIZE();
+int KanjiCode2List(int lang, int kcode);
+int List2KanjiCode(int lang, int kcode);
+int KanjiCodeTranslate(int lang, int kcode);
 
 #ifdef __cplusplus
 }
