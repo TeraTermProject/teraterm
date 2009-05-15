@@ -1267,7 +1267,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 					TempLen++;
 				}
 				else if ((cv->CRSend==IdCR) &&
-				         cv->TelFlag && ! cv->TelBinSend) {
+				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen] = 0;
 					TempLen++;
 				}
@@ -1348,7 +1348,7 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 
 			K = (cv->SendKanjiFirst << 8) + d;
 
-			// UTF-8への変換を行う。1?3バイトまでの対応なので注意。
+			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
 			if (cv->KanjiCodeSend == IdUTF8) {
 				OutputTextUTF8(K, TempStr, &TempLen, cv);
 
@@ -1445,7 +1445,7 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 					TempLen++;
 				}
 				else if ((cv->CRSend==IdCR) &&
-				    cv->TelFlag && ! cv->TelBinSend) {
+				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen] = 0;
 					TempLen++;
 				}
