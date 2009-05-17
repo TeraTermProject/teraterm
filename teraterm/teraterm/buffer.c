@@ -1348,7 +1348,7 @@ static void markURL(int x)
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	/* +40: "@ABCDEFGHIJKLMNO" */
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0, -1,  0,  0, -1,	/* +50: "PQRSTUVWXYZ[\]^_" */
 		  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	/* +60: "`abcdefghijklmno" */
-		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,  0,  0, -1,  0,	/* +70: "pqrstuvwxyz{|}~ " */
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0, -1,  0, -1,  0,	/* +70: "pqrstuvwxyz{|}~ " */
 		/* 0    : not url char
 		 * -1   : url char
 		 * other: url head char --> url_table array number + 1
@@ -2028,8 +2028,9 @@ static void invokeBrowser(LONG ptr)
 	}
 	end--;
  
-	if (start + 1024 <= end) {
-		end = start + 1023;
+	if (start + (LONG)sizeof(url) <= end) {
+		end = start + sizeof(url) - 1;
+		end--;  // '\0'‚Ì•ª‚Íˆø‚¢‚Ä‚¨‚­B
 	}
 	uptr = url;
 	for (i = 0; i < end - start + 1; i++) {
