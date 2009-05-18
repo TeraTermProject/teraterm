@@ -1171,7 +1171,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 			K = (cv->SendKanjiFirst << 8) + d;
 
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
-			if (cv->KanjiCodeSend == IdUTF8 || cv->Language == IdUTF8) {
+			if (cv->KanjiCodeSend == IdUTF8 || cv->Language == IdUtf8) {
 				OutputTextUTF8(K, TempStr, &TempLen, cv);
 
 			} else {
