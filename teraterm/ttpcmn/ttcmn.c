@@ -1225,14 +1225,14 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 				TempStr[0] = 0x1B;
 				TempStr[1] = '(';
 				switch (cv->KanjiOut) {
-				case IdKanjiOutJ:
-					TempStr[2] = 'J';
-					break;
-				case IdKanjiOutH:
-					TempStr[2] = 'H';
-					break;
-				default:
-					TempStr[2] = 'B';
+					case IdKanjiOutJ:
+						TempStr[2] = 'J';
+						break;
+					case IdKanjiOutH:
+						TempStr[2] = 'H';
+						break;
+					default:
+						TempStr[2] = 'B';
 				}
 				TempLen = 3;
 			}
@@ -1335,14 +1335,12 @@ int TextOutKR(PComVar cv, PCHAR B, int C) //HKS
 
 	Full = FALSE;
 	i = 0;
-	while (! Full && (i < C))
-	{
+	while (! Full && (i < C)) {
 		TempLen = 0;
 		d = (BYTE)B[i];
 		SendCodeNew = cv->SendCode;
 
-		if (cv->SendKanjiFlag)
-		{
+		if (cv->SendKanjiFlag) {
 			KanjiFlagNew = FALSE;
 			SendCodeNew = IdKanji;
 
