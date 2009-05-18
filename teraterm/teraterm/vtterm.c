@@ -3200,36 +3200,52 @@ BOOL ParseFirstRus(BYTE b)
 
 void ParseFirst(BYTE b)
 {
-	// UTF-8ÇÃèÍçáÇÕì¡ï Ç…èàóùÇ∑ÇÈ
-	if ((ts.Language==IdKorean && ts.KanjiCode == IdUTF8) &&
-		ParseFirstUTF8(b, 0)) {
-			return;
-	} else	if ((ts.Language==IdJapanese && ts.KanjiCode == IdUTF8) &&
-		ParseFirstUTF8(b, 0)) {
-			return;
-	} else 	if ((ts.Language==IdJapanese && ts.KanjiCode == IdUTF8m) &&
-		ParseFirstUTF8(b, 1)) {
-			return;
-	} else if ((ts.Language==IdJapanese) &&
-    ParseFirstJP(b)) return;
-  else if ((ts.Language==IdRussian) &&
-    ParseFirstRus(b)) return;
+	switch (ts.Language) {
+	  case IdUtf8:
+	  	ParseFirstUTF8(b, ts.KanjiCode == IdUTF8m);
+		return;
 
-  if (SSflag)
-  {
-    PutChar(b);
-    SSflag = FALSE;
-    return;
-  }
+	  case IdJapanese:
+	  case IdKorean:
+	  	switch (ts.KanjiCode) {
+		  case IdUTF8:
+		  	if (ParseFirstUTF8(b, 0)) {
+				return;
+			}
+			break;
+		  case IdUTF8m:
+		  	if (ParseFirstUTF8(b, 1)) {
+				return;
+			}
+			break;
+		  default:
+			if (ParseFirstJP(b))  {
+				return;
+			}
+		}
+		break;
 
-  if (b<=US)
-    ParseControl(b);
-  else if ((b>=0x20) && (b<=0x7E))
-    PutChar(b);
-  else if ((b>=0x80) && (b<=0x9F))
-    ParseControl(b);
-  else if (b>=0xA0)
-    PutChar(b);
+	  case IdRussian:
+		if (ParseFirstRus(b)) {
+			return;
+		}
+		break;
+	}
+
+	if (SSflag) {
+		PutChar(b);
+		SSflag = FALSE;
+		return;
+	}
+
+	if (b<=US)
+		ParseControl(b);
+	else if ((b>=0x20) && (b<=0x7E))
+		PutChar(b);
+	else if ((b>=0x80) && (b<=0x9F))
+		ParseControl(b);
+	else if (b>=0xA0)
+		PutChar(b);
 }
 
 int VTParse()

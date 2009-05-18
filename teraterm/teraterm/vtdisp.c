@@ -1928,7 +1928,7 @@ void ResetIME()
 	cv.Language = ts.Language;
 
 	/* reset IME */
-	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean)) //HKS
+	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
 	{
 		if (ts.UseIME==0)
 			FreeIME();
@@ -2080,7 +2080,7 @@ void CaretOn()
 	CaretX = (CursorX-WinOrgX)*FontWidth;
 	CaretY = (CursorY-WinOrgY)*FontHeight;
 
-	if ((ts.Language==IdJapanese || ts.Language==IdKorean) &&
+	if ((ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) &&
 	    CanUseIME() && (ts.IMEInline>0))
 	{
 		/* set IME conversion window pos. & font */
@@ -3302,7 +3302,7 @@ void DispSetActive(BOOL ActiveFlag)
 		ActiveWin = IdVT;
 	}
 	else {
-		if ((ts.Language==IdJapanese || ts.Language==IdKorean) &&
+		if ((ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) &&
 		    CanUseIME())
 		{
 			/* position & font of conv. window -> default */

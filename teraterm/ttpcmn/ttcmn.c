@@ -1171,7 +1171,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 			K = (cv->SendKanjiFirst << 8) + d;
 
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
-			if (cv->KanjiCodeSend == IdUTF8) {
+			if (cv->KanjiCodeSend == IdUTF8 || cv->Language == IdUTF8) {
 				OutputTextUTF8(K, TempStr, &TempLen, cv);
 
 			} else {
@@ -1288,7 +1288,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 				TempLen++;
 
 				// 半角カナはUnicodeでは2バイトになる (2004.10.4 yutaka)
-				if (cv->KanjiCodeSend==IdUTF8) {
+				if (cv->KanjiCodeSend==IdUTF8 || cv->Language==IdUtf8) {
 					TempLen = 0;
 					K = d;
 					OutputTextUTF8(K, TempStr, &TempLen, cv);
@@ -1513,11 +1513,14 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 		return C;
 	}
 
-	if (cv->Language==IdJapanese) {
-		return TextOutJP(cv,B,C);
-	}
-	if (cv->Language==IdKorean) { // HKS
-		return TextOutKR(cv,B,C);
+	switch (cv->Language) {
+	  case IdJapanese:
+	  case IdUtf8:
+		return TextOutJP(cv, B, C);
+		break;
+	  case IdKorean:
+		return TextOutKR(cv, B, C);
+		break;
 	}
 
 	Full = FALSE;
@@ -1627,7 +1630,7 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 
 			K = (cv->EchoKanjiFirst << 8) + d;
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
-			if (cv->KanjiCodeSend == IdUTF8) {
+			if (cv->KanjiCodeSend == IdUTF8 || cv->Language==IdUtf8) {
 				OutputTextUTF8(K, TempStr, &TempLen, cv);
 			}
 			else {
@@ -1787,7 +1790,7 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 		cv->InPtr = 0;
 	}
 
-	if (cv->Language==IdJapanese) {
+	if (cv->Language==IdJapanese || cv->Language == IdUtf8) {
 		return TextEchoJP(cv,B,C);
 	}
 

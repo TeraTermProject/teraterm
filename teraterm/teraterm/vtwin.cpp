@@ -1454,7 +1454,7 @@ void CVTWindow::RestoreSetup()
 /* called by the [Setup] Terminal command */
 void CVTWindow::SetupTerm()
 {
-	if (ts.Language==IdJapanese || ts.Language==IdKorean) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		ResetCharSet();
 	}
 	cv.CRSend = ts.CRSend;
@@ -4056,8 +4056,8 @@ void CVTWindow::OnSetupKeyboard()
 
 	if (Ok) {
 //		ResetKeypadMode(TRUE);
-		if ((ts.Language==IdJapanese) || (ts.Language==IdKorean)) //HKS
-		ResetIME();
+		if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
+			ResetIME();
 	}
 }
 
