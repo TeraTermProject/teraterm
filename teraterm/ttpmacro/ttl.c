@@ -18,6 +18,7 @@
 #include "ttlib.h"
 #include "ttmenc.h"
 #include "tttypes.h"
+#include <shellapi.h>
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -787,6 +788,7 @@ WORD TTLExec()
 {
 	TStrVal Str,Str2;
 	int mode = SW_SHOW;
+	int wait = 0, ret;
 	WORD Err;
 
 	Err = 0;
@@ -806,6 +808,12 @@ WORD TTLExec()
 			mode = SW_SHOW;
 		else
 			Err = ErrSyntax;
+
+		// get 3nd arg(optional) if given
+		if (CheckParameterGiven()) {
+			GetIntVal(&wait, &Err);
+			if (Err!=0) return Err;
+		}
 	}
 
 	if ((Err==0) &&
@@ -814,7 +822,20 @@ WORD TTLExec()
 
 	if (Err!=0) return Err;
 
-	WinExec(Str, mode);
+	if (!wait) {
+		WinExec(Str, mode);
+	}
+	else {
+		STARTUPINFO sui;
+		PROCESS_INFORMATION pi;
+		memset(&sui, 0, sizeof(STARTUPINFO));
+		sui.cb = sizeof(STARTUPINFO);
+		sui.wShowWindow = mode;
+		CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		GetExitCodeProcess(pi.hProcess, &ret);
+		SetResult(ret);
+	}
 	return Err;
 }
 

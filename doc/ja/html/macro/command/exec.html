@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-exec &lt;command line&gt; [&lt;show&gt;]
+exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt;]]
 </pre>
 
 <h2>解説</h2>
@@ -27,13 +27,15 @@ exec &lt;command line&gt; [&lt;show&gt;]
 コマンドライン文字列 &lt;command line&gt; に従い、アプリケーションを起動する。
 </p>
 
-showパラメータには以下の文字列を指定することができる。
+&lt;show&gt; パラメータには以下の文字列を指定することができる。
 <pre>
 hide
 minimize
 maximize
 show ;default parameters when no show command specified. 
 </pre>
+
+&lt;wait&gt; パラメータに 1 を指定すると、起動したアプリケーションが終了するまで待つ。アプリケーションの終了コードが result システム変数に格納される。<em>(バージョン 4.63以降)</em>
 
 <h2>例</h2>
 
