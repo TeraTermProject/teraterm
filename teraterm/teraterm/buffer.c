@@ -1338,6 +1338,7 @@ void BuffDumpCurrentLine(BYTE TERM)
 static void markURL(int x)
 {
 #ifdef URL_EMPHASIS
+	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)‚É€‹’‚·‚é
 	// by sakura editor 1.5.2.1: etc_uty.cpp
 	static const char	url_char[] = {
 	  /* +0  +1  +2  +3  +4  +5  +6  +7  +8  +9  +A  +B  +C  +D  +E  +F */
@@ -1348,7 +1349,7 @@ static void markURL(int x)
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	/* +40: "@ABCDEFGHIJKLMNO" */
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0, -1,  0,  0, -1,	/* +50: "PQRSTUVWXYZ[\]^_" */
 		  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	/* +60: "`abcdefghijklmno" */
-		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0, -1,  0, -1,  0,	/* +70: "pqrstuvwxyz{|}~ " */
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,  0,  0, -1,  0,	/* +70: "pqrstuvwxyz{|}~ " */
 		/* 0    : not url char
 		 * -1   : url char
 		 * other: url head char --> url_table array number + 1
