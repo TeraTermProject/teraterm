@@ -2471,10 +2471,9 @@ WORD TTLSetMulticastName()
 	TStrVal Str;
 	WORD Err;
 
-	if (GetString(Str,&Err))
-	{
-		if (Err!=0) return Err;
-	}
+	Err = 0;
+	GetStrVal(Str,&Err);
+	if (Err!=0) return Err;
 
 	SetFile(Str);
 	return SendCmnd(CmdSetMulticastName,IdTTLWaitCmndEnd);
@@ -2494,10 +2493,9 @@ WORD TTLSendMulticast()
 		return ErrLinkFirst;
 
 	// マルチキャスト識別用の名前を取得する。
-	if (GetString(Str,&Err))
-	{
-		if (Err!=0) return Err;
-	}
+	Err = 0;
+	GetStrVal(Str,&Err);
+	if (Err!=0) return Err;
 	SetFile(Str);
 
 	buf[0] = '\0';
