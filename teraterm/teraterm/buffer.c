@@ -587,7 +587,7 @@ void BuffInsertSpace(int Count)
 {
 	NewLine(PageStart+CursorY);
 
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 	}
 
@@ -630,7 +630,7 @@ void BuffEraseCurToEnd()
 	int i, YEnd;
 
 	NewLine(PageStart+CursorY);
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 	}
 	offset = CursorX;
@@ -661,7 +661,7 @@ void BuffEraseHomeToCur()
 	int i, YHome;
 
 	NewLine(PageStart+CursorY);
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(0); /* if cursor is on left half of a kanji, erase the kanji */
 	}
 	offset = NumOfColumns;
@@ -736,7 +736,7 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	}
 #endif /* NO_COPYLINE_FIX */
 
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 	}
 
@@ -803,7 +803,7 @@ void BuffDeleteChars(int Count)
 {
 	NewLine(PageStart+CursorY);
 
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(0); /* if cursor is on left harf of a kanji, erase the kanji */
 		EraseKanji(1); /* if cursor on right half... */
 	}
@@ -836,7 +836,7 @@ void BuffEraseChars(int Count)
 {
 	NewLine(PageStart+CursorY);
 
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(0); /* if cursor is on left harf of a kanji, erase the kanji */
 		EraseKanji(1); /* if cursor on right half... */
 	}
@@ -1425,7 +1425,7 @@ void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 	}
 #endif /* NO_COPYLINE_FIX */
 
-	if (ts.Language==IdJapanese || ts.Language==IdUtf8) {
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 		if (! Insert) {
 			EraseKanji(0); /* if cursor on left half... */

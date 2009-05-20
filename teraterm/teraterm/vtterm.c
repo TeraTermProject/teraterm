@@ -2784,124 +2784,207 @@ BOOL CheckKanji(BYTE b)
   return Check;
 }
 
+BOOL CheckKorean(BYTE b)
+{
+	BOOL Check;
+	if (ts.Language!=IdKorean)
+		return FALSE;
+
+	if (ts.KanjiCode == IdSJIS) {
+		if ((0xA1<=b) && (b<=0xFE)) {
+			Check = TRUE;
+		}
+		else {
+			Check = FALSE;
+		}
+	}
+
+	return Check;
+}
+
 BOOL ParseFirstJP(BYTE b)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
 {
-  if (KanjiIn)
-  {
-    if ((! ConvJIS) && (0x3F<b) && (b<0xFD) ||
-	ConvJIS && ( (0x20<b) && (b<0x7f) ||
-		     (0xa0<b) && (b<0xff) ))
-    {
-      PutKanji(b);
-      KanjiIn = FALSE;
-      return TRUE;
-    }
-    else if ((ts.TermFlag & TF_CTRLINKANJI)==0)
-      KanjiIn = FALSE;
-    else if ((b==CR) && Wrap) {
-      CarriageReturn(FALSE);
-      LineFeed(LF,FALSE);
-      Wrap = FALSE;
-    }
-  }
+	if (KanjiIn) {
+		if ((! ConvJIS) && (0x3F<b) && (b<0xFD) ||
+		      ConvJIS && ( (0x20<b) && (b<0x7f) ||
+		                   (0xa0<b) && (b<0xff) ))
+		{
+			PutKanji(b);
+			KanjiIn = FALSE;
+			return TRUE;
+		}
+		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
+			KanjiIn = FALSE;
+		}
+		else if ((b==CR) && Wrap) {
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+			Wrap = FALSE;
+		}
+	}
 
-  if (SSflag)
-  {
-    if (Gn[GLtmp] == IdKanji)
-    {
-      Kanji = b << 8;
-      KanjiIn = TRUE;
-      SSflag = FALSE;
-      return TRUE;
-    }
-    else if (Gn[GLtmp] == IdKatakana) b = b | 0x80;
+	if (SSflag) {
+		if (Gn[GLtmp] == IdKanji) {
+			Kanji = b << 8;
+			KanjiIn = TRUE;
+			SSflag = FALSE;
+			return TRUE;
+		}
+		else if (Gn[GLtmp] == IdKatakana) {
+			b = b | 0x80;
+		}
 
-    PutChar(b);
-    SSflag = FALSE;
-    return TRUE;
-  }
+		PutChar(b);
+		SSflag = FALSE;
+		return TRUE;
+	}
 
-  if ((! EUCsupIn) && (! EUCkanaIn) &&
-      (! KanjiIn) && CheckKanji(b))
-  {
-    Kanji = b << 8;
-    KanjiIn = TRUE;
-    return TRUE;
-  }
+	if ((!EUCsupIn) && (!EUCkanaIn) && (!KanjiIn) && CheckKanji(b)) {
+		Kanji = b << 8;
+		KanjiIn = TRUE;
+		return TRUE;
+	}
 
-  if (b<=US)
-    ParseControl(b);
-  else if (b==0x20)
-    PutChar(b);
-  else if ((b>=0x21) && (b<=0x7E))
-  {
-    if (EUCsupIn)
-    {
-      EUCcount--;
-      EUCsupIn = (EUCcount==0);
-      return TRUE;
-    }
+	if (b<=US) {
+		ParseControl(b);
+	}
+	else if (b==0x20) {
+		PutChar(b);
+	}
+	else if ((b>=0x21) && (b<=0x7E)) {
+		if (EUCsupIn) {
+			EUCcount--;
+			EUCsupIn = (EUCcount==0);
+			return TRUE;
+		}
 
-    if ((Gn[Glr[0]] == IdKatakana) || EUCkanaIn)
-    {
-      b = b | 0x80;
-      EUCkanaIn = FALSE;
-    }
-    PutChar(b);
-  }
-  else if (b==0x7f)
-    return TRUE;
-  else if ((b>=0x80) && (b<=0x8D))
-    ParseControl(b);
-  else if (b==0x8E)
-  {
-    if (ts.KanjiCode==IdEUC)
-      EUCkanaIn = TRUE;
-    else
-      ParseControl(b);
-  }
-  else if (b==0x8F)
-  {
-    if (ts.KanjiCode==IdEUC)
-    {
-      EUCcount = 2;
-      EUCsupIn = TRUE;
-    } else
-      ParseControl(b);
-  }
-  else if ((b>=0x90) && (b<=0x9F))
-    ParseControl(b);
-  else if (b==0xA0)
-    PutChar(0x20);
-  else if ((b>=0xA1) && (b<=0xFE))
-  {
-    if (EUCsupIn)
-    {
-      EUCcount--;
-      EUCsupIn = (EUCcount==0);
-      return TRUE;
-    }
+		if ((Gn[Glr[0]] == IdKatakana) || EUCkanaIn) {
+			b = b | 0x80;
+			EUCkanaIn = FALSE;
+		}
+		PutChar(b);
+	}
+	else if (b==0x7f) {
+		return TRUE;
+	}
+	else if ((b>=0x80) && (b<=0x8D)) {
+		ParseControl(b);
+	}
+	else if (b==0x8E) { // SS2
+		if (ts.KanjiCode==IdEUC) {
+			EUCkanaIn = TRUE;
+		}
+		else {
+			ParseControl(b);
+		}
+	}
+	else if (b==0x8F) { // SS3
+		if (ts.KanjiCode==IdEUC) {
+			EUCcount = 2;
+			EUCsupIn = TRUE;
+		}
+		else {
+			ParseControl(b);
+		}
+	}
+	else if ((b>=0x90) && (b<=0x9F)) {
+		ParseControl(b);
+	}
+	else if (b==0xA0) {
+		PutChar(0x20);
+	}
+	else if ((b>=0xA1) && (b<=0xFE)) {
+		if (EUCsupIn) {
+			EUCcount--;
+			EUCsupIn = (EUCcount==0);
+			return TRUE;
+		}
 
-    if ((Gn[Glr[1]] != IdASCII) ||
-	(ts.KanjiCode==IdEUC) && EUCkanaIn ||
-	(ts.KanjiCode==IdSJIS) ||
-	(ts.KanjiCode==IdJIS) &&
-	(ts.JIS7Katakana==0) &&
-	((ts.TermFlag & TF_FIXEDJIS)!=0))
-      PutChar(b);  // katakana
-    else {
-      if (Gn[Glr[1]] == IdASCII)
-	b = b & 0x7f;
-      PutChar(b);
-    }
-    EUCkanaIn = FALSE;
-  }
-  else
-    PutChar(b);
+		if ((Gn[Glr[1]] != IdASCII) ||
+		    (ts.KanjiCode==IdEUC) && EUCkanaIn ||
+		    (ts.KanjiCode==IdSJIS) ||
+		    (ts.KanjiCode==IdJIS) &&
+		    (ts.JIS7Katakana==0) &&
+		    ((ts.TermFlag & TF_FIXEDJIS)!=0))
+			PutChar(b);	// katakana
+		else {
+			if (Gn[Glr[1]] == IdASCII) {
+				b = b & 0x7f;
+			}
+			PutChar(b);
+		}
+		EUCkanaIn = FALSE;
+	}
+	else {
+		PutChar(b);
+	}
 
-  return TRUE;
+	return TRUE;
+}
+
+BOOL ParseFirstKR(BYTE b)
+// returns TRUE if b is processed
+//  (actually allways returns TRUE)
+{
+	if (KanjiIn) {
+		if ((0x41<=b) && (b<=0x5A) ||
+		    (0x61<=b) && (b<=0x7A) ||
+		    (0x81<=b) && (b<=0xFE))
+		{
+			PutKanji(b);
+			KanjiIn = FALSE;
+			return TRUE;
+		}
+		else if ((ts.TermFlag & TF_CTRLINKANJI)==0) {
+			KanjiIn = FALSE;
+		}
+		else if ((b==CR) && Wrap) {
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+			Wrap = FALSE;
+		}
+	}
+
+	if ((!KanjiIn) && CheckKorean(b)) {
+		Kanji = b << 8;
+		KanjiIn = TRUE;
+		return TRUE;
+	}
+
+	if (b<=US) {
+		ParseControl(b);
+	}
+	else if (b==0x20) {
+		PutChar(b);
+	}
+	else if ((b>=0x21) && (b<=0x7E)) {
+//		if (Gn[Glr[0]] == IdKatakana) {
+//			b = b | 0x80;
+//		}
+		PutChar(b);
+	}
+	else if (b==0x7f) {
+		return TRUE;
+	}
+	else if ((0x80<=b) && (b<=0x9F)) {
+		ParseControl(b);
+	}
+	else if (b==0xA0) {
+		PutChar(0x20);
+	}
+	else if ((b>=0xA1) && (b<=0xFE)) {
+		if (Gn[Glr[1]] == IdASCII) {
+			b = b & 0x7f;
+		}
+		PutChar(b);
+	}
+	else {
+		PutChar(b);
+	}
+
+	return TRUE;
 }
 
 
@@ -3206,7 +3289,6 @@ void ParseFirst(BYTE b)
 		return;
 
 	  case IdJapanese:
-	  case IdKorean:
 	  	switch (ts.KanjiCode) {
 		  case IdUTF8:
 		  	if (ParseFirstUTF8(b, 0)) {
@@ -3224,6 +3306,26 @@ void ParseFirst(BYTE b)
 			}
 		}
 		break;
+
+	  case IdKorean:
+	  	switch (ts.KanjiCode) {
+		  case IdUTF8:
+		  	if (ParseFirstUTF8(b, 0)) {
+				return;
+			}
+			break;
+		  case IdUTF8m:
+		  	if (ParseFirstUTF8(b, 1)) {
+				return;
+			}
+			break;
+		  default:
+			if (ParseFirstKR(b))  {
+				return;
+			}
+		}
+		break;
+
 
 	  case IdRussian:
 		if (ParseFirstRus(b)) {
