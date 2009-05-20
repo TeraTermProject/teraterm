@@ -1381,7 +1381,7 @@ static void markURL(int x)
 	}
 
 	if ((x-2>=0) && !strncmp(&CodeLine[x-2], "://", 3)) {
-		int i, len = 0;
+		int i, len = -1;
 		if ((x-6>=0) && !strncmp(&CodeLine[x-6], "http", 4)) {
 			len = 6;
 		}
