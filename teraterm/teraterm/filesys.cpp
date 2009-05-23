@@ -640,6 +640,7 @@ void LogToFile()
 			// 日付フォーマットを日本ではなく世界標準に変更した (2006.7.23 yutaka)
 			/* 2007.05.24 Gentaro */
 			if ( ts.LogTimestamp && eLineEnd ) {
+#if 1
 #if 0
 				SYSTEMTIME	LocalTime;
 				GetLocalTime(&LocalTime);
@@ -651,6 +652,25 @@ void LogToFile()
 						LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
 						LocalTime.wMilliseconds);
 #else
+				// ミリ秒も表示するように変更 (2009.5.23 maya)
+				SYSTEMTIME LocalTime;
+				GetLocalTime(&LocalTime);
+				char strtime[29];
+				char week[][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+				char month[][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+				                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+				_snprintf_s(strtime, sizeof(strtime), _TRUNCATE,
+				            "%s %s %02d %02d:%02d:%02d.%03d %04d",
+				            week[LocalTime.wDayOfWeek],
+				            month[LocalTime.wMonth-1],
+				            LocalTime.wDay,
+				            LocalTime.wHour,
+				            LocalTime.wMinute,
+				            LocalTime.wSecond,
+				            LocalTime.wMilliseconds,
+				            LocalTime.wYear);
+#endif
+#else
 					time_t tick = time(NULL);
 					char *strtime = ctime(&tick); 
 #endif
@@ -659,8 +679,7 @@ void LogToFile()
 					_lwrite(LogVar->FileHandle,"\r\n",2);
 				}
 				_lwrite(LogVar->FileHandle,"[",1);
-				// 変換した文字列の終端に \n が含まれているので取り除く。
-				_lwrite(LogVar->FileHandle, strtime, strlen(strtime) - 1);
+				_lwrite(LogVar->FileHandle, strtime, strlen(strtime));
 				_lwrite(LogVar->FileHandle,"] ",2);
 			}
 			
