@@ -62,6 +62,8 @@
           <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、韓国語モードを指定できるようにした。</li>
           <li>IMEのインライン変換を韓国語モードでも行えるようにした。</li>
           <li>受信文字コードの選択肢に UTF-8m を追加した。</li>
+          <li>teraterm.iniのKanjiSend/KanjiReceiveエントリで、KS5601を受け付けるようにした。</li>
+          <li><a href="../commandline/teraterm.html#kr">/KR=</a>, <a href="../commandline/teraterm.html#kt">/KT=</a> コ マンドラインオプションで、KS5601を受け付けるようにした。
         </ul></li-->
       <!--li>UTF-8モードを追加
         <ul>
@@ -85,6 +87,12 @@
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
       <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
+      <!-- li>韓国語モードの調整
+        <ul>
+          <li>韓国語モード時、ハングルなどの2バイト文字をマウスで正しく選択できない場合があるのを修正した。</li>
+          <li>韓国語モード時、一文字削除(DCH)等の制御シーケンスでハングルなどの2バイト文字を正しく扱うようにした。</li>
+          <li>韓国語モード時、ハングルなどの2バイト文字が行末に来た時に正しく改行するようにした。</li>
+        </ul></li -->
     </ul></li>
 
   <li>Misc

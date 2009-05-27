@@ -96,22 +96,24 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
   <dt id="kr">/KR=&lt;kanji code (receive)&gt;</dt>
-  <dd>Note: Japanese mode only
+  <dd>Note: Japanese, Korean and UTF-8 mode only
       <ul>
         <li><span class="syntax">/KR=SJIS</span></li>
         <li><span class="syntax">/KR=EUC</span></li>
         <li><span class="syntax">/KR=JIS</span></li>
         <li><span class="syntax">/KR=UTF8</span> UTF-8(Normalization Form C: Windows, Linux)</li>
         <li><span class="syntax">/KR=UTF8m</span> UTF-8(Normalization Form D: Mac OS X)</li>
+        <li><span class="syntax">/KR=KS5601</span> for Korean mode</li>
       </ul></dd>
 
   <dt id="kt">/KT=&lt;kanji code (transmit)&gt;</dt>
-  <dd>Note: Japanese mode only
+  <dd>Note: Japanese and Korean mode only
       <ul>
-        <li><span class="syntax">/KR=SJIS</span></li>
-        <li><span class="syntax">/KR=EUC</span></li>
-        <li><span class="syntax">/KR=JIS</span></li>
-        <li><span class="syntax">/KR=UTF8</span></li>
+        <li><span class="syntax">/KT=SJIS</span></li>
+        <li><span class="syntax">/KT=EUC</span></li>
+        <li><span class="syntax">/KT=JIS</span></li>
+        <li><span class="syntax">/KT=UTF8</span></li>
+        <li><span class="syntax">/KT=KS5601</span> for Korean mode</li>
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
