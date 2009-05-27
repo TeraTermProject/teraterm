@@ -2820,7 +2820,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ParamPort = IdSerial;
 			ParamBaud = str2id(BaudList, &Temp[6], IdBaudNone);
 		}
-		else if (_strnicmp(Temp, "/B", 2) == 0) {	/* telnet binary */
+		else if (_stricmp(Temp, "/B") == 0) {	/* telnet binary */
 			ParamPort = IdTCPIP;
 			ParamBin = 1;
 		}
@@ -2835,11 +2835,11 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				strncpy_s(DDETopic, 21, &Temp[3], _TRUNCATE);	// 21 = sizeof(TopicName)
 		}
 		// "New connection" ダイアログを表示しない (2008.11.14 maya)
-		else if (_strnicmp(Temp, "/DS", 3) == 0) {
+		else if (_stricmp(Temp, "/DS") == 0) {
 			ts->HostDialogOnStartup = FALSE;
 		}
 		// TCPLocalEcho/TCPCRSend を無効にする (maya 2007.4.25)
-		else if (_strnicmp(Temp, "/E", 2) == 0) {
+		else if (_stricmp(Temp, "/E") == 0) {
 			ts->DisableTCPEchoCR = TRUE;
 		}
 		else if (_strnicmp(Temp, "/FD=", 4) == 0) {	/* file transfer directory */
@@ -2852,9 +2852,9 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				_chdir(TempDir);
 			}
 		}
-		else if (_strnicmp(Temp, "/H", 2) == 0)	/* hide title bar */
+		else if (_stricmp(Temp, "/H") == 0)	/* hide title bar */
 			ts->HideTitle = 1;
-		else if (_strnicmp(Temp, "/I", 2) == 0)	/* iconize */
+		else if (_stricmp(Temp, "/I") == 0)	/* iconize */
 			ts->Minimize = 1;
 		else if (_strnicmp(Temp, "/K=", 3) == 0) {	/* Keyboard setup file */
 			Dequote(&Temp[3], Temp2);
@@ -2863,18 +2863,18 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if ((_strnicmp(Temp, "/KR=", 4) == 0) ||
 		         (_strnicmp(Temp, "/KT=", 4) == 0)) {	/* kanji code */
-			if (_strnicmp(&Temp[4], "UTF8m",  5) == 0 ||
-			    _strnicmp(&Temp[4], "UTF-8m", 6) == 0)
+			if (_stricmp(&Temp[4], "UTF8m") == 0 ||
+			    _stricmp(&Temp[4], "UTF-8m") == 0)
 				c = IdUTF8m;
-			else if (_strnicmp(&Temp[4], "UTF8",  4) == 0 ||
-			         _strnicmp(&Temp[4], "UTF-8", 5) == 0)
+			else if (_stricmp(&Temp[4], "UTF8") == 0 ||
+			         _stricmp(&Temp[4], "UTF-8") == 0)
 				c = IdUTF8;
-			else if (_strnicmp(&Temp[4], "SJIS",   4) == 0 ||
-			         _strnicmp(&Temp[4], "KS5601", 6) == 0)
+			else if (_stricmp(&Temp[4], "SJIS") == 0 ||
+			         _stricmp(&Temp[4], "KS5601") == 0)
 				c = IdSJIS;
-			else if (_strnicmp(&Temp[4], "EUC", 3) == 0)
+			else if (_stricmp(&Temp[4], "EUC") == 0)
 				c = IdEUC;
-			else if (_strnicmp(&Temp[4], "JIS", 3) == 0)
+			else if (_stricmp(&Temp[4], "JIS") == 0)
 				c = IdJIS;
 			else
 				c = -1;
@@ -2920,7 +2920,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
 		}
-		else if (_strnicmp(Temp, "/M", 2) == 0) {	/* macro option without file name */
+		else if (_stricmp(Temp, "/M") == 0) {	/* macro option without file name */
 			strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*", _TRUNCATE);
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
@@ -2937,11 +2937,11 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			if (strlen(ts->HostName) > 0)
 				ParamPort = IdFile;
 		}
-		else if (_strnicmp(Temp, "/T=0", 4) == 0) {	/* telnet disable */
+		else if (_stricmp(Temp, "/T=0") == 0) {	/* telnet disable */
 			ParamPort = IdTCPIP;
 			ParamTel = 0;
 		}
-		else if (_strnicmp(Temp, "/T=1", 4) == 0) {	/* telnet enable */
+		else if (_stricmp(Temp, "/T=1") == 0) {	/* telnet enable */
 			ParamPort = IdTCPIP;
 			ParamTel = 1;
 		}
@@ -2951,7 +2951,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		else if (_strnicmp(Temp, "/VTICON=", 8) == 0) {	/* VT window icon */
 			ts->VTIcon = IconName2IconId(&Temp[8]);
 		}
-		else if (_strnicmp(Temp, "/V", 2) == 0) {	/* invisible */
+		else if (_stricmp(Temp, "/V") == 0) {	/* invisible */
 			ts->HideWindow = 1;
 		}
 		else if (_strnicmp(Temp, "/W=", 3) == 0) {	/* Window title */
@@ -2972,12 +2972,12 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 #ifndef NO_INET6
-		else if (_strnicmp(Temp, "/4", 2) == 0)	/* Protocol Tera Term speaking */
+		else if (_stricmp(Temp, "/4") == 0)	/* Protocol Tera Term speaking */
 			ts->ProtocolFamily = AF_INET;
-		else if (_strnicmp(Temp, "/6", 2) == 0)
+		else if (_stricmp(Temp, "/6") == 0)
 			ts->ProtocolFamily = AF_INET6;
 #endif
-		else if (_strnicmp(Temp, "/DUPLICATE", 9) == 0) {	// duplicate session (2004.12.7. yutaka)
+		else if (_stricmp(Temp, "/DUPLICATE") == 0) {	// duplicate session (2004.12.7. yutaka)
 			ts->DuplicateSession = 1;
 
 		}
