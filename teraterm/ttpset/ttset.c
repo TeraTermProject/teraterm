@@ -325,6 +325,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->KanjiCode = IdUTF8;
 	else if (_stricmp(Temp, "UTF-8m") == 0)
 		ts->KanjiCode = IdUTF8m;
+	else if (_stricmp(Temp, "KS5601") == 0)
+		ts->KanjiCode = IdSJIS;
 	else
 		ts->KanjiCode = IdSJIS;
 	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
@@ -350,6 +352,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->KanjiCodeSend = IdJIS;
 	else if (_stricmp(Temp, "UTF-8") == 0)
 		ts->KanjiCodeSend = IdUTF8;
+	else if (_stricmp(Temp, "KS5601") == 0)
+		ts->KanjiCode = IdSJIS;
 	else
 		ts->KanjiCodeSend = IdSJIS;
 	// KanjiCode/KanjiCodeSend を現在の Language に存在する値に置き換える
@@ -1386,7 +1390,16 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		strncpy_s(Temp, sizeof(Temp), "UTF-8m", _TRUNCATE);
 		break;
 	default:
-		strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
+		switch (ts->Language) {
+		case IdJapanese:
+			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
+			break;
+		case IdKorean:
+			strncpy_s(Temp, sizeof(Temp), "KS5601", _TRUNCATE);
+			break;
+		default:
+			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
+		}
 	}
 	WritePrivateProfileString(Section, "KanjiReceive", Temp, FName);
 
@@ -1410,7 +1423,16 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		strncpy_s(Temp, sizeof(Temp), "UTF-8", _TRUNCATE);
 		break;
 	default:
-		strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
+		switch (ts->Language) {
+		case IdJapanese:
+			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
+			break;
+		case IdKorean:
+			strncpy_s(Temp, sizeof(Temp), "KS5601", _TRUNCATE);
+			break;
+		default:
+			strncpy_s(Temp, sizeof(Temp), "SJIS", _TRUNCATE);
+		}
 	}
 	WritePrivateProfileString(Section, "KanjiSend", Temp, FName);
 
@@ -2847,7 +2869,8 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			else if (_strnicmp(&Temp[4], "UTF8",  4) == 0 ||
 			         _strnicmp(&Temp[4], "UTF-8", 5) == 0)
 				c = IdUTF8;
-			else if (_strnicmp(&Temp[4], "SJIS", 4) == 0)
+			else if (_strnicmp(&Temp[4], "SJIS",   4) == 0 ||
+			         _strnicmp(&Temp[4], "KS5601", 6) == 0)
 				c = IdSJIS;
 			else if (_strnicmp(&Temp[4], "EUC", 3) == 0)
 				c = IdEUC;
