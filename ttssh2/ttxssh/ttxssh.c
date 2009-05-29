@@ -1742,6 +1742,127 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts,
                                      PCHAR DDETopic)
 {
+#if 1
+	int i;
+	BOOL inParam = FALSE;
+	BOOL inQuotes = FALSE;
+	BOOL inEqual = FALSE;
+	int param_len=strlen(param);
+	PCHAR start = NULL;
+	char *buf = (char *)calloc(param_len+1, sizeof(char));
+	int buflen = 0;
+
+	if (pvar->hostdlg_activated) {
+		pvar->settings.Enabled = pvar->hostdlg_Enabled;
+	}
+
+	for (i = 0; i < param_len; i++) {
+		if (inQuotes) {
+			// 現在位置が"の中
+			if (param[i] == '"') {
+#if 0
+// "を表すために""を渡す仕様にする場合
+				if (param[i+1] == '"') {
+					buf[buf_len] = param[i];
+					buf_len++;
+					i++;
+				}
+				else {
+#else
+				{
+#endif
+					// クォートしているときはここで終わり
+					// "をbufに入れずに解析に渡す
+					switch (parse_option(pvar, buf)) {
+					  case OPTION_CLEAR:
+						memset(start, ' ', (param + i) - start + 1);
+						break;
+					  case OPTION_REPLACE:
+						memset(start, ' ', (param + i) - start + 1);
+						buflen = strlen(buf);
+						memcpy(start, buf, buflen);
+						break;
+					}
+					inParam = FALSE;
+					inEqual = FALSE;
+					start = NULL;
+					memset(buf, 0, param_len);
+					buflen = 0;
+					inQuotes = FALSE;
+				}
+			}
+			else {
+				buf[buflen] = param[i];
+				buflen++;
+			}
+		}
+		else {
+			if (!inParam) {
+				// まだパラメータの中にいない
+				if (param[i] == '"') {
+					// " で始まる
+					start = param + i;
+					inParam = TRUE;
+					inQuotes = TRUE;
+				}
+				else if (param[i] != ' ' && param[i] != '\t') {
+					// 普通に始まる
+					buf[buflen] = param[i];
+					buflen++;
+					start = param + i;
+					inParam = TRUE;
+				}
+			}
+			else {
+				// 現在位置がパラメータの中
+				if (param[i] == ' ' || param[i] == '\t') {
+					// クォートしていないときはここで終わり
+					switch (parse_option(pvar, buf)) {
+					  case OPTION_CLEAR:
+						memset(start, ' ', (param + i) - start + 1);
+						break;
+					  case OPTION_REPLACE:
+						memset(start, ' ', (param + i) - start + 1);
+						buflen = strlen(buf);
+						memcpy(start, buf, buflen);
+						break;
+					}
+					inParam = FALSE;
+					inEqual = FALSE;
+					start = NULL;
+					memset(buf, 0, param_len);
+					buflen = 0;
+				}
+				else {
+					buf[buflen] = param[i];
+					buflen++;
+					if (!inEqual && param[i] == '=') {
+						inEqual = TRUE;
+						if (param[i+1] == '"') {
+							inQuotes = TRUE;
+							i++;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// buf に残りがあれば解析に渡す
+	if (strlen(buf) > 0) {
+		switch (parse_option(pvar, buf)) {
+		  case OPTION_CLEAR:
+			memset(start, ' ', (param + i) - start + 1);
+			break;
+		  case OPTION_REPLACE:
+			memset(start, ' ', (param + i) - start + 1);
+			buflen = strlen(buf);
+			memcpy(start, buf, buflen);
+			break;
+		}
+	}
+	free(buf);
+#else
 	// スペースを含むファイル名を認識するように修正 (2006.10.7 maya)
 	int i, buflen;
 	BOOL inParam = FALSE;
@@ -1858,6 +1979,7 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts,
 			}
 		}
 	}
+#endif
 
 	FWDUI_load_settings(pvar);
 
