@@ -87,12 +87,12 @@
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
       <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
-      <!-- li>韓国語モードの調整
+      <li>changed Korean language implementation
         <ul>
-          <li>韓国語モード時、ハングルなどの2バイト文字をマウスで正しく選択できない場合があるのを修正した。</li>
-          <li>韓国語モード時、一文字削除(DCH)等の制御シーケンスでハングルなどの2バイト文字を正しく扱うようにした。</li>
-          <li>韓国語モード時、ハングルなどの2バイト文字が行末に来た時に正しく改行するようにした。</li>
-        </ul></li -->
+          <li>Hangeul can not be selected by using double-click.</li>
+          <li>The control sequence of one character deletion(DCH) can not work Hangeul.</li>
+          <li>The carriage return can not work when Hangeul positioned at the end-of-line.</li>
+        </ul></li>
     </ul></li>
 
   <li>Misc
