@@ -91,12 +91,12 @@ Example: adding a TTSSH menu under File menu
   3. OpenSSL (used by TTSSH and TTProxy)
      (1) Extract openssl source into libs/openssl directory.
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-     (3) Move 'libs' directory on the command prompt. And run ディレクトリに移動し、buildopenssl.bat.
+     (3) Move 'libs' directory on the command prompt. And run buildopenssl.bat.
 
   4. Zlib (used by TTSSH)
      (1) Extract zlib source into libs/zlib directory.
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-     (3) Move 'libs' directory on the command prompt. And run ディレクトリに移動し、buildzlib.bat.
+     (3) Move 'libs' directory on the command prompt. And run buildzlib.bat.
 
 
 * How to build Tera Term
