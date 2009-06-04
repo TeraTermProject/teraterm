@@ -1858,13 +1858,14 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts,
 	}
 
 	// buf ‚ÉŽc‚è‚ª‚ ‚ê‚Î‰ðÍ‚É“n‚·
+	//   +1‚·‚é‚ÆÅŒã‚Ì'\0'‚àÁ‚µ‚Ä‚µ‚Ü‚¤‚Ì‚ÅAã‚Æ“¯‚¶‚Å‚Í‚¢‚¯‚È‚¢
 	if (strlen(buf) > 0) {
 		switch (parse_option(pvar, buf)) {
 		  case OPTION_CLEAR:
-			memset(start, ' ', (param + i) - start + 1);
+			memset(start, ' ', (param + i) - start);
 			break;
 		  case OPTION_REPLACE:
-			memset(start, ' ', (param + i) - start + 1);
+			memset(start, ' ', (param + i) - start);
 			buflen = strlen(buf);
 			memcpy(start, buf, buflen);
 			break;
