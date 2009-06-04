@@ -2651,17 +2651,31 @@ void Dequote(PCHAR Source, PCHAR Dest)
 	/* quoting char */
 	q = Source[i];
 	/* only '"' is used as quoting char */
-	if (q != '"')
-		q = 0;
-	else
+	if (q == '"')
 		i++;
 
 	c = Source[i];
 	i++;
 	j = 0;
-	while ((c != 0) && (c != q)) {
-		Dest[j] = c;
-		j++;
+	while ((c != 0)) {
+		if (c != '"') {
+			Dest[j] = c;
+			j++;
+		}
+		else {
+			if (q == '"' && Source[i] == '"') {
+				Dest[j] = c;
+				j++;
+				i++;
+			}
+			else if (q == '"' && Source[i] == '\0') {
+				break;
+			}
+			else {
+				Dest[j] = c;
+				j++;
+			}
+		}
 		c = Source[i];
 		i++;
 	}
