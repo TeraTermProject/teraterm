@@ -1595,6 +1595,92 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
+int FAR PASCAL TextEchoKR(PComVar cv, PCHAR B, int C)
+{
+	int i, TempLen;
+	WORD K;
+	char TempStr[11];
+	int EchoCodeNew;
+	BYTE d;
+	BOOL Full, KanjiFlagNew;
+
+	Full = FALSE;
+	i = 0;
+	while (! Full && (i < C)) {
+		TempLen = 0;
+		d = (BYTE)B[i];
+		EchoCodeNew = cv->EchoCode;
+
+		if (cv->EchoKanjiFlag) {
+			KanjiFlagNew = FALSE;
+			EchoCodeNew = IdKanji;
+
+			K = (cv->EchoKanjiFirst << 8) + d;
+			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
+			if (cv->KanjiCodeSend == IdUTF8) {
+				OutputTextUTF8(K, TempStr, &TempLen, cv);
+			}
+			else {
+				TempStr[TempLen] = HIBYTE(K);
+				TempStr[TempLen+1] = LOBYTE(K);
+				TempLen = TempLen + 2;
+			}
+		}
+		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
+			KanjiFlagNew = TRUE;
+			cv->EchoKanjiFirst = d;
+			EchoCodeNew = IdKanji;
+			TempLen = 0;
+		}
+		else {
+			KanjiFlagNew = FALSE;
+			TempLen = 0;
+			EchoCodeNew = IdASCII;
+
+			if (d==0x0d) {
+				TempStr[TempLen] = 0x0d;
+				TempLen++;
+				if (cv->CRSend==IdCRLF) {
+					TempStr[TempLen] = 0x0a;
+					TempLen++;
+				}
+				else if ((cv->CRSend==IdCR) &&
+				          cv->TelFlag && ! cv->TelBinSend) {
+					TempStr[TempLen] = 0;
+					TempLen++;
+				}
+			}
+			else {
+				TempStr[TempLen] = d;
+				TempLen++;
+				if (cv->TelFlag && (d==0xff)) {
+					TempStr[TempLen] = (char)0xff;
+					TempLen++;
+				}
+			}
+		} // if (cv->SendKanjiFlag) else if ... else ... end
+
+		if (TempLen == 0) {
+			i++;
+			cv->EchoCode = EchoCodeNew;
+			cv->EchoKanjiFlag = KanjiFlagNew;
+		}
+		else {
+			Full = InBuffSize-cv->InBuffCount-TempLen < 0;
+			if (! Full) {
+				i++;
+				cv->EchoCode = EchoCodeNew;
+				cv->EchoKanjiFlag = KanjiFlagNew;
+				memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
+				cv->InBuffCount = cv->InBuffCount + TempLen;
+			}
+		}
+
+	} // end of "while {}"
+
+	return i;
+}
+
 int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
@@ -1613,6 +1699,9 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 
 	if (cv->Language==IdJapanese || cv->Language == IdUtf8) {
 		return TextEchoJP(cv,B,C);
+	}
+	else if (cv->Language == IdKorean) {
+		return TextEchoKR(cv,B,C);
 	}
 
 	Full = FALSE;
