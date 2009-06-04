@@ -114,7 +114,10 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 <p>
 <span class="qanda">Q.</span> Why number of fonts in the list of <a href="../setup-font.html">[Setup] Font</a> dialog box is so small?<br>
 <span class="qanda">Q.</span> Why I can not select the "Times" font at the <a href="../setup-font.html">[Setup] Font</a> dialog box?<br>
-<span class="qanda">A.</span> Tera Term uses only fixed-pitch fonts such as "Terminal" and "Courier" because characters should be displayed with equal spacing in order to emulate the VT terminal properly. Displaying proportional font characters with equal spacing is in principle possible but it makes program complicated and slow. So Tera Term does not use proportional fonts.
+<span class="qanda">A.</span> Tera Term uses only fixed-pitch fonts such as "Terminal" and "Courier" because characters should be displayed with equal spacing in order to emulate the VT terminal properly. Displaying proportional font characters with equal spacing is in principle possible but it makes program complicated and slow. So Tera Term does not use proportional fonts.<br>
+<!--
+<span class="qanda">A.</span> Windows 7 では、非表示に設定されたフォントはダイアログボックスでリストに含まれません。コントロールパネルのフォントで、使いたいフォントを表示するように設定してください。
+-->
 </p>
 
 <p>
@@ -126,6 +129,17 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 <span class="qanda">Q.</span> The "at" command of Windows NT does not work for executing Tera Term.<br>
 <span class="qanda">A.</span> Specify "/interactive" option.
 </p>
+
+<!--
+<p>
+<span class="qanda">Q.</span> コマンドラインオプションの<a href="../commandline/teraterm.html#w">/W=</a>やマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルが変更できない。<br>
+<span class="qanda">A.</span> Linuxの一部のディストリビューションなどではウィンドウタイトルを変更する制御シーケンスを送信するよう設定されている場合があり、変更したウィンドウタイトルがホスト側に書き換えられてしまう事があります。この場合は以下のどちらかを行ってください。
+</p>
+<ul>
+  <li>ホスト側のシェル等の設定で、ウィンドウタイトルを変更する制御シーケンスを送出しないように設定する</li>
+  <li><a href="../menu/setup-additional.html">[Setup]Additional Setting</a>のGeneralタブにある Accept Window Title Change Request を off に変更する </li>
+</ul>
+-->
 
 
 </BODY>
