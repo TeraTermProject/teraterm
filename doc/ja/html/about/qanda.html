@@ -66,12 +66,14 @@ PPP 接続の場合、シリアルポートは Tera Term ではなく PPP 接続ソフトによって制御さ
 <span class="qanda">A.</span> <a href="../menu/setup-general.html">[Setup] General</a> で Default port を "TCP/IP" にしてください。
 </p>
 
+<!-- 現在のバージョンでは起動時に必ずTERATERM.INIを読み込むため、コメントアウト
 <p>
 <span class="qanda">Q.</span> TERATERM.INI を変更したが、その変更が有効にならない。<br>
 <span class="qanda">A.</span> TERATERM.INI を変更したときに Tera Term セッションが走っている場合、その変更はすぐには有効にはなりません(変更がなされた後に開かれたセッションに対してさえも有効にはなりません)。<br>
 これは、TERATERM.INI の情報は最初の Tera Term セッションが開かれた時にメモリにロードされ、それ以降、少なくとも一つのセッションが開いている間はメモリに保持され続けるからです。<br>
 メモリに保持されている情報を更新するためには、<a href="../menu/setup-restore.html">[Setup] Restore setup</a> コマンドを実行するか、すべての Tera Term セッションを閉じてください。ただし、TERATERM.INI 以外の設定ファイルに対しては、このようにする必要はありません。
 </p>
+-->
 
 <h2>[日本語]</h2>
 <p>
@@ -165,10 +167,12 @@ set term /eight	(VMS の場合)
 <span class="qanda">A.</span> Tera Term は"ＭＳ 明朝"や "Terminal" のような固定幅フォントしか使用しません。なぜなら VT 端末を正しくエミュレートするためには文字を等間隔で表示しなければならないからです。"Times" のような可変幅(プロポーショナル)フォントを等間隔に表示させるようにするにはプログラムが複雑になるためTera Term はそれらのフォントを使用していません。
 </p>
 
+<!-- 現在はフォント選択ダイアログで CF_NOVERTFONTS を指定している。フォント選択ダイアログに縦書きフォントが候補として出なくなったので、コメントアウト。
 <p>
 <span class="qanda">Q.</span> 文字が横倒しになって表示されてしまう。<br>
 <span class="qanda">A.</span> <a href="../menu/setup-font.html">[Setup] Font</a> ダイアログボックスでフォント名の先頭に "@" がついたフォントを選択すると文字が横倒しになって表示されます。"@" がつかないフォントを選択してください。
 </p>
+-->
 
 <p>
 <span class="qanda">Q.</span> ダブルクリックで単語を選択するときの単語の区切り方を以前のバージョンの Tera Term と同じにしてほしい。<br>
@@ -181,10 +185,12 @@ set term /eight	(VMS の場合)
 On になっていると、TEK4010 というグラフィック端末のコントロールシーケンスを受信したとき TEK window が自動的に開きます。
 </p>
 
+<!-- 1.X はサポート対象外
 <p>
 <span class="qanda">Q.</span> Tera Term 1.X ではスクロールバッファの量を800行以上にできませんが、もっと増やせませんか?<br>
 <span class="qanda">A.</span> Win 3.1 用の Tera Term ではできません。Win 95, Win NT 用の Tera Term Pro ではスクロールバッファの量を800行以上に設定できます。
 </p>
+-->
 
 <p>
 <span class="qanda">Q.</span> マクロをつかって、モデムに設定コマンド (AT...)を複数行送ろうとしたが、送るのが速すぎてモデムがコマンドを正常にうけつけない。<br>
