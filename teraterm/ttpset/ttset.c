@@ -1291,6 +1291,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// Font scaling -- test
 	ts->FontScaling = GetOnOff(Section, "FontScaling", FName, FALSE);
+
+	// Meta sets MSB
+	ts->Meta8Bit = GetOnOff(Section, "Meta8Bit", FName, FALSE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2236,6 +2239,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// added PasteDelayPerLine (2009.4.12 maya)
 	WriteInt(Section, "PasteDelayPerLine", FName,
 	         ts->PasteDelayPerLine);
+
+	// Meta sets MSB
+	WriteOnOff(Section, "Meta8Bit", FName, ts->Meta8Bit);
 }
 
 #define VTEditor "VT editor keypad"

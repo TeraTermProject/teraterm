@@ -2560,22 +2560,27 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 #endif
 
-	if (ts.MetaKey>0)
-	{
+	if (ts.MetaKey) {
 		if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) return;
 		Code = nChar;
-		for (i=1 ; i<=nRepCnt ; i++)
-		{
-			CommTextOut(&cv,&e,1);
+		for (i=1 ; i<=nRepCnt ; i++) {
+			if (ts.Meta8Bit) {
+				Code |= 0x80;
+			}
+			else {
+				CommTextOut(&cv,&e,1);
+				if (ts.LocalEcho) {
+					CommTextEcho(&cv,&e,1);
+				}
+			}
 			CommTextOut(&cv,&Code,1);
-			if (ts.LocalEcho>0)
-			{
-				CommTextEcho(&cv,&e,1);
+			if (ts.LocalEcho) {
 				CommTextEcho(&cv,&Code,1);
 			}
 		}
 		return;
 	}
+
 	CFrameWnd::OnSysChar(nChar, nRepCnt, nFlags);
 }
 
