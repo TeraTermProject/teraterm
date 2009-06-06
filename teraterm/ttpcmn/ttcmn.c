@@ -1119,31 +1119,24 @@ int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-static void OutputTextUTF8(WORD K, char *TempStr, int *TempLenSrc, PComVar cv)
+static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 {
 	unsigned int code;
-	int byte;
-	int TempLen = *TempLenSrc;
+	int outlen;
+	int TempLen = 0;
 
-	code = SJIS2UTF8(K, &byte, cv->Locale);
-	if (byte == 1) {
-		TempStr[TempLen++] = code;
-	}
-	else if (byte == 2) {
-		TempStr[TempLen++] = (code >> 8) & 0xff;
-		TempStr[TempLen++] = code & 0xff;
-
-	}
-	else if (byte == 3) {
+	code = SJIS2UTF8(K, &outlen, cv->Locale);
+	switch (outlen) {
+	  case 3:
 		TempStr[TempLen++] = (code >> 16) & 0xff;
+	  case 2:
 		TempStr[TempLen++] = (code >> 8) & 0xff;
+	  case 1:
 		TempStr[TempLen++] = code & 0xff;
-
 	}
 
-	*TempLenSrc = TempLen;
+	return TempLen;
 }
-
 
 // 
 // SJISから各種漢字コードへ変換して出力する。
@@ -1152,7 +1145,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;
-	char TempStr[11];
+	char TempStr[12];
 	int SendCodeNew;
 	BYTE d;
 	BOOL Full, KanjiFlagNew;
@@ -1163,38 +1156,41 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 		TempLen = 0;
 		d = (BYTE)B[i];
 		SendCodeNew = cv->SendCode;
+		KanjiFlagNew = FALSE;
 
 		if (cv->SendKanjiFlag) {
-			KanjiFlagNew = FALSE;
 			SendCodeNew = IdKanji;
 
 			K = (cv->SendKanjiFirst << 8) + d;
 
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
 			if (cv->KanjiCodeSend == IdUTF8 || cv->Language == IdUtf8) {
-				OutputTextUTF8(K, TempStr, &TempLen, cv);
-
-			} else {
-
-				if (cv->Language == IdJapanese) {
-					if (cv->KanjiCodeSend == IdEUC) {
+				TempLen += OutputTextUTF8(K, TempStr, cv);
+			}
+			else {
+				switch (cv->Language) {
+				  case IdJapanese:
+				  	switch (cv->KanjiCodeSend) {
+					  case IdEUC:
 						K = SJIS2EUC(K);
-					}
-					else if (cv->KanjiCodeSend != IdSJIS) {
+						break;
+					  case IdJIS:
 						K = SJIS2JIS(K);
+						if ((cv->SendCode==IdKatakana) &&
+						    (cv->JIS7KatakanaSend==1)) {
+							TempStr[TempLen++] = SI;
+						}
+						break;
+					  case IdSJIS:
+						/* nothing to do */
+						break;
 					}
-
-					if ((cv->SendCode==IdKatakana) &&
-					    (cv->KanjiCodeSend==IdJIS) &&
-					    (cv->JIS7KatakanaSend==1)) {
-						TempStr[TempLen] = SI;
-						TempLen++;
-					}
+					break;
+				  case IdKorean:
+				  	break;
 				}
-
-				TempStr[TempLen] = HIBYTE(K);
-				TempStr[TempLen+1] = LOBYTE(K);
-				TempLen = TempLen + 2;
+				TempStr[TempLen++] = HIBYTE(K);
+				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
 		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
@@ -1202,105 +1198,85 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 			cv->SendKanjiFirst = d;
 			SendCodeNew = IdKanji;
 
-			if ((cv->SendCode!=IdKanji) &&
-			    (cv->KanjiCodeSend==IdJIS)) {
-				TempStr[0] = 0x1B;
-				TempStr[1] = '$';
-				if (cv->KanjiIn == IdKanjiInB) {
-					TempStr[2] = 'B';
+			if (cv->Language == IdJapanese) {
+				if ((cv->SendCode!=IdKanji) && (cv->KanjiCodeSend==IdJIS)) {
+					TempStr[0] = 0x1B;
+					TempStr[1] = '$';
+					if (cv->KanjiIn == IdKanjiInB) {
+						TempStr[2] = 'B';
+					}
+					else {
+						TempStr[2] = '@';
+					}
+					TempLen = 3;
 				}
-				else {
-					TempStr[2] = '@';
-				}
-				TempLen = 3;
-			}
-			else {
-				TempLen = 0;
 			}
 		}
 		else {
-			KanjiFlagNew = FALSE;
-
-			if ((cv->SendCode==IdKanji) &&
-			    (cv->KanjiCodeSend==IdJIS)) {
-				TempStr[0] = 0x1B;
-				TempStr[1] = '(';
-				switch (cv->KanjiOut) {
-					case IdKanjiOutJ:
+			if (cv->Language == IdJapanese) {
+				if ((cv->SendCode==IdKanji) && (cv->KanjiCodeSend==IdJIS)) {
+					TempStr[0] = 0x1B;
+					TempStr[1] = '(';
+					switch (cv->KanjiOut) {
+					  case IdKanjiOutJ:
 						TempStr[2] = 'J';
 						break;
-					case IdKanjiOutH:
+					  case IdKanjiOutH:
 						TempStr[2] = 'H';
 						break;
-					default:
+					  default:
 						TempStr[2] = 'B';
+					}
+					TempLen = 3;
 				}
-				TempLen = 3;
-			}
-			else {
-				TempLen = 0;
-			}
 
-			if ((0xa0<d) && (d<0xe0)) {
-				SendCodeNew = IdKatakana;
-				if ((cv->SendCode!=IdKatakana) &&
-				    (cv->KanjiCodeSend==IdJIS) &&
-				    (cv->JIS7KatakanaSend==1)) {
-					TempStr[TempLen] = SO;
-					TempLen++;
+				if ((0xa0<d) && (d<0xe0)) {
+					SendCodeNew = IdKatakana;
+					if ((cv->SendCode!=IdKatakana) &&
+					    (cv->KanjiCodeSend==IdJIS) &&
+					    (cv->JIS7KatakanaSend==1)) {
+						TempStr[TempLen++] = SO;
+					}
 				}
-			}
-			else {
-				SendCodeNew = IdASCII;
-				if ((cv->SendCode==IdKatakana) &&
-				    (cv->KanjiCodeSend==IdJIS) &&
-				    (cv->JIS7KatakanaSend==1)) {
-					TempStr[TempLen] = SI;
-					TempLen++;
+				else {
+					SendCodeNew = IdASCII;
+					if ((cv->SendCode==IdKatakana) &&
+					    (cv->KanjiCodeSend==IdJIS) &&
+					    (cv->JIS7KatakanaSend==1)) {
+						TempStr[TempLen++] = SI;
+					}
 				}
 			}
 
 			if (d==0x0d) {
-				TempStr[TempLen] = 0x0d;
-				TempLen++;
+				TempStr[TempLen++] = 0x0d;
 				if (cv->CRSend==IdCRLF) {
-					TempStr[TempLen] = 0x0a;
-					TempLen++;
+					TempStr[TempLen++] = 0x0a;
 				}
 				else if ((cv->CRSend==IdCR) &&
 				          cv->TelFlag && ! cv->TelBinSend) {
-					TempStr[TempLen] = 0;
-					TempLen++;
+					TempStr[TempLen++] = 0;
 				}
 			}
-			else if ((d>=0xa1) && (d<=0xe0)) {
-				/* Katakana */
+			else if ((d>=0x80) && (cv->KanjiCodeSend==IdUTF8 || cv->Language==IdUtf8)) {
+				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
+			}
+			else if ((d>=0xa1) && (d<=0xe0) && (cv->Language == IdJapanese)) {
 				if (cv->KanjiCodeSend==IdEUC) {
-					TempStr[TempLen] = (char)0x8E;
-					TempLen++;
+					TempStr[TempLen++] = (char)0x8E;
 				}
 				if ((cv->KanjiCodeSend==IdJIS) &&
 					(cv->JIS7KatakanaSend==1)) {
-					TempStr[TempLen] = d & 0x7f;
+					TempStr[TempLen++] = d & 0x7f;
 				}
 				else {
-					TempStr[TempLen] = d;
-				}
-				TempLen++;
-
-				// 半角カナはUnicodeでは2バイトになる (2004.10.4 yutaka)
-				if (cv->KanjiCodeSend==IdUTF8 || cv->Language==IdUtf8) {
-					TempLen = 0;
-					K = d;
-					OutputTextUTF8(K, TempStr, &TempLen, cv);
+					TempStr[TempLen++] = d;
 				}
 			}
 			else {
-				TempStr[TempLen] = d;
-				TempLen++;
+				TempStr[TempLen++] = d;
 				if (cv->TelFlag && (d==0xff)) {
-					TempStr[TempLen] = (char)0xff;
-					TempLen++;
+					TempStr[TempLen++] = (char)0xff;
 				}
 			}
 		} // if (cv->SendKanjiFlag) else if ... else ... end
@@ -1328,7 +1304,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
-	char TempStr[11];
+	char TempStr[12];
 	BYTE d;
 	BOOL Full;
 
@@ -1337,8 +1313,8 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 	}
 
 	switch (cv->Language) {
-	  case IdJapanese:
 	  case IdUtf8:
+	  case IdJapanese:
 	  case IdKorean:
 		return TextOutJP(cv, B, C);
 		break;
@@ -1452,7 +1428,7 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 			K = (cv->EchoKanjiFirst << 8) + d;
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
 			if (cv->KanjiCodeSend == IdUTF8 || cv->Language==IdUtf8) {
-				OutputTextUTF8(K, TempStr, &TempLen, cv);
+				TempLen += OutputTextUTF8(K, TempStr, cv);
 			}
 			else {
 				if (cv->KanjiCodeEcho == IdEUC) {
@@ -1618,7 +1594,7 @@ int FAR PASCAL TextEchoKR(PComVar cv, PCHAR B, int C)
 			K = (cv->EchoKanjiFirst << 8) + d;
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
 			if (cv->KanjiCodeSend == IdUTF8) {
-				OutputTextUTF8(K, TempStr, &TempLen, cv);
+				TempLen += OutputTextUTF8(K, TempStr, cv);
 			}
 			else {
 				TempStr[TempLen] = HIBYTE(K);

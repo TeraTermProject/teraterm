@@ -45,6 +45,7 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 	unsigned int c, c1, c2, c3;
 	unsigned char *ptr, buf[3];
 	unsigned short cset;
+	int len = 0;
 
 	*byte = 2;
 
@@ -52,9 +53,11 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 	setlocale(LC_ALL, locale);
 
 	buf[0] = KCode >> 8;
-	buf[1] = KCode & 0xff;
-	buf[2] = '\0';
-	ret = mbtowc(&wchar, buf, 2);
+	if (buf[0] > 0) {
+		len++;
+	}
+	buf[len++] = KCode & 0xff;
+	ret = mbtowc(&wchar, buf, len);
 	if (ret <= 0) { // •ÏŠ·Ž¸”s
 		cset = 0;
 		if (_stricmp(locale, DEFAULT_LOCALE) == 0) {
@@ -67,11 +70,7 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 		}
 	} else {
 		ptr = (unsigned char *)&wchar;
-		if (ret >= 2) {
-			c = ((ptr[1] << 8) | ptr[0]);
-		} else {
-			c = '?';
-		}
+		c = ((ptr[1] << 8) | ptr[0]);
 	}
 
 	// UTF-16LE‚©‚çUTF-8‚Ö•ÏŠ·‚·‚é
