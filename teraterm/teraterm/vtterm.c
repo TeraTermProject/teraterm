@@ -25,6 +25,8 @@
 
 #include "vtterm.h"
 
+#define MAPSIZE(x) (sizeof(x)/sizeof((x)[0]))
+
   /* Parsing modes */
 #define ModeFirst 0
 #define ModeESC   1
@@ -3084,7 +3086,7 @@ static void UnicodeToCP932(unsigned int code, int byte)
 	wchar[1] = (code >> 8) & 0xff;
 
 	if (ts.UnicodeDecSpMapping) {
-		cset = ConvertUnicode(code, mapUnicodeSymbolToDecSp, sizeof(mapUnicodeSymbolToDecSp)/sizeof(mapUnicodeSymbolToDecSp[0]));
+		cset = ConvertUnicode(code, mapUnicodeSymbolToDecSp, MAPSIZE(mapUnicodeSymbolToDecSp));
 	}
 	if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
 		PutDecSp(cset & 0xff);
@@ -3096,7 +3098,7 @@ static void UnicodeToCP932(unsigned int code, int byte)
 		  case -1:
 			if (_stricmp(ts.Locale, DEFAULT_LOCALE) == 0) {
 				// U+301Cなどは変換できない。Unicode -> Shift_JISへ変換してみる。
-				cset = ConvertUnicode(code, mapUnicodeToSJIS, sizeof(mapUnicodeToSJIS)/sizeof(mapUnicodeToSJIS[0]));
+				cset = ConvertUnicode(code, mapUnicodeToSJIS, MAPSIZE(mapUnicodeToSJIS));
 				if (cset != 0) {
 					Kanji = cset & 0xff00;
 					PutKanji(cset & 0x00ff);
@@ -3216,7 +3218,7 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 		if (hfsplus_mode == 1) {
 			if (maybe_hfsplus == 0) {
 				if ((first_code_index = GetIndexOfHFSPlusFirstCode(
-						code, mapHFSPlusUnicode, sizeof(mapHFSPlusUnicode)/sizeof(mapHFSPlusUnicode[0])
+						code, mapHFSPlusUnicode, MAPSIZE(mapHFSPlusUnicode)
 						)) != -1) {
 					maybe_hfsplus = 1;
 					first_code = code;
@@ -3225,14 +3227,14 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 				}
 			} else {
 				maybe_hfsplus = 0;
-				cset = GetIllegalUnicode(first_code_index, first_code, code, mapHFSPlusUnicode, sizeof(mapHFSPlusUnicode)/sizeof(mapHFSPlusUnicode[0]));
+				cset = GetIllegalUnicode(first_code_index, first_code, code, mapHFSPlusUnicode, MAPSIZE(mapHFSPlusUnicode));
 				if (cset != 0) { // success
 					code = cset;
 
 				} else { // error
 					// 2つめの文字が半濁点の1文字目に相当する場合は、再度検索を続ける。(2005.10.15 yutaka)
 					if ((first_code_index = GetIndexOfHFSPlusFirstCode(
-							code, mapHFSPlusUnicode, sizeof(mapHFSPlusUnicode)/sizeof(mapHFSPlusUnicode[0])
+							code, mapHFSPlusUnicode, MAPSIZE(mapHFSPlusUnicode)
 							)) != -1) {
 
 						// 1つめの文字はそのまま出力する
