@@ -1263,7 +1263,7 @@ int TextOutJP(PComVar cv, PCHAR B, int C)
 			}
 			else if ((d>=0xa1) && (d<=0xe0) && (cv->Language == IdJapanese)) {
 				if (cv->KanjiCodeSend==IdEUC) {
-					TempStr[TempLen++] = (char)0x8E;
+					TempStr[TempLen++] = (char)SS2;
 				}
 				if ((cv->KanjiCodeSend==IdJIS) &&
 					(cv->JIS7KatakanaSend==1)) {
@@ -1528,7 +1528,7 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 			else if ((d>=0xa1) && (d<=0xe0)) {
 				/* Katakana */
 				if (cv->KanjiCodeEcho==IdEUC) {
-					TempStr[TempLen] = (char)0x8E;
+					TempStr[TempLen] = (char)SS2;
 					TempLen++;
 				}
 				if ((cv->KanjiCodeEcho==IdJIS) &&
