@@ -3161,42 +3161,38 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 		}
 	}
 
+	buf[count++] = b;
 	if (count < 2) {
-		buf[count++] = b;
 		return TRUE;
 	}
 
 	memset(mbchar, 0, sizeof(mbchar));
 
 	// 2バイトコードの場合
-	if ((buf[0] & 0xe0) == 0xc0 &&
-		(buf[1] & 0xc0) == 0x80) {
+	if ((buf[0] & 0xe0) == 0xc0) {
+		if ((buf[1] & 0xc0) == 0x80) {
 
-		if (hfsplus_mode == 1 && maybe_hfsplus == 1) {
-			UnicodeToCP932(first_code);
-			maybe_hfsplus = 0;
+			if (hfsplus_mode == 1 && maybe_hfsplus == 1) {
+				UnicodeToCP932(first_code);
+				maybe_hfsplus = 0;
+			}
+
+			code = ((buf[0] & 0x1f) << 6);
+			code |= ((buf[1] & 0x3f));
+
+			UnicodeToCP932(code);
 		}
-
-		code = ((buf[0] & 0x1f) << 6);
-		code |= ((buf[1] & 0x3f));
-
-		UnicodeToCP932(code);
-
-		// 次のバイトがASCIIならそのまま表示 (2006.6.30 yutaka)
-		if ((b & 0x80) != 0x80) { // ASCII(0x00-0x7f)
-			ParseASCII(b);
-			count = 0;  // reset counter
-
-		} else {
-			// ASCIIでないのなら、マルチバイト文字の始まりと見なす。
-			buf[0] = b;
-			count = 1;
+		else {
+			ParseASCII(buf[0]);
+			ParseASCII(buf[1]);
 		}
-
+		count = 0;
 		return TRUE;
 	}
 
-	buf[count++] = b;
+	if (count < 3) {
+		return TRUE;
+	}
 
 	if ((buf[0] & 0xe0) == 0xe0 &&
 		(buf[1] & 0xc0) == 0x80 &&
