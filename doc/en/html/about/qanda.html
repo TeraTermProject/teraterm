@@ -115,9 +115,9 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 <span class="qanda">Q.</span> Why number of fonts in the list of <a href="../setup-font.html">[Setup] Font</a> dialog box is so small?<br>
 <span class="qanda">Q.</span> Why I can not select the "Times" font at the <a href="../setup-font.html">[Setup] Font</a> dialog box?<br>
 <span class="qanda">A.</span> Tera Term uses only fixed-pitch fonts such as "Terminal" and "Courier" because characters should be displayed with equal spacing in order to emulate the VT terminal properly. Displaying proportional font characters with equal spacing is in principle possible but it makes program complicated and slow. So Tera Term does not use proportional fonts.<br>
-<!--
-<span class="qanda">A.</span> Windows 7 では、非表示に設定されたフォントはダイアログボックスでリストに含まれません。コントロールパネルのフォントで、使いたいフォントを表示するように設定してください。
--->
+
+<span class="qanda">A.</span>On Windows7, the font dialog uses the current users's show/hide font settings to determin the font list to display. This will result in the display of fewer font lists in most instances. To disable font hiding, users should go to the Font Settings page in the Fonts CPL and deselect the "Hide fonts based on language settings" checkbox.
+
 </p>
 
 <p>
@@ -130,17 +130,16 @@ In the case of PPP connection, the serial port is controlled by the PPP connecti
 <span class="qanda">A.</span> Specify "/interactive" option.
 </p>
 
-<!--
 <p>
-<span class="qanda">Q.</span> コマンドラインオプションの<a href="../commandline/teraterm.html#w">/W=</a>やマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルが変更できない。<br>
-<span class="qanda">A.</span> Linuxの一部のディストリビューションなどではウィンドウタイトルを変更する制御シーケンスを送信するよう設定されている場合があり、変更したウィンドウタイトルがホスト側に書き換えられてしまう事があります。この場合は以下のどちらかを行ってください。
-</p>
-<ul>
-  <li>ホスト側のシェル等の設定で、ウィンドウタイトルを変更する制御シーケンスを送出しないように設定する</li>
-  <li><a href="../menu/setup-additional.html">[Setup]Additional Setting</a>のGeneralタブにある Accept Window Title Change Request を off に変更する </li>
-</ul>
--->
+<span class="qanda">Q.</span> The window title can not change by using the <a href="../commandline/teraterm.html#w">/W=</a> of the command line option and the <a href="../macro/command/settitle.html">settitle</a> macro command.<br>
 
+<span class="qanda">A.</span> Some Linux distributions overwrite the window title after the current users' changing. To prevent this behavior, try either one of the following two methods:
+</p>
+
+<ul>
+  <li>A user configures the user's shell settings to disable sending the control sequence for the window title changing.</li>
+  <li>A user turns off the "Accept Window Title Change Request" on the General tab of the <a href="../menu/setup-additional.html">[Setup]Additional Setting</a> dialog.</li>
+</ul>
 
 </BODY>
 </HTML>
