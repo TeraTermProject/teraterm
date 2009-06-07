@@ -23,7 +23,7 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
   <dt id="hostname">&lt;username&gt;@&lt;host&gt;[:&lt;#TCP port&gt;]</dt>
   <dd>ホスト名指定ではTera Term本体が対応している形式の他に、ttssh拡張としてユーザ名付きも使えます。</dd>
 
-  <dt id="host-url">&lt;scheem&gt;://[&lt;username&gt[:&lt;password&gt;]@]&lt;host&gt;[:&lt;TCP port&gt;][/]</dt>
+  <dt id="host-url">&lt;scheme&gt;://[&lt;username&gt[:&lt;password&gt;]@]&lt;host&gt;[:&lt;TCP port&gt;][/]</dt>
   <dd>URL形式も拡張されます。<br>
       &lt;scheem&gt;には、ssh, ssh1, ssh2, slogin, slogin1, slogin2が使えます。<br>
       ポート番号が指定されなかった場合は22が使われます。(設定ファイルのTCPPortの値は無視されます)</dd>
@@ -125,6 +125,9 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
   <dt id="ssh-v">/ssh-v</dt>
   <dd>ログレベルを VERBOSE モードにする</dd>
 </dl>
+
+<p>値にスペースを含めるためには、値全体を `"' で囲んでください。<br>
+値に `"' を含めるためには、連続した `"'("") を指定してください。</p>
 
 
 <h2 id="example1">例</h2>
