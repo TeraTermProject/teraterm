@@ -3069,7 +3069,7 @@ int GetIndexOfHFSPlusFirstCode(unsigned short code, hfsplus_codemap_t *table, in
 }
 
 
-static void UnicodeToCP932(unsigned int code, int byte)
+static void UnicodeToCP932(unsigned int code)
 {
 	int ret;
 	char mbchar[32];
@@ -3147,18 +3147,14 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 		// 1バイト目がC1制御文字(0x80-0x9f)の場合も同様。
 		if (count == 0 || count == 1) {
 			if (hfsplus_mode == 1 && maybe_hfsplus == 1) {
-				UnicodeToCP932(first_code, 3);
+				UnicodeToCP932(first_code);
 				maybe_hfsplus = 0;
 			}
 
 			if (count == 1) {
 				ParseASCII(buf[0]);
-				//code = buf[0];
-				//UnicodeToCP932(code, 2);
 			}
 			ParseASCII(b);
-			//code = b;
-			//UnicodeToCP932(code, 2);
 
 			count = 0;  // reset counter
 			return TRUE;
@@ -3177,14 +3173,14 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 		(buf[1] & 0xc0) == 0x80) {
 
 		if (hfsplus_mode == 1 && maybe_hfsplus == 1) {
-			UnicodeToCP932(first_code, 3);
+			UnicodeToCP932(first_code);
 			maybe_hfsplus = 0;
 		}
 
 		code = ((buf[0] & 0x1f) << 6);
 		code |= ((buf[1] & 0x3f));
 
-		UnicodeToCP932(code, 2);
+		UnicodeToCP932(code);
 
 		// 次のバイトがASCIIならそのまま表示 (2006.6.30 yutaka)
 		if ((b & 0x80) != 0x80) { // ASCII(0x00-0x7f)
@@ -3238,7 +3234,7 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 							)) != -1) {
 
 						// 1つめの文字はそのまま出力する
-						UnicodeToCP932(first_code, 3);
+						UnicodeToCP932(first_code);
 
 						maybe_hfsplus = 1;
 						first_code = code;
@@ -3246,15 +3242,15 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 						return (TRUE);
 					}
 
-					UnicodeToCP932(first_code, 3);
-					UnicodeToCP932(code, 3);
+					UnicodeToCP932(first_code);
+					UnicodeToCP932(code);
 					count = 0;
 					return (TRUE);
 				}
 			}
 		}
 
-		UnicodeToCP932(code, 3);
+		UnicodeToCP932(code);
 
 skip:
 		count = 0;
