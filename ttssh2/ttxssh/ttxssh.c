@@ -663,9 +663,16 @@ void notify_established_secure_connection(PTInstVar pvar)
 	}
 
 	if (SecureLargeIcon != NULL && SecureSmallIcon != NULL) {
+#if 0
 		// 大きいアイコンは WNDCLASS にセットしているので取り出し方が違う (2006.8.10 maya)
 		pvar->OldLargeIcon =
 			(HICON) GetClassLong(pvar->NotificationWindow, GCL_HICON);
+#else
+		// Tera Term 側が WM_SETICON するようになったので普通に取り出す (2009.6.9 maya)
+		pvar->OldLargeIcon =
+			(HICON) SendMessage(pvar->NotificationWindow, WM_GETICON,
+			                    ICON_BIG, 0);
+#endif
 		pvar->OldSmallIcon =
 			(HICON) SendMessage(pvar->NotificationWindow, WM_GETICON,
 			                    ICON_SMALL, 0);
