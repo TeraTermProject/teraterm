@@ -620,9 +620,6 @@ CVTWindow::CVTWindow()
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = AfxGetInstanceHandle();
-	if (is_NT4()) {
-		fuLoad = LR_VGACOLOR;
-	}
 	wc.hIcon = NULL;
 	//wc.hCursor = LoadCursor(NULL,IDC_IBEAM);
 	wc.hCursor = NULL; // マウスカーソルは動的に変更する (2005.4.2 yutaka)
