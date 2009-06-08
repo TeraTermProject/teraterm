@@ -1262,6 +1262,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
 			}
 			else if ((d>=0xa1) && (d<=0xe0) && (cv->Language == IdJapanese)) {
+				/* Katakana */
 				if (cv->KanjiCodeSend==IdEUC) {
 					TempStr[TempLen++] = (char)SS2;
 				}
@@ -1330,24 +1331,19 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 			TempStr[TempLen] = 0x0d;
 			TempLen++;
 			if (cv->CRSend==IdCRLF) {
-				TempStr[TempLen] = 0x0a;
-				TempLen++;
+				TempStr[TempLen++] = 0x0a;
 			}
-			else if ((cv->CRSend==IdCR) &&
-					 cv->TelFlag && ! cv->TelBinSend) {
-				TempStr[TempLen] = 0;
-				TempLen++;
+			else if (cv->CRSend==IdCR && cv->TelFlag && ! cv->TelBinSend) {
+				TempStr[TempLen++] = 0;
 			}
 		}
 		else {
-			if ((cv->Language==IdRussian) &&
-			    (d>=128))
+			if ((cv->Language==IdRussian) && (d>=128)) {
 				d = RussConv(cv->RussClient,cv->RussHost,d);
-			TempStr[TempLen] = d;
-			TempLen++;
+			}
+			TempStr[TempLen++] = d;
 			if (cv->TelFlag && (d==0xff)) {
-				TempStr[TempLen] = (char)0xff;
-				TempLen++;
+				TempStr[TempLen++] = (char)0xff;
 			}
 		}
 
@@ -1409,7 +1405,7 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;
-	char TempStr[11];
+	char TempStr[12];
 	int EchoCodeNew;
 	BYTE d;
 	BOOL Full, KanjiFlagNew;
@@ -1420,34 +1416,41 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 		TempLen = 0;
 		d = (BYTE)B[i];
 		EchoCodeNew = cv->EchoCode;
+		KanjiFlagNew = FALSE;
 
 		if (cv->EchoKanjiFlag) {
-			KanjiFlagNew = FALSE;
 			EchoCodeNew = IdKanji;
 
 			K = (cv->EchoKanjiFirst << 8) + d;
+
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
-			if (cv->KanjiCodeSend == IdUTF8 || cv->Language==IdUtf8) {
+			if (cv->KanjiCodeEcho == IdUTF8 || cv->Language==IdUtf8) {
 				TempLen += OutputTextUTF8(K, TempStr, cv);
 			}
 			else {
-				if (cv->KanjiCodeEcho == IdEUC) {
-					K = SJIS2EUC(K);
+				switch (cv->Language) {
+				  case IdJapanese:
+					switch (cv->KanjiCodeEcho) {
+					  case IdEUC:
+						K = SJIS2EUC(K);
+						break;
+					  case IdJIS:
+						K = SJIS2JIS(K);
+						if ((cv->EchoCode==IdKatakana) &&
+						    (cv->JIS7KatakanaEcho==1)) {
+							TempStr[TempLen++] = SI;
+						}
+						break;
+					  case IdSJIS:
+						/* nothing to do */
+						break;
+					}
+					break;
+				  case IdKorean:
+					break;
 				}
-				else if (cv->KanjiCodeEcho != IdSJIS) {
-					K = SJIS2JIS(K);
-				}
-
-				if ((cv->EchoCode==IdKatakana) &&
-				    (cv->KanjiCodeEcho==IdJIS) &&
-				    (cv->JIS7KatakanaEcho==1)) {
-					TempStr[TempLen] = SI;
-					TempLen++;
-				}
-
-				TempStr[TempLen] = HIBYTE(K);
-				TempStr[TempLen+1] = LOBYTE(K);
-				TempLen = TempLen + 2;
+				TempStr[TempLen++] = HIBYTE(K);
+				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
 		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
@@ -1455,100 +1458,89 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 			cv->EchoKanjiFirst = d;
 			EchoCodeNew = IdKanji;
 
-			if ((cv->EchoCode!=IdKanji) &&
-			    (cv->KanjiCodeEcho==IdJIS)) {
-				TempStr[0] = 0x1B;
-				TempStr[1] = '$';
-				if (cv->KanjiIn == IdKanjiInB) {
-					TempStr[2] = 'B';
+			if (cv->Language == IdJapanese) {
+				if ((cv->EchoCode!=IdKanji) && (cv->KanjiCodeEcho==IdJIS)) {
+					TempStr[0] = 0x1B;
+					TempStr[1] = '$';
+					if (cv->KanjiIn == IdKanjiInB) {
+						TempStr[2] = 'B';
+					}
+					else {
+						TempStr[2] = '@';
+					}
+					TempLen = 3;
 				}
-				else {
-					TempStr[2] = '@';
-				}
-				TempLen = 3;
-			}
-			else {
-				TempLen = 0;
 			}
 		}
 		else {
-			KanjiFlagNew = FALSE;
-
-			if ((cv->EchoCode==IdKanji) &&
-			    (cv->KanjiCodeEcho==IdJIS)) {
-				TempStr[0] = 0x1B;
-				TempStr[1] = '(';
-				switch (cv->KanjiOut) {
-					case IdKanjiOutJ:
+			if (cv->Language == IdJapanese) {
+				if ((cv->EchoCode==IdKanji) && (cv->KanjiCodeEcho==IdJIS)) {
+					TempStr[0] = 0x1B;
+					TempStr[1] = '(';
+					switch (cv->KanjiOut) {
+					  case IdKanjiOutJ:
 						TempStr[2] = 'J';
 						break;
-					case IdKanjiOutH:
+					  case IdKanjiOutH:
 						TempStr[2] = 'H';
 						break;
-					default:
+					  default:
 						TempStr[2] = 'B';
+					}
+					TempLen = 3;
 				}
-				TempLen = 3;
-			}
-			else
-				TempLen = 0;
 
-			if ((0xa0<d) && (d<0xe0)) {
-				EchoCodeNew = IdKatakana;
-				if ((cv->EchoCode!=IdKatakana) &&
-				    (cv->KanjiCodeEcho==IdJIS) &&
-				    (cv->JIS7KatakanaEcho==1)) {
-					TempStr[TempLen] = SO;
-					TempLen++;
+				if ((0xa0<d) && (d<0xe0)) {
+					EchoCodeNew = IdKatakana;
+					if ((cv->EchoCode!=IdKatakana) &&
+					    (cv->KanjiCodeEcho==IdJIS) &&
+					    (cv->JIS7KatakanaEcho==1)) {
+						TempStr[TempLen++] = SO;
+					}
 				}
-			}
-			else {
-				EchoCodeNew = IdASCII;
-				if ((cv->EchoCode==IdKatakana) &&
-				    (cv->KanjiCodeEcho==IdJIS) &&
-				    (cv->JIS7KatakanaEcho==1)) {
-					TempStr[TempLen] = SI;
-					TempLen++;
+				else {
+					EchoCodeNew = IdASCII;
+					if ((cv->EchoCode==IdKatakana) &&
+					    (cv->KanjiCodeEcho==IdJIS) &&
+					    (cv->JIS7KatakanaEcho==1)) {
+						TempStr[TempLen++] = SI;
+					}
 				}
 			}
 
 			if (d==0x0d) {
-				TempStr[TempLen] = 0x0d;
-				TempLen++;
+				TempStr[TempLen++] = 0x0d;
 				if (cv->CRSend==IdCRLF) {
-					TempStr[TempLen] = 0x0a;
-					TempLen++;
+					TempStr[TempLen++] = 0x0a;
 				}
 				else if ((cv->CRSend==IdCR) &&
 				          cv->TelFlag && ! cv->TelBinSend) {
-					TempStr[TempLen] = 0;
-					TempLen++;
+					TempStr[TempLen++] = 0;
 				}
 			}
-			else if ((d>=0xa1) && (d<=0xe0)) {
+			else if ((d>=0x80) && (cv->KanjiCodeEcho==IdUTF8 || cv->Language==IdUtf8)) {
+				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
+			}
+			else if ((d>=0xa1) && (d<=0xe0) && (cv->Language == IdJapanese)) {
 				/* Katakana */
 				if (cv->KanjiCodeEcho==IdEUC) {
-					TempStr[TempLen] = (char)SS2;
-					TempLen++;
+					TempStr[TempLen++] = (char)SS2;
 				}
 				if ((cv->KanjiCodeEcho==IdJIS) &&
 					(cv->JIS7KatakanaEcho==1)) {
-					TempStr[TempLen] = d & 0x7f;
+					TempStr[TempLen++] = d & 0x7f;
 				}
 				else {
-					TempStr[TempLen] = d;
+					TempStr[TempLen++] = d;
 				}
-				TempLen++;
 			}
 			else {
-				TempStr[TempLen] = d;
-				TempLen++;
+				TempStr[TempLen++] = d;
 				if (cv->TelFlag && (d==0xff)) {
-					TempStr[TempLen] = (char)0xff;
-					TempLen++;
+					TempStr[TempLen++] = (char)0xff;
 				}
 			}
-		} // if (cv->SendKanjiFlag) else if ... else ... end
+		} // if (cv->EchoKanjiFlag) else if ... else ... end
 
 		if (TempLen == 0) {
 			i++;
@@ -1586,55 +1578,50 @@ int FAR PASCAL TextEchoKR(PComVar cv, PCHAR B, int C)
 		TempLen = 0;
 		d = (BYTE)B[i];
 		EchoCodeNew = cv->EchoCode;
+		KanjiFlagNew = FALSE;
 
 		if (cv->EchoKanjiFlag) {
-			KanjiFlagNew = FALSE;
 			EchoCodeNew = IdKanji;
 
 			K = (cv->EchoKanjiFirst << 8) + d;
+
 			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
-			if (cv->KanjiCodeSend == IdUTF8) {
+			if (cv->KanjiCodeEcho == IdUTF8) {
 				TempLen += OutputTextUTF8(K, TempStr, cv);
 			}
 			else {
-				TempStr[TempLen] = HIBYTE(K);
-				TempStr[TempLen+1] = LOBYTE(K);
-				TempLen = TempLen + 2;
+				TempStr[TempLen++] = HIBYTE(K);
+				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
 		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
 			KanjiFlagNew = TRUE;
 			cv->EchoKanjiFirst = d;
 			EchoCodeNew = IdKanji;
-			TempLen = 0;
 		}
 		else {
-			KanjiFlagNew = FALSE;
-			TempLen = 0;
 			EchoCodeNew = IdASCII;
 
 			if (d==0x0d) {
-				TempStr[TempLen] = 0x0d;
-				TempLen++;
+				TempStr[TempLen++] = 0x0d;
 				if (cv->CRSend==IdCRLF) {
-					TempStr[TempLen] = 0x0a;
-					TempLen++;
+					TempStr[TempLen++] = 0x0a;
 				}
 				else if ((cv->CRSend==IdCR) &&
 				          cv->TelFlag && ! cv->TelBinSend) {
-					TempStr[TempLen] = 0;
-					TempLen++;
+					TempStr[TempLen++] = 0;
 				}
+			}
+			else if ((d>=0x80) && (cv->KanjiCodeEcho==IdUTF8)) {
+				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
 			}
 			else {
-				TempStr[TempLen] = d;
-				TempLen++;
+				TempStr[TempLen++] = d;
 				if (cv->TelFlag && (d==0xff)) {
-					TempStr[TempLen] = (char)0xff;
-					TempLen++;
+					TempStr[TempLen++] = (char)0xff;
 				}
 			}
-		} // if (cv->SendKanjiFlag) else if ... else ... end
+		} // if (cv->EchoKanjiFlag) else if ... else ... end
 
 		if (TempLen == 0) {
 			i++;
@@ -1673,11 +1660,14 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 		cv->InPtr = 0;
 	}
 
-	if (cv->Language==IdJapanese || cv->Language == IdUtf8) {
+	switch (cv->Language) {
+	  case IdUtf8:
+	  case IdJapanese:
 		return TextEchoJP(cv,B,C);
-	}
-	else if (cv->Language == IdKorean) {
+		break;
+	  case IdKorean:
 		return TextEchoKR(cv,B,C);
+		break;
 	}
 
 	Full = FALSE;
@@ -1690,25 +1680,19 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 			TempStr[TempLen] = 0x0d;
 			TempLen++;
 			if (cv->CRSend==IdCRLF) {
-				TempStr[TempLen] = 0x0a;
-				TempLen++;
+				TempStr[TempLen++] = 0x0a;
 			}
-			else if ((cv->CRSend==IdCR) &&
-			         cv->TelFlag && ! cv->TelBinSend) {
-				TempStr[TempLen] = 0;
-				TempLen++;
+			else if (cv->CRSend==IdCR && cv->TelFlag && ! cv->TelBinSend) {
+				TempStr[TempLen++] = 0;
 			}
 		}
 		else {
-			if ((cv->Language==IdRussian) &&
-				(d>=128)) {
+			if ((cv->Language==IdRussian) && (d>=128)) {
 				d = RussConv(cv->RussClient,cv->RussHost,d);
 			}
-			TempStr[TempLen] = d;
-			TempLen++;
+			TempStr[TempLen++] = d;
 			if (cv->TelFlag && (d==0xff)) {
-				TempStr[TempLen] = (char)0xff;
-				TempLen++;
+				TempStr[TempLen++] = (char)0xff;
 			}
 		}
 
