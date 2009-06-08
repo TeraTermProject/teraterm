@@ -1139,9 +1139,9 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 }
 
 // 
-// SJISから各種漢字コードへ変換して出力する。
+// MBCSから各種漢字コードへ変換して出力する。
 //
-int TextOutJP(PComVar cv, PCHAR B, int C)
+int TextOutMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;
@@ -1316,7 +1316,7 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 	  case IdUtf8:
 	  case IdJapanese:
 	  case IdKorean:
-		return TextOutJP(cv, B, C);
+		return TextOutMBCS(cv, B, C);
 		break;
 	}
 
