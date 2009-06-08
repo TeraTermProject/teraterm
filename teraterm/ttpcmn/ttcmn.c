@@ -1127,6 +1127,8 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 
 	code = SJIS2UTF8(K, &outlen, cv->Locale);
 	switch (outlen) {
+	  case 4:
+		TempStr[TempLen++] = (code >> 24) & 0xff;
 	  case 3:
 		TempStr[TempLen++] = (code >> 16) & 0xff;
 	  case 2:
