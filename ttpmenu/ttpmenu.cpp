@@ -28,6 +28,7 @@ HWND		g_hWnd;				// メインのハンドル
 HWND		g_hWndMenu = NULL;	// 設定ダイアログのハンドル
 HWND		g_hWndTip;			// 設定ダイアログ内ツールチップのハンドル
 HICON		g_hIcon;			// アプリケーションアイコンのハンドル
+HICON		g_hIconSmall;		// アプリケーションアイコン(16x16)のハンドル
 HMENU		g_hMenu;			// メニュー（非表示）のハンドル
 HMENU		g_hSubMenu;			// ポップアップメニューのハンドル
 HMENU		g_hListMenu;		// 設定一覧ポップアップメニューのハンドル
@@ -982,7 +983,7 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	nid.uID					= TTERM_ICON;
 	nid.uFlags				= NIF_ICON | NIF_TIP | NIF_MESSAGE;
 	nid.uCallbackMessage	= WM_TMENU_NOTIFY;
-	nid.hIcon				= g_hIcon;
+	nid.hIcon				= g_hIconSmall;
 	lstrcpy(nid.szTip, "TeraTerm Menu");
 
 	::Shell_NotifyIcon(dwMessage, &nid);
@@ -2312,7 +2313,8 @@ BOOL CALLBACK DlgCallBack_Config(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			::EndDialog(hWnd, FALSE);
 		}
 		SetDlgPos(hWnd, POSITION_CENTER);
-		::SetClassLong(hWnd, GCL_HICON, (LONG) g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
 		CreateTooltip();
 		crText		= ::GetSysColor(COLOR_WINDOWTEXT);
 		crBkgnd		= ::GetSysColor(COLOR_WINDOW);
@@ -2411,7 +2413,9 @@ BOOL CALLBACK DlgCallBack_Version(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	switch(uMsg) {
 	case WM_INITDIALOG:
 		SetDlgPos(hWnd, POSITION_CENTER);
-		::SetClassLong(hWnd, GCL_HICON, (LONG) g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
+		SendDlgItemMessage(hWnd, IDC_TTPMENU_ICON, STM_SETICON, (WPARAM)g_hIcon, 0);
 		InitVersionDlg(hWnd);
 		return TRUE;
 	case WM_COMMAND:
@@ -2451,7 +2455,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	switch(uMsg) {
 	case WM_CREATE:
-		::SetClassLong(hWnd, GCL_HICON, (LONG) g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)g_hIcon);
+		PostMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall);
 		SetDlgPos(hWnd, POSITION_CENTER);
 		::ShowWindow(hWnd, SW_HIDE);
 		SetTaskTray(hWnd, NIM_ADD);
@@ -2576,6 +2581,7 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 	WNDCLASS	winClass;
 	char		uimsg[MAX_UIMSG];
 	DWORD		dwErr;
+	int			fuLoad = LR_DEFAULTCOLOR;
 
 	// インストーラで実行を検出するために mutex を作成する (2006.8.12 maya)
 	// 2重起動防止のためではないので、特に返り値は見ない
@@ -2586,8 +2592,13 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
 
-	g_hI	= hI;
-	g_hIcon	= ::LoadIcon(g_hI, (LPCSTR) TTERM_ICON);
+	g_hI			= hI;
+
+	if (is_NT4()){
+		fuLoad = LR_VGACOLOR;
+	}
+	g_hIcon			= (HICON)::LoadImage(g_hI, MAKEINTRESOURCE(TTERM_ICON), IMAGE_ICON, 32, 32, fuLoad);
+	g_hIconSmall	= (HICON)::LoadImage(g_hI, MAKEINTRESOURCE(TTERM_ICON), IMAGE_ICON, 16, 16, fuLoad);
 
 	memset(&winClass, 0, sizeof(winClass));
 	winClass.style			= (CS_BYTEALIGNCLIENT | CS_BYTEALIGNWINDOW | CS_DBLCLKS);

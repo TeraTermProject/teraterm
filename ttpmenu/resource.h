@@ -44,6 +44,7 @@
 #define BUTTON_INITFILE                 1035
 #define EDIT_PROMPT_USER                1036
 #define STATIC_ICON                     1036
+#define IDC_TTPMENU_ICON                1036
 #define EDIT_PROMPT_PASS                1037
 #define CHECK_TTSSH                     1037
 #define EDIT_OPTION                     1038
