@@ -1730,6 +1730,7 @@ void CVTWindow::OnDestroy()
 		::DestroyWindow(HTEKWin);
 	}
 
+	EndTerm();
 	EndDisp();
 
 	FreeBuffer();

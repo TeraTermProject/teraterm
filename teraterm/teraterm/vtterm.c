@@ -117,7 +117,7 @@ static BOOL DirectPrn = FALSE;
 static BYTE NewKeyStr[FuncKeyStrMax];
 static int NewKeyId, NewKeyLen;
 
-static _locale_t CLocale;
+static _locale_t CLocale = NULL;
 
 void ResetSBuffers()
 {
@@ -174,7 +174,9 @@ void ResetTerminal() /*reset variables but don't update screen */
   FocusReportMode = FALSE;
   MouseReportMode = IdMouseTrackNone;
 
-  CLocale = _create_locale(LC_ALL, "C");
+  if (CLocale == NULL) {
+    CLocale = _create_locale(LC_ALL, "C");
+  }
 
   /* Character sets */
   ResetCharSet();
@@ -3549,4 +3551,11 @@ void VisualBell() {
 	CSQExchangeColor();
 	Sleep(10);
 	CSQExchangeColor();
+}
+
+void EndTerm() {
+	if (CLocale) {
+		_free_locale(CLocale);
+	}
+	CLocale = NULL;
 }

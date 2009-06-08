@@ -18,6 +18,7 @@ void ChangeTerminalSize(int Nx, int Ny);
 int VTParse();
 void FocusReport(BOOL Focus);
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos);
+void EndTerm();
 
 #ifdef __cplusplus
 }
