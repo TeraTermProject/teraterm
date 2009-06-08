@@ -1403,7 +1403,7 @@ int FAR PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
+int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;
@@ -1565,87 +1565,6 @@ int FAR PASCAL TextEchoJP(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL TextEchoKR(PComVar cv, PCHAR B, int C)
-{
-	int i, TempLen;
-	WORD K;
-	char TempStr[11];
-	int EchoCodeNew;
-	BYTE d;
-	BOOL Full, KanjiFlagNew;
-
-	Full = FALSE;
-	i = 0;
-	while (! Full && (i < C)) {
-		TempLen = 0;
-		d = (BYTE)B[i];
-		EchoCodeNew = cv->EchoCode;
-		KanjiFlagNew = FALSE;
-
-		if (cv->EchoKanjiFlag) {
-			EchoCodeNew = IdKanji;
-
-			K = (cv->EchoKanjiFirst << 8) + d;
-
-			// UTF-8への変換を行う。1～3バイトまでの対応なので注意。
-			if (cv->KanjiCodeEcho == IdUTF8) {
-				TempLen += OutputTextUTF8(K, TempStr, cv);
-			}
-			else {
-				TempStr[TempLen++] = HIBYTE(K);
-				TempStr[TempLen++] = LOBYTE(K);
-			}
-		}
-		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
-			KanjiFlagNew = TRUE;
-			cv->EchoKanjiFirst = d;
-			EchoCodeNew = IdKanji;
-		}
-		else {
-			EchoCodeNew = IdASCII;
-
-			if (d==0x0d) {
-				TempStr[TempLen++] = 0x0d;
-				if (cv->CRSend==IdCRLF) {
-					TempStr[TempLen++] = 0x0a;
-				}
-				else if ((cv->CRSend==IdCR) &&
-				          cv->TelFlag && ! cv->TelBinSend) {
-					TempStr[TempLen++] = 0;
-				}
-			}
-			else if ((d>=0x80) && (cv->KanjiCodeEcho==IdUTF8)) {
-				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
-			}
-			else {
-				TempStr[TempLen++] = d;
-				if (cv->TelFlag && (d==0xff)) {
-					TempStr[TempLen++] = (char)0xff;
-				}
-			}
-		} // if (cv->EchoKanjiFlag) else if ... else ... end
-
-		if (TempLen == 0) {
-			i++;
-			cv->EchoCode = EchoCodeNew;
-			cv->EchoKanjiFlag = KanjiFlagNew;
-		}
-		else {
-			Full = InBuffSize-cv->InBuffCount-TempLen < 0;
-			if (! Full) {
-				i++;
-				cv->EchoCode = EchoCodeNew;
-				cv->EchoKanjiFlag = KanjiFlagNew;
-				memcpy(&(cv->InBuff[cv->InBuffCount]),TempStr,TempLen);
-				cv->InBuffCount = cv->InBuffCount + TempLen;
-			}
-		}
-
-	} // end of "while {}"
-
-	return i;
-}
-
 int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
@@ -1665,10 +1584,8 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 	switch (cv->Language) {
 	  case IdUtf8:
 	  case IdJapanese:
-		return TextEchoJP(cv,B,C);
-		break;
 	  case IdKorean:
-		return TextEchoKR(cv,B,C);
+		return TextEchoMBCS(cv,B,C);
 		break;
 	}
 
