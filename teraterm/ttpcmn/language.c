@@ -64,7 +64,7 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 			cset = ConvertUnicode(KCode, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
 		}
 		if (cset == 0) {
-			goto error;
+			c = 0xfffd;
 		} else {
 			c = cset;
 		}
@@ -91,8 +91,6 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 		code = (c1 << 16) | (c2 << 8) | c3;
 		*byte = 3;
 	}
-
-error:
 
 	return (code);
 }
