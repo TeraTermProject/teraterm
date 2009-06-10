@@ -3385,3 +3385,18 @@ void DispShowWindow(int mode) {
 		break;
 	}
 }
+
+void DispResizeWin(int w, int h) {
+	RECT r;
+
+	if (w <= 0 || h <= 0) {
+		GetWindowRect(HVTWin,&r);
+		if (w <= 0) {
+			w = r.right - r.left;
+		}
+		if (h <= 0) {
+			h = r.bottom - r.top;
+		}
+	}
+	SetWindowPos(HVTWin, 0, 0, 0, w, h, SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE);
+}

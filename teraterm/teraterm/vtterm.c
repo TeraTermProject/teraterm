@@ -1774,6 +1774,11 @@ void CSSetAttr()
 	if (NParam < 3) Param[3] = 0;
 	DispMoveWindow(Param[2], Param[3]);
 	break;
+      case 4: // set window size by pixel
+        if (NParam < 2) Param[2] = 0;
+	if (NParam < 3) Param[3] = 0;
+	DispResizeWin(Param[3], Param[2]);
+	break;
       case 5: // Raise window
 	DispShowWindow(WINDOW_RAISE);
 	break;
