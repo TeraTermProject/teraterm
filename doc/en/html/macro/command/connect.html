@@ -284,8 +284,9 @@ connect msg
 
 <ol>
  <li>In these examples parameters shown with Italic font have to be replaced with their actual values.</li>
- <!--li>パスワードにはスペースを含むことが可能です。パスワードの中でスペースを表すには、パスワード全体を `"' で囲んでください。パスワードに " を含めるためには、連続した `"`("") を使用してください。<br>
-※パスワードにスペースを含むために "@" を使用する仕様は、4.63 から廃止されました。</li-->
+ <li>A user's password can include space characters. If the password includes the space character, a user should put the password in quotations by using `"' character. Also, if the password includes the " character, a user should write the " two times.<br>
+ NOTICE: A user can not use the "@" character instead of the space character from Tera Term 4.63.
+ </li>
  <li>Please remember that entering actual username and password in Tera Term macro will cause them to be stored as an open text and it is your responsibility to keep such macro is secure location.</li>
  <li>When a user re-connect the remote host soon after disconnecting the server, a user could not connect the server. For more detail, refer to "<a href="../appendixes/disconnecttiming.html">here</a>".</li>
 </ol>
