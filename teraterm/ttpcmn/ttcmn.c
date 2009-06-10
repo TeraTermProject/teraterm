@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <setupapi.h>
+#include <locale.h>
 
 #include "compat_w95.h"
 
@@ -1151,6 +1152,9 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 	int SendCodeNew;
 	BYTE d;
 	BOOL Full, KanjiFlagNew;
+	_locale_t locale;
+
+	locale = _create_locale(LC_ALL, cv->Locale);
 
 	Full = FALSE;
 	i = 0;
@@ -1195,7 +1199,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
-		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
+		else if (_isleadbyte_l(d, locale)) {
 			KanjiFlagNew = TRUE;
 			cv->SendKanjiFirst = d;
 			SendCodeNew = IdKanji;
@@ -1300,6 +1304,8 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 		}
 
 	} // end of "while {}"
+
+	_free_locale(locale);
 
 	return i;
 }
@@ -1411,6 +1417,9 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 	int EchoCodeNew;
 	BYTE d;
 	BOOL Full, KanjiFlagNew;
+	_locale_t locale;
+
+	locale = _create_locale(LC_ALL, cv->Locale);
 
 	Full = FALSE;
 	i = 0;
@@ -1455,7 +1464,7 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 				TempStr[TempLen++] = LOBYTE(K);
 			}
 		}
-		else if (IsDBCSLeadByteEx(*cv->CodePage, d)) {
+		else if (_isleadbyte_l(d, locale)) {
 			KanjiFlagNew = TRUE;
 			cv->EchoKanjiFirst = d;
 			EchoCodeNew = IdKanji;
@@ -1561,6 +1570,8 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 		}
 
 	} // end of "while {}"
+
+	_free_locale(locale);
 
 	return i;
 }
