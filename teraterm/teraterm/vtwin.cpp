@@ -2549,7 +2549,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	// ALT + xを押下すると WM_SYSCHAR が飛んでくる。
 	// ALT + Enterでウィンドウの最大化 (2005.4.24 yutaka)
-	if (AltKey() && nChar == 13) {
+	if ((nFlags&0x2000) != 0 && nChar == CR) {
 		if (IsZoomed()) { // window is maximum
 			ShowWindow(SW_RESTORE);
 		} else {
