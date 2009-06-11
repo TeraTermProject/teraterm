@@ -82,6 +82,7 @@ void DispSetCurCharAttr(TCharAttr Attr);
 void DispMoveWindow(int x, int y);
 void DispShowWindow(int mode);
 void DispResizeWin(int w, int h);
+BOOL DispWindowIconified();
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

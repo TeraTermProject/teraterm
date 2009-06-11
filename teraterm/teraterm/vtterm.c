@@ -1774,7 +1774,7 @@ void CSSetAttr()
 	if (NParam < 3) Param[3] = 0;
 	DispMoveWindow(Param[2], Param[3]);
 	break;
-      case 4: // set window size by pixel
+      case 4: // set window size
         if (NParam < 2) Param[2] = 0;
 	if (NParam < 3) Param[3] = 0;
 	DispResizeWin(Param[3], Param[2]);
@@ -1800,6 +1800,13 @@ void CSSetAttr()
 	else {
 	  DispShowWindow(WINDOW_MAXIMIZE);
 	}
+	break;
+      case 11: // Report window state
+	if (Send8BitMode)
+	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\233%dt", CLocale, DispWindowIconified()?2:1);
+	else
+	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[%dt", CLocale, DispWindowIconified()?2:1);
+	CommBinaryOut(&cv,Report,strlen(Report));
 	break;
       case 14: /* get window size??? */
 	/* this is not actual window size */
