@@ -1839,7 +1839,7 @@ void CSSetAttr()
 	break;
       case 19: // Report display size (character)
 	DispGetRootWinSize(&x, &y);
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, x, y);
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
 	SendCSIstr(Report, len);
 	break;
     }
