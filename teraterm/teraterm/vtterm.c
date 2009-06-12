@@ -1844,7 +1844,9 @@ void CSSetAttr()
   {
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
-	SendCSIstr(">32;10;2c", 9); /* VT382 */
+	if (Param[1] < 1) {
+	  SendCSIstr(">32;10;2c", 9); /* VT382 */
+	}
 	break;
       case 'J':
 	if (Param[1]==3) // IO-8256 terminal
