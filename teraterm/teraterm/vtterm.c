@@ -1837,6 +1837,11 @@ void CSSetAttr()
 	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%u;t", CLocale, NumOfLines-StatusLine, NumOfColumns);
 	SendCSIstr(Report, len);
 	break;
+      case 19: // Report display size (character)
+	DispGetRootWinSize(&x, &y);
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, x, y);
+	SendCSIstr(Report, len);
+	break;
     }
   }
 

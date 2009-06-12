@@ -3424,3 +3424,32 @@ void DispGetWindowPos(int *x, int *y) {
 
 	return;
 }
+
+void DispGetRootWinSize(int *x, int *y)
+{
+	HMODULE mod;
+	HMONITOR monitor;
+	MONITORINFO monitorInfo;
+	RECT desktop, win, client;
+
+	GetWindowRect(HVTWin, &win);
+	GetClientRect(HVTWin, &client);
+
+	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	    (GetProcAddress(mod,"MonitorFromWindow") != NULL)) {
+		// マルチモニタがサポートされている場合
+		monitor = MonitorFromWindow(HVTWin, MONITOR_DEFAULTTONEAREST);
+		monitorInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(monitor, &monitorInfo);
+		desktop = monitorInfo.rcWork;
+	}
+	else {
+		// マルチモニタがサポートされていない場合
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop, 0);
+	}
+
+	*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
+	*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
+
+	return;
+}

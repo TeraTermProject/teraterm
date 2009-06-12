@@ -84,6 +84,7 @@ void DispShowWindow(int mode);
 void DispResizeWin(int w, int h);
 BOOL DispWindowIconified();
 void DispGetWindowPos(int *x, int *y);
+void DispGetRootWinSize(int *x, int *y);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];
