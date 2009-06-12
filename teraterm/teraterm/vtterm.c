@@ -295,6 +295,30 @@ void ChangeTerminalSize(int Nx, int Ny)
   MainBottom = NumOfColumns-1;
 }
 
+void SendCSIstr(char *str, int len) {
+	if (str == NULL || len <= 0)
+		return;
+
+	if (Send8BitMode)
+		CommBinaryOut(&cv,"\233", 1);
+	else
+		CommBinaryOut(&cv,"\033[", 2);
+
+	CommBinaryOut(&cv, str, len);
+}
+
+void SendOSCstr(char *str, int len) {
+	if (str == NULL || len <= 0)
+		return;
+
+	if (Send8BitMode)
+		CommBinaryOut(&cv,"\235", 1);
+	else
+		CommBinaryOut(&cv,"\033]", 2);
+
+	CommBinaryOut(&cv, str, len);
+}
+
 void BackSpace()
 {
   if (CursorX == 0)
@@ -1543,15 +1567,12 @@ void CSScreenErase()
   void CS_n_Mode()
   {
     char Report[16];
-    int Y;
+    int Y, len;
 
     switch (Param[1]) {
       case 5:
 	/* Device Status Report -> Ready */
-	if (Send8BitMode)
-	  CommBinaryOut(&cv,"\2330n",3);
-	else
-	  CommBinaryOut(&cv,"\033[0n",4);
+	SendCSIstr("0n", 2);
 	break;
       case 6:
 	/* Cursor Position Report */
@@ -1559,11 +1580,8 @@ void CSScreenErase()
 	if ((StatusLine>0) &&
 	    (Y==NumOfLines))
 	  Y = 1;
-	if (Send8BitMode)
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\233%u;%uR", CLocale, Y, CursorX+1);
-	else
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[%u;%uR", CLocale, Y, CursorX+1);
-	CommBinaryOut(&cv,Report,strlen(Report));
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%u;%uR", CLocale, Y, CursorX+1);
+	SendCSIstr(Report, len);
 	break;
     }
   }
@@ -1760,7 +1778,7 @@ void CSSetAttr()
 
   void CSSunSequence() /* Sun terminal private sequences */
   {
-    int x, y;
+    int x, y, len;
     char Report[16];
 
     switch (Param[1]) {
@@ -1803,33 +1821,21 @@ void CSSetAttr()
 	}
 	break;
       case 11: // Report window state
-	if (Send8BitMode)
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\233%dt", CLocale, DispWindowIconified()?2:1);
-	else
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[%dt", CLocale, DispWindowIconified()?2:1);
-	CommBinaryOut(&cv,Report,strlen(Report));
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
+	SendCSIstr(Report, len);
 	break;
       case 13: // Report window position
 	DispGetWindowPos(&x, &y);
-	if (Send8BitMode)
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\2333;%d;%dt", CLocale, x, y);
-	else
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[3;%d;%dt", CLocale, x, y);
-	CommBinaryOut(&cv,Report,strlen(Report));
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%d;%dt", CLocale, x, y);
+	SendCSIstr(Report, len);
 	break;
       case 14: /* get window size??? */
 	/* this is not actual window size */
-	if (Send8BitMode)
-	  CommBinaryOut(&cv,"\2334;640;480t",11);
-	else
-	  CommBinaryOut(&cv,"\033[4;640;480t",12);
+	SendCSIstr("4;640;480t", 10);
 	break;
       case 18: /* get terminal size */
-	if (Send8BitMode)
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\2338;%u;%u;t", CLocale, NumOfLines-StatusLine, NumOfColumns);
-	else
-	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[8;%u;%u;t", CLocale, NumOfLines-StatusLine, NumOfColumns);
-	CommBinaryOut(&cv,Report,strlen(Report));
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%u;t", CLocale, NumOfLines-StatusLine, NumOfColumns);
+	SendCSIstr(Report, len);
 	break;
     }
   }
@@ -1838,10 +1844,7 @@ void CSSetAttr()
   {
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
-	if (Send8BitMode)
-	  CommBinaryOut(&cv,"\233>32;10;2c",10); /* VT382 */
-	else
-	  CommBinaryOut(&cv,"\033[>32;10;2c",11); /* VT382 */
+	SendCSIstr(">32;10;2c", 9); /* VT382 */
 	break;
       case 'J':
 	if (Param[1]==3) // IO-8256 terminal
@@ -2600,6 +2603,7 @@ void XSequence(BYTE b)
 	static BYTE XsParseMode = ModeXsFirst, PrevMode;
 	static char StrBuff[sizeof(ts.Title)];
 	static unsigned int ColorNumber, StrLen;
+	int len;
 	COLORREF color;
 
 	switch (XsParseMode) {
@@ -2676,19 +2680,12 @@ void XSequence(BYTE b)
 			if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
 				if (strcmp(StrBuff, "?") == 0) {
 					color = DispGetANSIColor(ColorNumber);
-					if (Send8BitMode) {
-						_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-							"\2354;%d;rgb:%02x/%02x/%02x\234", CLocale, ColorNumber,
-							GetRValue(color), GetGValue(color), GetBValue(color));
-					}
-					else {
-						_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-							"\033]4;%d;rgb:%02x/%02x/%02x\033\\", CLocale, ColorNumber,
-							GetRValue(color), GetGValue(color), GetBValue(color));
-					}
+					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
+						"4;%d;rgb:%02x/%02x/%02x\234", CLocale, ColorNumber,
+						GetRValue(color), GetGValue(color), GetBValue(color));
 					ParseMode = ModeFirst;
 					XsParseMode = ModeXsFirst;
-					CommBinaryOut(&cv, StrBuff, strlen(StrBuff));
+					SendOSCstr(StrBuff, len);
 					break;
 				}
 				else if (XsParseColor(StrBuff, &color)) {
@@ -2710,18 +2707,11 @@ void XSequence(BYTE b)
 			if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
 				if (strcmp(StrBuff, "?") == 0) {
 					color = DispGetANSIColor(ColorNumber);
-					if (Send8BitMode) {
-						_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-							"\2354;%d;rgb:%02x/%02x/%02x\234", CLocale, ColorNumber,
-							GetRValue(color), GetGValue(color), GetBValue(color));
-					}
-					else {
-						_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-							"\033]4;%d;rgb:%02x/%02x/%02x\033\\", CLocale, ColorNumber,
-							GetRValue(color), GetGValue(color), GetBValue(color));
-					}
+					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
+						"4;%d;rgb:%02x/%02x/%02x\234", CLocale, ColorNumber,
+						GetRValue(color), GetGValue(color), GetBValue(color));
 					XsParseMode = ModeXsColorNum;
-					CommBinaryOut(&cv, StrBuff, strlen(StrBuff));
+					SendOSCstr(StrBuff, len);
 				}
 				else if (XsParseColor(StrBuff, &color)) {
 					DispSetANSIColor(ColorNumber, color);
@@ -3426,10 +3416,7 @@ int VTParse()
 }
 
 int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
-  if (Send8BitMode)
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "\233M%c%c%c", CLocale, mb+32, x+32, y+32);
-  else
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "\033[M%c%c%c", CLocale, mb+32, x+32, y+32);
+  return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
 }
 
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
@@ -3543,7 +3530,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
   if (len == 0)
     return FALSE;
 
-  CommBinaryOut(&cv, Report, len);
+  SendCSIstr(Report, len);
   return TRUE;
 }
 
@@ -3553,18 +3540,10 @@ void FocusReport(BOOL focus) {
 
   if (focus) {
     // Focus In
-    if (Send8BitMode) {
-      CommBinaryOut(&cv,"\233I",2);
-    } else {
-      CommBinaryOut(&cv,"\033[I",3);
-    }
+    SendCSIstr("I", 1);
   } else {
     // Focus Out
-    if (Send8BitMode) {
-      CommBinaryOut(&cv,"\233O",2);
-    } else {
-      CommBinaryOut(&cv,"\033[O",3);
-    }
+    SendCSIstr("O", 1);
   }
 }
 
