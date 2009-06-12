@@ -3399,6 +3399,7 @@ void DispResizeWin(int w, int h) {
 		}
 	}
 	SetWindowPos(HVTWin, 0, 0, 0, w, h, SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE);
+	AdjustSize = FALSE;
 }
 
 BOOL DispWindowIconified() {
