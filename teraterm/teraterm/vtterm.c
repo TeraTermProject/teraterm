@@ -1760,6 +1760,7 @@ void CSSetAttr()
 
   void CSSunSequence() /* Sun terminal private sequences */
   {
+    int x, y;
     char Report[16];
 
     switch (Param[1]) {
@@ -1806,6 +1807,14 @@ void CSSetAttr()
 	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\233%dt", CLocale, DispWindowIconified()?2:1);
 	else
 	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[%dt", CLocale, DispWindowIconified()?2:1);
+	CommBinaryOut(&cv,Report,strlen(Report));
+	break;
+      case 13: // Report window position
+	DispGetWindowPos(&x, &y);
+	if (Send8BitMode)
+	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\2333;%d;%dt", CLocale, x, y);
+	else
+	  _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "\033[3;%d;%dt", CLocale, x, y);
 	CommBinaryOut(&cv,Report,strlen(Report));
 	break;
       case 14: /* get window size??? */

@@ -3405,3 +3405,22 @@ void DispResizeWin(int w, int h) {
 BOOL DispWindowIconified() {
 	return IsIconic(HVTWin);
 }
+
+void DispGetWindowPos(int *x, int *y) {
+	WINDOWPLACEMENT wndpl;
+
+	wndpl.length = sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(HVTWin, &wndpl);
+
+	switch (wndpl.showCmd) {
+	  case SW_SHOWMAXIMIZED:
+		*x = wndpl.ptMaxPosition.x;
+		*y = wndpl.ptMaxPosition.y;
+		break;
+	  default:
+	  	*x = wndpl.rcNormalPosition.left;
+		*y = wndpl.rcNormalPosition.top;
+	}
+
+	return;
+}
