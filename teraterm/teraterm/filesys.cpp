@@ -283,6 +283,7 @@ void FreeFileVar(PFileVar *fv)
 }
 
 // &h をホスト名に置換 (2007.5.14)
+// &p をTCPポート番号に置換 (2009.6.12)
 void ConvertLogname(char *c, int destlen)
 {
 	char buf[MAXPATHLEN], buf2[MAXPATHLEN], *p = c;
@@ -292,7 +293,7 @@ void ConvertLogname(char *c, int destlen)
 	while(*p != '\0') {
 		if (*p == '&' && *(p+1) != '\0') {
 			switch (*(p+1)) {
-			case 'h':
+			  case 'h':
 				if (cv.Open) {
 					if (cv.PortType == IdTCPIP) {
 						strncat_s(buf,sizeof(buf),ts.HostName,_TRUNCATE);
@@ -303,7 +304,16 @@ void ConvertLogname(char *c, int destlen)
 					}
 				}
 				break;
-			default:
+			  case 'p':
+				if (cv.Open) {
+					if (cv.PortType == IdTCPIP) {
+						char port[6];
+						_snprintf_s(port, sizeof(port), _TRUNCATE, "%d", ts.TCPPort);
+						strncat_s(buf,sizeof(buf),port,_TRUNCATE);
+					}
+				}
+				break;
+			  default:
 				strncpy_s(buf2,sizeof(buf2),p,2);
 				strncat_s(buf,sizeof(buf),buf2,_TRUNCATE);
 			}
