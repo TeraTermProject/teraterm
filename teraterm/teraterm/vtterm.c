@@ -1839,7 +1839,7 @@ void CSSetAttr()
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
 	if (Send8BitMode)
-	  CommBinaryOut(&cv,"\233>32;10;2c",11); /* VT382 */
+	  CommBinaryOut(&cv,"\233>32;10;2c",10); /* VT382 */
 	else
 	  CommBinaryOut(&cv,"\033[>32;10;2c",11); /* VT382 */
 	break;
