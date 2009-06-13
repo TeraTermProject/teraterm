@@ -75,16 +75,16 @@
           <li>moved the Enable bold style to <a href="../menu/setup-window.html">[Setup]-[Window]</a>.</li>
           <li>moved the Russian Font char set to <a href="../menu/setup-terminalr.html">[Setup]-[Terminal] for Russian mode</a>.</li>
         </ul></li>
-      <!--li>AltキーでMSBをセットした文字を送信する機能を追加した。
+      <li>added the MSB set character by using the Alt key.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-term.html#Meta8Bit">Meta8Bit</a> エントリを追加した。デフォルトは off。</li>
-        </ul></li-->
+          <li>added the <a href="../setup/teraterm-term.html#Meta8Bit">Meta8Bit</a> entry in the teraterm.ini file. The default value is off.</li>
+        </ul></li>
       <li>added `&p' parameter to log file name that can convert the tcp port number.</li>
       <li>The <a href="../commandline/teraterm.html#f">/F</a> command line option overwrites the other option.</li>
-      <!--li>コマンドライン解析の仕様を変更した。
+      <li>Changed the command line specification regarding the double quotation.
         <ul>
-          <li>`"' を渡すために "" を指定する仕様を追加した。</li>
-        </ul></li-->
+          <li>A user can specify the "" characters instead of the " character.</li>
+        </ul></li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
     </ul></li>
 
@@ -102,8 +102,8 @@
           <li>The control sequence of one character deletion(DCH) can not work Hangeul.</li>
           <li>The carriage return can not work when Hangeul positioned at the end-of-line.</li>
         </ul></li>
-      <!--li>送信がUTF-8に設定されている時に、UTF-8に変換せずに送信する場合があるのを修正した。</li>
-      <li>UTF-8で2バイトになる文字の表示が遅れるのを修正した。</li-->
+      <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>
+      <li>The second character is late for sending by the UTF-8 encoding.</li>
     </ul></li>
 
   <li>Misc
