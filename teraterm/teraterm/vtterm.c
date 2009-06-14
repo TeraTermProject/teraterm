@@ -3126,14 +3126,14 @@ static void UnicodeToCP932(unsigned int code)
 			}
 
 			if (cset == 0) {
-				ParseASCII('?');
+				PutChar('?');
 				if (ts.UnknownUnicodeCharaAsWide) {
-					ParseASCII('?');
+					PutChar('?');
 				}
 			}
 			break;
 		  case 1:
-			ParseASCII(mbchar[0]);
+			PutChar(mbchar[0]);
 			break;
 		  default:
 			Kanji = mbchar[0] << 8;
