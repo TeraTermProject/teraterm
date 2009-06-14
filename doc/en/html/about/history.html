@@ -28,8 +28,6 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the `wait4all' macro command.</li>
-      <li>added a Subversion(SVN) revision number on the version dialog.</li>
       <li>added support for cursor control sequences.
         <ul>
           <li>added the <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
@@ -55,14 +53,13 @@
           <li>added the <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
       <li>Changed the BroadcastCommand functional specification. When the BroadcastCommand is not the realtime mode, a user cand send a message at the selected window in the listbox.</li>
-      <li>added the millisecond at the log timestamp line.</li>
       <li>changed Korean language implementation
         <ul>
           <li>added support for Korean mode with <a href="../commandline/teraterm.html#la">/LA</a> command line option, which specifies the <a href="../menu/setup-general.html">language mode</a>.</li>
           <li>added support for the IME inline conversion.</li>
           <li>added the `UTF-8m' selection for the receiving character code.</li>
           <li>added the KS5601 at the KanjiSend and KanjiReceive entry in the teraterm.ini file.</li>
-          <li>added the KS5601 in the <a href="../commandline/teraterm.html#kr">/KR=</a> and <a href="../commandline/teraterm.html#kt">/KT=</a> command line options.
+          <li>added the KS5601 in the <a href="../commandline/teraterm.html#kr">/KR</a> and <a href="../commandline/teraterm.html#kt">/KT</a> command line options.
         </ul></li>
       <li>added UTF-8 language
         <ul>
@@ -79,11 +76,13 @@
           <li>added the <a href="../setup/teraterm-term.html#Meta8Bit">Meta8Bit</a> entry in the teraterm.ini file. The default value is off.</li>
         </ul></li>
       <li>added `&p' parameter to log file name that can convert the tcp port number.</li>
+      <li>added the millisecond at the log timestamp line.</li>
       <li>The <a href="../commandline/teraterm.html#f">/F</a> command line option overwrites the other option.</li>
       <li>Changed the command line specification regarding the double quotation.
         <ul>
           <li>A user can specify the "" characters instead of the " character.</li>
         </ul></li>
+      <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
     </ul></li>
 
@@ -94,7 +93,6 @@
       <li>The continuedline copy does not work well.</li>
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
-      <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
       <li>changed Korean language implementation
         <ul>
           <li>Hangeul can not be selected by using double-click.</li>
@@ -103,6 +101,8 @@
         </ul></li>
       <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>
       <li>The second character is late for sending by the UTF-8 encoding.</li>
+      <!--li>ロケールオブジェクトがリークしていた問題を修正した。</li-->
+      <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
     </ul></li>
 
   <li>Misc
@@ -115,6 +115,7 @@
       <li>upgraded TTX KanjiMenu Plugin to <a href="#kanjimenu_0.1.6">0.1.6</a>.</li>
       <li>upgraded TeraTerm Menu to <a href="#ttmenu_1.09">1.09</a></li>
       <li>upgraded LogMeTT to 2.9.5</li>
+      <li>added a Subversion(SVN) revision number on the version dialog.</li>
       <li>added limited support for Microsoft Windows 7 RC(Build7100).</li>
     </ul></li>
 

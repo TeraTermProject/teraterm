@@ -28,8 +28,6 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、`wait4all'マクロコマンドが有効となる。</li>
-      <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
       <li>カーソル制御シーケンスに対応した。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
@@ -55,14 +53,13 @@
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
       <li>BroadcastCommand（非Realtime mode）において、リストボックスで選択された端末に対してのみ、メッセージを送信するようにした。</li>
-      <li>ログにタイムスタンプを書き込むときにミリ秒も記録するようにした。</li>
       <li>韓国語モードの調整
         <ul>
           <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、韓国語モードを指定できるようにした。</li>
           <li>IMEのインライン変換を韓国語モードでも行えるようにした。</li>
           <li>受信文字コードの選択肢に UTF-8m を追加した。</li>
           <li>teraterm.iniのKanjiSend/KanjiReceiveエントリで、KS5601を受け付けるようにした。</li>
-	  <li><a href="../commandline/teraterm.html#kr">/KR=</a>, <a href="../commandline/teraterm.html#kt">/KT=</a> コマンドラインオプションで、KS5601を受け付けるようにした。
+	  <li><a href="../commandline/teraterm.html#kr">/KR</a>, <a href="../commandline/teraterm.html#kt">/KT</a> コマンドラインオプションで、KS5601を受け付けるようにした。
         </ul></li>
       <li>UTF-8モードを追加
         <ul>
@@ -79,11 +76,13 @@
           <li>teraterm.ini に <a href="../setup/teraterm-term.html#Meta8Bit">Meta8Bit</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
       <li>ログファイル名中の &p を、接続中の TCP ポート番号に変換する機能を追加した。</li>
+      <li>ログにタイムスタンプを書き込むときにミリ秒も記録するようにした。</li>
       <li>コマンドラインオプションで、 <a href="../commandline/teraterm.html#f">/F</a> オプションは他のオプションより先に処理する(上書きされる)ように変更した。</li>
       <li>コマンドライン解析の仕様を変更した。
         <ul>
-          <li>`"' を渡すために "" を指定する仕様を追加した。</li>
+          <li>`"' を渡すために `""' を指定する仕様を追加した。</li>
         </ul></li>
+      <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、"<a href="../macro/command/wait4all.html">wait4all</a>" マクロコマンドが有効となる。</li>
       <li>マクロコマンド "<a href="../macro/command/exec.html">exec</a>" に、起動したアプリケーションの終了コードを result に格納するためのオプションを追加した。</li>
     </ul></li>
 
@@ -94,7 +93,6 @@
       <li>継続行コピーがうまく働かない場合があるのを修正した。</li>
       <li>ssh/cygwin接続を複製した後の新規接続で、<a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a>が無視されるのを修正した。</li>
       <li>クリッカブルURLにおいて、URL文字列が1024バイトを超えると、アプリケーションエラーとなるバグを修正した。</li>
-      <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" と "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" が、第一引数が文字列ではなく文字列型変数だった場合に値を正しく受け取らない問題を修正した。</li>
       <li>韓国語モードの調整
         <ul>
           <li>韓国語モード時、ハングルなどの2バイト文字をマウスで正しく選択できない場合があるのを修正した。</li>
@@ -103,6 +101,8 @@
         </ul></li>
       <li>送信がUTF-8に設定されている時に、UTF-8に変換せずに送信する場合があるのを修正した。</li>
       <li>UTF-8で2バイトになる文字の表示が遅れるのを修正した。</li>
+      <li>ロケールオブジェクトがリークしていた問題を修正した。</li>
+      <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" と "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" が、第一引数が文字列ではなく文字列型変数だった場合に値を正しく受け取らない問題を修正した。</li>
     </ul></li>
 
   <li>その他
@@ -115,6 +115,7 @@
       <li><a href="#kanjimenu_0.1.6">TTX KanjiMenu Plugin(0.1.6)</a>へ差し替えた。</li>
       <li><a href="#ttmenu_1.09">TeraTerm Menu(1.09)</a>へ差し替えた</li>
       <li>LogMeTT 2.9.5へ差し替えた</li>
+      <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
       <li>Windows 7 RC(Build7100) の暫定サポート</li>
     </ul></li>
 
