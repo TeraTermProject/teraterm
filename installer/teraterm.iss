@@ -141,6 +141,10 @@ Name: {userstartup}\Collector; Filename: {app}\collector\collector.exe; WorkingD
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
 [INI]
+Filename: {app}\teraterm.ini; Section: Tera Term; Key: CursorCtrlSequence; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
+Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: CursorCtrlSequence; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
+Filename: {app}\teraterm.ini; Section: Tera Term; Key: WindowCtrlSequence; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
+Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: WindowCtrlSequence; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: Tera Term; Key: Meta8Bit; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
 Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: Meta8Bit; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
 Filename: {app}\teraterm.ini; Section: Tera Term; Key: PasteDelayPerLine; String: 10; Flags: createkeyifdoesntexist; Components: TeraTerm

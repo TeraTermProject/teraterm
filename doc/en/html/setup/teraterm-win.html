@@ -546,5 +546,46 @@ TEKIcon=Default
 </pre>
 
 
+<!--h1><a name="WindowCtrlSequence">ウィンドウ制御のシーケンスを使用する</a></h1>
+<p>
+added support for the position moving, the minimization, the maximization, the most front, the most back and the refresh control sequences regarding the dtterm window operation.
+この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュ, ウィンドウサイズ変更(ピクセル単位), ウィンドウ状態報告, ウィンドウ位置報告, ルートウィンドウサイズ報告 が有効になります。
+</p>
+
+<pre>
+WindowCtrlSequence=on
+</pre>
+
+<pre>
+Default:
+WindowCtrlSequence=off
+</pre>
+
+
+<h1><a name="CursorCtrlSequence">カーソル形状を制御するシーケンスを使用する</a></h1>
+<p>
+この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。
+</p>
+
+<pre>
+CursorCtrlSequence=on
+</pre>
+
+<pre>
+Default:
+CursorCtrlSequence=off
+</pre>
+
+<p>
+Add the below configuration in the ~/.vimrc file for vim editor.
+</p>
+
+<pre>
+set t_SI=^[[3\ q
+set t_EI=^[[1\ q
+NOTE: Input ^[ by using Control-V Control-[.
+</pre-->
+
+
 </body>
 </html>

@@ -1294,6 +1294,12 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// Meta sets MSB
 	ts->Meta8Bit = GetOnOff(Section, "Meta8Bit", FName, FALSE);
+
+	// Window control sequence
+	ts->WindowCtrlSequence = GetOnOff(Section, "WindowCtrlSequence", FName, FALSE);
+
+	// Cursor control sequence
+	ts->CursorCtrlSequence = GetOnOff(Section, "CursorCtrlSequence", FName, FALSE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2242,6 +2248,12 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Meta sets MSB
 	WriteOnOff(Section, "Meta8Bit", FName, ts->Meta8Bit);
+
+	// Window control sequence
+	WriteOnOff(Section, "WindowCtrlSequence", FName, ts->WindowCtrlSequence);
+
+	// Cursor control sequence
+	WriteOnOff(Section, "CursorCtrlSequence", FName, ts->CursorCtrlSequence);
 }
 
 #define VTEditor "VT editor keypad"

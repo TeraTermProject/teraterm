@@ -30,14 +30,10 @@
     <ul>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the `wait4all' macro command.</li>
       <li>added a Subversion(SVN) revision number on the version dialog.</li>
-      <li>added support for DECSCUSR (Set Cursor Style), WYSTCURM (Wyse Steady Cursor Mode), WYULCURM (Wyse Underline Cursor Mode) and AT&amp;T 610 cursor blinking control sequences.<br>
-        Add the below configuration in the ~/.vimrc file for vim editor.
-        <pre>
-         set t_SI=^[[3\ q
-         set t_EI=^[[1\ q
-         NOTE: Input ^[ by using Control-V Control-[.
-        </pre>
-      </li>
+      <li>added support for cursor control sequences.
+        <ul>
+          <li>added the <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
+        </ul></li>
       <li>added configuring the delay time per a carriage return when a user pastes multiple lines. The default is 10 msec.
         <ul>
           <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
@@ -54,7 +50,10 @@
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
-      <li>added support for the position moving, the minimization, the maximization, the most front, the most back and the refresh control sequences regarding the dtterm window operation.</li>
+      <li>added support for the control sequences for window operation.
+        <ul>
+          <li>added the <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
+        </ul></li>
       <li>Changed the BroadcastCommand functional specification. When the BroadcastCommand is not the realtime mode, a user cand send a message at the selected window in the listbox.</li>
       <li>added the millisecond at the log timestamp line.</li>
       <li>changed Korean language implementation

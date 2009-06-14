@@ -457,6 +457,8 @@ struct tttset {
 	int PasteDelayPerLine;
 	WORD FontScaling;
 	WORD Meta8Bit;
+	WORD WindowCtrlSequence;
+	WORD CursorCtrlSequence;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -898,6 +900,8 @@ typedef TMap far *PMap;
  *   added tttset.PasteDelayPerLine.
  *   added tttset.FontScaling.
  *   added tttset.Meta8Bit.
+ *   added tttset.WindowCtrlSequence.
+ *   added tttset.CursorCtrlSequence.
  *
  * - At version 4.62, ttset_memfilemap was replaced with ttset_memfilemap_10.
  *   added tttset.DisableMouseTrackingByCtrl.

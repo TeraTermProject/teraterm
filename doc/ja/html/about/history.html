@@ -30,14 +30,10 @@
     <ul>
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、`wait4all'マクロコマンドが有効となる。</li>
       <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
-      <li>DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに対応した。<br>
-        vimの場合、~/.vimrc に以下のように追加する。
-        <pre>
-         set t_SI=^[[3\ q
-         set t_EI=^[[1\ q
-         注: ^[ はControl-V Control-[で入力する
-        </pre>
-      </li>
+      <li>カーソル制御シーケンスに対応した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
       <li>複数行の貼り付け時、改行ごとに遅延する時間を設定できるようにした。デフォルトは 10(ミリ秒)。
         <ul>
           <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>で設定値を変更できるようにした。</li>
@@ -54,7 +50,10 @@
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
-      <li>dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュに対応した。</li>
+      <li>ウィンドウ操作制御シーケンス対応した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
       <li>BroadcastCommand（非Realtime mode）において、リストボックスで選択された端末に対してのみ、メッセージを送信するようにした。</li>
       <li>ログにタイムスタンプを書き込むときにミリ秒も記録するようにした。</li>
       <li>韓国語モードの調整
