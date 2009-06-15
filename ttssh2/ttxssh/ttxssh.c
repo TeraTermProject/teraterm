@@ -801,6 +801,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks)
 		   CommLib should find ts->Telnet == 0 ... but we'll do this
 		   just to be on the safe side. */
 		pvar->cv->TelFlag = FALSE;
+		pvar->cv->TelLineMode = FALSE;
 
 		pvar->Precv = *hooks->Precv;
 		pvar->Psend = *hooks->Psend;
