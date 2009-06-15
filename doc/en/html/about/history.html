@@ -104,10 +104,10 @@
         <ul>
           <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>
           <li>The second character is late for sending by the UTF-8 encoding.</li>
-          <!--li>受信がUTF-8に設定されている時、本来表示されるはずの一部の文字が表示出来なかったのを修正した。</li-->
-          <!--li>受信がUTF-8に設定されている時、SS2,SS3が正しく処理されなかったのを修正した。</li-->
+          <li>When receiving is the UTF-8 mode, some characters can not display.</li>
+          <li>When receiving is the UTF-8 mode, ISO-2022(SS2 and SS3) control code does not work.</li>
         </ul></li>
-      <!--li>ロケールオブジェクトがリークしていた問題を修正した。</li-->
+      <li>Bug fix: the locale object is leaked.</li>
       <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
     </ul></li>
 
@@ -2025,7 +2025,7 @@ SYNOPSIS:
 
 <h3><a name="ttmenu_1.09">2009.6.x (Ver 1.09)</a></h3>
 <ul class="history">
-      <!--li>TTSSH のコマンドライン仕様変更に対応した。</li-->
+      <li>added support for changing TTSSH command line specification.</li>
 </ul>
 
 <h3><a name="ttmenu_1.08">2008.6.25 (Ver 1.08)</a></h3>
