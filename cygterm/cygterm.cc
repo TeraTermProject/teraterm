@@ -92,9 +92,13 @@
 // patch level 16 - added '-A' option and change '-a' option
 //   Written by IWAMOTO Kouichi. (doda)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 17 - enable TELNET SGA/ECHO negotiation
+//   Written by IWAMOTO Kouichi. (doda)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_16 (2008/11/21)";
+static char Version[] = "version 1.07_17 (2009/06/16)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1003,7 +1007,7 @@ bool IOBuf::flush_out()
 //-------------------------//
 enum { nIAC=255, nWILL=251, nWONT=252, nDO=253, nDONT=254 };
 enum { sSEND=1, sIS=0, sSB=250, sSE=240 };
-enum { oTERM=24, oNAWS=31 };
+enum { oECHO=1, oSGA=3, oTERM=24, oNAWS=31 };
 
 bool c_will_term = false;
 bool c_will_naws = false;
@@ -1106,6 +1110,12 @@ void telnet_nego(int te_sock)
         }
         (void)telnet_cmd(&te);
     }
+
+    // SGA/ECHO
+    te.putc(nIAC); te.putc(nWILL); te.putc(oSGA);
+    te.putc(nIAC); te.putc(nDO); te.putc(oSGA);
+    te.putc(nIAC); te.putc(nWILL); te.putc(oECHO);
+    te.flush_out();
 }
 
 //=============================================//
