@@ -26,6 +26,7 @@
 #include "vtterm.h"
 
 #define MAPSIZE(x) (sizeof(x)/sizeof((x)[0]))
+#define Accept8BitCtrl ((ts.TerminalID>=IdVT220J) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
 
   /* Parsing modes */
 #define ModeFirst 0
@@ -667,9 +668,7 @@ void PrnParseControl(BYTE b) // printer mode
       WriteToPrnFile(0,TRUE); // flush prn buff
       return;
     case CSI:
-      if ((ts.TerminalID<IdVT220J) ||
-	  ((ts.TermFlag & TF_ACCEPT8BITCTRL)==0))
-      {
+      if (! Accept8BitCtrl) {
 	PutChar(b); /* Disp C1 char in VT100 mode */
 	return;
       }
@@ -699,9 +698,7 @@ void ParseControl(BYTE b)
     /* English mode */
     if (ts.Language==IdEnglish)
     {
-      if ((ts.TerminalID<IdVT220J) ||
-	  ((ts.TermFlag & TF_ACCEPT8BITCTRL)==0))
-      {
+      if (!Accept8BitCtrl) {
 	PutChar(b); /* Disp C1 char in VT100 mode */
 	return;
       }
@@ -2729,7 +2726,7 @@ void XSequence(BYTE b)
 		}
 		break;
 	  case ModeXsString:
-		if ((b==ST && ts.KanjiCode!=IdSJIS) || b==BEL) { /* String Terminator */
+		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
 			StrBuff[StrLen] = '\0';
 			switch (Param[1]) {
 			  case 0: /* Change window title and icon name */
@@ -2775,7 +2772,7 @@ void XSequence(BYTE b)
 		}
 		break;
 	  case ModeXsColorSpec:
-		if ((b==ST && ts.KanjiCode!=IdSJIS) || b==BEL) { /* String Terminator */
+		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
 			StrBuff[StrLen] = '\0';
 			if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
 				if (strcmp(StrBuff, "?") == 0) {
