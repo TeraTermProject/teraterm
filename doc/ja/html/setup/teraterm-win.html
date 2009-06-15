@@ -563,18 +563,60 @@ TEKIcon=Default
 </pre>
 
 
-<h1><a name="WindowCtrlSequence">ウィンドウ制御のシーケンスを使用する</a></h1>
+<h1><a name="WindowCtrlSequence">ウィンドウ操作の制御シーケンスを使用する</a></h1>
 <p>
-この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面, 最背面, リフレッシュ, ウィンドウサイズ変更(ピクセル単位), ウィンドウ状態報告, ウィンドウ位置報告, ルートウィンドウサイズ報告 が有効になります。
+この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面移動, 最背面移動, リフレッシュ, ウィンドウサイズ変更(ピクセル単位, 文字単位) が有効になります。
+</p>
+
+<p>
+リモートからのウィンドウ操作を受け入れたくない場合は、設定ファイルの [Tera Term] セクションの WindowCtrlSequence 行を以下のように変更してください。
 </p>
 
 <pre>
-WindowCtrlSequence=on
+WindowCtrlSequence=off
 </pre>
 
 <pre>
 省略時:
-WindowCtrlSequence=off
+WindowCtrlSequence=on
+</pre>
+
+
+<h1><a name="WindowReportSequence">ウィンドウ情報報告の制御シーケンスを使用する</a></h1>
+<p>
+この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。
+</p>
+
+<p>
+セキュリティ上の理由等でウィンドウの情報を報告したくない場合は、設定ファイルの [Tera Term] セクションの WindowReportSequence 行を以下のように変更してください。
+</p>
+
+<pre>
+WindowReportSequence=off
+</pre>
+
+<pre>
+省略時:
+WindowReportSequence=on
+</pre>
+
+
+<h1><a name="TitleReportSequence">ウィンドウタイトル報告の制御シーケンスを使用する</a></h1>
+<p>
+この設定が on になっていると、dttermのウィンドウタイトル報告およびアイコンラベル報告の制御シーケンスが有効になります。
+</p>
+
+<p>
+セキュリティ上の理由等でウィンドウタイトルを報告したくない場合は、設定ファイルの [Tera Term] セクションの TitleReportSequence 行を以下のように変更してください。
+</p>
+
+<pre>
+TitleReportSequence=off
+</pre>
+
+<pre>
+省略時:
+TitleReportSequence=on
 </pre>
 
 
@@ -593,7 +635,7 @@ CursorCtrlSequence=off
 </pre>
 
 <p>
-vimの場合、~/.vimrc に以下のように追加する。
+vimを使用している場合、この機能を on にして ~/.vimrc に以下のように追加すると入力モードに応じてカーソル形状が変わるようになります。
 </p>
 
 <pre>
