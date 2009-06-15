@@ -1792,7 +1792,7 @@ void CSSetAttr()
   void CSSunSequence() /* Sun terminal private sequences */
   {
     int x, y, len;
-    char Report[16];
+    char Report[TitleBuffSize*2+10];
 
     switch (Param[1]) {
       case 1: // De-iconify window
@@ -1879,6 +1879,52 @@ void CSSetAttr()
 	  SendCSIstr(Report, len);
 	}
 	break;
+      case 20: // Report icon label
+        if (ts.WindowFlag & WF_TITLEREPORT) {
+	  switch (ts.AcceptTitleChangeRequest) {
+	    case IdTitleChangeRequestOff:
+	      len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
+	      break;
+	    case IdTitleChangeRequestAhead:
+	      len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, cv.TitleRemote, ts.Title);
+	      break;
+	    case IdTitleChangeRequestLast:
+	      len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, ts.Title, cv.TitleRemote);
+	      break;
+	    default:
+	      if (cv.TitleRemote[0] == 0) {
+	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
+	      }
+	      else {
+	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, cv.TitleRemote);
+	      }
+	  }
+	  SendOSCstr(Report, len);
+	}
+        break;
+      case 21: // Report window title
+        if (ts.WindowFlag & WF_TITLEREPORT) {
+	  switch (ts.AcceptTitleChangeRequest) {
+	    case IdTitleChangeRequestOff:
+	      len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
+	      break;
+	    case IdTitleChangeRequestAhead:
+	      len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, cv.TitleRemote, ts.Title);
+	      break;
+	    case IdTitleChangeRequestLast:
+	      len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, ts.Title, cv.TitleRemote);
+	      break;
+	    default:
+	      if (cv.TitleRemote[0] == 0) {
+	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
+	      }
+	      else {
+	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, cv.TitleRemote);
+	      }
+	  }
+	  SendOSCstr(Report, len);
+	}
+        break;
     }
   }
 
