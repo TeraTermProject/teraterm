@@ -84,6 +84,7 @@
         </ul></li>
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、"<a href="../macro/command/wait4all.html">wait4all</a>" マクロコマンドが有効となる。</li>
       <li>マクロコマンド "<a href="../macro/command/exec.html">exec</a>" に、起動したアプリケーションの終了コードを result に格納するためのオプションを追加した。</li>
+      <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
     </ul></li>
 
   <li>バグ修正
@@ -99,12 +100,15 @@
           <li>韓国語モード時、一文字削除(DCH)等の制御シーケンスでハングルなどの2バイト文字を正しく扱うようにした。</li>
           <li>韓国語モード時、ハングルなどの2バイト文字が行末に来た時に正しく改行するようにした。</li>
         </ul></li>
-      <li>送信がUTF-8に設定されている時に、UTF-8に変換せずに送信する場合があるのを修正した。</li>
-      <li>UTF-8で2バイトになる文字の表示が遅れるのを修正した。</li>
+      <li>UTF-8の調整
+        <ul>
+          <li>送信がUTF-8に設定されている時に、UTF-8に変換せずに送信する場合があるのを修正した。</li>
+          <li>UTF-8で2バイトになる文字の表示が遅れるのを修正した。</li>
+          <li>受信がUTF-8に設定されている時、本来表示されるはずの一部の文字が表示出来なかったのを修正した。</li>
+          <li>受信がUTF-8に設定されている時、SS2,SS3が正しく処理されなかったのを修正した。</li>
+        </ul></li>
       <li>ロケールオブジェクトがリークしていた問題を修正した。</li>
       <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" と "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" が、第一引数が文字列ではなく文字列型変数だった場合に値を正しく受け取らない問題を修正した。</li>
-      <li>受信がUTF-8に設定されている時、本来表示されるはずの一部の文字が表示出来なかったのを修正した。</li>
-      <li>受信がUTF-8に設定されている時、SS2,SS3が正しく処理されなかったのを修正した。</li>
     </ul></li>
 
   <li>その他
@@ -117,7 +121,6 @@
       <li><a href="#kanjimenu_0.1.6">TTX KanjiMenu Plugin(0.1.6)</a>へ差し替えた。</li>
       <li><a href="#ttmenu_1.09">TeraTerm Menu(1.09)</a>へ差し替えた</li>
       <li>LogMeTT 2.9.5へ差し替えた</li>
-      <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
       <li>Windows 7 RC(Build7100) の暫定サポート</li>
     </ul></li>
 

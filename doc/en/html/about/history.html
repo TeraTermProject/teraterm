@@ -84,6 +84,7 @@
         </ul></li>
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
+      <li>added a Subversion(SVN) revision number on the version dialog.</li>
     </ul></li>
 
   <li>Bug fixes
@@ -99,12 +100,15 @@
           <li>The control sequence of one character deletion(DCH) can not work Hangeul.</li>
           <li>The carriage return can not work when Hangeul positioned at the end-of-line.</li>
         </ul></li>
-      <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>
-      <li>The second character is late for sending by the UTF-8 encoding.</li>
+      <li>changed UTF-8 implementation
+        <ul>
+          <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>
+          <li>The second character is late for sending by the UTF-8 encoding.</li>
+          <!--li>受信がUTF-8に設定されている時、本来表示されるはずの一部の文字が表示出来なかったのを修正した。</li-->
+          <!--li>受信がUTF-8に設定されている時、SS2,SS3が正しく処理されなかったのを修正した。</li-->
+        </ul></li>
       <!--li>ロケールオブジェクトがリークしていた問題を修正した。</li-->
       <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
-      <!--li>受信がUTF-8に設定されている時、本来表示されるはずの一部の文字が表示出来なかったのを修正した。</li-->
-      <!--li>受信がUTF-8に設定されている時、SS2,SS3が正しく処理されなかったのを修正した。</li-->
     </ul></li>
 
   <li>Misc
@@ -117,7 +121,6 @@
       <li>upgraded TTX KanjiMenu Plugin to <a href="#kanjimenu_0.1.6">0.1.6</a>.</li>
       <li>upgraded TeraTerm Menu to <a href="#ttmenu_1.09">1.09</a></li>
       <li>upgraded LogMeTT to 2.9.5</li>
-      <li>added a Subversion(SVN) revision number on the version dialog.</li>
       <li>added limited support for Microsoft Windows 7 RC(Build7100).</li>
     </ul></li>
 
