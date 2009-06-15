@@ -542,8 +542,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
       (VKey==VK_MENU)) return KEYDOWN_CONTROL;
 
   /* debug mode */
-  if ((ts.Debug>0) && (VKey == VK_ESCAPE) && ShiftKey())
-  {
+  if ((ts.Debug>0) && (VKey == VK_ESCAPE) && ShiftKey()) {
     MessageBeep(0);
     DebugFlag = ! DebugFlag;
     CodeCount = 0;
@@ -551,8 +550,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
     return KEYDOWN_CONTROL;
   }
 
-  if (! AutoRepeatMode && (PreviousKey==VKey))
-  {
+  if (! AutoRepeatMode && (PreviousKey==VKey)) {
     PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
     return KEYDOWN_CONTROL;
   }
@@ -563,20 +561,17 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
     Scan = MapVirtualKey(VKey,0);
 
   ModStat = 0;
-  if (ShiftKey())
-  {
+  if (ShiftKey()) {
     Scan |= 0x200;
     ModStat = 2;
   }
 
-  if (ControlKey())
-  {
+  if (ControlKey()) {
     Scan |= 0x400;
     ModStat |= 4;
   }
 
-  if (AltKey())
-  {
+  if (AltKey()) {
     Scan |= 0x800;
     if (!ts.MetaKey) {
       ModStat |= 16;
@@ -585,7 +580,12 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 
   CodeCount = Count;
   CodeLength = 0;
-  CodeType = IdBinary;
+  if (cv.TelLineMode) {
+    CodeType = IdText;
+  }
+  else {
+    CodeType = IdBinary;
+  }
 
   /* exclude numeric keypad "." (scan code:83) */
   if ((VKey!=VK_DELETE) || (ts.DelKey==0) || (Scan==83))
@@ -594,12 +594,10 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
   else
     Key = 0;
 
-  if (Key==0)
-  {
+  if (Key==0) {
     CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, ModStat);
 
-    if ((ts.MetaKey>0) && (CodeLength==1) && AltKey())
-    {
+    if ((ts.MetaKey>0) && (CodeLength==1) && AltKey()) {
       Code[1] = Code[0];
       Code[0] = 0x1b;
       CodeLength = 2;
@@ -621,8 +619,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 
   if (CodeLength==0) return KEYDOWN_OTHER;
 
-  if (VKey==VK_NUMLOCK)
-  {
+  if (VKey==VK_NUMLOCK) {
     /* keep NumLock LED status */
     GetKeyboardState((PBYTE)KeyState);
     KeyState[VK_NUMLOCK] = KeyState[VK_NUMLOCK] ^ 1;
@@ -631,14 +628,11 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 
   PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
 
-  if (KeybEnabled)
-  {
+  if (KeybEnabled) {
     switch (CodeType) {
       case IdBinary:
-	if (TalkStatus==IdTalkKeyb)
-	{
-	  for (i = 1 ; i <= CodeCount ; i++)
-	  {
+	if (TalkStatus==IdTalkKeyb) {
+	  for (i = 1 ; i <= CodeCount ; i++) {
 	    CommBinaryOut(&cv,Code,CodeLength);
 	    if (ts.LocalEcho>0)
 	      CommBinaryEcho(&cv,Code,CodeLength);
@@ -646,10 +640,8 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 	}
 	break;
       case IdText:
-	if (TalkStatus==IdTalkKeyb)
-	{
-	  for (i = 1 ; i <= CodeCount ; i++)
-	  {
+	if (TalkStatus==IdTalkKeyb) {
+	  for (i = 1 ; i <= CodeCount ; i++) {
 	    if (ts.LocalEcho>0)
 	      CommTextEcho(&cv,Code,CodeLength);
 	    CommTextOut(&cv,Code,CodeLength);

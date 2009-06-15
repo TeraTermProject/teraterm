@@ -854,6 +854,12 @@ typedef struct {
 	time_t LastSendTime;
 	WORD isSSH;
 	char TitleRemote[TitleBuffSize];
+
+	BYTE LineModeBuff[OutBuffSize];
+	int LineModeBuffCount, FlushLen;
+	BOOL Flush;
+
+	BOOL TelLineMode;
 } TComVar;
 typedef TComVar far *PComVar;
 

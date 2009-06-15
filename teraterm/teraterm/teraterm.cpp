@@ -182,7 +182,7 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 	}
 
 	if (cv.Ready &&
-	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.LCount>0) || (cv.BCount>0) || (cv.DCount>0)) ) {
+	    (cv.RRQ || (cv.OutBuffCount>0) || (cv.InBuffCount>0) || (cv.FlushLen>0) || (cv.LCount>0) || (cv.BCount>0) || (cv.DCount>0)) ) {
 		Busy = 2;
 	}
 	else {

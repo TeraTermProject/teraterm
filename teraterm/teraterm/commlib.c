@@ -289,6 +289,10 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->CodePage = &ts->CodePage;
 	cv->ConnetingTimeout = &ts->ConnectingTimeout;
 	cv->LastSendTime = time(NULL);
+	cv->LineModeBuffCount = 0;
+	cv->Flush = FALSE;
+	cv->FlushLen = 0;
+	cv->TelLineMode = FALSE;
 
 	if ((ts->PortType!=IdSerial) && (strlen(ts->HostName)==0))
 	{
@@ -299,6 +303,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	switch (ts->PortType) {
 		case IdTCPIP:
 			cv->TelFlag = (ts->Telnet > 0);
+			cv->TelLineMode = TRUE;
 			if (! LoadWinsock()) {
 				if (cv->NoMsg==0) {
 					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
@@ -713,6 +718,9 @@ void CommClose(PComVar cv)
 	cv->InBuffCount = 0;
 	cv->OutPtr = 0;
 	cv->OutBuffCount = 0;
+	cv->LineModeBuffCount = 0;
+	cv->FlushLen = 0;
+	cv->Flush = FALSE;
 
 	/* close port & release resources */
 	switch (cv->PortType) {

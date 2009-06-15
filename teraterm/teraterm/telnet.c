@@ -358,6 +358,7 @@ void ParseTelWill(BYTE b)
 	switch (tr.HisOpt[ECHO].Status) {
 	  case Yes:
 	    ts.LocalEcho = 0;
+	    cv.TelLineMode = FALSE;
 	    break;
 	  case No:
 	    ts.LocalEcho = 1;
@@ -500,6 +501,10 @@ void ParseTelDo(BYTE b)
     case NAWS:
       if (tr.MyOpt[NAWS].Status==Yes)
 	SendWinSize();
+      break;
+    case SGA:
+      if (tr.MyOpt[SGA].Status==Yes)
+        cv.TelLineMode = FALSE;
       break;
   }
   TelStatus = TelIdle;

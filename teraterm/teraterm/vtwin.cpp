@@ -3080,6 +3080,8 @@ LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
 			TCPIPClosed = TRUE;
 			// disable transmition
 			cv.OutBuffCount = 0;
+			cv.LineModeBuffCount = 0;
+			cv.FlushLen = 0;
 			SetTimer(IdComEndTimer,1,NULL);
 			break;
 	}

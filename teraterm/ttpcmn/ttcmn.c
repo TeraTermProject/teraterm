@@ -1146,7 +1146,7 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 //
 int TextOutMBCS(PComVar cv, PCHAR B, int C)
 {
-	int i, TempLen;
+	int i, TempLen, OutLen;
 	WORD K;
 	char TempStr[12];
 	int SendCodeNew;
@@ -1263,6 +1263,9 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen++] = 0;
 				}
+				if (cv->TelLineMode) {
+					cv->Flush = TRUE;
+				}
 			}
 			else if ((d>=0x80) && (cv->KanjiCodeSend==IdUTF8 || cv->Language==IdUtf8)) {
 				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
@@ -1288,18 +1291,47 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 			}
 		} // if (cv->SendKanjiFlag) else if ... else ... end
 
-		if (TempLen == 0) {
-			i++;
-			cv->SendCode = SendCodeNew;
-			cv->SendKanjiFlag = KanjiFlagNew;
-		}
-		else {
-			Full = OutBuffSize-cv->OutBuffCount-TempLen < 0;
-			if (! Full) {
+		if (cv->TelLineMode) {
+			if (TempLen == 0) {
 				i++;
 				cv->SendCode = SendCodeNew;
 				cv->SendKanjiFlag = KanjiFlagNew;
-				CommRawOut(cv,TempStr,TempLen);
+			}
+			else {
+				Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
+				if (!Full) {
+					i++;
+					cv->SendCode = SendCodeNew;
+					cv->SendKanjiFlag = KanjiFlagNew;
+					memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
+					cv->LineModeBuffCount += TempLen;
+					if (cv->Flush) {
+						cv->FlushLen = cv->LineModeBuffCount;
+					}
+				}
+			}
+			if (cv->FlushLen > 0) {
+				OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
+				cv->FlushLen -= OutLen;
+				cv->LineModeBuffCount -= OutLen;
+				memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
+			}
+			cv->Flush = FALSE;
+		}
+		else {
+			if (TempLen == 0) {
+				i++;
+				cv->SendCode = SendCodeNew;
+				cv->SendKanjiFlag = KanjiFlagNew;
+			}
+			else {
+				Full = OutBuffSize-cv->OutBuffCount-TempLen < 0;
+				if (! Full) {
+					i++;
+					cv->SendCode = SendCodeNew;
+					cv->SendKanjiFlag = KanjiFlagNew;
+					CommRawOut(cv,TempStr,TempLen);
+				}
 			}
 		}
 
@@ -1312,7 +1344,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 
 int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 {
-	int i, TempLen;
+	int i, TempLen, OutLen;
 	char TempStr[12];
 	BYTE d;
 	BOOL Full;
@@ -1344,10 +1376,13 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 			else if (cv->CRSend==IdCR && cv->TelFlag && ! cv->TelBinSend) {
 				TempStr[TempLen++] = 0;
 			}
+			if (cv->TelLineMode) {
+				cv->Flush = TRUE;
+			}
 		}
 		else {
 			if ((cv->Language==IdRussian) && (d>=128)) {
-				d = RussConv(cv->RussClient,cv->RussHost,d);
+				d = RussConv(cv->RussClient, cv->RussHost, d);
 			}
 			TempStr[TempLen++] = d;
 			if (cv->TelFlag && (d==0xff)) {
@@ -1355,10 +1390,29 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 			}
 		}
 
-		Full = OutBuffSize-cv->OutBuffCount-TempLen < 0;
-		if (! Full) {
-			i++;
-			CommRawOut(cv,TempStr,TempLen);
+		if (cv->TelLineMode) {
+			Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
+			if (!Full) {
+				memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
+				cv->LineModeBuffCount += TempLen;
+				if (cv->Flush) {
+					cv->FlushLen = cv->LineModeBuffCount;
+				}
+			}
+			if (cv->FlushLen > 0) {
+				OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
+				cv->FlushLen -= OutLen;
+				cv->LineModeBuffCount -= OutLen;
+				memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
+			}
+			cv->Flush = FALSE;
+		}
+		else {
+			Full = OutBuffSize - cv->OutBuffCount - TempLen < 0;
+			if (! Full) {
+				i++;
+				CommRawOut(cv,TempStr,TempLen);
+			}
 		}
 	} // end of while {}
 
