@@ -3009,9 +3009,14 @@ BOOL ParseFirstKR(BYTE b)
 	return TRUE;
 }
 
-
 static void ParseASCII(BYTE b)
 {
+	if (SSflag) {
+		PutChar(b);
+		SSflag = FALSE;
+		return;
+	}
+
 	if (b<=US) {
 		ParseControl(b);
 	} else if ((b>=0x20) && (b<=0x7E)) {
