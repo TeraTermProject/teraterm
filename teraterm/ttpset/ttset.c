@@ -206,6 +206,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->TermFlag = 0;			// Terminal flag
 	ts->ColorFlag = 0;			// ANSI/Attribute color flags
 	ts->PortFlag = 0;			// Port flags
+	ts->WindowFlag = 0;			// Window flags
 	ts->TelPort = 23;
 
 	ts->DisableTCPEchoCR = FALSE;
@@ -1296,10 +1297,20 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->Meta8Bit = GetOnOff(Section, "Meta8Bit", FName, FALSE);
 
 	// Window control sequence
-	ts->WindowCtrlSequence = GetOnOff(Section, "WindowCtrlSequence", FName, FALSE);
+	if (GetOnOff(Section, "WindowCtrlSequence", FName, TRUE))
+		ts->WindowFlag |= WF_WINDOWCHANGE;
 
 	// Cursor control sequence
-	ts->CursorCtrlSequence = GetOnOff(Section, "CursorCtrlSequence", FName, FALSE);
+	if (GetOnOff(Section, "CursorCtrlSequence", FName, FALSE))
+		ts->WindowFlag |= WF_CURSORCHANGE;
+
+	// Window report sequence
+	if (GetOnOff(Section, "WindowReportSequence", FName, TRUE))
+		ts->WindowFlag |= WF_WINDOWREPORT;
+
+	// Window report sequence
+	if (GetOnOff(Section, "TitleReportSequence", FName, TRUE))
+		ts->WindowFlag |= WF_TITLEREPORT;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2250,10 +2261,20 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteOnOff(Section, "Meta8Bit", FName, ts->Meta8Bit);
 
 	// Window control sequence
-	WriteOnOff(Section, "WindowCtrlSequence", FName, ts->WindowCtrlSequence);
+	WriteOnOff(Section, "WindowCtrlSequence", FName,
+		ts->WindowFlag & WF_WINDOWCHANGE);
 
 	// Cursor control sequence
-	WriteOnOff(Section, "CursorCtrlSequence", FName, ts->CursorCtrlSequence);
+	WriteOnOff(Section, "CursorCtrlSequence", FName,
+		ts->WindowFlag & WF_CURSORCHANGE);
+
+	// Window report sequence
+	WriteOnOff(Section, "WindowReportSequence", FName,
+		ts->WindowFlag & WF_WINDOWREPORT);
+
+	// Title report sequence
+	WriteOnOff(Section, "TitleReportSequence", FName,
+		ts->WindowFlag & WF_TITLEREPORT);
 }
 
 #define VTEditor "VT editor keypad"

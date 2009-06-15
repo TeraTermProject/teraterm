@@ -201,6 +201,12 @@ typedef TCharAttr *PCharAttr;
 #define PF_CONFIRMDISCONN 1
 #define PF_BEEPONCONNECT  2
 
+// Window flags (used in ts.WindowFlag)
+#define WF_CURSORCHANGE  1
+#define WF_WINDOWCHANGE  2
+#define WF_WINDOWREPORT  4
+#define WF_TITLEREPORT   8
+
 // iconf flags (used in ts.VTIcon and ts.TEKIcon)
 #define IdIconDefault 0
 
@@ -457,8 +463,7 @@ struct tttset {
 	int PasteDelayPerLine;
 	WORD FontScaling;
 	WORD Meta8Bit;
-	WORD WindowCtrlSequence;
-	WORD CursorCtrlSequence;
+	WORD WindowFlag;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -900,8 +905,7 @@ typedef TMap far *PMap;
  *   added tttset.PasteDelayPerLine.
  *   added tttset.FontScaling.
  *   added tttset.Meta8Bit.
- *   added tttset.WindowCtrlSequence.
- *   added tttset.CursorCtrlSequence.
+ *   added tttset.WindowFlag.
  *
  * - At version 4.62, ttset_memfilemap was replaced with ttset_memfilemap_10.
  *   added tttset.DisableMouseTrackingByCtrl.

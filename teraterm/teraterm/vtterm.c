@@ -1496,23 +1496,27 @@ void CSScreenErase()
       case 4:	// IRM
         InsertMode = TRUE; break;
       case 12:	// SRM
-	ts.LocalEcho = 0;
-	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
-	  TelChangeEcho();
-	break;
+        ts.LocalEcho = 0;
+        if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+          TelChangeEcho();
+        break;
       case 20:	// LF/NL
-	LFMode = TRUE;
-	ts.CRSend = IdCRLF;
-	cv.CRSend = IdCRLF;
-	break;
+        LFMode = TRUE;
+        ts.CRSend = IdCRLF;
+        cv.CRSend = IdCRLF;
+        break;
       case 33:	// WYSTCURM
-	ts.NonblinkingCursor = TRUE;
-	ChangeCaret();
-	break;
+        if (ts.WindowFlag & WF_CURSORCHANGE) {
+          ts.NonblinkingCursor = TRUE;
+          ChangeCaret();
+        }
+        break;
       case 34:	// WYULCURM
-	ts.CursorShape = IdHCur;
-	ChangeCaret();
-	break;
+        if (ts.WindowFlag & WF_CURSORCHANGE) {
+          ts.CursorShape = IdHCur;
+          ChangeCaret();
+        }
+        break;
     }
   }
 
@@ -1544,23 +1548,27 @@ void CSScreenErase()
       case 4:	// IRM
         InsertMode = FALSE; break;
       case 12:	// SRM
-	ts.LocalEcho = 1;
-	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
-	  TelChangeEcho();
-	break;
+        ts.LocalEcho = 1;
+        if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+          TelChangeEcho();
+        break;
       case 20:	// LF/NL
-	LFMode = FALSE;
-	ts.CRSend = IdCR;
-	cv.CRSend = IdCR;
-	break;
+        LFMode = FALSE;
+        ts.CRSend = IdCR;
+        cv.CRSend = IdCR;
+        break;
       case 33:	// WYSTCURM
-	ts.NonblinkingCursor = FALSE;
-	ChangeCaret();
-	break;
+        if (ts.WindowFlag & WF_CURSORCHANGE) {
+          ts.NonblinkingCursor = FALSE;
+          ChangeCaret();
+        }
+        break;
       case 34:	// WYULCURM
-	ts.CursorShape = IdBlkCur;
-	ChangeCaret();
-	break;
+        if (ts.WindowFlag & WF_CURSORCHANGE) {
+          ts.CursorShape = IdBlkCur;
+          ChangeCaret();
+        }
+        break;
     }
   }
 
@@ -1783,64 +1791,88 @@ void CSSetAttr()
 
     switch (Param[1]) {
       case 1: // De-iconify window
-	DispShowWindow(WINDOW_RESTORE);
+	if (ts.WindowFlag & WF_WINDOWCHANGE)
+	  DispShowWindow(WINDOW_RESTORE);
 	break;
       case 2: // Iconify window
-	DispShowWindow(WINDOW_MINIMIZE);
+	if (ts.WindowFlag & WF_WINDOWCHANGE)
+	  DispShowWindow(WINDOW_MINIMIZE);
 	break;
       case 3: // set window position
-	if (NParam < 2) Param[2] = 0;
-	if (NParam < 3) Param[3] = 0;
-	DispMoveWindow(Param[2], Param[3]);
+	if (ts.WindowFlag & WF_WINDOWCHANGE) {
+	  if (NParam < 2) Param[2] = 0;
+	  if (NParam < 3) Param[3] = 0;
+	  DispMoveWindow(Param[2], Param[3]);
+	}
 	break;
       case 4: // set window size
-        if (NParam < 2) Param[2] = 0;
-	if (NParam < 3) Param[3] = 0;
-	DispResizeWin(Param[3], Param[2]);
+	if (ts.WindowFlag & WF_WINDOWCHANGE) {
+          if (NParam < 2) Param[2] = 0;
+	  if (NParam < 3) Param[3] = 0;
+	  DispResizeWin(Param[3], Param[2]);
+	}
 	break;
       case 5: // Raise window
-	DispShowWindow(WINDOW_RAISE);
+	if (ts.WindowFlag & WF_WINDOWCHANGE)
+	  DispShowWindow(WINDOW_RAISE);
 	break;
       case 6: // Lower window
-	DispShowWindow(WINDOW_LOWER);
+	if (ts.WindowFlag & WF_WINDOWCHANGE)
+	  DispShowWindow(WINDOW_LOWER);
 	break;
       case 7: // Refresh window
-	DispShowWindow(WINDOW_REFRESH);
+	if (ts.WindowFlag & WF_WINDOWCHANGE)
+	  DispShowWindow(WINDOW_REFRESH);
 	break;
       case 8: /* set terminal size */
-	if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
-	if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;
-	ChangeTerminalSize(Param[3],Param[2]);
+	if (ts.WindowFlag & WF_WINDOWCHANGE) {
+	  if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
+	  if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;
+	  ChangeTerminalSize(Param[3],Param[2]);
+	}
 	break;
       case 9: // Maximize/Restore window
-	if (NParam < 2 || Param[2] == 0) {
-	  DispShowWindow(WINDOW_RESTORE);
-	}
-	else {
-	  DispShowWindow(WINDOW_MAXIMIZE);
+	if (ts.WindowFlag & WF_WINDOWCHANGE) {
+	  if (NParam < 2 || Param[2] == 0) {
+	    DispShowWindow(WINDOW_RESTORE);
+	  }
+	  else {
+	    DispShowWindow(WINDOW_MAXIMIZE);
+	  }
 	}
 	break;
       case 11: // Report window state
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
-	SendCSIstr(Report, len);
+	if (ts.WindowFlag & WF_WINDOWREPORT) {
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
+	  SendCSIstr(Report, len);
+	}
 	break;
       case 13: // Report window position
-	DispGetWindowPos(&x, &y);
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%d;%dt", CLocale, x, y);
-	SendCSIstr(Report, len);
+	if (ts.WindowFlag & WF_WINDOWREPORT) {
+	  DispGetWindowPos(&x, &y);
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%d;%dt", CLocale, x, y);
+	  SendCSIstr(Report, len);
+	}
 	break;
       case 14: /* get window size??? */
-	/* this is not actual window size */
-	SendCSIstr("4;640;480t", 10);
+	if (ts.WindowFlag & WF_WINDOWREPORT) {
+	  /* this is not actual window size */
+	  SendCSIstr("4;640;480t", 10);
+	}
 	break;
       case 18: /* get terminal size */
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%u;t", CLocale, NumOfLines-StatusLine, NumOfColumns);
-	SendCSIstr(Report, len);
+	if (ts.WindowFlag & WF_WINDOWREPORT) {
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%u;t", CLocale,
+	                      NumOfLines-StatusLine, NumOfColumns);
+	  SendCSIstr(Report, len);
+	}
 	break;
       case 19: // Report display size (character)
-	DispGetRootWinSize(&x, &y);
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
-	SendCSIstr(Report, len);
+	if (ts.WindowFlag & WF_WINDOWREPORT) {
+	  DispGetRootWinSize(&x, &y);
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
+	  SendCSIstr(Report, len);
+	}
 	break;
     }
   }
@@ -1957,8 +1989,7 @@ void CSSetAttr()
 	      CSQExchangeColor(); /* Exchange text/back color */
 	    break;
 	  case 6:
-	    if ((StatusLine>0) &&
-		(CursorY==NumOfLines-1))
+	    if ((StatusLine>0) && (CursorY==NumOfLines-1))
 	      MoveCursor(0,CursorY);
 	    else {
 	      RelativeOrgMode = TRUE;
@@ -1971,7 +2002,12 @@ void CSSetAttr()
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackX10;
 	    break;
-	  case 12: ts.NonblinkingCursor = FALSE; ChangeCaret(); break;
+	  case 12:
+	    if (ts.WindowFlag & WF_CURSORCHANGE) {
+	      ts.NonblinkingCursor = FALSE;
+	      ChangeCaret();
+	    }
+	    break;
 	  case 19: PrintEX = TRUE; break;
 	  case 25: DispEnableCaret(TRUE); break; // cursor on
 	  case 38:
@@ -2062,8 +2098,7 @@ void CSSetAttr()
 	      CSQExchangeColor(); /* Exchange text/back color */
 	    break;
 	  case 6:
-	    if ((StatusLine>0) &&
-		(CursorY==NumOfLines-1))
+	    if ((StatusLine>0) && (CursorY==NumOfLines-1))
 	      MoveCursor(0,CursorY);
 	    else {
 	      RelativeOrgMode = FALSE;
@@ -2073,7 +2108,12 @@ void CSSetAttr()
 	  case 7: AutoWrapMode = FALSE; break;
 	  case 8: AutoRepeatMode = FALSE; break;
 	  case 9: MouseReportMode = IdMouseTrackNone; break;
-	  case 12: ts.NonblinkingCursor = TRUE; ChangeCaret(); break;
+	  case 12:
+	    if (ts.WindowFlag & WF_CURSORCHANGE) {
+	      ts.NonblinkingCursor = TRUE;
+	      ChangeCaret();
+	    }
+	    break;
 	  case 19: PrintEX = FALSE; break;
 	  case 25: DispEnableCaret(FALSE); break; // cursor off
 	  case 59:
@@ -2202,38 +2242,40 @@ void CSSetAttr()
   void CSSpace(BYTE b) {
     switch (b) {
       case 'q':
-        if (NParam > 0) {
-          if (Param[1] < 0) Param[1] = 0;
-          switch (Param[1]) {
-            case 0:
-            case 1:
-              ts.CursorShape = IdBlkCur;
-              ts.NonblinkingCursor = FALSE;
-              break;
-            case 2:
-              ts.CursorShape = IdBlkCur;
-              ts.NonblinkingCursor = TRUE;
-              break;
-            case 3:
-              ts.CursorShape = IdHCur;
-              ts.NonblinkingCursor = FALSE;
-              break;
-            case 4:
-              ts.CursorShape = IdHCur;
-              ts.NonblinkingCursor = TRUE;
-              break;
-            case 5:
-              ts.CursorShape = IdVCur;
-              ts.NonblinkingCursor = FALSE;
-              break;
-            case 6:
-              ts.CursorShape = IdVCur;
-              ts.NonblinkingCursor = TRUE;
-              break;
-	    default:
-	      return;
+        if (ts.WindowFlag & WF_CURSORCHANGE) {
+          if (NParam > 0) {
+            if (Param[1] < 0) Param[1] = 0;
+            switch (Param[1]) {
+              case 0:
+              case 1:
+                ts.CursorShape = IdBlkCur;
+                ts.NonblinkingCursor = FALSE;
+                break;
+              case 2:
+                ts.CursorShape = IdBlkCur;
+                ts.NonblinkingCursor = TRUE;
+                break;
+              case 3:
+                ts.CursorShape = IdHCur;
+                ts.NonblinkingCursor = FALSE;
+                break;
+              case 4:
+                ts.CursorShape = IdHCur;
+                ts.NonblinkingCursor = TRUE;
+                break;
+              case 5:
+                ts.CursorShape = IdVCur;
+                ts.NonblinkingCursor = FALSE;
+                break;
+              case 6:
+                ts.CursorShape = IdVCur;
+                ts.NonblinkingCursor = TRUE;
+                break;
+              default:
+                return;
+            }
+            ChangeCaret();
           }
-	  ChangeCaret();
         }
         break;
     }
