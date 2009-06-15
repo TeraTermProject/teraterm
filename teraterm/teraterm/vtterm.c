@@ -311,12 +311,17 @@ void SendOSCstr(char *str, int len) {
 	if (str == NULL || len <= 0)
 		return;
 
-	if (Send8BitMode)
+	if (Send8BitMode) {
 		CommBinaryOut(&cv,"\235", 1);
-	else
+		CommBinaryOut(&cv, str, len);
+		CommBinaryOut(&cv,"\234", 1);
+	}
+	else {
 		CommBinaryOut(&cv,"\033]", 2);
+		CommBinaryOut(&cv, str, len);
+		CommBinaryOut(&cv,"\033\\", 2);
+	}
 
-	CommBinaryOut(&cv, str, len);
 }
 
 void BackSpace()
@@ -2730,7 +2735,7 @@ void XSequence(BYTE b)
 				if (strcmp(StrBuff, "?") == 0) {
 					color = DispGetANSIColor(ColorNumber);
 					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-						"4;%d;rgb:%02x/%02x/%02x\234", CLocale, ColorNumber,
+						"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
 						GetRValue(color), GetGValue(color), GetBValue(color));
 					ParseMode = ModeFirst;
 					XsParseMode = ModeXsFirst;
@@ -2757,7 +2762,7 @@ void XSequence(BYTE b)
 				if (strcmp(StrBuff, "?") == 0) {
 					color = DispGetANSIColor(ColorNumber);
 					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-						"4;%d;rgb:%02x/%02x/%02x\234", CLocale, ColorNumber,
+						"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
 						GetRValue(color), GetGValue(color), GetBValue(color));
 					XsParseMode = ModeXsColorNum;
 					SendOSCstr(StrBuff, len);
