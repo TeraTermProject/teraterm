@@ -1841,7 +1841,7 @@ void CSSetAttr()
 	  if (NParam < 2 || Param[2] == 0) {
 	    DispShowWindow(WINDOW_RESTORE);
 	  }
-	  else {
+	  else if (Param[2] == 1) {
 	    DispShowWindow(WINDOW_MAXIMIZE);
 	  }
 	}
