@@ -1277,6 +1277,14 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 					TempStr[TempLen++] = d;
 				}
 			}
+			else if (d==0x15) { // Ctrl-U
+				if (cv->TelLineMode) {
+					cv->LineModeBuffCount = cv->FlushLen;
+				}
+		  		else {
+					TempStr[TempLen++] = d;
+				}
+			}
 			else if ((d>=0x80) && (cv->KanjiCodeSend==IdUTF8 || cv->Language==IdUtf8)) {
 				TempLen += OutputTextUTF8((WORD)d, TempStr, cv);
 			}
@@ -1402,6 +1410,14 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 				TempStr[TempLen++] = d;
 			}
 			break;
+
+		  case 0x15: // Ctrl-U
+			if (cv->TelLineMode) {
+				cv->LineModeBuffCount = cv->FlushLen;
+			}
+			else {
+				TempStr[TempLen++] = d;
+			}
 
 		  default:
 			if ((cv->Language==IdRussian) && (d>=128)) {
