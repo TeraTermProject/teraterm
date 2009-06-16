@@ -19,6 +19,7 @@ EXPORTS
   CommRead1Byte @22
   CommRawOut @23
   CommBinaryOut @24
+  CommBinaryBuffOut @52
   CommTextOut @25
   CommBinaryEcho @26
   CommTextEcho @27

@@ -1096,26 +1096,86 @@ int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
 		d[Len] = B[i];
 		Len++;
 
-		if ( cv->TelFlag && (B[i]=='\x0d') &&
-		     ! cv->TelBinSend ) {
-			d[Len] = '\x00';
-			Len++;
-		};
-
-		if ( cv->TelFlag && (B[i]=='\xff') ) {
-			d[Len] = '\xff';
-			Len++;
+		if ( cv->TelFlag && (B[i]=='\x0d') && ! cv->TelBinSend ) {
+			d[Len++] = '\x00';
+		}
+		else if ( cv->TelFlag && (B[i]=='\xff') ) {
+			d[Len++] = '\xff';
 		}
 
-		if ( OutBuffSize-cv->OutBuffCount-Len >=0 ) {
-			CommRawOut(cv,d,Len);
+		if ( OutBuffSize - cv->OutBuffCount - Len >= 0 ) {
+			CommRawOut(cv, d, Len);
 			a = 1;
 		}
 		else {
 			a = 0;
 		}
 
-		i = i + a;
+		i += a;
+	}
+	return i;
+}
+
+int FAR PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
+{
+	int a, i, Len, OutLen;
+	char d[3];
+
+	if ( ! cv->Ready ) {
+		return C;
+	}
+
+	i = 0;
+	a = 1;
+	while ((a>0) && (i<C)) {
+		Len = 0;
+
+		d[Len] = B[i];
+		Len++;
+
+		if (B[i] == CR) {
+			if ( cv->TelFlag && ! cv->TelBinSend ) {
+				d[Len++] = '\x00';
+			}
+			if (cv->TelLineMode) {
+				cv->Flush = TRUE;
+			}
+		}
+		else if ( cv->TelFlag && (B[i]=='\xff') ) {
+			d[Len++] = '\xff';
+		}
+
+		if (cv->TelLineMode) {
+			if (OutBuffSize - cv->LineModeBuffCount - Len >= 0) {
+				memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), d, Len);
+				cv->LineModeBuffCount += Len;
+				if (cv->Flush) {
+					cv->FlushLen = cv->LineModeBuffCount;
+				}
+				a = 1;
+			}
+			else {
+				a = 0;
+			}
+			if (cv->FlushLen > 0) {
+				OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
+				cv->FlushLen -= OutLen;
+				cv->LineModeBuffCount -= OutLen;
+				memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
+			}
+			cv->Flush = FALSE;
+		}
+		else {
+			if ( OutBuffSize - cv->OutBuffCount - Len >= 0 ) {
+				CommRawOut(cv, d, Len);
+				a = 1;
+			}
+			else {
+				a = 0;
+			}
+		}
+
+		i += a;
 	}
 	return i;
 }

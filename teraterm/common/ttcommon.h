@@ -39,6 +39,7 @@ int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b);
 void FAR PASCAL CommInsert1Byte(PComVar cv, BYTE b);
 int FAR PASCAL CommRawOut(PComVar cv, PCHAR B, int C);
 int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C);
+int FAR PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
 int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C);
 int FAR PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
 int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);

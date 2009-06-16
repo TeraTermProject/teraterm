@@ -633,7 +633,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
       case IdBinary:
 	if (TalkStatus==IdTalkKeyb) {
 	  for (i = 1 ; i <= CodeCount ; i++) {
-	    CommBinaryOut(&cv,Code,CodeLength);
+	    CommBinaryBuffOut(&cv,Code,CodeLength);
 	    if (ts.LocalEcho>0)
 	      CommBinaryEcho(&cv,Code,CodeLength);
 	  }
@@ -740,7 +740,7 @@ void KeyCodeSend(WORD KCode, WORD Count)
       case IdBinary:
 	for (i = 1 ; i <= Count ; i++)
 	{
-	  CommBinaryOut(&cv,Code,CodeLength);
+	  CommBinaryBuffOut(&cv,Code,CodeLength);
 	  if (ts.LocalEcho>0)
 	    CommBinaryEcho(&cv,Code,CodeLength);
 	}
