@@ -1612,7 +1612,7 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 				}
 			}
 
-			if (d==0x0d) {
+			if (d==CR) {
 				TempStr[TempLen++] = 0x0d;
 				if (cv->CRSend==IdCRLF) {
 					TempStr[TempLen++] = 0x0a;
@@ -1620,6 +1620,16 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 				else if ((cv->CRSend==IdCR) &&
 				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen++] = 0;
+				}
+			}
+			else if (d==0x15) { // Ctrl-U
+				if (cv->TelLineMode) {
+					// Move to top of line (CHA "\033[G") and erase line (EL "\033[K")
+					strncpy_s(TempStr, sizeof(TempStr), "\033[G\033[K", _TRUNCATE);
+					TempLen += 6;
+				}
+				else {
+					TempStr[TempLen++] = d;
 				}
 			}
 			else if ((d>=0x80) && (cv->KanjiCodeEcho==IdUTF8 || cv->Language==IdUtf8)) {
@@ -1699,7 +1709,8 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 		TempLen = 0;
 		d = (BYTE)B[i];
 
-		if (d==0x0d) {
+		switch (d) {
+		  case CR:
 			TempStr[TempLen] = 0x0d;
 			TempLen++;
 			if (cv->CRSend==IdCRLF) {
@@ -1708,8 +1719,20 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 			else if (cv->CRSend==IdCR && cv->TelFlag && ! cv->TelBinSend) {
 				TempStr[TempLen++] = 0;
 			}
-		}
-		else {
+			break;
+		  
+		  case 0x15: // Ctrl-U
+			if (cv->TelLineMode) {
+				// Move to top of line (CHA "\033[G") and erase line (EL "\033[K")
+				strncpy_s(TempStr, sizeof(TempStr), "\033[G\033[K", _TRUNCATE);
+				TempLen += 6;
+			}
+			else {
+				TempStr[TempLen++] = d;
+			}
+			break;
+
+		  default:
 			if ((cv->Language==IdRussian) && (d>=128)) {
 				d = RussConv(cv->RussClient,cv->RussHost,d);
 			}
