@@ -2,7 +2,7 @@
                 CygTerm+ - yet another Cygwin console
 
                 Using Cygwin with a terminal emulator.
-                
+
                 Copyright (c) 2006-2008 TeraTerm Project
                 http://ttssh2.sourceforge.jp/
 
@@ -19,7 +19,7 @@
 // P R E F A C E //
 
     This is an experiment trying to substitute a terminal emulator for the
-    DOS window as Cygwin console.  However, assume that it is carried out 
+    DOS window as Cygwin console.  However, assume that it is carried out
     without the mechanism of remote login.  In other words, it doesn't use
     `inetd', `in.telnetd' or `login'.
 
@@ -84,7 +84,7 @@
       See http://www.gnu.org/copyleft/gpl.html.
 
       Note: Any program including non-GPL program can invoke the CygTerm
-            executable (cygterm.exe) and communicate with it. 
+            executable (cygterm.exe) and communicate with it.
 
 // I N S T A L L //
 
@@ -109,7 +109,7 @@
       | SHELL = /bin/bash
       | ENV_1 = MAKE_MODE=unix
       | ENV_2 = HOME=/home
-      |   :         : 
+      |   :         :
 
     TERM
     ----
@@ -247,7 +247,7 @@
         [Save setup] in the situation that it was started by cygterm.exe.
         Otherwise telnet port number of TCP/IP is saved but 23 you will be
         confused by connection failure when you normally run Tera Term to do
-        telnet.  In that case it will be recovered by saving the setting 
+        telnet.  In that case it will be recovered by saving the setting
         with specifying TCP/IP Port# 23.
 
 // T E S T E D  O N //
@@ -266,20 +266,23 @@
 
 // C H A N G E S //
 v1.07_16 2008/11/21 (by doda)
-        * The option that enables ssh-agent proxy support is changed from '-a' to '-A'.
+        * The option that enables ssh-agent proxy support is changed from '-a'
+          to '-A'.
         * Added '-a' option that disables ssh-agent proxy support.
 
 v1.07_15 2008/11/01 (by doda)
         * Added ssh-agent proxy support.
 
 v1.07_14 2007/12/17 (by doda)
-        * Added '-o' option that is specifies the additional parameters for terminal-emulator.
+        * Added '-o' option that is specifies the additional parameters for
+          terminal-emulator.
 
 v1.07_13 2007/08/03 (by maya)
         * Added '-d' option that is specifies the start directory.
 
 v1.07_12 2007/06/10 (by doda)
-        * Add 'SOCKET_TIMEOUT' entry which the timeout value of socket for waiting telnet connection in cygterm.cfg file.
+        * Add 'SOCKET_TIMEOUT' entry which the timeout value of socket for
+          waiting telnet connection in cygterm.cfg file.
 
 v1.07_11 2007/01/31 (import from cygterm v1.07)
         * Avoid WinMainCRTStartup() redefinition error with gcc 3.4.
@@ -289,19 +292,24 @@ v1.06_11 2006/09/29 (by maya)
         * Stopped using HOME from environment variable and /etc/passwd.
           CygTerm passes HOME which is set by Cygwin. See also /etc/profile
         * Changed the priority of config files.
-          command line arguments > ~/.cygtermrc > /etc/cygterm.conf > cygterm.cfg > /etc/passwd
+          command line arguments > ~/.cygtermrc > /etc/cygterm.conf
+          > cygterm.cfg > /etc/passwd
 
 v1.06_10 2006/09/28 (by doda)
-        * Use getlogin() instead of environment variable USERNAME to get user name.
+        * Use getlogin() instead of environment variable USERNAME to get
+          user name.
 
 v1.06_09 2006/09/25 (by doda)
-        * Get shell information from /etc/passwd if SHELL parameter is not specified.
+        * Get shell information from /etc/passwd if SHELL parameter is not
+          specified.
 
 v1.06_08 2006/08/30 (by maya)
-        * Changed the priority of config files. cygterm.cfg is top priority config file.
+        * Changed the priority of config files. cygterm.cfg is top priority
+          config file.
 
 v1.06_07 2006/08/19 (by maya)
-        * Use `HOME' environment variable for changing home directory if the variable will be set.
+        * Use `HOME' environment variable for changing home directory if the
+          variable will be set.
 
 v1.06_06 2006/08/18 (by doda)
         * Limit a parameter length of both '-s' and '-t' option.
@@ -310,11 +318,15 @@ v1.06_05 2006/08/18 (by maya)
         * Create mutex object for running check by installer.
 
 v1.06_04 2006/08/15 (by doda)
-        * Add 'LOGIN_SHELL' entry which the shell is invoked as the login shell in cygterm.cfg file.
+        * Add 'LOGIN_SHELL' entry which the shell is invoked as the login shell
+          in cygterm.cfg file.
+
           LOGIN_SHELL: yes | no
 
 v1.06_03 2006/08/15 (by doda)
-        * Add 'HOME_CHDIR' entry which home directory is changed in cygterm.cfg file.
+        * Add 'HOME_CHDIR' entry which home directory is changed in cygterm.cfg
+          file.
+
           HOME_CHDIR: yes | no
 
 v1.06_02 2006/02/09 (by babydamons@yahoo.co.jp)
@@ -322,7 +334,8 @@ v1.06_02 2006/02/09 (by babydamons@yahoo.co.jp)
           "DotWork 2.50" is available at http://www5a.biglobe.ne.jp/~suuta/.
           Special Thanks to "suuta at hamal dot freemal dot ne dot jp"
 
-        * Makefile was changed, "clean" target was changed to don't remove cygterm.ico.
+        * Makefile was changed, "clean" target was changed to don't remove
+          cygterm.ico.
 
 v1.06_01 2006/02/08 (by babydamons@yahoo.co.jp)
         * The following configuration file reading was supported:
@@ -381,7 +394,7 @@ v1.02 2002/07/22
           How to check: $ strings cygterm.exe | grep version
 
 v1.01 2002/07/19
-        * Fixed that cygterm did not work with zsh or tcsh. 
+        * Fixed that cygterm did not work with zsh or tcsh.
           Input was blocked when zsh or tcsh started, because the approach to
           open the pseudo terminal was not good.
 

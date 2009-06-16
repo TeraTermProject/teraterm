@@ -76,7 +76,7 @@
        http://www.gnu.org/copyleft/gpl.html 参照。
 
        補足: 他プログラムが CygTerm実行形式(cygterm.exe)を起動し通信して
-             使用することは、それが非GPLプログラムの場合でも許可されます。 
+             使用することは、それが非GPLプログラムの場合でも許可されます。
 
 // イ ン ス ト ー ル //
 
@@ -162,7 +162,7 @@
     ---------------
         ssh認証エージェント転送機能を提供するかを指定します。
         有効にすると、OpenSSHのssh認証エージェントに対応したプログラムが、
-	CygTerm+を通してPageantにアクセスできるようになります。
+        CygTerm+を通してPageantにアクセスできるようになります。
         デフォルトは無効です。
 
     ENV_X
@@ -272,12 +272,12 @@
 
 // 変 更 履 歴 //
 v1.07_16 2008/11/21 (by doda)
-        * ssh認証エージェント転送機能を有効にするオプションを '-a' から
+        * ssh 認証エージェント転送機能を有効にするオプションを '-a' から
           '-A' に変更した。
-        * ssh認証エージェント転送機能を無効にするオプション '-a' を追加した。
+        * ssh 認証エージェント転送機能を無効にするオプション '-a' を追加した。
 
 v1.07_15 2008/11/01 (by doda)
-        * ssh認証エージェント転送機能をサポートした。
+        * ssh 認証エージェント転送機能をサポートした。
 
 v1.07_14 2007/12/17 (by doda)
         * ターミナル・エミュレータの追加のパラメータを指定するオプション
@@ -287,9 +287,10 @@ v1.07_13 2007/08/03 (by maya)
         * 開始ディレクトリを指定する '-d' オプションを追加した。
 
 v1.07_12 2007/06/10 (by doda)
-        * telnetの待ち受けソケットのタイムアウトを設定するオプション SOCKET_TIMEOUT を追加した。
+        * telnet の待ち受けソケットのタイムアウトを設定するオプション
+          SOCKET_TIMEOUT を追加した。
 
-        SOCKET_TIMEOUT = 秒数 
+          SOCKET_TIMEOUT = 秒数
 
 v1.07_11 2007/01/31 (import from cygterm v1.07)
         * gcc 3.4 での WinMainCRTStartup() 再定義エラー回避
@@ -299,13 +300,16 @@ v1.06_11 2006/09/29 (by maya)
         * 環境変数と /etc/passwd の HOME を使わないようにした。
           Cygwin によってセットされた HOME が利用される。関連項目 /etc/profile
         * 設定ファイルの優先順位を変更した。
-          コマンドライン引数 > ~/.cygtermrc > /etc/cygterm.conf > cygterm.cfg > /etc/passwd
+          コマンドライン引数 > ~/.cygtermrc > /etc/cygterm.conf > cygterm.cfg
+          > /etc/passwd
 
 v1.06_10 2006/09/28 (by doda)
-        * ユーザ名を得るのに、環境変数USERNAMEの代わりにgetlogin()を使うようにした。
+        * ユーザ名を得るのに、環境変数 USERNAME の代わりに getlogin() を使う
+          ようにした。
 
 v1.06_09 2006/09/25 (by doda)
-        * SHELLが設定されていない場合は、/etc/passwdからシェルの情報を得るようにした。
+        * SHELLが設定されていない場合は、/etc/passwd からシェルの情報を得る
+          ようにした。
 
 v1.06_08 2006/08/30 (by maya)
         * cygterm.cfg を設定ファイルの中で最優先されるようにした。
@@ -320,20 +324,26 @@ v1.06_05 2006/08/18 (by maya)
         * インストーラから起動チェックをするため、mutex を作成した。
 
 v1.06_04 2006/08/15 (by doda)
-        * シェルをログインシェルとして呼び出すオプション LOGIN_SHELL を追加した。
+        * シェルをログインシェルとして呼び出すオプション LOGIN_SHELL を
+          追加した。
+
           LOGIN_SHELL: yes | no
 
 v1.06_03 2006/08/15 (by doda)
-        * ホームディレクトリで起動するのを選択するオプション HOME_CHDIR を追加した。
+        * ホームディレクトリで起動するのを選択するオプション HOME_CHDIR を
+          追加した。
+
           HOME_CHDIR: yes | no
 
 v1.06_02 2006/02/09 (by babydamons@yahoo.co.jp)
         * CygTermのアイコンが作成されました。（"DotWork 2.50"にて作成）
-          "DotWork 2.50" は右記のURLより入手可能です。 http://www5a.biglobe.ne.jp/~suuta/.
+          "DotWork 2.50" は右記のURLより入手可能です。
+          http://www5a.biglobe.ne.jp/~suuta/
           すばらしいソフトウェアを公開していただき、
           "suuta at hamal dot freemal dot ne dot jp"に感謝致します。
 
-        * Makefileが修正されました。"clean"ターゲットでcygterm.icoを削除しないように。
+        * Makefile が修正されました。"clean" ターゲットで cygterm.ico を削除
+          しないように。
 
 v1.06_01 2006/02/08 (by babydamons@yahoo.co.jp)
         * 以下の設定ファイルの読み込みをサポート:
@@ -342,10 +352,10 @@ v1.06_01 2006/02/08 (by babydamons@yahoo.co.jp)
 
         * シェルがユーザのホームディレクトリで起動されるように。
 
-        * アカウントの設定情報を/etc/passwdからgetpwnam(3)で読み込むように。
-          アカウント名は環境変数USERNAMEからgetenv(3)で取得してます。
+        * アカウントの設定情報を /etc/passwd から getpwnam(3) で読み込むように。
+          アカウント名は環境変数 USERNAME からgetenv(3) で取得してます。
 
-        * Makefile修正：ディフォルトでアイコンつきの.exeをビルドします。
+        * Makefile 修正：ディフォルトでアイコンつきの .exe をビルドします。
 
 v1.06 2004/01/24
         * コマンドライン・オプションを追加。
@@ -362,7 +372,8 @@ v1.06 2004/01/24
 
 v1.05 2003/01/14
         * Ctrl+SPACE(NUL)が送信できるように修正。
-          改行コード CR+NUL を処理する方法として単純に NUL文字を無視していた              ため、Ctrl+SPACE 押下時でも NUL が送信されなかった。
+          改行コード CR+NUL を処理する方法として単純に NUL文字を無視していた
+          ため、Ctrl+SPACE 押下時でも NUL が送信されなかった。
 
 v1.04 2002/12/08
         * ターミナル・エミュレータおよびシェルの起動に失敗したときに
