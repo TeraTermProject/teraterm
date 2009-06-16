@@ -303,7 +303,9 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	switch (ts->PortType) {
 		case IdTCPIP:
 			cv->TelFlag = (ts->Telnet > 0);
-			cv->TelLineMode = TRUE;
+			if (ts->EnableLineMode) {
+				cv->TelLineMode = TRUE;
+			}
 			if (! LoadWinsock()) {
 				if (cv->NoMsg==0) {
 					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);

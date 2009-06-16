@@ -1311,6 +1311,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Window report sequence
 	if (GetOnOff(Section, "TitleReportSequence", FName, TRUE))
 		ts->WindowFlag |= WF_TITLEREPORT;
+
+	// Line at a time mode
+	ts->EnableLineMode = GetOnOff(Section, "EnableLineMode", FName, TRUE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2275,6 +2278,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Title report sequence
 	WriteOnOff(Section, "TitleReportSequence", FName,
 		ts->WindowFlag & WF_TITLEREPORT);
+
+	// Line at a time mode
+	WriteOnOff(Section, "EnableLineMode", FName, ts->EnableLineMode);
 }
 
 #define VTEditor "VT editor keypad"
