@@ -221,6 +221,11 @@ typedef TCharAttr *PCharAttr;
 #define IdTitleChangeRequestAhead     2
 #define IdTitleChangeRequestLast      3
 
+// Meta8Bit mode
+#define IdMeta8BitOff   0
+#define IdMeta8BitRaw   1
+#define IdMeta8BitText  2
+
 #define TitleBuffSize  50
 
 // Eterm lookfeel alphablend structure

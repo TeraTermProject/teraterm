@@ -598,13 +598,19 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
     CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, ModStat);
 
     if ((ts.MetaKey>0) && (CodeLength==1) && AltKey()) {
-      if (ts.Meta8Bit) {
-	Code[0] |= 0x80;
-      }
-      else {
-        Code[1] = Code[0];
-        Code[0] = 0x1b;
-        CodeLength = 2;
+      switch (ts.Meta8Bit) {
+        case IdMeta8BitRaw:
+	  Code[0] |= 0x80;
+	  CodeType = IdBinary;
+	  break;
+        case IdMeta8BitText:
+	  Code[0] |= 0x80;
+	  CodeType = IdText;
+	  break;
+	default:
+          Code[1] = Code[0];
+          Code[0] = 0x1b;
+          CodeLength = 2;
       }
       PeekMessage((LPMSG)&M,HWin,WM_SYSCHAR,WM_SYSCHAR,PM_REMOVE);
     }

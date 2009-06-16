@@ -1296,6 +1296,15 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Meta sets MSB
 	ts->Meta8Bit = GetOnOff(Section, "Meta8Bit", FName, FALSE);
 
+	// Meta sets MSB
+	GetPrivateProfileString(Section, "Meta8Bit", "off", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "raw") == 0 || _stricmp(Temp, "on") == 0)
+		ts->Meta8Bit = IdMeta8BitRaw;
+	else if (_stricmp(Temp, "text") == 0)
+		ts->Meta8Bit = IdMeta8BitText;
+	else
+		ts->Meta8Bit = IdMeta8BitOff;
+
 	// Window control sequence
 	if (GetOnOff(Section, "WindowCtrlSequence", FName, TRUE))
 		ts->WindowFlag |= WF_WINDOWCHANGE;
@@ -2261,7 +2270,16 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	         ts->PasteDelayPerLine);
 
 	// Meta sets MSB
-	WriteOnOff(Section, "Meta8Bit", FName, ts->Meta8Bit);
+	switch (ts->Meta8Bit) {
+	  case IdMeta8BitRaw:
+		WritePrivateProfileString(Section, "Meta8Bit", "raw", FName);
+		break;
+	  case IdMeta8BitText:
+		WritePrivateProfileString(Section, "Meta8Bit", "text", FName);
+		break;
+	  default:
+		WritePrivateProfileString(Section, "Meta8Bit", "off", FName);
+	}
 
 	// Window control sequence
 	WriteOnOff(Section, "WindowCtrlSequence", FName,

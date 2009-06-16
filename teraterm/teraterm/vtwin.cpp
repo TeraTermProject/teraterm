@@ -2562,18 +2562,28 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) return;
 		Code = nChar;
 		for (i=1 ; i<=nRepCnt ; i++) {
-			if (ts.Meta8Bit) {
+			switch (ts.Meta8Bit) {
+			  case IdMeta8BitRaw:
 				Code |= 0x80;
-			}
-			else {
-				CommTextOut(&cv,&e,1);
+				CommBinaryBuffOut(&cv, &Code, 1);
 				if (ts.LocalEcho) {
-					CommTextEcho(&cv,&e,1);
+					CommBinaryEcho(&cv, &Code, 1);
 				}
-			}
-			CommTextOut(&cv,&Code,1);
-			if (ts.LocalEcho) {
-				CommTextEcho(&cv,&Code,1);
+				break;
+			  case IdMeta8BitText:
+				Code |= 0x80;
+				CommTextOut(&cv, &Code, 1);
+				if (ts.LocalEcho) {
+					CommTextEcho(&cv, &Code, 1);
+				}
+				break;
+			  default:
+				CommTextOut(&cv, &e, 1);
+				CommTextOut(&cv, &Code, 1);
+				if (ts.LocalEcho) {
+					CommTextEcho(&cv, &e, 1);
+					CommTextEcho(&cv, &Code, 1);
+				}
 			}
 		}
 		return;
