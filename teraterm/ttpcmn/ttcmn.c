@@ -1254,7 +1254,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				}
 			}
 
-			if (d==0x0d) {
+			if (d==CR) {
 				TempStr[TempLen++] = 0x0d;
 				if (cv->CRSend==IdCRLF) {
 					TempStr[TempLen++] = 0x0a;
@@ -1265,6 +1265,16 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				}
 				if (cv->TelLineMode) {
 					cv->Flush = TRUE;
+				}
+			}
+			else if (d==BS) {
+				if (cv->TelLineMode) {
+					if (cv->FlushLen < cv->LineModeBuffCount) {
+						cv->LineModeBuffCount--;
+					}
+				}
+		  		else {
+					TempStr[TempLen++] = d;
 				}
 			}
 			else if ((d>=0x80) && (cv->KanjiCodeSend==IdUTF8 || cv->Language==IdUtf8)) {
@@ -1367,7 +1377,8 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 		TempLen = 0;
 		d = (BYTE)B[i];
 	
-		if (d==0x0d) {
+		switch (d) {
+		  case CR:
 			TempStr[TempLen] = 0x0d;
 			TempLen++;
 			if (cv->CRSend==IdCRLF) {
@@ -1379,8 +1390,20 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 			if (cv->TelLineMode) {
 				cv->Flush = TRUE;
 			}
-		}
-		else {
+			break;
+
+		  case BS:
+			if (cv->TelLineMode) {
+				if (cv->FlushLen < cv->LineModeBuffCount) {
+					cv->LineModeBuffCount--;
+				}
+			}
+		  	else {
+				TempStr[TempLen++] = d;
+			}
+			break;
+
+		  default:
 			if ((cv->Language==IdRussian) && (d>=128)) {
 				d = RussConv(cv->RussClient, cv->RussHost, d);
 			}
