@@ -265,6 +265,9 @@
                 zsh 4.3.4
 
 // C H A N G E S //
+v1.07_17 2009/06/16 (by doda)
+        * Added TELNET SGA/ECHO negotiation.
+
 v1.07_16 2008/11/21 (by doda)
         * The option that enables ssh-agent proxy support is changed from '-a'
           to '-A'.

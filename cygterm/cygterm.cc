@@ -93,7 +93,7 @@
 //   Written by IWAMOTO Kouichi. (doda)
 //
 /////////////////////////////////////////////////////////////////////////////
-// patch level 17 - enable TELNET SGA/ECHO negotiation
+// patch level 17 - added TELNET SGA/ECHO negotiation
 //   Written by IWAMOTO Kouichi. (doda)
 //
 
