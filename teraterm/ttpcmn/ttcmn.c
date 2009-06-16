@@ -1418,6 +1418,7 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 			else {
 				TempStr[TempLen++] = d;
 			}
+			break;
 
 		  default:
 			if ((cv->Language==IdRussian) && (d>=128)) {
