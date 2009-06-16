@@ -323,8 +323,9 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
 			osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 			GetVersionEx(&osvi);
-			if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) {
-				// NT4.0 はマルチモニタAPIに非対応
+			if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
+			     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10) ) {
+				// NT4.0, 95 はマルチモニタAPIに非対応
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rc_dsk, 0);
 			}
 			else {
