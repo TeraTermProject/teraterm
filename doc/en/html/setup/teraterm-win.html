@@ -546,14 +546,13 @@ TEKIcon=Default
 </pre>
 
 
-<!--h1><a name="WindowCtrlSequence">ウィンドウ操作の制御シーケンスを使用する</a></h1>
+<h1><a name="WindowCtrlSequence">Enable control sequence for window operation</a></h1>
 <p>
-added support for the position moving, the minimization, the maximization, the most front, the most back and the refresh control sequences regarding the dtterm window operation.
-この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面移動, 最背面移動, リフレッシュ, ウィンドウサイズ変更(ピクセル単位, 文字単位) が有効になります。
+added support for the position moving, the minimization, the maximization, the most front, the most back, the refresh and the window size changing(per pixel and character) control sequences regarding the dtterm window operation.
 </p>
 
 <p>
-リモートからのウィンドウ操作を受け入れたくない場合は、設定ファイルの [Tera Term] セクションの WindowCtrlSequence 行を以下のように変更してください。
+If TeraTerm does not accept the window operation from the remote host, please change the WindowCtrlSequence entry in the teraterm.ini file as follows:
 </p>
 
 <pre>
@@ -566,7 +565,7 @@ WindowCtrlSequence=on
 </pre>
 
 
-<h1><a name="WindowReportSequence">ウィンドウ情報報告の制御シーケンスを使用する</a></h1>
+<h1><a name="WindowReportSequence">Enable control sequence for window information reporting</a></h1>
 <p>
 この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。
 </p>
@@ -585,7 +584,7 @@ WindowReportSequence=on
 </pre>
 
 
-<h1><a name="TitleReportSequence">ウィンドウタイトル報告の制御シーケンスを使用する</a></h1>
+<h1><a name="TitleReportSequence">Enable control sequence for window title reporting</a></h1>
 <p>
 この設定が on になっていると、dttermのウィンドウタイトル報告およびアイコンラベル報告の制御シーケンスが有効になります。
 </p>
@@ -604,7 +603,7 @@ TitleReportSequence=on
 </pre>
 
 
-<h1><a name="CursorCtrlSequence">カーソル形状を制御するシーケンスを使用する</a></h1>
+<h1><a name="CursorCtrlSequence">Enable control sequence for cursor shape</a></h1>
 <p>
 この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。
 </p>
@@ -619,7 +618,7 @@ CursorCtrlSequence=off
 </pre>
 
 <p>
-vimを使用している場合、この機能を on にして ~/.vimrc に以下のように追加すると入力モードに応じてカーソル形状が変わるようになります。
+If a user uses the vim editor, write below entries in the ~/.vimrc to enable this feature.
 </p>
 
 <pre>
