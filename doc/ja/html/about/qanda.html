@@ -84,14 +84,14 @@ PPP 接続の場合、シリアルポートは Tera Term ではなく PPP 接続ソフトによって制御さ
 <span class="qanda">A.</span> ホストで使われている日本語コードが JIS 以外の場合で、日本語の入力ができない場合、ホストで 8 bit 文字の入力ができるように設定されていない<br>
 可能性があります。8 bit 文字を入力可能にするには、例えば以下のようなコマンドで設定してください。
 <pre>
-stty pass8	(SunOS等の unix の場合)
-set term /eight	(VMS の場合)
+stty pass8 -istrip	(SunOS等の unix の場合)
+set term /eight		(VMS の場合)
 </pre>
 詳しくは、ホストの管理者等に聞いてください。
 </p>
 
 <p>
-<span class="qanda">Q.</span> 漢字モードを JIS や EUC にしたとき Shift-JIS の漢字を受信すると Tera Term がハングアップする。<br>
+<span class="qanda">Q.</span> 漢字モードを JIS や EUC にしたとき Shift-JIS や UTF-8 の漢字を受信すると Tera Term がハングアップする。<br>
 <span class="qanda">A.</span> <A HREF="../usage/tips/not-c1-char.html">「C1 制御文字を使用しない」</A>を読んでください
 </p>
 
