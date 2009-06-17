@@ -65,6 +65,7 @@
         <ul>
           <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、UTF-8モードを指定できるようにした。</li>
         </ul></li>
+      <li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li>
       <li>フォント設定ダイアログで、OSのコモンダイアログをそのまま表示するようにした。
         <ul>
           <li>文字セットを選択できるようにした。</li>
@@ -85,12 +86,18 @@
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、"<a href="../macro/command/wait4all.html">wait4all</a>" マクロコマンドが有効となる。</li>
       <li>マクロコマンド "<a href="../macro/command/exec.html">exec</a>" に、起動したアプリケーションの終了コードを result に格納するためのオプションを追加した。</li>
       <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
+      <li>Secondary DA要求に対して、パラメータがなしまたは0の時のみ応答するようにした。</li>
+      <li>行単位送信(Line at a time)モードに対応した。
+        <ul>
+          <li>teraterm.ini に EnableLineMode エントリを追加した。デフォルトはon。</li>
+          <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
+        </ul></li>
     </ul></li>
 
   <li>バグ修正
     <ul>
       <li>AcceptTitleChangeRequestがoverwriteの時、リモートからのウィンドウタイトル変更要求を受けた後にマクロの<a href="../macro/command/settitle.html">settitle</a>コマンドでウィンドウタイトルの変更が出来なくなるのを修正した。</li>
-      <li>minicomを使った場合、最下行でのみ自動スクロールする機能がうまく働かない問題を修正した。</li>
+      <li>スクロール領域(DECSTBM)が設定されている場合、最下行でのみ自動スクロールする機能がうまく働かない問題を修正した。例えばminicomではスクロール領域を設定する為この問題が発生する。</li>
       <li>継続行コピーがうまく働かない場合があるのを修正した。</li>
       <li>ssh/cygwin接続を複製した後の新規接続で、<a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a>が無視されるのを修正した。</li>
       <li>クリッカブルURLにおいて、URL文字列が1024バイトを超えると、アプリケーションエラーとなるバグを修正した。</li>
@@ -110,6 +117,8 @@
         </ul></li>
       <li>ロケールオブジェクトがリークしていた問題を修正した。</li>
       <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" と "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" が、第一引数が文字列ではなく文字列型変数だった場合に値を正しく受け取らない問題を修正した。</li>
+      <li>8ビット応答設定(S8C1T)時、Secondary DAに対する応答の後ろにゴミが付いていた問題を修正した。</li>
+      <li>正しくないオプションが指定された時に、別の正しいオプションとして認識される場合があったのを修正した。例えば /BADOPTION が /B として認識されていた。</li>
     </ul></li>
 
   <li>その他

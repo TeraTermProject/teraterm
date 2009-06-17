@@ -71,6 +71,7 @@
           <li>moved the Enable bold style to <a href="../menu/setup-window.html">[Setup]-[Window]</a>.</li>
           <li>moved the Russian Font char set to <a href="../menu/setup-terminalr.html">[Setup]-[Terminal] for Russian mode</a>.</li>
         </ul></li>
+      <!--li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li-->
       <li>added the MSB set character by using the Alt key.
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#Meta8Bit">Meta8Bit</a> entry in the teraterm.ini file. The default value is off.</li>
@@ -85,12 +86,19 @@
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
       <li>added a Subversion(SVN) revision number on the version dialog.</li>
+      <!--li>Secondary DA要求に対して、パラメータがなしまたは0の時のみ応答するようにした。</li>
+      <li>行単位送信(Line at a time)モードに対応した。
+        <ul>
+          <li>teraterm.ini に EnableLineMode エントリを追加した。デフォルトはon。</li>
+          <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
+        </ul></li-->
     </ul></li>
 
   <li>Bug fixes
     <ul>
       <li>The <a href="../macro/command/settitle.html">settitle</a> macro does not work after accepting the changing request of the window title, when the AcceptTitleChangeRequest is overwrite.</li>
       <li>Not reset scrollback function does not work by using minicom application.</li>
+      <!--li>スクロール領域(DECSTBM)が設定されている場合、最下行でのみ自動スクロールする機能がうまく働かない問題を修正した。例えばminicomではスクロール領域を設定する為この問題が発生する。</li-->
       <li>The continuedline copy does not work well.</li>
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
@@ -110,6 +118,8 @@
         </ul></li>
       <li>Bug fix: the locale object is leaked.</li>
       <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
+      <!--li>8ビット応答設定(S8C1T)時、Secondary DAに対する応答の後ろにゴミが付いていた問題を修正した。</li>
+      <li>正しくないオプションが指定された時に、別の正しいオプションとして認識される場合があったのを修正した。例えば /BADOPTION が /B として認識されていた。</li-->
     </ul></li>
 
   <li>Misc
