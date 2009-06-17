@@ -203,6 +203,7 @@ TCPCRSend=
 ; [Setup] Terminal の設定値が使用される)
 </pre>
 
+
 <h1><a name="detecttelnet">Telnet コマンド自動検出の無効化</a></h1>
 
 <p>
@@ -226,6 +227,36 @@ TelAutoDetect=off
 省略時:
 TelAutoDetect=on
 </pre>
+
+
+<h1><a name="linemode">行単位送信モードの無効化</a></h1>
+
+<p>
+Tera Term 4.63 より行単位送信(Line at a time)モードに対応しました。<br>
+標準ではこの機能が有効になっているため、TCP/IP 接続時は入力されたデータがすぐに送信されず、改行を入力した時にまとめて送信されます。<br>
+ただし、以下のいずれかに当てはまる時は行単位送信モードは無効となり、文字単位送信(Character at a time)モードになります。
+</p>
+
+<ul>
+  <li>ssh接続時</li>
+  <li>telnetネゴシエーションで、サーバ側がエコーバックする事になった時 (WILL ECHO を受けた時)</li>
+  <li>telnetネゴシエーションで、Tera TermのSGA要求(WILL SGA)が許可された時 (DO SGA を受けた時)</li>
+</ul>
+
+<p>
+telnetやssh接続以外での接続時は上記の条件に当てはまらないため、行単位送信モードが有効になります。<br>
+telnetやssh以外の接続でも入力したデータをすぐに送信するようにしたい場合は、設定ファイルの [Tera Term] セクションの EnableLineMode 行を以下のように変更してください。
+</p>
+
+<pre>
+EnableLineMode=off
+</pre>
+
+<pre>
+省略時:
+EnableLineMode=on
+</pre>
+
 
 </BODY>
 </HTML>
