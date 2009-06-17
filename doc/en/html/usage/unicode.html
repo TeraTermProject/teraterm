@@ -12,12 +12,34 @@
 <h1>Unicode</h1>
 
 <p>
-To use UTF-8, changed from English to Japanese under Setup->General menu and select "Terminal" from the Tera Term "Setup" menu. Inside the dialog-box, select "UTF-8" from "Kanji(receive)" or "Kanji(transmit)". There is no need to restart Tera Term to activate these configuration changes.
-When "UTF8" is specified with '/KT' or '/KR' option in the command line, UTF-8 encoding/decoding can be used during transmitting and receiving of data.
+To use UTF-8, changed from English to UTF-8 under Setup->General menu and
+select "Terminal" from the Tera Term "Setup" menu. Inside the dialog-box,
+select "UTF-8" from "Kanji(receive)" or "Kanji(transmit)".
+There is no need to restart Tera Term to activate these configuration changes.
+
+When "UTF8" is specified with '/KT' or '/KR' option in the command line,
+UTF-8 encoding/decoding can be used during transmitting and receiving of data.
 </p>
 
+<!--p>
+UTF-8化を行うには、Tera Termの「Setup[設定]」メニューから「General[全般]」
+を選び、「Language[言語]」を "UTF-8", "Japanese" および "Korean"
+のいずれかへ変更します。<br>
+
+Languageに "Japanese" と "Korean" のいずれかを選んだ場合、次に「Setup[全般]」
+メニューから「Terminal[端末]」を選択すると出る "Terminal setup[端末の設定]"
+ダイアログの「Kanji(receive)[漢字-受信]」および「Kanji(transmit)[漢字-送信]」
+にて、"UTF-8" を選んでください。Tera Termの再起動は必要ありません。<br>
+
+コマンドラインの「/KT」および「/KR」オプションにおいて、"UTF8" を指定すると、
+送信および受信コードに UTF-8 を設定することができます。
+</p-->
+
+
 <p>
-Actually, Tera Term does not support completely Unicode language because the internal design is based on MBCS(Multiple Byte Character Set). So, the Unicode characters are two-step conversion as follows.
+Actually, Tera Term does not support completely Unicode language because
+the internal design is based on MBCS(Multiple Byte Character Set).
+So, the Unicode characters are two-step conversion as follows.
 </p>
 
 <pre>
@@ -26,13 +48,24 @@ UTF-8 <-----> Unicode(UTF-16LE) <-----> MBCS
 </pre>
 
 <p>
-(1): Tera Term can not support the surrogate pair, the combining character and the decomposed form because the application does not convert UTF-8 byte sequence over three bytes. <br>
-(2): A user must specify the codepage to convert the characters between Unicode and MBCS. The codepage is the enhanced character set by Microsoft, the number differs from one country to another.<br>
-Also, a user can only use the localazied language on the localized Windows. As an example, a language other than Japanese will be indecipherable characters on Japanese-language version of Windows. Likewise, Japanese language can not been shown on English-language version of Windows.
+(1): Tera Term can not support the surrogate pair and the combining character
+     <!--and the decomposed form-->
+     because the application does not convert UTF-8 byte sequence over three
+     bytes. <br>
+
+(2): A user must specify the locale to convert the characters between
+     Unicode and MBCS.
+<!--
+     The codepage is the enhanced character set by Microsoft,
+     the number differs from one country to another.
+-->
+
 </p>
 
 <p>
-To enable Unicode character sets with the localized language, you have to set properly the locale and codepage parameters in the 'teraterm.ini' file. See example of these values below.
+To enable Unicode character sets with the localized language, you have to
+set properly the locale and codepage parameters in the 'teraterm.ini' file.
+See example of these values below.
 </p>
 
 <pre>
@@ -43,8 +76,14 @@ Locale = japanese
 CodePage = 932
 </pre>
 
+<!--p>
+この設定は、"Terminal setup[端末の設定]" ダイアログの 「Locale[ロケール]」および
+「CodePage[言語コード]」でも設定できます。
+</p-->
+
 <p>
-Check the following web-sites to learn more about setting of locale and codepage in Tera Term:
+Check the following web-sites to learn more about setting of locale and
+codepage in Tera Term:
 </p>
 <ul>
   <li><a href="http://msdn.microsoft.com/en-us/library/39cwe7zf.aspx">Language Strings</a></li>
@@ -69,11 +108,25 @@ Locale = american
 CodePage = 65001
 </pre>
 
+<!--p>
+また、MBCSを表示する為にフォントを正しく設定する必要があります。<br>
+「Setup[設定]」メニューの「Font[フォント]」で、"フォント"に使用する言語の文字が
+扱えるフォントを、"文字セットに" 使用する言語の文字セットを指定してください。
+<br>
+
+ロケールおよびフォントが正しく設定されていれば、英語版Windowsで日本語を表示したり、
+日本語版Windowsで韓国語を表示したりする事も可能です。<br>
+ただし多国語対応していないので、一つのTera Termウィンドウで日本語と韓国語を
+同時に表示したりする事は出来ません。
+</p-->
+
 
 <h3>[NOTE] for Mac OS X users</h3>
 <p>
-For Mac OS X(HFS+) use "UTF-8m" encoding. Currently it only supports receiving mode.<br>
-To use this mode specify "UTF8m" as the value of the command line parameter '/KR'.
+For Mac OS X(HFS+) use "UTF-8m" encoding.
+Currently it only supports receiving mode.<br>
+To use this mode specify "UTF8m" as the value of the command line
+parameter '/KR'.
 </p>
 
 <h3>[NOTE] Language Strings for Locale</h3>
