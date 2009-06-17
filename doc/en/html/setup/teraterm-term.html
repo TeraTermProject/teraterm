@@ -300,13 +300,24 @@ StrictKeyMapping=off
 <p>
 A user should enable this configuration to send the MSB(Most Significant Bit) set character by using the Alt key.
 </p>
+<!--p>
+AltキーでMSB(Most Significant Bit 最上位ビット)をセットした文字を送信するには、設定ファイルの [Tera Term] セクションの Meta8Bit 行を以下のようにしてください。
+</p-->
+
+<pre>
+Meta8Bit=raw
+</pre>
 
 <p>
 Also, the user should enable the <a href="../menu/setup-keyboard.html">Meta Key</a> setting.
 </p>
 
+<!--p>
+また、AltキーでMSB(Most Significant Bit 最上位ビット)をセットした文字を、送信文字コードの設定に従って(UTF-8t等に)変換してから送信するには、以下のようにしてください>。
+</p-->
+
 <pre>
-Meta8Bit=on
+Meta8Bit=text
 </pre>
 
 <pre>

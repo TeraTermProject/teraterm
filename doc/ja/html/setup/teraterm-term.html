@@ -362,19 +362,27 @@ StrictKeyMapping=off
 </pre>
 
 
-<h1><a name="Meta8Bit">AltキーでMSBをセットした文字を送信する。</a></h1>
+<h1><a name="Meta8Bit">AltキーでMSBをセットした文字を送信する</a></h1>
 
 <p>
-AltキーでMSB(Most Significant Bit 最上位ビット)をセットした文字を送信するには、この設定を有効にしてください。
-</p>
-
-<p>
-この機能を有効にするには、<a href="../menu/setup-keyboard.html">Meta Key</a>の設定も有効にしておく必要があります。
+AltキーでMSB(Most Significant Bit 最上位ビット)をセットした文字を送信するには、設定ファイルの [Tera Term] セクションの Meta8Bit 行を以下のようにしてください。
 </p>
 
 <pre>
-Meta8Bit=on
+Meta8Bit=raw
 </pre>
+
+<p>
+また、AltキーでMSB(Most Significant Bit 最上位ビット)をセットした文字を、送信文字コードの設定に従って(UTF-8等に)変換してから送信するには、以下のようにしてください。
+</p>
+
+<pre>
+Meta8Bit=text
+</pre>
+
+<p>
+注: どちらの場合も、この機能を有効にするには <a href="../menu/setup-keyboard.html">Meta Key</a> の設定も有効にしておく必要があります。
+</p>
 
 <pre>
 省略時:
