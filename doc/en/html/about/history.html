@@ -103,7 +103,7 @@
       <li>The continuedline copy does not work well.</li>
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
-      <!--li>Windows 95 でクリップボードにある複数行のテキストを貼り付けると、アプリケーションエラーとなるバグを修正した。</li-->
+      <li>When a user pastes multiple lines, the application fault occurs on Windows 95.</li>
       <li>changed Korean language implementation
         <ul>
           <li>Hangeul can not be selected by using double-click.</li>
@@ -119,8 +119,8 @@
         </ul></li>
       <li>Bug fix: the locale object is leaked.</li>
       <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
-      <!--li>8ビット応答設定(S8C1T)時、Secondary DAに対する応答の後ろにゴミが付いていた問題を修正した。</li>
-      <li>正しくないオプションが指定された時に、別の正しいオプションとして認識される場合があったのを修正した。例えば /BADOPTION が /B として認識されていた。</li-->
+      <li>When the 8 bit answering configuration(S8C1T) is enabled, an invalid character sticks after the Secondary DA answering.</li>
+      <li>When an incorrect option is specified, the option error does not occur. For instance, the /BADOPTION is recognized as the /B option.</li>
     </ul></li>
 
   <li>Misc
