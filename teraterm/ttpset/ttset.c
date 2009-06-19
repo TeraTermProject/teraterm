@@ -1294,9 +1294,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->FontScaling = GetOnOff(Section, "FontScaling", FName, FALSE);
 
 	// Meta sets MSB
-	ts->Meta8Bit = GetOnOff(Section, "Meta8Bit", FName, FALSE);
-
-	// Meta sets MSB
 	GetPrivateProfileString(Section, "Meta8Bit", "off", Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "raw") == 0 || _stricmp(Temp, "on") == 0)
 		ts->Meta8Bit = IdMeta8BitRaw;
