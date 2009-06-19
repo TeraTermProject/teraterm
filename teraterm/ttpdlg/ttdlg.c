@@ -635,7 +635,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			get_lang_msg("DLG_WIN_HORZ", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_WINHORZ, uimsg);
 			GetDlgItemText(Dialog, IDC_FONTBOLD, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_WIN_BOLD", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			get_lang_msg("DLG_WIN_BOLDFONT", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_FONTBOLD, uimsg);
 			GetDlgItemText(Dialog, IDC_WINHIDETITLE, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_WIN_HIDETITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
