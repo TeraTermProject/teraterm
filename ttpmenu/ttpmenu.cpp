@@ -1272,7 +1272,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 
 		} else {
 			// SSHを使わない場合、/nossh オプションを付けておく。
-			::wsprintf(szArgment, "%s /nossh", szArgment);
+			::wsprintf(szArgment, "%s /nossh /T=1", szArgment);
 		}
 	}
 
