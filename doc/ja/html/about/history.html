@@ -32,27 +32,25 @@
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
-      <li>複数行の貼り付け時、改行ごとに遅延する時間を設定できるようにした。デフォルトは 10(ミリ秒)。
-        <ul>
-          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>で設定値を変更できるようにした。</li>
-        </ul></li>
-      <li>メニューの Send break を無効にできるようにした。peterprvy氏に感謝します。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> エントリを追加した。デフォルトは off。</li>
-        </ul></li>
-      <li>切断時に画面をクリアできるようにした。peterprvy氏に感謝します。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ClearScreenOnCloseConnection">ClearScreenOnCloseConnectionu</a> エントリを追加した。デフォルトは off。</li>
-        </ul></li>
-      <li>Duplicate session のアクセラレータキーを無効にできるようにした。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
-        </ul></li>
       <li>ウィンドウ操作/報告制御シーケンスに対応した。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a>, <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> エントリを追加した。デフォルトはすべて on。</li>
         </ul></li>
+      <li>行単位送信(Line at a time)モードに対応した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#linemode">EnableLineMode</a> エントリを追加した。デフォルトはon。</li>
+          <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
+        </ul></li>
+      <li>複数行の貼り付け時、改行ごとに遅延する時間を設定できるようにした。デフォルトは 10(ミリ秒)。
+        <ul>
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>で設定値を変更できるようにした。</li>
+        </ul></li>
       <li>BroadcastCommand（非Realtime mode）において、リストボックスで選択された端末に対してのみ、メッセージを送信するようにした。</li>
+      <li>UTF-8モードを追加
+        <ul>
+          <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、UTF-8モードを指定できるようにした。</li>
+        </ul></li>
+      <li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li>
       <li>韓国語モードの調整
         <ul>
           <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、韓国語モードを指定できるようにした。</li>
@@ -61,11 +59,6 @@
           <li>teraterm.iniのKanjiSend/KanjiReceiveエントリで、KS5601を受け付けるようにした。</li>
           <li><a href="../commandline/teraterm.html#kr">/KR</a>, <a href="../commandline/teraterm.html#kt">/KT</a> コマンドラインオプションで、KS5601を受け付けるようにした。
         </ul></li>
-      <li>UTF-8モードを追加
-        <ul>
-          <li><a href="../menu/setup-general.html">言語モード</a>を指定する <a href="../commandline/teraterm.html#la">/LA</a> コマンドラインオプションで、UTF-8モードを指定できるようにした。</li>
-        </ul></li>
-      <li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li>
       <li>フォント設定ダイアログで、OSのコモンダイアログをそのまま表示するようにした。
         <ul>
           <li>文字セットを選択できるようにした。</li>
@@ -78,6 +71,20 @@
         </ul></li>
       <li>ログファイル名中の &p を、接続中の TCP ポート番号に変換する機能を追加した。</li>
       <li>ログにタイムスタンプを書き込むときにミリ秒も記録するようにした。</li>
+      <li>Secondary DA要求に対して、パラメータがなしまたは 0 の時のみ応答するようにした。</li>
+      <li>マウスイベント通知で、モーションイベントの通知に仮対応した。</li>
+      <li>メニューの Send break を無効にできるようにした。peterprvy氏に感謝します。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
+      <li>切断時に画面をクリアできるようにした。peterprvy氏に感謝します。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ClearScreenOnCloseConnection">ClearScreenOnCloseConnectionu</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
+      <li>Duplicate session のアクセラレータキーを無効にできるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorSendBreak</a> エントリを追加した。デフォルトは off。</li>
+        </ul></li>
       <li>コマンドラインオプションで、 <a href="../commandline/teraterm.html#f">/F</a> オプションは他のオプションより先に処理する(上書きされる)ように変更した。</li>
       <li>コマンドライン解析の仕様を変更した。
         <ul>
@@ -86,13 +93,6 @@
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、"<a href="../macro/command/wait4all.html">wait4all</a>" マクロコマンドが有効となる。</li>
       <li>マクロコマンド "<a href="../macro/command/exec.html">exec</a>" に、起動したアプリケーションの終了コードを result に格納するためのオプションを追加した。</li>
       <li>バージョン情報に、Subversion(SVN)のリビジョン番号を表示するようにした。</li>
-      <li>Secondary DA要求に対して、パラメータがなしまたは 0 の時のみ応答するようにした。</li>
-      <li>行単位送信(Line at a time)モードに対応した。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-com.html#linemode">EnableLineMode</a> エントリを追加した。デフォルトはon。</li>
-          <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
-        </ul></li>
-        <li>マウスイベント通知で、モーションイベントの通知に仮対応した。</li>
     </ul></li>
 
   <li>バグ修正
@@ -103,13 +103,6 @@
       <li>ssh/cygwin接続を複製した後の新規接続で、<a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a>が無視されるのを修正した。</li>
       <li>クリッカブルURLにおいて、URL文字列が1024バイトを超えると、アプリケーションエラーとなるバグを修正した。</li>
       <li>クリッカブルURLにおいて、サポートされていないURIスキームもリンクになる問題を修正した。</li>
-      <li>Windows 95 でクリップボードにある複数行のテキストを貼り付けると、アプリケーションエラーとなるバグを修正した。</li>
-      <li>韓国語モードの調整
-        <ul>
-          <li>韓国語モード時、ハングルなどの2バイト文字をマウスで正しく選択できない場合があるのを修正した。</li>
-          <li>韓国語モード時、一文字削除(DCH)等の制御シーケンスでハングルなどの2バイト文字を正しく扱うようにした。</li>
-          <li>韓国語モード時、ハングルなどの2バイト文字が行末に来た時に正しく改行するようにした。</li>
-        </ul></li>
       <li>UTF-8の調整
         <ul>
           <li>送信がUTF-8に設定されている時に、UTF-8に変換せずに送信する場合があるのを修正した。</li>
@@ -117,10 +110,17 @@
           <li>受信がUTF-8に設定されている時、本来表示されるはずの一部の文字が表示出来なかったのを修正した。</li>
           <li>受信がUTF-8に設定されている時、SS2,SS3(ISO-2022)が正しく処理されなかったのを修正した。</li>
         </ul></li>
+      <li>韓国語モードの調整
+        <ul>
+          <li>韓国語モード時、ハングルなどの2バイト文字をマウスで正しく選択できない場合があるのを修正した。</li>
+          <li>韓国語モード時、一文字削除(DCH)等の制御シーケンスでハングルなどの2バイト文字を正しく扱うようにした。</li>
+          <li>韓国語モード時、ハングルなどの2バイト文字が行末に来た時に正しく改行するようにした。</li>
+        </ul></li>
+      <li>Windows 95 でクリップボードにある複数行のテキストを貼り付けると、アプリケーションエラーとなるバグを修正した。</li>
       <li>ロケールオブジェクトがリークしていた問題を修正した。</li>
-      <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" と "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" が、第一引数が文字列ではなく文字列型変数だった場合に値を正しく受け取らない問題を修正した。</li>
       <li>8ビット応答設定(S8C1T)時、Secondary DAに対する応答の後ろにゴミが付いていた問題を修正した。</li>
       <li>正しくないオプションが指定された時に、別の正しいオプションとして認識される場合があったのを修正した。例えば /BADOPTION が /B として認識されていた。</li>
+      <li>マクロコマンド "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" と "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" が、第一引数が文字列ではなく文字列型変数だった場合に値を正しく受け取らない問題を修正した。</li>
     </ul></li>
 
   <li>その他

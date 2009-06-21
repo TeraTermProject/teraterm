@@ -32,27 +32,25 @@
         <ul>
           <li>added the <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> entry in the teraterm.ini file. The default is off.</li>
         </ul></li>
-      <li>added configuring the delay time per a carriage return when a user pastes multiple lines. The default is 10 msec.
-        <ul>
-          <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
-        </ul></li>
-      <li>added a new optional setting that can disable the menu for "Duplicate session". Special thanks to peterprvy.
-        <ul>
-          <li>added the <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> in the teraterm.ini file. The default is off.</li>
-        </ul></li>
-      <li>added a new optional setting that can clear the screen when disconnected. Special thanks to peterprvy.
-        <ul>
-          <li>added <a href="../setup/teraterm-misc.html#ClearScreenOnCloseConnection">ClearScreenOnCloseConnection</a> in teraterm.ini file. The default is off.</li>
-        </ul></li>
-      <li>added a new optional setting that can disable the accelerator key for the Duplicate session.
-        <ul>
-          <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
-        </ul></li>
       <li>added support for the control sequences for window operation.
         <ul>
           <li>added the <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a> and <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> entry in the teraterm.ini file. The default is on.</li>
         </ul></li>
+      <!--li>行単位送信(Line at a time)モードに対応した。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#linemode">EnableLineMode</a> エントリを追加した。デフォルトはon。</li>
+          <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
+        </ul></li-->
+      <li>added configuring the delay time per a carriage return when a user pastes multiple lines. The default is 10 msec.
+        <ul>
+          <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+        </ul></li>
       <li>Changed the BroadcastCommand functional specification. When the BroadcastCommand is not the realtime mode, a user cand send a message at the selected window in the listbox.</li>
+      <li>added UTF-8 language
+        <ul>
+          <li>added the <a href="../commandline/teraterm.html#la">/LA</a> command line option for <a href="../menu/setup-general.html">language mode</a> specification.</li>
+        </ul></li>
+      <!--li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li-->
       <li>changed Korean language implementation
         <ul>
           <li>added support for Korean mode with <a href="../commandline/teraterm.html#la">/LA</a> command line option, which specifies the <a href="../menu/setup-general.html">language mode</a>.</li>
@@ -61,11 +59,6 @@
           <li>added the KS5601 at the KanjiSend and KanjiReceive entry in the teraterm.ini file.</li>
           <li>added the KS5601 in the <a href="../commandline/teraterm.html#kr">/KR</a> and <a href="../commandline/teraterm.html#kt">/KT</a> command line options.
         </ul></li>
-      <li>added UTF-8 language
-        <ul>
-          <li>added the <a href="../commandline/teraterm.html#la">/LA</a> command line option for <a href="../menu/setup-general.html">language mode</a> specification.</li>
-        </ul></li>
-      <!--li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li-->
       <li>The OS common dialog is shown in the font setup dialog box.
         <ul>
           <li>added the character set (aka "Script") drop-down combo box.</li>
@@ -78,6 +71,20 @@
         </ul></li>
       <li>added `&p' parameter to log file name that can convert the tcp port number.</li>
       <li>added the millisecond at the log timestamp line.</li>
+      <!--li>Secondary DA要求に対して、パラメータがなしまたは 0 の時のみ応答するようにした。</li-->
+      <!--li>マウスイベント通知で、モーションイベントの通知に仮対応した。</li-->
+      <li>added a new optional setting that can disable the menu for "Duplicate session". Special thanks to peterprvy.
+        <ul>
+          <li>added the <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> in the teraterm.ini file. The default is off.</li>
+        </ul></li>
+      <li>added a new optional setting that can clear the screen when disconnected. Special thanks to peterprvy.
+        <ul>
+          <li>added <a href="../setup/teraterm-misc.html#ClearScreenOnCloseConnection">ClearScreenOnCloseConnection</a> in teraterm.ini file. The default is off.</li>
+        </ul></li>
+      <li>added a new optional setting that can disable the accelerator key for the Duplicate session.
+        <ul>
+          <li>added the <a href="../setup/teraterm-misc.html#DisableAcceleratorSendBreak">DisableAcceleratorDuplicateSession</a> entry in the teraterm.ini file. The default is off.</li>
+        </ul></li>
       <li>The <a href="../commandline/teraterm.html#f">/F</a> command line option overwrites the other option.</li>
       <li>Changed the command line specification regarding the double quotation.
         <ul>
@@ -86,13 +93,6 @@
       <li>added the Wait4allMacroCommand entry in the teraterm.ini file. The default is off. Turn on the value to enable the "<a href="../macro/command/wait4all.html">wait4all</a>" macro command.</li>
       <li>added the new option of the "<a href="../macro/command/exec.html">exec</a>" macro command that the application exit code is stored in the result variable.</li>
       <li>added a Subversion(SVN) revision number on the version dialog.</li>
-      <!--li>Secondary DA要求に対して、パラメータがなしまたは 0 の時のみ応答するようにした。</li>
-      <li>行単位送信(Line at a time)モードに対応した。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-com.html#linemode">EnableLineMode</a> エントリを追加した。デフォルトはon。</li>
-          <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
-        </ul></li-->
-        <!--li>マウスイベント通知で、モーションイベントの通知に仮対応した。</li-->
     </ul></li>
 
   <li>Bug fixes
@@ -104,13 +104,6 @@
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
       <!--li>クリッカブルURLにおいて、サポートされていないURIスキームもリンクになる問題を修正した。</li-->
-      <li>When a user pastes multiple lines, the application fault occurs on Windows 95.</li>
-      <li>changed Korean language implementation
-        <ul>
-          <li>Hangeul can not be selected by using double-click.</li>
-          <li>The control sequence of one character deletion(DCH) can not work Hangeul.</li>
-          <li>The carriage return can not work when Hangeul positioned at the end-of-line.</li>
-        </ul></li>
       <li>changed UTF-8 implementation
         <ul>
           <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>
@@ -118,10 +111,17 @@
           <li>When receiving is the UTF-8 mode, some characters can not display.</li>
           <li>When receiving is the UTF-8 mode, ISO-2022(SS2 and SS3) control code does not work.</li>
         </ul></li>
+      <li>changed Korean language implementation
+        <ul>
+          <li>Hangeul can not be selected by using double-click.</li>
+          <li>The control sequence of one character deletion(DCH) can not work Hangeul.</li>
+          <li>The carriage return can not work when Hangeul positioned at the end-of-line.</li>
+        </ul></li>
+      <li>When a user pastes multiple lines, the application fault occurs on Windows 95.</li>
       <li>Bug fix: the locale object is leaked.</li>
-      <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
       <li>When the 8 bit answering configuration(S8C1T) is enabled, an invalid character sticks after the Secondary DA answering.</li>
       <li>When an incorrect option is specified, the option error does not occur. For instance, the /BADOPTION is recognized as the /B option.</li>
+      <li>The "<a href="../macro/command/sendmulticast.html">sendmulticast</a>" and the "<a href="../macro/command/setmulticastname.html">setmulticastname</a>" macro commands can not receive the value when the first argument is not a string but a user variable.</li>
     </ul></li>
 
   <li>Misc
