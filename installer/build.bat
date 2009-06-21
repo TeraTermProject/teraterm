@@ -24,3 +24,9 @@ devenv /%BUILD% release ..\TTProxy\TTProxy.sln
 devenv /%BUILD% release ..\TTXKanjiMenu\ttxkanjimenu.sln
 devenv /%BUILD% release ..\ttpmenu\ttpmenu.sln
 devenv /%BUILD% release ..\TTXSamples\TTXSamples.sln
+
+rem cygterm ‚ðƒRƒ“ƒpƒCƒ‹
+pushd ..\cygterm
+if "%BUILD%" == "rebuild" make clean
+make
+popd
