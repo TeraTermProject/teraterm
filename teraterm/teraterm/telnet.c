@@ -363,6 +363,9 @@ void ParseTelWill(BYTE b)
 	    ts.LocalEcho = 1;
 	    break;
 	}
+      if (tr.HisOpt[ECHO].Status == Yes) {
+        cv.TelLineMode = FALSE;
+      }
       break;
     case SGA:
       if (tr.HisOpt[SGA].Status == Yes) {
@@ -434,6 +437,9 @@ void ParseTelWont(BYTE b)
 	    break;
 	}
 	break;
+      if (tr.HisOpt[ECHO].Status == Yes) {
+        cv.TelLineMode = FALSE;
+      }
     case BINARY:
       switch (tr.HisOpt[BINARY].Status) {
 	case Yes:
