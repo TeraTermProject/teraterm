@@ -82,13 +82,15 @@ Tera Termマクロから接続する方法には、4 つの種類があります。
 <h3>telnet接続</h2>
 
 <pre class=".code">
-<code>connect '<em>myserver</em>:23 /nossh'
-connect '<em>myserver</em>:23 /telnet'
+<code>connect '<em>myserver</em>:23 /nossh /T=1'
 connect '<em>myserver</em>:23'
 </code></pre>
 
 <p>
-/nossh を使う方を強く推奨します。このオプションがない場合、Tera Termは teraterm.ini が最後に保存されたときと同じメソッド（telnet もしくは SSH）を使って、接続しようとします。もし、SSHを使って接続しようとするならば、connectマクロは失敗するでしょう。
+/nossh を指定することを強く推奨します。このオプションがない場合、Tera Termは teraterm.ini が最後に保存されたときと同じメソッド（telnet もしくは SSH）を使って、接続しようとします。もし、SSHを使って接続しようとするならば、connectマクロは失敗するでしょう。
+</p>
+<p>
+/T=1 を使うことを推奨します。このオプションがない場合、Tera Term は teraterm.ini の Telnet の値にしたがって接続しようとします。もし、Telnet の値も off の場合、Tera Term は telnet ネゴシエーションをしないので、意図したとおりの通信ができないでしょう。
 </p>
 
 <h3>SSH接続</h3>
