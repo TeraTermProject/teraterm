@@ -1583,6 +1583,8 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			// '/telnet' が指定されているときには '/nossh' と同じく
 			// SSHを無効にする (2006.9.16 maya)
 			pvar->settings.Enabled = 0;
+			// Tera Term の Telnet フラグも付ける
+			pvar->ts->Telnet = 1;
 
 		} else if (MATCH_STR(option + 1, "auth") == 0) {
 			// SSH2自動ログインオプションの追加
