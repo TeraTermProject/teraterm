@@ -488,6 +488,42 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	return TRUE;
 }
 
+// ファイルに定義された文字列が、textに含まれるかを調べる。
+static int search_clipboard(char *filename, char *text)
+{
+	int ret = 0;  // no hit
+	FILE *fp = NULL;
+	char buf[256];
+	int len;
+	
+	if (filename == NULL || filename[0] == '\0')
+		goto error;
+
+	fp = fopen(filename, "r");
+	if (fp == NULL)
+		goto error;
+
+	// TODO: 一行が256byteを超えている場合の考慮
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		len = strlen(buf);
+		if (buf[len - 1] == '\n') 
+			buf[len - 1] = '\0';
+		if (buf[0] == '\0')
+			continue;
+		if (strstr(text, buf)) { // hit
+			ret = 1;
+			break;
+		}
+	}
+
+error:
+	if (fp)
+		fclose(fp);
+
+	return (ret);
+}
+
+
 //
 // クリップボードに改行コードが含まれていたら、確認ダイアログを表示する。
 // クリップボードの変更も可能。
@@ -504,6 +540,7 @@ int CBStartPasteConfirmChange(HWND HWin)
 	char *pText;
 	int pos;
 	int ret = 0;
+	int confirm = 0;
 
 	if (ts.ConfirmChangePaste == 0)
 		return 1;
@@ -529,6 +566,17 @@ int CBStartPasteConfirmChange(HWND HWin)
 		pText = (char *)GlobalLock(hText);
 		pos = strcspn(pText, "\r\n");  // 改行が含まれていたら
 		if (pText[pos] != '\0') {
+			confirm = 1;
+
+		} else {
+			// 辞書をサーチする
+			if (search_clipboard(ts.ConfirmChangePasteStringFile, pText)) {
+				confirm = 1;
+			}
+
+		}
+
+		if (confirm) {
 			ClipboardPtr = pText;
 			PasteCanceled = 0;
 			ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),

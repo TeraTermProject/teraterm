@@ -1105,6 +1105,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// added ConfirmChangePaste (2008.2.3 yutaka)
 	ts->ConfirmChangePaste =
 		GetOnOff(Section, "ConfirmChangePaste", FName, TRUE);
+	GetPrivateProfileString(Section, "ConfirmChangePasteStringFile", "",
+	                        Temp, sizeof(Temp), FName);
+	strncpy_s(ts->ConfirmChangePasteStringFile, sizeof(ts->ConfirmChangePasteStringFile), Temp,
+	          _TRUNCATE);
 
 	// added ScrollWindowClearScreen (2008.5.3 yutaka)
 	ts->ScrollWindowClearScreen =
@@ -1511,6 +1515,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// added ConfirmChangePaste
 	WriteOnOff(Section, "ConfirmChangePaste", FName,
 	           ts->ConfirmChangePaste);
+	WritePrivateProfileString(Section, "ConfirmChangePasteStringFile",
+	                          ts->ConfirmChangePasteStringFile, FName);
 
 	// added ScrollWindowClearScreen
 	WriteOnOff(Section, "ScrollWindowClearScreen", FName,

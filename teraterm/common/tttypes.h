@@ -470,6 +470,7 @@ struct tttset {
 	WORD Meta8Bit;
 	WORD WindowFlag;
 	WORD EnableLineMode;
+	char ConfirmChangePasteStringFile[MAX_PATH];
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -919,6 +920,7 @@ typedef TMap far *PMap;
  *   added tttset.Meta8Bit.
  *   added tttset.WindowFlag.
  *   added tttset.EnableLineMode
+ *   added tttset.ConfirmChangePasteStringFile
  *
  * - At version 4.62, ttset_memfilemap was replaced with ttset_memfilemap_10.
  *   added tttset.DisableMouseTrackingByCtrl.
