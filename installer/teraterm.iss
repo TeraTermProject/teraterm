@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.63-RC3"
+#define AppVer "4.63-RC4"
 ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
@@ -517,6 +517,7 @@ var
   VTFont   : String;
   TEKFont  : String;
   FileDir  : String;
+  TCPPort  : integer;
 
 begin
   Language := GetIniString('Tera Term', 'Language', '', iniFile);
@@ -621,6 +622,13 @@ begin
   if Length(FileDir) = 0 then begin
     FileDir := ExpandConstant('{app}');
     SetIniString('Tera Term', 'FileDir', FileDir, iniFile);
+  end;
+
+  if TCPPort = 0 then begin
+    if IsComponentSelected('TTSSH') then
+      SetIniInt('Tera Term', 'TCPPort', 22, iniFile)
+    else
+      SetIniInt('Tera Term', 'TCPPort', 23, iniFile);
   end;
 
 end;
@@ -849,6 +857,6 @@ Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
 
 [_ISToolPreCompile]
-Name: makechm.bat
-Name: build.bat; Parameters: rebuild
+; Name: makechm.bat
+; Name: build.bat; Parameters: rebuild
 ; Name: build.bat
