@@ -857,6 +857,6 @@ Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
 
 [_ISToolPreCompile]
-; Name: makechm.bat
-; Name: build.bat; Parameters: rebuild
+Name: makechm.bat
+Name: build.bat; Parameters: rebuild
 ; Name: build.bat
