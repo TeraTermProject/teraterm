@@ -1243,10 +1243,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 					GetHNRec->PortType = IdTCPIP;
 					GetDlgItemText(dlg, IDC_HOSTNAME, GetHNRec->HostName,
 					               HostNameMaxLength);
-// TTXOpenTCP() ‚Å TelFlag ‚ð FALSE ‚É‚µ‚Ä‚¢‚é‚Ì‚ÅA‚»‚¿‚ç‚É”C‚¹‚éB
-#if 0
-					GetHNRec->Telnet = FALSE;
-#endif
 					pvar->hostdlg_activated = TRUE;
 					pvar->hostdlg_Enabled = FALSE;
 					if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {
@@ -1262,6 +1258,9 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 						} else {
 							pvar->settings.ssh_protocol_version = 2;
 						}
+					}
+					else {	// IDC_HOSTOTHER
+						GetHNRec->Telnet = FALSE;
 					}
 
 					// host history check button
