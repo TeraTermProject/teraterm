@@ -168,6 +168,7 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 		else if (rsize != sizeof(b)) {
 			MessageBox(pvar->cv->HWin, "rsize != sizeof(b), Disabled.", "TTXttyplay", MB_ICONEXCLAMATION);
 			pvar->enable = FALSE;
+			RestoreOLDTitle();
 			return FALSE;
 		}
 		h.tv.tv_sec = b[0];
@@ -311,8 +312,10 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
 	if (pvar->origPWriteFile) {
 		*hooks->PWriteFile = pvar->origPWriteFile;
 	}
-	RestoreOLDTitle();
-	pvar->enable = FALSE;
+	if (pvar->enable) {
+		RestoreOLDTitle();
+		pvar->enable = FALSE;
+	}
 }
 
 static void PASCAL FAR TTXModifyMenu(HMENU menu) {
