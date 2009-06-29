@@ -36,9 +36,9 @@
         <ul>
           <li>added the <a href="../setup/teraterm-win.html#WindowCtrlSequence">WindowCtrlSequence</a>, <a href="../setup/teraterm-win.html#WindowReportSequence">WindowReportSequence</a> and <a href="../setup/teraterm-win.html#TitleReportSequence">TitleReportSequence</a> entry in the teraterm.ini file. The default is on.</li>
         </ul></li>
-      <!--li>行単位送信(Line at a time)モードに対応した。
+      <!--li>added support of line at a time mode.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-com.html#linemode">EnableLineMode</a> エントリを追加した。デフォルトはon。</li>
+          <li>added the <a href="../setup/teraterm-com.html#linemode">EnableLineMode</a> entry in the teraterm.ini file. The default value is on.</li>
           <li>デフォルトの動作を文字単位送信(Character at a time)モードから行単位送信モードに変更した。</li>
         </ul></li-->
       <li>added configuring the delay time per a carriage return when a user pastes multiple lines. The default is 10 msec.
@@ -2166,17 +2166,18 @@ SYNOPSIS:
 <h2><a name="ttyrec">TTX ttyrec</a></h2>
 <h3><a name="ttyrec_1.01">2009.6.30 (Ver 1.01)</a></h3>
 <ul class="history">
-  <!--li>再生速度をタイトルに表示するようにした。peterprvy氏に感謝します。</li-->
+  <li>display replay speed in window title. Special thanks to peterprvy.</li>
   <li>added no-wait mode.
-    <!--ul>
-      <li><a href="../commandline/ttxttyplay.html#nowait">/ttyplay-nowait</a> コマンドラインオプションを追加した。</li>
-    </ul--></li>
-  <!--li>記録開始時に、現在のウィンドウサイズをウィンドウサイズ変更制御シーケンスとして記録出来るようにした。
     <ul>
-      <li>teraterm.ini に EnableLineMode エントリを追加した。デフォルトはoff。</li>
-    </ul></li!-->
-  <!--li>再生速度の変更が正しく動かないのを修正した。peterprvy氏に感謝します。</li-->
-  <!--li>大きなデータセグメントがあると正しく再生できないのを修正した。</li-->
+      <li>added the <a href="../commandline/ttxttyplay.html#nowait">/ttyplay-nowait</a> command line option.</li>
+    </ul></li>
+  <li>added support of recording current window size as window size change control sequence when recording is started.
+  <!-- 記録開始時に、現在のウィンドウサイズをウィンドウサイズ変更制御シーケンスとして記録出来るようにした。-->
+    <ul>
+      <li>added the EnableLineMode entry in the teraterm.ini file. The default is off.</li>
+    </ul></li>
+  <li>Bug fix: Replay speed changing doesn't work correctly. Special thanks to peterprvy.</li>
+  <!--li>Bug fix: 大きなデータセグメントがあると正しく再生できないのを修正した。</li-->
 </ul>
 
 <h3><a name="ttyrec_1.00">2008.12.16 (Ver 1.00)</a></h3>
