@@ -24,7 +24,7 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.63">2009.5.18 (Ver 4.63 not-released)</a></h3>
+<h3><a name="teraterm_4.63">2009.6.29 (Ver 4.63 not-released)</a></h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -89,6 +89,10 @@
       <li>コマンドライン解析の仕様を変更した。
         <ul>
           <li>`"' を渡すために `""' を指定する仕様を追加した。</li>
+        </ul></li>
+      <li>ConfirmChangePaste 機能に、任意の文字列を指定することができる新しいしくみを追加した。
+        <ul>
+          <li>teraterm.ini に ConfirmChangePasteStringFile エントリを追加した。文字列を列挙したテキストファイルへのパスを指定する。</li>
         </ul></li>
       <li>teraterm.ini に Wait4allMacroCommand エントリを追加した。デフォルトはoff。onにすると、"<a href="../macro/command/wait4all.html">wait4all</a>" マクロコマンドが有効となる。</li>
       <li>マクロコマンド "<a href="../macro/command/exec.html">exec</a>" に、起動したアプリケーションの終了コードを result に格納するためのオプションを追加した。</li>
