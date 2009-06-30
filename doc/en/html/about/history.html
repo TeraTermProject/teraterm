@@ -56,7 +56,7 @@
         <ul>
           <li>added the <a href="../commandline/teraterm.html#la">/LA</a> command line option for <a href="../menu/setup-general.html">language mode</a> specification.</li>
         </ul></li>
-      <!--li>送信漢字コードの設定がUTF-8の時、入力された文字がUTF-8に変換出来ない場合(不正な文字)は代わりにReplacement Character(U+FFFD)を送信するようにした。 </li-->
+      <li>In UTF-8 send mode, when the input character is not able to conver to UTF-8 (invalid character), Tera Term sends the Replacement Character(U+FFFD).</li>
       <li>changed Korean language implementation
         <ul>
           <li>added support for Korean mode with <a href="../commandline/teraterm.html#la">/LA</a> command line option, which specifies the <a href="../menu/setup-general.html">language mode</a>.</li>
@@ -77,8 +77,8 @@
         </ul></li>
       <li>added `&p' parameter to log file name that can convert the tcp port number.</li>
       <li>added the millisecond at the log timestamp line.</li>
-      <!--li>Secondary DA要求に対して、パラメータがなしまたは 0 の時のみ応答するようにした。</li-->
-      <!--li>マウスイベント通知で、モーションイベントの通知に仮対応した。</li-->
+      <li>response only for Secondary DA request without parameter or with parameter 0.</li>
+      <li>add experimental support for the motion event of mouse event notify.</li>
       <li>added a new optional setting that can disable the menu for "Duplicate session". Special thanks to peterprvy.
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#DisableMenuSendBreak">DisableMenuSendBreak</a> in the teraterm.ini file. The default is off.</li>
@@ -112,7 +112,7 @@
       <li>The continuedline copy does not work well.</li>
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
-      <!--li>クリッカブルURLにおいて、サポートされていないURIスキームもリンクになる問題を修正した。</li-->
+      <li>Unsupported URI scheme is to be clickable URL.</li>
       <li>changed UTF-8 implementation
         <ul>
           <li>A character could send not converting it to the UTF-8 encoding when the sending mode is UTF-8.</li>

@@ -567,12 +567,11 @@ WindowCtrlSequence=on
 
 <h1><a name="WindowReportSequence">Enable control sequence for window information reporting</a></h1>
 <p>
-This function enables the ddterm control sequence regarding the window information reporting. The 
-この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。
+This function enables the ddterm control sequence regarding the window information reporting. The window status reporting, the window position reporting, the window size(in pixcel and character) reporting and the root window size reporting.
 </p>
 
 <p>
-セキュリティ上の理由等でウィンドウの情報を報告したくない場合は、設定ファイルの [Tera Term] セクションの WindowReportSequence 行を以下のように変更してください。
+If you will not report window informations to remote host, e.g. security reason, please change the WindowReportSequence entry in the teraterm.ini file as follows:
 </p>
 
 <pre>
@@ -587,11 +586,11 @@ WindowReportSequence=on
 
 <h1><a name="TitleReportSequence">Enable control sequence for window title reporting</a></h1>
 <p>
-この設定が on になっていると、dttermのウィンドウタイトル報告およびアイコンラベル報告の制御シーケンスが有効になります。
+This function enables the ddterm control sequence regarding the window title and icon label reporting.
 </p>
 
 <p>
-セキュリティ上の理由等でウィンドウタイトルを報告したくない場合は、設定ファイルの [Tera Term] セクションの TitleReportSequence 行を以下のように変更してください。
+If you will not report window informations to remote host, e.g. security reason, please change the TitleReportSequence entry in the teraterm.ini file as follows:
 </p>
 
 <pre>
@@ -606,7 +605,7 @@ TitleReportSequence=on
 
 <h1><a name="CursorCtrlSequence">Enable control sequence for cursor shape</a></h1>
 <p>
-この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。
+This function enables cursor shape change by cursor change seqnence of DECSCUSR(cursor shape change), WYSTCURM(Wyse no-blinking cursor), WYULCURM(Wyse underlined cursor) and AT&amp;T 610 blinking cursor.
 </p>
 
 <pre>
@@ -626,7 +625,7 @@ If a user uses the vim editor, write below entries in the ~/.vimrc to enable thi
 set t_SI=^[[3\ q
 set t_EI=^[[1\ q
 NOTE: Input ^[ by using Control-V Control-[.
-</pre-->
+</pre>
 
 
 </body>
