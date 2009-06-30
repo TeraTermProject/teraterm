@@ -204,19 +204,19 @@ TelAutoDetect=on
 <h1><a name="linemode">Disabling "Line at a time" mode</a></h1>
 
 <p>
-Tera Term support for "Line at a time" mode from version 4.63.<br>
-The default value of this setting is on. TCP/IP connection doesn't send characters while the line feed is inputed.
-But, this setting is disabled (become to "Character at a time" mode) when following situations:
+Tera Term now supports for "Line at a time" mode from version 4.63.<br>
+Since the default value of this setting is on, when it is used in TCP/IP connection, input characters are not echoed back until the line feed is received.
+But, this setting is disabled (forced to "Character at a time" mode) when following situations:
 </p>
 
 <ul>
   <li>ssh connection</li>
-  <li>server will echo back (received WILL ECHO) in telnet negotiation</li>
+  <li>when a server becomes echo-back mode (received WILL ECHO) in telnet negotiation</li>
   <li>SGA request (WILL SGA) of Tera Term is accepted (received DO SGA) in telnet negotiation</li>
 </ul>
 
 <p>
-The telnet connection, and other than SSH connection doesn't mach to above conditions, "Line at a time" mode is to be enabled.<br>
+In any connection mode other than telnet and SSH, the above condition is not met and therefore, "Line at a time" mode is enabled.<br>
 To send the key input immediately, edit the EnableLineMode line in the [Tera Term] section of the setup file like the following:
 </p>
 
