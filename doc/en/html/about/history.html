@@ -108,7 +108,7 @@
   <li>Bug fixes
     <ul>
       <li>The <a href="../macro/command/settitle.html">settitle</a> macro does not work after accepting the changing request of the window title, when the AcceptTitleChangeRequest is overwrite.</li>
-      <li>Not reset scrollback function doesn't work when scroll region (DECSTBM) was set. <!--例えばminicomではスクロール領域を設定する為この問題が発生する。--></li>
+      <li>Not reset scrollback function doesn't work when scroll region (DECSTBM) was set. For example, minicom sets the scroll region.</li>
       <li>The continuedline copy does not work well.</li>
       <li>When a user connects to the server after duplicating the ssh and cygwin session, <a href="../setup/teraterm-com.html#port/nontelnet">TCPLocalEcho/TCPCRSend</a> is ignored.</li>
       <li>When the clickable URL characters are over 1024 byte, the application fault would occur.</li>
@@ -2171,13 +2171,12 @@ SYNOPSIS:
 <h2><a name="ttyrec">TTXttyrec</a></h2>
 <h3><a name="ttyrec_1.01">2009.6.30 (Ver 1.01)</a></h3>
 <ul class="history">
-  <li>display replay speed in window title. Special thanks to peterprvy.</li>
+  <li>added support for displaying the replay speed on the window title. Special thanks to peterprvy.</li>
   <li>added no-wait mode.
     <ul>
       <li>added the <a href="../commandline/ttxttyplay.html#nowait">/ttyplay-nowait</a> command line option.</li>
     </ul></li>
-  <li>added support of recording current window size as window size change control sequence when recording is started.
-  <!-- 記録開始時に、現在のウィンドウサイズをウィンドウサイズ変更制御シーケンスとして記録出来るようにした。-->
+  <li>added support for recording the current window size when recording is started. It is recorded as the window size change control sequence.
     <ul>
       <li>added the EnableLineMode entry in the teraterm.ini file. The default is off.</li>
     </ul></li>
