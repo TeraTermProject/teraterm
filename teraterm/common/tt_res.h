@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by t:\ttssh2\teraterm\teraterm\ttermpro.rc
+// Used by c:\usr\ttssh2\teraterm\teraterm\ttermpro.rc
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -132,6 +132,9 @@
 #define IDC_ACCEPT_TITLE_CHANGING_LABEL 2517
 #define IDC_PASTEDELAY_LABEL            2518
 #define IDC_PASTEDELAY_LABEL2           2519
+#define IDC_CONFIRM_STRING_FILE         2520
+#define IDC_CONFIRM_STRING_FILE_PATH    2521
+#define IDC_CONFIRM_STRING_FILE_STATIC  2522
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -224,7 +227,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        121
 #define _APS_NEXT_COMMAND_VALUE         52030
-#define _APS_NEXT_CONTROL_VALUE         2519
+#define _APS_NEXT_CONTROL_VALUE         2523
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

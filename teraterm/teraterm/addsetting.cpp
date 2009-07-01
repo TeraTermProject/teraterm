@@ -289,6 +289,7 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 {
 	char uimsg[MAX_UIMSG];
 	CButton *btn, *btn2;
+	CEdit *edit;
 	char buf[64];
 
 	CPropertyPage::OnInitDialog();
@@ -326,6 +327,9 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_CONFIRM_CHANGE_PASTE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CONFIRM_CHANGE_PASTE, ts.UIMsg);
+	GetDlgItemText(IDC_CONFIRM_STRING_FILE_STATIC, uimsg, sizeof(uimsg));
+	get_lang_msg("IDC_CONFIRM_STRING_FILE_STATIC", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_CONFIRM_STRING_FILE_STATIC, ts.UIMsg);
 	GetDlgItemText(IDC_DELIMITER, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_DELIMITER", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_DELIMITER, ts.UIMsg);
@@ -361,6 +365,18 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
 	btn->SetCheck(ts.ConfirmChangePaste);
 
+	// ファイルパス
+	SetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
+	edit = (CEdit *)GetDlgItem(IDC_CONFIRM_STRING_FILE);
+	btn = (CButton *)GetDlgItem(IDC_CONFIRM_STRING_FILE_PATH);
+	if (ts.ConfirmChangePaste) {
+		edit->EnableWindow(TRUE);
+		btn->EnableWindow(TRUE);
+	} else {
+		edit->EnableWindow(FALSE);
+		btn->EnableWindow(FALSE);
+	}
+
 	// (6)delimiter characters
 	SetDlgItemText(IDC_DELIM_LIST, ts.DelimList);
 
@@ -377,6 +393,8 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	CButton *btn, *btn2;
+	CEdit *edit;
+	char uimsg[MAX_UIMSG];
 
 	switch (wParam) {
 		case IDC_DISABLE_PASTE_RBUTTON | (BN_CLICKED << 16):
@@ -386,6 +404,41 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				btn2->EnableWindow(FALSE);
 			} else {
 				btn2->EnableWindow(TRUE);
+			}
+			return TRUE;
+
+		case IDC_CONFIRM_CHANGE_PASTE | (BN_CLICKED << 16):
+			btn2 = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
+			btn = (CButton *)GetDlgItem(IDC_CONFIRM_STRING_FILE_PATH);
+			edit = (CEdit *)GetDlgItem(IDC_CONFIRM_STRING_FILE);
+			if (btn2->GetCheck()) {
+				edit->EnableWindow(TRUE);
+				btn->EnableWindow(TRUE);
+			} else {
+				edit->EnableWindow(FALSE);
+				btn->EnableWindow(FALSE);
+			}
+			return TRUE;
+
+		case IDC_CONFIRM_STRING_FILE_PATH | (BN_CLICKED << 16):
+			{
+				OPENFILENAME ofn;
+
+				ZeroMemory(&ofn, sizeof(ofn));
+				ofn.lStructSize = get_OPENFILENAME_SIZE();
+				ofn.hwndOwner = GetSafeHwnd();
+				get_lang_msg("FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
+				             "txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
+				ofn.lpstrFilter = ts.UIMsg;
+				ofn.lpstrFile = ts.ConfirmChangePasteStringFile;
+				ofn.nMaxFile = sizeof(ts.ConfirmChangePasteStringFile);
+				get_lang_msg("FILEDLG_SELECT_CONFIRM_STRING_APP_TITLE", uimsg, sizeof(uimsg),
+				             "Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
+				ofn.lpstrTitle = uimsg;
+				ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_FORCESHOWHIDDEN | OFN_HIDEREADONLY;
+				if (GetOpenFileName(&ofn) != 0) {
+					SetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
+				}
 			}
 			return TRUE;
 	}
@@ -418,6 +471,7 @@ void CCopypastePropPageDlg::OnOK()
 	// (5)IDC_CONFIRM_CHANGE_PASTE
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
 	ts.ConfirmChangePaste = btn->GetCheck();
+	GetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
 
 	// (6)
 	GetDlgItemText(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
