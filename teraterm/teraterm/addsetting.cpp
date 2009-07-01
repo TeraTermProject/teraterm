@@ -327,9 +327,9 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_CONFIRM_CHANGE_PASTE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CONFIRM_CHANGE_PASTE, ts.UIMsg);
-	GetDlgItemText(IDC_CONFIRM_STRING_FILE_STATIC, uimsg, sizeof(uimsg));
+	GetDlgItemText(IDC_CONFIRM_STRING_FILE_LABEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_CONFIRM_STRING_FILE_STATIC", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_CONFIRM_STRING_FILE_STATIC, ts.UIMsg);
+	SetDlgItemText(IDC_CONFIRM_STRING_FILE_LABEL, ts.UIMsg);
 	GetDlgItemText(IDC_DELIMITER, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_DELIMITER", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_DELIMITER, ts.UIMsg);
