@@ -11,6 +11,8 @@
 #include "ttmdlg.h"
 #include "ttmparse.h"
 
+/* C言語スタイルのコメントをサポートするかどうか (2009.7.2 yutaka) */
+//#define SUPPORT_C_STYLE_COMMENT
 
 WORD TTLStatus = 0;
 char LineBuff[MaxLineLen]; // 行バッファのサイズを拡張した。(2007.6.9 maya)
@@ -329,7 +331,9 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 
 BYTE GetFirstChar()
 {
+	static int commenting = 0;
 	BYTE b;
+	int comment_starting = 0;
 
 	if (LinePtr<LineLen)
 		b = LineBuff[LinePtr];
@@ -340,6 +344,52 @@ BYTE GetFirstChar()
 		LinePtr++;
 		if (LinePtr<LineLen) b = LineBuff[LinePtr];
 	}
+
+#ifdef SUPPORT_C_STYLE_COMMENT
+	if (commenting) {
+		while (LinePtr < LineLen) {
+			/* コメントの終わりが出てくるまでスキップ */
+			if (LineBuff[LinePtr] == '*' && LineBuff[LinePtr + 1] == '/') {
+				commenting = 0;
+				LinePtr += 2;
+				break;
+			}
+			LinePtr++;
+		}
+		/* 一行にコメントの終わりがなかったら、次の行を読む。*/
+		if (commenting)
+			return 0;   // next line
+
+		if (LinePtr < LineLen) 
+			b = LineBuff[LinePtr];
+		else
+			b = 0;
+	}
+
+	/* C言語コメントの始まり */
+	if (LineBuff[LinePtr] == '/' && LineBuff[LinePtr + 1] == '*') {
+		comment_starting = 1;
+		LinePtr += 2;
+		while (LinePtr < LineLen) {
+			/* コメントの終わりが出てくるまでスキップ */
+			if (LineBuff[LinePtr] == '*' && LineBuff[LinePtr + 1] == '/') {
+				LinePtr += 2;
+				comment_starting = 0;
+				break;
+			}
+			LinePtr++;
+		}
+		if (LinePtr < LineLen) 
+			b = LineBuff[LinePtr];
+		else
+			b = 0;
+
+		/* コメントの終わりが一行に登場しない場合は、永続的に記録する。*/
+		if (comment_starting)
+			commenting = 1;
+	}
+#endif
+
 	if ((b>' ') && (b!=';'))
 	{
 		LinePtr++;
