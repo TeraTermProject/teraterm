@@ -12,7 +12,8 @@
 #include "ttmparse.h"
 
 /* C言語スタイルのコメントをサポートするかどうか (2009.7.2 yutaka) */
-//#define SUPPORT_C_STYLE_COMMENT
+#define SUPPORT_C_STYLE_COMMENT
+static int commenting = 0;   /* C言語コメント */
 
 WORD TTLStatus = 0;
 char LineBuff[MaxLineLen]; // 行バッファのサイズを拡張した。(2007.6.9 maya)
@@ -41,7 +42,6 @@ static PCHAR NameBuff;
 static HANDLE HStrBuff;
 static PCHAR StrBuff;
 static WORD IntVarCount, StrVarCount, LabVarCount;
-
 
 BOOL InitVar()
 {
@@ -87,6 +87,7 @@ void DispErr(WORD Err)
 		case ErrTooManyVar: strncpy_s(Msg, sizeof(Msg),"Too many variables.", _TRUNCATE); break;
 		case ErrTypeMismatch: strncpy_s(Msg, sizeof(Msg),"Type mismatch.", _TRUNCATE); break;
 		case ErrVarNotInit: strncpy_s(Msg, sizeof(Msg),"Variable not initialized.", _TRUNCATE); break;
+		case ErrCloseComment: strncpy_s(Msg, sizeof(Msg),"\"*/\" expected.", _TRUNCATE); break;
 	}
 
 	i = OpenErrDlg(Msg,LineBuff);
@@ -329,9 +330,14 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	return (*WordId!=0);
 }
 
+/* C言語コメントが閉じられているかどうか */
+int IsCommentClosed(void)
+{
+	return (commenting == 0);
+}
+
 BYTE GetFirstChar()
 {
-	static int commenting = 0;
 	BYTE b;
 	int comment_starting = 0;
 
@@ -364,6 +370,12 @@ BYTE GetFirstChar()
 			b = LineBuff[LinePtr];
 		else
 			b = 0;
+
+		while ((LinePtr<LineLen) && ((b==' ') || (b=='\t')))
+		{
+			LinePtr++;
+			if (LinePtr<LineLen) b = LineBuff[LinePtr];
+		}
 	}
 
 	/* C言語コメントの始まり */
@@ -379,10 +391,17 @@ BYTE GetFirstChar()
 			}
 			LinePtr++;
 		}
+
 		if (LinePtr < LineLen) 
 			b = LineBuff[LinePtr];
 		else
 			b = 0;
+
+		while ((LinePtr<LineLen) && ((b==' ') || (b=='\t')))
+		{
+			LinePtr++;
+			if (LinePtr<LineLen) b = LineBuff[LinePtr];
+		}
 
 		/* コメントの終わりが一行に登場しない場合は、永続的に記録する。*/
 		if (comment_starting)

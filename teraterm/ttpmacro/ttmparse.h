@@ -33,6 +33,7 @@
 #define ErrTooManyVar       13
 #define ErrTypeMismatch     14
 #define ErrVarNotInit       15
+#define ErrCloseComment     16
 
 #define TypUnknown  0
 #define TypInteger  1
@@ -236,6 +237,7 @@ void EndVar();
 void DispErr(WORD Err);
 void LockVar();
 void UnlockVar();
+int IsCommentClosed(void);
 BYTE GetFirstChar();
 BOOL CheckParameterGiven();
 BOOL GetIdentifier(PCHAR Name);

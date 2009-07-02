@@ -261,6 +261,11 @@ BOOL RegisterLabels(int IBuff)
 			DispErr(Err);
 		}
 	}
+
+	if (!IsCommentClosed()) {
+		DispErr(ErrCloseComment);
+	}
+
 	BuffPtr[IBuff] = 0;
 	InitLineNo(); // (2005.7.18 yutaka)
 	GlobalUnlock(BuffHandle[IBuff]);
