@@ -28,7 +28,7 @@ If MACRO is not linked to Tera Term, this command runs Tera Term with &lt;comman
 </p>
 
 <p>
-If MACRO has already been linked to Tera Term and Tera Term is not connected to the host, this command causes Tera Term to connect to the host specified by &lt;command line parameters&gt;. See "<a href="../../commandline/teraterm.html">Tera Term command line</a>" for the format of &lt;command line parameters&gt;.
+If MACRO has already been linked to Tera Term and Tera Term is not connected to the host, this command causes Tera Term to connect to the host specified by &lt;command line parameters&gt;. See "<a href="../../commandline/teraterm.html">Tera Term command line</a>" and "<a href="../../commandline/ttssh.html">TTSSH command line</a>" for the format of &lt;command line parameters&gt;.
 </p>
 
 <p>
@@ -69,13 +69,12 @@ Communication commands except "connect", "<a href="cygconnect.html">cygconnect</
 <h2>Connection method</h2>
 
 <p>
-There are 4 types of connection you can establish from Tera Term macro: 
+There are 3 types of connection you can establish from Tera Term macro: 
 </p>
 
 <ul>
  <li>Telnet connection (port 23)</li>
  <li>SSH1 or SSH2 connection (port 22)</li>
- <li>General connection</li>
  <li>Connection via COM port</li>
 </ul>
 
@@ -152,16 +151,6 @@ connect '<em>myserver</em> /ssh /2 /auth=challenge /user=<em>username</em> /ask4
 
 <p>
 Above 9 ways pass username and authentication method directly from macro, and the popup asks for password.
-</p>
-
-<h3>General connection</h3>
-
-<pre class=".code">
-<code>connect 'myserver /timeout=&lt;value&gt;'
-</code></pre>
-
-<p>
-Note: This option value is connecting timeout value(per seconds). Connecting to myserver could be canceled after timeout has occurred with the specified value. Conversely, no action if the value is zero. The default value is zero. Also this value would be saved as `ConnectingTimeout' entry in teraterm.ini file.
 </p>
 
 <h3>Connections via COM port</h3>

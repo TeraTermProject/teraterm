@@ -28,7 +28,7 @@ MACRO ‚ª Tera Term ‚ÆƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚È‚¢ê‡ATera Term ‚ğ‹N“®‚µ‚ÄMACRO ‚ÆƒŠƒ“ƒN‚
 </p>
 
 <p>
-MACRO ‚ª Tera Term ‚Æ‚·‚Å‚ÉƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚ÄATera Term ‚ªƒzƒXƒg‚ÉÚ‘±‚³‚ê‚Ä‚¢‚È‚¢ê‡ATera Term ‚ğƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ &lt;command line parameters&gt; ‚Åw’è‚³‚ê‚éƒzƒXƒg‚ÉÚ‘±‚³‚¹‚éBTera Term ‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒpƒ‰ƒ[ƒ^‚É‚Â‚¢‚Ä‚ÍA"<a href="../../commandline/teraterm.html">Tera Term Pro ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“</a>"‚ğQÆB
+MACRO ‚ª Tera Term ‚Æ‚·‚Å‚ÉƒŠƒ“ƒN‚³‚ê‚Ä‚¢‚ÄATera Term ‚ªƒzƒXƒg‚ÉÚ‘±‚³‚ê‚Ä‚¢‚È‚¢ê‡ATera Term ‚ğƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ &lt;command line parameters&gt; ‚Åw’è‚³‚ê‚éƒzƒXƒg‚ÉÚ‘±‚³‚¹‚éBTera Term ‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒpƒ‰ƒ[ƒ^‚É‚Â‚¢‚Ä‚ÍA"<a href="../../commandline/teraterm.html">Tera Term Pro ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“</a>"A"<a href="../../commandline/ttssh.html">TTSSH ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“</a>"‚ğQÆB
 </p>
 
 <p>
@@ -69,13 +69,12 @@ Tera Term ‚Æ MACRO ‚ÌƒŠƒ“ƒN‚µ‚Ä‚¢‚È‚¢ó‘Ô‚Å‚ÍA"connect" ‚Æ "<a href="cygconnect
 <h2>Ú‘±•û–@</h2>
 
 <p>
-Tera Termƒ}ƒNƒ‚©‚çÚ‘±‚·‚é•û–@‚É‚ÍA4 ‚Â‚Ìí—Ş‚ª‚ ‚è‚Ü‚·B
+Tera Termƒ}ƒNƒ‚©‚çÚ‘±‚·‚é•û–@‚É‚ÍA3 ‚Â‚Ìí—Ş‚ª‚ ‚è‚Ü‚·B
 </p>
 
 <ul>
  <li>telnetÚ‘± (port 23)</li>
  <li>SSH1 ‚¨‚æ‚Ñ SSH2 Ú‘± (port 22)</li>
- <li>General connection</li>
  <li>COM port Ú‘±</li>
 </ul>
 
@@ -152,16 +151,6 @@ connect '<em>myserver</em> /ssh /2 /auth=challenge /user=<em>username</em> /ask4
 
 <p>
 ‚±‚Ì9‚Â‚Ì•û–@‚ÍAƒ}ƒNƒ‚©‚çƒ†[ƒU–¼‚Æ”FØ•û–@‚ğ“n‚µ‚ÄAƒ|ƒbƒvƒAƒbƒv‚ÅƒpƒXƒ[ƒh‚Ì“ü—Í‚ğ‘£‚µ‚Ü‚·B
-</p>
-
-<h3>General connection</h3>
-
-<pre class=".code">
-<code>connect 'myserver /timeout=&lt;value&gt;'
-</code></pre>
-
-<p>
-Note: This option value is connecting timeout value(per seconds). Connecting to myserver could be canceled after timeout has occurred with the specified value. Conversely, no action if the value is zero. The default value is zero. Also this value would be saved as `ConnectingTimeout' entry in teraterm.ini file.
 </p>
 
 <h3>COMƒ|[ƒgÚ‘±</h3>
