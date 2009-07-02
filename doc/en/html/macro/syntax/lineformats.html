@@ -12,9 +12,9 @@
 <h1>Line formats</h1>
 
 <p>
-There are four kinds of line formats for macro files. Any line can contain a comment 
-which begins with a ";" character. Comments give no effect on the execution of MACRO.
-One line can contain up to 500 characters. The part that exceeded 500 characters is ignored.
+There are four kinds of line formats for macro files. Any line can contain a comment which begins with a ";" character. Also, a user can use the C language style comment(/* - */).<br>
+Comments give no effect on the execution of MACRO.<br>
+One line can contain up to 500 characters. The part that exceeded 500 characters is ignored.<br>
 </p>
 
 <h2>1) Empty lines</h2>
@@ -28,6 +28,16 @@ They give no effect on the execution of the macro.
 Example:
     ; Tera Term Language
 </pre>
+
+<pre>
+Example:
+    showtt 0 
+    MessageBox 'message 1' 'title 1' 
+    /* This is 'comment' "string" 
+    */ MessageBox 'message 2' 'title 2'
+    closett
+</pre>
+
 
 <h2>2) Command lines</h2>
 
