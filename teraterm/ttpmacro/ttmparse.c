@@ -333,7 +333,12 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 /* C言語コメントが閉じられているかどうか */
 int IsCommentClosed(void)
 {
+#ifdef SUPPORT_C_STYLE_COMMENT
 	return (commenting == 0);
+#else
+	// 当該機能が無効の場合は、常に「真」を返す。
+	return 1;
+#endif
 }
 
 BYTE GetFirstChar()
@@ -379,34 +384,40 @@ BYTE GetFirstChar()
 	}
 
 	/* C言語コメントの始まり */
-	if (LineBuff[LinePtr] == '/' && LineBuff[LinePtr + 1] == '*') {
-		comment_starting = 1;
-		LinePtr += 2;
-		while (LinePtr < LineLen) {
-			/* コメントの終わりが出てくるまでスキップ */
-			if (LineBuff[LinePtr] == '*' && LineBuff[LinePtr + 1] == '/') {
-				LinePtr += 2;
-				comment_starting = 0;
-				break;
+	do {
+		if (LineBuff[LinePtr] == '/' && LineBuff[LinePtr + 1] == '*') {
+			comment_starting = 1;
+			LinePtr += 2;
+			while (LinePtr < LineLen) {
+				/* コメントの終わりが出てくるまでスキップ */
+				if (LineBuff[LinePtr] == '*' && LineBuff[LinePtr + 1] == '/') {
+					LinePtr += 2;
+					comment_starting = 0;
+					break;
+				}
+				LinePtr++;
 			}
-			LinePtr++;
+
+			if (LinePtr < LineLen) 
+				b = LineBuff[LinePtr];
+			else
+				b = 0;
+
+			while ((LinePtr<LineLen) && ((b==' ') || (b=='\t')))
+			{
+				LinePtr++;
+				if (LinePtr<LineLen) b = LineBuff[LinePtr];
+			}
+
+			/* コメントの終わりが一行に登場しない場合は、永続的に記録する。*/
+			if (comment_starting)
+				commenting = 1;
 		}
 
-		if (LinePtr < LineLen) 
-			b = LineBuff[LinePtr];
-		else
-			b = 0;
-
-		while ((LinePtr<LineLen) && ((b==' ') || (b=='\t')))
-		{
-			LinePtr++;
-			if (LinePtr<LineLen) b = LineBuff[LinePtr];
-		}
-
-		/* コメントの終わりが一行に登場しない場合は、永続的に記録する。*/
-		if (comment_starting)
-			commenting = 1;
-	}
+		/* 1つの行に、複数のコメントがある場合に対応するため、次の文字がスラッシュならば、
+		 * ループ処理の始めに戻す。
+		 */
+	} while (b == '/');
 #endif
 
 	if ((b>' ') && (b!=';'))
