@@ -413,6 +413,9 @@ BYTE GetFirstChar()
 			if (comment_starting)
 				commenting = 1;
 		}
+		else {
+			break;
+		}
 
 		/* 1つの行に、複数のコメントがある場合に対応するため、次の文字がスラッシュならば、
 		 * ループ処理の始めに戻す。
