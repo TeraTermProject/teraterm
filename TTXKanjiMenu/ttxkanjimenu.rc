@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,5,0
- PRODUCTVERSION 0,1,5,0
+ FILEVERSION 0,1,6,0
+ PRODUCTVERSION 0,1,6,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
         BLOCK "041104b0"
         BEGIN
             VALUE "FileDescription", "TTX KanjiMenu Plug-in"
-            VALUE "FileVersion", "0, 1, 5, 0"
+            VALUE "FileVersion", "0, 1, 6, 0"
             VALUE "InternalName", "ttxkanjimenu"
             VALUE "LegalCopyright", "Copyright (C) 2007-2009 TeraTerm Project, Copyright (C) 2007 Sunao HARA"
             VALUE "OriginalFilename", "ttxkanjimenu.dll"
             VALUE "ProductName", "TTX KanjiMenu Plug-in"
-            VALUE "ProductVersion", "0, 1, 5, 0"
+            VALUE "ProductVersion", "0, 1, 6, 0"
         END
     END
     BLOCK "VarFileInfo"
