@@ -78,6 +78,9 @@ static char THIS_FILE[] = __FILE__;
 static HFONT DlgBroadcastFont;
 static HFONT DlgCommentFont;
 
+static BOOL TCPLocalEchoUsed = FALSE;
+static BOOL TCPCRSendUsed = FALSE;
+
 // 本体は addsetting.cpp
 extern mouse_cursor_t MouseCursor[];
 
@@ -3086,6 +3089,17 @@ LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
 			CommProcRRQ(&cv);
 			break;
 		case FD_CLOSE:
+			if (cv.PortType == IdTCPIP) {
+				if (TCPLocalEchoUsed) {
+					TCPLocalEchoUsed=FALSE;
+					ts.LocalEcho = ts.LocalEcho_ini;
+				}
+				if (TCPCRSendUsed) {
+					TCPCRSendUsed = FALSE;
+					ts.CRSend = ts.CRSend_ini;
+					cv.CRSend = ts.CRSend_ini;
+				}
+			}
 			Connecting = FALSE;
 			TCPIPClosed = TRUE;
 			// disable transmition
@@ -3155,29 +3169,16 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 				TelEnableHisOpt(BINARY);
 			}
 
-			// 直前の接続が非Telnet接続だった場合、Window を閉じていないと設定が残っている
-			// (LocalEcho, CRSend が TCPLocalEcho, TCPCRSend の値で上書きされている)
-			// Telnet のときには LocalEcho/CRSend を元の値に戻すために、
-			// 読み込み時の設定を持ってくる (2008.4.22 maya)
-			ts.CRSend = ts.CRSend_ini;
-			cv.CRSend = ts.CRSend_ini;
-			ts.LocalEcho = ts.LocalEcho_ini;
-
 			TelStartKeepAliveThread();
 		}
-		// SSH, Cygwin などで接続するときに利用される
-		else if (ts.DisableTCPEchoCR) {
-			// 上と同じ理由で、読み込み時の設定を持ってくる (2008.4.22 maya)
-			ts.CRSend = ts.CRSend_ini;
-			cv.CRSend = ts.CRSend_ini;
-			ts.LocalEcho = ts.LocalEcho_ini;
-		}
-		else {
+		else if (!ts.DisableTCPEchoCR) {
 			if (ts.TCPCRSend>0) {
+				TCPCRSendUsed = TRUE;
 				ts.CRSend = ts.TCPCRSend;
 				cv.CRSend = ts.TCPCRSend;
 			}
 			if (ts.TCPLocalEcho>0) {
+				TCPLocalEchoUsed = TRUE;
 				ts.LocalEcho = ts.TCPLocalEcho;
 			}
 		}
