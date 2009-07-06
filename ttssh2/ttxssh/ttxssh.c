@@ -787,6 +787,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks)
 {
 	if (pvar->settings.Enabled) {
 		// TCPLocalEcho/TCPCRSend ‚ð–³Œø‚É‚·‚é (maya 2007.4.25)
+		pvar->origDisableTCPEchoCR = pvar->ts->DisableTCPEchoCR;
 		pvar->ts->DisableTCPEchoCR = TRUE;
 
 		pvar->session_settings = pvar->settings;
@@ -836,6 +837,8 @@ static void PASCAL FAR TTXCloseTCP(TTXSockHooks FAR * hooks)
 		*hooks->Psend = pvar->Psend;
 		*hooks->PWSAAsyncSelect = pvar->PWSAAsyncSelect;
 		*hooks->Pconnect = pvar->Pconnect;
+
+		pvar->ts->DisableTCPEchoCR = pvar->origDisableTCPEchoCR;
 	}
 
 	uninit_TTSSH(pvar);

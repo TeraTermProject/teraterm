@@ -254,6 +254,8 @@ typedef struct _TInstVar {
 
 	// agent forward
 	BOOL agentfwd_enable;
+
+	BOOL origDisableTCPEchoCR;
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5
