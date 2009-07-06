@@ -3159,8 +3159,8 @@ WORD TTLStrMatch()
 WORD TTLStrScan()
 {
 	WORD Err;
-	int Len1, Len2, i, j;
 	TStrVal Str1, Str2;
+	char *p;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -3169,31 +3169,17 @@ WORD TTLStrScan()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	Len1 = strlen(Str1);
-	Len2 = strlen(Str2);
-	if ((Len1==0) || (Len2==0))
-	{
+	if ((Str1[0] == 0) || (Str2[0] == 0)) {
 		SetResult(0);
 		return Err;
 	}
 
-	i = 0;
-	j = 0;
-	do {
-		if (Str1[i]==Str2[j])
-		{
-			j++;
-			i++;
-		}
-		else if (j==0)
-			i++;
-		else
-			j = 0;
-	} while ((i<Len1) && (j<Len2));
-	if (j==Len2)
-		SetResult(i-Len2+1);
-	else
+	if ((p = strstr(Str1, Str2)) != NULL) {
+		SetResult(p - Str1 + 1);
+	}
+	else {
 		SetResult(0);
+	}
 	return Err;
 }
 
