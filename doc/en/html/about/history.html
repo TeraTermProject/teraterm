@@ -39,8 +39,8 @@
 
   <li>Bug fixes
     <ul>
-      <li>local echo and line feed are changed before connecting, these are ignored.</li>
-      <li>in serial connection, settings of TCPLocalEcho/TCPCRSend at previous connection are not reset.</li>
+      <li>fixed the problem that the settings of local echo and line feed before connection may not be effective.</li>
+      <li>fixed the problem that the settings of TCPLocalEcho/TCPCRSend in previous connection are not reset in serial connection.</li>
       <li><a href="../macro/command/strscan.html">strscan</a> macro command does not work correctly.</li>
     </ul>
   </li>
@@ -1351,7 +1351,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>after SSH connection was closed, settings of TCPLocalEcho/TCPCRSend are not used.</li>
+      <li>fixed the problem that the settings of TCPLocalEcho/TCPCRSend are not used after SSH connection was closed.</li>
     </ul>
   </li>
 
