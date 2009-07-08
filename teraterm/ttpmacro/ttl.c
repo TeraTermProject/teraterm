@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <mbstring.h>
 #include <time.h>
 #include <errno.h>
 #include "ttmdlg.h"
@@ -3174,7 +3175,7 @@ WORD TTLStrScan()
 		return Err;
 	}
 
-	if ((p = strstr(Str1, Str2)) != NULL) {
+	if ((p = _mbsstr(Str1, Str2)) != NULL) {
 		SetResult(p - Str1 + 1);
 	}
 	else {
