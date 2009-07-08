@@ -334,7 +334,13 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 int IsCommentClosed(void)
 {
 #ifdef SUPPORT_C_STYLE_COMMENT
-	return (commenting == 0);
+	int ret = (commenting == 0);
+
+	/* コメントが始まる手前までのコマンドを実行できるようにするため、
+	 * 内部フラグはクリアしておく。
+	 */
+	commenting = 0;
+	return (ret);
 #else
 	// 当該機能が無効の場合は、常に「真」を返す。
 	return 1;
