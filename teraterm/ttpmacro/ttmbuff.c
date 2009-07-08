@@ -257,6 +257,11 @@ BOOL RegisterLabels(int IBuff)
 			}
 		}
 
+		/* 次の行へ移す前に、C言語コメントを探すため、行末までスキャンする。*/
+		do {
+			b = GetFirstChar();
+		} while (b != 0);
+
 		if (Err>0) {
 			DispErr(Err);
 		}
