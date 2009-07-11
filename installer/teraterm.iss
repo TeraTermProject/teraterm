@@ -329,26 +329,26 @@ Root: HKCU; Subkey: Software\Classes\ssh; ValueType: string; ValueData: URL: SSH
 Root: HKCU; Subkey: Software\Classes\ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\ssh\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh\shell; ValueType: string; ValueData: open; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\ssh\shell\open; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: ssh; ValueType: string; ValueData: URL: SSH Protocol; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: ssh; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: ssh; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: ssh\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: ssh\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCR; Subkey: ssh\shell; ValueType: string; ValueData: open; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCR; Subkey: ssh\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCU; Subkey: Software\Classes\slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCU; Subkey: Software\Classes\slogin\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin\shell; ValueType: string; ValueData: open; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCU; Subkey: Software\Classes\slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: slogin; ValueType: string; ValueData: URL: slogin Protocol; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: slogin; ValueName: URL Protocol; ValueType: string; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: slogin; ValueName: EditFlags; ValueType: dword; ValueData: 2; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 Root: HKCR; Subkey: slogin\DefaultIcon; ValueType: string; ValueData: """{app}\ttxssh.dll"",0"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin\shell; ValueType: string; ValueData: Open with Tera Term; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
-Root: HKCR; Subkey: slogin\shell\Open with Tera Term\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCR; Subkey: slogin\shell; ValueType: string; ValueData: open; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
+Root: HKCR; Subkey: slogin\shell\open\command; ValueType: string; ValueData: """{app}\ttermpro.exe"" %1"; Flags: uninsdeletekey; Check: not isMinimumOfWin2K; Components: TTSSH; Tasks: sshassoc
 ; Associate with .TTY
 Root: HKCU; Subkey: Software\Classes\.tty; ValueType: string; ValueData: TTYRecordFile; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
 Root: HKCU; Subkey: Software\Classes\TTYRecordFile; ValueType: string; ValueData: TTY Record File; Flags: uninsdeletekey; Check: isMinimumOfWin2K; Components: Additional_Plugins/TTXttyrec; Tasks: ttyplayassoc
