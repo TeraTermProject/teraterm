@@ -6,7 +6,8 @@
   Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 95, 98 and Me.
 - Installer
   Inno Setup 5.2.3 (http://www.jrsoftware.org/isinfo.php)
-  ISTool 5.2.1 (http://www.istool.org/)
+  Inno Setup Preprocessor 5.2.3.0 (from ispack-5.2.3)
+  ISTool 5.3.0 (http://www.istool.org/)
   Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
 - others
   ActivePerl 5.8 later version
