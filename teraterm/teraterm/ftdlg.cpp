@@ -55,7 +55,7 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 		Ok = CDialog::Create(CFileTransDlg::IDD, GetDesktopWindow());
 	}
 	else { // parent window is VT window
-	Ok = CDialog::Create(CFileTransDlg::IDD, NULL);
+		Ok = CDialog::Create(CFileTransDlg::IDD, NULL);
 	}
 
 	// ŒÄ‚Ño‚µŒ³‚©‚çˆÚ“® (2009.2.7 maya)
@@ -64,6 +64,9 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 		if (fv->OpId == OpLog) {
 			ShowWindow(SW_MINIMIZE);
 		}
+	}
+	else {
+		::SetFocus(fv->HMainWin);
 	}
 
 	fv->HWin = GetSafeHwnd();
