@@ -20,7 +20,7 @@
 
 HWND HVTWin = NULL;
 HWND HTEKWin = NULL;
-  
+
 int ActiveWin = IdVT; /* IdVT, IdTEK */
 int TalkStatus = IdTalkKeyb; /* IdTalkKeyb, IdTalkCB, IdTalkTextFile */
 BOOL KeybEnabled = TRUE; /* keyboard switch */
