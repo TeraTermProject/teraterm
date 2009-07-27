@@ -30,6 +30,7 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	BOOL Ok;
 	WNDCLASS wc;
 	int fuLoad = LR_DEFAULTCOLOR;
+	HWND hwnd = GetForegroundWindow()->GetSafeHwnd();
 
 	fv = pfv;
 	cv = pcv;
@@ -66,7 +67,7 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 		}
 	}
 	else {
-		::SetFocus(fv->HMainWin);
+		::SetForegroundWindow(hwnd);
 	}
 
 	fv->HWin = GetSafeHwnd();
