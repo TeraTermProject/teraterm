@@ -24,13 +24,15 @@ getdir &lt;strvar&gt;
 <h2>解説</h2>
 
 <p>
-(Tera Term ではなく) MACRO の現在のディレクトリを文字列変数 &lt;strvar&gt; に格納する。
+(Tera Term ではなく) MACRO の現在のディレクトリを文字列変数 &lt;strvar&gt; に格納する。<br>
+ルートディレクトリの場合、文字列の末尾には円記号 (\) が付きます。ルート以外のディレクトリの場合、文字列はディレクトリ名で終わり、末尾に円記号は付きません。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
 getdir dir
+; dir = C:\Documents and Settings\yutaka\My Documents\TeraTermMacro
 </pre>
 
 <h2>参照</h2>

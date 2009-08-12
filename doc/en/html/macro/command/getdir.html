@@ -24,13 +24,15 @@ getdir &lt;strvar&gt;
 <h2>Remarks</h2>
 
 <p>
-Returns the current working directory for MACRO (not for Tera Term) to the string variable &lt;strvar&gt;.
+Returns the current working directory for MACRO (not for Tera Term) to the string variable &lt;strvar&gt;.<br>
+If the directory is the root, the string ends with a backslash(\). If the directory is a directory other than the root, the string ends with the directory name and not with a backslash.
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
 getdir dir
+; dir = C:\Documents and Settings\yutaka\My Documents\TeraTermMacro
 </pre>
 
 <h2>See also</h2>
