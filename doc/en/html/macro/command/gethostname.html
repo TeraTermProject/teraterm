@@ -14,7 +14,7 @@
 <h1>gethostname</h1>
 
 <p>
-Gets the hostname.
+Gets the hostname or IP address.
 </p>
 
 <pre class="macro-syntax">
@@ -24,17 +24,17 @@ gethostname &lt;strvar&gt;
 <h2>Remarks</h2>
 
 <p>
-Retrieves the connecting hostname of Tera Term and stores it in the string variable &lt;strvar&gt;.
+Retrieves the destination hostname or IP address of Tera Term and stores it in the string variable &lt;strvar&gt;.
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
 testlink
-if result > 0 then
+if result > 1 then
     gethostname hostname
     messagebox hostname result
-end if
+endif
 </pre>
 
 </body>

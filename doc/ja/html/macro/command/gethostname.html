@@ -14,7 +14,7 @@
 <h1>gethostname</h1>
 
 <p>
-ホスト名を得る。
+接続先のホスト名（IPアドレス）を得る。
 </p>
 
 <pre class="macro-syntax">
@@ -24,17 +24,17 @@ gethostname &lt;strvar&gt;
 <h2>解説</h2>
 
 <p>
-Tera Term が接続しているホスト名を文字列変数 &lt;strvar&gt; に格納する。
+Tera Term が接続しているホスト名（IPアドレス）を、文字列変数 &lt;strvar&gt; に格納する。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
 testlink
-if result > 0 then
+if result > 1 then
     gethostname hostname
     messagebox hostname result
-end if
+endif
 </pre>
 
 </body>
