@@ -211,7 +211,7 @@ BOOL OpenFTDlg(PFileVar fv)
 	get_lang_msg("DLG_FILETRANS_TRNAS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(HFTDlg, IDC_TRANS_TRANS, ts.UIMsg);
 	GetDlgItemText(HFTDlg, IDCANCEL, uimsg, sizeof(uimsg));
-	get_lang_msg("BTN_CANCEL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_FILETRANS_CLOSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(HFTDlg, IDCANCEL, ts.UIMsg);
 	GetDlgItemText(HFTDlg, IDC_TRANSPAUSESTART, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_FILETRANS_PAUSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
