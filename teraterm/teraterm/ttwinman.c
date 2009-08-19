@@ -197,7 +197,7 @@ void ChangeTitle()
 				_snprintf_s(TempTitle, sizeof(TempTitle), _TRUNCATE, "%s - %s", str, TempTitleWithRemote);
 			}
 			else {
-				strncat_s(TempTitle, sizeof(TempTitle), ts.HostName, _TRUNCATE);
+				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE);
 			}
 		}
 	}
