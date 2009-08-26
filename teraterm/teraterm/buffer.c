@@ -1366,7 +1366,7 @@ static void markURL(int x)
 	if (x == 0) {
 		if (AttrLine > AttrBuff && (AttrLine[x-1] & AttrURL)) {
 			if (!(ch & 0x80 || url_char[ch]==0)) { // かつURL構成文字なら
-				AttrLine[x] |= AttrURL; 
+				AttrLine[x] |= (AttrURL | AttrUnder); 
 			}
 		}
 		return;
@@ -1375,13 +1375,15 @@ static void markURL(int x)
 	if ((x-1>=0) && (AttrLine[x-1] & AttrURL) &&
 		!(ch & 0x80 || url_char[ch]==0)) {
 //		!((CodeLine[x] <= ' ') && !(AttrLine[x] & AttrKanji))) {
-			AttrLine[x] |= AttrURL; 
-//		AttrLine[x] |= (AttrURL | AttrUnder); 
+			AttrLine[x] |= (AttrURL | AttrUnder); 
 		return;
 	}
 
 	if ((x-2>=0) && !strncmp(&CodeLine[x-2], "://", 3)) {
 		int i, len = -1;
+		RECT rc;
+		int CaretX, CaretY;
+
 		if ((x-6>=0) && !strncmp(&CodeLine[x-6], "http", 4)) {
 			len = 6;
 		}
@@ -1403,9 +1405,22 @@ static void markURL(int x)
 		}
 #endif
 		for (i = 0; i <= len; i++) {
-				AttrLine[x-i] |= AttrURL; 
-//			AttrLine[x-i] |= (AttrURL | AttrUnder); 
+			AttrLine[x-i] |= (AttrURL | AttrUnder); 
 		}
+
+		/* ハイパーリンクの色属性変更は、すでに画面へ出力後に、バッファを遡って URL 属性を
+		 * 付け直すというロジックであるため、色が正しく描画されない場合がある。
+		 * 少々強引だが、ハイパーリンクを発見したタイミングで、その行に再描画指示を出すことで、
+		 * リアルタイムな色描画を実現する。
+		 * (2009.8.26 yutaka)
+		 */
+		CaretX = (0-WinOrgX)*FontWidth;
+		CaretY = (CursorY-WinOrgY)*FontHeight;
+		rc.left = CaretX;
+		rc.top = CaretY;
+		rc.right = CaretX + NumOfColumns * FontWidth;
+		rc.bottom = CaretY + FontHeight;
+		InvalidateRect(HVTWin, &rc, FALSE);
 	}
 #endif
 }

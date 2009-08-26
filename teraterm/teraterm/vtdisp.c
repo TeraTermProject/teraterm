@@ -1153,7 +1153,8 @@ void BGInitialize(void)
   BGVTReverseColor[0] = ts.VTReverseColor[0];
   BGVTReverseColor[1] = ts.VTReverseColor[1];
 
-#if 0
+#if 1
+  // ハイパーリンク描画の復活。(2009.8.26 yutaka)
   /* begin - ishizaki */
   BGURLColor[0] = ts.URLColor[0];
   BGURLColor[1] = ts.URLColor[1];
