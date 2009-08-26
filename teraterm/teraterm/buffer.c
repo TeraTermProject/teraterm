@@ -2550,13 +2550,16 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 	if (NClick == 0) {
 		extern void SetMouseCursor(char *cursor);
 
-		if ((AttrBuff[TmpPtr+X] & AttrURL)) {
-			SetMouseCursor("HAND");
+		// クリッカブルURLが有効の場合のみ、マウスカーソルを変形させる。(2009.8.27 yutaka)
+		if (ts.EnableClickableUrl) {
+			if ((AttrBuff[TmpPtr+X] & AttrURL)) {
+				SetMouseCursor("HAND");
 
-		} else {
-			SetMouseCursor(ts.MouseCursorName);
-			//SetCursor(LoadCursor(NULL, IDC_IBEAM));
+			} else {
+				SetMouseCursor(ts.MouseCursorName);
+				//SetCursor(LoadCursor(NULL, IDC_IBEAM));
 
+			}
 		}
 
 		UnlockBuffer();
