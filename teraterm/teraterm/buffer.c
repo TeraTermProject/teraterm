@@ -1355,6 +1355,16 @@ static void markURL(int x)
 		 * other: url head char --> url_table array number + 1
 		 */
 	};
+	static char *prefix[] = {
+		"https://",
+		"http://",
+		"sftp://",
+		"tftp://",
+		"news://",
+		"ftp://",
+		"mms://",
+		NULL
+	};
 	unsigned char ch = CodeLine[x];
 
 	if (ts.EnableClickableUrl == FALSE)
@@ -1383,32 +1393,17 @@ static void markURL(int x)
 		int i, len = -1;
 		RECT rc;
 		int CaretX, CaretY;
+		char **p = prefix;
 
-		if ((x-6>=0) && !strncmp(&CodeLine[x-6], "http", 4)) {
-			len = 6;
-		}
-		else if ((x-7>=0) && !strncmp(&CodeLine[x-7], "https", 5)) {
-			len = 7;
-		}
-		else if ((x-6>=0) && !strncmp(&CodeLine[x-6], "news", 4)) {
-			len = 6;
-		}
-		else if ((x-6>=0) && !strncmp(&CodeLine[x-6], "sftp", 4)) {
-			len = 6;
-		}
-		else if ((x-5>=0) && !strncmp(&CodeLine[x-5], "ftp", 3)) {
-			len = 5;
-		}
-		else if ((x-5>=0) && !strncmp(&CodeLine[x-5], "mms", 3)) {
-			len = 5;
-		}
-#if 0
-		if ((x-5>=0) && !strncmp(&CodeLine[x-5], "ttp", 3)) {
-			len = 5;
-		}
-#endif
-		for (i = 0; i <= len; i++) {
-			AttrLine[x-i] |= (AttrURL | AttrUnder); 
+		while (*p) {
+			len = strlen(*p) - 1;
+			if ((x-len>=0) && !strncmp(&CodeLine[x-len], *p, len)) {
+				for (i = 0; i <= len; i++) {
+					AttrLine[x-i] |= (AttrURL | AttrUnder); 
+				}
+				break;
+			}
+			p++;
 		}
 
 		/* ハイパーリンクの色属性変更は、すでに画面へ出力後に、バッファを遡って URL 属性を
