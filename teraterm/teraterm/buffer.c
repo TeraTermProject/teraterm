@@ -1367,7 +1367,8 @@ static void markURL(int x)
 	};
 	unsigned char ch = CodeLine[x];
 
-	if (ts.EnableClickableUrl == FALSE)
+	if (ts.EnableClickableUrl == FALSE && 
+		(ts.ColorFlag & CF_URLCOLOR) == 0)
 		return;
 
 	// 直前の行から連結しているか。
