@@ -1387,16 +1387,19 @@ static void markURL(int x)
 		if ((x-6>=0) && !strncmp(&CodeLine[x-6], "http", 4)) {
 			len = 6;
 		}
-		if ((x-7>=0) && !strncmp(&CodeLine[x-7], "https", 5)) {
+		else if ((x-7>=0) && !strncmp(&CodeLine[x-7], "https", 5)) {
 			len = 7;
 		}
-		if ((x-6>=0) && !strncmp(&CodeLine[x-6], "news", 4)) {
+		else if ((x-6>=0) && !strncmp(&CodeLine[x-6], "news", 4)) {
 			len = 6;
 		}
-		if ((x-5>=0) && !strncmp(&CodeLine[x-5], "ftp", 3)) {
+		else if ((x-6>=0) && !strncmp(&CodeLine[x-6], "sftp", 4)) {
+			len = 6;
+		}
+		else if ((x-5>=0) && !strncmp(&CodeLine[x-5], "ftp", 3)) {
 			len = 5;
 		}
-		if ((x-5>=0) && !strncmp(&CodeLine[x-5], "mms", 3)) {
+		else if ((x-5>=0) && !strncmp(&CodeLine[x-5], "mms", 3)) {
 			len = 5;
 		}
 #if 0
