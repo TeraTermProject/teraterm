@@ -627,7 +627,6 @@ set t_EI=^[[1\ q
 NOTE: Input ^[ by using Control-V Control-[.
 </pre>
 
-アプリケーション終了後に、カーソルを点滅状態に戻すには、以下のように設定をします。
 If the cursor periodically blinks after an application exits, a user should configure as follows.
 <br>
 In the ncurses 5.7 terminfo, the invisible(civis)/normal display(cnorm)/highlighting(cvvis) of the xterm cursor are as follows:
@@ -638,15 +637,17 @@ cnorm=\E[?12l\E[?25h
 cvvis=\E[?12;25h
 </pre>
 
-この設定だと、カーソルの通常表示時は非点滅に、強調表示時は点滅するようになります。このため terminfo 対応のアプリケーションがカーソルを通常表示しようとした時に点滅しなくなります。<br>
+When the upper configuration is enabled, the normal cursor displays with the non-blinking mode and the emphasis cursor displays with the blinking mode.
+このため terminfo 対応のアプリケーションがカーソルを通常表示しようとした時に点滅しなくなります。<br>
 対応としては、カーソルの点滅制御を無視する為に CursorCtrlSequence を off に設定するか、カーソル表示状態変更時に点滅状態を変更しないように以下の手順をホスト側で実施してください。
 
 <pre>
 % infocmp xterm > xterm.ti
-生成されたxterm.tiを編集し、cnorm, cvvisの値を \E?25h に変更する
+Open the xterm.ti file, change from a value of cnorm and cvvis to \E?25h.
 % tic -o ~/.terminfo xterm.ti
-システム全体に反映させるためには root で以下を実行
+Execute the tic command.
 # tic xterm.ti
+If the configuration is enabled as whole system, execute the upper command with a root user.
 </pre>
 
 </body>
