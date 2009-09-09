@@ -638,8 +638,8 @@ cvvis=\E[?12;25h
 </pre>
 
 When the upper configuration is enabled, the normal cursor displays with the non-blinking mode and the emphasis cursor displays with the blinking mode.
-このため terminfo 対応のアプリケーションがカーソルを通常表示しようとした時に点滅しなくなります。<br>
-対応としては、カーソルの点滅制御を無視する為に CursorCtrlSequence を off に設定するか、カーソル表示状態変更時に点滅状態を変更しないように以下の手順をホスト側で実施してください。
+So, the cursor does not blink when the terminfo application displays the own cursor.<br>
+If a user want to blink the cursor, turn off the CursorCtrlSequence entry or do in the following commands:
 
 <pre>
 % infocmp xterm > xterm.ti
