@@ -5,9 +5,9 @@
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
   Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 95, 98 and Me.
 - Installer
-  Inno Setup 5.2.3 (http://www.jrsoftware.org/isinfo.php)
-  Inno Setup Preprocessor 5.2.3.0 (from ispack-5.2.3)
-  ISTool 5.3.0 (http://www.istool.org/)
+  Inno Setup 5.3.4 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor 5.3.3 (from ispack-5.3.4)
+  ISTool 5.3.0 (from ispack-5.3.4)
   Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
 - others
   ActivePerl 5.8 later version
