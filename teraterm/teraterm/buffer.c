@@ -290,6 +290,9 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	else {
 		GlobalUnlock(HCodeNew);
 		GlobalUnlock(HAttrNew);
+		GlobalUnlock(HAttr2New);
+		GlobalUnlock(HAttrFGNew);
+		GlobalUnlock(HAttrBGNew);
 	}
 	BuffLock = LockOld;
 
