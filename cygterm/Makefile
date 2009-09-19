@@ -5,9 +5,10 @@ BINDIR = $(HOME)/bin
 CC = gcc
 CFLAGS = -O2 -fno-exceptions
 #CFLAGS = -g -fno-exceptions
-LIBS = -mwindows
+LDFLAGS = -mwindows
 
 LAUNCH = cyglaunch.exe
+LAUNCH_SRC = cyglaunch.c
 EXE = cygterm.exe
 SRC = $(EXE:.exe=.cc)
 CFG = $(EXE:.exe=.cfg)
@@ -19,20 +20,20 @@ all : $(EXE) $(LAUNCH) src
 
 $(EXE) : $(SRC) $(RES)
   ifeq (0, $(shell nm /usr/lib/crt0.o | grep -c WinMainCRTStartup))
-	$(CC) $(CFLAGS) -DNO_WIN_MAIN -o $(EXE) $(SRC) $(RES) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -DNO_WIN_MAIN -o $(EXE) $(SRC) $(RES)
   else
-	$(CC) $(CFLAGS) -o $(EXE) $(SRC) $(RES) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(EXE) $(SRC) $(RES)
   endif
 	strip $(EXE)
 
-$(LAUNCH) : cyglaunch.c $(RES)
-	cc -mno-cygwin -mwindows -o cyglaunch cyglaunch.c $(RES)
+$(LAUNCH) : $(LAUNCH_SRC) $(RES)
+	$(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES)
 	strip $(LAUNCH)
 
 $(RC):
 	echo 'icon ICON $(ICO)' > $(RC)
 
-$(RES):	$(ICO) $(RC)
+$(RES): $(ICO) $(RC)
 	windres -O coff -o $(RES) $(RC)
 
 clean :
@@ -49,4 +50,4 @@ uninstall :
 	rm -f $(BINDIR)/$(CFG)
 
 src :
-	tar cf - $(SRC) $(ICO) $(CFG) cyglaunch.c README README-j Makefile | gzip > cygterm+.tar.gz
+	tar cf - $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) README README-j Makefile | gzip > cygterm+.tar.gz
