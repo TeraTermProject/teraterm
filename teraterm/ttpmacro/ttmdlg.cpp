@@ -89,7 +89,9 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	char Temp[MAXPATHLEN];
 
 	// Get home directory
-	GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName));
+	if (GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName)) == 0) {
+		return;
+	}
 	ExtractDirName(FileName,HomeDir);
 	_chdir(HomeDir);
 

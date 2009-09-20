@@ -64,7 +64,9 @@ BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
 	// if (FirstInstance) { ‚Ì•”•ª‚©‚çˆÚ“® (2008.3.13 maya)
 	// ‹N“®Žž‚É‚ÍA‹¤—Lƒƒ‚ƒŠ‚Ì HomeDir ‚Æ SetupFName ‚Í‹ó‚É‚È‚é
 	/* Get home directory */
-	GetModuleFileName(hInst,Temp,sizeof(Temp));
+	if (GetModuleFileName(hInst,Temp,sizeof(Temp)) == 0) {
+		return TRUE;
+	}
 	ExtractDirName(Temp, ts->HomeDir);
 	_chdir(ts->HomeDir);
 	GetDefaultSetupFName(ts->HomeDir, ts->SetupFName, sizeof(ts->SetupFName));

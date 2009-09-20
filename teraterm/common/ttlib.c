@@ -625,7 +625,10 @@ void GetUILanguageFile(char *buf, int buflen)
 	char CurDir[MAX_PATH];
 
 	/* Get home directory */
-	GetModuleFileName(NULL,Temp,sizeof(Temp));
+	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+		memset(buf, 0, buflen);
+		return;
+	}
 	ExtractDirName(Temp, HomeDir);
 
 	/* Get SetupFName */
@@ -649,7 +652,10 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	char SetupFName[MAX_PATH];
 
 	/* Get home directory */
-	GetModuleFileName(NULL,Temp,sizeof(Temp));
+	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+		strncpy_s(buf, buflen, "off", _TRUNCATE);
+		return;
+	}
 	ExtractDirName(Temp, HomeDir);
 
 	/* Get SetupFName */

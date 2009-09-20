@@ -1755,9 +1755,14 @@ WORD TTLGetTTDir()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	GetModuleFileName(NULL, Temp, sizeof(Temp));
+	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) == 0) {
+		SetStrVal(VarId,"");
+		SetResult(0);
+		return Err;
+	}
 	ExtractDirName(Temp, HomeDir);
 	SetStrVal(VarId,HomeDir);
+	SetResult(1);
 
 	return Err;
 }

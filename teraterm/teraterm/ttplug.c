@@ -85,7 +85,9 @@ void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
     struct _finddata_t searchData;
     long searchHandle;
 
-    GetModuleFileName(hInst, buf, sizeof(buf));
+    if (GetModuleFileName(hInst, buf, sizeof(buf)) == 0) {
+      return;
+    }
     for (index = strlen(buf) - 1;
     index >= 0 && buf[index] != '\\' && buf[index] != ':' && buf[index] != '/';
       index--) {
