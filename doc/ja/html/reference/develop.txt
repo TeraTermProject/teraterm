@@ -13,6 +13,7 @@
   ISTool 5.3.0 (ispack-5.3.4 より)
   Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
 - その他
+  Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
   ActivePerl 5.8 以上
     OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
 
@@ -166,6 +167,8 @@
   CygTermのビルド方法について以下に示します。
 
    1. Cygwin(http://www.cygwin.com/)をインストールする
+      注意: 1.7.x は Windows 9x をサポートしていないので、1.5.x を利用する。
+            1.5.x は Windows 7 をサポートしていないようだが、1.5.x でコンパイルされたバイナリは 1.7.x 環境で実行できる。
    2. Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
       # cd cygterm
    3. CygTermをコンパイルする

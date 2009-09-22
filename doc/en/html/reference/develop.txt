@@ -10,6 +10,7 @@
   ISTool 5.3.0 (from ispack-5.3.4)
   Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
 - others
+  Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
   ActivePerl 5.8 later version
     converts character-code and return-code of documents for building OpenSSL.
 
@@ -160,6 +161,8 @@ Example: adding a TTSSH menu under File menu
   To build CygTerm source code is shown in the following step:
 
    1. Install Cygwin(http://www.cygwin.com/) to your PC.
+      Note: 1.7.x doesn't support Windows 9x. Use version 1.5.x.
+            1.5.x doesn't seem support Windows 7. But a binary that is compiled by 1.5.x can execute in 1.7.x environment.
    2. Launch Cygwin shell and go to cygterm directory.
       # cd cygterm
    3. Compile Cygterm.
