@@ -152,7 +152,7 @@ private:
 		}
 		
 		if (option != NULL) {
-			if (parse_option(option)) {
+			if (parse_option(option) == 1) {
 				*option = '\0';
 			}
 		}
