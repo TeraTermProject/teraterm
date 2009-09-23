@@ -2094,9 +2094,9 @@ public:
         ProxyInfo proxy;
         String realhost = ProxyInfo::parse(url, proxy);
         if (realhost != NULL) {
-			if (realhost.indexOf("://") != -1 && !prefix) {
-				proxy.type = proxy.TYPE_NONE;
-			}
+            if (realhost.indexOf("://") != -1 && !prefix) {
+                proxy.type = proxy.TYPE_NONE;
+            }
             instance().defaultProxy = proxy;
             if (realhost.length() == 0)
                 realhost = NULL;
