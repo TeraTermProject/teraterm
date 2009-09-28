@@ -4724,36 +4724,28 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					return FALSE;
 
 				case IDC_LIST:
-					// リストボックスをダブルクリックされたら、全選択か全選択解除を行う。
-					if (HIWORD(wp) == LBN_DBLCLK) {
-						int i, n, max;
-						BOOL flag;
+					// 一般的なアプリケーションと同じ操作感を持たせるため、
+					// 「SHIFT+クリック」による連続的な選択をサポートする。
+					// (2009.9.28 yutaka)
+					if (HIWORD(wp) == LBN_SELCHANGE && ShiftKey()) {
+						int i, cur, prev;
 
-						max = ListBox_GetCount(BroadcastWindowList);
-						n = 0;
-						for (i = 0 ; i < max ; i++) {
+						cur = ListBox_GetCurSel(BroadcastWindowList);
+						prev = -1;
+						for (i = cur - 1 ; i >= 0 ; i--) {
 							if (ListBox_GetSel(BroadcastWindowList, i)) {
-								n++;
+								prev = i;
+								break;
 							}
 						}
-						
-						if (max == 2) {  // エントリが2個の場合は常に全選択とする。
-							flag = TRUE;
-
-						} else {
-							if (n >= max - 1) { // all select
-								flag = FALSE;
+						if (prev != -1) {
+							// すでに選択済みの箇所があれば、そこから連続選択する。
+							for (i = prev ; i < cur ; i++) {
+								ListBox_SetSel(BroadcastWindowList, TRUE, i);
 							}
-							else {
-								flag = TRUE;
-							}
-
-						}
-
-						for (i = 0 ; i < max ; i++) {
-							ListBox_SetSel(BroadcastWindowList, flag, i);
 						}
 					}
+
 					return FALSE;
 
 				default:
