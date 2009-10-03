@@ -4364,6 +4364,21 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 }
 
 
+static int GetApplicationInstanceCount(void)
+{
+	int i;
+	HWND hd;
+
+	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
+		hd = GetNthWin(i);
+		if (hd == NULL) {
+			break;
+		}
+	}
+	return (i);
+}
+
+
 static void UpdateBroadcastWindowList(HWND hWnd)
 {
 	int i;
@@ -4526,6 +4541,10 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	RECT rc_dlg, rc, rc_ok;
 	POINT p;
 	static int ok2right, cancel2right, cmdlist2ok, list2bottom, list2right;
+	// for update list
+	const int list_timer_id = 100;
+	const int list_timer_tick = 1000; // msec
+	static int prev_instances = 1;
 
 	switch (msg) {
 		case WM_SHOWWINDOW:
@@ -4626,6 +4645,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			GetWindowRect(GetDlgItem(hWnd, IDC_LIST), &rc);
 			list2bottom = p.y - rc.bottom;
 			list2right = p.x - rc.right;
+
+			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
 
 			return FALSE;
 
@@ -4832,6 +4853,21 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				SetWindowPos(GetDlgItem(hWnd, IDC_LIST), 0,
 							 0, 0, dlg_w - p.x - list2right , dlg_h - p.y - list2bottom,
 							 SWP_NOMOVE | SWP_NOZORDER);
+			}
+			return TRUE;
+
+		case WM_TIMER:
+			{
+				int n;
+
+				if (wp != list_timer_id)
+					break;
+
+				n = GetApplicationInstanceCount();
+				if (n != prev_instances) {
+					prev_instances = n;
+					UpdateBroadcastWindowList(BroadcastWindowList);			
+				}
 			}
 			return TRUE;
 
