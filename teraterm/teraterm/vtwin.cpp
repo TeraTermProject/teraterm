@@ -4522,6 +4522,10 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	char historyfile[MAX_PATH];
 	static HWND hwndHostname     = NULL; // HOSTNAME dropdown
 	static HWND hwndHostnameEdit = NULL; // Edit control on HOSTNAME dropdown
+	// for resize
+	RECT rc_dlg, rc, rc_ok;
+	POINT p;
+	static int ok2right, cancel2right, cmdlist2ok, list2bottom, list2right;
 
 	switch (msg) {
 		case WM_SHOWWINDOW:
@@ -4603,6 +4607,25 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			GetDlgItemText(hWnd, IDCANCEL, uimsg, sizeof(uimsg));
 			get_lang_msg("BTN_CLOSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 			SetDlgItemText(hWnd, IDCANCEL, ts.UIMsg);
+
+			// 現在サイズから必要な値を計算
+			GetClientRect(hWnd,                                 &rc_dlg);
+			p.x = rc_dlg.right;
+			p.y = rc_dlg.bottom;
+			ClientToScreen(hWnd, &p);
+
+			GetWindowRect(GetDlgItem(hWnd, IDOK),               &rc_ok);
+			ok2right = p.x - rc_ok.left;
+
+			GetWindowRect(GetDlgItem(hWnd, IDCANCEL),               &rc);
+			cancel2right = p.x - rc.left;
+
+			GetWindowRect(GetDlgItem(hWnd, IDC_COMMAND_EDIT), &rc);
+			cmdlist2ok = rc_ok.left - rc.right;
+
+			GetWindowRect(GetDlgItem(hWnd, IDC_LIST), &rc);
+			list2bottom = p.y - rc.bottom;
+			list2right = p.x - rc.right;
 
 			return FALSE;
 
@@ -4758,6 +4781,57 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			EndDialog(hWnd, 0);
 			if (DlgBroadcastFont != NULL) {
 				DeleteObject(DlgBroadcastFont);
+			}
+			return TRUE;
+
+		case WM_SIZE:
+			{
+				// 再配置
+				int dlg_w, dlg_h;
+				RECT rc_dlg;
+				RECT rc;
+				POINT p;
+
+				// 新しいダイアログのサイズを得る
+				GetClientRect(hWnd,                                 &rc_dlg);
+				dlg_w = rc_dlg.right;
+				dlg_h = rc_dlg.bottom;
+
+				// OK button
+				GetWindowRect(GetDlgItem(hWnd, IDOK), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDOK), 0,
+							 dlg_w - ok2right, p.y, 0, 0,
+							 SWP_NOSIZE | SWP_NOZORDER);
+
+				// Cancel button
+				GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDCANCEL), 0,
+							 dlg_w - cancel2right, p.y, 0, 0,
+							 SWP_NOSIZE | SWP_NOZORDER);
+
+				// Command Edit box
+				GetWindowRect(GetDlgItem(hWnd, IDC_COMMAND_EDIT), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDC_COMMAND_EDIT), 0,
+							 0, 0, dlg_w - p.x - ok2right - cmdlist2ok, p.y,
+							 SWP_NOMOVE | SWP_NOZORDER);
+
+				// List Edit box
+				GetWindowRect(GetDlgItem(hWnd, IDC_LIST), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hWnd, &p);
+				SetWindowPos(GetDlgItem(hWnd, IDC_LIST), 0,
+							 0, 0, dlg_w - p.x - list2right , dlg_h - p.y - list2bottom,
+							 SWP_NOMOVE | SWP_NOZORDER);
 			}
 			return TRUE;
 
