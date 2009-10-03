@@ -1543,6 +1543,11 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	free(pvar->hosts_state.prefetched_hostname);
 	pvar->hosts_state.prefetched_hostname = _strdup(hostname);
 
+	// "/nosecuritywarning"が指定されている場合、ダイアログを表示させずに return success する。
+	if (pvar->nocheck_known_hosts == TRUE) {
+		return TRUE;
+	}
+
 	// known_hostsダイアログは同期的に表示させ、この時点においてユーザに確認
 	// させる必要があるため、直接コールに変更する。
 	// これによりknown_hostsの確認を待たずに、サーバへユーザ情報を送ってしまう問題を回避する。

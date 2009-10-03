@@ -256,6 +256,8 @@ typedef struct _TInstVar {
 	BOOL agentfwd_enable;
 
 	BOOL origDisableTCPEchoCR;
+
+	BOOL nocheck_known_hosts;
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5

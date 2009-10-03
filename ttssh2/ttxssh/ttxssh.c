@@ -1655,6 +1655,12 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			// パスワードを聞く (2006.9.18 maya)
 			pvar->ask4passwd = 1;
 
+		} else if (MATCH_STR(option + 1, "nosecuritywarning") == 0) {
+			// known_hostsチェックをしない。当該オプションを使うと、セキュリティ性が低下する
+			// ため、隠しオプション扱いとする。
+			// (2009.10.4 yutaka)
+			pvar->nocheck_known_hosts = TRUE;
+
 		}
 		else {	// Other (not ttssh) option
 			return OPTION_NONE;	// ttsshのオプションではないので消さない
