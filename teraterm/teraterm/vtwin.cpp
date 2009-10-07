@@ -4871,7 +4871,23 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			}
 			return TRUE;
 
+		case WM_VKEYTOITEM:
+			// リストボックスでキー押下(CTRL+A)されたら、全選択。
+			if ((HWND)lp == BroadcastWindowList) {
+				if (ControlKey() && LOWORD(wp) == 'A') {
+					int i, n;
+
+					//OutputDebugPrintf("msg %x wp %x lp %x\n", msg, wp, lp);
+					n = GetApplicationInstanceCount();
+					for (i = 0 ; i < n ; i++) {
+						ListBox_SetSel(BroadcastWindowList, TRUE, i);
+					}
+				}
+			}
+			return TRUE;
+
 		default:
+			//OutputDebugPrintf("msg %x wp %x lp %x\n", msg, wp, lp);
 			return FALSE;
 	}
 	return TRUE;
