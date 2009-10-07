@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <commctrl.h>
 
 #include "ttwinman.h"
 #include "ttcommon.h"
@@ -277,6 +278,8 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	OSVERSIONINFO osvi;
 	static int ok2right, info2bottom, edit2ok, edit2info;
 	RECT rc_edit, rc_ok, rc_cancel, rc_info;
+	// for status bar
+	static HWND hStatus = NULL;
 
 	switch (msg) {
 		case WM_INITDIALOG:
@@ -379,6 +382,12 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			             ts.PasteDialogSize.cx, ts.PasteDialogSize.cy,
 			             SWP_NOZORDER | SWP_NOMOVE);
 
+			// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
+			InitCommonControls();
+			hStatus = CreateStatusWindow(
+				WS_CHILD | WS_VISIBLE |
+				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hDlgWnd, 1);
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -403,6 +412,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 						DeleteObject(DlgClipboardFont);
 					}
 
+					DestroyWindow(hStatus);
 					EndDialog(hDlgWnd, IDOK);
 				}
 					break;
@@ -414,6 +424,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 						DeleteObject(DlgClipboardFont);
 					}
 
+					DestroyWindow(hStatus);
 					EndDialog(hDlgWnd, IDCANCEL);
 					break;
 
@@ -479,6 +490,9 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				GetWindowRect(hDlgWnd, &rc_dlg);
 				ts.PasteDialogSize.cx = rc_dlg.right - rc_dlg.left;
 				ts.PasteDialogSize.cy = rc_dlg.bottom - rc_dlg.top;
+
+				// status bar
+				SendMessage(hStatus , msg , wp , lp);
 			}
 			return TRUE;
 
