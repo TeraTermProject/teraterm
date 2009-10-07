@@ -4544,7 +4544,9 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	// for update list
 	const int list_timer_id = 100;
 	const int list_timer_tick = 1000; // msec
-	static int prev_instances = 1;
+	static int prev_instances = 0;
+	// for status bar
+	static HWND hStatus = NULL;
 
 	switch (msg) {
 		case WM_SHOWWINDOW:
@@ -4646,6 +4648,13 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			list2bottom = p.y - rc.bottom;
 			list2right = p.x - rc.right;
 
+			// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
+			InitCommonControls();
+			hStatus = CreateStatusWindow(
+				WS_CHILD | WS_VISIBLE |
+				CCS_BOTTOM | SBARS_SIZEGRIP, NULL, hWnd, 1);
+
+			// リスト更新タイマーの開始
 			SetTimer(hWnd, list_timer_id, list_timer_tick, NULL);
 
 			return FALSE;
@@ -4853,6 +4862,9 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				SetWindowPos(GetDlgItem(hWnd, IDC_LIST), 0,
 							 0, 0, dlg_w - p.x - list2right , dlg_h - p.y - list2bottom,
 							 SWP_NOMOVE | SWP_NOZORDER);
+
+				// status bar
+				SendMessage(hStatus , msg , wp , lp);
 			}
 			return TRUE;
 
@@ -4866,7 +4878,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				n = GetApplicationInstanceCount();
 				if (n != prev_instances) {
 					prev_instances = n;
-					UpdateBroadcastWindowList(BroadcastWindowList);			
+					UpdateBroadcastWindowList(BroadcastWindowList);	
 				}
 			}
 			return TRUE;
