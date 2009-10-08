@@ -219,6 +219,27 @@ WORD TTLCommCmdBin(char Cmd, int Wait)
 	return Err;
 }
 
+
+WORD TTLCommCmdDeb()
+{
+	int Val;
+	WORD Err;
+
+	Err = 0;
+	GetIntVal(&Val,&Err);
+
+	if ((Err==0) &&
+	    (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if ((Err==0) && (! Linked))
+		Err = ErrLinkFirst;
+	if (Err==0)
+	{
+		SetDebug(Val);
+	}
+	return Err;
+}
+
 WORD TTLCommCmdInt(char Cmd, int Wait)
 {
 	int Val;
@@ -3967,6 +3988,9 @@ int ExecCmnd()
 			Err = TTLCommCmdInt(CmdSetDtr,0); break;
 		case RsvSetEcho:
 			Err = TTLCommCmdBin(CmdSetEcho,0); break;
+
+		case RsvSetDebug:
+			Err = TTLCommCmdDeb(); break;
 		case RsvSetEnv:
 			Err = TTLSetEnv(); break;
 		case RsvSetExitCode:

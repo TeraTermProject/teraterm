@@ -21,7 +21,7 @@
 BOOL AutoRepeatMode;
 BOOL AppliKeyMode, AppliCursorMode;
 BOOL Send8BitMode;
-BOOL DebugFlag = FALSE;
+BYTE DebugFlag = DEBUG_FLAG_NONE;
 
 static char FuncKeyStr[NumOfUDK][FuncKeyStrMax];
 static int FuncKeyLen[NumOfUDK];
@@ -544,7 +544,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
   /* debug mode */
   if ((ts.Debug>0) && (VKey == VK_ESCAPE) && ShiftKey()) {
     MessageBeep(0);
-    DebugFlag = ! DebugFlag;
+	DebugFlag = (DebugFlag+1)%DEBUG_FLAG_MAXD;
     CodeCount = 0;
     PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
     return KEYDOWN_CONTROL;

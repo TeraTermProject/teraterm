@@ -855,6 +855,29 @@ void SetBinary(int BinFlag)
 	DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
 }
 
+/*
+Besides I created a setdebug command to set the debug flag of teraterm.
+Usage:
+setdebug <int>
+It sets the debug flag to <int> value. <int> can be:
+0: no debug: output as usual
+1: usual teraterm debug mode (described in http://ttssh2.sourceforge.jp/manual/en/ ... -term.html)
+2: hex output. Received bytes are printed in hex format (capital letters) separated by a space
+3: disable output completely
+
+cf. http://logmett.com/forum/viewtopic.php?f=3&t=999
+    http://logmett.com/forum/viewtopic.php?f=3&t=996
+*/
+void SetDebug(int DebugFlag)
+{
+  char Cmd[3];
+
+  Cmd[0] = CmdSetDebug;
+  Cmd[1] = DebugFlag+'0';
+  Cmd[2] = 0;
+  DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
+}
+
 void SetAppend(int AppendFlag)
 {
 	char Cmd[18];

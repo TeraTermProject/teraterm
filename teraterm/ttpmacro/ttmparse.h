@@ -214,6 +214,10 @@
 #define RsvALShift      171 // arithmetic left shift
 #define RsvLRShift      172 // logical right shift
 
+#define RsvWaitInt		173
+#define RsvSendInt      174
+#define RsvSetDebug     175
+
 // integer type for buffer pointer
 typedef DWORD BINT;
 

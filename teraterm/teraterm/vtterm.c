@@ -603,8 +603,21 @@ void PutKanji(BYTE b)
 
 void PutDebugChar(BYTE b)
 {
+	static BYTE buff[3];
+	int i = 0;
+
+	if (DebugFlag!=DEBUG_FLAG_NONE) {
   InsertMode = FALSE;
   AutoWrapMode = TRUE;
+
+	  if (DebugFlag==DEBUG_FLAG_HEXD) {
+		_snprintf(buff,3,"%02X",(unsigned int) b);
+
+		for (;i<2;i++)
+			PutChar(buff[i]);
+		PutChar(' ');
+	  }
+	  else if (DebugFlag==DEBUG_FLAG_NORM) {
 
   if ((b & 0x80) == 0x80)
   {
@@ -628,12 +641,14 @@ void PutDebugChar(BYTE b)
   }
   else
     PutChar(b);
+	  }
 
   if (CharAttr.Attr != AttrDefault)
   {
     UpdateStr();
     CharAttr.Attr = AttrDefault;
   }
+	}
 }
 
 void PrnParseControl(BYTE b) // printer mode
@@ -3480,7 +3495,7 @@ int VTParse()
 
   while ((c>0) && (ChangeEmu==0))
   {
-    if (DebugFlag)
+    if (DebugFlag!=DEBUG_FLAG_NONE)
       PutDebugChar(b);
     else {
       switch (ParseMode) {

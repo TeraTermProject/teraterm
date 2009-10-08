@@ -12,6 +12,12 @@ extern "C" {
 #define KEYDOWN_CONTROL	2	/* Ctrl,Shift‚È‚Ç */
 #define KEYDOWN_OTHER	0	/* ‚»‚Ì‘¼ */
 
+#define DEBUG_FLAG_NONE  0
+#define DEBUG_FLAG_NORM  1
+#define DEBUG_FLAG_HEXD  2
+#define DEBUG_FLAG_NOUT  3
+#define DEBUG_FLAG_MAXD  4
+
 void SetKeyMap();
 void ClearUserKey();
 void DefineUserKey(int NewKeyId, PCHAR NewKeyStr, int NewKeyLen);
@@ -29,7 +35,7 @@ void EndKeyboard();
 extern BOOL AutoRepeatMode;
 extern BOOL AppliKeyMode, AppliCursorMode;
 extern BOOL Send8BitMode;
-extern BOOL DebugFlag;
+extern BYTE DebugFlag;
 
 #ifdef __cplusplus
 }

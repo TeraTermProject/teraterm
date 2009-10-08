@@ -264,6 +264,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"sendln")==0) *WordId = RsvSendLn;
 		else if (_stricmp(Str,"setbaud")==0) *WordId = RsvSetBaud;
 		else if (_stricmp(Str,"setdate")==0) *WordId = RsvSetDate;
+		else if (_stricmp(Str,"setdebug")==0) *WordId = RsvSetDebug;
 		else if (_stricmp(Str,"setdir")==0) *WordId = RsvSetDir;
 		else if (_stricmp(Str,"setdlgpos")==0) *WordId = RsvSetDlgPos;
 		else if (_stricmp(Str,"setdtr")==0) *WordId = RsvSetDtr;    // add 'setdtr'  (2008.3.12 maya)

@@ -15,6 +15,7 @@
 #include "ttsetup.h"
 #include "telnet.h"
 #include "ttlib.h"
+#include "keyboard.h"
 
 #include "ttdde.h"
 #include "commlib.h"
@@ -329,6 +330,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdSendBroadcast  'O'
 #define CmdSendMulticast  'P'
 #define CmdSetMulticastName  'Q'
+#define CmdSetDebug     'R'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -583,6 +585,9 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		ts.LocalEcho = ParamBinaryFlag;
 		if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
 			TelChangeEcho();
+		break;
+	case CmdSetDebug:
+		DebugFlag = (Command[1]-'0')%DEBUG_FLAG_MAXD;
 		break;
 	case CmdSetTitle:
 		strncpy_s(ts.Title, sizeof(ts.Title),ParamFileName, _TRUNCATE);

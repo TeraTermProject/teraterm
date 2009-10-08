@@ -55,6 +55,7 @@
 #define CmdSendBroadcast  'O'
 #define CmdSendMulticast  'P'
 #define CmdSetMulticastName  'Q'
+#define CmdSetDebug  'R'
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,6 +82,7 @@ int Wait4all();
 void SetFile(PCHAR FN);
 void SetSecondFile(PCHAR FN);
 void SetBinary(int BinFlag);
+void SetDebug(int DebugFlag);
 void SetAppend(int AppendFlag);
 void SetXOption(int XOption);
 void SendSync();
