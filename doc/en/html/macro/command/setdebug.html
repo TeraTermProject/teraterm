@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>setdebug</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setdebug</h1>
+
+<p>
+Configures the debug mode to Tera Term.
+</p>
+
+<pre class="macro-syntax">
+setdebug &lt;flag&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Set the debug flag of Tera Term by using below flags. It is possible to wait the control code to enabling the debug mode.
+<br>
+<br>
+
+0: no debug: output as usual<br>
+1: usual teraterm debug mode (described in <a href="../../setup/teraterm-term.html#displayall">here</a>)<br>
+2: hex output. Received bytes are printed in hex format (capital letters) separated by a space<br>
+3: disable output completely<br>
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+setdebug 2
+wait '09 0D 0A'
+setdebug 0
+</pre>
+
+<h2>Reference</h2>
+
+<a href="wait.html">wait</a><br>
+
+</body>
+</html>

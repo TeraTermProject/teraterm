@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>setdebug</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setdebug</h1>
+
+<p>
+デバッグモードを設定する。
+</p>
+
+<pre class="macro-syntax">
+setdebug &lt;flag&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+以下のフラグにより、Tera Termのデバッグモードを設定する。デバッグモードを有効にすることで、"wait"コマンドで「制御コード」を待つことができる。
+<br>
+<br>
+
+0: デバッグモード無効。通常出力を行う。<br>
+1: 従来のデバッグモード（詳細は<a href="../../setup/teraterm-term.html#displayall">こちら</a>）<br>
+2: 16進出力モード。受信データを大文字の16進数で、空白をあけて表示する。<br>
+3: 出力を一切しない。<br>
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+setdebug 2
+wait '09 0D 0A'
+setdebug 0
+</pre>
+
+<h2>参照</h2>
+
+<a href="wait.html">wait</a><br>
+
+</body>
+</html>

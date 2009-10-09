@@ -251,6 +251,7 @@ HlpMacroCommandSetdate=html\macro\command\setdate.html
 HlpMacroCommandSetdir=html\macro\command\setdir.html
 HlpMacroCommandSetdlgpos=html\macro\command\setdlgpos.html
 HlpMacroCommandSetbaud=html\macro\command\setbaud.html
+HlpMacroCommandSetDebug=html\macro\command\setdebug.html
 HlpMacroCommandSetdtr=html\macro\command\setdtr.html
 HlpMacroCommandSetecho=html\macro\command\setecho.html
 HlpMacroCommandSetenv=html\macro\command\setenv.html
