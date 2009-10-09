@@ -4547,6 +4547,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	static int prev_instances = 0;
 	// for status bar
 	static HWND hStatus = NULL;
+	static int init_width, init_height;
 
 	switch (msg) {
 		case WM_SHOWWINDOW:
@@ -4628,6 +4629,11 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			GetDlgItemText(hWnd, IDCANCEL, uimsg, sizeof(uimsg));
 			get_lang_msg("BTN_CLOSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 			SetDlgItemText(hWnd, IDCANCEL, ts.UIMsg);
+
+			// ダイアログの初期サイズを保存
+			GetWindowRect(hWnd, &rc_dlg);
+			init_width = rc_dlg.right - rc_dlg.left;
+			init_height = rc_dlg.bottom - rc_dlg.top;
 
 			// 現在サイズから必要な値を計算
 			GetClientRect(hWnd,                                 &rc_dlg);
@@ -4867,6 +4873,16 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				SendMessage(hStatus , msg , wp , lp);
 			}
 			return TRUE;
+
+		case WM_GETMINMAXINFO:
+			{
+				// ダイアログの初期サイズより小さくできないようにする
+				LPMINMAXINFO lpmmi;
+				lpmmi = (LPMINMAXINFO)lp;
+				lpmmi->ptMinTrackSize.x = init_width;
+				lpmmi->ptMinTrackSize.y = init_height;
+			}
+			return FALSE;
 
 		case WM_TIMER:
 			{

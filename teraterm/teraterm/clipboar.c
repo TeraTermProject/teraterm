@@ -280,6 +280,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	RECT rc_edit, rc_ok, rc_cancel, rc_info;
 	// for status bar
 	static HWND hStatus = NULL;
+	static init_width, init_height;
 
 	switch (msg) {
 		case WM_INITDIALOG:
@@ -362,6 +363,11 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 			SetWindowPos(hDlgWnd, NULL, p.x, p.y,
 			             0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+			// ダイアログの初期サイズを保存
+			GetWindowRect(hDlgWnd, &rc_dlg);
+			init_width = rc_dlg.right - rc_dlg.left;
+			init_height = rc_dlg.bottom - rc_dlg.top;
 
 			// 現在サイズから必要な値を計算
 			GetClientRect(hDlgWnd,                                 &rc_dlg);
@@ -495,6 +501,16 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				SendMessage(hStatus , msg , wp , lp);
 			}
 			return TRUE;
+
+		case WM_GETMINMAXINFO:
+			{
+				// ダイアログの初期サイズより小さくできないようにする
+				LPMINMAXINFO lpmmi;
+				lpmmi = (LPMINMAXINFO)lp;
+				lpmmi->ptMinTrackSize.x = init_width;
+				lpmmi->ptMinTrackSize.y = init_height;
+			}
+			return FALSE;
 
 		default:
 			return FALSE;
