@@ -2424,6 +2424,13 @@ void DispReleaseDC()
   VTDC = NULL;
 }
 
+#define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
+#define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
+#define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
+#define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))
+#define isForeColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Fore))
+#define isBackColored(x) ((ts.ColorFlag & CF_ANSICOLOR) && ((x).Attr2 & Attr2Back))
+
 void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 // Setup device context
 //   Attr: character attributes
@@ -2440,10 +2447,10 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
   DCAttr = Attr;
   DCReverse = Reverse;
      
-  SelectObject(VTDC, VTFont[Attr.Attr & AttrFontMask]);
+  SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | (isURLColored(Attr)?AttrUnder:0)]);
 
   if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
-	if ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink)) {
+	if (isBlinkColored(Attr)) {
 #ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGVTBlinkColor[0];
 	  BackColor = BGVTBlinkColor[1];
@@ -2452,7 +2459,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	  BackColor = ts.VTBlinkColor[1];
 #endif
 	}
-	else if ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold)) {
+	else if (isBoldColored(Attr)) {
 #ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGVTBoldColor[0];
 	  BackColor = BGVTBoldColor[1];
@@ -2462,7 +2469,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 #endif
 	}
     /* begin - ishizaki */
-	else if ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL)) {
+	else if (isURLColored(Attr)) {
 #ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGURLColor[0];
 	  BackColor = BGURLColor[1];
@@ -2473,7 +2480,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	}
     /* end - ishizaki */
 	else {
-	  if ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) {
+	  if (isForeColored(Attr)) {
 		TextColor = ANSIColor[Attr.Fore];
 	  }
 	  else {
@@ -2485,7 +2492,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 		NoReverseColor = 1;
 	  }
 
-	  if ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) {
+	  if (isBackColored(Attr)) {
 		BackColor = ANSIColor[Attr.Back];
 	  }
 	  else {
@@ -2501,7 +2508,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	}
   }
   else { // full color
-	if ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Fore)) {
+	if (isForeColored(Attr)) {
 	  if (Attr.Fore<8 && (ts.ColorFlag&CF_PCBOLD16)) {
 	    if (((Attr.Attr&AttrBold)!=0) == (Attr.Fore!=0)) {
 	      TextColor = ANSIColor[Attr.Fore];
@@ -2517,27 +2524,27 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    TextColor = ANSIColor[Attr.Fore];
 	  }
 	}
-	else if ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink))
+	else if (isBlinkColored(Attr))
 #ifdef ALPHABLEND_TYPE2 // AKASI
 	  TextColor = BGVTBlinkColor[0];
-	else if ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold))
+	else if (isBoldColored(Attr))
 	  TextColor = BGVTBoldColor[0];
-	else if ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL))
+	else if (isURLColored(Attr))
 	  TextColor = BGURLColor[0];
 	else {
 	  TextColor = BGVTColor[0];
 #else
 	  TextColor = ts.VTBlinkColor[0];
-	else if ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold))
+	else if (isBoldColored(Attr))
 	  TextColor = ts.VTBoldColor[0];
-	else if ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL))
+	else if (isURLColored(Attr))
 	  TextColor = ts.URLColor[0];
 	else {
 	  TextColor = ts.VTColor[0];
 #endif
 	  NoReverseColor = 1;
 	}
-	if ((ts.ColorFlag & CF_ANSICOLOR) && (Attr.Attr2 & Attr2Back)) {
+	if (isBackColored(Attr)) {
 	  if (Attr.Back<8 && (ts.ColorFlag&CF_PCBOLD16)) {
 	    if (((Attr.Attr&AttrBlink)!=0) == (Attr.Back!=0)) {
 	      BackColor = ANSIColor[Attr.Back];
@@ -2553,20 +2560,20 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	    BackColor = ANSIColor[Attr.Back];
 	  }
 	}
-	else if ((ts.ColorFlag & CF_BLINKCOLOR) && (Attr.Attr & AttrBlink))
+	else if (isBlinkColored(Attr))
 #ifdef ALPHABLEND_TYPE2 // AKASI
 	  BackColor = BGVTBlinkColor[1];
-	else if ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold))
+	else if (isBoldColored(Attr))
 	  BackColor = BGVTBoldColor[1];
-	else if ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL))
+	else if (isURLColored(Attr))
 	  BackColor = BGURLColor[1];
 	else {
 	  BackColor = BGVTColor[1];
 #else
 	  BackColor = ts.VTBlinkColor[1];
-	else if ((ts.ColorFlag & CF_BOLDCOLOR) && (Attr.Attr & AttrBold))
+	else if (isBoldkColored(Attr))
 	  BackColor = ts.VTBoldColor[1];
-	else if ((ts.ColorFlag & CF_URLCOLOR) && (Attr.Attr & AttrURL))
+	else if (isURLColored(Attr))
 	  BackColor = ts.URLColor[1];
 	else {
 	  BackColor = ts.VTColor[1];

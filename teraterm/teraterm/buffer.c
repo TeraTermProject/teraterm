@@ -1380,7 +1380,7 @@ static void markURL(int x)
 	if (x == 0) {
 		if (AttrLine > AttrBuff && (AttrLine[x-1] & AttrURL)) {
 			if (!(ch & 0x80 || url_char[ch]==0)) { // ‚©‚ÂURL\¬•¶Žš‚È‚ç
-				AttrLine[x] |= (AttrURL | AttrUnder); 
+				AttrLine[x] |= AttrURL; 
 			}
 		}
 		return;
@@ -1389,7 +1389,7 @@ static void markURL(int x)
 	if ((x-1>=0) && (AttrLine[x-1] & AttrURL) &&
 		!(ch & 0x80 || url_char[ch]==0)) {
 //		!((CodeLine[x] <= ' ') && !(AttrLine[x] & AttrKanji))) {
-			AttrLine[x] |= (AttrURL | AttrUnder); 
+			AttrLine[x] |= AttrURL; 
 		return;
 	}
 
@@ -1403,7 +1403,7 @@ static void markURL(int x)
 			len = strlen(*p) - 1;
 			if ((x-len>=0) && !strncmp(&CodeLine[x-len], *p, len)) {
 				for (i = 0; i <= len; i++) {
-					AttrLine[x-i] |= (AttrURL | AttrUnder); 
+					AttrLine[x-i] |= AttrURL; 
 				}
 				break;
 			}
