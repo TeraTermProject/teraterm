@@ -151,12 +151,12 @@ int FWD_compare_specs(void const FAR * void_spec1, void const FAR * void_spec2);
 void FWD_prep_forwarding(PTInstVar pvar);
 void FWD_enter_interactive_mode(PTInstVar pvar);
 void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
-			  char FAR * local_hostname, int local_port,
-			  char FAR * originator, int originator_len,
-			  int *chan_num);
+              char FAR * local_hostname, int local_port,
+              char FAR * originator, int originator_len,
+              int *chan_num);
 void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
-				  char FAR * originator, int originator_len,
-				  int *chan_num);
+                  char FAR * originator, int originator_len,
+                  int *chan_num);
 void FWD_confirmed_open(PTInstVar pvar, uint32 local_channel_num,
   uint32 remote_channel_num);
 void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num);
