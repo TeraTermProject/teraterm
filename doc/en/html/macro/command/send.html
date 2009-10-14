@@ -40,6 +40,19 @@ myname='Tera Term'
 send 'My name is ' myname '.'
 </pre>
 
+
+<pre class="macro-example">
+/* "CTRL+C" is 3 in binary so just send 3 like so.
+ * 
+ * CTRL+A = 1, CTRL+B = 2.................. CTRL+Z = 26.
+ */
+send #3
+
+/* Send the tab code. */
+send #9
+</pre>
+
+
 <p>
 See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
 </p>

@@ -39,6 +39,19 @@ myname='Tera Term'
 send 'My name is ' myname '.'
 </pre>
 
+
+<pre class="macro-example">
+/* "CTRL+C"を送るには、以下のように直接"3"を指定する。
+ * 
+ * CTRL+A = 1, CTRL+B = 2.................. CTRL+Z = 26.
+ */
+send #3
+
+/* TABコードを送る */
+send #9
+</pre>
+
+
 <p>
 同期モードについては "<a href="setsync.html">setsync</a>" を参照。
 </p>
