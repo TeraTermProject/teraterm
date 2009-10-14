@@ -28,6 +28,7 @@
   <li><a href="#ttssh">TTSSHによるSSHの設計と実装</a></li>
   <li><a href="#macro">マクロ言語の設計と実装</a></li>
   <li><a href="#caret">キャレット制御</a></li>
+  <li><a href="#serial">シリアルポート</a></li>
 </ol>
 
 <hr width=80% align=center>
@@ -1092,7 +1093,114 @@ void CaretKillFocus(BOOL show)
 
 <br>
 
+
 <hr>
+
+
+<h2><a name="serial">シリアルポート</a></h2>
+  <h3>概要</h3>
+　Tera TermはUART(16550A)互換のシリアルポートに対応しているため、シリアルコンソールが使用できます。シリアルポートのことを、COM(Communication Port)ポートと呼ぶこともあります。OSが検出したCOMポートは、順に"COM1"、"COM2"といった名前が付けられ、アプリケーションから利用することができます。Microsoft Windows XPでは、最大256個のCOMポート（COM1～COM256）までが利用可能です。<br>
+　パソコンに搭載されるCOMポートは、せいぜい1つ、多くても2つであり、最近ではまったくCOMポートがないパソコンも存在します。そのため、USB接続によるシリアルポートを実現する「USBシリアル変換ケーブル」が発売されています。こういった製品の特徴として、OSに認識させるCOMポートの番号を、ユーザが自由に設定できるようになっています。すなわち、Tera Term見えには、2つのCOMポートがあった場合、それぞれ"COM1"、"COM2"として認識できるとは限らず、"COM1"、"COM7"といったふうに認識できるようになる必要があります。<br>
+　
+  <h3>COMポートのリストアップ</h3>
+　かつてのTera Termでは、"COM1"から"COM256"までのすべてのCOMポートを、接続ダイアログにリストアップしていましたが、使い勝手がよくありませんでした。そこで、接続ダイアログを呼び出したタイミングにおいて（Tera Term起動時のみでは不十分）、OSが認識しているCOMポートを検出するようにして、必要なCOMポートのみを表示させるようにしました。その検出ロジックが、DetectComPorts()#ttcmn.c です。QueryDosDevice() APIを使用し、MS-DOSデバイス名から"COM"を探します。<br>
+
+<pre class=code>
+	if (((h = GetModuleHandle("kernel32.dll")) != NULL) &&
+	    (GetProcAddress(h, "QueryDosDeviceA") != NULL) &&
+	    (QueryDosDevice(NULL, devicesBuff, 65535) != 0)) {
+		p = devicesBuff;
+		while (*p != '\0') {
+			if (strncmp(p, "COM", 3) == 0 && p[3] != '\0') {
+				ComPortTable[comports++] = atoi(p+3);
+				if (comports >= ComPortMax)
+					break;
+			}
+			p += (strlen(p)+1);
+		}
+</pre>
+
+  <h3>COMポートのフルネーム取得</h3>
+
+　上記の処理だけでもユーザビリティは向上するのですが、さらなる欲求として、各COMポートに付けられる「フルネーム」を同時に表示したくなります。COMポートの番号とともに、フルネームも付加表示できると、さらに使い勝手がよくなることが期待されます。この課題を解決するのが、ListupSerialPort()#ttcmn.c です。<br>
+　
+<pre class=code>
+static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDesc, int ComPortMax)
+{
+	GUID ClassGuid[1];
+	DWORD dwRequiredSize;
+	BOOL bRet;
+	HDEVINFO DeviceInfoSet = NULL;
+	SP_DEVINFO_DATA DeviceInfoData;
+	DWORD dwMemberIndex = 0;
+	int i;
+
+	DeviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+	bRet =
+		SetupDiClassGuidsFromName(_T("PORTS"), (LPGUID) & ClassGuid, 1,
+		                          &dwRequiredSize);
+	if (!bRet) {
+		goto cleanup;
+	}
+
+	DeviceInfoSet =
+		SetupDiGetClassDevs(&ClassGuid[0], NULL, NULL, DIGCF_PRESENT | DIGCF_PROFILE);
+
+	if (DeviceInfoSet) {
+		dwMemberIndex = 0;
+		while (SetupDiEnumDeviceInfo
+		       (DeviceInfoSet, dwMemberIndex++, &DeviceInfoData)) {
+			TCHAR szFriendlyName[MAX_PATH];
+			TCHAR szPortName[MAX_PATH];
+			DWORD dwReqSize = 0;
+			DWORD dwPropType;
+			DWORD dwType = REG_SZ;
+			HKEY hKey = NULL;
+
+			bRet = SetupDiGetDeviceRegistryProperty(DeviceInfoSet,
+			                                        &DeviceInfoData,
+			                                        SPDRP_FRIENDLYNAME,
+			                                        &dwPropType,
+			                                        (LPBYTE)
+			                                        szFriendlyName,
+			                                        sizeof(szFriendlyName),
+			                                        &dwReqSize);
+
+			hKey = SetupDiOpenDevRegKey(DeviceInfoSet,
+			                            &DeviceInfoData,
+			                            DICS_FLAG_GLOBAL,
+			                            0, DIREG_DEV, KEY_READ);
+			if (hKey) {
+				long lRet;
+				dwReqSize = sizeof(szPortName);
+				lRet = RegQueryValueEx(hKey,
+				                       _T("PortName"),
+				                       0,
+				                       &dwType,
+				                       (LPBYTE) & szPortName,
+				                       &dwReqSize);
+				RegCloseKey(hKey);
+			}
+
+			if (_strnicmp(szPortName, "COM", 3) == 0) {  // COMポートドライバを発見
+				int port = atoi(&szPortName[3]);
+				int i;
+
+				for (i = 0 ; i < comports ; i++) {
+					if (ComPortTable[i] == port) {  // 接続を確認
+						ComPortDesc[i] = _strdup(szFriendlyName);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+cleanup:
+	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
+}
+</pre>
 
 
 
