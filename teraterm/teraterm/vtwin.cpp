@@ -975,6 +975,7 @@ static BOOL isLogMeTTExist()
 				free(path);
 			}
 		}
+		RegCloseKey(key);
 	}
 
 	if (inregist == 0) {
