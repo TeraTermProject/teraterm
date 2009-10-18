@@ -76,5 +76,43 @@ logclose
 exit
 </pre>
 
+<pre class="macro-example">
+;
+; ログ採取をしながら、定型処理を連続実行させる。
+;
+
+getenv 'USERNAME' username
+gettime timestr "%Y%m%d-%H%M%S"
+getdir mdir
+sprintf2 filename '%s\console_%s_%s.log' mdir username timestr
+
+logopen filename 0 0
+
+step = 0
+while 1
+  call show_step
+  sendln 'echo do something'
+  wait '$'
+  pause 2
+endwhile
+
+logclose
+exit
+
+:show_step
+step = step + 1
+gettime timestr
+sprintf2 str '[%d] %s' step timestr
+statusbox str 'counter'
+return
+</pre>
+
+<h2>参照</h2>
+
+<a href="logwrite.html">logwrite</a><br>
+<a href="logclose.html">logclose</a><br>
+<a href="statusbox.html">statusbox</a><br>
+<a href="gettime.html">gettime</a><br>
+
 </body>
 </html>
