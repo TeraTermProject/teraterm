@@ -945,15 +945,43 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 }
 
 // LogMeIn.exe -> LogMeTT.exe へリネーム (2005.2.21 yutaka)
-char *LogMeTTexename = "LogMeTT.exe";
 static char LogMeTTMenuString[] = "Log&MeTT";
+static char LogMeTT[MAX_PATH];
+
 static BOOL isLogMeTTExist()
 {
-	char LogMeTT[MAX_PATH];
-	
-	strncpy_s(LogMeTT, sizeof(LogMeTT), ts.HomeDir, _TRUNCATE);
-	AppendSlash(LogMeTT, sizeof(LogMeTT));
-	strncat_s(LogMeTT, sizeof(LogMeTT), LogMeTTexename, _TRUNCATE);
+	const char *LogMeTTexename = "LogMeTT.exe";
+	LONG result;
+	HKEY key;
+	int inregist = 0;
+	DWORD dwSize;
+	DWORD dwType;
+	DWORD dwDisposition;
+	char *path;
+
+	/* LogMeTT 2.9.6からはレジストリにインストールパスが含まれる。*/
+	result = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\LogMeTT", 0, NULL,
+				REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &key, &dwDisposition);
+	if (result == ERROR_SUCCESS) {
+		result = RegQueryValueEx(key, "InstallPath", NULL, &dwType, NULL, &dwSize);
+		if (result == ERROR_SUCCESS) {
+			path = (char *)malloc(dwSize);
+			if (path != NULL) {
+				result = RegQueryValueEx(key, "InstallPath", NULL, &dwType, (LPBYTE)path, &dwSize);
+				if (result == ERROR_SUCCESS) {
+					inregist = 1;
+					strncpy_s(LogMeTT, sizeof(LogMeTT), path, _TRUNCATE);
+				}
+				free(path);
+			}
+		}
+	}
+
+	if (inregist == 0) {
+		strncpy_s(LogMeTT, sizeof(LogMeTT), ts.HomeDir, _TRUNCATE);
+		AppendSlash(LogMeTT, sizeof(LogMeTT));
+		strncat_s(LogMeTT, sizeof(LogMeTT), LogMeTTexename, _TRUNCATE);
+	}
 
 	if (_access(LogMeTT, 0) == -1) {
 		return FALSE;
@@ -3545,7 +3573,6 @@ void CVTWindow::OnLogMeInLaunch()
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-	char LogMeTT[MAX_PATH];
 
 	if (!isLogMeTTExist()) {
 		return;
@@ -3554,10 +3581,6 @@ void CVTWindow::OnLogMeInLaunch()
 	memset(&si, 0, sizeof(si));
 	GetStartupInfo(&si);
 	memset(&pi, 0, sizeof(pi));
-
-	strncpy_s(LogMeTT, sizeof(LogMeTT), ts.HomeDir, _TRUNCATE);
-	AppendSlash(LogMeTT, sizeof(LogMeTT));
-	strncat_s(LogMeTT, sizeof(LogMeTT), LogMeTTexename, _TRUNCATE);
 
 	if (CreateProcess(NULL, LogMeTT, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
