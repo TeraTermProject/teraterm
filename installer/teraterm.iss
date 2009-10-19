@@ -442,6 +442,13 @@ en.comp_TTXRecurringCommand=Recurring Command can be used
 ja.comp_TTXRecurringCommand=íËä˙ìIÇ…ï∂éöóÒÇëóêMÇ∑ÇÈ
 
 [Code]
+const
+  SHCNF_IDLIST = $0000;
+  SHCNE_ASSOCCHANGED = $08000000;
+
+procedure SHChangeNotify(wEventId, uFlags, dwItem1, dwItem2: Integer);
+external 'SHChangeNotify@shell32.dll stdcall';
+
 var
   UILangFilePage: TInputOptionWizardPage;
 
@@ -772,6 +779,8 @@ begin
           RegDeleteValue(HKEY_CLASSES_ROOT, 'telnet\shell', '');
         end;
 
+      SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+      
       end; // ssDone
    end; // case CurStep of
 end; // CurStepChanged
@@ -827,7 +836,9 @@ begin
             RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\ShinpeiTools');
           end;
         end;
-
+        
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+        
         // directory is deleted only if empty
         RemoveDir(app);
       end;
