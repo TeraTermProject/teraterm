@@ -393,7 +393,7 @@ ja.task_quickcyglaunch=クイック起動に cyg&launch のショートカットを作る
 ja.task_macroassoc=.&ttl ファイルを ttpmacro.exe に関連付ける
 ja.task_telnetassoc=t&elnet プロトコルを ttermpro.exe に関連付ける
 ja.task_sshassoc=&ssh プロトコルを ttermpro.exe に関連付ける
-ja.task_ttyplayassoc=.tty ファイルを ttermpro.exe に関連付ける
+ja.task_ttyplayassoc=.tty ファイルを tterm&pro.exe に関連付ける
 en.type_standard=Standard installation
 en.type_full=Full installation
 en.type_compact=Compact installation
@@ -778,7 +778,7 @@ begin
           RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'telnet\shell\Open with Tera Term');
           RegDeleteValue(HKEY_CLASSES_ROOT, 'telnet\shell', '');
         end;
-
+        
       SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
       
       end; // ssDone
