@@ -72,7 +72,7 @@ Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: ..\libs\logmett\Setup_LogMeTT_2_9_6.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
+Source: ..\libs\logmett\Setup_LogMeTT_2_9_6_19-10-2009.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -369,7 +369,7 @@ Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_
 
 [Run]
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
-Filename: {tmp}\Setup_LogMeTT_2_9_6.exe; Components: LogMeTT
+Filename: {tmp}\Setup_LogMeTT_2_9_6_19-10-2009.exe; Components: LogMeTT
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
 Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
 
@@ -778,9 +778,9 @@ begin
           RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'telnet\shell\Open with Tera Term');
           RegDeleteValue(HKEY_CLASSES_ROOT, 'telnet\shell', '');
         end;
-        
+
       SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
-      
+
       end; // ssDone
    end; // case CurStep of
 end; // CurStepChanged
@@ -836,9 +836,9 @@ begin
             RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\ShinpeiTools');
           end;
         end;
-        
+
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
-        
+
         // directory is deleted only if empty
         RemoveDir(app);
       end;
