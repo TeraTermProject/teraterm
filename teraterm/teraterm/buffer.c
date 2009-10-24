@@ -1708,6 +1708,7 @@ void UpdateStr()
 {
 	int X, Y;
 	TCharAttr TempAttr;
+	int pos, len;
 
 	if (StrChangeCount==0) {
 		return;
@@ -1723,8 +1724,37 @@ void UpdateStr()
 	TempAttr.Attr2 = AttrLine2[StrChangeStart];
 	TempAttr.Fore = AttrLineFG[StrChangeStart];
 	TempAttr.Back = AttrLineBG[StrChangeStart];
-	DispSetupDC(TempAttr, FALSE);
-	DispStr(&CodeLine[StrChangeStart],StrChangeCount,Y, &X);
+
+	/* これから描画する文字列の始まりが「URL構成文字属性」だった場合、
+	 * 当該色で行末までペイントされないようにする。
+	 * (2009.10.24 yutaka)
+	 */
+	if (TempAttr.Attr == AttrURL) {
+		/* 開始位置からどこまでが AttrURL かをカウントする */
+		len = 0;
+		for (pos = 0 ; pos < StrChangeCount ; pos++) {
+			if (TempAttr.Attr != AttrLine[StrChangeStart + pos])
+				break;
+			len++;
+		}
+		DispSetupDC(TempAttr, FALSE);
+		DispStr(&CodeLine[StrChangeStart], len, Y, &X);
+
+		/* 残りの文字列があれば、ふつうに描画を行う。*/
+		if (len < StrChangeCount) {
+			TempAttr.Attr = AttrLine[StrChangeStart + pos];
+			TempAttr.Attr2 = AttrLine2[StrChangeStart + pos];
+			TempAttr.Fore = AttrLineFG[StrChangeStart + pos];
+			TempAttr.Back = AttrLineBG[StrChangeStart + pos];
+
+			DispSetupDC(TempAttr, FALSE);
+			DispStr(&CodeLine[StrChangeStart + pos], (StrChangeCount - len), Y, &X);
+		}
+	} else {
+		DispSetupDC(TempAttr, FALSE);
+		DispStr(&CodeLine[StrChangeStart],StrChangeCount,Y, &X);
+	}
+
 	StrChangeCount = 0;
 }
 
