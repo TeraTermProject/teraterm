@@ -30,7 +30,7 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.64">2009.10.9 (Ver 4.64 unreleased)</a></h3>
+<h3><a name="teraterm_4.64">2009.10.24 (Ver 4.64 unreleased)</a></h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -49,10 +49,10 @@
     <ul>
       <li>接続前に行ったローカルエコーと送信改行コードの設定が無視される事があるのを修正した。</li>
       <li>シリアル接続時に、前の接続で使われたTCPLocalEcho/TCPCRSendの設定がリセットされないのを修正した。</li>
-      <li>ログウィンドウを表示しないでログ採取を開始したとき、表示されていないログウィンドウにフォーカスがいってしまうのを修正した。</li>
-      <li>マクロコマンド "<a href="../macro/command/strscan.html">strscan</a>" が正しく働かない場合があるのを修正した。</li>
+      <li>ログウィンドウを表示しないでログ採取を開始したとき、表示されていないログウィンドウにフォーカスが移行してしまう問題を修正した。</li>
+      <li>マクロコマンド "<a href="../macro/command/strscan.html">strscan</a>" が正しく働かない場合がある問題を修正した。</li>
       <li>マクロのC言語風コメントにおいて、正しくコメントを識別しないケースに対応した。</li>
-      <li>ウィンドウタイトルでTCPポート番号が正しく表示されない場合があるのを修正した。</li>
+      <li>ウィンドウタイトルでTCPポート番号が正しく表示されない場合がある問題を修正した。</li>
     </ul>
   </li>
 
@@ -64,7 +64,10 @@
         </ul></li>
       <li><a href="#ttssh_2.52">SSH2対応TTSSH(2.52)</a>へ差し替えた。</li>
       <li><a href="#ttproxy_1.0.0.16">TTProxy(1.0.0.16)</a>へ差し替えた。</li>
-      <li>LogMeTT 2.9.6へ差し替えた。</li>
+      <li>LogMeTT 2.9.6へ差し替えた。
+       <ul>
+        <li>LogMeTTのインストール検出をレジストリ(HKEY_CURRENT_USER\Software\LogMeTT\InstallPath)で行うようにした。</li>
+       </ul></li>
     </ul>
   </li>
 </ul>
