@@ -508,6 +508,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "EnableURLColor", FName, TRUE))
 		ts->ColorFlag |= CF_URLCOLOR;
 
+	if (GetOnOff(Section, "URLUnderline", FName, TRUE))
+		ts->ColorFlag |= CF_URLUNDERLINE;
+
 	/* TEK Color */
 	GetPrivateProfileString(Section, "TEKColor", "0,0,0,255,255,255",
 	                        Temp, sizeof(Temp), FName);
@@ -1723,6 +1726,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           (WORD) (ts->ColorFlag & CF_REVERSECOLOR));
 
 	WriteOnOff(Section, "EnableURLColor", FName,
+	           (WORD) (ts->ColorFlag & CF_URLCOLOR));
+
+	WriteOnOff(Section, "URLUnderline", FName,
 	           (WORD) (ts->ColorFlag & CF_URLCOLOR));
 
 	WriteOnOff(Section, "EnableANSIColor", FName,

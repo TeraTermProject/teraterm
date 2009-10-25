@@ -2425,6 +2425,7 @@ void DispReleaseDC()
 }
 
 #define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
+#define isURLUnderlined(x) ((ts.ColorFlag & CF_URLUNDERLINE) && (ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
 #define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
 #define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
 #define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))
@@ -2447,7 +2448,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
   DCAttr = Attr;
   DCReverse = Reverse;
      
-  SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | (isURLColored(Attr)?AttrUnder:0)]);
+  SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | (isURLUnderlined(Attr)?AttrUnder:0)]);
 
   if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
 	if (isBlinkColored(Attr)) {
