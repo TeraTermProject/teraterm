@@ -1729,7 +1729,7 @@ void UpdateStr()
 	 * 当該色で行末までペイントされないようにする。
 	 * (2009.10.24 yutaka)
 	 */
-	if (TempAttr.Attr == AttrURL) {
+	if (TempAttr.Attr & AttrURL) {
 		/* 開始位置からどこまでが AttrURL かをカウントする */
 		len = 0;
 		for (pos = 0 ; pos < StrChangeCount ; pos++) {
