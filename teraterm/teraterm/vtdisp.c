@@ -2424,7 +2424,7 @@ void DispReleaseDC()
 }
 
 #define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
-#define isURLUnderlined(x) ((ts.FontFlag & FF_URLUNDERLINE) && (ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
+#define isURLUnderlined(x) ((ts.FontFlag & FF_URLUNDERLINE) && ((x).Attr & AttrURL))
 #define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
 #define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
 #define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))
