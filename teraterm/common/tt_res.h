@@ -95,6 +95,7 @@
 #define IDC_ENABLE_URL_COLOR            1072
 #define IDC_ENABLE_ANSI_COLOR           1073
 #define IDC_DISABLE_PASTE_MBUTTON       1074
+#define IDC_URL_UNDERLINE               1075
 #define IDD_PRNABORTDLG                 2100
 #define IDD_FILETRANSDLG                2200
 #define IDC_TRANSFNAME                  2201

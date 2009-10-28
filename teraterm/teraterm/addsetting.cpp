@@ -550,6 +550,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_ENABLE_ATTR_COLOR_REVERSE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ENABLE_URL_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ENABLE_ANSI_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_URL_UNDERLINE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgVisualFont = NULL;
@@ -588,6 +589,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_ENABLE_ANSI_COLOR, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_ANSI", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ENABLE_ANSI_COLOR, ts.UIMsg);
+	GetDlgItemText(IDC_URL_UNDERLINE, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_URLUL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_URL_UNDERLINE, ts.UIMsg);
 
 	// (1)AlphaBlend
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlend);
@@ -636,6 +640,10 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	// (9)Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ANSI_COLOR);
 	btn->SetCheck((ts.ColorFlag&CF_ANSICOLOR) != 0);
+
+	// (10)URL Underline
+	btn = (CButton *)GetDlgItem(IDC_URL_UNDERLINE);
+	btn->SetCheck((ts.FontFlag&FF_URLUNDERLINE) != 0);
 
 	// ダイアログにフォーカスを当てる 
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND));
@@ -818,6 +826,12 @@ void CVisualPropPageDlg::OnOK()
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ANSI_COLOR);
 	if (((ts.ColorFlag & CF_ANSICOLOR) != 0) != btn->GetCheck()) {
 		ts.ColorFlag ^= CF_ANSICOLOR;
+	}
+
+	// (10) URL Underline
+	btn = (CButton *)GetDlgItem(IDC_URL_UNDERLINE);
+	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != btn->GetCheck()) {
+		ts.FontFlag ^= FF_URLUNDERLINE;
 	}
 
 	// 2006/03/11 by 337 : Alpha値も即時変更

@@ -184,6 +184,7 @@ DLG_TAB_VISUAL_BLINK=Enable B&link attribute color
 DLG_TAB_VISUAL_REVERSE=Enable Re&verse attribute color
 DLG_TAB_VISUAL_URL=Enable &URL attribute color
 DLG_TAB_VISUAL_ANSI=Enable A&NSI color
+DLG_TAB_VISUAL_URLUL=Un&derline URL string
 
 DLG_TAB_LOG_EDITOR=&Auswahl Editor
 DLG_TAB_LOG_FILENAME=&Standardprotokoll Name

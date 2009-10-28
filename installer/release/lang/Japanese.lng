@@ -185,6 +185,7 @@ DLG_TAB_VISUAL_BLINK=点滅属性色を有効にする(&L)
 DLG_TAB_VISUAL_REVERSE=反転属性色を有効にする(&V)
 DLG_TAB_VISUAL_URL=URL属性色を有効にする(&U)
 DLG_TAB_VISUAL_ANSI=ANSIカラーを有効にする(&N)
+DLG_TAB_VISUAL_URLUL=URL文字列に下線を付加する(&D)
 
 DLG_TAB_LOG_EDITOR=ログ表示用エディタ(&E)
 DLG_TAB_LOG_FILENAME=標準ログファイル名(strftimeフォーマット可) (&F)
