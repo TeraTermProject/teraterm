@@ -205,6 +205,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->MenuFlag = 0;			// Menu flags
 	ts->TermFlag = 0;			// Terminal flag
 	ts->ColorFlag = 0;			// ANSI/Attribute color flags
+	ts->FontFlag = 0;			// Font flag
 	ts->PortFlag = 0;			// Port flags
 	ts->WindowFlag = 0;			// Window flags
 	ts->TelPort = 23;
@@ -509,7 +510,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->ColorFlag |= CF_URLCOLOR;
 
 	if (GetOnOff(Section, "URLUnderline", FName, TRUE))
-		ts->ColorFlag |= CF_URLUNDERLINE;
+		ts->FontFlag |= FF_URLUNDERLINE;
 
 	/* TEK Color */
 	GetPrivateProfileString(Section, "TEKColor", "0,0,0,255,255,255",
@@ -597,7 +598,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	GetNthNum(Temp, 4, &(ts->VTFontCharSet));
 
 	/* Bold font flag */
-	ts->EnableBold = GetOnOff(Section, "EnableBold", FName, TRUE);
+	if (GetOnOff(Section, "EnableBold", FName, TRUE))
+		ts->FontFlag |= FF_BOLD;
 
 	/* Russian character set (font) */
 	GetPrivateProfileString(Section, "RussFont", "",
@@ -1729,7 +1731,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           (WORD) (ts->ColorFlag & CF_URLCOLOR));
 
 	WriteOnOff(Section, "URLUnderline", FName,
-	           (WORD) (ts->ColorFlag & CF_URLUNDERLINE));
+	           (WORD) (ts->FontFlag & FF_URLUNDERLINE));
 
 	WriteOnOff(Section, "EnableANSIColor", FName,
 	           (WORD) (ts->ColorFlag & CF_ANSICOLOR));
@@ -1753,7 +1755,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	          ts->VTFontCharSet);
 
 	/* Enable bold font flag */
-	WriteOnOff(Section, "EnableBold", FName, ts->EnableBold);
+	WriteOnOff(Section, "EnableBold", FName,
+		(WORD) (ts->FontFlag & FF_BOLD));
 
 	/* Russian character set (font) */
 	id2str(RussList, ts->RussFont, IdWindows, Temp, sizeof(Temp));

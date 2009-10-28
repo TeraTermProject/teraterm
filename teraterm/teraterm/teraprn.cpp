@@ -281,7 +281,7 @@ int VTPrintInit(int PrnFlag)
 	Prnlf.lfUnderline = 1;
 	PrnFont[AttrUnder] = CreateFontIndirect(&Prnlf);
 
-	if (ts.EnableBold > 0) {
+	if (ts.FontFlag & FF_BOLD) {
 		/* Bold */
 		Prnlf.lfUnderline = 0;
 		Prnlf.lfWeight = FW_BOLD;

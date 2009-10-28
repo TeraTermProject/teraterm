@@ -1889,8 +1889,7 @@ void ChangeFont()
   VTlf.lfUnderline = 1;
   VTFont[AttrUnder] = CreateFontIndirect(&VTlf);
 
-  if (ts.EnableBold>0)
-  {
+  if (ts.FontFlag & FF_BOLD) {
     /* Bold */
     VTlf.lfUnderline = 0;
     VTlf.lfWeight = FW_BOLD;
@@ -2425,7 +2424,7 @@ void DispReleaseDC()
 }
 
 #define isURLColored(x) ((ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
-#define isURLUnderlined(x) ((ts.ColorFlag & CF_URLUNDERLINE) && (ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
+#define isURLUnderlined(x) ((ts.FontFlag & FF_URLUNDERLINE) && (ts.ColorFlag & CF_URLCOLOR) && ((x).Attr & AttrURL))
 #define isBoldColored(x) ((ts.ColorFlag & CF_BOLDCOLOR) && ((x).Attr & AttrBold))
 #define isBlinkColored(x) ((ts.ColorFlag & CF_BLINKCOLOR) && ((x).Attr & AttrBlink))
 #define isReverseColored(x) ((ts.ColorFlag & CF_REVERSECOLOR) && ((x).Attr & AttrReverse))

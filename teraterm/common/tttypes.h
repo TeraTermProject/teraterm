@@ -196,7 +196,18 @@ typedef TCharAttr *PCharAttr;
 
 #define CF_USETEXTCOLOR 256
 #define CF_REVERSEVIDEO 512
-#define CF_URLUNDERLINE 1024
+
+// Font flags (used in ts.FontFlag)
+#define FF_BOLD         1
+#define FF_FAINT        2   // Not used
+#define FF_ITALIC       4   // Not used
+#define FF_UNDERLINE    8   // Not used
+#define FF_BLINK        16  // Not used
+#define FF_RAPIDBLINK   32  // Not used
+#define FF_REVERSE      64  // Not used
+#define FF_INVISIBLE    128 // Not used
+#define FF_STRIKEOUT    256 // Not used
+#define FF_URLUNDERLINE 512
 
 // port flags (used in ts.PortFlag)
 #define PF_CONFIRMDISCONN 1
@@ -270,7 +281,7 @@ struct tttset {
 	char PrnDev[80];
 	WORD PassThruDelay;
 	WORD PrnConvFF;
-	WORD EnableBold;
+	WORD FontFlag;
 	WORD RussFont;
 	int ScrollThreshold;
 	WORD Debug;

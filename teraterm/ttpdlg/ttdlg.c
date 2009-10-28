@@ -799,7 +799,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SetRB(Dialog,ts->UseNormalBGColor,IDC_WINUSENORMALBG,IDC_WINUSENORMALBG);
 #endif
 				ShowDlgItem(Dialog, IDC_FONTBOLD, IDC_FONTBOLD);
-				SetRB(Dialog, ts->EnableBold, IDC_FONTBOLD,IDC_FONTBOLD);
+				SetRB(Dialog, (ts->FontFlag & FF_BOLD) > 0, IDC_FONTBOLD,IDC_FONTBOLD);
 			}
 			else {
 				for (i = 0 ; i <=1 ; i++) {
@@ -984,7 +984,13 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 								}
 							}
 #endif
-							GetRB(Dialog,&ts->EnableBold,IDC_FONTBOLD,IDC_FONTBOLD);
+							GetRB(Dialog, &i, IDC_FONTBOLD, IDC_FONTBOLD);
+							if (i > 0) {
+								ts->FontFlag |= FF_BOLD;
+							}
+							else {
+								ts->FontFlag &= ~(WORD)FF_BOLD;
+							}
 						}
 						else {
 							for (i = 0 ; i <= 1 ; i++) {
