@@ -4067,6 +4067,7 @@ void CVTWindow::OnSetupWindow()
 			cv.TitleRemote[0] = '\0';
 		}
 
+		ChangeFont();
 		ChangeWin();
 	}
 
