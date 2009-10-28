@@ -1729,7 +1729,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           (WORD) (ts->ColorFlag & CF_URLCOLOR));
 
 	WriteOnOff(Section, "URLUnderline", FName,
-	           (WORD) (ts->ColorFlag & CF_URLCOLOR));
+	           (WORD) (ts->ColorFlag & CF_URLUNDERLINE));
 
 	WriteOnOff(Section, "EnableANSIColor", FName,
 	           (WORD) (ts->ColorFlag & CF_ANSICOLOR));
