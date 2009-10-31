@@ -3100,9 +3100,40 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message) {
 		case WM_INITDIALOG:
-			EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
+		{
+			static LPCHOOSEFONT cf;
+			PTTSet ts;
+			char uimsg[MAX_UIMSG];
+
+			//EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
+			cf = (LPCHOOSEFONT)lParam;
+			ts = (PTTSet)cf->lCustData;
+			get_lang_msg("DLG_CHOOSEFONT_STC6", uimsg, sizeof(uimsg),
+			             "\"Font style\" is not reflect to the font setting.", ts->UILanguageFile);
+			SetDlgItemText(Dialog, stc6, uimsg);
+
 			SetFocus(GetDlgItem(Dialog,cmb1));
+
 			break;
+		}
+#if 0
+		case WM_COMMAND:
+			if (LOWORD(wParam) == cmb2) {
+				if (HIWORD(wParam) == CBN_SELCHANGE) {
+					// フォントの変更による(メッセージによる)スタイルの変更では
+					// cmb2 からの通知が来ない
+					SendMessage(GetDlgItem(Dialog, cmb2), CB_GETCURSEL, 0, 0);
+				}
+			}
+			else if (LOWORD(wParam) == cmb1) {
+				if (HIWORD(wParam) == CBN_SELCHANGE) {
+					// フォントの変更前に一時保存されたスタイルが
+					// ここを抜けたあとに改めてセットされてしまうようだ
+					SendMessage(GetDlgItem(Dialog, cmb2), CB_GETCURSEL, 0, 0);
+				}
+			}
+			break;
+#endif
 	}
 	return FALSE;
 }
@@ -3122,6 +3153,7 @@ BOOL FAR PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;
+	cf.lCustData = (LPARAM)ts;
 	Ok = ChooseFont(&cf);
 	return Ok;
 }

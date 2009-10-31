@@ -337,6 +337,8 @@ DLG_WIN_BOLD=Bold
 DLG_WIN_BLINK=Blink
 DLG_WIN_REVERSEATTR=Reverse
 
+DLG_CHOOSEFONT_STC6="Font style" is not reflect to the font setting.
+
 DLG_WINLIST_TITLE=Window list
 DLG_WINLIST_LABEL=&Window:
 DLG_WINLIST_OPEN=&Open
