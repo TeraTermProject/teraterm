@@ -3109,7 +3109,7 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			cf = (LPCHOOSEFONT)lParam;
 			ts = (PTTSet)cf->lCustData;
 			get_lang_msg("DLG_CHOOSEFONT_STC6", uimsg, sizeof(uimsg),
-			             "\"Font style\" is not reflect to the font setting.", ts->UILanguageFile);
+			             "\"Font style\" selection here won't affect actual font appearance.", ts->UILanguageFile);
 			SetDlgItemText(Dialog, stc6, uimsg);
 
 			SetFocus(GetDlgItem(Dialog,cmb1));

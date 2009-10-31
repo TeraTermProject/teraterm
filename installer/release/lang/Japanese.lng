@@ -338,7 +338,7 @@ DLG_WIN_BOLD=太字
 DLG_WIN_BLINK=点滅
 DLG_WIN_REVERSEATTR=反転
 
-DLG_CHOOSEFONT_STC6="スタイル" はフォント設定に反映されません。
+DLG_CHOOSEFONT_STC6="スタイル" を選択しても実際のフォント表示には反映されません。
 
 DLG_WINLIST_TITLE=Tera Term: ウィンドウのリスト
 DLG_WINLIST_LABEL=ウィンドウ(&W):
