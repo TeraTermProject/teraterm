@@ -888,7 +888,11 @@ void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList)
 void FAR PASCAL SelectWin(int WinId)
 {
 	if ((WinId>=0) && (WinId<pm->NWin)) {
-		ShowWindow(pm->WinList[WinId],SW_SHOWNORMAL);
+		/* ウィンドウが最大化および最小化されていた場合、その状態を維持できるように、
+		 * SW_SHOWNORMAL から SW_SHOW へ変更した。
+		 * (2009.11.8 yutaka)
+		 */
+		ShowWindow(pm->WinList[WinId],SW_SHOW);
 		SetForegroundWindow(pm->WinList[WinId]);
 	}
 }
