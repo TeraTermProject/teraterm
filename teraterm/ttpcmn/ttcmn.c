@@ -891,8 +891,15 @@ void FAR PASCAL SelectWin(int WinId)
 		/* ウィンドウが最大化および最小化されていた場合、その状態を維持できるように、
 		 * SW_SHOWNORMAL から SW_SHOW へ変更した。
 		 * (2009.11.8 yutaka)
+		 * ウィンドウが最小化されているときは元のサイズに戻す(SW_RESTORE)ようにした。
+		 * (2009.11.9 maya)
 		 */
-		ShowWindow(pm->WinList[WinId],SW_SHOW);
+		if (IsIconic(pm->WinList[WinId])) {
+			ShowWindow(pm->WinList[WinId],SW_RESTORE);
+		}
+		else {
+			ShowWindow(pm->WinList[WinId],SW_SHOW);
+		}
 		SetForegroundWindow(pm->WinList[WinId]);
 	}
 }
