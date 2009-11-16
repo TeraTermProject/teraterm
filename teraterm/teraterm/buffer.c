@@ -103,7 +103,6 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	LONG NewSize;
 	int NxCopy, NyCopy, i;
 	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
-	PCHAR Ptr;
 	LONG SrcPtr, DestPtr;
 	WORD LockOld;
 
@@ -123,80 +122,27 @@ BOOL ChangeBuffer(int Nx, int Ny)
 
 	NewSize = (LONG)Nx * (LONG)Ny;
 
-	HCodeNew = GlobalAlloc(GMEM_MOVEABLE, NewSize);
-	if ( HCodeNew==0 ) {
-		return FALSE;
-	}
-	Ptr = GlobalLock(HCodeNew);
-	if ( Ptr==NULL ) {
-		GlobalFree(HCodeNew);
-		return FALSE;
-	}
-	CodeDest = Ptr;
+	HCodeNew = NULL;
+	HAttrNew = NULL;
+	HAttr2New = NULL;
+	HAttrFGNew = NULL;
+	HAttrBGNew = NULL;
 
-	HAttrNew = GlobalAlloc(GMEM_MOVEABLE, NewSize);
-	if ( HAttrNew==0 ) {
-		GlobalFree(HCodeNew);
-		return FALSE;
+	if ((HCodeNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (CodeDest=GlobalLock(HCodeNew)) == NULL) {
+		goto allocate_error;
 	}
-	Ptr = GlobalLock(HAttrNew);
-	if ( Ptr==NULL ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		return FALSE;
+	if ((HAttrNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDest=GlobalLock(HAttrNew)) == NULL) {
+		goto allocate_error;
 	}
-	AttrDest = Ptr;
-
-	HAttr2New = GlobalAlloc(GMEM_MOVEABLE, NewSize);
-	if ( HAttr2New==0 ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		return FALSE;
+	if ((HAttr2New=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDest2=GlobalLock(HAttr2New)) == NULL) {
+		goto allocate_error;
 	}
-	Ptr = GlobalLock(HAttr2New);
-	if ( Ptr==NULL ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		GlobalFree(HAttr2New);
-		return FALSE;
+	if ((HAttrFGNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDestFG=GlobalLock(HAttrFGNew)) == NULL) {
+		goto allocate_error;
 	}
-	AttrDest2 = Ptr;
-
-	HAttrFGNew = GlobalAlloc(GMEM_MOVEABLE, NewSize);
-	if ( HAttrFGNew==0 ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		GlobalFree(HAttr2New);
-		return FALSE;
+	if ((HAttrBGNew=GlobalAlloc(GMEM_MOVEABLE, NewSize)) == NULL || (AttrDestBG=GlobalLock(HAttrBGNew)) == NULL) {
+		goto allocate_error;
 	}
-	Ptr = GlobalLock(HAttrFGNew);
-	if ( Ptr==NULL ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		GlobalFree(HAttr2New);
-		GlobalFree(HAttrFGNew);
-		return FALSE;
-	}
-	AttrDestFG = Ptr;
-
-	HAttrBGNew = GlobalAlloc(GMEM_MOVEABLE, NewSize);
-	if ( HAttrBGNew==0 ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		GlobalFree(HAttr2New);
-		GlobalFree(HAttrFGNew);
-		return FALSE;
-	}
-	Ptr = GlobalLock(HAttrBGNew);
-	if ( Ptr==NULL ) {
-		GlobalFree(HCodeNew);
-		GlobalFree(HAttrNew);
-		GlobalFree(HAttr2New);
-		GlobalFree(HAttrFGNew);
-		GlobalFree(HAttrBGNew);
-		return FALSE;
-	}
-	AttrDestBG = Ptr;
 
 	memset(&CodeDest[0], 0x20, NewSize);
 	memset(&AttrDest[0], AttrDefault, NewSize);
@@ -297,6 +243,19 @@ BOOL ChangeBuffer(int Nx, int Ny)
 	BuffLock = LockOld;
 
 	return TRUE;
+
+allocate_error:
+	if (CodeDest)   GlobalUnlock(HCodeNew);
+	if (AttrDest)   GlobalUnlock(HAttrNew);
+	if (AttrDest2)  GlobalUnlock(HAttr2New);
+	if (AttrDestFG) GlobalUnlock(HAttrFGNew);
+	if (AttrDestBG) GlobalUnlock(HAttrBGNew);
+	if (HCodeNew)   GlobalFree(HCodeNew);
+	if (HAttrNew)   GlobalFree(HAttrNew);
+	if (HAttr2New)  GlobalFree(HAttr2New);
+	if (HAttrFGNew) GlobalFree(HAttrFGNew);
+	if (HAttrBGNew) GlobalFree(HAttrBGNew);
+	return FALSE;
 }
 
 void InitBuffer()
