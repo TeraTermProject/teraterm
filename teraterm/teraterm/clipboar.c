@@ -189,6 +189,8 @@ void CBSend()
 			CBMemPtr2++;
 			// added PasteDelayPerLine (2009.4.12 maya)
 			Sleep(ts.PasteDelayPerLine);
+			CBSendCR = FALSE;
+			break;
 		}
 
 		EndFlag = (CBMemPtr[CBMemPtr2]==0);
