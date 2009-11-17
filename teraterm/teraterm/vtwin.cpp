@@ -2743,6 +2743,13 @@ void CVTWindow::OnTimer(UINT nIDEvent)
 				if (ts.ClearScreenOnCloseConnection) {
 					OnEditClearScreen();
 				}
+
+				/* AutoWinClose=FALSE の場合、マクロのDDE接続が切れたことを検出
+				 * しないため、ttpmacro.exe がCPUストールする。
+				 * XTYP_DISCONNECT を送るようにした。
+				 * (2009.11.18 yutaka)
+				 */
+				EndDDE();
 			}
 			break;
 		case IdPrnStartTimer:
