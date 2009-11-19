@@ -14,6 +14,7 @@
 #define IdPrnStartTimer      8
 #define IdPrnProcTimer       9
 #define IdCancelConnectTimer 10  // add (2007.1.10 yutaka)
+#define IdPasteDelayTimer    11
 
   /* Window Id */
 #define IdVT  1

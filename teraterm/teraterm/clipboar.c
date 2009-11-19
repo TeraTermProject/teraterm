@@ -157,8 +157,16 @@ void CBSend()
 {
 	int c;
 	BOOL EndFlag;
+	static DWORD lastcr;
+	DWORD now;
 
 	if (CBMemHandle==NULL) {
+		return;
+	}
+
+	now = GetTickCount();
+	if (now < lastcr + ts.PasteDelayPerLine ||
+	   (now > lastcr && lastcr + ts.PasteDelayPerLine < lastcr)) {
 		return;
 	}
 
@@ -188,8 +196,9 @@ void CBSend()
 		if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
 			CBMemPtr2++;
 			// added PasteDelayPerLine (2009.4.12 maya)
-			Sleep(ts.PasteDelayPerLine);
+			lastcr = now;
 			CBSendCR = FALSE;
+			SetTimer(HVTWin, IdPasteDelayTimer, ts.PasteDelayPerLine, NULL);
 			break;
 		}
 
