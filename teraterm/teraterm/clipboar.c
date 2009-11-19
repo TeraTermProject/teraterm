@@ -195,10 +195,12 @@ void CBSend()
 		if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
 			CBMemPtr2++;
 			// added PasteDelayPerLine (2009.4.12 maya)
-			lastcr = now;
-			CBSendCR = FALSE;
-			SetTimer(HVTWin, IdPasteDelayTimer, ts.PasteDelayPerLine, NULL);
-			break;
+			if (ts.PasteDelayPerLine > 0) {
+				lastcr = now;
+				CBSendCR = FALSE;
+				SetTimer(HVTWin, IdPasteDelayTimer, ts.PasteDelayPerLine, NULL);
+				break;
+			}
 		}
 
 		EndFlag = (CBMemPtr[CBMemPtr2]==0);
