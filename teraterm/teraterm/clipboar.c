@@ -165,8 +165,7 @@ void CBSend()
 	}
 
 	now = GetTickCount();
-	if (now < lastcr + ts.PasteDelayPerLine ||
-	   (now > lastcr && lastcr + ts.PasteDelayPerLine < lastcr)) {
+	if (now - lastcr < ts.PasteDelayPerLine) {
 		return;
 	}
 
