@@ -607,7 +607,7 @@ BOOL GetLabelName(PCHAR Name)
 
 		b=0;
 		if (LinePtr<LineLen) b = LineBuff[LinePtr];
-		while ((LinePtr<LineLen) && (b>=' ') && (b!=q))
+		while ((LinePtr<LineLen) && (b>=' '||b=='\t') && (b!=q))
 		{
 			if (*i<MaxStrLen-1)
 			{
