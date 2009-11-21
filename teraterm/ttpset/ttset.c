@@ -2692,14 +2692,14 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 		return FALSE;
 	j = 0;
 
-	while (Param[*i] == ' ')
+	while (Param[*i] == ' ' || Param[*i] == '\t')
 		(*i)++;
 
 	Quoted = FALSE;
 	c = Param[*i];
 	(*i)++;
-	while ((c != 0) && (Quoted || (c != ' ')) &&
-	       (Quoted || (c != ';')) && (j < Size - 1)) {
+	while ((c != 0) && (j < Size - 1) &&
+	       (Quoted || ((c != ' ') && (c != ';') && (c != '\t')))) {
 		if (c == '"')
 			Quoted = !Quoted;
 		Temp[j] = c;
