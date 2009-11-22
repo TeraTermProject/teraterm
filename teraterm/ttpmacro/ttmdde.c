@@ -369,6 +369,10 @@ void DDESend()
 				Sleep(100);        // スリープしてサーバへCPUを回す。100の値に根拠はない。
 			} else {
 				// よく分からないエラーはそのまま捨てる。
+				// DDEサーバ(Tera Term)が AutoWinClose=off で切断した場合、DMLERR_NOTPROCESSED が
+				// 返ってくる。ここで破棄しなければ、延々とリトライすることになり、CPUを食い潰す。
+				// (2009.11.22 yutaka)
+				OutLen = 0;
 				break;
 			}
 		}
