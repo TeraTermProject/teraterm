@@ -402,15 +402,15 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdClearScreen:
 		switch (ParamFileName[0]) {
-	case '0':
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdEditCLS,0);
-		break;
-	case '1':
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdEditCLB,0);
-		break;
-	case '2':
-		PostMessage(HTEKWin,WM_USER_ACCELCOMMAND,IdCmdEditCLS,0);
-		break;
+		case '0':
+			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdEditCLS,0);
+			break;
+		case '1':
+			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdEditCLB,0);
+			break;
+		case '2':
+			PostMessage(HTEKWin,WM_USER_ACCELCOMMAND,IdCmdEditCLS,0);
+			break;
 		}
 		break;
 	case CmdCloseWin:
