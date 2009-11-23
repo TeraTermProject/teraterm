@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-disconnect
+disconnect [&lt;intval&gt;]
 </pre>
 
 <h2>解説</h2>
@@ -26,6 +26,11 @@ disconnect
 <p>
 Tera Term とホストの間の通信を終了させる。<br>
 もしこのコマンドによって Tera Term が終了しなければ、Tera Term と MACRO の間のリンクは保持される。
+</p>
+
+<p>
+&lt;intval&gt; に 0 が指定されている場合には、TCP/IP 接続切断時の確認ダイアログを表示せずに通信を終了する。<br>
+&lt;intval&gt; が指定されていないか 0 以外の場合には、TCP/IP 接続切断時の確認ダイアログを表示する。
 </p>
 
 <h2>参照</h2>

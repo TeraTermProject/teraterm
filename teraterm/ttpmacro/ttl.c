@@ -684,6 +684,32 @@ WORD TTLDelPassword()
 	return Err;
 }
 
+WORD TTLDisconnect()
+{
+	WORD Err;
+	int Val = 1;
+	char Str[21];
+
+	Err = 0;
+	// get 1rd arg(optional) if given
+	if (CheckParameterGiven()) {
+		GetIntVal(&Val, &Err);
+	}
+
+	if ((Err==0) &&
+	    (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if ((Err==0) && (! Linked))
+		Err = ErrLinkFirst;
+	if (Err==0)
+	{
+		_snprintf_s(Str,sizeof(Str),_TRUNCATE,"%d",Val);
+		SetFile(Str);
+		Err = SendCmnd(CmdDisconnect,0);
+	}
+	return Err;
+}
+
 WORD TTLDo()
 {
 	WORD WId, Err;
@@ -3806,7 +3832,7 @@ int ExecCmnd()
 		case RsvDelPassword:
 			Err = TTLDelPassword(); break;
 		case RsvDisconnect:
-			Err = TTLCommCmd(CmdDisconnect,0); break;
+			Err = TTLDisconnect(); break;
 		case RsvDo:
 			Err = TTLDo(); break;
 		case RsvElse:

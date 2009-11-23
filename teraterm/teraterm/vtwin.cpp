@@ -1592,7 +1592,7 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 				OnEditPaste();
 				return TRUE;
 			case ID_ACC_DISCONNECT:
-				OnFileDisconnect();
+				Disconnect(TRUE);
 				return TRUE;
 			case ID_FILE_DUPLICATESESSION:
 				// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
@@ -2975,7 +2975,7 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 			}
 			break;
 		case IdCmdDisconnect: // called by TTMACRO
-			OnFileDisconnect();
+			Disconnect(lParam);
 			break;
 		case IdCmdLoadKeyMap: // called by TTMACRO
 			SetKeyMap();
@@ -3868,22 +3868,29 @@ void CVTWindow::OnFilePrint()
 	BuffPrint(FALSE);
 }
 
-void CVTWindow::OnFileDisconnect()
+void CVTWindow::Disconnect(BOOL confirm)
 {
 	if (! cv.Ready) {
 		return;
 	}
 
-	get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Disconnect?", ts.UILanguageFile);
 	if ((cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
-	    (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
-	                  MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL)) {
-		return;
+	    (confirm)) {
+		get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
+		             "Disconnect?", ts.UILanguageFile);
+		if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
+		                 MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL) {
+			return;
+		}
 	}
 
 	::PostMessage(HVTWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
+}
+
+void CVTWindow::OnFileDisconnect()
+{
+	Disconnect(TRUE);
 }
 
 void CVTWindow::OnFileExit()

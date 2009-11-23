@@ -174,7 +174,8 @@ protected:
 	afx_msg void OnHelpUsing();
 	afx_msg void OnHelpAbout();
 	//}}AFX_MSG
-    DECLARE_MESSAGE_MAP();
+	DECLARE_MESSAGE_MAP();
+	void Disconnect(BOOL confirm);
 };
 #endif
 

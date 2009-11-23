@@ -431,7 +431,12 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
 		break;
 	case CmdDisconnect:
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdDisconnect,0);
+		if (ParamFileName[0] == '0') {
+			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdDisconnect,0);
+		}
+		else {
+			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdDisconnect,1);
+		}
 		break;
 	case CmdEnableKeyb:
 		KeybEnabled = (ParamBinaryFlag!=0);
