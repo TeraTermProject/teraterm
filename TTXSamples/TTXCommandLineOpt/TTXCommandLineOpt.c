@@ -29,7 +29,7 @@ PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
   int i = 0;
   BOOL quoted = FALSE;
 
-  while (*param == ' ') {
+  while (*param == ' ' || *param == '\t') {
     param++;
   }
 
@@ -37,9 +37,10 @@ PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
     return NULL;
   }
 
-  while (*param != '\0' && (quoted || *param != ';') && (quoted || *param != ' ')) {
-    if (*param == '"') {
+  while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+    if (*param == '"' && (*++param != '"' || !quoted)) {
       quoted = !quoted;
+      continue;
     }
     else if (i < size - 1) {
       buff[i++] = *param;

@@ -149,7 +149,7 @@ void ParseInputStr(char *rstr, int rcount) {
         i++;
         buff[(blen<InBuffSize)?blen:InBuffSize-1] = '\0';
 	p = buff;
-	
+
 	for (p=buff, func=0; isdigit(*p); p++) {
 	  func = func * 10 + *p - '0';
 	}
@@ -294,7 +294,7 @@ PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
   int i = 0;
   BOOL quoted = FALSE;
 
-  while (*param == ' ') {
+  while (*param == ' ' || *param == '\t') {
     param++;
   }
 
@@ -302,9 +302,10 @@ PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
     return NULL;
   }
 
-  while (*param != '\0' && (quoted || *param != ';') && (quoted || *param != ' ')) {
-    if (*param == '"') {
+  while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+    if (*param == '"' && (*++param != '"' || !quoted)) {
       quoted = !quoted;
+      continue;
     }
     else if (i < size - 1) {
       buff[i++] = *param;
