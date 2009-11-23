@@ -57,226 +57,226 @@ static char ParamSecondFileName[256];
 
 void GetClientHWnd(PCHAR HWndStr)
 {
-  int i;
-  BYTE b;
-  LONG HCli;
+	int i;
+	BYTE b;
+	LONG HCli;
 
-  HCli = 0;
-  i = 0;
-  b = HWndStr[0];
-  while (b > 0)
-  {
-    if (b <= 0x39)
-      HCli = (HCli << 4) + (b-0x30);
-    else
-      HCli = (HCli << 4) + (b-0x37);
-    i++;
-    b = HWndStr[i];
-  }
-  HWndDdeCli = (HWND)HCli;
+	HCli = 0;
+	i = 0;
+	b = HWndStr[0];
+	while (b > 0)
+	{
+		if (b <= 0x39)
+			HCli = (HCli << 4) + (b-0x30);
+		else
+			HCli = (HCli << 4) + (b-0x37);
+		i++;
+		b = HWndStr[i];
+	}
+	HWndDdeCli = (HWND)HCli;
 }
 
 void Byte2HexStr(BYTE b, LPSTR HexStr)
 {
-  if (b<0xa0)
-    HexStr[0] = 0x30 + (b >> 4);
-  else
-    HexStr[0] = 0x37 + (b >> 4);
-  if ((b & 0x0f) < 0x0a)
-    HexStr[1] = 0x30 + (b & 0x0f);
-  else
-    HexStr[1] = 0x37 + (b & 0x0f);
-  HexStr[2] = 0;
+	if (b<0xa0)
+		HexStr[0] = 0x30 + (b >> 4);
+	else
+		HexStr[0] = 0x37 + (b >> 4);
+	if ((b & 0x0f) < 0x0a)
+		HexStr[1] = 0x30 + (b & 0x0f);
+	else
+		HexStr[1] = 0x37 + (b & 0x0f);
+	HexStr[2] = 0;
 }
 
 void SetTopic()
 {
-  WORD w;
+	WORD w;
 
-  w = HIWORD(HVTWin);
-  Byte2HexStr(HIBYTE(w),&(TopicName[0]));
-  Byte2HexStr(LOBYTE(w),&(TopicName[2]));
-  w = LOWORD(HVTWin);
-  Byte2HexStr(HIBYTE(w),&(TopicName[4]));
-  Byte2HexStr(LOBYTE(w),&(TopicName[6]));
+	w = HIWORD(HVTWin);
+	Byte2HexStr(HIBYTE(w),&(TopicName[0]));
+	Byte2HexStr(LOBYTE(w),&(TopicName[2]));
+	w = LOWORD(HVTWin);
+	Byte2HexStr(HIBYTE(w),&(TopicName[4]));
+	Byte2HexStr(LOBYTE(w),&(TopicName[6]));
 }
 
 HDDEDATA WildConnect(HSZ ServiceHsz, HSZ TopicHsz, UINT ClipFmt)
 {
-  HSZPAIR Pairs[2];
-  BOOL Ok;
+	HSZPAIR Pairs[2];
+	BOOL Ok;
 
-  Pairs[0].hszSvc  = Service;
-  Pairs[0].hszTopic = Topic;
-  Pairs[1].hszSvc = NULL;
-  Pairs[1].hszTopic = NULL;
+	Pairs[0].hszSvc  = Service;
+	Pairs[0].hszTopic = Topic;
+	Pairs[1].hszSvc = NULL;
+	Pairs[1].hszTopic = NULL;
 
-  Ok = FALSE;
+	Ok = FALSE;
 
-  if ((ServiceHsz == 0) && (TopicHsz == 0))
-    Ok = TRUE;
-  else
-    if ((TopicHsz == 0) &&
-	(DdeCmpStringHandles(Service, ServiceHsz) == 0))
-      Ok = TRUE;
-    else
-      if ((DdeCmpStringHandles(Topic, TopicHsz) == 0) &&
-	  (ServiceHsz == 0))
-	Ok = TRUE;
+	if ((ServiceHsz == 0) && (TopicHsz == 0))
+		Ok = TRUE;
+	else
+		if ((TopicHsz == 0) &&
+		    (DdeCmpStringHandles(Service, ServiceHsz) == 0))
+			Ok = TRUE;
+		else
+			if ((DdeCmpStringHandles(Topic, TopicHsz) == 0) &&
+			    (ServiceHsz == 0))
+				Ok = TRUE;
 
-  if (Ok)
-    return DdeCreateDataHandle(Inst, (LPBYTE)(&Pairs), sizeof(Pairs),
-      0, NULL, ClipFmt, 0);
-  else
-    return 0;
+	if (Ok)
+		return DdeCreateDataHandle(Inst, (LPBYTE)(&Pairs), sizeof(Pairs),
+		                           0, NULL, ClipFmt, 0);
+	else
+		return 0;
 }
 
-  BOOL DDEGet1(LPBYTE b)
-  {
-    if (cv.DCount <= 0) return FALSE;
-    *b = ((LPSTR)cv.LogBuf)[cv.DStart];
-    cv.DStart++;
-    if (cv.DStart>=InBuffSize)
-      cv.DStart = cv.DStart-InBuffSize;
-    cv.DCount--;
-    return TRUE;
-  }
+BOOL DDEGet1(LPBYTE b)
+{
+	if (cv.DCount <= 0) return FALSE;
+	*b = ((LPSTR)cv.LogBuf)[cv.DStart];
+	cv.DStart++;
+	if (cv.DStart>=InBuffSize)
+		cv.DStart = cv.DStart-InBuffSize;
+	cv.DCount--;
+	return TRUE;
+}
 
-  LONG DDEGetDataLen()
-  {
-    BYTE b;
-    LONG Len;
-    int Start, Count;
+LONG DDEGetDataLen()
+{
+	BYTE b;
+	LONG Len;
+	int Start, Count;
 
-    Len = cv.DCount;
-    Start = cv.DStart;
-    Count = cv.DCount;
-    while (Count>0)
-    {
-      b = ((LPSTR)cv.LogBuf)[Start];
-      if ((b==0x00) || (b==0x01)) Len++;
-      Start++;
-      if (Start>=InBuffSize) Start = Start-InBuffSize;
-      Count--;
-    }
+	Len = cv.DCount;
+	Start = cv.DStart;
+	Count = cv.DCount;
+	while (Count>0)
+	{
+		b = ((LPSTR)cv.LogBuf)[Start];
+		if ((b==0x00) || (b==0x01)) Len++;
+		Start++;
+		if (Start>=InBuffSize) Start = Start-InBuffSize;
+		Count--;
+	}
 
-    return Len;
-  }
+	return Len;
+}
 
 HDDEDATA AcceptRequest(HSZ ItemHSz)
 {
-  BYTE b;
-  BOOL Unlock;
-  HDDEDATA DH;
-  LPSTR DP;
-  int i;
-  LONG Len;
+	BYTE b;
+	BOOL Unlock;
+	HDDEDATA DH;
+	LPSTR DP;
+	int i;
+	LONG Len;
 
-  if ((! DDELog) || (ConvH==0)) return 0;
+	if ((! DDELog) || (ConvH==0)) return 0;
 
-  if (DdeCmpStringHandles(ItemHSz, Item2) == 0) // item "PARAM"
-    DH = DdeCreateDataHandle(Inst,ParamFileName,sizeof(ParamFileName),0,
-			     Item2,CF_OEMTEXT,0);
-  else if (DdeCmpStringHandles(ItemHSz, Item) == 0) // item "DATA"
-  {
-    if (cv.HLogBuf==0) return 0;
+	if (DdeCmpStringHandles(ItemHSz, Item2) == 0) // item "PARAM"
+		DH = DdeCreateDataHandle(Inst,ParamFileName,sizeof(ParamFileName),0,
+		                         Item2,CF_OEMTEXT,0);
+	else if (DdeCmpStringHandles(ItemHSz, Item) == 0) // item "DATA"
+	{
+		if (cv.HLogBuf==0) return 0;
 
-    if (cv.LogBuf==NULL)
-    {
-      Unlock = TRUE;
-      cv.LogBuf = GlobalLock(cv.HLogBuf);
-      if (cv.LogBuf == NULL) return 0;
-    }
-    else Unlock = FALSE;
+		if (cv.LogBuf==NULL)
+		{
+			Unlock = TRUE;
+			cv.LogBuf = GlobalLock(cv.HLogBuf);
+			if (cv.LogBuf == NULL) return 0;
+		}
+		else Unlock = FALSE;
 
-    Len = DDEGetDataLen();
-    if ((SyncMode) &&
-	(SyncFreeSpace<Len))
-      Len = SyncFreeSpace;
+		Len = DDEGetDataLen();
+		if ((SyncMode) &&
+		    (SyncFreeSpace<Len))
+			Len = SyncFreeSpace;
 
-    DH = DdeCreateDataHandle(Inst,NULL,Len+2,0,
-			     Item,CF_OEMTEXT,0);
-    DP = DdeAccessData(DH,NULL);
-    if (DP != NULL)
-    {
-      i = 0;
-      while (i < Len)
-      {
-	if (DDEGet1(&b)) {
-	  if ((b==0x00) || (b==0x01))
-	  {
-	    DP[i] = 0x01;
-	    DP[i+1] = b + 1;
-	    i = i + 2;
-	  }
-	  else {
-	    DP[i] = b;
-	    i++;
-	  }
+		DH = DdeCreateDataHandle(Inst,NULL,Len+2,0,
+		                         Item,CF_OEMTEXT,0);
+		DP = DdeAccessData(DH,NULL);
+		if (DP != NULL)
+		{
+			i = 0;
+			while (i < Len)
+			{
+				if (DDEGet1(&b)) {
+					if ((b==0x00) || (b==0x01))
+					{
+						DP[i] = 0x01;
+						DP[i+1] = b + 1;
+						i = i + 2;
+					}
+					else {
+						DP[i] = b;
+						i++;
+					}
+				}
+				else
+					Len = 0;
+			}
+			DP[i] = 0;
+			DdeUnaccessData(DH);
+		}
+
+		if (Unlock)
+		{
+			GlobalUnlock(cv.HLogBuf);
+			cv.LogBuf = NULL;
+		}
 	}
 	else
-	  Len = 0;
-      }
-      DP[i] = 0;
-      DdeUnaccessData(DH);
-    }
+		return 0;
 
-    if (Unlock)
-    {
-      GlobalUnlock(cv.HLogBuf);
-      cv.LogBuf = NULL;
-    }
-  }
-  else
-    return 0;
-
-  return DH;
+	return DH;
 }
 
 HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
-  HDDEDATA Data)
+                    HDDEDATA Data)
 {
-  LPSTR DataPtr;
-  DWORD DataSize;
+	LPSTR DataPtr;
+	DWORD DataSize;
 
-  // 連続してXTYP_POKEがクライアント（マクロ）から送られてくると、サーバ（本体）側がまだ
-  // コマンドの貼り付けを行っていない場合、TalkStatusは IdTalkCB になので、DDE_FNOTPROCESSEDを
-  // 返すことがある。DDE_FBUSYに変更。
-  // (2006.11.6 yutaka)
-  if (TalkStatus != IdTalkKeyb)
-	  return (HDDEDATA)DDE_FBUSY;
+	// 連続してXTYP_POKEがクライアント（マクロ）から送られてくると、サーバ（本体）側がまだ
+	// コマンドの貼り付けを行っていない場合、TalkStatusは IdTalkCB になので、DDE_FNOTPROCESSEDを
+	// 返すことがある。DDE_FBUSYに変更。
+	// (2006.11.6 yutaka)
+	if (TalkStatus != IdTalkKeyb)
+		return (HDDEDATA)DDE_FBUSY;
 
-  if (ConvH==0) return DDE_FNOTPROCESSED;
+	if (ConvH==0) return DDE_FNOTPROCESSED;
 
-  if ((ClipFmt!=CF_TEXT) && (ClipFmt!=CF_OEMTEXT)) return DDE_FNOTPROCESSED;
+	if ((ClipFmt!=CF_TEXT) && (ClipFmt!=CF_OEMTEXT)) return DDE_FNOTPROCESSED;
 
-  if (DdeCmpStringHandles(ItemHSz, Item) != 0) return DDE_FNOTPROCESSED;
+	if (DdeCmpStringHandles(ItemHSz, Item) != 0) return DDE_FNOTPROCESSED;
 
-  DataPtr = DdeAccessData(Data,&DataSize);
-  if (DataPtr==NULL) return DDE_FNOTPROCESSED;
-  CBStartPaste(NULL,FALSE,CBBufSize,DataPtr,DataSize);
-  DdeUnaccessData(Data);
-  if (TalkStatus==IdTalkCB)
-    return (HDDEDATA)DDE_FACK;
-  else
-    return DDE_FNOTPROCESSED;
+	DataPtr = DdeAccessData(Data,&DataSize);
+	if (DataPtr==NULL) return DDE_FNOTPROCESSED;
+	CBStartPaste(NULL,FALSE,CBBufSize,DataPtr,DataSize);
+	DdeUnaccessData(Data);
+	if (TalkStatus==IdTalkCB)
+		return (HDDEDATA)DDE_FACK;
+	else
+		return DDE_FNOTPROCESSED;
 }
 
 WORD HexStr2Word(PCHAR Str)
 {
-  int i;
-  BYTE b;
-  WORD w;
+	int i;
+	BYTE b;
+	WORD w;
 
-  for (i=0; i<=3; i++)
-  {
-    b = Str[i];
-    if (b <= 0x39)
-      w = (w << 4) + (b-0x30);
-    else
-      w = (w << 4) + (b-0x37);
-  }
-  return w;
+	for (i=0; i<=3; i++)
+	{
+		b = Str[i];
+		if (b <= 0x39)
+			w = (w << 4) + (b-0x30);
+		else
+		w = (w << 4) + (b-0x37);
+	}
+	return w;
 }
 
 #define CmdSetHWnd      ' '
@@ -603,35 +603,35 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 	case CmdShowTT:
 		switch (ParamFileName[0]) {
-	case '-': ShowWindow(HVTWin,SW_HIDE); break;
-	case '0': ShowWindow(HVTWin,SW_MINIMIZE); break;
-	case '1': ShowWindow(HVTWin,SW_RESTORE); break;
-	case '2': ShowWindow(HTEKWin,SW_HIDE); break;
-	case '3': ShowWindow(HTEKWin,SW_MINIMIZE); break;
-	case '4':
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdCtrlOpenTEK,0);
-		break;
-	case '5':
-		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdCtrlCloseTEK,0);
-		break;
-	case '6': //steven add 
-		if (HWndLog == NULL) 
-			break; 
-		else 
-			ShowWindow(HWndLog, SW_HIDE); 
-		break; 
-	case '7': //steven add 
-		if (HWndLog == NULL) 
-			break; 
-		else 
-			ShowWindow(HWndLog, SW_MINIMIZE); 
-		break; 
-	case '8': //steven add 
-		if (HWndLog == NULL) 
-			break; 
-		else 
-			ShowWindow(HWndLog, SW_RESTORE); 
-		break; 
+		case '-': ShowWindow(HVTWin,SW_HIDE); break;
+		case '0': ShowWindow(HVTWin,SW_MINIMIZE); break;
+		case '1': ShowWindow(HVTWin,SW_RESTORE); break;
+		case '2': ShowWindow(HTEKWin,SW_HIDE); break;
+		case '3': ShowWindow(HTEKWin,SW_MINIMIZE); break;
+		case '4':
+			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdCtrlOpenTEK,0);
+			break;
+		case '5':
+			PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdCtrlCloseTEK,0);
+			break;
+		case '6': //steven add
+			if (HWndLog == NULL)
+				break;
+			else
+				ShowWindow(HWndLog, SW_HIDE);
+			break;
+		case '7': //steven add
+			if (HWndLog == NULL)
+				break;
+			else
+				ShowWindow(HWndLog, SW_MINIMIZE);
+			break;
+		case '8': //steven add
+			if (HWndLog == NULL)
+				break;
+			else
+				ShowWindow(HWndLog, SW_RESTORE);
+			break;
 		}
 		break;
 	case CmdXmodemRecv:
@@ -867,190 +867,191 @@ scp_rcv_error:
 }
 
 HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
-  HSZ HSz1, HSZ HSz2, HDDEDATA Data, DWORD Data1, DWORD Data2)
+                                  HSZ HSz1, HSZ HSz2, HDDEDATA Data,
+                                  DWORD Data1, DWORD Data2)
 {
-  HDDEDATA Result;
+	HDDEDATA Result;
 
-  if (Inst==0) return 0;
-  Result = 0;
+	if (Inst==0) return 0;
+	Result = 0;
 
-  switch (CallType) {
-    case XTYP_WILDCONNECT:
-      Result = WildConnect(HSz2, HSz1, Fmt);
-      break;
-    case XTYP_CONNECT:
-      if (Conv == 0)
-      {
-	if ((DdeCmpStringHandles(Topic, HSz1) == 0) &&
-	    (DdeCmpStringHandles(Service, HSz2) == 0))
-	{
-	  if (cv.Ready)
-	    SetDdeComReady(1);
-	  Result = (HDDEDATA)TRUE;
-	}
-      }
-      break;
-    case XTYP_CONNECT_CONFIRM:
-      ConvH = Conv;
-      break;
-    case XTYP_ADVREQ:
-    case XTYP_REQUEST:
-      Result = AcceptRequest(HSz2);
-      break;
+	switch (CallType) {
+		case XTYP_WILDCONNECT:
+			Result = WildConnect(HSz2, HSz1, Fmt);
+			break;
+		case XTYP_CONNECT:
+			if (Conv == 0)
+			{
+				if ((DdeCmpStringHandles(Topic, HSz1) == 0) &&
+				    (DdeCmpStringHandles(Service, HSz2) == 0))
+				{
+					if (cv.Ready)
+						SetDdeComReady(1);
+					Result = (HDDEDATA)TRUE;
+				}
+			}
+			break;
+		case XTYP_CONNECT_CONFIRM:
+			ConvH = Conv;
+			break;
+		case XTYP_ADVREQ:
+		case XTYP_REQUEST:
+			Result = AcceptRequest(HSz2);
+			break;
 
 	// クライアント(ttpmacro.exe)からサーバ(ttermpro.exe)へデータが送られてくると、
 	// このメッセージハンドラへ飛んでくる。
 	// 処理したら DDE_FACK、ビジーの場合は DDE_FBUSY 、無視する場合は DDE_FNOTPROCESSED を
 	// クライアントへ返す必要があり、break文が抜けていたので追加した。
 	// (2006.11.6 yutaka)
-	case XTYP_POKE:
-      Result = AcceptPoke(HSz2, Fmt, Data);
-	  break;
+		case XTYP_POKE:
+			Result = AcceptPoke(HSz2, Fmt, Data);
+			break;
 
-    case XTYP_ADVSTART:
-      if ((ConvH!=0) &&
-	  (DdeCmpStringHandles(Topic, HSz1) == 0) &&
-	  (DdeCmpStringHandles(Item, HSz2) == 0) &&
-	  ! AdvFlag)
-      {
-	AdvFlag = TRUE;
-	Result = (HDDEDATA)TRUE;
-      }
-      break;
-    case XTYP_ADVSTOP:
-      if ((ConvH!=0) &&
-	  (DdeCmpStringHandles(Topic, HSz1) == 0) &&
-	  (DdeCmpStringHandles(Item, HSz2) == 0) &&
-	  AdvFlag)
-      {
-	AdvFlag = FALSE;
-	Result = (HDDEDATA)TRUE;
-      }
-      break;
-    case XTYP_DISCONNECT:
-      ConvH = 0;
-      PostMessage(HVTWin,WM_USER_DDEEND,0,0);
-      break;
-    case XTYP_EXECUTE:
-      Result = AcceptExecute(HSz1, Data);
-  }  /* switch (CallType) */
+		case XTYP_ADVSTART:
+			if ((ConvH!=0) &&
+			    (DdeCmpStringHandles(Topic, HSz1) == 0) &&
+			    (DdeCmpStringHandles(Item, HSz2) == 0) &&
+			    ! AdvFlag)
+			{
+				AdvFlag = TRUE;
+				Result = (HDDEDATA)TRUE;
+			}
+			break;
+		case XTYP_ADVSTOP:
+			if ((ConvH!=0) &&
+			    (DdeCmpStringHandles(Topic, HSz1) == 0) &&
+			    (DdeCmpStringHandles(Item, HSz2) == 0) &&
+			    AdvFlag)
+			{
+				AdvFlag = FALSE;
+				Result = (HDDEDATA)TRUE;
+			}
+			break;
+		case XTYP_DISCONNECT:
+			ConvH = 0;
+			PostMessage(HVTWin,WM_USER_DDEEND,0,0);
+			break;
+		case XTYP_EXECUTE:
+			Result = AcceptExecute(HSz1, Data);
+	}  /* switch (CallType) */
 
-  return Result;
+	return Result;
 }
 
 BOOL InitDDE()
 {
-  BOOL Ok;
+	BOOL Ok;
 
-  if (ConvH != 0) return FALSE;
+	if (ConvH != 0) return FALSE;
 
-  Ok = TRUE;
+	Ok = TRUE;
 
-  if (DdeInitialize(&Inst,(PFNCALLBACK)DdeCallbackProc,0,0) == DMLERR_NO_ERROR)
-  {
-    Service= DdeCreateStringHandle(Inst, ServiceName, CP_WINANSI);
-    Topic  = DdeCreateStringHandle(Inst, TopicName, CP_WINANSI);
-    Item   = DdeCreateStringHandle(Inst, ItemName, CP_WINANSI);
-    Item2  = DdeCreateStringHandle(Inst, ItemName2, CP_WINANSI);
+	if (DdeInitialize(&Inst,(PFNCALLBACK)DdeCallbackProc,0,0) == DMLERR_NO_ERROR)
+	{
+		Service= DdeCreateStringHandle(Inst, ServiceName, CP_WINANSI);
+		Topic  = DdeCreateStringHandle(Inst, TopicName, CP_WINANSI);
+		Item   = DdeCreateStringHandle(Inst, ItemName, CP_WINANSI);
+		Item2  = DdeCreateStringHandle(Inst, ItemName2, CP_WINANSI);
 
-    Ok = DdeNameService(Inst, Service, 0, DNS_REGISTER) != 0;
-  }
-  else
-    Ok = FALSE;
+		Ok = DdeNameService(Inst, Service, 0, DNS_REGISTER) != 0;
+	}
+	else
+		Ok = FALSE;
 
-  SyncMode = FALSE;  
-  CloseTT = FALSE;
-  StartupFlag = FALSE;
-  DDELog = FALSE;
+	SyncMode = FALSE;  
+	CloseTT = FALSE;
+	StartupFlag = FALSE;
+	DDELog = FALSE;
 
-  if (Ok)
-  {
-    Ok = CreateLogBuf();
-    if (Ok) DDELog = TRUE;
-  }
+	if (Ok)
+	{
+		Ok = CreateLogBuf();
+		if (Ok) DDELog = TRUE;
+	}
 
-  if (! Ok) EndDDE();
-  return Ok;
+	if (! Ok) EndDDE();
+	return Ok;
 }
 
 void SendDDEReady()
 {
-  GetClientHWnd(TopicName);
-  PostMessage(HWndDdeCli,WM_USER_DDEREADY,0,0);
+	GetClientHWnd(TopicName);
+	PostMessage(HWndDdeCli,WM_USER_DDEREADY,0,0);
 }
 
 void EndDDE()
 {
-  DWORD Temp;
+	DWORD Temp;
 
-  if (ConvH != 0)
-    DdeDisconnect(ConvH);
-  ConvH = 0;  
-  SyncMode = FALSE;
-  StartupFlag = FALSE;
+	if (ConvH != 0)
+		DdeDisconnect(ConvH);
+	ConvH = 0;  
+	SyncMode = FALSE;
+	StartupFlag = FALSE;
 
-  Temp = Inst;
-  if (Inst != 0)
-  {
-    Inst = 0;
-    DdeNameService(Temp, Service, 0, DNS_UNREGISTER);
-    if (Service != 0)
-      DdeFreeStringHandle(Temp, Service);
-    Service = 0;
-    if (Topic != 0)
-      DdeFreeStringHandle(Temp, Topic);
-    Topic = 0;
-    if (Item != 0)
-      DdeFreeStringHandle(Temp, Item);
-    Item = 0;
-    if (Item2 != 0)
-      DdeFreeStringHandle(Temp, Item2);
-    Item2 = 0;
+	Temp = Inst;
+	if (Inst != 0)
+	{
+		Inst = 0;
+		DdeNameService(Temp, Service, 0, DNS_UNREGISTER);
+		if (Service != 0)
+			DdeFreeStringHandle(Temp, Service);
+		Service = 0;
+		if (Topic != 0)
+			DdeFreeStringHandle(Temp, Topic);
+		Topic = 0;
+		if (Item != 0)
+			DdeFreeStringHandle(Temp, Item);
+		Item = 0;
+		if (Item2 != 0)
+			DdeFreeStringHandle(Temp, Item2);
+		Item2 = 0;
 
-    DdeUninitialize(Temp);
-  }
-  TopicName[0] = 0;
-  
-  if (HWndDdeCli!=NULL)
-    PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,0,0);
-  HWndDdeCli = NULL;
-  AdvFlag = FALSE;
+		DdeUninitialize(Temp);
+	}
+	TopicName[0] = 0;
 
-  DDELog = FALSE;
-  FreeLogBuf();
-  cv.NoMsg = 0;
+	if (HWndDdeCli!=NULL)
+		PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,0,0);
+	HWndDdeCli = NULL;
+	AdvFlag = FALSE;
+
+	DDELog = FALSE;
+	FreeLogBuf();
+	cv.NoMsg = 0;
 }
 
 void DDEAdv()
 {
-  if ((ConvH==0) ||
-      (! AdvFlag) ||
-      (cv.DCount==0))
-    return;
+	if ((ConvH==0) ||
+	    (! AdvFlag) ||
+	    (cv.DCount==0))
+		return;
 
-  if ((! SyncMode) ||
-      SyncMode && SyncRecv)
-  {
-    if (SyncFreeSpace<10)
-      SyncFreeSpace=0;
-    else
-      SyncFreeSpace=SyncFreeSpace-10;
-    DdePostAdvise(Inst,Topic,Item);
-    SyncRecv = FALSE;
-  }
+	if ((! SyncMode) ||
+	    SyncMode && SyncRecv)
+	{
+		if (SyncFreeSpace<10)
+			SyncFreeSpace=0;
+		else
+			SyncFreeSpace=SyncFreeSpace-10;
+		DdePostAdvise(Inst,Topic,Item);
+		SyncRecv = FALSE;
+	}
 }
 
 void EndDdeCmnd(int Result)
 {
-  if ((ConvH==0) || (HWndDdeCli==NULL) || (! DdeCmnd)) return;
-  PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,(WPARAM)Result,0);
-  DdeCmnd = FALSE;
+	if ((ConvH==0) || (HWndDdeCli==NULL) || (! DdeCmnd)) return;
+	PostMessage(HWndDdeCli,WM_USER_DDECMNDEND,(WPARAM)Result,0);
+	DdeCmnd = FALSE;
 }
 
 void SetDdeComReady(WORD Ready)
 {
-  if (HWndDdeCli==NULL) return;
-  PostMessage(HWndDdeCli,WM_USER_DDECOMREADY,Ready,0);
+	if (HWndDdeCli==NULL) return;
+	PostMessage(HWndDdeCli,WM_USER_DDECOMREADY,Ready,0);
 }
 
 void RunMacro(PCHAR FName, BOOL Startup)
