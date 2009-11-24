@@ -1031,18 +1031,3 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 
 	return 0;
 }
-
-// add 'callmenu' (2007.11.18 maya)
-WORD CallMenu(int MenuId)
-{
-	char Cmd[10];
-
-	if (! Linked) {
-		ErrLinkFirst;
-	}
-
-	_snprintf_s(Cmd,sizeof(Cmd),_TRUNCATE,"%c%u",CmdCallMenu,MenuId);
-	DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
-
-	return 0;
-}

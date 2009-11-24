@@ -299,26 +299,6 @@ WORD TTLCall()
 	return Err;
 }
 
-// add 'callmenu' (2007.11.18 maya)
-WORD TTLCallMenu()
-{
-	WORD Err;
-	int Val;
-
-	Err = 0;
-	GetIntVal(&Val,&Err);
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if ((Err==0) && (! Linked))
-		Err = ErrLinkFirst;
-
-	if (Err==0) {
-		Err = CallMenu(Val);
-	}
-
-	return Err;
-}
-
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
 {
@@ -3809,7 +3789,7 @@ int ExecCmnd()
 		case RsvCall:
 			Err = TTLCall(); break;
 		case RsvCallMenu:
-			Err = TTLCallMenu(); break;
+			Err = TTLCommCmdInt(CmdCallMenu,0); break;
 		case RsvChangeDir:
 			Err = TTLCommCmdFile(CmdChangeDir,0); break;
 		case RsvClearScreen:

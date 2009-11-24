@@ -89,7 +89,6 @@ void SendSync();
 void SetSync(BOOL OnFlag);
 WORD SendCmnd(char OpId, int WaitFlag);
 WORD GetTTParam(char OpId, PCHAR Param, int destlen);
-WORD CallMenu(int MenuId);
 int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len);
 
 extern BOOL Linked;

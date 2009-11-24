@@ -687,7 +687,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		break;
 		// add 'callmenu' (2007.11.18 maya)
 	case CmdCallMenu:
-		i = atoi(Command + 1);
+		i = atoi(ParamFileName);
 		if (i >= 51110 && i <= 51990) {
 			PostMessage(HTEKWin,WM_COMMAND,MAKELONG(i,0),0);
 		}
