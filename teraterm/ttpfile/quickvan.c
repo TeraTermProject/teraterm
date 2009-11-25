@@ -785,6 +785,7 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
   }
   /* file no. */
   qv->FileNum++;
+  fv->ProgStat = 0;
   i = 3;
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */

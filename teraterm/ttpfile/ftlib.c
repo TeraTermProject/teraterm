@@ -181,5 +181,9 @@ BOOL FTCreateFile(PFileVar fv)
   fv->ByteCount = 0;
   fv->FileSize = 0;
 
+  if (fv->ProgStat != -1) {
+    fv->ProgStat = 0;
+  }
+
   return fv->FileOpen;
 }
