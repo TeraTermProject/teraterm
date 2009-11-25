@@ -532,6 +532,7 @@ BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
     fv->FileSize = GetFSize(fv->FullName);
 
   fv->ByteCount = 0;
+  fv->ProgStat = 0;
 
   SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
   SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);

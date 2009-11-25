@@ -110,7 +110,7 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%3.1f%%",Num); 
 	SetDlgItemText(HDlg, id_Item, NumStr); 
 
-	if (id_Progress != 0 && p != NULL && *p >= 0 && *p < (int)Num) {
+	if (id_Progress != 0 && p != NULL && *p >= 0 && (double)*p < Num) {
 		*p = (int)Num;
 		SendMessage(GetDlgItem(HDlg, id_Progress), PBM_SETPOS, (WPARAM)*p, 0);
 	}

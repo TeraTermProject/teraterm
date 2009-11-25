@@ -409,6 +409,7 @@ void ZSendFileDat(PFileVar fv, PZVar zv)
   zv->ZState = Z_SendFileDat;
 
   fv->ByteCount = 0;
+  fv->ProgStat = 0;
   SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
   SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
     fv->ByteCount, fv->FileSize, &fv->ProgStat);
