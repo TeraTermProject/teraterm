@@ -897,7 +897,7 @@ typedef TComVar far *PComVar;
 #define ID_SHOWMENUBAR   995
 
 #define MAXNWIN 50
-#define MAXCOMPORT 256
+#define MAXCOMPORT 4096
 #define MAXHOSTLIST 200
 
 /* shared memory */

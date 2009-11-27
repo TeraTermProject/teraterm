@@ -1972,7 +1972,7 @@ int PASCAL DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 #if 1
 		for (i=1; i<=ComPortMax; i++) {
 			FILE *fp;
-			char buf[11]; // \\.\COMxxx + NULL
+			char buf[12]; // \\.\COMxxxx + NULL
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "\\\\.\\COM%d", i);
 			if ((fp = fopen(buf, "r")) != NULL) {
 				fclose(fp);

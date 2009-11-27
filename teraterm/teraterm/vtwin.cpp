@@ -3362,7 +3362,7 @@ void CVTWindow::OnFileNewConnection()
 		}
 		else {
 			if (GetHNRec.PortType==IdSerial) {
-				char comport[4];
+				char comport[5];
 				Command[8] = 0;
 				strncat_s(Command,sizeof(Command)," /C=",_TRUNCATE);
 				_snprintf_s(comport, sizeof(comport), _TRUNCATE, "%d", GetHNRec.ComPort);
