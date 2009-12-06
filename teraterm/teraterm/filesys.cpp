@@ -235,11 +235,13 @@ void ShowFTDlg(WORD OpId)
 	if (OpId == OpLog) {
 		if (FLogDlg != NULL) {
 			FLogDlg->ShowWindow(SW_SHOWNORMAL);
+			SetForegroundWindow(FLogDlg->GetSafeHwnd());
 		}
 	}
 	else {
 		if (SendDlg != NULL) {
 			SendDlg->ShowWindow(SW_SHOWNORMAL);
+			SetForegroundWindow(SendDlg->GetSafeHwnd());
 		}
 	}
 }
