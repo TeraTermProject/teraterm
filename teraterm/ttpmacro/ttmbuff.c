@@ -230,6 +230,7 @@ BOOL RegisterLabels(int IBuff)
 	TName LabName;
 	WORD Err;
 	WORD VarType, VarId;
+	TStrVal tmp;
 
 	Buff[IBuff] = GlobalLock(BuffHandle[IBuff]);
 	if (Buff[IBuff]==NULL) {
@@ -256,11 +257,17 @@ BOOL RegisterLabels(int IBuff)
 				Err = ErrSyntax;
 			}
 		}
+		else {
+		    LinePtr--;
+		}
 
 		/* 次の行へ移す前に、C言語コメントを探すため、行末までスキャンする。*/
-		do {
-			b = GetFirstChar();
-		} while (b != 0);
+		while ((b=GetFirstChar()) != 0) {
+			if (b=='"' || b=='\'' || b=='#') {
+				LinePtr--;
+				GetString(tmp, &Err);
+			}
+		}
 
 		if (Err>0) {
 			DispErr(Err);
