@@ -18,14 +18,31 @@ Displays a dialog box prompting user to input a string.
 </p>
 
 <pre class="macro-syntax">
-filenamebox &lt;title&gt;
+filenamebox &lt;title&gt; [&lt;dialogtype&gt;]
 </pre>
 
-<h2>Remarks</h2>
+<h2>Parameters</h2>
 
-<p>
-The &lt;title&gt; is displayed as the dialog box title. The string entered by the user is returned in the system variable "inputstr".
-</p>
+<dl>
+	<dt class="macro">string &lt;title&gt;</dt>
+	<dd>The titie of dialog box</dd>
+
+	<dt class="macro">integer &lt;dialogtype&gt; (optional default=nonzero) (version 4.65 or later)</dt>
+	<dd>Specifies the type of dialog box.<br>
+        If this parameter is zero, creates [Save] dialog box.<br>
+	    If this parameter is nonzero, creates [Open] dialog box.</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System valiable &lt;result&gt; (version 4.65 or later)</dt>
+	<dd>If the user specifies a file name and clicks OK button, set to nonzero. The file name is stored in "inputstr."<br>
+	    If the user cancels or closes the dialog, set to zero.</dd>
+
+	<dt class="macro">System valiable &lt;inputstr&gt;</dt>
+	<dd>The file name entered by the user</dd>
+</dl>
 
 <h2>Example</h2>
 

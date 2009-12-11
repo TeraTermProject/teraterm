@@ -1100,10 +1100,17 @@ WORD TTLFilenameBox()
 	WORD Err, ValType, VarId;
 	OPENFILENAME ofn;
 	char uimsg[MAX_UIMSG];
+	BOOL SaveFlag = FALSE;
+	BOOL ret;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
 	if (Err!=0) return Err;
+
+	if (CheckParameterGiven()) { // dialogtype
+		GetIntVal(&SaveFlag, &Err);
+		if (Err!=0) return Err;
+	}
 
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
@@ -1121,7 +1128,13 @@ WORD TTLFilenameBox()
 		get_lang_msg("FILEDLG_ALL_FILTER", uimsg, sizeof(uimsg), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
 		ofn.lpstrFilter     = uimsg;
 		ofn.lpstrInitialDir = NULL;
-		GetOpenFileName(&ofn);
+		if (SaveFlag) {
+			ret = GetSaveFileName(&ofn);
+		}
+		else {
+			ret = GetOpenFileName(&ofn);
+		}
+		SetResult(ret);
 	}
 	return Err;
 }

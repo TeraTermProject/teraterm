@@ -18,14 +18,31 @@
 </p>
 
 <pre class="macro-syntax">
-filenamebox &lt;title&gt;
+filenamebox &lt;title&gt; [&lt;dialogtype&gt;]
 </pre>
 
-<h2>解説</h2>
+<h2>パラメータ</h2>
 
-<p>
-文字列 &lt;title&gt; はダイアログボックスのタイトル。入力された文字列はシステム変数 inputstr に代入される。
-</p>
+<dl>
+	<dt class="macro">文字列 &lt;title&gt;</dt>
+	<dd>ダイアログボックスのタイトル</dd>
+
+	<dt class="macro">整数 &lt;dialogtype&gt; (オプション デフォルト=非ゼロ) (バージョン 4.65 以降)</dt>
+	<dd>ダイアログボックスの種類を指定する。<br>
+	    0を指定すると［ファイル名を付けて保存］ダイアログボックスを開く。<br>
+	    0以外の値を指定すると［ファイルを開く］ダイアログボックスを開く。</dd>
+</dl>
+
+<h2>返り値</h2>
+
+<dl>
+	<dt class="macro">システム変数 &lt;result&gt; (バージョン 4.65 以降)</dt>
+	<dd>ユーザがファイル名を入力してOKボタンを押すと0以外の値が格納され、inputstrにファイル名が格納される。<br>
+	    ユーザがダイアログをキャンセルしたり閉じたりすると0が格納される。</dd>
+
+	<dt class="macro">システム変数 &lt;inputstr&gt;</dt>
+	<dd>入力されたファイル名</dd>
+</dl>
 
 <h2>例</h2>
 

@@ -60,6 +60,11 @@ dt {
 	border-width: 0px 0px 1px 0px;
 }
 
+dt.macro {
+	font-weight: normal;
+	font-style: italic;
+}
+
 li.description{
     margin-bottom: 1ex;
 }
