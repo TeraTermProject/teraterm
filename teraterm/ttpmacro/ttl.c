@@ -1129,6 +1129,7 @@ WORD TTLFilenameBox()
 		ofn.lpstrFilter     = uimsg;
 		ofn.lpstrInitialDir = NULL;
 		if (SaveFlag) {
+			ofn.Flags = OFN_OVERWRITEPROMPT;
 			ret = GetSaveFileName(&ofn);
 		}
 		else {
