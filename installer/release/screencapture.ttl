@@ -28,10 +28,15 @@ if appendmode=0 then
 	getdate filename "screencapture_%Y%m%d-%H%M%S.txt"
 	fileopen fp filename 0
 else
-	fileopen fp 'screencapture.txt' 1
+	filename = 'screencapture.txt'
+	fileopen fp filename 1
 endif
 
-if result <> 0 end
+if fp = -1 then
+	sprintf "Can't open "'"%s"' filename
+	messagebox inputstr "Error"
+	end
+endif
 
 ;select screen
 callmenu 50280
