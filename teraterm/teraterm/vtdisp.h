@@ -12,6 +12,8 @@ extern "C" {
 void BGInitialize(void);
 void BGSetupPrimary(BOOL);
 
+void BGExchangeColor(void);
+
 void BGOnSettingChange(void);
 void BGOnEnterSizeMove(void);
 void BGOnExitSizeMove(void);

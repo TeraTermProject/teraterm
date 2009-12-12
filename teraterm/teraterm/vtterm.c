@@ -2031,7 +2031,8 @@ void CSSetAttr()
       ts.ColorFlag ^= CF_REVERSEVIDEO;
 
 #ifdef ALPHABLEND_TYPE2
-      BGInitialize();
+//      BGInitialize();
+      BGExchangeColor();
 #endif
       DispChangeBackground();
       UpdateWindow(HVTWin);

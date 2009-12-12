@@ -1278,6 +1278,37 @@ void BGInitialize(void)
   (FARPROC)BGEnumDisplayMonitors = GetProcAddressWithDllName("user32.dll","EnumDisplayMonitors");
 }
 
+void BGExchangeColor() {
+	COLORREF ColorRef;
+      if (ts.ColorFlag & CF_REVERSECOLOR) {
+        ColorRef = BGVTColor[0];
+        BGVTColor[0] = BGVTReverseColor[0];
+        BGVTReverseColor[0] = ColorRef;
+        ColorRef = BGVTColor[1];
+        BGVTColor[1] = BGVTReverseColor[1];
+        BGVTReverseColor[1] = ColorRef;
+      }
+      else {
+        ColorRef = BGVTColor[0];
+        BGVTColor[0] = BGVTColor[1];
+        BGVTColor[1] = ColorRef;
+      }
+
+      ColorRef = BGVTBoldColor[0];
+      BGVTBoldColor[0] = BGVTBoldColor[1];
+      BGVTBoldColor[1] = ColorRef;
+
+      ColorRef = BGVTBlinkColor[0];
+      BGVTBlinkColor[0] = BGVTBlinkColor[1];
+      BGVTBlinkColor[1] = ColorRef;
+
+      ColorRef = BGURLColor[0];
+      BGURLColor[0] = BGURLColor[1];
+      BGURLColor[1] = ColorRef;
+
+//    BGReverseText = !BGReverseText;
+}
+
 void BGFillRect(HDC hdc,RECT *R,HBRUSH brush)
 {
   if(!BGEnable)
