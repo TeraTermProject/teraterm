@@ -2602,7 +2602,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
 	  BackColor = BGVTColor[1];
 #else
 	  BackColor = ts.VTBlinkColor[1];
-	else if (isBoldkColored(Attr))
+	else if (isBoldColored(Attr))
 	  BackColor = ts.VTBoldColor[1];
 	else if (isURLColored(Attr))
 	  BackColor = ts.URLColor[1];
