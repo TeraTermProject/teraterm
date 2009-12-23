@@ -166,7 +166,7 @@
 ■ CygTermのビルド方法
   CygTermのビルド方法について以下に示します。
 
-   1. Cygwin(http://www.cygwin.com/)をインストールする
+   1. Cygwin(http://www.cygwin.com/win-9x.html)をインストールする
       注意: 1.7.x は Windows 9x をサポートしていないので、1.5.x を利用する。
             1.5.x は Windows 7 をサポートしていないようだが、1.5.x でコンパイルされたバイナリは 1.7.x 環境で実行できる。
    2. Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
