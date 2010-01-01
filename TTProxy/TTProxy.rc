@@ -103,7 +103,7 @@ BEGIN
             VALUE "FileDescription", "プロキシプラグイン"
             VALUE "FileVersion", "1, 0, 0, 16"
             VALUE "InternalName", "TTProxy"
-            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2008, Copyright (C) 2003-2006 蛭子屋本舗"
+            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2009, Copyright (C) 2003-2006 蛭子屋本舗"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "蛭子屋本舗プロキシプラグイン集"
             VALUE "ProductVersion", "1, 0, 0, 16"
@@ -155,7 +155,7 @@ BEGIN
             VALUE "FileDescription", "Proxy plug-in"
             VALUE "FileVersion", "1, 0, 0, 16"
             VALUE "InternalName", "TTProxy"
-            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2008, Copyright (C) 2003-2006 Yebisuya Hompo"
+            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2009, Copyright (C) 2003-2006 Yebisuya Hompo"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "Proxy plug-in collection of Yebisuya Hompo"
             VALUE "ProductVersion", "1, 0, 0, 16"
@@ -231,7 +231,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About TTProxy"
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
-    LTEXT           "TTProxy\n%s, %d.%d.%d.%d\nCopyright (C) 2006-2008 TeraTerm Project\nTeraTerm Project: http://ttssh2.sourceforge.jp/\nCopyright (C) 2003-2006 %s\n%s: http://yebisuya.dip.jp/Software/TTProxy/",IDC_VERSION,7,7,212,52
+    LTEXT           "TTProxy\n%s, %d.%d.%d.%d\nCopyright (C) 2006-2009 TeraTerm Project\nTeraTerm Project: http://ttssh2.sourceforge.jp/\nCopyright (C) 2003-2006 %s\n%s: http://yebisuya.dip.jp/Software/TTProxy/",IDC_VERSION,7,7,212,52
     DEFPUSHBUTTON   "OK",IDOK,82,63,50,14
 END
 
