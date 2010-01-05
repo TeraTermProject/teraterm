@@ -10,7 +10,7 @@
 
 #define ORDER 4000
 
-#define MINIMUM_INTERVAL 10
+#define MINIMUM_INTERVAL 1
 #define DEFAULT_INTERVAL 300
 
 #define IdRecurringTimer 3001
