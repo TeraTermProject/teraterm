@@ -2805,18 +2805,41 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 
 		PageStart = BuffEnd - NumOfLines;
 	}
-	BuffScroll(NumOfLines,NumOfLines-1);
+
+	if (ts.TermFlag & TF_CLEARONRESIZE) {
+		BuffScroll(NumOfLines,NumOfLines-1);
+	}
+
 	/* Set Cursor */
-	CursorX = 0;
-	if (St) {
-		CursorY = NumOfLines-1;
-		CursorTop = CursorY;
-		CursorBottom = CursorY;
+	if (ts.TermFlag & TF_CLEARONRESIZE) {
+		CursorX = 0;
+		if (St) {
+			CursorY = NumOfLines-1;
+			CursorTop = CursorY;
+			CursorBottom = CursorY;
+		}
+		else {
+			CursorY = 0;
+			CursorTop = 0;
+			CursorBottom = NumOfLines-1-StatusLine;
+		}
 	}
 	else {
-		CursorY = 0;
-		CursorTop = 0;
-		CursorBottom = NumOfLines-1-StatusLine;
+		if (CursorX >= NumOfColumns) {
+			CursorX = NumOfColumns - 1;
+		}
+		if (St) {
+			CursorY = NumOfLines-1;
+			CursorTop = CursorY;
+			CursorBottom = CursorY;
+		}
+		else {
+			if (CursorY >= NumOfColumns - StatusLine) {
+				CursorY = NumOfLines - 1 - StatusLine;
+			}
+			CursorTop = 0;
+			CursorBottom = NumOfLines - 1 - StatusLine;
+		}
 	}
 
 	SelectStart.x = 0;
@@ -2854,7 +2877,10 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 	/* Change Window Size */
 	BuffChangeWinSize(W,H);
 	WinOrgY = -NumOfLines;
-	DispScrollHomePos();
+
+	if (ts.TermFlag & TF_CLEARONRESIZE) {
+		DispScrollHomePos();
+	}
 
 	if (cv.Ready && cv.TelFlag) {
 		TelInformWinSize(NumOfColumns,NumOfLines-StatusLine);

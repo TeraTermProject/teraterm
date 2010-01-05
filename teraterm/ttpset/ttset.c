@@ -1329,6 +1329,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// Line at a time mode
 	ts->EnableLineMode = GetOnOff(Section, "EnableLineMode", FName, TRUE);
+
+	// Clear window on resize
+	if (GetOnOff(Section, "ClearOnResize", FName, TRUE))
+		ts->TermFlag |= TF_CLEARONRESIZE;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
