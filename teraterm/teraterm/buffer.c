@@ -2834,7 +2834,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 			CursorBottom = CursorY;
 		}
 		else {
-			if (CursorY >= NumOfColumns - StatusLine) {
+			if (CursorY >= NumOfLines - StatusLine) {
 				CursorY = NumOfLines - 1 - StatusLine;
 			}
 			CursorTop = 0;
