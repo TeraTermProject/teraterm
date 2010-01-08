@@ -2315,6 +2315,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Line at a time mode
 	WriteOnOff(Section, "EnableLineMode", FName, ts->EnableLineMode);
+
+	// Clear window on resize
+	WriteOnOff(Section, "ClearOnResize", FName,
+		ts->TermFlag & TF_CLEARONRESIZE);
 }
 
 #define VTEditor "VT editor keypad"
