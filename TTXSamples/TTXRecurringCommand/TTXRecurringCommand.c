@@ -16,6 +16,7 @@
 #define IdRecurringTimer 3001
 
 #define ID_MENU_SETUP 55500
+#define ID_MENU_CONTROL 55501
 
 #define SECTION "TTXRecurringCommand"
 
@@ -29,6 +30,7 @@ typedef struct {
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
 	HMENU SetupMenu;
+	HMENU ControlMenu;
 	int interval;
 	BOOL enable;
 	int cmdLen;
@@ -390,8 +392,27 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 	UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 	pvar->SetupMenu = GetSetupMenu(menu);
+	pvar->ControlMenu = GetControlMenu(menu);
 
 	InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETUP, "Rec&urring command");
+
+	if (pvar->enable) {
+		flag |= MF_CHECKED;
+	}
+
+	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, "Rec&urring command");
+	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
+}
+
+static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+	if (menu==pvar->ControlMenu) {
+		if (pvar->enable) {
+			CheckMenuItem(pvar->ControlMenu, ID_MENU_CONTROL, MF_BYCOMMAND | MF_CHECKED);
+		}
+		else {
+			CheckMenuItem(pvar->ControlMenu, ID_MENU_CONTROL, MF_BYCOMMAND | MF_UNCHECKED);
+		}
+	}
 }
 
 //
@@ -461,6 +482,17 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 			break;
 		}
 		return 1;
+
+	  case ID_MENU_CONTROL:
+		pvar->enable = !pvar->enable;
+		if (pvar->enable) {
+			SetTimer(pvar->cv->HWin, IdRecurringTimer,
+			         pvar->interval * 1000, RecurringTimerProc);
+		}
+		else {
+			KillTimer(pvar->cv->HWin, IdRecurringTimer);
+		}
+		return 1;
 	}
 	return 0;
 }
@@ -476,7 +508,7 @@ static TTXExports Exports = {
 	TTXCloseTCP,
 	NULL, // TTXSetWinSize,
 	TTXModifyMenu,
-	NULL, // TTXModifyPopupMenu,
+	TTXModifyPopupMenu,
 	TTXProcessCommand,
 	NULL, // TTXEnd,
 	NULL, // TTXSetCommandLine,
