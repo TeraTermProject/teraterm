@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdio.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
