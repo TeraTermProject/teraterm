@@ -119,6 +119,7 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_DISABLE_MOUSE_TRACKING_CTRL, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING_LABEL, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_CLEAR_ON_RESIZE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgGeneralFont = NULL;
@@ -158,6 +159,9 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_LAST", ts.UIMsg, sizeof(ts.UIMsg), "last", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
+	GetDlgItemText(IDC_CLEAR_ON_RESIZE, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_CLEAR_ON_RESIZE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_CLEAR_ON_RESIZE, ts.UIMsg);
 
 	// (1)DisableAcceleratorSendBreak
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_SENDBREAK);
@@ -195,6 +199,10 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	// (8)IDC_ACCEPT_TITLE_CHANGING
 	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
 	cmb->SetCurSel(ts.AcceptTitleChangeRequest);
+
+	// (9)IDC_CLEAR_ON_RESIZE
+	btn = (CButton *)GetDlgItem(IDC_CLEAR_ON_RESIZE);
+	btn->SetCheck((ts.TermFlag & TF_CLEARONRESIZE) != 0);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -260,6 +268,12 @@ void CGeneralPropPageDlg::OnOK()
 	// (8)IDC_ACCEPT_TITLE_CHANGING 
 	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
 	ts.AcceptTitleChangeRequest = cmb->GetCurSel();
+
+	// (9)IDC_CLEAR_ON_RESIZE
+	btn = (CButton *)GetDlgItem(IDC_CLEAR_ON_RESIZE);
+	if (((ts.TermFlag & TF_CLEARONRESIZE) != 0) != btn->GetCheck()) {
+		ts.TermFlag ^= TF_CLEARONRESIZE;
+	}
 }
 
 

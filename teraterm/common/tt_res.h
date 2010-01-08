@@ -137,6 +137,7 @@
 #define IDC_CONFIRM_STRING_FILE         2520
 #define IDC_CONFIRM_STRING_FILE_PATH    2521
 #define IDC_CONFIRM_STRING_FILE_LABEL   2522
+#define IDC_CLEAR_ON_RESIZE             2523
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -229,7 +230,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        121
 #define _APS_NEXT_COMMAND_VALUE         52030
-#define _APS_NEXT_CONTROL_VALUE         2523
+#define _APS_NEXT_CONTROL_VALUE         2524
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
