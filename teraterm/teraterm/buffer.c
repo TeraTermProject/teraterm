@@ -2798,6 +2798,8 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 			Ny = NumOfLinesInBuff;
 		}
 
+		CursorY += Ny - NumOfLines;
+
 		NumOfColumns = Nx;
 		NumOfLines = Ny;
 		ts.TerminalWidth = Nx;
