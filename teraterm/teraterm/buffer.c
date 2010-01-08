@@ -2880,9 +2880,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 	BuffChangeWinSize(W,H);
 	WinOrgY = -NumOfLines;
 
-	if (ts.TermFlag & TF_CLEARONRESIZE) {
-		DispScrollHomePos();
-	}
+	DispScrollHomePos();
 
 	if (cv.Ready && cv.TelFlag) {
 		TelInformWinSize(NumOfColumns,NumOfLines-StatusLine);
