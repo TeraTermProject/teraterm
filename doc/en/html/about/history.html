@@ -30,15 +30,20 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.65">2009.11.18 (Ver 4.65 unreleased)</a></h3>
+<h3><a name="teraterm_4.65">2010.1.11 (Ver 4.65 unreleased)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>
       <li>expanded the maximun number of saved host to 500.</li>
       <li>expanded the maximum number of serial connection to 4096.</li>
-      <!--li>コマンドラインでタブもパラメータの区切りとして認識するようにした。</li-->
-      <!--li><a href="../menu/file.html">[File] メニューの [Show Log dialog]</a> を、ログウィンドウが表示されていても押せるようにした。</li-->
-      <!--li>マクロコマンド "<a href="../macro/command/disconnect.html">disconnect</a>" に、TCP/IP 接続切断時の確認ダイアログを制御するオプションを追加した。</li-->
+      <li>added support for the tab character as the command line delimiter.</li>
+      <li>enabled the [Show Log dialog] of the <a href="../menu/file.html">[File]</a> menu while the log window is shown.</li>
+      <li>added the confirmation parameter at the "<a href="../macro/command/disconnect.html">disconnect</a>" macro command.</li>
+      <li>added support for not clearing the terminal screen while resizing.
+        <ul>
+          <li>added the ClearOnResize entry in the teraterm.ini file and on the Additional Settings dialog. The default value is on.</li>
+        </ul></li>
+      <li>added support for overwritten confirmation at the "<a href="../macro/command/filenamebox.html">filenamebox</a>" macro command.</li>
     </ul>
   </li>
 
@@ -46,15 +51,17 @@
     <ul>
       <li>When the Auto Window Close is disabled, the ttermpro.exe can not notify the XTYP_DISCONNECT transaction to the ttpmacro.exe.</li>
       <li><a href="../menu/setup-additional.html">PasteDelayPerLine</a> setting does not work correctly.</li>
-      <!--li>マクロの文字列型定数にタブを直接入れられなかった問題を修正した。</li-->
-      <!--li>Kermit, ZMODEM, QuickVAN で複数のファイルを送信したとき、また ZMODEM, QuickVAN で複数のファイルを受信したとき、2個目以降のファイルでプログレスバーがリセットされない問題を修正した。</li-->
-      <!--li>マクロで、文字列中の /* をコメントの開始と誤認識していたのを修正した。</li-->
+      <li>The macro string-type constants can not describe a tab character.</li>
+      <li>When the multiple files are sent or received by the Kermit, ZMODEM and QuickVAN protocol, the progress bar can not be reset after the second file. </li>
+      <li>The `/*' characters in the macro string-type constants are falsely recognized as a beginning of the C language-style comment.</li>
+      <li>Workaround: When the Eterm look-feel is enabled, the screen display can not work after the Reverse Video (DECSCNM) set/reset.</li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
-      <!--li>Windows 7を正式にサポート。</li-->
+      <li>added support for Microsoft Windows 7.</li>
+      <li>updated the screencapture.ttl file.</li>
     </ul>
   </li>
 
