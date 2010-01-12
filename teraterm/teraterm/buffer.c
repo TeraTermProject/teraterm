@@ -2798,7 +2798,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 			Ny = NumOfLinesInBuff;
 		}
 
-		if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
+		if ((ts.TermFlag & TF_CLEARONRESIZE) == 0 && Ny != NumOfLines) {
 			l = NumOfLines - Ny;
 			d = NumOfLines - 1 - StatusLine - CursorY;
 			if (l > 0 && d > 0) {
