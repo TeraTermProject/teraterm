@@ -128,6 +128,7 @@
 #define IDC_CLIPBOARD_INFO              2511
 #define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
+#define IDC_CURSOR_CTRL_SEQ             2512
 #define IDC_MOUSEWHEEL_SCROLL_LINE      2513
 #define IDC_TRANSPROGRESS               2514
 #define IDC_PROTOPROGRESS               2515
