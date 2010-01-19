@@ -265,6 +265,9 @@
                 zsh 4.3.4
 
 // C H A N G E S //
+v1.07_18 2010/01/19 (by doda)
+        * Delete doubule quote character from '-d' option's parameter.
+
 v1.07_17 2009/06/16 (by doda)
         * Added TELNET SGA/ECHO negotiation.
 

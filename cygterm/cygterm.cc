@@ -96,9 +96,13 @@
 // patch level 17 - added TELNET SGA/ECHO negotiation
 //   Written by IWAMOTO Kouichi. (doda)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 17 - delete double quote character from '-d' option's parameter
+//   Written by IWAMOTO Kouichi. (doda)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_17 (2009/06/16)";
+static char Version[] = "version 1.07_18 (2010/01/19)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -394,6 +398,16 @@ void load_cfg()
     }
 }
 
+BOOL quote_cut(char *dst, size_t len, char *src) {
+	while (*src && len > 1) {
+		if (*src != '"') {
+			*dst++ = *src;
+		}
+		src++;
+	}
+	*dst = 0;
+}
+
 //=======================//
 // commandline arguments //
 //-----------------------//
@@ -461,7 +475,8 @@ void get_args(int argc, char** argv)
         else if (!strcmp(*argv, "-d")) {        // -d <exec directory>
             if (*++argv == NULL)
                 break;
-            chdir(*argv);
+	    quote_cut(tmp, sizeof(tmp), *argv);
+            chdir(tmp);
         }
         else if (!strcmp(*argv, "-o")) {        // -o <additional option for terminal>
             if (*++argv == NULL)
