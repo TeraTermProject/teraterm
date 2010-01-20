@@ -2799,6 +2799,17 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 		}
 
 		if ((ts.TermFlag & TF_CLEARONRESIZE) == 0 && Ny != NumOfLines) {
+		    BuffEnd += Ny - NumOfLines;
+		    if (Ny > NumOfLines) {
+			if (BuffEnd > NumOfLinesInBuff) {
+			    BuffEndAbs -= BuffEnd - NumOfLinesInBuff;
+			    if (BuffEndAbs < 0) {
+				BuffEndAbs += NumOfLinesInBuff;
+			    }
+			    BuffEnd = NumOfLinesInBuff;
+			}
+		    }
+/*
 			l = NumOfLines - Ny;
 			d = NumOfLines - 1 - StatusLine - CursorY;
 			if (l > 0 && d > 0) {
@@ -2813,6 +2824,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 			}
 
 			CursorY -= l;
+*/
 		}
 
 		NumOfColumns = Nx;
