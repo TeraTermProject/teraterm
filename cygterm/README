@@ -154,7 +154,7 @@
     SOCKET_TIMEOUT
     --------------
         Specify the timeout of socket for waiting telnet connection from
-        Tera Term. (default: 5secs)
+        terminal emulator. (default: 5secs)
 
     SSH_AGENT_PROXY
     ---------------
