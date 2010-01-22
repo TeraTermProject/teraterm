@@ -97,7 +97,7 @@
 //   Written by IWAMOTO Kouichi. (doda)
 //
 /////////////////////////////////////////////////////////////////////////////
-// patch level 17 - delete double quote character from '-d' option's parameter
+// patch level 18 - delete double quote character from '-d' option's parameter
 //   Written by IWAMOTO Kouichi. (doda)
 //
 
