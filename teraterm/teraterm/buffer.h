@@ -68,6 +68,8 @@ void BuffLineContinued(BOOL mode);
 void BuffRegionScrollUpNLines(int n);
 void BuffRegionScrollDownNLines(int n);
 void BuffSetCurCharAttr(TCharAttr Attr);
+void BuffSaveScreen();
+void BuffRestoreScreen();
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom;

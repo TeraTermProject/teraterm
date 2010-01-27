@@ -1333,6 +1333,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Clear window on resize
 	if (GetOnOff(Section, "ClearOnResize", FName, TRUE))
 		ts->TermFlag |= TF_CLEARONRESIZE;
+
+	// Alternate Screen Buffer
+	if (GetOnOff(Section, "AlternateScreenBuffer", FName, TRUE))
+		ts->TermFlag |= TF_ALTSCR;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2319,6 +2323,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Clear window on resize
 	WriteOnOff(Section, "ClearOnResize", FName,
 		ts->TermFlag & TF_CLEARONRESIZE);
+
+	// Alternate Screen Buffer
+	WriteOnOff(Section, "AlternateScreenBuffer", FName,
+		ts->TermFlag & TF_ALTSCR);
 }
 
 #define VTEditor "VT editor keypad"

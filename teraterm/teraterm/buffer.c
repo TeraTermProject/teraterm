@@ -68,6 +68,10 @@ static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
 
 static TCharAttr CurCharAttr;
 
+HANDLE SaveBuff = NULL;
+int SaveBuffX;
+int SaveBuffY;
+
 LONG GetLinePtr(int Line)
 {
 	LONG Ptr;
@@ -3175,4 +3179,89 @@ void BuffLineContinued(BOOL mode)
 void BuffSetCurCharAttr(TCharAttr Attr) {
 	CurCharAttr = Attr;
 	DispSetCurCharAttr(Attr);
+}
+
+void BuffSaveScreen()
+{
+	PCHAR CodeDest, AttrDest, AttrDest2, AttrDestFG, AttrDestBG;
+	LONG ScrSize;
+	LONG SrcPtr, DestPtr;
+	int i;
+
+	if (SaveBuff == NULL) {
+		ScrSize = NumOfColumns * NumOfLines;
+		if ((SaveBuff=GlobalAlloc(GMEM_MOVEABLE, ScrSize * 5)) != NULL) {
+			if ((CodeDest=GlobalLock(SaveBuff)) != NULL) {
+				AttrDest = CodeDest + ScrSize;
+				AttrDest2 = AttrDest + ScrSize;
+				AttrDestFG = AttrDest2 + ScrSize;
+				AttrDestBG = AttrDestFG + ScrSize;
+
+				SaveBuffX = NumOfColumns;
+				SaveBuffY = NumOfLines;
+
+				SrcPtr = GetLinePtr(PageStart);
+				DestPtr = 0;
+
+				for (i=0; i<NumOfLines; i++) {
+					memcpy(&CodeDest[DestPtr], &CodeBuff[SrcPtr], NumOfColumns);
+					memcpy(&AttrDest[DestPtr], &AttrBuff[SrcPtr], NumOfColumns);
+					memcpy(&AttrDest2[DestPtr], &AttrBuff2[SrcPtr], NumOfColumns);
+					memcpy(&AttrDestFG[DestPtr], &AttrBuffFG[SrcPtr], NumOfColumns);
+					memcpy(&AttrDestBG[DestPtr], &AttrBuffBG[SrcPtr], NumOfColumns);
+					SrcPtr = NextLinePtr(SrcPtr);
+					DestPtr += NumOfColumns;
+				}
+			}
+			else {
+				GlobalFree(SaveBuff);
+				SaveBuff = NULL;
+			}
+		}
+	}
+	return;
+}
+
+void BuffRestoreScreen()
+{
+	PCHAR CodeSrc, AttrSrc, AttrSrc2, AttrSrcFG, AttrSrcBG;
+	LONG ScrSize;
+	LONG SrcPtr, DestPtr;
+	int i;
+
+	if (SaveBuff != NULL) {
+		if ((CodeSrc=GlobalLock(SaveBuff)) != NULL) {
+			ScrSize = SaveBuffX * SaveBuffY;
+
+			AttrSrc = CodeSrc + ScrSize;
+			AttrSrc2 = AttrSrc + ScrSize;
+			AttrSrcFG = AttrSrc2 + ScrSize;
+			AttrSrcBG = AttrSrcFG + ScrSize;
+
+			if (SaveBuffX > NumOfColumns) {
+				SaveBuffX = NumOfColumns;
+			}
+			if (SaveBuffY > NumOfLines) {
+				SaveBuffY = NumOfLines;
+			}
+
+			SrcPtr = 0;
+			DestPtr = GetLinePtr(PageStart);
+
+			for (i=0; i<SaveBuffY; i++) {
+				memcpy(&CodeBuff[DestPtr], &CodeSrc[SrcPtr], SaveBuffX);
+				memcpy(&AttrBuff[DestPtr], &AttrSrc[SrcPtr], SaveBuffX);
+				memcpy(&AttrBuff2[DestPtr], &AttrSrc2[SrcPtr], SaveBuffX);
+				memcpy(&AttrBuffFG[DestPtr], &AttrSrcFG[SrcPtr], SaveBuffX);
+				memcpy(&AttrBuffBG[DestPtr], &AttrSrcBG[SrcPtr], SaveBuffX);
+				SrcPtr += SaveBuffX;
+				DestPtr = NextLinePtr(DestPtr);
+			}
+			BuffUpdateRect(WinOrgX,WinOrgY,WinOrgX+WinWidth-1,WinOrgY+WinHeight-1);
+		}
+
+		GlobalFree(SaveBuff);
+		SaveBuff = NULL;
+	}
+	return;
 }

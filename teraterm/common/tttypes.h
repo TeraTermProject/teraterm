@@ -182,6 +182,7 @@ typedef TCharAttr *PCharAttr;
 #define TF_ENABLESLINE        64
 #define TF_BACKWRAP           128
 #define TF_CLEARONRESIZE      256
+#define TF_ALTSCR             512
 
 // ANSI/Attribute color flags (used in ts.ColorFlag)
 #define CF_PCBOLD16     1

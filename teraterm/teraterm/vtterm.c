@@ -53,6 +53,7 @@ static BOOL InsertMode;
 static BOOL LFMode;
 static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
+static BOOL AltScr;
 int MouseReportMode;
 
 // save/restore cursor
@@ -2078,6 +2079,12 @@ void CSSetAttr()		// SGR
 	    if (ts.AutoWinSwitch>0)
 	      ChangeEmu = IdTEK; /* Enter TEK Mode */
 	    break;
+	  case 47: // Alternate Screen Buffer
+	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
+	      BuffSaveScreen();
+	      AltScr = TRUE;
+	    }
+	    break;
 	  case 59:
 	    if (ts.Language==IdJapanese)
 	    { /* kanji terminal */
@@ -2180,6 +2187,12 @@ void CSSetAttr()		// SGR
 	    break;
 	  case 19: PrintEX = FALSE; break;		// DECPEX
 	  case 25: DispEnableCaret(FALSE); break;	// cursor off (DECTCEM)
+	  case 47: // Alternate Screen Buffer
+	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
+	      BuffRestoreScreen();
+	      AltScr = FALSE;
+	    }
+	    break;
 	  case 59:
 	    if (ts.Language==IdJapanese)
 	    { /* katakana terminal */
