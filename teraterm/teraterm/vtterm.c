@@ -1505,7 +1505,7 @@ void CSScreenErase()
     ClearTabStop(Param[1]);
   }
 
-  void CS_h_Mode()
+  void CS_h_Mode()		// SM
   {
     switch (Param[1]) {
       case 2:	// KAM
@@ -1537,7 +1537,7 @@ void CSScreenErase()
     }
   }
 
-  void CS_i_Mode()
+  void CS_i_Mode()		// MC
   {
     if (Param[1]==-1) Param[1] = 0;
     switch (Param[1]) {
@@ -1557,7 +1557,7 @@ void CSScreenErase()
     }
   }
 
-  void CS_l_Mode()
+  void CS_l_Mode()		// RM
   {
     switch (Param[1]) {
       case 2:	// KAM
@@ -1589,7 +1589,7 @@ void CSScreenErase()
     }
   }
 
-  void CS_n_Mode()
+  void CS_n_Mode()		// DSR
   {
     char Report[16];
     int Y, len;
@@ -1611,7 +1611,7 @@ void CSScreenErase()
     }
   }
 
-void CSSetAttr()
+void CSSetAttr()		// SGR
 {
 	int i, P;
 
@@ -1996,7 +1996,7 @@ void CSSetAttr()
     }
   }
 
-    void CSQExchangeColor()
+    void CSQExchangeColor()		// DECSCNM / Visual Bell
     {
       COLORREF ColorRef;
 
@@ -2038,21 +2038,21 @@ void CSSetAttr()
       UpdateWindow(HVTWin);
     }
 
-    void CSQ_h_Mode()
+    void CSQ_h_Mode() // DECSET
     {
       int i;
 
       for (i = 1 ; i<=NParam ; i++)
 	switch (Param[i]) {
-	  case 1: AppliCursorMode = TRUE; break;
-	  case 3:
+	  case 1: AppliCursorMode = TRUE; break;		// DECCKM
+	  case 3:		// DECCOLM
 	    ChangeTerminalSize(132,NumOfLines-StatusLine);
 	    break;
-	  case 5: /* Reverse Video */
+	  case 5: /* Reverse Video (DECSCNM) */
 	    if (!(ts.ColorFlag & CF_REVERSEVIDEO))
 	      CSQExchangeColor(); /* Exchange text/back color */
 	    break;
-	  case 6:
+	  case 6: // DECOM
 	    if ((StatusLine>0) && (CursorY==NumOfLines-1))
 	      MoveCursor(0,CursorY);
 	    else {
@@ -2060,21 +2060,21 @@ void CSSetAttr()
 	      MoveCursor(0,CursorTop);
 	    }
 	    break;
-	  case 7: AutoWrapMode = TRUE; break;
-	  case 8: AutoRepeatMode = TRUE; break;
-	  case 9:
+	  case 7: AutoWrapMode = TRUE; break;		// DECAWM
+	  case 8: AutoRepeatMode = TRUE; break;		// DECARM
+	  case 9: /* X10 Mouse Tracking */
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackX10;
 	    break;
-	  case 12:
+	  case 12: /* att610 cursor blinking */ 
 	    if (ts.WindowFlag & WF_CURSORCHANGE) {
 	      ts.NonblinkingCursor = FALSE;
 	      ChangeCaret();
 	    }
 	    break;
-	  case 19: PrintEX = TRUE; break;
-	  case 25: DispEnableCaret(TRUE); break; // cursor on
-	  case 38:
+	  case 19: PrintEX = TRUE; break;		// DECPEX
+	  case 25: DispEnableCaret(TRUE); break;	// cursor on (DECTCEM)
+	  case 38: // DECTEK
 	    if (ts.AutoWinSwitch>0)
 	      ChangeEmu = IdTEK; /* Enter TEK Mode */
 	    break;
@@ -2093,32 +2093,32 @@ void CSSetAttr()
 		Glr[1] = 3;
 	    }
 	    break;
-	  case 66: AppliKeyMode = TRUE; break;
-	  case 67: ts.BSKey = IdBS; break;
-	  case 1000:
+	  case 66: AppliKeyMode = TRUE; break;		// DECNKM
+	  case 67: ts.BSKey = IdBS; break;		// DECBKM
+	  case 1000: // Mouse Tracking
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackVT200;
 	    break;
-	  case 1001:
+	  case 1001: // Hilite Mouse Tracking
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackVT200Hl;
 	    break;
-	  case 1002:
+	  case 1002: // Button-Event Mouse Tracking
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackBtnEvent;
 	    break;
-	  case 1003:
+	  case 1003: // Any-Event Mouse Tracking
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackAllEvent;
 	    break;
-	  case 1004:
+	  case 1004: // Focus Report
 	    if (ts.MouseEventTracking)
 	      FocusReportMode = TRUE;
 	    break;
       }
     }
 
-    void CSQ_i_Mode()
+    void CSQ_i_Mode()		// MC (DEC)
     {
       if (Param[1]==-1) Param[1] = 0;
       switch (Param[1]) {
@@ -2147,21 +2147,21 @@ void CSSetAttr()
       }
     }
 
-    void CSQ_l_Mode()
+    void CSQ_l_Mode()		// DECRST
     {
       int i;
 
       for (i = 1 ; i <= NParam ; i++)
 	switch (Param[i]) {
-	  case 1: AppliCursorMode = FALSE; break;
-	  case 3:
+	  case 1: AppliCursorMode = FALSE; break;		// DECCKM
+	  case 3: // DECCOLM
 	    ChangeTerminalSize(80,NumOfLines-StatusLine);
 	    break;
-	  case 5: /* Normal Video */
+	  case 5: /* Normal Video (DECSCNM) */
 	    if (ts.ColorFlag & CF_REVERSEVIDEO)
 	      CSQExchangeColor(); /* Exchange text/back color */
 	    break;
-	  case 6:
+	  case 6: // DECOM
 	    if ((StatusLine>0) && (CursorY==NumOfLines-1))
 	      MoveCursor(0,CursorY);
 	    else {
@@ -2169,17 +2169,17 @@ void CSSetAttr()
 	      MoveCursor(0,0);
 	    }
 	    break;
-	  case 7: AutoWrapMode = FALSE; break;
-	  case 8: AutoRepeatMode = FALSE; break;
-	  case 9: MouseReportMode = IdMouseTrackNone; break;
-	  case 12:
+	  case 7: AutoWrapMode = FALSE; break;		// DECAWM
+	  case 8: AutoRepeatMode = FALSE; break;	// DECARM
+	  case 9: MouseReportMode = IdMouseTrackNone; break; /* X10 Mouse Tracking */
+	  case 12: /* att610 cursor blinking */ 
 	    if (ts.WindowFlag & WF_CURSORCHANGE) {
 	      ts.NonblinkingCursor = TRUE;
 	      ChangeCaret();
 	    }
 	    break;
-	  case 19: PrintEX = FALSE; break;
-	  case 25: DispEnableCaret(FALSE); break; // cursor off
+	  case 19: PrintEX = FALSE; break;		// DECPEX
+	  case 25: DispEnableCaret(FALSE); break;	// cursor off (DECTCEM)
 	  case 59:
 	    if (ts.Language==IdJapanese)
 	    { /* katakana terminal */
@@ -2195,28 +2195,28 @@ void CSSetAttr()
 		Glr[1] = 3;
 	    }
 	    break;
-	  case 66: AppliKeyMode = FALSE; break;
-	  case 67: ts.BSKey = IdDEL; break;
-	  case 1000:
-	  case 1001:
-	  case 1002:
-	  case 1003: MouseReportMode = IdMouseTrackNone; break;
-	  case 1004: FocusReportMode = FALSE; break;
+	  case 66: AppliKeyMode = FALSE; break;		// DECNKM
+	  case 67: ts.BSKey = IdDEL; break;		// DECBKM
+	  case 1000: // Mouse Tracking
+	  case 1001: // Hilite Mouse Tracking
+	  case 1002: // Button-Event Mouse Tracking
+	  case 1003: MouseReportMode = IdMouseTrackNone; break; // Any-Event Mouse Tracking
+	  case 1004: FocusReportMode = FALSE; break; // Focus Report
 	}
     }
 
-    void CSQ_n_Mode()
+    void CSQ_n_Mode()		// DSR (DEC)
     {
     }
 
   void CSQuest(BYTE b)
   {
     switch (b) {
-      case 'K': CSLineErase(); break;
-      case 'h': CSQ_h_Mode(); break;
-      case 'i': CSQ_i_Mode(); break;
-      case 'l': CSQ_l_Mode(); break;
-      case 'n': CSQ_n_Mode(); break;
+      case 'K': CSLineErase(); break;		// DECSEL
+      case 'h': CSQ_h_Mode(); break;		// DECSET
+      case 'i': CSQ_i_Mode(); break;		// MC (DEC)
+      case 'l': CSQ_l_Mode(); break;		// DECRST
+      case 'n': CSQ_n_Mode(); break;		// DSR (DEC)
     }
   }
 
