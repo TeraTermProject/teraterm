@@ -11,13 +11,6 @@
 #define ORDER 5900
 #define SECTION "Resize Menu"
 
-int def_resize_list[][2] = {
-	{80, 37},
-	{120, 52},
-	{80, 24},
-	{110, 37}
-};
-
 #define ID_MENUID_BASE 55101
 #define MAX_MENU_ITEMS 20
 
@@ -46,36 +39,41 @@ void InitMenu() {
     DestroyMenu(pvar->ResizeMenu);
   }
 
-  pvar->ResizeMenu = CreateMenu();
+  if (pvar->MenuItems > 0) {
+    pvar->ResizeMenu = CreateMenu();
 
-  for (i=0; i < pvar->MenuItems; i++) {
-    x = pvar->ResizeList[i][0];
-    y = pvar->ResizeList[i][1];
-    if (i < 15) {
-      if (x == 0)
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "height: %d(&%x)", y, i+1);
-      else if (y == 0)
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "width: %d(&%x)", x, i+1);
-      else
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d(&%x)", x, y, i+1);
+    for (i=0; i < pvar->MenuItems; i++) {
+      x = pvar->ResizeList[i][0];
+      y = pvar->ResizeList[i][1];
+      if (i < 15) {
+	if (x == 0)
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "height: %d(&%x)", y, i+1);
+	else if (y == 0)
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "width: %d(&%x)", x, i+1);
+	else
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d(&%x)", x, y, i+1);
+      }
+      else if (i < 35) {
+	if (x == 0)
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "height: %d(&%c)", y, 'a' + i - 9);
+	else if (y == 0)
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "width: %d(&%c)", x, 'a' + i - 9);
+	else
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d(&%c)", x, y, 'a' + i - 9);
+      }
+      else {
+	if (x == 0)
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "height: %d", y);
+	else if (y == 0)
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "width: %d", x);
+	else
+	  _snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d", x, y);
+      }
+      InsertMenu(pvar->ResizeMenu, -1, MF_BYPOSITION, ID_MENUID_BASE+i, tmp);
     }
-    else if (i < 35) {
-      if (x == 0)
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "height: %d(&%c)", y, 'a' + i - 9);
-      else if (y == 0)
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "width: %d(&%c)", x, 'a' + i - 9);
-      else
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d(&%c)", x, y, 'a' + i - 9);
-    }
-    else {
-      if (x == 0)
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "height: %d", y);
-      else if (y == 0)
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "width: %d", x);
-      else
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%dx%d", x, y);
-    }
-    InsertMenu(pvar->ResizeMenu, -1, MF_BYPOSITION, ID_MENUID_BASE+i, tmp);
+  }
+  else {
+    pvar->ResizeMenu == NULL;
   }
 }
 
@@ -86,15 +84,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->cv = cv;
   pvar->ReplaceTermDlg = FALSE;
   pvar->ResizeMenu = NULL;
-
-  pvar->MenuItems = sizeof(def_resize_list)/sizeof(def_resize_list[0]);
-
-  for (i=0; i < pvar->MenuItems; i++) {
-    pvar->ResizeList[i][0] = def_resize_list[i][0];
-    pvar->ResizeList[i][1] = def_resize_list[i][1];
-  }
-
-  InitMenu();
+  pvar->MenuItems = 0;
 }
 
 static BOOL FAR PASCAL TTXSetupTerminal(HWND parent, PTTSet ts) {
@@ -148,17 +138,7 @@ static void PASCAL FAR ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
     }
   }
 
-  if (i == 0) {
-    pvar->MenuItems = sizeof(def_resize_list)/sizeof(def_resize_list[0]);
-
-    for (i=0; i < pvar->MenuItems; i++) {
-      pvar->ResizeList[i][0] = def_resize_list[i][0];
-      pvar->ResizeList[i][1] = def_resize_list[i][1];
-    }
-  }
-  else {
-    pvar->MenuItems = i;
-  }
+  pvar->MenuItems = i;
 }
 
 static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
@@ -169,15 +149,17 @@ static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
 static void PASCAL FAR TTXModifyMenu(HMENU menu) {
   MENUITEMINFO mi;
 
-  InitMenu();
+  if (pvar->MenuItems > 0) {
+    InitMenu();
 
-  memset(&mi, 0, sizeof(mi));
-  mi.cbSize = sizeof(mi);
-  mi.fMask  = MIIM_TYPE | MIIM_SUBMENU;
-  mi.fType  = MFT_STRING;
-  mi.hSubMenu = pvar->ResizeMenu;
-  mi.dwTypeData = "Resi&ze";
-  InsertMenuItem(menu, ID_HELPMENU, FALSE, &mi);
+    memset(&mi, 0, sizeof(mi));
+    mi.cbSize = sizeof(mi);
+    mi.fMask  = MIIM_TYPE | MIIM_SUBMENU;
+    mi.fType  = MFT_STRING;
+    mi.hSubMenu = pvar->ResizeMenu;
+    mi.dwTypeData = "Resi&ze";
+    InsertMenuItem(menu, ID_HELPMENU, FALSE, &mi);
+  }
 }
 
 static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
