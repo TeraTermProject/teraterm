@@ -220,7 +220,12 @@ typedef TCharAttr *PCharAttr;
 #define WF_CURSORCHANGE  1
 #define WF_WINDOWCHANGE  2
 #define WF_WINDOWREPORT  4
-#define WF_TITLEREPORT   8
+#define WF_TITLEREPORT   24 // (8 | 16)
+
+// Title Reporting Type
+#define IdTitleReportOff    0
+#define IdTitleReportOn     8
+#define IdTitleReportEmpty  24
 
 // iconf flags (used in ts.VTIcon and ts.TEKIcon)
 #define IdIconDefault 0

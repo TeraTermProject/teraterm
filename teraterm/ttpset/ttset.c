@@ -1324,8 +1324,13 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->WindowFlag |= WF_WINDOWREPORT;
 
 	// Window report sequence
-	if (GetOnOff(Section, "TitleReportSequence", FName, TRUE))
-		ts->WindowFlag |= WF_TITLEREPORT;
+	GetPrivateProfileString(Section, "TitleReportSequence", "Empty", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "on") == 0)
+		ts->WindowFlag |= IdTitleReportOn;
+	else if (_stricmp(Temp, "off") == 0)
+		ts->WindowFlag &= ~WF_TITLEREPORT;
+	else // empty
+		ts->WindowFlag |= IdTitleReportEmpty;
 
 	// Line at a time mode
 	ts->EnableLineMode = GetOnOff(Section, "EnableLineMode", FName, TRUE);
@@ -2314,8 +2319,17 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		ts->WindowFlag & WF_WINDOWREPORT);
 
 	// Title report sequence
-	WriteOnOff(Section, "TitleReportSequence", FName,
-		ts->WindowFlag & WF_TITLEREPORT);
+	switch (ts->WindowFlag & WF_TITLEREPORT) {
+	case IdTitleReportOff:
+		WritePrivateProfileString(Section, "TitleReportSequence", "off", FName);
+		break;
+	case IdTitleReportOn:
+		WritePrivateProfileString(Section, "TitleReportSequence", "on", FName);
+		break;
+	default: // IdTitleReportEmpty
+		WritePrivateProfileString(Section, "TitleReportSequence", "empty", FName);
+		break;
+	}
 
 	// Line at a time mode
 	WriteOnOff(Section, "EnableLineMode", FName, ts->EnableLineMode);
