@@ -1953,7 +1953,7 @@ void CSSetAttr()		// SGR
 	    SendOSCstr(Report, len);
 	    break;
 	  default: // IdTitleReportEmpty:
-	    SendOSCstr("L", 1);
+	    SendOSCstr("l", 1);
 	    break;
 	}
         break;
