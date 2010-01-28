@@ -1323,7 +1323,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "WindowReportSequence", FName, TRUE))
 		ts->WindowFlag |= WF_WINDOWREPORT;
 
-	// Window report sequence
+	// Title report sequence
 	GetPrivateProfileString(Section, "TitleReportSequence", "Empty", Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "on") == 0)
 		ts->WindowFlag |= IdTitleReportOn;
