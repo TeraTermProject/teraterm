@@ -2122,7 +2122,24 @@ void CSSetAttr()		// SGR
 	    if (ts.MouseEventTracking)
 	      FocusReportMode = TRUE;
 	    break;
-      }
+	  case 1047: // Alternate Screen Buffer
+	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
+	      BuffSaveScreen();
+	      AltScr = TRUE;
+	    }
+	    break;
+	  case 1048: // Save Cursor Position (Alternate Screen Buffer)
+	    if (ts.TermFlag & TF_ALTSCR) {
+	      SaveCursor();
+	    }
+	  case 1049: // Alternate Screen Buffer
+	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
+	      SaveCursor();
+	      BuffSaveScreen();
+	      BuffClearScreen();
+	      AltScr = TRUE;
+	    }
+	}
     }
 
     void CSQ_i_Mode()		// MC (DEC)
@@ -2215,6 +2232,26 @@ void CSSetAttr()		// SGR
 	  case 1002: // Button-Event Mouse Tracking
 	  case 1003: MouseReportMode = IdMouseTrackNone; break; // Any-Event Mouse Tracking
 	  case 1004: FocusReportMode = FALSE; break; // Focus Report
+	  case 1047: // Alternate Screen Buffer
+	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
+	      BuffClearScreen();
+	      BuffRestoreScreen();
+	      AltScr = FALSE;
+	    }
+	    break;
+	  case 1048: // Save Cursor Position (Alternate Screen Buffer)
+	    if (ts.TermFlag & TF_ALTSCR) {
+	      RestoreCursor();
+	    }
+	    break;
+	  case 1049: // Alternate Screen Buffer
+	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
+	      BuffClearScreen();
+	      BuffRestoreScreen();
+	      RestoreCursor();
+	      AltScr = FALSE;
+	    }
+	    break;
 	}
     }
 
