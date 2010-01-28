@@ -3230,7 +3230,7 @@ void BuffRestoreScreen()
 	PCHAR CodeSrc, AttrSrc, AttrSrc2, AttrSrcFG, AttrSrcBG;
 	LONG ScrSize;
 	LONG SrcPtr, DestPtr;
-	int i;
+	int i, CopyX, CopyY;
 
 	if (SaveBuff != NULL) {
 		if ((CodeSrc=GlobalLock(SaveBuff)) != NULL) {
@@ -3241,22 +3241,18 @@ void BuffRestoreScreen()
 			AttrSrcFG = AttrSrc2 + ScrSize;
 			AttrSrcBG = AttrSrcFG + ScrSize;
 
-			if (SaveBuffX > NumOfColumns) {
-				SaveBuffX = NumOfColumns;
-			}
-			if (SaveBuffY > NumOfLines) {
-				SaveBuffY = NumOfLines;
-			}
+			CopyX = (SaveBuffX > NumOfColumns) ? NumOfColumns : SaveBuffX;
+			CopyY = (SaveBuffY > NumOfLines) ? NumOfLines : SaveBuffY;
 
 			SrcPtr = 0;
 			DestPtr = GetLinePtr(PageStart);
 
-			for (i=0; i<SaveBuffY; i++) {
-				memcpy(&CodeBuff[DestPtr], &CodeSrc[SrcPtr], SaveBuffX);
-				memcpy(&AttrBuff[DestPtr], &AttrSrc[SrcPtr], SaveBuffX);
-				memcpy(&AttrBuff2[DestPtr], &AttrSrc2[SrcPtr], SaveBuffX);
-				memcpy(&AttrBuffFG[DestPtr], &AttrSrcFG[SrcPtr], SaveBuffX);
-				memcpy(&AttrBuffBG[DestPtr], &AttrSrcBG[SrcPtr], SaveBuffX);
+			for (i=0; i<CopyY; i++) {
+				memcpy(&CodeBuff[DestPtr], &CodeSrc[SrcPtr], CopyX);
+				memcpy(&AttrBuff[DestPtr], &AttrSrc[SrcPtr], CopyX);
+				memcpy(&AttrBuff2[DestPtr], &AttrSrc2[SrcPtr], CopyX);
+				memcpy(&AttrBuffFG[DestPtr], &AttrSrcFG[SrcPtr], CopyX);
+				memcpy(&AttrBuffBG[DestPtr], &AttrSrcBG[SrcPtr], CopyX);
 				SrcPtr += SaveBuffX;
 				DestPtr = NextLinePtr(DestPtr);
 			}
