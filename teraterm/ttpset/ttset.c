@@ -802,7 +802,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->TermFlag |= TF_BACKWRAP;
 
 	/* Beep type -- special option */
-	GetPrivateProfileString(Section, "Beep", "", Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "off") == 0)
 		ts->Beep = IdBeepOff;
 	else if (_stricmp(Temp, "visual") == 0)
