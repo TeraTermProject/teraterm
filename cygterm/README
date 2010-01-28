@@ -265,6 +265,9 @@
                 zsh 4.3.4
 
 // C H A N G E S //
+v1.07_19 2010/01/28 (by doda)
+        * Accept keyword "AUTO" with '-s' option.
+
 v1.07_18 2010/01/19 (by doda)
         * Delete doubule quote character from '-d' option's parameter.
 

@@ -100,9 +100,13 @@
 // patch level 18 - delete double quote character from '-d' option's parameter
 //   Written by IWAMOTO Kouichi. (doda)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 19 - accept keyword "AUTO" with '-s' option
+//   Written by IWAMOTO Kouichi. (doda)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_18 (2010/01/19)";
+static char Version[] = "version 1.07_19 (2010/01/28)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -144,6 +148,7 @@ int port_range = 40;     // default number of ports
 char cmd_term[256] = "";
 char cmd_termopt[256] = "";
 char cmd_shell[128] = "";
+char pw_shell[128] = "";
 
 // TCP port for connection to another terminal application
 //--------------------------------------------------------
@@ -254,8 +259,11 @@ void parse_cfg_line(char *buf)
         // shell command line
         if (strcasecmp(val, "AUTO") != 0) {
             strncpy(cmd_shell, val, sizeof(cmd_shell)-1);
-            cmd_shell[sizeof(cmd_shell)-1] = 0;
         }
+	else {
+	    strncpy(cmd_shell, pw_shell, sizeof(cmd_shell)-1);
+	}
+	cmd_shell[sizeof(cmd_shell)-1] = 0;
     }
     else if (!strcasecmp(name, "PORT_START")) {
         // minimum port# for TELNET
@@ -345,6 +353,9 @@ void load_cfg()
     if (username != NULL) {
         struct passwd* pw_ent = getpwnam(username);
         if (pw_ent != NULL) {
+	    strncpy(pw_shell, pw_ent->pw_shell, sizeof(pw_shell)-1);
+	    pw_shell[sizeof(pw_shell)-1] = 0;
+
             strcpy(usr_conf, pw_ent->pw_dir);
             strcat(usr_conf, "/.");
             strcat(usr_conf, bs + 1);
@@ -434,7 +445,12 @@ void get_args(int argc, char** argv)
         else if (!strcmp(*argv, "-s")) {        // -s <shell>
             if (*++argv == NULL)
                 break;
-            strncpy(cmd_shell, *argv, sizeof(cmd_shell)-1);
+	    if (strcasecmp(*argv, "AUTO") != 0) {
+		strncpy(cmd_shell, *argv, sizeof(cmd_shell)-1);
+	    }
+	    else {
+		strncpy(cmd_shell, pw_shell, sizeof(cmd_shell)-1);
+	    }
             cmd_shell[sizeof(cmd_shell)-1] = '\0';
         }
         else if (!strcmp(*argv, "-cd")) {       // -cd
