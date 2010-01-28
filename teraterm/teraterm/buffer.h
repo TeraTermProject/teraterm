@@ -70,6 +70,7 @@ void BuffRegionScrollDownNLines(int n);
 void BuffSetCurCharAttr(TCharAttr Attr);
 void BuffSaveScreen();
 void BuffRestoreScreen();
+void BuffDiscardSavedScreen();
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom;

@@ -196,6 +196,9 @@ void ResetTerminal() /*reset variables but don't update screen */
 
   // status buffers
   ResetSBuffers();
+
+  // Alternate Screen Buffer
+  AltScr = FALSE;
 }
 
 void ResetCharSet()

@@ -433,6 +433,9 @@ void BuffReset()
 	StatusLine = 0;
 
 	SeveralPageSelect = FALSE; // yutaka
+
+	/* Alternate Screen Buffer */
+	BuffDiscardSavedScreen();
 }
 
 void BuffScroll(int Count, int Bottom)
@@ -3264,4 +3267,11 @@ void BuffRestoreScreen()
 		SaveBuff = NULL;
 	}
 	return;
+}
+
+void BuffDiscardSavedScreen() {
+	if (SaveBuff != NULL) {
+		GlobalFree(SaveBuff);
+		SaveBuff = NULL;
+	}
 }
