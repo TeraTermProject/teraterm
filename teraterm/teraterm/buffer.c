@@ -2806,16 +2806,16 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 		}
 
 		if ((ts.TermFlag & TF_CLEARONRESIZE) == 0 && Ny != NumOfLines) {
-		    BuffEnd += Ny - NumOfLines;
-		    if (Ny > NumOfLines) {
-			if (BuffEnd > NumOfLinesInBuff) {
-			    BuffEndAbs -= BuffEnd - NumOfLinesInBuff;
-			    if (BuffEndAbs < 0) {
-				BuffEndAbs += NumOfLinesInBuff;
-			    }
-			    BuffEnd = NumOfLinesInBuff;
+			BuffEnd += Ny - NumOfLines;
+			if (Ny > NumOfLines) {
+				if (BuffEnd > NumOfLinesInBuff) {
+					BuffEndAbs -= BuffEnd - NumOfLinesInBuff;
+					if (BuffEndAbs < 0) {
+						BuffEndAbs += NumOfLinesInBuff;
+					}
+					BuffEnd = NumOfLinesInBuff;
+				}
 			}
-		    }
 /*
 			l = NumOfLines - Ny;
 			d = NumOfLines - 1 - StatusLine - CursorY;
