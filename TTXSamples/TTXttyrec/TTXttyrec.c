@@ -105,7 +105,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 
 static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
   (pvar->origReadIniFile)(fn, ts);
-  pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, FALSE);
+  pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
 }
 
 void WriteData(HANDLE fh, char *buff, int len) {
