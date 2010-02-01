@@ -73,13 +73,11 @@ void InitMenu() {
     }
   }
   else {
-    pvar->ResizeMenu == NULL;
+    pvar->ResizeMenu = NULL;
   }
 }
 
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
-  int i;
-
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->ReplaceTermDlg = FALSE;
