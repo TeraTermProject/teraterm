@@ -426,8 +426,45 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
 // RecurringCommand設定ダイアログのコールバック関数。
 //
 static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
+	char uimsg[MAX_UIMSG];
+	static HFONT DlgFont;
+	LOGFONT logfont;
+	HFONT font;
+
 	switch (msg) {
 	  case WM_INITDIALOG:
+	  	font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+
+		if ((GetI18nLogfont(SECTION, "DLG_TAHOMA_FONT", &logfont, GetDeviceCaps(GetDC(dlg), LOGPIXELSY),
+		                   pvar->ts->UILanguageFile) != FALSE) &&
+		   ((DlgFont = CreateFontIndirect(&logfont)) != NULL)) {
+			SendDlgItemMessage(dlg, IDC_ENABLE, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_INTERVAL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_INTERVAL_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMMAND, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMMAND_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+		}
+		else {
+			DlgFont = NULL;
+		}
+
+		GetWindowText(dlg, uimsg, sizeof(uimsg));
+		GetI18nStr(SECTION, "DLG_TITLE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
+		SetWindowText(dlg, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_ENABLE, uimsg, sizeof(uimsg));
+		GetI18nStr(SECTION, "DLG_ENABLE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
+		SetDlgItemText(dlg, IDC_ENABLE, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_INTERVAL_LABEL, uimsg, sizeof(uimsg));
+		GetI18nStr(SECTION, "DLG_INTERVAL", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
+		SetDlgItemText(dlg, IDC_INTERVAL_LABEL, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_COMMAND_LABEL, uimsg, sizeof(uimsg));
+		GetI18nStr(SECTION, "DLG_COMMAND", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
+		SetDlgItemText(dlg, IDC_COMMAND_LABEL, pvar->ts->UIMsg);
+
 		SendMessage(GetDlgItem(dlg, IDC_ENABLE), BM_SETCHECK,
 		            pvar->enable?BST_CHECKED:BST_UNCHECKED, 0);
 		SetDlgItemInt(dlg, IDC_INTERVAL, pvar->interval, FALSE);
@@ -460,10 +497,16 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 			}
 
 			EndDialog(dlg, IDOK);
+			if (DlgFont != NULL) {
+				DeleteObject(DlgFont);
+			}
 			return TRUE;
 
 		  case IDCANCEL:
 			EndDialog(dlg, IDCANCEL);
+			if (DlgFont != NULL) {
+				DeleteObject(DlgFont);
+			}
 			return TRUE;
 		}
 		break;

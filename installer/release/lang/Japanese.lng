@@ -931,5 +931,12 @@ MENU_ALWAYSONTOP=常に最前面に表示(&A)
 
 
 [TTXRecurringCommand]
+DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+
 MENU_SETUP_RECURRING=繰り返しコマンド(&U)
 MENU_CONTROL_RECURRING=繰り返しコマンド(&U)
+
+DLG_TITLE=繰り返しコマンド
+DLG_ENABLE=有効(&E)
+DLG_INTERVAL=間隔(秒)(&I)
+DLG_COMMAND=コマンド(&C)

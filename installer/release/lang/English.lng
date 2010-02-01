@@ -931,5 +931,12 @@ MENU_ALWAYSONTOP=&Always on top
 
 
 [TTXRecurringCommand]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
 MENU_SETUP_RECURRING=Rec&urring command
 MENU_CONTROL_RECURRING=Rec&urring command
+
+DLG_TITLE=Recurring command
+DLG_ENABLE=&Enable
+DLG_INTERVAL=&Interval(sec)
+DLG_COMMAND=&Command
