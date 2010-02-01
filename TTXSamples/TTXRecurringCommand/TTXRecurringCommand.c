@@ -6,6 +6,7 @@
 #include "ttlib.h"
 #include "tt_res.h"
 #include "resource.h"
+#include "i18n.h"
 
 #include "compat_w95.h"
 
@@ -395,13 +396,18 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 	pvar->SetupMenu = GetSetupMenu(menu);
 	pvar->ControlMenu = GetControlMenu(menu);
 
-	InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETUP, "Rec&urring command");
+	GetI18nStr(SECTION, "MENU_SETUP_RECURRING", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
+		"Rec&urring command", pvar->ts->UILanguageFile);
+	InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETUP, pvar->ts->UIMsg);
 
 	if (pvar->enable) {
 		flag |= MF_CHECKED;
 	}
 
-	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, "Rec&urring command");
+
+	GetI18nStr(SECTION, "MENU_CONTROL_RECURRING", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
+		"Rec&urring command", pvar->ts->UILanguageFile);
+	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, pvar->ts->UIMsg);
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
 

@@ -928,3 +928,8 @@ MENU_KS5601=Recv/Send: &KS5601
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=&Always on top
+
+
+[TTXRecurringCommand]
+MENU_SETUP_RECURRING=Rec&urring command
+MENU_CONTROL_RECURRING=Rec&urring command

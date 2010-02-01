@@ -928,3 +928,8 @@ MENU_KS5601=送受信: &KS5601
 
 [TTXAlwaysOnTop]
 MENU_ALWAYSONTOP=常に最前面に表示(&A)
+
+
+[TTXRecurringCommand]
+MENU_SETUP_RECURRING=繰り返しコマンド(&U)
+MENU_CONTROL_RECURRING=繰り返しコマンド(&U)
