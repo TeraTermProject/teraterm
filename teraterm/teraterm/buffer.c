@@ -3247,6 +3247,10 @@ void BuffRestoreScreen()
 				memcpy(&AttrBuff2[DestPtr], &AttrSrc2[SrcPtr], CopyX);
 				memcpy(&AttrBuffFG[DestPtr], &AttrSrcFG[SrcPtr], CopyX);
 				memcpy(&AttrBuffBG[DestPtr], &AttrSrcBG[SrcPtr], CopyX);
+				if (AttrBuff[DestPtr+CopyX-1] & AttrKanji) {
+					CodeBuff[DestPtr+CopyX-1] = ' ';
+					AttrBuff[DestPtr+CopyX-1] ^= AttrKanji;
+				}
 				SrcPtr += SaveBuffX;
 				DestPtr = NextLinePtr(DestPtr);
 			}
