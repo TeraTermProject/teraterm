@@ -177,6 +177,10 @@ BOOL ChangeBuffer(int Nx, int Ny)
 			memcpy(&AttrDest2[DestPtr],&AttrBuff2[SrcPtr],NxCopy);
 			memcpy(&AttrDestFG[DestPtr],&AttrBuffFG[SrcPtr],NxCopy);
 			memcpy(&AttrDestBG[DestPtr],&AttrBuffBG[SrcPtr],NxCopy);
+			if (AttrDest[DestPtr+NxCopy-1] & AttrKanji) {
+				CodeDest[DestPtr+NxCopy-1] = ' ';
+				AttrDest[DestPtr+NxCopy-1] ^= AttrKanji;
+			}
 			SrcPtr = NextLinePtr(SrcPtr);
 			DestPtr = DestPtr + (LONG)Nx;
 		}
