@@ -2765,7 +2765,7 @@ void BuffChangeWinSize(int Nx, int Ny)
 
 void BuffChangeTerminalSize(int Nx, int Ny)
 {
-	int i, Nb, W, H, l, d;
+	int i, Nb, W, H;
 	BOOL St;
 
 	Ny = Ny + StatusLine;
@@ -2806,32 +2806,22 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 		}
 
 		if ((ts.TermFlag & TF_CLEARONRESIZE) == 0 && Ny != NumOfLines) {
-			BuffEnd += Ny - NumOfLines;
 			if (Ny > NumOfLines) {
-				if (BuffEnd > NumOfLinesInBuff) {
-					BuffEndAbs -= BuffEnd - NumOfLinesInBuff;
-					if (BuffEndAbs < 0) {
-						BuffEndAbs += NumOfLinesInBuff;
-					}
-					BuffEnd = NumOfLinesInBuff;
+				CursorY += Ny - NumOfLines;
+				if (Ny > BuffEnd) {
+					CursorY -= Ny - BuffEnd;
+					BuffEnd = Ny;
 				}
 			}
-/*
-			l = NumOfLines - Ny;
-			d = NumOfLines - 1 - StatusLine - CursorY;
-			if (l > 0 && d > 0) {
-				if (d < l) {
-					l -= d;
+			else {
+				if (Ny  > CursorY + StatusLine + 1) {
+					BuffEnd -= NumOfLines - Ny;
 				}
 				else {
-					d = l;
-					l = 0;
+					BuffEnd -= NumOfLines - 1 - StatusLine - CursorY;
+					CursorY = Ny - 1 - StatusLine;
 				}
-				BuffEnd -= d;
 			}
-
-			CursorY -= l;
-*/
 		}
 
 		NumOfColumns = Nx;
