@@ -39,10 +39,10 @@
       <li>コマンドラインでタブもパラメータの区切りとして認識するようにした。</li>
       <li><a href="../menu/file.html">[File] メニューの [Show Log dialog]</a> を、ログウィンドウが表示されていても押せるようにした。</li>
       <li>マクロコマンド "<a href="../macro/command/disconnect.html">disconnect</a>" に、TCP/IP 接続切断時の確認ダイアログを制御するオプションを追加した。</li>
-      <!--li>リサイズ時、画面クリアを行わないようにするオプションを追加した。
+      <li>リサイズ時に画面クリアを行うかを設定出来るようにした。
         <ul>
-          <li>Additional Settings ダイアログおよび teraterm.ini に ClearOnResize エントリを追加した。デフォルトは on。</li>
-        </ul></li-->
+          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>で設定を変更できるようにした。</li>
+        </ul></li>
       <li>マクロコマンド "<a href="../macro/command/filenamebox.html">filenamebox</a>" で上書き確認を出すようにした。</li>
       <li>Additional Settings ダイアログに <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> を追加した。</li>
       <li>ウィンドウタイトル/アイコンラベル報告制御シーケンスに対して、空文字列を応答出来るようにした。
@@ -65,12 +65,16 @@
       <li>Kermit, ZMODEM, QuickVAN で複数のファイルを送信したとき、また ZMODEM, QuickVAN で複数のファイルを受信したとき、2個目以降のファイルでプログレスバーがリセットされない問題を修正した。</li>
       <li>マクロで、文字列中の /* をコメントの開始と誤認識していたのを修正した。</li>
       <li>Eterm look-feelを有効にしている時、Reverse Video (DECSCNM)のset/resetが行われると、以降まともに描画が更新されなくなるのを修正した。(暫定処置)</li>
+      <li>ウィンドウの横幅を縮めたとき、スクロールバッファ内の各行の行末にゴミが残る場合が有ったのを修正した。</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li><a href="#cygterm_1.07_18">CygTerm+ 1.07_18</a>へ差し替えた。</li>
+      <li><a href="#cygterm_1.07_19">CygTerm+ 1.07_19</a>へ差し替えた。</li>
+      <li><a href="#recurringcommand_1.01">TTXRecurringCommand Plugin(1.01)</a>へ差し替えた。</li>
+      <li><a href="#resizemenu_1.01">TTXResizeMenu Plugin(1.01)</a>へ差し替えた。</li>
+      <li><a href="#ttyrec_1.02">TTXttyrec Plugin(1.02)</a>へ差し替えた。</li>
       <li>Windows 7を正式にサポート。</li>
       <li>screencapture.ttl のアップデート</li>
     </ul>
@@ -1954,6 +1958,11 @@
 
 <h2><a name="cygterm">CygTerm+</a></h2>
 
+<h3><a name="cygterm_1.07_19">v1.07_19 2010/01/28 (by doda)</a></h3>
+<ul class="history">
+      <li>'-s' オプションの引数に 'AUTO' を受け付けるようにした。</li>
+</ul>
+
 <h3><a name="cygterm_1.07_18">v1.07_18 2010/01/19 (by doda)</a></h3>
 <ul class="history">
       <li>'-d' オプションの引数にダブルクォートが含まれていた場合、ダブルクォートを削除するようにした。</li>
@@ -2296,12 +2305,22 @@
 </ul>
 
 <h2><a name="resizemenu">TTXResizeMenu</a></h2>
+<h3><a name="resizemenu_1.01">2010.2.3 (Ver 1.01)</a></h3>
+<ul class="history">
+  <li>デフォルトのメニューを廃止した。</li>
+</ul>
+
 <h3><a name="resizemenu_1.00">2008.12.16 (Ver 1.00)</a></h3>
 <ul class="history">
   <li>初版。</li>
 </ul>
 
 <h2><a name="ttyrec">TTXttyrec</a></h2>
+<h3><a name="ttyrec_1.02">2010.2.3 (Ver 1.02)</a></h3>
+<ul class="history">
+  <li>teraterm.ini の RecordStartSize エントリのデフォルトを on に変更した。</li>
+</ul>
+
 <h3><a name="ttyrec_1.01">2009.7.5 (Ver 1.01)</a></h3>
 <ul class="history">
   <li>再生速度をタイトルに表示するようにした。peterprvy氏に感謝します。</li>
@@ -2329,6 +2348,13 @@
 </ul>
 
 <h2><a name="recurringcommand">TTXRecurringCommand</a></h2>
+<h3><a name="recurringcommand_1.01">2010.2.3 (Ver 1.01)</a></h3>
+<ul class="history">
+  <li>送信間隔の最小値を 10 秒から 1 秒に変更した。</li>
+  <li>コントロールメニューから、有効/無効を直接切り替えられるようにした。</li>
+  <li>ユーザインターフェイスのメッセージを読み込めるようにした。</li>
+</ul>
+
 <h3><a name="recurringcommand_1.00">2009.6.30 (Ver 1.00)</a></h3>
 <ul class="history">
   <li>初版。</li>

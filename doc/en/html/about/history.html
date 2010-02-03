@@ -39,10 +39,10 @@
       <li>added support for the tab character as the command line delimiter.</li>
       <li>enabled the [Show Log dialog] of the <a href="../menu/file.html">[File]</a> menu while the log window is shown.</li>
       <li>added the confirmation parameter at the "<a href="../macro/command/disconnect.html">disconnect</a>" macro command.</li>
-      <!--li>added support for not clearing the terminal screen while resizing.
+      <li>added support for not clearing the terminal screen while resizing.
         <ul>
-          <li>added the ClearOnResize entry in the teraterm.ini file and on the Additional Settings dialog. The default value is on.</li>
-        </ul></li-->
+          <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+        </ul></li>
       <li>added support for overwritten confirmation at the "<a href="../macro/command/filenamebox.html">filenamebox</a>" macro command.</li>
       <li>added the <a href="../setup/teraterm-win.html#CursorCtrlSequence">CursorCtrlSequence</a> entry on the Additional Settings dialog.</li>
       <!--li>ウィンドウタイトル/アイコンラベル報告制御シーケンスに対して、空文字列を応答出来るようにした。
@@ -65,12 +65,16 @@
       <li>When the multiple files are sent or received by the Kermit, ZMODEM and QuickVAN protocol, the progress bar can not be reset after the second file. </li>
       <li>The `/*' characters in the macro string-type constants are falsely recognized as a beginning of the C language-style comment.</li>
       <li>Workaround: When the Eterm look-feel is enabled, the screen display can not work after the Reverse Video (DECSCNM) set/reset.</li>
+      <!--li>ウィンドウの横幅を縮めたとき、スクロールバッファ内の各行の行末にゴミが残る場合が有ったのを修正した。</li-->
     </ul>
   </li>
 
   <li>Misc
     <ul>
-      <li>upgraded CygTerm+ to <a href="#cygterm_1.07_18">1.07_18</a></li>
+      <li>upgraded CygTerm+ to <a href="#cygterm_1.07_19">1.07_19</a></li>
+      <li>upgraded TTXRecurringCommand Plugin to <a href="#recurringcommand_1.01">1.01</a></li>
+      <li>upgraded TTXResizeMenu Plugin to <a href="#resizemenu_1.01">1.01</a></li>
+      <li>upgraded TTXttyrec Plugin to <a href="#ttyrec_1.02">1.02</a></li>
       <li>added support for Microsoft Windows 7.</li>
       <li>updated the screencapture.ttl file.</li>
     </ul>
@@ -1951,6 +1955,11 @@ SYNOPSIS:
 
 
 <h2><a name="cygterm">CygTerm+</a></h2>
+<h3><a name="cygterm_1.07_19">v1.07_19 2010/01/28 (by doda)</a></h3>
+<ul class="history">
+      <li>Accept keyword "AUTO" with '-s' option.</li>
+</ul>
+
 <h3><a name="cygterm_1.07_18">v1.07_18 2010/01/19 (by doda)</a></h3>
 <ul class="history">
       <li>If '-d' option's parameter contains double quote, delete it.</li>
@@ -2291,12 +2300,22 @@ SYNOPSIS:
 </ul>
 
 <h2><a name="resizemenu">TTXResizeMenu</a></h2>
+<h3><a name="resizemenu_1.01">2010.2.3 (Ver 1.01)</a></h3>
+<ul class="history">
+  <!--li>デフォルトのメニューを廃止した。</li-->
+</ul>
+
 <h3><a name="resizemenu_1.00">2008.12.16 (Ver 1.00)</a></h3>
 <ul class="history">
   <li>first release</li>
 </ul>
 
 <h2><a name="ttyrec">TTXttyrec</a></h2>
+<h3><a name="ttyrec_1.02">2010.2.3 (Ver 1.02)</a></h3>
+<ul class="history">
+  <li>changed the default value of "RecordStartSize" to On.</li>
+</ul>
+
 <h3><a name="ttyrec_1.01">2009.7.5 (Ver 1.01)</a></h3>
 <ul class="history">
   <li>added support for displaying the replay speed on the window title. Special thanks to peterprvy.</li>
@@ -2324,6 +2343,13 @@ SYNOPSIS:
 </ul>
 
 <h2><a name="recurringcommand">TTXRecurringCommand</a></h2>
+<h3><a name="recurringcommand_1.01">2010.2.3 (Ver 1.01)</a></h3>
+<ul class="history">
+  <!--li>送信間隔の最小値を 10 秒から 1 秒に変更した。</li-->
+  <!--li>コントロールメニューから、有効/無効を直接切り替えられるようにした。</li-->
+  <li>added support for dynamic loading of user interface messages.</li>
+</ul>
+
 <h3><a name="recurringcommand_1.00">2009.6.30 (Ver 1.00)</a></h3>
 <ul class="history">
   <li>first release</li>
