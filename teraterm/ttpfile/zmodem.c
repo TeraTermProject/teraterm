@@ -81,6 +81,8 @@
 
 int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
 {
+	char *s;
+
   if (CommRead1Byte(cv,b) == 0)
     return 0;
 
@@ -88,9 +90,15 @@ int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
   {
     if (fv->LogState==0)
     {
+		// 残りのASCII表示を行う
+		fv->FlushLogLineBuf = 1;
+		FTLog1Byte(fv,0);
+		fv->FlushLogLineBuf = 0;
+
       fv->LogState = 1;
       fv->LogCount = 0;
-      _lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+	  s = "\015\012<<< Received\015\012";
+      _lwrite(fv->LogFile, s, strlen(s));
     }
     FTLog1Byte(fv,*b);
   }
@@ -104,6 +112,7 @@ int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
 int ZWrite(PFileVar fv, PZVar zv, PComVar cv, PCHAR B, int C)
 {
   int i, j;
+  char *s;
 
   i = CommBinaryOut(cv,B,C);
 
@@ -111,9 +120,15 @@ int ZWrite(PFileVar fv, PZVar zv, PComVar cv, PCHAR B, int C)
   {
     if (fv->LogState!=0)
     {
+		// 残りのASCII表示を行う
+		fv->FlushLogLineBuf = 1;
+		FTLog1Byte(fv,0);
+		fv->FlushLogLineBuf = 0;
+
       fv->LogState = 0;
       fv->LogCount = 0;
-      _lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+	  s = "\015\012Sending >>>\015\012";
+      _lwrite(fv->LogFile, s, strlen(s));
     }
     for (j = 0 ; j <= i-1 ; j++)
       FTLog1Byte(fv,B[j]);
