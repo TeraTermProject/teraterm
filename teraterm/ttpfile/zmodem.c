@@ -652,7 +652,7 @@ void ZParseRInit(PFileVar fv, PZVar zv)
   if (fv->FileOpen) // close previous file
   {
     _lclose(fv->FileHandle);
-    fv->FileOpen = TRUE;
+    fv->FileOpen = FALSE;
   }
 
   if (! GetNextFname(fv))
