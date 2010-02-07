@@ -2,6 +2,21 @@
  Copyright(C) 1994-1998 T. Teranishi
  All rights reserved. */
 
+/*
+ "ZMODEM.LOG"の見方：
+ 　"B"の直後の二桁が Header Type を示す。
+
+2A 2A 18 42 30 31 30 30 30 30 30 30 32 33 62 65     **.B0100000023be
+35 30 0D 8A 11 
+   ↓
+2A 2A 18 42 30 31 30 30 30 30 30 30 32 33 62 65     **.B0100000023be
+^^^^^^^^ZPAD+ZPAD+ZDLE 
+         ^^ZHEX
+            ^^^^ZRINIT（2桁で表す）
+35 30 0D 8A 11 
+^^^^^CRC
+ */ 
+
 /* TTFILE.DLL, ZMODEM protocol */
 #include "teraterm.h"
 #include "tttypes.h"
@@ -698,142 +713,142 @@ BOOL ZParseSInit(PZVar zv)
 
 void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 {
-  switch (zv->RxType) {
-    case ZRQINIT:
-      if (zv->ZState==Z_RecvInit)
-	ZSendRInit(fv,zv);
-      break;
-    case ZRINIT:
-      ZParseRInit(fv,zv);
-      break;
-    case ZSINIT:
-      zv->ZPktState = Z_PktGetData;
-      if (zv->ZState==Z_RecvInit)
-	FTSetTimeOut(fv,IniTimeOut);
-      break;
-    case ZACK:
-      switch (zv->ZState) {
-	case Z_SendInitDat:
-	  ZSendFileHdr(zv);
-	  break;
-	case Z_SendDataDat2:
-	  zv->LastPos = ZRclHdr(zv);
-	  if (zv->Pos==zv->LastPos)
-	    ZSendDataDat(fv,zv);
-	  else {
-	    zv->Pos = zv->LastPos;
-	    ZSendDataHdr(zv);
-	  }
-	  break;
-      }
-      break;
-    case ZFILE:
-      zv->ZPktState = Z_PktGetData;
-      if ((zv->ZState==Z_RecvInit) ||
-	  (zv->ZState==Z_RecvInit2))
-      {
-	zv->BinFlag = zv->RxHdr[ZF0] != ZCNL;
-	FTSetTimeOut(fv,IniTimeOut);
-      }
-      break;
-    case ZSKIP:
+	switch (zv->RxType) {
+	case ZRQINIT:
+		if (zv->ZState==Z_RecvInit)
+			ZSendRInit(fv,zv);
+		break;
+	case ZRINIT:
+		ZParseRInit(fv,zv);
+		break;
+	case ZSINIT:
+		zv->ZPktState = Z_PktGetData;
+		if (zv->ZState==Z_RecvInit)
+			FTSetTimeOut(fv,IniTimeOut);
+		break;
+	case ZACK:
+		switch (zv->ZState) {
+		case Z_SendInitDat:
+			ZSendFileHdr(zv);
+			break;
+		case Z_SendDataDat2:
+			zv->LastPos = ZRclHdr(zv);
+			if (zv->Pos==zv->LastPos)
+				ZSendDataDat(fv,zv);
+			else {
+				zv->Pos = zv->LastPos;
+				ZSendDataHdr(zv);
+			}
+			break;
+		}
+		break;
+	case ZFILE:
+		zv->ZPktState = Z_PktGetData;
+		if ((zv->ZState==Z_RecvInit) ||
+			(zv->ZState==Z_RecvInit2))
+		{
+			zv->BinFlag = zv->RxHdr[ZF0] != ZCNL;
+			FTSetTimeOut(fv,IniTimeOut);
+		}
+		break;
+	case ZSKIP:
 		if (fv->FileOpen) {
 			_lclose(fv->FileHandle);
 			// サーバ側に存在するファイルを送信しようとすると、ZParseRInit()で二重closeになるため、
 			// ここでフラグを落としておく。 (2007.12.20 yutaka)
 			fv->FileOpen = FALSE;    
 		}
-      ZStoHdr(zv,0);
-      if (zv->CtlEsc)
-		zv->RxHdr[ZF0] = ESCCTL;
-      zv->ZState = Z_SendInit;
-      ZParseRInit(fv,zv);
-      break;
-    case ZNAK:
-      switch (zv->ZState) {
-	case Z_SendInitHdr:
-	case Z_SendInitDat:
-	  ZSendInitHdr(zv);
-	  break;
-	case Z_SendFileHdr:
-	case Z_SendFileDat:
-	  ZSendFileHdr(zv);
-	  break;
-      }
-      break;
-    case ZABORT:
-    case ZFERR:
-      if (zv->ZMode==IdZSend)
-      {
-	zv->ZState = Z_SendFIN;
-	ZSendFIN(zv);
-      }
-      break;
-    case ZFIN:
-      fv->Success = TRUE;
-      if (zv->ZMode==IdZReceive)
-      {
-	zv->ZState = Z_RecvFIN;
-	ZSendFIN(zv);
-	zv->CanCount = 2;
-	FTSetTimeOut(fv,FinTimeOut);
-      }
-      else {
-	zv->ZState = Z_End;
-	ZWrite(fv,zv,cv,"OO",2);
-      }
-      break;
-    case ZRPOS:
-      switch (zv->ZState) {
-	case Z_SendFileDat:
-	case Z_SendDataHdr:
-	case Z_SendDataDat:
-	case Z_SendDataDat2:
-	case Z_SendEOF:
-	  zv->Pos = ZRclHdr(zv);
-	  zv->LastPos = zv->Pos;
-	  ZSendDataHdr(zv);
-	  break;
-      }
-      break;
-    case ZDATA:
-      if (zv->Pos != ZRclHdr(zv))
-      {
-	ZSendRPOS(fv,zv);
-	return;
-      }
-      else {
-	FTSetTimeOut(fv,zv->TimeOut);
-	zv->ZPktState = Z_PktGetData;
-      }
-      break;
-    case ZEOF:
-      if (zv->Pos != ZRclHdr(zv))
-      {
-	ZSendRPOS(fv,zv);
-	return;
-      }
-      else {
-	if (fv->FileOpen)
-	{
-	  if (zv->CRRecv)
-	  {
-	    zv->CRRecv = FALSE;
-	    _lwrite(fv->FileHandle,"\012",1);
-	  }
-	  _lclose(fv->FileHandle);
-	  fv->FileOpen = FALSE;
+		ZStoHdr(zv,0);
+		if (zv->CtlEsc)
+			zv->RxHdr[ZF0] = ESCCTL;
+		zv->ZState = Z_SendInit;
+		ZParseRInit(fv,zv);
+		break;
+	case ZNAK:
+		switch (zv->ZState) {
+		case Z_SendInitHdr:
+		case Z_SendInitDat:
+			ZSendInitHdr(zv);
+			break;
+		case Z_SendFileHdr:
+		case Z_SendFileDat:
+			ZSendFileHdr(zv);
+			break;
+		}
+		break;
+	case ZABORT:
+	case ZFERR:
+		if (zv->ZMode==IdZSend)
+		{
+			zv->ZState = Z_SendFIN;
+			ZSendFIN(zv);
+		}
+		break;
+	case ZFIN:
+		fv->Success = TRUE;
+		if (zv->ZMode==IdZReceive)
+		{
+			zv->ZState = Z_RecvFIN;
+			ZSendFIN(zv);
+			zv->CanCount = 2;
+			FTSetTimeOut(fv,FinTimeOut);
+		}
+		else {
+			zv->ZState = Z_End;
+			ZWrite(fv,zv,cv,"OO",2);
+		}
+		break;
+	case ZRPOS:
+		switch (zv->ZState) {
+		case Z_SendFileDat:
+		case Z_SendDataHdr:
+		case Z_SendDataDat:
+		case Z_SendDataDat2:
+		case Z_SendEOF:
+			zv->Pos = ZRclHdr(zv);
+			zv->LastPos = zv->Pos;
+			ZSendDataHdr(zv);
+			break;
+		}
+		break;
+	case ZDATA:
+		if (zv->Pos != ZRclHdr(zv))
+		{
+			ZSendRPOS(fv,zv);
+			return;
+		}
+		else {
+			FTSetTimeOut(fv,zv->TimeOut);
+			zv->ZPktState = Z_PktGetData;
+		}
+		break;
+	case ZEOF:
+		if (zv->Pos != ZRclHdr(zv))
+		{
+			ZSendRPOS(fv,zv);
+			return;
+		}
+		else {
+			if (fv->FileOpen)
+			{
+				if (zv->CRRecv)
+				{
+					zv->CRRecv = FALSE;
+					_lwrite(fv->FileHandle,"\012",1);
+				}
+				_lclose(fv->FileHandle);
+				fv->FileOpen = FALSE;
+			}
+			zv->ZState = Z_RecvInit;
+			ZSendRInit(fv,zv);
+		}
+		break;
 	}
-	zv->ZState = Z_RecvInit;
-	ZSendRInit(fv,zv);
-      }
-      break;
-  }
-  zv->Quoted = FALSE;
-  zv->CRC = 0;
-  zv->CRC3 = 0xFFFFFFFF;
-  zv->PktInPtr = 0;
-  zv->PktInCount = 0;
+	zv->Quoted = FALSE;
+	zv->CRC = 0;
+	zv->CRC3 = 0xFFFFFFFF;
+	zv->PktInPtr = 0;
+	zv->PktInCount = 0;
 }
 
 BOOL ZParseFile(PFileVar fv, PZVar zv)
