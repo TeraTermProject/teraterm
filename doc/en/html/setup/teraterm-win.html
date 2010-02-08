@@ -584,22 +584,42 @@ WindowReportSequence=on
 </pre>
 
 
-<h1><a name="TitleReportSequence">Enable control sequence for window title reporting</a></h1>
-<p>
-This function enables the ddterm control sequence regarding the window title and icon label reporting.
-</p>
+<h1><a name="TitleReportSequence">Change the response to window title reporting request</a></h1>
+<!--p>
+dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。
+</p-->
 
 <p>
-If you do not want report title informations to be sent to remote host by some reason such as security, please change the TitleReportSequence entry in the teraterm.ini file as follows:
+To ignore a window title reporting request, edit the TitleReportSequence line in the [Tera Term] section of the setup file like the following:
+<!--報告要求に対して何も応答しないようにするには、設定ファイルの [Tera Term] セクションの TitleReportSequence 行を以下のように変更してください。-->
 </p>
 
 <pre>
-TitleReportSequence=off
+TitleReportSequence=ignore
 </pre>
+
+<p>
+Also, Tera Term reports empty string in the following configuration.
+<!-- また以下のようにすると、ウィンドウタイトルは空だと報告するようになります。 -->
+</p>
+
+<pre>
+TitleReportSequence=empty
+</pre>
+
+<!--p>
+以下のようにすると、現在のウィンドウタイトルを報告するようになります。<br>
+ただし、現在の現在のウィンドウタイトルを報告するのはセキュリティ上危険ですので、本当に必要な時のみこの設定を行うようにし
+てください。
+</p>
+
+<pre>
+TitleReportSequence=accept
+</pre-->
 
 <pre>
 Default:
-TitleReportSequence=on
+TitleReportSequence=empty
 </pre>
 
 

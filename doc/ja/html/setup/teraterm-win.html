@@ -601,25 +601,34 @@ WindowReportSequence=on
 </pre>
 
 
-<h1><a name="TitleReportSequence">ウィンドウタイトル報告の制御シーケンスを使用する</a></h1>
+<h1><a name="TitleReportSequence">ウィンドウタイトル報告要求への応答方法を変更する</a></h1>
 <p>
-この設定が on になっていると、dttermのウィンドウタイトル報告およびアイコンラベル報告の制御シーケンスが有効になります。
+dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。
 </p>
 
 <p>
-セキュリティ上の理由等でウィンドウタイトルを報告したくない場合は、設定ファイルの [Tera Term] セクションの TitleReportSequence 行を以下のように変更してください。
+報告要求に対して何も応答しないようにするには、設定ファイルの [Tera Term] セクションの TitleReportSequence 行を以下のように変更してください。
 </p>
 
 <pre>
-TitleReportSequence=off
+TitleReportSequence=ignore
 </pre>
 
 <p>
-また、以下のようにすると、常にウィンドウタイトルは空だと報告するようになります。
+また以下のようにすると、ウィンドウタイトルは空だと報告するようになります。
 </p>
 
 <pre>
 TitleReportSequence=empty
+</pre>
+
+<p>
+以下のようにすると、現在のウィンドウタイトルを報告するようになります。<br>
+ただし、現在の現在のウィンドウタイトルを報告するのはセキュリティ上危険ですので、本当に必要な時のみこの設定を行うようにしてください。
+</p>
+
+<pre>
+TitleReportSequence=accept
 </pre>
 
 <pre>

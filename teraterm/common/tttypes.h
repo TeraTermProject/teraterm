@@ -223,8 +223,8 @@ typedef TCharAttr *PCharAttr;
 #define WF_TITLEREPORT   24 // (8 | 16)
 
 // Title Reporting Type
-#define IdTitleReportOff    0
-#define IdTitleReportOn     8
+#define IdTitleReportIgnore 0
+#define IdTitleReportAccept 8
 #define IdTitleReportEmpty  24
 
 // iconf flags (used in ts.VTIcon and ts.TEKIcon)

@@ -1324,9 +1324,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// Title report sequence
 	GetPrivateProfileString(Section, "TitleReportSequence", "Empty", Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "on") == 0)
-		ts->WindowFlag |= IdTitleReportOn;
-	else if (_stricmp(Temp, "off") == 0)
+	if (_stricmp(Temp, "accept") == 0)
+		ts->WindowFlag |= IdTitleReportAccept;
+	else if (_stricmp(Temp, "ignore") == 0 || _stricmp(Temp, "off") == 0)
 		ts->WindowFlag &= ~WF_TITLEREPORT;
 	else // empty
 		ts->WindowFlag |= IdTitleReportEmpty;
@@ -2319,11 +2319,11 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Title report sequence
 	switch (ts->WindowFlag & WF_TITLEREPORT) {
-	case IdTitleReportOff:
-		WritePrivateProfileString(Section, "TitleReportSequence", "off", FName);
+	case IdTitleReportIgnore:
+		WritePrivateProfileString(Section, "TitleReportSequence", "ignore", FName);
 		break;
-	case IdTitleReportOn:
-		WritePrivateProfileString(Section, "TitleReportSequence", "on", FName);
+	case IdTitleReportAccept:
+		WritePrivateProfileString(Section, "TitleReportSequence", "accept", FName);
 		break;
 	default: // IdTitleReportEmpty
 		WritePrivateProfileString(Section, "TitleReportSequence", "empty", FName);

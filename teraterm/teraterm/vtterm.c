@@ -1897,10 +1897,10 @@ void CSSetAttr()		// SGR
 	break;
       case 20: // Report icon label
         switch (ts.WindowFlag & WF_TITLEREPORT) {
-	  case IdTitleReportOff:
+	  case IdTitleReportIgnore:
 	    // nothing to do
 	    break;
-	  case IdTitleReportOn:
+	  case IdTitleReportAccept:
 	    switch (ts.AcceptTitleChangeRequest) {
 	      case IdTitleChangeRequestOff:
 	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
@@ -1928,10 +1928,10 @@ void CSSetAttr()		// SGR
         break;
       case 21: // Report window title
         switch (ts.WindowFlag & WF_TITLEREPORT) {
-	  case IdTitleReportOff:
+	  case IdTitleReportIgnore:
 	    // nothing to do
 	    break;
-	  case IdTitleReportOn:
+	  case IdTitleReportAccept:
 	    switch (ts.AcceptTitleChangeRequest) {
 	      case IdTitleChangeRequestOff:
 	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
