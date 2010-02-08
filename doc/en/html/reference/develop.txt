@@ -5,9 +5,9 @@
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
   Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 95, 98 and Me.
 - Installer
-  Inno Setup 5.3.5 ANSI (http://www.jrsoftware.org/isinfo.php)
-  Inno Setup Preprocessor 5.3.5 (from ispack-5.3.4)
-  ISTool 5.3.0 (from ispack-5.3.5)
+  Inno Setup 5.3.7 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor 5.3.6 (from ispack-5.3.7)
+  ISTool 5.3.0.1 (from ispack-5.3.7)
   Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
 - others
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
@@ -16,7 +16,7 @@
 
 
 * Libraries
-- oniguruma 5.9.1 (http://www.geocities.jp/kosako3/oniguruma/)
+- oniguruma 5.9.2 (http://www.geocities.jp/kosako3/oniguruma/)
 - openssl 0.9.8l (http://www.openssl.org/)
 - zlib 1.2.3 (http://www.zlib.net/)
 - PuTTY 0.60 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)

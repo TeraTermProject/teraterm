@@ -8,9 +8,9 @@
   注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
   注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
 - インストーラ
-  Inno Setup 5.3.5 ANSI (http://www.jrsoftware.org/isinfo.php)
-  Inno Setup Preprocessor 5.3.5 (ispack-5.3.4 より)
-  ISTool 5.3.0 (ispack-5.3.5 より)
+  Inno Setup 5.3.7 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor 5.3.6 (ispack-5.3.7 より)
+  ISTool 5.3.0.1 (ispack-5.3.7 より)
   Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
 - その他
   Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
@@ -19,7 +19,7 @@
 
 
 ■ ライブラリ
-- oniguruma 5.9.1 (http://www.geocities.jp/kosako3/oniguruma/)
+- oniguruma 5.9.2 (http://www.geocities.jp/kosako3/oniguruma/)
 - openssl 0.9.8l (http://www.openssl.org/)
 - zlib 1.2.3 (http://www.zlib.net/)
 - PuTTY 0.60 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
