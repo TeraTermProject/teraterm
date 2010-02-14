@@ -101,8 +101,7 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 {
 	char uimsg[MAX_UIMSG];
 	char buf[64];
-	CButton *btn, *btn2;
-	CComboBox *cmb;
+	CButton *btn;
 
 	CPropertyPage::OnInitDialog();
 
@@ -115,12 +114,7 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_MOUSEWHEEL_SCROLL_LINE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_SCROLL_LINE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_ACCEPT_MOUSE_EVENT_TRACKING, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_DISABLE_MOUSE_TRACKING_CTRL, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING_LABEL, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CLEAR_ON_RESIZE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_CURSOR_CTRL_SEQ, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgGeneralFont = NULL;
@@ -141,32 +135,9 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, ts.UIMsg);
-	GetDlgItemText(IDC_ACCEPT_MOUSE_EVENT_TRACKING, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_MOUSE_EVENT_TRACKING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.UIMsg);
-	GetDlgItemText(IDC_DISABLE_MOUSE_TRACKING_CTRL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_GENERAL_DISABLE_MOUSE_TRACKING_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_DISABLE_MOUSE_TRACKING_CTRL, ts.UIMsg);
-	GetDlgItemText(IDC_ACCEPT_TITLE_CHANGING_LABEL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_ACCEPT_TITLE_CHANGING_LABEL, ts.UIMsg);
-
-	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_OVERWRITE", ts.UIMsg, sizeof(ts.UIMsg), "overwrite", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_AHEAD", ts.UIMsg, sizeof(ts.UIMsg), "ahead", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_GENERAL_ACCEPT_TITLE_CHANGING_LAST", ts.UIMsg, sizeof(ts.UIMsg), "last", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-
 	GetDlgItemText(IDC_CLEAR_ON_RESIZE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_GENERAL_CLEAR_ON_RESIZE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CLEAR_ON_RESIZE, ts.UIMsg);
-
-	GetDlgItemText(IDC_CURSOR_CTRL_SEQ, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_GENERAL_CURSOR_CTRL_SEQ", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_CURSOR_CTRL_SEQ, ts.UIMsg);
 
 	// (1)DisableAcceleratorSendBreak
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_SENDBREAK);
@@ -188,30 +159,9 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	btn = (CButton *)GetDlgItem(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE);
 	btn->SetCheck(ts.AutoScrollOnlyInBottomLine);
 
-	// (6)IDC_ACCEPT_MOUSE_EVENT_TRACKING
-	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
-	btn2 = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
-	btn->SetCheck(ts.MouseEventTracking);
-	if (ts.MouseEventTracking) {
-		btn2->EnableWindow(TRUE);
-	} else {
-		btn2->EnableWindow(FALSE);
-	}
-
-	// (7)IDC_DISABLE_MOUSE_TRACKING_CTRL
-	btn2->SetCheck(ts.DisableMouseTrackingByCtrl);
-
-	// (8)IDC_ACCEPT_TITLE_CHANGING
-	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
-	cmb->SetCurSel(ts.AcceptTitleChangeRequest);
-
-	// (9)IDC_CLEAR_ON_RESIZE
+	// (6)IDC_CLEAR_ON_RESIZE
 	btn = (CButton *)GetDlgItem(IDC_CLEAR_ON_RESIZE);
 	btn->SetCheck((ts.TermFlag & TF_CLEARONRESIZE) != 0);
-
-	// (10)IDC_CURSOR_CTRL_SEQ
-	btn = (CButton *)GetDlgItem(IDC_CURSOR_CTRL_SEQ);
-	btn->SetCheck((ts.WindowFlag & WF_CURSORCHANGE) != 0);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -219,28 +169,9 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	return FALSE;
 }
 
-BOOL CGeneralPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	CButton *btn, *btn2;
-
-	switch (wParam) {
-		case IDC_ACCEPT_MOUSE_EVENT_TRACKING | (BN_CLICKED << 16):
-			btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
-			btn2 = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
-			if (btn->GetCheck()) {
-				btn2->EnableWindow(TRUE);
-			} else {
-				btn2->EnableWindow(FALSE);
-			}
-			return TRUE;
-	}
-	return CPropertyPage::OnCommand(wParam, lParam);
-}
-
 void CGeneralPropPageDlg::OnOK()
 {
 	CButton *btn;
-	CComboBox *cmb;
 	char buf[64];
 	int val;
 
@@ -262,33 +193,217 @@ void CGeneralPropPageDlg::OnOK()
 	if (val > 0) 
 		ts.MouseWheelScrollLine = val;
 
-	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE 
+	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
 	btn = (CButton *)GetDlgItem(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE);
 	ts.AutoScrollOnlyInBottomLine = btn->GetCheck();
 
-	// (6)IDC_ACCEPT_MOUSE_EVENT_TRACKING 
-	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
-	ts.MouseEventTracking = btn->GetCheck();
-
-	// (7)IDC_DISABLE_MOUSE_TRACKING_CTRL 
-	btn = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
-	ts.DisableMouseTrackingByCtrl = btn->GetCheck();
-
-	// (8)IDC_ACCEPT_TITLE_CHANGING 
-	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
-	ts.AcceptTitleChangeRequest = cmb->GetCurSel();
-
-	// (9)IDC_CLEAR_ON_RESIZE
+	// (6)IDC_CLEAR_ON_RESIZE
 	btn = (CButton *)GetDlgItem(IDC_CLEAR_ON_RESIZE);
 	if (((ts.TermFlag & TF_CLEARONRESIZE) != 0) != btn->GetCheck()) {
 		ts.TermFlag ^= TF_CLEARONRESIZE;
 	}
+}
 
-	// (10)IDC_CURSOR_CTRL_SEQ
+
+
+// CSequencePropPageDlg ダイアログ
+
+IMPLEMENT_DYNAMIC(CSequencePropPageDlg, CPropertyPage)
+
+CSequencePropPageDlg::CSequencePropPageDlg()
+	: CPropertyPage(CSequencePropPageDlg::IDD)
+{
+}
+
+CSequencePropPageDlg::~CSequencePropPageDlg()
+{
+	if (DlgSequenceFont != NULL) {
+		DeleteObject(DlgSequenceFont);
+	}
+}
+
+BEGIN_MESSAGE_MAP(CSequencePropPageDlg, CPropertyPage)
+END_MESSAGE_MAP()
+
+// CSequencePropPageDlg メッセージ ハンドラ
+
+BOOL CSequencePropPageDlg::OnInitDialog()
+{
+	char uimsg[MAX_UIMSG];
+	CButton *btn, *btn2;
+	CComboBox *cmb;
+
+	CPropertyPage::OnInitDialog();
+
+	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
+	GetObject(font, sizeof(LOGFONT), &logfont);
+	if (get_lang_font("DLG_TAHOMA_FONT", GetSafeHwnd(), &logfont, &DlgSequenceFont, ts.UILanguageFile)) {
+		SendDlgItemMessage(IDC_ACCEPT_MOUSE_EVENT_TRACKING, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_DISABLE_MOUSE_TRACKING_CTRL, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING_LABEL, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_CURSOR_CTRL_SEQ, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+	}
+	else {
+		DlgSequenceFont = NULL;
+	}
+
+	GetDlgItemText(IDC_ACCEPT_MOUSE_EVENT_TRACKING, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_MOUSE_EVENT_TRACKING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.UIMsg);
+	GetDlgItemText(IDC_DISABLE_MOUSE_TRACKING_CTRL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_DISABLE_MOUSE_TRACKING_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_DISABLE_MOUSE_TRACKING_CTRL, ts.UIMsg);
+	GetDlgItemText(IDC_ACCEPT_TITLE_CHANGING_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ACCEPT_TITLE_CHANGING_LABEL, ts.UIMsg);
+
+	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", ts.UIMsg, sizeof(ts.UIMsg), "overwrite", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_AHEAD", ts.UIMsg, sizeof(ts.UIMsg), "ahead", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_LAST", ts.UIMsg, sizeof(ts.UIMsg), "last", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+
+	GetDlgItemText(IDC_CURSOR_CTRL_SEQ, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_CURSOR_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_CURSOR_CTRL_SEQ, ts.UIMsg);
+	GetDlgItemText(IDC_WINDOW_CTRL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_WINDOW_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_WINDOW_CTRL, ts.UIMsg);
+	GetDlgItemText(IDC_WINDOW_REPORT, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_WINDOW_REPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_WINDOW_REPORT, ts.UIMsg);
+	GetDlgItemText(IDC_TITLE_REPORT_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLE_REPORT_LABEL, ts.UIMsg);
+
+	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_IGNORE", ts.UIMsg, sizeof(ts.UIMsg), "ignore", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_ACCEPT", ts.UIMsg, sizeof(ts.UIMsg), "accept", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_EMPTY", ts.UIMsg, sizeof(ts.UIMsg), "empty", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+
+	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
+	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
+	btn2 = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
+	btn->SetCheck(ts.MouseEventTracking);
+	if (ts.MouseEventTracking) {
+		btn2->EnableWindow(TRUE);
+	} else {
+		btn2->EnableWindow(FALSE);
+	}
+
+	// (2)IDC_DISABLE_MOUSE_TRACKING_CTRL
+	btn2->SetCheck(ts.DisableMouseTrackingByCtrl);
+
+	// (3)IDC_ACCEPT_TITLE_CHANGING
+	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
+	cmb->SetCurSel(ts.AcceptTitleChangeRequest);
+
+	// (4)IDC_TITLE_REPORT
+	cmb = (CComboBox *)GetDlgItem(IDC_TITLE_REPORT);
+	switch (ts.WindowFlag & WF_TITLEREPORT) {
+		case IdTitleReportIgnore:
+			cmb->SetCurSel(0);
+			break;
+		case IdTitleReportAccept:
+			cmb->SetCurSel(1);
+			break;
+		default: // IdTitleReportEmpty
+			cmb->SetCurSel(2);
+			break;
+	}
+
+	// (5)IDC_WINDOW_CTRL
+	btn = (CButton *)GetDlgItem(IDC_WINDOW_CTRL);
+	btn->SetCheck((ts.WindowFlag & WF_WINDOWCHANGE) != 0);
+
+	// (6)IDC_WINDOW_REPORT
+	btn = (CButton *)GetDlgItem(IDC_WINDOW_REPORT);
+	btn->SetCheck((ts.WindowFlag & WF_WINDOWREPORT) != 0);
+
+	// (7)IDC_CURSOR_CTRL_SEQ
+	btn = (CButton *)GetDlgItem(IDC_CURSOR_CTRL_SEQ);
+	btn->SetCheck((ts.WindowFlag & WF_CURSORCHANGE) != 0);
+
+	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
+	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
+
+	return FALSE;
+}
+
+BOOL CSequencePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	CButton *btn, *btn2;
+
+	switch (wParam) {
+		case IDC_ACCEPT_MOUSE_EVENT_TRACKING | (BN_CLICKED << 16):
+			btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
+			btn2 = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
+			if (btn->GetCheck()) {
+				btn2->EnableWindow(TRUE);
+			} else {
+				btn2->EnableWindow(FALSE);
+			}
+			return TRUE;
+	}
+	return CPropertyPage::OnCommand(wParam, lParam);
+}
+
+void CSequencePropPageDlg::OnOK()
+{
+	CButton *btn;
+	CComboBox *cmb;
+
+	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
+	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
+	ts.MouseEventTracking = btn->GetCheck();
+
+	// (2)IDC_DISABLE_MOUSE_TRACKING_CTRL
+	btn = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
+	ts.DisableMouseTrackingByCtrl = btn->GetCheck();
+
+	// (3)IDC_ACCEPT_TITLE_CHANGING
+	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
+	ts.AcceptTitleChangeRequest = cmb->GetCurSel();
+
+	// (4)IDC_TITLE_REPORT
+	cmb = (CComboBox *)GetDlgItem(IDC_TITLE_REPORT);
+	switch (cmb->GetCurSel()) {
+		case 0:
+			ts.WindowFlag &= ~WF_TITLEREPORT;
+			break;
+		case 1:
+			ts.WindowFlag &= ~WF_TITLEREPORT;
+			ts.WindowFlag |= IdTitleReportAccept;
+			break;
+		default: // 2
+			ts.WindowFlag |= IdTitleReportEmpty;
+			break;
+	}
+
+	// (5)IDC_WINDOW_CTRL
+	btn = (CButton *)GetDlgItem(IDC_WINDOW_CTRL);
+	if (((ts.WindowFlag & WF_WINDOWCHANGE) != 0) != btn->GetCheck()) {
+		ts.WindowFlag ^= WF_WINDOWCHANGE;
+	}
+
+	// (6)IDC_WINDOW_REPORT
+	btn = (CButton *)GetDlgItem(IDC_WINDOW_REPORT);
+	if (((ts.WindowFlag & WF_WINDOWREPORT) != 0) != btn->GetCheck()) {
+		ts.WindowFlag ^= WF_WINDOWREPORT;
+	}
+
+	// (7)IDC_CURSOR_CTRL_SEQ
 	btn = (CButton *)GetDlgItem(IDC_CURSOR_CTRL_SEQ);
 	if (((ts.WindowFlag & WF_CURSORCHANGE) != 0) != btn->GetCheck()) {
 		ts.WindowFlag ^= WF_CURSORCHANGE;
 	}
+
 }
 
 
@@ -1390,6 +1505,8 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(UINT nIDCaption, CWnd* pParentW
 	:CPropertySheet(nIDCaption, pParentWnd, iSelectPage)
 {
 	AddPage(&m_GeneralPage);
+	AddPage(&m_SequencePage);
+	AddPage(&m_CopypastePage);
 	AddPage(&m_VisualPage);
 	AddPage(&m_LogPage);
 	AddPage(&m_CygwinPage);
@@ -1401,6 +1518,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(LPCTSTR pszCaption, CWnd* pPare
 	:CPropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
 	AddPage(&m_GeneralPage);
+	AddPage(&m_SequencePage);
 	AddPage(&m_CopypastePage);
 	AddPage(&m_VisualPage);
 	AddPage(&m_LogPage);
@@ -1437,25 +1555,30 @@ BOOL CAddSettingPropSheetDlg::OnInitDialog()
 	tc.pszText = ts.UIMsg;
 	tab->SetItem(0, &tc);
 
+	get_lang_msg("DLG_TABSHEET_TITLE_SEQUENCE", ts.UIMsg, sizeof(ts.UIMsg),
+	             "Control Sequence", ts.UILanguageFile);
+	tc.pszText = ts.UIMsg;
+	tab->SetItem(1, &tc);
+
 	get_lang_msg("DLG_TABSHEET_TITLE_COPYPASTE", ts.UIMsg, sizeof(ts.UIMsg),
 	             "Copy and Paste", ts.UILanguageFile);
 	tc.pszText = ts.UIMsg;
-	tab->SetItem(1, &tc);
+	tab->SetItem(2, &tc);
 
 	get_lang_msg("DLG_TABSHEET_TITLE_VISUAL", ts.UIMsg, sizeof(ts.UIMsg),
 	             "Visual", ts.UILanguageFile);
 	tc.pszText = ts.UIMsg;
-	tab->SetItem(2, &tc);
+	tab->SetItem(3, &tc);
 
 	get_lang_msg("DLG_TABSHEET_TITLE_Log", ts.UIMsg, sizeof(ts.UIMsg),
 	             "Log", ts.UILanguageFile);
 	tc.pszText = ts.UIMsg;
-	tab->SetItem(3, &tc);
+	tab->SetItem(4, &tc);
 
 	get_lang_msg("DLG_TABSHEET_TITLE_CYGWIN", ts.UIMsg, sizeof(ts.UIMsg),
 	             "Cygwin", ts.UILanguageFile);
 	tc.pszText = ts.UIMsg;
-	tab->SetItem(4, &tc);
+	tab->SetItem(5, &tc);
 
 	return FALSE;
 }

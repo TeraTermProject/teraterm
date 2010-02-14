@@ -20,6 +20,7 @@
 #define IDR_MENU1                       119
 #define IDR_PASTEMENU                   119
 #define IDD_CLIPBOARD_DIALOG            120
+#define IDD_TABSHEET_SEQUENCE           121
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -88,6 +89,7 @@
 #define IDC_ACCEPT_MOUSE_EVENT_TRACKING 1065
 #define IDC_ACCEPT_TITLE_CHANGING       1066
 #define IDC_AGENT_PROXY                 1067
+#define IDC_TITLE_REPORT                1067
 #define IDC_DISABLE_MOUSE_TRACKING_CTRL 1068
 #define IDC_ENABLE_ATTR_COLOR_BOLD      1069
 #define IDC_ENABLE_ATTR_COLOR_BLINK     1070
@@ -130,10 +132,13 @@
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
 #define IDC_MOUSEWHEEL_SCROLL_LINE      2513
+#define IDC_WINDOW_CTRL                 2513
 #define IDC_TRANSPROGRESS               2514
+#define IDC_WINDOW_REPORT               2514
 #define IDC_PROTOPROGRESS               2515
 #define IDC_ACCEPT_TITLE_CHANGING_LABEL 2517
 #define IDC_PASTEDELAY_LABEL            2518
+#define IDC_TITLE_REPORT_LABEL          2518
 #define IDC_PASTEDELAY_LABEL2           2519
 #define IDC_CONFIRM_STRING_FILE         2520
 #define IDC_CONFIRM_STRING_FILE_PATH    2521
@@ -229,7 +234,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        121
+#define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         52030
 #define _APS_NEXT_CONTROL_VALUE         2524
 #define _APS_NEXT_SYMED_VALUE           101

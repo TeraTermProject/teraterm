@@ -11,45 +11,56 @@
   <body>
     <h1>Additional settings（[Setup] メニュー）</h1>
 
+
     <h2>"General" タブ</h2>
     <dl>
-      <dt>EnableClickableURL</dt>
+      <dt>Enable clickable URL</dt>
       <dd>
 	URL をダブルクリックしたときにブラウザを起動する機能を有効にします。
       </dd>
 
-      <dt>DisableAcceleratorSendBreak</dt>
+      <dt>Disable accelerator send break</dt>
       <dd>
 	Alt-B で break を送信する機能を無効にします。
       </dd>
 
-      <dt>AcceptBroadcast</dt>
+      <dt>Accept broadcast</dt>
       <dd>
 	ブロードキャストコマンドを受け入れます。
       </dd>
 
-      <dt>MouseWheelScrollLine</dt>
+      <dt>Mouse wheel scroll line</dt>
       <dd>
 	マウスホイールによるスクロール行数を設定します。
       </dd>
 
-      <dt>AutoScrollOnlyInBottomLine</dt>
+      <dt>Auto scroll only in bottom line</dt>
       <dd>
 	最下行を表示していない状態では自動的にスクロールしないようにします。
       </dd>
 
-      <dt>Accept Mouse Event Tracking</dt>
+      <dt>Clear display when window resized</dt>
+      <dd>
+	VTウィンドウのサイズを変更した時に、表示内容をクリアするかどうかを設定します。
+      </dd>
+
+    </dl>
+
+
+    <h2>"Control Sequence" タブ</h2>
+    <dl>
+      <dt>Accept mouse event tracking</dt>
       <dd>
         ホスト側のアプリケーションによって、VT window がマウストラッキングモードに変更された場合、Tera Term はマウス操作をホストへ報告するようになります。<br>
         マウストラッキングモードはxtermの拡張機能ですので、TERM環境変数が"xterm"以外だとホスト側のアプリケーションはこの機能を使わないかもしれません。
       </dd>
 
-      <dt>Disable Mouse Event Tracking when Control is pressed</dt>
+      <dt>Disable mouse event tracking when Control is pressed</dt>
       <dd>
         マウストラッキングモード時、Controlキーが押されている間はマウス操作を通知しないようにします。
       </dd>
 
-      <dt>Accept Window Title Change Request</dt>
+      <dt>Accept window title change request</dt>
       <dd>
         リモートからのウィンドウタイトル変更要求を受け入れるかを設定します。
         <dl>
@@ -64,50 +75,99 @@
         </dl>
       </dd>
 
-      <dt>Clear display when window resized</dt>
+      <dt>Window title report</dt>
       <dd>
-	VTウィンドウのサイズを変更した時に、表示内容をクリアするかどうかを設定します。
+        dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。
+        <dl>
+          <dt>ignore</dt>
+          <dd>報告要求に対して何も応答しないようにする</dd>
+          <dt>accept</dt>
+          <dd>現在のウィンドウタイトルを報告する。ただし、現在の現在のウィンドウタイトルを報告するのはセキュリティ上危険ですので、本当に必要な時のみこの設定を行うようにしてください。</dd>
+          <dt>empty</dt>
+          <dd>ウィンドウタイトルは空だと報告する</dd>
+        </dl>
       </dd>
 
-      <dt>CursorCtrlSequence</dt>
+      <dt>Window control sequence</dt>
       <dd>
-      カーソル形状を制御するシーケンスを使用するかどうかを設定します。
+        この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面移動, 最背面移動, リフレッシュ, ウィンドウサイズ変更(ピクセル単位, 文字単位) が有効になります。
       </dd>
 
+      <dt>Window report sequence</dt>
+      <dd>
+        この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。<br>
+        セキュリティ上の理由等でウィンドウの情報を報告したくない場合は無効にしてください。
+      </dd>
+
+      <dt>Cursor control sequence</dt>
+      <dd>
+      カーソル形状を制御するシーケンスを使用するかどうかを設定します。<br>
+      この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。<br><br>
+      
+      vimを使用している場合、この機能を on にして ~/.vimrc に以下のように追加すると入力モードに応じてカーソル形状が変わるようになります。
+
+<pre>
+set t_SI=^[[3\ q
+set t_EI=^[[1\ q
+注: ^[ はControl-V Control-[で入力する
+</pre>
+
+      アプリケーション終了後に、カーソルを点滅状態に戻すには、以下のように設定をします。<br>
+      ncurses 5.7 の terminfo では xterm のカーソルの非表示(civis)/通常表示(cnorm)/強調表示(cvvis)はそれぞれ以下のようになっています。
+
+<pre>
+civis=\E[?25l
+cnorm=\E[?12l\E[?25h
+cvvis=\E[?12;25h
+</pre>
+
+      この設定だと、カーソルの通常表示時は非点滅に、強調表示時は点滅するようになります。
+      このため terminfo 対応のアプリケーションがカーソルを通常表示しようとした時に点滅しなくなります。<br>
+      対応としては、カーソルの点滅制御を無視する為に CursorCtrlSequence を off に設定するか、カーソル表示状態変更時に点滅状態を変更しないように以下の手順をホスト側で実施してください。
+
+<pre>
+% infocmp xterm > xterm.ti
+生成されたxterm.tiを編集し、cnorm, cvvisの値を \E?25h に変更する
+% tic -o ~/.terminfo xterm.ti
+システム全体に反映させるためには root で以下を実行
+# tic xterm.ti
+</pre>
+      </dd>
 
     </dl>
 
+
     <h2>"Copy and Paste" タブ</h2>
     <dl>
-      <dt><a name="continuedline">EnableContinuedLineCopy</a></dt>
+      <dt><a name="continuedline">Enable continued line copy</a></dt>
       <dd>
 	継続している行を改行せずにコピーする機能を有効にします。
       </dd>
 
-      <dt>DisableMouseRButtonPaste</dt>
+      <dt>Disable mouse R button paste</dt>
       <dd>
 	右クリックでクリップボードの内容を貼り付ける機能を無効にします。
       </dd>
 
-      <dt>ConfirmMouseRButtonPaste</dt>
+      <dt>Confirm mouse R button paste</dt>
       <dd>
 	右クリックでクリップボードの内容を貼り付けるとき、
 	ポップアップメニューで確認する機能を有効にします。
       </dd>
 
-      <dt>SelectOnlyByLButton</dt>
+      <dt>Select only by L button</dt>
       <dd>
 	マウスドラッグによる選択を、左ボタンでのみ有効にする。
       </dd>
 
-      <dt>ConfirmChangePaste</dt>
+      <dt>Confirm change paste</dt>
       <dd>
 	クリップボードに改行コード(CR/LF)を含む場合、マウスの右クリックおよびAlt+Vで
 	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
 	誤操作により、端末へ予期せぬコマンド投入を防ぐことができます。
       </dd>
 
-      <dt>StringFile</dt>
+      <dt>String file</dt>
       <dd>
 	クリップボードに、この設定で指定したファイル内に存在するテキストが含まれる場合、マウスの右クリックおよびAlt+Vで
 	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
@@ -115,22 +175,23 @@
     この設定は、ConfirmChangePasteの設定が有効な場合に作用します。
       </dd>
 
-      <dt>ConfirmChangePasteStringFile</dt>
+      <dt>Confirm change paste string file</dt>
       <dd>
 	ペースト時に、改行コード以外に警告したいキーワードを列挙したファイルを指定することができます。
       </dd>
 
-      <dt>Delimiter Characters</dt>
+      <dt>Delimiter characters</dt>
       <dd>
 	単語選択の区切り文字を設定します。
       </dd>
 
-      <dt>PasteDelayPerLine</dt>
+      <dt>Paste delay per line</dt>
       <dd>
 	複数行のデータを貼り付けるとき、改行が現れるごとにデータの送信を遅延させることができます。遅延する時間をミリ秒で設定します。
       </dd>
 
     </dl>
+
 
     <h2>"Visual" タブ</h2>
     <dl>
@@ -183,14 +244,15 @@ HAND  = ハンドカーソル
 
     </dl>
 
+
     <h2>"Log" タブ</h2>
     <dl>
-      <dt>View Log Editor</dt>
+      <dt>View log editor</dt>
       <dd>
 	ログを表示するエディタを指定します。
       </dd>
 
-      <dt>Default Log File Name(strftime format)</dt>
+      <dt>Default log file name(strftime format)</dt>
       <dd>
 	標準のログファイル名を指定します。strftime の書式が使用できます。
 <pre>
@@ -223,7 +285,7 @@ HAND  = ハンドカーソル
 </pre>
       </dd>
 
-      <dt>Default Log Save Folder</dt>
+      <dt>Default log save folder</dt>
       <dd>
 	標準のログ保存先を指定します。ログファイルがフルパスで指定されなかったときに使用されます。
       </dd>
@@ -234,9 +296,10 @@ HAND  = ハンドカーソル
       </dd>
     </dl>
 
+
     <h2>"Cygwin" タブ</h2>
     <dl>
-      <dt>Cygwin Install Path</dt>
+      <dt>Cygwin install path</dt>
       <dd>
 	Cygwin のインストール先を指定します。
       </dd>

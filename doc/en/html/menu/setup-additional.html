@@ -11,45 +11,56 @@
   <body>
     <h1>Additional settings([Setup] Menu)</h1>
 
+
     <h2>"General" Tab</h2>
     <dl>
-      <dt>EnableClickableURL</dt>
+      <dt>Enable clickable URL</dt>
       <dd>
 	Launches the web browser by clicking URL string.
       </dd>
 
-      <dt>DisableAcceleratorSendBreak</dt>
+      <dt>Disable accelerator send break</dt>
       <dd>
 	Disables accelerator key of send break.
       </dd>
 
-      <dt>AcceptBroadcast</dt>
+      <dt>Accept broadcast</dt>
       <dd>
 	Accept the broadcast command.
       </dd>
 
-      <dt>MouseWheelScrollLine</dt>
+      <dt>Mouse wheel scroll line</dt>
       <dd>
 	Configures the mouse wheel scroll line.
       </dd>
 
-      <dt>AutoScrollOnlyInBottomLine</dt>
+      <dt>Auto scroll only in bottom line</dt>
       <dd>
 	Stop auto scrolling except when the bottom line is displayed.
       </dd>
 
-      <dt>Accept Mouse Event Tracking</dt>
+      <dt>Clear display when window resized</dt>
+      <dd>
+        <!--VTウィンドウのサイズを変更した時に、表示内容をクリアするかどうかを設定します。-->
+      </dd>
+
+    </dl>
+
+
+    <h2>"Control Sequence" Tab</h2>
+    <dl>
+      <dt>Accept mouse event tracking</dt>
       <dd>
 	Tera Term would send the escape sequence of the mouse operation when VT window is changed to the mouse tracking mode by the host application.<br>
 	However, TERM environment variable should be "xterm" type.
       </dd>
 
-      <dt>Disable Mouse Event Tracking when Control is pressed</dt>
+      <dt>Disable mouse event tracking when Control is pressed</dt>
       <dd>
         The mouse tracking mode is enabled, TeraTerm does not send the mouse operation while the control key is pressed.
       </dd>
 
-      <dt>Accept Window Title Change Request</dt>
+      <dt>Accept window title change request</dt>
       <dd>
         Configures whether a user accepts the window title changing.
         <dl>
@@ -64,38 +75,89 @@
         </dl>
       </dd>
 
-      <dt>Clear display when window resized</dt>
+      <dt>Window title report</dt>
       <dd>
-        <!--VTウィンドウのサイズを変更した時に、表示内容をクリアするかどうかを設定します。-->
+        <!--dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。-->
+        <dl>
+          <dt>ignore</dt>
+          <dd>Ignore a window title reporting request.</dd>
+          <dt>accept</dt>
+          <!--dd>現在のウィンドウタイトルを報告する。ただし、現在の現在のウィンドウタイトルを報告するのはセキュリティ上危険ですので、本当に必要な時のみこの設定を行うようにしてください。</dd-->
+          <dt>empty</dt>
+          <dd>Report empty string.</dd>
+        </dl>
       </dd>
 
-      <dt>CursorCtrlSequence</dt>
+      <dt>Window control sequence</dt>
       <dd>
-      Enables the control sequence for the cursor shape.
+        added support for the position moving, the minimization, the maximization, the most front, the most back, the refresh and the window size changing(per pixel and character) control sequences regarding the dtterm window operation.
+      </dd>
+
+      <dt>Window report sequence</dt>
+      <dd>
+        This function enables the ddterm control sequence such as the window status reporting, the window position reporting, the window size(in pixcel and character) reporting and the root window size reporting, among the window information reporting features.<br>
+        If you do not want window informations to be sent to remote host by some reason such as security, please disable this setting.
+      </dd>
+
+      <dt>Cursor control sequence</dt>
+      <dd>
+      Enables the control sequence for the cursor shape.<br>
+      This function enables cursor shape change by cursor change seqnence of DECSCUSR(cursor shape change), WYSTCURM(Wyse no-blinking cursor), WYULCURM(Wyse underlined cursor) and AT&amp;T 610 blinking cursor.<br><br>
+      
+      If a user uses the vim editor, write below entries in the ~/.vimrc to enable this feature.
+
+<pre>
+set t_SI=^[[3\ q
+set t_EI=^[[1\ q
+NOTE: Input ^[ by using Control-V Control-[.
+</pre>
+
+      If the cursor periodically blinks after an application exits, a user should configure as follows.<br>
+      In the ncurses 5.7 terminfo, the invisible(civis)/normal display(cnorm)/highlighting(cvvis) of the xterm cursor are as follows:
+
+<pre>
+civis=\E[?25l
+cnorm=\E[?12l\E[?25h
+cvvis=\E[?12;25h
+</pre>
+
+      When the upper configuration is enabled, the normal cursor displays with the non-blinking mode and the emphasis cursor displays with the blinking mode.
+      So, the cursor does not blink when the terminfo application displays the own cursor.<br>
+      If a user want to blink the cursor, turn off the CursorCtrlSequence entry or do in the following commands:
+
+<pre>
+% infocmp xterm > xterm.ti
+Open the xterm.ti file, change from a value of cnorm and cvvis to \E?25h.
+% tic -o ~/.terminfo xterm.ti
+Execute the tic command.
+# tic xterm.ti
+If the configuration is enabled as whole system, execute the upper command with a root user.
+</pre>
       </dd>
 
     </dl>
 
+
     <h2>"Copy and Paste" Tab</h2>
     <dl>
-      <dt><a name="continuedline">EnableContinuedLineCopy</a></dt>
+      <dt><a name="continuedline">Enable continued line copy</a></dt>
       <dd>
 	Concatenates current line with the next line including word
 	characters when the whole line is stepped over.
       </dd>
 
-      <dt>DisableMouseRButtonPaste</dt>
+      <dt>Disable mouse R button paste</dt>
       <dd>
 	Disables pasting clipboard data when mouse right button is clicked.
       </dd>
 
-      <dt>ConfirmMouseRButtonPaste</dt>
+      <dt>Confirm mouse R button paste</dt>
       <dd>
 	Displays popup menu and confirm pasting clipboard data when mouse
 	right button is clicked.
       </dd>
 
-      <dt>SelectOnlyByLButton</dt>
+      <dt>Select only by L button</dt>
       <dd>
 	Enable selection by mouse drag only with left button.
       </dd>
@@ -107,7 +169,7 @@
 	This is a foolproof way.
       </dd>
 
-      <dt>StringFile</dt>
+      <dt>String file</dt>
       <dd>
 	When the Clipboard includes any strings in the specified file, 
 	the confirmation dialog can be shown to paste by right-click or Alt+V.
@@ -115,22 +177,23 @@
     This function works when the ConfirmChangePaste is enabled.
       </dd>
 
-      <dt>ConfirmChangePasteStringFile</dt>
+      <dt>Confirm change paste string file</dt>
       <dd>
 	When a user pastes, the user can specify a keyword file for ConfirmChangePaste except the CR/LF.
       </dd>
 
-      <dt>Delimiter Characters</dt>
+      <dt>Delimiter characters</dt>
       <dd>
 	Inludes delimiter characters for the word selection.
       </dd>
 
-      <dt>PasteDelayPerLine</dt>
+      <dt>Paste delay per line</dt>
       <dd>
 	A user can delay to send a line data to the remote host when the user pastes multiple lines. The delay time can be specified by this option on the millisecond time scale.
       </dd>
 
     </dl>
+
 
     <h2>"Visual" tab</h2>
     <dl>
@@ -183,14 +246,15 @@ HAND  = hand cursor
 
     </dl>
 
+
     <h2>"Log" tab</h2>
     <dl>
-      <dt>View Log Editor</dt>
+      <dt>View log editor</dt>
       <dd>
 	Specify the editor that is used for display log file
       </dd>
 
-      <dt>Default Log File Name(strftime format)</dt>
+      <dt>Default log file name(strftime format)</dt>
       <dd>
 	Specify default log file name. It can include a format of strftime.
 <pre>
@@ -223,7 +287,7 @@ SYNOPSIS:
 </pre>
       </dd>
 
-      <dt>Default Log Save Folder</dt>
+      <dt>Default log save folder</dt>
       <dd>
 	Specify default path to save log file. It is used when the log file name is not a full path.
       </dd>
@@ -234,9 +298,10 @@ SYNOPSIS:
       </dd>
     </dl>
 
+
     <h2>"Cygwin" tab</h2>
     <dl>
-      <dt>Cygwin Install Path</dt>
+      <dt>Cygwin install path</dt>
       <dd>
 	Specify the install directory of Cygwin.
       </dd>

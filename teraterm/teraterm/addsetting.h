@@ -43,6 +43,30 @@ private:
 
 protected:
 	DECLARE_MESSAGE_MAP()
+};
+
+
+
+// Control Sequence Page
+class CSequencePropPageDlg : public CPropertyPage
+{
+	DECLARE_DYNAMIC(CSequencePropPageDlg)
+
+public:
+	CSequencePropPageDlg();
+	virtual ~CSequencePropPageDlg();
+	BOOL OnInitDialog();
+	void OnOK();
+
+	enum { IDD = IDD_TABSHEET_SEQUENCE };
+
+private:
+	HFONT DlgSequenceFont;
+	LOGFONT logfont;
+	HFONT font;
+
+protected:
+	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 };
 
@@ -170,6 +194,7 @@ protected:
 
 public:
 	CGeneralPropPageDlg   m_GeneralPage;
+	CSequencePropPageDlg  m_SequencePage;
 	CCopypastePropPageDlg m_CopypastePage;
 	CVisualPropPageDlg    m_VisualPage;
 	CLogPropPageDlg       m_LogPage;
