@@ -44,11 +44,11 @@
           <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
         </ul></li>
       <li>added support for overwritten confirmation at the "<a href="../macro/command/filenamebox.html">filenamebox</a>" macro command.</li>
-      <!--li>ウィンドウタイトル/アイコンラベル報告制御シーケンスに対して、空文字列を応答出来るようにした。
+      <li>added support for replying an empty string at the window title and the icon label reporting control sequence.
         <ul>
-          <li>teraterm.ini の TitleReportSequence エントリで受け付ける値を accept, ignore, empty に変更した。</li>
+          <li>Changed to the ccept, ignore and empty value in the TitleReportSequence entry in the teraterm.ini file.</li>
           <li>changed the default value of "TitleReportSequence" to "empty".</li>
-        </ul></li-->
+        </ul></li>
       <li>added Contorl Sequence tab on the <a href="../menu/setup-additional.html">Additional settings dialog</a>
         <ul>
           <li>moved "Accept mouse event tracking request", "Disable mouse event tracking when Control is pressed" and "Accept window title change request" from General tab.</li>
@@ -69,7 +69,7 @@
       <li>When the multiple files are sent or received by the Kermit, ZMODEM and QuickVAN protocol, the progress bar can not be reset after the second file. </li>
       <li>The `/*' characters in the macro string-type constants are falsely recognized as a beginning of the C language-style comment.</li>
       <li>Workaround: When the Eterm look-feel is enabled, the screen display can not work after the Reverse Video (DECSCNM) set/reset.</li>
-      <!--li>ウィンドウの横幅を縮めたとき、スクロールバッファ内の各行の行末にゴミが残る場合が有ったのを修正した。</li-->
+      <li>When the width of the window is shrinked, the invalid character remains at the end of each line.</li>
     </ul>
   </li>
 
@@ -2306,7 +2306,7 @@ SYNOPSIS:
 <h2><a name="resizemenu">TTXResizeMenu</a></h2>
 <h3><a name="resizemenu_1.01">2010.2.3 (Ver 1.01)</a></h3>
 <ul class="history">
-  <!--li>デフォルトのメニューを廃止した。</li-->
+  <li>Deleted the default menu.</li>
 </ul>
 
 <h3><a name="resizemenu_1.00">2008.12.16 (Ver 1.00)</a></h3>
@@ -2349,8 +2349,8 @@ SYNOPSIS:
 <h2><a name="recurringcommand">TTXRecurringCommand</a></h2>
 <h3><a name="recurringcommand_1.01">2010.2.3 (Ver 1.01)</a></h3>
 <ul class="history">
-  <!--li>送信間隔の最小値を 10 秒から 1 秒に変更した。</li-->
-  <!--li>コントロールメニューから、有効/無効を直接切り替えられるようにした。</li-->
+  <li>Changed the minimum value of the sending interval from 10 to 1 second.</li>
+  <li>added support for switching directly the enabling and disabling by the control menu.</li>
   <li>added support for dynamic loading of user interface messages.</li>
 </ul>
 
