@@ -140,178 +140,6 @@ Name: {userstartup}\TeraTerm Menu; Filename: {app}\ttpmenu.exe; WorkingDir: {app
 Name: {userstartup}\Collector; Filename: {app}\collector\collector.exe; WorkingDir: {app}\Collector; IconFilename: {app}\collector\collector.exe; Components: Collector; Tasks: startupcollectoricon; IconIndex: 0; Flags: createonlyiffileexists
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\cyglaunch; Filename: {app}\cyglaunch.exe; WorkingDir: {app}; IconFilename: {app}\cyglaunch.exe; Components: cygterm; Tasks: quickcyglaunch; IconIndex: 0; Flags: createonlyiffileexists
 
-[INI]
-Filename: {app}\teraterm.ini; Section: TTXttyrec; Key: RecordStartSize; String: on; Flags: createkeyifdoesntexist; Components: Additional_Plugins/TTXttyrec
-Filename: {userdocs}\teraterm.ini; Section: TTXttyrec; Key: RecordStartSize; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: Additional_Plugins/TTXttyrec
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: AlternateScreenBuffer; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: AlternateScreenBuffer; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ClearOnResize; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ClearOnResize; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: URLUnderline; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: URLUnderline; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableLineMode; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableLineMode; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: TitleReportSequence; String: empty; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: TitleReportSequence; String: empty; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: WindowReportSequence; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: WindowReportSequence; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: CursorCtrlSequence; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: CursorCtrlSequence; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: WindowCtrlSequence; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: WindowCtrlSequence; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: Meta8Bit; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: Meta8Bit; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: PasteDelayPerLine; String: 10; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: PasteDelayPerLine; String: 10; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorDuplicateSession; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorDuplicateSession; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ClearScreenOnCloseConnection; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ClearScreenOnCloseConnection; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableMenuSendBreak; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableMenuSendBreak; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: PasteDialogSize; String: 330,220; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: PasteDialogSize; String: 330,220; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: TTXKanjiMenu; Key: UseOneSetting; String: on; Flags: createkeyifdoesntexist; Components: Additional_Plugins/TTXKanjiMenu
-Filename: {userdocs}\teraterm.ini; Section: TTXKanjiMenu; Key: UseOneSetting; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: Additional_Plugins/TTXKanjiMenu
-Filename: {app}\teraterm.ini; Section: TTSSH; Key: ForwardAgent; String: 0; Flags: createkeyifdoesntexist; Components: TTSSH
-Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: ForwardAgent; String: 0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableBoldAttrColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableBoldAttrColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableBlinkAttrColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableBlinkAttrColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableReverseAttrColor; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableReverseAttrColor; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableURLColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableURLColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableANSIColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableANSIColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: StrictKeyMapping; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: StrictKeyMapping; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: VTReverseColor; String: 255,255,255,0,0,0; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: VTReverseColor; String: 255,255,255,0,0,0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableWheelToCursorByCtrl; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableWheelToCursorByCtrl; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableMouseTrackingByCtrl; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableMouseTrackingByCtrl; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: TTSSH; Key: EnableRsaShortKeyServer; String: 0; Flags: createkeyifdoesntexist; Components: TTSSH
-Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: EnableRsaShortKeyServer; String: 0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: AcceptTitleChangeRequest; String: overwrite; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: AcceptTitleChangeRequest; String: overwrite; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ScrollWindowClearScreen; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ScrollWindowClearScreen; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: UnicodeToDecSpMapping; String: 3; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: UnicodeToDecSpMapping; String: 3; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: UnknownUnicodeCharacterAsWide; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: UnknownUnicodeCharacterAsWide; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: AutoScrollOnlyInBottomLine; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: AutoScrollOnlyInBottomLine; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: VTIcon; String: Default; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: VTIcon; String: Default; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: TEKIcon; String: Default; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: TEKIcon; String: Default; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: MouseWheelScrollLine; String: 3; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: MouseWheelScrollLine; String: 3; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisablePasteMouseMButton; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisablePasteMouseMButton; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: SaveVTWinPos; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: SaveVTWinPos; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: Xterm256Color; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: Xterm256Color; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: Aixterm16Color; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: Aixterm16Color; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: PcBoldColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: PcBoldColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ConfirmChangePaste; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ConfirmChangePaste; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: LogHideDialog; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: LogHideDialog; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: MaximizedBugTweak; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: MaximizedBugTweak; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: KillFocusCursor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: KillFocusCursor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: MouseEventTracking; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: MouseEventTracking; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: HostDialogOnStartup; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: HostDialogOnStartup; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: TranslateWheelToCursor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: TranslateWheelToCursor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ConfirmFileDragAndDrop; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ConfirmFileDragAndDrop; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ZmodemRcvCommand; String: rz; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ZmodemRcvCommand; String: rz; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: XmodemRcvCommand; String: ; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: XmodemRcvCommand; String: ; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: TelAutoDetect; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: TelAutoDetect; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: SelectOnlyByLButton; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: SelectOnlyByLButton; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ClearComBuffOnOpen; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ClearComBuffOnOpen; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableAppCursor; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableAppCursor; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableAppKeypad; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableAppKeypad; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: TTSSH; Key: CheckAuthListFirst; String: 0; Flags: createkeyifdoesntexist; Components: TTSSH
-Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: CheckAuthListFirst; String: 0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: MaxBroadcatHistory; String: 99; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: MaxBroadcatHistory; String: 99; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: TelKeepAliveInterval; String: 300; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: TelKeepAliveInterval; String: 300; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: VTCompatTab; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: VTCompatTab; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: FileSendFilter; String: ; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: FileSendFilter; String: ; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: LogAutoStart; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: LogAutoStart; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: LogDefaultPath; String: ; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: LogDefaultPath; String: ; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: AcceptBroadcast; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: AcceptBroadcast; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorSendBreak; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisableAcceleratorSendBreak; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ConfirmPasteMouseRButton; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ConfirmPasteMouseRButton; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: BroadcastCommandHistory; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: BroadcastCommandHistory; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ConnectingTimeout; String: 0; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ConnectingTimeout; String: 0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: LogDefaultName; String: teraterm.log; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: LogDefaultName; String: teraterm.log; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: TTSSH; Key: RememberPassword; String: 1; Flags: createkeyifdoesntexist; Components: TTSSH
-Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: RememberPassword; String: 1; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: LogTimestamp; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: LogTimestamp; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: AlphaBlend; String: 255; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: AlphaBlend; String: 255; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: UseNormalBGColor; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: UseNormalBGColor; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: HistoryList; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: HistoryList; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: LogTypePlainText; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: LogTypePlainText; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: URLColor; String: 0,255,0,255,255,255; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: URLColor; String: 0,255,0,255,255,255; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: EnableClickableUrl; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: EnableClickableUrl; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: DisablePasteMouseRButton; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: DisablePasteMouseRButton; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: BG; Key: BGEnable; String: off; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: BG; Key: BGEnable; String: off; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: BG; Key: BGUseAlphaBlendAPI; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: BG; Key: BGUseAlphaBlendAPI; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: BG; Key: BGSPIPath; String: plugin; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: BG; Key: BGSPIPath; String: plugin; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: BG; Key: BGFastSizeMove; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: BG; Key: BGFastSizeMove; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: BG; Key: BGNoFrame; String: on; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: BG; Key: BGNoFrame; String: on; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: BG; Key: BGThemeFile; String: theme\*.ini; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: BG; Key: BGThemeFile; String: theme\*.ini; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: Tera Term; Key: ViewlogEditor; String: notepad.exe; Flags: createkeyifdoesntexist; Components: TeraTerm
-Filename: {userdocs}\teraterm.ini; Section: Tera Term; Key: ViewlogEditor; String: notepad.exe; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TeraTerm
-Filename: {app}\teraterm.ini; Section: TTSSH; Key: KeyboardInteractive; String: 0; Flags: createkeyifdoesntexist; Components: TTSSH
-Filename: {userdocs}\teraterm.ini; Section: TTSSH; Key: KeyboardInteractive; String: 0; Flags: createkeyifdoesntexist; Check: isUserIniExists; Components: TTSSH
-
 [Registry]
 ; Cygterm Here
 Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
@@ -505,33 +333,6 @@ end;
 function GetDefaultIniFilename : String;
 begin
   Result := ExpandConstant('{app}') + '\TERATERM.INI';
-end;
-
-function isGetDefaultIniExists : Boolean;
-var
-  iniFile: String;
-begin
-  iniFile  := GetDefaultIniFilename();
-  if FileExists(iniFile) then
-    Result := True
-  else
-    Result := False;
-end;
-
-function GetUserIniFilename : String;
-begin
-  Result := ExpandConstant('{userdocs}') + '\TERATERM.INI';
-end;
-
-function isUserIniExists : Boolean;
-var
-  iniFile: String;
-begin
-  iniFile  := GetUserIniFilename();
-  if FileExists(iniFile) then
-    Result := True
-  else
-    Result := False;
 end;
 
 procedure SetIniFile(iniFile: String);
@@ -731,24 +532,13 @@ begin
     wpSelectComponents:
       begin
 
-        if isUserIniExists() then
-        begin
-          iniFile := GetIniString('Tera Term', 'UILanguageFile', '', GetUserIniFilename());
-          if iniFile = 'lang\Japanese.lng' then
-            UILangFilePage.SelectedValueIndex := 1
-          else if iniFile = 'lang\German.lng' then
-            UILangFilePage.SelectedValueIndex := 2
-          else
-            UILangFilePage.SelectedValueIndex := 0;
-        end if isGetDefaultIniExists() then begin
-          iniFile := GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename());
-          if iniFile = 'lang\Japanese.lng' then
-            UILangFilePage.SelectedValueIndex := 1
-          else if iniFile = 'lang\German.lng' then
-            UILangFilePage.SelectedValueIndex := 2
-          else
-            UILangFilePage.SelectedValueIndex := 0;
-        end;
+        iniFile := GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename());
+        if iniFile = 'lang\Japanese.lng' then
+          UILangFilePage.SelectedValueIndex := 1
+        else if iniFile = 'lang\German.lng' then
+          UILangFilePage.SelectedValueIndex := 2
+        else
+          UILangFilePage.SelectedValueIndex := 0;
 
       end;
   end;
@@ -764,11 +554,6 @@ begin
       begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
-
-        if isUserIniExists() then begin
-          iniFile := GetUserIniFilename();
-          SetIniFile(iniFile);
-        end;
 
         if not IsTaskSelected('cygtermhere') then
         begin;
@@ -805,8 +590,7 @@ var
   conf    : String;
   confmsg : String;
   app     : String;
-  userdoc : String;
-  i, res : integer;
+  i, res  : integer;
 begin
   case CurUninstallStep of
     usPostUninstall:
@@ -818,20 +602,12 @@ begin
         ini[4] := '\broadcast.log';
 
         conf := CustomMessage('msg_del_confirm');
-        app     := ExpandConstant('{app}');
-        userdoc := ExpandConstant('{userdocs}');
+        app  := ExpandConstant('{app}');
 
         // delete config files
         for i := 0 to 4 do
         begin
           buf := app + ini[i];
-          if FileExists(buf) then begin
-            confmsg := Format(conf, [buf]);
-            res := MsgBox(confmsg, mbInformation, MB_YESNO or MB_DEFBUTTON2);
-            if res = IDYES then
-              DeleteFile(buf);
-          end;
-          buf := userdoc + ini[i];
           if FileExists(buf) then begin
             confmsg := Format(conf, [buf]);
             res := MsgBox(confmsg, mbInformation, MB_YESNO or MB_DEFBUTTON2);
