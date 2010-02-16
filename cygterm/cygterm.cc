@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // CygTerm+ - yet another Cygwin console
-// Copyright (c) 2006-2008 TeraTerm Project
+// Copyright (c) 2006-2010 TeraTerm Project
 // Copyright (C) 2000-2006 NSym.
 //---------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
