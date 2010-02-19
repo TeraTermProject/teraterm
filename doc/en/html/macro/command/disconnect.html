@@ -14,23 +14,25 @@
 <h1>disconnect</h1>
 
 <p>
-Closes a connection.
+Closes the communication between Tera Term and the host.
 </p>
 
 <pre class="macro-syntax">
-disconnect [&lt;intval&gt;]
+disconnect [&lt;confirm&gt;]
 </pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">integer &lt;confirm&gt; (optional default=nonzero) (version 4.65 or later)</dt>
+	<dd>If this parameter is zero, the Tera Term is immediately disconnected without confirmation.<br>
+	    If this parameter is nonzero, the confirmation dialog is shown whether the Tera Term disconnects.</dd>
+</dl>
 
 <h2>Remarks</h2>
 
 <p>
-Closes the communication between Tera Term and the host.<br>
 If Tera Term is not terminated by this command, the link between Tera Term and MACRO is kept.
-</p>
-
-<p>
-When the &lt;intval&gt; is `0', the Tera Term is immediately disconnected without confirmation.<br>
-When the &lt;intval&gt; is not `0', the confirmation dialog is shown whether the Tera Term disconnects.
 </p>
 
 <h2>See also</h2>

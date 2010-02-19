@@ -14,23 +14,25 @@
 <h1>disconnect</h1>
 
 <p>
-通信を閉じる。
+Tera Term とホストの間の通信を終了させる。
 </p>
 
 <pre class="macro-syntax">
-disconnect [&lt;intval&gt;]
+disconnect [&lt;confirm&gt;]
 </pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">整数 &lt;confirm&gt; (オプション デフォルト=非ゼロ) (バージョン 4.65 以降)</dt>
+	<dd>0を指定すると、TCP/IP 接続切断時の確認ダイアログを表示せずに通信を終了する。<br>
+	    0以外の値を指定すると、TCP/IP 接続切断時の確認ダイアログを表示する。</dd>
+</dl>
 
 <h2>解説</h2>
 
 <p>
-Tera Term とホストの間の通信を終了させる。<br>
 もしこのコマンドによって Tera Term が終了しなければ、Tera Term と MACRO の間のリンクは保持される。
-</p>
-
-<p>
-&lt;intval&gt; に 0 が指定されている場合には、TCP/IP 接続切断時の確認ダイアログを表示せずに通信を終了する。<br>
-&lt;intval&gt; が指定されていないか 0 以外の場合には、TCP/IP 接続切断時の確認ダイアログを表示する。
 </p>
 
 <h2>参照</h2>
