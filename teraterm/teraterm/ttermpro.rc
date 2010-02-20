@@ -381,8 +381,8 @@ IDI_CYGTERM             ICON                    "..\\..\\cygterm\\cygterm.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,64,0,0
- PRODUCTVERSION 4,64,0,0
+ FILEVERSION 4,65,0,0
+ PRODUCTVERSION 4,65,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -399,12 +399,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TeraTerm Project T. Teranishi"
             VALUE "FileDescription", "Tera Term"
-            VALUE "FileVersion", "4, 64, 0, 0"
+            VALUE "FileVersion", "4, 65, 0, 0"
             VALUE "InternalName", "TTERMPRO"
             VALUE "LegalCopyright", "(C)TeraTerm Project 2004-2010, (C)T. Teranishi 1994-1998"
             VALUE "OriginalFilename", "TTERMPRO.EXE"
             VALUE "ProductName", "Tera Term"
-            VALUE "ProductVersion", "4, 64, 0, 0"
+            VALUE "ProductVersion", "4, 65, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
