@@ -2502,8 +2502,8 @@ void ParseCS(BYTE b) /* b is the final char */
 	    case 'g': CSDeleteTabStop(); break;         // TBC
 	    case 'h': CS_h_Mode(); break;               // SM
 	    case 'i': CS_i_Mode(); break;               // MC
-//	    caes 'b': break;                            // HPB  -- Not support
-//	    caes 'b': break;                            // VPB  -- Not support
+//	    caes 'j': break;                            // HPB  -- Not support
+//	    caes 'k': break;                            // VPB  -- Not support
 	    case 'l': CS_l_Mode(); break;               // RM
 	    case 'm': CSSetAttr(); break;               // SGR
 	    case 'n': CS_n_Mode(); break;               // DSR
