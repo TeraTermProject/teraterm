@@ -2488,13 +2488,13 @@ void ParseCS(BYTE b) /* b is the final char */
 	    case 'X': CSEraseCharacter(); break;        // ECH
 //	    case 'Y': break;				// CVT  -- Not support
 	    case 'Z': CSBackwardTab(); break;           // CBT
-//	    caes '[': break;                            // SRS  -- Not support
-//	    caes '\\': break;                           // PTX  -- Not support
-//	    caes ']': break;                            // SDS  -- Not support
-//	    caes '^': break;                            // SIMD -- Not support
+//	    case '[': break;                            // SRS  -- Not support
+//	    case '\\': break;                           // PTX  -- Not support
+//	    case ']': break;                            // SDS  -- Not support
+//	    case '^': break;                            // SIMD -- Not support
 	    case '`': CSMoveToColumnN(); break;         // HPA
 	    case 'a': CSCursorRight(); break;           // HPR
-//	    caes 'b': break;                            // REP  -- Not support
+//	    case 'b': break;                            // REP  -- Not support
 	    case 'c': AnswerTerminalType(); break;      // DA
 	    case 'd': CSMoveToLineN(); break;           // VPA
 	    case 'e': CSCursorUp(); break;              // VPR
@@ -2502,12 +2502,12 @@ void ParseCS(BYTE b) /* b is the final char */
 	    case 'g': CSDeleteTabStop(); break;         // TBC
 	    case 'h': CS_h_Mode(); break;               // SM
 	    case 'i': CS_i_Mode(); break;               // MC
-//	    caes 'j': break;                            // HPB  -- Not support
-//	    caes 'k': break;                            // VPB  -- Not support
+//	    case 'j': break;                            // HPB  -- Not support
+//	    case 'k': break;                            // VPB  -- Not support
 	    case 'l': CS_l_Mode(); break;               // RM
 	    case 'm': CSSetAttr(); break;               // SGR
 	    case 'n': CS_n_Mode(); break;               // DSR
-//	    caes 'o': break;                            // DAQ  -- Not support
+//	    case 'o': break;                            // DAQ  -- Not support
 
 	    // Private Sequence
 	    case 'r': CSSetScrollRegion(); break;       // DECSTBM
