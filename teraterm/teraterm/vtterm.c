@@ -2156,6 +2156,7 @@ void CSSetAttr()		// SGR
 	    if (ts.TermFlag & TF_ALTSCR) {
 	      SaveCursor();
 	    }
+	    break;
 	  case 1049: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
 	      SaveCursor();
