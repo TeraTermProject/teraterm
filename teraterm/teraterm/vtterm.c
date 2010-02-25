@@ -2066,9 +2066,11 @@ void CSSetAttr()		// SGR
     void CSQChangeColumnMode(int width)		// DECCOLM
     {
       ChangeTerminalSize(width, NumOfLines-StatusLine);
-      MoveCursor(0, 0);
-      BuffClearScreen();
-      UpdateWindow(HVTWin);
+      if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
+        MoveCursor(0, 0);
+        BuffClearScreen();
+        UpdateWindow(HVTWin);
+      }
     }
 
     void CSQ_h_Mode() // DECSET
