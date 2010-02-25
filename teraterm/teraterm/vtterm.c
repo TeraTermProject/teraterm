@@ -67,7 +67,7 @@ typedef struct {
 typedef TStatusBuff *PStatusBuff;
 
 // status buffer for main screen & status line
-static TStatusBuff SBuff1, SBuff2;
+static TStatusBuff SBuff1, SBuff2, SBuff3;
 
 static BOOL ESCFlag, JustAfterESC;
 static BOOL KanjiIn;
@@ -151,6 +151,7 @@ void ResetSBuffers()
   SBuff1.RelativeOrgMode = FALSE;
   // copy SBuff1 to SBuff2
   SBuff2 = SBuff1;
+  SBuff3 = SBuff1;
 }
 
 void ResetTerminal() /*reset variables but don't update screen */
@@ -875,6 +876,8 @@ void SaveCursor()
   if ((StatusLine>0) &&
       (CursorY==NumOfLines-1))
     Buff = &SBuff2; // for status line
+  else if (AltScr) 
+    Buff = &SBuff3; // for alternate screen
   else
     Buff = &SBuff1; // for main screen
 
@@ -898,6 +901,8 @@ void  RestoreCursor()
   if ((StatusLine>0) &&
       (CursorY==NumOfLines-1))
     Buff = &SBuff2; // for status line
+  else if (AltScr) 
+    Buff = &SBuff3; // for alternate screen
   else
     Buff = &SBuff1; // for main screen
 
