@@ -2063,6 +2063,14 @@ void CSSetAttr()		// SGR
       UpdateWindow(HVTWin);
     }
 
+    void CSQChangeColumnMode(int width)		// DECCOLM
+    {
+      ChangeTerminalSize(width, NumOfLines-StatusLine);
+      MoveCursor(0, 0);
+      BuffClearScreen();
+      UpdateWindow(HVTWin);
+    }
+
     void CSQ_h_Mode() // DECSET
     {
       int i;
@@ -2070,9 +2078,7 @@ void CSSetAttr()		// SGR
       for (i = 1 ; i<=NParam ; i++)
 	switch (Param[i]) {
 	  case 1: AppliCursorMode = TRUE; break;		// DECCKM
-	  case 3:		// DECCOLM
-	    ChangeTerminalSize(132,NumOfLines-StatusLine);
-	    break;
+	  case 3: CSQChangeColumnMode(132); break;		// DECCOLM
 	  case 5: /* Reverse Video (DECSCNM) */
 	    if (!(ts.ColorFlag & CF_REVERSEVIDEO))
 	      CSQExchangeColor(); /* Exchange text/back color */
@@ -2203,9 +2209,7 @@ void CSSetAttr()		// SGR
       for (i = 1 ; i <= NParam ; i++)
 	switch (Param[i]) {
 	  case 1: AppliCursorMode = FALSE; break;		// DECCKM
-	  case 3: // DECCOLM
-	    ChangeTerminalSize(80,NumOfLines-StatusLine);
-	    break;
+	  case 3: CSQChangeColumnMode(80); break;		// DECCOLM
 	  case 5: /* Normal Video (DECSCNM) */
 	    if (ts.ColorFlag & CF_REVERSEVIDEO)
 	      CSQExchangeColor(); /* Exchange text/back color */
