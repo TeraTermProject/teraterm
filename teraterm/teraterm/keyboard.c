@@ -615,18 +615,22 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
       PeekMessage((LPMSG)&M,HWin,WM_SYSCHAR,WM_SYSCHAR,PM_REMOVE);
     }
   }
-  else if ((IdUDK6<=Key) && (Key<=IdUDK20) &&
-	   (FuncKeyLen[Key-IdUDK6]>0))
-  {
-    memcpy(Code,&FuncKeyStr[Key-IdUDK6][0],FuncKeyLen[Key-IdUDK6]);
-    CodeLength = FuncKeyLen[Key-IdUDK6];
-    CodeType = IdBinary;
+  else {
+    if ((ts.MetaKey>0) && AltKey()) {
+      PeekMessage((LPMSG)&M,HWin,WM_SYSCHAR,WM_SYSCHAR,PM_REMOVE);
+    }
+
+    if ((IdUDK6<=Key) && (Key<=IdUDK20) && (FuncKeyLen[Key-IdUDK6]>0)) {
+      memcpy(Code,&FuncKeyStr[Key-IdUDK6][0],FuncKeyLen[Key-IdUDK6]);
+      CodeLength = FuncKeyLen[Key-IdUDK6];
+      CodeType = IdBinary;
+    }
+    else
+      GetKeyStr(HWin,KeyMap,Key,
+                AppliKeyMode && ! ts.DisableAppKeypad,
+                AppliCursorMode && ! ts.DisableAppCursor,
+                Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
   }
-  else
-    GetKeyStr(HWin,KeyMap,Key,
-              AppliKeyMode && ! ts.DisableAppKeypad,
-              AppliCursorMode && ! ts.DisableAppCursor,
-              Send8BitMode, Code, sizeof(Code), &CodeLength, &CodeType);
 
   if (CodeLength==0) return KEYDOWN_OTHER;
 
