@@ -339,9 +339,6 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 		settings->WriteBufferSize = (PACKET_MAX_SIZE / 2);   // 2MB
 	}
 
-	settings->LocalForwardingIdentityCheck =
-		read_BOOL_option(fileName, "LocalForwardingIdentityCheck", TRUE);
-
 	// SSH protocol version (2004.10.11 yutaka)
 	// default is SSH2 (2004.11.30 yutaka)
 	settings->ssh_protocol_version = GetPrivateProfileInt("TTSSH", "ProtocolVersion", 2, fileName);
@@ -411,10 +408,6 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	_itoa(settings->WriteBufferSize, buf, 10);
 	WritePrivateProfileString("TTSSH", "WriteBufferSize", buf, fileName);
-
-	WritePrivateProfileString("TTSSH", "LocalForwardingIdentityCheck",
-	                          settings->LocalForwardingIdentityCheck ? "1" : "0",
-	                          fileName);
 
 	// SSH protocol version (2004.10.11 yutaka)
 	WritePrivateProfileString("TTSSH", "ProtocolVersion",
@@ -1522,9 +1515,6 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			} else if (_stricmp(option + 4, "-autologin") == 0 ||
 			           _stricmp(option + 4, "-autologon") == 0) {
 				pvar->settings.TryDefaultAuth = TRUE;
-
-			} else if (_stricmp(option + 4, "-acceptall") == 0) {
-				pvar->settings.LocalForwardingIdentityCheck = FALSE;
 
 			// -axx‚æ‚èã‚É‚µ‚Ä‚Í‚¾‚ß
 			} else if (MATCH_STR(option + 4, "-a") == 0) {

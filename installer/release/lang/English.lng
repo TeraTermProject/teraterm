@@ -521,10 +521,12 @@ DLG_DIFFERENTHOST_REPLACE=&Replace the exist key with this new key
 DLG_FWD_TITLE=SSH Port Forwarding
 DLG_FWD_BANNER=Select direction for forwarded port:
 DLG_FWD_LOCAL_PORT=Forward &local port
+DLG_FWD_LOCAL_LISTEN=l&isten
 DLG_FWD_LOCAL_REMOTE=to remote &machine
 DLG_FWD_LOCAL_REMOTE_PORT=&port
 DLG_FWD_LOCAL_CHECKIDENTITY=A&ccept connections from other hosts
 DLG_FWD_REMOTE_PORT=Forward &remote server port
+DLG_FWD_REMOTE_LISTEN=li&sten
 DLG_FWD_REMOTE_LOCAL=to local m&achine
 DLG_FWD_REMOTE_LOCAL_PORT=p&ort
 

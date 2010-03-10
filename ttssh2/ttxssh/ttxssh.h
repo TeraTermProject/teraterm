@@ -121,7 +121,6 @@ typedef struct _TS_SSH {
 
 	int LogLevel;      /* 0 = NONE, 100 = Verbose */
 	int WriteBufferSize;
-	int LocalForwardingIdentityCheck;
 
 	int ssh_protocol_version; // SSH version (2004.10.11 yutaka)
 	int ssh_heartbeat_overtime; // SSH heartbeat(keepalive) (2004.12.11 yutaka)

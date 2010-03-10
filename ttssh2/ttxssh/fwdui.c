@@ -386,7 +386,7 @@ static BOOL is_service_name_char(char ch)
 	    || ch == '_' || ch == '-' || (ch >= '0' && ch <= '9');
 }
 
-static int parse_port_from_buf(char FAR * buf)
+static int parse_port_from_buf(char * buf)
 {
 	int i;
 
@@ -421,13 +421,13 @@ static int parse_port_from_buf(char FAR * buf)
 	}
 }
 
-static int parse_port(char FAR * FAR * str, char FAR * buf, int bufsize)
+static int parse_port(char *str, char *buf, int bufsize)
 {
 	int i = 0;
 
-	while (is_service_name_char(**str) && i < bufsize - 1) {
-		buf[i] = **str;
-		(*str)++;
+	while (is_service_name_char(*str) && i < bufsize - 1) {
+		buf[i] = *str;
+		str++;
 		i++;
 	}
 	buf[i] = 0;
@@ -435,65 +435,90 @@ static int parse_port(char FAR * FAR * str, char FAR * buf, int bufsize)
 	return parse_port_from_buf(buf);
 }
 
-static BOOL parse_request(FWDRequestSpec FAR * request, char FAR * str, PTInstVar pvar)
+static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 {
-	char FAR *host_start;
+	char *tmp, *ch;
+	int len, i, argc = 0, bracketed = 0;
+	char *argv[4];
 
-	if (str[0] == 'L' || str[0] == 'l') {
+	if ((tmp = strchr(str, ';')) != NULL) {
+		len = tmp - str;
+	}
+	else {
+		len = strlen(str);
+	}
+	tmp = _malloca(sizeof(char) * (len+1));
+	strncpy_s(tmp, sizeof(char) * (len+1), str, _TRUNCATE);
+
+	if (*tmp == 'L' || *tmp == 'l') {
 		request->type = FWD_LOCAL_TO_REMOTE;
-	} else if (str[0] == 'R' || str[0] == 'r') {
+	} else if (*tmp == 'R' || *tmp == 'r') {
 		request->type = FWD_REMOTE_TO_LOCAL;
-	} else if (str[0] == 'X' || str[0] == 'x') {
+	} else if (*tmp == 'X' || *tmp == 'x') {
 		make_X_forwarding_spec(request, pvar);
 		return TRUE;
 	} else {
 		return FALSE;
 	}
-	str++;
+	tmp++;
 
-	request->from_port =
-		parse_port(&str, request->from_port_name,
-		           sizeof(request->from_port_name));
-	if (request->from_port < 0) {
-		return FALSE;
-	}
-
-	if (*str != ':') {
-		return FALSE;
-	}
-	str++;
-
-	host_start = str;
-	while (*str != ':' && *str != 0 && *str != ';') {
-		str++;
-	}
-	if (*str != ':') {
-		return FALSE;
-	}
-	*str = 0;
-	strncpy_s(request->to_host, sizeof(request->to_host), host_start, _TRUNCATE);
-	request->to_host[sizeof(request->to_host) - 1] = 0;
-	*str = ':';
-	str++;
-
-	request->to_port =
-		parse_port(&str, request->to_port_name,
-		           sizeof(request->to_port_name));
-	if (request->to_port < 0) {
-		return FALSE;
-	}
-
-	if (*str == ':') {
-		str++;
-		request->check_identity = TRUE;
-		if (*str == '1') {
-			request->check_identity = FALSE;
-			str++;
+	argv[argc++] = tmp;
+	for (i=0; i<len; i++ ) {
+		ch = (tmp+i);
+		if (*ch == ':' && !bracketed) {
+			if (argc >= 4) {
+				argc++;
+				break;
+			}
+			*ch = '\0';
+			argv[argc++] = tmp+i+1;
+		}
+		else if (*ch == '[' && !bracketed) {
+			bracketed = 1;
+		}
+		else if (*ch == ']' && bracketed) {
+			bracketed = 0;
 		}
 	}
 
-	if (*str != ';' && *str != 0) {
-		return FALSE;
+	strncpy_s(request->bind_address, sizeof(request->bind_address),
+	          "127.0.0.1", _TRUNCATE);
+	i=0;
+	switch (argc) {
+		case 4:
+			if (*argv[i] == '\0' || strcmp(argv[i], "*") == 0) {
+				strncpy_s(request->bind_address, sizeof(request->bind_address),
+				          "0.0.0.0", _TRUNCATE);
+			}
+			else {
+				strncpy_s(request->bind_address, sizeof(request->bind_address),
+				          argv[i], _TRUNCATE);
+			}
+			i++;
+			// don't break here
+
+		case 3:
+			request->from_port = parse_port(argv[i], request->from_port_name,
+			                                sizeof(request->from_port_name));
+			if (request->from_port < 0) {
+				return FALSE;
+			}
+			i++;
+
+			strncpy_s(request->to_host, sizeof(request->to_host),
+			          argv[i], _TRUNCATE);
+			i++;
+
+			request->to_port = parse_port(argv[i], request->to_port_name,
+			                              sizeof(request->to_port_name));
+			if (request->to_port < 0) {
+				return FALSE;
+			}
+
+			break;
+
+		default:
+			return FALSE;
 	}
 
 	return TRUE;
@@ -527,13 +552,14 @@ static void FWDUI_save_settings(PTInstVar pvar)
 
 			switch (spec->type) {
 			case FWD_LOCAL_TO_REMOTE:
-				if (spec->check_identity == 0) {
-					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s:1",
+				if (strcmp(spec->bind_address,"127.0.0.1") == 0) {
+					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s",
 					            spec->from_port_name, spec->to_host,
 					            spec->to_port_name);
 				}
 				else {
-					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s",
+					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s:%s",
+					            spec->bind_address,
 					            spec->from_port_name, spec->to_host,
 					            spec->to_port_name);
 				}
@@ -643,15 +669,17 @@ static void get_spec_string(FWDRequestSpec FAR * spec, char FAR * buf,
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:
 		UTIL_get_lang_msg("MSG_FWD_REMOTE", pvar,
-		                  "Remote %s to local \"%s\" port %s");
+		                  "Remote %s:%s to local \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
-		            verbose_from_port, spec->to_host, verbose_to_port);
+		            spec->bind_address, verbose_from_port,
+		            spec->to_host, verbose_to_port);
 		break;
 	case FWD_LOCAL_TO_REMOTE:
 		UTIL_get_lang_msg("MSG_FWD_LOCAL", pvar,
-		                  "Local %s to remote \"%s\" port %s");
+		                  "Local %s:%s to remote \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
-		            verbose_from_port, spec->to_host, verbose_to_port);
+		            spec->bind_address, verbose_from_port,
+		            spec->to_host,verbose_to_port);
 		break;
 	case FWD_REMOTE_X11_TO_LOCAL:
 		UTIL_get_lang_msg("MSG_FWD_X", pvar,
@@ -723,9 +751,6 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_REMOVE, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWDSETUP_REMOVE", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_REMOVE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_CHECKIDENTITY, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWDSETUP_CHECKIDENTITY", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_CHECKIDENTITY, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_XFORWARD, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLD_FWDSETUP_X", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_XFORWARD, pvar->ts->UIMsg);
@@ -747,10 +772,6 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 		} else {
 			add_spec_to_listbox(dlg, requests + i, pvar);
 		}
-	}
-
-	if (!pvar->settings.LocalForwardingIdentityCheck) {
-		CheckDlgButton(dlg, IDC_CHECKIDENTITY, TRUE);
 	}
 
 	free(requests);
@@ -803,13 +824,6 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 
 	if (X_enabled) {
 		make_X_forwarding_spec(specs, pvar);
-	}
-
-	if (IsDlgButtonChecked(dlg, IDC_CHECKIDENTITY)) {
-		pvar->settings.LocalForwardingIdentityCheck = FALSE;
-	}
-	else {
-		pvar->settings.LocalForwardingIdentityCheck = TRUE;
 	}
 
 	qsort(specs, num_specs, sizeof(FWDRequestSpec), FWD_compare_specs);
@@ -922,21 +936,14 @@ static void set_dir_options_status(HWND dlg)
 		? FWD_REMOTE_TO_LOCAL : FWD_LOCAL_TO_REMOTE;
 
 	shift_over_input(dlg, type, IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT);
+	shift_over_input(dlg, type, IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR);
 	shift_over_input(dlg, type, IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST);
 	shift_over_input(dlg, type, IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT);
-
-	if (IsDlgButtonChecked(GetParent(dlg),IDC_CHECKIDENTITY)) {
-		if (type == FWD_LOCAL_TO_REMOTE) {
-			EnableWindow(GetDlgItem(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY), TRUE);
-		}
-		else {
-			EnableWindow(GetDlgItem(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY), FALSE);
-		}
-	}
 }
 
 static void setup_edit_controls(HWND dlg, FWDRequestSpec FAR * spec,
-                                WORD radio_item, WORD from_port_item,
+                                WORD radio_item,
+                                WORD from_port_item, WORD listen_address_item,
                                 WORD to_host_item, WORD to_port_item)
 {
 	CheckDlgButton(dlg, radio_item, TRUE);
@@ -945,6 +952,9 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec FAR * spec,
 	SetDlgItemText(dlg, to_port_item, spec->to_port_name);
 	if (strcmp(spec->to_host, "localhost") != 0) {
 		SetDlgItemText(dlg, to_host_item, spec->to_host);
+	}
+	if (strcmp(spec->bind_address, "127.0.0.1") != 0) {
+		SetDlgItemText(dlg, listen_address_item, spec->bind_address);
 	}
 
 	set_dir_options_status(dlg);
@@ -963,18 +973,21 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec, HWND dl
 	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_LOCAL_PORT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_LISTEN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_FWD_LOCAL_LISTEN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_LISTEN, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_LOCAL_REMOTE", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_LOCAL_REMOTE_PORT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_FWD_LOCAL_CHECKIDENTITY", pvar, uimsg);
-	SetDlgItemText(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_REMOTE_PORT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_LISTEN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_FWD_REMOTE_LISTEN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_LISTEN, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_REMOTE_LOCAL", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, pvar->ts->UIMsg);
@@ -991,22 +1004,14 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec, HWND dl
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:
 		setup_edit_controls(dlg, spec, IDC_SSHFWDREMOTETOLOCAL,
-		                    IDC_SSHRTLFROMPORT, IDC_SSHRTLTOHOST,
-		                    IDC_SSHRTLTOPORT);
+		                    IDC_SSHRTLFROMPORT, IDC_SSHRTLLISTENADDR,
+		                    IDC_SSHRTLTOHOST, IDC_SSHRTLTOPORT);
 		break;
 	case FWD_LOCAL_TO_REMOTE:
 		setup_edit_controls(dlg, spec, IDC_SSHFWDLOCALTOREMOTE,
-		                    IDC_SSHLTRFROMPORT, IDC_SSHLTRTOHOST,
-		                    IDC_SSHLTRTOPORT);
-		if (!spec->check_identity) {
-			CheckDlgButton(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY, TRUE);
-		}
+		                    IDC_SSHLTRFROMPORT, IDC_SSHLTRLISTENADDR,
+		                    IDC_SSHLTRTOHOST, IDC_SSHLTRTOPORT);
 		break;
-	}
-
-	if (!IsDlgButtonChecked(GetParent(dlg),IDC_CHECKIDENTITY)) {
-		CheckDlgButton(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY, FALSE);
-		EnableWindow(GetDlgItem(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY), FALSE);
 	}
 
 	fill_service_names(dlg, IDC_SSHRTLFROMPORT);
@@ -1035,6 +1040,14 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
 	grab_control_text(dlg, type, IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT,
 	                  new_spec.from_port_name,
 	                  sizeof(new_spec.from_port_name));
+	grab_control_text(dlg, type, IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR,
+	                  new_spec.bind_address, sizeof(new_spec.bind_address));
+	if (new_spec.bind_address[0] == 0) {
+		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "127.0.0.1", _TRUNCATE);
+	}
+	else if (strcmp(new_spec.bind_address, "*") == 0 ) {
+		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "0.0.0.0", _TRUNCATE);
+	}
 	grab_control_text(dlg, type, IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST,
 	                  new_spec.to_host, sizeof(new_spec.to_host));
 	if (new_spec.to_host[0] == 0) {
@@ -1066,13 +1079,6 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
 		return FALSE;
 	}
 
-	new_spec.check_identity = TRUE;
-	if (type == FWD_LOCAL_TO_REMOTE) {
-		if (IsDlgButtonChecked(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY)) {
-			new_spec.check_identity = FALSE;
-		}
-	}
-
 	*spec = new_spec;
 
 	EndDialog(dlg, 1);
@@ -1102,14 +1108,15 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRFROMPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHLTRLISTENADDR, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRTOHOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRTOPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLFROMPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHRTLLISTENADDR, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLTOHOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLTOPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
@@ -1163,9 +1170,9 @@ static void add_forwarding_entry(PTInstVar pvar, HWND dlg)
 
 	new_spec.type = FWD_LOCAL_TO_REMOTE;
 	new_spec.from_port_name[0] = 0;
+	new_spec.bind_address[0] = 0;
 	new_spec.to_host[0] = 0;
 	new_spec.to_port_name[0] = 0;
-	new_spec.check_identity = 1;
 
 	result = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHFWDEDIT),
 	                        dlg, fwd_edit_dlg_proc, (LPARAM) & closure);
@@ -1254,7 +1261,6 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_ADD, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_EDIT, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_REMOVE, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_CHECKIDENTITY, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_XFORWARD, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDX11, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgFwdFont, MAKELPARAM(TRUE,0));

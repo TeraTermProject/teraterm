@@ -469,159 +469,6 @@ static void channel_opening_error(PTInstVar pvar, int channel_num, int err)
 	FWD_free_channel(pvar, channel_num);
 }
 
-static void init_local_IP_numbers(PTInstVar pvar)
-{
-#ifndef NO_INET6
-	struct addrinfo hints;
-	struct addrinfo FAR *res0;
-	struct addrinfo FAR *res;
-	char buf[1024];
-	int num_addrs = 0;
-	int i;
-	struct sockaddr_storage FAR *addrs;
-
-	if (!gethostname(buf, sizeof(buf))) {
-		memset(&hints, 0, sizeof(hints));
-		if (getaddrinfo(buf, NULL, &hints, &res0))
-			res0 = NULL;
-
-		/* count number of addresses */
-		for (res = res0; res; res = res->ai_next)
-			num_addrs++;
-	}
-
-	addrs =
-		(struct sockaddr_storage FAR *)
-		malloc(sizeof(struct sockaddr_storage) * (num_addrs + 1));
-	for (res = res0, i = 0; i < num_addrs; ++i, res = res->ai_next)
-		memcpy(&addrs[i], res->ai_addr, res->ai_addrlen);
-
-	pvar->fwd_state.local_host_IP_numbers = addrs;
-
-	/* terminated by all zero filled sockaddr_storage */
-	memset(&addrs[num_addrs], 0, sizeof(struct sockaddr_storage));
-#else
-	HOSTENT FAR *hostent;
-	char buf[1024];
-	int num_addrs = 0;
-	uint32 FAR *addrs;
-
-	if (!gethostname(buf, sizeof(buf))) {
-		hostent = gethostbyname(buf);
-
-		if (hostent != NULL) {
-			for (; hostent->h_addr_list[num_addrs] != NULL; num_addrs++) {
-			}
-		}
-	} else {
-		hostent = NULL;
-	}
-
-	addrs = (uint32 FAR *) malloc(sizeof(uint32) * (num_addrs + 1));
-	pvar->fwd_state.local_host_IP_numbers = addrs;
-	if (hostent != NULL) {
-		int i;
-
-		for (i = 0; i < num_addrs; i++) {
-			addrs[i] = ntohl(*(uint32 FAR *) hostent->h_addr_list[i]);
-		}
-	}
-	addrs[num_addrs] = 0;
-#endif							/* NO_INET6 */
-}
-
-#ifndef NO_INET6
-static BOOL validate_IP_number(PTInstVar pvar, struct sockaddr FAR * addr)
-{
-#else
-static BOOL validate_IP_number(PTInstVar pvar, uint32 addr)
-{
-#endif							/* NO_INET6 */
-#ifndef NO_INET6
-	int i;
-	struct sockaddr_storage zss;	/* all bytes are filled by zero */
-
-	/* Should we allow a wider range of loopback addresses here?
-	   i.e. 127.xx.xx.xx or ::1
-	   Wouldn't want to introduce a security hole if there's
-	   some OS bug that lets an intruder get packets from us
-	   to such an address */
-	switch (addr->sa_family) {
-	case AF_INET:
-		if (((struct sockaddr_in FAR *) addr)->sin_addr.s_addr ==
-			htonl(INADDR_LOOPBACK))
-			return TRUE;
-		break;
-	case AF_INET6:
-		if (IN6_IS_ADDR_LOOPBACK
-			(&(((struct sockaddr_in6 FAR *) addr)->sin6_addr)))
-			return TRUE;
-		break;
-	default:
-		/* NOT REACHED */
-		break;
-	}
-
-	if (pvar->fwd_state.local_host_IP_numbers == NULL) {
-		init_local_IP_numbers(pvar);
-	}
-
-	memset(&zss, 0, sizeof(zss));
-	for (i = 0;; i++) {
-		if (memcmp
-			(&pvar->fwd_state.local_host_IP_numbers[i], &zss,
-			 sizeof(struct sockaddr_storage)) == 0)
-			break;
-
-		switch (addr->sa_family) {
-		case AF_INET:
-			if (memcmp
-				(&pvar->fwd_state.local_host_IP_numbers[i], addr,
-				 sizeof(struct sockaddr_in)) == 0)
-				return TRUE;
-			break;
-		case AF_INET6:
-			if (memcmp
-				(&pvar->fwd_state.local_host_IP_numbers[i], addr,
-				 sizeof(struct sockaddr_in6)) == 0)
-				return TRUE;
-			break;
-		default:
-			/* NOT REACHED */
-			break;
-		}
-	}
-	return FALSE;
-#else
-	int i;
-
-	if (pvar->settings.LocalForwardingIdentityCheck) {
-		/* Should we allow a wider range of loopback addresses here?
-		   i.e. 127.xx.xx.xx
-		   Wouldn't want to introduce a security hole if there's
-		   some OS bug that lets an intruder get packets from us
-		   to such an address */
-		if (addr == INADDR_LOOPBACK) {
-			return TRUE;
-		}
-
-		if (pvar->fwd_state.local_host_IP_numbers == NULL) {
-			init_local_IP_numbers(pvar);
-		}
-
-		for (i = 0; pvar->fwd_state.local_host_IP_numbers[i] != 0; i++) {
-			if (pvar->fwd_state.local_host_IP_numbers[i] == addr) {
-				return TRUE;
-			}
-		}
-
-		return FALSE;
-	} else {
-		return TRUE;
-	}
-#endif							/* NO_INET6 */
-}
-
 static int alloc_channel(PTInstVar pvar, int new_status,
                          int new_request_num)
 {
@@ -836,42 +683,6 @@ static void accept_local_connection(PTInstVar pvar, int request_num)
 #ifndef INET6
 	IP = (BYTE FAR *) & ((struct sockaddr_in *) (&addr))->sin_addr.s_addr;
 #endif
-
-#ifndef NO_INET6
-	is_localhost = validate_IP_number(pvar, (struct sockaddr FAR *) &addr);
-	if ((pvar->settings.LocalForwardingIdentityCheck && !is_localhost) ||
-	    (request->spec.check_identity && !is_localhost)) {
-		char hname[NI_MAXHOST];
-		if (getnameinfo((struct sockaddr FAR *) &addr, addrlen,
-		                hname, sizeof(hname), NULL, 0, NI_NUMERICHOST)) {
-			/* NOT REACHED */
-		}
-		UTIL_get_lang_msg("MSG_FWD_HOSTILE_ATTACK_ERROR", pvar,
-		                  "Host with IP number %s tried to connect to "
-		                  "forwarded local port %d.\n"
-		                  "This could be some kind of hostile attack.");
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg, hname,
-		            request->spec.from_port);
-		notify_nonfatal_error(pvar, buf);
-		safe_closesocket(pvar, s);
-		return;
-	}
-#else
-	if (!validate_IP_number
-		(pvar,
-		 ntohl(((struct sockaddr_in *) (&addr))->sin_addr.S_un.S_addr))) {
-		_snprintf(buf, sizeof(buf),
-		          "Host with IP number %d.%d.%d.%d tried to connect to "
-		          "forwarded local port %d.\n"
-		          "This could be some kind of hostile attack.", IP[0],
-		          IP[1], IP[2], IP[3], request->spec.from_port);
-		buf[NUM_ELEM(buf) - 1] = 0;
-		notify_nonfatal_error(pvar, buf);
-		safe_closesocket(pvar, s);
-		return;
-	}
-#endif							/* NO_INET6 */
 
 #ifndef NO_INET6
 	// SSH2 port-forwardingに接続元のリモートポートが必要。(2005.2.27 yutaka)
@@ -1179,6 +990,10 @@ int FWD_compare_specs(void const FAR * void_spec1,
 		delta = spec1->type - spec2->type;
 	}
 
+	if (delta == 0) {
+		delta = strcmp(spec1->bind_address, spec2->bind_address);
+	}
+
 	return delta;
 }
 
@@ -1194,7 +1009,8 @@ static BOOL can_server_listen_using(FWDRequestSpec FAR * listener,
 	    && listener->from_port == spec->from_port
 	    && listener->to_port == spec->to_port
 	    && (spec->type == FWD_REMOTE_X11_TO_LOCAL
-	     || strcmp(listener->to_host, spec->to_host) == 0);
+	     || strcmp(listener->to_host, spec->to_host) == 0)
+	    && strcmp(listener->bind_address, spec->bind_address);
 }
 
 BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec FAR * spec)
@@ -1307,7 +1123,7 @@ static BOOL are_specs_identical(FWDRequestSpec FAR * spec1,
 	    && spec1->from_port == spec2->from_port
 	    && spec1->to_port == spec2->to_port
 	    && strcmp(spec1->to_host, spec2->to_host) == 0
-	    && spec1->check_identity == spec2->check_identity;
+	    && strcmp(spec1->bind_address, spec2->bind_address) == 0;
 }
 
 static BOOL interactive_init_request(PTInstVar pvar, int request_num,
@@ -1322,14 +1138,17 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 		struct addrinfo FAR *res0;
 		SOCKET s;
 		char pname[NI_MAXSERV];
+		char bname[NI_MAXHOST];
 
 		_snprintf_s(pname, sizeof(pname), _TRUNCATE,
 		            "%d", request->spec.from_port);
+		_snprintf_s(bname, sizeof(bname), _TRUNCATE,
+		            "%s", request->spec.bind_address);
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_UNSPEC;	/* a user will be able to specify protocol in future version */
 		hints.ai_flags = AI_PASSIVE;
 		hints.ai_socktype = SOCK_STREAM;
-		if (getaddrinfo(NULL, pname, &hints, &res0))
+		if (getaddrinfo(bname, pname, &hints, &res0))
 			return FALSE;
 
 		/* count number of listening sockets and allocate area for them */
@@ -1636,7 +1455,9 @@ void FWD_prep_forwarding(PTInstVar pvar)
 		if ((request->status & FWD_DELETED) == 0) {
 			switch (request->spec.type) {
 			case FWD_REMOTE_TO_LOCAL:
-				SSH_request_forwarding(pvar, request->spec.from_port,
+				SSH_request_forwarding(pvar,
+				                       request->spec.bind_address,
+				                       request->spec.from_port,
 				                       request->spec.to_host,
 				                       request->spec.to_port);
 				num_server_listening_requests++;

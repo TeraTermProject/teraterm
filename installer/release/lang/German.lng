@@ -519,10 +519,12 @@ DLG_DIFFERENTHOST_REPLACE=Ersetze den vorhanden Schlüssel durch den neuen.
 DLG_FWD_TITLE=SSH Port Forwarding
 DLG_FWD_BANNER=Wähle die Richtung des Portforwardings:
 DLG_FWD_LOCAL_PORT=Forward Local Port
+DLG_FWD_LOCAL_LISTEN=l&isten
 DLG_FWD_LOCAL_REMOTE=zur Remote Maschine
 DLG_FWD_LOCAL_REMOTE_PORT=Rem. Port
 DLG_FWD_LOCAL_CHECKIDENTITY=Akzeptiere Verbindungen von andern Hosts
 DLG_FWD_REMOTE_PORT=Forward Remote Port
+DLG_FWD_REMOTE_LISTEN=li&sten
 DLG_FWD_REMOTE_LOCAL=zur lokalen Maschine
 DLG_FWD_REMOTE_LOCAL_PORT=Lok. Port
 

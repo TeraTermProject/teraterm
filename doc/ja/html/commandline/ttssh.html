@@ -104,18 +104,17 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
     /auth=&lt;mode&gt; は、認証方式のみを意味するようになる
   </dd>
 
-  <dt id="ssh-l">/ssh-L&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;[:1]</dt>
-  <dd>ローカルポート(&lt;port1&gt;)からリモート側ホスト(&lt;host&gt;)のポート(&lt;port2&gt;)へポートフォワーディングする<br>
-      リモート側のポート番号のあとに":1"がある場合、この転送設定において他のホストからの接続を受け入れる</dd>
+  <dt id="ssh-l">/ssh-L[&lt;listen_addr&gt;:]&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
+  <dd>ローカルのリッスンアドレス(&lt;listen_addr&gt;)ポート(&lt;port1&gt;)からリモート側ホスト(&lt;host&gt;)のポート(&lt;port2&gt;)へポートフォワーディングする<br>
+      &lt;listen_addr&gt;を省略すると、127.0.0.1でリッスンする</dd>
 
-  <dt id="ssh-r">/ssh-R&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
-  <dd>リモートポート(&lt;port1&gt;)からローカル側ホスト(&lt;host&gt;)のポート(&lt;port2&gt;)へポートフォワーディングする</dd>
+  <dt id="ssh-r">/ssh-R[&lt;listen_addr&gt;:]&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
+  <dd>リモートのリッスンアドレス(&lt;listen_addr&gt;)ポート(&lt;port1&gt;)からローカル側ホスト(&lt;host&gt;)のポート(&lt;port2&gt;)へポートフォワーディングする<br>
+      &lt;listen_addr&gt;を省略すると、127.0.0.1でリッスンする<br>
+      SSH1プロトコルでは&lt;listen_addr&gt;は利用されない</dd>
 
   <dt id="ssh-x">/ssh-X</dt>
   <dd>X11をポートフォワーディングする</dd>
-
-  <dt id="ssh-acceptall">/ssh-acceptall</dt>
-  <dd>ローカルの転送ポートは、他のホストからの接続を受け入れる</dd>
 
   <dt id="ssh-noagent">/ssh-A</dt>
   <dd>エージェント転送を有効にする</dd>

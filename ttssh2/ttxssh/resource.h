@@ -61,7 +61,9 @@
 #define IDC_SSHRTLTOPORT                1043
 #define IDC_SSHFWDLOCALTOREMOTE         1044
 #define IDC_SSHPASSWORDCAPTION          1045
+#define IDC_SSHLTRLISTENADDR            1045
 #define IDC_HOSTTCPPROTOCOLLABEL        1046
+#define IDC_SSHRTLLISTENADDR            1046
 #define IDC_HOSTTCPPROTOCOL             1047
 #define IDC_COMBO1                      1049
 #define IDC_SSH_VERSION                 1049
@@ -119,7 +121,9 @@
 #define IDD_SSHFWD_BANNER               1084
 #define IDD_SSHFWDBANNER                1084
 #define IDC_WEBSITES                    1085
+#define IDC_SSHFWDLOCALTOREMOTE_LISTEN  1085
 #define IDC_INCLUDES                    1086
+#define IDC_SSHFWDREMOTETOLOCAL_LISTEN  1086
 #define IDC_CRYPTOGRAPHY                1087
 #define IDC_CREDIT                      1088
 #define IDC_SSHFWDLOCALTOREMOTE_CHECKIDENTITY 1089

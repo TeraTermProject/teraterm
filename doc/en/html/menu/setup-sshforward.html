@@ -32,11 +32,6 @@
       <dd>
         Remove a selected entry.
       </dd>
-
-      <dt>Local ports a&ccept connections from other hosts</dt>
-      <dd>
-        Changed for local port to accept a connection request from other hosts. Unless this setup is enabled, a setup for each port forwarding cannot be enabled.
-      </dd>
     </dl>
 
     <h3>X Forwarding</h3>
@@ -60,6 +55,11 @@
         Source port to forward of local side.
       </dd>
 
+      <dt>listen</dt>
+      <dd>
+        Listen address of local side. If omitted, 127.0.0.1 is used.
+      </dd>
+
       <dt>to remote machine</dt>
       <dd>
         Destination host name of remote side.
@@ -70,11 +70,6 @@
         Destination port number.
       <dd>
       </dd>
-
-      <dt>A&ccept connections from other hosts</dt>
-      <dd>
-        Changed for this port to accept a connection request from other hosts.
-      </dd>
     </dl>
 
     <h3>remote forwarding</h3>
@@ -82,6 +77,12 @@
       <dt>forward remote server port</dt>
       <dd>
         Source port to forward of remote side.
+      </dd>
+
+      <dt>listen</dt>
+      <dd>
+        Listen address of remote side. If omitted, 127.0.0.1 is used.<br>
+        It is not used with SSH1 protocol.
       </dd>
 
       <dt>to local machine</dt>

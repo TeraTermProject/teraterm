@@ -3438,7 +3438,7 @@ void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 loc
 	}
 }
 
-void SSH_request_forwarding(PTInstVar pvar, int from_server_port,
+void SSH_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port,
                             char FAR * to_local_host, int to_local_port)
 {
 	if (SSHv1(pvar)) {
@@ -3470,8 +3470,7 @@ void SSH_request_forwarding(PTInstVar pvar, int from_server_port,
 		s = "tcpip-forward";
 		buffer_put_string(msg, s, strlen(s)); // ctype
 		buffer_put_char(msg, 1);  // want reply
-		s = "0.0.0.0";
-		buffer_put_string(msg, s, strlen(s));
+		buffer_put_string(msg, bind_address, strlen(bind_address));
 
 		buffer_put_int(msg, from_server_port);  // listening port
 

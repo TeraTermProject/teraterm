@@ -104,18 +104,17 @@ You can use the following command line parameters on TTSSH.
     '/auth=&lt;mode&gt;' means only authentication method
   </dd>
 
-  <dt id="ssh-l">/ssh-L&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;[:1]</dt>
-  <dd>port-fowarding from local port(&lt;port1&gt;) to remote side host(&lt;host&gt;) port(&lt;port2&gt;)<br>
-      if ':1' exists after the port number of remote side, this setting accepts connection from other hosts.</dd>
+  <dt id="ssh-l">/ssh-L[&lt;listen_addr&gt;:]&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
+  <dd>port-fowarding from local listen-address(&lt;listen_addr&gt;) port(&lt;port1&gt;) to remote side host(&lt;host&gt;) port(&lt;port2&gt;)<br>
+      if &lt;listen_addr&gt; is omitted, it listens at 127.0.0.1.</dd>
 
-  <dt id="ssh-r">/ssh-R&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
-  <dd>port-fowarding from remote port(&lt;port1&gt;) to local side host(&lt;host&gt;) port(&lt;port2&gt;)</dd>
+  <dt id="ssh-r">/ssh-R[&lt;listen_addr&gt;:]&lt;port1&gt;:&lt;host&gt;:&lt;port2&gt;</dt>
+  <dd>port-fowarding from remote listen-address(&lt;listen_addr&gt;) port(&lt;port1&gt;) to local side host(&lt;host&gt;) port(&lt;port2&gt;)<br>
+      if &lt;listen_addr&gt; is omitted, it listens at 127.0.0.1.<br>
+      &lt;listen_addr&gt; is not used with SSH1 protocol.</dd>
 
   <dt id="ssh-x">/ssh-X</dt>
   <dd>X11 port-fowarding</dd>
-
-  <dt id="ssh-acceptall">/ssh-acceptall</dt>
-  <dd>Local forward ports accept connections from other hosts</dd>
 
   <dt id="ssh-noagent">/ssh-A</dt>
   <dd>enable agent forwarding</dd>
