@@ -529,9 +529,7 @@ DLG_FWD_REMOTE_LOCAL_PORT=Lok. Port
 MSG_SAME_SERVERPORT_ERROR=You cannot have two forwardings from the same server port (%d).
 MSG_SAME_LOCALPORT_ERROR=You cannot have two forwardings from the same local port (%d).
 MSG_UNSPECIFYIED_FWD_ERROR1=The following forwardings were not specified when this SSH session began:\n\n
-MSG_UNSPECIFYIED_FWDS_ERROR1=The following forwarding was not specified when this SSH session began:\n\n
 MSG_UNSPECIFYIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwardings will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwardings should work.
-MSG_UNSPECIFYIED_FWDS_ERROR2=\nDue to a limitation of the SSH protocol, this forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
 MSG_INVALID_PORT_ERROR=Port "%s" is not a valid port number.\nEither choose a port name from the list, or enter a number between 1 and 65535.
 
 ; dlg fwd setup

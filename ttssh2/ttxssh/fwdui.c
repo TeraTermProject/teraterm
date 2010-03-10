@@ -845,15 +845,9 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	if (num_unspecified_forwardings > 0) {
-		if (num_unspecified_forwardings > 1) {
-			UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWDS_ERROR1", pvar,
-			                  "The following forwardings were not specified when this SSH session began:\n\n");
-			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-		} else {
-			UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR1", pvar,
-			                  "The following forwarding was not specified when this SSH session began:\n\n");
-			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-		}
+		UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR1", pvar,
+		                  "The following forwarding(s) was not specified when this SSH session began:\n\n");
+		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 
 		for (i = 0; i < num_specs; i++) {
 			if (specs[i].type != FWD_LOCAL_TO_REMOTE &&
@@ -867,17 +861,11 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 			}
 		}
 
-		if (num_unspecified_forwardings > 1) {
-			UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWDS_ERROR2", pvar,
-			                  "\nDue to a limitation of the SSH protocol, these forwardings will not work in the current SSH session.\n"
-			                  "If you save these settings and start a new SSH session, the forwardings should work.");
-			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-		} else {
-			UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR2", pvar,
-			                  "\nDue to a limitation of the SSH protocol, this forwarding will not work in the current SSH session.\n"
-			                  "If you save these settings and start a new SSH session, the forwarding should work.");
-			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-		}
+		UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR2", pvar,
+		                  "\nDue to a limitation of the SSH protocol, this forwarding(s) will not work in the current SSH session.\n"
+		                  "If you save these settings and start a new SSH session, the forwarding should work.");
+		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
+
 		notify_nonfatal_error(pvar, buf);
 	}
 

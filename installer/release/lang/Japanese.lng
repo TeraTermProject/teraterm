@@ -531,9 +531,7 @@ DLG_FWD_REMOTE_LOCAL_PORT=ポート(&O)
 MSG_SAME_SERVERPORT_ERROR=同一リモートポートに 2つ以上の転送は設定できません (%d).
 MSG_SAME_LOCALPORT_ERROR=同一ローカルポートに 2つ以上の転送は設定できません (%d).
 MSG_UNSPECIFYIED_FWD_ERROR1=このSSHセッションが始まったとき, 次の転送は指定されませんでした:\n\n
-MSG_UNSPECIFYIED_FWDS_ERROR1=このSSHセッションが始まったとき, 次の転送は指定されませんでした:\n\n
 MSG_UNSPECIFYIED_FWD_ERROR2=\nSSHプロトコルの規制のために, この転送は, 現在のSSHセッションで動作しません. \n設定を保存して, 新しいSSH セッションを開始すれば, 転送が有効になります.
-MSG_UNSPECIFYIED_FWDS_ERROR2=\nSSHプロトコルの規制のために, これらの転送は, 現在のSSHセッションで動作しません. \n設定を保存して, 新しいSSH セッションを開始すれば, 転送が有効になります.
 MSG_INVALID_PORT_ERROR="%s" は無効なポート番号です. \nポート名を一覧から選択するか, 1 から 65535の間で指定してください.
 
 ; dlg fwd setup
