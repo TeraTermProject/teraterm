@@ -565,9 +565,17 @@ static void FWDUI_save_settings(PTInstVar pvar)
 				}
 				break;
 			case FWD_REMOTE_TO_LOCAL:
-				_snprintf_s(str, str_remaining, _TRUNCATE, "R%s:%s:%s",
-				            spec->from_port_name, spec->to_host,
-				            spec->to_port_name);
+				if (strcmp(spec->bind_address,"127.0.0.1") == 0) {
+					_snprintf_s(str, str_remaining, _TRUNCATE, "R%s:%s:%s",
+					            spec->from_port_name, spec->to_host,
+					            spec->to_port_name);
+				}
+				else {
+					_snprintf_s(str, str_remaining, _TRUNCATE, "R%s:%s:%s:%s",
+					            spec->bind_address,
+					            spec->from_port_name, spec->to_host,
+					            spec->to_port_name);
+				}
 				break;
 			case FWD_REMOTE_X11_TO_LOCAL:
 				_snprintf_s(str, str_remaining, _TRUNCATE, "X");
