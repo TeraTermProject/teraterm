@@ -2279,8 +2279,8 @@ void CSSetAttr()		// SGR
 	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
 	      BuffClearScreen();
 	      BuffRestoreScreen();
-	      RestoreCursor();
 	      AltScr = FALSE;
+	      RestoreCursor();
 	    }
 	    break;
 	}
