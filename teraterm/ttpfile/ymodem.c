@@ -112,10 +112,10 @@ void YSendNAK(PFileVar fv, PYVar yv, PComVar cv)
 	yv->NAKCount--;
 	if (yv->NAKCount<0)
 	{
-		if (yv->NAKMode==XnakC)
+		if (yv->NAKMode==YnakC)
 		{
 			YSetOpt(fv,yv,XoptCheck);
-			yv->NAKMode = XnakNAK;
+			yv->NAKMode = YnakC;
 			yv->NAKCount = 9;
 		}
 		else {
@@ -124,7 +124,7 @@ void YSendNAK(PFileVar fv, PYVar yv, PComVar cv)
 		}
 	}
 
-	if (yv->NAKMode==XnakNAK)
+	if (yv->NAKMode!=YnakC)
 	{
 		b = NAK;
 		if ((yv->PktNum==0) && (yv->PktNumOffset==0))
@@ -179,12 +179,16 @@ void YInit
 {
 	char inistr[MAXPATHLEN + 10];
 
-	if (! GetNextFname(fv))
-	{
-		return;
+	if (yv->YMode == IdYSend) {
+		if (! GetNextFname(fv))
+		{
+			return;
+		}
+		/* file open */
+		fv->FileHandle = _lopen(fv->FullName,OF_READ);
+	} else {
+		fv->FileHandle = -1;
 	}
-	/* file open */
-	fv->FileHandle = _lopen(fv->FullName,OF_READ);
 	fv->FileOpen = fv->FileHandle>0;
 
 	fv->LogFlag = ((ts->LogFlag & LOG_Y)!=0);
@@ -240,17 +244,21 @@ void YInit
 		yv->NAKCount = 10;
 	}
 
+	if (fv->LogFlag) {
+		char buf[128];
+		time_t tm = time(NULL);
+
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "YMODEM %s start: %s\n", 
+			yv->YMode == IdYSend ? "Send" : "Recv",
+			ctime(&tm) 
+			);
+		_lwrite(fv->LogFile, buf, strlen(buf));
+	}
+
 	switch (yv->YMode) {
 	case IdYSend:
 		yv->TextFlag = 0;
 
-		if (fv->LogFlag) {
-			char buf[128];
-			time_t tm = time(NULL);
-
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "YMODEM start: %s\n", ctime(&tm));
-			_lwrite(fv->LogFile, buf, strlen(buf));
-		}
 
 		// ファイル送信開始前に、"rb ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		//strcpy(ts->YModemRcvCommand, "rb");
@@ -264,7 +272,14 @@ void YInit
 		break;
 
 	case IdYReceive:
+#if 0
+		strcpy(inistr, "sb teraterm2.ini\r\n");
+//		strcpy(inistr, "sb foo.txt\r\n");
+		YWrite(fv,yv,cv, inistr , strlen(inistr));
+#endif
+
 		YSendNAK(fv,yv,cv);
+
 		break;
 	}
 }
@@ -310,6 +325,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			  yv->PktReadMode = XpktBLK;
 			  if (yv->YOpt==Xopt1K)
 				  YSetOpt(fv,yv,XoptCRC);
+			  yv->DataLen = 128;
 			  FTSetTimeOut(fv,yv->TOutShort);
 		  }
 		  else if (b==STX)
@@ -317,6 +333,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			  yv->PktIn[0] = b;
 			  yv->PktReadMode = XpktBLK;
 			  YSetOpt(fv,yv,Xopt1K);
+			  yv->DataLen = 1024;
 			  FTSetTimeOut(fv,yv->TOutShort);
 		  }
 		  else if (b==EOT)
@@ -370,16 +387,18 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 	if (! GetPkt) return TRUE;
 
+#if 0
 	if ((yv->PktIn[1]==0) && (yv->PktNum==0) &&
 		(yv->PktNumOffset==0))
 	{
-		if (yv->NAKMode==XnakNAK)
+		if (yv->NAKMode!=YnakC)
 			yv->NAKCount = 10;
 		else
 			yv->NAKCount = 3;
 		YSendNAK(fv,yv,cv);
 		return TRUE;
 	}
+#endif
 
 	GetPkt = YCheckPacket(yv);
 	if (! GetPkt)
@@ -398,10 +417,34 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	/* send ACK */
 	b = ACK;
 	YWrite(fv,yv,cv,&b, 1);
-	yv->NAKMode = XnakNAK;
+	yv->NAKMode = YnakC;
 	yv->NAKCount = 10;
 
-	if (d==0) return TRUE;
+	// YMODEMの場合、block#0が「ファイル情報」となる。
+	if (d == 0) {
+		long modtime;
+        long bytes_total;
+		int mode;
+		int ret;
+		BYTE *p;
+		char *name, *nameend;
+
+		p = &(yv->PktIn[3]);
+		name = p;
+		strncpy_s(fv->FullName, sizeof(fv->FullName), name, _TRUNCATE);
+		nameend = name + 1 + strlen(name);
+		if (*nameend) {
+			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
+			if (ret == 3) {
+				fv->FileSize = bytes_total;
+			}
+		}
+		fv->FileHandle = _lcreat(fv->FullName,0);
+		fv->FileOpen = fv->FileHandle>0;
+
+		return TRUE;
+	}
+
 	yv->PktNum = yv->PktIn[1];
 	if (yv->PktNum==0)
 		yv->PktNumOffset = yv->PktNumOffset + 256;
