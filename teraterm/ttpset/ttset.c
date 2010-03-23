@@ -1065,6 +1065,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "YmodemLog", FName, FALSE))
 		ts->LogFlag |= LOG_Y;
 
+	/* YMODEM 受信コマンド (2010.3.23 yutaka) */
+	GetPrivateProfileString(Section, "YModemRcvCommand", "rb",
+	                        ts->YModemRcvCommand, sizeof(ts->YModemRcvCommand), FName);
+
 	/* Auto ZMODEM activation -- special option */
 	if (GetOnOff(Section, "ZmodemAuto", FName, FALSE))
 		ts->FTFlag |= FT_ZAUTO;
@@ -2150,6 +2154,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	/* YMODEM log  -- special option */
 	WriteOnOff(Section, "YmodemLog", FName, (WORD) (ts->LogFlag & LOG_Y));
+
+	/* YMODEM 受信コマンド (2010.3.23 yutaka) */
+	WritePrivateProfileString(Section, "YmodemRcvCommand", ts->YModemRcvCommand, FName);
 
 	/* Auto ZMODEM activation -- special option */
 	WriteOnOff(Section, "ZmodemAuto", FName,

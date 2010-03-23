@@ -7,6 +7,7 @@ All rights reserved. */
 #include "tttypes.h"
 #include "ttftypes.h"
 #include <stdio.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -243,15 +244,21 @@ void YInit
 	case IdYSend:
 		yv->TextFlag = 0;
 
-#if 1
+		if (fv->LogFlag) {
+			char buf[128];
+			time_t tm = time(NULL);
+
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "YMODEM start: %s\n", ctime(&tm));
+			_lwrite(fv->LogFile, buf, strlen(buf));
+		}
+
 		// ファイル送信開始前に、"rb ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
-		strcpy(ts->YModemRcvCommand, "rb");
+		//strcpy(ts->YModemRcvCommand, "rb");
 		if (ts->YModemRcvCommand[0] != '\0') {
 			_snprintf_s(inistr, sizeof(inistr), _TRUNCATE, "%s\015", 
 				ts->YModemRcvCommand);
 			YWrite(fv,yv,cv, inistr , strlen(inistr));
 		}
-#endif
 
 		FTSetTimeOut(fv,TimeOutVeryLong);
 		break;
@@ -435,6 +442,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 	int i;
 	BOOL SendFlag;
 	WORD Check;
+	BYTE firstch, lastrx;
 
 	SendFlag = FALSE;
 	if (yv->PktBufCount==0)
@@ -442,8 +450,16 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		i = YRead1Byte(fv,yv,cv,&b);
 		do {
 			if (i==0) return TRUE;
+			firstch = b;
 			switch (b) {
 			case ACK:
+				// 1回目のEOT送信後のACK受信で、終わりとする。
+				if (yv->SendEot) {
+					yv->SendEot = 0;
+					yv->LastSendEot = 1;
+					break;
+				}
+
 				if (! fv->FileOpen)
 				{
 					fv->Success = TRUE;
@@ -456,6 +472,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 						yv->PktNumOffset = yv->PktNumOffset + 256;
 					SendFlag = TRUE;
 				}
+
 				break;
 
 			case NAK:
@@ -496,8 +513,18 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		FTSetTimeOut(fv,TimeOutVeryLong);
 
 		do {
+			lastrx = firstch;
 			i = YRead1Byte(fv,yv,cv,&b);
-		} while (i!=0);
+			if (i != 0) {
+				firstch = b;
+				if (firstch == CAN && lastrx == CAN) {
+					// CAN(0x18)が連続してくると、ファイル送信の失敗と見なす。
+					// たとえば、サーバに同名のファイルが存在する場合など。
+					// (2010.3.23 yutaka)
+					return FALSE;
+				}
+			}
+		} while (i != 0);
 
 		if (yv->LastSendEot) { // オールゼロのブロックを送信して、もうファイルがないことを知らせる。
 			if (yv->DataLen==128)
@@ -638,8 +665,19 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 	}
 	/* a NAK or C could have arrived while we were buffering.  Consume it. */
 	do {
+		lastrx = firstch;
 		i = YRead1Byte(fv,yv,cv,&b);
-	} while (i!=0);
+		if (i != 0) {
+			firstch = b;
+			if (firstch == CAN && lastrx == CAN) {
+				// CAN(0x18)が連続してくると、ファイル送信の失敗と見なす。
+				// たとえば、サーバに同名のファイルが存在する場合など。
+				// (2010.3.23 yutaka)
+				return FALSE;
+			}
+		}
+	} while (i != 0);
+
 
 	i = 1;
 	while ((yv->PktBufCount>0) && (i>0))

@@ -1084,13 +1084,10 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	ModifyMenu(FileMenu, ID_FILE_XSEND, MF_BYCOMMAND, ID_FILE_XSEND, ts.UIMsg);
 
 	// TBD: YMODEMはまだ未サポートなので、メニューは隠す。(2008.5.15 yutaka)
-//#define YMODEM_TBD
-#ifndef YMODEM_TBD
-	DeleteMenu(TransMenu, 2, MF_BYPOSITION);
+	// 送信のみサポート (2010.3.23 yutaka)
+	//DeleteMenu(TransMenu, 2, MF_BYPOSITION);
+	//DeleteMenu(FileMenu, ID_FILE_YSEND, MF_BYCOMMAND);
 	DeleteMenu(FileMenu, ID_FILE_YRCV, MF_BYCOMMAND);
-	DeleteMenu(FileMenu, ID_FILE_YSEND, MF_BYCOMMAND);
-#endif
-#undef YMODEM_TBD
 
 	GetMenuString(FileMenu, ID_FILE_ZRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_TRANS_Z_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
