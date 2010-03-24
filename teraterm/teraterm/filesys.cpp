@@ -1313,8 +1313,11 @@ void YMODEMStart(int mode)
 		else
 		(*SetFileVar)(FileVar);
 	}
-	else /* IdZReceive or IdZAuto */
+	else {/* IdZReceive or IdZAuto */
 		FileVar->OpId = OpYRcv;
+		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
+		Opt = Yopt1K;
+	}
 
 	TalkStatus = IdTalkQuiet;
 

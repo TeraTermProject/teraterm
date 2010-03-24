@@ -280,7 +280,7 @@ void YInit
 		break;
 
 	case IdYReceive:
-#if 0
+#if 0   // for debug
 		strcpy(inistr, "sb teraterm2.ini\r\n");
 //		strcpy(inistr, "sb foo.txt\r\n");
 		YWrite(fv,yv,cv, inistr , strlen(inistr));
@@ -313,6 +313,15 @@ void YTimeOutProc(PFileVar fv, PYVar yv, PComVar cv)
 	}
 }
 
+// YMODEMサーバからファイルを受信する際、ProtoParse()から呼び出される関数。
+//
+// +-------+-------+--------+---------+-----+
+// |Header |Block# |1-Block#| Payload | CRC |
+// +-------+-------+--------+---------+-----+
+//    1       1        1      128/1024   2      byte
+//
+// return TRUE: ファイル受信中
+//        FALSE: 受信完了
 BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 {
 	BYTE b, d;
@@ -326,68 +335,72 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	while ((c>0) && (! GetPkt))
 	{
 		switch (yv->PktReadMode) {
-	  case XpktSOH:
-		  if (b==SOH)
-		  {
-			  yv->PktIn[0] = b;
-			  yv->PktReadMode = XpktBLK;
-			  if (yv->YOpt==Xopt1K)
-				  YSetOpt(fv,yv,XoptCRC);
-			  yv->DataLen = 128;
+		  case XpktSOH:
+			  // SOH か STX かでブロック長が決まる。
+			  if (b==SOH)
+			  {
+				  yv->PktIn[0] = b;
+				  yv->PktReadMode = XpktBLK;
+				  yv->DataLen = SOH_DATALEN;
+				  FTSetTimeOut(fv,yv->TOutShort);
+			  }
+			  else if (b==STX)
+			  {
+				  yv->PktIn[0] = b;
+				  yv->PktReadMode = XpktBLK;
+				  yv->DataLen = STX_DATALEN;
+				  FTSetTimeOut(fv,yv->TOutShort);
+			  }
+			  else if (b==EOT)
+			  {
+				  if (fv->FileOpen) {
+					  fv->FileOpen = 0;
+					  _lclose(fv->FileHandle);
+					  fv->FileHandle = -1;
+				  }
+
+				  b = ACK;
+				  fv->Success = TRUE;
+				  YWrite(fv,yv,cv,&b, 1);
+				  return FALSE;
+			  }
+			  else {
+				  /* flush comm buffer */
+				  cv->InBuffCount = 0;
+				  cv->InPtr = 0;
+				  return TRUE;
+			  }
+			  break;
+		  case XpktBLK:
+			  yv->PktIn[1] = b;
+			  yv->PktReadMode = XpktBLK2;
 			  FTSetTimeOut(fv,yv->TOutShort);
-		  }
-		  else if (b==STX)
-		  {
-			  yv->PktIn[0] = b;
-			  yv->PktReadMode = XpktBLK;
-			  YSetOpt(fv,yv,Xopt1K);
-			  yv->DataLen = 1024;
-			  FTSetTimeOut(fv,yv->TOutShort);
-		  }
-		  else if (b==EOT)
-		  {
-			  b = ACK;
-			  fv->Success = TRUE;
-			  YWrite(fv,yv,cv,&b, 1);
-			  return FALSE;
-		  }
-		  else {
-			  /* flush comm buffer */
-			  cv->InBuffCount = 0;
-			  cv->InPtr = 0;
-			  return TRUE;
-		  }
-		  break;
-	  case XpktBLK:
-		  yv->PktIn[1] = b;
-		  yv->PktReadMode = XpktBLK2;
-		  FTSetTimeOut(fv,yv->TOutShort);
-		  break;
-	  case XpktBLK2:
-		  yv->PktIn[2] = b;
-		  if ((b ^ yv->PktIn[1]) == 0xff)
-		  {
-			  yv->PktBufPtr = 3;
-			  yv->PktBufCount = yv->DataLen + yv->CheckLen;
-			  yv->PktReadMode = XpktDATA;
-			  FTSetTimeOut(fv,yv->TOutShort);
-		  }
-		  else
-			  YSendNAK(fv,yv,cv);
-		  break;
-	  case XpktDATA:
-		  yv->PktIn[yv->PktBufPtr] = b;
-		  yv->PktBufPtr++;
-		  yv->PktBufCount--;
-		  GetPkt = yv->PktBufCount==0;
-		  if (GetPkt)
-		  {
-			  FTSetTimeOut(fv,yv->TOutLong);
-			  yv->PktReadMode = XpktSOH;
-		  }
-		  else
-			  FTSetTimeOut(fv,yv->TOutShort);
-		  break;
+			  break;
+		  case XpktBLK2:
+			  yv->PktIn[2] = b;
+			  if ((b ^ yv->PktIn[1]) == 0xff)
+			  {
+				  yv->PktBufPtr = 3;
+				  yv->PktBufCount = yv->DataLen + yv->CheckLen;
+				  yv->PktReadMode = XpktDATA;
+				  FTSetTimeOut(fv,yv->TOutShort);
+			  }
+			  else
+				  YSendNAK(fv,yv,cv);
+			  break;
+		  case XpktDATA:
+			  yv->PktIn[yv->PktBufPtr] = b;
+			  yv->PktBufPtr++;
+			  yv->PktBufCount--;
+			  GetPkt = yv->PktBufCount==0;
+			  if (GetPkt)
+			  {
+				  FTSetTimeOut(fv,yv->TOutLong);
+				  yv->PktReadMode = XpktSOH;
+			  }
+			  else
+				  FTSetTimeOut(fv,yv->TOutShort);
+			  break;
 		}
 
 		if (! GetPkt) c = YRead1Byte(fv,yv,cv,&b);
@@ -449,6 +462,9 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		}
 		fv->FileHandle = _lcreat(fv->FullName,0);
 		fv->FileOpen = fv->FileHandle>0;
+
+		fv->DirLen = 0;
+		SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
 
 		return TRUE;
 	}
