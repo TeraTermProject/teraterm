@@ -1026,9 +1026,9 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 			((PXVar)ProtoVar)->XOpt = Opt1;
 			((PXVar)ProtoVar)->TextFlag = 1 - (Opt2 & 1);
 			break;
-		case PROTO_YM:  // TBD
+		case PROTO_YM:  
 			((PYVar)ProtoVar)->YMode = Mode;
-			((PYVar)ProtoVar)->YOpt = Yopt1K;  // TBD
+			((PYVar)ProtoVar)->YOpt = Opt1;
 			break;
 		case PROTO_ZM:
 			((PZVar)ProtoVar)->BinFlag = (Opt1 & 1) != 0;
@@ -1296,7 +1296,9 @@ void YMODEMStart(int mode)
 
 	if (mode==IdYSend)
 	{
-		Opt = ts.XmodemBin;
+		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
+		// TODO: "Yopt1K", "YoptG", "YoptSingle"を区別したいならば、IDD_FOPTを拡張する必要あり。
+		Opt = Yopt1K;
 		FileVar->OpId = OpYSend;
 		if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 		{
@@ -1306,7 +1308,7 @@ void YMODEMStart(int mode)
 				ProtoEnd();
 				return;
 			}
-			ts.XmodemBin = Opt;
+			//ts.XmodemBin = Opt;
 		}
 		else
 		(*SetFileVar)(FileVar);

@@ -1,5 +1,5 @@
 /* Tera Term
-Copyright(C) 2008 TeraTerm Project
+Copyright(C) 2008-2010 TeraTerm Project
 All rights reserved. */
 
 /* TTFILE.DLL, YMODEM protocol */
@@ -24,6 +24,10 @@ All rights reserved. */
 #define TimeOutShort 10
 #define TimeOutLong  20
 #define TimeOutVeryLong 60
+
+// データ転送サイズ。YMODEMでは 128 or 1024 byte をサポートする。
+#define SOH_DATALEN	128
+#define STX_DATALEN	1024
 
 int YRead1Byte(PFileVar fv, PYVar yv, PComVar cv, LPBYTE b)
 {
@@ -174,39 +178,25 @@ BOOL YCheckPacket(PYVar yv)
 		(LOBYTE(Check)==yv->PktIn[yv->DataLen+4]));  
 }
 
-void YInit
-(PFileVar fv, PYVar yv, PComVar cv, PTTSet ts)
+static void initialize_file_info(PFileVar fv, PYVar yv)
 {
-	char inistr[MAXPATHLEN + 10];
-
 	if (yv->YMode == IdYSend) {
-		if (! GetNextFname(fv))
-		{
-			return;
+		if (fv->FileOpen) {
+			_lclose(fv->FileHandle);
 		}
-		/* file open */
 		fv->FileHandle = _lopen(fv->FullName,OF_READ);
+		fv->FileSize = GetFSize(fv->FullName);
 	} else {
 		fv->FileHandle = -1;
+		fv->FileSize = 0;
 	}
 	fv->FileOpen = fv->FileHandle>0;
 
-	fv->LogFlag = ((ts->LogFlag & LOG_Y)!=0);
-	if (fv->LogFlag)
-		fv->LogFile = _lcreat("YMODEM.LOG",0);
-	fv->LogState = 0;
-	fv->LogCount = 0;
-
-	fv->FileSize = 0;
-	if ((yv->YMode==IdYSend) && fv->FileOpen) {
-		fv->FileSize = GetFSize(fv->FullName);
+	if (yv->YMode == IdYSend) {
 		InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
-	}
-	else {
+	} else {
 		fv->ProgStat = -1;
 	}
-
-	SetWindowText(fv->HWin, fv->DlgCaption);
 	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
 
 	yv->PktNumOffset = 0;
@@ -214,13 +204,32 @@ void YInit
 	yv->PktNumSent = 0;
 	yv->PktBufCount = 0;
 	yv->CRRecv = FALSE;
-
 	fv->ByteCount = 0;
-
 	yv->SendFileInfo = 0;
 	yv->SendEot = 0;
-	yv->ResendEot = 0;
 	yv->LastSendEot = 0;
+}
+
+void YInit
+(PFileVar fv, PYVar yv, PComVar cv, PTTSet ts)
+{
+	char inistr[MAXPATHLEN + 10];
+
+	if (yv->YMode == IdYSend) {
+		if (!GetNextFname(fv)) {
+			return;
+		}
+	} 
+
+	fv->LogFlag = ((ts->LogFlag & LOG_Y)!=0);
+	if (fv->LogFlag)
+		fv->LogFile = _lcreat("YMODEM.LOG",0);
+	fv->LogState = 0;
+	fv->LogCount = 0;
+
+	SetWindowText(fv->HWin, fv->DlgCaption);
+
+	initialize_file_info(fv, yv);
 
 	if (cv->PortType==IdTCPIP)
 	{
@@ -234,7 +243,7 @@ void YInit
 
 	YSetOpt(fv,yv,yv->YOpt);
 
-	if (yv->YOpt==XoptCheck)  // TODO
+	if (yv->YOpt == Yopt1K)  
 	{
 		yv->NAKMode = YnakC;
 		yv->NAKCount = 10;
@@ -258,7 +267,6 @@ void YInit
 	switch (yv->YMode) {
 	case IdYSend:
 		yv->TextFlag = 0;
-
 
 		// ファイル送信開始前に、"rb ファイル名"を自動的に呼び出す。(2007.12.20 yutaka)
 		//strcpy(ts->YModemRcvCommand, "rb");
@@ -496,42 +504,34 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			firstch = b;
 			switch (b) {
 			case ACK:
-				// 1回目のEOT送信後のACK受信で、終わりとする。
+				// 1回目のEOT送信後のACK受信で、「1ファイル送信」の終わりとする。
 				if (yv->SendEot) {
 					yv->SendEot = 0;
-					yv->LastSendEot = 1;
-					break;
+
+					// 送信ファイルが残っていない場合は、「全てのファイルを転送終了」を通知する。
+					if (!GetNextFname(fv)) {
+						yv->LastSendEot = 1;
+						break;
+					} else {
+						initialize_file_info(fv, yv);
+					}
 				}
 
-				if (! fv->FileOpen)
+				if (! fv->FileOpen) // もう送信するファイルがない場合は、正常終了。
 				{
 					fv->Success = TRUE;
 					return FALSE;
 				}
-				else if (yv->PktNumSent==(BYTE)(yv->PktNum+1))
+				else if (yv->PktNumSent==(BYTE)(yv->PktNum+1))  // 次のブロックを送る
 				{
 					yv->PktNum = yv->PktNumSent;
 					if (yv->PktNum==0)
 						yv->PktNumOffset = yv->PktNumOffset + 256;
 					SendFlag = TRUE;
 				}
-
 				break;
 
 			case NAK:
-				if (yv->PktNum == 0 && yv->YOpt == Xopt1K)
-				{
-					/* we wanted 1k with CRC, but the other end specified checksum */
-					/* keep the 1k block, but move back to checksum mode.          */
-					yv->YOpt = XoptCheck;
-					yv->CheckLen = 1;
-				}
-
-				// 1回目のEOT送信後のNAK受信で、再度EOTを送る。
-				if (yv->SendEot) {
-					yv->ResendEot = 1;
-				}
-
 				SendFlag = TRUE;
 				break;
 
@@ -555,6 +555,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		// reset timeout timer
 		FTSetTimeOut(fv,TimeOutVeryLong);
 
+		// 後続のサーバからのデータを読み捨てる。
 		do {
 			lastrx = firstch;
 			i = YRead1Byte(fv,yv,cv,&b);
@@ -564,13 +565,16 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 					// CAN(0x18)が連続してくると、ファイル送信の失敗と見なす。
 					// たとえば、サーバに同名のファイルが存在する場合など。
 					// (2010.3.23 yutaka)
+					fv->Success = FALSE;       // failure
 					return FALSE;
 				}
 			}
 		} while (i != 0);
 
 		if (yv->LastSendEot) { // オールゼロのブロックを送信して、もうファイルがないことを知らせる。
-			if (yv->DataLen==128)
+			yv->LastSendEot = 0;
+
+			if (yv->DataLen == SOH_DATALEN)
 				yv->PktOut[0] = SOH;
 			else
 				yv->PktOut[0] = STX;
@@ -594,19 +598,12 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			yv->PktBufCount = 3 + yv->DataLen + yv->CheckLen;
 
 		} 
-		else if (yv->ResendEot) {  // 2回目のEOT送信
-			yv->PktOut[0] = EOT;
-			yv->PktBufCount = 1;
-
-			yv->LastSendEot = 1;
-
-		} 
 		else if (yv->PktNumSent==yv->PktNum) /* make a new packet */
 		{
 			BYTE *dataptr = &yv->PktOut[3];
 			int eot = 0;  // End Of Transfer
 
-			if (yv->DataLen==128)
+			if (yv->DataLen == SOH_DATALEN)
 				yv->PktOut[0] = SOH;
 			else
 				yv->PktOut[0] = STX;
@@ -694,9 +691,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				yv->PktBufCount = 1;
 
 				yv->SendEot = 1;  // EOTフラグon。次はNAKを期待する。
-				yv->ResendEot = 0;
 				yv->LastSendEot = 0;
-
 			}
 
 		}
@@ -707,6 +702,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		yv->PktBufPtr = 0;
 	}
 	/* a NAK or C could have arrived while we were buffering.  Consume it. */
+	// 後続のサーバからのデータを読み捨てる。
 	do {
 		lastrx = firstch;
 		i = YRead1Byte(fv,yv,cv,&b);
@@ -716,6 +712,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				// CAN(0x18)が連続してくると、ファイル送信の失敗と見なす。
 				// たとえば、サーバに同名のファイルが存在する場合など。
 				// (2010.3.23 yutaka)
+				fv->Success = FALSE;       // failure
 				return FALSE;
 			}
 		}

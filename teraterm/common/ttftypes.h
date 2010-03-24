@@ -184,7 +184,6 @@ typedef struct {
   int TOutLong;
   int SendFileInfo;
   int SendEot;
-  int ResendEot;
   int LastSendEot;
 } TYVar;
 typedef TYVar far *PYVar;
