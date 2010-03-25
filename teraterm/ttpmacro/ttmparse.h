@@ -218,6 +218,9 @@
 #define RsvSendInt      174
 #define RsvSetDebug     175
 
+#define RsvYmodemRecv   176
+#define RsvYmodemSend   177
+
 // integer type for buffer pointer
 typedef DWORD BINT;
 

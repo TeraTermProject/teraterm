@@ -301,6 +301,8 @@
 #define HlpMacroCommandXmodemrecv       92105
 #define HlpMacroCommandXmodemsend       92106
 #define HlpMacroCommandYesnobox         92107
+#define HlpMacroCommandYmodemrecv       92176
+#define HlpMacroCommandYmodemsend       92177
 #define HlpMacroCommandZmodemrecv       92108
 #define HlpMacroCommandZmodemsend       92109
 

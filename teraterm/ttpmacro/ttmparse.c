@@ -319,6 +319,8 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		break;
 	case 'y':
 		if (_stricmp(Str,"yesnobox")==0) *WordId = RsvYesNoBox;
+		else if (_stricmp(Str,"ymodemrecv")==0) *WordId = RsvYmodemRecv;
+		else if (_stricmp(Str,"ymodemsend")==0) *WordId = RsvYmodemSend;
 		break;
 	case 'z':
 		if (_stricmp(Str,"zmodemrecv")==0) *WordId = RsvZmodemRecv;

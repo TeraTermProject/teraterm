@@ -56,6 +56,8 @@
 #define CmdSendMulticast  'P'
 #define CmdSetMulticastName  'Q'
 #define CmdSetDebug  'R'
+#define CmdYmodemSend   'S'
+#define CmdYmodemRecv   'T'
 
 #ifdef __cplusplus
 extern "C" {

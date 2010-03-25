@@ -3630,6 +3630,25 @@ WORD TTLZmodemSend()
 	return SendCmnd(CmdZmodemSend,IdTTLWaitCmndResult);
 }
 
+WORD TTLYmodemSend()
+{
+	TStrVal Str;
+	WORD Err;
+//	int BinFlag;
+
+	Err = 0;
+	GetStrVal(Str,&Err);
+//	GetIntVal(&BinFlag,&Err);
+	if ((Err==0) &&
+	    ((strlen(Str)==0) || (GetFirstChar()!=0)))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	SetFile(Str);
+//	SetBinary(BinFlag);
+	return SendCmnd(CmdYmodemSend,IdTTLWaitCmndResult);
+}
+
 // SYNOPSIS: 
 //   scpsend "c:\usr\sample.chm" "doc/sample.chm"
 //   scpsend "c:\usr\sample.chm"
@@ -4087,6 +4106,10 @@ int ExecCmnd()
 			Err = TTLCommCmd(CmdZmodemRecv,IdTTLWaitCmndResult); break;
 		case RsvZmodemSend:
 			Err = TTLZmodemSend(); break;
+		case RsvYmodemRecv:
+			Err = TTLCommCmd(CmdYmodemRecv,IdTTLWaitCmndResult); break;
+		case RsvYmodemSend:
+			Err = TTLYmodemSend(); break;
 		default:
 			Err = ErrSyntax;
 		}

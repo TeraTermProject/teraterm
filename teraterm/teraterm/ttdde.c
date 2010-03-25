@@ -331,6 +331,8 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdSendMulticast  'P'
 #define CmdSetMulticastName  'Q'
 #define CmdSetDebug     'R'
+#define CmdYmodemSend   'S'
+#define CmdYmodemRecv   'T'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -685,6 +687,32 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		else
 			return DDE_FNOTPROCESSED;
 		break;
+
+	case CmdYmodemRecv:
+		if ((FileVar==NULL) && NewFileVar(&FileVar))
+		{
+			FileVar->NoMsg = TRUE;
+			DdeCmnd = TRUE;
+			YMODEMStart(IdYReceive);
+		}
+		else
+			return DDE_FNOTPROCESSED;
+		break;
+	case CmdYmodemSend:
+		if ((FileVar==NULL) && NewFileVar(&FileVar))
+		{
+			FileVar->DirLen = 0;
+			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
+			FileVar->NumFname = 1;
+			//ts.XmodemBin = ParamBinaryFlag;
+			FileVar->NoMsg = TRUE;
+			DdeCmnd = TRUE;
+			YMODEMStart(IdYSend);
+		}
+		else
+			return DDE_FNOTPROCESSED;
+		break;
+
 		// add 'callmenu' (2007.11.18 maya)
 	case CmdCallMenu:
 		i = atoi(ParamFileName);
