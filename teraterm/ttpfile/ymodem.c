@@ -281,10 +281,11 @@ void YInit
 
 	case IdYReceive:
 #if 0   // for debug
-		strcpy(inistr, "sb teraterm2.ini\r\n");
-//		strcpy(inistr, "sb foo.txt\r\n");
+		strcpy(inistr, "sb -b svnrev.exe lrzsz-0.12.20.tar.gz\r\n");
+//		strcpy(inistr, "sb url3.txt url4.txt url5.txt\r\n");
 		YWrite(fv,yv,cv, inistr , strlen(inistr));
 #endif
+		yv->TextFlag = 0;
 
 		YSendNAK(fv,yv,cv);
 
@@ -325,7 +326,7 @@ void YTimeOutProc(PFileVar fv, PYVar yv, PComVar cv)
 BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 {
 	BYTE b, d;
-	int i, c;
+	int i, c, nak;
 	BOOL GetPkt;
 
 	c = YRead1Byte(fv,yv,cv,&b);
@@ -353,16 +354,23 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			  }
 			  else if (b==EOT)
 			  {
+				  // EOTが来たら、1つのファイル受信が完了したことを示す。
 				  if (fv->FileOpen) {
 					  fv->FileOpen = 0;
 					  _lclose(fv->FileHandle);
 					  fv->FileHandle = -1;
 				  }
 
+				  initialize_file_info(fv, yv);
+
+				  // EOTに対してACKを返す
 				  b = ACK;
-				  fv->Success = TRUE;
 				  YWrite(fv,yv,cv,&b, 1);
-				  return FALSE;
+
+				  // 次のファイル送信を促すため、'C'を送る。
+		  		  YSendNAK(fv,yv,cv);
+
+				  return TRUE;
 			  }
 			  else {
 				  /* flush comm buffer */
@@ -377,8 +385,17 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			  FTSetTimeOut(fv,yv->TOutShort);
 			  break;
 		  case XpktBLK2:
+			  nak = 1;
 			  yv->PktIn[2] = b;
-			  if ((b ^ yv->PktIn[1]) == 0xff)
+			  if ((b ^ yv->PktIn[1]) == 0xff) {
+				  nak = 0;
+				  if (yv->SendFileInfo) {
+					  if (yv->PktIn[1] == (BYTE)(yv->PktNum + 1))  // 次のブロック番号か
+						  nak = 0;
+				  }
+			  }
+
+			  if (nak == 0)
 			  {
 				  yv->PktBufPtr = 3;
 				  yv->PktBufCount = yv->DataLen + yv->CheckLen;
@@ -408,24 +425,26 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 	if (! GetPkt) return TRUE;
 
-#if 0
-	if ((yv->PktIn[1]==0) && (yv->PktNum==0) &&
-		(yv->PktNumOffset==0))
-	{
-		if (yv->NAKMode!=YnakC)
-			yv->NAKCount = 10;
-		else
-			yv->NAKCount = 3;
-		YSendNAK(fv,yv,cv);
-		return TRUE;
-	}
-#endif
-
 	GetPkt = YCheckPacket(yv);
 	if (! GetPkt)
 	{
 		YSendNAK(fv,yv,cv);
 		return TRUE;
+	}
+
+	// オールゼロならば、全ファイル受信の完了を示す。
+	if (yv->PktIn[1] == 0x00 && yv->PktIn[2] == 0xFF &&
+		yv->SendFileInfo == 0
+		) {
+		c = yv->DataLen;
+		while ((c>0) && (yv->PktIn[2+c]==0x00))
+			c--;
+		if (c == 0) {
+		  b = ACK;
+		  YWrite(fv,yv,cv,&b, 1);
+		  fv->Success = TRUE;
+		  return FALSE;
+		}
 	}
 
 	d = yv->PktIn[1] - yv->PktNum;
@@ -441,8 +460,17 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	yv->NAKMode = YnakC;
 	yv->NAKCount = 10;
 
+	// 重複している場合は、何もしない。
+	if (yv->SendFileInfo &&
+		yv->PktIn[1] == (BYTE)(yv->PktNum)) { 
+		return TRUE;
+	}
+
+	yv->PktNum = yv->PktIn[1];
+
 	// YMODEMの場合、block#0が「ファイル情報」となる。
-	if (d == 0) {
+	if (d == 0 &&
+		yv->SendFileInfo == 0) {
 		long modtime;
         long bytes_total;
 		int mode;
@@ -466,10 +494,11 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		fv->DirLen = 0;
 		SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
 
+		yv->SendFileInfo = 1;
+
 		return TRUE;
 	}
 
-	yv->PktNum = yv->PktIn[1];
 	if (yv->PktNum==0)
 		yv->PktNumOffset = yv->PktNumOffset + 256;
 
@@ -477,6 +506,11 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	if (yv->TextFlag>0)
 		while ((c>0) && (yv->PktIn[2+c]==0x1A))
 			c--;
+
+	// 最終ブロックの余分なデータを除去する
+	if (fv->ByteCount + c > fv->FileSize) {
+		c = fv->FileSize - fv->ByteCount;
+	}
 
 	if (yv->TextFlag>0)
 		for (i = 0 ; i <= c-1 ; i++)

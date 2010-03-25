@@ -1317,6 +1317,7 @@ void YMODEMStart(int mode)
 		FileVar->OpId = OpYRcv;
 		// ファイル転送時のオプションは"Yopt1K"に決め打ち。
 		Opt = Yopt1K;
+		(*SetFileVar)(FileVar);
 	}
 
 	TalkStatus = IdTalkQuiet;
