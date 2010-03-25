@@ -869,6 +869,16 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ymodemrecv">
+					<param name="Local" value="html\macro\command\ymodemrecv.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ymodemsend">
+					<param name="Local" value="html\macro\command\ymodemsend.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="zmodemrecv">
 					<param name="Local" value="html\macro\command\zmodemrecv.html">
 					<param name="ImageNumber" value="11">
