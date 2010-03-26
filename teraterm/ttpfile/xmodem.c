@@ -31,6 +31,11 @@ int XRead1Byte(PFileVar fv, PXVar xv, PComVar cv, LPBYTE b)
   {
     if (fv->LogState==0)
     {
+			// 残りのASCII表示を行う
+			fv->FlushLogLineBuf = 1;
+			FTLog1Byte(fv,0);
+			fv->FlushLogLineBuf = 0;
+
       fv->LogState = 1;
       fv->LogCount = 0;
       _lwrite(fv->LogFile,"\015\012<<<\015\012",7);
@@ -49,6 +54,11 @@ int XWrite(PFileVar fv, PXVar xv, PComVar cv, PCHAR B, int C)
   {
     if (fv->LogState != 0)
     {
+			// 残りのASCII表示を行う
+			fv->FlushLogLineBuf = 1;
+			FTLog1Byte(fv,0);
+			fv->FlushLogLineBuf = 0;
+
       fv->LogState = 0;
       fv->LogCount = 0;
       _lwrite(fv->LogFile,"\015\012>>>\015\012",7);
