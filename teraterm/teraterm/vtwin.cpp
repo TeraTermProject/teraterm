@@ -1367,7 +1367,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		}
 
 		if ((ConvH!=0) || (FileVar!=NULL)) {
+			// Control - Macro メニューの多重呼び出しを許可するには、#if 1 にする。
+#if 0
+			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_ENABLED);
+#else
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_GRAYED);
+#endif
 		}
 		else {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_ENABLED);

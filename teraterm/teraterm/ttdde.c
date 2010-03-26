@@ -1088,11 +1088,31 @@ void RunMacro(PCHAR FName, BOOL Startup)
 //		  In this case, the connection to the host will
 //		  made after the link to TT(P)MACRO is established.
 {
+	static PROCESS_INFORMATION pi;
 	int i;
 	char Cmnd[MAXPATHLEN+40];
 	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
+
+	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
+	// 該当する"ttpmacro"をフラッシュする。
+	if (FName == NULL && Startup == FALSE && ConvH != 0) {
+		HWND hwnd;
+		DWORD pid;
+
+		hwnd = GetTopWindow(NULL);
+		while (hwnd) {
+			GetWindowThreadProcessId(hwnd, &pid);
+			if (pid == pi.dwProcessId) {
+				BringWindowToTop(hwnd);
+				SetForegroundWindow(hwnd);
+				break;
+			}
+			hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
+		}
+
+		return;
+	}
 
 	SetTopic();
 	if (! InitDDE()) return;
