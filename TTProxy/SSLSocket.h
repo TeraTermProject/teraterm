@@ -220,7 +220,11 @@ public:
                                             break;
                                     }
                                 }
+#if (OPENSSL_VERSION_MAJOR < 1)
                                 X509V3_EXT_METHOD* method = X509V3_EXT_get(ex);
+#else
+                                const X509V3_EXT_METHOD* method = X509V3_EXT_get(ex);
+#endif
                                 sk_GENERAL_NAME_free(alt);
                                 if (i < n)
                                     match = true;
