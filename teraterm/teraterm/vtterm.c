@@ -2509,13 +2509,13 @@ void ParseCS(BYTE b) /* b is the final char */
 //	    case 'b': break;                            // REP  -- Not support
 	    case 'c': AnswerTerminalType(); break;      // DA
 	    case 'd': CSMoveToLineN(); break;           // VPA
-	    case 'e': CSCursorUp(); break;              // VPR
+	    case 'e': CSCursorDown(); break;            // VPR
 	    case 'f': CSMoveToXY(); break;              // HVP
 	    case 'g': CSDeleteTabStop(); break;         // TBC
 	    case 'h': CS_h_Mode(); break;               // SM
 	    case 'i': CS_i_Mode(); break;               // MC
 	    case 'j': CSCursorLeft(); break;            // HPB
-//	    case 'k': break;                            // VPB  -- Not support
+	    case 'k': CSCursorUp();                     // VPB
 	    case 'l': CS_l_Mode(); break;               // RM
 	    case 'm': CSSetAttr(); break;               // SGR
 	    case 'n': CS_n_Mode(); break;               // DSR
