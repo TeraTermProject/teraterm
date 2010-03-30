@@ -7,10 +7,6 @@
 #include "tttypes.h"
 #include "ttftypes.h"
 #include <stdio.h>
-#include <io.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
 
 #include "tt_res.h"
 #include "ttcommon.h"
@@ -224,12 +220,6 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 		FTSetTimeOut(fv, TimeOutVeryLong);
 		break;
 	case IdXReceive:
-#if 0
-//		strcpy(inistr, "sx svnrev.exe\r\n");
-		strcpy(inistr, "sx -b lrzsz-0.12.20.tar.gz\r\n");
-		XWrite(fv, xv, cv, inistr, strlen(inistr));
-#endif
-
 		XSendNAK(fv, xv, cv);
 		break;
 	}
@@ -259,7 +249,7 @@ void XTimeOutProc(PFileVar fv, PXVar xv, PComVar cv)
 BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 {
 	BYTE b, d;
-	int i, c, t;
+	int i, c;
 	BOOL GetPkt;
 
 	c = XRead1Byte(fv, xv, cv, &b);
@@ -281,21 +271,6 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 				XSetOpt(fv, xv, Xopt1K);
 				FTSetTimeOut(fv, xv->TOutShort);
 			} else if (b == EOT) {
-				// バイナリモードの場合、末尾のCPMEOFを削除する。
-				if (xv->TextFlag == 0) {
-					int fd;
-
-					_lclose(fv->FileHandle);
-					fv->FileHandle = -1;
-					fv->FileOpen = 0;
-
-					fd = _open(fv->FullName, _O_RDWR);
-					if (fd != -1) {
-						_chsize_s(fd, fv->FileSize);
-						_close(fd);
-					}
-				}
-
 				b = ACK;
 				fv->Success = TRUE;
 				XWrite(fv, xv, cv, &b, 1);
@@ -376,20 +351,10 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 	if (xv->PktNum == 0)
 		xv->PktNumOffset = xv->PktNumOffset + 256;
 
-	// XMODEMの仕様によれば、最後のブロックが 128/1024 byteに満たない場合、CPMEOF(0x1A)で
-	// パディングすることになっている。ASCIIモード・バイナリモードは関係なく、無条件に
-	// パディングされる。"lrzsz-0.12.20"の filbuf()#src/lsz.c の実装もそうなっている。
-	// よって、無条件に CPMEOF 削除処理が動作するようにし、バイナリファイルの末尾が壊れる
-	// 現象を回避する。
-	// (2010.3.26 yutaka)
-	t = xv->DataLen;
-	while ((t > 0) && (xv->PktIn[2 + t] == 0x1A))
-		t--;
+	c = xv->DataLen;
 	if (xv->TextFlag > 0)
-		c = t;
-	else
-		c = xv->DataLen;
-	fv->FileSize = fv->ByteCount + t;
+		while ((c > 0) && (xv->PktIn[2 + c] == 0x1A))
+			c--;
 
 	if (xv->TextFlag > 0)
 		for (i = 0; i <= c - 1; i++) {
