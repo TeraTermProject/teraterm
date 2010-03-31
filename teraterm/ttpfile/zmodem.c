@@ -1,5 +1,6 @@
 /* Tera Term
  Copyright(C) 1994-1998 T. Teranishi
+ Copyright(C) 2010 Tera Term Project
  All rights reserved. */
 
 /*
@@ -22,6 +23,7 @@
 #include "tttypes.h"
 #include "ttftypes.h"
 #include <stdio.h>
+#include <stdarg.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -94,6 +96,88 @@
 #define ZCBIN	1
 #define ZCNL	2
 
+/* ログファイル用バッファ */
+#define LOGBUFSIZE 256
+
+static char recvbuf[LOGBUFSIZE];
+static char sendbuf[LOGBUFSIZE];
+
+static void add_recvbuf(char *fmt, ...)
+{
+	va_list arg;
+	char buf[128];
+
+	va_start(arg, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, arg);
+	strncat_s(recvbuf, sizeof(recvbuf), buf, _TRUNCATE);
+	va_end(arg);
+}
+
+
+static void show_recvbuf(PFileVar fv)
+{
+	char *s;
+
+	s = recvbuf;
+	strncat_s(recvbuf, sizeof(recvbuf), "\015\012", _TRUNCATE);
+	_lwrite(fv->LogFile, s, strlen(s));
+
+	memset(recvbuf, 0, sizeof(recvbuf));
+}
+
+static void add_sendbuf(char *fmt, ...)
+{
+	va_list arg;
+	char buf[128];
+
+	va_start(arg, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, arg);
+	strncat_s(sendbuf, sizeof(sendbuf), buf, _TRUNCATE);
+	va_end(arg);
+}
+
+static void show_sendbuf(PFileVar fv)
+{
+	char *s;
+
+	s = sendbuf;
+	strncat_s(sendbuf, sizeof(sendbuf), "\015\012", _TRUNCATE);
+	_lwrite(fv->LogFile, s, strlen(s));
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+}
+
+static char *hdrtype_name(int type)
+{
+	static char *s[] = {
+		"ZRQINIT",
+		"ZRINIT",
+		"ZSINIT",
+		"ZACK",
+		"ZFILE",
+		"ZSKIP",
+		"ZNAK",
+		"ZABORT",
+		"ZFIN",
+		"ZRPOS",
+		"ZDATA",
+		"ZEOF",
+		"ZFERR",
+		"ZCRC",
+		"ZCHALLENGE",
+		"ZCOMPL",
+		"ZCAN",
+		"ZFREECNT",
+		"ZCOMMAND",
+		"ZSTDERR",
+	};
+
+	if (type >= ZRQINIT && type <= ZSTDERR)
+		return (s[type]);
+	else
+		return NULL;
+}
+
 int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
 {
 	char *s;
@@ -107,6 +191,8 @@ int ZRead1Byte(PFileVar fv, PZVar zv, PComVar cv, LPBYTE b)
 			fv->FlushLogLineBuf = 1;
 			FTLog1Byte(fv, 0);
 			fv->FlushLogLineBuf = 0;
+
+			show_sendbuf(fv);
 
 			fv->LogState = 1;
 			fv->LogCount = 0;
@@ -134,6 +220,8 @@ int ZWrite(PFileVar fv, PZVar zv, PComVar cv, PCHAR B, int C)
 			fv->FlushLogLineBuf = 1;
 			FTLog1Byte(fv, 0);
 			fv->FlushLogLineBuf = 0;
+
+			show_recvbuf(fv);
 
 			fv->LogState = 0;
 			fv->LogCount = 0;
@@ -191,6 +279,15 @@ void ZShHdr(PZVar zv, BYTE HdrType)
 
 	zv->PktOutPtr = 0;
 	zv->Sending = TRUE;
+
+	add_sendbuf("%s: %s", __FUNCTION__, hdrtype_name(HdrType));
+#if 0
+	if (HdrType == ZRPOS) {
+		LONG pos;
+		memcpy(&pos, zv->TxHdr[ZP0], 4);
+		add_sendbuf(" offset=%ld", pos);
+	}
+#endif
 }
 
 void ZPutBin(PZVar zv, int *i, BYTE b)
@@ -248,6 +345,8 @@ void ZSbHdr(PZVar zv, BYTE HdrType)
 
 	zv->PktOutPtr = 0;
 	zv->Sending = TRUE;
+
+	add_sendbuf("%s: %s", __FUNCTION__, hdrtype_name(HdrType));
 }
 
 void ZStoHdr(PZVar zv, LONG Pos)
@@ -331,6 +430,8 @@ void ZSendCancel(PZVar zv)
 	zv->PktOutPtr = 0;
 	zv->Sending = TRUE;
 	zv->ZState = Z_Cancel;
+
+	add_sendbuf("%s: ", __FUNCTION__);
 }
 
 void ZSendInitHdr(PZVar zv)
@@ -361,6 +462,8 @@ void ZSendInitDat(PZVar zv)
 	zv->PktOutPtr = 0;
 	zv->Sending = TRUE;
 	zv->ZState = Z_SendInitDat;
+
+	add_sendbuf("%s: ", __FUNCTION__);
 }
 
 void ZSendFileHdr(PZVar zv)
@@ -432,6 +535,11 @@ void ZSendFileDat(PFileVar fv, PZVar zv)
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 				  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+
+	add_sendbuf("%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
+		__FUNCTION__,
+		zv->TxHdr[ZF0], zv->TxHdr[ZF1],zv->TxHdr[ZF2],
+		&(fv->FullName[fv->DirLen]), fv->FileSize);
 }
 
 void ZSendDataHdr(PZVar zv)
@@ -494,6 +602,8 @@ void ZSendDataDat(PFileVar fv, PZVar zv)
 		zv->ZState = Z_SendDataDat2;	/* wait response from receiver */
 	else
 		zv->ZState = Z_SendDataDat;
+
+	add_sendbuf("%s: ", __FUNCTION__);
 }
 
 void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
@@ -706,6 +816,8 @@ BOOL ZParseSInit(PZVar zv)
 
 void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 {
+	add_recvbuf("%s: RxType %s ", __FUNCTION__, hdrtype_name(zv->RxType));
+
 	switch (zv->RxType) {
 	case ZRQINIT:
 		if (zv->ZState == Z_RecvInit)
@@ -795,6 +907,7 @@ void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 		case Z_SendEOF:
 			zv->Pos = ZRclHdr(zv);
 			zv->LastPos = zv->Pos;
+			add_recvbuf(" pos=%ld", zv->Pos);
 			ZSendDataHdr(zv);
 			break;
 		}
