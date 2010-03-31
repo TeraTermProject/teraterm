@@ -346,7 +346,7 @@ void ZSbHdr(PZVar zv, BYTE HdrType)
 	zv->PktOutPtr = 0;
 	zv->Sending = TRUE;
 
-	add_sendbuf("%s: %s", __FUNCTION__, hdrtype_name(HdrType));
+	add_sendbuf("%s: %s ", __FUNCTION__, hdrtype_name(HdrType));
 }
 
 void ZStoHdr(PZVar zv, LONG Pos)
