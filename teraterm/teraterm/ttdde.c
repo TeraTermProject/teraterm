@@ -1096,7 +1096,9 @@ void RunMacro(PCHAR FName, BOOL Startup)
 
 	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
 	// 該当する"ttpmacro"をフラッシュする。
-	if (FName == NULL && Startup == FALSE && ConvH != 0) {
+	// (2010.4.2 yutaka)
+	if ((FName == NULL && Startup == FALSE) && ConvH != 0) {
+#if 0
 		HWND hwnd;
 		DWORD pid;
 
@@ -1104,12 +1106,17 @@ void RunMacro(PCHAR FName, BOOL Startup)
 		while (hwnd) {
 			GetWindowThreadProcessId(hwnd, &pid);
 			if (pid == pi.dwProcessId) {
-				BringWindowToTop(hwnd);
-				SetForegroundWindow(hwnd);
+				// TODO: 
 				break;
 			}
 			hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
 		}
+#else
+		ShowWindow(HWndDdeCli, SW_NORMAL);
+		SetForegroundWindow(HWndDdeCli);
+		BringWindowToTop(HWndDdeCli);
+		FlashWindow(HWndDdeCli, TRUE);
+#endif
 
 		return;
 	}
