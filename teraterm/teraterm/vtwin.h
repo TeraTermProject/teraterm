@@ -169,6 +169,7 @@ protected:
 	afx_msg void OnControlOpenTEK();
 	afx_msg void OnControlCloseTEK();
 	afx_msg void OnControlMacro();
+	afx_msg void OnShowMacroWindow();
 	afx_msg void OnWindowWindow();
 	afx_msg void OnHelpIndex();
 	afx_msg void OnHelpUsing();

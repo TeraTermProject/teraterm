@@ -1088,7 +1088,7 @@ void RunMacro(PCHAR FName, BOOL Startup)
 //		  In this case, the connection to the host will
 //		  made after the link to TT(P)MACRO is established.
 {
-	static PROCESS_INFORMATION pi;
+	PROCESS_INFORMATION pi;
 	int i;
 	char Cmnd[MAXPATHLEN+40];
 	STARTUPINFO si;
@@ -1096,18 +1096,18 @@ void RunMacro(PCHAR FName, BOOL Startup)
 
 	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
 	// 該当する"ttpmacro"をフラッシュする。
-	// (2010.4.2 yutaka)
+	// (2010.4.2 yutaka, maya)
 	if ((FName == NULL && Startup == FALSE) && ConvH != 0) {
-#if 0
+#if 1
 		HWND hwnd;
-		DWORD pid;
+		DWORD pid_macro, pid;
 
+		GetWindowThreadProcessId(HWndDdeCli, &pid_macro);
 		hwnd = GetTopWindow(NULL);
 		while (hwnd) {
 			GetWindowThreadProcessId(hwnd, &pid);
-			if (pid == pi.dwProcessId) {
-				// TODO: 
-				break;
+			if (pid == pid_macro) {
+				FlashWindow(hwnd, TRUE);
 			}
 			hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
 		}
