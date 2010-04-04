@@ -129,6 +129,8 @@ typedef TCharAttr *PCharAttr;
 #define WM_USER_DDECOMREADY  WM_USER+23
 #define WM_USER_DDEEND       WM_USER+24
 
+#define MY_FORCE_FOREGROUND_MESSAGE	WM_USER+31
+
   /* port type ID */
 #define IdTCPIP  1
 #define IdSerial 2

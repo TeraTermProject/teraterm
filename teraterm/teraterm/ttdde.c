@@ -1100,17 +1100,24 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	if ((FName == NULL && Startup == FALSE) && ConvH != 0) {
 		HWND hwnd;
 		DWORD pid_macro, pid;
+		DWORD targetid;
+		DWORD currentActiveThreadId;
+
+		currentActiveThreadId = GetWindowThreadProcessId(GetForegroundWindow(), &pid);
 
 		GetWindowThreadProcessId(HWndDdeCli, &pid_macro);
 		hwnd = GetTopWindow(NULL);
 		while (hwnd) {
-			GetWindowThreadProcessId(hwnd, &pid);
+			targetid = GetWindowThreadProcessId(hwnd, &pid);
 			if (pid == pid_macro) {
 				FlashWindow(hwnd, TRUE);
+
+				SendMessage(hwnd, MY_FORCE_FOREGROUND_MESSAGE, (WPARAM)hwnd, 0);
 			}
 			hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
 		}
 
+		// マクロウィンドウ本体
 		ShowWindow(HWndDdeCli, SW_NORMAL);
 		SetForegroundWindow(HWndDdeCli);
 		BringWindowToTop(HWndDdeCli);

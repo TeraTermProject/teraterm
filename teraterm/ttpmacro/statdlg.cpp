@@ -11,6 +11,7 @@
 #include "ttmlib.h"
 
 #include "statdlg.h"
+#include "tttypes.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -23,6 +24,7 @@ static char THIS_FILE[] = __FILE__;
 BEGIN_MESSAGE_MAP(CStatDlg, CDialog)
 	//{{AFX_MSG_MAP(CStatDlg)
 	ON_MESSAGE(WM_EXITSIZEMOVE, OnExitSizeMove)
+	ON_MESSAGE(MY_FORCE_FOREGROUND_MESSAGE, OnSetForceForegroundWindow)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -138,6 +140,28 @@ LONG CStatDlg::OnExitSizeMove(UINT wParam, LONG lParam)
 	}
 
 	return CDialog::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
+}
+
+LONG CStatDlg::OnSetForceForegroundWindow(UINT wParam, LONG lParam)
+{
+	DWORD pid;
+	DWORD targetid;
+	DWORD currentActiveThreadId;
+	HWND hwnd = (HWND)wParam;
+
+	targetid = GetWindowThreadProcessId(hwnd, &pid);
+	currentActiveThreadId = GetWindowThreadProcessId(::GetForegroundWindow(), &pid);
+
+	SetForegroundWindow();
+	if (targetid == currentActiveThreadId) {
+		BringWindowToTop();
+	} else {
+		AttachThreadInput(targetid, currentActiveThreadId, TRUE);
+		BringWindowToTop();
+		AttachThreadInput(targetid, currentActiveThreadId, FALSE);
+	}
+
+	return TRUE;
 }
 
 void CStatDlg::Relocation(BOOL is_init, int new_WW)
