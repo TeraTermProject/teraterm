@@ -1098,7 +1098,6 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	// 該当する"ttpmacro"をフラッシュする。
 	// (2010.4.2 yutaka, maya)
 	if ((FName == NULL && Startup == FALSE) && ConvH != 0) {
-#if 1
 		HWND hwnd;
 		DWORD pid_macro, pid;
 
@@ -1111,12 +1110,10 @@ void RunMacro(PCHAR FName, BOOL Startup)
 			}
 			hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
 		}
-#else
+
 		ShowWindow(HWndDdeCli, SW_NORMAL);
 		SetForegroundWindow(HWndDdeCli);
 		BringWindowToTop(HWndDdeCli);
-		FlashWindow(HWndDdeCli, TRUE);
-#endif
 
 		return;
 	}
