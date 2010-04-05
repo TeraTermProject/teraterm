@@ -520,8 +520,8 @@ BEGIN
         MENUITEM "&Open TEK",                   ID_CONTROL_OPENTEK
         MENUITEM "&Close TEK",                  ID_CONTROL_CLOSETEK
         MENUITEM SEPARATOR
-        MENUITEM "Show Macro &Window",          52030, GRAYED
         MENUITEM "&Macro",                      ID_CONTROL_MACRO
+        MENUITEM "Show Macro &Window",          ID_CONTROL_SHOW_MACRO
     END
     POPUP "&Help"
     BEGIN

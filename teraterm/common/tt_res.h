@@ -210,6 +210,7 @@
 #define ID_CONTROL_OPENTEK              50450
 #define ID_CONTROL_CLOSETEK             50460
 #define ID_CONTROL_MACRO                50470
+#define ID_CONTROL_SHOW_MACRO           50480
 #define ID_HELP_INDEX2                  50910
 #define ID_HELP_USING2                  50920
 #define ID_HELP_ABOUT                   50990
@@ -228,7 +229,6 @@
 #define ID_TEKHELP_ABOUT                51990
 #define ID_EDIT_EXTERNALSETUP           52005
 #define ID_FILE_TERATERMMENU            52006
-#define ID_SHOW_MACRO                   52030
 
 // Next default values for new objects
 // 

@@ -424,6 +424,7 @@ Menu command                        ID
 [Control] Open TEK                  50450
 [Control] Close TEK                 50460
 [Control] Macro                     50470
+[Control] Show Macro Window         50480
 [Window] Window                     50810
 [Help] Index                        50910
 [Help] About Tera Term              50990

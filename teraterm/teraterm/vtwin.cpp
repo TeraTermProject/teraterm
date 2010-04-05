@@ -203,7 +203,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_CONTROL_OPENTEK, OnControlOpenTEK)
 	ON_COMMAND(ID_CONTROL_CLOSETEK, OnControlCloseTEK)
 	ON_COMMAND(ID_CONTROL_MACRO, OnControlMacro)
-	ON_COMMAND(ID_SHOW_MACRO, OnShowMacroWindow)
+	ON_COMMAND(ID_CONTROL_SHOW_MACRO, OnShowMacroWindow)
 	ON_COMMAND(ID_WINDOW_WINDOW, OnWindowWindow)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
@@ -1210,9 +1210,9 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	GetMenuString(ControlMenu, ID_CONTROL_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_CONTROL_MACRO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND, ID_CONTROL_MACRO, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_SHOW_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SHOW_MACRO_WINDOW", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_SHOW_MACRO, MF_BYCOMMAND, ID_SHOW_MACRO, ts.UIMsg);
+	GetMenuString(ControlMenu, ID_CONTROL_SHOW_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
+	get_lang_msg("MENU_CONTROL_SHOW_MACRO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	ModifyMenu(ControlMenu, ID_CONTROL_SHOW_MACRO, MF_BYCOMMAND, ID_CONTROL_SHOW_MACRO, ts.UIMsg);
 
 	GetMenuString(*Menu, ID_HELPMENU, uimsg, sizeof(uimsg), MF_BYPOSITION);
 	get_lang_msg("MENU_HELP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
@@ -1373,11 +1373,11 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 
 		if ((ConvH!=0) || (FileVar!=NULL)) {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_GRAYED);
-			EnableMenuItem(ControlMenu,ID_SHOW_MACRO,MF_BYCOMMAND | MF_ENABLED);
+			EnableMenuItem(ControlMenu,ID_CONTROL_SHOW_MACRO,MF_BYCOMMAND | MF_ENABLED);
 		}
 		else {
 			EnableMenuItem(ControlMenu,ID_CONTROL_MACRO,MF_BYCOMMAND | MF_ENABLED);
-			EnableMenuItem(ControlMenu,ID_SHOW_MACRO,MF_BYCOMMAND | MF_GRAYED);
+			EnableMenuItem(ControlMenu,ID_CONTROL_SHOW_MACRO,MF_BYCOMMAND | MF_GRAYED);
 		}
 
 	}
