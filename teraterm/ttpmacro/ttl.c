@@ -588,7 +588,8 @@ WORD TTLCrc32()
 WORD TTLCrc32File()
 {
 	TStrVal Str;
-	WORD Err, CRC, result=0;
+	int result = 0;
+	WORD Err, CRC;
 	HANDLE fh = INVALID_HANDLE_VALUE, hMap = NULL;
 	LPBYTE lpBuf = NULL;
 	DWORD fsize;
@@ -601,21 +602,21 @@ WORD TTLCrc32File()
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
 
-	fh = CreateFile(Str,GENERIC_READ|GENERIC_WRITE,0,NULL,OPEN_EXISTING,
+	fh = CreateFile(Str,GENERIC_READ,0,NULL,OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,NULL); /* ファイルオープン */
 	if (fh == INVALID_HANDLE_VALUE) {
 		result = -1;
 		goto error;
 	}
 	/* ファイルマッピングオブジェクト作成 */
-	hMap = CreateFileMapping(fh,NULL,PAGE_READWRITE,0,0,NULL);
+	hMap = CreateFileMapping(fh,NULL,PAGE_READONLY,0,0,NULL);
 	if (hMap == NULL) {
 		result = -1;
 		goto error;
 	}
 
 	/* ファイルをマップし、先頭アドレスをlpBufに取得 */
-	lpBuf = (LPBYTE)MapViewOfFile(hMap,FILE_MAP_WRITE,0,0,0);
+	lpBuf = (LPBYTE)MapViewOfFile(hMap,FILE_MAP_READ,0,0,0);
 	if (lpBuf == NULL) {
 		result = -1;
 		goto error;
