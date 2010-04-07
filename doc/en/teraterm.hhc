@@ -1117,6 +1117,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="filestat">
+					<param name="Local" value="html\macro\command\filestat.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filestrseek">
 					<param name="Local" value="html\macro\command\filestrseek.html">
 					<param name="ImageNumber" value="11">

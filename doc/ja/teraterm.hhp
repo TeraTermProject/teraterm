@@ -200,6 +200,7 @@ HlpMacroCommandFilerename=html\macro\command\filerename.html
 HlpMacroCommandFilesearch=html\macro\command\filesearch.html
 HlpMacroCommandFileseek=html\macro\command\fileseek.html
 HlpMacroCommandFileseekback=html\macro\command\fileseekback.html
+HlpMacroCommandFilestat=html\macro\command\filestat.html
 HlpMacroCommandFilestrseek=html\macro\command\filestrseek.html
 HlpMacroCommandFilestrseek2=html\macro\command\filestrseek2.html
 HlpMacroCommandFilewrite=html\macro\command\filewrite.html

@@ -199,6 +199,7 @@
 #define HlpMacroCommandFilesearch       92031
 #define HlpMacroCommandFileseek         92032
 #define HlpMacroCommandFileseekback     92033
+#define HlpMacroCommandFilestat         92178
 #define HlpMacroCommandFilestrseek      92034
 #define HlpMacroCommandFilestrseek2     92035
 #define HlpMacroCommandFilewrite        92036

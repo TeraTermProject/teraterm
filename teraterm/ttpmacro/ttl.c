@@ -20,6 +20,7 @@
 #include "ttmenc.h"
 #include "tttypes.h"
 #include <shellapi.h>
+#include <sys/stat.h>
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -1356,6 +1357,56 @@ WORD TTLFileSeekBack()
 	/* move back to the marked pos */
 	if (i<NumFHandle)
 		_llseek(FH,FPointer[i],0);
+	return Err;
+}
+
+WORD TTLFileStat()
+{
+	WORD Err, SizeVarId, TimeVarId, DrvVarId;
+	TStrVal FName;
+	struct _stat st;
+	int ret;
+	int result = -1;
+
+	Err = 0;
+	GetStrVal(FName,&Err);
+	if ((Err==0) &&
+	    (strlen(FName)==0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	if (!GetAbsPath(FName,sizeof(FName))) {
+		goto end;
+	}
+
+	ret = _stat(FName, &st);
+	if (ret != 0) {
+		goto end;
+	}
+
+	if (CheckParameterGiven()) { 
+		GetIntVar(&SizeVarId,&Err);
+		if (Err!=0) return Err;
+		SetIntVal(SizeVarId, st.st_size);
+	}
+
+	if (CheckParameterGiven()) { 
+		GetIntVar(&TimeVarId,&Err);
+		if (Err!=0) return Err;
+		SetIntVal(TimeVarId, (int)st.st_mtime);
+	}
+
+	if (CheckParameterGiven()) { 
+		GetIntVar(&DrvVarId,&Err);
+		if (Err!=0) return Err;
+		SetIntVal(DrvVarId, st.st_dev);
+	}
+
+	result = 0;
+
+end:
+	SetResult(result);
+
 	return Err;
 }
 
@@ -3897,6 +3948,8 @@ int ExecCmnd()
 			Err = TTLFileSeek(); break;
 		case RsvFileSeekBack:
 			Err = TTLFileSeekBack(); break;
+		case RsvFileStat:
+			Err = TTLFileStat(); break;
 		case RsvFileStrSeek:
 			Err = TTLFileStrSeek(); break;
 		case RsvFileStrSeek2:

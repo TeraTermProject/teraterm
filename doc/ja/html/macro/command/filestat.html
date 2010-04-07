@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>filestat</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filestat</h1>
+
+<p>
+ファイルの統計情報を取得する。
+</p>
+
+<pre class="macro-syntax">
+filestat &lt;filename&gt; &lt;size&gt; [&lt;mtime&gt;] [&lt;drive&gt;] 
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;filename&gt; の統計情報を取得する。<br>
+ファイルサイズを &lt;size&gt; 、最終変更時間を &lt;mtime&gt; 、ドライブ番号を &lt;drive&gt; に格納する。<br>
+取得に失敗した場合は、result 変数に -1 が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+filestat 'test.exe' size time drive
+
+if result = -1 then
+	messagebox 'file open error' 'filestat'
+else
+	sprintf2 str 'File size=%d Time modified=%d Drive=%d' size time drive
+	messagebox str 'filestat'
+endif
+</pre>
+
+</body>
+</html>
