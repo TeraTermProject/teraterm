@@ -1363,7 +1363,7 @@ WORD TTLFileSeekBack()
 WORD TTLFileStat()
 {
 	WORD Err, SizeVarId, TimeVarId, DrvVarId;
-	TStrVal FName;
+	TStrVal FName, TimeStr, DrvStr;
 	struct _stat st;
 	int ret;
 	int result = -1;
@@ -1391,15 +1391,17 @@ WORD TTLFileStat()
 	}
 
 	if (CheckParameterGiven()) { 
-		GetIntVar(&TimeVarId,&Err);
+		GetStrVar(&TimeVarId,&Err);
 		if (Err!=0) return Err;
-		SetIntVal(TimeVarId, (int)st.st_mtime);
+		ctime_s(TimeStr, sizeof(TimeStr), &st.st_mtime);
+		SetStrVal(TimeVarId, TimeStr);
 	}
 
 	if (CheckParameterGiven()) { 
-		GetIntVar(&DrvVarId,&Err);
+		GetStrVar(&DrvVarId,&Err);
 		if (Err!=0) return Err;
-		SetIntVal(DrvVarId, st.st_dev);
+		_snprintf_s(DrvStr, sizeof(DrvStr), _TRUNCATE, "%c", st.st_dev + 'A');
+		SetStrVal(DrvVarId, DrvStr);
 	}
 
 	result = 0;

@@ -40,7 +40,7 @@ filestat 'test.exe' size time drive
 if result = -1 then
 	messagebox 'file open error' 'filestat'
 else
-	sprintf2 str 'File size=%d Time modified=%d Drive=%d' size time drive
+	sprintf2 str 'File size=%d Time modified=%s Drive=%s' size time drive
 	messagebox str 'filestat'
 endif
 </pre>
