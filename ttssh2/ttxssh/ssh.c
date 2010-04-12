@@ -4040,6 +4040,7 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 	static char buf[192]; // TODO: malloc()‚É‚·‚×‚«
 	int cipher;
 	int len, i;
+	char *c_str;
 
 	// ’ÊM’†‚É‚ÍŒÄ‚Î‚ê‚È‚¢‚Í‚¸‚¾‚ªA”O‚Ì‚½‚ßB(2006.6.26 maya)
 	if (pvar->socket != INVALID_SOCKET) {
@@ -4052,42 +4053,56 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 		cipher = pvar->settings.CipherOrder[i] - '0';
 		if (cipher == 0) // disabled line
 			break;
-		if (cipher == SSH2_CIPHER_AES128_CBC) {
-			strncat_s(buf, sizeof(buf), "aes128-cbc,", _TRUNCATE);
+		switch (cipher) {
+			case SSH2_CIPHER_3DES_CBC:
+				c_str = "3des-cbc,";
+				break;
+			case SSH2_CIPHER_3DES_CTR:
+				c_str = "3des-ctr,";
+				break;
+			case SSH2_CIPHER_BLOWFISH_CBC:
+				c_str = "blowfish-cbc,";
+				break;
+			case SSH2_CIPHER_BLOWFISH_CTR:
+				c_str = "blowfish-ctr,";
+				break;
+			case SSH2_CIPHER_AES128_CBC:
+				c_str = "aes128-cbc";
+				break;
+			case SSH2_CIPHER_AES192_CBC:
+				c_str = "aes192-cbc,";
+				break;
+			case SSH2_CIPHER_AES256_CBC:
+				c_str = "aes256-cbc,";
+				break;
+			case SSH2_CIPHER_AES128_CTR:
+				c_str = "aes128-ctr,";
+				break;
+			case SSH2_CIPHER_AES192_CTR:
+				c_str = "aes192-ctr,";
+				break;
+			case SSH2_CIPHER_AES256_CTR:
+				c_str = "aes256-ctr,";
+				break;
+			case SSH2_CIPHER_ARCFOUR:
+				c_str = "arcfour,";
+				break;
+			case SSH2_CIPHER_ARCFOUR128:
+				c_str = "arcfour128,";
+				break;
+			case SSH2_CIPHER_ARCFOUR256:
+				c_str = "arcfour256,";
+				break;
+			case SSH2_CIPHER_CAST128_CBC:
+				c_str = "cast128-cbc,";
+				break;
+			case SSH2_CIPHER_CAST128_CTR:
+				c_str = "cast128-ctr,";
+				break;
+			default:
+				continue;
 		}
-		else if (cipher == SSH2_CIPHER_3DES_CBC) {
-			strncat_s(buf, sizeof(buf), "3des-cbc,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_AES192_CBC) {
-			strncat_s(buf, sizeof(buf), "aes192-cbc,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_AES256_CBC) {
-			strncat_s(buf, sizeof(buf), "aes256-cbc,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_BLOWFISH_CBC) {
-			strncat_s(buf, sizeof(buf), "blowfish-cbc,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_AES128_CTR) {
-			strncat_s(buf, sizeof(buf), "aes128-ctr,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_AES192_CTR) {
-			strncat_s(buf, sizeof(buf), "aes192-ctr,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_AES256_CTR) {
-			strncat_s(buf, sizeof(buf), "aes256-ctr,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_ARCFOUR) {
-			strncat_s(buf, sizeof(buf), "arcfour,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_ARCFOUR128) {
-			strncat_s(buf, sizeof(buf), "arcfour128,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_ARCFOUR256) {
-			strncat_s(buf, sizeof(buf), "arcfour256,", _TRUNCATE);
-		}
-		else if (cipher == SSH2_CIPHER_CAST128_CBC) {
-			strncat_s(buf, sizeof(buf), "cast128-cbc,", _TRUNCATE);
-		}
+		strncat_s(buf, sizeof(buf), c_str, _TRUNCATE);
 	}
 	len = strlen(buf);
 	buf[len - 1] = '\0';  // get rid of comma
@@ -4229,6 +4244,12 @@ static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_pr
 		cipher = SSH2_CIPHER_ARCFOUR;
 	} else if (strcmp(str_cipher, "cast128-cbc") == 0) {
 		cipher = SSH2_CIPHER_CAST128_CBC;
+	} else if (strcmp(str_cipher, "3des-ctr") == 0) {
+		cipher = SSH2_CIPHER_3DES_CTR;
+	} else if (strcmp(str_cipher, "blowfish-ctr") == 0) {
+		cipher = SSH2_CIPHER_BLOWFISH_CTR;
+	} else if (strcmp(str_cipher, "cast128-ctr") == 0) {
+		cipher = SSH2_CIPHER_CAST128_CTR;
 	}
 
 	return (cipher);
@@ -6539,6 +6560,9 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	                       | 1 << SSH2_CIPHER_ARCFOUR128
 	                       | 1 << SSH2_CIPHER_ARCFOUR256
 	                       | 1 << SSH2_CIPHER_CAST128_CBC
+	                       | 1 << SSH2_CIPHER_3DES_CTR
+	                       | 1 << SSH2_CIPHER_BLOWFISH_CTR
+	                       | 1 << SSH2_CIPHER_CAST128_CTR
 	);
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);

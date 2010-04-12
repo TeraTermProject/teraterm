@@ -312,7 +312,7 @@ error:
 
 
 // for SSH2(yutaka)
-static void c3DES_CBC_encrypt(PTInstVar pvar, unsigned char FAR * buf,
+static void c3DES_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
                               int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
@@ -359,7 +359,7 @@ error:
 	free(newbuf);
 }
 
-static void c3DES_CBC_decrypt(PTInstVar pvar, unsigned char FAR * buf,
+static void c3DES_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
                               int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
@@ -864,7 +864,10 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_ARCFOUR)
 		            | (1 << SSH2_CIPHER_ARCFOUR128)
 		            | (1 << SSH2_CIPHER_ARCFOUR256)
-		            | (1 << SSH2_CIPHER_CAST128_CBC);
+		            | (1 << SSH2_CIPHER_CAST128_CBC)
+		            | (1 << SSH2_CIPHER_3DES_CTR)
+		            | (1 << SSH2_CIPHER_BLOWFISH_CTR)
+		            | (1 << SSH2_CIPHER_CAST128_CTR);
 	}
 
 	sender_ciphers &= cipher_mask;
@@ -1329,6 +1332,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		switch (pvar->crypt_state.sender_cipher) {
 			// for SSH2(yutaka)
 		case SSH2_CIPHER_3DES_CBC:
+		case SSH2_CIPHER_3DES_CTR:
 			{
 				struct Enc *enc;
 
@@ -1344,7 +1348,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				//debug_print(10, enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher));
 				//debug_print(11, enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher));
 
-				pvar->crypt_state.encrypt = c3DES_CBC_encrypt;
+				pvar->crypt_state.encrypt = c3DES_encrypt2;
 				break;
 			}
 
@@ -1375,6 +1379,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			}
 
 		case SSH2_CIPHER_BLOWFISH_CBC:
+		case SSH2_CIPHER_BLOWFISH_CTR:
 			{
 				struct Enc *enc;
 
@@ -1416,6 +1421,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			}
 
 		case SSH2_CIPHER_CAST128_CBC:
+		case SSH2_CIPHER_CAST128_CTR:
 			{
 				struct Enc *enc;
 
@@ -1471,6 +1477,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		switch (pvar->crypt_state.receiver_cipher) {
 			// for SSH2(yutaka)
 		case SSH2_CIPHER_3DES_CBC:
+		case SSH2_CIPHER_3DES_CTR:
 			{
 				struct Enc *enc;
 
@@ -1486,7 +1493,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				//debug_print(12, enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher));
 				//debug_print(13, enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher));
 
-				pvar->crypt_state.decrypt = c3DES_CBC_decrypt;
+				pvar->crypt_state.decrypt = c3DES_decrypt2;
 				break;
 			}
 
@@ -1517,6 +1524,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			}
 
 		case SSH2_CIPHER_BLOWFISH_CBC:
+		case SSH2_CIPHER_BLOWFISH_CTR:
 			{
 				struct Enc *enc;
 
@@ -1559,6 +1567,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			}
 
 		case SSH2_CIPHER_CAST128_CBC:
+		case SSH2_CIPHER_CAST128_CTR:
 			{
 				struct Enc *enc;
 
@@ -1677,6 +1686,12 @@ static char FAR *get_cipher_name(int cipher)
 		return "Arcfour256";
 	case SSH2_CIPHER_CAST128_CBC:
 		return "CAST-128-CBC";
+	case SSH2_CIPHER_3DES_CTR:
+		return "3DES-CTR";
+	case SSH2_CIPHER_BLOWFISH_CTR:
+		return "Blowfish-CTR";
+	case SSH2_CIPHER_CAST128_CTR:
+		return "CAST-128-CTR";
 
 	default:
 		return "Unknown";

@@ -47,6 +47,9 @@ See LICENSE.TXT for the license.
 
 // from OpenSSH
 extern const EVP_CIPHER *evp_aes_128_ctr(void);
+extern const EVP_CIPHER *evp_des3_ctr(void);
+extern const EVP_CIPHER *evp_bf_ctr(void);
+extern const EVP_CIPHER *evp_cast5_ctr(void);
 
 // yutaka
 #define SSH2_USE
@@ -87,9 +90,10 @@ typedef enum {
 	SSH2_CIPHER_AES192_CTR, SSH2_CIPHER_AES256_CTR,
 	SSH2_CIPHER_ARCFOUR, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR256,
 	SSH2_CIPHER_CAST128_CBC,
+	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
 } SSHCipher;
 
-#define SSH_CIPHER_MAX SSH2_CIPHER_CAST128_CBC
+#define SSH_CIPHER_MAX SSH2_CIPHER_CAST128_CTR
 
 typedef enum {
 	SSH_AUTH_NONE, SSH_AUTH_RHOSTS, SSH_AUTH_RSA, SSH_AUTH_PASSWORD,
@@ -315,6 +319,9 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 	{SSH2_CIPHER_ARCFOUR128,   "arcfour128",    8, 16, 1536, EVP_rc4},
 	{SSH2_CIPHER_ARCFOUR256,   "arcfour256",    8, 32, 1536, EVP_rc4},
 	{SSH2_CIPHER_CAST128_CBC,  "cast128-cbc",   8, 16, 0, EVP_cast5_cbc},
+	{SSH2_CIPHER_3DES_CTR,     "3des-ctr",      8, 24, 0, evp_des3_ctr},
+	{SSH2_CIPHER_BLOWFISH_CTR, "blowfish-ctr",  8, 16, 0, evp_bf_ctr},
+	{SSH2_CIPHER_CAST128_CTR,  "cast128-ctr",   8, 16, 0, evp_cast5_ctr},
 	{SSH_CIPHER_NONE, NULL, 0, 0, 0, NULL},
 };
 
