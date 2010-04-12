@@ -1367,6 +1367,7 @@ WORD TTLFileStat()
 	struct _stat st;
 	int ret;
 	int result = -1;
+	struct tm *tmp;
 
 	Err = 0;
 	GetStrVal(FName,&Err);
@@ -1393,7 +1394,8 @@ WORD TTLFileStat()
 	if (CheckParameterGiven()) { 
 		GetStrVar(&TimeVarId,&Err);
 		if (Err!=0) return Err;
-		ctime_s(TimeStr, sizeof(TimeStr), &st.st_mtime);
+		tmp = localtime(&st.st_mtime);
+		strftime(TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", tmp);
 		SetStrVal(TimeVarId, TimeStr);
 	}
 
