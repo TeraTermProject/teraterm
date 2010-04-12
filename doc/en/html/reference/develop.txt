@@ -5,10 +5,9 @@
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
   Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 95, 98 and Me.
 - Installer
-  Inno Setup 5.3.7 ANSI (http://www.jrsoftware.org/isinfo.php)
-  Inno Setup Preprocessor 5.3.6 (from ispack-5.3.7)
-  ISTool 5.3.0.1 (from ispack-5.3.7)
-  Japanese-5-5.1.11.isl (http://www.jrsoftware.org/files/istrans/)
+  Inno Setup 5.3.9 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor 5.3.9 (from ispack-5.3.9)
+  ISTool 5.3.0.1 (from ispack-5.3.9)
 - others
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
   ActivePerl 5.8 later version
@@ -203,7 +202,6 @@ Example: adding a TTSSH menu under File menu
       http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
     Inno Setup
       http://www.jrsoftware.org/isdl.php
-      http://www.jrsoftware.org/files/istrans/
     Oniguruma
       http://www.geocities.jp/kosako3/oniguruma/
     OpenSSL
