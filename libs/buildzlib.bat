@@ -18,8 +18,10 @@ if exist zlibd.lib goto build_release
 nmake -f win32\Makefile.msc.debug clean
 nmake -f win32\Makefile.msc.debug
 move zlibd.lib examples\
+move zlib.pdb examples\
 nmake -f win32\Makefile.msc.release clean
 move examples\zlibd.lib .\
+move examples\zlib.pdb .\
 
 :build_release
 nmake -f win32\Makefile.msc.release
