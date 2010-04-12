@@ -295,10 +295,10 @@ void YInit
 
 void YCancel(PFileVar fv, PYVar yv, PComVar cv)
 {
-	BYTE b;
+	// five cancels & five backspaces per spec
+	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
-	b = CAN;
-	YWrite(fv,yv,cv,&b,1);
+	YWrite(fv,yv,cv, (PCHAR)&cancel, sizeof(cancel));
 	yv->YMode = 0; // quit
 }
 
@@ -602,6 +602,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			}
 			if (! SendFlag) i = YRead1Byte(fv,yv,cv,&b);
 		} while (!SendFlag);
+
 		// reset timeout timer
 		FTSetTimeOut(fv,TimeOutVeryLong);
 
@@ -646,6 +647,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				yv->PktOut[yv->DataLen+4] = LOBYTE(Check);
 			}
 			yv->PktBufCount = 3 + yv->DataLen + yv->CheckLen;
+			//fv->Success = TRUE;
 
 		} 
 		else if (yv->PktNumSent==yv->PktNum) /* make a new packet */

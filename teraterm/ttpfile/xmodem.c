@@ -227,10 +227,10 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 
 void XCancel(PFileVar fv, PXVar xv, PComVar cv)
 {
-	BYTE b;
+	// five cancels & five backspaces per spec
+	BYTE cancel[] = { CAN, CAN, CAN, CAN, CAN, BS, BS, BS, BS, BS };
 
-	b = CAN;
-	XWrite(fv, xv, cv, &b, 1);
+	XWrite(fv,xv,cv, (PCHAR)&cancel, sizeof(cancel));
 	xv->XMode = 0;				// quit
 }
 

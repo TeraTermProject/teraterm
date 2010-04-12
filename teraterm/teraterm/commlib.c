@@ -570,7 +570,8 @@ void CommThread(void *arg)
 			WaitForSingleObject(REnd,INFINITE);
 		}
 		else {
-			if (! cv->Ready) {
+			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
+			if (! cv->Ready || ERROR_OPERATION_ABORTED == DErr) {
 				_endthread();
 			}
 			ClearCommError(cv->ComID,&DErr,NULL);

@@ -1127,8 +1127,10 @@ BOOL FAR PASCAL ProtoCancel
 			KmtCancel(fv,(PKmtVar)pv,cv);
 			break;
 		case PROTO_XM:
-			if (((PXVar)pv)->XMode==IdXReceive)
-				XCancel(fv,(PXVar)pv,cv);
+			XCancel(fv,(PXVar)pv,cv);
+			break;
+		case PROTO_YM:
+			YCancel(fv, (PYVar)pv,cv);
 			break;
 		case PROTO_ZM:
 			ZCancel((PZVar)pv);
