@@ -119,18 +119,6 @@ ssh_aes_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	return (1);
 }
 
-void
-ssh_aes_ctr_iv(EVP_CIPHER_CTX *evp, int doset, unsigned char * iv, unsigned int len)
-{
-	struct ssh_aes_ctr_ctx *c;
-
-	if ((c = EVP_CIPHER_CTX_get_app_data(evp)) != NULL)
-		if(doset)
-			memcpy(c->aes_counter, iv, len);
-		else
-			memcpy(iv, c->aes_counter, len);
-}
-
 const EVP_CIPHER *
 evp_aes_128_ctr(void)
 {
