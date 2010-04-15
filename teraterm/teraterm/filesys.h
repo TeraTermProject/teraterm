@@ -56,8 +56,6 @@ void FileSend();
 void FLogChangeButton(BOOL Pause);
 void FLogRefreshNum();
 void FileTransEnd(WORD OpId);
-int FSOut1(BYTE b);
-int FSEcho1(BYTE b);
 
 void ProtoEnd();
 int ProtoDlgParse();

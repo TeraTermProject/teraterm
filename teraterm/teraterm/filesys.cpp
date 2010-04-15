@@ -876,8 +876,6 @@ void FileTransEnd(WORD OpId)
 	EndDdeCmnd(0);
 }
 
-// vtwin.cpp からコールしたいので、extern "C"を付ける。(2004.11.3 yutaka)
-extern "C" {
 int FSOut1(BYTE b)
 {
 	if (ts.TransBin > 0)
@@ -886,7 +884,7 @@ int FSOut1(BYTE b)
 		return CommTextOut(&cv,(PCHAR)&b,1);
 	else
 		return 1;
-	}
+}
 
 int FSEcho1(BYTE b)
 {
@@ -894,7 +892,6 @@ int FSEcho1(BYTE b)
 		return CommBinaryEcho(&cv,(PCHAR)&b,1);
 	else
 		return CommTextEcho(&cv,(PCHAR)&b,1);
-	}
 }
 
 extern "C" {
