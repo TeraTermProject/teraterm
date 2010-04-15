@@ -1827,9 +1827,9 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 
 				// console‚Ö‘—M
 				while (*ptr) {
-					FSOut1(*ptr);
+					CommTextOut(&cv, ptr, 1);
 					if (ts.LocalEcho > 0) {
-						FSEcho1(*ptr);
+						CommTextEcho(&cv, ptr, 1);
 					}
 					ptr++;
 				}
