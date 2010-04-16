@@ -482,7 +482,7 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 	}
 
 	strncpy_s(request->bind_address, sizeof(request->bind_address),
-	          "127.0.0.1", _TRUNCATE);
+	          "localhost", _TRUNCATE);
 	i=0;
 	switch (argc) {
 		case 4:
@@ -552,7 +552,7 @@ static void FWDUI_save_settings(PTInstVar pvar)
 
 			switch (spec->type) {
 			case FWD_LOCAL_TO_REMOTE:
-				if (strcmp(spec->bind_address,"127.0.0.1") == 0) {
+				if (strcmp(spec->bind_address,"localhost") == 0) {
 					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s",
 					            spec->from_port_name, spec->to_host,
 					            spec->to_port_name);
@@ -565,7 +565,7 @@ static void FWDUI_save_settings(PTInstVar pvar)
 				}
 				break;
 			case FWD_REMOTE_TO_LOCAL:
-				if (strcmp(spec->bind_address,"127.0.0.1") == 0) {
+				if (strcmp(spec->bind_address,"localhost") == 0) {
 					_snprintf_s(str, str_remaining, _TRUNCATE, "R%s:%s:%s",
 					            spec->from_port_name, spec->to_host,
 					            spec->to_port_name);
@@ -961,7 +961,7 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec FAR * spec,
 	if (strcmp(spec->to_host, "localhost") != 0) {
 		SetDlgItemText(dlg, to_host_item, spec->to_host);
 	}
-	if (strcmp(spec->bind_address, "127.0.0.1") != 0) {
+	if (strcmp(spec->bind_address, "localhost") != 0) {
 		SetDlgItemText(dlg, listen_address_item, spec->bind_address);
 	}
 
@@ -1051,7 +1051,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
 	grab_control_text(dlg, type, IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR,
 	                  new_spec.bind_address, sizeof(new_spec.bind_address));
 	if (new_spec.bind_address[0] == 0) {
-		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "127.0.0.1", _TRUNCATE);
+		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "localhost", _TRUNCATE);
 	}
 	else if (strcmp(new_spec.bind_address, "*") == 0 ) {
 		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "0.0.0.0", _TRUNCATE);
