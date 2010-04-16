@@ -549,8 +549,8 @@ DLG_FWDSETUP_XAPP=Display remote &X applications on local X server
 
 MSG_FWD_REMOTE_XSERVER=remote X server
 MSG_FWD_REMOTE_XSCREEN=X server (screen %d)
-MSG_FWD_REMOTE=Remote %s:%s to local "%s" port %s
-MSG_FWD_LOCAL=Local %s:%s to remote "%s" port %s
+MSG_FWD_REMOTE=Remote "%s" port %s to local "%s" port %s
+MSG_FWD_LOCAL=Local "%s" port %s to remote "%s" port %s
 MSG_FWD_X=Remote X applications to local X server
 
 ; dlg host

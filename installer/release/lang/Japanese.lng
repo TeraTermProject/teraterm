@@ -549,8 +549,8 @@ DLG_FWDSETUP_XAPP=リモートの(&X)アプリケーションをローカルのXサーバに表示する
 
 MSG_FWD_REMOTE_XSERVER=リモートX サーバ
 MSG_FWD_REMOTE_XSCREEN=X サーバ (画面 %d)
-MSG_FWD_REMOTE=リモートの %s:%s からローカル側ホスト "%s" のポート %s
-MSG_FWD_LOCAL=ローカルの %s:%s から リモート側ホスト "%s" のポート %s
+MSG_FWD_REMOTE=リモートの "%s" のポート %s からローカル側ホスト "%s" のポート %s
+MSG_FWD_LOCAL=ローカルの "%s" のポート %s から リモート側ホスト "%s" のポート %s
 MSG_FWD_X=リモートのXアプリケーションからローカルのXサーバ
 
 ; dlg host

@@ -440,6 +440,8 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 	char *tmp, *ch;
 	int len, i, argc = 0, bracketed = 0;
 	char *argv[4];
+	char hostname[256];
+	int start;
 
 	if ((tmp = strchr(str, ';')) != NULL) {
 		len = tmp - str;
@@ -491,8 +493,18 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 				          "0.0.0.0", _TRUNCATE);
 			}
 			else {
+				// IPv6 アドレスの "[", "]" があれば削除
+				start = 0;
+				strncpy_s(hostname, sizeof(hostname), argv[i], _TRUNCATE);
+				if (strlen(hostname) > 0 &&
+				    hostname[strlen(hostname)-1] == ']') {
+					hostname[strlen(hostname)-1] = '\0';
+				}
+				if (hostname[0] == '[') {
+					start = 1;
+				}
 				strncpy_s(request->bind_address, sizeof(request->bind_address),
-				          argv[i], _TRUNCATE);
+				          hostname + start, _TRUNCATE);
 			}
 			i++;
 			// don't break here
@@ -505,8 +517,18 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 			}
 			i++;
 
+			// IPv6 アドレスの "[", "]" があれば削除
+			start = 0;
+			strncpy_s(hostname, sizeof(hostname), argv[i], _TRUNCATE);
+			if (strlen(hostname) > 0 &&
+			    hostname[strlen(hostname)-1] == ']') {
+				hostname[strlen(hostname)-1] = '\0';
+			}
+			if (hostname[0] == '[') {
+				start = 1;
+			}
 			strncpy_s(request->to_host, sizeof(request->to_host),
-			          argv[i], _TRUNCATE);
+			          hostname + start, _TRUNCATE);
 			i++;
 
 			request->to_port = parse_port(argv[i], request->to_port_name,
@@ -532,6 +554,7 @@ static void FWDUI_save_settings(PTInstVar pvar)
 	int i;
 	char FAR *str = pvar->settings.DefaultForwarding;
 	int str_remaining = sizeof(pvar->settings.DefaultForwarding) - 1;
+	char format[20];
 
 	FWD_get_request_specs(pvar, requests, num_specs);
 
@@ -550,31 +573,74 @@ static void FWDUI_save_settings(PTInstVar pvar)
 			FWDRequestSpec FAR *spec = requests + i;
 			int chars;
 
+			// IPv6 アドレスなら "[", "]" を付加して文字列化
 			switch (spec->type) {
 			case FWD_LOCAL_TO_REMOTE:
 				if (strcmp(spec->bind_address,"localhost") == 0) {
-					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s",
+					if (strchr(spec->to_host, ':') == NULL) {
+						strncpy_s(format, sizeof(format), "L%s:%s:%s", _TRUNCATE);
+					}
+					else {
+						strncpy_s(format, sizeof(format), "L%s:[%s]:%s", _TRUNCATE);
+					}
+					_snprintf_s(str, str_remaining, _TRUNCATE, format,
 					            spec->from_port_name, spec->to_host,
 					            spec->to_port_name);
 				}
 				else {
-					_snprintf_s(str, str_remaining, _TRUNCATE, "L%s:%s:%s:%s",
-					            spec->bind_address,
-					            spec->from_port_name, spec->to_host,
-					            spec->to_port_name);
+					if (strchr(spec->bind_address, ':') == NULL) {
+						if (strchr(spec->to_host, ':') == NULL) {
+							strncpy_s(format, sizeof(format), "L%s:%s:%s:%s", _TRUNCATE);
+						}
+						else {
+							strncpy_s(format, sizeof(format), "L%s:%s:[%s]:%s", _TRUNCATE);
+						}
+					}
+					else {
+						if (strchr(spec->to_host, ':') == NULL) {
+							strncpy_s(format, sizeof(format), "L[%s]:%s:%s:%s", _TRUNCATE);
+						}
+						else {
+							strncpy_s(format, sizeof(format), "L[%s]:%s:[%s]:%s", _TRUNCATE);
+						}
+					}
+					_snprintf_s(str, str_remaining, _TRUNCATE, format,
+					            spec->bind_address, spec->from_port_name,
+					            spec->to_host, spec->to_port_name);
 				}
 				break;
 			case FWD_REMOTE_TO_LOCAL:
 				if (strcmp(spec->bind_address,"localhost") == 0) {
-					_snprintf_s(str, str_remaining, _TRUNCATE, "R%s:%s:%s",
+					if (strchr(spec->to_host, ':') == NULL) {
+						strncpy_s(format, sizeof(format), "R%s:%s:%s", _TRUNCATE);
+					}
+					else {
+						strncpy_s(format, sizeof(format), "R%s:[%s]:%s", _TRUNCATE);
+					}
+					_snprintf_s(str, str_remaining, _TRUNCATE, format,
 					            spec->from_port_name, spec->to_host,
 					            spec->to_port_name);
 				}
 				else {
-					_snprintf_s(str, str_remaining, _TRUNCATE, "R%s:%s:%s:%s",
-					            spec->bind_address,
-					            spec->from_port_name, spec->to_host,
-					            spec->to_port_name);
+					if (strchr(spec->bind_address, ':') == NULL) {
+						if (strchr(spec->to_host, ':') == NULL) {
+							strncpy_s(format, sizeof(format), "R%s:%s:%s:%s", _TRUNCATE);
+						}
+						else {
+							strncpy_s(format, sizeof(format), "R%s:%s:[%s]:%s", _TRUNCATE);
+						}
+					}
+					else {
+						if (strchr(spec->to_host, ':') == NULL) {
+							strncpy_s(format, sizeof(format), "R[%s]:%s:%s:%s", _TRUNCATE);
+						}
+						else {
+							strncpy_s(format, sizeof(format), "R[%s]:%s:[%s]:%s", _TRUNCATE);
+						}
+					}
+					_snprintf_s(str, str_remaining, _TRUNCATE, format,
+					            spec->bind_address, spec->from_port_name,
+					            spec->to_host, spec->to_port_name);
 				}
 				break;
 			case FWD_REMOTE_X11_TO_LOCAL:
@@ -677,14 +743,14 @@ static void get_spec_string(FWDRequestSpec FAR * spec, char FAR * buf,
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:
 		UTIL_get_lang_msg("MSG_FWD_REMOTE", pvar,
-		                  "Remote %s:%s to local \"%s\" port %s");
+		                  "Remote \"%s\" port %s to local \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
 		            spec->bind_address, verbose_from_port,
 		            spec->to_host, verbose_to_port);
 		break;
 	case FWD_LOCAL_TO_REMOTE:
 		UTIL_get_lang_msg("MSG_FWD_LOCAL", pvar,
-		                  "Local %s:%s to remote \"%s\" port %s");
+		                  "Local \"%s\" port %s to remote \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
 		            spec->bind_address, verbose_from_port,
 		            spec->to_host,verbose_to_port);
@@ -1056,10 +1122,28 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
 	else if (strcmp(new_spec.bind_address, "*") == 0 ) {
 		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "0.0.0.0", _TRUNCATE);
 	}
+	else {
+		// IPv6 アドレスの "[", "]" があれば削除
+		if (new_spec.bind_address[strlen(new_spec.bind_address)-1] == ']') {
+			new_spec.bind_address[strlen(new_spec.bind_address)-1] = '\0';
+		}
+		if (new_spec.bind_address[0] == '[') {
+			memmove(new_spec.bind_address, new_spec.bind_address + 1, strlen(new_spec.bind_address)+1);
+		}
+	}
 	grab_control_text(dlg, type, IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST,
 	                  new_spec.to_host, sizeof(new_spec.to_host));
 	if (new_spec.to_host[0] == 0) {
 		strncpy_s(new_spec.to_host, sizeof(new_spec.to_host), "localhost", _TRUNCATE);
+	}
+	else {
+		// IPv6 アドレスの "[", "]" があれば削除
+		if (new_spec.to_host[strlen(new_spec.to_host)-1] == ']') {
+			new_spec.to_host[strlen(new_spec.to_host)-1] = '\0';
+		}
+		if (new_spec.to_host[0] == '[') {
+			memmove(new_spec.to_host, new_spec.to_host + 1, strlen(new_spec.to_host)+1);
+		}
 	}
 	grab_control_text(dlg, type, IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT,
 	                  new_spec.to_port_name,
