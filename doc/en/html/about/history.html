@@ -53,7 +53,7 @@
       <li>When using alternate screen buffer, saving and restoring cursor position do not work correctly.</li>
       <!--li>代替スクリーンバッファ対応のカーソル位置保存制御シーケンスで、代替画面バッファへの切り替え、および画面のクリアが行われていたのを修正した。</li-->
       <li>If ClearOnResize setting is on, DECCOLM (Change Column Mode) control sequence does not clear screen.</li>
-      <!--li>キーボード設定ファイルで Alt+キー に機能を割り当てた時、余計な文字列が追加で出力されるのを修正した。</li-->
+      <li>When a user assigns a function to the Alt key in the KEYBOARD.CNF file, the unnecessary string print.</li>
       <li>VPR control sequence does not work correctly.</li>
       <li>The crc32file macro command does not work correctly for handling the file opening error. And also, the command supports the read-only file.</li>
       <li>Fixed a problem where TeraTerm consumes 100% CPU if a USB serial port is disconnected. Special thanks to Z. Vickery.</li>
@@ -1472,9 +1472,9 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li> Port forwarding.<!--ポート転送でリッスンするアドレスを指定できるようにした。-->
+      <li>Specifying the listen address in the port forwarding.
         <ul>
-          <!--li>ポート転送で他のホストからの接続を受け入れるかどうかの設定を削除した。</li-->
+          <li>removed the configuration that accepts the connection from other hosts.</li>
           <li>changed <a href="../commandline/ttssh.html#ssh-l">command line options</a>.</li>
           <li>changed <a href="../menu/setup-sshforward.html">SSH Port Forwarding dialog</a>.</li>
         </ul></li>
