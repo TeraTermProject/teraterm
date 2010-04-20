@@ -1010,7 +1010,8 @@ static BOOL can_server_listen_using(FWDRequestSpec FAR * listener,
 	    && listener->to_port == spec->to_port
 	    && (spec->type == FWD_REMOTE_X11_TO_LOCAL
 	     || strcmp(listener->to_host, spec->to_host) == 0)
-	    && strcmp(listener->bind_address, spec->bind_address);
+	    && (spec->type == FWD_REMOTE_X11_TO_LOCAL
+	     || strcmp(listener->bind_address, spec->bind_address) == 0);
 }
 
 BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec FAR * spec)
