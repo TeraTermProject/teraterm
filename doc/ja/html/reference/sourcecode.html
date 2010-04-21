@@ -29,6 +29,7 @@
   <li><a href="#macro">マクロ言語の設計と実装</a></li>
   <li><a href="#caret">キャレット制御</a></li>
   <li><a href="#serial">シリアルポート</a></li>
+  <li><a href="#xyzmodem">バイナリ転送プロトコル</a></li>
 </ol>
 
 <hr width=80% align=center>
@@ -1201,6 +1202,115 @@ cleanup:
 	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
 }
 </pre>
+
+
+<hr>
+
+
+<h2><a name="xyzmodem">バイナリ転送プロトコル</a></h2>
+  <h3>概要</h3>
+パソコン通信時代に、バイナリファイルを転送するためのプロトコルが多数開発され、Tera Termではいくつかの転送方式をサポートしています。これらのプロトコルは、今となってはレガシー仕様であり、ほとんど利用されることはありません。現在では、ルータなどの組み込み機器において、ファームウェアのアップロードに使われるぐらいです。
+本節では、XMODEM/YMODEM/ZMODEMに関して説明します。<br>
+
+  <h3>階層構造</h3>
+バイナリ転送プロトコルを容易に追加できるようにするため、各モジュールは階層構造になっています。
+
+<pre class=code>
+      +-------------------------------------------------------+
+      |ttermpro.exe (filesys.cpp)                             |
+      +-------------------------------------------------------+
+      |ttpfile.dll (ttfile.c)                                 |
+      +-------+--------+--------+--------+--------+-----------+
+      |Kermit | XMODEM | YMODEM | ZMODEM | B-Plus | Quick-VAN |
+      +-------+--------+--------+--------+--------+-----------+
+</pre>
+
+たとえば、XMODEMの送信メニューを選択した場合、処理のフローは以下のようになります。
+
+<pre class=code>
+filesys.cpp: OnFileXSend() -> XMODEMStart() -> OpenProtoDlg() ->
+ttfile.c: ProtoInit() ->
+xmodem.c: XInit()
+</pre>
+
+ZMODEMの受信メニューの処理に関しては、以下のとおりです。
+
+<pre class=code>
+filesys.cpp: OnFileZRcv() -> ZMODEMStart() -> OpenProtoDlg() ->
+ttfile.c: ProtoInit() ->
+zmodem.c: ZInit()
+</pre>
+
+  <h3>エントリポイント</h3>
+いかなるプロトコルを実装しようとも、ttpfile.dllにおける関数インターフェイス（エントリポイント）が用意されていれば、容易に新規プロトコルとして組み込むことができるようになっています。エントリポイントは、ProtoInit()・ProtoParse()・ProtoTimeOutProc()・ProtoCancel()から呼び出されます。<br>
+XMODEMのエントリポイントについて、以下に示します。
+
+<table border=1 align=center>
+<tr>
+  <th>関数</th>
+  <th>意味</th>
+</tr>
+
+<tr>
+  <td>XInit</td>
+  <td>初期化</td>
+</tr>
+
+<tr>
+  <td>XSendPacket</td>
+  <td>ファイル送信</td>
+</tr>
+
+<tr>
+  <td>YReadPacket</td>
+  <td>ファイル受信</td>
+</tr>
+
+<tr>
+  <td>XTimeOutProc</td>
+  <td>タイムアウト処理</td>
+</tr>
+
+<tr>
+  <td>XCancel</td>
+  <td>キャンセル処理</td>
+</tr>
+</table>
+<br>
+
+ZMODEMのエントリポイントについて、以下に示します。
+
+<table border=1 align=center>
+<tr>
+  <th>関数</th>
+  <th>意味</th>
+</tr>
+
+<tr>
+  <td>ZInit</td>
+  <td>初期化</td>
+</tr>
+
+<tr>
+  <td>ZParse</td>
+  <td>ファイル送信</td>
+</tr>
+
+<tr>
+  <td>ZParse</td>
+  <td>ファイル受信</td>
+</tr>
+
+<tr>
+  <td>ZTimeOutProc</td>
+  <td>タイムアウト処理</td>
+</tr>
+
+<tr>
+  <td>ZCancel</td>
+  <td>キャンセル処理</td>
+</tr>
+</table>
 
 
 
