@@ -16,7 +16,7 @@ perl -e "open(IN,'win32\Makefile.msc');while(<IN>){s/ -MD/ -MTd/;s/ -O2/ -Od/;s/
 :build
 if exist zlibd.lib goto build_release
 nmake -f win32\Makefile.msc.debug clean
-nmake -f win32\Makefile.msc.debug
+nmake -f win32\Makefile.msc.debug OBJA="inffast.obj"
 move zlibd.lib examples\
 move zlib.pdb examples\
 nmake -f win32\Makefile.msc.release clean
@@ -24,6 +24,6 @@ move examples\zlibd.lib .\
 move examples\zlib.pdb .\
 
 :build_release
-nmake -f win32\Makefile.msc.release
+nmake -f win32\Makefile.msc.release OBJA="inffast.obj"
 
 cd ..
