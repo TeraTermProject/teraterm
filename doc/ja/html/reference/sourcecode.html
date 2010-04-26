@@ -363,6 +363,9 @@ _snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
 
 
 <h2><a name="compatibility">古いバージョンのWindowsとの互換性維持</a></h2>
+
+<h3>ダイナミックローディング</h3>
+
 　Windowsのアプリケーションプログラムは、単一のバイナリファイルを変更することなく、新旧のバージョンのWindows上で起動できるようにするためには、アプリケーションプログラム側での工夫が必要です。<br>
 　たとえば、Windows2000で導入された SetLayeredWindowAttributes() APIを直接呼び出すと、WindowsNT4.0や98などではアプリケーションの起動に失敗するようになります。そのため、新しいAPIを呼び出すときは、LoadLibrary()を使って動的ロードするようにします。<br>
 
@@ -391,6 +394,19 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 </pre>
 
 　いちいち、手で関数プロトタイプを書いていくのは面倒である場合は、「DLLの遅延読み込み」というしくみを利用すると、上記のような手順は不要です。いきなり、関数を呼び出すことができます。ダイレクトに呼び出したい関数がある場合、それが古いWindowsではサポートされていないものであるならば、Visual Studioのプロジェクト設定で、「DLLの遅延読み込み」に該当するDLLを指定しておきます。
+
+
+<h3>Windows 95</h3>
+
+Visual Studio 2005になってから、Windows 95のサポートが打ち切られました。よって、必然的にVisual Studio 2005でビルドしたバイナリは、Windows 95では動かないことになります。参考までに、Visual Studio 2008では Windows 98 と NT4.0 、2000 のサポートが打ち切られ、Visual Studio 2010でも同様です。今後は、Windows XPもサポートされなくなることが予想されます。<p>
+
+現在、Tera TermではVisual Studio 2005によりビルドされていますが、とある工夫により Windows 95 でも動作するようになっています。もちろん、Microsoft非公認の方法であるため、Microsoftからの正式なサポートは受けられません。<br>
+そもそも、Visual Studio 2005 でビルドされたバイナリは、デフォルトで IsDebuggerPresent 関数にリンクしてしまっています。当該関数は Windows 98 からサポートされたAPIであるため、Windows 95ではリンクエラーとなるわけです。<br>
+そこで、Windows 95において、ダミーで IsDebuggerPresent 関数のシンボルを定義してあげれば、プログラムの起動時にエラーになることはなくなるのです。詳細は"comapt_w95.h"ヘッダを参照してください。<br>
+
+<ul>
+  <li><a href="http://sourceforge.jp/projects/ttssh2/svn/view/trunk/teraterm/common/compat_w95.h?view=markup&root=ttssh2">comapt_w95.h</a></li>
+</ul>
 
 <hr>
 
