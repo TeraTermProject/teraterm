@@ -291,6 +291,8 @@ static TTXExports Exports = {
 
 
 <h2><a name="secure">セキュアプログラミング</a></h2>
+
+<h3>文字列操作</h3>
 　WindowsのデフォルトアカウントはAdministrator権限を保持するために（ただし、Windows Vistaには当てはまらない）、アプリケーションにバッファオーバーフローの不具合があると、管理者権限を第三者に奪取されてしまう危険性があります。<br>
 　従来、C言語の文字列処理は開発者のミスにより、バッファオーバーフローが発生しやすいという状況にありました。そこで、MicrosoftはVisual Studio 2005から文字列処理関数のセキュリティ強化バージョンを提供するようになりました。<br>
 　<br>
@@ -330,6 +332,31 @@ static TTXExports Exports = {
 　いずれの関数においても、_s("secure")という接尾辞が付くため、見た目に区別が付きやすくなっています。当然のことながら、これらの関数はANSI C非互換です。<br>
 　<br>
 　なお、これらの関数を利用する際、Count引数（格納する最大文字数）には"_TRUNCATE"マクロを指定しており、バッファオーバーフローが発生する場合は、強制的にバッファの切り詰めを行っています。
+<p>
+
+　以下に、strncpy_s()の使用例を示します。strncpy_s()の第2引数(numberOfElements)には、<b>ナル文字(\0)も含めた</b>バッファサイズを指定します。書き込み先のバッファは3バイトしかないので、第3引数(strSource)で指定した5バイトのデータは、2バイトに切り詰められ、buf[]には"he\0"が格納されます。
+
+<pre class=code>
+char buf[3];
+strncpy_s(buf, sizeof(buf), "hello", _TRUNCATE);
+</pre>
+
+　次に、strncat_s()の使用例を示します。当該関数は、すでに存在する文字列に、さらに文字列を連結するものであるため、第1引数(strDest)は<b>かならずnull-terminateしている</b>必要性があります。strncpy_s()の第2引数(numberOfElements)には、ナル文字(\0)も含めたバッファサイズを指定します。以下の例では、最初の関数を実行すると、5バイト（4文字＋ナル文字）が格納されます。2つめの関数を実行する際、残り2バイトしかないので、2文字だけがコピーされ、最終的に"TeraTe"（4文字＋2文字＋ナル文字）となります。
+　
+<pre class=code>
+char str[7];
+str[0] = '\0';
+strncat_s(str, sizeof(str), "Tera", _TRUNCATE);
+strncat_s(str, sizeof(str), "Term", _TRUNCATE);
+</pre>
+
+　最後に、_snprintf_s()です。紛らわしいのが _snprintf() という関数であり、この関数は<b>null-terminateされない</b>ケースがあるため、使用禁止です。以下に、_snprintf_s()の使用例を示します。以下の例では、buf[]には"ab\0"が格納されます。
+
+<pre class=code>
+char buf[3];
+_snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
+</pre>
+
 
 <hr>
 
