@@ -254,7 +254,7 @@ HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 
 	DataPtr = DdeAccessData(Data,&DataSize);
 	if (DataPtr==NULL) return DDE_FNOTPROCESSED;
-	CBStartPaste(NULL,FALSE,CBBufSize,DataPtr,DataSize);
+	CBStartPaste(NULL, FALSE, FALSE, CBBufSize, DataPtr, DataSize);
 	DdeUnaccessData(Data);
 	if (TalkStatus==IdTalkCB)
 		return (HDDEDATA)DDE_FACK;

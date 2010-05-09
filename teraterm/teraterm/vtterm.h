@@ -3,7 +3,6 @@
  All rights reserved. */
 
 /* TERATERM.EXE, VT terminal emulation */
-extern int MouseReportMode;
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +18,8 @@ int VTParse();
 void FocusReport(BOOL Focus);
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos);
 void EndTerm();
+
+extern BOOL BracketedPaste;
 
 #ifdef __cplusplus
 }

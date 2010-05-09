@@ -21,11 +21,15 @@
 static HGLOBAL CBCopyHandle = NULL;
 static PCHAR CBCopyPtr = NULL;
 
+#define CB_BRACKET_NONE  0
+#define CB_BRACKET_START 1
+#define CB_BRACKET_END   2
 // for clipboard paste
 static HGLOBAL CBMemHandle = NULL;
 static PCHAR CBMemPtr = NULL;
 static LONG CBMemPtr2 = 0;
 static BOOL CBAddCR = FALSE;
+static BOOL CBBracketed = CB_BRACKET_NONE;
 static BYTE CBByte;
 static BOOL CBRetrySend;
 static BOOL CBRetryEcho;
@@ -83,7 +87,7 @@ void CBClose()
 	CBCopyHandle = NULL;
 }
 
-void CBStartPaste(HWND HWin, BOOL AddCR,
+void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
                   int BuffSize, PCHAR DataPtr, int DataSize)
 //
 //  DataPtr and DataSize are used only for DDE
@@ -100,6 +104,9 @@ void CBStartPaste(HWND HWin, BOOL AddCR,
 	}
 
 	CBAddCR = AddCR;
+	if (Bracketed) {
+		CBBracketed = CB_BRACKET_START;
+	}
 
 	if (BuffSize==0) { // for clipboar
 		if (IsClipboardFormatAvailable(CF_TEXT)) {
@@ -158,6 +165,9 @@ void CBSend()
 	int c;
 	BOOL EndFlag;
 	static DWORD lastcr;
+	static char BracketStart[] = "\033[200~";
+	static char BracketEnd[] = "\033[201~";
+	static int BracketPtr = 0;
 	DWORD now;
 
 	if (CBMemHandle==NULL) {
@@ -204,7 +214,14 @@ void CBSend()
 		}
 
 		EndFlag = (CBMemPtr[CBMemPtr2]==0);
-		if (! EndFlag) {
+		if (CBBracketed == CB_BRACKET_START) {
+			CBByte = BracketStart[BracketPtr++];
+			if (BracketPtr >= sizeof(BracketStart) - 1) {
+				CBBracketed = CB_BRACKET_END;
+				BracketPtr = 0;
+			}
+		}
+		else if (! EndFlag) {
 			CBByte = CBMemPtr[CBMemPtr2];
 			CBMemPtr2++;
 // Decoding characters which are encoded by MACRO
@@ -223,6 +240,14 @@ void CBSend()
 			EndFlag = FALSE;
 			CBAddCR = FALSE;
 			CBByte = 0x0d;
+		}
+		else if (CBBracketed == CB_BRACKET_END) {
+			EndFlag = FALSE;
+			CBByte = BracketEnd[BracketPtr++];
+			if (BracketPtr >= sizeof(BracketEnd) - 1) {
+				CBBracketed = CB_BRACKET_NONE;
+				BracketPtr = 0;
+			}
 		}
 		else {
 			CBEndPaste();

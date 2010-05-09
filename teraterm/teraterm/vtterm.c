@@ -54,6 +54,7 @@ static BOOL LFMode;
 static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
 static BOOL AltScr;
+BOOL BracketedPaste;
 int MouseReportMode;
 
 // save/restore cursor
@@ -200,6 +201,9 @@ void ResetTerminal() /*reset variables but don't update screen */
 
   // Alternate Screen Buffer
   AltScr = FALSE;
+
+  // Bracketed Paste Mode
+  BracketedPaste = FALSE;
 }
 
 void ResetCharSet()
@@ -2172,6 +2176,10 @@ void CSSetAttr()		// SGR
 	      BuffClearScreen();
 	      AltScr = TRUE;
 	    }
+	    break;
+	  case 2004: // Bracketed Paste Mode
+	    BracketedPaste = TRUE;
+	    break;
 	}
     }
 
@@ -2282,6 +2290,9 @@ void CSSetAttr()		// SGR
 	      AltScr = FALSE;
 	      RestoreCursor();
 	    }
+	    break;
+	  case 2004: // Bracketed Paste Mode
+	    BracketedPaste = FALSE;
 	    break;
 	}
     }
