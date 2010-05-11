@@ -781,7 +781,7 @@ DLG_OTHER_RESOLV_LOCAL=resolve local
 DLG_OTHER_TELNET=TELNET Proxy setup
 DLG_OTHER_HOST=&Hostname prompt
 DLG_OTHER_USER=&Username prompt
-DLG_OTHER_PASS=&Pasword prompt
+DLG_OTHER_PASS=&Password prompt
 DLG_OTHER_CONNECT=&Connected message
 DLG_OTHER_ERROR=&Error message
 
