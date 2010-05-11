@@ -21,10 +21,13 @@
 setbaud &lt;value&gt;
 </pre>
 
-<h2>解説</h2>
+<h2>パラメータ</h2>
 
+<dl>
+	<dt class="macro">整数 &lt;value&gt; (バージョン 4.66 未満)</dt>
+	<dd>ボーレートに対応するIDを指定する。
 <pre>
-value    baudrate
+ID       baud rate
 1        110 
 2        300 
 3        600 
@@ -41,11 +44,22 @@ value    baudrate
 14       460800 
 15       921600 
 </pre>
+	</dd>
+	
+	<dt class="macro">整数 &lt;value&gt; (バージョン 4.66 以降)</dt>
+	<dd>ボーレートを指定する。</dd>
+</dl>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-setbaud 12            ;change baud rate to 115200
+; change baud rate to 115200
+
+; less than version 4.66
+setbaud 12
+
+; version 4.66 or later
+setbaud 115200
 </pre>
 
 </body>

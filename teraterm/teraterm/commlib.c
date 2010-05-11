@@ -159,7 +159,7 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 
 	memset(&dcb,0,sizeof(DCB));
 	dcb.DCBlength = sizeof(DCB);
-	dcb.BaudRate = GetCommSerialBaudRate(ts->Baud);
+	dcb.BaudRate = ts->Baud;
 	dcb.fBinary = TRUE;
 	switch (ts->Parity) {
 		case IdParityEven:
@@ -1056,17 +1056,6 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 		}
 		EscapeCommFunction(cv->ComID,Func);
 	}
-}
-
-int GetCommSerialBaudRate(int id)
-{
-	char *ch;
-	int val;
-
-	// id-1‚ªƒŠƒXƒg‚Ìindex‚Æ‚È‚éB
-	ch = BaudList[id - 1];
-	val = atoi(ch);
-	return (val);
 }
 
 BOOL PrnOpen(PCHAR DevName)

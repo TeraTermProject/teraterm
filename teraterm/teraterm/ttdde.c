@@ -807,7 +807,7 @@ scp_rcv_error:
 
 	case CmdSetBaud:  // add 'setbaud' (2008.2.13 steven patch)
 		{
-		int val, ret;
+		int val;
 
 		//OutputDebugPrintf("CmdSetBaud entered\n");
 
@@ -815,9 +815,8 @@ scp_rcv_error:
 			return DDE_FNOTPROCESSED;
 
 		val = atoi(ParamFileName);
-		ret = GetCommSerialBaudRate(val);
-		//OutputDebugPrintf("CmdSetBaud: %d %d (%d)\n", val, ret, ts.Baud);
-		if (ret > 0) {
+		//OutputDebugPrintf("CmdSetBaud: %d (%d)\n", val, ts.Baud);
+		if (val > 0) {
 			ts.Baud = val;
 			CommResetSerial(&ts,&cv,FALSE);   // reset serial port
 			PostMessage(HVTWin,WM_USER_CHANGETITLE,0,0); // refresh title bar

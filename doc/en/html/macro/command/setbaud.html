@@ -21,10 +21,13 @@ Causes Tera Term to change baud rate.
 setbaud &lt;value&gt;
 </pre>
 
-<h2>Remarks</h2>
+<h2>Parameters</h2>
 
+<dl>
+	<dt class="macro">integer &lt;value&gt; (less than version 4.66)</dt>
+	<dd>The corresponding ID of baud rate.
 <pre>
-value    baudrate
+value    baud rate
 1        110 
 2        300 
 3        600 
@@ -41,11 +44,22 @@ value    baudrate
 14       460800 
 15       921600 
 </pre>
+	</dd>
+	
+	<dt class="macro">integer &lt;value&gt; (version 4.66 or later)</dt>
+	<dd>The immediate baud rate.</dd>
+</dl>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-setbaud 12            ;change baud rate to 115200
+; change baud rate to 115200
+
+; less than version 4.66
+setbaud 12
+
+; version 4.66 or later
+setbaud 115200
 </pre>
 
 </body>

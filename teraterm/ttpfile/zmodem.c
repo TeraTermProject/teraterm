@@ -665,21 +665,19 @@ void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 		Max = 1024;
 	} else {
 		zv->TimeOut = NormalTimeOut;
-		switch (ts->Baud) {
-		case IdBaud110:
+		if (ts->Baud <= 110) {
 			Max = 64;
-			break;
-		case IdBaud300:
+		}
+		else if (ts->Baud <= 300) {
 			Max = 128;
-			break;
-		case IdBaud600:
-		case IdBaud1200:
+		}
+		else if (ts->Baud <= 1200) {
 			Max = 256;
-			break;
-		case IdBaud2400:
+		}
+		else if (ts->Baud <= 2400) {
 			Max = 512;
-			break;
-		default:
+		}
+		else {
 			Max = 1024;
 		}
 	}

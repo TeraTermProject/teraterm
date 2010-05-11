@@ -397,7 +397,7 @@ struct tttset {
 	WORD HistoryList;
 	/* Serial */
 	WORD ComPort;
-	WORD Baud;
+	WORD Baud_; /* not in use */
 	WORD Parity;
 	WORD DataBit;
 	WORD StopBit;
@@ -493,6 +493,7 @@ struct tttset {
 	WORD WindowFlag;
 	WORD EnableLineMode;
 	char ConfirmChangePasteStringFile[MAX_PATH];
+	DWORD Baud;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -568,25 +569,8 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdCOM3 3
 #define IdCOM4 4
   /* Baud rate ID */
-#define IdBaudNone   0
-#define IdBaud110    1
-#define IdBaud300    2
-#define IdBaud600    3
-#define IdBaud1200   4
-#define IdBaud2400   5
-#define IdBaud4800   6
-#define IdBaud9600   7
-#define IdBaud14400  8
-#define IdBaud19200  9
-#define IdBaud38400  10
-#define IdBaud57600  11
-#define IdBaud115200 12
-// expansion (2005.11.30 yutaka)
-#define IdBaud230400 13
-#define IdBaud460800 14
-#define IdBaud921600 15
+#define BaudNone    0
 
-// index + 1 == IdBaudXXX �ƂȂ邱�ƁB
 static PCHAR far BaudList[] =
 	{"110","300","600","1200","2400","4800","9600",
 	 "14400","19200","38400","57600","115200",

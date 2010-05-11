@@ -169,9 +169,9 @@ void ChangeTitle()
 		else if (cv.PortType==IdSerial)
 		{
 			// COM5 over‚É‘Î‰ž
-			char str[20]; // COMxxxx:xxxxxxxbaud
+			char str[24]; // COMxxxx:xxxxxxxxxxbaud
 			if (ts.TitleFormat & 32) {
-				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d:%dbaud", ts.ComPort, GetCommSerialBaudRate(ts.Baud));
+				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d:%ubaud", ts.ComPort, ts.Baud);
 			}
 			else {
 				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d", ts.ComPort);

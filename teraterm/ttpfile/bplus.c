@@ -95,19 +95,27 @@ void BPInit
   }
   else {
     bv->TimeOut = BPTimeOut;
-    switch (ts->Baud) {
-      case IdBaud110:
-	bv->TimeOut = BPTimeOut*2;
-	bv->MaxBS = 1;
-	break;
-      case IdBaud300: bv->MaxBS = 1; break;
-      case IdBaud600: bv->MaxBS = 2; break;
-      case IdBaud1200: bv->MaxBS = 4; break;
-      case IdBaud2400: bv->MaxBS = 8; break;
-      case IdBaud4800: bv->MaxBS = 12; break;
-      default:
-	bv->MaxBS = 16;
-	break;
+    if (ts->Baud <= 110) {
+      bv->TimeOut = BPTimeOut*2;
+      bv->MaxBS = 1;
+    }
+    else if (ts->Baud <= 300) {
+      bv->MaxBS = 1;
+    }
+    else if (ts->Baud <= 600) {
+      bv->MaxBS = 2;
+    }
+    else if (ts->Baud <= 1200) {
+      bv->MaxBS = 4;
+    }
+    else if (ts->Baud <= 2400) {
+      bv->MaxBS = 8;
+    }
+    else if (ts->Baud <= 480) {
+      bv->MaxBS = 12;
+    }
+    else {
+      bv->MaxBS = 16;
     }
   }
 

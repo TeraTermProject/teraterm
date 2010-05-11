@@ -644,9 +644,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->ComPort = GetPrivateProfileInt(Section, "ComPort", 1, FName);
 
 	/* Baud rate */
-	GetPrivateProfileString(Section, "BaudRate", "9600",
-	                        Temp, sizeof(Temp), FName);
-	ts->Baud = str2id(BaudList, Temp, IdBaud9600);
+	ts->Baud = GetPrivateProfileInt(Section, "BaudRate", 9600, FName);
 
 	/* Parity */
 	GetPrivateProfileString(Section, "Parity", "",
@@ -1811,7 +1809,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "ComPort", Temp, FName);
 
 	/* Baud rate */
-	id2str(BaudList, ts->Baud, IdBaud9600, Temp, sizeof(Temp));
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->Baud);
 	WritePrivateProfileString(Section, "BaudRate", Temp, FName);
 
 	/* Parity */
@@ -2897,7 +2895,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	WORD ParamTCP = 65535;
 	WORD ParamTel = 2;
 	WORD ParamBin = 2;
-	WORD ParamBaud = IdBaudNone;
+	DWORD ParamBaud = BaudNone;
 	BOOL HostNameFlag = FALSE;
 	BOOL JustAfterHost = FALSE;
 
@@ -2943,7 +2941,8 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 
 		if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
 			ParamPort = IdSerial;
-			ParamBaud = str2id(BaudList, &Temp[6], IdBaudNone);
+			if (atoi(&Temp[3]) != 0)
+				ParamBaud = atoi(&Temp[3]);
 		}
 		else if (_stricmp(Temp, "/B") == 0) {	/* telnet binary */
 			ParamPort = IdTCPIP;
@@ -3176,10 +3175,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		ts->PortType = IdSerial;
 		if (ParamCom > 0) {
 			ts->ComPort = ParamCom;
- 		    /* Don't display new connection dialog if COM port is specified explicitly (2006.9.15 maya) */ 
+			/* Don't display new connection dialog if COM port is specified explicitly (2006.9.15 maya) */ 
 			ts->ComAutoConnect = TRUE; 
 		}
-		if (ParamBaud != IdBaudNone)
+		if (ParamBaud != BaudNone)
 			ts->Baud = ParamBaud;
 		break;
 	case IdFile:

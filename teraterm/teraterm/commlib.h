@@ -22,7 +22,6 @@ void CommSend(PComVar cv);
 void CommSendBreak(PComVar cv);
 void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuffer);
 void CommLock(PTTSet ts, PComVar cv, BOOL Lock);
-int GetCommSerialBaudRate(int id);
 BOOL PrnOpen(PCHAR DevName);
 int PrnWrite(PCHAR b, int c);
 void PrnCancel();

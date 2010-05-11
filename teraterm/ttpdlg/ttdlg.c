@@ -1410,7 +1410,8 @@ BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			}
 			SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w, 0);
 
-			SetDropDownList(Dialog, IDC_SERIALBAUD, BaudList, ts->Baud);
+			SetDropDownList(Dialog, IDC_SERIALBAUD, BaudList, 0);
+			SetDlgItemInt(Dialog, IDC_SERIALBAUD, ts->Baud, FALSE);
 			SetDropDownList(Dialog, IDC_SERIALDATA, DataList, ts->DataBit);
 			SetDropDownList(Dialog, IDC_SERIALPARITY, ParityList, ts->Parity);
 			SetDropDownList(Dialog, IDC_SERIALSTOP, StopList, ts->StopBit);
@@ -1437,7 +1438,10 @@ BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							ts->ComPort = 0;
 						}
 
-						ts->Baud = (WORD)GetCurSel(Dialog, IDC_SERIALBAUD);
+						GetDlgItemText(Dialog, IDC_SERIALBAUD, Temp, sizeof(Temp)-1);
+						if (atoi(Temp) != 0) {
+							ts->Baud = (DWORD)atoi(Temp);
+						}
 						ts->DataBit = (WORD)GetCurSel(Dialog, IDC_SERIALDATA);
 						ts->Parity = (WORD)GetCurSel(Dialog, IDC_SERIALPARITY);
 						ts->StopBit = (WORD)GetCurSel(Dialog, IDC_SERIALSTOP);
