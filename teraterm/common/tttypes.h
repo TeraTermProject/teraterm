@@ -916,6 +916,10 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
+ *   renamed tttset.Baud to Baud_.
+ *   added tttset.Baud.
+ *
  * - At version 4.63, ttset_memfilemap was replaced with ttset_memfilemap_11.
  *   added tttset.Wait4allMacroCommand.
  *   added tttset.DisableAcceleratorMenu.
@@ -989,4 +993,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_11"
+#define TT_FILEMAPNAME "ttset_memfilemap_12"
