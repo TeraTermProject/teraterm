@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>xterm のヒント</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>xterm のヒント</h1>
+
+<a name="Bracketed"></a>
+<h2>Bracketed Paste Mode</h2>
+
+この機能は xterm 拡張で、有効になっていると、クリップボードからの張り付け時に文字列の前後に特別なシーケンスを付加するというものです。<br>
+具体的には、DECSET の 2004(<CSI>?2004h) で有効になり、張り付け時に文字列の前に <ESC>200~, 後ろに <ESC>201~ が付くようになります。
+<p>
+
+以下に vim の .vimrc 設定例を示します。張り付け時は自動インデントが無効になります。
+
+<pre>
+if &term == "xterm"
+  let &t_ti = &t_ti . "\e[?2004h"
+  let &t_te = "\e[?2004l" . &t_te
+  set pastetoggle=&lt;Esc&gt;[201~
+  function XTermPasteBegin(ret)
+    set paste
+    return a:ret
+  endfunction
+  map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("i")
+  imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
+endif
+</pre>
+
+
+</BODY>
+</HTML>

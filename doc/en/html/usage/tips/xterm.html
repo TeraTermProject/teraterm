@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Tips on xterm</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Tips on xterm</h1>
+
+<a name="Bracketed"></a>
+<h2>Bracketed Paste Mode</h2>
+
+The bracketed paste mode is the xterm extension feature. When this feature is enabled, the pasted text is bracketed with control sequences so that the program can differentiate the pasted text from typed-in text.<br>
+The program will receive: ESC [ 200 ~, followed by the pasted text, followed by ESC [ 201 ~.
+<p>
+
+The vim configuration is described below. The following will use xterm's bracketed paste mode to make pasting automatically enable paste mode and insert mode. Also works fine in ~/.vimrc file.
+
+<pre>
+if &term == "xterm"
+  let &t_ti = &t_ti . "\e[?2004h"
+  let &t_te = "\e[?2004l" . &t_te
+  set pastetoggle=&lt;Esc&gt;[201~
+  function XTermPasteBegin(ret)
+    set paste
+    return a:ret
+  endfunction
+  map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("i")
+  imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
+endif
+</pre>
+
+
+</BODY>
+</HTML>
