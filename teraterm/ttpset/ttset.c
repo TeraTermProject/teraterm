@@ -2941,8 +2941,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 
 		if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
 			ParamPort = IdSerial;
-			if (atoi(&Temp[3]) != 0)
-				ParamBaud = atoi(&Temp[3]);
+			ParamBaud = atoi(&Temp[6]);
+			if (ParamBaud == 0) {
+				ParamBaud = 9600;
+			}
 		}
 		else if (_stricmp(Temp, "/B") == 0) {	/* telnet binary */
 			ParamPort = IdTCPIP;
