@@ -458,7 +458,7 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
       }
       break;
     case '2':
-    case '@':
+//  case VK_OEM_3: /* @ (106-JP Keyboard) */
       if (Control && !ts.StrictKeyMapping) {
 	// Ctrl-2 -> NUL
 	CodeLength = 1;
@@ -487,7 +487,7 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
       }
       break;
     case '6':
-    case '^':
+//  case VK_OEM_7: /* ^ (106-JP Keyboard) */
       if (Control && !ts.StrictKeyMapping) {
 	// Ctrl-6 -> RS
 	CodeLength = 1;
@@ -495,9 +495,7 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
       }
       break;
     case '7':
-    case '/':
-    case '?':
-    case '_':
+    case VK_OEM_2: /* / (101/106-JP Keyboard) */
       if (Control && !ts.StrictKeyMapping) {
 	// Ctrl-7 -> US
 	CodeLength = 1;
@@ -507,6 +505,13 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
     case '8':
       if (Control && !ts.StrictKeyMapping) {
 	// Ctrl-8 -> DEL
+	CodeLength = 1;
+	Code[0] = 0x7f;
+      }
+      break;
+    case VK_OEM_102:
+      if (Control && Shift && !ts.StrictKeyMapping) {
+	// Shift-Ctrl-_ (102RT/106-JP Keyboard)
 	CodeLength = 1;
 	Code[0] = 0x7f;
       }
