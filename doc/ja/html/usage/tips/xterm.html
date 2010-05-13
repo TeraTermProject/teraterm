@@ -31,6 +31,8 @@ if &term == "xterm"
   endfunction
   map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("i")
   imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
+  cmap <special> <Esc>[200~ <nop>
+  cmap <special> <Esc>[201~ <nop>
 endif
 </pre>
 
