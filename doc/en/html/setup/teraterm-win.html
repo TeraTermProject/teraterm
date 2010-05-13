@@ -486,17 +486,17 @@ KillFocusCursor=on
 
 
 <h1><a name="vttekpos">Fix the initial window position</a></h1>
-<!--p>
-ウィンドウの初期位置を変更するには、設定ファイルの [Tera Term] セクションの VTPos 行(VTウィンドウ) および TEKPos 行(TEKウィンドウ) を変更して下さい。<br>
-例えば、VTウィンドウの初期位置を画面の左端から 200 ピクセル、上端から 100 ピクセルの位置にする場合は、以下のようにして 下さい。
-</p-->
+<!p>
+In order to change the default window position, change values of VTPos line(VT Window) and TEKPos line(TEK Window) at [Tera Term] section inside the setup file.<br>
+For example, if you want to set the default VT window position to 200 pixels from the left side of the screen and 100px from the top of the screen, change the setup file as follows.
+</p>
 
 <pre>
 VTPos=200,100
 </pre>
 
-<!--p>
-また、以下のようにすると初期位置が固定されず、Windows が配置を決めるようになります。
+<p>
+The initial position is not fixed and Windows can decide the position by changing the setup file as follows.
 </p>
 
 <pre>
@@ -505,8 +505,8 @@ TEKPos=-2147483648,-2147483648
 </pre>
 
 <p>
-注: <a href="#savevtwinpos">後述</a>のように、SaveVTPosWinPos が on になっていると、"Save setup" を実行した時や VT ウィンドウを閉じた時に VTPos の設定が現在のウィンドウ位置で上書きされます。
-</p-->
+Notice: As described <a href="#savevtwinpos">below</a>, if SaveVTPosWinPos is on and at the time of executing "Save setup" or closing VT window, VTPos setting will be overwritten by current window position setting.
+</p>
 
 <pre>
 Default:
