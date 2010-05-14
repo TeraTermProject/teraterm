@@ -494,6 +494,7 @@ struct tttset {
 	WORD EnableLineMode;
 	char ConfirmChangePasteStringFile[MAX_PATH];
 	DWORD Baud;
+	WORD LogBinary;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -919,6 +920,7 @@ typedef TMap far *PMap;
  * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
  *   renamed tttset.Baud to Baud_.
  *   added tttset.Baud.
+ *   added tttset.LogBinary.
  *
  * - At version 4.63, ttset_memfilemap was replaced with ttset_memfilemap_11.
  *   added tttset.Wait4allMacroCommand.

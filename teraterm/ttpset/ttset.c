@@ -710,6 +710,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* File transfer binary flag */
 	ts->TransBin = GetOnOff(Section, "TransBin", FName, FALSE);
 
+	/* Log binary flag */
+	ts->LogBinary = GetOnOff(Section, "LogBinary", FName, FALSE);
+
 	/* Log append */
 	ts->Append = GetOnOff(Section, "LogAppend", FName, FALSE);
 
@@ -1878,10 +1881,13 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* File transfer binary flag */
 	WriteOnOff(Section, "TransBin", FName, ts->TransBin);
 
+	/* Log binary flag */
+	WriteOnOff(Section, "LogBinary", FName, ts->LogBinary);
+
 	/* Log append */
 	WriteOnOff(Section, "LogAppend", FName, ts->Append);
 
-	/* File transfer binary flag */
+	/* Log plain text flag */
 	WriteOnOff(Section, "LogTypePlainText", FName, ts->LogTypePlainText);
 
 	/* Log with timestamp (2006.7.23 maya) */

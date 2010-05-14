@@ -511,7 +511,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			LogVar->NoMsg = TRUE;
 			strncpy_s(LogVar->FullName, sizeof(LogVar->FullName),ParamFileName, _TRUNCATE);
 			ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-			ts.TransBin = ParamBinaryFlag;
+			ts.LogBinary = ParamBinaryFlag;
 			ts.Append = ParamAppendFlag;
 			ret = LogStart();
 			if (ret) {

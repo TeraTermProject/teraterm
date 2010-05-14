@@ -332,7 +332,7 @@ void ConvertLogname(char *c, int destlen)
 
 void FixLogOption()
 {
-	if (ts.TransBin) {
+	if (ts.LogBinary) {
 		ts.LogTypePlainText = false;
 		ts.LogTimestamp = false;
 	}
@@ -374,7 +374,7 @@ BOOL LogStart()
 		// 0x2000 = timestamp (2006.7.23 maya)
 		// 0x4000 = hide file transfer dialog (2008.1.30 maya)
 		// teraterm.iniの設定を見てからデフォルトオプションを決める。(2005.5.7 yutaka)
-		Option = MAKELONG(ts.TransBin,
+		Option = MAKELONG(ts.LogBinary,
 		                  ts.Append |
 		                  (0x1000 * ts.LogTypePlainText) |
 		                  (0x2000 * ts.LogTimestamp) |
@@ -395,7 +395,7 @@ BOOL LogStart()
 			FreeTTFILE();
 			return FALSE;
 		}
-		ts.TransBin = LOWORD(Option);
+		ts.LogBinary = LOWORD(Option);
 		ts.Append = HIWORD(Option);
 
 		if (ts.Append & 0x1000) {
@@ -439,7 +439,7 @@ BOOL LogStart()
 		FixLogOption();
 	}
 
-	if (ts.TransBin > 0)
+	if (ts.LogBinary > 0)
 	{
 		BinLog = TRUE;
 		FileLog = FALSE;
