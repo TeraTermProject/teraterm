@@ -1506,6 +1506,7 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 		if (cv->TelLineMode) {
 			Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
 			if (!Full) {
+				i++;
 				memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
 				cv->LineModeBuffCount += TempLen;
 				if (cv->Flush) {
