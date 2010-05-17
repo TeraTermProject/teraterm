@@ -249,9 +249,8 @@ Tera Term(Tera Term 4.58)とTera Term Pro 2.3との機能差分について以下に示します。
 
 <h2>修正されたオリジナルバグ</h2>
 
-<ol>
+<ul>
   <li>ウィンドウの幅を84ドット（XPのLUNAスタイルでは94ドット）より小さくすると、ウィンドウサイズを変更できなくなることがある。</li>
-  <li>行末のタブが次の行に自動改行されない。</li>
   <li>ttpmacro.exeに256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で落ちる。 </li>
   <li>マクロファイルに 256 バイトを越える長い行があると、BOF(Buffer Over Flow)で落ちる。 </li>
   <li>マクロ実行中に、サーバからの受信データをマクロへDDE送信しないことがある（setsyncコマンドによる同期はttermpro.exeとttpmacro.exe間のDDE通信のみに適用されるため）。 </li>
@@ -260,7 +259,7 @@ Tera Term(Tera Term 4.58)とTera Term Pro 2.3との機能差分について以下に示します。
   <li>マクロ実行中にCPU使用率が100%となることがある。</li>
   <li>マクロの除算結果が不正となる。</li>
   <li>ZMODEMの送信において、ファイルサイズが20MBを超えるとクラッシュする。</li>
-</ol>
+</ul>
 
 <hr>
 
