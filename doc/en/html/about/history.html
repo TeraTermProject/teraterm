@@ -30,7 +30,7 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.66">2010.4.7 (Ver 4.66 unreleased)</a></h3>
+<h3><a name="teraterm_4.66">2010.5.19 (Ver 4.66 unreleased)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>
@@ -51,7 +51,10 @@
         </ul></li>
       <li>added the "<a href="../macro/command/filestat.html">filestat</a>" macro command.</li>
       <li>added support for <a href="../usage/tips/xterm.html#Bracketed">bracketed paste mode</a>.</li>
-      <!--li>"ファイル送信" と "ログ" での binary フラグの扱いを分離した。</li-->
+      <li>Split the TransBin flag into the Send File and the Log flags.
+        <ul>
+          <li>added the LogBinary entry in the teraterm.ini file. The default value is off.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -65,7 +68,7 @@
       <li>The crc32file macro command does not work correctly for handling the file opening error. And also, the command supports the read-only file.</li>
       <li>Fixed a problem where TeraTerm consumes 100% CPU if a USB serial port is disconnected. Special thanks to Z. Vickery.</li>
       <li>Improved the cancellation logic for XModem and YModem transfers'. Special thanks to Z. Vickery.</li>
-      <!--li>英語モードおよびロシア語モードで、"Line at a time" モードが正しく働かないのを修正した。 Special thanks to p3g4asus.</li-->
+      <li>Line at a time can not work well in English and Russian language. Special thanks to p3g4asus.</li>
     </ul>
   </li>
 
