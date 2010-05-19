@@ -48,6 +48,7 @@
 #include <imagehlp.h>
 
 #include <windowsx.h>
+#include <imm.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -125,6 +126,8 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_WM_TIMER()
 	ON_WM_VSCROLL()
 	ON_MESSAGE(WM_IME_COMPOSITION,OnIMEComposition)
+	ON_MESSAGE(WM_INPUTLANGCHANGE,OnIMEInputChange)
+	ON_MESSAGE(WM_IME_NOTIFY,OnIMENotify)
 //<!--by AKASI
 	ON_MESSAGE(WM_WINDOWPOSCHANGING,OnWindowPosChanging)
 	ON_MESSAGE(WM_SETTINGCHANGE,OnSettingChange)
@@ -2896,6 +2899,22 @@ skip:
 		return 0;
 	}
 	return CFrameWnd::DefWindowProc(WM_IME_COMPOSITION,wParam,lParam);
+}
+
+LONG CVTWindow::OnIMEInputChange(UINT wParam, LONG lParam)
+{
+	ChangeCaret();
+
+	return CFrameWnd::DefWindowProc(WM_INPUTLANGCHANGE,wParam,lParam);
+}
+
+LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
+{
+	if (wParam == IMN_SETOPENSTATUS) {
+		ChangeCaret();
+	}
+
+	return CFrameWnd::DefWindowProc(WM_IME_NOTIFY,wParam,lParam);
 }
 
 LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)

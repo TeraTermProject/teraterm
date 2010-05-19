@@ -2104,9 +2104,25 @@ void CaretOn()
 // Turn on the cursor
 {
 	int CaretX, CaretY, H;
+    HIMC hImc;
+	HBITMAP color;
+	int ime_on;
 
 	if (ts.KillFocusCursor == 0 && !Active)
 		return;
+
+	/* IMEのon/off状態を見て、カーソルの色を変更する。
+	 * WM_INPUTLANGCHANGE, WM_IME_NOTIFY ではカーソルの再描画のみ行う。
+	 * (2010.5.20 yutaka)
+	 */
+	hImc = ImmGetContext(HVTWin);
+    ime_on = ImmGetOpenStatus(hImc);
+    ImmReleaseContext(HVTWin, hImc);
+	if (ime_on) {
+		color = (HBITMAP)1;
+	} else {
+		color = NULL;
+	}
 
 	CaretX = (CursorX-WinOrgX)*FontWidth;
 	CaretY = (CursorY-WinOrgY)*FontHeight;
@@ -2133,11 +2149,11 @@ void CaretOn()
 			DestroyCaret();
 			if (CursorOnDBCS) {
 				/* double width caret */
-				CreateCaret(HVTWin, 0, FontWidth*2, H);
+				CreateCaret(HVTWin, color, FontWidth*2, H);
 			}
 			else {
 				/* single width caret */
-				CreateCaret(HVTWin, 0, FontWidth, H);
+				CreateCaret(HVTWin, color, FontWidth, H);
 			}
 			CaretStatus = 1;
 		}
