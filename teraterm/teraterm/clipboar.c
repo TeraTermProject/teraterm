@@ -29,7 +29,7 @@ static HGLOBAL CBMemHandle = NULL;
 static PCHAR CBMemPtr = NULL;
 static LONG CBMemPtr2 = 0;
 static BOOL CBAddCR = FALSE;
-static BOOL CBBracketed = CB_BRACKET_NONE;
+static int CBBracketed = CB_BRACKET_NONE;
 static BYTE CBByte;
 static BOOL CBRetrySend;
 static BOOL CBRetryEcho;
