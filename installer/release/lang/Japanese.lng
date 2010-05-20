@@ -402,7 +402,6 @@ FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN送信
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: クリップボードの確認
-DLG_CLIPBOARD_INFO=クリップボードは現在ロックされています。
 
 ; ttptek
 ; tttek.c

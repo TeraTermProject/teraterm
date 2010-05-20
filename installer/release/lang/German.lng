@@ -402,7 +402,6 @@ FILEDLG_TRANS_TITLE_QVSEND=Quick-VAN Send
 
 ; dlg clipboard
 DLG_CLIPBOARD_TITLE=Tera Term: Clipboard confirmation
-DLG_CLIPBOARD_INFO=Currently, Clipboard has been locked.
 
 ; ttptek
 ; tttek.c

@@ -313,8 +313,8 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	RECT rc_dsk, rc_dlg;
 	int dlg_height, dlg_width;
 	OSVERSIONINFO osvi;
-	static int ok2right, info2bottom, edit2ok, edit2info;
-	RECT rc_edit, rc_ok, rc_cancel, rc_info;
+	static int ok2right, edit2ok, edit2bottom;
+	RECT rc_edit, rc_ok, rc_cancel;
 	// for status bar
 	static HWND hStatus = NULL;
 	static init_width, init_height;
@@ -333,7 +333,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			GetObject(font, sizeof(LOGFONT), &logfont);
 			if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgClipboardFont, ts.UILanguageFile)) {
 				SendDlgItemMessage(hDlgWnd, IDC_EDIT, WM_SETFONT, (WPARAM)DlgClipboardFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hDlgWnd, IDC_CLIPBOARD_INFO, WM_SETFONT, (WPARAM)DlgClipboardFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(hDlgWnd, IDOK, WM_SETFONT, (WPARAM)DlgClipboardFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(hDlgWnd, IDCANCEL, WM_SETFONT, (WPARAM)DlgClipboardFont, MAKELPARAM(TRUE,0));
 			}
@@ -344,9 +343,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
 			get_lang_msg("DLG_CLIPBOARD_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 			SetWindowText(hDlgWnd, ts.UIMsg);
-			GetDlgItemText(hDlgWnd, IDC_CLIPBOARD_INFO, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_CLIPBOARD_INFO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hDlgWnd, IDC_CLIPBOARD_INFO, ts.UIMsg);
 			GetDlgItemText(hDlgWnd, IDCANCEL, uimsg, sizeof(uimsg));
 			get_lang_msg("BTN_CANCEL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 			SetDlgItemText(hDlgWnd, IDCANCEL, ts.UIMsg);
@@ -410,15 +406,13 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			GetClientRect(hDlgWnd,                                 &rc_dlg);
 			GetWindowRect(GetDlgItem(hDlgWnd, IDC_EDIT),           &rc_edit);
 			GetWindowRect(GetDlgItem(hDlgWnd, IDOK),               &rc_ok);
-			GetWindowRect(GetDlgItem(hDlgWnd, IDC_CLIPBOARD_INFO), &rc_info);
 
 			p.x = rc_dlg.right;
 			p.y = rc_dlg.bottom;
 			ClientToScreen(hDlgWnd, &p);
 			ok2right = p.x - rc_ok.left;
-			info2bottom = p.y - rc_info.top;
+			edit2bottom = p.y - rc_edit.bottom;
 			edit2ok = rc_ok.left - rc_edit.right;
-			edit2info = rc_info.top - rc_edit.bottom;
 
 			// サイズを復元
 			SetWindowPos(hDlgWnd, NULL, 0, 0,
@@ -441,15 +435,17 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 					HGLOBAL hMem;
 					char *buf;
 
-					hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
-					buf = GlobalLock(hMem);
-					SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, len + 1, (LPARAM)buf);
-					GlobalUnlock(hMem);
+					if (OpenClipboard(hDlgWnd) != 0) {
+						hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
+						buf = GlobalLock(hMem);
+						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, len + 1, (LPARAM)buf);
+						GlobalUnlock(hMem);
 
-					EmptyClipboard();
-					SetClipboardData(CF_TEXT, hMem);
-
-					// hMemはクリップボードが保持しているので、破棄してはいけない。
+						EmptyClipboard();
+						SetClipboardData(CF_TEXT, hMem);
+						CloseClipboard();
+						// hMemはクリップボードが保持しているので、破棄してはいけない。
+					}
 
 					if (DlgClipboardFont != NULL) {
 						DeleteObject(DlgClipboardFont);
@@ -495,7 +491,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				GetWindowRect(GetDlgItem(hDlgWnd, IDC_EDIT),           &rc_edit);
 				GetWindowRect(GetDlgItem(hDlgWnd, IDOK),               &rc_ok);
 				GetWindowRect(GetDlgItem(hDlgWnd, IDCANCEL),           &rc_cancel);
-				GetWindowRect(GetDlgItem(hDlgWnd, IDC_CLIPBOARD_INFO), &rc_info);
 
 				// OK
 				p.x = rc_ok.left;
@@ -513,20 +508,12 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				             dlg_w - ok2right, p.y, 0, 0,
 				             SWP_NOSIZE | SWP_NOZORDER);
 
-				// INFO
-				p.x = rc_info.left;
-				p.y = rc_info.top;
-				ScreenToClient(hDlgWnd, &p);
-				SetWindowPos(GetDlgItem(hDlgWnd, IDC_CLIPBOARD_INFO), 0,
-				             p.x, dlg_h - info2bottom, 0, 0,
-				             SWP_NOSIZE | SWP_NOZORDER);
-
 				// EDIT
 				p.x = rc_edit.left;
 				p.y = rc_edit.top;
 				ScreenToClient(hDlgWnd, &p);
 				SetWindowPos(GetDlgItem(hDlgWnd, IDC_EDIT), 0,
-				             0, 0, dlg_w - p.x - edit2ok - ok2right, dlg_h - p.y - edit2info - info2bottom,
+				             0, 0, dlg_w - p.x - edit2ok - ok2right, dlg_h - p.y - edit2bottom,
 				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// サイズを保存
@@ -644,29 +631,32 @@ int CBStartPasteConfirmChange(HWND HWin)
 		}
 
 		if (confirm) {
-			ClipboardPtr = pText;
+			ClipboardPtr = (char *)calloc(sizeof(char), strlen(pText)+1);
+			memcpy(ClipboardPtr, pText, strlen(pText));
+			GlobalUnlock(hText);
+			CloseClipboard();
 			PasteCanceled = 0;
 			ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-							HVTWin, (DLGPROC)OnClipboardDlgProc);
+			                HVTWin, (DLGPROC)OnClipboardDlgProc);
+			free(ClipboardPtr);
 			if (ret == 0 || ret == -1) {
 				ret = GetLastError();
 			}
 
 			if (PasteCanceled) {
 				ret = 0;
-				GlobalUnlock(hText);
-				CloseClipboard();
 				goto error;
 			}
 
 		}
+		else {
+			GlobalUnlock(hText);
+			CloseClipboard();
+		}
 
 		ret = 1;
 
-		GlobalUnlock(hText);
 	}
-
-	CloseClipboard();
 
 error:
 	return (ret);

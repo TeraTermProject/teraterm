@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by c:\usr\ttssh2\teraterm\teraterm\ttermpro.rc
+// Used by t:\ttssh2\teraterm\teraterm\ttermpro.rc
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -127,7 +127,6 @@
 #define IDC_EDIT                        2510
 #define IDC_SCROLL_LINE                 2510
 #define IDC_PASTEDELAY_EDIT             2510
-#define IDC_CLIPBOARD_INFO              2511
 #define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
