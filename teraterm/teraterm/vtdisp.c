@@ -2104,7 +2104,7 @@ void CaretOn()
 // Turn on the cursor
 {
 	int CaretX, CaretY, H;
-    HIMC hImc;
+	HIMC hImc;
 	HBITMAP color;
 	int ime_on;
 
@@ -2116,8 +2116,8 @@ void CaretOn()
 	 * (2010.5.20 yutaka)
 	 */
 	hImc = ImmGetContext(HVTWin);
-    ime_on = ImmGetOpenStatus(hImc);
-    ImmReleaseContext(HVTWin, hImc);
+	ime_on = ImmGetOpenStatus(hImc);
+	ImmReleaseContext(HVTWin, hImc);
 	if (ime_on) {
 		color = (HBITMAP)1;
 	} else {
