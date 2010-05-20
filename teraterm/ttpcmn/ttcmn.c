@@ -393,6 +393,7 @@ void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 				}
 			}
 			else {
+				*Type = IdText; // do new-line conversion
 				*Len = 1;
 				KeyStr[0] = 0x0D;
 			}
