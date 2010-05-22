@@ -17,9 +17,14 @@
 #include "ttlib.h"
 #include "helpid.h"
 #include "dlglib.h"
+#include "vtterm.h"
 
 #include "filesys.h"
 #include "ftlib.h"
+
+#define FS_BRACKET_NONE  0
+#define FS_BRACKET_START 1
+#define FS_BRACKET_END   2
 
 PFileVar LogVar = NULL;
 PFileVar SendVar = NULL;
@@ -31,8 +36,13 @@ static BYTE LogLast = 0;
 BOOL FileLog = FALSE;
 BOOL BinLog = FALSE;
 BOOL DDELog = FALSE;
-static BOOL FileRetrySend, FileRetryEcho, FileCRSend;
+static BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
 static BYTE FileByte;
+
+static int FileBracketMode = FS_BRACKET_NONE;
+static int FileBracketPtr = 0;
+static char BracketStartStr[] = "\033[200~";
+static char BracketEndStr[] = "\033[201~";
 
 static BOOL FSend = FALSE;
 
@@ -833,6 +843,17 @@ void FileSendStart()
 	FileRetrySend = FALSE;
 	FileRetryEcho = FALSE;
 	FileCRSend = FALSE;
+	FileReadEOF = FALSE;
+
+	if (BracketedPasteMode()) {
+		FileBracketMode = FS_BRACKET_START;
+		FileBracketPtr = 0;
+		BinaryMode = TRUE;
+	}
+	else {
+		FileBracketMode = FS_BRACKET_NONE;
+		BinaryMode = ts.TransBin;
+	}
 
 	if (! OpenFTDlg(SendVar))
 		FileTransEnd(OpSendFile);
@@ -878,7 +899,7 @@ void FileTransEnd(WORD OpId)
 
 int FSOut1(BYTE b)
 {
-	if (ts.TransBin > 0)
+	if (BinaryMode)
 		return CommBinaryOut(&cv,(PCHAR)&b,1);
 	else if ((b>=0x20) || (b==0x09) || (b==0x0A) || (b==0x0D))
 		return CommTextOut(&cv,(PCHAR)&b,1);
@@ -888,7 +909,7 @@ int FSOut1(BYTE b)
 
 int FSEcho1(BYTE b)
 {
-	if (ts.TransBin > 0)
+	if (BinaryMode)
 		return CommBinaryEcho(&cv,(PCHAR)&b,1);
 	else
 		return CommTextEcho(&cv,(PCHAR)&b,1);
@@ -924,14 +945,41 @@ void FileSend()
 	}
 
 	do {
-		fc = _lread(SendVar->FileHandle,&FileByte,1);
-		SendVar->ByteCount = SendVar->ByteCount + fc;
+		if (FileBracketMode == FS_BRACKET_START) {
+			FileByte = BracketStartStr[FileBracketPtr++];
+			fc = 1;
 
-		if (FileCRSend && (fc==1) && (FileByte==0x0A))
-		{
+			if (FileBracketPtr >= sizeof(BracketStartStr) - 1) {
+				FileBracketMode = FS_BRACKET_END;
+				FileBracketPtr = 0;
+				BinaryMode = ts.TransBin;
+			}
+		}
+		else if (! FileReadEOF) {
 			fc = _lread(SendVar->FileHandle,&FileByte,1);
 			SendVar->ByteCount = SendVar->ByteCount + fc;
+
+			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
+				fc = _lread(SendVar->FileHandle,&FileByte,1);
+				SendVar->ByteCount = SendVar->ByteCount + fc;
+			}
 		}
+		else {
+			fc = 0;
+		}
+
+		if (fc == 0 && FileBracketMode == FS_BRACKET_END) {
+			FileReadEOF = TRUE;
+			FileByte = BracketEndStr[FileBracketPtr++];
+			fc = 1;
+			BinaryMode = TRUE;
+
+			if (FileBracketPtr >= sizeof(BracketEndStr) - 1) {
+				FileBracketMode = FS_BRACKET_NONE;
+				FileBracketPtr = 0;
+			}
+		}
+
 
 		if (fc!=0)
 		{
@@ -952,8 +1000,7 @@ void FileSend()
 					return;
 			}
 		}
-		if ((fc==0) || (SendVar->ByteCount % 100 == 0))
-		{
+		if ((fc==0) || ((SendVar->ByteCount % 100 == 0) && (FileBracketPtr == 0))) {
 			SendDlg->RefreshNum();
 			BCOld = SendVar->ByteCount;
 			if (fc!=0)

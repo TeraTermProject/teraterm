@@ -17,9 +17,8 @@ void ChangeTerminalSize(int Nx, int Ny);
 int VTParse();
 void FocusReport(BOOL Focus);
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos);
+BOOL BracketedPasteMode();
 void EndTerm();
-
-extern BOOL BracketedPaste;
 
 #ifdef __cplusplus
 }

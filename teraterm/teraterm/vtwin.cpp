@@ -783,7 +783,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	if (pasteRButton && !ts.ConfirmPasteMouseRButton) {
 		if (CBStartPasteConfirmChange(HVTWin)) {
-			CBStartPaste(HVTWin, FALSE, BracketedPaste, 0, NULL, 0);
+			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 			/* 最下行でだけ自動スクロールする設定の場合
 			   ペースト処理でスクロールさせる */
 			if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
@@ -793,7 +793,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 	}
 	else if (pasteMButton) {
 		if (CBStartPasteConfirmChange(HVTWin)) {
-			CBStartPaste(HVTWin, FALSE, BracketedPaste, 0, NULL, 0);
+			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 			/* 最下行でだけ自動スクロールする設定の場合
 			   ペースト処理でスクロールさせる */
 			if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
@@ -3932,7 +3932,7 @@ void CVTWindow::OnEditPaste()
 {
 	// add confirm (2008.2.4 yutaka)
 	if (CBStartPasteConfirmChange(HVTWin)) {
-		CBStartPaste(HVTWin, FALSE, BracketedPaste, 0, NULL, 0);
+		CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 		/* 最下行でだけ自動スクロールする設定の場合
 		   ペースト処理でスクロールさせる */
 		if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
@@ -3945,7 +3945,7 @@ void CVTWindow::OnEditPasteCR()
 {
 	// add confirm (2008.3.11 maya)
 	if (CBStartPasteConfirmChange(HVTWin)) {
-		CBStartPaste(HVTWin, TRUE, BracketedPaste, 0, NULL, 0);
+		CBStartPaste(HVTWin, TRUE, BracketedPasteMode(), 0, NULL, 0);
 		/* 最下行でだけ自動スクロールする設定の場合
 		   ペースト処理でスクロールさせる */
 		if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
@@ -5053,7 +5053,7 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 	if (sending) {
 		// 端末へ文字列を送り込む
 		// DDE通信に使う関数に変更。(2006.2.7 yutaka)
-		CBStartPaste(HVTWin, FALSE, BracketedPaste, TermWidthMax/*CBBufSize*/, buf, buflen);
+		CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), TermWidthMax/*CBBufSize*/, buf, buflen);
 		// 送信データがある場合は送信する
 		if (TalkStatus == IdTalkCB) {
 			CBSend();

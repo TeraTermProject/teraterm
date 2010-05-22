@@ -3769,3 +3769,7 @@ void EndTerm() {
 	}
 	CLocale = NULL;
 }
+
+BOOL BracketedPasteMode() {
+	return BracketedPaste;
+}
