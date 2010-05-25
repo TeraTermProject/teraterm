@@ -38,18 +38,15 @@
         <ul>
           <li>added the "YMODEM" under the Transfer of File menu.</li>
           <li>added the YmodemRcvCommand entry in the teraterm.ini file. The default is empty.</li>
-          <li>added the "<a href="../macro/command/ymodemrecv.html">ymodemrecv</a>" macro command.</li>
-          <li>added the "<a href="../macro/command/ymodemsend.html">ymodemsend</a>" macro command.</li>
+          <li>added the "<a href="../macro/command/ymodemrecv.html">ymodemrecv</a>" and "<a href="../macro/command/ymodemsend.html">ymodemsend</a>" macro command.</li>
         </ul></li>
-      <li>added support for the VPB and HPB control sequence.</li>
-      <li>added the Show Macro Window of the Control menu to flash the running macro window.</li>
       <li>added support for specifying any baud rate of the serial port connection.
         <ul>
           <li>A user can specify any baud rate at the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> menu.</li>
           <li>A user can specify any baud rate at the <a href="../commandline/teraterm.html#BAUD">/BAUD</a> option.</li>
           <li>A user can specify any baud rate at the "<a href="../macro/command/setbaud.html">setbaud</a>" macro command.</li>
         </ul></li>
-      <li>added the "<a href="../macro/command/filestat.html">filestat</a>" macro command.</li>
+      <li>added support for the VPB and HPB control sequence.</li>
       <li>added support for <a href="../usage/tips/xterm.html#Bracketed">bracketed paste mode</a>.</li>
       <li>Split the TransBin flag into the Send File and the Log flags.
         <ul>
@@ -57,20 +54,22 @@
         </ul></li>
       <li>Change the cursor color depending on the IME open status.</li>
       <li>Unlock the clipboard while the ConfirmChangePaste dialog is opened.</li>
+      <li>added the <a href="../menu/control.html">[Control]-[Show Macro Window]</a> menu to flash the running macro window.</li>
+      <li>added the "<a href="../macro/command/filestat.html">filestat</a>" macro command.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
+      <li>Fixed a problem where TeraTerm consumes 100% CPU if a USB serial port is disconnected. Special thanks to Z. Vickery.</li>
+      <li>When a user assigns a function to the Alt key in the KEYBOARD.CNF file, the unnecessary string print.</li>
+      <li>Improved the cancellation logic for XModem and YModem transfers'. Special thanks to Z. Vickery.</li>
+      <li>Line at a time can not work well in English and Russian language. Special thanks to p3g4asus.</li>
       <li>Switching to alternate screen buffer, saving and restoring cursor position do not work correctly.</li>
       <li>By using the "Save Cursor" control sequence, the alternate screen buffer switching and the screen clear execute in the wrong.</li>
       <li>If ClearOnResize setting is on, DECCOLM (Change Column Mode) control sequence does not clear screen.</li>
-      <li>When a user assigns a function to the Alt key in the KEYBOARD.CNF file, the unnecessary string print.</li>
       <li>VPR control sequence does not work correctly.</li>
-      <li>The crc32file macro command does not work correctly for handling the file opening error. And also, the command supports the read-only file.</li>
-      <li>Fixed a problem where TeraTerm consumes 100% CPU if a USB serial port is disconnected. Special thanks to Z. Vickery.</li>
-      <li>Improved the cancellation logic for XModem and YModem transfers'. Special thanks to Z. Vickery.</li>
-      <li>Line at a time can not work well in English and Russian language. Special thanks to p3g4asus.</li>
+      <li>The <a href="../macro/command/crc32.html">crc32file</a> macro command does not work correctly for handling the file opening error. And also, the command supports the read-only file.</li>
     </ul>
   </li>
 

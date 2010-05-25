@@ -38,18 +38,15 @@
         <ul>
           <li>FileメニューのTransferに"YMODEM"を追加した。</li>
           <li>teraterm.iniに YmodemRcvCommand エントリを追加した。デフォルトは空。</li>
-          <li>マクロコマンド "<a href="../macro/command/ymodemrecv.html">ymodemrecv</a>" を追加した。</li>
-          <li>マクロコマンド "<a href="../macro/command/ymodemsend.html">ymodemsend</a>" を追加した。</li>
+          <li>マクロコマンド "<a href="../macro/command/ymodemrecv.html">ymodemrecv</a>", "<a href="../macro/command/ymodemsend.html">ymodemsend</a>" を追加した。</li>
         </ul></li>
-      <li>VPB, HPB 制御シーケンスに対応した。</li>
-      <li>実行中のマクロウィンドウがどれか分かるようにするための Control - Show Macro Window メニューを追加した。</li>
       <li>シリアルポート接続のボーレートを選択肢以外からも手入力出来るようにした。
         <ul>
           <li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a>で任意のボーレートを指定できるようにした。</li>
           <li><a href="../commandline/teraterm.html#BAUD">/BAUD</a> オプションで任意のボーレートを指定できるようにした。</li>
           <li>マクロコマンド "<a href="../macro/command/setbaud.html">setbaud</a>" の引数にボーレートの値を直接指定できるようにした。</li>
         </ul></li>
-      <li>マクロコマンド "<a href="../macro/command/filestat.html">filestat</a>" を追加した。</li>
+      <li>VPB, HPB 制御シーケンスに対応した。</li>
       <li><a href="../usage/tips/xterm.html#Bracketed">Bracketed Paste Mode</a>に対応した。</li>
       <li>"ファイル送信" と "ログ" での binary フラグの扱いを分離した。
         <ul>
@@ -57,20 +54,22 @@
         </ul></li>
       <li>IMEのon/off状態を見て、カーソルの色を変更するようにした。</li>
       <li>ConfirmChangePaste の確認ダイアログ表示中にクリップボードをロックしないようにした。</li>
+      <li>実行中のマクロウィンドウがどれか分かるようにするための<a href="../menu/control.html">[Control]-[Show Macro Window]</a>メニューを追加した。</li>
+      <li>マクロコマンド "<a href="../macro/command/filestat.html">filestat</a>" を追加した。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
+      <li>USBシリアルポートが切断された場合、CPU使用率が100%となる問題を修正した。Z. Vickery氏に感謝します。</li>
+      <li>キーボード設定ファイルで Alt+キー に機能を割り当てた時、余計な文字列が追加で出力されるのを修正した。</li>
+      <li>XMODEM/YMODEMのキャンセル処理を改善した。Z. Vickery氏に感謝します。</li>
+      <li>英語モードおよびロシア語モードで、"Line at a time" モードが正しく働かないのを修正した。p3g4asus氏に感謝します。</li>
       <li>代替画面バッファへの切り替え時、カーソル位置の保存/復元が正しく働かない場合があるのを修正した。</li>
       <li>代替画面バッファ対応のカーソル位置保存制御シーケンスで、代替画面バッファへの切り替え、および画面のクリアが行われていたのを修正した。</li>
       <li>ClearOnResize が on の時、DECCOLM(桁数モード変更)制御シーケンスで画面がクリアされないのを修正した。</li>
-      <li>キーボード設定ファイルで Alt+キー に機能を割り当てた時、余計な文字列が追加で出力されるのを修正した。</li>
       <li>VPR 制御シーケンスの動作が正しくないのを修正した。</li>
-      <li>crc32file マクロコマンドにおいて、ファイルオープンエラーが正しく判定できていなかった問題を修正した。また、読み込み専用ファイルに対してエラーとならないようにした。</li>
-      <li>USBシリアルポートが切断された場合、CPU使用率が100%となる問題を修正した。Z. Vickery氏に感謝します。</li>
-      <li>XMODEM/YMODEMのキャンセル処理を改善した。Z. Vickery氏に感謝します。</li>
-      <li>英語モードおよびロシア語モードで、"Line at a time" モードが正しく働かないのを修正した。p3g4asus氏に感謝します。</li>
+      <li><a href="../macro/command/crc32.html">crc32file</a> マクロコマンドにおいて、ファイルオープンエラーが正しく判定できていなかった問題を修正した。また、読み込み専用ファイルに対してエラーとならないようにした。</li>
     </ul>
   </li>
 
