@@ -384,6 +384,8 @@ Menu command                        ID
 [File] Transfer/Kermit/Finish       50144
 [File] Transfer/XMODEM/Receive      50145
 [File] Transfer/XMODEM/Send         50146
+[File] Transfer/YMODEM/Receive      50157
+[File] Transfer/YMODEM/Send         50158
 [File] Transfer/ZMODEM/Receive      50151
 [File] Transfer/ZMODEM/Send         50152
 [File] Transfer/B-Plus/Receive      50153
