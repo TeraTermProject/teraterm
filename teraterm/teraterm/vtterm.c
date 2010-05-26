@@ -122,37 +122,56 @@ static int NewKeyId, NewKeyLen;
 
 static _locale_t CLocale = NULL;
 
-void ResetSBuffers()
+void ResetSBuffer(PStatusBuff sbuff)
 {
-  SBuff1.CursorX = 0;
-  SBuff1.CursorY = 0;
-  SBuff1.Attr = DefCharAttr;
+  sbuff->CursorX = 0;
+  sbuff->CursorY = 0;
+  sbuff->Attr = DefCharAttr;
   if (ts.Language==IdJapanese)
   {
-    SBuff1.Gn[0] = IdASCII;
-    SBuff1.Gn[1] = IdKatakana;
-    SBuff1.Gn[2] = IdKatakana;
-    SBuff1.Gn[3] = IdKanji;
-    SBuff1.Glr[0] = 0;
+    sbuff->Gn[0] = IdASCII;
+    sbuff->Gn[1] = IdKatakana;
+    sbuff->Gn[2] = IdKatakana;
+    sbuff->Gn[3] = IdKanji;
+    sbuff->Glr[0] = 0;
     if ((ts.KanjiCode==IdJIS) &&
 	(ts.JIS7Katakana==0))
-      SBuff1.Glr[1] = 2;  // 8-bit katakana
+      sbuff->Glr[1] = 2;  // 8-bit katakana
     else
-      SBuff1.Glr[1] = 3;
+      sbuff->Glr[1] = 3;
   }
   else {
-    SBuff1.Gn[0] = IdASCII;
-    SBuff1.Gn[1] = IdSpecial;
-    SBuff1.Gn[2] = IdASCII;
-    SBuff1.Gn[3] = IdASCII;
-    SBuff1.Glr[0] = 0;
-    SBuff1.Glr[1] = 0;
+    sbuff->Gn[0] = IdASCII;
+    sbuff->Gn[1] = IdSpecial;
+    sbuff->Gn[2] = IdASCII;
+    sbuff->Gn[3] = IdASCII;
+    sbuff->Glr[0] = 0;
+    sbuff->Glr[1] = 0;
   }
-  SBuff1.AutoWrapMode = TRUE;
-  SBuff1.RelativeOrgMode = FALSE;
+  sbuff->AutoWrapMode = TRUE;
+  sbuff->RelativeOrgMode = FALSE;
+}
+
+void ResetAllSBuffers()
+{
+  ResetSBuffer(&SBuff1);
   // copy SBuff1 to SBuff2
   SBuff2 = SBuff1;
   SBuff3 = SBuff1;
+}
+
+void ResetCurSBuffer()
+{
+    PStatusBuff Buff;
+
+    if (AltScr) {
+	Buff = &SBuff3; // Alternate screen buffer
+    }
+    else {
+	Buff = &SBuff1; // Normal screen buffer
+    }
+    ResetSBuffer(Buff);
+    SBuff2 = *Buff;
 }
 
 void ResetTerminal() /*reset variables but don't update screen */
@@ -197,7 +216,7 @@ void ResetTerminal() /*reset variables but don't update screen */
   PrinterMode = FALSE;
 
   // status buffers
-  ResetSBuffers();
+  ResetAllSBuffers();
 
   // Alternate Screen Buffer
   AltScr = FALSE;
@@ -2337,7 +2356,7 @@ void CSSetAttr()		// SGR
     BuffSetCurCharAttr(CharAttr);
 
     // status buffers
-    ResetSBuffers();
+    ResetCurSBuffer();
   }
 
   void CSExc(BYTE b)
