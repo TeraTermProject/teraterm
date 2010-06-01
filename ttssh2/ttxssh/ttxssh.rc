@@ -59,7 +59,7 @@ FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
     LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,132,248,27
     DEFPUSHBUTTON   "OK",IDOK,106,254,50,14
-    LTEXT           "Includes:\r\nTTSSH 1.5.4 (Robert O'Callahan roc+tt@cs.cmu.edu), 1998-1999\r\nIPv6 extention version 0.81 (kato@win6.jp), 2000-2003\r\nSSH2 support (Tera Term Project), 2004-2009",IDC_INCLUDES,6,36,248,34
+    LTEXT           "Includes:\r\nTTSSH 1.5.4 (Robert O'Callahan roc+tt@cs.cmu.edu), 1998-1999\r\nIPv6 extention version 0.81 (kato@win6.jp), 2000-2003\r\nSSH2 support (Tera Term Project), 2004-2010",IDC_INCLUDES,6,36,248,34
     LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,106,248,26
     ICON            "",IDC_TTSSH_ICON,234,7,21,20
     EDITTEXT        IDC_ABOUTTEXT,6,161,248,87,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY
@@ -487,7 +487,7 @@ BEGIN
             VALUE "FileDescription", "TTXSSH"
             VALUE "FileVersion", "2, 53, 0, 0"
             VALUE "InternalName", "TTXSSH"
-            VALUE "LegalCopyright", "(C)2004-2009 TeraTerm Project, (C)1998-1999 Robert O'Callahan"
+            VALUE "LegalCopyright", "(C)2004-2010 TeraTerm Project, (C)1998-1999 Robert O'Callahan"
             VALUE "OriginalFilename", "TTXSSH.dll"
             VALUE "ProductName", "TTSSH"
             VALUE "ProductVersion", "2, 53, 0, 0"
