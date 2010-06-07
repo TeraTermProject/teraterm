@@ -1169,6 +1169,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		GetPrivateProfileInt(Section, "CodePage ", DEFAULT_CODEPAGE,
 		                     FName);
 
+	ts->pureutf8 =
+		GetOnOff(Section, "PureUTF8", FName, FALSE);
+
 	// UI language message file
 	GetPrivateProfileString(Section, "UILanguageFile", "lang\\Default.lng",
 	                        Temp, sizeof(Temp), FName);
@@ -1563,6 +1566,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "Locale", ts->Locale, FName);
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->CodePage);
 	WritePrivateProfileString(Section, "CodePage", Temp, FName);
+
+	WriteOnOff(Section, "PureUTF8", FName,
+	           ts->pureutf8);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';

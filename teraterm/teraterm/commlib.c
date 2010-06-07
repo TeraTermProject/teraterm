@@ -293,6 +293,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->Flush = FALSE;
 	cv->FlushLen = 0;
 	cv->TelLineMode = FALSE;
+	cv->pureutf8 = &ts->pureutf8;
 
 	if ((ts->PortType!=IdSerial) && (strlen(ts->HostName)==0))
 	{

@@ -16,6 +16,7 @@
 
 #include "clipboar.h"
 #include "tt_res.h"
+#include "language.h"
 
 // for clipboard copy
 static HGLOBAL CBCopyHandle = NULL;
@@ -109,7 +110,11 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	}
 
 	if (BuffSize==0) { // for clipboar
-		if (IsClipboardFormatAvailable(CF_TEXT)) {
+		if (in_utf(ts) && 
+			IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+			// UTF-8の場合、Unicode(wchar_t)のまま受け取る。
+			Cf = CF_UNICODETEXT;
+		} else if (IsClipboardFormatAvailable(CF_TEXT)) {
 			Cf = CF_TEXT;
 		}
 		else if (IsClipboardFormatAvailable(CF_OEMTEXT)) {
@@ -169,6 +174,10 @@ void CBSend()
 	static char BracketEnd[] = "\033[201~";
 	static int BracketPtr = 0;
 	DWORD now;
+	char *ptr;
+	wchar_t *wptr;
+	char *mptr;
+	int mlen;
 
 	if (CBMemHandle==NULL) {
 		return;
@@ -196,9 +205,24 @@ void CBSend()
 		}
 	}
 
-	CBMemPtr = GlobalLock(CBMemHandle);
-	if (CBMemPtr==NULL) {
+	ptr = GlobalLock(CBMemHandle);
+	if (ptr==NULL) {
 		return;
+	}
+
+	mptr = NULL;
+	if (in_utf(ts)) {
+		/* UnicodeからUTF-8へ変換する。最後に null を追加する必要があるので、
+		 * +1 していることに注意。
+		 */
+		wptr = (wchar_t *)ptr;
+		convert_wchar_to_utf8(wptr, wcslen(wptr) + 1, NULL, &mlen);
+		mptr = malloc(sizeof(char) * mlen);
+		convert_wchar_to_utf8(wptr, wcslen(wptr) + 1, mptr, &mlen);
+		CBMemPtr = mptr;
+
+	} else {
+		CBMemPtr = ptr;
 	}
 
 	do {
@@ -251,6 +275,8 @@ void CBSend()
 		}
 		else {
 			CBEndPaste();
+			if (mptr)
+				free(mptr);
 			return;
 		}
 
@@ -270,7 +296,10 @@ void CBSend()
 	}
 	while (c>0);
 
-	if (CBMemPtr!=NULL) {
+	if (mptr)
+		free(mptr);
+
+	if (ptr !=NULL) {
 		GlobalUnlock(CBMemHandle);
 		CBMemPtr=NULL;
 	}

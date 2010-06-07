@@ -38,6 +38,9 @@ extern HINSTANCE hInst;
 
 extern int SerialNo;
 
+#define in_cv_utf(pure, lang) (pure && (lang == IdUtf8))
+#define in_utf(ts) in_cv_utf(ts.pureutf8, ts.Language)
+
 #ifdef __cplusplus
 }
 #endif

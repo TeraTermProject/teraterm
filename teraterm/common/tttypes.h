@@ -495,6 +495,7 @@ struct tttset {
 	char ConfirmChangePasteStringFile[MAX_PATH];
 	DWORD Baud;
 	WORD LogBinary;
+	int pureutf8;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -874,6 +875,8 @@ typedef struct {
 	BOOL Flush;
 
 	BOOL TelLineMode;
+
+	int *pureutf8;
 } TComVar;
 typedef TComVar far *PComVar;
 
@@ -916,6 +919,9 @@ typedef TMap far *PMap;
 /*
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
+ *
+ * - At version 4.67, ttset_memfilemap was replaced with ttset_memfilemap_13.
+ *   added tttset.pureutf8.
  *
  * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
  *   renamed tttset.Baud to Baud_.
@@ -995,4 +1001,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_12"
+#define TT_FILEMAPNAME "ttset_memfilemap_13"

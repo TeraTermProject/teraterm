@@ -17,6 +17,7 @@
 #include <locale.h>
 
 #include "compat_w95.h"
+#include "ttwinman.h"
 
 /* first instance flag */
 static BOOL FirstInstance = TRUE;
@@ -1445,12 +1446,17 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 		return C;
 	}
 
-	switch (cv->Language) {
-	  case IdUtf8:
-	  case IdJapanese:
-	  case IdKorean:
-		return TextOutMBCS(cv, B, C);
-		break;
+	if (in_cv_utf(cv->pureutf8, cv->Language)) {
+			// fall through
+
+	} else {
+		switch (cv->Language) {
+		  case IdUtf8:
+		  case IdJapanese:
+		  case IdKorean:
+			return TextOutMBCS(cv, B, C);
+			break;
+		}
 	}
 
 	Full = FALSE;
