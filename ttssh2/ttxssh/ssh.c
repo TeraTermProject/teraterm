@@ -4067,7 +4067,7 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 				c_str = "blowfish-ctr,";
 				break;
 			case SSH2_CIPHER_AES128_CBC:
-				c_str = "aes128-cbc";
+				c_str = "aes128-cbc,";
 				break;
 			case SSH2_CIPHER_AES192_CBC:
 				c_str = "aes192-cbc,";
