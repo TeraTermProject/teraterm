@@ -552,6 +552,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		do {
 			if (i==0) return TRUE;
 			firstch = b;
+
 			switch (b) {
 			case ACK:
 				// 1回目のEOT送信後のACK受信で、「1ファイル送信」の終わりとする。
@@ -574,6 +575,13 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				}
 				else if (yv->PktNumSent==(BYTE)(yv->PktNum+1))  // 次のブロックを送る
 				{
+					// ブロック0（ファイル情報）送信後は、ACK と 'C' を連続して受信することに
+					// なっているため、次の'C'を待つ。(2010.6.20 yutaka)
+					if ((yv->PktNum==0) && (yv->PktNumOffset==0)) {
+						SendFlag = FALSE;
+						break;
+					}
+
 					yv->PktNum = yv->PktNumSent;
 					if (yv->PktNum==0)
 						yv->PktNumOffset = yv->PktNumOffset + 256;
@@ -582,6 +590,13 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				break;
 
 			case NAK:
+				// 1回目のEOT送信後のNAK受信で、最後"EOT"を送る。
+				if (yv->SendEot) {
+					yv->PktNum = yv->PktNumSent;
+					if (yv->PktNum==0)
+						yv->PktNumOffset = yv->PktNumOffset + 256;
+				}
+
 				SendFlag = TRUE;
 				break;
 
@@ -593,6 +608,13 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				// 'C'を受け取ると、ブロックの送信を開始する。
 				if ((yv->PktNum==0) && (yv->PktNumOffset==0))
 				{
+					// ファイル情報送信後、ACK -> 'C' と受信したので、次のブロックを送信する。
+					if (yv->SendFileInfo) {
+						yv->PktNum = yv->PktNumSent;
+						if (yv->PktNum==0)
+							yv->PktNumOffset = yv->PktNumOffset + 256;
+					}
+
 					SendFlag = TRUE;
 				}
 				else if (yv->LastSendEot) {
