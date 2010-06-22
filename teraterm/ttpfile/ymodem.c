@@ -359,6 +359,11 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 					  fv->FileOpen = 0;
 					  _lclose(fv->FileHandle);
 					  fv->FileHandle = -1;
+
+					  // 1回目のEOTに対してNAKを返す
+					  b = NAK;
+					  YWrite(fv,yv,cv,&b, 1);
+					  return TRUE;
 				  }
 
 				  initialize_file_info(fv, yv);
@@ -484,7 +489,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		nameend = name + 1 + strlen(name);
 		if (*nameend) {
 			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
-			if (ret == 3) {
+			if (ret >= 1) {
 				fv->FileSize = bytes_total;
 			}
 		}
@@ -495,6 +500,9 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
 
 		yv->SendFileInfo = 1;
+
+		// 次のファイル送信を促すため、'C'を送る。
+		YSendNAK(fv,yv,cv);
 
 		return TRUE;
 	}
