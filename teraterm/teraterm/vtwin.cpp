@@ -1496,8 +1496,12 @@ void CVTWindow::SetupTerm()
 	cv.RussHost = ts.RussHost;
 	cv.RussClient = ts.RussClient;
 
-	if (cv.Ready && cv.TelFlag && (ts.TelEcho>0)) {
-		TelChangeEcho();
+	if (cv.Ready) {
+		if (cv.TelFlag && (ts.TelEcho>0)) {
+			TelChangeEcho();
+		}
+		_free_locale(cv.locale);
+		cv.locale = _create_locale(LC_ALL, cv.Locale);
 	}
 
 	if ((ts.TerminalWidth!=NumOfColumns) ||

@@ -3,6 +3,7 @@
  All rights reserved. */
 
 /* Constants and types for Tera Term */
+#include <locale.h>
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -877,6 +878,7 @@ typedef struct {
 	BOOL TelLineMode;
 
 	int *pureutf8;
+	_locale_t locale;
 } TComVar;
 typedef TComVar far *PComVar;
 
