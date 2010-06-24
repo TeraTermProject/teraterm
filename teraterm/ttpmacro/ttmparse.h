@@ -186,41 +186,40 @@
 #define RsvWaitN        143   // add 'waitn'  (2009.1.26 maya)
 #define RsvSendBroadcast    144
 #define RsvSendMulticast    145
-#define RsvSetMulticastName    146
-#define RsvSendlnBroadcast    147
-#define RsvWait4all         148
+#define RsvSetMulticastName 146
+#define RsvSendlnBroadcast  147
+#define RsvWait4all     148
+#define RsvWaitInt      149
+#define RsvSendInt      150
+#define RsvSetDebug     151
+#define RsvYmodemRecv   152
+#define RsvYmodemSend   153
+#define RsvFileStat     154
 
-#define RsvOperator     150
-#define RsvBNot         151
-#define RsvBAnd         152
-#define RsvBOr          153
-#define RsvBXor         154
-#define RsvMul          155
-#define RsvPlus         156
-#define RsvMinus        157
-#define RsvDiv          158
-#define RsvMod          159
-#define RsvLT           160
-#define RsvEQ           161
-#define RsvGT           162
-#define RsvLE           163
-#define RsvNE           164
-#define RsvGE           165
-#define RsvLNot         166
-#define RsvLAnd         167
-#define RsvLOr          168
-#define RsvLXor         169
-#define RsvARShift      170 // arithmetic right shift
-#define RsvALShift      171 // arithmetic left shift
-#define RsvLRShift      172 // logical right shift
+#define RsvOperator     200
+#define RsvBNot         201
+#define RsvBAnd         202
+#define RsvBOr          203
+#define RsvBXor         204
+#define RsvMul          205
+#define RsvPlus         206
+#define RsvMinus        207
+#define RsvDiv          208
+#define RsvMod          209
+#define RsvLT           210
+#define RsvEQ           211
+#define RsvGT           212
+#define RsvLE           213
+#define RsvNE           214
+#define RsvGE           215
+#define RsvLNot         216
+#define RsvLAnd         217
+#define RsvLOr          218
+#define RsvLXor         219
+#define RsvARShift      220 // arithmetic right shift
+#define RsvALShift      221 // arithmetic left shift
+#define RsvLRShift      222 // logical right shift
 
-#define RsvWaitInt		173
-#define RsvSendInt      174
-#define RsvSetDebug     175
-
-#define RsvYmodemRecv   176
-#define RsvYmodemSend   177
-#define RsvFileStat     178
 
 // integer type for buffer pointer
 typedef DWORD BINT;
