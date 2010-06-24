@@ -47,8 +47,12 @@ filenamebox &lt;title&gt; [&lt;dialogtype&gt;]
 <h2>Example</h2>
 
 <pre class="macro-example">
-filenamebox 'title'
-messagebox inputstr 'title' 0
+connect '/C=11'
+filenamebox 'File selection' 0
+if result&lt;&gt;0 then
+	messagebox inputstr 'title' 0
+	sendfile inputstr 1
+endif
 </pre>
 
 </body>
