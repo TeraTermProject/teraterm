@@ -474,7 +474,11 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				xv->PktBufCount = 1;
 			}
 		} else {				/* resend packet */
-			xv->PktBufCount = 3 + xv->DataLen + xv->CheckLen;
+			if (xv->PktOut[0] == EOT) {
+				xv->PktBufCount = 1;
+			} else {
+				xv->PktBufCount = 3 + xv->DataLen + xv->CheckLen;
+			}
 		}
 		xv->PktBufPtr = 0;
 	}
