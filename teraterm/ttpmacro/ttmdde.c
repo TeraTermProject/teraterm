@@ -1012,6 +1012,7 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 {
 	HDDEDATA Data;
 	PCHAR DataPtr;
+	int err;
 
 	if (! Linked) {
 		return ErrLinkFirst;
@@ -1019,11 +1020,13 @@ WORD GetTTParam(char OpId, PCHAR Param, int destlen)
 
 	SendCmnd(OpId,0);
 	Data = DdeClientTransaction(NULL,0,ConvH,Item2,CF_OEMTEXT,XTYP_REQUEST,5000,NULL);
-	if (Data==0) {
+	err = DdeGetLastError(Inst);  /* エラーチェック追加 (2010.7.17 yutaka) */
+	if (Data==0 || err) {
 		return 0;
 	}
 	DataPtr = (PCHAR)DdeAccessData(Data,NULL);
-	if (DataPtr!=NULL) {
+	err = DdeGetLastError(Inst);  /* エラーチェック追加 (2010.7.17 yutaka) */
+	if (DataPtr!=NULL && err == 0) {
 		strncpy_s(Param,destlen,DataPtr,_TRUNCATE);
 		DdeUnaccessData(Data);
 	}
