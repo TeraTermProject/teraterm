@@ -59,5 +59,13 @@ messagebox tmp 'exec'
 exec tmp
 </pre>
 
+<pre class="macro-example">
+; ディレクトリを作る
+getenv "USERPROFILE" userprof
+getdate logdir "log-%Y%m%d"
+sprintf2 cmd 'cmd /c mkdir "%s\My Documents\%s"' userprof logdir
+exec cmd "HIDE"
+</pre>
+
 </body>
 </html>
