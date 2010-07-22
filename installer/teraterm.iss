@@ -66,6 +66,7 @@ Source: release\ssh2login.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\wait_regex.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\lang\Japanese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\German.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\French.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
@@ -252,12 +253,14 @@ en.msg_language_subcaption=Select the language of application's menu and dialog,
 en.msg_language_none=&English
 en.msg_language_japanese=&Japanese
 en.msg_language_german=&German
+en.msg_language_french=&French
 ja.msg_language_caption=言語の選択
 ja.msg_language_description=ユーザーインターフェースの言語を選択してください。
 ja.msg_language_subcaption=アプリケーションのメニューやダイアログ等の表示言語を選択して、「次へ」をクリックしてください。
 ja.msg_language_none=英語(&E)
 ja.msg_language_japanese=日本語(&J)
 ja.msg_language_german=ドイツ語(&G)
+ja.msg_language_french=フランス語(&F)
 en.msg_del_confirm=Are you sure that you want to delete %s ?
 ja.msg_del_confirm=%s を削除しますか？
 en.msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
@@ -441,6 +444,8 @@ begin
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Japanese.lng', iniFile);
     2:
       SetIniString('Tera Term', 'UILanguageFile', 'lang\German.lng', iniFile);
+    3:
+      SetIniString('Tera Term', 'UILanguageFile', 'lang\French.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang\English.lng', iniFile);
   end;
@@ -467,6 +472,7 @@ var
   UILangFilePageNone        : String;
   UILangFilePageJapanese    : String;
   UILangFilePageGerman      : String;
+  UILangFilePageFrench      : String;
 begin
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
@@ -474,6 +480,7 @@ begin
   UILangFilePageNone        := CustomMessage('msg_language_none');
   UILangFilePageJapanese    := CustomMessage('msg_language_japanese');
   UILangFilePageGerman      := CustomMessage('msg_language_german');
+  UILangFilePageFrench      := CustomMessage('msg_language_french');
 
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
@@ -481,6 +488,7 @@ begin
   UILangFilePage.Add(UILangFilePageNone);
   UILangFilePage.Add(UILangFilePageJapanese);
   UILangFilePage.Add(UILangFilePageGerman);
+  UILangFilePage.Add(UILangFilePageFrench);
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
@@ -537,6 +545,8 @@ begin
           UILangFilePage.SelectedValueIndex := 1
         else if iniFile = 'lang\German.lng' then
           UILangFilePage.SelectedValueIndex := 2
+        else if iniFile = 'lang\French.lng' then
+          UILangFilePage.SelectedValueIndex := 3
         else
           UILangFilePage.SelectedValueIndex := 0;
 
