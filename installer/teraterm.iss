@@ -333,6 +333,29 @@ begin;
   end;
 end;
 
+{
+// If value is not found in INI, returns ""
+function GetIniString2(Section:String; Key:String; Filename:String) : String;
+var
+  Default1: String;
+  Default2: String;
+  Value1:   String;
+  Value2:   String;
+begin
+  Default1 := 'on';
+  Default2 := 'off';
+  Value1 := GetIniString(Section, Key, Default1, Filename);
+  Value2 := GetIniString(Section, Key, Default2, Filename);
+
+  if Value1 <> Value2 then
+    // no value in INI
+    Result := ''
+  else
+    // value in INI
+    Result := Value1
+end;
+}
+
 function GetDefaultIniFilename : String;
 begin
   Result := ExpandConstant('{app}') + '\TERATERM.INI';
