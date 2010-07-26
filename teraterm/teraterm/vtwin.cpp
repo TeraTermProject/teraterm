@@ -4035,6 +4035,7 @@ void CVTWindow::OnExternalSetup()
 	DWORD ret;
 
 	CAddSettingPropSheetDlg CAddSetting("", CWnd::FromHandle(HVTWin));
+	CAddSetting.EnableStackedTabs(FALSE);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
 		case -1:
