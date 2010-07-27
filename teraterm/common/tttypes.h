@@ -926,6 +926,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.67, ttset_memfilemap was replaced with ttset_memfilemap_13.
  *   added tttset.pureutf8.
+ *   added NextShownWin/PrevShownWin shortcut key.
  *
  * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
  *   renamed tttset.Baud to Baud_.
