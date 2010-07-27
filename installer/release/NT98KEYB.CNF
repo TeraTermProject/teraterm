@@ -162,8 +162,10 @@ BuffTop=1351
 BuffBottom=1359
 ; Ctrl + Tab
 NextWin=1039
+NextShownWin=off
 ; Ctrl + Shift + Tab
 PrevWin=1551
+PrevShownWin=off
 LocalEcho=off
 ScrollLock=off
 
