@@ -2997,6 +2997,12 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 		case IdCmdPrevWin:
 			SelectNextWin(HVTWin,-1);
 			break;
+		case IdCmdNextSWin:
+			SelectNextShownWin(HVTWin,1);
+			break;
+		case IdCmdPrevSWin:
+			SelectNextShownWin(HVTWin,-1);
+			break;
 		case IdCmdLocalEcho:
 			if (ts.LocalEcho==0) {
 				ts.LocalEcho = 1;

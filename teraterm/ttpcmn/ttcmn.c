@@ -732,6 +732,8 @@ void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 		case IdCmdBuffBottom:
 		case IdCmdNextWin:
 		case IdCmdPrevWin:
+		case IdCmdNextSWin:
+		case IdCmdPrevSWin:
 		case IdCmdLocalEcho:
 		case IdScrollLock:
 			PostMessage(HWin,WM_USER_ACCELCOMMAND,KeyCode,0);
@@ -924,6 +926,35 @@ void FAR PASCAL SelectNextWin(HWND HWin, int Next)
 	else if (i<0) {
 		i = pm->NWin-1;
 	}
+	SelectWin(i);
+}
+
+void FAR PASCAL SelectNextShownWin(HWND HWin, int Next)
+{
+	int i;
+
+	i = 0;
+	while ((i < pm->NWin) && (pm->WinList[i]!=HWin)) {
+		i++;
+	}
+	if (pm->WinList[i]!=HWin) {
+		return;
+	}
+
+	do {
+		i += Next;
+		if (i >= pm->NWin) {
+			i = 0;
+		}
+		else if (i < 0) {
+			i = pm->NWin-1;
+		}
+
+		if (pm->WinList[i] == HWin) {
+			return;
+		}
+	} while (IsIconic(pm->WinList[i]));
+
 	SelectWin(i);
 }
 

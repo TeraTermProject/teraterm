@@ -13,6 +13,7 @@ EXPORTS
   SetWinList @13
   SelectWin @14
   SelectNextWin @15
+  SelectNextShownWin @54
   GetNthWin @16
   CommReadRawByte @20
   CommInsert1Byte @21

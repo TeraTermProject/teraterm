@@ -2570,6 +2570,10 @@ void FAR PASCAL ReadKeyboardCnf
 
 	GetInt(KeyMap, IdCmdPrevWin, ShortCut, "PrevWin", FName);
 
+	GetInt(KeyMap, IdCmdNextSWin, ShortCut, "NextShownWin", FName);
+
+	GetInt(KeyMap, IdCmdPrevSWin, ShortCut, "PrevShownWin", FName);
+
 	GetInt(KeyMap, IdCmdLocalEcho, ShortCut, "LocalEcho", FName);
 
 	GetInt(KeyMap, IdScrollLock, ShortCut, "ScrollLock", FName);
