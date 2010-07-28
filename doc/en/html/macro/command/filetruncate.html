@@ -35,13 +35,33 @@ The system variable "result" value of -1 indicates an error.
 <h2>Example</h2>
 
 <pre class="macro-example">
+; Changes 32 bytes of a file.
 filetruncate 'test.exe' 32
-
 if result = -1 then
 	messagebox 'file truncate error' 'filetruncate'
 else
 	messagebox 'file truncate success' 'filetruncate'
 endif
+</pre>
+
+<pre class="macro-example">
+; Makes 8M bytes of a file containing all zero data.
+size = 8*1024*1024
+filetruncate 'bigfile.bin' size
+</pre>
+
+<pre class="macro-example">
+; Quotas the limitation size of a log file.
+maxsize = 1024
+logopen filename 0 0
+:loop
+logwrite '...'
+filetruncate filename maxsize
+do something...
+if err goto exit
+goto loop
+:exit
+logclose
 </pre>
 
 </body>

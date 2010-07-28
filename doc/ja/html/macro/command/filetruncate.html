@@ -34,13 +34,33 @@ filetruncate &lt;filename&gt; &lt;size&gt;
 <h2>例</h2>
 
 <pre class="macro-example">
+; ファイルを32バイトに切り詰める
 filetruncate 'test.exe' 32
-
 if result = -1 then
 	messagebox 'file truncate error' 'filetruncate'
 else
 	messagebox 'file truncate success' 'filetruncate'
 endif
+</pre>
+
+<pre class="macro-example">
+; 8MBの空ファイルを作る
+size = 8*1024*1024
+filetruncate 'bigfile.bin' size
+</pre>
+
+<pre class="macro-example">
+; ログファイルのサイズに上限を設ける
+maxsize = 1024
+logopen filename 0 0
+:loop
+logwrite '...'
+filetruncate filename maxsize
+do something...
+if err goto exit
+goto loop
+:exit
+logclose
 </pre>
 
 </body>
