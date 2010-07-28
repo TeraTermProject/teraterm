@@ -592,6 +592,12 @@ LONG CTEKWindow::OnAccelCommand(UINT wParam, LONG lParam)
 		case IdCmdPrevWin:
 			SelectNextWin(HTEKWin,-1);
 			break;
+		case IdCmdNextSWin:
+			SelectNextShownWin(HTEKWin,1);
+			break;
+		case IdCmdPrevSWin:
+			SelectNextShownWin(HTEKWin,-1);
+			break;
 		case IdBreak:
 		case IdCmdRestoreSetup:
 		case IdCmdLoadKeyMap:
