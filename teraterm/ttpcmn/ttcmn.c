@@ -953,7 +953,7 @@ void FAR PASCAL SelectNextShownWin(HWND HWin, int Next)
 		if (pm->WinList[i] == HWin) {
 			return;
 		}
-	} while (IsIconic(pm->WinList[i]));
+	} while (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i]));
 
 	SelectWin(i);
 }
