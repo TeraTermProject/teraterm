@@ -154,6 +154,8 @@ In this section, Tera Term functions are assigned to PC keys.
 	  BuffBottom		Scrolls screen to buffer bottom
 	  NextWin		Moves to the next Tera Term window
 	  PrevWin		Moves to the previous Tera Term window
+	  NextShownWin		Moves to the next Tera Term window (except minimized)
+	  PrevShownWin		Moves to the previous Tera Term window (except minimized)
 	  LocalEcho		Toggles the local echo status
 
 	  <PC key code>

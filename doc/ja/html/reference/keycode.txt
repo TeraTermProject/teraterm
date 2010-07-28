@@ -172,6 +172,8 @@ Tera Term の機能をPC キーに割り当てます。
 	BuffBottom		バッファー最後へスクロール
 	NextWin 		次の Tera Term ウィンドウへ移動
 	PrevWin 		前の Tera Term ウィンドウへ移動
+	NextShownWin 		次の最小化されていない Tera Term ウィンドウへ移動
+	PrevShownWin 		前の最小化されていない Tera Term ウィンドウへ移動
 	LocalEcho		Local echo を on/off する
 
 	<PC key code>
