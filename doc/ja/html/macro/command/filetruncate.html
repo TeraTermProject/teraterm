@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>filetruncate</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filetruncate</h1>
+
+<p>
+ファイルのサイズを変更する。
+</p>
+
+<pre class="macro-syntax">
+filetruncate &lt;filename&gt; &lt;size&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;filename&gt; をサイズ &lt;size&gt; バイトの大きさに変更する。<br>
+指定したサイズが、既存の大きさを超えた場合、ヌル文字('\0')が追加される。<br>
+<br>
+
+サイズ変更に成功した場合は、result 変数に 0 が格納される。失敗した場合は -1 が格納される。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+filetruncate 'test.exe' 32
+
+if result = -1 then
+	messagebox 'file truncate error' 'filetruncate'
+else
+	messagebox 'file truncate success' 'filetruncate'
+endif
+</pre>
+
+</body>
+</html>

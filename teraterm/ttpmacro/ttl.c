@@ -21,6 +21,11 @@
 #include "tttypes.h"
 #include <shellapi.h>
 #include <sys/stat.h>
+#include <io.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <share.h>
 
 // Oniguruma: Regular expression library
 #define ONIG_EXTERN extern
@@ -1503,6 +1508,58 @@ WORD TTLFileStrSeek2()
 		SetResult(0);
 		_llseek(FH,pos,0);
 	}
+	return Err;
+}
+
+WORD TTLFileTruncate()
+{
+	WORD Err;
+	TStrVal FName;
+	int result = -1;
+	int TruncByte;
+	int fh = -1;
+	int ret;
+
+	Err = 0;
+	GetStrVal(FName,&Err);
+	if ((Err==0) &&
+	    (strlen(FName)==0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	if (!GetAbsPath(FName,sizeof(FName))) {
+		goto end;
+	}
+
+	if (CheckParameterGiven()) { 
+		GetIntVal(&TruncByte,&Err);
+		if (Err!=0) return Err;
+	} else {
+		Err = ErrSyntax;
+		goto end;
+	}
+
+	// ファイルを指定したサイズで切り詰める。
+   ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
+   if (ret != 0) {
+		Err = ErrCantOpen;
+		goto end;
+   }
+   ret = _chsize_s(fh, TruncByte);
+   if (ret != 0) {
+		Err = ErrInvalidCtl;
+		goto end;
+   }
+
+	result = 0;
+	Err = 0;
+
+end:
+	SetResult(result);
+
+	if (fh != -1)
+		_close(fh);
+
 	return Err;
 }
 
@@ -3958,6 +4015,8 @@ int ExecCmnd()
 			Err = TTLFileStrSeek(); break;
 		case RsvFileStrSeek2:
 			Err = TTLFileStrSeek2(); break;
+		case RsvFileTruncate:
+			Err = TTLFileTruncate(); break;
 		case RsvFileWrite:
 			Err = TTLFileWrite(); break;
 		case RsvFileWriteLn:

@@ -203,6 +203,7 @@ HlpMacroCommandFileseekback=html\macro\command\fileseekback.html
 HlpMacroCommandFilestat=html\macro\command\filestat.html
 HlpMacroCommandFilestrseek=html\macro\command\filestrseek.html
 HlpMacroCommandFilestrseek2=html\macro\command\filestrseek2.html
+HlpMacroCommandFiletruncate=html\macro\command\filetruncate.html
 HlpMacroCommandFilewrite=html\macro\command\filewrite.html
 HlpMacroCommandFilewriteln=html\macro\command\filewriteln.html
 HlpMacroCommandFindoperations=html\macro\command\findoperations.html

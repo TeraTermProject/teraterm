@@ -202,6 +202,7 @@
 #define HlpMacroCommandFilestat         92178
 #define HlpMacroCommandFilestrseek      92034
 #define HlpMacroCommandFilestrseek2     92035
+#define HlpMacroCommandFiletruncate     92179
 #define HlpMacroCommandFilewrite        92036
 #define HlpMacroCommandFilewriteln      92037
 #define HlpMacroCommandFindoperations   92039

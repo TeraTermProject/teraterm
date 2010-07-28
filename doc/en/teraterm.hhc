@@ -1132,6 +1132,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="filetruncate">
+					<param name="Local" value="html\macro\command\filetruncate.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filewrite">
 					<param name="Local" value="html\macro\command\filewrite.html">
 					<param name="ImageNumber" value="11">

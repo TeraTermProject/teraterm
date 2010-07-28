@@ -195,6 +195,7 @@
 #define RsvYmodemRecv   152
 #define RsvYmodemSend   153
 #define RsvFileStat     154
+#define RsvFileTruncate 155
 
 #define RsvOperator     200
 #define RsvBNot         201
