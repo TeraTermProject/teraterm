@@ -50,16 +50,28 @@ filetruncate 'bigfile.bin' size
 </pre>
 
 <pre class="macro-example">
-; ログファイルのサイズに上限を設ける
-maxsize = 1024
+; マクロがある場所にログファイルを作る
+getdir dir
+sprintf2 filename '%s\test.log' dir
 logopen filename 0 0
+; ファイルの上限サイズ
+maxsize = 512
+counter = 0
+
 :loop
-logwrite '...'
+counter = counter + 1
+sprintf2 line 'counter = %d' counter
+logwrite line
+logwrite #13#10
 filetruncate filename maxsize
-do something...
-if err goto exit
+if result = -1 then
+	messagebox 'file truncate error' 'filetruncate'
+	goto skip
+endif
+if counter > 32 goto skip
 goto loop
-:exit
+
+:skip
 logclose
 </pre>
 
