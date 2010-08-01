@@ -383,7 +383,7 @@ begin
   $04: // Chinese
     begin
       if Length(Language) = 0 then
-        SetIniString('Tera Term', 'Language', 'Japanese', iniFile);
+        SetIniString('Tera Term', 'Language', 'UTF-8', iniFile);
       if Length(Locale) = 0 then
         SetIniString('Tera Term', 'Locale', 'chs', iniFile);
       if CodePage = 0 then
@@ -438,7 +438,7 @@ begin
       if GetUILanguage = $409 then begin // en-US
 
         if Length(Language) = 0 then
-          SetIniString('Tera Term', 'Language', 'Japanese', iniFile);
+          SetIniString('Tera Term', 'Language', 'UTF-8', iniFile);
         if Length(Locale) = 0 then
           SetIniString('Tera Term', 'Locale', 'american', iniFile);
         if CodePage = 0 then
