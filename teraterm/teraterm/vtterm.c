@@ -3682,7 +3682,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
   if (AltKey())
     modifier |= 16;
 
-  modifier = (ShiftKey()?4:0) | (ControlKey()?8:0) | (AltKey()?16:0);
+  modifier = (ShiftKey()?4:0) | (AltKey()?8:0) | (ControlKey()?16:0);
 
   switch (Event) {
     case IdMouseEventBtnDown:
