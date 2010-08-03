@@ -1298,6 +1298,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->DisableAcceleratorDuplicateSession =
 		GetOnOff(Section, "DisableAcceleratorDuplicateSession", FName, FALSE);
 
+	// added DisableMenuDuplicateSession (2010.8.3 maya)
+	ts->DisableMenuDuplicateSession =
+		GetOnOff(Section, "DisableMenuDuplicateSession", FName, FALSE);
+
 	// added PasteDelayPerLine (2009.4.12 maya)
 	ts->PasteDelayPerLine =
 		GetPrivateProfileInt(Section, "PasteDelayPerLine", 10, FName);
@@ -2305,6 +2309,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// DisableAcceleratorDuplicateSession
 	WriteOnOff(Section, "DisableAcceleratorDuplicateSession", FName,
 	           ts->DisableAcceleratorDuplicateSession);
+
+	// DisableMenuDuplicateSession
+	WriteOnOff(Section, "DisableMenuDuplicateSession", FName,
+	           ts->DisableMenuDuplicateSession);
 
 	// added PasteDelayPerLine (2009.4.12 maya)
 	WriteInt(Section, "PasteDelayPerLine", FName,
