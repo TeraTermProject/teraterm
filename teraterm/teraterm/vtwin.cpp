@@ -1248,7 +1248,12 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 		if ( Connecting ) {
 			EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_GRAYED);
 		} else {
-			EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_ENABLED);
+			if (ts.DisableMenuNewConnection) {
+				EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_GRAYED);
+			}
+			else {
+				EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_ENABLED);
+			}
 		}
 
 		if ( (! cv.Ready) || (SendVar!=NULL) ||

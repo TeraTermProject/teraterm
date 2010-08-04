@@ -498,6 +498,7 @@ struct tttset {
 	WORD LogBinary;
 	int pureutf8;
 	WORD DisableMenuDuplicateSession;
+	WORD DisableMenuNewConnection;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -929,6 +930,7 @@ typedef TMap far *PMap;
  *   added tttset.pureutf8.
  *   added NextShownWin/PrevShownWin shortcut key.
  *   added tttset.DisableMenuDuplicateSession.
+ *   added tttset.DisableMenuNewConnection.
  *
  * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
  *   renamed tttset.Baud to Baud_.

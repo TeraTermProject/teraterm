@@ -1302,6 +1302,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->DisableMenuDuplicateSession =
 		GetOnOff(Section, "DisableMenuDuplicateSession", FName, FALSE);
 
+	// added DisableMenuNewConnection (2010.8.4 maya)
+	ts->DisableMenuNewConnection =
+		GetOnOff(Section, "DisableMenuNewConnection", FName, FALSE);
+
 	// added PasteDelayPerLine (2009.4.12 maya)
 	ts->PasteDelayPerLine =
 		GetPrivateProfileInt(Section, "PasteDelayPerLine", 10, FName);
@@ -2313,6 +2317,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// DisableMenuDuplicateSession
 	WriteOnOff(Section, "DisableMenuDuplicateSession", FName,
 	           ts->DisableMenuDuplicateSession);
+
+	// DisableMenuNewConnection
+	WriteOnOff(Section, "DisableMenuNewConnection", FName,
+	           ts->DisableMenuNewConnection);
 
 	// added PasteDelayPerLine (2009.4.12 maya)
 	WriteInt(Section, "PasteDelayPerLine", FName,
