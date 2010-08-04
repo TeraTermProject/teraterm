@@ -1245,10 +1245,16 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 {
 	if ( SubMenu == FileMenu )
 	{
-		if ( Connecting ) {
-			EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_GRAYED);
-		} else {
-			if (ts.DisableMenuNewConnection) {
+		if (ts.DisableMenuNewConnection) {
+			if ( Connecting || cv.Open ) {
+				EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_GRAYED);
+			}
+			else {
+				EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_ENABLED);
+			}
+		}
+		else {
+			if ( Connecting ) {
 				EnableMenuItem(FileMenu,ID_FILE_NEWCONNECTION,MF_BYCOMMAND | MF_GRAYED);
 			}
 			else {
