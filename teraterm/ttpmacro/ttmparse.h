@@ -189,37 +189,37 @@
 #define RsvSetMulticastName 146
 #define RsvSendlnBroadcast  147
 #define RsvWait4all     148
-#define RsvWaitInt      149
-#define RsvSendInt      150
-#define RsvSetDebug     151
-#define RsvYmodemRecv   152
-#define RsvYmodemSend   153
-#define RsvFileStat     154
-#define RsvFileTruncate 155
+#define RsvWaitInt      173
+#define RsvSendInt      174
+#define RsvSetDebug     175
+#define RsvYmodemRecv   176
+#define RsvYmodemSend   177
+#define RsvFileStat     178
+#define RsvFileTruncate 179
 
-#define RsvOperator     200
-#define RsvBNot         201
-#define RsvBAnd         202
-#define RsvBOr          203
-#define RsvBXor         204
-#define RsvMul          205
-#define RsvPlus         206
-#define RsvMinus        207
-#define RsvDiv          208
-#define RsvMod          209
-#define RsvLT           210
-#define RsvEQ           211
-#define RsvGT           212
-#define RsvLE           213
-#define RsvNE           214
-#define RsvGE           215
-#define RsvLNot         216
-#define RsvLAnd         217
-#define RsvLOr          218
-#define RsvLXor         219
-#define RsvARShift      220 // arithmetic right shift
-#define RsvALShift      221 // arithmetic left shift
-#define RsvLRShift      222 // logical right shift
+#define RsvOperator     1000
+#define RsvBNot         1001
+#define RsvBAnd         1002
+#define RsvBOr          1003
+#define RsvBXor         1004
+#define RsvMul          1005
+#define RsvPlus         1006
+#define RsvMinus        1007
+#define RsvDiv          1008
+#define RsvMod          1009
+#define RsvLT           1010
+#define RsvEQ           1011
+#define RsvGT           1012
+#define RsvLE           1013
+#define RsvNE           1014
+#define RsvGE           1015
+#define RsvLNot         1016
+#define RsvLAnd         1017
+#define RsvLOr          1018
+#define RsvLXor         1019
+#define RsvARShift      1020 // arithmetic right shift
+#define RsvALShift      1021 // arithmetic left shift
+#define RsvLRShift      1022 // logical right shift
 
 
 // integer type for buffer pointer
