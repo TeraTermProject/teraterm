@@ -545,6 +545,7 @@ BreakSC:
 		if ( (ts->PortType==IdTCPIP) && cv->Open ) {
 			if ( cv->s!=INVALID_SOCKET ) {
 				Pclosesocket(cv->s);
+				cv->s = INVALID_SOCKET;  /* ソケット無効の印を付ける。(2010.8.6 yutaka) */
 			}
 			FreeWinsock();
 		}

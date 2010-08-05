@@ -2724,6 +2724,7 @@ void CVTWindow::OnTimer(UINT nIDEvent)
 		// CloseSocket()を呼びたいが、ここからは呼べないので、直接Win32APIをコールする。
 		if (!cv.Ready) {
 			closesocket(cv.s);
+			cv.s = INVALID_SOCKET;  /* ソケット無効の印を付ける。(2010.8.6 yutaka) */
 			//::PostMessage(HVTWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 		}
 	}
