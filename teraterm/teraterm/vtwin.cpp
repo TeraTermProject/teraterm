@@ -2120,7 +2120,7 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 	}
 
 	// added DisablePasteMouseMButton (2008.3.2 maya)
-	if (ts.DisablePasteMouseMButton) {
+	if (ts.DisablePasteMouseMButton || mousereport) {
 		ButtonUp(FALSE);
 	}
 	else {
