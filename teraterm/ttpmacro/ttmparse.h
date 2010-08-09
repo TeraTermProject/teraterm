@@ -189,8 +189,6 @@
 #define RsvSetMulticastName 146
 #define RsvSendlnBroadcast  147
 #define RsvWait4all     148
-#define RsvWaitInt      173
-#define RsvSendInt      174
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
 #define RsvYmodemSend   177
