@@ -178,6 +178,7 @@
 #define HlpMacroCommandCygConnect       92130
 #define HlpMacroCommandDelpassword      92011
 #define HlpMacroCommandDisconnect       92012
+#define HlpMacroCommandDispstr          92149
 #define HlpMacroCommandDo               92126
 #define HlpMacroCommandEnablekeyb       92015
 #define HlpMacroCommandEnd              92016
