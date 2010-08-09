@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>dispstr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>dispstr</h1>
+
+<p>
+Displays data.
+</p>
+
+<pre class="macro-syntax">
+dispstr &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to display characters on the window.<br>
+If &lt;data&gt; is a string, the string is displayed on the window. <br>
+If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the character is displayed on the window.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+dispstr 'ABC'
+
+; Display "ABC". (ASCII code of the character "A" is 65.)
+dispstr  65 66 67
+myname='Tera Term'
+dispstr 'My name is ' myname '.'
+
+; <!--ƒEƒBƒ“ƒhƒE‚Ì•\Ž¦“à—e‚ðƒNƒŠƒA‚·‚é-->
+dispstr #$1B"[2J"
+
+; <!--ƒEƒBƒ“ƒhƒE‚Ì10s–Ú20Œ…–Ú‚É Message ‚Æ•\Ž¦‚·‚é-->
+dispstr #$1B"[10;20HMessage"
+
+; <!--ƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ð 100,200 ‚ÉˆÚ“®‚·‚é-->
+dispstr #$1B"[3;100;200t"
+</pre>
+
+
+</body>
+</html>
