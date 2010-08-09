@@ -220,10 +220,11 @@ typedef TCharAttr *PCharAttr;
 #define PF_BEEPONCONNECT  2
 
 // Window flags (used in ts.WindowFlag)
-#define WF_CURSORCHANGE  1
-#define WF_WINDOWCHANGE  2
-#define WF_WINDOWREPORT  4
-#define WF_TITLEREPORT   24 // (8 | 16)
+#define WF_CURSORCHANGE    1
+#define WF_WINDOWCHANGE    2
+#define WF_WINDOWREPORT    4
+#define WF_TITLEREPORT     24 // (8 | 16)
+#define WF_IMECURSORCHANGE 32
 
 // Title Reporting Type
 #define IdTitleReportIgnore 0
@@ -931,6 +932,7 @@ typedef TMap far *PMap;
  *   added NextShownWin/PrevShownWin shortcut key.
  *   added tttset.DisableMenuDuplicateSession.
  *   added tttset.DisableMenuNewConnection.
+ *   added tttset.IMERelatedCursorStyle.
  *
  * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
  *   renamed tttset.Baud to Baud_.
