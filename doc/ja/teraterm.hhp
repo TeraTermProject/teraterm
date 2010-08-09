@@ -179,6 +179,7 @@ HlpMacroCommandCrc32File=html\macro\command\crc32.html
 HlpMacroCommandCygConnect=html\macro\command\cygconnect.html
 HlpMacroCommandDelpassword=html\macro\command\delpassword.html
 HlpMacroCommandDisconnect=html\macro\command\disconnect.html
+HlpMacroCommandDispstr=html\macro\command\dispstr.html
 HlpMacroCommandDo=html\macro\command\doloop.html
 HlpMacroCommandEnablekeyb=html\macro\command\enablekeyb.html
 HlpMacroCommandEnd=html\macro\command\end.html

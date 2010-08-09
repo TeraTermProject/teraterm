@@ -629,6 +629,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="dispstr">
+					<param name="Local" value="html\macro\command\dispstr.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="enablekeyb">
 					<param name="Local" value="html\macro\command\enablekeyb.html">
 					<param name="ImageNumber" value="11">
