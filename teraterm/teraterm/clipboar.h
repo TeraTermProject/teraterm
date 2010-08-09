@@ -13,7 +13,9 @@ PCHAR CBOpen(LONG MemSize);
 void CBClose();
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 		  int BuffSize, PCHAR DataPtr, int DataSize);
+void CBStartEcho(PCHAR DataPtr, int DataSize);
 void CBSend();
+void CBEcho();
 void CBEndPaste();
 int CBStartPasteConfirmChange(HWND HWin);
 

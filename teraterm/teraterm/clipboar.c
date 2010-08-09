@@ -36,6 +36,7 @@ static BOOL CBRetrySend;
 static BOOL CBRetryEcho;
 static BOOL CBSendCR;
 static BOOL CBDDE;
+static BOOL CBEchoOnly;
 
 static HFONT DlgClipboardFont;
 
@@ -125,6 +126,8 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 		}
 	}
 
+	CBEchoOnly = FALSE;
+
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
@@ -158,6 +161,36 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	}
 }
 
+void CBStartEcho(PCHAR DataPtr, int DataSize)
+{
+	if (! cv.Ready) {
+		return;
+	}
+	if (TalkStatus!=IdTalkKeyb) {
+		return;
+	}
+
+	CBEchoOnly = TRUE;
+	CBMemPtr2 = 0;
+	CBRetryEcho = FALSE;
+	CBSendCR = FALSE;
+
+	CBDDE = FALSE;
+	if ((CBMemHandle = GlobalAlloc(GHND, DataSize)) != NULL) {
+		CBDDE = TRUE;
+		if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+			memcpy(CBMemPtr, DataPtr, DataSize);
+			GlobalUnlock(CBMemHandle);
+			CBMemPtr=NULL;
+			TalkStatus=IdTalkCB;
+		}
+	}
+
+	if (TalkStatus != IdTalkCB) {
+		CBEndPaste();
+	}
+}
+
 // この関数はクリップボードおよびDDEデータを端末へ送り込む。
 //
 // CBMemHandleハンドルはグローバル変数なので、この関数が終了するまでは、
@@ -180,6 +213,11 @@ void CBSend()
 	int mlen;
 
 	if (CBMemHandle==NULL) {
+		return;
+	}
+
+	if (CBEchoOnly) {
+		CBEcho();
 		return;
 	}
 
@@ -305,6 +343,58 @@ void CBSend()
 	}
 }
 
+void CBEcho()
+{
+	if (CBMemHandle==NULL) {
+		return;
+	}
+
+	if (CBRetryEcho && CommTextEcho(&cv,(PCHAR)&CBByte,1) == 0) {
+		return;
+	}
+
+	if ((CBMemPtr = GlobalLock(CBMemHandle)) == NULL) {
+		return;
+	}
+
+	do {
+		if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
+			CBMemPtr2++;
+		}
+
+		if (CBMemPtr[CBMemPtr2] == 0) {
+			CBRetryEcho = FALSE;
+			CBEndPaste();
+			return;
+		}
+
+		CBByte = CBMemPtr[CBMemPtr2];
+		CBMemPtr2++;
+
+		// Decoding characters which are encoded by MACRO
+		//   to support NUL character sending
+		//
+		//  [encoded character] --> [decoded character]
+		//         01 01        -->     00
+		//         01 02        -->     01
+		if (CBByte==0x01) { /* 0x01 from MACRO */
+			CBByte = CBMemPtr[CBMemPtr2];
+			CBMemPtr2++;
+			CBByte = CBByte - 1; // character just after 0x01
+		}
+
+		CBSendCR = (CBByte==0x0D);
+
+	} while (CommTextEcho(&cv,(PCHAR)&CBByte,1) > 0);
+
+	CBRetryEcho = TRUE;
+
+	if (CBMemHandle != NULL) {
+		GlobalUnlock(CBMemHandle);
+		CBMemPtr=NULL;
+	}
+}
+
 void CBEndPaste()
 {
 	TalkStatus = IdTalkKeyb;
@@ -326,6 +416,7 @@ void CBEndPaste()
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
 	CBAddCR = FALSE;
+	CBEchoOnly = FALSE;
 }
 
 

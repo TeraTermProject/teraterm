@@ -58,6 +58,7 @@
 #define CmdSetDebug     'R'
 #define CmdYmodemSend   'S'
 #define CmdYmodemRecv   'T'
+#define CmdDispStr      'U'
 
 #ifdef __cplusplus
 extern "C" {

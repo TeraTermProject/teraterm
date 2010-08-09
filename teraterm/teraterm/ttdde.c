@@ -333,6 +333,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdSetDebug     'R'
 #define CmdYmodemSend   'S'
 #define CmdYmodemRecv   'T'
+#define CmdDispStr      'U'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -885,6 +886,10 @@ scp_rcv_error:
 		SetMulticastName(ParamFileName);
 		DdeCmnd = TRUE;
 		EndDdeCmnd(0);     // マクロ実行を終了させる。
+		break;
+
+	case CmdDispStr:
+		CBStartEcho(ParamFileName, sizeof(ParamFileName));
 		break;
 
 	default:

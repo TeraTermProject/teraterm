@@ -149,6 +149,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'd':
 		if (_stricmp(Str,"delpassword")==0) *WordId = RsvDelPassword;
 		else if (_stricmp(Str,"disconnect")==0) *WordId = RsvDisconnect;
+		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
 		break;
 	case 'e':

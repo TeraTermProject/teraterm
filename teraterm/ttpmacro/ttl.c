@@ -697,6 +697,44 @@ WORD TTLDisconnect()
 	return Err;
 }
 
+WORD TTLDispStr()
+{
+	TStrVal Str, buff;
+	WORD Err, ValType;
+	int Val;
+
+	if (! Linked)
+		return ErrLinkFirst;
+
+	buff[0] = 0;
+
+	while (TRUE) {
+		if (GetString(Str, &Err)) {
+			if (Err) return Err;
+			strncat_s(buff, MaxStrLen, Str, _TRUNCATE);
+		}
+		else if (GetExpression(&ValType, &Val, &Err)) {
+			if (Err!=0) return Err;
+			switch (ValType) {
+				case TypInteger:
+					Str[0] = LOBYTE(Val);
+					Str[1] = 0;
+					strncat_s(buff, MaxStrLen, Str, _TRUNCATE);
+				case TypString:
+					strncat_s(buff, MaxStrLen, StrVarPtr((WORD)Val), _TRUNCATE);
+					break;
+				default:
+					return ErrTypeMismatch;
+			}
+		}
+		else {
+			break;
+		}
+	}
+	SetFile(buff);
+	return SendCmnd(CmdDispStr, 0);
+}
+
 WORD TTLDo()
 {
 	WORD WId, Err;
@@ -3959,6 +3997,8 @@ int ExecCmnd()
 			Err = TTLDelPassword(); break;
 		case RsvDisconnect:
 			Err = TTLDisconnect(); break;
+		case RsvDispStr:
+			Err = TTLDispStr(); break;
 		case RsvDo:
 			Err = TTLDo(); break;
 		case RsvElse:
