@@ -2118,7 +2118,7 @@ void CaretOn()
 	hImc = ImmGetContext(HVTWin);
 	ime_on = ImmGetOpenStatus(hImc);
 	ImmReleaseContext(HVTWin, hImc);
-	if (ime_on) {
+	if ((ts.WindowFlag & WF_IMECURSORCHANGE) != 0 && ime_on) {
 		color = (HBITMAP)1;
 	} else {
 		color = NULL;

@@ -1357,6 +1357,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Alternate Screen Buffer
 	if (GetOnOff(Section, "AlternateScreenBuffer", FName, TRUE))
 		ts->TermFlag |= TF_ALTSCR;
+
+	// IME status related cursor style
+	if (GetOnOff(Section, "IMERelatedCursor", FName, FALSE))
+		ts->WindowFlag |= WF_IMECURSORCHANGE;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2373,6 +2377,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Alternate Screen Buffer
 	WriteOnOff(Section, "AlternateScreenBuffer", FName,
 		ts->TermFlag & TF_ALTSCR);
+
+	// IME status related cursor style
+	WriteOnOff(Section, "IMERelatedCursor", FName,
+		ts->WindowFlag & WF_IMECURSORCHANGE);
 }
 
 #define VTEditor "VT editor keypad"
