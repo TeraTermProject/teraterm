@@ -288,8 +288,10 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"strcompare")==0) *WordId = RsvStrCompare;
 		else if (_stricmp(Str,"strconcat")==0) *WordId = RsvStrConcat;
 		else if (_stricmp(Str,"strcopy")==0) *WordId = RsvStrCopy;
+		else if (_stricmp(Str,"strinsert")==0) *WordId = RsvStrInsert;
 		else if (_stricmp(Str,"strlen")==0) *WordId = RsvStrLen;
 		else if (_stricmp(Str,"strmatch")==0) *WordId = RsvStrMatch;
+		else if (_stricmp(Str,"strremove")==0) *WordId = RsvStrRemove;
 		else if (_stricmp(Str,"strscan")==0) *WordId = RsvStrScan;
 		break;
 	case 't':

@@ -3381,6 +3381,78 @@ WORD TTLStrScan()
 	return Err;
 }
 
+WORD TTLStrInsert()
+{
+	WORD Err, VarId;
+	int Index;
+	TStrVal Str;
+	int srclen, addlen;
+	char *srcptr, *np;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetIntVal(&Index,&Err);
+	GetStrVal(Str,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	srcptr = StrVarPtr(VarId);
+	srclen = strlen(srcptr);
+	if (Index <= 0 || Index > srclen+1) {
+		Err = ErrSyntax;
+	}
+	addlen = strlen(Str);
+	if (srclen + addlen + 1 > MaxStrLen) {
+		Err = ErrSyntax;
+	}
+	if (Err!=0) return Err;
+
+	// まずは挿入される箇所以降のデータを、後ろに移動する。
+	np = srcptr + (Index - 1);
+	memmove_s(np + addlen, MaxStrLen, np, srclen - (Index - 1));
+
+	// 文字列を挿入する
+	memcpy(np, Str, addlen);
+
+	// null-terminate
+	srcptr[srclen + addlen] = '\0';
+
+	return Err;
+}
+
+WORD TTLStrRemove()
+{
+	WORD Err, VarId;
+	int Index, Len;
+	int srclen;
+	char *srcptr, *np;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetIntVal(&Index,&Err);
+	GetIntVal(&Len,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	srcptr = StrVarPtr(VarId);
+	srclen = strlen(srcptr);
+	if (Len <=0 || Index <= 0 || (Index-1 + Len) > srclen) {
+		Err = ErrSyntax;
+	}
+	if (Err!=0) return Err;
+
+	// 文字列を削除する
+	np = srcptr + (Index - 1);
+	memmove_s(np, MaxStrLen, np + Len, srclen - Len);
+
+	// null-terminate
+	srcptr[srclen - Len] = '\0';
+
+	return Err;
+}
+
 WORD TTLTestLink()
 {
 	if (GetFirstChar()!=0)
@@ -4219,10 +4291,14 @@ int ExecCmnd()
 			Err = TTLStrConcat(); break;
 		case RsvStrCopy:
 			Err = TTLStrCopy(); break;
+		case RsvStrInsert:
+			Err = TTLStrInsert(); break;
 		case RsvStrLen:
 			Err = TTLStrLen(); break;
 		case RsvStrMatch:
 			Err = TTLStrMatch(); break;
+		case RsvStrRemove:
+			Err = TTLStrRemove(); break;
 		case RsvStrScan:
 			Err = TTLStrScan(); break;
 		case RsvTestLink:
