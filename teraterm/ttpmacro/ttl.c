@@ -3381,13 +3381,33 @@ WORD TTLStrScan()
 	return Err;
 }
 
+static void insert_string(char *str, int index, char *addstr)
+{
+	char *np;
+	int srclen;
+	int addlen;
+
+	srclen = strlen(str);
+	addlen = strlen(addstr);
+
+	// まずは挿入される箇所以降のデータを、後ろに移動する。
+	np = str + (index - 1);
+	memmove_s(np + addlen, MaxStrLen, np, srclen - (index - 1));
+
+	// 文字列を挿入する
+	memcpy(np, addstr, addlen);
+
+	// null-terminate
+	str[srclen + addlen] = '\0';
+}
+
 WORD TTLStrInsert()
 {
 	WORD Err, VarId;
 	int Index;
 	TStrVal Str;
 	int srclen, addlen;
-	char *srcptr, *np;
+	char *srcptr;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -3408,17 +3428,28 @@ WORD TTLStrInsert()
 	}
 	if (Err!=0) return Err;
 
-	// まずは挿入される箇所以降のデータを、後ろに移動する。
-	np = srcptr + (Index - 1);
-	memmove_s(np + addlen, MaxStrLen, np, srclen - (Index - 1));
-
-	// 文字列を挿入する
-	memcpy(np, Str, addlen);
-
-	// null-terminate
-	srcptr[srclen + addlen] = '\0';
+	insert_string(srcptr, Index, Str);
 
 	return Err;
+}
+
+static void remove_string(char *str, int index, int len)
+{
+	char *np;
+	int srclen;
+
+	srclen = strlen(str);
+
+	if (len <=0 || index <= 0 || (index-1 + len) > srclen) {
+		return;
+	}
+
+	// 文字列 str から index 文字目から len 文字削除する
+	np = str + (index - 1);
+	memmove_s(np, MaxStrLen, np + len, srclen - len);
+
+	// null-terminate
+	str[srclen - len] = '\0';
 }
 
 WORD TTLStrRemove()
@@ -3426,7 +3457,7 @@ WORD TTLStrRemove()
 	WORD Err, VarId;
 	int Index, Len;
 	int srclen;
-	char *srcptr, *np;
+	char *srcptr;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -3443,13 +3474,61 @@ WORD TTLStrRemove()
 	}
 	if (Err!=0) return Err;
 
-	// 文字列を削除する
-	np = srcptr + (Index - 1);
-	memmove_s(np, MaxStrLen, np + Len, srclen - Len);
+	remove_string(srcptr, Index, Len);
 
-	// null-terminate
-	srcptr[srclen - Len] = '\0';
+	return Err;
+}
 
+WORD TTLStrReplace()
+{
+	WORD Err, VarId;
+	TStrVal oldstr;
+	TStrVal newstr;
+	char *srcptr;
+	char *p;
+	int srclen, oldlen;
+	int pos;
+	int result = 0;
+
+	memset(oldstr, 0, MaxStrLen);
+	memset(newstr, 0, MaxStrLen);
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetIntVal(&pos,&Err);
+	GetStrVal(oldstr,&Err);
+	GetStrVal(newstr,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	srcptr = StrVarPtr(VarId);
+	srclen = strlen(srcptr);
+
+	if (pos > srclen) {
+		result = 0;
+		goto error;
+	}
+
+	// strptr文字列の pos 文字目以降において、oldstr を探す。
+	p = strstr(srcptr + (pos - 1), oldstr);
+	if (p == NULL) {
+		// 見つからなかった場合は、"0"で戻る。
+		result = 0;
+		goto error;
+	}
+
+	// まずは oldstr を削除する
+	oldlen = strlen(oldstr);
+	remove_string(srcptr, p - srcptr + 1, oldlen);
+
+	// newstr を挿入する
+	insert_string(srcptr, p - srcptr + 1, newstr);
+
+	result = 1;
+
+error:
+	SetResult(result);
 	return Err;
 }
 
@@ -4299,6 +4378,8 @@ int ExecCmnd()
 			Err = TTLStrMatch(); break;
 		case RsvStrRemove:
 			Err = TTLStrRemove(); break;
+		case RsvStrReplace:
+			Err = TTLStrReplace(); break;
 		case RsvStrScan:
 			Err = TTLStrScan(); break;
 		case RsvTestLink:

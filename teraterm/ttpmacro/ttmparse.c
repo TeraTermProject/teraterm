@@ -292,6 +292,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"strlen")==0) *WordId = RsvStrLen;
 		else if (_stricmp(Str,"strmatch")==0) *WordId = RsvStrMatch;
 		else if (_stricmp(Str,"strremove")==0) *WordId = RsvStrRemove;
+		else if (_stricmp(Str,"strreplace")==0) *WordId = RsvStrReplace;
 		else if (_stricmp(Str,"strscan")==0) *WordId = RsvStrScan;
 		break;
 	case 't':

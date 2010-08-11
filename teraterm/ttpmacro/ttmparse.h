@@ -197,6 +197,7 @@
 #define RsvFileTruncate 179
 #define RsvStrInsert    180
 #define RsvStrRemove    181
+#define RsvStrReplace   182
 
 #define RsvOperator     1000
 #define RsvBNot         1001
