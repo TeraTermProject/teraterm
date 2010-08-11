@@ -1036,6 +1036,10 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="strinsert">
+					<param name="Local" value="html\macro\command\strinsert.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strlen">
 					<param name="Local" value="html\macro\command\strlen.html">
 					<param name="ImageNumber" value="11">
@@ -1044,6 +1048,10 @@
 					<param name="Name" value="strmatch">
 					<param name="Local" value="html\macro\command\strmatch.html">
 					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="strremove">
+					<param name="Local" value="html\macro\command\strremove.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strscan">

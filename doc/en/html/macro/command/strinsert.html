@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strinsert</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strinsert</h1>
+
+<p>
+Inserts a string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strinsert &lt;strvar&gt; &lt;index&gt; &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Inserts a specified instance of &lt;string&gt; at a specified &lt;index&gt; position(1-origin) in the string variable &lt;strvar&gt;.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+s='abc'
+strinsert s 3 'XYZ'  ; 'abXYZc'
+messagebox s s
+
+s='abc'
+strinsert s 1 'XYZ'  ; 'XYZabc'
+messagebox s s
+
+s='abc'
+strinsert s -1 'XYZ'  ; Syntax error
+messagebox s s
+
+s='abc'
+strinsert s 0 'XYZ'  ; Syntax error
+messagebox s s
+
+s='abc'
+strinsert s 4 'XYZ'  ; 'abcXYZ'
+messagebox s s
+
+s='abc'
+strinsert s 5 'XYZ'  ; Syntax error
+messagebox s s
+</pre>
+
+</body>
+</html>

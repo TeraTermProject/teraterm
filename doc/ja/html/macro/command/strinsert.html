@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strinsert</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strinsert</h1>
+
+<p>
+文字列を挿入する。
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strinsert &lt;strvar&gt; &lt;index&gt; &lt;string&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列変数 &lt;strvar&gt; の &lt;index&gt; 位置（1オリジン）に、文字列 &lt;string&gt; を挿入する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+s='abc'
+strinsert s 3 'XYZ'  ; 'abXYZc'
+messagebox s s
+
+s='abc'
+strinsert s 1 'XYZ'  ; 'XYZabc'
+messagebox s s
+
+s='abc'
+strinsert s -1 'XYZ'  ; シンタックスエラー
+messagebox s s
+
+s='abc'
+strinsert s 0 'XYZ'  ; シンタックスエラー
+messagebox s s
+
+s='abc'
+strinsert s 4 'XYZ'  ; 'abcXYZ'
+messagebox s s
+
+s='abc'
+strinsert s 5 'XYZ'  ; シンタックスエラー
+messagebox s s
+</pre>
+
+</body>
+</html>
