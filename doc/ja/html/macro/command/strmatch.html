@@ -52,14 +52,15 @@ strmatch &lt;target string&gt; &lt;string with regular expression&gt;
 <h2>—á</h2>
 
 <pre class="macro-example">
-strmatch 'Tera Term' '(UTF-[789]).*'
+strmatch 'Microsoft Windows XP [Version 5.1.2600]' '\[(Version (\d+).(\d+).(\d+))\]'
+
 int2str s result
-messagebox s 'result'
-messagebox matchstr 'matchstr'
-messagebox groupmatchstr1 'groupmatchstr1'
-messagebox groupmatchstr2 'groupmatchstr2'
-messagebox groupmatchstr3 'groupmatchstr3'
-messagebox groupmatchstr4 'groupmatchstr4'
+messagebox s 'result'                        ; 22
+messagebox matchstr 'matchstr'               ; [Version 5.1.2600]
+messagebox groupmatchstr1 'groupmatchstr1'   ; Version 5.1.2600
+messagebox groupmatchstr2 'groupmatchstr2'   ; 5
+messagebox groupmatchstr3 'groupmatchstr3'   ; 1
+messagebox groupmatchstr4 'groupmatchstr4'   ; 2600
 </pre>
 
 </body>
