@@ -288,6 +288,7 @@ HlpMacroCommandStrinert=html\macro\command\strinsert.html
 HlpMacroCommandStrlen=html\macro\command\strlen.html
 HlpMacroCommandStrmatch=html\macro\command\strmatch.html
 HlpMacroCommandStrremove=html\macro\command\strremove.html
+HlpMacroCommandStrreplace=html\macro\command\strreplace.html
 HlpMacroCommandStrscan=html\macro\command\strscan.html
 HlpMacroCommandTestlink=html\macro\command\testlink.html
 HlpMacroCommandTolower=html\macro\command\tolower.html

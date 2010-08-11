@@ -1046,6 +1046,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="strreplace">
+					<param name="Local" value="html\macro\command\strreplace.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strscan">
 					<param name="Local" value="html\macro\command\strscan.html">
 					<param name="ImageNumber" value="11">

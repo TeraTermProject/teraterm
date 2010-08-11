@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strreplace</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strreplace</h1>
+
+<p>
+Replaces a string, with another string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strreplace &lt;strvar&gt; &lt;index&gt; &lt;oldstr&gt; &lt;newstr&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Replaces a specified &lt;oldstr&gt; string in the string variable &lt;strvar&gt; beginning at a specified position &lt;index&gt;(1-origin), with another specified &lt;newstr&gt; string.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+src='Microsoft Windows XP [Version 5.1.2600]'
+strmatch src '(Version \d+.\d+.)\d+'
+
+int2str s result
+messagebox s groupmatchstr1
+pos=result                ; 23
+mstr=groupmatchstr1       ; Version 5.1.
+
+strreplace src pos mstr 'Build '
+if result=1 then
+	messagebox src 'result'   ; Microsoft Windows XP [Build 2600]
+endif
+</pre>
+
+<h2>Reference</h2>
+
+<a href="strmatch.html">strmatch</a><br>
+<a href="strinsert.html">strinsert</a><br>
+<a href="strremove.html">strremove</a><br>
+
+</body>
+</html>

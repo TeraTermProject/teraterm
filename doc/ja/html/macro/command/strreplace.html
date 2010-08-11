@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strreplace</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strreplace</h1>
+
+<p>
+文字列を置換する。
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strreplace &lt;strvar&gt; &lt;index&gt; &lt;oldstr&gt; &lt;newstr&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列変数 &lt;strvar&gt; の &lt;index&gt; 位置（1オリジン）から、文字列 &lt;oldstr&gt; を検索し、文字列 &lt;newstr&gt; に置き換える。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+src='Microsoft Windows XP [Version 5.1.2600]'
+strmatch src '(Version \d+.\d+.)\d+'
+
+int2str s result
+messagebox s groupmatchstr1
+pos=result                ; 23
+mstr=groupmatchstr1       ; Version 5.1.
+
+strreplace src pos mstr 'Build '
+if result=1 then
+	messagebox src 'result'   ; Microsoft Windows XP [Build 2600]
+endif
+</pre>
+
+<h2>参照</h2>
+
+<a href="strmatch.html">strmatch</a><br>
+<a href="strinsert.html">strinsert</a><br>
+<a href="strremove.html">strremove</a><br>
+
+</body>
+</html>
