@@ -282,8 +282,10 @@
 #define HlpMacroCommandStrcompare       92092
 #define HlpMacroCommandStrconcat        92093
 #define HlpMacroCommandStrcopy          92094
+#define HlpMacroCommandStrinert         92180
 #define HlpMacroCommandStrlen           92095
 #define HlpMacroCommandStrmatch         92135
+#define HlpMacroCommandStrremove        92181
 #define HlpMacroCommandStrscan          92096
 #define HlpMacroCommandTestlink         92097
 #define HlpMacroCommandTolower          92118
