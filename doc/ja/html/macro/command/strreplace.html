@@ -26,7 +26,8 @@ strreplace &lt;strvar&gt; &lt;index&gt; &lt;oldstr&gt; &lt;newstr&gt;
 <h2>解説</h2>
 
 <p>
-文字列変数 &lt;strvar&gt; の &lt;index&gt; 位置（1オリジン）から、文字列 &lt;oldstr&gt; を検索し、文字列 &lt;newstr&gt; に置き換える。
+文字列変数 &lt;strvar&gt; の &lt;index&gt; 位置（1オリジン）から、文字列 &lt;oldstr&gt; を検索し、文字列 &lt;newstr&gt; に置き換える。<br>
+文字列 &lt;newstr&gt; が空('')の場合、文字列 &lt;oldstr&gt; は削除される。
 </p>
 
 <h2>例</h2>
@@ -44,6 +45,12 @@ strreplace src pos mstr 'Build '
 if result=1 then
 	messagebox src 'result'   ; Microsoft Windows XP [Build 2600]
 endif
+</pre>
+
+<pre class="macro-example">
+src='I can do it.'
+strreplace src 1 'can' ''
+messagebox src 'result'     ; 'I  do it.'
 </pre>
 
 <h2>参照</h2>
