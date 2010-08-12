@@ -14,19 +14,19 @@
 <h1>dispstr</h1>
 
 <p>
-Displays data.
+Displays character on the client terminal screen.
 </p>
 
 <pre class="macro-syntax">
-dispstr &lt;data1&gt; &lt;data2&gt;....
+dispstr &lt;data1&gt; [&lt;data2&gt;....]
 </pre>
 
 <h2>Remarks</h2>
 
 <p>
-Causes Tera Term to display characters on the window.<br>
-If &lt;data&gt; is a string, the string is displayed on the window. <br>
-If &lt;data&gt; is an integer, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the character is displayed on the window.
+Causes Tera Term to display characters on the client terminal screen.<br>
+If the &lt;data&gt; is a string type, the string is directly displayed on the terminal screen. <br>
+If the &lt;data&gt; is an integer type, its lowest-order byte (0-255) is regarded as an ASCII code of the character, and the corresponding character is displayed on the terminal screen.
 </p>
 
 <h2>Example</h2>
@@ -39,21 +39,21 @@ dispstr  65 66 67
 myname='Tera Term'
 dispstr 'My name is ' myname '.'
 
-; <!--ウィンドウの表示内容をクリアする-->
+; Clear your terminal screen by using the escape sequence.
 dispstr #$1B"[2J"
 
-; <!--ウィンドウの10行目20桁目に Message と表示する-->
+; Display "Message" string along the X=20, Y=10 coordinate in your terminal screen.
 dispstr #$1B"[10;20HMessage"
 
-; <!--ウィンドウの位置を 100,200 に移動する-->
+; Move your terminal screen to the X=100, Y=200 coordinate in the desktop.
 dispstr #$1B"[3;100;200t"
 </pre>
 
 <h2>Note</h2>
-<!--p>
-このコマンドの出力内容はホスト側からは認識できません。その為、このコマンドを使用すると表示状態がホスト側の想定とずれてしまい、表示が崩れる可能性があります。
-</p-->
 
+<p>
+The remote host can not recognize the dispstr output data. So, the terminal screen may not display properly because the buffer of the terminal screen differs from the remote host screen.
+</p>
 
 </body>
 </html>
