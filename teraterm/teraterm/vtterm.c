@@ -3651,6 +3651,7 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
   char Report[10];
   int x, y, len, modifier;
+  static int LastX = -1, LastY = -1, LastButton = 3;
 
   len = 0;
 
@@ -3695,6 +3696,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
 	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
+	  LastButton = Button;
 	  break;
 
 	case IdMouseTrackDECELR: /* not supported yet */
@@ -3707,13 +3709,10 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
     case IdMouseEventBtnUp:
       switch (MouseReportMode) {
 	case IdMouseTrackVT200:
-	  len = MakeMouseReportStr(Report, sizeof Report, 3 | modifier, x, y);
-	  break;
-
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
-	  MouseReport(IdMouseEventMove, Button, Xpos, Ypos);
 	  len = MakeMouseReportStr(Report, sizeof Report, 3 | modifier, x, y);
+	  LastButton = 3; // Release
 	  break;
 
 	case IdMouseTrackX10: /* nothing to do */
@@ -3726,9 +3725,18 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 
     case IdMouseEventMove:
       switch (MouseReportMode) {
-	case IdMouseTrackBtnEvent: /* not supported yet */
-	case IdMouseTrackAllEvent: /* not supported yet */
-	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier | 32, x, y);
+	case IdMouseTrackBtnEvent:
+	  if (LastButton == 3) {
+	    return FALSE;
+	  }
+	  /* FALLTHROUGH */
+	case IdMouseTrackAllEvent:
+	  if (x == LastX && y == LastY) {
+	    return FALSE;
+	  }
+	  len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | ((LastButton==3)?0:32), x, y);
+	  LastX = x;
+	  LastY = y;
 	  break;
 
 	case IdMouseTrackDECELR: /* not supported yet */

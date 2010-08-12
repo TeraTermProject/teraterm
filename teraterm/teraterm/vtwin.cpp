@@ -851,7 +851,9 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		return;
 	}
 
-	mousereport = MouseReport(IdMouseEventBtnDown, LMR, p.x, p.y);
+	if (mousereport = MouseReport(IdMouseEventBtnDown, LMR, p.x, p.y)) {
+		return;
+	}
 
 	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	if ((LMR == IdRightButton) &&
@@ -2140,10 +2142,17 @@ int CVTWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 void CVTWindow::OnMouseMove(UINT nFlags, CPoint point)
 {
 	int i;
+	BOOL mousereport;
+
+	mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
 
 	if (! (LButton || MButton || RButton)) {
 		// マウスカーソル直下にURL文字列があるかを走査する (2005.4.2 yutaka)
 		BuffChangeSelect(point.x, point.y,0);
+		return;
+	}
+
+	if (mousereport) {
 		return;
 	}
 
