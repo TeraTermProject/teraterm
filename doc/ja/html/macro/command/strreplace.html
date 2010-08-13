@@ -20,17 +20,29 @@
 <h2>形式</h2>
 
 <pre class="macro-syntax">
-strreplace &lt;strvar&gt; &lt;index&gt; &lt;oldstr&gt; &lt;newstr&gt;
+strreplace &lt;strvar&gt; &lt;index&gt; &lt;regex&gt; &lt;newstr&gt;
 </pre>
 
 <h2>解説</h2>
 
 <p>
-文字列変数 &lt;strvar&gt; の &lt;index&gt; 位置（1オリジン）から、文字列 &lt;oldstr&gt; を検索し、文字列 &lt;newstr&gt; に置き換える。<br>
-文字列 &lt;newstr&gt; が空('')の場合、文字列 &lt;oldstr&gt; は削除される。
+文字列変数 &lt;strvar&gt; の &lt;index&gt; 位置（1オリジン）から、正規表現 &lt;regex&gt; を検索し、文字列 &lt;newstr&gt; に置き換える。<br>
+文字列 &lt;newstr&gt; が空('')の場合、正規表現 &lt;regex&gt; は削除される。
 </p>
 
 <h2>例</h2>
+
+<pre class="macro-example">
+src='linux.txt'
+strreplace src 1 '\.txt' '.doc'
+messagebox src 'result'          ; linux.doc
+</pre>
+
+<pre class="macro-example">
+src='I can do it.'
+strreplace src 1 'can\s' ''
+messagebox src 'result'     ; 'I do it.'
+</pre>
 
 <pre class="macro-example">
 src='Microsoft Windows XP [Version 5.1.2600]'
@@ -45,12 +57,6 @@ strreplace src pos mstr 'Build '
 if result=1 then
 	messagebox src 'result'   ; Microsoft Windows XP [Build 2600]
 endif
-</pre>
-
-<pre class="macro-example">
-src='I can do it.'
-strreplace src 1 'can' ''
-messagebox src 'result'     ; 'I  do it.'
 </pre>
 
 <h2>参照</h2>

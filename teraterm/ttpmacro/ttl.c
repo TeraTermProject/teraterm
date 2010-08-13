@@ -3481,13 +3481,13 @@ WORD TTLStrRemove()
 
 WORD TTLStrReplace()
 {
-	WORD Err, VarId;
+	WORD Err, VarId, VarType;
 	TStrVal oldstr;
 	TStrVal newstr;
-	char *srcptr;
+	char *srcptr, *matchptr;
 	char *p;
-	int srclen, oldlen;
-	int pos;
+	int srclen, oldlen, matchlen;
+	int pos, ret;
 	int result = 0;
 
 	memset(oldstr, 0, MaxStrLen);
@@ -3510,7 +3510,10 @@ WORD TTLStrReplace()
 		goto error;
 	}
 
+	oldlen = strlen(oldstr);
+
 	// strptr文字列の pos 文字目以降において、oldstr を探す。
+#if 0
 	p = strstr(srcptr + (pos - 1), oldstr);
 	if (p == NULL) {
 		// 見つからなかった場合は、"0"で戻る。
@@ -3519,11 +3522,36 @@ WORD TTLStrReplace()
 	}
 
 	// まずは oldstr を削除する
-	oldlen = strlen(oldstr);
 	remove_string(srcptr, p - srcptr + 1, oldlen);
 
 	// newstr を挿入する
 	insert_string(srcptr, p - srcptr + 1, newstr);
+#else
+	p = srcptr + (pos - 1);
+	ret = FindRegexStringOne(oldstr, oldlen, p, strlen(p));
+	// FindRegexStringOneの中でUnlockVar()されてしまうので、LockVar()しなおす。
+	LockVar();
+	if (ret == 0) {
+		// 見つからなかった場合は、"0"で戻る。
+		result = 0;
+		goto error;
+	}
+
+	if (CheckVar("matchstr",&VarType,&VarId) &&
+		(VarType==TypString)) {
+		matchptr = StrVarPtr(VarId);
+		matchlen = strlen(matchptr);
+	} else {
+		result = 0;
+		goto error;
+	}
+
+	// まずは oldstr を削除する
+	remove_string(srcptr, (pos - 1) + ret, matchlen);
+
+	// newstr を挿入する
+	insert_string(srcptr, (pos - 1) + ret, newstr);
+#endif
 
 	result = 1;
 

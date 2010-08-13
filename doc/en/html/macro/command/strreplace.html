@@ -20,17 +20,29 @@ Replaces a string, with another string.
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-strreplace &lt;strvar&gt; &lt;index&gt; &lt;oldstr&gt; &lt;newstr&gt;
+strreplace &lt;strvar&gt; &lt;index&gt; &lt;regex&gt; &lt;newstr&gt;
 </pre>
 
 <h2>Remarks</h2>
 
 <p>
-Replaces a specified &lt;oldstr&gt; string in the string variable &lt;strvar&gt; beginning at a specified position &lt;index&gt;(1-origin), with another specified &lt;newstr&gt; string.<br>
-If the &lt;newstr&gt; is a null character(''), the &lt;oldstr&gt; string is removed.
+Replaces a specified &lt;regex&gt; string in the string variable &lt;strvar&gt; beginning at a specified position &lt;index&gt;(1-origin), with another specified &lt;newstr&gt; string.<br>
+If the &lt;newstr&gt; is a null character(''), the &lt;regex&gt; string is removed.
 </p>
 
 <h2>Example</h2>
+
+<pre class="macro-example">
+src='linux.txt'
+strreplace src 1 '\.txt' '.doc'
+messagebox src 'result'          ; linux.doc
+</pre>
+
+<pre class="macro-example">
+src='I can do it.'
+strreplace src 1 'can\s' ''
+messagebox src 'result'     ; 'I do it.'
+</pre>
 
 <pre class="macro-example">
 src='Microsoft Windows XP [Version 5.1.2600]'
@@ -45,12 +57,6 @@ strreplace src pos mstr 'Build '
 if result=1 then
 	messagebox src 'result'   ; Microsoft Windows XP [Build 2600]
 endif
-</pre>
-
-<pre class="macro-example">
-src='I can do it.'
-strreplace src 1 'can' ''
-messagebox src 'result'     ; 'I  do it.'
 </pre>
 
 <h2>Reference</h2>
