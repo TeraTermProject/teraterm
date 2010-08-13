@@ -2065,8 +2065,11 @@ void CVTWindow::OnLButtonDblClk(UINT nFlags, CPoint point)
 	DblClkX = point.x;
 	DblClkY = point.y;
 
-	if (! MouseReport(IdMouseEventBtnDown, IdLeftButton, DblClkX, DblClkY) &&
-		BuffUrlDblClk(DblClkX, DblClkY)) { // ブラウザ呼び出しの場合は何もしない。 (2005.4.3 yutaka)
+	if (MouseReport(IdMouseEventBtnDown, IdLeftButton, DblClkX, DblClkY)) {
+		return;
+	}
+
+	if (BuffUrlDblClk(DblClkX, DblClkY)) { // ブラウザ呼び出しの場合は何もしない。 (2005.4.3 yutaka)
 		return;
 	}
 
