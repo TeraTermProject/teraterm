@@ -3696,6 +3696,8 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
 	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
+	  LastX = x;
+	  LastY = y;
 	  LastButton = Button;
 	  break;
 
@@ -3712,6 +3714,8 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
 	  len = MakeMouseReportStr(Report, sizeof Report, 3 | modifier, x, y);
+	  LastX = x;
+	  LastY = y;
 	  LastButton = 3; // Release
 	  break;
 
