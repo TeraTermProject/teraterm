@@ -42,6 +42,13 @@
 #define NParamMax 16
 #define IntCharMax 5
 
+/* DEC Locator Flag */
+#define DecLocatorOneShot    1
+#define DecLocatorPixel      2
+#define DecLocatorButtonDown 4
+#define DecLocatorButtonUp   8
+#define DecLocatorFiltered   16
+
 void VisualBell();
 
 /* character attribute */
@@ -55,7 +62,6 @@ static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
 static BOOL AltScr;
 BOOL BracketedPaste;
-int MouseReportMode;
 
 // save/restore cursor
 typedef struct {
@@ -119,6 +125,12 @@ static BOOL DirectPrn = FALSE;
 /* User key */
 static BYTE NewKeyStr[FuncKeyStrMax];
 static int NewKeyId, NewKeyLen;
+
+/* Mouse Report */
+int MouseReportMode;
+unsigned int DecLocatorFlag;
+int LastX, LastY;
+int ButtonStat;
 
 static _locale_t CLocale = NULL;
 
@@ -196,6 +208,11 @@ void ResetTerminal() /*reset variables but don't update screen */
   Send8BitMode = ts.Send8BitCtrl;
   FocusReportMode = FALSE;
   MouseReportMode = IdMouseTrackNone;
+  DecLocatorFlag = 0;
+
+  LastX = 0;
+  LastY = 0;
+  ButtonStat = 0;
 
   if (CLocale == NULL) {
     CLocale = _create_locale(LC_ALL, "C");
@@ -2288,7 +2305,9 @@ void CSSetAttr()		// SGR
 	  case 1000: // Mouse Tracking
 	  case 1001: // Hilite Mouse Tracking
 	  case 1002: // Button-Event Mouse Tracking
-	  case 1003: MouseReportMode = IdMouseTrackNone; break; // Any-Event Mouse Tracking
+	  case 1003: // Any-Event Mouse Tracking
+	    MouseReportMode = IdMouseTrackNone;
+	    break;
 	  case 1004: FocusReportMode = FALSE; break; // Focus Report
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
@@ -2410,6 +2429,69 @@ void CSSetAttr()		// SGR
 	  HideStatusLine();
 	else if ((StatusLine==0) && (Param[1]==2))
 	  ShowStatusLine(1); // show
+	break;
+    }
+  }
+
+  void CSQuote(BYTE b)
+  {
+    switch (b) {
+      case 'w': // Enable Filter Rectangle (DECEFR)
+	break;
+
+      case 'z': // Enable DEC Locator reporting (DECELR)
+        if (Param[1] < 0) {
+	  Param[1] = 0;
+	}
+	switch (Param[1]) {
+	case 0:
+	  if (MouseReportMode == IdMouseTrackDECELR) {
+	    MouseReportMode = IdMouseTrackNone;
+	  }
+	  break;
+	case 1:
+	  if (ts.MouseEventTracking) {
+	    MouseReportMode = IdMouseTrackDECELR;
+	    DecLocatorFlag &= ~DecLocatorOneShot;
+	  }
+	  break;
+	case 2:
+	  if (ts.MouseEventTracking) {
+	    MouseReportMode = IdMouseTrackDECELR;
+	    DecLocatorFlag |= DecLocatorOneShot;
+	  }
+	  break;
+	}
+	if (NParam > 1 && Param[2] == 1) {
+	  DecLocatorFlag |= DecLocatorPixel;
+	}
+	break;
+
+      case '{': // Select Locator Events (DECSLE)
+        if (Param[1] < 0) {
+	  Param[1] = 0;
+	}
+	switch (Param[1]) {
+	case 0:
+	  DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown);
+	  break;
+	case 1:
+	  DecLocatorFlag |= DecLocatorButtonDown;
+	  break;
+	case 2:
+	  DecLocatorFlag &= ~DecLocatorButtonDown;
+	  break;
+	case 3:
+	  DecLocatorFlag |= DecLocatorButtonUp;
+	  break;
+	case 4:
+	  DecLocatorFlag &= ~DecLocatorButtonUp;
+	  break;
+	}
+	break;
+
+      case '|': // Request Locator Position (DECRQLP)
+	DecLocatorReport(IdMouseEventCurStat, 0);
 	break;
     }
   }
@@ -2575,6 +2657,8 @@ void ParseCS(BYTE b) /* b is the final char */
 	case '"': CSDouble(b); break;
 	/* intermediate char = '$' */
 	case '$': CSDol(b); break;
+	/* intermediate char = '\'' */
+	case '\'': CSQuote(b); break;
       }
       break;
   } /* of case Icount */
@@ -3648,18 +3732,106 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
   return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
 }
 
+BOOL DecLocatorReport(int Event, int Button) {
+  int x, y, MaxX, MaxY, len = 0;
+  char buff[24];
+
+  if (DecLocatorFlag & DecLocatorPixel) {
+    x = LastX;
+    y = LastY;
+    DispConvScreenToWin(NumOfColumns+1, NumOfLines+1, &MaxX, &MaxY);
+    if (x >= MaxX || y < 0 || y >= MaxY) {
+      x = -1;
+    }
+  }
+  else {
+    DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+    x++; y++;
+    if (x < 1 || x > NumOfColumns || y < 1 || y > NumOfLines) {
+      x = -1;
+    }
+  }
+
+  switch (Event) {
+  case IdMouseEventCurStat:
+    if (MouseReportMode == IdMouseTrackDECELR) {
+      if (x < 0) {
+	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d&w", CLocale, 1, ButtonStat);
+      }
+      else {
+	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, 1, ButtonStat, y, x);
+      }
+    }
+    else {
+      len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "0&w", CLocale);
+    }
+    break;
+
+  case IdMouseEventBtnDown:
+    if (DecLocatorFlag & DecLocatorButtonDown) {
+      if (x < 0) {
+	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d&w", CLocale, Button*2+2, ButtonStat);
+      }
+      else {
+	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, Button*2+2, ButtonStat, y, x);
+      }
+    }
+    break;
+
+  case IdMouseEventBtnUp:
+    if (DecLocatorFlag & DecLocatorButtonUp) {
+      if (x < 0) {
+	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d&w", CLocale, Button*2+3, ButtonStat);
+      }
+      else {
+	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, Button*2+3, ButtonStat, y, x);
+      }
+    }
+    break;
+
+  case IdMouseEventMove:
+    // not supported yet
+    break;
+  }
+
+  if (len == 0) {
+    return FALSE;
+  }
+
+  SendCSIstr(buff, len);
+
+  if (DecLocatorFlag & DecLocatorOneShot) {
+    MouseReportMode = IdMouseTrackNone;
+  }
+  return TRUE;
+}
+
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
   char Report[10];
   int x, y, len, modifier;
-  static int LastX = -1, LastY = -1, LastButton = 3;
+  static int LastSendX = -1, LastSendY = -1, LastButton = IdButtonRelease;
 
   len = 0;
+
+  switch (Event) {
+  case IdMouseEventBtnDown:
+    ButtonStat |= (8>>(3-Button));
+    break;
+  case IdMouseEventBtnUp:
+    ButtonStat &= ~(8>>(3-Button));
+    break;
+  }
+  LastX = Xpos;
+  LastY = Ypos;
 
   if (MouseReportMode == IdMouseTrackNone)
     return FALSE;
 
   if (ts.DisableMouseTrackingByCtrl && ControlKey())
     return FALSE;
+
+  if (MouseReportMode == IdMouseTrackDECELR)
+    return DecLocatorReport(Event, Button);
 
   DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
   x++; y++;
@@ -3696,12 +3868,11 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
 	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
-	  LastX = x;
-	  LastY = y;
+	  LastSendX = x;
+	  LastSendY = y;
 	  LastButton = Button;
 	  break;
 
-	case IdMouseTrackDECELR: /* not supported yet */
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	default:
 	  return FALSE;
@@ -3713,14 +3884,13 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackVT200:
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
-	  len = MakeMouseReportStr(Report, sizeof Report, 3 | modifier, x, y);
-	  LastX = x;
-	  LastY = y;
-	  LastButton = 3; // Release
+	  len = MakeMouseReportStr(Report, sizeof Report, IdButtonRelease | modifier, x, y);
+	  LastSendX = x;
+	  LastSendY = y;
+	  LastButton = IdButtonRelease;
 	  break;
 
 	case IdMouseTrackX10: /* nothing to do */
-	case IdMouseTrackDECELR: /* not supported yet */
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	default:
 	  return FALSE;
@@ -3735,15 +3905,14 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	  }
 	  /* FALLTHROUGH */
 	case IdMouseTrackAllEvent:
-	  if (x == LastX && y == LastY) {
+	  if (x == LastSendX && y == LastSendY) {
 	    return FALSE;
 	  }
-	  len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | ((LastButton==3)?0:32), x, y);
-	  LastX = x;
-	  LastY = y;
+	  len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | ((LastButton==IdButtonRelease)?0:32), x, y);
+	  LastSendX = x;
+	  LastSendY = y;
 	  break;
 
-	case IdMouseTrackDECELR: /* not supported yet */
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	case IdMouseTrackX10: /* nothing to do */
 	case IdMouseTrackVT200: /* nothing to do */
@@ -3761,7 +3930,6 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	  break;
 
 	case IdMouseTrackX10: /* nothing to do */
-	case IdMouseTrackDECELR: /* not supported yet */
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	  return FALSE;
       }

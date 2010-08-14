@@ -564,10 +564,17 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdMouseTrackAllEvent 6
 
   /* Mouse event */
+#define IdMouseEventCurStat  0
 #define IdMouseEventBtnDown  1
 #define IdMouseEventBtnUp    2
 #define IdMouseEventMove     3
 #define IdMouseEventWheel    4
+
+  /* Mouse buttons */
+#define IdLeftButton    0
+#define IdMiddleButton  1
+#define IdRightButton   2
+#define IdButtonRelease 3
 
   /* Serial port ID */
 #define IdCOM1 1

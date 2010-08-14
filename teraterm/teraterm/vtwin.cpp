@@ -57,11 +57,6 @@
 
 #define VTClassName "VTWin32"
 
-/* mouse buttons */
-#define IdLeftButton 0
-#define IdMiddleButton 1
-#define IdRightButton 2
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
