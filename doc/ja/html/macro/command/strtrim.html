@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strtrim</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strtrim</h1>
+
+<p>
+前後の文字を削除する。
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strtrim &lt;strvar&gt; &lt;trimchars&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列変数 &lt;strvar&gt;の先頭と末尾から、&lt;trimchars&gt; で指定された文字をすべて削除する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+src='         #include <stdio.h>         '
+strtrim src ' '
+messagebox src 'result'          ; '#include <stdio.h>'
+
+src='*;|@123***456@|;'
+strtrim src '*;|@'
+messagebox src 'result'          ; '123***456'
+
+src='*;|@123***456@|;'
+strtrim src '*;|@123456'
+messagebox src 'result'          ; ''
+
+src='#*;|@123***456@|;'
+strtrim src '*;|@'
+messagebox src 'result'          ; '#*;|@123***456'
+
+src='*;|@123***456@|;#'
+strtrim src '*;|@'
+messagebox src 'result'          ; '123***456@|;#'
+</pre>
+
+<h2>参照</h2>
+
+<a href="strinsert.html">strinsert</a><br>
+<a href="strremove.html">strremove</a><br>
+
+</body>
+</html>

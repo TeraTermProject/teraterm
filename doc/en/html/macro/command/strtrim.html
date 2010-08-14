@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strtrim</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strtrim</h1>
+
+<p>
+Trims characters from beginning and end of string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strtrim &lt;strvar&gt; &lt;trimchars&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Removes all occurrences of a set of characters specified in the &lt;trimchars&gt; from the beginning end end of the string variable &lt;strvar&gt;.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+src='         #include <stdio.h>         '
+strtrim src ' '
+messagebox src 'result'          ; '#include <stdio.h>'
+
+src='*;|@123***456@|;'
+strtrim src '*;|@'
+messagebox src 'result'          ; '123***456'
+
+src='*;|@123***456@|;'
+strtrim src '*;|@123456'
+messagebox src 'result'          ; ''
+
+src='#*;|@123***456@|;'
+strtrim src '*;|@'
+messagebox src 'result'          ; '#*;|@123***456'
+
+src='*;|@123***456@|;#'
+strtrim src '*;|@'
+messagebox src 'result'          ; '123***456@|;#'
+</pre>
+
+<h2>Reference</h2>
+
+<a href="strinsert.html">strinsert</a><br>
+<a href="strremove.html">strremove</a><br>
+
+</body>
+</html>
