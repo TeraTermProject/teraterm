@@ -294,6 +294,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"strremove")==0) *WordId = RsvStrRemove;
 		else if (_stricmp(Str,"strreplace")==0) *WordId = RsvStrReplace;
 		else if (_stricmp(Str,"strscan")==0) *WordId = RsvStrScan;
+		else if (_stricmp(Str,"strtrim")==0) *WordId = RsvStrTrim;
 		break;
 	case 't':
 		if (_stricmp(Str,"testlink")==0) *WordId = RsvTestLink;

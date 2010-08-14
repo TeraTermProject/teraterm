@@ -3433,6 +3433,7 @@ WORD TTLStrInsert()
 	return Err;
 }
 
+// 文字列 str の index 文字目（1オリジン）から len 文字削除する
 static void remove_string(char *str, int index, int len)
 {
 	char *np;
@@ -3444,7 +3445,6 @@ static void remove_string(char *str, int index, int len)
 		return;
 	}
 
-	// 文字列 str から index 文字目から len 文字削除する
 	np = str + (index - 1);
 	memmove_s(np, MaxStrLen, np + len, srclen - len);
 
@@ -3557,6 +3557,58 @@ WORD TTLStrReplace()
 
 error:
 	SetResult(result);
+	return Err;
+}
+
+WORD TTLStrTrim()
+{
+	TStrVal trimchars;
+	WORD Err, VarId;
+	int srclen;
+	int i, start, end;
+	char *srcptr, *p;
+	char table[256];
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetStrVal(trimchars,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	srcptr = StrVarPtr(VarId);
+	srclen = strlen(srcptr);
+
+	// 削除する文字のテーブルを作る。
+	memset(table, 0, sizeof(table));
+	for (p = trimchars; *p ; p++) {
+		table[*p] = 1;
+	}
+
+	// 文字列の先頭から検索する
+	for (i = 0 ; i < srclen ; i++) {
+		if (table[srcptr[i]] == 0) 
+			break;
+	}
+	// 削除されない有効な文字列の始まり。
+	// すべて削除対象となる場合は、start == srclen 。
+	start = i;  
+
+	// 文字列の末尾から検索する
+	for (i = srclen - 1 ; i >= 0 ; i--) {
+		if (table[srcptr[i]] == 0) 
+			break;
+	}
+	// 削除されない有効な文字列の終わり。
+	// すべて削除対象となる場合は、end == -1 。
+	end = i;
+
+	// 末尾を削る
+	srcptr[end + 1] = '\0';
+
+	// 次に、先頭から削る。
+	remove_string(srcptr, 1, start);
+
 	return Err;
 }
 
@@ -4410,6 +4462,8 @@ int ExecCmnd()
 			Err = TTLStrReplace(); break;
 		case RsvStrScan:
 			Err = TTLStrScan(); break;
+		case RsvStrTrim:
+			Err = TTLStrTrim(); break;
 		case RsvTestLink:
 			Err = TTLTestLink(); break;
 		case RsvToLower:
