@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strsplit</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strsplit</h1>
+
+<p>
+Splits a string by delimiters.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strsplit &lt;strvar&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Splits the string variable &lt;strvar&gt; by the &lt;separator&gt; delimiter, and returns the 9 system variables from "groupmatchstr1" to "groupmatchstr9".<br>
+
+The &lt;count&gt; is specified the maximum number of substrings to return.<br>
+
+If a number of substrings is smaller than &lt;count&gt;, the remaining groupmatchstr variables stores NULL.<br>
+</p>
+
+<p>
+If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+If &lt;special&gt; is not specified then 0 is used.
+</p>
+
+<table>
+ <tr>
+  <th>input</th>
+  <th>output</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>line feed</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>tab</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+src='A string'#9'of ,,tokens'#10'and some  more tokens'
+strsplit src ' ,\t\n' 9 1
+
+messagebox groupmatchstr1 "groupmatchstr1" ; 'A'
+messagebox groupmatchstr2 "groupmatchstr2" ; 'string'
+messagebox groupmatchstr3 "groupmatchstr3" ; 'of'
+messagebox groupmatchstr4 "groupmatchstr4" ; 'tokens'
+messagebox groupmatchstr5 "groupmatchstr5" ; 'and'
+messagebox groupmatchstr6 "groupmatchstr6" ; 'some'
+messagebox groupmatchstr7 "groupmatchstr7" ; 'more'
+messagebox groupmatchstr8 "groupmatchstr8" ; 'tokens'
+messagebox groupmatchstr9 "groupmatchstr9" ; ''
+
+src='Sun,Mon,Tue,Wed,Thu,Fri,Sat'
+strsplit src ',' 7
+
+messagebox groupmatchstr1 "groupmatchstr1" ; 'Sun'
+messagebox groupmatchstr2 "groupmatchstr2" ; 'Mon'
+messagebox groupmatchstr3 "groupmatchstr3" ; 'Tue'
+messagebox groupmatchstr4 "groupmatchstr4" ; 'Wed'
+messagebox groupmatchstr5 "groupmatchstr5" ; 'Thu'
+messagebox groupmatchstr6 "groupmatchstr6" ; 'Fri'
+messagebox groupmatchstr7 "groupmatchstr7" ; 'Sat'
+messagebox groupmatchstr8 "groupmatchstr8" ; ''
+messagebox groupmatchstr9 "groupmatchstr9" ; ''
+</pre>
+
+<h2>Reference</h2>
+
+</body>
+</html>

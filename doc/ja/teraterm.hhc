@@ -1063,6 +1063,10 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="strsplit">
+					<param name="Local" value="html\macro\command\strsplit.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strtrim">
 					<param name="Local" value="html\macro\command\strtrim.html">
 					</OBJECT>
