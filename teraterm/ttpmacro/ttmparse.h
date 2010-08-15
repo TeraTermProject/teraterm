@@ -199,6 +199,7 @@
 #define RsvStrRemove    181
 #define RsvStrReplace   182
 #define RsvStrTrim      183
+#define RsvStrSplit     184
 
 #define RsvOperator     1000
 #define RsvBNot         1001

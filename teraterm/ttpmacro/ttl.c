@@ -3612,6 +3612,62 @@ WORD TTLStrTrim()
 	return Err;
 }
 
+WORD TTLStrSplit()
+{
+#define MAXVARNUM 9
+	TStrVal delimchars;
+	WORD Err, VarId;
+	int maxvar, sp;
+	int srclen;
+	int i;
+	char *srcptr;
+	char *last, *tok[MAXVARNUM];
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetStrVal(delimchars,&Err);
+	GetIntVal(&maxvar,&Err);
+	// get 3rd arg(optional) if given
+	if (CheckParameterGiven()) {
+		GetIntVal(&sp, &Err);
+	} else {
+		sp = 0;
+	}
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	if (maxvar < 1 || maxvar > MAXVARNUM)
+		return ErrSyntax;
+
+	if (sp) {
+		// 改行コードを変換する
+		RestoreNewLine(delimchars);
+	}
+
+	srcptr = StrVarPtr(VarId);
+	srclen = strlen(srcptr);
+
+	// トークンの切り出しを行う。
+	memset(tok, 0, sizeof(tok));
+	tok[0] = strtok_s(srcptr, delimchars, &last);
+	for (i = 1 ; i < MAXVARNUM ; i++) {
+		tok[i] = strtok_s(NULL, delimchars, &last);
+		if (tok[i] == NULL)
+			break;
+	} 
+
+	// 結果の格納
+	for (i = 0 ; i < MAXVARNUM ; i++) {
+		LockVar();
+		SetGroupMatchStr(i+1, tok[i]);
+		UnlockVar();
+	}
+
+	return Err;
+#undef MAXVARNUM
+}
+
 WORD TTLTestLink()
 {
 	if (GetFirstChar()!=0)
@@ -4462,6 +4518,8 @@ int ExecCmnd()
 			Err = TTLStrReplace(); break;
 		case RsvStrScan:
 			Err = TTLStrScan(); break;
+		case RsvStrSplit:
+			Err = TTLStrSplit(); break;
 		case RsvStrTrim:
 			Err = TTLStrTrim(); break;
 		case RsvTestLink:
@@ -4601,12 +4659,18 @@ void SetGroupMatchStr(int no, PCHAR Str)
 {
 	WORD VarType, VarId;
 	char buf[128];
+	char *p;
+
+	if (Str == NULL)
+		p = "";
+	else
+		p = Str;
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "groupmatchstr%d", no);
 
 	if (CheckVar(buf,&VarType,&VarId) &&
 	    (VarType==TypString))
-		SetStrVal(VarId,Str);
+		SetStrVal(VarId,p);
 }
 
 void SetInputStr(PCHAR Str)

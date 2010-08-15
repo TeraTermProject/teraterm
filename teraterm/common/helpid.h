@@ -288,7 +288,8 @@
 #define HlpMacroCommandStrremove        92181
 #define HlpMacroCommandStrreplcae       92182
 #define HlpMacroCommandStrscan          92096
-#define HlpMacroCommandStrtrim           92183
+#define HlpMacroCommandStrsplit         92184
+#define HlpMacroCommandStrtrim          92183
 #define HlpMacroCommandTestlink         92097
 #define HlpMacroCommandTolower          92118
 #define HlpMacroCommandToupper          92119
