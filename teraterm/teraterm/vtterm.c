@@ -2435,6 +2435,7 @@ void CSSetAttr()		// SGR
 
   void CSQuote(BYTE b)
   {
+    int i;
     switch (b) {
       case 'w': // Enable Filter Rectangle (DECEFR)
 	break;
@@ -2468,25 +2469,27 @@ void CSSetAttr()		// SGR
 	break;
 
       case '{': // Select Locator Events (DECSLE)
-        if (Param[1] < 0) {
-	  Param[1] = 0;
-	}
-	switch (Param[1]) {
-	case 0:
-	  DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown);
-	  break;
-	case 1:
-	  DecLocatorFlag |= DecLocatorButtonDown;
-	  break;
-	case 2:
-	  DecLocatorFlag &= ~DecLocatorButtonDown;
-	  break;
-	case 3:
-	  DecLocatorFlag |= DecLocatorButtonUp;
-	  break;
-	case 4:
-	  DecLocatorFlag &= ~DecLocatorButtonUp;
-	  break;
+	for (i=1; i<=NParam; i++) {
+	  if (Param[i] < 0) {
+	    Param[i] = 0;
+	  }
+	  switch (Param[i]) {
+	  case 0:
+	    DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown);
+	    break;
+	  case 1:
+	    DecLocatorFlag |= DecLocatorButtonDown;
+	    break;
+	  case 2:
+	    DecLocatorFlag &= ~DecLocatorButtonDown;
+	    break;
+	  case 3:
+	    DecLocatorFlag |= DecLocatorButtonUp;
+	    break;
+	  case 4:
+	    DecLocatorFlag &= ~DecLocatorButtonUp;
+	    break;
+	  }
 	}
 	break;
 
