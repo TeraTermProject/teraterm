@@ -50,6 +50,7 @@
 #define DecLocatorFiltered   16
 
 void VisualBell();
+BOOL DecLocatorReport(int Event, int Button);
 
 /* character attribute */
 static TCharAttr CharAttr;
@@ -131,6 +132,7 @@ int MouseReportMode;
 unsigned int DecLocatorFlag;
 int LastX, LastY;
 int ButtonStat;
+int FilterTop, FilterBottom, FilterLeft, FilterRight;
 
 static _locale_t CLocale = NULL;
 
@@ -2435,9 +2437,21 @@ void CSSetAttr()		// SGR
 
   void CSQuote(BYTE b)
   {
-    int i;
+    int i, x, y;
     switch (b) {
       case 'w': // Enable Filter Rectangle (DECEFR)
+	if (DecLocatorFlag & DecLocatorPixel) {
+	  x = LastX;
+	  y = LastY;
+	}
+	else {
+	  DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+	}
+	FilterTop    = (Param[1]<0)?y:Param[1];
+	FilterLeft   = (Param[2]<0)?x:Param[2];
+	FilterBottom = (Param[3]<0)?y:Param[3];
+	FilterRight  = (Param[4]<0)?x:Param[4];
+	DecLocatorFlag |= DecLocatorFiltered;
 	break;
 
       case 'z': // Enable DEC Locator reporting (DECELR)
@@ -3731,8 +3745,13 @@ int VTParse()
   return ChangeEmu;
 }
 
-int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
-  return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
+int MakeLocatorReportStr(char *buff, size_t buffsize, int event, int x, int y) {
+  if (x < 0) {
+    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d&w", CLocale, event, ButtonStat);
+  }
+  else {
+    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, event, ButtonStat, y, x);
+  }
 }
 
 BOOL DecLocatorReport(int Event, int Button) {
@@ -3758,12 +3777,7 @@ BOOL DecLocatorReport(int Event, int Button) {
   switch (Event) {
   case IdMouseEventCurStat:
     if (MouseReportMode == IdMouseTrackDECELR) {
-      if (x < 0) {
-	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d&w", CLocale, 1, ButtonStat);
-      }
-      else {
-	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, 1, ButtonStat, y, x);
-      }
+      len = MakeLocatorReportStr(buff, sizeof(buff), 1, x, y);
     }
     else {
       len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "0&w", CLocale);
@@ -3772,28 +3786,23 @@ BOOL DecLocatorReport(int Event, int Button) {
 
   case IdMouseEventBtnDown:
     if (DecLocatorFlag & DecLocatorButtonDown) {
-      if (x < 0) {
-	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d&w", CLocale, Button*2+2, ButtonStat);
-      }
-      else {
-	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, Button*2+2, ButtonStat, y, x);
-      }
+      len = MakeLocatorReportStr(buff, sizeof(buff), Button*2+2, x, y);
     }
     break;
 
   case IdMouseEventBtnUp:
     if (DecLocatorFlag & DecLocatorButtonUp) {
-      if (x < 0) {
-	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d&w", CLocale, Button*2+3, ButtonStat);
-      }
-      else {
-	len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, Button*2+3, ButtonStat, y, x);
-      }
+      len = MakeLocatorReportStr(buff, sizeof(buff), Button*2+3, x, y);
     }
     break;
 
   case IdMouseEventMove:
-    // not supported yet
+    if (DecLocatorFlag & DecLocatorFiltered) {
+      if (y < FilterTop || y > FilterBottom || x < FilterLeft || x > FilterRight) {
+	len = MakeLocatorReportStr(buff, sizeof(buff), 10, x, y);
+	DecLocatorFlag &= ~DecLocatorFiltered;
+      }
+    }
     break;
   }
 
@@ -3807,6 +3816,10 @@ BOOL DecLocatorReport(int Event, int Button) {
     MouseReportMode = IdMouseTrackNone;
   }
   return TRUE;
+}
+
+int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
+  return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
 }
 
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
