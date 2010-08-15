@@ -2480,6 +2480,9 @@ void CSSetAttr()		// SGR
 	if (NParam > 1 && Param[2] == 1) {
 	  DecLocatorFlag |= DecLocatorPixel;
 	}
+	else {
+	  DecLocatorFlag &= ~DecLocatorPixel;
+	}
 	break;
 
       case '{': // Select Locator Events (DECSLE)
