@@ -3831,10 +3831,10 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 
   switch (Event) {
   case IdMouseEventBtnDown:
-    ButtonStat |= (8>>(3-Button));
+    ButtonStat |= (8>>(Button+1));
     break;
   case IdMouseEventBtnUp:
-    ButtonStat &= ~(8>>(3-Button));
+    ButtonStat &= ~(8>>(Button+1));
     break;
   }
   LastX = Xpos;
