@@ -20,7 +20,7 @@ Trims characters from beginning and end of string.
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-strtrim &lt;strvar&gt; &lt;trimchars&gt;
+strtrim &lt;strvar&gt; &lt;trimchars&gt; [&lt;special&gt;]
 </pre>
 
 <h2>Remarks</h2>
@@ -29,9 +29,37 @@ strtrim &lt;strvar&gt; &lt;trimchars&gt;
 Removes all occurrences of a set of characters specified in the &lt;trimchars&gt; from the beginning end end of the string variable &lt;strvar&gt;.
 </p>
 
+<p>
+If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+If &lt;special&gt; is not specified then 1 is used.
+</p>
+
+<table>
+ <tr>
+  <th>input</th>
+  <th>output</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>line feed</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>tab</td>
+ </tr>
+</table>
+
 <h2>Example</h2>
 
 <pre class="macro-example">
+src='   '#9' #include <stdio.h>      '#9' '
+strtrim src ' \t'
+messagebox src 'result'          ; '#include <stdio.h>'
+
 src='         #include <stdio.h>         '
 strtrim src ' '
 messagebox src 'result'          ; '#include <stdio.h>'

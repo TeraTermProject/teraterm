@@ -3565,16 +3565,28 @@ WORD TTLStrTrim()
 	TStrVal trimchars;
 	WORD Err, VarId;
 	int srclen;
-	int i, start, end;
+	int i, start, end, sp;
 	char *srcptr, *p;
 	char table[256];
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
 	GetStrVal(trimchars,&Err);
+	// get 3rd arg(optional) if given
+	if (CheckParameterGiven()) {
+		GetIntVal(&sp, &Err);
+	} else {
+		/* デフォルトは制御コード扱いとする。*/
+		sp = 1;
+	}
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
+
+	if (sp) {
+		// 改行コードを変換する
+		RestoreNewLine(trimchars);
+	}
 
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
