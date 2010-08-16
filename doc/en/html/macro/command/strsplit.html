@@ -60,18 +60,18 @@ If &lt;special&gt; is not specified then 0 is used.
 <h2>Example</h2>
 
 <pre class="macro-example">
-src='A string'#9'of ,,tokens'#10'and some  more tokens'
-strsplit src ' ,\t\n' 9 1
+src=',,Sun,Mon,Tue,,Thu,Fri,Sat'
+strsplit src ',' 7
 
-messagebox groupmatchstr1 "groupmatchstr1" ; 'A'
-messagebox groupmatchstr2 "groupmatchstr2" ; 'string'
-messagebox groupmatchstr3 "groupmatchstr3" ; 'of'
-messagebox groupmatchstr4 "groupmatchstr4" ; 'tokens'
-messagebox groupmatchstr5 "groupmatchstr5" ; 'and'
-messagebox groupmatchstr6 "groupmatchstr6" ; 'some'
-messagebox groupmatchstr7 "groupmatchstr7" ; 'more'
-messagebox groupmatchstr8 "groupmatchstr8" ; 'tokens'
-messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox groupmatchstr1 "groupmatchstr1" ; ''
+messagebox groupmatchstr2 "groupmatchstr2" ; ''
+messagebox groupmatchstr3 "groupmatchstr3" ; 'Sun'
+messagebox groupmatchstr4 "groupmatchstr4" ; 'Mon'
+messagebox groupmatchstr5 "groupmatchstr5" ; 'Tue'
+messagebox groupmatchstr6 "groupmatchstr6" ; ''
+messagebox groupmatchstr7 "groupmatchstr7" ; 'Thu'
+messagebox groupmatchstr8 "groupmatchstr8" ; 'Fri'
+messagebox groupmatchstr9 "groupmatchstr9" ; 'Sat'
 
 src='Sun,Mon,Tue,Wed,Thu,Fri,Sat'
 strsplit src ',' 7
@@ -83,6 +83,19 @@ messagebox groupmatchstr4 "groupmatchstr4" ; 'Wed'
 messagebox groupmatchstr5 "groupmatchstr5" ; 'Thu'
 messagebox groupmatchstr6 "groupmatchstr6" ; 'Fri'
 messagebox groupmatchstr7 "groupmatchstr7" ; 'Sat'
+messagebox groupmatchstr8 "groupmatchstr8" ; ''
+messagebox groupmatchstr9 "groupmatchstr9" ; ''
+
+src='A string'#10'of ,,tokens'#10'and some  more tokens'
+strsplit src '\n' 9
+
+messagebox groupmatchstr1 "groupmatchstr1" ; 'A string'
+messagebox groupmatchstr2 "groupmatchstr2" ; 'of ,,tokens'
+messagebox groupmatchstr3 "groupmatchstr3" ; 'and some  more tokens'
+messagebox groupmatchstr4 "groupmatchstr4" ; ''
+messagebox groupmatchstr5 "groupmatchstr5" ; ''
+messagebox groupmatchstr6 "groupmatchstr6" ; ''
+messagebox groupmatchstr7 "groupmatchstr7" ; ''
 messagebox groupmatchstr8 "groupmatchstr8" ; ''
 messagebox groupmatchstr9 "groupmatchstr9" ; ''
 </pre>

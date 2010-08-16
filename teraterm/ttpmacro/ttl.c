@@ -3615,12 +3615,12 @@ WORD TTLStrTrim()
 WORD TTLStrSplit()
 {
 #define MAXVARNUM 9
-	TStrVal delimchars;
+	TStrVal delimchars, buf;
 	WORD Err, VarId;
 	int maxvar, sp;
-	int srclen;
+	int srclen, len;
 	int i;
-	char *srcptr;
+	char *srcptr, *p;
 	char *last, *tok[MAXVARNUM];
 
 	Err = 0;
@@ -3631,7 +3631,8 @@ WORD TTLStrSplit()
 	if (CheckParameterGiven()) {
 		GetIntVal(&sp, &Err);
 	} else {
-		sp = 0;
+		/* デフォルトは制御コード扱いとする。*/
+		sp = 1;
 	}
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
@@ -3645,18 +3646,48 @@ WORD TTLStrSplit()
 		RestoreNewLine(delimchars);
 	}
 
+	// デリミタは1文字のみとする。
+	len = strlen(delimchars);
+	if (len != 1)
+		return ErrSyntax;
+
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
+	strcpy_s(buf, MaxStrLen, srcptr);  /* strtokで破壊されてもいいように、コピーバッファを使う。*/
 
 	// トークンの切り出しを行う。
 	memset(tok, 0, sizeof(tok));
+#if 0
 	tok[0] = strtok_s(srcptr, delimchars, &last);
 	for (i = 1 ; i < MAXVARNUM ; i++) {
 		tok[i] = strtok_s(NULL, delimchars, &last);
 		if (tok[i] == NULL)
 			break;
 	} 
+#else
+	/* strtokを使うと、連続した区切りが1つに丸められるため、自前でポインタを
+	 * たどる。ただし、区切り文字は1つのみとする。
+	 */
+	i = 0;
+	for (p = buf; *p == delimchars[0] ; p++) {
+		tok[i++] = NULL;
+		if (i > MAXVARNUM)
+			goto end;
+	}
+	
+	for (p = strtok_s(p, delimchars, &last); p != NULL ; p = strtok_s(NULL, delimchars, &last) ) {
+		tok[i++] = p;
+		if (i > MAXVARNUM)
+			goto end;
+		for (p += strlen(p) + 1 ; *p == delimchars[0] ; p++) {
+			tok[i++] = NULL;
+			if (i > MAXVARNUM)
+				goto end;
+		}
+	}
+#endif
 
+end:
 	// 結果の格納
 	for (i = 0 ; i < MAXVARNUM ; i++) {
 		LockVar();
