@@ -53,7 +53,6 @@
 #include "tt_res.h"
 #include "vtwin.h"
 #include "addsetting.h"
-#include "language.h"
 
 #define VTClassName "VTWin32"
 
@@ -2893,25 +2892,15 @@ LONG CVTWindow::OnIMEComposition(UINT wParam, LONG lParam)
 		//lpstr = (LPSTR)GlobalLock(hstr);
 		lpstr = (wchar_t *)GlobalLock(hstr);
 		if (lpstr!=NULL) {
-			if (in_utf(ts)) {
-				convert_wchar_to_utf8(lpstr, wcslen(lpstr), NULL, &mlen);
-			} else {
-				mlen = wcstombs(NULL, lpstr, 0);
-			}
+			mlen = wcstombs(NULL, lpstr, 0);
 			mbstr = (char *)malloc(sizeof(char) * (mlen + 1));
 			if (mbstr == NULL) {
 				goto skip;
 			}
+			Len = wcstombs(mbstr, lpstr, mlen + 1);
 
-			if (in_utf(ts)) {
-				convert_wchar_to_utf8(lpstr, wcslen(lpstr), mbstr, &mlen);
-				Len = mlen;
-			} else {
-				Len = wcstombs(mbstr, lpstr, mlen + 1);
-				// add this string into text buffer of application
-				Len = strlen(mbstr);
-			}
-
+			// add this string into text buffer of application
+			Len = strlen(mbstr);
 			if (Len==1) {
 				switch (mbstr[0]) {
 				case 0x20:

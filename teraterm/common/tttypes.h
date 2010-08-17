@@ -497,7 +497,6 @@ struct tttset {
 	char ConfirmChangePasteStringFile[MAX_PATH];
 	DWORD Baud;
 	WORD LogBinary;
-	int pureutf8;
 	WORD DisableMenuDuplicateSession;
 	WORD DisableMenuNewConnection;
 };
@@ -888,8 +887,6 @@ typedef struct {
 	BOOL Flush;
 
 	BOOL TelLineMode;
-
-	int *pureutf8;
 	_locale_t locale;
 } TComVar;
 typedef TComVar far *PComVar;
@@ -935,7 +932,6 @@ typedef TMap far *PMap;
  * when you change TMap or member of TMap.
  *
  * - At version 4.67, ttset_memfilemap was replaced with ttset_memfilemap_13.
- *   added tttset.pureutf8.
  *   added NextShownWin/PrevShownWin shortcut key.
  *   added tttset.DisableMenuDuplicateSession.
  *   added tttset.DisableMenuNewConnection.

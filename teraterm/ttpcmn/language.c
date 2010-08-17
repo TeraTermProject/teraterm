@@ -8,45 +8,8 @@
 #include "tttypes.h"
 #include <mbstring.h>
 #include <locale.h>
-#include "language.h"
 
 #include "sjis2uni.map"
-
-// データ送信時、UTF-16LE から UTF-8 へ変換する。
-void PASCAL convert_wchar_to_utf8(wchar_t *wbuf, int wbuflen, char *linebuf, int *linesize)
-{
-	char *p;
-	int i;
-	wchar_t ch;
-	int ratio = 3;
-
-	if (linebuf == NULL) {
-		*linesize = wbuflen * ratio * sizeof(wchar_t);
-		return;
-	}
-
-	p = linebuf;
-	for (i = 0 ; i < wbuflen ; i++) {
-		ch = wbuf[i];
-		// TODO: サロゲートペアは未サポート
-		if ((ch&0xF800) == 0xD800) 
-			ch = '.';
-
-		if (ch < 0x80) {
-			*p++ = (char)(ch);
-	    } else if (ch < 0x800) {
-			*p++ = (0xC0 | (ch >> 6));
-			*p++ = (0x80 | (ch & 0x3F));
-	    } else {
-			*p++ = (0xE0 | (ch >> 12));
-			*p++ = (0x80 | ((ch >> 6) & 0x3F));
-			*p++ = (0x80 | (ch & 0x3F));
-	    }
-	}
-
-	*linesize = p - linebuf;
-}
-
 
 unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
 {

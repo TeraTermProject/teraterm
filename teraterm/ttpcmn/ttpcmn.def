@@ -44,5 +44,3 @@ EXPORTS
   
   is_NT4 @50
   doSelectFolder @51
-  convert_wchar_to_utf8 @53
-  

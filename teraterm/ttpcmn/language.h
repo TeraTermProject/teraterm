@@ -9,7 +9,6 @@ extern "C" {
 #endif
 
 /* proto types */
-void PASCAL convert_wchar_to_utf8(wchar_t *wbuf, int wbuflen, char *linebuf, int *linesize);
 unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale);
 WORD FAR PASCAL SJIS2JIS(WORD KCode);
 WORD FAR PASCAL SJIS2EUC(WORD KCode);
