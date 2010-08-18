@@ -2494,7 +2494,7 @@ void CSSetAttr()		// SGR
 	  }
 	  switch (Param[i]) {
 	  case 0:
-	    DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown);
+	    DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown | DecLocatorFiltered);
 	    break;
 	  case 1:
 	    DecLocatorFlag |= DecLocatorButtonDown;
