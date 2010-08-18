@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strjoin</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strjoin</h1>
+
+<p>
+文字を連結する。
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+groupmatchstr1～groupmatchstr9 を区切り記号 &lt;separator&gt; で連結し、文字列変数 &lt;strvar&gt; に格納する。
+</p>
+
+<p>
+&lt;separator&gt; には区切り記号として扱う文字を1文字だけ指定する。
+</p>
+
+<p>
+&lt;count&gt; には、連結する部分文字列の最大数（9以下）を指定する。 <br>
+文字列中の部分文字列の数が &lt;count&gt; 以上であるとき、部分文字列が代入されなかったgroupmatchstrには、NULLが代入される。
+</p>
+
+<p>
+&lt;special&gt; が 1 の場合は、&lt;separator&gt; に含まれる以下の文字列は特殊文字として扱われる。<br>
+&lt;special&gt; が指定されない場合は 1 が使用される。
+</p>
+
+<table>
+ <tr>
+  <th>入力</th>
+  <th>出力</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>改行</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>タブ</td>
+ </tr>
+</table>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+groupmatchstr1="Jan" 
+groupmatchstr2="Feb" 
+groupmatchstr3="Mar" 
+groupmatchstr4="Apr" 
+groupmatchstr5="May" 
+groupmatchstr6="Jun" 
+strjoin strvar "," 6
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun'
+
+groupmatchstr1="Jan" 
+groupmatchstr2="Feb" 
+groupmatchstr3="Mar" 
+groupmatchstr4="Apr" 
+groupmatchstr5="May" 
+groupmatchstr6="Jun" 
+strjoin strvar "," 9
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,,,'
+</pre>
+
+<h2>参照</h2>
+
+</body>
+</html>

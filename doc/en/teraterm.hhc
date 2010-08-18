@@ -1031,6 +1031,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="strjoin">
+					<param name="Local" value="html\macro\command\strjoin.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strlen">
 					<param name="Local" value="html\macro\command\strlen.html">
 					<param name="ImageNumber" value="11">

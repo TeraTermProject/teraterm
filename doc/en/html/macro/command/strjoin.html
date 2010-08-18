@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strjoin</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strjoin</h1>
+
+<p>
+Concatenates a string with delimiters.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Concatenates a specified separator string variable &lt;strvar&gt; between each element of the 9 system variables from "groupmatchstr1" to "groupmatchstr9", yielding a single concatenated string.
+</p>
+
+<!--p>
+&lt;separator&gt; ‚É‚Í‹æØ‚è‹L†‚Æ‚µ‚Äˆµ‚¤•¶Žš‚ð1•¶Žš‚¾‚¯Žw’è‚·‚éB
+</p-->
+
+<p>
+The &lt;count&gt; is specified the maximum number of substrings to return.<br>
+If a number of substrings is larger than &lt;count&gt;, the remaining groupmatchstr variables stores NULL.
+</p>
+
+<p>
+If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+If &lt;special&gt; is not specified then 1 is used.
+</p>
+
+<table>
+ <tr>
+  <th>input</th>
+  <th>output</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>line feed</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>tab</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+groupmatchstr1="Jan" 
+groupmatchstr2="Feb" 
+groupmatchstr3="Mar" 
+groupmatchstr4="Apr" 
+groupmatchstr5="May" 
+groupmatchstr6="Jun" 
+strjoin strvar "," 6
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun'
+
+groupmatchstr1="Jan" 
+groupmatchstr2="Feb" 
+groupmatchstr3="Mar" 
+groupmatchstr4="Apr" 
+groupmatchstr5="May" 
+groupmatchstr6="Jun" 
+strjoin strvar "," 9
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,,,'
+</pre>
+
+<h2>Reference</h2>
+
+</body>
+</html>
