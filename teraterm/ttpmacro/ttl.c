@@ -3683,17 +3683,17 @@ WORD TTLStrSplit()
 	i = 0;
 	for (p = buf; *p == delimchars[0] ; p++) {
 		tok[i++] = NULL;
-		if (i > MAXVARNUM)
+		if (i >= maxvar)
 			goto end;
 	}
 	
 	for (p = strtok_s(p, delimchars, &last); p != NULL ; p = strtok_s(NULL, delimchars, &last) ) {
 		tok[i++] = p;
-		if (i > MAXVARNUM)
+		if (i >= maxvar)
 			goto end;
 		for (p += strlen(p) + 1 ; *p == delimchars[0] ; p++) {
 			tok[i++] = NULL;
-			if (i > MAXVARNUM)
+			if (i >= maxvar)
 				goto end;
 		}
 	}
