@@ -289,6 +289,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"strconcat")==0) *WordId = RsvStrConcat;
 		else if (_stricmp(Str,"strcopy")==0) *WordId = RsvStrCopy;
 		else if (_stricmp(Str,"strinsert")==0) *WordId = RsvStrInsert;
+		else if (_stricmp(Str,"strjoin")==0) *WordId = RsvStrJoin;
 		else if (_stricmp(Str,"strlen")==0) *WordId = RsvStrLen;
 		else if (_stricmp(Str,"strmatch")==0) *WordId = RsvStrMatch;
 		else if (_stricmp(Str,"strremove")==0) *WordId = RsvStrRemove;

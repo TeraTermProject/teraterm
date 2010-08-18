@@ -3711,6 +3711,66 @@ end:
 #undef MAXVARNUM
 }
 
+WORD TTLStrJoin()
+{
+#define MAXVARNUM 9
+	TStrVal delimchars, buf;
+	WORD Err, VarId;
+	WORD VarType;
+	int maxvar, sp;
+	int srclen, len;
+	int i;
+	char *srcptr, *p;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetStrVal(delimchars,&Err);
+	GetIntVal(&maxvar,&Err);
+	// get 3rd arg(optional) if given
+	if (CheckParameterGiven()) {
+		GetIntVal(&sp, &Err);
+	} else {
+		/* デフォルトは制御コード扱いとする。*/
+		sp = 1;
+	}
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	if (maxvar < 1 || maxvar > MAXVARNUM)
+		return ErrSyntax;
+
+	if (sp) {
+		// 改行コードを変換する
+		RestoreNewLine(delimchars);
+	}
+
+	// デリミタは1文字のみとする。
+	len = strlen(delimchars);
+	if (len != 1)
+		return ErrSyntax;
+
+	srcptr = StrVarPtr(VarId);
+	srclen = strlen(srcptr);
+
+	srcptr[0] = '\0';
+	for (i = 0 ; i < maxvar ; i++) {
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "groupmatchstr%d", i + 1);
+		if (CheckVar(buf,&VarType,&VarId)) {
+			if (VarType!=TypString)
+				return ErrSyntax;
+			p = StrVarPtr(VarId);
+			strncat_s(srcptr, MaxStrLen, p, _TRUNCATE);
+			strncat_s(srcptr, MaxStrLen, delimchars, _TRUNCATE);
+		}
+	}
+	/* 最後のデリミタを消す */
+	srcptr[strlen(srcptr) - 1] = '\0';
+
+	return Err;
+#undef MAXVARNUM
+}
+
 WORD TTLTestLink()
 {
 	if (GetFirstChar()!=0)
@@ -4551,6 +4611,8 @@ int ExecCmnd()
 			Err = TTLStrCopy(); break;
 		case RsvStrInsert:
 			Err = TTLStrInsert(); break;
+		case RsvStrJoin:
+			Err = TTLStrJoin(); break;
 		case RsvStrLen:
 			Err = TTLStrLen(); break;
 		case RsvStrMatch:
