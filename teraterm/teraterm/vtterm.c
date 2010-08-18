@@ -2441,16 +2441,18 @@ void CSSetAttr()		// SGR
     switch (b) {
       case 'w': // Enable Filter Rectangle (DECEFR)
 	if (DecLocatorFlag & DecLocatorPixel) {
-	  x = LastX;
-	  y = LastY;
+	  x = LastX + 1;
+	  y = LastY + 1;
 	}
 	else {
 	  DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+	  x++;
+	  y++;
 	}
-	FilterTop    = (Param[1]<0)?y:Param[1];
-	FilterLeft   = (Param[2]<0)?x:Param[2];
-	FilterBottom = (Param[3]<0)?y:Param[3];
-	FilterRight  = (Param[4]<0)?x:Param[4];
+	FilterTop    = (NParam<1 || Param[1]<1)? y : Param[1];
+	FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
+	FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
+	FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
 	DecLocatorFlag |= DecLocatorFiltered;
 	break;
 
@@ -3762,10 +3764,10 @@ BOOL DecLocatorReport(int Event, int Button) {
   char buff[24];
 
   if (DecLocatorFlag & DecLocatorPixel) {
-    x = LastX;
-    y = LastY;
+    x = LastX + 1;
+    y = LastY + 1;
     DispConvScreenToWin(NumOfColumns+1, NumOfLines+1, &MaxX, &MaxY);
-    if (x >= MaxX || y < 0 || y >= MaxY) {
+    if (x < 1 || x > MaxX || y < 1 || y > MaxY) {
       x = -1;
     }
   }
