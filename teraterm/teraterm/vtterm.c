@@ -2440,27 +2440,29 @@ void CSSetAttr()		// SGR
     int i, x, y;
     switch (b) {
       case 'w': // Enable Filter Rectangle (DECEFR)
-	if (DecLocatorFlag & DecLocatorPixel) {
-	  x = LastX + 1;
-	  y = LastY + 1;
+	if (MouseReportMode == IdMouseTrackDECELR) {
+	  if (DecLocatorFlag & DecLocatorPixel) {
+	    x = LastX + 1;
+	    y = LastY + 1;
+	  }
+	  else {
+	    DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+	    x++;
+	    y++;
+	  }
+	  FilterTop    = (NParam<1 || Param[1]<1)? y : Param[1];
+	  FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
+	  FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
+	  FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
+	  if (FilterTop > FilterBottom) {
+	    i = FilterTop; FilterTop = FilterBottom; FilterBottom = i;
+	  }
+	  if (FilterLeft > FilterRight) {
+	    i = FilterLeft; FilterLeft = FilterRight; FilterRight = i;
+	  }
+	  DecLocatorFlag |= DecLocatorFiltered;
+	  DecLocatorReport(IdMouseEventMove, 0);
 	}
-	else {
-	  DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
-	  x++;
-	  y++;
-	}
-	FilterTop    = (NParam<1 || Param[1]<1)? y : Param[1];
-	FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
-	FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
-	FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
-	if (FilterTop > FilterBottom) {
-	  i = FilterTop; FilterTop = FilterBottom; FilterBottom = i;
-	}
-	if (FilterLeft > FilterRight) {
-	  i = FilterLeft; FilterLeft = FilterRight; FilterRight = i;
-	}
-	DecLocatorFlag |= DecLocatorFiltered;
-	DecLocatorReport(IdMouseEventMove, 0);
 	break;
 
       case 'z': // Enable DEC Locator reporting (DECELR)
