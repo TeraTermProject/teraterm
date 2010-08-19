@@ -2453,6 +2453,12 @@ void CSSetAttr()		// SGR
 	FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
 	FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
 	FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
+	if (FilterTop > FilterBottom) {
+	  i = FilterTop; FilterTop = FilterBottom; FilterBottom = i;
+	}
+	if (FilterLeft > FilterRight) {
+	  i = FilterLeft; FilterLeft = FilterRight; FilterRight = i;
+	}
 	DecLocatorFlag |= DecLocatorFiltered;
 	break;
 
