@@ -344,29 +344,47 @@ void ChangeTerminalSize(int Nx, int Ny)
 }
 
 void SendCSIstr(char *str, int len) {
-	if (str == NULL || len <= 0)
+	int l;
+
+	if (str == NULL || len < 0)
 		return;
+
+	if (len == 0) {
+		l = strlen(str);
+	}
+	else {
+		l = len;
+	}
 
 	if (Send8BitMode)
 		CommBinaryOut(&cv,"\233", 1);
 	else
 		CommBinaryOut(&cv,"\033[", 2);
 
-	CommBinaryOut(&cv, str, len);
+	CommBinaryOut(&cv, str, l);
 }
 
 void SendOSCstr(char *str, int len) {
+	int l;
+
 	if (str == NULL || len <= 0)
 		return;
 
+	if (len == 0) {
+		l = strlen(str);
+	}
+	else {
+		l = len;
+	}
+
 	if (Send8BitMode) {
 		CommBinaryOut(&cv,"\235", 1);
-		CommBinaryOut(&cv, str, len);
+		CommBinaryOut(&cv, str, l);
 		CommBinaryOut(&cv,"\234", 1);
 	}
 	else {
 		CommBinaryOut(&cv,"\033]", 2);
-		CommBinaryOut(&cv, str, len);
+		CommBinaryOut(&cv, str, l);
 		CommBinaryOut(&cv,"\033\\", 2);
 	}
 
@@ -1648,7 +1666,7 @@ void CSScreenErase()
     switch (Param[1]) {
       case 5:
 	/* Device Status Report -> Ready */
-	SendCSIstr("0n", 2);
+	SendCSIstr("0n", 0);
 	break;
       case 6:
 	/* Cursor Position Report */
@@ -1925,7 +1943,7 @@ void CSSetAttr()		// SGR
       case 14: /* get window size??? */
 	if (ts.WindowFlag & WF_WINDOWREPORT) {
 	  /* this is not actual window size */
-	  SendCSIstr("4;640;480t", 10);
+	  SendCSIstr("4;640;480t", 0);
 	}
 	break;
       case 18: /* get terminal size */
@@ -1969,7 +1987,7 @@ void CSSetAttr()		// SGR
 	    SendOSCstr(Report, len);
 	    break;
 	  default: // IdTitleReportEmpty:
-	    SendOSCstr("L", 1);
+	    SendOSCstr("L", 0);
 	    break;
 	}
         break;
@@ -2000,7 +2018,7 @@ void CSSetAttr()		// SGR
 	    SendOSCstr(Report, len);
 	    break;
 	  default: // IdTitleReportEmpty:
-	    SendOSCstr("l", 1);
+	    SendOSCstr("l", 0);
 	    break;
 	}
         break;
@@ -2012,7 +2030,7 @@ void CSSetAttr()		// SGR
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
 	if (Param[1] < 1) {
-	  SendCSIstr(">32;100;2c", 10); /* VT382 */
+	  SendCSIstr(">32;100;2c", 0); /* VT382 */
 	}
 	break;
       case 'J':
@@ -2342,7 +2360,7 @@ void CSSetAttr()		// SGR
       switch (Param[1]) {
 	case 53:
 	  /* Locator Device Status Report -> Ready */
-	  SendCSIstr("?50n", 4);
+	  SendCSIstr("?50n", 0);
 	  break;
       }
     }
@@ -3985,10 +4003,10 @@ void FocusReport(BOOL focus) {
 
   if (focus) {
     // Focus In
-    SendCSIstr("I", 1);
+    SendCSIstr("I", 0);
   } else {
     // Focus Out
-    SendCSIstr("O", 1);
+    SendCSIstr("O", 0);
   }
 }
 
