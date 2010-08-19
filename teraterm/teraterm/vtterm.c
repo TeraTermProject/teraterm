@@ -2339,6 +2339,12 @@ void CSSetAttr()		// SGR
 
     void CSQ_n_Mode()		// DSR (DEC)
     {
+      switch (Param[1]) {
+	case 53:
+	  /* Locator Device Status Report -> Ready */
+	  SendCSIstr("?50n", 4);
+	  break;
+      }
     }
 
   void CSQuest(BYTE b)
