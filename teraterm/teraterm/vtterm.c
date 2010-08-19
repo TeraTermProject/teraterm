@@ -2012,7 +2012,7 @@ void CSSetAttr()		// SGR
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
 	if (Param[1] < 1) {
-	  SendCSIstr(">32;10;2c", 9); /* VT382 */
+	  SendCSIstr(">32;100;2c", 10); /* VT382 */
 	}
 	break;
       case 'J':
