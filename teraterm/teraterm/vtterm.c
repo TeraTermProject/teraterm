@@ -2460,6 +2460,7 @@ void CSSetAttr()		// SGR
 	  i = FilterLeft; FilterLeft = FilterRight; FilterRight = i;
 	}
 	DecLocatorFlag |= DecLocatorFiltered;
+	DecLocatorReport(IdMouseEventMove, 0);
 	break;
 
       case 'z': // Enable DEC Locator reporting (DECELR)
