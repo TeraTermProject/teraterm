@@ -3631,9 +3631,9 @@ WORD TTLStrSplit()
 	WORD Err;
 	int maxvar, sp;
 	int srclen, len;
-	int i;
+	int i, count;
 	char *p;
-	char *last, *tok[MAXVARNUM];
+	char /* *last, */ *tok[MAXVARNUM];
 
 	Err = 0;
 	GetStrVal(src,&Err);
@@ -3664,8 +3664,9 @@ WORD TTLStrSplit()
 		return ErrSyntax;
 
 	srclen = strlen(src);
-	strcpy_s(buf, MaxStrLen, src);  /* strtokで破壊されてもいいように、コピーバッファを使う。*/
+	strcpy_s(buf, MaxStrLen, src);  /* 破壊されてもいいように、コピーバッファを使う。*/
 
+#if 0
 	// トークンの切り出しを行う。
 	memset(tok, 0, sizeof(tok));
 #if 0
@@ -3697,13 +3698,28 @@ WORD TTLStrSplit()
 		}
 	}
 #endif
-
-end:
-	// 結果の格納
-	for (i = 0 ; i < MAXVARNUM ; i++) {
-		SetGroupMatchStr(i+1, tok[i]);
+#else
+	p = buf;
+	count = 1;
+	tok[count-1] = p;
+	for (i=0; i < srclen && count < maxvar; i++) {
+		if (*p == *delimchars) {
+			*p = '\0';
+			count++;
+			tok[count-1] = p+1;
+		}
+		p++;
 	}
+#endif
 
+//end:
+	// 結果の格納
+	for (i = 1 ; i <= count ; i++) {
+		SetGroupMatchStr(i, tok[i-1]);
+	}
+	for (i = count+1 ; i <= MAXVARNUM ; i++) {
+		SetGroupMatchStr(i, "");
+	}
 	return Err;
 #undef MAXVARNUM
 }
