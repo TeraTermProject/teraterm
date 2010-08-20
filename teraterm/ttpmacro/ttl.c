@@ -3627,16 +3627,16 @@ WORD TTLStrTrim()
 WORD TTLStrSplit()
 {
 #define MAXVARNUM 9
-	TStrVal delimchars, buf;
-	WORD Err, VarId;
+	TStrVal src, delimchars, buf;
+	WORD Err;
 	int maxvar, sp;
 	int srclen, len;
 	int i;
-	char *srcptr, *p;
+	char *p;
 	char *last, *tok[MAXVARNUM];
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVal(src,&Err);
 	GetStrVal(delimchars,&Err);
 	GetIntVal(&maxvar,&Err);
 	// get 3rd arg(optional) if given
@@ -3663,9 +3663,8 @@ WORD TTLStrSplit()
 	if (len != 1)
 		return ErrSyntax;
 
-	srcptr = StrVarPtr(VarId);
-	srclen = strlen(srcptr);
-	strcpy_s(buf, MaxStrLen, srcptr);  /* strtokで破壊されてもいいように、コピーバッファを使う。*/
+	srclen = strlen(src);
+	strcpy_s(buf, MaxStrLen, src);  /* strtokで破壊されてもいいように、コピーバッファを使う。*/
 
 	// トークンの切り出しを行う。
 	memset(tok, 0, sizeof(tok));
