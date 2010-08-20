@@ -62,6 +62,10 @@ strsplit &lt;strval&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
  </tr>
 </table>
 
+<p>
+実際に分割された個数をシステム変数 result に格納する。
+</p>
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -77,6 +81,7 @@ messagebox groupmatchstr6 "groupmatchstr6" ; ''
 messagebox groupmatchstr7 "groupmatchstr7" ; 'Thu,Fri,Sat'
 messagebox groupmatchstr8 "groupmatchstr8" ; ''
 messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox result         "result"         ; 7
 
 src='Sun,Mon,Tue,Wed,Thu,Fri,Sat'
 strsplit src ',' 7
@@ -90,6 +95,7 @@ messagebox groupmatchstr6 "groupmatchstr6" ; 'Fri'
 messagebox groupmatchstr7 "groupmatchstr7" ; 'Sat'
 messagebox groupmatchstr8 "groupmatchstr8" ; ''
 messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox result         "result"         ; 7
 
 src='A string'#10'of ,,tokens'#10'and some  more tokens'
 strsplit src '\n' 9
@@ -103,6 +109,7 @@ messagebox groupmatchstr6 "groupmatchstr6" ; ''
 messagebox groupmatchstr7 "groupmatchstr7" ; ''
 messagebox groupmatchstr8 "groupmatchstr8" ; ''
 messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox result         "result"         ; 3
 </pre>
 
 <h2>参照</h2>

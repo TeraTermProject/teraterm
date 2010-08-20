@@ -3720,6 +3720,7 @@ WORD TTLStrSplit()
 	for (i = count+1 ; i <= MAXVARNUM ; i++) {
 		SetGroupMatchStr(i, "");
 	}
+	SetResult(count);
 	return Err;
 #undef MAXVARNUM
 }
