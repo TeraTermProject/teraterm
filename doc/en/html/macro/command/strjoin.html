@@ -30,12 +30,11 @@ Concatenates a specified separator string variable &lt;strvar&gt; between each e
 </p>
 
 <!--p>
-&lt;separator&gt; には区切り記号として扱う文字を1文字だけ指定する。
+&lt;separator&gt; には区切り記号として扱う文字列を指定する。
 </p-->
 
 <p>
-The &lt;count&gt; is specified the maximum number of substrings to return.<br>
-If a number of substrings is larger than &lt;count&gt;, the remaining groupmatchstr variables stores NULL.
+The &lt;count&gt; is specified the maximum number of substrings to concatenate.
 </p>
 
 <p>
@@ -65,21 +64,27 @@ If &lt;special&gt; is not specified then 1 is used.
 <h2>Example</h2>
 
 <pre class="macro-example">
-groupmatchstr1="Jan" 
-groupmatchstr2="Feb" 
-groupmatchstr3="Mar" 
-groupmatchstr4="Apr" 
-groupmatchstr5="May" 
-groupmatchstr6="Jun" 
-strjoin strvar "," 6
-messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun'
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7="Jul"
+groupmatchstr8="Aug"
+groupmatchstr9="Sep"
+strjoin strvar " and " 6
+messagebox strvar "strvar"   ; 'Jan and Feb and Mar and Apr and May and Jun'
 
-groupmatchstr1="Jan" 
-groupmatchstr2="Feb" 
-groupmatchstr3="Mar" 
-groupmatchstr4="Apr" 
-groupmatchstr5="May" 
-groupmatchstr6="Jun" 
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7=""
+groupmatchstr8=""
+groupmatchstr9=""
 strjoin strvar "," 9
 messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,,,'
 </pre>

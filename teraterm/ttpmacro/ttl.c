@@ -3717,7 +3717,7 @@ WORD TTLStrJoin()
 	WORD Err, VarId;
 	WORD VarType;
 	int maxvar, sp;
-	int srclen, len;
+	int srclen;
 	int i;
 	char *srcptr, *p;
 
@@ -3744,11 +3744,6 @@ WORD TTLStrJoin()
 		RestoreNewLine(delimchars);
 	}
 
-	// デリミタは1文字のみとする。
-	len = strlen(delimchars);
-	if (len != 1)
-		return ErrSyntax;
-
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
 
@@ -3760,11 +3755,11 @@ WORD TTLStrJoin()
 				return ErrSyntax;
 			p = StrVarPtr(VarId);
 			strncat_s(srcptr, MaxStrLen, p, _TRUNCATE);
-			strncat_s(srcptr, MaxStrLen, delimchars, _TRUNCATE);
+			if (i < maxvar-1) {
+				strncat_s(srcptr, MaxStrLen, delimchars, _TRUNCATE);
+			}
 		}
 	}
-	/* 最後のデリミタを消す */
-	srcptr[strlen(srcptr) - 1] = '\0';
 
 	return Err;
 #undef MAXVARNUM

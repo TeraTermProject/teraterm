@@ -30,12 +30,11 @@ groupmatchstr1～groupmatchstr9 を区切り記号 &lt;separator&gt; で連結し、文字列変
 </p>
 
 <p>
-&lt;separator&gt; には区切り記号として扱う文字を1文字だけ指定する。
+&lt;separator&gt; には区切り記号として扱う文字列を指定する。
 </p>
 
 <p>
-&lt;count&gt; には、連結する部分文字列の最大数（9以下）を指定する。 <br>
-文字列中の部分文字列の数が &lt;count&gt; 以上であるとき、部分文字列が代入されなかったgroupmatchstrには、NULLが代入される。
+&lt;count&gt; には、連結する部分文字列の最大数（9以下）を指定する。
 </p>
 
 <p>
@@ -65,21 +64,27 @@ groupmatchstr1～groupmatchstr9 を区切り記号 &lt;separator&gt; で連結し、文字列変
 <h2>例</h2>
 
 <pre class="macro-example">
-groupmatchstr1="Jan" 
-groupmatchstr2="Feb" 
-groupmatchstr3="Mar" 
-groupmatchstr4="Apr" 
-groupmatchstr5="May" 
-groupmatchstr6="Jun" 
-strjoin strvar "," 6
-messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun'
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7="Jul"
+groupmatchstr8="Aug"
+groupmatchstr9="Sep"
+strjoin strvar " and " 6
+messagebox strvar "strvar"   ; 'Jan and Feb and Mar and Apr and May and Jun'
 
-groupmatchstr1="Jan" 
-groupmatchstr2="Feb" 
-groupmatchstr3="Mar" 
-groupmatchstr4="Apr" 
-groupmatchstr5="May" 
-groupmatchstr6="Jun" 
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7=""
+groupmatchstr8=""
+groupmatchstr9=""
 strjoin strvar "," 9
 messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,,,'
 </pre>
