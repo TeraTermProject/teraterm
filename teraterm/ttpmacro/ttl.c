@@ -3701,9 +3701,7 @@ WORD TTLStrSplit()
 end:
 	// Œ‹‰Ê‚ÌŠi”[
 	for (i = 0 ; i < MAXVARNUM ; i++) {
-		LockVar();
 		SetGroupMatchStr(i+1, tok[i]);
-		UnlockVar();
 	}
 
 	return Err;
