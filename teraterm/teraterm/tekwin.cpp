@@ -587,16 +587,16 @@ LONG CTEKWindow::OnAccelCommand(UINT wParam, LONG lParam)
 			OnFileExit();
 			break;
 		case IdCmdNextWin:
-			SelectNextWin(HTEKWin,1);
+			SelectNextWin(HTEKWin,1,FALSE);
 			break;
 		case IdCmdPrevWin:
-			SelectNextWin(HTEKWin,-1);
+			SelectNextWin(HTEKWin,-1,FALSE);
 			break;
 		case IdCmdNextSWin:
-			SelectNextShownWin(HTEKWin,1);
+			SelectNextWin(HTEKWin,1,TRUE);
 			break;
 		case IdCmdPrevSWin:
-			SelectNextShownWin(HTEKWin,-1);
+			SelectNextWin(HTEKWin,-1,TRUE);
 			break;
 		case IdBreak:
 		case IdCmdRestoreSetup:

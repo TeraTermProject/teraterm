@@ -31,8 +31,7 @@ void FAR PASCAL UnregWin(HWND HWin);
 void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag);
 void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
 void FAR PASCAL SelectWin(int WinId);
-void FAR PASCAL SelectNextWin(HWND HWin, int Next);
-void FAR PASCAL SelectNextShownWin(HWND HWin, int Next);
+void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
 HWND FAR PASCAL GetNthWin(int n);
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b);

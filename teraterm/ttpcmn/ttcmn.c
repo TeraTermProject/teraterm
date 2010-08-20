@@ -907,28 +907,7 @@ void FAR PASCAL SelectWin(int WinId)
 	}
 }
 
-void FAR PASCAL SelectNextWin(HWND HWin, int Next)
-{
-	int i;
-
-	i = 0;
-	while ((i<pm->NWin) && (pm->WinList[i]!=HWin)) {
-		i++;
-	}
-	if (pm->WinList[i]!=HWin) {
-		return;
-	}
-	i = i + Next;
-	if (i >= pm->NWin) {
-		i = 0;
-	}
-	else if (i<0) {
-		i = pm->NWin-1;
-	}
-	SelectWin(i);
-}
-
-void FAR PASCAL SelectNextShownWin(HWND HWin, int Next)
+void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 {
 	int i;
 
@@ -950,9 +929,9 @@ void FAR PASCAL SelectNextShownWin(HWND HWin, int Next)
 		}
 
 		if (pm->WinList[i] == HWin) {
-			return;
+			break;
 		}
-	} while (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i]));
+	} while ((SkipIconic && IsIconic(pm->WinList[i])) || !IsWindowVisible(pm->WinList[i]));
 
 	SelectWin(i);
 }

@@ -3005,16 +3005,16 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 			OnVScroll(SB_BOTTOM,0,NULL);
 			break;
 		case IdCmdNextWin:
-			SelectNextWin(HVTWin,1);
+			SelectNextWin(HVTWin,1,FALSE);
 			break;
 		case IdCmdPrevWin:
-			SelectNextWin(HVTWin,-1);
+			SelectNextWin(HVTWin,-1,FALSE);
 			break;
 		case IdCmdNextSWin:
-			SelectNextShownWin(HVTWin,1);
+			SelectNextWin(HVTWin,1,TRUE);
 			break;
 		case IdCmdPrevSWin:
-			SelectNextShownWin(HVTWin,-1);
+			SelectNextWin(HVTWin,-1,TRUE);
 			break;
 		case IdCmdLocalEcho:
 			if (ts.LocalEcho==0) {
