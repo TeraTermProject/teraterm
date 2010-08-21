@@ -3562,6 +3562,24 @@ error:
 	return Err;
 }
 
+WORD TTLStrSpecial()
+{
+	WORD Err, VarId;
+	char *srcptr;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	srcptr = StrVarPtr(VarId);
+	RestoreNewLine(srcptr);
+
+	return Err;
+}
+
 WORD TTLStrTrim()
 {
 	TStrVal trimchars;
@@ -4645,6 +4663,8 @@ int ExecCmnd()
 			Err = TTLStrReplace(); break;
 		case RsvStrScan:
 			Err = TTLStrScan(); break;
+		case RsvStrSpecial:
+			Err = TTLStrSpecial(); break;
 		case RsvStrSplit:
 			Err = TTLStrSplit(); break;
 		case RsvStrTrim:

@@ -281,6 +281,7 @@ HlpMacroCommandStrmatch=html\macro\command\strmatch.html
 HlpMacroCommandStrremove=html\macro\command\strremove.html
 HlpMacroCommandStrreplace=html\macro\command\strreplace.html
 HlpMacroCommandStrscan=html\macro\command\strscan.html
+HlpMacroCommandStrspecial=html\macro\command\strspecial.html
 HlpMacroCommandStrsplit=html\macro\command\strsplit.html
 HlpMacroCommandStrtrim=html\macro\command\strtrim.html
 HlpMacroCommandTestlink=html\macro\command\testlink.html

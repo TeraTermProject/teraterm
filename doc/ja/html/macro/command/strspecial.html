@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strspecial</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strspecial</h1>
+
+<p>
+特殊文字を変換する。
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strspecial &lt;strvar&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列変数 &lt;strvar&gt; に含まれる以下の文字を特殊文字に変換する。
+</p>
+
+<table>
+ <tr>
+  <th>入力</th>
+  <th>出力</th>
+ </tr>
+ <tr>
+  <td>\\</td>
+  <td>"\"</td>
+ </tr>
+ <tr>
+  <td>\n</td>
+  <td>改行</td>
+ </tr>
+ <tr>
+  <td>\t</td>
+  <td>タブ</td>
+ </tr>
+</table>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+str = "AB\tCD\nEF\\nGH"
+strspecial str
+messagebox str "special"
+</pre>
+
+</body>
+</html>
