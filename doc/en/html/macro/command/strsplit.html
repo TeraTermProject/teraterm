@@ -29,20 +29,25 @@ strsplit &lt;strval&gt; &lt;separator&gt; &lt;count&gt;
 Splits the string &lt;strval&gt; by the &lt;separator&gt; delimiter, and returns the 9 system variables from "groupmatchstr1" to "groupmatchstr9".
 </p>
 
-<!--p>
-&lt;separator&gt; には区切り記号として扱う文字を1文字だけ指定する。
-</p-->
-
 <p>
-The &lt;count&gt; is specified the maximum number of substrings to return.<br>
-If a number of substrings is smaller than &lt;count&gt;, the remaining groupmatchstr variables stores NULL.<br>
-<!--文字列中の部分文字列の数が &lt;count&gt; を超えるとき、最後のgroupmatchstrには残りの文字列がすべて代入される。<br>
-&lt;count&gt; が省略された場合には 9 とみなされる。-->
+<!--&lt;separator&gt; には区切り記号として扱う文字を1文字だけ指定する。-->
 </p>
 
-<!--p>
-実際に分割された個数をシステム変数 result に格納する。
-</p-->
+<p>
+The &lt;count&gt; is specified the maximum number of substrings to return. The upper limit of &lt;count&gt; is 9.<br>
+If a number of substrings is smaller than &lt;count&gt;, the remaining groupmatchstr variables stores NULL.<br>
+<!--文字列中の部分文字列の数が &lt;count&gt; を超えるとき、最後のgroupmatchstrには残りの文字列がすべて代入される。-->
+</p>
+
+<p>
+<!--&lt;count&gt; が省略された場合には、部分文字列の最大数は 9 とみなされる。<br>
+文字列中の部分文字列の数が 9 を超えるとき、&lt;count&gt; を指定した場合とは違い 9 番目の部分文字列のみが代入される。-->
+</p>
+
+<p>
+<!--実際に分割された個数をシステム変数 result に格納する。<br>
+&lt;count&gt; が省略され、文字列中の部分文字列の数が 9 を超えるときは、システム変数 result に 10 を格納する。-->
+</p>
 
 <h2>Example</h2>
 
@@ -88,6 +93,20 @@ messagebox groupmatchstr7 "groupmatchstr7" ; ''
 messagebox groupmatchstr8 "groupmatchstr8" ; ''
 messagebox groupmatchstr9 "groupmatchstr9" ; ''
 messagebox result         "result"         ; 3
+
+src='1,2,3,4,5,6,7,8,9,0'
+strsplit src ','
+
+messagebox groupmatchstr1 "groupmatchstr1" ; '1'
+messagebox groupmatchstr2 "groupmatchstr2" ; '2'
+messagebox groupmatchstr3 "groupmatchstr3" ; '3'
+messagebox groupmatchstr4 "groupmatchstr4" ; '4'
+messagebox groupmatchstr5 "groupmatchstr5" ; '5'
+messagebox groupmatchstr6 "groupmatchstr6" ; '6'
+messagebox groupmatchstr7 "groupmatchstr7" ; '7'
+messagebox groupmatchstr8 "groupmatchstr8" ; '8'
+messagebox groupmatchstr9 "groupmatchstr9" ; '9'
+messagebox result         "result"         ; 10
 </pre>
 
 <h2>Reference</h2>

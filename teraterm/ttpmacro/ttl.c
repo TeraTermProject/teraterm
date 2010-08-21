@@ -3641,7 +3641,7 @@ WORD TTLStrSplit()
 	int maxvar;
 	int srclen, len;
 	int i, count;
-	BOOL ary = FALSE;
+	BOOL ary = FALSE, omit = FALSE;
 	char *p;
 	char /* *last, */ *tok[MAXVARNUM];
 
@@ -3664,6 +3664,7 @@ WORD TTLStrSplit()
 	}
 	else {
 		maxvar = 9;
+		omit = TRUE;
 	}
 
 	if ((Err==0) && (GetFirstChar()!=0))
@@ -3721,11 +3722,13 @@ WORD TTLStrSplit()
 		p = buf;
 		count = 1;
 		tok[count-1] = p;
-		for (i=0; i < srclen && count < maxvar; i++) {
+		for (i=0; i < srclen && count < maxvar + omit; i++) { // count 省略時には、超過分を捨てるため 1 つ余分に進める
 			if (*p == *delimchars) {
 				*p = '\0';
 				count++;
-				tok[count-1] = p+1;
+				if (count <= MAXVARNUM) { // tok の要素数を超えて代入しないようにする(count 省略時のため)
+					tok[count-1] = p+1;
+				}
 			}
 			p++;
 		}
