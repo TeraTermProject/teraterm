@@ -47,11 +47,11 @@ static BOOL SyncMode = FALSE;
 static BOOL SyncRecv;
 static LONG SyncFreeSpace;
 
-static char ParamFileName[256];
+static char ParamFileName[MAX_PATH];
 static WORD ParamBinaryFlag;
 static WORD ParamAppendFlag;
 static WORD ParamXmodemOpt;
-static char ParamSecondFileName[256];
+static char ParamSecondFileName[MAX_PATH];
 
 #define CBBufSize TermWidthMax
 
@@ -337,8 +337,7 @@ WORD HexStr2Word(PCHAR Str)
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
-	char Command[260];
-	char Temp[MAXPATHLEN];
+	char Command[MAX_PATH + 1];
 	int i;
 	WORD w, c;
 
@@ -425,6 +424,8 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				SetDdeComReady(1);
 			break;
 		}
+		{
+		char Temp[MAX_PATH + 2];
 		strncpy_s(Temp, sizeof(Temp),"a ", _TRUNCATE); // dummy exe name
 		strncat_s(Temp,sizeof(Temp),ParamFileName,_TRUNCATE);
 		if (LoadTTSET())
@@ -432,6 +433,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		FreeTTSET();
 		cv.NoMsg = 1; /* suppress error messages */
 		PostMessage(HVTWin,WM_USER_COMMSTART,0,0);
+		}
 		break;
 	case CmdDisconnect:
 		if (ParamFileName[0] == '0') {
@@ -1094,7 +1096,7 @@ void RunMacro(PCHAR FName, BOOL Startup)
 {
 	PROCESS_INFORMATION pi;
 	int i;
-	char Cmnd[MAXPATHLEN+40];
+	char Cmnd[MAX_PATH+36]; // "TTPMACRO /D="(12) + TopicName(20) + " "(1) + MAX_PATH + " /S"(3)
 	STARTUPINFO si;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
 

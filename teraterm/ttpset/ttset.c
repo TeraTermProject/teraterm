@@ -196,7 +196,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -1363,7 +1363,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 	char buf[20];
 
 	/* version */
@@ -2921,8 +2921,8 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 #ifdef NO_INET6
 	BYTE b;
 #endif							/* NO_INET6 */
-	char Temp[MAXPATHLEN + 3];
-	char Temp2[MAXPATHLEN];
+	char Temp[MAX_PATH + 6]; // "/FD="(4) + `"'(1) + MAX_PATH  + `"'(1)
+	char Temp2[MAX_PATH + 6];
 	char TempDir[MAXPATHLEN];
 	WORD ParamPort = 0;
 	WORD ParamCom = 0;

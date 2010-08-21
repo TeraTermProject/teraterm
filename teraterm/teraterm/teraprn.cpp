@@ -41,7 +41,7 @@ static BOOL Printing = FALSE;
 static BOOL PrintAbortFlag = FALSE;
 
 /* pass-thru printing */
-static char PrnFName[MAXPATHLEN];
+static char PrnFName[MAX_PATH];
 static int HPrnFile = 0;
 static char PrnBuff[TermWidthMax];
 static int PrnBuffCount = 0;
@@ -463,7 +463,7 @@ void VTPrintEnd()
 extern "C" {
 void OpenPrnFile()
 {
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 
 	KillTimer(HVTWin,IdPrnStartTimer);
 	if (HPrnFile > 0) {

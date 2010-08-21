@@ -81,7 +81,7 @@ BOOL ExtractDirName(PCHAR PathName, PCHAR DirName)
 void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt)
 {
 	int i, j, NumOfDots;
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 	BYTE b;
 
 	NumOfDots = 0;
@@ -99,7 +99,7 @@ void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt)
 		if (b=='.')
 			NumOfDots++;
 		if ((b!=0) &&
-		    (j < MAXPATHLEN-1)) {
+		    (j < MAX_PATH-1)) {
 			Temp[j] = b;
 			j++;
 		}

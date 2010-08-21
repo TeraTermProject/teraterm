@@ -160,7 +160,7 @@ BOOL XCheckPacket(PXVar xv)
 }
 
 void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
-	char inistr[MAXPATHLEN + 10];
+	char inistr[MAX_PATH + 10];
 
 	fv->LogFlag = ((ts->LogFlag & LOG_X) != 0);
 	if (fv->LogFlag)

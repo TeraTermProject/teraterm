@@ -47,7 +47,7 @@ BOOL FAR PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 	char FNameFilter[81]; // 81(yutaka)
 	char TempDir[MAXPATHLEN];
 	char Dir[MAXPATHLEN];
-	char Name[MAXPATHLEN];
+	char Name[MAX_PATH];
 	BOOL Ok;
 
 	/* save current dir */
@@ -668,7 +668,7 @@ BOOL CALLBACK GetFnDlg
   (HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PFileVar fv;
-	char TempFull[MAXPATHLEN];
+	char TempFull[MAX_PATH];
 	int i, j;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;

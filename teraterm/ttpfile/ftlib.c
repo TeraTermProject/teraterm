@@ -148,8 +148,8 @@ void AddNum(PCHAR FName, int n)
   if (FName[k]!='.') k = strlen(FName);
   dLen = strlen(Num);
 
-  if (strlen(FName)+dLen > MAXPATHLEN - 1)
-    dLen = MAXPATHLEN - 1 - strlen(FName);
+  if (strlen(FName)+dLen > MAX_PATH - 1)
+    dLen = MAX_PATH - 1 - strlen(FName);
   memmove(&FName[k+dLen],&FName[k],strlen(FName)-k+1);
   memcpy(&FName[k+dLen-strlen(Num)],Num,strlen(Num));
 }
@@ -157,7 +157,7 @@ void AddNum(PCHAR FName, int n)
 BOOL FTCreateFile(PFileVar fv)
 {
   int i;
-  char Temp[MAXPATHLEN];
+  char Temp[MAX_PATH];
 
   FitFileName(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,NULL);
   if (! fv->OverWrite)

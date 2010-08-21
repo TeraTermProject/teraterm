@@ -213,7 +213,7 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 void YInit
 (PFileVar fv, PYVar yv, PComVar cv, PTTSet ts)
 {
-	char inistr[MAXPATHLEN + 10];
+	char inistr[MAX_PATH + 10];
 
 	if (yv->YMode == IdYSend) {
 		if (!GetNextFname(fv)) {

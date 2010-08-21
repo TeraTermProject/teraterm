@@ -19,9 +19,9 @@ void OpenStatDlg(PCHAR Text, PCHAR Caption, BOOL SPECIAL);
 void CloseStatDlg();
 
 extern char HomeDir[MAXPATHLEN];
-extern char FileName[MAXPATHLEN];
+extern char FileName[MAX_PATH];
 extern char TopicName[11];
-extern char ShortName[MAXPATHLEN];
+extern char ShortName[MAX_PATH];
 extern char Param2[MAXPATHLEN];
 extern char Param3[MAXPATHLEN];
 extern char Param4[MAXPATHLEN];

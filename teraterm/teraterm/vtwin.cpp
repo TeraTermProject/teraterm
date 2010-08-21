@@ -494,7 +494,7 @@ CVTWindow::CVTWindow()
 #ifdef ALPHABLEND_TYPE2
 	DWORD ExStyle;
 #endif
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 	char *Param;
 	int CmdShow;
 	PKeyMap tempkm;
@@ -1468,7 +1468,7 @@ void CVTWindow::ResetSetup()
 void CVTWindow::RestoreSetup()
 {
 	char TempDir[MAXPATHLEN];
-	char TempName[MAXPATHLEN];
+	char TempName[MAX_PATH];
 
 	if ( strlen(ts.SetupFName)==0 ) {
 		return;
@@ -4217,7 +4217,7 @@ void CVTWindow::OnSetupGeneral()
 void CVTWindow::OnSetupSave()
 {
 	BOOL Ok;
-	char TmpSetupFN[MAXPATHLEN];
+	char TmpSetupFN[MAX_PATH];
 	int ret;
 
 	strncpy_s(TmpSetupFN, sizeof(TmpSetupFN),ts.SetupFName, _TRUNCATE);

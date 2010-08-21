@@ -268,7 +268,7 @@ void SwitchTitleBar()
 
 void OpenHelp(HWND HWin, UINT Command, DWORD Data)
 {
-  char HelpFN[MAXPATHLEN];
+  char HelpFN[MAX_PATH];
 
   get_lang_msg("HELPFILE", ts.UIMsg, sizeof(ts.UIMsg), HTML_HELP, ts.UILanguageFile);
 
@@ -276,7 +276,7 @@ void OpenHelp(HWND HWin, UINT Command, DWORD Data)
   HWin = GetDesktopWindow();
   _snprintf_s(HelpFN, sizeof(HelpFN), _TRUNCATE, "%s\\%s", ts.HomeDir, ts.UIMsg);
   if (HtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-    char buf[MAXPATHLEN];
+    char buf[MAX_PATH];
     get_lang_msg("MSG_OPENHELP_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't open HTML help file(%s).", ts.UILanguageFile);
     _snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, HelpFN);
     MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
@@ -289,12 +289,12 @@ void OpenHelp(HWND HWin, UINT Command, DWORD Data)
 #if 0
 void OpenHtmlHelp(HWND HWin, char *filename)
 {
-	char HelpFN[MAXPATHLEN];
+	char HelpFN[MAX_PATH];
 
 	_snprintf(HelpFN, sizeof(HelpFN), "%s\\%s", ts.HomeDir, filename);
 	// HTMLヘルプのオーナーをTera Termからデスクトップへ変更 (2006.4.7 yutaka)
 	if (HtmlHelp(GetDesktopWindow(), HelpFN, HH_DISPLAY_TOPIC, 0) == NULL) {
-		char buf[MAXPATHLEN];
+		char buf[MAX_PATH + 28];
 		_snprintf(buf, sizeof(buf), "Can't open HTML help file(%s).", HelpFN);
 		MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
 	}

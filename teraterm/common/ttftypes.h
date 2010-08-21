@@ -69,7 +69,7 @@ typedef struct {
   WORD OpId;
   char DlgCaption[40];
 
-  char FullName[MAXPATHLEN];
+  char FullName[MAX_PATH];
   int DirLen;
 
   int NumFname, FNCount;

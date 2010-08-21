@@ -274,10 +274,10 @@ struct tttset {
 	char HomeDir[MAXPATHLEN];
 
 	/* Setup file name */
-	char SetupFName[MAXPATHLEN];
-	char KeyCnfFN[MAXPATHLEN];
-	char LogFN[MAXPATHLEN];
-	char MacroFN[MAXPATHLEN];
+	char SetupFName[MAX_PATH];
+	char KeyCnfFN[MAX_PATH];
+	char LogFN[MAX_PATH];
+	char MacroFN[MAX_PATH];
 	char HostName[1024];
 
 	POINT VTPos;
@@ -936,6 +936,10 @@ typedef TMap far *PMap;
  *   added tttset.DisableMenuDuplicateSession.
  *   added tttset.DisableMenuNewConnection.
  *   added tttset.IMERelatedCursorStyle.
+ *   changed size of tttset.SetupFName to MAX_PATH from MAXPATHLEN.
+ *   changed size of tttset.KeyCnfFN to MAX_PATH from MAXPATHLEN.
+ *   changed size of tttset.LogFN to MAX_PATH from MAXPATHLEN.
+ *   changed size of tttset.MacroFN to MAX_PATH from MAXPATHLEN.
  *
  * - At version 4.66, ttset_memfilemap was replaced with ttset_memfilemap_12.
  *   renamed tttset.Baud to Baud_.

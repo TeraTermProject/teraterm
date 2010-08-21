@@ -210,7 +210,7 @@ BOOL CCtrlWindow::OnInitDialog()
 	HDC TmpDC;
 	int CRTWidth, CRTHeight;
 	RECT Rect;
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
 	BOOL IOption, VOption;
 	int CmdShow;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];

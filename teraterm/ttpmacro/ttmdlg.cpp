@@ -21,9 +21,9 @@
 
 extern "C" {
 char HomeDir[MAXPATHLEN];
-char FileName[MAXPATHLEN];
+char FileName[MAX_PATH];
 char TopicName[11];
-char ShortName[MAXPATHLEN];
+char ShortName[MAX_PATH];
 char Param2[MAXPATHLEN];
 char Param3[MAXPATHLEN];
 char Param4[MAXPATHLEN];
@@ -86,7 +86,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 {
 	int i, j, k;
 	char *Param;
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 
 	// Get home directory
 	if (GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName)) == 0) {

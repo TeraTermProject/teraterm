@@ -42,7 +42,7 @@ static short VKBackslash;
 void SetKeyMap()
 {
   char TempDir[MAXPATHLEN];
-  char TempName[MAXPATHLEN];
+  char TempName[MAX_PATH];
 
   if ( strlen(ts.KeyCnfFN)==0 ) return;
   ExtractFileName(ts.KeyCnfFN,TempName,sizeof(TempName));

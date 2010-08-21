@@ -45,7 +45,7 @@ void PASCAL CopyTTSetToShmem(PTTSet ts)
 
 BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
 {
-	char Temp[MAXPATHLEN];
+	char Temp[MAX_PATH];
 
 	if (FirstInstance) {
 		// init window list
