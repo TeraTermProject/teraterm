@@ -27,7 +27,7 @@
     </p>
 
     <ul>
-      <li>HTTP(for SSH1,SSH2 )</li>
+      <li>HTTP <a href="#http_proxy">(*)</a></li>
       <li>TELNET(for telnet)</li>
       <li>SOCKS4</li>
       <li>SOCKS5</li>
@@ -48,5 +48,22 @@
     <p>
       Now, you are ready - try to connect.
     </p>
+    
+    <!-h2><a name="http_proxy" id="http_proxy">HTTP プロキシを使うときの注意点</a></h2>
+    
+    <p>
+    HTTP プロキシサーバは通常 HTTP リクエストを扱うために設置されているので、設定によっては以下のような接続を許さないことがあります。
+    </p>
+    
+    <ul>
+      <li>通信内容が HTTP, HTTPS ではない</li>
+      <li>通信先のポート番号が 80, 443 ではない</li>
+      <li>通信先のポート番号が 443 ではなく、CONNECT メソッドで接続しようとする</li>
+    </ul>
+    
+    <p>
+    このような設定のプロキシサーバを通信の中継に利用することはできません。
+    </p-->
+    
   </body>
 </html>
