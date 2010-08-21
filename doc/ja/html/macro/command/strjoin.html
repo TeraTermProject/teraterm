@@ -20,7 +20,7 @@
 <h2>形式</h2>
 
 <pre class="macro-syntax">
-strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt;
+strjoin &lt;strvar&gt; &lt;separator&gt; [&lt;count&gt;]
 </pre>
 
 <h2>解説</h2>
@@ -34,12 +34,25 @@ groupmatchstr1～groupmatchstr9 を区切り記号 &lt;separator&gt; で連結し、文字列変
 </p>
 
 <p>
-&lt;count&gt; には、連結する部分文字列の最大数（9以下）を指定する。
+&lt;count&gt; には、連結する部分文字列の最大数（9以下）を指定する。<br />
+&lt;count&gt; が省略された場合は 9 とみなされる。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7="Jul"
+groupmatchstr8="Aug"
+groupmatchstr9="Sep"
+strjoin strvar ","
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep'
+
 groupmatchstr1="Jan"
 groupmatchstr2="Feb"
 groupmatchstr3="Mar"

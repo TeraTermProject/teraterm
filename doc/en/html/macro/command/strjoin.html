@@ -20,7 +20,7 @@ Concatenates a string with delimiters.
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt;
+strjoin &lt;strvar&gt; &lt;separator&gt; [&lt;count&gt;]
 </pre>
 
 <h2>Remarks</h2>
@@ -34,12 +34,25 @@ Concatenates a specified separator string variable &lt;strvar&gt; between each e
 </p-->
 
 <p>
-The &lt;count&gt; is specified the maximum number of substrings to concatenate.
+The &lt;count&gt; is specified the maximum number of substrings to concatenate.<br />
+<!--&lt;count&gt; ‚ªÈ—ª‚³‚ê‚½ê‡‚Í 9 ‚Æ‚Ý‚È‚³‚ê‚éB-->
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7="Jul"
+groupmatchstr8="Aug"
+groupmatchstr9="Sep"
+strjoin strvar ","
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep'
+
 groupmatchstr1="Jan"
 groupmatchstr2="Feb"
 groupmatchstr3="Mar"

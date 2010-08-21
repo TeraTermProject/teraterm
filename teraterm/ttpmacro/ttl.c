@@ -3623,19 +3623,36 @@ WORD TTLStrSplit()
 	int maxvar;
 	int srclen, len;
 	int i, count;
+	BOOL ary = FALSE;
 	char *p;
 	char /* *last, */ *tok[MAXVARNUM];
 
 	Err = 0;
 	GetStrVal(src,&Err);
 	GetStrVal(delimchars,&Err);
-	GetIntVal(&maxvar,&Err);
+	// 3rd arg (optional)
+	if (CheckParameterGiven()) {
+		GetIntVal(&maxvar,&Err);
+		if (Err!=0) {
+			// TODO array
+#if 0
+			Err = 0;
+			// Parameter から array を受け取る
+			if (Err==0) {
+				ary = TRUE;
+			}
+#endif
+		}
+	}
+	else {
+		maxvar = 9;
+	}
 
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	if (maxvar < 1 || maxvar > MAXVARNUM)
+	if (!ary && (maxvar < 1 || maxvar > MAXVARNUM) )
 		return ErrSyntax;
 
 	// デリミタは1文字のみとする。
@@ -3679,16 +3696,21 @@ WORD TTLStrSplit()
 	}
 #endif
 #else
-	p = buf;
-	count = 1;
-	tok[count-1] = p;
-	for (i=0; i < srclen && count < maxvar; i++) {
-		if (*p == *delimchars) {
-			*p = '\0';
-			count++;
-			tok[count-1] = p+1;
+	if (ary) {
+		// TODO array
+	}
+	else {
+		p = buf;
+		count = 1;
+		tok[count-1] = p;
+		for (i=0; i < srclen && count < maxvar; i++) {
+			if (*p == *delimchars) {
+				*p = '\0';
+				count++;
+				tok[count-1] = p+1;
+			}
+			p++;
 		}
-		p++;
 	}
 #endif
 
@@ -3714,33 +3736,55 @@ WORD TTLStrJoin()
 	int maxvar;
 	int srclen;
 	int i;
+	BOOL ary = FALSE;
 	char *srcptr, *p;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
 	GetStrVal(delimchars,&Err);
-	GetIntVal(&maxvar,&Err);
+	// 3rd arg (optional)
+	if (CheckParameterGiven()) {
+		GetIntVal(&maxvar,&Err);
+		if (Err!=0) {
+			// TODO array
+#if 0
+			Err = 0;
+			// Parameter から array を受け取る
+			if (Err==0) {
+				ary = TRUE;
+			}
+#endif
+		}
+	}
+	else {
+		maxvar = 9;
+	}
 
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	if (maxvar < 1 || maxvar > MAXVARNUM)
+	if (!ary && (maxvar < 1 || maxvar > MAXVARNUM) )
 		return ErrSyntax;
 
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
 
 	srcptr[0] = '\0';
-	for (i = 0 ; i < maxvar ; i++) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "groupmatchstr%d", i + 1);
-		if (CheckVar(buf,&VarType,&VarId)) {
-			if (VarType!=TypString)
-				return ErrSyntax;
-			p = StrVarPtr(VarId);
-			strncat_s(srcptr, MaxStrLen, p, _TRUNCATE);
-			if (i < maxvar-1) {
-				strncat_s(srcptr, MaxStrLen, delimchars, _TRUNCATE);
+	if (ary) {
+		// TODO array
+	}
+	else {
+		for (i = 0 ; i < maxvar ; i++) {
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "groupmatchstr%d", i + 1);
+			if (CheckVar(buf,&VarType,&VarId)) {
+				if (VarType!=TypString)
+					return ErrSyntax;
+				p = StrVarPtr(VarId);
+				strncat_s(srcptr, MaxStrLen, p, _TRUNCATE);
+				if (i < maxvar-1) {
+					strncat_s(srcptr, MaxStrLen, delimchars, _TRUNCATE);
+				}
 			}
 		}
 	}
