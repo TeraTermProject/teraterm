@@ -7,8 +7,8 @@
 class CStatDlg : public CDialog
 {
 public:
-	BOOL Create(PCHAR Text, PCHAR Title, BOOL SPECIAL, int x, int y);
-	void Update(PCHAR Text, PCHAR Title, BOOL SPECIAL, int x, int y);
+	BOOL Create(PCHAR Text, PCHAR Title, int x, int y);
+	void Update(PCHAR Text, PCHAR Title, int x, int y);
 
 	//{{AFX_DATA(CStatDlg)
 	enum { IDD = IDD_STATDLG };
@@ -26,7 +26,6 @@ protected:
 	int  PosX, PosY, init_WW, WW, WH, TW, TH;
 	SIZE s;
 	HFONT DlgFont;
-	BOOL _SPECIAL;
 
 	//{{AFX_MSG(CStatDlg)
 	virtual BOOL OnInitDialog();

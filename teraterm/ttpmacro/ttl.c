@@ -1850,7 +1850,7 @@ WORD TTLGetPassword()
 	                        Temp,sizeof(Temp),Str);
 	if (Temp[0]==0) // password not exist
 	{
-		OpenInpDlg(Temp2, Str2, "Enter password", "", TRUE, FALSE);
+		OpenInpDlg(Temp2, Str2, "Enter password", "", TRUE);
 		if (Temp2[0]!=0) {
 			Encrypt(Temp2,Temp);
 			WritePrivateProfileString("Password",Str2,Temp,Str);
@@ -2188,7 +2188,6 @@ WORD TTLInputBox(BOOL Paswd)
 	TStrVal Str1, Str2, Str3;
 	WORD Err, ValType, VarId, P;
 	int sp = 1;
-	BOOL SPECIAL;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -2218,11 +2217,13 @@ WORD TTLInputBox(BOOL Paswd)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	SPECIAL = (sp == 0) ? FALSE : TRUE;
+	if (sp) {
+		RestoreNewLine(Str1);
+	}
 	SetInputStr("");
 	if (CheckVar("inputstr",&ValType,&VarId) &&
 	    (ValType==TypString))
-		OpenInpDlg(StrVarPtr(VarId),Str1,Str2,Str3,Paswd,SPECIAL);
+		OpenInpDlg(StrVarPtr(VarId),Str1,Str2,Str3,Paswd);
 	return Err;
 }
 
@@ -2365,7 +2366,6 @@ int MessageCommand(int BoxId, LPWORD Err)
 {
 	TStrVal Str1, Str2;
 	int sp = 1;
-	BOOL SPECIAL;
 	int ret;
 
 	*Err = 0;
@@ -2382,16 +2382,18 @@ int MessageCommand(int BoxId, LPWORD Err)
 		*Err = ErrSyntax;
 	if (*Err!=0) return 0;
 
-	SPECIAL = (sp == 0) ? FALSE : TRUE;
+	if (sp) {
+		RestoreNewLine(Str1);
+	}
 	if (BoxId==IdMsgBox) {
-		ret = OpenMsgDlg(Str1,Str2,FALSE,SPECIAL);
+		ret = OpenMsgDlg(Str1,Str2,FALSE);
 		// メッセージボックスをキャンセルすると、マクロの終了とする。
 		// (2008.8.5 yutaka)		
 		if (ret == IDCANCEL) {
 			TTLStatus = IdTTLEnd;
 		}
 	} else if (BoxId==IdYesNoBox) {
-		ret = OpenMsgDlg(Str1,Str2,TRUE,SPECIAL);
+		ret = OpenMsgDlg(Str1,Str2,TRUE);
 		// メッセージボックスをキャンセルすると、マクロの終了とする。
 		// (2008.8.6 yutaka)		
 		if (ret == IDCLOSE) {
@@ -2400,7 +2402,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 		return (ret);
 	}
 	else if (BoxId==IdStatusBox)
-		OpenStatDlg(Str1,Str2,SPECIAL);
+		OpenStatDlg(Str1,Str2);
 	return 0;
 }
 

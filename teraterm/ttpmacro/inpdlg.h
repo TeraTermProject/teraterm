@@ -8,7 +8,7 @@ class CInpDlg : public CDialog
 {
 public:
 	CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
-	        PCHAR Default, BOOL Paswd, BOOL SPECIAL,
+	        PCHAR Default, BOOL Paswd,
 	        int x, int y);
 
 	//{{AFX_DATA(CInpDlg)

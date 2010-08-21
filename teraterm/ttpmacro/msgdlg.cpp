@@ -20,15 +20,11 @@ static char THIS_FILE[] = __FILE__;
 
 // CMsgDlg dialog
 
-CMsgDlg::CMsgDlg(PCHAR Text, PCHAR Title,
-                 BOOL YesNo, BOOL SPECIAL,
+CMsgDlg::CMsgDlg(PCHAR Text, PCHAR Title, BOOL YesNo,
                  int x, int y) : CDialog(CMsgDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CMsgDlg)
 	//}}AFX_DATA_INIT
-	if (SPECIAL) { // (2007.9.11 maya)
-		RestoreNewLine(Text); // (2006.7.29 maya)
-	}
 	TextStr = Text;
 	TitleStr = Title;
 	YesNoFlag = YesNo;
