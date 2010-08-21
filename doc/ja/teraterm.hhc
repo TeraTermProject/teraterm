@@ -794,6 +794,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setdebug">
 					<param name="Local" value="html\macro\command\setdebug.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setdtr">
@@ -888,10 +889,12 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="ymodemrecv">
 					<param name="Local" value="html\macro\command\ymodemrecv.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="ymodemsend">
 					<param name="Local" value="html\macro\command\ymodemsend.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="zmodemrecv">
@@ -1038,10 +1041,12 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strinsert">
 					<param name="Local" value="html\macro\command\strinsert.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strjoin">
 					<param name="Local" value="html\macro\command\strjoin.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strlen">
@@ -1056,10 +1061,12 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strremove">
 					<param name="Local" value="html\macro\command\strremove.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strreplace">
 					<param name="Local" value="html\macro\command\strreplace.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strscan">
@@ -1074,10 +1081,12 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strsplit">
 					<param name="Local" value="html\macro\command\strsplit.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="strtrim">
 					<param name="Local" value="html\macro\command\strtrim.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="tolower">
@@ -1163,6 +1172,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filestat">
 					<param name="Local" value="html\macro\command\filestat.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filestrseek">
@@ -1177,6 +1187,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filetruncate">
 					<param name="Local" value="html\macro\command\filetruncate.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filewrite">
