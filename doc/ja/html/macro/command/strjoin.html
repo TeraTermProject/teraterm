@@ -20,7 +20,7 @@
 <h2>形式</h2>
 
 <pre class="macro-syntax">
-strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
+strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt;
 </pre>
 
 <h2>解説</h2>
@@ -36,30 +36,6 @@ groupmatchstr1～groupmatchstr9 を区切り記号 &lt;separator&gt; で連結し、文字列変
 <p>
 &lt;count&gt; には、連結する部分文字列の最大数（9以下）を指定する。
 </p>
-
-<p>
-&lt;special&gt; が 1 の場合は、&lt;separator&gt; に含まれる以下の文字列は特殊文字として扱われる。<br>
-&lt;special&gt; が指定されない場合は 1 が使用される。
-</p>
-
-<table>
- <tr>
-  <th>入力</th>
-  <th>出力</th>
- </tr>
- <tr>
-  <td>\\</td>
-  <td>"\"</td>
- </tr>
- <tr>
-  <td>\n</td>
-  <td>改行</td>
- </tr>
- <tr>
-  <td>\t</td>
-  <td>タブ</td>
- </tr>
-</table>
 
 <h2>例</h2>
 

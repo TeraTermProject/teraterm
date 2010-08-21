@@ -20,7 +20,7 @@ Concatenates a string with delimiters.
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
+strjoin &lt;strvar&gt; &lt;separator&gt; &lt;count&gt;
 </pre>
 
 <h2>Remarks</h2>
@@ -36,30 +36,6 @@ Concatenates a specified separator string variable &lt;strvar&gt; between each e
 <p>
 The &lt;count&gt; is specified the maximum number of substrings to concatenate.
 </p>
-
-<p>
-If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
-If &lt;special&gt; is not specified then 1 is used.
-</p>
-
-<table>
- <tr>
-  <th>input</th>
-  <th>output</th>
- </tr>
- <tr>
-  <td>\\</td>
-  <td>"\"</td>
- </tr>
- <tr>
-  <td>\n</td>
-  <td>line feed</td>
- </tr>
- <tr>
-  <td>\t</td>
-  <td>tab</td>
- </tr>
-</table>
 
 <h2>Example</h2>
 

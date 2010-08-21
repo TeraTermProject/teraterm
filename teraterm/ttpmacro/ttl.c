@@ -3567,28 +3567,17 @@ WORD TTLStrTrim()
 	TStrVal trimchars;
 	WORD Err, VarId;
 	int srclen;
-	int i, start, end, sp;
+	int i, start, end;
 	char *srcptr, *p;
 	char table[256];
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
 	GetStrVal(trimchars,&Err);
-	// get 3rd arg(optional) if given
-	if (CheckParameterGiven()) {
-		GetIntVal(&sp, &Err);
-	} else {
-		/* デフォルトは制御コード扱いとする。*/
-		sp = 1;
-	}
+
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-
-	if (sp) {
-		// 改行コードを変換する
-		RestoreNewLine(trimchars);
-	}
 
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
@@ -3631,7 +3620,7 @@ WORD TTLStrSplit()
 #define MAXVARNUM 9
 	TStrVal src, delimchars, buf;
 	WORD Err;
-	int maxvar, sp;
+	int maxvar;
 	int srclen, len;
 	int i, count;
 	char *p;
@@ -3641,24 +3630,13 @@ WORD TTLStrSplit()
 	GetStrVal(src,&Err);
 	GetStrVal(delimchars,&Err);
 	GetIntVal(&maxvar,&Err);
-	// get 3rd arg(optional) if given
-	if (CheckParameterGiven()) {
-		GetIntVal(&sp, &Err);
-	} else {
-		/* デフォルトは制御コード扱いとする。*/
-		sp = 1;
-	}
+
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
 	if (maxvar < 1 || maxvar > MAXVARNUM)
 		return ErrSyntax;
-
-	if (sp) {
-		// 改行コードを変換する
-		RestoreNewLine(delimchars);
-	}
 
 	// デリミタは1文字のみとする。
 	len = strlen(delimchars);
@@ -3733,7 +3711,7 @@ WORD TTLStrJoin()
 	TStrVal delimchars, buf;
 	WORD Err, VarId;
 	WORD VarType;
-	int maxvar, sp;
+	int maxvar;
 	int srclen;
 	int i;
 	char *srcptr, *p;
@@ -3742,24 +3720,13 @@ WORD TTLStrJoin()
 	GetStrVar(&VarId,&Err);
 	GetStrVal(delimchars,&Err);
 	GetIntVal(&maxvar,&Err);
-	// get 3rd arg(optional) if given
-	if (CheckParameterGiven()) {
-		GetIntVal(&sp, &Err);
-	} else {
-		/* デフォルトは制御コード扱いとする。*/
-		sp = 1;
-	}
+
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
 	if (maxvar < 1 || maxvar > MAXVARNUM)
 		return ErrSyntax;
-
-	if (sp) {
-		// 改行コードを変換する
-		RestoreNewLine(delimchars);
-	}
 
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);

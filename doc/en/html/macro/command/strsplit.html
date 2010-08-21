@@ -20,7 +20,7 @@ Splits a string by delimiters.
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-strsplit &lt;strval&gt; &lt;separator&gt; &lt;count&gt; [&lt;special&gt;]
+strsplit &lt;strval&gt; &lt;separator&gt; &lt;count&gt;
 </pre>
 
 <h2>Remarks</h2>
@@ -37,30 +37,6 @@ Splits the string &lt;strval&gt; by the &lt;separator&gt; delimiter, and returns
 The &lt;count&gt; is specified the maximum number of substrings to return.<br>
 If a number of substrings is smaller than &lt;count&gt;, the remaining groupmatchstr variables stores NULL.
 </p>
-
-<p>
-If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
-If &lt;special&gt; is not specified then 1 is used.
-</p>
-
-<table>
- <tr>
-  <th>input</th>
-  <th>output</th>
- </tr>
- <tr>
-  <td>\\</td>
-  <td>"\"</td>
- </tr>
- <tr>
-  <td>\n</td>
-  <td>line feed</td>
- </tr>
- <tr>
-  <td>\t</td>
-  <td>tab</td>
- </tr>
-</table>
 
 <!--p>
 ÀÛ‚É•ªŠ„‚³‚ê‚½ŒÂ”‚ğƒVƒXƒeƒ€•Ï” result ‚ÉŠi”[‚·‚éB
