@@ -2239,7 +2239,7 @@ void CSSetAttr()		// SGR
 	}
     }
 
-    void CSQ_i_Mode()		// MC (DEC)
+    void CSQ_i_Mode()		// DECMC
     {
       if (Param[1]==-1) Param[1] = 0;
       switch (Param[1]) {
@@ -2355,10 +2355,11 @@ void CSSetAttr()		// SGR
 	}
     }
 
-    void CSQ_n_Mode()		// DSR (DEC)
+    void CSQ_n_Mode()		// DECDSR
     {
       switch (Param[1]) {
 	case 53:
+	case 55:
 	  /* Locator Device Status Report -> Ready */
 	  SendCSIstr("?50n", 0);
 	  break;
@@ -2370,9 +2371,9 @@ void CSSetAttr()		// SGR
     switch (b) {
       case 'K': CSLineErase(); break;		// DECSEL
       case 'h': CSQ_h_Mode(); break;		// DECSET
-      case 'i': CSQ_i_Mode(); break;		// MC (DEC)
+      case 'i': CSQ_i_Mode(); break;		// DECMC
       case 'l': CSQ_l_Mode(); break;		// DECRST
-      case 'n': CSQ_n_Mode(); break;		// DSR (DEC)
+      case 'n': CSQ_n_Mode(); break;		// DECDSR
     }
   }
 
