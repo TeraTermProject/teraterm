@@ -87,6 +87,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,70,173,10
     CONTROL         "&Clear display when window resized",IDC_CLEAR_ON_RESIZE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,85,220,10
+    CONTROL         "Change cursor shape with &IME state",IDC_CURSOR_CHANGE_IME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,100,220,10
 END
 
 IDD_TABSHEET_SEQUENCE DIALOGEX 0, 0, 242, 148

@@ -143,6 +143,7 @@
 #define IDC_CONFIRM_STRING_FILE_PATH    2521
 #define IDC_CONFIRM_STRING_FILE_LABEL   2522
 #define IDC_CLEAR_ON_RESIZE             2523
+#define IDC_CURSOR_CHANGE_IME           2524
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
