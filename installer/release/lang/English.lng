@@ -160,6 +160,7 @@ DLG_TAB_GENERAL_ACCEPTBROADCAST=Accept &broadcast
 DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=Mouse &wheel scroll line
 DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=A&uto scroll only in bottom line
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&Clear display when window resized
+DLG_TAB_GENERAL_CURSOR_CHANGE_IME=Change cursor shape with &IME state
 
 DLG_TAB_SEQENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accept &mouse event tracking request
 DLG_TAB_SEQENCE_DISABLE_MOUSE_TRACKING_CTRL=&Disable mouse event tracking when Control is pressed

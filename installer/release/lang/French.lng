@@ -160,6 +160,7 @@ DLG_TAB_GENERAL_ACCEPTBROADCAST=Accepter &broadcast
 DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=Nbre de lignes si action molette de la souris
 DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=Défilement auto seulement sur la dernière ligne
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=Effacer l'écran quand la fenêtre est redimensionnée
+DLG_TAB_GENERAL_CURSOR_CHANGE_IME=Change cursor shape with &IME state
 
 DLG_TAB_SEQENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accepter les événement souris
 DLG_TAB_SEQENCE_DISABLE_MOUSE_TRACKING_CTRL=Accepter les événement souris quand CTRL est appuyé
