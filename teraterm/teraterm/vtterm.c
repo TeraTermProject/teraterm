@@ -3068,6 +3068,7 @@ void XSequence(BYTE b)
 			XsParseMode = ModeXsFirst;
 		}
 		else if (b == ';') {
+			StrBuff[StrLen] = '\0';
 			if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
 				if (strcmp(StrBuff, "?") == 0) {
 					color = DispGetANSIColor(ColorNumber);
