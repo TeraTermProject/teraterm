@@ -35,17 +35,18 @@
   <li>Changes
     <ul>
       <li>added the NextShownWin and PrevShownWin of new shortcut keys in the KEYBOARD.CNF file that display a next or previous window not minimized.</li>
-      <!-- li>NextWin/PrevWin ショートカットキーで切り替わる対象から、非表示状態のウィンドウを除いた。</li -->
+      <li>removed the hidden window from the target windows which switches by the shortcut key NextWin/PrevWin.</li>
       <li>added a new optional setting that can disable the menu for "New connection" and "Duplicate session".
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#DisableMenuNewConnection">DisableMenuNewConnection</a> and <a href="../setup/teraterm-misc.html#DisableMenuDuplicateSession">DisableMenuDuplicateSession</a> in the teraterm.ini file. The default is off.</li>
-      <!-- li>IMEのon/off状態でカーソル形状を変更するか設定できるようにした。
+      <li>added a user configuration for changing the cursor color depending on the IME open status.
         <ul>
           <li>A user can change the setup value on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
-        </ul></li -->
+        </ul></li>
       <li>added support for the motion event of mouse event notify.</li>
-      <!-- li>マウスイベント通知で、DEC Locator Mode に対応した。</li -->
-      <!-- li>vim で ttymouse が xterm2 に自動設定されるように、Secondary DA の応答を調整した。</li -->
+      <li>added support for the DEC Locator Mode depending on the mouse event notification.</li>
+      <li>The ttymouse can automatically setup the xterm2 to modify the response of the Secondary DA.
+</li>
       <li>added the "<a href="../macro/command/filetruncate.html">filetruncate</a>" macro command.</li>
       <li>added the "<a href="../macro/command/dispstr.html">dispstr</a>" macro command.</li>
       <li>added the "<a href="../macro/command/strinsert.html">strinsert</a>" macro command.</li>
@@ -62,8 +63,8 @@
       <li>The YMODEM sending and receiving procedure does not work for the HyperTerminal.</li>
       <li>The file sending is slowing.</li>
       <li>The retransmission EOT does not work well by using the XMODEM protocol.</li>
-      <!-- li>マウス操作の通知で、Control と Alt(Meta) の扱いが逆になっていたのを修正した。</li -->
-      <!-- il>色設定/問い合わせ制御シーケンスが正しく働かない場合があったのを修正した。</li -->
+      <li>The Control and Alt(Meta) motion are swapped depending on the mouse operation notification.</li>
+      <li>The color setup and request control sequence does not work well.</li>
       <li>A statusbox is closed by performing the OK button action.</li>
     </ul>
   </li>
