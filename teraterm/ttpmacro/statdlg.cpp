@@ -100,6 +100,8 @@ void CStatDlg::OnCancel()
 BOOL CStatDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam)) {
+		case IDOK:  // Enter keyâüâ∫Ç≈è¡Ç¶Ç»Ç¢ÇÊÇ§Ç…Ç∑ÇÈÅB(2010.8.25 yutaka)
+			return TRUE;
 		case IDCANCEL:
 			if ((HWND)lParam!=NULL) { // ignore ESC key
 				DestroyWindow();
