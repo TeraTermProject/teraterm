@@ -30,23 +30,24 @@ Splits the string &lt;strval&gt; by the &lt;separator&gt; delimiter, and returns
 </p>
 
 <p>
-<!--&lt;separator&gt; には区切り記号として扱う文字を1文字だけ指定する。-->
+One delimiter character is specified in the &lt;separator&gt;.
 </p>
 
 <p>
 The &lt;count&gt; is specified the maximum number of substrings to return. The upper limit of &lt;count&gt; is 9.<br>
 If a number of substrings is smaller than &lt;count&gt;, the remaining groupmatchstr variables stores ''(empty).<br>
-<!--文字列中の部分文字列の数が &lt;count&gt; を超えるとき、最後のgroupmatchstrには残りの文字列がすべて代入される。-->
+
+When the number of substrings are greater than the &lt;count&gt;, the remaining substrings stores into the last groupmatchstr variable.
 </p>
 
 <p>
-<!--&lt;count&gt; が省略された場合には、部分文字列の最大数は 9 とみなされる。<br>
-文字列中の部分文字列の数が 9 を超えるとき、&lt;count&gt; を指定した場合とは違い 9 番目の部分文字列のみが代入される。-->
+When the &lt;count&gt; is not specified, the maximum of substrings is 9.<br>
+If the number of substrings is larger than 9, the ninth substring stores into the last groupmatchstr variable.
 </p>
 
 <p>
-<!--実際に分割された個数をシステム変数 result に格納する。<br>
-&lt;count&gt; が省略され、文字列中の部分文字列の数が 9 を超えるときは、システム変数 result に 10 を格納する。-->
+The division count stores into the result system variable.<br>
+When the &lt;count&gt; is not specified and the number of substrings is larger than 9, the result value is 10.
 </p>
 
 <h2>Example</h2>
