@@ -55,5 +55,25 @@ Data が 7 bitだと、ZMODEM が使えません。<A HREF="../../menu/setup-serialport.htm
 参考: <A HREF="forwarding-files.html">中間ホストを経由してホストに接続した場合のファイル転送</A>
 </p>
 
+
+<h2>通信ソフトウェア</h2>
+
+<div class="indent1">
+<p>
+ZMODEMによるファイル送信は、Red Hat系Linux(Fedora, CentOS)上で lrzsz パッケージに対して正常に動作します。zmtx-zmrx パッケージに対しては動かないことがあります。
+<br>
+com0comを利用すると、ループバック接続でTera Termやハイパーターミナルと相互通信することができます。
+</p>
+
+<p>モデム通信プログラム
+<ul>
+  <li><a href="http://www.ohse.de/uwe/software/lrzsz.html">lrzsz</a></li>
+  <li><a href="ftp://ftp.netsw.org/net/modem/protocols/zmodem/zmtx-zmrx/">zmtx-zmrx</a></li>
+  <li><a href="http://com0com.sourceforge.net/">Null-modem emulator(com0com)</a></li>
+</ul>
+</p>
+
+</div>
+
 </BODY>
 </HTML>
