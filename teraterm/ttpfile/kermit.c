@@ -186,7 +186,7 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
       case 1:
         if ((MinMAXL<n) && (n<MaxMAXL))
            kv->KmtYour.MAXL = n;
-	break;
+        break;
       case 2:
         if ((MinTIME<n) && (n<MaxNum))
            kv->KmtYour.TIME = n;
@@ -197,15 +197,15 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
         break;
       case 4:
         kv->KmtYour.PADC = b ^ 0x40;
-	break;
+        break;
       case 5:
         if (n<0x20)
           kv->KmtYour.EOL = n;
         break;
       case 6:
-	if (KmtCheckQuote(b))
+        if (KmtCheckQuote(b))
           kv->KmtYour.QCTL = b;
-	break;
+        break;
       case 7:
         if (AckFlag) /* Ack packet from remote host */
         {
@@ -242,7 +242,7 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
         }
         else
           if ((kv->KmtYour.CHKT<1) ||
-	      (kv->KmtYour.CHKT>2))
+              (kv->KmtYour.CHKT>2))
             kv->KmtYour.CHKT = DefCHKT;
 
         kv->KmtMy.CHKT = kv->KmtYour.CHKT;
@@ -324,7 +324,7 @@ void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 
     if (OutFlag)
     {
-      if (kv->Quote8 && BINflag) b = b ^ 0x80;        
+      if (kv->Quote8 && BINflag) b = b ^ 0x80;
       for (j = 1 ; j <= kv->RepeatCount ; j++)
       {
         if (Buff==NULL) /* write to file */
@@ -771,29 +771,29 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
     case 'B':
       if (kv->KmtState == ReceiveFile)
       {
-	fv->Success = TRUE;
-	return FALSE;
+        fv->Success = TRUE;
+        return FALSE;
       }
     case 'D':
       if ((kv->KmtState == ReceiveData) &&
-	  (PktNumNew > kv->PktNum))
-	KmtDecode(fv,kv,NULL,&Len);
+          (PktNumNew > kv->PktNum))
+        KmtDecode(fv,kv,NULL,&Len);
       break;
     case 'E': return FALSE;
     case 'F':
       if ((kv->KmtState==ReceiveFile) ||
-	  (kv->KmtState==GetInit))
+          (kv->KmtState==GetInit))
       {
-	kv->KmtMode = IdKmtReceive;
+        kv->KmtMode = IdKmtReceive;
 
-	Len = sizeof(FNBuff);
-	KmtDecode(fv,kv,FNBuff,&Len);
-	FNBuff[Len] = 0;
-	GetFileNamePos(FNBuff,&i,&j);
-	strncpy_s(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,&FNBuff[j],_TRUNCATE);
-	/* file open */
-	if (! FTCreateFile(fv)) return FALSE;
-	kv->KmtState = ReceiveData;
+        Len = sizeof(FNBuff);
+        KmtDecode(fv,kv,FNBuff,&Len);
+        FNBuff[Len] = 0;
+        GetFileNamePos(FNBuff,&i,&j);
+        strncpy_s(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,&FNBuff[j],_TRUNCATE);
+        /* file open */
+        if (! FTCreateFile(fv)) return FALSE;
+        kv->KmtState = ReceiveData;
       }
       break;
 
@@ -808,114 +808,114 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 
     case 'N':
       switch (kv->KmtState) {
-	case SendInit:
-	  if (PktNumNew==kv->PktNum)
-            KmtSendPacket(fv,kv,cv);
-	  break;
-	case SendFile:
+        case SendInit:
           if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  else if (PktNumNew==kv->PktNum+1)
-	    KmtSendNextData(fv,kv,cv);
-	  break;
-	case SendData:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  else if (PktNumNew==kv->PktNum+1)
-	    KmtSendNextData(fv,kv,cv);
-	  break;
-	case SendEOF:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  else if (PktNumNew==kv->PktNum+1)
-	  {
-	    if (! KmtSendNextFile(fv,kv,cv))
-	      return FALSE;
-	  }
-	  break;
-	case SendEOT:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  break;
-	case ServerInit:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  break;
-	case GetInit:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  break;
-	case Finish:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  break;
+            KmtSendPacket(fv,kv,cv);
+          break;
+        case SendFile:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          else if (PktNumNew==kv->PktNum+1)
+            KmtSendNextData(fv,kv,cv);
+          break;
+        case SendData:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          else if (PktNumNew==kv->PktNum+1)
+            KmtSendNextData(fv,kv,cv);
+          break;
+        case SendEOF:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          else if (PktNumNew==kv->PktNum+1)
+          {
+            if (! KmtSendNextFile(fv,kv,cv))
+              return FALSE;
+          }
+          break;
+        case SendEOT:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          break;
+        case ServerInit:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          break;
+        case GetInit:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          break;
+        case Finish:
+          if (PktNumNew==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          break;
       }
       break;
 
     case 'Y':
       switch (kv->KmtState) {
-	case SendInit:
-	  if (PktNumNew==kv->PktNum)
-	  {
-	    KmtParseInit(kv,TRUE);
-	    if (! KmtSendNextFile(fv,kv,cv))
-	      return FALSE;
-	  }
-	  break;
-	case SendFile:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendNextData(fv,kv,cv);
-	  break;
-	case SendData:
-	  if (PktNumNew==kv->PktNum)
-	    KmtSendNextData(fv,kv,cv);
-	  else if (PktNumNew+1==kv->PktNum)
-	    KmtSendPacket(fv,kv,cv);
-	  break;
-	case SendEOF:
-	  if (PktNumNew==kv->PktNum)
-	  {
-	    if (! KmtSendNextFile(fv,kv,cv))
-	      return FALSE;
-	  }
-	  break;
-	case SendEOT:
-	  if (PktNumNew==kv->PktNum)
-	  {
-	    fv->Success = TRUE;
-	    return FALSE;
-	  }
-	  break;
-	case ServerInit:
-	  if (PktNumNew==kv->PktNum)
-	  {
-	    KmtParseInit(kv,TRUE);
-	    switch (kv->KmtMode) {
-	      case IdKmtGet:
-		KmtSendReceiveInit(fv,kv,cv);
-		break;
-	      case IdKmtFinish:
-		KmtSendFinish(fv,kv,cv);
+        case SendInit:
+          if (PktNumNew==kv->PktNum)
+          {
+            KmtParseInit(kv,TRUE);
+            if (! KmtSendNextFile(fv,kv,cv))
+              return FALSE;
+          }
+          break;
+        case SendFile:
+          if (PktNumNew==kv->PktNum)
+            KmtSendNextData(fv,kv,cv);
+          break;
+        case SendData:
+          if (PktNumNew==kv->PktNum)
+            KmtSendNextData(fv,kv,cv);
+          else if (PktNumNew+1==kv->PktNum)
+            KmtSendPacket(fv,kv,cv);
+          break;
+        case SendEOF:
+          if (PktNumNew==kv->PktNum)
+          {
+            if (! KmtSendNextFile(fv,kv,cv))
+              return FALSE;
+          }
+          break;
+        case SendEOT:
+          if (PktNumNew==kv->PktNum)
+          {
+            fv->Success = TRUE;
+            return FALSE;
+          }
+          break;
+        case ServerInit:
+          if (PktNumNew==kv->PktNum)
+          {
+            KmtParseInit(kv,TRUE);
+            switch (kv->KmtMode) {
+              case IdKmtGet:
+                KmtSendReceiveInit(fv,kv,cv);
                 break;
-	    }
-	  }
-	  break;
+              case IdKmtFinish:
+                KmtSendFinish(fv,kv,cv);
+                break;
+            }
+          }
+          break;
         case Finish:
-	  if (PktNumNew==kv->PktNum)
-	  {
-	    fv->Success = TRUE;
-	    return FALSE;
-	  }
-	  break;
+          if (PktNumNew==kv->PktNum)
+          {
+            fv->Success = TRUE;
+            return FALSE;
+          }
+          break;
       }
       break;
 
     case 'Z':
       if (kv->KmtState == ReceiveData)
       {
-	if (fv->FileOpen) _lclose(fv->FileHandle);
-	fv->FileOpen = FALSE;
-	kv->KmtState = ReceiveFile;
+        if (fv->FileOpen) _lclose(fv->FileHandle);
+        fv->FileOpen = FALSE;
+        kv->KmtState = ReceiveFile;
       }
   }
 
