@@ -13,9 +13,7 @@ if exist ..\teraterm\release\svnrev.exe goto svnrev
 devenv /build release ..\teraterm\ttermpro.sln /project svnrev /projectconfig release
 
 :svnrev
-pushd ..\teraterm
-release\svnrev.exe > ttpdlg\svnversion.h
-popd
+..\teraterm\release\svnrev.exe
 
 :build
 devenv /%BUILD% release ..\teraterm\ttermpro.sln
