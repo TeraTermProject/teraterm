@@ -823,9 +823,13 @@ void FAR PASCAL UnregWin(HWND HWin)
 
 char GetWindowTypeChar(HWND Hw, HWND HWin) 
 {
+#if 0
 	if (HWin == Hw)
 		return '*';
 	else if (!IsWindowVisible(Hw))
+#else
+	if (!IsWindowVisible(Hw))
+#endif
 		return '#';
 	else if (IsIconic(Hw))
 		return '-';
