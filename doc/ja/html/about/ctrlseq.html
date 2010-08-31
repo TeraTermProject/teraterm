@@ -1,0 +1,711 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>対応制御シーケンス</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>対応制御シーケンス</h1>
+
+<h2>C0 制御文字</h2>
+<table border="1">
+<tr><th>コード</th>	<th> 略号 </th>	<th>機能</th></tr>
+<tr><td>0x00</td>	<td >NUL </td>	<td> </td></tr>
+<tr><td>0x01</td>	<td> SOH </td>	<td> </td></tr>
+<tr><td>0x02</td>	<td> STX </td>	<td> </td></tr>
+<tr><td>0x03</td>	<td> ETX </td>	<td> </td></tr>
+<tr><td>0x04</td>	<td> EOT </td>	<td> </td></tr>
+<tr><td>0x05</td>	<td> ENQ </td>	<td> アンサーバック文字列送信 </td></tr>
+<tr><td>0x06</td>	<td> ACK </td>	<td> </td></tr>
+<tr><td>0x07</td>	<td> BEL </td>	<td> ビープ音を鳴らす </td></tr>
+<tr><td>0x08</td>	<td> BS  </td>	<td> カーソルを1桁左に移動 </td></tr>
+<tr><td>0x09</td>	<td> HT  </td>	<td> カーソルを次のタブストップに移動 </td></tr>
+<tr><td>0x0a</td>	<td> LF  </td>	<td> カーソルを一行下に移動 </td></tr>
+<tr><td>0x0b</td>	<td> VT  </td>	<td> カーソルを一行下に移動 </td></tr>
+<tr><td>0x0c</td>	<td> FF  </td>	<td> カーソルを一行下に移動 </td></tr>
+<tr><td>0x0d</td>	<td> CR  </td>	<td> カーソルを行頭に移動 </td></tr>
+<tr><td>0x0e</td>	<td> SO  </td>	<td> GL へ G1 を呼び出す </td></tr>
+<tr><td>0x0f</td>	<td> SI  </td>	<td> GL へ G0 を呼び出す </td></tr>
+<tr><td>0x10</td>	<td> DLE </td>	<td> </td></tr>
+<tr><td>0x11</td>	<td> DC1 </td>	<td> </td></tr>
+<tr><td>0x12</td>	<td> DC2 </td>	<td> </td></tr>
+<tr><td>0x13</td>	<td> DC3 </td>	<td> </td></tr>
+<tr><td>0x14</td>	<td> DC4 </td>	<td> </td></tr>
+<tr><td>0x15</td>	<td> NAK </td>	<td> </td></tr>
+<tr><td>0x16</td>	<td> SYN </td>	<td> </td></tr>
+<tr><td>0x17</td>	<td> ETB </td>	<td> </td></tr>
+<tr><td>0x18</td>	<td> CAN </td>	<td> </td></tr>
+<tr><td>0x19</td>	<td> EM  </td>	<td> </td></tr>
+<tr><td>0x1a</td>	<td> SUB </td>	<td> </td></tr>
+<tr><td>0x1b</td>	<td> ESC </td>	<td> エスケープシーケンスの開始 </td></tr>
+<tr><td>0x1c</td>	<td> FS  </td>	<td> </td></tr>
+<tr><td>0x1d</td>	<td> GS  </td>	<td> </td></tr>
+<tr><td>0x1e</td>	<td> RS  </td>	<td> </td></tr>
+<tr><td>0x1f</td>	<td> US  </td>	<td> </td></tr>
+</table>
+
+<h2>C1制御文字</h2>
+<table border="1">
+<tr><th>コード</th>	<th> 7bit表現 </th>	<th> 略号 </th>	<th>機能</th></tr>
+<tr><td>0x80</td>	<td> </td>	<td> PAD </td>	<td></td></tr>
+<tr><td>0x81</td>	<td> </td>	<td> HOP </td>	<td></td></tr>
+<tr><td>0x82</td>	<td> </td>	<td> BPH </td>	<td></td></tr>
+<tr><td>0x83</td>	<td> </td>	<td> NBH </td>	<td></td></tr>
+<tr><td>0x84</td>	<td> ESC D </td>	<td> IND </td>	<td> カーソルを一行下に移動 </td></tr>
+<tr><td>0x85</td>	<td> ESC E </td>	<td> NEL </td>	<td> カーソルを次の行の先頭に移動 </td></tr>
+<tr><td>0x86</td>	<td> </td>	<td> SSA </td>	<td></td></tr>
+<tr><td>0x87</td>	<td> </td>	<td> ESA </td>	<td></td></tr>
+<tr><td>0x88</td>	<td> ESC H </td>	<td> HTS </td>	<td> カーソル位置にタブストップを設定する </td></tr>
+<tr><td>0x89</td>	<td> </td>	<td> HTJ </td>	<td></td></tr>
+<tr><td>0x8a</td>	<td> </td>	<td> VTS </td>	<td></td></tr>
+<tr><td>0x8b</td>	<td> </td>	<td> PLD </td>	<td></td></tr>
+<tr><td>0x8c</td>	<td> </td>	<td> PLU </td>	<td></td></tr>
+<tr><td>0x8d</td>	<td> ESC M </td>	<td> RI  </td>	<td>カーソルを一行上に移動 </td></tr>
+<tr><td>0x8e</td>	<td> ESC N </td>	<td> SS2 </td>	<td> GL へ G2 を次の一文字に限り呼び出す </td></tr>
+<tr><td>0x8f</td>	<td> ESC O </td>	<td> SS3 </td>	<td> GL へ G3 を次の一文字に限り呼び出す </td></tr>
+<tr><td>0x90</td>	<td> ESC P </td>	<td> DCS </td>	<td>Device Control Sequence (<a href="#DCS">DCSシーケンス</a>を参照)</td></tr>
+<tr><td>0x91</td>	<td> </td>	<td> PU1 </td>	<td></td></tr>
+<tr><td>0x92</td>	<td> </td>	<td> PU2 </td>	<td></td></tr>
+<tr><td>0x93</td>	<td> </td>	<td> STS </td>	<td></td></tr>
+<tr><td>0x94</td>	<td> </td>	<td> CCH </td>	<td></td></tr>
+<tr><td>0x95</td>	<td> </td>	<td> MW  </td>	<td></td></tr>
+<tr><td>0x96</td>	<td> </td>	<td> SPA </td>	<td></td></tr>
+<tr><td>0x97</td>	<td> </td>	<td> EPA </td>	<td></td></tr>
+<tr><td>0x98</td>	<td> ESC X </td>	<td> SOS </td>	<td>文字列開始 (<a href="#SOS">SOSシーケンス</a>を参照)</td></tr>
+<tr><td>0x99</td>	<td> </td>	<td> SGCI </td>	<td></td></tr>
+<tr><td>0x9a</td>	<td> </td>	<td> SCI </td>	<td></td></tr>
+<tr><td>0x9b</td>	<td> ESC [ </td>	<td> CSI </td>	<td>CSIシーケンスを開始 (<a href="#CSI">CSIシーケンス</a>を参照)</td></tr>
+<tr><td>0x9c</td>	<td> ESC \ </td>	<td> ST  </td>	<td>文字列終端。DCS, SOS, OSC, PM, APC シーケンスの終端。</td></tr>
+<tr><td>0x9d</td>	<td> ESC ] </td>	<td> OSC </td>	<td>Operating System Command (<a href="#OSC">OSCシーケンス</a>を参照)</td></tr>
+<tr><td>0x9e</td>	<td> ESC ^ </td>	<td> PM  </td>	<td>Privacy Message (<a href="#PM">PMシーケンス</a>を参照)</td></tr>
+<tr><td>0x9f</td>	<td> ESC _ </td>	<td> APC </td>	<td>Application Program Command (<a href="#APC">APCシーケンス</a>を参照)</td></tr>
+</table>
+
+<h2>制御シーケンス</h2>
+<p>
+</p>
+
+<h3>エスケープシーケンス</h3>
+<table border="1">
+<tr><th>シーケンス</th>	<th>略号</th>	<th>機能</th></tr>
+<tr><td>ESC 7</td>	<td>DECSC</td>	<td>カーソル位置を保存する</td></tr>
+<tr><td>ESC 8</td>	<td>DECRC</td>	<td>保存したカーソル位置を復元する</td></tr>
+<tr><td>ESC =</td>	<td>DECPAM</td>	<td>アプリケーションキーパッドモードに設定する。</td></tr>
+<tr><td>ESC ></td>	<td>DECPNM</td>	<td>ノーマルキーパッドモードに設定する。</td></tr>
+<tr><td>ESC D</td>	<td>IND</td>	<td> カーソルを一行下に移動 </td></tr>
+<tr><td>ESC E</td>	<td>NEL</td>	<td> カーソルを次の行の先頭に移動 </td></tr>
+<tr><td>ESC H</td>	<td>HTS</td>	<td>現在のカーソル位置にタブストップを設定する</td></tr>
+<tr><td>ESC M</td>	<td>RI</td>	<td> カーソルを一行上に移動 </td></tr>
+<tr><td>ESC N</td>	<td>SS2</td>	<td> GL へ G2 を次の一文字に限り呼び出す </td></tr>
+<tr><td>ESC O</td>	<td>SS3</td>	<td> GL へ G3 を次の一文字に限り呼び出す </td></tr>
+<tr><td>ESC P</td>	<td>DCS</td>	<td>Device Control Sequence (<a href="#DCS">DCSシーケンス</a>を参照)</td></tr>
+<tr><td>ESC X</td>	<td>SOS</td>	<td>文字列開始 (<a href="#SOS">SOSシーケンス</a>を参照)</td></tr>
+<tr><td>ESC Z</td>	<td>DECID</td>	<td>端末IDを返答する</td></tr>
+<tr><td>ESC [</td>	<td>CSI</td>	<td>CSIシーケンスを開始 (<a href="#CSI">CSIシーケンス</a>を参照)</td></tr>
+<tr><td>ESC ￥</td>	<td>ST</td>	<td>文字列終端。DCS, SOS, OSC, PM, APC シーケンスの終端。</td></tr>
+<tr><td>ESC ]</td>	<td>OSC</td>	<td>Operating System Command (<a href="#OSC">OSCシーケンス</a>を参照)</td></tr>
+<tr><td>ESC ^</td>	<td>PM</td>	<td>Privacy Message (<a href="#PM">PMシーケンス</a>を参照)</td></tr>
+<tr><td>ESC _</td>	<td>APC</td>	<td>Application Program Command (<a href="#APC">APCシーケンス</a>を参照)</td></tr>
+<tr><td>ESC c</td>	<td>RIS</td>	<td>端末リセット</td>
+<tr><td>ESC g</td>	<td>-</td>	<td>可視ベル</td>
+<tr><td>ESC n</td>	<td>LS2</td>	<td> GL へ G2 を呼び出す </td></tr>
+<tr><td>ESC o</td>	<td>LS3</td>	<td> GL へ G3 を呼び出す </td></tr>
+<tr><td>ESC |</td>	<td>LS3R</td>	<td> GR へ G3 を呼び出す </td></tr>
+<tr><td>ESC }</td>	<td>LS2R</td>	<td> GR へ G2 を呼び出す </td></tr>
+<tr><td>ESC ~</td>	<td>LS1R</td>	<td> GR へ G1 を呼び出す </td></tr>
+<tr><td>ESC SP F</td>	<td>S7C1T</td>	<td>7ビットモード。応答に7ビットシーケンスを使う。</td></tr>
+<tr><td>ESC SP G</td>	<td>S8C1T</td>	<td>8ビットモード。応答に8ビットシーケンスを使う。</td></tr>
+<tr><td>ESC # 8</td>	<td>DECALN</td>	<td>画面を'E'で埋める</td></tr>
+
+<tr><td>ESC $</td>	<!-- td rowspan="5"></td -->	<td colspan="2" rowspan="5"> 文字集合の指示 (ISO/IEC 2022) </td>	</tr>
+<tr><td>ESC (</td></tr>
+<tr><td>ESC )</td></tr>
+<tr><td>ESC *</td></tr>
+<tr><td>ESC +</td></tr>
+</table>
+
+<h3><a name="CSI">CSIシーケンス</a></h3>
+<table border="1">
+<tr><th>シーケンス</th>		<th>略号</th>	<th>機能</th></tr>
+<tr><td>CSI <i>Ps</i> @</td>	<td>ICH</td>	<td>カーソル位置に <i>Ps</i> 個空白を挿入する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> A</td>	<td>CUU</td>	<td>カーソルを <i>Ps</i> 行上に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> B</td>	<td>CUD</td>	<td>カーソルを <i>Ps</i> 行下に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> C</td>	<td>CUF</td>	<td>カーソルを <i>Ps</i> 桁右に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> D</td>	<td>CUB</td>	<td>カーソルを <i>Ps</i> 桁左に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> E</td>	<td>CNL</td>	<td>カーソルを <i>Ps</i> 行下の 1 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> F</td>	<td>CPL</td>	<td>カーソルを <i>Ps</i> 行上の 1 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> G</td>	<td>CHA</td>	<td>カーソルを現在の行の <i>Ps</i> 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td>カーソルを <i>Ps1</i> 行目の <i>Ps2</i> 桁目に移動する。<i>Ps1</i>, <i>Ps2</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td>カーソルを <i>Ps</i> 個後ろのタブストップに移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>画面消去。<i>Ps</i>の省略時の値は 0。<pre>
+<i>Ps</i> = 0    カーソル位置から画面末尾までを消去する。
+   = 1    画面戦闘からカーソル位置までを消去する。
+   = 2    画面全体を消去する。
+</pre></td></tr>
+<tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>行消去。<i>Ps</i> の省略時の値は 0。
+<pre>
+<i>Ps</i> = 0    カーソル位置から行末までを消去する。
+   = 1    行頭からカーソル位置までを消去する。
+   = 2    行全体を消去する。
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td>カーソルのある行の前に <i>Ps</i> 行空行を挿入する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> M</td>	<td>DL</td>	<td>カーソルのある行から <i>Ps</i> 行を削除する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> P</td>	<td>DCH</td>	<td>カーソル位置の文字を <i>Ps</i> 文字削除する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> S</td>	<td>SU</td>	<td>画面を <i>Ps</i> 行上にスクロールする。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> T</td>	<td>SD</td>	<td>画面を <i>Ps</i> 行下にスクロールする。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> X</td>	<td>ECH</td>	<td>カーソル位置から <i>Ps</i> 文字を消す(空白にする)。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> Z</td>	<td>CBT</td>	<td>カーソルを <i>Ps</i> 個前のタブストップに移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> `</td>	<td>HPA</td>	<td>カーソルを現在の行の <i>Ps</i> 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> a</td>	<td>HPR</td>	<td>カーソルを <i>Ps</i> 桁右に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> c</td>	<td>DA</td>	<td>端末特性報告。省略時の <i>Ps</i> の値は 0。
+<pre>
+<i>Ps</i> = 0    端末特性を要求する。
+応答: 端末IDの設定により異なる。
+  VT100     ESC [ 1 ; 2 c
+  VT100J    ESC [ 5 ; 2 c
+  VT101     ESC [ 1 ; 0 c
+  VT102     ESC [ 6 c
+  VT102J    ESC [ 15 c
+  VT220J    ESC [ 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
+  VT282     ESC [ 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
+  VT320     CSI 63 ; 1 ; 2 ; 6 ; 7 ; 8 c
+  VT382     CSI 63 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 15 c
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td>カーソルを桁位置を変えずに <i>Ps</i> 行目に移動する。<i>Ps</i> の省略時の値は 1。</tr>
+<tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td>カーソルを <i>Ps</i> 行下に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> f</td>	<td>HVP</td>	<td>カーソルを <i>Ps1</i> 行目の <i>Ps2</i> 桁目に移動する。<i>Ps1</i>, <i>Ps2</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> g</td>	<td>TBC</td>	<td>タブストップの削除。<i>Ps</i> の省略時の値は 0。
+<pre>
+<i>Ps</i> = 0    カーソル位置のタブストップを削除する。
+   = 3    すべてのタブストップを削除する。
+</pre></td>
+</tr>
+<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td>モードを設定する。(<a href="#mode">モード</a>を参照)</td></tr>
+<tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td>印刷モード
+<pre>
+<i>Ps</i> = 0    画面を印刷する。
+   = 4    プリンタコントローラモードを無効にする。
+   = 5    プリンタコントローラモードを有効にする。
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> j</td>	<td>HPB</td>	<td>カーソルを <i>Ps</i> 桁左に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Ps</i> k</td>	<td>VPB</td>	<td>カーソルを <i>Ps</i> 行上に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
+<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td>モードを解除する。(<a href="#mode">モード</a>を参照)</td></tr>
+<tr><td>CSI <i>Pm</i> m</td>	<td>SGR</td>	<td>文字属性を設定する。省略時の <i>Pm</i> の値は 0。(<a href="#charattr">文字属性</a>を参照)
+</td></tr>
+<tr><td>CSI <i>Ps</i> n</td>	<td>DSR</td>	<td>端末の状態を報告する。
+<pre>
+<i>Ps</i> = 5    端末の状態を報告する。常に CSI 0 n (準備OK)を返す。
+          応答: CSI <i>s</i> n
+	    <i>s</i> = 0    正常
+   = 6    カーソルの位置を報告する。
+          応答: CSI <i>r</i> ; <i>c</i> R
+            <i>r</i>    行位置
+            <i>c</i>    桁位置
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td>上下マージン(スクロールリージョン)を設定する。
+<pre>
+<i>Ps1</i>    上マージンの行位置。省略時は 1。
+<i>Ps2</i>    下マージンの行位置。省略時は画面下端。
+</td></tr>
+<tr><td>CSI s</td>	<td>SCP</td>	<td>現在のカーソル位置を保存する。</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td>ウィンドウ操作
+<pre>
+Ps1 =  1    ウィンドウを通常表示状態にする。
+    =  2    ウィンドウを最小化する。
+    =  3    ウィンドウ位置を <i>Ps2</i>, <i>Ps3</i> に移動する。
+    =  4    ウィンドウサイズを高さ <i>Ps2</i> ドット, 幅 <i>Ps3</i> ドットに変更する。
+    =  5    ウィンドウを前面に移動する。
+    =  6    ウィンドウを背面に移動する。
+    =  7    ウィンドウを再描画する。
+    =  8    端末サイズを <i>Ps2</i> 行, <i>Ps3</i> 桁に変更する。
+    =  9    端末の最大化状態を変更する。
+            <i>Ps2</i> = 0    ウィンドウを通常サイズに変更する。
+	        = 1    ウィンドウを最大化する。
+
+    = 11    ウィンドウの最小化状態を報告する。
+            応答: CSI <i>s</i> t
+              <i>s</i> = 1    通常状態
+	        = 2    最小化状態
+
+    = 13    ウィンドウの位置を報告する。
+            応答: CSI 3 ; <i>x</i> ; <i>y</i> t
+              <i>x</i>    ウィンドウ左上角の X 座標
+              <i>y</i>    ウィンドウ左上角の Y 座標
+
+    = 14    ウィンドウのサイズを報告する。
+            応答: CSI 4 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    ウィンドウの高さ
+              <i>x</i>    ウィンドウの幅
+
+    = 18    端末サイズを報告する。
+            応答: CSI 8 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    端末サイズの高さ(行数)
+              <i>x</i>    端末サイズの幅(文字数)
+
+    = 19    ルートウィンドウのサイズを文字数で報告する。
+            応答: CSI 9 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    ルートウィンドウの高さ(行数)
+              <i>x</i>    ルートウィンドウの幅(文字数)
+
+    = 20    アイコンラベルを報告する。
+            応答: OSC L <i>title</i> ST
+              <i>title</i>    アイコンラベル (ウィンドウタイトル)
+
+    = 21    ウィンドウタイトルを報告する。
+            応答: OSC l <i>title</i> ST
+              <i>title</i>    ウィンドウタイトル
+</pre>
+</td></tr>
+<tr><td>CSI u</td>	<td>RCP</td>	<td>保存したカーソル位置を復元する。</td></tr>
+
+<tr><td>CSI > c</td>	<td>Secondary DA</td>	<td>第二端末特性報告。省略時の <i>Ps</i> の値は 0。
+<pre>
+<i>Ps</i> = 0    第二端末特性要求
+応答: CSI > 32 ; 100 ; 2 c
+</pre>
+</td></tr>
+<tr><td>CSI > 3; <i>Pm</i> J</td>	<td>-</td>	<td>Buff Erase Box</td></tr>
+<tr><td>CSI > 3; <i>Pm</i> K</td>	<td>-</td>	<td>Buff Erase Chars In Line</td></tr>
+<tr><td>CSI > 5; <i>Ps</i> K</td>	<td>-</td>	<td>
+<pre>
+Ps = 3..6	Draw Line
+   = 12		Set foreground color
+</pre></td></tr>
+
+<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td></td></tr>
+<tr><td>CSI ? <i>Pm</i> h</td>	<td>DECSET</td>	<td>DEC/xterm 拡張のモードを設定する。(<a href="#decmode">モード (DEC/xterm拡張)</a>を参照)</td></tr>
+<tr><td>CSI ? <i>Pm</i> i</td>	<td>DECMC</td>	<td>印刷モード
+<pre>
+<i>Pm</i> =  1    カーソル行を印刷する。
+   =  4    自動プリントモードを無効にする。
+   =  5    自動プリントモードを有効にする。
+<!--   = 10    DECPEX の設定を無視して、画面全体を印刷する。
+   = 11    全てのページを印刷する。
+--></pre>
+</td></tr>
+<tr><td>CSI ? <i>Pm</i> l</td>	<td>DECRST</td>	<td>DEC/xterm 拡張のモードを解除する。(<a href="#decmode">モード (DEC/xterm拡張)</a>を参照)</td></tr>
+<tr><td>CSI ? <i>Ps</i> n</td>	<td>DECDSR</td>	<td>端末の状態を報告する。
+<pre>
+<i>Ps</i> = 55    ロケータデバイスの状態を報告する。常に CSI ? 50 n (準備OK)を返す。
+</pre></td></tr>
+
+<tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>カーソル表示形式変更。<i>Ps</i> の省略時の値は 0。
+<pre>
+Ps = 0,1    ブロックカーソル / 点滅
+   = 2      ブロックカーソル / 非点滅
+   = 3      下線カーソル / 点滅
+   = 4      下線カーソル / 非点滅
+   = 5      縦線カーソル / 点滅
+   = 6      縦線カーソル / 非点滅
+</pre></td>
+</tr>
+
+<tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>ソフトリセット</td></tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td>端末動作モード設定
+<pre>
+Ps1 = 61    VT100 mode
+    = 62    VT200 mode
+    = 63    VT300 mode
+    = 64    VT400 mode
+
+Ps2 = 0    7 bit mode (S7C1T)
+    = 1    8 bit mode (S8C1T)
+</pre></td>
+</tr>
+
+<tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td>ステータス行から/へ移動。<i>Ps</i> の省略時の値は 0。
+<pre>
+Ps = 0    主画面へ移動。
+   = 1    ステータス行へ移動。
+</pre></td>
+</tr>
+
+<tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td>ステータス行の表示状態の変更。<i>Ps</i> の省略時の値は 0。
+<pre>
+Ps = 0    ステータス行を表示しない。
+     1    ステータス行を表示しない。
+     2    ステータス行を表示する。
+</pre></td>
+</tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td>filter rectangle 設定。
+<pre>
+Ps1   filter rectangle の上辺
+Ps2   filter rectangle の左辺
+Ps3   filter rectangle の下辺
+Ps4   filter rectangle の右辺
+</pre>
+filter rectangle は常にワンショットモード扱いになる。一度フィルタイベントを送信すると filter rectangle は無効になる。</td>
+</tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ' z</td>	<td>DECELR</td>	<td>DEC ロケータ報告モード。
+<pre>
+Ps1 = 0    ロケータ報告を無効にする
+    = 1    ロケータ報告を有効にする
+    = 2    ワンショットモード。次の一回の報告だけロケータ報告を有効にし、その後無効にする。
+Ps2 = 0    文字モード。2 と同じ。
+    = 1    ピクセルモード。位置をピクセル単位で報告する。
+    = 2    文字モード。位置を文字単位で報告する。
+</pre></td>
+</tr>
+
+<tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td>ロケータイベント設定。
+<pre>
+Pm = 0    ボタンダウン/アップイベントを無効にする。filter rectangle を無効にする。
+   = 1    ボタンダウンイベントを有効にする。ボタンが押されると、DECRQLP と同じ形式でロケータ位置を報告する。
+   = 2    ボタンダウンイベントを無効にする。
+   = 3    ボタンアップイベントを有効にする。ボタンが離されると、DECRQLP と同じ形式でロケータ位置を報告する。
+   = 4    ボタンアップイベントを無効にする。
+</pre></td>
+</tr>
+
+<tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td>ロケータの位置を応答する。
+<pre>
+応答: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
+Pe: イベントコード
+Pe =  0    ロケータ報告が無効
+   =  1    ロケータ位置要求(DECRQLP) を受けた
+   =  2    左ボタンが押された
+   =  3    左ボタンが離された
+   =  4    中ボタンが押された
+   =  5    中ボタンが離された
+   =  6    右ボタンが押された
+   =  7    右ボタンが離された
+   =  8    ボタン 4 が押された (未対応)
+   =  9    ボタン 4 が離された (未対応)
+   = 10    ロケータが filter rectangle の外に出た。
+
+Pb: ボタン状態。押されているボタンに対応する以下の値の合計。
+  1    右ボタン
+  2    中ボタン
+  4    左ボタン
+  8    ボタン4 (未対応)
+
+Pr: 縦位置。画面上端を 1 とする。
+
+Pc: 横位置。画面左端を 1 とする。
+
+Pp: ページ。常に 1。
+</pre>
+</td></tr>
+</table>
+
+<h3><a name="mode">モード</a></h3>
+<table border="1">
+    <tr>
+	<th>モード</th>
+	<th>略号</th>
+	<th>設定(SM)</th>
+	<th>解除(RM)</th>
+    </tr>
+    <tr>
+	<td> 2 </td>
+	<td> KAM </td>
+	<td>キーボードをロックする。キー入力はすべて無視される。</td>
+	<td>キーボードのロックを解除する。</td>
+    </tr>
+    <tr>
+	<td> 4 </td>
+	<td> IRM </td>
+	<td>挿入モードに設定する。</td>
+	<td>上書きモードに設定する。</td>
+    </tr>
+    <tr>
+	<td> 12 </td>
+	<td> SRM </td>
+	<td>ローカルエコーを無効にする。</td>
+	<td>ローカルエコーを有効にする。</td>
+    </tr>
+    <tr>
+	<td> 20 </td>
+	<td> LNM </td>
+	<td>New line モード。</td>
+	<td>Line feed モード。</td>
+    </tr>
+    <tr>
+	<td> 33 </td>
+	<td> WYSTCURM </td>
+	<td>カーソルの点滅を無効にする。</td>
+	<td>カーソルの点滅を有効にする。</td>
+    </tr>
+    <tr>
+	<td> 34 </td>
+	<td> WYULCURM </td>
+	<td>カーソルの形状を下線カーソルにする。</td>
+	<td>カーソルの形状をブロックカーソルにする。</td>
+    </tr>
+</table>
+
+<h3><a name="decmode">モード (DEC/xterm拡張)</a></h3>
+<table border="1">
+    <tr>
+	<th> モード </th>
+	<th> 略号 </th>
+	<th> 設定(DECSET) </th>
+	<th> 解除(DECRST) </th>
+    </tr>
+    <tr>
+	<td> 1 </td>
+	<td> DECCKM </td>
+	<td> アプリケーションカーソルモードに設定する。 </td>
+	<td> ノーマルカーソルモードに設定する。 </td>
+    </tr>
+    <tr>
+	<td> 3 </td>
+	<td> DECCOLM </td>
+	<td> ウィンドウの横幅を 132 桁にする。 </td>
+	<td> ウィンドウの横幅を 80 桁にする。 </td>
+    </tr>
+    <tr>
+	<td> 5 </td>
+	<td> DECSCNM </td>
+	<td> 反転表示モード。文字色と背景色を入れ替える。 </td>
+	<td> 通常表示モード。文字色と背景色を通常状態に戻す。</td>
+    </tr>
+    <tr>
+	<td> 6 </td>
+	<td> DECOM </td>
+	<td> 行数の基準位置を上マージンにする。上下マージンの外にカーソルを移動できないようにする。カーソル位置を上マージンの 1 桁目に移動する。 </td>
+	<td> 行数の基準位置を画面上端にする。上下マージンの外にカーソルを移動できるようにする。カーソル位置を画面上端の 1 桁目に移動する。 </td>
+    </tr>
+    <tr>
+	<td> 7 </td>
+	<td> DECAWM </td>
+	<td> 行末での自動改行を有効にする。</td>
+	<td> 行末での自動改行を無効にする。</td>
+    </tr>
+    <tr>
+	<td> 8 </td>
+	<td> DECARM </td>
+	<td> キーボードのオートリピートを有効にする。</td>
+	<td> キーボードのオートリピートを無効にする。</td>
+    </tr>
+    <tr>
+	<td> 9 </td>
+	<td> - </td>
+	<td> X10 互換マウス報告モードに設定する。</td>
+	<td> マウス報告モードを解除する。</td>
+    </tr>
+    <tr>
+	<td> 12 </td>
+	<td> - </td>
+	<td> カーソルの点滅を無効にする。 </td>
+	<td> カーソルの点滅を有効にする。 </td>
+    </tr>
+    <tr>
+	<td> 19 </td>
+	<td> DECPEX </td>
+	<td> 印刷範囲を画面全体にする。 </td>
+	<td> 印刷範囲をスクロールリージョン内にする。 </td>
+    </tr>
+    <tr>
+	<td> 25 </td>
+	<td> DECTCEM </td>
+	<td> カーソルを表示する。 </td>
+	<td> カーソルを非表示にする。 </td>
+    </tr>
+    <tr>
+	<td> 38 </td>
+	<td> DECTEK </td>
+	<td> TEKウィンドウに切り替える。 </td>
+	<td> 何も行わない。 </td>
+    </tr>
+    <tr>
+	<td> 47 </td>
+	<td> - </td>
+	<td> 代替画面バッファに切り替える。 </td>
+	<td> 標準画面バッファに切り替える。 </td>
+    </tr>
+    <tr>
+	<td> 59 </td>
+	<td> DECKKDM </td>
+	<td> 漢字端末モードに設定する。 </td>
+	<td> カタカナ端末モードに設定する。 </td>
+    </tr>
+    <tr>
+	<td> 66 </td>
+	<td> DECNKM </td>
+	<td> アプリケーションキーパッドモードに設定する。</td>
+	<td> 数値キーパッドモードに設定する。</td>
+    </tr>
+    <tr>
+	<td> 67 </td>
+	<td> DECBKM </td>
+	<td> Backspace キーで BS を送出する。</td>
+	<td> Backspace キーで DEL を送出する。</td>
+    </tr>
+    <tr>
+	<td> 1000 </td>
+	<td> - </td>
+	<td> マウス報告モードに設定する。マウスボタンの押し/離し,ホイールの回転を報告する。 </td>
+	<td> マウス報告モードを解除する。 </td>
+    </tr>
+    <!-- tr>
+	<td> 1001 </td>
+	<td> - </td>
+	<td> ハイライトマウス報告モードに設定する。 </td>
+	<td> マウス報告モードを解除する。 </td>
+    </tr -->
+    <tr>
+	<td> 1002 </td>
+	<td> - </td>
+	<td> ボタンイベントマウス報告モードに設定する。通常のマウス報告モードの他に、マウスボタンを押している間のマウスの動きも報告する。</td>
+	<td> マウス報告モードを解除する。 </td>
+    </tr>
+    <tr>
+	<td> 1003 </td>
+	<td> - </td>
+	<td> 全イベントマウス報告モードを有効にする。ボタンイベントマウス報告モードの他に、マウスボタンを押していない状態でもマウスの動きを報告する。 </td>
+	<td> マウス報告モードを解除する。 </td>
+    </tr>
+    <tr>
+	<td> 1004 </td>
+	<td> - </td>
+	<td> フォーカス報告モードに設定する。 </td>
+	<td> フォーカス報告モードを解除する。 </td>
+    </tr>
+    <tr>
+	<td> 1047 </td>
+	<td> - </td>
+	<td> 代替画面バッファに切り替える。 </td>
+	<td> 画面全体を消去した後、標準画面バッファに切り替える。 </td>
+    </tr>
+    <tr>
+	<td> 1048 </td>
+	<td> - </td>
+	<td> 現在のカーソル位置を保存する。 </td>
+	<td> 保存したカーソル位置を復元する。 </td>
+    </tr>
+    <tr>
+	<td> 1049 </td>
+	<td> - </td>
+	<td> 現在のカーソル位置を保存後、代替画面バッファに切り替え、画面全体を消去する。 </td>
+	<td> 画面全体を消去し、標準画面バッファに切り替えた後、保存したカーソル位置を復元する。 </td>
+    </tr>
+    <tr>
+	<td> 2004 </td>
+	<td> - </td>
+	<td> Bracketed paste mode を有効にする。 </td>
+	<td> Bracketed paste mode を無効にする。 </td>
+    </tr>
+</table>
+
+<h3><a name="charattr">文字属性</a></h3>
+<table border="1">
+<tr><th>番号</th>	<th>属性</th></tr>
+<tr><td> 0</td>		<td>全ての属性を解除する。</td></tr>
+<tr><td> 1</td>		<td>太字属性を設定する。</td></tr>
+<tr><td> 4</td>		<td>下線属性を設定する。</td></tr>
+<tr><td> 5</td>		<td>点滅属性を設定する。</td></tr>
+<tr><td> 7</td>		<td>反転属性を設定する。</td></tr>
+<tr><td>22</td>		<td>太字属性を解除する。</td></tr>
+<tr><td>24</td>		<td>下線属性を解除する。</td></tr>
+<tr><td>25</td>		<td>点滅属性を解除する。</td></tr>
+<tr><td>27</td>		<td>反転属性を解除する。</td></tr>
+
+<tr><td>30</td>		<td>文字色を黒(色番号0)に設定する。</td></tr>
+<tr><td>31</td>		<td>文字色を赤(色番号1)に設定する。</td></tr>
+<tr><td>32</td>		<td>文字色を緑(色番号2)に設定する。</td></tr>
+<tr><td>33</td>		<td>文字色を黄色(色番号3)に設定する。</td></tr>
+<tr><td>34</td>		<td>文字色を青(色番号4)に設定する。</td></tr>
+<tr><td>35</td>		<td>文字色を赤紫(色番号5)に設定する。</td></tr>
+<tr><td>36</td>		<td>文字色を水色(色番号6)に設定する。</td></tr>
+<tr><td>37</td>		<td>文字色を白(色番号7)に設定する。</td></tr>
+<tr><td>38 ; 5 ; <i>Ps</i></td>	<td>文字色を色番号 <i>Ps</i> に設定する。</td></tr>
+<tr><td>39</td>		<td>文字色を標準の文字色に設定する。</td></tr>
+
+<tr><td>40</td>		<td>背景色を黒(色番号0)に設定する。</td></tr>
+<tr><td>41</td>		<td>背景色を赤(色番号1)に設定する。</td></tr>
+<tr><td>42</td>		<td>背景色を緑(色番号2)に設定する。</td></tr>
+<tr><td>43</td>		<td>背景色を黄色(色番号3)に設定する。</td></tr>
+<tr><td>44</td>		<td>背景色を青(色番号4)に設定する。</td></tr>
+<tr><td>45</td>		<td>背景色を赤紫(色番号5)に設定する。</td></tr>
+<tr><td>46</td>		<td>背景色を水色(色番号6)に設定する。</td></tr>
+<tr><td>47</td>		<td>背景色を白(色番号7)に設定する。</td></tr>
+<tr><td>48 ; 5 ; <i>Ps</i></td>	<td>背景色を色番号 <i>Ps</i> に設定する。</td></tr>
+<tr><td>49</td>		<td>背景色を標準の背景色に設定する。</td></tr>
+
+<tr><td>90</td>		<td>文字色を暗い灰色(色番号8)に設定する。</td></tr>
+<tr><td>91</td>		<td>文字色を明るい赤(色番号9)に設定する。</td></tr>
+<tr><td>92</td>		<td>文字色を明るい緑(色番号10)に設定する。</td></tr>
+<tr><td>93</td>		<td>文字色を明るい黄色(色番号11)に設定する。</td></tr>
+<tr><td>94</td>		<td>文字色を明るい青(色番号12)に設定する。</td></tr>
+<tr><td>95</td>		<td>文字色を明るい赤紫(色番号13)に設定する。</td></tr>
+<tr><td>96</td>		<td>文字色を明るい水色(色番号14)に設定する。</td></tr>
+<tr><td>97</td>		<td>文字色を明るい白(色番号15)に設定する。</td></tr>
+
+<tr><td>100</td>	<td>背景色を暗い灰色(色番号8)に設定する。</td></tr>
+<tr><td>101</td>	<td>背景色を明るい赤(色番号9)に設定する。</td></tr>
+<tr><td>102</td>	<td>背景色を明るい緑(色番号10)に設定する。</td></tr>
+<tr><td>103</td>	<td>背景色を明るい黄色(色番号11)に設定する。</td></tr>
+<tr><td>104</td>	<td>背景色を明るい青(色番号12)に設定する。</td></tr>
+<tr><td>105</td>	<td>背景色を明るい赤紫(色番号13)に設定する。</td></tr>
+<tr><td>106</td>	<td>背景色を明るい水色(色番号14)に設定する。</td></tr>
+<tr><td>107</td>	<td>背景色を明るい白(色番号15)に設定する。</td></tr>
+</table>
+
+<h3><a name="DCS">DCSシーケンス</a></h3>
+<table border="1">
+<tr><th>シーケンス</th>	<th>略号</th>	<th>機能</th></tr>
+<tr><td>DCS <i>Ps1</i> ; <i>Ps2</i> | <i>Pt</i> ST</td>	<td>DECUDK</td>	<td>ユーザキー定義。
+<!--pre>
+<i>Ps1</i> = 0    全てのユーザ定義キー設定を消去。
+    = 1    キー設定?
+
+<i>Ps2</i> = 0    キー定義をロックする。
+    = 1    キー定義をロックしない。
+
+<i>Pt</i>         キー定義設定
+</pre -->
+</td></tr>
+</table>
+
+<h3><a name="OSC">OSCシーケンス</a></h3>
+<p>形式</p>
+<pre>
+OSC <i>Ps</i> ; <i>Pt</i> ST
+OSC <i>Ps</i> ; <i>Pt</i> BEL
+</pre>
+<table border="1">
+<tr><th> <i>Ps</i> </th>	<th>機能</th></tr>
+<tr><td> 0, 1, 2 </td>		<td>ウィンドウタイトルを <i>Pt</i> に変更する。</td></tr>
+<tr><td> 4 </td>		<td>色設定。<i>Pt</i> は <i>c</i> ; <i>spec</i> という書式で、色番号 <i>c</i> の色を <i>spec</i> に設定する。<br>
+<i>spec</i> は以下の形式を受け付ける。
+<pre>
+rgb:<i>r</i>/<i>g</i>/<i>b</i>
+rgb:<i>rr</i>/<i>gg</i>/<i>bb</i>
+rgb:<i>rrr</i>/<i>ggg</i>/<i>bbb</i>
+rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
+#<i>rgb</i>
+#<i>rrggbb</i>
+#<i>rrrgggbbb</i>
+#<i>rrrrggggbbbb</i>
+</pre>
+</table>
+
+<h3><a name="SOS">SOSシーケンス</a></h3>
+<p>形式</p>
+<pre>SOS <i>Pt</i> ST</pre>
+<p>対応しているSOSシーケンスはありません。すべて無視します。</p>
+
+<h3><a name="PM">PMシーケンス</a></h3>
+<p>形式</p>
+<pre>PM <i>Pt</i> ST</pre>
+<p>対応しているPMシーケンスはありません。すべて無視します。</p>
+
+<h3><a name="APC">APCシーケンス</a></h3>
+<p>形式</p>
+<pre>APC <i>Pt</i> ST</pre>
+<p>対応しているAPCシーケンスはありません。すべて無視します。</p>
+
+</body>
+</html>
