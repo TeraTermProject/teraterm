@@ -218,7 +218,7 @@
 <tr><td>CSI s</td>	<td>SCP</td>	<td>現在のカーソル位置を保存する。</td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td>ウィンドウ操作
 <pre>
-Ps1 =  1    ウィンドウを通常表示状態にする。
+<i>Ps1</i> =  1    ウィンドウを通常表示状態にする。
     =  2    ウィンドウを最小化する。
     =  3    ウィンドウ位置を <i>Ps2</i>, <i>Ps3</i> に移動する。
     =  4    ウィンドウサイズを高さ <i>Ps2</i> ドット, 幅 <i>Ps3</i> ドットに変更する。
@@ -276,11 +276,24 @@ Ps1 =  1    ウィンドウを通常表示状態にする。
 <tr><td>CSI > 3; <i>Pm</i> K</td>	<td>-</td>	<td>Buff Erase Chars In Line</td></tr>
 <tr><td>CSI > 5; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
-Ps = 3..6	Draw Line
+<i>Ps</i> = 3..6	Draw Line
    = 12		Set foreground color
 </pre></td></tr>
 
-<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td></td></tr>
+<tr><td>CSI ? <i>Ps</i> J</td>	<td>DECSED</td>	<td>選択的画面消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。
+<pre>
+<i>Ps</i> = 0    カーソル位置から画面末尾までの保護されていない文字を消去する。
+   = 1    画面戦闘からカーソル位置までの保護されていない文字を消去する。
+   = 2    画面全体の保護されていない文字を消去する。
+</pre>
+</td></tr>
+<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td>選択的行消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。 
+<pre>
+<i>Ps</i> = 0    カーソル位置から行末までの保護されていない文字を消去する。
+   = 1    行頭からカーソル位置までの保護されていない文字を消去する。
+   = 2    行全体の保護されていない文字を消去する。
+</pre>
+</td></tr>
 <tr><td>CSI ? <i>Pm</i> h</td>	<td>DECSET</td>	<td>DEC/xterm 拡張のモードを設定する。(<a href="#decmode">モード (DEC/xterm拡張)</a>を参照)</td></tr>
 <tr><td>CSI ? <i>Pm</i> i</td>	<td>DECMC</td>	<td>印刷モード
 <pre>
@@ -299,7 +312,7 @@ Ps = 3..6	Draw Line
 
 <tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>カーソル表示形式変更。<i>Ps</i> の省略時の値は 0。
 <pre>
-Ps = 0,1    ブロックカーソル / 点滅
+<i>Ps</i> = 0,1    ブロックカーソル / 点滅
    = 2      ブロックカーソル / 非点滅
    = 3      下線カーソル / 点滅
    = 4      下線カーソル / 非点滅
@@ -312,26 +325,34 @@ Ps = 0,1    ブロックカーソル / 点滅
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td>端末動作モード設定
 <pre>
-Ps1 = 61    VT100 mode
+<i>Ps1</i> = 61    VT100 mode
     = 62    VT200 mode
     = 63    VT300 mode
     = 64    VT400 mode
 
-Ps2 = 0    7 bit mode (S7C1T)
+<i>Ps2</i> = 0    7 bit mode (S7C1T)
     = 1    8 bit mode (S8C1T)
 </pre></td>
 </tr>
 
+<tr><td>CSI <i>Ps</i> " q</td>	<td>DECSCA</td>	<td>文字の保護属性を設定する。保護されている文字は選択的消去の対象外になる。
+<pre>
+<i>Ps</i> = 0    保護属性の解除。これ以降に出力される文字は保護されていない状態になる。
+   = 1    保護属性の設定。これ以降に出力される文字は保護状態になる。
+   = 2    保護属性の解除。これ以降に出力される文字は保護されていない状態になる。
+</pre>
+</td></tr>
+
 <tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td>ステータス行から/へ移動。<i>Ps</i> の省略時の値は 0。
 <pre>
-Ps = 0    主画面へ移動。
+<i>Ps</i> = 0    主画面へ移動。
    = 1    ステータス行へ移動。
 </pre></td>
 </tr>
 
 <tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td>ステータス行の表示状態の変更。<i>Ps</i> の省略時の値は 0。
 <pre>
-Ps = 0    ステータス行を表示しない。
+<i>Ps</i> = 0    ステータス行を表示しない。
      1    ステータス行を表示しない。
      2    ステータス行を表示する。
 </pre></td>
@@ -339,20 +360,20 @@ Ps = 0    ステータス行を表示しない。
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td>filter rectangle 設定。
 <pre>
-Ps1   filter rectangle の上辺
-Ps2   filter rectangle の左辺
-Ps3   filter rectangle の下辺
-Ps4   filter rectangle の右辺
+<i>Ps1</i>   filter rectangle の上辺
+<i>Ps2</i>   filter rectangle の左辺
+<i>Ps3</i>   filter rectangle の下辺
+<i>Ps4</i>   filter rectangle の右辺
 </pre>
 filter rectangle は常にワンショットモード扱いになる。一度フィルタイベントを送信すると filter rectangle は無効になる。</td>
 </tr>
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ' z</td>	<td>DECELR</td>	<td>DEC ロケータ報告モード。
 <pre>
-Ps1 = 0    ロケータ報告を無効にする
+<i>Ps1</i> = 0    ロケータ報告を無効にする
     = 1    ロケータ報告を有効にする
     = 2    ワンショットモード。次の一回の報告だけロケータ報告を有効にし、その後無効にする。
-Ps2 = 0    文字モード。2 と同じ。
+<i>Ps2</i> = 0    文字モード。2 と同じ。
     = 1    ピクセルモード。位置をピクセル単位で報告する。
     = 2    文字モード。位置を文字単位で報告する。
 </pre></td>
@@ -360,7 +381,7 @@ Ps2 = 0    文字モード。2 と同じ。
 
 <tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td>ロケータイベント設定。
 <pre>
-Pm = 0    ボタンダウン/アップイベントを無効にする。filter rectangle を無効にする。
+<i>Pm</i> = 0    ボタンダウン/アップイベントを無効にする。filter rectangle を無効にする。
    = 1    ボタンダウンイベントを有効にする。ボタンが押されると、DECRQLP と同じ形式でロケータ位置を報告する。
    = 2    ボタンダウンイベントを無効にする。
    = 3    ボタンアップイベントを有効にする。ボタンが離されると、DECRQLP と同じ形式でロケータ位置を報告する。
@@ -371,8 +392,8 @@ Pm = 0    ボタンダウン/アップイベントを無効にする。filter rectangle を無効にする
 <tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td>ロケータの位置を応答する。
 <pre>
 応答: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
-Pe: イベントコード
-Pe =  0    ロケータ報告が無効
+<i>Pe</i>: イベントコード
+<i>Pe</i> =  0    ロケータ報告が無効
    =  1    ロケータ位置要求(DECRQLP) を受けた
    =  2    左ボタンが押された
    =  3    左ボタンが離された
@@ -384,17 +405,17 @@ Pe =  0    ロケータ報告が無効
    =  9    ボタン 4 が離された (未対応)
    = 10    ロケータが filter rectangle の外に出た。
 
-Pb: ボタン状態。押されているボタンに対応する以下の値の合計。
+<i>Pb</i>: ボタン状態。押されているボタンに対応する以下の値の合計。
   1    右ボタン
   2    中ボタン
   4    左ボタン
   8    ボタン4 (未対応)
 
-Pr: 縦位置。画面上端を 1 とする。
+<i>Pr</i>: 縦位置。画面上端を 1 とする。
 
-Pc: 横位置。画面左端を 1 とする。
+<i>Pc</i>: 横位置。画面左端を 1 とする。
 
-Pp: ページ。常に 1。
+<i>Pp</i>: ページ。常に 1。
 </pre>
 </td></tr>
 </table>
