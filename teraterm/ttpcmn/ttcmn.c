@@ -821,6 +821,20 @@ void FAR PASCAL UnregWin(HWND HWin)
 	}
 }
 
+char GetWindowTypeChar(HWND Hw, HWND HWin) 
+{
+	if (HWin == Hw)
+		return '*';
+	else if (!IsWindowVisible(Hw))
+		return '#';
+	else if (IsIconic(Hw))
+		return '-';
+	else if (IsZoomed(Hw))
+		return '@';
+	else
+		return '+';
+}
+
 void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
 {
 	int i;
@@ -844,7 +858,9 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 			Temp[0] = '&';
 			Temp[1] = (char)(0x31 + i);
 			Temp[2] = ' ';
-			GetWindowText(Hw,&Temp[3],sizeof(Temp)-4);
+			Temp[3] = GetWindowTypeChar(Hw, NULL);
+			Temp[4] = ' ';
+			GetWindowText(Hw,&Temp[5],sizeof(Temp)-6);
 			AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_1+i,Temp);
 			i++;
 			if (i>8) {
@@ -875,7 +891,9 @@ void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList)
 		if ((GetClassName(Hw,Temp,sizeof(Temp))>0) &&
 		    ((strcmp(Temp,VTCLASSNAME)==0) ||
 		     (strcmp(Temp,TEKCLASSNAME)==0))) {
-			GetWindowText(Hw,Temp,sizeof(Temp)-1);
+			Temp[0] = GetWindowTypeChar(Hw, HWin);
+			Temp[1] = ' ';
+			GetWindowText(Hw,&Temp[2],sizeof(Temp)-3);
 			SendDlgItemMessage(HDlg, IList, LB_ADDSTRING,
 			                   0, (LONG)Temp);
 			if (Hw==HWin) {
