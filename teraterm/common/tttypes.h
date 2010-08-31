@@ -56,6 +56,8 @@
 #define AttrColorMask     (AttrBold | AttrBlink | AttrReverse)
 #define Attr2ColorMask    (Attr2Fore | Attr2Back)
 
+#define Attr2Protect      0x04
+
 typedef struct {
 	BYTE Attr;
 	BYTE Attr2;

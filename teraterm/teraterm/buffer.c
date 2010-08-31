@@ -464,7 +464,7 @@ void BuffScroll(int Count, int Bottom)
 			memcpy(&(AttrBuffBG[DestPtr]),&(AttrBuffBG[SrcPtr]),NumOfColumns);
 			memset(&(CodeBuff[SrcPtr]),0x20,NumOfColumns);
 			memset(&(AttrBuff[SrcPtr]),AttrDefault,NumOfColumns);
-			memset(&(AttrBuff2[SrcPtr]),CurCharAttr.Attr2,NumOfColumns);
+			memset(&(AttrBuff2[SrcPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 			memset(&(AttrBuffFG[SrcPtr]),CurCharAttr.Fore,NumOfColumns);
 			memset(&(AttrBuffBG[SrcPtr]),CurCharAttr.Back,NumOfColumns);
 			SrcPtr = PrevLinePtr(SrcPtr);
@@ -475,7 +475,7 @@ void BuffScroll(int Count, int Bottom)
 	for (i = 1 ; i <= n ; i++) {
 		memset(&CodeBuff[DestPtr],0x20,NumOfColumns);
 		memset(&AttrBuff[DestPtr],AttrDefault,NumOfColumns);
-		memset(&AttrBuff2[DestPtr],CurCharAttr.Attr2,NumOfColumns);
+		memset(&AttrBuff2[DestPtr],CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 		memset(&AttrBuffFG[DestPtr],CurCharAttr.Fore,NumOfColumns);
 		memset(&AttrBuffBG[DestPtr],CurCharAttr.Back,NumOfColumns);
 		DestPtr = PrevLinePtr(DestPtr);
@@ -580,7 +580,7 @@ void BuffInsertSpace(int Count)
 	        NumOfColumns-Count-CursorX);
 	memset(&(CodeLine[CursorX]),0x20,Count);
 	memset(&(AttrLine[CursorX]),AttrDefault,Count);
-	memset(&(AttrLine2[CursorX]),CurCharAttr.Attr2,Count);
+	memset(&(AttrLine2[CursorX]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[CursorX]),CurCharAttr.Fore,Count);
 	memset(&(AttrLineBG[CursorX]),CurCharAttr.Back,Count);
 	/* last char in current line is kanji first? */
@@ -616,7 +616,7 @@ void BuffEraseCurToEnd()
 	for (i = CursorY ; i <= YEnd ; i++) {
 		memset(&(CodeBuff[TmpPtr+offset]),0x20,NumOfColumns-offset);
 		memset(&(AttrBuff[TmpPtr+offset]),AttrDefault,NumOfColumns-offset);
-		memset(&(AttrBuff2[TmpPtr+offset]),CurCharAttr.Attr2,NumOfColumns-offset);
+		memset(&(AttrBuff2[TmpPtr+offset]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns-offset);
 		memset(&(AttrBuffFG[TmpPtr+offset]),CurCharAttr.Fore,NumOfColumns-offset);
 		memset(&(AttrBuffBG[TmpPtr+offset]),CurCharAttr.Back,NumOfColumns-offset);
 		offset = 0;
@@ -651,7 +651,7 @@ void BuffEraseHomeToCur()
 		}
 		memset(&(CodeBuff[TmpPtr]),0x20,offset);
 		memset(&(AttrBuff[TmpPtr]),AttrDefault,offset);
-		memset(&(AttrBuff2[TmpPtr]),CurCharAttr.Attr2,offset);
+		memset(&(AttrBuff2[TmpPtr]),CurCharAttr.Attr2 & Attr2ColorMask, offset);
 		memset(&(AttrBuffFG[TmpPtr]),CurCharAttr.Fore,offset);
 		memset(&(AttrBuffBG[TmpPtr]),CurCharAttr.Back,offset);
 		TmpPtr = NextLinePtr(TmpPtr);
@@ -685,7 +685,7 @@ void BuffInsertLines(int Count, int YEnd)
 	for (i = 1 ; i <= Count ; i++) {
 		memset(&(CodeBuff[DestPtr]),0x20,NumOfColumns);
 		memset(&(AttrBuff[DestPtr]),AttrDefault,NumOfColumns);
-		memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2,NumOfColumns);
+		memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 		memset(&(AttrBuffFG[DestPtr]),CurCharAttr.Fore,NumOfColumns);
 		memset(&(AttrBuffBG[DestPtr]),CurCharAttr.Back,NumOfColumns);
 		DestPtr = PrevLinePtr(DestPtr);
@@ -716,7 +716,7 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	NewLine(PageStart+CursorY);
 	memset(&(CodeLine[XStart]),0x20,Count);
 	memset(&(AttrLine[XStart]),AttrDefault,Count);
-	memset(&(AttrLine2[XStart]),CurCharAttr.Attr2,Count);
+	memset(&(AttrLine2[XStart]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[XStart]),CurCharAttr.Fore,Count);
 	memset(&(AttrLineBG[XStart]),CurCharAttr.Back,Count);
 
@@ -759,7 +759,7 @@ void BuffDeleteLines(int Count, int YEnd)
 	for (i = YEnd+1-Count ; i<=YEnd ; i++) {
 		memset(&(CodeBuff[DestPtr]),0x20,NumOfColumns);
 		memset(&(AttrBuff[DestPtr]),AttrDefault,NumOfColumns);
-		memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2,NumOfColumns);
+		memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 		memset(&(AttrBuffFG[DestPtr]),CurCharAttr.Fore,NumOfColumns);
 		memset(&(AttrBuffBG[DestPtr]),CurCharAttr.Back,NumOfColumns);
 		DestPtr = NextLinePtr(DestPtr);
@@ -796,7 +796,7 @@ void BuffDeleteChars(int Count)
 	        NumOfColumns-Count-CursorX);
 	memset(&(CodeLine[NumOfColumns-Count]),0x20,Count);
 	memset(&(AttrLine[NumOfColumns-Count]),AttrDefault,Count);
-	memset(&(AttrLine2[NumOfColumns-Count]),CurCharAttr.Attr2,Count);
+	memset(&(AttrLine2[NumOfColumns-Count]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[NumOfColumns-Count]),CurCharAttr.Fore,Count);
 	memset(&(AttrLineBG[NumOfColumns-Count]),CurCharAttr.Back,Count);
 
@@ -819,7 +819,7 @@ void BuffEraseChars(int Count)
 	}
 	memset(&(CodeLine[CursorX]),0x20,Count);
 	memset(&(AttrLine[CursorX]),AttrDefault,Count);
-	memset(&(AttrLine2[CursorX]),CurCharAttr.Attr2,Count);
+	memset(&(AttrLine2[CursorX]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
 	memset(&(AttrLineFG[CursorX]),CurCharAttr.Fore,Count);
 	memset(&(AttrLineBG[CursorX]),CurCharAttr.Back,Count);
 
@@ -954,7 +954,7 @@ void BuffEraseBox
 		}
 		memset(&(CodeBuff[Ptr+XStart]),0x20,C);
 		memset(&(AttrBuff[Ptr+XStart]),AttrDefault,C);
-		memset(&(AttrBuff2[Ptr+XStart]),CurCharAttr.Attr2,C);
+		memset(&(AttrBuff2[Ptr+XStart]),CurCharAttr.Attr2 & Attr2ColorMask, C);
 		memset(&(AttrBuffFG[Ptr+XStart]),CurCharAttr.Fore,C);
 		memset(&(AttrBuffBG[Ptr+XStart]),CurCharAttr.Back,C);
 		Ptr = NextLinePtr(Ptr);
@@ -1812,7 +1812,7 @@ void ScrollUp1Line()
 		}
 		memset(&(CodeBuff[SrcPtr]),0x20,NumOfColumns);
 		memset(&(AttrBuff[SrcPtr]),AttrDefault,NumOfColumns);
-		memset(&(AttrBuff2[SrcPtr]),CurCharAttr.Attr2,NumOfColumns);
+		memset(&(AttrBuff2[SrcPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 		memset(&(AttrBuffFG[SrcPtr]),CurCharAttr.Fore,NumOfColumns);
 		memset(&(AttrBuffBG[SrcPtr]),CurCharAttr.Back,NumOfColumns);
 
@@ -1872,7 +1872,7 @@ void BuffScrollNLines(int n)
 		for (i = CursorBottom+1-n ; i<=CursorBottom; i++) {
 			memset(&(CodeBuff[DestPtr]),0x20,NumOfColumns);
 			memset(&(AttrBuff[DestPtr]),AttrDefault,NumOfColumns);
-			memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2,NumOfColumns);
+			memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 			memset(&(AttrBuffFG[DestPtr]),CurCharAttr.Fore,NumOfColumns);
 			memset(&(AttrBuffBG[DestPtr]),CurCharAttr.Back,NumOfColumns);
 			DestPtr = NextLinePtr(DestPtr);
@@ -1920,7 +1920,7 @@ void BuffRegionScrollUpNLines(int n) {
 			for (i = CursorBottom+1-n ; i<=CursorBottom; i++) {
 				memset(&(CodeBuff[DestPtr]),0x20,NumOfColumns);
 				memset(&(AttrBuff[DestPtr]),AttrDefault,NumOfColumns);
-				memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2,NumOfColumns);
+				memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 				memset(&(AttrBuffFG[DestPtr]),CurCharAttr.Fore,NumOfColumns);
 				memset(&(AttrBuffBG[DestPtr]),CurCharAttr.Back,NumOfColumns);
 				DestPtr = NextLinePtr(DestPtr);
@@ -1958,7 +1958,7 @@ void BuffRegionScrollDownNLines(int n) {
 	for (i = CursorTop+n-1; i>=CursorTop; i--) {
 		memset(&(CodeBuff[DestPtr]),0x20,NumOfColumns);
 		memset(&(AttrBuff[DestPtr]),AttrDefault,NumOfColumns);
-		memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2,NumOfColumns);
+		memset(&(AttrBuff2[DestPtr]),CurCharAttr.Attr2 & Attr2ColorMask, NumOfColumns);
 		memset(&(AttrBuffFG[DestPtr]),CurCharAttr.Fore,NumOfColumns);
 		memset(&(AttrBuffBG[DestPtr]),CurCharAttr.Back,NumOfColumns);
 		DestPtr = PrevLinePtr(DestPtr);
@@ -2971,7 +2971,7 @@ void ClearBuffer()
 	NewLine(0);
 	memset(&CodeBuff[0],0x20,BufferSize);
 	memset(&AttrBuff[0],AttrDefault,BufferSize);
-	memset(&AttrBuff2[0],CurCharAttr.Attr2,BufferSize);
+	memset(&AttrBuff2[0],CurCharAttr.Attr2 & Attr2ColorMask, BufferSize);
 	memset(&AttrBuffFG[0],CurCharAttr.Fore,BufferSize);
 	memset(&AttrBuffBG[0],CurCharAttr.Back,BufferSize);
 
@@ -3268,4 +3268,133 @@ void BuffDiscardSavedScreen() {
 		GlobalFree(SaveBuff);
 		SaveBuff = NULL;
 	}
+}
+
+void BuffSelectedEraseCurToEnd()
+// Erase characters from cursor to the end of screen
+{
+	LONG TmpPtr;
+	int offset;
+	int i, j, YEnd;
+
+	NewLine(PageStart+CursorY);
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+		if (!(AttrLine2[CursorX] & Attr2Protect)) {
+			EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
+		}
+	}
+	offset = CursorX;
+	TmpPtr = GetLinePtr(PageStart+CursorY);
+	YEnd = NumOfLines-1;
+	if ((StatusLine>0) &&
+		(CursorY<NumOfLines-1)) {
+		YEnd--;
+	}
+	for (i = CursorY ; i <= YEnd ; i++) {
+		for (j = TmpPtr + offset; j < TmpPtr + NumOfColumns - offset; j++) {
+			if (!(AttrBuff2[j] & Attr2Protect)) {
+				CodeBuff[j] = 0x20;
+				AttrBuff[j] = AttrDefault;
+				AttrBuff2[j] = CurCharAttr.Attr2 & Attr2ColorMask;
+				AttrBuffFG[j] = CurCharAttr.Fore;
+				AttrBuffBG[j] = CurCharAttr.Back;
+			}
+		}
+		offset = 0;
+		TmpPtr = NextLinePtr(TmpPtr);
+	}
+	/* update window */
+	BuffUpdateRect(1, CursorY, NumOfColumns, YEnd);
+}
+
+void BuffSelectedEraseHomeToCur()
+// Erase characters from home to cursor
+{
+	LONG TmpPtr;
+	int offset;
+	int i, j, YHome;
+
+	NewLine(PageStart+CursorY);
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+		if (!(AttrLine2[CursorX] & Attr2Protect)) {
+			EraseKanji(0); /* if cursor is on left half of a kanji, erase the kanji */
+		}
+	}
+	offset = NumOfColumns;
+	if ((StatusLine>0) && (CursorY==NumOfLines-1)) {
+		YHome = CursorY;
+	}
+	else {
+		YHome = 0;
+	}
+	TmpPtr = GetLinePtr(PageStart+YHome);
+	for (i = YHome ; i <= CursorY ; i++) {
+		if (i==CursorY) {
+			offset = CursorX+1;
+		}
+		for (j = TmpPtr; j < TmpPtr + offset; j++) {
+			if (!(AttrBuff2[j] & Attr2Protect)) {
+				CodeBuff[j] = 0x20;
+				AttrBuff[j] = AttrDefault;
+				AttrBuff2[j] = CurCharAttr.Attr2 & Attr2ColorMask;
+				AttrBuffFG[j] = CurCharAttr.Fore;
+				AttrBuffBG[j] = CurCharAttr.Back;
+			}
+		}
+		TmpPtr = NextLinePtr(TmpPtr);
+	}
+
+	/* update window */
+	BuffUpdateRect(1, YHome, NumOfColumns, CursorY);
+}
+
+void BuffSelectedEraseScreen() {
+	BuffSelectedEraseHomeToCur();
+	BuffSelectedEraseCurToEnd();
+}
+
+void BuffSelectedEraseCharsInLine(int XStart, int Count)
+// erase non-protected characters in the current line
+//  XStart: start position of erasing
+//  Count: number of characters to be erased
+{
+	int i;
+#ifndef NO_COPYLINE_FIX
+	BOOL LineContinued=FALSE;
+
+	if (ts.EnableContinuedLineCopy && XStart == 0 && (AttrLine[0] & AttrLineContinued)) {
+		LineContinued = TRUE;
+	}
+#endif /* NO_COPYLINE_FIX */
+
+	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
+		if (!(AttrLine2[CursorX] & Attr2Protect)) {
+			EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
+		}
+	}
+
+	NewLine(PageStart+CursorY);
+	for (i=XStart; i < XStart + Count; i++) {
+		if (!(AttrLine2[i] & Attr2Protect)) {
+			CodeLine[i] = 0x20;
+			AttrLine[i] = AttrDefault;
+			AttrLine2[i] = CurCharAttr.Attr2 & Attr2ColorMask;
+			AttrLineFG[i] = CurCharAttr.Fore;
+			AttrLineBG[i] = CurCharAttr.Back;
+		}
+	}
+
+#ifndef NO_COPYLINE_FIX
+	if (ts.EnableContinuedLineCopy) {
+		if (LineContinued) {
+			BuffLineContinued(TRUE);
+		}
+
+		if (XStart + Count >= NumOfColumns) {
+			AttrBuff[NextLinePtr(LinePtr)] &= ~AttrLineContinued;
+		}
+	}
+#endif /* NO_COPYLINE_FIX */
+
+	BuffUpdateRect(XStart, CursorY, XStart+Count, CursorY);
 }

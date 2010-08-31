@@ -71,6 +71,10 @@ void BuffSetCurCharAttr(TCharAttr Attr);
 void BuffSaveScreen();
 void BuffRestoreScreen();
 void BuffDiscardSavedScreen();
+void BuffSelectedEraseCharsInLine(int XStart, int Count);
+void BuffSelectedEraseCurToEnd();
+void BuffSelectedEraseHomeToCur();
+void BuffSelectedEraseScreen();
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom;

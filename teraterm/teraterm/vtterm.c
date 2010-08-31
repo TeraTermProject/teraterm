@@ -1404,6 +1404,28 @@ void CSScreenErase()
 	}
 }
 
+void CSQSelScreenErase()
+{
+	if (Param[1] == -1) Param[1] = 0;
+	BuffUpdateScroll();
+	switch (Param[1]) {
+	case 0:
+		//	Erase characters from cursor to end
+		BuffSelectedEraseCurToEnd();
+		break;
+
+	case 1:
+		//	Erase characters from home to cursor
+		BuffSelectedEraseHomeToCur();
+		break;
+
+	case 2:
+		//	Erase entire screen
+		BuffSelectedEraseScreen();
+		break;
+	}
+}
+
   void CSInsertLine()
   {
   // Insert lines at current position
@@ -1437,6 +1459,26 @@ void CSScreenErase()
       /* erase entire line */
       case 2:
 	BuffEraseCharsInLine(0,NumOfColumns);
+	break;
+    }
+  }
+
+  void CSQSelLineErase()
+  {
+    if (Param[1] == -1) Param[1] = 0;
+    BuffUpdateScroll();
+    switch (Param[1]) {
+      /* erase char from cursor to end of line */
+      case 0:
+	BuffSelectedEraseCharsInLine(CursorX,NumOfColumns-CursorX);
+	break;
+      /* erase char from start of line to cursor */
+      case 1:
+	BuffSelectedEraseCharsInLine(0,CursorX+1);
+	break;
+      /* erase entire line */
+      case 2:
+	BuffSelectedEraseCharsInLine(0,NumOfColumns);
 	break;
     }
   }
@@ -1691,7 +1733,13 @@ void CSSetAttr()		// SGR
 		if (P<0) P = 0;
 		switch (P) {
 		case   0:	/* Clear all */
-			CharAttr = DefCharAttr;
+			if (CharAttr.Attr2 & Attr2Protect) {
+				CharAttr = DefCharAttr;
+				CharAttr.Attr2 |= Attr2Protect;
+			}
+			else {
+				CharAttr = DefCharAttr;
+			}
 			BuffSetCurCharAttr(CharAttr);
 			break;
 
@@ -2369,7 +2417,8 @@ void CSSetAttr()		// SGR
   void CSQuest(BYTE b)
   {
     switch (b) {
-      case 'K': CSLineErase(); break;		// DECSEL
+      case 'J': CSQSelScreenErase(); break;	// DECSED
+      case 'K': CSQSelLineErase(); break;	// DECSEL
       case 'h': CSQ_h_Mode(); break;		// DECSET
       case 'i': CSQ_i_Mode(); break;		// DECMC
       case 'l': CSQ_l_Mode(); break;		// DECRST
@@ -2434,6 +2483,24 @@ void CSSetAttr()		// SGR
 		Send8BitMode = TRUE;
 	      break;
 	  }
+	}
+	break;
+      case 'q': // DECSCA
+	if (Param[1] < 0) 
+	  Param[1] = 0;
+	switch (Param[1]) {
+	  case 0:
+	  case 2:
+	    CharAttr.Attr2 &= ~Attr2Protect;
+	    BuffSetCurCharAttr(CharAttr);
+	    break;
+	  case 1:
+	    CharAttr.Attr2 |= Attr2Protect;
+	    BuffSetCurCharAttr(CharAttr);
+	    break;
+	  default:
+	    /* nothing to do */
+	    break;
 	}
 	break;
     }
