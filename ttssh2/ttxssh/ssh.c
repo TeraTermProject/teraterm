@@ -7288,7 +7288,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	// —LŒø‚È”FØ•ûŽ®‚ª‚È‚¢ê‡
 	if (cstring == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR", pvar,
-		                  "SSH2 auth error: The server doesn't have valid authentication method.");
+		                  "The server doesn't have valid authentication method.");
 		notify_fatal_error(pvar, pvar->ts->UIMsg);
 		return FALSE;
 	}
