@@ -725,6 +725,7 @@ MSG_SSH_SETUP_COMP_ERROR=Une erreur est survenue pendant la configuration de la 
 MSG_SSH_DECRYPT_RSA_ERROR=Une erreur est survenue pendant le decryptage du challenge RSA.\nIl est possible que le fichier clé soit corrompu.
 MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=Erreur interne: méthode d'authentification non supportée
 MSG_SSH_AUTH_FAILURE_ERROR=erreur auto-logging SSH2: L'authentification de l'utilisateur a échoué.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=The server doesn't have valid authentication method.
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nLa méthode d'authentification n'est pas supportée par le serveur.
 MSG_SSH_CHANNEL_OPEN_ERROR=Un message SSH2 d'erreur d'ouverture de canal a été reçu.\ncanal [%d]: cause: %s(%d) message: %s
 MSG_SSH_NO_FREE_CHANNEL=Impossible d'ouvrir un nouveau canal. TTSSH tente actuellement d'ouvrir trop de canaux.

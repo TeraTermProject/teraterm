@@ -726,6 +726,7 @@ MSG_SSH_SETUP_COMP_ERROR=An error occurred while setting up compression.\nThe co
 MSG_SSH_DECRYPT_RSA_ERROR=An error occurred while decrypting the RSA challenge.\nPerhaps the key file is corrupted.
 MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=Internal error: unsupported authentication method
 MSG_SSH_AUTH_FAILURE_ERROR=SSH2 autologin error: user authentication failed.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=The server doesn't have valid authentication method.
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nAuthentication method is not supported by server.
 MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE was received.\nchannel [%d]: reason: %s(%d) message: %s
 MSG_SSH_NO_FREE_CHANNEL=Could not open new channel. TTSSH is already opening too many channels.

@@ -726,6 +726,7 @@ MSG_SSH_SETUP_COMP_ERROR=圧縮設定中にエラーが発生しました. \n切断します.
 MSG_SSH_DECRYPT_RSA_ERROR=RSA 復号中にエラーが発生しました. \n鍵ファイルが誤り, または破損している場合があります.
 MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=内部エラー: サポート外の認証方法
 MSG_SSH_AUTH_FAILURE_ERROR=SSH2自動ログインエラー: ユーザー認証が失敗しました.
+MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=サーバに有効な認証方式がありません.
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nサーバでサポートされていない認証方法です.
 MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE を受信しました. \nチャネル [%d]: 理由: %s(%d) メッセージ: %s
 MSG_SSH_NO_FREE_CHANNEL=新しいチャネルを開けません. チャネルがすべて使用中です.
