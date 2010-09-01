@@ -2187,7 +2187,7 @@ WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
 	WORD Err, ValType, VarId, P;
-	int sp = 1;
+	int sp;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -2209,6 +2209,7 @@ WORD TTLInputBox(BOOL Paswd)
 	}
 
 	// get 4th(3rd) arg(optional) if given
+	// this parameter is not used.
 	if (CheckParameterGiven()) {
 		GetIntVal(&sp, &Err);
 	}
@@ -2217,9 +2218,6 @@ WORD TTLInputBox(BOOL Paswd)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	if (sp) {
-		RestoreNewLine(Str1);
-	}
 	SetInputStr("");
 	if (CheckVar("inputstr",&ValType,&VarId) &&
 	    (ValType==TypString))
@@ -2365,7 +2363,7 @@ WORD TTLMakePath()
 int MessageCommand(int BoxId, LPWORD Err)
 {
 	TStrVal Str1, Str2;
-	int sp = 1;
+	int sp;
 	int ret;
 
 	*Err = 0;
@@ -2374,6 +2372,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 	if (*Err!=0) return 0;
 
 	// get 3rd arg(optional) if given
+	// this parameter is not used.
 	if (CheckParameterGiven()) {
 		GetIntVal(&sp, Err);
 	}
@@ -2382,9 +2381,6 @@ int MessageCommand(int BoxId, LPWORD Err)
 		*Err = ErrSyntax;
 	if (*Err!=0) return 0;
 
-	if (sp) {
-		RestoreNewLine(Str1);
-	}
 	if (BoxId==IdMsgBox) {
 		ret = OpenMsgDlg(Str1,Str2,FALSE);
 		// メッセージボックスをキャンセルすると、マクロの終了とする。

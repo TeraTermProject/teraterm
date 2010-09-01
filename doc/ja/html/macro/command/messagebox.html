@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
+messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(廃止)]
 </pre>
 
 <h2>解説</h2>
@@ -28,28 +28,8 @@ messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 </p>
 
 <p>
-&lt;special&gt; が 0 でない場合は、&lt;message&gt; に含まれる以下の文字列は特殊文字として扱われる。<br>
-&lt;special&gt; が指定されない場合は 1 が使用される。
+&lt;special&gt; は廃止されました。エラーにはなりませんが、無効です。
 </p>
-
-<table>
- <tr>
-  <th>入力</th>
-  <th>出力</th>
- </tr>
- <tr>
-  <td>\\</td>
-  <td>"\"</td>
- </tr>
- <tr>
-  <td>\n</td>
-  <td>改行</td>
- </tr>
- <tr>
-  <td>\t</td>
-  <td>タブ</td>
- </tr>
-</table>
 
 <h2>例</h2>
 
@@ -58,6 +38,7 @@ messagebox ErrorMessage 'Error'
 
 title="5行表示"
 message="1行目\n2行目\n3行目\n4行目\n5行目\n"
+strspecial message
 messagebox message title
 </pre>
 

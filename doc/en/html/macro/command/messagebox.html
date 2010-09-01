@@ -18,7 +18,7 @@ Displays a dialog box with message.
 </p>
 
 <pre class="macro-syntax">
-messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
+messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(obsolete)]
 </pre>
 
 <h2>Remarks</h2>
@@ -28,28 +28,8 @@ Displays a dialog box with &lt;message&gt; and &lt;title&gt;.
 </p>
 
 <p>
-If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
-If &lt;special&gt; is not specified then 1 is used.
+&lt;special&gt; is an obsolete parameter. It has not effect.
 </p>
-
-<table>
- <tr>
-  <th>input</th>
-  <th>output</th>
- </tr>
- <tr>
-  <td>\\</td>
-  <td>"\"</td>
- </tr>
- <tr>
-  <td>\n</td>
-  <td>line feed</td>
- </tr>
- <tr>
-  <td>\t</td>
-  <td>tab</td>
- </tr>
-</table>
 
 <h2>Example</h2>
 
@@ -58,6 +38,7 @@ messagebox ErrorMessage 'Error'
 
 title="Five lines display"
 message="First line\nSecond line\nThird line\nFourth line\nFifth line\n"
+strspecial message
 messagebox message title
 </pre>
 

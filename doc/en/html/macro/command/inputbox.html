@@ -18,7 +18,7 @@ Displays a dialog box prompting user to input a string.
 </p>
 
 <pre class="macro-syntax">
-inputbox &lt;message&gt; &lt;title&gt; [&lt;default&gt; [&lt;special&gt;]]
+inputbox &lt;message&gt; &lt;title&gt; [&lt;default&gt; [&lt;special&gt;(obsolete)]]
 </pre>
 
 <h2>Remarks</h2>
@@ -32,28 +32,8 @@ The &lt;default&gt; is default string on edit control. If it is not specified, '
 </p>
 
 <p>
-If &lt;special&gt; is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
-If &lt;special&gt; is not specified then 1 is used.
+&lt;special&gt; is an obsolete parameter. It has not effect.
 </p>
-
-<table>
- <tr>
-  <th>input</th>
-  <th>output</th>
- </tr>
- <tr>
-  <td>\\</td>
-  <td>"\"</td>
- </tr>
- <tr>
-  <td>\n</td>
-  <td>line feed</td>
- </tr>
- <tr>
-  <td>\t</td>
-  <td>tab</td>
- </tr>
-</table>
 
 <h2>Example</h2>
 
