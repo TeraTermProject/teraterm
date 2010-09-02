@@ -521,6 +521,9 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdVT282  7
 #define IdVT320  8
 #define IdVT382  9
+#define IdVT420  10
+#define IdVT520  11
+#define IdVT525  12
 
   /* Kanji Code ID */
 #define IdSJIS  1

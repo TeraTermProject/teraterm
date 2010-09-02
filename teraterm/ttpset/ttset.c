@@ -22,7 +22,7 @@
 
 static PCHAR far TermList[] =
 	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
-	"VT320", "VT382", NULL };
+	"VT320", "VT382", "VT420", "VT520", "VT525", NULL };
 
 static PCHAR far RussList[] =
 	{ "Windows", "KOI8-R", "CP-866", "ISO-8859-5", NULL };
