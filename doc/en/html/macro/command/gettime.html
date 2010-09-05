@@ -77,6 +77,10 @@ gettime timestr
 ;Stores the current date with the user format to "logfile" variable. 
 ;The format is log-YYYYMMDD-HHMMSS.txt.
 gettime logfile "log-%Y%m%d-%H%M%S.txt"
+changedir 'C:\Test'
+logopen logfile 0 0
+logwrite 'test data'
+logclose
 </pre>
 
 <h2>See also</h2>

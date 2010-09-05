@@ -79,6 +79,10 @@ gettime timestr
 ;現在の日時を元にしてログファイル名を生成し、変数logfileに格納。
 ;形式はlog-YYYYMMDD-HHMMSS.txt
 gettime logfile "log-%Y%m%d-%H%M%S.txt"
+changedir 'C:\Test'
+logopen logfile 0 0
+logwrite 'test data'
+logclose
 </pre>
 
 <h2>参照</h2>
