@@ -208,6 +208,7 @@ private:
             return digit;
         }
 
+#if 0
         static String parse(const char* url, ProxyInfo& proxy) {
             char* p = strstr((char*) url, "://");
             if (p == NULL) {
@@ -264,6 +265,78 @@ private:
             }
             return url;
         }
+#else
+        static String parse(const char* url, ProxyInfo& proxy) {
+            char* p = strstr((char*) url, "://");
+            if (p == NULL) {
+                proxy.type = TYPE_NONE;
+                return NULL;
+            }
+            proxy.type = parseType(url, p);
+            if (proxy.type == TYPE_NONE)
+                return NULL;
+            p += 3;
+            const char* start = p;
+
+            // user:pass Ç™Ç†ÇÍÇŒäiî[Ç∑ÇÈ
+            String tmp = String(start);
+            int index = tmp.indexOf('@');
+            if (index > -1) {
+                tmp = String(p, index);
+                index = tmp.indexOf(':');
+                if (index == -1) {
+                    proxy.user = urldecode(p, p + tmp.length());
+                }
+                else {
+                    proxy.user = urldecode(p, p + index);
+                    proxy.pass = urldecode(p + index + 1, p + tmp.length());
+                }
+                p += tmp.length() + 1;
+            }
+
+            // ÉzÉXÉgñºÇäiî[Ç∑ÇÈ
+            start = p;
+            int in_blacket = false;
+            while (*p != '\0' && *p != '/') {
+                if (*p == '[') {
+                    in_blacket = true;
+                }else if (in_blacket && *p == ']') {
+                    in_blacket = false;
+                }else if (!in_blacket && *p == ':') {
+                    if (*start == '[') {
+                        proxy.host = String(start + 1, p - start - 2);
+                    }
+                    else {
+                        proxy.host = String(start, p - start);
+                    }
+                    start = p + 1;
+                }
+                p++;
+            }
+
+            if (proxy.type != TYPE_NONE_FORCE && proxy.type != TYPE_SSL) {
+                if (proxy.host == NULL) {
+                    if (start >= p) {
+                        proxy.type = TYPE_NONE;
+                        return NULL;
+                    }
+                    proxy.host = String(start, p - start);
+                }else{
+                    // É|Å[Égî‘çÜÇäiî[Ç∑ÇÈ
+                    proxy.port = parsePort(start, p);
+                    if (proxy.port < 0) {
+                        proxy.type = TYPE_NONE;
+                        return NULL;
+                    }
+                }
+            }
+            if (*p == '/') {
+                p++;
+                return p;
+            }
+            return url;
+        }
+#endif
         String generateURL()const {
             if (type == TYPE_NONE || host == NULL)
                 return NULL;
@@ -279,7 +352,14 @@ private:
                     }
                     buffer.append('@');
                 }
-                urlencode(host, buffer);
+                if (host.indexOf(':') == -1) {
+                    buffer.append(host);
+                }
+                else {
+                    buffer.append("[");
+                    buffer.append(host);
+                    buffer.append("]");
+                }
                 if (port != 0) {
                     buffer.append(':');
                     int digit = 10000;
