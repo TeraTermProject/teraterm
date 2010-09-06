@@ -18,7 +18,7 @@
 #undef TTXGetUIHooks
 #undef TTXGetSetupHooks
 
-#define MAXNUMEXTENSIONS 16
+#define MAXNUMEXTENSIONS 32
 static HANDLE LibHandle[MAXNUMEXTENSIONS];
 static int NumExtensions = 0;
 static TTXExports * * Extensions;
