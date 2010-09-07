@@ -1043,9 +1043,11 @@ void ESCSpace(BYTE b)
 void ESCSharp(BYTE b)
 {
   switch (b) {
-    case '8':  /* Fill screen with "E" */
+    case '8':  /* Fill screen with "E" (DECALN) */
       BuffUpdateScroll();
       BuffFillWithE();
+      CursorTop = 0;
+      CursorBottom = NumOfLines-1-StatusLine;
       MoveCursor(0,0);
       ParseMode = ModeFirst;
       break;
