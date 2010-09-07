@@ -2476,16 +2476,17 @@ void CSSetAttr()		// SGR
   void CSDouble(BYTE b)
   {
     switch (b) {
-      case 'p':
+      case 'p': // DECSCL
 	/* Select terminal mode (software reset) */
 	SoftReset();
 	if (NParam > 0) {
 	  switch (Param[1]) {
-	    case 61: // VT100 Mode
+	    case 61: // VT-Level 1 (VT100)
 	      Send8BitMode = FALSE; break;
-	    case 62: // VT200 Mode
-	    case 63: // VT300 Mode
-	    case 64: // VT400 Mode
+	    case 62: // VT-Level 2 (VT200)
+	    case 63: // VT-Level 3 (VT300)
+	    case 64: // VT-Level 4 (VT400)
+	    case 65: // VT-Level 5 (VT500)
 	      if (NParam > 1 && Param[2] == 1)
 		Send8BitMode = FALSE;
 	      else
