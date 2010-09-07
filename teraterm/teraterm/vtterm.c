@@ -2106,6 +2106,8 @@ void CSSetAttr()		// SGR
       case 'K':
 	if ((NParam>=2) && (Param[1]==5))
 	{	// IO-8256 terminal
+	  if (Param[2] < 1 || NParam < 2) Param[2] = 0;
+	  if (Param[3] < 1 || NParam < 3) Param[3] = 0;
 	  switch (Param[2]) {
 	    case 3:
 	    case 4:
@@ -2132,8 +2134,8 @@ void CSSetAttr()		// SGR
 	}
 	else if (Param[1]==3)
 	{// IO-8256 terminal
-	  if (Param[2]<1) Param[2] = 1;
-	  if (Param[3]<1) Param[2] = 1;
+	  if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+	  if (Param[3] < 1 || NParam < 3) Param[3] = 1;
 	  BuffEraseCharsInLine(Param[2]-1,Param[3]-Param[2]+1);
 	}
 	break;
