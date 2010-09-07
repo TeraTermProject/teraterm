@@ -2524,6 +2524,16 @@ void CSSetAttr()		// SGR
 	if (Param[2] < 1 || NParam < 2) Param[2]=1;
 	if (Param[3] < 1 || NParam < 3) Param[3]=1;
 	if (Param[4] < 1 || NParam < 4) Param[4]=1;
+	if (RelativeOrgMode) {
+	  Param[1] += CursorTop;
+	  if (Param[1] > CursorBottom) {
+	    Param[1] = CursorBottom + 1;
+	  }
+	  Param[3] += CursorTop;
+	  if (Param[3] > CursorBottom) {
+	    Param[3] = CursorBottom + 1;
+	  }
+	}
 	BuffEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
 	break;
 
@@ -2532,6 +2542,16 @@ void CSSetAttr()		// SGR
 	if (Param[2] < 1 || NParam < 2) Param[2]=1;
 	if (Param[3] < 1 || NParam < 3) Param[3]=1;
 	if (Param[4] < 1 || NParam < 4) Param[4]=1;
+	if (RelativeOrgMode) {
+	  Param[1] += CursorTop;
+	  if (Param[1] > CursorBottom) {
+	    Param[1] = CursorBottom + 1;
+	  }
+	  Param[3] += CursorTop;
+	  if (Param[3] > CursorBottom) {
+	    Param[3] = CursorBottom + 1;
+	  }
+	}
 	BuffSelectEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
 	break;
 
