@@ -29,6 +29,7 @@ typedef struct {
   TWSAAsyncGetHostByName FAR * PWSAAsyncGetHostByName;
   TWSACancelAsyncRequest FAR * PWSACancelAsyncRequest;
   TWSAGetLastError FAR * PWSAGetLastError;
+  TWSAAsyncGetAddrInfo FAR * PWSAAsyncGetAddrInfo;
 } TTXSockHooks;
 
 typedef struct {

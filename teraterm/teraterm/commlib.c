@@ -20,7 +20,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h> /* for _snprintf() */
-#include "WSAAsyncGetAddrInfo.h"
 #endif /* NO_INET6 */
 #include <time.h>
 #include <locale.h>
@@ -327,7 +326,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				hints.ai_protocol = IPPROTO_TCP;
 				_snprintf_s(pname, sizeof(pname), _TRUNCATE, "%d", ts->TCPPort);
 
-				HAsync = WSAAsyncGetAddrInfo(HW, WM_USER_GETHOST,
+				HAsync = PWSAAsyncGetAddrInfo(HW, WM_USER_GETHOST,
 				                             ts->HostName, pname, &hints, &cv->res0);
 				if (HAsync == 0)
 					InvalidHost = TRUE;

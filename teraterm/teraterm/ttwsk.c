@@ -6,6 +6,7 @@
 
 #include "teraterm.h"
 #include "ttwsk.h"
+#include "WSAAsyncGetAddrInfo.h"
 
 static HANDLE HWinsock = NULL;
 
@@ -27,6 +28,7 @@ TWSACancelAsyncRequest PWSACancelAsyncRequest;
 TWSAGetLastError PWSAGetLastError;
 TWSAStartup PWSAStartup;
 TWSACleanup PWSACleanup;
+TWSAAsyncGetAddrInfo PWSAAsyncGetAddrInfo;
 
 void CheckWinsock()
 {
@@ -141,6 +143,8 @@ BOOL LoadWinsock()
 
     PWSACleanup = (TWSACleanup)GetProcAddress(HWinsock, MAKEINTRESOURCE(IdWSACLEANUP));
     if (PWSACleanup==NULL) Err = TRUE;
+
+    PWSAAsyncGetAddrInfo = WSAAsyncGetAddrInfo;
 
     if (Err)
     {

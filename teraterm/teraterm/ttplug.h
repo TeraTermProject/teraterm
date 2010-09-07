@@ -21,7 +21,8 @@ void PASCAL FAR TTXInternalOpenTCP(TTXSockHooks FAR * hooks);
       &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   \
       &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     \
       &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       \
-      &PWSACancelAsyncRequest, &PWSAGetLastError                 \
+      &PWSACancelAsyncRequest, &PWSAGetLastError,                \
+      &PWSAAsyncGetAddrInfo                                      \
     };                                                           \
     TTXInternalOpenTCP(&SockHooks);                              \
   } while (0)
@@ -36,7 +37,8 @@ void PASCAL FAR TTXInternalCloseTCP(TTXSockHooks FAR * hooks);
       &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   \
       &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     \
       &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       \
-      &PWSACancelAsyncRequest, &PWSAGetLastError                 \
+      &PWSACancelAsyncRequest, &PWSAGetLastError,                \
+      &PWSAAsyncGetAddrInfo                                      \
     };                                                           \
     TTXInternalCloseTCP(&SockHooks);                             \
   } while (0)
