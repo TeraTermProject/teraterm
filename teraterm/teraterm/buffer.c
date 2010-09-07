@@ -916,7 +916,6 @@ void BuffDrawLine(TCharAttr Attr, int Direction, int C)
 
 void BuffEraseBox
   (int XStart, int YStart, int XEnd, int YEnd)
-// IO-8256 terminal
 {
 	int C, i;
 	LONG Ptr;
@@ -3351,6 +3350,59 @@ void BuffSelectedEraseHomeToCur()
 void BuffSelectedEraseScreen() {
 	BuffSelectedEraseHomeToCur();
 	BuffSelectedEraseCurToEnd();
+}
+
+void BuffSelectEraseBox
+  (int XStart, int YStart, int XEnd, int YEnd)
+{
+	int C, i, j;
+	LONG Ptr;
+
+	if (XEnd>NumOfColumns-1) {
+		XEnd = NumOfColumns-1;
+	}
+	if (YEnd>NumOfLines-1-StatusLine) {
+		YEnd = NumOfLines-1-StatusLine;
+	}
+	if (XStart>XEnd) {
+		return;
+	}
+	if (YStart>YEnd) {
+		return;
+	}
+	C = XEnd-XStart+1;
+	Ptr = GetLinePtr(PageStart+YStart);
+	for (i=YStart; i<=YEnd; i++) {
+		if ((XStart>0) &&
+		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0) &&
+		    ((AttrBuff2[Ptr+XStart-1] & Attr2Protect) == 0)) {
+			CodeBuff[Ptr+XStart-1] = 0x20;
+			AttrBuff[Ptr+XStart-1] = CurCharAttr.Attr;
+			AttrBuff2[Ptr+XStart-1] = CurCharAttr.Attr2;
+			AttrBuffFG[Ptr+XStart-1] = CurCharAttr.Fore;
+			AttrBuffBG[Ptr+XStart-1] = CurCharAttr.Back;
+		}
+		if ((XStart+C<NumOfColumns) &&
+		    ((AttrBuff[Ptr+XStart+C-1] & AttrKanji) != 0) &&
+		    ((AttrBuff2[Ptr+XStart+C-1] & Attr2Protect) == 0)) {
+			CodeBuff[Ptr+XStart+C] = 0x20;
+			AttrBuff[Ptr+XStart+C] = CurCharAttr.Attr;
+			AttrBuff2[Ptr+XStart+C] = CurCharAttr.Attr2;
+			AttrBuffFG[Ptr+XStart+C] = CurCharAttr.Fore;
+			AttrBuffBG[Ptr+XStart+C] = CurCharAttr.Back;
+		}
+		for (j=Ptr+XStart; j<Ptr+XStart+C; j++) {
+			if (!(AttrBuff2[j] & Attr2Protect)) {
+				CodeBuff[j] = 0x20;
+				AttrBuff[j] = AttrDefault;
+				AttrBuff2[j] = CurCharAttr.Attr2 & Attr2ColorMask;
+				AttrBuffFG[j] = CurCharAttr.Fore;
+				AttrBuffBG[j] = CurCharAttr.Back;
+			}
+		}
+		Ptr = NextLinePtr(Ptr);
+	}
+	BuffUpdateRect(XStart,YStart,XEnd,YEnd);
 }
 
 void BuffSelectedEraseCharsInLine(int XStart, int Count)

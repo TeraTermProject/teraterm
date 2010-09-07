@@ -2518,12 +2518,20 @@ void CSSetAttr()		// SGR
   void CSDol(BYTE b)
   {
     switch (b) {
-      case 'z':
+      case 'z': // DECERA
 	if (Param[1] < 1 || NParam < 1) Param[1]=1;
 	if (Param[2] < 1 || NParam < 2) Param[2]=1;
 	if (Param[3] < 1 || NParam < 3) Param[3]=1;
 	if (Param[4] < 1 || NParam < 4) Param[4]=1;
 	BuffEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
+	break;
+
+      case '{': // DECSERA
+	if (Param[1] < 1 || NParam < 1) Param[1]=1;
+	if (Param[2] < 1 || NParam < 2) Param[2]=1;
+	if (Param[3] < 1 || NParam < 3) Param[3]=1;
+	if (Param[4] < 1 || NParam < 4) Param[4]=1;
+	BuffSelectEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
 	break;
 
       case '}':

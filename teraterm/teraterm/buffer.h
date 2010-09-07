@@ -75,6 +75,7 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count);
 void BuffSelectedEraseCurToEnd();
 void BuffSelectedEraseHomeToCur();
 void BuffSelectedEraseScreen();
+void BuffSelectEraseBox(int XStart, int YStart, int XEnd, int YEnd);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom;
