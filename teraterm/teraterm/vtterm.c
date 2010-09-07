@@ -2093,10 +2093,10 @@ void CSSetAttr()		// SGR
       case 'J':
 	if (Param[1]==3) // IO-8256 terminal
 	{
-	  if (Param[2]<1) Param[2]=1;
-	  if (Param[3]<1) Param[3]=1;
-	  if (Param[4]<1) Param[4]=1;
-	  if (Param[5]<1) Param[5]=1;
+	  if (Param[2] < 1 || NParam < 2) Param[2]=1;
+	  if (Param[3] < 1 || NParam < 3) Param[3]=1;
+	  if (Param[4] < 1 || NParam < 4) Param[4]=1;
+	  if (Param[5] < 1 || NParam < 5) Param[5]=1;
 	  BuffEraseBox(Param[3]-1,Param[2]-1,
 		       Param[5]-1,Param[4]-1);
 	}
