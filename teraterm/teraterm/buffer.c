@@ -3300,7 +3300,7 @@ void BuffSelectedEraseCurToEnd()
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	/* update window */
-	BuffUpdateRect(1, CursorY, NumOfColumns, YEnd);
+	BuffUpdateRect(0, CursorY, NumOfColumns, YEnd);
 }
 
 void BuffSelectedEraseHomeToCur()
@@ -3338,7 +3338,7 @@ void BuffSelectedEraseHomeToCur()
 	}
 
 	/* update window */
-	BuffUpdateRect(1, YHome, NumOfColumns, CursorY);
+	BuffUpdateRect(0, YHome, NumOfColumns, CursorY);
 }
 
 void BuffSelectedEraseScreen() {
