@@ -53,6 +53,7 @@
   /* Color attribute bit masks */
 #define Attr2Fore         0x01
 #define Attr2Back         0x02
+#define AttrSgrMask       (AttrBold | AttrUnder | AttrBlink | AttrReverse)
 #define AttrColorMask     (AttrBold | AttrBlink | AttrReverse)
 #define Attr2ColorMask    (Attr2Fore | Attr2Back)
 

@@ -3293,10 +3293,7 @@ void BuffSelectedEraseCurToEnd()
 		for (j = TmpPtr + offset; j < TmpPtr + NumOfColumns - offset; j++) {
 			if (!(AttrBuff2[j] & Attr2Protect)) {
 				CodeBuff[j] = 0x20;
-				AttrBuff[j] = AttrDefault;
-				AttrBuff2[j] = CurCharAttr.Attr2 & Attr2ColorMask;
-				AttrBuffFG[j] = CurCharAttr.Fore;
-				AttrBuffBG[j] = CurCharAttr.Back;
+				AttrBuff[j] &= AttrSgrMask;
 			}
 		}
 		offset = 0;
@@ -3334,10 +3331,7 @@ void BuffSelectedEraseHomeToCur()
 		for (j = TmpPtr; j < TmpPtr + offset; j++) {
 			if (!(AttrBuff2[j] & Attr2Protect)) {
 				CodeBuff[j] = 0x20;
-				AttrBuff[j] = AttrDefault;
-				AttrBuff2[j] = CurCharAttr.Attr2 & Attr2ColorMask;
-				AttrBuffFG[j] = CurCharAttr.Fore;
-				AttrBuffBG[j] = CurCharAttr.Back;
+				AttrBuff[j] &= AttrSgrMask;
 			}
 		}
 		TmpPtr = NextLinePtr(TmpPtr);
@@ -3377,27 +3371,18 @@ void BuffSelectEraseBox
 		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0) &&
 		    ((AttrBuff2[Ptr+XStart-1] & Attr2Protect) == 0)) {
 			CodeBuff[Ptr+XStart-1] = 0x20;
-			AttrBuff[Ptr+XStart-1] = CurCharAttr.Attr;
-			AttrBuff2[Ptr+XStart-1] = CurCharAttr.Attr2;
-			AttrBuffFG[Ptr+XStart-1] = CurCharAttr.Fore;
-			AttrBuffBG[Ptr+XStart-1] = CurCharAttr.Back;
+			AttrBuff[Ptr+XStart-1] &= AttrSgrMask;
 		}
 		if ((XStart+C<NumOfColumns) &&
 		    ((AttrBuff[Ptr+XStart+C-1] & AttrKanji) != 0) &&
 		    ((AttrBuff2[Ptr+XStart+C-1] & Attr2Protect) == 0)) {
 			CodeBuff[Ptr+XStart+C] = 0x20;
-			AttrBuff[Ptr+XStart+C] = CurCharAttr.Attr;
-			AttrBuff2[Ptr+XStart+C] = CurCharAttr.Attr2;
-			AttrBuffFG[Ptr+XStart+C] = CurCharAttr.Fore;
-			AttrBuffBG[Ptr+XStart+C] = CurCharAttr.Back;
+			AttrBuff[Ptr+XStart+C] &= AttrSgrMask;
 		}
 		for (j=Ptr+XStart; j<Ptr+XStart+C; j++) {
 			if (!(AttrBuff2[j] & Attr2Protect)) {
 				CodeBuff[j] = 0x20;
-				AttrBuff[j] = AttrDefault;
-				AttrBuff2[j] = CurCharAttr.Attr2 & Attr2ColorMask;
-				AttrBuffFG[j] = CurCharAttr.Fore;
-				AttrBuffBG[j] = CurCharAttr.Back;
+				AttrBuff[j] &= AttrSgrMask;
 			}
 		}
 		Ptr = NextLinePtr(Ptr);
@@ -3429,10 +3414,7 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 	for (i=XStart; i < XStart + Count; i++) {
 		if (!(AttrLine2[i] & Attr2Protect)) {
 			CodeLine[i] = 0x20;
-			AttrLine[i] = AttrDefault;
-			AttrLine2[i] = CurCharAttr.Attr2 & Attr2ColorMask;
-			AttrLineFG[i] = CurCharAttr.Fore;
-			AttrLineBG[i] = CurCharAttr.Back;
+			AttrLine[i] &= AttrSgrMask;
 		}
 	}
 
