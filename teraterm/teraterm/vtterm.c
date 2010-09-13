@@ -2092,51 +2092,48 @@ void CSSetAttr()		// SGR
 	  SendCSIstr(">32;100;2c", 0); /* VT382 */
 	}
 	break;
-      case 'J':
-	if (Param[1]==3) // IO-8256 terminal
-	{
-	  if (Param[2] < 1 || NParam < 2) Param[2]=1;
-	  if (Param[3] < 1 || NParam < 3) Param[3]=1;
-	  if (Param[4] < 1 || NParam < 4) Param[4]=1;
-	  if (Param[5] < 1 || NParam < 5) Param[5]=1;
-	  BuffEraseBox(Param[3]-1,Param[2]-1,
-		       Param[5]-1,Param[4]-1);
-	}
-	break;
-      case 'K':
-	if ((NParam>=2) && (Param[1]==5))
-	{	// IO-8256 terminal
-	  if (Param[2] < 1 || NParam < 2) Param[2] = 0;
-	  if (Param[3] < 1 || NParam < 3) Param[3] = 0;
-	  switch (Param[2]) {
-	    case 3:
-	    case 4:
-	    case 5:
-	    case 6:
-	      BuffDrawLine(CharAttr, Param[2], Param[3]);
-	      break;
-	    case 12:
-	      /* Text color */
-	      if ((Param[3]>=0) && (Param[3]<=7))
-	      {
-		switch (Param[3]) {
-		  case 3: CharAttr.Fore = IdBlue; break;
-		  case 4: CharAttr.Fore = IdCyan; break;
-		  case 5: CharAttr.Fore = IdYellow; break;
-		  case 6: CharAttr.Fore = IdMagenta; break;
-		  default: CharAttr.Fore = Param[3]; break;
-		}
-		CharAttr.Attr2 |= Attr2Fore;
-		BuffSetCurCharAttr(CharAttr);
-	      }
-	      break;
-	  }
-	}
-	else if (Param[1]==3)
-	{// IO-8256 terminal
+      case 'J':	// IO-8256 terminal
+	if (Param[1]==3) {
 	  if (Param[2] < 1 || NParam < 2) Param[2] = 1;
 	  if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-	  BuffEraseCharsInLine(Param[2]-1,Param[3]-Param[2]+1);
+	  if (Param[4] < 1 || NParam < 4) Param[4] = 1;
+	  if (Param[5] < 1 || NParam < 5) Param[5] = 1;
+	  BuffEraseBox(Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
+	}
+	break;
+      case 'K':	// IO-8256 terminal
+        switch (Param[1]) {
+	  case 3:
+	    if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+	    if (Param[3] < 1 || NParam < 3) Param[3] = 1;
+	    BuffEraseCharsInLine(Param[2]-1, Param[3]-Param[2]+1);
+	    break;
+	  case 5:
+	    if (NParam < 2) Param[2] = 0;
+	    if (NParam < 3) Param[3] = 0;
+	    switch (Param[2]) {
+	      case 3:
+	      case 4:
+	      case 5:
+	      case 6: // Draw Line
+		BuffDrawLine(CharAttr, Param[2], Param[3]);
+		break;
+
+	      case 12: // Text color
+		if ((Param[3]>=0) && (Param[3]<=7)) {
+		  switch (Param[3]) {
+		    case 3: CharAttr.Fore = IdBlue; break;
+		    case 4: CharAttr.Fore = IdCyan; break;
+		    case 5: CharAttr.Fore = IdYellow; break;
+		    case 6: CharAttr.Fore = IdMagenta; break;
+		    default: CharAttr.Fore = Param[3]; break;
+		  }
+		  CharAttr.Attr2 |= Attr2Fore;
+		  BuffSetCurCharAttr(CharAttr);
+		}
+		break;
+	    }
+	    break;
 	}
 	break;
     }
