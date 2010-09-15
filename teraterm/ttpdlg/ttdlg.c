@@ -1291,7 +1291,7 @@ static PCHAR far FlowList[] = {"Xon/Xoff","hardware","none",NULL};
 BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
-	int i, w;
+	int i, w, sel;
 	char Temp[128];
 	WORD ComPortTable[MAXCOMPORT];
 	static char *ComPortDesc[MAXCOMPORT];
@@ -1411,7 +1411,19 @@ BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_SETCURSEL, w, 0);
 
 			SetDropDownList(Dialog, IDC_SERIALBAUD, BaudList, 0);
-			SetDlgItemInt(Dialog, IDC_SERIALBAUD, ts->Baud, FALSE);
+			i = sel = 0;
+			while (BaudList[i] != NULL) {
+				if (atoi(BaudList[i]) == ts->Baud) {
+					SendDlgItemMessage(Dialog, IDC_SERIALBAUD, CB_SETCURSEL, i, 0);
+					sel = 1;
+					break;
+				}
+				i++;
+			}
+			if (!sel) {
+				SetDlgItemInt(Dialog, IDC_SERIALBAUD, ts->Baud, FALSE);
+			}
+
 			SetDropDownList(Dialog, IDC_SERIALDATA, DataList, ts->DataBit);
 			SetDropDownList(Dialog, IDC_SERIALPARITY, ParityList, ts->Parity);
 			SetDropDownList(Dialog, IDC_SERIALSTOP, StopList, ts->StopBit);
