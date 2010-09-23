@@ -367,7 +367,7 @@ void SendCSIstr(char *str, int len) {
 void SendOSCstr(char *str, int len) {
 	int l;
 
-	if (str == NULL || len <= 0)
+	if (str == NULL || len < 0)
 		return;
 
 	if (len == 0) {
