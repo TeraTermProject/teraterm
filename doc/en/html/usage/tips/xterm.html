@@ -33,7 +33,7 @@ if &term == "xterm"
     return a:ret
   endfunction
 
-  map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("i")
+  map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
   imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
   cmap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
   cmap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
