@@ -21,5 +21,19 @@ Causes Tera Term to send a break signal to the host.
 sendbreak
 </pre>
 
+<h2>Remarks</h2>
+
+<p>
+Raises the break interrupt(Break interrupt indicator) to the host system on the serial console. Also, sends IAC BREAK(255 243) to the host system on the TELNET and SSH console.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Calls the help message of Magic SysRq(Linux).
+sendbreak
+send 'h'
+</pre>
+
 </body>
 </html>
