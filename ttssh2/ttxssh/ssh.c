@@ -2833,6 +2833,55 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 
 }
 
+// ブレーク信号を送る。
+// OpenSSH の"~B"に相当する。ただし、SSH2のみ。
+// (2010.9.27 yutaka)
+int SSH_notify_break_signal(PTInstVar pvar)
+{
+	int ret = 0;
+
+	if (SSHv1(pvar)) {
+		// 何もしない。
+
+	} else if (SSHv2(pvar)) { 
+		buffer_t *msg;
+		char *s;
+		unsigned char *outmsg;
+		int len;
+		Channel_t *c;
+
+		c = ssh2_channel_lookup(pvar->shell_id);
+		if (c == NULL)
+			goto error;
+
+		msg = buffer_init();
+		if (msg == NULL) {
+			goto error;
+		}
+		buffer_put_int(msg, c->remote_id);
+		s = "break";
+		buffer_put_string(msg, s, strlen(s));
+		buffer_put_char(msg, 0);  // wantconfirm
+		buffer_put_int(msg, 1000);  
+		len = buffer_len(msg);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
+		memcpy(outmsg, buffer_ptr(msg), len);
+		finish_send_packet(pvar);
+		buffer_free(msg);
+
+		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at SSH_notify_break_signal().", LOG_LEVEL_VERBOSE);
+
+		ret = 1;
+
+	} else {
+		// SSHでない場合は何もしない。
+
+	}
+
+error:
+	return (ret);
+}
+
 int SSH_get_min_packet_size(PTInstVar pvar)
 {
 	if (SSHv1(pvar)) {

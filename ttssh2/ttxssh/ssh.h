@@ -561,5 +561,6 @@ void key_free(Key *key);
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
+int SSH_notify_break_signal(PTInstVar pvar);
 
 #endif

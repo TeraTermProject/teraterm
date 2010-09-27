@@ -3947,6 +3947,12 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd)
 	}
 
 	switch (cmd) {
+	case 50430: // FIXME: ID_CONTROL_SENDBREAK(tt_res.h)を指定したいが、ヘッダをincludeすると、多重定義となる。
+		if (SSH_notify_break_signal(pvar))
+			return 1;
+		else
+			return 0;  // SSH2で処理されなかった場合は、本来の動作を行うべく、ゼロを返す。
+
 	case ID_SSHSCPMENU:
 		if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHSCP), hWin, TTXScpDialog,
 			(LPARAM) pvar) == -1) {
