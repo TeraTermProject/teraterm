@@ -24,7 +24,7 @@ sendbreak
 <h2>解説</h2>
 
 <p>
-シリアルコンソールでは、ホスト側にブレーク割り込み(Break interrupt indicator)を発生させる。TELNET/SSHでは、IAC BREAK(255 243)を送信する。
+シリアルコンソールでは、ホスト側にブレーク割り込み(Break interrupt indicator)を発生させる。TELNETでは、IAC BREAK(255 243)を送信する。SSH2では、SSH2_MSG_CHANNEL_REQUEST("break")を送信する。
 </p>
 
 <h2>例</h2>

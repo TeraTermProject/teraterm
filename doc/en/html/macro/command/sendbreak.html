@@ -24,7 +24,7 @@ sendbreak
 <h2>Remarks</h2>
 
 <p>
-Raises the break interrupt(Break interrupt indicator) to the host system on the serial console. Also, sends IAC BREAK(255 243) to the host system on the TELNET and SSH console.
+Raises the break interrupt(Break interrupt indicator) to the host system on the serial console. This macro sends IAC BREAK(255 243) to the host system on the TELNET console. Also, sends SSH2_MSG_CHANNEL_REQUEST("break") to the host system on the SSH2 console.
 </p>
 
 <h2>Example</h2>
