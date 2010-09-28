@@ -14,7 +14,7 @@
 <h1>findfirst</h1>
 
 <p>
-文字列にあう最初のファイルを探す。
+文字列に合致する最初のファイルを探す。
 </p>
 
 <pre class="macro-syntax">
@@ -24,10 +24,10 @@ findfirst &lt;dir handle&gt; &lt;file name&gt; &lt;strvar&gt;
 <h2>解説</h2>
 
 <p>
-findfirst コマンドはファイル名  &lt;file name&gt; にあう最初のファイルを探す。<br>
+findfirst コマンドはファイル名  &lt;file name&gt; に合致する最初のファイルを探す。<br>
 ファイルが見つかった場合、ディレクトリハンドルが &lt;dir handle&gt; に、最初のファイル名が &lt;strvar&gt; に格納され、システム変数 &lt;result&gt; に 1 が格納される。<br>
 findfirst コマンドが最初のファイルを見つけた場合、ディレクトリハンドルを指定して findnext コマンドを使用し、
-&lt;file name&gt; にあう次のファイルを探すことができる。<br>
+&lt;file name&gt; に合致する次のファイルを探すことができる。<br>
 <strong>ディレクトリハンドルは findclose コマンドによって解放されなければならない。</strong>
 </p>
 
@@ -35,7 +35,7 @@ findfirst コマンドが最初のファイルを見つけた場合、ディレクトリハンドルを指定して
 <h1>findnext</h1>
 
 <p>
-文字列にあう次のファイルを探す。
+文字列に合致する次のファイルを探す。
 </p>
 
 <pre class="macro-syntax">
@@ -45,7 +45,7 @@ findnext &lt;dir handle&gt; &lt;strvar&gt;
 <h2>解説</h2>
 
 <p>
-findnext コマンドは findfirst コマンドで指定されたファイル名にあう次のファイルを探す。<br>
+findnext コマンドは findfirst コマンドで指定されたファイル名に合致する次のファイルを探す。<br>
 整数値 &lt;dir handle&gt; は findfirst コマンドで得られたディレクトリハンドルでなければならない。<br>
 もし次のファイルが見つかった場合、&lt;strvar&gt; にファイル名が、"result" に 1 が格納される。<br>
 それ以外の場合は、&lt;strvar&gt;と "result" にそれぞれ "" と 0 が格納される。
@@ -66,17 +66,18 @@ findclose &lt;dir handle&gt;
 
 <p>
 findclose コマンドは findfirst コマンドによって得られたディレクトリハンドル &lt;dir handle&gt; を解放する。<br>
-このコマンドは findfirst コマンドがファイルを見つけた場合、実行されなければならない。
+このコマンドはファイル検索処理が不要になった時点で、即座に実行されなければならない。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-findfirst dh '*.txt' filename
+extpat='*.txt'
+findfirst dh extpat filename
 
 while result
-messagebox filename '*.txt'
-findnext dh filename
+	messagebox filename extpat
+	findnext dh filename
 endwhile
 
 findclose dh

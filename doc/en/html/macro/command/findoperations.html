@@ -66,17 +66,18 @@ findclose &lt;dir handle&gt;
 
 <p>
 The findclose command releases the directory handle &lt;dir handle&gt; returned by the findfirst command.<br>
-This command should be executed if the findfirst command is executed successfully.
+As soon as the file operation ends, this command should be executed.
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-findfirst dh '*.txt' filename
+extpat='*.txt'
+findfirst dh extpat filename
 
 while result
-messagebox filename '*.txt'
-findnext dh filename
+	messagebox filename extpat
+	findnext dh filename
 endwhile
 
 findclose dh
