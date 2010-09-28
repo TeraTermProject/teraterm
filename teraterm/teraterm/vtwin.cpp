@@ -4345,6 +4345,13 @@ void CVTWindow::OnControlSendBreak()
 	if (cv.Ready)
 		switch (cv.PortType) {
 			case IdTCPIP:
+				// SSH2接続の場合、専用のブレーク信号を送信する。(2010.9.28 yutaka)
+				if (cv.isSSH == 2) {
+					if (TTXProcessCommand(HVTWin, ID_CONTROL_SENDBREAK)) {
+						break;
+					}
+				} 
+
 				TelSendBreak();
 				break;
 			case IdSerial:
