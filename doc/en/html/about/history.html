@@ -39,19 +39,25 @@
           <li>added support for the DECSCA (Select character protection attribute), DECSED (Selective Erase in Display), DECSEL (Selective Erase in Line) and DECSERA (Selective Erase Rectangular Area) control sequence.</li>
         </ul></li>
       <li>added support for the DECERA (Erase Rectangular Area) control sequence.</li>
-      <!-- li>"ウィンドウ" メニュー、および "ウィンドウのリスト" ダイアログで、ウィンドウの状態を表す文字を表示するようにした。</li -->
-      <!-- li>使用可能なプラグインの数を 16 から 32 に増やした。</li -->
-      <!-- li>WSAAsyncGetAddrInfo をプラグインからフック出来るようにした。</li -->
+      <li>A single character to indicate the window status can be shown on the "Window" menu and "Windows list" dialog. See below.
+        <ul type="disc">
+          <li>+ Normal window</li>
+          <li>- Minimized window</li>
+          <li>@ Maximized window</li>
+          <li># Hidden window</li>
+        </ul></li>
+      <li>Extended the maximum number of Tera Term plugins from 16 to 32.</li>
+      <li>The WSAAsyncGetAddrInfo function can be hooked  by using plugin.</li>
       <li>added an argument of the "<a href="../macro/command/beep.html">beep</a>" macro command.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <!--li><a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> ダイアログを表示したときに Baud rate が正しく選択されていない問題を修正した。</li-->
+      <li>The baud rate can not be properly selected on the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog.</li>
       <li><a href="../setup/teraterm-term.html#beep">Beep setting</a> does not work.</li>
-      <!-- li>DECALN (DEC Screen Alignment Test) 制御シーケンスで、スクロール領域をクリアするようにした。</li -->
-      <!-- li>ウィンドウタイトル/アイコンラベル報告要求に対して、空文字列を応答する設定が動作しない問題を修正した。</li -->
+      <li>The scroll area can not be cleared by using the DECALN (DEC Screen Alignment Test) control sequence.</li>
+      <li>An empty string can not reply by using the window title and icon label reporting request.</li>
     </ul>
   </li>
 
@@ -1575,7 +1581,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <!--li>SSH2 認証で、サーバが認証方式を返さなかったときにアプリケーションが落ちる問題を修正した。</li-->
+      <li>An application fault may occur when the remote system does not return the SSH2 authentication method.</li>
     </ul>
   </li>
 </ul>
@@ -2334,7 +2340,7 @@ SYNOPSIS:
 
 <h3><a name="ttproxy_1.0.0.17">2010.xx.xx (Ver 1.0.0.17)</a></h3>
 <ul class="history">
-      <!--li>Bug fix: プロキシサーバに IPv6 アドレスを指定できない問題を修正した。</li-->
+      <li>Bug fix: The IPv6 address can not be specified at the proxy server.</li>
 </ul>
 
 <h3><a name="ttproxy_1.0.0.16">2009.11.10 (Ver 1.0.0.16)</a></h3>
