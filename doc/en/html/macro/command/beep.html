@@ -18,20 +18,52 @@ Makes a beep sound.
 </p>
 
 <pre class="macro-syntax">
-beep
+beep [&lt;sound type&gt;]
 </pre>
 
 <h2>Remarks</h2>
 
 <p>
-Plays a waveform sound(Windows Default Beep sound).
+Plays a waveform sound.<br>
+The &lt;sound type&gt; parameter can be one of the following values. The default value is the Windows Default Beep sound.
 </p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Meaning</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>A simple beep</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Windows Asterisk sound</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>Windows Exclamation sound</td>
+ </tr>
+ <tr>
+  <td>3</td>
+  <td>Windows Critical Stop sound</td>
+ </tr>
+ <tr>
+  <td>4</td>
+  <td>Windows Question sound</td>
+ </tr>
+ <tr>
+  <td>5</td>
+  <td>Windows Default Beep sound</td>
+ </tr>
+</table>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
 for i 1 10
-	beep
+	beep 0
 	pause 1
 next
 </pre>

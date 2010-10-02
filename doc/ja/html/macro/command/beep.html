@@ -18,20 +18,52 @@
 </p>
 
 <pre class="macro-syntax">
-beep
+beep [&lt;sound type&gt;]
 </pre>
 
 <h2>解説</h2>
 
 <p>
-WAVE 形式のサウンド（SystemDefault；一般の警告音）を再生する。
+WAVE 形式のサウンドを再生する。<br>
+引数の意味は以下のとおり。省略時は「SystemDefault；一般の警告音」となる。
 </p>
+
+<table>
+ <tr>
+  <th>値</th>
+  <th>サウンド</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>コンピュータのスピーカから発生する標準的なビープ音</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>SystemAsterisk；メッセージ（情報）</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>SystemExclamation；メッセージ（警告）</td>
+ </tr>
+ <tr>
+  <td>3</td>
+  <td>SystemHand；システムエラー</td>
+ </tr>
+ <tr>
+  <td>4</td>
+  <td>SystemQuestion；メッセージ（問い合わせ）</td>
+ </tr>
+ <tr>
+  <td>5</td>
+  <td>SystemDefault；一般の警告音</td>
+ </tr>
+</table>
 
 <h2>例</h2>
 
 <pre class="macro-example">
 for i 1 10
-	beep
+	beep 0
 	pause 1
 next
 </pre>
