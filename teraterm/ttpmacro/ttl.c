@@ -271,13 +271,42 @@ WORD TTLCommCmdInt(char Cmd, int Wait)
 
 WORD TTLBeep()
 {
-	if (GetFirstChar()==0)
-	{
-		MessageBeep(0);
-		return 0;
+	int val = 0;
+	WORD Err = 0;
+	UINT type = MB_OK;
+
+	if (CheckParameterGiven()) {
+		GetIntVal(&val, &Err);
+		if (Err!=0) return Err;
+
+		switch (val) {
+		case 0:
+			type = -1;
+			break;
+		case 1:
+			type = MB_ICONASTERISK;
+			break;
+		case 2:
+			type = MB_ICONEXCLAMATION;
+			break;
+		case 3:
+			type = MB_ICONHAND;
+			break;
+		case 4:
+			type = MB_ICONQUESTION;
+			break;
+		case 5:
+			type = MB_OK;
+			break;
+		default:
+			return ErrSyntax;
+			break;
+		}
 	}
-	else
-		return ErrSyntax;
+
+	MessageBeep(type);
+
+	return 0;
 }
 
 WORD TTLBreak() {
