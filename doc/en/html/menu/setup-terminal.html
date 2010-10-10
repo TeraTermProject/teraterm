@@ -33,12 +33,16 @@
 
       <dt>New-line (receive)</dt>
       <dd>
+	If the CR options is selected, Tera Term doesn't convert it.<br>
 	If the CR+LF option is selected, received CR ($0D) characters are
+	converted to CR+LF ($0D $0A) pairs.<br>
+	If the LF option is selected, received LF ($0A) characters are
 	converted to CR+LF ($0D $0A) pairs.
       </dd>
 
       <dt>New-line (transmit)</dt>
       <dd>
+	If the CR options is selected, Tera Term doesn't convert it.<br>
 	If the CR+LF option is selected, CR ($0D) characters to be sent are
 	converted to CR+LF ($0D $0A) pairs before they are actually sent.
       </dd>
