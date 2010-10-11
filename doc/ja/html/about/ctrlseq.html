@@ -272,7 +272,7 @@
 応答: CSI > 32 ; 100 ; 2 c
 </pre>
 </td></tr>
-<tr><td>CSI > 3; <i>Pm</i> J</td>	<td>-</td>	<td>矩形消去。
+<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td>矩形消去。
 <pre>
 Ps1   filter rectangle の上辺
 Ps2   filter rectangle の左辺
@@ -280,8 +280,8 @@ Ps3   filter rectangle の下辺
 Ps4   filter rectangle の右辺
 </pre></td>
 </tr>
-<tr><td>CSI > 3; <i>Pm</i> K</td>	<td>-</td>	<td>Buff Erase Chars In Line</td></tr>
-<tr><td>CSI > 5; <i>Ps</i> K</td>	<td>-</td>	<td>
+<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td>現在の行の <i>Ps1</i> 桁目から <i>Ps2</i> 桁目までを消去する。</td></tr>
+<tr><td>CSI > 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
 <i>Ps</i> = 3..6	Draw Line
    = 12		Set foreground color
