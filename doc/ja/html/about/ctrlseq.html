@@ -272,7 +272,14 @@
 応答: CSI > 32 ; 100 ; 2 c
 </pre>
 </td></tr>
-<tr><td>CSI > 3; <i>Pm</i> J</td>	<td>-</td>	<td>Buff Erase Box</td></tr>
+<tr><td>CSI > 3; <i>Pm</i> J</td>	<td>-</td>	<td>矩形消去。
+<pre>
+Ps1   filter rectangle の上辺
+Ps2   filter rectangle の左辺
+Ps3   filter rectangle の下辺
+Ps4   filter rectangle の右辺
+</pre></td>
+</tr>
 <tr><td>CSI > 3; <i>Pm</i> K</td>	<td>-</td>	<td>Buff Erase Chars In Line</td></tr>
 <tr><td>CSI > 5; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
@@ -342,6 +349,15 @@
    = 2    保護属性の解除。これ以降に出力される文字は保護されていない状態になる。
 </pre>
 </td></tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ z</td>	<td>DECERA</td>	<td>矩形消去。<i>Ps1</i> ～ <i>Ps4</i> の省略時の値は現在のカーソル位置。
+<pre>
+<i>Ps1</i>   消去領域の上辺
+<i>Ps2</i>   消去領域の左辺
+<i>Ps3</i>   消去領域の下辺
+<i>Ps4</i>   消去領域の右辺
+</pre></td>
+</tr>
 
 <tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td>ステータス行から/へ移動。<i>Ps</i> の省略時の値は 0。
 <pre>
