@@ -2544,7 +2544,7 @@ void CSSetAttr()		// SGR
 	}
 	break;
 
-      case '}':
+      case '}': // DECSASD
 	if ((ts.TermFlag & TF_ENABLESLINE)==0) return;
 	if (StatusLine==0) return;
 	if ((Param[1]<1) && (CursorY==NumOfLines-1))
@@ -2552,7 +2552,7 @@ void CSSetAttr()		// SGR
 	else if ((Param[1]==1) && (CursorY<NumOfLines-1))
 	  MoveToStatusLine();
 	break;
-      case '~':
+      case '~': // DECSSDT
 	if ((ts.TermFlag & TF_ENABLESLINE)==0) return;
 	if (Param[1]<=1)
 	  HideStatusLine();
