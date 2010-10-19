@@ -104,9 +104,13 @@
 // patch level 19 - accept keyword "AUTO" with '-s' option
 //   Written by IWAMOTO Kouichi. (doda)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 20 - directory change timing with '-d' option is delayed
+//   Written by IWAMOTO Kouichi. (doda)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_19 (2010/01/28)";
+static char Version[] = "version 1.07_20 (2010/10/20)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,6 +153,7 @@ char cmd_term[256] = "";
 char cmd_termopt[256] = "";
 char cmd_shell[128] = "";
 char pw_shell[128] = "";
+char change_dir[256] = "";
 
 // TCP port for connection to another terminal application
 //--------------------------------------------------------
@@ -491,8 +496,7 @@ void get_args(int argc, char** argv)
         else if (!strcmp(*argv, "-d")) {        // -d <exec directory>
             if (*++argv == NULL)
                 break;
-	    quote_cut(tmp, sizeof(tmp), *argv);
-            chdir(tmp);
+            quote_cut(change_dir, sizeof(change_dir), *argv);
         }
         else if (!strcmp(*argv, "-o")) {        // -o <additional option for terminal>
             if (*++argv == NULL)
@@ -936,6 +940,9 @@ int exec_shell(int* sh_pid)
             const char *home_dir = getenv("HOME");
             // ignore chdir(2) system-call error.
             chdir(home_dir);
+        }
+        else if (change_dir[0] != 0) {
+            chdir(change_dir);
         }
         // execute a shell
         char *argv[32];

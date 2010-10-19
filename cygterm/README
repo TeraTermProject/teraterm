@@ -252,19 +252,23 @@
 
 // T E S T E D  O N //
 
-    As of 2008-Nov, CygTerm+ has been tested in the following environments.
+    As of 2010-Oct, CygTerm+ has been tested in the following environments.
 
         WindowsXP SP3 + Cygwin 1.5.25-15
+        WindowsXP SP3 + Cygwin 1.7.7
 
         Terminal emulator:
                 Tera Term Pro 2.3
-                Tera Term 4.60
+                Tera Term 4.67
                 PuTTY 0.60
         Shell:
-                bash 3.2.39
-                zsh 4.3.4
+                bash 3.2.51
+                zsh 4.3.10
 
 // C H A N G E S //
+v1.07_20 2010/10/20 (by doda)
+        * Directory change timing with '-d' option is delayed. (security fix)
+
 v1.07_19 2010/01/28 (by doda)
         * Accept keyword "AUTO" with '-s' option.
 

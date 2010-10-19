@@ -15,7 +15,7 @@
 
 
 #define Section "Tera Term"
-char *FName = ".\\TERATERM.INI";
+char *FName = "TERATERM.INI";
 
 
 //
@@ -92,14 +92,25 @@ found_path:;
 
 int main(int argc, char** argv)
 {
-	char Temp[256], Cmdline[256];
+	char Temp[256], CygwinDir[256], Cmdline[256];
+	char *bs;
 	int i;
 
-	// Cygwin install path
- 	GetPrivateProfileString(Section,"CygwinDirectory","c:\\cygwin",
-			  Temp,sizeof(Temp),FName);
+	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) > 0 &&
+	   (bs = strrchr(Temp, '\\')) != NULL) {
+		*bs = 0;
+		_chdir(Temp);
+		_snprintf(bs, sizeof(Temp) + Temp - bs, "\\%s", FName);
+	}
+	else {
+		_snprintf(Temp, sizeof(Temp), ".\\", FName);
+	}
 
-	//printf("%s %d\n", Temp, GetLastError());
+	// Cygwin install path
+ 	GetPrivateProfileString(Section, "CygwinDirectory", "c:\\cygwin",
+			  CygwinDir, sizeof(CygwinDir), Temp);
+
+	//printf("%s %d\n", CygwinDir, GetLastError());
 
 	Cmdline[0] = 0;
 	for (i=1; i<argc; i++) {
@@ -108,7 +119,7 @@ int main(int argc, char** argv)
 	}
 	//printf("%s\n", Cmdline);
 
-	OnCygwinConnection(Temp, Cmdline);
+	OnCygwinConnection(CygwinDir, Cmdline);
 
 	return 0;
 }
