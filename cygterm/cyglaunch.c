@@ -94,21 +94,21 @@ int main(int argc, char** argv)
 {
 	char Temp[256], Cmdline[256];
 	int i;
-	
+
 	// Cygwin install path
  	GetPrivateProfileString(Section,"CygwinDirectory","c:\\cygwin",
 			  Temp,sizeof(Temp),FName);
-	
+
 	//printf("%s %d\n", Temp, GetLastError());
-	
+
 	Cmdline[0] = 0;
 	for (i=1; i<argc; i++) {
 		strncat(Cmdline, argv[i], sizeof(Cmdline)-strlen(Cmdline)-1);
 		strncat(Cmdline, " ", sizeof(Cmdline)-strlen(Cmdline)-1);
 	}
 	//printf("%s\n", Cmdline);
-	
+
 	OnCygwinConnection(Temp, Cmdline);
-	
+
 	return 0;
 }
