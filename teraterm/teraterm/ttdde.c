@@ -742,7 +742,6 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		//MessageBox(NULL, "hoge", "foo", MB_OK);
 
 		if (func == NULL) {
-			h2 = LoadLibrary("ttxssh.dll");
 			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
 				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 				goto scp_send_error;
@@ -780,7 +779,6 @@ scp_send_error:
 		//MessageBox(NULL, "hoge", "foo", MB_OK);
 
 		if (func == NULL) {
-			h2 = LoadLibrary("ttxssh.dll");
 			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
 				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 				goto scp_rcv_error;

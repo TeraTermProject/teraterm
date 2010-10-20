@@ -1893,7 +1893,6 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 						char msg[128];
 
 						if (func == NULL) {
-							h2 = LoadLibrary("ttxssh.dll");
 							if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
 								_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 								goto scp_send_error;
