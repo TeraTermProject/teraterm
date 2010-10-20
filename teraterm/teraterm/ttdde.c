@@ -736,7 +736,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 		typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 		static PSSH_start_scp func = NULL;
-		static HMODULE h = NULL, h2 = NULL;
+		static HMODULE h = NULL;
 		char msg[128];
 
 		//MessageBox(NULL, "hoge", "foo", MB_OK);
@@ -764,7 +764,6 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 
 scp_send_error:
 		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-		FreeLibrary(h2);
 		return DDE_FNOTPROCESSED;
 		}
 		break;
@@ -773,7 +772,7 @@ scp_send_error:
 		{
 		typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 		static PSSH_start_scp func = NULL;
-		static HMODULE h = NULL, h2 = NULL;
+		static HMODULE h = NULL;
 		char msg[128];
 
 		//MessageBox(NULL, "hoge", "foo", MB_OK);
@@ -801,7 +800,6 @@ scp_send_error:
 
 scp_rcv_error:
 		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-		FreeLibrary(h2);
 		return DDE_FNOTPROCESSED;
 		}
 		break;

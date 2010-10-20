@@ -1889,7 +1889,7 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 					} else if (ret == IDNO) {   // SCP
 						typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 						static PSSH_start_scp func = NULL;
-						static HMODULE h = NULL, h2 = NULL;
+						static HMODULE h = NULL;
 						char msg[128];
 
 						if (func == NULL) {
@@ -1911,7 +1911,6 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 
 scp_send_error:
 						::MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-						FreeLibrary(h2);
 send_success:
 						FreeFileVar(&SendVar);  // ‰ð•ú‚ð–Y‚ê‚¸‚É
 
