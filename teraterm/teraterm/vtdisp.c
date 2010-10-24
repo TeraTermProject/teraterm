@@ -1139,6 +1139,7 @@ void BGDestruct(void)
 void BGInitialize(void)
 {
   char path[MAX_PATH],config_file[MAX_PATH],tempPath[MAX_PATH];
+  char msimg32_dll[MAX_PATH],user32_dll[MAX_PATH];
 
   // VTColor Çì«Ç›çûÇ›
   BGVTColor[0] = ts.VTColor[0];
@@ -1266,16 +1267,22 @@ void BGInitialize(void)
   BGPreloadSrc(&BGSrc2);
 
   // AlphaBlend ÇÃÉAÉhÉåÉXÇì«Ç›çûÇ›
-  if(BGUseAlphaBlendAPI)
-    (FARPROC)BGAlphaBlend = GetProcAddressWithDllName("msimg32.dll","AlphaBlend");
-  else
+  if(BGUseAlphaBlendAPI) {
+    GetSystemDirectory(msimg32_dll, sizeof(msimg32_dll));
+    strncat_s(msimg32_dll, sizeof(msimg32_dll), "\\msimg32.dll", _TRUNCATE);
+    (FARPROC)BGAlphaBlend = GetProcAddressWithDllName(msimg32_dll,"AlphaBlend");
+  }
+  else {
     BGAlphaBlend = NULL;
+  }
 
   if(!BGAlphaBlend)
     BGAlphaBlend = AlphaBlendWithoutAPI;
 
   //EnumDisplayMonitors ÇíTÇ∑
-  (FARPROC)BGEnumDisplayMonitors = GetProcAddressWithDllName("user32.dll","EnumDisplayMonitors");
+  GetSystemDirectory(user32_dll, sizeof(user32_dll));
+  strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
+  (FARPROC)BGEnumDisplayMonitors = GetProcAddressWithDllName(user32_dll,"EnumDisplayMonitors");
 }
 
 void BGExchangeColor() {

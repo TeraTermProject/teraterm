@@ -84,7 +84,11 @@ BOOL LoadWinsock()
 
   if (HWinsock == NULL)
   {
-    HWinsock = LoadLibrary("WSOCK32.DLL");
+    char wsock32_dll[MAX_PATH];
+
+    GetSystemDirectory(wsock32_dll, sizeof(wsock32_dll));
+    strncat_s(wsock32_dll, sizeof(wsock32_dll), "\\wsock32.dll", _TRUNCATE);
+    HWinsock = LoadLibrary(wsock32_dll);
     if (HWinsock == NULL) return FALSE;
 
     Err = FALSE;

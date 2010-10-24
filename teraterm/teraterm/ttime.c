@@ -52,9 +52,12 @@ BOOL LoadIME()
   PTTSet tempts;
 #endif
   char uimsg[MAX_UIMSG];
+  char imm32_dll[MAX_PATH];
 
   if (HIMEDLL != NULL) return TRUE;
-  HIMEDLL = LoadLibrary("IMM32.DLL");
+  GetSystemDirectory(imm32_dll, sizeof(imm32_dll));
+  strncat_s(imm32_dll, sizeof(imm32_dll), "\\imm32.dll", _TRUNCATE);
+  HIMEDLL = LoadLibrary(imm32_dll);
   if (HIMEDLL == NULL)
   {
     get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);

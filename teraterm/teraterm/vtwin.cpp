@@ -217,9 +217,12 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 	typedef BOOL (WINAPI *func)(HWND,COLORREF,BYTE,DWORD);
 	static HMODULE g_hmodUser32 = NULL;
 	static func g_pSetLayeredWindowAttributes = NULL;
+	char user32_dll[MAX_PATH];
 
+	GetSystemDirectory(user32_dll, sizeof(user32_dll));
+	strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
 	if (g_hmodUser32 == NULL) {
-		g_hmodUser32 = LoadLibrary("user32.dll");
+		g_hmodUser32 = LoadLibrary(user32_dll);
 		if (g_hmodUser32 == NULL) {
 			return FALSE;
 		}
@@ -351,10 +354,13 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	int frame;
 	char msg[3072], buf[256];
 	HMODULE h, h2;
+	char imagehlp_dll[MAX_PATH];
 
 	// Windows98/Me/NT4では動かないためスキップする。(2007.10.9 yutaka)
-	h2 = LoadLibrary("imagehlp.dll");
-	if (((h = GetModuleHandle("imagehlp.dll")) == NULL) ||
+	GetSystemDirectory(imagehlp_dll, sizeof(imagehlp_dll));
+	strncat_s(imagehlp_dll, sizeof(imagehlp_dll), "\\imagehlp.dll", _TRUNCATE);
+	h2 = LoadLibrary(imagehlp_dll);
+	if (((h = GetModuleHandle(imagehlp_dll)) == NULL) ||
 		(GetProcAddress(h, "SymGetLineFromAddr") == NULL)) {
 			FreeLibrary(h2);
 			goto error;

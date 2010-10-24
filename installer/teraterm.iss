@@ -363,21 +363,24 @@ end;
 
 procedure SetIniFile(iniFile: String);
 var
-  Language : String;
-  Locale   : String;
-  CodePage : integer;
-  VTFont   : String;
-  TEKFont  : String;
-  FileDir  : String;
-  TCPPort  : integer;
+  Language      : String;
+  Locale        : String;
+  CodePage      : integer;
+  VTFont        : String;
+  TEKFont       : String;
+  FileDir       : String;
+  TCPPort       : integer;
+  ViewlogEditor : String;
 
 begin
-  Language := GetIniString('Tera Term', 'Language', '', iniFile);
-  Locale   := GetIniString('Tera Term', 'Locale', '', iniFile);
-  CodePage := GetIniInt('Tera Term', 'CodePage', 0, 0, 0, iniFile);
-  VTFont   := GetIniString('Tera Term', 'VTFont', '', iniFile);
-  TEKFont  := GetIniString('Tera Term', 'TEKFont', '', iniFile);
-  FileDir  := GetIniString('Tera Term', 'FileDir', '', iniFile);
+  Language       := GetIniString('Tera Term', 'Language', '', iniFile);
+  Locale         := GetIniString('Tera Term', 'Locale', '', iniFile);
+  CodePage       := GetIniInt('Tera Term', 'CodePage', 0, 0, 0, iniFile);
+  VTFont         := GetIniString('Tera Term', 'VTFont', '', iniFile);
+  TEKFont        := GetIniString('Tera Term', 'TEKFont', '', iniFile);
+  FileDir        := GetIniString('Tera Term', 'FileDir', '', iniFile);
+  FileDir        := GetIniString('Tera Term', 'FileDir', '', iniFile);
+  ViewlogEditor  := GetIniString('Tera Term', 'ViewlogEditor', '', iniFile);
 
   case GetUILanguage and $3FF of
   $04: // Chinese
@@ -483,6 +486,11 @@ begin
       SetIniInt('Tera Term', 'TCPPort', 22, iniFile)
     else
       SetIniInt('Tera Term', 'TCPPort', 23, iniFile);
+  end;
+
+  if ViewlogEditor = 'notepad.exe' then begin
+    ViewlogEditor := ExpandConstant('{win}') + '\' + 'notepad.exe';
+    SetIniString('Tera Term', 'ViewlogEditor', ViewlogEditor, iniFile);
   end;
 
 end;
