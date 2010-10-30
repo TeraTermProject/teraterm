@@ -33,18 +33,29 @@
 
       <dt>New-line (receive)</dt>
       <dd>
-	CR を選択した場合、何も変換しません。<br>
-	CR+LF を選択した場合、受信された 改行文字 CR ($0D) を
-	CR+LF ($0D $0A)に変換します。<br>
-	LF を選択した場合、受信された 改行文字 LF ($0A) を
-	CR+LF ($0D $0A)に変換します。
+        <dl>
+          <dt>CR</dt>
+          <dd>何も変換しません。</dd>
+
+          <dt>CR+LF</dt>
+          <dd>受信された 改行文字 CR ($0D) を CR+LF ($0D $0A)に変換します。<br>
+              例) "CR LF" が受信された場合、"CR LF LF" に変換されます。</dd>
+
+          <dt>LF</dt>
+          <dd>受信された 改行文字 LF ($0A) を CR+LF ($0D $0A)に変換します。<br>
+              例) "CR CR LF" に変換されます。</dd>
+        </dl>
       </dd>
 
       <dt>New-line (transmit)</dt>
       <dd>
-	CR を選択した場合、何も変換しません。<br>
-	CR+LF を選択した場合、送信時に改行文字 CR ($0D) を
-	CR+LF ($0D $0A) に変換します。
+        <dl>
+          <dt>CR</dt>
+          <dd>何も変換しません。</dd>
+
+          <dt>CR+LF</dt>
+          <dd>送信時に改行文字 CR ($0D) を CR+LF ($0D $0A) に変換します。</dd>
+        </dl>
       </dd>
 
       <dt>Terminal ID</dt>
