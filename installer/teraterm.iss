@@ -702,7 +702,7 @@ Name: {app}\copyfont.bat; Type: files
 Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
 
-[_ISToolPreCompile]
+[InnoIDE_PreCompile]
 Name: makechm.bat
 ;Name: build.bat; Parameters: rebuild
 Name: build.bat
