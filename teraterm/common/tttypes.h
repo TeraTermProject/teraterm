@@ -910,7 +910,7 @@ typedef TComVar far *PComVar;
 #define ID_TRANSFER      9 // the position on [File] menu
 #define ID_SHOWMENUBAR   995
 
-#define MAXNWIN 50
+#define MAXNWIN 256
 #define MAXCOMPORT 4096
 #define MAXHOSTLIST 500
 
@@ -936,6 +936,9 @@ typedef TMap far *PMap;
 /*
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
+ *
+ * - At version 4.68, ttset_memfilemap was replaced with ttset_memfilemap_14.
+ *   increase WinList(MAXNWIN) size.
  *
  * - At version 4.67, ttset_memfilemap was replaced with ttset_memfilemap_13.
  *   added NextShownWin/PrevShownWin shortcut key.
@@ -1025,4 +1028,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_13"
+#define TT_FILEMAPNAME "ttset_memfilemap_14"

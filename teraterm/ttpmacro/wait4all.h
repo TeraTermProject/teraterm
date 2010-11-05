@@ -11,7 +11,7 @@ extern "C" {
 
 // TODO: ˆÈ‰º‚Ì’è‹`‚Í‹¤’Êƒwƒbƒ_‚©‚çinclude‚·‚×‚«
 #undef MAXNWIN
-#define MAXNWIN 50
+#define MAXNWIN 256
 #undef RingBufSize
 #define RingBufSize (4096*4)
 
