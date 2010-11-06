@@ -64,6 +64,7 @@ Source: release\random.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\screencapture.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\ssh2login.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\wait_regex.ttl; DestDir: {app}; Components: TeraTerm
+Source: release\lang\Default.lng; DestDir: {app}\lang; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: release\lang\Japanese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\German.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\French.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
@@ -473,7 +474,7 @@ begin
     3:
       SetIniString('Tera Term', 'UILanguageFile', 'lang\French.lng', iniFile);
     else
-      SetIniString('Tera Term', 'UILanguageFile', 'lang\English.lng', iniFile);
+      SetIniString('Tera Term', 'UILanguageFile', 'lang\Default.lng', iniFile);
   end;
 
   if Length(FileDir) = 0 then begin
