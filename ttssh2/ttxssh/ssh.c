@@ -1671,6 +1671,7 @@ static void init_protocol(PTInstVar pvar)
 		enque_handler(pvar, SSH2_MSG_USERAUTH_FAILURE, handle_SSH2_userauth_failure);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_BANNER, handle_SSH2_userauth_banner);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_INFO_REQUEST, handle_SSH2_userauth_inforeq);
+		enque_handler(pvar, SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ, handle_SSH2_userauth_passwd_changereq);
 
 		enque_handler(pvar, SSH2_MSG_UNIMPLEMENTED, handle_unimplemented);
 
@@ -6922,6 +6923,14 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_BANNER);
 	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);  // support for authorized_keys command (2006.2.23 yutaka)
 
+	// XXX: パスワード変更対応。
+	// ただし、OpenSSHやOpenSolaris(SSH-2.0-Sun_SSH_1.3)では、このメッセージを送ってこないため、
+	// 未評価。ゆえに、実装はしたが、開放はしない。
+	// (2010.11.11 yutaka)
+#if 0
+	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ);
+#endif
+
 	return do_SSH2_authrequest(pvar);
 }
 
@@ -7472,6 +7481,8 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		buffer_t *msg;
 		unsigned char *outmsg;
 		int i;
+		char *name, *inst, *lang;
+		char lprompt[512];
 
 		notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.", LOG_LEVEL_VERBOSE);
 
@@ -7484,22 +7495,21 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		///////// step1
 		// get string
-		slen = get_uint32_MSBfirst(data);
-		data += 4;
-		s = data;  // name
-		data += slen;
-
-		// get string
-		slen = get_uint32_MSBfirst(data);
-		data += 4;
-		s = data;  // instruction
-		data += slen;
-
-		// get string
-		slen = get_uint32_MSBfirst(data);
-		data += 4;
-		s = data;  // language tag
-		data += slen;
+		name = buffer_get_string(&data, NULL);
+		inst = buffer_get_string(&data, NULL);
+		lang = buffer_get_string(&data, NULL);
+		lprompt[0] = 0;
+		if (strlen(inst) > 0) {
+			strncat_s(lprompt, sizeof(lprompt), inst, _TRUNCATE);
+			strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
+		}
+		if (strlen(lang) > 0) {
+			strncat_s(lprompt, sizeof(lprompt), lang, _TRUNCATE);
+			strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
+		}
+		free(name);
+		free(inst);
+		free(lang);
 
 		// num-prompts
 		num = get_uint32_MSBfirst(data);
@@ -7513,6 +7523,12 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 			return FALSE;
 		}
 		buffer_put_int(msg, num);
+
+		// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
+		if (num == 0) {
+			if (strlen(lprompt) > 0) 
+				MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
+		}
 
 		// プロンプトの数だけ prompt & echo が繰り返される。
 		for (i = 0 ; i < num ; i++) {
@@ -7540,6 +7556,9 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 			// TODO: ここでプロンプトを表示してユーザから入力させるのが正解。
 			s = pvar->auth_state.cur_cred.password;
 			buffer_put_string(msg, s, strlen(s));
+
+			// リトライに対応できるよう、フラグをクリアする。(2010.11.11 yutaka)
+			pvar->keyboard_interactive_password_input = 0;
 		}
 
 		len = buffer_len(msg);
@@ -7652,6 +7671,107 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		pvar->pageant_keyfinal = TRUE;
 	}
+
+	return TRUE;
+}
+
+#define PASSWD_MAXLEN 150
+
+struct change_password {
+	char passwd[PASSWD_MAXLEN];
+	char new_passwd[PASSWD_MAXLEN];
+};
+
+static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	char retype_passwd[PASSWD_MAXLEN];
+	struct change_password *cp = (struct change_password *)lParam;
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+			SendMessage(GetDlgItem(dlg, IDC_PASSWD), WM_GETTEXT , sizeof(cp->passwd), (LPARAM)cp->passwd);
+			SendMessage(GetDlgItem(dlg, IDC_NEW_PASSWD), WM_GETTEXT , sizeof(cp->new_passwd), (LPARAM)cp->new_passwd);
+			SendMessage(GetDlgItem(dlg, IDC_CONFIRM_PASSWD), WM_GETTEXT , sizeof(retype_passwd), (LPARAM)retype_passwd);
+
+			if (strcmp(cp->new_passwd, retype_passwd) == 0) {
+				EndDialog(dlg, 1); // dialog close
+				return TRUE;
+			} 
+			MessageBox(NULL, "Mismatch; try again.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+			return FALSE;
+
+		case IDCANCEL:
+			EndDialog(dlg, 0); // dialog close
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
+{
+	int len;
+	char *data;
+	buffer_t *msg = NULL;
+	char *s, *username;
+	unsigned char *outmsg;
+	char *connect_id = "ssh-connection";
+	char *info, *lang;
+	char buf[128];
+	struct change_password cp;
+
+	notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ was received.", LOG_LEVEL_VERBOSE);
+
+	DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
+
+	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	data = pvar->ssh_state.payload;
+	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
+	len = pvar->ssh_state.payloadlen;
+
+	info = buffer_get_string(&data, NULL);
+	lang = buffer_get_string(&data, NULL);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s: info %s lang %s\n", __FUNCTION__, info, lang);
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+	free(info);
+	free(lang);
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		return FALSE;
+	}
+
+	// ペイロードの構築
+	username = pvar->auth_state.user;  // ユーザ名
+	buffer_put_string(msg, username, strlen(username));
+
+	// password authentication method
+	s = connect_id;
+	buffer_put_string(msg, s, strlen(s));
+	s = "password";
+	buffer_put_string(msg, s, strlen(s));
+
+	buffer_put_char(msg, 1); // additional info
+
+	s = cp.passwd;
+	buffer_put_string(msg, s, strlen(s));
+
+	s = cp.new_passwd;
+	buffer_put_string(msg, s, strlen(s));
+
+	// パケット送信
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_REQUEST, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+	buffer_free(msg);
 
 	return TRUE;
 }

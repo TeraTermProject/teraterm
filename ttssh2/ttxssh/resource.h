@@ -13,6 +13,7 @@
 #define IDD_SSHSCP                      105
 #define IDD_SSHAUTH                     106
 #define IDD_SSHSCP_PROGRESS             107
+#define IDD_SSHPASSWD_INPUT             108
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDD_SSHDIFFERENTHOST            601
@@ -96,6 +97,7 @@
 #define IDC_EDIT1                       1069
 #define IDC_FINGER_PRINT                1069
 #define IDC_SENDFILE_EDIT               1069
+#define IDC_PASSWD                      1069
 #define IDC_STATIC1                     1070
 #define IDC_COMPRESSLABEL               1070
 #define IDC_SSHVERSIONS                 1070
@@ -146,6 +148,7 @@
 #define IDC_HOSTRSAFILENAME             1103
 #define IDC_EDIT3                       1103
 #define IDC_FP_RANDOMART                1103
+#define IDC_CONFIRM_PASSWD              1103
 #define IDC_TTSSH_ICON                  1104
 #define IDC_KEYBITS_LABEL               1105
 #define IDC_KEYBITS                     1106
@@ -158,14 +161,16 @@
 #define IDC_SSHUSEPAGEANT               1205
 #define IDC_SSHUSETIS2                  1206
 #define IDC_REMEMBERPASSWORD            1207
+#define IDC_EDIT2                       1208
+#define IDC_NEW_PASSWD                  1208
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        108
+#define _APS_NEXT_RESOURCE_VALUE        109
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1208
+#define _APS_NEXT_CONTROL_VALUE         1209
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

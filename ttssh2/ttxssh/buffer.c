@@ -119,12 +119,13 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 {
 	char *data = *data_ptr;
 	char *ptr;
-	int buflen;
+	unsigned int buflen;
 
 	buflen = get_uint32_MSBfirst(data);
 	data += 4;
-	if (buflen <= 0)
-		return NULL;
+	// buflen == 0の場合でも、'\0'分は確保し、data_ptrを進め、リターンする。
+//	if (buflen <= 0)
+//		return NULL;
 
 	ptr = malloc(buflen + 1);
 	if (ptr == NULL) {

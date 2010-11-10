@@ -550,6 +550,7 @@ void ssh_heartbeat_unlock(void);
 void halt_ssh_heartbeat_thread(PTInstVar pvar);
 void ssh2_channel_free(void);
 BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar);
+BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar);
 void SSH2_update_compression_myproposal(PTInstVar pvar);
 void SSH2_update_cipher_myproposal(PTInstVar pvar);
 
