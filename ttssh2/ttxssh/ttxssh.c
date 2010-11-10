@@ -1529,6 +1529,19 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 				read_ssh_options_from_user_file(pvar, option + 13);
 				DeleteFile(option + 13);
 
+			} else if (MATCH_STR(option + 4, "-C=") == 0) {
+				pvar->settings.CompressionLevel = atoi(option+7);
+				if (pvar->settings.CompressionLevel < 0) {
+					pvar->settings.CompressionLevel = 0;
+				}
+				else if (pvar->settings.CompressionLevel > 9) {
+					pvar->settings.CompressionLevel = 9;
+				}
+			} else if (MATCH_STR(option + 4, "-C") == 0) {
+				pvar->settings.CompressionLevel = 6;
+			} else if (MATCH_STR(option + 4, "-c") == 0) {
+				pvar->settings.CompressionLevel = 0;
+
 			// /ssh1 と /ssh2 オプションの新規追加 (2006.9.16 maya)
 			} else if (MATCH_STR(option + 4, "1") == 0) {
 				pvar->settings.Enabled = 1;
