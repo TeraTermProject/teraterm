@@ -13,58 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ì˙ñ{åÍ resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_SSHPASSWD_INPUT DIALOGEX 0, 0, 231, 95
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "TTSSH: Password Authentication"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,174,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,174,24,50,14
-    LTEXT           "Password",IDC_STATIC,34,9,32,8
-    EDITTEXT        IDC_PASSWD,67,9,98,14,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "New Password",IDC_STATIC,17,33,48,8
-    EDITTEXT        IDC_NEW_PASSWD,67,31,97,14,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "Confirm Password",IDC_STATIC,7,58,59,8
-    EDITTEXT        IDC_CONFIRM_PASSWD,67,56,99,14,ES_PASSWORD | ES_AUTOHSCROLL
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_SSHPASSWD_INPUT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 224
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 88
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-#endif    // ì˙ñ{åÍ resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -393,6 +341,21 @@ BEGIN
     LTEXT           "Filename:",IDC_FN_STATIC,7,7,32,8
 END
 
+IDD_SSHPASSWD_INPUT DIALOGEX 0, 0, 231, 95
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "TTSSH: Password Authentication"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,174,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,174,24,50,14
+    LTEXT           "Password",IDC_STATIC,34,9,32,8
+    EDITTEXT        IDC_PASSWD,67,9,98,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "New Password",IDC_STATIC,17,33,48,8
+    EDITTEXT        IDC_NEW_PASSWD,67,31,97,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "Confirm Password",IDC_STATIC,7,58,59,8
+    EDITTEXT        IDC_CONFIRM_PASSWD,67,56,99,14,ES_PASSWORD | ES_AUTOHSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -500,6 +463,14 @@ BEGIN
         RIGHTMARGIN, 159
         TOPMARGIN, 7
         BOTTOMMARGIN, 75
+    END
+
+    IDD_SSHPASSWD_INPUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 224
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
     END
 END
 #endif    // APSTUDIO_INVOKED
