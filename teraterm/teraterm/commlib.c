@@ -19,11 +19,12 @@
 #ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <stdio.h> /* for _snprintf() */
 #endif /* NO_INET6 */
+#include <stdio.h> /* for _snprintf() */
 #include <time.h>
 #include <locale.h>
 
+#ifndef NO_INET6
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
 static int CloseSocket(SOCKET);
@@ -73,6 +74,7 @@ static int CloseSocket(SOCKET s)
 {
 	return Pclosesocket(s);
 }
+#endif /* NO_INET6 */
 
 #define CommInQueSize 8192
 #define CommOutQueSize 2048
@@ -440,18 +442,22 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 	if (InvalidHost)
 	{
-	  if (cv->NoMsg==0)
-	    MessageBox(cv->HWin,"Invalid host",ErrorCaption,
-	      MB_TASKMODAL | MB_ICONEXCLAMATION);
+	  if (cv->NoMsg==0) {
+	    get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
+	    get_lang_msg("MSG_INVALID_HOST_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Invalid host", ts->UILanguageFile);
+	    MessageBox(cv->HWin, ts->UIMsg, uimsg, MB_TASKMODAL | MB_ICONEXCLAMATION);
+	  }
 	}
 	else {
 	  cv->s= Psocket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 	  if (cv->s==INVALID_SOCKET)
 	  {
 	    InvalidHost = TRUE;
-	    if (cv->NoMsg==0)
-	      MessageBox(cv->HWin,ErrorCantConn,ErrorCaption,
-		MB_TASKMODAL | MB_ICONEXCLAMATION);
+	    if (cv->NoMsg==0) {
+	      get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
+	      get_lang_msg("MSG_COMM_TIMEOUT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot connect the host", ts->UILanguageFile);
+	      MessageBox(cv->HWin, ts->UIMsg, uimsg, MB_TASKMODAL | MB_ICONEXCLAMATION);
+	    }
 	  }
 	  else {
 	    BBuf = TRUE;
@@ -648,9 +654,10 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 					return;
 				}
 #else
-	if (cv->NoMsg==0)
-	  MessageBox(cv->HWin,ErrMsg,ErrorCaption,
-	    MB_TASKMODAL | MB_ICONEXCLAMATION);
+	if (cv->NoMsg==0) {
+	  get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
+	  MessageBox(cv->HWin, ErrMsg, uimsg, MB_TASKMODAL | MB_ICONEXCLAMATION);
+	}
 	PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 	return;
 #endif /* NO_INET6 */
