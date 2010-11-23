@@ -390,6 +390,32 @@ void SendOSCstr(char *str, int len) {
 
 }
 
+void SendDCSstr(char *str, int len) {
+	int l;
+
+	if (str == NULL || len < 0)
+		return;
+
+	if (len == 0) {
+		l = strlen(str);
+	}
+	else {
+		l = len;
+	}
+
+	if (Send8BitMode) {
+		CommBinaryOut(&cv,"\220", 1);
+		CommBinaryOut(&cv, str, l);
+		CommBinaryOut(&cv,"\234", 1);
+	}
+	else {
+		CommBinaryOut(&cv,"\033P", 2);
+		CommBinaryOut(&cv, str, l);
+		CommBinaryOut(&cv,"\033\\", 2);
+	}
+
+}
+
 void BackSpace()
 {
   if (CursorX == 0)
@@ -2084,6 +2110,17 @@ void CSSetAttr()		// SGR
     }
   }
 
+  void CSEQ(BYTE b)
+  {
+    switch (b) {
+      case 'c': /* Tertiary terminal report (Tertiary DA) */
+	if (Param[1] < 1) {
+	  SendDCSstr("!|FFFFFFFF", 0);
+	}
+	break;
+    }
+  }
+
   void CSGT(BYTE b)
   {
     switch (b) {
@@ -2798,6 +2835,8 @@ void ParseCS(BYTE b) /* b is the final char */
 	    case 'u': RestoreCursor(); break;           // RCP (Restore cursor (ANSI.SYS/SCO))
 	  } /* of case Prv=0 */
 	  break;
+	/* private parameter = '=' */
+	case '=': CSEQ(b); break;
 	/* private parameter = '>' */
 	case '>': CSGT(b); break;
 	/* private parameter = '?' */
