@@ -49,7 +49,7 @@ typedef HANDLE (PASCAL FAR *TWSAAsyncGetHostByName)
   (HWND hWnd, u_int wMsg, const char FAR * name, char FAR * buf, int buflen);
 typedef int (PASCAL FAR *TWSACancelAsyncRequest)(HANDLE hAsyncTaskHandle);
 typedef int (PASCAL FAR *TWSAGetLastError)(void);
-typedef HANDLE (__cdecl *TWSAAsyncGetAddrInfo)
+typedef HANDLE (PASCAL FAR *TWSAAsyncGetAddrInfo)
   (HWND hWnd, unsigned int wMsg, const char FAR * hostname,
    const char FAR * portname, struct addrinfo FAR * hints,
    struct addrinfo FAR * FAR * res);

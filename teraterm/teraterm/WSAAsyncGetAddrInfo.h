@@ -19,7 +19,7 @@ struct getaddrinfo_args {
   HANDLE FAR * lpHandle;
 };
 
-HANDLE WSAAsyncGetAddrInfo(HWND hWnd,
+HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd,
 			   unsigned int wMsg,
 			   const char FAR * hostname,
 			   const char FAR * portname,

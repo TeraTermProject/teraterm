@@ -10,7 +10,7 @@
 
 static unsigned __stdcall getaddrinfo_thread(void FAR * p);
 
-HANDLE WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
+HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
                            const char FAR * hostname,
                            const char FAR * portname,
                            struct addrinfo FAR * hints,
