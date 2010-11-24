@@ -53,6 +53,8 @@ typedef HANDLE (PASCAL FAR *TWSAAsyncGetAddrInfo)
   (HWND hWnd, unsigned int wMsg, const char FAR * hostname,
    const char FAR * portname, struct addrinfo FAR * hints,
    struct addrinfo FAR * FAR * res);
+// typedef int (PASCAL FAR *Tgetaddrinfo)(const char *name, const char *port, const struct addrinfo *hints, struct addrinfo **res);
+typedef void (PASCAL FAR *Tfreeaddrinfo)(struct addrinfo *ai);
 
 BOOL LoadWinsock();
 void FreeWinsock();
@@ -76,6 +78,8 @@ extern TWSAGetLastError PWSAGetLastError;
 extern TWSAStartup PWSAStartup;
 extern TWSACleanup PWSACleanup;
 extern TWSAAsyncGetAddrInfo PWSAAsyncGetAddrInfo;
+// extern Tgetaddrinfo Pgetaddrinfo;
+extern Tfreeaddrinfo Pfreeaddrinfo;
 
 #ifdef __cplusplus
 }

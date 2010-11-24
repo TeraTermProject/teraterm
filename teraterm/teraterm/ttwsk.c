@@ -30,6 +30,8 @@ TWSACancelAsyncRequest PWSACancelAsyncRequest;
 TWSAGetLastError PWSAGetLastError;
 TWSAStartup PWSAStartup;
 TWSACleanup PWSACleanup;
+// Tgetaddrinfo Pgetaddrinfo;
+Tfreeaddrinfo Pfreeaddrinfo;
 TWSAAsyncGetAddrInfo PWSAAsyncGetAddrInfo;
 
 void CheckWinsock()
@@ -151,6 +153,10 @@ BOOL LoadWinsock()
     if (PWSACleanup==NULL) Err = TRUE;
 
 #ifndef NO_INET6
+//    Pgetaddrinfo = (Tgetaddrinfo)GetProcAddress(HWinsock, "getaddrinfo");
+//    if (Pgetaddrinfo==NULL) Err = TRUE;
+
+    Pfreeaddrinfo = freeaddrinfo;
     PWSAAsyncGetAddrInfo = WSAAsyncGetAddrInfo;
 #endif /* NO_INET6 */
 

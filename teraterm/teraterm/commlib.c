@@ -742,7 +742,7 @@ void CommClose(PComVar cv)
 			}
 			HAsync = 0;
 #ifndef NO_INET6
-			freeaddrinfo(cv->res0);
+			Pfreeaddrinfo(cv->res0);
 #endif /* NO_INET6 */
 			if ( cv->s!=INVALID_SOCKET ) {
 				Pclosesocket(cv->s);

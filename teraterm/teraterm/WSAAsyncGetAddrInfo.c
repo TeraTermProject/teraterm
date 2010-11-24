@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <process.h>
 #include "WSAASyncGetAddrInfo.h"
+#include "ttwsk.h"
 
 static unsigned __stdcall getaddrinfo_thread(void FAR * p);
 
@@ -74,6 +75,7 @@ static unsigned __stdcall getaddrinfo_thread(void FAR * p)
 	res = ga->res;
 
 	/* call getaddrinfo */
+//	gai = Pgetaddrinfo(hostname, portname, hints, res);
 	gai = getaddrinfo(hostname, portname, hints, res);
 
 	/* send value of gai as message to window hWnd */
