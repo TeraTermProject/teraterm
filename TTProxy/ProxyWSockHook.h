@@ -2059,8 +2059,8 @@ private:                                                   \
             type = ProxyInfo::getTypeName(defaultProxy.type);
             host = defaultProxy.host;
             if (defaultProxy.port != 0) {
-                char* buffer = (char*) alloca(5);
-                _itoa_s(defaultProxy.port, buffer, 5, 10);
+                char* buffer = (char*) alloca(6);
+                _itoa_s(defaultProxy.port, buffer, 6, 10);
                 port = buffer;
             }
             if (defaultProxy.user != NULL) {
