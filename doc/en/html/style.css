@@ -144,3 +144,7 @@ td code.syntax {
 th + th, th + td, td + td {
 	padding-left: 2em;
 }
+
+table[border] th, table[border] td {
+	padding: 0 0.5em;
+}
