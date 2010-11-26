@@ -269,7 +269,13 @@
 </td></tr>
 <tr><td>CSI u</td>	<td>RCP</td>	<td>保存したカーソル位置を復元する。</td></tr>
 
-<tr><td>CSI > c</td>	<td>Secondary DA</td>	<td>第二端末特性報告。省略時の <i>Ps</i> の値は 0。
+<tr><td>CSI = <i>Ps</i> c</td>	<td>DA3 (Tertiary DA)</td>	<td>第三端末特性報告。省略時の <i>Ps</i> の値は 0。
+<pre>
+応答: DCS ! | FFFFFFFF ST
+</pre>
+</td></tr>
+
+<tr><td>CSI > c</td>	<td>DA2 (Secondary DA)</td>	<td>第二端末特性報告。省略時の <i>Ps</i> の値は 0。
 <pre>
 <i>Ps</i> = 0    第二端末特性要求
 応答: CSI > 32 ; 100 ; 2 c
@@ -335,13 +341,14 @@ Ps4   filter rectangle の右辺
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td>端末動作モード設定
 <pre>
-<i>Ps1</i> = 61    VT100 mode
-    = 62    VT200 mode
-    = 63    VT300 mode
-    = 64    VT400 mode
+<i>Ps1</i> = 61    VT-Level 1 (VT100モード)
+    = 62    VT-Level 2 (VT200モード)
+    = 63    VT-Level 3 (VT300モード)
+    = 64    VT-Level 4 (VT400モード)
+    = 65    VT-Level 5 (VT500モード)
 
-<i>Ps2</i> = 0    7 bit mode (S7C1T)
-    = 1    8 bit mode (S8C1T)
+<i>Ps2</i> = 0    7 bit モード (S7C1T)
+    = 1    8 bit モード (S8C1T)
 </pre></td>
 </tr>
 
