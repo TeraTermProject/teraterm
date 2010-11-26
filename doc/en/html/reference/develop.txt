@@ -16,7 +16,7 @@
 
 * Libraries
 - Oniguruma 5.9.2 (http://www.geocities.jp/kosako3/oniguruma/)
-- OpenSSL 1.0.0a (http://www.openssl.org/)
+- OpenSSL 1.0.0b (http://www.openssl.org/)
 - zlib 1.2.5 (http://www.zlib.net/)
 - PuTTY 0.60 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
