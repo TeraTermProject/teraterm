@@ -134,41 +134,41 @@
 <h2><a name="CSI">CSI Sequence</a></h2>
 <table border="1">
 <tr><th>Sequence</th>		<th>Mnemonic</th>	<th>Description</th></tr>
-<tr><td>CSI <i>Ps</i> @</td>	<td>ICH</td>	<td>カーソル位置に <i>Ps</i> 個空白を挿入する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> A</td>	<td>CUU</td>	<td>カーソルを <i>Ps</i> 行上に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> B</td>	<td>CUD</td>	<td>カーソルを <i>Ps</i> 行下に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> C</td>	<td>CUF</td>	<td>カーソルを <i>Ps</i> 桁右に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> D</td>	<td>CUB</td>	<td>カーソルを <i>Ps</i> 桁左に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> E</td>	<td>CNL</td>	<td>カーソルを <i>Ps</i> 行下の 1 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> F</td>	<td>CPL</td>	<td>カーソルを <i>Ps</i> 行上の 1 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> G</td>	<td>CHA</td>	<td>カーソルを現在の行の <i>Ps</i> 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td>カーソルを <i>Ps1</i> 行目の <i>Ps2</i> 桁目に移動する。<i>Ps1</i>, <i>Ps2</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td>カーソルを <i>Ps</i> 個後ろのタブストップに移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>画面消去。<i>Ps</i>の省略時の値は 0。<pre>
-<i>Ps</i> = 0    カーソル位置から画面末尾までを消去する。
-   = 1    画面戦闘からカーソル位置までを消去する。
-   = 2    画面全体を消去する。
+<tr><td>CSI <i>Ps</i> @</td>	<td>ICH</td>	<td> Insert <i>Ps</i> space (SP) characters starting at the cursor position. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> A</td>	<td>CUU</td>	<td> Moves cursor up <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> B</td>	<td>CUD</td>	<td> Moves cursor down <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> C</td>	<td>CUF</td>	<td> Moves cursor to the right <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> D</td>	<td>CUB</td>	<td> Moves cursor to the left <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> E</td>	<td>CNL</td>	<td> Moves cursor to the first column of <i>Ps</i>-th following line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> F</td>	<td>CPL</td>	<td> Moves cursor to the first column of <i>Ps</i>-th preceding line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> G</td>	<td>CHA</td>	<td> Moves cursor to the <i>Ps</i>-th column of the active line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td> Moves cursor to the <i>Ps</i> tabs forward. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>Erase in display. The default value of <i>Ps</i> is 0. <pre>
+<i>Ps</i> = 0    Erase from cursor through the end of the display.
+   = 1    Erase from the beginning of the display through the cursor.
+   = 2    Erase the complete of display.
 </pre></td></tr>
-<tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>行消去。<i>Ps</i> の省略時の値は 0。
+<tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>Erase in Line. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    カーソル位置から行末までを消去する。
-   = 1    行頭からカーソル位置までを消去する。
-   = 2    行全体を消去する。
+<i>Ps</i> = 0    Erase from the cursor through the end of the line.
+   = 1    Erase from the beginning of the line through the cursor.
+   = 2    Erase the complete of line.
 </pre>
 </td></tr>
-<tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td>カーソルのある行の前に <i>Ps</i> 行空行を挿入する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> M</td>	<td>DL</td>	<td>カーソルのある行から <i>Ps</i> 行を削除する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> P</td>	<td>DCH</td>	<td>カーソル位置の文字を <i>Ps</i> 文字削除する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> S</td>	<td>SU</td>	<td>画面を <i>Ps</i> 行上にスクロールする。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> T</td>	<td>SD</td>	<td>画面を <i>Ps</i> 行下にスクロールする。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> X</td>	<td>ECH</td>	<td>カーソル位置から <i>Ps</i> 文字を消す(空白にする)。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> Z</td>	<td>CBT</td>	<td>カーソルを <i>Ps</i> 個前のタブストップに移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> `</td>	<td>HPA</td>	<td>カーソルを現在の行の <i>Ps</i> 桁目に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> a</td>	<td>HPR</td>	<td>カーソルを <i>Ps</i> 桁右に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> c</td>	<td>DA</td>	<td>端末特性報告。省略時の <i>Ps</i> の値は 0。
+<tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td> Inserts <i>Ps</i> lines, stgarting at the cursor. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> M</td>	<td>DL</td>	<td> Deletes <i>Ps</i> lines in the scrolling region, starting with the line that has the cursor. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> P</td>	<td>DCH</td>	<td> Deletes <i>Ps</i> characters from the cursor position to the right. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> S</td>	<td>SU</td>	<td> Scroll up <i>Ps</i> lines. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> T</td>	<td>SD</td>	<td> Scroll down <i>Ps</i> lines. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> X</td>	<td>ECH</td>	<td> Erase <i>Ps</i> characters, from the cursor position to the right. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> Z</td>	<td>CBT</td>	<td> Moves cursor to the <i>Ps</i> tabs backward. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> `</td>	<td>HPA</td>	<td> Moves cursor to the <i>Ps</i>-th column of the active line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> a</td>	<td>HPR</td>	<td> Moves cursor to the right <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> c</td>	<td>DA</td>	<td> Primary Device Attribute. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    端末特性を要求する。
-応答: 端末IDの設定により異なる。
+<i>Ps</i> = 0    Asks for the terminal's architectural class and basic attributes.
+Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal ID</a> setting.
   VT100     ESC [ 1 ; 2 c
   VT100J    ESC [ 5 ; 2 c
   VT101     ESC [ 1 ; 0 c
@@ -183,26 +183,26 @@
   VT525     CSI 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
 </pre>
 </td></tr>
-<tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td>カーソルを桁位置を変えずに <i>Ps</i> 行目に移動する。<i>Ps</i> の省略時の値は 1。</tr>
-<tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td>カーソルを <i>Ps</i> 行下に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> f</td>	<td>HVP</td>	<td>カーソルを <i>Ps1</i> 行目の <i>Ps2</i> 桁目に移動する。<i>Ps1</i>, <i>Ps2</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> g</td>	<td>TBC</td>	<td>タブストップの削除。<i>Ps</i> の省略時の値は 0。
+<tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td> Move to the corresponding vertical position (line <i>Ps</i>) of the current column. The default value of <i>Ps</i> is 1. </tr>
+<tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td> Moves cursor down <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> f</td>	<td>HVP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> g</td>	<td>TBC</td>	<td> Clears the tab stop. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    カーソル位置のタブストップを削除する。
-   = 3    すべてのタブストップを削除する。
+<i>Ps</i> = 0    Clears the tab stop at the cursor.
+   = 3    Clears all tab stops.
 </pre></td>
 </tr>
-<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td>モードを設定する。(<a href="#mode">モード</a>を参照)</td></tr>
-<tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td>印刷モード
+<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets ANSI mode. (Refer to <a href="#mode">Modes (ANSI)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td> Printing mode.
 <pre>
-<i>Ps</i> = 0    画面を印刷する。
-   = 4    プリンタコントローラモードを無効にする。
-   = 5    プリンタコントローラモードを有効にする。
+<i>Ps</i> = 0    Print screen.
+   = 4    Turn off printer controller mode.
+   = 5    Turn on printer controller mode.
 </pre>
 </td></tr>
 <tr><td>CSI <i>Ps</i> j</td>	<td>HPB</td>	<td>カーソルを <i>Ps</i> 桁左に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
 <tr><td>CSI <i>Ps</i> k</td>	<td>VPB</td>	<td>カーソルを <i>Ps</i> 行上に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td>モードを解除する。(<a href="#mode">モード</a>を参照)</td></tr>
+<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td> Resets ANSI mode. (Refer to <a href="#mode">Modes (ANSI)</a>)</td></tr>
 <tr><td>CSI <i>Pm</i> m</td>	<td>SGR</td>	<td>文字属性を設定する。省略時の <i>Pm</i> の値は 0。(<a href="#charattr">文字属性</a>を参照)
 </td></tr>
 <tr><td>CSI <i>Ps</i> n</td>	<td>DSR</td>	<td>端末の状態を報告する。
