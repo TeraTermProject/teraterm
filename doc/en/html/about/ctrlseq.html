@@ -55,19 +55,19 @@
 <tr><td>0x81</td>	<td> </td>	<td> HOP </td>	<td></td></tr>
 <tr><td>0x82</td>	<td> </td>	<td> BPH </td>	<td></td></tr>
 <tr><td>0x83</td>	<td> </td>	<td> NBH </td>	<td></td></tr>
-<tr><td>0x84</td>	<td> ESC D </td>	<td> IND </td>	<td> ƒJ[ƒ\ƒ‹‚ğˆês‰º‚ÉˆÚ“® </td></tr>
-<tr><td>0x85</td>	<td> ESC E </td>	<td> NEL </td>	<td> ƒJ[ƒ\ƒ‹‚ğŸ‚Ìs‚Ìæ“ª‚ÉˆÚ“® </td></tr>
+<tr><td>0x84</td>	<td> ESC D </td>	<td> IND </td>	<td> Moves the cursor down one line in the same column. </td></tr>
+<tr><td>0x85</td>	<td> ESC E </td>	<td> NEL </td>	<td> Moves the cursor to the first position on the next line. </td></tr>
 <tr><td>0x86</td>	<td> </td>	<td> SSA </td>	<td></td></tr>
 <tr><td>0x87</td>	<td> </td>	<td> ESA </td>	<td></td></tr>
-<tr><td>0x88</td>	<td> ESC H </td>	<td> HTS </td>	<td> ƒJ[ƒ\ƒ‹ˆÊ’u‚Éƒ^ƒuƒXƒgƒbƒv‚ğİ’è‚·‚é </td></tr>
+<tr><td>0x88</td>	<td> ESC H </td>	<td> HTS </td>	<td> Sets a horizontal tab stop at the column where the cursor is. </td></tr>
 <tr><td>0x89</td>	<td> </td>	<td> HTJ </td>	<td></td></tr>
 <tr><td>0x8a</td>	<td> </td>	<td> VTS </td>	<td></td></tr>
 <tr><td>0x8b</td>	<td> </td>	<td> PLD </td>	<td></td></tr>
 <tr><td>0x8c</td>	<td> </td>	<td> PLU </td>	<td></td></tr>
-<tr><td>0x8d</td>	<td> ESC M </td>	<td> RI  </td>	<td>ƒJ[ƒ\ƒ‹‚ğˆêsã‚ÉˆÚ“® </td></tr>
-<tr><td>0x8e</td>	<td> ESC N </td>	<td> SS2 </td>	<td> GL ‚Ö G2 ‚ğŸ‚Ìˆê•¶š‚ÉŒÀ‚èŒÄ‚Ño‚· </td></tr>
-<tr><td>0x8f</td>	<td> ESC O </td>	<td> SS3 </td>	<td> GL ‚Ö G3 ‚ğŸ‚Ìˆê•¶š‚ÉŒÀ‚èŒÄ‚Ño‚· </td></tr>
-<tr><td>0x90</td>	<td> ESC P </td>	<td> DCS </td>	<td>Device Control Sequence (<a href="#DCS">DCSƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
+<tr><td>0x8d</td>	<td> ESC M </td>	<td> RI  </td>	<td> Moves the cursor up one line in the same column. </td></tr>
+<tr><td>0x8e</td>	<td> ESC N </td>	<td> SS2 </td>	<td> Temporarily maps the G2 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>0x8f</td>	<td> ESC O </td>	<td> SS3 </td>	<td> Temporarily maps the G3 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>0x90</td>	<td> ESC P </td>	<td> DCS </td>	<td> Device Control String. Introduces a <a href="#DCS">DCS Sequence</a>. </td></tr>
 <tr><td>0x91</td>	<td> </td>	<td> PU1 </td>	<td></td></tr>
 <tr><td>0x92</td>	<td> </td>	<td> PU2 </td>	<td></td></tr>
 <tr><td>0x93</td>	<td> </td>	<td> STS </td>	<td></td></tr>
@@ -75,58 +75,63 @@
 <tr><td>0x95</td>	<td> </td>	<td> MW  </td>	<td></td></tr>
 <tr><td>0x96</td>	<td> </td>	<td> SPA </td>	<td></td></tr>
 <tr><td>0x97</td>	<td> </td>	<td> EPA </td>	<td></td></tr>
-<tr><td>0x98</td>	<td> ESC X </td>	<td> SOS </td>	<td>•¶š—ñŠJn (<a href="#SOS">SOSƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
+<tr><td>0x98</td>	<td> ESC X </td>	<td> SOS </td>	<td> Start of string. Introduces a <a href="#SOS">SOS Sequence</a>. </td></tr>
 <tr><td>0x99</td>	<td> </td>	<td> SGCI </td>	<td></td></tr>
 <tr><td>0x9a</td>	<td> </td>	<td> SCI </td>	<td></td></tr>
-<tr><td>0x9b</td>	<td> ESC [ </td>	<td> CSI </td>	<td>CSIƒV[ƒPƒ“ƒX‚ğŠJn (<a href="#CSI">CSIƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>0x9c</td>	<td> ESC \ </td>	<td> ST  </td>	<td>•¶š—ñI’[BDCS, SOS, OSC, PM, APC ƒV[ƒPƒ“ƒX‚ÌI’[B</td></tr>
-<tr><td>0x9d</td>	<td> ESC ] </td>	<td> OSC </td>	<td>Operating System Command (<a href="#OSC">OSCƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>0x9e</td>	<td> ESC ^ </td>	<td> PM  </td>	<td>Privacy Message (<a href="#PM">PMƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>0x9f</td>	<td> ESC _ </td>	<td> APC </td>	<td>Application Program Command (<a href="#APC">APCƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
+<tr><td>0x9b</td>	<td> ESC [ </td>	<td> CSI </td>	<td> Contros Sequence Introducer. Intruduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
+<tr><td>0x9c</td>	<td> ESC \ </td>	<td> ST  </td>	<td> String terminator. Ends a DCS, SOS, OSC, PM and APC sequence. </td></tr>
+<tr><td>0x9d</td>	<td> ESC ] </td>	<td> OSC </td>	<td> Operating System Command. Introduces a <a href="#OSC">OSC Sequence</a>. </td></tr>
+<tr><td>0x9e</td>	<td> ESC ^ </td>	<td> PM  </td>	<td> Privacy Message. Introduces a <a href="#PM">PM Sequence</a>. </td></tr>
+<tr><td>0x9f</td>	<td> ESC _ </td>	<td> APC </td>	<td> Application Program Command. Introduces a <a href="#APC">APC Sequence</a> .</td></tr>
 </table>
 
-<h2>Control Sequence</h2>
-
-<h3><a name="ESC">Escape Sequence</a></h3>
+<h2><a name="ESC">Escape Sequence</a></h2>
 <table border="1">
 <tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
-<tr><td>ESC 7</td>	<td>DECSC</td>	<td>ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•Û‘¶‚·‚é</td></tr>
-<tr><td>ESC 8</td>	<td>DECRC</td>	<td>•Û‘¶‚µ‚½ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•œŒ³‚·‚é</td></tr>
-<tr><td>ESC =</td>	<td>DECPAM</td>	<td>ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒL[ƒpƒbƒhƒ‚[ƒh‚Éİ’è‚·‚éB</td></tr>
-<tr><td>ESC ></td>	<td>DECPNM</td>	<td>ƒm[ƒ}ƒ‹ƒL[ƒpƒbƒhƒ‚[ƒh‚Éİ’è‚·‚éB</td></tr>
-<tr><td>ESC D</td>	<td>IND</td>	<td> ƒJ[ƒ\ƒ‹‚ğˆês‰º‚ÉˆÚ“® </td></tr>
-<tr><td>ESC E</td>	<td>NEL</td>	<td> ƒJ[ƒ\ƒ‹‚ğŸ‚Ìs‚Ìæ“ª‚ÉˆÚ“® </td></tr>
-<tr><td>ESC H</td>	<td>HTS</td>	<td>Œ»İ‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚Éƒ^ƒuƒXƒgƒbƒv‚ğİ’è‚·‚é</td></tr>
-<tr><td>ESC M</td>	<td>RI</td>	<td> ƒJ[ƒ\ƒ‹‚ğˆêsã‚ÉˆÚ“® </td></tr>
-<tr><td>ESC N</td>	<td>SS2</td>	<td> GL ‚Ö G2 ‚ğŸ‚Ìˆê•¶š‚ÉŒÀ‚èŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC O</td>	<td>SS3</td>	<td> GL ‚Ö G3 ‚ğŸ‚Ìˆê•¶š‚ÉŒÀ‚èŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC P</td>	<td>DCS</td>	<td>Device Control Sequence (<a href="#DCS">DCSƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>ESC X</td>	<td>SOS</td>	<td>•¶š—ñŠJn (<a href="#SOS">SOSƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>ESC Z</td>	<td>DECID</td>	<td>’[––ID‚ğ•Ô“š‚·‚é</td></tr>
-<tr><td>ESC [</td>	<td>CSI</td>	<td>CSIƒV[ƒPƒ“ƒX‚ğŠJn (<a href="#CSI">CSIƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>ESC </td>	<td>ST</td>	<td>•¶š—ñI’[BDCS, SOS, OSC, PM, APC ƒV[ƒPƒ“ƒX‚ÌI’[B</td></tr>
-<tr><td>ESC ]</td>	<td>OSC</td>	<td>Operating System Command (<a href="#OSC">OSCƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>ESC ^</td>	<td>PM</td>	<td>Privacy Message (<a href="#PM">PMƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>ESC _</td>	<td>APC</td>	<td>Application Program Command (<a href="#APC">APCƒV[ƒPƒ“ƒX</a>‚ğQÆ)</td></tr>
-<tr><td>ESC c</td>	<td>RIS</td>	<td>’[––ƒŠƒZƒbƒg</td>
-<tr><td>ESC g</td>	<td>-</td>	<td>‰Â‹ƒxƒ‹</td>
-<tr><td>ESC n</td>	<td>LS2</td>	<td> GL ‚Ö G2 ‚ğŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC o</td>	<td>LS3</td>	<td> GL ‚Ö G3 ‚ğŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC |</td>	<td>LS3R</td>	<td> GR ‚Ö G3 ‚ğŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC }</td>	<td>LS2R</td>	<td> GR ‚Ö G2 ‚ğŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC ~</td>	<td>LS1R</td>	<td> GR ‚Ö G1 ‚ğŒÄ‚Ño‚· </td></tr>
-<tr><td>ESC SP F</td>	<td>S7C1T</td>	<td>7ƒrƒbƒgƒ‚[ƒhB‰“š‚É7ƒrƒbƒgƒV[ƒPƒ“ƒX‚ğg‚¤B</td></tr>
-<tr><td>ESC SP G</td>	<td>S8C1T</td>	<td>8ƒrƒbƒgƒ‚[ƒhB‰“š‚É8ƒrƒbƒgƒV[ƒPƒ“ƒX‚ğg‚¤B</td></tr>
-<tr><td>ESC # 8</td>	<td>DECALN</td>	<td>‰æ–Ê‚ğ'E'‚Å–„‚ß‚é</td></tr>
+<tr><td>ESC 7</td>	<td>DECSC</td>	<td> Save the following items. <br>
+					     - Cursor position<br>
+					     - Character attributes (SGR)<br>
+					     - GL and GR state<br>
+					     - Wrap flag<br>
+					     - Origin mode state<br>
+					     - Selective erase attribute (DECSCA)<br>
+					     - Any single SS2 or SS3 functions sent</td></tr>
+<tr><td>ESC 8</td>	<td>DECRC</td>	<td> Restores the terminal to the state saved by the save cursor (DECSC) function. </td></tr>
+<tr><td>ESC =</td>	<td>DECKPAM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Application Keypad Mode</a>. </td></tr>
+<tr><td>ESC ></td>	<td>DECKPNM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Normal Keypad Mode</a>. </td></tr>
+<tr><td>ESC D</td>	<td>IND</td>	<td> Moves the cursor down one line in the same column. </td></tr>
+<tr><td>ESC E</td>	<td>NEL</td>	<td> Moves the cursor to the first position on the next line. </td></tr>
+<tr><td>ESC H</td>	<td>HTS</td>	<td> Sets a horizontal tab stop at the column where the cursor is. </td></tr>
+<tr><td>ESC M</td>	<td>RI</td>	<td> Moves the cursor up one line in the same column. </td></tr>
+<tr><td>ESC N</td>	<td>SS2</td>	<td> Temporarily maps the G2 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>ESC O</td>	<td>SS3</td>	<td> Temporarily maps the G3 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>ESC P</td>	<td>DCS</td>	<td> Device Control String. Introduces a <a href="#DCS">DCS Sequence</a>. </td></tr>
+<tr><td>ESC X</td>	<td>SOS</td>	<td> Start of string. Introduces a <a href="#SOS">SOS Sequence</a>. </td></tr>
+<tr><td>ESC Z</td>	<td>DECID</td>	<td> Reports a Terminal ID. </td></tr>
+<tr><td>ESC [</td>	<td>CSI</td>	<td> Control Sequence Introducer. Introduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
+<tr><td>ESC </td>	<td>ST</td>	<td> String terminator. Ends a DCS, SOS, OSC, PM and APC sequence. </td></tr>
+<tr><td>ESC ]</td>	<td>OSC</td>	<td> Operating System Command. Introduces a <a href="#OSC">OSC Sequence</a>. </td></tr>
+<tr><td>ESC ^</td>	<td>PM</td>	<td> Privacy Message. Introduces a <a href="#PM">PM Sequence</a>. </td></tr>
+<tr><td>ESC _</td>	<td>APC</td>	<td> Application Program Command. Introduces a <a href="#APC">APC Sequence</a>. </td></tr>
+<tr><td>ESC c</td>	<td>RIS</td>	<td> Terminal Full Reset. </td>
+<tr><td>ESC g</td>	<td>-</td>	<td> Visible Bell. </td>
+<tr><td>ESC n</td>	<td>LS2</td>	<td> Maps G2 character set into GL. </td></tr>
+<tr><td>ESC o</td>	<td>LS3</td>	<td> Maps G3 character set into GL. </td></tr>
+<tr><td>ESC |</td>	<td>LS3R</td>	<td> Maps G3 character set into GR. </td></tr>
+<tr><td>ESC }</td>	<td>LS2R</td>	<td> Maps G2 character set into GR. </td></tr>
+<tr><td>ESC ~</td>	<td>LS1R</td>	<td> Maps G1 character set into GR. </td></tr>
+<tr><td>ESC SP F</td>	<td>S7C1T</td>	<td> 7-bit control mode. </td></tr>
+<tr><td>ESC SP G</td>	<td>S8C1T</td>	<td> 8-bit control mode. </td></tr>
+<tr><td>ESC # 8</td>	<td>DECALN</td>	<td> Fills the complete screen area with 'E'. </td></tr>
 
-<tr><td>ESC $</td>	<!-- td rowspan="5"></td -->	<td colspan="2" rowspan="5"> •¶šW‡‚Ìw¦ (ISO/IEC 2022) </td>	</tr>
+<tr><td>ESC $</td>	<!-- td rowspan="5"></td -->	<td colspan="2" rowspan="5"> Designates character set. (ISO/IEC 2022) </td>	</tr>
 <tr><td>ESC (</td></tr>
 <tr><td>ESC )</td></tr>
 <tr><td>ESC *</td></tr>
 <tr><td>ESC +</td></tr>
 </table>
 
-<h3><a name="CSI">CSI Sequence</a></h3>
+<h2><a name="CSI">CSI Sequence</a></h2>
 <table border="1">
 <tr><th>Sequence</th>		<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>CSI <i>Ps</i> @</td>	<td>ICH</td>	<td>ƒJ[ƒ\ƒ‹ˆÊ’u‚É <i>Ps</i> ŒÂ‹ó”’‚ğ‘}“ü‚·‚éB<i>Ps</i> ‚ÌÈ—ª‚Ì’l‚Í 1B</td></tr>
@@ -326,27 +331,27 @@ Ps4   filter rectangle ‚Ì‰E•Ó
 
 <tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>ƒJ[ƒ\ƒ‹•\¦Œ`®•ÏXB<i>Ps</i> ‚ÌÈ—ª‚Ì’l‚Í 0B
 <pre>
-<i>Ps</i> = 0,1    ƒuƒƒbƒNƒJ[ƒ\ƒ‹ / “_–Å
-   = 2      ƒuƒƒbƒNƒJ[ƒ\ƒ‹ / ”ñ“_–Å
-   = 3      ‰ºüƒJ[ƒ\ƒ‹ / “_–Å
-   = 4      ‰ºüƒJ[ƒ\ƒ‹ / ”ñ“_–Å
-   = 5      cüƒJ[ƒ\ƒ‹ / “_–Å
-   = 6      cüƒJ[ƒ\ƒ‹ / ”ñ“_–Å
+<i>Ps</i> = 0,1    Block cursor / Blink
+   = 2      Block cursor / Steady
+   = 3      Underline cursor / Blink
+   = 4      Underline cursor / Steady
+   = 5      Vertical line cursor / Blink
+   = 6      Vertical line cursor / Steady
 </pre></td>
 </tr>
 
-<tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>ƒ\ƒtƒgƒŠƒZƒbƒg</td></tr>
+<tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>Soft reset</td></tr>
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td>’[––“®ìƒ‚[ƒhİ’è
 <pre>
-<i>Ps1</i> = 61    VT-Level 1 (VT100ƒ‚[ƒh)
-    = 62    VT-Level 2 (VT200ƒ‚[ƒh)
-    = 63    VT-Level 3 (VT300ƒ‚[ƒh)
-    = 64    VT-Level 4 (VT400ƒ‚[ƒh)
-    = 65    VT-Level 5 (VT500ƒ‚[ƒh)
+<i>Ps1</i> = 61    VT-Level 1 (VT100 mode)
+    = 62    VT-Level 2 (VT200 mode)
+    = 63    VT-Level 3 (VT300 mode)
+    = 64    VT-Level 4 (VT400 mode)
+    = 65    VT-Level 5 (VT500 mode)
 
-<i>Ps2</i> = 0    7 bit ƒ‚[ƒh (S7C1T)
-    = 1    8 bit ƒ‚[ƒh (S8C1T)
+<i>Ps2</i> = 0    7 bit mode (S7C1T)
+    = 1    8 bit mode (S8C1T)
 </pre></td>
 </tr>
 
@@ -464,38 +469,42 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ğ‘—M‚
     <tr>
 	<td> 2 </td>
 	<td> KAM </td>
-	<td>ƒL[ƒ{[ƒh‚ğƒƒbƒN‚·‚éBƒL[“ü—Í‚Í‚·‚×‚Ä–³‹‚³‚ê‚éB</td>
-	<td>ƒL[ƒ{[ƒh‚ÌƒƒbƒN‚ğ‰ğœ‚·‚éB</td>
+	<td> Locks the keyboard. </td>
+	<td> Unlocks the keyboard. </td>
     </tr>
     <tr>
 	<td> 4 </td>
 	<td> IRM </td>
-	<td>‘}“üƒ‚[ƒh‚Éİ’è‚·‚éB</td>
-	<td>ã‘‚«ƒ‚[ƒh‚Éİ’è‚·‚éB</td>
+	<td> Insert mode. </td>
+	<td> Replace mode. </td>
     </tr>
     <tr>
 	<td> 12 </td>
 	<td> SRM </td>
-	<td>ƒ[ƒJƒ‹ƒGƒR[‚ğ–³Œø‚É‚·‚éB</td>
-	<td>ƒ[ƒJƒ‹ƒGƒR[‚ğ—LŒø‚É‚·‚éB</td>
+	<td> Local echo off. </td>
+	<td> Local echo on. </td>
     </tr>
     <tr>
 	<td> 20 </td>
 	<td> LNM </td>
-	<td>New line ƒ‚[ƒhB</td>
-	<td>Line feed ƒ‚[ƒhB</td>
+	<td> New line mode.<br>
+	     - Cursor moves to the first column of the next line when the terminal receives an LF, FF or VT character.<br>
+	     - New-line (Transmit) setting is changed to "CR+LF".</td>
+	<td> Line feed mode.<br>
+	     - Cursor moves to the current column on the next line when the terminal receives an LF, FF or VT character.<br>
+	     - New-line (Transmit) setting is changed to "CR".</td>
     </tr>
     <tr>
 	<td> 33 </td>
 	<td> WYSTCURM </td>
-	<td>ƒJ[ƒ\ƒ‹‚Ì“_–Å‚ğ–³Œø‚É‚·‚éB</td>
-	<td>ƒJ[ƒ\ƒ‹‚Ì“_–Å‚ğ—LŒø‚É‚·‚éB</td>
+	<td> Steady cursor. </td>
+	<td> Blinking cursor. </td>
     </tr>
     <tr>
 	<td> 34 </td>
 	<td> WYULCURM </td>
-	<td>ƒJ[ƒ\ƒ‹‚ÌŒ`ó‚ğ‰ºüƒJ[ƒ\ƒ‹‚É‚·‚éB</td>
-	<td>ƒJ[ƒ\ƒ‹‚ÌŒ`ó‚ğƒuƒƒbƒNƒJ[ƒ\ƒ‹‚É‚·‚éB</td>
+	<td> Underline cursor. </td>
+	<td> Block cursor. </td>
     </tr>
 </table>
 
@@ -510,140 +519,146 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ğ‘—M‚
     <tr>
 	<td> 1 </td>
 	<td> DECCKM </td>
-	<td> ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒJ[ƒ\ƒ‹ƒ‚[ƒh‚Éİ’è‚·‚éB </td>
-	<td> ƒm[ƒ}ƒ‹ƒJ[ƒ\ƒ‹ƒ‚[ƒh‚Éİ’è‚·‚éB </td>
+	<td> Application cursor keys. </td>
+	<td> Normal cursor keys. </td>
     </tr>
     <tr>
 	<td> 3 </td>
 	<td> DECCOLM </td>
-	<td> ƒEƒBƒ“ƒhƒE‚Ì‰¡•‚ğ 132 Œ…‚É‚·‚éB </td>
-	<td> ƒEƒBƒ“ƒhƒE‚Ì‰¡•‚ğ 80 Œ…‚É‚·‚éB </td>
+	<td> 132 column mode. </td>
+	<td> 80 column mode. </td>
     </tr>
     <tr>
 	<td> 5 </td>
 	<td> DECSCNM </td>
-	<td> ”½“]•\¦ƒ‚[ƒhB•¶šF‚Æ”wŒiF‚ğ“ü‚ê‘Ö‚¦‚éB </td>
-	<td> ’Êí•\¦ƒ‚[ƒhB•¶šF‚Æ”wŒiF‚ğ’Êíó‘Ô‚É–ß‚·B</td>
+	<td> Reverse video mode. </td>
+	<td> Normal video mode. </td>
     </tr>
     <tr>
 	<td> 6 </td>
 	<td> DECOM </td>
-	<td> s”‚ÌŠî€ˆÊ’u‚ğãƒ}[ƒWƒ“‚É‚·‚éBã‰ºƒ}[ƒWƒ“‚ÌŠO‚ÉƒJ[ƒ\ƒ‹‚ğˆÚ“®‚Å‚«‚È‚¢‚æ‚¤‚É‚·‚éBƒJ[ƒ\ƒ‹ˆÊ’u‚ğãƒ}[ƒWƒ“‚Ì 1 Œ…–Ú‚ÉˆÚ“®‚·‚éB </td>
-	<td> s”‚ÌŠî€ˆÊ’u‚ğ‰æ–Êã’[‚É‚·‚éBã‰ºƒ}[ƒWƒ“‚ÌŠO‚ÉƒJ[ƒ\ƒ‹‚ğˆÚ“®‚Å‚«‚é‚æ‚¤‚É‚·‚éBƒJ[ƒ\ƒ‹ˆÊ’u‚ğ‰æ–Êã’[‚Ì 1 Œ…–Ú‚ÉˆÚ“®‚·‚éB </td>
+	<td> Enable origin mode.<br>
+             - The home cursor position is at the upper-left corner of ther screen, with in the margins.<br>
+             - The starting point for line numbers depends on the current top margin setting.<br>
+             - The cursor <em>cannot</em> move outside of the margins.</td>
+	<td> Disables origin mode.<br>
+             - The home cursor position is at the upper-left corner of ther screen.<br>
+             - The starting point for line numbers independent of the margins.<br>
+             - The cursor <em>can</em> move outside of the margins.</td>
     </tr>
     <tr>
 	<td> 7 </td>
 	<td> DECAWM </td>
-	<td> s––‚Å‚Ì©“®‰üs‚ğ—LŒø‚É‚·‚éB</td>
-	<td> s––‚Å‚Ì©“®‰üs‚ğ–³Œø‚É‚·‚éB</td>
+	<td> Enables autowrap mode. </td>
+	<td> Disables autowrap mode. </td>
     </tr>
     <tr>
 	<td> 8 </td>
 	<td> DECARM </td>
-	<td> ƒL[ƒ{[ƒh‚ÌƒI[ƒgƒŠƒs[ƒg‚ğ—LŒø‚É‚·‚éB</td>
-	<td> ƒL[ƒ{[ƒh‚ÌƒI[ƒgƒŠƒs[ƒg‚ğ–³Œø‚É‚·‚éB</td>
+	<td> Auto-repeat keys. </td>
+	<td> No auto-repeat keys. </td>
     </tr>
     <tr>
 	<td> 9 </td>
 	<td> - </td>
-	<td> X10 ŒİŠ·ƒ}ƒEƒX•ñƒ‚[ƒh‚Éİ’è‚·‚éB</td>
-	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚ğ‰ğœ‚·‚éB</td>
+	<td> Enables X10 mouse tracking. Send mouse X &amp; Y on button press.</td>
+	<td> Disables mouse tracking. </td>
     </tr>
     <tr>
 	<td> 12 </td>
 	<td> - </td>
-	<td> ƒJ[ƒ\ƒ‹‚Ì“_–Å‚ğ–³Œø‚É‚·‚éB </td>
-	<td> ƒJ[ƒ\ƒ‹‚Ì“_–Å‚ğ—LŒø‚É‚·‚éB </td>
+	<td> Blinking cursor. </td>
+	<td> Steady cursor. </td>
     </tr>
     <tr>
 	<td> 19 </td>
 	<td> DECPEX </td>
-	<td> ˆóü”ÍˆÍ‚ğ‰æ–Ê‘S‘Ì‚É‚·‚éB </td>
-	<td> ˆóü”ÍˆÍ‚ğƒXƒNƒ[ƒ‹ƒŠ[ƒWƒ‡ƒ““à‚É‚·‚éB </td>
+	<td> Set print extent to full screen. </td>
+	<td> Limit print to scrolling region. </td>
     </tr>
     <tr>
 	<td> 25 </td>
 	<td> DECTCEM </td>
-	<td> ƒJ[ƒ\ƒ‹‚ğ•\¦‚·‚éB </td>
-	<td> ƒJ[ƒ\ƒ‹‚ğ”ñ•\¦‚É‚·‚éB </td>
+	<td> Show cursor. </td>
+	<td> Hide cursor. </td>
     </tr>
     <tr>
 	<td> 38 </td>
 	<td> DECTEK </td>
-	<td> TEKƒEƒBƒ“ƒhƒE‚ÉØ‚è‘Ö‚¦‚éB </td>
-	<td> ‰½‚às‚í‚È‚¢B </td>
+	<td> Switch to TEK window. </td>
+	<td> Do nothing. </td>
     </tr>
     <tr>
 	<td> 47 </td>
 	<td> - </td>
-	<td> ‘ã‘Ö‰æ–Êƒoƒbƒtƒ@‚ÉØ‚è‘Ö‚¦‚éB </td>
-	<td> •W€‰æ–Êƒoƒbƒtƒ@‚ÉØ‚è‘Ö‚¦‚éB </td>
+	<td> Switch to alternate screen buffer. </td>
+	<td> Switch to normal screen buffer. </td>
     </tr>
     <tr>
 	<td> 59 </td>
 	<td> DECKKDM </td>
-	<td> Š¿š’[––ƒ‚[ƒh‚Éİ’è‚·‚éB </td>
-	<td> ƒJƒ^ƒJƒi’[––ƒ‚[ƒh‚Éİ’è‚·‚éB </td>
+	<td> Kanji terminal mode. </td>
+	<td> Katakana terminal mode. </td>
     </tr>
     <tr>
 	<td> 66 </td>
 	<td> DECNKM </td>
-	<td> ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒL[ƒpƒbƒhƒ‚[ƒh‚Éİ’è‚·‚éB</td>
-	<td> ”’lƒL[ƒpƒbƒhƒ‚[ƒh‚Éİ’è‚·‚éB</td>
+	<td> <a href="../usage/tips/appkeypad.html">Application keypad mode</a>. </td>
+	<td> <a href="../usage/tips/appkeypad.html">Numeric keypad mode</a>. </td>
     </tr>
     <tr>
 	<td> 67 </td>
 	<td> DECBKM </td>
-	<td> Backspace ƒL[‚Å BS ‚ğ‘—o‚·‚éB</td>
-	<td> Backspace ƒL[‚Å DEL ‚ğ‘—o‚·‚éB</td>
+	<td> Backspace key sends BS. </td>
+	<td> Backspace key sends DEL. </td>
     </tr>
     <tr>
 	<td> 1000 </td>
 	<td> - </td>
-	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚Éİ’è‚·‚éBƒ}ƒEƒXƒ{ƒ^ƒ“‚Ì‰Ÿ‚µ/—£‚µ,ƒzƒC[ƒ‹‚Ì‰ñ“]‚ğ•ñ‚·‚éB </td>
-	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚ğ‰ğœ‚·‚éB </td>
+	<td> Enables normal mouse tracking. Send mouse X &amp; Y on button press and release. </td>
+	<td> Disables mouse tracking. </td>
     </tr>
     <!-- tr>
 	<td> 1001 </td>
 	<td> - </td>
-	<td> ƒnƒCƒ‰ƒCƒgƒ}ƒEƒX•ñƒ‚[ƒh‚Éİ’è‚·‚éB </td>
-	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚ğ‰ğœ‚·‚éB </td>
+	<td> Enables hilite mouse tracking. </td>
+	<td> Disables mouse tracking. </td>
     </tr -->
     <tr>
 	<td> 1002 </td>
 	<td> - </td>
-	<td> ƒ{ƒ^ƒ“ƒCƒxƒ“ƒgƒ}ƒEƒX•ñƒ‚[ƒh‚Éİ’è‚·‚éB’Êí‚Ìƒ}ƒEƒX•ñƒ‚[ƒh‚Ì‘¼‚ÉAƒ}ƒEƒXƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚Ä‚¢‚éŠÔ‚Ìƒ}ƒEƒX‚Ì“®‚«‚à•ñ‚·‚éB</td>
-	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚ğ‰ğœ‚·‚éB </td>
+	<td> Enables button-event mouse tracking. Essentially same as normal mouse tracking mode, but also reports button-motion event. </td>
+	<td> Disables mouse tracking. </td>
     </tr>
     <tr>
 	<td> 1003 </td>
 	<td> - </td>
-	<td> ‘SƒCƒxƒ“ƒgƒ}ƒEƒX•ñƒ‚[ƒh‚ğ—LŒø‚É‚·‚éBƒ{ƒ^ƒ“ƒCƒxƒ“ƒgƒ}ƒEƒX•ñƒ‚[ƒh‚Ì‘¼‚ÉAƒ}ƒEƒXƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚Ä‚¢‚È‚¢ó‘Ô‚Å‚àƒ}ƒEƒX‚Ì“®‚«‚ğ•ñ‚·‚éB </td>
-	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚ğ‰ğœ‚·‚éB </td>
+	<td> Enables any-event mouse tracking. Same as button-event mode, except that all motion events are reported, even if no mouse button is down. </td>
+	<td> Disables mouse tracking. </td>
     </tr>
     <tr>
 	<td> 1004 </td>
 	<td> - </td>
-	<td> ƒtƒH[ƒJƒX•ñƒ‚[ƒh‚Éİ’è‚·‚éB </td>
-	<td> ƒtƒH[ƒJƒX•ñƒ‚[ƒh‚ğ‰ğœ‚·‚éB </td>
+	<td> Enables focus reporting mode. </td>
+	<td> Disables focus reporting mode. </td>
     </tr>
     <tr>
 	<td> 1047 </td>
 	<td> - </td>
-	<td> ‘ã‘Ö‰æ–Êƒoƒbƒtƒ@‚ÉØ‚è‘Ö‚¦‚éB </td>
-	<td> ‰æ–Ê‘S‘Ì‚ğÁ‹‚µ‚½ŒãA•W€‰æ–Êƒoƒbƒtƒ@‚ÉØ‚è‘Ö‚¦‚éB </td>
+	<td> Switch to alternate screen buffer. </td>
+	<td> Clear screen, and switch to normal screen buffer. </td>
     </tr>
     <tr>
 	<td> 1048 </td>
 	<td> - </td>
-	<td> Œ»İ‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•Û‘¶‚·‚éB </td>
-	<td> •Û‘¶‚µ‚½ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•œŒ³‚·‚éB </td>
+	<td> Save cursor position. </td>
+	<td> Restore cursor position. </td>
     </tr>
     <tr>
 	<td> 1049 </td>
 	<td> - </td>
-	<td> Œ»İ‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•Û‘¶ŒãA‘ã‘Ö‰æ–Êƒoƒbƒtƒ@‚ÉØ‚è‘Ö‚¦A‰æ–Ê‘S‘Ì‚ğÁ‹‚·‚éB </td>
-	<td> ‰æ–Ê‘S‘Ì‚ğÁ‹‚µA•W€‰æ–Êƒoƒbƒtƒ@‚ÉØ‚è‘Ö‚¦‚½ŒãA•Û‘¶‚µ‚½ƒJ[ƒ\ƒ‹ˆÊ’u‚ğ•œŒ³‚·‚éB </td>
+	<td> Save cursor position, switch to alternate screen buffer, and clear screen. </td>
+	<td> Clear screen, switch to normal screen buffer, and restore cursor position. </td>
     </tr>
     <tr>
 	<td> 2004 </td>
@@ -653,61 +668,61 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ğ‘—M‚
     </tr>
 </table>
 
-<h3><a name="charattr">Character Attributes.</a></h3>
+<h3><a name="charattr">Character Attributes. (SGR)</a></h3>
 <table border="1">
 <tr><th>No.</th>	<th>Attribute</th></tr>
-<tr><td> 0</td>		<td>‘S‚Ä‚Ì‘®«‚ğ‰ğœ‚·‚éB</td></tr>
-<tr><td> 1</td>		<td>‘¾š‘®«‚ğİ’è‚·‚éB</td></tr>
-<tr><td> 4</td>		<td>‰ºü‘®«‚ğİ’è‚·‚éB</td></tr>
-<tr><td> 5</td>		<td>“_–Å‘®«‚ğİ’è‚·‚éB</td></tr>
-<tr><td> 7</td>		<td>”½“]‘®«‚ğİ’è‚·‚éB</td></tr>
-<tr><td>22</td>		<td>‘¾š‘®«‚ğ‰ğœ‚·‚éB</td></tr>
-<tr><td>24</td>		<td>‰ºü‘®«‚ğ‰ğœ‚·‚éB</td></tr>
-<tr><td>25</td>		<td>“_–Å‘®«‚ğ‰ğœ‚·‚éB</td></tr>
-<tr><td>27</td>		<td>”½“]‘®«‚ğ‰ğœ‚·‚éB</td></tr>
+<tr><td> 0</td>		<td>Normal</td></tr>
+<tr><td> 1</td>		<td>Bold</td></tr>
+<tr><td> 4</td>		<td>Underlined</td></tr>
+<tr><td> 5</td>		<td>Blink</td></tr>
+<tr><td> 7</td>		<td>Inverse</td></tr>
+<tr><td>22</td>		<td>Normal (neigher bold nor faint)</td></tr>
+<tr><td>24</td>		<td>Not underlined</td></tr>
+<tr><td>25</td>		<td>Steady (not blinking)</td></tr>
+<tr><td>27</td>		<td>Positive (not inverse)</td></tr>
 
-<tr><td>30</td>		<td>•¶šF‚ğ•(F”Ô†0)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>31</td>		<td>•¶šF‚ğÔ(F”Ô†1)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>32</td>		<td>•¶šF‚ğ—Î(F”Ô†2)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>33</td>		<td>•¶šF‚ğ‰©F(F”Ô†3)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>34</td>		<td>•¶šF‚ğÂ(F”Ô†4)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>35</td>		<td>•¶šF‚ğÔ‡(F”Ô†5)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>36</td>		<td>•¶šF‚ğ…F(F”Ô†6)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>37</td>		<td>•¶šF‚ğ”’(F”Ô†7)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>38 ; 5 ; <i>Ps</i></td>	<td>•¶šF‚ğF”Ô† <i>Ps</i> ‚Éİ’è‚·‚éB</td></tr>
-<tr><td>39</td>		<td>•¶šF‚ğ•W€‚Ì•¶šF‚Éİ’è‚·‚éB</td></tr>
+<tr><td>30</td>		<td>Set foreground color to Black. (Color No. 0)</td></tr>
+<tr><td>31</td>		<td>Set foreground color to Red. (Color No. 1)</td></tr>
+<tr><td>32</td>		<td>Set foreground color to Green. (Color No. 2)</td></tr>
+<tr><td>33</td>		<td>Set foreground color to Yellow. (Color No. 3)</td></tr>
+<tr><td>34</td>		<td>Set foreground color to Blue. (Color No. 4)</td></tr>
+<tr><td>35</td>		<td>Set foreground color to Magenta. (Color No. 5)</td></tr>
+<tr><td>36</td>		<td>Set foreground color to Cyan. (Color No. 6)</td></tr>
+<tr><td>37</td>		<td>Set foreground color to Blue. (Color No. 7)</td></tr>
+<tr><td>38 ; 5 ; <i>Ps</i></td>	<td>Set foreground color to <i>Ps</i>.</td></tr>
+<tr><td>39</td>		<td>Set foreground color to default.</td></tr>
 
-<tr><td>40</td>		<td>”wŒiF‚ğ•(F”Ô†0)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>41</td>		<td>”wŒiF‚ğÔ(F”Ô†1)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>42</td>		<td>”wŒiF‚ğ—Î(F”Ô†2)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>43</td>		<td>”wŒiF‚ğ‰©F(F”Ô†3)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>44</td>		<td>”wŒiF‚ğÂ(F”Ô†4)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>45</td>		<td>”wŒiF‚ğÔ‡(F”Ô†5)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>46</td>		<td>”wŒiF‚ğ…F(F”Ô†6)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>47</td>		<td>”wŒiF‚ğ”’(F”Ô†7)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>48 ; 5 ; <i>Ps</i></td>	<td>”wŒiF‚ğF”Ô† <i>Ps</i> ‚Éİ’è‚·‚éB</td></tr>
-<tr><td>49</td>		<td>”wŒiF‚ğ•W€‚Ì”wŒiF‚Éİ’è‚·‚éB</td></tr>
+<tr><td>40</td>		<td>Set background color to Black. (Color No. 0)</td></tr>
+<tr><td>41</td>		<td>Set background color to Black. (Color No. 1)</td></tr>
+<tr><td>42</td>		<td>Set background color to Black. (Color No. 2)</td></tr>
+<tr><td>43</td>		<td>Set background color to Black. (Color No. 3)</td></tr>
+<tr><td>44</td>		<td>Set background color to Black. (Color No. 4)</td></tr>
+<tr><td>45</td>		<td>Set background color to Black. (Color No. 5)</td></tr>
+<tr><td>46</td>		<td>Set background color to Black. (Color No. 6)</td></tr>
+<tr><td>47</td>		<td>Set background color to Black. (Color No. 7)</td></tr>
+<tr><td>48 ; 5 ; <i>Ps</i></td>	<td>Set background color to <i>Ps</i>.</td></tr>
+<tr><td>49</td>		<td>Set background color to Black.</td></tr>
 
-<tr><td>90</td>		<td>•¶šF‚ğˆÃ‚¢ŠDF(F”Ô†8)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>91</td>		<td>•¶šF‚ğ–¾‚é‚¢Ô(F”Ô†9)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>92</td>		<td>•¶šF‚ğ–¾‚é‚¢—Î(F”Ô†10)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>93</td>		<td>•¶šF‚ğ–¾‚é‚¢‰©F(F”Ô†11)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>94</td>		<td>•¶šF‚ğ–¾‚é‚¢Â(F”Ô†12)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>95</td>		<td>•¶šF‚ğ–¾‚é‚¢Ô‡(F”Ô†13)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>96</td>		<td>•¶šF‚ğ–¾‚é‚¢…F(F”Ô†14)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>97</td>		<td>•¶šF‚ğ–¾‚é‚¢”’(F”Ô†15)‚Éİ’è‚·‚éB</td></tr>
+<tr><td>90</td>		<td>Set foreground color to Gray. (Color No. 8)</td></tr>
+<tr><td>91</td>		<td>Set foreground color to Black. (Color No. 9)</td></tr>
+<tr><td>92</td>		<td>Set foreground color to Black. (Color No. 10)</td></tr>
+<tr><td>93</td>		<td>Set foreground color to Black. (Color No. 11)</td></tr>
+<tr><td>94</td>		<td>Set foreground color to Black. (Color No. 12)</td></tr>
+<tr><td>95</td>		<td>Set foreground color to Black. (Color No. 13)</td></tr>
+<tr><td>96</td>		<td>Set foreground color to Black. (Color No. 14)</td></tr>
+<tr><td>97</td>		<td>Set foreground color to Black. (Color No. 15)</td></tr>
 
-<tr><td>100</td>	<td>”wŒiF‚ğˆÃ‚¢ŠDF(F”Ô†8)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>101</td>	<td>”wŒiF‚ğ–¾‚é‚¢Ô(F”Ô†9)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>102</td>	<td>”wŒiF‚ğ–¾‚é‚¢—Î(F”Ô†10)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>103</td>	<td>”wŒiF‚ğ–¾‚é‚¢‰©F(F”Ô†11)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>104</td>	<td>”wŒiF‚ğ–¾‚é‚¢Â(F”Ô†12)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>105</td>	<td>”wŒiF‚ğ–¾‚é‚¢Ô‡(F”Ô†13)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>106</td>	<td>”wŒiF‚ğ–¾‚é‚¢…F(F”Ô†14)‚Éİ’è‚·‚éB</td></tr>
-<tr><td>107</td>	<td>”wŒiF‚ğ–¾‚é‚¢”’(F”Ô†15)‚Éİ’è‚·‚éB</td></tr>
+<tr><td>100</td>	<td>Set background color to Black. (Color No. 8)</td></tr>
+<tr><td>101</td>	<td>Set background color to Black. (Color No. 9)</td></tr>
+<tr><td>102</td>	<td>Set background color to Black. (Color No. 10)</td></tr>
+<tr><td>103</td>	<td>Set background color to Black. (Color No. 11)</td></tr>
+<tr><td>104</td>	<td>Set background color to Black. (Color No. 12)</td></tr>
+<tr><td>105</td>	<td>Set background color to Black. (Color No. 13)</td></tr>
+<tr><td>106</td>	<td>Set background color to Black. (Color No. 14)</td></tr>
+<tr><td>107</td>	<td>Set background color to Black. (Color No. 15)</td></tr>
 </table>
 
-<h3><a name="DCS">DCS Sequence</a></h3>
+<h2><a name="DCS">DCS Sequence</a></h2>
 <table border="1">
 <tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>DCS <i>Ps1</i> ; <i>Ps2</i> | <i>Pt</i> ST</td>	<td>DECUDK</td>	<td>Define user function key.
@@ -723,7 +738,7 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ğ‘—M‚
 </td></tr>
 </table>
 
-<h3><a name="OSC">OSC Sequence</a></h3>
+<h2><a name="OSC">OSC Sequence</a></h2>
 <p>Format</p>
 <pre>
 OSC <i>Ps</i> ; <i>Pt</i> ST
@@ -750,20 +765,20 @@ rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
 </pre>
 </table>
 
-<h3><a name="SOS">SOS Sequence</a></h3>
+<h2><a name="SOS">SOS Sequence</a></h2>
 <p>Format</p>
 <pre>SOS <i>Pt</i> ST</pre>
-<p>Tera Term implements no SOS functions; Pt is ignored.</p>
+<p>Tera Term implements no SOS functions; <i>Pt</i> is ignored.</p>
 
-<h3><a name="PM">PM Sequence</a></h3>
+<h2><a name="PM">PM Sequence</a></h2>
 <p>Format</p>
 <pre>PM <i>Pt</i> ST</pre>
-<p>Tera Term implements no PM functions; Pt is ignored.</p>
+<p>Tera Term implements no PM functions; <i>Pt</i> is ignored.</p>
 
-<h3><a name="APC">APC Sequence</a></h3>
+<h2><a name="APC">APC Sequence</a></h3>
 <p>Format</p>
 <pre>APC <i>Pt</i> ST</pre>
-<p>Tera Term implements no APC functions; Pt is ignored.</p>
+<p>Tera Term implements no APC functions; <i>Pt</i> is ignored.</p>
 
 </body>
 </html>
