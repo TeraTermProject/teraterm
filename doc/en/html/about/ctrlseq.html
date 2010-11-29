@@ -145,15 +145,15 @@
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td> Moves cursor to the <i>Ps</i> tabs forward. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>Erase in display. The default value of <i>Ps</i> is 0. <pre>
-<i>Ps</i> = 0    Erase from cursor through the end of the display.
-   = 1    Erase from the beginning of the display through the cursor.
-   = 2    Erase the complete of display.
+<i>Ps</i> = 0      Erase from cursor through the end of the display.
+   = 1      Erase from the beginning of the display through the cursor.
+   = 2      Erase the complete of display.
 </pre></td></tr>
-<tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>Erase in Line. The default value of <i>Ps</i> is 0.
+<tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>Erase in line. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    Erase from the cursor through the end of the line.
-   = 1    Erase from the beginning of the line through the cursor.
-   = 2    Erase the complete of line.
+<i>Ps</i> = 0      Erase from the cursor through the end of the line.
+   = 1      Erase from the beginning of the line through the cursor.
+   = 2      Erase the complete of line.
 </pre>
 </td></tr>
 <tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td> Inserts <i>Ps</i> lines, stgarting at the cursor. The default value of <i>Ps</i> is 1. </td></tr>
@@ -188,148 +188,151 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> f</td>	<td>HVP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> g</td>	<td>TBC</td>	<td> Clears the tab stop. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    Clears the tab stop at the cursor.
-   = 3    Clears all tab stops.
+<i>Ps</i> = 0      Clears the tab stop at the cursor.
+   = 3      Clears all tab stops.
 </pre></td>
 </tr>
-<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets ANSI mode. (Refer to <a href="#mode">Modes (ANSI)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets ANSI mode. (See <a href="#mode">Modes (ANSI)</a>)</td></tr>
 <tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td> Printing mode.
 <pre>
-<i>Ps</i> = 0    Print screen.
-   = 4    Turn off printer controller mode.
-   = 5    Turn on printer controller mode.
+<i>Ps</i> = 0      Print screen.
+   = 4      Turn off printer controller mode.
+   = 5      Turn on printer controller mode.
 </pre>
 </td></tr>
-<tr><td>CSI <i>Ps</i> j</td>	<td>HPB</td>	<td>カーソルを <i>Ps</i> 桁左に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Ps</i> k</td>	<td>VPB</td>	<td>カーソルを <i>Ps</i> 行上に移動する。<i>Ps</i> の省略時の値は 1。</td></tr>
-<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td> Resets ANSI mode. (Refer to <a href="#mode">Modes (ANSI)</a>)</td></tr>
-<tr><td>CSI <i>Pm</i> m</td>	<td>SGR</td>	<td>文字属性を設定する。省略時の <i>Pm</i> の値は 0。(<a href="#charattr">文字属性</a>を参照)
-</td></tr>
-<tr><td>CSI <i>Ps</i> n</td>	<td>DSR</td>	<td>端末の状態を報告する。
+<tr><td>CSI <i>Ps</i> j</td>	<td>HPB</td>	<td> Moves cursor to the left <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> k</td>	<td>VPB</td>	<td> Moves cursor up <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td> Resets ANSI mode. (See <a href="#mode">Modes (ANSI)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> m</td>	<td>SGR</td>	<td> Select character attributes. The default value of <i>Pm</i> is 0. (See <a href="#charattr">Character Attributes</a>.) </td></tr>
+<tr><td>CSI <i>Ps</i> n</td>	<td>DSR</td>	<td> Reports device status.
 <pre>
-<i>Ps</i> = 5    端末の状態を報告する。常に CSI 0 n (準備OK)を返す。
-          応答: CSI <i>s</i> n
-	    <i>s</i> = 0    正常
-   = 6    カーソルの位置を報告する。
-          応答: CSI <i>r</i> ; <i>c</i> R
-            <i>r</i>    行位置
-            <i>c</i>    桁位置
+<i>Ps</i> = 5      Requests the terminal's operation status report. Always returns "CSI 0 n" (Terminal ready).
+            Response: CSI <i>s</i> n
+            <i>s</i> = 0    Terminal ready.
+   = 6      Requests cursor position report.
+            Response: CSI <i>r</i> ; <i>c</i> R
+              <i>r</i>    Line number.
+              <i>c</i>    Column number.
 </pre>
 </td></tr>
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td>上下マージン(スクロールリージョン)を設定する。
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td> Sets top and bottom margin.
 <pre>
-<i>Ps1</i>    上マージンの行位置。省略時は 1。
-<i>Ps2</i>    下マージンの行位置。省略時は画面下端。
+<i>Ps1</i>    Line number for the top margin. The default value is 1.
+<i>Ps2</i>    Line number for the bottom margin. The default value is current number of lines per screen.
 </td></tr>
-<tr><td>CSI s</td>	<td>SCP</td>	<td>現在のカーソル位置を保存する。</td></tr>
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td>ウィンドウ操作
+<tr><td>CSI s</td>	<td>SCP</td>	<td> Save cursor position. Same as DECSC. </td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td> Window manipulation.
 <pre>
-<i>Ps1</i> =  1    ウィンドウを通常表示状態にする。
-    =  2    ウィンドウを最小化する。
-    =  3    ウィンドウ位置を <i>Ps2</i>, <i>Ps3</i> に移動する。
-    =  4    ウィンドウサイズを高さ <i>Ps2</i> ドット, 幅 <i>Ps3</i> ドットに変更する。
-    =  5    ウィンドウを前面に移動する。
-    =  6    ウィンドウを背面に移動する。
-    =  7    ウィンドウを再描画する。
-    =  8    端末サイズを <i>Ps2</i> 行, <i>Ps3</i> 桁に変更する。
-    =  9    端末の最大化状態を変更する。
-            <i>Ps2</i> = 0    ウィンドウを通常サイズに変更する。
-	        = 1    ウィンドウを最大化する。
+<i>Ps1</i> =  1    De-iconify window.
+    =  2    Minimize window.
+    =  3    Move window to [<i>Ps2</i>, <i>Ps3</i>].
+    =  4    Resize window to height <i>Ps2</i> pixels and width <i>Ps3</i> pixels.
+    =  5    Raise the window to the top of the stacking order.
+    =  6    Lower the window to the bottom of the stacking order.
 
-    = 11    ウィンドウの最小化状態を報告する。
-            応答: CSI <i>s</i> t
-              <i>s</i> = 1    通常状態
-	        = 2    最小化状態
+    =  7    Refresh window.
+    =  8    Resize window to <i>Ps2</i> lines and <i>Ps3</i> columns.
+    =  9    Change maximize state of window.
+            <i>Ps2</i> = 0    Restore maximized window.
+                = 1    Maximize window.
 
-    = 13    ウィンドウの位置を報告する。
-            応答: CSI 3 ; <i>x</i> ; <i>y</i> t
-              <i>x</i>    ウィンドウ左上角の X 座標
-              <i>y</i>    ウィンドウ左上角の Y 座標
+    = 11    Reports window state.
+            Response: CSI <i>s</i> t
+              <i>s</i> = 1    Normal. (non-iconified)
+                = 2    Iconified.
 
-    = 14    ウィンドウのサイズを報告する。
-            応答: CSI 4 ; <i>y</i> ; <i>x</i> t
-              <i>y</i>    ウィンドウの高さ
-              <i>x</i>    ウィンドウの幅
+    = 13    Reports window position.
+            Response: CSI 3 ; <i>x</i> ; <i>y</i> t
+              <i>x</i>    X position of window.
+              <i>y</i>    Y position of window.
 
-    = 18    端末サイズを報告する。
-            応答: CSI 8 ; <i>y</i> ; <i>x</i> t
-              <i>y</i>    端末サイズの高さ(行数)
-              <i>x</i>    端末サイズの幅(文字数)
+    = 14    Reports window size in pixels.
+            Response: CSI 4 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Window height in pixels.
+              <i>x</i>    Window width in pixels.
 
-    = 19    ルートウィンドウのサイズを文字数で報告する。
-            応答: CSI 9 ; <i>y</i> ; <i>x</i> t
-              <i>y</i>    ルートウィンドウの高さ(行数)
-              <i>x</i>    ルートウィンドウの幅(文字数)
+    = 18    Reports terminal size in characters.
+            Response: CSI 8 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Terminal height in characters. (Lines)
+              <i>x</i>    Terminal width in characters. (Columns)
 
-    = 20    アイコンラベルを報告する。
-            応答: OSC L <i>title</i> ST
-              <i>title</i>    アイコンラベル (ウィンドウタイトル)
+    = 19    Reports root window size in characters.
+            Response: CSI 9 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Root window height in characters.
+              <i>x</i>    Root window width in characters.
 
-    = 21    ウィンドウタイトルを報告する。
-            応答: OSC l <i>title</i> ST
-              <i>title</i>    ウィンドウタイトル
+    = 20    Reports icon label.
+            Response: OSC L <i>title</i> ST
+              <i>title</i>    icon label. (window title)
+
+    = 21    Reports window title.
+            Response: OSC l <i>title</i> ST
+              <i>title</i>    Window title.
 </pre>
 </td></tr>
-<tr><td>CSI u</td>	<td>RCP</td>	<td>保存したカーソル位置を復元する。</td></tr>
+<tr><td>CSI u</td>	<td>RCP</td>	<td> Restore cursor position. Same as DECRC. </td></tr>
 
-<tr><td>CSI = <i>Ps</i> c</td>	<td>DA3 (Tertiary DA)</td>	<td>第三端末特性報告。省略時の <i>Ps</i> の値は 0。
+<tr><td>CSI = <i>Ps</i> c</td>	<td>DA3 (Tertiary DA)</td>	<td> Tertiary Device Attribute. The default value of <i>Ps</i> is 0.
 <pre>
-応答: DCS ! | FFFFFFFF ST
+<i>Ps</i> = 0      Tertiary Device Attribute request.
+            Response: DCS ! | FFFFFFFF ST
 </pre>
 </td></tr>
 
-<tr><td>CSI > <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td>第二端末特性報告。省略時の <i>Ps</i> の値は 0。
+<tr><td>CSI > <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td> Secondary Device Attribute. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    第二端末特性要求
-応答: CSI > 32 ; 100 ; 2 c
+<i>Ps</i> = 0      Secondary Device Attribute request.
+            Response: CSI > 32 ; 100 ; 2 c
 </pre>
 </td></tr>
-<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td>矩形消去。
+<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td> Erase rectangular area.
 <pre>
-Ps1   filter rectangle の上辺
-Ps2   filter rectangle の左辺
-Ps3   filter rectangle の下辺
-Ps4   filter rectangle の右辺
+<i>Ps1</i>   Top-line border.
+<i>Ps2</i>   Left-column border.
+<i>Ps3</i>   Bottom-line border.
+<i>Ps4</i>   Right-column border.
 </pre></td>
 </tr>
-<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td>現在の行の <i>Ps1</i> 桁目から <i>Ps2</i> 桁目までを消去する。</td></tr>
+<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td> Erase characters from <i>Ps1</i> column through <i>Ps2</i> column. </td></tr>
 <tr><td>CSI > 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
-<i>Ps</i> = 3..6	Draw Line
-   = 12		Set foreground color
+<i>Ps</i> = 3..6   Draw Line
+   = 12     Set foreground color
 </pre></td></tr>
 
-<tr><td>CSI ? <i>Ps</i> J</td>	<td>DECSED</td>	<td>選択的画面消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。
+<tr><td>CSI ? <i>Ps</i> J</td>	<td>DECSED</td>	<td> Selective erase in display. DECSED only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    カーソル位置から画面末尾までの保護されていない文字を消去する。
-   = 1    画面戦闘からカーソル位置までの保護されていない文字を消去する。
-   = 2    画面全体の保護されていない文字を消去する。
+<i>Ps</i> = 0      Erase from cursor through the end of the display.
+   = 1      Erase from the beginning of the display through the cursor.
+   = 2      Erase the complete of display.
 </pre>
 </td></tr>
-<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td>選択的行消去。保護されていない文字のみを消去する。<i>Ps</i> の省略時の値は 0。 
+<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td> Selective erase in line. DECSEL only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    カーソル位置から行末までの保護されていない文字を消去する。
-   = 1    行頭からカーソル位置までの保護されていない文字を消去する。
-   = 2    行全体の保護されていない文字を消去する。
+<i>Ps</i> = 0      Erase from the cursor through the end of the line.
+   = 1      Erase from the beginning of the line through the cursor.
+   = 2      Erase the complete of line.
 </pre>
 </td></tr>
-<tr><td>CSI ? <i>Pm</i> h</td>	<td>DECSET</td>	<td>DEC/xterm 拡張のモードを設定する。(<a href="#decmode">モード (DEC/xterm拡張)</a>を参照)</td></tr>
-<tr><td>CSI ? <i>Pm</i> i</td>	<td>DECMC</td>	<td>印刷モード
+<tr><td>CSI ? <i>Pm</i> h</td>	<td>DECSET</td>	<td> Sets DEC/xterm specific mode. (See <a href="#decmode">Modes (DEC/xterm specific)</a>.) </td></tr>
+<tr><td>CSI ? <i>Pm</i> i</td>	<td>DECMC</td>	<td> Printing mode.
 <pre>
-<i>Pm</i> =  1    カーソル行を印刷する。
-   =  4    自動プリントモードを無効にする。
-   =  5    自動プリントモードを有効にする。
-<!--   = 10    DECPEX の設定を無視して、画面全体を印刷する。
-   = 11    全てのページを印刷する。
+<i>Pm</i> =  1     Print cursor line.
+   =  4     Disables auto-print mode.
+   =  5     Enables auto-print mode.
+<!--   = 10     Print screen. (Ignore DECPEX)
+   = 11     Prints all pages.
 --></pre>
 </td></tr>
-<tr><td>CSI ? <i>Pm</i> l</td>	<td>DECRST</td>	<td>DEC/xterm 拡張のモードを解除する。(<a href="#decmode">モード (DEC/xterm拡張)</a>を参照)</td></tr>
-<tr><td>CSI ? <i>Ps</i> n</td>	<td>DECDSR</td>	<td>端末の状態を報告する。
+<tr><td>CSI ? <i>Pm</i> l</td>	<td>DECRST</td>	<td> Resets DEC/xterm specific modes. (See <a href="#decmode">Modes (DEC/xterm specific)</a>.) </td></tr>
+<tr><td>CSI ? <i>Ps</i> n</td>	<td>DECDSR</td>	<td> Reports device status.
 <pre>
-<i>Ps</i> = 55    ロケータデバイスの状態を報告する。常に CSI ? 50 n (準備OK)を返す。
+<i>Ps</i> = 55     Reports locator device status. Always returns "CSI ? 50 n" (Locator ready).
+            Response: CSI ? <i>s</i> n
+              <i>s</i> = 50    Locator ready.
 </pre></td></tr>
 
-<tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>カーソル表示形式変更。<i>Ps</i> の省略時の値は 0。
+<tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>Sets cursor style. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0,1    Block cursor / Blink
    = 2      Block cursor / Steady
@@ -342,7 +345,7 @@ Ps4   filter rectangle の右辺
 
 <tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>Soft reset</td></tr>
 
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td>端末動作モード設定
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td> Select terminal's conformance level.
 <pre>
 <i>Ps1</i> = 61    VT-Level 1 (VT100 mode)
     = 62    VT-Level 2 (VT200 mode)
@@ -350,110 +353,110 @@ Ps4   filter rectangle の右辺
     = 64    VT-Level 4 (VT400 mode)
     = 65    VT-Level 5 (VT500 mode)
 
-<i>Ps2</i> = 0    7 bit mode (S7C1T)
-    = 1    8 bit mode (S8C1T)
+<i>Ps2</i> = 0     7 bit mode (S7C1T)
+    = 1     8 bit mode (S8C1T)
 </pre></td>
 </tr>
 
-<tr><td>CSI <i>Ps</i> " q</td>	<td>DECSCA</td>	<td>文字の保護属性を設定する。保護されている文字は選択的消去の対象外になる。
+<tr><td>CSI <i>Ps</i> " q</td>	<td>DECSCA</td>	<td> Select character protection attribute. Selective erase control functions (DECSED, DECSEL and DECSERA) can only erase characters defined as erasable.
 <pre>
-<i>Ps</i> = 0    保護属性の解除。これ以降に出力される文字は保護されていない状態になる。
-   = 1    保護属性の設定。これ以降に出力される文字は保護状態になる。
-   = 2    保護属性の解除。これ以降に出力される文字は保護されていない状態になる。
+<i>Ps</i> = 0      Not protected. DECSED, DECSEL and DECSERA can erase characters.
+   = 1      Protected. DECSED, DECSEL and DECSERA cannot erase characters.
+   = 2      Same as 0.
 </pre>
 </td></tr>
 
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ z</td>	<td>DECERA</td>	<td>矩形消去。<i>Ps1</i> ～ <i>Ps4</i> の省略時の値は現在のカーソル位置。
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ z</td>	<td>DECERA</td>	<td> Erase rectangular area. The default value of <i>Ps1</i> - <i>Ps4</i> is current cursor position.
 <pre>
-<i>Ps1</i>   消去領域の上辺
-<i>Ps2</i>   消去領域の左辺
-<i>Ps3</i>   消去領域の下辺
-<i>Ps4</i>   消去領域の右辺
+<i>Ps1</i>   Top-line border.
+<i>Ps2</i>   Left-column border.
+<i>Ps3</i>   Bottom-line border.
+<i>Ps4</i>   Right-column border.
 </pre></td>
 </tr>
 
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ {</td>	<td>DECSERA</td>	<td>選択的矩形消去。矩形内の保護されていない文字を消去する。<i>Ps1</i> ～ <i>Ps4</i> の省略時の値は現在のカーソル位置。
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ {</td>	<td>DECSERA</td>	<td> Selective erase rectangular area. DECSERA only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps1</i> - <i>Ps4</i> is current cursor position.
 <pre>
-<i>Ps1</i>   消去領域の上辺
-<i>Ps2</i>   消去領域の左辺
-<i>Ps3</i>   消去領域の下辺
-<i>Ps4</i>   消去領域の右辺
+<i>Ps1</i>   Top-line border.
+<i>Ps2</i>   Left-column border.
+<i>Ps3</i>   Bottom-line border.
+<i>Ps4</i>   Right-column border.
 </pre></td>
 </tr>
 
-<tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td>ステータス行から/へ移動。<i>Ps</i> の省略時の値は 0。
+<tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td> Moves cursor from/to status line. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    主画面へ移動。
-   = 1    ステータス行へ移動。
+<i>Ps</i> = 0      Moves to main screen.
+   = 1      Moves to status line.
 </pre></td>
 </tr>
 
-<tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td>ステータス行の表示状態の変更。<i>Ps</i> の省略時の値は 0。
+<tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td> Select the type of status line displayed. The default value of <i>Ps</i> is 0.
 <pre>
-<i>Ps</i> = 0    ステータス行を表示しない。
-     1    ステータス行を表示しない。
-     2    ステータス行を表示する。
+<i>Ps</i> = 0      No status line.
+     1      No status line.
+     2      Host-writable status line.
 </pre></td>
 </tr>
 
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td>filter rectangle 設定。
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td> Enables filter rectangle for locator report.
 <pre>
-<i>Ps1</i>   filter rectangle の上辺
-<i>Ps2</i>   filter rectangle の左辺
-<i>Ps3</i>   filter rectangle の下辺
-<i>Ps4</i>   filter rectangle の右辺
+<i>Ps1</i>   Top boundary of filter rectangle.
+<i>Ps2</i>   Left boundary of filter rectangle.
+<i>Ps3</i>   Bottom boundary of filter rectangle.
+<i>Ps4</i>   Right boundary of filter rectangle.
 </pre>
-filter rectangle は常にワンショットモード扱いになる。一度フィルタイベントを送信すると filter rectangle は無効になる。</td>
+Filter rectangles are always treated as "one-shot" events. Anytime the locator is detected to be outside a filter rectangle, an outside rectangle event is generated and the rectangle is disabled. </td>
 </tr>
 
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ' z</td>	<td>DECELR</td>	<td>DEC ロケータ報告モード。
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ' z</td>	<td>DECELR</td>	<td>DEC locator reporting mode.
 <pre>
-<i>Ps1</i> = 0    ロケータ報告を無効にする
-    = 1    ロケータ報告を有効にする
-    = 2    ワンショットモード。次の一回の報告だけロケータ報告を有効にし、その後無効にする。
-<i>Ps2</i> = 0    文字モード。2 と同じ。
-    = 1    ピクセルモード。位置をピクセル単位で報告する。
-    = 2    文字モード。位置を文字単位で報告する。
+<i>Ps1</i> = 0     Disables locator report.
+    = 1     Enables locator report.
+    = 2     One shot (allow one report, then disable).
+<i>Ps2</i> = 0     Character mode. Same as 2.
+    = 1     Pixel mode. Reporting unit is device physical pixels.
+    = 2     Character mode. Reporting unit is character cells.
 </pre></td>
 </tr>
 
-<tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td>ロケータイベント設定。
+<tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td> Select the locator event.
 <pre>
-<i>Pm</i> = 0    ボタンダウン/アップイベントを無効にする。filter rectangle を無効にする。
-   = 1    ボタンダウンイベントを有効にする。ボタンが押されると、DECRQLP と同じ形式でロケータ位置を報告する。
-   = 2    ボタンダウンイベントを無効にする。
-   = 3    ボタンアップイベントを有効にする。ボタンが離されると、DECRQLP と同じ形式でロケータ位置を報告する。
-   = 4    ボタンアップイベントを無効にする。
+<i>Pm</i> = 0      Disables button up/down events, Disables filter rectangle.
+   = 1      Enables button down event.
+   = 2      Disables button down event.
+   = 3      Enables button up event.
+   = 4      Disables button up event.
 </pre></td>
 </tr>
 
-<tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td>ロケータの位置を応答する。
+<tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td> Requests locator report.
 <pre>
-応答: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
-<i>Pe</i>: イベントコード
-<i>Pe</i> =  0    ロケータ報告が無効
-   =  1    ロケータ位置要求(DECRQLP) を受けた
-   =  2    左ボタンが押された
-   =  3    左ボタンが離された
-   =  4    中ボタンが押された
-   =  5    中ボタンが離された
-   =  6    右ボタンが押された
-   =  7    右ボタンが離された
-   =  8    ボタン 4 が押された (未対応)
-   =  9    ボタン 4 が離された (未対応)
-   = 10    ロケータが filter rectangle の外に出た。
+Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
+<i>Pe</i>: Event code.
+<i>Pe</i> =  0    Received a locator report request (DECRQLP), but the locator is unavailable.
+   =  1    Received a locator report request (DECRQLP).
+   =  2    Left button down.
+   =  3    Left button up.
+   =  4    Middle button down.
+   =  5    Middle button up.
+   =  6    Right button down.
+   =  7    Right button up.
+   =  8    Button 4 down. (not supported)
+   =  9    Button 4 up. (not supported)
+   = 10    Locator outside filter rectangle.
 
-<i>Pb</i>: ボタン状態。押されているボタンに対応する以下の値の合計。
-  1    右ボタン
-  2    中ボタン
-  4    左ボタン
-  8    ボタン4 (未対応)
+<i>Pb</i>: Button code, ASCII decimal 0-15 indicating which buttons are down if any. The state of the four buttons on the locator correspond to the low four bits of the decimal value, "1" means button depressed.
+  1    Right button.
+  2    Middle button.
+  4    Left button.
+  8    Button 4. (not supported)
 
-<i>Pr</i>: 縦位置。画面上端を 1 とする。
+<i>Pr</i>: Row coordinate.
 
-<i>Pc</i>: 横位置。画面左端を 1 とする。
+<i>Pc</i>: Column coordinate.
 
-<i>Pp</i>: ページ。常に 1。
+<i>Pp</i>: Page. Always 1.
 </pre>
 </td></tr>
 </table>
