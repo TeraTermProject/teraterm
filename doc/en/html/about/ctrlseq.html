@@ -217,8 +217,10 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 </td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td> Sets top and bottom margin.
 <pre>
-<i>Ps1</i>    Line number for the top margin. The default value is 1.
-<i>Ps2</i>    Line number for the bottom margin. The default value is current number of lines per screen.
+<i>Ps1</i>    Line number for the top margin.
+       The default value is 1.
+<i>Ps2</i>    Line number for the bottom margin.
+       The default value is current number of lines per screen.
 </td></tr>
 <tr><td>CSI s</td>	<td>SCP</td>	<td> Save cursor position. Same as DECSC. </td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td> Window manipulation.
@@ -445,7 +447,9 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
    =  9    Button 4 up. (not supported)
    = 10    Locator outside filter rectangle.
 
-<i>Pb</i>: Button code, ASCII decimal 0-15 indicating which buttons are down if any. The state of the four buttons on the locator correspond to the low four bits of the decimal value, "1" means button depressed.
+<i>Pb</i>: Button code, ASCII decimal 0-15 indicating which buttons are down if any.
+    The state of the four buttons on the locator correspond to the low four
+    bits of the decimal value, "1" means button depressed.
   1    Right button.
   2    Middle button.
   4    Left button.
