@@ -1155,10 +1155,14 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	          _TRUNCATE);
 
 	// Viewlog Editor path
-	GetPrivateProfileString(Section, "ViewlogEditor ", "notepad.exe",
-	                        Temp, sizeof(Temp), FName);
-	strncpy_s(ts->ViewlogEditor, sizeof(ts->ViewlogEditor), Temp,
-	          _TRUNCATE);
+	if (GetWindowsDirectory(Temp, sizeof(Temp)) + 13 < sizeof(Temp)) { // "\\notepad.exe"(12) + NUL(1)
+		strncat_s(Temp, sizeof(Temp), "\\notepad.exe", _TRUNCATE);
+	}
+	else {
+		Temp[0] = '\0';
+	}
+	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
+	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
 
 	// Locale for UTF-8
 	GetPrivateProfileString(Section, "Locale ", DEFAULT_LOCALE,
