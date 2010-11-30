@@ -2133,8 +2133,8 @@ void CSSetAttr()		// SGR
 	if (Param[1]==3) {
 	  if (Param[2] < 1 || NParam < 2) Param[2] = 1;
 	  if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-	  if (Param[4] < 1 || NParam < 4) Param[4] = 1;
-	  if (Param[5] < 1 || NParam < 5) Param[5] = 1;
+	  if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
+	  if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
 	  BuffEraseBox(Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
 	}
 	break;
@@ -2561,8 +2561,8 @@ void CSSetAttr()		// SGR
       case '{': // DECSERA
 	if (Param[1] < 1 || NParam < 1) Param[1]=1;
 	if (Param[2] < 1 || NParam < 2) Param[2]=1;
-	if (Param[3] < 1 || NParam < 3) Param[3]=1;
-	if (Param[4] < 1 || NParam < 4) Param[4]=1;
+	if (Param[3] < 1 || NParam < 3) Param[3]=NumOfLines-StatusLine;
+	if (Param[4] < 1 || NParam < 4) Param[4]=NumOfColumns;
 	if (RelativeOrgMode) {
 	  Param[1] += CursorTop;
 	  if (Param[1] > CursorBottom) {
