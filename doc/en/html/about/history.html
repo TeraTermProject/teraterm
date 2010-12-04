@@ -41,10 +41,10 @@
         </ul></li>
       <li>added support for the DECERA (Erase Rectangular Area) control sequence.</li>
       <li>added support for the DA3 (Tertiary Device Attribute) control sequence.</li>
-      <!-- li>端末 ID 設定で、VT420, VT520, VT525 に対応した。
+      <li>added support for the VT420, VT520 and VT525 on the terminal ID settings.
         <ul>
-          <li>DECSCL(端末動作モード設定)制御シーケンスで、VTレベル5(vt500シリーズ)に対応した。</li>
-        </ul></li -->
+          <li>The DECSCL(terminal mode setting) control sequence can support the VT level 5(vt500 series).</li>
+        </ul></li>
       <li>A single character to indicate the window status can be shown on the "Window" menu and "Windows list" dialog. See below.
         <ul type="disc">
           <li>+ Normal window</li>
@@ -67,7 +67,7 @@
       <li><a href="../setup/teraterm-term.html#beep">Beep setting</a> does not work.</li>
       <li>The scroll region can not be cleared by using the DECALN (DEC Screen Alignment Test) control sequence.</li>
       <li>An empty string can not reply by using the window title and icon label reporting request.</li>
-      <!-- li>IO-8256 端末の矩形消去、色変更、線引き、行消去制御シーケンスが正しく動作しない場合がある問題を修正した。</li -->
+      <li>The rectangle erasing, color changing and line drawing can not work well in the IO-8256 terminal.</li>
     </ul>
   </li>
 
@@ -2384,7 +2384,7 @@ SYNOPSIS:
 
 <h3><a name="ttproxy_1.0.0.17">2010.xx.xx (Ver 1.0.0.17)</a></h3>
 <ul class="history">
-      <!--li>Bug fix: ポート番号に5桁の数字を指定して保存すると落ちる問題を修正した。</li-->
+      <li>Bug fix: When the port number is specified by the five-figure numeric, the application fault would occur.</li>
 </ul>
 
 <h3><a name="ttproxy_1.0.0.16">2009.11.10 (Ver 1.0.0.16)</a></h3>
