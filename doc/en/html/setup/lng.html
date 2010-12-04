@@ -22,31 +22,30 @@ Tera Term installer will copy Japanese, German and French language file into the
 And also, the installer will write the language file name into the UILanguageFile entry in the TERATERM.INI file.
 </p>
 
-<!--
-<h2>フォントの指定</h2>
+<h2>Font Settings</h2>
 
 <p>
-インストーラは、フォントだけを指定するテンプレートとして Default.lng をコピーします。<br>
-フォントの指定は以下のようなフォーマットで行います。
+The installer copies the Default.lng file into the lang directory.<br>
+The font settings are as follows:
 </p>
 
 <pre>
-; 大きいフォント
+; A big font
 DLG_SYSTEM_FONT=System,12,0
-; 小さいフォント
+; A small font
 DLG_TAHOMA_FONT=Tahoma,8,0
 </pre>
 
 <p>
-一つ目にはフォント名を指定します。
+Describe a font name in the first entry.
 </p>
 
 <p>
-二つ目にはフォントサイズを数字で指定します。
+Describe a font size in the second entry.
 </p>
 
 <p>
-三つ目にはフォントのキャラクタセットを数字で指定します。
+Describe a font character set in the third entry.
 <pre>
 0   ANSI
 1   Default charset
@@ -68,8 +67,9 @@ DLG_TAHOMA_FONT=Tahoma,8,0
 238 Central European
 255 OEM/DOS
 </pre>
-詳しくは msdn ライブラリの <a href="http://msdn.microsoft.com/en-us/library/bb773327(VS.85).aspx">LOGFONT 構造体</a>の lfCharset の説明を参照してください。
-</p>-->
+
+Refer to the lfCharSet member of the <a href="http://msdn.microsoft.com/en-us/library/bb773327(VS.85).aspx">LOGFONT Structure</a> for complete information.
+</p>
 
 
 </BODY>
