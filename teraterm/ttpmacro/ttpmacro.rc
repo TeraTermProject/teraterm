@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -104,8 +104,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,67,0,0
- PRODUCTVERSION 4,67,0,0
+ FILEVERSION 4,68,0,0
+ PRODUCTVERSION 4,68,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -122,12 +122,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "T. Teranishi"
             VALUE "FileDescription", "TTPMACRO"
-            VALUE "FileVersion", "4, 67, 0, 0"
+            VALUE "FileVersion", "4, 68, 0, 0"
             VALUE "InternalName", "TTPMACRO"
             VALUE "LegalCopyright", "Copyright (C) TeraTerm Project 2004-2010, T. Teranishi 1994-1998"
             VALUE "OriginalFilename", "TTPMACRO.EXE"
             VALUE "ProductName", "TTPMACRO"
-            VALUE "ProductVersion", "4, 67, 0, 0"
+            VALUE "ProductVersion", "4, 68, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -145,7 +145,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_TTMACRO             ICON                    "ttmacro.ico"
-#endif    // English (U.S.) resources
+#endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
