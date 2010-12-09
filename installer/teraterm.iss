@@ -572,15 +572,18 @@ begin
     wpSelectComponents:
       begin
 
-        iniFile := GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename());
-        if iniFile = 'lang\Japanese.lng' then
-          UILangFilePage.SelectedValueIndex := 1
-        else if iniFile = 'lang\German.lng' then
-          UILangFilePage.SelectedValueIndex := 2
-        else if iniFile = 'lang\French.lng' then
-          UILangFilePage.SelectedValueIndex := 3
-        else
-          UILangFilePage.SelectedValueIndex := 0;
+        if FileExists(GetDefaultIniFileName()) then
+        begin
+          iniFile := GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename());
+          if iniFile = 'lang\Japanese.lng' then
+            UILangFilePage.SelectedValueIndex := 1
+          else if iniFile = 'lang\German.lng' then
+            UILangFilePage.SelectedValueIndex := 2
+          else if iniFile = 'lang\French.lng' then
+            UILangFilePage.SelectedValueIndex := 3
+          else
+            UILangFilePage.SelectedValueIndex := 0;
+        end;
 
       end;
   end;
