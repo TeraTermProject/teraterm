@@ -524,6 +524,7 @@ begin
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
+    // ‘¼‚ÌŒ¾Œê‚ÍÅV”Å‚É’Ç]‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅA“ú–{Œê‚¾‚¯“Á•Êˆµ‚¢
     else
       UILangFilePage.SelectedValueIndex := 0;
   end;
