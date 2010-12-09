@@ -574,12 +574,12 @@ begin
 
         if FileExists(GetDefaultIniFileName()) then
         begin
-          iniFile := GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename());
-          if iniFile = 'lang\Japanese.lng' then
+          iniFile := Lowercase(GetIniString('Tera Term', 'UILanguageFile', '', GetDefaultIniFilename()));
+          if iniFile = 'lang\japanese.lng' then
             UILangFilePage.SelectedValueIndex := 1
-          else if iniFile = 'lang\German.lng' then
+          else if iniFile = 'lang\german.lng' then
             UILangFilePage.SelectedValueIndex := 2
-          else if iniFile = 'lang\French.lng' then
+          else if iniFile = 'lang\french.lng' then
             UILangFilePage.SelectedValueIndex := 3
           else
             UILangFilePage.SelectedValueIndex := 0;
