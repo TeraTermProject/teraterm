@@ -259,4 +259,4 @@ Example: adding a TTSSH menu under File menu
        (3) TTSSH Changelog http://logmett.com/forum/viewtopic.php?f=5&t=29
            Added current modification.
 
-  9. Delete spanshots.
+  10. Delete spanshots.

@@ -271,4 +271,4 @@
        (3) TTSSH Changelog http://logmett.com/forum/viewtopic.php?f=5&t=29
            今回の変更を追加する
 
-  9. スナップショットを削除する
+  10. スナップショットを削除する
