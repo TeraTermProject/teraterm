@@ -221,6 +221,7 @@ static void cAES128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -230,19 +231,19 @@ static void cAES128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_AES128_ENCRYPT_ERROR1", pvar,
-		                  "AES128/192/256 encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-		            pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
+		                  "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "AES128/192/256", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_AES128_ENCRYPT_ERROR2", pvar,
-		                  "AES128/192/256 encrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "AES128/192/256");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -268,6 +269,7 @@ static void cAES128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -277,18 +279,19 @@ static void cAES128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_AES128_DECRYPT_ERROR1", pvar,
-		                  "AES128/192/256 decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
+		                  "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "AES128/192/256", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_AES128_DECRYPT_ERROR2", pvar,
-		                  "AES128/192/256 decrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "AES128/192/256");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -310,13 +313,13 @@ error:
 }
 
 
-
 // for SSH2(yutaka)
 static void c3DES_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
-                              int bytes)
+                           int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -326,19 +329,19 @@ static void c3DES_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_3DESCBC_ENCRYPT_ERROR1", pvar,
-		                  "3DES-CBC encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-		            pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
+		                  "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "3DES-CBC", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_3DESCBC_ENCRYPT_ERROR2", pvar,
-		                  "3DES-CBC encrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "3DES-CBC");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -360,10 +363,11 @@ error:
 }
 
 static void c3DES_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
-                              int bytes)
+                           int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -373,18 +377,19 @@ static void c3DES_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_3DESCBC_DECRYPT_ERROR1", pvar,
-		                  "3DES-CBC decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
+		                  "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "3DES-CBC", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_3DESCBC_DECRYPT_ERROR2", pvar,
-		                  "3DES-CBC decrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "3DES-CBC");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -411,6 +416,7 @@ static void cBlowfish_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -420,19 +426,19 @@ static void cBlowfish_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_BLOWFISH_ENCRYPT_ERROR1", pvar,
-		                  "Blowfish encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-		            pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
+		                  "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Blowfish", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_BLOWFISH_ENCRYPT_ERROR2", pvar,
-		                  "Blowfish encrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Blowfish");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -449,6 +455,7 @@ static void cBlowfish_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -458,18 +465,19 @@ static void cBlowfish_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_BLOWFISH_DECRYPT_ERROR1", pvar,
-		                  "Blowfish decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
+		                  "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Blowfish", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_BLOWFISH_DECRYPT_ERROR2", pvar,
-		                  "Blowfish decrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Blowfish");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -481,11 +489,13 @@ error:
 	free(newbuf);
 }
 
+
 static void cArcfour_encrypt(PTInstVar pvar, unsigned char FAR * buf,
-                               int bytes)
+                             int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -495,19 +505,19 @@ static void cArcfour_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_ARCFOUR_ENCRYPT_ERROR1", pvar,
-		                  "Arcfour encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-		            pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
+		                  "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Arcfour", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_ARCFOUR_ENCRYPT_ERROR2", pvar,
-		                  "Arcfour encrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Arcfour");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -520,10 +530,11 @@ error:
 }
 
 static void cArcfour_decrypt(PTInstVar pvar, unsigned char FAR * buf,
-                               int bytes)
+                             int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -533,18 +544,19 @@ static void cArcfour_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_ARCFOUR_DECRYPT_ERROR1", pvar,
-		                  "Arcfour decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
+		                  "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Arcfour", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_ARCFOUR_DECRYPT_ERROR2", pvar,
-		                  "Arcfour decrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Arcfour");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -556,11 +568,13 @@ error:
 	free(newbuf);
 }
 
+
 static void cCast128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
                              int bytes)
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -570,19 +584,19 @@ static void cCast128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_CAST128_ENCRYPT_ERROR1", pvar,
-		                  "CAST128 encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-		            pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
+		                  "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "CAST128", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_CAST128_ENCRYPT_ERROR2", pvar,
-		                  "CAST128 encrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "CAST128");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -599,6 +613,7 @@ static void cCast128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 {
 	unsigned char *newbuf = malloc(bytes);
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	char tmp[80];
 
 	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
 	if (bytes == 0)
@@ -608,18 +623,19 @@ static void cCast128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		return;
 
 	if (bytes % block_size) {
-		char tmp[80];
-		UTIL_get_lang_msg("MSG_CAST128_DECRYPT_ERROR1", pvar,
-		                  "CAST128 decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, bytes, block_size);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
+		                  "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "CAST128", bytes, block_size);
 		notify_fatal_error(pvar, tmp);
 		goto error;
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_CAST128_DECRYPT_ERROR2", pvar,
-		                  "CAST128 decrypt error(2)");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "CAST128");
+		notify_fatal_error(pvar, tmp);
 		goto error;
 
 	} else {
@@ -630,7 +646,6 @@ static void cCast128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 error:
 	free(newbuf);
 }
-
 
 
 static void c3DES_encrypt(PTInstVar pvar, unsigned char FAR * buf,
