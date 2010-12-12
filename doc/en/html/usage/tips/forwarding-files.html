@@ -38,17 +38,13 @@ When the connection type is the TCP/IP and dial-up PPP, the flow control will wo
 When the connection type is the TELNET, a user should connect by using the binary mode.
 </p>
 
-<!--
-
-
 <p>
-Kermit ではこのことは通常問題になりません。B-Plus と ZMODEM では、すべての制御文字をエスケープすることにより正しくファイル転送ができるようになる可能性があります。XMODEM と Quick-VAN では、すべての 8-bit 文字を通す回線を使用しないと正しくファイル転送ができません。
+By using the kermit protocol, it has no problem. By using the B-Plus and ZMODEM protocol, it may have no problem when all control characters are escaped. By using the XMODEM and Quick-VAN protocol, it has no problem when all 8bit characters can pass through.
 </p>
 
 <p>
-中間ホストから telnet コマンドで終端ホストに接続した場合、Tera Term が送出した制御文字の一部は中間ホストの telnet コマンドにより吸収されてしまい、終端ホストに伝わらないことがあります。これらの制御文字は通常 telnet の "echo", "escape", "erase", "flushoutput", "interrupt", "kill", "quit", "areyouthere" 等の機能に割り当てられています。ホストからファイルのダウンロードはできるが、ホストへのアップロードはできないというような場合、このような状況が原因になっている可能性が高いです。この問題を解決するには telnet コマンドの各機能に対して割り当てられた制御文字を解除するか、あるいは上述のように ZMODEM と B-Plus の場合はすべての制御文字をエスケープするようにしてください。ただし telnet コマンドによっては、各機能に割り当てられた制御文字をうまく解除できない場合があります。
+When a user connects from the intermediate server to the remote host by using the telnet command, a part of the control characters Tera Term sending will lost. These characters will be assigned to the telnet features such as the "echo", "escape", "erase", "flushoutput", "interrupt", "kill", "quit" and "areyouthere". If a user can download the file from the remote server but can not upload the file to the server, it has the above possible cause. To resolve this problem, cancel the control character feature or esacpe all control characters by using the B-Plus and ZMODEM protocol. However, it will not work well by using the telnet protocol.
 </p>
--->
 
 </div>
 
