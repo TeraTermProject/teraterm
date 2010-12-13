@@ -91,7 +91,7 @@ typedef struct scp {
 	char localfilefull[MAX_PATH];  // local filename fullpath
 	char remotefile[MAX_PATH];     // remote filename
 	FILE *localfp;                 // file pointer for local file
-	struct _stat filestat;         // file status information
+	struct __stat64 filestat;      // file status information
 	HWND progress_window;
 	HANDLE thread;
 	unsigned int thread_id;
@@ -3740,7 +3740,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	int len;
 	Channel_t *c = NULL;
 	FILE *fp = NULL;
-	struct _stat st;
+	struct __stat64 st;
 
 	// ソケットがクローズされている場合は何もしない。
 	if (pvar->socket == INVALID_SOCKET)
@@ -3776,7 +3776,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		}
 		c->scp.localfp = fp;     // file pointer
 
-		if (_stat(c->scp.localfilefull, &st) == 0) {
+		if (_stat64(c->scp.localfilefull, &st) == 0) {
 			c->scp.filestat = st;
 		} else {
 			goto error;
@@ -3880,7 +3880,7 @@ int SSH_sftp_transaction(PTInstVar pvar)
 	int len;
 	Channel_t *c = NULL;
 //	FILE *fp = NULL;
-//	struct _stat st;
+//	struct __stat64 st;
 
 	// ソケットがクローズされている場合は何もしない。
 	if (pvar->socket == INVALID_SOCKET)
@@ -8363,7 +8363,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 
 		total_size += ret;
 
-		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, (long long)c->scp.filestat.st_size, 
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, 
 			(100 * total_size / c->scp.filestat.st_size)%100 );
 		SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
 
@@ -8407,7 +8407,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		char buf[128];
 
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "C0644 %lld %s\n", 
-			(long long)c->scp.filestat.st_size, c->scp.localfile);
+			c->scp.filestat.st_size, c->scp.localfile);
 
 		c->scp.state = SCP_FILEINFO;
 		SSH2_send_channel_data(pvar, c, buf, strlen(buf));
