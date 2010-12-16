@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <direct.h>
+#include <ctype.h>
 #include "ttlib.h"
 #include "tt_res.h"
 
@@ -1363,6 +1364,28 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// IME status related cursor style
 	if (GetOnOff(Section, "IMERelatedCursor", FName, FALSE))
 		ts->WindowFlag |= WF_IMECURSORCHANGE;
+
+	// Terminal Unique ID
+	GetPrivateProfileString(Section, "TerminalUID", "FFFFFFFF", Temp, sizeof(Temp), FName);
+	if (strlen(Temp) == 8) {
+		for (i=0; i<8 && isxdigit(Temp[i]); i++) {
+			if (islower(Temp[i])) {
+				ts->TerminalUID[i] = toupper(Temp[i]);
+			}
+			else {
+				ts->TerminalUID[i] = Temp[i];
+			}
+		}
+		if (i == 8) {
+			ts->TerminalUID[i] = 0;
+		}
+		else {
+			strncpy_s(ts->TerminalUID, sizeof(ts->TerminalUID), "FFFFFFFF", _TRUNCATE);
+		}
+	}
+	else {
+		strncpy_s(ts->TerminalUID, sizeof(ts->TerminalUID), "FFFFFFFF", _TRUNCATE);
+	}
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2380,6 +2403,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// IME status related cursor style
 	WriteOnOff(Section, "IMERelatedCursor", FName,
 		ts->WindowFlag & WF_IMECURSORCHANGE);
+
+	// Terminal Unique ID
+	WritePrivateProfileString(Section, "TerminalUID", ts->TerminalUID, FName);
 }
 
 #define VTEditor "VT editor keypad"

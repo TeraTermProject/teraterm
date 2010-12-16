@@ -502,6 +502,7 @@ struct tttset {
 	WORD LogBinary;
 	WORD DisableMenuDuplicateSession;
 	WORD DisableMenuNewConnection;
+	char TerminalUID[9];
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -937,6 +938,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.69, ttset_memfilemap was replaced with ttset_memfilemap_15.
+ *   added tttset.TerminalUID.
+ *
  * - At version 4.68, ttset_memfilemap was replaced with ttset_memfilemap_14.
  *   increase WinList(MAXNWIN) size.
  *
@@ -1028,4 +1032,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_14"
+#define TT_FILEMAPNAME "ttset_memfilemap_15"

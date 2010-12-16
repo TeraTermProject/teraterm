@@ -2112,10 +2112,14 @@ void CSSetAttr()		// SGR
 
   void CSEQ(BYTE b)
   {
+    char Report[16];
+    int len;
+
     switch (b) {
       case 'c': /* Tertiary terminal report (Tertiary DA) */
 	if (Param[1] < 1) {
-	  SendDCSstr("!|FFFFFFFF", 0);
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "!|%8s", CLocale, ts.TerminalUID);
+	  SendDCSstr(Report, len);
 	}
 	break;
     }
