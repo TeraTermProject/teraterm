@@ -362,5 +362,24 @@ default:
 AlternateScreenBuffer=on
 </pre>
 
+<h1><a name="TerminalUID">Terminal unique ID <!--端末固有IDを設定する--></a></h1>
+
+<!-- p>
+Tera Term は DA3 制御シーケンスを受信すると、端末固有の ID 応答します。端末固有 ID は 8 桁の 16 進数値で、最初の 2 桁が製造場所を、残りの 6 桁が製造場所内で端末毎に割り振られた固有の番号です。
+</p>
+
+<p>
+DA3 制御シーケンスに対して応答する端末固有 ID を別の値、例えば 01234567 に変更したい場合は、設定ファイルの [Tera Term] セクションの TerminalUID 行を以下のようにしてください。
+</p -->
+
+<pre>
+TerminalUID=01234567
+</pre>
+
+<pre>
+Default:
+TerminalUID=FFFFFFFF
+</pre>
+
 </BODY>
 </HTML>
