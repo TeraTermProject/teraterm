@@ -2912,7 +2912,7 @@ void ControlSequence(BYTE b)
 #define ModeDcsString    2
 void DeviceControl(BYTE b)
 {
-	static char StrBuff[256];
+	static unsigned char StrBuff[256];
 	static int DcsParseMode = ModeDcsFirst;
 	static int StrLen;
 	static char Cmd;
