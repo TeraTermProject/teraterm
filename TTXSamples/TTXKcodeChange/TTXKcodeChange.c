@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
@@ -107,11 +108,11 @@ void CommOut(char *str, int len) {
   pvar->cv->OutBuffCount = c;
 }
 
-void ParseInputStr(char *rstr, int rcount) {
+void ParseInputStr(unsigned char *rstr, int rcount) {
   static WORD mode = IdModeFirst;
-  static char buff[InBuffSize];
+  static unsigned char buff[InBuffSize];
   static unsigned int blen;
-  char *p, *p2;
+  unsigned char *p, *p2;
   int i;
   unsigned int func;
 
