@@ -1386,6 +1386,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	else {
 		strncpy_s(ts->TerminalUID, sizeof(ts->TerminalUID), "FFFFFFFF", _TRUNCATE);
 	}
+
+	// Lock Terminal UID
+	if (GetOnOff(Section, "LockTUID", FName, TRUE))
+		ts->TermFlag |= TF_LOCKTUID;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2406,6 +2410,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Terminal Unique ID
 	WritePrivateProfileString(Section, "TerminalUID", ts->TerminalUID, FName);
+
+	// Lock Terminal UID
+	WritePrivateProfileString(Section, "LockTUID", FName, ts->TermFlag & TF_LOCKTUID);
 }
 
 #define VTEditor "VT editor keypad"

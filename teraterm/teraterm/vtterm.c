@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <mbstring.h>
 #include <locale.h>
+#include <ctype.h>
 
 #include "buffer.h"
 #include "ttwinman.h"
@@ -924,8 +925,10 @@ void ParseControl(BYTE b)
     case DCS:
       SavedMode = ParseMode;
       ESCFlag = FALSE;
+      ICount = 0;
       NParam = 1;
       Param[1] = -1;
+      Prv = 0;
       ParseMode = ModeDCS;
       break;
     case SOS:
@@ -2905,49 +2908,104 @@ void ControlSequence(BYTE b)
   FirstPrm = FALSE;
 }
 
+#define ModeDcsFirst     1
+#define ModeDcsString    2
 void DeviceControl(BYTE b)
 {
-  if (ESCFlag && (b=='\\') || (b==ST && ts.KanjiCode!=IdSJIS))
-  {
-    ESCFlag = FALSE;
-    ParseMode = SavedMode;
-    return;
-  }
+	static char StrBuff[256];
+	static int DcsParseMode = ModeDcsFirst;
+	static int StrLen;
+	static char Cmd;
 
-  if (b==ESC)
-  {
-    ESCFlag = TRUE;
-    return;
-  }
-  else ESCFlag = FALSE;
+	if ((ESCFlag && (b=='\\')) || (b==ST && ts.KanjiCode!=IdSJIS)) {
+		if (DcsParseMode == ModeDcsString) {
+			StrBuff[StrLen] = 0;
+			switch (ICount) {
+			case 0:
+				break;
+			case 1:
+				if (IntChar[1] == '!' && Cmd == '{') { // DECSTUI
+					if (! (ts.TermFlag & TF_LOCKTUID)) {
+						int i;
+						for (i=0; i<8 && isxdigit(StrBuff[i]); i++) {
+							if (islower(StrBuff[i])) {
+								StrBuff[i] = toupper(StrBuff[i]);
+							}
+						}
+						if (StrLen == 8 && i == 8) {
+							strncpy_s(ts.TerminalUID, sizeof(ts.TerminalUID), StrBuff, _TRUNCATE);
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		ESCFlag = FALSE;
+		ParseMode = SavedMode;
+		DcsParseMode = ModeDcsFirst;
+		StrLen = 0;
+		return;
+	}
 
-  if (b<=US)
-    ParseControl(b);
-  else if ((b>=0x30) && (b<=0x39))
-  {
-    if (Param[NParam] < 0) Param[NParam] = 0;
-    if (Param[NParam]<1000)
-      Param[NParam] = Param[NParam]*10 + b - 0x30;
-  }
-  else if (b==0x3B)
-  {
-    if (NParam < NParamMax)
-    {
-      NParam++;
-      Param[NParam] = -1;
-    }
-  }
-  else if ((b>=0x40) && (b<=0x7E))
-  {
-    if (b=='|')
-    {
-      ParseMode = ModeDCUserKey;
-      if (Param[1] < 1) ClearUserKey();
-      WaitKeyId = TRUE;
-      NewKeyId = 0;
-    }
-    else ParseMode = ModeSOS;
-  }
+	if (b==ESC) {
+		ESCFlag = TRUE;
+		return;
+	}
+	else {
+		ESCFlag = FALSE;
+	}
+
+	switch (DcsParseMode) {
+	case ModeDcsFirst:
+		if (b<=US) {
+			ParseControl(b);
+		}
+		else if ((b>=0x20) && (b<=0x2F)) {
+			if (ICount<IntCharMax) ICount++;
+			IntChar[ICount] = b;
+		}
+		else if ((b>=0x30) && (b<=0x39)) {
+			if (Param[NParam] < 0) Param[NParam] = 0;
+			if (Param[NParam]<1000)
+				Param[NParam] = Param[NParam]*10 + b - 0x30;
+		}
+		else if (b==0x3B) {
+			if (NParam < NParamMax) {
+				NParam++;
+				Param[NParam] = -1;
+			}
+		}
+		else if ((b>=0x40) && (b<=0x7E)) {
+			if (ICount == 0 && b=='|') {
+				ParseMode = ModeDCUserKey;
+				if (Param[1] < 1) ClearUserKey();
+				WaitKeyId = TRUE;
+				NewKeyId = 0;
+			}
+			else {
+				Cmd = b;
+				DcsParseMode = ModeDcsString;
+			}
+		}
+		else {
+			ParseMode = ModeSOS;
+		}
+		break;
+
+	case ModeDcsString:
+		if (b <= US && b != HT && b != CR) {
+			ESCFlag = FALSE;
+			ParseMode = SavedMode;
+			DcsParseMode = ModeDcsFirst;
+			StrLen = 0;
+		}
+		else if (StrLen < sizeof(StrBuff)-1) {
+			StrBuff[StrLen++] = b;
+		}
+		break;
+	}
 }
 
 void DCUserKey(BYTE b)
