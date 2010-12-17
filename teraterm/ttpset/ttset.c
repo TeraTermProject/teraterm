@@ -1368,7 +1368,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Terminal Unique ID
 	GetPrivateProfileString(Section, "TerminalUID", "FFFFFFFF", Temp, sizeof(Temp), FName);
 	if (strlen(Temp) == 8) {
-		for (i=0; i<8 && isxdigit(Temp[i]); i++) {
+		for (i=0; i<8 && isxdigit((unsigned char)Temp[i]); i++) {
 			if (islower(Temp[i])) {
 				ts->TerminalUID[i] = toupper(Temp[i]);
 			}
@@ -2412,7 +2412,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "TerminalUID", ts->TerminalUID, FName);
 
 	// Lock Terminal UID
-	WritePrivateProfileString(Section, "LockTUID", FName, ts->TermFlag & TF_LOCKTUID);
+	WriteOnOff(Section, "LockTUID", FName, ts->TermFlag & TF_LOCKTUID);
 }
 
 #define VTEditor "VT editor keypad"
