@@ -44,7 +44,7 @@ static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
 static COLORREF ANSIColor[256];
-static int Dx[256];
+static int Dx[TermWidthMax];
 
 // caret variables
 static int CaretStatus;
@@ -1956,7 +1956,7 @@ void ChangeFont()
 
   SetLogFont();
 
-  for (i = 0 ; i <= 255; i++)
+  for (i = 0 ; i < TermWidthMax; i++)
     Dx[i] = FontWidth;
 }
 
