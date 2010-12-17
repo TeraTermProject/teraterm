@@ -84,6 +84,7 @@ BOOL ColorStr2ColorRef(COLORREF *color, PCHAR Str) {
 static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
   char buff[1024];
   PCHAR cur, next;
+  int x, y;
 
   cur = Param;
   while (next = GetParam(buff, sizeof(buff), cur)) {
@@ -93,6 +94,13 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
     }
     else if (_strnicmp(buff, "/BG=", 4) == 0) {
       ColorStr2ColorRef(&(ts->VTColor[1]), &buff[4]);
+      memset(cur, ' ', next - cur);
+    }
+    else if (_strnicmp(buff, "/SIZE=", 6) == 0) {
+      if (sscanf_s(buff+6, "%dx%d", &x, &y) == 2 || sscanf_s(buff+6, "%d,%d", &x, &y) == 2) {
+	ts->TerminalWidth = x;
+	ts->TerminalHeight = y;
+      }
       memset(cur, ' ', next - cur);
     }
     cur = next;
