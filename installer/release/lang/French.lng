@@ -614,6 +614,7 @@ DLG_SSHSETUP_HEARTBEAT=HeartBeat(garder actif)
 DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 pour éteindre)
 DLG_SSHSETUP_PASSWORD=Garder mot de passe en mémoire
 DLG_SSHSETUP_FORWARDAGENT=Activer &agent forwarding
+DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
 DLG_SSHSETUP_NOTICE=Toutes options actives prochaine ouverture de session
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Choisir un fichier hôtes connus en R/W
@@ -662,6 +663,7 @@ MSG_FWD_DENIED_ERROR=Le serveur a essayé de rediriger une connexion à travers ce
 MSG_FWD_DENIED_X_ERROR=Le serveur a essayé de rediriger une connexion à travers cette machine.\nIl a demandé une connexion au serveur X local.\nVous n'aviez pas spécifié cette redirection par avance à TTSSH, par conséquent la requête a été refusée.
 MSG_FWD_DENIED_BY_SERVER_ERROR=Un programme sur la machine locale a essayé de se connecter à un port redirigé.\nLa demande de redirection a été refusée par le serveur. La connexion a été fermée.
 MSG_FWD_COMM_ERROR=Une erreur de communication est survenue lors de l'envoi de données redirigées vers un port local.\nLa connexion redirigée va être fermée.
+MSG_FWD_AGENT_FORWARDING_CONFIRM=Accept agent forwading request?
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=Une erreur est apparue lors d'une tentative de lecture d'un fichier d'hôtes connus.\nLe nom de fichier n'existe pas.

@@ -363,6 +363,9 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	// agent forward を有効にする (2008.11.25 maya)
 	settings->ForwardAgent = read_BOOL_option(fileName, "ForwardAgent", FALSE);
 
+	// agent forward 確認を有効にする
+	settings->ForwardAgentConfirm = read_BOOL_option(fileName, "ForwardAgentConfirm", TRUE);
+
 	clear_local_settings(pvar);
 }
 
@@ -439,6 +442,10 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	// agent forward を有効にする (2008.11.25 maya)
 	WritePrivateProfileString("TTSSH", "ForwardAgent",
 	                          settings->ForwardAgent ? "1" : "0", fileName);
+
+	// agent forward 確認を有効にする
+	WritePrivateProfileString("TTSSH", "ForwardAgentConfirm",
+	                          settings->ForwardAgentConfirm ? "1" : "0", fileName);
 }
 
 
@@ -2459,6 +2466,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_FORWARDAGENT, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_FORWARDAGENT, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_FORWARDAGENTCONFIRM, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENTCONFIRM", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_FORWARDAGENTCONFIRM, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_NOTICEBANNER, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_NOTICE", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_NOTICEBANNER, pvar->ts->UIMsg);
@@ -2515,6 +2525,12 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	}
 	if (pvar->settings.ForwardAgent) {
 		CheckDlgButton(dlg, IDC_FORWARDAGENT, TRUE);
+	}
+	else {
+		EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTCONFIRM), FALSE);
+	}
+	if (pvar->settings.ForwardAgentConfirm) {
+		CheckDlgButton(dlg, IDC_FORWARDAGENTCONFIRM, TRUE);
 	}
 }
 
@@ -2656,6 +2672,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 
 	pvar->settings.remember_password = IsDlgButtonChecked(dlg, IDC_REMEMBERPASSWORD);
 	pvar->settings.ForwardAgent = IsDlgButtonChecked(dlg, IDC_FORWARDAGENT);
+	pvar->settings.ForwardAgentConfirm = IsDlgButtonChecked(dlg, IDC_FORWARDAGENTCONFIRM);
 }
 
 static void move_cur_sel_delta(HWND listbox, int delta)
@@ -2784,6 +2801,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_HEARTBEATLABEL2, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_REMEMBERPASSWORD, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FORWARDAGENT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_FORWARDAGENTCONFIRM, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 		}
@@ -2826,6 +2844,14 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 		case IDC_CHOOSEREADONLYFILE:
 			choose_read_only_file(dlg);
+			return TRUE;
+		case IDC_FORWARDAGENT:
+			if (!IsDlgButtonChecked(dlg, IDC_FORWARDAGENT)) {
+				EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTCONFIRM), FALSE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTCONFIRM), TRUE);
+			}
 			return TRUE;
 		}
 		break;

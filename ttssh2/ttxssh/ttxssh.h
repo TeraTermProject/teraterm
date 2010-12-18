@@ -135,6 +135,9 @@ typedef struct _TS_SSH {
 
 	// Enable Agent forwarding
 	BOOL ForwardAgent;
+
+	// Confirm Agent forwarding
+	BOOL ForwardAgentConfirm;
 } TS_SSH;
 
 typedef struct _TInstVar {

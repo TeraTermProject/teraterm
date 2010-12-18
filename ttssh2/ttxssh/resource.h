@@ -81,6 +81,7 @@
 #define IDC_FORWARDAGENT                1055
 #define IDC_TTSSH_VERSION               1056
 #define IDC_FORWARD_AGENT               1056
+#define IDC_FORWARDAGENTCONFIRM         1056
 #define IDC_RSA1_TYPE                   1057
 #define IDC_RSA_TYPE                    1058
 #define IDC_DSA_TYPE                    1059

@@ -1914,3 +1914,22 @@ void FWD_end(PTInstVar pvar)
 		DestroyWindow(pvar->fwd_state.accept_wnd);
 	}
 }
+
+BOOL FWD_agent_forword_confirm(PTInstVar pvar)
+{
+	HWND cur_active = GetActiveWindow();
+	pvar->session_settings.ForwardAgentConfirm = 1;
+	if (pvar->session_settings.ForwardAgentConfirm) {
+		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
+		                  "Accept agent forwading request?");
+		if (MessageBox(cur_active != NULL ? cur_active : pvar->NotificationWindow,
+		               pvar->ts->UIMsg, "TTSSH",
+		               MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES) {
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}

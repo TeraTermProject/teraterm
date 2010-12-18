@@ -1961,7 +1961,7 @@ static BOOL handle_agent_open(PTInstVar pvar)
 		int remote_id = get_payload_uint32(pvar, 0);
 		int local_id;
 
-		if (pvar->agentfwd_enable) {
+		if (pvar->agentfwd_enable && FWD_agent_forword_confirm(pvar)) {
 			local_id = FWD_agent_open(pvar, remote_id);
 			if (local_id == -1) {
 				SSH_fail_channel_open(pvar, remote_id);
@@ -8914,7 +8914,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		c->remote_maxpacket = remote_maxpacket;
 
 	} else if (strcmp(ctype, "auth-agent@openssh.com") == 0) { // agent forwarding
-		if (pvar->agentfwd_enable) {
+		if (pvar->agentfwd_enable && FWD_agent_forword_confirm(pvar)) {
 			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_AGENT, chan_num);
 			if (c == NULL) {
 				UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,

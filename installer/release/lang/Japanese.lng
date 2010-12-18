@@ -615,6 +615,7 @@ DLG_SSHSETUP_HEARTBEAT=ハートビート(&keep-alive)
 DLG_SSHSETUP_HEARTBEAT_UNIT=秒(0を指定すると無効)
 DLG_SSHSETUP_PASSWORD=パスワードをメモリ上に記憶する(&M)
 DLG_SSHSETUP_FORWARDAGENT=エージェント転送を有効にする(&A)
+DLG_SSHSETUP_FORWARDAGENTCONFIRM=エージェント転送を確認する(&O)
 DLG_SSHSETUP_NOTICE=いずれの変更も次回のセッション以降有効になります.
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=読み書き用knownhostsファイルを選択してください
@@ -663,6 +664,7 @@ MSG_FWD_DENIED_ERROR=サーバはこのマシンに転送を試みました.\nマシン %s 上のポート
 MSG_FWD_DENIED_X_ERROR=サーバはこのマシンに転送を試みました.\nローカルのX サーバへの接続を要求しました.\nTTSSH に該当する転送設定が存在しないため, 要求を拒否しました.
 MSG_FWD_DENIED_BY_SERVER_ERROR=ローカルマシン上のプログラムは転送先ポートに接続しました.\n転送要求はサーバ側で拒否されました. 接続を閉じます.
 MSG_FWD_COMM_ERROR=ローカルポートに転送データを送信中, 通信エラーが発生しました.\n転送接続を閉じます.
+MSG_FWD_AGENT_FORWARDING_CONFIRM=エージェント転送要求を受け入れますか？
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=known_hosts 読み込み中にエラーが発生しました. \n指定されたファイル名は存在しません.
