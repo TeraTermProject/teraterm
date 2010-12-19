@@ -1915,7 +1915,7 @@ void FWD_end(PTInstVar pvar)
 	}
 }
 
-BOOL FWD_agent_forword_confirm(PTInstVar pvar)
+BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 {
 	HWND cur_active = GetActiveWindow();
 	pvar->session_settings.ForwardAgentConfirm = 1;

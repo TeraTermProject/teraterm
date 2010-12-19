@@ -168,6 +168,6 @@ void FWD_end(PTInstVar pvar);
 void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num);
 int FWD_check_local_channel_num(PTInstVar pvar, int local_num);
 int FWD_agent_open(PTInstVar pvar, uint32 remote_channel_num);
-BOOL FWD_agent_forword_confirm(PTInstVar pvar);
+BOOL FWD_agent_forward_confirm(PTInstVar pvar);
 
 #endif
