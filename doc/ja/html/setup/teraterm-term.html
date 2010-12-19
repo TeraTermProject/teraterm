@@ -428,6 +428,7 @@ AlternateScreenBuffer=off
 AlternateScreenBuffer=on
 </pre>
 
+
 <h1><a name="TerminalUID">端末固有IDを設定する</a></h1>
 
 <p>
@@ -445,6 +446,26 @@ TerminalUID=01234567
 <pre>
 省略時:
 TerminalUID=FFFFFFFF
+</pre>
+
+
+<h1><a name="LockTUID">端末固有IDを変更可能にする</a></h1>
+
+<p>
+端末固有 ID はホスト側から DECSTUI 制御シーケンスを送る事によって変更する事が出来ますが、標準ではこの機能は無効にされています。
+</p>
+
+<p>
+DECSTUI制御シーケンスによって端末固有 ID を変更できるようにしたい場合は、設定ファイルの [Tera Term] セクションの LockTUID 行を以下のようにしてください。
+</p>
+
+<pre>
+LockTUID=off
+</pre>
+
+<pre>
+省略時:
+LockTUID=on
 </pre>
 
 </BODY>
