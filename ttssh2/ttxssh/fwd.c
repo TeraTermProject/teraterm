@@ -1918,7 +1918,6 @@ void FWD_end(PTInstVar pvar)
 BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 {
 	HWND cur_active = GetActiveWindow();
-	pvar->session_settings.ForwardAgentConfirm = 1;
 	if (pvar->session_settings.ForwardAgentConfirm) {
 		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
 		                  "Accept agent forwading request?");
