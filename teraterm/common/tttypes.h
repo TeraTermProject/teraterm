@@ -563,7 +563,7 @@ typedef struct tttset TTTSet, *PTTSet;
 
   /* Mouse tracking mode */
 #define IdMouseTrackNone     0
-#define IdMouseTrackDECELR   1  // not supported
+#define IdMouseTrackDECELR   1
 #define IdMouseTrackX10      2
 #define IdMouseTrackVT200    3
 #define IdMouseTrackVT200Hl  4  // not supported
