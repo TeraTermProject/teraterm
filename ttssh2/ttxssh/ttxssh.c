@@ -1525,6 +1525,17 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			} else if (_stricmp(option + 4, "-autologin") == 0 ||
 			           _stricmp(option + 4, "-autologon") == 0) {
 				pvar->settings.TryDefaultAuth = TRUE;
+			} else if (MATCH_STR_I(option + 4, "-agentconfirm=") == 0) {
+				if ((_stricmp(option+18, "off") == 0) ||
+				    (_stricmp(option+18, "no") == 0) ||
+				    (_stricmp(option+18, "false") == 0) ||
+				    (_stricmp(option+18, "0") == 0) ||
+				    (_stricmp(option+18, "n") == 0)) {
+					pvar->settings.ForwardAgentConfirm = 0;
+				}
+				else {
+					pvar->settings.ForwardAgentConfirm = 1;
+				}
 
 			// -axx‚æ‚èã‚É‚µ‚Ä‚Í‚¾‚ß
 			} else if (MATCH_STR(option + 4, "-a") == 0) {
