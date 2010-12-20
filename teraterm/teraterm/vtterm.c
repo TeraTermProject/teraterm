@@ -2939,6 +2939,38 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen) {
 			break;
 		}
 		break;
+	case 'm':
+		if (StrBuff[1] == 0) {
+			RepStr[0] = '0';
+			RepStr[1] = '$';
+			RepStr[2] = 'r';
+			len = 3;
+			if (CharAttr.Attr & AttrBold) {
+				RepStr[len++] = '1';
+				RepStr[len++] = ';';
+			}
+			if (CharAttr.Attr & AttrUnder) {
+				RepStr[len++] = '4';
+				RepStr[len++] = ';';
+			}
+			if (CharAttr.Attr & AttrBlink) {
+				RepStr[len++] = '5';
+				RepStr[len++] = ';';
+			}
+			if (CharAttr.Attr & AttrReverse) {
+				RepStr[len++] = '7';
+				RepStr[len++] = ';';
+			}
+			if (len == 3) {
+				RepStr[len++] = '0';
+			}
+			else {
+				len--;
+			}
+			RepStr[len++] = 'm';
+			RepStr[len] = 0;
+		}
+		break;
 	}
 	if (len > 0) {
 		SendDCSstr(RepStr, len);
