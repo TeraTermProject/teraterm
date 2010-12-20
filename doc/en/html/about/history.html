@@ -33,18 +33,19 @@
 
 <h3><a name="teraterm_4.69">2011.xx.xx (Ver 4.69)</a></h3>
 <ul class="history">
-  <!-- li>Changes
+  <li>Changes
     <ul>
-      <li>DA3 制御シーケンスの応答に含まれる端末固有IDを設定出来るようにした。
+      <!-- li>DA3 制御シーケンスの応答に含まれる端末固有IDを設定出来るようにした。
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#TerminalUID">TerminalUID</a> entry in the teraterm.ini file. The default value is FFFFFFFF.</li>
-        </ul></li>
-      <li>DECSTUI(端末固有ID変更)制御シーケンスに対応した。
+        </ul></li -->
+      <li>added support for the DECSTUI (Change Terminal Unique ID) control sequece.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> エントリを追加した。デフォルトは on。</li>
+          <li>added the <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> entry in the teraterm.ini file. The default value is on.</li>
         </ul></li>
+      <li>addes support for the DECRQSS (Request terminal setting) control sequence. Supported control sequences are DECSCA, DECSCL, DECSTBM and SGR.</li>
     </ul>
-  </li -->
+  </li>
 
   <!-- li>Bug fixes
     <ul>

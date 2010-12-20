@@ -744,6 +744,23 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
 </pre -->
 </td></tr>
 <tr><td>DCS ! { <i>Pt</i> ST </td> <td>DECSTUI</td> <td>Change <a href="../setup/teraterm-term.html#TerminalUID">Terminal Unique ID</a> to <i>Pt</i>. DECSTUI works only when <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> LockUID setting is off.</td>
+<tr><td>DCS $ q <i>Pt</i> ST</td>       <td>DECRQSS</td>        <td>Request selection or setting.
+<pre>
+<i>Pt</i>: the setting that the host asks about.
+<i>Pt</i> = m    SGR
+   = r    DECSTBM
+   = "p   DECSCL
+   = "q   DECSCA
+
+Response: DCS <i>Ps</i> $ r <i>Pt</i> ST
+<i>Ps</i> = 0    Valid request.
+          <i>Pt</i> indicates the current setting of a valid control function
+          that the host asked about. 
+          <i>Pt</i> consists of all the characters in the control function,
+          except the CSI or ESC [ introducer characters.
+   = 1    Invalid request. Does not send <i>Pt</i>.
+</pre>
+</td></tr>
 </table>
 
 <h2><a name="OSC">OSC Sequence</a></h2>
