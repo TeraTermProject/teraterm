@@ -2994,8 +2994,8 @@ void DeviceControl(BYTE b)
 
 	if ((ESCFlag && (b=='\\')) || (b==ST && ts.KanjiCode!=IdSJIS)) {
 		if (DcsParseMode == ModeDcsString) {
-			ParseDCS(Cmd, StrBuff, StrLen);
 			StrBuff[StrLen] = 0;
+			ParseDCS(Cmd, StrBuff, StrLen);
 		}
 		ESCFlag = FALSE;
 		ParseMode = SavedMode;
