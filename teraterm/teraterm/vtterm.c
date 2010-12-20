@@ -2908,6 +2908,81 @@ void ControlSequence(BYTE b)
   FirstPrm = FALSE;
 }
 
+void RequestStatusString(unsigned char *StrBuff, int StrLen) {
+	unsigned char RepStr[256];
+	int len = 0;
+
+	switch (StrBuff[0]) {
+	case '"':
+		switch (StrBuff[1]) {
+		case 'p': // DECSCL
+			switch (ts.TerminalID) {
+			case IdVT220J:
+			case IdVT282:
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r62;%d", CLocale, Send8BitMode?0:1);
+				break;
+			case IdVT320:
+			case IdVT382:
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r63;%d", CLocale, Send8BitMode?0:1);
+				break;
+			case IdVT420:
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r64;%d", CLocale, Send8BitMode?0:1);
+				break;
+			case IdVT520:
+			case IdVT525:
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r65;%d", CLocale, Send8BitMode?0:1);
+				break;
+			default:
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r61;1", CLocale);
+				break;
+			}
+			break;
+		}
+		break;
+	}
+	if (len > 0) {
+		SendDCSstr(RepStr, len);
+	}
+	else {
+		SendDCSstr("1$r", 0);
+	}
+}
+
+void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
+	switch (ICount) {
+	case 0:
+		break;
+	case 1:
+		switch (IntChar[1]) {
+		case '!':
+			if (Cmd == '{') { // DECSTUI
+				if (! (ts.TermFlag & TF_LOCKTUID)) {
+					int i;
+					for (i=0; i<8 && isxdigit(StrBuff[i]); i++) {
+						if (islower(StrBuff[i])) {
+							StrBuff[i] = toupper(StrBuff[i]);
+						}
+					}
+					if (len == 8 && i == 8) {
+						strncpy_s(ts.TerminalUID, sizeof(ts.TerminalUID), StrBuff, _TRUNCATE);
+					}
+				}
+			}
+			break;
+		case '$':
+			if (Cmd == 'q')  { // DECRQSS
+				RequestStatusString(StrBuff, len);
+			}
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 #define ModeDcsFirst     1
 #define ModeDcsString    2
 void DeviceControl(BYTE b)
@@ -2915,32 +2990,12 @@ void DeviceControl(BYTE b)
 	static unsigned char StrBuff[256];
 	static int DcsParseMode = ModeDcsFirst;
 	static int StrLen;
-	static char Cmd;
+	static BYTE Cmd;
 
 	if ((ESCFlag && (b=='\\')) || (b==ST && ts.KanjiCode!=IdSJIS)) {
 		if (DcsParseMode == ModeDcsString) {
+			ParseDCS(Cmd, StrBuff, StrLen);
 			StrBuff[StrLen] = 0;
-			switch (ICount) {
-			case 0:
-				break;
-			case 1:
-				if (IntChar[1] == '!' && Cmd == '{') { // DECSTUI
-					if (! (ts.TermFlag & TF_LOCKTUID)) {
-						int i;
-						for (i=0; i<8 && isxdigit(StrBuff[i]); i++) {
-							if (islower(StrBuff[i])) {
-								StrBuff[i] = toupper(StrBuff[i]);
-							}
-						}
-						if (StrLen == 8 && i == 8) {
-							strncpy_s(ts.TerminalUID, sizeof(ts.TerminalUID), StrBuff, _TRUNCATE);
-						}
-					}
-				}
-				break;
-			default:
-				break;
-			}
 		}
 		ESCFlag = FALSE;
 		ParseMode = SavedMode;
