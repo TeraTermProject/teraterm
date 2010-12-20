@@ -2919,21 +2919,21 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen) {
 			switch (ts.TerminalID) {
 			case IdVT220J:
 			case IdVT282:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r62;%d", CLocale, Send8BitMode?0:1);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r62;%d\"p", CLocale, Send8BitMode?0:1);
 				break;
 			case IdVT320:
 			case IdVT382:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r63;%d", CLocale, Send8BitMode?0:1);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r63;%d\"p", CLocale, Send8BitMode?0:1);
 				break;
 			case IdVT420:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r64;%d", CLocale, Send8BitMode?0:1);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r64;%d\"p", CLocale, Send8BitMode?0:1);
 				break;
 			case IdVT520:
 			case IdVT525:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r65;%d", CLocale, Send8BitMode?0:1);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r65;%d\"p", CLocale, Send8BitMode?0:1);
 				break;
 			default:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r61;1", CLocale);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r61;1\"p", CLocale);
 				break;
 			}
 			break;
