@@ -2937,9 +2937,18 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen) {
 				break;
 			}
 			break;
+
+		case 'q': // DECSCA
+			if (CharAttr.Attr2 & Attr2Protect) {
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r1\"q", CLocale);
+			}
+			else {
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r0\"q", CLocale);
+			}
+			break;
 		}
 		break;
-	case 'm':
+	case 'm':	// SGR
 		if (StrBuff[1] == 0) {
 			RepStr[0] = '0';
 			RepStr[1] = '$';
@@ -2969,6 +2978,11 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen) {
 			}
 			RepStr[len++] = 'm';
 			RepStr[len] = 0;
+		}
+		break;
+	case 'r':	// DECSTBM
+		if (StrBuff[1] == 0) {
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%dr", CLocale, CursorTop+1, CursorBottom+1);
 		}
 		break;
 	}
