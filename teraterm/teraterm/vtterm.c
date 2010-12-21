@@ -1011,7 +1011,7 @@ void  RestoreCursor()
 
 void AnswerTerminalType()
 {
-  char Tmp[31];
+  char Tmp[50];
 
   if (ts.TerminalID<IdVT320)
     strncpy_s(Tmp, sizeof(Tmp),"\033[?", _TRUNCATE);
