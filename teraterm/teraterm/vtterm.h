@@ -19,6 +19,7 @@ void FocusReport(BOOL Focus);
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos);
 BOOL BracketedPasteMode();
 void EndTerm();
+void ChangeTerminalID();
 
 #ifdef __cplusplus
 }

@@ -1535,6 +1535,8 @@ void CVTWindow::SetupTerm()
 	          (ts.TerminalHeight!=WinHeight-StatusLine))) {
 		BuffChangeWinSize(ts.TerminalWidth,ts.TerminalHeight+StatusLine);
 	}
+
+	ChangeTerminalID();
 }
 
 void CVTWindow::Startup()

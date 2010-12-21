@@ -27,7 +27,7 @@
 #include "vtterm.h"
 
 #define MAPSIZE(x) (sizeof(x)/sizeof((x)[0]))
-#define Accept8BitCtrl ((ts.TerminalID>=IdVT220J) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
+#define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
 
   /* Parsing modes */
 #define ModeFirst 0
@@ -64,6 +64,8 @@ static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
 static BOOL AltScr;
 BOOL BracketedPaste;
+
+static int VTlevel;
 
 // save/restore cursor
 typedef struct {
@@ -208,10 +210,11 @@ void ResetTerminal() /*reset variables but don't update screen */
   RelativeOrgMode = FALSE;
   ts.ColorFlag &= ~CF_REVERSEVIDEO;
   AutoRepeatMode = TRUE;
-  Send8BitMode = ts.Send8BitCtrl;
   FocusReportMode = FALSE;
   MouseReportMode = IdMouseTrackNone;
   DecLocatorFlag = 0;
+
+  ChangeTerminalID();
 
   LastX = 0;
   LastY = 0;
@@ -814,7 +817,7 @@ void ParseControl(BYTE b)
       if ((ts.TermFlag & TF_ACCEPT8BITCTRL)==0)
 	return; /* ignore C1 char */
       /* C1 chars are interpreted as C0 chars in VT100 mode */
-      if (ts.TerminalID<IdVT220J)
+      if (VTlevel < 2)
 	b = b & 0x7F;
     }
   }
@@ -1064,8 +1067,14 @@ void AnswerTerminalType()
 void ESCSpace(BYTE b)
 {
   switch (b) {
-    case 'F': Send8BitMode = FALSE; break;	// S7C1T
-    case 'G': Send8BitMode = TRUE; break;	// S8C1T
+    case 'F':	// S7C1T
+      Send8BitMode = FALSE;
+      break;
+    case 'G':	// S8C1T
+      if (VTlevel >= 2) {
+	Send8BitMode = TRUE;
+      }
+      break;
   }
 }
 
@@ -2511,8 +2520,6 @@ void CSSetAttr()		// SGR
     CursorBottom = NumOfLines-1-StatusLine;
     ResetCharSet();
 
-    Send8BitMode = ts.Send8BitCtrl;
-
     /* Attribute */
     CharAttr = DefCharAttr;
     Special = FALSE;
@@ -2539,21 +2546,23 @@ void CSSetAttr()		// SGR
 	/* Select terminal mode (software reset) */
 	SoftReset();
 	if (NParam > 0) {
-	  switch (Param[1]) {
-	    case 61: // VT-Level 1 (VT100)
-	      Send8BitMode = FALSE; break;
-	    case 62: // VT-Level 2 (VT200)
-	    case 63: // VT-Level 3 (VT300)
-	    case 64: // VT-Level 4 (VT400)
-	    case 65: // VT-Level 5 (VT500)
-	      if (NParam > 1 && Param[2] == 1)
-		Send8BitMode = FALSE;
-	      else
-		Send8BitMode = TRUE;
-	      break;
+	  ChangeTerminalID();
+	  if (Param[1] >= 61 && Param[1] <= 65) {
+	    if (VTlevel > Param[1] - 60) {
+	      VTlevel = Param[1] - 60;
+	    }
 	  }
+	  else {
+	    VTlevel = 1;
+	  }
+
+	  if (VTlevel < 2 || (NParam > 1 && Param[2] == 1))
+	    Send8BitMode = FALSE;
+	  else
+	    Send8BitMode = TRUE;
 	}
 	break;
+
       case 'q': // DECSCA
 	if (Param[1] < 0) 
 	  Param[1] = 0;
@@ -2930,25 +2939,11 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen) {
 	case '"':
 		switch (StrBuff[1]) {
 		case 'p': // DECSCL
-			switch (ts.TerminalID) {
-			case IdVT220J:
-			case IdVT282:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r62;%d\"p", CLocale, Send8BitMode?0:1);
-				break;
-			case IdVT320:
-			case IdVT382:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r63;%d\"p", CLocale, Send8BitMode?0:1);
-				break;
-			case IdVT420:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r64;%d\"p", CLocale, Send8BitMode?0:1);
-				break;
-			case IdVT520:
-			case IdVT525:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r65;%d\"p", CLocale, Send8BitMode?0:1);
-				break;
-			default:
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r61;1\"p", CLocale);
-				break;
+			if (VTlevel > 1 && Send8BitMode) {
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r6%d;0\"p", CLocale, VTlevel);
+			}
+			else {
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r6%d;1\"p", CLocale, VTlevel);
 			}
 			break;
 
@@ -4345,4 +4340,33 @@ void EndTerm() {
 
 BOOL BracketedPasteMode() {
 	return BracketedPaste;
+}
+
+void ChangeTerminalID() {
+  switch (ts.TerminalID) {
+  case IdVT220J:
+  case IdVT282:
+    VTlevel = 2;
+    break;
+  case IdVT320:
+  case IdVT382:
+    VTlevel = 3;
+    break;
+  case IdVT420:
+    VTlevel = 4;
+    break;
+  case IdVT520:
+  case IdVT525:
+    VTlevel = 5;
+    break;
+  default:
+    VTlevel = 1;
+  }
+
+  if (VTlevel == 1) {
+    Send8BitMode = FALSE;
+  }
+  else {
+    Send8BitMode = ts.Send8BitCtrl;
+  }
 }
