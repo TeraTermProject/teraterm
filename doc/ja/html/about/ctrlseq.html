@@ -88,8 +88,10 @@
 <h2>エスケープシーケンス</h2>
 <table border="1">
 <tr><th>シーケンス</th>	<th>略号</th>	<th>機能</th></tr>
+<tr><td>ESC 6</td>	<td>DECBI</td>	<td>カーソルを左に 1 桁移動する。カーソルが左端に有った場合、画面を右に 1 桁スクロールする。スクロールした結果画面の右にはみ出した部分は失われる。</td></tr>
 <tr><td>ESC 7</td>	<td>DECSC</td>	<td>カーソル位置を保存する</td></tr>
 <tr><td>ESC 8</td>	<td>DECRC</td>	<td>保存したカーソル位置を復元する</td></tr>
+<tr><td>ESC 9</td>	<td>DECFI</td>	<td>カーソルを右に 1 桁移動する。カーソルが右端に有った場合、画面を左に 1 桁スクロールする。スクロールした結果画面の左にはみ出した部分は失われる。</td></tr>
 <tr><td>ESC =</td>	<td>DECKPAM</td>	<td><a href="../usage/tips/appkeypad.html">アプリケーションキーパッドモード</a>に設定する。</td></tr>
 <tr><td>ESC ></td>	<td>DECKPNM</td>	<td><a href="../usage/tips/appkeypad.html">ノーマルキーパッドモード</a>に設定する。</td></tr>
 <tr><td>ESC D</td>	<td>IND</td>	<td> カーソルを一行下に移動 </td></tr>

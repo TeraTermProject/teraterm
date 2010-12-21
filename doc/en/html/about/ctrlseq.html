@@ -88,6 +88,7 @@
 <h2><a name="ESC">Escape Sequence</a></h2>
 <table border="1">
 <tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
+<tr><td>ESC 6</td>	<td>DECBI</td>	<td> Moves the cursor backward one column. If the cursor is at the left margin, then all screen data within the margins moves one column to the right. The column shifted past the right margin is lost. </td></tr>
 <tr><td>ESC 7</td>	<td>DECSC</td>	<td> Save the following items. <br>
 					     - Cursor position<br>
 					     - Character attributes (SGR)<br>
@@ -97,6 +98,7 @@
 					     - Selective erase attribute (DECSCA)<br>
 					     - Any single SS2 or SS3 functions sent</td></tr>
 <tr><td>ESC 8</td>	<td>DECRC</td>	<td> Restores the terminal to the state saved by the save cursor (DECSC) function. </td></tr>
+<tr><td>ESC 9</td>	<td>DECFI</td>	<td> Moves the cursor forward one column. If the cursor is at the right margin, then all screen data within the margins moves one column to the left. The column shifted past the left margin is lost. </td></tr>
 <tr><td>ESC =</td>	<td>DECKPAM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Application Keypad Mode</a>. </td></tr>
 <tr><td>ESC ></td>	<td>DECKPNM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Normal Keypad Mode</a>. </td></tr>
 <tr><td>ESC D</td>	<td>IND</td>	<td> Moves the cursor down one line in the same column. </td></tr>
