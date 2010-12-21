@@ -1226,8 +1226,22 @@ void ParseEscape(BYTE b) /* b is the final char */
     /* no intermediate char */
     case 0:
       switch (b) {
+        case '6': // DECBI
+	  if (CursorX == 0) {
+	    BuffScrollRight(1);
+	  }
+	  else {
+	    CursorX--;
+	  }
 	case '7': SaveCursor(); break;
 	case '8': RestoreCursor(); break;
+	case '9': // DECFI
+	  if (CursorX == NumOfColumns-1) {
+	    BuffScrollLeft(1);
+	  }
+	  else {
+	    CursorX++;
+	  }
 	case '=': AppliKeyMode = TRUE; break;
 	case '>': AppliKeyMode = FALSE; break;
 	case 'D': /* IND */

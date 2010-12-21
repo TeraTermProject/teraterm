@@ -3432,3 +3432,57 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 
 	BuffUpdateRect(XStart, CursorY, XStart+Count, CursorY);
 }
+
+void BuffScrollLeft(int count)
+{
+	int i;
+	LONG Ptr;
+
+	UpdateStr();
+
+	Ptr = GetLinePtr(PageStart);
+	for (i = 1; i < NumOfLines - StatusLine; i++) {
+		memmove(&(CodeBuff[Ptr]),   &(CodeBuff[Ptr+count]),   NumOfColumns - count);
+		memmove(&(AttrBuff[Ptr]),   &(AttrBuff[Ptr+count]),   NumOfColumns - count);
+		memmove(&(AttrBuff2[Ptr]),  &(AttrBuff2[Ptr+count]),  NumOfColumns - count);
+		memmove(&(AttrBuffFG[Ptr]), &(AttrBuffFG[Ptr+count]), NumOfColumns - count);
+		memmove(&(AttrBuffBG[Ptr]), &(AttrBuffBG[Ptr+count]), NumOfColumns - count);
+
+		memset(&(CodeBuff[Ptr+NumOfColumns-count]),   0x20,          count);
+		memset(&(AttrBuff[Ptr+NumOfColumns-count]),   AttrDefault,   count);
+		memset(&(AttrBuff2[Ptr+NumOfColumns-count]),  AttrDefault,   count);
+		memset(&(AttrBuffFG[Ptr+NumOfColumns-count]), AttrDefaultFG, count);
+		memset(&(AttrBuffBG[Ptr+NumOfColumns-count]), AttrDefaultBG, count);
+
+		Ptr = NextLinePtr(Ptr);
+	}
+
+	BuffUpdateRect(0, 0, NumOfColumns-1, NumOfLines-1);
+}
+
+void BuffScrollRight(int count)
+{
+	int i;
+	LONG Ptr;
+
+	UpdateStr();
+
+	Ptr = GetLinePtr(PageStart);
+	for (i = 1; i < NumOfLines - StatusLine; i++) {
+		memmove(&(CodeBuff[Ptr+count]),   &(CodeBuff[Ptr]),   NumOfColumns - count);
+		memmove(&(AttrBuff[Ptr+count]),   &(AttrBuff[Ptr]),   NumOfColumns - count);
+		memmove(&(AttrBuff2[Ptr+count]),  &(AttrBuff2[Ptr]),  NumOfColumns - count);
+		memmove(&(AttrBuffFG[Ptr+count]), &(AttrBuffFG[Ptr]), NumOfColumns - count);
+		memmove(&(AttrBuffBG[Ptr+count]), &(AttrBuffBG[Ptr]), NumOfColumns - count);
+
+		memset(&(CodeBuff[Ptr]),   0x20,          count);
+		memset(&(AttrBuff[Ptr]),   AttrDefault,   count);
+		memset(&(AttrBuff2[Ptr]),  AttrDefault,   count);
+		memset(&(AttrBuffFG[Ptr]), AttrDefaultFG, count);
+		memset(&(AttrBuffBG[Ptr]), AttrDefaultBG, count);
+
+		Ptr = NextLinePtr(Ptr);
+	}
+
+	BuffUpdateRect(0, 0, NumOfColumns-1, NumOfLines-1);
+}
