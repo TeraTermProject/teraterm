@@ -1920,7 +1920,7 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 	HWND cur_active = GetActiveWindow();
 	if (pvar->session_settings.ForwardAgentConfirm) {
 		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
-		                  "Accept agent forwading request?");
+		                  "Are you sure you want to accept agent-forwarding request?");
 		if (MessageBox(cur_active != NULL ? cur_active : pvar->NotificationWindow,
 		               pvar->ts->UIMsg, "TTSSH",
 		               MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES) {
