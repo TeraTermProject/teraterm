@@ -3487,6 +3487,16 @@ void DispGetWindowPos(int *x, int *y) {
 	return;
 }
 
+void DispGetWindowSize(int *width, int *height) {
+	RECT r;
+
+	GetWindowRect(HVTWin, &r);
+	*width = r.right - r.left;
+	*height = r.bottom - r.top;
+
+	return;
+}
+
 void DispGetRootWinSize(int *x, int *y)
 {
 	HMODULE mod;

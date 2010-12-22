@@ -2053,8 +2053,9 @@ void CSSetAttr()		// SGR
 	break;
       case 14: /* get window size??? */
 	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  /* this is not actual window size */
-	  SendCSIstr("4;640;480t", 0);
+	  DispGetWindowSize(&x, &y);
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "4;%d;%dt", CLocale, y, x);
+	  SendCSIstr(Report, len);
 	}
 	break;
       case 18: /* get terminal size */

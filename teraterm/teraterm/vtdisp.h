@@ -86,6 +86,7 @@ void DispShowWindow(int mode);
 void DispResizeWin(int w, int h);
 BOOL DispWindowIconified();
 void DispGetWindowPos(int *x, int *y);
+void DispGetWindowSize(int *width, int *height);
 void DispGetRootWinSize(int *x, int *y);
 
 extern int WinWidth, WinHeight;
