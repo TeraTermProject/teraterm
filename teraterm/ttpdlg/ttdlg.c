@@ -48,12 +48,15 @@ char UILanguageFile[MAX_PATH];
 static PCHAR far NLListRcv[] = {"CR","CR+LF", "LF", NULL};
 static PCHAR far NLList[] = {"CR","CR+LF", NULL};
 static PCHAR far TermList[] =
-	{"VT100","VT101","VT102","VT282","VT320","VT382","VT420","VT520","VT525",NULL};
-static WORD TermJ_Term[] = {1,1,2,3,3,4,4,5,6};
-static WORD Term_TermJ[] = {1,3,4,7,8,9};
+	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",
+	 "VT420", "VT520", "VT525", NULL};
+static WORD Term_TermJ[] =
+	{IdVT100, IdVT101, IdVT102, IdVT282, IdVT320, IdVT382,
+	 IdVT420, IdVT520, IdVT525};
+static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
 static PCHAR far TermListJ[] =
-	{"VT100","VT100J","VT101","VT102","VT102J","VT220J",
-	 "VT282","VT320","VT382","VT420","VT520","VT525",NULL};
+	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
+	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
 static PCHAR far KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", "UTF-8m", NULL};
 static PCHAR far KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
 static PCHAR far KanjiInList[] = {"^[$@","^[$B",NULL};
@@ -263,7 +266,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 			if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
 				if ((ts->TerminalID>=1) &&
-					(ts->TerminalID<=9)) {
+					(ts->TerminalID <= sizeof(TermJ_Term)/sizeof(WORD))) {
 					w = TermJ_Term[ts->TerminalID-1];
 				}
 				else {
@@ -372,7 +375,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 						w = (WORD)GetCurSel(Dialog, IDC_TERMID);
 						if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
-							if ((w==0) || (w>6)) w = 1;
+							if ((w==0) || (w > sizeof(Term_TermJ)/sizeof(WORD))) w = 1;
 							w = Term_TermJ[w-1];
 						}
 						ts->TerminalID = w;
