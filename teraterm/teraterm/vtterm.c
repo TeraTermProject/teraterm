@@ -2248,7 +2248,6 @@ void CSSetAttr()		// SGR
       ts.ColorFlag ^= CF_REVERSEVIDEO;
 
 #ifdef ALPHABLEND_TYPE2
-//      BGInitialize();
       BGExchangeColor();
 #endif
       DispChangeBackground();
@@ -3418,7 +3417,6 @@ void XSequence(BYTE b)
 	  case ModeXsEsc:
 		if (b == '\\') { /* String Terminator */
 			XsParseMode = PrevMode;
-//			XSequence(ST);
 			XSequence(BEL);
 		}
 		else { /* Other character -- invalid sequence */
@@ -3426,9 +3424,6 @@ void XSequence(BYTE b)
 			XsParseMode = ModeXsFirst;
 		}
 		break;
-//	  default:
-//		ParseMode = ModeFirst;
-//		XsParseMode = ModeXsFirst;
 	}
 }
 
