@@ -1105,6 +1105,16 @@
 				</OBJECT>
 			<UL>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="basename">
+					<param name="Local" value="html\macro\command\basename.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="dirname">
+					<param name="Local" value="html\macro\command\dirname.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="fileclose">
 					<param name="Local" value="html\macro\command\fileclose.html">
 					<param name="ImageNumber" value="11">

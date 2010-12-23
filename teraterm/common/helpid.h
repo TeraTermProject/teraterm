@@ -160,6 +160,7 @@
 #define HlpMacroSyntaxExp               91005
 #define HlpMacroSyntaxLine              91006
 #define HlpMacroCommand                 92000
+#define HlpMacroCommandBasename         92187
 #define HlpMacroCommandBeep             92001
 #define HlpMacroCommandBplusrecv        92002
 #define HlpMacroCommandBplussend        92003
@@ -177,6 +178,7 @@
 #define HlpMacroCommandCrc32File        92139
 #define HlpMacroCommandCygConnect       92130
 #define HlpMacroCommandDelpassword      92011
+#define HlpMacroCommandDirname          92188
 #define HlpMacroCommandDisconnect       92012
 #define HlpMacroCommandDispstr          92149
 #define HlpMacroCommandDo               92126
