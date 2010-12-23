@@ -13,6 +13,7 @@ BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
 BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt);
 void AppendSlash(PCHAR Path, int destlen);
+void DeleteSlash(PCHAR Path);
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP);
 BYTE ConvHexChar(BYTE b);
 int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen);

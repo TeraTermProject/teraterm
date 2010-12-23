@@ -125,6 +125,21 @@ void AppendSlash(PCHAR Path, int destlen)
 	}
 }
 
+// Delete slashes at the end of a path name
+void DeleteSlash(PCHAR Path)
+{
+	size_t i;
+	for (i=strlen(Path)-1; i>=0; i--) {
+		if (i ==0 && Path[i] == '\\' ||
+		    Path[i] == '\\' && !_ismbblead(Path[i-1])) {
+			Path[i] = '\0';
+		}
+		else {
+			break;
+		}
+	}
+}
+
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP)
 {
 	BYTE b, low;

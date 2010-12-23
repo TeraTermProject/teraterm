@@ -131,6 +131,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"bplusrecv")==0) *WordId = RsvBPlusRecv;
 		else if (_stricmp(Str,"bplussend")==0) *WordId = RsvBPlusSend;
 		else if (_stricmp(Str,"break")==0) *WordId = RsvBreak;
+		else if (_stricmp(Str,"basename")==0) *WordId = RsvBasename;
 		break;
 	case 'c':
 		if (_stricmp(Str,"call")==0) *WordId = RsvCall;
@@ -151,6 +152,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"disconnect")==0) *WordId = RsvDisconnect;
 		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
+		else if (_stricmp(Str,"dirname")==0) *WordId = RsvDirname;
 		break;
 	case 'e':
 		if (_stricmp(Str,"else")==0) *WordId = RsvElse;

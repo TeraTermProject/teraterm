@@ -2385,6 +2385,84 @@ WORD TTLMakePath()
 	return Err;
 }
 
+static void basedirname(char *fullpath, char *dest_base, int base_len, char *dest_dir, int dir_len) {
+	char drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
+	char dirname[MAX_PATH];
+	char basename[MAX_PATH];
+
+	_splitpath_s(fullpath, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
+	strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
+	strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
+	DeleteSlash(dirname); // ññîˆÇÃ \ ÇéÊÇËèúÇ≠
+	if (strlen(fname) == 0 && strlen(ext) == 0) {
+		_splitpath_s(dirname, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
+		strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
+		strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
+		DeleteSlash(dirname); // ññîˆÇÃ \ ÇéÊÇËèúÇ≠
+		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
+		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
+	}
+	else {
+		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
+		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
+	}
+
+	if (dest_dir != NULL) {
+		strncpy_s(dest_dir, dir_len, dirname, _TRUNCATE);
+	}
+	if (dest_base != NULL) {
+		strncpy_s(dest_base, base_len, basename, _TRUNCATE);
+	}
+}
+
+static void basename(char *fullpath, char *dest, int len) {
+	basedirname(fullpath, dest, len, NULL, 0);
+}
+
+static void dirname(char *fullpath, char *dest, int len) {
+	basedirname(fullpath, NULL, 0, dest, len);
+}
+
+WORD TTLBasename()
+{
+	WORD VarId, Err;
+	TStrVal Src, Name;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetStrVal(Src,&Err);
+	if ((Err==0) &&
+	    (GetFirstChar()!=0))
+		Err = ErrSyntax;
+
+	if (Err!=0) return Err;
+
+	basename(Src, Name, sizeof(Name));
+	SetStrVal(VarId, Name);
+
+	return Err;
+}
+
+WORD TTLDirname()
+{
+	WORD VarId, Err;
+	TStrVal Src, Dir;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	GetStrVal(Src,&Err);
+	if ((Err==0) &&
+	    (GetFirstChar()!=0))
+		Err = ErrSyntax;
+
+	if (Err!=0) return Err;
+
+	dirname(Src, Dir, sizeof(Dir));
+	SetStrVal(VarId, Dir);
+
+	return Err;
+}
+
 #define IdMsgBox 1
 #define IdYesNoBox 2
 #define IdStatusBox 3
@@ -4420,6 +4498,8 @@ int ExecCmnd()
 
 	if (GetReservedWord(&WId)) 
 		switch (WId) {
+		case RsvBasename:
+			Err = TTLBasename(); break;
 		case RsvBeep:
 			Err = TTLBeep(); break;
 		case RsvBPlusRecv:
@@ -4453,6 +4533,8 @@ int ExecCmnd()
 			Err = TTLCrc32File(); break;
 		case RsvDelPassword:
 			Err = TTLDelPassword(); break;
+		case RsvDirname:
+			Err = TTLDirname(); break;
 		case RsvDisconnect:
 			Err = TTLDisconnect(); break;
 		case RsvDispStr:
