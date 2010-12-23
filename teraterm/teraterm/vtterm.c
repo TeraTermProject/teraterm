@@ -26,6 +26,8 @@
 
 #include "vtterm.h"
 
+void ParseFirst(BYTE b);
+
 #define MAPSIZE(x) (sizeof(x)/sizeof((x)[0]))
 #define Accept8BitCtrl ((VTlevel >= 2) && (ts.TermFlag & TF_ACCEPT8BITCTRL))
 
@@ -1367,6 +1369,10 @@ void EscapeSequence(BYTE b)
     ParseEscape(b);
   else if ((b>=0x80) && (b<=0x9F))
     ParseControl(b);
+  else if (b>=0xA0) {
+    ParseMode=ModeFirst;
+    ParseFirst(b);
+  }
 
   JustAfterESC = FALSE;
 }
@@ -2927,6 +2933,10 @@ void ControlSequence(BYTE b)
     else if ((b>=0x3C) && (b<=0x3F))
     { /* private char */
       if (FirstPrm) Prv = b;
+    }
+    else if (b>0xA0) {
+      ParseMode=ModeFirst;
+      ParseFirst(b);
     }
   }
   FirstPrm = FALSE;
