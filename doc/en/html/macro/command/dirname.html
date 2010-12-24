@@ -14,7 +14,7 @@
 <h1>dirname</h1>
 
 <p>
-Gets the directory name from a path name.
+Returns the directory name from a path name.
 </p>
 
 <pre class="macro-syntax">
@@ -23,10 +23,10 @@ dirname &lt;strvar&gt; &lt;path&gt;
 
 <h2>Remarks</h2>
 
-<!--p>
-パス名 &lt;path&gt; のディレクトリ名部分を &lt;strvar&gt; に格納する。<br>
-パス名は文字列として処理しており、実在している必要はない。
-</p-->
+<p>
+Given a &lt;path&gt; pathname, this macro will delete any suffix beginning with the last slash('/') character and return the result into the &lt;strvar&gt; variable name.<br>
+The pathname will need not be existed.
+</p>
 
 <h2>Example</h2>
 
