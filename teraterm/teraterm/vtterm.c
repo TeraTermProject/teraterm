@@ -2057,7 +2057,7 @@ void CSSetAttr()		// SGR
 	  SendCSIstr(Report, len);
 	}
 	break;
-      case 14: /* get window size??? */
+      case 14: /* get window size */
 	if (ts.WindowFlag & WF_WINDOWREPORT) {
 	  DispGetWindowSize(&x, &y);
 	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "4;%d;%dt", CLocale, y, x);
@@ -2834,7 +2834,7 @@ void ParseCS(BYTE b) /* b is the final char */
 //	    case 'O': break;				// EA   -- Not support
 	    case 'P': CSDeleteCharacter(); break;       // DCH
 //	    case 'Q': break;				// SEE  -- Not support
-//	    case 'R': break;				// CPR  -- Not support
+//	    case 'R': break;				// CPR  -- Report only, ignore.
 	    case 'S': CSScrollUP(); break;              // SU
 	    case 'T': CSScrollDown(); break;            // SD
 //	    case 'U': break;				// NP   -- Not support
