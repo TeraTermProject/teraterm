@@ -1390,6 +1390,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Lock Terminal UID
 	if (GetOnOff(Section, "LockTUID", FName, TRUE))
 		ts->TermFlag |= TF_LOCKTUID;
+	
+	// Don't confirm PasteCR
+	ts->DontConfirmPasteCR = GetOnOff(Section, "DontConfirmPasteCR", FName, FALSE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2413,6 +2416,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Lock Terminal UID
 	WriteOnOff(Section, "LockTUID", FName, ts->TermFlag & TF_LOCKTUID);
+
+	// Don't confirm PasteCR
+	WriteOnOff(Section, "DontConfirmPasteCR", FName, ts->DontConfirmPasteCR);
 }
 
 #define VTEditor "VT editor keypad"

@@ -709,10 +709,11 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 
 	if (hText != NULL) {
 		pText = (char *)GlobalLock(hText);
-		pos = strcspn(pText, "\r\n");  // 改行が含まれていたら
-		if (pText[pos] != '\0' || AddCR) {
-			confirm = 1;
-
+		if (!(ts.DontConfirmPasteCR && AddCR)) {
+			pos = strcspn(pText, "\r\n");  // 改行が含まれていたら
+			if (pText[pos] != '\0' || AddCR) {
+				confirm = 1;
+			}
 		} else {
 			// 辞書をサーチする
 			if (search_clipboard(ts.ConfirmChangePasteStringFile, pText)) {

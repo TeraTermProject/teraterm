@@ -504,6 +504,7 @@ struct tttset {
 	WORD DisableMenuDuplicateSession;
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
+	WORD DontConfirmPasteCR;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -941,6 +942,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.69, ttset_memfilemap was replaced with ttset_memfilemap_15.
  *   added tttset.TerminalUID.
+ *   added tttset.DontConfirmPasteCR.
  *
  * - At version 4.68, ttset_memfilemap was replaced with ttset_memfilemap_14.
  *   increase WinList(MAXNWIN) size.
