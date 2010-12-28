@@ -114,11 +114,6 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="漢字コードの自動制御">
-			<param name="Local" value="html\usage\kcodechange.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="LogMeTT">
 			<param name="Local" value="html\usage\LogMeTT\LogMeTTTutorial.htm">
 			<param name="ImageNumber" value="11">
@@ -138,6 +133,22 @@
 			<param name="Local" value="html\usage\transparent.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="追加プラグイン">
+			<param name="ImageNumber" value="1">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="漢字コードの自動制御">
+				<param name="Local" value="html\usage\kcodechange.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ウィンドウサイズ変更プラグイン">
+				<param name="Local" value="html\usage\resizemenu.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="VT window のコマンド">
@@ -368,6 +379,17 @@
 			<param name="Local" value="html\menu\help.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="追加プラグイン">
+			<param name="ImageNumber" value="1">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="[Resize] メニュー">
+				<param name="Local" value="html\menu\resize.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="TEK window のコマンド">

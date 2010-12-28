@@ -129,6 +129,17 @@
 			<param name="Local" value="html\usage\transparent.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Additional plugins">
+			<param name="ImageNumber" value="1">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Window resize plugin">
+				<param name="Local" value="html\usage\resizemenu.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="VT window commands">
@@ -359,6 +370,17 @@
 			<param name="Local" value="html\menu\help.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Addtional plugins">
+			<param name="ImageNumber" value="1">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="[Resize] menu">
+				<param name="Local" value="html\menu\resize.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="TEK window commands">
