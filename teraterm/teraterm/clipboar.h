@@ -17,7 +17,7 @@ void CBStartEcho(PCHAR DataPtr, int DataSize);
 void CBSend();
 void CBEcho();
 void CBEndPaste();
-int CBStartPasteConfirmChange(HWND HWin);
+int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR);
 
 #ifdef __cplusplus
 }

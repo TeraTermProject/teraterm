@@ -678,7 +678,7 @@ error:
 //
 // (2008.2.3 yutaka)
 //
-int CBStartPasteConfirmChange(HWND HWin)
+int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 {
 	UINT Cf;
 	HANDLE hText;
@@ -710,7 +710,7 @@ int CBStartPasteConfirmChange(HWND HWin)
 	if (hText != NULL) {
 		pText = (char *)GlobalLock(hText);
 		pos = strcspn(pText, "\r\n");  // â¸çsÇ™ä‹Ç‹ÇÍÇƒÇ¢ÇΩÇÁ
-		if (pText[pos] != '\0') {
+		if (pText[pos] != '\0' || AddCR) {
 			confirm = 1;
 
 		} else {

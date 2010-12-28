@@ -783,7 +783,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 
 	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	if (pasteRButton && !ts.ConfirmPasteMouseRButton) {
-		if (CBStartPasteConfirmChange(HVTWin)) {
+		if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
 			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 			/* 最下行でだけ自動スクロールする設定の場合
 			   ペースト処理でスクロールさせる */
@@ -793,7 +793,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 		}
 	}
 	else if (pasteMButton) {
-		if (CBStartPasteConfirmChange(HVTWin)) {
+		if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
 			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 			/* 最下行でだけ自動スクロールする設定の場合
 			   ペースト処理でスクロールさせる */
@@ -3972,7 +3972,7 @@ void CVTWindow::OnEditCopyTable()
 void CVTWindow::OnEditPaste()
 {
 	// add confirm (2008.2.4 yutaka)
-	if (CBStartPasteConfirmChange(HVTWin)) {
+	if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
 		CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 		/* 最下行でだけ自動スクロールする設定の場合
 		   ペースト処理でスクロールさせる */
@@ -3985,7 +3985,7 @@ void CVTWindow::OnEditPaste()
 void CVTWindow::OnEditPasteCR()
 {
 	// add confirm (2008.3.11 maya)
-	if (CBStartPasteConfirmChange(HVTWin)) {
+	if (CBStartPasteConfirmChange(HVTWin, TRUE)) {
 		CBStartPaste(HVTWin, TRUE, BracketedPasteMode(), 0, NULL, 0);
 		/* 最下行でだけ自動スクロールする設定の場合
 		   ペースト処理でスクロールさせる */
