@@ -35,29 +35,29 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <!-- li>DA3 制御シーケンスの応答に含まれる端末固有IDを設定出来るようにした。
+      <li>added support for configuring the Terminal ID included in the DA3 control sequence reply.
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#TerminalUID">TerminalUID</a> entry in the teraterm.ini file. The default value is FFFFFFFF.</li>
-        </ul></li -->
+        </ul></li>
       <li>added support for the DECSTUI (Change Terminal Unique ID) control sequece.
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> entry in the teraterm.ini file. The default value is on.</li>
         </ul></li>
       <li>addes support for the DECRQSS (Request terminal setting) control sequence. Supported control sequences are DECSCA, DECSCL, DECSTBM and SGR.</li>
       <li>added support for the DECFI, DECBI control sequences.</li>
-      <!-- li>ウィンドウサイズ問い合わせ制御シーケンスに対して常に480x640を応答していたのを、実際のウィンドウサイズを返すように変更した。</li -->
-      <!-- li>複数行の貼り付けを確認する設定の時、Alt+Rでの張り付け時は一行のみの場合でも確認するようにした。</li -->
+      <li>The control sequence requesting window size can reply the actual window size instead of the fixed 480x640 value.</li>
+      <li>The ConfirmChangePaste can confirm when only one line is pasted.</li>
       <li>added the "<a href="../macro/command/basename.html">basename</a>" and "<a href="../macro/command/dirname.html">dirname</a>" macro command.</li>
     </ul>
   </li>
 
-  <!-- li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>端末の横幅が 257 桁より大きいと正常に表示できない問題を修正した。</li>
-      <li>端末IDにVT520,VT525を設定していると、Primary DA (DA1) への応答が壊れていた問題を修正した。</li>
-      <li>言語モードが日本語以外の時、<a href="../menu/setup-terminal.html">Terminal Setup</a> ダイアログで端末IDに VT420, VT520, VT525 を指定しても実際には VT100 に設定される問題を修正した。</li>
+      <li>When the terminal width is 257 columns over, Tera Term does not display well.</li>
+      <li>When the terminal ID is VT520 and VT525, the Primary DA (DA1) reply is incorrect.</li>
+      <li>When the language is other than Japanese, the VT420, VT520 and VT525 on the <a href="../menu/setup-terminal.html">Terminal Setup</a> dialog do not work well.</li>
     </ul>
-  </li -->
+  </li>
 
   <li>Misc
     <ul>
