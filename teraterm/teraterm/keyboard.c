@@ -19,7 +19,7 @@
 #include "keyboard.h"
 
 BOOL AutoRepeatMode;
-BOOL AppliKeyMode, AppliCursorMode;
+BOOL AppliKeyMode, AppliCursorMode, AppliEscapeMode;
 BOOL Send8BitMode;
 BYTE DebugFlag = DEBUG_FLAG_NONE;
 
@@ -138,6 +138,16 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
 	*CodeType = IdText; // do new-line conversion
 	CodeLength = 1;
 	Code[0] = 0x0D;
+      }
+      break;
+    case VK_ESCAPE: // Escape Key
+      if (Single) {
+	if (AppliEscapeMode) {
+	  CodeLength = 3;
+	  Code[0] = 0x1B;
+	  Code[1] = 'O';
+	  Code[2] = '[';
+	}
       }
       break;
     case VK_SPACE:
@@ -468,8 +478,16 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
     case '3':
       if (Control && !ts.StrictKeyMapping) {
 	// Ctrl-3 -> ESC
-	CodeLength = 1;
-	Code[0] = 0x1b;
+	if (AppliEscapeMode) {
+	  CodeLength = 3;
+	  Code[0] = 0x1B;
+	  Code[1] = 'O';
+	  Code[2] = '[';
+	}
+	else {
+	  CodeLength = 1;
+	  Code[0] = 0x1b;
+	}
       }
       break;
     case '4':

@@ -209,6 +209,7 @@ void ResetTerminal() /*reset variables but don't update screen */
   AutoWrapMode = TRUE;
   AppliKeyMode = FALSE;
   AppliCursorMode = FALSE;
+  AppliEscapeMode = FALSE;
   RelativeOrgMode = FALSE;
   ts.ColorFlag &= ~CF_REVERSEVIDEO;
   AutoRepeatMode = TRUE;
@@ -2367,6 +2368,9 @@ void CSSetAttr()		// SGR
 	  case 2004: // Bracketed Paste Mode
 	    BracketedPaste = TRUE;
 	    break;
+	  case 7727: // mintty Application Escape Mode
+	    AppliEscapeMode = TRUE;
+	    break;
 	}
     }
 
@@ -2483,6 +2487,9 @@ void CSSetAttr()		// SGR
 	  case 2004: // Bracketed Paste Mode
 	    BracketedPaste = FALSE;
 	    break;
+	  case 7727: // mintty Application Escape Mode
+	    AppliEscapeMode = FALSE;
+	    break;
 	}
     }
 
@@ -2519,6 +2526,7 @@ void CSSetAttr()		// SGR
     RelativeOrgMode = FALSE;
     AppliKeyMode = FALSE;
     AppliCursorMode = FALSE;
+    AppliEscapeMode = FALSE;
     if ((StatusLine>0) &&
 	(CursorY == NumOfLines-1))
       MoveToMainScreen();

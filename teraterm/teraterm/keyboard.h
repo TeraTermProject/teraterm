@@ -33,7 +33,7 @@ void EndKeyboard();
 #define FuncKeyStrMax 32
 
 extern BOOL AutoRepeatMode;
-extern BOOL AppliKeyMode, AppliCursorMode;
+extern BOOL AppliKeyMode, AppliCursorMode, AppliEscapeMode;
 extern BOOL Send8BitMode;
 extern BYTE DebugFlag;
 
