@@ -383,16 +383,14 @@ TerminalUID=FFFFFFFF
 </pre>
 
 
-<!--
-
-<h1><a name="LockTUID">端末固有IDを変更可能にする</a></h1>
+<h1><a name="LockTUID">Changing Terminal Unique ID</a></h1>
 
 <p>
-端末固有 ID はホスト側から DECSTUI 制御シーケンスを送る事によって変更する事が出来ますが、標準ではこの機能は無効にされています。
+Basically, the terminal unique ID can be changed by receiving the DECSTUI control sequence. However, this feature is disabled.
 </p>
 
 <p>
-DECSTUI制御シーケンスによって端末固有 ID を変更できるようにしたい場合は、設定ファイルの [Tera Term] セクションの LockTUID 行を以下のようにしてください。
+When the feature is enabled, describe the LockTUID entry in the [Tera Term] section as follows:
 </p>
 
 <pre>
@@ -403,7 +401,6 @@ LockTUID=off
 Default:
 LockTUID=on
 </pre>
--->
 
 </BODY>
 </HTML>
