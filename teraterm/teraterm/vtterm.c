@@ -3320,7 +3320,11 @@ void XSequence(BYTE b)
 			}
 		}
 		else {
-			ParseMode = ModeFirst;
+			// Invalid Sequence. Ignore.
+			Param[1] = -1;
+			StrBuff[0] = '\0';
+			StrLen = 0;
+			XsParseMode = ModeXsString;
 		}
 		break;
 	  case ModeXsString:
@@ -3365,8 +3369,10 @@ void XSequence(BYTE b)
 			StrLen = 0;
 		}
 		else {
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
+			Param[1] = -1;
+			StrBuff[0] = '\0';
+			StrLen = 0;
+			XsParseMode = ModeXsString;
 		}
 		break;
 	  case ModeXsColorSpec:
