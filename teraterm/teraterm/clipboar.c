@@ -685,7 +685,7 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	char *pText;
 	int pos;
 	int ret = 0;
-	int confirm = 0;
+	BOOL confirm = FALSE;
 
 	if (ts.ConfirmChangePaste == 0)
 		return 1;
@@ -709,17 +709,21 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 
 	if (hText != NULL) {
 		pText = (char *)GlobalLock(hText);
-		if (!(ts.DontConfirmPasteCR && AddCR)) {
+		if (AddCR) {
+			if (ts.ConfirmChangePasteCR) {
+				confirm = TRUE;
+			}
+		}
+		else {
 			pos = strcspn(pText, "\r\n");  // 改行が含まれていたら
 			if (pText[pos] != '\0' || AddCR) {
-				confirm = 1;
+				confirm = TRUE;
 			}
-		} else {
-			// 辞書をサーチする
-			if (search_clipboard(ts.ConfirmChangePasteStringFile, pText)) {
-				confirm = 1;
-			}
+		}
 
+		// 辞書をサーチする
+		if (!confirm && search_clipboard(ts.ConfirmChangePasteStringFile, pText)) {
+			confirm = TRUE;
 		}
 
 		if (confirm) {
