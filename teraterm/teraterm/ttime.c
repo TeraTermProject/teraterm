@@ -33,12 +33,16 @@ typedef HIMC (WINAPI *TImmGetContext)(HWND);
 typedef BOOL (WINAPI *TImmReleaseContext)(HWND, HIMC);
 typedef BOOL (WINAPI *TImmSetCompositionFont)(HIMC, LPLOGFONTA);
 typedef BOOL (WINAPI *TImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
+typedef BOOL (WINAPI *TImmGetOpenStatus)(HIMC);
+typedef BOOL (WINAPI *TImmSetOpenStatus)(HIMC, BOOL);
 
 static TImmGetCompositionString PImmGetCompositionString;
 static TImmGetContext PImmGetContext;
 static TImmReleaseContext PImmReleaseContext;
 static TImmSetCompositionFont PImmSetCompositionFont;
 static TImmSetCompositionWindow PImmSetCompositionWindow;
+static TImmGetOpenStatus PImmGetOpenStatus;
+static TImmSetOpenStatus PImmSetOpenStatus;
 
 
 static HANDLE HIMEDLL = NULL;
@@ -99,6 +103,14 @@ BOOL LoadIME()
   PImmSetCompositionWindow = (TImmSetCompositionWindow)GetProcAddress(
     HIMEDLL, "ImmSetCompositionWindow");
   if (PImmSetCompositionWindow==NULL) Err = TRUE;
+
+  PImmGetOpenStatus = (TImmGetOpenStatus)GetProcAddress(
+    HIMEDLL, "ImmGetOpenStatus");
+  if (PImmGetOpenStatus==NULL) Err = TRUE;
+
+  PImmSetOpenStatus = (TImmSetOpenStatus)GetProcAddress(
+    HIMEDLL, "ImmSetOpenStatus");
+  if (PImmSetOpenStatus==NULL) Err = TRUE;
 
   if ( Err )
   {
@@ -201,4 +213,25 @@ HGLOBAL GetConvString(UINT wParam, LPARAM lParam)
 skip:
 	(*PImmReleaseContext)(HVTWin, hIMC);
 	return hstr;
+}
+
+BOOL GetIMEOpenStatus()
+{
+	HIMC hIMC;
+	BOOL stat;
+
+	hIMC = (*PImmGetContext)(HVTWin);
+	stat = (*PImmGetOpenStatus)(hIMC);
+	(*PImmReleaseContext)(HVTWin, hIMC);
+
+	return stat;
+
+}
+
+void SetIMEOpenStatus(BOOL stat) {
+	HIMC hIMC;
+
+	hIMC = (*PImmGetContext)(HVTWin);
+	(*PImmSetOpenStatus)(hIMC, stat);
+	(*PImmReleaseContext)(HVTWin, hIMC);
 }

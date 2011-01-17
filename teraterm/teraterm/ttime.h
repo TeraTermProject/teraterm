@@ -11,6 +11,8 @@ void FreeIME();
 BOOL CanUseIME();
 void SetConversionWindow(HWND HWin, int X, int Y);
 void SetConversionLogFont(PLOGFONT lf);
+BOOL GetIMEOpenStatus(void);
+void SetIMEOpenStatus(BOOL stat);
 
 HGLOBAL GetConvString(UINT wParam, LPARAM lParam);
 

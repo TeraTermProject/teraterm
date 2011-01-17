@@ -23,6 +23,7 @@
 #include "filesys.h"
 #include "teraprn.h"
 #include "telnet.h"
+#include "ttime.h"
 
 #include "vtterm.h"
 
@@ -139,6 +140,9 @@ int LastX, LastY;
 int ButtonStat;
 int FilterTop, FilterBottom, FilterLeft, FilterRight;
 
+/* IME Status */
+BOOL IMEstat;
+
 static _locale_t CLocale = NULL;
 
 void ResetSBuffer(PStatusBuff sbuff)
@@ -249,6 +253,9 @@ void ResetTerminal() /*reset variables but don't update screen */
 
   // Bracketed Paste Mode
   BracketedPaste = FALSE;
+
+  // Saved IME Status
+  IMEstat = FALSE;
 }
 
 void ResetCharSet()
@@ -2144,6 +2151,29 @@ void CSSetAttr()		// SGR
     }
   }
 
+  void CSLT(BYTE b)
+  {
+    switch (b) {
+      case 'r':
+	if (CanUseIME()) {
+	  SetIMEOpenStatus(IMEstat);
+	}
+	break;
+
+      case 's':
+	if (CanUseIME()) {
+	  IMEstat = GetIMEOpenStatus();
+	}
+	break;
+
+      case 't':
+	if (CanUseIME()) {
+	  SetIMEOpenStatus(Param[1] == 1);
+	}
+	break;
+    }
+  }
+
   void CSEQ(BYTE b)
   {
     char Report[16];
@@ -2541,6 +2571,9 @@ void CSSetAttr()		// SGR
 
     // status buffers
     ResetCurSBuffer();
+
+    // Saved IME status
+    IMEstat = FALSE;
   }
 
   void CSExc(BYTE b)
@@ -2879,6 +2912,8 @@ void ParseCS(BYTE b) /* b is the final char */
 	    case 'u': RestoreCursor(); break;           // RCP (Restore cursor (ANSI.SYS/SCO))
 	  } /* of case Prv=0 */
 	  break;
+	/* private parameter = '<' */
+	case '<': CSLT(b); break;
 	/* private parameter = '=' */
 	case '=': CSEQ(b); break;
 	/* private parameter = '>' */
