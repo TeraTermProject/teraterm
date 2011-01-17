@@ -2984,7 +2984,8 @@ void ControlSequence(BYTE b)
   FirstPrm = FALSE;
 }
 
-void RequestStatusString(unsigned char *StrBuff, int StrLen) {
+void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
+{
 	unsigned char RepStr[256];
 	int len = 0;
 
@@ -3031,6 +3032,37 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen) {
 			if (CharAttr.Attr & AttrReverse) {
 				RepStr[len++] = '7';
 				RepStr[len++] = ';';
+			}
+			if (CharAttr.Attr2 & Attr2Fore) {
+				if (CharAttr.Fore <= 7) {
+					RepStr[len++] = '3';
+					RepStr[len++] = '0' + CharAttr.Fore;
+					RepStr[len++] = ';';
+				}
+				else if (CharAttr.Fore <= 15) {
+					RepStr[len++] = '9';
+					RepStr[len++] = '0' + CharAttr.Fore - 8;
+					RepStr[len++] = ';';
+				}
+				else {
+					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, "38;5;%d;", CLocale, CharAttr.Fore);
+				}
+			}
+			if (CharAttr.Attr2 & Attr2Back) {
+				if (CharAttr.Back <= 7) {
+					RepStr[len++] = '4';
+					RepStr[len++] = '0' + CharAttr.Back;
+					RepStr[len++] = ';';
+				}
+				else if (CharAttr.Back <= 15) {
+					RepStr[len++] = '1';
+					RepStr[len++] = '0';
+					RepStr[len++] = '0' + CharAttr.Back - 8;
+					RepStr[len++] = ';';
+				}
+				else {
+					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, "48;5;%d;", CLocale, CharAttr.Back);
+				}
 			}
 			if (len == 3) {
 				RepStr[len++] = '0';
