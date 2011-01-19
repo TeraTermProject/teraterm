@@ -190,6 +190,7 @@ typedef TCharAttr *PCharAttr;
 #define TF_CLEARONRESIZE      256
 #define TF_ALTSCR             512
 #define TF_LOCKTUID           1024
+#define TF_INVALIDDECRPSS     2048
 
 // ANSI/Attribute color flags (used in ts.ColorFlag)
 #define CF_PCBOLD16     1

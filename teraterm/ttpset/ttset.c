@@ -1393,6 +1393,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	
 	// Confirm PasteCR
 	ts->ConfirmChangePasteCR = GetOnOff(Section, "ConfirmChangePasteCR", FName, TRUE);
+
+	// Use invalid DECRPSS (for testing)
+	if (GetOnOff(Section, "UseInvalidDECRQSSResponse", FName, FALSE))
+		ts->TermFlag |= TF_INVALIDDECRPSS;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)

@@ -3081,10 +3081,18 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 		break;
 	}
 	if (len > 0) {
+		if (ts.TermFlag & TF_INVALIDDECRPSS) {
+			RepStr[0] = '1';
+		}
 		SendDCSstr(RepStr, len);
 	}
 	else {
-		SendDCSstr("1$r", 0);
+		if (ts.TermFlag & TF_INVALIDDECRPSS) {
+			SendDCSstr("0$r", 0);
+		}
+		else {
+			SendDCSstr("1$r", 0);
+		}
 	}
 }
 
