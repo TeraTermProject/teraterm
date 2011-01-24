@@ -1075,6 +1075,7 @@ BOOL PrnOpen(PCHAR DevName)
 	DCB dcb;
 	DWORD DErr;
 	COMMTIMEOUTS ctmo;
+	OSVERSIONINFO osvi;
 
 	strncpy_s(Temp, sizeof(Temp),DevName, _TRUNCATE);
 	c = Temp;
@@ -1084,9 +1085,24 @@ BOOL PrnOpen(PCHAR DevName)
 	*c = '\0';
 	LPTFlag = (Temp[0]=='L') ||
 	          (Temp[0]=='l');
-	PrnID = CreateFile(Temp,GENERIC_WRITE,
-	                   0,NULL,OPEN_EXISTING,
-	                   0,NULL);
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+		// ネットワーク共有にマップされたデバイスが相手の場合、こうしないといけないらしい (2011.01.25 maya)
+		// http://logmett.com/forum/viewtopic.php?f=2&t=1383
+		// http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx#5
+		PrnID = CreateFile(Temp,GENERIC_WRITE | FILE_READ_ATTRIBUTES,
+		                   FILE_SHARE_READ,NULL,CREATE_ALWAYS,
+		                   0,NULL);
+	}
+	else {
+		// 9x では上記のコードでうまくいかないので従来通りの処理
+		PrnID = CreateFile(Temp,GENERIC_WRITE,
+		                   0,NULL,OPEN_EXISTING,
+		                   0,NULL);
+	}
+
 	if (PrnID == INVALID_HANDLE_VALUE) {
 		return FALSE;
 	}
