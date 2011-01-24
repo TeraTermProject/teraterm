@@ -1071,13 +1071,17 @@ void CommLock(PTTSet ts, PComVar cv, BOOL Lock)
 
 BOOL PrnOpen(PCHAR DevName)
 {
-	char Temp[MAXPATHLEN];
+	char Temp[MAXPATHLEN], *c;
 	DCB dcb;
 	DWORD DErr;
 	COMMTIMEOUTS ctmo;
 
 	strncpy_s(Temp, sizeof(Temp),DevName, _TRUNCATE);
-	Temp[4] = 0; // COMn or LPTn
+	c = Temp;
+	while (*c != '\0' && *c != ':') {
+		c++;
+	}
+	*c = '\0';
 	LPTFlag = (Temp[0]=='L') ||
 	          (Temp[0]=='l');
 	PrnID = CreateFile(Temp,GENERIC_WRITE,
