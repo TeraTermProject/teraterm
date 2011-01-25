@@ -204,6 +204,8 @@
 #define RsvStrSpecial   186
 #define RsvBasename     187
 #define RsvDirname      188
+#define RsvGetFileAttr  189
+#define RsvSetFileAttr  190
 
 #define RsvOperator     1000
 #define RsvBNot         1001

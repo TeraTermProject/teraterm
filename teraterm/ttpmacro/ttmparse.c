@@ -197,6 +197,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		if (_stricmp(Str,"getdate")==0) *WordId = RsvGetDate;
 		else if (_stricmp(Str,"getdir")==0) *WordId = RsvGetDir;
 		else if (_stricmp(Str,"getenv")==0) *WordId = RsvGetEnv;
+		else if (_stricmp(Str,"getfileattr")==0) *WordId = RsvGetFileAttr;
 		else if (_stricmp(Str,"gethostname")==0) *WordId = RsvGetHostname;
 		else if (_stricmp(Str,"getpassword")==0) *WordId = RsvGetPassword;
 		else if (_stricmp(Str,"gettime")==0) *WordId = RsvGetTime;
@@ -263,6 +264,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"sendbroadcast")==0) *WordId = RsvSendBroadcast;
 		else if (_stricmp(Str,"sendlnbroadcast")==0) *WordId = RsvSendlnBroadcast;
 		else if (_stricmp(Str,"sendmulticast")==0) *WordId = RsvSendMulticast;
+		else if (_stricmp(Str,"setfileattr")==0) *WordId = RsvSetFileAttr;
 		else if (_stricmp(Str,"setmulticastname")==0) *WordId = RsvSetMulticastName;
 		else if (_stricmp(Str,"sendfile")==0) *WordId = RsvSendFile;
 		else if (_stricmp(Str,"sendkcode")==0) *WordId = RsvSendKCode;

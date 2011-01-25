@@ -1240,6 +1240,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="getfileattr">
+					<param name="Local" value="html\macro\command\getfileattr.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="makepath">
 					<param name="Local" value="html\macro\command\makepath.html">
 					<param name="ImageNumber" value="11">
@@ -1247,6 +1252,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setdir">
 					<param name="Local" value="html\macro\command\setdir.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setfileattr">
+					<param name="Local" value="html\macro\command\setfileattr.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

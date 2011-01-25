@@ -214,6 +214,7 @@
 #define HlpMacroCommandGetdate          92043
 #define HlpMacroCommandGetdir           92044
 #define HlpMacroCommandGetenv           92045
+#define HlpMacroCommandGetfileattr      92189
 #define HlpMacroCommandGethostname      92141
 #define HlpMacroCommandGetpassword      92046
 #define HlpMacroCommandGettime          92047
@@ -269,6 +270,7 @@
 #define HlpMacroCommandSetenv           92123
 #define HlpMacroCommandSetecho          92082
 #define HlpMacroCommandSetexitcode      92083
+#define HlpMacroCommandSetfileattr      92190
 #define HlpMacroCommandSetMulticastName 92146
 #define HlpMacroCommandSetrts           92136
 #define HlpMacroCommandSetsync          92084

@@ -1838,6 +1838,22 @@ WORD TTLGetEnv()
 	return Err;
 }
 
+WORD TTLGetFileAttr()
+{
+	WORD Err;
+	TStrVal Filename;
+
+	Err = 0;
+	GetStrVal(Filename,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	SetResult(GetFileAttributes(Filename));
+
+	return Err;
+}
+
 WORD TTLGetHostname()
 {
 	WORD VarId, Err;
@@ -3001,6 +3017,29 @@ WORD TTLSetExitCode()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 	ExitCode = Val;
+	return Err;
+}
+
+WORD TTLSetFileAttr()
+{
+	WORD Err;
+	TStrVal Filename;
+	int attributes;
+
+	Err = 0;
+	GetStrVal(Filename,&Err);
+	GetIntVal(&attributes,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	if (SetFileAttributes(Filename, attributes) == 0) {
+		SetResult(0);
+	}
+	else {
+		SetResult(1);
+	}
+
 	return Err;
 }
 
@@ -4618,6 +4657,8 @@ int ExecCmnd()
 			Err = TTLGetDir(); break;
 		case RsvGetEnv:
 			Err = TTLGetEnv(); break;
+		case RsvGetFileAttr:
+			Err = TTLGetFileAttr(); break;
 		case RsvGetHostname:
 			Err = TTLGetHostname(); break;
 		case RsvGetPassword:
@@ -4716,6 +4757,8 @@ int ExecCmnd()
 			Err = TTLCommCmdInt(CmdSetBaud,0); break;
 		case RsvSetDate:
 			Err = TTLSetDate(); break;
+		case RsvSetDebug:
+			Err = TTLCommCmdDeb(); break;
 		case RsvSetDir:
 			Err = TTLSetDir(); break;
 		case RsvSetDlgPos:
@@ -4724,13 +4767,12 @@ int ExecCmnd()
 			Err = TTLCommCmdInt(CmdSetDtr,0); break;
 		case RsvSetEcho:
 			Err = TTLCommCmdBin(CmdSetEcho,0); break;
-
-		case RsvSetDebug:
-			Err = TTLCommCmdDeb(); break;
 		case RsvSetEnv:
 			Err = TTLSetEnv(); break;
 		case RsvSetExitCode:
 			Err = TTLSetExitCode(); break;
+		case RsvSetFileAttr:
+			Err = TTLSetFileAttr(); break;
 		case RsvSetRts:
 			Err = TTLCommCmdInt(CmdSetRts,0); break;
 		case RsvSetSync:
