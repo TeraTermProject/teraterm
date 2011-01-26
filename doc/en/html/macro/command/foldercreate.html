@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-  <title>filesearch</title>
+  <title>foldercreate</title>
   <meta http-equiv="Content-Style-Type" content="text/css">
   <link rel="stylesheet" href="../../style.css" type="text/css">
 </head>
@@ -11,34 +11,28 @@
 <body>
 
 
-<h1>filesearch</h1>
+<h1>foldercreate</h1>
 
 <p>
-Search a file or folder.
+Creates a folder.
 </p>
 
 <pre class="macro-syntax">
-filesearch &lt;filename&gt;
+foldercreate &lt;foldername&gt;
 </pre>
 
 <h2>Remarks</h2>
 
 <p>
-Searches for the file or folder specified by &lt;filename&gt;.<br>
-If it is found, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
+Creates aa new folder specified by &lt;foldername&gt;.<br>
+If the folder is created successfully, the system variable "result" is set to 0. Otherwise, "result" is set to non-zero.
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-filesearch 'readme.txt'
-if result=0 messagebox 'File not found.' 'error'
+foldercreate 'data'
 </pre>
-
-<h2>See also</h2>
-<ul>
-  <li><a href="foldersearch.html">foldersearch</a></li>
-</ul>
 
 </body>
 </html>

@@ -1763,6 +1763,86 @@ WORD TTLFlushRecv()
 	return 0;
 }
 
+WORD TTLFolderCreate()
+{
+	WORD Err;
+	TStrVal FName;
+
+	Err = 0;
+	GetStrVal(FName,&Err);
+	if ((Err==0) &&
+	    ((strlen(FName)==0) || (GetFirstChar()!=0)))
+		Err = ErrSyntax;
+	if (Err!=0) {
+		SetResult(1);
+		return Err;
+	}
+
+	if (!GetAbsPath(FName,sizeof(FName))) {
+		SetResult(-1);
+		return Err;
+	}
+
+	if (CreateDirectory(FName, NULL) == 0) {
+		SetResult(2);
+	}
+	else {
+		SetResult(0);
+	}
+	return Err;
+}
+
+WORD TTLFolderDelete()
+{
+	WORD Err;
+	TStrVal FName;
+
+	Err = 0;
+	GetStrVal(FName,&Err);
+	if ((Err==0) &&
+	    ((strlen(FName)==0) || (GetFirstChar()!=0)))
+		Err = ErrSyntax;
+	if (Err!=0) {
+		SetResult(1);
+		return Err;
+	}
+
+	if (!GetAbsPath(FName,sizeof(FName))) {
+		SetResult(-1);
+		return Err;
+	}
+
+	if (RemoveDirectory(FName) == 0) {
+		SetResult(2);
+	}
+	else {
+		SetResult(0);
+	}
+	return Err;
+}
+
+WORD TTLFolderSearch()
+{
+	WORD Err;
+	TStrVal FName;
+
+	Err = 0;
+	GetStrVal(FName,&Err);
+	if ((Err==0) &&
+	    ((strlen(FName)==0) || (GetFirstChar()!=0)))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	GetAbsPath(FName,sizeof(FName));
+	if (DoesFolderExist(FName)) {
+		SetResult(1);
+	}
+	else {
+		SetResult(0);
+	}
+	return Err;
+}
+
 WORD TTLFor()
 {
 	WORD Err, VarId;
@@ -4648,6 +4728,12 @@ int ExecCmnd()
 			Err = TTLFindNext(); break;
 		case RsvFlushRecv:
 			Err = TTLFlushRecv(); break;
+		case RsvFolderCreate:
+			Err = TTLFolderCreate(); break;
+		case RsvFolderDelete:
+			Err = TTLFolderDelete(); break;
+		case RsvFolderSearch:
+			Err = TTLFolderSearch(); break;
 		case RsvFor:
 			Err = TTLFor(); break;
 		case RsvGetDate:

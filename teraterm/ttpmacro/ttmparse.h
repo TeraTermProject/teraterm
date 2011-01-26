@@ -206,6 +206,9 @@
 #define RsvDirname      188
 #define RsvGetFileAttr  189
 #define RsvSetFileAttr  190
+#define RsvFolderCreate 191
+#define RsvFolderDelete 192
+#define RsvFolderSearch 193
 
 #define RsvOperator     1000
 #define RsvBNot         1001

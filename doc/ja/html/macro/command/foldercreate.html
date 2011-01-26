@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-  <title>filesearch</title>
+  <title>foldercreate</title>
   <meta http-equiv="Content-Style-Type" content="text/css">
   <link rel="stylesheet" href="../../style.css" type="text/css">
 </head>
@@ -11,34 +11,28 @@
 <body>
 
 
-<h1>filesearch</h1>
+<h1>foldercreate</h1>
 
 <p>
-ファイルまたはフォルダがあるか確かめる。
+フォルダを作成する。
 </p>
 
 <pre class="macro-syntax">
-filesearch &lt;filename&gt;
+foldercreate &lt;foldername&gt;
 </pre>
 
 <h2>解説</h2>
 
 <p>
-ファイルまたはフォルダ &lt;filename&gt; が存在するかどうか調べる。<br>
-存在する場合は、システム変数 result に1が返る。存在しない場合は、result に0が返る。
+フォルダ &lt;foldername&gt; を新しく作成する。<br>
+フォルダの作成が成功した場合、システム変数 result に 0 が格納される。それ以外の場合, result に 0 以外が格納される。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-filesearch 'readme.txt'
-if result=0 messagebox 'File not found.' 'error'
+foldercreate 'data'
 </pre>
-
-<h2>参照</h2>
-<ul>
-  <li><a href="foldersearch.html">foldersearch</a></li>
-</ul>
 
 </body>
 </html>

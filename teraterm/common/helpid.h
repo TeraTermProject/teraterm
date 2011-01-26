@@ -210,6 +210,9 @@
 #define HlpMacroCommandFilewriteln      92037
 #define HlpMacroCommandFindoperations   92039
 #define HlpMacroCommandFlushrecv        92041
+#define HlpMacroCommandFoldercreate     92191
+#define HlpMacroCommandFolderdelete     92192
+#define HlpMacroCommandFoldersearch     92193
 #define HlpMacroCommandFornext          92042
 #define HlpMacroCommandGetdate          92043
 #define HlpMacroCommandGetdir           92044

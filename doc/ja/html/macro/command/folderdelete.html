@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-  <title>filesearch</title>
+  <title>folderdelete</title>
   <meta http-equiv="Content-Style-Type" content="text/css">
   <link rel="stylesheet" href="../../style.css" type="text/css">
 </head>
@@ -11,34 +11,29 @@
 <body>
 
 
-<h1>filesearch</h1>
+<h1>folderdelete</h1>
 
 <p>
-ファイルまたはフォルダがあるか確かめる。
+フォルダを削除する。
 </p>
 
 <pre class="macro-syntax">
-filesearch &lt;filename&gt;
+folderdelete &lt;foldername&gt;
 </pre>
 
 <h2>解説</h2>
 
 <p>
-ファイルまたはフォルダ &lt;filename&gt; が存在するかどうか調べる。<br>
-存在する場合は、システム変数 result に1が返る。存在しない場合は、result に0が返る。
+フォルダ &lt;foldername&gt; を削除する。<br>
+フォルダの削除が成功した場合、システム変数 result に 0 が格納される。それ以外の場合, result に 0 以外が格納される。<br>
+フォルダが空でない場合には削除できない。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-filesearch 'readme.txt'
-if result=0 messagebox 'File not found.' 'error'
+folderdelete 'temp'
 </pre>
-
-<h2>参照</h2>
-<ul>
-  <li><a href="foldersearch.html">foldersearch</a></li>
-</ul>
 
 </body>
 </html>

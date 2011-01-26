@@ -1248,6 +1248,21 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="foldercreate">
+					<param name="Local" value="html\macro\command\foldercreate.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="folderdelete">
+					<param name="Local" value="html\macro\command\folderdelete.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="foldersearch">
+					<param name="Local" value="html\macro\command\foldersearch.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getdir">
 					<param name="Local" value="html\macro\command\getdir.html">
 					<param name="ImageNumber" value="11">

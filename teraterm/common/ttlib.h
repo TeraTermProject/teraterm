@@ -18,6 +18,7 @@ void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP);
 BYTE ConvHexChar(BYTE b);
 int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen);
 BOOL DoesFileExist(PCHAR FName);
+BOOL DoesFolderExist(PCHAR FName);
 long GetFSize(PCHAR FName);
 void uint2str(UINT i, PCHAR Str, int destlen, int len);
 #ifdef WIN32

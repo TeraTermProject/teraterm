@@ -191,6 +191,9 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"findfirst")==0) *WordId = RsvFindFirst;
 		else if (_stricmp(Str,"findnext")==0) *WordId = RsvFindNext;
 		else if (_stricmp(Str,"flushrecv")==0) *WordId = RsvFlushRecv;
+		else if (_stricmp(Str,"foldercreate")==0) *WordId = RsvFolderCreate;
+		else if (_stricmp(Str,"folderdelete")==0) *WordId = RsvFolderDelete;
+		else if (_stricmp(Str,"foldersearch")==0) *WordId = RsvFolderSearch;
 		else if (_stricmp(Str,"for")==0) *WordId = RsvFor;
 		break;
 	case 'g':

@@ -242,9 +242,31 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen)
 BOOL DoesFileExist(PCHAR FName)
 {
 	// check if a file exists or not
+	// フォルダまたはファイルがあれば TRUE を返す
 	struct _stat st;
 
 	return (_stat(FName,&st)==0);
+}
+
+BOOL DoesFolderExist(PCHAR FName)
+{
+	// check if a folder exists or not
+	// マクロ互換性のため
+	// DoesFileExist は従来通りフォルダまたはファイルがあれば TRUE を返し
+	// DoesFileExist はフォルダがある場合のみ TRUE を返す。
+	struct _stat st;
+
+	if (_stat(FName,&st)==0) {
+		if ((st.st_mode & _S_IFDIR) > 0) {
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
+	}
+	else {
+		return FALSE;
+	}
 }
 
 long GetFSize(PCHAR FName)
