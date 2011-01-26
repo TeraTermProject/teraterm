@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>setfileattr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setfileattr</h1>
+
+<p>
+Sets attributes of a file or directory.
+</p>
+
+<pre class="macro-syntax">
+setfileattr &lt;filename&gt; &lt;attributes&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string &lt;filename&gt;</dt>
+	<dd>The file name or directory name</dd>
+
+	<dt class="macro">integer &lt;attributes&gt;</dt>
+	<dd><!--Ý’è‚·‚é‘®«’l‚ðŽw’è‚·‚éB‘®«’l‚ÍˆÈ‰º‚Ì”’l‚Ì‘g‚Ý‡‚í‚¹‚Æ‚È‚éB--><br>
+	    <table border="2">
+	      <tr>
+	        <th>Value</th>
+	        <th>Meaning</th>
+	      </tr>
+	      <tr>
+	        <td>$1</td>
+	        <td>Read only</td>
+	      </tr>
+	      <tr>
+	        <td>$2</td>
+	        <td>Hidden</td>
+	      </tr>
+	      <tr>
+	        <td>$4</td>
+	        <td>The operating system uses a part of, or uses exclusively</td>
+	      </tr>
+	      <tr>
+	        <td>$20</td>
+	        <td>Archive</td>
+	      </tr>
+	      <tr>
+	        <td>$80</td>
+	        <td>Not have other attributes set</td>
+	      </tr>
+	      <tr>
+	        <td>$100</td>
+	        <td>Temporary</td>
+	      </tr>
+	      <tr>
+	        <td>$1000</td>
+	        <td>Physically moved to offline storage(Windows 2000 or later)</td>
+	      </tr>
+	      <tr>
+	        <td>$2000</td>
+	        <td>Not to be indexed by the content indexing service(Windows 2000 or later)</td>
+	      </tr>
+	    </table>
+	</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System valiable &lt;result&gt;</dt>
+	<!--dd>‘®«‚Ì•ÏX‚ÉŽ¸”s‚·‚é‚Æ0‚ªŠi”[‚³‚ê‚éB<br>
+	    ¬Œ÷‚·‚é‚Æ1‚ªŠi”[‚³‚ê‚éB</dd-->
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; add readonly attribute
+file = 'c:\test.txt'
+getfileattr file
+attr = result | $1 ; keep current attributes
+setfileattr file attr
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="getfileattr.html">getfileattr</a></li>
+  <li>MSDN Library <a href="http://msdn.microsoft.com/en-us/library/aa365535(v=VS.85).aspx">SetFileAttributes</a></li>
+  <li>MSDN Library <a href="http://msdn.microsoft.com/en-us/library/gg258117(v=VS.85).aspx">File Attribute Constants</a></li>
+</ul>
+
+</body>
+</html>
