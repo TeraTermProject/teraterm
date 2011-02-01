@@ -95,7 +95,7 @@ static BOOL FirstPrm;
 static BYTE IntChar[IntCharMax+1];
 static int ICount;
 static BYTE Prv;
-static int ParseMode, SavedMode;
+static int ParseMode;
 static int ChangeEmu;
 
 /* user defined keys */
@@ -936,7 +936,6 @@ void ParseControl(BYTE b)
       SSflag = TRUE;
       break;
     case DCS:
-      SavedMode = ParseMode;
       ESCFlag = FALSE;
       ICount = 0;
       NParam = 1;
@@ -945,7 +944,6 @@ void ParseControl(BYTE b)
       ParseMode = ModeDCS;
       break;
     case SOS:
-      SavedMode = ParseMode;
       ESCFlag = FALSE;
       ParseMode = ModeSOS;
       break;
@@ -963,7 +961,6 @@ void ParseControl(BYTE b)
       break;
     case PM:
     case APC:
-      SavedMode = ParseMode;
       ESCFlag = FALSE;
       ParseMode = ModeSOS;
       break;
@@ -1285,14 +1282,12 @@ void ParseEscape(BYTE b) /* b is the final char */
 	  SSflag = TRUE;
 	  break;
 	case 'P': /* DCS */
-	  SavedMode = ParseMode;
 	  ESCFlag = FALSE;
 	  NParam = 1;
 	  Param[1] = -1;
 	  ParseMode = ModeDCS;
 	  return;
 	case 'X': /* SOS */
-	  SavedMode = ParseMode;
 	  ESCFlag = FALSE;
 	  ParseMode = ModeSOS;
 	  return;
@@ -1313,7 +1308,6 @@ void ParseEscape(BYTE b) /* b is the final char */
 	  return;
 	case '^':
 	case '_': /* PM, APC */
-	  SavedMode = ParseMode;
 	  ESCFlag = FALSE;
 	  ParseMode = ModeSOS;
 	  return;
@@ -3175,7 +3169,7 @@ void DeviceControl(BYTE b)
 			ParseDCS(Cmd, StrBuff, StrLen);
 		}
 		ESCFlag = FALSE;
-		ParseMode = SavedMode;
+		ParseMode = ModeFirst;
 		DcsParseMode = ModeDcsFirst;
 		StrLen = 0;
 		return;
@@ -3229,7 +3223,7 @@ void DeviceControl(BYTE b)
 	case ModeDcsString:
 		if (b <= US && b != HT && b != CR) {
 			ESCFlag = FALSE;
-			ParseMode = SavedMode;
+			ParseMode = ModeFirst;
 			DcsParseMode = ModeDcsFirst;
 			StrLen = 0;
 		}
@@ -3246,7 +3240,7 @@ void DCUserKey(BYTE b)
   {
     if (! WaitKeyId) DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
     ESCFlag = FALSE;
-    ParseMode = SavedMode;
+    ParseMode = ModeFirst;
     return;
   }
 
@@ -3302,7 +3296,7 @@ void IgnoreString(BYTE b)
   if ((ESCFlag && (b=='\\')) ||
       (b<=US && b!=ESC && b!=HT) ||
       (b==ST && ts.KanjiCode!=IdSJIS))
-    ParseMode = SavedMode;
+    ParseMode = ModeFirst;
 
   if (b==ESC) ESCFlag = TRUE;
 	 else ESCFlag = FALSE;
