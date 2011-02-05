@@ -49,6 +49,7 @@
       <li>When the ConfirmChangePaste is enabled, a user is confirmed with pasting the text by using Alt+R accelerator key.
       The ConfirmChangePaste can confirm when only one line is pasted.</li>
       <li>added support for mintty's application escape mode.</li>
+      <!-- li>IME の状態を制御するための制御シーケンスを新設した。</li -->
       <li>added the "<a href="../macro/command/basename.html">basename</a>" and "<a href="../macro/command/dirname.html">dirname</a>" macro command.</li>
       <li>added the "<a href="../macro/command/getfileattr.html">getfileattr</a>" and "<a href="../macro/command/setfileattr.html">setfileattr</a>" macro command.</li>
       <li>added the "<a href="../macro/command/foldercreate.html">foldercreate</a>", "<a href="../macro/command/folderdelete.html">folderdelete</a>" and "<a href="../macro/command/foldersearch.html">foldersearch</a>" macro command.</li>
@@ -61,6 +62,8 @@
       <li>When the terminal ID is VT520 and VT525, the Primary DA (DA1) reply is incorrect.</li>
       <li>When the language is other than Japanese, the VT420, VT520 and VT525 on the <a href="../menu/setup-terminal.html">Terminal Setup</a> dialog do not work well.</li>
       <!--li>ネットワーク共有をマップしたローカルデバイスを<a href="../setup/teraterm-prn.html#direct">PassThruPort</a>に指定した場合、印刷ができない問題を修正した。</li-->
+      <!-- li>対応していな OSC 制御文字列を正しく無視出来ない場合があった問題を修正した。</li -->
+      <!-- li>DCS, SOS, APS, PM 制御文字列の直後の文字を正しく扱えていなかった問題を修正した。</li -->
     </ul>
   </li>
 

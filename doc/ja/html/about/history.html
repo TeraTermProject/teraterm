@@ -47,8 +47,8 @@
       <li>DECFI, DECBI 制御シーケンスに対応した。</li>
       <li>ウィンドウサイズ問い合わせ制御シーケンスに対して常に480x640を応答していたのを、実際のウィンドウサイズを返すように変更した。</li>
       <li>ConfirmChangePaste（危険なクリップボードの貼り付けを確認する）が有効で、Alt+R使用時、ペースト内容が一行のみの場合においても、ユーザに確認するようにした。</li>
-      <li></li>
       <li>mintty の Application Escape Mode に対応した。</li>
+      <li>IME の状態を制御するための制御シーケンスを新設した。</li>
       <li>マクロコマンド "<a href="../macro/command/basename.html">basename</a>", "<a href="../macro/command/dirname.html">dirname</a>" を追加した。</li>
       <li>マクロコマンド "<a href="../macro/command/getfileattr.html">getfileattr</a>", "<a href="../macro/command/setfileattr.html">setfileattr</a>" を追加した。</li>
       <li>マクロコマンド "<a href="../macro/command/foldercreate.html">foldercreate</a>", "<a href="../macro/command/folderdelete.html">folderdelete</a>", "<a href="../macro/command/foldersearch.html">foldersearch</a>" を追加した。</li>
@@ -61,6 +61,8 @@
       <li>端末IDにVT520,VT525を設定していると、Primary DA (DA1) への応答が壊れていた問題を修正した。</li>
       <li>言語モードが日本語以外の時、<a href="../menu/setup-terminal.html">Terminal Setup</a> ダイアログで端末IDに VT420, VT520, VT525 を指定しても実際には VT100 に設定される問題を修正した。</li>
       <li>ネットワーク共有をマップしたローカルデバイスを<a href="../setup/teraterm-prn.html#direct">PassThruPort</a>に指定した場合、印刷ができない問題を修正した。</li>
+      <li>対応していな OSC 制御文字列を正しく無視出来ない場合があった問題を修正した。</li>
+      <li>DCS, SOS, APS, PM 制御文字列の直後の文字を正しく扱えていなかった問題を修正した。</li>
     </ul>
   </li>
 
