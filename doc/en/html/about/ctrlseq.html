@@ -274,7 +274,14 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 </pre>
 </td></tr>
 <tr><td>CSI u</td>	<td>RCP</td>	<td> Restore cursor position. Same as DECRC. </td></tr>
-
+<tr><td>CSI &lt; r</td>	<td>-</td>	<td> Restore IME open state. </td></tr>
+<tr><td>CSI &lt; s</td>	<td>-</td>	<td> Save IME open state. </td></tr>
+<tr><td>CSI &lt; <i>Ps</i> t</td>	<td>-</td>	<td> Change IME open state. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Close IME.
+   = 1      Open IME.
+</pre>
+</td></tr>
 <tr><td>CSI = <i>Ps</i> c</td>	<td>DA3 (Tertiary DA)</td>	<td> Tertiary Device Attribute. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0      Tertiary Device Attribute request.
@@ -681,6 +688,12 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
 	<td> - </td>
 	<td> Enables Application Escape mode. </td>
 	<td> Disables Application Escape mode. </td>
+    </tr>
+    <tr>
+        <td> 7786 </td>
+        <td> - </td>
+        <td> Enables mouse wheel - cursorkey translation. </td>
+        <td> Disables mouse wheel - cursorkey translation. </td>
     </tr>
 </table>
 
