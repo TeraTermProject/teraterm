@@ -14,7 +14,7 @@
 <h2>C0 Control Character</h2>
 <table border="1">
 <tr><th>Hexadecimal</th>	<th>Mnemonic</th>	<th>Description</th></tr>
-<tr><td>0x00</td>	<td >NUL </td>	<td> </td></tr>
+<tr><td>0x00</td>	<td> NUL </td>	<td> </td></tr>
 <tr><td>0x01</td>	<td> SOH </td>	<td> </td></tr>
 <tr><td>0x02</td>	<td> STX </td>	<td> </td></tr>
 <tr><td>0x03</td>	<td> ETX </td>	<td> </td></tr>
@@ -146,11 +146,13 @@
 <tr><td>CSI <i>Ps</i> G</td>	<td>CHA</td>	<td> Moves cursor to the <i>Ps</i>-th column of the active line. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td> Moves cursor to the <i>Ps</i> tabs forward. The default value of <i>Ps</i> is 1. </td></tr>
-<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>Erase in display. The default value of <i>Ps</i> is 0. <pre>
+<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>Erase in display. The default value of <i>Ps</i> is 0.
+<pre>
 <i>Ps</i> = 0      Erase from cursor through the end of the display.
    = 1      Erase from the beginning of the display through the cursor.
    = 2      Erase the complete of display.
-</pre></td></tr>
+</pre>
+</td></tr>
 <tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>Erase in line. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0      Erase from the cursor through the end of the line.
@@ -192,8 +194,8 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <pre>
 <i>Ps</i> = 0      Clears the tab stop at the cursor.
    = 3      Clears all tab stops.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 <tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets ANSI mode. (See <a href="#mode">Modes (ANSI)</a>)</td></tr>
 <tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td> Printing mode.
 <pre>
@@ -223,6 +225,7 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
        The default value is 1.
 <i>Ps2</i>    Line number for the bottom margin.
        The default value is current number of lines per screen.
+</pre>
 </td></tr>
 <tr><td>CSI s</td>	<td>SCP</td>	<td> Save cursor position. Same as DECSC. </td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td> Window manipulation.
@@ -302,14 +305,15 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps2</i>   Left-column border.
 <i>Ps3</i>   Bottom-line border.
 <i>Ps4</i>   Right-column border.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 <tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td> Erase characters from <i>Ps1</i> column through <i>Ps2</i> column. </td></tr>
 <tr><td>CSI &gt; 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
 <i>Ps</i> = 3..6   Draw Line
    = 12     Set foreground color
-</pre></td></tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI ? <i>Ps</i> J</td>	<td>DECSED</td>	<td> Selective erase in display. DECSED only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps</i> is 0.
 <pre>
@@ -341,7 +345,8 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps</i> = 55     Reports locator device status. Always returns "CSI ? 50 n" (Locator ready).
             Response: CSI ? <i>s</i> n
               <i>s</i> = 50    Locator ready.
-</pre></td></tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>Sets cursor style. The default value of <i>Ps</i> is 0.
 <pre>
@@ -351,8 +356,8 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
    = 4      Underline cursor / Steady
    = 5      Vertical line cursor / Blink
    = 6      Vertical line cursor / Steady
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>Soft reset</td></tr>
 
@@ -367,8 +372,8 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps2</i> = 0     8 bit mode (S8C1T)
     = 1     7 bit mode (S7C1T)
     = 2     8 bit mode (S8C1T)
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> " q</td>	<td>DECSCA</td>	<td> Select character protection attribute. Selective erase control functions (DECSED, DECSEL and DECSERA) can only erase characters defined as erasable.
 <pre>
@@ -384,8 +389,8 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps2</i>   Left-column border.
 <i>Ps3</i>   Bottom-line border.
 <i>Ps4</i>   Right-column border.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ {</td>	<td>DECSERA</td>	<td> Selective erase rectangular area. DECSERA only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps1</i> - <i>Ps4</i> is current cursor position.
 <pre>
@@ -393,23 +398,23 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps2</i>   Left-column border.
 <i>Ps3</i>   Bottom-line border.
 <i>Ps4</i>   Right-column border.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td> Moves cursor from/to status line. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0      Moves to main screen.
    = 1      Moves to status line.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td> Select the type of status line displayed. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0      No status line.
      1      No status line.
      2      Host-writable status line.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td> Enables filter rectangle for locator report.
 <pre>
@@ -429,8 +434,8 @@ Filter rectangles are always treated as "one-shot" events. Anytime the locator i
 <i>Ps2</i> = 0     Character mode. Same as 2.
     = 1     Pixel mode. Reporting unit is device physical pixels.
     = 2     Character mode. Reporting unit is character cells.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td> Select the locator event.
 <pre>
@@ -439,8 +444,8 @@ Filter rectangles are always treated as "one-shot" events. Anytime the locator i
    = 2      Disables button down event.
    = 3      Enables button up event.
    = 4      Disables button up event.
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td> Requests locator report.
 <pre>
@@ -822,7 +827,7 @@ rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
 <pre>PM <i>Pt</i> ST</pre>
 <p>Tera Term implements no PM functions; <i>Pt</i> is ignored.</p>
 
-<h2><a name="APC">APC Sequence</a></h3>
+<h2><a name="APC">APC Sequence</a></h2>
 <p>Format</p>
 <pre>APC <i>Pt</i> ST</pre>
 <p>Tera Term implements no APC functions; <i>Pt</i> is ignored.</p>

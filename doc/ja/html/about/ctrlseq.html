@@ -14,7 +14,7 @@
 <h2>C0 §Œä•¶Žš</h2>
 <table border="1">
 <tr><th>ƒR[ƒh</th>	<th> —ª† </th>	<th>‹@”\</th></tr>
-<tr><td>0x00</td>	<td >NUL </td>	<td> </td></tr>
+<tr><td>0x00</td>	<td> NUL </td>	<td> </td></tr>
 <tr><td>0x01</td>	<td> SOH </td>	<td> </td></tr>
 <tr><td>0x02</td>	<td> STX </td>	<td> </td></tr>
 <tr><td>0x03</td>	<td> ETX </td>	<td> </td></tr>
@@ -139,11 +139,13 @@
 <tr><td>CSI <i>Ps</i> G</td>	<td>CHA</td>	<td>ƒJ[ƒ\ƒ‹‚ðŒ»Ý‚Ìs‚Ì <i>Ps</i> Œ…–Ú‚ÉˆÚ“®‚·‚éB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 1B</td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td>ƒJ[ƒ\ƒ‹‚ð <i>Ps1</i> s–Ú‚Ì <i>Ps2</i> Œ…–Ú‚ÉˆÚ“®‚·‚éB<i>Ps1</i>, <i>Ps2</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 1B</td></tr>
 <tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td>ƒJ[ƒ\ƒ‹‚ð <i>Ps</i> ŒÂŒã‚ë‚Ìƒ^ƒuƒXƒgƒbƒv‚ÉˆÚ“®‚·‚éB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 1B</td></tr>
-<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>‰æ–ÊÁ‹ŽB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B<pre>
+<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>‰æ–ÊÁ‹ŽB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B
+<pre>
 <i>Ps</i> = 0      ƒJ[ƒ\ƒ‹ˆÊ’u‚©‚ç‰æ–Ê––”ö‚Ü‚Å‚ðÁ‹Ž‚·‚éB
    = 1      ‰æ–Êæ“ª‚©‚çƒJ[ƒ\ƒ‹ˆÊ’u‚Ü‚Å‚ðÁ‹Ž‚·‚éB
    = 2      ‰æ–Ê‘S‘Ì‚ðÁ‹Ž‚·‚éB
-</pre></td></tr>
+</pre>
+</td></tr>
 <tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>sÁ‹ŽB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B
 <pre>
 <i>Ps</i> = 0      ƒJ[ƒ\ƒ‹ˆÊ’u‚©‚çs––‚Ü‚Å‚ðÁ‹Ž‚·‚éB
@@ -185,8 +187,8 @@
 <pre>
 <i>Ps</i> = 0      ƒJ[ƒ\ƒ‹ˆÊ’u‚Ìƒ^ƒuƒXƒgƒbƒv‚ðíœ‚·‚éB
    = 3      ‚·‚×‚Ä‚Ìƒ^ƒuƒXƒgƒbƒv‚ðíœ‚·‚éB
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 <tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td>ƒ‚[ƒh‚ðÝ’è‚·‚éB(<a href="#mode">ƒ‚[ƒh (ANSI)</a>‚ðŽQÆ)</td></tr>
 <tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td>ˆóüƒ‚[ƒh
 <pre>
@@ -214,6 +216,7 @@
 <pre>
 <i>Ps1</i>    ãƒ}[ƒWƒ“‚ÌsˆÊ’uBÈ—ªŽž‚Í 1B
 <i>Ps2</i>    ‰ºƒ}[ƒWƒ“‚ÌsˆÊ’uBÈ—ªŽž‚Í‰æ–Ê‰º’[B
+</pre>
 </td></tr>
 <tr><td>CSI s</td>	<td>SCP</td>	<td>Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ð•Û‘¶‚·‚éB</td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td>ƒEƒBƒ“ƒhƒE‘€ì
@@ -293,14 +296,15 @@
 <i>Ps2</i>   Á‹Ž—Ìˆæ‚Ì¶•Ó
 <i>Ps3</i>   Á‹Ž—Ìˆæ‚Ì‰º•Ó
 <i>Ps4</i>   Á‹Ž—Ìˆæ‚Ì‰E•Ó
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 <tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td>Œ»Ý‚Ìs‚Ì <i>Ps1</i> Œ…–Ú‚©‚ç <i>Ps2</i> Œ…–Ú‚Ü‚Å‚ðÁ‹Ž‚·‚éB</td></tr>
 <tr><td>CSI &gt; 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
 <i>Ps</i> = 3..6   Draw Line
    = 12     Set foreground color
-</pre></td></tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI ? <i>Ps</i> J</td>	<td>DECSED</td>	<td>‘I‘ð“I‰æ–ÊÁ‹ŽB•ÛŒì‚³‚ê‚Ä‚¢‚È‚¢•¶Žš‚Ì‚Ý‚ðÁ‹Ž‚·‚éB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B
 <pre>
@@ -332,7 +336,8 @@
 <i>Ps</i> = 55     ƒƒP[ƒ^ƒfƒoƒCƒX‚Ìó‘Ô‚ð•ñ‚·‚éBí‚É CSI ? 50 n (€”õOK)‚ð•Ô‚·B
             ‰ž“š: CSI ? <i>s</i> n
               <i>s</i> = 50    Locator ready.
-</pre></td></tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>ƒJ[ƒ\ƒ‹•\Ž¦Œ`Ž®•ÏXB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B
 <pre>
@@ -342,8 +347,8 @@
    = 4      ‰ºüƒJ[ƒ\ƒ‹ / ”ñ“_–Å
    = 5      cüƒJ[ƒ\ƒ‹ / “_–Å
    = 6      cüƒJ[ƒ\ƒ‹ / ”ñ“_–Å
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>ƒ\ƒtƒgƒŠƒZƒbƒg</td></tr>
 
@@ -358,8 +363,8 @@
 <i>Ps2</i> = 0     8 bit ƒ‚[ƒh (S8C1T)
     = 1     7 bit ƒ‚[ƒh (S7C1T)
     = 2     8 bit ƒ‚[ƒh (S8C1T)
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> " q</td>	<td>DECSCA</td>	<td>•¶Žš‚Ì•ÛŒì‘®«‚ðÝ’è‚·‚éB•ÛŒì‚³‚ê‚Ä‚¢‚é•¶Žš‚Í‘I‘ð“IÁ‹Ž‚Ì‘ÎÛŠO‚É‚È‚éB
 <pre>
@@ -375,8 +380,8 @@
 <i>Ps2</i>   Á‹Ž—Ìˆæ‚Ì¶•Ó
 <i>Ps3</i>   Á‹Ž—Ìˆæ‚Ì‰º•Ó
 <i>Ps4</i>   Á‹Ž—Ìˆæ‚Ì‰E•Ó
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ {</td>	<td>DECSERA</td>	<td>‘I‘ð“I‹éŒ`Á‹ŽB‹éŒ`“à‚Ì•ÛŒì‚³‚ê‚Ä‚¢‚È‚¢•¶Žš‚ðÁ‹Ž‚·‚éB<i>Ps1</i> ` <i>Ps4</i> ‚ÌÈ—ªŽž‚Ì’l‚ÍŒ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’uB
 <pre>
@@ -384,23 +389,23 @@
 <i>Ps2</i>   Á‹Ž—Ìˆæ‚Ì¶•Ó
 <i>Ps3</i>   Á‹Ž—Ìˆæ‚Ì‰º•Ó
 <i>Ps4</i>   Á‹Ž—Ìˆæ‚Ì‰E•Ó
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td>ƒXƒe[ƒ^ƒXs‚©‚ç/‚ÖˆÚ“®B<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B
 <pre>
 <i>Ps</i> = 0      Žå‰æ–Ê‚ÖˆÚ“®B
    = 1      ƒXƒe[ƒ^ƒXs‚ÖˆÚ“®B
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td>ƒXƒe[ƒ^ƒXs‚Ì•\Ž¦ó‘Ô‚Ì•ÏXB<i>Ps</i> ‚ÌÈ—ªŽž‚Ì’l‚Í 0B
 <pre>
 <i>Ps</i> = 0      ƒXƒe[ƒ^ƒXs‚ð•\Ž¦‚µ‚È‚¢B
      1      ƒXƒe[ƒ^ƒXs‚ð•\Ž¦‚µ‚È‚¢B
      2      ƒXƒe[ƒ^ƒXs‚ð•\Ž¦‚·‚éB
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td>filter rectangle Ý’èB
 <pre>
@@ -420,8 +425,8 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ð‘—M‚
 <i>Ps2</i> = 0     •¶Žšƒ‚[ƒhB2 ‚Æ“¯‚¶B
     = 1     ƒsƒNƒZƒ‹ƒ‚[ƒhBˆÊ’u‚ðƒsƒNƒZƒ‹’PˆÊ‚Å•ñ‚·‚éB
     = 2     •¶Žšƒ‚[ƒhBˆÊ’u‚ð•¶Žš’PˆÊ‚Å•ñ‚·‚éB
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td>ƒƒP[ƒ^ƒCƒxƒ“ƒgÝ’èB
 <pre>
@@ -430,8 +435,8 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ð‘—M‚
    = 2      ƒ{ƒ^ƒ“ƒ_ƒEƒ“ƒCƒxƒ“ƒg‚ð–³Œø‚É‚·‚éB
    = 3      ƒ{ƒ^ƒ“ƒAƒbƒvƒCƒxƒ“ƒg‚ð—LŒø‚É‚·‚éBƒ{ƒ^ƒ“‚ª—£‚³‚ê‚é‚ÆADECRQLP ‚Æ“¯‚¶Œ`Ž®‚ÅƒƒP[ƒ^ˆÊ’u‚ð•ñ‚·‚éB
    = 4      ƒ{ƒ^ƒ“ƒAƒbƒvƒCƒxƒ“ƒg‚ð–³Œø‚É‚·‚éB
-</pre></td>
-</tr>
+</pre>
+</td></tr>
 
 <tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td>ƒƒP[ƒ^‚ÌˆÊ’u‚ð‰ž“š‚·‚éB
 <pre>
