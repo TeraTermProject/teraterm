@@ -93,7 +93,7 @@
 <tr><td>ESC 8</td>	<td>DECRC</td>	<td>保存したカーソル位置を復元する</td></tr>
 <tr><td>ESC 9</td>	<td>DECFI</td>	<td>カーソルを右に 1 桁移動する。カーソルが右端に有った場合、画面を左に 1 桁スクロールする。スクロールした結果画面の左にはみ出した部分は失われる。</td></tr>
 <tr><td>ESC =</td>	<td>DECKPAM</td>	<td><a href="../usage/tips/appkeypad.html">アプリケーションキーパッドモード</a>に設定する。</td></tr>
-<tr><td>ESC ></td>	<td>DECKPNM</td>	<td><a href="../usage/tips/appkeypad.html">ノーマルキーパッドモード</a>に設定する。</td></tr>
+<tr><td>ESC &gt;</td>	<td>DECKPNM</td>	<td><a href="../usage/tips/appkeypad.html">ノーマルキーパッドモード</a>に設定する。</td></tr>
 <tr><td>ESC D</td>	<td>IND</td>	<td> カーソルを一行下に移動 </td></tr>
 <tr><td>ESC E</td>	<td>NEL</td>	<td> カーソルを次の行の先頭に移動 </td></tr>
 <tr><td>ESC H</td>	<td>HTS</td>	<td>現在のカーソル位置にタブストップを設定する</td></tr>
@@ -274,13 +274,13 @@
 </pre>
 </td></tr>
 
-<tr><td>CSI > <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td>第二端末特性報告。省略時の <i>Ps</i> の値は 0。
+<tr><td>CSI &gt; <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td>第二端末特性報告。省略時の <i>Ps</i> の値は 0。
 <pre>
 <i>Ps</i> = 0      第二端末特性要求
-            応答: CSI > 32 ; 100 ; 2 c
+            応答: CSI &gt; 32 ; 100 ; 2 c
 </pre>
 </td></tr>
-<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td>矩形消去。
+<tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td>矩形消去。
 <pre>
 <i>Ps1</i>   消去領域の上辺
 <i>Ps2</i>   消去領域の左辺
@@ -288,8 +288,8 @@
 <i>Ps4</i>   消去領域の右辺
 </pre></td>
 </tr>
-<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td>現在の行の <i>Ps1</i> 桁目から <i>Ps2</i> 桁目までを消去する。</td></tr>
-<tr><td>CSI > 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
+<tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td>現在の行の <i>Ps1</i> 桁目から <i>Ps2</i> 桁目までを消去する。</td></tr>
+<tr><td>CSI &gt; 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
 <i>Ps</i> = 3..6   Draw Line
    = 12     Set foreground color

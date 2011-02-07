@@ -100,7 +100,7 @@
 <tr><td>ESC 8</td>	<td>DECRC</td>	<td> Restores the terminal to the state saved by the save cursor (DECSC) function. </td></tr>
 <tr><td>ESC 9</td>	<td>DECFI</td>	<td> Moves the cursor forward one column. If the cursor is at the right margin, then all screen data within the margins moves one column to the left. The column shifted past the left margin is lost. </td></tr>
 <tr><td>ESC =</td>	<td>DECKPAM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Application Keypad Mode</a>. </td></tr>
-<tr><td>ESC ></td>	<td>DECKPNM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Normal Keypad Mode</a>. </td></tr>
+<tr><td>ESC &gt;</td>	<td>DECKPNM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Normal Keypad Mode</a>. </td></tr>
 <tr><td>ESC D</td>	<td>IND</td>	<td> Moves the cursor down one line in the same column. </td></tr>
 <tr><td>ESC E</td>	<td>NEL</td>	<td> Moves the cursor to the first position on the next line. </td></tr>
 <tr><td>ESC H</td>	<td>HTS</td>	<td> Sets a horizontal tab stop at the column where the cursor is. </td></tr>
@@ -283,13 +283,13 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 </pre>
 </td></tr>
 
-<tr><td>CSI > <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td> Secondary Device Attribute. The default value of <i>Ps</i> is 0.
+<tr><td>CSI &gt; <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td> Secondary Device Attribute. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0      Secondary Device Attribute request.
-            Response: CSI > 32 ; 100 ; 2 c
+            Response: CSI &gt; 32 ; 100 ; 2 c
 </pre>
 </td></tr>
-<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td> Erase rectangular area.
+<tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td> Erase rectangular area.
 <pre>
 <i>Ps1</i>   Top-line border.
 <i>Ps2</i>   Left-column border.
@@ -297,8 +297,8 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps4</i>   Right-column border.
 </pre></td>
 </tr>
-<tr><td>CSI > 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td> Erase characters from <i>Ps1</i> column through <i>Ps2</i> column. </td></tr>
-<tr><td>CSI > 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
+<tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td> Erase characters from <i>Ps1</i> column through <i>Ps2</i> column. </td></tr>
+<tr><td>CSI &gt; 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
 <pre>
 <i>Ps</i> = 3..6   Draw Line
    = 12     Set foreground color
