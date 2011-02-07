@@ -2202,8 +2202,7 @@ BOOL CVTWindow::OnMouseWheel(
 	if (MouseReport(IdMouseEventWheel, zDelta<0, pt.x, pt.y))
 		return TRUE;
 
-	if (ts.TranslateWheelToCursor && AppliCursorMode && !ts.DisableAppCursor &&
-	    !(ControlKey() && ts.DisableWheelToCursorByCtrl)) {
+	if (WheelToCursorMode()) {
 		if (zDelta < 0) {
 			KeyDown(HVTWin, VK_DOWN, line, MapVirtualKey(VK_DOWN, 0) | 0x100);
 			KeyUp(VK_DOWN);

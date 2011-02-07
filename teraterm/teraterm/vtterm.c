@@ -70,6 +70,8 @@ BOOL BracketedPaste;
 
 static int VTlevel;
 
+BOOL AcceptWheelToCursor;
+
 // save/restore cursor
 typedef struct {
   int CursorX, CursorY;
@@ -214,6 +216,7 @@ void ResetTerminal() /*reset variables but don't update screen */
   AppliKeyMode = FALSE;
   AppliCursorMode = FALSE;
   AppliEscapeMode = FALSE;
+  AcceptWheelToCursor = ts.TranslateWheelToCursor;
   RelativeOrgMode = FALSE;
   ts.ColorFlag &= ~CF_REVERSEVIDEO;
   AutoRepeatMode = TRUE;
@@ -2395,6 +2398,11 @@ void CSSetAttr()		// SGR
 	  case 7727: // mintty Application Escape Mode
 	    AppliEscapeMode = TRUE;
 	    break;
+	  case 7786: // Wheel to Cursor translation
+	    if (ts.TranslateWheelToCursor) {
+	      AcceptWheelToCursor = TRUE;
+	    }
+	    break;
 	}
     }
 
@@ -2514,6 +2522,9 @@ void CSSetAttr()		// SGR
 	  case 7727: // mintty Application Escape Mode
 	    AppliEscapeMode = FALSE;
 	    break;
+	  case 7786: // Wheel to Cursor translation
+	    AcceptWheelToCursor = FALSE;
+	    break;
 	}
     }
 
@@ -2551,6 +2562,7 @@ void CSSetAttr()		// SGR
     AppliKeyMode = FALSE;
     AppliCursorMode = FALSE;
     AppliEscapeMode = FALSE;
+    AcceptWheelToCursor = ts.TranslateWheelToCursor;
     if ((StatusLine>0) &&
 	(CursorY == NumOfLines-1))
       MoveToMainScreen();
@@ -4458,6 +4470,10 @@ void EndTerm() {
 
 BOOL BracketedPasteMode() {
 	return BracketedPaste;
+}
+
+BOOL WheelToCursorMode() {
+	return AcceptWheelToCursor && AppliCursorMode && !ts.DisableAppCursor && !(ControlKey() && ts.DisableWheelToCursorByCtrl);
 }
 
 void ChangeTerminalID() {

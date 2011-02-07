@@ -18,6 +18,7 @@ int VTParse();
 void FocusReport(BOOL Focus);
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos);
 BOOL BracketedPasteMode();
+BOOL WheelToCursorMode();
 void EndTerm();
 void ChangeTerminalID();
 
