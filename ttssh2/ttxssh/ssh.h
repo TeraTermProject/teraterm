@@ -195,9 +195,10 @@ enum channel_type {
 #define SSH2_OPEN_RESOURCE_SHORTAGE              4
 
 // キー交換アルゴリズム
-#define KEX_DH1     "diffie-hellman-group1-sha1"
-#define KEX_DH14    "diffie-hellman-group14-sha1"
-#define KEX_DHGEX   "diffie-hellman-group-exchange-sha1"
+#define KEX_DH1             "diffie-hellman-group1-sha1"
+#define KEX_DH14            "diffie-hellman-group14-sha1"
+#define KEX_DHGEX_SHA1      "diffie-hellman-group-exchange-sha1"
+#define KEX_DHGEX_SHA256    "diffie-hellman-group-exchange-sha256"
 
 // support of "Compression delayed" (2006.6.23 maya)
 enum compression_type {
@@ -211,6 +212,7 @@ enum kex_exchange {
 	KEX_DH_GRP1_SHA1,
 	KEX_DH_GRP14_SHA1,
 	KEX_DH_GEX_SHA1,
+	KEX_DH_GEX_SHA256,
 	KEX_MAX
 };
 
@@ -228,7 +230,8 @@ enum hmac_type {
 	HMAC_UNKNOWN
 };
 
-#define KEX_DEFAULT_KEX     "diffie-hellman-group-exchange-sha1," \
+#define KEX_DEFAULT_KEX     "diffie-hellman-group-exchange-sha256," \
+                            "diffie-hellman-group-exchange-sha1," \
                             "diffie-hellman-group14-sha1," \
                             "diffie-hellman-group1-sha1"
 #define KEX_DEFAULT_PK_ALG  "ssh-rsa,ssh-dss"
@@ -265,7 +268,7 @@ enum kex_init_proposals {
 #ifdef SSH2_DEBUG
 static char *myproposal[PROPOSAL_MAX] = {
 //	KEX_DEFAULT_KEX,
-	"diffie-hellman-group14-sha1,diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1",
+	"diffie-hellman-group14-sha1,diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256",
 	KEX_DEFAULT_PK_ALG,
 //	"ssh-dss,ssh-rsa",
 	KEX_DEFAULT_ENCRYPT,

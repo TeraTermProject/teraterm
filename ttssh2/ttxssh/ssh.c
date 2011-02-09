@@ -4502,8 +4502,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		pvar->kex_type = KEX_DH_GRP14_SHA1;
 	} else if (strcmp(str_kextype, KEX_DH1) == 0) {
 		pvar->kex_type = KEX_DH_GRP1_SHA1;
-	} else if (strcmp(str_kextype, KEX_DHGEX) == 0) {
+	} else if (strcmp(str_kextype, KEX_DHGEX_SHA1) == 0) {
 		pvar->kex_type = KEX_DH_GEX_SHA1;
+	} else if (strcmp(str_kextype, KEX_DHGEX_SHA256) == 0) {
+		pvar->kex_type = KEX_DH_GEX_SHA256;
 	}
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", str_kextype);
@@ -4683,15 +4685,18 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// send DH kex init
-	if (pvar->kex_type == KEX_DH_GRP1_SHA1) {
-		SSH2_dh_kex_init(pvar);
-
-	} else if (pvar->kex_type == KEX_DH_GRP14_SHA1) {
-		SSH2_dh_kex_init(pvar);
-
-	} else if (pvar->kex_type == KEX_DH_GEX_SHA1) {
-		SSH2_dh_gex_kex_init(pvar);
-
+	switch (pvar->kex_type) {
+		case KEX_DH_GRP1_SHA1:
+		case KEX_DH_GRP14_SHA1:
+			SSH2_dh_kex_init(pvar);
+			break;
+		case KEX_DH_GEX_SHA1:
+		case KEX_DH_GEX_SHA256:
+			SSH2_dh_gex_kex_init(pvar);
+			break;
+		default:
+			// TODO
+			break;
 	}
 
 	return TRUE;
@@ -5076,15 +5081,25 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 
 
 static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
-                          char *session_id, int session_id_len)
+                          char *session_id, int session_id_len,
+                          enum kex_exchange kex_type)
 {
 	buffer_t *b;
-	const EVP_MD *evp_md = EVP_sha1();
+	const EVP_MD *evp_md;
 	EVP_MD_CTX md;
 	char c = id;
 	int have;
-	int mdsz = EVP_MD_size(evp_md); // 20bytes(160bit)
-	u_char *digest = malloc(roundup(need, mdsz));
+	int mdsz;
+	u_char *digest;
+
+	if (kex_type == KEX_DH_GEX_SHA256) {
+		evp_md = EVP_sha256();
+	}
+	else {
+		evp_md = EVP_sha1();
+	}
+	mdsz = EVP_MD_size(evp_md);
+	digest = malloc(roundup(need, mdsz));
 
 	if (digest == NULL)
 		goto skip;
@@ -5149,7 +5164,7 @@ void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secr
 	int i, mode, ctos;
 
 	for (i = 0; i < NKEYS; i++) {
-		keys[i] = derive_key('A'+i, need, hash, shared_secret, session_id, session_id_len);
+		keys[i] = derive_key('A'+i, need, hash, shared_secret, session_id, session_id_len, pvar->kex_type);
 		//debug_print(i, keys[i], need);
 	}
 
@@ -5412,6 +5427,8 @@ static int ssh_rsa_verify(RSA *key,
 		memset(sigblob, 0, diff);
 		len = modlen;
 	}
+	
+	/* sha1 the data */
 	//	nid = (datafellows & SSH_BUG_RSASIGMD5) ? NID_md5 : NID_sha1;
 	nid = NID_sha1;
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
@@ -6198,7 +6215,7 @@ error:
 
 
 
-// SHA-1(160bit)を求める
+// SHA-1(160bit)/SHA-256(256bit)を求める
 static unsigned char *kex_dh_gex_hash(char *client_version_string,
                                       char *server_version_string,
                                       char *ckexinit, int ckexinitlen,
@@ -6210,12 +6227,13 @@ static unsigned char *kex_dh_gex_hash(char *client_version_string,
                                       BIGNUM *kexgex_p,
                                       BIGNUM *kexgex_g,
                                       BIGNUM *client_dh_pub,
+                                      enum kex_exchange kex_type,
                                       BIGNUM *server_dh_pub,
                                       BIGNUM *shared_secret)
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
-	const EVP_MD *evp_md = EVP_sha1();
+	const EVP_MD *evp_md;
 	EVP_MD_CTX md;
 
 	b = buffer_init();
@@ -6248,6 +6266,12 @@ static unsigned char *kex_dh_gex_hash(char *client_version_string,
 	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
+	if (kex_type == KEX_DH_GEX_SHA256) {
+		evp_md = EVP_sha256();
+	}
+	else {
+		evp_md = EVP_sha1();
+	}
 	EVP_DigestInit(&md, evp_md);
 	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
 	EVP_DigestFinal(&md, digest, NULL);
@@ -6281,7 +6305,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	BIGNUM *share_key = NULL;
 	char *hash;
 	char *emsg, emsg_tmp[1024];  // error message
-	int ret;
+	int ret, hashlen;
 	Key hostkey;  // hostkey
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEX_DH_GEX_REPLY was received.", LOG_LEVEL_VERBOSE);
@@ -6440,11 +6464,17 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		pvar->kexdh->p,
 		pvar->kexdh->g,
 		pvar->kexdh->pub_key,
+		pvar->kex_type,
 		/////// KEXGEX
 		dh_server_pub,
 		share_key);
 
-	
+	if (pvar->kex_type == KEX_DH_GEX_SHA256) {
+		hashlen = 32;
+	}
+	else{
+		hashlen = 20;
+	}
 	{
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
@@ -6452,10 +6482,10 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "dh_server_pub", dh_server_pub);
 		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "share_key", share_key);
 
-		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "hash", hash, 20);
+		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "hash", hash, hashlen);
 	}
 
-	//debug_print(30, hash, 20);
+	//debug_print(30, hash, hashlen);
 	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
 	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
 	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
@@ -6464,7 +6494,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	// session idの保存（初回接続時のみ）
 	if (pvar->session_id == NULL) {
-		pvar->session_id_len = 20;
+		pvar->session_id_len = hashlen;
 		pvar->session_id = malloc(pvar->session_id_len);
 		if (pvar->session_id != NULL) {
 			memcpy(pvar->session_id, hash, pvar->session_id_len);
@@ -6473,7 +6503,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		}
 	}
 
-	if ((ret = key_verify(rsa, dsa, signature, siglen, hash, 20)) != 1) {
+	if ((ret = key_verify(rsa, dsa, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && rsa != NULL) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
@@ -6563,16 +6593,18 @@ error:
 // KEXにおいてサーバから返ってくる 31 番メッセージに対するハンドラ
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 {
-
-	if (pvar->kex_type == KEX_DH_GRP1_SHA1 || pvar->kex_type == KEX_DH_GRP14_SHA1) {
-		handle_SSH2_dh_kex_reply(pvar);
-
-	} else if (pvar->kex_type == KEX_DH_GEX_SHA1) {
-		handle_SSH2_dh_gex_group(pvar);
-
-	} else {
-		// TODO:
-
+	switch (pvar->kex_type) {
+		case KEX_DH_GRP1_SHA1:
+		case KEX_DH_GRP14_SHA1:
+			handle_SSH2_dh_kex_reply(pvar);
+			break;
+		case KEX_DH_GEX_SHA1:
+		case KEX_DH_GEX_SHA256:
+			handle_SSH2_dh_gex_group(pvar);
+			break;
+		default:
+			// TODO
+			break;
 	}
 
 	return TRUE;

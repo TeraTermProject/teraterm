@@ -2240,8 +2240,10 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 				strncpy_s(buf, sizeof(buf), KEX_DH1, _TRUNCATE);
 			} else if (pvar->kex_type == KEX_DH_GRP14_SHA1) {
 				strncpy_s(buf, sizeof(buf), KEX_DH14, _TRUNCATE);
-			} else {
-				strncpy_s(buf, sizeof(buf), KEX_DHGEX, _TRUNCATE);
+			} else if (pvar->kex_type == KEX_DH_GEX_SHA1) {
+				strncpy_s(buf, sizeof(buf), KEX_DHGEX_SHA1, _TRUNCATE);
+			} else { // KEX_DH_GEX_SHA256
+				strncpy_s(buf, sizeof(buf), KEX_DHGEX_SHA256, _TRUNCATE);
 			}
 			append_about_text(dlg, "KEX:", buf);
 
