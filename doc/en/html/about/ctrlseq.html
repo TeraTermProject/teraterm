@@ -3,13 +3,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>Supported control sequences</title>
+<title>Supported control functions</title>
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
 
-<h1>Supported Control Sequences</h1>
+<h1>Supported Control Functions</h1>
 
 <h2>C0 Control Character</h2>
 <table border="1">
@@ -196,7 +196,7 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
    = 3      Clears all tab stops.
 </pre>
 </td></tr>
-<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets ANSI mode. (See <a href="#mode">Modes (ANSI)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets mode. (See <a href="#mode">Modes (Standard)</a>)</td></tr>
 <tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td> Printing mode.
 <pre>
 <i>Ps</i> = 0      Print screen.
@@ -206,7 +206,7 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 </td></tr>
 <tr><td>CSI <i>Ps</i> j</td>	<td>HPB</td>	<td> Moves cursor to the left <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> k</td>	<td>VPB</td>	<td> Moves cursor up <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
-<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td> Resets ANSI mode. (See <a href="#mode">Modes (ANSI)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td> Resets mode. (See <a href="#mode">Modes (Standard)</a>)</td></tr>
 <tr><td>CSI <i>Pm</i> m</td>	<td>SGR</td>	<td> Select character attributes. The default value of <i>Pm</i> is 0. (See <a href="#charattr">Character Attributes</a>.) </td></tr>
 <tr><td>CSI <i>Ps</i> n</td>	<td>DSR</td>	<td> Reports device status.
 <pre>
@@ -480,7 +480,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
 </td></tr>
 </table>
 
-<h3><a name="mode">Modes (ANSI)</a></h3>
+<h3><a name="mode">Modes (Standard)</a></h3>
 <table border="1">
     <tr>
 	<th>Mode No.</th>
