@@ -194,40 +194,11 @@ enum channel_type {
 #define SSH2_OPEN_UNKNOWN_CHANNEL_TYPE           3
 #define SSH2_OPEN_RESOURCE_SHORTAGE              4
 
-// キー交換アルゴリズム
-#define KEX_DH1             "diffie-hellman-group1-sha1"
-#define KEX_DH14            "diffie-hellman-group14-sha1"
-#define KEX_DHGEX_SHA1      "diffie-hellman-group-exchange-sha1"
-#define KEX_DHGEX_SHA256    "diffie-hellman-group-exchange-sha256"
-
-// support of "Compression delayed" (2006.6.23 maya)
-enum compression_type {
-	COMP_NONE,
-	COMP_ZLIB,
-	COMP_DELAYED,
-	COMP_UNKNOWN
-};
-
-enum kex_exchange {
-	KEX_DH_GRP1_SHA1,
-	KEX_DH_GRP14_SHA1,
-	KEX_DH_GEX_SHA1,
-	KEX_DH_GEX_SHA256,
-	KEX_MAX
-};
-
 enum hostkey_type {
 	KEY_RSA1,
 	KEY_RSA,
 	KEY_DSA,
 	KEY_UNSPEC,
-};
-
-// 下記のインデックスは ssh2_macs[] と合わせること。
-enum hmac_type {
-	HMAC_SHA1,
-	HMAC_MD5,
-	HMAC_UNKNOWN
 };
 
 #define KEX_DEFAULT_KEX     "diffie-hellman-group-exchange-sha256," \
@@ -239,8 +210,8 @@ enum hmac_type {
 #define KEX_DEFAULT_ENCRYPT ""
 #define KEX_DEFAULT_MAC     "hmac-sha1,hmac-md5"
 // support of "Compression delayed" (2006.6.23 maya)
-#define KEX_DEFAULT_COMP	"none,zlib@openssh.com,zlib"
-#define KEX_DEFAULT_LANG	""
+#define KEX_DEFAULT_COMP    "none,zlib@openssh.com,zlib"
+#define KEX_DEFAULT_LANG    ""
 
 /* Minimum modulus size (n) for RSA keys. */
 #define SSH_RSA_MINIMUM_MODULUS_SIZE    768
@@ -310,41 +281,88 @@ typedef struct ssh2_cipher {
 } ssh2_cipher_t;
 
 static ssh2_cipher_t ssh2_ciphers[] = {
-	{SSH2_CIPHER_3DES_CBC,     "3des-cbc",      8, 24, 0, EVP_des_ede3_cbc},
-	{SSH2_CIPHER_AES128_CBC,   "aes128-cbc",   16, 16, 0, EVP_aes_128_cbc},
-	{SSH2_CIPHER_AES192_CBC,   "aes192-cbc",   16, 24, 0, EVP_aes_192_cbc},
-	{SSH2_CIPHER_AES256_CBC,   "aes256-cbc",   16, 32, 0, EVP_aes_256_cbc},
-	{SSH2_CIPHER_BLOWFISH_CBC, "blowfish-cbc",  8, 16, 0, EVP_bf_cbc},
-	{SSH2_CIPHER_AES128_CTR,   "aes128-ctr",   16, 16, 0, evp_aes_128_ctr},
-	{SSH2_CIPHER_AES192_CTR,   "aes192-ctr",   16, 24, 0, evp_aes_128_ctr},
-	{SSH2_CIPHER_AES256_CTR,   "aes256-ctr",   16, 32, 0, evp_aes_128_ctr},
-	{SSH2_CIPHER_ARCFOUR,      "arcfour",       8, 16, 0, EVP_rc4},
+	{SSH2_CIPHER_3DES_CBC,     "3des-cbc",      8, 24, 0,    EVP_des_ede3_cbc},
+	{SSH2_CIPHER_AES128_CBC,   "aes128-cbc",   16, 16, 0,    EVP_aes_128_cbc},
+	{SSH2_CIPHER_AES192_CBC,   "aes192-cbc",   16, 24, 0,    EVP_aes_192_cbc},
+	{SSH2_CIPHER_AES256_CBC,   "aes256-cbc",   16, 32, 0,    EVP_aes_256_cbc},
+	{SSH2_CIPHER_BLOWFISH_CBC, "blowfish-cbc",  8, 16, 0,    EVP_bf_cbc},
+	{SSH2_CIPHER_AES128_CTR,   "aes128-ctr",   16, 16, 0,    evp_aes_128_ctr},
+	{SSH2_CIPHER_AES192_CTR,   "aes192-ctr",   16, 24, 0,    evp_aes_128_ctr},
+	{SSH2_CIPHER_AES256_CTR,   "aes256-ctr",   16, 32, 0,    evp_aes_128_ctr},
+	{SSH2_CIPHER_ARCFOUR,      "arcfour",       8, 16, 0,    EVP_rc4},
 	{SSH2_CIPHER_ARCFOUR128,   "arcfour128",    8, 16, 1536, EVP_rc4},
 	{SSH2_CIPHER_ARCFOUR256,   "arcfour256",    8, 32, 1536, EVP_rc4},
-	{SSH2_CIPHER_CAST128_CBC,  "cast128-cbc",   8, 16, 0, EVP_cast5_cbc},
-	{SSH2_CIPHER_3DES_CTR,     "3des-ctr",      8, 24, 0, evp_des3_ctr},
-	{SSH2_CIPHER_BLOWFISH_CTR, "blowfish-ctr",  8, 16, 0, evp_bf_ctr},
-	{SSH2_CIPHER_CAST128_CTR,  "cast128-ctr",   8, 16, 0, evp_cast5_ctr},
-	{SSH_CIPHER_NONE, NULL, 0, 0, 0, NULL},
+	{SSH2_CIPHER_CAST128_CBC,  "cast128-cbc",   8, 16, 0,    EVP_cast5_cbc},
+	{SSH2_CIPHER_3DES_CTR,     "3des-ctr",      8, 24, 0,    evp_des3_ctr},
+	{SSH2_CIPHER_BLOWFISH_CTR, "blowfish-ctr",  8, 16, 0,    evp_bf_ctr},
+	{SSH2_CIPHER_CAST128_CTR,  "cast128-ctr",   8, 16, 0,    evp_cast5_ctr},
+	{SSH_CIPHER_NONE,          NULL,            0,  0, 0,    NULL},
 };
 
 
+// 下記のインデックスは ssh2_kex_algorithms[] と合わせること。
+enum kex_algorithm {
+	KEX_DH_GRP1_SHA1,
+	KEX_DH_GRP14_SHA1,
+	KEX_DH_GEX_SHA1,
+	KEX_DH_GEX_SHA256,
+	KEX_DH_UNKNOWN,
+};
+
+typedef struct ssh2_kex_algorithm {
+	enum kex_algorithm kextype;
+	char *name;
+	const EVP_MD *(*evp_md)(void);
+} ssh2_kex_algorithm_t;
+
+static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
+	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},
+	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},
+	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},
+	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256},
+	{KEX_DH_UNKNOWN   , NULL                                  , NULL},
+};
+
+
+// 下記のインデックスは ssh2_macs[] と合わせること。
+enum hmac_type {
+	HMAC_SHA1,
+	HMAC_MD5,
+	HMAC_UNKNOWN
+};
+
 typedef struct ssh2_mac {
+	enum hmac_type type;
 	char *name;
 	const EVP_MD *(*func)(void);
 	int truncatebits;
 } ssh2_mac_t;
 
 static ssh2_mac_t ssh2_macs[] = {
-	{"hmac-sha1", EVP_sha1, 0},
-	{"hmac-md5", EVP_md5, 0},
-	{NULL, NULL, 0},
+	{HMAC_SHA1,    "hmac-sha1", EVP_sha1, 0},
+	{HMAC_MD5,     "hmac-md5",  EVP_md5,  0},
+	{HMAC_UNKNOWN, NULL,        NULL,     0},
 };
 
-static char *ssh_comp[] = {
-	"none",
-	"zlib",
-	"zlib@openssh.com",
+
+// 下記のインデックスは ssh_comps[] と合わせること。
+enum compression_type {
+	COMP_NONE,
+	COMP_ZLIB,
+	COMP_DELAYED,
+	COMP_UNKNOWN
+};
+
+typedef struct ssh_comp {
+	enum compression_type type;
+	char *name;
+} ssh_comp_t;
+
+static ssh_comp_t ssh_comps[] = {
+	{COMP_NONE,    "none"},
+	{COMP_ZLIB,    "zlib"},
+	{COMP_DELAYED, "zlib@openssh.com"},
+	{COMP_UNKNOWN, NULL},
 };
 
 

@@ -2236,16 +2236,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 			UTIL_get_lang_msg("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 
-			if (pvar->kex_type == KEX_DH_GRP1_SHA1) {
-				strncpy_s(buf, sizeof(buf), KEX_DH1, _TRUNCATE);
-			} else if (pvar->kex_type == KEX_DH_GRP14_SHA1) {
-				strncpy_s(buf, sizeof(buf), KEX_DH14, _TRUNCATE);
-			} else if (pvar->kex_type == KEX_DH_GEX_SHA1) {
-				strncpy_s(buf, sizeof(buf), KEX_DHGEX_SHA1, _TRUNCATE);
-			} else { // KEX_DH_GEX_SHA256
-				strncpy_s(buf, sizeof(buf), KEX_DHGEX_SHA256, _TRUNCATE);
-			}
-			append_about_text(dlg, "KEX:", buf);
+			append_about_text(dlg, "KEX:", ssh2_kex_algorithms[pvar->kex_type].name);
 
 			if (pvar->hostkey_type == KEY_DSA) {
 				strncpy_s(buf, sizeof(buf), "ssh-dss", _TRUNCATE);
@@ -2257,18 +2248,10 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 			// add HMAC algorithm (2004.12.17 yutaka)
 			buf[0] = '\0';
-			if (pvar->ctos_hmac == HMAC_SHA1) {
-				strncat_s(buf, sizeof(buf), "hmac-sha1", _TRUNCATE);
-			} else if (pvar->ctos_hmac == HMAC_MD5) {
-				strncat_s(buf, sizeof(buf), "hmac-md5", _TRUNCATE);
-			}
+			strncat_s(buf, sizeof(buf), ssh2_macs[pvar->ctos_hmac].name , _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_TOSERVER", pvar, " to server,");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-			if (pvar->stoc_hmac == HMAC_SHA1) {
-				strncat_s(buf, sizeof(buf), "hmac-sha1", _TRUNCATE);
-			} else if (pvar->stoc_hmac == HMAC_MD5) {
-				strncat_s(buf, sizeof(buf), "hmac-md5", _TRUNCATE);
-			}
+			strncat_s(buf, sizeof(buf), ssh2_macs[pvar->stoc_hmac].name , _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_FROMSERVER", pvar, " from server");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 			append_about_text(dlg, "HMAC:", buf);

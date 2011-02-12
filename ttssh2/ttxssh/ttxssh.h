@@ -199,7 +199,7 @@ typedef struct _TInstVar {
 	char client_version_string[128];
 	buffer_t *my_kex;
 	buffer_t *peer_kex;
-	enum kex_exchange kex_type; // KEX algorithm
+	enum kex_algorithm kex_type; // KEX algorithm
 	enum hostkey_type hostkey_type;
 	SSHCipher ctos_cipher;
 	SSHCipher stoc_cipher;

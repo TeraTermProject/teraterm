@@ -4263,43 +4263,39 @@ found:
 	}
 }
 
+static enum kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal)
+{
+	enum kex_algorithm type = KEX_DH_UNKNOWN;
+	char str_kextype[40];
+	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
+
+	choose_SSH2_proposal(server_proposal, my_proposal, str_kextype, sizeof(str_kextype));
+
+	while (ptr->name != NULL) {
+		if (strcmp(ptr->name, str_kextype) == 0) {
+			type = ptr->kextype;
+			break;
+		}
+		ptr++;
+	}
+
+	return (type);
+}
+
 static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
 {
 	SSHCipher cipher = SSH_CIPHER_NONE;
 	char str_cipher[16];
+	ssh2_cipher_t *ptr = ssh2_ciphers;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_cipher, sizeof(str_cipher));
 
-	if (strcmp(str_cipher, "3des-cbc") == 0) {
-		cipher = SSH2_CIPHER_3DES_CBC;
-	} else if (strcmp(str_cipher, "aes128-cbc") == 0) {
-		cipher = SSH2_CIPHER_AES128_CBC;
-	} else if (strcmp(str_cipher, "aes192-cbc") == 0) {
-		cipher = SSH2_CIPHER_AES192_CBC;
-	} else if (strcmp(str_cipher, "aes256-cbc") == 0) {
-		cipher = SSH2_CIPHER_AES256_CBC;
-	} else if (strcmp(str_cipher, "blowfish-cbc") == 0) {
-		cipher = SSH2_CIPHER_BLOWFISH_CBC;
-	} else if (strcmp(str_cipher, "aes128-ctr") == 0) {
-		cipher = SSH2_CIPHER_AES128_CTR;
-	} else if (strcmp(str_cipher, "aes192-ctr") == 0) {
-		cipher = SSH2_CIPHER_AES192_CTR;
-	} else if (strcmp(str_cipher, "aes256-ctr") == 0) {
-		cipher = SSH2_CIPHER_AES256_CTR;
-	} else if (strcmp(str_cipher, "arcfour128") == 0) {
-		cipher = SSH2_CIPHER_ARCFOUR128;
-	} else if (strcmp(str_cipher, "arcfour256") == 0) {
-		cipher = SSH2_CIPHER_ARCFOUR256;
-	} else if (strcmp(str_cipher, "arcfour") == 0) {
-		cipher = SSH2_CIPHER_ARCFOUR;
-	} else if (strcmp(str_cipher, "cast128-cbc") == 0) {
-		cipher = SSH2_CIPHER_CAST128_CBC;
-	} else if (strcmp(str_cipher, "3des-ctr") == 0) {
-		cipher = SSH2_CIPHER_3DES_CTR;
-	} else if (strcmp(str_cipher, "blowfish-ctr") == 0) {
-		cipher = SSH2_CIPHER_BLOWFISH_CTR;
-	} else if (strcmp(str_cipher, "cast128-ctr") == 0) {
-		cipher = SSH2_CIPHER_CAST128_CTR;
+	while (ptr->name != NULL) {
+		if (strcmp(ptr->name, str_cipher) == 0) {
+			cipher = ptr->cipher;
+			break;
+		}
+		ptr++;
 	}
 
 	return (cipher);
@@ -4310,13 +4306,16 @@ static enum hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my
 {
 	enum hmac_type type = HMAC_UNKNOWN;
 	char str_hmac[16];
+	ssh2_mac_t *ptr = ssh2_macs;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_hmac, sizeof(str_hmac));
 
-	if (strcmp(str_hmac, "hmac-sha1") == 0) {
-		type = HMAC_SHA1;
-	} else if (strcmp(str_hmac, "hmac-md5") == 0) {
-		type = HMAC_MD5;
+	while (ptr->name != NULL) {
+		if (strcmp(ptr->name, str_hmac) == 0) {
+			type = ptr->type;
+			break;
+		}
+		ptr++;
 	}
 
 	return (type);
@@ -4327,6 +4326,7 @@ static enum compression_type choose_SSH2_compression_algorithm(char *server_prop
 {
 	enum compression_type type = COMP_UNKNOWN;
 	char str_comp[20];
+	ssh_comp_t *ptr = ssh_comps;
 
 	// OpenSSH 4.3では遅延パケット圧縮("zlib@openssh.com")が新規追加されているため、
 	// マッチしないように修正した。
@@ -4337,13 +4337,12 @@ static enum compression_type choose_SSH2_compression_algorithm(char *server_prop
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_comp, sizeof(str_comp));
 
-	// support of "Compression delayed" (2006.6.23 maya)
-	if (strcmp(str_comp, "zlib@openssh.com") == 0) {
-		type = COMP_DELAYED;
-	} else if (strcmp(str_comp, "zlib") == 0) {
-		type = COMP_ZLIB; // packet compression enabled
-	} else if (strcmp(str_comp, "none") == 0) {
-		type = COMP_NONE; // packet compression disabled
+	while (ptr->name != NULL) {
+		if (strcmp(ptr->name, str_comp) == 0) {
+			type = ptr->type;
+			break;
+		}
+		ptr++;
 	}
 
 	return (type);
@@ -4424,7 +4423,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	int offset = 0;
 	char *msg = NULL;
 	char tmp[1024+512];
-	char str_kextype[40];
 	char str_keytype[10];
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEXINIT was received.", LOG_LEVEL_VERBOSE);
@@ -4490,25 +4488,15 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// サーバは、クライアントから送られてきた myproposal[PROPOSAL_KEX_ALGS] のカンマ文字列のうち、
 	// 先頭から自分の myproposal[] と比較を行い、最初にマッチしたものがKEXアルゴリズムとして
 	// 選択される。(2004.10.30 yutaka)
-	pvar->kex_type = -1;
-	choose_SSH2_proposal(buf, myproposal[PROPOSAL_KEX_ALGS],str_kextype, sizeof(str_kextype));
-	if (strlen(str_kextype) == 0) { // not match
+	pvar->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
+	if (pvar->kex_type == KEX_DH_UNKNOWN) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
 	}
-	if (strcmp(str_kextype, KEX_DH14) == 0) {
-		pvar->kex_type = KEX_DH_GRP14_SHA1;
-	} else if (strcmp(str_kextype, KEX_DH1) == 0) {
-		pvar->kex_type = KEX_DH_GRP1_SHA1;
-	} else if (strcmp(str_kextype, KEX_DHGEX_SHA1) == 0) {
-		pvar->kex_type = KEX_DH_GEX_SHA1;
-	} else if (strcmp(str_kextype, KEX_DHGEX_SHA256) == 0) {
-		pvar->kex_type = KEX_DH_GEX_SHA256;
-	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", str_kextype);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", ssh2_kex_algorithms[pvar->kex_type].name);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// ホストキーアルゴリズムチェック
@@ -4655,7 +4643,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "compression algorithm client to server: %s",
-	            ssh_comp[pvar->ctos_compression]);
+	            ssh_comps[pvar->ctos_compression].name);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	size = get_payload_uint32(pvar, offset);
@@ -4675,7 +4663,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "compression algorithm server to client: %s",
-	            ssh_comp[pvar->stoc_compression]);
+	            ssh_comps[pvar->stoc_compression].name);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// we_needの決定 (2004.11.6 yutaka)
@@ -5082,24 +5070,15 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 
 static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
                           char *session_id, int session_id_len,
-                          enum kex_exchange kex_type)
+                          enum kex_algorithm kex_type)
 {
 	buffer_t *b;
-	const EVP_MD *evp_md;
+	const EVP_MD *evp_md = ssh2_kex_algorithms[kex_type].evp_md();
 	EVP_MD_CTX md;
 	char c = id;
 	int have;
-	int mdsz;
-	u_char *digest;
-
-	if (kex_type == KEX_DH_GEX_SHA256) {
-		evp_md = EVP_sha256();
-	}
-	else {
-		evp_md = EVP_sha1();
-	}
-	mdsz = EVP_MD_size(evp_md);
-	digest = malloc(roundup(need, mdsz));
+	int mdsz = EVP_MD_size(evp_md);
+	u_char *digest = malloc(roundup(need, mdsz));
 
 	if (digest == NULL)
 		goto skip;
@@ -5960,7 +5939,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	BIGNUM *share_key = NULL;
 	char *hash;
 	char *emsg, emsg_tmp[1024];  // error message
-	int ret;
+	int ret, hashlen;
 	Key hostkey;  // hostkey
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEXDH_REPLY was received.", LOG_LEVEL_VERBOSE);
@@ -6108,7 +6087,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	                   pvar->kexdh->pub_key,
 	                   dh_server_pub,
 	                   share_key);
-	//debug_print(30, hash, 20);
+
+	hashlen = EVP_MD_size(ssh2_kex_algorithms[pvar->kex_type].evp_md());
+	//debug_print(30, hash, hashlen);
 	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
 	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
 	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
@@ -6117,7 +6098,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	// session idの保存（初回接続時のみ）
 	if (pvar->session_id == NULL) {
-		pvar->session_id_len = 20;
+		pvar->session_id_len = hashlen;
 		pvar->session_id = malloc(pvar->session_id_len);
 		if (pvar->session_id != NULL) {
 			memcpy(pvar->session_id, hash, pvar->session_id_len);
@@ -6227,13 +6208,13 @@ static unsigned char *kex_dh_gex_hash(char *client_version_string,
                                       BIGNUM *kexgex_p,
                                       BIGNUM *kexgex_g,
                                       BIGNUM *client_dh_pub,
-                                      enum kex_exchange kex_type,
+                                      enum kex_algorithm kex_type,
                                       BIGNUM *server_dh_pub,
                                       BIGNUM *shared_secret)
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
-	const EVP_MD *evp_md;
+	const EVP_MD *evp_md = ssh2_kex_algorithms[kex_type].evp_md();
 	EVP_MD_CTX md;
 
 	b = buffer_init();
@@ -6266,12 +6247,6 @@ static unsigned char *kex_dh_gex_hash(char *client_version_string,
 	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	if (kex_type == KEX_DH_GEX_SHA256) {
-		evp_md = EVP_sha256();
-	}
-	else {
-		evp_md = EVP_sha1();
-	}
 	EVP_DigestInit(&md, evp_md);
 	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
 	EVP_DigestFinal(&md, digest, NULL);
@@ -6469,12 +6444,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		dh_server_pub,
 		share_key);
 
-	if (pvar->kex_type == KEX_DH_GEX_SHA256) {
-		hashlen = 32;
-	}
-	else{
-		hashlen = 20;
-	}
+	hashlen = EVP_MD_size(ssh2_kex_algorithms[pvar->kex_type].evp_md());
 	{
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
