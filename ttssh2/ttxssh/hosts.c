@@ -36,6 +36,7 @@ See LICENSE.TXT for the license.
 #include "resource.h"
 #include "matcher.h"
 #include "ssh.h"
+#include "key.h"
 #include "hosts.h"
 
 #include <openssl/bn.h>

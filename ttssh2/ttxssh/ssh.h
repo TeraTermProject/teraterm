@@ -574,15 +574,6 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar);
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar);
 void SSH2_update_compression_myproposal(PTInstVar pvar);
 void SSH2_update_cipher_myproposal(PTInstVar pvar);
-
-enum hostkey_type get_keytype_from_name(char *name);
-char *get_sshname_from_key(Key *key);
-int key_to_blob(Key *key, char **blobp, int *lenp);
-Key *key_from_blob(char *data, int blen);
-void key_free(Key *key);
-RSA *duplicate_RSA(RSA *src);
-DSA *duplicate_DSA(DSA *src);
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
 int SSH_notify_break_signal(PTInstVar pvar);
 
 #endif

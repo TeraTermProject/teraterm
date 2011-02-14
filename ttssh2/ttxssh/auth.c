@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ttxssh.h"
 #include "util.h"
 #include "ssh.h"
+#include "key.h"
 
 #include <io.h>
 #include <fcntl.h>

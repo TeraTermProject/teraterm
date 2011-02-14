@@ -253,6 +253,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\kex.c"
+			>
+		</File>
+		<File
+			RelativePath=".\key.c"
+			>
+		</File>
+		<File
 			RelativePath="keyfiles.c"
 			>
 		</File>
