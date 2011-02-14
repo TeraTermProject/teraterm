@@ -4972,6 +4972,9 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	notify_verbose_message(pvar, "SSH2_MSG_KEX_DH_GEX_INIT was sent at handle_SSH2_dh_gex_group().", LOG_LEVEL_VERBOSE);
 
 	// ここで作成したDH鍵は、あとでハッシュ計算に使うため取っておく。(2004.10.31 yutaka)
+	if (pvar->kexdh != NULL) {
+		DH_free(pvar->kexdh);
+	}
 	pvar->kexdh = dh;
 
 	{
