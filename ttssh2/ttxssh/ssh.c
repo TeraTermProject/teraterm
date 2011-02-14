@@ -6107,7 +6107,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		}
 	}
 
-	if ((ret = key_verify(rsa, dsa, signature, siglen, hash, 20)) != 1) {
+	if ((ret = key_verify(rsa, dsa, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && rsa != NULL) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
