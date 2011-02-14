@@ -143,7 +143,8 @@ unsigned char *kex_dh_hash(char *client_version_string,
                            u_char *serverhostkeyblob, int sbloblen,
                            BIGNUM *client_dh_pub,
                            BIGNUM *server_dh_pub,
-                           BIGNUM *shared_secret)
+                           BIGNUM *shared_secret,
+                           unsigned int *hashlen)
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
@@ -178,12 +179,15 @@ unsigned char *kex_dh_hash(char *client_version_string,
 
 	//write_buffer_file(digest, EVP_MD_size(evp_md));
 
+	*hashlen = EVP_MD_size(evp_md);
+
 	return digest;
 }
 
 
 // SHA-1(160bit)/SHA-256(256bit)ÇãÅÇﬂÇÈ
-unsigned char *kex_dh_gex_hash(char *client_version_string,
+unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
+                               char *client_version_string,
                                char *server_version_string,
                                char *ckexinit, int ckexinitlen,
                                char *skexinit, int skexinitlen,
@@ -194,13 +198,12 @@ unsigned char *kex_dh_gex_hash(char *client_version_string,
                                BIGNUM *kexgex_p,
                                BIGNUM *kexgex_g,
                                BIGNUM *client_dh_pub,
-                               enum kex_algorithm kex_type,
                                BIGNUM *server_dh_pub,
-                               BIGNUM *shared_secret)
+                               BIGNUM *shared_secret,
+                               unsigned int *hashlen)
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
-	const EVP_MD *evp_md = ssh2_kex_algorithms[kex_type].evp_md();
 	EVP_MD_CTX md;
 
 	b = buffer_init();
@@ -241,6 +244,8 @@ unsigned char *kex_dh_gex_hash(char *client_version_string,
 
 	//write_buffer_file(digest, EVP_MD_size(evp_md));
 
+	*hashlen = EVP_MD_size(evp_md);
+
 	return digest;
 }
 
@@ -270,10 +275,9 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 
 static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
                           char *session_id, int session_id_len,
-                          enum kex_algorithm kex_type)
+                          const EVP_MD *evp_md)
 {
 	buffer_t *b;
-	const EVP_MD *evp_md = ssh2_kex_algorithms[kex_type].evp_md();
 	EVP_MD_CTX md;
 	char c = id;
 	int have;
@@ -324,7 +328,8 @@ void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secr
 	int i, mode, ctos;
 
 	for (i = 0; i < NKEYS; i++) {
-		keys[i] = derive_key('A'+i, need, hash, shared_secret, session_id, session_id_len, pvar->kex_type);
+		keys[i] = derive_key('A'+i, need, hash, shared_secret, session_id, session_id_len,
+		                     ssh2_kex_algorithms[pvar->kex_type].evp_md());
 		//debug_print(i, keys[i], need);
 	}
 

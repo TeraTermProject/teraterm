@@ -40,8 +40,10 @@ unsigned char *kex_dh_hash(char *client_version_string,
                            u_char *serverhostkeyblob, int sbloblen,
                            BIGNUM *client_dh_pub,
                            BIGNUM *server_dh_pub,
-                           BIGNUM *shared_secret);
-unsigned char *kex_dh_gex_hash(char *client_version_string,
+                           BIGNUM *shared_secret,
+                           unsigned int *hashlen);
+unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
+                               char *client_version_string,
                                char *server_version_string,
                                char *ckexinit, int ckexinitlen,
                                char *skexinit, int skexinitlen,
@@ -52,9 +54,9 @@ unsigned char *kex_dh_gex_hash(char *client_version_string,
                                BIGNUM *kexgex_p,
                                BIGNUM *kexgex_g,
                                BIGNUM *client_dh_pub,
-                               enum kex_algorithm kex_type,
                                BIGNUM *server_dh_pub,
-                               BIGNUM *shared_secret);
+                               BIGNUM *shared_secret,
+                               unsigned int *hashlen);
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secret,

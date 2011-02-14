@@ -5083,9 +5083,9 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	                   server_host_key_blob, bloblen,
 	                   pvar->kexdh->pub_key,
 	                   dh_server_pub,
-	                   share_key);
+	                   share_key,
+	                   &hashlen);
 
-	hashlen = EVP_MD_size(ssh2_kex_algorithms[pvar->kex_type].evp_md());
 	//debug_print(30, hash, hashlen);
 	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
 	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
@@ -5360,6 +5360,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// ハッシュの計算
 	/* calc and verify H */
 	hash = kex_dh_gex_hash(
+		ssh2_kex_algorithms[pvar->kex_type].evp_md(),
 		pvar->client_version_string,
 		pvar->server_version_string,
 		buffer_ptr(pvar->my_kex),  buffer_len(pvar->my_kex),
@@ -5372,12 +5373,11 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		pvar->kexdh->p,
 		pvar->kexdh->g,
 		pvar->kexdh->pub_key,
-		pvar->kex_type,
 		/////// KEXGEX
 		dh_server_pub,
-		share_key);
+		share_key,
+		&hashlen);
 
-	hashlen = EVP_MD_size(ssh2_kex_algorithms[pvar->kex_type].evp_md());
 	{
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
