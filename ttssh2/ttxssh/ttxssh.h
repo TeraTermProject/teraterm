@@ -200,7 +200,7 @@ typedef struct _TInstVar {
 	buffer_t *my_kex;
 	buffer_t *peer_kex;
 	enum kex_algorithm kex_type; // KEX algorithm
-	enum hostkey_type hostkey_type;
+	enum ssh_keytype hostkey_type;
 	SSHCipher ctos_cipher;
 	SSHCipher stoc_cipher;
 	enum hmac_type ctos_hmac;

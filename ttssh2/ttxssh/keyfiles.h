@@ -34,16 +34,18 @@ See LICENSE.TXT for the license.
 #ifndef __KEYFILES_H
 #define __KEYFILES_H
 
-CRYPTKeyPair FAR * KEYFILES_read_private_key(PTInstVar pvar, char FAR * relative_name,
-  char FAR * passphrase, BOOL FAR * invalid_passphrase,
-  BOOL is_auto_login);
+Key * KEYFILES_read_private_key(PTInstVar pvar,
+                                char * relative_name,
+                                char * passphrase,
+                                BOOL * invalid_passphrase,
+                                BOOL is_auto_login);
 
-CRYPTKeyPair *read_SSH2_private_key(PTInstVar pvar,
-							char FAR * relative_name,
-							char FAR * passphrase,
-							BOOL FAR * invalid_passphrase,
-							BOOL is_auto_login,
-							char *errmsg,
-							int errmsg_len);
+Key *read_SSH2_private_key(PTInstVar pvar,
+                           char * relative_name,
+                           char * passphrase,
+                           BOOL * invalid_passphrase,
+                           BOOL is_auto_login,
+                           char *errmsg,
+                           int errmsg_len);
 
 #endif

@@ -287,19 +287,21 @@ int ssh_rsa_verify(RSA *key,
 	return ret;
 }
 
-int key_verify(RSA *rsa_key, DSA *dsa_key,
+int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen)
 {
 	int ret = 0;
 
-	if (rsa_key != NULL) {
-		ret = ssh_rsa_verify(rsa_key, signature, signaturelen, data, datalen);
+	if (key->type == KEY_RSA) {
+		ret = ssh_rsa_verify(key->rsa, signature, signaturelen, data, datalen);
 
-	} else if (dsa_key != NULL) {
-		ret = ssh_dss_verify(dsa_key, signature, signaturelen, data, datalen);
+	}
+	else if (key->type == KEY_DSA) {
+		ret = ssh_dss_verify(key->dsa, signature, signaturelen, data, datalen);
 
-	} else {
+	}
+	else {
 		return -1;
 	}
 
@@ -620,7 +622,7 @@ char *get_sshname_from_key(Key *key)
 //
 // キー文字列から種別を判定する
 //
-enum hostkey_type get_keytype_from_name(char *name)
+enum ssh_keytype get_keytype_from_name(char *name)
 {
 	if (strcmp(name, "rsa1") == 0) {
 		return KEY_RSA1;
@@ -699,7 +701,7 @@ Key *key_from_blob(char *data, int blen)
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
 	Key *hostkey;  // hostkey
-	enum hostkey_type type;
+	enum ssh_keytype type;
 
 	hostkey = malloc(sizeof(Key));
 	if (hostkey == NULL)
@@ -718,8 +720,7 @@ Key *key_from_blob(char *data, int blen)
 
 	type = get_keytype_from_name(key);
 
-		// RSA key
-	if (type == KEY_RSA) {
+	if (type == KEY_RSA) { // RSA key
 		rsa = RSA_new();
 		if (rsa == NULL) {
 			goto error;
@@ -736,7 +737,8 @@ Key *key_from_blob(char *data, int blen)
 		hostkey->type = type;
 		hostkey->rsa = rsa;
 
-	} else if (type == KEY_DSA) { // DSA key
+	}
+	else if (type == KEY_DSA) { // DSA key
 		dsa = DSA_new();
 		if (dsa == NULL) {
 			goto error;
@@ -777,21 +779,8 @@ error:
 	return NULL;
 }
 
-char *get_SSH2_keyname(CRYPTKeyPair *keypair)
-{
-	char *s;
 
-	if (keypair->RSA_key != NULL) {
-		s = "ssh-rsa";
-	} else {
-		s = "ssh-dss";
-	}
-
-	return (s);
-}
-
-
-BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, char *data, int datalen)
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen)
 {
 	buffer_t *msg = NULL;
 	char *s;
@@ -802,30 +791,25 @@ BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, ch
 		return FALSE;
 	}
 
-	if (keypair->RSA_key != NULL) { // RSA
-		const EVP_MD *evp_md;
+	if (keypair->type == KEY_RSA) { // RSA
+		const EVP_MD *evp_md = EVP_sha1();
 		EVP_MD_CTX md;
 		u_char digest[EVP_MAX_MD_SIZE], *sig;
 		u_int slen, dlen, len;
-		int ok, nid;
-
-		nid = NID_sha1;
-		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
-			goto error;
-		}
+		int ok, nid = NID_sha1;
 
 		// ダイジェスト値の計算
 		EVP_DigestInit(&md, evp_md);
 		EVP_DigestUpdate(&md, data, datalen);
 		EVP_DigestFinal(&md, digest, &dlen);
 
-		slen = RSA_size(keypair->RSA_key);
+		slen = RSA_size(keypair->rsa);
 		sig = malloc(slen);
 		if (sig == NULL)
 			goto error;
 
 		// 電子署名を計算
-		ok = RSA_sign(nid, digest, dlen, sig, &len, keypair->RSA_key);
+		ok = RSA_sign(nid, digest, dlen, sig, &len, keypair->rsa);
 		memset(digest, 'd', sizeof(digest));
 		if (ok != 1) { // error
 			free(sig);
@@ -846,7 +830,7 @@ BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, ch
 
 		}
 
-		s = get_SSH2_keyname(keypair);
+		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_append_length(msg, sig, slen);
 		len = buffer_len(msg);
@@ -861,7 +845,8 @@ BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, ch
 		memcpy(*sigptr, buffer_ptr(msg), len);
 		free(sig);
 
-	} else { // DSA
+	}
+	else if (keypair->type == KEY_DSA) { // DSA
 		DSA_SIG *sig;
 		const EVP_MD *evp_md = EVP_sha1();
 		EVP_MD_CTX md;
@@ -874,7 +859,7 @@ BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, ch
 		EVP_DigestFinal(&md, digest, &dlen);
 
 		// DSA電子署名を計算
-		sig = DSA_do_sign(digest, dlen, keypair->DSA_key);
+		sig = DSA_do_sign(digest, dlen, keypair->dsa);
 		memset(digest, 'd', sizeof(digest));
 		if (sig == NULL) {
 			goto error;
@@ -893,7 +878,7 @@ BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, ch
 		DSA_SIG_free(sig);
 
 		// setting
-		s = get_SSH2_keyname(keypair);
+		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_append_length(msg, sigblob, sizeof(sigblob));
 		len = buffer_len(msg);
@@ -906,6 +891,10 @@ BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, ch
 		}
 		memcpy(*sigptr, buffer_ptr(msg), len);
 
+	}
+	else {
+		buffer_free(msg);
+		return FALSE;
 	}
 
 	buffer_free(msg);
@@ -921,7 +910,7 @@ error:
 BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 {
 	buffer_t *msg = NULL;
-	CRYPTKeyPair *keypair;
+	Key *keypair;
 	char *s;
 
 	msg = buffer_init();
@@ -932,19 +921,24 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 
 	keypair = pvar->auth_state.cur_cred.key_pair;
 
-	if (keypair->RSA_key != NULL) { // RSA
-		s = get_SSH2_keyname(keypair);
+	if (keypair->type == KEY_RSA) { // RSA
+		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, keypair->RSA_key->e); // 公開指数
-		buffer_put_bignum2(msg, keypair->RSA_key->n); // p×q
+		buffer_put_bignum2(msg, keypair->rsa->e); // 公開指数
+		buffer_put_bignum2(msg, keypair->rsa->n); // p×q
 
-	} else { // DSA
-		s = get_SSH2_keyname(keypair);
+	}
+	else if (keypair->type == KEY_RSA) { // DSA
+		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
-		buffer_put_bignum2(msg, keypair->DSA_key->p); // 素数
-		buffer_put_bignum2(msg, keypair->DSA_key->q); // (p-1)の素因数
-		buffer_put_bignum2(msg, keypair->DSA_key->g); // 整数
-		buffer_put_bignum2(msg, keypair->DSA_key->pub_key); // 公開鍵
+		buffer_put_bignum2(msg, keypair->dsa->p); // 素数
+		buffer_put_bignum2(msg, keypair->dsa->q); // (p-1)の素因数
+		buffer_put_bignum2(msg, keypair->dsa->g); // 整数
+		buffer_put_bignum2(msg, keypair->dsa->pub_key); // 公開鍵
+
+	}
+	else {
+		return FALSE;
 
 	}
 

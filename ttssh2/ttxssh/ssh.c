@@ -2473,7 +2473,7 @@ static void try_send_credentials(PTInstVar pvar)
 				break;
 			}
 		case SSH_AUTH_RSA:{
-				int len = BN_num_bytes(cred->key_pair->RSA_key->n);
+				int len = BN_num_bytes(cred->key_pair->rsa->n);
 				unsigned char FAR *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RSA, 2 + len);
 
@@ -2482,15 +2482,15 @@ static void try_send_credentials(PTInstVar pvar)
 				                       LOG_LEVEL_VERBOSE);
 
 				set_ushort16_MSBfirst(outmsg, len * 8);
-				BN_bn2bin(cred->key_pair->RSA_key->n, outmsg + 2);
+				BN_bn2bin(cred->key_pair->rsa->n, outmsg + 2);
 				/* don't destroy the current credentials yet */
 				enque_handlers(pvar, 2, RSA_msgs, RSA_handlers);
 				break;
 			}
 		case SSH_AUTH_RHOSTS_RSA:{
-				int mod_len = BN_num_bytes(cred->key_pair->RSA_key->n);
+				int mod_len = BN_num_bytes(cred->key_pair->rsa->n);
 				int name_len = strlen(cred->rhosts_client_user);
-				int exp_len = BN_num_bytes(cred->key_pair->RSA_key->e);
+				int exp_len = BN_num_bytes(cred->key_pair->rsa->e);
 				int index;
 				unsigned char FAR *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RHOSTS_RSA,
@@ -2506,11 +2506,11 @@ static void try_send_credentials(PTInstVar pvar)
 
 				set_uint32(outmsg + index, 8 * mod_len);
 				set_ushort16_MSBfirst(outmsg + index + 4, 8 * exp_len);
-				BN_bn2bin(cred->key_pair->RSA_key->e, outmsg + index + 6);
+				BN_bn2bin(cred->key_pair->rsa->e, outmsg + index + 6);
 				index += 6 + exp_len;
 
 				set_ushort16_MSBfirst(outmsg + index, 8 * mod_len);
-				BN_bn2bin(cred->key_pair->RSA_key->n, outmsg + index + 2);
+				BN_bn2bin(cred->key_pair->rsa->n, outmsg + index + 2);
 				/* don't destroy the current credentials yet */
 				enque_handlers(pvar, 2, RSA_msgs, RSA_handlers);
 				break;
@@ -4515,26 +4515,13 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		msg = tmp;
 		goto error;
 	}
-	if (strcmp(str_keytype, "ssh-rsa") == 0) {
-		pvar->hostkey_type = KEY_RSA;
-	} else if (strcmp(str_keytype, "ssh-dss") == 0) {
-		pvar->hostkey_type = KEY_DSA;
-	} else if (strcmp(str_keytype, "rsa1") == 0) {
-		pvar->hostkey_type = KEY_RSA1;
-	} else if (strcmp(str_keytype, "rsa") == 0) {
-		pvar->hostkey_type = KEY_RSA;
-	} else if (strcmp(str_keytype, "dsa") == 0) {
-		pvar->hostkey_type = KEY_DSA;
-	}
-#if 0
-	// TODO: 現状は KEY_RSA しかサポートしていない (2004.10.24 yutaka)
-	if (pvar->hostkey_type != KEY_RSA) {
-		strcpy(tmp, "unknown KEY type: ");
-		strcat(tmp, buf);
+	pvar->hostkey_type = get_keytype_from_name(str_keytype);
+	if (pvar->hostkey_type == KEY_UNSPEC) {
+		strncpy_s(tmp, sizeof(tmp), "unknown host KEY type: ", _TRUNCATE);
+		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
 	}
-#endif
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "server host key algorithm: %s", str_keytype);
@@ -4925,10 +4912,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	int len;
 	int offset = 0;
 	char *server_host_key_blob;
-	int bloblen, keynamelen, siglen;
-	char key[128];
-	RSA *rsa = NULL;
-	DSA *dsa = NULL;
+	int bloblen, siglen;
 	BIGNUM *dh_server_pub = NULL;
 	char *signature;
 	int dh_len, share_len;
@@ -4937,7 +4921,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	char *hash;
 	char *emsg, emsg_tmp[1024];  // error message
 	int ret, hashlen;
-	Key hostkey;  // hostkey
+	Key *hostkey;  // hostkey
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEXDH_REPLY was received.", LOG_LEVEL_VERBOSE);
 
@@ -4959,83 +4943,21 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	push_memdump("KEXDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
 
-	// key_from_blob()#key.c の処理が以下から始まる。
-	// known_hosts検証用の server_host_key は rsa or dsa となる。
-	keynamelen = get_uint32_MSBfirst(data);
-	if (keynamelen >= 128) {
-		emsg = "keyname length too big @ handle_SSH2_dh_kex_reply()";
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
+		emsg = "key_from_blob error @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
-	data +=4 ;
-	memcpy(key, data, keynamelen);
-	key[keynamelen] = 0;
-	data += keynamelen;
-
-	push_memdump("KEXDH_REPLY", "keyname", key, keynamelen);
-
-	// RSA key
-	if (strcmp(key, "ssh-rsa") == 0) {
-		rsa = RSA_new();
-		if (rsa == NULL) {
-			emsg = "Out of memory1 @ handle_SSH2_dh_kex_reply()";
-			goto error;
-		}
-		rsa->n = BN_new();
-		rsa->e = BN_new();
-		if (rsa->n == NULL || rsa->e == NULL) {
-			emsg = "Out of memory2 @ handle_SSH2_dh_kex_reply()";
-			goto error;
-		}
-
-		buffer_get_bignum2(&data, rsa->e);
-		buffer_get_bignum2(&data, rsa->n);
-
-		hostkey.type = KEY_RSA;
-		hostkey.rsa = rsa;
-
-	} else if (strcmp(key, "ssh-dss") == 0) { // DSA key
-		dsa = DSA_new();
-		if (dsa == NULL) {
-			emsg = "Out of memory3 @ handle_SSH2_dh_kex_reply()";
-			goto error;
-		}
-		dsa->p = BN_new();
-		dsa->q = BN_new();
-		dsa->g = BN_new();
-		dsa->pub_key = BN_new();
-		if (dsa->p == NULL ||
-		    dsa->q == NULL ||
-		    dsa->g == NULL ||
-		    dsa->pub_key == NULL) {
-			emsg = "Out of memory4 @ handle_SSH2_dh_kex_reply()";
-			goto error;
-		}
-
-		buffer_get_bignum2(&data, dsa->p);
-		buffer_get_bignum2(&data, dsa->q);
-		buffer_get_bignum2(&data, dsa->g);
-		buffer_get_bignum2(&data, dsa->pub_key);
-
-		hostkey.type = KEY_DSA;
-		hostkey.dsa = dsa;
-
-	} else {
-		// unknown key
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "Unknown key type(%s) @ handle_SSH2_dh_kex_reply()", key);
-		emsg = emsg_tmp;
-		goto error;
-
-	}
+	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey.type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "type mismatch for decoded server_host_key_blob @ %s", __FUNCTION__);
 		emsg = emsg_tmp;
 		goto error;
 	}
-	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, &hostkey);
+	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (pvar->socket == INVALID_SOCKET) {
 		emsg = "Server disconnected @ handle_SSH2_dh_kex_reply()";
 		goto error;
@@ -5043,7 +4965,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	dh_server_pub = BN_new();
 	if (dh_server_pub == NULL) {
-		emsg = "Out of memory5 @ handle_SSH2_dh_kex_reply()";
+		emsg = "Out of memory1 @ handle_SSH2_dh_kex_reply()";
 		goto error;
 	}
 
@@ -5064,13 +4986,13 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
-		emsg = "Out of memory6 @ handle_SSH2_dh_kex_reply()";
+		emsg = "Out of memory2 @ handle_SSH2_dh_kex_reply()";
 		goto error;
 	}
 	share_len = DH_compute_key(dh_buf, dh_server_pub, pvar->kexdh);
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory7 @ handle_SSH2_dh_kex_reply()";
+		emsg = "Out of memory3 @ handle_SSH2_dh_kex_reply()";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
@@ -5117,12 +5039,12 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		}
 	}
 
-	if ((ret = key_verify(rsa, dsa, signature, siglen, hash, hashlen)) != 1) {
-		if (ret == -3 && rsa != NULL) {
+	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
+		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_dh_kex_reply()", BN_num_bits(rsa->n));
+				            "@ handle_SSH2_dh_kex_reply()", BN_num_bits(hostkey->rsa->n));
 			}
 			else {
 				goto cont;
@@ -5184,17 +5106,15 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 
 	BN_free(dh_server_pub);
-	RSA_free(rsa);
-	DSA_free(dsa);
+	key_free(hostkey);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	free(dh_buf);
 	return TRUE;
 
 error:
-	RSA_free(rsa);
-	DSA_free(dsa);
-	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	BN_free(dh_server_pub);
+	DH_free(pvar->kexdh); pvar->kexdh = NULL;
+	key_free(hostkey);
 	free(dh_buf);
 	BN_free(share_key);
 
@@ -5215,10 +5135,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	int len;
 	int offset = 0;
 	char *server_host_key_blob;
-	int bloblen, keynamelen, siglen;
-	char key[128];
-	RSA *rsa = NULL;
-	DSA *dsa = NULL;
+	int bloblen, siglen;
 	BIGNUM *dh_server_pub = NULL;
 	char *signature;
 	int dh_len, share_len;
@@ -5227,7 +5144,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	char *hash;
 	char *emsg, emsg_tmp[1024];  // error message
 	int ret, hashlen;
-	Key hostkey;  // hostkey
+	Key *hostkey = NULL;  // hostkey
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEX_DH_GEX_REPLY was received.", LOG_LEVEL_VERBOSE);
 
@@ -5249,83 +5166,21 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	push_memdump("DH_GEX_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
 
-	// key_from_blob()#key.c の処理が以下から始まる。
-	// known_hosts検証用の server_host_key は rsa or dsa となる。
-	keynamelen = get_uint32_MSBfirst(data);
-	if (keynamelen >= 128) {
-		emsg = "keyname length too big @ handle_SSH2_dh_gex_reply()";
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
+		emsg = "key_from_blob error @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
-	data +=4 ;
-	memcpy(key, data, keynamelen);
-	key[keynamelen] = 0;
-	data += keynamelen;
-
-	push_memdump("DH_GEX_REPLY", "keyname", key, keynamelen);
-
-	// RSA key
-	if (strcmp(key, "ssh-rsa") == 0) {
-		rsa = RSA_new();
-		if (rsa == NULL) {
-			emsg = "Out of memory1 @ handle_SSH2_dh_gex_reply()";
-			goto error;
-		}
-		rsa->n = BN_new();
-		rsa->e = BN_new();
-		if (rsa->n == NULL || rsa->e == NULL) {
-			emsg = "Out of memory2 @ handle_SSH2_dh_gex_reply()";
-			goto error;
-		}
-
-		buffer_get_bignum2(&data, rsa->e);
-		buffer_get_bignum2(&data, rsa->n);
-
-		hostkey.type = KEY_RSA;
-		hostkey.rsa = rsa;
-
-	} else if (strcmp(key, "ssh-dss") == 0) { // DSA key
-		dsa = DSA_new();
-		if (dsa == NULL) {
-			emsg = "Out of memory3 @ handle_SSH2_dh_gex_reply()";
-			goto error;
-		}
-		dsa->p = BN_new();
-		dsa->q = BN_new();
-		dsa->g = BN_new();
-		dsa->pub_key = BN_new();
-		if (dsa->p == NULL ||
-		    dsa->q == NULL ||
-		    dsa->g == NULL ||
-		    dsa->pub_key == NULL) {
-			emsg = "Out of memory4 @ handle_SSH2_dh_gex_reply()";
-			goto error;
-		}
-
-		buffer_get_bignum2(&data, dsa->p);
-		buffer_get_bignum2(&data, dsa->q);
-		buffer_get_bignum2(&data, dsa->g);
-		buffer_get_bignum2(&data, dsa->pub_key);
-
-		hostkey.type = KEY_DSA;
-		hostkey.dsa = dsa;
-
-	} else {
-		// unknown key
-		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "Unknown key type(%s) @ handle_SSH2_dh_gex_reply()", key);
-		emsg = emsg_tmp;
-		goto error;
-
-	}
+	data += bloblen;
 
 	// known_hosts対応 (2006.3.20 yutaka)
-	if (hostkey.type != pvar->hostkey_type) {  // ホストキーの種別比較
+	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 		            "type mismatch for decoded server_host_key_blob @ %s", __FUNCTION__);
 		emsg = emsg_tmp;
 		goto error;
 	}
-	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, &hostkey);
+	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (pvar->socket == INVALID_SOCKET) {
 		emsg = "Server disconnected @ handle_SSH2_dh_gex_reply()";
 		goto error;
@@ -5333,7 +5188,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	dh_server_pub = BN_new();
 	if (dh_server_pub == NULL) {
-		emsg = "Out of memory5 @ handle_SSH2_dh_gex_reply()";
+		emsg = "Out of memory1 @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 
@@ -5355,13 +5210,13 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
-		emsg = "Out of memory6 @ handle_SSH2_dh_gex_reply()";
+		emsg = "Out of memory2 @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 	share_len = DH_compute_key(dh_buf, dh_server_pub, pvar->kexdh);
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory7 @ handle_SSH2_dh_gex_reply()";
+		emsg = "Out of memory3 @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
@@ -5417,12 +5272,12 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		}
 	}
 
-	if ((ret = key_verify(rsa, dsa, signature, siglen, hash, hashlen)) != 1) {
-		if (ret == -3 && rsa != NULL) {
+	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
+		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_dh_gex_reply", BN_num_bits(rsa->n));
+				            "@ handle_SSH2_dh_gex_reply()", BN_num_bits(hostkey->rsa->n));
 			}
 			else {
 				goto cont;
@@ -5484,17 +5339,15 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 
 	BN_free(dh_server_pub);
-	RSA_free(rsa);
-	DSA_free(dsa);
+	key_free(hostkey);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	free(dh_buf);
 	return TRUE;
 
 error:
-	RSA_free(rsa);
-	DSA_free(dsa);
-	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	BN_free(dh_server_pub);
+	key_free(hostkey);
+	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	free(dh_buf);
 	BN_free(share_key);
 
@@ -5765,7 +5618,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		int bloblen;
 		char *signature = NULL;
 		int siglen;
-		CRYPTKeyPair *keypair = pvar->auth_state.cur_cred.key_pair;
+		Key *keypair = pvar->auth_state.cur_cred.key_pair;
 
 		if (get_SSH2_publickey_blob(pvar, &blob, &bloblen) == FALSE) {
 			goto error;
@@ -5787,7 +5640,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = "publickey";
 		buffer_put_string(signbuf, s, strlen(s));
 		buffer_put_char(signbuf, 1); // true
-		s = get_SSH2_keyname(keypair); // key typeに応じた文字列を得る
+		s = get_sshname_from_key(keypair); // key typeに応じた文字列を得る
 		buffer_put_string(signbuf, s, strlen(s));
 		s = buffer_ptr(blob);
 		buffer_append_length(signbuf, s, bloblen);
@@ -5805,7 +5658,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 		s = "publickey";
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_char(msg, 1); // true
-		s = get_SSH2_keyname(keypair); // key typeに応じた文字列を得る
+		s = get_sshname_from_key(keypair); // key typeに応じた文字列を得る
 		buffer_put_string(msg, s, strlen(s));
 		s = buffer_ptr(blob);
 		buffer_append_length(msg, s, bloblen);

@@ -425,7 +425,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	int method = SSH_AUTH_PASSWORD;
 	char FAR *password =
 		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
-	CRYPTKeyPair FAR *key_pair = NULL;
+	Key *key_pair = NULL;
 
 	if (IsDlgButtonChecked(dlg, IDC_SSHUSERSA)) {
 		method = SSH_AUTH_RSA;
@@ -1436,12 +1436,12 @@ void AUTH_destroy_cur_cred(PTInstVar pvar)
 	destroy_malloced_string(&pvar->auth_state.cur_cred.password);
 	destroy_malloced_string(&pvar->auth_state.cur_cred.rhosts_client_user);
 	if (pvar->auth_state.cur_cred.key_pair != NULL) {
-		CRYPT_free_key_pair(pvar->auth_state.cur_cred.key_pair);
+		key_free(pvar->auth_state.cur_cred.key_pair);
 		pvar->auth_state.cur_cred.key_pair = NULL;
 	}
 }
 
-static char FAR *get_auth_method_name(SSHAuthMethod auth)
+static const char *get_auth_method_name(SSHAuthMethod auth)
 {
 	switch (auth) {
 	case SSH_AUTH_PASSWORD:
@@ -1463,7 +1463,7 @@ static char FAR *get_auth_method_name(SSHAuthMethod auth)
 
 void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 {
-	char *method = "unknown";
+	const char *method = "unknown";
 
 	if (pvar->auth_state.user == NULL) {
 		strncpy_s(dest, len, "None", _TRUNCATE);
@@ -1490,16 +1490,12 @@ void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 
 			} else {
 				if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-					if (pvar->auth_state.cur_cred.key_pair->RSA_key != NULL) {
-						method = "RSA";
-					} else if (pvar->auth_state.cur_cred.key_pair->DSA_key != NULL) {
-						method = "DSA";
-					}
+					method = key_type(pvar->auth_state.cur_cred.key_pair);
 				}
 				else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 					int len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);
 					char *s = (char *)malloc(len+1);
-					enum hostkey_type keytype;
+					enum ssh_keytype keytype;
 
 					memcpy(s, pvar->pageant_curkey+4+4, len);
 					s[len] = '\0';

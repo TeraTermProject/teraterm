@@ -1211,7 +1211,7 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 
 	decrypted_challenge_len =
 		RSA_private_decrypt(challenge_len, challenge, challenge,
-		                    AUTH_get_cur_cred(pvar)->key_pair->RSA_key,
+		                    AUTH_get_cur_cred(pvar)->key_pair->rsa,
 		                    RSA_PKCS1_PADDING);
 	if (decrypted_challenge_len < 0) {
 		free(session_buf);
@@ -1745,7 +1745,7 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char FAR * dest, int len)
 	}
 }
 
-static void destroy_public_key(CRYPTPublicKey FAR * key)
+static void destroy_public_key(CRYPTPublicKey * key)
 {
 	if (key->RSA_key != NULL) {
 		RSA_free(key->RSA_key);
@@ -1753,7 +1753,7 @@ static void destroy_public_key(CRYPTPublicKey FAR * key)
 	}
 }
 
-void CRYPT_free_public_key(CRYPTPublicKey FAR * key)
+void CRYPT_free_public_key(CRYPTPublicKey * key)
 {
 	destroy_public_key(key);
 	free(key);
@@ -1861,15 +1861,4 @@ int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase,
 
 	memset(passphrase_key, 0, sizeof(passphrase_key));
 	return 1;
-}
-
-void CRYPT_free_key_pair(CRYPTKeyPair FAR * key_pair)
-{
-	if (key_pair->RSA_key != NULL)
-		RSA_free(key_pair->RSA_key);
-
-	if (key_pair->DSA_key != NULL)
-		DSA_free(key_pair->DSA_key);
-
-	free(key_pair);
 }

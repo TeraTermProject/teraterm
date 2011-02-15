@@ -811,7 +811,7 @@ static BOOL match_key(PTInstVar pvar, Key *key)
 		       BN_cmp(key->rsa->e, pvar->hosts_state.hostkey.rsa->e) == 0 && 
 		       BN_cmp(key->rsa->n, pvar->hosts_state.hostkey.rsa->n) == 0;
 
-	} else { // // SSH2 DSA host public key
+	} else if (key->type == KEY_DSA) {  // SSH2 DSA host public key
 
 		return key->dsa != NULL && pvar->hosts_state.hostkey.dsa && 
 		       BN_cmp(key->dsa->p, pvar->hosts_state.hostkey.dsa->p) == 0 && 
@@ -819,6 +819,9 @@ static BOOL match_key(PTInstVar pvar, Key *key)
 		       BN_cmp(key->dsa->g, pvar->hosts_state.hostkey.dsa->g) == 0 &&
 		       BN_cmp(key->dsa->pub_key, pvar->hosts_state.hostkey.dsa->pub_key) == 0;
 
+	}
+	else {
+		return FALSE;
 	}
 
 }
@@ -889,7 +892,7 @@ static char FAR *format_host_key(PTInstVar pvar)
 	int host_len = strlen(pvar->hosts_state.prefetched_hostname);
 	char *result = NULL;
 	int index;
-	enum hostkey_type type = pvar->hosts_state.hostkey.type;
+	enum ssh_keytype type = pvar->hosts_state.hostkey.type;
 
 	if (type == KEY_RSA1) {
 		int result_len = host_len + 50 + 8 +

@@ -82,13 +82,8 @@ typedef struct {
 } CRYPTDetectAttack;
 
 typedef struct {
-  RSA FAR * RSA_key;
+  RSA *RSA_key;
 } CRYPTPublicKey;
-
-typedef struct _CRYPTKeyPair {
-  RSA FAR * RSA_key;
-  DSA *DSA_key;
-} CRYPTKeyPair;
 
 typedef union {
   Cipher3DESState c3DES;
@@ -136,7 +131,6 @@ void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char FAR * cookie);
 void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char FAR * cookie);
 #define CRYPT_get_server_cookie(pvar) ((pvar)->crypt_state.server_cookie)
 
-void CRYPT_free_key_pair(CRYPTKeyPair FAR * key_pair);
 void CRYPT_free_public_key(CRYPTPublicKey FAR * key);
 
 BOOL CRYPT_set_server_RSA_key(PTInstVar pvar,
@@ -171,7 +165,7 @@ int CRYPT_get_encryption_block_size(PTInstVar pvar);
 BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char FAR * buf, int bytes);
 int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase, char FAR * buf, int len);
 RSA FAR *make_key(PTInstVar pvar,
-						 int bits, unsigned char FAR * exp,
-						 unsigned char FAR * mod);
+                  int bits, unsigned char FAR * exp,
+                  unsigned char FAR * mod);
 
 #endif

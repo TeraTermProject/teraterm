@@ -33,6 +33,7 @@ See LICENSE.TXT for the license.
 
 #include "ttxssh.h"
 #include "keyfiles.h"
+#include "key.h"
 
 #include <io.h>
 #include <fcntl.h>
@@ -91,11 +92,11 @@ static BOOL normalize_key(RSA FAR * key)
 	return OK;
 }
 
-static RSA FAR *read_RSA_private_key(PTInstVar pvar,
-                                     char FAR * relative_name,
-                                     char FAR * passphrase,
-                                     BOOL FAR * invalid_passphrase,
-                                     BOOL is_auto_login)
+static RSA *read_RSA_private_key(PTInstVar pvar,
+                                 char * relative_name,
+                                 char * passphrase,
+                                 BOOL * invalid_passphrase,
+                                 BOOL is_auto_login)
 {
 	char filename[2048];
 	int fd;
@@ -310,26 +311,25 @@ static RSA FAR *read_RSA_private_key(PTInstVar pvar,
 	return key;
 }
 
-CRYPTKeyPair FAR *KEYFILES_read_private_key(PTInstVar pvar,
-                                            char FAR * relative_name,
-                                            char FAR * passphrase,
-                                            BOOL FAR * invalid_passphrase,
-                                            BOOL is_auto_login)
+Key *KEYFILES_read_private_key(PTInstVar pvar,
+                               char * relative_name,
+                               char * passphrase,
+                               BOOL * invalid_passphrase,
+                               BOOL is_auto_login)
 {
-	RSA FAR *RSA_key = read_RSA_private_key(pvar, relative_name,
-	                                        passphrase, invalid_passphrase,
-	                                        is_auto_login);
+	RSA *RSA_key = read_RSA_private_key(pvar, relative_name,
+	                                    passphrase, invalid_passphrase,
+	                                    is_auto_login);
 
 	if (RSA_key == NULL) {
 		return FALSE;
 	} else {
-		CRYPTKeyPair FAR *result =
-			(CRYPTKeyPair FAR *) malloc(sizeof(CRYPTKeyPair));
+		Key *result = (Key *) malloc(sizeof(Key));
 
 		// フリーするときに 0 かどうかで判別するため追加。(2004.12.20 yutaka)
-		ZeroMemory(result, sizeof(CRYPTKeyPair)); 
+		ZeroMemory(result, sizeof(Key)); 
 
-		result->RSA_key = RSA_key;
+		result->rsa = RSA_key;
 		return result;
 	}
 }
@@ -339,17 +339,17 @@ CRYPTKeyPair FAR *KEYFILES_read_private_key(PTInstVar pvar,
 // SSH2
 //
 
-CRYPTKeyPair *read_SSH2_private_key(PTInstVar pvar,
-                                    char FAR * relative_name,
-                                    char FAR * passphrase,
-                                    BOOL FAR * invalid_passphrase,
-                                    BOOL is_auto_login,
-                                    char *errmsg,
-                                    int errmsg_len)
+Key *read_SSH2_private_key(PTInstVar pvar,
+                           char * relative_name,
+                           char * passphrase,
+                           BOOL * invalid_passphrase,
+                           BOOL is_auto_login,
+                           char *errmsg,
+                           int errmsg_len)
 {
 	char filename[2048];
 	FILE *fp = NULL;
-	CRYPTKeyPair *result = NULL;
+	Key *result = NULL;
 	EVP_PKEY *pk = NULL;
 	unsigned long err = 0;
 
@@ -368,8 +368,8 @@ CRYPTKeyPair *read_SSH2_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	result = (CRYPTKeyPair *)malloc(sizeof(CRYPTKeyPair));
-	ZeroMemory(result, sizeof(CRYPTKeyPair)); 
+	result = (Key *)malloc(sizeof(Key));
+	ZeroMemory(result, sizeof(Key)); 
 
 	// ファイルからパスフレーズを元に秘密鍵を読み込む。
 	pk = PEM_read_PrivateKey(fp, NULL, NULL, passphrase);
@@ -381,19 +381,21 @@ CRYPTKeyPair *read_SSH2_private_key(PTInstVar pvar,
 	}
 
 	if (pk->type == EVP_PKEY_RSA) { // RSA key
-		result->RSA_key = EVP_PKEY_get1_RSA(pk);
-		result->DSA_key = NULL;
+		result->type = KEY_RSA;
+		result->rsa = EVP_PKEY_get1_RSA(pk);
+		result->dsa = NULL;
 
 		// RSA目くらましを有効にする（タイミング攻撃からの防御）
-		if (RSA_blinding_on(result->RSA_key, NULL) != 1) {
+		if (RSA_blinding_on(result->rsa, NULL) != 1) {
 			err = ERR_get_error();
 			ERR_error_string_n(err, errmsg, errmsg_len);
 			goto error;
 		}
 
 	} else if (pk->type == EVP_PKEY_DSA) { // DSA key
-		result->RSA_key = NULL;
-		result->DSA_key = EVP_PKEY_get1_DSA(pk);
+		result->type = KEY_DSA;
+		result->rsa = NULL;
+		result->dsa = EVP_PKEY_get1_DSA(pk);
 
 	} else {
 		goto error;
@@ -410,7 +412,7 @@ error:
 		EVP_PKEY_free(pk);
 
 	if (result != NULL)
-		CRYPT_free_key_pair(result);
+		key_free(result);
 
 	if (fp != NULL)
 		fclose(fp);

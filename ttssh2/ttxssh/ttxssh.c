@@ -99,9 +99,9 @@ static HFONT DlgKeygenFont;
 static TInstVar FAR *pvar;
 
 typedef struct {
-	int	cnt;
-	HWND	dlg;
-	enum hostkey_type type;
+	int cnt;
+	HWND dlg;
+	enum ssh_keytype type;
 } cbarg_t;
 
   /* WIN32 allows multiple instances of a DLL */
@@ -2864,7 +2864,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 typedef struct {
 	RSA *rsa;
 	DSA *dsa;
-	enum hostkey_type type;
+	enum ssh_keytype type;
 } ssh_private_key_t;
 
 static ssh_private_key_t private_key = {NULL, NULL, KEY_UNSPEC};
@@ -2872,7 +2872,7 @@ static ssh_private_key_t private_key = {NULL, NULL, KEY_UNSPEC};
 typedef struct {
 	RSA *rsa;
 	DSA *dsa;
-	enum hostkey_type type;
+	enum ssh_keytype type;
 } ssh_public_key_t;
 
 static ssh_public_key_t public_key = {NULL, NULL, KEY_UNSPEC};
@@ -2894,7 +2894,7 @@ static void free_ssh_key(void)
 	public_key.type = KEY_UNSPEC;
 }
 
-static BOOL generate_ssh_key(enum hostkey_type type, int bits, void (*cbfunc)(int, int, void *), void *cbarg)
+static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int, int, void *), void *cbarg)
 {
 	// if SSH key already is generated, should free the resource.
 	free_ssh_key();
@@ -3440,7 +3440,7 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
-	static enum hostkey_type key_type;
+	static enum ssh_keytype key_type;
 	char uimsg[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;

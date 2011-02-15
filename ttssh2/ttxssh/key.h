@@ -28,27 +28,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ttxssh.h"
 
-#if 0
-int ssh_dss_verify(DSA *key,
-                   u_char *signature, u_int signaturelen,
-                   u_char *data, u_int datalen);
-int ssh_rsa_verify(RSA *key,
-                   u_char *signature, u_int signaturelen,
-                   u_char *data, u_int datalen);
-#endif
-int key_verify(RSA *rsa_key, DSA *dsa_key,
+int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen);
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
-char* key_fingerprint_raw(Key *k, int *dgst_raw_length);
 
+char* key_fingerprint_raw(Key *k, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
-void key_free(Key *key);
+
+const char *key_type(const Key *k);
 char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
+
+void key_free(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
 Key *key_from_blob(char *data, int blen);
-char *get_SSH2_keyname(CRYPTKeyPair *keypair);
-BOOL generate_SSH2_keysign(CRYPTKeyPair *keypair, char **sigptr, int *siglen, char *data, int datalen);
 BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);
+BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen);

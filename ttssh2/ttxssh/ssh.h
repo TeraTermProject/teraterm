@@ -194,7 +194,7 @@ enum channel_type {
 #define SSH2_OPEN_UNKNOWN_CHANNEL_TYPE           3
 #define SSH2_OPEN_RESOURCE_SHORTAGE              4
 
-enum hostkey_type {
+enum ssh_keytype {
 	KEY_RSA1,
 	KEY_RSA,
 	KEY_DSA,
@@ -406,7 +406,7 @@ enum kex_modes {
 // ホストキー(SSH1, SSH2含む)のデータ構造 (2006.3.21 yutaka)
 typedef struct Key {
 	// host key type
-	enum hostkey_type type;
+	enum ssh_keytype type;
 	// SSH2 RSA
 	RSA *rsa;
 	// SSH2 DSA
