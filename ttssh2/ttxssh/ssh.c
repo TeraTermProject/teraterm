@@ -4951,12 +4951,13 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	len = pvar->ssh_state.payloadlen;
 
 	// for debug
-	//write_buffer_file(data, len);
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
 
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
 	server_host_key_blob = data; // for hash
+
+	push_memdump("KEXDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
 
 	// key_from_blob()#key.c の処理が以下から始まる。
 	// known_hosts検証用の server_host_key は rsa or dsa となる。
@@ -4969,6 +4970,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	memcpy(key, data, keynamelen);
 	key[keynamelen] = 0;
 	data += keynamelen;
+
+	push_memdump("KEXDH_REPLY", "keyname", key, keynamelen);
 
 	// RSA key
 	if (strcmp(key, "ssh-rsa") == 0) {
@@ -5086,6 +5089,16 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	                   share_key,
 	                   &hashlen);
 
+	{
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
+
+		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "dh_server_pub", dh_server_pub);
+		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "share_key", share_key);
+
+		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
+	}
+
 	//debug_print(30, hash, hashlen);
 	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
 	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
@@ -5117,7 +5130,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		}
 		else {
 			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-			            "key verify error(%d) @ handle_SSH2_dh_kex_reply()", ret);
+			            "key verify error(%d) @ handle_SSH2_dh_kex_reply()\r\n%s", ret, SENDTOME);
 		}
 		emsg = emsg_tmp;
 		save_memdump(LOGDUMP);
@@ -5227,10 +5240,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	push_memdump("DH_GEX_REPLY", "full dump", data, len);
-
 	// for debug
-	//write_buffer_file(data, len);
+	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
 
 	bloblen = get_uint32_MSBfirst(data);
 	data += 4;
@@ -5242,7 +5253,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// known_hosts検証用の server_host_key は rsa or dsa となる。
 	keynamelen = get_uint32_MSBfirst(data);
 	if (keynamelen >= 128) {
-		emsg = "keyname length too big @ handle_SSH2_dh_kex_reply()";
+		emsg = "keyname length too big @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 	data +=4 ;
@@ -5256,13 +5267,13 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	if (strcmp(key, "ssh-rsa") == 0) {
 		rsa = RSA_new();
 		if (rsa == NULL) {
-			emsg = "Out of memory1 @ handle_SSH2_dh_kex_reply()";
+			emsg = "Out of memory1 @ handle_SSH2_dh_gex_reply()";
 			goto error;
 		}
 		rsa->n = BN_new();
 		rsa->e = BN_new();
 		if (rsa->n == NULL || rsa->e == NULL) {
-			emsg = "Out of memory2 @ handle_SSH2_dh_kex_reply()";
+			emsg = "Out of memory2 @ handle_SSH2_dh_gex_reply()";
 			goto error;
 		}
 
@@ -5275,7 +5286,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	} else if (strcmp(key, "ssh-dss") == 0) { // DSA key
 		dsa = DSA_new();
 		if (dsa == NULL) {
-			emsg = "Out of memory3 @ handle_SSH2_dh_kex_reply()";
+			emsg = "Out of memory3 @ handle_SSH2_dh_gex_reply()";
 			goto error;
 		}
 		dsa->p = BN_new();
@@ -5286,7 +5297,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		    dsa->q == NULL ||
 		    dsa->g == NULL ||
 		    dsa->pub_key == NULL) {
-			emsg = "Out of memory4 @ handle_SSH2_dh_kex_reply()";
+			emsg = "Out of memory4 @ handle_SSH2_dh_gex_reply()";
 			goto error;
 		}
 
@@ -5301,7 +5312,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	} else {
 		// unknown key
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "Unknown key type(%s) @ handle_SSH2_dh_kex_reply()", key);
+		            "Unknown key type(%s) @ handle_SSH2_dh_gex_reply()", key);
 		emsg = emsg_tmp;
 		goto error;
 
@@ -5322,7 +5333,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	dh_server_pub = BN_new();
 	if (dh_server_pub == NULL) {
-		emsg = "Out of memory5 @ handle_SSH2_dh_kex_reply()";
+		emsg = "Out of memory5 @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 
@@ -5337,20 +5348,20 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	// check DH public value
 	if (!dh_pub_is_valid(pvar->kexdh, dh_server_pub)) {
-		emsg = "DH public value invalid @ handle_SSH2_dh_kex_reply()";
+		emsg = "DH public value invalid @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 	// 共通鍵の生成
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
-		emsg = "Out of memory6 @ handle_SSH2_dh_kex_reply()";
+		emsg = "Out of memory6 @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 	share_len = DH_compute_key(dh_buf, dh_server_pub, pvar->kexdh);
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory7 @ handle_SSH2_dh_kex_reply()";
+		emsg = "Out of memory7 @ handle_SSH2_dh_gex_reply()";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
@@ -5411,7 +5422,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 			if (!pvar->settings.EnableRsaShortKeyServer) {
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ SSH2_DH_GEX", BN_num_bits(rsa->n));
+				            "@ handle_SSH2_dh_gex_reply", BN_num_bits(rsa->n));
 			}
 			else {
 				goto cont;
@@ -5419,7 +5430,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		}
 		else {
 			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-			            "key verify error(%d) @ SSH2_DH_GEX\r\n%s", ret, SENDTOME);
+			            "key verify error(%d) @ handle_SSH2_dh_gex_reply()\r\n%s", ret, SENDTOME);
 		}
 		emsg = emsg_tmp;
 		save_memdump(LOGDUMP);
