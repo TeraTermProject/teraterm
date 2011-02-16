@@ -2,6 +2,7 @@
 #define BUFFER_H
 
 #include <openssl/bn.h>
+#include <openssl/ec.h>
 #include <zlib.h>
 
 typedef struct buffer {
@@ -27,6 +28,8 @@ char *buffer_ptr(buffer_t *msg);
 void buffer_put_bignum(buffer_t *buffer, BIGNUM *value);
 void buffer_put_bignum2(buffer_t *msg, BIGNUM *value);
 void buffer_get_bignum2(char **data, BIGNUM *value);
+void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *point);
+void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point);
 char *buffer_tail_ptr(buffer_t *msg);
 int buffer_overflow_verify(buffer_t *msg, int len);
 void buffer_consume(buffer_t *buf, int shift_byte);

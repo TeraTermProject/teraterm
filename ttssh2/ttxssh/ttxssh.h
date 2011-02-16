@@ -66,6 +66,7 @@ typedef struct _TInstVar FAR * PTInstVar;
 #include "fwd.h"
 
 #include <openssl/dh.h>
+#include <openssl/ec.h>
 #include <openssl/evp.h>
 #include "buffer.h"
 
@@ -260,6 +261,8 @@ typedef struct _TInstVar {
 	BOOL origDisableTCPEchoCR;
 
 	BOOL nocheck_known_hosts;
+
+	EC_KEY *ecdh_client_key;
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5

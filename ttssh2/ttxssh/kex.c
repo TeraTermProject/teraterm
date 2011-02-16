@@ -250,6 +250,57 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
 }
 
 
+unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
+                             const EC_GROUP *ec_group,
+                             char *client_version_string,
+                             char *server_version_string,
+                             char *ckexinit, int ckexinitlen,
+                             char *skexinit, int skexinitlen,
+                             u_char *serverhostkeyblob, int sbloblen,
+                             const EC_POINT *client_dh_pub,
+                             const EC_POINT *server_dh_pub,
+                             BIGNUM *shared_secret,
+                             unsigned int *hashlen)
+{
+	buffer_t *b;
+	static unsigned char digest[EVP_MAX_MD_SIZE];
+	EVP_MD_CTX md;
+
+	b = buffer_init();
+	buffer_put_string(b, client_version_string, strlen(client_version_string));
+	buffer_put_string(b, server_version_string, strlen(server_version_string));
+
+	/* kexinit messages: fake header: len+SSH2_MSG_KEXINIT */
+	buffer_put_int(b, ckexinitlen+1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, ckexinit, ckexinitlen);
+	buffer_put_int(b, skexinitlen+1);
+	buffer_put_char(b, SSH2_MSG_KEXINIT);
+	buffer_append(b, skexinit, skexinitlen);
+
+	buffer_put_string(b, serverhostkeyblob, sbloblen);
+
+	buffer_put_ecpoint(b, ec_group, client_dh_pub);
+	buffer_put_ecpoint(b, ec_group, server_dh_pub);
+	buffer_put_bignum2(b, shared_secret);
+
+	// yutaka
+	//debug_print(38, buffer_ptr(b), buffer_len(b));
+
+	EVP_DigestInit(&md, evp_md);
+	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestFinal(&md, digest, NULL);
+
+	buffer_free(b);
+
+	//write_buffer_file(digest, EVP_MD_size(evp_md));
+
+	*hashlen = EVP_MD_size(evp_md);
+
+	return digest;
+}
+
+
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 {
 	int i;
@@ -270,6 +321,84 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
 		return 1;
 	//logit("invalid public DH value (%d/%d)", bits_set, BN_num_bits(dh->p));
 	return 0;
+}
+
+
+// from openssh 5.8p1 key.c
+int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public)
+{
+	BN_CTX *bnctx;
+	EC_POINT *nq = NULL;
+	BIGNUM *order, *x, *y, *tmp;
+	int ret = -1;
+
+	if ((bnctx = BN_CTX_new()) == NULL) {
+		return ret;
+	}
+	BN_CTX_start(bnctx);
+
+	/*
+	 * We shouldn't ever hit this case because bignum_get_ecpoint()
+	 * refuses to load GF2m points.
+	 */
+	if (EC_METHOD_get_field_type(EC_GROUP_method_of(group)) !=
+	    NID_X9_62_prime_field) {
+		goto out;
+	}
+
+	/* Q != infinity */
+	if (EC_POINT_is_at_infinity(group, public)) {
+		goto out;
+	}
+
+	if ((x = BN_CTX_get(bnctx)) == NULL ||
+	    (y = BN_CTX_get(bnctx)) == NULL ||
+	    (order = BN_CTX_get(bnctx)) == NULL ||
+		(tmp = BN_CTX_get(bnctx)) == NULL) {
+		goto out;
+	}
+
+	/* log2(x) > log2(order)/2, log2(y) > log2(order)/2 */
+	if (EC_GROUP_get_order(group, order, bnctx) != 1) {
+		goto out;
+	}
+	if (EC_POINT_get_affine_coordinates_GFp(group, public,
+		x, y, bnctx) != 1) {
+		goto out;
+	}
+	if (BN_num_bits(x) <= BN_num_bits(order) / 2) {
+		goto out;
+	}
+	if (BN_num_bits(y) <= BN_num_bits(order) / 2) {
+		goto out;
+	}
+
+	/* nQ == infinity (n == order of subgroup) */
+	if ((nq = EC_POINT_new(group)) == NULL) {
+		goto out;
+	}
+	if (EC_POINT_mul(group, nq, NULL, public, order, bnctx) != 1) {
+		goto out;
+	}
+	if (EC_POINT_is_at_infinity(group, nq) != 1) {
+		goto out;
+	}
+
+	/* x < order - 1, y < order - 1 */
+	if (!BN_sub(tmp, order, BN_value_one())) {
+		goto out;
+	}
+	if (BN_cmp(x, tmp) >= 0) {
+		goto out;
+	}
+	if (BN_cmp(y, tmp) >= 0) {
+		goto out;
+	}
+	ret = 0;
+ out:
+	BN_CTX_free(bnctx);
+	EC_POINT_free(nq);
+	return ret;
 }
 
 

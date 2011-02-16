@@ -8,6 +8,7 @@
 #include "ttxssh.h"
 #include "util.h"
 #include <openssl/bn.h>
+#include <openssl/ec.h>
 #include <zlib.h>
 
 void buffer_clear(buffer_t *buf)
@@ -278,6 +279,52 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 	buf += len;
 
 	*data = buf;
+}
+
+void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *point)
+{
+	unsigned char *buf = NULL;
+	size_t len;
+	BN_CTX *bnctx;
+
+	/* Determine length */
+	bnctx = BN_CTX_new();
+	len = EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
+	    NULL, 0, bnctx);
+	/* Convert */
+	buf = malloc(len);
+	if (buf == NULL) {
+		*buf = 0;
+		goto error;
+	}
+	if (EC_POINT_point2oct(curve, point, POINT_CONVERSION_UNCOMPRESSED,
+	    buf, len, bnctx) != len) {
+		goto error;
+	}
+	/* Append */
+	buffer_put_string(msg, buf, len);
+
+error:
+	free(buf);
+	BN_CTX_free(bnctx);
+}
+
+void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
+{
+	char *buf = *data;
+	size_t len;
+	BN_CTX *bnctx;
+
+	bnctx = BN_CTX_new();
+
+	len = get_uint32_MSBfirst(buf);
+	buf += 4;
+	EC_POINT_oct2point(curve, point, buf, len, bnctx);
+	buf += len;
+
+	*data = buf;
+
+	BN_CTX_free(bnctx);
 }
 
 void buffer_dump(FILE *fp, buffer_t *buf)

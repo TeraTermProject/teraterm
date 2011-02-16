@@ -151,6 +151,9 @@ enum channel_type {
 #define SSH2_MSG_KEX_DH_GEX_REPLY           33
 #define SSH2_MSG_KEX_DH_GEX_REQUEST         34
 
+#define SSH2_MSG_KEX_ECDH_INIT              30
+#define SSH2_MSG_KEX_ECDH_REPLY             31
+
 #define SSH2_MSG_USERAUTH_REQUEST            50
 #define SSH2_MSG_USERAUTH_FAILURE            51
 #define SSH2_MSG_USERAUTH_SUCCESS            52
@@ -201,7 +204,10 @@ enum ssh_keytype {
 	KEY_UNSPEC,
 };
 
-#define KEX_DEFAULT_KEX     "diffie-hellman-group-exchange-sha256," \
+#define KEX_DEFAULT_KEX     "ecdh-sha2-nistp256," \
+                            "ecdh-sha2-nistp384," \
+                            "ecdh-sha2-nistp521," \
+                            "diffie-hellman-group-exchange-sha256," \
                             "diffie-hellman-group-exchange-sha1," \
                             "diffie-hellman-group14-sha1," \
                             "diffie-hellman-group1-sha1"
@@ -306,6 +312,9 @@ enum kex_algorithm {
 	KEX_DH_GRP14_SHA1,
 	KEX_DH_GEX_SHA1,
 	KEX_DH_GEX_SHA256,
+	KEX_ECDH_SHA2_256,
+	KEX_ECDH_SHA2_384,
+	KEX_ECDH_SHA2_521,
 	KEX_DH_UNKNOWN,
 };
 
@@ -320,6 +329,9 @@ static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},
 	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},
 	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256},
+	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256},
+	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384},
+	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512},
 	{KEX_DH_UNKNOWN   , NULL                                  , NULL},
 };
 

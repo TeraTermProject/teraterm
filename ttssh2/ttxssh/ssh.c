@@ -131,6 +131,7 @@ void SSH2_send_kexinit(PTInstVar pvar);
 static BOOL handle_SSH2_kexinit(PTInstVar pvar);
 static void SSH2_dh_kex_init(PTInstVar pvar);
 static void SSH2_dh_gex_kex_init(PTInstVar pvar);
+static void SSH2_ecdh_kex_init(PTInstVar pvar);
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar);
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar);
 static BOOL handle_SSH2_newkeys(PTInstVar pvar);
@@ -3156,6 +3157,10 @@ void SSH_end(PTInstVar pvar)
 			DH_free(pvar->kexdh);
 			pvar->kexdh = NULL;
 		}
+		if (pvar->ecdh_client_key) {
+			EC_KEY_free(pvar->ecdh_client_key);
+			pvar->ecdh_client_key = NULL;
+		}
 		memset(pvar->server_version_string, 0, sizeof(pvar->server_version_string));
 		memset(pvar->client_version_string, 0, sizeof(pvar->client_version_string));
 
@@ -4669,6 +4674,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		case KEX_DH_GEX_SHA256:
 			SSH2_dh_gex_kex_init(pvar);
 			break;
+		case KEX_ECDH_SHA2_256:
+		case KEX_ECDH_SHA2_384:
+		case KEX_ECDH_SHA2_521:
+			SSH2_ecdh_kex_init(pvar);
+			break;
 		default:
 			// TODO
 			break;
@@ -4881,6 +4891,81 @@ error:;
 	DH_free(dh);
 
 	return FALSE;
+}
+
+
+//
+// KEX_ECDH_SHA2_256 or KEX_ECDH_SHA2_384 or KEX_ECDH_SHA2_521
+//
+ 
+static void SSH2_ecdh_kex_init(PTInstVar pvar)
+{
+	EC_KEY *client_key = NULL;
+	const EC_GROUP *group;
+	buffer_t *msg = NULL;
+	unsigned char *outmsg;
+	int len;
+
+	client_key = EC_KEY_new();
+	if (client_key == NULL) {
+		goto error;
+	}
+	switch (pvar->kex_type) {
+		case KEX_ECDH_SHA2_256:
+			client_key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+			break;
+		case KEX_ECDH_SHA2_384:
+			client_key = EC_KEY_new_by_curve_name(NID_secp384r1);
+			break;
+		case KEX_ECDH_SHA2_521:
+			client_key = EC_KEY_new_by_curve_name(NID_secp521r1);
+			break;
+		default:
+			goto error;
+	}
+	if (client_key == NULL) {
+		goto error;
+	}
+	if (EC_KEY_generate_key(client_key) != 1) {
+		goto error;
+	}
+	group = EC_KEY_get0_group(client_key);
+
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		return;
+	}
+
+	buffer_put_ecpoint(msg, group, EC_KEY_get0_public_key(client_key));
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_KEX_ECDH_INIT, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+
+	// ここで作成した鍵は、あとでハッシュ計算に使うため取っておく。
+	if (pvar->ecdh_client_key) {
+		EC_KEY_free(pvar->ecdh_client_key);
+	}
+	pvar->ecdh_client_key = client_key;
+
+	SSH2_dispatch_init(2);
+	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
+	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
+
+	buffer_free(msg);
+
+	notify_verbose_message(pvar, "SSH2_MSG_KEX_ECDH_INIT was sent at SSH2_ecdh_kex_init().", LOG_LEVEL_VERBOSE);
+
+	return;
+
+error:;
+	EC_KEY_free(client_key);
+	buffer_free(msg);
+
+	notify_fatal_error(pvar, "error occurred @ SSH2_ecdh_kex_init()");
 }
 
 
@@ -5357,6 +5442,261 @@ error:
 }
 
 
+//
+// Elliptic Curv Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_ECDH_REPLY:31)
+//
+static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
+{
+	char *data;
+	int len;
+	int offset = 0;
+	char *server_host_key_blob;
+	int bloblen, siglen;
+	EC_POINT *server_public = NULL;
+	const EC_GROUP *group;
+	char *signature;
+	int ecdh_len;
+	char *ecdh_buf = NULL;
+	BIGNUM *share_key = NULL;
+	char *hash;
+	char *emsg, emsg_tmp[1024];  // error message
+	int ret, hashlen;
+	Key *hostkey = NULL;  // hostkey
+
+	notify_verbose_message(pvar, "SSH2_MSG_KEX_ECDH_REPLY was received.", LOG_LEVEL_VERBOSE);
+
+	memset(&hostkey, 0, sizeof(hostkey));
+
+	// TODO: buffer overrun check
+
+	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	data = pvar->ssh_state.payload;
+	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
+	len = pvar->ssh_state.payloadlen;
+
+	// for debug
+	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
+
+	bloblen = get_uint32_MSBfirst(data);
+	data += 4;
+	server_host_key_blob = data; // for hash
+
+	push_memdump("DH_GEX_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+
+	hostkey = key_from_blob(data, bloblen);
+	if (hostkey == NULL) {
+		emsg = "key_from_blob error @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+	data += bloblen;
+
+	// known_hosts対応 (2006.3.20 yutaka)
+	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
+		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+		            "type mismatch for decoded server_host_key_blob @ %s", __FUNCTION__);
+		emsg = emsg_tmp;
+		goto error;
+	}
+	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
+	if (pvar->socket == INVALID_SOCKET) {
+		emsg = "Server disconnected @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+
+	/* Q_S, server public key */
+	group = EC_KEY_get0_group(pvar->ecdh_client_key);
+	server_public = EC_POINT_new(group);
+	if (server_public == NULL) {
+		emsg = "Out of memory1 @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+
+	buffer_get_ecpoint(&data, group, server_public);
+
+	siglen = get_uint32_MSBfirst(data);
+	data += 4;
+	signature = data;
+	data += siglen;
+
+	push_memdump("KEX_ECDH_REPLY", "signature", signature, siglen);
+
+	// check public key
+	if (key_ec_validate_public(group, server_public) != 0) {
+		emsg = "ECDH invalid server public key @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+	// 共通鍵の生成
+	ecdh_len = (EC_GROUP_get_degree(group) + 7) / 8;
+	ecdh_buf = malloc(ecdh_len);
+	if (ecdh_buf == NULL) {
+		emsg = "Out of memory2 @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+	if (ECDH_compute_key(ecdh_buf, ecdh_len, server_public,
+	                     pvar->ecdh_client_key, NULL) != (int)ecdh_len) {
+		emsg = "Out of memory2 @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+	share_key = BN_new();
+	if (share_key == NULL) {
+		emsg = "Out of memory3 @ handle_SSH2_ecdh_kex_reply()";
+		goto error;
+	}
+	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
+	BN_bin2bn(ecdh_buf, ecdh_len, share_key);
+	//debug_print(40, ecdh_buf, ecdh_len);
+
+	// ハッシュの計算
+	/* calc and verify H */
+	hash = kex_ecdh_hash(ssh2_kex_algorithms[pvar->kex_type].evp_md(),
+	                     group,
+	                     pvar->client_version_string,
+	                     pvar->server_version_string,
+	                     buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
+	                     buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
+	                     server_host_key_blob, bloblen,
+	                     EC_KEY_get0_public_key(pvar->ecdh_client_key),
+	                     server_public,
+	                     share_key,
+	                     &hashlen);
+
+	{
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
+
+		push_bignum_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "share_key", share_key);
+
+		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "hash", hash, hashlen);
+	}
+
+	//debug_print(30, hash, hashlen);
+	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
+	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
+	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
+	//debug_print(34, buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
+	//debug_print(35, server_host_key_blob, bloblen);
+
+	// session idの保存（初回接続時のみ）
+	if (pvar->session_id == NULL) {
+		pvar->session_id_len = hashlen;
+		pvar->session_id = malloc(pvar->session_id_len);
+		if (pvar->session_id != NULL) {
+			memcpy(pvar->session_id, hash, pvar->session_id_len);
+		} else {
+			// TODO:
+		}
+	}
+
+	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
+		if (ret == -3 && hostkey->type == KEY_RSA) {
+			if (!pvar->settings.EnableRsaShortKeyServer) {
+				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+				            "key verify error(remote rsa key length is too short %d-bit) "
+				            "@ handle_SSH2_ecdh_kex_reply()", BN_num_bits(hostkey->rsa->n));
+			}
+			else {
+				goto cont;
+			}
+		}
+		else {
+			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
+			            "key verify error(%d) @ handle_SSH2_ecdh_kex_reply()\r\n%s", ret, SENDTOME);
+		}
+		emsg = emsg_tmp;
+		save_memdump(LOGDUMP);
+		goto error;
+	}
+
+cont:
+	kex_derive_keys(pvar, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
+
+	// KEX finish
+	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
+	finish_send_packet(pvar);
+
+	notify_verbose_message(pvar, "SSH2_MSG_NEWKEYS was sent at handle_SSH2_ecdh_kex_reply().", LOG_LEVEL_VERBOSE);
+
+	// SSH2_MSG_NEWKEYSを送り終わったあとにキーの設定および再設定を行う
+	// 送信用の暗号鍵は SSH2_MSG_NEWKEYS の送信後に、受信用のは SSH2_MSG_NEWKEYS の
+	// 受信後に再設定を行う。
+	if (pvar->rekeying == 1) { // キーの再設定
+		// まず、送信用だけ設定する。
+		ssh2_set_newkeys(pvar, MODE_OUT);
+		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
+		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
+		enable_send_compression(pvar);
+		if (!CRYPT_start_encryption(pvar, 1, 0)) {
+			// TODO: error
+		}
+
+	} else {
+		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
+		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
+		ssh2_set_newkeys(pvar, MODE_IN);
+		ssh2_set_newkeys(pvar, MODE_OUT);
+
+		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
+		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
+		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
+
+		// パケット圧縮が有効なら初期化する。(2005.7.9 yutaka)
+		// SSH2_MSG_NEWKEYSの受信より前なのでここだけでよい。(2006.10.30 maya)
+		prep_compression(pvar);
+		enable_compression(pvar);
+	}
+
+	// TTSSHバージョン情報に表示するキービット数を求めておく
+	{
+		int bits;
+		BIGNUM *order = BN_new();
+		EC_GROUP_get_order(group, order, NULL);
+		bits = BN_num_bits(order);
+		pvar->client_key_bits = bits;
+		pvar->server_key_bits = bits;
+		BN_free(order);
+	}
+#if 0
+	{
+		BN_CTX *ctx;
+		BIGNUM *pub_key = NULL;
+		int bits;
+		ctx = BN_CTX_new();
+
+		pub_key = EC_POINT_point2bn(group, server_public, POINT_CONVERSION_UNCOMPRESSED, NULL, ctx);
+		bits = BN_num_bits(pub_key);
+		printf("%d\n", bits);
+
+		pub_key = EC_POINT_point2bn(group, EC_KEY_get0_public_key(pvar->ecdh_client_key), POINT_CONVERSION_UNCOMPRESSED, NULL, ctx);
+		bits = BN_num_bits(pub_key);
+		printf("%d\n", bits);
+
+		BN_CTX_free(ctx);
+	}
+#endif
+
+	SSH2_dispatch_init(3);
+	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
+	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
+
+	EC_POINT_clear_free(server_public);
+	key_free(hostkey);
+	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
+	free(ecdh_buf);
+	return TRUE;
+
+error:
+	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
+	key_free(hostkey);
+	EC_POINT_clear_free(server_public);
+	free(ecdh_buf);
+	BN_free(share_key);
+
+	notify_fatal_error(pvar, emsg);
+
+	return FALSE;
+}
+
+
 // KEXにおいてサーバから返ってくる 31 番メッセージに対するハンドラ
 static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 {
@@ -5368,6 +5708,11 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 		case KEX_DH_GEX_SHA1:
 		case KEX_DH_GEX_SHA256:
 			handle_SSH2_dh_gex_group(pvar);
+			break;
+		case KEX_ECDH_SHA2_256:
+		case KEX_ECDH_SHA2_384:
+		case KEX_ECDH_SHA2_521:
+			handle_SSH2_ecdh_kex_reply(pvar);
 			break;
 		default:
 			// TODO

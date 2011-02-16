@@ -57,7 +57,19 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
                                BIGNUM *server_dh_pub,
                                BIGNUM *shared_secret,
                                unsigned int *hashlen);
+unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
+                             const EC_GROUP *ec_group,
+                             char *client_version_string,
+                             char *server_version_string,
+                             char *ckexinit, int ckexinitlen,
+                             char *skexinit, int skexinitlen,
+                             u_char *serverhostkeyblob, int sbloblen,
+                             const EC_POINT *client_dh_pub,
+                             const EC_POINT *server_dh_pub,
+                             BIGNUM *shared_secret,
+                               unsigned int *hashlen);
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
+int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public);
 void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secret,
                      char *session_id, int session_id_len);
