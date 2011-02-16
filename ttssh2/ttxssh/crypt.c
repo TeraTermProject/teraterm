@@ -1737,11 +1737,11 @@ void CRYPT_get_server_key_info(PTInstVar pvar, char FAR * dest, int len)
 			            BN_num_bits(pvar->crypt_state.host_key.RSA_key->n));
 		}
 	} else { // SSH2
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO", pvar,
-			                  "%d-bit server key, %d-bit host key");
+			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO2", pvar,
+			                  "%d-bit client key, %d-bit server key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
-			            pvar->server_key_bits,
-			            pvar->client_key_bits);
+			            pvar->client_key_bits,
+			            pvar->server_key_bits);
 	}
 }
 

@@ -2260,7 +2260,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
-			UTIL_get_lang_msg("DLG_ABOUT_SERVERKEY", pvar, "Server keys:");
+			UTIL_get_lang_msg("DLG_ABOUT_KEXKEY", pvar, "Key exchange keys:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 
 			AUTH_get_auth_info(pvar, buf, sizeof(buf));
