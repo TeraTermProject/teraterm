@@ -5534,12 +5534,12 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	}
 	if (ECDH_compute_key(ecdh_buf, ecdh_len, server_public,
 	                     pvar->ecdh_client_key, NULL) != (int)ecdh_len) {
-		emsg = "Out of memory2 @ handle_SSH2_ecdh_kex_reply()";
+		emsg = "Out of memory3 @ handle_SSH2_ecdh_kex_reply()";
 		goto error;
 	}
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory3 @ handle_SSH2_ecdh_kex_reply()";
+		emsg = "Out of memory4 @ handle_SSH2_ecdh_kex_reply()";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
