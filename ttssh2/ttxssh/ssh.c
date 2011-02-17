@@ -5661,6 +5661,7 @@ cont:
 			break;
 		default:
 			// TODO
+			break;
 	}
 
 	SSH2_dispatch_init(3);
