@@ -5646,33 +5646,22 @@ cont:
 	}
 
 	// TTSSHバージョン情報に表示するキービット数を求めておく
-	{
-		int bits;
-		BIGNUM *order = BN_new();
-		EC_GROUP_get_order(group, order, NULL);
-		bits = BN_num_bits(order);
-		pvar->client_key_bits = bits;
-		pvar->server_key_bits = bits;
-		BN_free(order);
+	switch (pvar->kex_type) {
+		case KEX_ECDH_SHA2_256:
+			pvar->client_key_bits = 256;
+			pvar->server_key_bits = 256;
+			break;
+		case KEX_ECDH_SHA2_384:
+			pvar->client_key_bits = 384;
+			pvar->server_key_bits = 384;
+			break;
+		case KEX_ECDH_SHA2_521:
+			pvar->client_key_bits = 521;
+			pvar->server_key_bits = 521;
+			break;
+		default:
+			// TODO
 	}
-#if 0
-	{
-		BN_CTX *ctx;
-		BIGNUM *pub_key = NULL;
-		int bits;
-		ctx = BN_CTX_new();
-
-		pub_key = EC_POINT_point2bn(group, server_public, POINT_CONVERSION_UNCOMPRESSED, NULL, ctx);
-		bits = BN_num_bits(pub_key);
-		printf("%d\n", bits);
-
-		pub_key = EC_POINT_point2bn(group, EC_KEY_get0_public_key(pvar->ecdh_client_key), POINT_CONVERSION_UNCOMPRESSED, NULL, ctx);
-		bits = BN_num_bits(pub_key);
-		printf("%d\n", bits);
-
-		BN_CTX_free(ctx);
-	}
-#endif
 
 	SSH2_dispatch_init(3);
 	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
