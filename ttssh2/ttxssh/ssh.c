@@ -4592,7 +4592,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "MAC algorithm client to server: %s",
-	            ssh2_macs[pvar->ctos_hmac]);
+	            ssh2_macs[pvar->ctos_hmac].name);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	size = get_payload_uint32(pvar, offset);
@@ -4612,7 +4612,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "MAC algorithm server to client: %s",
-	            ssh2_macs[pvar->stoc_hmac]);
+	            ssh2_macs[pvar->stoc_hmac].name);
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// ˆ³kƒAƒ‹ƒSƒŠƒYƒ€‚ÌŒˆ’è
