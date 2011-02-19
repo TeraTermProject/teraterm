@@ -377,7 +377,7 @@ static int get_key_file_name(HWND parent, char FAR * buf, int bufsize, PTInstVar
 	// フィルタの追加 (2004.12.19 yutaka)
 	// 3ファイルフィルタの追加 (2005.4.26 yutaka)
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
-	                  "identity files\\0identity;id_rsa;id_dsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0all(*.*)\\0*.*\\0\\0");
+	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0all(*.*)\\0*.*\\0\\0");
 	memcpy(filter, pvar->ts->UIMsg, sizeof(filter));
 	params.lpstrFilter = filter;
 	params.lpstrCustomFilter = NULL;
@@ -388,7 +388,7 @@ static int get_key_file_name(HWND parent, char FAR * buf, int bufsize, PTInstVar
 	params.lpstrFileTitle = NULL;
 	params.lpstrInitialDir = NULL;
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_TITLE", pvar,
-	                  "Choose a file with the RSA/DSA private key");
+	                  "Choose a file with the RSA/DSA/ECDSA private key");
 	params.lpstrTitle = pvar->ts->UIMsg;
 	params.Flags =
 		OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
@@ -450,7 +450,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		GetDlgItemText(dlg, file_ctl_ID, buf, sizeof(buf));
 		if (buf[0] == 0) {
 			UTIL_get_lang_msg("MSG_KEYSPECIFY_ERROR", pvar,
-			                  "You must specify a file containing the RSA/DSA private key.");
+			                  "You must specify a file containing the RSA/DSA/ECDSA private key.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 			SetFocus(GetDlgItem(dlg, file_ctl_ID));
 			destroy_malloced_string(&password);

@@ -508,10 +508,10 @@ DLG_AUTHSETUP_LOCALUSER=Lokaler Benutzername:
 DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-Schlüssel:
 DLG_AUTHSETUP_CHECKAUTH=Prüfe die Authentifizierungsmethoden vor dem Logins (SSH2)
 
-FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA-Schlüssel auswählen
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;*.*;id_rsa;id_dsa\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0all(*.*)\0*.*\0\0
-MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA-Schlüssel auswählen.
-MSG_READKEY_ERROR=Lesefehler des DSA/RSA-Schlüssels\n%s
+FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA-Schlüssel auswählen
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;*.*;id_rsa;id_dsa;id_ecdsa\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0all(*.*)\0*.*\0\0
+MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA-Schlüssel auswählen.
+MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA-Schlüssels\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.
 MSG_NOAUTHMETHOD_ERROR=Der Server unterstützt keine der von TTSSH angebotenen\nAuthentifizierungs-Optionen. Die Verbindung wird beendet.
 

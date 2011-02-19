@@ -995,7 +995,9 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		return FALSE;
 	}
 
-	if (keypair->type == KEY_RSA) { // RSA
+	switch (keypair->type) {
+	case KEY_RSA: // RSA
+	{
 		const EVP_MD *evp_md = EVP_sha1();
 		EVP_MD_CTX md;
 		u_char digest[EVP_MAX_MD_SIZE], *sig;
@@ -1048,9 +1050,11 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 		memcpy(*sigptr, buffer_ptr(msg), len);
 		free(sig);
-
+		
+		break;
 	}
-	else if (keypair->type == KEY_DSA) { // DSA
+	case KEY_DSA: // DSA
+	{
 		DSA_SIG *sig;
 		const EVP_MD *evp_md = EVP_sha1();
 		EVP_MD_CTX md;
@@ -1095,10 +1099,72 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 		memcpy(*sigptr, buffer_ptr(msg), len);
 
+		break;
 	}
-	else {
+	case KEY_ECDSA256: // ECDSA
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+	{
+		ECDSA_SIG *sig;
+		const EVP_MD *evp_md;
+		EVP_MD_CTX md;
+		u_char digest[EVP_MAX_MD_SIZE];
+		u_int len, dlen, nid;
+		buffer_t *buf2 = NULL;
+
+		switch (keypair->type) {
+			case KEY_ECDSA256:
+				nid = NID_sha256;
+				break;
+			case KEY_ECDSA384:
+				nid = NID_sha384;
+				break;
+			case KEY_ECDSA521:
+				nid = NID_sha512;
+				break;
+		}
+		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
+			goto error;
+		}
+		EVP_DigestInit(&md, evp_md);
+		EVP_DigestUpdate(&md, data, datalen);
+		EVP_DigestFinal(&md, digest, &dlen);
+
+		sig = ECDSA_do_sign(digest, dlen, keypair->ecdsa);
+		memset(digest, 'd', sizeof(digest));
+
+		if (sig == NULL) {
+			goto error;
+		}
+
+		buf2 = buffer_init();
+		if (buf2 == NULL) {
+			// TODO: error check
+			goto error;
+		}
+		buffer_put_bignum2(buf2, sig->r);
+		buffer_put_bignum2(buf2, sig->s);
+		ECDSA_SIG_free(sig);
+
+		s = get_sshname_from_key(keypair);
+		buffer_put_string(msg, s, strlen(s));
+		buffer_put_string(msg, buffer_ptr(buf2), buffer_len(buf2));
+		buffer_free(buf2);
+		len = buffer_len(msg);
+
+		*siglen = len;
+		*sigptr = malloc(len);
+		if (*sigptr == NULL) {
+			goto error;
+		}
+		memcpy(*sigptr, buffer_ptr(msg), len);
+
+		break;
+	}
+	default:
 		buffer_free(msg);
 		return FALSE;
+		break;
 	}
 
 	buffer_free(msg);
@@ -1115,7 +1181,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 {
 	buffer_t *msg = NULL;
 	Key *keypair;
-	char *s;
+	char *s, *tmp;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -1125,25 +1191,33 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 
 	keypair = pvar->auth_state.cur_cred.key_pair;
 
-	if (keypair->type == KEY_RSA) { // RSA
+	switch (keypair->type) {
+	case KEY_RSA: // RSA
 		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_bignum2(msg, keypair->rsa->e); // ŒöŠJŽw”
 		buffer_put_bignum2(msg, keypair->rsa->n); // p~q
-
-	}
-	else if (keypair->type == KEY_RSA) { // DSA
+		break;
+	case KEY_DSA: // DSA
 		s = get_sshname_from_key(keypair);
 		buffer_put_string(msg, s, strlen(s));
 		buffer_put_bignum2(msg, keypair->dsa->p); // ‘f”
 		buffer_put_bignum2(msg, keypair->dsa->q); // (p-1)‚Ì‘fˆö”
 		buffer_put_bignum2(msg, keypair->dsa->g); // ®”
 		buffer_put_bignum2(msg, keypair->dsa->pub_key); // ŒöŠJŒ®
-
-	}
-	else {
+		break;
+	case KEY_ECDSA256: // ECDSA
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		s = get_sshname_from_key(keypair);
+		buffer_put_string(msg, s, strlen(s));
+		tmp = curve_keytype_to_name(keypair->type);
+		buffer_put_string(msg, tmp, strlen(tmp));
+		buffer_put_ecpoint(msg, EC_KEY_get0_group(keypair->ecdsa),
+		                        EC_KEY_get0_public_key(keypair->ecdsa));
+		break;
+	default:
 		return FALSE;
-
 	}
 
 	*blobptr = msg;

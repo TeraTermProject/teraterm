@@ -380,10 +380,12 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		goto error;
 	}
 
-	if (pk->type == EVP_PKEY_RSA) { // RSA key
+	switch (pk->type) {
+	case EVP_PKEY_RSA: // RSA key
 		result->type = KEY_RSA;
 		result->rsa = EVP_PKEY_get1_RSA(pk);
 		result->dsa = NULL;
+		result->ecdsa = NULL;
 
 		// RSA目くらましを有効にする（タイミング攻撃からの防御）
 		if (RSA_blinding_on(result->rsa, NULL) != 1) {
@@ -391,14 +393,41 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 			ERR_error_string_n(err, errmsg, errmsg_len);
 			goto error;
 		}
+		break;
 
-	} else if (pk->type == EVP_PKEY_DSA) { // DSA key
+	case EVP_PKEY_DSA: // DSA key
 		result->type = KEY_DSA;
 		result->rsa = NULL;
 		result->dsa = EVP_PKEY_get1_DSA(pk);
+		result->ecdsa = NULL;
+		break;
 
-	} else {
+	case EVP_PKEY_EC: // ECDSA key
+		result->rsa = NULL;
+		result->dsa = NULL;
+		result->ecdsa = EVP_PKEY_get1_EC_KEY(pk);
+		{
+			const EC_GROUP *g = EC_KEY_get0_group(result->ecdsa);
+			switch (EC_GROUP_get_curve_name(g)) {
+				case NID_X9_62_prime256v1:
+					result->type = KEY_ECDSA256;
+					break;
+				case NID_secp384r1:
+					result->type = KEY_ECDSA384;
+					break;
+				case NID_secp521r1:
+					result->type = KEY_ECDSA521;
+					break;
+				default:
+					goto error;
+					break;
+			}
+		}
+		break;
+
+	default:
 		goto error;
+		break;
 	}
 
 	if (pk != NULL)
