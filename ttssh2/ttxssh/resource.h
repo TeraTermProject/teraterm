@@ -94,11 +94,14 @@
 #define IDC_SAVE_PRIBATE_KEY            1066
 #define IDC_SAVE_PRIVATE_KEY            1066
 #define IDC_ZLIB_VERSION                1067
+#define IDC_ECDSA256_TYPE               1067
 #define IDC_HISTORY_LABEL               1068
+#define IDC_ECDSA384_TYPE               1068
 #define IDC_EDIT1                       1069
 #define IDC_FINGER_PRINT                1069
 #define IDC_SENDFILE_EDIT               1069
 #define IDC_PASSWD                      1069
+#define IDC_ECDSA521_TYPE               1069
 #define IDC_STATIC1                     1070
 #define IDC_COMPRESSLABEL               1070
 #define IDC_SSHVERSIONS                 1070

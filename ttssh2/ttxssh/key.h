@@ -41,6 +41,7 @@ const char *key_type(const Key *k);
 char *get_sshname_from_keytype(enum ssh_keytype type);
 char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
+char *curve_keytype_to_name(enum ssh_keytype type);
 
 void key_free(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);

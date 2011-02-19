@@ -2861,18 +2861,20 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 typedef struct {
 	RSA *rsa;
 	DSA *dsa;
+	EC_KEY *ecdsa;
 	enum ssh_keytype type;
 } ssh_private_key_t;
 
-static ssh_private_key_t private_key = {NULL, NULL, KEY_UNSPEC};
+static ssh_private_key_t private_key = {NULL, NULL, NULL, KEY_UNSPEC};
 
 typedef struct {
 	RSA *rsa;
 	DSA *dsa;
+	EC_KEY *ecdsa;
 	enum ssh_keytype type;
 } ssh_public_key_t;
 
-static ssh_public_key_t public_key = {NULL, NULL, KEY_UNSPEC};
+static ssh_public_key_t public_key = {NULL, NULL, NULL, KEY_UNSPEC};
 
 static void free_ssh_key(void)
 {
@@ -2887,6 +2889,11 @@ static void free_ssh_key(void)
 	RSA_free(public_key.rsa);
 	public_key.rsa = NULL;
 
+	EC_KEY_free(private_key.ecdsa);
+	private_key.ecdsa = NULL;
+	EC_KEY_free(public_key.ecdsa);
+	public_key.ecdsa = NULL;
+
 	private_key.type = KEY_UNSPEC;
 	public_key.type = KEY_UNSPEC;
 }
@@ -2896,7 +2903,10 @@ static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int
 	// if SSH key already is generated, should free the resource.
 	free_ssh_key();
 
-	if (type == KEY_RSA1 || type == KEY_RSA) {
+	switch (type) {
+	case KEY_RSA1:
+	case KEY_RSA:
+	{
 		RSA *priv = NULL;
 		RSA *pub = NULL;
 
@@ -2918,8 +2928,11 @@ static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int
 		BN_copy(pub->n, priv->n);
 		BN_copy(pub->e, priv->e);
 		public_key.rsa = pub;
-
-	} else if (type == KEY_DSA) {
+		break;
+	}
+	
+	case KEY_DSA:
+	{
 		DSA *priv = NULL;
 		DSA *pub = NULL;
 
@@ -2951,8 +2964,51 @@ static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int
 		BN_copy(pub->g, priv->g);
 		BN_copy(pub->pub_key, priv->pub_key);
 		public_key.dsa = pub;
+		break;
+	}
 
-	} else {
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+	{
+		EC_KEY *priv = NULL;
+		EC_KEY *pub = NULL;
+
+		switch (type) {
+			case KEY_ECDSA256:
+				priv = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+				pub = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+				break;
+			case KEY_ECDSA384:
+				priv = EC_KEY_new_by_curve_name(NID_secp384r1);
+				pub = EC_KEY_new_by_curve_name(NID_secp384r1);
+				break;
+			case KEY_ECDSA521:
+				priv = EC_KEY_new_by_curve_name(NID_secp521r1);
+				pub = EC_KEY_new_by_curve_name(NID_secp521r1);
+				break;
+		}
+		if (priv == NULL || pub == NULL) {
+			goto error;
+		}
+
+		// private key
+		if (EC_KEY_generate_key(priv) != 1) {
+			goto error;
+		}
+		EC_KEY_set_asn1_flag(priv, OPENSSL_EC_NAMED_CURVE);
+		private_key.ecdsa = priv;
+
+		// public key
+		if (EC_KEY_set_public_key(pub, EC_KEY_get0_public_key(priv)) != 1) {
+			goto error;
+		}
+		public_key.ecdsa = pub;
+
+		break;
+	}
+
+	default:
 		goto error;
 	}
 
@@ -3480,6 +3536,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_RSA1_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_RSA_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_DSA_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ECDSA256_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ECDSA384_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ECDSA521_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYBITS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYBITS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEY_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
@@ -3526,6 +3585,31 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			cbarg.type = key_type;
 			cbarg.dlg = dlg;
 
+			bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+
+			switch (key_type) {
+				case KEY_RSA1:
+				case KEY_RSA:
+				case KEY_DSA:
+					if (bits < ((key_type==KEY_DSA)?SSH_DSA_MINIMUM_KEY_SIZE:SSH_RSA_MINIMUM_KEY_SIZE)) {
+						UTIL_get_lang_msg("MSG_KEYBITS_MIN_ERROR", pvar,
+						                  "The key bits is too small.");
+						MessageBox(dlg, pvar->ts->UIMsg,
+						           "Tera Term", MB_OK | MB_ICONEXCLAMATION);
+						return TRUE;
+					}
+					break;
+				case KEY_ECDSA256:
+					SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
+					break;
+				case KEY_ECDSA384:
+					SetDlgItemInt(dlg, IDC_KEYBITS, 384, FALSE);
+					break;
+				case KEY_ECDSA521:
+					SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
+					break;
+			}
+
 			// passphrase edit box disabled(default)
 			EnableWindow(GetDlgItem(dlg, IDC_KEY_EDIT), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_CONFIRM_EDIT), FALSE);
@@ -3537,19 +3621,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			EnableWindow(GetDlgItem(dlg, IDC_RSA1_TYPE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_RSA_TYPE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_DSA_TYPE), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDOK), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDCANCEL), FALSE);
-
-			bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
-
-			if (bits < ((key_type==KEY_DSA)?SSH_DSA_MINIMUM_KEY_SIZE:SSH_RSA_MINIMUM_KEY_SIZE)) {
-				UTIL_get_lang_msg("MSG_KEYBITS_MIN_ERROR", pvar,
-				                  "The key bits is too small.");
-				MessageBox(dlg, pvar->ts->UIMsg,
-				           "Tera Term", MB_OK | MB_ICONEXCLAMATION);
-				return TRUE;
-			}
 
 			if (generate_ssh_key(key_type, bits, keygen_progress, &cbarg)) {
 				MSG msg;
@@ -3574,6 +3651,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_RSA1_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_RSA_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_DSA_TYPE), TRUE);
+				EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), TRUE);
+				EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), TRUE);
+				EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDOK), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDCANCEL), TRUE);
@@ -3606,6 +3686,21 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			key_type = KEY_DSA;
 			break;
 
+		case IDC_ECDSA256_TYPE | (BN_CLICKED << 16):
+			key_type = KEY_ECDSA256;
+			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
+			break;
+
+		case IDC_ECDSA384_TYPE | (BN_CLICKED << 16):
+			key_type = KEY_ECDSA384;
+			SetDlgItemInt(dlg, IDC_KEYBITS, 384, FALSE);
+			break;
+
+		case IDC_ECDSA521_TYPE | (BN_CLICKED << 16):
+			key_type = KEY_ECDSA521;
+			SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
+			break;
+
 		// saving public key file
 		case IDC_SAVE_PUBLIC_KEY:
 			{
@@ -3621,24 +3716,37 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof(ofn);
 			ofn.hwndOwner = dlg;
-			if (public_key.type == KEY_RSA1) {
+			switch (public_key.type) {
+			case KEY_RSA1:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER", pvar,
 				                  "SSH1 RSA key(identity.pub)\\0identity.pub\\0All Files(*.*)\\0*.*\\0\\0");
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "identity.pub", _TRUNCATE);
-			} else if (public_key.type == KEY_RSA) {
+				break;
+			case KEY_RSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_RSA_FILTER", pvar,
 				                  "SSH2 RSA key(id_rsa.pub)\\0id_rsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_rsa.pub", _TRUNCATE);
-			} else {
+				break;
+			case KEY_DSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_DSA_FILTER", pvar,
 				                  "SSH2 DSA key(id_dsa.pub)\\0id_dsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_dsa.pub", _TRUNCATE);
+				break;
+			case KEY_ECDSA256:
+			case KEY_ECDSA384:
+			case KEY_ECDSA521:
+				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER", pvar,
+				                  "SSH2 ECDSA key(id_ecdsa.pub)\\0id_ecdsa.pub\\0All Files(*.*)\\0*.*\\0\\0");
+				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				ofn.lpstrFilter = uimsg;
+				strncpy_s(filename, sizeof(filename), "id_ecdsa.pub", _TRUNCATE);
+				break;
 			}
 			ofn.lpstrFile = filename;
 			ofn.nMaxFile = sizeof(filename);
@@ -3679,11 +3787,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				fprintf(fp, " %s", buf);
 				OPENSSL_free(buf);
 
-			} else { // SSH2 RSA, DSA
+			} else { // SSH2 RSA, DSA, ECDSA
 				buffer_t *b;
-				char *keyname;
+				char *keyname, *s;
 				DSA *dsa = public_key.dsa;
 				RSA *rsa = public_key.rsa;
+				EC_KEY *ecdsa = public_key.ecdsa;
 				int len;
 				char *blob;
 				char *uuenc; // uuencode data
@@ -3693,19 +3802,33 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				if (b == NULL)
 					goto public_error;
 
-				if (public_key.type == KEY_DSA) { // DSA
+				switch (public_key.type) {
+				case KEY_DSA: // DSA
 					keyname = "ssh-dss";
 					buffer_put_string(b, keyname, strlen(keyname));
 					buffer_put_bignum2(b, dsa->p);
 					buffer_put_bignum2(b, dsa->q);
 					buffer_put_bignum2(b, dsa->g);
 					buffer_put_bignum2(b, dsa->pub_key);
+					break;
 
-				} else { // RSA
+				case KEY_RSA: // RSA
 					keyname = "ssh-rsa";
 					buffer_put_string(b, keyname, strlen(keyname));
 					buffer_put_bignum2(b, rsa->e);
 					buffer_put_bignum2(b, rsa->n);
+					break;
+
+				case KEY_ECDSA256: // ECDSA
+				case KEY_ECDSA384:
+				case KEY_ECDSA521:
+					keyname = get_sshname_from_keytype(public_key.type);
+					buffer_put_string(b, keyname, strlen(keyname));
+					s = curve_keytype_to_name(public_key.type);
+					buffer_put_string(b, s, strlen(s));
+					buffer_put_ecpoint(b, EC_KEY_get0_group(ecdsa),
+					                      EC_KEY_get0_public_key(ecdsa));
+					break;
 				}
 
 				blob = buffer_ptr(b);
@@ -3773,24 +3896,37 @@ public_error:
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof(ofn);
 			ofn.hwndOwner = dlg;
-			if (private_key.type == KEY_RSA1) {
+			switch (private_key.type) {
+			case KEY_RSA1:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER", pvar,
 				                  "SSH1 RSA key(identity)\\0identity\\0All Files(*.*)\\0*.*\\0\\0");
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "identity", _TRUNCATE);
-			} else if (private_key.type == KEY_RSA) {
+				break;
+			case KEY_RSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER", pvar,
 				                  "SSH2 RSA key(id_rsa)\\0id_rsa\\0All Files(*.*)\\0*.*\\0\\0");
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_rsa", _TRUNCATE);
-			} else {
+				break;
+			case KEY_DSA:
 				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER", pvar,
 				                  "SSH2 DSA key(id_dsa)\\0id_dsa\\0All Files(*.*)\\0*.*\\0\\0");
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_dsa", _TRUNCATE);
+				break;
+			case KEY_ECDSA256:
+			case KEY_ECDSA384:
+			case KEY_ECDSA521:
+				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER", pvar,
+				                  "SSH2 ECDSA key(id_ecdsa)\\0id_ecdsa\\0All Files(*.*)\\0*.*\\0\\0");
+				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				ofn.lpstrFilter = uimsg;
+				strncpy_s(filename, sizeof(filename), "id_ecdsa", _TRUNCATE);
+				break;
 			}
 			ofn.lpstrFile = filename;
 			ofn.nMaxFile = sizeof(filename);
@@ -3920,7 +4056,7 @@ error:;
 				buffer_free(b);
 				buffer_free(enc);
 
-			} else { // SSH2 RSA, DSA
+			} else { // SSH2 RSA, DSA, ECDSA
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
@@ -3942,11 +4078,19 @@ error:;
 					MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 					break;
 				}
-
-				if (key_type == KEY_RSA) { // RSA
+ 
+				switch (key_type) {
+				case KEY_RSA: // RSA
 					ret = PEM_write_RSAPrivateKey(fp, private_key.rsa, cipher, buf, len, NULL, NULL);
-				} else { // DSA
+					break;
+				case KEY_DSA: // DSA
 					ret = PEM_write_DSAPrivateKey(fp, private_key.dsa, cipher, buf, len, NULL, NULL);
+					break;
+				case KEY_ECDSA256: // ECDSA
+				case KEY_ECDSA384:
+				case KEY_ECDSA521:
+					ret = PEM_write_ECPrivateKey(fp, private_key.ecdsa, cipher, buf, len, NULL, NULL);
+					break;
 				}
 				if (ret == 0) {
 					UTIL_get_lang_msg("MSG_SAVE_KEY_WRITEFILE_ERROR", pvar,
