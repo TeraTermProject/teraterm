@@ -4428,7 +4428,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	int offset = 0;
 	char *msg = NULL;
 	char tmp[1024+512];
-	char str_keytype[10];
+	char str_keytype[20];
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEXINIT was received.", LOG_LEVEL_VERBOSE);
 
@@ -4512,7 +4512,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
-	pvar->hostkey_type = -1;
+	pvar->hostkey_type = KEY_UNSPEC;
 	choose_SSH2_proposal(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS], str_keytype, sizeof(str_keytype));
 	if (strlen(str_keytype) == 0) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown host KEY type: ", _TRUNCATE);

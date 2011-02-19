@@ -76,6 +76,7 @@ static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #include "buffer.h"
 #include "cipher.h"
+#include "key.h"
 
 #include "sftp.h"
 
@@ -2238,11 +2239,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 			append_about_text(dlg, "KEX:", ssh2_kex_algorithms[pvar->kex_type].name);
 
-			if (pvar->hostkey_type == KEY_DSA) {
-				strncpy_s(buf, sizeof(buf), "ssh-dss", _TRUNCATE);
-			} else {
-				strncpy_s(buf, sizeof(buf), "ssh-rsa", _TRUNCATE);
-			}
+			strncpy_s(buf, sizeof(buf), get_sshname_from_keytype(pvar->hostkey_type), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 

@@ -201,6 +201,9 @@ enum ssh_keytype {
 	KEY_RSA1,
 	KEY_RSA,
 	KEY_DSA,
+	KEY_ECDSA256,
+	KEY_ECDSA384,
+	KEY_ECDSA521,
 	KEY_UNSPEC,
 };
 
@@ -211,7 +214,10 @@ enum ssh_keytype {
                             "diffie-hellman-group-exchange-sha1," \
                             "diffie-hellman-group14-sha1," \
                             "diffie-hellman-group1-sha1"
-#define KEX_DEFAULT_PK_ALG  "ssh-rsa,ssh-dss"
+#define KEX_DEFAULT_PK_ALG  "ecdsa-sha2-nistp256," \
+                            "ecdsa-sha2-nistp384," \
+                            "ecdsa-sha2-nistp521," \
+                            "ssh-rsa,ssh-dss"
 // use the setting of pvar.CipherOrder.
 #define KEX_DEFAULT_ENCRYPT ""
 #define KEX_DEFAULT_MAC     "hmac-sha1,hmac-md5"
@@ -423,6 +429,8 @@ typedef struct Key {
 	RSA *rsa;
 	// SSH2 DSA
 	DSA *dsa;
+	// SSH2 ECDSA
+	EC_KEY *ecdsa;
 	// SSH1 RSA
 	int bits;
 	unsigned char *exp;

@@ -642,6 +642,7 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 			pvar->hosts_state.hostkey.type = key->type;
 			pvar->hosts_state.hostkey.dsa = key->dsa;
 			pvar->hosts_state.hostkey.rsa = key->rsa;
+			pvar->hosts_state.hostkey.ecdsa = key->ecdsa;
 
 			index += eat_base64(data + index);
 			index += eat_spaces(data + index);
@@ -791,8 +792,11 @@ static BOOL match_key(PTInstVar pvar, Key *key)
 	int bits;
 	unsigned char FAR * exp;
 	unsigned char FAR * mod;
+	const EC_GROUP *group;
+	const EC_POINT *pa, *pb;
 
-	if (key->type == KEY_RSA1) {  // SSH1 host public key
+	switch (key->type) {
+	case KEY_RSA1: // SSH1 host public key
 		bits = key->bits;
 		exp = key->exp;
 		mod = key->mod;
@@ -805,22 +809,30 @@ static BOOL match_key(PTInstVar pvar, Key *key)
 			&& equal_mp_ints(mod, pvar->hosts_state.key_mod);
 			*/
 
-	} else if (key->type == KEY_RSA) {  // SSH2 RSA host public key
-
+	case KEY_RSA: // SSH2 RSA host public key
 		return key->rsa != NULL && pvar->hosts_state.hostkey.rsa != NULL &&
 		       BN_cmp(key->rsa->e, pvar->hosts_state.hostkey.rsa->e) == 0 && 
 		       BN_cmp(key->rsa->n, pvar->hosts_state.hostkey.rsa->n) == 0;
 
-	} else if (key->type == KEY_DSA) {  // SSH2 DSA host public key
-
+	case KEY_DSA: // SSH2 DSA host public key
 		return key->dsa != NULL && pvar->hosts_state.hostkey.dsa && 
 		       BN_cmp(key->dsa->p, pvar->hosts_state.hostkey.dsa->p) == 0 && 
 		       BN_cmp(key->dsa->q, pvar->hosts_state.hostkey.dsa->q) == 0 &&
 		       BN_cmp(key->dsa->g, pvar->hosts_state.hostkey.dsa->g) == 0 &&
 		       BN_cmp(key->dsa->pub_key, pvar->hosts_state.hostkey.dsa->pub_key) == 0;
 
-	}
-	else {
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		if (key->ecdsa == NULL || pvar->hosts_state.hostkey.ecdsa == NULL) {
+			return FALSE;
+		}
+		group = EC_KEY_get0_group(key->ecdsa);
+		pa = EC_KEY_get0_public_key(key->ecdsa),
+		pb = EC_KEY_get0_public_key(pvar->hosts_state.hostkey.ecdsa);
+		return EC_POINT_cmp(group, pa, pb, NULL) == 0;
+
+	default:
 		return FALSE;
 	}
 
@@ -894,7 +906,9 @@ static char FAR *format_host_key(PTInstVar pvar)
 	int index;
 	enum ssh_keytype type = pvar->hosts_state.hostkey.type;
 
-	if (type == KEY_RSA1) {
+	switch (type) {
+	case KEY_RSA1:
+	{
 		int result_len = host_len + 50 + 8 +
 		                 get_ushort16_MSBfirst(pvar->hosts_state.hostkey.exp) / 3 +
 		                 get_ushort16_MSBfirst(pvar->hosts_state.hostkey.mod) / 3;
@@ -920,7 +934,15 @@ static char FAR *format_host_key(PTInstVar pvar)
 		index += print_mp_int(result + index, pvar->hosts_state.hostkey.mod);
 		strncpy_s(result + index, result_len - index, " \r\n", _TRUNCATE);
 
-	} else if (type == KEY_RSA || type == KEY_DSA) {
+		break;
+	}
+
+	case KEY_RSA:
+	case KEY_DSA:
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+	{
 		Key *key = &pvar->hosts_state.hostkey;
 		char *blob = NULL;
 		int blen, uulen, msize;
@@ -961,7 +983,10 @@ error:
 		if (uu != NULL)
 			free(uu);
 
-	} else {
+		break;
+	}
+
+	default:
 		return NULL;
 
 	}
@@ -1082,17 +1107,27 @@ static void delete_different_key(PTInstVar pvar)
 		}
 
 		// 接続中のサーバのキーを読み込む
-		if (pvar->hosts_state.hostkey.type == KEY_RSA1) { // SSH1
+		switch (pvar->hosts_state.hostkey.type) {
+		case KEY_RSA1: // SSH1
 			key.type = KEY_RSA1;
 			key.bits = pvar->hosts_state.hostkey.bits;
 			key.exp = copy_mp_int(pvar->hosts_state.hostkey.exp);
 			key.mod = copy_mp_int(pvar->hosts_state.hostkey.mod);
-		} else if (pvar->hosts_state.hostkey.type == KEY_RSA) { // SSH2 RSA
+			break;
+		case KEY_RSA: // SSH2 RSA
 			key.type = KEY_RSA;
 			key.rsa = duplicate_RSA(pvar->hosts_state.hostkey.rsa);
-		} else { // SSH2 DSA
+			break;
+		case KEY_DSA: // SSH2 DSA
 			key.type = KEY_DSA;
 			key.dsa = duplicate_DSA(pvar->hosts_state.hostkey.dsa);
+			break;
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			key.type = pvar->hosts_state.hostkey.type;
+			key.ecdsa = EC_KEY_dup(pvar->hosts_state.hostkey.ecdsa);
+			break;
 		}
 
 		// ファイルから読み込む
@@ -1532,17 +1567,23 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 
 	// known_hosts に存在しないキーはあとでファイルへ書き込むために、ここで保存しておく。
 	pvar->hosts_state.hostkey.type = key->type;
-	if (key->type == KEY_RSA1) { // SSH1
+	switch (key->type) {
+	case KEY_RSA1: // SSH1
 		pvar->hosts_state.hostkey.bits = key->bits;
 		pvar->hosts_state.hostkey.exp = copy_mp_int(key->exp);
 		pvar->hosts_state.hostkey.mod = copy_mp_int(key->mod);
-
-	} else if (key->type == KEY_RSA) { // SSH2 RSA
+		break;
+	case KEY_RSA: // SSH2 RSA
 		pvar->hosts_state.hostkey.rsa = duplicate_RSA(key->rsa);
-
-	} else { // SSH2 DSA
+		break;
+	case KEY_DSA: // SSH2 DSA
 		pvar->hosts_state.hostkey.dsa = duplicate_DSA(key->dsa);
-
+		break;
+	case KEY_ECDSA256: // SSH2 ECDSA
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		pvar->hosts_state.hostkey.ecdsa = EC_KEY_dup(key->ecdsa);
+		break;
 	}
 	free(pvar->hosts_state.prefetched_hostname);
 	pvar->hosts_state.prefetched_hostname = _strdup(hostname);

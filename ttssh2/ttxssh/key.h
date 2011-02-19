@@ -38,6 +38,7 @@ char* key_fingerprint_raw(Key *k, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
 
 const char *key_type(const Key *k);
+char *get_sshname_from_keytype(enum ssh_keytype type);
 char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
 

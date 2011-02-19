@@ -26,11 +26,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "ttxssh.h"
 #include "key.h"
+#include "kex.h"
 
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
+#include <openssl/ecdsa.h>
 
 #define INTBLOB_LEN 20
 #define SIGBLOB_LEN (2*INTBLOB_LEN)
@@ -287,21 +288,98 @@ int ssh_rsa_verify(RSA *key,
 	return ret;
 }
 
+int ssh_ecdsa_verify(EC_KEY *key, enum ssh_keytype keytype,
+                     u_char *signature, u_int signaturelen,
+                     u_char *data, u_int datalen)
+{
+	ECDSA_SIG *sig;
+	const EVP_MD *evp_md;
+	EVP_MD_CTX md;
+	unsigned char digest[EVP_MAX_MD_SIZE], *sigblob;
+	unsigned int len, dlen;
+	int ret, nid = NID_undef;
+	char *ptr;
+
+	OpenSSL_add_all_digests();
+
+	if (key == NULL) {
+		return -2;
+	}
+
+	ptr = signature;
+
+	len = get_uint32_MSBfirst(ptr);
+	ptr += 4;
+	if (strncmp(get_sshname_from_keytype(keytype), ptr, len) != 0) {
+		return -3;
+	}
+	ptr += len;
+
+	len = get_uint32_MSBfirst(ptr);
+	ptr += 4;
+	sigblob = ptr;
+	ptr += len;
+
+	/* parse signature */
+	if ((sig = ECDSA_SIG_new()) == NULL)
+		return -4;
+	if ((sig->r = BN_new()) == NULL)
+		return -5;
+	if ((sig->s = BN_new()) == NULL)
+		return -6;
+
+	buffer_get_bignum2(&sigblob, sig->r);
+	buffer_get_bignum2(&sigblob, sig->s);
+	if (sigblob != ptr) {
+		return -7;
+	}
+
+	/* hash the data */
+	switch (keytype) {
+		case KEY_ECDSA256:
+			nid = NID_sha256;
+			break;
+		case KEY_ECDSA384:
+			nid = NID_sha384;
+			break;
+		case KEY_ECDSA521:
+			nid = NID_sha512;
+			break;
+	}
+	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
+		return -8;
+	}
+	EVP_DigestInit(&md, evp_md);
+	EVP_DigestUpdate(&md, data, datalen);
+	EVP_DigestFinal(&md, digest, &dlen);
+
+	ret = ECDSA_do_verify(digest, dlen, sig, key);
+	memset(digest, 'd', sizeof(digest));
+
+	ECDSA_SIG_free(sig);
+
+	return ret;
+}
+
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen)
 {
 	int ret = 0;
 
-	if (key->type == KEY_RSA) {
+	switch (key->type) {
+	case KEY_RSA:
 		ret = ssh_rsa_verify(key->rsa, signature, signaturelen, data, datalen);
-
-	}
-	else if (key->type == KEY_DSA) {
+		break;
+	case KEY_DSA:
 		ret = ssh_dss_verify(key->dsa, signature, signaturelen, data, datalen);
-
-	}
-	else {
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		ret = ssh_ecdsa_verify(key->ecdsa, key->type, signature, signaturelen, data, datalen);
+		break;
+	default:
 		return -1;
 	}
 
@@ -399,6 +477,9 @@ char* key_fingerprint_raw(Key *k, int *dgst_raw_length)
 
 	case KEY_DSA:
 	case KEY_RSA:
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
 		key_to_blob(k, &blob, &len);
 		break;
 
@@ -438,6 +519,10 @@ key_type(const Key *k)
 		return "RSA";
 	case KEY_DSA:
 		return "DSA";
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		return "ECDSA";
 	}
 	return "unknown";
 }
@@ -453,6 +538,12 @@ key_size(const Key *k)
 		return BN_num_bits(k->rsa->n);
 	case KEY_DSA:
 		return BN_num_bits(k->dsa->p);
+	case KEY_ECDSA256:
+		return 256;
+	case KEY_ECDSA384:
+		return 384;
+	case KEY_ECDSA521:
+		return 521;
 	}
 	return 0;
 }
@@ -587,6 +678,10 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep)
 //
 void key_free(Key *key)
 {
+	if (key == NULL) {
+		return;
+	}
+
 	switch (key->type) {
 		case KEY_RSA1:
 		case KEY_RSA:
@@ -600,6 +695,14 @@ void key_free(Key *key)
 				DSA_free(key->dsa);
 			key->dsa = NULL;
 			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			if (key->ecdsa != NULL)
+				EC_KEY_free(key->ecdsa);
+			key->ecdsa = NULL;
+			break;
 	}
 	free(key);
 }
@@ -607,17 +710,26 @@ void key_free(Key *key)
 //
 // キーから文字列を返却する
 //
-char *get_sshname_from_key(Key *key)
+char *get_sshname_from_keytype(enum ssh_keytype type)
 {
-	if (key->type == KEY_RSA) {
+	if (type == KEY_RSA) {
 		return "ssh-rsa";
-	} else if (key->type == KEY_DSA) {
+	} else if (type == KEY_DSA) {
 		return "ssh-dss";
+	} else if (type == KEY_ECDSA256) {
+		return "ecdsa-sha2-nistp256";
+	} else if (type == KEY_ECDSA384) {
+		return "ecdsa-sha2-nistp384";
+	} else if (type == KEY_ECDSA521) {
+		return "ecdsa-sha2-nistp521";
 	} else {
 		return "ssh-unknown";
 	}
 }
-
+char *get_sshname_from_key(Key *key)
+{
+	return get_sshname_from_keytype(key->type);
+}
 
 //
 // キー文字列から種別を判定する
@@ -634,10 +746,44 @@ enum ssh_keytype get_keytype_from_name(char *name)
 		return KEY_RSA;
 	} else if (strcmp(name, "ssh-dss") == 0) {
 		return KEY_DSA;
+	} else if (strcmp(name, "ecdsa-sha2-nistp256") == 0) {
+		return KEY_ECDSA256;
+	} else if (strcmp(name, "ecdsa-sha2-nistp384") == 0) {
+		return KEY_ECDSA384;
+	} else if (strcmp(name, "ecdsa-sha2-nistp521") == 0) {
+		return KEY_ECDSA521;
 	}
 	return KEY_UNSPEC;
 }
 
+
+enum ssh_keytype key_curve_name_to_keytype(char *name)
+{
+	if (strcmp(name, "nistp256") == 0) {
+		return KEY_ECDSA256;
+	} else if (strcmp(name, "nistp384") == 0) {
+		return KEY_ECDSA384;
+	} else if (strcmp(name, "nistp521") == 0) {
+		return KEY_ECDSA521;
+	}
+	return KEY_UNSPEC;
+}
+
+char *curve_keytype_to_name(enum ssh_keytype type)
+{
+	switch (type) {
+		case KEY_ECDSA256:
+			return "nistp256";
+			break;
+		case KEY_ECDSA384:
+			return "nistp384";
+			break;
+		case KEY_ECDSA521:
+			return "nistp521";
+			break;
+	}
+	return NULL;
+}
 
 //
 // キー情報からバッファへ変換する (for SSH2)
@@ -646,29 +792,39 @@ enum ssh_keytype get_keytype_from_name(char *name)
 int key_to_blob(Key *key, char **blobp, int *lenp)
 {
 	buffer_t *b;
-	char *sshname;
+	char *sshname, *tmp;
 	int len;
 	int ret = 1;  // success
 
 	b = buffer_init();
 	sshname = get_sshname_from_key(key);
 
-	if (key->type == KEY_RSA) {
+	switch (key->type) {
+	case KEY_RSA:
 		buffer_put_string(b, sshname, strlen(sshname));
 		buffer_put_bignum2(b, key->rsa->e);
 		buffer_put_bignum2(b, key->rsa->n);
-
-	} else if (key->type == KEY_DSA) {
+		break;
+	case KEY_DSA:
 		buffer_put_string(b, sshname, strlen(sshname));
 		buffer_put_bignum2(b, key->dsa->p);
 		buffer_put_bignum2(b, key->dsa->q);
 		buffer_put_bignum2(b, key->dsa->g);
 		buffer_put_bignum2(b, key->dsa->pub_key);
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		buffer_put_string(b, sshname, strlen(sshname));
+		tmp = curve_keytype_to_name(key->type);
+		buffer_put_string(b, tmp, strlen(tmp));
+		buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
+		                      EC_KEY_get0_public_key(key->ecdsa));
+		break;
 
-	} else {
+	default:
 		ret = 0;
 		goto error;
-
 	}
 
 	len = buffer_len(b);
@@ -700,6 +856,9 @@ Key *key_from_blob(char *data, int blen)
 	char key[128];
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
+	EC_KEY *ecdsa = NULL;
+	EC_POINT *q = NULL;
+	char *curve = NULL;
 	Key *hostkey;  // hostkey
 	enum ssh_keytype type;
 
@@ -720,7 +879,8 @@ Key *key_from_blob(char *data, int blen)
 
 	type = get_keytype_from_name(key);
 
-	if (type == KEY_RSA) { // RSA key
+	switch (type) {
+	case KEY_RSA: // RSA key
 		rsa = RSA_new();
 		if (rsa == NULL) {
 			goto error;
@@ -736,9 +896,9 @@ Key *key_from_blob(char *data, int blen)
 
 		hostkey->type = type;
 		hostkey->rsa = rsa;
+		break;
 
-	}
-	else if (type == KEY_DSA) { // DSA key
+	case KEY_DSA: // DSA key
 		dsa = DSA_new();
 		if (dsa == NULL) {
 			goto error;
@@ -761,11 +921,53 @@ Key *key_from_blob(char *data, int blen)
 
 		hostkey->type = type;
 		hostkey->dsa = dsa;
+		break;
 
-	} else {
-		// unknown key
+	case KEY_ECDSA256: // ECDSA
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		curve = buffer_get_string(&data, NULL);
+		if (type != key_curve_name_to_keytype(curve)) {
+			goto error;
+		}
+
+		switch (type) {
+			case KEY_ECDSA256:
+				ecdsa = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+				break;
+			case KEY_ECDSA384:
+				ecdsa = EC_KEY_new_by_curve_name(NID_secp384r1);
+				break;
+			case KEY_ECDSA521:
+				ecdsa = EC_KEY_new_by_curve_name(NID_secp521r1);
+				break;
+			default:
+				goto error;
+		}
+		if (ecdsa == NULL) {
+			goto error;
+		}
+
+		q = EC_POINT_new(EC_KEY_get0_group(ecdsa));
+		if (q == NULL) {
+			goto error;
+		}
+
+		buffer_get_ecpoint(&data, EC_KEY_get0_group(ecdsa), q);
+		if (key_ec_validate_public(EC_KEY_get0_group(ecdsa), q) == -1) {
+			goto error;
+		}
+
+		if (EC_KEY_set_public_key(ecdsa, q) != 1) {
+			goto error;
+		}
+
+		hostkey->type = type;
+		hostkey->ecdsa = ecdsa;
+		break;
+
+	default: // unknown key
 		goto error;
-
 	}
 
 	return (hostkey);
@@ -775,6 +977,8 @@ error:
 		RSA_free(rsa);
 	if (dsa != NULL)
 		DSA_free(dsa);
+	if (ecdsa != NULL)
+		EC_KEY_free(ecdsa);
 
 	return NULL;
 }
