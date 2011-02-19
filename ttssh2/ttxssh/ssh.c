@@ -5191,16 +5191,16 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 
 	BN_free(dh_server_pub);
-	key_free(hostkey);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
-	free(dh_buf);
+	key_free(hostkey);
+	if (dh_buf != NULL) free(dh_buf);
 	return TRUE;
 
 error:
 	BN_free(dh_server_pub);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	key_free(hostkey);
-	free(dh_buf);
+	if (dh_buf != NULL) free(dh_buf);
 	BN_free(share_key);
 
 	notify_fatal_error(pvar, emsg);
@@ -5424,16 +5424,16 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 
 	BN_free(dh_server_pub);
-	key_free(hostkey);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
-	free(dh_buf);
+	key_free(hostkey);
+	if (dh_buf != NULL) free(dh_buf);
 	return TRUE;
 
 error:
 	BN_free(dh_server_pub);
-	key_free(hostkey);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
-	free(dh_buf);
+	key_free(hostkey);
+	if (dh_buf != NULL) free(dh_buf);
 	BN_free(share_key);
 
 	notify_fatal_error(pvar, emsg);
@@ -5668,17 +5668,17 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 
+	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
 	EC_POINT_clear_free(server_public);
 	key_free(hostkey);
-	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
-	free(ecdh_buf);
+	if (ecdh_buf != NULL) free(ecdh_buf);
 	return TRUE;
 
 error:
+	EC_POINT_clear_free(server_public);
 	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
 	key_free(hostkey);
-	EC_POINT_clear_free(server_public);
-	free(ecdh_buf);
+	if (ecdh_buf != NULL) free(ecdh_buf);
 	BN_free(share_key);
 
 	notify_fatal_error(pvar, emsg);
