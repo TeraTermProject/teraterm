@@ -82,6 +82,10 @@ static void init_hostkey(Key *key)
 		RSA_free(key->rsa);
 		key->rsa = NULL;
 	}
+	if (key->ecdsa != NULL) {
+		EC_KEY_free(key->ecdsa);
+		key->ecdsa = NULL;
+	}
 }
 
 
