@@ -335,17 +335,7 @@ int ssh_ecdsa_verify(EC_KEY *key, enum ssh_keytype keytype,
 	}
 
 	/* hash the data */
-	switch (keytype) {
-		case KEY_ECDSA256:
-			nid = NID_sha256;
-			break;
-		case KEY_ECDSA384:
-			nid = NID_sha384;
-			break;
-		case KEY_ECDSA521:
-			nid = NID_sha512;
-			break;
-	}
+	nid = keytype_to_hash_nid(keytype);
 	if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
 		return -8;
 	}
@@ -931,19 +921,7 @@ Key *key_from_blob(char *data, int blen)
 			goto error;
 		}
 
-		switch (type) {
-			case KEY_ECDSA256:
-				ecdsa = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
-				break;
-			case KEY_ECDSA384:
-				ecdsa = EC_KEY_new_by_curve_name(NID_secp384r1);
-				break;
-			case KEY_ECDSA521:
-				ecdsa = EC_KEY_new_by_curve_name(NID_secp521r1);
-				break;
-			default:
-				goto error;
-		}
+		ecdsa = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		if (ecdsa == NULL) {
 			goto error;
 		}
@@ -1112,17 +1090,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		u_int len, dlen, nid;
 		buffer_t *buf2 = NULL;
 
-		switch (keypair->type) {
-			case KEY_ECDSA256:
-				nid = NID_sha256;
-				break;
-			case KEY_ECDSA384:
-				nid = NID_sha384;
-				break;
-			case KEY_ECDSA521:
-				nid = NID_sha512;
-				break;
-		}
+		nid = keytype_to_hash_nid(keypair->type);
 		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
 			goto error;
 		}
@@ -1224,4 +1192,56 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	*bloblen = buffer_len(msg);
 
 	return TRUE;
+}
+
+int kextype_to_cipher_nid(enum kex_algorithm type)
+{
+	switch (type) {
+		case KEX_ECDH_SHA2_256:
+			return NID_X9_62_prime256v1;
+		case KEX_ECDH_SHA2_384:
+			return NID_secp384r1;
+		case KEX_ECDH_SHA2_521:
+			return NID_secp521r1;
+	}
+	return NID_undef;
+}
+
+int keytype_to_hash_nid(enum ssh_keytype type)
+{
+	switch (type) {
+		case KEY_ECDSA256:
+			return NID_sha256;
+		case KEY_ECDSA384:
+			return NID_sha384;
+		case KEY_ECDSA521:
+			return NID_sha512;
+	}
+	return NID_undef;
+}
+
+int keytype_to_cipher_nid(enum ssh_keytype type)
+{
+	switch (type) {
+		case KEY_ECDSA256:
+			return NID_X9_62_prime256v1;
+		case KEY_ECDSA384:
+			return NID_secp384r1;
+		case KEY_ECDSA521:
+			return NID_secp521r1;
+	}
+	return NID_undef;
+}
+
+enum ssh_keytype nid_to_keytype(int nid)
+{
+	switch (nid) {
+		case NID_X9_62_prime256v1:
+			return KEY_ECDSA256;
+		case NID_secp384r1:
+			return KEY_ECDSA384;
+		case NID_secp521r1:
+			return KEY_ECDSA521;
+	}
+	return KEY_UNSPEC;
 }

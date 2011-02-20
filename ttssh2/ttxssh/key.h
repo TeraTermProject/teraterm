@@ -48,3 +48,8 @@ int key_to_blob(Key *key, char **blobp, int *lenp);
 Key *key_from_blob(char *data, int blen);
 BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);
 BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen);
+
+int kextype_to_cipher_nid(enum kex_algorithm type);
+int keytype_to_hash_nid(enum ssh_keytype type);
+int keytype_to_cipher_nid(enum ssh_keytype type);
+enum ssh_keytype nid_to_keytype(int nid);

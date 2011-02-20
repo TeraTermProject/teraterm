@@ -408,19 +408,9 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		result->ecdsa = EVP_PKEY_get1_EC_KEY(pk);
 		{
 			const EC_GROUP *g = EC_KEY_get0_group(result->ecdsa);
-			switch (EC_GROUP_get_curve_name(g)) {
-				case NID_X9_62_prime256v1:
-					result->type = KEY_ECDSA256;
-					break;
-				case NID_secp384r1:
-					result->type = KEY_ECDSA384;
-					break;
-				case NID_secp521r1:
-					result->type = KEY_ECDSA521;
-					break;
-				default:
-					goto error;
-					break;
+			result->type = nid_to_keytype(EC_GROUP_get_curve_name(g));
+			if (result->type == KEY_UNSPEC) {
+				goto error;
 			}
 		}
 		break;

@@ -2974,20 +2974,8 @@ static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int
 		EC_KEY *priv = NULL;
 		EC_KEY *pub = NULL;
 
-		switch (type) {
-			case KEY_ECDSA256:
-				priv = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
-				pub = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
-				break;
-			case KEY_ECDSA384:
-				priv = EC_KEY_new_by_curve_name(NID_secp384r1);
-				pub = EC_KEY_new_by_curve_name(NID_secp384r1);
-				break;
-			case KEY_ECDSA521:
-				priv = EC_KEY_new_by_curve_name(NID_secp521r1);
-				pub = EC_KEY_new_by_curve_name(NID_secp521r1);
-				break;
-		}
+		priv = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
+		pub = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		if (priv == NULL || pub == NULL) {
 			goto error;
 		}

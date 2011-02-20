@@ -4910,19 +4910,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	if (client_key == NULL) {
 		goto error;
 	}
-	switch (pvar->kex_type) {
-		case KEX_ECDH_SHA2_256:
-			client_key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
-			break;
-		case KEX_ECDH_SHA2_384:
-			client_key = EC_KEY_new_by_curve_name(NID_secp384r1);
-			break;
-		case KEX_ECDH_SHA2_521:
-			client_key = EC_KEY_new_by_curve_name(NID_secp521r1);
-			break;
-		default:
-			goto error;
-	}
+	client_key = EC_KEY_new_by_curve_name(kextype_to_cipher_nid(pvar->kex_type));
 	if (client_key == NULL) {
 		goto error;
 	}
