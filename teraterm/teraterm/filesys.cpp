@@ -479,7 +479,8 @@ BOOL LogStart()
 
 	if (ts.Append > 0)
 	{
-		LogVar->FileHandle = _lopen(LogVar->FullName,OF_WRITE);
+		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, FILE_SHARE_READ, NULL,
+		                                     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (LogVar->FileHandle>0){
 			_llseek(LogVar->FileHandle,0,2);
 			/* 2007.05.24 Gentaro
@@ -488,11 +489,11 @@ BOOL LogStart()
 			*/
 			eLineEnd = Line_FileHead;
 		}
-		else
-			LogVar->FileHandle = _lcreat(LogVar->FullName,0);
 	}
-	else
-		LogVar->FileHandle = _lcreat(LogVar->FullName,0);
+	else {
+		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, FILE_SHARE_READ, NULL,
+		                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	}
 	LogVar->FileOpen = (LogVar->FileHandle>0);
 	if (! LogVar->FileOpen)
 	{

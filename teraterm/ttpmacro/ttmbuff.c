@@ -110,7 +110,7 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 		return FALSE;
 	}
 
-	F = _lopen(FileName,0);
+	F = _lopen(FileName,OF_READ);
 	if (F<=0) {
 		return FALSE;
 	}
