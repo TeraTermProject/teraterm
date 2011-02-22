@@ -174,12 +174,12 @@ BEGIN
     LTEXT           "There is no entry for the server ""#####################################"" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.",IDC_HOSTWARNING,15,7,184,41
     LTEXT           "If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,26
     LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,75,176,8
-    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,51,222,50,14,WS_GROUP
-    PUSHBUTTON      "&Disconnect",IDCANCEL,117,222,50,14,WS_GROUP
     EDITTEXT        IDC_FINGER_PRINT,15,86,179,12,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_FP_RANDOMART,14,105,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
     CONTROL         "&Add this machine and its key to the known hosts list",IDC_ADDTOKNOWNHOSTS,
                     "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,207,181,13
+    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,50,222,50,14,WS_GROUP
+    PUSHBUTTON      "&Disconnect",IDCANCEL,115,222,50,14,WS_GROUP
 END
 
 IDD_SSHDIFFERENTHOST DIALOGEX 0, 0, 215, 242
@@ -190,12 +190,12 @@ BEGIN
     LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,184,43
     LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,24
     LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,75,176,8
-    DEFPUSHBUTTON   "&Disconnect",IDCANCEL,115,222,50,14,WS_GROUP
     EDITTEXT        IDC_FINGER_PRINT,15,86,179,12,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_FP_RANDOMART,14,105,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
     CONTROL         "&Replace the exist key with this new key",IDC_ADDTOKNOWNHOSTS,
                     "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,34,207,153,13
-    PUSHBUTTON      "&Continue",IDC_CONTINUE,49,222,50,14,WS_GROUP
+    PUSHBUTTON      "&Continue",IDC_CONTINUE,50,222,50,14,WS_GROUP
+    DEFPUSHBUTTON   "&Disconnect",IDCANCEL,115,222,50,14,WS_GROUP
 END
 
 IDD_SSHAUTHSETUP DIALOGEX 0, 0, 309, 228
@@ -414,7 +414,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 208
         TOPMARGIN, 7
-        BOTTOMMARGIN, 135
+        BOTTOMMARGIN, 236
     END
 
     IDD_SSHAUTHSETUP, DIALOG
