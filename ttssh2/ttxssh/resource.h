@@ -22,6 +22,7 @@
 #define IDD_SSHFWDSETUP                 603
 #define IDD_SSHFWDEDIT                  604
 #define IDD_SSHTISAUTH                  605
+#define IDD_SSHDIFFERENTTYPEKEY         606
 #define IDC_HOSTCOMLABEL                608
 #define IDC_HOSTCOM                     609
 #define IDC_HOSTHELP                    699

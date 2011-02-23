@@ -791,13 +791,20 @@ static BOOL equal_mp_ints(unsigned char FAR * num1,
 }
 
 // 公開鍵が等しいかを検証する
-static BOOL match_key(PTInstVar pvar, Key *key)
+//   -1 ... 鍵の型が違う
+//    0 ... 等しくない
+//    1 ... 等しい
+static int match_key(PTInstVar pvar, Key *key)
 {
 	int bits;
 	unsigned char FAR * exp;
 	unsigned char FAR * mod;
 	const EC_GROUP *group;
 	const EC_POINT *pa, *pb;
+
+	if (pvar->hosts_state.hostkey.type != key->type) {
+		return -1;
+	}
 
 	switch (key->type) {
 	case KEY_RSA1: // SSH1 host public key
@@ -1219,29 +1226,17 @@ static void delete_different_key(PTInstVar pvar)
 					host_index += eat_to_end_of_pattern(data + host_index);
 				} while (data[host_index] == ',');
 
-				// ホストが等しくて合致するキーが見つかる
-				if (match_key(pvar, &key)) {
-					do_write = 1;
-				}
 				// ホストが等しくない
-				else if (!matched) {
+				if (!matched) {
 					do_write = 1;
 				}
-				// ホストが等しい and 接続のバージョンが違う
+				// ホストが等しい
 				else {
-					int rsa1_key_bits=0;
-					rsa1_key_bits = atoi(data + host_index + eat_spaces(data + host_index));
-					
-					if (rsa1_key_bits > 0) { // ファイルのキーは ssh1
-						if (!SSHv1(pvar)) {
-							do_write = 1;
-						}
+					// 鍵の形式が違う or 合致するキー
+					if (match_key(pvar, &key) != 0) {
+						do_write = 1;
 					}
-					else { // ファイルのキーは ssh2
-						if (!SSHv2(pvar)) {
-							do_write = 1;
-						}
-					}
+					// 鍵の形式が同じで合致しないキーはスキップされる
 				}
 			}
 
@@ -1496,6 +1491,113 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	}
 }
 
+//
+// 同じホストで鍵形式が違う時の追加確認ダイアログを分離
+//
+static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+                                         LPARAM lParam)
+{
+	PTInstVar pvar;
+	LOGFONT logfont;
+	HFONT font;
+	char uimsg[MAX_UIMSG];
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		pvar = (PTInstVar) lParam;
+		pvar->hosts_state.hosts_dialog = dlg;
+		SetWindowLong(dlg, DWL_USER, lParam);
+
+		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
+		GetWindowText(dlg, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_TITLE", pvar, uimsg);
+		SetWindowText(dlg, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNINIG", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNINIG2", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_FINGERPRINT", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_ADD", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_CONTINUE, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("BTN_CONTINUE", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_CONTINUE, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
+		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+
+		init_hosts_dlg(pvar, dlg);
+
+		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
+			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+		}
+		else {
+			DlgHostsAddFont = NULL;
+		}
+
+		// add host check box のデフォルトは off にする
+		// SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
+
+		return TRUE;			/* because we do not set the focus */
+
+	case WM_COMMAND:
+		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+
+		switch (LOWORD(wParam)) {
+		case IDC_CONTINUE:
+			if (IsDlgButtonChecked(dlg, IDC_ADDTOKNOWNHOSTS)) {
+				add_host_key(pvar);
+			}
+
+			if (SSHv1(pvar)) {
+				SSH_notify_host_OK(pvar);
+			} else { // SSH2
+				// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
+			}
+
+			pvar->hosts_state.hosts_dialog = NULL;
+
+			EndDialog(dlg, 1);
+
+			if (DlgHostsAddFont != NULL) {
+				DeleteObject(DlgHostsAddFont);
+			}
+
+			return TRUE;
+
+		case IDCANCEL:			/* kill the connection */
+			pvar->hosts_state.hosts_dialog = NULL;
+			notify_closed_connection(pvar);
+			EndDialog(dlg, 0);
+
+			if (DlgHostsAddFont != NULL) {
+				DeleteObject(DlgHostsAddFont);
+			}
+
+			return TRUE;
+
+		default:
+			return FALSE;
+		}
+
+	default:
+		return FALSE;
+	}
+}
+
 void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
@@ -1518,6 +1620,17 @@ void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 	}
 }
 
+void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
+{
+	if (pvar->hosts_state.hosts_dialog == NULL) {
+		HWND cur_active = GetActiveWindow();
+
+		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTTYPEKEY),
+		               cur_active != NULL ? cur_active : wnd,
+		               hosts_add2_dlg_proc, (LPARAM) pvar);
+	}
+}
+
 //
 // サーバから送られてきたホスト公開鍵の妥当性をチェックする
 //
@@ -1525,12 +1638,12 @@ void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 //
 BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key)
 {
-	int found_different_key = 0;
+	int found_different_key = 0, found_different_type_key = 0;
 
 	// すでに known_hosts ファイルからホスト公開鍵を読み込んでいるなら、それと比較する。
 	if (pvar->hosts_state.prefetched_hostname != NULL
 	 && _stricmp(pvar->hosts_state.prefetched_hostname, hostname) == 0
-	 && match_key(pvar, key)) {
+	 && match_key(pvar, key) == 1) {
 
 		if (SSHv1(pvar)) {
 			SSH_notify_host_OK(pvar);
@@ -1548,7 +1661,8 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 			}
 
 			if (pvar->hosts_state.hostkey.type != KEY_UNSPEC) {
-				if (match_key(pvar, key)) {
+				int match = match_key(pvar, key);
+				if (match == 1) {
 					finish_read_host_files(pvar, 0);
 					// すべてのエントリを参照して、合致するキーが見つかったら戻る。
 					// SSH2の場合はここでは何もしない。(2006.3.29 yutaka)
@@ -1558,9 +1672,14 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 						// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
 					}
 					return TRUE;
-				} else {
+				}
+				else if (match == 0) {
 					// キーは known_hosts に見つかったが、キーの内容が異なる。
 					found_different_key = 1;
+				}
+				else {
+					// キーの形式が違う場合
+					found_different_type_key = 1;
 				}
 			}
 		} while (pvar->hosts_state.hostkey.type != KEY_UNSPEC);  // キーが見つかっている間はループする
@@ -1608,7 +1727,11 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 #else
 		HOSTS_do_different_key_dialog(pvar->NotificationWindow, pvar);
 #endif
-	} else {
+	}
+	else if (found_different_type_key) {
+		HOSTS_do_different_type_key_dialog(pvar->NotificationWindow, pvar);
+	}
+	else {
 #if 0
 		PostMessage(pvar->NotificationWindow, WM_COMMAND,
 		            ID_SSHUNKNOWNHOST, 0);
