@@ -65,7 +65,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname,
 BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key);
 #endif
 void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar);
-void HOSTS_do_different_host_dialog(HWND wnd, PTInstVar pvar);
+void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar);
 void HOSTS_notify_disconnecting(PTInstVar pvar);
 void HOSTS_end(PTInstVar pvar);
 #endif
