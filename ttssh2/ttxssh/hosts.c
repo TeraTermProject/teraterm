@@ -1410,19 +1410,19 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTHOST_TITLE", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTKEY_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTHOST_WARNING", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTKEY_WARNING", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTHOST_WARNING2", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTKEY_WARNING2", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTHOST_FINGERPRINT", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTKEY_FINGERPRINT", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTHOST_REPLACE", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTKEY_REPLACE", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_CONTINUE, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_CONTINUE", pvar, uimsg);
@@ -1507,12 +1507,12 @@ void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar)
 	}
 }
 
-void HOSTS_do_different_host_dialog(HWND wnd, PTInstVar pvar)
+void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog == NULL) {
 		HWND cur_active = GetActiveWindow();
 
-		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTHOST),
+		DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHDIFFERENTKEY),
 		               cur_active != NULL ? cur_active : wnd,
 		               hosts_replace_dlg_proc, (LPARAM) pvar);
 	}
@@ -1604,9 +1604,9 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	if (found_different_key) {
 #if 0
 		PostMessage(pvar->NotificationWindow, WM_COMMAND,
-		            ID_SSHDIFFERENTHOST, 0);
+		            ID_SSHDIFFERENTKEY, 0);
 #else
-		HOSTS_do_different_host_dialog(pvar->NotificationWindow, pvar);
+		HOSTS_do_different_key_dialog(pvar->NotificationWindow, pvar);
 #endif
 	} else {
 #if 0

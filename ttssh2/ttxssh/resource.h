@@ -16,7 +16,7 @@
 #define IDD_SSHPASSWD_INPUT             108
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
-#define IDD_SSHDIFFERENTHOST            601
+#define IDD_SSHDIFFERENTKEY             601
 #define IDC_HOSTSERIAL                  602
 #define IDD_SSHAUTHSETUP                602
 #define IDD_SSHFWDSETUP                 603

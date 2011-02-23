@@ -518,11 +518,11 @@ MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts ”FØ‚Í•W€‚Ì”FØ•ûŽ®‚Å‚Í‚È‚¢‚½‚ß, ”FØ‚ÉŽ¸”s‚
 MSG_NOAUTHMETHOD_ERROR=ƒT[ƒo‚ÍTTSSH ‚ª’ñ‹Ÿ‚·‚é”FØƒIƒvƒVƒ‡ƒ“‚ðƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚¹‚ñ.\nÚ‘±‚Í•Â‚¶‚ç‚ê‚Ü‚·.
 
 ; dlg diff host
-DLG_DIFFERENTHOST_TITLE=ƒZƒLƒ…ƒŠƒeƒBŒx
-DLG_DIFFERENTHOST_WARNING=knows hostsƒŠƒXƒg’†‚ÌƒT[ƒo"####################################"‚ÌƒGƒ“ƒgƒŠ‚Æ, Ú‘±æ‚ÌƒzƒXƒgŒ®‚ª *ˆê’v‚µ‚Ä‚¢‚Ü‚¹‚ñ* ˆ«ˆÓ‚ðŽ‚Á‚½ƒzƒXƒg‚ª, Ú‘±‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚éƒT[ƒo‚Ì‚Ó‚è‚ð‚µ‚Ä‚¢‚é‰Â”\«‚à‚ ‚è‚Ü‚·‚Ì‚Å, \•ª’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢.
-DLG_DIFFERENTHOST_WARNING2=known hostsƒŠƒXƒg‚É‚±‚ÌƒzƒXƒg‚ð’Ç‰Á‚µ‚Ä‘±s‚·‚é‚Æ, ŽŸ‰ñ‚©‚ç‚±‚ÌŒx‚Ío‚È‚­‚È‚è‚Ü‚·.
-DLG_DIFFERENTHOST_FINGERPRINT=ƒT[ƒo‘¤‚ÌƒzƒXƒgŒ®Žw–ä:
-DLG_DIFFERENTHOST_REPLACE=Šù‘¶‚ÌŒ®‚ð, V‚µ‚¢Œ®‚Åã‘‚«‚·‚é(&R)
+DLG_DIFFERENTKEY_TITLE=ƒZƒLƒ…ƒŠƒeƒBŒx
+DLG_DIFFERENTKEY_WARNING=knows hostsƒŠƒXƒg’†‚ÌƒT[ƒo"####################################"‚ÌƒGƒ“ƒgƒŠ‚Æ, Ú‘±æ‚ÌƒzƒXƒgŒ®‚ª *ˆê’v‚µ‚Ä‚¢‚Ü‚¹‚ñ* ˆ«ˆÓ‚ðŽ‚Á‚½ƒzƒXƒg‚ª, Ú‘±‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚éƒT[ƒo‚Ì‚Ó‚è‚ð‚µ‚Ä‚¢‚é‰Â”\«‚à‚ ‚è‚Ü‚·‚Ì‚Å, \•ª’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢.
+DLG_DIFFERENTKEY_WARNING2=known hostsƒŠƒXƒg‚É‚±‚ÌƒzƒXƒg‚ð’Ç‰Á‚µ‚Ä‘±s‚·‚é‚Æ, ŽŸ‰ñ‚©‚ç‚±‚ÌŒx‚Ío‚È‚­‚È‚è‚Ü‚·.
+DLG_DIFFERENTKEY_FINGERPRINT=ƒT[ƒo‘¤‚ÌƒzƒXƒgŒ®Žw–ä:
+DLG_DIFFERENTKEY_REPLACE=Šù‘¶‚ÌŒ®‚ð, V‚µ‚¢Œ®‚Åã‘‚«‚·‚é(&R)
 
 ; dlg fwd edit
 DLG_FWD_TITLE=SSHƒ|[ƒg“]‘—

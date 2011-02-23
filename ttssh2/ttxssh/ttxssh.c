@@ -4171,8 +4171,8 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd)
 	case ID_SSHUNKNOWNHOST:
 		HOSTS_do_unknown_host_dialog(hWin, pvar);
 		return 1;
-	case ID_SSHDIFFERENTHOST:
-		HOSTS_do_different_host_dialog(hWin, pvar);
+	case ID_SSHDIFFERENTKEY:
+		HOSTS_do_different_key_dialog(hWin, pvar);
 		return 1;
 	case ID_SSHASYNCMESSAGEBOX:
 		if (pvar->err_msg != NULL) {

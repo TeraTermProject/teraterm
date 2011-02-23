@@ -89,7 +89,7 @@ HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 
 #define ID_SSHAUTH            62501
 #define ID_SSHUNKNOWNHOST     62502
-#define ID_SSHDIFFERENTHOST   62503
+#define ID_SSHDIFFERENTKEY    62503
 #define ID_SSHASYNCMESSAGEBOX 62504
 
 #define OPTION_NONE     0
