@@ -2974,6 +2974,9 @@ static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int
 		EC_KEY *priv = NULL;
 		EC_KEY *pub = NULL;
 
+		UTIL_get_lang_msg("MSG_KEYGEN_GENERATING", pvar, "generating key");
+		SetDlgItemText(((cbarg_t *)cbarg)->dlg, IDC_KEYGEN_PROGRESS_LABEL, pvar->ts->UIMsg);
+
 		priv = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		pub = EC_KEY_new_by_curve_name(keytype_to_cipher_nid(type));
 		if (priv == NULL || pub == NULL) {
@@ -2992,6 +2995,9 @@ static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int
 			goto error;
 		}
 		public_key.ecdsa = pub;
+
+		UTIL_get_lang_msg("MSG_KEYGEN_GENERATED", pvar, "key generated");
+		SetDlgItemText(((cbarg_t *)cbarg)->dlg, IDC_KEYGEN_PROGRESS_LABEL, pvar->ts->UIMsg);
 
 		break;
 	}
