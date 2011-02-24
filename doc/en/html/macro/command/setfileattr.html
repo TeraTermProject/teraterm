@@ -28,7 +28,7 @@ setfileattr &lt;filename&gt; &lt;attributes&gt;
 	<dd>The file name or directory name</dd>
 
 	<dt class="macro">integer &lt;attributes&gt;</dt>
-	<dd><!--設定する属性値を指定する。属性値は以下の数値の組み合わせとなる。--><br>
+	<dd>A user can specify a attribute value combined in the following:<br>
 	    <table border="2">
 	      <tr>
 	        <th>Value</th>
@@ -53,7 +53,7 @@ setfileattr &lt;filename&gt; &lt;attributes&gt;
 	      <tr>
 	        <td>$80</td>
 	        <td>Not have other attributes set<br>
-	            <!--単独で指定したときのみ有効--></td>
+	            Enabled when the value is independently specified.</td>
 	      </tr>
 	      <tr>
 	        <td>$100</td>
@@ -75,8 +75,8 @@ setfileattr &lt;filename&gt; &lt;attributes&gt;
 
 <dl>
 	<dt class="macro">System valiable &lt;result&gt;</dt>
-	<!--dd>属性の変更に失敗すると0が格納される。<br>
-	    成功すると1が格納される。</dd-->
+	<dd>When the command fails, 0 is stored.<br>
+	    When the command succeeds, 1 is stored.</dd>
 </dl>
 
 <h2>Example</h2>
