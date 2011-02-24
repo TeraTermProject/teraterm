@@ -190,6 +190,8 @@ private:
 		}
 		(FARPROC&) *hooks->Pconnect = ProxyWSockHook::hook_connect((FARPROC) *hooks->Pconnect);
 		(FARPROC&) *hooks->PWSAAsyncGetHostByName = ProxyWSockHook::hook_WSAAsyncGetHostByName((FARPROC) *hooks->PWSAAsyncGetHostByName);
+		(FARPROC&) *hooks->PWSAAsyncGetAddrInfo = ProxyWSockHook::hook_WSAAsyncGetAddrInfo((FARPROC) *hooks->PWSAAsyncGetAddrInfo);
+		(FARPROC&) *hooks->Pfreeaddrinfo = ProxyWSockHook::hook_freeaddrinfo((FARPROC) *hooks->Pfreeaddrinfo);
 		(FARPROC&) *hooks->PWSAAsyncSelect = ProxyWSockHook::hook_WSAAsyncSelect((FARPROC) *hooks->PWSAAsyncSelect);
 		(FARPROC&) *hooks->PWSACancelAsyncRequest = ProxyWSockHook::hook_WSACancelAsyncRequest((FARPROC) *hooks->PWSACancelAsyncRequest);
 	}
@@ -198,6 +200,8 @@ private:
 		// unhook functions
 		ProxyWSockHook::unhook_connect((FARPROC) *hooks->Pconnect);
 		ProxyWSockHook::unhook_WSAAsyncGetHostByName((FARPROC) *hooks->PWSAAsyncGetHostByName);
+		ProxyWSockHook::unhook_WSAAsyncGetAddrInfo((FARPROC) *hooks->PWSAAsyncGetAddrInfo);
+		ProxyWSockHook::unhook_freeaddrinfo((FARPROC) *hooks->Pfreeaddrinfo);
 		ProxyWSockHook::unhook_WSAAsyncSelect((FARPROC) *hooks->PWSAAsyncSelect);
 		ProxyWSockHook::unhook_WSACancelAsyncRequest((FARPROC) *hooks->PWSACancelAsyncRequest);
 	}

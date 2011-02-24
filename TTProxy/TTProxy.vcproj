@@ -77,7 +77,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="wsock32.lib ttpcmn.lib"
+				AdditionalDependencies="ws2_32.lib ttpcmn.lib"
 				OutputFile="Release/TTXProxy.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -180,7 +180,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="wsock32.lib ttpcmn.lib"
+				AdditionalDependencies="ws2_32.lib ttpcmn.lib"
 				OutputFile="Debug/TTXProxy.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

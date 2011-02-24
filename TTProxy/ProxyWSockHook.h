@@ -49,7 +49,11 @@ public:
 private:
     struct DUMMYHOSTENT {
         struct hostent entry;
+        struct addrinfo ainfo[2];
         in_addr addr;
+        struct in6_addr addr6;
+        struct sockaddr_in saddr;
+        struct sockaddr_in6 saddr6;
         char* addrlist[2];
         char* alias;
         char hostname[1];
@@ -467,6 +471,7 @@ private:
         String realhost;
         unsigned short  realport;
         in_addr addr;
+        struct in6_addr addr6;
         char* buffer;
         DWORD time;
         ConnectionInfo(ProxyInfo& proxy, String realhost):proxy(proxy), realhost(realhost), buffer(NULL) {
@@ -475,8 +480,21 @@ private:
             delete[] buffer;
         }
         void fillBuffer(char* buffer, int bufferLength) {
+          fillBuffer(buffer, bufferLength, "ssh");
+        }
+        void fillBuffer(char* buffer, int bufferLength, const char *portname) {
+            struct servent *sv;
+            int portnum = 0;
+            if (sv = getservbyname(portname, "tcp")) {
+              portnum = sv->s_port;
+            }
+            else {
+              portnum = atoi(portname);
+            }
+            memset(buffer, 0, bufferLength);
             DUMMYHOSTENT* dst = (DUMMYHOSTENT*) buffer;
             dst->addr = addr;
+            dst->addr6 = addr6;
             dst->addrlist[0] = (char*) &dst->addr;
             dst->addrlist[1] = NULL;
             dst->entry.h_addr_list = dst->addrlist;
@@ -485,6 +503,35 @@ private:
             dst->entry.h_addrtype = AF_INET;
             dst->entry.h_length = sizeof (in_addr);
             dst->entry.h_name = dst->hostname;
+
+            dst->saddr6.sin6_family = AF_INET6;
+            dst->saddr6.sin6_port = htons(portnum);
+            dst->saddr6.sin6_flowinfo = 0;
+            dst->saddr6.sin6_addr = dst->addr6;
+            dst->saddr6.sin6_scope_id = 0;
+
+            dst->saddr.sin_family = AF_INET;
+            dst->saddr.sin_port = htons(portnum);
+            dst->saddr.sin_addr = dst->addr;
+
+            dst->ainfo[0].ai_flags = 0;
+            dst->ainfo[0].ai_family = PF_INET6;
+            dst->ainfo[0].ai_socktype = SOCK_STREAM;
+            dst->ainfo[0].ai_protocol = IPPROTO_TCP;
+            dst->ainfo[0].ai_addrlen = sizeof(sockaddr_in6);
+            dst->ainfo[0].ai_canonname = NULL;
+            dst->ainfo[0].ai_addr = (struct sockaddr *)(&dst->saddr6);
+            dst->ainfo[0].ai_next = &dst->ainfo[1];
+
+            dst->ainfo[1].ai_flags = 0;
+            dst->ainfo[1].ai_family = PF_INET;
+            dst->ainfo[1].ai_socktype = SOCK_STREAM;
+            dst->ainfo[1].ai_protocol = IPPROTO_TCP;
+            dst->ainfo[1].ai_addrlen = sizeof(sockaddr_in);
+            dst->ainfo[1].ai_canonname = NULL;
+            dst->ainfo[1].ai_addr = (struct sockaddr *)(&dst->saddr);
+            dst->ainfo[1].ai_next = NULL;
+
             strcpy_s(dst->hostname, bufferLength - sizeof (DUMMYHOSTENT), realhost);
         }
     };
@@ -539,6 +586,20 @@ private:
                 return NULL;
             return get(addr.S_un.S_un_b.s_b4 - 1);
         }
+        ConnectionInfo* get(in6_addr addr) {
+            int i;
+            for (i=0; i<10; i++) {
+              if (addr.s6_addr[i] != 0)
+                return NULL;
+            }
+            if (addr.s6_addr[10] != 0xff || addr.s6_addr[11] != 0xff)
+                return NULL;
+            for (i=12; i<15; i++) {
+              if (addr.s6_addr[i] != 0)
+                return NULL;
+            }
+            return get(addr.s6_addr[15] - 1);
+        }
         ConnectionInfo* get(int index) {
             ::EnterCriticalSection(&section);
             ConnectionInfo* info = 0 <= index && index < countof(list) ? (ConnectionInfo*) list[index] : NULL;
@@ -590,6 +651,10 @@ private:
             table.put(url, info);
             ::LeaveCriticalSection(&section);
             info->addr.s_addr = htonl(i + 1);
+            memset(info->addr6.s6_addr, 0, 16);
+            info->addr6.s6_addr[10] = 0xff;
+            info->addr6.s6_addr[11] = 0xff;
+            info->addr6.s6_addr[15] = i + 1;
 
             info->time = ::GetTickCount();
             return info;
@@ -1670,7 +1735,7 @@ private:                                                   \
     Hooker::hook(module, (FARPROC) HOOKEDAPI_##APINAME, (FARPROC) instance().ORIG_##APINAME);
 
 #define LOADAPI(APINAME) \
-    (FARPROC&) ORIG_##APINAME = ::GetProcAddress(wsock32, #APINAME);
+    (FARPROC&) ORIG_##APINAME = ::GetProcAddress(ws2_32, #APINAME);
 
 #define SETUP_HOOKAPI(APINAME) \
     Hooker::setup((FARPROC) instance().ORIG_##APINAME, (FARPROC) HOOKEDAPI_##APINAME);
@@ -1686,6 +1751,17 @@ private:                                                   \
                 holder = info;
             }
         }
+        else if (name->sa_family == AF_INET6) {
+            struct sockaddr_in6* in6 = (struct sockaddr_in6*) name;
+            info = connectioninfolist.get(in6->sin6_addr);
+            if (info == NULL && defaultProxy.type != ProxyInfo::TYPE_NONE) {
+                DWORD bufflen = 64;
+                char* buff = new char[64];
+                WSAAddressToString((struct sockaddr*)name, sizeof(struct sockaddr_in6), NULL, buff, &bufflen);
+                info = new ConnectionInfo(defaultProxy, buff);
+                holder = info;
+            }
+        }
         if (info != NULL) {
             if (info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
                 info = NULL;
@@ -1695,15 +1771,26 @@ private:                                                   \
                     hostname = info->realhost;
                 }else{
                     info->realport = ntohs(((struct sockaddr_in*) name)->sin_port);
-                    ((struct sockaddr_in*) name)->sin_port = htons(info->proxy.getPort());
+                    if (name->sa_family == AF_INET) {
+                        ((struct sockaddr_in*) name)->sin_port = htons(info->proxy.getPort());
+                    } else { // AF_INET6
+                        ((struct sockaddr_in6*) name)->sin6_port = htons(info->proxy.getPort());
+                    }
                     hostname = info->proxy.host;
                 }
-                struct hostent* entry = ORIG_gethostbyname(hostname);
-                if (entry == NULL) {
+                struct addrinfo hints, *res;
+                memset(&hints, 0, sizeof hints);
+                hints.ai_family = name->sa_family;
+                if (getaddrinfo(hostname, NULL, &hints, &res) != 0) {
                     WSASetLastError(WSAECONNREFUSED);
                     return SOCKET_ERROR;
                 }
-                memcpy(&((struct sockaddr_in*) name)->sin_addr, entry->h_addr_list[0], entry->h_length);
+                if (name->sa_family == AF_INET) {
+                    memcpy(&((struct sockaddr_in*) name)->sin_addr, &((struct sockaddr_in*)res->ai_addr)->sin_addr, sizeof(struct in_addr));
+                } else { // AF_INET6
+                    memcpy(&((struct sockaddr_in6*) name)->sin6_addr, &((struct sockaddr_in6*)res->ai_addr)->sin6_addr, sizeof(struct in6_addr));
+                }
+                freeaddrinfo(res);
             }
         }
         int result = ORIG_connect(s, name, namelen);
@@ -1937,6 +2024,45 @@ private:                                                   \
         return handle;
     }
 
+    DECLARE_HOOKAPI(HANDLE, WSAAsyncGetAddrInfo, (HWND window, UINT message, const char* hostname, const char* portname, struct addrinfo* hints, struct addrinfo** res), (window, message, hostname, portname, hints, res)) {
+        ConnectionInfo* info = connectioninfolist.find(hostname);
+        if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
+            return ORIG_WSAAsyncGetAddrInfo(window, message, hostname, portname, hints, res);
+        }
+        if (info->proxy.type == ProxyInfo::TYPE_SSL
+            || info->proxy.type == ProxyInfo::TYPE_HTTP_SSL
+            || info->proxy.type == ProxyInfo::TYPE_TELNET_SSL
+            || info->proxy.type == ProxyInfo::TYPE_SOCKS4_SSL
+            || info->proxy.type == ProxyInfo::TYPE_SOCKS5_SSL) {
+            if (!SSLSocket::isEnabled()) {
+                ::WSASetLastError(WSAHOST_NOT_FOUND);
+                return NULL;
+            }
+        }
+        HANDLE handle = connectioninfolist.getTask(info);
+        int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostname) + 1;
+        info->buffer = new char[bufferLength];
+        info->fillBuffer(info->buffer, bufferLength, portname);
+        DUMMYHOSTENT* d = (DUMMYHOSTENT*)info->buffer;
+        *res = d->ainfo;
+        if (aicount < 256) {
+            ailist[aicount++] = d->ainfo;
+        }
+        ::PostMessage(window, message, (WPARAM) handle, MAKELPARAM(0, 0));
+        return handle;
+    }
+
+    DECLARE_HOOKAPI(void, freeaddrinfo, (struct addrinfo* ai), (ai)) {
+        int i;
+        for (i=0; i<aicount; i++) {
+            if (ailist[i] == ai) {
+                return;
+            }
+        }
+        ORIG_freeaddrinfo(ai);
+        return;
+    }
+
     DECLARE_HOOKAPI(int, WSAAsyncSelect, (SOCKET s, HWND window, UINT message, long event), (s, window, message, event)) {
         asyncselectinfo.put(s, window, message, event);
         return ORIG_WSAAsyncSelect(s, window, message, event);
@@ -1993,12 +2119,16 @@ private:                                                   \
     HWND owner;
     HMODULE resource_module;
     AsyncSelectInfoTable asyncselectinfo;
+    struct addrinfo* ailist[256];
+    int aicount;
 
-    ProxyWSockHook():shower(NULL), owner(NULL), resource_module(GetInstanceHandle()), timeout(0) {
-        HMODULE wsock32 = ::GetModuleHandle("wsock32.dll");
+    ProxyWSockHook():shower(NULL), owner(NULL), resource_module(GetInstanceHandle()), timeout(0), aicount(0) {
+        HMODULE ws2_32 = ::GetModuleHandle("ws2_32.dll");
         LOADAPI(connect)
         LOADAPI(gethostbyname)
         LOADAPI(WSAAsyncGetHostByName)
+        LOADAPI(WSAAsyncGetAddrInfo)
+        LOADAPI(freeaddrinfo)
         LOADAPI(WSAAsyncSelect)
         LOADAPI(WSACancelAsyncRequest)
         LOADAPI(send)
@@ -2134,6 +2264,8 @@ public:
         SETUP_HOOKAPI(connect)
         SETUP_HOOKAPI(gethostbyname)
         SETUP_HOOKAPI(WSAAsyncGetHostByName)
+        SETUP_HOOKAPI(WSAAsyncGetAddrInfo)
+        SETUP_HOOKAPI(freeaddrinfo)
         SETUP_HOOKAPI(WSAAsyncSelect)
         SETUP_HOOKAPI(WSACancelAsyncRequest)
         SETUP_HOOKAPI(send)
@@ -2146,6 +2278,8 @@ public:
         INSTALL_HOOKAPI(connect)
         INSTALL_HOOKAPI(gethostbyname)
         INSTALL_HOOKAPI(WSAAsyncGetHostByName)
+        INSTALL_HOOKAPI(WSAAsyncGetAddrInfo)
+        INSTALL_HOOKAPI(freeaddrinfo)
         INSTALL_HOOKAPI(WSAAsyncSelect)
         INSTALL_HOOKAPI(WSACancelAsyncRequest)
         INSTALL_HOOKAPI(send)
@@ -2159,6 +2293,8 @@ public:
         UNINSTALL_HOOKAPI(connect)
         UNINSTALL_HOOKAPI(gethostbyname)
         UNINSTALL_HOOKAPI(WSAAsyncGetHostByName)
+        UNINSTALL_HOOKAPI(WSAAsyncGetAddrInfo)
+        UNINSTALL_HOOKAPI(freeaddrinfo)
         UNINSTALL_HOOKAPI(WSAAsyncSelect)
         UNINSTALL_HOOKAPI(WSACancelAsyncRequest)
         UNINSTALL_HOOKAPI(send)
@@ -2170,7 +2306,7 @@ public:
     static String generateURL() {
         return instance().defaultProxy.generateURL();
     }
-	static String parseURL(const char* url, BOOL prefix) {
+        static String parseURL(const char* url, BOOL prefix) {
         ProxyInfo proxy;
         String realhost = ProxyInfo::parse(url, proxy);
         if (realhost != NULL) {
