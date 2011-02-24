@@ -524,8 +524,8 @@ DLG_DIFFERENTKEY_REPLACE=Den vorhanden Schlüssel durch den neuen ersetzen.
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=SICHERHEITSWARNUNG
-DLG_DIFFERENTTYPEKEY_WARNINIG=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
-DLG_DIFFERENTTYPEKEY_WARNINIG2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
+DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
+DLG_DIFFERENTTYPEKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_DIFFERENTTYPEKEY_ADD=Den Server zur "known hosts"-Liste hinzufügen.
 
@@ -635,8 +635,8 @@ DLG_TIS_BANNER=Logging in to %s
 
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=SICHERHEITSWARNUNG
-DLG_UNKNOWNHOST_WARNINIG=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
-DLG_UNKNOWNHOST_WARNINIG2=Wenn Sie auf 'Continue' klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
+DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
+DLG_UNKNOWNHOST_WARNING2=Wenn Sie auf 'Continue' klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_UNKNOWNHOST_FINGERPRINT=Der Fingerabdruck des Schlüssels:
 DLG_UNKNOWNHOST_ADD=Den Server zur "known hosts"-Liste hinzufügen.
 

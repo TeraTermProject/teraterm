@@ -1301,10 +1301,10 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		UTIL_get_lang_msg("DLG_UNKNONWHOST_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNINIG", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNINIG2", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING2", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_FINGERPRINT", pvar, uimsg);
@@ -1513,10 +1513,10 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNINIG", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNING", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNINIG2", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_WARNING2", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_FINGERPRINT", pvar, uimsg);

@@ -526,8 +526,8 @@ DLG_DIFFERENTKEY_ADD=既存の鍵を, 新しい鍵で上書きする(&R)
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=セキュリティ警告
-DLG_DIFFERENTTYPEKEY_WARNINIG=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵の種類が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
-DLG_DIFFERENTTYPEKEY_WARNINIG2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
+DLG_DIFFERENTTYPEKEY_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵の種類が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
+DLG_DIFFERENTTYPEKEY_WARNING2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=サーバ側のホスト鍵指紋:
 DLG_DIFFERENTTYPEKEY_ADD=このホストをknown hostsリストに追加する(&A)
 
@@ -638,8 +638,8 @@ DLG_TIS_BANNER=ログイン中: %s
 
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=セキュリティ警告
-DLG_UNKNOWNHOST_WARNINIG=known hostsリストにサーバ"#####################################"のエントリはありません. 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください！
-DLG_UNKNOWNHOST_WARNINIG2=known hostsリストのこのホストを追加して続行すると, 次回からこの警告は出なくなります.
+DLG_UNKNOWNHOST_WARNING=known hostsリストにサーバ"#####################################"のエントリはありません. 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください！
+DLG_UNKNOWNHOST_WARNING2=known hostsリストのこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_UNKNOWNHOST_FINGERPRINT=サーバ側のホスト鍵指紋:
 DLG_UNKNOWNHOST_ADD=このホストをknown hostsリストに追加する(&A)
 
