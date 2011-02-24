@@ -515,7 +515,7 @@ private:
             dst->saddr.sin_addr = dst->addr;
 
             dst->ainfo[0].ai_flags = 0;
-            dst->ainfo[0].ai_family = PF_INET6;
+            dst->ainfo[0].ai_family = AF_INET6;
             dst->ainfo[0].ai_socktype = SOCK_STREAM;
             dst->ainfo[0].ai_protocol = IPPROTO_TCP;
             dst->ainfo[0].ai_addrlen = sizeof(sockaddr_in6);
@@ -524,7 +524,7 @@ private:
             dst->ainfo[0].ai_next = &dst->ainfo[1];
 
             dst->ainfo[1].ai_flags = 0;
-            dst->ainfo[1].ai_family = PF_INET;
+            dst->ainfo[1].ai_family = AF_INET;
             dst->ainfo[1].ai_socktype = SOCK_STREAM;
             dst->ainfo[1].ai_protocol = IPPROTO_TCP;
             dst->ainfo[1].ai_addrlen = sizeof(sockaddr_in);
