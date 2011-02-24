@@ -1497,41 +1497,41 @@ private:
         *ptr++ = SOCKS5_VERSION;
         *ptr++ = SOCKS5_CMD_CONNECT;
         *ptr++ = 0; /* reserved */
-        in_addr addr;
-        addr.s_addr = INADDR_NONE;
-        char ch = realhost.charAt(0);
-        if ('0' <= ch && ch <= '9') {
-            addr.s_addr = inet_addr(realhost);
+        struct addrinfo hints, *res = NULL;
+        if (resolve != RESOLVE_REMOTE) {
+            memset(&hints, 0, sizeof(hints));
+            getaddrinfo(realhost, NULL, &hints, &res);
         }
-        if (addr.s_addr != INADDR_NONE) {
-            *ptr++ = SOCKS5_ATYP_IPv4;
-            memcpy(ptr, &addr, sizeof addr);
-            ptr += sizeof addr;
-        }else{
-            struct hostent* entry = resolve != RESOLVE_REMOTE ? gethostbyname(realhost) : NULL;
-            if (entry != NULL) {
-#ifndef AF_INET6
-#define AF_INET6 23
-#endif
-                if ((entry->h_addrtype == AF_INET || entry->h_addrtype == AF_INET6) 
-                    && entry->h_length == (entry->h_addrtype == AF_INET ? 4 : 16)) {
-                    *ptr++ = entry->h_addrtype == AF_INET ? SOCKS5_ATYP_IPv4 : SOCKS5_ATYP_IPv6;
-                    memcpy(ptr, entry->h_addr_list[0], entry->h_length);
-                    ptr += entry->h_length;
-                }else{
-                    WSASetLastError(WSAECONNREFUSED);
-                    return SOCKET_ERROR;
-                }
-            }else if (resolve == RESOLVE_LOCAL) {
+        if (res) {
+            switch (res->ai_family) {
+              case AF_INET:
+                *ptr++ = SOCKS5_ATYP_IPv4;
+                memcpy(ptr, &((struct sockaddr_in*)res->ai_addr)->sin_addr, sizeof(in_addr));
+                ptr += sizeof(in_addr);
+                break;
+              case AF_INET6:
+                *ptr++ = SOCKS5_ATYP_IPv6;
+                memcpy(ptr, &((struct sockaddr_in6*)res->ai_addr)->sin6_addr, sizeof(in6_addr));
+                ptr += sizeof(in6_addr);
+                break;
+              default:
+                freeaddrinfo(res);
                 WSASetLastError(WSAECONNREFUSED);
                 return SOCKET_ERROR;
-            }else{
-                *ptr++ = SOCKS5_ATYP_DOMAINNAME;
-                len = strlen(realhost);
-                *ptr++ = len;
-                memcpy(ptr, realhost, len);
-                ptr += len;
+                break;
             }
+            freeaddrinfo(res);
+        }
+        else if (resolve == RESOLVE_LOCAL) {
+            WSASetLastError(WSAECONNREFUSED);
+            return SOCKET_ERROR;
+        }
+        else {
+            *ptr++ = SOCKS5_ATYP_DOMAINNAME;
+            len = strlen(realhost);
+            *ptr++ = len;
+            memcpy(ptr, realhost, len);
+            ptr += len;
         }
         *ptr++ = realport >> 8;     /* DST.PORT */
         *ptr++ = realport & 0xFF;
