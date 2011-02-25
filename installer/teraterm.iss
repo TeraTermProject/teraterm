@@ -1,6 +1,6 @@
 #define AppName "Tera Term"
-#define AppVer "4.68"
-#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+#define AppVer "4.69-RC1"
+;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
 AppCopyright=TeraTerm Project
@@ -74,7 +74,7 @@ Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
-Source: ..\libs\logmett\Setup_LogMeTT_2_9_7.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
+Source: ..\libs\logmett\Setup_LogMeTT_2_9_8_1.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
 Source: ..\libs\logmett\Setup_TTLEditor_1_2_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
@@ -709,5 +709,5 @@ Name: {app}\libeay.txt; Type: files
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-; Name: build.bat; Parameters: rebuild
-Name: build.bat
+Name: build.bat; Parameters: rebuild
+;Name: build.bat
