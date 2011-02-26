@@ -65,7 +65,7 @@
       <li>Tera Term can not ignore the unsupported OSC control string. </li>
       <li>Tera Term can not understand a character after the DCS, SOS, APC and PM Control string.</li>
       <li>When a log file is opend by writable mode, the file is existing and writing by another process can be opend.</li>
-      <!-- li>8ビット文字列の受信時に、制御シーケンスとして誤って扱う場合があった問題を修正した。</li -->
+      <li>When 8-bit string is received, the string is recognized as the control sequence by mistake.</li>
     </ul>
   </li>
 
@@ -2459,10 +2459,10 @@ SYNOPSIS:
 <ul class="history">
       <li>added support for IPv6.<ul>
 	<li>Bug fix: The IPv6 address can not be specified at the proxy server.</li>
-        <!-- li>Bug fix: IPv6 アドレスを持つプロキシサーバに IPv6 で接続しない問題を修正した。</li -->
-        <!-- li>Bug fix: SOCKS5 プロキシ接続で実ホストへの IPv6 アドレス指定での接続が出来ない問題を修正した。</li -->
-        <!-- li>Bug fix: HTTP/TELNET プロキシ接続でローカル側で名前解決が出来ないホストに対して接続できない問題を修正した。</li -->
-        <!-- li>Bug fix: SOCKS プロキシ接続で設定に関わらず常にローカル側で名前を解決しようとする問題を修正した。</li -->
+        <li>Bug fix: Tera Term can not connect the proxy server with the IPv6 address by the IPv6 protocol.</li>
+        <li>Bug fix: Tera Term can not connect the IPv6 host by using the SOCK5 proxy protocol.</li>
+        <li>Bug fix: Tera Term can not connect the host not resolving the domain name by using the HTTP/TELNET proxy protocol.</li>
+        <li>Bug fix: Tera Term will try to resolve the domain name by mistake despite the SOCKS proxy connection.</li>
       </ul></li>
 </ul>
 
