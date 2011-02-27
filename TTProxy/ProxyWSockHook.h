@@ -1328,7 +1328,7 @@ private:
         static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         char buf[1024];
         int status_code;
-        if (sendToSocketFormat(s, "CONNECT %s:%d HTTP/1.0\r\n", realhost, realport) == SOCKET_ERROR)
+        if (sendToSocketFormat(s, strchr(realhost,':')?"CONNECT [%s]:%d HTTP/1.0\r\n":"CONNECT %s:%d HTTP/1.0\r\n", realhost, realport) == SOCKET_ERROR)
             return SOCKET_ERROR;
         if (proxy.user != NULL) {
             int userlen = strlen(proxy.user);
@@ -1665,7 +1665,7 @@ private:
         while (!err) {
             switch (wait_for_prompt(s, prompt_table, countof(prompt_table), 10)) {
             case 0: /* Hostname prompt */
-                if (sendToSocketFormat(s, "%s:%d\n", realhost, realport) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, strchr(realhost,':')?"[%s]:%d\n":"%s:%d\n", realhost, realport) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 1: /* Username prompt */
