@@ -4517,6 +4517,7 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 	// すべてのTera Termにメッセージとデータを送る
 	count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 	for (i = 0 ; i < count ; i++) { 
+		hd = NULL;
 		if (parent_only) {
 			hd = GetParent(hWnd);
 			i = MAXNWIN;		// 337: 強引かつ直値 :P
@@ -4527,7 +4528,7 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 			}
 		}
 		if (hd == NULL) {
-			break;
+			continue;
 		}
 
 		ZeroMemory(&cds, sizeof(cds));
