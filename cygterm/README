@@ -3,7 +3,7 @@
 
                 Using Cygwin with a terminal emulator.
 
-                Copyright (c) 2006-2010 TeraTerm Project
+                Copyright (c) 2006-2011 TeraTerm Project
                 http://ttssh2.sourceforge.jp/
 
                 Based on CygTerm by Original developer:
@@ -266,6 +266,9 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_21 2011/02/28 (by maya)
+        * Add mutex object for running check by installer.
+
 v1.07_20 2010/10/20 (by doda)
         * Directory change timing with '-d' option is delayed. (security fix)
 

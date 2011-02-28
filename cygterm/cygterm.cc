@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // CygTerm+ - yet another Cygwin console
-// Copyright (c) 2006-2010 TeraTerm Project
+// Copyright (c) 2006-2011 TeraTerm Project
 // Copyright (C) 2000-2006 NSym.
 //---------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
@@ -108,9 +108,13 @@
 // patch level 20 - directory change timing with '-d' option is delayed
 //   Written by IWAMOTO Kouichi. (doda)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 21 - add mutex
+//   Written by NAGATA Shinya. (maya)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_20 (2010/10/20)";
+static char Version[] = "version 1.07_21 (2011/2/28)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1243,8 +1247,16 @@ int main(int argc, char** argv)
     int sh_pid, agent_pid = 0;
 
     // Create mutex for running check by installer (2006.8.18 maya)
-    HANDLE hMutex;
-    hMutex = CreateMutex(NULL, TRUE, "CygTermAppMutex");
+    SECURITY_DESCRIPTOR sd;
+    SECURITY_ATTRIBUTES sa;
+    HANDLE hMutex, hMutex2;
+    InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
+    SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
+    sa.nLength = sizeof(sa);
+    sa.lpSecurityDescriptor = &sd;
+    sa.bInheritHandle = FALSE;
+    hMutex = CreateMutex(&sa, FALSE, "CygTermAppMutex");
+    hMutex2 = CreateMutex(&sa, FALSE, "Global\\CygTermAppMutex");
 
     // load configuration
     load_cfg();
