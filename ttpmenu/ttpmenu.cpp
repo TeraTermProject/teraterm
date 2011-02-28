@@ -2585,8 +2585,16 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	// インストーラで実行を検出するために mutex を作成する (2006.8.12 maya)
 	// 2重起動防止のためではないので、特に返り値は見ない
-	HANDLE hMutex;
-	hMutex = CreateMutex(NULL, TRUE, "TeraTermMenuAppMutex");
+	SECURITY_DESCRIPTOR sd;
+	SECURITY_ATTRIBUTES sa;
+	HANDLE hMutex, hMutex2;
+	InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
+	SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
+	sa.nLength = sizeof(sa);
+	sa.lpSecurityDescriptor = &sd;
+	sa.bInheritHandle = FALSE;
+	hMutex = CreateMutex(&sa, FALSE, "TeraTermMenuAppMutex");
+	hMutex2 = CreateMutex(&sa, FALSE, "Global\\TeraTermMenuAppMutex");
 
 	checkIniFile();		//INIファイル/レジストリ切替
 

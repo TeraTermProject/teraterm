@@ -16,7 +16,7 @@ DefaultGroupName={#AppName}
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-AppMutex=TeraTermProAppMutex, TeraTermProMacroAppMutex, TeraTermProKeycodeAppMutex, TeraTermMenuAppMutex, CygTermAppMutex
+AppMutex=TeraTermProAppMutex, TeraTermProMacroAppMutex, TeraTermProKeycodeAppMutex, TeraTermMenuAppMutex, CygTermAppMutex, Global\TeraTermProAppMutex, Global\TeraTermProMacroAppMutex, Global\TeraTermProKeycodeAppMutex, Global\TeraTermMenuAppMutex, Global\CygTermAppMutex
 #ifndef snapshot
 OutputBaseFilename=teraterm-{#AppVer}
 #else
