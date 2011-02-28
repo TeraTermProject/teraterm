@@ -487,7 +487,10 @@ private:
           fillBuffer(buffer, bufferLength, "ssh", AF_UNSPEC);
         }
         void fillBuffer(char* buffer, int bufferLength, const char *portname, int addr_family) {
-            struct servent *sv;
+            struct servent* sv;
+            struct addrinfo* res;
+            struct addrinfo* res0;
+            struct addrinfo hints;
             int portnum = 0;
             if (sv = getservbyname(portname, "tcp")) {
               portnum = sv->s_port;
@@ -545,8 +548,41 @@ private:
                     break;
                 case AF_UNSPEC:
                 default:
-                    dst->ainfo[0].ai_next = &dst->ainfo[1];
-                    dst->ai = &dst->ainfo[0];
+                    memset(&hints, 0, sizeof hints);
+                    getaddrinfo(proxy.host, NULL, &hints, &res0);
+                    if (res0) {
+                        int flag = 0;
+                        for (res = res0; res; res = res->ai_next) {
+                            switch (res->ai_family) {
+                            case AF_INET6:
+                                flag |= 1;
+                                break;
+                            case AF_INET:
+                                flag |= 2;
+                                break;
+                            }
+                            if (flag == 3)
+                                break;
+                        }
+                        switch (flag) {
+                        case 1:
+                            dst->ai = &dst->ainfo[0];
+                            break;
+                        case 2:
+                            dst->ai = &dst->ainfo[1];
+                            break;
+                        case 3:
+                        default:
+                            dst->ainfo[0].ai_next = &dst->ainfo[1];
+                            dst->ai = &dst->ainfo[0];
+                            break;
+                        }
+                        freeaddrinfo(res0);
+                    }
+                    else {
+                        dst->ainfo[0].ai_next = &dst->ainfo[1];
+                        dst->ai = &dst->ainfo[0];
+                    }
                     break;
             }
 
