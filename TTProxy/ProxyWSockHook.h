@@ -49,6 +49,7 @@ public:
 private:
     struct DUMMYHOSTENT {
         struct hostent entry;
+        struct addrinfo *ai;
         struct addrinfo ainfo[2];
         in_addr addr;
         struct in6_addr addr6;
@@ -483,6 +484,9 @@ private:
           fillBuffer(buffer, bufferLength, "ssh");
         }
         void fillBuffer(char* buffer, int bufferLength, const char *portname) {
+          fillBuffer(buffer, bufferLength, "ssh", AF_UNSPEC);
+        }
+        void fillBuffer(char* buffer, int bufferLength, const char *portname, int addr_family) {
             struct servent *sv;
             int portnum = 0;
             if (sv = getservbyname(portname, "tcp")) {
@@ -521,7 +525,7 @@ private:
             dst->ainfo[0].ai_addrlen = sizeof(sockaddr_in6);
             dst->ainfo[0].ai_canonname = NULL;
             dst->ainfo[0].ai_addr = (struct sockaddr *)(&dst->saddr6);
-            dst->ainfo[0].ai_next = &dst->ainfo[1];
+            dst->ainfo[0].ai_next = NULL;
 
             dst->ainfo[1].ai_flags = 0;
             dst->ainfo[1].ai_family = AF_INET;
@@ -531,6 +535,20 @@ private:
             dst->ainfo[1].ai_canonname = NULL;
             dst->ainfo[1].ai_addr = (struct sockaddr *)(&dst->saddr);
             dst->ainfo[1].ai_next = NULL;
+
+            switch (addr_family) {
+                case AF_INET:
+                    dst->ai = &dst->ainfo[1];
+                    break;
+                case AF_INET6:
+                    dst->ai = &dst->ainfo[0];
+                    break;
+                case AF_UNSPEC:
+                default:
+                    dst->ainfo[0].ai_next = &dst->ainfo[1];
+                    dst->ai = &dst->ainfo[0];
+                    break;
+            }
 
             strcpy_s(dst->hostname, bufferLength - sizeof (DUMMYHOSTENT), realhost);
         }
@@ -2042,11 +2060,11 @@ private:                                                   \
         HANDLE handle = connectioninfolist.getTask(info);
         int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostname) + 1;
         info->buffer = new char[bufferLength];
-        info->fillBuffer(info->buffer, bufferLength, portname);
+        info->fillBuffer(info->buffer, bufferLength, portname, hints->ai_family);
         DUMMYHOSTENT* d = (DUMMYHOSTENT*)info->buffer;
-        *res = d->ainfo;
+        *res = d->ai;
         if (aicount < 256) {
-            ailist[aicount++] = d->ainfo;
+            ailist[aicount++] = d->ai;
         }
         ::PostMessage(window, message, (WPARAM) handle, MAKELPARAM(0, 0));
         return handle;
