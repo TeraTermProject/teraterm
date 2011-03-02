@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.69-RC2"
+#define AppVer "4.69-RC3"
 ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
@@ -16,7 +16,7 @@ DefaultGroupName={#AppName}
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-AppMutex=TeraTermProAppMutex, TeraTermProMacroAppMutex, TeraTermProKeycodeAppMutex, TeraTermMenuAppMutex, CygTermAppMutex, Global\TeraTermProAppMutex, Global\TeraTermProMacroAppMutex, Global\TeraTermProKeycodeAppMutex, Global\TeraTermMenuAppMutex, Global\CygTermAppMutex
+;AppMutex=TeraTermProAppMutex, TeraTermProMacroAppMutex, TeraTermProKeycodeAppMutex, TeraTermMenuAppMutex, CygTermAppMutex, Global\TeraTermProAppMutex, Global\TeraTermProMacroAppMutex, Global\TeraTermProKeycodeAppMutex, Global\TeraTermMenuAppMutex, Global\CygTermAppMutex
 #ifndef snapshot
 OutputBaseFilename=teraterm-{#AppVer}
 #else
@@ -282,6 +282,8 @@ en.comp_TTXAlwaysOnTop=Always On Top can be used
 ja.comp_TTXAlwaysOnTop=常に最前面に表示できるようにする
 en.comp_TTXRecurringCommand=Recurring Command can be used
 ja.comp_TTXRecurringCommand=定期的に文字列を送信する
+en.msg_AppRunningError=Setup has detected that Tera Term is currently running.%n%nPlease close all instances of it now, then click Next to continue.
+ja.msg_AppRunningError=セットアップは実行中の Tera Term を検出しました。%n%n開いているアプリケーションをすべて閉じてから「次へ」をクリックしてください。
 
 [Code]
 const
@@ -356,6 +358,73 @@ begin
     Result := Value1
 end;
 }
+
+function CheckAppUsing(Filename:String) : integer;
+var
+  TmpFileName : String;
+begin
+  if FileExists(FileName) then
+    begin
+      TmpFileName := FileName + '.' + GetDateTimeString('yyyymmddhhnnss', #0, #0); // Tmp file ends with timestamp
+      if FileCopy(FileName, TmpFileName, True) then
+        if DeleteFile(FileName) then
+          if RenameFile(TmpFileName, FileName) then
+            Result := 0
+          else
+            Result := -1 // permission?
+        else
+          begin
+            Result := 1; // failed to delete
+            DeleteFile(TmpFileName);
+          end
+      else
+        Result := -1 // permission?
+    end
+  else
+    Result := 0;
+end;
+
+function CheckAppsUsing() : integer;
+var
+  FileDir  : String;
+  FileName : array[0..6] of String;
+  i        : integer;
+  flag     : boolean;
+begin
+  FileDir := ExpandConstant('{app}');
+  FileName[0] := FileDir + '\ttermpro.exe';
+  FileName[1] := FileDir + '\ttpmacro.exe';
+  FileName[2] := FileDir + '\keycode.exe';
+  FileName[3] := FileDir + '\ttpmenu.exe';
+  FileName[4] := FileDir + '\cygterm.exe';
+  FileName[5] := FileDir + '\Collector.exe';
+  FileName[6] := FileDir + '\Collector_org.exe';
+  
+  flag := True;
+  for i := 0 to 6 do
+  begin
+    if flag = True then
+    begin
+      case CheckAppUsing(FileName[i]) of
+        1:
+          // failed to delete. in use.
+          begin
+            Result := 1;
+            flag := False;
+          end;
+        -1:
+          // failed to copy/rename
+          begin
+            Result := -1;
+            flag := False;
+          end;
+        else
+          // OK
+      end;
+    end;
+  end;
+
+end;
 
 function GetDefaultIniFilename : String;
 begin
@@ -537,6 +606,8 @@ var
   ResultCode: Integer;
   iniFile : String;
 begin
+  Result := True;
+
   case CurPageID of
 
     wpWelcome:
@@ -570,6 +641,19 @@ begin
 
       end;
 
+    wpSelectDir:
+      begin
+
+        ResultCode := CheckAppsUsing();
+        if ResultCode = 1 then
+          begin
+            MsgBox(CustomMessage('msg_AppRunningError'), mbError, MB_OK);
+            Result := False;
+          end;
+        // if -1, goto next. turn over to Inno Setup.
+
+      end;
+
     wpSelectComponents:
       begin
 
@@ -588,7 +672,6 @@ begin
 
       end;
   end;
-  Result := True;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
