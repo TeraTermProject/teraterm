@@ -53,5 +53,22 @@ goto loop
 fileclose fhandle
 </pre>
 
+<pre class="macro-example">
+; ファイルオープン
+fileopen fhandle 'test.txt' 0
+while 1
+    ; 一行読み込み
+    filereadln fhandle line
+    if result=1 then 
+          break
+    endif
+    ; 読み込んだ行を表示
+    messagebox line 'test.txt'
+    ; ファイル最後まで繰り返す
+endwhile
+; ファイルクローズ
+fileclose fhandle
+</pre>
+
 </body>
 </html>

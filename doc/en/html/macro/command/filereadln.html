@@ -52,5 +52,22 @@ goto loop
 fileclose fhandle
 </pre>
 
+<pre class="macro-example">
+; Open a file.
+fileopen fhandle 'test.txt' 0
+while 1
+    ; Read a line from the file.
+    filereadln fhandle line
+    if result=1 then 
+          break
+    endif
+    ; Display the line.
+    messagebox line 'test.txt'
+    ; Repeat until the end of the file.
+endwhile
+; Close the file.
+fileclose fhandle
+</pre>
+
 </body>
 </html>
