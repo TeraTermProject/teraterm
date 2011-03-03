@@ -282,8 +282,8 @@ en.comp_TTXAlwaysOnTop=Always On Top can be used
 ja.comp_TTXAlwaysOnTop=常に最前面に表示できるようにする
 en.comp_TTXRecurringCommand=Recurring Command can be used
 ja.comp_TTXRecurringCommand=定期的に文字列を送信する
-en.msg_AppRunningError=Setup has detected that Tera Term is currently running.%n%nPlease close all instances of it now, then click Next to continue.
-ja.msg_AppRunningError=セットアップは実行中の Tera Term を検出しました。%n%n開いているアプリケーションをすべて閉じてから「次へ」をクリックしてください。
+en.msg_AppRunningError=Setup has detected that %s is currently running.%n%nPlease close all instances of it now, then click Next to continue.
+ja.msg_AppRunningError=セットアップは実行中の %s を検出しました。%n%n開いているアプリケーションをすべて閉じてから「次へ」をクリックしてください。
 
 [Code]
 const
@@ -359,7 +359,7 @@ begin
 end;
 }
 
-function CheckAppUsing(Filename:String) : integer;
+function CheckFileUsing(Filename:String) : integer;
 var
   TmpFileName : String;
 begin
@@ -384,12 +384,13 @@ begin
     Result := 0;
 end;
 
-function CheckAppsUsing() : integer;
+function CheckAppsUsing() : string;
 var
   FileDir  : String;
   FileName : array[0..6] of String;
+  FileDesc : array[0..6] of String;
   i        : integer;
-  flag     : boolean;
+  ErrMsg   : String;
 begin
   FileDir := ExpandConstant('{app}');
   FileName[0] := FileDir + '\ttermpro.exe';
@@ -399,28 +400,29 @@ begin
   FileName[4] := FileDir + '\cygterm.exe';
   FileName[5] := FileDir + '\Collector.exe';
   FileName[6] := FileDir + '\Collector_org.exe';
+  FileDesc[0] := 'Tera Term';
+  FileDesc[1] := 'Tera Term Macro';
+  FileDesc[2] := 'Keycode';
+  FileDesc[3] := 'TeraTerm Menu';
+  FileDesc[4] := 'CygTerm+';
+  FileDesc[5] := 'Collector';
+  FileDesc[6] := 'Collector';
   
-  flag := True;
   for i := 0 to 6 do
   begin
-    if flag = True then
-    begin
-      case CheckAppUsing(FileName[i]) of
-        1:
-          // failed to delete. in use.
-          begin
-            Result := 1;
-            flag := False;
-          end;
-        -1:
-          // failed to copy/rename
-          begin
-            Result := -1;
-            flag := False;
-          end;
-        else
-          // OK
-      end;
+    case CheckFileUsing(FileName[i]) of
+      1:
+        // Failed to delete. In use.
+        begin
+          if Length(Result) > 0 then
+            Result := Result + ', ' + FileDesc[i]
+          else
+            Result := FileDesc[i]
+        end;
+      else
+        // -1: Failed to copy/rename
+        //  0: OK
+        // NOP
     end;
   end;
 
@@ -603,8 +605,9 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 var
   uninstaller  : String;
   uninstaller2 : String;
-  ResultCode: Integer;
-  iniFile : String;
+  ResultCode   : Integer;
+  iniFile      : String;
+  ErrMsg       : String;
 begin
   Result := True;
 
@@ -644,14 +647,16 @@ begin
     wpSelectDir:
       begin
 
-        ResultCode := CheckAppsUsing();
-        if ResultCode = 1 then
+        ErrMsg := CheckAppsUsing();
+        if Length(ErrMsg) > 0 then
           begin
-            MsgBox(CustomMessage('msg_AppRunningError'), mbError, MB_OK);
+            MsgBox(Format(CustomMessage('msg_AppRunningError'), [ErrMsg]), mbError, MB_OK);
             Result := False;
-          end;
-        // if -1, goto next. turn over to Inno Setup.
-
+          end
+        else
+        // -1: goto next. Turn over to Inno Setup.
+        //  0: goto next. No problem.
+        // NOP
       end;
 
     wpSelectComponents:
