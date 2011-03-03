@@ -266,6 +266,9 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_22 2011/03/03 (by maya)
+        * Delete mutex object for running check by installer.
+
 v1.07_21 2011/02/28 (by maya)
         * Add mutex object for running check by installer.
 

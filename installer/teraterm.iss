@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.69-RC3"
+#define AppVer "4.69-RC4"
 ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
@@ -16,7 +16,6 @@ DefaultGroupName={#AppName}
 ShowLanguageDialog=yes
 AllowNoIcons=true
 UninstallDisplayIcon={app}\ttermpro.exe
-;AppMutex=TeraTermProAppMutex, TeraTermProMacroAppMutex, TeraTermProKeycodeAppMutex, TeraTermMenuAppMutex, CygTermAppMutex, Global\TeraTermProAppMutex, Global\TeraTermProMacroAppMutex, Global\TeraTermProKeycodeAppMutex, Global\TeraTermMenuAppMutex, Global\CygTermAppMutex
 #ifndef snapshot
 OutputBaseFilename=teraterm-{#AppVer}
 #else
@@ -390,7 +389,6 @@ var
   FileName : array[0..6] of String;
   FileDesc : array[0..6] of String;
   i        : integer;
-  ErrMsg   : String;
 begin
   FileDir := ExpandConstant('{app}');
   FileName[0] := FileDir + '\ttermpro.exe';

@@ -49,19 +49,6 @@ CTeraApp theApp;
 // CTeraApp initialization
 BOOL CTeraApp::InitInstance()
 {
-	// インストーラで実行を検出するために mutex を作成する (2006.8.12 maya)
-	// 2重起動防止のためではないので、特に返り値は見ない
-	SECURITY_DESCRIPTOR sd;
-	SECURITY_ATTRIBUTES sa;
-	HANDLE hMutex, hMutex2;
-	InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
-	SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
-	sa.nLength = sizeof(sa);
-	sa.lpSecurityDescriptor = &sd;
-	sa.bInheritHandle = FALSE;
-	hMutex = CreateMutex(&sa, FALSE, "TeraTermProAppMutex");
-	hMutex2 = CreateMutex(&sa, FALSE, "Global\\TeraTermProAppMutex");
-
 	hInst = m_hInstance;
 	m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;

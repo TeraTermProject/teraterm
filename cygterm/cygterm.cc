@@ -112,6 +112,10 @@
 // patch level 21 - add mutex
 //   Written by NAGATA Shinya. (maya)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 22 - delete mutex
+//   Written by NAGATA Shinya. (maya)
+//
 
 static char Program[] = "CygTerm+";
 static char Version[] = "version 1.07_21 (2011/2/28)";
@@ -1245,18 +1249,6 @@ int main(int argc, char** argv)
     int sh_pty = -1;
     HANDLE hTerm = NULL;
     int sh_pid, agent_pid = 0;
-
-    // Create mutex for running check by installer (2006.8.18 maya)
-    SECURITY_DESCRIPTOR sd;
-    SECURITY_ATTRIBUTES sa;
-    HANDLE hMutex, hMutex2;
-    InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
-    SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
-    sa.nLength = sizeof(sa);
-    sa.lpSecurityDescriptor = &sd;
-    sa.bInheritHandle = FALSE;
-    hMutex = CreateMutex(&sa, FALSE, "CygTermAppMutex");
-    hMutex2 = CreateMutex(&sa, FALSE, "Global\\CygTermAppMutex");
 
     // load configuration
     load_cfg();
