@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.69-RC4"
+#define AppVer "4.69"
 ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
@@ -794,6 +794,6 @@ Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
 
 [InnoIDE_PreCompile]
-;Name: makechm.bat
-;Name: build.bat; Parameters: rebuild
+Name: makechm.bat
+Name: build.bat; Parameters: rebuild
 ;Name: build.bat
