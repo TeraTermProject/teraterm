@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>strlen</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strlen</h1>
+
+<p>
+文字列の長さを返す。
+</p>
+
+<h2>形式</h2>
+
+<pre class="macro-syntax">
+strlen &lt;string&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列 &lt;string&gt; の長さをシステム変数 result に格納する。<br>
+文字列の長さにはナル文字は含まない。また、長さはバイト単位でカウントされる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strlen Txcnt
+if result>0 then
+	logwrite Txcnt
+else
+	messagebox 'Txcnt is NULL' 'error'
+endif
+</pre>
+
+</body>
+</html>

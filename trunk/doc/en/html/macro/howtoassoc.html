@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>How to associate "TTL" files with MACRO</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>How to associate "TTL" files with MACRO</h1>
+
+<p class="notice">
+Since Tera Term 4.59, you can associate ".TTL" files with MACRO with installer.
+</p>
+
+<p>
+To associate the file extention ".TTL" with MACRO, do the following steps.
+</p>
+
+<ol>
+  <li>Execute the [View] Options command of Explorer.</li>
+
+  <li>Select the "File Types" tab.</li>
+
+  <li>Click the "New Type" button and specify items like the following.
+<pre>
+Description of type:	Tera Term macro files
+Associated extention:	TTL
+</pre></li>
+  <li>Click the "New" button and specify items like the following.
+<pre>
+Action:	Execute
+Application used to perform action:
+	"C:\Program Files\teraterm\ttpmacro.exe" "%1"
+	(If Tera Term Pro is installed in C:\Program Files\teraterm.)
+</pre></li>
+  <li>Close all the dialog boxes by clicking "OK" buttons.</li>
+</ol>
+
+</BODY>
+</HTML>

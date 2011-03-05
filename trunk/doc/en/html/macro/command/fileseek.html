@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>fileseek</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>fileseek</h1>
+
+<p>
+Moves a file pointer.
+</p>
+
+<pre class="macro-syntax">
+fileseek &lt;file handle&gt; &lt;offset&gt; &lt;origin&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Moves the pointer for the file specified by &lt;file handle&gt;.<br>
+With this command, the file pointer is moved to followings:
+</p>
+
+<table>
+ <tr>
+  <th>&lt;origin&gt;</th>
+  <td>0</td>
+  <td>&lt;offset&gt; bytes from the beginning of the file.</td>
+ </tr>
+ <tr>
+  <th>&lt;origin&gt;</th>
+  <td>1</td>
+  <td>&lt;offset&gt; bytes from the current position.</td>
+ </tr>
+ <tr>
+  <th>&lt;origin&gt;</th>
+  <td>2</td>
+  <td>&lt;offset&gt; bytes from the end of the file.</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Move to the beginning of file.
+fileseek fhandle 0 0
+
+; Move 10 bytes from the current position.
+fileseek fhandle 10 1
+
+; Move to the end of file.
+fileseek fhandle 0 2
+
+; Move to the position 10 bytes backward from the end of file.
+fileseek fhandle 0-10 2
+</pre>
+
+</body>
+</html>

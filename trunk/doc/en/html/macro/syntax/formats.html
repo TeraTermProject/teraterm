@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Formats of constants</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Formats of constants</h1>
+
+<h2>1) Integer-type constants</h2>
+
+<p>
+A integer-type constant is expressed as a decimal number or a hexadecimal number which begins with a "$" character..
+</p>
+
+<pre>
+Example:
+    123
+    -11
+    $3a
+    $10F
+</pre>
+
+<p>
+<A HREF="../appendixes/negative.html">Note on negative integer constants</A>
+</p>
+
+
+<h2>2) String-type constants</h2>
+
+<p>
+There are two ways of expressing a string-type constant.<P></P>
+</p>
+
+<p>
+a) A character string quoted by ' or " (both sides must be same).
+</p>
+
+<pre>
+Example:
+    'Hello, world'
+    "I can't do that"
+</pre>
+
+<p>
+b) A single character expressed as a "#" followed by an ASCII code (decimal or hexadecimal number).
+Note: Strings can not contain NUL (ASCII code 0) characters.
+</p>
+
+<pre>
+Example:
+    #65     The character "A".
+    #$41    The character "A".
+    #13     The CR character.
+</pre>
+
+<p>
+<A HREF="../appendixes/ascii.html">ASCII code table</A> 
+</p>
+
+<p>
+Format a) and b) can be combined in one expression.
+</p>
+
+<pre>
+Example:
+    'cat readme.txt'#13#10
+    'abc'#$0d#$0a'def'#$0d#$0a'ghi'
+</pre>
+
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+<title>LogMeTT Tutorial</title>
+</head>
+
+<body>
+
+<h1>LogMeTT Tutorial</h1>
+
+<h2><a name="whatis">1. LogMeTTとは</a></h2>
+
+<p>
+LogMeTTはターミナルエミュレータTeraTerm Macroのランチャーツールです。TeraTermからリモートホストへ自動ログインしたり、さまざまな処理を行わせたりすることができます。ログインの自動化ツールとしてはTeraTerm Menuがありますが、ssh2接続やスケジュール機能、自動ログ取得機能、接続ホストごとに配色設定などを設定できる等の利点があります。また、ツリー構造でホストごと、マクロごとに階層化できるためサーバ管理に向いています。USA在住の<a href="http://www.logmett.com/">Boris氏</a>により開発されています。LogMeTTはTeraTermインストーラに付属しています。
+</p>
+
+
+<h2><a name="whatcan">2. LogMeTTでできること</a></h2>
+
+<p>
+TeraTerm Macroを使いリモートホストへの自動接続を管理することができます。ホストをツリー構造で登録することができるので、ホストが多数ある場合でも効率的に管理することが可能です。また、工夫次第であらゆる作業を自動化できます。※ただし、2006/11Verssion2.8(Release6)現在、TeraTerm Menuにあるようなキーボードショートカットによる即時起動のような機能は利用できません。
+</p>
+
+
+<h2><a name="launch">3. 起動方法</a></h2>
+
+<p>
+LogMeTTはTeraTermのFileメニューから呼び出すことで起動することができます。起動すると、常駐プロセスとしてタスクトレイにアイコンが表示されます。
+</p>
+
+<div class="img"><img class="block" width="209" height="29" src="tasktray.jpg" alt="tasktray"></div>
+
+
+<h2><a name="configuration">4. 設定</a></h2>
+
+<p>
+ここからは、実際にLogMeTTを使ってリモートホストへSSH2による接続を自動化する設定を紹介します。簡単な操作でTeraTermの自動化を体験してみてください。
+</p>
+
+<p>
+1. LogMeTTのタスクトレイアイコン(上記3.の図にある丸囲い）を右クリックして“Configure…”を選択する。
+</p>
+
+<p>
+2. 設定ダイアログが表示される。“Settings”タブの下にある、“General”タブに “Run at log on to Windows”にチェックを入れると(下図参照)Windowsログオン時にLogMeTTが自動起動される。
+</p>
+
+<p>
+3. “Settings” タブの下にある “New Connections”タブで、Log file creationが &quot;Start logging&quot;になっていると、メニューから起動した場合自動的にログが取得されるようになる。(“TeraTermをインストールしたディレクトリ\Logs\LogMeTT<var>メニュー名</var>_<var>日付時間</var>.log”として保存される)
+</p>
+
+<div class="img"><img width="652" height="529" src="setting_logon.jpg" alt="logon"></div>
+
+<p>
+4. メニューバーの“Connection”から“Add Child”を選ぶと、エントリが一つ追加される。画面左のThis computerを右クリックしても“Add Child”が選択できる。
+</p>
+
+<p>
+5. “This computer”の下に“Unnamed connection #1”というアイコンが追加されるので、そのアイコンを選択し“F2”キーを押して名前をつける。
+</p>
+
+<div class="img"><img width="654" height="530" src="setting_add.jpg" alt="add"></div>
+
+<p>
+6. “Macro”タブを選び、リモートホストへログインするためのマクロを記述する。たとえば、ユーザ名を固定とし、パスワードはダイアログボックスで入力させたい場合は、次のようなマクロを書く。もちろん、パスワードをマクロ内に記述してもよいが、マクロの取り扱いには注意すること。<br>
+<span class="warning">※セキュリティに配慮したマクロ(パスワードの暗号化等)については<a href="#security">5.セキュリティに配慮したマクロについて</a>を参照</span>
+</p>
+
+<p>
+＝注意＝<br>この記述はTeraTerm Macroなのでシングルクォート ' ダブルクォート " に気をつけること。下記をコピーして貼り付けると安全
+</p>
+
+<pre class="code"><code>
+username = 'nike'
+hostname = '192.168.1.3'
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+msg = 'Enter password for user '
+strconcat msg username
+passwordbox msg 'Get password'
+
+msg = hostname
+strconcat msg ':22 /ssh /auth=password /user='
+strconcat msg username
+strconcat msg ' /passwd='
+strconcat msg inputstr
+
+connect msg
+</code></pre>
+
+<div class="img"><img width="654" height="558" src="macro.jpg" alt="macro"></div>
+
+<p>
+7. F9キーを押して、マクロが正常に動作するか検証する。 問題なければ、右上にあるApplyボタンを押して設定内容を保存する。
+</p>
+
+<p>
+8. 登録したリモートホストはタスクトレイの右クリックメニューから選択することができる。
+</p>
+
+<p>
+9. “Popup”タブにメッセージを記述しておくと、
+</p>
+
+<div class="img"><img width="654" height="473" src="popup.jpg" alt="popup"></div>
+
+<p>
+実行時に下記のポップアップメッセージが表示される。
+</p>
+
+<div class="img"><img width="193" height="117" src="popup2.jpg" alt="popup"></div>
+
+<p>
+重要なホストに接続する際や、root等の特権アクセスのマクロにPopupで注意を促す際等に利用する。ポップアップメッセージではOKを押すとマクロが実行され、Cancelを押すとMacroは実行されない。
+</p>
+
+<p>
+10. “Colors”タブでは、接続メニュー毎にTeraTermの配色を変更できる。 Popup同様、重要なホストに接続する際等のメニュー配色を変えるなどに利用する。ユーザ毎、ホスト毎に配色を変更する事で誤操作の予防にもなる。
+</p>
+
+<div class="img"><img width="653" height="506" src="color.jpg" alt="color"></div>
+
+<p>
+11. Scheduleタブでは、設定したマクロを自動実行させることができる。 上手くマクロを組めば、下記のような事が可能になる。
+</p>
+
+<ul>
+  <li>定期的に電源をon/off</li>
+  <li>“Settings”タブの“User Data”タブ項目と組み合わせ、障害発生時にe-mailや電話させるなどの自動処理</li>
+  <li>定時バックアップ、ステータスチェック</li>
+</ul>
+
+<p class="warning">
+※注意:メニューの階層は親から順番に実行されてしまうため、子をスケジュールに入れておくとその直系親ツリーがすべて実行される。単一タスクとして行いたい場合は独立させること（This computer直下)。また、ホストとLogMeTTを実行するPCの時刻差異に注意すること。
+</p>
+
+<p class="notice">
+Scheduleを実行する場合は、後述の自動ログをONにすることを推奨する。(後で何が起きたかわからなくなってしまわないように)
+</p>
+
+
+<h2><a name="security">5. セキュリティに配慮したマクロについて</a></h2>
+
+<p>
+この項目は、TeraTerm Macroに関するTopicです。
+</p>
+
+<p>
+“4. 設定”で紹介したマクロではマクロ内にユーザ名が記述されており、セキュリティ上あまり良くないと思われます。パスワードは毎回入力するタイプです。これを、ユーザ名、パスワードを暗号化したファイルに保存する方式を紹介します。
+</p>
+
+
+<h3>1. パスワードを暗号化して記憶（ローカル保存）するマクロ＝自動ログイン</h3>
+
+<p>
+※ユーザ名を <span class="variable">scott</span> ホスト名を <span class="variable">remote.host</span> パスワードファイルの保存先を <span class="variable">C:\mydata\filename.dat</span> とした場合のマクロ例です。
+</p>
+
+<pre class="code"><code>
+; setting
+hostname = 'remote.host'
+username = 'scott'
+getpassword 'C:\mydata\filename.dat' 'usrpass' inputstr
+
+; connection &amp; login
+msg = hostname
+strconcat msg ':22 /ssh /2 /auth=password /user='
+strconcat msg usernam
+strconcat msg ' /passwd='
+strconcat msg inputstr
+connect msg
+</code></pre>
+
+<p>
+※getpassword 'filepath\filename' '識別子' $格納変数
+</p>
+
+<p>
+同一格納ファイルに複数の識別子でパスワードを暗号化保存できます。
+</p>
+
+<p>
+このマクロは、最初の一度だけパスワードを聞かれますが、その後はC:\mydata\filename.datに保存された暗号化パスワードが利用されるためLogMeTTメニューからの選択だけで自動ログインが可能になります。
+</p>
+
+
+<h3>2. ユーザIDとパスワードを両方暗号化して記憶（ローカル保存）するマクロ＝自動ログイン</h3>
+
+<p>
+ホスト名を <span class="variable">remote.host</span> ユーザIDとパスワードファイルの保存先を <span class="variable">C:\mydata\filename.dat</span> とした場合のマクロ例です。
+</p>
+
+<pre class="code"><code>
+; setting
+hostname = 'remote.host'
+getpassword 'C:\mydata\filename.dat' 'usrid' username
+getpassword 'C:\mydata\filename.dat' 'usrpass' inputstr
+
+; connection &amp; login
+msg = hostname
+strconcat msg ':22 /ssh /2 /auth=password /user='
+strconcat msg username
+strconcat msg ' /passwd='
+strconcat msg inputstr
+connect msg
+</code></pre>
+
+<p>
+※getpassword 'filepath\filename' '識別子' $格納変数
+</p>
+
+<p>
+このマクロではユーザIDも識別子usridとして格納しています。最初のログイン時にはユーザIDとパスワードの両方を入力しなければなりませんが、2回目以降は同様にLogMeTTメニューからの選択だけで自動ログインが可能になります。同じように、getpasswordを利用することでホスト名を暗号化してしまうことも可能ですが、TeraTermのヒストリに過去接続したホストが残る場合もありますのでセキュリティを考慮する場合は様々な注意が必要です。ホスト名、そのホストに登録されているID、パスワード等のすべてを暗号化して隠すことができるマクロです。
+</p>
+
+
+<h3>3. telnetを利用する場合</h3>
+
+<p>
+telnet(ポート23)を利用して接続する場合は接続マクロが一部違いますので注意してください。これは、telnetが接続セッション確立後に認証を行うためです。
+</p>
+
+<pre class="code"><code>
+; setting
+hostname = 'remote.host'
+getpassword 'C:\mydata\filename.dat' 'usrid' username
+getpassword 'C:\mydata\filename.dat' 'usrpass' inputstr
+;; login session ※
+UsernamePrompt = 'Please login:'
+PasswordPrompt = 'Please Enter password:'
+
+; connection
+msg = hostname
+strconcat msg ':23'
+strconcat msg ' /nossh'
+connect msg
+
+; login
+wait   UsernamePrompt
+sendln username
+wait   PasswordPrompt
+sendln inputstr
+</code></pre>
+
+<p>
+※telnetではログインするホストの応答内容にあわせて記述を変更する必要があります。(ログインプロンプト)
+</p>
+
+
+<h3>暗号化して記憶（ローカル保存）したファイルの取り扱いについて</h3>
+
+<p>
+保存されたパスワードファイルを安全に保管することで、たとえばrootユーザで接続する場合はそのファイルが必要になるような運用を行うことができます。管理者は最初に一度だけ複雑で長いパスワードを設定し、ファイル保存後は破棄してしまってかまわないのです。
+</p>
+
+<p>
+上記のマクロ例のようにローカル保存する場合は、セキュリティの観点からスタートアップにパスワード格納ファイルの削除バッチファイルを入れておくと、ログイン後最初の一度だけパスワード認証が必要になり、セキュリティと利便性の両立などを図ることができます。
+</p>
+
+<p>
+完全なセキュリティはありませんが、機密性を強化するのに役立ててください。
+</p>
+
+
+<h2><a name="latestversion">6. 最新版の入手先</a></h2>
+
+<p>
+TeraTermに付属しているLogMeTTは基本的にリリース時点での最新版を同梱するようにしていますが、別プロダクトですのでリリースによってはLogMeTTの最新版が先に提供されることもあります。最新版の<a href="http://www.logmett.com/forum/viewforum.php?f=5">ダウンロードはこちら</a>
+</p>
+
+<p>
+また、LogMeTTのメニュー“Help”から“Check for updates”を選択しても最新版を入手可能です。
+</p>
+
+
+<h2><a name="contact">7. 連絡先</a></h2>
+
+<p>
+e-mail: boris at logmett.com <br>
+<a href="http://www.logmett.com/index.php?/Products/LogMeTT.html">LogMeTT web page</a>
+</p>
+
+</body>
+</html>

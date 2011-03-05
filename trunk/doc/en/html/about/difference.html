@@ -1,0 +1,729 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Differences from 2.3</title>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+
+<body>
+
+<h1>Differences from 2.3</h1>
+
+<p>
+There are differences between Tera Term(Tera Term 4.58) and Tera Term Pro 2.3 in the following table: 
+</p>
+
+<h2>Feature Differences</h2>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="20%">Content</th>
+	<th width="30%">Tera Term Pro 2.3</th>
+	<th width="30%">Tera Term</th>
+</tr>
+
+<tr>
+	<td>Source code</td>
+	<td>Opened</td>
+	<td>Opened</td>
+</tr>
+
+<tr>
+	<td>Development tool</td>
+	<td>Visual C++ 5.0 / Watcom C/C++ 11.0</td>
+	<td>Visual Studio 2005[*1]</td>
+</tr>
+
+<tr>
+	<td>License</td>
+	<td>Proprietary[*2]</td>
+	<td>Modified BSD license[*3]</td>
+</tr>
+
+<tr>
+	<td>Icon</td>
+	<td><img src="../image/teraterm.png" alt="Tera Term" width="32" height="32">[*4]</td>
+	<td><img src="../image/teraterm_new.png" alt="Tera Term" width="32" height="32">[*4]</td>
+</tr>
+
+<tr>
+	<td>TTSSH icon</td>
+	<td><img src="../image/ttsecure.png" alt="TTSSH" width="32" height="32"></td>
+	<td><img src="../image/ttsecure_new.png" alt="TTSSH" width="32" height="32">[*4]</td>
+</tr>
+
+<tr>
+	<td>Maximum COM port</td>
+	<td>16</td>
+	<td>256</td>
+</tr>
+
+<tr>
+	<td>Serial baud rate</td>
+	<td>from 110 to 115200</td>
+	<td>from 110 to 921600</td>
+</tr>
+
+<tr>
+	<td>Plugin module</td>
+	<td>Need to setup "TERATERM_EXTENSIONS" environmental variable</td>
+	<td>No need</td>
+</tr>
+
+<tr>
+	<td>Linked library</td>
+	<td>SSLeay, zlib</td>
+	<td>OpenSSL, zlib, Oniguruma, PuTTY</td>
+</tr>
+
+<tr>
+	<td>TTSSH</td>
+	<td>SSH 1.5</td>
+	<td>SSH 1.5 and 2</td>
+</tr>
+
+<tr>
+	<td>support SSH protocl</td>
+	<td>shell, port-forwarding, X11 forwarding</td>
+	<td>shell, port-forwarding, X11 forwarding, SCP</td>
+</tr>
+
+<tr>
+	<td>unsupport SSH protocl</td>
+	<td>SFTP, SCP</td>
+	<td>SFTP</td>
+</tr>
+
+<tr>
+	<td>SSH Symmetric key cipher algorithm</td>
+	<td>3DES, DES, Blowfish</td>
+	<td>3DES-CBC, Blowfish, AES128, AES192, AES256</td>
+</tr>
+
+<tr>
+	<td>SSH packet compression</td>
+	<td>Yes</td>
+	<td>Yes, and also supports SSH2 delayed compression.</td>
+</tr>
+
+<tr>
+	<td>Pageant[*5] collaboration</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Japanese character code</td>
+	<td>EUC-JP/Shift_JIS/JIS</td>
+	<td>EUC-JP/Shift_JIS/JIS/UTF-8/UTF-8 MAC</td>
+</tr>
+
+<tr>
+	<td>Unicode</td>
+	<td>Not supported</td>
+	<td>Support single language[*6]</td>
+</tr>
+
+<tr>
+	<td>IPv6</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Transparency window</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Heart beat[*7]</td>
+	<td>No</td>
+	<td>telnet, SSH1 and 2</td>
+</tr>
+
+<tr>
+	<td>Maximize window</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Scroll Lock key</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Prohibit right-clicking</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Online help document</td>
+	<td>WinHelp</td>
+	<td>HtmlHelp</td>
+</tr>
+
+<tr>
+	<td>Clickable URL</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>Wheel mouse</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+<tr>
+	<td>I18N</td>
+	<td>No</td>
+	<td>Yes[*8]</td>
+</tr>
+
+<tr>
+	<td>Proxy</td>
+	<td>No</td>
+	<td>Yes[*9](HTTP, TELNET, SOCKS4, SOCKS5, SSL, HTTP+SSL, TELNET+SSL, SOCKS4+SSL, SOCKS5+SSL)</td>
+</tr>
+
+<tr>
+	<td>xterm 256 color mode</td>
+	<td>No</td>
+	<td>Yes</td>
+</tr>
+
+</table>
+
+<p></p>
+
+<ul>
+  <li>[*1] You can not use Visual Studio 2005 Express Edition because the partial code of souce code is MFC(C++).</li>
+  <li>[*2] Without written permission by the author (Takashi Teranishi), you may not distribute modified versions of this package, and may not distribute this package for profit.</li>
+  <li>[*3] Tera Term is distributed under <a href="http://www.opensource.org/licenses/bsd-license.php">Modified BSD License</a>.</li>
+  <li>[*4] Icon designer is Tatsuhiko Sakamoto.</li>
+  <li>[*5] <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">An SSH authentication agent</a> for PuTTY and WinSCP.</li>
+  <li>[*6] Tera Term can not simultaneously display multi languages because it has not completely implemented as Unicode API. Now Tera Term mutually converts between Unicode(UCS-2) and MBCS. Also, Chinese version Windows can display Chinese characters when you configure the locale for Unicode.</li>
+  <li>[*7] If there is no communication for a long time in NAT network, SSH session may disconnect because the router will clear NAT table.</li>
+  <li>[*8] You can switch the messeage language by using the language file(lang\*.lng). You need to re-startup Tera Term to active new messeage language.</li>
+  <li>[*9] Using <a href="http://yebisuya.dip.jp/Software/TTProxy/en/">TTProxy</a>.</li>
+</ul>
+
+<p>
+Other new features are shown below.
+</p>
+
+<ul>
+  <li>ANSI color change and continued-line copy.</li>
+  <li>Changing mouse cursor type.</li>
+  <li>Adding a comment to loggin file.</li>
+  <li>Broadcast command feature.</li>
+  <li>Selecting all buffer.</li>
+  <li>Extend the maximum length of the host name.</li>
+  <li>TeraTerm Menu and LogMeTT included.</li>
+  <li>Duplicate session.</li>
+  <li>Extend the maximum byte of Tera Term scroll buffer.</li>
+  <li>Support for a drag-and-drop operation moving the folder from explorer.</li>
+  <li>The second later Tera Term instance can read teraterm.ini file from not the shared memory but disk file system.</li>
+  <li>Support for VisualStyle(WindowsXP).</li>
+  <li>Add new title format.</li>
+  <li>Add new type of log collection.</li>
+  <li>Support for a default log file name(You can use strftime format).</li>
+  <li>Add the wizard generating SSH authentication key.</li>
+  <li>Add CygTerm configuration dialog.</li>
+  <li>Support for having tabs by using Collector.</li>
+  <li>Add scroll through the screen buffer to the back page when &lt;ESC&gt;[J esacpe sequence is done.</li>
+  <li>Add log reply menu.</li>
+  <li>Add New-line to `LF' type.</li>
+  <li>Add support for selecting a current screen buffer.</li>
+  <li>Add support bash style shortcut key(C-u, C-d, C-k, C-p, C-n, C-b, C-f, C-a, C-a) in "Host" drop-down on "New connectin" dialog. </li>
+</ul>
+
+<hr>
+
+<h2>Bug fixes: Tera Term Pro 2.3</h2>
+
+<ul>
+  <li>Tera Term window size could not be changed after the window width is smaller than 84 dot(94 dot on XP LUNA style).</li>
+  <li>BOF(Buffer Over Flow) problem in ttpmacro.exe program, which 256 byte longer command line parameter is specified.</li>
+  <li>BOF(Buffer Over Flow) problem in ttpmacro.exe program when a line of macro is longer than 256 byte.</li>
+  <li>The program of ttermpro.exe can not send the server data to ttpmacro.exe program with DDE transaction.</li>
+  <li>The 'pause' macro command had a time-lag about 1 sec.</li>
+  <li>The macro script might stall with logging mode.</li>
+  <li>The cpu scheduling of Tera Term process could occupy while macro script running.</li>
+  <li>The division operator of macro language does not work.</li>
+  <li>Tera Term would crash when the sending file size exceeded 20MB with ZMODEM protocol.</li>
+</ul>
+
+<hr>
+
+<h2>New keyboard shortcut</h2>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">Key</th>
+	<th width="70%">Function</th>
+</tr>
+
+<tr>
+	<td>ScrollLock</td>
+	<td>Tera Term window scroll locked or unlocked(toggle) </td>
+</tr>
+
+<tr>
+	<td>Alt + Enter</td>
+	<td>Switch to Tera Term next/prev window</td>
+</tr>
+
+<tr>
+	<td>Alt + D</td>
+	<td>Duplicate session (SSH, telnet only) </td>
+</tr>
+
+<tr>
+	<td>Alt + G</td>
+	<td>Cygwin connection</td>
+</tr>
+
+<tr>
+	<td>Left click, Shift + Left click </td>
+	<td>Select several pages of output from Tera Term window. 
+	    Or expand ans contract of text area that has been selected. 
+    </td>
+</tr>
+
+<tr>
+	<td>Shift + Mouse drag</td>
+	<td>Deleted to support for above key shortcut</td>
+</tr>
+
+<tr>
+	<td>Alt + MouseDrag </td>
+	<td>Select rectangular block of text</td>
+</tr>
+
+</table>
+
+
+<hr>
+
+<h2>New macro command</h2>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">Command</th>
+	<th width="70%">Feature</th>
+</tr>
+
+<tr>
+	<td>connect</td>
+	<td>has SSH auto login parameters</td>
+</tr>
+
+<tr>
+	<td>waitregex</td>
+	<td>is waitln regular expression version.</td>
+</tr>
+
+<tr>
+	<td>ifdefined</td>
+	<td>can retrieve the type of the variable value.</td>
+</tr>
+
+<tr>
+	<td>mpause</td>
+	<td>can sleep per milisecond.</td>
+</tr>
+
+<tr>
+	<td>sprintf</td>
+	<td>can generate the format string as like printf function of C language.</td>
+</tr>
+
+<tr>
+	<td>str2int</td>
+	<td>can convert a hexadecimal string to a number.</td>
+</tr>
+
+<tr>
+	<td>fileread</td>
+	<td>can read specified byte data from file.</td>
+</tr>
+
+<tr>
+	<td>clipb2var</td>
+	<td>can copy data from the Clipboard.</td>
+</tr>
+
+<tr>
+	<td>var2clipb</td>
+	<td>can copy data to the Clipboard.</td>
+</tr>
+
+<tr>
+	<td>random</td>
+	<td>can generate the random number.</td>
+</tr>
+
+<tr>
+	<td>tolower</td>
+	<td>can translate characters to lowercase.</td>
+</tr>
+
+<tr>
+	<td>toupper</td>
+	<td>can translate characters to uppercase.</td>
+</tr>
+
+<tr>
+	<td>break</td>
+	<td>can exit from within a for or while loop.</td>
+</tr>
+
+<tr>
+	<td>inputbox</td>
+	<td>can specify a default string which the text box contains as default text.</td>
+</tr>
+
+<tr>
+	<td>rotateleft</td>
+	<td>can rotate the 32bit value toward the left per bit.</td>
+</tr>
+
+<tr>
+	<td>rotateright</td>
+	<td>can rotate the 32bit value toward the right per bit.</td>
+</tr>
+
+<tr>
+	<td>setenv</td>
+	<td>can change an environment variable on Tera Term process.</td>
+</tr>
+
+<tr>
+	<td>filenamebox</td>
+	<td>Displays a dialog box prompting user to input a string. </td>
+</tr>
+
+<tr>
+	<td>do - loop</td>
+	<td>Loop control</td>
+</tr>
+
+<tr>
+	<td>until - enduntil</td>
+	<td>Loop control</td>
+</tr>
+
+<tr>
+	<td>callmenu</td>
+	<td>can call Tera Term window menu.</td>
+</tr>
+
+<tr>
+	<td>cygconnect</td>
+	<td>Connects to Cygwin. </td>
+</tr>
+
+<tr>
+	<td>scpsend</td>
+	<td>Sends a file from the host with the SCP protocol. </td>
+</tr>
+
+<tr>
+	<td>scprecv</td>
+	<td>Receives a file from the remote host with the SCP protocol. </td>
+</tr>
+
+<tr>
+	<td>getver</td>
+	<td>Get the version of Tera Term. </td>
+</tr>
+
+<tr>
+	<td>setbaud</td>
+	<td>Causes Tera Term to change baud rate. </td>
+</tr>
+
+</table>
+
+
+<hr>
+
+<h2>New teraterm.ini entry</h2>
+
+<p>
+"Tera Term" sections are shown below.
+</p>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">Entry</th>
+	<th width="70%">Feature</th>
+</tr>
+
+
+<tr>
+	<td>UILanguageFile</td>
+	<td>can specify the I18N language file. The default language is English.</td>
+</tr>
+
+<tr>
+	<td>ConnectingTimeout</td>
+	<td>is disconnection timeout value per second while TCP connecting.
+	    Also, this value can be specified at /timeout command line option.</td>
+</tr>
+
+<tr>
+	<td>DisablePasteMouseRButton</td>
+	<td>can disable pasting by right-click.</td>
+</tr>
+
+<tr>
+	<td>ConfirmPasteMouseRButton</td>
+	<td>can require the user to confirm an action before pasting by right-click is carried out.</td>
+</tr>
+
+<tr>
+	<td>DisableAcceleratorSendBreak</td>
+	<td>can disable sending break signal by Alt+B key shortcut.</td>
+</tr>
+
+<tr>
+	<td>ANSIColor</td>
+	<td>can configure ANSI color table.</td>
+</tr>
+
+<tr>
+	<td>EnableContinuedLineCopy</td>
+	<td>can enable concatenating the next line.</td>
+</tr>
+
+<tr>
+	<td>MouseCursor</td>
+	<td>can change the kind of the mouse pointer.</td>
+</tr>
+
+<tr>
+	<td>AlphaBlend</td>
+	<td>can setup the transparency value of Tera Term window.</td>
+</tr>
+
+<tr>
+	<td>CygwinDirectory</td>
+	<td>can specify a folder of Cygwin installation.</td>
+</tr>
+
+<tr>
+	<td>ViewlogEditor</td>
+	<td>can specify a editor program which open a log file.</td>
+</tr>
+
+<tr>
+	<td>Locale</td>
+	<td>can specify a locale for Unicode.</td>
+</tr>
+
+<tr>
+	<td>CodePage</td>
+	<td>can specify code page for Unicode. </td>
+</tr>
+
+<tr>
+	<td>UseNormalBGColor</td>
+	<td>can enable matching a character with a screen for a background color.</td>
+</tr>
+
+<tr>
+	<td>KanjiReceive</td>
+	<td>added "UTF-8" and "UTF-8m" option for Unicode.</td>
+</tr>
+
+<tr>
+	<td>KanjiSend</td>
+	<td>added "UTF-8" option for Unicode. Besides, "UTF-8m" is not necessary because sending procedure is NFC at UTF-8-MAC.</td>
+</tr>
+
+<tr>
+	<td>URLColor</td>
+	<td>can specify the emphasis color of Clickable URL. Actually, it does not work.</td>
+</tr>
+
+<tr>
+	<td>EnableClickableUrl</td>
+	<td>can enable Clickable URL.</td>
+</tr>
+
+<tr>
+	<td>LogTypePlainText</td>
+	<td>can not include control codes in logging file.</td>
+</tr>
+
+<tr>
+	<td>LogTimestamp</td>
+	<td>can insert OS timestamp in the head of the line while log collection doing.</td>
+</tr>
+
+<tr>
+	<td>LogDefaultName</td>
+	<td>can specify the default file name when log collection starts. You can use <a href="http://msdn2.microsoft.com/ja-jp/library/fe06s4ak(VS.80).aspx">strftime</a> format.</td>
+</tr>
+
+<tr>
+	<td>LogDefaultPath</td>
+	<td>can specify the default path name when log collection starts. </td>
+</tr>
+
+<tr>
+	<td>LogAutoStart</td>
+	<td>can automatically start log collection when Tera Term connect to remote server.</td>
+</tr>
+
+<tr>
+	<td>BroadcastCommandHistory</td>
+	<td>can record command historys of Broadcast Command to teraterm.ini file.</td>
+</tr>
+
+<tr>
+	<td>AcceptBroadcast</td>
+	<td>does not send the command the user input to own window when this option is off.</td>
+</tr>
+
+<tr>
+	<td>TitleFormat</td>
+	<td>added "13", "29", "45" and "61" as format ID.</td>
+</tr>
+
+<tr>
+	<td>FileSendFilter</td>
+	<td>can configure filters of file name on sending dialog.</td>
+</tr>
+
+<tr>
+	<td>VTCompatTab</td>
+	<td>can enable that the tab display at the end of line is VT compatible terminal.</td>
+</tr>
+
+<tr>
+	<td>MaxBroadcatHistory</td>
+	<td>Number for the history of broadcast command</td>
+</tr>
+
+<tr>
+	<td>DisableAppKeypad, DisableAppCursor</td>
+	<td>can disable application keypad/cursor mode. </td>
+</tr>
+
+<tr>
+	<td>ClearComBuffOnOpen</td>
+	<td>Don't clear COM buffer when serial port opening.</td>
+</tr>
+
+<tr>
+	<td>Send8BitCtrl</td>
+	<td>Send C1 (ASCII $80-$9F) control characters.</td>
+</tr>
+
+<tr>
+	<td>SelectOnlyByLButton</td>
+	<td>enables only mouse left-click to select the text by dragging.</td>
+</tr>
+
+<tr>
+	<td>TelAutoDetect</td>
+	<td>controls telnet command detection.</td>
+</tr>
+
+<tr>
+	<td>ZmodemRcvCommand</td>
+	<td>Receive command for ZMODEM</td>
+</tr>
+
+<tr>
+	<td>XmodemRcvCommand</td>
+	<td>Receive command for XMODEM</td>
+</tr>
+
+<tr>
+	<td>ConfirmFileDragAndDrop</td>
+	<td>Confirmation of File Transfer by Drag & Drop</td>
+</tr>
+
+<tr>
+	<td>TranslateWheelToCursor</td>
+	<td>Mouse wheel action in application cursor mode</td>
+</tr>
+
+<tr>
+	<td>HostDialogOnStartup</td>
+	<td>Showing "New Connection" dialog on startup</td>
+</tr>
+
+<tr>
+	<td>MouseEventTracking</td>
+	<td>Mouse tracking mode</td>
+</tr>
+
+<tr>
+	<td>KillFocusCursor</td>
+	<td>Display the cursor even if the window comes out of focus</td>
+</tr>
+
+<tr>
+	<td>ConfirmChangePaste</td>
+	<td>Show the confirmation dialog when the Clipboard includes CR/LF by pasting</td>
+</tr>
+
+<tr>
+	<td>MaximizedBugTweak</td>
+	<td>How to scroll the screen when the window size is maximized</td>
+</tr>
+
+</table>
+
+<p>
+"TTSSH" sections are shown below.
+</p>
+
+<table align="center" bgcolor="#f0f0f0" border="1" cellpadding="1" cellspacing="1" width="100%">
+<tr>
+	<th width="30%">Entry</th>
+	<th width="70%">Feature</th>
+</tr>
+
+<tr>
+	<td>CipherOrder</td>
+	<td>added "7" as 3DES-CBC, "8" as AES128, "9" as AES192, ":" as AES256, ";" as BlowfishBlowfish(SSH2).</td>
+</tr>
+
+<tr>
+	<td>ProtocolVersion</td>
+	<td>can be SSH protocol version.</td>
+</tr>
+
+<tr>
+	<td>HeartBeat</td>
+	<td>can be keep-alive(heart-beat) interval per second.</td>
+</tr>
+
+<tr>
+	<td>RememberPassword</td>
+	<td>can configure whether the password string which the user input will preserve on memory.</td>
+</tr>
+
+<tr>
+	<td>CheckAuthListFirst</td>
+	<td>disables SSH2 unsupported authentication method before tyring user authentication.</td>
+</tr>
+
+</table>
+
+
+</body>
+</html>

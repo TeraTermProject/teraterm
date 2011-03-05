@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Window resize plugin</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Window resize plugin</h1>
+
+<p><a href="../menu/resize.html">[Resize] menu</a> on Tera Term top menu bar</p>
+
+<h2>Feature</h2>
+
+<p>
+A user can add the [Resize] menu on the top menu bar by using the TTXResizeMenu plugin.<br>
+When the [Resize] menu entry is selected, Tera Term window is automatically resized by the specified size.
+</p>
+
+
+<h2>Usage</h2>
+
+<p>
+Basically, the [Resize] menu does not display after the plugin is installed.<br>
+Next, a user must register the menu entry in the teraterm.ini file.
+<br><br>
+
+Add a [Resize Menu] section in the teraterm.ini file, and describe the "ResizeMenuN = X, Y" entry. N is an 1-origin number.<br>
+When X or Y equals zero, the value is not changed. For example, (X, Y)=(0, 37) means that the width is not changed and the height is changed into 37 lines.<br>
+These value maximum is 20.
+</p>
+
+<h2>Example</h2>
+<pre>
+[Resize Menu]
+;
+; width 80 columns, height 37 rows
+ResizeMenu1 =  80, 37
+;
+; normal VT size
+ResizeMenu2 =  80, 24
+;
+; Width is not changed, Height is changed to 52 lines.
+ResizeMenu3 =   0, 52
+;
+; Height is not changed, Width is changed to 132 columns(DECCOLM equivalence).
+ResizeMenu4 = 132,  0
+</pre>
+
+<h2>ToDo</h2>
+
+<ul>
+  <li>The Resize menu value can be changed by the dialog box.</li>
+</ul>
+
+</body>
+</html>

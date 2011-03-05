@@ -1,0 +1,296 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>connect</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>connect</h1>
+
+<p>
+Connects.
+</p>
+
+<pre class="macro-syntax">
+connect &lt;command line parameters&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+If MACRO is not linked to Tera Term, this command runs Tera Term with &lt;command line parameters&gt;, and links it to MACRO.
+</p>
+
+<p>
+If MACRO has already been linked to Tera Term and Tera Term is not connected to the host, this command causes Tera Term to connect to the host specified by &lt;command line parameters&gt;. See "<a href="../../commandline/teraterm.html">Tera Term command line</a>" and "<a href="../../commandline/ttssh.html">TTSSH command line</a>" for the format of &lt;command line parameters&gt;.
+</p>
+
+<p>
+If MACRO has already been linked to Tera Term and Tera Term has already been connected to the host, this command is ignored.
+</p>
+
+<p>
+As a result of this command, the system variable "result" is set to one of the following values depending on the link and connection status:
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Status</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Link to Tera Term has not been made.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Connection to the host has not been made, but link to Tera Term has been made.</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>Both connection and link have been made.</td>
+ </tr>
+</table>
+
+<p>
+To test the current link and connect status before executing the "connect" command, use the "<a href="testlink.html">testlink</a>" command.
+</p>
+
+<p>
+Communication commands except "connect", "<a href="cygconnect.html">cygconnect</a>" and "<a href="testlink.html">testlink</a>" can not be executed before the link is established.
+</p>
+
+<h2>Connection method</h2>
+
+<p>
+There are 3 types of connection you can establish from Tera Term macro: 
+</p>
+
+<ul>
+ <li>Telnet connection (port 23)</li>
+ <li>SSH1 or SSH2 connection (port 22)</li>
+ <li>Connection via COM port</li>
+</ul>
+
+<h3>Telnet connections</h3>
+
+<pre class=".code">
+<code>connect '<em>myserver</em>:23 /nossh /T=1'
+connect '<em>myserver</em>:23'
+</code></pre>
+
+<p>
+Using /nossh is strongly recommended. Without this parameter Tera Term will start connecting with the same method (telnet or SSH) that was used during last time when teraterm.ini file was saved. In case it was SSH than your macro will try to connect via SSH and will eventually fail.
+</p>
+<p>
+Using /T=1 is recommended. Without this parameter Tera Term will start connecting with the value of 'Telnet' in teraterm.ini file. When the Telnet value is off, Tera Term may not work well.
+</p>
+
+<h3>SSH connections</h3>
+
+<pre class=".code">
+<code>connect '<em>myserver</em> /ssh'
+</code></pre>
+
+<p>
+This way will start SSH connection without defining whether SSH1 or SSH2 has to be used.
+</p>
+
+<pre class=".code">
+<code>connect '<em>myserver</em> /ssh /1'
+connect '<em>myserver</em> /ssh /2'
+</code></pre>
+
+<p>
+Parameters /1 and /2 force to use SSH1 or SSH2 method.
+</p>
+
+<pre class=".code">
+<code>connect '<em>myserver</em> /ssh /auth=password /user=<em>username</em> /passwd=<em>password</em>'
+connect '<em>myserver</em> /ssh /1 /auth=password /user=<em>username</em> /passwd=<em>password</em>'
+connect '<em>myserver</em> /ssh /2 /auth=password /user=<em>username</em> /passwd=<em>password</em>'
+connect '<em>myserver</em> /ssh /auth=publickey /user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
+connect '<em>myserver</em> /ssh /1 /auth=publickey /user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
+connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
+connect '<em>myserver</em> /ssh /auth=challenge /user=<em>username</em> /passwd=<em>password</em>'
+connect '<em>myserver</em> /ssh /1 /auth=challenge /user=<em>username</em> /passwd=<em>password</em>'
+connect '<em>myserver</em> /ssh /2 /auth=challenge /user=<em>username</em> /passwd=<em>password</em>'
+</code></pre>
+
+<p>
+Above 9 ways allow to skip popup dialog and pass username and password directly from macro. Please note that /auth=password or /auth=publickey or /auth=challenge is the parameter saying that authentication will be done by entering password or private-key-file thus you should not replace the word 'password' or the word 'publickey' in it with actual password.
+</p>
+
+<pre class=".code">
+<code>connect '<em>myserver</em> /ssh /auth=pageant /user=<em>username</em>'
+connect '<em>myserver</em> /ssh /1 /auth=pageant /user=<em>username</em>'
+connect '<em>myserver</em> /ssh /2 /auth=pageant /user=<em>username</em>'
+</code></pre>
+
+<p>
+Above 3 ways allow to skip popup dialog and pass username directly from macro.
+</p>
+
+<pre class=".code">
+<code>connect '<em>myserve</em> /ssh /auth=password /user=<em>username</em> /ask4passwd'
+connect '<em>myserver</em> /ssh /1 /auth=password /user=<em>username</em> /ask4passwd'
+connect '<em>myserver</em> /ssh /2 /auth=password /user=<em>username</em> /ask4passwd'
+connect '<em>myserver</em> /ssh /auth=publickey /user=<em>username</em> /ask4passwd /keyfile=<em>private-key-file</em>'
+connect '<em>myserver</em> /ssh /1 /auth=publickey /user=<em>username</em> /ask4passwd /keyfile=<em>private-key-file</em>'
+connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /ask4passwd /keyfile=<em>private-key-file</em>'
+connect '<em>myserve</em> /ssh /auth=challenge /user=<em>username</em> /ask4passwd'
+connect '<em>myserver</em> /ssh /1 /auth=challenge /user=<em>username</em> /ask4passwd'
+connect '<em>myserver</em> /ssh /2 /auth=challenge /user=<em>username</em> /ask4passwd'
+</code></pre>
+
+<p>
+Above 9 ways pass username and authentication method directly from macro, and the popup asks for password.
+</p>
+
+<h3>Connections via COM port</h3>
+
+<pre class=".code">
+<code>connect '/C=x'
+</code></pre>
+
+<p>
+Here x represents COM port number. For example to connect via COM port 1 the command will look like: connect '/C=1'
+</p>
+
+<p>
+source URL: <a href="http://logmett.com/forum/viewtopic.php?t=28">http://logmett.com/forum/viewtopic.php?t=28</a>
+</p>
+
+<h2>Examples</h2>
+
+<pre class="macro-example">
+; No command line parameter
+connect ''
+
+; Timeout will occur if connection does not succeed within five seconds.
+connect '<em>myserver</em> /timeout=5'
+
+; Run Tera Term and open telnet session
+connect '<em>myserver</em>:23 /nossh'
+
+; Run Tera Term and open SSH session
+connect '<em>myserver</em> /ssh'
+
+; Run Tera Term and open SSH1 session
+connect '<em>myserver</em> /ssh /1'
+
+; Run Tera Term and open SSH2 session
+connect '<em>myserver</em> /ssh /2'
+
+; Run Tera Term,open SSH session and do not prompt for user name and password
+connect '<em>myserver</em> /ssh /auth=password /user=<em>username</em> /passwd=<em>password</em>'
+
+; Run Tera Term, open SSH1 session and do not prompt for user name and password
+connect '<em>myserver</em> /ssh /1 /auth=password /user=<em>username</em> /passwd=<em>password</em>'
+
+; Run Tera Term, open SSH2 session and do not prompt for user name and password
+connect '<em>myserver</em> /ssh /2 /auth=password /user=<em>username</em> /passwd=<em>password</em>'
+
+; Run Tera Term, open SSH session and, not prompt for user name and password and use private key file
+connect '<em>myserver</em> /ssh /auth=publickey/user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
+
+; Run Tera Term, open SSH1 session and, not prompt for user name and password and use private key file
+connect '<em>myserver</em> /ssh /1 /auth=publickey/user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
+
+; Run Tera Term, open SSH2 session and, not prompt for user name and password and use private key file
+connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /passwd=<em>password</em> /keyfile=<em>private-key-file</em>'
+
+; Tera Term automatically connects the remote host with the public key 
+; authentication, and not prompt for user name and password and use private key file.
+connect '<em>myserver</em> /ssh /auth=pageant /user=<em>username</em>'
+
+; RunTera Term and open serial port connection. Port number is x=1..256
+connect '/C=x'
+
+CommandLine = '111.111.11.11'
+connect CommandLine
+</pre>
+
+
+<pre class="macro-example">
+; Sample macro for Tera Term
+;  Telnet login
+
+; open Tera Term
+;   command line = 'TERATERM myhost.mydomain' (telnet)
+connect 'myhost.mydomain'
+
+; set username
+UsernamePrompt = 'Username:'
+Username = 'MYNAME'
+PasswordPrompt = 'Password:'
+; get password from file
+getpassword 'password.dat' 'mypassword' Password
+
+; login
+wait   UsernamePrompt
+sendln Username
+
+wait   PasswordPrompt
+sendln Password
+
+; OK, auto login complete.
+</pre>
+
+
+<pre class="macro-example">
+; sample macro of Tera Term
+; 
+; File: ssh2login.ttl
+; Description: auto login with SSH2 protocol
+; Environment: generic
+
+username = 'nike'
+hostname = '192.168.1.3'
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+msg = 'Enter password for user '
+strconcat msg username
+passwordbox msg 'Get password'
+
+msg = hostname
+strconcat msg ':22 /ssh /auth=password /user='
+strconcat msg username
+strconcat msg ' /passwd='
+strconcat msg inputstr
+
+connect msg
+</pre>
+
+
+
+<h2>Note</h2>
+
+<ol>
+ <li>In these examples parameters shown with Italic font have to be replaced with their actual values.</li>
+ <li>A user's password can include space characters. If the password includes the space character, a user should put the password in quotations by using `"' character. Also, if the password includes the " character, a user should write the " two times.<br>
+ NOTICE: A user can not use the "@" character instead of the space character from Tera Term 4.63.
+ </li>
+ <li>Please remember that entering actual username and password in Tera Term macro will cause them to be stored as an open text and it is your responsibility to keep such macro is secure location.</li>
+ <li>When a user re-connect the remote host soon after disconnecting the server, a user could not connect the server. For more detail, refer to "<a href="../appendixes/disconnecttiming.html">here</a>".</li>
+</ol>
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="closett.html">closett</a>"</li>
+ <li>"<a href="cygconnect.html">cygconnect</a>"</li>
+ <li>"<a href="disconnect.html">disconnect</a>"</li>
+ <li>"<a href="testlink.html">testlink</a>"</li>
+ <li>"<a href="unlink.html">unlink</a>"</li>
+</ul>
+
+</body>
+</html>

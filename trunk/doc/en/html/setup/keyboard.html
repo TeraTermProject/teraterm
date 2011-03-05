@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Keyboard setup file</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Keyboard setup file</h1>
+
+<p>
+The keyboard setup file assigns keys on PC keyboard for various functions such as VT terminal functions, sending user defined character strings, Tera Term commands and executing macro files.
+</p>
+
+<p>
+The default keyboard setup stored in the file KEYBOARD.CNF is almost compatible with VT terminal keyboard.
+You can modify key assignments by editing the file.
+See <A HREF="../reference/keycode.txt">KEYCODE.TXT</A> for the format of keyboard setup file.
+</p>
+
+<p>
+The file name of keyboard setup file to be loaded by Tera Term can be specified as a <A HREF="../commandline/teraterm.html">command line</A> parameter of Tera Term.
+If you omit the file name extension, the default extension ".CNF" is assumed. If you omit the file name, the default file  <strong>KEYBOARD.CNF</strong> is loaded.
+</p>
+
+<p>
+The distribution package contains the following keyboard setup files:
+</p>
+
+<dl>
+  <dt>IBMKEYB.CNF</dt>
+  <dd>Sample file for the IBM-PC/AT 101-key keyboard</dd>
+
+  <dt>PC98KEYB.CNF</dt>
+  <dd>Sample file for the NEC PC 98 keyboard (Japanese Windows 95)</dd>
+
+  <dt>NT98KEYB.CNF</dt>
+  <dd>Sample file for the NEC PC 98 keyboard (Japanese Windows NT)</dd>
+
+  <dt>FUNCTION.CNF</dt>
+  <dd>A customize sample based on IBMKEYB.CNF<br>
+      <ul>
+        <li>F1-F10 are modified</li>
+        <li>Editor keypad(*1) and Special keys(*2) are used to send a character sequence which displays a symbol on the key top of each VT200 terminal keyboard(*3).</li>
+      </ul></dd>
+
+  <dt>EDITOR.CNF</dt>
+  <dd>A customize sample based on IBMKEYB.CNF<br>
+      <ul>
+        <li>Editor keypad(*1) are used to send a character sequence which displays a symbol on the key top of each VT200 terminal keyboard(*3).</li>
+      </ul></dd>
+
+  <dt>KEYBOARD.CNF</dt>
+  <dd>Default keyboard setup file (copy of EDITOR.CNF at the moment just after the installation)</dd>
+</dl>
+
+<p>
+(*1) Editor keypad mentioned here are Ins, Del, Home, End, PageUp and PageDown.<br>
+(*2) Special keys mentioned here are *, /, +, -, Ctrl+"+" on a Ten-Key pad.<br>
+(*3) The location of these keys on VT220 is different from a generic 101(106) keyboard. With a keyboard setup file other than FUNCTION.CNF  and EDITOR.CNF, a character sequence to be sent is same as one of 101(106) keyboard. This is derived from the specification of original Tera Term Pro.<br>
+On the other hand, FUNCTION.CNF and EDITOR.CNF defines a character sequence which displays a symbol of each key top "as-is". By using this, special keys will behave as each symbol of key top when an application which utilizes speical keys is run.
+</p>
+
+<p>
+The installer will copy <strong>EDITOR.CNF</strong> on <strong>KEYBOARD.CNF</strong>.
+If you want to use a different key map, copy an appropriate file on <strong>KEYBOARD.CNF</strong> to meet your need.
+</p>
+
+<p>
+If you want to use PC98 NX key map, use <strong>IBMKEYB.CNF</strong>.
+</p>
+
+
+</body>
+</html>

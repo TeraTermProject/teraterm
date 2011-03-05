@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filestrseek</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filestrseek</h1>
+
+<p>
+Forward searchs a string from a file.
+</p>
+
+<pre class="macro-syntax">
+filestrseek &lt;file handle&gt; &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Searches for &lt;string&gt; in the file specified by &lt;file handle&gt;.<br>
+The search is done forward and started from the current position of the file pointer. For the backward search, use the "<a href="filestrseek2.html">filestrseek2</a>" command.<br>
+If &lt;string&gt; is found, the file pointer is moved to the next character of the string and the system variable "result" is set to 1.<br>
+If &lt;string&gt; is not found, the file pointer is not moved and "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+fileopen fhandle 'teraterm.log' 0
+
+; Search for the string "abc" in the file "teraterm.log".
+filestrseek fhandle 'abc'
+if result=0 goto not_found
+; Read characters from the next of "abc" to the end of the line.
+filereadln fhandle str
+
+:not_found
+fileclose fhandle
+</pre>
+
+</body>
+</html>

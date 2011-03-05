@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>ファイル転送 (Tera Term 設定ファイル)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="rename">受信したファイルの名前を自動的に変更して上書きを避ける</a></h1>
+
+<p>
+Kermit, Zmodem, BPlus, Quick-VAN プロトコルを使用してファイルを受信する場合、ファイル名はホスト(送信側)により与えられます。もし、同じファイル名がすでにローカルディスクに存在する場合、そのファイルは受信されたファイルにより上書きされます。この上書きを避けるには、設定ファイルの [Tera Term] セクションの AutoFileRename 行を以下のように変更してください。
+</p>
+
+<pre>
+AutoFileRename=on
+</pre>
+
+<p>
+この場合、受信されたファイルは上書きを避けるために自動的に名前が変更されます。例えば、受信されたファイルが "abc.txt" で同じ名前がすでにローカルディスクに存在する場合、受信されたファイルの名前は "abc1.txt" に変更されます。
+</p>
+
+<pre>
+省略時:
+AutoFileRename=on
+</pre>
+
+
+<h1><a name="bpauto">B-Plus 受信の自動起動</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの BPAuto 行を、
+</p>
+
+<pre>
+BPAuto=on
+</pre>
+
+<p>
+のように変更すると、Nifty-Serve 等の BBS で、B-Plus のダウンロードコマンドを実行したときに、自動的に Tera Term の B-Plus 受信が開始されるようになります。
+</p>
+
+<pre>
+省略時:
+BPAuto=off
+</pre>
+
+
+<h1><a name="bpesc">B-Plus ですべての制御文字をエスケープする</a></h1>
+
+<p>
+B-Plus では、通信回線が一部の制御文字を通さないことを想定して、それらをエスケープする(他の文字の組み合わせに置き換える)ようになっています。しかし、想定外の制御文字も通さない回線の場合は転送がうまくいきません。そのような場合は、設定ファイルの [Tera Term] セクションの BPEscCtl 行を、
+</p>
+
+<pre>
+BPEscCtl=on
+</pre>
+
+<p>
+のように変更してください。これですべての制御文字をエスケープするようになります。
+</p>
+
+<pre>
+省略時:
+BPEscCtl=off
+</pre>
+
+
+<h1><a name="bplog">B-Plus のログ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの BPLog 行を、
+</p>
+
+<pre>
+BPLog=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で B-Plus を用いたファイル転送をするときに、交換されるパケット内容をファイル BPLUS.LOG に記録します。
+</p>
+
+<pre>
+省略時:
+BPLog=off
+</pre>
+
+
+<h1><a name="kmlog">Kermit のログ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの KmtLog 行を、
+</p>
+
+<pre>
+KmtLog=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で Kermit を用いたファイル転送をするときに、交換されるパケット内容をファイル KERMIT.LOG に記録します。
+</p>
+
+<pre>
+省略時:
+KmtLog=off
+</pre>
+
+
+<h1><a name="qvlog">Quick-VAN のログ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの QVLog 行を、
+</p>
+
+<pre>
+QVLog=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で Quick-VAN を用いたファイル転送をするときに、交換されるパケット内容をファイル QUICKVAN.LOG に記録します。
+</p>
+
+<pre>
+省略時:
+QVLog=off
+</pre>
+
+
+<h1><a name="qvwinsize">Quick-VAN のウィンドウサイズ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの QVWinSize 行を、
+</p>
+
+<pre>
+QVWinSize=&lt;window size (10進数(正))&gt;
+</pre>
+
+<p>
+のように変更すると、Quick-VAN プロトコルで用いられるウインドウサイズというパラメーターを設定することができます。
+</p>
+
+<p>
+設定可能なウインドウサイズの値は、1～99です。一般に、回線が十分に高速でエラーがない場合、ウインドウサイズを大きくすればするほど、転送速度が向上します。ただし、低速な回線やエラーの多い回線を使用したり、ホストや PC がデータを取りこぼしたりする場合には、ウインドウサイズが大きすぎると逆に転送速度が低下します。
+</p>
+
+<p>
+また、実際に用いられるウインドウサイズの値は、 Tera Term 側の設定値と、ホスト (PC-VAN) 側の設定値の小さい方になります。したがって、 Tera Term の設定値をある値より大きくすると、それ以上転送速度は変化しなくなります。
+</p>
+
+<pre>
+省略時:
+QVWinSize=8
+</pre>
+
+
+<h1><a name="xmlog">XMODEM のログ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの XmodemLog 行を、
+</p>
+
+<pre>
+XmodemLog=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で XMODEM を用いたファイル転送をするときに、交換されるパケット内容をファイル XMODEM.LOG に記録します。
+</p>
+
+<pre>
+省略時:
+XmodemLog=off
+</pre>
+
+
+<h1><a name="xmodemrecv">XMODEM の受信コマンド</a></h1>
+
+<p>
+XMODEM でファイル送信を開始する直前に、ホストに 「XMODEM を受信するコマンド」を送信し、自動的に受信を開始させることができます。このときに Tera Term から送信する「XMODEM を受信するコマンド」を指定します。
+</p>
+
+<pre>
+XmodemRcvCommand=rx
+</pre>
+
+<p>
+コマンドを指定しない場合は、「受信コマンド」を送信しません。
+</p>
+
+<pre>
+省略時:
+XmodemRcvCommand=
+</pre>
+
+
+<h1><a name="zmauto">ZMODEM 受信の自動起動</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの ZmodemAuto 行を、
+</p>
+
+<pre>
+ZmodemAuto=on
+</pre>
+
+<p>
+のように変更すると、ホスト側の ZMODEM 送信(ダウンロード)コマンドを実行したときに、自動的に Tera Term の ZMODEM 受信が開始されるようになります。
+</p>
+
+<p>
+注意:	このオプションを on にすると、ホスト側の受信(アップロード)コマンドを実行した時にも、自動的に Tera Term の ZMODEM 受信(送信ではなく)が開始されてしまうことがあります。この問題は解決不可能で、この動作が困る場合は、このオプションを off にしてください。
+</p>
+
+<pre>
+省略時:
+ZmodemAuto=off
+</pre>
+
+
+<h1><a name="zmparam">ZMODEM 送信の設定</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの ZmodemDataLen と ZmodemWinSize 行を以下のように変更すると、ZMODEM 送信に関する設定をすることができます。これらの設定は ZMODEM 受信には影響を与えません。
+</p>
+
+<pre>
+ZmodemDataLen=&lt;データサブパケットの最大長(バイト数)&gt;
+ZmodemWinSize=&lt;送信のウィンドウサイズ(バイト数)&gt;
+</pre>
+
+<pre>
+省略時:
+ZmodemDataLen=1024
+ZmodemWinSize=32767
+</pre>
+
+<p>
+この設定は ZMODEM 受信には影響を与えません。
+</p>
+
+<p>
+設定可能な&lt;データサブパケットの最大長&gt;の値は0～1024です。低速な回線やエラーの多い回線を使用したり、ホストのデータ処理能力が低くデータを取りこぼす場合は、小さな値を設定すると、エラー等の障害に対して、より安定なファイル送信を行うことができます。シリアルポート使用時でボーレートが低い場合は、設定値よりも小さい値が使用されることがあります。
+</p>
+
+<p>
+設定可能な&lt;送信のウィンドウサイズ&gt;の値は-32768～32767です。例えば、値を30000にすると、約30000バイトに一回、データパケットの送信を休み、ホストから確認を取ります。値を負(ウィンドウサイズ無限大に対応)にすると、ホストからエラーの報告がないかぎり、一回も休まずにデータパケットを送信しつづけ、最大限の送信速度が得られます。ホストや回線の能力によっては、ウィンドウサイズをある値より大きくすると、正常なファイル送信ができなくなったり、非常に時間がかかったりすることがあります。
+</p>
+
+※注
+<p>
+アライドテレシスのルータに対しては、ZmodemDataLen=128 としないと、通信が成功しない場合があります。
+</p>
+
+
+<h1><a name="zmesc">ZMODEM ですべての制御文字をエスケープする</a></h1>
+
+<p>
+ZMODEM では、通信回線が一部の制御文字を通さないことを想定して、それらをエスケープする(他の文字の組み合わせに置き換える)ようになっています。しかし、想定外の制御文字も通さない回線の場合は転送がうまくいきません。そのような場合は、設定ファイルの [Tera Term] セクションの ZmodemEscCtl 行を、
+</p>
+
+<pre>
+ZmodemEscCtl=on
+</pre>
+
+<p>
+のように変更してください。これですべての制御文字をエスケープするようになります。
+</p>
+
+<pre>
+省略時:
+ZmodemEscCtl=off
+</pre>
+
+
+<h1><a name="zmlog">ZMODEM のログ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの ZmodemLog 行を、
+</p>
+
+<pre>
+ZmodemLog=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で ZMODEM を用いたファイル転送をするときに、交換されるパケット内容をファイル ZMODEM.LOG に記録します。
+</p>
+
+<pre>
+省略時:
+ZmodemLog=off
+</pre>
+
+
+<h1><a name="zmodemrecv">ZMODEM の受信コマンド</a></h1>
+
+<p>
+ZMODEM でファイル送信を開始する直前に、ホストに「ZMODEM を受信するコマンド」を送信し、自動的に受信を開始させることができます。このときに Tera Term から送信する「ZMODEM を受信するコマンド」を指定します。
+</p>
+
+<p>
+コマンドを指定しない場合は、「受信コマンド」を送信しません。
+</p>
+
+<pre>
+ZmodemRcvCommand=
+</pre>
+
+<pre>
+省略時:
+ZmodemRcvCommand=rz
+</pre>
+
+
+<h1><a name="filter">送信ダイアログのファイル名フィルタ</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの FileSendFilter 行を、
+</p>
+
+<pre>
+FileSendFilter=*.txt;a.log
+</pre>
+
+<p>
+のように変更すると、ダイアログの「ファイルの種類」にユーザ定義のフィルタが反映されます。
+</p>
+
+<pre>
+省略時:
+FileSendFilter=
+</pre>
+
+
+<h1><a name="draganddrop">ドラッグ&ドロップによるファイル送信の確認</a></h1>
+
+<p>
+Tera Term は、デフォルトではファイルをウインドウにドラッグ&ドロップしたときに、ファイルを転送するかどうか確認のメッセージボックスを表示します。<br>
+設定ファイルの [Tera Term] セクションの ConfirmFileDragAndDrop 行を下記のように変更すると、確認をせずにファイルの転送を開始します。
+</p>
+
+<pre>
+ConfirmFileDragAndDrop=off
+</pre>
+
+<pre>
+省略時:
+ConfirmFileDragAndDrop=on
+</pre>
+
+
+</BODY>
+</HTML>

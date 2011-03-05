@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>foldersearch</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>foldersearch</h1>
+
+<p>
+Search a folder.
+</p>
+
+<pre class="macro-syntax">
+foldersearch &lt;foldername&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Searches for the folder specified by &lt;foldername&gt;.<br>
+If it is found, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
+</p>
+
+<h2>Note</h2>
+
+<p>
+The foldersearch command returns 1 when the &lt;foldername&gt is a folder, and returns 0 when the &lt;foldername&gt is a file. For this reason, this command can not be used as checking the existing folder.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+foldersearch 'data'
+if result=0 messagebox 'Folder not found.' 'error'
+</pre>
+
+<pre class="macro-example">
+name = 'data'
+filesearch name
+if result=1 then
+    foldersearch name
+    if result=1 then
+        sprintf2 msg '%s is a folder.' name
+        messagebox msg ''
+    else
+        sprintf2 msg '%s is a file.' name
+        messagebox msg ''
+    endif
+else
+    sprintf2 msg '%s is not found.' name
+    messagebox msg ''
+endif
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="filesearch.html">filesearch</a></li>
+</ul>
+
+</body>
+</html>

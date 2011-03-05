@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>random</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>random</h1>
+
+<p>
+乱数を生成する。
+</p>
+
+<pre class="macro-syntax">
+random &lt;integer variable&gt; &lt;max value&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+0から&lt;max number&gt;-1までの整数の一様乱数を生成し、整数変数&lt;integer variable&gt;へ代入する。&lt;max number&gt;は0を超える数値でなければならない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 0から99までの乱数を変数valへ格納する
+random val 100
+</pre>
+
+<pre class="macro-example">
+; 乱数で処理を分ける
+while 1
+	random val 10
+	int2str valstr val
+	statusbox valstr 'val'
+	if val=0 then
+		messagebox 'The val is zero.' 'test'
+	elseif val<5 then
+		messagebox 'The val is less than five.' 'test'
+	else
+		messagebox 'The val is greater than five.' 'test'
+	endif
+endwhile
+</pre>
+
+</body>
+</html>

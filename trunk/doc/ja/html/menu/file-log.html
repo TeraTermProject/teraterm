@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>Log ([File] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Log ([File] メニュー)</h1>
+    <p>
+      ホストから受信した文字をファイルに書き込みます。
+    </p>
+
+    <h2>"Log" ダイアログボックス(ファイル名指定)</h2>
+    <dl>
+      <dt>File Name</dt>
+      <dd>
+	書き込むファイルのファイル名を入力または選択してください。
+      </dd>
+
+      <dt>Binary</dt>
+      <dd>
+	ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
+	選択しない場合は、漢字コード、改行文字は変換され、
+	エスケープシーケンスは取り除かれてから書き込まれます。
+      </dd>
+
+      <dt>Append</dt>
+      <dd>
+	すでに存在するファイルに追加して書き込みたい場合は選択してください。
+	選択しない場合は上書きされます。
+      </dd>
+
+      <dt>Plain text</dt>
+      <dd>
+	ASCII 非表示文字を書き込みたくない場合は選択してください。
+      </dd>
+
+      <dt>Timestamp</dt>
+      <dd>
+	ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。
+      </dd>
+
+      <dt>Hide dialog</dt>
+      <dd>
+	ログ転送のダイアログを表示したくない場合は選択してください。
+      </dd>
+    </dl>
+
+    <h2>"Log" ダイアログボックス(ファイルへ書き込み中)</h2>
+    <dl>
+      <dt>Close</dt>
+      <dd>
+	Close ボタンを押すとファイルへの書き込みを終了します。
+      </dd>
+
+      <dt>Pause/Start</dt>
+      <dd>
+	Pause ボタンを押すとファイルへの書き込みを一時中断します。
+	このとき Pause ボタンは Start ボタンに変化します。
+	その後 Start ボタンを押すと書き込みを再開します。
+      </dd>
+    </dl>
+  </body>
+</html>

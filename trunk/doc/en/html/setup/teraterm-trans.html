@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>File transfer (Tera Term setup file)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="rename">Auto renaming of a received file to avoid overwriting</a></h1>
+
+<p>
+When a file is received by using the Kermit, Zmodem, BPlus or Quick-VAN protocol, the file name is given by the remote host. If the same file name already exists in the local disk, the existing file is overwritten by the received file. To avoid this overwriting, edit the AutoFileRename line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+AutoFileRename=on
+</pre>
+
+<p>
+Then, the received file is renamed automatically to avoid overwriting. For example, if the received file is "abc.txt" and the same file name already exists in the local disk, the received file is renamed to be "abc1.txt".
+</p>
+
+<pre>
+Default:
+AutoFileRename=on
+</pre>
+
+
+<h1><a name="bpauto">Auto activation of B-Plus Receive</a></h1>
+
+<p>
+To enable the auto activation of the B-Plus Receive command, edit the BPAuto line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+BPAuto=on
+</pre>
+
+<p>
+If you run the B-Plus Send command in the host, the B-Plus Receive command of Tera Term is automatically activated.
+</p>
+
+<pre>
+Default:
+BPAuto=off
+</pre>
+
+
+<h1><a name="bpesc">Escaping all control characters in the B-Plus protocol</a></h1>
+
+<p>
+To escape all control characters in the B-Plus file transfer, edit the BPEscCtl line in the [Tera Term] section of the setup file like the following.
+</p>
+
+<pre>
+BPEscCtl=on
+</pre>
+
+<pre>
+Default:
+BPEscCtl=off
+</pre>
+
+
+<h1><a name="bplog">B-Plus log</a></h1>
+
+<p>
+To log data packets of B-Plus to the file BPLUS.LOG, edit the BPLog line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+BPLog=on
+</pre>
+
+<pre>
+Default:
+BPLog=off
+</pre>
+
+
+<h1><a name="kmlog">Kermit log</a></h1>
+
+<p>
+To log data packets of Kermit to the file KERMIT.LOG, edit the KmtLog line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+KmtLog=on
+</pre>
+
+<pre>
+Default:
+KmtLog=off
+</pre>
+
+
+<h1><a name="xmlog">XMODEM log</a></h1>
+
+<p>
+To log data packets of XMODEM to the file XMODEM.LOG, edit the XmodemLog line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+XmodemLog=on
+</pre>
+
+<pre>
+Default:
+XmodemLog=off
+</pre>
+
+
+<h1><a name="zmauto">Auto activation of ZMODEM Receive</a></h1>
+
+<p>
+To enable the auto activation of the ZMODEM Receive command, edit the ZmodemAuto line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ZmodemAuto=on
+</pre>
+
+<p>
+If you run the ZMODEM Send command at the host, the ZMODEM Receive command of Tera Term is automatically activated.
+</p>
+
+<p>
+Note: If you turn this option on, executing the ZMODEM Receive command at the host may activate also the ZMODEM Receive (not Send) command of Tera Term. This problem is unavoidable. If you don't like this behavior, turn this option off.
+</p>
+
+<pre>
+Default:
+ZmodemAuto=off
+</pre>
+
+
+<h1><a name="xmodemrecv">Receive command for XMODEM</a></h1>
+
+<p>
+You can automatically start the receipt of file by sending "a command for XMODEM receipt" to host immediately before transmitting a file. Specify a command for XMODEM receipt to be sent from Tera Term.
+</p>
+
+<pre>
+XmodemRcvCommand=rx
+</pre>
+
+<p>
+If not specified, " a command for XMODEM receipt" will not be sent.
+</p>
+
+<pre>
+default:
+XmodemRcvCommand=
+</pre>
+
+
+<h1><a name="zmparam">Parameters for ZMODEM sending</a></h1>
+
+<p>
+You can change the ZMODEM parameters for sending by editing the ZmodemDataLen and ZmodemWinSize lines in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ZmodemDataLen=&lt;data sub packet length in bytes&gt;
+ZmodemWinSize=&lt;window size for sending in bytes&gt;
+</pre>
+
+<p>
+Note that these parameters does not affect ZMODEM receiving.
+</p>
+
+<p>
+The maximum data sub packet length is 1024. Usually the larger packet length causes the faster sending speed.
+</p>
+
+<p>
+The maximum window size is 32767. Usually the larger window size causes the faster sending speed. If you want to set the window size to infinity, specify a minus value (e.g. -1).
+</p>
+
+<p>
+If the communication line has problems in the flow control or error correction, or the data processing power of the host is extremely low, decreasing the packet length or window size may improve speed and stability of file sending.
+</p>
+
+<pre>
+Default:
+ZmodemDataLen=1024
+ZmodemWinSize=32767
+</pre>
+
+NOTICE
+
+<p>
+Please specify the ZmodemDataLen=128 at the Allied Telesis router.
+</p>
+
+
+<h1><a name="zmesc">Escaping all control characters in the ZMODEM protocol</a></h1>
+
+<p>
+To escape all control characters in the ZMODEM file transfer, edit the ZmodemEscCtl line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ZmodemEscCtl=on
+</pre>
+
+<pre>
+Default:
+ZmodemEscCtl=off
+</pre>
+
+
+<h1><a name="zmlog">ZMODEM log</a></h1>
+
+<p>
+To log data packets of ZMODEM to the file ZMODEM.LOG, edit the following line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ZmodemLog=on
+</pre>
+
+<pre>
+Default:
+ZmodemLog=off
+</pre>
+
+
+<h1><a name="zmodemrecv">Receive command for ZMODEM</a></h1>
+
+<p>
+You can automatically start the receipt of file by sending "a command for ZMODEM receipt" to host immediately before transmitting a file. Specify a command for ZMODEM receipt to be sent from Tera Term.
+</p>
+
+<p>
+If not specified, " a command for XMODEM receipt" will not be sent.
+</p>
+
+<pre>
+ZmodemRcvCommand=
+</pre>
+
+<pre>
+default:
+ZmodemRcvCommand=rz
+</pre>
+
+
+<h1><a name="filter">File name filter for send file dialog</a></h1>
+
+<p>
+To apply user define filter for "types of file" on send file dialog, edit the following line in the [Tera Term] section of the setup file like the following: 
+</p>
+
+<pre>
+FileSendFilter=*.txt;a.log
+</pre>
+
+<pre>
+default:
+FileSendFilter=
+</pre>
+
+
+<h1><a name="draganddrop">Confirmation of File Transfer by Drag & Drop</a></h1>
+
+<p>
+Tera Term displays a message box to confirm the file transfer operation when a file is dragged and dropped in a window as a default.<br>
+If ConfirmFileDragAndDrop line in "Tera Term" section of setup file is modified as follows, a file transfer will be started without a confirmation.
+</p>
+
+<pre>
+ConfirmFileDragAndDrop=off
+</pre>
+
+<pre>
+default:
+ConfirmFileDragAndDrop=on
+</pre>
+
+
+</BODY>
+</HTML>

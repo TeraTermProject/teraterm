@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>recvln</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>recvln</h1>
+
+<p>
+Receives characters of a line.
+</p>
+
+<pre class="macro-syntax">
+recvln
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Retrieves a line of received characters from the host and stores it in the system variable "inputstr".<br>
+This command waits until a line is received or the communication between Tera Term and the host is terminated or the timeout occurs.
+</p>
+
+<p>
+If the system variable "timeout" or "mtimeout" is greater than zero, the timeout occurs when &lt;timeout&gt;.&lt;mtimeout&gt; seconds have passed. If the timeout is less than or equal to zero, the timeout never occurs.
+</p>
+
+<p>
+If the line is received successfully, the system variable "result" is set to 1. Otherwise, "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; open the log file
+fileopen file 'log.txt' 0
+; enter synchronous mode
+setsync 1
+result=1
+
+while result=1
+  ; receive one line
+  recvln
+  ; write it to the log file
+  filewriteln file inputstr
+endwhile
+
+; enter asynchronous mode
+setsync 0
+</pre>
+
+<p>
+See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
+</p>
+
+</body>
+</html>

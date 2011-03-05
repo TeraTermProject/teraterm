@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Associate with TELNET protocol</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Associate with TELNET protocol</h1>
+
+<p class="notice">
+Since Tera Term 4.59, you can associate with TELNET protocol with installer.
+</p>
+
+<p>Specify Application like follows.</p>
+
+<pre class="syntax">
+"C:\Program Files\teraterm\ttermpro.exe" /nossh /T=1 %1
+</pre>
+
+<p>
+If TTSSH is installed and SSH is enabled in TERATERM.ini, Tera Term starts SSH connection to the remote host.<br>
+Use TTSSH command line option "/nossh". It specify the connection protocol does not SSH.
+</p>
+
+<p>
+Use ttermpro.exe command line option "/T=1". It explicitly specify the connection protocol is TELNET.
+</p>
+
+</body>
+</html>

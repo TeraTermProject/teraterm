@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>dirname</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>dirname</h1>
+
+<p>
+Returns the directory name from a path name.
+</p>
+
+<pre class="macro-syntax">
+dirname &lt;strvar&gt; &lt;path&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Given a &lt;path&gt; pathname, this macro will delete any suffix beginning with the last slash('/') character and return the result into the &lt;strvar&gt; variable name.<br>
+The pathname will need not be existed.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+dirname dir 'c:\teraterm\test.txt'
+; dir = "c:\teraterm"
+dirname dir 'c:\teraterm\'
+; dir = "c:"
+dirname dir 'c:\teraterm'
+; dir = "c:"
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="basename.html">dirname</a></li>
+  <li><a href="makepath.html">makepath</a></li>
+</ul>
+
+</body>
+</html>

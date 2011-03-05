@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>folderdelete</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>folderdelete</h1>
+
+<p>
+フォルダを削除する。
+</p>
+
+<pre class="macro-syntax">
+folderdelete &lt;foldername&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+フォルダ &lt;foldername&gt; を削除する。<br>
+フォルダの削除が成功した場合、システム変数 result に 0 が格納される。それ以外の場合, result に 0 以外が格納される。<br>
+ただし、フォルダが空でない場合には削除できない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+folderdelete 'temp'
+</pre>
+
+</body>
+</html>

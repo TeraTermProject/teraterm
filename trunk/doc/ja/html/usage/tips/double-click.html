@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>ダブルクリックによる単語選択の区切り文字</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>ダブルクリックによる単語選択の区切り文字</h1>
+
+<p>
+左マウスボタンで単語をダブルクリックすると、その単語を選択することができます。<br>
+設定ファイルの [Tera Term] セクションの DelimList 行を以下のように変更することによって単語の区切り文字を指定することができます。
+</p>
+
+<pre>
+DelimList=&lt;区切り文字のリスト&gt;
+</pre>
+
+<p>
+例えば、
+</p>
+
+<pre>
+DelimList=&lt;&gt;()[]
+</pre>
+
+<p>
+は6つの区切り文字 "&lt;", "&gt;", "(", ")", "[", "]" を指定します。
+ただし、スペース文字と "$" はそれぞれ、"$20", "$24" という形式で指定しなければなりません。
+</p>
+
+<pre>
+DelimList=$20 ; スペース文字
+
+省略時:
+DelimList=$20!"#$24%&amp;'()*+,-./:;&lt;=&gt;?@[\]^`{|}~
+</pre>
+
+<p>
+この "DelimList" 行には、1バイトコード文字(いわゆる半角文字)しか指定できません。2バイトコード文字(いわゆる全角文字)は区切り文字として取り扱われます。<br>
+2バイトコード文字を区切り文字としないようにするには、DelimDBCS 行を以下のように変更してください。
+</p>
+
+<pre>
+DelimDBCS=off
+
+省略時:
+DelimDBCS=on
+</pre>
+
+<p>
+以前のバージョンの Tera Term と単語選択の仕方を同じにするには、
+</p>
+
+<pre>
+DelimList=$20
+DelimDBCS=off
+</pre>
+
+<p>
+としてください。
+</p>
+
+</BODY>
+</HTML>

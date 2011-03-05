@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>getfileattr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getfileattr</h1>
+
+<p>
+Returns the attributes of a file or directory.
+</p>
+
+<pre class="macro-syntax">
+getfileattr &lt;filename&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string &lt;filename&gt;</dt>
+	<dd>The file name or directory name</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System valiable &lt;result&gt;</dt>
+	<dd>When this command fails, -1 is stored.<br>
+		When the command succeeds, the returned value is in the following:<br>
+	    <table border="2">
+	      <tr>
+	        <th>Value</th>
+	        <th>Meaning</th>
+	      </tr>
+	      <tr>
+	        <td>$1</td>
+	        <td>Read only</td>
+	      </tr>
+	      <tr>
+	        <td>$2</td>
+	        <td>Hidden</td>
+	      </tr>
+	      <tr>
+	        <td>$4</td>
+	        <td>The operating system uses a part of, or uses exclusively</td>
+	      </tr>
+	      <tr>
+	        <td>$10</td>
+	        <td>Directory</td>
+	      </tr>
+	      <tr>
+	        <td>$20</td>
+	        <td>Archive</td>
+	      </tr>
+	      <tr>
+	        <td>$80</td>
+	        <td>Not have other attributes set</td>
+	      </tr>
+	      <tr>
+	        <td>$100</td>
+	        <td>Temporary</td>
+	      </tr>
+	      <tr>
+	        <td>$200</td>
+	        <td>Sparse file</td>
+	      </tr>
+	      <tr>
+	        <td>$400</td>
+	        <td>Has an associated reparse point, or a file that is a symbolic link</td>
+	      </tr>
+	      <tr>
+	        <td>$800</td>
+	        <td>Compressed</td>
+	      </tr>
+	      <tr>
+	        <td>$1000</td>
+	        <td>Physically moved to offline storage(Windows 2000 or later)</td>
+	      </tr>
+	      <tr>
+	        <td>$2000</td>
+	        <td>Not to be indexed by the content indexing service(Windows 2000 or later)</td>
+	      </tr>
+	      <tr>
+	        <td>$4000</td>
+	        <td>Encrypted</td>
+	      </tr>
+	    </table>
+	</dd>
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+file = 'c:\test.txt'
+getfileattr file
+if result &lt;&gt; -1 then
+	if result &amp; $1 &gt; 0 then
+		messagebox 'This file has readonly attribute.' file
+	endif
+endif
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="setfileattr.html">setfileattr</a></li>
+  <li>MSDN Library <a href="http://msdn.microsoft.com/en-us/library/aa364944(v=VS.85).aspx">GetFileAttributes</a></li>
+  <li>MSDN Library <a href="http://msdn.microsoft.com/en-us/library/gg258117(v=VS.85).aspx">File Attribute Constants</a></li>
+</ul>
+
+</body>
+</html>

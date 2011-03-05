@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>言語ファイル</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>言語ファイル</h1>
+
+<p>
+Tera Term のメニューやダイアログには、英語のメッセージが割り当てられています。<br>
+言語ファイルを作成することにより、メッセージをローカライズすることができます。<br>
+また、このファイルにはダイアログのフォントとフォントサイズも指定することができます。
+</p>
+
+<p>
+インストーラは、lang フォルダの中に日本語、ドイツ語、フランス語の言語ファイルをコピーします。<br>
+また、インストーラは指定された言語が使用されるように、TERATERM.INI の UILanguageFile に言語ファイル名を指定します。
+</p>
+
+<h2>フォントの指定</h2>
+
+<p>
+インストーラは、フォントだけを指定するテンプレートとして Default.lng をコピーします。<br>
+フォントの指定は以下のようなフォーマットで行います。
+</p>
+
+<pre>
+; 大きいフォント
+DLG_SYSTEM_FONT=System,12,0
+; 小さいフォント
+DLG_TAHOMA_FONT=Tahoma,8,0
+</pre>
+
+<p>
+一つ目にはフォント名を指定します。
+</p>
+
+<p>
+二つ目にはフォントサイズを数字で指定します。
+</p>
+
+<p>
+三つ目にはフォントのキャラクタセットを数字で指定します。
+<pre>
+0   ANSI
+1   既定の文字セット
+2   シンボル(記号)
+77  Mac
+128 日本語(Shift_JIS)
+129 韓国語(EUC-KR)
+130 韓国語(Johab)
+134 簡体字中国語(GB2312)
+136 繁体字中国語(Big5)
+161 ギリシャ語
+162 トルコ語
+163 ベトナム語
+177 ヘブライ語
+178 アラビア語
+186 バルト言語
+204 キリル言語
+222 タイ語
+238 中央ヨーロッパ言語
+255 OEM/DOS
+</pre>
+詳しくは msdn ライブラリの <a href="http://msdn.microsoft.com/en-us/library/bb773327(VS.85).aspx">LOGFONT 構造体</a>の lfCharset の説明を参照してください。
+</p>
+
+
+</BODY>
+</HTML>

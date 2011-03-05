@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Mouse</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Mouse</h1>
+
+<h2>
+VT window
+</h2>
+
+<dl>
+<dt>Wheel mouse</dt>
+<dd>This package supports wheel mouse button. Also, a user can send cursor key sequences as the mouse wheel rotating when the application cursor mode is enabled by starting vi or less command.</dd>
+
+<dt>Dragging with the left button</dt>
+<dd>Selects text, and copies it to the clipboard.</dd>
+
+<dt>Dragging with the left button while pressing the Alt key</dt>
+<dd>Selects text in a rectangular region of the screen, and copies it to the clipboard.</dd>
+
+<dt>Double clicking the left button</dt>
+<dd>Selects a word, and copies it to the clipboard.</dd>
+
+<dt>Triple clicking the left button</dt>
+<dd>Selects a line, and copies it to the clipboard.</dd>
+
+<dt>Dragging with the right button</dt>
+<dd>Selects text, copies it to the clipboard, and then sends it to the host.<br>
+    It is effective when both <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> and <a href="../menu/setup-additional.html">SelectOnlyByLButton</a> are disabled.</dd>
+
+<dt>Clicking the right button</dt>
+<dd>Sends text in the clipboard to the host.<br>
+    It is effective when <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> is disabled.</dd>
+
+<dt>Double clicking the left button on the title bar</dt>
+<dd>If the window size (real screen size) is not equal to the terminal size (logical size of the terminal), resizes the window to the terminal size. A further double clicking restores the original window size.</dd>
+
+<dt>Clicking the left button while pressing the Ctrl key</dt>
+<dd>If the menu bar is hidden, the pop-up menu appears. To hide the menu bar, check the Hide menu bar option in the [Setup] Window dialog box.</dd>
+
+<dt>Dragging the window by the left button while pressing the Alt key</dt>
+<dd>Moves the window, if the title bar is hidden. To hide the title bar, check the Hide title bar option in the [Setup] Window dialog box.</dd>
+
+<dt>Clicking the right button while pressing the Alt key</dt>
+<dd>Minimizes the window, if the title bar is hidden.</dd>
+
+<dt>Dragging a text file and dropping it into the window</dt>
+<dd>If <a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> is off, the file will be sent. Kanji-code and CrLF-code will be converted.<br>
+If ConfirmFileDragAndDrop is on, a messagebox will be displayed. When "Send file" is chosen in it, the file will be sent. Kanji-code and CrLF-code will be converted. If SSH2 connection is used, "SCP" will be displayed as an option and when it is chosen, the file will be sent via SCP.</dd>
+
+<dt>Dragging with the middle button, Clicking the middle button</dt>
+<dd>These actions are no longer supported.</dd>
+</dl>
+
+<h2>
+TEK window
+</h2>
+
+<dl>
+<dt>Dragging with the left button</dt>
+<dd>Selects a portion of the screen.</dd>
+
+<dt>Clicking the right button</dt>
+<dd>Same as VT window.</dd>
+
+<dt>Clicking the left button while pressing the Ctrl key</dt>
+<dd>Same as VT window.</dd>
+
+</dl>
+
+</BODY>
+</HTML>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>sendln</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendln</h1>
+
+<p>
+Sends data with new-line.
+</p>
+
+<pre class="macro-syntax">
+sendln &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to send characters followed by a new-line character to the host.<br>
+Format of &lt;data&gt; is the same as the "<a href="send.html">send</a>" command.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Only a new-line character is sent.
+sendln
+
+sendln 'abc'
+
+Password='mypassword'
+sendln Password
+</pre>
+
+<p>
+See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>How to run a macro file</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>How to run a macro file</h1>
+
+<p>
+The executable file TTPMACRO.EXE should be placed in the directory in which TTERMPRO.EXE exists.<br>
+There are two ways to run a macro file.
+</p>
+
+<h2>1) From Tera Term.</h2>
+
+<p>
+To start MACRO, select the [Control] Macro command and then the macro file in the Open Macro dialog box.
+</p>
+
+<h2>2) From MACRO.</h2>
+
+<p>
+The macro file can be specified as a parameter of the command line (shortcut link) of TTPMACRO.EXE. For example, if you want to run the macro file "DIALUP.TTL", specify the command line (shortcut link) like:
+</p>
+
+<pre>
+TTPMACRO DIALUP.TTL
+</pre>
+
+<p>
+You can omit the file name extension ".TTL". If you omit the file name, the Open Macro dialog box appears. It's convenient to install icons (shortcuts) for the macro files you use frequently.
+</p>
+
+<p>
+If you choose method 2), you can run Tera Term, after starting the MACRO, by using the "connect" command in the macro file.
+</p>
+
+<p>
+While the macro is running, you can pause it, restart it, and stop it by pressing the appropriate buttons in the MACRO dialog box.
+</p>
+
+
+<h2>Note: Running without displaying a window</h2>
+
+<p>
+To run without displaying a window, activate TTERMPRO.EXE or TTPMACRO.EXE with a command line option of "/V".<br>
+When TTERMPRO.EXE is run by using "connect" macro command, "/V" must be specified as an argument for it.<br>
+This option is required to run without logging in such as using a task.
+</p>
+
+
+</BODY>
+</HTML>

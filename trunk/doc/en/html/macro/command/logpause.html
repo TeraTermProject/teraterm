@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>logpause</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>logpause</h1>
+
+<p>
+Causes Tera Term to pause logging.
+</p>
+
+<pre class="macro-syntax">
+logpause
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Received characters are discarded while logging is paused.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+prompt = '$'
+
+cygconnect
+wait prompt
+
+; get a user name
+getenv 'USERNAME' username
+; get the date and time
+gettime timestr "%Y%m%d-%H%M%S"
+
+; add the user name and the timestamp to the log file name
+sprintf2 filename 'd:\console_%s_%s.log' username timestr
+;messagebox filename 'filename'
+
+logopen filename 0 0
+logwrite 'Log start'#13#10
+sendln 'cal'
+wait prompt
+; Suspend logging
+logpause
+; The below command is not logging
+sendln 'date'
+wait prompt
+; Resume logging
+logstart
+sendln 'uptime'
+wait prompt
+logwrite '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'#13#10
+logclose
+
+end
+</pre>
+
+</body>
+</html>

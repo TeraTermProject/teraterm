@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>random</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>random</h1>
+
+<p>
+Generates random number.
+</p>
+
+<pre class="macro-syntax">
+random &lt;integer variable&gt; &lt;max value&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Generates random integer within the range 0..&lt;max number&gt;-1 and assigns it to &lt;integer variable&gt;. The &lt;max number&gt; has to be greater than 0.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Variable val will contain integer within the range 0..99.
+random val 100
+</pre>
+
+<pre class="macro-example">
+; random selection
+while 1
+	random val 10
+	int2str valstr val
+	statusbox valstr 'val'
+	if val=0 then
+		messagebox 'The val is zero.' 'test'
+	elseif val<5 then
+		messagebox 'The val is less than five.' 'test'
+	else
+		messagebox 'The val is greater than five.' 'test'
+	endif
+endwhile
+</pre>
+
+</body>
+</html>

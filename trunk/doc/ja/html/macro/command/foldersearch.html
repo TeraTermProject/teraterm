@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>foldersearch</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>foldersearch</h1>
+
+<p>
+フォルダがあるか確かめる。
+</p>
+
+<pre class="macro-syntax">
+foldersearch &lt;foldername&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+フォルダ &lt;foldername&gt; が存在するかどうか調べる。<br>
+存在する場合は、システム変数 result に1が返る。存在しない場合は、result に0が返る。
+</p>
+
+<h2>注意</h2>
+
+<p>
+foldersearch コマンドは、&lt;foldername&gt; がファイルとして存在する場合には0を返す。このため、フォルダ作成前の存在チェックには使用できない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+foldersearch 'data'
+if result=0 messagebox 'Folder not found.' 'error'
+</pre>
+
+<pre class="macro-example">
+name = 'data'
+filesearch name
+if result=1 then
+    foldersearch name
+    if result=1 then
+        sprintf2 msg '%s is a folder.' name
+        messagebox msg ''
+    else
+        sprintf2 msg '%s is a file.' name
+        messagebox msg ''
+    endif
+else
+    sprintf2 msg '%s is not found.' name
+    messagebox msg ''
+endif
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="filesearch.html">filesearch</a></li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Broadcast command([Control] Menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Broadcast command([Control] Menu)</h1>
+    
+    <h2>If "Realtime mode" is off</h2>
+    
+    <dl>
+      <dt>Command input control</dt>
+      <dd>
+        Input the command to be sent to each window.
+      </dd>
+      
+      <dt>Enter key</dt>
+      <dd>
+        Choose an option whether new line is added or not after the transmission of the control command specifed in above. A New line code can be chosen from the list of "CRLF", "CR", "LF".
+      </dd>
+      
+      <dt>Submit</dt>
+      <dd>
+        Transmit the command. If "<a href="./setup-additional.html">AcceptBroadcast</a>" of the window is effective, the command will be received.
+      </dd>
+      
+      <dt>History</dt>
+      <dd>
+        Choose an option whether to save the history of transmitted commands. A maximum number of history to be saved can be specified by "<a href="../setup/teraterm-misc.html#broadcast">MaxBroadcatHistory</a>" .
+      </dd>
+      
+      <dt>Send to this process only</dt>
+      <dd>
+        If this option is chosen, the command will be transmitted only to the Tera Term window where "Broadcast command" dialog is specified.
+      </dd>
+    </dl>
+    
+    
+    <h2>If "Realtime mode" is on</h2>
+    
+    <dl>
+      <dt>Command input control</dt>
+      <dd>
+        Keys entered with this control focused will be transmitted to the windows that are chosen in the following window list. The command will be received by the window where "<a href="./setup-additional.html">AcceptBroadcast</a>" is even disabled.
+      </dd>
+      
+      <dt>Windows List</dt>
+      <dd>
+        Choose the windows where the commands will be transmitted.
+      </dd>
+    </dl>
+
+  </body>
+</html>

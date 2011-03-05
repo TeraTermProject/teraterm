@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>CygTerm+ コマンドライン</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>CygTerm+ コマンドライン</h1>
+
+<pre class="syntax">
+cygterm.exe [-t 'terminal-emulator'] [-p port-number] [-dumb]
+            [-s 'shell'] [-ls | -nols] [-cd | -nocd] [-A | -a]
+            [-v 'env-var' ...] [-d 'directory'] [-o 'option']
+</pre>
+
+<dl>
+  <dt id="t">-t 'terminal-emulator'</dt>
+  <dd>
+    ターミナル・エミュレータを指定します。
+    指定形式は設定ファイルの TERM と同じです。
+    空白文字を含む場合は必ずクォートで囲みます。
+  </dd>
+
+  <dt id="p">-p port-number</dt>
+  <dd>
+    ターミナル・エミュレータを起動するのではなく、
+    ローカルホストのこのポート番号への接続を試みます。
+    他のアプリケーション・プログラムが -p オプションを使って、
+    cygterm.exe 経由で Cygwinを利用する、等が考えられます。
+  </dd>
+
+  <dt id="dumb">-dumb</dt>
+  <dd>
+    TELNETオプション・ネゴシエーションを行いません。
+    さらに TELNETコマンドが送信されてきても無視します。
+    シェル側の環境変数 TERM は 'dumb' となります。
+  </dd>
+
+  <dt id="s">-s 'shell'</dt>
+  <dd>
+    Cygwin上のシェルを指定します。
+    指定形式は設定ファイルの SHELL と同じです。
+    空白文字を含む場合は必ずクォートで囲みます。
+    必ずしもシェルコマンドである必要はありません。
+  </dd>
+
+  <dt id="ls">-ls</dt>
+  <dd>シェルをログインシェルとして起動します。</dd>
+
+  <dt id="nols">-nols</dt>
+  <dd>シェルを(ログインシェルではなく)通常のシェルとして起動します。</dd>
+
+  <dt id="cd">-cd</dt>
+  <dd>
+    カレントディレクトリをホームディレクトリに移動してからシェルを起動します。
+  </dd>
+
+  <dt id="nocd">-nocd</dt>
+  <dd>カレントディレクトリを移動せずにシェルを起動します。</dd>
+
+  <dt id="noagent">-A</dt>
+  <dd>
+    ssh認証エージェント転送機能を有効にします。
+    OpenSSHのssh認証エージェントに対応したプログラムが、
+    CygTerm+を通してPageantにアクセス出来るようになります。
+  </dd>
+
+  <dt id="a">-a</dt>
+  <dd>ssh認証エージェント転送機能を無効にします。</dd>
+
+  <dt id="v">-v 'env-var'</dt>
+  <dd>
+    シェル起動時に設定しておきたい環境変数を指定します。
+    指定形式は設定ファイルの ENV_X と同じです。
+    空白文字を含む場合は必ずクォートで囲みます。
+    -v オプションはいくつでも指定できます。
+  </dd>
+
+  <dt id="d">-d 'directory'</dt>
+  <dd>
+    カレントディレクトリを指定されたディレクトリに移動してから
+    シェルを起動します。
+  </dd>
+
+  <dt id="o">-o 'option'</dt>
+  <dd>
+    ターミナル・エミュレータへの追加のパラメータを指定します。
+    TERMを変えずに追加のパラメータを指定したい時に使います。
+  </dd>
+</dl>
+
+<p>
+ターミナル・エミュレータもしくは接続先ポート番号、と Cygwin側シェルの指定が最低必要となります。 これらがコマンドライン・オプションによって与えられるならば、設定ファイル cygterm.cfg が無くても実行できます。
+</p>
+
+<p>
+cygterm.exe は cygwin1.dll を利用する Win32アプリケーションです。Cygwin上から実行することも、Windows上のショートカットから実行することもできます。
+</p>
+
+<p>
+※ Windows上から実行するには cygwin1.dll のディレクトリパスがWindows環境変数 PATH に追加されている必要があります。(通常 Cygwinルートディレクトリ\bin)
+</p>
+
+</body>
+</html>

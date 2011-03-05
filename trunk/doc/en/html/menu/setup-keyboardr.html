@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Keyboard ([Setup] menu; Russian mode)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Keyboard ([Setup] menu; Russian mode)</h1>
+
+    <h2>"Keyboard setup" dialog box</h2>
+    <dl>
+      <dt>Transmit DEL by:</dt>
+      <dd>
+	<dl>
+	  <dt>Backspace key</dt>
+	  <dd>
+	    If this option is checked, pressing the backspace key sends
+	    the DEL character (ASCII 0x7F). If not checked, the BS character
+	    (ASCII 0x08) is sent. Even if this option is (not) checked,
+	    the BS (DEL) character can be sent by pressing the
+	    Ctrl+backspace key.
+	  </dd>
+
+	  <dt>Delete key</dt>
+	  <dd>
+	    If this option is checked, pressing the Delete key sends the
+	    DEL character. If not checked, the function assigned for the
+	    Delete key is determined by the
+	    <a href="../setup/keyboard.html">keyboard setupfile</a>.
+	  </dd>
+	</dl>
+      </dd>
+
+      <dt>Keyboard</dt>
+      <dd>
+	Russian keyboard driver type. If you are using the standard
+	keyboard driver which comes with Russian Windows, select Windows.
+	If you are using non-Russian Windows and using a driver which
+	generates KOI8-R code, select KOI8-R.
+      </dd>
+
+      <dt>Meta key</dt>
+      <dd>
+	Enables the meta-key mode. The Alt key is used as the meta key.
+	For example, the sequence ESC A is sent by pressing the Alt+A key.
+	Shortcut keys which use the Alt key (such as Alt+C) are disabled.
+      </dd>
+
+      <dt>Disabled mode:</dt>
+      <dd>
+	<dl>
+	  <dt>Application Keypad</dt>
+	  <dd>
+	    This option disables Application Keypad mode.<br>
+	    If this option is selected, you can prevent a problem of a
+	    numeric keypad from being unavailable due to an accidental
+	    transition to Application Keypad mode.<br>
+	    Note that some application which uses application keypad mode
+	    may encounter other problems when this option is selected.
+	  </dd>
+
+	  <dt>Application Cursor</dt>
+	  <dd>
+	    This option disables Application Cursor mode.
+	  </dd>
+	</dl>
+      </dd>
+    </dl>
+
+    <p>
+      You can modify key assignments by editing the
+      <a href="../setup/keyboard.html">keyboard setupfile</a>.
+    </p>
+  </body>
+</html>

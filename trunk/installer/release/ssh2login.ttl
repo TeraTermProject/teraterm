@@ -1,0 +1,24 @@
+; sample macro of Tera Term
+;
+; File: ssh2login.ttl
+; Description: auto login with SSH2 protocol
+; Environment: generic
+; Update: 2004/12/4
+; Author: Yutaka Hirata
+
+username = 'nike'
+hostname = '192.168.1.3'
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+msg = 'Enter password for user '
+strconcat msg username
+passwordbox msg 'Get password'
+
+msg = hostname
+strconcat msg ':22 /ssh /auth=password /user='
+strconcat msg username
+strconcat msg ' /passwd='
+strconcat msg inputstr
+
+connect msg

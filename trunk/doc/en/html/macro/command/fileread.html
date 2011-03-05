@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>fileread</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>fileread</h1>
+
+<p>
+Reads a file.
+</p>
+
+<pre class="macro-syntax">
+fileread &lt;file handle&gt; &lt;read byte&gt; &lt;strvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Reads specified byte data from the file specified by &lt;file handle&gt;.<br>
+The data are written into the string variable &lt;strvar&gt;. The file pointer is moved to reading bytes. <br>
+If the file pointer reaches the end of the file while reading the data, the system variable "result" is set to 1. Otherwise, "result" is set to zero.<br>
+The range of &lt;read byte&gt; argument must be from 1 to 255.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+filename = 'foo.txt'
+
+fileopen fp filename 0
+
+:loop
+<strong>fileread</strong> fp 10 data
+messagebox data filename
+if result goto fclose
+goto loop
+
+:fclose
+fileclose fp
+</pre>
+
+</body>
+</html>

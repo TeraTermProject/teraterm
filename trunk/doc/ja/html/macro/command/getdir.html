@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getdir</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getdir</h1>
+
+<p>
+MACRO の現在のディレクトリを得る。
+</p>
+
+<pre class="macro-syntax">
+getdir &lt;strvar&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+(Tera Term ではなく) MACRO の現在のディレクトリを文字列変数 &lt;strvar&gt; に格納する。<br>
+ルートディレクトリの場合、文字列の末尾には円記号 (\) が付く。ルート以外のディレクトリの場合、文字列はディレクトリ名で終わり、末尾に円記号は付かない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+getdir dir
+; dir = C:\Documents and Settings\yutaka\My Documents\TeraTermMacro
+</pre>
+
+<h2>参照</h2>
+
+<ul>
+ <li>"<a href="setdir.html">setdir</a>"</li>
+</ul>
+
+</body>
+</html>

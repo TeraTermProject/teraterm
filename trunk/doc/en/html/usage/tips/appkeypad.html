@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Keypad mode</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Keypad mode</h1>
+
+<p>This document has not been translated yet.</p>
+
+<p>
+There are the numeric keypad mode and the application keypad mode at VT100 numeric keypad. The remote host can configure these keypad mode with sending the control sequence. These modes have in the following differences:
+</p>
+
+<dl>
+  <dt>Numeric keypad mode</dt>
+  <dd>
+    In normal mode, the keypad behaves like a normal Windows keypad:
+    with NumLock on or off, the number keys generate numbers.
+    This is the default mode.
+  </dd>
+
+  <dt>Application keypad mode</dt>
+  <dd>
+    In application mode, all the keypad keys send special control sequences, _including_ Num Lock. Num Lock stops behaving like Num Lock and becomes another function key. For example, if a user pushes 1 key, Tera Term will send &lt;ESC&gt;Oq sequence.<br>
+    A user can use this mode to distinguish between full key numeric key and numeric keypad. Basically, an application will change to application keypad mode.
+  </dd>
+</dl>
+
+<h1>Cursor key mode</h1>
+<p>
+There are normal cursor mode and application cursor mode in VT100 cursor key definition. The remote application can change this cursor mode by sending the control sequence.
+</p>
+
+<dl>
+  <dt>Normal cursor mode</dt>
+  <dd>
+    In this mode, the arrow keys send the same key sequences. For example, UP ARROW sends &lt;ESC&gt;[A sequence.
+  </dd>
+
+  <dt>Application cursor mode</dt>
+  <dd>
+    In this mode, the arrow keys do not send the same key sequences. For example, UP ARROW sends &lt;ESC&gt;OA sequence. <br>
+    Also, Tera Term would send UP ARROW or DOWN ARROW key sequence instead of scrolling through the window by rotating the mouse wheel. Refer to 
+    <a href="../../setup/teraterm-misc.html#mousewheel">Mouse wheel action in application cursor mode</a>.
+  </dd>
+</dl>
+
+<h1>Disabling application keypad/cursor mode</h1>
+<p>
+If a user does not want to use the application keypad/cursor mode, disable this mode on <a href="../../menu/setup-keyboard.html">keyboard configuration dialog</a>. So, a user can use the numeric keypad as numbering on vi editor. However, some problem may be occurred on this mode.
+</p>
+
+<p>
+Here is <a href="about_tenkey.html">Another method</a> to disable the application keypad mode.
+</p>
+
+</body>
+</html>

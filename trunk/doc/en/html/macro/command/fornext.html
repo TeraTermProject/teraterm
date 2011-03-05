@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>for, next</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>for, next</h1>
+
+<p>
+Repeats.
+</p>
+
+<pre class="macro-syntax">
+for &lt;intvar&gt; &lt;first&gt; &lt;last&gt;<br>
+  ...<br>
+  ...<br>
+next
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Repeats the statements between "for" and "next" until the integer variable &lt;intvar&gt; has the value &lt;last&gt; at the 'next' statement.<br>
+The initial value of the &lt;intvar&gt; is &lt;first&gt;. If &lt;last&gt; is greater than &lt;first&gt;, &lt;intvar&gt; is incremented by 1 at the 'next' line. If &lt;last&gt; is less than &lt;first&gt;, &lt;intvar&gt; is decremented by 1 at the 'next' line.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Repeat ten times.
+for i 1 10
+  sendln 'abc'
+next
+
+; Repeat five times.
+for i 5 1
+  sendln 'abc'
+next
+</pre>
+
+</body>
+</html>

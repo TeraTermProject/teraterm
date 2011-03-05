@@ -1,0 +1,42 @@
+; sample macro of Tera Term
+;
+; File: mpause.ttl
+; Description: wait command in each millisecond
+; Environment: generic
+; Update: 2006/2/10
+; Author: Yutaka Hirata
+
+timeout = 2
+
+sendln
+sendln
+sendln
+
+for i 1 100
+
+	sendln "uptime"
+	pause 3
+	sendln "uptime"
+	; wait for 500 milliseconds.
+	mpause 500
+	mpause 500
+	mpause 500
+	mpause 500
+	mpause 500
+	mpause 500
+	sendln "uptime"
+
+	sendln "cat /etc/passwd"
+	sendln
+	sendln
+	sendln
+
+	:WAIT_CHECK
+	sendln "#------ Log End -----"
+	wait "------ Log End -----"
+	if result=0 goto WAIT_CHECK
+	flushrecv
+next
+
+sendln "#----- Macro Finish -----"
+end

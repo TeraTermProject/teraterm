@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>PF1-PF4 keys of VT100</TITLE>
+<link rel="stylesheet" href="../../style.css" type="text/css">
+<META http-equiv="Content-Style-Type" content="text/css">
+</HEAD>
+<BODY>
+
+<h1>PF1-PF4 keys of VT100</h1>
+
+<p>
+In the default setup, PF1-PF4 keys of VT100 are emulated by "Num Lock", "/", "*" and "-" keys of numeric keypad. To emulate PF1-PF4 keys by F1-F4 keys of PC keyboard, edit the keyboard setup file KEYBOARD.CNF like the following (see also <A HREF="../../reference/keycode.txt">KEYCODE.TXT</A>):
+</p>
+
+<pre>
+[Numeric keypad]
+PF1=59
+PF2=60
+PF3=61
+PF4=62
+; Key codes for F1-F4 keys are 59-62.
+
+[X function keys]
+XF1=off
+XF2=off
+XF3=off
+XF4=off
+; XF1-XF4 items should be disabled, because
+; key codes 59-62 can not be used twice in the setup file.
+</pre>
+
+</BODY>
+</HTML>

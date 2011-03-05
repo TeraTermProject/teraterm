@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strscan</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strscan</h1>
+
+<p>
+Searches for substring in string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strscan &lt;string&gt; &lt;substring&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Searches for &lt;substring&gt; in &lt;string&gt;.<br>
+If &lt;substring&gt; is found, its position(1-origin) is returned in the system variable "result".<br>
+If &lt;string&gt; contains more than one occurrence of &lt;substring&gt;, the position of the first one is returned. If &lt;substring&gt; is not found, "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strscan 'tera term' 'term'
+; result = 6
+int2str valstr result
+messagebox valstr 'result'
+</pre>
+
+<pre class="macro-example">
+; Converts a hex string to a hexadecimal and binary value
+basenum='0060E3da'
+base=16
+call base2dec
+int2str sdec decnum
+messagebox sdec 'decnum'
+base=2
+call dec2base
+messagebox basenum 'basenum'
+end
+
+:dec2base
+basenum=''
+tmp=decnum      ;modified so not destructive of decnum
+while tmp>0
+   strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
+   strconcat basedig basenum
+   basenum=basedig
+   tmp=tmp/base
+endwhile
+return
+
+:base2dec
+decnum=0
+strlen basenum
+len=result
+for i 1 len
+   strcopy basenum i 1 basedig
+   decnum=decnum*base
+   strscan '0123456789ABCDEFabcdef' basedig
+   if result>16 result=result-6      ;take care of lower case
+   decnum=decnum+result-1
+next
+return
+</pre>
+
+
+<pre class="macro-example">
+; Network IP calculation from IP and Subnet mask
+ip='192.168.1.189'
+sn='255.255.255.248'
+bits=0          ;calculate bits & first address in sn
+bitstr='000 128 192 224 240 248 252 254 255'    ;lookup table for # bits
+do
+    str2int isn sn
+    int2str stmp isn
+    strscan bitstr stmp     ;use lookup table to find bits
+    bits=bits+(result-1)/4  
+    str2int tmp ip      ;find net by bitwise AND of ip and mask
+    sprintf2 net '%s%d' net tmp&isn
+    strscan sn '.'
+    strcopy sn result+1 999 sn
+    strscan ip '.'
+    strcopy ip result+1 999 ip
+    if result>0 strconcat net '.'           
+loop while result>0
+messagebox bits 'bits'
+messagebox net 'net'
+</pre>
+
+
+
+</body>
+</html>

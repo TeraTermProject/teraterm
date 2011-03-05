@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Line formats</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Line formats</h1>
+
+<p>
+There are four kinds of line formats for macro files. Any line can contain a comment which begins with a ";" character. Also, a user can use the C language style comment(/* - */).<br>
+Comments give no effect on the execution of MACRO.<br>
+One line can contain up to 500 characters. The part that exceeded 500 characters is ignored.<br>
+</p>
+
+<h2>1) Empty lines</h2>
+
+<p>
+Lines which have no character or contain only space or tab characters or a comment. 
+They give no effect on the execution of the macro.
+</p>
+
+<pre>
+Example:
+    ; Tera Term Language
+</pre>
+
+<pre>
+Example:
+    showtt 0 
+    MessageBox 'message 1' 'title 1' 
+    /* This is 'comment' "string" 
+    */ MessageBox 'message 2' 'title 2'
+    closett
+</pre>
+
+
+<h2>2) Command lines</h2>
+
+<p>
+Lines containing a single command with parameters.
+</p>
+
+<pre>
+Format:
+    &lt;command&gt; &lt;parameter&gt; ...
+
+Example:
+    connect'myhost'
+    wait 'OK' 'ERROR'
+    if result=2 goto error
+    sendln 'cat'
+    pause A*10
+    end
+</pre>
+
+<h2>3) Assignment lines</h2>
+
+<p>
+Lines which contain an assignment statement.
+</p>
+
+<pre>
+Format:
+    &lt;Variable&gt; = &lt;Value (constant, variable, expression)&gt;
+
+Example:
+    A = 33
+    B = C            C must already have a value.
+    VAL = I*(I+1)	
+    A=B=C            The value of B=C (0 for false, 1 for true) is assigned to A.
+    Error=0&lt;J	
+    Username='MYNAME'
+</pre>
+
+<h2>4) Label lines</h2>
+
+<p>
+Lines which begin with a ':' character followed by a label identifier.
+</p>
+
+<pre>
+Format:
+    :&lt;Label&gt;
+
+Example:
+    :dial
+    :100
+</pre>
+
+</BODY>
+</HTML>
+

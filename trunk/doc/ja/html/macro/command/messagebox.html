@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>messagebox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>messagebox</h1>
+
+<p>
+ダイアログボックスを開き、ユーザーにメッセージを知らせる。
+</p>
+
+<pre class="macro-syntax">
+messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(廃止)]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列 &lt;message&gt; はダイアログボックスに表示されるメッセージ、文字列 &lt;title&gt; はダイアログボックスのタイトルを表す。
+</p>
+
+<p>
+&lt;special&gt; は廃止されました。エラーにはなりませんが、無効です。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+messagebox ErrorMessage 'Error'
+
+title="5行表示"
+message="1行目\n2行目\n3行目\n4行目\n5行目\n"
+strspecial message
+messagebox message title
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="strspecial.html">strspecial</a></li>
+</ul>
+
+</body>
+</html>

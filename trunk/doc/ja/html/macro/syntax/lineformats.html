@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>行の形式</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>行の形式</h1>
+
+<p>
+行の形式は以下の4つに分類できる。どの行も ";" 文字で始まるコメントを含むことができる。また、C言語風コメント（/* ～ */）も使用可能。<br>
+コメントは MACRO の実行に影響を与えない。<br>
+1つの行は最大500文字まで。500 文字を越える部分は無視される。<br>
+</p>
+
+<h2>1) 空白行</h2>
+
+<p>
+文字がない行や空白文字 (space または tab)やコメントだけの行。
+MACROの実行に影響をあたえない。
+</p>
+
+<pre>
+例:
+    ; Tera Term Language
+</pre>
+
+<pre>
+例:
+    showtt 0 
+    MessageBox 'message 1' 'title 1' 
+    /* This is 'comment' "string" 
+    */ MessageBox 'message 2' 'title 2'
+    closett
+</pre>
+
+<h2>2) コマンド行</h2>
+
+<p>
+1つのコマンド名と0個以上のパラメータ。
+</p>
+
+<pre>
+書式:
+    &lt;コマンド&gt; &lt;パラメータ&gt; ...
+
+例:
+    connect'myhost'
+    wait 'OK' 'ERROR'
+    if result=2 goto error
+    sendln 'cat'
+    pause A*10
+    end
+</pre>
+
+<h2>3) 代入行</h2>
+
+<p>
+変数に値を代入する。
+</p>
+
+<pre>
+書式:
+    &lt;変数&gt; = &lt;定数、変数、式&gt;
+
+例:
+    A = 33               数値の代入
+    B = C                C はすでに値が代入されてなければならない。
+    VAL = I*(I+1)	
+    A=B=C                B=C の結果 (真:1、偽:0) が A に代入される。
+    Error=0&lt;J	
+    Username='MYNAME'    文字列の代入
+</pre>
+
+<h2>4) ラベル行</h2>
+
+<p>
+":" とその直後に続くラベル名からなる。
+</p>
+
+<pre>
+書式:
+    :&lt;Label&gt;
+
+例:
+    :dial
+    :100
+</pre>
+
+</BODY>
+</HTML>
+

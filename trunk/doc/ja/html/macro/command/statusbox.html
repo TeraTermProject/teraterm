@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>statusbox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>statusbox</h1>
+
+<p>
+ステータスダイアログボックスを表示する。
+</p>
+
+<pre class="macro-syntax">
+statusbox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(廃止)]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ステータスダイアログボックスが表示されていない場合、それを表示する。<br>
+ダイアログボックスのメッセージを &lt;message&gt; に、タイトルを &lt;title&gt; に変える。
+</p>
+
+<p>
+"<a href="setdlgpos.html">setdlgpos</a>" コマンドはステータスダイアログボックスの位置を変える。<br>
+"<a href="closesbox.html">closesbox</a>" コマンドはステータスダイアログボックスを閉じる。EnterキーやESCキーでは閉じることはできません。
+</p>
+
+<p>
+&lt;special&gt; は廃止されました。エラーにはなりませんが、無効です。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 表示位置を指定
+setdlgpos 200 200
+; ダイアログボックスを表示
+statusbox 'Message' 'Title'
+pause 3
+; ダイアログボックスを移動
+setdlgpos 0 0
+pause 3
+; ダイアログボックスを閉じる
+closesbox
+</pre>
+
+
+<pre class="macro-example">
+; カウンタを表示しながらループする
+step = 0
+while 1
+  call show_step
+  sendln 'echo do something'
+  wait '$'
+  pause 2
+endwhile
+end
+
+:show_step
+step = step + 1
+int2str s step
+statusbox s 'counter'
+return
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="strspecial.html">strspecial</a></li>
+</ul>
+
+</body>
+</html>

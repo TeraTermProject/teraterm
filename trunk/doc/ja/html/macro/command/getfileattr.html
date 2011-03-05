@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getfileattr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getfileattr</h1>
+
+<p>
+ファイルまたはディレクトリの属性を得る。
+</p>
+
+<pre class="macro-syntax">
+getfileattr &lt;filename&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">文字列 &lt;filename&gt;</dt>
+	<dd>ファイル名またはディレクトリ名</dd>
+</dl>
+
+<h2>返り値</h2>
+
+<dl>
+	<dt class="macro">システム変数 &lt;result&gt;</dt>
+	<dd>属性の取得に失敗すると -1 が格納される。<br>
+	    取得に成功すると、属性値が格納される。属性値は以下の数値の組み合わせとなる。<br>
+	    <table border="2">
+	      <tr>
+	        <th>値</th>
+	        <th>意味</th>
+	      </tr>
+	      <tr>
+	        <td>$1</td>
+	        <td>読み取り専用</td>
+	      </tr>
+	      <tr>
+	        <td>$2</td>
+	        <td>隠しファイルまたは隠しディレクトリ</td>
+	      </tr>
+	      <tr>
+	        <td>$4</td>
+	        <td>オペレーティングシステムの一部、またはオペレーティングシステム専用</td>
+	      </tr>
+	      <tr>
+	        <td>$10</td>
+	        <td>ディレクトリ</td>
+	      </tr>
+	      <tr>
+	        <td>$20</td>
+	        <td>アーカイブ</td>
+	      </tr>
+	      <tr>
+	        <td>$80</td>
+	        <td>特に属性はない</td>
+	      </tr>
+	      <tr>
+	        <td>$100</td>
+	        <td>一時ファイル</td>
+	      </tr>
+	      <tr>
+	        <td>$200</td>
+	        <td>スパースファイル</td>
+	      </tr>
+	      <tr>
+	        <td>$400</td>
+	        <td>再解析ポイントが関連付けられているか、シンボリックリンク</td>
+	      </tr>
+	      <tr>
+	        <td>$800</td>
+	        <td>圧縮されている</td>
+	      </tr>
+	      <tr>
+	        <td>$1000</td>
+	        <td>オフラインの記憶装置へ物理的に移動された(Windows 2000 以降)</td>
+	      </tr>
+	      <tr>
+	        <td>$2000</td>
+	        <td>「インデックスサービス」の対象になっていない(Windows 2000 以降)</td>
+	      </tr>
+	      <tr>
+	        <td>$4000</td>
+	        <td>暗号化されている</td>
+	      </tr>
+	    </table>
+	</dd>
+</dl>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+file = 'c:\test.txt'
+getfileattr file
+if result &lt;&gt; -1 then
+	if result &amp; $1 &gt; 0 then
+		messagebox 'This file has readonly attribute.' file
+	endif
+endif
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="setfileattr.html">setfileattr</a></li>
+  <li>MSDN ライブラリ <a href="http://msdn.microsoft.com/en-us/library/aa364944(v=VS.85).aspx">GetFileAttributes</a></li>
+  <li>MSDN ライブラリ <a href="http://msdn.microsoft.com/en-us/library/gg258117(v=VS.85).aspx">File Attribute Constants</a></li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Cygwin connection</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Cygwin connection</h1>
+
+<p>
+  Tera Term can connect to local Cygwin environment.<br>
+  <A HREF="http://www.cygwin.com/">Cygwin</A> is a Linux-like environment for Windows.<br>
+  Cygwin is open source software.<br>
+  [NOTE] Cygwin 1.5.x doesn't seem support Windows 7. Please use Cygwin 1.7.x on Windows 7.
+</p>
+
+<p>
+This package makes it possible to connect local Cygwin by using built in Cygterm.<br>
+Select "Cygwin connection" from "File" menu or press "Alt + G " to connect to Cygwin.<br>
+Prior connecting to Cygwin, Cygwin installation path has to be entered into Tera Term ini file.<br>
+The format is "drive-letter:\directory".
+</p>
+
+<pre>
+----------------------------
+; Cygwin install path
+CygwinDirectory = c:\cygwin
+----------------------------
+</pre>
+
+<p>
+[NOTE]<br>
+If cygterm fails to start you might need to download its source and recompile it.<br>
+Latest source code is available at <a href="http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/ttssh2/cygterm/">ViewCVS of sourcefoge.jp</a>.
+</p>
+
+<p>
+Be careful not to save [Setup] [Save setup] in the situation that it was started by cygterm.exe.<br>
+Otherwise telnet port number of TCP/IP is saved but 23 you will be confused by connection failure when you normally run Tera Term to do telnet.  In that case it will be recovered by saving the setting with specifying TCP/IP Port# 23.
+</p>
+
+
+</BODY>
+</HTML>

@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>setdlgpos</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setdlgpos</h1>
+
+<p>
+Sets the position of dialog box.
+</p>
+
+<pre class="macro-syntax">
+setdlgpos &lt;x&gt; &lt;y&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Changes the initial position for dialog boxes opend by the "<a href="inputbox.html">inputbox</a>", "<a href="messagebox.html">messagebox</a>", "<a href="passwordbox.html">passwordbox</a>" and "<a href="statusbox.html">statusbox</a>" commands. If the status dialog box is displayed, the "setdlgpos" command also moves the dialog box.<br>
+&lt;x&gt; and &lt;y&gt; specify the position (x,y) in the screen coordinate.<br>
+The origin (0,0) is upper left corner of the screen.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Message box at the upper left corner.
+setdlgpos 0 0
+messagebox 'Message' 'Title'
+
+; Open the status box.
+setdlgpos 0 200
+statusbox 'Message' 'Title'
+
+; Moves the status box.
+for i 0 200
+  setdlgpos i 200
+next
+</pre>
+
+</body>
+</html>

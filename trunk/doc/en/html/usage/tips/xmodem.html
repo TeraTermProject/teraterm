@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Tips on XMODEM</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Tips on XMODEM</h1>
+
+<p>
+The XMODEM file transfer protocol requires the communication lines to be transparent to all 8 bit characters, from $00 to $FF.
+</p>
+
+<h2>For serial port:</h2>
+
+<div class="indent1">
+<p>
+Set the appropriate parameters in the <A HREF="../../menu/setup-serialport.html">[Setup] Serial port</A> dialog box. Data must be 8 bit, and Flow control must be hard (CTS/RTS) or none.
+</p>
+</div>
+
+<h2>For telnet:</h2>
+
+<div class="indent1">
+<p>
+If file transfers fail, try connecting to the host with the binary option. To connect with the binary option:
+</p>
+
+<ul class="no-marker">
+  <li class="description">Specify the /B option on the <A HREF="../../commandline/teraterm.html">command line</A>, or</li>
+  <li class="description">Edit the setup file.<br>
+Telnet binary option</li>
+</ul>
+</div>
+
+</BODY>
+</HTML>

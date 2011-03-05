@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>waitregex</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>waitregex</h1>
+
+<p>
+Waits a line that contains string with regular expression.
+</p>
+
+<pre class="macro-syntax">
+waitregex &lt;string1 with regular expression&gt; [&lt;string2 with regular expression&gt; ...]
+mwaitregex &lt;string1 with regular expression&gt; [&lt;string2 with regular expression&gt; ...]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Supports <a href="../../reference/RE.txt">Oniguruma Regular Expressions</a>.<br>
+Pauses until the string (maximum 256 characters), which matches one or more character strings with regular expression is received from the host, or until the timeout occurs. Maximum number of the regular expression strings is 10.
+</p>
+
+<p>
+If the system variable "timeout" or "mtimeout" is greater than zero, the timeout occurs when &lt;timeout&gt;.&lt;mtimeout&gt; seconds have passed. If the timeout is less than or equal to zero, the timeout never occurs.
+</p>
+
+<p>
+These commands return one of the following values in the system variable "result":
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Meaning</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Timeout.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>&lt;string1 with regular expression&gt; has received.</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>&lt;string2 with regular expression&gt; has received.</td>
+ </tr>
+ <tr>
+  <td>n</td>
+  <td>&lt;stringn with regular expression&gt; has received. n=1..10.</td>
+ </tr>
+</table>
+
+<p>
+The received line is stored in the system variable "inputstr".<br>
+The first matched pattern is stored in the system variable "matchstr".<br>
+Group matched patterns of regular expressions are stored in 9 system variables from "groupmatchstr1" to "groupmatchstr9".
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+timeout = 30
+waitregex 'Longhorn' '.*@sai' 'Pentium\d+' 'TeraTermX{3}'
+int2str s result
+messagebox s 'result'
+messagebox inputstr 'inputstr'
+messagebox matchstr 'matchstr'
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filetruncate</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filetruncate</h1>
+
+<p>
+Changes the size of a file.
+</p>
+
+<pre class="macro-syntax">
+filetruncate &lt;filename&gt; &lt;size&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Changes the &lt;size&gt; bytes of a &lt;filename&gt; file.<br>
+Null characters('\0') are appended if the file is extended.<br>
+<br>
+
+The system variable "result" value is set to 0 if the file size is successfully changed. 
+The system variable "result" value of -1 indicates an error.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Changes 32 bytes of a file.
+filetruncate 'test.exe' 32
+if result = -1 then
+	messagebox 'file truncate error' 'filetruncate'
+else
+	messagebox 'file truncate success' 'filetruncate'
+endif
+</pre>
+
+<pre class="macro-example">
+; Makes 8M bytes of a file containing all zero data.
+size = 8*1024*1024
+filetruncate 'bigfile.bin' size
+</pre>
+
+<pre class="macro-example">
+; Opens a log file at the macro file directory.
+getdir dir
+sprintf2 filename '%s\test.log' dir
+logopen filename 0 0
+; Limitation of a file size
+maxsize = 512
+counter = 0
+
+:loop
+counter = counter + 1
+sprintf2 line 'counter = %d' counter
+logwrite line
+logwrite #13#10
+filetruncate filename maxsize
+if result = -1 then
+	messagebox 'file truncate error' 'filetruncate'
+	goto skip
+endif
+if counter > 32 goto skip
+goto loop
+
+:skip
+logclose
+</pre>
+
+</body>
+</html>

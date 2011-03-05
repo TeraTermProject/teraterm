@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+    <title>SSH Keygenerator ([Setup] メニュー)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH Keygenerator ([Setup] メニュー)</h1>
+
+    <h2>"TTSSH: Key Generator" ダイアログボックス</h2>
+    <p>
+      詳しい解説は<a href="../usage/ssh.html">SSH 接続</a>の「<a href="../usage/ssh.html#generate">キーの生成</a>」
+      をご覧下さい。
+    </p>
+
+    <dl>
+      <dt>Key type</dt>
+      <dd>生成する鍵の種類を指定します。
+        <dl>
+          <dt>RSA1</dt>
+          <dd>SSH1用 RSA鍵を生成します。</dd>
+
+          <dt>RSA</dt>
+          <dd>SSH2用 RSA鍵を生成します。</dd>
+
+          <dt>DSA</dt>
+          <dd>SSH2用 DSA鍵を生成します。</dd>
+
+          <dt>ECDSA-256</dt>
+          <dd>SSH2用 ECDSA(256bit)鍵を生成します。</dd>
+
+          <dt>ECDSA-384</dt>
+          <dd>SSH2用 ECDSA(384bit)鍵を生成します。</dd>
+
+          <dt>ECDSA-521</dt>
+          <dd>SSH2用 ECDSA(521bit)鍵を生成します。</dd>
+        </dl>
+      </dd>
+
+      <dt>Key Bits</dt>
+      <dd>生成する鍵の鍵長を指定します。</dd>
+
+      <dt>Generate</dt>
+      <dd>鍵を生成します。</dd>
+
+      <dt>Key passphrase</dt>
+      <dd>生成した秘密鍵に付けるパスフレーズを指定します。</dd>
+
+      <dt>Confirm passphrase</dt>
+      <dd>
+        秘密鍵に付けるパスフレーズの確認をします。
+        Key passphraseと同じものを入力してください。
+      </dd>
+
+      <dt>Save public key</dt>
+      <dd>生成した公開鍵を保存します。</dd>
+
+      <dt>Save private key</dt>
+      <dd>生成した秘密鍵を保存します。</dd>
+    <dl>
+
+  </body>
+</html>

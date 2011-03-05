@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>filestrseek2</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filestrseek2</h1>
+
+<p>
+Backward searchs a string from a file.
+</p>
+
+<pre class="macro-syntax">
+filestrseek2 &lt;file handle&gt; &lt;string&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Searches for &lt;string&gt; in the file specified by &lt;file handle&gt;.<br>
+The search is done backward and started from the current position of the file pointer. For the forward search, use the "<a href="filestrseek.html">filestrseek</a>" command.<br>
+If &lt;string&gt; is found, the file pointer is moved to the position of the character just before the string and the system variable "result" is set to 1. However, if the string locates at one byte of the file, the file pointer is zero offset.<br>
+If &lt;string&gt; is not found, the file pointer is not moved and "result" is set to zero.<br>
+If the file pointer is already zero before the execution of this command, "result" is set to zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Open the file "teraterm.log". The file pointer is set to the end of file.
+fileopen fhandle 'teraterm.log' 1
+
+:next
+; Backward search for the string "abc"
+filestrseek2 fhandle 'abc'
+if result=0 goto not_found
+; mark the file pointer
+filemarkptr fhandle
+; Read characters from the character just before "abc" to the end of the line.
+filereadln fhandle str
+; recall the file pointer
+fileseekback fhanlde
+; search for the next word
+goto next
+
+:not_found
+fileclose fhandle
+</pre>
+
+</body>
+</html>

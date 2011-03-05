@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>sprintf</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sprintf</h1>
+
+<p>
+Returns formatted output.
+</p>
+
+<pre class="macro-syntax">
+sprintf FORMAT [ARGUMENT ...]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+FORMAT controls the output as in C language printf with ARGUMENTs converted to proper type first.
+The output string is stored in the string variable &lt;inputstr&gt;.
+</p>
+
+<table>
+<caption>supported format style</caption>
+<tr>
+  <th>type</th>
+  <td>c, d, i, o, u, x, X, e, E, f, g, G, a, A and s</td>
+</tr>
+<tr>
+  <th>flags(option)</th>
+  <td>-, +, 0, # and blank(' ')</td>
+</tr>
+<tr>
+  <th>width(option)</th>
+  <td>decimal integer</td>
+</tr>
+<tr>
+  <th>precision(option)</th>
+  <td>nonnegative decimal integer(option), preceded by a period(.)</td>
+</tr>
+</table>
+
+<p>
+As a result of this command, the system variable "result" is set to one of the following values.
+</p>
+
+<table>
+<tr>
+  <th>Value</th>
+  <th>Status</th>
+</tr>
+<tr>
+  <td>0</td>
+  <td>Formatted successfully</td>
+</tr>
+<tr>
+  <td>1</td>
+  <td>No format string</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Invalid format</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Invalid argument</td>
+</tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+sprintf 'Tera Term 4.%d' 51
+messagebox inputstr 'sprintf test(1)'
+
+sprintf 'Windows %d (+%s)' 2000 'SP4'
+messagebox inputstr 'sprintf test(2)'
+
+sprintf '%s=%d %s=0x%x' 'dec' 10 'hex' 33
+messagebox inputstr 'sprintf test macro(3)'
+</pre>
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="sprintf2.html">sprintf2</a>"</li>
+</ul>
+
+</BODY>
+</HTML>

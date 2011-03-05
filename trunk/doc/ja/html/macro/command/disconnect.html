@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>disconnect</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>disconnect</h1>
+
+<p>
+Tera Term とホストの間の通信を終了させる。
+</p>
+
+<pre class="macro-syntax">
+disconnect [&lt;confirm&gt;]
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">整数 &lt;confirm&gt; (オプション デフォルト=非ゼロ) (バージョン 4.65 以降)</dt>
+	<dd>0を指定すると、TCP/IP 接続切断時の確認ダイアログを表示せずに通信を終了する。<br>
+	    0以外の値を指定すると、TCP/IP 接続切断時の確認ダイアログを表示する。</dd>
+</dl>
+
+<h2>解説</h2>
+
+<p>
+もしこのコマンドによって Tera Term が終了しなければ、Tera Term と MACRO の間のリンクは保持される。
+</p>
+
+<h2>参照</h2>
+
+<ul>
+ <li>"<a href="closett.html">closett</a>"</li>
+ <li>"<a href="connect.html">connect</a>"</li>
+ <li>"<a href="cygconnect.html">cygconnect</a>"</li>
+ <li>"<a href="testlink.html">testlink</a>"</li>
+ <li>"<a href="unlink.html">unlink</a>"</li>
+ <li><a href="../appendixes/disconnecttiming.html">切断後すぐに接続する場合の注意点</a></li>
+</ul>
+
+</body>
+</html>

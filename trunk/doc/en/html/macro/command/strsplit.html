@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strsplit</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strsplit</h1>
+
+<p>
+Splits a string by delimiters.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strsplit &lt;strval&gt; &lt;separator&gt; [&lt;count&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Splits the string &lt;strval&gt; by the &lt;separator&gt; delimiter, and returns the 9 system variables from "groupmatchstr1" to "groupmatchstr9".
+</p>
+
+<p>
+One delimiter character is specified in the &lt;separator&gt;.
+</p>
+
+<p>
+The &lt;count&gt; is specified the maximum number of substrings to return. The upper limit of &lt;count&gt; is 9.<br>
+If a number of substrings is smaller than &lt;count&gt;, the remaining groupmatchstr variables stores ''(empty).<br>
+
+When the number of substrings are greater than the &lt;count&gt;, the remaining substrings stores into the last groupmatchstr variable.
+</p>
+
+<p>
+When the &lt;count&gt; is not specified, the maximum of substrings is 9.<br>
+If the number of substrings is larger than 9, the ninth substring stores into the last groupmatchstr variable.
+</p>
+
+<p>
+The division count stores into the result system variable.<br>
+When the &lt;count&gt; is not specified and the number of substrings is larger than 9, the result value is 10.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+src=',,Sun,Mon,Tue,,Thu,Fri,Sat'
+strsplit src ',' 7
+
+messagebox groupmatchstr1 "groupmatchstr1" ; ''
+messagebox groupmatchstr2 "groupmatchstr2" ; ''
+messagebox groupmatchstr3 "groupmatchstr3" ; 'Sun'
+messagebox groupmatchstr4 "groupmatchstr4" ; 'Mon'
+messagebox groupmatchstr5 "groupmatchstr5" ; 'Tue'
+messagebox groupmatchstr6 "groupmatchstr6" ; ''
+messagebox groupmatchstr7 "groupmatchstr7" ; 'Thu,Fri,Sat'
+messagebox groupmatchstr8 "groupmatchstr8" ; ''
+messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox result         "result"         ; 7
+
+src='Sun,Mon,Tue,Wed,Thu,Fri,Sat'
+strsplit src ',' 7
+
+messagebox groupmatchstr1 "groupmatchstr1" ; 'Sun'
+messagebox groupmatchstr2 "groupmatchstr2" ; 'Mon'
+messagebox groupmatchstr3 "groupmatchstr3" ; 'Tue'
+messagebox groupmatchstr4 "groupmatchstr4" ; 'Wed'
+messagebox groupmatchstr5 "groupmatchstr5" ; 'Thu'
+messagebox groupmatchstr6 "groupmatchstr6" ; 'Fri'
+messagebox groupmatchstr7 "groupmatchstr7" ; 'Sat'
+messagebox groupmatchstr8 "groupmatchstr8" ; ''
+messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox result         "result"         ; 7
+
+src='A string'#10'of ,,tokens'#10'and some  more tokens'
+strsplit src '\n' 9
+
+messagebox groupmatchstr1 "groupmatchstr1" ; 'A string'
+messagebox groupmatchstr2 "groupmatchstr2" ; 'of ,,tokens'
+messagebox groupmatchstr3 "groupmatchstr3" ; 'and some  more tokens'
+messagebox groupmatchstr4 "groupmatchstr4" ; ''
+messagebox groupmatchstr5 "groupmatchstr5" ; ''
+messagebox groupmatchstr6 "groupmatchstr6" ; ''
+messagebox groupmatchstr7 "groupmatchstr7" ; ''
+messagebox groupmatchstr8 "groupmatchstr8" ; ''
+messagebox groupmatchstr9 "groupmatchstr9" ; ''
+messagebox result         "result"         ; 3
+
+src='1,2,3,4,5,6,7,8,9,0'
+strsplit src ','
+
+messagebox groupmatchstr1 "groupmatchstr1" ; '1'
+messagebox groupmatchstr2 "groupmatchstr2" ; '2'
+messagebox groupmatchstr3 "groupmatchstr3" ; '3'
+messagebox groupmatchstr4 "groupmatchstr4" ; '4'
+messagebox groupmatchstr5 "groupmatchstr5" ; '5'
+messagebox groupmatchstr6 "groupmatchstr6" ; '6'
+messagebox groupmatchstr7 "groupmatchstr7" ; '7'
+messagebox groupmatchstr8 "groupmatchstr8" ; '8'
+messagebox groupmatchstr9 "groupmatchstr9" ; '9'
+messagebox result         "result"         ; 10
+</pre>
+
+<h2>Reference</h2>
+
+<a href="strjoin.html">strjoin</a><br>
+
+</body>
+</html>

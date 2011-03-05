@@ -1,0 +1,22 @@
+; Sample macro for Tera Term
+;  Telnet login
+
+; open Tera Term
+;   command line = 'TERATERM myhost.mydomain' (telnet)
+connect 'myhost.mydomain'
+
+; set username
+UsernamePrompt = 'Username:'
+Username = 'MYNAME'
+PasswordPrompt = 'Password:'
+; get password from file
+getpassword 'password.dat' 'mypassword' Password
+
+; login
+wait   UsernamePrompt
+sendln Username
+
+wait   PasswordPrompt
+sendln Password
+
+; OK, auto login complete.

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Language file</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Language file</h1>
+
+<p>
+Tera Term's menu and dialog are assigned to English message.<br>
+A user can localize the message to make the language file.<br>
+And also, the user can specify the dialog font and the font size in the file.
+</p>
+
+<p>
+Tera Term installer will copy Japanese, German and French language file into the lang directory.<br>
+And also, the installer will write the language file name into the UILanguageFile entry in the TERATERM.INI file.
+</p>
+
+<h2>Font Settings</h2>
+
+<p>
+The installer copies the Default.lng file into the lang directory.<br>
+The font settings are as follows:
+</p>
+
+<pre>
+; A big font
+DLG_SYSTEM_FONT=System,12,0
+; A small font
+DLG_TAHOMA_FONT=Tahoma,8,0
+</pre>
+
+<p>
+Describe a font name in the first entry.
+</p>
+
+<p>
+Describe a font size in the second entry.
+</p>
+
+<p>
+Describe a font character set in the third entry.
+<pre>
+0   ANSI
+1   Default charset
+2   Symbol
+77  Mac
+128 Japanese(Shift_JIS)
+129 Hangul(EUC-KR)
+130 Hangul(Johab)
+134 Simplified Chinese(GB2312)
+136 Traditional Chinese(Big5)
+161 Greek
+162 Turkish
+163 Vietnamese
+177 HEBREW
+178 Arabic
+186 Baltic
+204 Cyrillic
+222 Thai
+238 Central European
+255 OEM/DOS
+</pre>
+
+Refer to the lfCharSet member of the <a href="http://msdn.microsoft.com/en-us/library/bb773327(VS.85).aspx">LOGFONT Structure</a> for complete information.
+</p>
+
+
+</BODY>
+</HTML>

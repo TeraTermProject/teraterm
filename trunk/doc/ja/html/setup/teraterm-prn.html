@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>印刷 (Tera Term 設定ファイル)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="delay">エスケープシーケンスによる印刷の遅延</a></h1>
+
+<p>
+エスケープシーケンスによる印刷に対する遅延時間を設定することができます。エスケープシーケンスによる印刷は ESC[5i で始まり、ESC[4i で終了します。ESC[5i と ESC[4i の間に受信されたデータは Tera Term が ESC[4i を受信してから遅延時間が経過した時に印刷されます。この遅延時間内に二番目の ESC[5i が受信された場合、 一番目と二番目の印刷データは結合され、二番目の遅延時間が経過したあとに、一度にまとめて印刷されます。つまり、複数の印刷シーケンスが連続して受信されそれらの間隔が遅延時間以下である場合、それらは一つの印刷シーケンスとして取り扱われます。遅延時間を設定するには設定ファイルの [Tera Term] セクションの PassThruDelay 行を、
+</p>
+
+<pre>
+PassThruDelay=&lt;遅延時間(秒)&gt;
+</pre>
+
+<pre>
+省略時:
+PassThruDelay=3
+</pre>
+
+
+<h1><a name="direct">エスケープシーケンスによる印刷でポートに直接出力</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの PassThruPort 行を以下のように変更することによって、エスケープシーケンスにより送られた印刷データをポートに直接出力することができます。
+</p>
+
+<pre>
+PassThruPort=&lt;port&gt;
+</pre>
+
+<p>
+文字列 &lt;port&gt; は出力先のポートを指定します。&lt;port&gt; の形式は MS-DOS の "mode" コマンドと同じです。もしポートが指定されない場合、Tera Term は Windows の印刷機能を使用してデータを印刷します。
+</p>
+
+<pre>
+例:
+  PassThruPort=LPT1
+  PassThruPort=COM2: 9600,n,8,1,x
+</pre>
+
+<pre>
+省略時:
+PassThruPort=
+</pre>
+
+
+<h1><a name="formfeed">エスケープシーケンスによる印刷時の改ページを禁止する</a></h1>
+
+<p>
+エスケープシーケンスによる印刷時に FF 文字を受信すると改ページ (form-feed) されます。FF 文字による改ページを禁止するには、設定ファイルの [Tera Term] セクションの PrnConvFF 行を以下のように変更してください。
+</p>
+
+<pre>
+PrnConvFF=on
+</pre>
+
+<p>
+FF 文字を受信した時に、改ページの変わりに改行するようになります。
+</p>
+
+<p>
+注意: このオプションは<a href="#direct">印刷データを直接ポートに出力する</a>場合には無視されます。
+</p>
+
+<pre>
+省略時:
+PrnConvFF=off
+</pre>
+
+
+<h1><a name="font">プリンタフォントの指定</a></h1>
+
+<p>
+VT window の画面を印刷するときに使用するフォント(プリンタフォント)を指定することができます。初期設定は、画面表示用のフォント([Setup] Fontで指定されるフォント)が印刷用にも使われるようになっています。プリンタフォントを指定するには、次の手順にしたがってください。
+
+</p>
+
+<ol>
+ <li>[Setup] Font で画面表示用のフォントをいろいろ変えて、印刷してみる。</li>
+ <li>好みの印刷用フォントが見つかったら [Setup] Save setup で設定ファイルに現在の設定を保存。</li>
+ <li>[Tera Term] セクションの VTFont 行のパラメター(例えば"標準明朝,0,-19,128")を PrnFont 行にコピーする。</li>
+ <li>画面用のフォントをもとの設定にもどす。</li>
+</ol>
+
+<pre>
+例:
+PrnFont=標準明朝,0,-19,128
+</pre>
+
+<pre>
+省略時:
+PrnFont=
+</pre>
+
+
+<h1><a name="margin">ページ余白の指定</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションに PrnMargin 行を以下のように変更すると、印刷のためのページ余白(左、右、上、下)を指定することができます。
+</p>
+
+<pre>
+PrnMargin=&lt;左&gt;,&lt;右&gt;,&lt;上&gt;,&lt;下&gt;   ; (1/100 インチ単位)
+</pre>
+
+<pre>
+省略時:
+PrnMargin=50,50,50,50
+</pre>
+
+
+<h1><a name="scale">印刷の倍率</a></h1>
+
+<p>
+印刷された文字や画像が小さすぎたり大きすぎたりする場合、通常はコントロールパネルの"プリンタ"で拡大/縮小倍率を変えることにより文字や画像を拡大/縮小することができます。もしプリンタドライバーが拡大/縮小に対応していない場合、水平方向と垂直方向の倍率を指定することができます。倍率を指定するには、設定ファイルの [Tera Term] セクションの VTPPI と TEKPPI 行を以下のように変更してください。
+</p>
+
+<pre>
+VTPPI=&lt;x(水平), y(垂直); pixels per inch)&gt;    ; VTウィンドウ用
+TEKPPI=&lt;x(水平), y(垂直); pixels per inch)&gt;   ; TEK ウインドウ用
+</pre>
+
+<p>
+倍率の単位は ピクセル/インチ でなければなりません。もし文字や画像が小さすぎる(大きすぎる)場合は倍率を増やして(減らして)ください。指定された倍率のうちすくなくとも一つが0の場合、Tera Term はプリンタドライバーの既定の値を使用します。
+</p>
+
+<pre>
+例:
+VTPPI=300,300
+TEKPPI=300,300
+</pre>
+
+<pre>
+省略時:
+VTPPI=0,0
+TEKPPI=0,0
+</pre>
+
+
+</BODY>
+</HTML>

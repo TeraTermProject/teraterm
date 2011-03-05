@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>名前の形式</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>名前の形式</h1>
+
+<h2>1) 変数の名前</h2>
+
+<p>
+1文字目は、アルファベット (A-Z, a-z) か "_"、2文字目以降はアルファベットか "_" か数字 (0-9)。アルファベットの大文字と小文字は区別されない。最大長は32文字。
+</p>
+
+<pre>
+例:
+    VARIABLE
+    _flag
+</pre>
+
+<h2>2) ラベルの名前</h2>
+
+<p>
+アルファベット (A-Z, a-z) か "_" か数字 (0-9) で構成される。最大長は32文字。
+</p>
+
+<pre>
+例:
+    label1
+    100
+</pre>
+
+<h2>3) 予約語</h2>
+
+<p>
+以下に示す名前は、コマンドや演算子、システム変数として使われる。ユーザーが定義する変数やラベルの名前として使うことはできない。
+</p>
+
+<pre>
+コマンド:
+    bplusrecv, bplussend, changedir... (「<A HREF="../command/index.html">TTL コマンドリファレンス</A>」を参照)
+
+演算子:
+    and, not, or, xor
+
+システム変数:
+    groupmatchstr1, groupmatchstr2, groupmatchstr3, groupmatchstr4, groupmatchstr5,
+    groupmatchstr6, groupmatchstr7, groupmatchstr8, groupmatchstr9, inputstr,
+    matchstr, param2, param3, param4, param5, param6, param7, param8, param9,
+    result, timeout, mtimeout
+</pre>
+
+</BODY>
+</HTML>
+

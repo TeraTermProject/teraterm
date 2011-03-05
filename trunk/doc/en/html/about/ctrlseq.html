@@ -1,0 +1,846 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Supported control functions</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Supported Control Functions</h1>
+
+<h2>C0 Control Character</h2>
+<table border="1">
+<tr><th>Hexadecimal</th>	<th>Mnemonic</th>	<th>Description</th></tr>
+<tr><td>0x00</td>	<td> NUL </td>	<td> </td></tr>
+<tr><td>0x01</td>	<td> SOH </td>	<td> </td></tr>
+<tr><td>0x02</td>	<td> STX </td>	<td> </td></tr>
+<tr><td>0x03</td>	<td> ETX </td>	<td> </td></tr>
+<tr><td>0x04</td>	<td> EOT </td>	<td> </td></tr>
+<tr><td>0x05</td>	<td> ENQ </td>	<td> Sends the <a href="../menu/setup-terminal.html#answerback">answerback message</a>.</td></tr>
+<tr><td>0x06</td>	<td> ACK </td>	<td> </td></tr>
+<tr><td>0x07</td>	<td> BEL </td>	<td> Sounds the bell tone.</td></tr>
+<tr><td>0x08</td>	<td> BS  </td>	<td> Moves the cursor one character position to the left. </td></tr>
+<tr><td>0x09</td>	<td> HT  </td>	<td> Moves the cursor to the next tab stop.</td></tr>
+<tr><td>0x0a</td>	<td> LF  </td>	<td> Cause a line feed or a new line operation, depending on the setting of <a href="#mode">line feed/new line mode</a>.</td></tr>
+<tr><td>0x0b</td>	<td> VT  </td>	<td> Same as LF.</td></tr>
+<tr><td>0x0c</td>	<td> FF  </td>	<td> Same as LF.</td></tr>
+<tr><td>0x0d</td>	<td> CR  </td>	<td> Moves the cursor to the left margin on the current line.</td></tr>
+<tr><td>0x0e</td>	<td> SO  </td>	<td> Maps G1 character set into GL. </td></tr>
+<tr><td>0x0f</td>	<td> SI  </td>	<td> Maps G0 character set into GL. </td></tr>
+<tr><td>0x10</td>	<td> DLE </td>	<td> </td></tr>
+<tr><td>0x11</td>	<td> DC1 </td>	<td> </td></tr>
+<tr><td>0x12</td>	<td> DC2 </td>	<td> </td></tr>
+<tr><td>0x13</td>	<td> DC3 </td>	<td> </td></tr>
+<tr><td>0x14</td>	<td> DC4 </td>	<td> </td></tr>
+<tr><td>0x15</td>	<td> NAK </td>	<td> </td></tr>
+<tr><td>0x16</td>	<td> SYN </td>	<td> </td></tr>
+<tr><td>0x17</td>	<td> ETB </td>	<td> </td></tr>
+<tr><td>0x18</td>	<td> CAN </td>	<td> </td></tr>
+<tr><td>0x19</td>	<td> EM  </td>	<td> </td></tr>
+<tr><td>0x1a</td>	<td> SUB </td>	<td> </td></tr>
+<tr><td>0x1b</td>	<td> ESC </td>	<td> Introduces an <a href="#ESC">escape sequence</a>. </td></tr>
+<tr><td>0x1c</td>	<td> FS  </td>	<td> </td></tr>
+<tr><td>0x1d</td>	<td> GS  </td>	<td> </td></tr>
+<tr><td>0x1e</td>	<td> RS  </td>	<td> </td></tr>
+<tr><td>0x1f</td>	<td> US  </td>	<td> </td></tr>
+</table>
+
+<h2>C1 Control Character</h2>
+<table border="1">
+<tr><th>Hexadecimal</th>	<th>Equivalent 7-bit control</th>	<th>Mnemonic</th>	<th>Description</th></tr>
+<tr><td>0x80</td>	<td> </td>	<td> PAD </td>	<td></td></tr>
+<tr><td>0x81</td>	<td> </td>	<td> HOP </td>	<td></td></tr>
+<tr><td>0x82</td>	<td> </td>	<td> BPH </td>	<td></td></tr>
+<tr><td>0x83</td>	<td> </td>	<td> NBH </td>	<td></td></tr>
+<tr><td>0x84</td>	<td> ESC D </td>	<td> IND </td>	<td> Moves the cursor down one line in the same column. </td></tr>
+<tr><td>0x85</td>	<td> ESC E </td>	<td> NEL </td>	<td> Moves the cursor to the first position on the next line. </td></tr>
+<tr><td>0x86</td>	<td> </td>	<td> SSA </td>	<td></td></tr>
+<tr><td>0x87</td>	<td> </td>	<td> ESA </td>	<td></td></tr>
+<tr><td>0x88</td>	<td> ESC H </td>	<td> HTS </td>	<td> Sets a horizontal tab stop at the column where the cursor is. </td></tr>
+<tr><td>0x89</td>	<td> </td>	<td> HTJ </td>	<td></td></tr>
+<tr><td>0x8a</td>	<td> </td>	<td> VTS </td>	<td></td></tr>
+<tr><td>0x8b</td>	<td> </td>	<td> PLD </td>	<td></td></tr>
+<tr><td>0x8c</td>	<td> </td>	<td> PLU </td>	<td></td></tr>
+<tr><td>0x8d</td>	<td> ESC M </td>	<td> RI  </td>	<td> Moves the cursor up one line in the same column. </td></tr>
+<tr><td>0x8e</td>	<td> ESC N </td>	<td> SS2 </td>	<td> Temporarily maps the G2 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>0x8f</td>	<td> ESC O </td>	<td> SS3 </td>	<td> Temporarily maps the G3 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>0x90</td>	<td> ESC P </td>	<td> DCS </td>	<td> Device Control String. Introduces a <a href="#DCS">DCS Sequence</a>. </td></tr>
+<tr><td>0x91</td>	<td> </td>	<td> PU1 </td>	<td></td></tr>
+<tr><td>0x92</td>	<td> </td>	<td> PU2 </td>	<td></td></tr>
+<tr><td>0x93</td>	<td> </td>	<td> STS </td>	<td></td></tr>
+<tr><td>0x94</td>	<td> </td>	<td> CCH </td>	<td></td></tr>
+<tr><td>0x95</td>	<td> </td>	<td> MW  </td>	<td></td></tr>
+<tr><td>0x96</td>	<td> </td>	<td> SPA </td>	<td></td></tr>
+<tr><td>0x97</td>	<td> </td>	<td> EPA </td>	<td></td></tr>
+<tr><td>0x98</td>	<td> ESC X </td>	<td> SOS </td>	<td> Start of string. Introduces a <a href="#SOS">SOS Sequence</a>. </td></tr>
+<tr><td>0x99</td>	<td> </td>	<td> SGCI </td>	<td></td></tr>
+<tr><td>0x9a</td>	<td> </td>	<td> SCI </td>	<td></td></tr>
+<tr><td>0x9b</td>	<td> ESC [ </td>	<td> CSI </td>	<td> Contros Sequence Introducer. Intruduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
+<tr><td>0x9c</td>	<td> ESC \ </td>	<td> ST  </td>	<td> String terminator. Ends a DCS, SOS, OSC, PM and APC sequence. </td></tr>
+<tr><td>0x9d</td>	<td> ESC ] </td>	<td> OSC </td>	<td> Operating System Command. Introduces a <a href="#OSC">OSC Sequence</a>. </td></tr>
+<tr><td>0x9e</td>	<td> ESC ^ </td>	<td> PM  </td>	<td> Privacy Message. Introduces a <a href="#PM">PM Sequence</a>. </td></tr>
+<tr><td>0x9f</td>	<td> ESC _ </td>	<td> APC </td>	<td> Application Program Command. Introduces a <a href="#APC">APC Sequence</a> .</td></tr>
+</table>
+
+<h2><a name="ESC">Escape Sequence</a></h2>
+<table border="1">
+<tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
+<tr><td>ESC 6</td>	<td>DECBI</td>	<td> Moves the cursor backward one column. If the cursor is at the left margin, then all screen data within the margins moves one column to the right. The column shifted past the right margin is lost. </td></tr>
+<tr><td>ESC 7</td>	<td>DECSC</td>	<td> Save the following items. <br>
+					     - Cursor position<br>
+					     - Character attributes (SGR)<br>
+					     - GL and GR state<br>
+					     - Wrap flag<br>
+					     - Origin mode state<br>
+					     - Selective erase attribute (DECSCA)<br>
+					     - Any single SS2 or SS3 functions sent</td></tr>
+<tr><td>ESC 8</td>	<td>DECRC</td>	<td> Restores the terminal to the state saved by the save cursor (DECSC) function. </td></tr>
+<tr><td>ESC 9</td>	<td>DECFI</td>	<td> Moves the cursor forward one column. If the cursor is at the right margin, then all screen data within the margins moves one column to the left. The column shifted past the left margin is lost. </td></tr>
+<tr><td>ESC =</td>	<td>DECKPAM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Application Keypad Mode</a>. </td></tr>
+<tr><td>ESC &gt;</td>	<td>DECKPNM</td>	<td> Using <a href="../usage/tips/appkeypad.html">Normal Keypad Mode</a>. </td></tr>
+<tr><td>ESC D</td>	<td>IND</td>	<td> Moves the cursor down one line in the same column. </td></tr>
+<tr><td>ESC E</td>	<td>NEL</td>	<td> Moves the cursor to the first position on the next line. </td></tr>
+<tr><td>ESC H</td>	<td>HTS</td>	<td> Sets a horizontal tab stop at the column where the cursor is. </td></tr>
+<tr><td>ESC M</td>	<td>RI</td>	<td> Moves the cursor up one line in the same column. </td></tr>
+<tr><td>ESC N</td>	<td>SS2</td>	<td> Temporarily maps the G2 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>ESC O</td>	<td>SS3</td>	<td> Temporarily maps the G3 character set into GL or GR, for the next graphic character. </td></tr>
+<tr><td>ESC P</td>	<td>DCS</td>	<td> Device Control String. Introduces a <a href="#DCS">DCS Sequence</a>. </td></tr>
+<tr><td>ESC X</td>	<td>SOS</td>	<td> Start of string. Introduces a <a href="#SOS">SOS Sequence</a>. </td></tr>
+<tr><td>ESC Z</td>	<td>DECID</td>	<td> Reports a Terminal ID. </td></tr>
+<tr><td>ESC [</td>	<td>CSI</td>	<td> Control Sequence Introducer. Introduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
+<tr><td>ESC \</td>	<td>ST</td>	<td> String terminator. Ends a DCS, SOS, OSC, PM and APC sequence. </td></tr>
+<tr><td>ESC ]</td>	<td>OSC</td>	<td> Operating System Command. Introduces a <a href="#OSC">OSC Sequence</a>. </td></tr>
+<tr><td>ESC ^</td>	<td>PM</td>	<td> Privacy Message. Introduces a <a href="#PM">PM Sequence</a>. </td></tr>
+<tr><td>ESC _</td>	<td>APC</td>	<td> Application Program Command. Introduces a <a href="#APC">APC Sequence</a>. </td></tr>
+<tr><td>ESC c</td>	<td>RIS</td>	<td> Terminal Full Reset. </td>
+<tr><td>ESC g</td>	<td>-</td>	<td> Visible Bell. </td>
+<tr><td>ESC n</td>	<td>LS2</td>	<td> Maps G2 character set into GL. </td></tr>
+<tr><td>ESC o</td>	<td>LS3</td>	<td> Maps G3 character set into GL. </td></tr>
+<tr><td>ESC |</td>	<td>LS3R</td>	<td> Maps G3 character set into GR. </td></tr>
+<tr><td>ESC }</td>	<td>LS2R</td>	<td> Maps G2 character set into GR. </td></tr>
+<tr><td>ESC ~</td>	<td>LS1R</td>	<td> Maps G1 character set into GR. </td></tr>
+<tr><td>ESC SP F</td>	<td>S7C1T</td>	<td> 7-bit control mode. </td></tr>
+<tr><td>ESC SP G</td>	<td>S8C1T</td>	<td> 8-bit control mode. </td></tr>
+<tr><td>ESC # 8</td>	<td>DECALN</td>	<td> Fills the complete screen area with 'E'. </td></tr>
+
+<tr><td>ESC $</td>	<!-- td rowspan="5"></td -->	<td colspan="2" rowspan="5"> Designates character set. (ISO/IEC 2022) </td>	</tr>
+<tr><td>ESC (</td></tr>
+<tr><td>ESC )</td></tr>
+<tr><td>ESC *</td></tr>
+<tr><td>ESC +</td></tr>
+</table>
+
+<h2><a name="CSI">CSI Sequence</a></h2>
+<table border="1">
+<tr><th>Sequence</th>		<th>Mnemonic</th>	<th>Description</th></tr>
+<tr><td>CSI <i>Ps</i> @</td>	<td>ICH</td>	<td> Insert <i>Ps</i> space (SP) characters starting at the cursor position. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> A</td>	<td>CUU</td>	<td> Moves cursor up <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> B</td>	<td>CUD</td>	<td> Moves cursor down <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> C</td>	<td>CUF</td>	<td> Moves cursor to the right <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> D</td>	<td>CUB</td>	<td> Moves cursor to the left <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> E</td>	<td>CNL</td>	<td> Moves cursor to the first column of <i>Ps</i>-th following line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> F</td>	<td>CPL</td>	<td> Moves cursor to the first column of <i>Ps</i>-th preceding line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> G</td>	<td>CHA</td>	<td> Moves cursor to the <i>Ps</i>-th column of the active line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> H</td>	<td>CUP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> I</td>	<td>CHT</td>	<td> Moves cursor to the <i>Ps</i> tabs forward. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> J</td>	<td>ED</td>	<td>Erase in display. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Erase from cursor through the end of the display.
+   = 1      Erase from the beginning of the display through the cursor.
+   = 2      Erase the complete of display.
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> K</td>	<td>EL</td>	<td>Erase in line. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Erase from the cursor through the end of the line.
+   = 1      Erase from the beginning of the line through the cursor.
+   = 2      Erase the complete of line.
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td> Inserts <i>Ps</i> lines, stgarting at the cursor. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> M</td>	<td>DL</td>	<td> Deletes <i>Ps</i> lines in the scrolling region, starting with the line that has the cursor. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> P</td>	<td>DCH</td>	<td> Deletes <i>Ps</i> characters from the cursor position to the right. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> S</td>	<td>SU</td>	<td> Scroll up <i>Ps</i> lines. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> T</td>	<td>SD</td>	<td> Scroll down <i>Ps</i> lines. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> X</td>	<td>ECH</td>	<td> Erase <i>Ps</i> characters, from the cursor position to the right. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> Z</td>	<td>CBT</td>	<td> Moves cursor to the <i>Ps</i> tabs backward. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> `</td>	<td>HPA</td>	<td> Moves cursor to the <i>Ps</i>-th column of the active line. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> a</td>	<td>HPR</td>	<td> Moves cursor to the right <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> c</td>	<td>DA</td>	<td> Primary Device Attribute. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0    Asks for the terminal's architectural class and basic attributes.
+Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal ID</a> setting.
+  VT100     ESC [ 1 ; 2 c
+  VT100J    ESC [ 5 ; 2 c
+  VT101     ESC [ 1 ; 0 c
+  VT102     ESC [ 6 c
+  VT102J    ESC [ 15 c
+  VT220J    ESC [ 62 ; 1 ; 2 ; 5 ; 6 ; 7 ; 8 c
+  VT282     ESC [ 62 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 11 c
+  VT320     CSI 63 ; 1 ; 2 ; 6 ; 7 ; 8 c
+  VT382     CSI 63 ; 1 ; 2 ; 4 ; 5 ; 6 ; 7 ; 8 ; 10 ; 15 c
+  VT420     CSI 64 ; 1 ; 2 ; 7 ; 8 ; 9 ; 15 ; 18 ; 21 c"
+  VT520     CSI 65 ; 1 ; 2 ; 7 ; 8 ; 9 ; 12 ; 18 ; 19 ; 21 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+  VT525     CSI 65 ; 1 ; 2 ; 7 ; 9 ; 12 ; 18 ; 19 ; 21 ; 22 ; 23 ; 24 ; 42 ; 44 ; 45 ; 46 c
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> d</td>	<td>VPA</td>	<td> Move to the corresponding vertical position (line <i>Ps</i>) of the current column. The default value of <i>Ps</i> is 1. </tr>
+<tr><td>CSI <i>Ps</i> e</td>	<td>VPR</td>	<td> Moves cursor down <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> f</td>	<td>HVP</td>	<td> Moves cursor to the <i>Ps1</i>-th line and to the <i>Ps2</i>-th column. The default value of <i>Ps1</i> and <i>Ps2</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> g</td>	<td>TBC</td>	<td> Clears the tab stop. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Clears the tab stop at the cursor.
+   = 3      Clears all tab stops.
+</pre>
+</td></tr>
+<tr><td>CSI <i>Pm</i> h</td>	<td>SM</td>	<td> Sets mode. (See <a href="#mode">Modes (Standard)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> i</td>	<td>MC</td>	<td> Printing mode.
+<pre>
+<i>Ps</i> = 0      Print screen.
+   = 4      Turn off printer controller mode.
+   = 5      Turn on printer controller mode.
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps</i> j</td>	<td>HPB</td>	<td> Moves cursor to the left <i>Ps</i> columns. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> k</td>	<td>VPB</td>	<td> Moves cursor up <i>Ps</i> lines in the same column. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Pm</i> l</td>	<td>RM</td>	<td> Resets mode. (See <a href="#mode">Modes (Standard)</a>)</td></tr>
+<tr><td>CSI <i>Pm</i> m</td>	<td>SGR</td>	<td> Select character attributes. The default value of <i>Pm</i> is 0. (See <a href="#charattr">Character Attributes</a>.) </td></tr>
+<tr><td>CSI <i>Ps</i> n</td>	<td>DSR</td>	<td> Reports device status.
+<pre>
+<i>Ps</i> = 5      Requests the terminal's operation status report. Always returns "CSI 0 n" (Terminal ready).
+            Response: CSI <i>s</i> n
+            <i>s</i> = 0    Terminal ready.
+   = 6      Requests cursor position report.
+            Response: CSI <i>r</i> ; <i>c</i> R
+              <i>r</i>    Line number.
+              <i>c</i>    Column number.
+</pre>
+</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td> Sets top and bottom margin.
+<pre>
+<i>Ps1</i>    Line number for the top margin.
+       The default value is 1.
+<i>Ps2</i>    Line number for the bottom margin.
+       The default value is current number of lines per screen.
+</pre>
+</td></tr>
+<tr><td>CSI s</td>	<td>SCP</td>	<td> Save cursor position. Same as DECSC. </td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td> Window manipulation.
+<pre>
+<i>Ps1</i> =  1    De-iconify window.
+    =  2    Minimize window.
+    =  3    Move window to [<i>Ps2</i>, <i>Ps3</i>].
+    =  4    Resize window to height <i>Ps2</i> pixels and width <i>Ps3</i> pixels.
+    =  5    Raise the window to the top of the stacking order.
+    =  6    Lower the window to the bottom of the stacking order.
+    =  7    Refresh window.
+    =  8    Resize window to <i>Ps2</i> lines and <i>Ps3</i> columns.
+    =  9    Change maximize state of window.
+            <i>Ps2</i> = 0    Restore maximized window.
+                = 1    Maximize window.
+
+    = 11    Reports window state.
+            Response: CSI <i>s</i> t
+              <i>s</i> = 1    Normal. (non-iconified)
+                = 2    Iconified.
+
+    = 13    Reports window position.
+            Response: CSI 3 ; <i>x</i> ; <i>y</i> t
+              <i>x</i>    X position of window.
+              <i>y</i>    Y position of window.
+
+    = 14    Reports window size in pixels.
+            Response: CSI 4 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Window height in pixels.
+              <i>x</i>    Window width in pixels.
+
+    = 18    Reports terminal size in characters.
+            Response: CSI 8 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Terminal height in characters. (Lines)
+              <i>x</i>    Terminal width in characters. (Columns)
+
+    = 19    Reports root window size in characters.
+            Response: CSI 9 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Root window height in characters.
+              <i>x</i>    Root window width in characters.
+
+    = 20    Reports icon label.
+            Response: OSC L <i>title</i> ST
+              <i>title</i>    icon label. (window title)
+
+    = 21    Reports window title.
+            Response: OSC l <i>title</i> ST
+              <i>title</i>    Window title.
+</pre>
+</td></tr>
+<tr><td>CSI u</td>	<td>RCP</td>	<td> Restore cursor position. Same as DECRC. </td></tr>
+<tr><td>CSI &lt; r</td>	<td>-</td>	<td> Restore IME open state. </td></tr>
+<tr><td>CSI &lt; s</td>	<td>-</td>	<td> Save IME open state. </td></tr>
+<tr><td>CSI &lt; <i>Ps</i> t</td>	<td>-</td>	<td> Change IME open state. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Close IME.
+   = 1      Open IME.
+</pre>
+</td></tr>
+<tr><td>CSI = <i>Ps</i> c</td>	<td>DA3 (Tertiary DA)</td>	<td> Tertiary Device Attribute. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Tertiary Device Attribute request.
+            Response: DCS ! | <i>dddddddd</i> ST
+              <i>dddddddd</i>  <a href="../setup/teraterm-term.html#TerminalUID">Terminal Unique ID</a>
+</pre>
+</td></tr>
+
+<tr><td>CSI &gt; <i>Ps</i> c</td>	<td>DA2 (Secondary DA)</td>	<td> Secondary Device Attribute. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Secondary Device Attribute request.
+            Response: CSI &gt; 32 ; 100 ; 2 c
+</pre>
+</td></tr>
+<tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> J</td>	<td>-</td>	<td> Erase rectangular area.
+<pre>
+<i>Ps1</i>   Top-line border.
+<i>Ps2</i>   Left-column border.
+<i>Ps3</i>   Bottom-line border.
+<i>Ps4</i>   Right-column border.
+</pre>
+</td></tr>
+<tr><td>CSI &gt; 3 ; <i>Ps1</i> ; <i>Ps2</i> K</td>	<td>-</td>	<td> Erase characters from <i>Ps1</i> column through <i>Ps2</i> column. </td></tr>
+<tr><td>CSI &gt; 5 ; <i>Ps</i> K</td>	<td>-</td>	<td>
+<pre>
+<i>Ps</i> = 3..6   Draw Line
+   = 12     Set foreground color
+</pre>
+</td></tr>
+
+<tr><td>CSI ? <i>Ps</i> J</td>	<td>DECSED</td>	<td> Selective erase in display. DECSED only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Erase from cursor through the end of the display.
+   = 1      Erase from the beginning of the display through the cursor.
+   = 2      Erase the complete of display.
+</pre>
+</td></tr>
+<tr><td>CSI ? <i>Ps</i> K</td>	<td>DECSEL</td>	<td> Selective erase in line. DECSEL only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Erase from the cursor through the end of the line.
+   = 1      Erase from the beginning of the line through the cursor.
+   = 2      Erase the complete of line.
+</pre>
+</td></tr>
+<tr><td>CSI ? <i>Pm</i> h</td>	<td>DECSET</td>	<td> Sets DEC/xterm specific mode. (See <a href="#decmode">Modes (DEC/xterm specific)</a>.) </td></tr>
+<tr><td>CSI ? <i>Pm</i> i</td>	<td>DECMC</td>	<td> Printing mode.
+<pre>
+<i>Pm</i> =  1     Print cursor line.
+   =  4     Disables auto-print mode.
+   =  5     Enables auto-print mode.
+<!--   = 10     Print screen. (Ignore DECPEX)
+   = 11     Prints all pages.
+--></pre>
+</td></tr>
+<tr><td>CSI ? <i>Pm</i> l</td>	<td>DECRST</td>	<td> Resets DEC/xterm specific modes. (See <a href="#decmode">Modes (DEC/xterm specific)</a>.) </td></tr>
+<tr><td>CSI ? <i>Ps</i> n</td>	<td>DECDSR</td>	<td> Reports device status.
+<pre>
+<i>Ps</i> = 55     Reports locator device status. Always returns "CSI ? 50 n" (Locator ready).
+            Response: CSI ? <i>s</i> n
+              <i>s</i> = 50    Locator ready.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps</i> SP q</td>	<td>DECSCUSR</td>	<td>Sets cursor style. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0,1    Block cursor / Blink
+   = 2      Block cursor / Steady
+   = 3      Underline cursor / Blink
+   = 4      Underline cursor / Steady
+   = 5      Vertical line cursor / Blink
+   = 6      Vertical line cursor / Steady
+</pre>
+</td></tr>
+
+<tr><td>CSI ! p</td>	<td>DECSTR</td>	<td>Soft reset</td></tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> " p</td>	<td>DECSCL</td>	<td> Select terminal's conformance level.
+<pre>
+<i>Ps1</i> = 61    VT-Level 1 (VT100 mode)
+    = 62    VT-Level 2 (VT200 mode)
+    = 63    VT-Level 3 (VT300 mode)
+    = 64    VT-Level 4 (VT400 mode)
+    = 65    VT-Level 5 (VT500 mode)
+
+<i>Ps2</i> = 0     8 bit mode (S8C1T)
+    = 1     7 bit mode (S7C1T)
+    = 2     8 bit mode (S8C1T)
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps</i> " q</td>	<td>DECSCA</td>	<td> Select character protection attribute. Selective erase control functions (DECSED, DECSEL and DECSERA) can only erase characters defined as erasable.
+<pre>
+<i>Ps</i> = 0      Not protected. DECSED, DECSEL and DECSERA can erase characters.
+   = 1      Protected. DECSED, DECSEL and DECSERA cannot erase characters.
+   = 2      Same as 0.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ z</td>	<td>DECERA</td>	<td> Erase rectangular area. The default value of <i>Ps1</i> - <i>Ps4</i> is current cursor position.
+<pre>
+<i>Ps1</i>   Top-line border.
+<i>Ps2</i>   Left-column border.
+<i>Ps3</i>   Bottom-line border.
+<i>Ps4</i>   Right-column border.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> $ {</td>	<td>DECSERA</td>	<td> Selective erase rectangular area. DECSERA only erase characters defined as erasable by the DECSCA control function. The default value of <i>Ps1</i> - <i>Ps4</i> is current cursor position.
+<pre>
+<i>Ps1</i>   Top-line border.
+<i>Ps2</i>   Left-column border.
+<i>Ps3</i>   Bottom-line border.
+<i>Ps4</i>   Right-column border.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps</i> $ }</td>	<td>DECSASD</td>	<td> Moves cursor from/to status line. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      Moves to main screen.
+   = 1      Moves to status line.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps</i> $ ~</td>	<td>DECSSDT</td>	<td> Select the type of status line displayed. The default value of <i>Ps</i> is 0.
+<pre>
+<i>Ps</i> = 0      No status line.
+     1      No status line.
+     2      Host-writable status line.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> ; <i>Ps4</i> ' w</td>	<td>DECEFR</td>	<td> Enables filter rectangle for locator report.
+<pre>
+<i>Ps1</i>   Top boundary of filter rectangle.
+<i>Ps2</i>   Left boundary of filter rectangle.
+<i>Ps3</i>   Bottom boundary of filter rectangle.
+<i>Ps4</i>   Right boundary of filter rectangle.
+</pre>
+Filter rectangles are always treated as "one-shot" events. Anytime the locator is detected to be outside a filter rectangle, an outside rectangle event is generated and the rectangle is disabled. </td>
+</tr>
+
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ' z</td>	<td>DECELR</td>	<td>DEC locator reporting mode.
+<pre>
+<i>Ps1</i> = 0     Disables locator report.
+    = 1     Enables locator report.
+    = 2     One shot (allow one report, then disable).
+<i>Ps2</i> = 0     Character mode. Same as 2.
+    = 1     Pixel mode. Reporting unit is device physical pixels.
+    = 2     Character mode. Reporting unit is character cells.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Pm</i> ' {</td>	<td>DECSLE</td>	<td> Select the locator event.
+<pre>
+<i>Pm</i> = 0      Disables button up/down events, Disables filter rectangle.
+   = 1      Enables button down event.
+   = 2      Disables button down event.
+   = 3      Enables button up event.
+   = 4      Disables button up event.
+</pre>
+</td></tr>
+
+<tr><td>CSI ' |</td>	<td>DECRQLP</td>	<td> Requests locator report.
+<pre>
+Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
+<i>Pe</i>: Event code.
+<i>Pe</i> =  0    Received a locator report request (DECRQLP), but the locator is unavailable.
+   =  1    Received a locator report request (DECRQLP).
+   =  2    Left button down.
+   =  3    Left button up.
+   =  4    Middle button down.
+   =  5    Middle button up.
+   =  6    Right button down.
+   =  7    Right button up.
+   =  8    Button 4 down. (not supported)
+   =  9    Button 4 up. (not supported)
+   = 10    Locator outside filter rectangle.
+
+<i>Pb</i>: Button code, ASCII decimal 0-15 indicating which buttons are down if any.
+    The state of the four buttons on the locator correspond to the low four
+    bits of the decimal value, "1" means button depressed.
+  1    Right button.
+  2    Middle button.
+  4    Left button.
+  8    Button 4. (not supported)
+
+<i>Pr</i>: Row coordinate.
+
+<i>Pc</i>: Column coordinate.
+
+<i>Pp</i>: Page. Always 1.
+</pre>
+</td></tr>
+</table>
+
+<h3><a name="mode">Modes (Standard)</a></h3>
+<table border="1">
+    <tr>
+	<th>Mode No.</th>
+	<th>Mnemonic</th>
+	<th>Set (SM)</th>
+	<th>Reset (RM)</th>
+    </tr>
+    <tr>
+	<td> 2 </td>
+	<td> KAM </td>
+	<td> Locks the keyboard. </td>
+	<td> Unlocks the keyboard. </td>
+    </tr>
+    <tr>
+	<td> 4 </td>
+	<td> IRM </td>
+	<td> Insert mode. </td>
+	<td> Replace mode. </td>
+    </tr>
+    <tr>
+	<td> 12 </td>
+	<td> SRM </td>
+	<td> Local echo off. </td>
+	<td> Local echo on. </td>
+    </tr>
+    <tr>
+	<td> 20 </td>
+	<td> LNM </td>
+	<td> New line mode.<br>
+	     - Cursor moves to the first column of the next line when the terminal receives an LF, FF or VT character.<br>
+	     - New-line (Transmit) setting is changed to "CR+LF".</td>
+	<td> Line feed mode.<br>
+	     - Cursor moves to the current column on the next line when the terminal receives an LF, FF or VT character.<br>
+	     - New-line (Transmit) setting is changed to "CR".</td>
+    </tr>
+    <tr>
+	<td> 33 </td>
+	<td> WYSTCURM </td>
+	<td> Steady cursor. </td>
+	<td> Blinking cursor. </td>
+    </tr>
+    <tr>
+	<td> 34 </td>
+	<td> WYULCURM </td>
+	<td> Underline cursor. </td>
+	<td> Block cursor. </td>
+    </tr>
+</table>
+
+<h3><a name="decmode">Modes (DEC/xterm specific)</a></h3>
+<table border="1">
+    <tr>
+	<th> Mode No. </th>
+	<th> Mnemonic </th>
+	<th> Set (DECSET) </th>
+	<th> Reset (DECRST) </th>
+    </tr>
+    <tr>
+	<td> 1 </td>
+	<td> DECCKM </td>
+	<td> Application cursor keys. </td>
+	<td> Normal cursor keys. </td>
+    </tr>
+    <tr>
+	<td> 3 </td>
+	<td> DECCOLM </td>
+	<td> 132 column mode. </td>
+	<td> 80 column mode. </td>
+    </tr>
+    <tr>
+	<td> 5 </td>
+	<td> DECSCNM </td>
+	<td> Reverse video mode. </td>
+	<td> Normal video mode. </td>
+    </tr>
+    <tr>
+	<td> 6 </td>
+	<td> DECOM </td>
+	<td> Enable origin mode.<br>
+             - The home cursor position is at the upper-left corner of ther screen, with in the margins.<br>
+             - The starting point for line numbers depends on the current top margin setting.<br>
+             - The cursor <em>cannot</em> move outside of the margins.</td>
+	<td> Disables origin mode.<br>
+             - The home cursor position is at the upper-left corner of ther screen.<br>
+             - The starting point for line numbers independent of the margins.<br>
+             - The cursor <em>can</em> move outside of the margins.</td>
+    </tr>
+    <tr>
+	<td> 7 </td>
+	<td> DECAWM </td>
+	<td> Enables autowrap mode. </td>
+	<td> Disables autowrap mode. </td>
+    </tr>
+    <tr>
+	<td> 8 </td>
+	<td> DECARM </td>
+	<td> Auto-repeat keys. </td>
+	<td> No auto-repeat keys. </td>
+    </tr>
+    <tr>
+	<td> 9 </td>
+	<td> - </td>
+	<td> Enables X10 mouse tracking. Send mouse X &amp; Y on button press.</td>
+	<td> Disables mouse tracking. </td>
+    </tr>
+    <tr>
+	<td> 12 </td>
+	<td> - </td>
+	<td> Blinking cursor. </td>
+	<td> Steady cursor. </td>
+    </tr>
+    <tr>
+	<td> 19 </td>
+	<td> DECPEX </td>
+	<td> Set print extent to full screen. </td>
+	<td> Limit print to scrolling region. </td>
+    </tr>
+    <tr>
+	<td> 25 </td>
+	<td> DECTCEM </td>
+	<td> Show cursor. </td>
+	<td> Hide cursor. </td>
+    </tr>
+    <tr>
+	<td> 38 </td>
+	<td> DECTEK </td>
+	<td> Switch to TEK window. </td>
+	<td> Do nothing. </td>
+    </tr>
+    <tr>
+	<td> 47 </td>
+	<td> - </td>
+	<td> Switch to alternate screen buffer. </td>
+	<td> Switch to normal screen buffer. </td>
+    </tr>
+    <tr>
+	<td> 59 </td>
+	<td> DECKKDM </td>
+	<td> Kanji terminal mode. </td>
+	<td> Katakana terminal mode. </td>
+    </tr>
+    <tr>
+	<td> 66 </td>
+	<td> DECNKM </td>
+	<td> <a href="../usage/tips/appkeypad.html">Application keypad mode</a>. </td>
+	<td> <a href="../usage/tips/appkeypad.html">Numeric keypad mode</a>. </td>
+    </tr>
+    <tr>
+	<td> 67 </td>
+	<td> DECBKM </td>
+	<td> Backspace key sends BS. </td>
+	<td> Backspace key sends DEL. </td>
+    </tr>
+    <tr>
+	<td> 1000 </td>
+	<td> - </td>
+	<td> Enables normal mouse tracking. Send mouse X &amp; Y on button press and release. </td>
+	<td> Disables mouse tracking. </td>
+    </tr>
+    <!-- tr>
+	<td> 1001 </td>
+	<td> - </td>
+	<td> Enables hilite mouse tracking. </td>
+	<td> Disables mouse tracking. </td>
+    </tr -->
+    <tr>
+	<td> 1002 </td>
+	<td> - </td>
+	<td> Enables button-event mouse tracking. Essentially same as normal mouse tracking mode, but also reports button-motion event. </td>
+	<td> Disables mouse tracking. </td>
+    </tr>
+    <tr>
+	<td> 1003 </td>
+	<td> - </td>
+	<td> Enables any-event mouse tracking. Same as button-event mode, except that all motion events are reported, even if no mouse button is down. </td>
+	<td> Disables mouse tracking. </td>
+    </tr>
+    <tr>
+	<td> 1004 </td>
+	<td> - </td>
+	<td> Enables focus reporting mode. </td>
+	<td> Disables focus reporting mode. </td>
+    </tr>
+    <tr>
+	<td> 1047 </td>
+	<td> - </td>
+	<td> Switch to alternate screen buffer. </td>
+	<td> Clear screen, and switch to normal screen buffer. </td>
+    </tr>
+    <tr>
+	<td> 1048 </td>
+	<td> - </td>
+	<td> Save cursor position. </td>
+	<td> Restore cursor position. </td>
+    </tr>
+    <tr>
+	<td> 1049 </td>
+	<td> - </td>
+	<td> Save cursor position, switch to alternate screen buffer, and clear screen. </td>
+	<td> Clear screen, switch to normal screen buffer, and restore cursor position. </td>
+    </tr>
+    <tr>
+	<td> 2004 </td>
+	<td> - </td>
+	<td> <a href="../usage/tips/xterm.html#Bracketed">Enables Bracketed paste mode</a>. </td>
+	<td> <a href="../usage/tips/xterm.html#Bracketed">Disables Bracketed paste mode</a>. </td>
+    </tr>
+    <tr>
+	<td> 7727 </td>
+	<td> - </td>
+	<td> Enables Application Escape mode. </td>
+	<td> Disables Application Escape mode. </td>
+    </tr>
+    <tr>
+        <td> 7786 </td>
+        <td> - </td>
+        <td> Enables mouse wheel - cursorkey translation. </td>
+        <td> Disables mouse wheel - cursorkey translation. </td>
+    </tr>
+</table>
+
+<h3><a name="charattr">Character Attributes. (SGR)</a></h3>
+<table border="1">
+<tr><th>No.</th>	<th>Attribute</th></tr>
+<tr><td> 0</td>		<td>Normal</td></tr>
+<tr><td> 1</td>		<td>Bold</td></tr>
+<tr><td> 4</td>		<td>Underlined</td></tr>
+<tr><td> 5</td>		<td>Blink</td></tr>
+<tr><td> 7</td>		<td>Inverse</td></tr>
+<tr><td>22</td>		<td>Normal (neigher bold nor faint)</td></tr>
+<tr><td>24</td>		<td>Not underlined</td></tr>
+<tr><td>25</td>		<td>Steady (not blinking)</td></tr>
+<tr><td>27</td>		<td>Positive (not inverse)</td></tr>
+
+<tr><td>30</td>		<td>Set foreground color to Black. (Color No. 0)</td></tr>
+<tr><td>31</td>		<td>Set foreground color to Red. (Color No. 1)</td></tr>
+<tr><td>32</td>		<td>Set foreground color to Green. (Color No. 2)</td></tr>
+<tr><td>33</td>		<td>Set foreground color to Yellow. (Color No. 3)</td></tr>
+<tr><td>34</td>		<td>Set foreground color to Blue. (Color No. 4)</td></tr>
+<tr><td>35</td>		<td>Set foreground color to Magenta. (Color No. 5)</td></tr>
+<tr><td>36</td>		<td>Set foreground color to Cyan. (Color No. 6)</td></tr>
+<tr><td>37</td>		<td>Set foreground color to White. (Color No. 7)</td></tr>
+<tr><td>38 ; 5 ; <i>Ps</i></td>	<td>Set foreground color to color number <i>Ps</i>.</td></tr>
+<tr><td>39</td>		<td>Set foreground color to default.</td></tr>
+
+<tr><td>40</td>		<td>Set background color to Black. (Color No. 0)</td></tr>
+<tr><td>41</td>		<td>Set background color to Red. (Color No. 1)</td></tr>
+<tr><td>42</td>		<td>Set background color to Green. (Color No. 2)</td></tr>
+<tr><td>43</td>		<td>Set background color to Yellow. (Color No. 3)</td></tr>
+<tr><td>44</td>		<td>Set background color to Blue. (Color No. 4)</td></tr>
+<tr><td>45</td>		<td>Set background color to Magenta. (Color No. 5)</td></tr>
+<tr><td>46</td>		<td>Set background color to Cyan. (Color No. 6)</td></tr>
+<tr><td>47</td>		<td>Set background color to White. (Color No. 7)</td></tr>
+<tr><td>48 ; 5 ; <i>Ps</i></td>	<td>Set background color to color number <i>Ps</i>.</td></tr>
+<tr><td>49</td>		<td>Set background color to Black.</td></tr>
+
+<tr><td>90</td>		<td>Set foreground color to Gray. (Color No. 8)</td></tr>
+<tr><td>91</td>		<td>Set foreground color to Bright Red. (Color No. 9)</td></tr>
+<tr><td>92</td>		<td>Set foreground color to Bright Green. (Color No. 10)</td></tr>
+<tr><td>93</td>		<td>Set foreground color to Bright Yellow. (Color No. 11)</td></tr>
+<tr><td>94</td>		<td>Set foreground color to Bright Blue. (Color No. 12)</td></tr>
+<tr><td>95</td>		<td>Set foreground color to Bright Magenta. (Color No. 13)</td></tr>
+<tr><td>96</td>		<td>Set foreground color to Bright Cyan. (Color No. 14)</td></tr>
+<tr><td>97</td>		<td>Set foreground color to Bright White. (Color No. 15)</td></tr>
+
+<tr><td>100</td>	<td>Set background color to Gray. (Color No. 8)</td></tr>
+<tr><td>101</td>	<td>Set background color to Bright Red. (Color No. 9)</td></tr>
+<tr><td>102</td>	<td>Set background color to Bright Green. (Color No. 10)</td></tr>
+<tr><td>103</td>	<td>Set background color to Bright Yellow. (Color No. 11)</td></tr>
+<tr><td>104</td>	<td>Set background color to Bright Blue. (Color No. 12)</td></tr>
+<tr><td>105</td>	<td>Set background color to Bright Magenta. (Color No. 13)</td></tr>
+<tr><td>106</td>	<td>Set background color to Bright Cyan. (Color No. 14)</td></tr>
+<tr><td>107</td>	<td>Set background color to Bright White. (Color No. 15)</td></tr>
+</table>
+
+<h2><a name="DCS">DCS Sequence</a></h2>
+<table border="1">
+<tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
+<tr><td>DCS <i>Ps1</i> ; <i>Ps2</i> | <i>Pt</i> ST</td>	<td>DECUDK</td>	<td>Define user function key.
+<!--pre>
+<i>Ps1</i> = 0    Clear all UDK settings.
+    = 1    Define user key?
+
+<i>Ps2</i> = 0    Lock UDK.
+    = 1    Unlock UDK.
+
+<i>Pt</i>         Key definition.
+</pre -->
+</td></tr>
+<tr><td>DCS ! { <i>Pt</i> ST </td> <td>DECSTUI</td> <td>Change <a href="../setup/teraterm-term.html#TerminalUID">Terminal Unique ID</a> to <i>Pt</i>. DECSTUI works only when <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> LockUID setting is off.</td>
+<tr><td>DCS $ q <i>Pt</i> ST</td>       <td>DECRQSS</td>        <td>Request selection or setting.
+<pre>
+<i>Pt</i>: the setting that the host asks about.
+<i>Pt</i> = m    SGR
+   = r    DECSTBM
+   = "p   DECSCL
+   = "q   DECSCA
+
+Response: DCS <i>Ps</i> $ r <i>Pt</i> ST
+<i>Ps</i> = 0    Valid request.
+          <i>Pt</i> indicates the current setting of a valid control function
+          that the host asked about. 
+          <i>Pt</i> consists of all the characters in the control function,
+          except the CSI or ESC [ introducer characters.
+   = 1    Invalid request. Does not send <i>Pt</i>.
+</pre>
+</td></tr>
+</table>
+
+<h2><a name="OSC">OSC Sequence</a></h2>
+<p>Format</p>
+<pre>
+OSC <i>Ps</i> ; <i>Pt</i> ST
+OSC <i>Ps</i> ; <i>Pt</i> BEL
+</pre>
+<table border="1">
+<tr><th> <i>Ps</i> </th>	<th>Description</th></tr>
+<tr><td> 0, 1, 2 </td>		<td>Change window title to <i>Pt</i>. </td></tr>
+<tr><td> 4 </td>		<td>Change color.
+<pre>
+<i>Pt</i> = <i>c</i> ; <i>spec</i>
+</pre>
+Change color number <i>c</i> to the color specified by <i>spec</i>.<br>
+<i>spec</i> accepts following formats.
+<pre>
+rgb:<i>r</i>/<i>g</i>/<i>b</i>
+rgb:<i>rr</i>/<i>gg</i>/<i>bb</i>
+rgb:<i>rrr</i>/<i>ggg</i>/<i>bbb</i>
+rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
+#<i>rgb</i>
+#<i>rrggbb</i>
+#<i>rrrgggbbb</i>
+#<i>rrrrggggbbbb</i>
+</pre>
+</table>
+
+<h2><a name="SOS">SOS Sequence</a></h2>
+<p>Format</p>
+<pre>SOS <i>Pt</i> ST</pre>
+<p>Tera Term implements no SOS functions; <i>Pt</i> is ignored.</p>
+
+<h2><a name="PM">PM Sequence</a></h2>
+<p>Format</p>
+<pre>PM <i>Pt</i> ST</pre>
+<p>Tera Term implements no PM functions; <i>Pt</i> is ignored.</p>
+
+<h2><a name="APC">APC Sequence</a></h2>
+<p>Format</p>
+<pre>APC <i>Pt</i> ST</pre>
+<p>Tera Term implements no APC functions; <i>Pt</i> is ignored.</p>
+
+<h2>References</h2>
+<ul>
+  <li><a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48</a></li>
+  <li><a href="http://vt100.net/">VT100.net</a></li>
+  <li><a href="http://invisible-island.net/xterm/ctlseqs/ctlseqs.html">Xterm control sequences</a></li>
+  <li><a href="http://www.cs.utk.edu/~shuford/terminal/dec_vt_mouse.html">Locator input models for ANSI Terminals (sixth revision)</a></li>
+  <li><a href="http://bjh21.me.uk/all-escapes/all-escapes.txt">all-escapes.txt</a></li>
+  <li><a href="http://publib.boulder.ibm.com/infocenter/aix/v7r1/index.jsp?topic=/com.ibm.aix.cmds/doc/aixcmds1/aixterm.htm">aixterm</a></li>
+</ul>
+
+</body>
+</html>

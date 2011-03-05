@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Tips on TCP/IP connection with a port other than 23</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Telnet port number</h1>
+
+<p>
+On the <A HREF="../../commandline/teraterm.html">command line</A>, or on the <A HREF="../../menu/file.html">[File] New connection</A> dialog box, you can specify the TCP port number (&lt;TCP port#&gt;) and telnet flag (&lt;telnet flag&gt;) for a TCP/IP connection. If these parameters are omitted in the command line, the default values are taken from the Tera Term setup file.
+</p>
+
+<p>
+Only if &lt;telnet flag&gt; is 1 (on) and &lt;TCP port#&gt; is 23, Tera Term starts spontaneously sending telnet commands to the host for the option negotiation when the TCP/IP connection is established.
+</p>
+
+<p>
+This particular port number for telnet, 23, can be changed by editing the TelPort line in the [Tera Term] section of setup file like the following:
+</p>
+
+<pre>
+TelPort=&lt;telnet port#&gt;
+
+Default:
+TelPort=23
+</pre>
+
+<p>
+Whatever &lt;TCP port#&gt; is and whatever &lt;telnet flag&gt; is, Tera Term can respond to telnet commands sent by the host.
+</p>
+
+<h1>Terminal setup for non-telnet TCP/IP connection</h1>
+
+<p>
+For a non-telnet TCP/IP connection (usually with a port other than 23), you may need to set the "local echo" option on, and the "new-line (transmit)" option to CR+LF. If you edit the TCPLocalEcho and TCPCRSend lines in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TCPLocalEcho=on
+TCPCRSend=CRLF    (CR is also acceptable)
+</pre>
+
+<p>
+the "local echo" option is turned on and the "new-line (transmit)" option is set to CRLF automatically when the connection is establised on condition that &lt;telnet flag&gt; is 0 (off), or &lt;TCP port#&gt; is not equal to &lt;telnet port#&gt;. Otherwise, setup values specified by [Setup] Terminal are used. By using these options, one setup file can support both the telnet connection and non-telnet connection.
+</p>
+
+<pre>
+Default:
+TCPLocalEcho=off  (This option is disabled and the "local echo" option in the [Setup] Terminal dialog box is always used.)
+
+TCPCRSend=        (This option is disabled and the "new-line (transmit)" option in the [Setup] Terminal dialog box is always used.)
+</pre>
+
+</BODY>
+</HTML>

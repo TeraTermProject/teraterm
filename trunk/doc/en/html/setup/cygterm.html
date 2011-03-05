@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>CygTerm+ setup file</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>CygTerm+ setup file</h1>
+
+<p>
+cygterm.cfg is a configuration file.  This includes definitions for the command lines of a terminal emulator and a shell, and several parameters.<br>
+cygterm.cfg is loaded from the same directory cygterm.exe exists in.
+</p>
+
+<p>
+An example of cygterm.cfg
+</p>
+<pre>
+TERM = C:\program files\ttermpro\ttermpro.exe %s %d /KR=SJIS /KT=SJIS
+TERM_TYPE = vt100
+PORT_START = 20000
+PORT_RANGE = 40
+SHELL = /bin/bash
+ENV_1 = MAKE_MODE=unix
+ENV_2 = HOME=/home
+  :         :
+</pre>
+
+<dl>
+  <dt>TERM</dt>
+  <dd>
+    This is the command line to execute a terminal emulaitor.
+    Specify the full path to the command if it isn't in Windows search path.
+    This needs to be described `%s' and `%d' for the host and port number.
+  </dd>
+
+  <dt>TERM_TYPE</dt>
+  <dd>
+    This terminal type is adopted when the terminal emulator did not give
+    a terminal type. (default: vt100)  Then this value is set to the
+    environment variable TERM on a shell.
+  </dd>
+
+  <dt>PORT_START</dt>
+  <dd>
+    This is the minimum TCP port number allowed for use. (default: 20000)
+  </dd>
+
+  <dt>PORT_RANGE</dt>
+  <dd>
+    This is the maximum number of TCP ports allowed for use. (default: 40)<br>
+
+    cygterm.exe looks for an unused port number between PORT_START and
+    PORT_START+PORT_RANGE, and therefore can be run concurrently as many
+    as this number.
+  </dd>
+
+  <dt>SHELL</dt>
+  <dd>
+    This is the command line to execute a shell in Cygwin side (normally
+    /bin/bash). (default: get from /etc/passwd)
+    Specify the full path to the shell or keyword "AUTO".
+  </dd>
+
+  <dt>ENV_X</dt>
+  <dd>
+    This is the environment variable to be set when starting the shell.
+    It should be of the form `name=value' (like putenv).  It is possible to
+    give as many environment variables as needed by beginning with "ENV_".
+  </dd>
+
+  <dt>LOGIN_SHELL</dt>
+  <dd>
+    If this parameter is set to yes, shell is invoked as a login shell.
+    (default: no)
+  </dd>
+
+  <dt>HOME_CHDIR</dt>
+  <dd>
+    If this parameter is set to yes, current directory is changed to home
+    directory before invoke a shell. (default: no)
+  </dd>
+
+  <dt>SOCKET_TIMEOUT</dt>
+  <dd>
+    Specify the timeout of socket for waiting telnet connection from Tera Term.
+    (default: 5secs)
+  </dd>
+</dl>
+
+</body>
+</html>

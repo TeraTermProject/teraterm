@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <TITLE>Additional settings([Setup] Menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Additional settings([Setup] Menu)</h1>
+
+
+    <h2>"General" Tab</h2>
+    <dl>
+      <dt>Enable clickable URL</dt>
+      <dd>
+	Launches the web browser by clicking URL string.
+      </dd>
+
+      <dt>Disable accelerator send break</dt>
+      <dd>
+	Disables accelerator key of send break.
+      </dd>
+
+      <dt>Accept broadcast</dt>
+      <dd>
+	Accept the broadcast command.
+      </dd>
+
+      <dt>Mouse wheel scroll line</dt>
+      <dd>
+	Configures the mouse wheel scroll line.
+      </dd>
+
+      <dt>Auto scroll only in bottom line</dt>
+      <dd>
+	Stop auto scrolling except when the bottom line is displayed.
+      </dd>
+
+      <dt>Clear display when window resized</dt>
+      <dd>
+        The current screen is cleared when the VT window resizes.
+      </dd>
+
+      <dt>Change cursor shape with IME state</dt>
+      <dd>
+        When the IME is enabled, the caret is gray.
+      </dd>
+
+    </dl>
+
+
+    <h2>"Control Sequence" Tab</h2>
+    <dl>
+      <dt>Accept mouse event tracking</dt>
+      <dd>
+	Tera Term would send the escape sequence of the mouse operation when VT window is changed to the mouse tracking mode by the host application.<br>
+	However, TERM environment variable should be "xterm" type.
+      </dd>
+
+      <dt>Disable mouse event tracking when Control is pressed</dt>
+      <dd>
+        The mouse tracking mode is enabled, TeraTerm does not send the mouse operation while the control key is pressed.
+      </dd>
+
+      <dt>Accept window title change request</dt>
+      <dd>
+        Configures whether a user accepts the window title changing.
+        <dl>
+          <dt>off</dt>
+          <dd>Do not accept it.</dd>
+          <dt>overwrite</dt>
+          <dd>Accept it, and then display only the window tile.</dd>
+          <dt>ahead</dt>
+          <dd>Accept it, and then insert the window title before the canonical title.</dd>
+          <dt>last</dt>
+          <dd>Accept it, and then insert the window title after the canonical title.</dd>
+        </dl>
+      </dd>
+
+      <dt>Window title report</dt>
+      <dd>
+        A user can configurate how Tera Term can respond to the ddterm window title and icon label reporting request. 
+        <dl>
+          <dt>ignore</dt>
+          <dd>Ignore a window title reporting request.</dd>
+          <dt>accept</dt>
+          <dd>Tera Term reports the current window title. However, be careful about using this feature because the security problem will occur.</dd>
+          <dt>empty</dt>
+          <dd>Report empty string.</dd>
+        </dl>
+      </dd>
+
+      <dt>Window control sequence</dt>
+      <dd>
+        added support for the position moving, the minimization, the maximization, the most front, the most back, the refresh and the window size changing(per pixel and character) control sequences regarding the dtterm window operation.
+      </dd>
+
+      <dt>Window report sequence</dt>
+      <dd>
+        This function enables the ddterm control sequence such as the window status reporting, the window position reporting, the window size(in pixcel and character) reporting and the root window size reporting, among the window information reporting features.<br>
+        If you do not want window informations to be sent to remote host by some reason such as security, please disable this setting.
+      </dd>
+
+      <dt>Cursor control sequence</dt>
+      <dd>
+      Enables the control sequence for the cursor shape.<br>
+      This function enables cursor shape change by cursor change seqnence of DECSCUSR(cursor shape change), WYSTCURM(Wyse no-blinking cursor), WYULCURM(Wyse underlined cursor) and AT&amp;T 610 blinking cursor.<br><br>
+      
+      If a user uses the vim editor, write below entries in the ~/.vimrc to enable this feature.
+
+<pre>
+set t_SI=^[[3\ q
+set t_EI=^[[1\ q
+NOTE: Input ^[ by using Control-V Control-[.
+</pre>
+
+      If the cursor periodically blinks after an application exits, a user should configure as follows.<br>
+      In the ncurses 5.7 terminfo, the invisible(civis)/normal display(cnorm)/highlighting(cvvis) of the xterm cursor are as follows:
+
+<pre>
+civis=\E[?25l
+cnorm=\E[?12l\E[?25h
+cvvis=\E[?12;25h
+</pre>
+
+      When the upper configuration is enabled, the normal cursor displays with the non-blinking mode and the emphasis cursor displays with the blinking mode.
+      So, the cursor does not blink when the terminfo application displays the own cursor.<br>
+      If a user want to blink the cursor, turn off the CursorCtrlSequence entry or do in the following commands:
+
+<pre>
+% infocmp xterm > xterm.ti
+Open the xterm.ti file, change from a value of cnorm and cvvis to \E?25h.
+% tic -o ~/.terminfo xterm.ti
+Execute the tic command.
+# tic xterm.ti
+If the configuration is enabled as whole system, execute the upper command with a root user.
+</pre>
+      </dd>
+
+    </dl>
+
+
+    <h2>"Copy and Paste" Tab</h2>
+    <dl>
+      <dt><a name="continuedline">Enable continued line copy</a></dt>
+      <dd>
+	Concatenates current line with the next line including word
+	characters when the whole line is stepped over.
+      </dd>
+
+      <dt>Disable mouse R button paste</dt>
+      <dd>
+	Disables pasting clipboard data when mouse right button is clicked.
+      </dd>
+
+      <dt>Confirm mouse R button paste</dt>
+      <dd>
+	Displays popup menu and confirm pasting clipboard data when mouse
+	right button is clicked.
+      </dd>
+
+      <dt>Select only by L button</dt>
+      <dd>
+	Enable selection by mouse drag only with left button.
+      </dd>
+
+      <dt>ConfirmChangePaste</dt>
+      <dd>
+	When the Clipboard includes CR/LF, the confirmation
+	dialog can be shown to paste by right-click or Alt+V.
+	This is a foolproof way.
+      </dd>
+
+      <dt>String file</dt>
+      <dd>
+	When the Clipboard includes any strings in the specified file, 
+	the confirmation dialog can be shown to paste by right-click or Alt+V.
+	This is a foolproof way.<br>
+    This function works when the ConfirmChangePaste is enabled.
+      </dd>
+
+      <dt>Confirm change paste string file</dt>
+      <dd>
+	When a user pastes, the user can specify a keyword file for ConfirmChangePaste except the CR/LF.
+      </dd>
+
+      <dt>Delimiter characters</dt>
+      <dd>
+	Inludes delimiter characters for the word selection.
+      </dd>
+
+      <dt>Paste delay per line</dt>
+      <dd>
+	A user can delay to send a line data to the remote host when the user pastes multiple lines. The delay time can be specified by this option on the millisecond time scale.
+      </dd>
+
+    </dl>
+
+
+    <h2>"Visual" tab</h2>
+    <dl>
+      <dt>AlphaBlend</dt>
+      <dd>
+	You can setup the value of transparency. The range of transparency
+	is from 0 to 255. The more transparency reduces the value, the more
+	window transparency is blinding.
+      </dd>
+
+      <dt>Eterm lookfeel</dt>
+      <dd>
+	Tera Term window looks like Eterm-lookfeel background transparency.
+      </dd>
+    </dl>
+
+    <p>
+      See also <a href="../usage/transparent.html">Background transparency</a>.
+    </p>
+
+    <dl>
+      <dt>MouseCursor</dt>
+      <dd>
+	Mouse cursor can have one of the 4 shapes listed below:
+<pre>
+ARROW = standard arrow cursor
+IBEAM = ibeam cursor(default)
+CROSS = cross cursor
+HAND  = hand cursor
+</pre>
+      </dd>
+
+      <dt>ANSI color</dt>
+      <dd>Specifies the RGB value of the color for PC style and aixterm style 16 colors mode.</dd>
+
+      <dt>Enable Bold attribute color</dt>
+      <dt>Enable Blink attribute color</dt>
+      <dt>Enable Reverse attribute color</dt>
+      <dt>Enable URL attribute color</dt>
+      <dt>Enable ANSI color</dt>
+      <dd>
+        Enables each color attributes and color setting.<br>
+	If ANSI color is disabled, 16 colors and 256 colors modes are also disabled.
+      </dd>
+
+      <dt>Underline URL string</dt>
+      <dd>
+        Enables Underline attribute on URL string.
+      </dd>
+
+    </dl>
+
+
+    <h2>"Log" tab</h2>
+    <dl>
+      <dt>View log editor</dt>
+      <dd>
+	Specify the editor that is used for display log file
+      </dd>
+
+      <dt>Default log file name(strftime format)</dt>
+      <dd>
+	Specify default log file name. It can include a format of strftime.
+<pre>
+SYNOPSIS:
+&h      Host name(or empty when not connecting)
+&p      TCP port number(or empty when not connecting, not TCP connection)
+%a      Abbreviated weekday name
+%A      Full weekday name
+%b      Abbreviated month name
+%B      Full month name
+%c      Date and time representation appropriate for locale
+%d      Day of month as decimal number (01 - 31)
+%H      Hour in 24-hour format (00 - 23)
+%I      Hour in 12-hour format (01 - 12)
+%j      Day of year as decimal number (001 - 366)
+%m      Month as decimal number (01 - 12)
+%M      Minute as decimal number (00 -  59)
+%p      Current locale's A.M./P.M. indicator for 12-hour clock
+%S      Second as decimal number (00 - 59)
+%U      Week of year as decimal number, with Sunday as first day of week (00 - 53)
+%w      Weekday as decimal number (0 - 6; Sunday is 0)
+%W      Week of year as decimal number, with Monday as first day of week (00 - 53)
+%x      Date representation for current locale
+%X      Time representation for current locale
+%y      Year without century, as decimal number (00 - 99)
+%Y      Year with century, as decimal number
+%z, %Z  Either the time-zone name or time zone abbreviation, depending on registry settings;
+        no characters if time zone is unknown
+%%      Percent sign
+</pre>
+      </dd>
+
+      <dt>Default log save folder</dt>
+      <dd>
+	Specify default path to save log file. It is used when the log file name is not a full path.
+      </dd>
+
+      <dt>Auto start logging</dt>
+      <dd>
+    Start logging automaticaly when connecting. Default Log File Name is used for log file name.
+      </dd>
+    </dl>
+
+
+    <h2>"Cygwin" tab</h2>
+    <dl>
+      <dt>Cygwin install path</dt>
+      <dd>
+	Specify the install directory of Cygwin.
+      </dd>
+
+      <dt>CygTerm</dt>
+      <dd>
+	Configure CygTerm settings.
+      </dd>
+    </dl>
+  </body>
+</html>

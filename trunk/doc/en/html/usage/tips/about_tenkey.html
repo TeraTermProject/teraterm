@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Numeric keypad</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>Numeric keypad</h1>
+
+<p>
+In the default setup, Tera Term emulates VT100 keyboard. Therefore some
+numeric keys do not work like them in other applications. For example,
+the "Num Lock" key does not work as "Num Lock". To disable the emulation
+and use numeric keys in normal way, edit the keyboard setup file
+KEYBOARD.CNF to disable every items in the [VT numeric keypad] section
+by using the word "off", like the following (see also
+<A HREF="../../reference/keycode.txt">KEYCODE.TXT</A>):
+</p>
+
+<pre>
+[VT numeric keypad]
+
+Num0=off
+Num1=off
+Num2=off
+Num3=off
+Num4=off
+Num5=off
+Num6=off
+Num7=off
+Num8=off
+Num9=off
+NumMinus=off
+NumComma=off
+NumPeriod=off
+NumEnter=off
+PF1=off
+PF2=off
+PF3=off
+PF4=off
+</pre>
+
+</BODY>
+</HTML>

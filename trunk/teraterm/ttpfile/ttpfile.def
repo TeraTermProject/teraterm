@@ -1,0 +1,15 @@
+EXPORTS
+  GetSetupFname @1
+  GetTransFname @2
+  GetMultiFname @3
+  GetGetFname @4
+  SetFileVar @5
+  GetXFname @6
+
+  ProtoInit @7
+  ProtoParse @8
+  ProtoTimeOutProc @9
+  ProtoCancel @10
+
+  TTFILESetUILanguageFile @11
+  TTFILESetFileSendFilter @12

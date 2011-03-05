@@ -1,0 +1,27 @@
+; sample macro of Tera Term
+;
+; File: random.ttl
+; Description: generate the random value
+; Environment: generic
+; Update: 2006/2/11
+; Author: Yutaka Hirata
+
+connect '192.168.1.2 /2 /ssh /auth=password /user=yutaka /passwd=yutaka'
+pause 5
+
+
+val = 0
+
+while 1
+  random val 100
+  call show_step
+  pause 2
+endwhile
+
+exit
+
+
+:show_step
+int2str s val
+statusbox s 'random value'
+return

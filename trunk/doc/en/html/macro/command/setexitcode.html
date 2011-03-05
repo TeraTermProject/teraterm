@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>setexitcode</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setexitcode</h1>
+
+<p>
+Sets the exit code of MACRO.
+</p>
+
+<pre class="macro-syntax">
+setexitcode &lt;exit code&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<h3>For Windows 98</h3>
+
+<p>
+If MACRO is run from a batch file by the command line "start /w ttpmacro &lt;ttl filename&gt;" (the option /w is necessary), the exit code can be tested by the DOS command "if errorlevel n".
+</p>
+
+<h3>For Windows NT4.0/2000/XP</h3>
+
+<p>
+If MACRO is run from a batch file by the command line "ttpmacro &lt;ttl filename&gt;", the exit code can be tested by the DOS command "if errorlevel n".
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+----- Batch file "test.bat" (for Win 98/Me) ------
+rem Run MACRO using the "start /w" command.
+start /w ttpmacro test.ttl
+rem Display message if the exit code is greater than 0.
+if errorlevel 1 echo Error!
+----- End of "test.bat" ---------
+
+----- Batch file "test.bat" (for Win NT/2000/XP) ------
+rem Run MACRO. No need to use the "start" command.
+ttpmacro test.ttl
+rem Display message if the exit code is greater than 0.
+if errorlevel 1 echo Error!
+----- End of "test.bat" ---------
+
+----- Macro file "test.ttl" ----
+; Set the exit code to 1.
+setexitcode 1
+----- End of "test.ttl"  ----------
+</pre>
+
+</body>
+</html>

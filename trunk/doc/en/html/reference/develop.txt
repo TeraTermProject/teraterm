@@ -1,0 +1,262 @@
+* Development Environment
+- OS
+  Windows XP Professional
+- Compiler
+  Visual Studio 2005 SP1 Standard Edition (or higher edition)
+  Note: the executable program which was compiled by Visual Studio 2008 does not work on Windows NT 4.0, 95, 98 and Me.
+- Installer
+  Inno Setup 5.4.1 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor (from ispack-5.4.1)
+  ISTool 1.0.0 (from ispack-5.4.1)
+- others
+  Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
+  ActivePerl 5.8 later version
+    converts character-code and return-code of documents for building OpenSSL.
+
+
+* Libraries
+- Oniguruma 5.9.2 (http://www.geocities.jp/kosako3/oniguruma/)
+- OpenSSL 1.0.0d (http://www.openssl.org/)
+- zlib 1.2.5 (http://www.zlib.net/)
+- PuTTY 0.60 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+
+
+* Notice for SVN commiter
+- SVN repository for commiter is followings:
+  svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk
+
+- Should not edit checkout file in copying directory.
+  The other modification code may be deleted in SVN server when you commit checkout file. Also, fix it carefully when the conflicting occurs.
+
+- Should not have opened checkout file.
+  SVN commit procedure may be failure while checkout file will have been opened.
+
+
+* Naming rule to add menu ID
+
+The first digit is 5.
+
+The second digit is:
+  Tera Term VT window         0
+  Tera Term TEK window        1
+  TTSSH                       2
+  TTProxy                     3
+  TTXKanjiMenu                4
+
+The third digit is:
+  [File] menu                 1
+  [Edit] menu                 2
+  [Setup] menu                3
+  [Control] menu              4
+  [Window] menu               8
+  [Help] menu                 9
+
+
+Example: adding a TTSSH menu under File menu
+
+#define ID_SSHSCPMENU       52110
+
+
+* What to do when new macro command is added?
+
+- Coding
+-- get a new number of command internal ID.
+   ... teraterm/ttmacro/ttmparse.h
+-- add a if statement to below function.
+   ... CheckReservedWord@teraterm/ttmacro/ttmparse.c
+-- add a caller doing the macro command.
+   ... ExecCmnd@teraterm/ttmacro/ttl.c
+-- make a function code for the macro command.
+
+- Help topic
+-- make the command help file.
+   ... doc/LANG/html/macro/command/hogefunc.html
+-- add the file to help topic.
+   ... doc/LANG/teraterm.hhc
+-- get a new number of context ID in help page.
+   The value is internal ID + 92000.
+   ... teraterm/common/helpid.h
+-- make the alias between context ID and calling file.
+   ... doc/LANG/teraterm.hhp
+
+
+* How to build Libraries
+  1. PuTTY (used by TTSSH)
+     (1) Extract putty source into libs/putty directory.
+
+  2. Oniguruma (used by Tera Term Macro)
+     (1) Extract oniguruma source into libs/oniguruma directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run buildoniguruma.bat.
+
+  3. OpenSSL (used by TTSSH and TTProxy)
+     (1) Extract openssl source into libs/openssl directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run buildopenssl.bat.
+
+  4. Zlib (used by TTSSH)
+     (1) Extract zlib source into libs/zlib directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run buildzlib.bat.
+
+
+* How to build Tera Term
+  To build Tera Term source code is shown in the following step:
+  And you should use Visual Studio 2005 Standard Edition later version to build Tera Term because Tera Term program links MFC library (Visual Studio 2005 Express Edition can't be used).
+
+  1. Checkout Tera Term source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  2. Open teraterm\visualc\ttermpro.sln with Visual Studio.
+     The linefeed code of .sln file must be "CR+LF".
+  3. Build Tera Term solution.
+  4. Tera Term execution program will be generated in teraterm\visualc\bin directory if the building is successful.
+
+
+* How to build TeraTerm Menu
+  1. Checkout TeraTerm Menu source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  2. Open ttpmenu\ttpmenu.sln with Visual Studio.
+  3. Build ttpmenu solution.
+  4. ttpmenu.exe will be generated in Release directory if the building is successful.
+
+
+* How to build TTXKanjiMenu
+  1. Checkout TTXKanjiMenu source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  2. Open TTXKanjiMenu\ttxkanjimenu.sln with Visual Studio.
+  3. Build ttpmenu solution.
+  4. ttxkanjimenu.dll will be generated in TTXKanjiMenu directory if the building is successful.
+
+
+* How to build TTProxy
+  To build TTProxy source code is shown in the following step:
+  And you need Visual Studio 2005(VC++8.0) to build.
+
+  1. Checkout TTProxy source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  2. Open TTProxy\TTProxy.sln with Visual Studio.
+  3. Build TTProxy solution.
+  4. TTProxy DLL module will be generated in TTProxy directory if the building is successful.
+
+
+* How to build TTSSH
+  To build TTSSH source code is shown in the following step:
+  And you need Visual Studio 2005(VC++8.0) and ActivePerl to build.
+
+  * VS2005 Express Edition is able to build TTSSH. TTSSH links to ttpcmn.lib and it must be created beforehand. VS2005 Express Edition cannot build Tera Term, but it can create ttpcmn.lib
+
+  * On VS2008 Express Edition, following error occurs:
+      .\ttxssh.rc(10) : fatal error RC1015: cannot open include file 'afxres.h'.
+
+    To avoid this error, edit ttxssh.rc file. Delete the line of "afxres.h", and add 2 lines.
+
+      - #include "afxres.h"
+      + #include <windows.h>
+      + #define IDC_STATIC -1
+
+  1. Checkout TTSSH source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  2. Open ttssh2\ttssh.sln with Visual Studio.
+  3. Build TTSSH solution.
+  4. TTSSH DLL will be generated in ttssh2\ttxssh directory if the building is successful.
+
+
+* How to build CygTerm
+  To build CygTerm source code is shown in the following step:
+
+   1. Install Cygwin(http://www.cygwin.com/win-9x.html) to your PC.
+      Note: 1.7.x doesn't support Windows 9x. Use version 1.5.x.
+            1.5.x doesn't seem support Windows 7. But a binary that is compiled by 1.5.x can execute in 1.7.x environment.
+   2. Launch Cygwin shell and go to cygterm directory.
+      # cd cygterm
+   3. Compile Cygterm.
+      # make
+
+
+* How to build TTXSamples
+  To build TTXSamples source code is shown in the following step:
+  And you need Visual Studio 2005(VC++8.0) to build.
+  VS2005 Express Edition is able to build TTXSamples.
+
+  1. Checkout TTXSamples source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  2. Open TTXSamples\TTXSamples.sln with Visual Studio.
+  3. Build TTXSamples solution.
+  4. TTXSamples DLL module will be generated in TTXSamples directory if the building is successful.
+
+
+* How to build HTML help file
+  To build  HTML help file is shown in the following step:
+
+  1. Intall HTML Help Workshop from below site:
+     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/hwMicrosoftHTMLHelpDownloads.asp
+
+  2. Copy document files with batch file on command prompt.
+     > cd teraterm\insatller
+     > convtext.bat
+
+  3. Select Open of File menu and open doc\en\teraterm.hhp file or doc\jp\teratermj.hhp.
+
+  4. Select Compile of File menu and HTML help file will be created.
+
+
+* How to release Tera Term installation package
+  To release Tera Term installation package is shown in the following step:
+
+  1. Check latest libraries and tools.
+    Visual Studio
+      http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
+    Inno Setup
+      http://www.jrsoftware.org/isdl.php
+    Oniguruma
+      http://www.geocities.jp/kosako3/oniguruma/
+    OpenSSL
+      http://www.openssl.org/
+    zlib
+      http://www.zlib.net/
+    PuTTY
+      http://www.chiark.greenend.org.uk/~sgtatham/putty/
+    CygTerm
+      http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
+    LogMeTT
+      http://www.logmett.com/forum/viewforum.php?f=5
+
+  2. Increase the software version and modify date.
+     Increment the version of VS_VERSION_INFO while release process.
+     - ttermpro.rc
+     - ttxssh.rc
+     - ttmacro.rc // only modifying
+     - ttpmenu.rc // only modifying
+     - TTProxy.rc // only modifying
+     - ttxkanjimenu.rc // only modifying
+     - teraterm.iss
+     - html/about/hisotry.html
+
+       Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.
+
+       Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
+
+  3. Create SVN tag.
+       The naming rule is `teraterm-version'(ex. teraterm-4_62).
+
+  4. Re-checkout from svn tag.
+
+  5. Evaluate executable program file.
+       - Rebuild Tera Term program
+       - Make installer package
+         Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
+       - Test Tera Term installation and evaluate it.
+
+  6. Update SourceForge.jp project site.
+
+  7. Update SourceForge.jp project home page.
+
+  8. Announce release to mailing list(in Japan).
+
+  9. Announce release to forum(in Canada).
+       (1) Announcements http://logmett.com/forum/viewforum.php?f=5
+           Create new topic in `Announcements' entry.
+           Change the type of previous Announcement from Announcement to Normal.
+           Delete third previous Announcement.
+
+       (2) Tera Term Changelog http://logmett.com/forum/viewtopic.php?f=5&t=3
+           Added current modification.
+
+       (3) TTSSH Changelog http://logmett.com/forum/viewtopic.php?f=5&t=29
+           Added current modification.
+
+  10. Delete snapshots.

@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttxkanjimenu", "ttxkanjimenu.vcproj", "{DCCE3462-94BD-49E8-8DC9-4EEAC23C04B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCCE3462-94BD-49E8-8DC9-4EEAC23C04B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DCCE3462-94BD-49E8-8DC9-4EEAC23C04B7}.Debug|Win32.Build.0 = Debug|Win32
+		{DCCE3462-94BD-49E8-8DC9-4EEAC23C04B7}.Release|Win32.ActiveCfg = Release|Win32
+		{DCCE3462-94BD-49E8-8DC9-4EEAC23C04B7}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

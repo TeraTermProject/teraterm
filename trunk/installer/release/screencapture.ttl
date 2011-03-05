@@ -1,0 +1,80 @@
+; sample macro of Tera Term
+;
+; File: screencapture.ttl
+; Description: capture screen contents and write to file
+; Environment: generic
+; Update: 2007/11/25, 12/5, 2008/01/30
+; Author: IWAMOTO Kouichi (doda), Yutaka Hirata
+; Tips:
+;   It is recommended that you will add in the following entry
+;   in `KEYBOARD.CNF' file because you can capture your screen
+;   at one's fingertrips.
+;
+;   [User keys]
+;   ;Shift + F12
+;   User1=600,2,screencapture.ttl
+;
+
+; Configuration
+
+appendmode = 1        ; 0 or 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+getdate header #13#10"======== %Y-%m-%d %H:%M:%S ==========================================="#13#10#13#10
+
+if appendmode=0 then
+;	call makefilename
+	getdate filename "screencapture_%Y%m%d-%H%M%S.txt"
+	fileopen fp filename 0
+else
+	filename = 'screencapture.txt'
+	fileopen fp filename 1
+endif
+
+if fp = -1 then
+	sprintf "Can't open "'"%s"' filename
+	messagebox inputstr "Error"
+	end
+endif
+
+;select screen
+callmenu 50280
+
+mpause 500
+
+filewrite fp header
+
+offset = 0
+do
+	clipb2var buff offset
+	if result>0 filewrite fp buff
+	offset = offset + 1
+loop while result = 2
+
+fileclose fp
+
+;reset selection
+callmenu 50270
+
+end
+
+
+:makefilename
+getdate StrDate
+gettime StrTime
+                           ;1234567890
+                           ;YYYY-MM-DD
+strcopy StrDate 1 4 DateY  ;YYYY
+strcopy StrDate 6 2 DateM  ;     MM
+strcopy StrDate 9 2 DateD  ;        DD
+
+                           ;1234567890
+                           ;HH:MM:SS
+strcopy StrTime 1 2 TimeH  ;HH
+strcopy StrTime 4 2 TimeM  ;   MM
+strcopy StrTime 7 2 TimeS  ;      SS
+
+sprintf "screencapture_%s%s%s-%s%s%s.txt" DateY DateM DateD TimeH TimeM TimeS
+filename = inputstr
+return

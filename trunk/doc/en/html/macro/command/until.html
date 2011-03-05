@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>until, enduntil</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>until, enduntil</h1>
+
+<p>
+Repeats.
+</p>
+
+<pre class="macro-syntax">
+until &lt;int&gt;<br>
+  ...<br>
+  ...<br>
+enduntil
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Repeats the statements between 'until' and 'enduntil' while &lt;int&gt; is zero.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; Repeat ten times.
+i = 1
+until i > 10
+  i = i + 1
+enduntil
+</pre>
+
+</body>
+</html>

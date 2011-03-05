@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>send</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>send</h1>
+
+<p>
+データを送信する。
+</p>
+
+<pre class="macro-syntax">
+send &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;data&gt; が文字列型の場合、文字列をホストへ送信させる。<br>
+&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を送信させる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+send 'ABC'
+
+; "ABC" を送信させる。("A" の ASCII コードは65)
+send  65 66 67
+myname='Tera Term'
+send 'My name is ' myname '.'
+</pre>
+
+
+<pre class="macro-example">
+/* "CTRL+C"を送るには、以下のように直接"3"を指定する。
+ * 
+ * CTRL+A = 1, CTRL+B = 2.................. CTRL+Z = 26.
+ */
+send #3
+
+/* TABコードを送る */
+send #9
+</pre>
+
+
+<p>
+同期モードについては "<a href="setsync.html">setsync</a>" を参照。
+</p>
+
+</body>
+</html>

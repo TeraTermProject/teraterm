@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>testlink</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>testlink</h1>
+
+<p>
+Reports the current link and connection status.
+</p>
+
+<pre class="macro-syntax">
+testlink
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+The system variable "result" is set to one of the following values depending on the link and connection status:
+</p>
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Status</th>
+ </tr>
+ <tr>
+  <td>0</td>
+  <td>Link to Tera Term has not been made.</td>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Connection to the host has not been made, but link to Tera Term has been made.</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>Both connection and link have been made.</td>
+ </tr>
+</table>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; If MACRO is not linked to Tera Term, 
+testlink
+; execute the connect command.
+if result=0 connect 'host'
+</pre>
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="closett.html">closett</a>"</li>
+ <li>"<a href="connect.html">connect</a>"</li>
+ <li>"<a href="cygconnect.html">cygconnect</a>"</li>
+ <li>"<a href="disconnect.html">disconnect</a>"</li>
+ <li>"<a href="unlink.html">unlink</a>"</li>
+</ul>
+
+</body>
+</html>

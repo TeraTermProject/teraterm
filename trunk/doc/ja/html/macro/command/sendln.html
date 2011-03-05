@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>sendln</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendln</h1>
+
+<p>
+データと改行を送信する。
+</p>
+
+<pre class="macro-syntax">
+sendln &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列とそれに続く改行文字をホストへ送信させる。<br>
+&lt;data&gt; の形式は、<a href="send.html">"send"</a>コマンドと同じ。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; 改行文字だけ送信
+sendln
+
+sendln 'abc'
+
+Password='mypassword'
+sendln Password
+</pre>
+
+<p>
+同期モードについては "<a href="setsync.html">setsync</a>" を参照。
+</p>
+
+</body>
+</html>

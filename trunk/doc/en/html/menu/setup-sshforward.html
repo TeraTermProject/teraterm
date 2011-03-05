@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>SSH Forwarding ([Setup] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>SSH Forwarding ([Setup] menu)</h1>
+
+    <h2>"TTSSH: Forwarding" dialog box</h2>
+    <p>
+      SSH port forwarding
+    </p>
+
+    <h3>Port Forwarding</h3>
+    <dl>
+      <dt>Add...</dt>
+      <dd>
+        Add a port forwarding entry.
+      </dd>
+
+      <dt>Edit...</dt>
+      <dd>
+        Edit a selected entry.
+      </dd>
+
+      <dt>Remove</dt>
+      <dd>
+        Remove a selected entry.
+      </dd>
+    </dl>
+
+    <h3>X Forwarding</h3>
+    <dl>
+      <dt>Display remote X application on local X server</dt>
+      <dd>
+        Check this option if you want to redirect X11 connection over the secure channel.
+      </dd>
+    </dl>
+
+
+    <h2>"TTSSH: Forwarding Edit" dialog box</h2>
+    <p>
+      Edit each forward setting.
+    </p>
+
+    <h3>local forwarding</h3>
+    <dl>
+      <dt>Forward local port</dt>
+      <dd>
+        Source port to forward of local side.
+      </dd>
+
+      <dt>listen</dt>
+      <dd>
+        Listen address of local side. If omitted, localhost is used.
+      </dd>
+
+      <dt>to remote machine</dt>
+      <dd>
+        Destination host name of remote side.
+      </dd>
+
+      <dt>port</dt>
+      <dd>
+        Destination port number.
+      <dd>
+      </dd>
+    </dl>
+
+    <h3>remote forwarding</h3>
+    <dl>
+      <dt>forward remote server port</dt>
+      <dd>
+        Source port to forward of remote side.
+      </dd>
+
+      <dt>listen</dt>
+      <dd>
+        Listen address of remote side. If omitted, localhost is used.<br>
+        It is not used with SSH1 protocol.
+      </dd>
+
+      <dt>to local machine</dt>
+      <dd>
+        Destination host name of local side.
+      </dd>
+
+      <dt>port</dt>
+      <dd>
+        Destination port number.
+      </dd>
+    </dl>
+
+  </body>
+</html>

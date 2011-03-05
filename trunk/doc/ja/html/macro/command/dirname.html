@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>dirname</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>dirname</h1>
+
+<p>
+パス名からディレクトリ名を得る。
+</p>
+
+<pre class="macro-syntax">
+dirname &lt;strvar&gt; &lt;path&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+パス名 &lt;path&gt; のディレクトリ名部分を &lt;strvar&gt; に格納する。<br>
+パス名は文字列として処理しており、実在している必要はない。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+dirname dir 'c:\teraterm\test.txt'
+; dir = "c:\teraterm"
+dirname dir 'c:\teraterm\'
+; dir = "c:"
+dirname dir 'c:\teraterm'
+; dir = "c:"
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="basename.html">dirname</a></li>
+  <li><a href="makepath.html">makepath</a></li>
+</ul>
+
+</body>
+</html>

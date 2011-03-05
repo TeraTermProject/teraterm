@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>closett</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>closett</h1>
+
+<p>
+Tera Term を終了させる。
+</p>
+
+<pre class="macro-syntax">
+closett
+</pre>
+
+<h2>解説</h2>
+
+<p>
+Tera Term を終了させ、 MACRO は非リンク状態に入る。<br>
+非リンク状態では、connect コマンドによって新しい Tera Term ウィンドウを開き、MACRO をそれにリンクさせることができる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+messagebox 'foo' 'val'
+closett
+end
+</pre>
+
+<h2>参照</h2>
+
+<ul>
+ <li>"<a href="connect.html">connect</a>"</li>
+ <li>"<a href="cygconnect.html">cygconnect</a>"</li>
+ <li>"<a href="disconnect.html">disconnect</a>"</li>
+ <li>"<a href="testlink.html">testlink</a>"</li>
+ <li>"<a href="unlink.html">unlink</a>"</li>
+</ul>
+
+</body>
+</html>

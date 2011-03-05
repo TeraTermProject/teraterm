@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>rotateleft</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>rotateleft</h1>
+
+<p>
+左にローテート(循環シフト)する。
+</p>
+
+<pre class="macro-syntax">
+rotateleft &lt;intvar&gt; &lt;intval&gt; &lt;count&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+整数値 &lt;intval&gt; を左に &lt;count&gt; 桁ローテート(循環シフト)した値を整数型変数 &lt;intvar&gt; にコピーする。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+rotateleft b $80000000 4
+sprintf '0x%08x' b
+messagebox inputstr '0x00000008'
+</pre>
+
+</body>
+</html>

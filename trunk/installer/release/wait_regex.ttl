@@ -1,0 +1,31 @@
+; sample macro of Tera Term
+;
+; File: wait_regex.ttl
+; Description: wait command with regular expression
+; Environment: generic
+; Update: 2005/10/15
+; Author: Yutaka Hirata
+
+connect '192.168.1.2 /2 /ssh /auth=password /user=yutaka /passwd=yutaka'
+
+while 1
+
+	sendln 'uptime'
+;	waitregex 'Longhorn' '.*@sai' 'Pentium\d+' 'TeraTermX{3}'
+	waitregex '(You).*(log\w+).*(this)'
+
+	int2str s result
+	messagebox s 'result'
+	messagebox inputstr 'inputstr'
+	messagebox matchstr 'matchstr'
+	messagebox groupmatchstr1 'groupmatchstr1'
+	messagebox groupmatchstr2 'groupmatchstr2'
+	messagebox groupmatchstr3 'groupmatchstr3'
+	messagebox groupmatchstr4 'groupmatchstr4'
+
+	sendln 'cal'
+	wait 'yutaka'
+
+	pause 3
+
+endwhile

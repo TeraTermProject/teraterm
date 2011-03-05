@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Log ([File] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Log ([File] menu)</h1>
+    <p>
+      Logs received characters to a file.
+    </p>
+
+    <h2>"Log" dialog box (to input the log file name)</h2>
+    <dl>
+      <dt>File Name</dt>
+      <dd>
+	Enter or select the log file name.
+      </dd>
+
+      <dt>Binary</dt>
+      <dd>
+	If you select this option, received characters are written without
+	any modifications. Otherwise, new-line codes are converted and
+	escape sequences are stripped out.
+      </dd>
+
+      <dt>Append</dt>
+      <dd>
+	If you select this option and the specified log file already exists,
+	received characters are appended to the file. Otherwise, the file is
+	overwritten.
+      </dd>
+
+      <dt>Plain text</dt>
+      <dd>
+	If you select this option, ASCII non-printable characters are not written.
+      </dd>
+
+      <dt>Timestamp</dt>
+      <dd>
+	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.
+      </dd>
+
+      <dt>Hide dialog</dt>
+      <dd>
+	If you select this option, "Log" dialog box is not displayed.
+      </dd>
+    </dl>
+
+    <h2>"Log" dialog box (displayed while logging)</h2>
+    <dl>
+      <dt>Close</dt>
+      <dd>
+	The Close button quits logging and closes the log file.
+      </dd>
+
+      <dt>Pause/Start</dt>
+      <dd>
+	The Pause button pauses logging. The Start button restarts logging.
+	These buttons function as toggles.
+      </dd>
+    </dl>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>yesnobox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>yesnobox</h1>
+
+<p>
+ダイアログボックスを開き、ユーザーに「はい」/「いいえ」を選択させる。
+</p>
+
+<pre class="macro-syntax">
+yesnobox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(廃止)]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列 &lt;message&gt; はダイアログボックスに表示されるメッセージ、文字列 &lt;title&gt; はダイアログボックスのタイトル。
+</p>
+
+<p>
+「はい」ボタンが押された場合、システム変数 resultに1が格納される。「いいえ」ボタンが押された場合、result に0が格納される。
+</p>
+
+<p>
+&lt;special&gt; は廃止されました。エラーにはなりませんが、無効です。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+:retry
+;;; do something ;;;
+yesnobox 'もう一回やりますか?' 'Tera Term'
+if result goto retry
+end
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="strspecial.html">strspecial</a></li>
+</ul>
+
+</body>
+</html>

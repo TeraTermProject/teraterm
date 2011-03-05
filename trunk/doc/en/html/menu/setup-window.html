@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Window ([Setup] menu)</title>
+    <META http-equiv="Content-Style-Type" content="text/css">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Window ([Setup] menu)</h1>
+
+    <h2>"Window setup" dialog box</h2>
+    <dl>
+      <dt>Title</dt>
+      <dd>
+	Text displayed in the window title.
+      </dd>
+
+      <dt>Cursor shape</dt>
+      <dd>
+	Cursor shape. Block, Vertical line or Horizontal line.
+      </dd>
+
+      <dt>Enable bold font</dt>
+      <dd>
+	Enables the use of bold style font for characters with the bold attribute.
+      </dd>
+
+      <dt>Hide title bar</dt>
+      <dd>
+	Hides the title bar and menu bar. You can move the window by
+	dragging it with the left mouse button while pressing the Alt key.
+	You can minimize the window by clicking the right mouse button
+	while pressing the Alt key. Clicking the left mouse button while
+	pressing the Ctrl key causes the pop-up menu to appear. 
+      </dd>
+
+      <dt>Hide menu bar</dt>
+      <dd>
+	Hides the menu bar. Clicking the left mouse button while pressing
+	the Ctrl key causes the pop-up menu to appear.
+      </dd>
+
+      <dt>16 Colors (PC style)</dt>
+      <dd>
+	Enables the PC style mapping of bold color.  In this mode, the bold (blink)
+	attribute is used as a color attribute bit for text (background).
+	This option increases the number of colors for text and
+	background specified by escape sequences twice, from 8 to 16.
+      </dd>
+
+      <dt>16 Colors (aixterm style)</dt>
+      <dd>
+	Enables aixterm style 16 colors mode.
+	This option increases the number of colors for text and
+	background specified by escape sequences twice, from 8 to 16.<br>
+	
+	<b>NOTE</b>: The escape sequence(&lt;CSI&gt;100m) which changes the background color to the color number nine would conflict the escape sequence of the resetting rxvt-style characters and background color. So, if a user enables this mode, the behavior of &lt;CSI&gt;100m escape sequence will work never before.<br>
+	If a user does not like this behavior, turn off this option.
+      </dd>
+
+      <dt>256 Colors (xterm style)</dt>
+      <dd>
+	Enables xterm style 256 colors mode.
+	This option increases the number of colors for text and
+	background specified by escape sequences twice, from 8 to 256.<br>
+	Also, a user can change the color table by the escape sequence.
+      </dd>
+
+      <dt>Scroll buffer</dt>
+      <dd>
+	Enables the scroll buffer. If enabled, the number of lines in the
+	scroll buffer (including the displayed area) can be specified.
+	The maximum number of lines is 10000.
+	If memory is not enough, this value is reduced automatically.<br>
+	See also <a href="../setup/teraterm-win.html#scrollbuf">Maximum scroll buffer size</a>.
+      </dd>
+
+      <dt>Color</dt>
+      <dd>
+	<dl>
+	  <dt>Text</dt>
+	  <dd>
+	    Text color.
+	  </dd>
+
+	  <dt>Background</dt>
+	  <dd>
+	    Background color.
+	  </dd>
+
+	  <dt>Attribute</dt>
+	  <dd>
+	    Attribute of characters (Normal, Bold, Blink, Reverse or URL) whose colors
+	    are being changed.<br>
+        Note: Currently, the function URL attribute is disabled.
+	  </dd>
+
+	  <dt>Reverse</dt>
+	  <dd>
+	    Exchanges the text color and background color.
+	  </dd>
+
+	  <dt>R, G, B</dt>
+	  <dd>
+	    Specifies the RGB value of the character color.
+	  </dd>
+
+	  <dt>Always use Normal text's BG</td>
+	  <dd>
+	    If this option is ON, Tera Term uses Normal background color instead of Bold, Blink and URL's background color.
+	  </dd>
+	</dl>
+      </dd>
+    </dl>
+  </body>
+</html>

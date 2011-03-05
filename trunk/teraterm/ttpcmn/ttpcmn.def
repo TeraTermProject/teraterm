@@ -1,0 +1,45 @@
+EXPORTS
+  StartTeraTerm @1
+  ChangeDefaultSet @2
+  GetDefaultSet @3
+  GetKeyCode @4
+  GetKeyStr @5
+  SetCOMFlag @44
+  ClearCOMFlag @45
+  CheckCOMFlag @46
+  RegWin @10
+  UnregWin @11
+  SetWinMenu @12
+  SetWinList @13
+  SelectWin @14
+  SelectNextWin @15
+  GetNthWin @16
+  CommReadRawByte @20
+  CommInsert1Byte @21
+  CommRead1Byte @22
+  CommRawOut @23
+  CommBinaryOut @24
+  CommBinaryBuffOut @52
+  CommTextOut @25
+  CommBinaryEcho @26
+  CommTextEcho @27
+  DetectComPorts @42
+  GetDefaultFName @47
+  ExtractFileName @48
+  
+  SJIS2JIS @30
+  SJIS2EUC @31
+  JIS2SJIS @32
+  RussConv @33
+  RussConvStr @34
+  ConvertUnicode @35
+  CopyTTSetToShmem @36
+  CopyShmemToTTSet @37
+  
+  GetI18nStr @40
+  GetI18nLogfont @41
+  
+  OutputDebugPrintf @49
+  
+  is_NT4 @50
+  doSelectFolder @51

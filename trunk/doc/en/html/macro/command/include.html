@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>include</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>include</h1>
+
+<p>
+Moves control to the include file.
+</p>
+
+<pre class="macro-syntax">
+include &lt;include file name&gt;
+</pre>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+----- Main file "main.ttl" ------
+i=10
+:loop
+; Move to the include file.
+include 'sub.ttl'
+if i&gt;=0 goto loop
+end
+----- End of "main.ttl" ---------
+
+----- Include file "sub.ttl" ----
+if i&lt;0 then
+  messagebox 'error!' 'sub'
+  ; Go back to the main file.
+  exit
+endif
+i = i - 1
+; Go back to the main file.
+----- End of "sub.ttl" ----------
+</pre>
+
+</body>
+</html>

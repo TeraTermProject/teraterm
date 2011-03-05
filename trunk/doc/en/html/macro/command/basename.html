@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>basename</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>basename</h1>
+
+<p>
+Returns trailing name component of path
+</p>
+
+<pre class="macro-syntax">
+basename &lt;strvar&gt; &lt;path&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Given a &lt;path&gt; string containing the path to a file or directory, this macro will return the trailing name component into the &lt;strvar&gt; variable name.<br>
+The file or directory will need not be existed.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+basename fname 'c:\teraterm\test.txt'
+; fname = "test.txt"
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="dirname.html">dirname</a></li>
+  <li><a href="makepath.html">makepath</a></li>
+</ul>
+
+</body>
+</html>

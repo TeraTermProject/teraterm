@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>setfileattr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setfileattr</h1>
+
+<p>
+ファイルまたはディレクトリの属性を変更する。
+</p>
+
+<pre class="macro-syntax">
+setfileattr &lt;filename&gt; &lt;attributes&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">文字列 &lt;filename&gt;</dt>
+	<dd>ファイル名またはディレクトリ名</dd>
+
+	<dt class="macro">整数 &lt;attributes&gt;</dt>
+	<dd>設定する属性値を指定する。属性値は以下の数値の組み合わせとなる。<br>
+	    <table border="2">
+	      <tr>
+	        <th>値</th>
+	        <th>意味</th>
+	      </tr>
+	      <tr>
+	        <td>$1</td>
+	        <td>読み取り専用</td>
+	      </tr>
+	      <tr>
+	        <td>$2</td>
+	        <td>隠しファイルまたは隠しディレクトリ</td>
+	      </tr>
+	      <tr>
+	        <td>$4</td>
+	        <td>オペレーティングシステムの一部、またはオペレーティングシステム専用</td>
+	      </tr>
+	      <tr>
+	        <td>$20</td>
+	        <td>アーカイブ</td>
+	      </tr>
+	      <tr>
+	        <td>$80</td>
+	        <td>特に属性はない<br>
+	            単独で指定したときのみ有効</td>
+	      </tr>
+	      <tr>
+	        <td>$100</td>
+	        <td>一時ファイル</td>
+	      </tr>
+	      <tr>
+	        <td>$1000</td>
+	        <td>オフラインの記憶装置へ物理的に移動された(Windows 2000 以降)</td>
+	      </tr>
+	      <tr>
+	        <td>$2000</td>
+	        <td>「インデックスサービス」の対象になっていない(Windows 2000 以降)</td>
+	      </tr>
+	    </table>
+	</dd>
+</dl>
+
+<h2>返り値</h2>
+
+<dl>
+	<dt class="macro">システム変数 &lt;result&gt;</dt>
+	<dd>属性の変更に失敗すると0が格納される。<br>
+	    成功すると1が格納される。</dd>
+</dl>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; add readonly attribute
+file = 'c:\test.txt'
+getfileattr file
+attr = result | $1 ; keep current attributes
+setfileattr file attr
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="getfileattr.html">getfileattr</a></li>
+  <li>MSDN ライブラリ <a href="http://msdn.microsoft.com/en-us/library/aa365535(v=VS.85).aspx">SetFileAttributes</a></li>
+  <li>MSDN ライブラリ <a href="http://msdn.microsoft.com/en-us/library/gg258117(v=VS.85).aspx">File Attribute Constants</a></li>
+</ul>
+
+</body>
+</html>

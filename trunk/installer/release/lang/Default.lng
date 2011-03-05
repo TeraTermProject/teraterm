@@ -1,0 +1,16 @@
+[Tera Term]
+DLG_SYSTEM_FONT=System,12,0
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+[TTSSH]
+DLG_TAHOMA_FONT=Tahoma,8,0
+DLG_SYSTEM_FONT=System,12,0
+
+[TTProxy]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+[TTMenu]
+DLG_TAHOMA_FONT=Tahoma,8,0
+
+[TTXRecurringCommand]
+DLG_TAHOMA_FONT=Tahoma,8,0

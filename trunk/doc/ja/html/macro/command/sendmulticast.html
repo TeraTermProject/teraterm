@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>sendmulticast</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendmulticast</h1>
+
+<p>
+データをマルチキャスト送信する。
+</p>
+
+<pre class="macro-syntax">
+sendmulticast &lt;multicastname&gt; &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;multicastname&gt;引数で指定した端末へ、文字列をマルチキャスト送信する。端末の識別は、<a href="setmulticastname.html">setmulticastname</a>コマンドで事前に設定しておく。<br>
+&lt;data&gt; が文字列型の場合、文字列をホストへ送信させる。<br>
+&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を送信させる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; TerminalA
+setmulticastname 'screen1'
+; Do not receive any strings.
+</pre>
+
+<pre class="macro-example">
+; TerminalB
+setmulticastname 'screen2'
+; The 'violin' string will be sent by the TerminalD.
+</pre>
+
+<pre class="macro-example">
+; TerminalC
+setmulticastname 'screen2'
+; The 'violin' string will be sent by the TerminalD.
+</pre>
+
+<pre class="macro-example">
+; TerminalD
+setmulticastname 'screen3'
+sendmulticast 'screen2' 'violin' 13 10     ; Multicast transmission
+; Do not receive any strings.
+</pre>
+
+</body>
+</html>

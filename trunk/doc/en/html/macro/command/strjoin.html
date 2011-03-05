@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strjoin</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strjoin</h1>
+
+<p>
+Concatenates a string with delimiters.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strjoin &lt;strvar&gt; &lt;separator&gt; [&lt;count&gt;]
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Concatenates a specified separator string variable &lt;strvar&gt; between each element of the 9 system variables from "groupmatchstr1" to "groupmatchstr9", yielding a single concatenated string.
+</p>
+
+<p>
+&lt;separator&gt; is specified delimiter characters.
+</p>
+
+<p>
+The &lt;count&gt; is specified the maximum number of substrings to concatenate.<br />
+When the &lt;count&gt; is left out, the default value is 9.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7="Jul"
+groupmatchstr8="Aug"
+groupmatchstr9="Sep"
+strjoin strvar ","
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep'
+
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7="Jul"
+groupmatchstr8="Aug"
+groupmatchstr9="Sep"
+strjoin strvar " and " 6
+messagebox strvar "strvar"   ; 'Jan and Feb and Mar and Apr and May and Jun'
+
+groupmatchstr1="Jan"
+groupmatchstr2="Feb"
+groupmatchstr3="Mar"
+groupmatchstr4="Apr"
+groupmatchstr5="May"
+groupmatchstr6="Jun"
+groupmatchstr7=""
+groupmatchstr8=""
+groupmatchstr9=""
+strjoin strvar "," 9
+messagebox strvar "strvar"   ; 'Jan,Feb,Mar,Apr,May,Jun,,,'
+</pre>
+
+<h2>Reference</h2>
+
+<a href="strsplit.html">strsplit</a><br>
+
+</body>
+</html>

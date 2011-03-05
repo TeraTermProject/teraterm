@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>changedir</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>changedir</h1>
+
+<p>
+Tera Term の現在のディレクトリを変更する。
+</p>
+
+<pre class="macro-syntax">
+changedir &lt;path&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+Tera Term の現在のディレクトリを &lt;path&gt; に変更する。
+</p>
+
+<p>
+<strong>注意:</strong> <a href="setdir.html">setdir</a> コマンドは MACRO の現在のディレクトリを変更する。通信コマンド(kmtsend 等)で指定されるファイル名は Tera Term の現在のディレクトリを基準にする。その他のコマンド(fileopen 等)で指定されるファイル名は MACRO の現在のディレクトリを基準にする。
+</p>
+
+<p>
+<strong>補足:</strong> 通信コマンド（sendfile, kmtsend等）に指定されるファイル名は、changedirコマンドの影響を受けないため、絶対パスである必要がある。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+changedir 'c:\'
+sendfile 'd:\source\code.dat' 1
+</pre>
+
+</body>
+</html>

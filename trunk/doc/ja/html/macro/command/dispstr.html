@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>dispstr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>dispstr</h1>
+
+<p>
+文字を端末画面に出力する。
+</p>
+
+<pre class="macro-syntax">
+dispstr &lt;data1&gt; [&lt;data2&gt;....]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;data&gt; が文字列型の場合、文字列をそのまま端末画面に表示する。<br>
+&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとして扱い、対応する文字を端末画面に表示する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+dispstr 'ABC'
+
+; "ABC" を表示する。("A" の ASCII コードは65)
+dispstr  65 66 67
+myname='Tera Term'
+dispstr 'My name is ' myname '.'
+
+; 端末画面の表示内容をクリアする
+dispstr #$1B"[2J"
+
+; 端末画面の10行20桁目に Message と表示する
+dispstr #$1B"[10;20HMessage"
+
+; 端末画面を 100,200 に移動する
+dispstr #$1B"[3;100;200t"
+</pre>
+
+<pre class="macro-example">
+; Change terminal size to 80x24
+dispstr #$1b"[8;24;80t"
+ 
+; demo
+for y 24 30
+  x = 80
+  while x < 100
+    sprintf #$1b"[8;%d;%dt" y x
+    dispstr inputstr
+    x = x + 5
+    pause 1
+  endwhile
+next 
+</pre>
+
+<h2>注意</h2>
+
+<p>
+当該コマンドの出力内容はホスト側からは認識できない。そのため、当該コマンドを使用すると、端末画面の表示状態がホスト側とずれてしまい、端末画面の表示が崩れる可能性がある。
+</p>
+
+</body>
+</html>

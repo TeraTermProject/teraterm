@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Communication (Tera Term setup file)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="maxport">Maximum serial port number</a></h1>
+
+<p>
+You can specify the maximum serial port number (maximum value of n for COMn) to be listed in the [File] New connection and [Setup] Serial port dialog boxes. To specify the maximum number, edit the MaxComPort line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+MaxComPort=&lt;maximum serial port number&gt;
+</pre>
+
+<p>
+The maximum serial port number can not be less than 4 even if the actual maximum number is less than 4.
+</p>
+
+<pre>
+Default:
+MaxComPort=4
+</pre>
+
+
+<h1><a name="clearcom">Don't clear COM buffer when serial port opening.</a></h1>
+
+<p>
+In the default setup, Tera Term cleaning COM buffer when serial port opening.
+</p>
+
+<p>
+To disable COM buffer cleaning, edit the ClearComBuffOnOpen line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ClearComBuffOnOpen=off
+</pre>
+
+<pre>
+Default:
+ClearComBuffOnOpen=on
+</pre>
+
+
+<h1><a name="confirm">Disabling the warning on TCP/IP disconnection</a></h1>
+
+<p>
+In the default setup, Tera Term displays the warning message "Disconnect ?" when you try to close the TCP/IP connection by using the "Close" command in  the system menu (or by double clicking the icon at upper left corner of the window).
+</p>
+
+<p>
+To disable this warning message, edit the ConfirmDisconnect line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+ConfirmDisconnect=off
+</pre>
+
+<pre>
+Default:
+ConfirmDisconnect=on
+</pre>
+
+
+<h1><a name="telbin">Telnet binary option</a></h1>
+
+<p>
+To enable the telnet binary option, edit the TelBin line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TelBin=on
+</pre>
+
+<p>
+You can also specify the binary option on the <a href="../commandline/teraterm.html">command line</a> (/B option).
+</p>
+
+<pre>
+Default:
+TelBin=off
+</pre>
+
+
+<h1><a name="telecho">Telnet echo option</a></h1>
+
+<p>
+If you edit the TelEcho line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TelEcho=on
+</pre>
+
+<p>
+Tera Term tries to change the host's echoing (remote echoing) status, depending on the status of "Local echo" option in the [Setup] Terminal dialog box. If "Local echo" is (not) checked, Tera Term tries to make the remote echoing off (on), to avoid double echoing or no echoing at the remote host and Tera Term. Note that this mechanism does not work for hosts which do not support the telnet echo option.
+</p>
+
+<pre>
+Default:
+TelEcho=off
+</pre>
+
+
+<h1><a name="tellog">Telnet log</a></h1>
+
+<p>
+To log option-negotiation data of a telnet session to the file TELNET.LOG, edit the TelLog line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TelLog=on
+</pre>
+
+<pre>
+Default:
+TelLog=off
+</pre>
+
+
+<h1><a name="port/nontelnet">Telnet port number / Terminal setup for non-telnet connection</a></h1>
+
+<h2><a name="port">Telnet port number</a></h2>
+
+<p>
+On the <a href="../commandline/teraterm.html">command line</a>, or on the <a href="../menu/file-new.html">[File] New connection</a> dialog box, you can specify the TCP port number (&lt;TCP port#&gt;) and telnet flag (&lt;telnet flag&gt;) for a TCP/IP connection. If these parameters are omitted in the command line, the default values are taken from the Tera Term setup file.
+</p>
+
+<p>
+Only if &lt;telnet flag&gt; is 1 (on) and &lt;TCP port#&gt; is 23, Tera Term starts spontaneously sending telnet commands to the host for the option negotiation when the TCP/IP connection is established.
+</p>
+
+<p>
+This particular port number for telnet, 23, can be changed by editing the TelPort line in the [Tera Term] section of setup file like the following:
+</p>
+
+<pre>
+TelPort=&lt;telnet port#&gt;
+</pre>
+
+<pre>
+Default:
+TelPort=23
+</pre>
+
+<p>
+Whatever &lt;TCP port#&gt; is and whatever &lt;telnet flag&gt; is, Tera Term can respond to telnet commands sent by the host. (except <a href="#detecttelnet">TelAutoDetect</a> setting is off.)
+</p>
+
+<h2><a name="nontelnet">Terminal setup for non-telnet TCP/IP connection</a></h2>
+
+<p>
+For a non-telnet TCP/IP connection (usually with a port other than 23), you may need to set the "local echo" option on, and the "new-line (transmit)" option to CR+LF. If you edit the TCPLocalEcho and TCPCRSend lines in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TCPLocalEcho=on
+TCPCRSend=CRLF    (CR is also acceptable)
+</pre>
+
+<p>
+the "local echo" option is turned on and the "new-line (transmit)" option is set to CRLF automatically when the connection is establised on condition that &lt;telnet flag&gt; is 0 (off), or &lt;TCP port#&gt; is not equal to &lt;telnet port#&gt;. Otherwise, setup values specified by [Setup] Terminal are used. By using these options, one setup file can support both the telnet connection and non-telnet connection.
+</p>
+
+<pre>
+Default:
+TCPLocalEcho=off
+; (This option is disabled and the "local echo" option
+; in the [Setup] Terminal dialog box is always used.)
+TCPCRSend=
+; (This option is disabled and the "new-line (transmit)" option
+; in the [Setup] Terminal dialog box is always used.)
+</pre>
+
+
+<h1><a name="detecttelnet">Disable Auto-Detect mode of Telnet command</a></h1>
+
+<p>
+Tera Term will detect a command of Telnet sent from host even a connection is in non-Telnet mode.Once it detects a command, a connection is treated as if in Telnet mode.<br>
+However, there is a possible problem that a connection is forced to Telnet mode when a character of '0xFF' is sent from Tera Term, it will be echoed back and is recognized as Telnet command.
+</p>
+
+<p>
+This problem can be avoided by changing TelAutoDetect in [Tera Term] section of configuration file as follows,
+</p>
+
+<pre>
+TelAutoDetect=off
+</pre>
+
+<pre>
+Default:
+TelAutoDetect=on
+</pre>
+
+
+<h1><a name="linemode">Disabling "Line at a time" mode</a></h1>
+
+<p>
+Tera Term now supports for "Line at a time" mode from version 4.63.<br>
+Since the default value of this setting is on, when it is used in TCP/IP connection, input characters are not sent until the line feed is inputed.
+But, this setting is disabled (forced to "Character at a time" mode) when following situations:
+</p>
+
+<ul>
+  <li>ssh connection</li>
+  <li>when a server becomes echo-back mode (received WILL ECHO) in telnet negotiation</li>
+  <li>SGA request (WILL SGA) of Tera Term is accepted (received DO SGA) in telnet negotiation</li>
+</ul>
+
+<p>
+In any connection mode other than telnet and SSH, the above condition is not met and therefore, "Line at a time" mode is enabled.<br>
+To send the key input immediately, edit the EnableLineMode line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+EnableLineMode=off
+</pre>
+
+<pre>
+Default:
+EnableLineMode=on
+</pre>
+
+
+</BODY>
+</HTML>

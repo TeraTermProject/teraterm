@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>fileopen</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>fileopen</h1>
+
+<p>
+ファイルを開く。
+</p>
+
+<pre class="macro-syntax">
+fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+ファイル &lt;filename&gt; を開く。<br>
+ファイルが存在しない場合は、新たに作成されてからオープンされる。もしファイルが正しくオープンされた場合、ファイルハンドルが整数変数 &lt;file handle&gt; に格納される。それ以外の場合、&lt;file handle&gt; に-1が格納される。<br>
+&lt;append flag&gt; が0の場合、ファイルポインタの位置はファイルの始めにセットされる。&lt;append flag&gt; が0以外の場合、ファイルポインタはファイルの最後にセットされる。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+fileopen fhandle 'data.dat' 0
+fileopen fhandle 'data.dat' 1
+</pre>
+
+<pre class="macro-example">
+fileopen fhandle 'test.bat' 0
+filewrite fhandle 'md .\v20080619_Test'
+fileclose fhandle
+pause 5
+exec 'cmd /c test.bat'
+pause 10
+end
+</pre>
+
+</body>
+</html>

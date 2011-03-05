@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>マクロ実行法</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEA>
+<BODY>
+
+<h1>マクロ実行法</h1>
+
+<p>
+TTPMACRO.EXE は TTERMPRO.EXE があるディレクトリに置かれていなければなりません。<br>
+マクロファイルを実行するには、2通りの方法があります。
+</p>
+
+<h2>1) Tera Term からマクロを実行する。</h2>
+
+<p>
+Tera Term の [Control] Macro コマンドを実行してください。すると、MACRO が起動し、マクロファイル (*.TTL) を選択するダイアログボックスが現れるので、実行したいマクロファイルを選択してください。
+</p>
+
+<h2>2) MACRO を直接起動し、マクロを実行する。 (Tera Term はマクロから起動。)</h2>
+
+<p>
+TTPMACRO.EXE を起動するときのコマンドライン(ショートカットのリンク先)でマクロファイル名を指定することができます。例えばマクロファイル "DIALUP.TTL" を実行したい場合、コマンドライン(ショートカットのリンク先)は、
+</p>
+
+<pre>
+TTPMACRO DIALUP.TTL
+</pre>
+
+<p>
+と指定してください。マクロファイル名の拡張子 ".TTL" は省略可能です。マクロファイル名を省略すると、MACRO起動後にマクロファイルを選択するダイアログボックスが現れます。よく使用するマクロは、アイコン(ショートカット)を作成しておくと便利です。
+</p>
+
+<p>
+方法 2) で、MACRO を起動した場合、マクロコマンド<A HREF="command/connect.html">connect</A>によって、Tera Term を起動することができます。
+</p>
+
+<p>
+マクロ実行中は、「MACRO - &lt;マクロファイル名&gt;」というアイコンまたはダイアログボックスがあらわれます。ダイアログボックスの「Pause」/「Start」/「End] ボタンを押すとマクロを停止/再開/終了することができます。
+</p>
+
+
+<h2>注: ウインドウを表示しないで実行する</h2>
+
+<p>
+ウインドウを表示しないで実行するには、TTERMPRO.EXE および TTPMACRO.EXE ともに "/V" コマンドラインオプションを指定して起動します。<br>
+マクロの connect コマンドを用いて TTERMPRO.EXE が起動される場合は、connect コマンドの引数に "/V" を追加する必要があります。<br>
+タスクなどを用い、ログインしていない状態で実行するにはこのオプションが必要です。
+</p>
+
+
+</BODY>
+</HTML>

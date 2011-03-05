@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>sendbreak</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendbreak</h1>
+
+<p>
+ブレーク信号をホストへ送出する。
+</p>
+
+<pre class="macro-syntax">
+sendbreak
+</pre>
+
+<h2>解説</h2>
+
+<p>
+シリアルコンソールでは、ホスト側にブレーク割り込み(Break interrupt indicator)を発生させる。TELNETでは、IAC BREAK(255 243)を送信する。SSH2では、SSH2_MSG_CHANNEL_REQUEST("break")を送信する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; Magic SysRq(Linux) のヘルプを呼び出す
+sendbreak
+send 'h'
+</pre>
+
+</body>
+</html>

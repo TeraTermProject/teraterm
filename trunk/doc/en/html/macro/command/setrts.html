@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>setrts</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setrts</h1>
+
+<p>
+Changes the RTS status of Tera Term.
+</p>
+
+<pre class="macro-syntax">
+setrts &lt;flag&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+If the connection is not serial connection or flow control is not "none", this command will do nothing.
+</p>
+
+<p>
+If &lt;echo flag&gt; is zero, the RTS is turned off.<br>
+If &lt;echo flag&gt; is non-zero, the RTS is turned on.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; RTS on
+setrts 1
+
+; RTS off
+setrts 0
+</pre>
+
+</body>
+</html>

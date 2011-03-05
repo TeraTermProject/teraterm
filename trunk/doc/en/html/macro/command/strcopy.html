@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strcopy</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strcopy</h1>
+
+<p>
+Copies a string.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+strcopy &lt;string&gt; &lt;pos&gt; &lt;len&gt; &lt;strvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Copies a substring of &lt;string&gt; to the string variable &lt;strvar&gt;.
+The substring begings at the &lt;pos&gt;th character in &lt;string&gt;, and its length is &lt;len&gt;.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strcopy 'tera term' 6 4 substr
+; substr='term'
+</pre>
+
+</body>
+</html>
