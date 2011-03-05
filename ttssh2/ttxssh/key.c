@@ -702,20 +702,15 @@ void key_free(Key *key)
 //
 char *get_sshname_from_keytype(enum ssh_keytype type)
 {
-	if (type == KEY_RSA) {
-		return "ssh-rsa";
-	} else if (type == KEY_DSA) {
-		return "ssh-dss";
-	} else if (type == KEY_ECDSA256) {
-		return "ecdsa-sha2-nistp256";
-	} else if (type == KEY_ECDSA384) {
-		return "ecdsa-sha2-nistp384";
-	} else if (type == KEY_ECDSA521) {
-		return "ecdsa-sha2-nistp521";
-	} else {
-		return "ssh-unknown";
+	int i;
+
+	for (i = 0 ; ssh2_host_key[i].name ; i++) {
+		if (type == ssh2_host_key[i].type)
+			return ssh2_host_key[i].name;
 	}
+	return "ssh-unknown";
 }
+
 char *get_sshname_from_key(Key *key)
 {
 	return get_sshname_from_keytype(key->type);

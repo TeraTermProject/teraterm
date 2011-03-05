@@ -198,6 +198,7 @@ enum channel_type {
 #define SSH2_OPEN_RESOURCE_SHORTAGE              4
 
 enum ssh_keytype {
+	KEY_NONE,
 	KEY_RSA1,
 	KEY_RSA,
 	KEY_DSA,
@@ -205,6 +206,23 @@ enum ssh_keytype {
 	KEY_ECDSA384,
 	KEY_ECDSA521,
 	KEY_UNSPEC,
+	KEY_MAX = KEY_UNSPEC,
+};
+
+typedef struct ssh2_host_key {
+	enum ssh_keytype type;
+	char *name;
+} ssh2_host_key_t;
+
+static ssh2_host_key_t ssh2_host_key[] = {
+	{KEY_NONE, "none"},
+	{KEY_RSA1, "ssh-rsa1"},  // for SSH1 only
+	{KEY_RSA, "ssh-rsa"},
+	{KEY_DSA, "ssh-dss"},
+	{KEY_ECDSA256, "ecdsa-sha2-nistp256"},
+	{KEY_ECDSA384, "ecdsa-sha2-nistp384"},
+	{KEY_ECDSA521, "ecdsa-sha2-nistp521"},
+	{KEY_UNSPEC, "ssh-unknown"},
 };
 
 #define KEX_DEFAULT_KEX     "ecdh-sha2-nistp256," \
@@ -314,6 +332,7 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 
 // 下記のインデックスは ssh2_kex_algorithms[] と合わせること。
 enum kex_algorithm {
+	KEX_DH_NONE,       /* disabled line */
 	KEX_DH_GRP1_SHA1,
 	KEX_DH_GRP14_SHA1,
 	KEX_DH_GEX_SHA1,
@@ -322,6 +341,7 @@ enum kex_algorithm {
 	KEX_ECDH_SHA2_384,
 	KEX_ECDH_SHA2_521,
 	KEX_DH_UNKNOWN,
+	KEX_DH_MAX = KEX_DH_UNKNOWN,
 };
 
 typedef struct ssh2_kex_algorithm {
@@ -331,6 +351,7 @@ typedef struct ssh2_kex_algorithm {
 } ssh2_kex_algorithm_t;
 
 static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
+	{KEX_DH_NONE      , "none",                                 NULL},
 	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},
 	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},
 	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},
@@ -344,9 +365,11 @@ static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 
 // 下記のインデックスは ssh2_macs[] と合わせること。
 enum hmac_type {
+	HMAC_NONE,
 	HMAC_SHA1,
 	HMAC_MD5,
-	HMAC_UNKNOWN
+	HMAC_UNKNOWN,
+	HMAC_MAX = HMAC_UNKNOWN,
 };
 
 typedef struct ssh2_mac {
@@ -357,6 +380,7 @@ typedef struct ssh2_mac {
 } ssh2_mac_t;
 
 static ssh2_mac_t ssh2_macs[] = {
+	{HMAC_NONE,    "none",      NULL,     0},
 	{HMAC_SHA1,    "hmac-sha1", EVP_sha1, 0},
 	{HMAC_MD5,     "hmac-md5",  EVP_md5,  0},
 	{HMAC_UNKNOWN, NULL,        NULL,     0},
@@ -368,7 +392,8 @@ enum compression_type {
 	COMP_NONE,
 	COMP_ZLIB,
 	COMP_DELAYED,
-	COMP_UNKNOWN
+	COMP_UNKNOWN,
+	COMP_MAX = COMP_UNKNOWN,
 };
 
 typedef struct ssh_comp {
@@ -594,6 +619,9 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar);
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar);
 void SSH2_update_compression_myproposal(PTInstVar pvar);
 void SSH2_update_cipher_myproposal(PTInstVar pvar);
+void SSH2_update_kex_myproposal(PTInstVar pvar);
+void SSH2_update_host_key_myproposal(PTInstVar pvar);
+void SSH2_update_hmac_myproposal(PTInstVar pvar);
 int SSH_notify_break_signal(PTInstVar pvar);
 
 #endif

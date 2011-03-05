@@ -253,6 +253,96 @@ static void normalize_cipher_order(char FAR * buf)
 	buf[i] = 0;
 }
 
+static void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
+{
+	char listed[KEX_DH_MAX + 1];
+	char allowed[KEX_DH_MAX + 1];
+	int i, j;
+
+	memset(listed, 0, sizeof(listed));
+	memset(allowed, 0, sizeof(allowed));
+	for (i = 0; i < default_strings_len ; i++) {
+		allowed[default_strings[i]] = 1;
+	}
+
+	for (i = 0; buf[i] != 0; i++) {
+		int num = buf[i] - '0';
+
+		if (num < 0 || num > default_strings_len
+			|| !allowed[num]
+			|| listed[num]) {
+			memmove(buf + i, buf + i + 1, strlen(buf + i + 1) + 1);
+			i--;
+		} else {
+			listed[num] = 1;
+		}
+	}
+
+	for (j = 0; j < default_strings_len ; j++) {
+		int num = default_strings[j];
+
+		if (!listed[num]) {
+			buf[i] = num + '0';
+			i++;
+		}
+	}
+
+	buf[i] = 0;
+}
+
+static void normalize_kex_order(char FAR * buf)
+{
+	static char default_strings[] = {
+		KEX_ECDH_SHA2_256,
+		KEX_ECDH_SHA2_384,
+		KEX_ECDH_SHA2_521,
+		KEX_DH_GEX_SHA256,
+		KEX_DH_GEX_SHA1,
+		KEX_DH_GRP14_SHA1,
+		KEX_DH_GRP1_SHA1,
+		KEX_DH_NONE,
+	};
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
+}
+
+static void normalize_host_key_order(char FAR * buf)
+{
+	static char default_strings[] = {
+		KEY_ECDSA256,
+		KEY_ECDSA384,
+		KEY_ECDSA521,
+		KEY_RSA,
+		KEY_DSA,
+		KEY_NONE,
+	};
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
+}
+
+static void normalize_mac_order(char FAR * buf)
+{
+	static char default_strings[] = {
+		HMAC_SHA1,
+		HMAC_MD5,
+		HMAC_NONE,
+	};
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
+}
+
+static void normalize_comp_order(char FAR * buf)
+{
+	static char default_strings[] = {
+		COMP_NONE,
+		COMP_ZLIB,
+		COMP_DELAYED,
+	};
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
+}
+
+
 /* Remove local settings from the shared memory block. */
 static void clear_local_settings(PTInstVar pvar)
 {
@@ -309,6 +399,19 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 
 	READ_STD_STRING_OPTION(CipherOrder);
 	normalize_cipher_order(settings->CipherOrder);
+
+	// KEX order
+	READ_STD_STRING_OPTION(KexOrder);
+	normalize_kex_order(settings->KexOrder);
+	// Host Key algorithm order
+	READ_STD_STRING_OPTION(HostKeyOrder);
+	normalize_host_key_order(settings->HostKeyOrder);
+	// H-MAC order
+	READ_STD_STRING_OPTION(MacOrder);
+	normalize_mac_order(settings->MacOrder);
+	// Compression algorithm order
+	READ_STD_STRING_OPTION(CompOrder);
+	normalize_comp_order(settings->CompOrder);
 
 	read_string_option(fileName, "KnownHostsFiles", "ssh_known_hosts",
 	                   settings->KnownHostsFiles,
@@ -391,6 +494,18 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	WritePrivateProfileString("TTSSH", "CipherOrder",
 	                          settings->CipherOrder, fileName);
+
+	WritePrivateProfileString("TTSSH", "KexOrder",
+	                          settings->KexOrder, fileName);
+
+	WritePrivateProfileString("TTSSH", "HostKeyOrder",
+	                          settings->HostKeyOrder, fileName);
+
+	WritePrivateProfileString("TTSSH", "MacOrder",
+	                          settings->MacOrder, fileName);
+
+	WritePrivateProfileString("TTSSH", "CompOrder",
+	                          settings->CompOrder, fileName);
 
 	WritePrivateProfileString("TTSSH", "KnownHostsFiles",
 	                          settings->KnownHostsFiles, fileName);
@@ -825,6 +940,9 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks)
 
 		// ê›íËÇ myproposal Ç…îΩâfÇ∑ÇÈÇÃÇÕÅAê⁄ë±íºëOÇÃÇ±Ç±ÇæÇØÅB (2006.6.26 maya)
 		SSH2_update_cipher_myproposal(pvar);
+		SSH2_update_kex_myproposal(pvar);
+		SSH2_update_host_key_myproposal(pvar);
+		SSH2_update_hmac_myproposal(pvar);
 		SSH2_update_compression_myproposal(pvar);
 	}
 }

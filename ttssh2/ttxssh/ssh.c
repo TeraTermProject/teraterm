@@ -4169,6 +4169,8 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 void SSH2_update_compression_myproposal(PTInstVar pvar)
 {
 	static char buf[128]; // TODO: malloc()にすべき
+	int index;
+	int len, i;
 
 	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
 	if (pvar->socket != INVALID_SOCKET) {
@@ -4177,11 +4179,22 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 
 	// 圧縮レベルに応じて、myproposal[]を書き換える。(2005.7.9 yutaka)
 	buf[0] = '\0';
-	if (pvar->settings.CompressionLevel > 0) {
-		// 将来的に圧縮アルゴリズムの優先度をユーザが変えられるようにする。
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "zlib@openssh.com,zlib,none");
+	for (i = 0 ; pvar->settings.CompOrder[i] != 0 ; i++) {
+		index = pvar->settings.CompOrder[i] - '0';
+		if (index == COMP_NONE) // disabled line
+			break;
+		strncat_s(buf, sizeof(buf), ssh_comps[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
-	else {
+	len = strlen(buf);
+	buf[len - 1] = '\0';  // get rid of comma
+
+	// 圧縮指定がない場合は、圧縮レベルを無条件にゼロにする。
+	if (buf[0] == '\0') {
+		pvar->settings.CompressionLevel = 0;
+	}
+
+	if (pvar->settings.CompressionLevel == 0) {
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, KEX_DEFAULT_COMP);
 	}
 	if (buf[0] != '\0') {
@@ -4190,6 +4203,84 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 	}
 }
 
+// KEXアルゴリズム優先順位に応じて、myproposal[]を書き換える。
+// (2011.2.28 yutaka)
+void SSH2_update_kex_myproposal(PTInstVar pvar)
+{
+	static char buf[256]; // TODO: malloc()にすべき
+	int index;
+	int len, i;
+
+	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
+	if (pvar->socket != INVALID_SOCKET) {
+		return;
+	}
+
+	buf[0] = '\0';
+	for (i = 0 ; pvar->settings.KexOrder[i] != 0 ; i++) {
+		index = pvar->settings.KexOrder[i] - '0';
+		if (index == KEX_DH_NONE) // disabled line
+			break;
+		strncat_s(buf, sizeof(buf), ssh2_kex_algorithms[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
+	}
+	len = strlen(buf);
+	buf[len - 1] = '\0';  // get rid of comma
+	myproposal[PROPOSAL_KEX_ALGS] = buf; 
+}
+
+// Host Keyアルゴリズム優先順位に応じて、myproposal[]を書き換える。
+// (2011.2.28 yutaka)
+void SSH2_update_host_key_myproposal(PTInstVar pvar)
+{
+	static char buf[256]; // TODO: malloc()にすべき
+	int index;
+	int len, i;
+
+	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
+	if (pvar->socket != INVALID_SOCKET) {
+		return;
+	}
+
+	buf[0] = '\0';
+	for (i = 0 ; pvar->settings.HostKeyOrder[i] != 0 ; i++) {
+		index = pvar->settings.HostKeyOrder[i] - '0';
+		if (index == KEY_NONE) // disabled line
+			break;
+		strncat_s(buf, sizeof(buf), ssh2_host_key[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
+	}
+	len = strlen(buf);
+	buf[len - 1] = '\0';  // get rid of comma
+	myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = buf; 
+}
+
+// H-MACアルゴリズム優先順位に応じて、myproposal[]を書き換える。
+// (2011.2.28 yutaka)
+void SSH2_update_hmac_myproposal(PTInstVar pvar)
+{
+	static char buf[256]; // TODO: malloc()にすべき
+	int index;
+	int len, i;
+
+	// 通信中には呼ばれないはずだが、念のため。(2006.6.26 maya)
+	if (pvar->socket != INVALID_SOCKET) {
+		return;
+	}
+
+	buf[0] = '\0';
+	for (i = 0 ; pvar->settings.MacOrder[i] != 0 ; i++) {
+		index = pvar->settings.MacOrder[i] - '0';
+		if (index == HMAC_NONE) // disabled line
+			break;
+		strncat_s(buf, sizeof(buf), ssh2_macs[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
+	}
+	len = strlen(buf);
+	buf[len - 1] = '\0';  // get rid of comma
+	myproposal[PROPOSAL_MAC_ALGS_CTOS] = buf; 
+	myproposal[PROPOSAL_MAC_ALGS_STOC] = buf; 
+}
 
 // クライアントからサーバへのキー交換開始要求
 void SSH2_send_kexinit(PTInstVar pvar)

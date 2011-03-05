@@ -139,6 +139,12 @@ typedef struct _TS_SSH {
 
 	// Confirm Agent forwarding
 	BOOL ForwardAgentConfirm;
+
+	// KEX order(derived from teraterm.ini)
+	char KexOrder[KEX_DH_MAX+1];
+	char HostKeyOrder[KEY_MAX+1];
+	char MacOrder[HMAC_MAX+1];
+	char CompOrder[COMP_MAX+1];
 } TS_SSH;
 
 typedef struct _TInstVar {
