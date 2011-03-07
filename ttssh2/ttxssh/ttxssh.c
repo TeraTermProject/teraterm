@@ -334,9 +334,9 @@ static void normalize_mac_order(char FAR * buf)
 static void normalize_comp_order(char FAR * buf)
 {
 	static char default_strings[] = {
-		COMP_NONE,
-		COMP_ZLIB,
 		COMP_DELAYED,
+		COMP_ZLIB,
+		COMP_NONE,
 	};
 
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
