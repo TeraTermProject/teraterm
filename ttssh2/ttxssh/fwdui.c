@@ -1337,6 +1337,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	PTInstVar pvar;
 	LOGFONT logfont;
 	HFONT font;
+	BOOL ret;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1370,11 +1371,13 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK:
 
-			if (DlgFwdFont != NULL) {
+			ret = end_fwd_dlg(pvar, dlg);
+
+			if (ret == TRUE && DlgFwdFont != NULL) {
 				DeleteObject(DlgFwdFont);
 			}
 
-			return end_fwd_dlg(pvar, dlg);
+			return ret;
 
 		case IDCANCEL:
 			free_all_listbox_specs(dlg);
