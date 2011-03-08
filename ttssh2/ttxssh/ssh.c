@@ -4195,7 +4195,7 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 	}
 
 	if (pvar->settings.CompressionLevel == 0) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, KEX_DEFAULT_COMP);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ssh_comps[COMP_NONE].name);
 	}
 	if (buf[0] != '\0') {
 		myproposal[PROPOSAL_COMP_ALGS_CTOS] = buf;  // Client To Server
