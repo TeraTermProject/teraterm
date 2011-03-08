@@ -787,7 +787,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 			/* 最下行でだけ自動スクロールする設定の場合
 			   ペースト処理でスクロールさせる */
-			if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
+			if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && WinOrgY != 0) {
 				DispVScroll(SCROLL_BOTTOM, 0);
 			}
 		}
@@ -797,7 +797,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 			/* 最下行でだけ自動スクロールする設定の場合
 			   ペースト処理でスクロールさせる */
-			if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
+			if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && WinOrgY != 0) {
 				DispVScroll(SCROLL_BOTTOM, 0);
 			}
 		}
@@ -1707,7 +1707,7 @@ void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	/* 最下行でだけ自動スクロールする設定の場合
 	   リモートへのキー入力送信でスクロールさせる */
-	if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
+	if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && WinOrgY != 0) {
 		DispVScroll(SCROLL_BOTTOM, 0);
 	}
 }
@@ -2004,7 +2004,7 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	case KEYDOWN_COMMOUT:
 		/* 最下行でだけ自動スクロールする設定の場合
 		   リモートへのキー入力送信でスクロールさせる */
-		if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
+		if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
 		}
 		return;
@@ -3975,7 +3975,7 @@ void CVTWindow::OnEditPaste()
 		CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
 		/* 最下行でだけ自動スクロールする設定の場合
 		   ペースト処理でスクロールさせる */
-		if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
+		if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
 		}
 	}
@@ -3988,7 +3988,7 @@ void CVTWindow::OnEditPasteCR()
 		CBStartPaste(HVTWin, TRUE, BracketedPasteMode(), 0, NULL, 0);
 		/* 最下行でだけ自動スクロールする設定の場合
 		   ペースト処理でスクロールさせる */
-		if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
+		if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
 		}
 	}
