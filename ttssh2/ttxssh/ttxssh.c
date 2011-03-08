@@ -3606,6 +3606,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
 	static enum ssh_keytype key_type;
+	static int saved_key_bits;
 	char uimsg[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
@@ -3670,6 +3671,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		// default key type
 		SendMessage(GetDlgItem(dlg, IDC_RSA_TYPE), BM_SETCHECK, BST_CHECKED, 0);
 		key_type = KEY_RSA;
+		saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 
 		// default key bits
 		SetDlgItemInt(dlg, IDC_KEYBITS, SSH_KEYGEN_DEFAULT_BITS, FALSE);
@@ -3766,7 +3768,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), TRUE);
-				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
+				if (!isECDSAkey(key_type)) {
+					EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
+				}
 				EnableWindow(GetDlgItem(dlg, IDOK), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDCANCEL), TRUE);
 
@@ -3787,28 +3791,52 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 
 		// if radio button pressed...
 		case IDC_RSA1_TYPE | (BN_CLICKED << 16):
+			if (isECDSAkey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
+				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
+			}
 			key_type = KEY_RSA1;
 			break;
 
 		case IDC_RSA_TYPE | (BN_CLICKED << 16):
+			if (isECDSAkey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
+				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
+			}
 			key_type = KEY_RSA;
 			break;
 
 		case IDC_DSA_TYPE | (BN_CLICKED << 16):
+			if (isECDSAkey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
+				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
+			}
 			key_type = KEY_DSA;
 			break;
 
 		case IDC_ECDSA256_TYPE | (BN_CLICKED << 16):
+			if (!isECDSAkey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
+				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+			}
 			key_type = KEY_ECDSA256;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
 			break;
 
 		case IDC_ECDSA384_TYPE | (BN_CLICKED << 16):
+			if (!isECDSAkey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
+				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+			}
 			key_type = KEY_ECDSA384;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 384, FALSE);
 			break;
 
 		case IDC_ECDSA521_TYPE | (BN_CLICKED << 16):
+			if (!isECDSAkey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
+				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+			}
 			key_type = KEY_ECDSA521;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
 			break;

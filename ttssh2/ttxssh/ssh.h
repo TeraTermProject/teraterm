@@ -208,6 +208,7 @@ enum ssh_keytype {
 	KEY_UNSPEC,
 	KEY_MAX = KEY_UNSPEC,
 };
+#define isECDSAkey(type)	((type) >= KEY_ECDSA256 && (type) <= KEY_ECDSA521)
 
 typedef struct ssh2_host_key {
 	enum ssh_keytype type;
