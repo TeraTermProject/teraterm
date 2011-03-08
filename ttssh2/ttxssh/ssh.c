@@ -4042,22 +4042,110 @@ const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher)
 	return type;
 }
 
-#if 0
-static int get_mac_index(char *name)
+char* get_kex_algorithm_name(kex_algorithm kextype)
 {
-	ssh2_mac_t *ptr = ssh2_macs;
-	int val = -1;
+	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
+	static char buf[64];
 
 	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, name) == 0) {
-			val = ptr - ssh2_macs;
+		if (kextype == ptr->kextype) {
+			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
 			break;
 		}
 		ptr++;
 	}
-	return (val);
+	return buf;
 }
-#endif
+
+const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
+{
+	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
+	const EVP_MD *evp_md;
+
+	while (ptr->name != NULL) {
+		if (kextype == ptr->kextype) {
+			evp_md = ptr->evp_md();
+			break;
+		}
+		ptr++;
+	}
+	return evp_md;
+}
+
+char* get_ssh2_mac_name(hmac_type type)
+{
+	ssh2_mac_t *ptr = ssh2_macs;
+	static char buf[64];
+
+	while (ptr->name != NULL) {
+		if (type == ptr->type) {
+			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			break;
+		}
+		ptr++;
+	}
+	return buf;
+}
+
+const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type)
+{
+	ssh2_mac_t *ptr = ssh2_macs;
+	const EVP_MD *evp_md;
+
+	while (ptr->name != NULL) {
+		if (type == ptr->type) {
+			evp_md = ptr->evp_md();
+			break;
+		}
+		ptr++;
+	}
+	return evp_md;
+}
+
+int get_ssh2_mac_truncatebits(hmac_type type)
+{
+	ssh2_mac_t *ptr = ssh2_macs;
+	int bits;
+
+	while (ptr->name != NULL) {
+		if (type == ptr->type) {
+			bits = ptr->truncatebits;
+			break;
+		}
+		ptr++;
+	}
+	return bits;
+}
+
+char* get_ssh2_comp_name(compression_type type)
+{
+	ssh2_comp_t *ptr = ssh2_comps;
+	static char buf[32];
+
+	while (ptr->name != NULL) {
+		if (type == ptr->type) {
+			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			break;
+		}
+		ptr++;
+	}
+	return buf;
+}
+
+char* get_ssh_keytype_name(ssh_keytype type)
+{
+	ssh2_host_key_t *ptr = ssh2_host_key;
+	static char buf[32];
+
+	while (ptr->name != NULL) {
+		if (type == ptr->type) {
+			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			break;
+		}
+		ptr++;
+	}
+	return buf;
+}
 
 
 static void do_write_buffer_file(void *buf, int len, char *file, int lineno)
@@ -4183,7 +4271,7 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 		index = pvar->settings.CompOrder[i] - '0';
 		if (index == COMP_NONE) // disabled line
 			break;
-		strncat_s(buf, sizeof(buf), ssh_comps[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), get_ssh2_comp_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
@@ -4195,7 +4283,7 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 	}
 
 	if (pvar->settings.CompressionLevel == 0) {
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ssh_comps[COMP_NONE].name);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, get_ssh2_comp_name(COMP_NOCOMP));
 	}
 	if (buf[0] != '\0') {
 		myproposal[PROPOSAL_COMP_ALGS_CTOS] = buf;  // Client To Server
@@ -4221,7 +4309,7 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 		index = pvar->settings.KexOrder[i] - '0';
 		if (index == KEX_DH_NONE) // disabled line
 			break;
-		strncat_s(buf, sizeof(buf), ssh2_kex_algorithms[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), get_kex_algorithm_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
@@ -4247,7 +4335,7 @@ void SSH2_update_host_key_myproposal(PTInstVar pvar)
 		index = pvar->settings.HostKeyOrder[i] - '0';
 		if (index == KEY_NONE) // disabled line
 			break;
-		strncat_s(buf, sizeof(buf), ssh2_host_key[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), get_ssh_keytype_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
@@ -4273,7 +4361,7 @@ void SSH2_update_hmac_myproposal(PTInstVar pvar)
 		index = pvar->settings.MacOrder[i] - '0';
 		if (index == HMAC_NONE) // disabled line
 			break;
-		strncat_s(buf, sizeof(buf), ssh2_macs[index].name, _TRUNCATE);
+		strncat_s(buf, sizeof(buf), get_ssh2_mac_name(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
@@ -4359,9 +4447,9 @@ found:
 	}
 }
 
-static enum kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal)
+static kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_proposal)
 {
-	enum kex_algorithm type = KEX_DH_UNKNOWN;
+	kex_algorithm type = KEX_DH_UNKNOWN;
 	char str_kextype[40];
 	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
 
@@ -4398,9 +4486,9 @@ static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_pr
 }
 
 
-static enum hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my_proposal)
+static hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my_proposal)
 {
-	enum hmac_type type = HMAC_UNKNOWN;
+	hmac_type type = HMAC_UNKNOWN;
 	char str_hmac[16];
 	ssh2_mac_t *ptr = ssh2_macs;
 
@@ -4418,11 +4506,11 @@ static enum hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my
 }
 
 
-static enum compression_type choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
+static compression_type choose_SSH2_compression_algorithm(char *server_proposal, char *my_proposal)
 {
-	enum compression_type type = COMP_UNKNOWN;
+	compression_type type = COMP_UNKNOWN;
 	char str_comp[20];
-	ssh_comp_t *ptr = ssh_comps;
+	ssh2_comp_t *ptr = ssh2_comps;
 
 	// OpenSSH 4.3では遅延パケット圧縮("zlib@openssh.com")が新規追加されているため、
 	// マッチしないように修正した。
@@ -4463,11 +4551,11 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 		}
 
 		// current_keys[]に設定しておいて、あとで pvar->ssh2_keys[] へコピーする。
-		md = ssh2_macs[val].func();
+		md = get_ssh2_mac_EVP_MD(val);
 		current_keys[mode].mac.md = md;
 		current_keys[mode].mac.key_len = current_keys[mode].mac.mac_len = EVP_MD_size(md);
-		if (ssh2_macs[val].truncatebits != 0) {
-			current_keys[mode].mac.mac_len = ssh2_macs[val].truncatebits / 8;
+		if (get_ssh2_mac_truncatebits(val) != 0) {
+			current_keys[mode].mac.mac_len = get_ssh2_mac_truncatebits(val) / 8;
 		}
 
 		// キーサイズとブロックサイズもここで設定しておく (2004.11.7 yutaka)
@@ -4592,7 +4680,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", ssh2_kex_algorithms[pvar->kex_type].name);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", get_kex_algorithm_name(pvar->kex_type));
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// ホストキーアルゴリズムチェック
@@ -4683,7 +4771,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "MAC algorithm client to server: %s",
-	            ssh2_macs[pvar->ctos_hmac].name);
+	            get_ssh2_mac_name(pvar->ctos_hmac));
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	size = get_payload_uint32(pvar, offset);
@@ -4703,7 +4791,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "MAC algorithm server to client: %s",
-	            ssh2_macs[pvar->stoc_hmac].name);
+	            get_ssh2_mac_name(pvar->stoc_hmac));
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// 圧縮アルゴリズムの決定
@@ -4726,7 +4814,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "compression algorithm client to server: %s",
-	            ssh_comps[pvar->ctos_compression].name);
+	            get_ssh2_comp_name(pvar->ctos_compression));
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	size = get_payload_uint32(pvar, offset);
@@ -4746,7 +4834,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "compression algorithm server to client: %s",
-	            ssh_comps[pvar->stoc_compression].name);
+	            get_ssh2_comp_name(pvar->stoc_compression));
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// we_needの決定 (2004.11.6 yutaka)
@@ -5390,7 +5478,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// ハッシュの計算
 	/* calc and verify H */
 	hash = kex_dh_gex_hash(
-		ssh2_kex_algorithms[pvar->kex_type].evp_md(),
+		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		pvar->client_version_string,
 		pvar->server_version_string,
 		buffer_ptr(pvar->my_kex),  buffer_len(pvar->my_kex),
@@ -5627,7 +5715,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
-	hash = kex_ecdh_hash(ssh2_kex_algorithms[pvar->kex_type].evp_md(),
+	hash = kex_ecdh_hash(get_kex_algorithm_EVP_MD(pvar->kex_type),
 	                     group,
 	                     pvar->client_version_string,
 	                     pvar->server_version_string,

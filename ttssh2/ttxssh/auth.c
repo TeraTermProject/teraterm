@@ -1495,7 +1495,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 				else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 					int len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);
 					char *s = (char *)malloc(len+1);
-					enum ssh_keytype keytype;
+					ssh_keytype keytype;
 
 					memcpy(s, pvar->pageant_curkey+4+4, len);
 					s[len] = '\0';

@@ -915,7 +915,7 @@ static char FAR *format_host_key(PTInstVar pvar)
 	int host_len = strlen(pvar->hosts_state.prefetched_hostname);
 	char *result = NULL;
 	int index;
-	enum ssh_keytype type = pvar->hosts_state.hostkey.type;
+	ssh_keytype type = pvar->hosts_state.hostkey.type;
 
 	switch (type) {
 	case KEY_RSA1:

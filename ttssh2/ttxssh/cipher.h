@@ -54,10 +54,6 @@
 #define SSH_CIPHER_BLOWFISH	6
 #define SSH_CIPHER_RESERVED	7
 
-#ifndef SSH_CIPHER_MAX
-#define SSH_CIPHER_MAX		31
-#endif
-
 #define CIPHER_ENCRYPT		1
 #define CIPHER_DECRYPT		0
 

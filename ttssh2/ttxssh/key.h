@@ -38,10 +38,9 @@ char* key_fingerprint_raw(Key *k, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
 
 const char *key_type(const Key *k);
-char *get_sshname_from_keytype(enum ssh_keytype type);
 char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
-char *curve_keytype_to_name(enum ssh_keytype type);
+char *curve_keytype_to_name(ssh_keytype type);
 
 void key_free(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
@@ -49,7 +48,7 @@ Key *key_from_blob(char *data, int blen);
 BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);
 BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data, int datalen);
 
-int kextype_to_cipher_nid(enum kex_algorithm type);
-int keytype_to_hash_nid(enum ssh_keytype type);
-int keytype_to_cipher_nid(enum ssh_keytype type);
-enum ssh_keytype nid_to_keytype(int nid);
+int kextype_to_cipher_nid(kex_algorithm type);
+int keytype_to_hash_nid(ssh_keytype type);
+int keytype_to_cipher_nid(ssh_keytype type);
+ssh_keytype nid_to_keytype(int nid);

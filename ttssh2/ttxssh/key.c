@@ -288,7 +288,7 @@ int ssh_rsa_verify(RSA *key,
 	return ret;
 }
 
-int ssh_ecdsa_verify(EC_KEY *key, enum ssh_keytype keytype,
+int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
                      u_char *signature, u_int signaturelen,
                      u_char *data, u_int datalen)
 {
@@ -310,7 +310,7 @@ int ssh_ecdsa_verify(EC_KEY *key, enum ssh_keytype keytype,
 
 	len = get_uint32_MSBfirst(ptr);
 	ptr += 4;
-	if (strncmp(get_sshname_from_keytype(keytype), ptr, len) != 0) {
+	if (strncmp(get_ssh_keytype_name(keytype), ptr, len) != 0) {
 		return -3;
 	}
 	ptr += len;
@@ -700,26 +700,15 @@ void key_free(Key *key)
 //
 // キーから文字列を返却する
 //
-char *get_sshname_from_keytype(enum ssh_keytype type)
-{
-	int i;
-
-	for (i = 0 ; ssh2_host_key[i].name ; i++) {
-		if (type == ssh2_host_key[i].type)
-			return ssh2_host_key[i].name;
-	}
-	return "ssh-unknown";
-}
-
 char *get_sshname_from_key(Key *key)
 {
-	return get_sshname_from_keytype(key->type);
+	return get_ssh_keytype_name(key->type);
 }
 
 //
 // キー文字列から種別を判定する
 //
-enum ssh_keytype get_keytype_from_name(char *name)
+ssh_keytype get_keytype_from_name(char *name)
 {
 	if (strcmp(name, "rsa1") == 0) {
 		return KEY_RSA1;
@@ -742,7 +731,7 @@ enum ssh_keytype get_keytype_from_name(char *name)
 }
 
 
-enum ssh_keytype key_curve_name_to_keytype(char *name)
+ssh_keytype key_curve_name_to_keytype(char *name)
 {
 	if (strcmp(name, "nistp256") == 0) {
 		return KEY_ECDSA256;
@@ -754,7 +743,7 @@ enum ssh_keytype key_curve_name_to_keytype(char *name)
 	return KEY_UNSPEC;
 }
 
-char *curve_keytype_to_name(enum ssh_keytype type)
+char *curve_keytype_to_name(ssh_keytype type)
 {
 	switch (type) {
 		case KEY_ECDSA256:
@@ -845,7 +834,7 @@ Key *key_from_blob(char *data, int blen)
 	EC_POINT *q = NULL;
 	char *curve = NULL;
 	Key *hostkey;  // hostkey
-	enum ssh_keytype type;
+	ssh_keytype type;
 
 	hostkey = malloc(sizeof(Key));
 	if (hostkey == NULL)
@@ -1189,7 +1178,7 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 	return TRUE;
 }
 
-int kextype_to_cipher_nid(enum kex_algorithm type)
+int kextype_to_cipher_nid(kex_algorithm type)
 {
 	switch (type) {
 		case KEX_ECDH_SHA2_256:
@@ -1202,7 +1191,7 @@ int kextype_to_cipher_nid(enum kex_algorithm type)
 	return NID_undef;
 }
 
-int keytype_to_hash_nid(enum ssh_keytype type)
+int keytype_to_hash_nid(ssh_keytype type)
 {
 	switch (type) {
 		case KEY_ECDSA256:
@@ -1215,7 +1204,7 @@ int keytype_to_hash_nid(enum ssh_keytype type)
 	return NID_undef;
 }
 
-int keytype_to_cipher_nid(enum ssh_keytype type)
+int keytype_to_cipher_nid(ssh_keytype type)
 {
 	switch (type) {
 		case KEY_ECDSA256:
@@ -1228,7 +1217,7 @@ int keytype_to_cipher_nid(enum ssh_keytype type)
 	return NID_undef;
 }
 
-enum ssh_keytype nid_to_keytype(int nid)
+ssh_keytype nid_to_keytype(int nid)
 {
 	switch (nid) {
 		case NID_X9_62_prime256v1:

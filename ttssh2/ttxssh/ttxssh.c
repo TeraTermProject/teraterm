@@ -102,7 +102,7 @@ static TInstVar FAR *pvar;
 typedef struct {
 	int cnt;
 	HWND dlg;
-	enum ssh_keytype type;
+	ssh_keytype type;
 } cbarg_t;
 
   /* WIN32 allows multiple instances of a DLL */
@@ -178,85 +178,10 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv)
 	init_TTSSH(pvar);
 }
 
-/*
- * Remove unsupported cipher or duplicated cipher.
- * Add unspecified ciphers at the end of list.
- */
-static void normalize_cipher_order(char FAR * buf)
-{
-	char ciphers_listed[SSH_CIPHER_MAX + 1];
-	char ciphers_allowed[SSH_CIPHER_MAX + 1];
-	int i, j;
-
-	/* SSH_CIPHER_NONE means that all ciphers below that one are disabled.
-	   We *never* allow no encryption. */
-#if 0
-	static char default_ciphers[] = {
-		SSH_CIPHER_3DES,
-		SSH_CIPHER_NONE,
-		SSH_CIPHER_DES, SSH_CIPHER_BLOWFISH
-	};
-#else
-	// for SSH2(yutaka)
-	static char default_ciphers[] = {
-		SSH2_CIPHER_AES256_CTR,
-		SSH2_CIPHER_AES256_CBC,
-		SSH2_CIPHER_AES192_CTR,
-		SSH2_CIPHER_AES192_CBC,
-		SSH2_CIPHER_AES128_CTR,
-		SSH2_CIPHER_AES128_CBC,
-		SSH2_CIPHER_3DES_CTR,
-		SSH2_CIPHER_3DES_CBC,
-		SSH2_CIPHER_BLOWFISH_CTR,
-		SSH2_CIPHER_BLOWFISH_CBC,
-		SSH2_CIPHER_ARCFOUR256,
-		SSH2_CIPHER_ARCFOUR128,
-		SSH2_CIPHER_ARCFOUR,
-		SSH2_CIPHER_CAST128_CTR,
-		SSH2_CIPHER_CAST128_CBC,
-		SSH_CIPHER_3DES,
-		SSH_CIPHER_NONE,
-		SSH_CIPHER_DES,
-		SSH_CIPHER_BLOWFISH
-	};
-#endif
-
-	memset(ciphers_listed, 0, sizeof(ciphers_listed));
-
-	memset(ciphers_allowed, 0, sizeof(ciphers_allowed));
-	for (i = 0; i < NUM_ELEM(default_ciphers); i++) {
-		ciphers_allowed[default_ciphers[i]] = 1;
-	}
-
-	for (i = 0; buf[i] != 0; i++) {
-		int cipher_num = buf[i] - '0';
-
-		if (cipher_num < 0 || cipher_num > SSH_CIPHER_MAX
-			|| !ciphers_allowed[cipher_num]
-			|| ciphers_listed[cipher_num]) {
-			memmove(buf + i, buf + i + 1, strlen(buf + i + 1) + 1);
-			i--;
-		} else {
-			ciphers_listed[cipher_num] = 1;
-		}
-	}
-
-	for (j = 0; j < NUM_ELEM(default_ciphers); j++) {
-		int cipher_num = default_ciphers[j];
-
-		if (!ciphers_listed[cipher_num]) {
-			buf[i] = cipher_num + '0';
-			i++;
-		}
-	}
-
-	buf[i] = 0;
-}
-
 static void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
 {
-	char listed[KEX_DH_MAX + 1];
-	char allowed[KEX_DH_MAX + 1];
+	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
+	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
 	int i, j;
 
 	memset(listed, 0, sizeof(listed));
@@ -288,6 +213,48 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 	}
 
 	buf[i] = 0;
+}
+
+/*
+ * Remove unsupported cipher or duplicated cipher.
+ * Add unspecified ciphers at the end of list.
+ */
+static void normalize_cipher_order(char FAR * buf)
+{
+	/* SSH_CIPHER_NONE means that all ciphers below that one are disabled.
+	   We *never* allow no encryption. */
+#if 0
+	static char default_strings[] = {
+		SSH_CIPHER_3DES,
+		SSH_CIPHER_NONE,
+		SSH_CIPHER_DES, SSH_CIPHER_BLOWFISH
+	};
+#else
+	// for SSH2(yutaka)
+	static char default_strings[] = {
+		SSH2_CIPHER_AES256_CTR,
+		SSH2_CIPHER_AES256_CBC,
+		SSH2_CIPHER_AES192_CTR,
+		SSH2_CIPHER_AES192_CBC,
+		SSH2_CIPHER_AES128_CTR,
+		SSH2_CIPHER_AES128_CBC,
+		SSH2_CIPHER_3DES_CTR,
+		SSH2_CIPHER_3DES_CBC,
+		SSH2_CIPHER_BLOWFISH_CTR,
+		SSH2_CIPHER_BLOWFISH_CBC,
+		SSH2_CIPHER_ARCFOUR256,
+		SSH2_CIPHER_ARCFOUR128,
+		SSH2_CIPHER_ARCFOUR,
+		SSH2_CIPHER_CAST128_CTR,
+		SSH2_CIPHER_CAST128_CBC,
+		SSH_CIPHER_3DES,
+		SSH_CIPHER_NONE,
+		SSH_CIPHER_DES,
+		SSH_CIPHER_BLOWFISH
+	};
+#endif
+
+	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
 
 static void normalize_kex_order(char FAR * buf)
@@ -336,6 +303,7 @@ static void normalize_comp_order(char FAR * buf)
 	static char default_strings[] = {
 		COMP_DELAYED,
 		COMP_ZLIB,
+		COMP_NOCOMP,
 		COMP_NONE,
 	};
 
@@ -2355,18 +2323,18 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 			UTIL_get_lang_msg("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 
-			append_about_text(dlg, "KEX:", ssh2_kex_algorithms[pvar->kex_type].name);
+			append_about_text(dlg, "KEX:", get_kex_algorithm_name(pvar->kex_type));
 
-			strncpy_s(buf, sizeof(buf), get_sshname_from_keytype(pvar->hostkey_type), _TRUNCATE);
+			strncpy_s(buf, sizeof(buf), get_ssh_keytype_name(pvar->hostkey_type), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 
 			// add HMAC algorithm (2004.12.17 yutaka)
 			buf[0] = '\0';
-			strncat_s(buf, sizeof(buf), ssh2_macs[pvar->ctos_hmac].name , _TRUNCATE);
+			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->ctos_hmac) , _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_TOSERVER", pvar, " to server,");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf, sizeof(buf), ssh2_macs[pvar->stoc_hmac].name , _TRUNCATE);
+			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->stoc_hmac) , _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_FROMSERVER", pvar, " from server");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 			append_about_text(dlg, "HMAC:", buf);
@@ -2980,7 +2948,7 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
-	enum ssh_keytype type;
+	ssh_keytype type;
 } ssh_private_key_t;
 
 static ssh_private_key_t private_key = {NULL, NULL, NULL, KEY_UNSPEC};
@@ -2989,7 +2957,7 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
-	enum ssh_keytype type;
+	ssh_keytype type;
 } ssh_public_key_t;
 
 static ssh_public_key_t public_key = {NULL, NULL, NULL, KEY_UNSPEC};
@@ -3016,7 +2984,7 @@ static void free_ssh_key(void)
 	public_key.type = KEY_UNSPEC;
 }
 
-static BOOL generate_ssh_key(enum ssh_keytype type, int bits, void (*cbfunc)(int, int, void *), void *cbarg)
+static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int, void *), void *cbarg)
 {
 	// if SSH key already is generated, should free the resource.
 	free_ssh_key();
@@ -3605,7 +3573,7 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
-	static enum ssh_keytype key_type;
+	static ssh_keytype key_type;
 	static int saved_key_bits;
 	char uimsg[MAX_UIMSG];
 	LOGFONT logfont;
@@ -3962,7 +3930,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				case KEY_ECDSA256: // ECDSA
 				case KEY_ECDSA384:
 				case KEY_ECDSA521:
-					keyname = get_sshname_from_keytype(public_key.type);
+					keyname = get_ssh_keytype_name(public_key.type);
 					buffer_put_string(b, keyname, strlen(keyname));
 					s = curve_keytype_to_name(public_key.type);
 					buffer_put_string(b, s, strlen(s));

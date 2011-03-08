@@ -91,17 +91,15 @@ typedef enum {
 	SSH2_CIPHER_ARCFOUR, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR256,
 	SSH2_CIPHER_CAST128_CBC,
 	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
+	SSH_CIPHER_MAX = SSH2_CIPHER_CAST128_CTR,
 } SSHCipher;
-
-#define SSH_CIPHER_MAX SSH2_CIPHER_CAST128_CTR
 
 typedef enum {
 	SSH_AUTH_NONE, SSH_AUTH_RHOSTS, SSH_AUTH_RSA, SSH_AUTH_PASSWORD,
 	SSH_AUTH_RHOSTS_RSA, SSH_AUTH_TIS, SSH_AUTH_KERBEROS,
 	SSH_AUTH_PAGEANT = 16,
+	SSH_AUTH_MAX = SSH_AUTH_PAGEANT,
 } SSHAuthMethod;
-
-#define SSH_AUTH_MAX SSH_AUTH_PAGEANT
 
 typedef enum {
 	SSH_GENERIC_AUTHENTICATION, SSH_TIS_AUTHENTICATION
@@ -197,60 +195,8 @@ enum channel_type {
 #define SSH2_OPEN_UNKNOWN_CHANNEL_TYPE           3
 #define SSH2_OPEN_RESOURCE_SHORTAGE              4
 
-enum ssh_keytype {
-	KEY_NONE,
-	KEY_RSA1,
-	KEY_RSA,
-	KEY_DSA,
-	KEY_ECDSA256,
-	KEY_ECDSA384,
-	KEY_ECDSA521,
-	KEY_UNSPEC,
-	KEY_MAX = KEY_UNSPEC,
-};
-#define isECDSAkey(type)	((type) >= KEY_ECDSA256 && (type) <= KEY_ECDSA521)
 
-typedef struct ssh2_host_key {
-	enum ssh_keytype type;
-	char *name;
-} ssh2_host_key_t;
-
-static ssh2_host_key_t ssh2_host_key[] = {
-	{KEY_NONE, "none"},
-	{KEY_RSA1, "ssh-rsa1"},  // for SSH1 only
-	{KEY_RSA, "ssh-rsa"},
-	{KEY_DSA, "ssh-dss"},
-	{KEY_ECDSA256, "ecdsa-sha2-nistp256"},
-	{KEY_ECDSA384, "ecdsa-sha2-nistp384"},
-	{KEY_ECDSA521, "ecdsa-sha2-nistp521"},
-	{KEY_UNSPEC, "ssh-unknown"},
-};
-
-#define KEX_DEFAULT_KEX     "ecdh-sha2-nistp256," \
-                            "ecdh-sha2-nistp384," \
-                            "ecdh-sha2-nistp521," \
-                            "diffie-hellman-group-exchange-sha256," \
-                            "diffie-hellman-group-exchange-sha1," \
-                            "diffie-hellman-group14-sha1," \
-                            "diffie-hellman-group1-sha1"
-#define KEX_DEFAULT_PK_ALG  "ecdsa-sha2-nistp256," \
-                            "ecdsa-sha2-nistp384," \
-                            "ecdsa-sha2-nistp521," \
-                            "ssh-rsa,ssh-dss"
-// use the setting of pvar.CipherOrder.
-#define KEX_DEFAULT_ENCRYPT ""
-#define KEX_DEFAULT_MAC     "hmac-sha1,hmac-md5"
-// support of "Compression delayed" (2006.6.23 maya)
-#define KEX_DEFAULT_COMP    "none,zlib@openssh.com,zlib"
-#define KEX_DEFAULT_LANG    ""
-
-/* Minimum modulus size (n) for RSA keys. */
-#define SSH_RSA_MINIMUM_MODULUS_SIZE    768
-
-#define SSH_KEYGEN_DEFAULT_BITS   2048
-#define SSH_RSA_MINIMUM_KEY_SIZE   768
-#define SSH_DSA_MINIMUM_KEY_SIZE  1024
-
+// クライアントからサーバへの提案事項
 enum kex_init_proposals {
 	PROPOSAL_KEX_ALGS,
 	PROPOSAL_SERVER_HOST_KEY_ALGS,
@@ -265,28 +211,13 @@ enum kex_init_proposals {
 	PROPOSAL_MAX
 };
 
+#define KEX_DEFAULT_KEX     ""
+#define KEX_DEFAULT_PK_ALG  ""
+#define KEX_DEFAULT_ENCRYPT ""
+#define KEX_DEFAULT_MAC     ""
+#define KEX_DEFAULT_COMP    ""
+#define KEX_DEFAULT_LANG    ""
 
-// クライアントからサーバへの提案事項
-#ifdef SSH2_DEBUG
-static char *myproposal[PROPOSAL_MAX] = {
-//	KEX_DEFAULT_KEX,
-	"diffie-hellman-group14-sha1,diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256",
-	KEX_DEFAULT_PK_ALG,
-//	"ssh-dss,ssh-rsa",
-	KEX_DEFAULT_ENCRYPT,
-	KEX_DEFAULT_ENCRYPT,
-	"hmac-md5,hmac-sha1",
-	"hmac-md5,hmac-sha1",
-//	"hmac-sha1",
-//	"hmac-sha1",
-//	KEX_DEFAULT_MAC,
-//	KEX_DEFAULT_MAC,
-	KEX_DEFAULT_COMP,
-	KEX_DEFAULT_COMP,
-	KEX_DEFAULT_LANG,
-	KEX_DEFAULT_LANG,
-};
-#else
 static char *myproposal[PROPOSAL_MAX] = {
 	KEX_DEFAULT_KEX,
 	KEX_DEFAULT_PK_ALG,
@@ -299,7 +230,43 @@ static char *myproposal[PROPOSAL_MAX] = {
 	KEX_DEFAULT_LANG,
 	KEX_DEFAULT_LANG,
 };
-#endif
+
+
+typedef enum {
+	KEY_NONE,
+	KEY_RSA1,
+	KEY_RSA,
+	KEY_DSA,
+	KEY_ECDSA256,
+	KEY_ECDSA384,
+	KEY_ECDSA521,
+	KEY_UNSPEC,
+	KEY_MAX = KEY_UNSPEC,
+} ssh_keytype;
+#define isECDSAkey(type)	((type) >= KEY_ECDSA256 && (type) <= KEY_ECDSA521)
+
+typedef struct ssh2_host_key {
+	ssh_keytype type;
+	char *name;
+} ssh2_host_key_t;
+
+static ssh2_host_key_t ssh2_host_key[] = {
+	{KEY_RSA1,     "ssh-rsa1"},  // for SSH1 only
+	{KEY_RSA,      "ssh-rsa"},
+	{KEY_DSA,      "ssh-dss"},
+	{KEY_ECDSA256, "ecdsa-sha2-nistp256"},
+	{KEY_ECDSA384, "ecdsa-sha2-nistp384"},
+	{KEY_ECDSA521, "ecdsa-sha2-nistp521"},
+	{KEY_UNSPEC,   "ssh-unknown"},
+	{KEY_NONE,     NULL},
+};
+
+/* Minimum modulus size (n) for RSA keys. */
+#define SSH_RSA_MINIMUM_MODULUS_SIZE    768
+
+#define SSH_KEYGEN_DEFAULT_BITS   2048
+#define SSH_RSA_MINIMUM_KEY_SIZE   768
+#define SSH_DSA_MINIMUM_KEY_SIZE  1024
 
 
 typedef struct ssh2_cipher {
@@ -331,8 +298,7 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 };
 
 
-// 下記のインデックスは ssh2_kex_algorithms[] と合わせること。
-enum kex_algorithm {
+typedef enum {
 	KEX_DH_NONE,       /* disabled line */
 	KEX_DH_GRP1_SHA1,
 	KEX_DH_GRP14_SHA1,
@@ -343,16 +309,15 @@ enum kex_algorithm {
 	KEX_ECDH_SHA2_521,
 	KEX_DH_UNKNOWN,
 	KEX_DH_MAX = KEX_DH_UNKNOWN,
-};
+} kex_algorithm;
 
 typedef struct ssh2_kex_algorithm {
-	enum kex_algorithm kextype;
+	kex_algorithm kextype;
 	char *name;
 	const EVP_MD *(*evp_md)(void);
 } ssh2_kex_algorithm_t;
 
 static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
-	{KEX_DH_NONE      , "none",                                 NULL},
 	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},
 	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},
 	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},
@@ -360,53 +325,51 @@ static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
 	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256},
 	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384},
 	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512},
-	{KEX_DH_UNKNOWN   , NULL                                  , NULL},
+	{KEX_DH_NONE      , NULL,                                   NULL},
 };
 
 
-// 下記のインデックスは ssh2_macs[] と合わせること。
-enum hmac_type {
-	HMAC_NONE,
+typedef enum {
+	HMAC_NONE,      /* disabled line */
 	HMAC_SHA1,
 	HMAC_MD5,
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
-};
+} hmac_type;
 
 typedef struct ssh2_mac {
-	enum hmac_type type;
+	hmac_type type;
 	char *name;
-	const EVP_MD *(*func)(void);
+	const EVP_MD *(*evp_md)(void);
 	int truncatebits;
 } ssh2_mac_t;
 
 static ssh2_mac_t ssh2_macs[] = {
-	{HMAC_NONE,    "none",      NULL,     0},
 	{HMAC_SHA1,    "hmac-sha1", EVP_sha1, 0},
 	{HMAC_MD5,     "hmac-md5",  EVP_md5,  0},
-	{HMAC_UNKNOWN, NULL,        NULL,     0},
+	{HMAC_NONE,    NULL,        NULL,     0},
 };
 
 
-// 下記のインデックスは ssh_comps[] と合わせること。
-enum compression_type {
-	COMP_NONE,
+typedef enum {
+	COMP_NONE,      /* disabled line */
+	COMP_NOCOMP,
 	COMP_ZLIB,
 	COMP_DELAYED,
 	COMP_UNKNOWN,
 	COMP_MAX = COMP_UNKNOWN,
-};
+} compression_type;
 
-typedef struct ssh_comp {
-	enum compression_type type;
+typedef struct ssh2_comp {
+	compression_type type;
 	char *name;
-} ssh_comp_t;
+} ssh2_comp_t;
 
-static ssh_comp_t ssh_comps[] = {
-	{COMP_NONE,    "none"},
+static ssh2_comp_t ssh2_comps[] = {
+	{COMP_NOCOMP,  "none"},
 	{COMP_ZLIB,    "zlib"},
 	{COMP_DELAYED, "zlib@openssh.com"},
-	{COMP_UNKNOWN, NULL},
+	{COMP_NONE,    NULL},
 };
 
 
@@ -450,7 +413,7 @@ enum kex_modes {
 // ホストキー(SSH1, SSH2含む)のデータ構造 (2006.3.21 yutaka)
 typedef struct Key {
 	// host key type
-	enum ssh_keytype type;
+	ssh_keytype type;
 	// SSH2 RSA
 	RSA *rsa;
 	// SSH2 DSA
@@ -608,7 +571,14 @@ BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
 int get_cipher_block_size(SSHCipher cipher);
 int get_cipher_key_len(SSHCipher cipher);
+char* get_kex_algorithm_name(kex_algorithm kextype);
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher);
+const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
+char* get_ssh2_mac_name(hmac_type type);
+const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type);
+int get_ssh2_mac_truncatebits(hmac_type type);
+char* get_ssh2_comp_name(compression_type type);
+char* get_ssh_keytype_name(ssh_keytype type);
 int get_cipher_discard_len(SSHCipher cipher);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);

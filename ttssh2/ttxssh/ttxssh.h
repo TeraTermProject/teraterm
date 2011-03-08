@@ -206,14 +206,14 @@ typedef struct _TInstVar {
 	char client_version_string[128];
 	buffer_t *my_kex;
 	buffer_t *peer_kex;
-	enum kex_algorithm kex_type; // KEX algorithm
-	enum ssh_keytype hostkey_type;
+	kex_algorithm kex_type; // KEX algorithm
+	ssh_keytype hostkey_type;
 	SSHCipher ctos_cipher;
 	SSHCipher stoc_cipher;
-	enum hmac_type ctos_hmac;
-	enum hmac_type stoc_hmac;
-	enum compression_type ctos_compression;
-	enum compression_type stoc_compression;
+	hmac_type ctos_hmac;
+	hmac_type stoc_hmac;
+	compression_type ctos_compression;
+	compression_type stoc_compression;
 	int we_need;
 	int key_done;
 	int rekeying;

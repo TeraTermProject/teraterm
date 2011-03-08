@@ -458,7 +458,7 @@ void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secr
 
 	for (i = 0; i < NKEYS; i++) {
 		keys[i] = derive_key('A'+i, need, hash, shared_secret, session_id, session_id_len,
-		                     ssh2_kex_algorithms[pvar->kex_type].evp_md());
+		                     get_kex_algorithm_EVP_MD(pvar->kex_type));
 		//debug_print(i, keys[i], need);
 	}
 
