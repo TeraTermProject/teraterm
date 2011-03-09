@@ -158,6 +158,7 @@
 #define IDC_KEYBITS_LABEL               1105
 #define IDC_KEYBITS                     1106
 #define IDC_KEYGEN_PROGRESS_LABEL       1107
+#define IDC_PROGBAR                     1108
 #define IDC_SSHUSEPASSWORD              1201
 #define IDC_SSHUSERSA                   1202
 #define IDC_SSHFWDREMOTETOLOCAL         1202

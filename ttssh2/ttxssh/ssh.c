@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <process.h>
 #include <time.h>
+#include <commctrl.h>
 #include "buffer.h"
 #include "ssh.h"
 #include "crypt.h"
@@ -7443,6 +7444,19 @@ static int is_canceled_window(HWND hd)
 	return 0;
 }
 
+void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
+	HWND HProg;
+	HProg = GetDlgItem(HDlg, id_Progress);
+
+	*CurProgStat = 0;
+
+	SendMessage(HProg, PBM_SETRANGE, (WPARAM)0, MAKELPARAM(0, 100));
+	SendMessage(HProg, PBM_SETSTEP, (WPARAM)1, 0);
+	SendMessage(HProg, PBM_SETPOS, (WPARAM)0, 0);
+
+	return;
+}
+
 static unsigned __stdcall ssh_scp_thread(void FAR * p)
 {
 	Channel_t *c = (Channel_t *)p;
@@ -7453,9 +7467,12 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	size_t ret;
 	HWND hWnd = c->scp.progress_window;
 	scp_dlg_parm_t parm;
+	int rate, ProgStat;
 
 	//SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfile);
 	SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
+
+	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
 	do {
 		// Cancelボタンが押下されたらウィンドウが消える。
@@ -7487,9 +7504,13 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 
 		total_size += ret;
 
-		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, 
-			(100 * total_size / c->scp.filestat.st_size)%100 );
+		rate = (int)(100 * total_size / c->scp.filestat.st_size);
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, rate);
 		SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+		if (ProgStat != rate) {
+			ProgStat = rate;
+			SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
+		}
 
 	} while (ret <= sizeof(buf));
 
@@ -7580,6 +7601,9 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 	unsigned char *data;
 	unsigned int buflen;
 	int eof;
+	int rate, ProgStat;
+
+	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
 	for (;;) {
 		// Cancelボタンが押下されたらウィンドウが消える。
@@ -7611,9 +7635,14 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 
 				free(data);  // free!
 
-				_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, 
-					(100 * c->scp.filercvsize / c->scp.filetotalsize)%100 );
+				rate =(int)(100 * c->scp.filercvsize / c->scp.filetotalsize);
+				_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, rate);
 				SendMessage(GetDlgItem(c->scp.progress_window, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+
+				if (ProgStat != rate) {
+					ProgStat = rate;
+					SendDlgItemMessage(c->scp.progress_window, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
+				}
 
 				if (eof)
 					goto done;
