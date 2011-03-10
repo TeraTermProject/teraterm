@@ -7468,11 +7468,16 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	HWND hWnd = c->scp.progress_window;
 	scp_dlg_parm_t parm;
 	int rate, ProgStat;
+	DWORD stime;
+	int elapsed, prev_elapsed;
 
 	//SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfile);
 	SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
+
+	stime = GetTickCount();
+	prev_elapsed = 0;
 
 	do {
 		// Cancelボタンが押下されたらウィンドウが消える。
@@ -7510,6 +7515,27 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 		if (ProgStat != rate) {
 			ProgStat = rate;
 			SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
+		}
+
+		elapsed = (GetTickCount() - stime) / 1000;
+		if (elapsed > prev_elapsed) {
+			if (elapsed > 2) {
+				rate = (int)(total_size / elapsed);
+				if (rate < 1200) {
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
+				}
+				else if (rate < 1200000) {
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+				}
+				else {
+					_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 100000 % 100, "MBytes/s");
+				}
+			}
+			else {
+				_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
+			}
+			SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+			prev_elapsed = elapsed;
 		}
 
 	} while (ret <= sizeof(buf));
@@ -7602,8 +7628,13 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 	unsigned int buflen;
 	int eof;
 	int rate, ProgStat;
+	DWORD stime;
+	int elapsed, prev_elapsed;
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
+
+	stime = GetTickCount();
+	prev_elapsed = 0;
 
 	for (;;) {
 		// Cancelボタンが押下されたらウィンドウが消える。
@@ -7642,6 +7673,27 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 				if (ProgStat != rate) {
 					ProgStat = rate;
 					SendDlgItemMessage(c->scp.progress_window, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
+				}
+
+				elapsed = (GetTickCount() - stime) / 1000;
+				if (elapsed > prev_elapsed) {
+					if (elapsed > 2) {
+						rate = (int)(c->scp.filercvsize / elapsed);
+						if (rate < 1200) {
+							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d %s)", elapsed / 60, elapsed % 60, rate, "Bytes/s");
+						}
+						else if (rate < 1200000) {
+							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100, "KBytes/s");
+						}
+						else {
+							_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d (%d.%02d %s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100, "MBytes/s");
+						}
+					}
+					else {
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
+					}
+					SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+					prev_elapsed = elapsed;
 				}
 
 				if (eof)
