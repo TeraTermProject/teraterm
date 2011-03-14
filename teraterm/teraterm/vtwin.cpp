@@ -3388,6 +3388,7 @@ void CVTWindow::OnFileNewConnection()
 		if ((GetHNRec.PortType==IdTCPIP) &&
 		    (ts.HistoryList>0) &&
 		    LoadTTSET()) {
+
 			(*AddHostToList)(ts.SetupFName,GetHNRec.HostName);
 			FreeTTSET();
 		}
@@ -4816,6 +4817,16 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				case IDOK:
 					{
 						memset(buf, 0, sizeof(buf));
+
+						// realtime modeの場合、Enter keyのみ送る。
+						// cf. http://logmett.com/forum/viewtopic.php?f=8&t=1601
+						// (2011.3.14 hirata)
+						checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
+						if (checked & BST_CHECKED) { // checkあり
+							strncpy_s(buf, sizeof(buf), "\n", _TRUNCATE);
+							goto skip;
+						}
+
 						ret = GetDlgItemText(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
 						if (ret == 0) { // error
 							memset(buf, 0, sizeof(buf));
@@ -4853,6 +4864,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							}
 						}
 
+skip:;
 						// 337: 2007/03/20 チェックされていたら親ウィンドウにのみ送信
 						checked = SendMessage(GetDlgItem(hWnd, IDC_PARENT_ONLY), BM_GETCHECK, 0, 0);
 
