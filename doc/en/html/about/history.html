@@ -33,11 +33,13 @@
 
 <h3><a name="teraterm_4.70">2011.xx.xx (Ver 4.x70)</a></h3>
 <ul class="history">
-  <!-- li>Changes
+  <li>Changes
     <ul>
+      <li>By using the broadcast command in the real time mode, the Submit button has the only function of acting as &lt;Enter&gt; key. cf. <a href="http://logmett.com/forum/viewtopic.php?f=8&t=1601">Broadcast command issue in 4.68</a> </li>
+      <li>The century year of the version dialog is changed to 2011.</li>
       <li></li>
     </ul>
-  </li -->
+  </li>
 
   <!-- li>Bug fixes
     <ul>
@@ -1663,7 +1665,14 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <!-- li>SSH鍵生成ダイアログで、鍵の種類にECDSA鍵を選んだ場合は鍵のビット数の入力ボックスを無効化するようにした。</li -->
+      <li>When the ECDSA key is selected on the SSH key generator dialog, the input box of the key bits is disabled.</li>
+      <li>Some kind of the KEX, host key, HMAC and compression algorithm order can be specified in the teraterm.ini file.
+        <ul>
+          <li>KexOrder=56743210</li>
+          <li>HostKeyOrder=456230</li>
+          <li>MacOrder=120</li>
+          <li>CompOrder=3210</li>
+        </ul></li>
     </ul>
   </li>
 

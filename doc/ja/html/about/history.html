@@ -33,11 +33,12 @@
 
 <h3><a name="teraterm_4.70">2011.xx.xx (Ver 4.70)</a></h3>
 <ul class="history">
-  <!-- li>変更
+  <li>変更
     <ul>
-      <li></li>
+      <li>ブロードキャストコマンドにおいて、リアルタイムモードの場合、SubmitボタンではEnterキーのみ送るようにした。 cf. <a href="http://logmett.com/forum/viewtopic.php?f=8&t=1601">Broadcast command issue in 4.68</a> </li>
+      <li>バージョンダイアログのCopyrightを2011年に修正した。</li>
     </ul>
-  </li -->
+  </li>
 
   <!-- li>バグ修正
     <ul>
@@ -1665,6 +1666,13 @@
   <li>変更
     <ul>
       <li>SSH鍵生成ダイアログで、鍵の種類にECDSA鍵を選んだ場合は鍵のビット数の入力ボックスを無効化するようにした。</li>
+      <li>KEX、ホストキー、HMAC、圧縮アルゴリズムオーダーを、teraterm.iniのエントリで指定できるようにした。
+        <ul>
+          <li>KexOrder=56743210</li>
+          <li>HostKeyOrder=456230</li>
+          <li>MacOrder=120</li>
+          <li>CompOrder=3210</li>
+        </ul></li>
     </ul>
   </li>
 
