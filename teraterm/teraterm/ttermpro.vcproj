@@ -372,6 +372,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\winjump.c"
+				>
+			</File>
+			<File
 				RelativePath="WSAAsyncGetAddrInfo.c"
 				>
 			</File>

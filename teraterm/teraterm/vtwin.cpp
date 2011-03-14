@@ -53,6 +53,7 @@
 #include "tt_res.h"
 #include "vtwin.h"
 #include "addsetting.h"
+#include "winjump.h"
 
 #define VTClassName "VTWin32"
 
@@ -3390,6 +3391,7 @@ void CVTWindow::OnFileNewConnection()
 		    LoadTTSET()) {
 
 			(*AddHostToList)(ts.SetupFName,GetHNRec.HostName);
+			add_session_to_jumplist(GetHNRec.HostName, GetHNRec.SetupFN);
 			FreeTTSET();
 		}
 
