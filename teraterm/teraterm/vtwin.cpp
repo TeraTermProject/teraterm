@@ -4407,6 +4407,9 @@ static HWND BroadcastWindowList;
 static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
 {
+	char buf[1024];
+	int len;
+
 	switch (msg) {
 		case WM_CREATE:
 			break;
@@ -4414,8 +4417,14 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 		case WM_DESTROY:
 			break;
 
-		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
+			// すでにテキストが入力されている場合は、カーソルを末尾へ移動させる。
+			len = GetWindowText(dlg, buf, sizeof(buf));
+			SendMessage(dlg, EM_SETSEL, len, len);
+			SetFocus(dlg);
+			break;
+
+		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 		case WM_RBUTTONUP:
 			SetFocus(dlg);
@@ -4826,6 +4835,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 						checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
 						if (checked & BST_CHECKED) { // checkあり
 							strncpy_s(buf, sizeof(buf), "\n", _TRUNCATE);
+							SetDlgItemText(hWnd, IDC_COMMAND_EDIT, "");
 							goto skip;
 						}
 
