@@ -3661,7 +3661,7 @@ WORD TTLStrInsert()
 static void remove_string(char *str, int index, int len)
 {
 	char *np;
-	int srclen;
+	int srclen, copylen;
 
 	srclen = strlen(str);
 
@@ -3669,8 +3669,23 @@ static void remove_string(char *str, int index, int len)
 		return;
 	}
 
+	/*
+	   remove_string(str, 6, 4);
+
+	   <------------>srclen
+			 <-->len
+	   XXXXXX****YYY
+	        ^index(np)
+			     ^np+len 
+				 <-->srclen - len - index
+		    «
+	   XXXXXXYYY
+	 */
+
 	np = str + (index - 1);
-	memmove_s(np, MaxStrLen, np + len, srclen - len);
+	copylen = srclen - len - (index - 1);
+	if (copylen > 0)
+		memmove_s(np, MaxStrLen, np + len, copylen);
 
 	// null-terminate
 	str[srclen - len] = '\0';
