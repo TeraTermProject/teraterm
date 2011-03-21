@@ -586,6 +586,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 					// ブロック0（ファイル情報）送信後は、ACK と 'C' を連続して受信することに
 					// なっているため、次の'C'を待つ。(2010.6.20 yutaka)
 					if ((yv->PktNum==0) && (yv->PktNumOffset==0)) {
+						yv->SendFileInfo = 1;   // 送信済みフラグon
 						SendFlag = FALSE;
 						break;
 					}
@@ -701,7 +702,10 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				int ret, total;
 				BYTE buf[1024 + 10];
 
-				yv->SendFileInfo = 1;   // 送信済みフラグon
+				// ACK を受けてからフラグをonとする。そうしないと、ACKを受けずに、'C'のみ
+				// 受け取ったとしても、ブロック1の送信を始めてしまう。
+				// (2011.3.21 yutaka)
+				//yv->SendFileInfo = 1;   // 送信済みフラグon
 
 			   /* timestamp */
 			   _stat(fv->FullName, &st);
