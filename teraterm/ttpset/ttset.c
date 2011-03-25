@@ -922,6 +922,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	GetPrivateProfileString(Section, "PassThruPort", "",
 	                        ts->PrnDev, sizeof(ts->PrnDev), FName);
 
+	/* プリンタ用制御コードを無視するかどうか */
+	ts->IgnorePrinterCtrl = GetOnOff(Section, "IgnorePrinterCtrl", FName, FALSE);
+
 	/* Printer Font --- special option */
 	GetPrivateProfileString(Section, "PrnFont", "",
 	                        Temp, sizeof(Temp), FName);
@@ -2104,6 +2107,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Printer port for pass-thru printing */
 	/*   -- special option */
 	WritePrivateProfileString(Section, "PassThruPort", ts->PrnDev, FName);
+
+	/* プリンタ用制御コードを無視するかどうか */
+	WriteOnOff(Section, "IgnorePrinterCtrl", FName, ts->IgnorePrinterCtrl);
 
 	/* Printer Font --- special option */
 	WriteFont(Section, "PrnFont", FName,

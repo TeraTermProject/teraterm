@@ -506,6 +506,7 @@ struct tttset {
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
 	WORD ConfirmChangePasteCR;
+	BOOL IgnorePrinterCtrl; 
 };
 
 typedef struct tttset TTTSet, *PTTSet;

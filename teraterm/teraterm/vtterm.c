@@ -1724,6 +1724,15 @@ void CSQSelScreenErase()
 
   void CS_i_Mode()		// MC
   {
+	  /* プリンタ制御コードが来ても無視する。
+	   * ランニング試験中、ホストからプリンタ制御コードが届くと、印刷ダイアログが
+	   * 表示され、Tera Termが一時停止し、試験が止まらないようにしたい。
+	   * (2011.3.25 yutaka)
+	   */
+	  if (ts.IgnorePrinterCtrl)
+		  return;
+
+
     if (Param[1]==-1) Param[1] = 0;
     switch (Param[1]) {
       /* print screen */
