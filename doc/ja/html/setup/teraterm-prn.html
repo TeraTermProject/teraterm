@@ -50,6 +50,36 @@ PassThruPort=&lt;port&gt;
 PassThruPort=
 </pre>
 
+<p>
+ロシア語モードの場合は<a href="#russfont">印刷フォントのロシア語コードセット</a>を参照のこと。
+</p>
+
+
+<h1><a name="ignoremc">印刷用制御コードを無視する</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの IgnorePrinterCtrl 行を以下のように変更することによって、印刷用制御コード(MC: Media Copy)を無視するかどうかを設定できます。PassThruPort 行の指定は無効となります。
+</p>
+
+<pre>
+IgnorePrinterCtrl=on|off
+</pre>
+
+<p>
+
+</p>
+
+<pre>
+例:
+IgnorePrinterCtrl=on
+</pre>
+
+<pre>
+省略時:
+IgnorePrinterCtrl=off
+</pre>
+
+
 
 <h1><a name="formfeed">エスケープシーケンスによる印刷時の改ページを禁止する</a></h1>
 
@@ -141,6 +171,30 @@ TEKPPI=300,300
 省略時:
 VTPPI=0,0
 TEKPPI=0,0
+</pre>
+
+
+<h1><a name="russfont">印刷フォントのロシア語コードセット (Russian mode only)</a></h1>
+
+<p>
+<a href="#font">プリンタフォントの指定</a>もしくは<a href="#direct">エスケープシーケンスによる印刷でポートに直接出力</a>を選択した場合、キャラクタセットも指定しなければなりません。さもなくば、ロシア語の文字は正しく印刷されません。キャラクタセットを指定するには、設定ファイルの [Tera Term] セクションの RussPrint 行を以下のように変更してください。
+</p>
+
+<pre>
+RussFont=&lt;char set&gt;
+</pre>
+
+<pre>
+&lt;char set&gt;には以下のいずれかを指定可能。
+  Windows
+  KOI8-R
+  CP-866
+  ISO-8859-5
+</pre>
+
+<pre>
+省略時:
+RussPrint=Windows
 </pre>
 
 
