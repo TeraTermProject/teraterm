@@ -3473,7 +3473,7 @@ void CVTWindow::OnFileNewConnection()
 // (2004.12.6 yutaka)
 void CVTWindow::OnDuplicateSession()
 {
-	char Command[MAX_PATH];
+	char Command[1024];
 	char *exec = "ttermpro";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -3503,6 +3503,14 @@ void CVTWindow::OnDuplicateSession()
 	} else {
 		// telnet/ssh/cygwin接続以外では複製を行わない。
 		return;
+	}
+
+	// セッション複製を行う際、/K= があれば引き継ぎを行うようにする。
+	// cf. http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682
+	// (2011.3.27 yutaka)
+	if (strlen(ts.KeyCnfFN) > 0) {
+		strncat_s(Command, sizeof(Command), " /K=", _TRUNCATE);
+		strncat_s(Command, sizeof(Command), ts.KeyCnfFN, _TRUNCATE);
 	}
 
 	memset(&si, 0, sizeof(si));
