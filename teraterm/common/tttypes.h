@@ -191,6 +191,7 @@ typedef TCharAttr *PCharAttr;
 #define TF_ALTSCR             512
 #define TF_LOCKTUID           1024
 #define TF_INVALIDDECRPSS     2048
+#define TF_PRINTERCTRL        4096
 
 // ANSI/Attribute color flags (used in ts.ColorFlag)
 #define CF_PCBOLD16     1
@@ -506,7 +507,6 @@ struct tttset {
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
 	WORD ConfirmChangePasteCR;
-	BOOL IgnorePrinterCtrl; 
 };
 
 typedef struct tttset TTTSet, *PTTSet;

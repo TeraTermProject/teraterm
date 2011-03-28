@@ -1724,29 +1724,26 @@ void CSQSelScreenErase()
 
   void CS_i_Mode()		// MC
   {
-	  /* プリンタ制御コードが来ても無視する。
-	   * ランニング試験中、ホストからプリンタ制御コードが届くと、印刷ダイアログが
-	   * 表示され、Tera Termが一時停止し、試験が止まらないようにしたい。
-	   * (2011.3.25 yutaka)
-	   */
-	  if (ts.IgnorePrinterCtrl)
-		  return;
-
-
     if (Param[1]==-1) Param[1] = 0;
     switch (Param[1]) {
       /* print screen */
 	//  PrintEX --	TRUE: print screen
 	//		FALSE: scroll region
-      case 0: BuffPrint(! PrintEX); break;
+      case 0:
+	if (ts.TermFlag&TF_PRINTERCTRL) {
+	  BuffPrint(! PrintEX);
+	}
+	break;
       /* printer controller mode off */
       case 4: break; /* See PrnParseCS() */
       /* printer controller mode on */
       case 5:
-	if (! AutoPrintMode)
-	  OpenPrnFile();
-	DirectPrn = (ts.PrnDev[0]!=0);
-	PrinterMode = TRUE;
+	if (ts.TermFlag&TF_PRINTERCTRL) {
+	  if (! AutoPrintMode)
+	    OpenPrnFile();
+	  DirectPrn = (ts.PrnDev[0]!=0);
+	  PrinterMode = TRUE;
+	}
 	break;
     }
   }
@@ -2420,10 +2417,12 @@ void CSSetAttr()		// SGR
       if (Param[1]==-1) Param[1] = 0;
       switch (Param[1]) {
 	case 1:
-	  OpenPrnFile();
-	  BuffDumpCurrentLine(LF);
-	  if (! AutoPrintMode)
-	    ClosePrnFile();
+	  if (ts.TermFlag&TF_PRINTERCTRL) {
+	    OpenPrnFile();
+	    BuffDumpCurrentLine(LF);
+	    if (! AutoPrintMode)
+	      ClosePrnFile();
+	  }
 	  break;
 	/* auto print mode off */
 	case 4:
@@ -2435,10 +2434,12 @@ void CSSetAttr()		// SGR
 	  break;
 	/* auto print mode on */
 	case 5:
-	  if (! AutoPrintMode)
-	  {
-	    OpenPrnFile();
-	    AutoPrintMode = TRUE;
+	  if (ts.TermFlag&TF_PRINTERCTRL) {
+	    if (! AutoPrintMode)
+	    {
+	      OpenPrnFile();
+	      AutoPrintMode = TRUE;
+	    }
 	  }
 	  break;
       }
