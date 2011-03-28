@@ -1359,9 +1359,95 @@ ZMODEMのエントリポイントについて、以下に示します。
 </tr>
 </table>
 
+  <h3>テスト手法</h3>
+　バイナリ転送プロトコルはシリアル回線で利用されることが多いのですが、最近のPCは、シリアルポートが搭載されていないため、シリアル接続でのテストを行うことが難しくなっています。そこで、<a href="http://com0com.sourceforge.net/">com0comというNull-modem emulator</a>を利用すると、1つのPC内で仮想的に2つのCOMポートを生成し、Tera Term同士、Tera Termと別ターミナルソフト同士で、シリアル通信を行うことができます。
+　
+
+<div align="center">
+<img src="image/devman_com0com.png" width=468 height=171>
+</div>
+
+
+  <h3>記号</h3>
+　バイナリ転送プロトコルでは、ACKやCANといったキャラクタ表記が使われますが、これらはASCIIコード表から来ています。man 7 ascii でASCIIコード一覧が参照できます。以下に代表的な記号と値を引用します。
+　
+
+<pre class=code>
+Oct   Dec   Hex   Char                        Oct   Dec   Hex   Char
+------------------------------------------------------------------------
+001   1     01    SOH (start of heading)      101   65    41    A
+002   2     02    STX (start of text)         102   66    42    B
+004   4     04    EOT (end of transmission)   104   68    44    D
+006   6     06    ACK (acknowledge)           106   70    46    F
+025   21    15    NAK (negative ack.)         125   85    55    U
+030   24    18    CAN (cancel)                130   88    58    X
+</pre>
+
+
+
   <h3>XMODEM</h3>
 XMODEMは、ファイルのデータを一定のサイズ（128バイトおよび1024バイト）に分割し、ブロックごとにACKを確認しながら、送信を行うプロトコルです。ブロック単位で、毎回ACKを確認するため、転送速度は速くはありませんが、実装がシンプルとなります。<br>
 最後のブロックが一定のサイズに満たない場合は、満たすようにCPMEOF(0x1A)がパディングされます。すなわち、データを送ると、かならずデータのサイズが一定のサイズの倍数となり、末尾にCPMEOFが付加される場合があるということです。そのため、ファイルの送信に完全性を求める場合は、XMOMDEは使えません。なお、CPMEOFというのは、MS-DOSの前身であるCP/MというOSにおいて、テキストファイルの終端(EOF)を表す値のことです。<br>
+　XMODEMのプロトコルについては、下記サイトが参考になります。
+
+<ul>
+　<li><a href="http://ja.wikipedia.org/wiki/XMODEM">XMODEM - Wikipedia</a></li>
+</ul>
+<br>
+
+　teraterm.ini で XmodemLog エントリを有効にすると、通信ログを採取することができます。通信ログファイルは、ttermpro.exe と同じディレクトリに"XMODEM.LOG"という名前で生成されます。
+
+<pre class=code>
+; XMODEM log
+XmodemLog=on
+</pre>
+
+　簡単な例として、Tera Term(COM10)から<a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a>(COM11)に対して、67バイトのファイルを送信した場合の通信ログを示します。「&lt;&lt;&lt;」行はTera Termがホストから受信したデータで、「&gt;&gt;&gt;」行はTera Termが送信したデータです。
+　
+<pre class=code>
+&lt;&lt;&lt;
+15                                                  .
+
+&gt;&gt;&gt;
+01 01 FE 23 0D 0A 23 20 6B 6E 6F 77 6E 5F 68 6F     ...#..# known_ho
+73 74 73 20 66 69 6C 65 20 66 6F 72 20 54 54 53     sts file for TTS
+53 48 28 41 6E 20 53 53 48 20 45 78 74 65 6E 73     SH(An SSH Extens
+69 6F 6E 20 74 6F 20 54 65 72 61 20 54 65 72 6D     ion to Tera Term
+29 0D 0A 23 0D 0A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A     )..#............
+1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A     ................
+1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A     ................
+1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A 1A     ................
+1A 1A 1A EC                                         ....
+
+&lt;&lt;&lt;
+06                                                  .
+
+&gt;&gt;&gt;
+04                                                  .
+
+&lt;&lt;&lt;
+06 
+</pre>
+
+　上記ログの意味は以下のとおりです。
+　
+<ol>
+ <li>NAK受信</li>
+ <li>ブロックデータの送信</li>
+ <li>ACK受信</li>
+ <li>EOTの送信</li>
+ <li>ACK受信</li>
+</ol>
+
+　ブロックデータは、「ヘッダ(3byte)＋データ(128byte)＋CRC(1byte)」から構成されます。この例では、送信データが128byte未満なので、パディングとしてCPMEOF(0x1A)で埋められています。
+
+
+
+  <h3>YMODEM</h3>
+
+
+
+  <h3>ZMODEM</h3>
 
 
 </BODY>
