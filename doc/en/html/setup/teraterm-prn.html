@@ -59,12 +59,12 @@ For Russian mode, you should see also <a href="#russfont">Russian code set of th
 <h1><a name="ignoremc">Ignore the printing control sequence</a></h1>
 
 <p>
-You can ignore the printing control sequence(MC: Media Copy) by editing the IgnorePrinterCtrl line in the [Tera Term] section of the setup file like the following:
+You can ignore the printing control sequence(MC: Media Copy) by editing the PrinterCtrlSequence line in the [Tera Term] section of the setup file like the following:
 The PassThruPort line is also disabled.
 </p>
 
 <pre>
-IgnorePrinterCtrl=on|off
+PrinterCtrlSequence=on|off
 </pre>
 
 <p>
@@ -73,12 +73,12 @@ IgnorePrinterCtrl=on|off
 
 <pre>
 Example:
-IgnorePrinterCtrl=on
+PrinterCtrlSequence=off
 </pre>
 
 <pre>
 Default:
-IgnorePrinterCtrl=off
+PrinterCtrlSequence=on
 </pre>
 
 
