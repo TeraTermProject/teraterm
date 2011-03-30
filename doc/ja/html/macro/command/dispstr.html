@@ -64,10 +64,24 @@ for y 24 30
 next 
 </pre>
 
+<pre class="macro-example">
+connect '/C=1'
+if result == 1 then
+  dispstr 'Error opening COM1'   ; 接続状態でないため、このコマンドは失敗する。
+elseif result == 2 then
+  dispstr 'Successfully opened COM1'
+endif
+end
+</pre>
+
 <h2>注意</h2>
 
 <p>
 当該コマンドの出力内容はホスト側からは認識できない。そのため、当該コマンドを使用すると、端末画面の表示状態がホスト側とずれてしまい、端末画面の表示が崩れる可能性がある。
+</p>
+
+<p>
+Tera Termは接続状態でないと、マクロコマンドは実行されない。
 </p>
 
 </body>

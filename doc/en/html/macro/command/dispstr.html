@@ -65,10 +65,24 @@ for y 24 30
 next 
 </pre>
 
+<pre class="macro-example">
+connect '/C=1'
+if result == 1 then
+  dispstr 'Error opening COM1'   ; Command error because of not connection.
+elseif result == 2 then
+  dispstr 'Successfully opened COM1'
+endif
+end
+</pre>
+
 <h2>Note</h2>
 
 <p>
 The remote host can not recognize the dispstr output data. So, the terminal screen may not display properly because the buffer of the terminal screen differs from the remote host screen.
+</p>
+
+<p>
+When Tera Term does not connect to the host, this macro command can not be executed.
 </p>
 
 </body>
