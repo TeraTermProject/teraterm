@@ -2407,13 +2407,6 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 	return FALSE;
 }
 
-#define OBFUSCATING_ROUND_TO 32
-
-static int obfuscating_round_up(PTInstVar pvar, int size)
-{
-	return (size + OBFUSCATING_ROUND_TO - 1) & ~(OBFUSCATING_ROUND_TO - 1);
-}
-
 static void try_send_credentials(PTInstVar pvar)
 {
 	if ((pvar->ssh_state.status_flags & STATUS_DONT_SEND_CREDENTIALS) == 0) {
@@ -2436,19 +2429,16 @@ static void try_send_credentials(PTInstVar pvar)
 			return;
 		case SSH_AUTH_PASSWORD:{
 				int len = strlen(cred->password);
-				// Round up password length to discourage traffic analysis
-				int obfuscated_len = obfuscating_round_up(pvar, len);
 				unsigned char FAR *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_PASSWORD,
-					                  4 + obfuscated_len);
+					                  4 + len);
 
 				notify_verbose_message(pvar,
 				                       "Trying PASSWORD authentication...",
 				                       LOG_LEVEL_VERBOSE);
 
-				set_uint32(outmsg, obfuscated_len);
+				set_uint32(outmsg, len);
 				memcpy(outmsg + 4, cred->password, len);
-				memset(outmsg + 4 + len, 0, obfuscated_len - len);
 				
 				// セッション複製時にパスワードを使い回したいので、ここでのリソース解放はやめる。
 				// socket close時にもこの関数は呼ばれているので、たぶん問題ない。(2005.4.8 yutaka)
@@ -2564,22 +2554,21 @@ static void try_send_credentials(PTInstVar pvar)
 						begin_send_packet(pvar, SSH_CMSG_AUTH_TIS, 0);
 
 					notify_verbose_message(pvar,
-					                    "Trying TIS authentication...",
-					                    LOG_LEVEL_VERBOSE);
+					                       "Trying TIS authentication...",
+					                       LOG_LEVEL_VERBOSE);
 					enque_handlers(pvar, 2, TIS_msgs, TIS_handlers);
 				} else {
 					int len = strlen(cred->password);
-					int obfuscated_len = obfuscating_round_up(pvar, len);
 					unsigned char FAR *outmsg =
 						begin_send_packet(pvar, SSH_CMSG_AUTH_TIS_RESPONSE,
-						                  4 + obfuscated_len);
+						                  4 + len);
 
-					notify_verbose_message(pvar, "Sending TIS response",
-											LOG_LEVEL_VERBOSE);
+					notify_verbose_message(pvar,
+					                       "Sending TIS response",
+					                       LOG_LEVEL_VERBOSE);
 
-					set_uint32(outmsg, obfuscated_len);
+					set_uint32(outmsg, len);
 					memcpy(outmsg + 4, cred->password, len);
-					memset(outmsg + 4 + len, 0, obfuscated_len - len);
 					enque_simple_auth_handlers(pvar);
 				}
 
@@ -2609,18 +2598,16 @@ static void try_send_user_name(PTInstVar pvar)
 
 		if (username != NULL) {
 			int len = strlen(username);
-			int obfuscated_len = obfuscating_round_up(pvar, len);
 			unsigned char FAR *outmsg =
-				begin_send_packet(pvar, SSH_CMSG_USER, 4 + obfuscated_len);
+				begin_send_packet(pvar, SSH_CMSG_USER, 4 + len);
 			char buf[1024] = "Sending user name: ";
 			static const int msgs[] =
 				{ SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
 			static const SSHPacketHandler handlers[]
 			= { handle_noauth_success, handle_auth_required };
 
-			set_uint32(outmsg, obfuscated_len);
+			set_uint32(outmsg, len);
 			memcpy(outmsg + 4, username, len);
-			memset(outmsg + 4 + len, 0, obfuscated_len - len);
 			finish_send_packet(pvar);
 
 			pvar->ssh_state.status_flags |= STATUS_DONT_SEND_USER_NAME;
