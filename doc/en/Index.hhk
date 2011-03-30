@@ -1161,8 +1161,8 @@
 <param name="Local" value="html\usage\tips\xmodem.html">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="Tips on xterm">
-<param name="Local" value="html\usage\tips\xterm.html">
+<param name="Name" value="Tips on vim">
+<param name="Local" value="html\usage\tips\vim.html">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="Tips on ZMODEM">

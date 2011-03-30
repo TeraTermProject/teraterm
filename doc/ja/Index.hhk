@@ -1197,8 +1197,8 @@
 <param name="Local" value="html\usage\tips\xmodem.html">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
-<param name="Name" value="xterm のヒント">
-<param name="Local" value="html\usage\tips\xterm.html">
+<param name="Name" value="vim からの制御シーケンスの使用例">
+<param name="Local" value="html\usage\tips\vim.html">
 </OBJECT>
 <LI><OBJECT type="text/sitemap">
 <param name="Name" value="ZMODEM のヒント">
