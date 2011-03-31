@@ -11,7 +11,7 @@
 
 <h1>対応制御シーケンス</h1>
 
-<h2>C0 制御文字</h2>
+<h2><a name="C0">C0 制御文字</a></h2>
 <table border="1">
 <tr><th>コード</th>	<th> 略号 </th>	<th>機能</th></tr>
 <tr><td>0x00</td>	<td> NUL </td>	<td> </td></tr>
@@ -48,7 +48,7 @@
 <tr><td>0x1f</td>	<td> US  </td>	<td> </td></tr>
 </table>
 
-<h2>C1制御文字</h2>
+<h2><a name="C1">C1制御文字</a></h2>
 <table border="1">
 <tr><th>コード</th>	<th> 7bit表現 </th>	<th> 略号 </th>	<th>機能</th></tr>
 <tr><td>0x80</td>	<td> </td>	<td> PAD </td>	<td></td></tr>
@@ -85,7 +85,7 @@
 <tr><td>0x9f</td>	<td> ESC _ </td>	<td> APC </td>	<td>Application Program Command (<a href="#APC">APCシーケンス</a>を参照)</td></tr>
 </table>
 
-<h2>エスケープシーケンス</h2>
+<h2><a name="ESC">エスケープシーケンス</a></h2>
 <table border="1">
 <tr><th>シーケンス</th>	<th>略号</th>	<th>機能</th></tr>
 <tr><td>ESC 6</td>	<td>DECBI</td>	<td>カーソルを左に 1 桁移動する。カーソルが左端に有った場合、画面を右に 1 桁スクロールする。スクロールした結果画面の右にはみ出した部分は失われる。</td></tr>
@@ -812,7 +812,7 @@ OSC 4 ; <i>c</i> ; rgb:<i>rr</i>/<i>gg</i>/<i>bb</i> ST
 <pre>APC <i>Pt</i> ST</pre>
 <p>対応しているAPCシーケンスはありません。すべて無視します。</p>
 
-<h2>参考文献</h2>
+<h2><a name="ref">参考文献</a></h2>
 <ul>
   <li><a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48</a></li>
   <li><a href="http://vt100.net/">VT100.net</a></li>
