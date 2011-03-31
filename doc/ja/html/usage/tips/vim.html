@@ -10,22 +10,72 @@
 <body>
 
 <h1>vim からの制御シーケンスの使用例</h1>
+<p>
+Tera Term では、制御シーケンスを使用する事によってホスト側から Tera Term の動作を変更したりする事が出来ます。
+ここでは vim からこれらの制御シーケンスを活用する為の設定例を紹介します。
+</p>
 
-<h2><a name="Bracketed">Bracketed Paste Mode</a></h2>
+<h2><a name="CursorStyle">挿入モードへの出入り時にカーソル形状を変更する</a></h2>
+<p>
+Tera Term では、以下のカーソル表示状態変更制御シーケンスに対応しています。
+</p>
+
+<table border="1">
+  <tr> <th>略称</th> <th>シーケンス</th> <th>機能</th> </tr>
+
+  <tr> <td rowspan="2">DECTCEM</td>
+       <td>ESC [ ? 25 h</td> <td>カーソルを表示状態にする</td> </tr>
+  <tr> <td>ESC [ ? 25 l</td> <td>カーソルを非表示状態にする</td> </tr>
+
+  <tr> <td rowspan="7">DECSCUSR</td>
+       <td>ESC SP 0 q</td> <td>カーソル形状を箱型で点滅状態にする</td> </tr>
+  <tr> <td>ESC SP 1 q</td> <td>カーソル形状を箱型で点滅状態にする</td> </tr>
+  <tr> <td>ESC SP 2 q</td> <td>カーソル形状を箱型で点灯(非点滅)状態にする</td> </tr>
+  <tr> <td>ESC SP 3 q</td> <td>カーソル形状を下線で点滅状態にする</td> </tr>
+  <tr> <td>ESC SP 4 q</td> <td>カーソル形状を下線で点灯(非点滅)状態にする</td> </tr>
+  <tr> <td>ESC SP 5 q</td> <td>カーソル形状を縦線で点滅状態にする</td> </tr>
+  <tr> <td>ESC SP 6 q</td> <td>カーソル形状を縦線で点灯(非点滅)状態にする</td> </tr>
+
+  <tr> <td rowspan="2">WYSTCURM</td>
+       <td>ESC [ 33 h</td> <td>カーソルを点灯(非点滅)状態にする</td> </tr>
+  <tr> <td>ESC [ 33 l</td> <td>カーソルを点滅状態にする</td> </tr>
+
+  <tr> <td rowspan="2">WYULCURM</td>
+       <td>ESC [ 34 h</td> <td>カーソル形状を下線にする</td> </tr>
+  <tr> <td>ESC [ 34 l</td> <td>カーソル形状を箱型にする</td> </tr>
+
+  <tr> <td rowspan="2"> (AT&amp;T 610) </td>
+       <td>ESC [ ? 12 l</td> <td>カーソルを点灯(非点滅)状態にする</td> </tr>
+  <tr> <td>ESC [ ? 12 h</td> <td>カーソルを点滅状態にする</td> </tr>
+</table>
 
 <p>
-この機能は xterm 拡張で、有効になっていると、クリップボードからの貼り付け時に文字列の前後に特別なシーケンスを付加するというものです。<br>
-具体的には、DECSET の 2004(&lt;CSI&gt;?2004h) で有効になり、貼り付け時に文字列の前に &lt;ESC&gt;200~, 後ろに &lt;ESC&gt;201~ が付くようになります。
+これらの制御シーケンスを挿入モードに入る時 (t_SI 設定) および挿入モードから出る時 (t_EI 設定) に出力する事で、挿入モードでのカーソル形状を変更できます。<br>
+例えば .vimrc に以下の設定を追加すると、挿入モードに入った時にカーソル形状が下線で点滅に、挿入モードから出た時に箱型で点滅に変わるようになります。
+</p>
+
+<pre class="macro-example">
+let t_SI .= "\e[3 q"
+let t_EI .= "\e[1 q"
+</pre>
+
+<p>注: DECTCEM <strong>以外</strong>の制御シーケンスを使うには、Additional Settings ダイアログの Control sequence タブに有る Cursor control sequence を on にする必要があります。(デフォルトは off)</p>
+
+
+<h2><a name="Bracketed">クリップボードからの貼り付け時に自動インデントを無効にする</a></h2>
+<p>
+通常、ホスト側のアプリケーション (vim 等) からは、ユーザのキー入力とクリップボードからの貼り付けを区別できません。
+しかし xterm の拡張機能である Bracketed Paste Mode を利用するとこれらを区別出来るようになるため、クリップボードからの貼り付け時は動作を変える事ができます。
 </p>
 
 <p>
-以下に vim の .vimrc 設定例を示します。貼り付け時は自動インデントが無効になります。
+.vimrc に以下の設定を追加すると、クリップボードからの貼り付け時に自動で set paste を実行して、自動インデントや補完等が無効になります。
 </p>
 
-<pre>
+<pre class="macro-example">
 if &term == "xterm"
-  let &t_ti = &t_ti . "\e[?2004h"
-  let &t_te = "\e[?2004l" . &t_te
+  let &t_ti .= "\e[?2004h"
+  let &t_te .= "\e[?2004l"
   let &pastetoggle = "\e[201~"
 
   function XTermPasteBegin(ret)
@@ -40,6 +90,53 @@ if &term == "xterm"
 endif
 </pre>
 
+<h3>Bracketed Paste mode</h3>
+<p>
+この機能は xterm 拡張で、有効になっていると、クリップボードからの貼り付け時に文字列の前後に特別なシーケンスを付加するというものです。<br>
+具体的には、DECSET の 2004(&lt;CSI&gt;?2004h) で有効になり、貼り付け時に文字列の前に &lt;ESC&gt;200~, 後ろに &lt;ESC&gt;201~ が付くようになります。
+</p>
+
+
+<h2><a name="IMEcontrol">IME を制御する</a></h2>
+<p>
+Tera Term では IME の状態を制御する為の独自の制御シーケンスをサポートしています。
+この制御シーケンスを利用すれば、モードにより IME の有効/無効を切り替えるといった事が出来るようになります。
+</p>
+
+<p>
+.vimrc に以下の設定を追加すると、挿入モードから抜けた時に IME をオフにし、再度挿入モードに入った時に IME の状態を元に戻すようになります。
+</p>
+
+<pre class="macro-example">
+let &t_SI .= "\e[&lt;r"
+let &t_EI .= "\e[&lt;s\e[&lt;0t"
+let &t_te .= "\e[&lt;0t\e[&lt;s"
+</pre>
+
+<p>
+注: この設定を行う場合、"<a href="#AppESC">挿入モードでの ESC キーを押した後の待ちを無くす</a>"の設定も併用した方がいいでしょう。
+</p>
+
+
+<h2><a name="AppESC">挿入モードでの ESC キーを押した後の待ちを無くす</a></h2>
+<p>
+Tera Term や xterm 等の端末エミュレータでは、ESC キーが押された時に ESC (0x1b) を送信します。また、カーソルキーやファンクションキー等が押された時に ESC で始まる文字列を送信します。
+この為、ホスト側のアプリケーションでは ESC を受信しても、それだけでは ESC キーが押されたのか、それともカーソルキーやファンクションキーが押されたのか区別する事が出来ません。<br>
+そこで vim では ESC を受信した時は 1 秒ほど待ち、他の文字が送られてこないか、送られてきた場合はカーソルキー等を表す文字列になるかどうかで、ESC キーが押されたのか、それともカーソルキー等が押されたのかを判別します。
+この為、挿入モードで ESC キーを押されてから実際に挿入モードを抜けるのが 1 秒程遅れます。
+これにより、<a href="#CursorStyle">モードによりカーソル形状を変える設定</a>や <a href="#IMEcontrol">IME を制御する設定</a>を行っても、状態が反映されるのが遅れます。
+</p>
+
+<p>
+この問題は Application Wheel Mode を使う事で回避できます。
+.vimrc に以下の設定を追加すると、挿入モードで ESC キーを押した時に待たずにすぐに挿入モードを抜けるようになります。
+</p>
+
+<pre class="macro-example">
+let &t_SI .= "\e[?7727h"
+let &t_EI .= "\e[?7727l"
+inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
+</pre>
 
 </body>
 </html>
