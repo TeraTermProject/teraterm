@@ -10,14 +10,14 @@
 <body>
 
 <h1>Tips on vim</h1>
-<!-- h1>vim からの制御シーケンスの使用例</h1 -->
-<!-- p>
-Tera Term では、制御シーケンスを使用する事によってホスト側から Tera Term の動作を変更したりする事が出来ます。
-ここでは vim からこれらの制御シーケンスを活用する為の設定例を紹介します。
-</p -->
+<h1>VIM Control Sequence Examples</h1>
+<p>
+When a user uses the control sequence, the remote host can control the Tera Term behavior. 
+The VIM procedure for using the control sequence is described below.
+</p>
 
+<h2><a name="CursorStyle">Changing cursor shape on entering and leaving into insert mode</a></h2>
 <!--
-<h2><a name="CursorStyle">挿入モードへの出入り時にカーソル形状を変更する</a></h2>
 <p>
 Tera Term では、以下のカーソル表示状態変更制御シーケンスに対応しています。
 </p>
@@ -65,16 +65,13 @@ let t_EI .= "\e[1 q"
 -->
 
 <h2><a name="Bracketed">Bracketed Paste Mode</a></h2>
-<!-- h2><a name="Bracketed">クリップボードからの貼り付け時に自動インデントを無効にする</a></h2 -->
-<!-- p>
-通常、ホスト側のアプリケーション (vim 等) からは、ユーザのキー入力とクリップボードからの貼り付けを区別できません。
-しかし xterm の拡張機能である Bracketed Paste Mode を利用するとこれらを区別出来るようになるため、クリップボードからの貼り付け時は動作を変える事ができます。
-</p -->
+<h2><a name="Bracketed">Auto indent can be disabled on pasting from clipboard</a></h2>
+<p>
+Basically, the host application can not recognize the difference between the user input and pasting from clipboard. 
+However, when a user uses the Bracketed Paste Mode as the xterm extension, the application can recognize its difference and a user can change the behavior of pasting from clipboard.
+</p>
 
 <p>
-<!--
-.vimrc に以下の設定を追加すると、クリップボードからの貼り付け時に自動で set paste を実行して、自動インデントや補完等が無効になります。
--->
 The vim configuration is described below. The following will use xterm's bracketed paste mode to make pasting automatically enable paste mode and insert mode. Also works fine in ~/.vimrc file.
 </p>
 
@@ -103,8 +100,9 @@ The program will receive: ESC [ 200 ~, followed by the pasted text, followed by 
 </p>
 
 
+<h2><a name="IMEcontrol">Controlling IME</a></h2>
+
 <!--
-<h2><a name="IMEcontrol">IME を制御する</a></h2>
 <p>
 Tera Term では IME の状態を制御する為の独自の制御シーケンスをサポートしています。
 この制御シーケンスを利用すれば、モードにより IME の有効/無効を切り替えるといった事が出来るようになります。
