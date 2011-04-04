@@ -1950,9 +1950,27 @@ void ChangeFont()
 
   strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),"Tera Special", _TRUNCATE);
   VTFont[AttrSpecial] = CreateFontIndirect(&VTlf);
-  VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
-  VTFont[AttrSpecial | AttrUnder] = VTFont[AttrSpecial];
-  VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial];
+
+  /* Special font (Underline) */
+  VTlf.lfUnderline = 1;
+  VTlf.lfHeight = FontHeight - 1; // adjust for underline
+  VTFont[AttrSpecial | AttrUnder] = CreateFontIndirect(&VTlf);
+
+  if (ts.FontFlag & FF_BOLD) {
+    /* Special font (Bold) */
+    VTlf.lfUnderline = 0;
+    VTlf.lfHeight = FontHeight;
+    VTlf.lfWeight = FW_BOLD;
+    VTFont[AttrSpecial | AttrBold] = CreateFontIndirect(&VTlf);
+    /* Special font (Bold + Underline) */
+    VTlf.lfUnderline = 1;
+    VTlf.lfHeight = FontHeight - 1; // adjust for underline
+    VTFont[AttrSpecial | AttrBold | AttrUnder] = CreateFontIndirect(&VTlf);
+  }
+  else {
+    VTFont[AttrSpecial | AttrBold] = VTFont[AttrSpecial];
+    VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
+  }
 
   SetLogFont();
 
