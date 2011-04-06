@@ -198,6 +198,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	int i;
 	HDC TmpDC;
 	char Temp[MAX_PATH];
+	OSVERSIONINFO osvi;
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -212,6 +213,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->TelPort = 23;
 
 	ts->DisableTCPEchoCR = FALSE;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
 
 	/* Version number */
 /*  GetPrivateProfileString(Section,"Version","",
@@ -626,7 +630,20 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->DelKey = GetOnOff(Section, "DeleteKey", FName, FALSE);
 
 	/* Meta Key */
-	ts->MetaKey = GetOnOff(Section, "MetaKey", FName, FALSE);
+	GetPrivateProfileString(Section, "MetaKey", "off", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "on") == 0)
+	  ts->MetaKey = IdMetaOn;
+	else if (_stricmp(Temp, "left") == 0)
+	  ts->MetaKey = IdMetaLeft;
+	else if (_stricmp(Temp, "right") == 0)
+	  ts->MetaKey = IdMetaRight;
+	else
+	  ts->MetaKey = IdMetaOff;
+
+	// Windows95 Œn‚Í¶‰E‚Ì Alt ‚Ì”»•Ê‚É”ñ‘Î‰ž
+	if ((osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) && ts->MetaKey != IdMetaOff) {
+	  ts->MetaKey = IdMetaOn;
+	}
 
 	/* Application Keypad */
 	ts->DisableAppKeypad =
@@ -1850,7 +1867,20 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteOnOff(Section, "DeleteKey", FName, ts->DelKey);
 
 	/* Meta key */
-	WriteOnOff(Section, "MetaKey", FName, ts->MetaKey);
+	switch (ts->MetaKey) {
+	case 1:
+		strncpy_s(Temp, sizeof(Temp), "on", _TRUNCATE);
+		break;
+	case 2:
+		strncpy_s(Temp, sizeof(Temp), "left", _TRUNCATE);
+		break;
+	case 3:
+		strncpy_s(Temp, sizeof(Temp), "right", _TRUNCATE);
+		break;
+	default:
+		strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
+	}
+	WritePrivateProfileString(Section, "Metakey", Temp, FName);
 
 	/* Application Keypad */
 	WriteOnOff(Section, "DisableAppKeypad", FName, ts->DisableAppKeypad);

@@ -19,6 +19,7 @@
 #include "tektypes.h"
 #include "tekwin.h"
 #include "ttdde.h"
+#include "keyboard.h"
 
 #include "teraapp.h"
 
@@ -189,7 +190,7 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 
 BOOL CTeraApp::PreTranslateMessage(MSG* pMsg)
 {
-	if (ts.MetaKey>0) {
+	if (MetaKey(ts.MetaKey)) {
 		return FALSE; /* ignore accelerator keys */
 	}
 	else {

@@ -564,6 +564,11 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdBS  1
 #define IdDEL 2
 
+#define IdMetaOff   0
+#define IdMetaOn    1
+#define IdMetaLeft  2
+#define IdMetaRight 3
+
   /* Mouse tracking mode */
 #define IdMouseTrackNone     0
 #define IdMouseTrackDECELR   1

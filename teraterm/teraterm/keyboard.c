@@ -596,7 +596,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 
   if (AltKey()) {
     Scan |= 0x800;
-    if (!ts.MetaKey) {
+    if (!MetaKey(ts.MetaKey)) {
       ModStat |= 16;
     }
   }
@@ -620,7 +620,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
   if (Key==0) {
     CodeLength = VKey2KeyStr(VKey, HWin, Code, sizeof(Code), &CodeType, ModStat);
 
-    if ((ts.MetaKey>0) && (CodeLength==1) && AltKey()) {
+    if (MetaKey(ts.MetaKey) && (CodeLength==1)) {
       switch (ts.Meta8Bit) {
         case IdMeta8BitRaw:
 	  Code[0] |= 0x80;
@@ -639,7 +639,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
     }
   }
   else {
-    if ((ts.MetaKey>0) && AltKey()) {
+    if (MetaKey(ts.MetaKey)) {
       PeekMessage((LPMSG)&M,HWin,WM_SYSCHAR,WM_SYSCHAR,PM_REMOVE);
     }
 
@@ -817,6 +817,20 @@ BOOL ControlKey()
 BOOL AltKey()
 {
   return ((GetAsyncKeyState(VK_MENU) & 0xFFFFFF80) != 0);
+}
+
+BOOL MetaKey(int mode)
+{
+  switch (mode) {
+  case IdMetaOn:
+    return ((GetAsyncKeyState(VK_MENU) & 0xFFFFFF80) != 0);
+  case IdMetaLeft:
+    return ((GetAsyncKeyState(VK_LMENU) & 0xFFFFFF80) != 0);
+  case IdMetaRight:
+    return ((GetAsyncKeyState(VK_RMENU) & 0xFFFFFF80) != 0);
+  default:
+    return FALSE;
+  }
 }
 
 void InitKeyboard()

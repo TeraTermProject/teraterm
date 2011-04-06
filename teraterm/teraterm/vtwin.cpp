@@ -1688,7 +1688,7 @@ void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-	if ((ts.MetaKey>0) && AltKey()) {
+	if (MetaKey(ts.MetaKey)) {
 		::PostMessage(HVTWin,WM_SYSCHAR,nChar,MAKELONG(nRepCnt,nFlags));
 		return;
 	}
@@ -2011,8 +2011,10 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-
-	if ((ts.MetaKey>0) && ((nFlags & 0x2000) != 0)) {
+	// 右Altでもなぜか nFlags の拡張キービット(8) が立たないので
+	// nFlags は当てにせず GetAsyncKeyState を使って判断する
+	if (MetaKey(ts.MetaKey))
+	{
 		/* for Ctrl+Alt+Key combination */
 		GetKeyboardState((PBYTE)KeyState);
 		KeyState[VK_MENU] = 0;
@@ -2022,21 +2024,6 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		M.wParam = nChar;
 		M.lParam = MAKELONG(nRepCnt,nFlags & 0xdfff);
 		TranslateMessage(&M);
-
-	} else {
-		// ScrollLockキーが点灯している場合は、マウスをクリックしっぱなし状態であると
-		// 見なす。すなわち、パージング処理が一時停止する。
-		// 当該キーを消灯させると、処理が再開される。(2006.11.14 yutaka)
-#if 0
-		GetKeyboardState((PBYTE)KeyState);
-		if (KeyState[VK_SCROLL] == 0x81) { // on : scroll locked
-			ScrollLock = TRUE;
-		} else if (KeyState[VK_SCROLL] == 0x80) { // off : scroll unlocked
-			ScrollLock = FALSE;
-		} else {
-			// do nothing
-		}
-#endif
 	}
 
 }
@@ -2626,7 +2613,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 #endif
 
-	if (ts.MetaKey) {
+	if (MetaKey(ts.MetaKey)) {
 		if (!KeybEnabled || (TalkStatus!=IdTalkKeyb)) return;
 		Code = nChar;
 		for (i=1 ; i<=nRepCnt ; i++) {
@@ -2684,9 +2671,10 @@ void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	if ((nChar==VK_F10) ||
-	    (ts.MetaKey>0) &&
-	    ((MainMenu==NULL) || (nChar!=VK_MENU)) &&
-		((nFlags & 0x2000) != 0)) {
+	   ((ts.MetaKey == IdMetaOn) && (nFlags & 0x2000) ||
+	    (ts.MetaKey == IdMetaLeft) && (nFlags & 0x2100) == 0x2000 ||
+	    (ts.MetaKey == IdMetaRight) && (nFlags & 0x2100) == 0x2100) &&
+	   ((MainMenu==NULL) || (nChar!=VK_MENU))) {
 		KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff);
 		// OnKeyDown(nChar,nRepCnt,nFlags);
 	}

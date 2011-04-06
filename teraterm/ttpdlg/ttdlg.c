@@ -65,6 +65,8 @@ static PCHAR far KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
 static PCHAR far RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
 static PCHAR far RussList2[] = {"Windows","KOI8-R",NULL};
 static PCHAR far LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
+static PCHAR far MetaList[] = {"off", "on", "left", "right", NULL};
+static PCHAR far MetaList2[] = {"off", "on", NULL};
 
 // HKS
 static PCHAR far KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
@@ -1178,6 +1180,7 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+	OSVERSIONINFO osvi;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -1192,6 +1195,7 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(Dialog, IDC_KEYBDEL, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_KEYBKEYBTEXT, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_KEYBKEYB, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_KEYBMETATEXT, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_KEYBMETA, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_KEYBDISABLE, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_KEYBAPPKEY, WM_SETFONT, (WPARAM)DlgKeybFont, MAKELPARAM(TRUE,0));
@@ -1219,9 +1223,9 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(Dialog, IDC_KEYBKEYBTEXT, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_KEYB_KEYB", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_KEYBKEYBTEXT, uimsg);
-			GetDlgItemText(Dialog, IDC_KEYBMETA, uimsg2, sizeof(uimsg2));
+			GetDlgItemText(Dialog, IDC_KEYBMETATEXT, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_KEYB_META", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetDlgItemText(Dialog, IDC_KEYBMETA, uimsg);
+			SetDlgItemText(Dialog, IDC_KEYBMETATEXT, uimsg);
 			GetDlgItemText(Dialog, IDC_KEYBDISABLE, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_KEYB_DISABLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_KEYBDISABLE, uimsg);
@@ -1246,6 +1250,16 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetRB(Dialog,ts->MetaKey,IDC_KEYBMETA,IDC_KEYBMETA);
 			SetRB(Dialog,ts->DisableAppKeypad,IDC_KEYBAPPKEY,IDC_KEYBAPPKEY);
 			SetRB(Dialog,ts->DisableAppCursor,IDC_KEYBAPPCUR,IDC_KEYBAPPCUR);
+
+			osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+                        GetVersionEx(&osvi);
+                        if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList2, ts->MetaKey + 1);
+                        }
+			else {
+				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList, ts->MetaKey + 1);
+			}
+
 			if (ts->Language==IdRussian) {
 				ShowDlgItem(Dialog,IDC_KEYBKEYBTEXT,IDC_KEYBKEYB);
 				SetDropDownList(Dialog, IDC_KEYBKEYB, RussList2, ts->RussKeyb);
@@ -1263,6 +1277,7 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						GetRB(Dialog,&ts->MetaKey,IDC_KEYBMETA,IDC_KEYBMETA);
 						GetRB(Dialog,&ts->DisableAppKeypad,IDC_KEYBAPPKEY,IDC_KEYBAPPKEY);
 						GetRB(Dialog,&ts->DisableAppCursor,IDC_KEYBAPPCUR,IDC_KEYBAPPCUR);
+						ts->MetaKey = (WORD)GetCurSel(Dialog, IDC_KEYBMETA) - 1;
 						if (ts->Language==IdRussian)
 							ts->RussKeyb = (WORD)GetCurSel(Dialog, IDC_KEYBKEYB);
 					}

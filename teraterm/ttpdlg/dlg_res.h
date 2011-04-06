@@ -64,6 +64,7 @@
 #define IDC_KEYBMETA                    303
 #define IDC_KEYBKEYBTEXT                304
 #define IDC_KEYBKEYB                    305
+#define IDC_KEYBMETATEXT                306
 #define IDC_KEYBDISABLE                 310
 #define IDC_KEYBAPPKEY                  311
 #define IDC_KEYBAPPCUR                  312

@@ -27,6 +27,7 @@ void KeyUp(WORD VKey);
 BOOL ShiftKey();
 BOOL ControlKey();
 BOOL AltKey();
+BOOL MetaKey(int mode);
 void InitKeyboard();
 void EndKeyboard();
 

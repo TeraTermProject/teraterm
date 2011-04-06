@@ -267,7 +267,7 @@ DLG_KEYB_TRANSMIT=Envoyer DEL avec:
 DLG_KEYB_BS=Touche &Bkspace
 DLG_KEYB_DEL=Touche &Delete
 DLG_KEYB_KEYB=&Clavier:
-DLG_KEYB_META=Alt = &Meta
+DLG_KEYB_META=Alt = &Meta:
 DLG_KEYB_DISABLE=Dévalider le mode:
 DLG_KEYB_APPKEY=Codes pavé numérique
 DLG_KEYB_APPCUR=Codes Curseur pavé numérique
