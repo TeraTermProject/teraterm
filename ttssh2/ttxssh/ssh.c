@@ -4477,7 +4477,7 @@ static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_pr
 static hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my_proposal)
 {
 	hmac_type type = HMAC_UNKNOWN;
-	char str_hmac[16];
+	char str_hmac[64];
 	ssh2_mac_t *ptr = ssh2_macs;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_hmac, sizeof(str_hmac));
