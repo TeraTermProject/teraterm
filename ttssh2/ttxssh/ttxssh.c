@@ -293,6 +293,8 @@ static void normalize_mac_order(char FAR * buf)
 	static char default_strings[] = {
 		HMAC_SHA1,
 		HMAC_MD5,
+		HMAC_SHA1_96,
+		HMAC_MD5_96,
 		HMAC_NONE,
 	};
 

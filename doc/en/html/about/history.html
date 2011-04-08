@@ -1677,13 +1677,14 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>When the ECDSA key is selected on the SSH key generator dialog, the input box of the key bits is disabled.</li>
-      <li>Some kind of the KEX, host key, HMAC and compression algorithm order can be specified in the teraterm.ini file.
+      <li>Some kind of the KEX, host key, MAC and compression algorithm order can be specified in the teraterm.ini file.
         <ul>
           <li>KexOrder=56743210</li>
           <li>HostKeyOrder=456230</li>
           <li>MacOrder=120</li>
           <li>CompOrder=3210</li>
         </ul></li>
+      <li>added support for SSH2 MAC algorithms: hmac-sha1-96, hmac-md5-96</li>
     </ul>
   </li>
 

@@ -1678,13 +1678,14 @@
   <li>変更
     <ul>
       <li>SSH鍵生成ダイアログで、鍵の種類にECDSA鍵を選んだ場合は鍵のビット数の入力ボックスを無効化するようにした。</li>
-      <li>KEX、ホストキー、HMAC、圧縮アルゴリズムオーダーを、teraterm.iniのエントリで指定できるようにした。
+      <li>KEX、ホストキー、MAC、圧縮アルゴリズムオーダーを、teraterm.iniのエントリで指定できるようにした。
         <ul>
           <li>KexOrder=56743210</li>
           <li>HostKeyOrder=456230</li>
           <li>MacOrder=120</li>
           <li>CompOrder=3210</li>
         </ul></li>
+      <li>SSH2 の MAC アルゴリズムとして hmac-sha1-96, hmac-md5-96 をサポートした。</li>
     </ul>
   </li>
 

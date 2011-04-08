@@ -333,6 +333,8 @@ typedef enum {
 	HMAC_NONE,      /* disabled line */
 	HMAC_SHA1,
 	HMAC_MD5,
+	HMAC_SHA1_96,
+	HMAC_MD5_96,
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
 } hmac_type;
@@ -345,9 +347,11 @@ typedef struct ssh2_mac {
 } ssh2_mac_t;
 
 static ssh2_mac_t ssh2_macs[] = {
-	{HMAC_SHA1,    "hmac-sha1", EVP_sha1, 0},
-	{HMAC_MD5,     "hmac-md5",  EVP_md5,  0},
-	{HMAC_NONE,    NULL,        NULL,     0},
+	{HMAC_SHA1,    "hmac-sha1",    EVP_sha1, 0},
+	{HMAC_MD5,     "hmac-md5",     EVP_md5,  0},
+	{HMAC_SHA1_96, "hmac-sha1-96", EVP_sha1, 96},
+	{HMAC_MD5_96,  "hmac-md5-96",  EVP_md5,  96},
+	{HMAC_NONE,    NULL,           NULL,     0},
 };
 
 
