@@ -2977,7 +2977,7 @@ void ControlSequence(BYTE b)
     {
       if (Param[NParam] < 0)
 	Param[NParam] = 0;
-      if (Param[NParam]<1000)
+      if (Param[NParam]<10000)
        Param[NParam] = Param[NParam]*10 + b - 0x30;
     }
     else if (b==0x3B)
