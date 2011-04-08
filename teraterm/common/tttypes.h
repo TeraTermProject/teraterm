@@ -577,6 +577,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdMouseTrackVT200Hl  4  // not supported
 #define IdMouseTrackBtnEvent 5
 #define IdMouseTrackAllEvent 6
+#define IdMouseTrackNetTerm  7
 
   /* Mouse event */
 #define IdMouseEventCurStat  0

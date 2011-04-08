@@ -2409,6 +2409,10 @@ void CSSetAttr()		// SGR
 	      AcceptWheelToCursor = TRUE;
 	    }
 	    break;
+	  case 14001: // NetTerm mouse mode
+	    if (ts.MouseEventTracking)
+	      MouseReportMode = IdMouseTrackNetTerm;
+	    break;
 	}
     }
 
@@ -2534,6 +2538,9 @@ void CSSetAttr()		// SGR
 	    break;
 	  case 7786: // Wheel to Cursor translation
 	    AcceptWheelToCursor = FALSE;
+	    break;
+	  case 14001: // NetTerm mouse mode
+	    MouseReportMode = IdMouseTrackNone;
 	    break;
 	}
     }
@@ -4348,7 +4355,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
   if (x < 1) x = 1;
   if (y < 1) y = 1;
 
-  if (MouseReportMode != IdMouseTrackDECELR) {
+  if (MouseReportMode != IdMouseTrackDECELR && MouseReportMode != IdMouseTrackNetTerm) {
     if (x > 0xff - 32) x = 0xff - 32;
     if (y > 0xff - 32) y = 0xff - 32;
   }
@@ -4382,6 +4389,11 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	  LastButton = Button;
 	  break;
 
+	case IdMouseTrackNetTerm:
+	  len = _snprintf_s_l(Report, sizeof Report, _TRUNCATE, "\033}%d,%d\r", CLocale, y, x);
+	  CommBinaryOut(&cv, Report, len);
+	  return TRUE;
+
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	default:
 	  return FALSE;
@@ -4400,6 +4412,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	  break;
 
 	case IdMouseTrackX10: /* nothing to do */
+	case IdMouseTrackNetTerm: /* nothing to do */
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	default:
 	  return FALSE;
@@ -4425,6 +4438,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	case IdMouseTrackX10: /* nothing to do */
 	case IdMouseTrackVT200: /* nothing to do */
+	case IdMouseTrackNetTerm: /* nothing to do */
 	default:
 	  return FALSE;
       }
@@ -4440,6 +4454,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 
 	case IdMouseTrackX10: /* nothing to do */
 	case IdMouseTrackVT200Hl: /* not supported yet */
+	case IdMouseTrackNetTerm: /* nothing to do */
 	  return FALSE;
       }
       break;
