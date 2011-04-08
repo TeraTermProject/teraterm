@@ -51,7 +51,8 @@
   <li>バグ修正
     <ul>
       <li>strremove マクロにおいて、文字列の末尾1バイトの削除時にBOFが発生していた問題を修正した。 cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24631">Ticket#24631</a></li>
-      <li>YMODEM: ファイル送信において、ACKを待たずとも、ブロック1を送信してしまうバグを修正した。 cf.<a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24286">Sending with Y-Modem fails with u-boot (intermittent)</a></li>
+      <li>YMODEM: ファイル送信において、ACKを待たずとも、ブロック1を送信してしまう問題を修正した。 cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24286">Sending with Y-Modem fails with u-boot (intermittent)</a></li>
+      <li>xterm 形式のマウスイベント通知で、マウスポインタの位置が224行目以降だった場合に不正な報告をする問題を修正した。</li>
     </ul>
   </li>
 

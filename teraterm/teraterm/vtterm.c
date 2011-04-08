@@ -4350,7 +4350,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 
   if (MouseReportMode != IdMouseTrackDECELR) {
     if (x > 0xff - 32) x = 0xff - 32;
-    if (x > 0xff - 32) y = 0xff - 32;
+    if (y > 0xff - 32) y = 0xff - 32;
   }
 
   if (ShiftKey())
