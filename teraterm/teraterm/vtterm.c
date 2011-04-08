@@ -4413,6 +4413,8 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 
 	case IdMouseTrackX10: /* nothing to do */
 	case IdMouseTrackNetTerm: /* nothing to do */
+	  return TRUE;
+
 	case IdMouseTrackVT200Hl: /* not supported yet */
 	default:
 	  return FALSE;
