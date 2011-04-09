@@ -297,7 +297,7 @@ static void normalize_mac_order(char FAR * buf)
 		HMAC_NONE,
 		HMAC_SHA1_96,
 		HMAC_MD5_96,
-#if 0	// HMAC-SHA2 support
+#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
 		HMAC_SHA2_256,
 		HMAC_SHA2_256_96,
 		HMAC_SHA2_512,
