@@ -102,14 +102,13 @@ The program will receive: ESC [ 200 ~, followed by the pasted text, followed by 
 
 <h2><a name="IMEcontrol">Controlling IME</a></h2>
 
-<!--
 <p>
-Tera Term では IME の状態を制御する為の独自の制御シーケンスをサポートしています。
-この制御シーケンスを利用すれば、モードにより IME の有効/無効を切り替えるといった事が出来るようになります。
+Tera Term can support the original sequence to control the IME behavior.
+For example, A user can switch the IME status of enabling and disabling to use this control sequence.
 </p>
 
 <p>
-.vimrc に以下の設定を追加すると、挿入モードから抜けた時に IME をオフにし、再度挿入モードに入った時に IME の状態を元に戻すようになります。
+When below contents is be added in the .vimrc file, the IME status is off after the insert mode exiting. Next, the IME status is on after the insert mode enabling.
 </p>
 
 <pre class="macro-example">
@@ -119,22 +118,22 @@ let &t_te .= "\e[&lt;0t\e[&lt;s"
 </pre>
 
 <p>
-注: この設定を行う場合、"<a href="#AppESC">挿入モードでの ESC キーを押した後の待ちを無くす</a>"の設定も併用した方がいいでしょう。
+NOTICE: You are recommended to configure the <a href="#AppESC">Delete wait time after ESC key is pushed in insert mode</a>.
 </p>
 
 
-<h2><a name="AppESC">挿入モードでの ESC キーを押した後の待ちを無くす</a></h2>
+<h2><a name="AppESC">Delete wait time after ESC key is pushed in insert mode</a></h2>
 <p>
-Tera Term や xterm 等の端末エミュレータでは、ESC キーが押された時に ESC (0x1b) を送信します。また、カーソルキーやファンクションキー等が押された時に ESC で始まる文字列を送信します。
-この為、ホスト側のアプリケーションでは ESC を受信しても、それだけでは ESC キーが押されたのか、それともカーソルキーやファンクションキーが押されたのか区別する事が出来ません。<br>
-そこで vim では ESC を受信した時は 1 秒ほど待ち、他の文字が送られてこないか、送られてきた場合はカーソルキー等を表す文字列になるかどうかで、ESC キーが押されたのか、それともカーソルキー等が押されたのかを判別します。
-この為、挿入モードで ESC キーを押されてから実際に挿入モードを抜けるのが 1 秒程遅れます。
-これにより、<a href="#CursorStyle">モードによりカーソル形状を変える設定</a>や <a href="#IMEcontrol">IME を制御する設定</a>を行っても、状態が反映されるのが遅れます。
+When the ESC key is pressed, Tera Term, xterm and other terminal emulator send the ESC(0x1b) key code. Also, when the cursor key and the function key is pushed, Tera Term sends the ESC key code.
+Therefore, the host application can not recognize whether the ESC key is pressed. <br>
+So, the vim waits for one second when the ESC key code is received to recognize what key is pressed. 
+As a result, when a user presses the ESC key, the time for the insert mode exiting will be late for 1 second.
+This behavior can not be affected by enabling <a href="#CursorStyle">Changing cursor shape on entering and leaving into insert mode</a> and <a href="#IMEcontrol">Controlling IME</a>.
 </p>
 
 <p>
-この問題は Application Wheel Mode を使う事で回避できます。
-.vimrc に以下の設定を追加すると、挿入モードで ESC キーを押した時に待たずにすぐに挿入モードを抜けるようになります。
+Please use the Application Wheel Mode to resolve this problem.
+When below contents is added in the .vimrc file, the insert mode is quickly exited after the ESC key is pressed.
 </p>
 
 <pre class="macro-example">
@@ -142,7 +141,6 @@ let &t_SI .= "\e[?7727h"
 let &t_EI .= "\e[?7727l"
 inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
--->
 
 </body>
 </html>
