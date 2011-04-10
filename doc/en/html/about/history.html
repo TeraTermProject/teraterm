@@ -43,8 +43,8 @@
           <li>added the <a href="../setup/teraterm-prn.html#ignoremc">PrinterCtrlSequence</a> entry in the teraterm.ini file. The default value is off.</li>
         </ul></li>
       <li>The /k option is inherited by using the Duplicate Session. cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682">/k inheritance in "new session"</a></li>
-      <!-- li>DEC 特殊文字のフォントに高輝度/下線属性を反映するようにした。</li -->
-      <!-- li>Meta Key の設定で、左Altや右AltのみMeta Keyに設定できるようにした。</li -->
+      <li>DEC special character font can support the high brightness and the under line attribute.</li>
+      <li>The Meta Key can be only assigned to the left ALT or the right ALT key.</li>
       <li>added support for the NetTerm style mouse event tracking.</li>
     </ul>
   </li>
@@ -53,8 +53,8 @@
     <ul>
       <li>When a last one byte of a string is removed by using the strremove macro command, the BOF will be ocurred. cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24631">Ticket#24631</a></li>
       <li>YMODEM: When a file is sent, the block1 can be sent not waiting the ACK from the YMODEM server. cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24286">Sending with Y-Modem fails with u-boot (intermittent)</a></li>
-      <!-- li>xterm 形式のマウスイベント通知で、マウスポインタの位置が224行目以降だった場合に不正な報告をする問題を修正した。</li -->
-      <!-- li>DECSET/DECRST 制御シーケンスで、10000 以上のモードが指定された時に正しく無視できない場合が有った問題を修正した。</li -->
+      <li>When the mouse cursor position is later 224 line on xterm-style mouse event notification, Tera Term would report the invalid reporting.</li>
+      <li>When the 10000 over mode is specified on the DECSET/DECRST control sequence, Tera Term would not be able to ignore.</li>
     </ul>
   </li>
 
