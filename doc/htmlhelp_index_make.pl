@@ -4,7 +4,7 @@
 # HTMLヘルプのインデックスファイルを生成する
 #
 # Usage(ActivePerl):
-#  perl htmlhelp_index_make.pl
+#  perl htmlhelp_index_make.pl ja html > ja\Index.hhk
 #
 
 use Cwd;
@@ -71,7 +71,7 @@ sub get_file_paths {
 sub check_html_file {
 	my($filename) = shift;
 	local(*FP);
-	my($line, $no);
+	my($line, $no, $val);
 	
 	if ($filename !~ /.html$/) {
 		return;
@@ -85,7 +85,9 @@ sub check_html_file {
 		if ($line =~ /<TITLE>(.+)<\/TITLE>/i) {
 #			print "$filename:$no: $1\n";
 #			print "$line\n";
-			write_add_index($filename, $1);
+			$val = $1;
+			$val =~ s/"/&#34;/g;  # 二重引用符をエスケープする
+			write_add_index($filename, $val);
 			last;
 		}
 
