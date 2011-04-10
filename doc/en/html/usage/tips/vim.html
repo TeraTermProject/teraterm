@@ -17,43 +17,43 @@ The VIM procedure for using the control sequence is described below.
 </p>
 
 <h2><a name="CursorStyle">Changing cursor shape on entering and leaving into insert mode</a></h2>
-<!--
+
 <p>
-Tera Term では、以下のカーソル表示状態変更制御シーケンスに対応しています。
+Tera Term can support below control sequence changing the cursor shape.
 </p>
 
 <table border="1">
-  <tr> <th>略称</th> <th>シーケンス</th> <th>機能</th> </tr>
+  <tr> <th>Abbreviation</th> <th>Sequence</th> <th>Function</th> </tr>
 
   <tr> <td rowspan="2">DECTCEM</td>
-       <td>ESC [ ? 25 h</td> <td>カーソルを表示状態にする</td> </tr>
-  <tr> <td>ESC [ ? 25 l</td> <td>カーソルを非表示状態にする</td> </tr>
+       <td>ESC [ ? 25 h</td> <td>Makes the cursor visible</td> </tr>
+  <tr> <td>ESC [ ? 25 l</td> <td>Makes the cursor invisible</td> </tr>
 
   <tr> <td rowspan="7">DECSCUSR</td>
-       <td>ESC SP 0 q</td> <td>カーソル形状を箱型で点滅状態にする</td> </tr>
-  <tr> <td>ESC SP 1 q</td> <td>カーソル形状を箱型で点滅状態にする</td> </tr>
-  <tr> <td>ESC SP 2 q</td> <td>カーソル形状を箱型で点灯(非点滅)状態にする</td> </tr>
-  <tr> <td>ESC SP 3 q</td> <td>カーソル形状を下線で点滅状態にする</td> </tr>
-  <tr> <td>ESC SP 4 q</td> <td>カーソル形状を下線で点灯(非点滅)状態にする</td> </tr>
-  <tr> <td>ESC SP 5 q</td> <td>カーソル形状を縦線で点滅状態にする</td> </tr>
-  <tr> <td>ESC SP 6 q</td> <td>カーソル形状を縦線で点灯(非点滅)状態にする</td> </tr>
+       <td>ESC SP 0 q</td> <td>Blink Block</td> </tr>
+  <tr> <td>ESC SP 1 q</td> <td>Blink Block</td> </tr>
+  <tr> <td>ESC SP 2 q</td> <td>Steady Block</td> </tr>
+  <tr> <td>ESC SP 3 q</td> <td>Blink Underline</td> </tr>
+  <tr> <td>ESC SP 4 q</td> <td>Steady Underline</td> </tr>
+  <tr> <td>ESC SP 5 q</td> <td>Blink Vertical line</td> </tr>
+  <tr> <td>ESC SP 6 q</td> <td>Steady Vertical line</td> </tr>
 
   <tr> <td rowspan="2">WYSTCURM</td>
-       <td>ESC [ 33 h</td> <td>カーソルを点灯(非点滅)状態にする</td> </tr>
-  <tr> <td>ESC [ 33 l</td> <td>カーソルを点滅状態にする</td> </tr>
+       <td>ESC [ 33 h</td> <td>Steady Wyse Cursor</td> </tr>
+  <tr> <td>ESC [ 33 l</td> <td>Blink Wyse Cursor</td> </tr>
 
   <tr> <td rowspan="2">WYULCURM</td>
-       <td>ESC [ 34 h</td> <td>カーソル形状を下線にする</td> </tr>
-  <tr> <td>ESC [ 34 l</td> <td>カーソル形状を箱型にする</td> </tr>
+       <td>ESC [ 34 h</td> <td>Steady Wyse underline cursor</td> </tr>
+  <tr> <td>ESC [ 34 l</td> <td>Steady Wyse block cursor</td> </tr>
 
   <tr> <td rowspan="2"> (AT&amp;T 610) </td>
-       <td>ESC [ ? 12 l</td> <td>カーソルを点灯(非点滅)状態にする</td> </tr>
-  <tr> <td>ESC [ ? 12 h</td> <td>カーソルを点滅状態にする</td> </tr>
+       <td>ESC [ ? 12 l</td> <td>Steady Cursor</td> </tr>
+  <tr> <td>ESC [ ? 12 h</td> <td>Blink Cursor</td> </tr>
 </table>
 
 <p>
-これらの制御シーケンスを挿入モードに入る時 (t_SI 設定) および挿入モードから出る時 (t_EI 設定) に出力する事で、挿入モードでのカーソル形状を変更できます。<br>
-例えば .vimrc に以下の設定を追加すると、挿入モードに入った時にカーソル形状が下線で点滅に、挿入モードから出た時に箱型で点滅に変わるようになります。
+The vim cursor can be changed in the insert mode to output above control sequences when a user enters(t_SI) and leaves(t_EI). <br>
+For example, when below contents is added in the .vimrc file, the cursor style is underline and blinking in the insert mode. Next, the cursor style is block and blinking outside the insert mode.
 </p>
 
 <pre class="macro-example">
@@ -61,8 +61,8 @@ let t_SI .= "\e[3 q"
 let t_EI .= "\e[1 q"
 </pre>
 
-<p>注: DECTCEM <strong>以外</strong>の制御シーケンスを使うには、Additional Settings ダイアログの Control sequence タブに有る Cursor control sequence を on にする必要があります。(デフォルトは off)</p>
--->
+<p>NOTICE: If a user uses the control sequence except the DECTCEM, turn on the Cursor control sequence of the Additional Settings dialog(The default value is off).
+</p>
 
 <h2><a name="Bracketed">Bracketed Paste Mode</a></h2>
 <h2><a name="Bracketed">Auto indent can be disabled on pasting from clipboard</a></h2>
