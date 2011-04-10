@@ -251,7 +251,7 @@ static void normalize_cipher_order(char FAR * buf)
 		SSH_CIPHER_NONE,
 		SSH_CIPHER_DES,
 		SSH_CIPHER_BLOWFISH,
-		0, 0, 0 // Dummy
+		0, 0, 0 // Dummy for SSH_CIPHER_IDEA, SSH_CIPHER_TSS, SSH_CIPHER_RC4
 	};
 #endif
 
