@@ -306,18 +306,20 @@ static void normalize_host_key_order(char FAR * buf)
 static void normalize_mac_order(char FAR * buf)
 {
 	static char default_strings[] = {
+#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+		HMAC_SHA2_512,
+		HMAC_SHA2_256,
+#endif	// HMAC-SHA2 support
 		HMAC_SHA1,
 		HMAC_RIPEMD160,
 		HMAC_MD5,
 		HMAC_NONE,
+#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+		HMAC_SHA2_512_96,
+		HMAC_SHA2_256_96,
+#endif	// HMAC-SHA2 support
 		HMAC_SHA1_96,
 		HMAC_MD5_96,
-#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
-		HMAC_SHA2_256,
-		HMAC_SHA2_256_96,
-		HMAC_SHA2_512,
-		HMAC_SHA2_512_96,
-#endif	// HMAC-SHA2 support
 	};
 
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
