@@ -66,7 +66,7 @@ BEGIN
     LTEXT           "Tera Term Project:     http://ttssh2.sourceforge.jp/",IDC_WEBSITES,6,88,248,13,SS_SUNKEN
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
     LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
-    LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,145,15
+    LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
     LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,181,8
 END
 

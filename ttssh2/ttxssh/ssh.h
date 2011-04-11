@@ -38,6 +38,7 @@ See LICENSE.TXT for the license.
 #include <openssl/evp.h>
 
 #include "buffer.h"
+#include "config.h"
 
 #define DEBUG_PRINT_TO_FILE(base, msg, len) { \
 	static int count = 0; \
@@ -50,14 +51,9 @@ extern const EVP_CIPHER *evp_aes_128_ctr(void);
 extern const EVP_CIPHER *evp_des3_ctr(void);
 extern const EVP_CIPHER *evp_bf_ctr(void);
 extern const EVP_CIPHER *evp_cast5_ctr(void);
-
-// yutaka
-#define SSH2_USE
-
-// HMAC-SHA2 draft
-// http://www.ietf.org/id/draft-dbider-sha2-mac-for-ssh-00.txt
-#undef HMAC_SHA2_DRAFT
-
+#ifdef WITH_CAMELLIA_DRAFT
+extern const EVP_CIPHER *evp_camellia_128_ctr(void);
+#endif // WITH_CAMELLIA_DRAFT
 
 /* Some of this code has been adapted from Ian Goldberg's Pilot SSH */
 
@@ -95,7 +91,13 @@ typedef enum {
 	SSH2_CIPHER_ARCFOUR, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR256,
 	SSH2_CIPHER_CAST128_CBC,
 	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
+#ifdef WITH_CAMELLIA_DRAFT
+	SSH2_CIPHER_CAMELLIA128_CBC, SSH2_CIPHER_CAMELLIA192_CBC, SSH2_CIPHER_CAMELLIA256_CBC,
+	SSH2_CIPHER_CAMELLIA128_CTR, SSH2_CIPHER_CAMELLIA192_CTR, SSH2_CIPHER_CAMELLIA256_CTR,
+	SSH_CIPHER_MAX = SSH2_CIPHER_CAMELLIA256_CTR,
+#else // WITH_CAMELLIA_DRAFT
 	SSH_CIPHER_MAX = SSH2_CIPHER_CAST128_CTR,
+#endif // WITH_CAMELLIA_DRAFT
 } SSHCipher;
 
 typedef enum {
@@ -283,21 +285,37 @@ typedef struct ssh2_cipher {
 } ssh2_cipher_t;
 
 static ssh2_cipher_t ssh2_ciphers[] = {
-	{SSH2_CIPHER_3DES_CBC,     "3des-cbc",      8, 24, 0,    EVP_des_ede3_cbc},
-	{SSH2_CIPHER_AES128_CBC,   "aes128-cbc",   16, 16, 0,    EVP_aes_128_cbc},
-	{SSH2_CIPHER_AES192_CBC,   "aes192-cbc",   16, 24, 0,    EVP_aes_192_cbc},
-	{SSH2_CIPHER_AES256_CBC,   "aes256-cbc",   16, 32, 0,    EVP_aes_256_cbc},
-	{SSH2_CIPHER_BLOWFISH_CBC, "blowfish-cbc",  8, 16, 0,    EVP_bf_cbc},
-	{SSH2_CIPHER_AES128_CTR,   "aes128-ctr",   16, 16, 0,    evp_aes_128_ctr},
-	{SSH2_CIPHER_AES192_CTR,   "aes192-ctr",   16, 24, 0,    evp_aes_128_ctr},
-	{SSH2_CIPHER_AES256_CTR,   "aes256-ctr",   16, 32, 0,    evp_aes_128_ctr},
-	{SSH2_CIPHER_ARCFOUR,      "arcfour",       8, 16, 0,    EVP_rc4},
-	{SSH2_CIPHER_ARCFOUR128,   "arcfour128",    8, 16, 1536, EVP_rc4},
-	{SSH2_CIPHER_ARCFOUR256,   "arcfour256",    8, 32, 1536, EVP_rc4},
-	{SSH2_CIPHER_CAST128_CBC,  "cast128-cbc",   8, 16, 0,    EVP_cast5_cbc},
-	{SSH2_CIPHER_3DES_CTR,     "3des-ctr",      8, 24, 0,    evp_des3_ctr},
-	{SSH2_CIPHER_BLOWFISH_CTR, "blowfish-ctr",  8, 16, 0,    evp_bf_ctr},
-	{SSH2_CIPHER_CAST128_CTR,  "cast128-ctr",   8, 16, 0,    evp_cast5_ctr},
+	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, EVP_des_ede3_cbc},
+	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, EVP_aes_128_cbc},
+	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, EVP_aes_192_cbc},
+	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, EVP_aes_256_cbc},
+	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, EVP_bf_cbc},
+	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, evp_aes_128_ctr},
+	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, evp_aes_128_ctr},
+	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, evp_aes_128_ctr},
+	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, EVP_rc4},
+	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, EVP_rc4},
+	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, EVP_rc4},
+	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, EVP_cast5_cbc},
+	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, evp_des3_ctr},
+	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 16,    0, evp_bf_ctr},
+	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, evp_cast5_ctr},
+#ifdef WITH_CAMELLIA_DRAFT
+	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, EVP_camellia_128_cbc},
+	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, EVP_camellia_192_cbc},
+	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, EVP_camellia_256_cbc},
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, evp_camellia_128_ctr},
+#ifdef WITH_CAMELLIA_PRIVATE
+	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0, EVP_camellia_128_cbc},
+	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0, EVP_camellia_192_cbc},
+	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc@openssh.org", 16, 32, 0, EVP_camellia_256_cbc},
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr@openssh.org", 16, 16, 0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr@openssh.org", 16, 24, 0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr@openssh.org", 16, 32, 0, evp_camellia_128_ctr},
+#endif // WITH_CAMELLIA_PRIVATE
+#endif // WITH_CAMELLIA_DRAFT
 	{SSH_CIPHER_NONE,          NULL,            0,  0, 0,    NULL},
 };
 
@@ -363,7 +381,7 @@ static ssh2_mac_t ssh2_macs[] = {
 	{HMAC_SHA1_96,     "hmac-sha1-96",               EVP_sha1,      96},
 	{HMAC_MD5_96,      "hmac-md5-96",                EVP_md5,       96},
 	{HMAC_RIPEMD160,   "hmac-ripemd160@openssh.com", EVP_ripemd160, 0},
-#if HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
 	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},
 	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96},
 	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},

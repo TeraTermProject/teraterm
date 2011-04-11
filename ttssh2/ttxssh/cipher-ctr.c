@@ -21,13 +21,21 @@
 #include <malloc.h>
 #include <string.h>
 
+#include "config.h"
+
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 #include <openssl/des.h>
 #include <openssl/blowfish.h>
 #include <openssl/cast.h>
+#ifdef WITH_CAMELLIA_DRAFT
+#include <openssl/camellia.h>
+#endif // WITH_CAMELLIA_DRAFT
 
 extern const EVP_CIPHER *evp_aes_128_ctr(void);
+#ifdef WITH_CAMELLIA_DRAFT
+extern const EVP_CIPHER *evp_camellia_128_ctr(void);
+#endif // WITH_CAMELLIA_DRAFT
 
 struct ssh_aes_ctr_ctx
 {
@@ -53,6 +61,14 @@ struct ssh_cast5_ctr_ctx
 	CAST_KEY	cast5_ctx;
 	unsigned char	cast5_counter[CAST_BLOCK];
 };
+
+#ifdef WITH_CAMELLIA_DRAFT
+struct ssh_camellia_ctr_ctx
+{
+	CAMELLIA_KEY	camellia_ctx;
+	unsigned char	camellia_counter[CAMELLIA_BLOCK_SIZE];
+};
+#endif // WITH_CAMELLIA_DRAFT
 
 static void
 ssh_ctr_inc(unsigned char *ctr, unsigned int len)
@@ -404,3 +420,91 @@ evp_cast5_ctr(void)
 #endif
 	return (&cast5_ctr);
 }
+
+#ifdef WITH_CAMELLIA_DRAFT
+//============================================================================
+// Camellia
+//============================================================================
+static int
+ssh_camellia_ctr(EVP_CIPHER_CTX *ctx, unsigned char *dest, const unsigned char *src, unsigned int len)
+{
+	struct ssh_camellia_ctr_ctx *c;
+	unsigned int n = 0;
+	unsigned char buf[CAMELLIA_BLOCK_SIZE];
+
+	if (len == 0)
+		return (1);
+	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) == NULL)
+		return (0);
+
+	while ((len--) > 0) {
+		if (n == 0) {
+			Camellia_encrypt(c->camellia_counter, buf, &c->camellia_ctx);
+			ssh_ctr_inc(c->camellia_counter, CAMELLIA_BLOCK_SIZE);
+		}
+		*(dest++) = *(src++) ^ buf[n];
+		n = (n + 1) % CAMELLIA_BLOCK_SIZE;
+	}
+	return (1);
+}
+
+static int
+ssh_camellia_ctr_init(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
+{
+	struct ssh_camellia_ctr_ctx *c;
+
+	if ((c = EVP_CIPHER_CTX_get_app_data(ctx)) == NULL) {
+		c = malloc(sizeof(*c));
+		EVP_CIPHER_CTX_set_app_data(ctx, c);
+	}
+	if (key != NULL)
+		Camellia_set_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &c->camellia_ctx);
+	if (iv != NULL)
+		memcpy(c->camellia_counter, iv, CAMELLIA_BLOCK_SIZE);
+	return (1);
+}
+
+static int
+ssh_camellia_ctr_cleanup(EVP_CIPHER_CTX *ctx)
+{
+	struct ssh_camellia_ctr_ctx *c;
+
+	if((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
+		memset(c, 0, sizeof(*c));
+		free(c);
+		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
+	}
+	return (1);
+}
+
+void
+ssh_camellia_ctr_iv(EVP_CIPHER_CTX *evp, int doset, unsigned char * iv, unsigned int len)
+{
+	struct ssh_camellia_ctr_ctx *c;
+
+	if ((c = EVP_CIPHER_CTX_get_app_data(evp)) != NULL)
+		if(doset)
+			memcpy(c->camellia_counter, iv, len);
+		else
+			memcpy(iv, c->camellia_counter, len);
+}
+
+const EVP_CIPHER *
+evp_camellia_128_ctr(void)
+{
+	static EVP_CIPHER camellia_ctr;
+
+	memset(&camellia_ctr, 0, sizeof(EVP_CIPHER));
+	camellia_ctr.nid = NID_undef;
+	camellia_ctr.block_size = CAMELLIA_BLOCK_SIZE;
+	camellia_ctr.iv_len = CAMELLIA_BLOCK_SIZE;
+	camellia_ctr.key_len = 16;
+	camellia_ctr.init = ssh_camellia_ctr_init;
+	camellia_ctr.cleanup = ssh_camellia_ctr_cleanup;
+	camellia_ctr.do_cipher = ssh_camellia_ctr;
+#ifndef SSH_OLD_EVP
+	camellia_ctr.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH | EVP_CIPH_ALWAYS_CALL_INIT | EVP_CIPH_CUSTOM_IV;
+#endif
+	return (&camellia_ctr);
+}
+#endif // WITH_CAMELLIA_DRAFT

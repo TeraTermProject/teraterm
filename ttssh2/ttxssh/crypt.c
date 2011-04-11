@@ -647,6 +647,85 @@ error:
 	free(newbuf);
 }
 
+#ifdef WITH_CAMELLIA_DRAFT
+static void cCamellia_encrypt(PTInstVar pvar, unsigned char FAR * buf,
+                             int bytes)
+{
+	unsigned char *newbuf = malloc(bytes);
+	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	char tmp[80];
+
+	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
+	if (bytes == 0)
+		goto error;
+
+	if (newbuf == NULL)
+		return;
+
+	if (bytes % block_size) {
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
+		                  "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Camellia128/192/256", bytes, block_size);
+		notify_fatal_error(pvar, tmp);
+		goto error;
+	}
+
+	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Camellia128/192/256");
+		notify_fatal_error(pvar, tmp);
+		goto error;
+
+	} else {
+		memcpy(buf, newbuf, bytes);
+
+	}
+
+error:
+	free(newbuf);
+}
+
+static void cCamellia_decrypt(PTInstVar pvar, unsigned char FAR * buf,
+                             int bytes)
+{
+	unsigned char *newbuf = malloc(bytes);
+	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	char tmp[80];
+
+	// 事前復号化により、全ペイロードが復号化されている場合は、0バイトになる。(2004.11.7 yutaka)
+	if (bytes == 0)
+		goto error;
+
+	if (newbuf == NULL)
+		return;
+
+	if (bytes % block_size) {
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
+		                  "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Camellia128/192/256", bytes, block_size);
+		notify_fatal_error(pvar, tmp);
+		goto error;
+	}
+
+	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            "Camellia128/192/256");
+		notify_fatal_error(pvar, tmp);
+		goto error;
+
+	} else {
+		memcpy(buf, newbuf, bytes);
+
+	}
+
+error:
+	free(newbuf);
+}
+#endif // WITH_CAMELLIA_DRAFT
 
 static void c3DES_encrypt(PTInstVar pvar, unsigned char FAR * buf,
                           int bytes)
@@ -868,7 +947,7 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 
 	} else { // for SSH2(yutaka)
 		// SSH2がサポートするデータ通信用アルゴリズム（公開鍵交換用とは別）
-		cipher_mask = (1 << SSH2_CIPHER_3DES_CBC)
+		cipher_mask =((1 << SSH2_CIPHER_3DES_CBC)
 		            | (1 << SSH2_CIPHER_AES128_CBC)
 		            | (1 << SSH2_CIPHER_AES192_CBC)
 		            | (1 << SSH2_CIPHER_AES256_CBC)
@@ -882,7 +961,16 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_CAST128_CBC)
 		            | (1 << SSH2_CIPHER_3DES_CTR)
 		            | (1 << SSH2_CIPHER_BLOWFISH_CTR)
-		            | (1 << SSH2_CIPHER_CAST128_CTR);
+		            | (1 << SSH2_CIPHER_CAST128_CTR)
+#ifdef WITH_CAMELLIA_DRAFT
+		            | (1 << SSH2_CIPHER_CAMELLIA128_CBC)
+		            | (1 << SSH2_CIPHER_CAMELLIA192_CBC)
+		            | (1 << SSH2_CIPHER_CAMELLIA256_CBC)
+		            | (1 << SSH2_CIPHER_CAMELLIA128_CTR)
+		            | (1 << SSH2_CIPHER_CAMELLIA192_CTR)
+		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
+#endif // WITH_CAMELLIA_DRAFT
+		);
 	}
 
 	sender_ciphers &= cipher_mask;
@@ -1455,6 +1543,33 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				break;
 			}
 
+#ifdef WITH_CAMELLIA_DRAFT
+		case SSH2_CIPHER_CAMELLIA128_CBC:
+		case SSH2_CIPHER_CAMELLIA192_CBC:
+		case SSH2_CIPHER_CAMELLIA256_CBC:
+		case SSH2_CIPHER_CAMELLIA128_CTR:
+		case SSH2_CIPHER_CAMELLIA192_CTR:
+		case SSH2_CIPHER_CAMELLIA256_CTR:
+			{
+				struct Enc *enc;
+
+				enc = &pvar->ssh2_keys[MODE_OUT].enc;
+				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
+				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
+				                 CIPHER_ENCRYPT,
+				                 get_cipher_EVP_CIPHER(pvar->crypt_state.sender_cipher),
+				                 get_cipher_discard_len(pvar->crypt_state.sender_cipher),
+				                 pvar);
+
+				//debug_print(10, enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher));
+				//debug_print(11, enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher));
+
+				pvar->crypt_state.encrypt = cCamellia_encrypt;
+				break;
+			}
+#endif // WITH_CAMELLIA_DRAFT
+
 		case SSH_CIPHER_3DES:{
 				c3DES_init(encryption_key, &pvar->crypt_state.enc.c3DES);
 				pvar->crypt_state.encrypt = c3DES_encrypt;
@@ -1602,6 +1717,33 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				break;
 			}
 
+#ifdef WITH_CAMELLIA_DRAFT
+		case SSH2_CIPHER_CAMELLIA128_CBC:
+		case SSH2_CIPHER_CAMELLIA192_CBC:
+		case SSH2_CIPHER_CAMELLIA256_CBC:
+		case SSH2_CIPHER_CAMELLIA128_CTR:
+		case SSH2_CIPHER_CAMELLIA192_CTR:
+		case SSH2_CIPHER_CAMELLIA256_CTR:
+			{
+				struct Enc *enc;
+
+				enc = &pvar->ssh2_keys[MODE_IN].enc;
+				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
+				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
+				                 CIPHER_DECRYPT,
+				                 get_cipher_EVP_CIPHER(pvar->crypt_state.receiver_cipher),
+				                 get_cipher_discard_len(pvar->crypt_state.receiver_cipher),
+				                 pvar);
+
+				//debug_print(12, enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher));
+				//debug_print(13, enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher));
+
+				pvar->crypt_state.decrypt = cCamellia_decrypt;
+				break;
+			}
+#endif // WITH_CAMELLIA_DRAFT
+
 		case SSH_CIPHER_3DES:{
 				c3DES_init(decryption_key, &pvar->crypt_state.dec.c3DES);
 				pvar->crypt_state.decrypt = c3DES_decrypt;
@@ -1707,6 +1849,20 @@ static char FAR *get_cipher_name(int cipher)
 		return "Blowfish-CTR";
 	case SSH2_CIPHER_CAST128_CTR:
 		return "CAST-128-CTR";
+#ifdef WITH_CAMELLIA_DRAFT
+	case SSH2_CIPHER_CAMELLIA128_CBC:
+		return "Camellia128-CBC";
+	case SSH2_CIPHER_CAMELLIA192_CBC:
+		return "Camellia192-CBC";
+	case SSH2_CIPHER_CAMELLIA256_CBC:
+		return "Camellia256-CBC";
+	case SSH2_CIPHER_CAMELLIA128_CTR:
+		return "Camellia128-CTR";
+	case SSH2_CIPHER_CAMELLIA192_CTR:
+		return "Camellia192-CTR";
+	case SSH2_CIPHER_CAMELLIA256_CTR:
+		return "Camellia256-CTR";
+#endif // WITH_CAMELLIA_DRAFT
 
 	default:
 		return "Unknown";
