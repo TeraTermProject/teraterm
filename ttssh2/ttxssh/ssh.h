@@ -358,7 +358,7 @@ typedef enum {
 	HMAC_SHA1_96,
 	HMAC_MD5_96,
 	HMAC_RIPEMD160,
-#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+#ifdef WITH_HMAC_SHA2_DRAFT	// HMAC-SHA2 support
 	HMAC_SHA2_256,
 	HMAC_SHA2_256_96,
 	HMAC_SHA2_512,
@@ -381,7 +381,7 @@ static ssh2_mac_t ssh2_macs[] = {
 	{HMAC_SHA1_96,     "hmac-sha1-96",               EVP_sha1,      96},
 	{HMAC_MD5_96,      "hmac-md5-96",                EVP_md5,       96},
 	{HMAC_RIPEMD160,   "hmac-ripemd160@openssh.com", EVP_ripemd160, 0},
-#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+#ifdef WITH_HMAC_SHA2_DRAFT	// HMAC-SHA2 support
 	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},
 	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96},
 	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},

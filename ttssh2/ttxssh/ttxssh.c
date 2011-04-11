@@ -306,7 +306,7 @@ static void normalize_host_key_order(char FAR * buf)
 static void normalize_mac_order(char FAR * buf)
 {
 	static char default_strings[] = {
-#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+#ifdef WITH_HMAC_SHA2_DRAFT	// HMAC-SHA2 support
 		HMAC_SHA2_512,
 		HMAC_SHA2_256,
 #endif	// HMAC-SHA2 support
@@ -314,7 +314,7 @@ static void normalize_mac_order(char FAR * buf)
 		HMAC_RIPEMD160,
 		HMAC_MD5,
 		HMAC_NONE,
-#ifdef HMAC_SHA2_DRAFT	// HMAC-SHA2 support
+#ifdef WITH_HMAC_SHA2_DRAFT	// HMAC-SHA2 support
 		HMAC_SHA2_512_96,
 		HMAC_SHA2_256_96,
 #endif	// HMAC-SHA2 support
@@ -2298,14 +2298,14 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	get_file_version("ttxssh.dll", &a, &b, &c, &d);
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 #ifdef WITH_CAMELLIA_DRAFT
-#ifdef HMAC_SHA2_DRAFT
+#ifdef WITH_HMAC_SHA2_DRAFT
 //		"TTSSH\r\nTera Term Secure Shell extension, %d.%d with Camellia/HMAC-SHA2", a, b);
 		"TTSSH\r\nTera Term Secure Shell extension, %d.%d (Camellia/HMAC-SHA2)", a, b);
 #else
 		"TTSSH\r\nTera Term Secure Shell extension, %d.%d with Camellia support", a, b);
 #endif
 #else
-#ifdef HMAC_SHA2_DRAFT
+#ifdef WITH_HMAC_SHA2_DRAFT
 		"TTSSH\r\nTera Term Secure Shell extension, %d.%d with HMAC-SHA2 support", a, b);
 #else
 		"TTSSH\r\nTera Term Secure Shell extension, %d.%d", a, b);
