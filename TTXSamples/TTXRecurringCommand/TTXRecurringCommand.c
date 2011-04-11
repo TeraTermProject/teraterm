@@ -94,74 +94,50 @@ WORD GetOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, BOOL Default)
 //
 void UnEscapeStr(BYTE *Text)
 {
-	unsigned int i, j=0, k;
-	size_t size;
-	unsigned char *buf;
+	int i;
+	unsigned char *src, *dst;
 
-	size = strlen(Text);
-	buf = malloc(size+1);
+	src = dst = Text;
+	while (*src && *src != '\\') {
+		src++; dst++;
+	}
 
-	memset(buf, 0, size+1);
-	for (i=0; i<size; i++) {
-		if (Text[i] == '\\') {
-			switch (Text[i+1]) {
-				case '\\':
-					buf[j] = '\\';
-					i++;
-					break;
-				case 'n':
-					buf[j] = '\n';
-					i++;
-					break;
-				case 't':
-					buf[j] = '\t';
-					i++;
-					break;
-				case 'a':
-					buf[j] = '\a';
-					i++;
-					break;
-				case 'b':
-					buf[j] = '\b';
-					i++;
-					break;
-				case 'f':
-					buf[j] = '\f';
-					i++;
-					break;
-				case 'r':
-					buf[j] = '\r';
-					i++;
-					break;
-				case 'v':
-					buf[j] = '\v';
-					i++;
-					break;
-				case 'e':
-					buf[j] = '\033';
-					i++;
-					break;
+	while (*src) {
+		if (*src == '\\') {
+			switch (*++src) {
+				case '\\': *dst = '\\';   break;
+				case 'n':  *dst = '\n';   break;
+				case 't':  *dst = '\t';   break;
+				case 'a':  *dst = '\a';   break;
+				case 'b':  *dst = '\b';   break;
+				case 'f':  *dst = '\f';   break;
+				case 'r':  *dst = '\r';   break;
+				case 'v':  *dst = '\v';   break;
+				case 'e':  *dst = '\033'; break;
+//				case '"':  *dst = '"';    break;
+//				case '\'': *dst = '\'';   break;
 				case 'x':
-					if (isxdigit(Text[i+2]) && isxdigit(Text[i+3])) {
-						i+=2;
-						// buf[j] = ((Text[i]|0x20) - (isalpha(Text[i])?'a'-10:'0')) << 4;
-						if (isalpha(Text[i]))
-							buf[j] = (Text[i]|0x20) - 'a' + 10;
-						else
-							buf[j] = Text[i] - '0';
-						buf[j] <<= 4;
+					if (isxdigit(src[1]) && isxdigit(src[2])) {
+						src++;
+						if (isalpha(*src)) {
+							*dst = (*src|0x20) - 'a' + 10;
+						}
+						else {
+							*dst = *src - '0';
+						}
+						*dst <<= 4;
 
-						i++;
-						// buf[j] += ((Text[i]|0x20) - (isalpha(Text[i])?'a'-10:'0'));
-						if (isalpha(Text[i]))
-							buf[j] += (Text[i]|0x20) - 'a' + 10;
-						else
-							buf[j] += Text[i] - '0';
+						src++;
+						if (isalpha(*src)) {
+							*dst += (*src|0x20) - 'a' + 10;
+						}
+						else {
+							*dst += *src - '0';
+						}
 					}
 					else {
-						buf[j++] = '\\';
-						buf[j] = 'x';
-						i++;
+						*dst++ = '\\';
+						*dst = 'x';
 					}
 					break;
 				case '0':
@@ -172,26 +148,25 @@ void UnEscapeStr(BYTE *Text)
 				case '5':
 				case '6':
 				case '7':
-					buf[j] = 0;
-					for (k=0; k<3; k++, i++) {
-						if (Text[i+1] < '0' || Text[i+1] > '7')
+					*dst = 0;
+					for (i=0; i<3; i++) {
+						if (*src < '0' || *src > '7')
 							break;
-						buf[j] = (buf[j] << 3) + Text[i+1] - '0';
+						*dst = *dst << 3 + *src - '0';
 					}
-					break;
+					src--;
 				default:
-					buf[j] = '\\';
+					*dst = '\\';
+					src--;
 			}
 		}
 		else {
-			buf[j] = Text[i];
+			*dst = *src;
 		}
-		j++;
+		src++; dst++;
 	}
-	/* use memcpy to copy with '\0' */
-	memcpy(Text, buf, size);
 
-	free(buf);
+	return (dst - Text);
 }
 
 //
