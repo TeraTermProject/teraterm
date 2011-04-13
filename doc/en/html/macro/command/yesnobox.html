@@ -18,22 +18,52 @@ Displays a dialog box, and ask Yes or No to user.
 </p>
 
 <pre class="macro-syntax">
-yesnobox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(obsolete)]
+yesnobox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 </pre>
 
-<h2>Remarks</h2>
+<h2>Parameters</h2>
 
-<p>
-Displays a dialog box with the &lt;message&gt;, &lt;title&gt;, "Yes" button and "No" button.
-</p>
+<dl>
+	<dt class="macro">string &lt;message&gt;</dt>
+	<dd>It is displayed in the dialog box.</dd>
+	
+	<dt class="macro">string &lt;title&gt;</dt>
+	<dd>It is displayed as the dialog box title.</dd>
+	
+	<dt class="macro">integer &lt;special&gt; (optional default=1)</dt>
+	<dd>If it is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+	    
+	    <table border="2">
+	     <tr>
+	      <th>input</th>
+	      <th>output</th>
+	     </tr>
+	     <tr>
+	      <td>\\</td>
+	      <td>"\"</td>
+	     </tr>
+	     <tr>
+	      <td>\n</td>
+	      <td>line feed</td>
+	     </tr>
+	     <tr>
+	      <td>\t</td>
+	      <td>tab</td>
+	     </tr>
+	    </table>
+	    
+	</dd>
 
-<p>
-If the user clicks on the "Yes" button, the system variable "result" is set to 1. If the user clicks on the "No" button, "result" is set to zero.
-</p>
+</dl>
 
-<p>
-&lt;special&gt; is an obsolete parameter. It has not effect.
-</p>
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System valiable &lt;result&gt;</dt>
+	<dd>If the user clicks on the "Yes" button, it is set to 1.<br>
+	    If the user clicks on the "No" button, it is set to zero.</dd>
+	
+</dl>
 
 <h2>Example</h2>
 

@@ -18,8 +18,43 @@ Displays the status dialog box.
 </p>
 
 <pre class="macro-syntax">
-statusbox &lt;message&gt; &lt;title&gt; [&lt;special&gt;(obsolete)]
+statusbox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 </pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string &lt;message&gt;</dt>
+	<dd>It is displayed in the dialog box.</dd>
+	
+	<dt class="macro">string &lt;title&gt;</dt>
+	<dd>It is displayed as the dialog box title.</dd>
+	
+	<dt class="macro">integer &lt;special&gt; (optional default=1)</dt>
+	<dd>If it is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
+	    
+	    <table border="2">
+	     <tr>
+	      <th>input</th>
+	      <th>output</th>
+	     </tr>
+	     <tr>
+	      <td>\\</td>
+	      <td>"\"</td>
+	     </tr>
+	     <tr>
+	      <td>\n</td>
+	      <td>line feed</td>
+	     </tr>
+	     <tr>
+	      <td>\t</td>
+	      <td>tab</td>
+	     </tr>
+	    </table>
+	    
+	</dd>
+
+</dl>
 
 <h2>Remarks</h2>
 
@@ -31,10 +66,6 @@ Changes the message to &lt;message&gt; and title to &lt;title&gt;.
 <p>
 The "<a href="setdlgpos.html">setdlgpos</a>" command changes the position of status dialog box.<br>
 The "<a href="closebox.html">closesbox</a>" command closes the status dialog box. A user can not close the status dialog box by using the Enter and ESC key.
-</p>
-
-<p>
-&lt;special&gt; is an obsolete parameter. It has not effect.
 </p>
 
 <h2>Example</h2>
