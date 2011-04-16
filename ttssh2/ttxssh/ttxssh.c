@@ -2537,15 +2537,15 @@ static char FAR *get_cipher_name(int cipher)
 	}
 }
 
-static void set_move_button_status(HWND dlg)
+static void set_move_button_status(HWND dlg, int type, int up, int down)
 {
-	HWND cipherControl = GetDlgItem(dlg, IDC_SSHCIPHERPREFS);
+	HWND cipherControl = GetDlgItem(dlg, type);
 	int curPos = (int) SendMessage(cipherControl, LB_GETCURSEL, 0, 0);
 	int maxPos = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0) - 1;
 
-	EnableWindow(GetDlgItem(dlg, IDC_SSHMOVECIPHERUP),
+	EnableWindow(GetDlgItem(dlg, up),
 	             curPos > 0 && curPos <= maxPos);
-	EnableWindow(GetDlgItem(dlg, IDC_SSHMOVECIPHERDOWN),
+	EnableWindow(GetDlgItem(dlg, down),
 	             curPos >= 0 && curPos < maxPos);
 }
 
@@ -2553,6 +2553,10 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 {
 	HWND compressionControl = GetDlgItem(dlg, IDC_SSHCOMPRESSIONLEVEL);
 	HWND cipherControl = GetDlgItem(dlg, IDC_SSHCIPHERPREFS);
+	HWND kexControl = GetDlgItem(dlg, IDC_SSHKEX_LIST);
+	HWND hostkeyControl = GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST);
+	HWND macControl = GetDlgItem(dlg, IDC_SSHMAC_LIST);
+	HWND compControl = GetDlgItem(dlg, IDC_SSHCOMP_LIST);
 	int i;
 	int ch;
 	char uimsg[MAX_UIMSG];
@@ -2569,6 +2573,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_COMPRESSHIGH, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS_HIGHEST", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_COMPRESSHIGH, pvar->ts->UIMsg);
+
 	GetDlgItemText(dlg, IDC_CIPHERORDER, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_CHIPER", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_CIPHERORDER, pvar->ts->UIMsg);
@@ -2578,6 +2583,47 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_SSHMOVECIPHERDOWN, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_CHIPER_DOWN", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHMOVECIPHERDOWN, pvar->ts->UIMsg);
+
+	GetDlgItemText(dlg, IDC_KEX_ORDER, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_KEX", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_KEX_ORDER, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHKEX_MOVEUP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_KEX_UP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHKEX_MOVEUP, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHKEX_MOVEDOWN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_KEX_DOWN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHKEX_MOVEDOWN, pvar->ts->UIMsg);
+
+	GetDlgItemText(dlg, IDC_HOST_KEY_ORDER, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_HOST_KEY_ORDER, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEUP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_UP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEUP, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEDOWN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_DOWN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHHOST_KEY_MOVEDOWN, pvar->ts->UIMsg);
+
+	GetDlgItemText(dlg, IDC_MAC_ORDER, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_MAC", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_MAC_ORDER, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHMAC_MOVEUP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_MAC_UP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHMAC_MOVEUP, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHMAC_MOVEDOWN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_MAC_DOWN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHMAC_MOVEDOWN, pvar->ts->UIMsg);
+
+	GetDlgItemText(dlg, IDC_COMP_ORDER, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_COMP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_COMP_ORDER, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHCOMP_MOVEUP, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_COMP_UP", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHCOMP_MOVEUP, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHCOMP_MOVEDOWN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_COMP_DOWN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHCOMP_MOVEDOWN, pvar->ts->UIMsg);
+
 	GetDlgItemText(dlg, IDC_KNOWNHOSTS, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_KNOWNHOST", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_KNOWNHOSTS, pvar->ts->UIMsg);
@@ -2616,6 +2662,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	SendMessage(compressionControl, TBM_SETPOS, TRUE,
 	            pvar->settings.CompressionLevel);
 
+	// Cipher order
 	normalize_cipher_order(pvar->settings.CipherOrder);
 
 	for (i = 0; pvar->settings.CipherOrder[i] != 0; i++) {
@@ -2628,7 +2675,91 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	SendMessage(cipherControl, LB_SETCURSEL, 0, 0);
-	set_move_button_status(dlg);
+	set_move_button_status(dlg, IDC_SSHCIPHERPREFS, IDC_SSHMOVECIPHERUP, IDC_SSHMOVECIPHERDOWN);
+
+	// KEX order
+	normalize_kex_order(pvar->settings.KexOrder);
+	for (i = 0; pvar->settings.KexOrder[i] != 0; i++) {
+		int index = pvar->settings.KexOrder[i] - '0';
+		char FAR *name = NULL;
+
+		if (index == 0)	{
+			UTIL_get_lang_msg("DLG_SSHSETUP_KEX_BORDER", pvar,
+							  "<KEXs below this line are disabled>");
+			name = pvar->ts->UIMsg;
+		} else {
+			name = get_kex_algorithm_name(index);
+		}
+
+		if (name != NULL) {
+			SendMessage(kexControl, LB_ADDSTRING, 0, (LPARAM) name);
+		}
+	}
+	SendMessage(kexControl, LB_SETCURSEL, 0, 0);
+	set_move_button_status(dlg, IDC_SSHKEX_LIST, IDC_SSHKEX_MOVEUP, IDC_SSHKEX_MOVEDOWN);
+
+	// Host Key order
+	normalize_host_key_order(pvar->settings.HostKeyOrder);
+	for (i = 0; pvar->settings.HostKeyOrder[i] != 0; i++) {
+		int index = pvar->settings.HostKeyOrder[i] - '0';
+		char FAR *name = NULL;
+
+		if (index == 0)	{
+			UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
+							  "<Host Keys below this line are disabled>");
+			name = pvar->ts->UIMsg;
+		} else {
+			name = get_ssh_keytype_name(index);
+		}
+
+		if (name != NULL) {
+			SendMessage(hostkeyControl, LB_ADDSTRING, 0, (LPARAM) name);
+		}
+	}
+	SendMessage(hostkeyControl, LB_SETCURSEL, 0, 0);
+	set_move_button_status(dlg, IDC_SSHHOST_KEY_LIST, IDC_SSHHOST_KEY_MOVEUP, IDC_SSHHOST_KEY_MOVEDOWN);
+
+	// MAC order
+	normalize_mac_order(pvar->settings.MacOrder);
+	for (i = 0; pvar->settings.MacOrder[i] != 0; i++) {
+		int index = pvar->settings.MacOrder[i] - '0';
+		char FAR *name = NULL;
+
+		if (index == 0)	{
+			UTIL_get_lang_msg("DLG_SSHSETUP_MAC_BORDER", pvar,
+							  "<MACs below this line are disabled>");
+			name = pvar->ts->UIMsg;
+		} else {
+			name = get_ssh2_mac_name(index);
+		}
+
+		if (name != NULL) {
+			SendMessage(macControl, LB_ADDSTRING, 0, (LPARAM) name);
+		}
+	}
+	SendMessage(macControl, LB_SETCURSEL, 0, 0);
+	set_move_button_status(dlg, IDC_SSHMAC_LIST, IDC_SSHMAC_MOVEUP, IDC_SSHMAC_MOVEDOWN);
+
+	// Compression order
+	normalize_comp_order(pvar->settings.CompOrder);
+	for (i = 0; pvar->settings.CompOrder[i] != 0; i++) {
+		int index = pvar->settings.CompOrder[i] - '0';
+		char FAR *name = NULL;
+
+		if (index == 0)	{
+			UTIL_get_lang_msg("DLG_SSHSETUP_COMP_BORDER", pvar,
+							  "<Compressions below this line are disabled>");
+			name = pvar->ts->UIMsg;
+		} else {
+			name = get_ssh2_comp_name(index);
+		}
+
+		if (name != NULL) {
+			SendMessage(compControl, LB_ADDSTRING, 0, (LPARAM) name);
+		}
+	}
+	SendMessage(compControl, LB_SETCURSEL, 0, 0);
+	set_move_button_status(dlg, IDC_SSHCOMP_LIST, IDC_SSHCOMP_MOVEUP, IDC_SSHCOMP_MOVEDOWN);
 
 	for (i = 0; (ch = pvar->settings.KnownHostsFiles[i]) != 0 && ch != ';';
 		 i++) {
@@ -2737,13 +2868,16 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	char buf[4096];
 	char buf2[1024];
 	HWND compressionControl = GetDlgItem(dlg, IDC_SSHCOMPRESSIONLEVEL);
-	HWND cipherControl = GetDlgItem(dlg, IDC_SSHCIPHERPREFS);
+	HWND cipherControl;
 	int i, j, buf2index, bufindex;
-	int count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
+	int count;
 
 	pvar->settings.CompressionLevel =
 		(int) SendMessage(compressionControl, TBM_GETPOS, 0, 0);
 
+	// Cipher order
+	cipherControl = GetDlgItem(dlg, IDC_SSHCIPHERPREFS);
+	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
 	buf2index = 0;
 	for (i = 0; i < count; i++) {
 		int len = SendMessage(cipherControl, LB_GETTEXTLEN, i, 0);
@@ -2764,6 +2898,114 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	buf2[buf2index] = 0;
 	normalize_cipher_order(buf2);
 	strncpy_s(pvar->settings.CipherOrder, sizeof(pvar->settings.CipherOrder), buf2, _TRUNCATE);
+
+	// KEX order
+	cipherControl = GetDlgItem(dlg, IDC_SSHKEX_LIST);
+	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
+	buf2index = 0;
+	for (i = 0; i < count; i++) {
+		int len = SendMessage(cipherControl, LB_GETTEXTLEN, i, 0);
+
+		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
+			buf[0] = 0;
+			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
+			for (j = 0;
+				 j <= KEX_DH_MAX
+				 && strcmp(buf, get_kex_algorithm_name(j)) != 0; j++) {
+			}
+			if (j <= KEX_DH_MAX) {
+				buf2[buf2index] = '0' + j;
+				buf2index++;
+			} else {
+				buf2[buf2index] = '0';  // disabled line
+				buf2index++;
+			}
+		}
+	}
+	buf2[buf2index] = 0;
+	normalize_kex_order(buf2);
+	strncpy_s(pvar->settings.KexOrder, sizeof(pvar->settings.KexOrder), buf2, _TRUNCATE);
+
+	// Host Key order
+	cipherControl = GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST);
+	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
+	buf2index = 0;
+	for (i = 0; i < count; i++) {
+		int len = SendMessage(cipherControl, LB_GETTEXTLEN, i, 0);
+
+		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
+			buf[0] = 0;
+			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
+			for (j = 0;
+				j <= KEY_MAX
+				 && strcmp(buf, get_ssh_keytype_name(j)) != 0; j++) {
+			}
+			if (j <= KEY_MAX) {
+				buf2[buf2index] = '0' + j;
+				buf2index++;
+			} else {
+				buf2[buf2index] = '0';  // disabled line
+				buf2index++;
+			}
+		}
+	}
+	buf2[buf2index] = 0;
+	normalize_host_key_order(buf2);
+	strncpy_s(pvar->settings.HostKeyOrder, sizeof(pvar->settings.HostKeyOrder), buf2, _TRUNCATE);
+
+	// MAC order
+	cipherControl = GetDlgItem(dlg, IDC_SSHMAC_LIST);
+	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
+	buf2index = 0;
+	for (i = 0; i < count; i++) {
+		int len = SendMessage(cipherControl, LB_GETTEXTLEN, i, 0);
+
+		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
+			buf[0] = 0;
+			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
+			for (j = 0;
+				j <= HMAC_MAX
+				&& strcmp(buf, get_ssh2_mac_name(j)) != 0; j++) {
+			}
+			if (j <= HMAC_MAX) {
+				buf2[buf2index] = '0' + j;
+				buf2index++;
+			} else {
+				buf2[buf2index] = '0';  // disabled line
+				buf2index++;
+			}
+		}
+	}
+	buf2[buf2index] = 0;
+	normalize_mac_order(buf2);
+	strncpy_s(pvar->settings.MacOrder, sizeof(pvar->settings.MacOrder), buf2, _TRUNCATE);
+
+	// Compression order
+	cipherControl = GetDlgItem(dlg, IDC_SSHCOMP_LIST);
+	count = (int) SendMessage(cipherControl, LB_GETCOUNT, 0, 0);
+	buf2index = 0;
+	for (i = 0; i < count; i++) {
+		int len = SendMessage(cipherControl, LB_GETTEXTLEN, i, 0);
+
+		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
+			buf[0] = 0;
+			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
+			for (j = 0;
+				j <= COMP_MAX
+				&& strcmp(buf, get_ssh2_comp_name(j)) != 0; j++) {
+			}
+			if (j <= COMP_MAX) {
+				buf2[buf2index] = '0' + j;
+				buf2index++;
+			} else {
+				buf2[buf2index] = '0';  // disabled line
+				buf2index++;
+			}
+		}
+	}
+	buf2[buf2index] = 0;
+	normalize_comp_order(buf2);
+	strncpy_s(pvar->settings.CompOrder, sizeof(pvar->settings.CompOrder), buf2, _TRUNCATE);
 
 	buf[0] = 0;
 	GetDlgItemText(dlg, IDC_READWRITEFILENAME, buf, sizeof(buf));
@@ -2959,18 +3201,75 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 				DeleteObject(DlgSetupFont);
 			}
 			return TRUE;
+		// Cipher order
 		case IDC_SSHMOVECIPHERUP:
 			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHCIPHERPREFS), -1);
-			set_move_button_status(dlg);
+			set_move_button_status(dlg, IDC_SSHCIPHERPREFS, IDC_SSHMOVECIPHERUP, IDC_SSHMOVECIPHERDOWN);
 			SetFocus(GetDlgItem(dlg, IDC_SSHCIPHERPREFS));
 			return TRUE;
 		case IDC_SSHMOVECIPHERDOWN:
 			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHCIPHERPREFS), 1);
-			set_move_button_status(dlg);
+			set_move_button_status(dlg, IDC_SSHCIPHERPREFS, IDC_SSHMOVECIPHERUP, IDC_SSHMOVECIPHERDOWN);
 			SetFocus(GetDlgItem(dlg, IDC_SSHCIPHERPREFS));
 			return TRUE;
 		case IDC_SSHCIPHERPREFS:
-			set_move_button_status(dlg);
+			set_move_button_status(dlg, IDC_SSHCIPHERPREFS, IDC_SSHMOVECIPHERUP, IDC_SSHMOVECIPHERDOWN);
+			return TRUE;
+		// KEX order
+		case IDC_SSHKEX_MOVEUP:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHKEX_LIST), -1);
+			set_move_button_status(dlg, IDC_SSHKEX_LIST, IDC_SSHKEX_MOVEUP, IDC_SSHKEX_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHKEX_LIST));
+			return TRUE;
+		case IDC_SSHKEX_MOVEDOWN:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHKEX_LIST), 1);
+			set_move_button_status(dlg, IDC_SSHKEX_LIST, IDC_SSHKEX_MOVEUP, IDC_SSHKEX_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHKEX_LIST));
+			return TRUE;
+		case IDC_SSHKEX_LIST:
+			set_move_button_status(dlg, IDC_SSHKEX_LIST, IDC_SSHKEX_MOVEUP, IDC_SSHKEX_MOVEDOWN);
+			return TRUE;
+		// Host Key order
+		case IDC_SSHHOST_KEY_MOVEUP:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST), -1);
+			set_move_button_status(dlg, IDC_SSHHOST_KEY_LIST, IDC_SSHHOST_KEY_MOVEUP, IDC_SSHHOST_KEY_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST));
+			return TRUE;
+		case IDC_SSHHOST_KEY_MOVEDOWN:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST), 1);
+			set_move_button_status(dlg, IDC_SSHHOST_KEY_LIST, IDC_SSHHOST_KEY_MOVEUP, IDC_SSHHOST_KEY_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST));
+			return TRUE;
+		case IDC_SSHHOST_KEY_LIST:
+			set_move_button_status(dlg, IDC_SSHHOST_KEY_LIST, IDC_SSHHOST_KEY_MOVEUP, IDC_SSHHOST_KEY_MOVEDOWN);
+			return TRUE;
+		// Mac order
+		case IDC_SSHMAC_MOVEUP:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHMAC_LIST), -1);
+			set_move_button_status(dlg, IDC_SSHMAC_LIST, IDC_SSHMAC_MOVEUP, IDC_SSHMAC_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHMAC_LIST));
+			return TRUE;
+		case IDC_SSHMAC_MOVEDOWN:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHMAC_LIST), 1);
+			set_move_button_status(dlg, IDC_SSHMAC_LIST, IDC_SSHMAC_MOVEUP, IDC_SSHMAC_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHMAC_LIST));
+			return TRUE;
+		case IDC_SSHMAC_LIST:
+			set_move_button_status(dlg, IDC_SSHMAC_LIST, IDC_SSHMAC_MOVEUP, IDC_SSHMAC_MOVEDOWN);
+			return TRUE;
+		// Compression order
+		case IDC_SSHCOMP_MOVEUP:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHCOMP_LIST), -1);
+			set_move_button_status(dlg, IDC_SSHCOMP_LIST, IDC_SSHCOMP_MOVEUP, IDC_SSHCOMP_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHCOMP_LIST));
+			return TRUE;
+		case IDC_SSHCOMP_MOVEDOWN:
+			move_cur_sel_delta(GetDlgItem(dlg, IDC_SSHCOMP_LIST), 1);
+			set_move_button_status(dlg, IDC_SSHCOMP_LIST, IDC_SSHCOMP_MOVEUP, IDC_SSHCOMP_MOVEDOWN);
+			SetFocus(GetDlgItem(dlg, IDC_SSHCOMP_LIST));
+			return TRUE;
+		case IDC_SSHCOMP_LIST:
+			set_move_button_status(dlg, IDC_SSHCOMP_LIST, IDC_SSHCOMP_MOVEUP, IDC_SSHCOMP_MOVEDOWN);
 			return TRUE;
 		case IDC_CHOOSEREADWRITEFILE:
 			choose_read_write_file(dlg);
