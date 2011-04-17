@@ -31,7 +31,21 @@ enablekeyb &lt;flag&gt;
 <h2>例</h2>
 
 <pre class="macro-example">
+; ユーザのキー入力を無視する
 enablekeyb 0
+
+for i 1 5
+	sendln 'date'
+	wait '$'
+	pause 5
+next
+
+; ユーザのキー入力を許可する
+enablekeyb 1
+
+sendln 'cat &gt; /tmp/foo.txt'
+pause 10
+send $4   ; CTRL+D
 </pre>
 
 </body>

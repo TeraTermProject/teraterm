@@ -31,7 +31,21 @@ When the value is 0, a user can not input while the macro is sending the data.
 <h2>Example</h2>
 
 <pre class="macro-example">
+; Disabling a user input
 enablekeyb 0
+
+for i 1 5
+	sendln 'date'
+	wait '$'
+	pause 5
+next
+
+; Enabling a user input
+enablekeyb 1
+
+sendln 'cat &gt; /tmp/foo.txt'
+pause 10
+send $4   ; CTRL+D
 </pre>
 
 </body>
