@@ -2573,6 +2573,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_COMPRESSHIGH, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS_HIGHEST", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_COMPRESSHIGH, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_COMPRESSNOTE, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_COMPRESS_NOTE", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_COMPRESSNOTE, pvar->ts->UIMsg);
 
 	GetDlgItemText(dlg, IDC_CIPHERORDER, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_CHIPER", pvar, uimsg);
@@ -3159,17 +3162,39 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgSetupFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_COMPRESSLABEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMPRESSNONE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMPRESSHIGH, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMPRESSNOTE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
 			SendDlgItemMessage(dlg, IDC_CIPHERORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHCIPHERPREFS, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHMOVECIPHERUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHMOVECIPHERDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
+			SendDlgItemMessage(dlg, IDC_KEX_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHKEX_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHKEX_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHKEX_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
+			SendDlgItemMessage(dlg, IDC_HOST_KEY_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHHOST_KEY_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHHOST_KEY_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHHOST_KEY_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
+			SendDlgItemMessage(dlg, IDC_MAC_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHMAC_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHMAC_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHMAC_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
+			SendDlgItemMessage(dlg, IDC_COMP_ORDER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHCOMP_LIST, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHCOMP_MOVEUP, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHCOMP_MOVEDOWN, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
 			SendDlgItemMessage(dlg, IDC_CHOOSEREADWRITEFILE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_READWRITEFILENAME, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CHOOSEREADONLYFILE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_READONLYFILENAME, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMPRESSNONE, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_COMPRESSHIGH, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_NOTICEBANNER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KNOWNHOSTS, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HEARTBEATLABEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HEARTBEAT_EDIT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
@@ -3177,6 +3202,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_REMEMBERPASSWORD, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FORWARDAGENT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FORWARDAGENTCONFIRM, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_NOTICEBANNER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 		}
