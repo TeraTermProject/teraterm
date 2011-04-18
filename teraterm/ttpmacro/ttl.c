@@ -2312,7 +2312,7 @@ WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
 	WORD Err, ValType, VarId, P;
-	int sp = 1;
+	int sp = 0;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -2569,7 +2569,7 @@ WORD TTLDirname()
 int MessageCommand(int BoxId, LPWORD Err)
 {
 	TStrVal Str1, Str2;
-	int sp = 1;
+	int sp = 0;
 	int ret;
 
 	*Err = 0;

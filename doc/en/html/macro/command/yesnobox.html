@@ -30,7 +30,7 @@ yesnobox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 	<dt class="macro">string &lt;title&gt;</dt>
 	<dd>It is displayed as the dialog box title.</dd>
 	
-	<dt class="macro">integer &lt;special&gt; (optional default=1)</dt>
+	<dt class="macro">integer &lt;special&gt; (optional default=0)</dt>
 	<dd>If it is non-zero, following strings in &lt;message&gt; is treated as spacial character.<br>
 	    
 	    <table border="2">
@@ -52,6 +52,7 @@ yesnobox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 	     </tr>
 	    </table>
 	    
+	    <!--このオプションの使用は推奨されません。strspecial マクロコマンドを使用して文字列を変換することで同等の結果を得られます。-->
 	</dd>
 
 </dl>
