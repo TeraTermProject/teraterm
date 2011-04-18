@@ -114,8 +114,10 @@ int main(int argc, char** argv)
 
 	Cmdline[0] = 0;
 	for (i=1; i<argc; i++) {
+		if (i != 1) {
+			strncat(Cmdline, " ", sizeof(Cmdline)-strlen(Cmdline)-1);
+		}
 		strncat(Cmdline, argv[i], sizeof(Cmdline)-strlen(Cmdline)-1);
-		strncat(Cmdline, " ", sizeof(Cmdline)-strlen(Cmdline)-1);
 	}
 	//printf("%s\n", Cmdline);
 
