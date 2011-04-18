@@ -116,9 +116,13 @@
 // patch level 22 - delete mutex
 //   Written by NAGATA Shinya. (maya)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 23 - display errormessage when chdir failed.
+//   Written by IWAMOTO Kouichi. (doda)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_21 (2011/2/28)";
+static char Version[] = "version 1.07_23 (2011/4/18)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -950,7 +954,11 @@ int exec_shell(int* sh_pid)
             chdir(home_dir);
         }
         else if (change_dir[0] != 0) {
-            chdir(change_dir);
+	    if (chdir(change_dir) < 0) {
+		char tmp[256];
+		snprintf(tmp, 256, "Can't chdir to \"%s\".", change_dir);
+		c_error(tmp);
+	    }
         }
         // execute a shell
         char *argv[32];
