@@ -108,6 +108,33 @@ void CFileTransDlg::RefreshNum()
 {
 	char NumStr[24];
 	double rate;
+	int rate2;
+	static DWORD prev_elapsed;
+	DWORD elapsed;
+
+	if (fv->OpId == OpSendFile) {
+		if (fv->StartTime == 0) {
+			SetDlgItemText(IDC_ELAPSEDTIME, "0:00");
+			prev_elapsed = 0;
+		}
+		else {
+			elapsed = (GetTickCount() - fv->StartTime) / 1000;
+			if (elapsed != prev_elapsed && elapsed != 0) {
+				rate2 = fv->ByteCount / elapsed;
+				if (rate2 < 1200) {
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate2);
+				}
+				else if (rate2 < 1200000) {
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate2 / 1000, rate2 / 10 % 100);
+				}
+				else {
+					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate2 / (1000*1000), rate2 / 10000 % 100);
+				}
+				SetDlgItemText(IDC_ELAPSEDTIME, NumStr);
+				prev_elapsed = elapsed;
+			}
+		}
+	}
 
 	if (fv->OpId == OpSendFile && fv->FileSize > 0) {
 		rate = 100.0 * (double)fv->ByteCount / (double)fv->FileSize;

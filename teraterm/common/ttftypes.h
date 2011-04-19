@@ -97,6 +97,8 @@ typedef struct {
   int FlushLogLineBuf;
 
   int ProgStat;
+
+  DWORD StartTime;
 } TFileVar;
 typedef TFileVar far *PFileVar;
 

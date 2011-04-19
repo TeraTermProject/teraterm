@@ -175,6 +175,7 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 	} else {
 		fv->ProgStat = -1;
 	}
+	fv->StartTime = GetTickCount();
 
 	SetWindowText(fv->HWin, fv->DlgCaption);
 	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
@@ -372,6 +373,7 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 
 	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, xv->PktNumOffset + xv->PktNum);
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	FTSetTimeOut(fv, xv->TOutLong);
 
@@ -503,6 +505,7 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 					  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 	}
 
 	return TRUE;

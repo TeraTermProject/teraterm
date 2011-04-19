@@ -185,5 +185,7 @@ BOOL FTCreateFile(PFileVar fv)
     fv->ProgStat = 0;
   }
 
+  fv->StartTime = GetTickCount();
+
   return fv->FileOpen;
 }

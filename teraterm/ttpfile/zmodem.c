@@ -532,9 +532,11 @@ void ZSendFileDat(PFileVar fv, PZVar zv)
 
 	fv->ByteCount = 0;
 	fv->ProgStat = 0;
+	fv->StartTime = GetTickCount();
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 				  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	add_sendbuf("%s: ZFILE: ZF0=%x ZF1=%x ZF2=%x file=%s size=%lu",
 		__FUNCTION__,
@@ -579,6 +581,7 @@ void ZSendDataDat(PFileVar fv, PZVar zv)
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 				  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 	zv->Pos = fv->ByteCount;
 
 	zv->PktOut[zv->PktOutCount] = ZDLE;
@@ -643,6 +646,7 @@ void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, "ZMODEM");
 
 	InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+	fv->StartTime = GetTickCount();
 
 	fv->FileSize = 0;
 
@@ -984,6 +988,8 @@ BOOL ZParseFile(PFileVar fv, PZVar zv)
 	if (fv->FileSize > 0)
 		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 					  0, fv->FileSize, &fv->ProgStat);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, GetTickCount(), fv->ByteCount);
+
 	/* set timeout for data */
 	FTSetTimeOut(fv, zv->TimeOut);
 	return TRUE;
@@ -1019,6 +1025,7 @@ BOOL ZWriteData(PFileVar fv, PZVar zv)
 	if (fv->FileSize > 0)
 		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 					  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	/* set timeout for data */
 	FTSetTimeOut(fv, zv->TimeOut);

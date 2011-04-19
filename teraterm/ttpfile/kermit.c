@@ -348,6 +348,7 @@ void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
   if (Buff==NULL)
     SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
   *BuffLen = BuffPtr;
+  SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 }
 
 BOOL KmtEncode(PFileVar fv, PKmtVar kv)
@@ -464,6 +465,7 @@ void KmtSendNextData(PFileVar fv, PKmtVar kv, PComVar cv)
   SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
   SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
                 fv->ByteCount, fv->FileSize, &fv->ProgStat);
+  SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
   DataLen = 0;
   DataLenNew = 0;
 
@@ -484,6 +486,7 @@ void KmtSendNextData(PFileVar fv, PKmtVar kv, PComVar cv)
     SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
     SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
                   fv->ByteCount, fv->FileSize, &fv->ProgStat);
+    SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
     KmtSendEOFPacket(fv,kv,cv);
   }
   else {
@@ -533,11 +536,13 @@ BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
 
   fv->ByteCount = 0;
   fv->ProgStat = 0;
+  fv->StartTime = GetTickCount();
 
   SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
   SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
   SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
                 fv->ByteCount, fv->FileSize, &fv->ProgStat);
+  SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
   KmtIncPacketNum(kv);
   strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4,&(fv->FullName[fv->DirLen]),_TRUNCATE); // put FName
@@ -611,9 +616,11 @@ void KmtInit
 
   if (kv->KmtMode == IdKmtSend) {
     InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+    fv->StartTime = GetTickCount();
   }
   else {
     fv->ProgStat = -1;
+    fv->StartTime = 0;
   }
 
   fv->FileOpen = FALSE;

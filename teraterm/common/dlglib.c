@@ -116,6 +116,39 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	}
 }
 
+void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
+{
+	static int prev_elapsed;
+	int elapsed, rate;
+	char buff[64];
+
+	elapsed = (GetTickCount() - stime) / 1000;
+
+	if (elapsed == 0) {
+		prev_elapsed = 0;
+		SetDlgItemText(HDlg, id_Item, "0:00");
+		return;
+	}
+
+	if (elapsed == prev_elapsed) {
+		return;
+	}
+	prev_elapsed = elapsed;
+
+	rate = bytes / elapsed;
+	if (rate < 1200) {
+		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate); 
+	}
+	else if (rate < 1200000) {
+		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100); 
+	}
+	else {
+		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100); 
+	}
+
+	SetDlgItemText(HDlg, id_Item, buff);
+}
+
 void SetDropDownList(HWND HDlg, int Id_Item, PCHAR far *List, int nsel)
 {
 	int i;

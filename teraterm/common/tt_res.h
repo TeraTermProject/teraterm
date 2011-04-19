@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by t:\ttssh2\teraterm\teraterm\ttermpro.rc
+// Used by i:\My Documents\Visual Studio 2005\Projects\TeraTerm\teraterm\teraterm\ttermpro.rc
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -144,6 +144,10 @@
 #define IDC_CONFIRM_STRING_FILE_LABEL   2522
 #define IDC_CLEAR_ON_RESIZE             2523
 #define IDC_CURSOR_CHANGE_IME           2524
+#define IDC_PROT_ELAPSED                2525
+#define IDC_PROTOELAPSEDTIME            2526
+#define IDC_ELAPSEDTEXT                 2527
+#define IDC_ELAPSEDTIME                 2528
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003

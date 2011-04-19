@@ -197,6 +197,7 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 	} else {
 		fv->ProgStat = -1;
 	}
+	fv->StartTime = GetTickCount();
 	SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
 
 	yv->PktNumOffset = 0;
@@ -538,6 +539,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 	SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, yv->PktNumOffset+yv->PktNum);
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
+	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
 	FTSetTimeOut(fv,yv->TOutLong);
 
@@ -824,6 +826,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 			fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 	}
 
 	return TRUE;

@@ -195,6 +195,9 @@ BOOL OpenFTDlg(PFileVar fv)
 
 	FTDlg = new CFileTransDlg();
 
+	fv->StartTime = 0;
+	fv->ProgStat = 0;
+
 	if (FTDlg!=NULL)
 	{
 		FTDlg->Create(fv, &cv, &ts);
@@ -231,10 +234,9 @@ BOOL OpenFTDlg(PFileVar fv)
 	SetDlgItemText(HFTDlg, IDC_TRANSHELP, ts.UIMsg);
 
 	if (fv->OpId == OpSendFile) {
+		fv->StartTime = GetTickCount();
 		InitDlgProgress(HFTDlg, IDC_TRANSPROGRESS, &fv->ProgStat);
-	}
-	else {
-		fv->ProgStat = -1;
+		ShowWindow(GetDlgItem(HFTDlg, IDC_ELAPSEDTEXT), SW_SHOW);
 	}
 
 	return (FTDlg!=NULL);

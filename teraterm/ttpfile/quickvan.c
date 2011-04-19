@@ -112,6 +112,7 @@ void QVInit
   SetDlgItemText(fv->HWin, IDC_PROTOPROT, "Quick-VAN");
 
   InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
+  fv->StartTime = GetTickCount();
 
   qv->SeqNum = 0;
   qv->FileNum = 0;
@@ -398,6 +399,7 @@ BOOL QVParseVFILE(PFileVar fv, PQVVar qv)
   if (fv->FileSize>0)
     SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
       0, fv->FileSize, &fv->ProgStat);
+  SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 
   /* Send VRPOS */
   QVSetResPacket(qv,'P',0,0);
@@ -477,6 +479,7 @@ void QVWriteToFile(PFileVar fv, PQVVar qv)
   if (fv->FileSize>0)
     SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
       fv->ByteCount, fv->FileSize, &fv->ProgStat);
+  SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 }
 
 BOOL QVCheckWindow8(PQVVar qv, WORD w0, WORD w1, BYTE b, LPWORD  w)
@@ -786,6 +789,7 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
   /* file no. */
   qv->FileNum++;
   fv->ProgStat = 0;
+  fv->StartTime = GetTickCount();
   i = 3;
   QVPutNum2(qv,qv->FileNum,&i);
   /* file name */
@@ -852,6 +856,7 @@ void QVSendVDATA(PFileVar fv, PQVVar qv)
     SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
     SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
 		  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+    SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
     for (i = C ; i <= 127 ; i++)
       qv->PktOut[3+i] = 0;
     /* send VDAT */

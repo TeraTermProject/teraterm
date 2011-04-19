@@ -578,6 +578,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdMouseTrackBtnEvent 5
 #define IdMouseTrackAllEvent 6
 #define IdMouseTrackNetTerm  7
+#define IdMouseTrackJSBTerm  8
 
   /* Mouse event */
 #define IdMouseEventCurStat  0
