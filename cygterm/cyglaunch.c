@@ -95,6 +95,7 @@ int main(int argc, char** argv)
 	char Temp[256], CygwinDir[256], Cmdline[256];
 	char *bs;
 	int i;
+	BOOL d_opt=FALSE;
 
 	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) > 0 &&
 	   (bs = strrchr(Temp, '\\')) != NULL) {
@@ -117,7 +118,17 @@ int main(int argc, char** argv)
 		if (i != 1) {
 			strncat(Cmdline, " ", sizeof(Cmdline)-strlen(Cmdline)-1);
 		}
+		if (d_opt && strncmp("\"\\\\", argv[i], 3) == 0) {
+			argv[i][1] = '/';
+			argv[i][2] = '/';
+		}
 		strncat(Cmdline, argv[i], sizeof(Cmdline)-strlen(Cmdline)-1);
+		if (strcmp(argv[i], "-d") == 0) {
+			d_opt = TRUE;
+		}
+		else {
+			d_opt = FALSE;
+		}
 	}
 	//printf("%s\n", Cmdline);
 
