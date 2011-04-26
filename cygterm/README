@@ -266,6 +266,9 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_23 2011/04/18 (by doda)
+        * Display error message when chdir() was failed.
+
 v1.07_22 2011/03/03 (by maya)
         * Delete mutex object for running check by installer.
 

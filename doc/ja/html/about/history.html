@@ -61,7 +61,13 @@
 
   <li>その他
     <ul>
+      <li>インストーラを修正した。
+        <ul>
+          <li>フォルダのコンテキストメニューに CygTerm Here を追加した時、名前に複数の連続するスペースを含むフォルダへの CygTerm Here が正しく働かないのを修正した。</li>
+        </ul></li>
       <li><a href="#ttssh_2.57">SSH2対応TTSSH(2.57)</a>へ差し替えた。</li>
+      <li><a href="#cygterm_1.07_23">CygTerm+ 1.07_23</a>へ差し替えた。</li>
+      <li><a href="#cyglaunch_1.03">cyglaunch (1.03)</a>へ差し替えた。</li>
     </ul>
   </li>
 
@@ -2321,6 +2327,11 @@
 
 <h2><a name="cygterm">CygTerm+</a></h2>
 
+<h3><a name="cygterm_1.07_23">v1.07_23 2011/04/18 (by doda)</a></h3>
+<ul class="history">
+      <li>-d オプションで指定されたディレクトリへの移動が失敗した時、エラーメッセージを表示するようにした。</li>
+</ul>
+
 <h3><a name="cygterm_1.07_22">v1.07_22 2011/03/03 (by maya)</a></h3>
 <ul class="history">
       <li>インストーラから起動チェックをするための mutex を削除した。</li>
@@ -2518,6 +2529,12 @@
 
 
 <h2><a name="cyglaunch">cyglaunch</a></h2>
+<h3><a name="cyglaunch_1.03">2011.xx.xx (Ver 1.03)</a></h3>
+<ul class="history">
+      <li>ドライブのルートディレクトリへの CygTerm Here が正しく働かない問題を修正した。</li>
+      <li>UNC パスのディレクトリへの CygTerm Here が正しく働かない場合が有る問題を修正した。</li>
+</ul>
+
 <h3><a name="cyglaunch_1.02">2010.12.7 (Ver 1.02)</a></h3>
 <ul class="history">
       <li>セキュリティ修正: カレントディレクトリを cyglaunch.exe があるディレクトリに変更してから cygterm.exe を起動するようにした。</li>
