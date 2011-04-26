@@ -92,7 +92,7 @@ WORD GetOnOff(PCHAR Sect, PCHAR Key, PCHAR FName, BOOL Default)
 // \n, \t等を展開する。
 // common/ttlib.c:RestoreNewLine()がベース。
 //
-void UnEscapeStr(BYTE *Text)
+int UnEscapeStr(BYTE *Text)
 {
 	int i;
 	unsigned char *src, *dst;
@@ -152,9 +152,11 @@ void UnEscapeStr(BYTE *Text)
 					for (i=0; i<3; i++) {
 						if (*src < '0' || *src > '7')
 							break;
-						*dst = *dst << 3 + *src - '0';
+						*dst = (*dst << 3) + *src - '0';
+						src++;
 					}
 					src--;
+					break;
 				default:
 					*dst = '\\';
 					src--;
@@ -166,7 +168,9 @@ void UnEscapeStr(BYTE *Text)
 		src++; dst++;
 	}
 
-	return (dst - Text);
+	*dst = '\0';
+
+	return (int)(dst - Text);
 }
 
 //
