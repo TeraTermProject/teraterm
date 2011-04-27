@@ -46,7 +46,7 @@
       <li>DEC special character font can support the bold and the under line attribute.</li>
       <li>The Meta Key can be only assigned to the left ALT or the right ALT key.</li>
       <li>added support for the NetTerm style mouse event tracking.</li>
-      <!-- li>ファイル送信およびファイル転送時のダイアログに、経過時間および転送速度を表示するようにした。</li -->
+      <li>added the elapsed time and the trasnfer speed on the file sending dialog.</li>
       <li>Resurrected the special argument of the box-style macro command. However, this option is obsolete. The default is 0 because of backward compatibility.</li>
     </ul>
   </li>
@@ -64,7 +64,7 @@
     <ul>
       <li>Modified Tera Term installer script
         <ul>
-          <!-- li>フォルダのコンテキストメニューに CygTerm Here を追加した時、名前に複数の連続するスペースを含むフォルダへ の CygTerm Here が正しく働かないのを修正した。</li -->
+          <li>Bug fix: When the CygTerm Here is added in the context menu, the CygTerm Here does not work well with the folder name containing continuing spaces.</li>
         </ul></li>
       <li>upgraded TTSSH version supporting SSH2 to <a href="#ttssh_2.57">2.57</a></li>
       <li>upgraded CygTerm+ to <a href="#cygterm_1.07_23">1.07_23</a></li>
@@ -1693,7 +1693,7 @@ SYNOPSIS:
           <li>CompOrder=3210</li>
         </ul></li>
       <li>added support for SSH2 MAC algorithms: hmac-sha1-96, hmac-md5-96, hmac-ripemd160@openssh.com</li>
-      <!-- li>SCP ファイル転送時、ダイアログに経過時間, 転送速度, プログレスバーを表示するようにした。</li -->
+      <li>added the elapsed time and the transmit speed on the SCP dialog.</li>
     </ul>
   </li>
 
@@ -2330,7 +2330,7 @@ SYNOPSIS:
 
 <h3><a name="cygterm_1.07_23">v1.07_23 2011/04/18 (by doda)</a></h3>
 <ul class="history">
-      <!-- li>-d オプションで指定されたディレクトリへの移動が失敗した時、エラーメッセージを表示するようにした。</li -->
+      <li>added the error message when the CygTerm can not move the directory specified by -d option.</li>
 </ul>
 
 <h3><a name="cygterm_1.07_22">v1.07_22 2011/03/03 (by maya)</a></h3>
@@ -2532,8 +2532,8 @@ SYNOPSIS:
 <h2><a name="cyglaunch">cyglaunch</a></h2>
 <h3><a name="cyglaunch_1.03">2011.xx.xx (Ver 1.03)</a></h3>
 <ul class="history">
-      <!-- li>ドライブのルートディレクトリへの CygTerm Here が正しく働かない問題を修正した。</li -->
-      <!-- li>UNC パスのディレクトリへの CygTerm Here が正しく働かない場合が有る問題を修正した。</li -->
+      <li>The CygTerm Here does not work well for the root directory.</li>
+      <li>The CygTerm Here does not work well for the UNC path.</li>
 </ul>
 
 <h3><a name="cyglaunch_1.02">2010.12.7 (Ver 1.02)</a></h3>
