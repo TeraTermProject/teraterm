@@ -81,6 +81,8 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 		SendDlgItemMessage(IDC_EDIT_FULLPATH, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_TRANS_TRANS, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_TRANSBYTES, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TRANS_ELAPSED, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TRANS_ETIME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_TRANSPAUSESTART, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDCANCEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_TRANSHELP, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
@@ -114,7 +116,7 @@ void CFileTransDlg::RefreshNum()
 
 	if (fv->OpId == OpSendFile) {
 		if (fv->StartTime == 0) {
-			SetDlgItemText(IDC_ELAPSEDTIME, "0:00");
+			SetDlgItemText(IDC_TRANS_ETIME, "0:00");
 			prev_elapsed = 0;
 		}
 		else {
@@ -130,7 +132,7 @@ void CFileTransDlg::RefreshNum()
 				else {
 					_snprintf_s(NumStr, sizeof(NumStr), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate2 / (1000*1000), rate2 / 10000 % 100);
 				}
-				SetDlgItemText(IDC_ELAPSEDTIME, NumStr);
+				SetDlgItemText(IDC_TRANS_ETIME, NumStr);
 				prev_elapsed = elapsed;
 			}
 		}

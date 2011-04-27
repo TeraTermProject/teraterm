@@ -223,6 +223,9 @@ BOOL OpenFTDlg(PFileVar fv)
 	GetDlgItemText(HFTDlg, IDC_TRANS_TRANS, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_FILETRANS_TRNAS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(HFTDlg, IDC_TRANS_TRANS, ts.UIMsg);
+	GetDlgItemText(HFTDlg, IDC_TRANS_ELAPSED, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FILETRANS_ELAPSED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(HFTDlg, IDC_TRANS_ELAPSED, ts.UIMsg);
 	GetDlgItemText(HFTDlg, IDCANCEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_FILETRANS_CLOSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(HFTDlg, IDCANCEL, ts.UIMsg);
@@ -236,7 +239,7 @@ BOOL OpenFTDlg(PFileVar fv)
 	if (fv->OpId == OpSendFile) {
 		fv->StartTime = GetTickCount();
 		InitDlgProgress(HFTDlg, IDC_TRANSPROGRESS, &fv->ProgStat);
-		ShowWindow(GetDlgItem(HFTDlg, IDC_ELAPSEDTEXT), SW_SHOW);
+		ShowWindow(GetDlgItem(HFTDlg, IDC_TRANS_ELAPSED), SW_SHOW);
 	}
 
 	return (FTDlg!=NULL);
@@ -1112,6 +1115,9 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 	GetDlgItemText(Hpd, IDC_PROT_TRANS, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_PROT_TRANS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(Hpd, IDC_PROT_TRANS, ts.UIMsg);
+	GetDlgItemText(Hpd, IDC_PROT_ELAPSED, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_PROT_ELAPSED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(Hpd, IDC_PROT_ELAPSED, ts.UIMsg);
 	GetDlgItemText(Hpd, IDCANCEL, uimsg, sizeof(uimsg));
 	get_lang_msg("BTN_CANCEL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(Hpd, IDCANCEL, ts.UIMsg);
