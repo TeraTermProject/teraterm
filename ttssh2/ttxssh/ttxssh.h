@@ -169,6 +169,8 @@ typedef struct _TInstVar {
 	PWriteIniFile WriteIniFile;
 	PParseParam ParseParam;
 
+	HMENU FileMenu;
+
 	SOCKET socket;
 	HWND NotificationWindow;
 	unsigned int notification_msg;

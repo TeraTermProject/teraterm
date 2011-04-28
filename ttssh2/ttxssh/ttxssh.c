@@ -2189,8 +2189,36 @@ static void insertMenuBeforeItem(HMENU menu, WORD beforeItemID, WORD flags,
 	}
 }
 
+#define GetFileMenu(menu)       GetSubMenuByChildID(menu, 50110) // ID_FILE_NEWCONNECTION
+#define GetEditMenu(menu)       GetSubMenuByChildID(menu, 50210) // ID_EDIT_COPY2
+#define GetSetupMenu(menu)      GetSubMenuByChildID(menu, 50310) // ID_SETUP_TERMINAL
+#define GetControlMenu(menu)    GetSubMenuByChildID(menu, 50410) // ID_CONTROL_RESETTERMINAL
+#define GetHelpMenu(menu)       GetSubMenuByChildID(menu, 50990) // ID_HELP_ABOUT
+
+HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
+  int i, j, items, subitems, cur_id;
+  HMENU m;
+
+  items = GetMenuItemCount(menu);
+
+  for (i=0; i<items; i++) {
+    if (m = GetSubMenu(menu, i)) {
+      subitems = GetMenuItemCount(m);
+      for (j=0; j<subitems; j++) {
+        cur_id = GetMenuItemID(m, j);
+        if (cur_id == id) {
+          return m;
+        }
+      }
+    }
+  }
+  return NULL;
+}
+
 static void PASCAL FAR TTXModifyMenu(HMENU menu)
 {
+	pvar->FileMenu = GetFileMenu(menu);
+
 	/* inserts before ID_HELP_ABOUT */
 	UTIL_get_lang_msg("MENU_ABOUT", pvar, "About &TTSSH...");
 	insertMenuBeforeItem(menu, 50990, MF_ENABLED, ID_ABOUTMENU, pvar->ts->UIMsg);
@@ -2209,7 +2237,16 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu)
 
 	/* inserts before ID_FILE_CHANGEDIR */
 	UTIL_get_lang_msg("MENU_SSH_SCP", pvar, "SS&H SCP...");
-	insertMenuBeforeItem(menu, 50170, MF_ENABLED, ID_SSHSCPMENU, pvar->ts->UIMsg);
+	insertMenuBeforeItem(menu, 50170, MF_GRAYED, ID_SSHSCPMENU, pvar->ts->UIMsg);
+}
+
+static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+	if (menu == pvar->FileMenu) {
+		if (pvar->cv->Ready && pvar->settings.Enabled)
+			EnableMenuItem(menu, ID_SSHSCPMENU, MF_BYCOMMAND | MF_ENABLED);
+		else
+			EnableMenuItem(menu, ID_SSHSCPMENU, MF_BYCOMMAND | MF_GRAYED);
+	}
 }
 
 static void append_about_text(HWND dlg, char FAR * prefix, char FAR * msg)
@@ -4960,7 +4997,7 @@ static TTXExports Exports = {
 	TTXCloseTCP,
 	TTXSetWinSize,
 	TTXModifyMenu,
-	NULL,
+	TTXModifyPopupMenu,
 	TTXProcessCommand,
 	TTXEnd,
 	TTXSetCommandLine
