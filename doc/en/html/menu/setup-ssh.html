@@ -13,13 +13,6 @@
 
     <h2>"TTSSH: Setup" Dialog box</h2>
     <dl>
-      <dt>Compression level</dt>
-      <dd>
-	Specify the level of compression for transmission. The more right,
-	the more compression is done (note: it may degrade the throughout
-	with a high speed link such as ADSL or FTTH).
-      </dd>
-
       <dt>Prefered cihper order</dt>
       <dd>
 	Specify the type of encryption for SSH with the order.<br>
@@ -52,6 +45,39 @@
       <dt>Confirm agent forwarding</dt>
       <dd>
 	When the SSH agent-forwarding is requested, a user will confirm contacting the Pageant.
+      </dd>
+
+      <dt>KEX order (SSH2 only)</dt>
+      <dd>
+	Specify the type of KEX(Key Exchange) for SSH2 with the order.<br>
+	&lt;KEXs below this line are disabled&gt;
+      </dd>
+
+      <dt>MAC order (SSH2 only)</dt>
+      <dd>
+	Specify the type of MAC for SSH2 with the order.<br>
+	&lt;MACs below this line are disabled&gt;
+      </dd>
+
+      <dt>Host key order (SSH2 only)</dt>
+      <dd>
+	Specify the type of host key for SSH2 with the order.<br>
+	&lt;Host keys below this line are disabled&gt;
+      </dd>
+
+      <dt>Compression order (SSH2 only)</dt>
+      <dd>
+	Specify the type of compression key for SSH2 with the order.<br>
+	&lt;Compressions below this line are disabled&gt;
+      </dd>
+
+      <dt>Compression level</dt>
+      <dd>
+	Specify the level of compression for transmission. The more right,
+	the more compression is done (note: it may degrade the throughout
+	with a high speed link such as ADSL or FTTH).<br>
+	<!--SSH1 の場合は、Compression level が 0 であれば圧縮が無効、1 以上であれば圧縮が有効になります。<br>
+	SSH2 の場合は、Compression order で圧縮を有効にします。そのうえで Compression level を 1 以上にすると圧縮が有効になります。-->
       </dd>
     </dl>
   </body>

@@ -13,13 +13,6 @@
 
     <h2>"TTSSH: Setup" ダイアログボックス</h2>
     <dl>
-      <dt>Compression level</dt>
-      <dd>
-	通信路の圧縮レベルを指定します。
-	右にスライドさせるほど圧縮が強くかかります。
-	(但し、ADSL や FTTH 等高速な回線ではレスポンスが悪くなる場合もあります。)
-      </dd>
-
       <dt>Prefered cihper order</dt>
       <dd>
 	SSH 接続で使用する暗号の種類を順序を付けて指定します。<br>
@@ -50,6 +43,39 @@
       <dt>Confirm agent forwarding</dt>
       <dd>
 	リモートから SSH エージェント転送が要求されたとき、要求に応えて Pageant に問い合わせるかどうかユーザに確認します。
+      </dd>
+
+      <dt>KEX order (SSH2 only)</dt>
+      <dd>
+	SSH2 接続で使用するKEX(鍵交換)の種類を順序を付けて指定します。<br>
+	&lt;KEXs below this line are disabled&gt;以下の暗号は使用されません。
+      </dd>
+
+      <dt>MAC order (SSH2 only)</dt>
+      <dd>
+	SSH2 接続で使用するMACの種類を順序を付けて指定します。<br>
+	&lt;MACs below this line are disabled&gt;以下の暗号は使用されません。
+      </dd>
+
+      <dt>Host key order (SSH2 only)</dt>
+      <dd>
+	SSH2 接続で使用するホスト鍵の種類を順序を付けて指定します。<br>
+	&lt;Host keys below this line are disabled&gt;以下の暗号は使用されません。
+      </dd>
+
+      <dt>Compression order (SSH2 only)</dt>
+      <dd>
+	SSH2 接続で使用する圧縮方式を順序を付けて指定します。<br>
+	&lt;Compressions below this line are disabled&gt;以下の暗号は使用されません。
+      </dd>
+
+      <dt>Compression level</dt>
+      <dd>
+	通信路の圧縮レベルを指定します。
+	右にスライドさせるほど圧縮が強くかかります。
+	(但し、ADSL や FTTH 等高速な回線ではレスポンスが悪くなる場合もあります。)<br>
+	SSH1 の場合は、Compression level が 0 であれば圧縮が無効、1 以上であれば圧縮が有効になります。<br>
+	SSH2 の場合は、Compression order で圧縮を有効にします。そのうえで Compression level を 1 以上にすると圧縮が有効になります。
       </dd>
     </dl>
   </body>
