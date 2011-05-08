@@ -2663,6 +2663,19 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+	// for animation
+	static HDC dlgdc = NULL;
+	static int dlgw, dlgh;
+	static HBITMAP dlgbmp = NULL, dlgprevbmp = NULL;
+	static LPDWORD dlgpixel = NULL;
+	static HICON dlghicon = NULL;
+	//const int ID_EFFECT_TIMER = 1;
+	RECT dlgrc = {0};
+	BITMAPINFO       bmi;
+	BITMAPINFOHEADER bmiHeader;
+	PAINTSTRUCT ps;
+	int x, y;
+#define POS(x,y) ((x) + (y)*dlgw)
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -2702,7 +2715,13 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
 								  IMAGE_ICON, 32, 32, fuLoad);
+#if 0
 				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
+#else
+				// Picture Control に描画すると、なぜか透過色が透過にならず、黒となってしまうため、
+				// WM_PAINT で描画する。
+				dlghicon = hicon;
+#endif
 			}
 
 			GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
@@ -2784,22 +2803,132 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			// メッセージが拾えない。(2005.4.5 yutaka)
 			do_subclass_window(GetDlgItem(Dialog, IDC_AUTHOR_URL), &author_url_class);
 			do_subclass_window(GetDlgItem(Dialog, IDC_FORUM_URL), &forum_url_class);
+
+			/*
+			 * ダイアログのビットマップ化を行い、背景にエフェクトをかけられるようにする。
+			 * (2011.5.7 yutaka)
+			 */
+			// ダイアログのサイズ
+			GetWindowRect(Dialog, &dlgrc);
+			dlgw = dlgrc.right - dlgrc.left;
+			dlgh = dlgrc.bottom - dlgrc.top;
+			// ビットマップの作成
+			dlgdc = CreateCompatibleDC(NULL);
+			ZeroMemory(&bmiHeader, sizeof(BITMAPINFOHEADER));
+			bmiHeader.biSize      = sizeof(BITMAPINFOHEADER);
+			bmiHeader.biWidth     = dlgw;
+			bmiHeader.biHeight    = -dlgh;
+			bmiHeader.biPlanes    = 1;
+			bmiHeader.biBitCount  = 32;
+			bmi.bmiHeader = bmiHeader;
+			dlgbmp = CreateDIBSection(NULL, (LPBITMAPINFO)&bmi, DIB_RGB_COLORS, &dlgpixel, NULL, 0);
+			dlgprevbmp = (HBITMAP)SelectObject(dlgdc, dlgbmp);
+			// ビットマップの背景色（朝焼けっぽい）を作る。
+			for (y = 0 ; y < dlgh ; y++) {
+				double dx = (double)(255 - 180) / dlgw;
+				double dy = (double)255/dlgh;
+				BYTE r, g, b;
+				for (x = 0 ; x < dlgw ; x++) {
+					r = min((int)(180+dx*x), 255);
+					g = min((int)(180+dx*x), 255);
+					b = max((int)(255-y*dx), 0);
+					// 画素の並びは、下位バイトからB, G, R, Aとなる。
+					dlgpixel[POS(x, y)] = b | g << 8 | r << 16;
+				}
+			}
+			// エフェクトタイマーの開始
+			//SetTimer(Dialog, ID_EFFECT_TIMER, 40, NULL);
+
 			return TRUE;
 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
+				int val;
 				case IDOK:
-					EndDialog(Dialog, 1);
-					return TRUE;
-
+					val = 1;
 				case IDCANCEL:
-					EndDialog(Dialog, 0);
+					val = 0;
+					//KillTimer(Dialog, ID_EFFECT_TIMER);
+
+					SelectObject(dlgdc, dlgprevbmp);
+					DeleteObject(dlgbmp);
+					DeleteDC(dlgdc);
+					dlgdc = NULL;
+					dlgprevbmp = dlgbmp = NULL;
+
+					EndDialog(Dialog, val);
 					return TRUE;
 			}
 			if (DlgAboutFont != NULL) {
 				DeleteObject(DlgAboutFont);
 			}
 			break;
+
+		// static textの背景を透過させる。
+		case WM_CTLCOLORSTATIC:
+			SetBkMode((HDC)wParam, TRANSPARENT);
+			return (BOOL)GetStockObject( NULL_BRUSH );
+			break;
+
+		case WM_PAINT:
+			if (dlgdc) {
+				hdc = BeginPaint(Dialog, &ps);
+				BitBlt(hdc, 
+					ps.rcPaint.left, ps.rcPaint.top, 
+					ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
+					dlgdc, 
+					ps.rcPaint.left, ps.rcPaint.top, 
+					SRCCOPY);
+
+				DrawIconEx(hdc, 15, 10, dlghicon, 0, 0, 0, 0, DI_NORMAL | DI_DEFAULTSIZE);
+
+				EndPaint(Dialog, &ps);
+			}
+			break;
+
+#if 0
+		case WM_MOUSEMOVE:
+			{
+				int xpos, ypos, x, y, nx, ny, max = 10;
+				DWORD val;
+				BYTE r, g, b;
+				RECT rc;
+
+				xpos = LOWORD(lParam); 
+				ypos = HIWORD(lParam);
+
+				for (y = -max ; y < max ; y++) {
+					for (x = -max ; x < max ; x++) {
+						nx = xpos + x;
+						ny = ypos + y;
+						if (nx >= 1 && nx <= dlgw-1 &&
+							ny >= 1 && ny <= dlgh-1) {
+
+							val = dlgpixel[POS(nx,ny)];
+							r = GetRValue(val);
+							g = GetGValue(val);
+							b = GetBValue(val);
+							val = (r + g + b) / 3;
+							dlgpixel[POS(nx,ny)] = b | g << 8 | r << 16;
+						}
+					}
+				}
+
+				rc.left = xpos - max;
+				rc.top = ypos - max;
+				rc.right = xpos + max;
+				rc.bottom = ypos + max;
+				InvalidateRect(Dialog, &rc, FALSE);
+			}
+			break;
+
+		case WM_TIMER:
+			if (wParam == ID_EFFECT_TIMER) 
+			{
+			}
+			break;
+#endif
+
 	}
 	return FALSE;
 }
