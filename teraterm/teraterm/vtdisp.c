@@ -3162,7 +3162,7 @@ void DispUpdateScroll()
 
   /* 最下行でだけ自動スクロールする設定の場合
      NewOrgYが変化していなくてもバッファ行数が変化するので更新する */
-  if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin)
+  if (ts.AutoScrollOnlyInBottomLine != 0)
   {
     if ((BuffEnd==WinHeight) &&
         (ts.EnableScrollBuff>0))
@@ -3206,7 +3206,7 @@ void DispUpdateScroll()
   if (NewOrgX!=WinOrgX)
     SetScrollPos(HVTWin,SB_HORZ,NewOrgX,TRUE);
 
-  if (!(ts.AutoScrollOnlyInBottomLine && ts.TermIsWin) && NewOrgY!=WinOrgY)
+  if (ts.AutoScrollOnlyInBottomLine == 0 && NewOrgY!=WinOrgY)
   {
     if ((BuffEnd==WinHeight) &&
         (ts.EnableScrollBuff>0))

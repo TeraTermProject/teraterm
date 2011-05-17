@@ -1766,7 +1766,7 @@ void MoveCursor(int Xnew, int Ynew)
 	Wrap = FALSE;
 
 	/* 最下行でだけ自動スクロールする*/
-	if (!(ts.AutoScrollOnlyInBottomLine && ts.TermIsWin) || WinOrgY == 0) {
+	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
 		DispScrollToCursor(CursorX, CursorY);
 	}
 }
@@ -1777,7 +1777,7 @@ void MoveRight()
 {
 	CursorX++;
 	/* 最下行でだけ自動スクロールする */
-	if (!(ts.AutoScrollOnlyInBottomLine && ts.TermIsWin) || WinOrgY == 0) {
+	if (ts.AutoScrollOnlyInBottomLine == 0 || WinOrgY == 0) {
 		DispScrollToCursor(CursorX, CursorY);
 	}
 }
@@ -1832,7 +1832,7 @@ void BuffScrollNLines(int n)
 	if ((CursorTop == 0) && (CursorBottom == NumOfLines-1)) {
 		WinOrgY = WinOrgY-n;
 		/* 最下行でだけ自動スクロールする */
-		if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && NewOrgY != 0) {
+		if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
 			NewOrgY = WinOrgY;
 		}
 		BuffScroll(n,CursorBottom);
@@ -1840,7 +1840,7 @@ void BuffScrollNLines(int n)
 	}
 	else if ((CursorTop==0) && (CursorY<=CursorBottom)) {
 		/* 最下行でだけ自動スクロールする */
-		if (ts.AutoScrollOnlyInBottomLine && ts.TermIsWin && NewOrgY != 0) {
+		if (ts.AutoScrollOnlyInBottomLine != 0 && NewOrgY != 0) {
 			/* スクロールさせない場合の処理 */
 			WinOrgY = WinOrgY-n;
 			NewOrgY = WinOrgY;
