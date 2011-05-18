@@ -7,6 +7,7 @@
 #include "teraterm.h"
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <io.h>
 #include <direct.h>
 #include <commdlg.h>
@@ -2596,6 +2597,7 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 			// 親にWM_CTLCOLORSTATICを送って背景ブラシを取得し、背景描画する
 			HBRUSH hbr;
 			HBRUSH hbrOld;
+
 			hbr = (HBRUSH)SendMessage( GetParent( hWnd ), WM_CTLCOLORSTATIC, wParam, (LPARAM)hWnd );
 			hbrOld = (HBRUSH)SelectObject( hdc, hbr );
 			FillRect( hdc, &rc, hbr );
@@ -2664,18 +2666,24 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	LOGFONT logfont;
 	HFONT font;
 	// for animation
+//#define EFFECT_ENABLED        // エフェクトの有効可否
+#define TEXTURE_ENABLED             // テクスチャの有効可否
 	static HDC dlgdc = NULL;
 	static int dlgw, dlgh;
 	static HBITMAP dlgbmp = NULL, dlgprevbmp = NULL;
 	static LPDWORD dlgpixel = NULL;
 	static HICON dlghicon = NULL;
-	//const int ID_EFFECT_TIMER = 1;
+	const int icon_x = 15, icon_y = 10, icon_w = 32, icon_h = 32;
+	const int ID_EFFECT_TIMER = 1;
 	RECT dlgrc = {0};
 	BITMAPINFO       bmi;
 	BITMAPINFOHEADER bmiHeader;
-	PAINTSTRUCT ps;
 	int x, y;
 #define POS(x,y) ((x) + (y)*dlgw)
+	static short *wavemap = NULL;
+	static short *wavemap_old = NULL;
+	static LPDWORD dlgorgpixel = NULL;
+	static int waveflag = 0;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -2714,7 +2722,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				}
 
 				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
-								  IMAGE_ICON, 32, 32, fuLoad);
+								  IMAGE_ICON, icon_w, icon_h, fuLoad);
 #if 0
 				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
 #else
@@ -2836,8 +2844,19 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					dlgpixel[POS(x, y)] = b | g << 8 | r << 16;
 				}
 			}
+			// 2D Water effect 用
+			wavemap = calloc(sizeof(short), dlgw * dlgh);
+			wavemap_old = calloc(sizeof(short), dlgw * dlgh);
+			dlgorgpixel = calloc(sizeof(DWORD), dlgw * dlgh);
+			memcpy(dlgorgpixel, dlgpixel, dlgw * dlgh * sizeof(DWORD));
+
+			srand((unsigned int)time(NULL));
+
+
+#ifdef EFFECT_ENABLED
 			// エフェクトタイマーの開始
-			//SetTimer(Dialog, ID_EFFECT_TIMER, 40, NULL);
+			SetTimer(Dialog, ID_EFFECT_TIMER, 100, NULL);
+#endif
 
 			return TRUE;
 
@@ -2848,13 +2867,19 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					val = 1;
 				case IDCANCEL:
 					val = 0;
-					//KillTimer(Dialog, ID_EFFECT_TIMER);
+#ifdef EFFECT_ENABLED
+					KillTimer(Dialog, ID_EFFECT_TIMER);
+#endif
 
 					SelectObject(dlgdc, dlgprevbmp);
 					DeleteObject(dlgbmp);
 					DeleteDC(dlgdc);
 					dlgdc = NULL;
 					dlgprevbmp = dlgbmp = NULL;
+
+					free(wavemap);
+					free(wavemap_old);
+					free(dlgorgpixel);
 
 					EndDialog(Dialog, val);
 					return TRUE;
@@ -2870,64 +2895,96 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			return (BOOL)GetStockObject( NULL_BRUSH );
 			break;
 
+#ifdef EFFECT_ENABLED
+		case WM_ERASEBKGND:
+			return 0;
+#endif
+
 		case WM_PAINT:
 			if (dlgdc) {
+				PAINTSTRUCT ps;
 				hdc = BeginPaint(Dialog, &ps);
+
+#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 				BitBlt(hdc, 
 					ps.rcPaint.left, ps.rcPaint.top, 
 					ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
 					dlgdc, 
 					ps.rcPaint.left, ps.rcPaint.top, 
 					SRCCOPY);
+#endif
 
-				DrawIconEx(hdc, 15, 10, dlghicon, 0, 0, 0, 0, DI_NORMAL | DI_DEFAULTSIZE);
+				DrawIconEx(hdc, icon_x, icon_y, dlghicon, icon_w, icon_h, 0, 0, DI_NORMAL);
 
 				EndPaint(Dialog, &ps);
 			}
 			break;
 
-#if 0
 		case WM_MOUSEMOVE:
 			{
-				int xpos, ypos, x, y, nx, ny, max = 10;
-				DWORD val;
-				BYTE r, g, b;
-				RECT rc;
+				int xpos, ypos;
+				static int idx = 0;
+				short amplitudes[4] = {250, 425, 350, 650};
 
 				xpos = LOWORD(lParam); 
 				ypos = HIWORD(lParam);
 
-				for (y = -max ; y < max ; y++) {
-					for (x = -max ; x < max ; x++) {
-						nx = xpos + x;
-						ny = ypos + y;
-						if (nx >= 1 && nx <= dlgw-1 &&
-							ny >= 1 && ny <= dlgh-1) {
-
-							val = dlgpixel[POS(nx,ny)];
-							r = GetRValue(val);
-							g = GetGValue(val);
-							b = GetBValue(val);
-							val = (r + g + b) / 3;
-							dlgpixel[POS(nx,ny)] = b | g << 8 | r << 16;
-						}
-					}
-				}
-
-				rc.left = xpos - max;
-				rc.top = ypos - max;
-				rc.right = xpos + max;
-				rc.bottom = ypos + max;
-				InvalidateRect(Dialog, &rc, FALSE);
+				wavemap[POS(xpos,ypos)] = amplitudes[idx++];
+				idx %= 4;
 			}
 			break;
 
 		case WM_TIMER:
 			if (wParam == ID_EFFECT_TIMER) 
 			{
+				int x, y;
+				short height, xdiff;
+				short *p_new, *p_old;
+
+				if (waveflag == 0) {
+					p_new = wavemap;
+					p_old = wavemap_old;
+				} else {
+					p_new = wavemap_old;
+					p_old = wavemap;
+				}
+				waveflag ^= 1;
+
+				// 水面の計算
+				// アルゴリズムは下記サイト(2D Water)より。
+				// cf. http://freespace.virgin.net/hugo.elias/graphics/x_water.htm
+				for (y = 1; y < dlgh - 1 ; y++) {
+					for (x = 1; x < dlgw - 1 ; x++) {
+						height = (p_new[POS(x,y-1)] + 
+							      p_new[POS(x-1,y)] +
+							      p_new[POS(x+1,y)] +
+							      p_new[POS(x,y+1)]) / 2 - p_old[POS(x,y)];
+						height -= (height >> 5);
+						p_old[POS(x,y)] = height;
+					}
+				}
+
+				// 水面の描画
+				for (y = 1; y < dlgh - 1 ; y++) {
+					for (x = 1; x < dlgw - 1 ; x++) {
+						xdiff = p_old[POS(x+1,y)] - p_old[POS(x,y)];
+						dlgpixel[POS(x,y)] = dlgorgpixel[POS(x + xdiff, y)];
+					}
+				}
+
+#if 0
+				hdc = GetDC(Dialog);
+				BitBlt(hdc, 
+					0, 0, dlgw, dlgh,
+					dlgdc, 
+					0, 0,
+					SRCCOPY);
+				ReleaseDC(Dialog, hdc);
+#endif
+
+				InvalidateRect(Dialog, NULL, FALSE);
 			}
 			break;
-#endif
 
 	}
 	return FALSE;
