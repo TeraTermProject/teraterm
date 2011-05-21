@@ -2684,6 +2684,8 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	static short *wavemap_old = NULL;
 	static LPDWORD dlgorgpixel = NULL;
 	static int waveflag = 0;
+	static int fullcolor = 0;
+	int bitspixel;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -2858,6 +2860,13 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetTimer(Dialog, ID_EFFECT_TIMER, 100, NULL);
 #endif
 
+			// âÊñ ÇÃêFêîÇí≤Ç◊ÇÈÅB
+			hwnd = GetDesktopWindow();
+			hdc = GetDC(hwnd);
+			bitspixel = GetDeviceCaps(hdc, BITSPIXEL);
+			fullcolor = (bitspixel == 32 ? 1 : 0);
+			ReleaseDC(hwnd, hdc);
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -2906,12 +2915,14 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				hdc = BeginPaint(Dialog, &ps);
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
-				BitBlt(hdc, 
-					ps.rcPaint.left, ps.rcPaint.top, 
-					ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
-					dlgdc, 
-					ps.rcPaint.left, ps.rcPaint.top, 
-					SRCCOPY);
+				if (fullcolor) {
+					BitBlt(hdc, 
+						ps.rcPaint.left, ps.rcPaint.top, 
+						ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
+						dlgdc, 
+						ps.rcPaint.left, ps.rcPaint.top, 
+						SRCCOPY);
+				}
 #endif
 
 				DrawIconEx(hdc, icon_x, icon_y, dlghicon, icon_w, icon_h, 0, 0, DI_NORMAL);
