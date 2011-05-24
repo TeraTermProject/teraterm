@@ -449,7 +449,7 @@ begin
   VTFont         := GetIniString('Tera Term', 'VTFont', '', iniFile);
   TEKFont        := GetIniString('Tera Term', 'TEKFont', '', iniFile);
   FileDir        := GetIniString('Tera Term', 'FileDir', '', iniFile);
-  FileDir        := GetIniString('Tera Term', 'FileDir', '', iniFile);
+  TCPPort        := GetIniInt('Tera Term', 'TCPPort', 0, 0, 65535, iniFile)
   ViewlogEditor  := GetIniString('Tera Term', 'ViewlogEditor', '', iniFile);
 
   case GetUILanguage and $3FF of
