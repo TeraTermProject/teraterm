@@ -798,7 +798,7 @@ void PrnParseControl(BYTE b) // printer mode
       ICount = 0;
       FirstPrm = TRUE;
       NParam = 1;
-      Param[1] = -1;
+      Param[1] = 0;
       Prv = 0;
       ParseMode = ModeCSI;
       WriteToPrnFile(0,TRUE); // flush prn buff
@@ -942,7 +942,7 @@ void ParseControl(BYTE b)
       ESCFlag = FALSE;
       ICount = 0;
       NParam = 1;
-      Param[1] = -1;
+      Param[1] = 0;
       Prv = 0;
       ParseMode = ModeDCS;
       break;
@@ -954,7 +954,7 @@ void ParseControl(BYTE b)
       ICount = 0;
       FirstPrm = TRUE;
       NParam = 1;
-      Param[1] = -1;
+      Param[1] = 0;
       Prv = 0;
       ParseMode = ModeCSI;
       break;
@@ -1185,7 +1185,7 @@ void PrnParseEscape(BYTE b) // printer mode
 	  ICount = 0;
 	  FirstPrm = TRUE;
 	  NParam = 1;
-	  Param[1] = -1;
+	  Param[1] = 0;
 	  Prv = 0;
 	  WriteToPrnFile(ESC,FALSE);
 	  WriteToPrnFile('[',FALSE);
@@ -1287,7 +1287,7 @@ void ParseEscape(BYTE b) /* b is the final char */
 	case 'P': /* DCS */
 	  ESCFlag = FALSE;
 	  NParam = 1;
-	  Param[1] = -1;
+	  Param[1] = 0;
 	  ParseMode = ModeDCS;
 	  return;
 	case 'X': /* SOS */
@@ -1299,7 +1299,7 @@ void ParseEscape(BYTE b) /* b is the final char */
 	  ICount = 0;
 	  FirstPrm = TRUE;
 	  NParam = 1;
-	  Param[1] = -1;
+	  Param[1] = 0;
 	  Prv = 0;
 	  ParseMode = ModeCSI;
 	  return;
@@ -1445,7 +1445,6 @@ void EscapeSequence(BYTE b)
 
 void CSScreenErase()
 {
-	if (Param[1] == -1) Param[1] = 0;
 	BuffUpdateScroll();
 	switch (Param[1]) {
 	case 0:
@@ -1480,7 +1479,6 @@ void CSScreenErase()
 
 void CSQSelScreenErase()
 {
-	if (Param[1] == -1) Param[1] = 0;
 	BuffUpdateScroll();
 	switch (Param[1]) {
 	case 0:
@@ -1519,7 +1517,6 @@ void CSQSelScreenErase()
 
   void CSLineErase()
   {
-    if (Param[1] == -1) Param[1] = 0;
     BuffUpdateScroll();
     switch (Param[1]) {
       /* erase char from cursor to end of line */
@@ -1539,7 +1536,6 @@ void CSQSelScreenErase()
 
   void CSQSelLineErase()
   {
-    if (Param[1] == -1) Param[1] = 0;
     BuffUpdateScroll();
     switch (Param[1]) {
       /* erase char from cursor to end of line */
@@ -1619,7 +1615,6 @@ void CSQSelScreenErase()
   {
     if (Param[1]<1) Param[1] = 1;
     Param[1]--;
-    if (Param[1] < 0) Param[1] = 0;
     if (Param[1] > NumOfColumns-1) Param[1] = NumOfColumns-1;
     MoveCursor(Param[1],CursorY);
   }
@@ -1686,7 +1681,6 @@ void CSQSelScreenErase()
 
   void CSDeleteTabStop()
   {
-    if (Param[1]==-1) Param[1] = 0;
     ClearTabStop(Param[1]);
   }
 
@@ -1724,7 +1718,6 @@ void CSQSelScreenErase()
 
   void CS_i_Mode()		// MC
   {
-    if (Param[1]==-1) Param[1] = 0;
     switch (Param[1]) {
       /* print screen */
 	//  PrintEX --	TRUE: print screen
@@ -1810,7 +1803,6 @@ void CSSetAttr()		// SGR
 	for (i=1 ; i<=NParam ; i++)
 	{
 		P = Param[i];
-		if (P<0) P = 0;
 		switch (P) {
 		case   0:	/* Clear all */
 			if (CharAttr.Attr2 & Attr2Protect) {
@@ -1881,9 +1873,6 @@ void CSSetAttr()		// SGR
 				i++;
 				if (i < NParam) {
 					P = Param[++i];
-					if (P<0) {
-						P = 0;
-					}
 					CharAttr.Attr2 |= Attr2Fore;
 					CharAttr.Fore = P;
 					BuffSetCurCharAttr(CharAttr);
@@ -1915,9 +1904,6 @@ void CSSetAttr()		// SGR
 				i++;
 				if (i < NParam) {
 					P = Param[++i];
-					if (P<0) {
-						P = 0;
-					}
 					CharAttr.Attr2 |= Attr2Back;
 					CharAttr.Back = P;
 					BuffSetCurCharAttr(CharAttr);
@@ -2418,7 +2404,6 @@ void CSSetAttr()		// SGR
 
     void CSQ_i_Mode()		// DECMC
     {
-      if (Param[1]==-1) Param[1] = 0;
       switch (Param[1]) {
 	case 1:
 	  if (ts.TermFlag&TF_PRINTERCTRL) {
@@ -2634,8 +2619,6 @@ void CSSetAttr()		// SGR
 	break;
 
       case 'q': // DECSCA
-	if (Param[1] < 0) 
-	  Param[1] = 0;
 	switch (Param[1]) {
 	  case 0:
 	  case 2:
@@ -2730,9 +2713,6 @@ void CSSetAttr()		// SGR
 	break;
 
       case 'z': // Enable DEC Locator reporting (DECELR)
-        if (Param[1] < 0) {
-	  Param[1] = 0;
-	}
 	switch (Param[1]) {
 	case 0:
 	  if (MouseReportMode == IdMouseTrackDECELR) {
@@ -2762,9 +2742,6 @@ void CSSetAttr()		// SGR
 
       case '{': // Select Locator Events (DECSLE)
 	for (i=1; i<=NParam; i++) {
-	  if (Param[i] < 0) {
-	    Param[i] = 0;
-	  }
 	  switch (Param[i]) {
 	  case 0:
 	    DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown | DecLocatorFiltered);
@@ -2796,7 +2773,6 @@ void CSSetAttr()		// SGR
       case 'q':
         if (ts.WindowFlag & WF_CURSORCHANGE) {
           if (NParam > 0) {
-            if (Param[1] < 0) Param[1] = 0;
             switch (Param[1]) {
               case 0:
               case 1:
@@ -2982,17 +2958,14 @@ void ControlSequence(BYTE b)
     }
     else if ((b>=0x30) && (b<=0x39))
     {
-      if (Param[NParam] < 0)
-	Param[NParam] = 0;
-      if (Param[NParam]<10000)
-       Param[NParam] = Param[NParam]*10 + b - 0x30;
+      Param[NParam] = Param[NParam]*10 + b - 0x30;
     }
     else if (b==0x3B)
     {
       if (NParam < NParamMax)
       {
 	NParam++;
-	Param[NParam] = -1;
+	Param[NParam] = 0;
       }
     }
     else if ((b>=0x3C) && (b<=0x3F))
@@ -3222,14 +3195,12 @@ void DeviceControl(BYTE b)
 			IntChar[ICount] = b;
 		}
 		else if ((b>=0x30) && (b<=0x39)) {
-			if (Param[NParam] < 0) Param[NParam] = 0;
-			if (Param[NParam]<1000)
-				Param[NParam] = Param[NParam]*10 + b - 0x30;
+			Param[NParam] = Param[NParam]*10 + b - 0x30;
 		}
 		else if (b==0x3B) {
 			if (NParam < NParamMax) {
 				NParam++;
-				Param[NParam] = -1;
+				Param[NParam] = 0;
 			}
 		}
 		else if ((b>=0x40) && (b<=0x7E)) {
@@ -3431,9 +3402,7 @@ void XSequence(BYTE b)
 	switch (XsParseMode) {
 	  case ModeXsFirst:
 		if (isdigit(b)) {
-			if (Param[1] < 1000) {
-				Param[1] = Param[1]*10 + b - '0';
-			}
+			Param[1] = Param[1]*10 + b - '0';
 		}
 		else if (b == ';') {
 			StrBuff[0] = '\0';
@@ -3448,7 +3417,7 @@ void XSequence(BYTE b)
 		}
 		else {
 			// Invalid Sequence. Ignore.
-			Param[1] = -1;
+			Param[1] = 0xFFFFFFFF;
 			StrBuff[0] = '\0';
 			StrLen = 0;
 			XsParseMode = ModeXsString;
@@ -3496,7 +3465,7 @@ void XSequence(BYTE b)
 			StrLen = 0;
 		}
 		else {
-			Param[1] = -1;
+			Param[1] = 0xFFFFFFFF;
 			StrBuff[0] = '\0';
 			StrLen = 0;
 			XsParseMode = ModeXsString;
