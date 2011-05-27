@@ -8001,10 +8001,19 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 		pvar->ssh_state.payload_datalen = strlen;
 		pvar->ssh_state.payload_datastart = 12; // id + data_type + strlen
 
-	} else {
+	} else if (c->type == TYPE_PORTFWD) {
 		//debug_print(0, data, strlen);
 		FWD_received_data(pvar, c->local_num, data, strlen);
 
+	} else if (c->type == TYPE_SCP) {  // SCP
+		SSH2_scp_response(pvar, c, data, strlen);
+
+	} else if (c->type == TYPE_SFTP) {  // SFTP
+
+	} else if (c->type == TYPE_AGENT) {  // agent forward
+		if (!SSH_agent_response(pvar, c, 0, data, strlen)) {
+			return FALSE;
+		}
 	}
 
 	//debug_print(200, data, strlen);
