@@ -2050,7 +2050,7 @@ void CSSetAttr()		// SGR
       case 13: // Report window position
 	if (ts.WindowFlag & WF_WINDOWREPORT) {
 	  DispGetWindowPos(&x, &y);
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%d;%dt", CLocale, x, y);
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%u;%ut", CLocale, (unsigned int)x, (unsigned int)y);
 	  SendCSIstr(Report, len);
 	}
 	break;
