@@ -8063,6 +8063,9 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 	else if (c->type == TYPE_AGENT) {
 		ssh2_channel_send_close(pvar, c);
 	}
+	else {
+		// Ç«Ç§Ç∑ÇÈÇÃÇ™ê≥ÇµÇ¢ÅH
+	}
 
 	return TRUE;
 }
