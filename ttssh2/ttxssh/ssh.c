@@ -7212,7 +7212,9 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 	free(cstring);
 
 	// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
-	FWD_free_channel(pvar, c->local_num);
+	if (c->type == TYPE_PORTFWD) {
+		FWD_free_channel(pvar, c->local_num);
+	}
 
 	// チャネルの解放漏れを修正 (2007.5.1 maya)
 	ssh2_channel_delete(c);
@@ -8165,7 +8167,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 
 	} else if (strcmp(ctype, "auth-agent@openssh.com") == 0) { // agent forwarding
 		if (pvar->agentfwd_enable && FWD_agent_forward_confirm(pvar)) {
-			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_AGENT, chan_num);
+			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_AGENT, -1);
 			if (c == NULL) {
 				UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 				                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -8275,7 +8277,10 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	} else if (c->type == TYPE_SCP) {
 		ssh2_channel_delete(c);
 
-	} else {
+	} else if (c->type == TYPE_AGENT) {
+		ssh2_channel_delete(c);
+
+	} else { // TYPE_PORTFWD
 		ssh2_channel_delete(c);
 
 	}
@@ -8296,8 +8301,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	char *emsg = "exit-status";
 	int estat = 0;
 	Channel_t *c;
-
-	notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was received.", LOG_LEVEL_VERBOSE);
+	char log[128];
 
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
@@ -8322,6 +8326,9 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 
 	reply = data[0];
 	data += 1;
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE, "SSH2_MSG_CHANNEL_REQUEST was received. local:%d remote:%d %s reply:%d", c->self_id, c->remote_id, str, reply);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
 
 	// 終了コードが含まれているならば
 	if (memcmp(str, emsg, strlen(emsg)) == 0) {

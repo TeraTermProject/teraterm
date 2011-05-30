@@ -299,13 +299,13 @@ void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
 {
 	FWDChannel FAR *channel = &pvar->fwd_state.channels[local_channel_num];
 
-	if (channel->type == TYPE_AGENT) {
+	if (channel->type == TYPE_AGENT) { // TYPE_AGENT ‚Å‚±‚±‚É—ˆ‚é‚Ì‚Í SSH1 ‚Ì‚Ý
 		buffer_free(channel->agent_msg);
 		// channel_close Žž‚Æ TTSSH I—¹Žž‚É2‰ñŒÄ‚Î‚ê‚é‚Ì‚ÅA“ñd free –hŽ~‚Ì‚½‚ß
 		channel->agent_msg = NULL;
 		channel->status = 0;
 	}
-	else {
+	else { // TYPE_PORTFWD
 		UTIL_destroy_sock_write_buf(&channel->writebuf);
 		if (channel->filter != NULL) {
 			channel->filter(channel->filter_closure, 0, NULL, NULL);
