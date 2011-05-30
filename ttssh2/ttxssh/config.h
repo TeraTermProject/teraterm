@@ -1,3 +1,7 @@
+// ドラフトでなくなった場合に ifdef を削除するために使用する。
+// コンパイルにおいて on/off するために利用すると、TERATERM.INIに
+// 保存するときの記号がずれてしまうのでやってはいけない。
+
 // HMAC-SHA2 draft
 // http://tools.ietf.org/html/draft-dbider-sha2-mac-for-ssh-02
 #undef WITH_HMAC_SHA2_DRAFT
