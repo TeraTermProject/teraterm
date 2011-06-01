@@ -7415,6 +7415,7 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 
 
 #define WM_SENDING_FILE (WM_USER + 1)
+#define WM_CHANNEL_CLOSE (WM_USER + 2)
 
 typedef struct scp_dlg_parm {
 	Channel_t *c;
@@ -7429,6 +7430,16 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 	switch (msg) {
 		case WM_INITDIALOG:
 			return FALSE;
+
+		// SCPファイル受信(remote-to-local)時、使用する。
+		case WM_CHANNEL_CLOSE:
+			{
+			scp_dlg_parm_t *parm = (scp_dlg_parm_t *)wp;
+
+			ssh2_channel_send_close(parm->pvar, parm->c);
+			}
+			return TRUE;
+			break;
 
 		case WM_SENDING_FILE:
 			{
@@ -7668,6 +7679,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 	int rate, ProgStat;
 	DWORD stime;
 	int elapsed, prev_elapsed;
+	scp_dlg_parm_t parm;
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
@@ -7748,7 +7760,13 @@ done:
 	ShowWindow(c->scp.progress_window, SW_HIDE);
 
 cancel_abort:
-	ssh2_channel_send_close(pvar, c);
+	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
+	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
+	// (2011.6.1 yutaka)
+	parm.c = c;
+	parm.pvar = pvar;
+	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
+
 	return 0;
 }
 
