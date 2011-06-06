@@ -369,18 +369,21 @@ static char putty_path[2048];
 #define JUMPLISTREG_OK 0
 #define sfree free
 
-static OSVERSIONINFO osVersion;
 static char *IniFile = NULL;
 
-BOOL init_winver(void)
+BOOL isJumpListSupported(void)
 {
-    ZeroMemory(&osVersion, sizeof(osVersion));
-    osVersion.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-//    return GetVersionEx ( (OSVERSIONINFO *) &osVersion);
+	static OSVERSIONINFO osVersion;
 
-	osVersion.dwMajorVersion = 7;
-	osVersion.dwMinorVersion = 0;
-	return 0;
+	if (osVersion.dwOSVersionInfoSize != sizeof(OSVERSIONINFO)) {
+ 		osVersion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&osVersion);
+	}
+	if ((osVersion.dwMajorVersion < 6) ||
+	    (osVersion.dwMajorVersion == 6 && osVersion.dwMinorVersion < 1))
+		return FALSE;
+	else
+		return TRUE;
 }
 
 int add_to_jumplist_registry(const char *item)
@@ -665,13 +668,10 @@ void clear_jumplist(void)
 /* Adds a saved session to the Windows 7 jumplist. */
 void add_session_to_jumplist(const char * const sessionname, char *inifile)
 {
-	init_winver();
-
-    if ((osVersion.dwMajorVersion < 6) ||
-        (osVersion.dwMajorVersion == 6 && osVersion.dwMinorVersion < 1))
+    if (!isJumpListSupported())
         return;                        /* do nothing on pre-Win7 systems */
 
-	IniFile = inifile;
+    IniFile = inifile;
 
     if (add_to_jumplist_registry(sessionname) == JUMPLISTREG_OK) {
         update_jumplist_from_registry();
@@ -684,8 +684,7 @@ void add_session_to_jumplist(const char * const sessionname, char *inifile)
 /* Removes a saved session from the Windows jumplist. */
 void remove_session_from_jumplist(const char * const sessionname)
 {
-    if ((osVersion.dwMajorVersion < 6) ||
-        (osVersion.dwMajorVersion == 6 && osVersion.dwMinorVersion < 1))
+    if (!isJumpListSupported())
         return;                        /* do nothing on pre-Win7 systems */
 
     if (remove_from_jumplist_registry(sessionname) == JUMPLISTREG_OK) {
