@@ -507,6 +507,7 @@ struct tttset {
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
 	WORD ConfirmChangePasteCR;
+	WORD JumpList;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -949,6 +950,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.70, ttset_memfilemap was replaced with ttset_memfilemap_16.
+ *   added tttset.JumpList.
+ *
  * - At version 4.69, ttset_memfilemap was replaced with ttset_memfilemap_15.
  *   added tttset.TerminalUID.
  *   added tttset.ConfirmChangePasteCR.
@@ -1044,4 +1048,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_15"
+#define TT_FILEMAPNAME "ttset_memfilemap_16"

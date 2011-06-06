@@ -3374,12 +3374,13 @@ void CVTWindow::OnFileNewConnection()
 	}
 
 	if ((*GetHostName)(HVTWin,&GetHNRec)) {
-		if ((GetHNRec.PortType==IdTCPIP) &&
-		    (ts.HistoryList>0) &&
-		    LoadTTSET()) {
-
-			(*AddHostToList)(ts.SetupFName,GetHNRec.HostName);
-			add_session_to_jumplist(GetHNRec.HostName, GetHNRec.SetupFN);
+		if ((GetHNRec.PortType==IdTCPIP) && LoadTTSET()) {
+			if (ts.HistoryList) {
+				(*AddHostToList)(ts.SetupFName,GetHNRec.HostName);
+			}
+			if (ts.JumpList) {
+				add_session_to_jumplist(GetHNRec.HostName, GetHNRec.SetupFN);
+			}
 			FreeTTSET();
 		}
 

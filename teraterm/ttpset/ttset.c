@@ -1415,6 +1415,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Confirm PasteCR
 	ts->ConfirmChangePasteCR = GetOnOff(Section, "ConfirmChangePasteCR", FName, TRUE);
 
+	// Jump List
+	ts->JumpList = GetOnOff(Section, "JumpList", FName, TRUE);
+
 	// Use invalid DECRPSS (for testing)
 	if (GetOnOff(Section, "UseInvalidDECRQSSResponse", FName, FALSE))
 		ts->TermFlag |= TF_INVALIDDECRPSS;
@@ -2461,6 +2464,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Confirm PasteCR
 	WriteOnOff(Section, "ConfirmChangePasteCR", FName, ts->ConfirmChangePasteCR);
+
+	// Confirm PasteCR
+	WriteOnOff(Section, "JumpList", FName, ts->JumpList);
 }
 
 #define VTEditor "VT editor keypad"
