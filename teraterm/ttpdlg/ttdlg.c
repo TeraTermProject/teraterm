@@ -2665,9 +2665,12 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+
+#undef EFFECT_ENABLED	// エフェクトの有効可否
+#define TEXTURE_ENABLED	// テクスチャの有効可否
+
+#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
-//#define EFFECT_ENABLED        // エフェクトの有効可否
-#define TEXTURE_ENABLED             // テクスチャの有効可否
 	static HDC dlgdc = NULL;
 	static int dlgw, dlgh;
 	static HBITMAP dlgbmp = NULL, dlgprevbmp = NULL;
@@ -2686,6 +2689,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	static int waveflag = 0;
 	static int fullcolor = 0;
 	int bitspixel;
+#endif
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -2723,14 +2727,16 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					fuLoad = LR_VGACOLOR;
 				}
 
+#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
-								  IMAGE_ICON, icon_w, icon_h, fuLoad);
-#if 0
-				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
-#else
+				                  IMAGE_ICON, icon_w, icon_h, fuLoad);
 				// Picture Control に描画すると、なぜか透過色が透過にならず、黒となってしまうため、
 				// WM_PAINT で描画する。
 				dlghicon = hicon;
+#else
+				hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_TTERM),
+				                  IMAGE_ICON, 32, 32, fuLoad);
+				SendDlgItemMessage(Dialog, IDC_TT_ICON, STM_SETICON, (WPARAM)hicon, 0);
 #endif
 			}
 
@@ -2814,6 +2820,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			do_subclass_window(GetDlgItem(Dialog, IDC_AUTHOR_URL), &author_url_class);
 			do_subclass_window(GetDlgItem(Dialog, IDC_FORUM_URL), &forum_url_class);
 
+#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 			/*
 			 * ダイアログのビットマップ化を行い、背景にエフェクトをかけられるようにする。
 			 * (2011.5.7 yutaka)
@@ -2866,19 +2873,19 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			bitspixel = GetDeviceCaps(hdc, BITSPIXEL);
 			fullcolor = (bitspixel == 32 ? 1 : 0);
 			ReleaseDC(hwnd, hdc);
+#endif
 
 			return TRUE;
 
 		case WM_COMMAND:
+#ifdef EFFECT_ENABLED
 			switch (LOWORD(wParam)) {
 				int val;
 				case IDOK:
 					val = 1;
 				case IDCANCEL:
 					val = 0;
-#ifdef EFFECT_ENABLED
 					KillTimer(Dialog, ID_EFFECT_TIMER);
-#endif
 
 					SelectObject(dlgdc, dlgprevbmp);
 					DeleteObject(dlgbmp);
@@ -2893,11 +2900,22 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					EndDialog(Dialog, val);
 					return TRUE;
 			}
+#else
+			switch (LOWORD(wParam)) {
+				case IDOK:
+					EndDialog(Dialog, 1);
+					return TRUE;
+				case IDCANCEL:
+					EndDialog(Dialog, 0);
+					return TRUE;
+			}
+#endif
 			if (DlgAboutFont != NULL) {
 				DeleteObject(DlgAboutFont);
 			}
 			break;
 
+#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 		// static textの背景を透過させる。
 		case WM_CTLCOLORSTATIC:
 			SetBkMode((HDC)wParam, TRANSPARENT);
@@ -2914,7 +2932,6 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				PAINTSTRUCT ps;
 				hdc = BeginPaint(Dialog, &ps);
 
-#if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 				if (fullcolor) {
 					BitBlt(hdc, 
 						ps.rcPaint.left, ps.rcPaint.top, 
@@ -2923,7 +2940,6 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						ps.rcPaint.left, ps.rcPaint.top, 
 						SRCCOPY);
 				}
-#endif
 
 				DrawIconEx(hdc, icon_x, icon_y, dlghicon, icon_w, icon_h, 0, 0, DI_NORMAL);
 
@@ -2996,6 +3012,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				InvalidateRect(Dialog, NULL, FALSE);
 			}
 			break;
+#endif
 
 	}
 	return FALSE;
