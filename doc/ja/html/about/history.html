@@ -35,14 +35,14 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>ブロードキャストコマンドにおいて、リアルタイムモードの場合、SubmitボタンではEnterキーのみ送るようにした。 cf. <a href="http://logmett.com/forum/viewtopic.php?f=8&t=1601">Broadcast command issue in 4.68</a> </li>
+      <li>ブロードキャストコマンドにおいて、リアルタイムモードの場合、SubmitボタンではEnterキーのみ送るようにした。</li>
       <li>バージョンダイアログのCopyrightを2011年に修正した。背景にエフェクトを追加した。</li>
       <li>Windows7ジャンプリストに対応した。</li>
       <li>印刷用制御コードを無視することができるエントリをサポートした。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-prn.html#ignoremc">PrinterCtrlSequence</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li>
-      <li>セッション複製を行う際、/K= があれば引き継ぎを行うようにした。 cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24682">/k inheritance in "new session"</a></li>
+      <li>セッション複製を行う際、/K= があれば引き継ぎを行うようにした。</li>
       <li>DEC 特殊文字のフォントに高輝度/下線属性を反映するようにした。</li>
       <li>Meta Key の設定で、左Altや右AltのみMeta Keyに設定できるようにした。</li>
       <li>NetTerm 形式のマウスイベント通知に対応した。</li>
@@ -53,8 +53,8 @@
 
   <li>バグ修正
     <ul>
-      <li>strremove マクロにおいて、文字列の末尾1バイトの削除時にBOFが発生していた問題を修正した。 cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24631">Ticket#24631</a></li>
-      <li>YMODEM: ファイル送信において、ACKを待たずとも、ブロック1を送信してしまう問題を修正した。 cf. <a href="http://sourceforge.jp/ticket/browse.php?group_id=1412&tid=24286">Sending with Y-Modem fails with u-boot (intermittent)</a></li>
+      <li>strremove マクロにおいて、文字列の末尾1バイトの削除時にBOFが発生していた問題を修正した。</li>
+      <li>YMODEM: ファイル送信において、ACKを待たずとも、ブロック1を送信してしまう問題を修正した。</li>
       <li>xterm 形式のマウスイベント通知で、マウスポインタの位置が224行目以降だった場合に不正な報告をする問題を修正した。</li>
       <li>DECSET/DECRST 制御シーケンスで、10000 以上のモードが指定された時に正しく無視できない場合が有った問題を修正した。</li>
       <li>ウィンドウ位置報告要求に対して不正な形式で応答する場合がある問題を修正した。</li>
