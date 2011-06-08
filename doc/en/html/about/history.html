@@ -54,7 +54,7 @@
     <ul>
       <li>When the mouse cursor position is later 224 line on xterm-style mouse event notification, Tera Term would report the invalid reporting.</li>
       <li>When the 10000 over mode is specified on the DECSET/DECRST control sequence, Tera Term would not be able to ignore.</li>
-      <!--li>ウィンドウ位置報告要求に対して不正な形式で応答する場合がある問題を修正した。</li-->
+      <li>The invalid result may be responded for the window position reporting.</li>
       <li>YMODEM: When a file is sent, the block1 can be sent not waiting the ACK from the YMODEM server.</li>
       <li>When a last one byte of a string is removed by using the strremove macro command, the BOF will be ocurred.</li>
     </ul>
@@ -1701,8 +1701,8 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>Tera Term can not connect to the OpenSSH 5.7 later server by using SSH1 protocol.</li>
-      <!--li>SSH2 の SSH_MSG_CHANNEL_EXTENDED_DATA パケットを正しく処理しないことがある問題を修正した。</li-->
-      <!--li>SSH2 チャネルを開けなかった場合にアプリケーションが落ちることがある問題を修正した。</li-->
+      <li>SSH_MSG_CHANNEL_EXTENDED_DATA(SSH2) packet can not be worked well.</li>
+      <li>When SSH2 channel does not be opened, the application fault will be occurred.</li>
     </ul>
   </li>
 
