@@ -7461,8 +7461,12 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 					}
 
 				case IDCANCEL:
-					EndDialog(hWnd, 0);
-					DestroyWindow(hWnd);
+					// ウィンドウをいきなり破棄するのではなく、非表示にするのみとして、
+					// スレッドからのメッセージを処理できるようにする。
+					// (2011.6.8 yutaka)
+					//EndDialog(hWnd, 0);
+					//DestroyWindow(hWnd);
+					ShowWindow(hWnd, SW_HIDE);
 					return TRUE;
 				default:
 					return FALSE;
@@ -7489,6 +7493,9 @@ static int is_canceled_window(HWND hd)
 		return 0;
 	// ウィンドウが見えなくなったら、キャンセルされた。
 	if (IsWindow(hd) == 0)
+		return 1;
+	// ウィンドウが非表示の場合、キャンセルされた。
+	if (IsWindowVisible(hd) == 0)
 		return 1;
 	return 0;
 }
@@ -7604,7 +7611,12 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	return 0;
 
 cancel_abort:
-	ssh2_channel_send_close(pvar, c);
+	// チャネルのクローズを行いたいが、直接 ssh2_channel_send_close() を呼び出すと、
+	// 当該関数がスレッドセーフではないため、SCP処理が正常に終了しない場合がある。
+	// (2011.6.8 yutaka)
+	parm.c = c;
+	parm.pvar = pvar;
+	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
 
 abort:
 
