@@ -15,6 +15,7 @@ typedef struct buffer {
 void buffer_clear(buffer_t *buf);
 buffer_t *buffer_init(void);
 void buffer_free(buffer_t *buf);
+void buffer_append_space(buffer_t * buf, int size);
 int buffer_append(buffer_t *buf, char *ptr, int size);
 int buffer_append_length(buffer_t *msg, char *ptr, int size);
 void buffer_put_raw(buffer_t *msg, char *ptr, int size);

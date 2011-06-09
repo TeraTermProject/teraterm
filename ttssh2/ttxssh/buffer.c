@@ -51,6 +51,37 @@ void buffer_free(buffer_t * buf)
 	}
 }
 
+// バッファの領域拡張のみを行う。
+void buffer_append_space(buffer_t * buf, int size)
+{
+	int n;
+	int ret = -1;
+	int newlen;
+
+	n = buf->offset + size;
+	if (n < buf->maxlen) {
+		// 
+	} else {
+		// バッファが足りないので補充する。(2005.7.2 yutaka)
+		newlen = buf->maxlen + size + 32*1024;
+		if (newlen > 0xa00000) { // 1MB over is not supported
+			goto panic;
+		}
+		buf->buf = realloc(buf->buf, newlen);
+		if (buf->buf == NULL)
+			goto panic;
+		buf->maxlen = newlen;
+	}
+
+	return;
+
+panic:
+	{
+	char *p = NULL;
+	*p = 0; // application fault
+	}
+}
+
 int buffer_append(buffer_t * buf, char *ptr, int size)
 {
 	int n;

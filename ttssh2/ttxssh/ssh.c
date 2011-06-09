@@ -1097,6 +1097,10 @@ static void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		set_uint32(data, encryption_size - 4);
 		data[4] = (unsigned char) padding;
 		data_length = encryption_size + CRYPT_get_sender_MAC_size(pvar);
+		if (msg) {
+			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
+			buffer_append_space(msg, padding + EVP_MAX_MD_SIZE);
+		}
 #endif
 		//if (pvar->ssh_state.outbuflen <= 7 + data_length) *(int *)0 = 0;
 		CRYPT_set_random_data(pvar, data + 5 + len, padding);
