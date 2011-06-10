@@ -7522,7 +7522,8 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
 	long long total_size = 0;
-	char buf[8192];
+	char *buf = NULL;
+	size_t buflen;
 	char s[80];
 	size_t ret;
 	HWND hWnd = c->scp.progress_window;
@@ -7530,6 +7531,16 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	int rate, ProgStat;
 	DWORD stime;
 	int elapsed, prev_elapsed;
+
+	// 圧縮付きでSCP送信を行うと、BOFで落ちるため、workaroundとして、
+	// 圧縮の場合はバッファサイズを小さくする。
+	// (2011.6.11 yutaka)
+	if (pvar->ts_SSH->CompressionLevel == 0) {
+		buflen = 8192;
+	} else {
+		buflen = 1024;
+	}
+	buf = malloc(buflen);
 
 	//SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfile);
 	SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
@@ -7545,7 +7556,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 			goto cancel_abort;
 
 		// ファイルから読み込んだデータはかならずサーバへ送信する。
-		ret = fread(buf, 1, sizeof(buf), c->scp.localfp);
+		ret = fread(buf, 1, buflen, c->scp.localfp);
 		if (ret == 0)
 			break;
 
@@ -7598,7 +7609,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 			prev_elapsed = elapsed;
 		}
 
-	} while (ret <= sizeof(buf));
+	} while (ret <= buflen);
 
 	// eof
 	c->scp.state = SCP_DATA;
@@ -7612,6 +7623,8 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 
 	ShowWindow(hWnd, SW_HIDE);
 
+	free(buf);
+
 	return 0;
 
 cancel_abort:
@@ -7623,6 +7636,8 @@ cancel_abort:
 	SendMessage(hWnd, WM_CHANNEL_CLOSE, (WPARAM)&parm, 0);
 
 abort:
+
+	free(buf);
 
 	return 0;
 }
