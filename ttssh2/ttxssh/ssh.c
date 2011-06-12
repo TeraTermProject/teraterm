@@ -7536,7 +7536,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	// 圧縮の場合はバッファサイズを小さくする。
 	// (2011.6.11 yutaka)
 	if (pvar->ts_SSH->CompressionLevel == 0) {
-		buflen = 8192;
+		buflen = 8192*4;
 	} else {
 		buflen = 1024;
 	}
