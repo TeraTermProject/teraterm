@@ -1100,6 +1100,8 @@ static void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		if (msg) {
 			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
 			buffer_append_space(msg, padding + EVP_MAX_MD_SIZE);
+			// realloc()されると、ポインタが変わる可能性があるので、再度取り直す。
+			data = buffer_ptr(msg);
 		}
 #endif
 		//if (pvar->ssh_state.outbuflen <= 7 + data_length) *(int *)0 = 0;
@@ -7538,7 +7540,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	if (pvar->ts_SSH->CompressionLevel == 0) {
 		buflen = 8192*4;
 	} else {
-		buflen = 1024;
+		buflen = 8192*4;
 	}
 	buf = malloc(buflen);
 
