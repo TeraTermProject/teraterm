@@ -221,6 +221,10 @@ int buffer_len(buffer_t *msg)
 	return (msg->len);
 }
 
+// buffer_append() や buffer_append_space() でメッセージバッファに追加を行うと、
+// 内部で realloc() によりバッファポインタが変わってしまうことがある。
+// メッセージバッファのポインタを取得する際は、バッファ追加が完了した後に
+// 行わなければ、BOFで落ちる。
 char *buffer_ptr(buffer_t *msg)
 {
 	return (msg->buf);
