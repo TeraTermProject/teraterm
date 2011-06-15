@@ -98,8 +98,9 @@ end
 
 :show_step
 step = step + 1
-int2str s step
-statusbox s 'counter'
+gettime timestr &quot;%Y/%m/%d-%H:%M:%S&quot;
+sprintf2 s &quot;counter %d&quot; step
+statusbox timestr s
 return
 </pre>
 
