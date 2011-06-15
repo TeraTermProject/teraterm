@@ -7864,9 +7864,15 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 	} else if (c->scp.state == SCP_DATA) {  // payloadの受信
 		unsigned char *newdata = malloc(buflen);
+		BOOL ret;
 		if (newdata != NULL) {
 			memcpy(newdata, data, buflen);
-			PostThreadMessage(c->scp.thread_id, WM_RECEIVING_FILE, (WPARAM)newdata, (LPARAM)buflen);
+			do {
+				// スレッドがキューを作っていない場合、メッセージポストが失敗することがあるので、
+				// 無限リトライする。MSDNにそうしろと書いてある。
+				// (2011.6.15 yutaka)
+				ret = PostThreadMessage(c->scp.thread_id, WM_RECEIVING_FILE, (WPARAM)newdata, (LPARAM)buflen);
+			} while (ret == FALSE);
 		}
 
 	} else if (c->scp.state == SCP_CLOSING) {  // EOFの受信
