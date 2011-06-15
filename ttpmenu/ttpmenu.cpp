@@ -1385,6 +1385,34 @@ BOOL InitMenu(void)
 }
 
 /* ==========================================================================
+	Function Name	: (VOID) DeleteListMenuIcons()
+	Outline			: SHGetFileInfo で取り出したアイコンリソースを開放する。
+	                  ポップアップメニューと一覧表示で使用するため、
+	                  開放できるのは一覧更新直前とプログラム終了時。
+	Arguments		: 
+	Return Value	: 
+	Reference		: 
+	Renewal			: 
+	Notes			: 
+	Attention		: 
+	Up Date			: 
+   ======1=========2=========3=========4=========5=========6=========7======= */
+VOID DeleteListMenuIcons()
+{
+	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
+		memset(g_MenuData.szName, 0, MAX_PATH);
+		if (g_MenuData.hLargeIcon[cnt] != NULL) {
+			::DestroyIcon(g_MenuData.hLargeIcon[cnt]);
+			g_MenuData.hLargeIcon[cnt] = NULL;
+		}
+		if (g_MenuData.hSmallIcon[cnt] != NULL) {
+			::DestroyIcon(g_MenuData.hSmallIcon[cnt]);
+			g_MenuData.hSmallIcon[cnt] = NULL;
+		}
+	}
+}
+
+/* ==========================================================================
 	Function Name	: (BOOL) InitListMenu()
 	Outline			: 設定一覧ポップアップメニューを初期化する。
 	Arguments		: HWND		hWnd		(In) ウインドウのハンドル
@@ -1404,17 +1432,7 @@ BOOL InitListMenu(HWND hWnd)
 	DWORD	dwIndex = 0;
 	DWORD	dwSize = MAX_PATH;
 
-	for (int cnt = 0; cnt < MAXJOBNUM; cnt++) {
-		memset(g_MenuData.szName, 0, MAX_PATH);
-		if (g_MenuData.hLargeIcon[cnt] != NULL) {
-			::DestroyIcon(g_MenuData.hLargeIcon[cnt]);
-			g_MenuData.hLargeIcon[cnt] = NULL;
-		}
-		if (g_MenuData.hSmallIcon[cnt] != NULL) {
-			::DestroyIcon(g_MenuData.hSmallIcon[cnt]);
-			g_MenuData.hSmallIcon[cnt] = NULL;
-		}
-	}
+	DeleteListMenuIcons();
 
 	if ((hKey = RegOpen(HKEY_CURRENT_USER, TTERM_KEY)) != INVALID_HANDLE_VALUE) {
 		while (RegEnumEx(hKey, dwIndex, szEntryName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
@@ -2480,6 +2498,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SaveConfig();
 		SetTaskTray(hWnd, NIM_DELETE);
 		::UnregisterHotKey(hWnd, WM_MENUOPEN);
+		DeleteListMenuIcons();
 		::DestroyMenu(g_hListMenu);
 		::DestroyMenu(g_hMenu);
 		::PostQuitMessage(0);
