@@ -231,7 +231,7 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 	  if (pvar->rec_stsize) {
 	    _snprintf_s(buff, sizeof(buff), _TRUNCATE, "\033[8;%d;%dt",
 	                pvar->ts->TerminalHeight, pvar->ts->TerminalWidth);
-	    WriteData(pvar->fh, buff, strlen(buff));
+	    WriteData(pvar->fh, buff, (int)strlen(buff));
 	  }
 	}
       }
