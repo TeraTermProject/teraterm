@@ -21,6 +21,8 @@
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
+#include <shlobj.h>
 
 #include "winjump.h"
 #include "teraterm.h"
@@ -49,8 +51,6 @@ typedef PROPVARIANT *REFPROPVARIANT;
 #define _PROPVARIANTINIT_DEFINED_
 #define PropVariantInit(pvar) memset((pvar),0,sizeof(PROPVARIANT))
 #endif
-
-#define IID_IShellLink IID_IShellLinkA
 
 typedef struct ICustomDestinationListVtbl {
     HRESULT ( __stdcall *QueryInterface ) (
@@ -237,11 +237,6 @@ typedef struct IShellLinkVtbl
 
 } IShellLinkVtbl;
 
-typedef struct IShellLink
-{
-    IShellLinkVtbl *lpVtbl;
-} IShellLink;
-
 typedef struct IObjectCollectionVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -364,10 +359,7 @@ static const PROPERTYKEY PKEY_Title = {
     (void **)(void *)((obj) + (sizeof((obj)-(type **)(obj))) \
 		            - (sizeof((obj)-(type **)(obj))))
 
-static char putty_path[2048];
-
-#define JUMPLISTREG_OK 0
-#define sfree free
+// LPCWSTR AppID = L"TeraTermProject.TeraTerm.ttermpro";
 
 static char *IniFile = NULL;
 
@@ -384,16 +376,6 @@ BOOL isJumpListSupported(void)
 		return FALSE;
 	else
 		return TRUE;
-}
-
-int add_to_jumplist_registry(const char *item)
-{
-	return JUMPLISTREG_OK;
-}
-
-int remove_from_jumplist_registry(const char *item)
-{
-	return JUMPLISTREG_OK;
 }
 
 /*
@@ -416,16 +398,27 @@ static IShellLink *make_shell_link(const char *appname,
                                    const char *sessionname)
 {
     IShellLink *ret;
-    char *app_path, *param_string, *desc_string;
+    char *app_path, *param_string, *desc_string, *tmp_ptr;
+    static char tt_path[2048];
     //void *psettings_tmp;
     IPropertyStore *pPS;
     PROPVARIANT pv;
+    int len;
 
     /* Retrieve path to executable. */
-    if (!putty_path[0])
-        GetModuleFileName(NULL, putty_path, sizeof(putty_path) - 1);
+    if (!tt_path[0])
+        GetModuleFileName(NULL, tt_path, sizeof(tt_path) - 1);
 
-    app_path = _strdup(putty_path);
+    if (appname) {
+	tmp_ptr = strrchr(tt_path, '\\');
+	len = (tmp_ptr - tt_path) + strlen(appname) + 2;
+	app_path = malloc(len);
+	strncpy_s(app_path, len, tt_path, (tmp_ptr - tt_path + 1));
+	strcat_s(app_path, len, appname);
+    }
+    else {
+	app_path = _strdup(tt_path);
+    }
 
     /* Create the new item. */
     if (!SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL,
@@ -438,27 +431,24 @@ static IShellLink *make_shell_link(const char *appname,
 
 	param_string = _strdup(sessionname);
     ret->lpVtbl->SetArguments(ret, param_string);
-    sfree(param_string);
+    free(param_string);
 
 	desc_string = _strdup("Connect to Tera Term session");
     ret->lpVtbl->SetDescription(ret, desc_string);
-    sfree(desc_string);
+    free(desc_string);
 
     ret->lpVtbl->SetIconLocation(ret, app_path, 0);
 
     /* To set the link title, we require the property store of the link. */
-    if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret,
-                                              COMPTR(IPropertyStore, &pPS)))) {
-        PropVariantInit(&pv);
-        pv.vt = VT_LPSTR;
-        pv.pszVal = _strdup(sessionname);
-        pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
-        sfree(pv.pszVal);
-        pPS->lpVtbl->Commit(pPS);
-        pPS->lpVtbl->Release(pPS);
+    if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret, COMPTR(IPropertyStore, &pPS)))) {
+	PropVariantInit(&pv);
+	pv.vt = VT_LPSTR;
+	pv.pszVal = _strdup(sessionname);
+	pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
+	free(pv.pszVal);
+	pPS->lpVtbl->Commit(pPS);
+	pPS->lpVtbl->Release(pPS);
     }
-
-    sfree(app_path);
 
     return ret;
 }
@@ -466,9 +456,13 @@ static IShellLink *make_shell_link(const char *appname,
 /* Updates jumplist from registry. */
 static void update_jumplist_from_registry(void)
 {
-    const char *piterator;
+    char EntName[128];
+    char TempHost[1024];
+
+    const char *piterator = TempHost;
     UINT num_items;
     UINT nremoved;
+    int i;
 
     /* Variables used by the cleanup code must be initialised to NULL,
      * so that we don't try to free or release them if they were never
@@ -479,11 +473,6 @@ static void update_jumplist_from_registry(void)
     IShellLink *link = NULL;
     IObjectArray *pRemoved = NULL;
     int need_abort = FALSE;
-
-	char EntName[128];
-	char TempHost[1024];
-	int i;
-
 
     /*
      * Create an ICustomDestinationList: the top-level object which
@@ -506,7 +495,7 @@ static void update_jumplist_from_registry(void)
         goto cleanup;
     need_abort = TRUE;
     if (!SUCCEEDED(pRemoved->lpVtbl->GetCount(pRemoved, &nremoved)))
-        nremoved = 0;
+	nremoved = 0;
 
     /*
      * Create an object collection to form the 'Recent Sessions'
@@ -521,52 +510,46 @@ static void update_jumplist_from_registry(void)
      * Go through the jump list entries from the registry and add each
      * one to the collection.
      */
-	i = 1;
-	do {
-		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-		GetPrivateProfileString("Hosts",EntName,"",
-		                        TempHost,sizeof(TempHost), IniFile);
-		if ( strlen(TempHost) > 0 ) {
-			piterator = TempHost;
-		} else {
-			continue;
+    for (i=1; i<=MAX_JUMPLIST_ITEMS; i++) {
+	_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
+	GetPrivateProfileString("Hosts", EntName, "", TempHost, sizeof(TempHost), IniFile);
+	if (strlen(TempHost) == 0) {
+	    break;
+	}
+
+	OutputDebugPrintf("%s\n", piterator);
+	link = make_shell_link(NULL, piterator);
+	if (link) {
+	    UINT j;
+	    int found;
+
+	    /*
+	     * Check that the link isn't in the user-removed list.
+	     */
+	    for (j = 0, found = FALSE; j < nremoved && !found; j++) {
+		IShellLink *rlink;
+		if (SUCCEEDED(pRemoved->lpVtbl->GetAt
+			      (pRemoved, j, COMPTR(IShellLink, &rlink)))) {
+		    char desc1[2048], desc2[2048];
+		    if (SUCCEEDED(link->lpVtbl->GetDescription
+		                  (link, desc1, sizeof(desc1)-1)) &&
+		        SUCCEEDED(rlink->lpVtbl->GetDescription
+			          (rlink, desc2, sizeof(desc2)-1)) &&
+		        !strcmp(desc1, desc2)) {
+			found = TRUE;
+		    }
+		    rlink->lpVtbl->Release(rlink);
 		}
+	    }
 
-		OutputDebugPrintf("%s\n", piterator);
-        link = make_shell_link(NULL, piterator);
-        if (link) {
-            UINT i;
-            int found;
+	    if (!found) {
+		collection->lpVtbl->AddObject(collection, link);
+	    }
 
-            /*
-             * Check that the link isn't in the user-removed list.
-             */
-            for (i = 0, found = FALSE; i < nremoved && !found; i++) {
-                IShellLink *rlink;
-                if (SUCCEEDED(pRemoved->lpVtbl->GetAt
-                              (pRemoved, i, COMPTR(IShellLink, &rlink)))) {
-                    char desc1[2048], desc2[2048];
-                    if (SUCCEEDED(link->lpVtbl->GetDescription
-                                  (link, desc1, sizeof(desc1)-1)) &&
-                        SUCCEEDED(rlink->lpVtbl->GetDescription
-                                  (rlink, desc2, sizeof(desc2)-1)) &&
-                        !strcmp(desc1, desc2)) {
-                        found = TRUE;
-                    }
-                    rlink->lpVtbl->Release(rlink);
-                }
-            }
-
-            if (!found) {
-                collection->lpVtbl->AddObject(collection, link);
-            }
-
-            link->lpVtbl->Release(link);
-            link = NULL;
-        }
-
-		i++;
-	} while ((i <= MAX_JUMPLIST_ITEMS) && (strlen(TempHost)>0));
+	    link->lpVtbl->Release(link);
+	    link = NULL;
+	}
+    }
 
     /*
      * Get the array form of the collection we've just constructed,
@@ -574,7 +557,7 @@ static void update_jumplist_from_registry(void)
      */
     if (!SUCCEEDED(collection->lpVtbl->QueryInterface
                    (collection, COMPTR(IObjectArray, &array))))
-        goto cleanup;
+	goto cleanup;
 
     pCDL->lpVtbl->AppendCategory(pCDL, L"Recent Sessions", array);
 
@@ -585,7 +568,7 @@ static void update_jumplist_from_registry(void)
     if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
                                     NULL, CLSCTX_INPROC_SERVER,
                                     COMPTR(IObjectCollection, &collection))))
-        goto cleanup;
+	goto cleanup;
 
     /*
      * Get the array form of the collection we've just constructed,
@@ -593,7 +576,7 @@ static void update_jumplist_from_registry(void)
      */
     if (!SUCCEEDED(collection->lpVtbl->QueryInterface
                    (collection, COMPTR(IObjectArray, &array))))
-        goto cleanup;
+	goto cleanup;
 
     pCDL->lpVtbl->AddUserTasks(pCDL, array);
 
@@ -613,7 +596,7 @@ static void update_jumplist_from_registry(void)
     if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
                                     NULL, CLSCTX_INPROC_SERVER,
                                     COMPTR(IObjectCollection, &collection))))
-        goto cleanup;
+	goto cleanup;
 
     /*
      * Get the array form of the collection we've just constructed,
@@ -621,7 +604,7 @@ static void update_jumplist_from_registry(void)
      */
     if (!SUCCEEDED(collection->lpVtbl->QueryInterface
                    (collection, COMPTR(IObjectArray, &array))))
-        goto cleanup;
+	goto cleanup;
 
     pCDL->lpVtbl->AddUserTasks(pCDL, array);
 
@@ -652,6 +635,17 @@ static void update_jumplist_from_registry(void)
     if (link) link->lpVtbl->Release(link);
 }
 
+void add_to_recent_docs(const char * const sessionname)
+{
+    IShellLink *link = NULL;
+
+    link = make_shell_link(NULL, sessionname);
+
+    SHAddToRecentDocs(6 /* SHARD_LINK */, link);
+
+    return;
+}
+
 /* Clears the entire jumplist. */
 void clear_jumplist(void)
 {
@@ -659,8 +653,8 @@ void clear_jumplist(void)
 
     if (CoCreateInstance(&CLSID_DestinationList, NULL, CLSCTX_INPROC_SERVER,
                          COMPTR(ICustomDestinationList, &pCDL)) == S_OK) {
-        pCDL->lpVtbl->DeleteList(pCDL, NULL);
-        pCDL->lpVtbl->Release(pCDL);
+	pCDL->lpVtbl->DeleteList(pCDL, NULL);
+	pCDL->lpVtbl->Release(pCDL);
     }
 
 }
@@ -669,28 +663,22 @@ void clear_jumplist(void)
 void add_session_to_jumplist(const char * const sessionname, char *inifile)
 {
     if (!isJumpListSupported())
-        return;                        /* do nothing on pre-Win7 systems */
+	return;                        /* do nothing on pre-Win7 systems */
+
+//    add_to_recent_docs(sessionname);
 
     IniFile = inifile;
 
-    if (add_to_jumplist_registry(sessionname) == JUMPLISTREG_OK) {
-        update_jumplist_from_registry();
-    } else {
-        /* Make sure we don't leave the jumplist dangling. */
-        clear_jumplist();
-    }
+    update_jumplist_from_registry();
+    return;
 }
 
 /* Removes a saved session from the Windows jumplist. */
 void remove_session_from_jumplist(const char * const sessionname)
 {
     if (!isJumpListSupported())
-        return;                        /* do nothing on pre-Win7 systems */
+	return;                        /* do nothing on pre-Win7 systems */
 
-    if (remove_from_jumplist_registry(sessionname) == JUMPLISTREG_OK) {
-        update_jumplist_from_registry();
-    } else {
-        /* Make sure we don't leave the jumplist dangling. */
-        clear_jumplist();
-    }
+    update_jumplist_from_registry();
+    return;
 }
