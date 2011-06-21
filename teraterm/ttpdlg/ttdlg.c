@@ -29,6 +29,9 @@
 static char FAR * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 #endif /* NO_INET6 */
 
+#undef EFFECT_ENABLED	// エフェクトの有効可否
+#undef TEXTURE_ENABLED	// テクスチャの有効可否
+
 #include "compat_w95.h"
 
 static HANDLE hInst;
@@ -2665,9 +2668,6 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
-
-#undef EFFECT_ENABLED	// エフェクトの有効可否
-#define TEXTURE_ENABLED	// テクスチャの有効可否
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
