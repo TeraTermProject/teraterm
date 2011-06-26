@@ -250,9 +250,11 @@ BOOL ExtractAssociatedIconEx(char *szPath, HICON *hLargeIcon, HICON *hSmallIcon)
 
 	::SHGetFileInfo(szPath, 0, &sfi, sizeof(sfi), SHGFI_LARGEICON | SHGFI_ICON);
 	*hLargeIcon = ::CopyIcon(sfi.hIcon);
+	::DestroyIcon(sfi.hIcon);
 
 	::SHGetFileInfo(szPath, 0, &sfi, sizeof(sfi), SHGFI_SMALLICON | SHGFI_ICON);
 	*hSmallIcon = ::CopyIcon(sfi.hIcon);
+	::DestroyIcon(sfi.hIcon);
 
 	return TRUE;
 }
