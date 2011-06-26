@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by i:\My Documents\Visual Studio 2005\Projects\TeraTerm\teraterm\teraterm\ttermpro.rc
+// Used by t:\ttssh2\teraterm\teraterm\ttermpro.rc
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100

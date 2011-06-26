@@ -230,7 +230,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_FULLPATH,55,24,106,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER,WS_EX_CLIENTEDGE
     CONTROL         "Bytes transfered:",IDC_TRANS_TRANS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,15,38,76,10
     RTEXT           "",IDC_TRANSBYTES,97,38,64,10
-    CONTROL         "Elapsed time:",IDC_TRANS_ELAPSED,"Static",SS_LEFTNOWORDWRAP | NOT WS_VISIBLE, 15,48,46,8
+    CONTROL         "Elapsed time:",IDC_TRANS_ELAPSED,"Static",SS_LEFTNOWORDWRAP | NOT WS_VISIBLE,15,48,46,8
     RTEXT           "",IDC_TRANS_ETIME,60,48,101,8
     CONTROL         "",IDC_TRANSPROGRESS,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER,15,60,146,12
     DEFPUSHBUTTON   "Close",IDCANCEL,18,76,40,14
@@ -374,8 +374,8 @@ IDI_CYGTERM             ICON                    "..\\..\\cygterm\\cygterm.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,69,0,0
- PRODUCTVERSION 4,69,0,0
+ FILEVERSION 4,70,0,0
+ PRODUCTVERSION 4,70,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -392,12 +392,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TeraTerm Project T. Teranishi"
             VALUE "FileDescription", "Tera Term"
-            VALUE "FileVersion", "4, 69, 0, 0"
+            VALUE "FileVersion", "4, 70, 0, 0"
             VALUE "InternalName", "TTERMPRO"
             VALUE "LegalCopyright", "(C)TeraTerm Project 2004-2011, (C)T. Teranishi 1994-1998"
             VALUE "OriginalFilename", "TTERMPRO.EXE"
             VALUE "ProductName", "Tera Term"
-            VALUE "ProductVersion", "4, 69, 0, 0"
+            VALUE "ProductVersion", "4, 70, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
