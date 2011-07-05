@@ -488,7 +488,7 @@ void ParseStrftimeFileName(PCHAR FName, int destlen)
 {
 	char filename[MAX_PATH];
 	char dirname[MAX_PATH];
-	char buf[80];
+	char buf[MAX_PATH];
 	char *c;
 	time_t time_local;
 	struct tm *tm_local;
