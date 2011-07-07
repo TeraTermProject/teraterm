@@ -2011,9 +2011,7 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-	// 右Altでもなぜか nFlags の拡張キービット(8) が立たないので
-	// nFlags は当てにせず GetAsyncKeyState を使って判断する
-	if (MetaKey(ts.MetaKey))
+	if (MetaKey(ts.MetaKey) && (nFlags & 0x2000) != 0)
 	{
 		/* for Ctrl+Alt+Key combination */
 		GetKeyboardState((PBYTE)KeyState);
