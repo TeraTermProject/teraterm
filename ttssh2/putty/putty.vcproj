@@ -40,7 +40,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\libs\putty;..\..\libs\putty\windows"
-				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SECURITY_WIN32"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -185,6 +185,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libs\putty\WINDOWS\WINHELP.H"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINMISC.C"
 				>
 			</File>
 			<File
