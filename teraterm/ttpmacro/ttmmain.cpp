@@ -264,7 +264,8 @@ BOOL CCtrlWindow::OnInitDialog()
 		InitDDE(GetSafeHwnd());
 	}
 
-	if ((FileName[0]==0) && (! GetFileName(GetSafeHwnd()))) {
+	if ((FileName[0]==0) && (! GetFileName(GetSafeHwnd())) ||
+	    (GetFileAttributes(FileName)==-1)) {
 		EndDDE();
 		PostQuitMessage(0);
 		return TRUE;
