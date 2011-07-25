@@ -102,7 +102,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\libs\putty;..\..\libs\putty\windows"
-				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SECURITY_WIN32"
 				RuntimeLibrary="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
