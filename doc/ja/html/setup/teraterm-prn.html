@@ -58,7 +58,7 @@ PassThruPort=
 <h1><a name="ignoremc">印刷用制御コードを無視する</a></h1>
 
 <p>
-設定ファイルの [Tera Term] セクションの PrinterCtrlSequence 行を以下のように変更することによって、印刷用制御コード(MC: Media Copy)を無視するかどうかを設定できます。PassThruPort 行の指定は無効となります。
+設定ファイルの [Tera Term] セクションの PrinterCtrlSequence 行を以下のように変更することによって、印刷用制御コード(MC: Media Copy)を無視するかどうかを設定できます。PassThruPort 行は指定しても無効となります。
 </p>
 
 <pre>
@@ -70,12 +70,12 @@ PrinterCtrlSequence=on|off
 </p>
 
 <pre>
-例:
+例(印刷用制御コードを無視する):
 PrinterCtrlSequence=off
 </pre>
 
 <pre>
-省略時:
+省略時(印刷用制御コードを解釈する):
 PrinterCtrlSequence=on
 </pre>
 
