@@ -60,6 +60,10 @@ BOOL CCtrlApp::InitInstance()
 
 int CCtrlApp::ExitInstance()
 {
+	//delete m_pMainWnd;
+	if (m_pMainWnd) {
+		m_pMainWnd->DestroyWindow();
+	}
 	m_pMainWnd = NULL;
 	return ExitCode;
 }
