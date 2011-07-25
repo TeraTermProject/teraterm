@@ -1958,6 +1958,8 @@ WORD TTLGetPassword()
 	TStrVal Str, Str2, Temp2;
 	char Temp[512];
 	WORD VarId, Err;
+	int result = 0;  /* failure */
+	char filepath[1024];
 
 	Err = 0;
 	GetStrVal(Str,&Err);
@@ -1971,20 +1973,30 @@ WORD TTLGetPassword()
 	if (Str2[0]==0) return Err;
 
 	GetAbsPath(Str,sizeof(Str));
+
+	// ファイルパスに環境変数が含まれているならば、展開する。
+	ExpandEnvironmentStrings(Str, filepath, sizeof(filepath));
+
 	GetPrivateProfileString("Password",Str2,"",
-	                        Temp,sizeof(Temp),Str);
+	                        Temp,sizeof(Temp), filepath);
 	if (Temp[0]==0) // password not exist
 	{
 		OpenInpDlg(Temp2, Str2, "Enter password", "", TRUE);
 		if (Temp2[0]!=0) {
 			Encrypt(Temp2,Temp);
-			WritePrivateProfileString("Password",Str2,Temp,Str);
+			if (WritePrivateProfileString("Password",Str2,Temp, filepath) != 0) {
+				result = 1;  /* success */
+			}
 		}
 	}
-	else // password exist
+	else {// password exist
 		Decrypt(Temp,Temp2);
+		result = 1;  /* success */
+	}
 
 	SetStrVal(VarId,Temp2);
+
+	SetResult(result);  // 成功可否を設定する。
 	return Err;
 }
 
