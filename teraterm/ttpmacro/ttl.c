@@ -61,7 +61,7 @@ int ExitCode = 0;
 
 // for "FindXXXX" commands
 #define NumDirHandle 8
-static long DirHandle[NumDirHandle];
+static long DirHandle[NumDirHandle] = {-1,-1, -1, -1, -1, -1, -1, -1};
 /* for "FileMarkPtr" and "FileSeekBack" commands */
 #define NumFHandle 16
 static int FHandle[NumFHandle];

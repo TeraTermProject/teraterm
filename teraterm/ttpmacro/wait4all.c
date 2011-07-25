@@ -140,7 +140,7 @@ int unregister_macro_window(HWND hwnd)
 	hd = lock_shmem();
 
 	for (i = 0 ; i < MAXNWIN ; i++) {
-		if (pm->WinList[i] == hwnd) {
+		if (pm && pm->WinList[i] == hwnd) {
 			pm->NWin--;
 			pm->WinList[i] = NULL;
 
