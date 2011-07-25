@@ -2751,6 +2751,9 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 #ifdef SVNVERSION
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#else
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# UNK)");
+			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #endif
 			SendMessage(GetDlgItem(Dialog, IDC_TT_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 

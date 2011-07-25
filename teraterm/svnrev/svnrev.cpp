@@ -67,7 +67,12 @@ BOOL write_svn_revesion(char *path, int revision) {
 	}
 
 	// compare revisions
-	if (file_revision >= revision) {
+	// .svn 配下のファイルが存在しない(-1)場合においても、ビルドができるように、
+	// ヘッダファイルは作成する。企業のイントラネットから SourceForge のSVNリポジトリへ
+	// 直接アクセスできない場合、tarballをダウンロードするしかなく、その際 .svn ディレクトリが
+	// 存在しない。
+	if (file_revision != -1 &&
+		(file_revision >= revision)) {
 		return TRUE;
 	}
 
