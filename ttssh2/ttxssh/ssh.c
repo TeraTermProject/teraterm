@@ -2772,8 +2772,26 @@ void SSH_notify_host_OK(PTInstVar pvar)
 	}
 }
 
+void get_window_pixel_size(PTInstVar pvar, int *x, int *y)
+{
+	RECT r;
+
+	if (pvar->cv->HWin && GetWindowRect(pvar->cv->HWin, &r)) {
+		*x = r.right - r.left;
+		*y = r.bottom - r.top;
+	}
+	else {
+		*x = 0;
+		*y = 0;
+	}
+
+	return;
+}
+
 void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 {
+	int x, y;
+
 	pvar->ssh_state.win_cols = cols;
 	pvar->ssh_state.win_rows = rows;
 
@@ -2812,8 +2830,9 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		buffer_put_char(msg, 0);  // wantconfirm
 		buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
 		buffer_put_int(msg, pvar->ssh_state.win_rows);  // lines
-		buffer_put_int(msg, 480);  // XXX:
-		buffer_put_int(msg, 640);  // XXX:
+		get_window_pixel_size(pvar, &x, &y);
+		buffer_put_int(msg, x);  // window width (pixel):
+		buffer_put_int(msg, y);  // window height (pixel):
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
@@ -6948,7 +6967,7 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_t *msg, *ttymsg;
 	char *s = "pty-req";  // pseudo terminalのリクエスト
 	unsigned char *outmsg;
-	int len;
+	int len, x, y;
 #ifdef DONT_WANTCONFIRM
 	int wantconfirm = 0; // false
 #else
@@ -6976,8 +6995,9 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_put_string(msg, s, strlen(s));
 	buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
 	buffer_put_int(msg, pvar->ssh_state.win_rows);  // lines
-	buffer_put_int(msg, 480);  // XXX:
-	buffer_put_int(msg, 640);  // XXX:
+	get_window_pixel_size(pvar, &x, &y);
+	buffer_put_int(msg, x);  // window width (pixel):
+	buffer_put_int(msg, y);  // window height (pixel):
 
 	// TTY modeはここで渡す (2005.7.17 yutaka)
 #if 0
