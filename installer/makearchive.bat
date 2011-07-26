@@ -1,3 +1,4 @@
+@echo off
 rem ●使用例
 rem 通常のビルド
 rem   makearchive.bat
@@ -11,6 +12,8 @@ rem   makearchive.bat plugins
 SET debug=no
 SET plugins=no
 
+if "%1"=="/?" goto help
+@echo on
 if "%1"=="debug" SET debug=yes
 if "%1"=="plugins" SET plugins=yes
 
@@ -69,3 +72,17 @@ del /f %dst%\lang\English.lng
 del /f %dst%\svnrev.exe
 
 perl setini.pl release\TERATERM.INI > %dst%\TERATERM.INI
+
+exit /b
+
+:help
+echo Tera Termをビルドするために必要なソースコードをすべてコンパイルします。
+echo.
+echo   %0          通常のビルド
+echo   %0 rebuild  リビルド
+echo   %0 debug    デバッグ情報含むビルド
+echo   %0 plugins  プラグイン情報含むビルド
+echo.
+echo リリース物件を作成する場合は"rebuild"を使用してください。
+exit /b
+
