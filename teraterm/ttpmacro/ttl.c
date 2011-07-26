@@ -3820,17 +3820,26 @@ error:
 WORD TTLStrSpecial()
 {
 	WORD Err, VarId;
-	char *srcptr;
+	TStrVal srcstr;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
-
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	srcptr = StrVarPtr(VarId);
-	RestoreNewLine(srcptr);
+	if (CheckParameterGiven()) { // strspecial strvar strval
+		GetStrVal(srcstr,&Err);
+		if ((Err==0) && (GetFirstChar()!=0))
+			Err = ErrSyntax;
+		if (Err!=0) {
+			return Err;
+		}
+
+		RestoreNewLine(srcstr);
+		SetStrVal(VarId, srcstr);
+	}
+	else { // strspecial strvar
+		RestoreNewLine(StrVarPtr(VarId));
+	}
 
 	return Err;
 }
