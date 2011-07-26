@@ -1,1 +1,0 @@
-makearchive.bat debug
