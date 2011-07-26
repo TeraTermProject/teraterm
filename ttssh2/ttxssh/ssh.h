@@ -473,6 +473,22 @@ enum fp_rep {
 	SSH_FP_RANDOMART
 };
 
+enum fp_type {
+	SSH_FP_SHA1,
+	SSH_FP_MD5
+};
+
+enum sshfp_types {
+	SSHFP_KEY_RESERVED,
+	SSHFP_KEY_RSA,
+	SSHFP_KEY_DSA
+};
+
+enum sshfp_hashes {
+	SSHFP_HASH_RESERVED,
+	SSHFP_HASH_SHA1
+};
+
 enum scp_dir {
 	TOREMOTE, FROMREMOTE,
 };

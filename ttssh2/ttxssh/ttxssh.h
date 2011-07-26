@@ -145,6 +145,8 @@ typedef struct _TS_SSH {
 	char HostKeyOrder[KEY_MAX+1];
 	char MacOrder[HMAC_MAX+1];
 	char CompOrder[COMP_MAX+1];
+
+	BOOL VerifyHostKeyDNS;
 } TS_SSH;
 
 typedef struct _TInstVar {

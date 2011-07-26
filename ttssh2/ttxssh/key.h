@@ -34,7 +34,7 @@ int key_verify(Key *key,
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
 
-char* key_fingerprint_raw(Key *k, int *dgst_raw_length);
+char *key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
 
 const char *key_type(const Key *k);

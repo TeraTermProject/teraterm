@@ -49,6 +49,9 @@ See LICENSE.TXT for the license.
 #include <errno.h>
 #include <sys/stat.h>
 #include <direct.h>
+#include <memory.h>
+
+#include <windns.h>
 
 static HFONT DlgHostsAddFont;
 static HFONT DlgHostsReplaceFont;
@@ -128,12 +131,7 @@ static char FAR *FAR * parse_multi_path(char FAR * buf)
 void HOSTS_init(PTInstVar pvar)
 {
 	pvar->hosts_state.prefetched_hostname = NULL;
-#if 0
-	pvar->hosts_state.key_exp = NULL;
-	pvar->hosts_state.key_mod = NULL;
-#else
 	init_hostkey(&pvar->hosts_state.hostkey);
-#endif
 	pvar->hosts_state.hosts_dialog = NULL;
 	pvar->hosts_state.file_names = NULL;
 }
@@ -693,16 +691,8 @@ static int read_host_key(PTInstVar pvar,
 		return 0;
 	}
 
-#if 0
-	pvar->hosts_state.key_bits = 0;
-	free(pvar->hosts_state.key_exp);
-	pvar->hosts_state.key_exp = NULL;
-	free(pvar->hosts_state.key_mod);
-	pvar->hosts_state.key_mod = NULL;
-#else
 	// hostkey type is KEY_UNSPEC.
 	init_hostkey(&pvar->hosts_state.hostkey);
-#endif
 
 	do {
 		if (pvar->hosts_state.file_data == NULL
@@ -1631,6 +1621,107 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 	}
 }
 
+int is_numeric_hostname(const char *hostname)
+{
+	struct addrinfo hints, *ai;
+
+	if (hostname == NULL) {
+		return -1;
+	}
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_NUMERICHOST;
+
+	if (getaddrinfo(hostname, NULL, &hints, &ai) == 0) {
+		freeaddrinfo(ai);
+		return 1;
+	}
+
+	return 0;
+}
+
+#define DNS_TYPE_SSHFP	44
+typedef struct {
+	BYTE Algorithm;
+	BYTE DigestType;
+	BYTE Digest[1];
+} DNS_SSHFP_DATA, *PDNS_SSHFP_DATA;
+enum verifydns_result {
+	DNS_VERIFY_NONE,
+	DNS_VERIFY_MATCH,
+	DNS_VERIFY_MISMATCH,
+	DNS_VERIFY_DIFFERENTTYPE,
+	DNS_VERIFY_AUTH_MATCH,
+	DNS_VERIFY_AUTH_MISMATCH,
+	DNS_VERIFY_AUTH_DIFFERENTTYPE
+};
+
+int verify_hostkey_dns(char FAR *hostname, Key *key)
+{
+	DNS_STATUS status;
+	PDNS_RECORD rec, p;
+	PDNS_SSHFP_DATA t;
+	int hostkey_alg, hostkey_dtype, hostkey_dlen;
+	BYTE *hostkey_digest;
+	int found = DNS_VERIFY_NONE;
+	char buff[1024];
+
+	switch (key->type) {
+	case KEY_RSA:
+		hostkey_alg = SSHFP_KEY_RSA;
+		break;
+	case KEY_DSA:
+		hostkey_alg = SSHFP_KEY_DSA;
+		break;
+	// XXX KEY_ECDSA
+	default: // Un-supported algorighm
+		hostkey_alg = SSHFP_KEY_RESERVED;
+	}
+
+	if (hostkey_alg) {
+		hostkey_dtype = SSHFP_HASH_SHA1;
+		hostkey_digest = key_fingerprint_raw(key, SSH_FP_SHA1, &hostkey_dlen);
+	}
+	else {
+		hostkey_dtype = SSHFP_HASH_RESERVED;
+		hostkey_digest = NULL;
+	}
+
+	status = DnsQuery(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
+
+	if (status == 0) {
+		for (p=rec; p!=NULL; p=p->pNext) {
+			if (p->wType == DNS_TYPE_SSHFP) {
+				t = (PDNS_SSHFP_DATA)&(p->Data.Null);
+				if (t->Algorithm == hostkey_alg && t->DigestType == hostkey_dtype) {
+					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
+						found = DNS_VERIFY_MATCH;
+						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "Match: alg=%d, dgst=%d, flags=%d (%x)",
+							t->Algorithm, t->DigestType, p->Flags);
+						MessageBox(NULL, buff, "DNS Verify Match", MB_OK);
+						break;
+					}
+					else {
+						found = DNS_VERIFY_MISMATCH;
+						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "Missmatch: alg=%d, dgst=%d, flags=%d (%x)",
+							t->Algorithm, t->DigestType, p->Flags);
+						MessageBox(NULL, buff, "DNS Verify Missmatch", MB_OK);
+						break;
+					}
+				}
+				else {
+					found = DNS_VERIFY_DIFFERENTTYPE;
+				}
+			}
+		}
+	}
+
+	free(hostkey_digest);
+	DnsRecordListFree(rec, DnsFreeRecordList);
+	return found;
+}
+
 //
 // サーバから送られてきたホスト公開鍵の妥当性をチェックする
 //
@@ -1638,7 +1729,7 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 //
 BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key)
 {
-	int found_different_key = 0, found_different_type_key = 0;
+	int found_different_key = 0, found_different_type_key = 0, dns_sshfp_check = 0;
 
 	// すでに known_hosts ファイルからホスト公開鍵を読み込んでいるなら、それと比較する。
 	if (pvar->hosts_state.prefetched_hostname != NULL
@@ -1687,6 +1778,11 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 		finish_read_host_files(pvar, 0);
 	}
 
+	if (pvar->settings.VerifyHostKeyDNS) {
+		if (!is_numeric_hostname(hostname)) {
+			dns_sshfp_check = verify_hostkey_dns(hostname, key);
+		}
+	}
 
 	// known_hosts に存在しないキーはあとでファイルへ書き込むために、ここで保存しておく。
 	pvar->hosts_state.hostkey.type = key->type;
@@ -1721,24 +1817,13 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	// これによりknown_hostsの確認を待たずに、サーバへユーザ情報を送ってしまう問題を回避する。
 	// (2007.10.1 yutaka)
 	if (found_different_key) {
-#if 0
-		PostMessage(pvar->NotificationWindow, WM_COMMAND,
-		            ID_SSHDIFFERENTKEY, 0);
-#else
 		HOSTS_do_different_key_dialog(pvar->NotificationWindow, pvar);
-#endif
 	}
 	else if (found_different_type_key) {
 		HOSTS_do_different_type_key_dialog(pvar->NotificationWindow, pvar);
 	}
 	else {
-#if 0
-		PostMessage(pvar->NotificationWindow, WM_COMMAND,
-		            ID_SSHUNKNOWNHOST, 0);
-#else
 		HOSTS_do_unknown_host_dialog(pvar->NotificationWindow, pvar);
-#endif
-
 	}
 
 	return TRUE;
@@ -1747,8 +1832,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 void HOSTS_notify_disconnecting(PTInstVar pvar)
 {
 	if (pvar->hosts_state.hosts_dialog != NULL) {
-		PostMessage(pvar->hosts_state.hosts_dialog, WM_COMMAND, IDCANCEL,
-		            0);
+		PostMessage(pvar->hosts_state.hosts_dialog, WM_COMMAND, IDCANCEL, 0);
 		/* the main window might not go away if it's not enabled. (see vtwin.cpp) */
 		EnableWindow(pvar->NotificationWindow, TRUE);
 	}
@@ -1759,12 +1843,7 @@ void HOSTS_end(PTInstVar pvar)
 	int i;
 
 	free(pvar->hosts_state.prefetched_hostname);
-#if 0
-	free(pvar->hosts_state.key_exp);
-	free(pvar->hosts_state.key_mod);
-#else
 	init_hostkey(&pvar->hosts_state.hostkey);
-#endif
 
 	if (pvar->hosts_state.file_names != NULL) {
 		for (i = 0; pvar->hosts_state.file_names[i] != NULL; i++) {

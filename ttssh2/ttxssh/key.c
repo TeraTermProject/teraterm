@@ -435,7 +435,7 @@ error:
 }
 
 
-char* key_fingerprint_raw(Key *k, int *dgst_raw_length)
+char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 {
 	const EVP_MD *md = NULL;
 	EVP_MD_CTX ctx;
@@ -447,8 +447,16 @@ char* key_fingerprint_raw(Key *k, int *dgst_raw_length)
 
 	*dgst_raw_length = 0;
 
-	// MD5アルゴリズムを使用する
-	md = EVP_md5();
+	switch (dgst_type) {
+	case SSH_FP_MD5:
+		md = EVP_md5();
+		break;
+	case SSH_FP_SHA1:
+		md = EVP_sha1();
+		break;
+	default:
+		md = EVP_md5();
+	}
 
 	switch (k->type) {
 	case KEY_RSA1:
@@ -633,7 +641,7 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep)
 	int i, retval_len;
 
 	// fingerprintのハッシュ値（バイナリ）を求める
-	dgst_raw = key_fingerprint_raw(key, &dgst_raw_len);
+	dgst_raw = key_fingerprint_raw(key, SSH_FP_MD5, &dgst_raw_len);
 
 	if (dgst_rep == SSH_FP_HEX) {
 		// 16進表記へ変換する

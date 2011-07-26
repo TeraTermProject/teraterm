@@ -465,6 +465,9 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	// agent forward 確認を有効にする
 	settings->ForwardAgentConfirm = read_BOOL_option(fileName, "ForwardAgentConfirm", TRUE);
 
+	// ホスト鍵の DNS でのチェック (RFC 4255)
+	settings->VerifyHostKeyDNS = read_BOOL_option(fileName, "VerifyHostKeyDNS", FALSE);
+
 	clear_local_settings(pvar);
 }
 
@@ -557,6 +560,12 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	// agent forward 確認を有効にする
 	WritePrivateProfileString("TTSSH", "ForwardAgentConfirm",
 	                          settings->ForwardAgentConfirm ? "1" : "0", fileName);
+
+/*
+	// ホスト鍵の DNS でのチェック (RFC 4255)
+	WritePrivateProfileString("TTSSH", "VerifyHostKeyDNS",
+	                          settings->VerifyHostKeyDNS ? "1" : "0", fileName);
+ */
 }
 
 
