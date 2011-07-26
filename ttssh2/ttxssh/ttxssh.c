@@ -82,6 +82,8 @@ static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #include "compat_w95.h"
 
+#include "puttyversion.h"
+
 #define MATCH_STR(s, o) strncmp((s), (o), NUM_ELEM(o) - 1)
 #define MATCH_STR_I(s, o) _strnicmp((s), (o), NUM_ELEM(o) - 1)
 
@@ -2375,6 +2377,13 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 #endif
 	SendMessage(GetDlgItem(dlg, IDC_ZLIB_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
+	// PuTTYのバージョンを設定する (2011.7.26 yutaka)
+#ifdef PUTTYVERSION
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "PuTTY %s", PUTTYVERSION);
+#else
+	_snprintf(buf, sizeof(buf), "PuTTY Unknown");
+#endif
+	SendMessage(GetDlgItem(dlg, IDC_PUTTY_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
 	// TTSSHダイアログに表示するSSHに関する情報 (2004.10.30 yutaka)
 	if (pvar->socket != INVALID_SOCKET) {

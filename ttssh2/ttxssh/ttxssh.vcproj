@@ -25,6 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="$(OutDir)\puttyrev.exe"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -83,8 +84,8 @@
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\libs\openssl\out32.dbg;..\..\libs\zlib;..\..\teraterm\Debug"
-				DelayLoadDLLs="dnsapi.dll"
 				ModuleDefinitionFile="ttxssh.def"
+				DelayLoadDLLs="dnsapi.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/ttxssh.pdb"
 				GenerateMapFile="true"
@@ -129,6 +130,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="$(OutDir)\puttyrev.exe"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -188,8 +190,8 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\libs\openssl\out32;..\..\libs\zlib;..\..\teraterm\Release"
-				DelayLoadDLLs="dnsapi.dll"
 				ModuleDefinitionFile="ttxssh.def"
+				DelayLoadDLLs="dnsapi.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/ttxssh.pdb"
 				SubSystem="2"
