@@ -20,13 +20,34 @@ Converts special characters.
 <h2>Format</h2>
 
 <pre class="macro-syntax">
-strspecial &lt;strvar&gt;
+strspecial &lt;strvar&gt; [&lt;strval&gt;]
 </pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string valiable &lt;strvar&gt;</dt>
+	<!--dd>第2引数を渡さない場合は、この引数で指定した文字列が変換される。<br />
+	    第2引数を渡した場合は、この引数は無視される。</dd-->
+	
+	<dt class="macro">string &lt;strval&gt; (optional)</dt>
+	<!--dd>この引数を指定した場合、この引数で指定した文字列が変換される。</dd-->
+
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System valiable &lt;result&gt;</dt>
+	<!--dd>変換後の文字列が格納される。</dd-->
+	
+</dl>
 
 <h2>Remarks</h2>
 
 <p>
 Converts the following characters in the &lt;strvar&gt; to special characters.
+<!-- 渡された文字列に含まれる以下の文字を特殊文字に変換する。 -->
 </p>
 
 <table border="2">
@@ -53,6 +74,11 @@ Converts the following characters in the &lt;strvar&gt; to special characters.
 <pre class="macro-example">
 str = "AB\tCD\nEF\\nGH"
 strspecial str
+messagebox str "special"
+</pre>
+
+<pre class="macro-example">
+strspecial str "AB\tCD\nEF\\nGH"
 messagebox str "special"
 </pre>
 
