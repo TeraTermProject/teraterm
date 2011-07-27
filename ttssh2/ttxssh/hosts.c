@@ -1665,7 +1665,6 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	int hostkey_alg, hostkey_dtype, hostkey_dlen;
 	BYTE *hostkey_digest;
 	int found = DNS_VERIFY_NONE;
-	char buff[1024];
 
 	switch (key->type) {
 	case KEY_RSA:
@@ -1682,7 +1681,7 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 		hostkey_alg = SSHFP_KEY_ECDSA;
 		hostkey_dtype = SSHFP_HASH_SHA256;
 		break;
-	default: // Un-supported algorighm
+	default: // Un-supported algorithm
 		hostkey_alg = SSHFP_KEY_RESERVED;
 		hostkey_dtype = SSHFP_HASH_RESERVED;
 	}
@@ -1703,16 +1702,10 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 				if (t->Algorithm == hostkey_alg && t->DigestType == hostkey_dtype) {
 					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
 						found = DNS_VERIFY_MATCH;
-						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "Match: alg=%d, dgst=%d, flags=%d (%x)",
-							t->Algorithm, t->DigestType, p->Flags);
-						MessageBox(NULL, buff, "DNS Verify Match", MB_OK);
 						break;
 					}
 					else {
 						found = DNS_VERIFY_MISMATCH;
-						_snprintf_s(buff, sizeof(buff), _TRUNCATE, "Missmatch: alg=%d, dgst=%d, flags=%d (%x)",
-							t->Algorithm, t->DigestType, p->Flags);
-						MessageBox(NULL, buff, "DNS Verify Missmatch", MB_OK);
 						break;
 					}
 				}
