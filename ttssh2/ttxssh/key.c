@@ -454,6 +454,9 @@ char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 	case SSH_FP_SHA1:
 		md = EVP_sha1();
 		break;
+	case SSH_FP_SHA256:
+		md = EVP_sha256();
+		break;
 	default:
 		md = EVP_md5();
 	}

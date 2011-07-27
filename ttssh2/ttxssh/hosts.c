@@ -1670,21 +1670,27 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	switch (key->type) {
 	case KEY_RSA:
 		hostkey_alg = SSHFP_KEY_RSA;
+		hostkey_dtype = SSHFP_HASH_SHA1;
 		break;
 	case KEY_DSA:
 		hostkey_alg = SSHFP_KEY_DSA;
+		hostkey_dtype = SSHFP_HASH_SHA1;
 		break;
-	// XXX KEY_ECDSA
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		hostkey_alg = SSHFP_KEY_ECDSA;
+		hostkey_dtype = SSHFP_HASH_SHA256;
+		break;
 	default: // Un-supported algorighm
 		hostkey_alg = SSHFP_KEY_RESERVED;
+		hostkey_dtype = SSHFP_HASH_RESERVED;
 	}
 
 	if (hostkey_alg) {
-		hostkey_dtype = SSHFP_HASH_SHA1;
-		hostkey_digest = key_fingerprint_raw(key, SSH_FP_SHA1, &hostkey_dlen);
+		hostkey_digest = key_fingerprint_raw(key, hostkey_dtype, &hostkey_dlen);
 	}
 	else {
-		hostkey_dtype = SSHFP_HASH_RESERVED;
 		hostkey_digest = NULL;
 	}
 
