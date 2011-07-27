@@ -165,6 +165,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"exec")==0) *WordId = RsvExec;
 		else if (_stricmp(Str,"execcmnd")==0) *WordId = RsvExecCmnd;
 		else if (_stricmp(Str,"exit")==0) *WordId = RsvExit;
+		else if (_stricmp(Str,"expandenv")==0) *WordId = RsvExpandEnv;
 		break;
 	case 'f':
 		if (_stricmp(Str,"fileclose")==0) *WordId = RsvFileClose;

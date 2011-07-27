@@ -974,6 +974,36 @@ WORD TTLExit()
 	return ErrSyntax;
 }
 
+WORD TTLExpandEnv()
+{
+	WORD Err, VarId;
+	TStrVal deststr, srcptr;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	if (Err!=0) return Err;
+
+	if (CheckParameterGiven()) { // expandenv strvar strval
+		GetStrVal(srcptr,&Err);
+		if ((Err==0) && (GetFirstChar()!=0))
+			Err = ErrSyntax;
+		if (Err!=0) {
+			return Err;
+		}
+
+		// ファイルパスに環境変数が含まれているならば、展開する。
+		ExpandEnvironmentStrings(srcptr, deststr, MaxStrLen);
+		SetStrVal(VarId, deststr);
+	}
+	else { // expandenv strvar
+		// ファイルパスに環境変数が含まれているならば、展開する。
+		ExpandEnvironmentStrings(StrVarPtr(VarId), deststr, MaxStrLen);
+		SetStrVal(VarId, deststr);
+	}
+
+	return Err;
+}
+
 WORD TTLFileClose()
 {
 	WORD Err;
@@ -1973,9 +2003,6 @@ WORD TTLGetPassword()
 	if (Str2[0]==0) return Err;
 
 	GetAbsPath(Str,sizeof(Str));
-
-	// ファイルパスに環境変数が含まれているならば、展開する。
-	ExpandEnvironmentStrings(Str, filepath, sizeof(filepath));
 
 	GetPrivateProfileString("Password",Str2,"",
 	                        Temp,sizeof(Temp), filepath);
@@ -4722,6 +4749,8 @@ int ExecCmnd()
 			Err = TTLExecCmnd(); break;
 		case RsvExit:
 			Err = TTLExit(); break;
+		case RsvExpandEnv:
+			Err = TTLExpandEnv(); break;
 		case RsvFileClose:
 			Err = TTLFileClose(); break;
 		case RsvFileConcat:

@@ -188,6 +188,7 @@
 #define HlpMacroCommandExec             92019
 #define HlpMacroCommandExeccmnd         92020
 #define HlpMacroCommandExit             92021
+#define HlpMacroCommandExpandenv        92194
 #define HlpMacroCommandFileclose        92022
 #define HlpMacroCommandFileconcat       92023
 #define HlpMacroCommandFilecopy         92024

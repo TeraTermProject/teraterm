@@ -179,6 +179,7 @@ HlpMacroCommandEndUntil=html\macro\command\until.html
 HlpMacroCommandExec=html\macro\command\exec.html
 HlpMacroCommandExeccmnd=html\macro\command\execcmnd.html
 HlpMacroCommandExit=html\macro\command\exit.html
+HlpMacroCommandExpandenv=html\macro\command\expandenv.html
 HlpMacroCommandFileclose=html\macro\command\fileclose.html
 HlpMacroCommandFileconcat=html\macro\command\fileconcat.html
 HlpMacroCommandFilecopy=html\macro\command\filecopy.html

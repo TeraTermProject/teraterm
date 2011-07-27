@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>expandenv</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>expandenv</h1>
+
+<p>
+Expands environment variables.
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+expandenv &lt;strvar&gt; [&lt;strval&gt;]
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string valiable &lt;strvar&gt;</dt>
+	<!--dd>‘æ2ˆø”‚ð“n‚³‚È‚¢ê‡‚ÍA‚±‚Ìˆø”‚ÅŽw’è‚µ‚½•¶Žš—ñ‚ª“WŠJ‚³‚ê‚éB<br />
+	    ‘æ2ˆø”‚ð“n‚µ‚½ê‡‚ÍA‚±‚Ìˆø”‚Í–³Ž‹‚³‚ê‚éB</dd-->
+	
+	<dt class="macro">string &lt;strval&gt; (optional)</dt>
+	<!--dd>‚±‚Ìˆø”‚ðŽw’è‚µ‚½ê‡A‚±‚Ìˆø”‚ÅŽw’è‚µ‚½•¶Žš—ñ‚ª“WŠJ‚³‚ê‚éB</dd-->
+
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System valiable &lt;result&gt;</dt>
+	<!--dd>“WŠJŒã‚Ì•¶Žš—ñ‚ªŠi”[‚³‚ê‚éB</dd-->
+	
+</dl>
+
+<h2>Remarks</h2>
+
+<p>
+<!-- “n‚³‚ê‚½•¶Žš—ñ‚ÉŠÜ‚Ü‚ê‚éŠÂ‹«•Ï”‚ð“WŠJ‚·‚éB -->
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+str = "%WINDIR%\notepad.exe"
+expandenv str
+messagebox str "env"
+</pre>
+
+<pre class="macro-example">
+expandenv str "%WINDIR%\notepad.exe"
+messagebox str "env"
+</pre>
+
+</body>
+</html>

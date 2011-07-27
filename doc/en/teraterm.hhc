@@ -1019,6 +1019,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="expandenv">
+					<param name="Local" value="html\macro\command\expandenv.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="int2str">
 					<param name="Local" value="html\macro\command\int2str.html">
 					<param name="ImageNumber" value="11">
