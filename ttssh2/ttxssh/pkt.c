@@ -185,9 +185,9 @@ int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen)
 					SSH2_send_kexinit(pvar);
 				}
 
- 			} else {
- 				// reset flag to re-read server ID (2008.1.24 yutaka)
- 				pvar->pkt_state.seen_newline = 0;
+			} else {
+				// reset flag to re-read server ID (2008.1.24 yutaka)
+				pvar->pkt_state.seen_newline = 0;
 
 			}
 
@@ -245,7 +245,7 @@ int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen)
 				// 4MBを超える巨大なパケットが届いたら、異常終了する。
 				// 実際にはデータ化けで復号失敗時に、誤認識することが多い。
 				UTIL_get_lang_msg("MSG_PKT_OVERSIZED_ERROR", pvar,
-								  "Oversized packet received from server; connection will close.");
+				                  "Oversized packet received from server; connection will close.");
 				notify_fatal_error(pvar, pvar->ts->UIMsg);
 			} else {
 				int amount_read =
