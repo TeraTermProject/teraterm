@@ -856,7 +856,9 @@ void CRYPT_set_random_data(PTInstVar pvar, unsigned char FAR * buf,
 
 void CRYPT_initialize_random_numbers(PTInstVar pvar)
 {
-	RAND_screen();
+	// ŒÄ‚Î‚È‚­‚Ä‚à‚æ‚¢‚ç‚µ‚¢
+	// http://www.mail-archive.com/openssl-users@openssl.org/msg60484.html
+	//RAND_screen();
 }
 
 static BIGNUM FAR *get_bignum(unsigned char FAR * bytes)
