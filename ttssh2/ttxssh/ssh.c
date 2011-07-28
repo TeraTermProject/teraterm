@@ -1704,7 +1704,7 @@ static void init_protocol(PTInstVar pvar)
 
 BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 {
-	static const char prefix[] = "Received server prologue string: ";
+	static char prefix[64];
 
 	// initialize SSH2 memory dump (2005.3.7 yutaka)
 	init_memdump();
@@ -1713,15 +1713,16 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 	if (ID_len <= 0) {
 		return FALSE;
 	} else {
-		int buf_len = ID_len + NUM_ELEM(prefix);
-		char FAR *buf = (char FAR *) malloc(buf_len);
+		int buf_len;
+		char FAR *buf;
 
+		strncpy_s(prefix, sizeof(prefix), "Received server identification string: ", _TRUNCATE);
+		buf_len = strlen(prefix) + ID_len + 1;
+		buf = (char FAR *) malloc(buf_len);
 		strncpy_s(buf, buf_len, prefix, _TRUNCATE);
 		strncat_s(buf, buf_len, ID, _TRUNCATE);
 		chop_newlines(buf);
-
 		notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
-
 		free(buf);
 
 
@@ -1788,6 +1789,14 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 				} else {
 					// 改行コードの除去 (2004.8.4 yutaka)
 					pvar->client_version_string[--TTSSH_ID_len] = 0;
+
+					strncpy_s(prefix, sizeof(prefix), "Sent client identification string: ", _TRUNCATE);
+					buf_len = strlen(prefix) + strlen(pvar->client_version_string) + 1;
+					buf = (char FAR *) malloc(buf_len);
+					strncpy_s(buf, buf_len, prefix, _TRUNCATE);
+					strncat_s(buf, buf_len, pvar->client_version_string, _TRUNCATE);
+					notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+					free(buf);
 
 					push_memdump("server ID", NULL, pvar->server_version_string, strlen(pvar->server_version_string));
 					push_memdump("client ID", NULL, pvar->client_version_string, strlen(pvar->client_version_string));
@@ -4431,6 +4440,7 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	buffer_t *msg;
 	unsigned char *outmsg;
 	int len, i;
+	char log[1024];
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -4455,6 +4465,48 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	}
 	buffer_put_char(msg, 0);
 	buffer_put_int(msg, 0);
+
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: KEX algorithm: %s",
+	            myproposal[0]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: server host key algorithm: %s",
+	            myproposal[1]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: encryption algorithm client to server: %s",
+	            myproposal[2]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: encryption algorithm server to client: %s",
+	            myproposal[3]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: MAC algorithm client to server: %s",
+	            myproposal[4]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: MAC algorithm server to client: %s",
+	            myproposal[5]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: compression algorithm client to server: %s",
+	            myproposal[6]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(log, sizeof(log), _TRUNCATE,
+	            "client proposal: compression algorithm server to client: %s",
+	            myproposal[7]);
+	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
+
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_KEXINIT, len);
@@ -4713,6 +4765,12 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// get rid of Cookie length
 	offset += SSH2_COOKIE_LENGTH;
 
+
+	// KEXの決定。判定順をmyproposal[PROPOSAL_KEX_ALGS]の並びと合わせること。
+	// サーバは、クライアントから送られてきた myproposal[PROPOSAL_KEX_ALGS] のカンマ文字列のうち、
+	// 先頭から自分の myproposal[] と比較を行い、最初にマッチしたものがKEXアルゴリズムとして
+	// 選択される。(2004.10.30 yutaka)
+
 	// キー交換アルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
@@ -4722,10 +4780,9 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	buf[i] = '\0'; // null-terminate
 	offset += size;
 
-	// KEXの決定。判定順をmyproposal[PROPOSAL_KEX_ALGS]の並びと合わせること。
-	// サーバは、クライアントから送られてきた myproposal[PROPOSAL_KEX_ALGS] のカンマ文字列のうち、
-	// 先頭から自分の myproposal[] と比較を行い、最初にマッチしたものがKEXアルゴリズムとして
-	// 選択される。(2004.10.30 yutaka)
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: KEX algorithm: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->kex_type = choose_SSH2_kex_algorithm(buf, myproposal[PROPOSAL_KEX_ALGS]);
 	if (pvar->kex_type == KEX_DH_UNKNOWN) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown KEX algorithm: ", _TRUNCATE);
@@ -4734,8 +4791,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s", get_kex_algorithm_name(pvar->kex_type));
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// ホストキーアルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
@@ -4745,6 +4800,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: server host key algorithm: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->hostkey_type = KEY_UNSPEC;
 	choose_SSH2_proposal(buf, myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS], str_keytype, sizeof(str_keytype));
 	if (strlen(str_keytype) == 0) { // not match
@@ -4761,9 +4820,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "server host key algorithm: %s", str_keytype);
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// クライアント -> サーバ暗号アルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
@@ -4773,6 +4829,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: encryption algorithm client to server: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->ctos_cipher = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
 	if (pvar->ctos_cipher == SSH_CIPHER_NONE) {
 		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(ctos): ", _TRUNCATE);
@@ -4781,10 +4841,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "encryption algorithm client to server: %s",
-	            get_cipher_string(pvar->ctos_cipher));
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// サーバ -> クライアント暗号アルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
@@ -4794,6 +4850,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: encryption algorithm server to client: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->stoc_cipher = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
 	if (pvar->stoc_cipher == SSH_CIPHER_NONE) {
 		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(stoc): ", _TRUNCATE);
@@ -4802,10 +4862,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "encryption algorithm server to client: %s",
-	            get_cipher_string(pvar->stoc_cipher));
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// HMAC(Hash Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
 	size = get_payload_uint32(pvar, offset);
@@ -4815,6 +4871,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: MAC algorithm client to server: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->ctos_hmac = choose_SSH2_hmac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
 	if (pvar->ctos_hmac == HMAC_UNKNOWN) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown HMAC algorithm: ", _TRUNCATE);
@@ -4823,10 +4883,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "MAC algorithm client to server: %s",
-	            get_ssh2_mac_name(pvar->ctos_hmac));
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
@@ -4835,6 +4891,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: MAC algorithm server to client: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->stoc_hmac = choose_SSH2_hmac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
 	if (pvar->stoc_hmac == HMAC_UNKNOWN) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown HMAC algorithm: ", _TRUNCATE);
@@ -4843,10 +4903,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "MAC algorithm server to client: %s",
-	            get_ssh2_mac_name(pvar->stoc_hmac));
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	// 圧縮アルゴリズムの決定
 	// pvar->ssh_state.compressing = FALSE; として下記メンバを使用する。
@@ -4858,6 +4914,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: compression algorithm client to server: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->ctos_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_CTOS]);
 	if (pvar->ctos_compression == COMP_UNKNOWN) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
@@ -4866,10 +4926,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "compression algorithm client to server: %s",
-	            get_ssh2_comp_name(pvar->ctos_compression));
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
@@ -4878,6 +4934,10 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buf[i] = 0;
 	offset += size;
+
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "server proposal: compression algorithm server to client: %s", buf);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+
 	pvar->stoc_compression = choose_SSH2_compression_algorithm(buf, myproposal[PROPOSAL_COMP_ALGS_STOC]);
 	if (pvar->stoc_compression == COMP_UNKNOWN) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown Packet Compression algorithm: ", _TRUNCATE);
@@ -4886,10 +4946,47 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
+
+	// 決定
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KEX algorithm: %s",
+	            get_kex_algorithm_name(pvar->kex_type));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "server host key algorithm: %s",
+	            get_ssh_keytype_name(pvar->hostkey_type));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "encryption algorithm client to server: %s",
+	            get_cipher_string(pvar->ctos_cipher));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "encryption algorithm server to client: %s",
+	            get_cipher_string(pvar->stoc_cipher));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "MAC algorithm client to server: %s",
+	            get_ssh2_mac_name(pvar->ctos_hmac));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "MAC algorithm server to client: %s",
+	            get_ssh2_mac_name(pvar->stoc_hmac));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "compression algorithm client to server: %s",
+	            get_ssh2_comp_name(pvar->ctos_compression));
+	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 	            "compression algorithm server to client: %s",
 	            get_ssh2_comp_name(pvar->stoc_compression));
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+
 
 	// we_needの決定 (2004.11.6 yutaka)
 	// キー再作成の場合はスキップする。
