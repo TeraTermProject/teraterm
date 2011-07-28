@@ -46,6 +46,7 @@ int get_OPENFILENAME_SIZE();
 int KanjiCode2List(int lang, int kcode);
 int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
+char *mctimelocal();
 
 #ifdef __cplusplus
 }

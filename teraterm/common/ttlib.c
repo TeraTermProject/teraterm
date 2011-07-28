@@ -862,3 +862,26 @@ int KanjiCodeTranslate(int lang, int kcode)
 	kcode--;
 	return Table[lang][kcode];
 }
+
+char *mctimelocal()
+{
+	SYSTEMTIME LocalTime;
+	static char strtime[29];
+	char week[][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+	char month[][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+	GetLocalTime(&LocalTime);
+	_snprintf_s(strtime, sizeof(strtime), _TRUNCATE,
+	            "%s %s %02d %02d:%02d:%02d.%03d %04d",
+	            week[LocalTime.wDayOfWeek],
+	            month[LocalTime.wMonth-1],
+	            LocalTime.wDay,
+	            LocalTime.wHour,
+	            LocalTime.wMinute,
+	            LocalTime.wSecond,
+	            LocalTime.wMilliseconds,
+	            LocalTime.wYear);
+
+	return strtime;
+}

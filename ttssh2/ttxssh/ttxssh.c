@@ -892,25 +892,10 @@ void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level)
 		             _S_IREAD | _S_IWRITE);
 
 		if (file >= 0) {
-			SYSTEMTIME LocalTime;
-			char strtime[29];
-			char week[][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-			char month[][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-			                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+			char *strtime = mctimelocal();
 			DWORD processid;
 			char tmp[26];
 
-			GetLocalTime(&LocalTime);
-			_snprintf_s(strtime, sizeof(strtime), _TRUNCATE,
-			            "%s %s %02d %02d:%02d:%02d.%03d %04d",
-			            week[LocalTime.wDayOfWeek],
-			            month[LocalTime.wMonth-1],
-			            LocalTime.wDay,
-			            LocalTime.wHour,
-			            LocalTime.wMinute,
-			            LocalTime.wSecond,
-			            LocalTime.wMilliseconds,
-			            LocalTime.wYear);
 			_write(file, strtime, strlen(strtime));
 			GetWindowThreadProcessId(pvar->cv->HWin, &processid);
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, " [%lu] ",processid);
