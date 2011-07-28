@@ -14,7 +14,7 @@
 <h1>expandenv</h1>
 
 <p>
-Expands environment variables.
+Expands environment-variable strings.
 </p>
 
 <h2>Format</h2>
@@ -27,11 +27,11 @@ expandenv &lt;strvar&gt; [&lt;strval&gt;]
 
 <dl>
 	<dt class="macro">string valiable &lt;strvar&gt;</dt>
-	<!--dd>第2引数を渡さない場合は、この引数で指定した文字列が展開される。<br />
-	    第2引数を渡した場合は、この引数は無視される。</dd-->
+	<dd>The specified string is expanded.<br />
+	    When the second argument(&lt;strval&gt;) is given, the result expanding the argument stores into the string valiable &lt;strvar&gt;.</dd>
 	
 	<dt class="macro">string &lt;strval&gt; (optional)</dt>
-	<!--dd>この引数を指定した場合、この引数で指定した文字列が展開される。</dd-->
+	<dd>When this argument is given,  the result expanding the argument stores into the string valiable &lt;strvar&gt;.</dd>
 
 </dl>
 
@@ -39,27 +39,32 @@ expandenv &lt;strvar&gt; [&lt;strval&gt;]
 
 <dl>
 	<dt class="macro">System valiable &lt;result&gt;</dt>
-	<!--dd>展開後の文字列が格納される。</dd-->
+	<dd>The expanded string stores.</dd>
 	
 </dl>
 
 <h2>Remarks</h2>
 
 <p>
-<!-- 渡された文字列に含まれる環境変数を展開する。 -->
+The expandenv command expands one or more environment-variable strings(%variableName%) and replaces them with the values for the current user.
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-str = "%WINDIR%\notepad.exe"
+str = &quot;%WINDIR%\notepad.exe&quot;
 expandenv str
-messagebox str "env"
+messagebox str &quot;env&quot;    ; C:\WINDOWS\notepad.exe
 </pre>
 
 <pre class="macro-example">
-expandenv str "%WINDIR%\notepad.exe"
-messagebox str "env"
+expandenv str &quot;%WINDIR%\notepad.exe&quot;
+messagebox str &quot;env&quot;    ; C:\WINDOWS\notepad.exe
+</pre>
+
+<pre class="macro-example">
+expandenv str &quot;%test%\notepad.exe&quot;
+messagebox str &quot;env&quot;    ; %test%\notepad.exe
 </pre>
 
 </body>
