@@ -3530,8 +3530,11 @@ void XSequence(BYTE b)
 			XSequence(BEL);
 		}
 		else { /* Other character -- invalid sequence */
-			ParseMode = ModeFirst;
+			ICount = 0;
+			JustAfterESC = TRUE;
+			ParseMode = ModeESC;
 			XsParseMode = ModeXsFirst;
+			EscapeSequence(b);
 		}
 		break;
 	}
