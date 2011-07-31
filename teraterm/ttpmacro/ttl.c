@@ -1989,7 +1989,6 @@ WORD TTLGetPassword()
 	char Temp[512];
 	WORD VarId, Err;
 	int result = 0;  /* failure */
-	char filepath[1024];
 
 	Err = 0;
 	GetStrVal(Str,&Err);
@@ -2005,13 +2004,13 @@ WORD TTLGetPassword()
 	GetAbsPath(Str,sizeof(Str));
 
 	GetPrivateProfileString("Password",Str2,"",
-	                        Temp,sizeof(Temp), filepath);
+	                        Temp,sizeof(Temp), Str);
 	if (Temp[0]==0) // password not exist
 	{
 		OpenInpDlg(Temp2, Str2, "Enter password", "", TRUE);
 		if (Temp2[0]!=0) {
 			Encrypt(Temp2,Temp);
-			if (WritePrivateProfileString("Password",Str2,Temp, filepath) != 0) {
+			if (WritePrivateProfileString("Password",Str2,Temp, Str) != 0) {
 				result = 1;  /* success */
 			}
 		}
