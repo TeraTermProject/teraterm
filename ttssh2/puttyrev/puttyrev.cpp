@@ -28,6 +28,7 @@ void write_putty_version(char *path)
 	int i;
 	CString filename, buf, cs;
 	char revision[64] = {0};
+	char header_line[64], *p;
 
 	// PuTTYのバージョンを取得する。
 	filename = path;
@@ -54,11 +55,35 @@ void write_putty_version(char *path)
 close:
 	csf.Close();
 
-write:
-	// バージョンをヘッダに書き込む。
 	filename = path;
 	filename += "\\ttssh2\\ttxssh\\puttyversion.h";
 
+	// バージョンをチェックし、変更がなければ抜ける
+	ret = csf.Open(filename, CFile::modeRead);
+	if (ret == FALSE) {
+		goto write;
+	}
+
+	if (csf.ReadString(header_line, sizeof(header_line)) == NULL) {
+		csf.Close();
+		goto write;
+	}
+
+	if ( (p = strchr(header_line, '"')) == NULL ) {
+		csf.Close();
+		goto write;
+	}
+
+	p++;
+	if (strncmp(p, revision, strlen(p)-2) == 0) {
+		csf.Close();
+		goto end;
+	}
+
+	csf.Close();
+
+write:
+	// バージョンをヘッダに書き込む。
 	ret = csf.Open(filename, CFile::modeWrite | CFile::modeCreate);
 	if (ret == FALSE) {
 		goto end;
