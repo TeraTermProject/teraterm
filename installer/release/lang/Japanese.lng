@@ -519,12 +519,12 @@ MSG_READKEY_ERROR=SSH2秘密鍵の読み込みに失敗しました\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts 認証は標準の認証方式ではないため, 認証に失敗するかもしれません.\nRhosts 認証をTTSSH で使用するには, Rhosts 認証を標準に設定後TTSSH を再起動し, 接続前に設定メニューから"SSH 認証..." を選択して下さい.
 MSG_NOAUTHMETHOD_ERROR=サーバはTTSSH が提供する認証オプションをサポートしていません.\n接続は閉じられます.
 
-; dlg diff type
+; dlg diff key
 DLG_DIFFERENTKEY_TITLE=セキュリティ警告
 DLG_DIFFERENTKEY_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
 DLG_DIFFERENTKEY_WARNING2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_DIFFERENTKEY_FINGERPRINT=サーバ側のホスト鍵指紋:
-DLG_DIFFERENTKEY_ADD=既存の鍵を, 新しい鍵で上書きする(&R)
+DLG_DIFFERENTKEY_REPLACE=既存の鍵を, 新しい鍵で上書きする(&R)
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=セキュリティ警告
