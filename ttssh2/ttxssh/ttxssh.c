@@ -563,11 +563,9 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	WritePrivateProfileString("TTSSH", "ForwardAgentConfirm",
 	                          settings->ForwardAgentConfirm ? "1" : "0", fileName);
 
-/*
 	// ホスト鍵の DNS でのチェック (RFC 4255)
 	WritePrivateProfileString("TTSSH", "VerifyHostKeyDNS",
 	                          settings->VerifyHostKeyDNS ? "1" : "0", fileName);
- */
 }
 
 
