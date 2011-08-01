@@ -662,6 +662,13 @@ DLG_UNKNOWNHOST_WARNING2=known hostsリストのこのホストを追加して続行すると, 次回
 DLG_UNKNOWNHOST_FINGERPRINT=サーバ側のホスト鍵指紋:
 DLG_UNKNOWNHOST_ADD=このホストをknown hostsリストに追加する(&A)
 
+DLG_HOSTKEY_SSHFP_NOTFOUND=DNSで鍵指紋情報が見つかりませんでした。
+DLG_HOSTKEY_SSHFP_MATCH=DNSDNSで鍵指紋情報が見つかり、ホスト鍵の鍵指紋と一致しました。
+DLG_HOSTKEY_SSHFP_MISMATCH=DNSで鍵指紋情報が見つかりましたが、ホスト鍵の鍵指紋と一致しませんでした。
+DLG_HOSTKEY_SSHFP_DIFFTYPE=DNSで鍵指紋情報が見つかりましたが、ホスト鍵と鍵の種類が一致しませんでした。
+DLG_HOSTKEY_DNSSEC_NG=DNSの鍵指紋情報はDNSSECで認証されて*いません*。
+DLG_HOSTKEY_DNSSEC_OK=DNSの鍵指紋情報はDNSSECで認証されています。
+
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s暗号化エラー(1): bytes %d (%d)
 MSG_ENCRYPT_ERROR2=%s暗号化エラー(2)
