@@ -178,6 +178,8 @@
 #define IDC_KEYGEN_PROGRESS_LABEL       1107
 #define IDC_PROGBAR                     1108
 #define IDC_PROGTIME                    1109
+#define IDC_HOSTSSHFPCHECK              1110
+#define IDC_HOSTSSHFPDNSSEC             1111
 #define IDC_SSHUSEPASSWORD              1201
 #define IDC_SSHUSERSA                   1202
 #define IDC_SSHFWDREMOTETOLOCAL         1202

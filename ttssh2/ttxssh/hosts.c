@@ -53,6 +53,23 @@ See LICENSE.TXT for the license.
 
 #include <windns.h>
 
+#define DNS_TYPE_SSHFP	44
+typedef struct {
+	BYTE Algorithm;
+	BYTE DigestType;
+	BYTE Digest[1];
+} DNS_SSHFP_DATA, *PDNS_SSHFP_DATA;
+enum verifydns_result {
+	DNS_VERIFY_NONE,
+	DNS_VERIFY_NOTFOUND,
+	DNS_VERIFY_MATCH,
+	DNS_VERIFY_MISMATCH,
+	DNS_VERIFY_DIFFERENTTYPE,
+	DNS_VERIFY_AUTH_MATCH,
+	DNS_VERIFY_AUTH_MISMATCH,
+	DNS_VERIFY_AUTH_DIFFERENTTYPE
+};
+
 static HFONT DlgHostsAddFont;
 static HFONT DlgHostsReplaceFont;
 
@@ -1309,6 +1326,43 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
 
+		switch (pvar->dns_key_check) {
+		case DNS_VERIFY_NOTFOUND:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "SSHFP RR not found.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_MATCH:
+		case DNS_VERIFY_AUTH_MATCH:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "SSHFP RR found and match.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_MISMATCH:
+		case DNS_VERIFY_AUTH_MISMATCH:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "SSHFP RR found but not match.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_DIFFERENTTYPE:
+		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "SSHFP RR found but different type.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		}
+
+		switch (pvar->dns_key_check) {
+		case DNS_VERIFY_MATCH:
+		case DNS_VERIFY_MISMATCH:
+		case DNS_VERIFY_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "SSHFP RR is *not* authenticated by DNSSEC.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_AUTH_MATCH:
+		case DNS_VERIFY_AUTH_MISMATCH:
+		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "SSHFP RR is authenticated by DNSSEC.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			break;
+		}
+
 		init_hosts_dlg(pvar, dlg);
 
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
@@ -1416,6 +1470,43 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
 
+		switch (pvar->dns_key_check) {
+		case DNS_VERIFY_NOTFOUND:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "SSHFP RR not found.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_MATCH:
+		case DNS_VERIFY_AUTH_MATCH:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "SSHFP RR found and match.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_MISMATCH:
+		case DNS_VERIFY_AUTH_MISMATCH:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "SSHFP RR found but not match.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_DIFFERENTTYPE:
+		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "SSHFP RR found but different type.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		}
+
+		switch (pvar->dns_key_check) {
+		case DNS_VERIFY_MATCH:
+		case DNS_VERIFY_MISMATCH:
+		case DNS_VERIFY_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "SSHFP RR is *not* authenticated by DNSSEC.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_AUTH_MATCH:
+		case DNS_VERIFY_AUTH_MISMATCH:
+		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "SSHFP RR is authenticated by DNSSEC.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			break;
+		}
+
 		init_hosts_dlg(pvar, dlg);
 
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
@@ -1520,6 +1611,43 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+
+		switch (pvar->dns_key_check) {
+		case DNS_VERIFY_NOTFOUND:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "SSHFP RR not found.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_MATCH:
+		case DNS_VERIFY_AUTH_MATCH:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "SSHFP RR found and match.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_MISMATCH:
+		case DNS_VERIFY_AUTH_MISMATCH:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "SSHFP RR found but not match.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_DIFFERENTTYPE:
+		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "SSHFP RR found but different type.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			break;
+		}
+
+		switch (pvar->dns_key_check) {
+		case DNS_VERIFY_MATCH:
+		case DNS_VERIFY_MISMATCH:
+		case DNS_VERIFY_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "SSHFP RR is *not* authenticated by DNSSEC.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			break;
+		case DNS_VERIFY_AUTH_MATCH:
+		case DNS_VERIFY_AUTH_MISMATCH:
+		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "SSHFP RR is authenticated by DNSSEC.");
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			break;
+		}
 
 		init_hosts_dlg(pvar, dlg);
 
@@ -1641,22 +1769,6 @@ int is_numeric_hostname(const char *hostname)
 	return 0;
 }
 
-#define DNS_TYPE_SSHFP	44
-typedef struct {
-	BYTE Algorithm;
-	BYTE DigestType;
-	BYTE Digest[1];
-} DNS_SSHFP_DATA, *PDNS_SSHFP_DATA;
-enum verifydns_result {
-	DNS_VERIFY_NONE,
-	DNS_VERIFY_MATCH,
-	DNS_VERIFY_MISMATCH,
-	DNS_VERIFY_DIFFERENTTYPE,
-	DNS_VERIFY_AUTH_MATCH,
-	DNS_VERIFY_AUTH_MISMATCH,
-	DNS_VERIFY_AUTH_DIFFERENTTYPE
-};
-
 int verify_hostkey_dns(char FAR *hostname, Key *key)
 {
 	DNS_STATUS status;
@@ -1664,7 +1776,7 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	PDNS_SSHFP_DATA t;
 	int hostkey_alg, hostkey_dtype, hostkey_dlen;
 	BYTE *hostkey_digest;
-	int found = DNS_VERIFY_NONE;
+	int found = DNS_VERIFY_NOTFOUND;
 
 	switch (key->type) {
 	case KEY_RSA:
@@ -1728,7 +1840,9 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 //
 BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key)
 {
-	int found_different_key = 0, found_different_type_key = 0, dns_sshfp_check = 0;
+	int found_different_key = 0, found_different_type_key = 0;
+
+	pvar->dns_key_check = DNS_VERIFY_NONE;
 
 	// すでに known_hosts ファイルからホスト公開鍵を読み込んでいるなら、それと比較する。
 	if (pvar->hosts_state.prefetched_hostname != NULL
@@ -1806,7 +1920,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	}
 
 	if (pvar->settings.VerifyHostKeyDNS && !is_numeric_hostname(hostname)) {
-		dns_sshfp_check = verify_hostkey_dns(hostname, key);
+		pvar->dns_key_check = verify_hostkey_dns(hostname, key);
 	}
 
 	// known_hostsダイアログは同期的に表示させ、この時点においてユーザに確認

@@ -273,6 +273,8 @@ typedef struct _TInstVar {
 	BOOL nocheck_known_hosts;
 
 	EC_KEY *ecdh_client_key;
+
+	int dns_key_check;
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5
