@@ -1370,6 +1370,8 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
@@ -1514,6 +1516,8 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsReplaceFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
@@ -1656,6 +1660,8 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
