@@ -15,6 +15,7 @@
 #include "vtdisp.h"
 
 #include <locale.h>
+#include<olectl.h>
 
 #define CurWidth 2
 
@@ -636,6 +637,48 @@ void BGGetWallpaperInfo(WallpaperInfo *wi)
   RegCloseKey(hKey);
 }
 
+// .bmp以外の画像ファイルを読む。
+// 壁紙が .bmp 以外のファイルになっていた場合への対処。
+// (2011.8.3 yutaka)
+// cf. http://www.geocities.jp/ccfjd821/purogu/wpe-ji9.html
+static HBITMAP GetBitmapHandle(char *File)
+{  
+	OLE_HANDLE hOle = 0;
+	IStream *iStream=NULL;
+	IPicture *iPicture;
+	HGLOBAL hMem;
+	LPVOID pvData;
+	DWORD nReadByte=0,nFileSize;
+	HANDLE hFile;
+	short type;
+	HBITMAP hBitmap = NULL;
+
+	hFile=CreateFile(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+	nFileSize=GetFileSize(hFile,NULL);
+	hMem=GlobalAlloc(GMEM_MOVEABLE,nFileSize);
+	pvData=GlobalLock(hMem);
+
+	ReadFile(hFile,pvData,nFileSize,&nReadByte,NULL);
+
+	GlobalUnlock(hMem);
+	CloseHandle(hFile);
+
+	CreateStreamOnHGlobal(hMem,TRUE,&iStream);
+
+	OleLoadPicture(iStream,nFileSize,FALSE,&IID_IPicture,(LPVOID*)&iPicture);
+
+	iStream->lpVtbl->Release((IStream *)iPicture);
+
+	iPicture->lpVtbl->get_Type(iPicture,&type);
+	if(type==PICTYPE_BITMAP){
+		iPicture->lpVtbl->get_Handle(iPicture,&hOle);
+	}
+
+	hBitmap=(HBITMAP)hOle;
+
+	return (hBitmap);
+}
+
 void BGPreloadWallpaper(BGSrc *src)
 {
   HBITMAP       hbm;
@@ -645,10 +688,13 @@ void BGPreloadWallpaper(BGSrc *src)
 
   //壁紙を読み込み
   //LR_CREATEDIBSECTION を指定するのがコツ
-  if(wi.pattern == BG_STRETCH)
+  if (wi.pattern == BG_STRETCH) {
     hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-  else
-    hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+	// TODO: 画像を画面いっぱいに拡大するには、どうしたらよいか？
+  } else {
+    //hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+	hbm = GetBitmapHandle(wi.filename);
+  }
 
   //壁紙DCを作る
   if(hbm)
@@ -661,6 +707,7 @@ void BGPreloadWallpaper(BGSrc *src)
     src->width   = bm.bmWidth;
     src->height  = bm.bmHeight;
     src->pattern = wi.pattern;
+
   }else{
     src->hdc = NULL;
   }
