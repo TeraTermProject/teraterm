@@ -63,5 +63,29 @@ waitrecv &lt;sub-string&gt; &lt;len&gt; &lt;pos&gt;
  </tr>
 </table>
 
+
+<h2>ó·</h2>
+
+<pre class="macro-example">
+; Every byte is shown in hexadecimal
+setdebug 2
+waitrecv '43 0D'  2 1
+setdebug 0
+
+; In this mode non printable characters are shown as control keys e.g. ^A = 1, ^B = 2 etc.
+setdebug 1
+waitrecv 'C^M' 2 1
+setdebug 0
+
+; Normal mode
+setdebug 0
+waitrecv 'C'#13 2 1
+</pre>
+
+<h2>éQè∆</h2>
+
+<a href="setdebug.html">setdebug</a><br>
+<a href="wait.html">wait</a><br>
+
 </body>
 </html>
