@@ -1184,6 +1184,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	PTInstVar pvar;
 	LOGFONT logfont;
 	HFONT font;
+	BOOL result;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1225,11 +1226,15 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK:
 
-			if (DlgFwdEditFont != NULL) {
-				DeleteObject(DlgFwdEditFont);
+			result = end_fwd_edit_dlg(closure->pvar, closure->spec, dlg);
+
+			if (result) {
+				if (DlgFwdEditFont != NULL) {
+					DeleteObject(DlgFwdEditFont);
+				}
 			}
 
-			return end_fwd_edit_dlg(closure->pvar, closure->spec, dlg);
+			return result;
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
