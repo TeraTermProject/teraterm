@@ -15,7 +15,7 @@
 #include "vtdisp.h"
 
 #include <locale.h>
-#include<olectl.h>
+#include <olectl.h>
 
 #define CurWidth 2
 
@@ -641,8 +641,9 @@ void BGGetWallpaperInfo(WallpaperInfo *wi)
 // 壁紙が .bmp 以外のファイルになっていた場合への対処。
 // (2011.8.3 yutaka)
 // cf. http://www.geocities.jp/ccfjd821/purogu/wpe-ji9.html
+// この関数は Windows 2000 未満の場合には呼んではいけない
 static HBITMAP GetBitmapHandle(char *File)
-{  
+{
 	OLE_HANDLE hOle = 0;
 	IStream *iStream=NULL;
 	IPicture *iPicture;
@@ -683,17 +684,31 @@ void BGPreloadWallpaper(BGSrc *src)
 {
   HBITMAP       hbm;
   WallpaperInfo wi;
+  OSVERSIONINFO osvi;
 
   BGGetWallpaperInfo(&wi);
 
   //壁紙を読み込み
   //LR_CREATEDIBSECTION を指定するのがコツ
-  if (wi.pattern == BG_STRETCH) {
-    hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-	// TODO: 画像を画面いっぱいに拡大するには、どうしたらよいか？
-  } else {
-    //hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
-	hbm = GetBitmapHandle(wi.filename);
+  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx(&osvi);
+  if (osvi.dwMajorVersion < 6) {
+    if (wi.pattern == BG_STRETCH) {
+      hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    }
+    else {
+      hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+    }
+  }
+  else {
+    if (wi.pattern == BG_STRETCH) {
+      hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+      // TODO: 画像を画面いっぱいに拡大するには、どうしたらよいか？
+    }
+    else {
+      //hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+      hbm = GetBitmapHandle(wi.filename);
+    }
   }
 
   //壁紙DCを作る
