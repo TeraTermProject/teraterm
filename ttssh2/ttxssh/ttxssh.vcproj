@@ -245,6 +245,14 @@
 			>
 		</File>
 		<File
+			RelativePath="dns.c"
+			>
+		</File>
+		<File
+			RelativePath="dns.h"
+			>
+		</File>
+		<File
 			RelativePath="fwd.c"
 			>
 		</File>

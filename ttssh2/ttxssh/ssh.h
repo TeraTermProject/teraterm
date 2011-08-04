@@ -479,19 +479,6 @@ enum fp_type {
 	SSH_FP_SHA256
 };
 
-enum sshfp_types {
-	SSHFP_KEY_RESERVED,
-	SSHFP_KEY_RSA,
-	SSHFP_KEY_DSA,
-	SSHFP_KEY_ECDSA
-};
-
-enum sshfp_hashes {
-	SSHFP_HASH_RESERVED,
-	SSHFP_HASH_SHA1,
-	SSHFP_HASH_SHA256
-};
-
 enum scp_dir {
 	TOREMOTE, FROMREMOTE,
 };

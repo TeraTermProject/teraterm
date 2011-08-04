@@ -38,6 +38,7 @@ See LICENSE.TXT for the license.
 #include "ssh.h"
 #include "key.h"
 #include "hosts.h"
+#include "dns.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -51,24 +52,6 @@ See LICENSE.TXT for the license.
 #include <direct.h>
 #include <memory.h>
 
-#include <windns.h>
-
-#define DNS_TYPE_SSHFP	44
-typedef struct {
-	BYTE Algorithm;
-	BYTE DigestType;
-	BYTE Digest[1];
-} DNS_SSHFP_DATA, *PDNS_SSHFP_DATA;
-enum verifydns_result {
-	DNS_VERIFY_NONE,
-	DNS_VERIFY_NOTFOUND,
-	DNS_VERIFY_MATCH,
-	DNS_VERIFY_MISMATCH,
-	DNS_VERIFY_DIFFERENTTYPE,
-	DNS_VERIFY_AUTH_MATCH,
-	DNS_VERIFY_AUTH_MISMATCH,
-	DNS_VERIFY_AUTH_DIFFERENTTYPE
-};
 
 static HFONT DlgHostsAddFont;
 static HFONT DlgHostsReplaceFont;
@@ -1753,90 +1736,6 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 		               cur_active != NULL ? cur_active : wnd,
 		               hosts_add2_dlg_proc, (LPARAM) pvar);
 	}
-}
-
-int is_numeric_hostname(const char *hostname)
-{
-	struct addrinfo hints, *ai;
-
-	if (hostname == NULL) {
-		return -1;
-	}
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_flags = AI_NUMERICHOST;
-
-	if (getaddrinfo(hostname, NULL, &hints, &ai) == 0) {
-		freeaddrinfo(ai);
-		return 1;
-	}
-
-	return 0;
-}
-
-int verify_hostkey_dns(char FAR *hostname, Key *key)
-{
-	DNS_STATUS status;
-	PDNS_RECORD rec, p;
-	PDNS_SSHFP_DATA t;
-	int hostkey_alg, hostkey_dtype, hostkey_dlen;
-	BYTE *hostkey_digest;
-	int found = DNS_VERIFY_NOTFOUND;
-
-	switch (key->type) {
-	case KEY_RSA:
-		hostkey_alg = SSHFP_KEY_RSA;
-		hostkey_dtype = SSHFP_HASH_SHA1;
-		break;
-	case KEY_DSA:
-		hostkey_alg = SSHFP_KEY_DSA;
-		hostkey_dtype = SSHFP_HASH_SHA1;
-		break;
-	case KEY_ECDSA256:
-	case KEY_ECDSA384:
-	case KEY_ECDSA521:
-		hostkey_alg = SSHFP_KEY_ECDSA;
-		hostkey_dtype = SSHFP_HASH_SHA256;
-		break;
-	default: // Un-supported algorithm
-		hostkey_alg = SSHFP_KEY_RESERVED;
-		hostkey_dtype = SSHFP_HASH_RESERVED;
-	}
-
-	if (hostkey_alg) {
-		hostkey_digest = key_fingerprint_raw(key, hostkey_dtype, &hostkey_dlen);
-	}
-	else {
-		hostkey_digest = NULL;
-	}
-
-	status = DnsQuery(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
-
-	if (status == 0) {
-		for (p=rec; p!=NULL; p=p->pNext) {
-			if (p->wType == DNS_TYPE_SSHFP) {
-				t = (PDNS_SSHFP_DATA)&(p->Data.Null);
-				if (t->Algorithm == hostkey_alg && t->DigestType == hostkey_dtype) {
-					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
-						found = DNS_VERIFY_MATCH;
-						break;
-					}
-					else {
-						found = DNS_VERIFY_MISMATCH;
-						break;
-					}
-				}
-				else {
-					found = DNS_VERIFY_DIFFERENTTYPE;
-				}
-			}
-		}
-	}
-
-	free(hostkey_digest);
-	DnsRecordListFree(rec, DnsFreeRecordList);
-	return found;
 }
 
 //
