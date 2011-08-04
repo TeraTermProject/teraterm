@@ -57,7 +57,6 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About TTSSH"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,106,263,50,14
     LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
     ICON            "",IDC_TTSSH_ICON,234,7,21,20
     LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
@@ -69,6 +68,7 @@ BEGIN
     LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,116,248,26
     LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,140,248,27
     EDITTEXT        IDC_ABOUTTEXT,6,171,248,87,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY
+    DEFPUSHBUTTON   "OK",IDOK,106,263,50,14
 END
 
 IDD_SSHAUTH DIALOGEX 0, 0, 309, 262

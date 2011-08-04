@@ -2495,7 +2495,8 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_about_dlg((PTInstVar) lParam, dlg);
-		return TRUE;
+		SetFocus(GetDlgItem(dlg, IDOK));
+		return FALSE;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
