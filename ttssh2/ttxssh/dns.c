@@ -119,7 +119,6 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 					}
 					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
 						found = DNS_VERIFY_MATCH;
-						break;
 					}
 					else {
 						found = DNS_VERIFY_MISMATCH;
@@ -127,7 +126,8 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 					}
 				}
 				else {
-					found = DNS_VERIFY_DIFFERENTTYPE;
+					if (found == DNS_VERIFY_NOTFOUND)
+						found = DNS_VERIFY_DIFFERENTTYPE;
 				}
 			}
 		}
