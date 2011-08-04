@@ -56,8 +56,8 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	DNS_STATUS status;
 	PDNS_RECORD rec, p;
 	PDNS_SSHFP_DATA t;
-	int hostkey_alg, hostkey_dtype, hostkey_dlen;
-	BYTE *hostkey_digest;
+	int hostkey_alg, hostkey_dtype, hostkey_dlen, fp_type;
+	BYTE *hostkey_digest = NULL;
 	int found = DNS_VERIFY_NOTFOUND;
 	OSVERSIONINFO osvi;
 
@@ -71,28 +71,17 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	switch (key->type) {
 	case KEY_RSA:
 		hostkey_alg = SSHFP_KEY_RSA;
-		hostkey_dtype = SSHFP_HASH_SHA1;
 		break;
 	case KEY_DSA:
 		hostkey_alg = SSHFP_KEY_DSA;
-		hostkey_dtype = SSHFP_HASH_SHA1;
 		break;
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 		hostkey_alg = SSHFP_KEY_ECDSA;
-		hostkey_dtype = SSHFP_HASH_SHA256;
 		break;
 	default: // Un-supported algorithm
 		hostkey_alg = SSHFP_KEY_RESERVED;
-		hostkey_dtype = SSHFP_HASH_RESERVED;
-	}
-
-	if (hostkey_alg) {
-		hostkey_digest = key_fingerprint_raw(key, hostkey_dtype, &hostkey_dlen);
-	}
-	else {
-		hostkey_digest = NULL;
 	}
 
 	status = DnsQuery(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
@@ -101,7 +90,33 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 		for (p=rec; p!=NULL; p=p->pNext) {
 			if (p->wType == DNS_TYPE_SSHFP) {
 				t = (PDNS_SSHFP_DATA)&(p->Data.Null);
-				if (t->Algorithm == hostkey_alg && t->DigestType == hostkey_dtype) {
+				if (t->Algorithm == SSHFP_KEY_RESERVED)
+					continue; // skip invalid record
+				if (t->Algorithm == hostkey_alg) {
+					if (hostkey_digest == NULL || t->DigestType != hostkey_dtype) {
+						switch (t->DigestType) {
+						case SSHFP_HASH_SHA1:
+							if (hostkey_alg != SSHFP_KEY_RSA && hostkey_alg != SSHFP_KEY_DSA)
+								fp_type = -1; // SHA1 does not allowed to use with ECDSA key
+							else
+								fp_type = SSH_FP_SHA1;
+							break;
+						case SSHFP_HASH_SHA256:
+							fp_type = SSH_FP_SHA256;
+							break;
+						default:
+							fp_type = -1;
+						}
+
+						if (fp_type == -1)
+							continue; // skip invalid/un-supported hash type.
+
+						hostkey_dtype = t->DigestType;
+						free(hostkey_digest);
+						hostkey_digest = key_fingerprint_raw(key, fp_type, &hostkey_dlen);
+						if (!hostkey_digest)
+							continue;
+					}
 					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
 						found = DNS_VERIFY_MATCH;
 						break;
