@@ -115,9 +115,16 @@ When below contents is be added in the .vimrc file, the IME status is off after 
 let &t_SI .= "\e[&lt;r"
 let &t_EI .= "\e[&lt;s\e[&lt;0t"
 let &t_te .= "\e[&lt;0t\e[&lt;s"
+
+set timeoutlen=100
 </pre>
 
 <p>
+<!--
+timeoutlen の設定は、挿入モードで ESC キーを押してから実際に挿入モードを抜ける(IME がオフになる)までの時間を調整しています。
+この値を短くすれば ESC キーを押してから IME がオフになるまでの時間が短くなりますが、 遅い回線を使っている時などにカーソルキーやファンクションキーが正しく働かないというトラブルが起きる事があります。<br>
+また ESC キーを押した後の遅れを減らすには"<a href="#AppESC">挿入モードでの ESC キーを押した後の待ちを無くす</a>"の設定を利用する方法もあります。
+-->
 NOTICE: You are recommended to configure the <a href="#AppESC">Delete wait time after ESC key is pushed in insert mode</a>.
 </p>
 
