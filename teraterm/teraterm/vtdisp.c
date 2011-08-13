@@ -632,6 +632,12 @@ void BGGetWallpaperInfo(WallpaperInfo *wi)
   else
   if(wi->pattern == 2)
     wi->pattern = BG_STRETCH;
+  else
+  if(wi->pattern == 10)
+	  wi->pattern = BG_FIT_HEIGHT;
+  else
+  if(wi->pattern == 6)
+	  wi->pattern = BG_FIT_WIDTH;
 
   //レジストリキーのクローズ
   RegCloseKey(hKey);
@@ -793,6 +799,7 @@ void BGPreloadWallpaper(BGSrc *src)
 	HBITMAP       hbm;
 	WallpaperInfo wi;
 	OSVERSIONINFO osvi;
+	int s_width, s_height;
 
 	BGGetWallpaperInfo(&wi);
 
@@ -816,15 +823,41 @@ void BGPreloadWallpaper(BGSrc *src)
 		}
 	}
 	else {
+		BITMAP bm;
+		float ratio;
+
 		hbm = GetBitmapHandle(wi.filename);
 
 #ifdef DEBUG_XP
-		wi.pattern = BG_STRETCH; 
+		//wi.pattern = BG_STRETCH; 
+		//wi.pattern = BG_FIT_WIDTH; 
+		//wi.pattern = BG_FIT_HEIGHT; 
 #endif
+
+		GetObject(hbm,sizeof(bm),&bm);
+		// 壁紙の設定に合わせて、画像のストレッチサイズを決める。
 		if (wi.pattern == BG_STRETCH) {
-			HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, CRTWidth, CRTHeight);
+			s_width = CRTWidth;
+			s_height = CRTHeight;
+		} else if (wi.pattern == BG_FIT_WIDTH) {
+			ratio = (float)CRTWidth / bm.bmWidth;
+			s_width = CRTWidth;
+			s_height = (int)(CRTHeight * ratio);
+		} else if (wi.pattern == BG_FIT_HEIGHT) {
+			ratio = (float)CRTHeight / bm.bmHeight;
+			s_width = (int)(CRTWidth * ratio);
+			s_height = CRTHeight;
+		} else {
+			s_width = 0;
+			s_height = 0;
+		}
+
+		if (s_width && s_height) {
+			HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, s_width, s_height);
 			DeleteObject(hbm);
 			hbm = newhbm;
+
+			wi.pattern = BG_STRETCH; 
 		}
 	}
 
