@@ -80,7 +80,7 @@ static int SRegionBottom;
 #define BG_SECTION "BG"
 
 typedef enum _BG_TYPE    {BG_COLOR = 0,BG_PICTURE,BG_WALLPAPER} BG_TYPE;
-typedef enum _BG_PATTERN {BG_STRETCH = 0,BG_TILE,BG_CENTER,BG_FIT_WIDTH,BG_FIT_HEIGHT,BG_AUTOFIT} BG_PATTERN;
+typedef enum _BG_PATTERN {BG_STRETCH = 0,BG_TILE,BG_CENTER,BG_FIT_WIDTH,BG_FIT_HEIGHT,BG_AUTOFIT,BG_AUTOFILL} BG_PATTERN;
 
 typedef struct _BGSrc
 {
@@ -627,17 +627,19 @@ void BGGetWallpaperInfo(WallpaperInfo *wi)
   if(tile)
     wi->pattern = BG_TILE;
   else
-  if(wi->pattern == 0)
+  if(wi->pattern == 0) // Center(中央に表示)
     wi->pattern = BG_CENTER;
   else
-  if(wi->pattern == 2)
+  if(wi->pattern == 2) // Stretch(画面に合わせて伸縮) アスペクト比は無視される
     wi->pattern = BG_STRETCH;
   else
-  if(wi->pattern == 10)
-	  wi->pattern = BG_FIT_HEIGHT;
+  if(wi->pattern == 10) // Fill(ページ横幅に合わせる) とあるが、和訳がおかしい
+                        // アスペクト比を維持して、はみ出してでも最大表示する
+    wi->pattern = BG_AUTOFILL;
   else
-  if(wi->pattern == 6)
-	  wi->pattern = BG_FIT_WIDTH;
+  if(wi->pattern == 6) // Fit(ページ縦幅に合わせる) とあるが、和訳がおかしい
+                       // アスペクト比を維持して、はみ出さないように最大表示する
+    wi->pattern = BG_AUTOFIT;
 
   //レジストリキーのクローズ
   RegCloseKey(hKey);
@@ -839,14 +841,34 @@ void BGPreloadWallpaper(BGSrc *src)
 		if (wi.pattern == BG_STRETCH) {
 			s_width = CRTWidth;
 			s_height = CRTHeight;
-		} else if (wi.pattern == BG_FIT_WIDTH) {
-			ratio = (float)CRTWidth / bm.bmWidth;
-			s_width = CRTWidth;
-			s_height = (int)(bm.bmHeight * ratio);
-		} else if (wi.pattern == BG_FIT_HEIGHT) {
-			ratio = (float)CRTHeight / bm.bmHeight;
-			s_width = (int)(bm.bmWidth * ratio);
-			s_height = CRTHeight;
+		} else if (wi.pattern == BG_AUTOFILL || wi.pattern == BG_AUTOFIT) {
+			if (wi.pattern == BG_AUTOFILL) {
+				if ((bm.bmHeight * CRTWidth) < (bm.bmWidth * CRTHeight)) {
+					wi.pattern = BG_FIT_HEIGHT;
+				}
+				else {
+					wi.pattern = BG_FIT_WIDTH;
+				}
+			}
+			if (wi.pattern == BG_AUTOFIT) {
+				if ((bm.bmHeight * CRTWidth) < (bm.bmWidth * CRTHeight)) {
+					wi.pattern = BG_FIT_WIDTH;
+				}
+				else {
+					wi.pattern = BG_FIT_HEIGHT;
+				}
+			}
+			if (wi.pattern == BG_FIT_WIDTH) {
+				ratio = (float)CRTWidth / bm.bmWidth;
+				s_width = CRTWidth;
+				s_height = (int)(bm.bmHeight * ratio);
+			}
+			else {
+				ratio = (float)CRTHeight / bm.bmHeight;
+				s_width = (int)(bm.bmWidth * ratio);
+				s_height = CRTHeight;
+			}
+
 		} else {
 			s_width = 0;
 			s_height = 0;
