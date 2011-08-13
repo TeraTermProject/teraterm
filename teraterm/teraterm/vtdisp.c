@@ -680,54 +680,171 @@ static HBITMAP GetBitmapHandle(char *File)
 	return (hBitmap);
 }
 
+// 線形補完法により比較的鮮明にビットマップを拡大・縮小する。
+// Windows 9x/NT対応
+// cf.http://katahiromz.web.fc2.com/win32/bilinear.html
+static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cyNew)
+{
+    INT ix, iy, x0, y0, x1, y1;
+    DWORD x, y;
+    BITMAP bm;
+    HBITMAP hbmNew;
+    HDC hdc;
+    BITMAPINFO bi;
+    BYTE *pbNewBits, *pbBits, *pbNewLine, *pbLine0, *pbLine1;
+    DWORD wfactor, hfactor;
+    DWORD ex0, ey0, ex1, ey1;
+    DWORD r0, g0, b0, a0, r1, g1, b1, a1;
+    DWORD c00, c01, c10, c11;
+    LONG nWidthBytes, nWidthBytesNew;
+    BOOL fAlpha;
+
+    if (GetObject(hbm, sizeof(BITMAP), &bm) == 0)
+        return NULL;
+
+    hbmNew = NULL;
+    hdc = CreateCompatibleDC(NULL);
+    if (hdc != NULL)
+    {
+        nWidthBytes = bm.bmWidth * 4;
+        ZeroMemory(&bi, sizeof(BITMAPINFOHEADER));
+        bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        bi.bmiHeader.biWidth = bm.bmWidth;
+        bi.bmiHeader.biHeight = bm.bmHeight;
+        bi.bmiHeader.biPlanes = 1;
+        bi.bmiHeader.biBitCount = 32;
+        fAlpha = (bm.bmBitsPixel == 32);
+        pbBits = (BYTE *)HeapAlloc(GetProcessHeap(), 0, 
+                                   nWidthBytes * bm.bmHeight);
+        if (pbBits == NULL)
+            return NULL;
+        GetDIBits(hdc, hbm, 0, bm.bmHeight, pbBits, &bi, DIB_RGB_COLORS);
+        bi.bmiHeader.biWidth = cxNew;
+        bi.bmiHeader.biHeight = cyNew;
+        hbmNew = CreateDIBSection(hdc, &bi, DIB_RGB_COLORS,
+                                  (VOID **)&pbNewBits, NULL, 0);
+        if (hbmNew != NULL)
+        {
+            nWidthBytesNew = cxNew * 4;
+            wfactor = (bm.bmWidth << 8) / cxNew;
+            hfactor = (bm.bmHeight << 8) / cyNew;
+            if (!fAlpha)
+                a0 = 255;
+            for(iy = 0; iy < cyNew; iy++)
+            {
+                y = hfactor * iy;
+                y0 = y >> 8;
+                y1 = min(y0 + 1, (INT)bm.bmHeight - 1);
+                ey1 = y & 0xFF;
+                ey0 = 0x100 - ey1;
+                pbNewLine = pbNewBits + iy * nWidthBytesNew;
+                pbLine0 = pbBits + y0 * nWidthBytes;
+                pbLine1 = pbBits + y1 * nWidthBytes;
+                for(ix = 0; ix < cxNew; ix++)
+                {
+                    x = wfactor * ix;
+                    x0 = x >> 8;
+                    x1 = min(x0 + 1, (INT)bm.bmWidth - 1);
+                    ex1 = x & 0xFF;
+                    ex0 = 0x100 - ex1;
+                    c00 = ((LPDWORD)pbLine0)[x0];
+                    c01 = ((LPDWORD)pbLine1)[x0];
+                    c10 = ((LPDWORD)pbLine0)[x1];
+                    c11 = ((LPDWORD)pbLine1)[x1];
+
+                    b0 = ((ex0 * (c00 & 0xFF)) + 
+                          (ex1 * (c10 & 0xFF))) >> 8;
+                    b1 = ((ex0 * (c01 & 0xFF)) + 
+                          (ex1 * (c11 & 0xFF))) >> 8;
+                    g0 = ((ex0 * ((c00 >> 8) & 0xFF)) + 
+                          (ex1 * ((c10 >> 8) & 0xFF))) >> 8;
+                    g1 = ((ex0 * ((c01 >> 8) & 0xFF)) + 
+                          (ex1 * ((c11 >> 8) & 0xFF))) >> 8;
+                    r0 = ((ex0 * ((c00 >> 16) & 0xFF)) + 
+                          (ex1 * ((c10 >> 16) & 0xFF))) >> 8;
+                    r1 = ((ex0 * ((c01 >> 16) & 0xFF)) + 
+                          (ex1 * ((c11 >> 16) & 0xFF))) >> 8;
+                    b0 = (ey0 * b0 + ey1 * b1) >> 8;
+                    g0 = (ey0 * g0 + ey1 * g1) >> 8;
+                    r0 = (ey0 * r0 + ey1 * r1) >> 8;
+
+                    if (fAlpha)
+                    {
+                        a0 = ((ex0 * ((c00 >> 24) & 0xFF)) + 
+                              (ex1 * ((c10 >> 24) & 0xFF))) >> 8;
+                        a1 = ((ex0 * ((c01 >> 24) & 0xFF)) + 
+                              (ex1 * ((c11 >> 24) & 0xFF))) >> 8;
+                        a0 = (ey0 * a0 + ey1 * a1) >> 8;
+                    }
+                    ((LPDWORD)pbNewLine)[ix] = 
+                        MAKELONG(MAKEWORD(b0, g0), MAKEWORD(r0, a0));
+                }
+            }
+        }
+        HeapFree(GetProcessHeap(), 0, pbBits);
+        DeleteDC(hdc);
+    }
+    return hbmNew;
+}
+
 void BGPreloadWallpaper(BGSrc *src)
 {
-  HBITMAP       hbm;
-  WallpaperInfo wi;
-  OSVERSIONINFO osvi;
+//#define DEBUG_XP
+	HBITMAP       hbm;
+	WallpaperInfo wi;
+	OSVERSIONINFO osvi;
 
-  BGGetWallpaperInfo(&wi);
+	BGGetWallpaperInfo(&wi);
 
-  //壁紙を読み込み
-  //LR_CREATEDIBSECTION を指定するのがコツ
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&osvi);
-  if (osvi.dwMajorVersion < 6) {
-    if (wi.pattern == BG_STRETCH) {
-      hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-    }
-    else {
-      hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
-    }
-  }
-  else {
-    if (wi.pattern == BG_STRETCH) {
-      hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-      // TODO: 画像を画面いっぱいに拡大するには、どうしたらよいか？
-    }
-    else {
-      //hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
-      hbm = GetBitmapHandle(wi.filename);
-    }
-  }
+#ifdef DEBUG_XP
+	strcpy(wi.filename, "c:\\usr\\ttssh2\\1011_01.jpg");
+#endif
 
-  //壁紙DCを作る
-  if(hbm)
-  {
-    BITMAP bm;
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+#ifdef DEBUG_XP
+	osvi.dwMajorVersion = 7;
+#endif
+	if (osvi.dwMajorVersion < 6) {
+		//壁紙を読み込み
+		//LR_CREATEDIBSECTION を指定するのがコツ
+		if (wi.pattern == BG_STRETCH) {
+			hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		}
+		else {
+			hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+		}
+	}
+	else {
+		hbm = GetBitmapHandle(wi.filename);
 
-    GetObject(hbm,sizeof(bm),&bm);
+#ifdef DEBUG_XP
+		wi.pattern = BG_STRETCH; 
+#endif
+		if (wi.pattern == BG_STRETCH) {
+			HBITMAP newhbm = CreateStretched32BppBitmapBilinear(hbm, CRTWidth, CRTHeight);
+			DeleteObject(hbm);
+			hbm = newhbm;
+		}
+	}
 
-    src->hdc     = CreateBitmapDC(hbm);
-    src->width   = bm.bmWidth;
-    src->height  = bm.bmHeight;
-    src->pattern = wi.pattern;
+	//壁紙DCを作る
+	if(hbm)
+	{
+		BITMAP bm;
 
-  }else{
-    src->hdc = NULL;
-  }
+		GetObject(hbm,sizeof(bm),&bm);
 
-  src->color = GetSysColor(COLOR_DESKTOP);
+		src->hdc     = CreateBitmapDC(hbm);
+		src->width   = bm.bmWidth;
+		src->height  = bm.bmHeight;
+		src->pattern = wi.pattern;
+
+	}else{
+		src->hdc = NULL;
+	}
+
+	src->color = GetSysColor(COLOR_DESKTOP);
 }
 
 void BGPreloadSrc(BGSrc *src)
