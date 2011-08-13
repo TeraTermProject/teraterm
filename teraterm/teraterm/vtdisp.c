@@ -842,10 +842,10 @@ void BGPreloadWallpaper(BGSrc *src)
 		} else if (wi.pattern == BG_FIT_WIDTH) {
 			ratio = (float)CRTWidth / bm.bmWidth;
 			s_width = CRTWidth;
-			s_height = (int)(CRTHeight * ratio);
+			s_height = (int)(bm.bmHeight * ratio);
 		} else if (wi.pattern == BG_FIT_HEIGHT) {
 			ratio = (float)CRTHeight / bm.bmHeight;
-			s_width = (int)(CRTWidth * ratio);
+			s_width = (int)(bm.bmWidth * ratio);
 			s_height = CRTHeight;
 		} else {
 			s_width = 0;
