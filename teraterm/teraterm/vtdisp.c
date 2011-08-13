@@ -663,6 +663,9 @@ static HBITMAP GetBitmapHandle(char *File)
 	HBITMAP hBitmap = NULL;
 
 	hFile=CreateFile(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return (hBitmap);
+	}
 	nFileSize=GetFileSize(hFile,NULL);
 	hMem=GlobalAlloc(GMEM_MOVEABLE,nFileSize);
 	pvData=GlobalLock(hMem);
@@ -829,6 +832,9 @@ void BGPreloadWallpaper(BGSrc *src)
 		float ratio;
 
 		hbm = GetBitmapHandle(wi.filename);
+		if (hbm == NULL) {
+			goto createdc;
+		}
 
 #ifdef DEBUG_XP
 		//wi.pattern = BG_STRETCH; 
@@ -884,6 +890,7 @@ void BGPreloadWallpaper(BGSrc *src)
 	}
 
 	//ï«éÜDCÇçÏÇÈ
+createdc:
 	if(hbm)
 	{
 		BITMAP bm;
