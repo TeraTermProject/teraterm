@@ -36,6 +36,7 @@
   <li>変更
     <ul>
       <li>OSC 文字列中に制御シーケンスが含まれていた時にその制御シーケンスを解釈するように変更した。</li>
+      <li>Eterm look-feel: Windows Vista以降において、壁紙がBMP形式以外にも対応した。</li>
       <li>マクロコマンド "<a href="../macro/command/getpassword.html">getpassword</a>"を機能アップデートした。
         <ul>
           <li>コマンドの実行可否を"result"システム変数に格納するようにした。</li>
@@ -45,7 +46,6 @@
           <li>変換する文字列を strspecial コマンドに、第2引数として指定できるようにした。</li>
         </ul></li>
       <li>マクロコマンド "<a href="../macro/command/expandenv.html">expandenv</a>" を追加した。</li>
-      <li>Eterm look-feel: Windows Vista以降において、壁紙がBMP形式以外にも対応した。</li>
     </ul>
   </li>
 
@@ -1721,6 +1721,8 @@
   <li>変更
     <ul>
       <li>バージョンダイアログに、PuTTYのバージョンを表記するようにした。</li>
+      <li>接続時に時間がかかるため、省略できる乱数の初期化を削除した。</li>
+      <li>ログファイルのタイムスタンプをミリ秒まで記録するようにした。</li>
     </ul>
   </li>
 
