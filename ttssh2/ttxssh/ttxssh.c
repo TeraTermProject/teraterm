@@ -669,7 +669,7 @@ static int PASCAL FAR TTXconnect(SOCKET s,
                                  int namelen)
 {
 #ifndef NO_INET6
-	if (pvar->socket == INVALID_SOCKET) {
+	if (pvar->socket == INVALID_SOCKET || pvar->socket != s) {
 		struct sockaddr_storage ss;
 		int len;
 
