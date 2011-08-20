@@ -18,8 +18,16 @@ Moves control to the include file.
 </p>
 
 <pre class="macro-syntax">
-include &lt;include file name&gt;
+include '&lt;include file name&gt;'
 </pre>
+
+<h2>Remarks</h2>
+
+<p>
+Loads the specified macro file and interprets the macro. When the macro execution ends, the next line of the include command is restarted.<br>
+Also, the include nest leve is 9.
+</p>
+
 
 <h2>Example</h2>
 
@@ -43,6 +51,11 @@ i = i - 1
 ; Go back to the main file.
 ----- End of "sub.ttl" ----------
 </pre>
+
+<h2>Reference</h2>
+
+<a href="../howtorun.html">Note: Loading a macro file</a><br>
+
 
 </body>
 </html>

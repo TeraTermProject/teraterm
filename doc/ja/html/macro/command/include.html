@@ -18,8 +18,15 @@
 </p>
 
 <pre class="macro-syntax">
-include &lt;include file name&gt;
+include '&lt;include file name&gt;'
 </pre>
+
+<h2>解説</h2>
+
+<p>
+引数に指定したマクロファイルを読み込み、マクロ実行を行う。実行終了後、includeコマンドの次の行から処理が再開される。<br>
+なお、includeのネストは 9 までである。
+</p>
 
 <h2>例</h2>
 
@@ -43,6 +50,11 @@ i = i - 1
 ; メインファイルへ戻る。
 -----インクルードファイル終わり-------
 </pre>
+
+
+<h2>参照</h2>
+
+<a href="../howtorun.html">注: マクロファイルの読み込み</a><br>
 
 </body>
 </html>
