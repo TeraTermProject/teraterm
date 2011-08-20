@@ -35,7 +35,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <!-- li>OSC 文字列中に制御シーケンスが含まれていた時にその制御シーケンスを解釈するように変更した。</li -->
+      <li>When the OSC string includes a control sequence, the control sequence can be procedured.</li>
       <li>Eterm look-feel: The wallpaper file format can support any format other than BMP on Windows Vista or later.</li>
       <li>"<a href="../macro/command/getpassword.html">getpassword</a>" macro command is updated.
         <ul>
@@ -52,7 +52,7 @@
   <li>Bug fixes
     <ul>
       <li>The log file which name length is 80 bytes over can not be opened.</li>
-      <!-- li>メタキー設定を有効にしている時、Control+Meta キー入力がダブる場合があったのを修正した。</li -->
+      <li>When the meta key is enabled, the Control and Meta key is redundantly inputed.</li>
     </ul>
   </li>
 
@@ -1720,17 +1720,17 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>added the PuTTY version on the version dialog.</li>
-      <!--li>接続時に時間がかかるため、省略できる乱数の初期化を削除した。</li-->
-      <!--li>ログファイルのタイムスタンプをミリ秒まで記録するようにした。</li-->
+      <li>removed the random initialization because it takes a long time to connect.</li>
+      <li>The timestamp of the log file is recorded on the millisecond time scale.</li>
     </ul>
   </li>
 
-  <!-- li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>IPv4 フォールバックしたときに SSH 接続が無効になることがある問題を修正した。</li>
-      <li>ウィンドウサイズ変更通知で、正しいウィンドウサイズ(ピクセル数)を通知するように修正した。</li>
+      <li>When the IPv4 fallback is occurred, the SSH connection may fail.</li>
+      <li>When the window size change is notified, the right window size(pixel) can be reported.</li>
     </ul>
-  </li -->
+  </li>
 
   <li>Misc
     <ul>
