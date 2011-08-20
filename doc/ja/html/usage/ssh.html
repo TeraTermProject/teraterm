@@ -53,6 +53,8 @@
 
     <h2><a name="securitywarning">セキュリティ警告</a></h2>
 
+    <h3><a name="known_hosts">known_hosts ファイル</a></h3>
+
     <p>SSH 接続時には SSH サーバのホスト鍵をチェックし、一致する鍵が ssh_known_hosts にない場合には警告を表示します。<br />
        チェックの結果は以下のように分類されます。</p>
 
@@ -69,6 +71,16 @@
     <p>OpenSSH の場合、サーバ管理者は以下のようなコマンドでサーバのホスト鍵の指紋を取得できます。</p>
 
     <pre>ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub</pre>
+
+    <h3><a name="SSHFP">SSHFP RR</a></h3>
+
+    <p>SSH 接続時に、RFC 4255 に規定されている SSHFP RR による検証が可能ですが、DNSSEC 認証ができないので参考程度の位置づけとなります。</p>
+
+    <p>ドメインの所有者であれば DNS の SSHFP レコードに SSH サーバホスト鍵の署名を登録することが可能です。クライアントは SSHFP レコードを取得し、接続中のサーバホスト鍵と比較することで検証が可能です。<br />
+       この機能は Windows リゾルバの制限により Windows 2000 以降でのみ有効です。</p>
+
+    <p>SSHFP に関して規定している RFC 4255 には「DNSSEC 認証されていない SSHFP RR を信頼してはいけない」とあります。<br />
+       Windows リゾルバは DNSSEC の署名が検証ができないため、常に DNSSEC 認証に失敗します。</p>
 
     <h2><a name="generate">キーの生成</a></h2>
 
