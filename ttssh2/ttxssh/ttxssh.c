@@ -698,7 +698,7 @@ static int PASCAL FAR TTXconnect(SOCKET s,
 				htons(find_local_port(pvar));
 			break;
 		default:
-			/* NOT REACHED */
+			/* UNSPEC */
 			break;
 		}
 
