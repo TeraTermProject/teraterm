@@ -257,12 +257,12 @@ typedef struct ssh2_host_key {
 } ssh2_host_key_t;
 
 static ssh2_host_key_t ssh2_host_key[] = {
-	{KEY_RSA1,     "ssh-rsa1"},  // for SSH1 only
-	{KEY_RSA,      "ssh-rsa"},
-	{KEY_DSA,      "ssh-dss"},
-	{KEY_ECDSA256, "ecdsa-sha2-nistp256"},
-	{KEY_ECDSA384, "ecdsa-sha2-nistp384"},
-	{KEY_ECDSA521, "ecdsa-sha2-nistp521"},
+	{KEY_RSA1,     "ssh-rsa1"},            // for SSH1 only
+	{KEY_RSA,      "ssh-rsa"},             // RFC4253
+	{KEY_DSA,      "ssh-dss"},             // RFC4253
+	{KEY_ECDSA256, "ecdsa-sha2-nistp256"}, // RFC5656
+	{KEY_ECDSA384, "ecdsa-sha2-nistp384"}, // RFC5656
+	{KEY_ECDSA521, "ecdsa-sha2-nistp521"}, // RFC5656
 	{KEY_UNSPEC,   "ssh-unknown"},
 	{KEY_NONE,     NULL},
 };
@@ -285,28 +285,28 @@ typedef struct ssh2_cipher {
 } ssh2_cipher_t;
 
 static ssh2_cipher_t ssh2_ciphers[] = {
-	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, EVP_des_ede3_cbc},
-	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, EVP_aes_128_cbc},
-	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, EVP_aes_192_cbc},
-	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, EVP_aes_256_cbc},
-	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, EVP_bf_cbc},
-	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, evp_aes_128_ctr},
-	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, evp_aes_128_ctr},
-	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, evp_aes_128_ctr},
-	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, EVP_rc4},
-	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, EVP_rc4},
-	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, EVP_rc4},
-	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, EVP_cast5_cbc},
-	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, evp_des3_ctr},
-	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 16,    0, evp_bf_ctr},
-	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, evp_cast5_ctr},
+	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, EVP_des_ede3_cbc},     // RFC4253
+	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, EVP_aes_128_cbc},      // RFC4253
+	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, EVP_aes_192_cbc},      // RFC4253
+	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, EVP_aes_256_cbc},      // RFC4253
+	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, EVP_bf_cbc},           // RFC4253
+	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, EVP_rc4},              // RFC4253
+	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, EVP_rc4},              // RFC4345
+	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, EVP_rc4},              // RFC4345
+	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, EVP_cast5_cbc},        // RFC4253
+	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, evp_des3_ctr},         // RFC4344
+	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 16,    0, evp_bf_ctr},           // RFC4344
+	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, evp_cast5_ctr},        // RFC4344
 #ifdef WITH_CAMELLIA_DRAFT
-	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, EVP_camellia_128_cbc},
-	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, EVP_camellia_192_cbc},
-	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, EVP_camellia_256_cbc},
-	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, evp_camellia_128_ctr},
-	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, evp_camellia_128_ctr},
-	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
 #ifdef WITH_CAMELLIA_PRIVATE
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0, EVP_camellia_128_cbc},
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0, EVP_camellia_192_cbc},
@@ -340,13 +340,13 @@ typedef struct ssh2_kex_algorithm {
 } ssh2_kex_algorithm_t;
 
 static ssh2_kex_algorithm_t ssh2_kex_algorithms[] = {
-	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},
-	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},
-	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},
-	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256},
-	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256},
-	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384},
-	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512},
+	{KEX_DH_GRP1_SHA1,  "diffie-hellman-group1-sha1",           EVP_sha1},   // RFC4253
+	{KEX_DH_GRP14_SHA1, "diffie-hellman-group14-sha1",          EVP_sha1},   // RFC4253
+	{KEX_DH_GEX_SHA1,   "diffie-hellman-group-exchange-sha1",   EVP_sha1},   // RFC4419
+	{KEX_DH_GEX_SHA256, "diffie-hellman-group-exchange-sha256", EVP_sha256}, // RFC4419
+	{KEX_ECDH_SHA2_256, "ecdh-sha2-nistp256",                   EVP_sha256}, // RFC5656
+	{KEX_ECDH_SHA2_384, "ecdh-sha2-nistp384",                   EVP_sha384}, // RFC5656
+	{KEX_ECDH_SHA2_521, "ecdh-sha2-nistp521",                   EVP_sha512}, // RFC5656
 	{KEX_DH_NONE      , NULL,                                   NULL},
 };
 
@@ -376,16 +376,16 @@ typedef struct ssh2_mac {
 } ssh2_mac_t;
 
 static ssh2_mac_t ssh2_macs[] = {
-	{HMAC_SHA1,        "hmac-sha1",                  EVP_sha1,      0},
-	{HMAC_MD5,         "hmac-md5",                   EVP_md5,       0},
-	{HMAC_SHA1_96,     "hmac-sha1-96",               EVP_sha1,      96},
-	{HMAC_MD5_96,      "hmac-md5-96",                EVP_md5,       96},
+	{HMAC_SHA1,        "hmac-sha1",                  EVP_sha1,      0},  // RFC4253
+	{HMAC_MD5,         "hmac-md5",                   EVP_md5,       0},  // RFC4253
+	{HMAC_SHA1_96,     "hmac-sha1-96",               EVP_sha1,      96}, // RFC4253
+	{HMAC_MD5_96,      "hmac-md5-96",                EVP_md5,       96}, // RFC4253
 	{HMAC_RIPEMD160,   "hmac-ripemd160@openssh.com", EVP_ripemd160, 0},
 #ifdef WITH_HMAC_SHA2_DRAFT	// HMAC-SHA2 support
-	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},
-	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96},
-	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},
-	{HMAC_SHA2_512_96, "hmac-sha2-512-96",           EVP_sha512,    96},
+	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},  // draft-dbider-sha2-mac-for-ssh-02
+	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96}, // draft-dbider-sha2-mac-for-ssh-02
+	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},  // draft-dbider-sha2-mac-for-ssh-02
+	{HMAC_SHA2_512_96, "hmac-sha2-512-96",           EVP_sha512,    96}, // draft-dbider-sha2-mac-for-ssh-02
 #endif	// HMAC-SHA2 support
 	{HMAC_NONE,        NULL,                         NULL,          0},
 };
@@ -406,8 +406,8 @@ typedef struct ssh2_comp {
 } ssh2_comp_t;
 
 static ssh2_comp_t ssh2_comps[] = {
-	{COMP_NOCOMP,  "none"},
-	{COMP_ZLIB,    "zlib"},
+	{COMP_NOCOMP,  "none"},             // RFC4253
+	{COMP_ZLIB,    "zlib"},             // RFC4253
 	{COMP_DELAYED, "zlib@openssh.com"},
 	{COMP_NONE,    NULL},
 };
