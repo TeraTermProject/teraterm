@@ -120,12 +120,9 @@ set timeoutlen=100
 </pre>
 
 <p>
-<!--
-timeoutlen の設定は、挿入モードで ESC キーを押してから実際に挿入モードを抜ける(IME がオフになる)までの時間を調整しています。
-この値を短くすれば ESC キーを押してから IME がオフになるまでの時間が短くなりますが、 遅い回線を使っている時などにカーソルキーやファンクションキーが正しく働かないというトラブルが起きる事があります。<br>
-また ESC キーを押した後の遅れを減らすには"<a href="#AppESC">挿入モードでの ESC キーを押した後の待ちを無くす</a>"の設定を利用する方法もあります。
--->
-NOTICE: You are recommended to configure the <a href="#AppESC">Delete wait time after ESC key is pushed in insert mode</a>.
+When the timeoutlen of the vim is enabled, the vim will wait until either the complete mapping or key sequence has been received. In other words, the timeoutlen is used to describe the time from IME on to off after the ESC key is pressed in the insert mode. <br>
+If the timeoutlen is the small value, a trouble may occur that the cursor and function key do not work well. <br>
+As an alternative, please use the <a href="#AppESC">Delete wait time after ESC key is pushed in insert mode</a>.
 </p>
 
 
