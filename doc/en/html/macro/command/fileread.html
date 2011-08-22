@@ -27,7 +27,8 @@ fileread &lt;file handle&gt; &lt;read byte&gt; &lt;strvar&gt;
 Reads specified byte data from the file specified by &lt;file handle&gt;.<br>
 The data are written into the string variable &lt;strvar&gt;. The file pointer is moved to reading bytes. <br>
 If the file pointer reaches the end of the file while reading the data, the system variable "result" is set to 1. Otherwise, "result" is set to zero.<br>
-The range of &lt;read byte&gt; argument must be from 1 to 255.
+The range of &lt;read byte&gt; argument must be from 1 to 255.<br>
+Also, a null character('\0) is added at the end of the string variable &lt;strvar&gt;.
 </p>
 
 <h2>Example</h2>
@@ -46,6 +47,40 @@ goto loop
 :fclose
 fileclose fp
 </pre>
+
+<pre class="macro-example">
+; Send 32 bytes from a binary file.
+filename = 'sample.bin'
+
+fileopen fhandle filename 0
+if fhandle == -1 goto the_end
+
+call send_16_bytes      ; send first 16 bytes
+fileseek fhandle 16 1   ; seek past next 16 without sending
+call send_16_bytes      ; send next (last) 16 bytes
+fileclose fhandle
+goto the_end
+ 
+;#########################################
+:send_16_bytes
+    for i 1 16
+        fileread fhandle 1 str      ; read one byte at a time so we can detect zero.
+        if result == 1 break
+        str2code integer str        ; if zero then str will be empty and integer will be set to zero
+        ;sprintf 'integer = 0x%02X' integer
+        ;messagebox inputstr 'test'
+        send integer
+    next
+return
+;#########################################
+:the_end
+</pre>
+
+
+<h2>Reference</h2>
+
+<a href="fileopen.html">fileopen</a><br>
+<a href="fileclose.html">fileclose</a><br>
 
 </body>
 </html>

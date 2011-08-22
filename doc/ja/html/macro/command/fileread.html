@@ -27,7 +27,8 @@ fileread &lt;file handle&gt; &lt;read byte&gt; &lt;strvar&gt;
 &lt;file handle&gt; により指定されたファイルから特定したバイト数のデータを読み出す。<br>
 データは文字列変数 &lt;strvar&gt; へ記憶され、ファイルポインタは読み込んだバイト数分進められる。<br>
 データを読み込み終わる前にファイルポインタがファイルの終わりまで行った場合は、システム変数 "result" に 1 が格納される。 それ以外は、"result" に 0 が格納される。<br>
-変数 &lt;read byte&gt; のとる値の範囲は 1 から 255 でなければならない。
+変数 &lt;read byte&gt; のとる値の範囲は 1 から 255 でなければならない。<br>
+なお、文字列変数 &lt;strvar&gt; の末尾は '\0' が付加される。
 </p>
 
 <h2>例</h2>
@@ -46,6 +47,39 @@ goto loop
 :fclose
 fileclose fp
 </pre>
+
+<pre class="macro-example">
+; バイナリファイルの先頭から32バイトを読み込み、ホストへ送信する。
+filename = 'sample.bin'
+
+fileopen fhandle filename 0
+if fhandle == -1 goto the_end
+
+call send_16_bytes      ; send first 16 bytes
+fileseek fhandle 16 1   ; seek past next 16 without sending
+call send_16_bytes      ; send next (last) 16 bytes
+fileclose fhandle
+goto the_end
+ 
+;#########################################
+:send_16_bytes
+    for i 1 16
+        fileread fhandle 1 str      ; read one byte at a time so we can detect zero.
+        if result == 1 break
+        str2code integer str        ; if zero then str will be empty and integer will be set to zero
+        ;sprintf 'integer = 0x%02X' integer
+        ;messagebox inputstr 'test'
+        send integer
+    next
+return
+;#########################################
+:the_end
+</pre>
+
+<h2>参照</h2>
+
+<a href="fileopen.html">fileopen</a><br>
+<a href="fileclose.html">fileclose</a><br>
 
 </body>
 </html>

@@ -26,7 +26,8 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt;
 <p>
 ファイル &lt;filename&gt; を開く。<br>
 ファイルが存在しない場合は、新たに作成されてからオープンされる。もしファイルが正しくオープンされた場合、ファイルハンドルが整数変数 &lt;file handle&gt; に格納される。それ以外の場合、&lt;file handle&gt; に-1が格納される。<br>
-&lt;append flag&gt; が0の場合、ファイルポインタの位置はファイルの始めにセットされる。&lt;append flag&gt; が0以外の場合、ファイルポインタはファイルの最後にセットされる。
+&lt;append flag&gt; が0の場合、ファイルポインタの位置はファイルの始めにセットされる。&lt;append flag&gt; が0以外の場合、ファイルポインタはファイルの最後にセットされる。<br>
+なお、ファイルはバイナリモードでオープンされる。
 </p>
 
 <h2>例</h2>
@@ -45,6 +46,11 @@ exec 'cmd /c test.bat'
 pause 10
 end
 </pre>
+
+<h2>参照</h2>
+
+<a href="filewrite.html">filewrite</a><br>
+<a href="fileclose.html">fileclose</a><br>
 
 </body>
 </html>

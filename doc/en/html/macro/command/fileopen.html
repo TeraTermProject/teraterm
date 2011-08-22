@@ -26,7 +26,8 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt;
 <p>
 Opens a file specified by &lt;file name&gt;.<br>
 If the file does not exist, it is created and then opened. If the file is successfully opened, the file handle is returned in the integer variable &lt;file handle&gt;. Otherwise, &lt;file handle&gt; is set to -1.<br>
-If &lt;append flag&gt; is zero, the file pointer is set to the beginning of the file. If &lt;append flag&gt; is non-zero, the file pointer is set to the end of the file.
+If &lt;append flag&gt; is zero, the file pointer is set to the beginning of the file. If &lt;append flag&gt; is non-zero, the file pointer is set to the end of the file.<br>
+Also, the file is opened in the binary mode.
 </p>
 
 <h2>Example</h2>
@@ -45,6 +46,11 @@ exec 'cmd /c test.bat'
 pause 10
 end
 </pre>
+
+<h2>Reference</h2>
+
+<a href="filewrite.html">filewrite</a><br>
+<a href="fileclose.html">fileclose</a><br>
 
 </body>
 </html>
