@@ -49,6 +49,41 @@
       When using Key-pair authentication, check [RSA/DSA key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.
     </p>
 
+    <h2><a name="securitywarning">Security Warning</a></h2>
+
+    <h3><a name="known_hosts">ssh_known_hosts file</a></h3>
+
+    <p>On SSH connection, Tera Term searches the server host key into the ssh_known_hosts file. If the host key can not be found, the security warning is shown.<br />
+       The result is described below.</p>
+
+    <ul>
+      <li>No host key in ssh_known_hosts.</li>
+      <li>Mismatching the host key type found in ssh_known_hosts.</li>
+      <li>Mismatching the host key found in ssh_known_hosts.</li>
+      <li>Matching the host key found in ssh_known_hosts(not warning).</li>
+    </ul>
+
+<!--
+    <p>警告が表示された場合には、意図しないサーバに接続しているか中間者攻撃に遭っている可能性があります。<br />
+       しかし、始めてサーバに接続するときや、サーバの再インストールなどにより SSH サーバのホスト鍵が変更された場合にもこの警告が表示されます。「警告ダイアログに表示されている、接続中の SSH サーバのホスト鍵の指紋」と「接続しようとしている SSH サーバのホスト鍵の正確な指紋」を比較してください。</p>
+
+    <p>OpenSSH の場合、サーバ管理者は以下のようなコマンドでサーバのホスト鍵の指紋を取得できます。</p>
+
+    <pre>ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub</pre>
+-->
+
+    <h3><a name="SSHFP">SSHFP RR</a></h3>
+
+<!--
+    <p>SSH 接続時に、RFC 4255 に規定されている SSHFP RR (Secure SHell FingerPrint Resource Record) による検証が可能ですが、現在のTera Termでは DNSSEC 認証ができないので参考程度の位置づけとなります。</p>
+
+    <p>ドメインの所有者であれば DNS の SSHFP レコードに SSH サーバホスト鍵の署名を登録することが可能です。クライアント(Tera Term)は SSHFP レコードを取得し、接続中のサーバホスト鍵と比較することで検証が可能です。<br />
+       この機能は Windows リゾルバの制限により Windows 2000 以降でのみ有効です。</p>
+
+    <p>SSHFP に関して規定している RFC 4255 には「DNSSEC 認証されていない SSHFP RR を信頼してはならない」とあります。<br />
+       Tera Termが利用しているWindows リゾルバは DNSSEC の署名が検証ができないため、常に DNSSEC 認証に失敗します。</p>
+-->
+
     <h2><a name="generate">Generating Key</a></h2>
 
     <p>
