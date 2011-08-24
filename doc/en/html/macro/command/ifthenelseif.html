@@ -20,13 +20,13 @@ Conditional branching
 <h2>1) Format 1</h2>
 
 <pre class="macro-syntax">
-if &lt;int&gt; &lt;statement&gt;
+if &lt;expression&gt; &lt;statement&gt;
 </pre>
 
 <h3>Remarks</h3>
 
 <p>
-Executes a &lt;statement&gt;, if &lt;int&gt; is non-zero.
+Executes a &lt;statement&gt;, if &lt;expression&gt; is true(non-zero).
 </p>
 
 <h3>Example</h3>
@@ -43,17 +43,17 @@ if result A=0
 <h2>2) Format 2</h2>
 
 <pre class="macro-syntax">
-if &lt;int 1&gt; then
+if &lt;expression 1&gt; then
   ...
-  (Statements for the case:  &lt;int 1&gt; is true (non-zero).)
+  (Statements for the case:  &lt;expression 1&gt; is true (non-zero).)
   ...
-[elseif &lt;int 2&gt; then]
+[elseif &lt;expression 2&gt; then]
   ...
-  (Statements for the case:  &lt;int 1&gt; is false (zero) and &lt;int 2&gt; is true.)
+  (Statements for the case:  &lt;expression 1&gt; is false (zero) and &lt;expression 2&gt; is true.)
   ...
-[elseif &lt;int N&gt; then]
+[elseif &lt;expression N&gt; then]
   ...
-  (Statements for the case:  &lt;int 1&gt;, &lt;int 2&gt;,... and &lt;int N-1&gt; are all false, and &lt;int N&gt; is true.)
+  (Statements for the case:  &lt;expression 1&gt;, &lt;expression 2&gt;,... and &lt;expression N-1&gt; are all false, and &lt;expression N&gt; is true.)
   ...
 [else]
   ...
@@ -95,6 +95,10 @@ else
   c = '?'
 endif
 </pre>
+
+<h2>Reference</h2>
+
+<a href="..\syntax\expressions.html">Expressions and operators</a><br>
 
 </body>
 </html>

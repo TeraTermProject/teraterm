@@ -18,17 +18,17 @@
 </p>
 
 <pre class="macro-syntax">
-do [ { while | until } &lt;int&gt; (option)]<br>
+do [ { while | until } &lt;expression&gt; (option)]<br>
   ...<br>
   ...<br>
-loop [ { while | until } &lt;int&gt; (option)]
+loop [ { while | until } &lt;expression&gt; (option)]
 </pre>
 
 <h2>解説</h2>
 
 <p>
 'do' と 'loop' の間のコマンドを、条件式に従って繰り返す。<br>
-条件式は、while の場合は&lt;int&gt; が0以外である限り、until の場合は&lt;int&gt;が0である限り繰り返す。<br>
+条件式は、while の場合は&lt;expression&gt; が0以外である限り、until の場合は&lt;expression&gt;が0である限り繰り返す。<br>
 'do' に条件式を指定した場合は、条件によっては一度もループが実行されない場合がある。'loop' に条件式を指定した場合は、最低1度はループが実行される。どちらにも条件を指定しなかった場合は、無限ループとなる。
 </p>
 
@@ -51,6 +51,10 @@ do
     offset = offset + 1
 loop while result = 2
 </pre>
+
+<h2>参照</h2>
+
+<a href="..\syntax\expressions.html">式と演算子</a><br>
 
 </body>
 </html>
