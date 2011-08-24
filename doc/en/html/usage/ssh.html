@@ -63,26 +63,23 @@
       <li>Matching the host key found in ssh_known_hosts(not warning).</li>
     </ul>
 
-<!--
-    <p>警告が表示された場合には、意図しないサーバに接続しているか中間者攻撃に遭っている可能性があります。<br />
-       しかし、始めてサーバに接続するときや、サーバの再インストールなどにより SSH サーバのホスト鍵が変更された場合にもこの警告が表示されます。「警告ダイアログに表示されている、接続中の SSH サーバのホスト鍵の指紋」と「接続しようとしている SSH サーバのホスト鍵の正確な指紋」を比較してください。</p>
+    <p>When the security warning message is shown, a user will receive a network attack known as spoofing secretly redirecting the user's connection to a different server. <br />
+       However, this message will be shown when a user connects to a server for the first time and the server's host key is newly updated by reinstalling the server computer. If a user will see this warning, please compare a fingerprint on the warning dialog to the trusted fingerprint. </p>
 
-    <p>OpenSSH の場合、サーバ管理者は以下のようなコマンドでサーバのホスト鍵の指紋を取得できます。</p>
+    <p>OpenSSH: The server administrator can get the fingerprint(hash) of the server's host key by using below command.</p>
 
     <pre>ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub</pre>
--->
 
     <h3><a name="SSHFP">SSHFP RR</a></h3>
 
-<!--
-    <p>SSH 接続時に、RFC 4255 に規定されている SSHFP RR (Secure SHell FingerPrint Resource Record) による検証が可能ですが、現在のTera Termでは DNSSEC 認証ができないので参考程度の位置づけとなります。</p>
+    <p>When a user is using SSH to connect to a server, the user can use SSHFP RR (Secure SHell FingerPrint Resource Record) defined in RFC 4255. However, this feature is experimentally implemented because the current Tera Term can not do the DNSSEC authentication.</p>
 
-    <p>ドメインの所有者であれば DNS の SSHFP レコードに SSH サーバホスト鍵の署名を登録することが可能です。クライアント(Tera Term)は SSHFP レコードを取得し、接続中のサーバホスト鍵と比較することで検証が可能です。<br />
-       この機能は Windows リゾルバの制限により Windows 2000 以降でのみ有効です。</p>
+    <p>A domain owner can regist the SSHFP record into the DNS zone. The client software(Tera Term) can get the SSHFP record on connection and verify the record with the server's host key. <br />
+       However, this feature can be used on Windows 2000 or later by the limitation of the Windows resolver.</p>
 
-    <p>SSHFP に関して規定している RFC 4255 には「DNSSEC 認証されていない SSHFP RR を信頼してはならない」とあります。<br />
-       Tera Termが利用しているWindows リゾルバは DNSSEC の署名が検証ができないため、常に DNSSEC 認証に失敗します。</p>
--->
+    <p>Please refer to below one sentence in RFC 4255. <br />
+       <i>A public key verified using this method MUST NOT be trusted if the SSHFP resource record (RR) used for verification was not authenticated by a trusted SIG RR.</i><br />
+      The DNSSEC authentication always fails because the Windows resolver used by Tera Term can not verify the DNSSEC signature. </p>
 
     <h2><a name="generate">Generating Key</a></h2>
 
