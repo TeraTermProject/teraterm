@@ -4264,7 +4264,6 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 			case SSH2_CIPHER_CAST128_CTR:
 				c_str = "cast128-ctr,";
 				break;
-#ifdef WITH_CAMELLIA_DRAFT
 #ifdef WITH_CAMELLIA_PRIVATE
 			case SSH2_CIPHER_CAMELLIA128_CBC:
 				c_str = "camellia128-cbc,camellia128-cbc@openssh.org,";
@@ -4284,7 +4283,7 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 			case SSH2_CIPHER_CAMELLIA256_CTR:
 				c_str = "camellia256-ctr,camellia256-ctr@openssh.org,";
 				break;
-#else // WITH_CAMELLIA_PRIVATE
+#endif // WITH_CAMELLIA_PRIVATE
 			case SSH2_CIPHER_CAMELLIA128_CBC:
 				c_str = "camellia128-cbc,";
 				break;
@@ -4303,8 +4302,6 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 			case SSH2_CIPHER_CAMELLIA256_CTR:
 				c_str = "camellia256-ctr,";
 				break;
-#endif // WITH_CAMELLIA_PRIVATE
-#endif // WITH_CAMELLIA_DRAFT
 			default:
 				continue;
 		}
@@ -6065,14 +6062,12 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	                       | 1 << SSH2_CIPHER_3DES_CTR
 	                       | 1 << SSH2_CIPHER_BLOWFISH_CTR
 	                       | 1 << SSH2_CIPHER_CAST128_CTR
-#ifdef WITH_CAMELLIA_DRAFT
 	                       | 1 << SSH2_CIPHER_CAMELLIA128_CBC
 	                       | 1 << SSH2_CIPHER_CAMELLIA192_CBC
 	                       | 1 << SSH2_CIPHER_CAMELLIA256_CBC
 	                       | 1 << SSH2_CIPHER_CAMELLIA128_CTR
 	                       | 1 << SSH2_CIPHER_CAMELLIA192_CTR
 	                       | 1 << SSH2_CIPHER_CAMELLIA256_CTR
-#endif // WITH_CAMELLIA_DRAFT
 	);
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);

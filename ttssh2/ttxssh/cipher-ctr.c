@@ -28,14 +28,10 @@
 #include <openssl/des.h>
 #include <openssl/blowfish.h>
 #include <openssl/cast.h>
-#ifdef WITH_CAMELLIA_DRAFT
 #include <openssl/camellia.h>
-#endif // WITH_CAMELLIA_DRAFT
 
 extern const EVP_CIPHER *evp_aes_128_ctr(void);
-#ifdef WITH_CAMELLIA_DRAFT
 extern const EVP_CIPHER *evp_camellia_128_ctr(void);
-#endif // WITH_CAMELLIA_DRAFT
 
 struct ssh_aes_ctr_ctx
 {
@@ -62,13 +58,11 @@ struct ssh_cast5_ctr_ctx
 	unsigned char	cast5_counter[CAST_BLOCK];
 };
 
-#ifdef WITH_CAMELLIA_DRAFT
 struct ssh_camellia_ctr_ctx
 {
 	CAMELLIA_KEY	camellia_ctx;
 	unsigned char	camellia_counter[CAMELLIA_BLOCK_SIZE];
 };
-#endif // WITH_CAMELLIA_DRAFT
 
 static void
 ssh_ctr_inc(unsigned char *ctr, unsigned int len)
@@ -421,7 +415,6 @@ evp_cast5_ctr(void)
 	return (&cast5_ctr);
 }
 
-#ifdef WITH_CAMELLIA_DRAFT
 //============================================================================
 // Camellia
 //============================================================================
@@ -507,4 +500,3 @@ evp_camellia_128_ctr(void)
 #endif
 	return (&camellia_ctr);
 }
-#endif // WITH_CAMELLIA_DRAFT

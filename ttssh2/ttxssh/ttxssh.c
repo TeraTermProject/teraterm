@@ -234,7 +234,6 @@ static void normalize_cipher_order(char FAR * buf)
 #else
 	// for SSH2(yutaka)
 	static char default_strings[] = {
-#ifdef WITH_CAMELLIA_DRAFT
 		SSH2_CIPHER_CAMELLIA256_CTR,
 		SSH2_CIPHER_AES256_CTR,
 		SSH2_CIPHER_CAMELLIA256_CBC,
@@ -247,14 +246,6 @@ static void normalize_cipher_order(char FAR * buf)
 		SSH2_CIPHER_AES128_CTR,
 		SSH2_CIPHER_CAMELLIA128_CBC,
 		SSH2_CIPHER_AES128_CBC,
-#else // WITH_CAMELLIA_DRAFT
-		SSH2_CIPHER_AES256_CTR,
-		SSH2_CIPHER_AES256_CBC,
-		SSH2_CIPHER_AES192_CTR,
-		SSH2_CIPHER_AES192_CBC,
-		SSH2_CIPHER_AES128_CTR,
-		SSH2_CIPHER_AES128_CBC,
-#endif // WITH_CAMELLIA_DRAFT
 		SSH2_CIPHER_3DES_CTR,
 		SSH2_CIPHER_3DES_CBC,
 		SSH2_CIPHER_BLOWFISH_CTR,
@@ -2338,11 +2329,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
 	get_file_version("ttxssh.dll", &a, &b, &c, &d);
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-#ifdef WITH_CAMELLIA_DRAFT
-		"TTSSH\r\nTera Term Secure Shell extension, %d.%d with Camellia support", a, b);
-#else
-		"TTSSH\r\nTera Term Secure Shell extension, %d.%d", a, b);
-#endif
+	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", a, b);
 	SendMessage(GetDlgItem(dlg, IDC_TTSSH_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
 	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)
@@ -2557,7 +2544,6 @@ static char FAR *get_cipher_name(int cipher)
 		return "Blowfish-CTR(SSH2)";
 	case SSH2_CIPHER_CAST128_CTR:
 		return "CAST128-CTR(SSH2)";
-#ifdef WITH_CAMELLIA_DRAFT
 	case SSH2_CIPHER_CAMELLIA128_CBC:
 		return "Camellia128-CBC(SSH2)";
 	case SSH2_CIPHER_CAMELLIA192_CBC:
@@ -2570,7 +2556,6 @@ static char FAR *get_cipher_name(int cipher)
 		return "Camellia192-CTR(SSH2)";
 	case SSH2_CIPHER_CAMELLIA256_CTR:
 		return "Camellia256-CTR(SSH2)";
-#endif // WITH_CAMELLIA_DRAFT
 
 	default:
 		return NULL;

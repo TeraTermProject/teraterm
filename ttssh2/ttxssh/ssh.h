@@ -51,9 +51,7 @@ extern const EVP_CIPHER *evp_aes_128_ctr(void);
 extern const EVP_CIPHER *evp_des3_ctr(void);
 extern const EVP_CIPHER *evp_bf_ctr(void);
 extern const EVP_CIPHER *evp_cast5_ctr(void);
-#ifdef WITH_CAMELLIA_DRAFT
 extern const EVP_CIPHER *evp_camellia_128_ctr(void);
-#endif // WITH_CAMELLIA_DRAFT
 
 /* Some of this code has been adapted from Ian Goldberg's Pilot SSH */
 
@@ -91,13 +89,9 @@ typedef enum {
 	SSH2_CIPHER_ARCFOUR, SSH2_CIPHER_ARCFOUR128, SSH2_CIPHER_ARCFOUR256,
 	SSH2_CIPHER_CAST128_CBC,
 	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
-#ifdef WITH_CAMELLIA_DRAFT
 	SSH2_CIPHER_CAMELLIA128_CBC, SSH2_CIPHER_CAMELLIA192_CBC, SSH2_CIPHER_CAMELLIA256_CBC,
 	SSH2_CIPHER_CAMELLIA128_CTR, SSH2_CIPHER_CAMELLIA192_CTR, SSH2_CIPHER_CAMELLIA256_CTR,
 	SSH_CIPHER_MAX = SSH2_CIPHER_CAMELLIA256_CTR,
-#else // WITH_CAMELLIA_DRAFT
-	SSH_CIPHER_MAX = SSH2_CIPHER_CAST128_CTR,
-#endif // WITH_CAMELLIA_DRAFT
 } SSHCipher;
 
 typedef enum {
@@ -300,7 +294,6 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, evp_des3_ctr},         // RFC4344
 	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 16,    0, evp_bf_ctr},           // RFC4344
 	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, evp_cast5_ctr},        // RFC4344
-#ifdef WITH_CAMELLIA_DRAFT
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
@@ -315,7 +308,6 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr@openssh.org", 16, 24, 0, evp_camellia_128_ctr},
 	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr@openssh.org", 16, 32, 0, evp_camellia_128_ctr},
 #endif // WITH_CAMELLIA_PRIVATE
-#endif // WITH_CAMELLIA_DRAFT
 	{SSH_CIPHER_NONE,          NULL,            0,  0, 0,    NULL},
 };
 

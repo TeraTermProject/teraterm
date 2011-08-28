@@ -647,7 +647,6 @@ error:
 	free(newbuf);
 }
 
-#ifdef WITH_CAMELLIA_DRAFT
 static void cCamellia_encrypt(PTInstVar pvar, unsigned char FAR * buf,
                              int bytes)
 {
@@ -725,7 +724,6 @@ static void cCamellia_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 error:
 	free(newbuf);
 }
-#endif // WITH_CAMELLIA_DRAFT
 
 static void c3DES_encrypt(PTInstVar pvar, unsigned char FAR * buf,
                           int bytes)
@@ -964,14 +962,12 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_3DES_CTR)
 		            | (1 << SSH2_CIPHER_BLOWFISH_CTR)
 		            | (1 << SSH2_CIPHER_CAST128_CTR)
-#ifdef WITH_CAMELLIA_DRAFT
 		            | (1 << SSH2_CIPHER_CAMELLIA128_CBC)
 		            | (1 << SSH2_CIPHER_CAMELLIA192_CBC)
 		            | (1 << SSH2_CIPHER_CAMELLIA256_CBC)
 		            | (1 << SSH2_CIPHER_CAMELLIA128_CTR)
 		            | (1 << SSH2_CIPHER_CAMELLIA192_CTR)
 		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
-#endif // WITH_CAMELLIA_DRAFT
 		);
 	}
 
@@ -1545,7 +1541,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				break;
 			}
 
-#ifdef WITH_CAMELLIA_DRAFT
 		case SSH2_CIPHER_CAMELLIA128_CBC:
 		case SSH2_CIPHER_CAMELLIA192_CBC:
 		case SSH2_CIPHER_CAMELLIA256_CBC:
@@ -1570,7 +1565,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.encrypt = cCamellia_encrypt;
 				break;
 			}
-#endif // WITH_CAMELLIA_DRAFT
 
 		case SSH_CIPHER_3DES:{
 				c3DES_init(encryption_key, &pvar->crypt_state.enc.c3DES);
@@ -1719,7 +1713,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				break;
 			}
 
-#ifdef WITH_CAMELLIA_DRAFT
 		case SSH2_CIPHER_CAMELLIA128_CBC:
 		case SSH2_CIPHER_CAMELLIA192_CBC:
 		case SSH2_CIPHER_CAMELLIA256_CBC:
@@ -1744,7 +1737,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.decrypt = cCamellia_decrypt;
 				break;
 			}
-#endif // WITH_CAMELLIA_DRAFT
 
 		case SSH_CIPHER_3DES:{
 				c3DES_init(decryption_key, &pvar->crypt_state.dec.c3DES);
@@ -1851,7 +1843,6 @@ static char FAR *get_cipher_name(int cipher)
 		return "Blowfish-CTR";
 	case SSH2_CIPHER_CAST128_CTR:
 		return "CAST-128-CTR";
-#ifdef WITH_CAMELLIA_DRAFT
 	case SSH2_CIPHER_CAMELLIA128_CBC:
 		return "Camellia128-CBC";
 	case SSH2_CIPHER_CAMELLIA192_CBC:
@@ -1864,7 +1855,6 @@ static char FAR *get_cipher_name(int cipher)
 		return "Camellia192-CTR";
 	case SSH2_CIPHER_CAMELLIA256_CTR:
 		return "Camellia256-CTR";
-#endif // WITH_CAMELLIA_DRAFT
 
 	default:
 		return "Unknown";
