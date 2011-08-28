@@ -2,10 +2,6 @@
 // コンパイルにおいて on/off するために利用すると、TERATERM.INIに
 // 保存するときの記号がずれてしまうのでやってはいけない。
 
-// HMAC-SHA2 draft
-// http://tools.ietf.org/html/draft-dbider-sha2-mac-for-ssh-02
-#undef WITH_HMAC_SHA2_DRAFT
-
 // Camellia support draft
 // http://tools.ietf.org/html/draft-kanno-secsh-camellia-02
 // https://bugzilla.mindrot.org/show_bug.cgi?id=1340
