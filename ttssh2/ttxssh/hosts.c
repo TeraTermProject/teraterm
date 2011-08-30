@@ -1311,22 +1311,22 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "SSHFP RR not found.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_AUTH_MATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "SSHFP RR found and match.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "Matching host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "SSHFP RR found but not match.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "Mismatching host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_DIFFERENTTYPE:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "SSHFP RR found but different type.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "Mismatching host key type found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		}
@@ -1335,13 +1335,13 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "SSHFP RR is *not* authenticated by DNSSEC.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "Found insecure fingerprint in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_AUTH_MATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "SSHFP RR is authenticated by DNSSEC.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "Found secure fingerprint in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
 			break;
 		}
@@ -1457,22 +1457,22 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "SSHFP RR not found.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_AUTH_MATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "SSHFP RR found and match.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "Matching host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "SSHFP RR found but not match.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "Mismatching host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_DIFFERENTTYPE:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "SSHFP RR found but different type.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "Mismatching host key type found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		}
@@ -1481,13 +1481,13 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "SSHFP RR is *not* authenticated by DNSSEC.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "Found insecure fingerprint in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_AUTH_MATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "SSHFP RR is authenticated by DNSSEC.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "Found secure fingerprint in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
 			break;
 		}
@@ -1601,22 +1601,22 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "SSHFP RR not found.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_AUTH_MATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "SSHFP RR found and match.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "Matching host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "SSHFP RR found but not match.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "Mismatching host key fingerprint found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_DIFFERENTTYPE:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "SSHFP RR found but different type.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "Mismatching host key type found in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
 			break;
 		}
@@ -1625,13 +1625,13 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "SSHFP RR is *not* authenticated by DNSSEC.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "Found insecure fingerprint in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
 			break;
 		case DNS_VERIFY_AUTH_MATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "SSHFP RR is authenticated by DNSSEC.");
+			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "Found secure fingerprint in DNS.");
 			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
 			break;
 		}

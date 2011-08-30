@@ -662,12 +662,12 @@ DLG_UNKNOWNHOST_WARNING2=If you choose to add this machine to the known hosts li
 DLG_UNKNOWNHOST_FINGERPRINT=The server's host key fingerprint is:
 DLG_UNKNOWNHOST_ADD=&Add this machine and its key to the known hosts list
 
-DLG_HOSTKEY_SSHFP_NOTFOUND=SSHFP RR not found.
-DLG_HOSTKEY_SSHFP_MATCH=SSHFP RR found and match.
-DLG_HOSTKEY_SSHFP_MISMATCH=SSHFP RR found but not match.
-DLG_HOSTKEY_SSHFP_DIFFTYPE=SSHFP RR found but different type.
-DLG_HOSTKEY_DNSSEC_NG=SSHFP RR is *not* authenticated by DNSSEC.
-DLG_HOSTKEY_DNSSEC_OK=SSHFP RR is authenticated by DNSSEC.
+DLG_HOSTKEY_SSHFP_NOTFOUND=No host key fingerprint found in DNS.
+DLG_HOSTKEY_SSHFP_MATCH=Matching host key fingerprint found in DNS.
+DLG_HOSTKEY_SSHFP_MISMATCH=Mismatching host key fingerprint found in DNS.
+DLG_HOSTKEY_SSHFP_DIFFTYPE=Mismatching host key type found in DNS.
+DLG_HOSTKEY_DNSSEC_NG=Found insecure fingerprint in DNS.
+DLG_HOSTKEY_DNSSEC_OK=Found secure fingerprint in DNS.
 
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s encrypt error(1): bytes %d (%d)
