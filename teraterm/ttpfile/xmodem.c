@@ -417,11 +417,10 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 			case CAN:
 				break;
 			case 0x43:
-				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0)) {
-					if ((xv->XOpt == XoptCheck) && (xv->PktNumSent == 0))
+				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
+					 if ((xv->XOpt == XoptCheck))
 						XSetOpt(fv, xv, XoptCRC);
-					if (xv->XOpt != XoptCheck)
-						SendFlag = TRUE;
+					SendFlag = TRUE;
 				}
 				break;
 			}
