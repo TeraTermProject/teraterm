@@ -113,8 +113,8 @@ Name: custom; Description: {cm:type_custom}; Flags: iscustom
 Name: TeraTerm; Description: Tera Term & Macro; Flags: fixed; Types: custom compact full standard
 Name: TTSSH; Description: TTSSH; Types: compact full standard
 Name: cygterm; Description: CygTerm+; Types: full standard; Check: not isIA64
-Name: LogMeTT; Description: LogMeTT; Types: full standard; MinVersion: 4.1.1998,4.0.1381sp6
-Name: TTLEdit; Description: TTLEdit; Types: full standard; MinVersion: 4.1.1998,4.0.1381sp6
+Name: LogMeTT; Description: LogMeTT ({cm:comp_installer}); Types: full; MinVersion: 4.1.1998,4.0.1381sp6
+Name: TTLEdit; Description: TTLEdit ({cm:comp_installer}); Types: full; MinVersion: 4.1.1998,4.0.1381sp6
 Name: TeraTerm_Menu; Description: TeraTerm Menu; Types: full
 Name: TTProxy; Description: TTProxy; Types: full standard
 Name: Collector; Description: Collector; Types: full
@@ -281,6 +281,8 @@ en.comp_TTXAlwaysOnTop=Always On Top can be used
 ja.comp_TTXAlwaysOnTop=常に最前面に表示できるようにする
 en.comp_TTXRecurringCommand=Recurring Command can be used
 ja.comp_TTXRecurringCommand=定期的に文字列を送信する
+en.comp_installer=Other installer is started
+ja.comp_installer=インストーラが起動します
 en.msg_AppRunningError=Setup has detected that %s is currently running.%n%nPlease close all instances of it now, then click Next to continue.
 ja.msg_AppRunningError=セットアップは実行中の %s を検出しました。%n%n開いているアプリケーションをすべて閉じてから「次へ」をクリックしてください。
 
