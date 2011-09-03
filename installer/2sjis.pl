@@ -19,3 +19,6 @@ while (<IN>) {
 }
 close OUT;
 close IN;
+
+my(@filestat) = stat $in;
+utime $filestat[8], $filestat[9], $out;
