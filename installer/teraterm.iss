@@ -475,7 +475,7 @@ begin
       if CodePage = 0 then
         SetIniInt('Tera Term', 'CodePage', 932, iniFile);
       if Length(VTFont) = 0 then
-        SetIniString('Tera Term', 'VTFont', '‚l‚r –¾’©,0,-16,128', iniFile);
+        SetIniString('Tera Term', 'VTFont', 'Terminal,0,-19,128', iniFile);
       if Length(TEKFont) = 0 then
         SetIniString('Tera Term', 'TEKFont', 'Terminal,0,-8,128', iniFile);
     end;
