@@ -15,8 +15,11 @@ CFG = $(EXE:.exe=.cfg)
 RES = $(EXE:.exe=.res)
 ICO = $(EXE:.exe=.ico)
 RC  = $(EXE:.exe=.rc)
+ARCHIVE = cygterm+.tar.gz
 
-all : $(EXE) $(LAUNCH) src
+.PHONY: all clean install uninstall
+
+all : $(EXE) $(LAUNCH) $(ARCHIVE)
 
 $(EXE) : $(SRC) $(RES)
   ifeq (0, $(shell nm /usr/lib/crt0.o | grep -c WinMainCRTStartup))
@@ -37,7 +40,7 @@ $(RES): $(ICO) $(RC)
 	windres -O coff -o $(RES) $(RC)
 
 clean :
-	rm -f $(EXE) $(RC) $(RES) $(LAUNCH) cygterm+.tar.gz
+	rm -f $(EXE) $(RC) $(RES) $(LAUNCH) $(ARCHIVE)
 
 install : $(EXE)
 	@ install -v $(EXE) $(BINDIR)/$(EXE)
@@ -49,5 +52,5 @@ uninstall :
 	rm -f $(BINDIR)/$(EXE)
 	rm -f $(BINDIR)/$(CFG)
 
-src :
-	tar cf - $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) README README-j Makefile | gzip > cygterm+.tar.gz
+$(ARCHIVE) : $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) README README-j Makefile
+	tar cf - $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) README README-j Makefile | gzip > $(ARCHIVE)
