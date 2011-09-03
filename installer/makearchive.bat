@@ -1,31 +1,38 @@
 @echo off
-rem ●使用例
-rem 通常のビルド
-rem   makearchive.bat
-rem リビルド
-rem   makearchive.bat rebuild
-rem デバッグ情報含む
-rem   makearchive.bat debug
-rem プラグイン含む
-rem   makearchive.bat plugins
 
 SET debug=no
 SET plugins=no
+SET rebuild=
+SET release=
 
 if "%1"=="/?" goto help
 @echo on
 if "%1"=="debug" SET debug=yes
 if "%1"=="plugins" SET plugins=yes
+if "%1"=="rebuild" SET rebuild=rebuild
+if "%1"=="release" SET release=yes
 
 CALL makechm.bat
-CALL build.bat %1
+CALL build.bat %rebuild%
 
+rem  change folder name
+if not "%release%"=="yes" goto snapshot
+set ver=
+for /f "delims=" %%i in ('perl issversion.pl') do @set ver=%%i
+set dst=Output\teraterm-%ver%
+goto create
+
+:snapshot
 rem  for XP or later
 set today=snapshot-%date:~0,4%%date:~5,2%%date:~8,2%
-
-for %%a in (%today%, %today%_2, %today%_3, %today%_4, %today%_5) do (
-set dst=%%a
-if not exist %%a goto create
+@for /l %%i in (1,1,10) do @(
+if %%i==1 (
+set dst=%today%
+if not exist %today% goto create
+) else (
+set dst=%today%_%%i
+if not exist %today%_%%i goto create
+)
 )
 
 :create
@@ -43,6 +50,7 @@ copy /y ..\ttpmenu\Release\ttpmenu.exe %dst%
 copy /y ..\TTProxy\Release\TTXProxy.dll %dst%
 copy /y ..\TTXKanjiMenu\Release\ttxkanjimenu.dll %dst%
 if "%plugins%"=="yes" copy /y ..\TTXSamples\Release\*.dll %dst%
+if "%release%"=="yes" copy /y ..\TTXSamples\Release\*.dll %dst%
 
 rem Debug file
 if "%debug%"=="yes" copy /y ..\teraterm\release\*.pdb %dst%
@@ -56,6 +64,15 @@ if "%plugins%"=="yes" (
 pushd %dst%
 if exist TTXFixedWinSize.dll ren TTXFixedWinSize.dll _TTXFixedWinSize.dll
 if exist TTXResizeWin.dll ren TTXResizeWin.dll _TTXResizeWin.dll
+popd
+)
+if "%release%"=="yes" (
+pushd %dst%
+if exist TTXOutputBuffering.dll ren TTXOutputBuffering.dll _TTXOutputBuffering.dll
+if exist TTXFixedWinSize.dll ren TTXFixedWinSize.dll _TTXFixedWinSize.dll
+if exist TTXResizeWin.dll ren TTXResizeWin.dll _TTXResizeWin.dll
+if exist TTXShowCommandLine.dll ren TTXShowCommandLine.dll _TTXShowCommandLine.dll
+if exist TTXtest.dll ren TTXtest.dll _TTXtest.dll
 popd
 )
 
@@ -82,7 +99,8 @@ echo   %0          通常のビルド
 echo   %0 rebuild  リビルド
 echo   %0 debug    デバッグ情報含むビルド
 echo   %0 plugins  プラグイン情報含むビルド
+echo   %0 release  通常のビルド + プラグインを含む + フォルダ名が特殊
+echo      アーカイブ版リリース作成用
 echo.
-echo リリース物件を作成する場合は"rebuild"を使用してください。
 exit /b
 

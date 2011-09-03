@@ -795,5 +795,8 @@ Name: {app}\libeay.txt; Type: files
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-;Name: build.bat; Parameters: rebuild
 Name: build.bat
+;Name: build.bat; Parameters: rebuild
+
+[InnoIDE_PostCompile]
+;Name: makearchive.bat; Parameters: release
