@@ -12,13 +12,22 @@
 <h1>Emulations</h1>
 
 <UL>
- <LI>DEC VT100 and selected features of VT200/300</LI>
+ <LI>DEC VT100 and selected features of VT200/300 [*1]</LI>
  <LI>ANSI control sequences, which are not supported by VT100 (color attribute etc.), are also supported.</LI>
+ <LI>The xterm extension sequences like as the mouse and the 256 color are supported.</LI>
  <LI>You can enable or disable the use of bold style font for characters with the bold attribute. You can also set the color to display them.</LI>
  <LI>Characters with the blink attribute don't actually blink. Instead, you can set the color with which to display them.</LI>
  <LI>Characters with double width/height and VT52 mode are not supported.</LI>
  <LI>Tektronix TEK4010</LI>
 </UL>
+
+<p>
+<b>[*1] DEC special font</b><br>
+The line drawing characters by using the Linux TUI(Text User Interface) are controlled as the
+DEC special font(Tera Special font). The special font is defined as the &lt;ESC&gt;(0 escape
+sequence, and assigned to the line drawing character from 0x60 to 0x7f. <br>
+Reference: <a href="qanda.html">Frequently asked questions</a>
+</p>
 
 </BODY>
 </HTML>
