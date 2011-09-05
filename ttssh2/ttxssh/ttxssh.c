@@ -455,7 +455,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	settings->ForwardAgentConfirm = read_BOOL_option(fileName, "ForwardAgentConfirm", TRUE);
 
 	// ホスト鍵の DNS でのチェック (RFC 4255)
-	settings->VerifyHostKeyDNS = read_BOOL_option(fileName, "VerifyHostKeyDNS", FALSE);
+	settings->VerifyHostKeyDNS = read_BOOL_option(fileName, "VerifyHostKeyDNS", TRUE);
 
 	clear_local_settings(pvar);
 }
