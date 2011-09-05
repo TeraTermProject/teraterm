@@ -646,6 +646,7 @@ DLG_SSHSETUP_HEARTBEAT_UNIT=秒(0を指定すると無効)
 DLG_SSHSETUP_PASSWORD=パスワードをメモリ上に記憶する(&M)
 DLG_SSHSETUP_FORWARDAGENT=エージェント転送を有効にする(&A)
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=エージェント転送を確認する(&O)
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=ホストキーの鍵指紋をDNSで確認する(&V)
 DLG_SSHSETUP_NOTICE=いずれの変更も次回のセッション以降有効になります.
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=読み書き用knownhostsファイルを選択してください

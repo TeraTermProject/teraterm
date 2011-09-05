@@ -158,7 +158,8 @@ BEGIN
     CONTROL         "Enable &agent forwarding",IDC_FORWARDAGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,195,187,10
     CONTROL         "C&onfirm agent forwarding",IDC_FORWARDAGENTCONFIRM,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,209,187,10
-    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,17,223,187,12
+    CONTROL         "&Verify hostkey fingerprint by DNS",IDC_VERIFYHOSTKEYDNS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,223,187,10
+    LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,17,237,187,12
     GROUPBOX        "K&EX order (SSH2 only)",IDC_KEX_ORDER,216,8,187,98
     LISTBOX         IDC_SSHKEX_LIST,230,20,159,60,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     PUSHBUTTON      "Move Up(&3)",IDC_SSHKEX_MOVEUP,242,85,58,13,WS_GROUP

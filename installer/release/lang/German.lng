@@ -643,6 +643,7 @@ DLG_SSHSETUP_HEARTBEAT=HeartBeat(&keep-alive)
 DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 to turn off)
 DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verify hostkey fingerprint by DNS
 DLG_SSHSETUP_NOTICE=Die Einstellungen werden beim Start der nächsten Sitzung aktiv.
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Choose a read/write known-hosts file

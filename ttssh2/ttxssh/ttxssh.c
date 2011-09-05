@@ -2676,6 +2676,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDC_FORWARDAGENTCONFIRM, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_FORWARDAGENTCONFIRM", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_FORWARDAGENTCONFIRM, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_VERIFYHOSTKEYDNS, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_VERIFYHOSTKEYDNS", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_VERIFYHOSTKEYDNS, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_NOTICEBANNER, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_NOTICE", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_NOTICEBANNER, pvar->ts->UIMsg);
@@ -2823,6 +2826,9 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	}
 	if (pvar->settings.ForwardAgentConfirm) {
 		CheckDlgButton(dlg, IDC_FORWARDAGENTCONFIRM, TRUE);
+	}
+	if (pvar->settings.VerifyHostKeyDNS) {
+		CheckDlgButton(dlg, IDC_VERIFYHOSTKEYDNS, TRUE);
 	}
 }
 
@@ -3076,6 +3082,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	pvar->settings.remember_password = IsDlgButtonChecked(dlg, IDC_REMEMBERPASSWORD);
 	pvar->settings.ForwardAgent = IsDlgButtonChecked(dlg, IDC_FORWARDAGENT);
 	pvar->settings.ForwardAgentConfirm = IsDlgButtonChecked(dlg, IDC_FORWARDAGENTCONFIRM);
+	pvar->settings.VerifyHostKeyDNS = IsDlgButtonChecked(dlg, IDC_VERIFYHOSTKEYDNS);
 }
 
 static void move_cur_sel_delta(HWND listbox, int delta)
@@ -3227,6 +3234,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_REMEMBERPASSWORD, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FORWARDAGENT, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FORWARDAGENTCONFIRM, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_VERIFYHOSTKEYDNS, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_NOTICEBANNER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));

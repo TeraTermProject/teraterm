@@ -645,6 +645,7 @@ DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 pour éteindre)
 DLG_SSHSETUP_PASSWORD=Garder mot de passe en mémoire
 DLG_SSHSETUP_FORWARDAGENT=Activer &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verify hostkey fingerprint by DNS
 DLG_SSHSETUP_NOTICE=Toutes options actives prochaine ouverture de session
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Choisir un fichier hôtes connus en R/W
