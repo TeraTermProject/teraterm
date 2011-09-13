@@ -166,7 +166,7 @@ getpassword 'C:\mydata\filename.dat' 'usrpass' inputstr
 ; connection &amp; login
 msg = hostname
 strconcat msg ':22 /ssh /2 /auth=password /user='
-strconcat msg usernam
+strconcat msg username
 strconcat msg ' /passwd='
 strconcat msg inputstr
 connect msg
