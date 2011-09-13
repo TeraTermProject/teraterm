@@ -1721,12 +1721,46 @@ PCHAR StrVarPtr(TVarId VarId)
 // for ifdefined (2006.9.23 maya)
 void GetVarType(LPWORD ValType, int far *Val, LPWORD Err)
 {
-	GetFactor(ValType,Val,Err);
-	
-	if (*Err == ErrVarNotInit) {
-		ValType = TypUnknown;
-	}
+	TName Name;
+	WORD WId;
+	TVarId VarId;
+	int Index;
 
+	if (GetIdentifier(Name)) {
+		if (CheckReservedWord(Name,&WId)) {
+			*ValType = TypUnknown;
+		}
+		else {
+			CheckVar(Name, ValType, &VarId);
+			switch (*ValType) {
+				case TypIntArray:
+					if (GetIndex(&Index, Err)) {
+						if (Index >= 0 && Index < IntAryVal[VarId].size) {
+							*ValType = TypInteger;
+						}
+						else {
+							*ValType = TypUnknown;
+						}
+					}
+					break;
+				case TypStrArray:
+					if (GetIndex(&Index, Err)) {
+						VarId = GetStrVarFromArray(VarId, Index, Err);
+						if (*Err == 0) {
+							*ValType = TypString;
+						}
+						else {
+							*ValType = TypUnknown;
+						}
+					}
+					break;
+			}
+		}
+	}
+	else {
+		*ValType = TypUnknown;
+	}
+	
 	*Err = 0;
 }
 
