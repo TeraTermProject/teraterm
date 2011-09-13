@@ -36,6 +36,7 @@
 #define ErrCloseComment     16
 #define ErrOutOfRange       17
 #define ErrCloseBracket     18
+#define ErrFewMemory        19
 
 #define TypUnknown  0
 #define TypInteger  1
@@ -280,8 +281,8 @@ BOOL CheckVar(PCHAR Name, LPWORD VarType, PVarId VarId);
 BOOL NewIntVar(PCHAR Name, int InitVal);
 BOOL NewStrVar(PCHAR Name, PCHAR InitVal);
 BOOL NewLabVar(PCHAR Name, BINT InitVal, WORD ILevel);
-BOOL NewIntAryVar(PCHAR Name, int size);
-BOOL NewStrAryVar(PCHAR Name, int size);
+int NewIntAryVar(PCHAR Name, int size);
+int NewStrAryVar(PCHAR Name, int size);
 void DelLabVar(WORD ILevel);
 void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level);
 BOOL GetExpression(LPWORD ValType, int far *Val, LPWORD Err);

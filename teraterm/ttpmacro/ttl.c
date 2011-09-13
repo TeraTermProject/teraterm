@@ -721,12 +721,10 @@ WORD TTLDim(WORD type)
 	if (Err!=0) return Err;
 
 	if (type == RsvIntDim) {
-		if (!NewIntAryVar(Name, size))
-			Err = ErrTooManyVar;
+		Err = NewIntAryVar(Name, size);
 	}
-	else {
-		if (!NewStrAryVar(Name, size))
-			Err = ErrTooManyVar;
+	else { // type == RsvStrDim
+		Err = NewStrAryVar(Name, size);
 	}
 	return Err;
 }

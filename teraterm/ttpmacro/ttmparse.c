@@ -106,6 +106,7 @@ void DispErr(WORD Err)
 		case ErrCloseComment: strncpy_s(Msg, sizeof(Msg),"\"*/\" expected.", _TRUNCATE); break;
 		case ErrOutOfRange: strncpy_s(Msg, sizeof(Msg), "Index out of range.", _TRUNCATE); break;
 		case ErrCloseBracket: strncpy_s(Msg, sizeof(Msg), "\"]\" expected.", _TRUNCATE); break;
+		case ErrFewMemory: strncpy_s(Msg, sizeof(Msg), "Can't allocate memory.", _TRUNCATE); break;
 	}
 
 	i = OpenErrDlg(Msg,LineBuff);
@@ -852,34 +853,36 @@ BOOL NewStrVar(PCHAR Name, PCHAR InitVal)
 	return TRUE;
 }
 
-BOOL NewIntAryVar(PCHAR Name, int size)
+int NewIntAryVar(PCHAR Name, int size)
 {
 	long P;
-	if (IntAryVarCount >= MaxNumOfIntAryVar) return FALSE;
+	if (IntAryVarCount >= MaxNumOfIntAryVar) return ErrTooManyVar;
+	if (size <= 0 || size > 65536) return ErrOutOfRange;
 
-	if ((IntAryVal[IntAryVarCount].val = calloc(size, sizeof(int))) == NULL) return FALSE;
+	if ((IntAryVal[IntAryVarCount].val = calloc(size, sizeof(int))) == NULL) return ErrFewMemory;
 	IntAryVal[IntAryVarCount].size = size;
 
 	P = (IntAryVarIdOff + IntAryVarCount) * MaxNameLen;
 	strncpy_s(&NameBuff[P], MaxNameLen, Name, _TRUNCATE);
 
 	IntAryVarCount++;
-	return TRUE;
+	return 0;
 }
 
-BOOL NewStrAryVar(PCHAR Name, int size)
+int NewStrAryVar(PCHAR Name, int size)
 {
 	long P;
-	if (StrAryVarCount >= MaxNumOfStrAryVar) return FALSE;
+	if (StrAryVarCount >= MaxNumOfStrAryVar) return ErrTooManyVar;
+	if (size <= 0 || size > 65536) return ErrOutOfRange;
 
-	if ((StrAryVal[StrAryVarCount].val = calloc(size, sizeof(TStrVal))) == NULL) return FALSE;
+	if ((StrAryVal[StrAryVarCount].val = calloc(size, sizeof(TStrVal))) == NULL) return ErrFewMemory;
 	StrAryVal[StrAryVarCount].size = size;
 
 	P = (StrAryVarIdOff + StrAryVarCount) * MaxNameLen;
 	strncpy_s(&NameBuff[P], MaxNameLen, Name, _TRUNCATE);
 
 	StrAryVarCount++;
-	return TRUE;
+	return 0;
 }
 
 BOOL NewLabVar(PCHAR Name, BINT InitVal, WORD ILevel)
