@@ -229,7 +229,8 @@ BOOL RegisterLabels(int IBuff)
 	BYTE b;
 	TName LabName;
 	WORD Err;
-	WORD VarType, VarId;
+	WORD VarType;
+	TVarId VarId;
 	TStrVal tmp;
 
 	Buff[IBuff] = GlobalLock(BuffHandle[IBuff]);
@@ -244,7 +245,7 @@ BOOL RegisterLabels(int IBuff)
 		b = GetFirstChar();
 		if (b==':') {
 			if (GetLabelName(LabName) && (GetFirstChar()==0)) {
-				if (CheckVar(LabName,&VarType,&VarId)) {
+				if (CheckVar(LabName, &VarType, &VarId)) {
 					Err = ErrLabelAlreadyDef;
 				}
 				else {

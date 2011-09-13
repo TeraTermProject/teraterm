@@ -20,28 +20,44 @@ char LineBuff[MaxLineLen]; // 行バッファのサイズを拡張した。(2007.6.9 maya)
 WORD LinePtr;
 WORD LineLen;
 
+typedef struct {
+    int size;
+    int *val;
+} TIntAry, *PIntAry;
+
+typedef struct {
+    int size;
+    PStrVal val;
+} TStrAry, *PStrAry;
+
 // 変数の個数を128->256、ラベルの個数を256->512へ拡張した。(2006.2.1 yutaka)
 // 変数の個数を、InitTTL で作っているシステム変数の分だけ追加した。(2006.7.26 maya)
-#define MaxNumOfIntVar (LONG)(128*2+3)
-#define MaxNumOfStrVar (LONG)(128*2+19)
-#define MaxNumOfLabVar (LONG)256*2
+#define MaxNumOfIntVar (LONG)(256+3)
+#define MaxNumOfStrVar (LONG)(256+19)
+#define MaxNumOfLabVar (LONG)512
+#define MaxNumOfIntAryVar (LONG)256
+#define MaxNumOfStrAryVar (LONG)256
 
 #define IntVarIdOff (LONG)0
 #define StrVarIdOff (IntVarIdOff+MaxNumOfIntVar)
 #define LabVarIdOff (StrVarIdOff+MaxNumOfStrVar)
-#define MaxNumOfName (MaxNumOfIntVar+MaxNumOfStrVar+MaxNumOfLabVar)
+#define IntAryVarIdOff (LabVarIdOff+MaxNumOfLabVar)
+#define StrAryVarIdOff (IntAryVarIdOff+MaxNumOfIntAryVar)
+#define MaxNumOfName (MaxNumOfIntVar+MaxNumOfStrVar+MaxNumOfLabVar+MaxNumOfIntAryVar+MaxNumOfStrAryVar)
 #define NameBuffLen MaxNumOfName*MaxNameLen
 #define StrBuffLen MaxNumOfStrVar*MaxStrLen
 
 static int IntVal[MaxNumOfIntVar];
 static BINT LabVal[MaxNumOfLabVar];
 static BYTE LabLevel[MaxNumOfLabVar];
+static TIntAry IntAryVal[MaxNumOfIntAryVar];
+static TStrAry StrAryVal[MaxNumOfStrAryVar];
 
 static HANDLE HNameBuff;
 static PCHAR NameBuff;
 static HANDLE HStrBuff;
 static PCHAR StrBuff;
-static WORD IntVarCount, StrVarCount, LabVarCount;
+static WORD IntVarCount, StrVarCount, LabVarCount, IntAryVarCount, StrAryVarCount;
 
 BOOL InitVar()
 {
@@ -88,6 +104,8 @@ void DispErr(WORD Err)
 		case ErrTypeMismatch: strncpy_s(Msg, sizeof(Msg),"Type mismatch.", _TRUNCATE); break;
 		case ErrVarNotInit: strncpy_s(Msg, sizeof(Msg),"Variable not initialized.", _TRUNCATE); break;
 		case ErrCloseComment: strncpy_s(Msg, sizeof(Msg),"\"*/\" expected.", _TRUNCATE); break;
+		case ErrOutOfRange: strncpy_s(Msg, sizeof(Msg), "Index out of range.", _TRUNCATE); break;
+		case ErrCloseBracket: strncpy_s(Msg, sizeof(Msg), "\"]\" expected.", _TRUNCATE); break;
 	}
 
 	i = OpenErrDlg(Msg,LineBuff);
@@ -216,6 +234,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"include")==0) *WordId = RsvInclude ;
 		else if (_stricmp(Str,"inputbox")==0) *WordId = RsvInputBox;
 		else if (_stricmp(Str,"int2str")==0) *WordId = RsvInt2Str;
+		else if (_stricmp(Str,"intdim")==0) *WordId = RsvIntDim;
 		break;
 	case 'k':
 		if (_stricmp(Str,"kmtfinish")==0) *WordId = RsvKmtFinish;
@@ -296,6 +315,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"strcompare")==0) *WordId = RsvStrCompare;
 		else if (_stricmp(Str,"strconcat")==0) *WordId = RsvStrConcat;
 		else if (_stricmp(Str,"strcopy")==0) *WordId = RsvStrCopy;
+		else if (_stricmp(Str,"strdim")==0) *WordId = RsvStrDim;
 		else if (_stricmp(Str,"strinsert")==0) *WordId = RsvStrInsert;
 		else if (_stricmp(Str,"strjoin")==0) *WordId = RsvStrJoin;
 		else if (_stricmp(Str,"strlen")==0) *WordId = RsvStrLen;
@@ -752,50 +772,56 @@ BOOL GetNumber(int far *Num)
 	return TRUE;
 }
 
-BOOL CheckVar(PCHAR Name, LPWORD VarType, LPWORD VarId)
+BOOL CheckVar(PCHAR Name, LPWORD VarType, PVarId VarId)
 {
 	int i;
 	long P;
 
 	*VarType = TypUnknown;
 
-	i = 0;
-	while (i<IntVarCount)
-	{
-		P = (i+IntVarIdOff)*MaxNameLen;
-		if (_stricmp(&NameBuff[P],Name)==0)
-		{
+	for (i=0; i<IntVarCount; i++) {
+		P = (i + IntVarIdOff) * MaxNameLen;
+		if (_stricmp(&NameBuff[P], Name) == 0) {
 			*VarType = TypInteger;
-			*VarId = (WORD)i;
+			*VarId = (TVarId)i;
 			return TRUE;
 		}
-		i++;
 	}
 
-	i = 0;
-	while (i<StrVarCount)
-	{
-		P = (i+StrVarIdOff)*MaxNameLen;
-		if (_stricmp(&NameBuff[P],Name)==0)
-		{
+	for (i=0; i<StrVarCount; i++) {
+		P = (i + StrVarIdOff) * MaxNameLen;
+		if (_stricmp(&NameBuff[P], Name) == 0) {
 			*VarType = TypString;
 			*VarId = i;
 			return TRUE;
 		}
-		i++;
 	}
 
-	i = 0;
-	while (i<LabVarCount)
-	{
-		P = (i+LabVarIdOff)*MaxNameLen;
-		if (_stricmp(&NameBuff[P],Name)==0)
-		{
+	for (i=0; i<LabVarCount; i++) {
+		P = (i + LabVarIdOff) * MaxNameLen;
+		if (_stricmp(&NameBuff[P], Name) == 0) {
 			*VarType = TypLabel;
 			*VarId = i;
 			return TRUE;
 		}
-		i++;
+	}
+
+	for (i=0; i<IntAryVarCount; i++) {
+		P = (i + IntAryVarIdOff) * MaxNameLen;
+		if (_stricmp(&NameBuff[P], Name) == 0) {
+			*VarType = TypIntArray;
+			*VarId = i;
+			return TRUE;
+		}
+	}
+
+	for (i=0; i<StrAryVarCount; i++) {
+		P = (i + StrAryVarIdOff) * MaxNameLen;
+		if (_stricmp(&NameBuff[P], Name) == 0) {
+			*VarType = TypStrArray;
+			*VarId = i;
+			return TRUE;
+		}
 	}
 
 	return FALSE;
@@ -823,6 +849,36 @@ BOOL NewStrVar(PCHAR Name, PCHAR InitVal)
 	P = StrVarCount*MaxStrLen;
 	strncpy_s(&StrBuff[P],MaxStrLen,InitVal,_TRUNCATE);
 	StrVarCount++;
+	return TRUE;
+}
+
+BOOL NewIntAryVar(PCHAR Name, int size)
+{
+	long P;
+	if (IntAryVarCount >= MaxNumOfIntAryVar) return FALSE;
+
+	if ((IntAryVal[IntAryVarCount].val = calloc(size, sizeof(int))) == NULL) return FALSE;
+	IntAryVal[IntAryVarCount].size = size;
+
+	P = (IntAryVarIdOff + IntAryVarCount) * MaxNameLen;
+	strncpy_s(&NameBuff[P], MaxNameLen, Name, _TRUNCATE);
+
+	IntAryVarCount++;
+	return TRUE;
+}
+
+BOOL NewStrAryVar(PCHAR Name, int size)
+{
+	long P;
+	if (StrAryVarCount >= MaxNumOfStrAryVar) return FALSE;
+
+	if ((StrAryVal[StrAryVarCount].val = calloc(size, sizeof(TStrVal))) == NULL) return FALSE;
+	StrAryVal[StrAryVarCount].size = size;
+
+	P = (StrAryVarIdOff + StrAryVarCount) * MaxNameLen;
+	strncpy_s(&NameBuff[P], MaxNameLen, Name, _TRUNCATE);
+
+	StrAryVarCount++;
 	return TRUE;
 }
 
@@ -863,16 +919,18 @@ void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level)
 BOOL GetFactor(LPWORD ValType, int far *Val, LPWORD Err)
 {
 	TName Name;
-	WORD P, Id;
+	WORD P, WId;
+	TVarId VarId;
+	int Index;
 
 	P = LinePtr;
 	*Err = 0;
 	if (GetIdentifier(Name)) {
-		if (CheckReservedWord(Name,&Id)) {
+		if (CheckReservedWord(Name,&WId)) {
 			if (GetFactor(ValType, Val, Err)) {
 				if ((*Err==0) && (*ValType!=TypInteger))
 					*Err = ErrTypeMismatch;
-				switch (Id) {
+				switch (WId) {
 					case RsvBNot: *Val = ~(*Val); break;
 					case RsvLNot: *Val = !(*Val); break;
 					default: *Err = ErrSyntax;
@@ -882,10 +940,36 @@ BOOL GetFactor(LPWORD ValType, int far *Val, LPWORD Err)
 				*Err = ErrSyntax;
 			}
 		}
-		else if (CheckVar(Name, ValType, &Id)) {
+		else if (CheckVar(Name, ValType, &VarId)) {
 			switch (*ValType) {
-				case TypInteger: *Val = IntVal[Id]; break;
-				case TypString: *Val = Id; break;
+				case TypInteger: *Val = IntVal[VarId]; break;
+				case TypString: *Val = VarId; break;
+				case TypIntArray:
+					if (GetIndex(&Index, Err)) {
+						if (Index >= 0 && Index < IntAryVal[VarId].size) {
+							*Val = IntAryVal[VarId].val[Index];
+							*ValType = TypInteger;
+						}
+						else {
+							*Err = ErrOutOfRange;
+						}
+					}
+					else if (*Err == 0) {
+						*Val = VarId;
+					}
+					break;
+				case TypStrArray:
+					if (GetIndex(&Index, Err)) {
+						VarId = GetStrVarFromArray(VarId, Index, Err);
+						if (*Err == 0) {
+							*Val = VarId;
+							*ValType = TypString;
+						}
+					}
+					else if (*Err == 0) {
+						*Val = VarId;
+					}
+					break;
 			}
 		}
 		else
@@ -893,11 +977,11 @@ BOOL GetFactor(LPWORD ValType, int far *Val, LPWORD Err)
 	}
 	else if (GetNumber(Val))
 		*ValType = TypInteger;
-	else if (GetOperator(&Id)) {
+	else if (GetOperator(&WId)) {
 		if (GetFactor(ValType, Val, Err)) {
 			if ((*Err==0) && (*ValType != TypInteger))
 				*Err = ErrTypeMismatch;
-			switch (Id) {
+			switch (WId) {
 				case RsvPlus:                    break;
 				case RsvMinus:   *Val = -(*Val); break;
 				case RsvBNot:    *Val = ~(*Val); break;
@@ -1490,33 +1574,54 @@ void GetIntVal(int far *Val, LPWORD Err)
 		*Err = ErrTypeMismatch;
 }
 
-void SetIntVal(WORD VarId, int Val)
+void SetIntVal(TVarId VarId, int Val)
 {
-	IntVal[VarId] = Val;
+	if (VarId >> 16) {
+		IntAryVal[(VarId>>16)-1].val[VarId & 0xffff] = Val;
+	}
+	else {
+		IntVal[VarId] = Val;
+	}
 }
 
-int CopyIntVal(WORD VarId)
+int CopyIntVal(TVarId VarId)
 {
-	return IntVal[VarId];
+	if (VarId >> 16) {
+		return IntAryVal[(VarId>>16)-1].val[VarId & 0xffff];
+	}
+	else {
+		return IntVal[VarId];
+	}
 }
 
-void GetIntVar(LPWORD VarId, LPWORD Err)
+void GetIntVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
 	WORD VarType;
+	int Index;
 
 	if (*Err!=0) return;
 
-	if (GetIdentifier(Name))
-	{
-		if (CheckVar(Name,&VarType,VarId))
-		{
-			if (VarType!=TypInteger)
+	if (GetIdentifier(Name)) {
+		if (CheckVar(Name, &VarType, VarId)) {
+			switch (VarType) {
+			case TypInteger:
+				break;
+			case TypIntArray:
+				if (GetIndex(&Index, Err)) {
+					*VarId = GetIntVarFromArray(*VarId, Index, Err);
+				}
+				else if (*Err == 0) {
+					*Err = ErrTypeMismatch;
+				}
+				break;
+			default:
 				*Err = ErrTypeMismatch;
+			}
 		}
 		else {
-			if (NewIntVar(Name,0))
-				CheckVar(Name,&VarType,VarId);
+			if (NewIntVar(Name, 0))
+				CheckVar(Name, &VarType, VarId);
 			else
 				*Err = ErrTooManyVar;
 		}
@@ -1538,18 +1643,17 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 	Str[0] = 0;
 	if (*Err!=0) return;
 
-	if (GetString(Str,Err))
+	if (GetString(Str, Err))
 		return;
-	else if (GetExpression(&VarType,&VarId,Err))
-	{
+	else if (GetExpression(&VarType, &VarId, Err)) {
 		if (*Err!=0) return;
 		switch (VarType) {
 			case TypString:
-				strncpy_s(Str,MaxStrLen,&StrBuff[VarId*MaxStrLen],_TRUNCATE);
+				strncpy_s(Str, MaxStrLen, StrVarPtr(VarId), _TRUNCATE);
 				break;
 			case TypInteger:
 				if (AutoConversion)
-					_snprintf_s(Str,MaxStrLen,_TRUNCATE,"%d",VarId);
+					_snprintf_s(Str, MaxStrLen, _TRUNCATE, "%d", VarId);
 				else
 					*Err = ErrTypeMismatch;
 				break;
@@ -1561,23 +1665,34 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 		*Err = ErrSyntax;
 }
 
-void GetStrVar(LPWORD VarId, LPWORD Err)
+void GetStrVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
 	WORD VarType;
+	int Index;
 
 	if (*Err!=0) return;
 
-	if (GetIdentifier(Name))
-	{
-		if (CheckVar(Name,&VarType,VarId))
-		{
-			if (VarType!=TypString)
+	if (GetIdentifier(Name)) {
+		if (CheckVar(Name, &VarType, VarId)) {
+			switch (VarType) {
+			case TypString:
+				break;
+			case TypStrArray:
+				if (GetIndex(&Index, Err)) {
+					*VarId = GetStrVarFromArray(*VarId, Index, Err);
+				}
+				else if (*Err == 0) {
+					*Err = ErrTypeMismatch;
+				}
+				break;
+			default:
 				*Err = ErrTypeMismatch;
+			}
 		}
 		else {
-			if (NewStrVar(Name,""))
-				CheckVar(Name,&VarType,VarId);
+			if (NewStrVar(Name, ""))
+				CheckVar(Name, &VarType, VarId);
 			else
 				*Err = ErrTooManyVar;
 		}
@@ -1586,16 +1701,21 @@ void GetStrVar(LPWORD VarId, LPWORD Err)
 		*Err = ErrSyntax;
 }
 
-void SetStrVal(WORD VarId, PCHAR Str)
+void SetStrVal(TVarId VarId, PCHAR Str)
 {
 	// StrBuf の運用上 MaxStrLen が正しいサイズなのでサイズを固定
 	// (2007.6.23 maya)
-	strncpy_s(&StrBuff[VarId*MaxStrLen],MaxStrLen,Str,_TRUNCATE);
+	strncpy_s(StrVarPtr(VarId), MaxStrLen, Str, _TRUNCATE);
 }
 
-PCHAR StrVarPtr(WORD VarId)
+PCHAR StrVarPtr(TVarId VarId)
 {
-	return (&StrBuff[VarId*MaxStrLen]);
+	if (VarId >> 16) {
+		return StrAryVal[(VarId>>16)-1].val[VarId & 0xffff];
+	}
+	else {
+		return &StrBuff[VarId*MaxStrLen];
+	}
 }
 
 // for ifdefined (2006.9.23 maya)
@@ -1608,4 +1728,45 @@ void GetVarType(LPWORD ValType, int far *Val, LPWORD Err)
 	}
 
 	*Err = 0;
+}
+
+BOOL GetIndex(int *Index, LPWORD Err)
+{
+	WORD P;
+	int Idx;
+
+	*Err = 0;
+	P = LinePtr;
+	if (GetFirstChar() == '[') {
+		GetIntVal(&Idx, Err);
+		if (*Err == 0) {
+			if (GetFirstChar() == ']') {
+				*Index = Idx;
+				return TRUE;
+			}
+			*Err = ErrCloseBracket;
+		}
+	}
+	LinePtr = P;
+	return FALSE;
+}
+
+TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err)
+{
+	if (Index < 0 || Index >= IntAryVal[VarId].size) {
+		*Err = ErrOutOfRange;
+		return -1;
+	}
+	*Err = 0;
+	return ((VarId+1) << 16) | Index;
+}
+
+TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
+{
+	if (Index < 0 || Index >= StrAryVal[VarId].size) {
+		*Err = ErrOutOfRange;
+		return -1;
+	}
+	*Err = 0;
+	return ((VarId+1) << 16) | Index;
 }

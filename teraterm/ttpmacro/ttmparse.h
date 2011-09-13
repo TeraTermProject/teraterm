@@ -34,12 +34,16 @@
 #define ErrTypeMismatch     14
 #define ErrVarNotInit       15
 #define ErrCloseComment     16
+#define ErrOutOfRange       17
+#define ErrCloseBracket     18
 
 #define TypUnknown  0
 #define TypInteger  1
 #define TypLogical  2
 #define TypString   3
 #define TypLabel    4
+#define TypIntArray 5
+#define TypStrArray 6
 
 #define RsvBeep         1
 #define RsvBPlusRecv    2
@@ -190,6 +194,8 @@
 #define RsvSendlnBroadcast  147
 #define RsvWait4all     148
 #define RsvDispStr      149
+#define RsvIntDim       150
+#define RsvStrDim       151
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
 #define RsvYmodemSend   177
@@ -250,6 +256,9 @@ typedef TName far *PName;
 typedef char TStrVal [MaxStrLen];
 typedef TStrVal far *PStrVal;
 
+typedef DWORD TVarId;
+typedef TVarId far *PVarId;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -264,25 +273,31 @@ BYTE GetFirstChar();
 BOOL CheckParameterGiven();
 BOOL GetIdentifier(PCHAR Name);
 BOOL GetReservedWord(LPWORD WordId);
+BOOL CheckReservedWord(PCHAR Str, LPWORD WordId);
 BOOL GetLabelName(PCHAR Name);
 BOOL GetString(PCHAR Str, LPWORD Err);
-BOOL CheckVar(PCHAR Name, LPWORD VarType, LPWORD VarId);
+BOOL CheckVar(PCHAR Name, LPWORD VarType, PVarId VarId);
 BOOL NewIntVar(PCHAR Name, int InitVal);
 BOOL NewStrVar(PCHAR Name, PCHAR InitVal);
 BOOL NewLabVar(PCHAR Name, BINT InitVal, WORD ILevel);
+BOOL NewIntAryVar(PCHAR Name, int size);
+BOOL NewStrAryVar(PCHAR Name, int size);
 void DelLabVar(WORD ILevel);
 void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level);
 BOOL GetExpression(LPWORD ValType, int far *Val, LPWORD Err);
 void GetIntVal(int far *Val, LPWORD Err);
-void SetIntVal(WORD VarId, int Val);
-int CopyIntVal(WORD VarId);
-void GetIntVar(LPWORD VarId, LPWORD Err);
+void SetIntVal(TVarId VarId, int Val);
+int CopyIntVal(TVarId VarId);
+void GetIntVar(PVarId VarId, LPWORD Err);
 void GetStrVal(PCHAR Str, LPWORD Err);
 void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion);
-void GetStrVar(LPWORD VarId, LPWORD Err);
-void SetStrVal(WORD VarId, PCHAR Str);
-PCHAR StrVarPtr(WORD VarId);
+void GetStrVar(PVarId VarId, LPWORD Err);
+void SetStrVal(TVarId VarId, PCHAR Str);
+PCHAR StrVarPtr(TVarId VarId);
 void GetVarType(LPWORD ValType, int far *Val, LPWORD Err);
+TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
+TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
+BOOL GetIndex(int *Index, LPWORD Err);
 
 extern WORD TTLStatus;
 extern char LineBuff[MaxLineLen];

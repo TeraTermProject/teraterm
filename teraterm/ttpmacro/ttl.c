@@ -319,11 +319,11 @@ WORD TTLBreak() {
 WORD TTLCall()
 {
 	TName LabName;
-	WORD Err, VarType, VarId;
+	WORD Err, VarType;
+	TVarId VarId;
 
-	if (GetLabelName(LabName) && (GetFirstChar()==0))
-	{
-		if (CheckVar(LabName,&VarType,&VarId) && (VarType==TypLabel))
+	if (GetLabelName(LabName) && (GetFirstChar()==0)) {
+		if (CheckVar(LabName, &VarType, &VarId) && (VarType==TypLabel))
 			Err = CallToLabel(VarId);
 		else
 			Err = ErrLabelReq;
@@ -337,7 +337,8 @@ WORD TTLCall()
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
 {
-	WORD VarId, Err;
+	WORD Err;
+	TVarId VarId;
 	HANDLE hText;
 	PTSTR clipbText;
 	char buf[MaxStrLen];
@@ -347,7 +348,7 @@ WORD TTLClipb2Var()
 	static int cbbuffsize, cblen;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVar(&VarId, &Err);
 	if (Err!=0) return Err;
 
 	// get 2nd arg(optional) if given
@@ -376,7 +377,7 @@ WORD TTLClipb2Var()
 					strncpy_s(buf,sizeof(buf),clipbText,_TRUNCATE);
 					GlobalUnlock(hText);
 					CloseClipboard();
-					SetStrVal(VarId,buf);
+					SetStrVal(VarId, buf);
 					SetResult(3);
 					return Err;
 				}
@@ -398,7 +399,7 @@ WORD TTLClipb2Var()
 		else {
 			SetResult(1);
 		}
-		SetStrVal(VarId,buf);
+		SetStrVal(VarId, buf);
 	}
 	else {
 		SetResult(0);
@@ -462,13 +463,14 @@ WORD TTLCloseTT()
 
 WORD TTLCode2Str()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	int Num, Len, c, i;
 	BYTE d;
 	TStrVal Str;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVar(&VarId, &Err);
 
 	GetIntVal(&Num,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
@@ -487,7 +489,7 @@ WORD TTLCode2Str()
 		}
 	}
 	Str[i] = 0;
-	SetStrVal(VarId,Str);
+	SetStrVal(VarId, Str);
 	return Err;
 }
 
@@ -601,17 +603,18 @@ static unsigned long crc2(int n, unsigned char c[])
 WORD TTLCrc32()
 {
 	TStrVal Str;
-	WORD Err, CRC;
+	WORD Err;
+	TVarId VarId;
 
 	Err = 0;
-	GetIntVar(&CRC, &Err);
+	GetIntVar(&VarId, &Err);
 	GetStrVal(Str,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
 
-	SetIntVal(CRC, crc2(strlen(Str), Str));
+	SetIntVal(VarId, crc2(strlen(Str), Str));
 
 	return Err;
 }
@@ -624,13 +627,14 @@ WORD TTLCrc32File()
 {
 	TStrVal Str;
 	int result = 0;
-	WORD Err, CRC;
+	WORD Err;
+	TVarId VarId;
 	HANDLE fh = INVALID_HANDLE_VALUE, hMap = NULL;
 	LPBYTE lpBuf = NULL;
 	DWORD fsize;
 
 	Err = 0;
-	GetIntVar(&CRC, &Err);
+	GetIntVar(&VarId, &Err);
 	GetStrVal(Str,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
@@ -659,7 +663,7 @@ WORD TTLCrc32File()
 
 	fsize = GetFileSize(fh,NULL);
 
-	SetIntVal(CRC, crc2(fsize, lpBuf));
+	SetIntVal(VarId, crc2(fsize, lpBuf));
 
 error:
 	if (lpBuf != NULL) {
@@ -697,6 +701,33 @@ WORD TTLDelPassword()
 		WritePrivateProfileString("Password",NULL,NULL,Str);
 	else            // delete password specified by Str2
 		WritePrivateProfileString("Password",Str2,NULL,Str);
+	return Err;
+}
+
+WORD TTLDim(WORD type)
+{
+	WORD Err, WordId, VarType;
+	TName Name;
+	TVarId VarId;
+	int size;
+
+	Err = 0;
+
+	if (! GetIdentifier(Name)) return ErrSyntax;
+	if (CheckReservedWord(Name, &WordId)) return ErrSyntax;
+	if (CheckVar(Name, &VarType, &VarId)) return ErrSyntax;
+
+	GetIntVal(&size, &Err);
+	if (Err!=0) return Err;
+
+	if (type == RsvIntDim) {
+		if (!NewIntAryVar(Name, size))
+			Err = ErrTooManyVar;
+	}
+	else {
+		if (!NewStrAryVar(Name, size))
+			Err = ErrTooManyVar;
+	}
 	return Err;
 }
 
@@ -976,11 +1007,12 @@ WORD TTLExit()
 
 WORD TTLExpandEnv()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	TStrVal deststr, srcptr;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVar(&VarId, &Err);
 	if (Err!=0) return Err;
 
 	if (CheckParameterGiven()) { // expandenv strvar strval
@@ -1114,13 +1146,14 @@ WORD TTLFileCopy()
 
 WORD TTLFileCreate()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int FH;
 	TStrVal FName;
 
 	Err = 0;
-	GetIntVar(&VarId,&Err);
-	GetStrVal(FName,&Err);
+	GetIntVar(&VarId, &Err);
+	GetStrVal(FName, &Err);
 	if ((Err==0) &&
 	    ((strlen(FName)==0) || (GetFirstChar()!=0)))
 		Err = ErrSyntax;
@@ -1130,7 +1163,7 @@ WORD TTLFileCreate()
 	}
 
 	if (!GetAbsPath(FName,sizeof(FName))) {
-		SetIntVal(VarId,-1);
+		SetIntVal(VarId, -1);
 		SetResult(-1);
 		return Err;
 	}
@@ -1142,7 +1175,7 @@ WORD TTLFileCreate()
 	  else {
 		SetResult(0);
 	}
-	SetIntVal(VarId,FH);
+	SetIntVal(VarId, FH);
 	return Err;
 }
 
@@ -1201,7 +1234,8 @@ WORD TTLFileMarkPtr()
 WORD TTLFilenameBox()
 {
 	TStrVal Str1;
-	WORD Err, ValType, VarId;
+	WORD Err, ValType;
+	TVarId VarId;
 	OPENFILENAME ofn;
 	char uimsg[MAX_UIMSG];
 	BOOL SaveFlag = FALSE;
@@ -1221,7 +1255,7 @@ WORD TTLFilenameBox()
 	if (Err!=0) return Err;
 
 	SetInputStr("");
-	if (CheckVar("inputstr",&ValType,&VarId) &&
+	if (CheckVar("inputstr", &ValType, &VarId) &&
 	    (ValType==TypString)) {
 		memset(&ofn, 0, sizeof(OPENFILENAME));
 		ofn.lStructSize     = sizeof(OPENFILENAME);
@@ -1246,44 +1280,46 @@ WORD TTLFilenameBox()
 
 WORD TTLFileOpen()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int Append, FH;
 	TStrVal FName;
 
 	Err = 0;
-	GetIntVar(&VarId,&Err);
-	GetStrVal(FName,&Err);
-	GetIntVal(&Append,&Err);
+	GetIntVar(&VarId, &Err);
+	GetStrVal(FName, &Err);
+	GetIntVal(&Append, &Err);
 	if ((Err==0) &&
 	    ((strlen(FName)==0) || (GetFirstChar()!=0)))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
 	if (!GetAbsPath(FName,sizeof(FName))) {
-		SetIntVal(VarId,-1);
+		SetIntVal(VarId, -1);
 		return Err;
 	}
 	FH = _lopen(FName,OF_READWRITE);
 	if (FH<0)
 		FH = _lcreat(FName,0);
 	if (FH<0) FH = -1;
-	SetIntVal(VarId,FH);
+	SetIntVal(VarId, FH);
 	if (FH<0) return Err;
-	if (Append!=0) _llseek(FH,0,2);  
+	if (Append!=0) _llseek(FH, 0, 2);  
 	return Err;
 }
 
 WORD TTLFileReadln()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int FH, i, c;
 	TStrVal Str;
 	BOOL EndFile, EndLine;
 	BYTE b;
 
 	Err = 0;
-	GetIntVal(&FH,&Err);
-	GetStrVar(&VarId,&Err);
+	GetIntVal(&FH, &Err);
+	GetStrVar(&VarId, &Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -1292,14 +1328,14 @@ WORD TTLFileReadln()
 	EndLine = FALSE;
 	EndFile = TRUE;
 	do {
-		c = _lread(FH,&b,1);
+		c = _lread(FH, &b, 1);
 		if (c>0) EndFile = FALSE;
 		if (c==1) {
 			switch (b) {
 				case 0x0d:
-					c = _lread(FH,&b,1);
+					c = _lread(FH, &b, 1);
 					if ((c==1) && (b!=0x0a))
-						_llseek(FH,-1,1);
+						_llseek(FH, -1, 1);
 					EndLine = TRUE;
 					break;
 				case 0x0a: EndLine = TRUE; break;
@@ -1319,7 +1355,7 @@ WORD TTLFileReadln()
 		SetResult(0);
 
 	Str[i] = 0;
-	SetStrVal(VarId,Str);
+	SetStrVal(VarId, Str);
 	return Err;
 }
 
@@ -1330,7 +1366,8 @@ WORD TTLFileReadln()
 // (2006.11.1 yutaka)
 WORD TTLFileRead()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int FH, i, c;
 	int ReadByte;   // 読み込むバイト数
 	TStrVal Str;
@@ -1464,7 +1501,8 @@ WORD TTLFileSeekBack()
 
 WORD TTLFileStat()
 {
-	WORD Err, SizeVarId, TimeVarId, DrvVarId;
+	WORD Err;
+	TVarId SizeVarId, TimeVarId, DrvVarId;
 	TStrVal FName, TimeStr, DrvStr;
 	struct _stat st;
 	int ret;
@@ -1717,7 +1755,8 @@ WORD TTLFindClose()
 
 WORD TTLFindFirst()
 {
-	WORD DH, Name, Err;
+	TVarId DH, Name;
+	WORD Err;
 	TStrVal Dir;
 	int i;
 	struct _finddata_t data;
@@ -1760,7 +1799,8 @@ WORD TTLFindFirst()
 
 WORD TTLFindNext()
 {
-	WORD Name, Err;
+	TVarId Name;
+	WORD Err;
 	int DH;
 	struct _finddata_t data;
 
@@ -1875,7 +1915,8 @@ WORD TTLFolderSearch()
 
 WORD TTLFor()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int ValStart, ValEnd, i;
 
 	Err = 0;
@@ -1912,7 +1953,8 @@ WORD TTLFor()
 
 WORD TTLGetDir()
 {
-	WORD VarId, Err;
+	WORD Err;
+	TVarId VarId;
 	TStrVal Str;
 
 	Err = 0;
@@ -1928,7 +1970,8 @@ WORD TTLGetDir()
 
 WORD TTLGetEnv()
 {
-	WORD VarId, Err;
+	WORD Err;
+	TVarId VarId;
 	TStrVal Str;
 	PCHAR Str2;
 
@@ -1966,7 +2009,8 @@ WORD TTLGetFileAttr()
 
 WORD TTLGetHostname()
 {
-	WORD VarId, Err;
+	WORD Err;
+	TVarId VarId;
 	char Str[MaxStrLen];
 
 	Err = 0;
@@ -1987,7 +2031,8 @@ WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2;
 	char Temp[512];
-	WORD VarId, Err;
+	WORD Err;
+	TVarId VarId;
 	int result = 0;  /* failure */
 
 	Err = 0;
@@ -2028,7 +2073,8 @@ WORD TTLGetPassword()
 
 WORD TTLGetTime(WORD mode)
 {
-	WORD VarId, Err;
+	WORD Err;
+	TVarId VarId;
 	TStrVal Str1, Str2;
 	time_t time1;
 	struct tm *ptm;
@@ -2082,7 +2128,8 @@ WORD TTLGetTime(WORD mode)
 
 WORD TTLGetTitle()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	char Str[TitleBuffSize*2];
 
 	Err = 0;
@@ -2101,7 +2148,8 @@ WORD TTLGetTitle()
 
 WORD TTLGetTTDir()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	char Temp[MAX_PATH],HomeDir[MAX_PATH];
 
 	Err = 0;
@@ -2188,7 +2236,8 @@ error:
 //
 WORD TTLGetVer()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Str1, Str2;
 	int a, b, c, d;
 	int compare = 0;
@@ -2241,7 +2290,8 @@ WORD TTLGetVer()
 WORD TTLGoto()
 {
 	TName LabName;
-	WORD Err, VarType, VarId;
+	WORD Err, VarType;
+	TVarId VarId;
 
 	if (GetLabelName(LabName) && (GetFirstChar()==0))
 	{
@@ -2349,7 +2399,8 @@ WORD TTLInclude()
 WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
-	WORD Err, ValType, VarId, P;
+	WORD Err, ValType, P;
+	TVarId VarId;
 	int sp = 0;
 
 	Err = 0;
@@ -2393,7 +2444,8 @@ WORD TTLInputBox(BOOL Paswd)
 
 WORD TTLInt2Str()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	int Num;
 	TStrVal Str2;
 
@@ -2502,7 +2554,8 @@ WORD TTLLoop()
 
 WORD TTLMakePath()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Dir, Name;
 
 	Err = 0;
@@ -2562,7 +2615,8 @@ static void dirname(char *fullpath, char *dest, int len) {
 
 WORD TTLBasename()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Src, Name;
 
 	Err = 0;
@@ -2582,7 +2636,8 @@ WORD TTLBasename()
 
 WORD TTLDirname()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Src, Dir;
 
 	Err = 0;
@@ -2717,7 +2772,8 @@ WORD TTLMilliPause()
 WORD TTLRecvRandom()
 {
 	static int srand_init = 0;
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	int MaxNum, Num;
 	double d;
 
@@ -2749,7 +2805,8 @@ WORD TTLRecvRandom()
 WORD TTLRecvLn()
 {
 	TStrVal Str;
-	WORD ValType, VarId;
+	WORD ValType;
+	TVarId VarId;
 	int TimeOut;
 
 	if (GetFirstChar()!=0)
@@ -2796,7 +2853,8 @@ WORD TTLReturn()
 #define ROTATE_DIR_RIGHT 1
 WORD BitRotate(int direction)
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	int x, n;
 
 	Err = 0;
@@ -3245,7 +3303,8 @@ WORD TTLSprintf(int getvar)
 	TStrVal Fmt;
 	int Num;
 	TStrVal Str;
-	WORD Err = 0, TmpErr, VarId;
+	WORD Err = 0, TmpErr;
+	TVarId VarId;
 	char buf[MaxStrLen];
 	char *p, subFmt[MaxStrLen], buf2[MaxStrLen];
 
@@ -3265,7 +3324,7 @@ WORD TTLSprintf(int getvar)
 	UChar* pattern, * str;
 
 	if (getvar) {
-		GetStrVar(&VarId,&Err);
+		GetStrVar(&VarId, &Err);
 		if (Err!=0) {
 			SetResult(4);
 			return Err;
@@ -3437,7 +3496,8 @@ WORD TTLStatusBox()
 
 WORD TTLStr2Code()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Str;
 	int Len, c, i;
 	unsigned int Num;
@@ -3465,7 +3525,8 @@ WORD TTLStr2Code()
 
 WORD TTLStr2Int()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Str;
 	int Num;
 
@@ -3536,7 +3597,8 @@ WORD TTLStrCompare()
 
 WORD TTLStrConcat()
 {
-	WORD VarId, Err;
+	TVarId VarId;
+	WORD Err;
 	TStrVal Str;
 
 	Err = 0;
@@ -3552,7 +3614,8 @@ WORD TTLStrConcat()
 
 WORD TTLStrCopy()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int From, Len, SrcLen;
 	TStrVal Str;
 
@@ -3671,7 +3734,8 @@ static void insert_string(char *str, int index, char *addstr)
 
 WORD TTLStrInsert()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int Index;
 	TStrVal Str;
 	int srclen, addlen;
@@ -3737,7 +3801,8 @@ static void remove_string(char *str, int index, int len)
 
 WORD TTLStrRemove()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int Index, Len;
 	int srclen;
 	char *srcptr;
@@ -3764,7 +3829,8 @@ WORD TTLStrRemove()
 
 WORD TTLStrReplace()
 {
-	WORD Err, VarId, VarType;
+	WORD Err, VarType;
+	TVarId VarId;
 	TStrVal oldstr;
 	TStrVal newstr;
 	char *srcptr, *matchptr;
@@ -3845,7 +3911,8 @@ error:
 
 WORD TTLStrSpecial()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	TStrVal srcstr;
 
 	Err = 0;
@@ -3873,7 +3940,8 @@ WORD TTLStrSpecial()
 WORD TTLStrTrim()
 {
 	TStrVal trimchars;
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	int srclen;
 	int i, start, end;
 	char *srcptr, *p;
@@ -4042,7 +4110,8 @@ WORD TTLStrJoin()
 {
 #define MAXVARNUM 9
 	TStrVal delimchars, buf;
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	WORD VarType;
 	int maxvar;
 	int srclen;
@@ -4122,7 +4191,8 @@ WORD TTLTestLink()
 // added (2007.7.12 maya)
 WORD TTLToLower()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	TStrVal Str;
 	int i=0;
 
@@ -4151,7 +4221,8 @@ WORD TTLToLower()
 // added (2007.7.12 maya)
 WORD TTLToUpper()
 {
-	WORD Err, VarId;
+	WORD Err;
+	TVarId VarId;
 	TStrVal Str;
 	int i=0;
 
@@ -4194,7 +4265,8 @@ WORD TTLUnlink()
 WORD TTLWait(BOOL Ln)
 {
 	TStrVal Str;
-	WORD Err, ValType, VarId;
+	WORD Err, ValType;
+	TVarId VarId;
 	int i, Val;
 	BOOL NoMore;
 	int TimeOut;
@@ -4299,7 +4371,8 @@ WORD TTLWaitRegex(BOOL Ln)
 
 WORD TTLWaitEvent()
 {
-	WORD Err, ValType, VarId;
+	WORD Err, ValType;
+	TVarId VarId;
 	int TimeOut;
 
 	Err = 0;
@@ -4331,7 +4404,8 @@ WORD TTLWaitEvent()
 
 WORD TTLWaitN()
 {
-	WORD Err, ValType, VarId;
+	WORD Err, ValType;
+	TVarId VarId;
 	int TimeOut, WaitBytes;
 
 	ClearWaitN();
@@ -4376,7 +4450,8 @@ WORD TTLWaitRecv()
 	TStrVal Str;
 	WORD Err;
 	int Pos, Len, TimeOut;
-	WORD VarType, VarId;
+	WORD VarType;
+	TVarId VarId;
 
 	Err = 0;
 	GetStrVal(Str,&Err);
@@ -4590,18 +4665,17 @@ WORD TTLScpRecv()
 int ExecCmnd()
 {
 	WORD WId, Err;
-	BOOL StrConst, E;
+	BOOL StrConst, E, WithIndex;
 	TStrVal Str;
 	TName Cmnd;
-	WORD ValType, VarType, VarId;
-	int Val;
+	WORD ValType, VarType;
+	TVarId VarId;
+	int Val, Index;
 
 	Err = 0;
 
-	if (EndWhileFlag>0)
-	{
-		if (GetReservedWord(&WId))
-		{
+	if (EndWhileFlag>0) {
+		if (GetReservedWord(&WId)) {
 			switch (WId) {
 			case RsvWhile:
 			case RsvUntil:
@@ -4617,10 +4691,8 @@ int ExecCmnd()
 		return 0;
 	}
 
-	if (BreakFlag>0)
-	{
-		if (GetReservedWord(&WId))
-		{
+	if (BreakFlag>0) {
+		if (GetReservedWord(&WId)) {
 			switch (WId) {
 			case RsvIf:
 				if (CheckThen(&Err))
@@ -4650,8 +4722,7 @@ int ExecCmnd()
 		return Err;
 	}
 
-	if (EndIfFlag>0)
-	{
+	if (EndIfFlag>0) {
 		if (! GetReservedWord(&WId))
 			;
 		else if ((WId==RsvIf) && CheckThen(&Err))
@@ -4661,8 +4732,7 @@ int ExecCmnd()
 		return Err;
 	}
 
-	if (ElseFlag>0)
-	{
+	if (ElseFlag>0) {
 		if (! GetReservedWord(&WId))
 			;
 		else if ((WId==RsvIf) && CheckThen(&Err))
@@ -4837,6 +4907,9 @@ int ExecCmnd()
 			Err = TTLInputBox(FALSE); break;
 		case RsvInt2Str:
 			Err = TTLInt2Str(); break;
+		case RsvIntDim:
+		case RsvStrDim:
+			Err = TTLDim(WId); break;
 		case RsvKmtFinish:
 			Err = TTLCommCmd(CmdKmtFinish,IdTTLWaitCmndResult); break;
 		case RsvKmtGet:
@@ -5022,10 +5095,15 @@ int ExecCmnd()
 		default:
 			Err = ErrSyntax;
 		}
-	else if (GetIdentifier(Cmnd))
-	{
-		if (GetFirstChar()=='=')
-		{
+	else if (GetIdentifier(Cmnd)) {
+		if (GetIndex(&Index, &Err)) {
+			WithIndex = TRUE;
+		}
+		else {
+			WithIndex = FALSE;
+		}
+
+		if (!Err && GetFirstChar() == '=') {
 			StrConst = GetString(Str,&Err);
 			if (StrConst)
 				ValType = TypString;
@@ -5033,11 +5111,24 @@ int ExecCmnd()
 				if (! GetExpression(&ValType,&Val,&Err))
 					Err = ErrSyntax;
 
-			if (Err==0)
-			{
-				if (CheckVar(Cmnd,&VarType,&VarId))
-				{
-					if (VarType==ValType)
+			if (!Err) {
+				if (CheckVar(Cmnd,&VarType,&VarId)) {
+					if (WithIndex) {
+						switch (VarType) {
+						case TypIntArray:
+							VarId = GetIntVarFromArray(VarId, Index, &Err);
+							if (!Err) VarType = TypInteger;
+							break;
+						case TypStrArray:
+							VarId = GetStrVarFromArray(VarId, Index, &Err);
+							if (!Err) VarType = TypString;
+							break;
+						default:
+							Err = ErrSyntax;
+						}
+					}
+					if (Err) return Err;
+					if (VarType==ValType) {
 						switch (ValType) {
 						case TypInteger: SetIntVal(VarId,Val); break;
 						case TypString:
@@ -5047,10 +5138,14 @@ int ExecCmnd()
 							// StrVarPtr の返り値が TStrVal のポインタであることを期待してサイズを固定
 							// (2007.6.23 maya)
 								strncpy_s(StrVarPtr(VarId),MaxStrLen,StrVarPtr((WORD)Val),_TRUNCATE);
-							break;
+						break;
+						default:
+							Err = ErrSyntax;
 						}
-					else
+					}
+					else {
 						Err = ErrTypeMismatch;
+					}
 				}
 				else {
 					switch (ValType) {
@@ -5066,7 +5161,7 @@ int ExecCmnd()
 					}
 					if (! E) Err = ErrTooManyVar;
 				}
-				if ((Err==0) && (GetFirstChar()!=0))
+				if (!Err && (GetFirstChar()!=0))
 					Err = ErrSyntax;
 			}
 		}
@@ -5101,7 +5196,8 @@ void Exec()
 // (2005.10.7 yutaka)
 void SetMatchStr(PCHAR Str)
 {
-	WORD VarType, VarId;
+	WORD VarType;
+	TVarId VarId;
 
 	if (CheckVar("matchstr",&VarType,&VarId) &&
 	    (VarType==TypString))
@@ -5112,7 +5208,8 @@ void SetMatchStr(PCHAR Str)
 // (2005.10.15 yutaka)
 void SetGroupMatchStr(int no, PCHAR Str)
 {
-	WORD VarType, VarId;
+	WORD VarType;
+	TVarId VarId;
 	char buf[128];
 	char *p;
 
@@ -5130,7 +5227,8 @@ void SetGroupMatchStr(int no, PCHAR Str)
 
 void SetInputStr(PCHAR Str)
 {
-	WORD VarType, VarId;
+	WORD VarType;
+	TVarId VarId;
 
 	if (CheckVar("inputstr",&VarType,&VarId) &&
 	    (VarType==TypString))
@@ -5139,7 +5237,8 @@ void SetInputStr(PCHAR Str)
 
 void SetResult(int ResultCode)
 {
-  WORD VarType, VarId;
+  WORD VarType;
+  TVarId VarId;
 
 	if (CheckVar("result",&VarType,&VarId) &&
 	    (VarType==TypInteger))
