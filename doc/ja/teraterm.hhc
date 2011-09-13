@@ -1390,6 +1390,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="intdim">
+					<param name="Local" value="html\macro\command\intdim.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>					
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="messagebox">
 					<param name="Local" value="html\macro\command\messagebox.html">
 					<param name="ImageNumber" value="11">
@@ -1442,6 +1447,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="statusbox">
 					<param name="Local" value="html\macro\command\statusbox.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="strdim">
+					<param name="Local" value="html\macro\command\strdim.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">

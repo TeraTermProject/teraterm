@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>intdim</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>intdim</h1>
+
+<p>
+整数配列型の変数を宣言する。
+</p>
+
+<pre class="macro-syntax">
+intdim &lt;array size&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+&lt;array size&gt;個の要素を持つ整数配列型の変数を宣言する。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+intdim fibonacci 20
+fibonacci[0] = 0
+fibonacci[1] = 1
+for i 2 19
+        fibonacci[i] = fibonacci[i-2] + fibonacci[i-1]
+next
+
+msg = ""
+for i 0 19
+        sprintf2 msg "%d, " fibonacci[i]
+next
+
+messagebox msg "result"
+</pre>
+
+</body>
+</html>

@@ -231,6 +231,7 @@
 #define HlpMacroCommandInclude          92051
 #define HlpMacroCommandInputbox         92052
 #define HlpMacroCommandInt2str          92053
+#define HlpMacroCommandIntdim           92150
 #define HlpMacroCommandKmtfinish        92054
 #define HlpMacroCommandKmtget           92055
 #define HlpMacroCommandKmtrecv          92056
@@ -290,6 +291,7 @@
 #define HlpMacroCommandStrcompare       92092
 #define HlpMacroCommandStrconcat        92093
 #define HlpMacroCommandStrcopy          92094
+#define HlpMacroCommandStrdim           92151
 #define HlpMacroCommandStrinsert        92180
 #define HlpMacroCommandStrjoin          92185
 #define HlpMacroCommandStrlen           92095

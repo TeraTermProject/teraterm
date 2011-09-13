@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>strdim</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>strdim</h1>
+
+<p>
+Declare string array variable.
+</p>
+
+<pre class="macro-syntax">
+strdim &lt;array size&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+<!--
+&lt;array size&gt;ŒÂ‚Ì—v‘f‚ðŽ‚Â•¶Žš—ñ”z—ñŒ^‚Ì•Ï”‚ðéŒ¾‚·‚éB
+-->
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strdim timeary 10
+for i 9 0
+        gettime timeary[9-i]
+        statusbox i "wait"
+        pause 1
+next
+
+msg = ""
+for i 0 9
+        strconcat msg timeary[i]
+        strconcat msg #13#10
+next
+
+messagebox msg "result"
+</pre>
+
+</body>
+</html>
