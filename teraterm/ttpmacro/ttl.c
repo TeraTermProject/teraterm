@@ -5145,6 +5145,9 @@ int ExecCmnd()
 						Err = ErrTypeMismatch;
 					}
 				}
+				else if (WithIndex) {
+					Err = ErrSyntax;
+				}
 				else {
 					switch (ValType) {
 					case TypInteger: E = NewIntVar(Cmnd,Val); break;
