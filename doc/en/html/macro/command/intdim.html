@@ -25,7 +25,8 @@ intdim &lt;array size&gt;
 
 <p>
 <!--
-&lt;array size&gt;個の要素を持つ整数配列型の変数を宣言する。
+&lt;array size&gt;個の要素を持つ整数配列型の変数を宣言する。&lt;array size&gt;の最大値は65536。<br />
+配列内の各要素の初期値は0。
 -->
 </p>
 
@@ -41,7 +42,7 @@ next
 
 msg = ""
 for i 0 19
-        sprintf2 msg "%d, " fibonacci[i]
+        sprintf2 msg "%s%d, " msg fibonacci[i]
 next
 
 messagebox msg "result"
