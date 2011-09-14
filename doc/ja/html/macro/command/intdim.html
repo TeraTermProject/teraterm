@@ -24,13 +24,14 @@ intdim &lt;array size&gt;
 <h2>解説</h2>
 
 <p>
-&lt;array size&gt;個の要素を持つ整数配列型の変数を宣言する。&lt;array size&gt;の最大値は65536。<br />
+&lt;array size&gt;個の要素を持つ整数配列型の変数を宣言する。&lt;array size&gt;は 1 ～ 65536 の範囲の値を持つことができ、配列の添字は0オリジンである。<br />
 配列内の各要素の初期値は0。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
+; フィボナッチ数列(Fibonacci sequence)
 intdim fibonacci 20
 fibonacci[0] = 0
 fibonacci[1] = 1
@@ -38,13 +39,97 @@ for i 2 19
         fibonacci[i] = fibonacci[i-2] + fibonacci[i-1]
 next
 
-msg = ""
+msg = &quot;&quot;
 for i 0 19
-        sprintf2 msg "%s%d, " msg fibonacci[i]
+        sprintf2 msg &quot;%s%d, &quot; msg fibonacci[i]
 next
 
-messagebox msg "result"
+messagebox msg &quot;result&quot;
 </pre>
+
+
+<pre class="macro-example">
+; 2分探索木(binary search tree)
+N = 10
+intdim a N
+a[0] = 1
+a[1] = 2
+a[2] = 3
+a[3] = 7
+a[4] = 11
+a[5] = 32
+a[6] = 40
+a[7] = 68
+a[8] = 81
+a[9] = 99
+
+inputbox 'Search data?' 'User Input'
+str2int key inputstr
+
+flag = 0
+low = 0
+high = N - 1
+while low &lt;= high
+	mid = (low + high) / 2
+	if a[mid] == key then
+		sprintf &quot;Your data %d found in index %d.&quot; key mid
+		messagebox inputstr 'Success'
+		flag = 1
+		break
+	endif
+	if a[mid] &lt; key then
+		low = mid + 1
+	else
+		high = mid - 1
+	endif
+endwhile
+
+if flag == 0 then
+	messagebox 'Your data not found.' 'Failure'
+endif
+end
+</pre>
+
+
+<pre class="macro-example">
+; エラトステネスのふるい(sieve of Eratosthenes)
+;
+; Example of execution result
+; 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 [18 primes]
+;
+
+N = 30
+intdim flag N+1
+count = 1
+for i 0 N
+	flag[i] = 1
+next
+
+for i 0 N
+	if flag[i] =1 then
+		count = count + 1
+		p = 2 * i + 3
+		sprintf &quot;%d &quot; p
+		dispstr inputstr
+		
+		k = i + p
+		while k &lt;= N
+			flag[k] = 0
+			k = k + p
+		endwhile
+	endif
+next
+
+sprintf &quot;[%d primes]&quot; count
+dispstr inputstr
+
+end
+</pre>
+
+
+<h2>参照</h2>
+
+<a href="..\syntax\types.html">データ型</a><br>
 
 </body>
 </html>
