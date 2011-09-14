@@ -5135,7 +5135,7 @@ int ExecCmnd()
 							else
 							// StrVarPtr の返り値が TStrVal のポインタであることを期待してサイズを固定
 							// (2007.6.23 maya)
-								strncpy_s(StrVarPtr(VarId),MaxStrLen,StrVarPtr((WORD)Val),_TRUNCATE);
+								strncpy_s(StrVarPtr(VarId),MaxStrLen,StrVarPtr((TVarId)Val),_TRUNCATE);
 						break;
 						default:
 							Err = ErrSyntax;
@@ -5155,7 +5155,7 @@ int ExecCmnd()
 						if (StrConst)
 							E = NewStrVar(Cmnd,Str);
 						else
-							E = NewStrVar(Cmnd,StrVarPtr((WORD)Val));
+							E = NewStrVar(Cmnd,StrVarPtr((TVarId)Val));
 						break;
 					default: 
 						E = FALSE;
