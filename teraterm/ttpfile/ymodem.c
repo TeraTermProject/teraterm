@@ -486,7 +486,11 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 		p = &(yv->PktIn[3]);
 		name = p;
-		strncpy_s(fv->FullName, sizeof(fv->FullName), name, _TRUNCATE);
+		strncpy_s(&(fv->FullName[fv->DirLen]),
+				  sizeof(fv->FullName) - fv->DirLen, name,
+				  _TRUNCATE);
+		if (!FTCreateFile(fv))
+			return FALSE;
 		nameend = name + 1 + strlen(name);
 		if (*nameend) {
 			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
@@ -494,11 +498,8 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 				fv->FileSize = bytes_total;
 			}
 		}
-		fv->FileHandle = _lcreat(fv->FullName,0);
-		fv->FileOpen = fv->FileHandle>0;
 
-		fv->DirLen = 0;
-		SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));
+		SetDlgItemText(fv->HWin, IDC_PROTOFNAME, name);
 
 		yv->SendFileInfo = 1;
 
