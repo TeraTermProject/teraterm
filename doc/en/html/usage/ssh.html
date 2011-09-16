@@ -72,14 +72,14 @@
 
     <h3><a name="SSHFP">SSHFP RR</a></h3>
 
-    <p>When a user is using SSH to connect to a server, the user can use SSHFP RR (Secure SHell FingerPrint Resource Record) defined in RFC 4255. However, this feature is experimentally implemented because the current Tera Term can not do the DNSSEC authentication.</p>
+    <p>When a user is using SSH to connect to a server, the user can use SSHFP RR (Secure SHell FingerPrint Resource Record) defined in RFC 4255. However, this feature is experimentally implemented because the current Tera Term can not do the DNSSEC verification.</p>
 
     <p>A domain owner can regist the SSHFP record into the DNS zone. The client software(Tera Term) can get the SSHFP record on connection and verify the record with the server's host key. <br />
        However, this feature can be used on Windows 2000 or later by the limitation of the Windows resolver.</p>
 
     <p>Please refer to below one sentence in RFC 4255. <br />
        <i>A public key verified using this method MUST NOT be trusted if the SSHFP resource record (RR) used for verification was not authenticated by a trusted SIG RR.</i><br />
-      The DNSSEC authentication always fails because the Windows resolver used by Tera Term can not verify the DNSSEC signature. </p>
+      The DNSSEC verification always fails because the Windows resolver used by Tera Term can not verify the DNSSEC signature. </p>
 
     <h2><a name="generate">Generating Key</a></h2>
 
