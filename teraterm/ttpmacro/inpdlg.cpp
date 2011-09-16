@@ -146,7 +146,7 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 		}
 		// ウインドウサイズの計算
 		WW = WW + TW - CW;
-		WH = WH + 2*TH+3*BH/2 - CH + EH/2+BH/2+12;
+		WH = WH + TH+5*BH/2 - CH + EH/2+BH/2+12;
 		init_WW = WW;
 	}
 	else {
@@ -158,9 +158,9 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
 	HEdit = ::GetDlgItem(GetSafeHwnd(), IDC_INPEDIT);
 
-	::MoveWindow(HText,(TW-s.cx)/2,TH/2,TW,TH,TRUE);
-	::MoveWindow(HEdit,(WW-EW)/2-4,2*TH+5,EW,EH,TRUE);
-	::MoveWindow(HOk,(TW-BW)/2,2*TH+EH/2+BH/2+12,BW,BH,TRUE);
+	::MoveWindow(HText,(TW-s.cx)/2,BH/2,TW,TH,TRUE);
+	::MoveWindow(HEdit,(WW-EW)/2-4,TH+BH+5,EW,EH,TRUE);
+	::MoveWindow(HOk,(TW-BW)/2,TH+BH+EH/2+BH/2+12,BW,BH,TRUE);
 
 	if (PaswdFlag) {
 		SendDlgItemMessage(IDC_INPEDIT,EM_SETPASSWORDCHAR,(UINT)'*',0);

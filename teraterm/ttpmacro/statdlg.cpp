@@ -181,7 +181,7 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 			}
 			// ウインドウサイズの計算
 			WW = WW + TW - CW;
-			WH = WH + 2*TH - CH;
+			WH = WH + TH - CH + 10;
 			init_WW = WW;
 		}
 		else {
@@ -189,7 +189,7 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 			WW = new_WW;
 		}
 
-		::MoveWindow(HText,(TW-s.cx)/2,TH/2,TW,TH,TRUE);
+		::MoveWindow(HText,(TW-s.cx)/2,5,TW,TH,TRUE);
 	}
 
 	if (PosX<=-100) {

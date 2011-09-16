@@ -131,7 +131,7 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 		}
 		// ウインドウサイズの計算
 		WW = WW + TW - CW;
-		WH = WH + 2*TH+3*BH/2 - CH;
+		WH = WH + TH+5*BH/2 - CH;
 		init_WW = WW;
 	}
 	else {
@@ -143,7 +143,7 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
 	HNo = ::GetDlgItem(GetSafeHwnd(), IDCLOSE);
 
-	::MoveWindow(HText,(TW-s.cx)/2,TH/2,TW,TH,TRUE);
+	::MoveWindow(HText,(TW-s.cx)/2, BH/2,TW,TH,TRUE);
 	if (YesNoFlag) {
 		if (is_init) {
 			::SetWindowText(HOk,"&Yes");
@@ -155,12 +155,12 @@ void CMsgDlg::Relocation(BOOL is_init, int new_WW)
 			get_lang_msg("BTN_NO", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			::SetWindowText(HNo,uimsg);
 		}
-		::MoveWindow(HOk,(2*TW-5*BW)/4,2*TH,BW,BH,TRUE);
-		::MoveWindow(HNo,(2*TW+BW)/4,2*TH,BW,BH,TRUE);
+		::MoveWindow(HOk,(2*TW-5*BW)/4,TH+BH,BW,BH,TRUE);
+		::MoveWindow(HNo,(2*TW+BW)/4,TH+BH,BW,BH,TRUE);
 		::ShowWindow(HNo,SW_SHOW);
 	}
 	else {
-		::MoveWindow(HOk,(TW-BW)/2,2*TH,BW,BH,TRUE);
+		::MoveWindow(HOk,(TW-BW)/2,TH+BH,BW,BH,TRUE);
 	}
 
 	if (PosX<=-100) {
