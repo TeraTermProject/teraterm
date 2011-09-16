@@ -180,8 +180,8 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 				TW = CW;
 			}
 			// ウインドウサイズの計算
-			WW = WW + TW - CW;
-			WH = WH + TH - CH + 10;
+			WW = TW + (WW - CW);
+			WH = TH + 10 + (WH - CH);
 			init_WW = WW;
 		}
 		else {
