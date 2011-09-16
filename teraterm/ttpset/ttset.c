@@ -558,7 +558,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 			if (*t == ',')
 				n++;
 		n /= 4;
-		for (i = 0; i <= n; i++) {
+		for (i = 0; i < n; i++) {
 			int colorid, r, g, b;
 			GetNthNum(Temp, i * 4 + 1, (int far *) &colorid);
 			GetNthNum(Temp, i * 4 + 2, (int far *) &r);
