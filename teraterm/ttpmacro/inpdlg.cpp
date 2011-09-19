@@ -34,6 +34,7 @@ CInpDlg::CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
 	PaswdFlag = Paswd;
 	PosX = x;
 	PosY = y;
+	DlgFont = NULL;
 }
 
 BEGIN_MESSAGE_MAP(CInpDlg, CDialog)
@@ -52,7 +53,7 @@ BOOL CInpDlg::OnInitDialog()
 	HWND HEdit, HOk;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
-	HFONT font;
+	HFONT font, tmpfont;
 
 	CDialog::OnInitDialog();
 	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
@@ -71,9 +72,15 @@ BOOL CInpDlg::OnInitDialog()
 	SetDlgItemText(IDC_INPTEXT,TextStr);
 	SetDlgItemText(IDC_INPEDIT,DefaultStr);
 
-	TmpDC = ::GetDC(GetSafeHwnd());
+	TmpDC = ::GetDC(GetDlgItem(IDC_INPTEXT)->GetSafeHwnd());
+	if (DlgFont) {
+		tmpfont = (HFONT)SelectObject(TmpDC, DlgFont);
+	}
 	CalcTextExtent(TmpDC,TextStr,&s);
-	::ReleaseDC(GetSafeHwnd(),TmpDC);
+	if (DlgFont && tmpfont != NULL) {
+		SelectObject(TmpDC, tmpfont);
+	}
+	::ReleaseDC(GetDlgItem(IDC_INPTEXT)->GetSafeHwnd(),TmpDC);
 	TW = s.cx + s.cx/10;
 	TH = s.cy;
 

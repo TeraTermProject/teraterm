@@ -34,6 +34,7 @@ BOOL CStatDlg::Create(PCHAR Text, PCHAR Title, int x, int y)
 	TitleStr = Title;
 	PosX = x;
 	PosY = y;
+	DlgFont = NULL;
 	return CDialog::Create(CStatDlg::IDD, GetDesktopWindow());
 }
 
@@ -41,6 +42,7 @@ void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
 {
 	RECT R;
 	HDC TmpDC;
+	HFONT tmpfont;
 
 	if (Title!=NULL) {
 		SetWindowText(Title);
@@ -54,9 +56,15 @@ void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
 	WH = R.bottom-R.top;
 
 	if (Text!=NULL) {
-		TmpDC = ::GetDC(GetSafeHwnd());
+		TmpDC = ::GetDC(GetDlgItem(IDC_STATTEXT)->GetSafeHwnd());
+		if (DlgFont) {
+			tmpfont = (HFONT)SelectObject(TmpDC, DlgFont);
+		}
 		CalcTextExtent(TmpDC,Text,&s);
-		::ReleaseDC(GetSafeHwnd(),TmpDC);
+		if (DlgFont && tmpfont != NULL) {
+			SelectObject(TmpDC, tmpfont);
+		}
+		::ReleaseDC(GetDlgItem(IDC_STATTEXT)->GetSafeHwnd(),TmpDC);
 		TW = s.cx + s.cx/10;
 		TH = s.cy;
 
