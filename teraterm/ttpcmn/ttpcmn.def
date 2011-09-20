@@ -14,6 +14,7 @@ EXPORTS
   SelectWin @14
   SelectNextWin @15
   GetNthWin @16
+  ShowAllWin @54
   CommReadRawByte @20
   CommInsert1Byte @21
   CommRead1Byte @22

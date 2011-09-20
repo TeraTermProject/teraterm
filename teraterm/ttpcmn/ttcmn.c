@@ -877,7 +877,14 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 	}
 	get_lang_msg("MENU_WINDOW_WINDOW", buf, buflen, "&Window", langFile);
 	if (VTFlag == 1) {
+		AppendMenu(menu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_WINDOW, buf);
+
+		get_lang_msg("MENU_WINDOW_MINIMIZEALL", buf, buflen, "&Minimize All", langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, buf);
+
+		get_lang_msg("MENU_WINDOW_RESTOREALL", buf, buflen, "&Restore All", langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, buf);
 	}
 	else {
 		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, buf);
@@ -956,6 +963,14 @@ void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 	} while ((SkipIconic && IsIconic(pm->WinList[i])) || !IsWindowVisible(pm->WinList[i]));
 
 	SelectWin(i);
+}
+
+void FAR PASCAL ShowAllWin(int stat) {
+	int i;
+
+	for (i=0; i < pm->NWin; i++) {
+		ShowWindow(pm->WinList[i], stat);
+	}
 }
 
 HWND FAR PASCAL GetNthWin(int n)

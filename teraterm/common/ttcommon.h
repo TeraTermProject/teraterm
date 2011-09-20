@@ -33,6 +33,7 @@ void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
 void FAR PASCAL SelectWin(int WinId);
 void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
 HWND FAR PASCAL GetNthWin(int n);
+void FAR PASCAL ShowAllWin(int stat);
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
 int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b);

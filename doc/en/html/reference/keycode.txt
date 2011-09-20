@@ -430,6 +430,8 @@ Menu command                        ID
 [Control] Macro                     50470
 [Control] Show Macro Window         50480
 [Window] Window                     50810
+[Window] Minimize All               50811
+[Window] Restore All                50812
 [Help] Index                        50910
 [Help] About Tera Term              50990
 

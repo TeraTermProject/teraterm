@@ -204,6 +204,8 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_CONTROL_MACRO, OnControlMacro)
 	ON_COMMAND(ID_CONTROL_SHOW_MACRO, OnShowMacroWindow)
 	ON_COMMAND(ID_WINDOW_WINDOW, OnWindowWindow)
+	ON_COMMAND(ID_WINDOW_MINIMIZEALL, OnWindowMinimizeAll)
+	ON_COMMAND(ID_WINDOW_RESTOREALL, OnWindowRestoreAll)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
 	//}}AFX_MSG_MAP
@@ -5172,6 +5174,16 @@ void CVTWindow::OnWindowWindow()
 	if (Close) {
 		OnClose();
 	}
+}
+
+void CVTWindow::OnWindowMinimizeAll()
+{
+	ShowAllWin(SW_MINIMIZE);
+}
+
+void CVTWindow::OnWindowRestoreAll()
+{
+	ShowAllWin(SW_RESTORE);
 }
 
 void CVTWindow::OnHelpIndex()

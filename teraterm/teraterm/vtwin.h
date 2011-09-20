@@ -173,6 +173,8 @@ protected:
 	afx_msg void OnControlMacro();
 	afx_msg void OnShowMacroWindow();
 	afx_msg void OnWindowWindow();
+	afx_msg void OnWindowMinimizeAll();
+	afx_msg void OnWindowRestoreAll();
 	afx_msg void OnHelpIndex();
 	afx_msg void OnHelpUsing();
 	afx_msg void OnHelpAbout();
