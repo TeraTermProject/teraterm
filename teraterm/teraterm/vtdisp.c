@@ -3646,23 +3646,92 @@ int TCharAttrCmp(TCharAttr a, TCharAttr b)
   }
 }
 
-void DispSetANSIColor(int num, COLORREF color)
+void DispSetColor(int num, COLORREF color)
 {
-  if (num < 0 || num > 255)
-	return;
+	HDC TmpDC;
 
-  ANSIColor[num] = color;
-  DispSetNearestColors(num, num, NULL);
-  InvalidateRect(HVTWin,NULL,FALSE);
-//  ChangeWin();
+	TmpDC = GetDC(NULL);
+	color = GetNearestColor(TmpDC, color);
+	ReleaseDC(NULL, TmpDC);
+
+	switch (num) {
+	case CS_VT_NORMALFG:
+		ts.VTColor[0] = color;
+		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
+			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
+		}
+		break;
+	case CS_VT_NORMALBG:
+		ts.VTColor[1] = color;
+		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
+			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
+		}
+		if (ts.UseNormalBGColor) {
+			ts.VTBoldColor[1] =color;
+			ts.VTBlinkColor[1] =color;
+			ts.URLColor[1] = color;
+		}
+		break;
+	case CS_VT_BOLDFG:    ts.VTBoldColor[0] = color; break;
+	case CS_VT_BOLDBG:    ts.VTBoldColor[1] = color; break;
+	case CS_VT_BLINKFG:   ts.VTBlinkColor[0] = color; break;
+	case CS_VT_BLINKBG:   ts.VTBlinkColor[1] = color; break;
+	case CS_VT_REVERSEFG: ts.VTReverseColor[0] = color; break;
+	case CS_VT_REVERSEBG: ts.VTReverseColor[1] = color; break;
+	case CS_VT_URLFG:     ts.URLColor[0] = color; break;
+	case CS_VT_URLBG:     ts.URLColor[1] = color; break;
+	case CS_TEK_FG:       ts.TEKColor[0] = color; break;
+	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
+	default:
+		if (num >= 0 && num <= 255) {
+			ANSIColor[num] = color;
+		}
+		else {
+			return;
+		}
+		break;
+	}
+
+#ifdef ALPHABLEND_TYPE2
+	BGInitialize();
+#endif
+	if (num == CS_TEK_FG || num == CS_TEK_BG) {
+		if (HTEKWin)
+			InvalidateRect(HTEKWin, NULL, FALSE);
+	}
+	else {
+		InvalidateRect(HVTWin,NULL,FALSE);
+	}
 }
 
-COLORREF DispGetANSIColor(int num)
+COLORREF DispGetColor(int num)
 {
-  if (num < 0 || num > 255)
-	return ANSIColor[0];
+	COLORREF color;
 
-  return ANSIColor[num];
+	switch (num) {
+	case CS_VT_NORMALFG:  color = ts.VTColor[0]; break;
+	case CS_VT_NORMALBG:  color = ts.VTColor[1]; break;
+	case CS_VT_BOLDFG:    color = ts.VTBoldColor[0]; break;
+	case CS_VT_BOLDBG:    color = ts.VTBoldColor[1]; break;
+	case CS_VT_BLINKFG:   color = ts.VTBlinkColor[0]; break;
+	case CS_VT_BLINKBG:   color = ts.VTBlinkColor[1]; break;
+	case CS_VT_REVERSEFG: color = ts.VTReverseColor[0]; break;
+	case CS_VT_REVERSEBG: color = ts.VTReverseColor[1]; break;
+	case CS_VT_URLFG:     color = ts.URLColor[0]; break;
+	case CS_VT_URLBG:     color = ts.URLColor[1]; break;
+	case CS_TEK_FG:       color = ts.TEKColor[0]; break;
+	case CS_TEK_BG:       color = ts.TEKColor[1]; break;
+	default:
+		if (num >= 0 && num <= 255) {
+			color = ANSIColor[num];
+		}
+		else {
+			color = ANSIColor[0];
+		}
+		break;
+	}
+
+	return color;
 }
 
 void DispSetCurCharAttr(TCharAttr Attr) {

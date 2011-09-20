@@ -3386,6 +3386,59 @@ BOOL XsParseColor(char *colspec, COLORREF *color)
 	return TRUE;
 }
 
+void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
+	COLORREF color;
+	char StrBuff[256];
+	int len;
+
+	switch (mode) {
+	case 10:
+		ColorNumber = CS_VT_NORMALFG;
+		break;
+	case 11:
+		ColorNumber = CS_VT_NORMALBG;
+		break;
+	case 15:
+		ColorNumber = CS_TEK_FG;
+		break;
+	case 16:
+		ColorNumber = CS_TEK_BG;
+		break;
+	}
+
+	switch (mode) {
+	case 4:
+		if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
+			if (strcmp(ColorSpec, "?") == 0) {
+				color = DispGetColor(ColorNumber);
+				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
+					"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
+					GetRValue(color), GetGValue(color), GetBValue(color));
+				SendOSCstr(StrBuff, len);
+			}
+			else if (XsParseColor(ColorSpec, &color)) {
+				DispSetColor(ColorNumber, color);
+			}
+		}
+		break;
+	case 10:
+	case 11:
+	case 15:
+	case 16:
+		if (strcmp(ColorSpec, "?") == 0) {
+			color = DispGetColor(ColorNumber);
+			len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
+				"%d;rgb:%02x/%02x/%02x", CLocale, mode,
+				GetRValue(color), GetGValue(color), GetBValue(color));
+			SendOSCstr(StrBuff, len);
+		}
+		else if (XsParseColor(ColorSpec, &color)) {
+			DispSetColor(ColorNumber, color);
+		}
+		break;
+	}
+}
+
 #define ModeXsFirst     1
 #define ModeXsString    2
 #define ModeXsColorNum  3
@@ -3396,8 +3449,6 @@ void XSequence(BYTE b)
 	static BYTE XsParseMode = ModeXsFirst, PrevMode;
 	static char StrBuff[sizeof(ts.Title)];
 	static unsigned int ColorNumber, StrLen;
-	int len;
-	COLORREF color;
 
 	switch (XsParseMode) {
 	  case ModeXsFirst:
@@ -3407,11 +3458,21 @@ void XSequence(BYTE b)
 		else if (b == ';') {
 			StrBuff[0] = '\0';
 			StrLen = 0;
-			if (Param[1] == 4) {
+			switch (Param[1]) {
+			case 4:
 				ColorNumber = 0;
 				XsParseMode = ModeXsColorNum;
-			}
-			else {
+				break;
+			case 10:
+			case 11:
+			case 15:
+			case 16:
+				XsParseMode = ModeXsColorSpec;
+				ColorNumber = 0;
+				StrBuff[0] = '\0';
+				StrLen = 0;
+				break;
+			default:
 				XsParseMode = ModeXsString;
 			}
 		}
@@ -3474,18 +3535,7 @@ void XSequence(BYTE b)
 	  case ModeXsColorSpec:
 		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
 			StrBuff[StrLen] = '\0';
-			if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
-				if (strcmp(StrBuff, "?") == 0) {
-					color = DispGetANSIColor(ColorNumber);
-					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-						"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
-						GetRValue(color), GetGValue(color), GetBValue(color));
-					SendOSCstr(StrBuff, len);
-				}
-				else if (XsParseColor(StrBuff, &color)) {
-					DispSetANSIColor(ColorNumber, color);
-				}
-			}
+			XsProcColor(Param[1], ColorNumber, StrBuff);
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
 		}
@@ -3499,22 +3549,32 @@ void XSequence(BYTE b)
 		}
 		else if (b == ';') {
 			StrBuff[StrLen] = '\0';
-			if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
-				if (strcmp(StrBuff, "?") == 0) {
-					color = DispGetANSIColor(ColorNumber);
-					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-						"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
-						GetRValue(color), GetGValue(color), GetBValue(color));
-					SendOSCstr(StrBuff, len);
-				}
-				else if (XsParseColor(StrBuff, &color)) {
-					DispSetANSIColor(ColorNumber, color);
-				}
-			}
+			XsProcColor(Param[1], ColorNumber, StrBuff);
+
 			ColorNumber = 0;
 			StrBuff[0] = '\0';
 			StrLen = 0;
-			XsParseMode = ModeXsColorNum;
+
+			switch (Param[1]) {
+			case 4:
+				XsParseMode = ModeXsColorNum;
+				break;
+			case 10:
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+				XsParseMode = ModeXsColorSpec;
+				Param[1]++;
+				break;
+			default:
+				XsParseMode = ModeXsString;
+				Param[1] = 0xFFFFFFFF;
+				break;
+			}
 		}
 		else if (StrLen < sizeof(StrBuff) - 1) {
 			StrBuff[StrLen++] = b;

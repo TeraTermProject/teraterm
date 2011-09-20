@@ -78,6 +78,21 @@ typedef TCharAttr *PCharAttr;
 #define IdCyan    6
 #define IdFore    7
 
+  /* for DispSetColor / DispGetColor */
+// ANSIColor -- 0-255
+#define CS_VT_NORMALFG     256
+#define CS_VT_NORMALBG     257
+#define CS_VT_BOLDFG       258
+#define CS_VT_BOLDBG       259
+#define CS_VT_BLINKFG      260
+#define CS_VT_BLINKBG      261
+#define CS_VT_REVERSEFG    262
+#define CS_VT_REVERSEBG    263
+#define CS_VT_URLFG        264
+#define CS_VT_URLBG        265
+#define CS_TEK_FG          266
+#define CS_TEK_BG          267
+
   /* Kermit function id */
 #define IdKmtReceive 1
 #define IdKmtGet     2
