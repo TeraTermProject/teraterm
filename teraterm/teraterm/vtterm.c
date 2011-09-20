@@ -3480,10 +3480,7 @@ void XSequence(BYTE b)
 					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
 						"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
 						GetRValue(color), GetGValue(color), GetBValue(color));
-					ParseMode = ModeFirst;
-					XsParseMode = ModeXsFirst;
 					SendOSCstr(StrBuff, len);
-					break;
 				}
 				else if (XsParseColor(StrBuff, &color)) {
 					DispSetANSIColor(ColorNumber, color);
@@ -3508,7 +3505,6 @@ void XSequence(BYTE b)
 					len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
 						"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
 						GetRValue(color), GetGValue(color), GetBValue(color));
-					XsParseMode = ModeXsColorNum;
 					SendOSCstr(StrBuff, len);
 				}
 				else if (XsParseColor(StrBuff, &color)) {
