@@ -44,5 +44,7 @@ TCHAR	*PathTok(TCHAR *str, TCHAR *separator);
 TCHAR	*lstrstri(TCHAR *s1, TCHAR *s2);
 void	UTIL_get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, PCHAR iniFile);
 int		UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PCHAR iniFile);
+LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
+                                   WPARAM wParam, LPARAM lParam);
 
 #endif

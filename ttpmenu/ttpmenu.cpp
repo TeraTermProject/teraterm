@@ -650,6 +650,16 @@ BOOL InitListBox(HWND hWnd)
 	return TRUE;
 }
 
+
+void init_password_control(HWND dlg, int item)
+{
+	HWND passwordControl = GetDlgItem(dlg, item);
+
+	SetWindowLong(passwordControl, GWL_USERDATA,
+	              SetWindowLong(passwordControl, GWL_WNDPROC,
+	                            (LONG) password_wnd_proc));
+}
+
 /* ==========================================================================
 	Function Name	: (BOOL) InitConfigDlg()
 	Outline			: 設定ダイアログを初期化する。
@@ -751,6 +761,8 @@ BOOL InitConfigDlg(HWND hWnd)
 	GetDlgItemText(hWnd, BUTTON_ETC, uitmp, sizeof(uitmp));
 	UTIL_get_lang_msg("DLG_CONFIG_DETAIL", uimsg, sizeof(uimsg), uitmp, UILanguageFile);
 	SetDlgItemText(hWnd, BUTTON_ETC, uimsg);
+
+	init_password_control(hWnd, EDIT_PASSWORD);
 
 	memset(&g_JobInfo, 0, sizeof(JobInfo));
 

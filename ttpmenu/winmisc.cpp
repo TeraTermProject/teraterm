@@ -442,3 +442,21 @@ int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PCHAR
 
 	return TRUE;
 }
+
+LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
+                                   WPARAM wParam, LPARAM lParam)
+{
+	switch (msg) {
+	case WM_CHAR:
+		if ((GetKeyState(VK_CONTROL) & 0x8000) != 0) {
+			char chars[] = { (char) wParam, 0 };
+
+			SendMessage(control, EM_REPLACESEL, (WPARAM) TRUE,
+			            (LPARAM) (char FAR *) chars);
+			return 0;
+		}
+	}
+
+	return CallWindowProc((WNDPROC) GetWindowLong(control, GWL_USERDATA),
+	                      control, msg, wParam, lParam);
+}
