@@ -3982,6 +3982,15 @@ static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 	return;
 }
 
+static void init_password_control(HWND dlg, int item)
+{
+	HWND passwordControl = GetDlgItem(dlg, item);
+
+	SetWindowLong(passwordControl, GWL_USERDATA,
+	              SetWindowLong(passwordControl, GWL_WNDPROC,
+	                            (LONG) password_wnd_proc));
+}
+
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
@@ -4047,6 +4056,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgHostFont = NULL;
 		}
+
+		init_password_control(dlg, IDC_KEY_EDIT);
+		init_password_control(dlg, IDC_CONFIRM_EDIT);
 
 		// default key type
 		SendMessage(GetDlgItem(dlg, IDC_RSA_TYPE), BM_SETCHECK, BST_CHECKED, 0);

@@ -71,6 +71,8 @@ void AUTH_notify_disconnecting(PTInstVar pvar);
 void AUTH_notify_end_error(PTInstVar pvar);
 void AUTH_end(PTInstVar pvar);
 void destroy_malloced_string(char FAR * FAR * str);
+LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
+                                   WPARAM wParam, LPARAM lParam);
 
 #define AUTH_get_cur_cred(pvar) (&(pvar)->auth_state.cur_cred)
 

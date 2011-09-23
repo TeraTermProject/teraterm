@@ -63,8 +63,8 @@ static int auth_types_to_control_IDs[] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, IDC_SSHUSEPAGEANT, -1
 };
 
-static LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
-                                          WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
+                                   WPARAM wParam, LPARAM lParam)
 {
 	switch (msg) {
 	case WM_CHAR:
