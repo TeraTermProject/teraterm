@@ -14,47 +14,348 @@
  例えば、"A"のASCIIコードは10進数で65、16進数で$41。
 </p>
 
-<pre>
-Char    Code    Char    Code    Char    Code    Char    Code
-<hr>
-NUL(^@) 0$00    DLE(^P) 16$10   SPACE 32$20     0       48$30
-SOH(^A) 1$01    DC1(^Q) 17$11   !     33$21     1       49$31
-STX(^B) 2$02    DC2(^R) 18$12   "     34$22     2       50$32
-ETX(^C) 3$03    DC3(^S) 19$13   #     35$23     3       51$33
-EOT(^D) 4$04    DC4(^T) 20$14   $     36$24     4       52$34
-ENQ(^E) 5$05    NAK(^U) 21$15   %     37$25     5       53$35
-ACK(^F) 6$06    SYN(^V) 22$16   &amp;     38$26     6       54$36
-BEL(^G) 7$07    ETB(^W) 23$17   '     39$27     7       55$37
-BS(^H)  8$08    CAN(^X) 24$18   (     40$28     8       56$38
-HT(^I)  9$09    EM(^Y)  25$19   )     41$29     9       57$39
-LF(^J)  10$0A   SUB(^Z) 26$1A   *     42$2A     :       58$3A
-VT(^K)  11$0B   ESC(^[) 27$1B   +     43$2B     ;       59$3B
-FF(^L)  12$0C   FS(^\)  28$1C   ,     44$2C     &lt;       60$3C
-CR(^M)  13$0D   GS(^])  29$1D   -     45$2D     =       61$3D
-SO(^N)  14$0E   RS(^^)  30$1E   .     46$2E     &gt;       62$3E
-SI(^O)  15$0F   US(^_)  31$1F   /     47$2F     ?       63$3F
-</pre>
-
-<pre>
-Char    Code    Char    Code    Char    Code    Char    Code
-<hr>
-@       64$40   P       80$50   `       96$60   p       112$70
-A       65$41   Q       81$51   a       97$61   q       113$71
-B       66$42   R       82$52   b       98$62   r       114$72
-C       67$43   S       83$53   c       99$63   s       115$73
-D       68$44   T       84$54   d       100$64  t       116$74
-E       69$45   U       85$55   e       101$65  u       117$75
-F       70$46   V       86$56   f       102$66  v       118$76
-G       71$47   W       87$57   g       103$67  w       119$77
-H       72$48   X       88$58   h       104$68  x       120$78
-I       73$49   Y       89$59   i       105$69  y       121$79
-J       74$4A   Z       90$5A   j       106$6A  z       122$7A
-K       75$4B   [       91$5B   k       107$6B  {       123$7B
-L       76$4C   \       92$5C   l       108$6C  |       124$7C
-M       77$4D   ]       93$5D   m       109$6D  }       125$7D
-N       78$4E   ^       94$5E   n       110$6E  ~       126$7E
-O       79$4F   _       95$5F   o       111$6F  DEL     127$7F
-</pre>
+<table border="1">
+  <tr>
+    <th>Char</th>
+    <th>Code</th>
+    <th>Char</th>
+    <th>Code</th>
+    <th>Char</th>
+    <th>Code</th>
+    <th>Char</th>
+    <th>Code</th>
+  </tr>
+  <tr>
+    <td>NUL<br>(^@)</td>
+    <td>0<br>$00</td>
+    <td>DLE<br>(^P)</td>
+    <td>16<br>$10</td>
+    <td>SPACE</td>
+    <td>32<br>$20</td>
+    <td>0</td>
+    <td>48<br>$30</td>
+  </tr>
+  <tr>
+    <td>SOH<br>(^A)</td>
+    <td>1<br>$01</td>
+    <td>DC1<br>(^Q)</td>
+    <td>17<br>$11</td>
+    <td>!</td>
+    <td>33<br>$21</td>
+    <td>1</td>
+    <td>49<br>$31</td>
+  </tr>
+  <tr>
+    <td>STX<br>(^B)</td>
+    <td>2<br>$02</td>
+    <td>DC2<br>(^R)</td>
+    <td>18<br>$12</td>
+    <td>"</td>
+    <td>34<br>$22</td>
+    <td>2</td>
+    <td>50<br>$32</td>
+  </tr>
+  <tr>
+    <td>ETX<br>(^C)</td>
+    <td>3<br>$03</td>
+    <td>DC3<br>(^S)</td>
+    <td>19<br>$13</td>
+    <td>#</td>
+    <td>35<br>$23</td>
+    <td>3</td>
+    <td>51<br>$33</td>
+  </tr>
+  <tr>
+    <td>EOT<br>(^D)</td>
+    <td>4<br>$04</td>
+    <td>DC4<br>(^T)</td>
+    <td>20<br>$14</td>
+    <td>$</td>
+    <td>36<br>$24</td>
+    <td>4</td>
+    <td>52<br>$34</td>
+  </tr>
+  <tr>
+    <td>ENQ<br>(^E)</td>
+    <td>5<br>$05</td>
+    <td>NAK<br>(^U)</td>
+    <td>21<br>$15</td>
+    <td>%</td>
+    <td>37<br>$25</td>
+    <td>5</td>
+    <td>53<br>$35</td>
+  </tr>
+  <tr>
+    <td>ACK<br>(^F)</td>
+    <td>6<br>$06</td>
+    <td>SYN<br>(^V)</td>
+    <td>22<br>$16</td>
+    <td>&amp;</td>
+    <td>38<br>$26</td>
+    <td>6</td>
+    <td>54<br>$36</td>
+  </tr>
+  <tr>
+    <td>BEL<br>(^G)</td>
+    <td>7<br>$07</td>
+    <td>ETB<br>(^W)</td>
+    <td>23<br>$17</td>
+    <td>'</td>
+    <td>39<br>$27</td>
+    <td>7</td>
+    <td>55<br>$37</td>
+  </tr>
+  <tr>
+    <td>BS<br>(^H)</td>
+    <td>8<br>$08</td>
+    <td>CAN<br>(^X)</td>
+    <td>24<br>$18</td>
+    <td>(</td>
+    <td>40<br>$28</td>
+    <td>8</td>
+    <td>56<br>$38</td>
+  </tr>
+  <tr>
+    <td>HT<br>(^I)</td>
+    <td>9<br>$09</td>
+    <td>EM<br>(^Y)</td>
+    <td>25<br>$19</td>
+    <td>)</td>
+    <td>41<br>$29</td>
+    <td>9</td>
+    <td>57<br>$39</td>
+  </tr>
+  <tr>
+    <td>LF<br>(^J)</td>
+    <td>10<br>$0A</td>
+    <td>SUB<br>(^Z)</td>
+    <td>26<br>$1A</td>
+    <td>*</td>
+    <td>42<br>$2A</td>
+    <td>:</td>
+    <td>58<br>$3A</td>
+  </tr>
+  <tr>
+    <td>VT<br>(^K)</td>
+    <td>11<br>$0B</td>
+    <td>ESC<br>(^[)</td>
+    <td>27<br>$1B</td>
+    <td>+</td>
+    <td>43<br>$2B</td>
+    <td>;</td>
+    <td>59<br>$3B</td>
+  </tr>
+  <tr>
+    <td>FF<br>(^L)</td>
+    <td>12<br>$0C</td>
+    <td>FS<br>(^\)</td>
+    <td>28<br>$1C</td>
+    <td>,</td>
+    <td>44<br>$2C</td>
+    <td>&lt;</td>
+    <td>60<br>$3C</td>
+  </tr>
+  <tr>
+    <td>CR<br>(^M)</td>
+    <td>13<br>$0D</td>
+    <td>GS<br>(^])</td>
+    <td>29<br>$1D</td>
+    <td>-</td>
+    <td>45<br>$2D</td>
+    <td>=</td>
+    <td>61<br>$3D</td>
+  </tr>
+  <tr>
+    <td>SO<br>(^N)</td>
+    <td>14<br>$0E</td>
+    <td>RS<br>(^^)</td>
+    <td>30<br>$1E</td>
+    <td>.</td>
+    <td>46<br>$2E</td>
+    <td>&gt;</td>
+    <td>62<br>$3E</td>
+  </tr>
+  <tr>
+    <td>SI<br>(^O)</td>
+    <td>15<br>$0F</td>
+    <td>US<br>(^_)</td>
+    <td>31<br>$1F</td>
+    <td>/</td>
+    <td>47<br>$2F</td>
+    <td>?</td>
+    <td>63<br>$3F</td>
+  </tr>
+  <tr>
+    <th>Char</th>
+    <th>Code</th>
+    <th>Char</th>
+    <th>Code</th>
+    <th>Char</th>
+    <th>Code</th>
+    <th>Char</th>
+    <th>Code</th>
+  </tr>
+  <tr>
+    <td>@</td>
+    <td>64<br>$40</td>
+    <td>P</td>
+    <td>80<br>$50</td>
+    <td>`</td>
+    <td>96<br>$60</td>
+    <td>p</td>
+    <td>112<br>$70</td>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>65<br>$41</td>
+    <td>Q</td>
+    <td>81<br>$51</td>
+    <td>a</td>
+    <td>97<br>$61</td>
+    <td>q</td>
+    <td>113<br>$71</td>
+  </tr>
+  <tr>
+    <td>B</td>
+    <td>66<br>$42</td>
+    <td>R</td>
+    <td>82<br>$52</td>
+    <td>b</td>
+    <td>98<br>$62</td>
+    <td>r</td>
+    <td>114<br>$72</td>
+  </tr>
+  <tr>
+    <td>C</td>
+    <td>67<br>$43</td>
+    <td>S</td>
+    <td>83<br>$53</td>
+    <td>c</td>
+    <td>99<br>$63</td>
+    <td>s</td>
+    <td>115<br>$73</td>
+  </tr>
+  <tr>
+    <td>D</td>
+    <td>68<br>$44</td>
+    <td>T</td>
+    <td>84<br>$54</td>
+    <td>d</td>
+    <td>100<br>$64</td>
+    <td>t</td>
+    <td>116<br>$74</td>
+  </tr>
+  <tr>
+    <td>E</td>
+    <td>69<br>$45</td>
+    <td>U</td>
+    <td>85<br>$55</td>
+    <td>e</td>
+    <td>101<br>$65</td>
+    <td>u</td>
+    <td>117<br>$75</td>
+  </tr>
+  <tr>
+    <td>F</td>
+    <td>70<br>$46</td>
+    <td>V</td>
+    <td>86<br>$56</td>
+    <td>f</td>
+    <td>102<br>$66</td>
+    <td>v</td>
+    <td>118<br>$76</td>
+  </tr>
+  <tr>
+    <td>G</td>
+    <td>71<br>$47</td>
+    <td>W</td>
+    <td>87<br>$57</td>
+    <td>g</td>
+    <td>103<br>$67</td>
+    <td>w</td>
+    <td>119<br>$77</td>
+  </tr>
+  <tr>
+    <td>H</td>
+    <td>72<br>$48</td>
+    <td>X</td>
+    <td>88<br>$58</td>
+    <td>h</td>
+    <td>104<br>$68</td>
+    <td>x</td>
+    <td>120<br>$78</td>
+  </tr>
+  <tr>
+    <td>I</td>
+    <td>73<br>$49</td>
+    <td>Y</td>
+    <td>89<br>$59</td>
+    <td>i</td>
+    <td>105<br>$69</td>
+    <td>y</td>
+    <td>121<br>$79</td>
+  </tr>
+  <tr>
+    <td>J</td>
+    <td>74<br>$4A</td>
+    <td>Z</td>
+    <td>90<br>$5A</td>
+    <td>j</td>
+    <td>106<br>$6A</td>
+    <td>z</td>
+    <td>122<br>$7A</td>
+  </tr>
+  <tr>
+    <td>K</td>
+    <td>75<br>$4B</td>
+    <td>[</td>
+    <td>91<br>$5B</td>
+    <td>k</td>
+    <td>107<br>$6B</td>
+    <td>{</td>
+    <td>123<br>$7B</td>
+  </tr>
+  <tr>
+    <td>L</td>
+    <td>76<br>$4C</td>
+    <td>\</td>
+    <td>92<br>$5C</td>
+    <td>l</td>
+    <td>108<br>$6C</td>
+    <td>|</td>
+    <td>124<br>$7C</td>
+  </tr>
+  <tr>
+    <td>M</td>
+    <td>77<br>$4D</td>
+    <td>]</td>
+    <td>93<br>$5D</td>
+    <td>m</td>
+    <td>109<br>$6D</td>
+    <td>}</td>
+    <td>125<br>$7D</td>
+  </tr>
+  <tr>
+    <td>N</td>
+    <td>78<br>$4E</td>
+    <td>^</td>
+    <td>94<br>$5E</td>
+    <td>n</td>
+    <td>110<br>$6E</td>
+    <td>~</td>
+    <td>126<br>$7E</td>
+  </tr>
+  <tr>
+    <td>O</td>
+    <td>79<br>$4F</td>
+    <td>_</td>
+    <td>95<br>$5F</td>
+    <td>o</td>
+    <td>111<br>$6F</td>
+    <td>DEL</td>
+    <td>127<br>$7F</td>
+  </tr>
+</table>
 
 </body>
 </html>
