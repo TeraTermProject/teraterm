@@ -1105,8 +1105,40 @@ static void _dquote_string(char *str, char *dst, int dst_len)
 
 static void dquote_string(char *str, char *dst, int dst_len)
 {
-	// " で始まるか、スペースが含まれる場合にはクオートする
-	if (str[0] == '"' || strchr(str, '" ') != NULL) {
+	// ",スペース,^A-^_ が含まれる場合にはクオートする
+	if (strchr(str, '"') != NULL ||
+	    strchr(str, ' ') != NULL ||
+	    strchr(str, 0x01) != NULL ||
+	    strchr(str, 0x02) != NULL ||
+	    strchr(str, 0x03) != NULL ||
+	    strchr(str, 0x04) != NULL ||
+	    strchr(str, 0x05) != NULL ||
+	    strchr(str, 0x06) != NULL ||
+	    strchr(str, 0x07) != NULL ||
+	    strchr(str, 0x08) != NULL ||
+	    strchr(str, 0x09) != NULL ||
+	    strchr(str, 0x0a) != NULL ||
+	    strchr(str, 0x0b) != NULL ||
+	    strchr(str, 0x0c) != NULL ||
+	    strchr(str, 0x0d) != NULL ||
+	    strchr(str, 0x0e) != NULL ||
+	    strchr(str, 0x0f) != NULL ||
+	    strchr(str, 0x10) != NULL ||
+	    strchr(str, 0x11) != NULL ||
+	    strchr(str, 0x12) != NULL ||
+	    strchr(str, 0x13) != NULL ||
+	    strchr(str, 0x14) != NULL ||
+	    strchr(str, 0x15) != NULL ||
+	    strchr(str, 0x16) != NULL ||
+	    strchr(str, 0x17) != NULL ||
+	    strchr(str, 0x18) != NULL ||
+	    strchr(str, 0x19) != NULL ||
+	    strchr(str, 0x1a) != NULL ||
+	    strchr(str, 0x1b) != NULL ||
+	    strchr(str, 0x1c) != NULL ||
+	    strchr(str, 0x1d) != NULL ||
+	    strchr(str, 0x1e) != NULL ||
+	    strchr(str, 0x1f) != NULL) {
 		_dquote_string(str, dst, dst_len);
 		return;
 	}
