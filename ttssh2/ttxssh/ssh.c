@@ -1766,7 +1766,7 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 				get_file_version("ttxssh.dll", &a, &b, &c, &d);
 
 				_snprintf_s(TTSSH_ID, sizeof(TTSSH_ID), _TRUNCATE,
-				            "SSH-%d.%d-TTSSH/%d.%d Win32\n",
+				            "SSH-%d.%d-TTSSH/%d.%d Win32\r\n",
 				            pvar->protocol_major, pvar->protocol_minor, a, b);
 				TTSSH_ID_len = strlen(TTSSH_ID);
 
@@ -1788,7 +1788,8 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 					notify_fatal_error(pvar, pvar->ts->UIMsg);
 				} else {
 					// 改行コードの除去 (2004.8.4 yutaka)
-					pvar->client_version_string[--TTSSH_ID_len] = 0;
+					pvar->client_version_string[--TTSSH_ID_len] = 0; // \n
+					pvar->client_version_string[--TTSSH_ID_len] = 0; // \r
 
 					strncpy_s(prefix, sizeof(prefix), "Sent client identification string: ", _TRUNCATE);
 					buf_len = strlen(prefix) + strlen(pvar->client_version_string) + 1;
