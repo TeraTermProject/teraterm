@@ -877,7 +877,7 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 	}
 	get_lang_msg("MENU_WINDOW_WINDOW", buf, buflen, "&Window", langFile);
 	if (VTFlag == 1) {
-		AppendMenu(menu, MF_SEPARATOR, NULL, NULL);
+		AppendMenu(menu, MF_SEPARATOR, 0, NULL);
 		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_WINDOW, buf);
 
 		get_lang_msg("MENU_WINDOW_MINIMIZEALL", buf, buflen, "&Minimize All", langFile);
