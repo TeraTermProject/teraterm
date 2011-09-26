@@ -496,6 +496,12 @@ TTXttyplay メニューコマンド         ID
 -----------------------------------------
 [File] TTY Replay                   55302
 
+TTXRecurringCommand メニューコマンド ID
+-----------------------------------------
+[Setup] Recurring Command           55500
+[Control] Recurring Command         55501
+
+
 2) TEK window
 
 メニューコマンド                    ID
