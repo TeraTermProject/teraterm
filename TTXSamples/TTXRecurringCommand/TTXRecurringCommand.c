@@ -17,8 +17,10 @@
 
 #define IdRecurringTimer 3001
 
-#define ID_MENU_SETUP 55500
+#define ID_MENU_SETUP   55500
 #define ID_MENU_CONTROL 55501
+#define ID_MENU_ENABLE  55502
+#define ID_MENU_DISABLE 55503
 
 #define SECTION "TTXRecurringCommand"
 
@@ -519,6 +521,21 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 			         pvar->interval * 1000, RecurringTimerProc);
 		}
 		else {
+			KillTimer(pvar->cv->HWin, IdRecurringTimer);
+		}
+		return 1;
+
+	  case ID_MENU_ENABLE:
+	  	if (!pvar->enable) {
+			pvar->enable = TRUE;
+			SetTimer(pvar->cv->HWin, IdRecurringTimer,
+			         pvar->interval * 1000, RecurringTimerProc);
+		}
+		return 1;
+
+	  case ID_MENU_DISABLE:
+	  	if (pvar->enable) {
+			pvar->enable = FALSE;
 			KillTimer(pvar->cv->HWin, IdRecurringTimer);
 		}
 		return 1;
