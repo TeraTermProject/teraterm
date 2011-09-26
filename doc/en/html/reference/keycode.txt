@@ -490,6 +490,8 @@ TTXRecurringCommand Menu command    ID
 -----------------------------------------
 [Setup] Recurring Command           55500
 [Control] Recurring Command         55501
+-- Enable Recurring Command         55502 (not in menu)
+-- Disable Recurring Command        55503 (not in menu)
 
 
 2) TEK window

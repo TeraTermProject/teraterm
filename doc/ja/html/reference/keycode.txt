@@ -500,7 +500,8 @@ TTXRecurringCommand メニューコマンド ID
 -----------------------------------------
 [Setup] Recurring Command           55500
 [Control] Recurring Command         55501
-
+-- Enable Recurring Command         55502 (メニュー割り当て無し)
+-- Disable Recurring Command        55503 (メニュー割り当て無し)
 
 2) TEK window
 
