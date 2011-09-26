@@ -36,16 +36,16 @@
   <li>Changes
     <ul>
       <li>added support for OSC 10 (Change VT window text foreground color), 11 (Change VT window text background color), 15 (Change TEK window text foreground color) and 16 (Change TEK window text background color) control string.</li>
-      <!--li><a href="../menu/window.html">[Window]</a> メニューに <a href="../menu/window.html#minimize">[Minimize All]</a>, <a href="../menu/window.html#restore">[Restore All]</a> メニューを追加した。</li-->
-      <!--li>マクロコマンド "<a href="../macro/command/messagebox.html">messagebox</a>", "<a href="../macro/command/inputbox.html">inputbox</a>", "<a href="../macro/command/statusbox.html">statusbox</a>"で、表示されるメッセージの上下の余白の大きさを調整した。 </li-->
+      <li>added the <a href="../menu/window.html#minimize">[Minimize All]</a> and the <a href="../menu/window.html#restore">[Restore All]</a> menu into the <a href="../menu/window.html">[Window]</a> menu.</li>
+      <li>adjusted the up and down space size of the shown message at the "<a href="../macro/command/messagebox.html">messagebox</a>", "<a href="../macro/command/inputbox.html">inputbox</a>" and "<a href="../macro/command/statusbox.html">statusbox</a>" macro commands.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>XMODEM: The first packet is sent out twice by using the xmodem sending function. <br>cf. <a href="http://logmett.com/forum/viewtopic.php?f=2&t=354">why the first xmodem packet been always send out twice?</a></li>
-      <!--li><a href="../macro/command/ifdefined.html">ifdefined</a>に整数リテラルを渡すと"整数型変数"と判定する問題を修正した。</li-->
-      <!-- li>ANSI Color の 0 番の設定が正しく読み込めない問題を修正した。</li -->
+      <li><a href="../macro/command/ifdefined.html">ifdefined</a> macro command: When the interger literal is specified, the command mistakenly returns the interger type.</li>
+      <li>The zero index of the ANSI color settings can not be loaded.</li>
     </ul>
   </li>
 
@@ -1745,7 +1745,7 @@ SYNOPSIS:
 <ul class="history">
   <li>Bug fixes
     <ul>
-      <!--li>鍵生成ダイアログでパスワードに制御文字(^A-^_)を入力できるようにした。</li-->
+      <li>The control characters(^A-^_) can be inputed as the password string on the key generator dialog.</li>
     </ul>
   </li>
 
