@@ -4399,10 +4399,10 @@ void ApplyBoradCastCommandHisotry(HWND Dialog, char *historyfile)
 
 // ドロップダウンの中のエディットコントロールを
 // サブクラス化するためのウインドウプロシージャ
-static WNDPROC OrigHostnameEditProc; // Original window procedure
+static WNDPROC OrigBroadcastEditProc; // Original window procedure
 static HWND BroadcastWindowList;
-static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
-                                         WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
+                                          WPARAM wParam, LPARAM lParam)
 {
 	char buf[1024];
 	int len;
@@ -4435,7 +4435,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 				int i;
 				HWND hd;
 				int count;
-
+OutputDebugPrintf("msg=%d wParam=%d lParam=%d\n", msg, wParam, lParam);
 				if (wParam == 0x0d) {  // Enter key
 					SetWindowText(dlg, "");
 					SendMessage(dlg, EM_SETSEL, 0, 0);
@@ -4464,7 +4464,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 			break;
 
 		default:
-			return CallWindowProc(OrigHostnameEditProc, dlg, msg, wParam, lParam);
+			return CallWindowProc(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
 	}
 
 	return FALSE;
@@ -4643,8 +4643,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 	HFONT font;
 	char uimsg[MAX_UIMSG];
 	char historyfile[MAX_PATH];
-	static HWND hwndHostname     = NULL; // HOSTNAME dropdown
-	static HWND hwndHostnameEdit = NULL; // Edit control on HOSTNAME dropdown
+	static HWND hwndBroadcast     = NULL; // Broadcast dropdown
+	static HWND hwndBroadcastEdit = NULL; // Edit control on Broadcast dropdown
 	// for resize
 	RECT rc_dlg, rc, rc_ok;
 	POINT p;
@@ -4682,10 +4682,10 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
 
 			// サブクラス化させてリアルタイムモードにする (2008.1.21 yutaka)
-			hwndHostname = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
-			hwndHostnameEdit = GetWindow(hwndHostname, GW_CHILD);
-			OrigHostnameEditProc = (WNDPROC)GetWindowLong(hwndHostnameEdit, GWL_WNDPROC);
-			SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)HostnameEditProc);
+			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
+			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
+			OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWL_WNDPROC);
+			SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)BroadcastEditProc);
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
@@ -4794,10 +4794,10 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				checked = SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_GETCHECK, 0, 0);
 				if (checked & BST_CHECKED) { // checkあり
 					// new handler
-					hwndHostname = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
-					hwndHostnameEdit = GetWindow(hwndHostname, GW_CHILD);
-					OrigHostnameEditProc = (WNDPROC)GetWindowLong(hwndHostnameEdit, GWL_WNDPROC);
-					SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)HostnameEditProc);
+					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
+					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
+					OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWL_WNDPROC);
+					SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -4808,7 +4808,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
 					// restore old handler
-					SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)OrigHostnameEditProc);
+					SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)OrigBroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
@@ -4883,7 +4883,7 @@ skip:;
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
 					// 破棄されないので、以下の「ウィンドウプロシージャ戻し」は不要と思われる。(yutaka)
 #if 0
-					SetWindowLong(hwndHostnameEdit, GWL_WNDPROC, (LONG)OrigHostnameEditProc);
+					SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)OrigBroadcastEditProc);
 #endif
 
 					//EndDialog(hDlgWnd, IDOK);
