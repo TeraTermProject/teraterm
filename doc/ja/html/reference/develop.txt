@@ -103,8 +103,9 @@
 
   3. OpenSSL (used by TTSSH and TTProxy)
      (1) openssl のソースを libs/openssl の中に展開する。
-     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl.bat を実行する。
+     (2) OpenSSL 1.0.0e 以降では、手動で libs/openssl/Makefile.bak を削除してください。
+     (3) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (4) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl.bat を実行する。
 
   4. Zlib (used by TTSSH)
      (1) zlib のソースを libs/zlib の中に展開する。
