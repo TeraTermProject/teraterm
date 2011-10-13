@@ -221,6 +221,7 @@
 #define HlpMacroCommandGetfileattr      92189
 #define HlpMacroCommandGethostname      92141
 #define HlpMacroCommandGetpassword      92046
+#define HlpMacroCommandGetspecialfolder 92195
 #define HlpMacroCommandGettime          92047
 #define HlpMacroCommandGettitle         92048
 #define HlpMacroCommandGetttdir         92140

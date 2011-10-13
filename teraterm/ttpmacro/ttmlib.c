@@ -8,7 +8,8 @@
 #include "ttlib.h"
 #include <string.h>
 #include <direct.h>
-
+#include <Shlobj.h>
+#include <stdio.h>
 static char CurrentDir[MAXPATHLEN];
 
 void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s)
@@ -83,4 +84,135 @@ BOOL GetAbsPath(PCHAR FName, int destlen)
   AppendSlash(FName,destlen);
   strncat_s(FName,destlen,Temp,_TRUNCATE);
   return TRUE;
+}
+
+int DoGetSpecialFolder(int CSIDL, PCHAR KEY, PCHAR dest, int dest_len)
+{
+	OSVERSIONINFO osvi;
+	LONG result;
+	HKEY hKey;
+	DWORD disposition, len, type;
+
+	char Path[MAX_PATH] = "";
+	LPITEMIDLIST pidl;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
+	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) ) {
+		switch (CSIDL) {
+			case CSIDL_COMMON_DESKTOPDIRECTORY:
+			case CSIDL_COMMON_STARTMENU:
+			case CSIDL_COMMON_PROGRAMS:
+			case CSIDL_COMMON_STARTUP:
+				return 0;
+		}
+		result = RegCreateKeyEx(HKEY_CURRENT_USER,
+		                        "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
+		                        0,
+		                        "",
+		                        REG_OPTION_NON_VOLATILE,
+		                        KEY_READ,
+		                        NULL,
+		                        &hKey,
+		                        &disposition);
+		if (result != ERROR_SUCCESS) {
+			return 0;
+		}
+
+		len = sizeof(Path);
+		result = RegQueryValueEx(hKey, KEY, NULL, &type, Path, &len);
+		if (result != ERROR_SUCCESS) {
+			return 0;
+		}
+
+		RegCloseKey(hKey);
+	}
+	else {
+		if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != NOERROR) {
+			return 0;
+		}
+
+		SHGetPathFromIDList(pidl, Path);
+		CoTaskMemFree(pidl);
+	}
+
+	strncpy_s(dest, dest_len, Path, _TRUNCATE);
+	return 1;
+}
+
+int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
+{
+	int CSIDL;
+	char REGKEY[256];
+
+	if (_stricmp(type, "AllUsersDesktop") == 0) {
+		CSIDL = CSIDL_COMMON_DESKTOPDIRECTORY;
+		strncpy_s(REGKEY, sizeof(REGKEY), "", _TRUNCATE);
+	}
+	else if (_stricmp(type, "AllUsersStartMenu") == 0) {
+		CSIDL = CSIDL_COMMON_STARTMENU;
+		strncpy_s(REGKEY, sizeof(REGKEY), "", _TRUNCATE);
+	}
+	else if (_stricmp(type, "AllUsersPrograms") == 0) {
+		CSIDL = CSIDL_COMMON_PROGRAMS;
+		strncpy_s(REGKEY, sizeof(REGKEY), "", _TRUNCATE);
+	}
+	else if (_stricmp(type, "AllUsersStartup") == 0) {
+		CSIDL = CSIDL_COMMON_STARTUP;
+		strncpy_s(REGKEY, sizeof(REGKEY), "", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Desktop") == 0) {
+		CSIDL = CSIDL_DESKTOPDIRECTORY;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Desktop", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Favorites") == 0) {
+		CSIDL = CSIDL_FAVORITES;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Favorites", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Fonts") == 0) {
+		CSIDL = CSIDL_FONTS;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Fonts", _TRUNCATE);
+	}
+	else if (_stricmp(type, "MyDocuments") == 0) {
+		CSIDL = CSIDL_PERSONAL;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Personal", _TRUNCATE);
+	}
+	else if (_stricmp(type, "NetHood") == 0) {
+		CSIDL = CSIDL_NETHOOD;
+		strncpy_s(REGKEY, sizeof(REGKEY), "NetHood", _TRUNCATE);
+	}
+	else if (_stricmp(type, "PrintHood") == 0) {
+		CSIDL = CSIDL_PRINTHOOD;
+		strncpy_s(REGKEY, sizeof(REGKEY), "PrintHood", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Programs") == 0) {
+		CSIDL = CSIDL_PROGRAMS;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Programs", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Recent") == 0) {
+		CSIDL = CSIDL_RECENT;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Recent", _TRUNCATE);
+	}
+	else if (_stricmp(type, "SendTo") == 0) {
+		CSIDL = CSIDL_SENDTO;
+		strncpy_s(REGKEY, sizeof(REGKEY), "SendTo", _TRUNCATE);
+	}
+	else if (_stricmp(type, "StartMenu") == 0) {
+		CSIDL = CSIDL_STARTMENU;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Start Menu", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Startup") == 0) {
+		CSIDL = CSIDL_STARTUP;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Startup", _TRUNCATE);
+	}
+	else if (_stricmp(type, "Templates") == 0) {
+		CSIDL = CSIDL_TEMPLATES;
+		strncpy_s(REGKEY, sizeof(REGKEY), "Templates", _TRUNCATE);
+	}
+
+	if (!DoGetSpecialFolder(CSIDL, REGKEY, dest, dest_len)) {
+		return 0;
+	}
+	return 1;
 }

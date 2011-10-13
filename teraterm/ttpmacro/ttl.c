@@ -2069,6 +2069,30 @@ WORD TTLGetPassword()
 	return Err;
 }
 
+WORD TTLGetSpecialFolder()
+{
+	WORD Err;
+	TVarId VarId;
+	TStrVal type;
+	int result;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	if (Err!=0) return Err;
+
+	GetStrVal(type,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) {
+		return Err;
+	}
+
+	result = GetSpecialFolder(StrVarPtr(VarId), sizeof(TStrVal), type);
+	SetResult(result);
+
+	return Err;
+}
+
 WORD TTLGetTime(WORD mode)
 {
 	WORD Err;
@@ -4887,6 +4911,8 @@ int ExecCmnd()
 			Err = TTLGetHostname(); break;
 		case RsvGetPassword:
 			Err = TTLGetPassword(); break;
+		case RsvGetSpecialFolder:
+			Err = TTLGetSpecialFolder(); break;
 		case RsvGetTitle:
 			Err = TTLGetTitle(); break;
 		case RsvGetTTDir:

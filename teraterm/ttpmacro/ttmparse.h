@@ -217,6 +217,7 @@
 #define RsvFolderDelete 192
 #define RsvFolderSearch 193
 #define RsvExpandEnv    194
+#define RsvGetSpecialFolder  195
 
 #define RsvOperator     1000
 #define RsvBNot         1001
