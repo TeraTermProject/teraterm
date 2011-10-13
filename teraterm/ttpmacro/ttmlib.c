@@ -9,7 +9,7 @@
 #include <string.h>
 #include <direct.h>
 #include <Shlobj.h>
-#include <stdio.h>
+
 static char CurrentDir[MAXPATHLEN];
 
 void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s)
@@ -91,7 +91,7 @@ int DoGetSpecialFolder(int CSIDL, PCHAR KEY, PCHAR dest, int dest_len)
 	OSVERSIONINFO osvi;
 	LONG result;
 	HKEY hKey;
-	DWORD disposition, len, type;
+	DWORD disposition, len;
 
 	char Path[MAX_PATH] = "";
 	LPITEMIDLIST pidl;
@@ -121,7 +121,7 @@ int DoGetSpecialFolder(int CSIDL, PCHAR KEY, PCHAR dest, int dest_len)
 		}
 
 		len = sizeof(Path);
-		result = RegQueryValueEx(hKey, KEY, NULL, &type, Path, &len);
+		result = RegQueryValueEx(hKey, KEY, NULL, NULL, Path, &len);
 		if (result != ERROR_SUCCESS) {
 			return 0;
 		}
