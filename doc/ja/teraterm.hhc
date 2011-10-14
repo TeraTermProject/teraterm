@@ -1365,6 +1365,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="getspecialfolder">
+					<param name="Local" value="html\macro\command\getspecialfolder.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="gettime">
 					<param name="Local" value="html\macro\command\gettime.html">
 					<param name="ImageNumber" value="11">

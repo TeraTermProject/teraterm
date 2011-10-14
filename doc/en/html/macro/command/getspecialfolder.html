@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>getspecialfolder</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getspecialfolder</h1>
+
+<p>
+<!--“ÁŽêƒtƒHƒ‹ƒ_‚ÌƒpƒX‚ðŽæ“¾‚·‚éB-->
+</p>
+
+<h2>Format</h2>
+
+<pre class="macro-syntax">
+getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string valiable &lt;strvar&gt;</dt>
+	<dd><!--‚±‚Ìˆø”‚ÅŽw’è‚µ‚½•¶Žš—ñ•Ï”‚ª•Ô‚è’l‚É—p‚¢‚ç‚ê‚éB--></dd>
+	
+	<dt class="macro">string &lt;foldertype&gt;</dt>
+	<dd><!--‚±‚Ìˆø”‚ÅŽw’è‚µ‚½Ží—Þ‚Ì“ÁŽêƒtƒHƒ‹ƒ_‚ª•¶Žš—ñ•Ï” &lt;strvar&gt;‚É‘ã“ü‚³‚ê‚éB-->
+	  <table border="2">
+	    <tr>
+	        <th>AllUsersDesktop</th>
+	        <td>directory that contains files and folders that appear on the desktop for all users</td>
+	    </tr>
+	    <tr>
+	        <th>AllUsersStartMenu</th>
+	        <td>directory that contains the programs and folders that appear on the Start menu for all users</td>
+	    </tr>
+	    <tr>
+	        <th>AllUsersPrograms</th>
+	        <td>directory that contains the directories for the common program groups that appear on the Start menu for all users</td>
+	    </tr>
+	    <tr>
+	        <th>AllUsersStartup</th>
+	        <td>directory that contains the programs that appear in the Startup folder for all users</td>
+	    </tr>
+	    <tr>
+	        <th>Desktop</th>
+	        <td>virtual folder that represents the Windows desktop</td>
+	    </tr>
+	    <tr>
+	        <th>Favorites</th>
+	        <td>directory that serves as a common repository for the user's favorite items</td>
+	    </tr>
+	    <tr>
+	        <th>Fonts</th>
+	        <td>virtual folder that contains fonts</td>
+	    </tr>
+	    <tr>
+	        <th>MyDocuments</th>
+	        <td>virtual folder that represents the My Documents desktop item</td>
+	    </tr>
+	    <tr>
+	        <th>NetHood</th>
+	        <td>directory that contains the link objects that may exist in the My Network Places virtual folder</td>
+	    </tr>
+	    <tr>
+	        <th>PrintHood</th>
+	        <td>directory that contains the link objects that can exist in the Printers virtual folder</td>
+	    </tr>
+	    <tr>
+	        <th>Programs</th>
+	        <td>directory that contains the user's program groups</td>
+	    </tr>
+	    <tr>
+	        <th>Recent</th>
+	        <td>directory that contains shortcuts to the user's most recently used documents</td>
+	    </tr>
+	    <tr>
+	        <th>SendTo</th>
+	        <td>directory that contains Send To menu items</td>
+	    </tr>
+	    <tr>
+	        <th>StartMenu</th>
+	        <td>directory that contains Start menu items</td>
+	    </tr>
+	    <tr>
+	        <th>Startup</th>
+	        <td>directory that corresponds to the user's Startup program group</td>
+	    </tr>
+	    <tr>
+	        <th>Templates</th>
+	        <td>directory that serves as a common repository for document templates</td>
+	    </tr>
+	  </table>
+	  cf. <a href="http://msdn.microsoft.com/en-us/library/bb762494.aspx">CSIDL</a>
+	</dd>
+
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">string variable &lt;strvar&gt;</dt>
+	<!--dd>Žæ“¾‚³‚ê‚½•¶Žš—ñ‚ªŠi”[‚³‚ê‚éB</dd-->
+
+	<dt class="macro">System variable &lt;result&gt;</dt>
+	<dd>When the command fails, 0 is stored.<br>
+	    When the command succeeds, 1 is stored.</dd>
+
+</dl>
+
+<h2>Remarks</h2>
+
+<p>
+<!--Windows ‚Ì“ÁŽêƒtƒHƒ‹ƒ_‚ðŽæ“¾‚µ‚Ä &lt;strvar&gt; ‚ÉŠi”[‚µ‚Ü‚·B-->
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+getspecialfolder str "Desktop"
+messagebox str &quot;Desktop&quot;
+</pre>
+
+</body>
+</html>

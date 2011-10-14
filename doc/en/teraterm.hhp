@@ -212,6 +212,7 @@ HlpMacroCommandGetenv=html\macro\command\getenv.html
 HlpMacroCommandGetfileattr=html\macro\command\getfileattr.html
 HlpMacroCommandGethostname=html\macro\command\gethostname.html
 HlpMacroCommandGetpassword=html\macro\command\getpassword.html
+HlpMacroCommandGetspecialfolder=html\macro\command\getspecialfolder.html
 HlpMacroCommandGettime=html\macro\command\gettime.html
 HlpMacroCommandGettitle=html\macro\command\gettitle.html
 HlpMacroCommandGetttdir=html\macro\command\getttdir.html
