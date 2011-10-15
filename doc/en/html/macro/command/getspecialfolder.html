@@ -14,7 +14,7 @@
 <h1>getspecialfolder</h1>
 
 <p>
-<!--特殊フォルダのパスを取得する。-->
+Retrieves the path of a special folder.
 </p>
 
 <h2>Format</h2>
@@ -23,14 +23,17 @@
 getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 </pre>
 
+<h2>Remarks</h2>
+
+<p>
+Stores a Windows special folder to the &lt;strvar&gt; string variable.
+</p>
+
 <h2>Parameters</h2>
 
 <dl>
-	<dt class="macro">string valiable &lt;strvar&gt;</dt>
-	<dd><!--この引数で指定した文字列変数が返り値に用いられる。--></dd>
-	
 	<dt class="macro">string &lt;foldertype&gt;</dt>
-	<dd><!--この引数で指定した種類の特殊フォルダが文字列変数 &lt;strvar&gt;に代入される。-->
+	<dd>The drive and path of the specified folder by the string &lt;foldertype&gt; stores into the &lt;strvar&gt; string variable.
 	  <table border="2">
 	    <tr>
 	        <th>AllUsersDesktop</th>
@@ -97,7 +100,7 @@ getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 	        <td>directory that serves as a common repository for document templates</td>
 	    </tr>
 	  </table>
-	  cf. <a href="http://msdn.microsoft.com/en-us/library/bb762494.aspx">CSIDL</a>
+	  cf. <a href="http://msdn.microsoft.com/en-us/library/bb762494.aspx">CSIDL(MSDN library)</a>
 	</dd>
 
 </dl>
@@ -106,7 +109,7 @@ getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 
 <dl>
 	<dt class="macro">string variable &lt;strvar&gt;</dt>
-	<!--dd>取得された文字列が格納される。</dd-->
+	<dd>Returns into the got string.</dd>
 
 	<dt class="macro">System variable &lt;result&gt;</dt>
 	<dd>When the command fails, 0 is stored.<br>
@@ -114,17 +117,14 @@ getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 
 </dl>
 
-<h2>Remarks</h2>
-
-<p>
-<!--Windows の特殊フォルダを取得して &lt;strvar&gt; に格納します。-->
-</p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
 getspecialfolder str "Desktop"
-messagebox str &quot;Desktop&quot;
+if result then
+	messagebox str &quot;Desktop&quot;   ; C:\Documents and Settings\user\desktop
+endif
 </pre>
 
 </body>

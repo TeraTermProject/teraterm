@@ -23,35 +23,39 @@
 getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 </pre>
 
+<h2>解説</h2>
+
+<p>
+Windows の特殊フォルダを取得して &lt;strvar&gt; に格納します。
+</p>
+
 <h2>パラメータ</h2>
 <dl>
-	<dt class="macro">文字列変数 &lt;strvar&gt;</dt>	<dd>この引数で指定した文字列変数が返り値に用いられる。</dd>
-	
 	<dt class="macro">文字列 &lt;foldertype&gt;</dt>	<dd>この引数で指定した種類の特殊フォルダが文字列変数 &lt;strvar&gt;に代入される。<br>
 	  <table border="2">
 	    <tr>
 	        <th>AllUsersDesktop</th>
-	        <td>All Usersの「デスクトップ」ディレクトリ</td>
+	        <td>All Usersの「デスクトップ」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>AllUsersStartMenu</th>
-	        <td>All Usersの「スタートメニュー」ディレクトリ</td>
+	        <td>All Usersの「スタートメニュー」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>AllUsersPrograms</th>
-	        <td>All Usersのスタートメニューの「プログラム」ディレクトリ</td>
+	        <td>All Usersのスタートメニューの「プログラム」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>AllUsersStartup</th>
-	        <td>All Usersのスタートメニューの「スタートアップ」ディレクトリ</td>
+	        <td>All Usersのスタートメニューの「スタートアップ」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>Desktop</th>
-	        <td>「デスクトップ」仮装フォルダ</td>
+	        <td>「デスクトップ」仮想フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>Favorites</th>
-	        <td>「お気に入り」ディレクトリ</td>
+	        <td>「お気に入り」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>Fonts</th>
@@ -71,30 +75,30 @@ getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 	    </tr>
 	    <tr>
 	        <th>Programs</th>
-	        <td>スタートメニューの「プログラム」ディレクトリ</td>
+	        <td>スタートメニューの「プログラム」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>Recent</th>
-	        <td>「最近使ったファイル」ディレクトリ</td>
+	        <td>「最近使ったファイル」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>SendTo</th>
-	        <td>コンテキストメニューの「送る」ディレクトリ</td>
+	        <td>コンテキストメニューの「送る」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>StartMenu</th>
-	        <td>「スタートメニュー」ディレクトリ</td>
+	        <td>「スタートメニュー」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>Startup</th>
-	        <td>スタートメニューの「スタートアップ」ディレクトリ</td>
+	        <td>スタートメニューの「スタートアップ」フォルダ</td>
 	    </tr>
 	    <tr>
 	        <th>Templates</th>
-	        <td>「テンプレート」ディレクトリ</td>
+	        <td>「テンプレート」フォルダ</td>
 	    </tr>
 	  </table>
-	  cf. <a href="http://msdn.microsoft.com/en-us/library/bb762494.aspx">CSIDL</a>
+	  cf. <a href="http://msdn.microsoft.com/en-us/library/bb762494.aspx">CSIDL(MSDN library)</a>
 	</dd>
 
 </dl>
@@ -111,17 +115,13 @@ getspecialfolder &lt;strvar&gt; &lt;foldertype&gt;
 
 </dl>
 
-<h2>解説</h2>
-
-<p>
-Windows の特殊フォルダを取得して &lt;strvar&gt; に格納します。
-</p>
-
 <h2>例</h2>
 
 <pre class="macro-example">
 getspecialfolder str "Desktop"
-messagebox str &quot;Desktop&quot;
+if result then
+	messagebox str &quot;Desktop&quot;   ; C:\Documents and Settings\user\desktop
+endif
 </pre>
 
 </body>
