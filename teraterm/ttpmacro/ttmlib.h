@@ -14,7 +14,7 @@ void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s);
 void TTMGetDir(PCHAR Dir, int destlen);
 void TTMSetDir(PCHAR Dir);
 int GetAbsPath(PCHAR FName, int destlen);
-int GetSpecialFolder(PCHAR Text);
+int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type);
 
 #ifdef __cplusplus
 }
