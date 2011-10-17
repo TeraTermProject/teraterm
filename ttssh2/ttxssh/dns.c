@@ -131,9 +131,9 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 				}
 			}
 		}
+		DnsRecordListFree(rec, DnsFreeRecordList);
 	}
 
 	free(hostkey_digest);
-	DnsRecordListFree(rec, DnsFreeRecordList);
 	return found;
 }
