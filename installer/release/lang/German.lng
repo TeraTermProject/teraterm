@@ -734,6 +734,7 @@ MSG_SSH_UNABLE_FWD_ERROR=\nIt may have disconnected because it was unable to for
 MSG_SSH_SERVER_DISCON_ERROR=Server disconnected with message '%s'.%s
 MSG_SSH_SERVER_DISCON_NORES_ERROR=Server disconnected (no reason given).%s
 MSG_SSH_VERSION_ERROR=This program does not understand the server's version of the protocol.
+MSG_SSH_VERSION_MISMATCH=Protocol version mismatch. server:%d.%d client:%d
 MSG_SSH_SEND_ID_ERROR=An error occurred while sending the SSH ID string.\nThe connection will close.
 MSG_SSH_UNEXP_MSG2_ERROR=Unexpected SSH2 message(%d) on current stage(%d)
 MSG_SSH_UNEXP_MSG_ERROR=Unexpected packet type received: %d

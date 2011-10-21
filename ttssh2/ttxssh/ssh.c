@@ -1605,21 +1605,6 @@ static BOOL parse_protocol_ID(PTInstVar pvar, char FAR * ID)
 	pvar->protocol_major = atoi(ID + 4);
 	pvar->protocol_minor = atoi(str + 1);
 
-	// for SSH2(yutaka)
-	// 1.99ならSSH2での接続を行う
-	if (pvar->protocol_major == 1 && pvar->protocol_minor == 99) {
-		// ユーザが SSH2 を選択しているのならば
-		if (pvar->settings.ssh_protocol_version == 2) {
-			pvar->protocol_major = 2;
-			pvar->protocol_minor = 0;
-		}
-
-	}
-
-	// SSH バージョンを teraterm 側にセットする
-	// SCP コマンドのため (2008.2.3 maya)
-	pvar->cv->isSSH = pvar->protocol_major;
-
 	for (str = str + 1; *str >= '0' && *str <= '9'; str++) {
 	}
 
@@ -1631,22 +1616,41 @@ On entry, the pvar->protocol_xxx fields hold the server's advertised
 protocol number. We replace the fields with the protocol number we will
 actually use, or return FALSE if there is no usable protocol version.
 */
-static BOOL negotiate_protocol(PTInstVar pvar)
+static int negotiate_protocol(PTInstVar pvar)
 {
 	switch (pvar->protocol_major) {
 	case 1:
+		if (pvar->protocol_minor == 99 &&
+		    pvar->settings.ssh_protocol_version == 2) {
+			// サーバが 1.99 でユーザが SSH2 を選択しているのならば
+			// 2.0 接続とする
+			pvar->protocol_major = 2;
+			pvar->protocol_minor = 0;
+			return 0;
+		}
+
+		if (pvar->settings.ssh_protocol_version == 2) {
+			// バージョン違い
+			return -1;
+		}
+
 		if (pvar->protocol_minor > 5) {
 			pvar->protocol_minor = 5;
 		}
 
-		return TRUE;
+		return 0;
 
 	// for SSH2(yutaka)
 	case 2:
-		return TRUE;			// SSH2 support
+		if (pvar->settings.ssh_protocol_version == 1) {
+			// バージョン違い
+			return -1;
+		}
+
+		return 0;			// SSH2 support
 
 	default:
-		return FALSE;
+		return 1;
 	}
 }
 
@@ -1705,6 +1709,8 @@ static void init_protocol(PTInstVar pvar)
 BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 {
 	static char prefix[64];
+	int negotiate;
+	char uimsg[MAX_UIMSG];
 
 	// initialize SSH2 memory dump (2005.3.7 yutaka)
 	init_memdump();
@@ -1753,14 +1759,31 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 
 			pvar->ssh_state.server_ID = _strdup(ID);
 
-			if (!parse_protocol_ID(pvar, ID) || !negotiate_protocol(pvar)) {
+			if (!parse_protocol_ID(pvar, ID)) {
 				UTIL_get_lang_msg("MSG_SSH_VERSION_ERROR", pvar,
 				                  "This program does not understand the server's version of the protocol.");
 				notify_fatal_error(pvar, pvar->ts->UIMsg);
-			} else {
+			}
+			else if ((negotiate = negotiate_protocol(pvar)) == 1) {
+				UTIL_get_lang_msg("MSG_SSH_VERSION_ERROR", pvar,
+				                  "This program does not understand the server's version of the protocol.");
+				notify_fatal_error(pvar, pvar->ts->UIMsg);
+			}
+			else if (negotiate == -1) {
+				UTIL_get_lang_msg("MSG_SSH_VERSION_MISMATCH", pvar,
+				                  "Protocol version mismatch. server:%d.%d client:%d");
+				_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, pvar->ts->UIMsg,
+				            pvar->protocol_major, pvar->protocol_minor, pvar->settings.ssh_protocol_version);
+				notify_fatal_error(pvar, uimsg);
+			}
+			else {
 				char TTSSH_ID[1024];
 				int TTSSH_ID_len;
 				int a, b, c, d;
+
+				// SSH バージョンを teraterm 側にセットする
+				// SCP コマンドのため (2008.2.3 maya)
+				pvar->cv->isSSH = pvar->protocol_major;
 
 				// 自分自身のバージョンを取得する (2005.3.3 yutaka)
 				get_file_version("ttxssh.dll", &a, &b, &c, &d);

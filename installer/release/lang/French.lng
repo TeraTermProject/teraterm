@@ -736,6 +736,7 @@ MSG_SSH_UNABLE_FWD_ERROR=\nIl est possible que vous ayez été déconnecté car ll a
 MSG_SSH_SERVER_DISCON_ERROR=Serveur déconnecté avec le message '%s'.%s
 MSG_SSH_SERVER_DISCON_NORES_ERROR=Serveur déconnecté (cause inconnue).%s
 MSG_SSH_VERSION_ERROR=Ce programme ne comprend pas la version de protocole du serveur.
+MSG_SSH_VERSION_MISMATCH=Protocol version mismatch. server:%d.%d client:%d
 MSG_SSH_SEND_ID_ERROR=Une erreur est survenue en cours d'envoi du SSH ID.\nConnexion coupée.
 MSG_SSH_UNEXP_MSG2_ERROR=Message inattendu de SSH2(%d) à l'étape courante (%d)
 MSG_SSH_UNEXP_MSG_ERROR=Reçu un type de paquet inattendu: %d
