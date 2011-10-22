@@ -1747,14 +1747,14 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <!--li>サーバのプロトコルバージョンと指定した SSH のバージョンが一致しない場合、接続しないようにした。</li-->
+      <li>When the SSH version of the TTSSH does not match the server protocol version, a user can not connect.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>The control characters(^A-^_) can be inputed as the password string on the key generator dialog.</li>
-      <!--li>サーバのプロトコルバージョンが 1.99 の場合に、プロトコルに SSH1 を指定しても SSH2 で接続される問題を修正した。</li-->
+      <li>When the server protocol is 1.99, Tera Term will connect with the SSH2 protocol by using the SSH1 specified protocol.</li>
     </ul>
   </li>
 
