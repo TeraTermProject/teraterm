@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
@@ -31,6 +32,7 @@ typedef struct {
 	PComVar cv;
 	Tsend origPsend;
 	TWriteFile origPWriteFile;
+	PParseParam origParseParam;
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
 	HMENU SetupMenu;
@@ -326,20 +328,38 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
 //
 // TTXReadIniFile, TTXWriteIniFile -- 設定ファイルの読み書き
 //
-static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
-	pvar->origReadIniFile(fn, ts);
+void ReadINI(PCHAR fn, PTTSet ts) {
+	char buff[256];
+	char *p;
 
-	GetPrivateProfileString(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), fn);
+	if (fn[0] == '\\' || fn[0] == '/' || (fn[0] != 0 && fn[1] == ':')) {
+		strncpy_s(buff, sizeof(buff), fn, _TRUNCATE);
+	}
+	else {
+		GetModuleFileName(NULL, buff, sizeof(buff));
+		p = strrchr(buff, '\\');
+		if (!p) {
+			return;
+		}
+		strncpy_s(p+1, sizeof(buff) - ((p+1)-buff), fn, _TRUNCATE);
+	}
+
+	GetPrivateProfileString(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), buff);
 	strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
 
-	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, fn);
+	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, buff);
 	if (pvar->interval < MINIMUM_INTERVAL) {
 		pvar->interval = MINIMUM_INTERVAL;
 	}
 
-	pvar->enable = GetOnOff(SECTION, "Enable", fn, FALSE);
+	pvar->enable = GetOnOff(SECTION, "Enable", buff, FALSE);
+}
+
+static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+	pvar->origReadIniFile(fn, ts);
+	ReadINI(fn, ts);
 
 	return;
 }
@@ -359,12 +379,65 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 	return;
 }
 
+//
+// TTXParseParam -- コマンドラインオプションの解釈
+//	今のところ固有のコマンドラインオプションは無い。(必要?)
+//	/F= による設定ファイルの切り替えのみ対応。
+//
+
+PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
+	int i = 0;
+	BOOL quoted = FALSE;
+
+	while (*param == ' ' || *param == '\t') {
+		param++;
+	}
+
+	if (*param == '\0' || *param == ';') {
+		return NULL;
+	}
+
+	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+		if (*param == '"' && (*++param != '"' || !quoted)) {
+			quoted = !quoted;
+			continue;
+		}
+		else if (i < size - 1) {
+			buff[i++] = *param;
+		}
+		param++;
+	}
+
+	buff[i] = '\0';
+	return param;
+}
+
+static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
+        char buff[1024];
+        PCHAR next;
+        pvar->origParseParam(Param, ts, DDETopic);
+
+        next = Param;
+        while (next = GetParam(buff, sizeof(buff), next)) {
+                if (_strnicmp(buff, "/F=", 3) == 0) {
+                        ReadINI(&buff[3], ts);
+                }
+        }
+
+	return;
+}
+
 static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
 	pvar->origReadIniFile = *hooks->ReadIniFile;
 	*hooks->ReadIniFile = TTXReadIniFile;
 
 	pvar->origWriteIniFile = *hooks->WriteIniFile;
 	*hooks->WriteIniFile = TTXWriteIniFile;
+
+	pvar->origParseParam = *hooks->ParseParam;
+	*hooks->ParseParam = TTXParseParam;
+
+	return;
 }
 
 //
