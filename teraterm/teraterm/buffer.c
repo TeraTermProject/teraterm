@@ -3061,7 +3061,8 @@ void ClearTabStop(int Ps)
 
 	if (NTabStops>0) {
 		switch (Ps) {
-			case 0:
+		case 0:
+			if (ts.TabStopFlag & TABF_TBC0) {
 				i = 0;
 				while ((TabStops[i]!=CursorX) && (i<NTabStops-1)) {
 					i++;
@@ -3072,10 +3073,12 @@ void ClearTabStop(int Ps)
 						TabStops[j] = TabStops[j+1];
 					}
 				}
-				break;
-			case 3:
+			}
+			break;
+		case 3:
+			if (ts.TabStopFlag & TABF_TBC3)
 				NTabStops = 0;
-				break;
+			break;
 		}
 	}
 }

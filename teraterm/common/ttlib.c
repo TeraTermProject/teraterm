@@ -581,27 +581,28 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
-void GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
+BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
 {
 	int i, j, k;
-	char c;
 
 	i = 1;
 	j = 0;
 	k = 0;
-	do {
-		c = Source[j];
-		if ( c==',' ) {
+
+	while (i<Nth && Source[j] != 0) {
+		if (Source[j++] == ',') {
 			i++;
 		}
-		j++;
-		if ( (i==Nth) && (c!=',') && (k<Size-1) ) {
-			Dest[k] = c;
-			k++;
+	}
+
+	if (i == Nth) {
+		while (Source[j] != 0 && Source[j] != ',' && k<Size-1) {
+			Dest[k++] = Source[j++];
 		}
 	}
-	while ((i<=Nth) && (c!=0));
+
 	Dest[k] = 0;
+	return (i>=Nth);
 }
 
 void GetNthNum(PCHAR Source, int Nth, int far *Num)

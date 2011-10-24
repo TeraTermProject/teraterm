@@ -928,7 +928,7 @@ void ParseControl(BYTE b)
       LineFeed(0,TRUE);
       CarriageReturn(TRUE);
       break;
-    case HTS: SetTabStop(); break;
+    case HTS: if (ts.TabStopFlag & TABF_HTS8) SetTabStop(); break;
     case RI: CursorUpWithScroll(); break;
     case SS2:
       GLtmp = 2;
@@ -1271,7 +1271,7 @@ void ParseEscape(BYTE b) /* b is the final char */
 	  LineFeed(0,TRUE);
 	  break;
 	case 'H': /* HTS */
-	  SetTabStop();
+	  if (ts.TabStopFlag & TABF_HTS7) SetTabStop();
 	  break;
 	case 'M': /* RI */
 	  CursorUpWithScroll();

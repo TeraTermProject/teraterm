@@ -247,6 +247,16 @@ typedef TCharAttr *PCharAttr;
 #define WF_TITLEREPORT     24 // (8 | 16)
 #define WF_IMECURSORCHANGE 32
 
+// Tab Stop flags (used in ts.TabStopFlag)
+#define TABF_NONE       0
+#define TABF_HTS7       1
+#define TABF_HTS8       2
+#define TABF_TBC0       4
+#define TABF_TBC3       8
+#define TABF_HTS        (TABF_HTS7 | TABF_HTS8)
+#define TABF_TBC        (TABF_TBC0 | TABF_TBC3)
+#define TABF_ALL        (TABF_HTS | TABF_TBC)
+
 // Title Reporting Type
 #define IdTitleReportIgnore 0
 #define IdTitleReportAccept 8
@@ -523,6 +533,7 @@ struct tttset {
 	char TerminalUID[9];
 	WORD ConfirmChangePasteCR;
 	WORD JumpList;
+	WORD TabStopFlag;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -967,6 +978,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.72, ttset_memfilemap was replaced with ttset_memfilemap_17.
+ *   added tttset.TabStopFlag.
+ *
  * - At version 4.70, ttset_memfilemap was replaced with ttset_memfilemap_16.
  *   added tttset.JumpList.
  *
@@ -1065,4 +1079,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_16"
+#define TT_FILEMAPNAME "ttset_memfilemap_17"

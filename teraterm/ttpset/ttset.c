@@ -197,7 +197,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
-	char Temp[MAX_PATH];
+	char Temp[MAX_PATH], Temp2[MAX_PATH];
 	OSVERSIONINFO osvi;
 
 	ts->Minimize = 0;
@@ -1418,6 +1418,29 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Jump List
 	ts->JumpList = GetOnOff(Section, "JumpList", FName, TRUE);
 
+	GetPrivateProfileString(Section, "TabStopModifySequence", "on", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "all") == 0)
+		ts->TabStopFlag = TABF_ALL;
+	else if (_stricmp(Temp, "off") == 0 || _stricmp(Temp, "none") == 0)
+		ts->TabStopFlag = TABF_NONE;
+	else {
+		ts->TabStopFlag = TABF_NONE;
+		for (i=1; GetNthString(Temp, i, sizeof(Temp2), Temp2); i++) {
+			if (_stricmp(Temp2, "HTS") == 0)
+				ts->TabStopFlag |= TABF_HTS;
+			else if (_stricmp(Temp2, "HTS7") == 0)
+				ts->TabStopFlag |= TABF_HTS7;
+			else if (_stricmp(Temp2, "HTS8") == 0)
+				ts->TabStopFlag |= TABF_HTS8;
+			else if (_stricmp(Temp2, "TBC") == 0)
+				ts->TabStopFlag |= TABF_TBC;
+			else if (_stricmp(Temp2, "TBC0") == 0)
+				ts->TabStopFlag |= TABF_TBC0;
+			else if (_stricmp(Temp2, "TBC3") == 0)
+				ts->TabStopFlag |= TABF_TBC3;
+		}
+	}
+
 	// Use invalid DECRPSS (for testing)
 	if (GetOnOff(Section, "UseInvalidDECRQSSResponse", FName, FALSE))
 		ts->TermFlag |= TF_INVALIDDECRPSS;
@@ -2467,6 +2490,40 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Confirm PasteCR
 	WriteOnOff(Section, "JumpList", FName, ts->JumpList);
+
+	// TabStopModifySequence
+	switch (ts->TabStopFlag) {
+	case TABF_ALL:
+		strncpy_s(Temp, sizeof(Temp), "on", _TRUNCATE);
+		break;
+	case TABF_NONE:
+		strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
+		break;
+	default:
+		switch (ts->TabStopFlag & TABF_HTS) {
+			case TABF_HTS7: strncpy_s(Temp, sizeof(Temp), "HTS7", _TRUNCATE); break;
+			case TABF_HTS8: strncpy_s(Temp, sizeof(Temp), "HTS8", _TRUNCATE); break;
+			case TABF_HTS:  strncpy_s(Temp, sizeof(Temp), "HTS",  _TRUNCATE); break;
+			default: Temp[0] = 0; break;
+		}
+
+		if (ts->TabStopFlag & TABF_TBC) {
+			if (Temp[0] != 0) {
+				strncat_s(Temp, sizeof(Temp), ",", _TRUNCATE);
+			}
+			switch (ts->TabStopFlag & TABF_TBC) {
+				case TABF_TBC0: strncat_s(Temp, sizeof(Temp), "TBC0", _TRUNCATE); break;
+				case TABF_TBC3: strncat_s(Temp, sizeof(Temp), "TBC3", _TRUNCATE); break;
+				case TABF_TBC:  strncat_s(Temp, sizeof(Temp), "TBC",  _TRUNCATE); break;
+			}
+		}
+
+		if (Temp[0] == 0) { // –³‚¢‚Í‚¸‚¾‚¯‚ê‚Ç”O‚Ì‚½‚ß
+			strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
+		}
+		break;
+	}
+	WritePrivateProfileString(Section, "TabStopModifySequence", Temp, FName);
 }
 
 #define VTEditor "VT editor keypad"
