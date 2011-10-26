@@ -1748,11 +1748,11 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>When the SSH version of the TTSSH does not match the server protocol version, a user can not connect.</li>
-      <!-- li>ホスト鍵の確認(<a href="../usage/ssh.html#securitywarning">セキュリティ警告</a>)ダイアログに<a href="../usage/ssh.html#SSHFP">DNSのSSHFP RRによる検証結果を表示する機能</a>を追加した。
+      <li>added the <a href="../usage/ssh.html#SSHFP">SSHFP RR</a> on the <a href="../usage/ssh.html#securitywarning">Security Warning</a> dialog.
         <ul>
-          <li>"<a href="../menu/setup-ssh.html">SSH 設定</a>" ダイアログにチェックボックスを追加した。<li>
+          <li>added the "Verify hostkey fingerprint by DNS" checkbox on the "<a href="../menu/setup-ssh.html">TTSSH: Setup</a>" dialog box.</li>
         </ul>
-      </li -->
+      </li>
     </ul>
   </li>
 
@@ -1760,7 +1760,7 @@ SYNOPSIS:
     <ul>
       <li>The control characters(^A-^_) can be inputed as the password string on the key generator dialog.</li>
       <li>When the server protocol is 1.99, Tera Term will connect with the SSH2 protocol by using the SSH1 specified protocol.</li>
-      <!-- li>ホスト鍵のSSHFP検証を有効にしている時に、SSHFP RR が引けないとアプリケーションエラーになる問題を修正した。</li -->
+      <li>When the SSHFP verification is enabled and the SSHFP RR does not query, the application fault will occur.</li>
     </ul>
   </li>
 
@@ -2912,7 +2912,7 @@ SYNOPSIS:
 <h3><a name="recurringcommand_1.02">2011.xx.xx (Ver 1.02)</a></h3>
 <ul class="history">
   <li>added the menu id to enable and disable for the macro command.</li>
-  <!-- li>/F= オプションによる設定ファイルの指定に対応した。</li -->
+  <li>added support for the reading the configuration file by using the /F= option.</li>
 </ul>
 
 <h3><a name="recurringcommand_1.01">2010.2.10 (Ver 1.01)</a></h3>
