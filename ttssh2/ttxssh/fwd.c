@@ -449,11 +449,11 @@ static void channel_opening_error(PTInstVar pvar, int channel_num, int err)
 	if (request->spec.type == FWD_REMOTE_X11_TO_LOCAL) {
 		UTIL_get_lang_msg("MSG_FWD_CHANNEL_OPEN_X_ERROR", pvar,
 		                  "The server attempted to forward a connection through this machine.\n"
-		                  "It requested a connection to the X server on %s (screen %d).\n"
+		                  "It requested a connection to the X server on %s (display %d:%d).\n"
 		                  "%s.\n" "The forwarded connection will be closed.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 		            pvar->ts->UIMsg,
-		            request->spec.to_host, request->spec.to_port - 6000,
+		            request->spec.to_host, request->spec.to_port - 6000, request->spec.x11_screen,
 		            uimsg);
 	} else {
 		UTIL_get_lang_msg("MSG_FWD_CHANNEL_OPEN_ERROR", pvar,
@@ -1464,7 +1464,7 @@ void FWD_prep_forwarding(PTInstVar pvar)
 				num_server_listening_requests++;
 				break;
 			case FWD_REMOTE_X11_TO_LOCAL:{
-					int screen_num = request->spec.to_port - 6000;
+					int screen_num = request->spec.x11_screen;
 
 					pvar->fwd_state.X11_auth_data =
 						X11_load_local_auth_data(screen_num);

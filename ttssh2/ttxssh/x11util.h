@@ -49,7 +49,7 @@ typedef struct _X11AuthData {
 #define X11_get_spoofed_protocol_data(d) ((d)->spoofed_data)
 #define X11_get_spoofed_protocol_data_len(d) ((d)->spoofed_data_len)
 
-void X11_get_DISPLAY_info(char FAR * name_buf, int name_buf_len, int FAR * port);
+void X11_get_DISPLAY_info(char FAR * name_buf, int name_buf_len, int FAR * port, int FAR * screen);
 X11AuthData FAR * X11_load_local_auth_data(int screen_num);
 void FAR * X11_init_unspoofing_filter(struct _TInstVar FAR * pvar,
   X11AuthData FAR * auth_data);

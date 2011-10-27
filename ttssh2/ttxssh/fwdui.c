@@ -371,13 +371,13 @@ static void make_X_forwarding_spec(FWDRequestSpec FAR * spec, PTInstVar pvar)
 	spec->type = FWD_REMOTE_X11_TO_LOCAL;
 	spec->from_port = -1;
 	X11_get_DISPLAY_info(spec->to_host, sizeof(spec->to_host),
-	                     &spec->to_port);
+	                     &spec->to_port, &spec->x11_screen);
 	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSERVER", pvar, "remote X server");
 	strncpy_s(spec->from_port_name, sizeof(spec->from_port_name),
 	          pvar->ts->UIMsg, _TRUNCATE);
-	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSCREEN", pvar, "X server (screen %d)");
+	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSCREEN", pvar, "X server (display %d:%d)");
 	_snprintf_s(spec->to_port_name, sizeof(spec->to_port_name), _TRUNCATE,
-	            pvar->ts->UIMsg, spec->to_port - 6000);
+	            pvar->ts->UIMsg, spec->to_port - 6000, spec->x11_screen);
 }
 
 static BOOL is_service_name_char(char ch)

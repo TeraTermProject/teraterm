@@ -565,7 +565,7 @@ DLD_FWDSETUP_X=X Forwarding
 DLG_FWDSETUP_XAPP=Display remote &X applications on local X server
 
 MSG_FWD_REMOTE_XSERVER=remote X server
-MSG_FWD_REMOTE_XSCREEN=X server (screen %d)
+MSG_FWD_REMOTE_XSCREEN=X server (display %d:%d)
 MSG_FWD_REMOTE=Remote "%s" port %s to local "%s" port %s
 MSG_FWD_LOCAL=Local "%s" port %s to remote "%s" port %s
 MSG_FWD_X=Remote X applications to local X server
@@ -693,7 +693,7 @@ MSG_FWD_MACHINEDOWN_ERROR=The machine could not be contacted (possibly the machi
 MSG_FWD_ADDRNOTFOUTD_ERROR=No address was found for the machine
 MSG_FWD_CONNECT_ERROR=The forwarding connection could not be established
 MSG_FWD_CHANNEL_ERROR=Communications error %s forwarded local %s.\n%s (code %d).\nThe forwarded connection will be closed.
-MSG_FWD_CHANNEL_OPEN_X_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to the X server on %s (screen %d).\n%s.\nThe forwarded connection will be closed.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to the X server on %s (display %d:%d).\n%s.\nThe forwarded connection will be closed.
 MSG_FWD_CHANNEL_OPEN_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to %s (port %s).\n%s.\nThe forwarded connection will be closed.
 DLG_FWDMON_TITLE=TTSSH Port Forwarding Monitor
 MSG_FWD_HOSTILE_ATTACK_ERROR=Host with IP number %s tried to connect to forwarded local port %d.\nThis could be some kind of hostile attack.

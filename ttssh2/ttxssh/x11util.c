@@ -42,12 +42,13 @@ typedef struct {
 } X11UnspoofingFilterClosure;
 
 void X11_get_DISPLAY_info(char FAR * name_buf, int name_buf_len,
-                          int FAR * port)
+                          int FAR * port, int FAR * screen)
 {
 	char FAR *DISPLAY = getenv("DISPLAY");
 
 	strncpy_s(name_buf, name_buf_len, "localhost", _TRUNCATE);
 	*port = 6000;
+	*screen = 0;
 
 	if (DISPLAY != NULL) {
 		int i;
@@ -63,7 +64,13 @@ void X11_get_DISPLAY_info(char FAR * name_buf, int name_buf_len,
 		}
 
 		if (DISPLAY[i] == ':') {
-			*port = atoi(DISPLAY + i + 1) + 6000;
+			*port = atoi(&DISPLAY[++i]) + 6000;
+			while (DISPLAY[i] >= '0' && DISPLAY[i] <= '9') {
+				i++;
+			}
+			if (DISPLAY[i] == '.' && DISPLAY[i+1] != 0) {
+				*screen = atoi(&DISPLAY[++i]);
+			}
 		}
 	}
 }

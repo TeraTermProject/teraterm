@@ -79,7 +79,7 @@ typedef struct {
 #define FWD_REMOTE_X11_TO_LOCAL          3
 
 /* If 'type' is FWD_REMOTE_X11_TO_LOCAL, then from_port must be
-   -1, to_port must be 6000 + screen number, and to_host must
+   -1, to_port must be 6000 + display number, and to_host must
    be the desired X server host.
 
    There can be no more than one spec of a given type and from_port
@@ -93,6 +93,7 @@ typedef struct {
   char to_port_name[32];
   char to_host[256];
   char bind_address[256];
+  int x11_screen;
 } FWDRequestSpec;
 
 #define FWD_DELETED                      0x01

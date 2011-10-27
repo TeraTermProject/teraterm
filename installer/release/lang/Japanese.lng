@@ -565,7 +565,7 @@ DLD_FWDSETUP_X=Xクライアントアプリケーションの転送
 DLG_FWDSETUP_XAPP=リモートの(&X)アプリケーションをローカルのXサーバに表示する
 
 MSG_FWD_REMOTE_XSERVER=リモートX サーバ
-MSG_FWD_REMOTE_XSCREEN=X サーバ (画面 %d)
+MSG_FWD_REMOTE_XSCREEN=X サーバ (ディスプレイ %d:%d)
 MSG_FWD_REMOTE=リモートの "%s" のポート %s からローカル側ホスト "%s" のポート %s
 MSG_FWD_LOCAL=ローカルの "%s" のポート %s から リモート側ホスト "%s" のポート %s
 MSG_FWD_X=リモートのXアプリケーションからローカルのXサーバ
@@ -693,7 +693,7 @@ MSG_FWD_MACHINEDOWN_ERROR=転送先マシンに接続できません (おそらくマシンがダウンし
 MSG_FWD_ADDRNOTFOUTD_ERROR=マシンにアドレスがありません
 MSG_FWD_CONNECT_ERROR=転送接続を確立できませんでした
 MSG_FWD_CHANNEL_ERROR=通信エラー %s forwarded local %s.\n%s (コード %d).\n転送接続を終了します.
-MSG_FWD_CHANNEL_OPEN_X_ERROR=サーバはこのマシンに転送を試みました.\n%s 上のXサーバへの接続を要求しました (画面 %d). \n転送接続を終了します.
+MSG_FWD_CHANNEL_OPEN_X_ERROR=サーバはこのマシンに転送を試みました.\n%s 上のXサーバへの接続を要求しました (ディスプレイ %d:%d). \n転送接続を終了します.
 MSG_FWD_CHANNEL_OPEN_ERROR=サーバはこのマシンに転送を試みました.\n%s への接続を要求しました (ポート %s).\n%s.\n転送接続を終了します.
 DLG_FWDMON_TITLE=TTSSH ポート転送モニタ
 MSG_FWD_HOSTILE_ATTACK_ERROR=IP 番号 %s のホストが, ローカルポート %d に転送接続を試みました.\n悪意のある攻撃の場合があります.
