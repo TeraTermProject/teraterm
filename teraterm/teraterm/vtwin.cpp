@@ -4435,7 +4435,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 				int i;
 				HWND hd;
 				int count;
-OutputDebugPrintf("msg=%d wParam=%d lParam=%d\n", msg, wParam, lParam);
+
 				if (wParam == 0x0d) {  // Enter key
 					SetWindowText(dlg, "");
 					SendMessage(dlg, EM_SETSEL, 0, 0);
@@ -4462,6 +4462,19 @@ OutputDebugPrintf("msg=%d wParam=%d lParam=%d\n", msg, wParam, lParam);
 #endif
 			}
 			break;
+
+		case WM_CHAR:
+#if 0
+			switch (wParam) {
+				case VK_RETURN:
+				case VK_ESCAPE:
+					// Œx‰¹‚ªo‚È‚¢‚æ‚¤‚É‚·‚é
+					return FALSE;
+			}
+			// not break;
+#endif
+			// “ü—Í‚µ‚½•¶š‚ª‚ªIDC_COMMAND_EDIT‚Éc‚ç‚È‚¢‚æ‚¤‚ÉÌ‚Ä‚é
+			return FALSE;
 
 		default:
 			return CallWindowProc(OrigBroadcastEditProc, dlg, msg, wParam, lParam);
