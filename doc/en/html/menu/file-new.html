@@ -21,12 +21,13 @@
     <dl>
       <dt>Host</dt>
       <dd>
-	Enter the host name or IP address, or select one from the host list.
+	Enter the host name or IP address(IPv4 and IPv6), or select one from the host list.
 	To edit the host list, use the
-	<a href="setup-tcpip.html">[Setup] TCP/IP</a> command.
+	<a href="setup-tcpip.html">[Setup] TCP/IP</a> command.<br>
+	The IPv6 address is surround with the bracket. (Refer to <a href="http://tools.ietf.org/html/rfc3986">RFC3986</a> / <a href="http://tools.ietf.org/html/rfc5952#section-6">RFC5952</a>)<br>
 	You can enter not only the host name or address, but also the
 	<a href="../commandline/teraterm.html">command line parameters</a>
-	like the following:
+	like the following:<br>
 
     <pre>
     myhost.mydomain                     Host name only.
@@ -34,6 +35,10 @@
     foohost.foodomain /F=FOOHOST.INI    Host name &amp; setup file name.
     /C=1                                Specifies the serial port connection.
     /R=LOG.DAT                          Replays the log file.
+    [2001:db8:1:2:8401:2ff:fe03:405]    IPv6 address
+    [fe80::8401:2ff:fe03:405%3]:8022    IPv6 address and Port number
+    user@myhost.example.com:10022 /ssh  SSH connection to a port number other than 22
+    ssh://user@myhost.example.com       SSH connection to the SSH protocol(ssh://)
     </pre>
       </dd>
 

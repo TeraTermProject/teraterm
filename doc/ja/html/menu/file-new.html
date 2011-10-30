@@ -21,12 +21,13 @@
     <dl>
       <dt>Host</dt>
       <dd>
-	接続するホスト名または IP address をキーボードで入力して指定するか、
+	接続するホスト名または IP address(IPv4 & IPv6) をキーボードで入力して指定するか、
 	リストの中から選択してください。リストを編集するには
-	<a href="setup-tcpip.html">[Setup] TCP/IP</a> を使ってください。
+	<a href="setup-tcpip.html">[Setup] TCP/IP</a> を使ってください。<br>
+	IPv6アドレスは角括弧（大括弧）で囲みます（<a href="http://tools.ietf.org/html/rfc3986">RFC3986</a> / <a href="http://tools.ietf.org/html/rfc5952#section-6">RFC5952</a> 参照）。<br>
 	また、ホスト名だけでなく以下のような、
 	<a href="../commandline/teraterm.html">コマンドライン</a>
-	文字列を指定することもできます。
+	文字列を指定することもできます。<br>
 
     <pre>
     myhost.mydomain                     通常はホスト名または IP address だけ
@@ -34,6 +35,10 @@
     foohost.foodomain /F=FOOHOST.INI    ホスト名+設定ファイル名を指定
     /C=1                                シリアルポートを指定することも可能
     /R=LOG.DAT                          ホストやポートに接続せずに、ログファイルの内容を再生
+    [2001:db8:1:2:8401:2ff:fe03:405]    IPv6アドレス
+    [fe80::8401:2ff:fe03:405%3]:8022    IPv6アドレス + ポート番号
+    user@myhost.example.com:10022 /ssh  22番ポート以外へのSSH接続
+    ssh://user@myhost.example.com       SSHプロトコル(ssh://)への接続
     </pre>
       </dd>
 
