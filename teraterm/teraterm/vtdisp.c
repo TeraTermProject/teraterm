@@ -3693,7 +3693,9 @@ void DispSetColor(int num, COLORREF color)
 	}
 
 #ifdef ALPHABLEND_TYPE2
-	BGInitialize();
+	if (num > 255) {
+		BGInitialize();
+	}
 #endif
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)

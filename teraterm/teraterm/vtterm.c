@@ -3444,6 +3444,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 #define ModeXsColorNum  3
 #define ModeXsColorSpec 4
 #define ModeXsEsc       5
+#define ModeXsIgnore    6
 void XSequence(BYTE b)
 {
 	static BYTE XsParseMode = ModeXsFirst, PrevMode;
@@ -3467,21 +3468,16 @@ void XSequence(BYTE b)
 			case 11:
 			case 15:
 			case 16:
-				XsParseMode = ModeXsColorSpec;
 				ColorNumber = 0;
-				StrBuff[0] = '\0';
-				StrLen = 0;
+				XsParseMode = ModeXsColorSpec;
 				break;
 			default:
 				XsParseMode = ModeXsString;
 			}
 		}
 		else {
-			// Invalid Sequence. Ignore.
-			Param[1] = 0xFFFFFFFF;
-			StrBuff[0] = '\0';
-			StrLen = 0;
-			XsParseMode = ModeXsString;
+			XsParseMode = ModeXsIgnore;
+			XSequence(b);
 		}
 		break;
 	  case ModeXsString:
@@ -3522,14 +3518,10 @@ void XSequence(BYTE b)
 		}
 		else if (b == ';') {
 			XsParseMode = ModeXsColorSpec;
-			StrBuff[0] = '\0';
-			StrLen = 0;
 		}
 		else {
-			Param[1] = 0xFFFFFFFF;
-			StrBuff[0] = '\0';
-			StrLen = 0;
-			XsParseMode = ModeXsString;
+			XsParseMode = ModeXsIgnore;
+			XSequence(b);
 		}
 		break;
 	  case ModeXsColorSpec:
@@ -3571,8 +3563,7 @@ void XSequence(BYTE b)
 				Param[1]++;
 				break;
 			default:
-				XsParseMode = ModeXsString;
-				Param[1] = 0xFFFFFFFF;
+				XsParseMode = ModeXsIgnore;
 				break;
 			}
 		}
@@ -3593,6 +3584,16 @@ void XSequence(BYTE b)
 			EscapeSequence(b);
 		}
 		break;
+	  case ModeXsIgnore:
+		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+			ParseMode = ModeFirst;
+			XsParseMode = ModeXsFirst;
+		}
+		else if (b == ESC) {
+			PrevMode = ModeXsIgnore;
+			XsParseMode = ModeXsEsc;
+		}
+	  	break;
 	}
 }
 
