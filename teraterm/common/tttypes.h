@@ -257,6 +257,11 @@ typedef TCharAttr *PCharAttr;
 #define TABF_TBC        (TABF_TBC0 | TABF_TBC3)
 #define TABF_ALL        (TABF_HTS | TABF_TBC)
 
+// Control Sequence flags (used in ts.CtrlFlag)
+#define CSF_CBWRITE     1
+#define CSF_CBREAD      2
+#define CSF_CBRW        (CSF_CBREAD | CSF_CBWRITE)
+
 // Title Reporting Type
 #define IdTitleReportIgnore 0
 #define IdTitleReportAccept 8
@@ -534,6 +539,7 @@ struct tttset {
 	WORD ConfirmChangePasteCR;
 	WORD JumpList;
 	WORD TabStopFlag;
+	DWORD CtrlFlag;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -980,6 +986,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.72, ttset_memfilemap was replaced with ttset_memfilemap_17.
  *   added tttset.TabStopFlag.
+ *   added tttset.CtrlFlag.
  *
  * - At version 4.70, ttset_memfilemap was replaced with ttset_memfilemap_16.
  *   added tttset.JumpList.

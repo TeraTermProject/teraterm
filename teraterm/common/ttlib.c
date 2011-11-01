@@ -14,6 +14,80 @@
 // for _ismbblead
 #include <mbctype.h>
 
+// for b64encode/b64decode
+// static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static char b64dec_table[] = {
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
+   52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
+   -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+   15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
+   -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+   41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+};
+
+// void b64encode(PCHAR dst, int dsize, PCHAR src, int len)
+// {
+// }
+
+int b64decode(PCHAR dst, int dsize, PCHAR src)
+{
+	unsigned int b;
+	char c;
+	int len = 0;
+
+	if (src == NULL || dst == NULL || dsize == 0) {
+		return 0;
+	}
+
+	while (1) {
+		if ((c = b64dec_table[*src++]) == -1) {
+			break;
+		}
+		b = c << 18;
+
+		if ((c = b64dec_table[*src++]) == -1) {
+			break;
+		}
+		b |= c << 12;
+
+		dst[len++] = (b >> 16) & 0xff;
+		if (len >= dsize) {
+			break;
+		}
+
+		if ((c = b64dec_table[*src++]) == -1) {
+			break;
+		}
+		b |= c << 6;
+
+		dst[len++] = (b >> 8) & 0xff;
+		if (len >= dsize) {
+			break;
+		}
+
+		if ((c = b64dec_table[*src++]) == -1) {
+			break;
+		}
+		b |= c;
+
+		dst[len++] = b & 0xff;
+		if (len >= dsize) {
+			break;
+		}
+	}
+	return len;
+}
+
 BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos)
 {
 	BYTE b;

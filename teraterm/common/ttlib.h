@@ -48,6 +48,9 @@ int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
 char *mctimelocal();
 
+// void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
+int b64decode(PCHAR dst, int dsize, PCHAR src);
+
 #ifdef __cplusplus
 }
 #endif

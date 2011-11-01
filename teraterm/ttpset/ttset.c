@@ -210,6 +210,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->FontFlag = 0;			// Font flag
 	ts->PortFlag = 0;			// Port flags
 	ts->WindowFlag = 0;			// Window flags
+	ts->CtrlFlag = 0;			// Control sequence flags
 	ts->TelPort = 23;
 
 	ts->DisableTCPEchoCR = FALSE;
@@ -1442,6 +1443,15 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		}
 	}
 
+	// Clipboard Access from Remote
+	GetPrivateProfileString(Section, "ClipboardAccessFromRemote", "off", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "readwrite") == 0)
+		ts->CtrlFlag |= CSF_CBRW;
+	else if (_stricmp(Temp, "read") == 0)
+		ts->CtrlFlag |= CSF_CBREAD;
+	else if (_stricmp(Temp, "write") == 0)
+		ts->CtrlFlag |= CSF_CBWRITE;
+
 	// Use invalid DECRPSS (for testing)
 	if (GetOnOff(Section, "UseInvalidDECRQSSResponse", FName, FALSE))
 		ts->TermFlag |= TF_INVALIDDECRPSS;
@@ -2525,6 +2535,22 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		break;
 	}
 	WritePrivateProfileString(Section, "TabStopModifySequence", Temp, FName);
+
+	// Clipboard Access from Remote
+	switch (ts->CtrlFlag & CSF_CBRW) {
+	case CSF_CBREAD:
+		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "read", FName);
+		break;
+	case CSF_CBWRITE:
+		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "write", FName);
+		break;
+	case CSF_CBRW:
+		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "on", FName);
+		break;
+	default:
+		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "off", FName);
+		break;
+	}
 }
 
 #define VTEditor "VT editor keypad"

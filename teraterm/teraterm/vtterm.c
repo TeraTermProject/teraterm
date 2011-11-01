@@ -145,6 +145,11 @@ int FilterTop, FilterBottom, FilterLeft, FilterRight;
 /* IME Status */
 BOOL IMEstat;
 
+/* OSC String buffer */
+#define MAXOSCBUFFSIZE 4096
+static char *OSCStrBuff;
+static unsigned int OSCStrBuffSize;
+
 static _locale_t CLocale = NULL;
 
 void ResetSBuffer(PStatusBuff sbuff)
@@ -3439,6 +3444,55 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 	}
 }
 
+void XsProcClipboard(PCHAR buff)
+{
+	int len, blen;
+	char *p, *cbbuff;
+	HGLOBAL cbmem;
+
+	p = buff;
+	while (strchr("cps01234567", *p)) {
+		p++;
+	}
+
+	if (*p++ == ';') {
+		if (*p == '?' && *(p+1) == 0) { // Read access
+			if (ts.CtrlFlag & CSF_CBREAD) {
+				; // not supported.
+			}
+		}
+		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access
+			len = strlen(buff);
+			blen = len * 3 / 4 + 1;
+
+			if ((cbmem = GlobalAlloc(GMEM_MOVEABLE, blen)) == NULL) {
+				return;
+			};
+			if ((cbbuff = GlobalLock(cbmem)) == NULL) {
+				GlobalFree(cbmem);
+				return;
+			}
+
+			len = b64decode(cbbuff, blen, p);
+
+			if (len == 0 || len >= blen) {
+				GlobalUnlock(cbmem);
+				GlobalFree(cbmem);
+				return;
+			}
+
+			cbbuff[len] = 0;
+			GlobalUnlock(cbmem);
+
+			if (OpenClipboard(NULL)) {
+				EmptyClipboard();
+				SetClipboardData(CF_TEXT, cbmem);
+				CloseClipboard();
+			}
+		}
+	}
+}
+
 #define ModeXsFirst     1
 #define ModeXsString    2
 #define ModeXsColorNum  3
@@ -3450,6 +3504,9 @@ void XSequence(BYTE b)
 	static BYTE XsParseMode = ModeXsFirst, PrevMode;
 	static char StrBuff[sizeof(ts.Title)];
 	static unsigned int ColorNumber, StrLen;
+	static char realloc_failed = FALSE;
+	char *p;
+	unsigned int new_size;
 
 	switch (XsParseMode) {
 	  case ModeXsFirst:
@@ -3471,6 +3528,21 @@ void XSequence(BYTE b)
 				ColorNumber = 0;
 				XsParseMode = ModeXsColorSpec;
 				break;
+			case 52:
+				if ((ts.CtrlFlag & CSF_CBRW) == 0) {
+					XsParseMode = ModeXsIgnore;
+					break;
+				}
+				if (OSCStrBuff == NULL) {
+					OSCStrBuff = malloc(sizeof(ts.Title));
+					if (OSCStrBuff == NULL) {
+						XsParseMode = ModeXsIgnore;
+						break;
+					}
+					OSCStrBuffSize = sizeof(ts.Title);
+				}
+				XsParseMode = ModeXsString;
+				break;
 			default:
 				XsParseMode = ModeXsString;
 			}
@@ -3482,17 +3554,22 @@ void XSequence(BYTE b)
 		break;
 	  case ModeXsString:
 		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
-			StrBuff[StrLen] = '\0';
 			switch (Param[1]) {
 			  case 0: /* Change window title and icon name */
 			  case 1: /* Change icon name */
 			  case 2: /* Change window title */
+				StrBuff[StrLen] = '\0';
 				if (ts.AcceptTitleChangeRequest) {
 					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
 					// (2006.6.15 maya) ƒ^ƒCƒgƒ‹‚É“n‚·•¶Žš—ñ‚ðSJIS‚É•ÏŠ·
 					ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
 					ChangeTitle();
 				}
+				break;
+			  case 52: /* Clipboard access */
+			  	OSCStrBuff[StrLen] = '\0';
+				XsProcClipboard(OSCStrBuff);
+
 				break;
 			  default:
 				/* nothing to do */;
@@ -3507,6 +3584,29 @@ void XSequence(BYTE b)
 		else if (b <= US) { /* Other control character -- invalid sequence */
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+		}
+		else if (Param[1] == 52) {
+			if (StrLen < OSCStrBuffSize - 1) {
+				OSCStrBuff[StrLen++] = b;
+			}
+			else if (!realloc_failed && OSCStrBuffSize < MAXOSCBUFFSIZE) {
+				new_size = OSCStrBuffSize * 2;
+				if (new_size > MAXOSCBUFFSIZE) {
+					new_size = MAXOSCBUFFSIZE;
+				}
+
+				p = realloc(OSCStrBuff, new_size);
+				if (p == NULL) {
+					realloc_failed = TRUE;
+				}
+				else {
+					OSCStrBuff = p;
+					OSCStrBuffSize = new_size;
+					if (StrLen < OSCStrBuffSize - 1) {
+						OSCStrBuff[StrLen++] = b;
+					}
+				}
+			}
 		}
 		else if (StrLen < sizeof(StrBuff) - 1) {
 			StrBuff[StrLen++] = b;
@@ -3593,7 +3693,7 @@ void XSequence(BYTE b)
 			PrevMode = ModeXsIgnore;
 			XsParseMode = ModeXsEsc;
 		}
-	  	break;
+		break;
 	}
 }
 
@@ -4520,6 +4620,11 @@ void VisualBell() {
 void EndTerm() {
 	if (CLocale) {
 		_free_locale(CLocale);
+	}
+	if (OSCStrBuff) {
+		free(OSCStrBuff);
+		OSCStrBuff = NULL;
+		OSCStrBuffSize = 0;
 	}
 	CLocale = NULL;
 }
