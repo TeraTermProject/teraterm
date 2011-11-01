@@ -820,6 +820,16 @@ rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
 <tr><td> 11 </td>		<td>Change VT Window's text background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 15 </td>		<td>Change TEK Window's text foreground color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 16 </td>		<td>Change TEK Window's text background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 52 </td>		<td>Clipboard access.
+<pre>
+<i>Pt</i> = <i>Pc</i> ; <i>Pd</i>
+</pre>
+Change the contents of clipboard <i>Pc</i> to <i>Pd</i>.
+<pre>
+
+<i>Pc</i>: ignored.
+<i>Pd</i>: new clipboard contents. encoded in base64.
+</pre>
 </table>
 
 <h2><a name="SOS">SOS Sequence</a></h2>
