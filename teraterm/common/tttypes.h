@@ -540,6 +540,8 @@ struct tttset {
 	WORD JumpList;
 	WORD TabStopFlag;
 	DWORD CtrlFlag;
+	char ClickableUrlBrowser[MAX_PATH];
+	char ClickableUrlBrowserArg[MAX_PATH];
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -987,6 +989,8 @@ typedef TMap far *PMap;
  * - At version 4.72, ttset_memfilemap was replaced with ttset_memfilemap_17.
  *   added tttset.TabStopFlag.
  *   added tttset.CtrlFlag.
+ *   added tttset.ClickableUrlBrowser.
+ *   added tttset.ClickableUrlBrowserArg.
  *
  * - At version 4.70, ttset_memfilemap was replaced with ttset_memfilemap_16.
  *   added tttset.JumpList.

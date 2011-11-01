@@ -1455,6 +1455,12 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Use invalid DECRPSS (for testing)
 	if (GetOnOff(Section, "UseInvalidDECRQSSResponse", FName, FALSE))
 		ts->TermFlag |= TF_INVALIDDECRPSS;
+
+	// ClickableUrlBrowser
+	GetPrivateProfileString(Section, "ClickableUrlBrowser", "",
+	                        ts->ClickableUrlBrowser, sizeof(ts->ClickableUrlBrowser), FName);
+	GetPrivateProfileString(Section, "ClickableUrlBrowserArg", "",
+	                        ts->ClickableUrlBrowserArg, sizeof(ts->ClickableUrlBrowserArg), FName);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2551,6 +2557,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "off", FName);
 		break;
 	}
+
+	// ClickableUrlBrowser
+	WritePrivateProfileString(Section, "ClickableUrlBrowser", ts->ClickableUrlBrowser, FName);
+	WritePrivateProfileString(Section, "ClickableUrlBrowserArg", ts->ClickableUrlBrowserArg, FName);
 }
 
 #define VTEditor "VT editor keypad"

@@ -2030,7 +2030,7 @@ static void invokeBrowser(LONG ptr)
 {
 #ifdef URL_EMPHASIS
 	LONG i, start, end;
-	char url[1024];
+	char url[1024], param[1024];
 	char *uptr, ch;
 
 	start = ptr;
@@ -2044,7 +2044,7 @@ static void invokeBrowser(LONG ptr)
 		end++;
 	}
 	end--;
- 
+
 	if (start + (LONG)sizeof(url) <= end) {
 		end = start + sizeof(url) - 1;
 		end--;  // '\0'の分は引いておく。
@@ -2063,7 +2063,25 @@ static void invokeBrowser(LONG ptr)
 		}
 	}
 	*uptr = '\0';
-	ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+
+	if (strncmp(url, "http://", strlen("http://")) == 0 ||
+	    strncmp(url, "https://", strlen("https://")) == 0 ||
+	    strncmp(url, "ftp://", strlen("ftp://")) == 0) {
+		if (strlen(ts.ClickableUrlBrowser) > 0) {
+			_snprintf_s(param, sizeof(param), _TRUNCATE, "%s %s",
+			            ts.ClickableUrlBrowserArg, url);
+			if ((int)ShellExecute(NULL, NULL, ts.ClickableUrlBrowser, param, NULL,SW_SHOWNORMAL) < 32) {
+				// コマンドの実行に失敗した場合は通常と同じ処理をする
+				ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+			}
+		}
+		else {
+			ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+		}
+	}
+	else {
+		ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+	}
 #endif
 }
 /* end - ishizaki */

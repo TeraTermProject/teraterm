@@ -243,5 +243,33 @@ DisableAcceleratorDuplicateSession=off
 </pre>
 
 
+<h1><a name="ClickableUrlBrowser">クリッカブル URL で起動するブラウザ</a></h1>
+
+<p>
+URL クリックが有効な場合、通常は URL のスキームに OS で関連付けられたプログラムが起動します。<br />
+起動するブラウザと引数を指定するには、設定ファイルの [Tera Term] セクションの ClickableUrlBrowser 行と ClickableUrlBrowserArg 行を以下のように変更してください。
+</p>
+
+<pre>
+ClickableUrlBrowser=firefox
+ClickableUrlBrowserArg=-new-tab
+
+ClickableUrlBrowser=opera
+ClickableUrlBrowserArg=-newpage
+
+ClickableUrlBrowser=iexplore
+ClickableUrlBrowserArg=
+
+ClickableUrlBrowser=chrome
+ClickableUrlBrowserArg=
+</pre>
+
+<pre>
+省略時:
+ClickableUrlBrowser=
+ClickableUrlBrowserArg=
+</pre>
+
+
 </BODY>
 </HTML>
