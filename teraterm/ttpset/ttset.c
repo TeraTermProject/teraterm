@@ -2488,7 +2488,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Confirm PasteCR
 	WriteOnOff(Section, "ConfirmChangePasteCR", FName, ts->ConfirmChangePasteCR);
 
-	// Confirm PasteCR
+	// Jump List
 	WriteOnOff(Section, "JumpList", FName, ts->JumpList);
 
 	// TabStopModifySequence
