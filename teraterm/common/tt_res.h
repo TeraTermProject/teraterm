@@ -148,6 +148,8 @@
 #define IDC_PROTOELAPSEDTIME            2526
 #define IDC_TRANS_ELAPSED               2527
 #define IDC_TRANS_ETIME                 2528
+#define IDC_CLIPBOARD_ACCESS_LABEL      2529
+#define IDC_CLIPBOARD_ACCESS            2530
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003

@@ -261,6 +261,8 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_WINDOW_CTRL, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_WINDOW_REPORT, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CURSOR_CTRL_SEQ, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_CLIPBOARD_ACCESS_LABEL, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgSequenceFont = NULL;
@@ -305,6 +307,19 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_EMPTY", ts.UIMsg, sizeof(ts.UIMsg), "empty", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
+	GetDlgItemText(IDC_CLIPBOARD_ACCESS_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_CLIPBOARD_ACCESS_LABEL, ts.UIMsg);
+
+	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg), "write only", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_READ", ts.UIMsg, sizeof(ts.UIMsg), "read only", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_ON", ts.UIMsg, sizeof(ts.UIMsg), "read/write", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
 	btn2 = (CButton *)GetDlgItem(IDC_DISABLE_MOUSE_TRACKING_CTRL);
@@ -347,6 +362,23 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 	// (7)IDC_CURSOR_CTRL_SEQ
 	btn = (CButton *)GetDlgItem(IDC_CURSOR_CTRL_SEQ);
 	btn->SetCheck((ts.WindowFlag & WF_CURSORCHANGE) != 0);
+
+	// (8)IDC_CLIPBOARD_ACCESS
+	cmb = (CComboBox *)GetDlgItem(IDC_CLIPBOARD_ACCESS);
+	switch (ts.CtrlFlag & CSF_CBRW) {
+		case CSF_CBRW:
+			cmb->SetCurSel(3);
+			break;
+		case CSF_CBREAD:
+			cmb->SetCurSel(2);
+			break;
+		case CSF_CBWRITE:
+			cmb->SetCurSel(1);
+			break;
+		default: // off
+			cmb->SetCurSel(0);
+			break;
+	}
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -422,6 +454,24 @@ void CSequencePropPageDlg::OnOK()
 		ts.WindowFlag ^= WF_CURSORCHANGE;
 	}
 
+	// (8)IDC_TITLE_REPORT
+	cmb = (CComboBox *)GetDlgItem(IDC_CLIPBOARD_ACCESS);
+	switch (cmb->GetCurSel()) {
+		case 0: // off
+			ts.CtrlFlag &= ~CSF_CBRW;
+			break;
+		case 1: // write only
+			ts.CtrlFlag &= ~CSF_CBRW;
+			ts.CtrlFlag |= CSF_CBWRITE;
+			break;
+		case 2: // read only
+			ts.CtrlFlag &= ~CSF_CBRW;
+			ts.CtrlFlag |= CSF_CBREAD;
+			break;
+		default: // read/write
+			ts.CtrlFlag |= CSF_CBRW;
+			break;
+	}
 }
 
 
