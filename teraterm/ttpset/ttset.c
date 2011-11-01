@@ -1418,6 +1418,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Jump List
 	ts->JumpList = GetOnOff(Section, "JumpList", FName, TRUE);
 
+	// TabStopModifySequence
 	GetPrivateProfileString(Section, "TabStopModifySequence", "on", Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "all") == 0)
 		ts->TabStopFlag = TABF_ALL;
