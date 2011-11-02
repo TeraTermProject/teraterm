@@ -282,6 +282,7 @@ typedef struct IObjectCollection
     IObjectCollectionVtbl *lpVtbl;
 } IObjectCollection;
 
+#if !(_MSC_VER >= 1500)  // VC2008(VC9.0) or later
 typedef struct IPropertyStoreVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -322,6 +323,7 @@ typedef struct IPropertyStore
 {
     IPropertyStoreVtbl *lpVtbl;
 } IPropertyStore;
+#endif
 
 static const CLSID CLSID_DestinationList = {
     0x77f10cf0, 0x3db5, 0x4966, {0xb5,0x20,0xb7,0xc5,0x4f,0xd3,0x5e,0xd6}
