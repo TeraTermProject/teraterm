@@ -38,14 +38,14 @@
       <li>added support for OSC 10 (Change VT window text foreground color), 11 (Change VT window text background color), 15 (Change TEK window text foreground color) and 16 (Change TEK window text background color) control string.</li>
       <li>added the <a href="../menu/window.html#minimize">[Minimize All]</a> and the <a href="../menu/window.html#restore">[Restore All]</a> menu into the <a href="../menu/window.html">[Window]</a> menu.</li>
       <li>Broadcast Command: When a user uses the real time mode, the input characters does not show on the edit control.</li>
-      <!-- li>OSC 52 (クリップボードアクセス) 制御文字列に対応した。
+      <li>added support for OSC 52 (Clipboard access) control string.
         <ul>
-          <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>でアクセスを許可するか設定できるようにした。</li>
-        </ul></li -->
-      <!-- li>クリッカブル URL で起動するブラウザを指定できるようにした。
+          <li>added the Clipboard access from remote entry on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+        </ul></li>
+      <li>added support for specifying an any browser as the clickable URL.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ClickableUrlBrowser">ClickableUrlBrowser</a>,  ClickableUrlBrowserArg エントリを追加した。デフォルトは ""。</li>
-        </ul></li-->
+          <li>added the <a href="../setup/teraterm-misc.html#ClickableUrlBrowser">ClickableUrlBrowser</a> and ClickableUrlBrowserArg entries in the teraterm.ini file. The default value is empty.</li>
+        </ul></li>
       <li>added the "<a href="../macro/command/getspecialfolder.html">getspecialfolder</a>" macro command.</li>
       <li>adjusted the up and down space size of the shown message at the "<a href="../macro/command/messagebox.html">messagebox</a>", "<a href="../macro/command/inputbox.html">inputbox</a>" and "<a href="../macro/command/statusbox.html">statusbox</a>" macro commands.</li>
     </ul>
@@ -56,7 +56,7 @@
       <li>XMODEM: The first packet is sent out twice by using the xmodem sending function. <br>cf. <a href="http://logmett.com/forum/viewtopic.php?f=2&t=354">why the first xmodem packet been always send out twice?</a></li>
       <li><a href="../macro/command/ifdefined.html">ifdefined</a> macro command: When the interger literal is specified, the command mistakenly returns the interger type.</li>
       <li>The zero index of the ANSI color settings can not be loaded.</li>
-      <!-- li>OSC 文字列の後に続く文字列が正しく表示されない事がある問題を修正した。</li -->
+      <li>The string following after OSC string will not display well.</li>
     </ul>
   </li>
 
