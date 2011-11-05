@@ -47,7 +47,7 @@
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -122,7 +122,7 @@
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -207,11 +207,11 @@
 			Name="ReadMe"
 			>
 			<File
-				RelativePath="ReadMe.txt"
+				RelativePath="ReadMe-ja.txt"
 				>
 			</File>
 			<File
-				RelativePath="ReadMe-ja.txt"
+				RelativePath="ReadMe.txt"
 				>
 			</File>
 		</Filter>
