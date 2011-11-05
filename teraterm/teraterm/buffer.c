@@ -7,6 +7,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include <string.h>
+#include <stdio.h>
 
 #include "ttwinman.h"
 #include "teraprn.h"
