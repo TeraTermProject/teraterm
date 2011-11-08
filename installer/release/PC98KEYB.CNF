@@ -137,6 +137,8 @@ XF3=100
 XF4=101
 ; F5 key
 XF5=102
+; Shift + Tab key
+XBackTab=527
 
 [Shortcut keys]
 ;Ctrl + INS

@@ -2943,10 +2943,6 @@ LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 {
 	switch (wParam) {
-		case IdScrollLock:
-			ScrollLock = ! ScrollLock;
-			break;
-
 		case IdHold:
 			if (TalkStatus==IdTalkKeyb) {
 				Hold = ! Hold;
@@ -3029,6 +3025,9 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 			break;
 		case IdCmdRestoreSetup: // called by TTMACRO
 			RestoreSetup();
+			break;
+		case IdCmdScrollLock:
+			ScrollLock = ! ScrollLock;
 			break;
 	}
 	return 0;

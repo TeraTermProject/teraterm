@@ -2732,7 +2732,7 @@ void FAR PASCAL ReadKeyboardCnf
 
 	GetInt(KeyMap, IdUDK20, VTFunction, "UDK20", FName);
 
-	// XTERM function keys
+	// XTERM function / extended keys
 	GetInt(KeyMap, IdXF1, XFunction, "XF1", FName);
 
 	GetInt(KeyMap, IdXF2, XFunction, "XF2", FName);
@@ -2742,6 +2742,8 @@ void FAR PASCAL ReadKeyboardCnf
 	GetInt(KeyMap, IdXF4, XFunction, "XF4", FName);
 
 	GetInt(KeyMap, IdXF5, XFunction, "XF5", FName);
+
+	GetInt(KeyMap, IdXBackTab, XFunction, "XBackTab", FName);
 
 	// accelerator keys
 	GetInt(KeyMap, IdCmdEditCopy, ShortCut, "EditCopy", FName);
@@ -2780,7 +2782,7 @@ void FAR PASCAL ReadKeyboardCnf
 
 	GetInt(KeyMap, IdCmdLocalEcho, ShortCut, "LocalEcho", FName);
 
-	GetInt(KeyMap, IdScrollLock, ShortCut, "ScrollLock", FName);
+	GetInt(KeyMap, IdCmdScrollLock, ShortCut, "ScrollLock", FName);
 
 	/* user keys */
 

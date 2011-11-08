@@ -139,6 +139,8 @@ XF3=off
 XF4=off
 ; F5 key
 XF5=off
+; Shift + Tab key
+XBackTab=527
 
 [Shortcut keys]
 ; Ctrl + Insert

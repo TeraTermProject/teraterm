@@ -742,26 +742,27 @@ typedef TGetHNRec far *PGetHNRec;
 #define IdHold            67
 #define IdPrint           68
 #define IdBreak           69
-#define IdCmdEditCopy     70
-#define IdCmdEditPaste    71
-#define IdCmdEditPasteCR  72
-#define IdCmdEditCLS      73
-#define IdCmdEditCLB      74
-#define IdCmdCtrlOpenTEK  75
-#define IdCmdCtrlCloseTEK 76
-#define IdCmdLineUp       77
-#define IdCmdLineDown     78
-#define IdCmdPageUp       79
-#define IdCmdPageDown     80
-#define IdCmdBuffTop      81
-#define IdCmdBuffBottom   82
-#define IdCmdNextWin      83
-#define IdCmdPrevWin      84
-#define IdCmdNextSWin     85
-#define IdCmdPrevSWin     86
-#define IdCmdLocalEcho    87
-#define IdScrollLock      88
-#define IdUser1           89
+#define IdXBackTab        70
+#define IdCmdEditCopy     71
+#define IdCmdEditPaste    72
+#define IdCmdEditPasteCR  73
+#define IdCmdEditCLS      74
+#define IdCmdEditCLB      75
+#define IdCmdCtrlOpenTEK  76
+#define IdCmdCtrlCloseTEK 77
+#define IdCmdLineUp       78
+#define IdCmdLineDown     79
+#define IdCmdPageUp       80
+#define IdCmdPageDown     81
+#define IdCmdBuffTop      82
+#define IdCmdBuffBottom   83
+#define IdCmdNextWin      84
+#define IdCmdPrevWin      85
+#define IdCmdNextSWin     86
+#define IdCmdPrevSWin     87
+#define IdCmdLocalEcho    88
+#define IdCmdScrollLock   89
+#define IdUser1           90
 #define NumOfUDK          IdUDK20-IdUDK6+1
 #define NumOfUserKey      99
 #define IdKeyMax          IdUser1+NumOfUserKey-1
@@ -991,6 +992,8 @@ typedef TMap far *PMap;
  *   added tttset.CtrlFlag.
  *   added tttset.ClickableUrlBrowser.
  *   added tttset.ClickableUrlBrowserArg.
+ *   added XBackTab Key ID.
+ *   Key ID renumbered.
  *
  * - At version 4.70, ttset_memfilemap was replaced with ttset_memfilemap_16.
  *   added tttset.JumpList.

@@ -713,6 +713,15 @@ void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 				strncpy_s(KeyStr,destlen,"\033[15~",_TRUNCATE);
 			}
 			break;
+		case IdXBackTab: /* XTERM Back Tab */
+			if (Send8BitMode) {
+				*Len = 2;
+				strncpy_s(KeyStr,destlen,"\233Z",_TRUNCATE);
+			} else {
+				*Len = 3;
+				strncpy_s(KeyStr,destlen,"\033[Z",_TRUNCATE);
+			}
+			break;
 		case IdHold:
 		case IdPrint:
 		case IdBreak:
@@ -734,7 +743,7 @@ void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 		case IdCmdNextSWin:
 		case IdCmdPrevSWin:
 		case IdCmdLocalEcho:
-		case IdScrollLock:
+		case IdCmdScrollLock:
 			PostMessage(HWin,WM_USER_ACCELCOMMAND,KeyCode,0);
 			break;
 		default:
