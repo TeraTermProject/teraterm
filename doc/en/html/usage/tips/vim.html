@@ -57,8 +57,15 @@ For example, when below contents is added in the .vimrc file, the cursor style i
 </p>
 
 <pre class="macro-example">
-let t_SI .= "\e[3 q"
-let t_EI .= "\e[1 q"
+&quot;for screen
+&quot; term xterm-256color in .screenrc
+if &amp;term == &quot;xterm-256color&quot;
+    let &amp;t_SI .= &quot;\eP\e[3 q\e\\&quot;
+    let &amp;t_EI .= &quot;\eP\e[1 q\e\\&quot;
+elseif &amp;term == &quot;xterm&quot;
+    let &amp;t_SI .= &quot;\e[3 q&quot;
+    let &amp;t_EI .= &quot;\e[1 q&quot;
+endif
 </pre>
 
 <p>NOTICE: If a user uses the control sequence except the DECTCEM, turn on the Cursor control sequence of the Additional Settings dialog(The default value is off).
@@ -76,24 +83,32 @@ The vim configuration is described below. The following will use xterm's bracket
 </p>
 
 <pre class="macro-example">
-if &term == "xterm"
-  let &t_ti .= "\e[?2004h"
-  let &t_te .= "\e[?2004l"
-  let &pastetoggle = "\e[201~"
+if &amp;term =~ &quot;xterm&quot;
+    &quot;for screen
+    &quot; term xterm-256color in .screenrc
+    if &amp;term == &quot;xterm-256color&quot;
+        let &amp;t_SI = &amp;t_SI . &quot;\eP\e[?2004h\e\\&quot;
+        let &amp;t_EI = &quot;\eP\e[?2004l\e\\&quot; . &amp;t_EI
+        let &amp;pastetoggle = &quot;\e[201~&quot;
+    elseif &amp;term == &quot;xterm&quot;
+        let &amp;t_SI .= &amp;t_SI . &quot;\e[?2004h&quot;
+        let &amp;t_EI .= &quot;\e[?2004l&quot; . &amp;t_EI
+        let &amp;pastetoggle = &quot;\e[201~&quot;
+    endif
 
-  function XTermPasteBegin(ret)
-    set paste
-    return a:ret
-  endfunction
+    function XTermPasteBegin(ret)
+        set paste
+        return a:ret
+    endfunction
 
-  map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
-  imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
-  cmap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
-  cmap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+    map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin(&quot;0i&quot;)
+    imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin(&quot;&quot;)
+    cmap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
+    cmap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
 endif
 </pre>
 
-<h3>Bracketed Paste mode</h3>
+<h4>About Bracketed Paste mode</h4>
 <p>
 The bracketed paste mode is the xterm extension feature. When this feature is enabled, the pasted text is bracketed with control sequences so that the program can differentiate the pasted text from typed-in text.<br>
 The program will receive: ESC [ 200 ~, followed by the pasted text, followed by ESC [ 201 ~.

@@ -55,8 +55,15 @@ Tera Term では、以下のカーソル表示状態変更制御シーケンスに対応しています。
 </p>
 
 <pre class="macro-example">
-let t_SI .= "\e[3 q"
-let t_EI .= "\e[1 q"
+&quot;for screen
+&quot; .screenrcでterm xterm-256colorとしている場合
+if &amp;term == &quot;xterm-256color&quot;
+    let &amp;t_SI .= &quot;\eP\e[3 q\e\\&quot;
+    let &amp;t_EI .= &quot;\eP\e[1 q\e\\&quot;
+elseif &amp;term == &quot;xterm&quot;
+    let &amp;t_SI .= &quot;\e[3 q&quot;
+    let &amp;t_EI .= &quot;\e[1 q&quot;
+endif
 </pre>
 
 <p>注: DECTCEM <strong>以外</strong>の制御シーケンスを使うには、Additional Settings ダイアログの Control sequence タブに有る Cursor control sequence を on にする必要があります。(デフォルトは off)</p>
@@ -73,24 +80,32 @@ let t_EI .= "\e[1 q"
 </p>
 
 <pre class="macro-example">
-if &term == "xterm"
-  let &t_ti .= "\e[?2004h"
-  let &t_te .= "\e[?2004l"
-  let &pastetoggle = "\e[201~"
+if &amp;term =~ &quot;xterm&quot;
+    &quot;for screen
+    &quot; .screenrcでterm xterm-256colorとしている場合
+    if &amp;term == &quot;xterm-256color&quot;
+        let &amp;t_SI = &amp;t_SI . &quot;\eP\e[?2004h\e\\&quot;
+        let &amp;t_EI = &quot;\eP\e[?2004l\e\\&quot; . &amp;t_EI
+        let &amp;pastetoggle = &quot;\e[201~&quot;
+    elseif &amp;term == &quot;xterm&quot;
+        let &amp;t_SI .= &amp;t_SI . &quot;\e[?2004h&quot;
+        let &amp;t_EI .= &quot;\e[?2004l&quot; . &amp;t_EI
+        let &amp;pastetoggle = &quot;\e[201~&quot;
+    endif
 
-  function XTermPasteBegin(ret)
-    set paste
-    return a:ret
-  endfunction
+    function XTermPasteBegin(ret)
+        set paste
+        return a:ret
+    endfunction
 
-  map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
-  imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
-  cmap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
-  cmap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+    map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin(&quot;0i&quot;)
+    imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin(&quot;&quot;)
+    cmap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
+    cmap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
 endif
 </pre>
 
-<h3>Bracketed Paste mode</h3>
+<h4>Bracketed Paste mode について</h4>
 <p>
 この機能は xterm 拡張で、有効になっていると、クリップボードからの貼り付け時に文字列の前後に特別なシーケンスを付加するというものです。<br>
 具体的には、DECSET の 2004(&lt;CSI&gt;?2004h) で有効になり、貼り付け時に文字列の前に &lt;ESC&gt;200~, 後ろに &lt;ESC&gt;201~ が付くようになります。
