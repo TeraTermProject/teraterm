@@ -2015,6 +2015,7 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	if (MetaKey(ts.MetaKey) && (nFlags & 0x2000) != 0)
 	{
+		PeekMessage((LPMSG)&M,HVTWin,WM_CHAR,WM_CHAR,PM_REMOVE);
 		/* for Ctrl+Alt+Key combination */
 		GetKeyboardState((PBYTE)KeyState);
 		KeyState[VK_MENU] = 0;
