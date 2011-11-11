@@ -2461,12 +2461,7 @@ void DispDestroyCaret()
 BOOL IsCaretOn()
 // check if caret is on
 {
-	// 非アクティブ（フォーカス無効）の場合においても、カーソル描画を行いたいため、
-	// 2つめの条件を追加する。(2008.1.24 yutaka)
-  if (ts.KillFocusCursor == 0)
-	return (( Active && (CaretStatus==0)) );
-  else
-	return ((Active && (CaretStatus==0)) || (!Active && (CaretStatus==0)));
+	return ((ts.KillFocusCursor || Active) && (CaretStatus==0));
 }
 
 void DispEnableCaret(BOOL On)
