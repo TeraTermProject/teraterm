@@ -74,8 +74,8 @@ The vim configuration is described below. The following will use xterm's bracket
 
 <pre class="macro-example">
 if &amp;term =~ "xterm"
-    let &amp;t_SI .= "\e[?2004h"
-    let &amp;t_EI .= "\e[?2004l"
+    let &amp;t_ti .= "\e[?2004h"
+    let &amp;t_te .= "\e[?2004l"
     let &amp;pastetoggle = "\e[201~"
 
     function XTermPasteBegin(ret)
@@ -87,6 +87,26 @@ if &amp;term =~ "xterm"
     inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
     cnoremap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
     cnoremap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+endif
+</pre>
+
+<!-- p>
+上記の設定ではノーマルモードで貼り付けを行うと挿入モードに切り替わって貼り付けが行われますが、これを行わずに挿入モードの時のみ有効にする場合は以下の設定を使用して下さい。<br>
+後述の<a href="#withScreen">GNU Screenとの併用時の注意点</a>にある設定を行う場合はこちらの方が都合がいいでしょう。
+</p -->
+
+<pre class="macro-example">
+if &amp;term =~ "xterm"
+    let &amp;t_SI .= "\e[?2004h"
+    let &amp;t_EI .= "\e[?2004l"
+    let &amp;pastetoggle = "\e[201~"
+
+    function XTermPasteBegin(ret)
+        set paste
+        return a:ret
+    endfunction
+
+    inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
 endif
 </pre>
 
