@@ -55,15 +55,8 @@ Tera Term では、以下のカーソル表示状態変更制御シーケンスに対応しています。
 </p>
 
 <pre class="macro-example">
-&quot;for screen
-&quot; .screenrcでterm xterm-256colorとしている場合
-if &amp;term == &quot;xterm-256color&quot;
-    let &amp;t_SI .= &quot;\eP\e[3 q\e\\&quot;
-    let &amp;t_EI .= &quot;\eP\e[1 q\e\\&quot;
-elseif &amp;term == &quot;xterm&quot;
-    let &amp;t_SI .= &quot;\e[3 q&quot;
-    let &amp;t_EI .= &quot;\e[1 q&quot;
-endif
+let &amp;t_SI .= "\e[3 q"
+let &amp;t_EI .= "\e[1 q"
 </pre>
 
 <p>注: DECTCEM <strong>以外</strong>の制御シーケンスを使うには、Additional Settings ダイアログの Control sequence タブに有る Cursor control sequence を on にする必要があります。(デフォルトは off)</p>
@@ -80,28 +73,20 @@ endif
 </p>
 
 <pre class="macro-example">
-if &amp;term =~ &quot;xterm&quot;
-    &quot;for screen
-    &quot; .screenrcでterm xterm-256colorとしている場合
-    if &amp;term == &quot;xterm-256color&quot;
-        let &amp;t_SI = &amp;t_SI . &quot;\eP\e[?2004h\e\\&quot;
-        let &amp;t_EI = &quot;\eP\e[?2004l\e\\&quot; . &amp;t_EI
-        let &amp;pastetoggle = &quot;\e[201~&quot;
-    elseif &amp;term == &quot;xterm&quot;
-        let &amp;t_SI .= &amp;t_SI . &quot;\e[?2004h&quot;
-        let &amp;t_EI .= &quot;\e[?2004l&quot; . &amp;t_EI
-        let &amp;pastetoggle = &quot;\e[201~&quot;
-    endif
+if &amp;term =~ "xterm"
+    let &amp;t_SI .= "\e[?2004h"
+    let &amp;t_EI .= "\e[?2004l"
+    let &amp;pastetoggle = "\e[201~"
 
     function XTermPasteBegin(ret)
         set paste
         return a:ret
     endfunction
 
-    map &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin(&quot;0i&quot;)
-    imap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin(&quot;&quot;)
-    cmap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
-    cmap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+    noremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
+    inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
+    cnoremap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
+    cnoremap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
 endif
 </pre>
 
@@ -156,6 +141,27 @@ let &t_SI .= "\e[?7727h"
 let &t_EI .= "\e[?7727l"
 inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
+
+
+<h2><a name="withScreen">GNU Screenとの併用時の注意点</a></h2>
+<p>
+GNU Screenを使用している場合、screen内部で動かしているアプリケーションが制御シーケンスを送っても、そのシーケンスにscreenが対応していない場合はTera Term側へ送らずに捨ててしまい期待通りに動きません。その場合、
+</p>
+
+<pre class="macro-example">
+if &amp;term == "screen"
+    let &amp;t_SI .= "\eP\e[3 q\e\\"
+    let &amp;t_EI .= "\eP\e[1 q\e\\"
+else
+    let &amp;t_SI .= "\e[3 q"
+    let &amp;t_EI .= "\e[1 q"
+endif
+</pre>
+
+<p>
+というように、端末タイプが screen の時は t_SI, t_EI, t_ti, t_te に設定するシーケンスを "\eP" と "\e\\" で挟むとTera Termに制御シーケンスが届くようになります。<br>
+ただし、この方法を使って制御シーケンスがscreenを抜けるようにしても送ったシーケンスの状態はscreenの管理外になるので、screenのウィンドウを切り替えた時等に期待通りに動かない場合がありますので注意してください。
+</p>
 
 </body>
 </html>
