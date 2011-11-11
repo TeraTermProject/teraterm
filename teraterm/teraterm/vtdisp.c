@@ -2251,23 +2251,20 @@ void ChangeCaret()
   UINT T;
 
   if (! Active) return;
-  if (CaretEnabled)
-  {
-	DestroyCaret();
-	switch (ts.CursorShape) {
-	  case IdVCur:
-		CreateCaret(HVTWin, 0, CurWidth, FontHeight);
-		break;
-	  case IdHCur:
-		CreateCaret(HVTWin, 0, FontWidth, CurWidth);
-		break;
-	}
+  DestroyCaret();
+  switch (ts.CursorShape) {
+    case IdVCur:
+  	CreateCaret(HVTWin, 0, CurWidth, FontHeight);
+  	break;
+    case IdHCur:
+  	CreateCaret(HVTWin, 0, FontWidth, CurWidth);
+  	break;
+  }
+  if (CaretEnabled) {
 	CaretStatus = 1;
   }
   CaretOn();
-  if (CaretEnabled &&
-	  (ts.NonblinkingCursor!=0))
-  {
+  if (CaretEnabled && (ts.NonblinkingCursor!=0)) {
     T = GetCaretBlinkTime() * 2 / 3;
     SetTimer(HVTWin,IdCaretTimer,T,NULL);
   }
