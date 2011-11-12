@@ -90,10 +90,10 @@ if &amp;term =~ "xterm"
 endif
 </pre>
 
-<!-- p>
-上記の設定ではノーマルモードで貼り付けを行うと挿入モードに切り替わって貼り付けが行われますが、これを行わずに挿入モードの時のみ有効にする場合は以下の設定を使用して下さい。<br>
-後述の<a href="#withScreen">GNU Screenとの併用時の注意点</a>にある設定を行う場合はこちらの方が都合がいいでしょう。
-</p -->
+<p>
+When a user pastes at the normal mode by using the above configuration, the mode will be automatically changed to the insert mode and do the paste. If this behavior is denied, use the below configuration.<br>
+Also, refer to the <a href="#withScreen">GNU Screen Notice</a>.
+</p>
 
 <pre class="macro-example">
 if &amp;term =~ "xterm"
@@ -163,10 +163,9 @@ inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
 
 
-<!--
-<h2><a name="withScreen">GNU Screenとの併用時の注意点</a></h2>
+<h2><a name="withScreen">GNU Screen Notice</a></h2>
 <p>
-GNU Screenを使用している場合、screen内部で動かしているアプリケーションが制御シーケンスを送っても、そのシーケンスにscreenが対応していない場合はTera Term側へ送らずに捨ててしまい期待通りに動きません。その場合、
+When the GNU Screen is used, an application on the screen sends the control sequence and the sequence will be abandoned because the screen can not support the sequence.
 </p>
 
 <pre class="macro-example">
@@ -180,10 +179,9 @@ endif
 </pre>
 
 <p>
-というように、端末タイプが screen の時は t_SI, t_EI, t_ti, t_te に設定するシーケンスを "\eP" と "\e\\" で挟むとTera Termに制御シーケンスが届くようになります。<br>
-ただし、この方法を使って制御シーケンスがscreenを抜けるようにしても送ったシーケンスの状態はscreenの管理外になるので、screenのウィンドウを切り替えた時等に期待通りに動かない場合がありますので注意してください。
+Use the above configuration to resolve this problem. When the terminal type is `screen', the vim entry sandwitches in the sequence between the "\eP" and "\e\\".<br>
+However, the screen can not work to switch the window because the sequence can not be managed by the screen.
 </p>
--->
 
 </body>
 </html>
