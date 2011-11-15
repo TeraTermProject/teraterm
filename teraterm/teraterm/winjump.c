@@ -52,6 +52,7 @@ typedef PROPVARIANT *REFPROPVARIANT;
 #define PropVariantInit(pvar) memset((pvar),0,sizeof(PROPVARIANT))
 #endif
 
+#if !(_MSC_VER >= 1600)  // VC2010(VC10.0) or later
 typedef struct ICustomDestinationListVtbl {
     HRESULT ( __stdcall *QueryInterface ) (
         /* [in] ICustomDestinationList*/ void *This,
@@ -281,6 +282,7 @@ typedef struct IObjectCollection
 {
     IObjectCollectionVtbl *lpVtbl;
 } IObjectCollection;
+#endif
 
 #if !(_MSC_VER >= 1500)  // VC2008(VC9.0) or later
 typedef struct IPropertyStoreVtbl
