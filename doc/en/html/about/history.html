@@ -46,6 +46,7 @@
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#ClickableUrlBrowser">ClickableUrlBrowser</a> and ClickableUrlBrowserArg entries in the teraterm.ini file. The default value is empty.</li>
         </ul></li>
+      <!--li>マクロのデータ型で<a href="../macro/syntax/types.html#IntegerArray">整数配列</a>、<a href="../macro/syntax/types.html#StringArray">文字列配列</a>をサポートした。</li-->
       <li>added the "<a href="../macro/command/getspecialfolder.html">getspecialfolder</a>" macro command.</li>
       <li>adjusted the up and down space size of the shown message at the "<a href="../macro/command/messagebox.html">messagebox</a>", "<a href="../macro/command/inputbox.html">inputbox</a>" and "<a href="../macro/command/statusbox.html">statusbox</a>" macro commands.</li>
     </ul>
@@ -54,6 +55,7 @@
   <li>Bug fixes
     <ul>
       <li>XMODEM: The first packet is sent out twice by using the xmodem sending function. <br>cf. <a href="http://logmett.com/forum/viewtopic.php?f=2&t=354">why the first xmodem packet been always send out twice?</a></li>
+      <!--li>YMODEM: ファイルを受信したときに、ファイル保存フォルダに保存されない問題を修正した。</li-->
       <li><a href="../macro/command/ifdefined.html">ifdefined</a> macro command: When the interger literal is specified, the command mistakenly returns the interger type.</li>
       <li>The zero index of the ANSI color settings can not be loaded.</li>
       <li>The string following after OSC string will not display well.</li>
