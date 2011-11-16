@@ -78,7 +78,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib imm32.lib ttpcmn.lib"
+				AdditionalDependencies="ws2_32.lib imm32.lib ttpcmn.lib imagehlp.lib"
 				OutputFile="..\Debug/ttermpro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
