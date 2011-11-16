@@ -31,21 +31,21 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.72">2011.xx.xx (Ver 4.72)</a></h3>
+<h3><a name="teraterm_4.72">2011.11.30 (Ver 4.72)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>
       <li>added support for OSC 10 (Change VT window text foreground color), 11 (Change VT window text background color), 15 (Change TEK window text foreground color) and 16 (Change TEK window text background color) control string.</li>
-      <li>added the <a href="../menu/window.html#minimize">[Minimize All]</a> and the <a href="../menu/window.html#restore">[Restore All]</a> menu into the <a href="../menu/window.html">[Window]</a> menu.</li>
-      <li>Broadcast Command: When a user uses the real time mode, the input characters does not show on the edit control.</li>
       <li>added support for OSC 52 (Clipboard access) control string.
         <ul>
           <li>added the Clipboard access from remote entry on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
         </ul></li>
+      <li>Broadcast Command: When a user uses the real time mode, the input characters does not show on the edit control.</li>
       <li>added support for specifying an any browser as the clickable URL.
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#ClickableUrlBrowser">ClickableUrlBrowser</a> and ClickableUrlBrowserArg entries in the teraterm.ini file. The default value is empty.</li>
         </ul></li>
+      <li>added the <a href="../menu/window.html#minimize">[Minimize All]</a> and the <a href="../menu/window.html#restore">[Restore All]</a> menu into the <a href="../menu/window.html">[Window]</a> menu.</li>
       <!--li>マクロのデータ型で<a href="../macro/syntax/types.html#IntegerArray">整数配列</a>、<a href="../macro/syntax/types.html#StringArray">文字列配列</a>をサポートした。</li-->
       <li>added the "<a href="../macro/command/getspecialfolder.html">getspecialfolder</a>" macro command.</li>
       <li>adjusted the up and down space size of the shown message at the "<a href="../macro/command/messagebox.html">messagebox</a>", "<a href="../macro/command/inputbox.html">inputbox</a>" and "<a href="../macro/command/statusbox.html">statusbox</a>" macro commands.</li>
@@ -54,13 +54,13 @@
 
   <li>Bug fixes
     <ul>
-      <li>XMODEM: The first packet is sent out twice by using the xmodem sending function. <br>cf. <a href="http://logmett.com/forum/viewtopic.php?f=2&t=354">why the first xmodem packet been always send out twice?</a></li>
-      <!--li>YMODEM: ファイルを受信したときに、ファイル保存フォルダに保存されない問題を修正した。</li-->
-      <li><a href="../macro/command/ifdefined.html">ifdefined</a> macro command: When the interger literal is specified, the command mistakenly returns the interger type.</li>
-      <li>The zero index of the ANSI color settings can not be loaded.</li>
       <li>The string following after OSC string will not display well.</li>
-      <li>When the keyboard has the AltGr key and the MetaKey=on is configured, the invalid character will be input.</li>
       <li>When the cursor is hid, the vertical bar shape can not be shown.</li>
+      <li>When the keyboard has the AltGr key and the MetaKey=on is configured, the invalid character will be input.</li>
+      <li>The zero index of the ANSI color settings can not be loaded.</li>
+      <li>XMODEM: The first packet is sent out twice by using the xmodem sending function.</li>
+      <!--li>YMODEM: ファイルを受信したときに、ファイル保存フォルダに保存されない問題を修正した。</li-->
+      <li>"<a href="../macro/command/ifdefined.html">ifdefined</a>" macro command: When the interger literal is specified, the command mistakenly returns the interger type.</li>
     </ul>
   </li>
 
@@ -1757,7 +1757,7 @@ SYNOPSIS:
 
 <h2><a name="ttssh">TTSSH</a></h2>
 
-<h3><a name="ttssh_2.59">2011.11.xx (Ver 2.59)</a></h3>
+<h3><a name="ttssh_2.59">2011.11.30 (Ver 2.59)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>
@@ -2762,7 +2762,7 @@ SYNOPSIS:
 
 <h2><a name="ttmenu">TeraTerm Menu</a></h2>
 
-<h3><a name="ttmenu_1.11">2011.x.xx (Ver 1.11)</a></h3>
+<h3><a name="ttmenu_1.11">2011.11.30 (Ver 1.11)</a></h3>
 <ul class="history">
       <li>added support for inputing the control character(^A-^_) as the password.</li>
 </ul>
@@ -2924,7 +2924,7 @@ SYNOPSIS:
 </ul>
 
 <h2><a name="recurringcommand">TTXRecurringCommand</a></h2>
-<h3><a name="recurringcommand_1.02">2011.xx.xx (Ver 1.02)</a></h3>
+<h3><a name="recurringcommand_1.02">2011.11.30 (Ver 1.02)</a></h3>
 <ul class="history">
   <li>added the menu id to enable and disable for the macro command.</li>
   <li>added support for the reading the configuration file by using the /F= option.</li>

@@ -31,21 +31,21 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
-<h3><a name="teraterm_4.72">2011.xx.xx (Ver 4.72)</a></h3>
+<h3><a name="teraterm_4.72">2011.11.30 (Ver 4.72)</a></h3>
 <ul class="history">
   <li>変更
     <ul>
       <li>OSC 10 (VTウィンドウ文字色変更), 11 (VTウィンドウ背景色変更), 15 (TEKウィンドウ文字色変更), 16 (TEKウィンドウ背景色変更) 制御文字列に対応した。</li>
-      <li><a href="../menu/window.html">[Window]</a> メニューに <a href="../menu/window.html#minimize">[Minimize All]</a>, <a href="../menu/window.html#restore">[Restore All]</a> メニューを追加した。</li>
-      <li>ブロードキャストコマンドにおいて、リアルタイムモードの場合、キー入力でエディットコントロールに文字が残らないようにした。</li>
       <li>OSC 52 (クリップボードアクセス) 制御文字列に対応した。
         <ul>
           <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>でアクセスを許可するか設定(Clipboard access from remote)できるようにした。</li>
         </ul></li>
+      <li>ブロードキャストコマンドにおいて、リアルタイムモードの場合、キー入力でエディットコントロールに文字が残らないようにした。</li>
       <li>クリッカブル URL で起動するブラウザを指定できるようにした。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-misc.html#ClickableUrlBrowser">ClickableUrlBrowser</a>,  ClickableUrlBrowserArg エントリを追加した。デフォルトは ""。</li>
         </ul></li>
+      <li><a href="../menu/window.html">[Window]</a> メニューに <a href="../menu/window.html#minimize">[Minimize All]</a>, <a href="../menu/window.html#restore">[Restore All]</a> メニューを追加した。</li>
       <li>マクロのデータ型で<a href="../macro/syntax/types.html#IntegerArray">整数配列</a>、<a href="../macro/syntax/types.html#StringArray">文字列配列</a>をサポートした。</li>
       <li>マクロコマンド "<a href="../macro/command/getspecialfolder.html">getspecialfolder</a>" を追加した。</li>
       <li>マクロコマンド "<a href="../macro/command/messagebox.html">messagebox</a>", "<a href="../macro/command/inputbox.html">inputbox</a>", "<a href="../macro/command/statusbox.html">statusbox</a>"で、表示されるメッセージの上下の余白の大きさを調整した。 </li>
@@ -54,13 +54,13 @@
 
   <li>バグ修正
     <ul>
-      <li>XMODEM: 送信時、初回のパケットが2回送られる問題を修正した。<br>cf. <a href="http://logmett.com/forum/viewtopic.php?f=2&t=354">why the first xmodem packet been always send out twice?</a></li>
-      <li>YMODEM: ファイルを受信したときに、ファイル保存フォルダに保存されない問題を修正した。</li>
-      <li><a href="../macro/command/ifdefined.html">ifdefined</a>に整数リテラルを渡すと"整数型変数"と判定する問題を修正した。</li>
-      <li>ANSI Color の 0 番の設定が正しく読み込めない問題を修正した。</li>
       <li>OSC 文字列の後に続く文字列が正しく表示されない事がある問題を修正した。</li>
-      <li>AltGr キーが有るキーボードを使用している場合、MetaKey=on の設定の時に余計な文字が入力される場合があった問題を修正した。</li>
       <li>カーソルが非表示状態の時に、カーソル形状の縦線への変更が正しく行えなかった問題を修正した。</li>
+      <li>AltGr キーが有るキーボードを使用している場合、MetaKey=on の設定の時に余計な文字が入力される場合があった問題を修正した。</li>
+      <li>ANSI Color の 0 番の設定が正しく読み込めない問題を修正した。</li>
+      <li>XMODEM: 送信時、初回のパケットが2回送られる問題を修正した。</li>
+      <li>YMODEM: ファイルを受信したときに、ファイル保存フォルダに保存されない問題を修正した。</li>
+      <li>マクロコマンド "<a href="../macro/command/ifdefined.html">ifdefined</a>" に整数リテラルを渡すと"整数型変数"と判定する問題を修正した。</li>
     </ul>
   </li>
 
@@ -1758,7 +1758,7 @@
 
 <h2><a name="ttssh">TTSSH</a></h2>
 
-<h3><a name="ttssh_2.59">2011.11.xx (Ver 2.59)</a></h3>
+<h3><a name="ttssh_2.59">2011.11.30 (Ver 2.59)</a></h3>
 <ul class="history">
   <li>変更
     <ul>
@@ -2765,7 +2765,7 @@
 
 <h2><a name="ttmenu">TeraTerm Menu</a></h2>
 
-<h3><a name="ttmenu_1.11">2011.x.xx (Ver 1.11)</a></h3>
+<h3><a name="ttmenu_1.11">2011.11.30 (Ver 1.11)</a></h3>
 <ul class="history">
       <li>パスワードに制御文字(^A-^_)を入力できるようにした。</li>
 </ul>
@@ -2927,7 +2927,7 @@
 </ul>
 
 <h2><a name="recurringcommand">TTXRecurringCommand</a></h2>
-<h3><a name="recurringcommand_1.02">2011.xx.xx (Ver 1.02)</a></h3>
+<h3><a name="recurringcommand_1.02">2011.11.30 (Ver 1.02)</a></h3>
 <ul class="history">
   <li>有効/無効にする為のメニューIDを追加した。(マクロ用)</li>
   <li>/F= オプションによる設定ファイルの指定に対応した。</li>
