@@ -3,10 +3,11 @@
   Windows XP Professional
 - コンパイラ
   Visual Studio 2005 SP1 (Standard Edition 以上)
-  注: Visual Studio 2008 でコンパイルした実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
+  注: Visual Studio 2008 (Standard Edition 以上) でコンパイルした実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
   Windows Server 2003 R2 Platform SDK
   注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
   注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
+  注3: Visual Studio 2010 (Professional Edition 以上)でコンパイルした実行ファイルは Windows 2000, NT 4.0, 95, 98, Me で動きません。
 - インストーラ
   Inno Setup 5.4.2 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor (ispack-5.4.2 より)
