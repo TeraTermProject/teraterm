@@ -18,7 +18,10 @@ int get_svn_revision(char *path) {
 	int revision = -1;
 
 	filename = path;
-	filename += "\\.svn\\entries"; // [top of source tree]\.svn\entries
+	if (filename.Right(1) != "\\") {
+		filename += "\\";
+	}
+	filename += ".svn\\entries"; // [top of source tree]\.svn\entries
 
 	ret = csf.Open(filename, CFile::modeRead);
 	if (ret == FALSE) {
@@ -46,15 +49,19 @@ int get_svn_revision(char *path) {
 	return revision;
 }
 
-BOOL write_svn_revesion(char *path, int revision) {
+BOOL write_svn_revesion(char *filename, int revision) {
 	BOOL ret;
 	CStdioFile csf;
-	CString cs, filename;
+	CString cs;
 	int file_revision = -1;
 	
-	filename = path;
-	filename += "\\teraterm\\ttpdlg\\svnversion.h";
-
+	// print to stdout
+	if (strcmp(filename, "-") == 0) {
+		CStdioFile csf (stdout);
+		cs.Format("#define SVNVERSION %d\n", revision);
+		csf.WriteString(cs);
+		return TRUE;
+	}
 
 	// read current file
 	ret = csf.Open(filename, CFile::modeRead);
@@ -97,30 +104,19 @@ BOOL write_svn_revesion(char *path, int revision) {
 
 int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 {
-	int nRetCode = 0;
 	int revision = -1;
-	char path[MAX_PATH * 2];
-	int i, len;
+	char *input, *output;
 
-	if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0)) {
-		return 1;
+	if (argc != 3) {
+		printf("USAGE: %s path output\n", argv[0]);
+		return -1;
 	}
 
-	GetModuleFileName(::GetModuleHandle(NULL), path, sizeof(path));
-	len = (int)strlen(path);
-	for (i=len; i>=0; i--) {
-		if (path[i] == '\\') {
-			break;
-		}
-		path[i] = '\0';
-	}
-	SetCurrentDirectory(path); // teraterm\debug or teraterm\release
-	SetCurrentDirectory("..\\..\\"); // top of source tree
-	GetCurrentDirectory(sizeof(path), path);
+	input = argv[1];
+	output = argv[2];
+	revision = get_svn_revision(input);
 
-	revision = get_svn_revision(path);
-
-	if (!write_svn_revesion(path, revision)) {
+	if (!write_svn_revesion(output, revision)) {
 		return 1;
 	}
 
