@@ -8,7 +8,7 @@
 #
 
 use Cwd;
-@dirstack = (); 
+@dirstack = ();
 
 $ret = do_main($ARGV[0], $ARGV[1]);
 if ($ret) {
@@ -58,7 +58,7 @@ sub check_file {
 	my($filename, $chmupdated) = @_;
 	my(@filestat) = stat $filename;
 	
-	if ($filestat[8] > $chmupdated) {
+	if ($filestat[9] > $chmupdated) {
 		return 1;
 	}
 	return 0;
