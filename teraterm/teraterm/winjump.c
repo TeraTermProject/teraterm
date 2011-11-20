@@ -547,7 +547,7 @@ static void update_jumplist_from_registry(void)
 	    }
 
 	    if (!found) {
-		collection->lpVtbl->AddObject(collection, link);
+		collection->lpVtbl->AddObject(collection, (IUnknown *)link);
 	    }
 
 	    link->lpVtbl->Release(link);
