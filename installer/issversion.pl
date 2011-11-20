@@ -2,7 +2,7 @@
 
 open ISS, 'teraterm.iss';
 while(<ISS>){
-	if (/^#define AppVer "([0-9\.]+)"$/) {
+	if (/^#define AppVer "(.+)"$/) {
 		print $1;
 		last;
 	}
