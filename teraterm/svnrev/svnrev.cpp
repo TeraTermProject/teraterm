@@ -9,42 +9,26 @@ CWinApp theApp;
 
 using namespace std;
 
-// Get revision fron "entries" file.
-int get_svn_revision(char *path) {
-	BOOL ret;
-	CStdioFile csf;
-	CString cs, filename;
-	int format = -1;
+int get_svn_revision(char *svnversion, char *path) {
+	FILE *fp;
+	char command[MAX_PATH*2];
+	char result[32];
 	int revision = -1;
 
-	filename = path;
-	if (filename.Right(1) != "\\") {
-		filename += "\\";
-	}
-	filename += ".svn\\entries"; // [top of source tree]\.svn\entries
-
-	ret = csf.Open(filename, CFile::modeRead);
-	if (ret == FALSE) {
+	// subversion 1.7 から .svn\entries のフォーマットが変わったため、
+	// .svn\entries を直接読み込むのをやめ、
+	// svnversion.exe コマンドを呼び出した結果を返す
+	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s -n %s", svnversion, path);
+	if ((fp = _popen(command, "rt")) == NULL ) {
 		return -1;
 	}
 
-	csf.SeekToBegin();
-
-	// line 1
-	csf.ReadString(cs);
-	format = atoi(cs);
-
-	if (format == 8 || format == 9 || format == 10) {
-		// skip line 2 name, 3 kind
-		csf.ReadString(cs);
-		csf.ReadString(cs);
-
-		// line 4 revision
-		csf.ReadString(cs);
-		revision = atoi(cs);
+	while(!feof(fp)){
+		fgets(result, sizeof(result), fp);
+		revision = atoi(result);
+		break;
 	}
-
-	csf.Close();
+	_pclose(fp);
 
 	return revision;
 }
@@ -105,16 +89,17 @@ BOOL write_svn_revesion(char *filename, int revision) {
 int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 {
 	int revision = -1;
-	char *input, *output;
+	char *svnversion, *input, *output;
 
-	if (argc != 3) {
-		printf("USAGE: %s path output\n", argv[0]);
+	if (argc != 4) {
+		printf("USAGE: %s svnversion path output\n", argv[0]);
 		return -1;
 	}
 
-	input = argv[1];
-	output = argv[2];
-	revision = get_svn_revision(input);
+	svnversion = argv[1]; // svnversion.exe
+	input = argv[2];      // top of source tree
+	output = argv[3];     // output to
+	revision = get_svn_revision(svnversion, input);
 
 	if (!write_svn_revesion(output, revision)) {
 		return 1;
