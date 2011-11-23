@@ -1,4 +1,10 @@
-set HELP_COMPILER=C:\progra~1\htmlhe~1\hhc.exe
+
+if exist "%Programfiles(x86)%\HTML Help Workshop\hhc.exe" (
+	set HELP_COMPILER="%Programfiles(x86)%\HTML Help Workshop\hhc.exe"
+) else (
+	set HELP_COMPILER=C:\progra~1\htmlhe~1\hhc.exe
+)
+
 set updated=
 
 CALL convtext.bat
