@@ -114,7 +114,7 @@ In this section, VT function keys are assigned to PC keys.
 		F6=64
 
 4) [X function keys] section
-In this section, Xterm F1-F5 keys are assigned to PC keys.
+In this section, Xterm F1-F5 keys and BackTab key are assigned to PC keys.
 
 	Format:
 		<Xterm function key name>=<PC key code>
@@ -122,7 +122,7 @@ In this section, Xterm F1-F5 keys are assigned to PC keys.
 	where:
 
 	  <Xterm function key name>
-		XF1, XF2, XF3, XF4, XF5
+		XF1, XF2, XF3, XF4, XF5, XBackTab
 
 	  <PC key code>
 		PC key code (decimal number)
