@@ -468,5 +468,43 @@ LockTUID=off
 LockTUID=on
 </pre>
 
+
+<h1><a name="TabStopModify">タブストップ位置の変更を禁止する</a></h1>
+
+<p>
+制御シーケンスによるタブストップの位置の変更を禁止したい場合は、設定ファイルの [Tera Term] セクションの TabStopModifySequence 行を以下のようにしてください。
+</p>
+
+<pre>
+TabStopModifySequence=off
+</pre>
+
+<p>
+また、タブストップの位置を変更する制御シーケンスの内、特定のもののみを禁止する事も出来ます。以下のタブストップ変更シーケンスの内、<strong>許可する</strong>シーケンスの略号の組み合わせを指定します。
+</p>
+
+<table>
+<tr><th>略号</th> <th>シーケンス</th><th>説明</th></tr>
+<tr><td>HTS7</td> <td>ESC H</td>     <td>カーソル位置にタブストップを設定する (7ビット形式)</td></tr>
+<tr><td>HTS8</td> <td>0x88</td>      <td>カーソル位置にタブストップを設定する (8ビット形式)</td></tr>
+<tr><td>HTS</td>  <td> - </td>       <td>HTS7とHTS8の両方</td></tr>
+<tr><td>TBC0</td> <td>ESC [ 0 g</td> <td>カーソル位置のタブストップを削除する</td></tr>
+<tr><td>TBC3</td> <td>ESC [ 3 g</td> <td>すべてのタブストップを削除する</td></tr>
+<tr><td>TBC</td>  <td> - </td>       <td>TBC0とTBC3の両方</td></tr>
+</table>
+
+<p>
+例えば、8ビット形式のタブ設定シーケンス(HTC8)のみを禁止したい場合は、設定ファイルの [Tera Term] セクションの TabStopModifySequence 行を以下のようにしてください。
+</p>
+
+<pre>
+TabStopModifySequence=HTS7,TBC
+</pre>
+
+<pre>
+省略時:
+TabStopModifySequence=on
+</pre>
+
 </BODY>
 </HTML>
