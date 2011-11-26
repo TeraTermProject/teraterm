@@ -1,18 +1,11 @@
-#include "stdafx.h"
+#include <windows.h>
+#include <stdio.h>
 #include "svnrev.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-CWinApp theApp;
-
-using namespace std;
 
 int get_svn_revision(char *svnversion, char *path) {
 	FILE *fp;
 	char command[MAX_PATH*2];
-	char result[32];
+	char result[32]= "";
 	int revision = -1;
 
 	// subversion 1.7 から .svn\entries のフォーマットが変わったため、
@@ -23,38 +16,34 @@ int get_svn_revision(char *svnversion, char *path) {
 		return -1;
 	}
 
-	while(!feof(fp)){
-		fgets(result, sizeof(result), fp);
-		revision = atoi(result);
-		break;
-	}
+	fread(result, sizeof(result), sizeof(result)-1, fp);
+	revision = atoi(result);
 	_pclose(fp);
+
+	if (revision == 0) {
+		revision = -1;
+	}
 
 	return revision;
 }
 
 BOOL write_svn_revesion(char *filename, int revision) {
-	BOOL ret;
-	CStdioFile csf;
-	CString cs;
+	FILE *fp;
+	char buf[64] = "";
 	int file_revision = -1;
-	
+
 	// print to stdout
 	if (strcmp(filename, "-") == 0) {
-		CStdioFile csf (stdout);
-		cs.Format("#define SVNVERSION %d\n", revision);
-		csf.WriteString(cs);
+		fprintf(stdout, "#define SVNVERSION %d\n", revision);
 		return TRUE;
 	}
 
 	// read current file
-	ret = csf.Open(filename, CFile::modeRead);
-	if (ret == TRUE) {
-		csf.SeekToBegin();
-		csf.ReadString(cs);
-		csf.Close();
+	if (fopen_s(&fp, filename, "r") == 0) {
+		fread(buf, sizeof(char), sizeof(buf)-1, fp);
+		fclose(fp);
 
-		ret = sscanf_s(cs, "#define SVNVERSION %d", &file_revision);
+		sscanf_s(buf, "#define SVNVERSION %d", &file_revision);
 	}
 
 	// compare revisions
@@ -67,26 +56,23 @@ BOOL write_svn_revesion(char *filename, int revision) {
 		return TRUE;
 	}
 
-	ret = csf.Open(filename, CFile::modeWrite | CFile::modeCreate);
-	if (ret == FALSE) {
+	if (fopen_s(&fp, filename, "w+") != 0) {
 		return FALSE;
 	}
 
 	if (revision >= 1) {
-		cs.Format("#define SVNVERSION %d\n", revision);
-		csf.WriteString(cs);
+		fprintf(fp, "#define SVNVERSION %d\n", revision);
 	}
 	else {
-		cs.Format("#undef SVNVERSION\n");
-		csf.WriteString(cs);
+		fprintf(fp, "#undef SVNVERSION\n");
 	}
 
-	csf.Close();
+	fclose(fp);
 
 	return TRUE;
 }
 
-int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
+int main(int argc, char* argv[])
 {
 	int revision = -1;
 	char *svnversion, *input, *output;
