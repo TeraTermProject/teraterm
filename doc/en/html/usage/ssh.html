@@ -23,13 +23,19 @@
     </p>
 
     <p>
-      There are several ways of connection of SSH as follows      <ul>
-	<li>Password authentication</li>
-	<li>Key-pair (Public Key and Private key) authentication</li>
-	<li>rhosts authentication for SSH1</li>
-	<li>challenge/response (SSH1), keyboard-interactive (SSH2) authentication</li>
+      There are several ways of connection of SSH as follows
+      <ul>
+        <li>Password authentication</li>
+        <li>Public Key (and Private key pair) authentication
+          <!--ul>
+            <li>認証エージェント Pageant を利用する</li>
+          </ul-->
+        </li>
+        <li>rhosts authentication for SSH1</li>
+        <li>challenge/response (SSH1), keyboard-interactive (SSH2) authentication</li>
       </ul>
-      In this document, we will describe Password authentication and Key-pair authentication which would be most widely used.    </p>
+      In this document, we will describe Password authentication and Key-pair authentication which would be most widely used.
+    </p>
 
     <h2><a name="connproc">Procedure of connection</a></h2>
 
@@ -41,14 +47,22 @@
       When using SSH, you should change SSH version in a default parameter. Make sure that it is synchronized to the host to be connected.
     </p>
 
-    <p>
-      Once connected, then you will be prompted to select authentication method in a dialog.    </p>
-    <div class="img"><img src="../image/Authentication.png" alt="Authentication method"></div>
-    <p>
-      If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.<br>
-      When using Key-pair authentication, check [RSA/DSA key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
-      The passphrase can include the control character(0x01 - 0x1F).
+    <p id="ssh_auth_dialog">
+      Once connected, then you will be prompted to select authentication method in a dialog.
     </p>
+    <div class="img"><img src="../image/Authentication.png" alt="Authentication method"></div>
+    <!--p>
+      TTSSH は複数の認証方法をサポートしていますが、明示的に一つの認証方法を選択する必要があります。一つの認証方法に失敗した場合、続けて別の種類の認証を試みることはありません。<br>
+      たとえば OpenSSH クライアントではパスワード認証と keyboard-interactive 認証の見た目がそう変わらないためサーバの認証方式を意識せずにログインできますが、TTSSH はそうではありません。keyboard-interactive 認証と公開鍵認証をサポートしているサーバにパスワード認証でログインしようとしても必ず失敗します。
+    </p-->
+    <ul>
+      <li>If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.</li>
+      <li>When using public key authentication, check [RSA/DSA/ECDSA key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
+          Note: The passphrase can include the control character(0x01 - 0x1F).</li>
+      <!--li>keyboard-interactive認証を使用する場合は「Use challange/response to log in(keyboard-interactive)」にチェックをつけ、ユーザ名を入力します。<br>
+          サーバからのプロンプトと文字列を入力するダイアログが表示されるので、パスワードを入力します。</li-->
+      <!--li>Pageant を用いて認証する場合は「Use Pageant」にチェックをつけ、ユーザ名を入力します。</li-->
+    </ul>
 
     <h2><a name="securitywarning">Security Warning</a></h2>
 
@@ -85,7 +99,7 @@
     <h2><a name="generate">Generating Key</a></h2>
 
     <p>
-     Here, we will describe how to generate Public/Private key.  To generate key, select [Setup]
+     Here, we will describe how to generate Public/Private key pair.  To generate key, select [Setup]
 menu and choose [SSH KeyGenerator...].
     </p>
     <div class="img"><img src="../image/SelectKeyGenerator.png" alt="Choosing key generation"></div>

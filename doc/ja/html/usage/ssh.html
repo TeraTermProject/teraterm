@@ -24,12 +24,16 @@
     <p>
       また、SSH の接続方法には
       <ul>
-	<li>パスワード認証</li>
-	<li>公開鍵と秘密鍵（キー・ペア）による認証</li>
-	<li>SSH1 における rhosts 認証</li>
-	<li>challenge/response (SSH1), keyboard-interactive (SSH2) 認証</li>
+        <li>パスワード認証</li>
+        <li>公開鍵（と秘密鍵のペアによる）認証
+          <ul>
+            <li>認証エージェント Pageant を利用する</li>
+          </ul>
+        </li>
+        <li>SSH1 における rhosts 認証</li>
+        <li>challenge/response (SSH1), keyboard-interactive (SSH2) 認証</li>
       </ul>
-      がありますが、ここでは需要が多いと思われるパスワード認証とキー・ペア認証について触れたいと思います。
+      があります。ここでは需要が多いと思われる認証方法について触れたいと思います。
     </p>
 
     <h2><a name="connproc">接続の手順</a></h2>
@@ -42,15 +46,22 @@
       SSH で接続する場合、デフォルトから変更する箇所は「SSH version」です。接続先のサーバにあわせて選択してください。
     </p>
 
-    <p>
+    <p id="ssh_auth_dialog">
       接続すると、今度は認証方法を選択するダイアログが現れます。
     </p>
     <div class="img"><img src="../image/Authentication.png" alt="認証方法"></div>
     <p>
-      ここで、パスワード認証を使用する場合は「Use plain password to log in」にチェックがついていることを確認し、ユーザ名とパスワードを入力します。これらが正しければ無事ログインできます。<br>
-      キー・ペア認証を用いる場合は、上から2番目の「Use RSA/DSA key to log in」にチェックをつけ、「Private key file:」ボタンを押して秘密キーのファイルを指定します。その後ユーザ名と秘密キーのパスフレーズを入力してログインします。<br>
-      パスフレーズには制御文字(0x01 - 0x1F)を入力することができます。
+      TTSSH は複数の認証方法をサポートしていますが、明示的に一つの認証方法を選択する必要があります。一つの認証方法に失敗した場合、続けて別の種類の認証を試みることはありません。<br>
+      たとえば OpenSSH クライアントではパスワード認証と keyboard-interactive 認証の見た目がそう変わらないためサーバの認証方式を意識せずにログインできますが、TTSSH はそうではありません。keyboard-interactive 認証と公開鍵認証をサポートしているサーバにパスワード認証でログインしようとしても必ず失敗します。
     </p>
+    <ul>
+      <li>パスワード認証を使用する場合は「Use plain password to log in」にチェックがついていることを確認し、ユーザ名とパスワードを入力します。これらが正しければ無事ログインできます。</li>
+      <li>公開鍵認証を用いる場合は、上から2番目の「Use RSA/DSA/ECDSA key to log in」にチェックをつけ、「Private key file:」ボタンを押して秘密キーのファイルを指定します。その後ユーザ名と秘密キーのパスフレーズを入力してログインします。<br>
+          ※パスフレーズには制御文字(0x01 - 0x1F)を入力することができます。</li>
+      <li>keyboard-interactive認証を使用する場合は「Use challange/response to log in(keyboard-interactive)」にチェックをつけ、ユーザ名を入力します。<br>
+          サーバからのプロンプトと文字列を入力するダイアログが表示されるので、パスワードを入力します。</li>
+      <li>Pageant を用いて認証する場合は「Use Pageant」にチェックをつけ、ユーザ名を入力します。</li>
+    </ul>
 
     <h2><a name="securitywarning">セキュリティ警告</a></h2>
 
@@ -86,7 +97,7 @@
     <h2><a name="generate">キーの生成</a></h2>
 
     <p>
-      ここで、キー・ペア認証に用いる公開鍵・秘密鍵の生成方法を説明します。鍵ファイルを生成するには [Setup] メニューから「SSH KeyGenerator...」を選択します。
+      ここで、公開鍵認証に用いる公開鍵・秘密鍵ペアの生成方法を説明します。鍵ファイルを生成するには [Setup] メニューから「SSH KeyGenerator...」を選択します。
     </p>
     <div class="img"><img src="../image/SelectKeyGenerator.png" alt="キー生成を選択"></div>
     <p>
