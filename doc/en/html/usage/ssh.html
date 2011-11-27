@@ -51,10 +51,10 @@
       Once connected, then you will be prompted to select authentication method in a dialog.
     </p>
     <div class="img"><img src="../image/Authentication.png" alt="Authentication method"></div>
-    <!--p>
-      TTSSH は複数の認証方法をサポートしていますが、明示的に一つの認証方法を選択する必要があります。一つの認証方法に失敗した場合、続けて別の種類の認証を試みることはありません。<br>
-      たとえば OpenSSH クライアントではパスワード認証と keyboard-interactive 認証の見た目がそう変わらないためサーバの認証方式を意識せずにログインできますが、TTSSH はそうではありません。keyboard-interactive 認証と公開鍵認証をサポートしているサーバにパスワード認証でログインしようとしても必ず失敗します。
-    </p-->
+    <p>
+      The TTSSH can support some authentication methods and a user should select one of methods. When an authentication method is failed, the TTSSH does not retry to authenticate another method.<br>
+      For example, the OpenSSH client will be able to login to the server without regard to the difference the password and the keyboard-interactive authentication. However, the TTSSH can not login to the server with the keyboard-interactive and public key authentication by using the password authentication.
+    </p>
     <ul>
       <li>If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.</li>
       <li>When using public key authentication, check [RSA/DSA/ECDSA key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
