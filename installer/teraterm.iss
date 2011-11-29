@@ -147,6 +147,12 @@ Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm; ValueType: string; Va
 Root: HKCU; Subkey: Software\Classes\Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%L\"""""; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
 Root: HKCR; Subkey: Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
 Root: HKCR; Subkey: Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%L\"""""; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
+; Cygterm Here from folder Background
+; MinVersion 5.00.0000 = not Win9x, 6.0.6000 = Vista or later
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: "Cy&gterm Here"; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: "Cy&gterm Here"; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 ; Associate with .TTL
 Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
 Root: HKCU; Subkey: Software\Classes\TeraTerm.MacroFile; ValueType: string; ValueData: Tera Term Macro File; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
