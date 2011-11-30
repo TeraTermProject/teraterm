@@ -3,11 +3,11 @@
   Windows XP Professional
 - Compiler
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
-  Note: The executable program which was compiled by Visual Studio 2008 Standard Edition (or higher edition) does not work on Windows NT 4.0, 95, 98 and Me.
+    Note: The executable program which was compiled by Visual Studio 2008 Standard Edition (or higher edition) does not work on Windows NT 4.0, 95, 98 and Me.
+    Note2: The executable program which was compiled by Visual Studio 2010 Professional Edition (or higher edition) does not work on Windows 2000, NT 4.0, 95, 98 and Me.
   Windows Server 2003 R2 Platform SDK
-  Note: The OpenSSL 0.9.8i will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.
-  Note2: Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
-  Note3: The executable program which was compiled by Visual Studio 2010 Professional Edition (or higher edition) does not work on Windows 2000, NT 4.0, 95, 98 and Me.
+    Note: The OpenSSL 0.9.8i will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.
+    Note2: Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
 - Installer
   Inno Setup 5.4.2 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor (from ispack-5.4.2)
@@ -223,7 +223,8 @@ Example: adding a TTSSH menu under File menu
     CygTerm
       http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
     LogMeTT
-      http://www.logmett.com/forum/viewforum.php?f=5
+      http://logmett.com/freeware/LogMeTT.php
+      http://logmett.com/freeware/TTLEdit.php
 
   3. Increase the software version and modify date.
      Increment the version of VS_VERSION_INFO while release process.
