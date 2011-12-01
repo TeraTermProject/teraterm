@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.72-RC3"
+#define AppVer "4.72-RC4"
 ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
