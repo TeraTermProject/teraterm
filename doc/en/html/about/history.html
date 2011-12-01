@@ -1775,6 +1775,7 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>When the SSH version of the TTSSH does not match the server protocol version, a user can not connect.</li>
+      <li>The control characters(^A-^_) can be inputed as the password string on the key generator dialog.</li>
       <li>added the <a href="../usage/ssh.html#SSHFP">SSHFP RR</a> on the <a href="../usage/ssh.html#securitywarning">Security Warning</a> dialog.
         <ul>
           <li>added the "Verify hostkey fingerprint by DNS" checkbox on the "<a href="../menu/setup-ssh.html">TTSSH: Setup</a>" dialog box.</li>
@@ -1785,10 +1786,10 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>The control characters(^A-^_) can be inputed as the password string on the key generator dialog.</li>
       <li>When the server protocol is 1.99, Tera Term will connect with the SSH2 protocol by using the SSH1 specified protocol.</li>
-      <li>When the SSHFP verification is enabled and the SSHFP RR does not query, the application fault will occur.</li>
       <li>When the transfering display number is an integer other than zero, the X11 forwaring does not work well.</li>
+      <!--li>認証に失敗したときに表示される認証ダイアログのユーザ名に、最初に入力したユーザ名ではなくデフォルトのユーザ名が入力される問題を修正した。</li-->
+      <li>When the SSHFP verification is enabled and the SSHFP RR does not query, the application fault will occur.</li>
     </ul>
   </li>
 

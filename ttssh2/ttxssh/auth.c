@@ -267,7 +267,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
 	}
-	if (strlen(pvar->ssh2_username) > 0) {
+	else if (strlen(pvar->ssh2_username) > 0) {
 		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->ssh2_username);
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
