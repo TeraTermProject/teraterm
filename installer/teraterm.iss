@@ -699,6 +699,8 @@ begin
         begin;
           RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Folder\shell\cygterm');
           RegDeleteKeyIncludingSubkeys(HKEY_CLASSES_ROOT, 'Folder\shell\cygterm');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\Directory\Background\shell\cygterm');
+          RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\Classes\LibraryFolder\Background\shell\cygterm');
         end;
 
         if not IsTaskSelected('macroassoc') then
@@ -717,7 +719,7 @@ begin
           RegDeleteValue(HKEY_CLASSES_ROOT, 'telnet\shell', '');
         end;
 
-      SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+        SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
 
       end; // ssDone
    end; // case CurStep of
