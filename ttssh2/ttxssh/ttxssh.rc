@@ -158,7 +158,8 @@ BEGIN
     CONTROL         "Enable &agent forwarding",IDC_FORWARDAGENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,195,187,10
     CONTROL         "C&onfirm agent forwarding",IDC_FORWARDAGENTCONFIRM,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,209,187,10
-    CONTROL         "&Verify hostkey fingerprint by DNS",IDC_VERIFYHOSTKEYDNS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,223,187,10
+    CONTROL         "&Verify hostkey fingerprint by DNS",IDC_VERIFYHOSTKEYDNS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,223,187,10
     LTEXT           "All options take effect the next time a session is started.",IDC_NOTICEBANNER,17,237,187,12
     GROUPBOX        "K&EX order (SSH2 only)",IDC_KEX_ORDER,216,8,187,98
     LISTBOX         IDC_SSHKEX_LIST,230,20,159,60,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
@@ -552,8 +553,8 @@ IDI_SECURETT            ICON                    "ttsecure.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,58,0,0
- PRODUCTVERSION 2,58,0,0
+ FILEVERSION 2,59,0,0
+ PRODUCTVERSION 2,59,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -569,12 +570,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "TTXSSH"
-            VALUE "FileVersion", "2, 58, 0, 0"
+            VALUE "FileVersion", "2, 59, 0, 0"
             VALUE "InternalName", "TTXSSH"
             VALUE "LegalCopyright", "(C)2004-2011 TeraTerm Project, (C)1998-1999 Robert O'Callahan"
             VALUE "OriginalFilename", "TTXSSH.dll"
             VALUE "ProductName", "TTSSH"
-            VALUE "ProductVersion", "2, 58, 0, 0"
+            VALUE "ProductVersion", "2, 59, 0, 0"
         END
     END
     BLOCK "VarFileInfo"

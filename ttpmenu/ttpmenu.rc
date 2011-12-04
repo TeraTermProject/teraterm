@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -203,8 +203,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,10,0,0
- PRODUCTVERSION 1,10,0,0
+ FILEVERSION 1,11,0,0
+ PRODUCTVERSION 1,11,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -222,12 +222,12 @@ BEGIN
             VALUE "Comments", "Tera Term launch tool"
             VALUE "CompanyName", "TeraTerm Project, Shinpei Hayakawa"
             VALUE "FileDescription", "TeraTerm Menu"
-            VALUE "FileVersion", "1, 10, 0, 0"
+            VALUE "FileVersion", "1, 11, 0, 0"
             VALUE "InternalName", "ttpmenu"
             VALUE "LegalCopyright", "Copyright (C) 2004-2011 TeraTerm Project, 1997-2003 Shinpei Hayakawa"
             VALUE "OriginalFilename", "ttpmenu.exe"
             VALUE "ProductName", "TeraTerm Menu"
-            VALUE "ProductVersion", "1, 10, 0, 0"
+            VALUE "ProductVersion", "1, 11, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -236,7 +236,7 @@ BEGIN
     END
 END
 
-#endif    // English (U.S.) resources
+#endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
