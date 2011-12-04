@@ -1,6 +1,6 @@
 #define AppName "Tera Term"
 #define AppVer "4.72"
-;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [Setup]
 AppCopyright=TeraTerm Project
@@ -805,8 +805,8 @@ Name: {app}\libeay.txt; Type: files
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [InnoIDE_PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
