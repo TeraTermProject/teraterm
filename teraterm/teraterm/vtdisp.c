@@ -19,6 +19,41 @@
 
 #define CurWidth 2
 
+int DefaultColorTable[256][3] = {
+  {  0,  0,  0}, {255,  0,  0}, {  0,255,  0}, {255,255,  0}, {  0,  0,255}, {255,  0,255}, {  0,255,255}, {255,255,255},  //   0 -   7
+  {128,128,128}, {128,  0,  0}, {  0,128,  0}, {128,128,  0}, {  0,  0,128}, {128,  0,128}, {  0,128,128}, {192,192,192},  //   8 -  15
+  {  0,  0,  0}, {  0,  0, 95}, {  0,  0,135}, {  0,  0,175}, {  0,  0,215}, {  0,  0,255}, {  0, 95,  0}, {  0, 95, 95},  //  16 -  23
+  {  0, 95,135}, {  0, 95,175}, {  0, 95,215}, {  0, 95,255}, {  0,135,  0}, {  0,135, 95}, {  0,135,135}, {  0,135,175},  //  24 -  31
+  {  0,135,215}, {  0,135,255}, {  0,175,  0}, {  0,175, 95}, {  0,175,135}, {  0,175,175}, {  0,175,215}, {  0,175,255},  //  32 -  39
+  {  0,215,  0}, {  0,215, 95}, {  0,215,135}, {  0,215,175}, {  0,215,215}, {  0,215,255}, {  0,255,  0}, {  0,255, 95},  //  40 -  47
+  {  0,255,135}, {  0,255,175}, {  0,255,215}, {  0,255,255}, { 95,  0,  0}, { 95,  0, 95}, { 95,  0,135}, { 95,  0,175},  //  48 -  55
+  { 95,  0,215}, { 95,  0,255}, { 95, 95,  0}, { 95, 95, 95}, { 95, 95,135}, { 95, 95,175}, { 95, 95,215}, { 95, 95,255},  //  56 -  63
+  { 95,135,  0}, { 95,135, 95}, { 95,135,135}, { 95,135,175}, { 95,135,215}, { 95,135,255}, { 95,175,  0}, { 95,175, 95},  //  64 -  71
+  { 95,175,135}, { 95,175,175}, { 95,175,215}, { 95,175,255}, { 95,215,  0}, { 95,215, 95}, { 95,215,135}, { 95,215,175},  //  72 -  79
+  { 95,215,215}, { 95,215,255}, { 95,255,  0}, { 95,255, 95}, { 95,255,135}, { 95,255,175}, { 95,255,215}, { 95,255,255},  //  80 -  87
+  {135,  0,  0}, {135,  0, 95}, {135,  0,135}, {135,  0,175}, {135,  0,215}, {135,  0,255}, {135, 95,  0}, {135, 95, 95},  //  88 -  95
+  {135, 95,135}, {135, 95,175}, {135, 95,215}, {135, 95,255}, {135,135,  0}, {135,135, 95}, {135,135,135}, {135,135,175},  //  96 - 103
+  {135,135,215}, {135,135,255}, {135,175,  0}, {135,175, 95}, {135,175,135}, {135,175,175}, {135,175,215}, {135,175,255},  // 104 - 111
+  {135,215,  0}, {135,215, 95}, {135,215,135}, {135,215,175}, {135,215,215}, {135,215,255}, {135,255,  0}, {135,255, 95},  // 112 - 119
+  {135,255,135}, {135,255,175}, {135,255,215}, {135,255,255}, {175,  0,  0}, {175,  0, 95}, {175,  0,135}, {175,  0,175},  // 120 - 127
+  {175,  0,215}, {175,  0,255}, {175, 95,  0}, {175, 95, 95}, {175, 95,135}, {175, 95,175}, {175, 95,215}, {175, 95,255},  // 128 - 135
+  {175,135,  0}, {175,135, 95}, {175,135,135}, {175,135,175}, {175,135,215}, {175,135,255}, {175,175,  0}, {175,175, 95},  // 136 - 143
+  {175,175,135}, {175,175,175}, {175,175,215}, {175,175,255}, {175,215,  0}, {175,215, 95}, {175,215,135}, {175,215,175},  // 144 - 151
+  {175,215,215}, {175,215,255}, {175,255,  0}, {175,255, 95}, {175,255,135}, {175,255,175}, {175,255,215}, {175,255,255},  // 152 - 159
+  {215,  0,  0}, {215,  0, 95}, {215,  0,135}, {215,  0,175}, {215,  0,215}, {215,  0,255}, {215, 95,  0}, {215, 95, 95},  // 160 - 167
+  {215, 95,135}, {215, 95,175}, {215, 95,215}, {215, 95,255}, {215,135,  0}, {215,135, 95}, {215,135,135}, {215,135,175},  // 168 - 175
+  {215,135,215}, {215,135,255}, {215,175,  0}, {215,175, 95}, {215,175,135}, {215,175,175}, {215,175,215}, {215,175,255},  // 176 - 183
+  {215,215,  0}, {215,215, 95}, {215,215,135}, {215,215,175}, {215,215,215}, {215,215,255}, {215,255,  0}, {215,255, 95},  // 184 - 191
+  {215,255,135}, {215,255,175}, {215,255,215}, {215,255,255}, {255,  0,  0}, {255,  0, 95}, {255,  0,135}, {255,  0,175},  // 192 - 199
+  {255,  0,215}, {255,  0,255}, {255, 95,  0}, {255, 95, 95}, {255, 95,135}, {255, 95,175}, {255, 95,215}, {255, 95,255},  // 200 - 207
+  {255,135,  0}, {255,135, 95}, {255,135,135}, {255,135,175}, {255,135,215}, {255,135,255}, {255,175,  0}, {255,175, 95},  // 208 - 215
+  {255,175,135}, {255,175,175}, {255,175,215}, {255,175,255}, {255,215,  0}, {255,215, 95}, {255,215,135}, {255,215,175},  // 216 - 223
+  {255,215,215}, {255,215,255}, {255,255,  0}, {255,255, 95}, {255,255,135}, {255,255,175}, {255,255,215}, {255,255,255},  // 224 - 231
+  {  8,  8,  8}, { 18, 18, 18}, { 28, 28, 28}, { 38, 38, 38}, { 48, 48, 48}, { 58, 58, 58}, { 68, 68, 68}, { 78, 78, 78},  // 232 - 239
+  { 88, 88, 88}, { 98, 98, 98}, {108,108,108}, {118,118,118}, {128,128,128}, {138,138,138}, {148,148,148}, {158,158,158},  // 240 - 247
+  {168,168,168}, {178,178,178}, {188,188,188}, {198,198,198}, {208,208,208}, {218,218,218}, {228,228,228}, {238,238,238}   // 248 - 255
+};
+
 int WinWidth, WinHeight;
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
@@ -1664,266 +1699,17 @@ void DispApplyANSIColor() {
 
 void InitColorTable()
 {
+  int i;
 #ifndef NO_ANSI_COLOR_EXTENSION
   DispApplyANSIColor();
 #else /* NO_ANSI_COLOR_EXTENSION */
-  ANSIColor[IdBack ]     = RGB(  0,  0,  0);
-  ANSIColor[IdRed  ]     = RGB(255,  0,  0);
-  ANSIColor[IdGreen]     = RGB(  0,255,  0);
-  ANSIColor[IdYellow]    = RGB(255,255,  0);
-  ANSIColor[IdBlue]      = RGB(  0,  0,255);
-  ANSIColor[IdMagenta]   = RGB(255,  0,255);
-  ANSIColor[IdCyan]      = RGB(  0,255,255);
-  ANSIColor[IdFore ]     = RGB(255,255,255);
-  ANSIColor[IdBack+8]    = RGB(128,128,128);
-  ANSIColor[IdRed+8]     = RGB(128,  0,  0);
-  ANSIColor[IdGreen+8]   = RGB(  0,128,  0);
-  ANSIColor[IdYellow+8]	 = RGB(128,128,  0);
-  ANSIColor[IdBlue+8]    = RGB(  0,  0,128);
-  ANSIColor[IdMagenta+8] = RGB(128,  0,128);
-  ANSIColor[IdCyan+8]    = RGB(  0,128,128);
-  ANSIColor[IdFore+8]    = RGB(192,192,192);
+  for (i=0; i<=15; i++) {
+    ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
+  }
 #endif /* NO_ANSI_COLOR_EXTENSION */
-  ANSIColor[16] = RGB(0,0,0);
-  ANSIColor[17] = RGB(0,0,95);
-  ANSIColor[18] = RGB(0,0,135);
-  ANSIColor[19] = RGB(0,0,175);
-  ANSIColor[20] = RGB(0,0,215);
-  ANSIColor[21] = RGB(0,0,255);
-  ANSIColor[22] = RGB(0,95,0);
-  ANSIColor[23] = RGB(0,95,95);
-  ANSIColor[24] = RGB(0,95,135);
-  ANSIColor[25] = RGB(0,95,175);
-  ANSIColor[26] = RGB(0,95,215);
-  ANSIColor[27] = RGB(0,95,255);
-  ANSIColor[28] = RGB(0,135,0);
-  ANSIColor[29] = RGB(0,135,95);
-  ANSIColor[30] = RGB(0,135,135);
-  ANSIColor[31] = RGB(0,135,175);
-  ANSIColor[32] = RGB(0,135,215);
-  ANSIColor[33] = RGB(0,135,255);
-  ANSIColor[34] = RGB(0,175,0);
-  ANSIColor[35] = RGB(0,175,95);
-  ANSIColor[36] = RGB(0,175,135);
-  ANSIColor[37] = RGB(0,175,175);
-  ANSIColor[38] = RGB(0,175,215);
-  ANSIColor[39] = RGB(0,175,255);
-  ANSIColor[40] = RGB(0,215,0);
-  ANSIColor[41] = RGB(0,215,95);
-  ANSIColor[42] = RGB(0,215,135);
-  ANSIColor[43] = RGB(0,215,175);
-  ANSIColor[44] = RGB(0,215,215);
-  ANSIColor[45] = RGB(0,215,255);
-  ANSIColor[46] = RGB(0,255,0);
-  ANSIColor[47] = RGB(0,255,95);
-  ANSIColor[48] = RGB(0,255,135);
-  ANSIColor[49] = RGB(0,255,175);
-  ANSIColor[50] = RGB(0,255,215);
-  ANSIColor[51] = RGB(0,255,255);
-  ANSIColor[52] = RGB(95,0,0);
-  ANSIColor[53] = RGB(95,0,95);
-  ANSIColor[54] = RGB(95,0,135);
-  ANSIColor[55] = RGB(95,0,175);
-  ANSIColor[56] = RGB(95,0,215);
-  ANSIColor[57] = RGB(95,0,255);
-  ANSIColor[58] = RGB(95,95,0);
-  ANSIColor[59] = RGB(95,95,95);
-  ANSIColor[60] = RGB(95,95,135);
-  ANSIColor[61] = RGB(95,95,175);
-  ANSIColor[62] = RGB(95,95,215);
-  ANSIColor[63] = RGB(95,95,255);
-  ANSIColor[64] = RGB(95,135,0);
-  ANSIColor[65] = RGB(95,135,95);
-  ANSIColor[66] = RGB(95,135,135);
-  ANSIColor[67] = RGB(95,135,175);
-  ANSIColor[68] = RGB(95,135,215);
-  ANSIColor[69] = RGB(95,135,255);
-  ANSIColor[70] = RGB(95,175,0);
-  ANSIColor[71] = RGB(95,175,95);
-  ANSIColor[72] = RGB(95,175,135);
-  ANSIColor[73] = RGB(95,175,175);
-  ANSIColor[74] = RGB(95,175,215);
-  ANSIColor[75] = RGB(95,175,255);
-  ANSIColor[76] = RGB(95,215,0);
-  ANSIColor[77] = RGB(95,215,95);
-  ANSIColor[78] = RGB(95,215,135);
-  ANSIColor[79] = RGB(95,215,175);
-  ANSIColor[80] = RGB(95,215,215);
-  ANSIColor[81] = RGB(95,215,255);
-  ANSIColor[82] = RGB(95,255,0);
-  ANSIColor[83] = RGB(95,255,95);
-  ANSIColor[84] = RGB(95,255,135);
-  ANSIColor[85] = RGB(95,255,175);
-  ANSIColor[86] = RGB(95,255,215);
-  ANSIColor[87] = RGB(95,255,255);
-  ANSIColor[88] = RGB(135,0,0);
-  ANSIColor[89] = RGB(135,0,95);
-  ANSIColor[90] = RGB(135,0,135);
-  ANSIColor[91] = RGB(135,0,175);
-  ANSIColor[92] = RGB(135,0,215);
-  ANSIColor[93] = RGB(135,0,255);
-  ANSIColor[94] = RGB(135,95,0);
-  ANSIColor[95] = RGB(135,95,95);
-  ANSIColor[96] = RGB(135,95,135);
-  ANSIColor[97] = RGB(135,95,175);
-  ANSIColor[98] = RGB(135,95,215);
-  ANSIColor[99] = RGB(135,95,255);
-  ANSIColor[100] = RGB(135,135,0);
-  ANSIColor[101] = RGB(135,135,95);
-  ANSIColor[102] = RGB(135,135,135);
-  ANSIColor[103] = RGB(135,135,175);
-  ANSIColor[104] = RGB(135,135,215);
-  ANSIColor[105] = RGB(135,135,255);
-  ANSIColor[106] = RGB(135,175,0);
-  ANSIColor[107] = RGB(135,175,95);
-  ANSIColor[108] = RGB(135,175,135);
-  ANSIColor[109] = RGB(135,175,175);
-  ANSIColor[110] = RGB(135,175,215);
-  ANSIColor[111] = RGB(135,175,255);
-  ANSIColor[112] = RGB(135,215,0);
-  ANSIColor[113] = RGB(135,215,95);
-  ANSIColor[114] = RGB(135,215,135);
-  ANSIColor[115] = RGB(135,215,175);
-  ANSIColor[116] = RGB(135,215,215);
-  ANSIColor[117] = RGB(135,215,255);
-  ANSIColor[118] = RGB(135,255,0);
-  ANSIColor[119] = RGB(135,255,95);
-  ANSIColor[120] = RGB(135,255,135);
-  ANSIColor[121] = RGB(135,255,175);
-  ANSIColor[122] = RGB(135,255,215);
-  ANSIColor[123] = RGB(135,255,255);
-  ANSIColor[124] = RGB(175,0,0);
-  ANSIColor[125] = RGB(175,0,95);
-  ANSIColor[126] = RGB(175,0,135);
-  ANSIColor[127] = RGB(175,0,175);
-  ANSIColor[128] = RGB(175,0,215);
-  ANSIColor[129] = RGB(175,0,255);
-  ANSIColor[130] = RGB(175,95,0);
-  ANSIColor[131] = RGB(175,95,95);
-  ANSIColor[132] = RGB(175,95,135);
-  ANSIColor[133] = RGB(175,95,175);
-  ANSIColor[134] = RGB(175,95,215);
-  ANSIColor[135] = RGB(175,95,255);
-  ANSIColor[136] = RGB(175,135,0);
-  ANSIColor[137] = RGB(175,135,95);
-  ANSIColor[138] = RGB(175,135,135);
-  ANSIColor[139] = RGB(175,135,175);
-  ANSIColor[140] = RGB(175,135,215);
-  ANSIColor[141] = RGB(175,135,255);
-  ANSIColor[142] = RGB(175,175,0);
-  ANSIColor[143] = RGB(175,175,95);
-  ANSIColor[144] = RGB(175,175,135);
-  ANSIColor[145] = RGB(175,175,175);
-  ANSIColor[146] = RGB(175,175,215);
-  ANSIColor[147] = RGB(175,175,255);
-  ANSIColor[148] = RGB(175,215,0);
-  ANSIColor[149] = RGB(175,215,95);
-  ANSIColor[150] = RGB(175,215,135);
-  ANSIColor[151] = RGB(175,215,175);
-  ANSIColor[152] = RGB(175,215,215);
-  ANSIColor[153] = RGB(175,215,255);
-  ANSIColor[154] = RGB(175,255,0);
-  ANSIColor[155] = RGB(175,255,95);
-  ANSIColor[156] = RGB(175,255,135);
-  ANSIColor[157] = RGB(175,255,175);
-  ANSIColor[158] = RGB(175,255,215);
-  ANSIColor[159] = RGB(175,255,255);
-  ANSIColor[160] = RGB(215,0,0);
-  ANSIColor[161] = RGB(215,0,95);
-  ANSIColor[162] = RGB(215,0,135);
-  ANSIColor[163] = RGB(215,0,175);
-  ANSIColor[164] = RGB(215,0,215);
-  ANSIColor[165] = RGB(215,0,255);
-  ANSIColor[166] = RGB(215,95,0);
-  ANSIColor[167] = RGB(215,95,95);
-  ANSIColor[168] = RGB(215,95,135);
-  ANSIColor[169] = RGB(215,95,175);
-  ANSIColor[170] = RGB(215,95,215);
-  ANSIColor[171] = RGB(215,95,255);
-  ANSIColor[172] = RGB(215,135,0);
-  ANSIColor[173] = RGB(215,135,95);
-  ANSIColor[174] = RGB(215,135,135);
-  ANSIColor[175] = RGB(215,135,175);
-  ANSIColor[176] = RGB(215,135,215);
-  ANSIColor[177] = RGB(215,135,255);
-  ANSIColor[178] = RGB(215,175,0);
-  ANSIColor[179] = RGB(215,175,95);
-  ANSIColor[180] = RGB(215,175,135);
-  ANSIColor[181] = RGB(215,175,175);
-  ANSIColor[182] = RGB(215,175,215);
-  ANSIColor[183] = RGB(215,175,255);
-  ANSIColor[184] = RGB(215,215,0);
-  ANSIColor[185] = RGB(215,215,95);
-  ANSIColor[186] = RGB(215,215,135);
-  ANSIColor[187] = RGB(215,215,175);
-  ANSIColor[188] = RGB(215,215,215);
-  ANSIColor[189] = RGB(215,215,255);
-  ANSIColor[190] = RGB(215,255,0);
-  ANSIColor[191] = RGB(215,255,95);
-  ANSIColor[192] = RGB(215,255,135);
-  ANSIColor[193] = RGB(215,255,175);
-  ANSIColor[194] = RGB(215,255,215);
-  ANSIColor[195] = RGB(215,255,255);
-  ANSIColor[196] = RGB(255,0,0);
-  ANSIColor[197] = RGB(255,0,95);
-  ANSIColor[198] = RGB(255,0,135);
-  ANSIColor[199] = RGB(255,0,175);
-  ANSIColor[200] = RGB(255,0,215);
-  ANSIColor[201] = RGB(255,0,255);
-  ANSIColor[202] = RGB(255,95,0);
-  ANSIColor[203] = RGB(255,95,95);
-  ANSIColor[204] = RGB(255,95,135);
-  ANSIColor[205] = RGB(255,95,175);
-  ANSIColor[206] = RGB(255,95,215);
-  ANSIColor[207] = RGB(255,95,255);
-  ANSIColor[208] = RGB(255,135,0);
-  ANSIColor[209] = RGB(255,135,95);
-  ANSIColor[210] = RGB(255,135,135);
-  ANSIColor[211] = RGB(255,135,175);
-  ANSIColor[212] = RGB(255,135,215);
-  ANSIColor[213] = RGB(255,135,255);
-  ANSIColor[214] = RGB(255,175,0);
-  ANSIColor[215] = RGB(255,175,95);
-  ANSIColor[216] = RGB(255,175,135);
-  ANSIColor[217] = RGB(255,175,175);
-  ANSIColor[218] = RGB(255,175,215);
-  ANSIColor[219] = RGB(255,175,255);
-  ANSIColor[220] = RGB(255,215,0);
-  ANSIColor[221] = RGB(255,215,95);
-  ANSIColor[222] = RGB(255,215,135);
-  ANSIColor[223] = RGB(255,215,175);
-  ANSIColor[224] = RGB(255,215,215);
-  ANSIColor[225] = RGB(255,215,255);
-  ANSIColor[226] = RGB(255,255,0);
-  ANSIColor[227] = RGB(255,255,95);
-  ANSIColor[228] = RGB(255,255,135);
-  ANSIColor[229] = RGB(255,255,175);
-  ANSIColor[230] = RGB(255,255,215);
-  ANSIColor[231] = RGB(255,255,255);
-  ANSIColor[232] = RGB(8,8,8);
-  ANSIColor[233] = RGB(18,18,18);
-  ANSIColor[234] = RGB(28,28,28);
-  ANSIColor[235] = RGB(38,38,38);
-  ANSIColor[236] = RGB(48,48,48);
-  ANSIColor[237] = RGB(58,58,58);
-  ANSIColor[238] = RGB(68,68,68);
-  ANSIColor[239] = RGB(78,78,78);
-  ANSIColor[240] = RGB(88,88,88);
-  ANSIColor[241] = RGB(98,98,98);
-  ANSIColor[242] = RGB(108,108,108);
-  ANSIColor[243] = RGB(118,118,118);
-  ANSIColor[244] = RGB(128,128,128);
-  ANSIColor[245] = RGB(138,138,138);
-  ANSIColor[246] = RGB(148,148,148);
-  ANSIColor[247] = RGB(158,158,158);
-  ANSIColor[248] = RGB(168,168,168);
-  ANSIColor[249] = RGB(178,178,178);
-  ANSIColor[250] = RGB(188,188,188);
-  ANSIColor[251] = RGB(198,198,198);
-  ANSIColor[252] = RGB(208,208,208);
-  ANSIColor[253] = RGB(218,218,218);
-  ANSIColor[254] = RGB(228,228,228);
-  ANSIColor[255] = RGB(238,238,238);
+  for (i=16; i<=255; i++) {
+    ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
+  }
 
   if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
 #ifdef ALPHABLEND_TYPE2
@@ -3638,7 +3424,7 @@ int TCharAttrCmp(TCharAttr a, TCharAttr b)
   }
 }
 
-void DispSetColor(int num, COLORREF color)
+void DispSetColor(unsigned int num, COLORREF color)
 {
 	HDC TmpDC;
 
@@ -3647,6 +3433,33 @@ void DispSetColor(int num, COLORREF color)
 	ReleaseDC(NULL, TmpDC);
 
 	switch (num) {
+#ifdef ALPHABLEND_TYPE2
+	case CS_VT_NORMALFG:
+		BGVTColor[0] = color;
+		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
+			ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
+		}
+		break;
+	case CS_VT_NORMALBG:
+		BGVTColor[1] = color;
+		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
+			ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
+		}
+		if (ts.UseNormalBGColor) {
+			BGVTBoldColor[1] = BGVTColor[1];
+			BGVTBlinkColor[1] = BGVTColor[1];
+			BGURLColor[1] = BGVTColor[1];
+		}
+		break;
+	case CS_VT_BOLDFG:    BGVTBoldColor[0] = color; break;
+	case CS_VT_BOLDBG:    BGVTBoldColor[1] = color; break;
+	case CS_VT_BLINKFG:   BGVTBlinkColor[0] = color; break;
+	case CS_VT_BLINKBG:   BGVTBlinkColor[1] = color; break;
+	case CS_VT_REVERSEFG: BGVTReverseColor[0] = color; break;
+	case CS_VT_REVERSEBG: BGVTReverseColor[1] = color; break;
+	case CS_VT_URLFG:     BGURLColor[0] = color; break;
+	case CS_VT_URLBG:     BGURLColor[1] = color; break;
+#else
 	case CS_VT_NORMALFG:
 		ts.VTColor[0] = color;
 		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
@@ -3659,9 +3472,9 @@ void DispSetColor(int num, COLORREF color)
 			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
 		}
 		if (ts.UseNormalBGColor) {
-			ts.VTBoldColor[1] =color;
-			ts.VTBlinkColor[1] =color;
-			ts.URLColor[1] = color;
+			ts.VTBoldColor[1] = ts.VTColor[1];
+			ts.VTBlinkColor[1] = ts.VTColor[1];
+			ts.URLColor[1] = ts.VTColor[1];
 		}
 		break;
 	case CS_VT_BOLDFG:    ts.VTBoldColor[0] = color; break;
@@ -3672,10 +3485,11 @@ void DispSetColor(int num, COLORREF color)
 	case CS_VT_REVERSEBG: ts.VTReverseColor[1] = color; break;
 	case CS_VT_URLFG:     ts.URLColor[0] = color; break;
 	case CS_VT_URLBG:     ts.URLColor[1] = color; break;
+#endif
 	case CS_TEK_FG:       ts.TEKColor[0] = color; break;
 	case CS_TEK_BG:       ts.TEKColor[1] = color; break;
 	default:
-		if (num >= 0 && num <= 255) {
+		if (num <= 255) {
 			ANSIColor[num] = color;
 		}
 		else {
@@ -3684,11 +3498,6 @@ void DispSetColor(int num, COLORREF color)
 		break;
 	}
 
-#ifdef ALPHABLEND_TYPE2
-	if (num > 255) {
-		BGInitialize();
-	}
-#endif
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
 			InvalidateRect(HTEKWin, NULL, FALSE);
@@ -3698,7 +3507,109 @@ void DispSetColor(int num, COLORREF color)
 	}
 }
 
-COLORREF DispGetColor(int num)
+void DispResetColor(unsigned int num)
+{
+	HDC TmpDC;
+	
+	TmpDC = GetDC(NULL);
+	
+	switch(num) {
+#ifdef ALPHABLEND_TYPE2
+	case CS_VT_NORMALFG:
+		BGVTColor[0] = ts.VTColor[0];
+		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
+			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
+		}
+		break;
+		break;
+	case CS_VT_NORMALBG:
+		BGVTColor[1] = ts.VTColor[1];
+		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
+			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
+		}
+		if (ts.UseNormalBGColor) {
+			ts.VTBoldColor[1] = ts.VTColor[1];
+			ts.VTBlinkColor[1] = ts.VTColor[1];
+			ts.URLColor[1] = ts.VTColor[1];
+		}
+		break;
+		break;
+	case CS_VT_BOLDFG:    BGVTBoldColor[0] = ts.VTBoldColor[0]; break;
+	case CS_VT_BOLDBG:    BGVTBoldColor[1] = ts.VTBoldColor[1]; break;
+	case CS_VT_BLINKFG:   BGVTBlinkColor[0] = ts.VTBlinkColor[0]; break;
+	case CS_VT_BLINKBG:   BGVTBlinkColor[1] = ts.VTBlinkColor[1]; break;
+	case CS_VT_REVERSEFG: BGVTReverseColor[0] = ts.VTReverseColor[0]; break;
+	case CS_VT_REVERSEBG: BGVTReverseColor[1] = ts.VTReverseColor[1]; break;
+	case CS_VT_URLFG:     BGURLColor[0] = ts.URLColor[0]; break;
+	case CS_VT_URLBG:     BGURLColor[1] = ts.URLColor[1]; break;
+#endif
+	case CS_TEK_FG:
+		break;
+	case CS_TEK_BG:
+		break;
+	case CS_ALL:
+		InitColorTable();
+		DispSetNearestColors(0, 255, NULL);
+		break;
+	default:
+		if (num == IdBack) {
+			if (ts.ColorFlag & CF_USETEXTCOLOR) {
+#ifdef ALPHABLEND_TYPE2
+				ANSIColor[IdBack] = BGVTColor[1]; // use background color for "Black"
+#else
+				ANSIColor[IdBack] = ts.VTColor[1]; // use background color for "Black"
+#endif
+			}
+			else {
+#ifndef NO_ANSI_COLOR_EXTENSION
+				ANSIColor[IdBack] = ts.ANSIColor[IdBack];
+#else /* NO_ANSI_COLOR_EXTENSION */
+				ANSIColor[IdBack] = RGB(DefaultColorTable[IdBack][0], DefaultColorTable[IdBack][1], DefaultColorTable[IdBack][2]);
+#endif
+			}
+			DispSetNearestColors(num, num, NULL);
+		}
+		else if (num == IdFore) {
+			if (ts.ColorFlag & CF_USETEXTCOLOR) {
+#ifdef ALPHABLEND_TYPE2
+				ANSIColor[IdFore] = BGVTColor[0]; // use text color for "white"
+#else
+				ANSIColor[IdFore] = ts.VTColor[0]; // use text color for "white"
+#endif
+			}
+			else {
+#ifndef NO_ANSI_COLOR_EXTENSION
+				ANSIColor[IdFore] = ts.ANSIColor[IdFore];
+#else /* NO_ANSI_COLOR_EXTENSION */
+				ANSIColor[IdFore] = RGB(DefaultColorTable[IdFore][0], DefaultColorTable[IdFore][1], DefaultColorTable[IdFore][2]);
+#endif
+			}
+			DispSetNearestColors(num, num, NULL);
+		}
+  		else if (num <= 15) {
+#ifndef NO_ANSI_COLOR_EXTENSION
+			ANSIColor[num] = ts.ANSIColor[num];
+#else /* NO_ANSI_COLOR_EXTENSION */
+			ANSIColor[num] = RGB(DefaultColorTable[num][0], DefaultColorTable[num][1], DefaultColorTable[num][2]);
+#endif
+			DispSetNearestColors(num, num, NULL);
+		}
+		else if (num <= 255) {
+			ANSIColor[num] = RGB(DefaultColorTable[num][0], DefaultColorTable[num][1], DefaultColorTable[num][2]);
+			DispSetNearestColors(num, num, NULL);
+		}
+	}
+
+	if (num == CS_TEK_FG || num == CS_TEK_BG) {
+		if (HTEKWin)
+			InvalidateRect(HTEKWin, NULL, FALSE);
+	}
+	else {
+		InvalidateRect(HVTWin,NULL,FALSE);
+	}
+}
+
+COLORREF DispGetColor(unsigned int num)
 {
 	COLORREF color;
 
@@ -3716,7 +3627,7 @@ COLORREF DispGetColor(int num)
 	case CS_TEK_FG:       color = ts.TEKColor[0]; break;
 	case CS_TEK_BG:       color = ts.TEKColor[1]; break;
 	default:
-		if (num >= 0 && num <= 255) {
+		if (num <= 255) {
 			color = ANSIColor[num];
 		}
 		else {

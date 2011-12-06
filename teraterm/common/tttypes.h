@@ -90,8 +90,12 @@ typedef TCharAttr *PCharAttr;
 #define CS_VT_REVERSEBG    263
 #define CS_VT_URLFG        264
 #define CS_VT_URLBG        265
-#define CS_TEK_FG          266
-#define CS_TEK_BG          267
+#define CS_VT_UNDERFG      266
+#define CS_VT_UNDERBG      267
+#define CS_TEK_FG          268
+#define CS_TEK_BG          269
+#define CS_UNSPEC          0xffffffff
+#define CS_ALL             CS_UNSPEC
 
   /* Kermit function id */
 #define IdKmtReceive 1

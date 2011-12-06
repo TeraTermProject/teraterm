@@ -3395,52 +3395,103 @@ BOOL XsParseColor(char *colspec, COLORREF *color)
 void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 	COLORREF color;
 	char StrBuff[256];
+	unsigned int colornum = CS_UNSPEC;
 	int len;
 
 	switch (mode) {
+	case 4:
+		if (ColorNumber <= 255) {
+			colornum = ColorNumber;
+		}
+		break;
+	case 5:
+		switch (ColorNumber) {
+		case 0:
+			colornum = CS_VT_BOLDFG;
+			break;
+		case 1:
+			// Underline -- not supported.
+			// colornum = CS_VT_UNDERFG;
+			break;
+		case 2:
+			colornum = CS_VT_BLINKFG;
+			break;
+		case 3:
+			colornum = CS_VT_REVERSEBG;
+			break;
+		}
+		break;
 	case 10:
-		ColorNumber = CS_VT_NORMALFG;
+		colornum = CS_VT_NORMALFG;
 		break;
 	case 11:
-		ColorNumber = CS_VT_NORMALBG;
+		colornum = CS_VT_NORMALBG;
 		break;
 	case 15:
-		ColorNumber = CS_TEK_FG;
+		colornum = CS_TEK_FG;
 		break;
 	case 16:
-		ColorNumber = CS_TEK_BG;
+		colornum = CS_TEK_BG;
 		break;
 	}
 
-	switch (mode) {
-	case 4:
-		if ((ts.ColorFlag & CF_XTERM256) && ColorNumber <= 255) {
-			if (strcmp(ColorSpec, "?") == 0) {
-				color = DispGetColor(ColorNumber);
-				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-					"4;%d;rgb:%02x/%02x/%02x", CLocale, ColorNumber,
-					GetRValue(color), GetGValue(color), GetBValue(color));
-				SendOSCstr(StrBuff, len);
-			}
-			else if (XsParseColor(ColorSpec, &color)) {
-				DispSetColor(ColorNumber, color);
-			}
-		}
-		break;
-	case 10:
-	case 11:
-	case 15:
-	case 16:
+	if (colornum != CS_UNSPEC) {
 		if (strcmp(ColorSpec, "?") == 0) {
-			color = DispGetColor(ColorNumber);
-			len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-				"%d;rgb:%02x/%02x/%02x", CLocale, mode,
-				GetRValue(color), GetGValue(color), GetBValue(color));
+			color = DispGetColor(colornum);
+			if (mode == 4 || mode == 5) {
+				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
+					"%d;%d;rgb:%02x/%02x/%02x", CLocale, mode, ColorNumber,
+					GetRValue(color), GetGValue(color), GetBValue(color));
+			}
+			else {
+				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
+					"%d;rgb:%02x/%02x/%02x", CLocale, mode,
+					GetRValue(color), GetGValue(color), GetBValue(color));
+			}
 			SendOSCstr(StrBuff, len);
 		}
 		else if (XsParseColor(ColorSpec, &color)) {
-			DispSetColor(ColorNumber, color);
+			DispSetColor(colornum, color);
 		}
+	}
+}
+
+void XsResetColor(int mode, unsigned int color)
+{
+	switch (mode) {
+	case 104:
+		if (color < 256) {
+			DispResetColor(color);
+		}
+		break;
+	case 105:
+		switch (color) {
+		case 0:
+			DispResetColor(CS_VT_BOLDFG);
+			break;
+		case 1:
+			// Underline -- not supported.
+			// DispResetColor(CS_VT_UNDERFG);
+			break;
+		case 2:
+			DispResetColor(CS_VT_BLINKFG);
+			break;
+		case 3:
+			DispResetColor(CS_VT_REVERSEBG);
+			break;
+		}
+		break;
+	case 110:
+		DispResetColor(CS_VT_NORMALFG);
+		break;
+	case 111:
+		DispResetColor(CS_VT_NORMALBG);
+		break;
+	case 115:
+		DispResetColor(CS_TEK_FG);
+		break;
+	case 116:
+		DispResetColor(CS_TEK_FG);
 		break;
 	}
 }
@@ -3514,7 +3565,30 @@ void XSequence(BYTE b)
 
 	switch (XsParseMode) {
 	  case ModeXsFirst:
-		if (isdigit(b)) {
+		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+			switch (Param[1]) {
+			case 104:
+				DispResetColor(CS_ALL);
+				break;
+			case 110:
+			case 111:
+			case 115:
+			case 116:
+				XsResetColor(Param[1], 0);
+				break;
+			}
+			ParseMode = ModeFirst;
+			XsParseMode = ModeXsFirst;
+		}
+		else if (b == ESC) { /* Escape */
+			PrevMode = ModeXsFirst;
+			XsParseMode = ModeXsEsc;
+		}
+		else if (b <= US) { /* Other control character -- invalid sequence */
+			ParseMode = ModeFirst;
+			XsParseMode = ModeXsFirst;
+		}
+		else if (isdigit(b)) {
 			Param[1] = Param[1]*10 + b - '0';
 		}
 		else if (b == ';') {
@@ -3522,6 +3596,9 @@ void XSequence(BYTE b)
 			StrLen = 0;
 			switch (Param[1]) {
 			case 4:
+			case 5:
+			case 104:
+			case 105:
 				ColorNumber = 0;
 				XsParseMode = ModeXsColorNum;
 				break;
@@ -3546,6 +3623,12 @@ void XSequence(BYTE b)
 					OSCStrBuffSize = sizeof(ts.Title);
 				}
 				XsParseMode = ModeXsString;
+				break;
+			case 110:
+			case 111:
+			case 115:
+			case 116:
+				XsResetColor(Param[1], 0);
 				break;
 			default:
 				XsParseMode = ModeXsString;
@@ -3617,11 +3700,33 @@ void XSequence(BYTE b)
 		}
 		break;
 	  case ModeXsColorNum:
-		if (isdigit(b)) {
+		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+			if (Param[1] == 104 || Param[1] == 105) {
+				XsResetColor(Param[1], ColorNumber);
+			}
+			ColorNumber = 0;
+			ParseMode = ModeFirst;
+			XsParseMode = ModeXsFirst;
+		}
+		else if (b == ESC) { /* Escape */
+			PrevMode = ModeXsColorNum;
+			XsParseMode = ModeXsEsc;
+		}
+		else if (b <= US) { /* Other control character -- invalid sequence */
+			ParseMode = ModeFirst;
+			XsParseMode = ModeXsFirst;
+		}
+		else if (isdigit(b)) {
 			ColorNumber = ColorNumber*10 + b - '0';
 		}
 		else if (b == ';') {
-			XsParseMode = ModeXsColorSpec;
+			if (Param[1] == 104 || Param[1] == 105) {
+				XsResetColor(Param[1], ColorNumber);
+				ColorNumber = 0;
+			}
+			else {
+				XsParseMode = ModeXsColorSpec;
+			}
 		}
 		else {
 			XsParseMode = ModeXsIgnore;
@@ -3653,6 +3758,7 @@ void XSequence(BYTE b)
 
 			switch (Param[1]) {
 			case 4:
+			case 5:
 				XsParseMode = ModeXsColorNum;
 				break;
 			case 10:
