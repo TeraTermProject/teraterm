@@ -24,6 +24,7 @@
 #include "teraprn.h"
 #include "telnet.h"
 #include "ttime.h"
+#include "clipboar.h"
 
 #include "vtterm.h"
 
@@ -3447,7 +3448,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
-	char *p, *cbbuff;
+	char *p, *cbbuff, hdr[20];
 	HGLOBAL cbmem;
 
 	p = buff;
@@ -3458,7 +3459,10 @@ void XsProcClipboard(PCHAR buff)
 	if (*p++ == ';') {
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
-				; // not supported.
+				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
+				if (strncat_s(hdr, sizeof(hdr), buff, p - buff) == 0) {
+					CBStartPasteB64(HVTWin, hdr, "\033\\");
+				}
 			}
 		}
 		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access

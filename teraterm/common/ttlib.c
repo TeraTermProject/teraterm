@@ -16,7 +16,7 @@
 #include <mbctype.h>
 
 // for b64encode/b64decode
-// static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char b64dec_table[] = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -36,9 +36,59 @@ static char b64dec_table[] = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
-// void b64encode(PCHAR dst, int dsize, PCHAR src, int len)
-// {
-// }
+void b64encode(PCHAR d, int dsize, PCHAR s, int len)
+{
+	unsigned int b = 0;
+	int state = 0;
+	unsigned char *src, *dst;
+
+	src = (unsigned char *)s;
+	dst = (unsigned char *)d;
+
+	if (dsize == 0 || dst == NULL || src == NULL) {
+		return;
+	}
+	if (dsize < 5) {
+		*dst = 0;
+		return;
+	}
+
+	while (len > 0) {
+		b = (b << 8) | *src++;
+		len--;
+		state++;
+
+		if (state == 3) {
+			*dst++ = b64enc_table[(b>>18) & 0x3f];
+			*dst++ = b64enc_table[(b>>12) & 0x3f];
+			*dst++ = b64enc_table[(b>>6) & 0x3f];
+			*dst++ = b64enc_table[b & 0x3f];
+			dsize -= 4;
+			state = 0;
+			b = 0;
+			if (dsize < 5)
+				break;
+		}
+	}
+
+	if (dsize >= 5) {
+		if (state == 1) {
+			*dst++ = b64enc_table[(b>>2) & 0x3f];
+			*dst++ = b64enc_table[(b<<4) & 0x3f];
+			*dst++ = '=';
+			*dst++ = '=';
+		}
+		else if (state == 2) {
+			*dst++ = b64enc_table[(b>>10) & 0x3f];
+			*dst++ = b64enc_table[(b>>4) & 0x3f];
+			*dst++ = b64enc_table[(b<<2) & 0x3f];
+			*dst++ = '=';
+		}
+	}
+
+	*dst = 0;
+	return;
+}
 
 int b64decode(PCHAR dst, int dsize, PCHAR src)
 {

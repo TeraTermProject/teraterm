@@ -13,6 +13,7 @@
 
 #include "ttwinman.h"
 #include "ttcommon.h"
+#include "ttlib.h"
 
 #include "clipboar.h"
 #include "tt_res.h"
@@ -156,6 +157,70 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	}
 }
 
+void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
+{
+	HANDLE tmpHandle = NULL;
+	char *tmpPtr = NULL;
+	int len, hlen, flen, blen;
+
+	if (! cv.Ready) {
+		return;
+	}
+	if (TalkStatus!=IdTalkKeyb) {
+		return;
+	}
+
+	CBEchoOnly = FALSE;
+
+	CBMemHandle = NULL;
+	CBMemPtr = NULL;
+	CBMemPtr2 = 0;
+	CBDDE = TRUE;
+
+	if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(HWin)) {
+		if ((tmpHandle = GetClipboardData(CF_TEXT)) == NULL) {
+			CloseClipboard();
+		}
+	}
+	else if (IsClipboardFormatAvailable(CF_OEMTEXT) && OpenClipboard(HWin)) {
+		if ((tmpHandle = GetClipboardData(CF_OEMTEXT)) == NULL) {
+			CloseClipboard();
+		}
+	}
+
+	if (tmpHandle) {
+		if ((tmpPtr = GlobalLock(tmpHandle)) != NULL) {
+			hlen = strlen(header);
+			flen = strlen(footer);
+			len = strlen(tmpPtr);
+			blen = (len + 2) / 3 * 4 + hlen + flen + 1;
+			if ((CBMemHandle = GlobalAlloc(GHND, blen)) != NULL) {
+				if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+					if (hlen > 0) {
+						strncpy_s(CBMemPtr, blen, header, _TRUNCATE);
+					}
+					b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, len);
+					if (flen > 0) {
+						strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
+					}
+					TalkStatus=IdTalkCB;
+					GlobalUnlock(CBMemPtr);
+					CBMemPtr = NULL;
+				}
+			}
+			GlobalUnlock(tmpPtr);
+		}
+		CloseClipboard();
+	}
+
+	CBRetrySend = FALSE;
+	CBRetryEcho = FALSE;
+	CBSendCR = FALSE;
+	if (TalkStatus != IdTalkCB) {
+		CBEndPaste();
+	}
+}
+
 void CBStartEcho(PCHAR DataPtr, int DataSize)
 {
 	if (! cv.Ready) {
@@ -170,9 +235,8 @@ void CBStartEcho(PCHAR DataPtr, int DataSize)
 	CBRetryEcho = FALSE;
 	CBSendCR = FALSE;
 
-	CBDDE = FALSE;
+	CBDDE = TRUE;
 	if ((CBMemHandle = GlobalAlloc(GHND, DataSize)) != NULL) {
-		CBDDE = TRUE;
 		if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
 			memcpy(CBMemPtr, DataPtr, DataSize);
 			GlobalUnlock(CBMemHandle);
