@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "tttypes.h"
 #include <shlobj.h>
+#include <ctype.h>
 
 // for _ismbblead
 #include <mbctype.h>
@@ -41,49 +42,49 @@ static char b64dec_table[] = {
 
 int b64decode(PCHAR dst, int dsize, PCHAR src)
 {
-	unsigned int b;
+	unsigned int b = 0;
 	char c;
-	int len = 0;
+	int len = 0, state = 0;
 
-	if (src == NULL || dst == NULL || dsize == 0) {
+	if (src == NULL || dst == NULL || dsize == 0)
 		return 0;
-	}
 
 	while (1) {
-		if ((c = b64dec_table[*src++]) == -1) {
-			break;
-		}
-		b = c << 18;
-
-		if ((c = b64dec_table[*src++]) == -1) {
-			break;
-		}
-		b |= c << 12;
-
-		dst[len++] = (b >> 16) & 0xff;
-		if (len >= dsize) {
-			break;
+		if (isspace(*src)) {
+			src++;
+			continue;
 		}
 
-		if ((c = b64dec_table[*src++]) == -1) {
+		if ((c = b64dec_table[*src++]) == -1)
 			break;
-		}
-		b |= c << 6;
 
-		dst[len++] = (b >> 8) & 0xff;
-		if (len >= dsize) {
-			break;
-		}
+		b = (b << 6) | c;
+		state++;
 
-		if ((c = b64dec_table[*src++]) == -1) {
-			break;
+		if (state == 4) {
+			if (dsize > len)
+				dst[len++] = (b >> 16) & 0xff;
+			if (dsize > len)
+				dst[len++] = (b >> 8) & 0xff;
+			if (dsize > len)
+				dst[len++] = b & 0xff;
+			state = 0;
+			if (dsize <= len)
+				break;
 		}
-		b |= c;
+	}
 
-		dst[len++] = b & 0xff;
-		if (len >= dsize) {
-			break;
-		}
+	if (state == 2) {
+		b <<= 4;
+		if (dsize > len)
+			dst[len++] = (b >> 8) & 0xff;
+	}
+	else if (state == 3) {
+		b <<= 6;
+		if (dsize > len)
+			dst[len++] = (b >> 16) & 0xff;
+		if (dsize > len)
+			dst[len++] = (b >> 8) & 0xff;
 	}
 	return len;
 }
