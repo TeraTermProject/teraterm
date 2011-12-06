@@ -158,6 +158,17 @@ BOOL FTCreateFile(PFileVar fv)
 {
   int i;
   char Temp[MAX_PATH];
+  char *p;
+
+  for (p=&(fv->FullName[fv->DirLen]); *p; p++) {
+    if (strchr("\\/:*?\"<>|", *p)) {
+      *p = '_';
+    }
+  }
+
+  if (fv->FullName[fv->DirLen] == 0) {
+    strncpy_s(&(fv->FullName[fv->DirLen]), sizeof(fv->FullName) - fv->DirLen, "noname", _TRUNCATE);
+  }
 
   FitFileName(&(fv->FullName[fv->DirLen]),sizeof(fv->FullName) - fv->DirLen,NULL);
   if (! fv->OverWrite)
