@@ -9,6 +9,10 @@
   メニューやダイアログの日本語を有効にするには、TERATERM.INI の
   UILanguageFile を lang\Japanese.lng に変更してください。
 
+; User interface language file that includes message strings.
+; Tera Term uses English message when the filename is not specified.
+UILanguageFile=lang\Japanese.lng
+
 - Windows 7 のジャンプリストが有効になっているとレジストリに情報が記録
   されます。この動作が望ましくない場合は TERATERM.INI の JumpList を
   off に変更してジャンプリストを無効にしてください。
