@@ -9,7 +9,10 @@ About Tera Term archive
 ; Tera Term uses English message when the filename is not specified.
 UILanguageFile=lang\Japanese.lng
 
-- When the Windows 7 jump list is enabled, the registry will be recorded on each starting. If this behavior is disabled, please change the JumpList entry to off in the teraterm.ini file.
+- When the Windows 7 jump list is enabled, a file(%AppData%\Microsoft\
+  Windows\Recent\CustomDestinations) will be recorded on each starting. 
+  If this behavior is disabled, please change the JumpList entry to off 
+  in the teraterm.ini file.
 
 - Many plugins are included. Please remove the plugin unless necessary.
 

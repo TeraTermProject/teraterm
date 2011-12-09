@@ -13,8 +13,9 @@
 ; Tera Term uses English message when the filename is not specified.
 UILanguageFile=lang\Japanese.lng
 
-- Windows 7 のジャンプリストが有効になっているとレジストリに情報が記録
-  されます。この動作が望ましくない場合は TERATERM.INI の JumpList を
+- Windows 7 のジャンプリストが有効になっているとファイル(%AppData%\
+  Microsoft\Windows\Recent\CustomDestinations)に情報が記録されます。
+  この動作が望ましくない場合は TERATERM.INI の JumpList を
   off に変更してジャンプリストを無効にしてください。
 
 - インストーラの標準インストールでは含まれない多くの追加プラグインが
