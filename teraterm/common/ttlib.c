@@ -15,6 +15,9 @@
 // for _ismbblead
 #include <mbctype.h>
 
+// for isInvalidFileNameChar / replaceInvalidFileNameChar
+static char *invalidFileNameChars = "\\/:*?\"<>|";
+
 // for b64encode/b64decode
 static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char b64dec_table[] = {
@@ -442,26 +445,22 @@ int isInvalidFileNameChar(PCHAR FName)
 			i++;
 			continue;
 		}
-		switch (FName[i]) {
-			case '\\':
-			case '/':
-			case ':':
-			case '*':
-			case '?':
-			case '"':
-			case '<':
-			case '>':
-			case '|':
-				return 1;
+		if ((FName[i] >= 0 && FName[i] < ' ') || strchr(invalidFileNameChars, FName[i])) {
+			return 1;
 		}
 	}
 	return 0;
 }
 
-// ファイル名に使用できない文字を削除する (2006.8.28 maya)
-void deleteInvalidFileNameChar(PCHAR FName)
+// ファイル名に使用できない文字を c に置き換える
+// c に 0 を指定した場合は文字を削除する
+void replaceInvalidFileNameChar(PCHAR FName, unsigned char c)
 {
 	int i, j=0, len;
+
+	if ((c >= 0 && c < ' ') || strchr(invalidFileNameChars, c)) {
+		c = 0;
+	}
 
 	len = strlen(FName);
 	for (i=0; i<len; i++) {
@@ -470,20 +469,13 @@ void deleteInvalidFileNameChar(PCHAR FName)
 			FName[j++] = FName[++i];
 			continue;
 		}
-		switch (FName[i]) {
-			case '\\':
-			case '/':
-			case ':':
-			case '*':
-			case '?':
-			case '"':
-			case '<':
-			case '>':
-			case '|':
-				break;
-			default:
-				FName[j] = FName[i];
-				j++;
+		if ((FName[i] >= 0 && FName[i] < ' ') || strchr(invalidFileNameChars, FName[i])) {
+			if (c) {
+				FName[j++] = c;
+			}
+		}
+		else {
+			FName[j++] = FName[i];
 		}
 	}
 	FName[j] = 0;

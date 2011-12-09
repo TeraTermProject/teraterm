@@ -25,7 +25,8 @@ void uint2str(UINT i, PCHAR Str, int destlen, int len);
 void QuoteFName(PCHAR FName);
 #endif
 int isInvalidFileNameChar(PCHAR FName);
-void deleteInvalidFileNameChar(PCHAR FName);
+#define deleteInvalidFileNameChar(name) replaceInvalidFileNameChar(name, 0)
+void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 int isInvalidStrftimeChar(PCHAR FName);
 void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
