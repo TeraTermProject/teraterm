@@ -1437,7 +1437,11 @@ WORD TTLFileRename()
 		SetResult(-2);
 		return Err;
 	}
-	rename(FName1,FName2);
+	if (rename(FName1,FName2) != 0) {
+		// リネームに失敗したら、エラーで返す。
+		SetResult(-3);
+		return Err;
+	}
 
 	SetResult(0);
 	return Err;
