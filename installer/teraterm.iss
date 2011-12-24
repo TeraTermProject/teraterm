@@ -2,6 +2,30 @@
 #define AppVer "4.72"
 #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
+[InnoIDE_PreCompile]
+Name: makechm.bat
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
+
+[InnoIDE_PostCompile]
+;Name: makearchive.bat; Parameters: release
+
+[PreCompile]
+Name: makechm.bat
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
+
+[PostCompile]
+;Name: makearchive.bat; Parameters: release
+
+[_ISToolPreCompile]
+Name: makechm.bat
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
+
+[_ISToolPostCompile]
+Name: makearchive.bat; Parameters: release
+
 [Setup]
 AppCopyright=TeraTerm Project
 AppName={#AppName}
@@ -149,9 +173,9 @@ Root: HKCR; Subkey: Folder\shell\cygterm; ValueType: string; ValueData: Cy&gterm
 Root: HKCR; Subkey: Folder\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%L\"""""; Flags: uninsdeletekey; Check: not isWin2kOrLater; Components: cygterm; Tasks: cygtermhere
 ; Cygterm Here from folder Background
 ; MinVersion 5.00.0000 = not Win9x, 6.0.6000 = Vista or later
-Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: "Cy&gterm Here"; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
+Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 Root: HKCU; Subkey: Software\Classes\Directory\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
-Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: "Cy&gterm Here"; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
+Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm; ValueType: string; ValueData: Cy&gterm Here; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 Root: HKCU; Subkey: Software\Classes\LibraryFolder\Background\shell\cygterm\command; ValueType: string; ValueData: """{app}\cyglaunch.exe"" -nocd -nols -d ""\""%V\"""""; Flags: uninsdeletekey; Components: cygterm; Tasks: cygtermhere; MinVersion: 5.00.0000,6.0.6000
 ; Associate with .TTL
 Root: HKCU; Subkey: Software\Classes\.ttl; ValueType: string; ValueData: TeraTerm.MacroFile; Flags: uninsdeletekey; Check: isWin2kOrLater; Components: TeraTerm; Tasks: macroassoc
@@ -413,7 +437,7 @@ begin
   FileDesc[4] := 'CygTerm+';
   FileDesc[5] := 'Collector';
   FileDesc[6] := 'Collector';
-  
+
   for i := 0 to 6 do
   begin
     case CheckFileUsing(FileName[i]) of
@@ -802,11 +826,3 @@ Name: {app}\ttermpj.hlp; Type: files
 Name: {app}\copyfont.bat; Type: files
 Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
-
-[InnoIDE_PreCompile]
-Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
-
-[InnoIDE_PostCompile]
-;Name: makearchive.bat; Parameters: release
