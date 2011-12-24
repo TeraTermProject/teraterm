@@ -9,9 +9,9 @@
     注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
     注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
 - インストーラ
-  Inno Setup 5.4.2 ANSI (http://www.jrsoftware.org/isinfo.php)
-  Inno Setup Preprocessor (ispack-5.4.2 より)
-  InnoIDE 1.0.0 (ispack-5.4.2 より)
+  Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor (ispack-5.4.3 より)
+  InnoIDE 1.0.0 (ispack-5.4.3 より)
 - その他
   Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
   ActivePerl 5.8 以上
