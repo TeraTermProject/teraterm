@@ -484,7 +484,11 @@ BOOL LogStart()
 
 	if (ts.Append > 0)
 	{
-		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, FILE_SHARE_READ, NULL,
+		int dwShareMode = 0;
+		if (ts.LogLockExclusive) {
+			dwShareMode = FILE_SHARE_READ;
+		}
+		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 		                                     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (LogVar->FileHandle>0){
 			_llseek(LogVar->FileHandle,0,2);
@@ -496,7 +500,11 @@ BOOL LogStart()
 		}
 	}
 	else {
-		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, FILE_SHARE_READ, NULL,
+		int dwShareMode = 0;
+		if (ts.LogLockExclusive) {
+			dwShareMode = FILE_SHARE_READ;
+		}
+		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 		                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	LogVar->FileOpen = (LogVar->FileHandle>0);

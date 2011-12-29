@@ -1461,6 +1461,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        ts->ClickableUrlBrowser, sizeof(ts->ClickableUrlBrowser), FName);
 	GetPrivateProfileString(Section, "ClickableUrlBrowserArg", "",
 	                        ts->ClickableUrlBrowserArg, sizeof(ts->ClickableUrlBrowserArg), FName);
+
+	// Exclusive Lock when open the log file
+	ts->LogLockExclusive = GetOnOff(Section, "LogLockExclusive", FName, TRUE);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2561,6 +2564,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// ClickableUrlBrowser
 	WritePrivateProfileString(Section, "ClickableUrlBrowser", ts->ClickableUrlBrowser, FName);
 	WritePrivateProfileString(Section, "ClickableUrlBrowserArg", ts->ClickableUrlBrowserArg, FName);
+
+	// Exclusive Lock when open the log file
+	WriteOnOff(Section, "LogLockExclusive", FName, ts->LogLockExclusive);
 }
 
 #define VTEditor "VT editor keypad"

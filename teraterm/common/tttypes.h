@@ -546,6 +546,7 @@ struct tttset {
 	DWORD CtrlFlag;
 	char ClickableUrlBrowser[MAX_PATH];
 	char ClickableUrlBrowserArg[MAX_PATH];
+	WORD LogLockExclusive;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -991,6 +992,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.73, ttset_memfilemap was replaced with ttset_memfilemap_18.
+ *   added tttset.LogLockExclusive
+ *
  * - At version 4.72, ttset_memfilemap was replaced with ttset_memfilemap_17.
  *   added tttset.TabStopFlag.
  *   added tttset.CtrlFlag.
@@ -1097,4 +1101,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_17"
+#define TT_FILEMAPNAME "ttset_memfilemap_18"

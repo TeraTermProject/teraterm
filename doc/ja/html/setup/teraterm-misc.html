@@ -271,5 +271,22 @@ ClickableUrlBrowserArg=
 </pre>
 
 
+<h1><a name="LogLockExclusive">ログファイルを排他ロックする</a></h1>
+
+<p>
+Tera Term はログファイルを書き込むために開くとき排他ロックをかけます。これは複数のプロセスから同じログファイルに書き込みをしないためで、同時に同じファイルを開こうとすると失敗します。<br />
+何らかの理由で同じログファイルに同時に書き込みたい場合や、書き込み中のログファイルを別のエディタで開く妨げになる場合のために、排他ロックをせずにログファイルを開くことができます。
+</p>
+
+<pre>
+LogLockExclusive=off
+</pre>
+
+<pre>
+省略時:
+LogLockExclusive=on
+</pre>
+
+
 </BODY>
 </HTML>
