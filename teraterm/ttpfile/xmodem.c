@@ -499,11 +499,15 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 	}
 
 	if (xv->PktBufCount == 0) {
-		SetDlgNum(fv->HWin, IDC_PROTOPKTNUM,
-				  xv->PktNumOffset + xv->PktNumSent);
+		if (xv->PktNumSent == 0) {
+			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, xv->PktNumOffset + 256);
+		}
+		else {
+			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, xv->PktNumOffset + xv->PktNumSent);
+		}
 		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-					  fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		              fv->ByteCount, fv->FileSize, &fv->ProgStat);
 		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 	}
 

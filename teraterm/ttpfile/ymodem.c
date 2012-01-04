@@ -822,11 +822,15 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 	if (yv->PktBufCount==0)
 	{
-		SetDlgNum(fv->HWin, IDC_PROTOPKTNUM,
-			yv->PktNumOffset+yv->PktNumSent);
+		if (yv->PktNumSent == 0) {
+			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, yv->PktNumOffset + 256);
+		}
+		else {
+			SetDlgNum(fv->HWin, IDC_PROTOPKTNUM, yv->PktNumOffset + yv->PktNumSent);
+		}
 		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 		SetDlgPercent(fv->HWin, IDC_PROTOPERCENT, IDC_PROTOPROGRESS,
-			fv->ByteCount, fv->FileSize, &fv->ProgStat);
+		              fv->ByteCount, fv->FileSize, &fv->ProgStat);
 		SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
 	}
 
