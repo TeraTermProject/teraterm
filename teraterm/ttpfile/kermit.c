@@ -6,6 +6,8 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
+#include <stdio.h>
+#include <time.h>
 #include <string.h>
 
 #include "tt_res.h"
@@ -29,6 +31,51 @@
 #define MyQBIN  'Y'
 #define DefCHKT 1
 #define MyREPT  '~'
+
+
+static void KmtReadLog(PFileVar fv, BYTE *buf, int len)
+{
+	int j;
+
+	if (fv->LogFlag && (len>0))
+	{
+		if (fv->LogState == 0)
+		{
+			// 残りのASCII表示を行う
+			fv->FlushLogLineBuf = 1;
+			FTLog1Byte(fv,0);
+			fv->FlushLogLineBuf = 0;
+
+			fv->LogState = 1;
+			fv->LogCount = 0;
+			_lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+		}
+		for (j=0 ; j <= len-1 ; j++)
+			FTLog1Byte(fv, buf[j]);
+	}
+}
+
+static void KmtWriteLog(PFileVar fv, BYTE *buf, int len)
+{
+	int j;
+
+	if (fv->LogFlag && (len>0))
+	{
+		if (fv->LogState != 0)
+		{
+			// 残りのASCII表示を行う
+			fv->FlushLogLineBuf = 1;
+			FTLog1Byte(fv,0);
+			fv->FlushLogLineBuf = 0;
+
+			fv->LogState = 0;
+			fv->LogCount = 0;
+			_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+		}
+		for (j=0 ; j <= len-1 ; j++)
+			FTLog1Byte(fv, buf[j]);
+	}
+}
 
 BYTE KmtNum(BYTE b)
 {
@@ -68,9 +115,13 @@ void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 
   if (fv->LogFlag)
   {
+#if 0
     _lwrite(fv->LogFile,"> ",2);
     _lwrite(fv->LogFile,&(kv->PktOut[1]),C-1);
     _lwrite(fv->LogFile,"\015\012",2);
+#else
+	KmtWriteLog(fv,&(kv->PktOut[1]),C-1);
+#endif
   }
 
   /* end-of-line character */
@@ -652,8 +703,22 @@ void KmtInit
   kv->PktNum = 0;
 
   fv->LogFlag = ((ts->LogFlag & LOG_KMT)!=0);
-  if (fv->LogFlag)
+  if (fv->LogFlag) {
+	char buf[128];
+	time_t tm = time(NULL);
+
     fv->LogFile = _lcreat("KERMIT.LOG",0);
+    fv->LogCount = 0;
+    fv->LogState = 0;
+    fv->FlushLogLineBuf = 0;
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "KERMIT %s start: %s\n", 
+		kv->KmtMode == IdKmtSend ? "Send" : 
+		kv->KmtMode == IdKmtReceive ? "Receive" :
+		kv->KmtMode == IdKmtGet ? "Get" : "Finish",
+		ctime(&tm) 
+		);
+	_lwrite(fv->LogFile, buf, strlen(buf));
+  }
 
   switch (kv->KmtMode) {
     case IdKmtSend:
@@ -755,9 +820,13 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 
   if (fv->LogFlag)
   {
+#if 0
     _lwrite(fv->LogFile,"< ",2);
     _lwrite(fv->LogFile,&(kv->PktIn[1]),kv->PktInLen+1);
     _lwrite(fv->LogFile,"\015\012",2);
+#else
+    KmtReadLog(fv,&(kv->PktIn[1]),kv->PktInLen+1);
+#endif
   }
 
   PktNumNew = KmtCalcPktNum(kv,kv->PktIn[2]);
