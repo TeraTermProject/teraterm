@@ -20,7 +20,7 @@
 
 * Libraries
 - Oniguruma 5.9.2 (http://www.geocities.jp/kosako3/oniguruma/)
-- OpenSSL 1.0.0f (http://www.openssl.org/)
+- OpenSSL 1.0.0g (http://www.openssl.org/)
 - zlib 1.2.5 (http://www.zlib.net/)
 - PuTTY 0.62 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
@@ -100,7 +100,7 @@ Example: adding a TTSSH menu under File menu
 
   3. OpenSSL (used by TTSSH and TTProxy)
      (1) Extract openssl source into libs/openssl directory.
-     (2) Delete the libs/openssl/Makefile.bak file manually on the OpenSSL 1.0.0e or later.
+     (2) When the libs/openssl/Makefile.bak file exists on the OpenSSL 1.0.0e or later, delete the file only once
      (3) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
      (4) Move 'libs' directory on the command prompt. And run buildopenssl.bat.
 

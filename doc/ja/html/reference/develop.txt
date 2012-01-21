@@ -22,7 +22,7 @@
 
 ■ ライブラリ
 - Oniguruma 5.9.2 (http://www.geocities.jp/kosako3/oniguruma/)
-- OpenSSL 1.0.0f (http://www.openssl.org/)
+- OpenSSL 1.0.0g (http://www.openssl.org/)
 - zlib 1.2.5 (http://www.zlib.net/)
 - PuTTY 0.62 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
@@ -106,7 +106,7 @@
 
   3. OpenSSL (used by TTSSH and TTProxy)
      (1) openssl のソースを libs/openssl の中に展開する。
-     (2) OpenSSL 1.0.0e 以降では、手動で libs/openssl/Makefile.bak を削除してください。
+     (2) OpenSSL 1.0.0e 以降で、libs/openssl/Makefile.bak が最初から存在する場合は、一度だけ手動で削除してください。
      (3) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
      (4) コマンドプロンプト上から libs ディレクトリに移動し、buildopenssl.bat を実行する。
 
