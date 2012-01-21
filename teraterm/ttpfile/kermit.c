@@ -38,9 +38,14 @@ All rights reserved.
 #define MyREPT  '~'
 
 
-static void KmtOutputCommonLog(PFileVar fv, BYTE *buf, int len)
+BYTE KmtNum(BYTE b);
+
+
+static void KmtOutputCommonLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 {
-	int i;
+	int i, datalen;
+	char str[128];
+	char type, *s;
 
 	for (i = 0 ; i < len ; i++)
 		FTLog1Byte(fv, buf[i]);
@@ -49,23 +54,102 @@ static void KmtOutputCommonLog(PFileVar fv, BYTE *buf, int len)
 	fv->FlushLogLineBuf = 1;
 	FTLog1Byte(fv, 0);
 	fv->FlushLogLineBuf = 0;
+
+	/* パケットを人間に分かりやすく表示する。
+	Packet Format
+	+------+-------------+-------------+------+------------+-------+
+	| MARK | tochar(LEN) | tochar(SEQ) | TYPE | DATA       | CHECK |
+	+------+-------------+-------------+------+------------+-------+
+     */
+	if (len >= 4) {
+		type = buf[3];
+		switch (type) {
+			case 'D': s = "Data"; break;
+			case 'Y': s = "ACK"; break;
+			case 'N': s = "NAK"; break;
+			case 'S': s = "SendInitiate"; break;
+			case 'B': s = "EOT"; break;
+			case 'F': s = "FileHeader"; break;
+			case 'Z': s = "EOF"; break;
+			case 'E': s = "Error"; break;
+			case 'Q': s = "BlockCheckErrorPsuedoPacket"; break;
+			case 'T': s = "TimeoutPsuedoPacket"; break;
+			case 'I': s = "Initialize"; break;
+			case 'X': s = "Text Header"; break;
+			case 'A': s = "FileAttributes"; break;
+			case 'C': s = "HostCommand"; break;
+			case 'K': s = "KermitCommand"; break;
+			case 'G': s = "GenericKermitCommand"; break;
+			default: s = "UNKNOWN"; break;
+		}
+		datalen = KmtNum(buf[1]) - 2 - kv->KmtMy.CHKT;
+
+		_snprintf_s(str, sizeof(str), _TRUNCATE, "MARK=%x LEN=%d SEQ#=%d TYPE=%s DATA_LEN=%d\n",
+			buf[0], KmtNum(buf[1]), KmtNum(buf[2]), s, datalen);
+		_lwrite(fv->LogFile, str, strlen(str));
+
+		// Initial Connection
+		if (type == 'S' && datalen >= 6) {
+			char *p = &buf[4];
+			char t[32];
+
+			_snprintf_s(str, sizeof(str), _TRUNCATE, 
+				"  Data: MAXL=%d TIME=%d NPAD=%d PADC=%x EOL=%x QCTL=%c ",
+				KmtNum(p[0]), KmtNum(p[1]), KmtNum(p[2]), p[3]^0x40, p[4], p[5]
+				);
+
+			// QBIN 以降はオプション扱い。
+			if (datalen >= 7) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "QBIN=%c ", p[6]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+			if (datalen >= 8) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "CHKT=%c ", p[7]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+			if (datalen >= 9) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "REPT=%c ", p[8]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+			if (datalen >= 10) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "CAPAS=%x ", p[9]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+			if (datalen >= 11) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "WINDO=%x ", p[10]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+			if (datalen >= 12) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "MAXLX1=%x ", p[11]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+			if (datalen >= 13) {
+				_snprintf_s(t, sizeof(t), _TRUNCATE, "MAXLX2=%x ", p[12]);
+				strncat_s(str, sizeof(str), t, _TRUNCATE);
+			}
+
+			_lwrite(fv->LogFile, str, strlen(str));
+			_lwrite(fv->LogFile, "\015\012", 2);
+
+		}
+	}
 }
 
-static void KmtReadLog(PFileVar fv, BYTE *buf, int len)
+static void KmtReadLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 {
 	if (fv->LogFlag && (len>0))
 	{
 		_lwrite(fv->LogFile,"\015\012<<<\015\012",7);
-		KmtOutputCommonLog(fv, buf, len);
+		KmtOutputCommonLog(fv, kv, buf, len);
 	}
 }
 
-static void KmtWriteLog(PFileVar fv, BYTE *buf, int len)
+static void KmtWriteLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 {
 	if (fv->LogFlag && (len>0))
 	{
 		_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
-		KmtOutputCommonLog(fv, buf, len);
+		KmtOutputCommonLog(fv, kv, buf, len);
 	}
 }
 
@@ -112,7 +196,7 @@ void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 		_lwrite(fv->LogFile,&(kv->PktOut[1]),C-1);
 		_lwrite(fv->LogFile,"\015\012",2);
 #else
-		KmtWriteLog(fv, &(kv->PktOut[0]), C);
+		KmtWriteLog(fv, kv, &(kv->PktOut[0]), C+1);
 #endif
 	}
 
@@ -789,21 +873,21 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 		}
 		else
 			switch (kv->PktReadMode) {
-		case WaitLen:
-			kv->PktIn[1] = b;
-			kv->PktInLen = KmtNum(b);
-			kv->PktInCount = kv->PktInLen;
-			kv->PktInPtr = 2;
-			kv->PktReadMode = WaitCheck;
-			break;
-		case WaitCheck:
-			kv->PktIn[kv->PktInPtr] = b;
-			kv->PktInPtr++;
-			kv->PktInCount--;
-			GetPkt = (kv->PktInCount==0);
-			if (GetPkt) kv->PktReadMode = WaitMark;
-			break;  
-		}
+			case WaitLen:
+				kv->PktIn[1] = b;
+				kv->PktInLen = KmtNum(b);
+				kv->PktInCount = kv->PktInLen;
+				kv->PktInPtr = 2;
+				kv->PktReadMode = WaitCheck;
+				break;
+			case WaitCheck:
+				kv->PktIn[kv->PktInPtr] = b;
+				kv->PktInPtr++;
+				kv->PktInCount--;
+				GetPkt = (kv->PktInCount==0);
+				if (GetPkt) kv->PktReadMode = WaitMark;
+				break;  
+			}
 
 		if (! GetPkt) c = CommRead1Byte(cv,&b);
 	}
@@ -817,7 +901,7 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 		_lwrite(fv->LogFile,&(kv->PktIn[1]),kv->PktInLen+1);
 		_lwrite(fv->LogFile,"\015\012",2);
 #else
-		KmtReadLog(fv,&(kv->PktIn[0]),kv->PktInLen);
+		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInLen+2);
 #endif
 	}
 
