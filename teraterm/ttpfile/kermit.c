@@ -1,6 +1,11 @@
 /* Tera Term
 Copyright(C) 1994-1998 T. Teranishi
-All rights reserved. */
+All rights reserved. 
+Copyright(C) 2004-2012 Tera Term Project
+All rights reserved. 
+
+  Kermit specification: http://www.kermitproject.org/
+ */
 
 /* TTFILE.DLL, Kermit protocol */
 #include "teraterm.h"
@@ -221,88 +226,88 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 		b = kv->PktIn[i+3];
 		n = KmtNum(b);
 		switch (i) {
-	  case 1:
-		  if ((MinMAXL<n) && (n<MaxMAXL))
-			  kv->KmtYour.MAXL = n;
-		  break;
-	  case 2:
-		  if ((MinTIME<n) && (n<MaxNum))
-			  kv->KmtYour.TIME = n;
-		  break;
-	  case 3:
-		  if (n<MaxNum)
-			  kv->KmtYour.NPAD = n;
-		  break;
-	  case 4:
-		  kv->KmtYour.PADC = b ^ 0x40;
-		  break;
-	  case 5:
-		  if (n<0x20)
-			  kv->KmtYour.EOL = n;
-		  break;
-	  case 6:
-		  if (KmtCheckQuote(b))
-			  kv->KmtYour.QCTL = b;
-		  break;
-	  case 7:
-		  if (AckFlag) /* Ack packet from remote host */
-		  {
-			  if ((b=='Y') &&
-				  KmtCheckQuote(kv->KmtMy.QBIN))
-				  kv->Quote8 = TRUE;
-			  else if (KmtCheckQuote(b) &&
-				  ((b==kv->KmtMy.QBIN) ||
-				  (kv->KmtMy.QBIN=='Y')))
+		  case 1:
+			  if ((MinMAXL<n) && (n<MaxMAXL))
+				  kv->KmtYour.MAXL = n;
+			  break;
+		  case 2:
+			  if ((MinTIME<n) && (n<MaxNum))
+				  kv->KmtYour.TIME = n;
+			  break;
+		  case 3:
+			  if (n<MaxNum)
+				  kv->KmtYour.NPAD = n;
+			  break;
+		  case 4:
+			  kv->KmtYour.PADC = b ^ 0x40;
+			  break;
+		  case 5:
+			  if (n<0x20)
+				  kv->KmtYour.EOL = n;
+			  break;
+		  case 6:
+			  if (KmtCheckQuote(b))
+				  kv->KmtYour.QCTL = b;
+			  break;
+		  case 7:
+			  if (AckFlag) /* Ack packet from remote host */
 			  {
-				  kv->KmtMy.QBIN = b;
-				  kv->Quote8 = TRUE;
+				  if ((b=='Y') &&
+					  KmtCheckQuote(kv->KmtMy.QBIN))
+					  kv->Quote8 = TRUE;
+				  else if (KmtCheckQuote(b) &&
+					  ((b==kv->KmtMy.QBIN) ||
+					  (kv->KmtMy.QBIN=='Y')))
+				  {
+					  kv->KmtMy.QBIN = b;
+					  kv->Quote8 = TRUE;
+				  }
 			  }
-		  }
-		  else /* S-packet from remote host */
-			  if ((b=='Y') && KmtCheckQuote(kv->KmtMy.QBIN))
-				  kv->Quote8 = TRUE;
-			  else if (KmtCheckQuote(b))
-			  {
-				  kv->KmtMy.QBIN = b;
-				  kv->Quote8 = TRUE;
-			  }
+			  else /* S-packet from remote host */
+				  if ((b=='Y') && KmtCheckQuote(kv->KmtMy.QBIN))
+					  kv->Quote8 = TRUE;
+				  else if (KmtCheckQuote(b))
+				  {
+					  kv->KmtMy.QBIN = b;
+					  kv->Quote8 = TRUE;
+				  }
 
-			  if (! kv->Quote8) kv->KmtMy.QBIN = 'N';
-			  kv->KmtYour.QBIN = kv->KmtMy.QBIN;
+				  if (! kv->Quote8) kv->KmtMy.QBIN = 'N';
+				  kv->KmtYour.QBIN = kv->KmtMy.QBIN;
+				  break;
+
+		  case 8:
+			  kv->KmtYour.CHKT = b - 0x30;
+			  if (AckFlag)
+			  {
+				  if (kv->KmtYour.CHKT!=kv->KmtMy.CHKT)
+					  kv->KmtYour.CHKT = DefCHKT;
+			  }
+			  else
+				  if ((kv->KmtYour.CHKT<1) ||
+					  (kv->KmtYour.CHKT>2))
+					  kv->KmtYour.CHKT = DefCHKT;
+
+			  kv->KmtMy.CHKT = kv->KmtYour.CHKT;
 			  break;
 
-	  case 8:
-		  kv->KmtYour.CHKT = b - 0x30;
-		  if (AckFlag)
-		  {
-			  if (kv->KmtYour.CHKT!=kv->KmtMy.CHKT)
-				  kv->KmtYour.CHKT = DefCHKT;
-		  }
-		  else
-			  if ((kv->KmtYour.CHKT<1) ||
-				  (kv->KmtYour.CHKT>2))
-				  kv->KmtYour.CHKT = DefCHKT;
+		  case 9:
+			  kv->KmtYour.REPT = b;
+			  if (! AckFlag &&
+				  (kv->KmtYour.REPT>0x20) &&
+				  (kv->KmtYour.REPT<0x7F))
+				  kv->KmtMy.REPT = kv->KmtYour.REPT;
+			  /*
+			  Very old bug:
+			  Kermit fails to properly negotiate to NOT use "repeat"
+			  compression when talking to a primitive partner (a
+			  prominent example of a kermit implementation that does
+			  not support repeat is the bootloader "U-Boot").
 
-		  kv->KmtMy.CHKT = kv->KmtYour.CHKT;
-		  break;
-
-	  case 9:
-		  kv->KmtYour.REPT = b;
-		  if (! AckFlag &&
-			  (kv->KmtYour.REPT>0x20) &&
-			  (kv->KmtYour.REPT<0x7F))
-			  kv->KmtMy.REPT = kv->KmtYour.REPT;
-		  /*
-		  Very old bug:
-		  Kermit fails to properly negotiate to NOT use "repeat"
-		  compression when talking to a primitive partner (a
-		  prominent example of a kermit implementation that does
-		  not support repeat is the bootloader "U-Boot").
-
-		  by Anders Larsen (2007/9/11 yutaka)
-		  */
-		  kv->RepeatFlag = kv->KmtMy.REPT == kv->KmtYour.REPT;
-		  break;
+			  by Anders Larsen (2007/9/11 yutaka)
+			  */
+			  kv->RepeatFlag = kv->KmtMy.REPT == kv->KmtYour.REPT;
+			  break;
 		}
 	}
 
@@ -871,105 +876,105 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 
 	case 'N':
 		switch (kv->KmtState) {
-	case SendInit:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		break;
-	case SendFile:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		else if (PktNumNew==kv->PktNum+1)
-			KmtSendNextData(fv,kv,cv);
-		break;
-	case SendData:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		else if (PktNumNew==kv->PktNum+1)
-			KmtSendNextData(fv,kv,cv);
-		break;
-	case SendEOF:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		else if (PktNumNew==kv->PktNum+1)
-		{
-			if (! KmtSendNextFile(fv,kv,cv))
-				return FALSE;
-		}
-		break;
-	case SendEOT:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		break;
-	case ServerInit:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		break;
-	case GetInit:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		break;
-	case Finish:
-		if (PktNumNew==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		break;
+		case SendInit:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			break;
+		case SendFile:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			else if (PktNumNew==kv->PktNum+1)
+				KmtSendNextData(fv,kv,cv);
+			break;
+		case SendData:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			else if (PktNumNew==kv->PktNum+1)
+				KmtSendNextData(fv,kv,cv);
+			break;
+		case SendEOF:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			else if (PktNumNew==kv->PktNum+1)
+			{
+				if (! KmtSendNextFile(fv,kv,cv))
+					return FALSE;
+			}
+			break;
+		case SendEOT:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			break;
+		case ServerInit:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			break;
+		case GetInit:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			break;
+		case Finish:
+			if (PktNumNew==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			break;
 		}
 		break;
 
 	case 'Y':
 		switch (kv->KmtState) {
-	case SendInit:
-		if (PktNumNew==kv->PktNum)
-		{
-			KmtParseInit(kv,TRUE);
-			if (! KmtSendNextFile(fv,kv,cv))
-				return FALSE;
-		}
-		break;
-	case SendFile:
-		if (PktNumNew==kv->PktNum)
-			KmtSendNextData(fv,kv,cv);
-		break;
-	case SendData:
-		if (PktNumNew==kv->PktNum)
-			KmtSendNextData(fv,kv,cv);
-		else if (PktNumNew+1==kv->PktNum)
-			KmtSendPacket(fv,kv,cv);
-		break;
-	case SendEOF:
-		if (PktNumNew==kv->PktNum)
-		{
-			if (! KmtSendNextFile(fv,kv,cv))
-				return FALSE;
-		}
-		break;
-	case SendEOT:
-		if (PktNumNew==kv->PktNum)
-		{
-			fv->Success = TRUE;
-			return FALSE;
-		}
-		break;
-	case ServerInit:
-		if (PktNumNew==kv->PktNum)
-		{
-			KmtParseInit(kv,TRUE);
-			switch (kv->KmtMode) {
-	case IdKmtGet:
-		KmtSendReceiveInit(fv,kv,cv);
-		break;
-	case IdKmtFinish:
-		KmtSendFinish(fv,kv,cv);
-		break;
+		case SendInit:
+			if (PktNumNew==kv->PktNum)
+			{
+				KmtParseInit(kv,TRUE);
+				if (! KmtSendNextFile(fv,kv,cv))
+					return FALSE;
 			}
-		}
-		break;
-	case Finish:
-		if (PktNumNew==kv->PktNum)
-		{
-			fv->Success = TRUE;
-			return FALSE;
-		}
-		break;
+			break;
+		case SendFile:
+			if (PktNumNew==kv->PktNum)
+				KmtSendNextData(fv,kv,cv);
+			break;
+		case SendData:
+			if (PktNumNew==kv->PktNum)
+				KmtSendNextData(fv,kv,cv);
+			else if (PktNumNew+1==kv->PktNum)
+				KmtSendPacket(fv,kv,cv);
+			break;
+		case SendEOF:
+			if (PktNumNew==kv->PktNum)
+			{
+				if (! KmtSendNextFile(fv,kv,cv))
+					return FALSE;
+			}
+			break;
+		case SendEOT:
+			if (PktNumNew==kv->PktNum)
+			{
+				fv->Success = TRUE;
+				return FALSE;
+			}
+			break;
+		case ServerInit:
+			if (PktNumNew==kv->PktNum)
+			{
+				KmtParseInit(kv,TRUE);
+				switch (kv->KmtMode) {
+				case IdKmtGet:
+					KmtSendReceiveInit(fv,kv,cv);
+					break;
+				case IdKmtFinish:
+					KmtSendFinish(fv,kv,cv);
+					break;
+				}
+			}
+			break;
+		case Finish:
+			if (PktNumNew==kv->PktNum)
+			{
+				fv->Success = TRUE;
+				return FALSE;
+			}
+			break;
 		}
 		break;
 
