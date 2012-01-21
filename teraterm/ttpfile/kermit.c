@@ -33,47 +33,34 @@ All rights reserved. */
 #define MyREPT  '~'
 
 
+static void KmtOutputCommonLog(PFileVar fv, BYTE *buf, int len)
+{
+	int i;
+
+	for (i = 0 ; i < len ; i++)
+		FTLog1Byte(fv, buf[i]);
+
+	// 残りのASCII表示を行う
+	fv->FlushLogLineBuf = 1;
+	FTLog1Byte(fv, 0);
+	fv->FlushLogLineBuf = 0;
+}
+
 static void KmtReadLog(PFileVar fv, BYTE *buf, int len)
 {
-	int j;
-
 	if (fv->LogFlag && (len>0))
 	{
-		if (fv->LogState == 0)
-		{
-			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv,0);
-			fv->FlushLogLineBuf = 0;
-
-			fv->LogState = 1;
-			fv->LogCount = 0;
-			_lwrite(fv->LogFile,"\015\012<<<\015\012",7);
-		}
-		for (j=0 ; j <= len-1 ; j++)
-			FTLog1Byte(fv, buf[j]);
+		_lwrite(fv->LogFile,"\015\012<<<\015\012",7);
+		KmtOutputCommonLog(fv, buf, len);
 	}
 }
 
 static void KmtWriteLog(PFileVar fv, BYTE *buf, int len)
 {
-	int j;
-
 	if (fv->LogFlag && (len>0))
 	{
-		if (fv->LogState != 0)
-		{
-			// 残りのASCII表示を行う
-			fv->FlushLogLineBuf = 1;
-			FTLog1Byte(fv,0);
-			fv->FlushLogLineBuf = 0;
-
-			fv->LogState = 0;
-			fv->LogCount = 0;
-			_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
-		}
-		for (j=0 ; j <= len-1 ; j++)
-			FTLog1Byte(fv, buf[j]);
+		_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
+		KmtOutputCommonLog(fv, buf, len);
 	}
 }
 
@@ -120,7 +107,7 @@ void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 		_lwrite(fv->LogFile,&(kv->PktOut[1]),C-1);
 		_lwrite(fv->LogFile,"\015\012",2);
 #else
-		KmtWriteLog(fv,&(kv->PktOut[1]),C-1);
+		KmtWriteLog(fv, &(kv->PktOut[0]), C);
 #endif
 	}
 
@@ -825,7 +812,7 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 		_lwrite(fv->LogFile,&(kv->PktIn[1]),kv->PktInLen+1);
 		_lwrite(fv->LogFile,"\015\012",2);
 #else
-		KmtReadLog(fv,&(kv->PktIn[1]),kv->PktInLen+1);
+		KmtReadLog(fv,&(kv->PktIn[0]),kv->PktInLen);
 #endif
 	}
 
