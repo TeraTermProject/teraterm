@@ -38,5 +38,26 @@ scpsend 'C:\usr\cvs\doc\en\teraterm.chm'
 scpsend 'C:\usr\cvs\doc\en\teraterm.chm' 'tmp/foo.chm'
 </pre>
 
+<pre class="macro-example">
+; Confirm finishing a file sending.
+SOURFILE = 'C:\usr\ttssh2\doc\en\teraterm.chm'
+DESTFILE = '~'
+
+;; Send a file.
+scpsend SOURFILE DESTFILE
+;; Confirm a scp process.
+do
+  mpause 5000
+  sprintf2 str 'ps -ef |grep -v grep |grep -c scp'
+  sendln str
+  waitln '0' '1'
+loop while result != 1
+;; Do next macro after finishing the file sending.
+sendln 'echo SCP finish'
+;; Exit this macro script.
+end
+</pre>
+
+
 </body>
 </html>
