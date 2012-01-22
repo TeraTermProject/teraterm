@@ -60,7 +60,7 @@ static void KmtOutputCommonLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 	+------+-------------+-------------+------+------------+-------+
 	| MARK | tochar(LEN) | tochar(SEQ) | TYPE | DATA       | CHECK |
 	+------+-------------+-------------+------+------------+-------+
-     */
+	 */
 	if (len >= 4) {
 		type = buf[3];
 		switch (type) {
@@ -196,7 +196,7 @@ void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 		_lwrite(fv->LogFile,&(kv->PktOut[1]),C-1);
 		_lwrite(fv->LogFile,"\015\012",2);
 #else
-		KmtWriteLog(fv, kv, &(kv->PktOut[0]), C+1);
+		KmtWriteLog(fv, kv, &(kv->PktOut[0]), C);
 #endif
 	}
 
