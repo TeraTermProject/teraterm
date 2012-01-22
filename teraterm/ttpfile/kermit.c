@@ -25,8 +25,8 @@ All rights reserved.
 #define MaxNum 94
 
 #define MinMAXL 10
-#define MaxMAXL 94 
-#define DefMAXL 90
+#define MaxMAXL 94
+#define DefMAXL 94
 #define MinTIME 1
 #define DefTIME 10
 #define DefNPAD 0
