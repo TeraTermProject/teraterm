@@ -334,6 +334,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdYmodemSend   'S'
 #define CmdYmodemRecv   'T'
 #define CmdDispStr      'U'
+#define CmdLogInfo      'V'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -888,6 +889,22 @@ scp_rcv_error:
 
 	case CmdDispStr:
 		CBStartEcho(ParamFileName, sizeof(ParamFileName));
+		break;
+
+	case CmdLogInfo:
+		if (LogVar) {
+			ParamFileName[0] = '0'
+				+ (ts.LogBinary != 0)
+				+ ((ts.Append != 0) << 1)
+				+ ((ts.LogTypePlainText != 0) << 2)
+				+ ((ts.LogTimestamp != 0) << 3)
+				+ ((ts.LogHideDialog != 0) << 4);
+			strncpy_s(ParamFileName+1, sizeof(ParamFileName)-1, LogVar->FullName, _TRUNCATE);
+		}
+		else {
+			ParamFileName[0] = '0' - 1;
+			ParamFileName[1] = 0;
+		}
 		break;
 
 	default:

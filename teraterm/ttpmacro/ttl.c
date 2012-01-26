@@ -2489,6 +2489,28 @@ WORD TTLInt2Str()
 	return Err;
 }
 
+WORD TTLLogInfo() 
+{
+	WORD Err;
+	TVarId VarId;
+	char Str[MaxStrLen];
+
+	Err = 0;
+	GetStrVar(&VarId, &Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if ((Err==0) && (! Linked))
+		Err = ErrLinkFirst;
+	if (Err!=0) return Err;
+
+	Err = GetTTParam(CmdLogInfo, Str, sizeof(Str));
+	if (Err==0) {
+		SetResult(Str[0] - '0');
+		SetStrVal(VarId, Str+1);
+	}
+	return Err;
+}
+
 WORD TTLLogOpen()
 {
 	TStrVal Str;
@@ -4950,6 +4972,8 @@ int ExecCmnd()
 			Err = TTLCommCmdFile(CmdLoadKeyMap,0); break;
 		case RsvLogClose:
 			Err = TTLCommCmd(CmdLogClose,0); break;
+		case RsvLogInfo:
+			Err = TTLLogInfo(); break;
 		case RsvLogOpen:
 			Err = TTLLogOpen(); break;
 		case RsvLogPause:

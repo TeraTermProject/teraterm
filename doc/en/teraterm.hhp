@@ -231,6 +231,7 @@ HlpMacroCommandKmtrecv=html\macro\command\kmtrecv.html
 HlpMacroCommandKmtsend=html\macro\command\kmtsend.html
 HlpMacroCommandLoadkeymap=html\macro\command\loadkeymap.html
 HlpMacroCommandLogclose=html\macro\command\logclose.html
+HlpMacroCommandLoginfo=html\macro\command\loginfo.html
 HlpMacroCommandLogopen=html\macro\command\logopen.html
 HlpMacroCommandLogpause=html\macro\command\logpause.html
 HlpMacroCommandLogstart=html\macro\command\logstart.html

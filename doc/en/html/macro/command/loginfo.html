@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>logopen</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>loginfo</h1>
+
+<p>
+Tera Term ‚ÌƒƒOŽæ“¾ó‘Ô‚ð“¾‚é
+</p>
+
+<pre class="macro-syntax">
+loginfo &lt;strvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+ƒƒO‚ðŽæ“¾‚µ‚Ä‚¢‚éê‡Astrvar ‚ÉƒƒOƒtƒ@ƒCƒ‹–¼‚ªŠi”[‚³‚êAƒƒOŽæ“¾Žž‚Ìƒtƒ‰ƒO‚Ìó‘Ô‚ª result ‚ÉŠi”[‚³‚ê‚éB<br>
+ƒƒO‚ðŽæ“¾‚µ‚Ä‚¢‚È‚¢ê‡‚Í result ‚É -1 ‚ªŠi”[‚³‚ê‚éB
+</p>
+<p>
+ƒƒOŽæ“¾Žž‚É result ‚ÉŠi”[‚³‚ê‚é’l‚ÍAˆÈ‰º‚Ì“à on ‚É‚È‚Á‚Ä‚¢‚éƒtƒ‰ƒO‚É‘Î‰ž‚·‚é’l‚Ì‡Œv‚Æ‚È‚éB
+</p>
+
+<table>
+ <tr>
+  <th>’l</th>
+  <th>ˆÓ–¡</th>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>ƒoƒCƒiƒŠƒtƒ‰ƒO</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>ƒAƒyƒ“ƒhƒtƒ‰ƒO</td>
+ </tr>
+ <tr>
+  <td>4</td>
+  <td>ƒvƒŒƒCƒ“ƒeƒLƒXƒgƒtƒ‰ƒO</td>
+ </tr>
+ <tr>
+  <td>8</td>
+  <td>ƒ^ƒCƒ€ƒXƒ^ƒ“ƒvƒtƒ‰ƒO</td>
+ </tr>
+ <tr>
+  <td>16</td>
+  <td>ƒ_ƒCƒAƒƒO”ñ•\Ž¦ƒtƒ‰ƒO</td>
+ </tr>
+</table>
+
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+loginfo logfile
+
+if result == -1 then
+	; ƒƒO‚ðŽæ“¾‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅAV‚½‚ÉƒƒOŽæ“¾‚ðŠJŽn‚·‚é
+	logopen "test.log" 0 0 0 1
+
+elseif result & 8 == 0 then
+	flags = result
+	; ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ª–³Œø‚È‚Ì‚ÅAƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ð—LŒø‚É‚µ‚ÄŠJ‚«‚È‚¨‚·B
+	logclose
+	logopen logfile 0 1 flags&4 1 flags&16
+endif
+</pre>
+
+
+<h2>Reference</h2>
+
+<a href="logopen.html">logwrite</a><br>
+
+</body>
+</html>

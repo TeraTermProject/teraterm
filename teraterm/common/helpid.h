@@ -239,6 +239,7 @@
 #define HlpMacroCommandKmtsend          92057
 #define HlpMacroCommandLoadkeymap       92058
 #define HlpMacroCommandLogclose         92059
+#define HlpMacroCommandLoginfo          92152
 #define HlpMacroCommandLogopen          92060
 #define HlpMacroCommandLogpause         92061
 #define HlpMacroCommandLogstart         92062

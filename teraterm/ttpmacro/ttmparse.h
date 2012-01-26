@@ -197,6 +197,7 @@
 #define RsvDispStr      149
 #define RsvIntDim       150
 #define RsvStrDim       151
+#define RsvLogInfo      152
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
 #define RsvYmodemSend   177

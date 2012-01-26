@@ -730,6 +730,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="loginfo">
+					<param name="Local" value="html\macro\command\loginfo.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logopen">
 					<param name="Local" value="html\macro\command\logopen.html">
 					<param name="ImageNumber" value="11">
