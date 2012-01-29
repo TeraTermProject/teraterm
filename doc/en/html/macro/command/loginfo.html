@@ -14,7 +14,7 @@
 <h1>loginfo</h1>
 
 <p>
-Tera Term のログ取得状態を得る
+Retrieves Tera Term log status.
 </p>
 
 <pre class="macro-syntax">
@@ -24,37 +24,37 @@ loginfo &lt;strvar&gt;
 <h2>Remarks</h2>
 
 <p>
-ログを取得している場合、strvar にログファイル名が格納され、ログ取得時のフラグの状態が result に格納される。<br>
-ログを取得していない場合は result に -1 が格納される。
+When Tera Term is logging, the file name stores in the strvar variable and the flag status of log starting is stored in the result variable.<br>
+On the contrary, when Tera Term is not logging, the result variable is -1.
 </p>
 <p>
-ログ取得時に result に格納される値は、以下の内 on になっているフラグに対応する値の合計となる。
+The result variable is bitwise OR in the following value:
 </p>
 
 <table>
  <tr>
-  <th>値</th>
-  <th>意味</th>
+  <th>Value</th>
+  <th>Meaning</th>
  </tr>
  <tr>
   <td>1</td>
-  <td>バイナリフラグ</td>
+  <td>Binary flag</td>
  </tr>
  <tr>
   <td>2</td>
-  <td>アペンドフラグ</td>
+  <td>Append flag</td>
  </tr>
  <tr>
   <td>4</td>
-  <td>プレインテキストフラグ</td>
+  <td>Plain text flag</td>
  </tr>
  <tr>
   <td>8</td>
-  <td>タイムスタンプフラグ</td>
+  <td>Timestamp flag</td>
  </tr>
  <tr>
   <td>16</td>
-  <td>ダイアログ非表示フラグ</td>
+  <td>Hide dialog flag</td>
  </tr>
 </table>
 
@@ -65,12 +65,12 @@ loginfo &lt;strvar&gt;
 loginfo logfile
 
 if result == -1 then
-	; ログを取得していないので、新たにログ取得を開始する
+	; When Tera Term is not logging, a new log is started.
 	logopen "test.log" 0 0 0 1
 
 elseif result & 8 == 0 then
 	flags = result
-	; タイムスタンプが無効なので、タイムスタンプを有効にして開きなおす。
+	; When the log timestamp is disabled, a new log with timestamp is re-opend.
 	logclose
 	logopen logfile 0 1 flags&4 1 flags&16
 endif
