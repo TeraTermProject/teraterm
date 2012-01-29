@@ -103,11 +103,16 @@ typedef struct {
 typedef TFileVar far *PFileVar;
 
 typedef struct {
-  BYTE MAXL,TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT;
+	int MAXL;
+	BYTE TIME,NPAD,PADC,EOL,QCTL,QBIN,CHKT,REPT,CAPAS,WINDO,MAXLX1,MAXLX2;
 } KermitParam;
 
+#define	KMT_DATAMAX		4000
+#define	KMT_PKTMAX		(KMT_DATAMAX + 32)
+#define	KMT_PKTQUE		4
+
 typedef struct {
-  BYTE PktIn[96], PktOut[96];
+  BYTE PktIn[KMT_PKTMAX], PktOut[KMT_PKTMAX];
   int PktInPtr;
   int PktInLen, PktInCount;
   int PktNum, PktNumOffset;
@@ -120,6 +125,12 @@ typedef struct {
   BYTE NextSeq;
   BYTE NextByte;
   KermitParam KmtMy, KmtYour;
+  int PktOutCount, PktInLongPacketLen;
+  int FileAttrFlag;
+  BOOL FileType;
+  time_t FileTime;
+  int FileMode;
+  LONGLONG FileSize;
 } TKmtVar;
 typedef TKmtVar far *PKmtVar;
 
@@ -134,6 +145,7 @@ typedef TKmtVar far *PKmtVar;
 #define SendData 3
 #define SendEOF 4
 #define SendEOT 5
+#define SendFileAttr 6
 
 #define ReceiveInit 6
 #define ReceiveFile 7

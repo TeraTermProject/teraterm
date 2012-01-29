@@ -14,6 +14,7 @@ All rights reserved.
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "tt_res.h"
 #include "ttcommon.h"
@@ -37,6 +38,14 @@ All rights reserved.
 #define DefCHKT 1
 #define MyREPT  '~'
 
+#define	KMT_CAP_LONGPKT	2
+#define	KMT_CAP_SLIDWIN	4
+#define	KMT_CAP_FILATTR	8
+
+#define	KMT_ATTR_TIME	001
+#define	KMT_ATTR_MODE	002
+#define	KMT_ATTR_SIZE	003
+#define	KMT_ATTR_TYPE	004
 
 BYTE KmtNum(BYTE b);
 
@@ -177,6 +186,21 @@ void KmtCalcCheck(WORD Sum, BYTE CHKT, PCHAR Check)
 	}
 }
 
+// a single-character type 1 checksum を計算する
+static int KmtCheckSumType1(BYTE *buf, int len)
+{
+	WORD Sum;
+	BYTE check;
+	int i;
+
+	Sum = 0;
+	for (i = 0 ; i < len ; i++) {
+		Sum = Sum + buf[i];
+	}
+	KmtCalcCheck(Sum, 1, &check);
+	return (check);
+}
+
 void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 {
 	int C;
@@ -186,7 +210,11 @@ void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 		CommBinaryOut(cv,&(kv->KmtYour.PADC), 1);
 
 	/* packet */
+#ifdef KERMIT_CAPAS
+	C = kv->PktOutCount;
+#else
 	C = KmtNum(kv->PktOut[1]) + 2;
+#endif
 	CommBinaryOut(cv,&kv->PktOut[0], C);
 
 	if (fv->LogFlag)
@@ -209,19 +237,44 @@ void KmtSendPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 
 void KmtMakePacket(PFileVar fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataLen)
 {
-	int i;
+	int i, nlen, headnum;
 	WORD Sum;
 
+	// SEQからCHECKまでの長さ。MARKとLENは含まない。
+	nlen = DataLen + kv->KmtMy.CHKT + 2;
+
 	kv->PktOut[0] = 1; /* MARK */
-	kv->PktOut[1] = KmtChar((BYTE)(DataLen + kv->KmtMy.CHKT + 2)); /* LEN */
+	kv->PktOut[1] = KmtChar((BYTE)(nlen)); /* LEN */
 	kv->PktOut[2] = KmtChar(SeqNum); /* SEQ */
 	kv->PktOut[3] = PktType; /* TYPE */
 
+	/* Long Packetの場合 */
+	if (nlen > MaxNum) {
+		int k;
+		memmove_s(&kv->PktOut[7], KMT_PKTMAX-7, &kv->PktOut[4], DataLen);
+		kv->PktOut[1] = KmtChar(0);  /* LEN=0 */
+		k =  DataLen + kv->KmtMy.CHKT;
+		kv->PktOut[4] = KmtChar(k / 95);
+		kv->PktOut[5] = KmtChar(k % 95);
+		Sum = KmtCheckSumType1(&kv->PktOut[1], 5);
+		kv->PktOut[6] = KmtChar((BYTE)Sum);  /* HCHECK */
+
+		/* LEN+SEQ+TYPE+LENX1+LENX2+HCHECK */
+		headnum = 6;
+
+	} else {
+		/* LEN+SEQ+TYPE */
+		headnum = 3;
+	}
+
 	/* check sum */
 	Sum = 0;
-	for (i = 1 ; i <= DataLen+3 ; i++)
+	for (i = 1 ; i <= DataLen + headnum ; i++)
 		Sum = Sum + kv->PktOut[i];
-	KmtCalcCheck(Sum, kv->KmtMy.CHKT, &(kv->PktOut[DataLen+4]));
+	KmtCalcCheck(Sum, kv->KmtMy.CHKT, &(kv->PktOut[DataLen + headnum + 1]));
+
+	/* バッファの全体サイズ */
+	kv->PktOutCount = 1 + headnum + DataLen + kv->KmtMy.CHKT;
 }
 
 
@@ -245,6 +298,19 @@ void KmtSendInitPkt(PFileVar fv, PKmtVar kv, PComVar cv, BYTE PktType)
 	kv->PktOut[10] = kv->KmtMy.QBIN;
 	kv->PktOut[11] = kv->KmtMy.CHKT + 0x30;
 	kv->PktOut[12] = kv->KmtMy.REPT;
+
+#ifdef KERMIT_CAPAS
+	if (kv->KmtMy.CAPAS > 0) {
+		kv->PktOut[13] = KmtChar(kv->KmtMy.CAPAS);
+		NParam++;
+		if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
+			kv->PktOut[14] = KmtChar(1);
+			kv->PktOut[15] = KmtChar(KMT_DATAMAX / 95);
+			kv->PktOut[16] = KmtChar(KMT_DATAMAX % 95);
+			NParam += 3;
+		}
+	}
+#endif
 
 	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum - kv->PktNumOffset),PktType,NParam);
 	KmtSendPacket(fv,kv,cv);
@@ -273,13 +339,25 @@ int KmtCalcPktNum(PKmtVar kv, BYTE b)
 
 BOOL KmtCheckPacket(PKmtVar kv)
 {
-	int i;
+	int i, len;
 	WORD Sum;
 	BYTE Check[3];
 
+	/* Long Packet の場合、まず HCHECK を検証する。 */
+	if (kv->PktInLen == 0) {
+		Sum = KmtCheckSumType1(&kv->PktIn[1], 5);
+		if ((BYTE)Sum != kv->PktIn[6])
+			return FALSE;
+		len = kv->PktInCount - 1 - kv->KmtMy.CHKT;
+
+	} else {
+		len = kv->PktInLen+1-kv->KmtMy.CHKT;
+
+	}
+
 	/* Calc sum */
 	Sum = 0;
-	for (i = 1 ; i <= kv->PktInLen+1-kv->KmtMy.CHKT ; i++)
+	for (i = 1 ; i <= len ; i++)
 		Sum = Sum + kv->PktIn[i];
 
 	/* Calc CHECK */
@@ -287,7 +365,7 @@ BOOL KmtCheckPacket(PKmtVar kv)
 
 	for (i = 1 ; i <= kv->KmtMy.CHKT ; i++)
 		if (Check[i-1] !=
-			kv->PktIn[ kv->PktInLen +1- kv->KmtMy.CHKT +i ])
+			kv->PktIn[ len + i ])
 			return FALSE;
 	return TRUE;
 }
@@ -300,14 +378,21 @@ BOOL KmtCheckQuote(BYTE b)
 
 void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 {
-	int i, NParam;
+	int i, NParam, off, cap;
 	BYTE b, n;
 
-	NParam = kv->PktInLen - 2 - kv->KmtMy.CHKT;
+	if (kv->PktInLen == 0) {  /* Long Packet */
+		NParam = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
+		off = 7;
+
+	} else {
+		NParam = kv->PktInLen - 2 - kv->KmtMy.CHKT;
+		off = 3;
+	}
 
 	for (i=1 ; i <= NParam ; i++)
 	{
-		b = kv->PktIn[i+3];
+		b = kv->PktIn[i + off];
 		n = KmtNum(b);
 		switch (i) {
 		  case 1:
@@ -392,9 +477,40 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 			  */
 			  kv->RepeatFlag = kv->KmtMy.REPT == kv->KmtYour.REPT;
 			  break;
+
+		  case 10:  /* CAPAS */
+			  kv->KmtYour.CAPAS = n;
+
+			  // Tera Termとサーバの capabilities のANDを取る。
+			  cap = 0;
+			  if (n & kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
+				  cap |= KMT_CAP_LONGPKT;
+			  }
+			  if (n & kv->KmtMy.CAPAS & KMT_CAP_SLIDWIN) {
+				  cap |= KMT_CAP_SLIDWIN;
+			  }
+			  if (n & kv->KmtMy.CAPAS & KMT_CAP_FILATTR) {
+				  cap |= KMT_CAP_FILATTR;
+			  }
+			  kv->KmtMy.CAPAS = cap;
+			  break;
 		}
 	}
 
+	/* Long Packet の場合、MAXL を更新する。*/
+	if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
+		kv->KmtMy.MAXL = kv->PktInLongPacketLen;
+		if (kv->KmtMy.MAXL < 10)
+			kv->KmtMy.MAXL = 80;
+		else if (kv->KmtMy.MAXL > KMT_DATAMAX)
+			kv->KmtMy.MAXL = KMT_DATAMAX;
+
+	} else {
+		/* Capabilities が落ちているのに、LEN=0 の場合は、MAXL は DefMAXL のままとする。
+		 * TODO: 本来はエラーとすべき？
+		 */
+
+	}
 }
 
 void KmtSendAck(PFileVar fv, PKmtVar kv, PComVar cv)
@@ -412,12 +528,19 @@ void KmtSendAck(PFileVar fv, PKmtVar kv, PComVar cv)
 
 void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 {
-	int i, j, DataLen, BuffPtr;
+	int i, j, DataLen, BuffPtr, off;
 	BYTE b, b2;
 	BOOL CTLflag,BINflag,REPTflag,OutFlag;
 
 	BuffPtr = 0;
-	DataLen = kv->PktInLen - kv->KmtMy.CHKT - 2;
+
+	if (kv->PktInLen == 0) {  /* Long Packet */
+		DataLen = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
+		off = 7;
+	} else {
+		DataLen = kv->PktInLen - kv->KmtMy.CHKT - 2;
+		off = 3;
+	}
 
 	OutFlag = FALSE;
 	kv->RepeatCount = 1;
@@ -426,7 +549,7 @@ void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 	REPTflag = FALSE;
 	for (i = 1 ; i <= DataLen ; i++)
 	{
-		b = kv->PktIn[3+i];
+		b = kv->PktIn[off + i];
 		b2 = b & 0x7f;
 		if (CTLflag)
 		{
@@ -476,6 +599,24 @@ void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 		SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
 	*BuffLen = BuffPtr;
 	SetDlgTime(fv->HWin, IDC_PROTOELAPSEDTIME, fv->StartTime, fv->ByteCount);
+}
+
+static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
+{
+	int DataLen, BuffPtr, off;
+	BYTE *p;
+
+	BuffPtr = 0;
+
+	if (kv->PktInLen == 0) {  /* Long Packet */
+		DataLen = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
+		off = 7;
+	} else {
+		DataLen = kv->PktInLen - kv->KmtMy.CHKT - 2;
+		off = 3;
+	}
+
+	p = &kv->PktIn[off];
 }
 
 BOOL KmtEncode(PFileVar fv, PKmtVar kv)
@@ -638,11 +779,22 @@ void KmtSendEOTPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
 {
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+	struct _stati64 st;
 
 	if (! GetNextFname(fv))
 	{
 		KmtSendEOTPacket(fv,kv,cv);
 		return TRUE;
+	}
+
+	if (_stati64(fv->FullName, &st) == 0) {
+		kv->FileAttrFlag = KMT_ATTR_TIME | KMT_ATTR_MODE | KMT_ATTR_SIZE | KMT_ATTR_TYPE;
+		kv->FileType = TRUE;
+		kv->FileTime = st.st_ctime;
+		kv->FileMode = st.st_mode;
+		kv->FileSize = st.st_size;
+	} else {
+		kv->FileAttrFlag = 0;
 	}
 
 	/* file open */
@@ -681,6 +833,46 @@ BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
 	kv->RepeatCount = 0;
 	kv->NextByteFlag = FALSE;
 	kv->KmtState = SendFile;
+	return TRUE;
+}
+
+BOOL KmtSendNextFileAttr(PFileVar fv, PKmtVar kv, PComVar cv)
+{
+	char buf[512], s[128];
+	char t[64];
+
+	buf[0] = '\0';
+	if ( (kv->FileAttrFlag & KMT_ATTR_TYPE) != 0 ) {
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "\"%c%s8", KmtChar(2), kv->FileType ? "A" : "B");
+		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
+	}
+	if ( (kv->FileAttrFlag & KMT_ATTR_TIME) != 0 ) {
+		struct tm *date = localtime(&kv->FileTime);
+		int len;
+		len = strftime(t, sizeof(t), "%Y%m%d %H:%M:%S", date);
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "#%d%s", len, t);
+		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
+	}
+	if ( (kv->FileAttrFlag & KMT_ATTR_MODE) != 0 ) {
+		_snprintf_s(t, sizeof(t), _TRUNCATE, "%03o", kv->FileMode & 0777);
+		_snprintf_s(s, sizeof(s), _TRUNCATE, ",%d%s", strlen(t), t);
+		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
+	}
+	if ( (kv->FileAttrFlag & KMT_ATTR_SIZE) != 0 ) {
+		_snprintf_s(t, sizeof(t), _TRUNCATE, "%I64d", kv->FileSize);
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "1%d%s", strlen(t), t);
+		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
+	}
+
+	KmtIncPacketNum(kv);
+	strncpy_s(&(kv->PktOut[4]),sizeof(kv->PktOut)-4, buf, _TRUNCATE);
+	KmtMakePacket(fv,kv,(BYTE)(kv->PktNum-kv->PktNumOffset),(BYTE)'A',
+		strlen(buf));
+	KmtSendPacket(fv,kv,cv);
+
+	kv->RepeatCount = 0;
+	kv->NextByteFlag = FALSE;
+	kv->KmtState = SendFileAttr;
 	return TRUE;
 }
 
@@ -768,6 +960,17 @@ void KmtInit
 		kv->KmtMy.QBIN = MyQBIN;
 	kv->KmtMy.CHKT = DefCHKT;
 	kv->KmtMy.REPT = MyREPT;
+
+	/* CAPAS: a capability of Kermit 
+	 * (2012/1/22 yutaka) 
+	 */
+	kv->KmtMy.CAPAS = 0x00;
+#ifdef KERMIT_CAPAS
+	if (ts->KermitOpt & KmtOptLongPacket)
+		kv->KmtMy.CAPAS |= KMT_CAP_LONGPKT;
+	if (ts->KermitOpt & KmtOptFileAttr)
+		kv->KmtMy.CAPAS |= KMT_CAP_FILATTR;
+#endif
 
 	/* default your parameters */
 	kv->KmtYour = kv->KmtMy;
@@ -876,15 +1079,48 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 			case WaitLen:
 				kv->PktIn[1] = b;
 				kv->PktInLen = KmtNum(b);
+#ifdef KERMIT_CAPAS
+				if (kv->PktInLen == 0) {  /* Long Packet */
+					kv->PktInCount = 0;
+				} else if (kv->PktInLen >= 3) {  /* Normal Packet */
+					kv->PktInCount = kv->PktInLen + 2;
+				} else {
+					/* If unchar(LEN) = 1 or 2, the packet is invalid and should cause an Error. */
+					GetPkt = FALSE;
+					goto read_end;
+				}
+#else
 				kv->PktInCount = kv->PktInLen;
+#endif
 				kv->PktInPtr = 2;
 				kv->PktReadMode = WaitCheck;
 				break;
 			case WaitCheck:
+				// バッファが溢れたら、異常終了する。
+				// Tera Term側がLong Packetをサポートしていない場合に、サーバ側から不正に
+				// Long Packetが送られてきた場合も救済できる。
+				if (kv->PktInPtr > kv->KmtMy.MAXL) {
+					GetPkt = FALSE;
+					goto read_end;
+				}
 				kv->PktIn[kv->PktInPtr] = b;
 				kv->PktInPtr++;
+#ifdef KERMIT_CAPAS
+				// Long Packet
+				if (kv->PktInCount == 0 && kv->PktInPtr == 6) {
+					kv->PktInLongPacketLen = KmtNum(kv->PktIn[4])*95 + KmtNum(kv->PktIn[5]);
+					kv->PktInCount = kv->PktInLongPacketLen + 7;
+				}
+
+				// 期待したバッファサイズになったら終わる。
+				if (kv->PktInCount != 0 && kv->PktInPtr >= kv->PktInCount) {
+					GetPkt = TRUE;
+					break;
+				}
+#else
 				kv->PktInCount--;
 				GetPkt = (kv->PktInCount==0);
+#endif
 				if (GetPkt) kv->PktReadMode = WaitMark;
 				break;  
 			}
@@ -892,14 +1128,13 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 		if (! GetPkt) c = CommRead1Byte(cv,&b);
 	}
 
+read_end:
 	if (! GetPkt) return TRUE;
 
 	if (fv->LogFlag)
 	{
-#if 0
-		_lwrite(fv->LogFile,"< ",2);
-		_lwrite(fv->LogFile,&(kv->PktIn[1]),kv->PktInLen+1);
-		_lwrite(fv->LogFile,"\015\012",2);
+#ifdef KERMIT_CAPAS
+		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInCount);
 #else
 		KmtReadLog(fv, kv, &(kv->PktIn[0]), kv->PktInLen+2);
 #endif
@@ -949,6 +1184,13 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 		}
 		break;
 
+	case 'A':   /* File Attribute(Optional) */
+		if ((kv->KmtState == ReceiveData) &&
+			(PktNumNew > kv->PktNum)) {
+			KmtRecvFileAttr(fv,kv,NULL,&Len);
+		}
+		break;
+
 	case 'S':
 		if ((kv->KmtState == ReceiveInit) ||
 			(kv->KmtState == GetInit))
@@ -967,8 +1209,12 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 		case SendFile:
 			if (PktNumNew==kv->PktNum)
 				KmtSendPacket(fv,kv,cv);
-			else if (PktNumNew==kv->PktNum+1)
-				KmtSendNextData(fv,kv,cv);
+			else if (PktNumNew==kv->PktNum+1) {
+				if (kv->KmtMy.CAPAS & KMT_CAP_FILATTR) 
+					KmtSendNextData(fv,kv,cv);
+				else
+					KmtSendNextData(fv,kv,cv);
+			}
 			break;
 		case SendData:
 			if (PktNumNew==kv->PktNum)
@@ -1015,8 +1261,17 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 			}
 			break;
 		case SendFile:
-			if (PktNumNew==kv->PktNum)
+			if (PktNumNew==kv->PktNum) {
+				if (kv->KmtMy.CAPAS & KMT_CAP_FILATTR)
+					KmtSendNextFileAttr(fv,kv,cv);
+				else
+					KmtSendNextData(fv,kv,cv);
+			}
+			break;
+		case SendFileAttr:
+			if (PktNumNew==kv->PktNum) {
 				KmtSendNextData(fv,kv,cv);
+			}
 			break;
 		case SendData:
 			if (PktNumNew==kv->PktNum)

@@ -900,6 +900,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Kermit log  -- special option */
 	if (GetOnOff(Section, "KmtLog", FName, FALSE))
 		ts->LogFlag |= LOG_KMT;
+	if (GetOnOff(Section, "KmtLongPacket", FName, FALSE))
+		ts->KermitOpt |= KmtOptLongPacket;
+	if (GetOnOff(Section, "KmtFileAttr", FName, FALSE))
+		ts->KermitOpt |= KmtOptFileAttr;
 
 	// Enable language selection -- special option
 	if (!GetOnOff(Section, "LanguageSelection", FName, TRUE))
@@ -2159,6 +2163,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	/* Kermit log  -- special option */
 	WriteOnOff(Section, "KmtLog", FName, (WORD) (ts->LogFlag & LOG_KMT));
+	WriteOnOff(Section, "KmtLongPacket", FName, (WORD) (ts->KermitOpt & KmtOptLongPacket));
+	WriteOnOff(Section, "KmtFileAttr", FName, (WORD) (ts->KermitOpt & KmtOptFileAttr));
 
 	// Enable language selection -- special option
 	if ((ts->MenuFlag & MF_NOLANGUAGE) == 0)

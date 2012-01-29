@@ -169,6 +169,11 @@ typedef TCharAttr *PCharAttr;
 #define YoptG   2
 #define YoptSingle    3
 
+  /* KERMIT option */
+#define KmtOptLongPacket 1
+#define KmtOptFileAttr 2
+#define KmtOptSlideWin 4
+
   /* Language */
 #define IdEnglish  1
 #define IdJapanese 2
@@ -547,6 +552,7 @@ struct tttset {
 	char ClickableUrlBrowser[MAX_PATH];
 	char ClickableUrlBrowserArg[MAX_PATH];
 	WORD LogLockExclusive;
+	WORD KermitOpt;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -994,6 +1000,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.73, ttset_memfilemap was replaced with ttset_memfilemap_18.
  *   added tttset.LogLockExclusive
+ *   added tttset.KermitOpt
  *
  * - At version 4.72, ttset_memfilemap was replaced with ttset_memfilemap_17.
  *   added tttset.TabStopFlag.
