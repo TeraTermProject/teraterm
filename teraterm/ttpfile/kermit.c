@@ -15,12 +15,15 @@ All rights reserved.
 #include <time.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/utime.h>
 
 #include "tt_res.h"
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "ftlib.h"
+
+//#define KERMIT_CAPAS
 
 /* kermit parameters */
 #define MaxNum 94
@@ -159,6 +162,21 @@ static void KmtWriteLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 	{
 		_lwrite(fv->LogFile,"\015\012>>>\015\012",7);
 		KmtOutputCommonLog(fv, kv, buf, len);
+	}
+}
+
+static void KmtStringLog(PFileVar fv, PKmtVar kv, char *fmt, ...)
+{
+	char tmp[1024];
+	int len;
+	va_list arg;
+
+	if (fv->LogFlag) {
+		va_start(arg, fmt);
+		len = _vsnprintf(tmp, sizeof(tmp), fmt, arg);
+		va_end(arg);
+		_lwrite(fv->LogFile, tmp, len);
+		_lwrite(fv->LogFile,"\015\012",2);
 	}
 }
 
@@ -383,7 +401,7 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 
 	if (kv->PktInLen == 0) {  /* Long Packet */
 		NParam = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
-		off = 7;
+		off = 6;
 
 	} else {
 		NParam = kv->PktInLen - 2 - kv->KmtMy.CHKT;
@@ -536,7 +554,7 @@ void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 
 	if (kv->PktInLen == 0) {  /* Long Packet */
 		DataLen = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
-		off = 7;
+		off = 6;
 	} else {
 		DataLen = kv->PktInLen - kv->KmtMy.CHKT - 2;
 		off = 3;
@@ -603,20 +621,71 @@ void KmtDecode(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 
 static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 {
-	int DataLen, BuffPtr, off;
-	BYTE *p;
+	int DataLen, BuffPtr, off, c, n, j;
+	BYTE *p, *q;
+	char str[256];
+	struct tm tm;
 
 	BuffPtr = 0;
 
 	if (kv->PktInLen == 0) {  /* Long Packet */
 		DataLen = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
-		off = 7;
+		off = 6;
 	} else {
 		DataLen = kv->PktInLen - kv->KmtMy.CHKT - 2;
 		off = 3;
 	}
 
-	p = &kv->PktIn[off];
+	kv->FileAttrFlag = 0;
+	p = q = &kv->PktIn[1 + off];
+	while ((p - q) < DataLen) {
+		c = *p++;
+
+		n = KmtNum(*p);  /* 0-255 */
+		p++;
+		for (j = 0 ; j < n ; j++) {
+			str[j] = *p++;
+		}
+		str[j] = 0;
+
+		switch(c) {
+		case '.':	// System ID
+		case '*':	// Encoding
+		case '!':	// File length in K byte
+		case '-':	// Generic "world" protection code
+		case '/':	// Record format
+		case '(':	// File Block Size
+		case '+':	// Disposition
+		case '0':	// System-dependent parameters
+			break;
+		case '"':	// File type
+			kv->FileAttrFlag |= KMT_ATTR_TYPE;
+			kv->FileType = (str[0] == 'A' ? TRUE : FALSE);
+			break;
+		case '#':	// File creation date "20100226 12:23:45"
+			kv->FileAttrFlag |= KMT_ATTR_TIME;
+			memset(&tm, 0, sizeof(tm));
+			if ( sscanf(str, "%04d%02d%02d %02d:%02d:%02d", 
+				&tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
+				kv->FileTime = time(NULL);
+
+			} else {
+				tm.tm_year -= 1900;		// 1900-
+				tm.tm_mon -= 1;			// 0 - 11
+				kv->FileTime = mktime(&tm);
+			}
+			break;
+		case ',':	// File attribute "664"
+			kv->FileAttrFlag |= KMT_ATTR_MODE;
+			sscanf(str, "%03o", &kv->FileMode);
+			break;
+		case '1':	// File length in bytes
+			kv->FileAttrFlag |= KMT_ATTR_SIZE;
+			kv->FileSize = _atoi64(str);
+			break;
+		}
+	}
+
 }
 
 BOOL KmtEncode(PFileVar fv, PKmtVar kv)
@@ -1086,7 +1155,9 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 					kv->PktInCount = kv->PktInLen + 2;
 				} else {
 					/* If unchar(LEN) = 1 or 2, the packet is invalid and should cause an Error. */
+					KmtStringLog(fv, kv, "If unchar(LEN) = %d is 1 or 2, the packet is invalid.", kv->PktInLen);
 					GetPkt = FALSE;
+					kv->PktReadMode = WaitMark;
 					goto read_end;
 				}
 #else
@@ -1100,7 +1171,9 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 				// Tera Term側がLong Packetをサポートしていない場合に、サーバ側から不正に
 				// Long Packetが送られてきた場合も救済できる。
 				if (kv->PktInPtr > kv->KmtMy.MAXL) {
+					KmtStringLog(fv, kv, "Read buffer overflow(%d > %d).", kv->PktInPtr, kv->KmtMy.MAXL);
 					GetPkt = FALSE;
+					kv->PktReadMode = WaitMark;
 					goto read_end;
 				}
 				kv->PktIn[kv->PktInPtr] = b;
@@ -1115,7 +1188,6 @@ BOOL KmtReadPacket(PFileVar fv,  PKmtVar kv, PComVar cv)
 				// 期待したバッファサイズになったら終わる。
 				if (kv->PktInCount != 0 && kv->PktInPtr >= kv->PktInCount) {
 					GetPkt = TRUE;
-					break;
 				}
 #else
 				kv->PktInCount--;
@@ -1323,6 +1395,15 @@ read_end:
 			if (fv->FileOpen) _lclose(fv->FileHandle);
 			fv->FileOpen = FALSE;
 			kv->KmtState = ReceiveFile;
+
+			/* ファイル属性を設定する。*/
+			if (kv->FileAttrFlag & KMT_ATTR_TIME) {
+				struct _utimbuf utm;
+				memset(&utm, 0, sizeof(utm));
+				utm.actime  = kv->FileTime;
+				utm.modtime = kv->FileTime;
+				_utime(fv->FullName, &utm);
+			}
 		}
 	}
 
