@@ -4568,7 +4568,7 @@ BOOL DecLocatorReport(int Event, int Button) {
 #define MOUSE_POS_EXT_LIMIT (2047 - 32)
 
 int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
-  char tmpx[3], tmpy[4];
+  char tmpx[3], tmpy[3];
 
   switch (MouseReportExtMode) {
   case IdMouseTrackExtNone:
