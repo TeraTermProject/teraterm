@@ -138,6 +138,7 @@ static int NewKeyId, NewKeyLen;
 
 /* Mouse Report */
 int MouseReportMode;
+int MouseReportExtMode;
 unsigned int DecLocatorFlag;
 int LastX, LastY;
 int ButtonStat;
@@ -228,6 +229,7 @@ void ResetTerminal() /*reset variables but don't update screen */
   AutoRepeatMode = TRUE;
   FocusReportMode = FALSE;
   MouseReportMode = IdMouseTrackNone;
+  MouseReportExtMode = IdMouseTrackExtNone;
   DecLocatorFlag = 0;
 
   ChangeTerminalID();
@@ -2371,6 +2373,9 @@ void CSSetAttr()		// SGR
 	    if (ts.MouseEventTracking)
 	      FocusReportMode = TRUE;
 	    break;
+	  case 1005: // Extended Mouse Tracking
+	    if (ts.MouseEventTracking)
+	      MouseReportExtMode = IdMouseTrackExtUTF8;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
 	      BuffSaveScreen();
@@ -2501,6 +2506,8 @@ void CSSetAttr()		// SGR
 	    MouseReportMode = IdMouseTrackNone;
 	    break;
 	  case 1004: FocusReportMode = FALSE; break; // Focus Report
+	  case 1005: // Extended Mouse Tracking
+	      MouseReportExtMode = IdMouseTrackExtNone;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
 	      BuffClearScreen();
@@ -4557,8 +4564,46 @@ BOOL DecLocatorReport(int Event, int Button) {
   return TRUE;
 }
 
+#define MOUSE_POS_LIMIT (255 - 32)
+#define MOUSE_POS_EXT_LIMIT (2047 - 32)
+
 int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
-  return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
+  char tmpx[3], tmpy[4];
+
+  switch (MouseReportExtMode) {
+  case IdMouseTrackExtNone:
+    if (x >= MOUSE_POS_LIMIT) x = MOUSE_POS_LIMIT;
+    if (y >= MOUSE_POS_LIMIT) y = MOUSE_POS_LIMIT;
+    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
+    break;
+  case IdMouseTrackExtUTF8:
+    if (x >= MOUSE_POS_EXT_LIMIT) x = MOUSE_POS_EXT_LIMIT;
+    if (y >= MOUSE_POS_EXT_LIMIT) y = MOUSE_POS_EXT_LIMIT;
+    x += 32;
+    y += 32;
+    if (x < 128) {
+      tmpx[0] = x;
+      tmpx[1] = 0;
+    }
+    else {
+      tmpx[0] = (x >> 6) & 0x1f | 0xc0;
+      tmpx[1] = x & 0x3f | 0x80;
+      tmpx[2] = 0;
+    }
+    if (y < 128) {
+      tmpy[0] = y;
+      tmpy[1] = 0;
+    }
+    else {
+      tmpy[0] = (x >> 6) & 0x1f | 0xc0;
+      tmpy[1] = y & 0x3f | 0x80;
+      tmpy[2] = 0;
+    }
+    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%s%s", CLocale, mb+32, tmpx, tmpy);
+    break;
+  }
+  buff[0] = 0;
+  return 0;
 }
 
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
@@ -4593,11 +4638,6 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 
   if (x < 1) x = 1;
   if (y < 1) y = 1;
-
-  if (MouseReportMode != IdMouseTrackDECELR && MouseReportMode != IdMouseTrackNetTerm) {
-    if (x > 0xff - 32) x = 0xff - 32;
-    if (y > 0xff - 32) y = 0xff - 32;
-  }
 
   if (ShiftKey())
     modifier = 4;
