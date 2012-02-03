@@ -53,8 +53,13 @@
         </ul></li>
       <li>When the receiving file is empty, the file name is assigned to noname.</li>
       <li>When the receiving file name contains banned characters, these characters are replaced to _.</li>
-      <li>Kermit: Changed the MAXL from 90 to 94. Workaround for failing to communicate against NT-4S(Hitachi VoIP gateway).</li>
-      <li>Kermit: Improved the KERMIT.LOG more easily.</li>
+      <li>KERMIT protocol
+        <ul>
+          <li>Changed the MAXL from 90 to 94. Workaround for failing to communicate against NT-4S(Hitachi VoIP gateway).</li>
+          <li>Improved the KERMIT.LOG more easily.</li>
+          <li>added the <a href="../setup/teraterm-trans.html#kmlongpkt">KmtLongPacket</a> entry in the teraterm.ini file. The default value is off.
+          <li>added the <a href="../setup/teraterm-trans.html#kmfileattr">KmtFileAttr</a> entry in the teraterm.ini file. The default value is off.
+        </ul></li>
       <li>added the "<a href="../macro/command/loginfo.html">loginfo</a>" macro command.</li>
     </ul>
   </li>

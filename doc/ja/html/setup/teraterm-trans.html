@@ -109,6 +109,47 @@ KmtLog=off
 </pre>
 
 
+<h1><a name="kmlongpkt">Kermit のロングパケット</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの KmtLongPacket 行を、
+</p>
+
+<pre>
+KmtLongPacket=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で Kermit を用いたファイル転送をするときに、94バイト以上のロングパケットを扱うことができます。ただし、Kermitサーバ側が当該機能をサポートしている必要があります。
+</p>
+
+<pre>
+省略時:
+KmtLongPacket=off
+</pre>
+
+
+<h1><a name="kmfileattr">Kermit のファイル属性</a></h1>
+
+<p>
+設定ファイルの [Tera Term] セクションの KmtFileAttr 行を、
+</p>
+
+<pre>
+KmtFileAttr=on
+</pre>
+
+<p>
+のように変更すると、ホストと Tera Term の間で Kermit を用いたファイル転送をするときに、ファイル属性情報（サイズ、種別、タイムスタンプなど）を扱うことができます。ただし、Kermitサーバ側が当該機能をサポートしている必要があります。
+</p>
+
+<pre>
+省略時:
+KmtFileAttr=off
+</pre>
+
+
+
 <h1><a name="qvlog">Quick-VAN のログ</a></h1>
 
 <p>
