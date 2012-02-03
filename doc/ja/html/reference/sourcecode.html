@@ -1778,6 +1778,139 @@ YmodemLog=on
 
   <h3>ZMODEM</h3>
 
+TBD
+
+
+
+  <h3>KERMIT</h3>
+　KERMIT（カーミット：セサミストリートに登場するカエルのマペット）は、1981年にコロンビア大学で開発されたファイル転送プロトコルであり、現在はカーミットプロジェクトによりメンテナンスされています。下記のサイトから仕様書が入手できます。<br>
+　
+<ul>
+  <li><a href="http://www.kermitproject.org/">The Kermit Project</a></li>
+</ul>
+<br>
+
+　上記サイトでは、ソースコードも配布されており、様々なプラットフォームに実装されています。実装の名称としては、C-KermitやE-Kermit、Kermit95などがあります。<br>
+　teraterm.ini で KmtLog エントリを有効にすると、通信ログを採取することができます。通信ログファイルは、ttermpro.exe と同じディレクトリに"KERMIT.LOG"という名前で生成されます。
+　
+<pre class=code>
+; Kermit log
+KmtLog=on
+</pre>
+
+　KERMITは元々低速なシリアル通信を想定しているため、一度に送れるデータサイズはせいぜい94バイトです。ただし、拡張オプションで数千バイトのデータを扱うことはできますが、クライアントとサーバの両方が当該機能をサポートしている必要があります。<br>
+　パケットのフォーマットは基本形式と拡張形式があり、仕様書の「Appendix I Packet Format and Types」に分かりやすい図解があります。下記に引用します。<br>
+　以下は基本形式です。94バイトまでしか扱えません。
+
+<pre class=code>
+Basic Kermit Packet Layout
+       |&lt;------Included in CHECK------&gt;|
+       |                               |
++------+-----+-----+------+------ - - -+-------+
+| MARK | LEN | SEQ | TYPE | DATA       | CHECK |&lt;terminator&gt;
++------+-----+-----+------+------ - - -+-------+
+             |                                 |
+             |&lt;--------LEN-32 characters------&gt;|
+
+  MARK   パケットの先頭。CTRL-A(0x01)が入る。
+  LEN    パケットサイズ+32。"LEN+2"バイトが全体サイズとなる。
+  SEQ    「シーケンス番号+32」の剰余64。シーケンス番号は0～63まで。
+  TYPE   大文字アルファベットでパケットの種別を表す。
+  DATA   データ
+  CHECK  加算チェックサム。1,2,3バイトのいずれかの形式を選べる。
+</pre>
+
+　以下は拡張形式です。
+
+<pre class=code>
+Kermit Extended Packet Layout
+       |&lt;-------------------------Included in CHECK-------------&gt;|
+       |                                                         |
+       |&lt;-------Included in HCHECK-------&gt;|                      |
+       |                                  |                      |
++------+-----+-----+------+-------+-------+--------+----- - - - -+-------+
+| MARK |     | SEQ | TYPE | LENX1 | LENX2 | HCHECK | DATA        | CHECK |
++------+-----+-----+------+-------+-------+--------+----- - - - -+-------+
+        blank                                      |                     |
+                                                   |&lt;-------------------&gt;|
+                    LX1=LENX1-32, LX2=LX2-32 95 x LX1 + LX2 chars
+HCHECK is a single-character type 1 checksum
+</pre>
+
+　拡張形式では94バイト以上のデータを一度に送れるようにするため、データサイズを表現する領域が2バイトに増えています。基本形式の"LEN"は常にゼロです（32を加算するので、ASCIIコードの空白になる）。また、ヘッダサイズが3バイト増えており、ヘッダ用のチェックサムが追加されています。<br>
+　<br>
+　
+　下記は初期文字列です。
+　
+<pre class=code>
+Initialization String
+1         2      3       4       5       6       7       8       9       10
++-------+-------+-------+-------+-------+-------+-------+-------+-------+- -
+| MAXL  | TIME  | NPAD  | PADC  | EOL   | QCTL  | QBIN  | CHKT  | REPT  |
++-------+-------+-------+-------+-------+-------+-------+-------+-------+- -
+     10           CAPAS+1  CAPAS+2  CAPAS+3
+- --+-------+ - -+--------+--------+--------+- -
+    | CAPAS ... 0| WINDO  | MAXLX1 | MAXLX1 |
+- --+-------+-  -+--------+--------+--------+- -
+
+MAXL  Maximum length (0-94) +32
+TIME  Timeout, seconds (0-94) +32
+NPAD  Number of pad characters (0-94) +32
+EOL   Packet terminator (0-63) +32
+QCTL  Control prefix, literal
+QBIN  8th bit prefix, literal
+CHKT  Block check type {1,2,3}, literal
+REPT  Repeat count prefix, literal
+CAPAS Extendable capabilities mask, ends when value-32 is even
+WINDO Window size (0-31) +32
+MAXLX1
+      High part of extended packet maximum length (int(max/95)+32)
+MAXLX2
+      Low part of extended packet maximum length (mod(max,95)+32)
+</pre>
+
+　下記はパケット種別です。
+
+<pre class=code>
+Packet Types
+Y   Acknowledgment (ACK). Data according to what kind of packet is being acknowledged.
+N   Negative Acknowledgment (NAK). Data field always empty.
+S   Send Initiation. Data field contains unencoded initialization string. Tells receiver to expect files. ACK to this packet also contains unencoded initialization string.
+I   Initialize. Data field contains unencoded initialization string. Sent to server to set parameters prior to a command. ACK to this packet also contains unencoded initialization string.
+F   File Header. Indicates file data about to arrive for named file. Data field contains encoded file name. ACK to this packet may contain encoded name receiver will store file under.
+X   Text Header. Indicates screen data about to arrive. Data field contains encoded heading for display.
+A   File Attributes. Data field contains unencoded attributes. ACK may contain unencoded corresponding
+agreement or refusal, per attribute.
+D   Data Packet. Data field contains encoded file or screen data. ACK may contain X to interrupt sending this file, Z to interrupt entire transaction.
+Z   End of file. Data field may contain D for Discard.
+B   Break transmission.
+E   Error. Data field contains encoded error message.
+R   Receive Initiate. Data field contains encoded file name.
+C   Host Command. Data field contains encoded command for host’s command processor.
+K   Kermit Command. Data field contains encoded command for Kermit command processor.
+T   Timeout psuedopacket, for internal use.
+Q   Block check error psuedopacket, for internal use.
+G   Generic Kermit Command. Data field contains a single character subcommand, followed by zero or more
+    length-encoded operands, encoded after formation:
+    I Login [<%user[%password[%account]]>]
+    C CWD, Change Working Directory [<%directory[%password]>]
+    L Logout, Bye
+    F Finish (Shut down the server, but don’t logout).
+    D Directory [<%filespec>]
+    U Disk Usage Query [<%area>]
+    E Erase (delete) <%filespec>
+    T Type <%filespec>
+    R Rename <%oldname%newname>
+    K Copy <%source%destination>
+    W Who’s logged in? [<%user ID or network host[%options]>]
+    M Send a short Message <%destination%text>
+    H Help [<%topic>]
+    Q Server Status Query
+    P Program <%[program-filespec][%program-commands]>
+    J Journal <%command[%argument]>
+    V Variable <%command[%argument[%argument]]>
+</pre>
+
 
 </BODY>
 </HTML>
