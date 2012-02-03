@@ -59,8 +59,8 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 		Ok = CDialog::Create(CFileTransDlg::IDD, NULL);
 	}
 
-	// 呼び出し元から移動 (2009.2.7 maya)
 	if (!fv->HideDialog) {
+		// Visible = False のダイアログを表示する
 		ShowWindow(SW_SHOWNORMAL);
 		if (fv->OpId == OpLog) {
 			ShowWindow(SW_MINIMIZE);
