@@ -23,7 +23,7 @@ All rights reserved.
 #include "dlglib.h"
 #include "ftlib.h"
 
-//#define KERMIT_CAPAS
+#define KERMIT_CAPAS
 
 /* kermit parameters */
 #define MaxNum 94
@@ -50,12 +50,17 @@ All rights reserved.
 #define	KMT_ATTR_SIZE	003
 #define	KMT_ATTR_TYPE	004
 
+/* MARK [LEN+SEQ+TYPE] DATA CHECK */
+#define HEADNUM 3
+/* MARK [LEN+SEQ+TYPE+LENX1+LENX2+HCHECK] DATA CHECK */
+#define LONGPKT_HEADNUM 6
+
 BYTE KmtNum(BYTE b);
 
 
 static void KmtOutputCommonLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 {
-	int i, datalen;
+	int i, datalen, n;
 	char str[128];
 	char type, *s;
 
@@ -72,6 +77,13 @@ static void KmtOutputCommonLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 	+------+-------------+-------------+------+------------+-------+
 	| MARK | tochar(LEN) | tochar(SEQ) | TYPE | DATA       | CHECK |
 	+------+-------------+-------------+------+------------+-------+
+	                     <------------ LEN ------------------------>
+
+	Long Packet Format
+	+------+-----+-----+------+-------+-------+--------+----- - - - -+-------+
+	| MARK |  0  | SEQ | TYPE | LENX1 | LENX2 | HCHECK | DATA        | CHECK |
+	+------+-----+-----+------+-------+-------+--------+----- - - - -+-------+
+	                                                   <-- 95*LENX1+LENX2 --->
 	 */
 	if (len >= 4) {
 		type = buf[3];
@@ -94,10 +106,14 @@ static void KmtOutputCommonLog(PFileVar fv, PKmtVar kv, BYTE *buf, int len)
 			case 'G': s = "GenericKermitCommand"; break;
 			default: s = "UNKNOWN"; break;
 		}
-		datalen = KmtNum(buf[1]) - 2 - kv->KmtMy.CHKT;
+		n = KmtNum(buf[1]);
+		if (n >= 3)
+			datalen = n - 2 - kv->KmtMy.CHKT;
+		else
+			datalen = KmtNum(buf[4])*95 + KmtNum(buf[5]) - kv->KmtMy.CHKT;
 
 		_snprintf_s(str, sizeof(str), _TRUNCATE, "MARK=%x LEN=%d SEQ#=%d TYPE=%s DATA_LEN=%d\n",
-			buf[0], KmtNum(buf[1]), KmtNum(buf[2]), s, datalen);
+			buf[0], n, KmtNum(buf[2]), s, datalen);
 		_lwrite(fv->LogFile, str, strlen(str));
 
 		// Initial Connection
@@ -275,14 +291,14 @@ void KmtMakePacket(PFileVar fv, PKmtVar kv, BYTE SeqNum, BYTE PktType, int DataL
 		kv->PktOut[4] = KmtChar(k / 95);
 		kv->PktOut[5] = KmtChar(k % 95);
 		Sum = KmtCheckSumType1(&kv->PktOut[1], 5);
-		kv->PktOut[6] = KmtChar((BYTE)Sum);  /* HCHECK */
+		kv->PktOut[6] = (BYTE)Sum;  /* HCHECK */
 
 		/* LEN+SEQ+TYPE+LENX1+LENX2+HCHECK */
-		headnum = 6;
+		headnum = LONGPKT_HEADNUM;
 
 	} else {
 		/* LEN+SEQ+TYPE */
-		headnum = 3;
+		headnum = HEADNUM;
 	}
 
 	/* check sum */
@@ -396,16 +412,16 @@ BOOL KmtCheckQuote(BYTE b)
 
 void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 {
-	int i, NParam, off, cap;
+	int i, NParam, off, cap, maxlen;
 	BYTE b, n;
 
 	if (kv->PktInLen == 0) {  /* Long Packet */
 		NParam = kv->PktInLongPacketLen - kv->KmtMy.CHKT;
-		off = 6;
+		off = LONGPKT_HEADNUM;
 
 	} else {
 		NParam = kv->PktInLen - 2 - kv->KmtMy.CHKT;
-		off = 3;
+		off = HEADNUM;
 	}
 
 	for (i=1 ; i <= NParam ; i++)
@@ -512,12 +528,24 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 			  }
 			  kv->KmtMy.CAPAS = cap;
 			  break;
+
+		  case 11:  /* WINDO */
+			  // TBD
+			  break;
+
+		  case 12:  /* LENX1 */
+			  maxlen = n * 95;
+			  break;
+
+		  case 13:  /* LENX2 */
+			  maxlen += n;
+			  break;
 		}
 	}
 
 	/* Long Packet の場合、MAXL を更新する。*/
 	if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
-		kv->KmtMy.MAXL = kv->PktInLongPacketLen;
+		kv->KmtMy.MAXL = maxlen;
 		if (kv->KmtMy.MAXL < 10)
 			kv->KmtMy.MAXL = 80;
 		else if (kv->KmtMy.MAXL > KMT_DATAMAX)
@@ -796,7 +824,7 @@ void KmtSendEOFPacket(PFileVar fv, PKmtVar kv, PComVar cv)
 
 void KmtSendNextData(PFileVar fv, PKmtVar kv, PComVar cv)
 {
-	int DataLen, DataLenNew;
+	int DataLen, DataLenNew, maxlen;
 	BOOL NextFlag;
 
 	SetDlgNum(fv->HWin, IDC_PROTOBYTECOUNT, fv->ByteCount);
@@ -806,10 +834,16 @@ void KmtSendNextData(PFileVar fv, PKmtVar kv, PComVar cv)
 	DataLen = 0;
 	DataLenNew = 0;
 
+	if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
+		maxlen = kv->KmtMy.MAXL - 6;
+	} else {
+		maxlen = kv->KmtYour.MAXL-kv->KmtMy.CHKT-4;
+	}
+
 	NextFlag = KmtEncode(fv,kv);
 	if (NextFlag) DataLenNew = DataLen + strlen(kv->ByteStr);
 	while (NextFlag &&
-		(DataLenNew < kv->KmtYour.MAXL-kv->KmtMy.CHKT-4))
+		(DataLenNew < maxlen))
 	{
 		strncpy_s(&(kv->PktOut[4+DataLen]),sizeof(kv->PktOut) - (4+DataLen),kv->ByteStr,_TRUNCATE);
 		DataLen = DataLenNew;
