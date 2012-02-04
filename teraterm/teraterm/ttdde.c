@@ -635,8 +635,11 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		case '8': //steven add
 			if (HWndLog == NULL)
 				break;
-			else
+			else {
 				ShowWindow(HWndLog, SW_RESTORE);
+				// Šg’£ƒXƒ^ƒCƒ‹ WS_EX_NOACTIVATE ó‘Ô‚ğ‰ğœ‚·‚é
+				SetForegroundWindow(HWndLog);
+			}
 			break;
 		}
 		break;

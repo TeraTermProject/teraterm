@@ -30,7 +30,7 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	BOOL Ok;
 	WNDCLASS wc;
 	int fuLoad = LR_DEFAULTCOLOR;
-	HWND hwnd = GetForegroundWindow()->GetSafeHwnd();
+	HWND hwnd;
 
 	fv = pfv;
 	cv = pcv;
@@ -52,6 +52,7 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	RegisterClass(&wc);
 
 	Pause = FALSE;
+	hwnd = GetForegroundWindow()->GetSafeHwnd();
 	if (fv->OpId == OpLog) { // parent window is desktop
 		Ok = CDialog::Create(CFileTransDlg::IDD, GetDesktopWindow());
 	}
@@ -67,6 +68,8 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 		}
 	}
 	else {
+		// 直前にフォアグラウンドだったウィンドウにフォーカスを戻す。
+		// メニューからログをスタートした時に VTWin にフォーカスが戻らないので必要っぽい。
 		::SetForegroundWindow(hwnd);
 	}
 
@@ -158,6 +161,15 @@ void CFileTransDlg::RefreshNum()
 BOOL CFileTransDlg::OnInitDialog()
 {
 	int fuLoad = LR_DEFAULTCOLOR;
+
+	if (fv->HideDialog) {
+		// Visible = False でもフォアグラウンドに来てしまうので、そうならない
+		// ように拡張スタイル WS_EX_NOACTIVATE を指定する。
+		// (Windows 2000 以上で有効)
+		// WS_EX_NOACTIVATE を指定すると表示されている時もタスクバーに現れない
+		// ので WS_EX_APPWINDOW も指定する。
+		ModifyStyleEx(0, WS_EX_NOACTIVATE | WS_EX_APPWINDOW);
+	}
 
 	SetWindowText(fv->DlgCaption);
 	SetDlgItemText(IDC_TRANSFNAME, &(fv->FullName[fv->DirLen]));
