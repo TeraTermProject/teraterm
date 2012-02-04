@@ -1892,23 +1892,23 @@ T   Timeout psuedopacket, for internal use.
 Q   Block check error psuedopacket, for internal use.
 G   Generic Kermit Command. Data field contains a single character subcommand, followed by zero or more
     length-encoded operands, encoded after formation:
-    I Login [<%user[%password[%account]]>]
-    C CWD, Change Working Directory [<%directory[%password]>]
+    I Login [&lt;%user[%password[%account]]&gt;]
+    C CWD, Change Working Directory [&lt;%directory[%password]&gt;]
     L Logout, Bye
     F Finish (Shut down the server, but donÅft logout).
-    D Directory [<%filespec>]
-    U Disk Usage Query [<%area>]
-    E Erase (delete) <%filespec>
-    T Type <%filespec>
-    R Rename <%oldname%newname>
-    K Copy <%source%destination>
-    W WhoÅfs logged in? [<%user ID or network host[%options]>]
-    M Send a short Message <%destination%text>
-    H Help [<%topic>]
+    D Directory [&lt;%filespec&gt;]
+    U Disk Usage Query [&lt;%area&gt;]
+    E Erase (delete) &lt;%filespec&gt;
+    T Type &lt;%filespec&gt;
+    R Rename &lt;%oldname%newname&gt;
+    K Copy &lt;%source%destination&gt;
+    W WhoÅfs logged in? [&lt;%user ID or network host[%options]&gt;]
+    M Send a short Message &lt;%destination%text&gt;
+    H Help [&lt;%topic&gt;]
     Q Server Status Query
-    P Program <%[program-filespec][%program-commands]>
-    J Journal <%command[%argument]>
-    V Variable <%command[%argument[%argument]]>
+    P Program &lt;%[program-filespec][%program-commands]&gt;
+    J Journal &lt;%command[%argument]&gt;
+    V Variable &lt;%command[%argument[%argument]]&gt;
 </pre>
 
 
