@@ -835,7 +835,12 @@ void KmtSendNextData(PFileVar fv, PKmtVar kv, PComVar cv)
 	DataLenNew = 0;
 
 	if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
-		maxlen = kv->KmtMy.MAXL - 6;
+		// Long Packetで94バイト以上送ると、なぜか相手側が受け取ってくれないので、
+		// 送信失敗するため、94バイトに制限する。
+		// 受信は速いが、送信は遅くなる。
+		// (2012.2.5 yutaka)
+		//maxlen = kv->KmtMy.MAXL - kv->KmtMy.CHKT - LONGPKT_HEADNUM - 1;
+		maxlen = kv->KmtYour.MAXL-kv->KmtMy.CHKT-4;
 	} else {
 		maxlen = kv->KmtYour.MAXL-kv->KmtMy.CHKT-4;
 	}
