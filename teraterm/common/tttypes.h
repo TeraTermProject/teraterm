@@ -629,8 +629,8 @@ typedef struct tttset TTTSet, *PTTSet;
   /* Extended mouse tracking mode */
 #define IdMouseTrackExtNone  0
 #define IdMouseTrackExtUTF8  1
-#define IdMouseTrackExtSGR   2  // ‚»‚Ì‚¤‚¿c
-#define IdMouseTrackExtURXVT 3  // ‹C‚ªŒü‚¢‚½‚çc
+#define IdMouseTrackExtSGR   2
+#define IdMouseTrackExtURXVT 3
 
   /* Mouse event */
 #define IdMouseEventCurStat  0

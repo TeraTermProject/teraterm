@@ -2381,6 +2381,10 @@ void CSSetAttr()		// SGR
 	    if (ts.MouseEventTracking)
 	      MouseReportExtMode = IdMouseTrackExtSGR;
 	    break;
+	  case 1015: // Extended Mouse Tracking (rxvt-unicode)
+	    if (ts.MouseEventTracking)
+	      MouseReportExtMode = IdMouseTrackExtURXVT;
+	    break;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
 	      BuffSaveScreen();
@@ -2515,6 +2519,7 @@ void CSSetAttr()		// SGR
 	    break;
 	  case 1005: // Extended Mouse Tracking (UTF-8)
 	  case 1006: // Extended Mouse Tracking (SGR)
+	  case 1015: // Extended Mouse Tracking (rxvt-unicode)
 	      MouseReportExtMode = IdMouseTrackExtNone;
 	    break;
 	  case 1047: // Alternate Screen Buffer
@@ -4585,6 +4590,7 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
     if (y >= MOUSE_POS_LIMIT) y = MOUSE_POS_LIMIT;
     return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
     break;
+
   case IdMouseTrackExtUTF8:
     if (x >= MOUSE_POS_EXT_LIMIT) x = MOUSE_POS_EXT_LIMIT;
     if (y >= MOUSE_POS_EXT_LIMIT) y = MOUSE_POS_EXT_LIMIT;
@@ -4610,8 +4616,13 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
     }
     return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%s%s", CLocale, mb+32, tmpx, tmpy);
     break;
+
   case IdMouseTrackExtSGR:
     return _snprintf_s_l(buff, buffsize, _TRUNCATE, "<%d;%d;%d%c", CLocale, mb&0x7f, x, y, (mb&0x80)?'m':'M');
+    break;
+
+  case IdMouseTrackExtURXVT:
+    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d;%dM", CLocale, mb+32, x, y);
     break;
   }
   buff[0] = 0;
