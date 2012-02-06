@@ -2376,6 +2376,7 @@ void CSSetAttr()		// SGR
 	  case 1005: // Extended Mouse Tracking
 	    if (ts.MouseEventTracking)
 	      MouseReportExtMode = IdMouseTrackExtUTF8;
+	    break;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
 	      BuffSaveScreen();
@@ -2505,9 +2506,12 @@ void CSSetAttr()		// SGR
 	  case 1003: // Any-Event Mouse Tracking
 	    MouseReportMode = IdMouseTrackNone;
 	    break;
-	  case 1004: FocusReportMode = FALSE; break; // Focus Report
+	  case 1004: // Focus Report
+	    FocusReportMode = FALSE;
+	    break;
 	  case 1005: // Extended Mouse Tracking
-	      MouseReportExtMode = IdMouseTrackExtNone;
+	    MouseReportExtMode = IdMouseTrackExtNone;
+	    break;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
 	      BuffClearScreen();
