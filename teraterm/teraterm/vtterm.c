@@ -2373,9 +2373,13 @@ void CSSetAttr()		// SGR
 	    if (ts.MouseEventTracking)
 	      FocusReportMode = TRUE;
 	    break;
-	  case 1005: // Extended Mouse Tracking
+	  case 1005: // Extended Mouse Tracking (UTF-8)
 	    if (ts.MouseEventTracking)
 	      MouseReportExtMode = IdMouseTrackExtUTF8;
+	    break;
+	  case 1006: // Extended Mouse Tracking (SGR)
+	    if (ts.MouseEventTracking)
+	      MouseReportExtMode = IdMouseTrackExtSGR;
 	    break;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
@@ -2509,8 +2513,9 @@ void CSSetAttr()		// SGR
 	  case 1004: // Focus Report
 	    FocusReportMode = FALSE;
 	    break;
-	  case 1005: // Extended Mouse Tracking
-	    MouseReportExtMode = IdMouseTrackExtNone;
+	  case 1005: // Extended Mouse Tracking (UTF-8)
+	  case 1006: // Extended Mouse Tracking (SGR)
+	      MouseReportExtMode = IdMouseTrackExtNone;
 	    break;
 	  case 1047: // Alternate Screen Buffer
 	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
@@ -4605,13 +4610,16 @@ int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
     }
     return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%s%s", CLocale, mb+32, tmpx, tmpy);
     break;
+  case IdMouseTrackExtSGR:
+    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "<%d;%d;%d%c", CLocale, mb&0x7f, x, y, (mb&0x80)?'m':'M');
+    break;
   }
   buff[0] = 0;
   return 0;
 }
 
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
-  char Report[10];
+  char Report[32];
   int x, y, len, modifier;
   static int LastSendX = -1, LastSendY = -1, LastButton = IdButtonRelease;
 
@@ -4688,7 +4696,13 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	case IdMouseTrackVT200:
 	case IdMouseTrackBtnEvent:
 	case IdMouseTrackAllEvent:
-	  len = MakeMouseReportStr(Report, sizeof Report, IdButtonRelease | modifier, x, y);
+	  if (MouseReportExtMode == IdMouseTrackExtSGR) {
+	    modifier |= 128;
+	  }
+	  else {
+	    Button = IdButtonRelease;
+	  }
+	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
 	  LastSendX = x;
 	  LastSendY = y;
 	  LastButton = IdButtonRelease;
