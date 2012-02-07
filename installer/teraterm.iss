@@ -236,11 +236,13 @@ Name: sshassoc; Description: {cm:task_sshassoc}; Components: TTSSH; Flags: unche
 Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_Plugins/TTXttyrec; Flags: unchecked
 
 [Run]
-Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
-Filename: {tmp}\Setup_LogMeTT_2_9_9_2.exe; Components: LogMeTT
-Filename: {tmp}\Setup_TTLEditor_1_4_41.exe; Components: TTLEdit
-Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
-Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
+Filename: "{app}\ttermpro.exe"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:launch_teraterm}"; Components: TeraTerm
+Filename: "{tmp}\Setup_LogMeTT_2_9_9_2.exe"; Flags: skipifsilent; Components: LogMeTT
+Filename: "{tmp}\Setup_LogMeTT_2_9_9_2.exe"; Parameters: "/SILENT"; Flags: skipifnotsilent; Components: LogMeTT
+Filename: "{tmp}\Setup_TTLEditor_1_4_41.exe"; Flags: skipifsilent; Components: TTLEdit
+Filename: "{tmp}\Setup_TTLEditor_1_4_41.exe"; Parameters: "/SILENT"; Flags: skipifnotsilent; Components: TTLEdit
+Filename: "{app}\ttpmenu.exe"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:launch_ttmenu}"; Components: TeraTerm_Menu
+Filename: "{app}\Collector\Collector.exe"; Flags: nowait postinstall skipifsilent unchecked; Description: "{cm:launch_collector}"; Components: Collector
 
 [CustomMessages]
 en.task_desktopicon=Create Tera Term shortcut to &Desktop
