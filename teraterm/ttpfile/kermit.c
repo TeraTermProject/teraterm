@@ -897,7 +897,7 @@ BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
 
 	if (_stati64(fv->FullName, &st) == 0) {
 		kv->FileAttrFlag = KMT_ATTR_TIME | KMT_ATTR_MODE | KMT_ATTR_SIZE | KMT_ATTR_TYPE;
-		kv->FileType = TRUE;
+		kv->FileType = FALSE; // Binary
 		kv->FileTime = st.st_ctime;
 		kv->FileMode = st.st_mode;
 		kv->FileSize = st.st_size;
