@@ -839,8 +839,12 @@ void KmtSendNextData(PFileVar fv, PKmtVar kv, PComVar cv)
 		// 送信失敗するため、94バイトに制限する。
 		// 受信は速いが、送信は遅くなる。
 		// (2012.2.5 yutaka)
-		//maxlen = kv->KmtMy.MAXL - kv->KmtMy.CHKT - LONGPKT_HEADNUM - 1;
-		maxlen = kv->KmtYour.MAXL-kv->KmtMy.CHKT-4;
+		// CommBinaryOut() で1KBまでという制限がかかっていることが判明したため、
+		// 512バイトまでに拡張する。
+		// (2012.2.7 yutaka)
+		maxlen = kv->KmtMy.MAXL - kv->KmtMy.CHKT - LONGPKT_HEADNUM - 1;
+		maxlen = min(maxlen, 512);
+
 	} else {
 		maxlen = kv->KmtYour.MAXL-kv->KmtMy.CHKT-4;
 	}
