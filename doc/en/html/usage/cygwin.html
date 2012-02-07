@@ -44,5 +44,24 @@ Otherwise telnet port number of TCP/IP is saved but 23 you will be confused by c
 </p>
 
 
-</BODY>
-</HTML>
+
+<h2>Cygterm Here</h2>
+
+<!--p>
+インストーラで選択すると、フォルダの右クリックや開いているフォルダに Cygterm Here というコンテキストメニューが追加されます。選択されているフォルダで Cygwin 接続を開くことができます。
+</p>
+
+<p>
+一般的な環境で動作するようにパラメータを設定していますが、csh/tcsh では CHERE_INVOKING をチェックしないことがあります。必要であれば /etc/csh.login を修正するか Cygterm Here のレジストリ設定を下記のように変更してください。
+</p-->
+
+<pre>
+before:
+"C:\Program Files\teraterm\cyglaunch.exe" -nocd -v CHERE_INVOKING=y -d "\"%L\""
+after:
+"C:\Program Files\teraterm\cyglaunch.exe" -nocd -nols -d "\"%L\""
+</pre>
+
+
+</body>
+</html>
