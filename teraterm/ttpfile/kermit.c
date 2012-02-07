@@ -338,7 +338,7 @@ void KmtSendInitPkt(PFileVar fv, PKmtVar kv, PComVar cv, BYTE PktType)
 		kv->PktOut[13] = KmtChar(kv->KmtMy.CAPAS);
 		NParam++;
 		if (kv->KmtMy.CAPAS & KMT_CAP_LONGPKT) {
-			kv->PktOut[14] = KmtChar(1);
+			kv->PktOut[14] = KmtChar(0);
 			kv->PktOut[15] = KmtChar(KMT_DATAMAX / 95);
 			kv->PktOut[16] = KmtChar(KMT_DATAMAX % 95);
 			NParam += 3;
