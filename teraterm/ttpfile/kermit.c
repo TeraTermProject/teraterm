@@ -690,17 +690,90 @@ static void KmtRecvFileAttr(PFileVar fv, PKmtVar kv, PCHAR Buff, int *BuffLen)
 			kv->FileAttrFlag |= KMT_ATTR_TYPE;
 			kv->FileType = (str[0] == 'A' ? TRUE : FALSE);
 			break;
-		case '#':	// File creation date "20100226 12:23:45"
+		case '#':	// File creation date "[yy]yymmdd[ hh:mm[:ss]]"
 			kv->FileAttrFlag |= KMT_ATTR_TIME;
 			memset(&tm, 0, sizeof(tm));
-			if ( sscanf(str, "%04d%02d%02d %02d:%02d:%02d", 
-				&tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
-				kv->FileTime = time(NULL);
-
-			} else {
-				tm.tm_year -= 1900;		// 1900-
-				tm.tm_mon -= 1;			// 0 - 11
-				kv->FileTime = mktime(&tm);
+			switch (strlen(str)) {
+				case 17:
+					if ( sscanf(str, "%04d%02d%02d %02d:%02d:%02d",
+					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+					            &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
+						kv->FileTime = time(NULL);
+					} else {
+						tm.tm_year -= 1900;		// 1900-
+						tm.tm_mon -= 1;			// 0 - 11
+						kv->FileTime = mktime(&tm);
+					}
+					break;
+				case 14:
+					if ( sscanf(str, "%04d%02d%02d %02d:%02d",
+					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+					            &tm.tm_hour, &tm.tm_min) < 5 ) {
+						kv->FileTime = time(NULL);
+					} else {
+						tm.tm_year -= 1900;		// 1900-
+						tm.tm_mon -= 1;			// 0 - 11
+						tm.tm_sec = 0;
+						kv->FileTime = mktime(&tm);
+					}
+					break;
+				case 8:
+					if ( sscanf(str, "%04d%02d%02d",
+					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday) < 3 ) {
+						kv->FileTime = time(NULL);
+					} else {
+						tm.tm_year -= 1900;		// 1900-
+						tm.tm_mon -= 1;			// 0 - 11
+						tm.tm_hour = 0;
+						tm.tm_min = 0;
+						tm.tm_sec = 0;
+						kv->FileTime = mktime(&tm);
+					}
+					break;
+				case 15:
+					if ( sscanf(str, "%02d%02d%02d %02d:%02d:%02d",
+					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+					            &tm.tm_hour, &tm.tm_min, &tm.tm_sec) < 6 ) {
+						kv->FileTime = time(NULL);
+					} else {
+						if (tm.tm_year <= 49) {
+							tm.tm_year += 100;		// 1900-
+						}
+						tm.tm_mon -= 1;			// 0 - 11
+						kv->FileTime = mktime(&tm);
+					}
+					break;
+				case 12:
+					if ( sscanf(str, "%02d%02d%02d %02d:%02d",
+					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+					            &tm.tm_hour, &tm.tm_min) < 5 ) {
+						kv->FileTime = time(NULL);
+					} else {
+						if (tm.tm_year <= 49) {
+							tm.tm_year += 100;		// 1900-
+						}
+						tm.tm_mon -= 1;			// 0 - 11
+						tm.tm_sec = 0;
+						kv->FileTime = mktime(&tm);
+					}
+					break;
+				case 6:
+					if ( sscanf(str, "%02d%02d%02d",
+					            &tm.tm_year, &tm.tm_mon, &tm.tm_mday) < 3 ) {
+						kv->FileTime = time(NULL);
+					} else {
+						if (tm.tm_year <= 49) {
+							tm.tm_year += 100;		// 1900-
+						}
+						tm.tm_mon -= 1;			// 0 - 11
+						tm.tm_hour = 0;
+						tm.tm_min = 0;
+						tm.tm_sec = 0;
+						kv->FileTime = mktime(&tm);
+					}
+					break;
+				default:
+					kv->FileTime = time(NULL);
 			}
 			break;
 		case ',':	// File attribute "664"
