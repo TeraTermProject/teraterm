@@ -1196,9 +1196,14 @@ WORD TTLFileDelete()
 		SetResult(-1);
 		return Err;
 	}
-	remove(FName);
+	
+	if (remove(FName) != 0) {
+		SetResult(-1);
+	}
+	else {
+		SetResult(0);
+	}
 
-	SetResult(0);
 	return Err;
 }
 
