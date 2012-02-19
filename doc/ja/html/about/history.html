@@ -47,10 +47,6 @@
         </ul></li>
       <li>OSC 52 (クリップボードアクセス) 制御文字列によるクリップボードの読み取りに対応した。</li>
       <li>xterm(UTF-8), xterm(SGR), rxvt-unicode 形式の拡張マウスイベント通知に対応した。</li>
-      <li>書き込み中のログファイルを排他ロックするかどうかを設定できるようにした。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a> エントリを追加した。デフォルトは on。</li>
-        </ul></li>
       <li>ファイル転送で受信ファイル名が空文字列だった時、ファイル名を noname にするようにした。</li>
       <li>ファイル転送で受信ファイル名に使えない文字が含まれていた時、その文字を _ に置き換えるようにした。</li>
       <li>KERMIT プロトコル
@@ -60,6 +56,10 @@
           <li>teraterm.ini に <a href="../setup/teraterm-trans.html#kmlongpkt">KmtLongPacket</a> エントリを追加した。デフォルトは off。</li>
           <li>teraterm.ini に <a href="../setup/teraterm-trans.html#kmfileattr">KmtFileAttr</a> エントリを追加した。デフォルトは off。</li>
         </ul></li>
+      <li>書き込み中のログファイルを排他ロックするかどうかを設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a> エントリを追加した。デフォルトは on。</li>
+        </ul></li>
       <li>マクロコマンド "<a href="../macro/command/loginfo.html">loginfo</a>" を追加した。</li>
     </ul>
   </li>
@@ -67,9 +67,9 @@
   <li>バグ修正
     <ul>
       <li>キリル文字の変換テーブル(KOI8-R, CP866, Windows-1251, ISO8859-5 間)を修正した。</li>
-      <li>マクロコマンド "<a href="../macro/command/filerename.html">filerename</a>" において、リネームが失敗した場合、result にエラーをセットするようにした。</li>
       <li>XMODEM, YMODEM で送信中に表示されるパケット番号が正しくない場合がある問題を修正</li>
       <li>ログ取得を開始したとき、ログウィンドウが一瞬アクティブになる動作を修正(対策は Windows 2000 以降でのみ有効)。</li>
+      <li>マクロコマンド "<a href="../macro/command/filerename.html">filerename</a>" において、リネームが失敗した場合、result にエラーをセットするようにした。</li>
       <li>マクロコマンド "<a href="../macro/command/filedelete.html">filedelete</a>" において、削除が失敗した場合、result にエラーをセットするようにした。</li>
     </ul>
   </li>
@@ -77,7 +77,6 @@
   <li>その他
     <ul>
       <li><a href="#ttssh_2.60">TTSSH(2.60)</a>へ差し替えた。</li>
-      <li></li>
     </ul>
   </li>
 </ul>
@@ -1824,7 +1823,7 @@
 
 <h3><a name="ttssh_2.60">2012.xx.xx (Ver 2.60)</a></h3>
 <ul class="history">
-  <li>変更
+  <!--li>変更
     <ul>
     </ul>
   </li>
@@ -1832,7 +1831,7 @@
   <li>バグ修正
     <ul>
     </ul>
-  </li>
+  </li-->
 
   <li>その他
     <ul>

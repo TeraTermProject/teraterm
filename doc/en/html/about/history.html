@@ -47,10 +47,6 @@
         </ul></li>
       <li>added support for reading the Clipboard by using the OSC 52(clipboard accessing) control sequence.</li>
       <li>added support for xterm(UTF-8), xterm(SGR) and rxvt-unicode style extended mouse tracking mode.</li>
-      <li>added support for exclusive-locking the log file in written mode.
-        <ul>
-          <li>added the <a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a> entry in the teraterm.ini file. The default value is on.
-        </ul></li>
       <li>When the receiving file is empty, the file name is assigned to noname.</li>
       <li>When the receiving file name contains banned characters, these characters are replaced to _.</li>
       <li>KERMIT protocol
@@ -60,6 +56,10 @@
           <li>added the <a href="../setup/teraterm-trans.html#kmlongpkt">KmtLongPacket</a> entry in the teraterm.ini file. The default value is off.
           <li>added the <a href="../setup/teraterm-trans.html#kmfileattr">KmtFileAttr</a> entry in the teraterm.ini file. The default value is off.
         </ul></li>
+      <li>added support for exclusive-locking the log file in written mode.
+        <ul>
+          <li>added the <a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a> entry in the teraterm.ini file. The default value is on.
+        </ul></li>
       <li>added the "<a href="../macro/command/loginfo.html">loginfo</a>" macro command.</li>
     </ul>
   </li>
@@ -67,9 +67,9 @@
   <li>Bug fixes
     <ul>
       <li>Updated the Cyrillic letter translation table(range of KOI8-R, CP866, Windows-1251 and ISO8859-5).</li>
-      <li>"<a href="../macro/command/filerename.html">filerename</a>" macro command: When a file can not be renamed, the error code stores to the result variable.</li>
       <li>The packet number will not be correct while sending a file by using the XMODEM and YMODEM protocol.</li>
       <li>When a log is started, the log window is temporarily activated. However, this is enabled for Windows 2000 later.</li>
+      <li>"<a href="../macro/command/filerename.html">filerename</a>" macro command: When a file can not be renamed, the error code stores to the result variable.</li>
       <li>"<a href="../macro/command/filedelete.html">filedelete</a>" macro command: When a file can not be removed, the error code stores to the result variable.</li>
     </ul>
   </li>
@@ -77,7 +77,6 @@
   <li>Misc
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.60">2.60</a></li>
-      <li></li>
     </ul>
   </li>
 </ul>
@@ -1823,7 +1822,7 @@ SYNOPSIS:
 
 <h3><a name="ttssh_2.60">2012.xx.xx (Ver 2.60)</a></h3>
 <ul class="history">
-  <li>Changes
+  <!--li>Changes
     <ul>
     </ul>
   </li>
@@ -1831,7 +1830,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
     </ul>
-  </li>
+  </li-->
 
   <li>Misc
     <ul>
