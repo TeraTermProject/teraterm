@@ -30,6 +30,7 @@ $(EXE) : $(SRC) $(RES)
 	strip $(EXE)
 
 $(LAUNCH) : $(LAUNCH_SRC) $(RES)
+	@# gcc 4.3.2? or later doesn't support "-mno-cygwin" flag.
 	( $(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
 	( gcc-3 $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
 	( i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) 
