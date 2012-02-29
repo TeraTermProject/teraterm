@@ -383,8 +383,8 @@ void load_cfg()
                 strcpy(dot, "rc");
             }
         }
-        mktemp(tmp_conf);
-        FILE* fp = fopen(tmp_conf, "w");
+        int fd = mkstemp(tmp_conf);
+        FILE* fp = fdopen(fd, "w");
         if (fp != NULL) {
             if (pw_ent != NULL) {
                 fprintf(fp, "ENV_1=USER=%s\n",  pw_ent->pw_name);

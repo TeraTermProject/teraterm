@@ -30,7 +30,9 @@ $(EXE) : $(SRC) $(RES)
 	strip $(EXE)
 
 $(LAUNCH) : $(LAUNCH_SRC) $(RES)
-	$(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES)
+	( $(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	( gcc-3 $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	( i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) 
 	strip $(LAUNCH)
 
 $(RC):
