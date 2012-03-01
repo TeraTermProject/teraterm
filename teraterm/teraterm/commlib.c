@@ -164,16 +164,24 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	dcb.BaudRate = ts->Baud;
 	dcb.fBinary = TRUE;
 	switch (ts->Parity) {
-		case IdParityEven:
-			dcb.fParity = TRUE;
-			dcb.Parity = EVENPARITY;
+		case IdParityNone:
+			dcb.Parity = NOPARITY;
 			break;
 		case IdParityOdd:
 			dcb.fParity = TRUE;
 			dcb.Parity = ODDPARITY;
 			break;
-		case IdParityNone:
-			dcb.Parity = NOPARITY;
+		case IdParityEven:
+			dcb.fParity = TRUE;
+			dcb.Parity = EVENPARITY;
+			break;
+		case IdParityMark:
+			dcb.fParity = TRUE;
+			dcb.Parity = MARKPARITY;
+			break;
+		case IdParitySpace:
+			dcb.fParity = TRUE;
+			dcb.Parity = SPACEPARITY;
 			break;
 	}
 
@@ -205,6 +213,9 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	switch (ts->StopBit) {
 		case IdStopBit1:
 			dcb.StopBits = ONESTOPBIT;
+			break;
+		case IdStopBit15:
+			dcb.StopBits = ONE5STOPBITS;
 			break;
 		case IdStopBit2:
 			dcb.StopBits = TWOSTOPBITS;

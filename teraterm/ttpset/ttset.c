@@ -672,6 +672,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->Parity = IdParityEven;
 	else if (_stricmp(Temp, "odd") == 0)
 		ts->Parity = IdParityOdd;
+	else if (_stricmp(Temp, "mark") == 0)
+		ts->Parity = IdParityMark;
+	else if (_stricmp(Temp, "space") == 0)
+		ts->Parity = IdParitySpace;
 	else
 		ts->Parity = IdParityNone;
 
@@ -688,6 +692,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        Temp, sizeof(Temp), FName);
 	if (_stricmp(Temp, "2") == 0)
 		ts->StopBit = IdStopBit2;
+	else if (_stricmp(Temp, "1.5") == 0)
+		ts->StopBit = IdStopBit15;
 	else
 		ts->StopBit = IdStopBit1;
 
@@ -1958,6 +1964,12 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	case IdParityOdd:
 		strncpy_s(Temp, sizeof(Temp), "odd", _TRUNCATE);
 		break;
+	case IdParityMark:
+		strncpy_s(Temp, sizeof(Temp), "mark", _TRUNCATE);
+		break;
+	case IdParitySpace:
+		strncpy_s(Temp, sizeof(Temp), "space", _TRUNCATE);
+		break;
 	default:
 		strncpy_s(Temp, sizeof(Temp), "none", _TRUNCATE);
 	}
@@ -1972,10 +1984,17 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "DataBit", Temp, FName);
 
 	/* Stop bit */
-	if (ts->StopBit == IdStopBit2)
+	switch (ts->StopBit) {
+	case IdStopBit2:
 		strncpy_s(Temp, sizeof(Temp), "2", _TRUNCATE);
-	else
+		break;
+	case IdStopBit15:
+		strncpy_s(Temp, sizeof(Temp), "1.5", _TRUNCATE);
+		break;
+	default:
 		strncpy_s(Temp, sizeof(Temp), "1", _TRUNCATE);
+		break;
+	}
 
 	WritePrivateProfileString(Section, "StopBit", Temp, FName);
 

@@ -659,15 +659,18 @@ static PCHAR far BaudList[] =
 	 "230400", "460800", "921600", NULL};
 
   /* Parity ID */
-#define IdParityEven 1
-#define IdParityOdd  2
-#define IdParityNone 3
+#define IdParityNone  1
+#define IdParityOdd   2
+#define IdParityEven  3
+#define IdParityMark  4
+#define IdParitySpace 5
   /* Data bit ID */
 #define IdDataBit7 1
 #define IdDataBit8 2
   /* Stop bit ID */
-#define IdStopBit1 1
-#define IdStopBit2 2
+#define IdStopBit1  1
+#define IdStopBit15 2
+#define IdStopBit2  3
   /* Flow control ID */
 #define IdFlowX 1
 #define IdFlowHard 2

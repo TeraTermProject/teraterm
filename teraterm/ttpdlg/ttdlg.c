@@ -1306,8 +1306,8 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 }
 
 static PCHAR far DataList[] = {"7 bit","8 bit",NULL};
-static PCHAR far ParityList[] = {"even","odd","none",NULL};
-static PCHAR far StopList[] = {"1 bit","2 bit",NULL};
+static PCHAR far ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
+static PCHAR far StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
 static PCHAR far FlowList[] = {"Xon/Xoff","hardware","none",NULL};
 
 BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
