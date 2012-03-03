@@ -430,15 +430,15 @@ void KmtParseInit(PKmtVar kv, BOOL AckFlag)
 		n = KmtNum(b);
 		switch (i) {
 		  case 1:
-			  if ((MinMAXL<n) && (n<MaxMAXL))
+			  if ((MinMAXL<=n) && (n<=MaxMAXL))
 				  kv->KmtYour.MAXL = n;
 			  break;
 		  case 2:
-			  if ((MinTIME<n) && (n<MaxNum))
+			  if ((MinTIME<=n) && (n<=MaxNum))
 				  kv->KmtYour.TIME = n;
 			  break;
 		  case 3:
-			  if (n<MaxNum)
+			  if (n<=MaxNum)
 				  kv->KmtYour.NPAD = n;
 			  break;
 		  case 4:
