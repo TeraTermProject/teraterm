@@ -183,6 +183,19 @@ void ChangeTitle()
 				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE); 
 			}
 		}
+		else if (cv.PortType == IdNamedPipe)
+		{
+			char str[sizeof(TempTitle)];
+			strncpy_s(str, sizeof(str), ts.HostName, _TRUNCATE);
+
+			if (ts.TitleFormat & 8) {
+				// format ID = 13(8 + 5): <hots/port> - <title>
+				_snprintf_s(TempTitle, sizeof(TempTitle), _TRUNCATE, "%s - %s", str, TempTitleWithRemote);
+			}
+			else {
+				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE);
+			}
+		}
 		else {
 			char str[sizeof(TempTitle)];
 			if (ts.TitleFormat & 16) {

@@ -158,6 +158,7 @@ typedef TCharAttr *PCharAttr;
 #define IdTCPIP  1
 #define IdSerial 2
 #define IdFile   3
+#define IdNamedPipe   4
 
   /* XMODEM option */
 #define XoptCheck 1

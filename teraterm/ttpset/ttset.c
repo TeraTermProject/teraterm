@@ -258,6 +258,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->PortType = IdTCPIP;
 	else if (_stricmp(Temp, "serial") == 0)
 		ts->PortType = IdSerial;
+	else if (_stricmp(Temp, "namedpipe") == 0)
+		ts->PortType = IdNamedPipe;
 	else {
 		ts->PortType = IdTCPIP;
 	}
@@ -1508,6 +1510,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Port type */
 	if (ts->PortType == IdSerial)
 		strncpy_s(Temp, sizeof(Temp), "serial", _TRUNCATE);
+	if (ts->PortType == IdNamedPipe)
+		strncpy_s(Temp, sizeof(Temp), "namedpipe", _TRUNCATE);
 	else						/* IdFile -> IdTCPIP */
 		strncpy_s(Temp, sizeof(Temp), "tcpip", _TRUNCATE);
 
@@ -3192,7 +3196,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			HostNameFlag = FALSE;
 		}
 
-		if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
+		if (_strnicmp(Temp, "/NAMEDPIPE", 10) == 0) {	/* 名前付きパイプ */
+			ParamPort = IdNamedPipe;
+		}
+		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
 			ParamPort = IdSerial;
 			ParamBaud = atoi(&Temp[6]);
 		}
@@ -3368,9 +3375,14 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			if (JustAfterHost && (sscanf(Temp, "%d", &c) == 1))
 				ParamTCP = c;
 			else {
-				ParamPort = IdTCPIP;
 				strncpy_s(ts->HostName, sizeof(ts->HostName), Temp, _TRUNCATE);	/* host name */
-				HostNameFlag = TRUE;
+				if (ParamPort == IdNamedPipe) {
+					// 何もしない。
+
+				} else {
+					ParamPort = IdTCPIP;
+					HostNameFlag = TRUE;
+				}
 			}
 		}
 		JustAfterHost = FALSE;
@@ -3435,6 +3447,11 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		break;
 	case IdFile:
 		ts->PortType = IdFile;
+		break;
+	case IdNamedPipe:
+		ts->PortType = IdNamedPipe;
+		ts->ComPort = 0;
+		break;
 	}
 }
 

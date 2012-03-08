@@ -234,8 +234,8 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 #ifdef NO_INET6
 	int Err;
 #endif /* NO_INET6 */
-	char ErrMsg[21];
-	char P[50];
+	char ErrMsg[21+256];
+	char P[50+256];
 
 	MSG Msg;
 #ifndef NO_INET6
@@ -550,6 +550,33 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				PostMessage(cv->HWin, WM_USER_COMMOPEN, 0, 0);
 			}
 			break;
+
+		case IdNamedPipe:
+			InitFileIO(IdNamedPipe);  /* TTPLUG */
+			TTXOpenFile(); /* TTPLUG */
+			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
+			cv->ComID =
+			PCreateFile(P,GENERIC_READ | GENERIC_WRITE,
+			            0,NULL,OPEN_EXISTING,
+			            0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
+						NULL);
+			if (cv->ComID == INVALID_HANDLE_VALUE ) {
+				get_lang_msg("MSG_CANTOEPN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s(%d)", ts->UILanguageFile);
+				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[0], GetLastError());
+
+				if (cv->NoMsg==0) {
+					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
+					MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+				}
+				InvalidHost = TRUE;
+			}
+			else {
+				cv->Open = TRUE;
+				PostMessage(cv->HWin, WM_USER_COMMOPEN, 0, 0);
+				InvalidHost = FALSE;
+			}
+			break; /* end of "case IdNamedPipe:" */
+
 	} /* end of "switch" */
 
 #ifndef NO_INET6
@@ -565,6 +592,45 @@ BreakSC:
 			FreeWinsock();
 		}
 		return;
+	}
+}
+
+// 名前付きパイプ用スレッド
+void NamedPipeThread(void *arg)
+{
+	PComVar cv = (PComVar)arg;
+	DWORD DErr;
+	HANDLE REnd;
+	char Temp[20];
+	char Buffer[1];  // 1byte
+	DWORD BytesRead, TotalBytesAvail, BytesLeftThisMessage;
+
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
+	REnd = OpenEvent(EVENT_ALL_ACCESS,FALSE, Temp);
+	while (TRUE) {
+		BytesRead = 0;
+		// 名前付きパイプはイベントを待つことができない仕様なので、キューの中身を
+		// 覗き見することで、ReadFile() するかどうか判断する。
+		if (PeekNamedPipe(cv->ComID, Buffer, sizeof(Buffer), &BytesRead, &TotalBytesAvail, &BytesLeftThisMessage)) {
+			if (! cv->Ready) {
+				_endthread();
+			}
+			if (BytesRead == 0) {  // 空だったら、何もしない。
+				Sleep(1);
+				continue;
+			}
+			if (! cv->RRQ) {
+				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_READ);
+			}
+			// ReadFile() が終わるまで待つ。
+			WaitForSingleObject(REnd,INFINITE);
+		}
+		else {
+			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
+			if (! cv->Ready || ERROR_OPERATION_ABORTED == DErr) {
+				_endthread();
+			}
+		}
 	}
 }
 
@@ -703,6 +769,25 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 		case IdFile:
 			cv->RRQ = TRUE;
 			break;
+
+		case IdNamedPipe:
+			cv->ComPort = 0;
+			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READENDNAME, cv->ComPort);
+			ReadEnd = CreateEvent(NULL,FALSE,FALSE,Temp);
+			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", WRITENAME, cv->ComPort);
+			memset(&wol,0,sizeof(OVERLAPPED));
+			wol.hEvent = CreateEvent(NULL,TRUE,TRUE,Temp);
+			_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s%d", READNAME, cv->ComPort);
+			memset(&rol,0,sizeof(OVERLAPPED));
+			rol.hEvent = CreateEvent(NULL,TRUE,FALSE,Temp);
+
+			/* create the receiver thread */
+			if (_beginthread(NamedPipeThread,0,cv) == -1) {
+				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
+				get_lang_msg("MSG_TT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Can't create thread", ts->UILanguageFile);
+				MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+			}
+			break;
 	}
 	cv->Ready = TRUE;
 }
@@ -778,6 +863,16 @@ void CommClose(PComVar cv)
 			break;
 		case IdFile:
 			if (cv->ComID != INVALID_HANDLE_VALUE) {
+				PCloseFile(cv->ComID);
+			}
+			TTXCloseFile(); /* TTPLUG */
+			break;
+
+		case IdNamedPipe:
+			if ( cv->ComID != INVALID_HANDLE_VALUE ) {
+				CloseHandle(ReadEnd);
+				CloseHandle(wol.hEvent);
+				CloseHandle(rol.hEvent);
 				PCloseFile(cv->ComID);
 			}
 			TTXCloseFile(); /* TTPLUG */
@@ -870,6 +965,29 @@ void CommReceive(PComVar cv)
 					DErr = GetLastError();
 				}
 				break;
+
+			case IdNamedPipe:
+				// キューの中に最低1バイト以上のデータが入っていることを確認できているため、
+				// ReadFile() はブロックすることはないため、一括して読む。
+				if (PReadFile(cv->ComID,&(cv->InBuff[cv->InBuffCount]),
+				              InBuffSize-cv->InBuffCount,&C,NULL)) {
+					if (C == 0) {
+						DErr = ERROR_HANDLE_EOF;
+					}
+					else {
+						cv->InBuffCount = cv->InBuffCount + C;
+					}
+				}
+				else {
+					DErr = GetLastError();
+				}
+
+				// 1バイト以上読めたら、イベントを起こし、スレッドを再開させる。
+				if (cv->InBuffCount > 0) {
+					cv->RRQ = FALSE;
+					SetEvent(ReadEnd);
+				}
+				break;
 		}
 	}
 
@@ -893,6 +1011,17 @@ void CommReceive(PComVar cv)
 				else {
 					cv->RRQ = TRUE;
 				}
+				return;
+			case IdNamedPipe:
+				// TODO: たぶん、ここに来ることはない。
+				if (DErr != ERROR_IO_PENDING) {
+					PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
+					cv->RRQ = FALSE;
+				}
+				else {
+					cv->RRQ = TRUE;
+				}
+				SetEvent(ReadEnd);
 				return;
 		}
 		cv->RRQ = FALSE;
@@ -929,6 +1058,9 @@ void CommSend(PComVar cv)
 			Max = OutBuffSize - Stat.cbOutQue;
 			break;
 		case IdFile:
+			Max = cv->OutBuffCount;
+			break;
+		case IdNamedPipe:
 			Max = cv->OutBuffCount;
 			break;
 	}
@@ -1002,6 +1134,14 @@ void CommSend(PComVar cv)
 			break;
 
 		case IdFile:
+			if (! PWriteFile(cv->ComID, &(cv->OutBuff[cv->OutPtr]), C, (LPDWORD)&D, NULL)) {
+				if (! GetLastError() == ERROR_IO_PENDING) {
+					D = C; /* ignore data */
+				}
+			}
+			break;
+
+		case IdNamedPipe:
 			if (! PWriteFile(cv->ComID, &(cv->OutBuff[cv->OutPtr]), C, (LPDWORD)&D, NULL)) {
 				if (! GetLastError() == ERROR_IO_PENDING) {
 					D = C; /* ignore data */
