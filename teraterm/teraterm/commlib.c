@@ -554,15 +554,39 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 		case IdNamedPipe:
 			InitFileIO(IdNamedPipe);  /* TTPLUG */
 			TTXOpenFile(); /* TTPLUG */
+			
+			memset(P, 0, sizeof(P));
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
+
+			// 名前付きパイプが正しい書式かをチェックする。
+			// \\ServerName\pipe\PipeName
+			// (2012.3.10 yutaka)
+			InvalidHost = TRUE;
+			if (P[0] == '\\' && P[1] == '\\') {
+				char *s = strchr(&P[2], '\\');
+				if (s && _strnicmp(s+1, "pipe\\", 5) == 0) {
+					InvalidHost = FALSE;
+				}
+			}
+			if (InvalidHost) {
+				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, 
+					"Invalid pipe name\n[%s]\n"
+					"A valid pipe name has the form\n"
+					"\"\\\\<ServerName\\pipe\\<PipeName>\"", 
+					&P[0], GetLastError());
+				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
+				MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
+				break;
+			}
+
 			cv->ComID =
 			PCreateFile(P,GENERIC_READ | GENERIC_WRITE,
 			            0,NULL,OPEN_EXISTING,
 			            0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
 						NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				get_lang_msg("MSG_CANTOEPN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s(%d)", ts->UILanguageFile);
-				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[0], GetLastError());
+				get_lang_msg("MSG_CANTOEPN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
+				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
 
 				if (cv->NoMsg==0) {
 					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
