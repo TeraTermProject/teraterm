@@ -23,6 +23,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
          [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
+         [/NAMEDPIPE]
          [;&lt;comment&gt;]
 </pre>
 
@@ -31,7 +32,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
 <dl>
   <dt id="host">&lt;host&gt;</dt>
-  <dd>Host name or IP address.</dd>
+  <dd>Host name or IP address or Named pipe.</dd>
 
   <dt>&lt;host&gt;:&lt;TCP port#&gt;</dt>
   <dd>&lt;host&gt; with a TCP port number.<br>
@@ -167,6 +168,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="y">/Y=&lt;window position (y)&gt;</dt>
   <dd>Windows position (vertical)</dd>
 
+  <dt id="namedpipe">/NAMEDPIPE</dt>
+  <dd>Named pipe(\\&lt;ServerName&gt;\pipe\&lt;PipeName&gt;)</dd>
+  
   <dt id="comment">;&lt;comment&gt;</dt>
   <dd>Comment. Should be last in the command line.</dd>
 </dl>
@@ -188,6 +192,7 @@ TTERMPRO /C=2 /BAUD=9600 /F=MYSETUP.INI
 TTERMPRO /K=MYKEY.CNF /W="My host"
 TTERMPRO /R=README.TXT ; replay a file
 TTERMPRO myhost /B /X=100 /Y=50
+TTERMPRO /NAMEDPIPE \\.\pipe\vmware-serial-port
 </pre>
 
 
