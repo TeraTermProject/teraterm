@@ -11,7 +11,7 @@
   <body>
     <h1>New Connection ([File] メニュー)</h1>
     <p>
-      新しいホストまたはシリアルポートに接続します。
+      新しいホストまたはシリアルポート、名前付きパイプに接続します。また、ログ再生も行えます。
       すでに接続されているときは、別の Tera Term セッションを起動します。
     </p>
 
@@ -21,7 +21,7 @@
     <dl>
       <dt>Host</dt>
       <dd>
-	接続するホスト名または IP address(IPv4 & IPv6) をキーボードで入力して指定するか、
+	接続するホスト名または IP address(IPv4 & IPv6) 、名前付きパイプをキーボードで入力して指定するか、
 	リストの中から選択してください。リストを編集するには
 	<a href="setup-tcpip.html">[Setup] TCP/IP</a> を使ってください。<br>
 	IPv6アドレスは角括弧（大括弧）で囲みます（<a href="http://tools.ietf.org/html/rfc3986">RFC3986</a> / <a href="http://tools.ietf.org/html/rfc5952#section-6">RFC5952</a> 参照）。<br>
@@ -39,6 +39,7 @@
     [fe80::8401:2ff:fe03:405%3]:8022    IPv6アドレス + ポート番号
     user@myhost.example.com:10022 /ssh  22番ポート以外へのSSH接続
     ssh://user@myhost.example.com       SSHプロトコル(ssh://)への接続
+    \\.\pipe\vmware-serial-port         名前付きパイプへの接続
     </pre>
     
     このエディットコントロールでは、Ctrl+a(キャレットを先頭へ移動) Ctrl+e(キャレットを最後尾へ移動) Ctrl+b(キャレットを1文字後ろへ移動) Ctrl+f(キャレットを1文字前へ移動) Ctrl+n(1つ下のHost設定を選択) Ctrl+p(1つ上のHost設定を選択) Ctrl+d(一文字削除) Ctrl+k(行末まで削除) を使うことができます。

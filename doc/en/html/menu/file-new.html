@@ -11,7 +11,7 @@
   <body>
     <h1>New connection ([File] menu)</h1>
     <p>
-      Connects to a new host or a serial port.
+      Connects to a new host or a serial port or a named pipe. Also, Replays a log file.
       If the connection is already open, opens a new Tera Term window.
     </p>
 
@@ -21,7 +21,7 @@
     <dl>
       <dt>Host</dt>
       <dd>
-	Enter the host name or IP address(IPv4 and IPv6), or select one from the host list.
+	Enter the host name or IP address(IPv4 and IPv6) or named pipe, or select one from the host list.
 	To edit the host list, use the
 	<a href="setup-tcpip.html">[Setup] TCP/IP</a> command.<br>
 	The IPv6 address is surround with the bracket. (Refer to <a href="http://tools.ietf.org/html/rfc3986">RFC3986</a> / <a href="http://tools.ietf.org/html/rfc5952#section-6">RFC5952</a>)<br>
@@ -39,6 +39,7 @@
     [fe80::8401:2ff:fe03:405%3]:8022    IPv6 address and Port number
     user@myhost.example.com:10022 /ssh  SSH connection to a port number other than 22
     ssh://user@myhost.example.com       SSH connection to the SSH protocol(ssh://)
+    \\.\pipe\vmware-serial-port         Named pipe connection
     </pre>
     
     This edit control can support the Ctrl+a(Home key), Ctrl+e(End key), Ctrl+b(left-arrow), Ctrl+f(right-arrow), Ctrl+n(down-arrow), Ctrl+p(up-arrow), Ctrl+d(delete the character at point) and Ctrl+k(kill the text from point to the end of the line).
