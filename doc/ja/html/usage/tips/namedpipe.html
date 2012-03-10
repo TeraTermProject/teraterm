@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>名前付きパイプ</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>名前付きパイプ</h1>
+<p>
+VMwareやHyper-Vといった仮想化ソフトウェアの名前付きパイプを利用することにより、Tera Termから名前付きパイプを介して、仮想マシンのゲストOSへシリアルコンソール接続を行うことができるようになります。
+</p>
+
+<pre>
+   +---------------+ 
+   | Guest OS      |
+   |               |
+   +----[COM]------+
+   | Hypervisor    |
+   +------+--------+
+          |
+          |                              +-------------+
+          |                              |             |
+          +-------[Named pipe]-----------+  Tera Term  |
+                                         |             |
+                                         +-------------+
+</pre>
+
+<h2><a name="vmware">Linux on VMware</a></h2>
+<p>
+VMware Player 3.1.5 + Fedora 16の組み合わせを例としてあげます。
+</p>
+
+<p>
+VMware Player 3以降で名前付きパイプに対応しましたが、古いバージョンでは未対応なので、新しいバージョンにアップグレードして下さい。「仮想マシンの設定」ダイアログ - ハードウェア - シリアルポートにおいて、「名前付きパイプを使用する」を選択し、下記の通り入力します。
+<ul>
+  <li>「\\.\pipe\vmware-serial-port」</li>
+  <li>「この端末はサーバです」</li>
+  <li>「接続先はアプリケーションです」</li>
+</ul>
+</p>
+
+<p>
+Fedora 16は、デフォルトではシリアルコンソールが使用されていません。GRUB2の設定を変更することにより、ブートローダおよびLinuxブートログ、ログインプロンプトをシリアルコンソールに出力することができるようになります。<br>
+GRUB2の設定方法について示します。
+root権限で、/etc/default/grub を編集します。
+
+<pre>
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="Fedora"
+GRUB_DEFAULT=saved
+GRUB_CMDLINE_LINUX="rd.md=0 rd.dm=0 rd.lvm.lv=VolGroup/lv_swap <font color=red><s>quiet rhgb</s></font> rd.lvm.lv=VolGroup/lv_root rd.luks=0 LANG=ja_JP.UTF-8  KEYTABLE=jp106"
+<font color=red>GRUB_TERMINAL="serial console"
+GRUB_SERIAL_COMMAND="serial --unit=0 --speed=38400"
+GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,38400"</font>
+</pre>
+
+次に、grub2-mkconfigコマンドを実行し、設定を反映させます。
+<pre>
+# grub2-mkconfig -o /boot/grub2/grub.cfg
+</pre>
+</p>
+
+以上より、VMwareからFedoraを起動すると、名前付きパイプ(\\.\pipe\vmware-serial-port)が作成されるので、Tera Termから接続可能となります。なお、ブレーク信号には対応していないので、Tera Termから"Send break"してもMagic SysRq keyは動作しません。
+
+
+<h2><a name="vmware">Windows Server 2008 on Hyper-V</a></h2>
+<p>
+TBD
+</p>
+
+
+
+</body>
+</html>

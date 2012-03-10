@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Named pipe</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Named pipe</h1>
+<p>
+Tera Term can connect the serial console of the virtual machine by using the VMware and Hyper-V named pipe.
+</p>
+
+<pre>
+   +---------------+ 
+   | Guest OS      |
+   |               |
+   +----[COM]------+
+   | Hypervisor    |
+   +------+--------+
+          |
+          |                              +-------------+
+          |                              |             |
+          +-------[Named pipe]-----------+  Tera Term  |
+                                         |             |
+                                         +-------------+
+</pre>
+
+<h2><a name="vmware">Linux on VMware</a></h2>
+<p>
+For example, the VMware Player 3.1.5 and Fedora 16 combination is described below.
+</p>
+
+<p>
+The VMware Player 3 later can support the named pipe. Please upgrade your VMware Player if you use the older version. Next, call the Virtual machine configuration dialog - Hardware - Serial port, and select the use the named pipe. Please input as follows.
+<ul>
+  <li>\\.\pipe\vmware-serial-port</li>
+  <li>This terminal is server.</li>
+  <li>The destination host is application.</li>
+</ul>
+</p>
+
+<p>
+Fedora 16 does not use the serial console by default. So, the boot loader, Linux boot message and the login prompt can output on the serial console by changing the GRUB2 configuration.<br>
+The GRUB2 configuration is described below.
+A user needs to edit the /etc/default/grub by using the superuser privilege.
+<pre>
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="Fedora"
+GRUB_DEFAULT=saved
+GRUB_CMDLINE_LINUX="rd.md=0 rd.dm=0 rd.lvm.lv=VolGroup/lv_swap <font color=red><s>quiet rhgb</s></font> rd.lvm.lv=VolGroup/lv_root rd.luks=0 LANG=ja_JP.UTF-8  KEYTABLE=jp106"
+<font color=red>GRUB_TERMINAL="serial console"
+GRUB_SERIAL_COMMAND="serial --unit=0 --speed=38400"
+GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,38400"</font>
+</pre>
+
+Next, please reflect the new configuration by using the grub2-mkconfig command.
+<pre>
+# grub2-mkconfig -o /boot/grub2/grub.cfg
+</pre>
+</p>
+
+Thus, the named pipe(\\.\pipe\vmware-serial-port) will be created after the VMware launches the Fedora.
+So, Tera Term can connect to the virtual machine by using the named pipe. However, the Magic SysRq key
+can not be worked after doing "Send break" of Tera Term because the break signal is not be supported.
+
+
+<h2><a name="vmware">Windows Server 2008 on Hyper-V</a></h2>
+<p>
+TBD
+</p>
+
+
+
+</body>
+</html>
