@@ -229,6 +229,31 @@ void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuff)
 	SetCommMask(cv->ComID,EV_RXCHAR);
 }
 
+// 名前付きパイプが正しい書式かをチェックする。
+// \\ServerName\pipe\PipeName
+//
+// return  0: 正しい
+//        -1: 不正
+// (2012.3.10 yutaka)
+int CheckNamedPipeFormat(char *p, int size)
+{
+	int ret = -1;
+	char *s;
+
+	if (size <= 8)
+		goto error;
+
+	if (p[0] == '\\' && p[1] == '\\') {
+		s = strchr(&p[2], '\\');
+		if (s && _strnicmp(s+1, "pipe\\", 5) == 0) {
+			ret = 0;
+		}
+	}
+
+error:
+	return (ret);
+}
+
 void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 {
 #ifdef NO_INET6
@@ -253,6 +278,13 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 #endif /* NO_INET6 */
 
 	char uimsg[MAX_UIMSG];
+
+	// ホスト名が名前付きパイプかどうかを調べる。
+	if (ts->PortType == IdTCPIP) {
+		if (CheckNamedPipeFormat(ts->HostName, strlen(ts->HostName)) == 0) {
+			ts->PortType = IdNamedPipe;
+		}
+	}
 
 	/* initialize ComVar */
 	cv->InBuffCount = 0;
@@ -559,21 +591,14 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
 
 			// 名前付きパイプが正しい書式かをチェックする。
-			// \\ServerName\pipe\PipeName
-			// (2012.3.10 yutaka)
-			InvalidHost = TRUE;
-			if (P[0] == '\\' && P[1] == '\\') {
-				char *s = strchr(&P[2], '\\');
-				if (s && _strnicmp(s+1, "pipe\\", 5) == 0) {
-					InvalidHost = FALSE;
-				}
-			}
-			if (InvalidHost) {
+			if (CheckNamedPipeFormat(P, strlen(P)) < 0) {
+				InvalidHost = TRUE;
+
 				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, 
-					"Invalid pipe name\n[%s]\n"
+					"Invalid pipe name\n\n"
 					"A valid pipe name has the form\n"
-					"\"\\\\<ServerName\\pipe\\<PipeName>\"", 
-					&P[0], GetLastError());
+					"\"\\\\<ServerName>\\pipe\\<PipeName>\"", 
+					GetLastError());
 				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
 				MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
 				break;

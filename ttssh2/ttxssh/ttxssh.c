@@ -1141,7 +1141,10 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendMessage(GetDlgItem(dlg, IDC_HISTORY), BM_SETCHECK, BST_UNCHECKED, 0);
 		}
 
-		if (GetHNRec->PortType == IdFile)
+		// ファイルおよび名前付きパイプの場合、TCP/IP扱いとする。
+		if (GetHNRec->PortType == IdFile ||
+			GetHNRec->PortType == IdNamedPipe
+			)
 			GetHNRec->PortType = IdTCPIP;
 
 		strncpy_s(EntName, sizeof(EntName), "Host", _TRUNCATE);

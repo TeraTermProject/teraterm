@@ -1992,7 +1992,10 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_HOSTHELP, uimsg);
 
-			if ( GetHNRec->PortType==IdFile ) {
+			// ファイルおよび名前付きパイプの場合、TCP/IP扱いとする。
+			if ( GetHNRec->PortType==IdFile ||
+ 				 GetHNRec->PortType==IdNamedPipe
+				) {
 				GetHNRec->PortType = IdTCPIP;
 			}
 
