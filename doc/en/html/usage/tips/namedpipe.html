@@ -67,6 +67,26 @@ Thus, the named pipe(\\.\pipe\vmware-serial-port) will be created after the VMwa
 So, Tera Term can connect to the virtual machine by using the named pipe. However, the Magic SysRq key
 can not be worked after doing "Send break" of Tera Term because the break signal is not be supported.
 
+<p>
+For your reference, the serial configuration is different from the GRUB2 because the Legacy GRUB is used at Fedora 15 before.
+A user needs to edit directly the /boot/grub/grub.conf by using the superuser privilege.
+
+<pre>
+default=0
+timeout=5
+<font color=red>#splashimage=(hd0,0)/grub/splash.xpm.gz</font>
+hiddenmenu
+<font color=red>serial --unit=0 --speed=38400
+terminal --timeout=5 serial console</font>
+title Fedora (2.6.38.6-26.rc1.fc15.i686.PAE)
+        root (hd0,0)
+        kernel /vmlinuz-2.6.38.6-26.rc1.fc15.i686.PAE ro root=/dev/mapper/VolGroup-lv_root rd_LVM_LV=VolGroup/lv_root rd_LVM_LV=VolGroup/lv_swap rd_NO_LUKS rd_NO_MD rd_NO_DM LANG=ja_JP.UTF-8 KEYTABLE=jp106 selinux=0 <font color=red><s>rhgb quiet</s></font> <font color=red>console=tty0 console=ttyS0,38400</font>
+        initrd /initramfs-2.6.38.6-26.rc1.fc15.i686.PAE.img
+</pre>
+
+</p>
+
+
 
 <h2><a name="vmware">Windows Server 2008 on Hyper-V</a></h2>
 <p>

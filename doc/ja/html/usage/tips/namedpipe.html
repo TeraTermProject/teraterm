@@ -66,6 +66,26 @@ GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,38400"</font>
 
 以上より、VMwareからFedoraを起動すると、名前付きパイプ(\\.\pipe\vmware-serial-port)が作成されるので、Tera Termから接続可能となります。なお、ブレーク信号には対応していないので、Tera Termから"Send break"してもMagic SysRq keyは動作しません。
 
+<p>
+参考までに、Fedora 15以前では Legacy GRUB が採用されているため、シリアルコンソールの設定が異なります。
+root権限で、/boot/grub/grub.conf を直接編集します。
+
+<pre>
+default=0
+timeout=5
+<font color=red>#splashimage=(hd0,0)/grub/splash.xpm.gz</font>
+hiddenmenu
+<font color=red>serial --unit=0 --speed=38400
+terminal --timeout=5 serial console</font>
+title Fedora (2.6.38.6-26.rc1.fc15.i686.PAE)
+        root (hd0,0)
+        kernel /vmlinuz-2.6.38.6-26.rc1.fc15.i686.PAE ro root=/dev/mapper/VolGroup-lv_root rd_LVM_LV=VolGroup/lv_root rd_LVM_LV=VolGroup/lv_swap rd_NO_LUKS rd_NO_MD rd_NO_DM LANG=ja_JP.UTF-8 KEYTABLE=jp106 selinux=0 <font color=red><s>rhgb quiet</s></font> <font color=red>console=tty0 console=ttyS0,38400</font>
+        initrd /initramfs-2.6.38.6-26.rc1.fc15.i686.PAE.img
+</pre>
+
+</p>
+
+
 
 <h2><a name="vmware">Windows Server 2008 on Hyper-V</a></h2>
 <p>
