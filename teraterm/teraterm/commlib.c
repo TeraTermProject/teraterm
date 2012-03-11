@@ -675,8 +675,9 @@ void NamedPipeThread(void *arg)
 			WaitForSingleObject(REnd,INFINITE);
 		}
 		else {
-			DErr = GetLastError();  // this returns 995 (operation aborted) if a USB com port is removed
-			if (! cv->Ready || ERROR_OPERATION_ABORTED == DErr) {
+			DErr = GetLastError();  // this returns 109 (broken pipe) if a named pipe is removed.
+			if (! cv->Ready || ERROR_BROKEN_PIPE == DErr) {
+				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 				_endthread();
 			}
 		}
@@ -1192,7 +1193,9 @@ void CommSend(PComVar cv)
 
 		case IdNamedPipe:
 			if (! PWriteFile(cv->ComID, &(cv->OutBuff[cv->OutPtr]), C, (LPDWORD)&D, NULL)) {
-				if (! GetLastError() == ERROR_IO_PENDING) {
+				// ERROR_IO_PENDING 以外のエラーだったら、パイプがクローズされているかもしれないが、
+				// 送信できたことにする。
+				if (! (GetLastError() == ERROR_IO_PENDING)) {
 					D = C; /* ignore data */
 				}
 			}
