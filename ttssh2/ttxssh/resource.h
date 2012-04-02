@@ -181,6 +181,8 @@
 #define IDC_HOSTSSHFPCHECK              1110
 #define IDC_HOSTSSHFPDNSSEC             1111
 #define IDC_VERIFYHOSTKEYDNS            1112
+#define IDC_COMMENT_LABEL               1113
+#define IDC_COMMENT_EDIT                1114
 #define IDC_SSHUSEPASSWORD              1201
 #define IDC_SSHUSERSA                   1202
 #define IDC_SSHFWDREMOTETOLOCAL         1202

@@ -4021,6 +4021,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDC_CONFIRM_LABEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_KEYGEN_PASSPHRASE2", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_CONFIRM_LABEL, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_COMMENT_LABEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_KEYGEN_COMMENT", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_COMMENT_LABEL, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_SAVE_PUBLIC_KEY, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_KEYGEN_SAVEPUBLIC", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_SAVE_PUBLIC_KEY, pvar->ts->UIMsg);
@@ -4048,8 +4051,10 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_KEYBITS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEY_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CONFIRM_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMMENT_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEY_EDIT, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CONFIRM_EDIT, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_COMMENT_EDIT, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYGEN_PROGRESS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SAVE_PUBLIC_KEY, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SAVE_PRIVATE_KEY, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
@@ -4076,6 +4081,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		EnableWindow(GetDlgItem(dlg, IDC_KEY_EDIT), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_CONFIRM_EDIT), FALSE);
 
+		// comment edit box disabled (default)
+		EnableWindow(GetDlgItem(dlg, IDC_COMMENT_EDIT), FALSE);
+
 		// file saving dialog disabled(default)
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PUBLIC_KEY), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PRIBATE_KEY), FALSE);
@@ -4089,6 +4097,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			{
 			int bits;
 			cbarg_t cbarg;
+			char comment[1024]; // comment string in private key
 
 			cbarg.cnt = 0;
 			cbarg.type = key_type;
@@ -4123,6 +4132,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			EnableWindow(GetDlgItem(dlg, IDC_KEY_EDIT), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_CONFIRM_EDIT), FALSE);
 
+			// comment edit box disabled (default)
+			EnableWindow(GetDlgItem(dlg, IDC_COMMENT_EDIT), FALSE);
+
 			// file saving dialog disabled(default)
 			EnableWindow(GetDlgItem(dlg, IDC_SAVE_PUBLIC_KEY), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SAVE_PRIBATE_KEY), FALSE);
@@ -4152,6 +4164,11 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				// passphrase edit box disabled(default)
 				EnableWindow(GetDlgItem(dlg, IDC_KEY_EDIT), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_CONFIRM_EDIT), TRUE);
+
+				// enable comment edit box
+				EnableWindow(GetDlgItem(dlg, IDC_COMMENT_EDIT), TRUE);
+				ssh_make_comment(comment, sizeof(comment));
+				SetDlgItemText(dlg, IDC_COMMENT_EDIT, comment);
 
 				// file saving dialog disabled(default)
 				EnableWindow(GetDlgItem(dlg, IDC_SAVE_PUBLIC_KEY), TRUE);
@@ -4293,7 +4310,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				break;
 			}
 
-			ssh_make_comment(comment, sizeof(comment));
+			GetDlgItemText(dlg, IDC_COMMENT_EDIT, comment, sizeof(comment));
 
 			// saving public key file
 			fp = fopen(filename, "wb");
@@ -4382,7 +4399,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			}
 
 			// writing a comment(+LF)
-			fprintf(fp, " %s", comment);
+			if (comment[0] != 0) {
+				fprintf(fp, " %s", comment);
+			}
 			fputc(0x0a, fp);
 
 public_error:
