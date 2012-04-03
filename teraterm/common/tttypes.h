@@ -554,6 +554,7 @@ struct tttset {
 	char ClickableUrlBrowserArg[MAX_PATH];
 	WORD LogLockExclusive;
 	WORD KermitOpt;
+	WORD FontQuality;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1008,6 +1009,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.74, ttset_memfilemap was replaced with ttset_memfilemap_19.
+ *   added tttset.FontQuality
+ *
  * - At version 4.73, ttset_memfilemap was replaced with ttset_memfilemap_18.
  *   added tttset.LogLockExclusive
  *   added tttset.KermitOpt
@@ -1118,4 +1122,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_18"
+#define TT_FILEMAPNAME "ttset_memfilemap_19"

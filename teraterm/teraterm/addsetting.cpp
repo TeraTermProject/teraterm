@@ -739,6 +739,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	char uimsg[MAX_UIMSG];
 	CListBox *listbox;
 	CButton *btn;
+	CComboBox *cmb;
 	int i;
 
 	CPropertyPage::OnInitDialog();
@@ -751,6 +752,8 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_ETERM_LOOKFEEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_MOUSE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_MOUSE_CURSOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_FONT_QUALITY_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_FONT_QUALITY, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ANSICOLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ANSI_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_RED, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
@@ -780,6 +783,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_MOUSE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_MOUSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_MOUSE, ts.UIMsg);
+	GetDlgItemText(IDC_FONT_QUALITY_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_FONT_QUALITY_LABEL, ts.UIMsg);
 	GetDlgItemText(IDC_RED, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_RED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_RED, ts.UIMsg);
@@ -808,6 +814,15 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	get_lang_msg("DLG_TAB_VISUAL_URLUL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_URL_UNDERLINE, ts.UIMsg);
 
+	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", ts.UIMsg, sizeof(ts.UIMsg), "Default", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED", ts.UIMsg, sizeof(ts.UIMsg), "Non-Antialiased", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED", ts.UIMsg, sizeof(ts.UIMsg), "Antialiased", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", ts.UIMsg, sizeof(ts.UIMsg), "ClearType", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+
 	// (1)AlphaBlend
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlend);
 	SetDlgItemText(IDC_ALPHA_BLEND, buf);
@@ -823,7 +838,24 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	}
 	listbox->SelectString(0, ts.MouseCursorName);
 
-	// (4)ANSI color
+	// (4)Font quality
+	cmb = (CComboBox *)GetDlgItem(IDC_FONT_QUALITY);
+	switch (ts.FontQuality) {
+		case DEFAULT_QUALITY:
+			cmb->SetCurSel(0);
+			break;
+		case NONANTIALIASED_QUALITY:
+			cmb->SetCurSel(1);
+			break;
+		case ANTIALIASED_QUALITY:
+			cmb->SetCurSel(2);
+			break;
+		default: // CLEARTYPE_QUALITY
+			cmb->SetCurSel(3);
+			break;
+	}
+
+	// (5)ANSI color
 	listbox = (CListBox *)GetDlgItem(IDC_ANSI_COLOR);
 	for (i = 0 ; i < 16 ; i++) {
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", i);
@@ -836,27 +868,27 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	            (LPARAM)GetDlgItem(IDC_SAMPLE_COLOR));
 #endif
 
-	// (5)Bold Attr Color
+	// (6)Bold Attr Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ATTR_COLOR_BOLD);
 	btn->SetCheck((ts.ColorFlag&CF_BOLDCOLOR) != 0);
 
-	// (6)Blink Attr Color
+	// (7)Blink Attr Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ATTR_COLOR_BLINK);
 	btn->SetCheck((ts.ColorFlag&CF_BLINKCOLOR) != 0);
 
-	// (7)Reverse Attr Color
+	// (8)Reverse Attr Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ATTR_COLOR_REVERSE);
 	btn->SetCheck((ts.ColorFlag&CF_REVERSECOLOR) != 0);
 
-	// (8)URL Color
+	// (9)URL Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_URL_COLOR);
 	btn->SetCheck((ts.ColorFlag&CF_URLCOLOR) != 0);
 
-	// (9)Color
+	// (10)Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ANSI_COLOR);
 	btn->SetCheck((ts.ColorFlag&CF_ANSICOLOR) != 0);
 
-	// (10)URL Underline
+	// (11)URL Underline
 	btn = (CButton *)GetDlgItem(IDC_URL_UNDERLINE);
 	btn->SetCheck((ts.FontFlag&FF_URLUNDERLINE) != 0);
 
@@ -966,6 +998,7 @@ void CVisualPropPageDlg::OnOK()
 {
 	CListBox *listbox;
 	CButton *btn;
+	CComboBox *cmb;
 	int sel;
 	int beforeAlphaBlend;
 	char buf[MAXPATHLEN];
@@ -993,19 +1026,36 @@ void CVisualPropPageDlg::OnOK()
 		strncpy_s(ts.MouseCursorName, sizeof(ts.MouseCursorName), MouseCursor[sel].name, _TRUNCATE);
 	}
 
-	// (5) Attr Bold Color
+	// (4)Font quality
+	cmb = (CComboBox *)GetDlgItem(IDC_FONT_QUALITY);
+	switch (cmb->GetCurSel()) {
+		case 0:
+			ts.FontQuality = DEFAULT_QUALITY;
+			break;
+		case 1:
+			ts.FontQuality = NONANTIALIASED_QUALITY;
+			break;
+		case 2:
+			ts.FontQuality = ANTIALIASED_QUALITY;
+			break;
+		default: // 3
+			ts.FontQuality = CLEARTYPE_QUALITY;
+			break;
+	}
+
+	// (6) Attr Bold Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ATTR_COLOR_BOLD);
 	if (((ts.ColorFlag & CF_BOLDCOLOR) != 0) != btn->GetCheck()) {
 		ts.ColorFlag ^= CF_BOLDCOLOR;
 	}
 
-	// (6) Attr Blink Color
+	// (7) Attr Blink Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ATTR_COLOR_BLINK);
 	if (((ts.ColorFlag & CF_BLINKCOLOR) != 0) != btn->GetCheck()) {
 		ts.ColorFlag ^= CF_BLINKCOLOR;
 	}
 
-	// (7) Attr Reverse Color
+	// (8) Attr Reverse Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ATTR_COLOR_REVERSE);
 	if (ts.ColorFlag & CF_REVERSEVIDEO) { // Reverse Videoƒ‚[ƒh(DECSCNM)Žž‚Íˆ—‚ð•Ï‚¦‚é
 		if (ts.ColorFlag & CF_REVERSECOLOR) {
@@ -1031,19 +1081,19 @@ void CVisualPropPageDlg::OnOK()
 		ts.ColorFlag ^= CF_REVERSECOLOR;
 	}
 
-	// (8) URL Color
+	// (9) URL Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_URL_COLOR);
 	if (((ts.ColorFlag & CF_URLCOLOR) != 0) != btn->GetCheck()) {
 		ts.ColorFlag ^= CF_URLCOLOR;
 	}
 
-	// (9) Color
+	// (10) Color
 	btn = (CButton *)GetDlgItem(IDC_ENABLE_ANSI_COLOR);
 	if (((ts.ColorFlag & CF_ANSICOLOR) != 0) != btn->GetCheck()) {
 		ts.ColorFlag ^= CF_ANSICOLOR;
 	}
 
-	// (10) URL Underline
+	// (11) URL Underline
 	btn = (CButton *)GetDlgItem(IDC_URL_UNDERLINE);
 	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != btn->GetCheck()) {
 		ts.FontFlag ^= FF_URLUNDERLINE;

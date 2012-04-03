@@ -4075,6 +4075,7 @@ void CVTWindow::OnExternalSetup()
 #endif
 			DispSetNearestColors(IdBack, IdFore+8, NULL);
 			ChangeWin();
+			ChangeFont();
 			break;
 		default:
 			/* nothing to do */

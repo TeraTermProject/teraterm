@@ -19,6 +19,10 @@
 
 #include "compat_w95.h"
 
+#ifndef CLEARTYPE_QUALITY
+#define CLEARTYPE_QUALITY 5
+#endif
+
 #define Section "Tera Term"
 
 static PCHAR far TermList[] =
@@ -1476,6 +1480,18 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// Exclusive Lock when open the log file
 	ts->LogLockExclusive = GetOnOff(Section, "LogLockExclusive", FName, TRUE);
+
+	// Font quality
+	GetPrivateProfileString(Section, "FontQuality", "default",
+	                        Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "nonantialiased") == 0)
+		ts->FontQuality = NONANTIALIASED_QUALITY;
+	else if (_stricmp(Temp, "antialiased") == 0)
+		ts->FontQuality = ANTIALIASED_QUALITY;
+	else if (_stricmp(Temp, "cleartype") == 0)
+		ts->FontQuality = CLEARTYPE_QUALITY;
+	else
+		ts->FontQuality = DEFAULT_QUALITY;
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2596,6 +2612,17 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Exclusive Lock when open the log file
 	WriteOnOff(Section, "LogLockExclusive", FName, ts->LogLockExclusive);
+
+	// Font quality
+	if (ts->FontQuality == NONANTIALIASED_QUALITY)
+		strncpy_s(Temp, sizeof(Temp), "nonantialiased", _TRUNCATE);
+	else if (ts->FontQuality == ANTIALIASED_QUALITY)
+		strncpy_s(Temp, sizeof(Temp), "antialiased", _TRUNCATE);
+	else if (ts->FontQuality == CLEARTYPE_QUALITY)
+		strncpy_s(Temp, sizeof(Temp), "cleartype", _TRUNCATE);
+	else
+		strncpy_s(Temp, sizeof(Temp), "default", _TRUNCATE);
+	WritePrivateProfileString(Section, "FontQuality", Temp, FName);
 }
 
 #define VTEditor "VT editor keypad"

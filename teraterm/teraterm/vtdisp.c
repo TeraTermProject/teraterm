@@ -1913,7 +1913,7 @@ void SetLogFont()
   VTlf.lfCharSet = ts.VTFontCharSet;
   VTlf.lfOutPrecision  = OUT_CHARACTER_PRECIS;
   VTlf.lfClipPrecision = CLIP_CHARACTER_PRECIS;
-  VTlf.lfQuality       = DEFAULT_QUALITY;
+  VTlf.lfQuality       = (BYTE)ts.FontQuality;
   VTlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
   strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),ts.VTFont, _TRUNCATE);
 }

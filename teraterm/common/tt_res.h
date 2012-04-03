@@ -63,6 +63,7 @@
 #define IDC_ENV2                        1041
 #define IDC_MOUSE                       1042
 #define IDC_DELIMITER                   1043
+#define IDC_FONT_QUALITY_LABEL          1043
 #define IDC_ANSICOLOR                   1044
 #define IDC_RED                         1045
 #define IDC_GREEN                       1046
@@ -144,6 +145,7 @@
 #define IDC_CONFIRM_STRING_FILE_LABEL   2522
 #define IDC_CLEAR_ON_RESIZE             2523
 #define IDC_CURSOR_CHANGE_IME           2524
+#define IDC_FONT_QUALITY                2524
 #define IDC_PROT_ELAPSED                2525
 #define IDC_PROTOELAPSEDTIME            2526
 #define IDC_TRANS_ELAPSED               2527
@@ -243,7 +245,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2524
+#define _APS_NEXT_CONTROL_VALUE         2525
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
