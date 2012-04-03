@@ -1034,7 +1034,7 @@ void AnswerTerminalType()
 {
   char Tmp[50];
 
-  if (ts.TerminalID<IdVT320)
+  if (ts.TerminalID<IdVT320 || !Send8BitMode)
     strncpy_s(Tmp, sizeof(Tmp),"\033[?", _TRUNCATE);
   else
     strncpy_s(Tmp, sizeof(Tmp),"\233?", _TRUNCATE);
