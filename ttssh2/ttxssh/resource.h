@@ -193,6 +193,7 @@
 #define IDC_REMEMBERPASSWORD            1207
 #define IDC_EDIT2                       1208
 #define IDC_NEW_PASSWD                  1208
+#define IDC_SENDFILE_TO                 1208
 #define IDC_PUTTY_VERSION               1209
 
 // Next default values for new objects

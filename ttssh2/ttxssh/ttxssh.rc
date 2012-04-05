@@ -347,7 +347,8 @@ BEGIN
     LTEXT           "&From:",IDC_STATIC,10,8,20,8
     EDITTEXT        IDC_SENDFILE_EDIT,35,7,156,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SENDFILE_SELECT,196,7,14,14
-    LTEXT           "To:    remote host home directory",IDC_STATIC,18,25,173,8
+    LTEXT           "To:    remote host home directory",IDC_STATIC,18,25,16,8
+    EDITTEXT        IDC_SENDFILE_TO,35,24,156,14,ES_AUTOHSCROLL
     LTEXT           "You can drag the file to this window.",IDC_FILE_PROGRESS,44,43,128,11,0,WS_EX_STATICEDGE
     DEFPUSHBUTTON   "&Send",IDOK,222,7,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,222,24,50,14

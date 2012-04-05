@@ -3809,6 +3809,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
 	static char sendfile[MAX_PATH] = "";
+	static char sendfiledir[MAX_PATH] = "";
 	static char recvdir[MAX_PATH] = "";
 	HWND hWnd;
 	HDROP hDrop;
@@ -3819,6 +3820,12 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		DragAcceptFiles(dlg, TRUE);
+
+		// SCPファイル送信先を表示する
+		if (sendfiledir[0] == '\0') {
+			_snprintf_s(sendfiledir, MAX_PATH, _TRUNCATE, "."); // home directory
+		}
+		SendMessage(GetDlgItem(dlg, IDC_SENDFILE_TO), WM_SETTEXT, 0, (LPARAM)sendfiledir);
 
 		// SCPファイル受信先を表示する
 		if (recvdir[0] == '\0') {
@@ -3894,7 +3901,9 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			hWnd = GetDlgItem(dlg, IDC_SENDFILE_EDIT);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfile), (LPARAM)sendfile);
 			if (sendfile[0] != '\0') {
-				SSH_start_scp(pvar, sendfile, NULL);
+				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
+				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);				
+				SSH_start_scp(pvar, sendfile, sendfiledir);
 				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;
