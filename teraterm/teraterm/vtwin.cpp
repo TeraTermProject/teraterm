@@ -1884,6 +1884,13 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 
 					hook = SetWindowsHookEx( WH_CBT, MsgBoxHootProc, NULL, dwThreadID );
 					if (cv.isSSH == 2) {
+						char s[128], *sm;
+						if (ts.ScpSendDir[0] == '\0' || ts.ScpSendDir[0] == '.')
+							sm = "Home directory";
+						else
+							sm = ts.ScpSendDir;
+						_snprintf_s(s, sizeof(s), _TRUNCATE, "\r\n(SCP:%s)", sm);
+						strncat_s(ts.UIMsg, sizeof(ts.UIMsg), s, _TRUNCATE);
 						ret = MessageBox(ts.UIMsg, uimsg, MB_YESNOCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON3);
 					}
 					else {
@@ -1916,7 +1923,7 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 						}
 
 						if (func != NULL) {
-							func(SendVar->FullName, NULL);
+							func(SendVar->FullName, ts.ScpSendDir);
 							goto send_success;
 						} 
 

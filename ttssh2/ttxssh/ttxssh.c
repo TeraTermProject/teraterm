@@ -3823,7 +3823,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 		// SCPファイル送信先を表示する
 		if (sendfiledir[0] == '\0') {
-			_snprintf_s(sendfiledir, MAX_PATH, _TRUNCATE, "."); // home directory
+			_snprintf_s(sendfiledir, MAX_PATH, _TRUNCATE, pvar->ts->ScpSendDir); // home directory
 		}
 		SendMessage(GetDlgItem(dlg, IDC_SENDFILE_TO), WM_SETTEXT, 0, (LPARAM)sendfiledir);
 
@@ -3902,7 +3902,8 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfile), (LPARAM)sendfile);
 			if (sendfile[0] != '\0') {
 				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
-				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);				
+				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);	
+				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
 				SSH_start_scp(pvar, sendfile, sendfiledir);
 				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close

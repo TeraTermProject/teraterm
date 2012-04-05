@@ -805,6 +805,11 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        ts->FileSendFilter, sizeof(ts->FileSendFilter),
 	                        FName);
 
+	/* SCP‘—MæƒpƒX (2012.4.6 yutaka) */
+	GetPrivateProfileString(Section, "ScpSendDir", ".",
+	                        ts->ScpSendDir, sizeof(ts->ScpSendDir), FName);
+
+
 /*--------------------------------------------------*/
 	/* 8 bit control code flag  -- special option */
 	if (GetOnOff(Section, "Accept8BitCtrl", FName, TRUE))
@@ -2107,6 +2112,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* filter on file send (2007.6.5 maya) */
 	WritePrivateProfileString(Section, "FileSendFilter",
 	                          ts->FileSendFilter, FName);
+
+	WritePrivateProfileString(Section, "ScpSendDir", ts->ScpSendDir, FName);
 
 /*------------------------------------------------------------------*/
 	/* 8 bit control code flag  -- special option */
