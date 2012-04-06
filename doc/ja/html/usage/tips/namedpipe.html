@@ -87,9 +87,15 @@ title Fedora (2.6.38.6-26.rc1.fc15.i686.PAE)
 
 
 
-<h2><a name="vmware">Windows Server 2008 on Hyper-V</a></h2>
+<h2><a name="vmware">Windows Server on Hyper-V</a></h2>
 <p>
-TBD
+Windows Server 2008 R2 の Hyper-V を使い、仮想マシン上で Windows Server を動作させる例を挙げます。
+</p>
+
+<p>
+Hyper-V のCOMポートの設定で、名前付きパイプを指定します。名前付きパイプの形式は「\\.\pipe\」となります。
+当該名前付きパイプを使って、Tera Termから Hyper-V のCOMポートに接続することができます。
+なお、ゲストOSは Windows Server でないと、SAC(Special Administration Console)は利用できません。デスクトップ版WindowsではSACは利用不可なので、名前付きパイプで接続しても、何もできません。
 </p>
 
 

@@ -88,9 +88,19 @@ title Fedora (2.6.38.6-26.rc1.fc15.i686.PAE)
 
 
 
-<h2><a name="vmware">Windows Server 2008 on Hyper-V</a></h2>
+<h2><a name="vmware">Windows Server on Hyper-V</a></h2>
 <p>
-TBD
+For example, the Windows Server is working on the virtual machine by using the Hyper-V of the 
+Windows Server 2008 R2.
+</p>
+
+<p>
+Please specify the named pipe on the COM port configuration of the Hyper-V. The named pipe 
+format is "\\.\pipe\". Tera Term can connect to the COM port of the Hyper-V by using the
+named pipe. Also, the SAC(Special Administration Console) can not be used when the guest
+OS is not Windows Server series. If a user uses the desktop version Windows, Tera Term 
+can connect to the named pipe, however the user can not do anything because the Windows
+does not support the SAC.
 </p>
 
 
