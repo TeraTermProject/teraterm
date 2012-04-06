@@ -3901,9 +3901,11 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			hWnd = GetDlgItem(dlg, IDC_SENDFILE_EDIT);
 			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfile), (LPARAM)sendfile);
 			if (sendfile[0] != '\0') {
+				// 送信パスを取り出し、teraterm.ini も合わせて更新する。
 				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
 				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);	
 				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
+
 				SSH_start_scp(pvar, sendfile, sendfiledir);
 				//SSH_scp_transaction(pvar, "bigfile30.bin", "", FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
@@ -3912,6 +3914,11 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			return FALSE;
 
 		case IDCANCEL:
+			// 送信パスを取り出し、teraterm.ini も合わせて更新する。
+			hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
+			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);	
+			strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
+
 			EndDialog(dlg, 0); // dialog close
 			return TRUE;
 
