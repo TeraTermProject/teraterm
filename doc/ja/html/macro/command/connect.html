@@ -271,6 +271,31 @@ connect msg
 </pre>
 
 
+<pre class="macro-example">
+[test.bat]
+ttpmacro.exe paramtest.ttl &quot;192.168.3.2&quot; cal
+ttpmacro.exe paramtest.ttl &quot;192.168.3.2&quot; uptime
+ttpmacro.exe paramtest.ttl &quot;192.168.3.2&quot; &quot;uname -a&quot;
+ttpmacro.exe paramtest.ttl &quot;192.168.3.2&quot; &quot;cat /proc/cpuinfo&quot;
+pause
+
+[paramtest.ttl]
+prompt = 'yutaka@sai(~) '
+sprintf2 var &quot;%s /2 /ssh /auth=password /user=yutaka /passwd=yutaka&quot; param2 
+;messagebox var &quot;test&quot;
+connect var
+wait prompt
+
+sendln param3
+wait prompt
+
+pause 10
+
+sendln 'exit'
+pause 3
+</pre>
+
+
 <h2>’ˆÓ</h2>
 
 <ol>
@@ -290,6 +315,7 @@ connect msg
  <li>"<a href="testlink.html">testlink</a>"</li>
  <li>"<a href="unlink.html">unlink</a>"</li>
  <li><a href="../appendixes/disconnecttiming.html">Ø’fŒã‚·‚®‚ÉÚ‘±‚·‚éê‡‚Ì’ˆÓ“_</a></li>
+ <li>"<a href="../syntax/variables.html">•Ï”</a>"</li>
 </ul>
 
 </body>
