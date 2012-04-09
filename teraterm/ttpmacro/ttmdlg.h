@@ -31,6 +31,7 @@ extern char Param7[MAXPATHLEN];
 extern char Param8[MAXPATHLEN];
 extern char Param9[MAXPATHLEN];
 extern BOOL SleepFlag;
+extern int ParamCnt;
 
 #ifdef __cplusplus
 }

@@ -104,6 +104,7 @@ BOOL InitTTL(HWND HWin)
 	NewStrVar("param7",Param7);
 	NewStrVar("param8",Param8);
 	NewStrVar("param9",Param9);
+	NewIntVar("paramcnt",ParamCnt);  // ƒtƒ@ƒCƒ‹–¼‚àŠÜ‚Şˆø”‚ÌŒÂ” (2012.4.10 yutaka)
 
 	ParseAgain = FALSE;
 	IfNest = 0;

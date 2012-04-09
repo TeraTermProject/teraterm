@@ -33,6 +33,7 @@ char Param7[MAXPATHLEN];
 char Param8[MAXPATHLEN];
 char Param9[MAXPATHLEN];
 BOOL SleepFlag;
+int ParamCnt;   /* ˆø”‚ÌŒÂ” */
 }
 
 static int DlgPosX = -1000;
@@ -161,6 +162,8 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 			}
 		}
 	}
+
+	ParamCnt = j;
 
 	if (FileName[0]=='*') {
 		FileName[0] = 0;
