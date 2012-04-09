@@ -32,7 +32,7 @@ typedef struct {
 
 // 変数の個数を128->256、ラベルの個数を256->512へ拡張した。(2006.2.1 yutaka)
 // 変数の個数を、InitTTL で作っているシステム変数の分だけ追加した。(2006.7.26 maya)
-#define MaxNumOfIntVar (LONG)(256+3)
+#define MaxNumOfIntVar (LONG)(256+4)
 #define MaxNumOfStrVar (LONG)(256+19)
 #define MaxNumOfLabVar (LONG)512
 #define MaxNumOfIntAryVar (LONG)256
