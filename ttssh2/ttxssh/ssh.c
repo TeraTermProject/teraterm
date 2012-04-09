@@ -3822,7 +3822,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		strncpy_s(c->scp.localfilefull, sizeof(c->scp.localfilefull), sendfile, _TRUNCATE);  // full path
 		ExtractFileName(sendfile, c->scp.localfile, sizeof(c->scp.localfile));   // file name only
 		if (dstfile == NULL || dstfile[0] == '\0') { // remote file path
-			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), ".", _TRUNCATE);  // full path
+			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), "~/", _TRUNCATE);  // full path
 		} else {
 			strncpy_s(c->scp.remotefile, sizeof(c->scp.remotefile), dstfile, _TRUNCATE);  // full path
 		}
