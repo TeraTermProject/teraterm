@@ -1885,7 +1885,7 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 					hook = SetWindowsHookEx( WH_CBT, MsgBoxHootProc, NULL, dwThreadID );
 					if (cv.isSSH == 2) {
 						char s[128], *sm;
-						if (ts.ScpSendDir[0] == '\0' || ts.ScpSendDir[0] == '.')
+						if (ts.ScpSendDir[0] == '\0' || (ts.ScpSendDir[0] == '~' && ts.ScpSendDir[1] == '/'))
 							sm = "Home directory";
 						else
 							sm = ts.ScpSendDir;
