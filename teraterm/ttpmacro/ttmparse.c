@@ -1654,7 +1654,7 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion)
 		if (*Err!=0) return;
 		switch (VarType) {
 			case TypString:
-				strncpy_s(Str, MaxStrLen, StrVarPtr(VarId), _TRUNCATE);
+				strncpy_s(Str, MaxStrLen, StrVarPtr((TVarId)VarId), _TRUNCATE);
 				break;
 			case TypInteger:
 				if (AutoConversion)

@@ -780,7 +780,7 @@ WORD TTLDispStr()
 					Str[1] = 0;
 					strncat_s(buff, MaxStrLen, Str, _TRUNCATE);
 				case TypString:
-					strncat_s(buff, MaxStrLen, StrVarPtr((WORD)Val), _TRUNCATE);
+					strncat_s(buff, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					break;
 				default:
 					return ErrTypeMismatch;
@@ -2967,7 +2967,7 @@ WORD TTLSend()
 			if (Err!=0) return Err;
 			switch (ValType) {
 				case TypInteger: DDEOut1Byte(LOBYTE(Val)); break;
-				case TypString: DDEOut(StrVarPtr((WORD)Val)); break;
+				case TypString: DDEOut(StrVarPtr((TVarId)Val)); break;
 				default:
 					return ErrTypeMismatch;
 			}
@@ -3013,7 +3013,7 @@ static WORD DoSendBroadcast(BOOL crlf)
 						strncat_s(buf, MaxStrLen, "\n", _TRUNCATE);
 					break;
 				case TypString: 
-					strncat_s(buf, MaxStrLen, StrVarPtr((WORD)Val), _TRUNCATE);
+					strncat_s(buf, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					if (crlf) 
 						strncat_s(buf, MaxStrLen, "\n", _TRUNCATE);
 					break;
@@ -3093,7 +3093,7 @@ WORD TTLSendMulticast()
 					strncat_s(buf, MaxStrLen, asc, _TRUNCATE);
 					break;
 				case TypString: 
-					strncat_s(buf, MaxStrLen, StrVarPtr((WORD)Val), _TRUNCATE);
+					strncat_s(buf, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					break;
 				default:
 					return ErrTypeMismatch;
@@ -4339,7 +4339,7 @@ WORD TTLWait(BOOL Ln)
 				if (Err==0)
 				{
 					if (ValType==TypString)
-						strncpy_s(Str, sizeof(Str),StrVarPtr((WORD)Val), _TRUNCATE);
+						strncpy_s(Str, sizeof(Str),StrVarPtr((TVarId)Val), _TRUNCATE);
 					else
 						Err=ErrTypeMismatch;
 				}
