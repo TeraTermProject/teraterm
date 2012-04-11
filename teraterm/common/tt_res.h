@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by T:\ttssh2\teraterm\teraterm\ttermpro.rc
+// Used by c:\usr\ttssh2\teraterm\teraterm\ttermpro.rc
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -21,6 +21,7 @@
 #define IDR_PASTEMENU                   119
 #define IDD_CLIPBOARD_DIALOG            120
 #define IDD_TABSHEET_SEQUENCE           121
+#define IDD_DAD_DIALOG                  122
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -128,6 +129,7 @@
 #define IDC_EDIT                        2510
 #define IDC_SCROLL_LINE                 2510
 #define IDC_PASTEDELAY_EDIT             2510
+#define IDC_SCP_PATH                    2510
 #define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
@@ -147,7 +149,9 @@
 #define IDC_CURSOR_CHANGE_IME           2524
 #define IDC_FONT_QUALITY                2524
 #define IDC_PROT_ELAPSED                2525
+#define IDC_DAD_STATIC                  2525
 #define IDC_PROTOELAPSEDTIME            2526
+#define IDC_DAD_SENDFILE                2526
 #define IDC_TRANS_ELAPSED               2527
 #define IDC_TRANS_ETIME                 2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
@@ -243,9 +247,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        122
+#define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2525
+#define _APS_NEXT_CONTROL_VALUE         2527
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

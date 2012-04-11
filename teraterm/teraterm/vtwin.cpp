@@ -1799,21 +1799,87 @@ void CVTWindow::OnDestroy()
 	TTXEnd(); /* TTPLUG */
 }
 
-// MessageBoxのボタン名変更用ハンドラ
-static LRESULT CALLBACK MsgBoxHootProc( INT hc, WPARAM wParam, LPARAM lParam )
+static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	if ( hc == HCBT_ACTIVATE ) {
-		// &Send file や S&CP のようなアクセラレータキーは設けない
-		get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Send file", ts.UILanguageFile);
-		SetDlgItemText( (HWND)wParam, IDOK, ts.UIMsg );
-		SetDlgItemText( (HWND)wParam, IDYES, ts.UIMsg );
-		SetDlgItemText( (HWND)wParam, IDNO, "SCP" );
+	static HFONT DlgDragDropFont = NULL;
+	char uimsg[MAX_UIMSG];
+	LOGFONT logfont;
+	HFONT font;
 
-		return FALSE;
+	switch (msg) {
+		case WM_INITDIALOG:
+			font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
+			GetObject(font, sizeof(LOGFONT), &logfont);
+			if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgDragDropFont, ts.UILanguageFile)) {
+				SendDlgItemMessage(hDlgWnd, IDC_SCP_PATH, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(hDlgWnd, IDOK, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(hDlgWnd, IDCANCEL, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(hDlgWnd, IDC_DAD_STATIC, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(hDlgWnd, IDC_DAD_SENDFILE, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
+			} else {
+				DlgDragDropFont = NULL;
+			}
+
+			GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
+			get_lang_msg("MSG_DANDD_CONF_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+			SetWindowText(hDlgWnd, ts.UIMsg);
+
+			get_lang_msg("MSG_DANDD_CONF", ts.UIMsg, sizeof(ts.UIMsg),
+			             "Are you sure that you want to send the file content?", ts.UILanguageFile);
+			SetDlgItemText(hDlgWnd, IDC_DAD_STATIC, ts.UIMsg);
+
+			get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", ts.UIMsg, sizeof(ts.UIMsg),
+						 "Send file", ts.UILanguageFile);
+			SetDlgItemText(hDlgWnd, IDOK, ts.UIMsg);
+
+			SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)ts.ScpSendDir);
+
+			// キャンセルボタンをデフォルトにし、無意識にEnterキーを押下しても、何もしないようにする。
+			SetFocus(GetDlgItem(hDlgWnd, IDCANCEL));
+			PostMessage(GetDlgItem(hDlgWnd, IDCANCEL), WM_NEXTDLGCTL, 0, 0L) ;
+
+			// SSH2 接続ではない場合には "SCP" を無効化する。
+			if (cv.isSSH != 2) {
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_STATIC), FALSE);
+			}
+
+			// TRUEにするとボタンにフォーカスが当たらない。
+			return FALSE;
+
+		case WM_COMMAND:
+			switch (LOWORD(wp)) {
+				case IDC_DAD_SENDFILE:
+					SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_GETTEXT, sizeof(ts.ScpSendDir), (LPARAM)ts.ScpSendDir);
+					if (DlgDragDropFont != NULL) {
+						DeleteObject(DlgDragDropFont);
+					}
+					EndDialog(hDlgWnd, IDC_DAD_SENDFILE);
+					break;
+
+				case IDOK:
+					if (DlgDragDropFont != NULL) {
+						DeleteObject(DlgDragDropFont);
+					}
+					EndDialog(hDlgWnd, IDOK);
+					break;
+
+				case IDCANCEL:
+					if (DlgDragDropFont != NULL) {
+						DeleteObject(DlgDragDropFont);
+					}
+					EndDialog(hDlgWnd, IDCANCEL);
+					break;
+
+				default:
+					return FALSE;
+			}
+
+		default:
+			return FALSE;
 	}
-
-	return CallNextHookEx( NULL, hc, wParam, lParam );
+	return TRUE;
 }
 
 void CVTWindow::OnDropFiles(HDROP hDropInfo)
@@ -1872,39 +1938,18 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 				if (ts.ConfirmFileDragAndDrop) {
 					// いきなりファイルの内容を送り込む前に、ユーザに問い合わせを行う。(2006.1.21 yutaka)
 					// MessageBoxでSCPも選択できるようにする。(2008.1.25 yutaka)
-					char uimsg[MAX_UIMSG];
-					HHOOK hook = NULL;
-					DWORD dwThreadID = GetCurrentThreadId();
+					// SCPパスを指定できるようにダイアログに変更した。(2012.4.11 yutaka)
 					int ret;
 
-					get_lang_msg("MSG_DANDD_CONF_TITLE", uimsg, sizeof(uimsg),
-					             "Tera Term: File Drag and Drop", ts.UILanguageFile);
-					get_lang_msg("MSG_DANDD_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-					             "Are you sure that you want to send the file content?", ts.UILanguageFile);
+					ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_DAD_DIALOG),
+									HVTWin, (DLGPROC)OnDragDropDlgProc);
 
-					hook = SetWindowsHookEx( WH_CBT, MsgBoxHootProc, NULL, dwThreadID );
-					if (cv.isSSH == 2) {
-						char s[128], *sm;
-						if (ts.ScpSendDir[0] == '\0' || (ts.ScpSendDir[0] == '~' && ts.ScpSendDir[1] == '/' && ts.ScpSendDir[2] == '\0'))
-							sm = "Home directory";
-						else
-							sm = ts.ScpSendDir;
-						_snprintf_s(s, sizeof(s), _TRUNCATE, "\r\n(SCP:%s)", sm);
-						strncat_s(ts.UIMsg, sizeof(ts.UIMsg), s, _TRUNCATE);
-						ret = MessageBox(ts.UIMsg, uimsg, MB_YESNOCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON3);
-					}
-					else {
-						// SSH2 接続ではない場合には "SCP" を出さない (2008.1.25 maya)
-						ret = MessageBox(ts.UIMsg, uimsg, MB_OKCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON2);
-					}
-					UnhookWindowsHookEx( hook );
-
-					if (ret == IDOK || ret == IDYES) {   // sendfile
+					if (ret == IDOK) {   // sendfile
 						SendVar->DirLen = 0;
 						ts.TransBin = 0;
 						FileSendStart();
 
-					} else if (ret == IDNO) {   // SCP
+					} else if (ret == IDC_DAD_SENDFILE) {   // SCP
 						typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 						static PSSH_start_scp func = NULL;
 						static HMODULE h = NULL;
