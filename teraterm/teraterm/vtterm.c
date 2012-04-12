@@ -83,6 +83,10 @@ typedef struct {
 } TStatusBuff;
 typedef TStatusBuff *PStatusBuff;
 
+// currently only used for AUTO CR/LF receive mode
+BYTE PrevCharacter;
+BOOL PrevCRorLFGeneratedCRLF;	  // indicates that previous CR or LF really generated a CR+LF
+
 // status buffer for main screen & status line
 static TStatusBuff SBuff1, SBuff2, SBuff3;
 
@@ -267,6 +271,10 @@ void ResetTerminal() /*reset variables but don't update screen */
 
   // Saved IME Status
   IMEstat = FALSE;
+
+  // previous received character
+  PrevCharacter = -1;	// none
+  PrevCRorLFGeneratedCRLF = FALSE;
 }
 
 void ResetCharSet()
@@ -864,13 +872,26 @@ void ParseControl(BYTE b)
     case HT: Tab(); break;
 
     case LF:
-		// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
-		// CR+LFとして扱うようにする。
-		// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
-		// (2007.1.21 yutaka)
 		if (ts.CRReceive == IdLF) {
+			// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
+			// CR+LFとして扱うようにする。
+			// cf. http://www.neocom.ca/forum/viewtopic.php?t=216
+			// (2007.1.21 yutaka)
 			CarriageReturn(TRUE);
 			LineFeed(b, TRUE);
+			break;
+		}
+		else if (ts.CRReceive == IdAUTO) {
+			// 9th Apr 2012: AUTO CR/LF mode (tentner)
+			// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+			if(PrevCharacter != CR || !PrevCRorLFGeneratedCRLF) {
+				CarriageReturn(TRUE);
+				LineFeed(b, TRUE);
+				PrevCRorLFGeneratedCRLF = TRUE;
+			}
+			else {
+				PrevCRorLFGeneratedCRLF = FALSE;
+			}
 			break;
 		}
 
@@ -887,9 +908,24 @@ void ParseControl(BYTE b)
 	LineFeed(b,TRUE);
       break;
     case CR:
-      CarriageReturn(TRUE);
-      if (ts.CRReceive==IdCRLF)
-	CommInsert1Byte(&cv,LF);
+      if (ts.CRReceive == IdAUTO) {
+	// 9th Apr 2012: AUTO CR/LF mode (tentner)
+	// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+	if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
+	  CarriageReturn(TRUE);
+	  LineFeed(b, TRUE);
+	  PrevCRorLFGeneratedCRLF = TRUE;
+	}
+	else {
+	  PrevCRorLFGeneratedCRLF = FALSE;
+	}
+      }
+      else {
+	CarriageReturn(TRUE);
+	if (ts.CRReceive==IdCRLF) {
+	  CommInsert1Byte(&cv,LF);
+	}
+      }
       break;
     case SO:
       if ((ts.Language==IdJapanese) &&
@@ -4486,6 +4522,8 @@ int VTParse()
 	  ParseFirst(b);
       }
     }
+
+    PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
 
     if (ChangeEmu==0)
       c = CommRead1Byte(&cv,&b);

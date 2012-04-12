@@ -565,6 +565,7 @@ typedef struct tttset TTTSet, *PTTSet;
 #define IdCR   1
 #define IdCRLF 2
 #define IdLF   3
+#define IdAUTO 4
 
   /* Terminal ID */
 #define IdVT100  1

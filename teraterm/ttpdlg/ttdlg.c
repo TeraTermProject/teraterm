@@ -49,7 +49,7 @@ static HFONT DlgWinlistFont;
 
 char UILanguageFile[MAX_PATH];
 
-static PCHAR far NLListRcv[] = {"CR","CR+LF", "LF", NULL};
+static PCHAR far NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
 static PCHAR far NLList[] = {"CR","CR+LF", NULL};
 static PCHAR far TermList[] =
 	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",
@@ -267,7 +267,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			if ( ts->TermIsWin>0 )
 				DisableDlgItem(Dialog,IDC_TERMRESIZE,IDC_TERMRESIZE);
 
-			SetDropDownList(Dialog, IDC_TERMCRRCV, NLListRcv, ts->CRReceive); // add 'LF' (2007.1.21 yutaka)
+			SetDropDownList(Dialog, IDC_TERMCRRCV, NLListRcv, ts->CRReceive); // add 'LF' (2007.1.21 yutaka), added "AUTO" (9th Apr 2012, tentner)
 			SetDropDownList(Dialog, IDC_TERMCRSEND, NLList, ts->CRSend);
 
 			if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */

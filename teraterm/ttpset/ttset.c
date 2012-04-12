@@ -306,6 +306,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	else if (_stricmp(Temp, "LF") == 0) {
 		ts->CRReceive = IdLF;
 	}
+	else if (_stricmp(Temp, "AUTO") == 0) {
+		ts->CRReceive = IdAUTO;
+	}
 	else {
 		ts->CRReceive = IdCR;
 	}
@@ -1560,6 +1563,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	}
 	else if (ts->CRReceive == IdLF) {
 		strncpy_s(Temp, sizeof(Temp), "LF", _TRUNCATE);
+	}
+	else if (ts->CRReceive == IdAUTO) {
+		strncpy_s(Temp, sizeof(Temp), "AUTO", _TRUNCATE);
 	}
 	else {
 		strncpy_s(Temp, sizeof(Temp), "CR", _TRUNCATE);
