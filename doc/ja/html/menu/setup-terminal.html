@@ -31,7 +31,7 @@
 	ウインドウサイズも同じ大きさに自動的に変更されます。
       </dd>
 
-      <dt>New-line (receive)</dt>
+      <dt id="CRReceive">New-line (receive)</dt>
       <dd>
         <dl>
           <dt>CR</dt>
@@ -43,7 +43,13 @@
 
           <dt>LF</dt>
           <dd>受信された 改行文字 LF ($0A) を CR+LF ($0D $0A)に変換します。<br>
-              例) "CR CR LF" に変換されます。</dd>
+              例) "CR LF" が受信された場合、"CR CR LF" に変換されます。</dd>
+
+          <dt>AUTO</dt>
+          <dd>受信された 改行文字 CR ($0D), 改行文字 LF ($0A) を CR+LF ($0D $0A)に変換します。<br>
+              例) "CR LF" が受信された場合、変換しません。<br>
+                  "CR" が受信された場合、"CR LF" に変換されます。<br>
+                  "LF" が受信された場合、"CR LF" に変換されます。</dd>
         </dl>
       </dd>
 
