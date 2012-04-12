@@ -46,10 +46,10 @@
               e.g.) If "CR LF" is received, it is converted to "CR CR LF."</dd>
 
           <dt>AUTO</dt>
-          <!--dd>受信された 改行文字 CR ($0D), 改行文字 LF ($0A) を CR+LF ($0D $0A)に変換します。<br>
-              e.g.) "CR LF" が受信された場合、変換しません。<br>
-                    If "CR LF" is received, it is converted to "CR LF."<br>
-                    If "CR LF" is received, it is converted to "CR LF."</dd-->
+          <dd>Received CR ($0D) or LF ($0A) character is converted to CR+LF ($0D $0A) pairs.<br>
+              e.g.) If "CR+LF" are received, it is not converted.<br>
+                    If "CR" is received, it is converted to "CR LF."<br>
+                    If "LF" is received, it is converted to "CR LF."</dd>
         </dl>
       </dd>
 
