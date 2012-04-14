@@ -229,6 +229,11 @@ BOOL GetFileName(HWND HWin)
 		return FALSE;
 	}
 	else {
+		/* ttpmacro.exeが単体で起動され、ダイアログでマクロファイルが読み込まれた場合は、
+		 * 引数の個数は"1"となり、"param1"が更新される。
+		 * (2012.4.14 yutaka)
+		 */
+		ParamCnt = 1;
 		return TRUE;
 	}
 }

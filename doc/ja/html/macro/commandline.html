@@ -28,7 +28,9 @@
 
   <dt>&lt;macro file&gt;</dt>
   <dd>マクロファイル名<br>
-      ファイル名が絶対パスでないときは、ttpmacro.exe からの相対パスと見なされます。</dd>
+      ファイル名が絶対パスでないときは、ttpmacro.exe からの相対パスと見なされます。<br>
+      ファイル名（パスを除く）はシステム変数 param1 に格納される。
+      </dd>
 
   <dt>&lt;second param&gt;</dt>
   <dd>システム変数 param2 に格納される文字列</dd>
@@ -55,11 +57,11 @@
   <dd>システム変数 param9 に格納される文字列</dd>
 
   <dt>paramcnt</dt>
-  <dd>システム変数 param[2-9] に格納された文字列の個数 - 1</dd>
+  <dd>システム変数 param1..9 に格納された文字列の個数</dd>
 </dl>
 
 <p>
-システム変数 param2 ～ param9, paramcnt については<A HREF="./syntax/variables.html">"変数"</A> 参照。
+システム変数 param1, param2 ～ param9, paramcnt については<A HREF="./syntax/variables.html">"変数"</A> 参照。
 </p>
 
 

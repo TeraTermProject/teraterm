@@ -28,7 +28,8 @@
 
   <dt>&lt;macro file&gt;</dt>
   <dd>Macro filename.<br>
-      If this value is not a full path, it is understood as a relative path from ttpmacro.exe.</dd>
+      If this value is not a full path, it is understood as a relative path from ttpmacro.exe.<br>
+      The filename(path excluded) is stored in the system variable "param1".</dd>
 
   <dt>&lt;second param&gt;</dt>
   <dd>Character string stored in the system variable "param2".</dd>
@@ -55,11 +56,11 @@
   <dd>Character string stored in the system variable "param9".</dd>
 
   <dt>paramcnt</dt>
-  <dd>"Count of the string stored in the system variable param[2-9]" - 1</dd>
+  <dd>"Count of the string stored in the system variable param1..9"</dd>
 </dl>
 
 <p>
-See <A HREF="./syntax/variables.html">"Variables"</A> for the system variables "param2" to "param9", "paramcnt".
+See <A HREF="./syntax/variables.html">"Variables"</A> for the system variables "param1", "param2" to "param9", "paramcnt".
 </p>
 
 

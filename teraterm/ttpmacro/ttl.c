@@ -96,6 +96,7 @@ BOOL InitTTL(HWND HWin)
 	NewStrVar("groupmatchstr8","");   // for 'waitregex' command (2005.10.15 yutaka)
 	NewStrVar("groupmatchstr9","");   // for 'waitregex' command (2005.10.15 yutaka)
 
+	NewStrVar("param1",ShortName);  // マクロファイル名 (2012.4.14 yutaka)
 	NewStrVar("param2",Param2);
 	NewStrVar("param3",Param3);
 	NewStrVar("param4",Param4);
