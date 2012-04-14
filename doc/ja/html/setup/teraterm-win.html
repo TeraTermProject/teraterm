@@ -368,12 +368,12 @@ Eterm風半透明ウィンドウの詳細設定をします。
 <table>
   <tr>
     <th>BGSPIPath</th>
-    <td>On / Off</td>
+    <td>フォルダ名</td>
     <td>画像を読み込むのに用いる、Susie Plugin が格納されているフォルダを指定します。</td>
   </tr>
   <tr>
     <th>BGFastSizeMove</th>
-    <td>フォルダ名</td>
+    <td>On / Off</td>
     <td>ウィンドウの移動、サイズ変更を高速に行います。Windows が「ドラッグ中にウィンドウの内容を表示する」場合に有効です。</td>
   </tr>
   <tr>
@@ -467,6 +467,47 @@ BGThemeFile = theme\*.ini
     <td>テキストの色を設定します。</td>
   </tr>
 </table>
+
+<h2>テーマファイルの拡張設定</h2>
+
+theme\Advanced.sample ファイルを利用して、拡張設定をすることができます。<br>
+下記は、指定した画像ファイル(sample.jpg)を Tera Term の背景に描画する例で、
+teraterm.ini の BGThemeFile エントリで指定してください。
+
+<pre>
+[BG]
+; Advanced Setting
+; Image source setting
+; Type      : Color / Picture / Wallpaper
+: Pattern   : Stretch / Tile / Center / FitWidth / FitHeight / AutoFit
+; AntiAlias : On / Off
+; Color     : R,G,B (0-255)
+; Alpha     : 0-255
+; File      : wildcard =&gt; random select
+; Dest = (Src1  * Src1Alpha + Dest * (255 - Src1Alpha)) / 255
+; Dest = (Src2  * Src2Alpha + Dest * (255 - Src2Alpha)) / 255
+BGReverseTextAlpha = 192
+;
+BGDestType      = Picture
+BGDestFile      = sample.jpg
+BGDestPattern   = AutoFit
+BGDestAntiAlias = On
+BGDestColor     = 0,0,0
+;
+BGSrc1Type      = Color
+BGSrc1File      = 
+BGSrc1Pattern   = 
+BGSrc1AntiAlias = 
+BGSrc1Color     = 32,32,32
+BGSrc1Alpha     = 64
+;
+BGSrc2Type      = Color
+BGSrc2File      = 
+BGSrc2Pattern   = 
+BGSrc2AntiAlias = 
+BGSrc2Color     = 32,32,32
+BGSrc2Alpha     = 64
+</pre>
 
 
 <h1><a name="maximize">ウィンドウ最大化時の画面スクロール方法</a></h1>

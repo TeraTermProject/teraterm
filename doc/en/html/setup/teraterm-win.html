@@ -351,12 +351,12 @@ To specify the detailed settings for Eterm lookfeel window, edit the [Tera Term]
 <table>
   <tr>
     <th>BGSPIPath</th>
-    <td>On / Off</td>
+    <td>folder name</td>
     <td>This option can specify Susie plugin path to load the image. Susie is Japanese free software.</td>
   </tr>
   <tr>
     <th>BGFastSizeMove</th>
-    <td>folder name</td>
+    <td>On / Off</td>
     <td>This option enables Tera Term window moving and resizing to more faster. This feature is valid in Windows dragging mode.</td>
   </tr>
   <tr>
@@ -450,6 +450,51 @@ BGThemeFile = theme\*.ini
     <td>This option can configure the text color.</td>
   </tr>
 </table>
+
+
+<h2>Extension of theme file</h2>
+
+A user can configure the extension of the theme file based on the theme\Advanced.sample file.<br>
+For example, an image file(sample.jpg) can be drawn in the Tera Term background.
+Please specify the .ini file at the BGThemeFile entry of the teraterm.ini file.
+
+<pre>
+[BG]
+; Advanced Setting
+; Image source setting
+; Type      : Color / Picture / Wallpaper
+: Pattern   : Stretch / Tile / Center / FitWidth / FitHeight / AutoFit
+; AntiAlias : On / Off
+; Color     : R,G,B (0-255)
+; Alpha     : 0-255
+; File      : wildcard =&gt; random select
+; Dest = (Src1  * Src1Alpha + Dest * (255 - Src1Alpha)) / 255
+; Dest = (Src2  * Src2Alpha + Dest * (255 - Src2Alpha)) / 255
+BGReverseTextAlpha = 192
+;
+BGDestType      = Picture
+BGDestFile      = sample.jpg
+BGDestPattern   = AutoFit
+BGDestAntiAlias = On
+BGDestColor     = 0,0,0
+;
+BGSrc1Type      = Color
+BGSrc1File      = 
+BGSrc1Pattern   = 
+BGSrc1AntiAlias = 
+BGSrc1Color     = 32,32,32
+BGSrc1Alpha     = 64
+;
+BGSrc2Type      = Color
+BGSrc2File      = 
+BGSrc2Pattern   = 
+BGSrc2AntiAlias = 
+BGSrc2Color     = 32,32,32
+BGSrc2Alpha     = 64
+</pre>
+
+
+
 
 
 <h1><a name="maximize">How to scroll the screen when the window size is maximized</a></h1>
