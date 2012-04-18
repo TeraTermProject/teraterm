@@ -1313,6 +1313,66 @@ WORD TTLFileOpen()
 	return Err;
 }
 
+// Format: filelock <file handle> [<timeout>]
+// (2012.4.19 yutaka)
+WORD TTLFileLock()
+{
+	WORD Err;
+	int FH;
+	DWORD timeout;
+	int result;
+	BOOL ret;
+	DWORD dwStart;
+
+	Err = 0;
+	GetIntVal(&FH,&Err);
+	if (Err!=0) return Err;
+
+	timeout = -1;  // 無限大
+	if (CheckParameterGiven()) {
+		GetIntVal(&timeout, &Err);
+		if (Err!=0) return Err;
+	}
+
+	result = 1;  // error
+	dwStart = GetTickCount();
+	do {
+		ret = LockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
+		if (ret != 0) { // ロック成功
+			result = 0;  // success
+			break;
+		}
+		Sleep(1);
+	} while (GetTickCount() - dwStart < (timeout*1000));
+
+	SetResult(result);
+	return Err;
+}
+
+// Format: fileunlock <file handle> 
+// (2012.4.19 yutaka)
+WORD TTLFileUnLock()
+{
+	WORD Err;
+	int FH;
+	BOOL ret;
+
+	Err = 0;
+	GetIntVal(&FH,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	ret = UnlockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
+	if (ret != 0) { // アンロック成功
+		SetResult(0);
+	} else {
+		SetResult(1);
+	}
+
+	return Err;
+}
+
 WORD TTLFileReadln()
 {
 	WORD Err;
@@ -4891,6 +4951,10 @@ int ExecCmnd()
 			Err = TTLFilenameBox(); break;  // add 'filenamebox' (2007.9.13 maya)
 		case RsvFileOpen:
 			Err = TTLFileOpen(); break;
+		case RsvFileLock:
+			Err = TTLFileLock(); break;
+		case RsvFileUnLock:
+			Err = TTLFileUnLock(); break;
 		case RsvFileReadln:
 			Err = TTLFileReadln(); break;
 		case RsvFileRead:

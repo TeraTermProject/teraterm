@@ -1183,6 +1183,10 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="filelock">
+					<param name="Local" value="html\macro\command\filelock.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filemarkptr">
 					<param name="Local" value="html\macro\command\filemarkptr.html">
 					<param name="ImageNumber" value="11">
@@ -1241,6 +1245,10 @@
 					<param name="Name" value="filetruncate">
 					<param name="Local" value="html\macro\command\filetruncate.html">
 					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="fileunlock">
+					<param name="Local" value="html\macro\command\fileunlock.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filewrite">
@@ -1403,7 +1411,7 @@
 					<param name="Name" value="intdim">
 					<param name="Local" value="html\macro\command\intdim.html">
 					<param name="ImageNumber" value="11">
-					</OBJECT>					
+					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="messagebox">
 					<param name="Local" value="html\macro\command\messagebox.html">

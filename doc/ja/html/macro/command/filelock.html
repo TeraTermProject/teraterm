@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>filelock</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>filelock</h1>
+
+<p>
+開いているファイルをロックする。
+</p>
+
+<pre class="macro-syntax">
+filelock &lt;file handle&gt; [&lt;timeout&gt;]
+</pre>
+
+<h2>解説</h2>
+
+<p>
+すでに開いているファイルハンドル &lt;file handle&gt; を指定すると、ファイル全体をロックする。
+ロック中、他のプロセスからの当該ファイルへのアクセスはエラーとなる。<br>
+filelock同士であれば、ファイルのロックが解除されるまで待つ。引数 &lt;timeout&gt; の指定があれば、
+指定時間（秒）最大待つ。
+</p>
+
+<p>
+ロックに成功すると result 変数が 0 に、失敗すると 1 となる。
+</p>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+fileopen fhandle 'test.txt' 0
+filelock fhandle
+if result!=0 then
+	messagebox 'error' 'hoge'
+endif
+filewrite fhandle 'sample'
+pause 60
+fileunlock fhandle
+if result!=0 then
+	messagebox 'error' 'hoge'
+endif
+fileclose fhandle
+</pre>
+
+<h2>参照</h2>
+
+<ul>
+ <li>"<a href="fileunlock.html">fileunlock</a>"</li>
+</ul>
+
+</body>
+</html>

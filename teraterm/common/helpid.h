@@ -194,6 +194,7 @@
 #define HlpMacroCommandFilecopy         92024
 #define HlpMacroCommandFilecreate       92025
 #define HlpMacroCommandFiledelete       92026
+#define HlpMacroCommandFileLock         92153
 #define HlpMacroCommandFilemarkptr      92027
 #define HlpMacroCommandFilenamebox      92124
 #define HlpMacroCommandFileopen         92028
@@ -207,6 +208,7 @@
 #define HlpMacroCommandFilestrseek      92034
 #define HlpMacroCommandFilestrseek2     92035
 #define HlpMacroCommandFiletruncate     92179
+#define HlpMacroCommandFileUnLock       92154
 #define HlpMacroCommandFilewrite        92036
 #define HlpMacroCommandFilewriteln      92037
 #define HlpMacroCommandFindoperations   92039

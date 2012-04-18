@@ -198,6 +198,8 @@
 #define RsvIntDim       150
 #define RsvStrDim       151
 #define RsvLogInfo      152
+#define RsvFileLock     153
+#define RsvFileUnLock   154
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
 #define RsvYmodemSend   177

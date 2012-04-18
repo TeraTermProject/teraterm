@@ -476,7 +476,7 @@
 				<param name="Name" value="TTXttyplay">
 				<param name="Local" value="html\commandline\ttxttyplay.html">
 				<param name="ImageNumber" value="11">
-			</OBJECT>
+				</OBJECT>
 		</UL>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -1170,6 +1170,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="filelock">
+					<param name="Local" value="html\macro\command\filelock.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filemarkptr">
 					<param name="Local" value="html\macro\command\filemarkptr.html">
 					<param name="ImageNumber" value="11">
@@ -1227,6 +1232,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filetruncate">
 					<param name="Local" value="html\macro\command\filetruncate.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="fileunlock">
+					<param name="Local" value="html\macro\command\fileunlock.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1390,7 +1400,7 @@
 					<param name="Name" value="intdim">
 					<param name="Local" value="html\macro\command\intdim.html">
 					<param name="ImageNumber" value="11">
-					</OBJECT>					
+					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="messagebox">
 					<param name="Local" value="html\macro\command\messagebox.html">

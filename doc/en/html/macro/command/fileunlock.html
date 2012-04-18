@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>fileunlock</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>fileunlock</h1>
+
+<p>
+Unlocks the specified file.
+</p>
+
+<pre class="macro-syntax">
+fileunlock &lt;file handle&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Unlocks the specified whole file. Unlocking a file enables other processes
+to access the file.
+</p>
+
+<p>
+If the function succeeds, the result variable is 0.<br>
+If the function fails, the result variable is 1.
+</p>
+
+
+<h2>Examples</h2>
+
+<pre class="macro-example">
+fileopen fhandle 'test.txt' 0
+filelock fhandle
+if result!=0 then
+	messagebox 'error' 'hoge'
+endif
+filewrite fhandle 'sample'
+pause 60
+fileunlock fhandle
+if result!=0 then
+	messagebox 'error' 'hoge'
+endif
+fileclose fhandle
+</pre>
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="filelock.html">filelock</a>"</li>
+</ul>
+
+</body>
+</html>
