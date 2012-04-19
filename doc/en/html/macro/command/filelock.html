@@ -25,9 +25,28 @@ filelock &lt;file handle&gt; [&lt;timeout&gt;]
 
 <p>
 Locks the specified whole file for exclusive access by the calling process. <br>
-The filelock command will wait until the file is unlocked. However, the command will time out
-at the &lt;timeout&gt; value when the argument is specified.
+The &lt;timeout&gt; argument is described below.
 </p>
+
+<table>
+ <tr>
+  <th><b>&lt;timeout&gt;</b></th>
+  <td><b>Description</b></td>
+ </tr>
+ <tr>
+  <th>0</th>
+  <td>Returns quickly the error when the file is already locked.</td>
+ </tr>
+ <tr>
+  <th>Abbreviation</th>
+  <td>Returns only when the file is unlocked.</td>
+ </tr>
+ <tr>
+  <th>Value</th>
+  <td>Waits until the file is unlocked or the time-out interval(in seconds) elapses. 
+      Returns the error when the time-out interval elapsed.</td>
+ </tr>
+</table>
 
 <p>
 If the function succeeds, the result variable is 0.<br>
