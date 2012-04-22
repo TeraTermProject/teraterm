@@ -103,6 +103,7 @@ Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Men
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
 Source: release\theme\Advanced.sample; DestDir: {app}\theme\; Components: TeraTerm
+Source: release\theme\ImageFile.INI; DestDir: {app}\theme\; Components: TeraTerm
 Source: release\theme\Scale.INI; DestDir: {app}\theme\; Components: TeraTerm
 Source: release\theme\Tile.INI; DestDir: {app}\theme\; Components: TeraTerm
 Source: release\theme\scale\23.jpg; DestDir: {app}\theme\scale; Components: TeraTerm
