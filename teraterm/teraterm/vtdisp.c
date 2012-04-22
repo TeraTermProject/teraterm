@@ -326,15 +326,17 @@ FARPROC GetProcAddressWithDllName(char *dllName,char *procName)
     return 0;
 }
 
-void RandomFile(char *filespec,char *filename, int destlen)
+void RandomFile(char *filespec_src,char *filename, int destlen)
 {
   int    i;
   int    file_num;
-  char   fullpath[MAX_PATH];
+  char   fullpath[1024];
   char   *filePart;
-
+  char filespec[1024];
   HANDLE hFind;
   WIN32_FIND_DATA fd;
+
+  ExpandEnvironmentStrings(filespec_src, filespec, sizeof(filespec));
 
   //ê‚ëŒÉpÉXÇ…ïœä∑
   if(!GetFullPathName(filespec,MAX_PATH,fullpath,&filePart))
