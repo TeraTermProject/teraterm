@@ -268,6 +268,7 @@ DLG_SELECT_DIR_TITLE=Select new directory
 DLG_GEN_TITLE=Tera Term: General setup
 DLG_GEN_PORT=Default &port:
 DLG_GEN_LANG=&Language:
+DLG_GEN_LANG_UI=Language&UI:
 
 DLG_HOST_TITLE=Tera Term: New connection
 DLG_HOST_TCPIPHOST=H&ost:
@@ -441,6 +442,7 @@ BTN_CONTINUE=&Continue
 ; common
 MSG_ERROR=ERROR
 MSG_TT_ERROR=Tera Term: Error
+MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.
 
 BTN_OK=OK
 BTN_CANCEL=Cancel

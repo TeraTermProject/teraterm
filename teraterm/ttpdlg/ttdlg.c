@@ -3025,9 +3025,78 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 }
 
 static PCHAR far LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
+static char **LangUIList = NULL;
+
+static void make_sel_lang_ui(void)
+{
+	int    i;
+	int    file_num;
+	char   fullpath[1024] = "lang\\*.lng";
+	HANDLE hFind;
+	WIN32_FIND_DATA fd;
+	char **p;
+
+	// メモリフリー
+	if (LangUIList) {
+		p = LangUIList;
+		while (*p) {
+			free(*p);
+			p++;
+		}
+		free(LangUIList);
+		LangUIList = NULL;
+	}
+
+	file_num = 0;
+	hFind = FindFirstFile(fullpath,&fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+		  if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			file_num ++;
+		} while(FindNextFile(hFind,&fd));
+		FindClose(hFind);
+	}
+
+	file_num++;  // NULL
+	LangUIList = calloc(file_num, sizeof(char *));
+
+	i = 0;
+	hFind = FindFirstFile(fullpath,&fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				LangUIList[i++] = _strdup(fd.cFileName);
+			}
+		} while(FindNextFile(hFind,&fd));
+		FindClose(hFind);
+	}
+	LangUIList[i++] = NULL;
+
+}
+
+static int get_sel_lang_ui(char **list, char *selstr)
+{
+	int n = 0;
+	char **p = list;
+
+	if (selstr == NULL || selstr[0] == '\0') {
+		n = 0;  // English
+	} else {
+		while (*p) {
+			if (strstr(selstr, *p)) {
+				n = p - list;
+				break;
+			}
+			p++;
+		}
+	}
+
+	return (n + 1);  // 1origin
+}
 
 BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	static int langui_sel = 1;
 	PTTSet ts;
 	WORD w;
 	char Temp[8];
@@ -3047,6 +3116,8 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(Dialog, IDC_GENPORT, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_GENLANGLABEL, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_GENLANG, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_GENLANGUI_LABEL, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
+				SendDlgItemMessage(Dialog, IDC_GENLANG_UI, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDOK, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDCANCEL, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
 				SendDlgItemMessage(Dialog, IDC_GENHELP, WM_SETFONT, (WPARAM)DlgGenFont, MAKELPARAM(TRUE,0));
@@ -3064,6 +3135,9 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(Dialog, IDC_GENLANGLABEL, uimsg2, sizeof(uimsg2));
 			get_lang_msg("DLG_GEN_LANG", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_GENLANGLABEL, uimsg);
+			GetDlgItemText(Dialog, IDC_GENLANGUI_LABEL, uimsg2, sizeof(uimsg2));
+			get_lang_msg("DLG_GEN_LANG_UI", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			SetDlgItemText(Dialog, IDC_GENLANGUI_LABEL, uimsg);
 			GetDlgItemText(Dialog, IDOK, uimsg2, sizeof(uimsg2));
 			get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDOK, uimsg);
@@ -3098,6 +3172,15 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				ShowDlgItem(Dialog,IDC_GENLANGLABEL,IDC_GENLANG);
 				SetDropDownList(Dialog, IDC_GENLANG, LangList, ts->Language);
 			}
+
+			// 最初に指定されている言語ファイルの番号を覚えておく。
+			make_sel_lang_ui();
+			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFile_ini);
+			SetDropDownList(Dialog, IDC_GENLANG_UI, LangUIList, langui_sel);
+			if (LangUIList[0] == NULL) {
+				EnableWindow(GetDlgItem(Dialog, IDC_GENLANG_UI), FALSE);
+			}
+
 			return TRUE;
 
 		case WM_COMMAND:
@@ -3126,6 +3209,17 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							}
 
 							ts->Language = language;
+						}
+
+						// 言語ファイルが変更されていた場合
+						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
+						if (w != langui_sel) {
+							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE, 
+								"lang/%s", LangUIList[w - 1]);
+
+							get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg), 
+								"This option takes effect the next time a session is started.", UILanguageFile);
+							MessageBox(Dialog, uimsg, "Tera Term: CONFIGURATION WARNING", MB_ICONEXCLAMATION);
 						}
 					}
 
