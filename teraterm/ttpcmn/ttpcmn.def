@@ -46,3 +46,4 @@ EXPORTS
   doSelectFolder @51
 
   mctimelocal @53
+  RestartTeraTerm @55

@@ -3216,12 +3216,19 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (w != langui_sel) {
+							int ret;
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE, 
 								"%s/%s", LANG_PATH, LangUIList[w - 1]);
 
 							get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg), 
-								"This option takes effect the next time a session is started.", UILanguageFile);
-							MessageBox(Dialog, uimsg, "Tera Term: CONFIGURATION WARNING", MB_ICONEXCLAMATION);
+								"This option takes effect the next time a session is started.\n"
+								"Are you sure that you want to relaunch Tera Term?"
+								, UILanguageFile);
+							ret = MessageBox(Dialog, uimsg, "Tera Term: CONFIGURATION WARNING", MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+							if (ret == IDYES) {
+								// re-launch
+								RestartTeraTerm(GetParent(Dialog), ts);
+							}
 						}
 					}
 

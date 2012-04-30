@@ -442,7 +442,7 @@ BTN_CONTINUE=Weiter
 ; common
 MSG_ERROR=Fehler
 MSG_TT_ERROR=TeraTerm-Fehler
-MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.
+MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.\nAre you sure that you want to relaunch Tera Term?
 
 BTN_OK=OK
 BTN_CANCEL=Abbrechen

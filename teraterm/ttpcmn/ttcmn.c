@@ -17,6 +17,7 @@
 #include <locale.h>
 
 #include "compat_w95.h"
+#include "tt_res.h"
 
 /* first instance flag */
 static BOOL FirstInstance = TRUE;
@@ -77,6 +78,30 @@ BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
 	}
 	else {
 		return FALSE;
+	}
+}
+
+// 設定ファイルをディスクに保存し、Tera Term本体を再起動する。
+// (2012.4.30 yutaka)
+void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts)
+{
+	char path[1024];
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	SendMessage(hwnd, WM_COMMAND, ID_SETUP_SAVE, 0);
+	SendMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
+
+	if (GetModuleFileName(NULL, path, sizeof(path)) == 0) {
+		return;
+	}
+
+	memset(&si, 0, sizeof(si));
+	GetStartupInfo(&si);
+	memset(&pi, 0, sizeof(pi));
+
+	if (CreateProcess(NULL, path, NULL, NULL, FALSE, 0,
+	                  NULL, NULL, &si, &pi) == 0) {
 	}
 }
 
