@@ -11,6 +11,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttwinman.h"
+#include "ttcommon.h"
 
 mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1003,6 +1004,7 @@ void CVisualPropPageDlg::OnOK()
 	int beforeAlphaBlend;
 	char buf[MAXPATHLEN];
 	COLORREF TmpColor;
+	int flag_changed = 0;
 
 	// (1)
 	beforeAlphaBlend = ts.AlphaBlend;
@@ -1017,7 +1019,10 @@ void CVisualPropPageDlg::OnOK()
 	// グローバル変数 BGEnable を直接書き換えると、プログラムが落ちることが
 	// あるのでコピーを修正するのみとする。(2005.4.24 yutaka)
 	btn = (CButton *)GetDlgItem(IDC_ETERM_LOOKFEEL);
-	ts.EtermLookfeel.BGEnable = btn->GetCheck();
+	if (ts.EtermLookfeel.BGEnable != btn->GetCheck()) {
+		flag_changed = 1;
+		ts.EtermLookfeel.BGEnable = btn->GetCheck();
+	}
 
 	// (3)
 	listbox = (CListBox *)GetDlgItem(IDC_MOUSE_CURSOR);
@@ -1108,6 +1113,11 @@ void CVisualPropPageDlg::OnOK()
 		if (ts.AlphaBlend != beforeAlphaBlend) {
 			SetWindowStyle(&ts);
 		}
+	}
+
+	if (flag_changed) {
+		// re-launch
+		RestartTeraTerm(GetSafeHwnd(), &ts);
 	}
 }
 

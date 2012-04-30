@@ -88,9 +88,20 @@ void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts)
 	char path[1024];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
+	char uimsg[MAX_UIMSG];
+	int ret;
+
+	get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg), 
+		"This option takes effect the next time a session is started.\n"
+		"Are you sure that you want to relaunch Tera Term?"
+		, ts->UILanguageFile);
+	ret = MessageBox(hwnd, uimsg, "Tera Term: Configuration Warning", MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+	if (ret != IDYES) 
+		return;
 
 	SendMessage(hwnd, WM_COMMAND, ID_SETUP_SAVE, 0);
-	SendMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
+	// TODO: 自動終了させようとすると、アプリが落ちる場合がある。
+	//SendMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
 
 	if (GetModuleFileName(NULL, path, sizeof(path)) == 0) {
 		return;
