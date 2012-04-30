@@ -3026,12 +3026,14 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 static PCHAR far LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
 static char **LangUIList = NULL;
+#define LANG_PATH "lang"
+#define LANG_EXT ".lng"
 
 static void make_sel_lang_ui(void)
 {
 	int    i;
 	int    file_num;
-	char   fullpath[1024] = "lang\\*.lng";
+	char   fullpath[1024] = LANG_PATH "\\*" LANG_EXT;
 	HANDLE hFind;
 	WIN32_FIND_DATA fd;
 	char **p;
@@ -3215,7 +3217,7 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (w != langui_sel) {
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE, 
-								"lang/%s", LangUIList[w - 1]);
+								"%s/%s", LANG_PATH, LangUIList[w - 1]);
 
 							get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg), 
 								"This option takes effect the next time a session is started.", UILanguageFile);
