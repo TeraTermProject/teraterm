@@ -100,17 +100,17 @@ void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts)
 		return;
 
 	SendMessage(hwnd, WM_COMMAND, ID_SETUP_SAVE, 0);
-	// TODO: 自動終了させようとすると、アプリが落ちる場合がある。
-	//SendMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
+	// ID_FILE_EXIT メッセージではアプリが落ちることがあるため、WM_QUIT をポストする。
+	//PostMessage(hwnd, WM_COMMAND, ID_FILE_EXIT, 0);
+	PostQuitMessage(0);
 
+	// 自プロセスの再起動。
 	if (GetModuleFileName(NULL, path, sizeof(path)) == 0) {
 		return;
 	}
-
 	memset(&si, 0, sizeof(si));
 	GetStartupInfo(&si);
 	memset(&pi, 0, sizeof(pi));
-
 	if (CreateProcess(NULL, path, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
 	}
