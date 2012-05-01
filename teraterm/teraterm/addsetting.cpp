@@ -1312,10 +1312,11 @@ BEGIN_MESSAGE_MAP(CCygwinPropPageDlg, CPropertyPage)
 END_MESSAGE_MAP()
 
 // CCygwinPropPageDlg メッセージ ハンドラ
+#define CYGTERM_FILE "cygterm.cfg"  // CygTerm configuration file
 
 BOOL CCygwinPropPageDlg::OnInitDialog()
 {
-	char *cfgfile = "cygterm.cfg"; // CygTerm configuration file
+	char *cfgfile = CYGTERM_FILE; // CygTerm configuration file
 	char cfg[MAX_PATH];
 	FILE *fp;
 	char buf[256], *head, *body;
@@ -1471,7 +1472,7 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CCygwinPropPageDlg::OnOK()
 {
-	char *cfgfile = "cygterm.cfg"; // CygTerm configuration file
+	char *cfgfile = CYGTERM_FILE; // CygTerm configuration file
 	char *tmpfile = "cygterm.tmp";
 	char cfg[MAX_PATH];
 	char tmp[MAX_PATH];
@@ -1619,6 +1620,11 @@ void CCygwinPropPageDlg::OnOK()
 			             "Can't rename CygTerm configuration file (%d).", ts.UILanguageFile);
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
 			MessageBox(buf, uimsg, MB_ICONEXCLAMATION);
+		} else {
+			// cygterm.cfg ファイルへの保存が成功したら、メッセージダイアログを表示する。
+			// 改めて、Save setupを実行する必要はないことを注意喚起する。
+			// (2012.5.1 yutaka)
+			MessageBox(CYGTERM_FILE " has been saved. Do not do save setup.", "Tera Term: Notice", MB_OK | MB_ICONINFORMATION);
 		}
 	}
 
