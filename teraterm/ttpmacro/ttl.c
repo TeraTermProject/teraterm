@@ -2168,7 +2168,7 @@ WORD TTLGetTime(WORD mode)
 {
 	WORD Err;
 	TVarId VarId;
-	TStrVal Str1, Str2;
+	TStrVal Str1, Str2, tzStr;
 	time_t time1;
 	struct tm *ptm;
 	char *format;
@@ -2187,6 +2187,15 @@ WORD TTLGetTime(WORD mode)
 //			return ErrSyntax;
 		}
 		set_result = TRUE;
+
+		// タイムゾーンの指定があれば、localtime()に影響させる。(2012.5.2 yutaka)
+		if (CheckParameterGiven()) {
+			GetStrVal(tzStr, &Err);
+			if (Err!=0) return Err;
+			_putenv_s("TZ", tzStr);
+			_tzset();
+		}
+
 	}
 	else {
 		switch (mode) {

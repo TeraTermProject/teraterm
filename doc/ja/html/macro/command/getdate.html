@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-getdate &lt;strvar&gt; [&lt;format&gt;]
+getdate &lt;strvar&gt; [&lt;format&gt;] [&lt;timezone&gt;]
 </pre>
 
 <h2>解説</h2>
@@ -29,7 +29,8 @@ formatが省略された場合、格納される形式は"YYYY-MM-DD"となる。(&lt;format&gt; に %
 </p>
 
 <p>
-formatが指定されたgetdateは、同じformatが指定されたgettimeと動作が等しくなる。
+formatが指定されたgetdateは、同じformatが指定されたgettimeと動作が等しくなる。<br>
+&lt;timezone&gt にタイムゾーンを表す文字列を指定すると、タイムゾーンを加味した日付計算が行われる。
 </p>
 
 <p>
@@ -79,6 +80,11 @@ getdate datestr
 ;現在の日時を元にしてログファイル名を生成し、変数logfileに格納。
 ;形式はlog-YYYYMMDD-HHMMSS.txt
 getdate logfile "log-%Y%m%d-%H%M%S.txt"
+
+;GMTで時刻を取得する。
+tz="GMT"
+gettime s "%Y/%m/%d %H:%M:%S" tz
+messagebox s tz
 </pre>
 
 <h2>参照</h2>
