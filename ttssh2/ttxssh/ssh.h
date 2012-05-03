@@ -39,6 +39,8 @@ See LICENSE.TXT for the license.
 
 #include "buffer.h"
 #include "config.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define DEBUG_PRINT_TO_FILE(base, msg, len) { \
 	static int count = 0; \
@@ -628,5 +630,71 @@ void SSH2_update_kex_myproposal(PTInstVar pvar);
 void SSH2_update_host_key_myproposal(PTInstVar pvar);
 void SSH2_update_hmac_myproposal(PTInstVar pvar);
 int SSH_notify_break_signal(PTInstVar pvar);
+
+///
+enum scp_state {
+	SCP_INIT, SCP_TIMESTAMP, SCP_FILEINFO, SCP_DATA, SCP_CLOSING,
+};
+
+typedef struct bufchain {
+	buffer_t *msg;
+	struct bufchain *next;
+} bufchain_t;
+
+typedef struct scp {
+	enum scp_dir dir;              // transfer direction
+	enum scp_state state;          // SCP state 
+	char localfile[MAX_PATH];      // local filename
+	char localfilefull[MAX_PATH];  // local filename fullpath
+	char remotefile[MAX_PATH];     // remote filename
+	FILE *localfp;                 // file pointer for local file
+	struct __stat64 filestat;      // file status information
+	HWND progress_window;
+	HANDLE thread;
+	unsigned int thread_id;
+	PTInstVar pvar;
+	// for receiving file
+	long long filetotalsize;
+	long long filercvsize;
+} scp_t;
+
+enum sftp_state {
+	SFTP_INIT, 
+};
+
+typedef struct sftp {
+	enum sftp_state state;
+} sftp_t;
+
+typedef struct channel {
+	int used;
+	int self_id;
+	int remote_id;
+	unsigned int local_window;
+	unsigned int local_window_max;
+	unsigned int local_consumed;
+	unsigned int local_maxpacket;
+	unsigned int remote_window;
+	unsigned int remote_maxpacket;
+	enum channel_type type;
+	int local_num;
+	bufchain_t *bufchain;
+	scp_t scp;
+	buffer_t *agent_msg;
+	int agent_request_len;
+	sftp_t sftp;
+} Channel_t;
+
+unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len);
+void finish_send_packet_special(PTInstVar pvar, int skip_compress);
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen);
+
+#define finish_send_packet(pvar) finish_send_packet_special((pvar), 0)
+#define get_payload_uint32(pvar, offset) get_uint32_MSBfirst((pvar)->ssh_state.payload + (offset))
+#define get_uint32(buf) get_uint32_MSBfirst((buf))
+#define set_uint32(buf, v) set_uint32_MSBfirst((buf), (v))
+#define get_mpint_len(pvar, offset) ((get_ushort16_MSBfirst((pvar)->ssh_state.payload + (offset)) + 7) >> 3)
+#define get_ushort16(buf) get_ushort16_MSBfirst((buf))
+///
 
 #endif

@@ -76,49 +76,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // channel data structure
 #define CHANNEL_MAX 100
 
-enum scp_state {
-	SCP_INIT, SCP_TIMESTAMP, SCP_FILEINFO, SCP_DATA, SCP_CLOSING,
-};
-
-typedef struct bufchain {
-	buffer_t *msg;
-	struct bufchain *next;
-} bufchain_t;
-
-typedef struct scp {
-	enum scp_dir dir;              // transfer direction
-	enum scp_state state;          // SCP state 
-	char localfile[MAX_PATH];      // local filename
-	char localfilefull[MAX_PATH];  // local filename fullpath
-	char remotefile[MAX_PATH];     // remote filename
-	FILE *localfp;                 // file pointer for local file
-	struct __stat64 filestat;      // file status information
-	HWND progress_window;
-	HANDLE thread;
-	unsigned int thread_id;
-	PTInstVar pvar;
-	// for receiving file
-	long long filetotalsize;
-	long long filercvsize;
-} scp_t;
-
-typedef struct channel {
-	int used;
-	int self_id;
-	int remote_id;
-	unsigned int local_window;
-	unsigned int local_window_max;
-	unsigned int local_consumed;
-	unsigned int local_maxpacket;
-	unsigned int remote_window;
-	unsigned int remote_maxpacket;
-	enum channel_type type;
-	int local_num;
-	bufchain_t *bufchain;
-	scp_t scp;
-	buffer_t *agent_msg;
-	int agent_request_len;
-} Channel_t;
 
 static Channel_t channels[CHANNEL_MAX];
 
@@ -159,7 +116,6 @@ void SSH2_dispatch_add_message(unsigned char message);
 void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end);
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 static void start_ssh_heartbeat_thread(PTInstVar pvar);
-static void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen);
 void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c);
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num, unsigned char *data, unsigned int buflen);
 
@@ -709,12 +665,6 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
 	}
 }
 
-#define get_payload_uint32(pvar, offset) get_uint32_MSBfirst((pvar)->ssh_state.payload + (offset))
-#define get_uint32(buf) get_uint32_MSBfirst((buf))
-#define set_uint32(buf, v) set_uint32_MSBfirst((buf), (v))
-#define get_mpint_len(pvar, offset) ((get_ushort16_MSBfirst((pvar)->ssh_state.payload + (offset)) + 7) >> 3)
-#define get_ushort16(buf) get_ushort16_MSBfirst((buf))
-
 #define do_crc(buf, len) (~(uint32)crc32(0xFFFFFFFF, (buf), (len)))
 
 /* Decrypt the payload, checksum it, eat the padding, get the packet type
@@ -846,7 +796,7 @@ static int prep_packet(PTInstVar pvar, char FAR * data, int len,
    or for the packet type byte).
    Returns a pointer to the payload data area, a region of length 'len',
    to be filled by the caller. */
-static unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len)
+unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len)
 {
 	unsigned char FAR *buf;
 
@@ -872,7 +822,6 @@ static unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len)
 	return buf + 1;
 }
 
-#define finish_send_packet(pvar) finish_send_packet_special((pvar), 0)
 
 // 送信リトライ関数の追加
 //
@@ -973,7 +922,7 @@ error:
 
 /* if skip_compress is true, then the data has already been compressed
    into outbuf + 12 */
-static void finish_send_packet_special(PTInstVar pvar, int skip_compress)
+void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 {
 	unsigned int len = pvar->ssh_state.outgoing_packet_len;
 	unsigned char FAR *data;
@@ -3269,7 +3218,7 @@ void SSH_end(PTInstVar pvar)
 
 }
 
-static void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen)
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
@@ -7303,6 +7252,12 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 			char ch = '\0';
 			SSH2_send_channel_data(pvar, c, &ch, 1);
 		}
+
+	} else if (c->type == TYPE_SFTP) {
+		// SFTPセッションを開始するためのネゴシエーションを行う。
+		// (2012.5.3 yutaka)
+		sftp_do_init(pvar, c);
+
 	}
 
 	return TRUE;
@@ -8126,6 +8081,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 		SSH2_scp_response(pvar, c, data, str_len);
 
 	} else if (c->type == TYPE_SFTP) {  // SFTP
+		sftp_response(pvar, c, data, str_len);
 
 	} else if (c->type == TYPE_AGENT) {  // agent forward
 		if (!SSH_agent_response(pvar, c, 0, data, str_len)) {
