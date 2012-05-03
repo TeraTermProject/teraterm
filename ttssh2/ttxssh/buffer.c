@@ -11,6 +11,13 @@
 #include <openssl/ec.h>
 #include <zlib.h>
 
+// バッファのオフセットを初期化し、まだ読んでいない状態にする。
+// Tera Term(TTSSH)オリジナル関数。
+void buffer_rewind(buffer_t *buf)
+{
+	buf->offset = 0;
+}
+
 void buffer_clear(buffer_t *buf)
 {
 	buf->offset = 0;
@@ -142,6 +149,59 @@ void buffer_put_raw(buffer_t *msg, char *ptr, int size)
 	int ret = -1;
 
 	ret = buffer_append(msg, ptr, size);
+}
+
+int buffer_get_ret(buffer_t *msg, void *buf, int len)
+{
+	if (len > msg->len - msg->offset) {
+		// TODO: エラー処理
+		OutputDebugPrintf("buffer_get_ret: trying to get more bytes %d than in buffer %d",
+		    len, msg->len - msg->offset);
+		return (-1);
+	}
+	memcpy(buf, msg->buf + msg->offset, len);
+	msg->offset += len;
+	return (0);
+}
+
+int buffer_get_int_ret(int *ret, buffer_t *msg)
+{
+	unsigned char buf[4];
+
+	if (buffer_get_ret(msg, (char *) buf, 4) == -1)
+		return (-1);
+	if (ret != NULL)
+		*ret = get_uint32(buf);
+	return (0);
+}
+
+int buffer_get_int(buffer_t *msg)
+{
+	int ret = -1;
+
+	if (buffer_get_int_ret(&ret, msg) == -1) {
+		// TODO: エラー処理
+		OutputDebugPrintf("buffer_get_int: buffer error");
+	}
+	return (ret);
+}
+
+int buffer_get_char_ret(char *ret, buffer_t *msg)
+{
+	if (buffer_get_ret(msg, ret, 1) == -1)
+		return (-1);
+	return (0);
+}
+
+int buffer_get_char(buffer_t *msg)
+{
+	char ch;
+
+	if (buffer_get_char_ret(&ch, msg) == -1) {
+		// TODO: エラー処理
+		OutputDebugPrintf("buffer_get_char: buffer error");
+	}
+	return (unsigned char)ch;
 }
 
 // getting string buffer.

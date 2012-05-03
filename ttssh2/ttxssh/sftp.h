@@ -99,6 +99,8 @@ OF SUCH DAMAGE.
 #define SSH2_FX_OP_UNSUPPORTED		8
 #define SSH2_FX_MAX			8
 
+/* Maximum packet that we are willing to send/accept */
+#define SFTP_MAX_MSG_LENGTH	(256 * 1024)
 
 void sftp_do_init(PTInstVar pvar, Channel_t *c);
 void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen);

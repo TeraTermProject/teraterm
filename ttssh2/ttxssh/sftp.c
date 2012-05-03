@@ -51,6 +51,30 @@ OF SUCH DAMAGE.
 #include <sys/stat.h>
 #include <assert.h>
 
+static void sftp_do_syslog(PTInstVar pvar, int level, char *fmt, ...)
+{
+	char tmp[1024];
+	va_list arg;
+
+	va_start(arg, fmt);
+	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	va_end(arg);
+
+	notify_verbose_message(pvar, tmp, level);
+}
+
+static void sftp_syslog(PTInstVar pvar, char *fmt, ...)
+{
+	char tmp[1024];
+	va_list arg;
+
+	va_start(arg, fmt);
+	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	va_end(arg);
+
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+}
+
 // SFTP専用バッファを確保する。SCPとは異なり、先頭に後続のデータサイズを埋め込む。
 static void sftp_buffer_alloc(buffer_t **message)
 {
@@ -89,7 +113,35 @@ static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	SSH2_send_channel_data(pvar, c, p, len);
 }
 
+static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen, buffer_t **message)
+{
+	buffer_t *msg = *message;
+	int msg_len;
+
+	// バッファを確保し、データをすべて放り込む。以降は buffer_t 型を通して操作する。
+	// そうしたほうが OpenSSH のコードとの親和性が良くなるため。
+	buffer_clear(msg);
+	buffer_append(msg, data, buflen);
+	buffer_rewind(msg);
+
+	msg_len = buffer_get_int(msg);
+	if (msg_len > SFTP_MAX_MSG_LENGTH) {
+		// TODO:
+		OutputDebugPrintf("Received message too long %u", msg_len);
+		goto error;
+	}
+	if (msg_len + 4 != buflen) {
+		// TODO:
+		OutputDebugPrintf("Buffer length %u is invalid", buflen);
+		goto error;
+	}
+
+error:
+	return;
+}
+
 // SFTP通信開始前のネゴシエーション
+// based on do_init()#sftp-client.c
 void sftp_do_init(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
@@ -101,10 +153,45 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 	buffer_put_int(msg, SSH2_FILEXFER_VERSION);
 	sftp_send_msg(pvar, c, msg);
 	sftp_buffer_free(msg);
+
+	sftp_syslog(pvar, "SFTP client version %u", SSH2_FILEXFER_VERSION);
 }
 
+static void sftp_do_init_recv(PTInstVar pvar, buffer_t *msg)
+{
+	unsigned int type;
+
+	type = buffer_get_char(msg);
+	if (type != SSH2_FXP_VERSION) {
+		goto error;
+	}
+	sftp_syslog(pvar, "SFTP server version %u", type);
+
+error:
+	return;
+}
+
+// SFTP受信処理 -メインルーチン-
 void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
+	buffer_t *msg;
+	int state;
+
 	OutputDebugPrintf("len %d\n", buflen);
 
+	/*
+	 * Allocate buffer
+	 */
+	sftp_buffer_alloc(&msg);
+	sftp_get_msg(pvar, c, data, buflen, &msg);
+
+	state = c->sftp.state;
+	if (state == SFTP_INIT) {
+		sftp_do_init_recv(pvar, msg);
+	}
+
+	/*
+	 * Free buffer
+	 */
+	sftp_buffer_free(msg);
 }
