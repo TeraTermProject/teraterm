@@ -664,6 +664,17 @@ enum sftp_state {
 
 typedef struct sftp {
 	enum sftp_state state;
+	unsigned int transfer_buflen;
+	unsigned int num_requests;
+	unsigned int version;
+	unsigned int msg_id;
+#define SFTP_EXT_POSIX_RENAME   0x00000001
+#define SFTP_EXT_STATVFS    0x00000002
+#define SFTP_EXT_FSTATVFS   0x00000004
+#define SFTP_EXT_HARDLINK   0x00000008
+	unsigned int exts;
+	unsigned long long limit_kbps;
+	//struct bwlimit bwlimit_in, bwlimit_out;
 } sftp_t;
 
 typedef struct channel {

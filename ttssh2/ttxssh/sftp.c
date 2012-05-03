@@ -76,6 +76,13 @@ static void sftp_syslog(PTInstVar pvar, char *fmt, ...)
 }
 
 // SFTP専用バッファを確保する。SCPとは異なり、先頭に後続のデータサイズを埋め込む。
+//
+// buffer_t
+//    +---------+------------------------------------+
+//    | msg_len | data                               |  
+//    +---------+------------------------------------+
+//       4byte   <------------- msg_len ------------->
+//
 static void sftp_buffer_alloc(buffer_t **message)
 {
 	buffer_t *msg;
@@ -113,6 +120,7 @@ static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	SSH2_send_channel_data(pvar, c, p, len);
 }
 
+// サーバから受信したSFTPパケットをバッファに格納する。
 static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen, buffer_t **message)
 {
 	buffer_t *msg = *message;
@@ -127,12 +135,12 @@ static void sftp_get_msg(PTInstVar pvar, Channel_t *c, unsigned char *data, unsi
 	msg_len = buffer_get_int(msg);
 	if (msg_len > SFTP_MAX_MSG_LENGTH) {
 		// TODO:
-		OutputDebugPrintf("Received message too long %u", msg_len);
+		sftp_syslog(pvar, "Received message too long %u", msg_len);
 		goto error;
 	}
 	if (msg_len + 4 != buflen) {
 		// TODO:
-		OutputDebugPrintf("Buffer length %u is invalid", buflen);
+		sftp_syslog(pvar, "Buffer length %u is invalid", buflen);
 		goto error;
 	}
 
@@ -146,8 +154,15 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
 
+	// SFTP管理構造体の初期化
+	memset(&c->sftp, 0, sizeof(c->sftp));
 	c->sftp.state = SFTP_INIT;
+	c->sftp.transfer_buflen = DEFAULT_COPY_BUFLEN;
+	c->sftp.num_requests = DEFAULT_NUM_REQUESTS;
+	c->sftp.exts = 0;
+	c->sftp.limit_kbps = 0;
 
+	// ネゴシエーションの開始
 	sftp_buffer_alloc(&msg);
 	buffer_put_char(msg, SSH2_FXP_INIT); 
 	buffer_put_int(msg, SSH2_FILEXFER_VERSION);
@@ -157,7 +172,7 @@ void sftp_do_init(PTInstVar pvar, Channel_t *c)
 	sftp_syslog(pvar, "SFTP client version %u", SSH2_FILEXFER_VERSION);
 }
 
-static void sftp_do_init_recv(PTInstVar pvar, buffer_t *msg)
+static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 {
 	unsigned int type;
 
@@ -165,7 +180,49 @@ static void sftp_do_init_recv(PTInstVar pvar, buffer_t *msg)
 	if (type != SSH2_FXP_VERSION) {
 		goto error;
 	}
-	sftp_syslog(pvar, "SFTP server version %u", type);
+	c->sftp.version = buffer_get_int(msg);
+	sftp_syslog(pvar, "SFTP server version %u, remote version %u", type, c->sftp.version);
+
+	while (buffer_remain_len(msg) > 0) {
+		char *name = buffer_get_string_msg(msg, NULL);
+		char *value = buffer_get_string_msg(msg, NULL);
+		int known = 0;
+
+        if (strcmp(name, "posix-rename@openssh.com") == 0 &&
+            strcmp(value, "1") == 0) {
+            c->sftp.exts |= SFTP_EXT_POSIX_RENAME;
+            known = 1;
+        } else if (strcmp(name, "statvfs@openssh.com") == 0 &&
+            strcmp(value, "2") == 0) {
+            c->sftp.exts |= SFTP_EXT_STATVFS;
+            known = 1;
+        } else if (strcmp(name, "fstatvfs@openssh.com") == 0 &&
+            strcmp(value, "2") == 0) {
+            c->sftp.exts |= SFTP_EXT_FSTATVFS;
+            known = 1;
+        } else if (strcmp(name, "hardlink@openssh.com") == 0 &&
+            strcmp(value, "1") == 0) {
+            c->sftp.exts |= SFTP_EXT_HARDLINK;
+            known = 1;
+        }
+        if (known) {
+            sftp_syslog(pvar, "Server supports extension \"%s\" revision %s",
+                name, value);
+        } else {
+            sftp_syslog(pvar, "Unrecognised server extension \"%s\"", name);
+        }
+
+		free(name);
+		free(value);
+	}
+
+	if (c->sftp.version == 0) {
+		c->sftp.transfer_buflen = min(c->sftp.transfer_buflen, 20480);
+	}
+	c->sftp.limit_kbps = 0;
+	if (c->sftp.limit_kbps > 0) {
+		// TODO:
+	}
 
 error:
 	return;
@@ -177,8 +234,6 @@ void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned i
 	buffer_t *msg;
 	int state;
 
-	OutputDebugPrintf("len %d\n", buflen);
-
 	/*
 	 * Allocate buffer
 	 */
@@ -187,7 +242,8 @@ void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned i
 
 	state = c->sftp.state;
 	if (state == SFTP_INIT) {
-		sftp_do_init_recv(pvar, msg);
+		sftp_do_init_recv(pvar, c, msg);
+		sftp_syslog(pvar, "Connected to SFTP server.");
 	}
 
 	/*

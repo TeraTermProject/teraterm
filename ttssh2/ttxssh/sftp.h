@@ -102,6 +102,9 @@ OF SUCH DAMAGE.
 /* Maximum packet that we are willing to send/accept */
 #define SFTP_MAX_MSG_LENGTH	(256 * 1024)
 
+#define DEFAULT_COPY_BUFLEN 32768   /* Size of buffer for up/download */
+#define DEFAULT_NUM_REQUESTS    64  /* # concurrent outstanding requests */
+
 void sftp_do_init(PTInstVar pvar, Channel_t *c);
 void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen);
 

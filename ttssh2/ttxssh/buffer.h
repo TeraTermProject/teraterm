@@ -42,5 +42,7 @@ int buffer_get_int(buffer_t *msg);
 int buffer_get_char_ret(char *ret, buffer_t *msg);
 int buffer_get_char(buffer_t *msg);
 void buffer_rewind(buffer_t *buf);
+void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr);
+int buffer_remain_len(buffer_t *msg);
 
 #endif				/* BUFFER_H */

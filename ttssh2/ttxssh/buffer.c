@@ -236,6 +236,21 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 	return(ptr);
 }
 
+// buffer_get_string() の buffer_t 版。本来はこちらが OpenSSH スタイル。
+// NOTE: You should free the return pointer if it's unused.
+void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
+{
+	char *data, *olddata;
+	void *ret;
+	int off;
+
+	data = olddata = buffer_tail_ptr(msg);
+	ret = buffer_get_string(&data, buflen_ptr);
+	off = data - olddata;
+	msg->offset += off;
+	return (ret);
+}
+
 void buffer_put_string(buffer_t *msg, char *ptr, int size)
 {
 	char buf[4];
@@ -279,6 +294,12 @@ void buffer_put_int(buffer_t *msg, int value)
 int buffer_len(buffer_t *msg)
 {
 	return (msg->len);
+}
+
+// まだ読み込んでいない残りのサイズを返す。本来はこちらが OpenSSH スタイル。
+int buffer_remain_len(buffer_t *msg)
+{
+	return (msg->len - msg->offset);
 }
 
 // buffer_append() や buffer_append_space() でメッセージバッファに追加を行うと、
