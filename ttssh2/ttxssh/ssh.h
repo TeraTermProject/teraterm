@@ -659,11 +659,12 @@ typedef struct scp {
 } scp_t;
 
 enum sftp_state {
-	SFTP_INIT, 
+	SFTP_INIT, SFTP_CONNECTED, SFTP_REALPATH, 
 };
 
 typedef struct sftp {
 	enum sftp_state state;
+	HWND console_window;
 	unsigned int transfer_buflen;
 	unsigned int num_requests;
 	unsigned int version;
@@ -675,6 +676,7 @@ typedef struct sftp {
 	unsigned int exts;
 	unsigned long long limit_kbps;
 	//struct bwlimit bwlimit_in, bwlimit_out;
+	char path[1024];
 } sftp_t;
 
 typedef struct channel {

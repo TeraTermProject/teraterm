@@ -51,6 +51,22 @@ OF SUCH DAMAGE.
 #include <sys/stat.h>
 #include <assert.h>
 
+
+#define WM_USER_CONSOLE (WM_USER + 1)
+
+static void sftp_console_message(PTInstVar pvar, Channel_t *c, char *fmt, ...)
+{
+	char tmp[1024];
+	va_list arg;
+
+	va_start(arg, fmt);
+	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	va_end(arg);
+
+	SendMessage(c->sftp.console_window, WM_USER_CONSOLE, 0, (LPARAM)tmp);
+	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+}
+
 static void sftp_do_syslog(PTInstVar pvar, int level, char *fmt, ...)
 {
 	char tmp[1024];
@@ -148,8 +164,23 @@ error:
 	return;
 }
 
+static void sftp_send_string_request(PTInstVar pvar, Channel_t *c, unsigned int id, unsigned int code,
+									 char *s, unsigned int len)
+{
+	buffer_t *msg;
+
+	sftp_buffer_alloc(&msg);
+	buffer_put_char(msg, code);
+	buffer_put_int(msg, id);
+	buffer_put_string(msg, s, len);
+	sftp_send_msg(pvar, c, msg);
+	sftp_syslog(pvar, "Sent message fd %d T:%u I:%u", c->remote_id, code, id);
+	sftp_buffer_free(msg);
+}
+
+
 // SFTP通信開始前のネゴシエーション
-// based on do_init()#sftp-client.c
+// based on do_init()#sftp-client.c(OpenSSH 6.0)
 void sftp_do_init(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg;
@@ -224,15 +255,205 @@ static void sftp_do_init_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 		// TODO:
 	}
 
+	sftp_syslog(pvar, "Connected to SFTP server.");
+
 error:
 	return;
 }
 
-// SFTP受信処理 -メインルーチン-
+// パスの送信
+// based on do_realpath()#sftp-client.c(OpenSSH 6.0)
+static void sftp_do_realpath(PTInstVar pvar, Channel_t *c, char *path)
+{
+	unsigned int id;
+
+	strncpy_s(c->sftp.path, sizeof(c->sftp.path), path, _TRUNCATE);
+	id = c->sftp.msg_id++;
+	sftp_send_string_request(pvar, c, id, SSH2_FXP_REALPATH, path, strlen(path));
+}
+
+/* Convert from SSH2_FX_ status to text error message */
+static const char *fx2txt(int status)
+{       
+    switch (status) {
+    case SSH2_FX_OK:
+        return("No error");
+    case SSH2_FX_EOF:
+        return("End of file");
+    case SSH2_FX_NO_SUCH_FILE:
+        return("No such file or directory");
+    case SSH2_FX_PERMISSION_DENIED:
+        return("Permission denied");
+    case SSH2_FX_FAILURE:
+        return("Failure");
+    case SSH2_FX_BAD_MESSAGE:
+        return("Bad message");
+    case SSH2_FX_NO_CONNECTION:
+        return("No connection");
+    case SSH2_FX_CONNECTION_LOST:
+        return("Connection lost");
+    case SSH2_FX_OP_UNSUPPORTED:
+        return("Operation unsupported");
+    default:
+        return("Unknown status");
+    }
+    /* NOTREACHED */
+}
+
+static char *sftp_do_realpath_recv(PTInstVar pvar, Channel_t *c, buffer_t *msg)
+{
+	unsigned int type, expected_id, count, id;
+	char *filename = NULL, *longname;
+
+	type = buffer_get_char(msg);
+	id = buffer_get_int(msg);
+
+	expected_id = c->sftp.msg_id - 1; 
+	if (id != expected_id) {
+		sftp_syslog(pvar, "ID mismatch (%u != %u)", id, expected_id);
+		goto error;
+	}
+
+	if (type == SSH2_FXP_STATUS) {
+		unsigned int status = buffer_get_int(msg);
+
+		sftp_syslog(pvar, "Couldn't canonicalise: %s", fx2txt(status));
+		goto error;
+	} else if (type != SSH2_FXP_NAME) {
+        sftp_syslog(pvar, "Expected SSH2_FXP_NAME(%u) packet, got %u",
+            SSH2_FXP_NAME, type);
+		goto error;
+	}
+
+	count = buffer_get_int(msg);
+	if (count != 1) {
+		sftp_syslog(pvar, "Got multiple names (%d) from SSH_FXP_REALPATH", count);
+		goto error;
+	}
+
+	filename = buffer_get_string_msg(msg, NULL);
+	longname = buffer_get_string_msg(msg, NULL);
+	//a = decode_attrib(&msg);
+
+	sftp_console_message(pvar, c, "SSH_FXP_REALPATH %s -> %s", c->sftp.path, filename);
+
+	free(longname);
+
+error:
+	return (filename);
+}
+
+
+/*
+ * SFTP コマンドラインコンソール
+ */
+static WNDPROC hEditProc;
+
+static LRESULT CALLBACK EditProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg) {
+		case WM_KEYDOWN:
+		if ((int)wParam == VK_RETURN) {
+			char buf[512];
+
+			GetWindowText(hwnd, buf, sizeof(buf));
+			SetWindowText(hwnd, "");
+			if (buf[0] != '\0') {
+				SendDlgItemMessage(GetParent(hwnd), IDC_SFTP_CONSOLE, EM_REPLACESEL, 0, (LPARAM) buf);
+				SendDlgItemMessage(GetParent(hwnd), IDC_SFTP_CONSOLE, EM_REPLACESEL, 0,
+								   (LPARAM) (char FAR *) "\r\n");
+			}
+		}
+		break;
+	default:
+		return (CallWindowProc(hEditProc, hwnd, uMsg, wParam, lParam));
+	}
+
+	return 0L;
+}
+
+static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	static HFONT DlgDragDropFont = NULL;
+	LOGFONT logfont;
+	HFONT font;
+	HWND hEdit;
+
+	switch (msg) {
+		case WM_INITDIALOG:
+			font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
+			GetObject(font, sizeof(LOGFONT), &logfont);
+			DlgDragDropFont = NULL;
+
+			hEdit = GetDlgItem(hDlgWnd, IDC_SFTP_EDIT);
+			SetFocus(hEdit);
+
+			// エディットコントロールのサブクラス化
+			hEditProc = (WNDPROC)GetWindowLong(hEdit, GWL_WNDPROC);
+			SetWindowLong(hEdit, GWL_WNDPROC, (LONG)EditProc);
+
+			return TRUE;
+
+		case WM_COMMAND:
+			switch (LOWORD(wp)) {
+				case IDOK:
+					break;
+
+				case IDCANCEL:
+					if (DlgDragDropFont != NULL) {
+						DeleteObject(DlgDragDropFont);
+					}
+					EndDialog(hDlgWnd, IDCANCEL);
+					DestroyWindow(hDlgWnd);
+					break;
+
+				default:
+					return FALSE;
+			}
+
+		case WM_USER_CONSOLE:
+			SendDlgItemMessage(hDlgWnd, IDC_SFTP_CONSOLE, EM_REPLACESEL, 0, (LPARAM) lp);
+			SendDlgItemMessage(hDlgWnd, IDC_SFTP_CONSOLE, EM_REPLACESEL, 0,
+							   (LPARAM) (char FAR *) "\r\n");
+			return TRUE;
+
+#if 0
+		case WM_SIZE:
+			{
+				// 再配置
+				int dlg_w, dlg_h;
+				RECT rc_dlg;
+				RECT rc;
+				POINT p;
+
+				// 新しいダイアログのサイズを得る
+				GetClientRect(hDlgWnd, &rc_dlg);
+				dlg_w = rc_dlg.right;
+				dlg_h = rc_dlg.bottom;
+
+				// コマンドプロンプト
+				GetWindowRect(GetDlgItem(hDlgWnd, IDC_SFTP_EDIT), &rc);
+				p.x = rc.left;
+				p.y = rc.top;
+				ScreenToClient(hDlgWnd, &p);
+				SetWindowPos(GetDlgItem(hDlgWnd, IDC_SFTP_EDIT), 0,
+ 							 0, 0, dlg_w, p.y,
+							 SWP_NOSIZE | SWP_NOZORDER);
+			}
+			return TRUE;
+#endif
+
+		default:
+			return FALSE;
+	}
+	return TRUE;
+}
+
+// SFTP受信処理 -ステートマシーン-
 void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
 	buffer_t *msg;
-	int state;
+	HWND hDlgWnd;
 
 	/*
 	 * Allocate buffer
@@ -240,10 +461,26 @@ void sftp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned i
 	sftp_buffer_alloc(&msg);
 	sftp_get_msg(pvar, c, data, buflen, &msg);
 
-	state = c->sftp.state;
-	if (state == SFTP_INIT) {
+	if (c->sftp.state == SFTP_INIT) {
 		sftp_do_init_recv(pvar, c, msg);
-		sftp_syslog(pvar, "Connected to SFTP server.");
+
+		// コンソールを起動する。
+		hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_SFTP_DIALOG), 
+				pvar->cv->HWin, (DLGPROC)OnSftpConsoleDlgProc);	
+		if (hDlgWnd != NULL) {
+			c->sftp.console_window = hDlgWnd;
+			ShowWindow(hDlgWnd, SW_SHOW);
+		}
+
+		sftp_do_realpath(pvar, c, ".");
+		c->sftp.state = SFTP_CONNECTED;
+
+	} else if (c->sftp.state == SFTP_CONNECTED) {
+		char *remote_path;
+		remote_path = sftp_do_realpath_recv(pvar, c, msg);
+
+		c->sftp.state = SFTP_REALPATH;
+
 	}
 
 	/*
