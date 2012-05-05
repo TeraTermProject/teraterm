@@ -3216,16 +3216,21 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
 						if (w != langui_sel) {
-							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE, 
-								"%s/%s", LANG_PATH, LangUIList[w - 1]);
+							char CurDir[MAX_PATH];
 
-							// re-launch
-							RestartTeraTerm(GetParent(Dialog), ts);
+							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE, 
+								"%s\\%s", LANG_PATH, LangUIList[w - 1]);
+
+							GetCurrentDirectory(sizeof(CurDir), CurDir);
+							SetCurrentDirectory(ts->HomeDir);
+							_fullpath(ts->UILanguageFile, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile));
+							SetCurrentDirectory(CurDir);
 						}
 					}
 
-					// TTXKanjiMenu のために、OK 押下時にメニュー再描画の
-					// メッセージを飛ばすようにした。 (2007.7.14 maya)
+					// TTXKanjiMenu は Language を見てメニューを表示するので、変更の可能性がある
+					// OK 押下時にメニュー再描画のメッセージを飛ばすようにした。 (2007.7.14 maya)
+					// 言語ファイルの変更時にメニューの再描画が必要 (2012.5.5 maya)
 					PostMessage(GetParent(Dialog),WM_USER_CHANGEMENU,0,0);
 
 					EndDialog(Dialog, 1);
