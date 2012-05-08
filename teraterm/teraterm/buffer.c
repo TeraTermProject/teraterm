@@ -3508,3 +3508,15 @@ void BuffScrollRight(int count)
 
 	BuffUpdateRect(0, 0, NumOfColumns-1, NumOfLines-1);
 }
+
+// 現在行をまるごとバッファに格納する。返り値は現在のカーソル位置(X)。
+int BuffGetCurrentLineData(char *buf, int bufsize)
+{
+	LONG Ptr;
+
+	Ptr = GetLinePtr(PageStart + CursorY);
+	memset(buf, 0, bufsize);
+	memcpy(buf, &CodeBuff[Ptr], min(NumOfColumns, bufsize - 1));
+	return (CursorX);
+}
+

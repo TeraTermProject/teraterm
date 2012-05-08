@@ -124,6 +124,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_MESSAGE(WM_IME_COMPOSITION,OnIMEComposition)
 	ON_MESSAGE(WM_INPUTLANGCHANGE,OnIMEInputChange)
 	ON_MESSAGE(WM_IME_NOTIFY,OnIMENotify)
+	ON_MESSAGE(WM_IME_REQUEST,OnIMERequest)
 //<!--by AKASI
 	ON_MESSAGE(WM_WINDOWPOSCHANGING,OnWindowPosChanging)
 	ON_MESSAGE(WM_SETTINGCHANGE,OnSettingChange)
@@ -2991,6 +2992,45 @@ LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 	}
 
 	return CFrameWnd::DefWindowProc(WM_IME_NOTIFY,wParam,lParam);
+}
+
+// IMEの前後参照変換機能への対応
+// cf. http://d.hatena.ne.jp/topiyama/20070703
+//     http://ice.hotmint.com/putty/#DOWNLOAD
+// (2012.5.9 yutaka)
+LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
+{
+	int size;
+	char buf[512];
+
+	if (wParam == IMR_DOCUMENTFEED) {
+		size = NumOfColumns + 1;
+		if (lParam == 0) {  // 1回目の呼び出し
+			// バッファのサイズを返すのみ。
+
+		} else {  // 2回目の呼び出し
+			//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
+			RECONVERTSTRING *pReconv   = (RECONVERTSTRING*)lParam;
+			char*  pszParagraph        = (char*)pReconv + sizeof(RECONVERTSTRING);
+			int cx;
+
+			cx = BuffGetCurrentLineData(buf, sizeof(buf));
+	        
+			pReconv->dwSize            = sizeof(RECONVERTSTRING);
+			pReconv->dwVersion         = 0;
+			pReconv->dwStrLen          = size;
+			pReconv->dwStrOffset       = sizeof(RECONVERTSTRING);
+			pReconv->dwCompStrLen      = 0;
+			pReconv->dwCompStrOffset   = 0;
+			pReconv->dwTargetStrLen    = 0;
+			pReconv->dwTargetStrOffset = cx;
+	        
+			memcpy(pszParagraph, buf, size);
+		}
+		return (sizeof(RECONVERTSTRING) + size);
+	}
+
+	return CFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
 }
 
 LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)

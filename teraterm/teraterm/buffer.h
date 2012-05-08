@@ -78,6 +78,7 @@ void BuffSelectedEraseScreen();
 void BuffSelectEraseBox(int XStart, int YStart, int XEnd, int YEnd);
 void BuffScrollLeft(int count);
 void BuffScrollRight(int count);
+int BuffGetCurrentLineData(char *buf, int bufsize);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom;
