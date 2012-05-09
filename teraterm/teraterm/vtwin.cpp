@@ -2995,18 +2995,38 @@ LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 }
 
 // IMEの前後参照変換機能への対応
+// MSからちゃんと仕様が提示されていないので、アドホックにやるしかないらしい。
 // cf. http://d.hatena.ne.jp/topiyama/20070703
 //     http://ice.hotmint.com/putty/#DOWNLOAD
+//     http://27213143.at.webry.info/201202/article_2.html
+//     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
 // (2012.5.9 yutaka)
 LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
 {
-	int size;
-	char buf[512];
+	static int complen, newsize;
+	static char comp[512];
+	int size, ret;
+	char buf[512], newbuf[1024];
+	HIMC hIMC;
 
 	if (wParam == IMR_DOCUMENTFEED) {
-		size = NumOfColumns + 1;
+		size = NumOfColumns + 1;   // カーソルがある行の長さ+null
+
 		if (lParam == 0) {  // 1回目の呼び出し
 			// バッファのサイズを返すのみ。
+			// ATOK2012では常に complen=0 となる。
+			complen = 0;
+			memset(comp, 0, sizeof(comp));
+			hIMC = ImmGetContext(HVTWin);
+			if (hIMC) {
+				ret = ImmGetCompositionString(hIMC, GCS_COMPSTR, comp, sizeof(comp));
+				if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
+					memset(comp, 0, sizeof(comp));
+				}
+				complen = strlen(comp);  // w/o null
+				ImmReleaseContext(HVTWin, hIMC);
+			}
+			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
 
 		} else {  // 2回目の呼び出し
 			//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
@@ -3015,19 +3035,27 @@ LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
 			int cx;
 
 			cx = BuffGetCurrentLineData(buf, sizeof(buf));
+
+			// カーソル位置に変換文字列を挿入する。
+			memset(newbuf, 0, sizeof(newbuf));
+			memcpy(newbuf, buf, cx);
+			memcpy(newbuf + cx, comp, complen);
+			memcpy(newbuf + cx + complen, buf + cx, size - cx);
+			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
 	        
 			pReconv->dwSize            = sizeof(RECONVERTSTRING);
 			pReconv->dwVersion         = 0;
-			pReconv->dwStrLen          = size;
+			pReconv->dwStrLen          = newsize - 1;
 			pReconv->dwStrOffset       = sizeof(RECONVERTSTRING);
-			pReconv->dwCompStrLen      = 0;
-			pReconv->dwCompStrOffset   = 0;
-			pReconv->dwTargetStrLen    = 0;
+			pReconv->dwCompStrLen      = complen;
+			pReconv->dwCompStrOffset   = cx;
+			pReconv->dwTargetStrLen    = complen;
 			pReconv->dwTargetStrOffset = cx;
 	        
-			memcpy(pszParagraph, buf, size);
+			memcpy(pszParagraph, newbuf, newsize);
+			//OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
 		}
-		return (sizeof(RECONVERTSTRING) + size);
+		return (sizeof(RECONVERTSTRING) + newsize);
 	}
 
 	return CFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
