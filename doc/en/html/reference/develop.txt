@@ -16,6 +16,9 @@
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
   ActivePerl 5.8 later version
     converts character-code and return-code of documents for building OpenSSL.
+  Subversion for Windows (http://sourceforge.net/projects/win32svn/)
+    Use the compatible version for checkouted svn version.
+    Copy the "svnversion.exe" to the libs\svn\bin directory.
 
 
 * Libraries

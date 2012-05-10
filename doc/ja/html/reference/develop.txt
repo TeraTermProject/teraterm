@@ -18,6 +18,7 @@
     OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     ソースのチェックアウトに使った svn と互換性のあるバージョン
+    "svnversion.exe"を libs\svn\bin 配下にコピーしてください。
 
 
 ■ ライブラリ
