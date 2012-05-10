@@ -3009,7 +3009,9 @@ LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
 	char buf[512], newbuf[1024];
 	HIMC hIMC;
 
-	if (wParam == IMR_DOCUMENTFEED) {
+	// "IME=off"の場合は、何もしない。
+	if (ts.UseIME > 0 &&
+		wParam == IMR_DOCUMENTFEED) {
 		size = NumOfColumns + 1;   // カーソルがある行の長さ+null
 
 		if (lParam == 0) {  // 1回目の呼び出し
