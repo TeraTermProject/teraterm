@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>IMEのヒント</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>IMEのヒント</h1>
+
+<h2><a name="feedback">前後参照変換</a></h2>
+<p>
+すでに確定済みの文字があった場合においても、カーソル前後の文字を参照して、最適な変換を行うしくみです。
+ATOKでは「カーソル位置前後の文章を参照して変換する」、MS-IMEでは「挿入時、前の内容を参照して変換をする」と呼ばれています。<br>
+この機能はIME(Input Method Editor)[*1]とアプリケーションと連携して実現するため、アプリケーション側の対応も必要です。また、当該機能は厳密にMicrosoftから仕様が開示されていないので、アプリケーション(Tera Term)の実装はアドホックなものとなり、IMEとの組み合わせによっては、正しく動作しない場合があります。<br>
+<i>[*1] かつてはFEP(Front End Processor)と呼ばれていた。</i>
+</p>
+
+<p>
+<b>夏にお茶を飲みながら、本を読む。</b>
+</p>
+
+例として、上記の確定した文章があるとします。
+
+<p>
+<b>(A)夏に(B)お茶を飲みながら、(C)本を読む。</b>
+</p>
+
+前後参照変換機能が有効になっている場合、(A),(B),(C)の位置にカーソルがあり、「atui」と入力すると、IMEはそれぞれ下記のように適切な漢字に変換します。
+
+<p>
+<b><font color=red>暑い</font>夏に<font color=red>熱い</font>お茶を飲みながら、<font color=red>厚い</font>本を読む。</b>
+</p>
+
+Tera Termの実装としては、WM_IME_REQUESTメッセージでIMR_DOCUMENTFEEDパラメータを受信したら、現在のカーソルがある行のデータを返却することで、IMEの変換処理に貢献します。<br>
+データの返却方法は、ATOKとIMEで異なります。
+
+<p>
+<b>夏に|お茶を飲みながら、本を読む。</b>
+</p>
+
+ATOK2012の場合、|の位置にカーソルがあり、「a」と入力した時点で、メッセージが飛んできます。
+このときTera Termは、「<font color=blue>夏にお茶を飲みながら、本を読む。</font>」というデータを返します。<br>
+MS-IME2002/2003の場合、「あつi」と入力した時点で、メッセージが飛んできます。
+このときTera Termは、「<font color=blue>夏に<u>あつ</u>お茶を飲みながら、本を読む。</font>」というデータを返します。<br>
+
+</body>
+</html>
