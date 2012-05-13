@@ -1465,11 +1465,11 @@ void BGInitialize(void)
 	  // Additional settings Ç©ÇÁåƒÇ—èoÇ≥ÇÍÇÈÇ±Ç∆Ç™Ç†ÇÈÇΩÇﬂÅB
 	  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
 	  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
-  }
 
-  // îwåiâÊëúÇÃì«Ç›çûÇ›
-  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
-  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
+	  // îwåiâÊëúÇÃì«Ç›çûÇ›
+	  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
+	  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
+  }
 
   if(!BGEnable)
     return;
