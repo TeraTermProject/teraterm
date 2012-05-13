@@ -13,6 +13,12 @@
 // AKASI氏によるEterm風透過ウィンドウ
 #define ALPHABLEND_TYPE2
 
+// Eterm look-feel
+#define BG_SECTION "BG"
+#define BG_DESTFILE "BGDestFile"
+#define BG_THEME_IMAGEFILE "theme\\ImageFile.INI"
+#define BG_THEME_IMAGEFILE_DEFAULT "theme\\*.INI"
+
 // Added by 337 2006/03/01
 #define USE_NORMAL_BGCOLOR
 

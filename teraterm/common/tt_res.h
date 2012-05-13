@@ -130,6 +130,7 @@
 #define IDC_SCROLL_LINE                 2510
 #define IDC_PASTEDELAY_EDIT             2510
 #define IDC_SCP_PATH                    2510
+#define IDC_BGIMG_EDIT                  2510
 #define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
@@ -153,7 +154,10 @@
 #define IDC_PROTOELAPSEDTIME            2526
 #define IDC_DAD_SENDFILE                2526
 #define IDC_TRANS_ELAPSED               2527
+#define IDC_BGIMG_LABEL                 2527
 #define IDC_TRANS_ETIME                 2528
+#define IDC_BUTTON1                     2528
+#define IDC_BGIMG_BUTTON                2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
 #define IDC_CLIPBOARD_ACCESS            2530
 #define ID_ACC_SENDBREAK                50001
@@ -249,7 +253,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2527
+#define _APS_NEXT_CONTROL_VALUE         2529
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

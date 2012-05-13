@@ -556,6 +556,7 @@ struct tttset {
 	WORD KermitOpt;
 	WORD FontQuality;
 	char ScpSendDir[MAXPATHLEN];
+	char BGImageFilePath[MAX_PATH];
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1014,6 +1015,7 @@ typedef TMap far *PMap;
  * - At version 4.74, ttset_memfilemap was replaced with ttset_memfilemap_19.
  *   added tttset.FontQuality
  *   added tttset.ScpSenDir
+ *   added tttset.BGImageFilePath
  *
  * - At version 4.73, ttset_memfilemap was replaced with ttset_memfilemap_18.
  *   added tttset.LogLockExclusive

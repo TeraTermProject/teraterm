@@ -770,6 +770,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_ENABLE_URL_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ENABLE_ANSI_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_URL_UNDERLINE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_BGIMG_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_BGIMG_EDIT, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_BGIMG_BUTTON, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgVisualFont = NULL;
@@ -831,6 +834,18 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	// (2)[BG] BGEnable
 	btn = (CButton *)GetDlgItem(IDC_ETERM_LOOKFEEL);
 	btn->SetCheck(ts.EtermLookfeel.BGEnable);
+
+	// Eterm look-feelの背景画像指定。
+	SetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath);
+	if (ts.EtermLookfeel.BGEnable) {
+		GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+	} else {
+		GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+	}
 
 	// (3)Mouse cursor type
 	listbox = (CListBox *)GetDlgItem(IDC_MOUSE_CURSOR);
@@ -904,8 +919,38 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	CListBox *listbox;
 	int sel;
 	char buf[MAXPATHLEN];
+	CButton *btn;
 
 	switch (wParam) {
+		case IDC_ETERM_LOOKFEEL:
+			// チェックされたら Enable/Disable をトグルする。
+			btn = (CButton *)GetDlgItem(IDC_ETERM_LOOKFEEL);
+			if (btn->GetCheck()) {
+				GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(TRUE);
+				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
+				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+			} else {
+				GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
+				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+				// 無効化されたら、BGThemeFile を元に戻す。
+				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+			}
+			return TRUE;
+
+		case IDC_BGIMG_BUTTON | (BN_CLICKED << 16):
+			// 背景画像をダイアログで指定する。
+			{
+				CString         filter("Image Files(*.jpg;*.jpeg;*.bmp)|*.jpg;*.jpeg;*.bmp|All Files(*.*)|*.*||");
+				CFileDialog     selDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, filter);
+				if (selDlg.DoModal() == IDOK) {
+					// 背景画像指定が意図的に行われたら、BGThemeFile を固定化する。
+					SetDlgItemText(IDC_BGIMG_EDIT, selDlg.GetPathName());
+					strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
+				}
+			}
+			return TRUE;
+
 		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16):
 			listbox = (CListBox *)GetDlgItem(IDC_ANSI_COLOR);
 			sel = listbox->GetCurSel();
@@ -1022,6 +1067,10 @@ void CVisualPropPageDlg::OnOK()
 	if (ts.EtermLookfeel.BGEnable != btn->GetCheck()) {
 		flag_changed = 1;
 		ts.EtermLookfeel.BGEnable = btn->GetCheck();
+	}
+
+	if (ts.EtermLookfeel.BGEnable) {
+		GetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath, sizeof(ts.BGImageFilePath));
 	}
 
 	// (3)

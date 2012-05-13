@@ -2378,7 +2378,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(NULL, NULL, NULL, FName);
 
 	// Eterm lookfeel alphablend (2005.4.24 yutaka)
-#define ETERM_SECTION "BG"
+#define ETERM_SECTION BG_SECTION
 	WriteOnOff(ETERM_SECTION, "BGEnable", FName,
 	           ts->EtermLookfeel.BGEnable);
 	WriteOnOff(ETERM_SECTION, "BGUseAlphaBlendAPI", FName,
@@ -2393,6 +2393,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           ts->EtermLookfeel.BGNoFrame);
 	WritePrivateProfileString(ETERM_SECTION, "BGThemeFile",
 	                          ts->EtermLookfeel.BGThemeFile, FName);
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s\\%s", ts->HomeDir, BG_THEME_IMAGEFILE);
+	WritePrivateProfileString(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, Temp);
 
 #ifdef USE_NORMAL_BGCOLOR
 	// UseNormalBGColor

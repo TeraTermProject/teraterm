@@ -112,8 +112,6 @@ static int SRegionBottom;
 #include <stdio.h>
 #include <time.h>
 
-#define BG_SECTION "BG"
-
 typedef enum _BG_TYPE    {BG_COLOR = 0,BG_PICTURE,BG_WALLPAPER} BG_TYPE;
 typedef enum _BG_PATTERN {BG_STRETCH = 0,BG_TILE,BG_CENTER,BG_FIT_WIDTH,BG_FIT_HEIGHT,BG_AUTOFIT,BG_AUTOFILL} BG_PATTERN;
 
@@ -1388,7 +1386,7 @@ void BGReadIniFile(char *file)
   BGDest.antiAlias = BGGetOnOff("BGDestAntiAlias",BGDest.antiAlias,file);
   BGDest.color     = BGGetColor("BGDestColor",BGDest.color,file);
 
-  GetPrivateProfileString(BG_SECTION,"BGDestFile",BGDest.file,path,MAX_PATH,file);
+  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, BGDest.file,path,MAX_PATH,file);
   RandomFile(path,BGDest.file,sizeof(BGDest.file));
 
   //その他読み出し
@@ -1462,8 +1460,16 @@ void BGInitialize(void)
   strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
 
   //コンフィグファイルの決定
-  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
-  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
+  if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
+	  // 空の場合のみ、ディスクから読む。BGInitialize()が Tera Term 起動時以外にも、
+	  // Additional settings から呼び出されることがあるため。
+	  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
+	  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
+  }
+
+  // 背景画像の読み込み
+  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
+  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
 
   if(!BGEnable)
     return;
