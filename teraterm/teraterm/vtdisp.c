@@ -1450,19 +1450,19 @@ void BGInitialize(void)
   BGDestruct();
 
   //BG が有効かチェック
-  ts.EtermLookfeel.BGEnable = BGEnable = BGGetOnOff("BGEnable",FALSE,ts.SetupFName);
-  ts.EtermLookfeel.BGUseAlphaBlendAPI = BGGetOnOff("BGUseAlphaBlendAPI",TRUE ,ts.SetupFName);
-  ts.EtermLookfeel.BGNoFrame = BGGetOnOff("BGNoFrame"         ,FALSE,ts.SetupFName);
-  ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove"    ,TRUE ,ts.SetupFName);
-  ts.EtermLookfeel.BGNoCopyBits = BGGetOnOff("BGFlickerlessMove" ,TRUE ,ts.SetupFName);
-
-  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
-  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
-
-  //コンフィグファイルの決定
+  // 空の場合のみ、ディスクから読む。BGInitialize()が Tera Term 起動時以外にも、
+  // Additional settings から呼び出されることがあるため。
   if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
-	  // 空の場合のみ、ディスクから読む。BGInitialize()が Tera Term 起動時以外にも、
-	  // Additional settings から呼び出されることがあるため。
+	  ts.EtermLookfeel.BGEnable = BGEnable = BGGetOnOff("BGEnable",FALSE,ts.SetupFName);
+	  ts.EtermLookfeel.BGUseAlphaBlendAPI = BGGetOnOff("BGUseAlphaBlendAPI",TRUE ,ts.SetupFName);
+	  ts.EtermLookfeel.BGNoFrame = BGGetOnOff("BGNoFrame"         ,FALSE,ts.SetupFName);
+	  ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove"    ,TRUE ,ts.SetupFName);
+	  ts.EtermLookfeel.BGNoCopyBits = BGGetOnOff("BGFlickerlessMove" ,TRUE ,ts.SetupFName);
+
+	  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
+	  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
+
+	  //コンフィグファイルの決定
 	  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
 	  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
 
