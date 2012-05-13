@@ -38,6 +38,7 @@
 #define IDC_COLOR_BLUE                  1015
 #define IDC_SAMPLE_COLOR                1016
 #define IDC_COMMAND_EDIT                1017
+#define IDC_RESTART                     1017
 #define IDC_ENTERKEY_CHECK              1018
 #define IDC_RADIO_CRLF                  1019
 #define IDC_RADIO_CR                    1020

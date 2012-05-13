@@ -196,7 +196,7 @@ DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
 DLG_TAB_VISUAL_ALHPA=&Alpha blend
-DLG_TAB_VISUAL_ETERM=&Eterm lookfeel
+DLG_TAB_VISUAL_ETERM=&Eterm lookfeel(*)
 DLG_TAB_VISUAL_MOUSE=&Mouse cursor
 DLG_TAB_VISUAL_FONT_QUALITY=&Font quality
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=Default
@@ -212,6 +212,7 @@ DLG_TAB_VISUAL_REVERSE=Enable Re&verse attribute color
 DLG_TAB_VISUAL_URL=Enable &URL attribute color
 DLG_TAB_VISUAL_ANSI=Enable A&NSI color
 DLG_TAB_VISUAL_URLUL=Un&derline URL string
+DLG_TAB_VISUAL_RESTART=(*)Need to Save setup and restart Tera Term
 
 DLG_TAB_LOG_EDITOR=View log &editor
 DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)

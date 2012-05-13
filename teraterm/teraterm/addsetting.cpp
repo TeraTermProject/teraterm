@@ -773,6 +773,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_BGIMG_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_BGIMG_EDIT, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_BGIMG_BUTTON, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_RESTART, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgVisualFont = NULL;
@@ -817,6 +818,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_URL_UNDERLINE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_URLUL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_URL_UNDERLINE, ts.UIMsg);
+	GetDlgItemText(IDC_RESTART, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_RESTART", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_RESTART, ts.UIMsg);
 
 	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", ts.UIMsg, sizeof(ts.UIMsg), "Default", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
@@ -1166,7 +1170,7 @@ void CVisualPropPageDlg::OnOK()
 
 	if (flag_changed) {
 		// re-launch
-		RestartTeraTerm(GetSafeHwnd(), &ts);
+		// RestartTeraTerm(GetSafeHwnd(), &ts);
 	}
 }
 
