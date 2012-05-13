@@ -939,6 +939,8 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
 				// ñ≥å¯âªÇ≥ÇÍÇΩÇÁÅABGThemeFile Çå≥Ç…ñﬂÇ∑ÅB
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+				// îwåiâÊëúÇ‡ñ≥å¯âªÇ∑ÇÈÅB
+				SetDlgItemText(IDC_BGIMG_EDIT, "");
 			}
 			return TRUE;
 
@@ -1075,6 +1077,8 @@ void CVisualPropPageDlg::OnOK()
 
 	if (ts.EtermLookfeel.BGEnable) {
 		GetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath, sizeof(ts.BGImageFilePath));
+	} else {
+		strncpy_s(ts.BGImageFilePath, sizeof(ts.BGImageFilePath), "%SystemRoot%\\Web\\Wallpaper\\*.bmp", _TRUNCATE);
 	}
 
 	// (3)
