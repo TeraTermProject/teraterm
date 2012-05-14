@@ -2107,7 +2107,7 @@ void CSSetAttr()		// SGR
 	break;
       case 18: /* get terminal size */
 	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%u;t", CLocale,
+	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%ut", CLocale,
 	                      NumOfLines-StatusLine, NumOfColumns);
 	  SendCSIstr(Report, len);
 	}
