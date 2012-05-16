@@ -45,7 +45,7 @@
         <ul>
           <li>added support for the named pipe. Tera Term can <a href="../usage/tips/namedpipe.html">connect the serial port of the VMware and Hyper-V</a>.</li>
           <li>A named pipe can be specified into the TCP/IP:Host entry of <a href="../menu/file-new.html">New connection dialog</a>.</li>
-          <li>added the <a href="../commandline/teraterm.html#NAMEDPIPE">/NAMEDPIPE</a> option by specifying the named pipe.</li>
+          <li>added the <a href="../commandline/teraterm.html#namedpipe">/NAMEDPIPE</a> option by specifying the named pipe.</li>
         </ul></li>
       <li>added the AUTO entry in the <a href="../menu/setup-terminal.html#CRReceive">New-line(receive)</a>. Special thanks to tentner.</li>
       <li>added the selection of the font quality.
@@ -60,8 +60,12 @@
         <ul>
           <li>Environment variable strings(%variableName%) can be included in the ini file path.</li>
           <li>added an image file specified configuration(theme\ImageFile.INI). Also, a background image file can be specified on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
-          <li>Enabled the "Eterm lookfeel" checkbox on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.  Also, a user will be confirmed whether Tera Term is be relaunched.</li>
+          <li>Enabled the "Eterm lookfeel" checkbox on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
         </ul></li>
+      <li>added the LanguageUI entry on the <a href="..\menu\setup-general.html">General setup dialog</a>.</li>
+      <li>A message dialog is shown when the cygterm.cfg has been saved on the Cygwin tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+      <li>added support for IME feedback back and forth function. The ATOK2012, MS-IME2002 and MS-IME2003 work well. Also, this feature is disabled with "IME=off"(teraterm.ini).</li>
+      <li>Removed an extra semicolon(;) included in the window size requesting.</li>
       <li>Macro
         <ul>
           <li>added the "paramcnt"(argument count) and "param1"(macro filename) in the <a href="../macro/syntax/variables.html">Variables</a>.</li>
@@ -70,10 +74,6 @@
           <li>added the <a href="../macro/command/fileunlock.html">fileunlock</a> command.</li>
           <li>added the third argument _timezone_ at the <a href="../macro/command/gettime.html">gettime</a> and <a href="../macro/command/getdate.html">getdate</a> command.</li>
         </ul></li>
-      <li>added the LanguageUI entry on the <a href="..\menu\setup-general.html">General setup dialog</a>.</li>
-      <li>A message dialog is shown when the cygterm.cfg has been saved on the Cygwin tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
-      <li>added support for IME feedback back and forth function. The ATOK2012, MS-IME2002 and MS-IME2003 work well. Also, this feature is disabled with "IME=off"(teraterm.ini).</li>
-      <li>Removed an extra semicolon(;) included in the window size requesting.</li>
     </ul>
   </li>
 
@@ -84,8 +84,8 @@
           <li>The initial parameters of the KERMIT server do not be checked well.</li>
         </ul></li>
       <li>The drop down list's items are not shown on Windows 2000 or earlier.</li>
-      <li>A string array can not be recognized as the argument of the macro command. cf.<a href="http://logmett.com/forum/viewtopic.php?f=3&t=1970">Using String Array with sendln</a></li>
-      <li>Fixed a typo of the Cyrillic letter translation table(range of KOI8-R, CP866, Windows-1251 and ISO8859-5).</li>
+      <li>Fixed a typo of the Cyrillic letter translation table(range of CP866 and ISO8859-5).</li>
+      <li>A string array can not be recognized as the argument of the macro command.</li>
     </ul>
   </li>
 

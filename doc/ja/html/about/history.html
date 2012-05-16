@@ -45,7 +45,7 @@
         <ul>
           <li>名前付きパイプをサポートした。Tera Termから<a href="../usage/tips/namedpipe.html">VMwareやHyper-Vにシリアルポート接続が可能</a>となる。</li>
           <li><a href="../menu/file-new.html">New connectionダイアログ</a>のTCP/IP:Hostに名前付きパイプを指定できるようにした。</li>
-          <li><a href="../commandline/teraterm.html#NAMEDPIPE">/NAMEDPIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
+          <li><a href="../commandline/teraterm.html#namedpipe">/NAMEDPIPE</a> オプションで名前付きパイプを指定できるようにした。</li>
         </ul></li>
       <li><a href="../menu/setup-terminal.html#CRReceive">受信改行モード</a>にAUTOを追加した。tentner氏に感謝します。</li>
       <li>表示フォントの品質を選択できるようにした。
@@ -60,8 +60,12 @@
         <ul>
           <li>iniファイルパスに環境変数文字列(%variableName%)を含められるようにした。</li>
           <li>画像ファイル指定設定(theme\ImageFile.INI)を追加した。<a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、背景画像を指定できるようにした。</li>
-          <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、有効化できるようにした。設定変更後、再起動するかを問い合わせるようにした。</li>
+          <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、有効化できるようにした。</li>
         </ul></li>
+      <li><a href="..\menu\setup-general.html">General setupダイアログ</a>で言語ファイルを指定できるようにした。</li>
+      <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のCygwinタブで、設定保存できた場合、メッセージダイアログを表示するようにした。</li>
+      <li><a href="../usage/tips/ime.html#feedback">IMEの前後参考変換機能</a>に対応した。ATOK2012,MS-IME2002,MS-IME2003で動作確認済み。MS-IME2010では動作不可。"IME=off"(teraterm.ini)の場合は機能無効。</li>
+      <li>ウィンドウサイズ問い合わせに対する応答に含まれていた余分な ; を削除した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/syntax/variables.html">変数</a>に"paramcnt"（引数の個数）、"param1"（マクロファイル名）を追加した。</li>
@@ -70,10 +74,6 @@
           <li><a href="../macro/command/fileunlock.html">fileunlock</a>コマンドを追加した。</li>
           <li><a href="../macro/command/gettime.html">gettime</a>, <a href="../macro/command/getdate.html">getdate</a>コマンドの第3引数にタイムゾーンを追加した。</li>
         </ul></li>
-      <li><a href="..\menu\setup-general.html">General setupダイアログ</a>で言語ファイルを指定できるようにした。</li>
-      <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のCygwinタブで、設定保存できた場合、メッセージダイアログを表示するようにした。</li>
-      <li><a href="../usage/tips/ime.html#feedback">IMEの前後参考変換機能</a>に対応した。ATOK2012,MS-IME2002,MS-IME2003で動作確認済み。MS-IME2010では動作不可。"IME=off"(teraterm.ini)の場合は機能無効。</li>
-      <li>ウィンドウサイズ問い合わせに対する応答に含まれていた余分な ; を削除した。</li>
     </ul>
   </li>
 
@@ -84,8 +84,8 @@
           <li>サーバの初期パラメータの符号チェックバグを修正した。</li>
         </ul></li>
       <li>Windows 2000 以前で、ドロップダウンリストの選択肢が表示されない問題を修正した。</li>
-      <li>マクロコマンドの引数に文字型配列が指定できない問題を修正した。cf.<a href="http://logmett.com/forum/viewtopic.php?f=3&t=1970">Using String Array with sendln</a></li>
-      <li>キリル文字の変換テーブル(KOI8-R, CP866, Windows-1251, ISO8859-5 間)のtypoを修正した。</li>
+      <li>キリル文字の変換テーブル(CP866, ISO8859-5 間)のtypoを修正した。</li>
+      <li>マクロコマンドの引数に文字型配列が指定できない問題を修正した。</li>
     </ul>
   </li>
 
