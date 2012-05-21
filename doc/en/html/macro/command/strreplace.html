@@ -30,6 +30,11 @@ Replaces a specified &lt;regex&gt; string in the string variable &lt;strvar&gt; 
 If the &lt;newstr&gt; is ''(empty), the &lt;regex&gt; string is removed from &lt;strvar&gt;.
 </p>
 
+<p>
+When the replacing succeeds, the result variable is 1 and the matched string by the &lt;regex&gt; is stored into the matchstr variable. <br>
+When the replacing fails, the result variable is 0.
+</p>
+
 <h2>Example</h2>
 
 <pre class="macro-example">
