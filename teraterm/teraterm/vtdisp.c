@@ -1454,6 +1454,10 @@ void BGInitialize(void)
   // Additional settings から呼び出されることがあるため。
   if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
 	  ts.EtermLookfeel.BGEnable = BGEnable = BGGetOnOff("BGEnable",FALSE,ts.SetupFName);
+  } else {
+	  BGEnable = BGGetOnOff("BGEnable",FALSE,ts.SetupFName);
+  }
+
 	  ts.EtermLookfeel.BGUseAlphaBlendAPI = BGGetOnOff("BGUseAlphaBlendAPI",TRUE ,ts.SetupFName);
 	  ts.EtermLookfeel.BGNoFrame = BGGetOnOff("BGNoFrame"         ,FALSE,ts.SetupFName);
 	  ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove"    ,TRUE ,ts.SetupFName);
@@ -1462,6 +1466,7 @@ void BGInitialize(void)
 	  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
 	  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
 
+  if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
 	  //コンフィグファイルの決定
 	  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
 	  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
@@ -1469,7 +1474,7 @@ void BGInitialize(void)
 	  // 背景画像の読み込み
 	  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
 	  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
-  }
+  } 
 
   if(!BGEnable)
     return;
