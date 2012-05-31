@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.74-RC1"
+#define AppVer "4.74"
 ; #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
