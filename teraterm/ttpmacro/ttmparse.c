@@ -239,6 +239,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"inputbox")==0) *WordId = RsvInputBox;
 		else if (_stricmp(Str,"int2str")==0) *WordId = RsvInt2Str;
 		else if (_stricmp(Str,"intdim")==0) *WordId = RsvIntDim;
+		else if (_stricmp(Str,"ispassword")==0) *WordId = RsvIsPassword;    // add 'ispassword'  (2012.5.24 yutaka)
 		break;
 	case 'k':
 		if (_stricmp(Str,"kmtfinish")==0) *WordId = RsvKmtFinish;
@@ -306,6 +307,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"setecho")==0) *WordId = RsvSetEcho;
 		else if (_stricmp(Str,"setenv")==0) *WordId = RsvSetEnv;    // reactivate 'setenv' (2007.8.31 maya)
 		else if (_stricmp(Str,"setexitcode")==0) *WordId = RsvSetExitCode;
+		else if (_stricmp(Str,"setpassword")==0) *WordId = RsvSetPassword;    // add 'setpassword'  (2012.5.23 yutaka)
 		else if (_stricmp(Str,"setrts")==0) *WordId = RsvSetRts;    // add 'setrts'  (2008.3.12 maya)
 		else if (_stricmp(Str,"setsync")==0) *WordId = RsvSetSync;
 		else if (_stricmp(Str,"settime")==0) *WordId = RsvSetTime;

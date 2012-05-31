@@ -2140,6 +2140,80 @@ WORD TTLGetPassword()
 	return Err;
 }
 
+// setpassword 'password.dat' 'mypassword' passowrd
+WORD TTLSetPassword()
+{
+	TStrVal FileNameStr, KeyStr;
+	char Temp[512];
+	WORD Err;
+	TVarId VarId;
+	PCHAR VarStr;
+	int result = 0;  /* failure */
+
+	Err = 0;
+	GetStrVal(FileNameStr, &Err);   // ファイル名
+	GetStrVal(KeyStr, &Err);  // キー名
+	GetStrVar(&VarId, &Err);
+	VarStr = StrVarPtr(VarId);  // 変数へのポインタ
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	// 文字列が空の場合はエラーとする。
+	if (FileNameStr[0]==0 || 
+	    KeyStr[0]==0 ||
+	    VarStr[0]==0)   // "getpassword"同様、空パスワードも許可しない。
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+
+	// パスワードを暗号化する。
+	Encrypt(VarStr, Temp);
+
+	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0) 
+		result = 1;  /* success */
+
+	SetResult(result);  // 成功可否を設定する。
+	return Err;
+}
+
+// ispassword 'password.dat' 'username' ; result: 0=false; 1=true
+WORD TTLIsPassword()
+{
+	TStrVal FileNameStr, KeyStr;
+	char Temp[512];
+	WORD Err;
+	int result = 0; 
+
+	Err = 0;
+	GetStrVal(FileNameStr, &Err);   // ファイル名
+	GetStrVal(KeyStr, &Err);  // キー名
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	// 文字列が空の場合はエラーとする。
+	if (FileNameStr[0]==0 || 
+	    KeyStr[0]==0)
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	GetAbsPath(FileNameStr, sizeof(FileNameStr));
+
+	Temp[0] = 0;
+	GetPrivateProfileString("Password", KeyStr,"",
+	                        Temp, sizeof(Temp), FileNameStr);
+	if (Temp[0] == 0) { // password not exist
+		result = 0; 
+	} else {
+		result = 1; 
+	}
+
+	SetResult(result);  // 成功可否を設定する。
+	return Err;
+}
+
 WORD TTLGetSpecialFolder()
 {
 	WORD Err;
@@ -5017,6 +5091,10 @@ int ExecCmnd()
 			Err = TTLGetHostname(); break;
 		case RsvGetPassword:
 			Err = TTLGetPassword(); break;
+		case RsvSetPassword:
+			Err = TTLSetPassword(); break;
+		case RsvIsPassword:
+			Err = TTLIsPassword(); break;
 		case RsvGetSpecialFolder:
 			Err = TTLGetSpecialFolder(); break;
 		case RsvGetTitle:

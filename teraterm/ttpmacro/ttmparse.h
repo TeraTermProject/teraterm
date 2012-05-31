@@ -221,6 +221,8 @@
 #define RsvFolderSearch 193
 #define RsvExpandEnv    194
 #define RsvGetSpecialFolder  195
+#define RsvSetPassword  196
+#define RsvIsPassword   197
 
 #define RsvOperator     1000
 #define RsvBNot         1001

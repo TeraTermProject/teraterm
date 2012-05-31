@@ -1311,8 +1311,18 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ispassword">
+					<param name="Local" value="html\macro\command\ispassword.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="passwordbox">
 					<param name="Local" value="html\macro\command\passwordbox.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setpassword">
+					<param name="Local" value="html\macro\command\setpassword.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>

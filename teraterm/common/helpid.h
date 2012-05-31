@@ -235,6 +235,7 @@
 #define HlpMacroCommandInputbox         92052
 #define HlpMacroCommandInt2str          92053
 #define HlpMacroCommandIntdim           92150
+#define HlpMacroCommandIsPassword       92197
 #define HlpMacroCommandKmtfinish        92054
 #define HlpMacroCommandKmtget           92055
 #define HlpMacroCommandKmtrecv          92056
@@ -281,6 +282,7 @@
 #define HlpMacroCommandSetexitcode      92083
 #define HlpMacroCommandSetfileattr      92190
 #define HlpMacroCommandSetMulticastName 92146
+#define HlpMacroCommandSetPassword      92196
 #define HlpMacroCommandSetrts           92136
 #define HlpMacroCommandSetsync          92084
 #define HlpMacroCommandSettime          92085
