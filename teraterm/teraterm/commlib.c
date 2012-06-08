@@ -675,8 +675,10 @@ void NamedPipeThread(void *arg)
 			WaitForSingleObject(REnd,INFINITE);
 		}
 		else {
-			DErr = GetLastError();  // this returns 109 (broken pipe) if a named pipe is removed.
-			if (! cv->Ready || ERROR_BROKEN_PIPE == DErr) {
+			DErr = GetLastError();  
+			// [VMware] this returns 109 (broken pipe) if a named pipe is removed.
+			// [Virtual Box] this returns 233 (pipe not connected) if a named pipe is removed.
+			if (! cv->Ready || ERROR_BROKEN_PIPE == DErr || ERROR_PIPE_NOT_CONNECTED == DErr) {
 				PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 				_endthread();
 			}
