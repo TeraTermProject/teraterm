@@ -2918,8 +2918,8 @@ void FAR PASCAL ReadKeyboardCnf
 void FAR PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
                                PCHAR key, int MaxList)
 {
-	int i;
-	char EntName[10];
+	int i, j;
+	char EntName[10], EntName2[10];
 	char TempHost[HostNameMaxLength + 1];
 
 	if (_stricmp(IniSrc, IniDest) == 0)
@@ -2927,19 +2927,22 @@ void FAR PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
 
 	WritePrivateProfileString(section, NULL, NULL, IniDest);
 
-	i = 1;
+	i = j = 1;
 	do {
 		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "%s%i", key, i);
+		_snprintf_s(EntName2, sizeof(EntName2), _TRUNCATE, "%s%i", key, j);
 
 		/* Get one hostname from file IniSrc */
 		GetPrivateProfileString(section, EntName, "",
 		                        TempHost, sizeof(TempHost), IniSrc);
 		/* Copy it to the file IniDest */
-		if (strlen(TempHost) > 0)
-			WritePrivateProfileString(section, EntName, TempHost, IniDest);
+		if (strlen(TempHost) > 0) {
+			WritePrivateProfileString(section, EntName2, TempHost, IniDest);
+			j++;
+		}
 		i++;
 	}
-	while ((i <= MaxList) && (strlen(TempHost) > 0));
+	while (i <= MaxList);
 
 	/* update file */
 	WritePrivateProfileString(NULL, NULL, NULL, IniDest);
@@ -2977,10 +2980,11 @@ void FAR PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
 				if (i == 1)
 					Update = FALSE;
 			}
-			else
+			else if (Len > 0) {
 				j = j + Len + 1;
+			}
 			i++;
-		} while ((i <= MaxList) && (Len != 0) && Update);
+		} while ((i <= MaxList) && Update);
 
 		if (Update) {
 			WritePrivateProfileString(section, NULL, NULL, FName);

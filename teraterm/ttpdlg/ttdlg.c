@@ -1619,7 +1619,7 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					                   0, (LPARAM)TempHost);
 				}
 				i++;
-			} while ((i <= MAXHOSTLIST) && (strlen(TempHost)>0));
+			} while (i <= MAXHOSTLIST);
 
 			/* append a blank item to the bottom */
 			TempHost[0] = 0;
@@ -2009,7 +2009,7 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					                   0, (LPARAM)TempHost);
 				}
 				i++;
-			} while ((i <= MAXHOSTLIST) && (strlen(TempHost)>0));
+			} while (i <= MAXHOSTLIST);
 
 			SendDlgItemMessage(Dialog, IDC_HOSTNAME, EM_LIMITTEXT,
 			                   HostNameMaxLength-1, 0);

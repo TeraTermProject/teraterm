@@ -1159,7 +1159,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 				SendDlgItemMessage(dlg, IDC_HOSTNAME, CB_ADDSTRING,
 				                   0, (LPARAM) TempHost);
 			i++;
-		} while ((i <= MAXHOSTLIST) && (strlen(TempHost) > 0));
+		} while (i <= MAXHOSTLIST);
 
 		SendDlgItemMessage(dlg, IDC_HOSTNAME, EM_LIMITTEXT,
 		                   HostNameMaxLength - 1, 0);
