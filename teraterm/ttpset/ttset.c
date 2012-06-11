@@ -1534,7 +1534,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Port type */
 	if (ts->PortType == IdSerial)
 		strncpy_s(Temp, sizeof(Temp), "serial", _TRUNCATE);
-	if (ts->PortType == IdNamedPipe)
+	else if (ts->PortType == IdNamedPipe)
 		strncpy_s(Temp, sizeof(Temp), "namedpipe", _TRUNCATE);
 	else						/* IdFile -> IdTCPIP */
 		strncpy_s(Temp, sizeof(Temp), "tcpip", _TRUNCATE);
