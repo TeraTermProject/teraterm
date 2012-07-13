@@ -256,6 +256,8 @@ Example: adding a TTSSH menu under File menu
        - Test Tera Term installation and evaluate it.
 
   7. Update SourceForge.jp project site.
+       - Add new release.
+       - Submit news.
 
   8. Update SourceForge.jp project home page.
 
