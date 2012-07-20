@@ -336,14 +336,21 @@ void DDEOut1Byte(BYTE B)
 
 void DDEOut(PCHAR B)
 {
-	int i;
-
-	i = strlen(B);
-	if (OutLen+i > OutBufSize-1) {
-		i = OutBufSize-1 - OutLen;
+	while (*B) {
+		if (OutLen >= OutBufSize - 1)
+			break;
+		OutBuf[OutLen++] = *B;
+		if (*B == 0x01) {
+			if (OutLen >= OutBufSize - 1) {
+				OutLen--;
+				break;
+			}
+			else {
+				OutBuf[OutLen++] = 0x02;
+			}
+		}
+		B++;
 	}
-	memcpy(&(OutBuf[OutLen]),B,i);
-	OutLen = OutLen + i;
 }
 
 void DDESend()
