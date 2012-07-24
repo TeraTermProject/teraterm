@@ -145,6 +145,48 @@ void YSendNAK(PFileVar fv, PYVar yv, PComVar cv)
 	FTSetTimeOut(fv,t);
 }
 
+void YSendNAKTimeout(PFileVar fv, PYVar yv, PComVar cv)
+{
+	BYTE b;
+	int t;
+
+	/* flush comm buffer */
+	cv->InBuffCount = 0;
+	cv->InPtr = 0;
+
+	yv->NAKCount--;
+	if (yv->NAKCount<0)
+	{
+		if (yv->NAKMode==YnakC)
+		{
+			YSetOpt(fv,yv,XoptCheck);
+			yv->NAKMode = YnakC;
+			yv->NAKCount = 9;
+		}
+		else {
+			YCancel(fv,yv,cv);
+			return;
+		}
+	}
+
+	//if (yv->NAKMode!=YnakC)
+	if (1)
+	{
+		b = NAK;
+		if ((yv->PktNum==0) && (yv->PktNumOffset==0))
+			t = TimeOutInit;
+		else
+			t = yv->TOutLong;
+	}
+	else {
+		b = 'C';
+		t = TimeOutC;
+	}
+	YWrite(fv,yv,cv,&b,1);
+	yv->PktReadMode = XpktSOH;
+	FTSetTimeOut(fv,t);
+}
+
 WORD YCalcCheck(PYVar yv, PCHAR PktBuf)
 {
 	int i;
@@ -310,7 +352,10 @@ void YTimeOutProc(PFileVar fv, PYVar yv, PComVar cv)
 		yv->YMode = 0; // quit
 		break;
 	case IdXReceive:
-		YSendNAK(fv,yv,cv);
+		if ((yv->PktNum == 0) && yv->PktNumOffset == 0) 
+			YSendNAK(fv,yv,cv);
+		else
+			YSendNAKTimeout(fv,yv,cv);
 		break;
 	}
 }
