@@ -84,6 +84,10 @@ getdate logfile "log-%Y%m%d-%H%M%S.txt"
 tz="GMT"
 gettime s "%Y/%m/%d %H:%M:%S" tz
 messagebox s tz
+
+;To retrieve Today's date.
+gettime s "|%d|%#d|"    ; |07|7| (Today is 7th).
+gettime s "|%d|%#d|"    ; |25|25| (Today is 25th).
 </pre>
 
 <h2>See also</h2>
