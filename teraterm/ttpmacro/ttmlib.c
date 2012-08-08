@@ -76,7 +76,13 @@ BOOL GetAbsPath(PCHAR FName, int destlen)
   if (! GetFileNamePos(FName,&i,&j)) {
     return FALSE;
   }
-  else if (i>0) {
+  if (strlen(FName) > 2 && FName[1] == ':') {
+    // fullpath
+    return TRUE;
+  }
+  else if (FName[0] == '\\') {
+    // UNC (\\server\path)
+    // from drive root (\foo\bar)
     return TRUE;
   }
   strncpy_s(Temp, sizeof(Temp), FName, _TRUNCATE);
