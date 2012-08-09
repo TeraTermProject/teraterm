@@ -50,10 +50,10 @@
       <li>COM port: The default setting can not be saved in the teraterm.ini file.</li>
       <li>Macro command: The send and sendln can not transmit a character #01.</li>
       <li>YMODEM: When the receiving a file is temporarily stopped, Tera Term can not send a NAK after timeout. So, the transfering can not be continued.</li>
-      <!--li>ファイルを扱うマクロコマンドで、相対パスを正しく解析しないことがある問題を修正した。
+      <li>Macro command regarding file using: A relative path will not be recognized.
         <ul>
-          <li>相対パスの基準が、マクロファイルになる場合と teraterm ディレクトリになる場合があった。この修正でマクロファイルを基準にするようにした。</li>
-        </ul></li-->
+          <li>The base of a relatvie path will be a path existing a macro file or Tera Term installation directory. By using this bugfix, the relative path can be a path existing a macro file.</li>
+        </ul></li>
     </ul>
   </li>
 
