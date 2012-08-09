@@ -80,14 +80,21 @@ BOOL GetAbsPath(PCHAR FName, int destlen)
     // fullpath
     return TRUE;
   }
-  else if (FName[0] == '\\') {
+  else if (FName[0] == '\\' && FName[1] == '\\') {
     // UNC (\\server\path)
-    // from drive root (\foo\bar)
     return TRUE;
   }
   strncpy_s(Temp, sizeof(Temp), FName, _TRUNCATE);
   strncpy_s(FName,destlen,CurrentDir,_TRUNCATE);
-  AppendSlash(FName,destlen);
+
+  if (Temp[0] == '\\' && destlen > 2) {
+    // from drive root (\foo\bar)
+    FName[2] = 0;
+  }
+  else {
+    AppendSlash(FName,destlen);
+  }
+
   strncat_s(FName,destlen,Temp,_TRUNCATE);
   return TRUE;
 }
