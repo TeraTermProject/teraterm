@@ -373,10 +373,10 @@ static ssh2_mac_t ssh2_macs[] = {
 	{HMAC_SHA1_96,     "hmac-sha1-96",               EVP_sha1,      96}, // RFC4253
 	{HMAC_MD5_96,      "hmac-md5-96",                EVP_md5,       96}, // RFC4253
 	{HMAC_RIPEMD160,   "hmac-ripemd160@openssh.com", EVP_ripemd160, 0},
-	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},  // draft-dbider-sha2-mac-for-ssh-02
-	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96}, // draft-dbider-sha2-mac-for-ssh-02
-	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},  // draft-dbider-sha2-mac-for-ssh-02
-	{HMAC_SHA2_512_96, "hmac-sha2-512-96",           EVP_sha512,    96}, // draft-dbider-sha2-mac-for-ssh-02
+	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},  // RFC6668
+	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
+	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},  // RFC6668
+	{HMAC_SHA2_512_96, "hmac-sha2-512-96",           EVP_sha512,    96}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
 	{HMAC_NONE,        NULL,                         NULL,          0},
 };
 
