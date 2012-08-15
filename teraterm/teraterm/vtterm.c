@@ -4778,7 +4778,7 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	  if (x == LastSendX && y == LastSendY) {
 	    return FALSE;
 	  }
-	  len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | ((LastButton==IdButtonRelease)?0:32), x, y);
+	  len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | 32, x, y);
 	  LastSendX = x;
 	  LastSendY = y;
 	  break;
