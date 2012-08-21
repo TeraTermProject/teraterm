@@ -3072,25 +3072,18 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 		break;
 	case 'm':	// SGR
 		if (StrBuff[1] == 0) {
-			RepStr[0] = '0';
-			RepStr[1] = '$';
-			RepStr[2] = 'r';
-			len = 3;
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r0", CLocale);
 			if (CharAttr.Attr & AttrBold) {
-				RepStr[len++] = '1';
-				RepStr[len++] = ';';
+				len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";1", CLocale);
 			}
 			if (CharAttr.Attr & AttrUnder) {
-				RepStr[len++] = '4';
-				RepStr[len++] = ';';
+				len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";4", CLocale);
 			}
 			if (CharAttr.Attr & AttrBlink) {
-				RepStr[len++] = '5';
-				RepStr[len++] = ';';
+				len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";5", CLocale);
 			}
 			if (CharAttr.Attr & AttrReverse) {
-				RepStr[len++] = '7';
-				RepStr[len++] = ';';
+				len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";7", CLocale);
 			}
 			if (CharAttr.Attr2 & Attr2Fore) {
 				int color = CharAttr.Fore;
@@ -3099,27 +3092,21 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 				}
 
 				if (color <= 7) {
-					RepStr[len++] = '3';
-					RepStr[len++] = '0' + color;
-					RepStr[len++] = ';';
+					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";3%d", CLocale, color);
 				}
 				else if (color <= 15) {
 					if (ts.ColorFlag & CF_AIXTERM16) {
-						RepStr[len++] = '9';
-						RepStr[len++] = '0' + color - 8;
-						RepStr[len++] = ';';
+						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";9%d", CLocale, color-8);
 					}
 					else if (ts.ColorFlag & CF_XTERM256) {
-						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, "38;5;%d;", CLocale, color);
+						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";38;5;%d", CLocale, color);
 					}
 					else if (ts.ColorFlag & CF_PCBOLD16) {
-						RepStr[len++] = '3';
-						RepStr[len++] = '0' + color - 8;
-						RepStr[len++] = ';';
+						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";3%d", CLocale, color-8);
 					}
 				}
 				else if (ts.ColorFlag & CF_XTERM256) {
-					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, "38;5;%d;", CLocale, color);
+					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";38;5;%d", CLocale, color);
 				}
 			}
 			if (CharAttr.Attr2 & Attr2Back) {
@@ -3128,35 +3115,22 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 					color += 8;
 				}
 				if (color <= 7) {
-					RepStr[len++] = '4';
-					RepStr[len++] = '0' + color;
-					RepStr[len++] = ';';
+					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";4%d", CLocale, color);
 				}
 				else if (color <= 15) {
 					if (ts.ColorFlag & CF_AIXTERM16) {
-						RepStr[len++] = '1';
-						RepStr[len++] = '0';
-						RepStr[len++] = '0' + color - 8;
-						RepStr[len++] = ';';
+						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";10%d", CLocale, color-8);
 					}
 					else if (ts.ColorFlag & CF_XTERM256) {
-						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, "48;5;%d;", CLocale, color);
+						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";48;5;%d", CLocale, color);
 					}
 					else if (ts.ColorFlag & CF_PCBOLD16) {
-						RepStr[len++] = '4';
-						RepStr[len++] = '0' + color - 8;
-						RepStr[len++] = ';';
+						len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";4%d", CLocale, color-8);
 					}
 				}
 				else if (ts.ColorFlag & CF_XTERM256) {
-					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, "48;5;%d;", CLocale, color);
+					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";48;5;%d", CLocale, color);
 				}
-			}
-			if (len == 3) {
-				RepStr[len++] = '0';
-			}
-			else {
-				len--;
 			}
 			RepStr[len++] = 'm';
 			RepStr[len] = 0;
