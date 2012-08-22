@@ -579,6 +579,7 @@ void SSH_channel_output_eof(PTInstVar pvar, uint32 remote_channel_num);
 void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 local_channel_num);
 void SSH_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port,
                             char FAR * to_local_host, int to_local_port);
+void SSH_cancel_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port, int reply);
 void SSH_request_X11_forwarding(PTInstVar pvar,
   char FAR * auth_protocol, unsigned char FAR * auth_data, int auth_data_len, int screen_num);
 void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,

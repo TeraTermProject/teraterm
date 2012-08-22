@@ -3535,6 +3535,36 @@ void SSH_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_se
 	}
 }
 
+void SSH_cancel_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port, int reply)
+{
+	if (SSHv2(pvar)) {
+		buffer_t *msg;
+		char *s;
+		unsigned char *outmsg;
+		int len;
+
+		msg = buffer_init();
+		if (msg == NULL) {
+			// TODO: error check
+			return;
+		}
+		s = "cancel-tcpip-forward";
+		buffer_put_string(msg, s, strlen(s)); // ctype
+		buffer_put_char(msg, reply);  // want reply
+		buffer_put_string(msg, bind_address, strlen(bind_address));
+
+		buffer_put_int(msg, from_server_port);  // listening port
+
+		len = buffer_len(msg);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_GLOBAL_REQUEST, len);
+		memcpy(outmsg, buffer_ptr(msg), len);
+		finish_send_packet(pvar);
+		buffer_free(msg);
+
+		notify_verbose_message(pvar, "SSH2_MSG_GLOBAL_REQUEST was sent at SSH_cancel_request_forwarding().", LOG_LEVEL_VERBOSE);
+	}
+}
+
 void SSH_request_X11_forwarding(PTInstVar pvar,
                                 char FAR * auth_protocol,
                                 unsigned char FAR * auth_data,
