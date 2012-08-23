@@ -3085,7 +3085,7 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			if (CharAttr.Attr & AttrReverse) {
 				len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";7", CLocale);
 			}
-			if (CharAttr.Attr2 & Attr2Fore) {
+			if (CharAttr.Attr2 & Attr2Fore && ts.ColorFlag & CF_ANSICOLOR) {
 				int color = CharAttr.Fore;
 				if (color <= 7 && (CharAttr.Attr & AttrBold) && (ts.ColorFlag & CF_PCBOLD16)) {
 					color += 8;
@@ -3109,7 +3109,7 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 					len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";38;5;%d", CLocale, color);
 				}
 			}
-			if (CharAttr.Attr2 & Attr2Back) {
+			if (CharAttr.Attr2 & Attr2Back && ts.ColorFlag & CF_ANSICOLOR) {
 				int color = CharAttr.Back;
 				if (color <= 7 && (CharAttr.Attr & AttrBlink) && (ts.ColorFlag & CF_PCBOLD16)) {
 					color += 8;
