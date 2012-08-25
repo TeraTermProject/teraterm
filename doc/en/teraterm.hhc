@@ -115,6 +115,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tera Term Menu">
+			<param name="Local" value="html\usage\TTMenu\TTMenu.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Tips">
 			<param name="Local" value="html\usage\tips\index.html">
 			<param name="ImageNumber" value="11">

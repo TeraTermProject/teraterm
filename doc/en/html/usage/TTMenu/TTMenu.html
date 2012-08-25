@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+<title>Tera Term Menu Tutorial</title>
+</head>
+
+<body>
+
+<h1>Tera Term Menu Tutorial</h1>
+
+<h2><a name="whatis">1. About Tera Term Menu</a></h2>
+
+<p>
+Tera Term Menu(ttpmenu.exe) is a launcher tool which can kick the Tera Term easily.
+Tera Term Menu copyright belongs to S.Hayakawa, however the Tera Term Menu is currently maintenanced by Tera Term Project and this is inclued into the Tera Term installation package.
+</p>
+
+
+<h2><a name="registry">2. Registry</a></h2>
+
+<p>
+Tera Term Menu configuration is recorded into the registry(HKEY_CURRENT_USER\Software\ShinpeiTools\TTermMenu).
+If the ini file wants to be used instead of the registry, please put the "ttpmenu.ini"(empty size) in the "ttpmenu.exe" directory in advance.
+</p>
+
+
+<h2><a name="launch">3. How to launch</a></h2>
+
+<p>
+When the Tera Term Menu is launched, the application be shown on the tasktray. When the tasktray icon is clicked by the left mouse button, a user can kick the Tera Term from the menulist. And when the icon is clicked by the right mouse button, the user can register the menu list and configure the behavior of the Tera Term Menu.
+</p>
+
+<div class="img"><img class="block" width="176" height="26" src="tasktray.png" alt="tasktray"></div>
+
+
+<h2><a name="configuration">4. Configuration</a></h2>
+
+<p>
+When a user uses the Tera Term Menu for the first time, the menu list is empty. First, please make the menu list. Click the tasktray icon by the right mouse button, and select the "List Configuration". Next, input some entries on the "Configuration" and push the left arrow button. So, your menu list will be registered on the "List Item" at the left side.
+</p>
+
+<div class="img"><img class="block" width="455" height="443" src="menulist1.png" alt="Menu list"></div>
+
+<p>
+The above is the example that Tera Term connects to the Linux machine(Fedora) has 192.168.153.128 ip address by SSH protocol. When a user want to use the SSH connection, please check the "use SSH". 
+If SSH port number uses any number other than 22, please specify the ip address and port number(ip:port) at the Host Name.<br>
+If the public key authentication uses, please specify the private key file at the Keyfile entry.
+</p>
+
+<p>
+When a user specifies the detail configuration on server connection, please push the "details" button and then call the below configuration screen.
+</p>
+
+<div class="img"><img class="block" width="327" height="313" src="menulist2.png" alt="Menu list"></div>
+
+<p>
+The above is the example that the Option specifies the "/KT=UTF8 /KR=UTF8". This option is passed in the Tera Term command line. So, the Tera Term command line will be in the following parameter:
+</p>
+
+<pre class="code"><code>
+"C:\Program Files\teraterm\ttermpro.exe" 192.168.153.128:22 /ssh /auth=password /user=yutaka /passwd=****** /KT=UTF8 /KR=UTF8  
+</code></pre>
+
+<p>
+When the menu list is completely registered, a user can click the Tera Term Menu icon by the left mouse button and then the menu list will be shown. At the result, the user can launch the Tera Term easily.
+</p>
+
+<div class="img"><img class="block" width="129" height="105" src="menulist3.png" alt="Menu list"></div>
+
+
+<h2><a name="contact">5. Contact</a></h2>
+
+<p>
+TO: Tera Term Project
+</p>
+
+
+</body>
+</html>
