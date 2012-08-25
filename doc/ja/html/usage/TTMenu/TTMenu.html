@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+<title>Tera Term Menu Tutorial</title>
+</head>
+
+<body>
+
+<h1>Tera Term Menu Tutorial</h1>
+
+<h2><a name="whatis">1. Tera Term Menuとは</a></h2>
+
+<p>
+Tera Term Menu(ttpmenu.exe)とは、Tera Termをボタン一発で起動することができるランチャーツールです。
+Tera Term Menuは早川信平氏による著作物ですが、現在ではTera Term Projectによりメンテナンスされており、Tera Termのインストールパッケージにも含まれています。
+</p>
+
+
+<h2><a name="registry">2. レジストリ</a></h2>
+
+<p>
+Tera Term Menuの設定情報は、レジストリ(HKEY_CURRENT_USER\Software\ShinpeiTools\TTermMenu)に記録されます。
+レジストリではなく、iniファイルを使いたい場合は、あらかじめ"ttpmenu.exe"があるディレクトリに"ttpmenu.ini"（0バイトで可）を設置しておきます。
+</p>
+
+
+<h2><a name="launch">3. 起動方法</a></h2>
+
+<p>
+Tera Term Menuを起動すると、アプリケーションがタスクトレイに常駐します。タスクトレイのアイコンを左クリックすると、メニューリストからランチャーを起動することができます。右クリックすると、メニューリストの登録やTera Term Menuの動作設定を行うことができます。
+</p>
+
+<div class="img"><img class="block" width="176" height="26" src="tasktray.png" alt="tasktray"></div>
+
+
+<h2><a name="configuration">4. 設定</a></h2>
+
+<p>
+初めてTera Term Menuを使う場合、何もランチャーが登録されていないので、まずはメニューリストの作成から行います。タスクトレイのアイコンを右クリックして、"List Configuration"を選びます。次に、右側にある"Configuration"において、項目を入力し、←ボタンを押下すると、左側の"List Item"にメニュー登録されます。
+</p>
+
+<div class="img"><img class="block" width="455" height="443" src="menulist1.png" alt="Menu list"></div>
+
+<p>
+上記は、192.168.153.128というLinuxマシン(Fedora)にSSH接続する例を示しています。SSH接続する場合は、"use SSH"にチェックを入れます。SSH接続するポート番号が22番以外のものを指定したい場合は、Host Nameに「IPアドレス:ポート番号」という記載をします。<br>
+公開鍵認証を行いたい場合は、Keyfileに秘密鍵ファイルを指定します。
+</p>
+
+<p>
+サーバへ接続する際、より詳細な指定をしたい場合は、"details"ボタンを押下して、下記の設定画面を呼び出します。
+</p>
+
+<div class="img"><img class="block" width="327" height="313" src="menulist2.png" alt="Menu list"></div>
+
+<p>
+上記の例では、Optionに"/KT=UTF8 /KR=UTF8"を指定しています。これはTera Termのコマンドラインにそのまま渡されます。すなわち、この例においては、Tera Termが下記のようなコマンドラインパラメータで起動されることを意味しています。
+</p>
+
+<pre class="code"><code>
+"C:\Program Files\teraterm\ttermpro.exe" 192.168.153.128:22 /ssh /auth=password /user=yutaka /passwd=****** /KT=UTF8 /KR=UTF8  
+</code></pre>
+
+<p>
+メニューリストの登録が完了すると、Tera Term Menuのアイコンを左クリックすることで、メニューリストが表示されるようになり、Tera Termが容易に起動できるようになります。
+</p>
+
+<div class="img"><img class="block" width="129" height="105" src="menulist3.png" alt="Menu list"></div>
+
+
+<h2><a name="contact">5. 連絡先</a></h2>
+
+<p>
+Tera Term Projectまで。
+</p>
+
+
+</body>
+</html>
