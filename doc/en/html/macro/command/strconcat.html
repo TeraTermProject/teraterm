@@ -33,7 +33,12 @@ Appends a copy of &lt;string&gt; to the end of the string variable &lt;strvar&gt
 
 <pre class="macro-example">
 filename = 'c:\teraterm\'
-strconcat filename 'test.txt'
+strconcat filename 'test.txt'  ; c:\teraterm\test.txt
+
+msg='HOST:'
+sprintf2 var "%s/ USER NAME:%s" '192.168.1.1' 'test user'
+strconcat msg var
+messagebox msg "inputstr" ; HOST:192.168.1.1/ USER NAME:test user
 </pre>
 
 </body>
