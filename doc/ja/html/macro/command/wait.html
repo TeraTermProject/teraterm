@@ -65,7 +65,7 @@ wait &lt;string1&gt; [&lt;string2&gt; ...]
 timeout = 30
 
 ; 文字列 "OK" か "ERROR" を待つ。
-Wait 'OK' 'ERROR'
+wait 'OK' 'ERROR'
 ; タイムアウトなら、:timeout へジャンプ。
 if result=0 goto timeout
 ; "OK" が来たなら、:ok へジャンプ
@@ -77,8 +77,9 @@ If result=2 goto error
 wait #10'&gt;' 'complete.'#13
 
 ; タイムアウトを100ミリ秒に設定。
-timeout = 100
-mwait 'server response'
+timeout = 0
+mtimeout = 100
+wait 'server response'
 </pre>
 
 <pre class="macro-example">

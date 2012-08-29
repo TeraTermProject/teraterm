@@ -64,7 +64,7 @@ These commands return one of the following values in the system variable "result
 ; The timeout limit is 30 sec.
 timeout = 30
 
-Wait 'OK' 'ERROR'
+wait 'OK' 'ERROR'
 ; If timeout occurs, go to ":timeout".
 if result=0 goto timeout
 ; has received, go to ":error".
@@ -75,9 +75,10 @@ If result=2 goto error
 ; Wait a line beginning with the "&gt;" or a line ending with the "complete.". (ASCII code of LF is 10, and CR is 13.)
 wait #10'&gt;' 'complete.'#13
 
-; The timeout limit is 30 msec.
-timeout = 100
-mwait 'server response'
+; The timeout limit is 100 msec.
+timeout = 0
+mtimeout = 100
+wait 'server response'
 </pre>
 
 <pre class="macro-example">
