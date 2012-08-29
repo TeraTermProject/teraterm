@@ -24,7 +24,8 @@ int2str &lt;strvar&gt; &lt;integer value&gt;
 <h2>解説</h2>
 
 <p>
-整数値 &lt;integer value&gt; を10進表現の文字列に変換して文字列型変数 &lt;strvar&gt; に代入する。
+整数値 &lt;integer value&gt; を10進表現の文字列に変換して文字列型変数 &lt;strvar&gt; に代入する。<br>
+sprintfシリーズの書式指定"%d"と等価である。
 </p>
 
 <h2>例</h2>
@@ -32,7 +33,19 @@ int2str &lt;strvar&gt; &lt;integer value&gt;
 <pre class="macro-example">
 ; valstrに '123' を代入
 int2str valstr 123
+messagebox valstr "str"     ; 123
+
+num = 123
+sprintf2 valstr "%d" num
+messagebox valstr "str"     ; 123
 </pre>
+
+<h2>参照</h2>
+
+<ul>
+ <li>"<a href="sprintf.html">sprintf</a>"</li>
+ <li>"<a href="sprintf2.html">sprintf2</a>"</li>
+</ul>
 
 </body>
 </html>

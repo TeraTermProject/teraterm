@@ -24,7 +24,8 @@ int2str &lt;strvar&gt; &lt;integer value&gt;
 <h2>Remarks</h2>
 
 <p>
-Converts &lt;integer value&gt; to its string expression, and returns it in the string variable &lt;strvar&gt;.
+Converts &lt;integer value&gt; to its string expression, and returns it in the string variable &lt;strvar&gt;.<br>
+This command is equal to the formatted output("%d") of the sprintf family.
 </p>
 
 <h2>Example</h2>
@@ -32,7 +33,19 @@ Converts &lt;integer value&gt; to its string expression, and returns it in the s
 <pre class="macro-example">
 ; The string "123" is assigned to the variable "valstr".
 int2str valstr 123
+messagebox valstr "str"     ; 123
+
+num = 123
+sprintf2 valstr "%d" num
+messagebox valstr "str"     ; 123
 </pre>
+
+<h2>See also</h2>
+
+<ul>
+ <li>"<a href="sprintf.html">sprintf</a>"</li>
+ <li>"<a href="sprintf2.html">sprintf2</a>"</li>
+</ul>
 
 </body>
 </html>
