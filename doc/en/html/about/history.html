@@ -35,10 +35,10 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>When the host number is discontinous value, Tera Term can read the [Hosts] section in the teraterm.ini file.</li>
       <li>A button value is changed from 3 to 35 while the button is not pressed at the Any Event Tracking mode.</li>
       <li>added the 0; character at the reply head by requesting the character attribute of the DECRQSS.</li>
       <li>At requesting the character attribute of the DECRQSS, the color attribute is not included in reply when the <a href="../menu/setup-additional.html">Enable ANSI Color</a> is off.</li>
+      <li>When the host number is discontinous value, Tera Term can read the [Hosts] section in the teraterm.ini file.</li>
       <li>Macro
         <ul>
           <li>added the <a href="../macro/command/setpassword.html">setpassword</a> command.</li>
@@ -51,8 +51,8 @@
     <ul>
       <li>Named pipe: The pipe can not be disconnected when the Oracle Virtual Box is terminated.</li>
       <li>COM port: The default setting can not be saved in the teraterm.ini file.</li>
-      <li>Macro command: The send and sendln can not transmit a character #01.</li>
       <li>YMODEM: When the receiving a file is temporarily stopped, Tera Term can not send a NAK after timeout. So, the transfering can not be continued.</li>
+      <li>Macro command: The send and sendln can not transmit a character #01.</li>
       <li>Macro command regarding file using: A relative path will not be recognized.
         <ul>
           <li>The base of a relatvie path will be a path existing a macro file or Tera Term installation directory. By using this bugfix, the relative path can be a path existing a macro file.</li>

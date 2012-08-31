@@ -35,10 +35,10 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>TERATERM.INI の [Hosts] セクションで、Hostに続く数字が飛んでいても続きを読むようにした。</li>
       <li>Any Event Tracking モードで、ボタンを押していない状態でのモーションイベントのボタン値を 3 から 35 へ変更した。</li>
       <li>DECRQSS による文字属性の問い合わせで、応答の先頭に 0; を付加するようにした。</li>
       <li>DECRQSS による文字属性の問い合わせで、<a href="../menu/setup-additional.html">Enable ANSI Color</a> 設定がオフの時は応答に色属性を含めないようにした。</li>
+      <li>TERATERM.INI の [Hosts] セクションで、Hostに続く数字が飛んでいても続きを読むようにした。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/command/setpassword.html">setpassword</a>コマンドを追加した。</li>
@@ -51,8 +51,8 @@
     <ul>
       <li>名前付きパイプ: Oracle Virtual Boxの終了時、パイプの切断ができていなかった問題を修正した。</li>
       <li>COMポートをデフォルト設定で保存できない問題を修正した。</li>
-      <li>マクロコマンド send, sendln で、0x01 を含む文字列を正しく送れない問題を修正した。</li>
       <li>YMODEM: 受信中に一時停止した場合、タイムアウトでNAKを送信していないため、再送できていなかった問題を修正した。</li>
+      <li>マクロコマンド send, sendln で、0x01 を含む文字列を正しく送れない問題を修正した。</li>
       <li>ファイルを扱うマクロコマンドで、相対パスを正しく解析しないことがある問題を修正した。
         <ul>
           <li>相対パスの基準が、マクロファイルになる場合と teraterm ディレクトリになる場合があった。この修正でマクロファイルを基準にするようにした。</li>
