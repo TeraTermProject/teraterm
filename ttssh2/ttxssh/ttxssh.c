@@ -305,10 +305,10 @@ static void normalize_mac_order(char FAR * buf)
 		HMAC_RIPEMD160,
 		HMAC_MD5,
 		HMAC_NONE,
-		HMAC_SHA2_512_96,
-		HMAC_SHA2_256_96,
 		HMAC_SHA1_96,
 		HMAC_MD5_96,
+		0, // Dummy for HMAC_SHA2_512_96,
+		0, // Dummy for HMAC_SHA2_256_96,
 	};
 
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
