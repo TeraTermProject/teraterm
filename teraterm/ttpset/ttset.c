@@ -2434,14 +2434,6 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Convert Unicode symbol characters to DEC Special characters
 	WriteUint(Section, "UnicodeToDecSpMapping", FName, ts->UnicodeDecSpMapping);
 
-	// VT Window Icon
-	IconId2IconName(Temp, sizeof(Temp), ts->VTIcon);
-	WritePrivateProfileString(Section, "VTIcon", Temp, FName);
-
-	// Tek Window Icon
-	IconId2IconName(Temp, sizeof(Temp), ts->TEKIcon);
-	WritePrivateProfileString(Section, "TEKIcon", Temp, FName);
-
 	// AutoScrollOnlyInBottomLine
 	WriteOnOff(Section, "AutoScrollOnlyInBottomLine", FName,
 		ts->AutoScrollOnlyInBottomLine);
