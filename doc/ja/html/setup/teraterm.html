@@ -14,8 +14,38 @@
 <p>
 起動時または、<a href="../menu/setup-restore.html">[Setup] Restore setup</a>を実行したとき、設定ファイルの内容にしたがい Tera Term が初期化されます。<br>
 <a href="../commandline/teraterm.html">コマンドライン</a>で設定ファイル名を指定することができます。ファイル名の拡張子を省略した場合は、".INI"であるとみなされます。<br>
-コマンドラインでファイル名を指定しない場合、"My Documents"(2000/XP:%UserProfile%\My Documents, Vista以降:%UserProfile%\Documents) に TERATERM.INI が存在すれば "My Documents" の TERATERM.INI が読み込まれ、存在しない場合は ttermpro.exe と同じディレクトリの TERATERM.INI が読み込まれます。
+コマンドラインでファイル名を指定しない場合、"My Documents"[*1] に TERATERM.INI が存在すれば "My Documents" の TERATERM.INI が読み込まれ、存在しない場合は ttermpro.exe と同じディレクトリの TERATERM.INI が読み込まれます。
 </p>
+
+[*1] My Documentsのデフォルトの場所
+<table border=1>
+ <tr>
+  <th>OS</th>
+  <th>場所</th>
+ </tr>
+ <tr>
+  <td>Vista/7</td>
+  <td>%UserProfile%\Documents</td>
+ </tr>
+ <tr>
+  <td>2000/XP</td>
+  <td>%UserProfile%\My Documents</td>
+ </tr>
+ <tr>
+  <td>NT4.0</td>
+  <td>C:\Winnt\Personal\ユーザ名\Personal</td>
+ </tr>
+ <tr>
+  <td>ME</td>
+  <td>C:\My Documents, C:\WINDOWS\Profiles\ユーザ\My Documents</td>
+ </tr>
+ <tr>
+  <td>95/98</td>
+  <td>C:\My Documents</td>
+ </tr>
+</table>
+
+
 
 <p>
 変更した設定は設定ファイルに自動的に保存されません。現在の設定を設定ファイルに保存するには、<a href="../menu/setup-save.html">[Setup] Save setup</a>を実行してください。

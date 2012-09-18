@@ -14,8 +14,37 @@
 <p>
 Tera Term is initialized by information contained in the setup file when Tera Term is started, or when the <a href="../menu/setup-restore.html">[Setup] Restore setup</a> command is executed.<br>
 The file name of the setup file can be specified as a <a href="../commandline/teraterm.html">command line</a> parameter of Tera Term. If you omit the file name extention, the default extension ".INI" is used.<br>
-If If you omit the file name, TERATERM.INI in "My Documents"(2000/XP:%UserProfile%\My Documents, Vista later:%UserProfile%\Documents) is used if there is TERATERM.INI in "My Documents." TERATERM.INI in teraterm dir is used if there is not TERATERM.INI in "My Documents."
+If If you omit the file name, TERATERM.INI in "My Documents"[*1] is used if there is TERATERM.INI in "My Documents." TERATERM.INI in teraterm dir is used if there is not TERATERM.INI in "My Documents."
 </p>
+
+[*1] My Documents default placement
+<table border=1>
+ <tr>
+  <th>OS</th>
+  <th>Placement</th>
+ </tr>
+ <tr>
+  <td>Vista/7</td>
+  <td>%UserProfile%\Documents</td>
+ </tr>
+ <tr>
+  <td>2000/XP</td>
+  <td>%UserProfile%\My Documents</td>
+ </tr>
+ <tr>
+  <td>NT4.0</td>
+  <td>C:\Winnt\Personal\<i>USERNAME</i>\Personal</td>
+ </tr>
+ <tr>
+  <td>ME</td>
+  <td>C:\My Documents, C:\WINDOWS\Profiles\<i>USERNAME</i>\My Documents</td>
+ </tr>
+ <tr>
+  <td>95/98</td>
+  <td>C:\My Documents</td>
+ </tr>
+</table>
+
 
 <p>
 The changed setup is not saved to setup file automatically. To save the current setup into the setup file, execute the <a href="../menu/setup-save.html">[Setup] Save setup</a> command.
