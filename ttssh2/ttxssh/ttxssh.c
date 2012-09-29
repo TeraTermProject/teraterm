@@ -4197,7 +4197,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), TRUE);
-				if (!isECDSAkey(key_type)) {
+				if (!isFixedLengthKey(key_type)) {
 					EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				}
 				EnableWindow(GetDlgItem(dlg, IDOK), TRUE);
@@ -4220,7 +4220,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 
 		// if radio button pressed...
 		case IDC_RSA1_TYPE | (BN_CLICKED << 16):
-			if (isECDSAkey(key_type)) {
+			if (isFixedLengthKey(key_type)) {
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
@@ -4228,7 +4228,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			break;
 
 		case IDC_RSA_TYPE | (BN_CLICKED << 16):
-			if (isECDSAkey(key_type)) {
+			if (isFixedLengthKey(key_type)) {
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
@@ -4236,15 +4236,16 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			break;
 
 		case IDC_DSA_TYPE | (BN_CLICKED << 16):
-			if (isECDSAkey(key_type)) {
-				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
-				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
+			if (!isFixedLengthKey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
+				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
 			key_type = KEY_DSA;
+			SetDlgItemInt(dlg, IDC_KEYBITS, 1024, FALSE);
 			break;
 
 		case IDC_ECDSA256_TYPE | (BN_CLICKED << 16):
-			if (!isECDSAkey(key_type)) {
+			if (!isFixedLengthKey(key_type)) {
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
@@ -4253,7 +4254,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			break;
 
 		case IDC_ECDSA384_TYPE | (BN_CLICKED << 16):
-			if (!isECDSAkey(key_type)) {
+			if (!isFixedLengthKey(key_type)) {
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
@@ -4262,7 +4263,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			break;
 
 		case IDC_ECDSA521_TYPE | (BN_CLICKED << 16):
-			if (!isECDSAkey(key_type)) {
+			if (!isFixedLengthKey(key_type)) {
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}

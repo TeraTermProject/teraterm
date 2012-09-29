@@ -245,7 +245,7 @@ typedef enum {
 	KEY_UNSPEC,
 	KEY_MAX = KEY_UNSPEC,
 } ssh_keytype;
-#define isECDSAkey(type)	((type) >= KEY_ECDSA256 && (type) <= KEY_ECDSA521)
+#define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ECDSA521)
 
 typedef struct ssh2_host_key {
 	ssh_keytype type;
