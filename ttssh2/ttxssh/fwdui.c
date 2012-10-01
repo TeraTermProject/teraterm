@@ -288,6 +288,7 @@ static TCP_service_name service_DB[] = {
 	{514, "shell"},
 	{1135, "shelob"},
 	{1137, "shelobsrv"},
+	{4190, "sieve"},
 	{9, "sink"},
 	{775, "sms_db"},
 	{777, "sms_update"},
