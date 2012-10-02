@@ -28,7 +28,9 @@
           <dd>Generate SSH2 RSA key.</dd>
 
           <dt>DSA</dt>
-          <dd>Generate SSH2 DSA key.</dd>
+          <dd>Generate SSH2 DSA key.<br />
+          When the DSA key bits is not 1024, the key is invalid. <!--The key can not be used./サーバによっては使えない可能性がありますので作成できません。--><br />
+          If the key bits is over 1024, the security level can not be stronger. Please use the RSA and ECDSA key algorithm if your security level is higher.</dd>
 
           <dt>ECDSA-256</dt>
           <dd>Generate SSH2 ECDSA(256bit) key.</dd>
