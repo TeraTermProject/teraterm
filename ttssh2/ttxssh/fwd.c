@@ -595,7 +595,7 @@ static void make_local_connection(PTInstVar pvar, int channel_num)
 			continue;
 		if (WSAAsyncSelect
 		    (channel->local_socket, make_accept_wnd(pvar), WM_SOCK_IO,
-		     FD_CONNECT | FD_READ | FD_CLOSE | FD_WRITE) == SOCKET_ERROR) {
+		     FD_CONNECT | FD_READ | FD_CLOSE) == SOCKET_ERROR) {
 			closesocket(channel->local_socket);
 			channel->local_socket = INVALID_SOCKET;
 			continue;
@@ -914,7 +914,7 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 							if (WSAAsyncSelect
 							    (channel->local_socket,
 							     make_accept_wnd(pvar), WM_SOCK_IO,
-							     FD_CONNECT | FD_READ | FD_CLOSE | FD_WRITE
+							     FD_CONNECT | FD_READ | FD_CLOSE 
 							    ) == SOCKET_ERROR) {
 								closesocket(channel->local_socket);
 								channel->local_socket = INVALID_SOCKET;
@@ -1176,7 +1176,7 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 			}
 			if (WSAAsyncSelect
 				(s, make_accept_wnd(pvar), WM_SOCK_ACCEPT,
-				 FD_ACCEPT | FD_READ | FD_CLOSE | FD_WRITE
+				 FD_ACCEPT | FD_READ | FD_CLOSE 
 				) == SOCKET_ERROR) {
 				s = INVALID_SOCKET;
 				continue;
@@ -1796,7 +1796,7 @@ static BOOL blocking_write(PTInstVar pvar, SOCKET s, const char FAR * data,
 
 	if ( (pvar->PWSAAsyncSelect) (s, pvar->fwd_state.accept_wnd,
 	                                WM_SOCK_ACCEPT,
-									FD_READ | FD_CLOSE | FD_WRITE) == SOCKET_ERROR ) {
+									FD_READ | FD_CLOSE) == SOCKET_ERROR ) {
 			goto error;
 	}
 
