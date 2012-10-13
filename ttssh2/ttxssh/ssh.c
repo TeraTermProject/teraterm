@@ -7664,7 +7664,7 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	DWORD stime;
 	int elapsed, prev_elapsed;
 
-	buflen = 8192*4;
+	buflen = min(c->remote_window, 8192*4); // max 32KB
 	buf = malloc(buflen);
 
 	//SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfile);
@@ -7676,15 +7676,19 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 	prev_elapsed = 0;
 
 	do {
+		int readlen, count=0;
+
 		// Cancelボタンが押下されたらウィンドウが消える。
 		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
 		// ファイルから読み込んだデータはかならずサーバへ送信する。
-		ret = fread(buf, 1, buflen, c->scp.localfp);
+		readlen = max(4096, min(buflen, c->remote_window)); // min 4KB
+		ret = fread(buf, 1, readlen, c->scp.localfp);
 		if (ret == 0)
 			break;
 
+		// remote_window が回復するまで待つ
 		do {
 			// socket or channelがクローズされたらスレッドを終わる
 			if (pvar->socket == INVALID_SOCKET || c->scp.state == SCP_CLOSING || c->used == 0)
@@ -7692,6 +7696,12 @@ static unsigned __stdcall ssh_scp_thread(void FAR * p)
 
 			if (ret > c->remote_window) {
 				Sleep(100);
+			}
+
+			// 100回抜けられなかったら抜けてしまう
+			count++;
+			if (count > 100) {
+				break;
 			}
 
 		} while (ret > c->remote_window);
