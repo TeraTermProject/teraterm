@@ -196,8 +196,6 @@ BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 		send_until_block(pvar, socket, buf->bufdata + buf->datastart,
 						 first_amount);
 
-	//OutputDebugPrintf("%s: %d %d\n", __FUNCTION__, first_amount, sent);
-
 	if (sent < 0) {
 		return FALSE;
 	} else {
