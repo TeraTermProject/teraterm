@@ -750,6 +750,10 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 		int amount = recv(channel->local_socket, buf, sizeof(buf), 0);
 		int err;
 
+		// Xサーバからのデータ受信があれば、ノンブロッキングモードでソケット受信を行い、
+		// SSHサーバのXアプリケーションへ送信する。
+		//OutputDebugPrintf("%s: recv %d\n", __FUNCTION__, amount);
+
 		if (amount > 0) {
 			char FAR *new_buf = buf;
 			int action = FWD_FILTER_RETAIN;
@@ -1827,6 +1831,11 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 
 	s = channel->local_socket;
 	if (length > 0 && s != INVALID_SOCKET) {
+		// SSHサーバのXアプリケーションから送られてきたX11データを、
+		// Tera Termと同じPCに同居しているXサーバに、ブロッキングモードを使って、
+		// 送信する。
+		// Xサーバに送信時に発生する FD_WRITE は、処理する必要がないため無視する。
+		//OutputDebugPrintf("%s: send %d\n", __FUNCTION__, length);
 		if (!UTIL_sock_buffered_write
 			(pvar, &channel->writebuf, blocking_write, s, data, length)) {
 			closed_local_connection(pvar, local_channel_num);
