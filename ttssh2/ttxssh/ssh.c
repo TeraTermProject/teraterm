@@ -209,9 +209,9 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 			break;
 
 		if (c->local_num == -1) { // shell or SCP
-			SSH2_send_channel_data(pvar, c, buffer_ptr(ch->msg), size);
+			SSH2_send_channel_data(pvar, c, buffer_ptr(ch->msg), size, TRUE);
 		} else { // port-forwarding
-			SSH_channel_send(pvar, c->local_num, -1, buffer_ptr(ch->msg), size);
+			SSH_channel_send(pvar, c->local_num, -1, buffer_ptr(ch->msg), size, TRUE);
 		}
 
 		c->bufchain = ch->next;
@@ -2982,7 +2982,7 @@ void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen
 
 	} else { // for SSH2(yutaka)
 		Channel_t *c = ssh2_channel_lookup(pvar->shell_id);
-		SSH2_send_channel_data(pvar, c, (unsigned char *)buf, buflen);
+		SSH2_send_channel_data(pvar, c, (unsigned char *)buf, buflen, 0);
 	}
 
 }
@@ -3218,7 +3218,7 @@ void SSH_end(PTInstVar pvar)
 
 }
 
-void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen)
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen, int retry)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
@@ -3237,11 +3237,21 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * bu
 	if (c == NULL)
 		return;
 
+	// リトライではない、通常のパケット送信の際、以前送れなかったデータが
+	// リンクドリストに残っているようであれば、リストの末尾に繋ぐ。
+	// これによりパケットが壊れたように見える現象が改善される。
+	// (2012.10.14 yutaka)
+	if (retry == 0 && c->bufchain) {
+		ssh2_channel_add_bufchain(c, buf, buflen);
+		return;
+	}
+
 	if ((unsigned int)buflen > c->remote_window) {
-		unsigned int offset = c->remote_window;
+		unsigned int offset = 0;
 		// 送れないデータはいったん保存しておく
 		ssh2_channel_add_bufchain(c, buf + offset, buflen - offset);
 		buflen = offset;
+		return;
 	}
 	if (buflen > 0) {
 		msg = buffer_init();
@@ -3276,7 +3286,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * bu
 /* support for port forwarding */
 void SSH_channel_send(PTInstVar pvar, int channel_num,
                       uint32 remote_channel_num,
-                      unsigned char FAR * buf, int len)
+                      unsigned char FAR * buf, int len, int retry)
 {
 	if (SSHv1(pvar)) {
 		unsigned char FAR *outmsg =
@@ -3323,7 +3333,7 @@ void SSH_channel_send(PTInstVar pvar, int channel_num,
 	} else {
 		// ポートフォワーディングにおいてクライアントからの送信要求を、SSH通信に乗せてサーバまで送り届ける。
 		Channel_t *c = ssh2_local_channel_lookup(channel_num);
-		SSH2_send_channel_data(pvar, c, buf, len);
+		SSH2_send_channel_data(pvar, c, buf, len, retry);
 	}
 
 }
@@ -7280,7 +7290,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 		// (2007.12.27 yutaka)
 		if (c->scp.dir == FROMREMOTE) {
 			char ch = '\0';
-			SSH2_send_channel_data(pvar, c, &ch, 1);
+			SSH2_send_channel_data(pvar, c, &ch, 1, 0);
 		}
 
 	} else if (c->type == TYPE_SFTP) {
@@ -7581,7 +7591,7 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 			{
 			scp_dlg_parm_t *parm = (scp_dlg_parm_t *)wp;
 
-			SSH2_send_channel_data(parm->pvar, parm->c, parm->buf, parm->buflen);
+			SSH2_send_channel_data(parm->pvar, parm->c, parm->buf, parm->buflen, 0);
 			}
 			return TRUE;
 			break;
@@ -7787,7 +7797,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 			(unsigned long)c->scp.filestat.st_mtime,  (unsigned long)c->scp.filestat.st_atime);
 
 		c->scp.state = SCP_TIMESTAMP;
-		SSH2_send_channel_data(pvar, c, buf, strlen(buf));
+		SSH2_send_channel_data(pvar, c, buf, strlen(buf), 0);
 
 	} else if (c->scp.state == SCP_TIMESTAMP) {
 		char buf[128];
@@ -7796,7 +7806,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 			c->scp.filestat.st_size, c->scp.localfile);
 
 		c->scp.state = SCP_FILEINFO;
-		SSH2_send_channel_data(pvar, c, buf, strlen(buf));
+		SSH2_send_channel_data(pvar, c, buf, strlen(buf), 0);
 
 	} else if (c->scp.state == SCP_FILEINFO) {
 		HWND hDlgWnd;
@@ -8017,7 +8027,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 reply:
 	ch = '\0';
-	SSH2_send_channel_data(pvar, c, &ch, 1);
+	SSH2_send_channel_data(pvar, c, &ch, 1, 0);
 	return TRUE;
 }
 
@@ -8657,11 +8667,11 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	}
 
 	if (SSHv2(pvar)) {
-		SSH2_send_channel_data(pvar, c, response, resplen);
+		SSH2_send_channel_data(pvar, c, response, resplen, 0);
 	}
 	else {
 		SSH_channel_send(pvar, local_channel_num, fc->remote_num,
-		                 response, resplen);
+		                 response, resplen, 0);
 	}
 	safefree(response);
 

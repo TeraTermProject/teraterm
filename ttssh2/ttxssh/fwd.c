@@ -769,7 +769,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 			 && (channel->status & FWD_CLOSED_REMOTE_OUT) == 0) {
 				// ポートフォワーディングにおいてクライアントからの送信要求を、SSH通信に乗せてサーバまで送り届ける。
 				SSH_channel_send(pvar, channel_num, channel->remote_num, new_buf,
-				                 amount);
+				                 amount, 0);
 			}
 
 			switch (action) {

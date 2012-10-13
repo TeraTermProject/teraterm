@@ -216,7 +216,7 @@ static void sftp_send_msg(PTInstVar pvar, Channel_t *c, buffer_t *msg)
 	// 最初にメッセージサイズを格納する。
 	set_uint32(p, len - 4);
 	// ペイロードの送信。
-	SSH2_send_channel_data(pvar, c, p, len);
+	SSH2_send_channel_data(pvar, c, p, len, 0);
 }
 
 // サーバから受信したSFTPパケットをバッファに格納する。

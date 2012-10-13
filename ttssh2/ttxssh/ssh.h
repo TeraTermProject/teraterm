@@ -572,7 +572,7 @@ void SSH_get_compression_info(PTInstVar pvar, char FAR * dest, int len);
 /* len must be <= SSH_MAX_SEND_PACKET_SIZE */
 void SSH_channel_send(PTInstVar pvar, int channel_num,
                       uint32 remote_channel_num,
-                      unsigned char FAR * buf, int len);
+                      unsigned char FAR * buf, int len, int retry);
 void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num);
 void SSH_confirm_channel_open(PTInstVar pvar, uint32 remote_channel_num, uint32 local_channel_num);
 void SSH_channel_output_eof(PTInstVar pvar, uint32 remote_channel_num);
@@ -701,7 +701,7 @@ typedef struct channel {
 
 unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len);
 void finish_send_packet_special(PTInstVar pvar, int skip_compress);
-void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen);
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen, int retry);
 
 #define finish_send_packet(pvar) finish_send_packet_special((pvar), 0)
 #define get_payload_uint32(pvar, offset) get_uint32_MSBfirst((pvar)->ssh_state.payload + (offset))
