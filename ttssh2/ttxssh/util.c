@@ -79,7 +79,7 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 
 	/* Fast path case: buffer is empty, try nonblocking write */
 	if (buf->datalen == 0) {
-#if 0
+#if 1
 		int sent_amount = send_until_block(pvar, socket, data, len);
 
 		if (sent_amount < 0) {
@@ -92,6 +92,12 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 		// まともに動かない。ゆえに、初回でブロッキングモードを使い、確実に送信してしまう。
 		// ポート転送(local-to-remote)において、でかいパケットを受信できない問題への対処。
 		// (2007.11.29 yutaka)
+		// オリジナルコードにバグがあると思っていたが、SSH遅延送信処理に問題があったため、
+		// それが根本原因であり、オリジナルコードには問題がなかったと考える。
+		// 本来はノンブロッキングで扱うべきところを、無理矢理ブロッキングにすることにより、
+		// Tera Termが「応答なし」、Xmingが「CPUストール」という不可思議な現象が出てしまう
+		// ように見える。そのため、本来のコードに戻すことを決断する。
+		// (2012.10.14 yutaka)
 		if (!blocking_write(pvar, socket, data, len)) {
 			return FALSE;
 		} else {
