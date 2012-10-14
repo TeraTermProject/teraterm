@@ -977,6 +977,48 @@ void TelStartKeepAliveThread() {
 
 
 
+  <h3>X11転送</h3>
+　X11転送(X11 port forwarding)は、SSHサーバ上でXウィンドウアプリケーションを起動し、アプリケーションのGUI画面をTera Termが動作しているコンソールPCに飛ばすしくみです。このしくみを使うと、SSHセッション上で"xeyes"や"firefox"、"xemacs"などのソフトウェアを動かすことができるようになります。なお、コンソールPC上には、Xming(http://sourceforge.net/projects/xming/)などのXサーバをあらかじめ用意しておく必要があります。<br>
+　下図にX11転送のフローを示します。図を見ると分かるように、Tera Term(TTSSH)はXアプリケーションとXサーバをつなぐ橋渡しの役目を持ちます。このようなTera Termのことを"Redirector"や"Port forwarder"、"TCP proxy"と呼びます。
+
+<div align="center">
+<img src="image/x11forward.png" width=720 height=540>
+</div>
+
+　X11転送を利用するためには、Tera TermおよびSSHサーバの双方に事前設定が必要です。まず、Tera Termのほうはteraterm.iniに下記の設定が必要です。
+
+<pre class=code>
+[TTSSH]
+DefaultForwarding=X
+</pre>
+
+　SSHサーバのほうは、OpenSSHを例に挙げると、"sshd_config"に下記の設定が必要です。デフォルトは"no"になっているため、通常はデフォルトではX11転送が使えません。
+
+<pre class=code>
+X11Forwarding=yes
+</pre>
+
+　Tera TermはX11転送が有効であると、spec.typeに"FWD_REMOTE_X11_TO_LOCAL"を設定します。これはSSHサーバ側からTera Term側に向かって、X11転送を行うことを意味します。Tera Termは、リモートホストにSSH接続する際、セッションオープン後の"SSH2_MSG_CHANNEL_OPEN_CONFIRMATION"において、X11転送の初期化を行います。
+
+<pre class=code>
+	if (c->type == TYPE_SHELL) {
+		// ポートフォワーディングの準備 (2005.2.26, 2005.6.21 yutaka)
+		// シェルオープンしたあとに X11 の要求を出さなくてはならない。(2005.7.3 yutaka)
+		FWD_prep_forwarding(pvar);
+		FWD_enter_interactive_mode(pvar);
+	}
+</pre>
+
+　FWD_prep_forwarding()では、"x11-req"サービス名と"MIT-MAGIC-COOKIE-1"をSSHサーバに送信し、SSHサーバ側のX11転送の初期化を促します。SSH接続時にX11の初期化が完了すると、SSHサーバ側に環境変数"DISPLAY"が自動的に設定されます。
+
+<pre class=code>
+# echo $DISPLAY
+DISPLAY=localhost:10.0
+</pre>
+
+　ここまで準備が整うと、SSHサーバ上でXアプリケーションを起動させることができます。XアプリケーションからXサーバ、すなわちSSHサーバからTera Termへ送られてくるデータは、SSH2_MSG_CHANNEL_DATA メッセージ形式となります。当該メッセージは FWD_received_data() で処理され、Xサーバ(TCP/6000)へ送られます。Xサーバのソケットは channel->local_socket で、ノンブロッキングモードで扱われます。そのため、一度でパケットを全部送れない場合があるため、送れなかったデータは内部バッファに溜めておく必要があります。また、channel->local_socket にパケットをsendすることにより、FD_WRITE メッセージが発生し、write_local_connection_buffer() が呼び出されます。ここでは、前回送れなかったデータがあれば、内部バッファから取り出し、再度Xサーバへの送信を試みます。<br>
+　反対に、Xサーバ、すなわちX11の画面上で何らかの操作が行われた場合、Tera TermからSSHサーバにデータを送信する必要があります。このとき、Tera Termへは FD_READ メッセージが発生し、read_local_connection() が呼び出されます。ここでは、Xサーバから送られてきたデータを SSH2_MSG_CHANNEL_DATA メッセージ形式に載せて、SSHサーバへ送ります。
+
 <hr>
 
 
