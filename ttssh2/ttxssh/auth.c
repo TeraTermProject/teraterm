@@ -378,6 +378,7 @@ static int get_key_file_name(HWND parent, char FAR * buf, int bufsize, PTInstVar
 	// 3ファイルフィルタの追加 (2005.4.26 yutaka)
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
 	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0all(*.*)\\0*.*\\0\\0");
+//	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0PuTTY(*.ppk)\\0*.ppk\\0all(*.*)\\0*.*\\0\\0");
 	memcpy(filter, pvar->ts->UIMsg, sizeof(filter));
 	params.lpstrFilter = filter;
 	params.lpstrCustomFilter = NULL;
@@ -1490,7 +1491,7 @@ void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 
 			} else {
 				if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-					method = key_type(pvar->auth_state.cur_cred.key_pair);
+					method = ssh_key_type(pvar->auth_state.cur_cred.key_pair);
 				}
 				else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 					int len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);
