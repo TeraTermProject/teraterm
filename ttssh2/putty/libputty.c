@@ -11,19 +11,13 @@
 #include "ssh.h"
 #include "libputty.h"
 
-/* 
- * PuTTY形式の鍵ファイルを読み込み、OpenSSH形式の鍵ファイルに変換する。
- * (2012.10.16 yutaka)
- */
-int load_and_convert_putty_keyfile(char *file, char *pass, char *outfile)
+
+static int common_convert_keyfile(struct ssh2_userkey *ssh2key, char *pass, char *outfile)
 {
-	struct ssh2_userkey *ssh2key = NULL;
-	Filename filename, outfilename;
+	Filename outfilename;
 	const char *error = NULL;
 	int ret = -1;
 
-	filename = filename_from_str(file);
-	ssh2key = ssh2_load_userkey(&filename, pass, &error);
 	if (ssh2key && ssh2key != SSH2_WRONG_PASSPHRASE) {
 		error = NULL;  // success
 	} else if (error == NULL) {
@@ -45,6 +39,42 @@ int load_and_convert_putty_keyfile(char *file, char *pass, char *outfile)
 			ret = 0;
 		}
 	}
+	return (ret);
+}
+
+/* 
+ * SECSH(ssh.com)形式の鍵ファイルを読み込み、OpenSSH形式の鍵ファイルに変換する。
+ * (2012.10.17 yutaka)
+ */
+int load_and_convert_sshcom_keyfile(char *file, char *pass, char *outfile)
+{
+	struct ssh2_userkey *ssh2key = NULL;
+	const char *error = NULL;
+	Filename filename;
+	int ret = -1;
+
+	filename = filename_from_str(file);
+	ssh2key = import_ssh2(&filename, SSH_KEYTYPE_SSHCOM, pass, &error); 
+	ret = common_convert_keyfile(ssh2key, pass, outfile);
+
+	return (ret);
+}
+
+
+/* 
+ * PuTTY形式の鍵ファイルを読み込み、OpenSSH形式の鍵ファイルに変換する。
+ * (2012.10.16 yutaka)
+ */
+int load_and_convert_putty_keyfile(char *file, char *pass, char *outfile)
+{
+	struct ssh2_userkey *ssh2key = NULL;
+	const char *error = NULL;
+	Filename filename;
+	int ret = -1;
+
+	filename = filename_from_str(file);
+	ssh2key = ssh2_load_userkey(&filename, pass, &error);
+	ret = common_convert_keyfile(ssh2key, pass, outfile);
 
 	return (ret);
 }

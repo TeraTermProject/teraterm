@@ -3,6 +3,7 @@
  */
 // PuTTY is copyright 1997-2007 Simon Tatham.
 
+int load_and_convert_sshcom_keyfile(char *file, char *pass, char *outfile);
 int load_and_convert_putty_keyfile(char *file, char *pass, char *outfile);
 
 // WINDOWS\WINPGNTC.C

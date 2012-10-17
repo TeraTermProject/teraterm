@@ -341,13 +341,19 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 // SSH2
 //
 
-static int import_putty_keyfile(char *filename, char *passphrase, char *newfile, int newfilelen)
+static int import_not_openssh_keyfile(char *filename, char *passphrase, char *newfile, int newfilelen)
 {
 	int ret = -1;
+	int putty_key = 0, sshcom_key = 0;
 
 	// 拡張子が.ppkならば、PuTTY形式の鍵ファイルと見なす。
-	if (strstr(filename, ".ppk") == NULL)
+	if (strstr(filename, ".ppk") != NULL) {
+		putty_key = 1;
+	} else if (strstr(filename, ".sshcom") != NULL) {
+		sshcom_key = 1;
+	} else {
 		goto error;
+	}
 
 	// 一時ファイルの名前を取得する。
 	if (tmpnam_s(newfile, newfilelen) != 0)
@@ -355,7 +361,10 @@ static int import_putty_keyfile(char *filename, char *passphrase, char *newfile,
 
 	if (passphrase[0] == 0)  // 空パスワードの場合
 		passphrase = NULL;
-	if (load_and_convert_putty_keyfile(filename, passphrase, newfile) < 0)
+
+	if (putty_key && load_and_convert_putty_keyfile(filename, passphrase, newfile) < 0)
+		goto error;
+	if (sshcom_key && load_and_convert_sshcom_keyfile(filename, passphrase, newfile) < 0)
 		goto error;
 
 	ret = 0;
@@ -389,7 +398,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 
 	// PuTTY形式の鍵ファイルかどうかをチェックする。
 	puttyfile[0] = 0;
-	if (import_putty_keyfile(filename, passphrase, puttyfile, sizeof(puttyfile)) == 0) {
+	if (import_not_openssh_keyfile(filename, passphrase, puttyfile, sizeof(puttyfile)) == 0) {
 		strncpy_s(filename, sizeof(filename), puttyfile, _TRUNCATE);
 	}
 
