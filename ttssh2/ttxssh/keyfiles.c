@@ -345,6 +345,7 @@ static int import_not_openssh_keyfile(char *filename, char *passphrase, char *ne
 {
 	int ret = -1;
 	int putty_key = 0, sshcom_key = 0;
+	char templates[2096];
 
 	// 拡張子が.ppkならば、PuTTY形式の鍵ファイルと見なす。
 	if (strstr(filename, ".ppk") != NULL) {
@@ -356,8 +357,11 @@ static int import_not_openssh_keyfile(char *filename, char *passphrase, char *ne
 	}
 
 	// 一時ファイルの名前を取得する。
-	if (tmpnam_s(newfile, newfilelen) != 0)
+	_snprintf_s(templates, sizeof(templates), _TRUNCATE, "%sXXXXXX", filename);
+	if (_mktemp_s(templates, strlen(templates)+1) != 0)
 		goto error;
+
+	strncpy_s(newfile, newfilelen, templates, _TRUNCATE);
 
 	if (passphrase[0] == 0)  // 空パスワードの場合
 		passphrase = NULL;
