@@ -59,6 +59,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="comctl32.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -119,6 +120,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="comctl32.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -144,6 +146,10 @@
 			Name="Putty Files"
 			>
 			<File
+				RelativePath="..\..\libs\putty\IMPORT.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\INT64.H"
 				>
 			</File>
@@ -157,6 +163,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libs\putty\NETWORK.H"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\NOTIMING.C"
 				>
 			</File>
 			<File
@@ -176,11 +186,79 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libs\putty\SSHAES.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\SSHBN.C"
 				>
 			</File>
 			<File
+				RelativePath="..\..\libs\putty\SSHDES.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHDSS.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHDSSG.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHMD5.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHPRIME.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHPUBK.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHRAND.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHRSA.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHRSAG.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHSH256.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHSH512.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\SSHSHA.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\TREE234.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\TREE234.H"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\VERSION.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINCTRLS.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINHELP.C"
 				>
 			</File>
 			<File
@@ -192,11 +270,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINNOISE.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINNOJMP.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINPGEN.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\WINDOWS\WINPGNTC.C"
 				>
 			</File>
 			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINSTORE.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\WINDOWS\WINSTUFF.H"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINTIME.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINUTILS.C"
 				>
 			</File>
 		</Filter>

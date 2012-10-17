@@ -3,11 +3,52 @@
  */
 // PuTTY is copyright 1997-2007 Simon Tatham.
 
+#include "putty.h"
+
 #include <windows.h>
 #include <assert.h>
 
 #include "ssh.h"
 #include "libputty.h"
+
+/* 
+ * PuTTY形式の鍵ファイルを読み込み、OpenSSH形式の鍵ファイルに変換する。
+ * (2012.10.16 yutaka)
+ */
+int load_and_convert_putty_keyfile(char *file, char *pass, char *outfile)
+{
+	struct ssh2_userkey *ssh2key = NULL;
+	Filename filename, outfilename;
+	const char *error = NULL;
+	int ret = -1;
+
+	filename = filename_from_str(file);
+	ssh2key = ssh2_load_userkey(&filename, pass, &error);
+	if (ssh2key && ssh2key != SSH2_WRONG_PASSPHRASE) {
+		error = NULL;  // success
+	} else if (error == NULL) {
+		// error 
+		if (ssh2key == SSH2_WRONG_PASSPHRASE)
+		    error = "wrong passphrase";
+		else
+		    error = "unknown error";
+	} else {
+		// error 
+	}
+
+	if (error == NULL) {
+		outfilename = filename_from_str(outfile);
+		ret = export_ssh2(&outfilename, SSH_KEYTYPE_OPENSSH, ssh2key, pass);
+		if (ret == 0) { // error
+			ret = -1;
+		} else {
+			ret = 0;
+		}
+	}
+
+	return (ret);
+}
+
 
 /*
  * for SSH2
@@ -155,7 +196,7 @@ int putty_get_ssh1_keylen(unsigned char *key,
  * Following functions are copied from putty source.
  */
 
-
+#if 0
 // SSHRSA.C
 /* Given a public blob, determine its length. */
 int rsa_public_blob_len(void *data, int maxlen)
@@ -180,6 +221,7 @@ int rsa_public_blob_len(void *data, int maxlen)
 
 	return p - (unsigned char *)data;
 }
+#endif
 
 // WINDOWS\WINPGNT.C
 /*
@@ -245,6 +287,7 @@ static void *get_keylist2(int *length)
 	return ret;
 }
 
+#if 0
 // WINDOWS\WINDOW.C
 /*
  * Print a modal (Really Bad) message box and perform a fatal exit.
@@ -262,3 +305,4 @@ void modalfatalbox(char *fmt, ...)
 	           MB_SYSTEMMODAL | MB_ICONERROR | MB_OK);
 	sfree(stuff);
 }
+#endif

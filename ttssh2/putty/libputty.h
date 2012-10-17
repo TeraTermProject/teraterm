@@ -3,6 +3,8 @@
  */
 // PuTTY is copyright 1997-2007 Simon Tatham.
 
+int load_and_convert_putty_keyfile(char *file, char *pass, char *outfile);
+
 // WINDOWS\WINPGNTC.C
 extern int agent_exists(void);
 extern int agent_query(void *in, int inlen, void **out, int *outlen,

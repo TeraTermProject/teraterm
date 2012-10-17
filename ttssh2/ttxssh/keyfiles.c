@@ -46,6 +46,8 @@ See LICENSE.TXT for the license.
 #include <openssl/pem.h>
 #include <openssl/err.h>
 
+#include "libputty.h"
+
 static char ID_string[] = "SSH PRIVATE KEY FILE FORMAT 1.1\n";
 
 static BIGNUM FAR *get_bignum(unsigned char FAR * bytes)
@@ -339,6 +341,28 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 // SSH2
 //
 
+static int import_putty_keyfile(char *filename, char *passphrase, char *newfile, int newfilelen)
+{
+	int ret = -1;
+
+	// 拡張子が.ppkならば、PuTTY形式の鍵ファイルと見なす。
+	if (strstr(filename, ".ppk") == NULL)
+		goto error;
+
+	// 一時ファイルの名前を取得する。
+	if (tmpnam_s(newfile, newfilelen) != 0)
+		goto error;
+
+	if (passphrase[0] == 0)  // 空パスワードの場合
+		passphrase = NULL;
+	if (load_and_convert_putty_keyfile(filename, passphrase, newfile) < 0)
+		goto error;
+
+	ret = 0;
+error:
+	return (ret);
+}
+
 Key *read_SSH2_private_key(PTInstVar pvar,
                            char * relative_name,
                            char * passphrase,
@@ -352,6 +376,7 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 	Key *result = NULL;
 	EVP_PKEY *pk = NULL;
 	unsigned long err = 0;
+	char puttyfile[2048];
 
 	OpenSSL_add_all_algorithms();
 	ERR_load_crypto_strings();
@@ -361,6 +386,12 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 	// あるファイルを読み込むことができる。(2005.2.7 yutaka)
 	get_teraterm_dir_relative_name(filename, sizeof(filename),
 	                               relative_name);
+
+	// PuTTY形式の鍵ファイルかどうかをチェックする。
+	puttyfile[0] = 0;
+	if (import_putty_keyfile(filename, passphrase, puttyfile, sizeof(puttyfile)) == 0) {
+		strncpy_s(filename, sizeof(filename), puttyfile, _TRUNCATE);
+	}
 
 	fp = fopen(filename, "r");
 	if (fp == NULL) {
@@ -424,6 +455,10 @@ Key *read_SSH2_private_key(PTInstVar pvar,
 		EVP_PKEY_free(pk);
 
 	fclose(fp);
+
+	if (puttyfile[0] != 0)
+		remove(puttyfile);
+
 	return (result);
 
 error:
@@ -435,6 +470,9 @@ error:
 
 	if (fp != NULL)
 		fclose(fp);
+
+	if (puttyfile[0] != 0)
+		remove(puttyfile);
 
 	return (NULL);
 }
