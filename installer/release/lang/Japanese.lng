@@ -454,6 +454,10 @@ BTN_HELP=ヘルプ(&H)
 HELPFILE=teratermj.chm
 MSG_OPENHELP_ERROR=HTMLヘルプ(%s)を開けません.
 
+; ttset
+MSG_INI_ERROR=Tera Term: エラー
+MSG_INI_WRITE_ERROR=iniファイルに書き込みができません
+
 
 [TTSSH]
 ; font

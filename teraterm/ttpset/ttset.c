@@ -1507,9 +1507,21 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	int i;
 	char Temp[MAX_PATH];
 	char buf[20];
+	int ret;
+	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], msg[MAX_UIMSG];
 
 	/* version */
-	WritePrivateProfileString(Section, "Version", "2.3", FName);
+	ret = WritePrivateProfileString(Section, "Version", "2.3", FName);
+	if (ret == 0) {
+		// iniファイルの書き込みに失敗したら、エラーメッセージを表示する。(2012.10.18 yutaka)
+		ret = GetLastError();
+		get_lang_msg("MSG_INI_WRITE_ERROR", uimsg, sizeof(uimsg), "Cannot write ini file", ts->UILanguageFile);
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "%s (%d)", uimsg, ret);
+
+		get_lang_msg("MSG_INI_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", ts->UILanguageFile);
+
+		MessageBox(NULL, msg, uimsg2, MB_ICONEXCLAMATION);
+	}
 
 	/* Language */
 	switch (ts->Language) {

@@ -454,6 +454,9 @@ BTN_HELP=Hilfe
 HELPFILE=teraterm.chm
 MSG_OPENHELP_ERROR=Hilfedatei kann nicht geöffnet werden (%s).
 
+; ttset
+MSG_INI_ERROR=Tera Term: Error
+MSG_INI_WRITE_ERROR=Cannot write ini file.
 
 [TTSSH]
 ; font
