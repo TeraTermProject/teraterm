@@ -45,7 +45,7 @@ MENU_EDIT_CANCELSELECT=Effacer la se&lection
 MENU_EDIT_SELECTSCREEN=Sélectionner l'ecran
 MENU_EDIT_SELECTALL=Tout selectionner
 
-MENU_SETUP=Configuration
+MENU_SETUP=&Configuration
 MENU_SETUP_TERMINAL=&Terminal...
 MENU_SETUP_WINDOW=&Fenetre...
 MENU_SETUP_FONT=&Police...
@@ -58,7 +58,7 @@ MENU_SETUP_SAVE=&Sauvegarder setup...
 MENU_SETUP_RESTORE=&Restaurer setup...
 MENU_SETUP_LOADKEYMAP=Charger jeu de touches...
 
-MENU_CONTROL=Contrôle
+MENU_CONTROL=C&ontrôle
 MENU_CONTROL_RESET=&Reset du terminal
 MENU_CONTROL_RESETTITLE=R&eset titre distant
 MENU_CONTROL_AREYOUTHERE=Il y a quelqu'un?\tAlt+T
@@ -70,7 +70,7 @@ MENU_CONTROL_CLOSETEK=&Fermer TEK
 MENU_CONTROL_MACRO=&Macro
 MENU_CONTROL_SHOW_MACRO=Afficher fenêtre Macro
 
-MENU_WINDOW=&Fenêtre
+MENU_WINDOW=Fe&nêtre
 MENU_WINDOW_WINDOW=&Fenêtre
 MENU_WINDOW_MINIMIZEALL=&Minimize All
 MENU_WINDOW_RESTOREALL=&Restore All
