@@ -397,6 +397,32 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 	*data = buf;
 }
 
+void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
+{
+	char *buf;
+	int bits, bytes;
+
+	bits = buffer_get_int(buffer);
+	bytes = (bits + 7) / 8;
+
+	if ((buffer->len - buffer->offset) < bytes) {
+		return;
+	}
+	buf = buffer->buf + buffer->offset;
+	if ((*buf & 0x80) != 0) {
+		char *tmp = (char *)malloc(bytes + 1);
+		tmp[0] = '\0';
+		memcpy(tmp + 1, buf, bytes);
+		BN_bin2bn(tmp, bytes + 1, value);
+		free(tmp);
+	}
+	else {
+		BN_bin2bn(buf, bytes, value);
+	}
+
+	buffer->offset += bytes;
+}
+
 void buffer_put_ecpoint(buffer_t *msg, const EC_GROUP *curve, const EC_POINT *point)
 {
 	unsigned char *buf = NULL;

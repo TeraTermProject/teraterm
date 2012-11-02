@@ -377,8 +377,7 @@ static int get_key_file_name(HWND parent, char FAR * buf, int bufsize, PTInstVar
 	// フィルタの追加 (2004.12.19 yutaka)
 	// 3ファイルフィルタの追加 (2005.4.26 yutaka)
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
-	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0all(*.*)\\0*.*\\0\\0");
-//	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0PuTTY(*.ppk)\\0*.ppk\\0all(*.*)\\0*.*\\0\\0");
+	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa;*.ppk\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0PuTTY(*.ppk)\\0*.ppk\\0all(*.*)\\0*.*\\0\\0");
 	memcpy(filter, pvar->ts->UIMsg, sizeof(filter));
 	params.lpstrFilter = filter;
 	params.lpstrCustomFilter = NULL;
@@ -481,16 +480,57 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		} else { // SSH2(yutaka)
 			BOOL invalid_passphrase = FALSE;
 			char errmsg[256];
+			FILE *fp = NULL;
+			ssh2_keyfile_type keyfile_type;
 
 			memset(errmsg, 0, sizeof(errmsg));
-			//GetCurrentDirectory(sizeof(errmsg), errmsg);
 
-			key_pair = read_SSH2_private_key(pvar, buf, password,
-			                                 &invalid_passphrase,
-			                                 FALSE,
-			                                 errmsg,
-			                                 sizeof(errmsg)
-			                                );
+			keyfile_type = get_ssh2_keytype(buf, &fp, errmsg, sizeof(errmsg));
+			switch (keyfile_type) {
+				case SSH2_KEYFILE_TYPE_OPENSSH:
+				{
+					key_pair = read_SSH2_private_key(pvar, fp, password,
+					                                 &invalid_passphrase,
+					                                 FALSE,
+					                                 errmsg,
+					                                 sizeof(errmsg)
+					                                );
+					break;
+				}
+				case SSH2_KEYFILE_TYPE_PUTTY:
+				{
+					key_pair = read_SSH2_PuTTY_private_key(pvar, fp, password,
+					                                       &invalid_passphrase,
+					                                       FALSE,
+					                                       errmsg,
+					                                       sizeof(errmsg)
+					                                      );
+					break;
+				}
+				case SSH2_KEYFILE_TYPE_SECSH:
+				{
+					key_pair = read_SSH2_SECSH_private_key(pvar, fp, password,
+					                                       &invalid_passphrase,
+					                                       FALSE,
+					                                       errmsg,
+					                                       sizeof(errmsg)
+					                                      );
+					break;
+				}
+				default:
+				{
+					char buf[1024];
+					UTIL_get_lang_msg("MSG_READKEY_ERROR", pvar,
+					                  "read error SSH2 private key file\r\n%s");
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, errmsg);
+					notify_nonfatal_error(pvar, buf);
+					// ここに来たということは SSH2 秘密鍵が開けない、あるいはファイル形式がおかしいので
+					// 鍵ファイルの選択ボタンにフォーカスを移す
+					SetFocus(GetDlgItem(dlg, IDC_CHOOSERSAFILE));
+					destroy_malloced_string(&password);
+					return FALSE;
+				}
+			}
 
 			if (key_pair == NULL) { // read error
 				char buf[1024];

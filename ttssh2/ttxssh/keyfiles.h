@@ -34,6 +34,13 @@ See LICENSE.TXT for the license.
 #ifndef __KEYFILES_H
 #define __KEYFILES_H
 
+typedef enum {
+	SSH2_KEYFILE_TYPE_NONE,
+	SSH2_KEYFILE_TYPE_OPENSSH,
+	SSH2_KEYFILE_TYPE_PUTTY,
+	SSH2_KEYFILE_TYPE_SECSH
+} ssh2_keyfile_type;
+
 Key * KEYFILES_read_private_key(PTInstVar pvar,
                                 char * relative_name,
                                 char * passphrase,
@@ -41,11 +48,32 @@ Key * KEYFILES_read_private_key(PTInstVar pvar,
                                 BOOL is_auto_login);
 
 Key *read_SSH2_private_key(PTInstVar pvar,
-                           char * relative_name,
+                           FILE * fp,
                            char * passphrase,
                            BOOL * invalid_passphrase,
                            BOOL is_auto_login,
                            char *errmsg,
                            int errmsg_len);
+
+Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
+                                 FILE * fp,
+                                 char * passphrase,
+                                 BOOL * invalid_passphrase,
+                                 BOOL is_auto_login,
+                                 char *errmsg,
+                                 int errmsg_len);
+
+Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
+                                 FILE * fp,
+                                 char * passphrase,
+                                 BOOL * invalid_passphrase,
+                                 BOOL is_auto_login,
+                                 char *errmsg,
+                                 int errmsg_len);
+
+ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
+                                   FILE **fp,
+                                   char *errmsg,
+                                   int errmsg_len);
 
 #endif
