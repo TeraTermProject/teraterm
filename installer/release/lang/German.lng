@@ -2,7 +2,7 @@
 DLG_SYSTEM_FONT=System,14,0
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-MENU_FILE=Datei(&F)
+MENU_FILE=D&atei
 MENU_FILE_NEW=&Neue Verbindung...\tAlt+N
 MENU_FILE_DUPLICATE=&Verbindung duplizieren\tAlt+D
 MENU_FILE_GYGWIN=&Cygwin-Verbindung\tAlt+G
@@ -34,7 +34,7 @@ MENU_TRANS_BP_SEND=&Senden
 MENU_TRANS_QV_RCV=&Empfangen
 MENU_TRANS_QV_SEND=&Senden
 
-MENU_EDIT=&Editieren
+MENU_EDIT=B&earbeiten
 MENU_EDIT_COPY=&Kopieren\tAlt+C
 MENU_EDIT_COPYTABLE=&Tabelle kopieren
 MENU_EDIT_PASTE=&Einfügen\tAlt+V
@@ -45,7 +45,7 @@ MENU_EDIT_CANCELSELECT=&Auswahl aufheben
 MENU_EDIT_SELECTSCREEN=&Bildschirm markieren
 MENU_EDIT_SELECTALL=&Alles auswählen
 
-MENU_SETUP=&Einstellungen
+MENU_SETUP=Ein&stellungen
 MENU_SETUP_TERMINAL=&Terminal-Einstellungen
 MENU_SETUP_WINDOW=&Fenster-Einstellungen
 MENU_SETUP_FONT=&Schriftart...
@@ -58,7 +58,7 @@ MENU_SETUP_SAVE=&Setup sichern
 MENU_SETUP_RESTORE=&Setup laden
 MENU_SETUP_LOADKEYMAP=&Keyboard-Layout einstellen
 
-MENU_CONTROL=&Steuerung
+MENU_CONTROL=Ste&uerung
 MENU_CONTROL_RESET=&Terminal zurücksetzen
 MENU_CONTROL_RESETTITLE=R&eset remote title
 MENU_CONTROL_AREYOUTHERE=Are you &there\tAlt+T
@@ -82,22 +82,22 @@ MENU_HELP_ABOUT=&Über Tera Term...
 MENU_SHOW_MENUBAR=Menüleiste anzeigen
 
 
-TEKMENU_FILE=&Datei
+TEKMENU_FILE=D&atei
 TEKMENU_FILE_PRINT=&Drucken...\tAlt+P
 TEKMENU_FILE_EXIT=&Beenden\tAlt+Q
 
-TEKMENU_EDIT=&Bearbeiten
+TEKMENU_EDIT=B&earbeiten
 TEKMENU_EDIT_COPY=&Kopieren\tAlt+C
 TEKMENU_EDIT_COPYSCREEN=Bildschirm kopieren
 TEKMENU_EDIT_PASTE=&Einfügen\tAlt+V
 TEKMENU_EDIT_PASTECR=Einfügen<C&R>\tAlt+R
 TEKMENU_EDIT_CLSCREEN=Bildschirm leeren
 
-TEKMENU_SETUP=&Einrichtung
+TEKMENU_SETUP=Ein&stellungen
 TEKMENU_SETUP_WINDOW=&Fenster
 TEKMENU_SETUP_FONT=&Schriftart
 
-TEKMENU_VTWIN=VT-Fenster
+TEKMENU_VTWIN=VT-Fenster(&U)
 
 TEKMENU_WINDOW=&Fenster
 
