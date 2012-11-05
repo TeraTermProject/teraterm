@@ -15,6 +15,7 @@
 #define IDD_SSHSCP_PROGRESS             107
 #define IDD_SSHPASSWD_INPUT             108
 #define IDD_SFTP_DIALOG                 109
+#define IDI_SECURETT_YELLOW             110
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDD_SSHDIFFERENTKEY             601
@@ -203,7 +204,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        110
+#define _APS_NEXT_RESOURCE_VALUE        111
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1210
 #define _APS_NEXT_SYMED_VALUE           101
