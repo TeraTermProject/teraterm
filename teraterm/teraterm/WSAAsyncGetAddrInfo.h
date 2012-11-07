@@ -12,8 +12,8 @@
 struct getaddrinfo_args {
   HWND hWnd;
   unsigned int wMsg;
-  const char FAR * hostname;
-  const char FAR * portname;
+  char FAR * hostname;
+  char FAR * portname;
   struct addrinfo FAR * hints;
   struct addrinfo FAR * FAR * res;
   HANDLE FAR * lpHandle;

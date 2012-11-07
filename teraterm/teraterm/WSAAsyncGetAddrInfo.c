@@ -31,14 +31,17 @@ HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 	/* packing arguments struct addrinfo_args */
 	ga->hWnd = hWnd;
 	ga->wMsg = wMsg;
-	ga->hostname = hostname;
-	ga->portname = portname;
+	ga->hostname = _strdup(hostname); // ポインタだけ渡すと、スレッド先で不定となる。(2012.11.7 yutaka)
+	ga->portname = _strdup(portname);
 	ga->hints = hints;
 	ga->res = res;
 
 	ga->lpHandle = (HANDLE FAR *)malloc(sizeof(HANDLE));
-	if (ga->lpHandle == NULL)
+	if (ga->lpHandle == NULL) {
+		free(ga->hostname);
+		free(ga->portname);
 		return NULL;
+	}
 
 	/* create sub-thread running getaddrinfo() */
 	thread = (HANDLE)_beginthreadex(NULL, 0, getaddrinfo_thread, ga, CREATE_SUSPENDED, &tid);
@@ -48,6 +51,8 @@ HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 	/* return thread handle */
 	if (thread == 0) {
 		free(ga->lpHandle);
+		free(ga->hostname);
+		free(ga->portname);
 		free(ga);
 		return NULL;
 	} else
@@ -82,6 +87,8 @@ static unsigned __stdcall getaddrinfo_thread(void FAR * p)
 	PostMessage(hWnd, wMsg, (WPARAM)*ga->lpHandle, MAKELPARAM(0, gai));
 
 	free(ga->lpHandle);
+	free(ga->hostname);
+	free(ga->portname);
 	free(p);
 
 	return 0;
