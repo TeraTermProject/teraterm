@@ -25,8 +25,13 @@ clipb2var &lt;strvar&gt; [&lt;offset&gt;]
 
 <p>
 クリップボードのテキストデータを &lt;strvar&gt; へ代入する。<br>
-<a href="../syntax/types.html#String">文字列変数の最大長の制限</a>を受けるため、クリップボードのテキストデータが長すぎた場合は256バイト目以降が切り捨てられる。<br>
-&lt;offset&gt;を指定すると、offset*255+1文字目以降の内容が代入される。
+<a href="../syntax/types.html#String">文字列変数の最大長の制限</a>を受けるため、クリップボードのテキストデータが長すぎた場合は256バイト目以降が切り捨てられる。
+</p>
+
+<p>
+&lt;offset&gt;を指定すると、offset*255+1文字目以降の内容が代入される。<br>
+&lt;offset&gt;に0以外を指定する場合、一度&lt;offset&gt;無し、または&lt;offset&gt;に0を指定してclipb2varを実行する必要がある。<br>
+&lt;offset&gt;に0以外を指定した時に得られるクリップボードの内容は現在のものではなく、最後に&lt;offset&gt;無し、または&lt;offset&gt;に0を指定してclipb2varを実行した時点でのクリップボードの内容となる。
 </p>
 
 <p>

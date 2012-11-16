@@ -25,8 +25,15 @@ clipb2var &lt;strvar&gt; [&lt;offset&gt;]
 
 <p>
 Copies the text data in clipboard to &lt;strvar&gt;.<br>
-If clipboad content is too long, copied data was truncated. (cf. <a href="../syntax/types.html#String">maximum length of a string</a>)</br>
-If offset is specified, copied string starts offset*255-1 bytes.
+If clipboad content is too long, copied data was truncated. (cf. <a href="../syntax/types.html#String">maximum length of a string</a>)
+</p>
+
+<p>
+If &lt;offset&gt; is specified, copied string starts offset*255-1 bytes.<br>
+<!--
+&lt;offset&gt;に0以外を指定する場合、一度&lt;offset&gt;無し、または&lt;offset&gt;に0を指定してclipb2varを実行する必要がある。<br>
+&lt;offset&gt;に0以外を指定した時に得られるクリップボードの内容は現在のものではなく、最後に&lt;offset&gt;無し、または&lt;offset&gt;に0を指定してclipb2varを実行した時点でのクリップボードの内容となる。
+-->
 </p>
 
 <p>
