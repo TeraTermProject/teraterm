@@ -30,10 +30,8 @@ If clipboad content is too long, copied data was truncated. (cf. <a href="../syn
 
 <p>
 If &lt;offset&gt; is specified, copied string starts offset*255-1 bytes.<br>
-<!--
-&lt;offset&gt;に0以外を指定するためには、事前に&lt;offset&gt;無し、または&lt;offset&gt;に0を指定してclipb2varを実行する必要がある。<br>
-&lt;offset&gt;に0以外を指定した時に得られるクリップボードの内容は現在のものではなく、最後に&lt;offset&gt;無し、または&lt;offset&gt;に0を指定してclipb2varを実行した時点でのクリップボードの内容となる。
--->
+When the &lt;offset&gt; is specified not 0, please run the clipb2var command with the offset is nothing or is 0.<br>
+When &lt;offset&gt; is not 0, the clipboard content is not current but the content after the &lt;offset&gt; is nothing or 0.
 </p>
 
 <p>
@@ -74,8 +72,8 @@ clipb2var data
 messagebox data 'clipboard data'
 </pre>
 
-<!--pre class="macro-example">
-; 255バイトを超えるクリップボード文字列を読み込む
+<pre class="macro-example">
+; Load the clipboard data over 255 byte
 ; +------------------------------------------------------------------+
 ; |  512 bytes clipboard text                                        |
 ; +------------------------------------------------------------------+
@@ -83,18 +81,18 @@ messagebox data 'clipboard data'
 ; | (1) 255 bytes           | (2) 255 bytes            | (3) 2 bytes | 
 ; +-------------------------+--------------------------+-------------+
 
-clipb2var data ; data に (1) が代入され、result に 2 が代入される
+clipb2var data ; (1) stores into the data and the result is 2.
 messagebox data 'clipboard data 1'
 
-clipb2var data 1 ; data に (2) が代入され、result に 2 が代入される
+clipb2var data 1 ; (2) stores into the data and the result is 2.
 messagebox data 'clipboard data 2'
 
-clipb2var data 2 ; data に (3) が代入され、result に 1 が代入される
+clipb2var data 2 ; (3) stores into the data and the result is 1.
 messagebox data 'clipboard data 3'
 
-clipb2var data 3 ; data にはなにも代入されず、result に 0 が代入される
+clipb2var data 3 ; the data is empty and the result is 0.
 messagebox data 'clipboard data 4'
-</pre-->
+</pre>
 
 <pre class="macro-example">
 ; read a clipboard content and write it to a file.
