@@ -4031,14 +4031,12 @@ WORD TTLStrReplace()
 	TVarId VarId;
 	TStrVal oldstr;
 	TStrVal newstr;
+	TStrVal tmpstr;
 	char *srcptr, *matchptr;
 	char *p;
 	int srclen, oldlen, matchlen;
 	int pos, ret;
 	int result = 0;
-
-	memset(oldstr, 0, MaxStrLen);
-	memset(newstr, 0, MaxStrLen);
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -4052,29 +4050,18 @@ WORD TTLStrReplace()
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
 
-	if (pos > srclen) {
+	if (pos > srclen || pos <= 0) {
 		result = 0;
 		goto error;
 	}
+	pos--;
+
+	strncpy_s(tmpstr, MaxStrLen, srcptr, _TRUNCATE);
 
 	oldlen = strlen(oldstr);
 
 	// strptr•¶Žš—ñ‚Ì pos •¶Žš–ÚˆÈ~‚É‚¨‚¢‚ÄAoldstr ‚ð’T‚·B
-#if 0
-	p = strstr(srcptr + (pos - 1), oldstr);
-	if (p == NULL) {
-		// Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚ÍA"0"‚Å–ß‚éB
-		result = 0;
-		goto error;
-	}
-
-	// ‚Ü‚¸‚Í oldstr ‚ðíœ‚·‚é
-	remove_string(srcptr, p - srcptr + 1, oldlen);
-
-	// newstr ‚ð‘}“ü‚·‚é
-	insert_string(srcptr, p - srcptr + 1, newstr);
-#else
-	p = srcptr + (pos - 1);
+	p = tmpstr + pos;
 	ret = FindRegexStringOne(oldstr, oldlen, p, strlen(p));
 	// FindRegexStringOne‚Ì’†‚ÅUnlockVar()‚³‚ê‚Ä‚µ‚Ü‚¤‚Ì‚ÅALockVar()‚µ‚È‚¨‚·B
 	LockVar();
@@ -4083,6 +4070,7 @@ WORD TTLStrReplace()
 		result = 0;
 		goto error;
 	}
+	ret--;
 
 	if (CheckVar("matchstr",&VarType,&VarId) &&
 		(VarType==TypString)) {
@@ -4093,12 +4081,9 @@ WORD TTLStrReplace()
 		goto error;
 	}
 
-	// ‚Ü‚¸‚Í oldstr ‚ðíœ‚·‚é
-	remove_string(srcptr, (pos - 1) + ret, matchlen);
-
-	// newstr ‚ð‘}“ü‚·‚é
-	insert_string(srcptr, (pos - 1) + ret, newstr);
-#endif
+	strncpy_s(srcptr, MaxStrLen, tmpstr, pos + ret);
+	strncat_s(srcptr, MaxStrLen, newstr, _TRUNCATE);
+	strncat_s(srcptr, MaxStrLen, tmpstr + pos + ret + matchlen, _TRUNCATE);
 
 	result = 1;
 
