@@ -3532,6 +3532,9 @@ void XsProcClipboard(PCHAR buff)
 	int len, blen;
 	char *p, *cbbuff, hdr[20];
 	HGLOBAL cbmem;
+	int wide_len;
+	HGLOBAL wide_cbmem;
+	LPWSTR wide_buf;
 
 	p = buff;
 	while (strchr("cps01234567", *p)) {
@@ -3570,9 +3573,20 @@ void XsProcClipboard(PCHAR buff)
 			cbbuff[len] = 0;
 			GlobalUnlock(cbmem);
 
+			wide_len = MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, NULL, 0);
+			wide_cbmem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
+			if (wide_cbmem) {
+				wide_buf = (LPWSTR)GlobalLock(wide_cbmem);
+				MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, wide_buf, wide_len);
+				GlobalUnlock(wide_cbmem);
+			}
+
 			if (OpenClipboard(NULL)) {
 				EmptyClipboard();
 				SetClipboardData(CF_TEXT, cbmem);
+				if (wide_buf) {
+					SetClipboardData(CF_UNICODETEXT, wide_cbmem);
+				}
 				CloseClipboard();
 			}
 		}

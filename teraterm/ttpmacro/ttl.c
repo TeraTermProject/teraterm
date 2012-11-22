@@ -348,6 +348,10 @@ WORD TTLClipb2Var()
 	char *newbuff;
 	static char *cbbuff;
 	static int cbbuffsize, cblen;
+	HANDLE wide_hText;
+	LPWSTR wide_buf;
+	int mb_len;
+	UINT Cf;
 
 	Err = 0;
 	GetStrVar(&VarId, &Err);
@@ -363,34 +367,84 @@ WORD TTLClipb2Var()
 	if (Err!=0) return Err;
 
 	if (Num == 0) {
+		if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+			Cf = CF_UNICODETEXT;
+		}
+		else if (IsClipboardFormatAvailable(CF_TEXT)) {
+			Cf = CF_TEXT;
+		}
+		else {
+			cblen = 0;
+			SetResult(0);
+			return Err;
+		}
 		if (OpenClipboard(NULL) == 0) {
 			cblen = 0;
 			SetResult(0);
 			return Err;
 		}
-		hText = GetClipboardData(CF_TEXT);
-		if (hText != NULL) {
-			clipbText = GlobalLock(hText);
-			cblen = strlen(clipbText);
-			if (cbbuffsize <= cblen) {
-				if ((newbuff = realloc(cbbuff, cblen + 1)) == NULL) {
-					// realloc failed. fall back to old mode.
-					cblen = 0;
-					strncpy_s(buf,sizeof(buf),clipbText,_TRUNCATE);
+
+		if (Cf == CF_UNICODETEXT) {
+			wide_hText = GetClipboardData(CF_UNICODETEXT);
+			if (wide_hText != NULL) {
+				wide_buf = GlobalLock(wide_hText);
+				mb_len = WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, NULL, 0, NULL, NULL);
+				hText = GlobalAlloc(GMEM_MOVEABLE, sizeof(CHAR) * mb_len);
+				clipbText = GlobalLock(hText);
+				if (hText != NULL) {
+					WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, clipbText, mb_len, NULL, NULL);
+
+					cblen = strlen(clipbText);
+					if (cbbuffsize <= cblen) {
+						if ((newbuff = realloc(cbbuff, cblen + 1)) == NULL) {
+							// realloc failed. fall back to old mode.
+							cblen = 0;
+							strncpy_s(buf,sizeof(buf),clipbText,_TRUNCATE);
+							GlobalUnlock(hText);
+							CloseClipboard();
+							SetStrVal(VarId, buf);
+							SetResult(3);
+							return Err;
+						}
+						cbbuff = newbuff;
+						cbbuffsize = cblen + 1;
+					}
+					strncpy_s(cbbuff, cbbuffsize, clipbText, _TRUNCATE);
+
 					GlobalUnlock(hText);
-					CloseClipboard();
-					SetStrVal(VarId, buf);
-					SetResult(3);
-					return Err;
+					GlobalFree(hText);
 				}
-				cbbuff = newbuff;
-				cbbuffsize = cblen + 1;
+				GlobalUnlock(wide_hText);
 			}
-			strncpy_s(cbbuff, cbbuffsize, clipbText, _TRUNCATE);
-			GlobalUnlock(hText);
+			else {
+				cblen = 0;
+			}
 		}
-		else {
-			cblen = 0;
+		else if (Cf == CF_TEXT) {
+			hText = GetClipboardData(CF_TEXT);
+			if (hText != NULL) {
+				clipbText = GlobalLock(hText);
+				cblen = strlen(clipbText);
+				if (cbbuffsize <= cblen) {
+					if ((newbuff = realloc(cbbuff, cblen + 1)) == NULL) {
+						// realloc failed. fall back to old mode.
+						cblen = 0;
+						strncpy_s(buf,sizeof(buf),clipbText,_TRUNCATE);
+						GlobalUnlock(hText);
+						CloseClipboard();
+						SetStrVal(VarId, buf);
+						SetResult(3);
+						return Err;
+					}
+					cbbuff = newbuff;
+					cbbuffsize = cblen + 1;
+				}
+				strncpy_s(cbbuff, cbbuffsize, clipbText, _TRUNCATE);
+				GlobalUnlock(hText);
+			}
+			else {
+				cblen = 0;
+			}
 		}
 		CloseClipboard();
 	}
@@ -417,6 +471,9 @@ WORD TTLVar2Clipb()
 	TStrVal Str;
 	HGLOBAL hText;
 	PTSTR clipbText;
+	int wide_len;
+	HGLOBAL wide_hText;
+	LPWSTR wide_buf;
 
 	Err = 0;
 	GetStrVal(Str,&Err);
@@ -427,12 +484,25 @@ WORD TTLVar2Clipb()
 	strncpy_s(clipbText, sizeof(Str), Str, _TRUNCATE);
 	GlobalUnlock(hText);
 
+	wide_len = MultiByteToWideChar(CP_ACP, 0, clipbText, -1, NULL, 0);
+	wide_hText = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
+	if (wide_hText) {
+		wide_buf = (LPWSTR)GlobalLock(wide_hText);
+		MultiByteToWideChar(CP_ACP, 0, clipbText, -1, wide_buf, wide_len);
+		GlobalUnlock(wide_hText);
+	}
+
 	if (OpenClipboard(NULL) == 0) {
 		SetResult(0);
 	}
 	else {
 		EmptyClipboard();
 		SetClipboardData(CF_TEXT, hText);
+
+		if (wide_buf) {
+			SetClipboardData(CF_UNICODETEXT, wide_hText);
+		}
+
 		CloseClipboard();
 		SetResult(1);
 	}

@@ -21,6 +21,8 @@
 // for clipboard copy
 static HGLOBAL CBCopyHandle = NULL;
 static PCHAR CBCopyPtr = NULL;
+static HGLOBAL CBCopyWideHandle = NULL;
+static LPWSTR CBCopyWidePtr = NULL;
 
 #define CB_BRACKET_NONE  0
 #define CB_BRACKET_START 1
@@ -36,6 +38,7 @@ static BOOL CBRetrySend;
 static BOOL CBRetryEcho;
 static BOOL CBSendCR;
 static BOOL CBDDE;
+static BOOL CBWIDE;
 static BOOL CBEchoOnly;
 
 static HFONT DlgClipboardFont;
@@ -67,8 +70,18 @@ PCHAR CBOpen(LONG MemSize)
 void CBClose()
 {
 	BOOL Empty;
+	int WideCharLength;
+
 	if (CBCopyHandle==NULL) {
 		return;
+	}
+
+	WideCharLength = MultiByteToWideChar(CP_ACP, 0, CBCopyPtr, -1, NULL, 0);
+	CBCopyWideHandle = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * WideCharLength);
+	if (CBCopyWideHandle) {
+		CBCopyWidePtr = (LPWSTR)GlobalLock(CBCopyWideHandle);
+		MultiByteToWideChar(CP_ACP, 0, CBCopyPtr, -1, CBCopyWidePtr, WideCharLength);
+		GlobalUnlock(CBCopyWideHandle);
 	}
 
 	Empty = FALSE;
@@ -83,10 +96,15 @@ void CBClose()
 		EmptyClipboard();
 		if (! Empty) {
 			SetClipboardData(CF_TEXT, CBCopyHandle);
+			if (CBCopyWidePtr) {
+				SetClipboardData(CF_UNICODETEXT, CBCopyWideHandle);
+				CBCopyWidePtr = NULL;
+			}
 		}
 		CloseClipboard();
 	}
 	CBCopyHandle = NULL;
+	CBCopyWideHandle = NULL;
 }
 
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
@@ -111,7 +129,10 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	}
 
 	if (BuffSize==0) { // for clipboar
-		if (IsClipboardFormatAvailable(CF_TEXT)) {
+		if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+			Cf = CF_UNICODETEXT;
+		}
+		else if (IsClipboardFormatAvailable(CF_TEXT)) {
 			Cf = CF_TEXT;
 		}
 		else if (IsClipboardFormatAvailable(CF_OEMTEXT)) {
@@ -128,12 +149,39 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
 	CBDDE = FALSE;
+	CBWIDE = FALSE;
 	if (BuffSize==0) { //clipboard
 		if (OpenClipboard(HWin)) {
-			CBMemHandle = GetClipboardData(Cf);
-		}
-		if (CBMemHandle!=NULL) {
-			TalkStatus=IdTalkCB;
+			if (Cf == CF_UNICODETEXT) {
+				// 貼り付け処理では CBMemHandle ではなく dde と同じように CBMemPtr が使われる
+				HGLOBAL TmpHandle = GetClipboardData(Cf);
+				CBWIDE = TRUE;
+				if (TmpHandle) {
+					LPWSTR TmpPtr = (LPWSTR)GlobalLock(TmpHandle);
+					int mb_len = WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, 0, 0, NULL, NULL);
+
+					CBMemHandle = GlobalAlloc(GHND, mb_len);
+					if (CBMemHandle != NULL) {
+						CBMemPtr = GlobalLock(CBMemHandle);
+						if (CBMemPtr != NULL) {
+							WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, CBMemPtr, mb_len, NULL, NULL);
+
+							GlobalUnlock(CBMemHandle);
+							CBMemPtr=NULL;
+							TalkStatus=IdTalkCB;
+						}
+
+						GlobalUnlock(TmpHandle);
+						CloseClipboard();
+					}
+				}
+			}
+			else {
+				CBMemHandle = GetClipboardData(Cf);
+				if (CBMemHandle!=NULL) {
+					TalkStatus=IdTalkCB;
+				}
+			}
 		}
 	}
 	else { // dde
@@ -162,6 +210,9 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	HANDLE tmpHandle = NULL;
 	char *tmpPtr = NULL;
 	int len, hlen, flen, blen;
+	UINT Cf;
+	LPWSTR tmpPtrWide = NULL;
+	int mb_len;
 
 	if (! cv.Ready) {
 		return;
@@ -176,41 +227,81 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
 	CBDDE = TRUE;
+	CBWIDE = FALSE;
 
-	if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(HWin)) {
+	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(HWin)) {
+		Cf = CF_UNICODETEXT;
+		if ((tmpHandle = GetClipboardData(CF_UNICODETEXT)) == NULL) {
+			CloseClipboard();
+		}
+	}
+	else if (IsClipboardFormatAvailable(CF_TEXT) && OpenClipboard(HWin)) {
+		Cf = CF_TEXT;
 		if ((tmpHandle = GetClipboardData(CF_TEXT)) == NULL) {
 			CloseClipboard();
 		}
 	}
 	else if (IsClipboardFormatAvailable(CF_OEMTEXT) && OpenClipboard(HWin)) {
+		Cf = CF_OEMTEXT;
 		if ((tmpHandle = GetClipboardData(CF_OEMTEXT)) == NULL) {
 			CloseClipboard();
 		}
 	}
 
-	if (tmpHandle) {
-		if ((tmpPtr = GlobalLock(tmpHandle)) != NULL) {
-			hlen = strlen(header);
-			flen = strlen(footer);
-			len = strlen(tmpPtr);
-			blen = (len + 2) / 3 * 4 + hlen + flen + 1;
-			if ((CBMemHandle = GlobalAlloc(GHND, blen)) != NULL) {
-				if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
-					if (hlen > 0) {
-						strncpy_s(CBMemPtr, blen, header, _TRUNCATE);
+	if (Cf == CF_UNICODETEXT) {
+		if (tmpHandle) {
+			if ((tmpPtrWide = GlobalLock(tmpHandle)) != NULL) {
+				hlen = strlen(header);
+				flen = strlen(footer);
+				mb_len = WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, 0, 0, NULL, NULL);
+				blen = (mb_len + 2) / 3 * 4 + hlen + flen + 1;
+				if ((CBMemHandle = GlobalAlloc(GHND, blen)) != NULL) {
+					if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+						if (hlen > 0) {
+							strncpy_s(CBMemPtr, blen, header, _TRUNCATE);
+						}
+						tmpPtr = (char *)calloc(sizeof(char), mb_len);
+						WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, tmpPtr, mb_len, NULL, NULL);
+						b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, mb_len);
+						free(tmpPtr);
+						if (flen > 0) {
+							strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
+						}
+						TalkStatus=IdTalkCB;
+						GlobalUnlock(CBMemPtr);
+						CBMemPtr = NULL;
 					}
-					b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, len);
-					if (flen > 0) {
-						strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
-					}
-					TalkStatus=IdTalkCB;
-					GlobalUnlock(CBMemPtr);
-					CBMemPtr = NULL;
 				}
+				GlobalUnlock(tmpPtrWide);
 			}
-			GlobalUnlock(tmpPtr);
+			CloseClipboard();
 		}
-		CloseClipboard();
+	}
+	else {
+		if (tmpHandle) {
+			if ((tmpPtr = GlobalLock(tmpHandle)) != NULL) {
+				hlen = strlen(header);
+				flen = strlen(footer);
+				len = strlen(tmpPtr);
+				blen = (len + 2) / 3 * 4 + hlen + flen + 1;
+				if ((CBMemHandle = GlobalAlloc(GHND, blen)) != NULL) {
+					if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+						if (hlen > 0) {
+							strncpy_s(CBMemPtr, blen, header, _TRUNCATE);
+						}
+						b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, len);
+						if (flen > 0) {
+							strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
+						}
+						TalkStatus=IdTalkCB;
+						GlobalUnlock(CBMemPtr);
+						CBMemPtr = NULL;
+					}
+				}
+				GlobalUnlock(tmpPtr);
+			}
+			CloseClipboard();
+		}
 	}
 
 	CBRetrySend = FALSE;
@@ -234,6 +325,7 @@ void CBStartEcho(PCHAR DataPtr, int DataSize)
 	CBMemPtr2 = 0;
 	CBRetryEcho = FALSE;
 	CBSendCR = FALSE;
+	CBWIDE = FALSE;
 
 	CBDDE = TRUE;
 	if ((CBMemHandle = GlobalAlloc(GHND, DataSize)) != NULL) {
@@ -438,15 +530,16 @@ void CBEndPaste()
 		if (CBMemPtr!=NULL) {
 			GlobalUnlock(CBMemHandle);
 		}
-		if (CBDDE) {
+		if (CBDDE || CBWIDE) {
 			GlobalFree(CBMemHandle);
 		}
 	}
-	if (!CBDDE) {
+	if (!CBDDE && !CBWIDE) {
 		CloseClipboard();
 	}
 
 	CBDDE = FALSE;
+	CBWIDE = FALSE;
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
@@ -589,6 +682,9 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 					int len = SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXTLENGTH, 0, 0);
 					HGLOBAL hMem;
 					char *buf;
+					int wide_len;
+					HGLOBAL wide_hMem;
+					LPWSTR wide_buf;
 
 					if (OpenClipboard(hDlgWnd) != 0) {
 						hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
@@ -596,8 +692,19 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, len + 1, (LPARAM)buf);
 						GlobalUnlock(hMem);
 
+						wide_len = MultiByteToWideChar(CP_ACP, 0, buf, -1, NULL, 0);
+						wide_hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
+						if (wide_hMem) {
+							wide_buf = (LPWSTR)GlobalLock(wide_hMem);
+							MultiByteToWideChar(CP_ACP, 0, buf, -1, wide_buf, wide_len);
+							GlobalUnlock(wide_hMem);
+						}
+
 						EmptyClipboard();
 						SetClipboardData(CF_TEXT, hMem);
+						if (wide_buf) {
+							SetClipboardData(CF_UNICODETEXT, wide_hMem);
+						}
 						CloseClipboard();
 						// hMemはクリップボードが保持しているので、破棄してはいけない。
 					}
@@ -750,6 +857,9 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	int pos;
 	int ret = 0;
 	BOOL confirm = FALSE;
+	HANDLE wide_hText;
+	LPWSTR wide_buf;
+	int mb_len;
 
 	if (ts.ConfirmChangePaste == 0)
 		return 1;
@@ -759,7 +869,9 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	if (TalkStatus!=IdTalkKeyb)
 		goto error;
 
-	if (IsClipboardFormatAvailable(CF_TEXT))
+	if (IsClipboardFormatAvailable(CF_UNICODETEXT))
+		Cf = CF_UNICODETEXT;
+	else if (IsClipboardFormatAvailable(CF_TEXT))
 		Cf = CF_TEXT;
 	else if (IsClipboardFormatAvailable(CF_OEMTEXT))
 		Cf = CF_OEMTEXT;
@@ -769,55 +881,72 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	if (!OpenClipboard(HWin)) 
 		goto error;
 
-	hText = GetClipboardData(Cf);
-
-	if (hText != NULL) {
-		pText = (char *)GlobalLock(hText);
-		if (AddCR) {
-			if (ts.ConfirmChangePasteCR) {
-				confirm = TRUE;
-			}
+	if (Cf == CF_UNICODETEXT) {
+		wide_hText = GetClipboardData(CF_UNICODETEXT);
+		if (wide_hText != NULL) {
+			wide_buf = GlobalLock(wide_hText);
+			mb_len = WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, NULL, 0, NULL, NULL);
+			ClipboardPtr = (char *)calloc(sizeof(char), mb_len);
+			WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, ClipboardPtr, mb_len, NULL, NULL);
+			GlobalUnlock(wide_hText);
 		}
 		else {
-			pos = strcspn(pText, "\r\n");  // 改行が含まれていたら
-			if (pText[pos] != '\0' || AddCR) {
-				confirm = TRUE;
-			}
+			CloseClipboard();
+			goto error;
 		}
-
-		// 辞書をサーチする
-		if (!confirm && search_clipboard(ts.ConfirmChangePasteStringFile, pText)) {
-			confirm = TRUE;
-		}
-
-		if (confirm) {
+	}
+	else {
+		hText = GetClipboardData(Cf);
+		if (hText != NULL) {
+			pText = (char *)GlobalLock(hText);
 			ClipboardPtr = (char *)calloc(sizeof(char), strlen(pText)+1);
 			memcpy(ClipboardPtr, pText, strlen(pText));
 			GlobalUnlock(hText);
-			CloseClipboard();
-			PasteCanceled = 0;
-			ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-			                HVTWin, (DLGPROC)OnClipboardDlgProc);
-			free(ClipboardPtr);
-			if (ret == 0 || ret == -1) {
-				ret = GetLastError();
-			}
-
-			if (PasteCanceled) {
-				ret = 0;
-				goto error;
-			}
-
 		}
 		else {
-			GlobalUnlock(hText);
 			CloseClipboard();
+			goto error;
 		}
+	}
+	CloseClipboard();
 
-		ret = 1;
-
+	if (AddCR) {
+		if (ts.ConfirmChangePasteCR) {
+			confirm = TRUE;
+		}
+	}
+	else {
+		pos = strcspn(ClipboardPtr, "\r\n");  // 改行が含まれていたら
+		if (ClipboardPtr[pos] != '\0' || AddCR) {
+			confirm = TRUE;
+		}
 	}
 
+	// 辞書をサーチする
+	if (!confirm && search_clipboard(ts.ConfirmChangePasteStringFile, ClipboardPtr)) {
+		confirm = TRUE;
+	}
+
+	if (confirm) {
+		PasteCanceled = 0;
+		ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
+		                HVTWin, (DLGPROC)OnClipboardDlgProc);
+		if (ret == 0 || ret == -1) {
+			ret = GetLastError();
+		}
+
+		if (PasteCanceled) {
+			ret = 0;
+			goto error;
+		}
+	}
+
+	ret = 1;
+
 error:
+	if (ClipboardPtr != NULL) {
+		free(ClipboardPtr);
+		ClipboardPtr = NULL;
+	}
 	return (ret);
 }
