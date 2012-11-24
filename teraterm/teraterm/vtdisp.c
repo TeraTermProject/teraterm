@@ -3771,3 +3771,30 @@ void DispGetRootWinSize(int *x, int *y)
 
 	return;
 }
+
+int DispFindClosestColor(int red, int green, int blue)
+{
+	int i, color, diff_r, diff_g, diff_b, diff, min;
+	char buff[1024];
+
+
+	min = 0xfffffff;
+	color = 0;
+
+	for (i=0; i<256; i++) {
+		diff_r = red - GetRValue(ANSIColor[i]);
+		diff_g = green - GetGValue(ANSIColor[i]);
+		diff_b = blue - GetBValue(ANSIColor[i]);
+		diff = diff_r * diff_r + diff_g * diff_g + diff_b * diff_b;
+
+		if (diff < min) {
+			min = diff;
+			color = i;
+		}
+	}
+
+	if ((ts.ColorFlag & CF_FULLCOLOR) != 0 && color < 16 && (color & 7) != 0) {
+		color ^= 8;
+	}
+	return color;
+}

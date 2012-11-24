@@ -44,8 +44,9 @@ void ParseFirst(BYTE b);
 #define ModeDLE   7
 #define ModeCAN   8
 
-#define NParamMax 16
-#define IntCharMax 5
+#define NParamMax  16
+#define NSParamMax 16
+#define IntCharMax  5
 
 /* DEC Locator Flag */
 #define DecLocatorOneShot    1
@@ -97,7 +98,8 @@ static int  EUCcount;
 static BOOL Special;
 
 static int Param[NParamMax+1];
-static int NParam;
+static int SubParam[NParamMax+1][NSParamMax+1];
+static int NParam, NSParam[NParamMax+1];
 static BOOL FirstPrm;
 static BYTE IntChar[IntCharMax+1];
 static int ICount;
@@ -157,6 +159,15 @@ static char *OSCStrBuff;
 static unsigned int OSCStrBuffSize;
 
 static _locale_t CLocale = NULL;
+
+void ClearParams()
+{
+    ICount = 0;
+    NParam = 1;
+    NSParam[1] = 0;
+    Param[1] = 0;
+    Prv = 0;
+}
 
 void ResetSBuffer(PStatusBuff sbuff)
 {
@@ -811,11 +822,8 @@ void PrnParseControl(BYTE b) // printer mode
 	PutChar(b); /* Disp C1 char in VT100 mode */
 	return;
       }
-      ICount = 0;
+      ClearParams();
       FirstPrm = TRUE;
-      NParam = 1;
-      Param[1] = 0;
-      Prv = 0;
       ParseMode = ModeCSI;
       WriteToPrnFile(0,TRUE); // flush prn buff
       WriteToPrnFile(b,FALSE);
@@ -983,11 +991,8 @@ void ParseControl(BYTE b)
       SSflag = TRUE;
       break;
     case DCS:
+      ClearParams();
       ESCFlag = FALSE;
-      ICount = 0;
-      NParam = 1;
-      Param[1] = 0;
-      Prv = 0;
       ParseMode = ModeDCS;
       break;
     case SOS:
@@ -995,15 +1000,12 @@ void ParseControl(BYTE b)
       ParseMode = ModeSOS;
       break;
     case CSI:
-      ICount = 0;
+      ClearParams();
       FirstPrm = TRUE;
-      NParam = 1;
-      Param[1] = 0;
-      Prv = 0;
       ParseMode = ModeCSI;
       break;
     case OSC:
-      Param[1] = 0;
+      ClearParams();
       ParseMode = ModeXS;
       break;
     case PM:
@@ -1226,11 +1228,8 @@ void PrnParseEscape(BYTE b) // printer mode
     case 0:
       switch (b) {
 	case '[': /* CSI */
-	  ICount = 0;
+	  ClearParams();
 	  FirstPrm = TRUE;
-	  NParam = 1;
-	  Param[1] = 0;
-	  Prv = 0;
 	  WriteToPrnFile(ESC,FALSE);
 	  WriteToPrnFile('[',FALSE);
 	  ParseMode = ModeCSI;
@@ -1329,28 +1328,25 @@ void ParseEscape(BYTE b) /* b is the final char */
 	  SSflag = TRUE;
 	  break;
 	case 'P': /* DCS */
+	  ClearParams();
 	  ESCFlag = FALSE;
-	  NParam = 1;
-	  Param[1] = 0;
 	  ParseMode = ModeDCS;
 	  return;
 	case 'X': /* SOS */
 	  ESCFlag = FALSE;
 	  ParseMode = ModeSOS;
 	  return;
-	case 'Z': AnswerTerminalType(); break;
+	case 'Z': /* DECID */
+	  AnswerTerminalType();
+	  break;
 	case '[': /* CSI */
-	  ICount = 0;
+	  ClearParams();
 	  FirstPrm = TRUE;
-	  NParam = 1;
-	  Param[1] = 0;
-	  Prv = 0;
 	  ParseMode = ModeCSI;
 	  return;
 	case '\\': break; /* ST */
 	case ']': /* XTERM sequence (OSC) */
-	  NParam = 1;
-	  Param[1] = 0;
+	  ClearParams();
 	  ParseMode = ModeXS;
 	  return;
 	case '^':
@@ -1841,7 +1837,7 @@ void CSQSelScreenErase()
 
 void CSSetAttr()		// SGR
 {
-	int i, P;
+	int i, j, P, r, g, b, color;
 
 	UpdateStr();
 	for (i=1 ; i<=NParam ; i++)
@@ -1913,12 +1909,74 @@ void CSSetAttr()		// SGR
 			break;
 
 		case  38:	/* text color (256color mode) */
-			if ((ts.ColorFlag & CF_XTERM256) && i < NParam && Param[i+1] == 5) {
-				i++;
-				if (i < NParam) {
-					P = Param[++i];
+			if (ts.ColorFlag & CF_XTERM256) {
+				/*
+				 * Change foreground color. accept following formats.
+				 *
+				 * 38 ; 2 ; r ; g ; b
+				 * 38 ; 2 : r : g : b
+				 * 38 : 2 : r : g : b
+				 * 38 ; 5 ; idx
+				 * 38 ; 5 : idx
+				 * 38 : 5 : idx
+				 *
+				 */
+				color = -1;
+				j = 0;
+				if (NSParam[i] > 0) {
+					P = SubParam[i][1];
+					j++;
+				}
+				else if (i < NParam) {
+					P = Param[i+1];
+					if (P == 2 || P == 5) {
+						i++;
+					}
+				}
+				switch (P) {
+				case 2:
+					r = g = b = 0;
+					if (NSParam[i] > 0) {
+						if (j < NSParam[i]) {
+							r = SubParam[i][++j];
+							if (j < NSParam[i]) {
+								g = SubParam[i][++j];
+							}
+							if (j < NSParam[i]) {
+								b = SubParam[i][++j];
+							}
+							color = DispFindClosestColor(r, g, b);
+						}
+					}
+					else if (i < NParam && NSParam[i+1] > 0) {
+						r = Param[++i];
+						g = SubParam[i][1];
+						if (NSParam[i] > 1) {
+							b = SubParam[i][2];
+						}
+						color = DispFindClosestColor(r, g, b);
+					}
+					else if (i+2 < NParam) {
+						r = Param[++i];
+						g = Param[++i];
+						b = Param[++i];
+						color = DispFindClosestColor(r, g, b);
+					}
+					break;
+				case 5:
+					if (NSParam[i] > 0) {
+						if (j < NSParam[i]) {
+							color = SubParam[i][++j];
+						}
+					}
+					else if (i < NParam) {
+						color = Param[++i];
+					}
+					break;
+				}
+				if (color >= 0) {
 					CharAttr.Attr2 |= Attr2Fore;
-					CharAttr.Fore = P;
+					CharAttr.Fore = color;
 					BuffSetCurCharAttr(CharAttr);
 				}
 			}
@@ -1944,12 +2002,63 @@ void CSSetAttr()		// SGR
 			break;
 
 		case  48:	/* Back color (256color mode) */
-			if ((ts.ColorFlag & CF_XTERM256) && i < NParam && Param[i+1] == 5) {
-				i++;
-				if (i < NParam) {
-					P = Param[++i];
+			if (ts.ColorFlag & CF_XTERM256) {
+				color = -1;
+				j = 0;
+				if (NSParam[i] > 0) {
+					P = SubParam[i][1];
+					j++;
+				}
+				else if (i < NParam) {
+					P = Param[i+1];
+					if (P == 2 || P == 5) {
+						i++;
+					}
+				}
+				switch (P) {
+				case 2:
+					r = g = b = 0;
+					if (NSParam[i] > 0) {
+						if (j < NSParam[i]) {
+							r = SubParam[i][++j];
+							if (j < NSParam[i]) {
+								g = SubParam[i][++j];
+							}
+							if (j < NSParam[i]) {
+								b = SubParam[i][++j];
+							}
+							color = DispFindClosestColor(r, g, b);
+						}
+					}
+					else if (i < NParam && NSParam[i+1] > 0) {
+						r = Param[++i];
+						g = SubParam[i][1];
+						if (NSParam[i] > 1) {
+							b = SubParam[i][2];
+						}
+						color = DispFindClosestColor(r, g, b);
+					}
+					else if (i+2 < NParam) {
+						r = Param[++i];
+						g = Param[++i];
+						b = Param[++i];
+						color = DispFindClosestColor(r, g, b);
+					}
+					break;
+				case 5:
+					if (NSParam[i] > 0) {
+						if (j < NSParam[i]) {
+							color = SubParam[i][++j];
+						}
+					}
+					else if (i < NParam) {
+						color = Param[++i];
+					}
+					break;
+				}
+				if (color >= 0) {
 					CharAttr.Attr2 |= Attr2Back;
-					CharAttr.Back = P;
+					CharAttr.Back = color;
 					BuffSetCurCharAttr(CharAttr);
 				}
 			}
@@ -3021,14 +3130,27 @@ void ControlSequence(BYTE b)
     }
     else if ((b>=0x30) && (b<=0x39))
     {
-      Param[NParam] = Param[NParam]*10 + b - 0x30;
+      if (NSParam[NParam] > 0) {
+	SubParam[NParam][NSParam[NParam]] = SubParam[NParam][NSParam[NParam]]*10 + b - 0x30;
+      }
+      else {
+	Param[NParam] = Param[NParam]*10 + b - 0x30;
+      }
+    }
+    else if (b==0x3A)
+    { /* ':' Subparameter delimiter */
+      if (NSParam[NParam] < NSParamMax) {
+	NSParam[NParam]++;
+	SubParam[NParam][NSParam[NParam]] = 0;
+      }
     }
     else if (b==0x3B)
-    {
+    { /* ';' Parameter delimiter */
       if (NParam < NParamMax)
       {
 	NParam++;
 	Param[NParam] = 0;
+	NSParam[NParam] = 0;
       }
     }
     else if ((b>=0x3C) && (b<=0x3F))
