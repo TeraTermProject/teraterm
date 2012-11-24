@@ -1,27 +1,27 @@
 #define AppName "Tera Term"
-#define AppVer "4.75"
+#define AppVer "4.76-RC1"
 #define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
 
 [InnoIDE_PostCompile]
 Name: makearchive.bat; Parameters: release
 
 [PreCompile]
 Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
 
 [PostCompile]
 Name: makearchive.bat; Parameters: release
 
 [_ISToolPreCompile]
 Name: makechm.bat
-Name: build.bat
-;Name: build.bat; Parameters: rebuild
+;Name: build.bat
+Name: build.bat; Parameters: rebuild
 
 [_ISToolPostCompile]
 Name: makearchive.bat; Parameters: release
