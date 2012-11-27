@@ -1974,7 +1974,7 @@ void CSSetAttr()		// SGR
 					}
 					break;
 				}
-				if (color >= 0) {
+				if (color >= 0 && color < 256) {
 					CharAttr.Attr2 |= Attr2Fore;
 					CharAttr.Fore = color;
 					BuffSetCurCharAttr(CharAttr);
@@ -2056,7 +2056,7 @@ void CSSetAttr()		// SGR
 					}
 					break;
 				}
-				if (color >= 0) {
+				if (color >= 0 && color < 256) {
 					CharAttr.Attr2 |= Attr2Back;
 					CharAttr.Back = color;
 					BuffSetCurCharAttr(CharAttr);

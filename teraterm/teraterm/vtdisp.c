@@ -3777,9 +3777,11 @@ int DispFindClosestColor(int red, int green, int blue)
 	int i, color, diff_r, diff_g, diff_b, diff, min;
 	char buff[1024];
 
-
 	min = 0xfffffff;
 	color = 0;
+
+	if (red < 0 || red > 255 || green < 0 || green > 255 || blue < 0 || blue > 255)
+		return -1;
 
 	for (i=0; i<256; i++) {
 		diff_r = red - GetRValue(ANSIColor[i]);
