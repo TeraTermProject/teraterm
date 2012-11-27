@@ -741,7 +741,15 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
 <tr><td>35</td>		<td>Set foreground color to Magenta. (Color No. 5)</td></tr>
 <tr><td>36</td>		<td>Set foreground color to Cyan. (Color No. 6)</td></tr>
 <tr><td>37</td>		<td>Set foreground color to White. (Color No. 7)</td></tr>
-<tr><td>38 ; 5 ; <i>Ps</i></td>	<td>Set foreground color to color number <i>Ps</i>.</td></tr>
+<tr><td>38 ; 2 ; <i>r</i> ; <i>g</i> ; <i>b</i><br>
+	38 ; 2 ; <i>r</i> : <i>g</i> : <i>b</i><br>
+	38 ; 2 : <i>r</i> : <i>g</i> : <i>b</i><br>
+	38 : 2 : <i>r</i> : <i>g</i> : <i>b</i></td>
+			<td>Set foreground color in RGB value, matching closest entry in 256 colors palette.</td></tr>
+<tr><td>38 ; 5 ; <i>Ps</i><br>
+	38 ; 5 : <i>Ps</i><br>
+	38 : 5 : <i>Ps</i></td>
+			<td>Set foreground color to color number <i>Ps</i>.</td></tr>
 <tr><td>39</td>		<td>Set foreground color to default.</td></tr>
 
 <tr><td>40</td>		<td>Set background color to Black. (Color No. 0)</td></tr>
@@ -752,7 +760,15 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
 <tr><td>45</td>		<td>Set background color to Magenta. (Color No. 5)</td></tr>
 <tr><td>46</td>		<td>Set background color to Cyan. (Color No. 6)</td></tr>
 <tr><td>47</td>		<td>Set background color to White. (Color No. 7)</td></tr>
-<tr><td>48 ; 5 ; <i>Ps</i></td>	<td>Set background color to color number <i>Ps</i>.</td></tr>
+<tr><td>48 ; 2 ; <i>r</i> ; <i>g</i> ; <i>b</i><br>
+	48 ; 2 ; <i>r</i> : <i>g</i> : <i>b</i><br>
+	48 ; 2 : <i>r</i> : <i>g</i> : <i>b</i><br>
+	48 : 2 : <i>r</i> : <i>g</i> : <i>b</i></td>
+			<td>Set background color in RGB value, matching closest entry in 256 colors palette.</td></tr>
+<tr><td>48 ; 5 ; <i>Ps</i><br>
+	48 ; 5 : <i>Ps</i><br>
+	48 : 5 : <i>Ps</i></td>
+			<td>Set background color to color number <i>Ps</i>.</td></tr>
 <tr><td>49</td>		<td>Set background color to Black.</td></tr>
 
 <tr><td>90</td>		<td>Set foreground color to Gray. (Color No. 8)</td></tr>
