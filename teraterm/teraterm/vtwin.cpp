@@ -2654,7 +2654,6 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	char e = ESC;
 	char Code;
 	unsigned int i;
-	static int origHideTitle = -1;
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
 	// ALT + xÇâüâ∫Ç∑ÇÈÇ∆ WM_SYSCHAR Ç™îÚÇÒÇ≈Ç≠ÇÈÅB
@@ -2662,18 +2661,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	if ((nFlags&0x2000) != 0 && nChar == CR) {
 		if (IsZoomed()) { // window is maximum
 			ShowWindow(SW_RESTORE);
-			if (origHideTitle != -1 && ts.HideTitle != origHideTitle) {
-				ts.HideTitle = origHideTitle;
-				ChangeWin();
-			}
-			origHideTitle = -1;
 		} else {
-			if (origHideTitle == -1 && ts.HideTitle == 0) {
-				origHideTitle = ts.HideTitle;
-				ts.HideTitle = 1;
-				OnChangeMenu(0, NULL);
-				OnChangeTBar(0, NULL);
-			}
 			ShowWindow(SW_MAXIMIZE);
 		}
 	}
