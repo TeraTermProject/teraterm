@@ -35,19 +35,19 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li><a href="../setup/teraterm-win.html#WindowIcon">VTIcon, TEKIcon の設定</a>をteraterm.iniに保存しないようにした。</li>
-      <li>特殊フォルダの取得方法をレジストリ読み込みからSH系APIに変更した。</li>
-      <li>Save setupで ini ファイルの保存に失敗したら、エラーメッセージを表示するようにした。</li>
       <li><a href="ctrlseq.html#charattr">SGR 38:2, 48:2</a>(RGB値指定での文字色/背景色変更)に対応した。現在の実装では256色パレットで最も近い色が使われる。</li>
       <li><a href="ctrlseq.html#charattr">SGR 38:5, 48:5</a>(256色パレット指定での文字色/背景色変更)で、: 区切りに対応した。(ISO/IEC 8613-6 (ITU-T Rec. T.416) 形式)</li>
+      <li>特殊フォルダの取得方法をレジストリ読み込みからSH系APIに変更した。</li>
+      <li><a href="../setup/teraterm-win.html#WindowIcon">VTIcon, TEKIcon の設定</a>をteraterm.iniに保存しないようにした。</li>
+      <li>Save setupで ini ファイルの保存に失敗したら、エラーメッセージを表示するようにした。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
+      <li><a href="ctrlseq.html#charattr">SGR 38:5, 48:5</a>(256色パレット指定での文字色/背景色変更)で、範囲外のパレット番号指定を無視できていなかった問題を修正した。</li>
       <li>キーボードレイアウトによってクリップボードへコピー・貼り付けされる文字が化ける問題を修正した。</li>
       <li>マクロコマンド <a href="../macro/command/strreplace.html">strreplace</a> で、システム変数 'matchstr', 'groupmatchstr1'～'groupmatchstr9' を渡すと落ちる事がある問題を修正した。</li>
-      <li><a href="ctrlseq.html#charattr">SGR 38:5, 48:5</a>(256色パレット指定での文字色/背景色変更)で、範囲外のパレット番号指定を無視できていなかった問題を修正した。</li>
     </ul>
   </li>
 
@@ -1958,9 +1958,9 @@
   <li>変更
     <ul>
       <li>RFC6668(OpenSSH 6.1)で削除されたため、SSH2 の MAC アルゴリズムで hmac-sha2-256-96, hmac-sha2-512-96 のサポートを廃止した。</li>
+      <li>PuTTY 形式および SECSH(ssh.com) 形式の SSH2 秘密鍵に対応した。</li>
       <li>SSH Forwardingダイアログのポート番号のサービス名を追加した。</li>
       <li>SSHプロトコルでは正式にサポートしているのは1024ビットであるため、<a href="../menu/setup-sshkeygenerator.html">SSH 鍵生成</a>で、DSA 鍵の鍵長を 1024 ビット固定に変更した。</li>
-      <li>PuTTY 形式および SECSH(ssh.com) 形式の SSH2 秘密鍵に対応した。</li>
       <li>TTSSHのアイコンを緑色に変更した</li>
     </ul>
   </li>
