@@ -301,6 +301,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ttsecure_yellow.ico"
+			>
+		</File>
+		<File
 			RelativePath="ttxssh.c"
 			>
 		</File>
