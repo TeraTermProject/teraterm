@@ -361,16 +361,16 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						if ( ts->TerminalWidth<1 ) {
 							ts->TerminalWidth = 1;
 						}
-						if ( ts->TerminalWidth>500 ) {
-							ts->TerminalWidth = 500;
+						if ( ts->TerminalWidth>TermWidthMax ) {
+							ts->TerminalWidth = TermWidthMax;
 						}
 
 						ts->TerminalHeight = GetDlgItemInt(Dialog,IDC_TERMHEIGHT,NULL,FALSE);
 						if ( ts->TerminalHeight<1 ) {
 							ts->TerminalHeight = 1;
 						}
-						if ( ts->TerminalHeight>500 ) {
-							ts->TerminalHeight = 500;
+						if ( ts->TerminalHeight>TermHeightMax ) {
+							ts->TerminalHeight = TermHeightMax;
 						}
 
 						GetRB(Dialog,&ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);

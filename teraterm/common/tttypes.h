@@ -605,7 +605,7 @@ typedef struct tttset TTTSet, *PTTSet;
 
 // ‰¡•‚ÌÅ‘å’l‚ğ300‚©‚ç500‚É•ÏX (2008.2.15 maya)
 #define TermWidthMax  500
-#define TermHeightMax 200
+#define TermHeightMax 500
 
   /* Cursor shapes */
 #define IdBlkCur 1
