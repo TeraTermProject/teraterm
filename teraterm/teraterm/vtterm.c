@@ -2812,6 +2812,36 @@ void CSSetAttr()		// SGR
   void CSDol(BYTE b)
   {
     switch (b) {
+      case 'v': // DECCRA
+	if (Param[1] < 1 || NParam < 1) Param[1] = 1;
+	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+	if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
+	if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
+	if (Param[5] < 1 || NParam < 5) Param[5] = 1;
+	if (Param[6] < 1 || NParam < 6) Param[6] = 1;
+	if (Param[7] < 1 || NParam < 7) Param[7] = 1;
+	if (Param[8] < 1 || NParam < 8) Param[8] = 1;
+	if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
+	  if (RelativeOrgMode) {
+	    Param[1] += CursorTop;
+	    if (Param[1] > CursorBottom) {
+	      Param[1] = CursorBottom + 1;
+	    }
+	    Param[3] += CursorTop;
+	    if (Param[3] > CursorBottom) {
+	      Param[3] = CursorBottom + 1;
+	    }
+	    Param[6] += CursorTop;
+	    if (Param[6] > CursorBottom) {
+	      Param[6] = CursorBottom + 1;
+	    }
+	    if (Param[6] + Param[3] - Param[1] > CursorBottom) {
+	      Param[3] = Param[1] + CursorBottom - Param[6] + 1;
+	    }
+	  }
+	  BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
+	}
+	break;
       case 'z': // DECERA
       case '{': // DECSERA
 	if (Param[1] < 1 || NParam < 1) Param[1]=1;

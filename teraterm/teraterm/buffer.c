@@ -962,6 +962,86 @@ void BuffEraseBox
 	BuffUpdateRect(XStart,YStart,XEnd,YEnd);
 }
 
+void BuffCopyBox(
+	int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int SrcPage,
+	int DstX, int DstY, int DstPage)
+{
+	int i, C, L;
+	LONG SPtr, DPtr;
+
+	SrcXStart--;
+	SrcYStart--;
+	SrcXEnd--;
+	SrcYEnd--;
+	SrcPage--;
+	DstX--;
+	DstY--;
+	DstPage--;
+
+	if (SrcXEnd > NumOfColumns - 1) {
+		SrcXEnd = NumOfColumns-1;
+	}
+	if (SrcYEnd > NumOfLines-1-StatusLine) {
+		SrcYEnd = NumOfColumns-1;
+	}
+	if (SrcXStart > SrcXEnd ||
+	    SrcYStart > SrcYEnd ||
+	    DstX > NumOfColumns-1 ||
+	    DstY > NumOfLines-1-StatusLine) {
+		return;
+	}
+
+	C = SrcXEnd - SrcXStart + 1;
+	if (DstX + C > NumOfColumns) {
+		C = NumOfColumns - DstX;
+	}
+	L = SrcYEnd - SrcYStart + 1;
+	if (DstY + C > NumOfColumns) {
+		C = NumOfColumns - DstX;
+	}
+
+	if (SrcXStart > DstX) {
+		SPtr = GetLinePtr(PageStart+SrcYStart);
+		DPtr = GetLinePtr(PageStart+DstY);
+		for (i=0; i<L; i++) {
+			memcpy(&(CodeBuff[DPtr+DstX]), &(CodeBuff[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuff[DPtr+DstX]), &(AttrBuff[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuff2[DPtr+DstX]), &(AttrBuff2[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuffFG[DPtr+DstX]), &(AttrBuffFG[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuffBG[DPtr+DstX]), &(AttrBuffBG[SPtr+SrcXStart]), C);
+			SPtr = NextLinePtr(SPtr);
+			DPtr = NextLinePtr(DPtr);
+		}
+	}
+	else if (SrcXStart < DstX) {
+		SPtr = GetLinePtr(PageStart+SrcYEnd);
+		DPtr = GetLinePtr(PageStart+DstY+L-1);
+		for (i=L; i>0; i--) {
+			memcpy(&(CodeBuff[DPtr+DstX]), &(CodeBuff[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuff[DPtr+DstX]), &(AttrBuff[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuff2[DPtr+DstX]), &(AttrBuff2[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuffFG[DPtr+DstX]), &(AttrBuffFG[SPtr+SrcXStart]), C);
+			memcpy(&(AttrBuffBG[DPtr+DstX]), &(AttrBuffBG[SPtr+SrcXStart]), C);
+			SPtr = PrevLinePtr(SPtr);
+			DPtr = PrevLinePtr(DPtr);
+		}
+	}
+	else if (SrcYStart != DstY) {
+		SPtr = GetLinePtr(PageStart+SrcYStart);
+		DPtr = GetLinePtr(PageStart+DstY);
+		for (i=0; i<L; i++) {
+			memmove(&(CodeBuff[DPtr+DstX]), &(CodeBuff[SPtr+SrcXStart]), C);
+			memmove(&(AttrBuff[DPtr+DstX]), &(AttrBuff[SPtr+SrcXStart]), C);
+			memmove(&(AttrBuff2[DPtr+DstX]), &(AttrBuff2[SPtr+SrcXStart]), C);
+			memmove(&(AttrBuffFG[DPtr+DstX]), &(AttrBuffFG[SPtr+SrcXStart]), C);
+			memmove(&(AttrBuffBG[DPtr+DstX]), &(AttrBuffBG[SPtr+SrcXStart]), C);
+			SPtr = NextLinePtr(SPtr);
+			DPtr = NextLinePtr(DPtr);
+		}
+	}
+	BuffUpdateRect(DstX,DstY,DstX+C-1,DstY+L-1);
+}
+
 int LeftHalfOfDBCS(LONG Line, int CharPtr)
 // If CharPtr is on the right half of a DBCS character,
 // return pointer to the left half
