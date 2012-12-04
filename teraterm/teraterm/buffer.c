@@ -3487,7 +3487,7 @@ void BuffSelectedEraseScreen() {
 	BuffSelectedEraseCurToEnd();
 }
 
-void BuffSelectEraseBox
+void BuffSelectiveEraseBox
   (int XStart, int YStart, int XEnd, int YEnd)
 {
 	int C, i, j;

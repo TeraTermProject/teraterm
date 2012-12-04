@@ -77,7 +77,7 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count);
 void BuffSelectedEraseCurToEnd();
 void BuffSelectedEraseHomeToCur();
 void BuffSelectedEraseScreen();
-void BuffSelectEraseBox(int XStart, int YStart, int XEnd, int YEnd);
+void BuffSelectiveEraseBox(int XStart, int YStart, int XEnd, int YEnd);
 void BuffScrollLeft(int count);
 void BuffScrollRight(int count);
 int BuffGetCurrentLineData(char *buf, int bufsize);

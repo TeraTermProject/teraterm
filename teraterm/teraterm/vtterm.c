@@ -2886,7 +2886,7 @@ void CSSetAttr()		// SGR
 	  BuffEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
 	}
 	else {
-	  BuffSelectEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
+	  BuffSelectiveEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
 	}
 	break;
 
