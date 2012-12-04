@@ -962,6 +962,45 @@ void BuffEraseBox
 	BuffUpdateRect(XStart,YStart,XEnd,YEnd);
 }
 
+void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
+{
+	int Cols, i;
+	LONG Ptr;
+
+	if (XEnd>NumOfColumns-1) {
+		XEnd = NumOfColumns-1;
+	}
+	if (YEnd>NumOfLines-1-StatusLine) {
+		YEnd = NumOfLines-1-StatusLine;
+	}
+	if (XStart>XEnd) {
+		return;
+	}
+	if (YStart>YEnd) {
+		return;
+	}
+	Cols = XEnd-XStart+1;
+	Ptr = GetLinePtr(PageStart+YStart);
+	for (i=YStart; i<=YEnd; i++) {
+		if ((XStart>0) &&
+		    ((AttrBuff[Ptr+XStart-1] & AttrKanji) != 0)) {
+			CodeBuff[Ptr+XStart-1] = 0x20;
+			AttrBuff[Ptr+XStart-1] ^= AttrKanji;
+		}
+		if ((XStart+Cols<NumOfColumns) &&
+		    ((AttrBuff[Ptr+XStart+Cols-1] & AttrKanji) != 0)) {
+			CodeBuff[Ptr+XStart+Cols] = 0x20;
+		}
+		memset(&(CodeBuff[Ptr+XStart]), ch, Cols);
+		memset(&(AttrBuff[Ptr+XStart]), CurCharAttr.Attr, Cols);
+		memset(&(AttrBuff2[Ptr+XStart]), CurCharAttr.Attr2 & Attr2ColorMask, Cols);
+		memset(&(AttrBuffFG[Ptr+XStart]), CurCharAttr.Fore, Cols);
+		memset(&(AttrBuffBG[Ptr+XStart]), CurCharAttr.Back, Cols);
+		Ptr = NextLinePtr(Ptr);
+	}
+	BuffUpdateRect(XStart, YStart, XEnd, YEnd);
+}
+
 void BuffCopyBox(
 	int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int SrcPage,
 	int DstX, int DstY, int DstPage)

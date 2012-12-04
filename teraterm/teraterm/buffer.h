@@ -29,6 +29,7 @@ void BuffEraseChars(int Count);
 void BuffFillWithE();
 void BuffDrawLine(TCharAttr Attr, int Direction, int C);
 void BuffEraseBox(int XStart, int YStart, int XEnd, int YEnd);
+void BuffFillBox(char c, int XStart, int YStart, int XEnd, int YEnd);
 void BuffCopyBox(int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int SrcPage, int DstX, int DstY, int DstPage);
 void BuffCBCopy(BOOL Table);
 void BuffPrint(BOOL ScrollRegion);

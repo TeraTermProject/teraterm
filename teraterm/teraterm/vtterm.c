@@ -2842,6 +2842,30 @@ void CSSetAttr()		// SGR
 	  BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
 	}
 	break;
+      case 'x': // DECFRA
+	if (NParam < 1 || Param[1] < 32 || (Param[1] > 127 && Param[1] < 160) || Param[1] > 255) {
+	  return;
+	}
+	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+	if (Param[3] < 1 || NParam < 3) Param[3] = 1;
+	if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
+	if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
+	if (Param[2] > Param[4] || Param[3] > Param[5]) {
+	  return;
+	}
+	if (RelativeOrgMode) {
+	  Param[2] += CursorTop;
+	  if (Param[2] > CursorBottom) {
+	    Param[2] = CursorBottom + 1;
+	  }
+	  Param[4] += CursorTop;
+	  if (Param[4] > CursorBottom) {
+	    Param[4] = CursorBottom + 1;
+	  }
+	}
+	BuffFillBox(Param[1], Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
+	break;
+
       case 'z': // DECERA
       case '{': // DECSERA
 	if (Param[1] < 1 || NParam < 1) Param[1]=1;
