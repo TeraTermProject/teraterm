@@ -993,7 +993,7 @@ void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
 		}
 		memset(&(CodeBuff[Ptr+XStart]), ch, Cols);
 		memset(&(AttrBuff[Ptr+XStart]), CurCharAttr.Attr, Cols);
-		memset(&(AttrBuff2[Ptr+XStart]), CurCharAttr.Attr2 & Attr2ColorMask, Cols);
+		memset(&(AttrBuff2[Ptr+XStart]), CurCharAttr.Attr2, Cols);
 		memset(&(AttrBuffFG[Ptr+XStart]), CurCharAttr.Fore, Cols);
 		memset(&(AttrBuffBG[Ptr+XStart]), CurCharAttr.Back, Cols);
 		Ptr = NextLinePtr(Ptr);
