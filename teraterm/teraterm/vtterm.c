@@ -1835,64 +1835,66 @@ void CSQSelScreenErase()
     }
   }
 
-void CSSetAttr()		// SGR
+void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 {
 	int i, j, P, r, g, b, color;
+	TCharAttr dummy;
 
-	UpdateStr();
-	for (i=1 ; i<=NParam ; i++)
+	if (mask == NULL) {
+		mask = &dummy;
+	}
+
+	for (i=start ; i<=NParam ; i++)
 	{
 		P = Param[i];
 		switch (P) {
 		case   0:	/* Clear all */
-			if (CharAttr.Attr2 & Attr2Protect) {
-				CharAttr = DefCharAttr;
-				CharAttr.Attr2 |= Attr2Protect;
-			}
-			else {
-				CharAttr = DefCharAttr;
-			}
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr = DefCharAttr.Attr;
+			attr->Attr2 = DefCharAttr.Attr2 | (attr->Attr2&Attr2Protect);
+			attr->Fore = DefCharAttr.Fore;
+			attr->Back = DefCharAttr.Back;
+			mask->Attr = AttrSgrMask;
+			mask->Attr2 = Attr2ColorMask;
 			break;
 
 		case   1:	/* Bold */
-			CharAttr.Attr |= AttrBold;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr |= AttrBold;
+			mask->Attr |= AttrBold;
 			break;
 
 		case   4:	/* Under line */
-			CharAttr.Attr |= AttrUnder;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr |= AttrUnder;
+			mask->Attr |= AttrUnder;
 			break;
 
 		case   5:	/* Blink */
-			CharAttr.Attr |= AttrBlink;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr |= AttrBlink;
+			mask->Attr |= AttrBlink;
 			break;
 
 		case   7:	/* Reverse */
-			CharAttr.Attr |= AttrReverse;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr |= AttrReverse;
+			mask->Attr |= AttrReverse;
 			break;
 
 		case  22:	/* Bold off */
-			CharAttr.Attr &= ~ AttrBold;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr &= ~ AttrBold;
+			mask->Attr |= AttrBold;
 			break;
 
 		case  24:	/* Under line off */
-			CharAttr.Attr &= ~ AttrUnder;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr &= ~ AttrUnder;
+			mask->Attr |= AttrUnder;
 			break;
 
 		case  25:	/* Blink off */
-			CharAttr.Attr &= ~ AttrBlink;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr &= ~ AttrBlink;
+			mask->Attr |= AttrBlink;
 			break;
 
 		case  27:	/* Reverse off */
-			CharAttr.Attr &= ~ AttrReverse;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr &= ~ AttrReverse;
+			mask->Attr |= AttrReverse;
 			break;
 
 		case  30:
@@ -1903,9 +1905,9 @@ void CSSetAttr()		// SGR
 		case  35:
 		case  36:
 		case  37:	/* text color */
-			CharAttr.Attr2 |= Attr2Fore;
-			CharAttr.Fore = P - 30;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr2 |= Attr2Fore;
+			mask->Attr2 |= Attr2Fore;
+			attr->Fore = P - 30;
 			break;
 
 		case  38:	/* text color (256color mode) */
@@ -1975,17 +1977,17 @@ void CSSetAttr()		// SGR
 					break;
 				}
 				if (color >= 0 && color < 256) {
-					CharAttr.Attr2 |= Attr2Fore;
-					CharAttr.Fore = color;
-					BuffSetCurCharAttr(CharAttr);
+					attr->Attr2 |= Attr2Fore;
+					mask->Attr2 |= Attr2Fore;
+					attr->Fore = color;
 				}
 			}
 			break;
 
 		case  39:	/* Reset text color */
-			CharAttr.Attr2 &= ~ Attr2Fore;
-			CharAttr.Fore = AttrDefaultFG;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr2 &= ~ Attr2Fore;
+			mask->Attr2 |= Attr2Fore;
+			attr->Fore = AttrDefaultFG;
 			break;
 
 		case  40:
@@ -1996,9 +1998,9 @@ void CSSetAttr()		// SGR
 		case  45:
 		case  46:
 		case  47:	/* Back color */
-			CharAttr.Attr2 |= Attr2Back;
-			CharAttr.Back = P - 40;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr2 |= Attr2Back;
+			mask->Attr2 |= Attr2Back;
+			attr->Back = P - 40;
 			break;
 
 		case  48:	/* Back color (256color mode) */
@@ -2057,17 +2059,17 @@ void CSSetAttr()		// SGR
 					break;
 				}
 				if (color >= 0 && color < 256) {
-					CharAttr.Attr2 |= Attr2Back;
-					CharAttr.Back = color;
-					BuffSetCurCharAttr(CharAttr);
+					attr->Attr2 |= Attr2Back;
+					mask->Attr2 |= Attr2Back;
+					attr->Back = color;
 				}
 			}
 			break;
 
 		case  49:	/* Reset back color */
-			CharAttr.Attr2 &= ~ Attr2Back;
-			CharAttr.Back = AttrDefaultBG;
-			BuffSetCurCharAttr(CharAttr);
+			attr->Attr2 &= ~ Attr2Back;
+			mask->Attr2 |= Attr2Back;
+			attr->Back = AttrDefaultBG;
 			break;
 
 		case 90:
@@ -2079,19 +2081,19 @@ void CSSetAttr()		// SGR
 		case 96:
 		case 97:	/* aixterm style text color */
 			if (ts.ColorFlag & CF_AIXTERM16) {
-				CharAttr.Attr2 |= Attr2Fore;
-				CharAttr.Fore = P - 90 + 8;
-				BuffSetCurCharAttr(CharAttr);
+				attr->Attr2 |= Attr2Fore;
+				mask->Attr2 |= Attr2Fore;
+				attr->Fore = P - 90 + 8;
 			}
 			break;
 
 		case 100:
 			if (! (ts.ColorFlag & CF_AIXTERM16)) {
 				/* Reset text and back color */
-				CharAttr.Attr2 &= ~ (Attr2Fore | Attr2Back);
-				CharAttr.Fore = AttrDefaultFG;
-				CharAttr.Back = AttrDefaultBG;
-				BuffSetCurCharAttr(CharAttr);
+				attr->Attr2 &= ~ (Attr2Fore | Attr2Back);
+				mask->Attr2 |= Attr2ColorMask;
+				attr->Fore = AttrDefaultFG;
+				attr->Back = AttrDefaultBG;
 				break;
 			}
 			/* fall through to aixterm style back color */
@@ -2104,13 +2106,20 @@ void CSSetAttr()		// SGR
 		case 106:
 		case 107:	/* aixterm style back color */
 			if (ts.ColorFlag & CF_AIXTERM16) {
-				CharAttr.Attr2 |= Attr2Back;
-				CharAttr.Back = P - 100 + 8;
-				BuffSetCurCharAttr(CharAttr);
+				attr->Attr2 |= Attr2Back;
+				mask->Attr2 |= Attr2Back;
+				attr->Back = P - 100 + 8;
 			}
 			break;
 		}
 	}
+}
+
+void CSSetAttr()		// SGR
+{
+	UpdateStr();
+	ParseSGRParams(&CharAttr, NULL, 1);
+	BuffSetCurCharAttr(CharAttr);
 }
 
   void CSSetScrollRegion()
@@ -2811,7 +2820,42 @@ void CSSetAttr()		// SGR
 
   void CSDol(BYTE b)
   {
+    TCharAttr attr, mask;
+    attr = DefCharAttr;
+    mask = DefCharAttr;
+
     switch (b) {
+      case 'r': // DECCARA
+      case 't': // DECRARA
+	if (Param[1] < 1 || NParam < 1) Param[1] = 1;
+	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+	if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
+	if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
+	if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
+	  if (RelativeOrgMode) {
+	    Param[1] += CursorTop;
+	    if (Param[1] > CursorBottom) {
+	      Param[1] = CursorBottom + 1;
+	    }
+	    Param[3] += CursorTop;
+	    if (Param[3] > CursorBottom) {
+	      Param[3] = CursorBottom + 1;
+	    }
+	  }
+	}
+	ParseSGRParams(&attr, &mask, 5);
+	if (b == 'r') { // DECCARA
+	  attr.Attr &= AttrSgrMask;
+	  mask.Attr &= AttrSgrMask;
+	  attr.Attr2 &= Attr2ColorMask;
+	  mask.Attr2 &= Attr2ColorMask;
+	  BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
+	}
+	else { // DECRARA
+	  attr.Attr &= AttrSgrMask;
+	  BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
+	}
+	break;
       case 'v': // DECCRA
 	if (Param[1] < 1 || NParam < 1) Param[1] = 1;
 	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
