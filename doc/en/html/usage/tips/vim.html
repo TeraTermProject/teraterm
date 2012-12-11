@@ -163,6 +163,28 @@ inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
 
 
+<!--
+<h2><a name="TitleStack">ウィンドウタイトルを保存/復元する</a></h2>
+<p>
+Tera Term では xterm のウィンドウタイトル変更制御シーケンスに対応しています。
+例えば vim の場合、set title を実行するとウィンドウタイトルに現在開いているファイル名等の情報が表示されるようになります
+。<br>
+しかし vim はウィンドウタイトルの変更は出来ますが、元のタイトルが何であったか把握する事が出来ません。
+その為 vim の終了時に元のウィンドウタイトルに戻す事が出来ず、代わりに "Thanks for flying Vim" や "Vim を使ってくれてありがとう" というメッセージをウィンドウタイトルにセットして終了します。
+</p>
+
+<p>
+この問題は、ウィンドウタイトルの保存/復元機能を使う事で回避できます。
+.vimrc に以下の設定を追加すると、vim 起動時にウィンドウタイトルを保存し、終了時に保存したタイトルに復元するようになりま
+す。
+</p>
+
+<pre class="macro-example">
+let &amp;t_ti .= "\e[22;0t"
+let &amp;t_te .= "\e[23;0t"
+</pre>
+-->
+
 <h2><a name="withScreen">GNU Screen Notice</a></h2>
 <p>
 When the GNU Screen is used, an application on the screen sends the control sequence and the sequence will be abandoned because the screen can not support the sequence.
