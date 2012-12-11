@@ -107,6 +107,13 @@ static BYTE Prv;
 static int ParseMode;
 static int ChangeEmu;
 
+typedef struct tstack {
+    char *title;
+    struct tstack *next;
+} TStack;
+typedef TStack *PTStack;
+PTStack TitleStack = NULL;
+
 /* user defined keys */
 static BOOL WaitKeyId, WaitHi;
 
@@ -2150,6 +2157,7 @@ void CSSetAttr()		// SGR
   {
     int x, y, len;
     char Report[TitleBuffSize*2+10];
+    PTStack t;
 
     switch (Param[1]) {
       case 1: // De-iconify window
@@ -2299,6 +2307,44 @@ void CSSetAttr()		// SGR
 	    break;
 	}
         break;
+    case 22: // Push Title
+      if (NParam < 2) {
+	Param[2] = 0;
+      }
+      switch (Param[2]) {
+      case 0:
+      case 1:
+      case 2:
+	if (ts.AcceptTitleChangeRequest && (t=malloc(sizeof(TStack))) != NULL) {
+	  if ((t->title = _strdup(cv.TitleRemote)) != NULL) {
+	    t->next = TitleStack;
+	    TitleStack = t;
+	  }
+	  else {
+	    free(t);
+	  }
+	}
+	break;
+      }
+      break;
+    case 23: // Pop Title
+      if (NParam < 2) {
+	Param[2] = 0;
+      }
+      switch (Param[2]) {
+      case 0:
+      case 1:
+      case 2:
+	if (ts.AcceptTitleChangeRequest && TitleStack != NULL) {
+	  t = TitleStack;
+	  TitleStack = t->next;
+	  strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), t->title, _TRUNCATE);
+	  ChangeTitle();
+	  free(t->title);
+	  free(t);
+	}
+	break;
+      }
     }
   }
 
