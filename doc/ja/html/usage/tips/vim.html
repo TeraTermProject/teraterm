@@ -128,9 +128,9 @@ Tera Term ‚Å‚Í IME ‚Ìó‘Ô‚ğ§Œä‚·‚éˆ×‚Ì“Æ©‚Ì§ŒäƒV[ƒPƒ“ƒX‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·
 </p>
 
 <pre class="macro-example">
-let &t_SI .= "\e[&lt;r"
-let &t_EI .= "\e[&lt;s\e[&lt;0t"
-let &t_te .= "\e[&lt;0t\e[&lt;s"
+let &amp;t_SI .= "\e[&lt;r"
+let &amp;t_EI .= "\e[&lt;s\e[&lt;0t"
+let &amp;t_te .= "\e[&lt;0t\e[&lt;s"
 
 set timeoutlen=100
 </pre>
@@ -157,8 +157,8 @@ Tera Term ‚â xterm “™‚Ì’[––ƒGƒ~ƒ…ƒŒ[ƒ^‚Å‚ÍAESC ƒL[‚ª‰Ÿ‚³‚ê‚½‚É ESC (0x1b) ‚
 </p>
 
 <pre class="macro-example">
-let &t_SI .= "\e[?7727h"
-let &t_EI .= "\e[?7727l"
+let &amp;t_SI .= "\e[?7727h"
+let &amp;t_EI .= "\e[?7727l"
 inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
 

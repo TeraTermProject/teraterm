@@ -128,9 +128,9 @@ When below contents is be added in the .vimrc file, the IME status is off after 
 </p>
 
 <pre class="macro-example">
-let &t_SI .= "\e[&lt;r"
-let &t_EI .= "\e[&lt;s\e[&lt;0t"
-let &t_te .= "\e[&lt;0t\e[&lt;s"
+let &amp;t_SI .= "\e[&lt;r"
+let &amp;t_EI .= "\e[&lt;s\e[&lt;0t"
+let &amp;t_te .= "\e[&lt;0t\e[&lt;s"
 
 set timeoutlen=100
 </pre>
@@ -157,8 +157,8 @@ When below contents is added in the .vimrc file, the insert mode is quickly exit
 </p>
 
 <pre class="macro-example">
-let &t_SI .= "\e[?7727h"
-let &t_EI .= "\e[?7727l"
+let &amp;t_SI .= "\e[?7727h"
+let &amp;t_EI .= "\e[?7727l"
 inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
 
