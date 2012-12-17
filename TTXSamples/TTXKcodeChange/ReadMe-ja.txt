@@ -22,21 +22,26 @@ TTXKcodeChange -- 制御シーケンスで送受信漢字コードを変更出来るようにする
     問い合わせに対して、以下の形式の応答を返します。
       Key=Value;[Key=Value;...]<CR>
 
+  <OSC>5965;Pt<ST>
+  <OSC>5965;Pt<BEL>
+    設定保存シーケンス
+    Ptで指定した設定をスタックに保存します。;で区切り複数指定する事もできます。
+
+  <OSC>5966;Pt<ST>
+  <OSC>5966;Pt<BEL>
+    設定復元シーケンス
+    Ptで指定した設定がスタックに保存されていた場合、その設定に復元します。
+    ;で区切り複数指定する事もできます。
+
 使用例:
   ログインシェルがzshの時の設定例です。
   
   [.zloginの記述]
-  echo -n "\e]5964;kt;kr\a"              # KT/KRの設定を問い合わせる
-  read -t 1 TT_ORG_KCODE                 # 応答を待つ(タイムアウト:1秒)
-  if [ $? -eq 0 ]; then
-    echo -n "\e]5963;kr=euc;kt=euc\a"    # 応答があったなら設定を変更する
-  fi
+  echo -ne "\e]5965;kt;kr\a"             # KT/KRの設定を保存する
+  echo -ne "\e]5963;kr=euc;kt=euc\a"     # KT/KRの設定をEUCに変更する
 
   [.zlogoutの記述]
-  # .zloginで漢字コードの設定が保存されていたら、その設定に戻す。
-  if [ " ${TT_ORG_KCODE}" != " " ]; then
-    echo -n "\e]5963;${TT_ORG_KCODE}\a"
-  fi
+  echo -n "\e]5966;kt;kr\a"              # KT/KRの設定を保存した値に復元する
 
 解説:
   受信データのフックのサンプルです。

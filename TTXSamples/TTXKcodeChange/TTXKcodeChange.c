@@ -26,9 +26,16 @@
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
+typedef struct cfgstack {
+    int val;
+    struct cfgstack *next;
+} TStack;
+typedef TStack *PStack;
+
 typedef struct {
   PTTSet ts;
   PComVar cv;
+  PStack config[2];
   Trecv origPrecv;
   Tsend origPsend;
   TReadFile origPReadFile;
@@ -41,6 +48,8 @@ static TInstVar InstVar;
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
+  pvar->config[0] = NULL;
+  pvar->config[1] = NULL;
   pvar->origPrecv = NULL;
   pvar->origPsend = NULL;
   pvar->origPReadFile = NULL;
@@ -115,6 +124,7 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
   unsigned char *p, *p2;
   int i;
   unsigned int func;
+  PStack t;
 
 #define AcceptC1Control \
   ((pvar->cv->KanjiCodeEcho == IdEUC || pvar->cv->KanjiCodeEcho == IdJIS) && \
@@ -261,6 +271,50 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
 	      p = p2;
 	    }
 	    CommOut("\r", 1);
+	    break;
+	  case 5965:
+	    while (p && *p) {
+	      if ((p2 = strchr(p, ';')) != NULL)
+		*p2++ = '\0';
+	      if (_stricmp(p, "kt") == 0) {
+		if ((t=malloc(sizeof(TStack))) != NULL) {
+		  t->val = pvar->cv->KanjiCodeSend;
+		  t->next = pvar->config[0];
+		  pvar->config[0] = t;
+		}
+	      }
+	      else if (_stricmp(p, "kr") == 0) {
+		if ((t=malloc(sizeof(TStack))) != NULL) {
+		  t->val = pvar->cv->KanjiCodeEcho;
+		  t->next = pvar->config[1];
+		  pvar->config[1] = t;
+		}
+	      }
+	      p = p2;
+	    }
+	    break;
+	  case 5966:
+	    while (p && *p) {
+	      if ((p2 = strchr(p, ';')) != NULL)
+		*p2++ = '\0';
+	      if (_stricmp(p, "kt") == 0) {
+		if (pvar->config[0] != NULL) {
+		  t = pvar->config[0];
+		  pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = t->val;
+		  pvar->config[0] = t->next;
+		  free(t);
+		}
+	      }
+	      else if (_stricmp(p, "kr") == 0) {
+		if (pvar->config[1] != NULL) {
+		  t = pvar->config[1];
+		  pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = t->val;
+		  pvar->config[1] = t->next;
+		  free(t);
+		}
+	      }
+	      p = p2;
+	    }
 	    break;
 	  default:
 	    ; /* nothing to do */
