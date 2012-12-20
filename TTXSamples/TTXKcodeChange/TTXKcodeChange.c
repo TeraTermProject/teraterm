@@ -184,7 +184,6 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
         }
         break;
       case IdModeProc:
-        i++;
         buff[(blen<InBuffSize)?blen:InBuffSize-1] = '\0';
 	p = buff;
 	
