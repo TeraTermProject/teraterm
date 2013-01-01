@@ -3775,7 +3775,7 @@ void DispGetRootWinSize(int *x, int *y)
 int DispFindClosestColor(int red, int green, int blue)
 {
 	int i, color, diff_r, diff_g, diff_b, diff, min;
-	char buff[1024];
+	//char buff[1024];
 
 	min = 0xfffffff;
 	color = 0;
