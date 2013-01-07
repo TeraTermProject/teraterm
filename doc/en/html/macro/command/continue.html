@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>continue</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>continue</h1>
+
+<p>
+Transfers control immediately to the next iteration of a loop.
+</p>
+
+<pre class="macro-syntax">
+continue
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Transfer from inside a "for" or "while" loop to the next iteration of that loop.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+a=0
+b=0
+while a<5 
+    a=a+1
+    if a>2 then
+        <strong>continue</strong>
+    endif
+    b=b+1
+endwhile
+
+sprintf2 var "a=%d b=%d" a b
+dispstr var
+;a=5 b=2
+</pre>
+
+<h2>Reference</h2>
+
+<a href="doloop.html">do, loop</a><br>
+<a href="fornext.html">for, next</a><br>
+<a href="until.html">until, enduntil</a><br>
+<a href="while.html">while, endwhile</a><br>
+<a href="break.html">break</a><br>
+
+</body>
+</html>

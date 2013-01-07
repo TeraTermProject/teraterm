@@ -175,6 +175,7 @@ HlpMacroCommandClosesbox=html\macro\command\closesbox.html
 HlpMacroCommandClosett=html\macro\command\closett.html
 HlpMacroCommandCode2str=html\macro\command\code2str.html
 HlpMacroCommandConnect=html\macro\command\connect.html
+HlpMacroCommandContinue=html\macro\command\continue.html
 HlpMacroCommandCrc32=html\macro\command\crc32.html
 HlpMacroCommandCrc32File=html\macro\command\crc32.html
 HlpMacroCommandCygConnect=html\macro\command\cygconnect.html
