@@ -200,6 +200,7 @@
 #define RsvLogInfo      152
 #define RsvFileLock     153
 #define RsvFileUnLock   154
+#define RsvContinue     155
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176
 #define RsvYmodemSend   177

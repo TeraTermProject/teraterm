@@ -13,6 +13,7 @@
 
 int EndWhileFlag;
 int BreakFlag;
+BOOL ContinueFlag;
 
 #define MAXBUFFLEN 2147483647
 
@@ -492,7 +493,7 @@ int BackToWhile(BOOL flag)
 	return 0;
 }
 
-WORD BreakLoop()
+WORD BreakLoop(WORD WId)
 {
 	if (SP<1) {
 		return ErrInvalidCtl;
@@ -501,10 +502,15 @@ WORD BreakLoop()
 	switch (TypeStack[SP-1]) {
 		case CtlFor:
 		case CtlWhile:
-			SP--;
-			if (LevelStack[SP] < INest) {
-				INest = LevelStack[SP];
-				CloseBuff(INest+1);
+			if (WId == RsvContinue) {
+				ContinueFlag = TRUE;
+			}
+			else {
+				SP--;
+				if (LevelStack[SP] < INest) {
+					INest = LevelStack[SP];
+					CloseBuff(INest+1);
+				}
 			}
 			BreakFlag = 1;
 			break;

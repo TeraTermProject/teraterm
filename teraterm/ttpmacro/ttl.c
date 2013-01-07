@@ -311,11 +311,11 @@ WORD TTLBeep()
 	return 0;
 }
 
-WORD TTLBreak() {
+WORD TTLBreak(WORD WId) {
 	if (GetFirstChar()!=0)
 		return ErrSyntax;
 
-	return BreakLoop();
+	return BreakLoop(WId);
 }
 
 WORD TTLCall()
@@ -4918,7 +4918,7 @@ WORD TTLScpRecv()
 int ExecCmnd()
 {
 	WORD WId, Err;
-	BOOL StrConst, E, WithIndex;
+	BOOL StrConst, E, WithIndex, Result;
 	TStrVal Str;
 	TName Cmnd;
 	WORD ValType, VarType;
@@ -4927,8 +4927,10 @@ int ExecCmnd()
 
 	Err = 0;
 
+	Result = GetReservedWord(&WId);
+
 	if (EndWhileFlag>0) {
-		if (GetReservedWord(&WId)) {
+		if (Result) {
 			switch (WId) {
 			case RsvWhile:
 			case RsvUntil:
@@ -4945,7 +4947,7 @@ int ExecCmnd()
 	}
 
 	if (BreakFlag>0) {
-		if (GetReservedWord(&WId)) {
+		if (Result) {
 			switch (WId) {
 			case RsvIf:
 				if (CheckThen(&Err))
@@ -4972,11 +4974,12 @@ int ExecCmnd()
 				BreakFlag--; break;
 			}
 		}
-		return Err;
+		if (BreakFlag>0 || !ContinueFlag)
+			return Err;
 	}
 
 	if (EndIfFlag>0) {
-		if (! GetReservedWord(&WId))
+		if (! Result)
 			;
 		else if ((WId==RsvIf) && CheckThen(&Err))
 			EndIfFlag++;
@@ -4986,7 +4989,7 @@ int ExecCmnd()
 	}
 
 	if (ElseFlag>0) {
-		if (! GetReservedWord(&WId))
+		if (! Result)
 			;
 		else if ((WId==RsvIf) && CheckThen(&Err))
 			EndIfFlag++;
@@ -5006,7 +5009,7 @@ int ExecCmnd()
 		return Err;
 	}
 
-	if (GetReservedWord(&WId)) 
+	if (Result) 
 		switch (WId) {
 		case RsvBasename:
 			Err = TTLBasename(); break;
@@ -5017,7 +5020,8 @@ int ExecCmnd()
 		case RsvBPlusSend:
 			Err = TTLCommCmdFile(CmdBPlusSend,IdTTLWaitCmndResult); break;
 		case RsvBreak:
-			Err = TTLBreak(); break;
+		case RsvContinue:
+			Err = TTLBreak(WId); break;
 		case RsvCall:
 			Err = TTLCall(); break;
 		case RsvCallMenu:

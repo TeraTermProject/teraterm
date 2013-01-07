@@ -174,6 +174,7 @@
 #define HlpMacroCommandClosett          92008
 #define HlpMacroCommandCode2str         92009
 #define HlpMacroCommandConnect          92010
+#define HlpMacroCommandContinue         92155
 #define HlpMacroCommandCrc32            92138
 #define HlpMacroCommandCrc32File        92139
 #define HlpMacroCommandCygConnect       92130

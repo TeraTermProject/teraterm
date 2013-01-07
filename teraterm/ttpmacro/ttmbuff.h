@@ -32,10 +32,11 @@ void InitLineNo(void);
 int GetLineNo(void);
 char *GetLineBuffer(void);
 int IsUpdateMacroCommand(void);
-WORD BreakLoop();
+WORD BreakLoop(WORD WId);
 
 extern int EndWhileFlag;
 extern int BreakFlag;
+extern BOOL ContinueFlag;
 
 #ifdef __cplusplus
 }
