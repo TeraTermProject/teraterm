@@ -4638,7 +4638,7 @@ error:;
 
 				cipher = NULL;
 				if (len > 0) {
-					cipher = EVP_des_ede3_cbc();
+					cipher = EVP_aes_128_cbc();
 				}
 
 				fp = fopen(filename, "w");
