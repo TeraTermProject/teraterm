@@ -12,7 +12,7 @@
 
 #include "inpdlg.h"
 
-#define MaxStrLen 256
+#define MaxStrLen 512
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

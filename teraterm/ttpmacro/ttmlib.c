@@ -15,7 +15,7 @@ static char CurrentDir[MAXPATHLEN];
 void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s)
 {
   int W, H, i, i0;
-  char Temp[256];
+  char Temp[512];
   DWORD dwExt;
 
   W = 0;

@@ -17,7 +17,7 @@
 #include "statdlg.h"
 #include "ttmlib.h"
 
-#define MaxStrLen 256
+#define MaxStrLen 512
 
 extern "C" {
 char HomeDir[MAXPATHLEN];
