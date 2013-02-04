@@ -3159,154 +3159,136 @@ void PrnParseCS(BYTE b) // printer mode
 
 void ParseCS(BYTE b) /* b is the final char */
 {
-  if (PrinterMode) { // printer mode
-    PrnParseCS(b);
-    return;
-  }
+	if (PrinterMode) { // printer mode
+		PrnParseCS(b);
+		return;
+	}
 
-  switch (ICount) {
-    /* no intermediate char */
-    case 0:
-      switch (Prv) {
-	/* no private parameter */
-	case 0:
-	  switch (b) {
-	    // ISO/IEC 6429 / ECMA-48 Sequence
-	    case '@': CSInsertCharacter(); break;       // ICH
-	    case 'A': CSCursorUp(); break;              // CUU
-	    case 'B': CSCursorDown(); break;            // CUD
-	    case 'C': CSCursorRight(); break;           // CUF
-	    case 'D': CSCursorLeft(); break;            // CUB
-	    case 'E': CSCursorDown1(); break;           // CNL
-	    case 'F': CSCursorUp1(); break;             // CPL
-	    case 'G': CSMoveToColumnN(); break;         // CHA
-	    case 'H': CSMoveToXY(); break;              // CUP
-	    case 'I': CSForwardTab(); break;            // CHT
-	    case 'J': CSScreenErase(); break;           // ED
-	    case 'K': CSLineErase(); break;             // EL
-	    case 'L': CSInsertLine(); break;            // IL
-	    case 'M': CSDeleteNLines(); break;          // DL
-//	    case 'N': break;				// EF   -- Not support
-//	    case 'O': break;				// EA   -- Not support
-	    case 'P': CSDeleteCharacter(); break;       // DCH
-//	    case 'Q': break;				// SEE  -- Not support
-//	    case 'R': break;				// CPR  -- Report only, ignore.
-	    case 'S': CSScrollUP(); break;              // SU
-	    case 'T': CSScrollDown(); break;            // SD
-//	    case 'U': break;				// NP   -- Not support
-//	    case 'V': break;				// PP   -- Not support
-//	    case 'W': break;				// CTC  -- Not support
-	    case 'X': CSEraseCharacter(); break;        // ECH
-//	    case 'Y': break;				// CVT  -- Not support
-	    case 'Z': CSBackwardTab(); break;           // CBT
-//	    case '[': break;                            // SRS  -- Not support
-//	    case '\\': break;                           // PTX  -- Not support
-//	    case ']': break;                            // SDS  -- Not support
-//	    case '^': break;                            // SIMD -- Not support
-	    case '`': CSMoveToColumnN(); break;         // HPA
-	    case 'a': CSCursorRight(); break;           // HPR
-//	    case 'b': break;                            // REP  -- Not support
-	    case 'c': AnswerTerminalType(); break;      // DA
-	    case 'd': CSMoveToLineN(); break;           // VPA
-	    case 'e': CSCursorDown(); break;            // VPR
-	    case 'f': CSMoveToXY(); break;              // HVP
-	    case 'g': CSDeleteTabStop(); break;         // TBC
-	    case 'h': CS_h_Mode(); break;               // SM
-	    case 'i': CS_i_Mode(); break;               // MC
-	    case 'j': CSCursorLeft(); break;            // HPB
-	    case 'k': CSCursorUp();                     // VPB
-	    case 'l': CS_l_Mode(); break;               // RM
-	    case 'm': CSSetAttr(); break;               // SGR
-	    case 'n': CS_n_Mode(); break;               // DSR
-//	    case 'o': break;                            // DAQ  -- Not support
+	switch (ICount) {
+	  case 0: /* no intermediate char */
+		switch (Prv) {
+		  case 0: /* no private parameter */
+			switch (b) {
+			// ISO/IEC 6429 / ECMA-48 Sequence
+			  case '@': CSInsertCharacter(); break;   // ICH
+			  case 'A': CSCursorUp(); break;          // CUU
+			  case 'B': CSCursorDown(); break;        // CUD
+			  case 'C': CSCursorRight(); break;       // CUF
+			  case 'D': CSCursorLeft(); break;        // CUB
+			  case 'E': CSCursorDown1(); break;       // CNL
+			  case 'F': CSCursorUp1(); break;         // CPL
+			  case 'G': CSMoveToColumnN(); break;     // CHA
+			  case 'H': CSMoveToXY(); break;          // CUP
+			  case 'I': CSForwardTab(); break;        // CHT
+			  case 'J': CSScreenErase(); break;       // ED
+			  case 'K': CSLineErase(); break;         // EL
+			  case 'L': CSInsertLine(); break;        // IL
+			  case 'M': CSDeleteNLines(); break;      // DL
+//			  case 'N': break;                        // EF   -- Not support
+//			  case 'O': break;                        // EA   -- Not support
+			  case 'P': CSDeleteCharacter(); break;   // DCH
+//			  case 'Q': break;                        // SEE  -- Not support
+//			  case 'R': break;                        // CPR  -- Report only, ignore.
+			  case 'S': CSScrollUP(); break;          // SU
+			  case 'T': CSScrollDown(); break;        // SD
+//			  case 'U': break;                        // NP   -- Not support
+//			  case 'V': break;                        // PP   -- Not support
+//			  case 'W': break;                        // CTC  -- Not support
+			  case 'X': CSEraseCharacter(); break;    // ECH
+//			  case 'Y': break;                        // CVT  -- Not support
+			  case 'Z': CSBackwardTab(); break;       // CBT
+//			  case '[': break;                        // SRS  -- Not support
+//			  case '\\': break;                       // PTX  -- Not support
+//			  case ']': break;                        // SDS  -- Not support
+//			  case '^': break;                        // SIMD -- Not support
+			  case '`': CSMoveToColumnN(); break;     // HPA
+			  case 'a': CSCursorRight(); break;       // HPR
+//			  case 'b': break;                        // REP  -- Not support
+			  case 'c': AnswerTerminalType(); break;  // DA
+			  case 'd': CSMoveToLineN(); break;       // VPA
+			  case 'e': CSCursorDown(); break;        // VPR
+			  case 'f': CSMoveToXY(); break;          // HVP
+			  case 'g': CSDeleteTabStop(); break;     // TBC
+			  case 'h': CS_h_Mode(); break;           // SM
+			  case 'i': CS_i_Mode(); break;           // MC
+			  case 'j': CSCursorLeft(); break;        // HPB
+			  case 'k': CSCursorUp();                 // VPB
+			  case 'l': CS_l_Mode(); break;           // RM
+			  case 'm': CSSetAttr(); break;           // SGR
+			  case 'n': CS_n_Mode(); break;           // DSR
+//			  case 'o': break;                        // DAQ  -- Not support
 
-	    // Private Sequence
-	    case 'r': CSSetScrollRegion(); break;       // DECSTBM
-	    case 's': SaveCursor(); break;              // SCP (Save cursor (ANSI.SYS/SCO?))
-	    case 't': CSSunSequence(); break;           // DECSLPP / Window manipulation(dtterm?)
-	    case 'u': RestoreCursor(); break;           // RCP (Restore cursor (ANSI.SYS/SCO))
-	  } /* of case Prv=0 */
-	  break;
-	/* private parameter = '<' */
-	case '<': CSLT(b); break;
-	/* private parameter = '=' */
-	case '=': CSEQ(b); break;
-	/* private parameter = '>' */
-	case '>': CSGT(b); break;
-	/* private parameter = '?' */
-	case '?': CSQuest(b); break;
-      } /* end of siwtch (Prv) */
-      break;
-    /* one intermediate char */
-    case 1:
-      switch (IntChar[1]) {
-        /* intermediate char = ' ' */
-	case ' ': CSSpace(b); break;
-	/* intermediate char = '!' */
-	case '!': CSExc(b); break;
-	/* intermediate char = '"' */
-	case '"': CSDouble(b); break;
-	/* intermediate char = '$' */
-	case '$': CSDol(b); break;
-	/* intermediate char = '\'' */
-	case '\'': CSQuote(b); break;
-      }
-      break;
-  } /* of case Icount */
+			// Private Sequence
+			  case 'r': CSSetScrollRegion(); break;   // DECSTBM
+			  case 's': SaveCursor(); break;          // SCP (Save cursor (ANSI.SYS/SCO?))
+			  case 't': CSSunSequence(); break;       // DECSLPP / Window manipulation(dtterm?)
+			  case 'u': RestoreCursor(); break;       // RCP (Restore cursor (ANSI.SYS/SCO))
+			}
+			break; /* end of case Prv=0 */
+		  case '<': CSLT(b); break;    /* private parameter = '<' */
+		  case '=': CSEQ(b); break;    /* private parameter = '=' */
+		  case '>': CSGT(b); break;    /* private parameter = '>' */
+		  case '?': CSQuest(b); break; /* private parameter = '?' */
+		} /* end of switch (Prv) */
+		break; /* end of no intermediate char */
+	  case 1: /* one intermediate char */
+		switch (IntChar[1]) {
+		  case ' ': CSSpace(b); break;  /* intermediate char = ' ' */
+		  case '!': CSExc(b); break;    /* intermediate char = '!' */
+		  case '"': CSDouble(b); break; /* intermediate char = '"' */
+		  case '$': CSDol(b); break;    /* intermediate char = '$' */
+		  case '\'': CSQuote(b); break; /* intermediate char = '\'' */
+		}
+		break;
+	} /* end of switch (Icount) */
 
-  ParseMode = ModeFirst;
+	ParseMode = ModeFirst;
 }
 
 void ControlSequence(BYTE b)
 {
-  if ((b<=US) || (b>=0x80) && (b<=0x9F))
-    ParseControl(b); /* ctrl char */
-  else if ((b>=0x40) && (b<=0x7E))
-    ParseCS(b); /* terminate char */
-  else {
-    if (PrinterMode)
-      WriteToPrnFile(b,FALSE);
+	if ((b<=US) || (b>=0x80) && (b<=0x9F))
+		ParseControl(b); /* ctrl char */
+	else if ((b>=0x40) && (b<=0x7E))
+		ParseCS(b); /* terminate char */
+	else {
+		if (PrinterMode)
+			WriteToPrnFile(b,FALSE);
 
-    if ((b>=0x20) && (b<=0x2F))
-    { /* intermediate char */
-      if (ICount<IntCharMax) ICount++;
-      IntChar[ICount] = b;
-    }
-    else if ((b>=0x30) && (b<=0x39))
-    {
-      if (NSParam[NParam] > 0) {
-	SubParam[NParam][NSParam[NParam]] = SubParam[NParam][NSParam[NParam]]*10 + b - 0x30;
-      }
-      else {
-	Param[NParam] = Param[NParam]*10 + b - 0x30;
-      }
-    }
-    else if (b==0x3A)
-    { /* ':' Subparameter delimiter */
-      if (NSParam[NParam] < NSParamMax) {
-	NSParam[NParam]++;
-	SubParam[NParam][NSParam[NParam]] = 0;
-      }
-    }
-    else if (b==0x3B)
-    { /* ';' Parameter delimiter */
-      if (NParam < NParamMax)
-      {
-	NParam++;
-	Param[NParam] = 0;
-	NSParam[NParam] = 0;
-      }
-    }
-    else if ((b>=0x3C) && (b<=0x3F))
-    { /* private char */
-      if (FirstPrm) Prv = b;
-    }
-    else if (b>0xA0) {
-      ParseMode=ModeFirst;
-      ParseFirst(b);
-    }
-  }
-  FirstPrm = FALSE;
+		if ((b>=0x20) && (b<=0x2F)) { /* intermediate char */
+			if (ICount<IntCharMax) ICount++;
+			IntChar[ICount] = b;
+		}
+		else if ((b>=0x30) && (b<=0x39)) { /* parameter value */
+			if (NSParam[NParam] > 0) {
+				SubParam[NParam][NSParam[NParam]] = SubParam[NParam][NSParam[NParam]]*10 + b - 0x30;
+			}
+			else {
+				Param[NParam] = Param[NParam]*10 + b - 0x30;
+			}
+		}
+		else if (b==0x3A) { /* ':' Subparameter delimiter */
+			if (NSParam[NParam] < NSParamMax) {
+				NSParam[NParam]++;
+				SubParam[NParam][NSParam[NParam]] = 0;
+			}
+		}
+		else if (b==0x3B) { /* ';' Parameter delimiter */
+			if (NParam < NParamMax) {
+				NParam++;
+				Param[NParam] = 0;
+				NSParam[NParam] = 0;
+			}
+		}
+		else if ((b>=0x3C) && (b<=0x3F)) { /* private char */
+			if (FirstPrm) Prv = b;
+		}
+		else if (b>0xA0) {
+			ParseMode=ModeFirst;
+			ParseFirst(b);
+		}
+	}
+	FirstPrm = FALSE;
 }
 
 void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
@@ -3539,70 +3521,66 @@ void DeviceControl(BYTE b)
 
 void DCUserKey(BYTE b)
 {
-  if (ESCFlag && (b=='\\') || (b==ST && ts.KanjiCode!=IdSJIS))
-  {
-    if (! WaitKeyId) DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
-    ESCFlag = FALSE;
-    ParseMode = ModeFirst;
-    return;
-  }
+	if (ESCFlag && (b=='\\') || (b==ST && ts.KanjiCode!=IdSJIS)) {
+		if (! WaitKeyId) DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
+		ESCFlag = FALSE;
+		ParseMode = ModeFirst;
+		return;
+	}
 
-  if (b==ESC)
-  {
-    ESCFlag = TRUE;
-    return;
-  }
-  else ESCFlag = FALSE;
+	if (b==ESC) {
+		ESCFlag = TRUE;
+		return;
+	}
+	else ESCFlag = FALSE;
 
-  if (WaitKeyId)
-  {
-    if ((b>=0x30) && (b<=0x39))
-    {
-      if (NewKeyId<1000)
-	NewKeyId = NewKeyId*10 + b - 0x30;
-    }
-    else if (b==0x2F)
-    {
-      WaitKeyId = FALSE;
-      WaitHi = TRUE;
-      NewKeyLen = 0;
-    }
-  }
-  else {
-    if (b==0x3B)
-    {
-      DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
-      WaitKeyId = TRUE;
-      NewKeyId = 0;
-    }
-    else {
-      if (NewKeyLen < FuncKeyStrMax)
-      {
-	if (WaitHi)
-	{
-	  NewKeyStr[NewKeyLen] = ConvHexChar(b) << 4;
-	  WaitHi = FALSE;
+	if (WaitKeyId) {
+		if ((b>=0x30) && (b<=0x39)) {
+			if (NewKeyId<1000)
+				NewKeyId = NewKeyId*10 + b - 0x30;
+		}
+		else if (b==0x2F) {
+			WaitKeyId = FALSE;
+			WaitHi = TRUE;
+			NewKeyLen = 0;
+		}
 	}
 	else {
-	  NewKeyStr[NewKeyLen] = NewKeyStr[NewKeyLen] +
-				 ConvHexChar(b);
-	  WaitHi = TRUE;
-	  NewKeyLen++;
+		if (b==0x3B) {
+			DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
+			WaitKeyId = TRUE;
+			NewKeyId = 0;
+		}
+		else {
+			if (NewKeyLen < FuncKeyStrMax) {
+				if (WaitHi) {
+					NewKeyStr[NewKeyLen] = ConvHexChar(b) << 4;
+					WaitHi = FALSE;
+				}
+				else {
+					NewKeyStr[NewKeyLen] = NewKeyStr[NewKeyLen] + ConvHexChar(b);
+					WaitHi = TRUE;
+					NewKeyLen++;
+				}
+			}
+		}
 	}
-      }
-    }
-  }
 }
 
 void IgnoreString(BYTE b)
 {
-  if ((ESCFlag && (b=='\\')) ||
-      (b<=US && b!=ESC && b!=HT) ||
-      (b==ST && ts.KanjiCode!=IdSJIS))
-    ParseMode = ModeFirst;
+	if ((ESCFlag && (b=='\\')) ||
+	    (b<=US && b!=ESC && b!=HT) ||
+	    (b==ST && ts.KanjiCode!=IdSJIS)) {
+		ParseMode = ModeFirst;
+	}
 
-  if (b==ESC) ESCFlag = TRUE;
-	 else ESCFlag = FALSE;
+	if (b==ESC) {
+		ESCFlag = TRUE;
+	}
+	else {
+		ESCFlag = FALSE;
+	}
 }
 
 BOOL XsParseColor(char *colspec, COLORREF *color)
