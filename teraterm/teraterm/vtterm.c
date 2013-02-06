@@ -3291,6 +3291,53 @@ void ControlSequence(BYTE b)
 	FirstPrm = FALSE;
 }
 
+int CheckUTF8Seq(BYTE b, int utf8_stat)
+{
+	if (ts.Language == IdUtf8 || (ts.Language==IdJapanese && (ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m))) {
+		if (utf8_stat > 0) {
+			if (b >= 0x80 && b < 0xc0) {
+				utf8_stat -= 1;
+			}
+			else { // Invalid UTF-8 sequence
+				utf8_stat = 0;
+			}
+		}
+		else if (b < 0xc0) {
+			; // nothing to do
+		}
+		else if (b < 0xe0) { // 2byte sequence
+			utf8_stat = 1;
+		}
+		else if (b < 0xf0) { // 3byte sequence
+			utf8_stat = 2;
+		}
+		else if (b < 0xf8) { // 4byte sequence
+			utf8_stat = 3;
+		}
+	}
+	return utf8_stat;
+}
+
+void IgnoreString(BYTE b)
+{
+	static int utf8_stat = 0;
+
+	if ((ESCFlag && (b=='\\')) ||
+	    (b<=US && b!=ESC && b!=HT) ||
+	    (b==ST && ts.KanjiCode!=IdSJIS && utf8_stat == 0)) {
+		ParseMode = ModeFirst;
+	}
+
+	if (b==ESC) {
+		ESCFlag = TRUE;
+	}
+	else {
+		ESCFlag = FALSE;
+	}
+
+	utf8_stat = CheckUTF8Seq(b, utf8_stat);
+}
+
 void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 {
 	unsigned char RepStr[256];
@@ -3448,9 +3495,10 @@ void DeviceControl(BYTE b)
 	static unsigned char StrBuff[256];
 	static int DcsParseMode = ModeDcsFirst;
 	static int StrLen;
+	static int utf8_stat = 0;
 	static BYTE Cmd;
 
-	if ((ESCFlag && (b=='\\')) || (b==ST && ts.KanjiCode!=IdSJIS)) {
+	if ((ESCFlag && (b=='\\')) || (b==ST && ts.KanjiCode!=IdSJIS && utf8_stat == 0)) {
 		if (DcsParseMode == ModeDcsString) {
 			StrBuff[StrLen] = 0;
 			ParseDCS(Cmd, StrBuff, StrLen);
@@ -3459,16 +3507,20 @@ void DeviceControl(BYTE b)
 		ParseMode = ModeFirst;
 		DcsParseMode = ModeDcsFirst;
 		StrLen = 0;
+		utf8_stat = 0;
 		return;
 	}
 
 	if (b==ESC) {
 		ESCFlag = TRUE;
+		utf8_stat = 0;
 		return;
 	}
 	else {
 		ESCFlag = FALSE;
 	}
+
+	utf8_stat = CheckUTF8Seq(b, utf8_stat);
 
 	switch (DcsParseMode) {
 	case ModeDcsFirst:
@@ -3502,6 +3554,8 @@ void DeviceControl(BYTE b)
 		}
 		else {
 			ParseMode = ModeSOS;
+			utf8_stat = 0;
+			IgnoreString(b);
 		}
 		break;
 
@@ -3521,7 +3575,9 @@ void DeviceControl(BYTE b)
 
 void DCUserKey(BYTE b)
 {
-	if (ESCFlag && (b=='\\') || (b==ST && ts.KanjiCode!=IdSJIS)) {
+	static int utf8_stat = 0;
+
+	if (ESCFlag && (b=='\\') || (b==ST && ts.KanjiCode!=IdSJIS && utf8_stat == 0)) {
 		if (! WaitKeyId) DefineUserKey(NewKeyId,NewKeyStr,NewKeyLen);
 		ESCFlag = FALSE;
 		ParseMode = ModeFirst;
@@ -3533,6 +3589,8 @@ void DCUserKey(BYTE b)
 		return;
 	}
 	else ESCFlag = FALSE;
+
+	utf8_stat = CheckUTF8Seq(b, utf8_stat);
 
 	if (WaitKeyId) {
 		if ((b>=0x30) && (b<=0x39)) {
@@ -3564,22 +3622,6 @@ void DCUserKey(BYTE b)
 				}
 			}
 		}
-	}
-}
-
-void IgnoreString(BYTE b)
-{
-	if ((ESCFlag && (b=='\\')) ||
-	    (b<=US && b!=ESC && b!=HT) ||
-	    (b==ST && ts.KanjiCode!=IdSJIS)) {
-		ParseMode = ModeFirst;
-	}
-
-	if (b==ESC) {
-		ESCFlag = TRUE;
-	}
-	else {
-		ESCFlag = FALSE;
 	}
 }
 
@@ -3843,18 +3885,22 @@ void XsProcClipboard(PCHAR buff)
 #define ModeXsColorSpec 4
 #define ModeXsEsc       5
 #define ModeXsIgnore    6
+
+#define CheckST(b,uf)	(((b)==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS) && (uf)==0) || (b)==BEL)
+
 void XSequence(BYTE b)
 {
 	static BYTE XsParseMode = ModeXsFirst, PrevMode;
 	static char StrBuff[sizeof(ts.Title)];
 	static unsigned int ColorNumber, StrLen;
+	static int utf8_stat = 0;
 	static char realloc_failed = FALSE;
 	char *p;
 	unsigned int new_size;
 
 	switch (XsParseMode) {
 	  case ModeXsFirst:
-		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+	  	if (CheckST(b, utf8_stat)) {
 			switch (Param[1]) {
 			case 104:
 				DispResetColor(CS_ALL);
@@ -3868,14 +3914,17 @@ void XSequence(BYTE b)
 			}
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 		}
 		else if (b == ESC) { /* Escape */
 			PrevMode = ModeXsFirst;
 			XsParseMode = ModeXsEsc;
+			utf8_stat = 0;
 		}
 		else if (b <= US) { /* Other control character -- invalid sequence */
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 		}
 		else if (isdigit(b)) {
 			Param[1] = Param[1]*10 + b - '0';
@@ -3929,7 +3978,7 @@ void XSequence(BYTE b)
 		}
 		break;
 	  case ModeXsString:
-		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+	  	if (CheckST(b, utf8_stat)) {
 			switch (Param[1]) {
 			  case 0: /* Change window title and icon name */
 			  case 1: /* Change icon name */
@@ -3952,58 +4001,67 @@ void XSequence(BYTE b)
 			}
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 		}
 		else if (b == ESC) { /* Escape */
 			PrevMode = ModeXsString;
 			XsParseMode = ModeXsEsc;
+			utf8_stat = 0;
 		}
 		else if (b <= US) { /* Other control character -- invalid sequence */
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 		}
-		else if (Param[1] == 52) {
-			if (StrLen < OSCStrBuffSize - 1) {
-				OSCStrBuff[StrLen++] = b;
-			}
-			else if (!realloc_failed && OSCStrBuffSize < MAXOSCBUFFSIZE) {
-				new_size = OSCStrBuffSize * 2;
-				if (new_size > MAXOSCBUFFSIZE) {
-					new_size = MAXOSCBUFFSIZE;
+		else {
+			utf8_stat = CheckUTF8Seq(b, utf8_stat);
+			if (Param[1] == 52) {
+				if (StrLen < OSCStrBuffSize - 1) {
+					OSCStrBuff[StrLen++] = b;
 				}
+				else if (!realloc_failed && OSCStrBuffSize < MAXOSCBUFFSIZE) {
+					new_size = OSCStrBuffSize * 2;
+					if (new_size > MAXOSCBUFFSIZE) {
+						new_size = MAXOSCBUFFSIZE;
+					}
 
-				p = realloc(OSCStrBuff, new_size);
-				if (p == NULL) {
-					realloc_failed = TRUE;
-				}
-				else {
-					OSCStrBuff = p;
-					OSCStrBuffSize = new_size;
-					if (StrLen < OSCStrBuffSize - 1) {
-						OSCStrBuff[StrLen++] = b;
+					p = realloc(OSCStrBuff, new_size);
+					if (p == NULL) {
+						realloc_failed = TRUE;
+					}
+					else {
+						OSCStrBuff = p;
+						OSCStrBuffSize = new_size;
+						if (StrLen < OSCStrBuffSize - 1) {
+							OSCStrBuff[StrLen++] = b;
+						}
 					}
 				}
 			}
-		}
-		else if (StrLen < sizeof(StrBuff) - 1) {
-			StrBuff[StrLen++] = b;
+			else if (StrLen < sizeof(StrBuff) - 1) {
+				StrBuff[StrLen++] = b;
+			}
 		}
 		break;
 	  case ModeXsColorNum:
-		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+	  	if (CheckST(b, utf8_stat)) {
 			if (Param[1] == 104 || Param[1] == 105) {
 				XsResetColor(Param[1], ColorNumber);
 			}
 			ColorNumber = 0;
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 		}
 		else if (b == ESC) { /* Escape */
 			PrevMode = ModeXsColorNum;
 			XsParseMode = ModeXsEsc;
+			utf8_stat = 0;
 		}
 		else if (b <= US) { /* Other control character -- invalid sequence */
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 		}
 		else if (isdigit(b)) {
 			ColorNumber = ColorNumber*10 + b - '0';
@@ -4023,7 +4081,7 @@ void XSequence(BYTE b)
 		}
 		break;
 	  case ModeXsColorSpec:
-		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+	  	if (CheckST(b, utf8_stat)) {
 			StrBuff[StrLen] = '\0';
 			XsProcColor(Param[1], ColorNumber, StrBuff);
 			ParseMode = ModeFirst;
@@ -4066,6 +4124,8 @@ void XSequence(BYTE b)
 				break;
 			}
 		}
+		else if (b >= 0x80) {
+		}
 		else if (StrLen < sizeof(StrBuff) - 1) {
 			StrBuff[StrLen++] = b;
 		}
@@ -4080,17 +4140,22 @@ void XSequence(BYTE b)
 			JustAfterESC = TRUE;
 			ParseMode = ModeESC;
 			XsParseMode = ModeXsFirst;
+			utf8_stat = 0;
 			EscapeSequence(b);
 		}
 		break;
 	  case ModeXsIgnore:
-		if ((b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS)) || b==BEL) { /* String Terminator */
+	  	if (CheckST(b, utf8_stat)) {
 			ParseMode = ModeFirst;
 			XsParseMode = ModeXsFirst;
 		}
 		else if (b == ESC) {
+			utf8_stat = 0;
 			PrevMode = ModeXsIgnore;
 			XsParseMode = ModeXsEsc;
+		}
+		else {
+			utf8_stat = CheckUTF8Seq(b, utf8_stat);
 		}
 		break;
 	}
