@@ -98,7 +98,7 @@ Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: only
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\libs\logmett\Setup_LogMeTT_2_9_9_2.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
-Source: ..\libs\logmett\Setup_TTLEditor_1_4_41.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
+Source: ..\libs\logmett\Setup_TTLEditor_1_4_45.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
