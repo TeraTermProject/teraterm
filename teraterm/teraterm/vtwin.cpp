@@ -3288,6 +3288,7 @@ LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
 			break;
 		case FD_CLOSE:
 			if (cv.PortType == IdTCPIP) {
+				int ret;
 				if (TCPLocalEchoUsed) {
 					TCPLocalEchoUsed=FALSE;
 					ts.LocalEcho = ts.LocalEcho_ini;
@@ -3297,6 +3298,8 @@ LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
 					ts.CRSend = ts.CRSend_ini;
 					cv.CRSend = ts.CRSend_ini;
 				}
+				ret = PWSAGetLastError();
+				OutputDebugPrintf("PWSAGetLastError()  = %d\n", ret);
 			}
 			Connecting = FALSE;
 			TCPIPClosed = TRUE;
