@@ -8,6 +8,10 @@
 extern "C" {
 #endif
 
+#ifndef MaxStrLen	// ttmparse.hÇ≈Ç‡íËã`ÇµÇƒÇ¢ÇÈÇΩÇﬂìÒèdíËã`ñhé~
+#define MaxStrLen (LONG)512
+#endif
+
 void ParseParam(PBOOL IOption, PBOOL VOption);
 BOOL GetFileName(HWND HWin);
 void SetDlgPos(int x, int y);
@@ -22,14 +26,14 @@ extern char HomeDir[MAXPATHLEN];
 extern char FileName[MAX_PATH];
 extern char TopicName[11];
 extern char ShortName[MAX_PATH];
-extern char Param2[MAXPATHLEN];
-extern char Param3[MAXPATHLEN];
-extern char Param4[MAXPATHLEN];
-extern char Param5[MAXPATHLEN];
-extern char Param6[MAXPATHLEN];
-extern char Param7[MAXPATHLEN];
-extern char Param8[MAXPATHLEN];
-extern char Param9[MAXPATHLEN];
+extern char Param2[MaxStrLen];
+extern char Param3[MaxStrLen];
+extern char Param4[MaxStrLen];
+extern char Param5[MaxStrLen];
+extern char Param6[MaxStrLen];
+extern char Param7[MaxStrLen];
+extern char Param8[MaxStrLen];
+extern char Param9[MaxStrLen];
 extern BOOL SleepFlag;
 extern int ParamCnt;
 

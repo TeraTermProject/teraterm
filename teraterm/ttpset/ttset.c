@@ -25,6 +25,8 @@
 
 #define Section "Tera Term"
 
+#define MaxStrLen (LONG)512
+
 static PCHAR far TermList[] =
 	{ "VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	"VT320", "VT382", "VT420", "VT520", "VT525", NULL };
@@ -3194,8 +3196,8 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 #ifdef NO_INET6
 	BYTE b;
 #endif							/* NO_INET6 */
-	char Temp[MAX_PATH + 6]; // "/FD="(4) + `"'(1) + MAX_PATH  + `"'(1)
-	char Temp2[MAX_PATH + 6];
+	char Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
+	char Temp2[MaxStrLen];
 	char TempDir[MAXPATHLEN];
 	WORD ParamPort = 0;
 	WORD ParamCom = 0;

@@ -24,14 +24,14 @@ char HomeDir[MAXPATHLEN];
 char FileName[MAX_PATH];
 char TopicName[11];
 char ShortName[MAX_PATH];
-char Param2[MAXPATHLEN];
-char Param3[MAXPATHLEN];
-char Param4[MAXPATHLEN];
-char Param5[MAXPATHLEN];
-char Param6[MAXPATHLEN];
-char Param7[MAXPATHLEN];
-char Param8[MAXPATHLEN];
-char Param9[MAXPATHLEN];
+char Param2[MaxStrLen];
+char Param3[MaxStrLen];
+char Param4[MaxStrLen];
+char Param5[MaxStrLen];
+char Param6[MaxStrLen];
+char Param7[MaxStrLen];
+char Param8[MaxStrLen];
+char Param9[MaxStrLen];
 BOOL SleepFlag;
 int ParamCnt;   /* à¯êîÇÃå¬êî */
 }
@@ -87,7 +87,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 {
 	int i, j, k;
 	char *Param;
-	char Temp[MAX_PATH];
+	char Temp[MaxStrLen];
 
 	// Get home directory
 	if (GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName)) == 0) {

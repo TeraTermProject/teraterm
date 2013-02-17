@@ -254,7 +254,9 @@
 typedef DWORD BINT;
 
 #define MaxNameLen (LONG)32
+#ifndef MaxStrLen	// ttmdlg.h‚Å‚à’è‹`‚µ‚Ä‚¢‚é‚½‚ß“ñd’è‹`–h~
 #define MaxStrLen (LONG)512
+#endif
 #define MaxLineLen (LONG)1024
 
 #define INT_BIT (CHAR_BIT * sizeof(int))

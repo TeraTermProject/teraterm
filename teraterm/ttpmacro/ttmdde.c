@@ -825,7 +825,7 @@ int Wait4all()
 
 void SetFile(PCHAR FN)
 {
-	char Cmd[1 + MAX_PATH];
+	char Cmd[1 + MaxStrLen];
 
 #if 1
 	_snprintf_s(Cmd, sizeof(Cmd), _TRUNCATE, "%c%s", CmdSetFile, FN);
@@ -839,7 +839,7 @@ void SetFile(PCHAR FN)
 // add (2008.1.3 yutaka)
 void SetSecondFile(PCHAR FN)
 {
-	char Cmd[1 + MAX_PATH];
+	char Cmd[1 + MaxStrLen];
 
 #if 1
 	memset(Cmd, 0, sizeof(Cmd));

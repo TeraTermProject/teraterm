@@ -26,6 +26,8 @@
 #define ItemName "DATA"
 #define ItemName2 "PARAM"
 
+#define MaxStrLen (LONG)512
+
 char TopicName[21] = "";
 HCONV ConvH = 0;
 BOOL AdvFlag = FALSE;
@@ -47,11 +49,11 @@ static BOOL SyncMode = FALSE;
 static BOOL SyncRecv;
 static LONG SyncFreeSpace;
 
-static char ParamFileName[MAX_PATH];
+static char ParamFileName[MaxStrLen];
 static WORD ParamBinaryFlag;
 static WORD ParamAppendFlag;
 static WORD ParamXmodemOpt;
-static char ParamSecondFileName[MAX_PATH];
+static char ParamSecondFileName[MaxStrLen];
 
 #define CBBufSize TermWidthMax
 
@@ -338,7 +340,7 @@ WORD HexStr2Word(PCHAR Str)
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
-	char Command[MAX_PATH + 1];
+	char Command[MaxStrLen + 1];
 	int i;
 	WORD w, c;
 
@@ -426,7 +428,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			break;
 		}
 		{
-		char Temp[MAX_PATH + 2];
+		char Temp[MaxStrLen + 2];
 		strncpy_s(Temp, sizeof(Temp),"a ", _TRUNCATE); // dummy exe name
 		strncat_s(Temp,sizeof(Temp),ParamFileName,_TRUNCATE);
 		if (LoadTTSET())
