@@ -931,7 +931,7 @@ DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=User Name
 DLG_ETC_PASS=Password
 
-MSG_ERROR_READREG=Couldn't read the registory data.\n
+MSG_ERROR_READREG=Couldn't read the registry data.\n
 MSG_ERROR_MAKETTL=Could not make 'ttpmenu.TTL'\n
 MSG_ERROR_LAUNCH=Launching the application was failure.\n
 MSG_ERROR_NOREGNAME=error: no registry name
@@ -939,11 +939,11 @@ MSG_ERROR_INVALIDREGNAME=can't use "\\" in registry name
 MSG_ERROR_NOHOST=error: no host name
 MSG_ERROR_NOMACRO=error: no macro filename
 MSG_ERROR_CHECKFILE=checking [%s] file was failure.\n
-MSG_ERROR_SAVEREG=error: couldn't save to registory.\n
-MSG_ERROR_OPENREG=error: couldn't open registory.\n
+MSG_ERROR_SAVEREG=error: couldn't save to registry.\n
+MSG_ERROR_OPENREG=error: couldn't open registry.\n
 MSG_ERROR_SELECTREG=Select deleted registry name
 MSG_ERROR_GETDELETEREG=Couldn't get the deleting entry
-MSG_ERROR_DELETEREG=Couldn't delete the registory.\n
+MSG_ERROR_DELETEREG=Couldn't delete the registry.\n
 MSG_ERROR_WINCLASS=Couldn't register the window class.\n
 
 FILEDLG_MACRO_TITLE=specifying macro file

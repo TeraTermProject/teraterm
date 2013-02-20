@@ -4,7 +4,7 @@ static char *Registry_id =
 	"@(#)Copyright (C) NTT-IT 1998  -- registry.cpp --  Ver1.00b1";
 /* ==========================================================================
 	Project Name		: Universal Library
-	Outline				: Registory Function
+	Outline				: Registry Function
 	Create				: 1998-02-17(Tue)
 	Update				: 
 	Copyright			: S.Hayakawa				NTT-IT

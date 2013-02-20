@@ -3,7 +3,7 @@
 /* @(#)Copyright (C) NTT-IT 1998   -- registry.h -- Ver1.00b1 */
 /* ========================================================================
 	Project  Name			: Universal Library
-	Outline					: Registory function Header
+	Outline					: Registry function Header
 	Create					: 1998-02-17(Tue)
 	Update					: 
 	Copyright				: S.Hayakawa				NTT-IT

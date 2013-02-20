@@ -1216,7 +1216,7 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 	if (RegLoadLoginHostInformation(szName, &jobInfo) == FALSE) {
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msg("MSG_ERROR_MAKETTL", uimsg, sizeof(uimsg),
-		                  "Couldn't read the registory data.\n", UILanguageFile);
+		                  "Couldn't read the registry data.\n", UILanguageFile);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
@@ -1800,7 +1800,7 @@ BOOL SaveLoginHostInformation(HWND hWnd)
 	if (RegSaveLoginHostInformation(&g_JobInfo) == FALSE) {
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msg("MSG_ERROR_SAVEREG", uimsg, sizeof(uimsg),
-		                  "error: couldn't save to registory.\n", UILanguageFile);
+		                  "error: couldn't save to registry.\n", UILanguageFile);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		SetCurrentDirectory(cur);
 		return FALSE;
@@ -1846,7 +1846,7 @@ BOOL LoadLoginHostInformation(HWND hWnd)
 	if (RegLoadLoginHostInformation(szName, &g_JobInfo) == FALSE) {
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msg("MSG_ERROR_OPENREG", uimsg, sizeof(uimsg),
-		                  "Couldn't open the registory.\n", UILanguageFile);
+		                  "Couldn't open the registry.\n", UILanguageFile);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
@@ -1983,7 +1983,7 @@ BOOL DeleteLoginHostInformation(HWND hWnd)
 	if (RegDelete(HKEY_CURRENT_USER, szSubKey) != ERROR_SUCCESS) {
 		dwErr = ::GetLastError();
 		UTIL_get_lang_msg("MSG_ERROR_DELETEREG", uimsg, sizeof(uimsg),
-		                  "Couldn't delete the registory.\n", UILanguageFile);
+		                  "Couldn't delete the registry.\n", UILanguageFile);
 		ErrorMessage(hWnd, dwErr, uimsg);
 		return FALSE;
 	}
