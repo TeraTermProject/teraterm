@@ -139,6 +139,7 @@ DIRDLG_CYGTERM_DIR_TITLE=Cygwin-Ordner auswählen
 MSG_CYGTERM_CONF_WRITEFILE_ERROR=Die CygTerm-Konfigurationsdatei kann nicht geschrieben werden (%d).
 MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Alte CygTerm-Konfigurationsdatei kann nicht gelöscht werden (%d).
 MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Die CygTerm-Konfigurationsdatei kann nicht umbenannt werden (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=%s has been saved. Do not do save setup.
 FILEDLG_SELECT_LOGVIEW_APP_TITLE=Choose a executing file with launching logging file
 FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
 FILEDLG_SELECT_LOGDIR_TITLE=Log-Ordner auswählen
@@ -197,6 +198,7 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
 DLG_TAB_VISUAL_ALHPA=&Transparenz
 DLG_TAB_VISUAL_ETERM=&Eterm-Aussehen(*)
+DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_MOUSE=&Mauszeiger
 DLG_TAB_VISUAL_FONT_QUALITY=&Font quality
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=Default
@@ -443,6 +445,7 @@ BTN_CONTINUE=Weiter
 ; common
 MSG_ERROR=Fehler
 MSG_TT_ERROR=TeraTerm-Fehler
+MSG_TT_NOTICE=Tera Term: Notice
 MSG_TT_TAKE_EFFECT=This option takes effect the next time a session is started.\nAre you sure that you want to relaunch Tera Term?
 
 BTN_OK=OK

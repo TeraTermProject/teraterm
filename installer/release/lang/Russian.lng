@@ -140,6 +140,7 @@ DIRDLG_CYGTERM_DIR_TITLE=Указать папку Cygwin
 MSG_CYGTERM_CONF_WRITEFILE_ERROR=Не удается записать файл конфигурации CygTerm (%d).
 MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Не удается удалить файл конфигурации CygTerm (%d).
 MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Не удается переименовать файл конфигурации CygTerm (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=%s has been saved. Do not do save setup.
 FILEDLG_SELECT_LOGVIEW_APP_TITLE=Выберите исполняемый файл для запуска лог-файла
 FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
 FILEDLG_SELECT_LOGDIR_TITLE=Укажите папку лог-файла
@@ -198,6 +199,7 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=мс
 
 DLG_TAB_VISUAL_ALHPA=&Прозрачный
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
+DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_MOUSE=&Курсор мыши
 DLG_TAB_VISUAL_FONT_QUALITY=&Качество шрифта
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=По умолчанию
@@ -444,6 +446,7 @@ BTN_CONTINUE=&Продолжить
 ; common
 MSG_ERROR=ОШИБКА
 MSG_TT_ERROR=Tera Term: Ошибка
+MSG_TT_NOTICE=Tera Term: Notice
 MSG_TT_TAKE_EFFECT=Эта опция действует при следующей сессии.
 
 BTN_OK=OK

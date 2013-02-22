@@ -785,6 +785,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_ETERM_LOOKFEEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_ETERM", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ETERM_LOOKFEEL, ts.UIMsg);
+	GetDlgItemText(IDC_BGIMG_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_BGIMG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_BGIMG_LABEL, ts.UIMsg);
 	GetDlgItemText(IDC_MOUSE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_MOUSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_MOUSE, ts.UIMsg);
@@ -1681,7 +1684,11 @@ void CCygwinPropPageDlg::OnOK()
 			// cygterm.cfg ファイルへの保存が成功したら、メッセージダイアログを表示する。
 			// 改めて、Save setupを実行する必要はないことを注意喚起する。
 			// (2012.5.1 yutaka)
-			MessageBox(CYGTERM_FILE " has been saved. Do not do save setup.", "Tera Term: Notice", MB_OK | MB_ICONINFORMATION);
+			get_lang_msg("MSG_TT_NOTICE", uimsg, sizeof(uimsg), "MSG_TT_NOTICE", ts.UILanguageFile);
+			get_lang_msg("MSG_CYGTERM_CONF_SAVED_NOTICE", ts.UIMsg, sizeof(ts.UIMsg),
+			             "%s has been saved. Do not do save setup.", ts.UILanguageFile);
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, CYGTERM_FILE);
+			MessageBox(buf, uimsg, MB_OK | MB_ICONINFORMATION);
 		}
 	}
 

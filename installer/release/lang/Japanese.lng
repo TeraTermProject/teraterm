@@ -139,6 +139,7 @@ DIRDLG_CYGTERM_DIR_TITLE=Cygwin ディレクトリを選択してください
 MSG_CYGTERM_CONF_WRITEFILE_ERROR=CygTerm 設定ファイルに書込みできません (%d).
 MSG_CYGTERM_CONF_REMOVEFILE_ERROR=古い CygTerm 設定ファイルを削除できません (%d).
 MSG_CYGTERM_CONF_RENAMEFILE_ERROR=CygTerm 設定ファイルの名前を変更できません (%d).
+MSG_CYGTERM_CONF_SAVED_NOTICE=%s が保存されました。設定を保存しないでください。
 FILEDLG_SELECT_LOGVIEW_APP_TITLE=Tera Term: エディタを指定
 FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0すべてのファイル(*.*)\0*.*\0\0
 FILEDLG_SELECT_LOGDIR_TITLE=ログフォルダを選択してください
@@ -197,6 +198,7 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=ミリ秒
 
 DLG_TAB_VISUAL_ALHPA=半透明度(&A)
 DLG_TAB_VISUAL_ETERM=&Eterm風にする(*)
+DLG_TAB_VISUAL_BGIMG=背景画像(&I)
 DLG_TAB_VISUAL_MOUSE=マウスカーソル(&M)
 DLG_TAB_VISUAL_FONT_QUALITY=フォントの品質(&F)
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=デフォルト
@@ -443,6 +445,7 @@ BTN_CONTINUE=続行(&C)
 ; common
 MSG_ERROR=エラー
 MSG_TT_ERROR=Tera Term: エラー
+MSG_TT_NOTICE=Tera Term: 通知
 MSG_TT_TAKE_EFFECT=次回起動時に設定が有効となります.
 
 BTN_OK=OK
