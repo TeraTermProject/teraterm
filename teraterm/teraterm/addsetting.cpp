@@ -794,6 +794,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_FONT_QUALITY_LABEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_FONT_QUALITY_LABEL, ts.UIMsg);
+	GetDlgItemText(IDC_ANSICOLOR, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_ANSICOLOR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ANSICOLOR, ts.UIMsg);
 	GetDlgItemText(IDC_RED, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_RED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_RED, ts.UIMsg);
