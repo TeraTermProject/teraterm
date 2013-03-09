@@ -18,6 +18,19 @@
 // for isInvalidFileNameChar / replaceInvalidFileNameChar
 static char *invalidFileNameChars = "\\/:*?\"<>|";
 
+// ファイルに使用することができない文字
+// cf. Naming Files, Paths, and Namespaces
+//     http://msdn.microsoft.com/en-us/library/aa365247.aspx
+// (2013.3.9 yutaka)
+static char *invalidFileNameStrings[] = {
+	"AUX", "CLOCK$", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+	"CON", "CONFIG$", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+	"NUL", "PRN",
+	".", "..", 
+	NULL
+};
+
+
 // for b64encode/b64decode
 static char *b64enc_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char b64dec_table[] = {
@@ -438,6 +451,16 @@ void QuoteFName(PCHAR FName)
 int isInvalidFileNameChar(PCHAR FName)
 {
 	int i, len;
+	char **p, c;
+
+	// チェック対象の文字を強化した。(2013.3.9 yutaka)
+	p = invalidFileNameStrings;
+	while (*p) {
+		if (_strcmpi(FName, *p) == 0) {
+			return 1;  // Invalid
+		}
+		p++;
+	}
 
 	len = strlen(FName);
 	for (i=0; i<len; i++) {
@@ -449,6 +472,12 @@ int isInvalidFileNameChar(PCHAR FName)
 			return 1;
 		}
 	}
+
+	// ファイル名の末尾にピリオドおよび空白はNG。
+	c = FName[len - 1];
+	if (c == '.' || c == ' ')
+		return 1;
+
 	return 0;
 }
 
