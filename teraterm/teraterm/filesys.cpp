@@ -304,6 +304,7 @@ void FreeFileVar(PFileVar *fv)
 void ConvertLogname(char *c, int destlen)
 {
 	char buf[MAXPATHLEN], buf2[MAXPATHLEN], *p = c;
+	char tmphost[1024];
 
 	memset(buf, 0, sizeof(buf));
 
@@ -313,7 +314,13 @@ void ConvertLogname(char *c, int destlen)
 			  case 'h':
 				if (cv.Open) {
 					if (cv.PortType == IdTCPIP) {
-						strncat_s(buf,sizeof(buf),ts.HostName,_TRUNCATE);
+						// ホスト名がIPv6アドレスだと、ファイル名に使用できない文字が入るため、
+						// 余計な文字は削除する。
+						// (2013.3.9 yutaka)
+						strncpy_s(tmphost, sizeof(tmphost), ts.HostName, _TRUNCATE);
+						//strncpy_s(tmphost, sizeof(tmphost), "2001:0db8:bd05:01d2:288a:1fc0:0001:10ee", _TRUNCATE);
+						deleteInvalidFileNameChar(tmphost);
+						strncat_s(buf,sizeof(buf), tmphost, _TRUNCATE);
 					}
 					else if (cv.PortType == IdSerial) {
 						strncpy_s(buf2,sizeof(buf2),buf,_TRUNCATE);
