@@ -319,7 +319,7 @@ void ConvertLogname(char *c, int destlen)
 						// (2013.3.9 yutaka)
 						strncpy_s(tmphost, sizeof(tmphost), ts.HostName, _TRUNCATE);
 						//strncpy_s(tmphost, sizeof(tmphost), "2001:0db8:bd05:01d2:288a:1fc0:0001:10ee", _TRUNCATE);
-						deleteInvalidFileNameChar(tmphost);
+						replaceInvalidFileNameChar(tmphost, '_');
 						strncat_s(buf,sizeof(buf), tmphost, _TRUNCATE);
 					}
 					else if (cv.PortType == IdSerial) {
