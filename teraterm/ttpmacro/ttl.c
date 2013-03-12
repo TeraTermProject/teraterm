@@ -2926,26 +2926,32 @@ WORD TTLDirname()
 #define IdMsgBox 1
 #define IdYesNoBox 2
 #define IdStatusBox 3
+#define IdListBox 4
+#define LISTBOX_ITEM_NUM 10
 
 int MessageCommand(int BoxId, LPWORD Err)
 {
 	TStrVal Str1, Str2;
 	int sp = 0;
 	int ret;
+	char *s[LISTBOX_ITEM_NUM] = {0};
+	TStrVal str;
+	int i;
 
 	*Err = 0;
 	GetStrVal2(Str1, Err, TRUE);
 	GetStrVal2(Str2, Err, TRUE);
 	if (*Err!=0) return 0;
 
-	// get 3rd arg(optional) if given
-	if (CheckParameterGiven()) {
-		GetIntVal(&sp, Err);
+	if (BoxId != IdListBox) {
+		// get 3rd arg(optional) if given
+		if (CheckParameterGiven()) {
+			GetIntVal(&sp, Err);
+		}
+		if ((*Err==0) && (GetFirstChar()!=0))
+			*Err = ErrSyntax;
+		if (*Err!=0) return 0;
 	}
-
-	if ((*Err==0) && (GetFirstChar()!=0))
-		*Err = ErrSyntax;
-	if (*Err!=0) return 0;
 
 	if (sp) {
 		RestoreNewLine(Str1);
@@ -2967,9 +2973,50 @@ int MessageCommand(int BoxId, LPWORD Err)
 		}
 		return (ret);
 	}
-	else if (BoxId==IdStatusBox)
+	else if (BoxId==IdStatusBox) {
 		OpenStatDlg(Str1,Str2);
+
+	} else if (BoxId==IdListBox) {
+		//  リストボックスの選択肢を取得する。
+		for (i = 0 ; i < LISTBOX_ITEM_NUM ; i++) {
+			if (CheckParameterGiven()) {
+				GetStrVal2(str, Err, TRUE);
+				if (*Err ==0 ) 
+					s[i] = _strdup(str);
+			} else {
+				s[i] = NULL;
+			}
+		}
+		if (s[0] == NULL) {
+			*Err = ErrSyntax;
+			return 0;
+		}
+
+		// return 
+		//   0以上: 選択項目
+		//   -1: キャンセル
+		ret = OpenListDlg(Str1, Str2, s);
+
+		for (i = 0 ; i < LISTBOX_ITEM_NUM ; i++) {
+			free(s[i]);
+		}
+
+		return (ret);
+
+	}
 	return 0;
+}
+
+// リストボックス
+// (2013.3.13 yutaka)
+WORD TTLListBox()
+{
+	WORD Err;
+	int ret;
+
+	ret = MessageCommand(IdListBox, &Err);
+	SetResult(ret);
+	return Err;
 }
 
 WORD TTLMessageBox()
@@ -5185,6 +5232,8 @@ int ExecCmnd()
 			Err = TTLCommCmd(CmdKmtRecv,IdTTLWaitCmndResult); break;
 		case RsvKmtSend:
 			Err = TTLCommCmdFile(CmdKmtSend,IdTTLWaitCmndResult); break;
+		case RsvListBox:
+			Err = TTLListBox(); break;
 		case RsvLoadKeyMap:
 			Err = TTLCommCmdFile(CmdLoadKeyMap,0); break;
 		case RsvLogClose:

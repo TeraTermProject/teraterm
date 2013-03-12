@@ -241,6 +241,7 @@
 #define HlpMacroCommandKmtget           92055
 #define HlpMacroCommandKmtrecv          92056
 #define HlpMacroCommandKmtsend          92057
+#define HlpMacroCommandListBox          92198
 #define HlpMacroCommandLoadkeymap       92058
 #define HlpMacroCommandLogclose         92059
 #define HlpMacroCommandLoginfo          92152

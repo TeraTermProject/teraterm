@@ -22,6 +22,8 @@ int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo);
 void OpenStatDlg(PCHAR Text, PCHAR Caption);
 void CloseStatDlg();
 
+int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists);
+
 extern char HomeDir[MAXPATHLEN];
 extern char FileName[MAX_PATH];
 extern char TopicName[11];

@@ -228,6 +228,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ListDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="msgdlg.cpp"
 				>
 			</File>
@@ -261,11 +265,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ListDlg.h"
+				>
+			</File>
+			<File
 				RelativePath="msgdlg.h"
 				>
 			</File>
 			<File
 				RelativePath="statdlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
@@ -395,5 +407,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="ttpmacro.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

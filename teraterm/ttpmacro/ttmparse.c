@@ -249,7 +249,8 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"kmtsend")==0) *WordId = RsvKmtSend;
 		break;
 	case 'l':
-		if (_stricmp(Str,"loadkeymap")==0) *WordId = RsvLoadKeyMap;
+		if (_stricmp(Str,"listbox")==0) *WordId = RsvListBox;
+		else if (_stricmp(Str,"loadkeymap")==0) *WordId = RsvLoadKeyMap;
 		else if (_stricmp(Str,"logclose")==0) *WordId = RsvLogClose;
 		else if (_stricmp(Str,"loginfo")==0) *WordId = RsvLogInfo;
 		else if (_stricmp(Str,"logopen")==0) *WordId = RsvLogOpen;

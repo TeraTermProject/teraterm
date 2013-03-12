@@ -15,6 +15,7 @@
 #include "inpdlg.h"
 #include "msgdlg.h"
 #include "statdlg.h"
+#include "ListDlg.h"
 #include "ttmlib.h"
 
 #define MaxStrLen 512
@@ -299,3 +300,17 @@ void CloseStatDlg()
 	StatDlg = NULL;
 }
 }
+
+extern "C" {
+int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists)
+{
+	int ret = -1;
+
+	CListDlg ListDlg(Text, Caption, Lists);
+	if (ListDlg.DoModal() == IDOK) {
+		ret = ListDlg.m_SelectItem;
+	}
+	return (ret);
+}
+}
+
