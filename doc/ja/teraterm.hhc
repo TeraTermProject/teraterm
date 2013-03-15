@@ -1429,6 +1429,10 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="listbox">
+					<param name="Local" value="html\macro\command\listbox.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="messagebox">
 					<param name="Local" value="html\macro\command\messagebox.html">
 					<param name="ImageNumber" value="11">

@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>listbox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>listbox</h1>
+
+<p>
+Displays a list box, and ask a item to user.
+</p>
+
+<pre class="macro-syntax">
+listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;item10&gt;]
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string &lt;message&gt;</dt>
+	<dd>It is displayed in the list box.</dd>
+	
+	<dt class="macro">string &lt;title&gt;</dt>
+	<dd>It is displayed as the list box title.</dd>
+	
+	<dt class="macro">string &lt;itemN&gt; (N=1-10)</dt>
+	<dd>It is displayed as the list box items.</dd>
+
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System variable &lt;result&gt;</dt>
+	<dd>If the user selects one of items, it is set to from 0 to N-1.<br>
+	    If the user cancels, it is set to -1.</dd>
+	
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+listbox 'Select your favorite food.' 'Confirmation' 'Banana' 'Apple' 'Orange'
+sprintf2 var "%d" result
+messagebox var "result"
+; result
+;   -1: Cancel
+;    0: Banana
+;    1: Apple
+;    2: Orange
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="yesnobox.html">yesnobox</a></li>
+</ul>
+
+</body>
+</html>
