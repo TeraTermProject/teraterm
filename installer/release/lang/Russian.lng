@@ -1,5 +1,5 @@
 ; Updated by TeraTerm Project (Feb 28 2013)
-; Last translated (Russian language) by Ryumik Sergey (Feb 20 2013)
+; Last translated (Russian language) by Ryumik Sergey (Mar 11 2013)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -21,11 +21,11 @@ MENU_FILE_PRINT=&Печать...\tAlt+P
 MENU_FILE_DISCONNECT=&Разъединение\tAlt+I
 MENU_FILE_EXIT=&Выход\tAlt+Q
 
-MENU_TRANS=&Передать
-MENU_TRANS_KERMIT_RCV=&Принять
+MENU_TRANS=&Трансфер
+MENU_TRANS_KERMIT_RCV=&Готовность
 MENU_TRANS_KERMIT_GET=&Прием...
 MENU_TRANS_KERMIT_SEND=&Передача...
-MENU_TRANS_KERMIT_FINISH=&Закончить
+MENU_TRANS_KERMIT_FINISH=&Финиш
 MENU_TRANS_X_RCV=&Прием...
 MENU_TRANS_X_SEND=&Передача...
 MENU_TRANS_Y_RCV=&Прием...
@@ -142,7 +142,7 @@ DIRDLG_CYGTERM_DIR_TITLE=Указать папку Cygwin
 MSG_CYGTERM_CONF_WRITEFILE_ERROR=Не удается записать файл конфигурации CygTerm (%d).
 MSG_CYGTERM_CONF_REMOVEFILE_ERROR=Не удается удалить файл конфигурации CygTerm (%d).
 MSG_CYGTERM_CONF_RENAMEFILE_ERROR=Не удается переименовать файл конфигурации CygTerm (%d).
-MSG_CYGTERM_CONF_SAVED_NOTICE=Cygwin tab configuration was saved in %s.
+MSG_CYGTERM_CONF_SAVED_NOTICE=Таблица конфигурации Cygwin была сохранена в %s.
 FILEDLG_SELECT_LOGVIEW_APP_TITLE=Выберите исполняемый файл для запуска лог-файла
 FILEDLG_SELECT_LOGVIEW_APP_FILTER=exe(*.exe)\0*.exe\0all(*.*)\0*.*\0\0
 FILEDLG_SELECT_LOGDIR_TITLE=Укажите папку лог-файла
@@ -201,14 +201,14 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=мс
 
 DLG_TAB_VISUAL_ALHPA=&Прозрачный
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
-DLG_TAB_VISUAL_BGIMG=Background &Image
+DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
 DLG_TAB_VISUAL_MOUSE=&Курсор мыши
 DLG_TAB_VISUAL_FONT_QUALITY=&Качество шрифта
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=По умолчанию
 DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED=Не сглаженный
 DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED=Сглаженный
 DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE=ClearType
-DLG_TAB_VISUAL_ANSICOLOR=AN&SI color
+DLG_TAB_VISUAL_ANSICOLOR=AN&SI цвет
 DLG_TAB_VISUAL_RED=&      R
 DLG_TAB_VISUAL_GREEN=&      G
 DLG_TAB_VISUAL_BLUE=&      B
@@ -240,14 +240,14 @@ DLG_PRNABORT_PRINTING=Печать
 
 DLG_PROT_FIELNAME=Имя файла:
 DLG_PROT_PROTO=Протокол:
-DLG_PROT_PACKET=пакет#:
+DLG_PROT_PACKET=Пакет#:
 DLG_PROT_TRANS=Переданные байты:
-DLG_PROT_ELAPSED=Затраченное время:
+DLG_PROT_ELAPSED=Время:
 
 DLG_FILETRANS_FILENAME=Имя файла:
 DLG_FILETRANS_FULLPATH=Полный путь:
 DLG_FILETRANS_TRNAS=Переданные байты:
-DLG_FILETRANS_ELAPSED=Затраченное время:
+DLG_FILETRANS_ELAPSED=Время:
 DLG_FILETRANS_START=&Старт
 DLG_FILETRANS_PAUSE=&Пауза
 DLG_FILETRANS_CLOSE=Закрыть
@@ -274,8 +274,8 @@ DLG_SELECT_DIR_TITLE=Выбрать новую папку
 
 DLG_GEN_TITLE=Tera Term: Общие настройки
 DLG_GEN_PORT=&Порт:
-DLG_GEN_LANG=&Язык:
-DLG_GEN_LANG_UI=&Язык UI:
+DLG_GEN_LANG=&Кодировка:
+DLG_GEN_LANG_UI=&Язык меню:
 
 DLG_HOST_TITLE=Tera Term: Новое соединение
 DLG_HOST_TCPIPHOST=&Хост:
@@ -325,7 +325,7 @@ DLG_TERM_ISWIN=&Размер по окну
 DLG_TERM_RESIZE=&Автомат.размер окна
 DLG_TERM_NEWLINE=Новая строка
 DLG_TERM_CRRCV=&Прием:
-DLG_TERM_CRSEND=&Перед.:
+DLG_TERM_CRSEND=&Передача
 DLG_TERM_ID=&Терминал ID:
 DLG_TERM_LOCALECHO=&Локальное эхо
 DLG_TERM_ANSBACK=&Ответ:
@@ -449,7 +449,7 @@ BTN_CONTINUE=&Продолжить
 ; common
 MSG_ERROR=ОШИБКА
 MSG_TT_ERROR=Tera Term: Ошибка
-MSG_TT_NOTICE=Tera Term: Notice
+MSG_TT_NOTICE=Tera Term: Внимание
 MSG_TT_TAKE_EFFECT=Эта опция действует при следующей сессии.
 
 BTN_OK=OK
