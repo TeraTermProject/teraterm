@@ -270,9 +270,9 @@
        インストールおよび実行をテストする
 
   7. SourceForge.jp を更新する
-       [ダウンロード]-[管理]-[新規作成]
+     - [ダウンロード]-[管理]-[新規作成]
          変更履歴を入力してリリースを作成する
-       [ニュース一覧]-[新規登録]
+     - [ニュース一覧]-[新規登録]
          ニュース記事を作成する
 
   8. プロジェクトページを更新する
@@ -280,10 +280,10 @@
   9. メーリングリストにアナウンスする
 
   10. フォーラムに告知する
-       (1) Announcements http://logmett.com/forum/viewforum.php?f=5
-           Announcements に新規投稿する。種類は Announcement
-           一つ前の Announcement の種類を Normal に変更する
-           Announcement は三個残すことになっているので、三つ前の Announcement を削除する
+       - Announcements http://logmett.com/forum/viewforum.php?f=5
+         Announcements に新規投稿する。種類は Announcement
+         一つ前の Announcement の種類を Normal に変更する
+         Announcement は三個残すことになっているので、三つ前の Announcement を削除する
 
 
   11. スナップショットを削除する

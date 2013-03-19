@@ -229,6 +229,8 @@ Example: adding a TTSSH menu under File menu
       http://logmett.com/freeware/LogMeTT.php
       http://logmett.com/freeware/TTLEdit.php
 
+  2. Check the document files.
+
   3. Increase the software version and modify date.
      Increment the version of VS_VERSION_INFO while release process.
      - ttermpro.rc
@@ -264,9 +266,9 @@ Example: adding a TTSSH menu under File menu
   9. Announce release to mailing list(in Japan).
 
   10. Announce release to forum(in Canada).
-       (1) Announcements http://logmett.com/forum/viewforum.php?f=5
-           Create new topic in `Announcements' entry.
-           Change the type of previous Announcement from Announcement to Normal.
-           Delete third previous Announcement.
+       - Announcements http://logmett.com/forum/viewforum.php?f=5
+         Create new topic in `Announcements' entry.
+         Change the type of previous Announcement from Announcement to Normal.
+         Delete third previous Announcement.
 
   11. Delete snapshots.
