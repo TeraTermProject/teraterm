@@ -241,8 +241,8 @@ Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
 Filename: {tmp}\Setup_LogMeTT_2_9_9_2.exe; Flags: skipifsilent; Components: LogMeTT
 Filename: {tmp}\Setup_LogMeTT_2_9_9_2.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: LogMeTT
-Filename: {tmp}\Setup_TTLEditor_1_4_41.exe; Flags: skipifsilent; Components: TTLEdit
-Filename: {tmp}\Setup_TTLEditor_1_4_41.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: TTLEdit
+Filename: {tmp}\Setup_TTLEditor_1_4_45.exe; Flags: skipifsilent; Components: TTLEdit
+Filename: {tmp}\Setup_TTLEditor_1_4_45.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: TTLEdit
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
 Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
 
