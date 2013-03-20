@@ -40,6 +40,11 @@
 
 #include "ttl.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iptypes.h>
+#include <iphlpapi.h>
+
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
 
@@ -2165,6 +2170,130 @@ WORD TTLGetHostname()
 		SetStrVal(VarId,Str);
 	return Err;
 }
+
+#define MAX_IPADDR 10
+/*
+ strdim ipaddr 10
+ getipv4addr ipaddr[0]
+ result = N
+ */
+WORD TTLGetIPv4Addr()
+{
+	WORD Err;
+	TVarId VarId, id;
+	INTERFACE_INFO info[MAX_IPADDR];
+	SOCKET sock;
+	DWORD socknum;
+	int num;
+	int i, n;
+	IN_ADDR addr;
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	// 自分自身の全IPv4アドレスを取得する。
+	num = 0;
+	sock = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, 0);
+	if (WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, info, sizeof(info), &socknum, NULL, NULL) != SOCKET_ERROR) {
+		n = socknum / sizeof(info[0]);
+		for (i = 0 ; i < n ; i++) {
+			if ((info[i].iiFlags & IFF_UP) == 0) 
+				continue;
+			if ((info[i].iiFlags & IFF_LOOPBACK) != 0)
+				continue;
+			addr = info[i].iiAddress.AddressIn.sin_addr;
+
+			id = GetStrVarFromArray(GetArrayVarId(VarId), num, &Err);
+			if (Err == 0) {
+				SetStrVal(id, inet_ntoa(addr));
+				num++;
+			} else {
+				break;
+			}
+		}
+	}
+	closesocket(sock);
+
+	SetResult(num);
+
+	return Err;
+}
+
+
+// IPv6アドレスを文字列に変換する。
+static void myInetNtop(int Family, char *pAddr, char *pStringBuf, size_t StringBufSize)
+{
+	int i;
+	char s[16];
+	unsigned int val;
+
+	pStringBuf[0] = '\0';
+	for (i = 0 ; i < 16 ; i++) {
+		val = (pAddr[i]) & 0xFF;
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "%02x", val);
+		strncat_s(pStringBuf, StringBufSize, s, _TRUNCATE);
+		if (i != 15 && (i & 1))
+			strncat_s(pStringBuf, StringBufSize, ":", _TRUNCATE);
+	}
+}
+
+
+WORD TTLGetIPv6Addr()
+{
+	WORD Err;
+	TVarId VarId, id;
+	int num;
+    DWORD ret;
+    IP_ADAPTER_ADDRESSES addr[256];/* XXX */
+    ULONG len = sizeof(addr);
+	char ipv6str[64];
+
+	Err = 0;
+	GetStrVar(&VarId,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	// 自分自身の全IPv6アドレスを取得する。
+	num = 0;
+	ret = GetAdaptersAddresses(AF_INET6, 0, NULL, addr, &len);
+	if (ret == ERROR_SUCCESS) {
+		IP_ADAPTER_ADDRESSES *padap = &addr[0];
+
+		do {
+			IP_ADAPTER_UNICAST_ADDRESS *uni = padap->FirstUnicastAddress;
+
+			if (!uni) {
+				continue;
+			}
+			do {
+				SOCKET_ADDRESS addr = uni->Address;
+				struct sockaddr_in6 *sa;
+
+				if (!(uni->Flags & IP_ADAPTER_ADDRESS_DNS_ELIGIBLE)) {
+					continue;
+				}
+				sa = (struct sockaddr_in6*)addr.lpSockaddr;
+				myInetNtop(AF_INET6, (char*)&sa->sin6_addr, ipv6str, sizeof(ipv6str));
+
+				id = GetStrVarFromArray(GetArrayVarId(VarId), num, &Err);
+				if (Err == 0) {
+					SetStrVal(id, ipv6str);
+					num++;
+				}
+
+			} while ((uni = uni->Next));
+		} while ((padap = padap->Next));
+	}
+
+	SetResult(num);
+
+	return Err;
+}
+
 
 WORD TTLGetPassword()
 {
@@ -5195,6 +5324,10 @@ int ExecCmnd()
 			Err = TTLGetFileAttr(); break;
 		case RsvGetHostname:
 			Err = TTLGetHostname(); break;
+		case RsvGetIPv4Addr:
+			Err = TTLGetIPv4Addr(); break;
+		case RsvGetIPv6Addr:
+			Err = TTLGetIPv6Addr(); break;
 		case RsvGetPassword:
 			Err = TTLGetPassword(); break;
 		case RsvSetPassword:

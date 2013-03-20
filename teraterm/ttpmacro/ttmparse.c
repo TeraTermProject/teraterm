@@ -225,6 +225,8 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"getenv")==0) *WordId = RsvGetEnv;
 		else if (_stricmp(Str,"getfileattr")==0) *WordId = RsvGetFileAttr;
 		else if (_stricmp(Str,"gethostname")==0) *WordId = RsvGetHostname;
+		else if (_stricmp(Str,"getipv4addr")==0) *WordId = RsvGetIPv4Addr;
+		else if (_stricmp(Str,"getipv6addr")==0) *WordId = RsvGetIPv6Addr;
 		else if (_stricmp(Str,"getpassword")==0) *WordId = RsvGetPassword;
 		else if (_stricmp(Str,"getspecialfolder")==0) *WordId = RsvGetSpecialFolder;
 		else if (_stricmp(Str,"gettime")==0) *WordId = RsvGetTime;
@@ -1814,4 +1816,10 @@ TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
 	}
 	*Err = 0;
 	return ((VarId+1) << 16) | Index;
+}
+
+// 配列の要素変数から、配列全体のVarIDを返す。
+TVarId GetArrayVarId(TVarId VarId)
+{
+	return ((VarId>>16)-1);
 }

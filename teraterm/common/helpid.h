@@ -223,6 +223,8 @@
 #define HlpMacroCommandGetenv           92045
 #define HlpMacroCommandGetfileattr      92189
 #define HlpMacroCommandGethostname      92141
+#define HlpMacroCommandGetipv4addr      92199
+#define HlpMacroCommandGetipv6addr      92200
 #define HlpMacroCommandGetpassword      92046
 #define HlpMacroCommandGetspecialfolder 92195
 #define HlpMacroCommandGettime          92047

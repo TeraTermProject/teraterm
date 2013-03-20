@@ -225,6 +225,8 @@
 #define RsvSetPassword  196
 #define RsvIsPassword   197
 #define RsvListBox      198
+#define RsvGetIPv4Addr  199
+#define RsvGetIPv6Addr  200
 
 #define RsvOperator     1000
 #define RsvBNot         1001
@@ -309,6 +311,7 @@ void GetVarType(LPWORD ValType, int far *Val, LPWORD Err);
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
 BOOL GetIndex(int *Index, LPWORD Err);
+TVarId GetArrayVarId(TVarId VarId);
 
 extern WORD TTLStatus;
 extern char LineBuff[MaxLineLen];
