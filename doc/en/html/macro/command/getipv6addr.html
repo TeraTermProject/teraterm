@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>getipv6addr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getipv6addr</h1>
+
+<p>
+Retrieves local IPv6 address(es)
+</p>
+
+<pre class="macro-syntax">
+getipv6addr &lt;string array[0]&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">Array &lt;string array[0]&gt;</dt>
+	<dd>IP addresses are stored in the string array. The max items is 10.</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System variable &lt;result&gt;</dt>
+	<dd>It is set to the IP address number.<br>
+	    If the IP address is nothing, it is set to 0.</dd>
+	
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+strdim ipaddr 10
+
+getipv6addr ipaddr[0]
+N = result - 1
+for i 0 N
+	messagebox ipaddr[i] "IPv6 address"
+next
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="getipv4addr.html">getipv4addr</a></li>
+</ul>
+
+</body>
+</html>

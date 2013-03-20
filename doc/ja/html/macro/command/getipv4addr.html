@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getipv4addr</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getipv4addr</h1>
+
+<p>
+自端末のIPv4アドレスを取得する。
+</p>
+
+<pre class="macro-syntax">
+getipv4addr &lt;string array[0]&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">配列 &lt;string array[0]&gt;</dt>
+	<dd>IPアドレスを格納する文字型配列。最大10個まで。</dd>
+</dl>
+
+<h2>返り値</h2>
+
+<dl>
+	<dt class="macro">システム変数 &lt;result&gt;</dt>
+	<dd>IPアドレスの個数が格納される。<br>
+	    IPアドレスが存在しない場合、0が格納される。</dd>
+	
+</dl>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+strdim ipaddr 10
+
+getipv4addr ipaddr[0]
+N = result - 1
+for i 0 N
+	messagebox ipaddr[i] "IPv4 address"
+next
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="getipv6addr.html">getipv6addr</a></li>
+</ul>
+
+</body>
+</html>
