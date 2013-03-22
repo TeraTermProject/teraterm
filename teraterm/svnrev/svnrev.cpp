@@ -7,11 +7,18 @@ int get_svn_revision(char *svnversion, char *path) {
 	char command[MAX_PATH*2];
 	char result[32]= "";
 	int revision = -1;
+	char arg1[MAX_PATH], arg2[MAX_PATH];
 
 	// subversion 1.7 から .svn\entries のフォーマットが変わったため、
 	// .svn\entries を直接読み込むのをやめ、
 	// svnversion.exe コマンドを呼び出した結果を返す
-	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s -n %s", svnversion, path);
+
+	// _popen はスペースが含まれる場合にダブルクォートで囲んでも
+	// うまく動かないため 8.3 形式に変換
+	GetShortPathName(svnversion, arg1, sizeof(arg1));
+	GetShortPathName(path, arg2, sizeof(arg2));
+
+	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s -n %s", arg1, arg2);
 	if ((fp = _popen(command, "rt")) == NULL ) {
 		return -1;
 	}
