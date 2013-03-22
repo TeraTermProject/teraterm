@@ -2181,6 +2181,7 @@ WORD TTLGetIPv4Addr()
 {
 	WORD Err;
 	TVarId VarId, id;
+	WSADATA ws;
 	INTERFACE_INFO info[MAX_IPADDR];
 	SOCKET sock;
 	DWORD socknum;
@@ -2195,6 +2196,10 @@ WORD TTLGetIPv4Addr()
 	if (Err!=0) return Err;
 
 	// 自分自身の全IPv4アドレスを取得する。
+	if (WSAStartup(MAKEWORD(2,2), &ws) != 0) {
+		SetResult(-1);
+		return Err;
+	}
 	num = 0;
 	sock = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, 0);
 	if (WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, info, sizeof(info), &socknum, NULL, NULL) != SOCKET_ERROR) {
@@ -2216,6 +2221,7 @@ WORD TTLGetIPv4Addr()
 		}
 	}
 	closesocket(sock);
+	WSACleanup();
 
 	SetResult(num);
 
