@@ -3063,9 +3063,9 @@ int MessageCommand(int BoxId, LPWORD Err)
 	TStrVal Str1, Str2;
 	int sp = 0;
 	int ret;
-	char *s[LISTBOX_ITEM_NUM] = {0};
-	TStrVal str;
-	int i;
+	char **s;
+	int i, ary_size;
+	TVarId VarId, VarId2;
 
 	*Err = 0;
 	GetStrVal2(Str1, Err, TRUE);
@@ -3107,18 +3107,23 @@ int MessageCommand(int BoxId, LPWORD Err)
 
 	} else if (BoxId==IdListBox) {
 		//  リストボックスの選択肢を取得する。
-		for (i = 0 ; i < LISTBOX_ITEM_NUM ; i++) {
-			if (CheckParameterGiven()) {
-				GetStrVal2(str, Err, TRUE);
-				if (*Err ==0 ) 
-					s[i] = _strdup(str);
-			} else {
-				s[i] = NULL;
-			}
+		GetStrAryVar(&VarId, Err);
+		if (*Err!=0) return 0;
+
+		ary_size = GetStrAryVarSize(VarId);
+		s = (char **)calloc(ary_size + 1, sizeof(char *));
+		if (s == NULL) {
+			*Err = ErrFewMemory;
+			return -1;
+		}
+		for (i = 0 ; i < ary_size ; i++) {
+			VarId2 = GetStrVarFromArray(VarId, i, Err);
+			if (*Err!=0) return -1;
+			s[i] = _strdup(StrVarPtr(VarId2));
 		}
 		if (s[0] == NULL) {
 			*Err = ErrSyntax;
-			return 0;
+			return -1;
 		}
 
 		// return 
@@ -3126,9 +3131,10 @@ int MessageCommand(int BoxId, LPWORD Err)
 		//   -1: キャンセル
 		ret = OpenListDlg(Str1, Str2, s);
 
-		for (i = 0 ; i < LISTBOX_ITEM_NUM ; i++) {
+		for (i = 0 ; i < ary_size ; i++) {
 			free(s[i]);
 		}
+		free(s);
 
 		return (ret);
 
