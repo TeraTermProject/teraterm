@@ -43,7 +43,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iptypes.h>
-#include <iphlpapi.h>
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -2247,6 +2246,12 @@ static void myInetNtop(int Family, char *pAddr, char *pStringBuf, size_t StringB
 }
 
 
+typedef DWORD (__stdcall *pGetAdaptersAddresses)(ULONG Family,
+                                                 DWORD Flags,
+                                                 PVOID Reserved,
+                                                 PIP_ADAPTER_ADDRESSES pAdapterAddresses,
+                                                 PULONG pOutBufLen);
+
 WORD TTLGetIPv6Addr()
 {
 	WORD Err;
@@ -2256,6 +2261,8 @@ WORD TTLGetIPv6Addr()
     IP_ADAPTER_ADDRESSES addr[256];/* XXX */
     ULONG len = sizeof(addr);
 	char ipv6str[64];
+	HMODULE h;
+	pGetAdaptersAddresses pfunc;
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -2264,8 +2271,18 @@ WORD TTLGetIPv6Addr()
 	if (Err!=0) return Err;
 
 	// 自分自身の全IPv6アドレスを取得する。
+	if ((h = LoadLibrary("iphlpapi.dll")) == NULL) {
+		int err = GetLastError();
+		SetResult(-1);
+		return Err;
+	}
+	if ((pfunc = (pGetAdaptersAddresses)GetProcAddress(h, "GetAdaptersAddresses")) == NULL) {
+		FreeLibrary(h);
+		SetResult(-1);
+		return Err;
+	}
 	num = 0;
-	ret = GetAdaptersAddresses(AF_INET6, 0, NULL, addr, &len);
+	ret = pfunc(AF_INET6, 0, NULL, addr, &len);
 	if (ret == ERROR_SUCCESS) {
 		IP_ADAPTER_ADDRESSES *padap = &addr[0];
 
@@ -2297,6 +2314,7 @@ WORD TTLGetIPv6Addr()
 
 	SetResult(num);
 
+	FreeLibrary(h);
 	return Err;
 }
 

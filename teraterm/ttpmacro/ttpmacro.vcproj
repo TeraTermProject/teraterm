@@ -79,7 +79,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib Version.lib iphlpapi.lib"
+				AdditionalDependencies="onig_s.lib Version.lib"
 				OutputFile="..\Release/ttpmacro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -176,7 +176,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib Version.lib iphlpapi.lib"
+				AdditionalDependencies="onig_sd.lib Version.lib"
 				OutputFile="..\Debug/ttpmacro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
