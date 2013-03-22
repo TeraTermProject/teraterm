@@ -20,6 +20,7 @@ protected:
 	PCHAR m_Caption;
 	CHAR **m_Lists;
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
+	HFONT DlgFont;
 
 	DECLARE_MESSAGE_MAP()
 public:

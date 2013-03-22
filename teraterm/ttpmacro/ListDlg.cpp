@@ -22,6 +22,7 @@ CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists)
 	m_Text = Text;
 	m_Caption = Caption;
 	m_Lists = Lists;
+	DlgFont = NULL;
 }
 
 CListDlg::~CListDlg()
@@ -53,10 +54,29 @@ void CListDlg::OnBnClickedOk()
 BOOL CListDlg::OnInitDialog()
 {
 	char **p;
+	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+	LOGFONT logfont;
+	HFONT font;
 
 	CDialog::OnInitDialog();
 
 	// TODO:  Ç±Ç±Ç…èâä˙âªÇí«â¡ÇµÇƒÇ≠ÇæÇ≥Ç¢
+	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
+	GetObject(font, sizeof(LOGFONT), &logfont);
+	if (get_lang_font("DLG_SYSTEM_FONT", m_hWnd, &logfont, &DlgFont, UILanguageFile)) {
+		SendDlgItemMessage(IDC_LISTBOX, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_STATIC, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDOK, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDCANCEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+	}
+
+	GetDlgItemText(IDOK, uimsg2, sizeof(uimsg2));
+	get_lang_msg("BTN_OK", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+	SetDlgItemText(IDOK, uimsg);
+	GetDlgItemText(IDCANCEL, uimsg2, sizeof(uimsg2));
+	get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+	SetDlgItemText(IDCANCEL, uimsg);
+
 	p = m_Lists;
 	while (*p) {
 		m_xcList.InsertString(-1, _T(*p));
