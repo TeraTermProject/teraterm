@@ -312,6 +312,10 @@ TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
 BOOL GetIndex(int *Index, LPWORD Err);
 TVarId GetArrayVarId(TVarId VarId);
+void GetIntAryVar(PVarId VarId, LPWORD Err);
+void GetStrAryVar(PVarId VarId, LPWORD Err);
+int GetIntAryVarSize(TVarId VarId);
+int GetStrAryVarSize(TVarId VarId);
 
 extern WORD TTLStatus;
 extern char LineBuff[MaxLineLen];

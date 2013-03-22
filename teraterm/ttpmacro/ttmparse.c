@@ -1823,3 +1823,55 @@ TVarId GetArrayVarId(TVarId VarId)
 {
 	return ((VarId>>16)-1);
 }
+
+void GetIntAryVar(PVarId VarId, LPWORD Err)
+{
+	TName Name;
+	WORD VarType;
+
+	if (*Err!=0) return;
+
+	if (GetIdentifier(Name)) {
+		if (CheckVar(Name, &VarType, VarId)) {
+			if (VarType != TypIntArray) {
+				*Err = ErrTypeMismatch;
+			}
+		}
+		else {
+			*Err = ErrTypeMismatch;
+		}
+	}
+	else
+		*Err = ErrSyntax;
+}
+
+void GetStrAryVar(PVarId VarId, LPWORD Err)
+{
+	TName Name;
+	WORD VarType;
+
+	if (*Err!=0) return;
+
+	if (GetIdentifier(Name)) {
+		if (CheckVar(Name, &VarType, VarId)) {
+			if (VarType != TypStrArray) {
+				*Err = ErrTypeMismatch;
+			}
+		}
+		else {
+			*Err = ErrTypeMismatch;
+		}
+	}
+	else
+		*Err = ErrSyntax;
+}
+
+int GetIntAryVarSize(TVarId VarId)
+{
+	return IntAryVal[VarId].size;
+}
+
+int GetStrAryVarSize(TVarId VarId)
+{
+	return StrAryVal[VarId].size;
+}
