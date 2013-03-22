@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;item10&gt;]
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
 </pre>
 
 <h2>パラメータ</h2>
@@ -30,7 +30,7 @@ listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;i
 	<dt class="macro">文字列 &lt;title&gt;</dt>
 	<dd>リストボックスのタイトル。</dd>
 	
-	<dt class="macro">文字列 &lt;itemN&gt; (N=1-10)</dt>
+	<dt class="macro">文字型文字列 &lt;string array&gt;</dt>
 	<dd>リストボックスの選択項目。</dd>
 
 </dl>
@@ -47,7 +47,11 @@ listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;i
 <h2>例</h2>
 
 <pre class="macro-example">
-listbox '好きな食べ物を選んでください' 'あなたへの問い' 'バナナ' 'りんご' 'みかん'
+strdim msg 3
+msg[0] = 'バナナ' 
+msg[1] = 'りんご' 
+msg[2] = 'みかん'
+listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 sprintf2 var "%d" result
 messagebox var "result"
 ; result

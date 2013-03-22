@@ -18,7 +18,7 @@ Displays a list box, and ask a item to user.
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;item10&gt;]
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
 </pre>
 
 <h2>Parameters</h2>
@@ -30,7 +30,7 @@ listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;i
 	<dt class="macro">string &lt;title&gt;</dt>
 	<dd>It is displayed as the list box title.</dd>
 	
-	<dt class="macro">string &lt;itemN&gt; (N=1-10)</dt>
+	<dt class="macro">array&lt;string array&gt;</dt>
 	<dd>It is displayed as the list box items.</dd>
 
 </dl>
@@ -47,7 +47,11 @@ listbox &lt;message&gt; &lt;title&gt; &lt;item1&gt; [&lt;item2&gt;] [...] [&lt;i
 <h2>Example</h2>
 
 <pre class="macro-example">
-listbox 'Select your favorite food.' 'Confirmation' 'Banana' 'Apple' 'Orange'
+strdim msg 3
+msg[0] = 'Banana' 
+msg[1] = 'Apple' 
+msg[2] = 'Orange'
+listbox 'Select your favorite food.' 'Confirmation' msg
 sprintf2 var "%d" result
 messagebox var "result"
 ; result
