@@ -33,7 +33,8 @@ getipv6addr &lt;string array&gt;
 <dl>
 	<dt class="macro">システム変数 &lt;result&gt;</dt>
 	<dd>IPアドレスの個数が格納される。<br>
-	    IPアドレスが存在しない場合、0が格納される。</dd>
+	    IPアドレスが存在しない場合、0が格納される。
+	    IPアドレスの取得に失敗した場合、-1が格納される。Windows 2000 以前では常に失敗する。</dd>
 	
 </dl>
 
@@ -43,10 +44,16 @@ getipv6addr &lt;string array&gt;
 strdim ipaddr 10
 
 getipv6addr ipaddr
-N = result - 1
-for i 0 N
-	messagebox ipaddr[i] "IPv6 address"
-next
+if result = -1 then
+	messagebox 'Error' 'IPv6 address'
+elseif result = 0 then
+	messagebox 'Not found' 'IPv6 address'
+else
+	N = result - 1
+	for i 0 N
+		messagebox ipaddr[i] "IPv6 address"
+	next
+endif
 </pre>
 
 <h2>参照</h2>

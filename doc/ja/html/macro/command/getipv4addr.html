@@ -33,7 +33,8 @@ getipv4addr &lt;string array&gt;
 <dl>
 	<dt class="macro">システム変数 &lt;result&gt;</dt>
 	<dd>IPアドレスの個数が格納される。<br>
-	    IPアドレスが存在しない場合、0が格納される。</dd>
+	    IPアドレスが存在しない場合、0が格納される。<br>
+	    IPアドレスの取得に失敗した場合、-1が格納される。</dd>
 	
 </dl>
 
@@ -43,10 +44,17 @@ getipv4addr &lt;string array&gt;
 strdim ipaddr 10
 
 getipv4addr ipaddr
-N = result - 1
-for i 0 N
-	messagebox ipaddr[i] "IPv4 address"
-next
+if result = -1 then
+	messagebox 'Error' 'IPv4 address'
+elseif result = 0 then
+	messagebox 'Not found' 'IPv4 address'
+else
+	N = result - 1
+	for i 0 N
+		messagebox ipaddr[i] "IPv4 address"
+	next
+endif
+
 </pre>
 
 <h2>参照</h2>

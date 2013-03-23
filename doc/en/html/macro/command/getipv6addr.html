@@ -33,7 +33,8 @@ getipv6addr &lt;string array&gt;
 <dl>
 	<dt class="macro">System variable &lt;result&gt;</dt>
 	<dd>It is set to the IP address number.<br>
-	    If the IP address is nothing, it is set to 0.</dd>
+	    If the IP address is nothing, it is set to 0.
+	    <!--IPƒAƒhƒŒƒX‚Ìæ“¾‚É¸”s‚µ‚½ê‡A-1‚ªŠi”[‚³‚ê‚éBWindows 2000 ˆÈ‘O‚Å‚Íí‚É¸”s‚·‚éB--></dd>
 	
 </dl>
 
@@ -43,10 +44,16 @@ getipv6addr &lt;string array&gt;
 strdim ipaddr 10
 
 getipv6addr ipaddr
-N = result - 1
-for i 0 N
-	messagebox ipaddr[i] "IPv6 address"
-next
+if result = -1 then
+	messagebox 'Error' 'IPv6 address'
+elseif result = 0 then
+	messagebox 'Not found' 'IPv6 address'
+else
+	N = result - 1
+	for i 0 N
+		messagebox ipaddr[i] "IPv6 address"
+	next
+endif
 </pre>
 
 <h2>See also</h2>
