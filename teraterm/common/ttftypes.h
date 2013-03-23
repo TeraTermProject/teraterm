@@ -63,6 +63,12 @@
 #define TitQVRcv    "Quick-VAN Receive"
 #define TitQVSend   "Quick-VAN Send"
 
+// log rotate mode
+enum rotate_mode {
+	ROTATE_NONE,
+	ROTATE_SIZE
+};
+
 typedef struct {
   HWND HMainWin;
   HWND HWin;
@@ -99,6 +105,11 @@ typedef struct {
   int ProgStat;
 
   DWORD StartTime;
+
+  // log rotate
+  enum rotate_mode RotateMode;
+  LONG RotateSize;
+
 } TFileVar;
 typedef TFileVar far *PFileVar;
 

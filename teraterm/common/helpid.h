@@ -249,6 +249,7 @@
 #define HlpMacroCommandLoginfo          92152
 #define HlpMacroCommandLogopen          92060
 #define HlpMacroCommandLogpause         92061
+#define HlpMacroCommandLogrotate        92201
 #define HlpMacroCommandLogstart         92062
 #define HlpMacroCommandLogwrite         92063
 #define HlpMacroCommandLoop             92127

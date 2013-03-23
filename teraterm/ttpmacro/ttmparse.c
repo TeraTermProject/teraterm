@@ -257,6 +257,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"loginfo")==0) *WordId = RsvLogInfo;
 		else if (_stricmp(Str,"logopen")==0) *WordId = RsvLogOpen;
 		else if (_stricmp(Str,"logpause")==0) *WordId = RsvLogPause;
+		else if (_stricmp(Str,"logrotate")==0) *WordId = RsvLogRotate;
 		else if (_stricmp(Str,"logstart")==0) *WordId = RsvLogStart;
 		else if (_stricmp(Str,"logwrite")==0) *WordId = RsvLogWrite;
 		else if (_stricmp(Str,"loop")==0) *WordId = RsvLoop;

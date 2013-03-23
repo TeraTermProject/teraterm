@@ -227,6 +227,7 @@
 #define RsvListBox      198
 #define RsvGetIPv4Addr  199
 #define RsvGetIPv6Addr  200
+#define RsvLogRotate    201
 
 #define RsvOperator     1000
 #define RsvBNot         1001

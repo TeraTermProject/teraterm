@@ -2862,6 +2862,47 @@ WORD TTLInt2Str()
 	return Err;
 }
 
+//
+// logrotate size value
+// logrotate halt
+//
+WORD TTLLogRotate() 
+{
+	WORD Err;
+	char Str[MaxStrLen];
+	char buf[MaxStrLen*2];
+	int size;
+
+	Err = 0;
+	GetStrVal(Str, &Err);
+	if ((Err==0) && (! Linked))
+		Err = ErrLinkFirst;
+	if (Err!=0) return Err;
+
+	Err = ErrSyntax;
+	if (strcmp(Str, "size") == 0) {
+		if (CheckParameterGiven()) {
+			Err = 0;
+			size = 0;
+			GetIntVal(&size, &Err);
+			if (size < 128)
+				Err = ErrSyntax;
+			if (Err == 0)
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s %u", Str, size);
+		}
+
+	} else if (strcmp(Str, "halt") == 0) {
+		Err = 0;
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", Str);
+	} 
+	if (Err!=0) return Err;
+
+	SetFile(buf);
+	Err = SendCmnd(CmdLogRotate, 0);
+
+	return Err;
+}
+
 WORD TTLLogInfo() 
 {
 	WORD Err;
@@ -5407,6 +5448,8 @@ int ExecCmnd()
 			Err = TTLLogOpen(); break;
 		case RsvLogPause:
 			Err = TTLCommCmd(CmdLogPause,0); break;
+		case RsvLogRotate:
+			Err = TTLLogRotate(); break;
 		case RsvLogStart:
 			Err = TTLCommCmd(CmdLogStart,0); break;
 		case RsvLogWrite:

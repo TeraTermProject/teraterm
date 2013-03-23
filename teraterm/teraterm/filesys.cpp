@@ -22,6 +22,8 @@
 #include "filesys.h"
 #include "ftlib.h"
 
+#include <io.h>
+
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
 #define FS_BRACKET_END   2
@@ -530,6 +532,8 @@ BOOL LogStart()
 	}
 	LogVar->ByteCount = 0;
 
+	LogVar->RotateMode = ROTATE_NONE;
+
 	if (! OpenFTDlg(LogVar)) {
 		FileTransEnd(OpLog);
 		return FALSE;
@@ -647,6 +651,58 @@ void CommentLogToFile(char *buf, int size)
 	logfile_unlock();
 }
 
+// ログをローテートする。
+// (2013.3.21 yutaka)
+static void LogRotate(void)
+{
+	const int loopmax = 10000;  // XXX
+	char filename[1024];
+	int i;
+	int dwShareMode = 0;
+
+	if (! LogVar->FileOpen) return;
+
+	if (LogVar->RotateMode == ROTATE_NONE)
+		return;
+
+	if (LogVar->RotateMode == ROTATE_SIZE) {
+		if (LogVar->ByteCount <= LogVar->RotateSize) 
+			return;
+		//OutputDebugPrintf("%s: mode %d size %ld\n", __FUNCTION__, LogVar->RotateMode, LogVar->ByteCount);
+	} else {
+		return;
+	}
+
+	logfile_lock();
+	// ログサイズを再初期化する。
+	LogVar->ByteCount = 0;
+
+	// いったん今のファイルをクローズして、別名のファイルをオープンする。
+	_lclose(LogVar->FileHandle);
+
+	for (i = 1 ; i < loopmax ; i++) {
+		_snprintf_s(filename, sizeof(filename), _TRUNCATE, "%s.%d", LogVar->FullName, i);
+		if (_access_s(filename, 0) != 0)
+			break;
+	}
+	if (i >= loopmax) {
+		// TODO:
+	}
+
+	// 別ファイルにリネーム。
+	rename(LogVar->FullName, filename);
+
+	// 再オープン
+	if (ts.LogLockExclusive) {
+		dwShareMode = FILE_SHARE_READ;
+	}
+	LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+	                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	logfile_unlock();
+
+}
+
 void LogToFile()
 {
 	PCHAR Buf;
@@ -738,6 +794,10 @@ void LogToFile()
 	if (((cv.FilePause & OpLog) !=0) || cv.ProtoFlag) return;
 	if (FLogDlg!=NULL)
 		FLogDlg->RefreshNum();
+
+	// ログ・ローテート
+	LogRotate();
+
 }
 
 BOOL CreateLogBuf()

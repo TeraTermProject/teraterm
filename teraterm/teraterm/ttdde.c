@@ -337,6 +337,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdYmodemRecv   'T'
 #define CmdDispStr      'U'
 #define CmdLogInfo      'V'
+#define CmdLogRotate    'W'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -506,6 +507,23 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN),ParamFileName, _TRUNCATE);
 		PostMessage(HVTWin,WM_USER_ACCELCOMMAND,IdCmdLoadKeyMap,0);
 		break;
+
+	case CmdLogRotate:
+		if (LogVar != NULL) {
+			char *p = ParamFileName;
+			int s;
+
+			if (strncmp(p, "size", 4) == 0) {
+				s = atoi(&p[5]);
+				LogVar->RotateMode = ROTATE_SIZE;
+				LogVar->RotateSize = s;
+
+			} else if (strncmp(p, "halt", 4) == 0) {
+				LogVar->RotateMode = ROTATE_NONE;
+			}
+		}
+		break;
+
 	case CmdLogClose:
 		if (LogVar != NULL) FileTransEnd(OpLog);
 		break;
