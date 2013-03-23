@@ -18,14 +18,14 @@ Retrieves local IPv6 address(es)
 </p>
 
 <pre class="macro-syntax">
-getipv6addr &lt;string array[0]&gt;
+getipv6addr &lt;string array&gt;
 </pre>
 
 <h2>Parameters</h2>
 
 <dl>
-	<dt class="macro">Array &lt;string array[0]&gt;</dt>
-	<dd>IP addresses are stored in the string array. The max items is 10.</dd>
+	<dt class="macro">Array &lt;string array&gt;</dt>
+	<dd>IP addresses are stored in the string array.</dd>
 </dl>
 
 <h2>Return Value</h2>
@@ -42,7 +42,7 @@ getipv6addr &lt;string array[0]&gt;
 <pre class="macro-example">
 strdim ipaddr 10
 
-getipv6addr ipaddr[0]
+getipv6addr ipaddr
 N = result - 1
 for i 0 N
 	messagebox ipaddr[i] "IPv6 address"

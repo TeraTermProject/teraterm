@@ -18,14 +18,14 @@
 </p>
 
 <pre class="macro-syntax">
-getipv6addr &lt;string array[0]&gt;
+getipv6addr &lt;string array&gt;
 </pre>
 
 <h2>パラメータ</h2>
 
 <dl>
-	<dt class="macro">配列 &lt;string array[0]&gt;</dt>
-	<dd>IPアドレスを格納する文字型配列。最大10個まで。</dd>
+	<dt class="macro">配列 &lt;string array&gt;</dt>
+	<dd>IPアドレスを格納する文字型配列。</dd>
 </dl>
 
 <h2>返り値</h2>
@@ -42,7 +42,7 @@ getipv6addr &lt;string array[0]&gt;
 <pre class="macro-example">
 strdim ipaddr 10
 
-getipv6addr ipaddr[0]
+getipv6addr ipaddr
 N = result - 1
 for i 0 N
 	messagebox ipaddr[i] "IPv6 address"

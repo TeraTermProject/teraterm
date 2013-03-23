@@ -2170,10 +2170,10 @@ WORD TTLGetHostname()
 	return Err;
 }
 
-#define MAX_IPADDR 10
+#define MAX_IPADDR 30
 /*
  strdim ipaddr 10
- getipv4addr ipaddr[0]
+ getipv4addr ipaddr
  result = N
  */
 WORD TTLGetIPv4Addr()
@@ -2189,7 +2189,7 @@ WORD TTLGetIPv4Addr()
 	IN_ADDR addr;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrAryVar(&VarId,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2210,7 +2210,7 @@ WORD TTLGetIPv4Addr()
 				continue;
 			addr = info[i].iiAddress.AddressIn.sin_addr;
 
-			id = GetStrVarFromArray(GetArrayVarId(VarId), num, &Err);
+			id = GetStrVarFromArray(VarId, num, &Err);
 			if (Err == 0) {
 				SetStrVal(id, inet_ntoa(addr));
 				num++;
@@ -2265,7 +2265,7 @@ WORD TTLGetIPv6Addr()
 	pGetAdaptersAddresses pfunc;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrAryVar(&VarId,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2302,7 +2302,7 @@ WORD TTLGetIPv6Addr()
 				sa = (struct sockaddr_in6*)addr.lpSockaddr;
 				myInetNtop(AF_INET6, (char*)&sa->sin6_addr, ipv6str, sizeof(ipv6str));
 
-				id = GetStrVarFromArray(GetArrayVarId(VarId), num, &Err);
+				id = GetStrVarFromArray(VarId, num, &Err);
 				if (Err == 0) {
 					SetStrVal(id, ipv6str);
 					num++;
