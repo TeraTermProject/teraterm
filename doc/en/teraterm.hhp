@@ -241,6 +241,7 @@ HlpMacroCommandLogclose=html\macro\command\logclose.html
 HlpMacroCommandLoginfo=html\macro\command\loginfo.html
 HlpMacroCommandLogopen=html\macro\command\logopen.html
 HlpMacroCommandLogpause=html\macro\command\logpause.html
+HlpMacroCommandLogrotate=html\macro\command\logrotate.html
 HlpMacroCommandLogstart=html\macro\command\logstart.html
 HlpMacroCommandLogwrite=html\macro\command\logwrite.html
 HlpMacroCommandLoop=html\macro\command\doloop.html

@@ -749,6 +749,10 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="logrotate">
+					<param name="Local" value="html\macro\command\logrotate.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logstart">
 					<param name="Local" value="html\macro\command\logstart.html">
 					<param name="ImageNumber" value="11">

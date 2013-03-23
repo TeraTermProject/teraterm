@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>logrotate</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>logrotate</h1>
+
+<p>
+Rotates a log file.
+</p>
+
+<pre class="macro-syntax">
+logrotate 'size' &lt;num&gt;
+logrotate 'halt'
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">'size' &lt;num&gt;</dt>
+	<dd>When a log file size is over &lt;num&gt; byte, the log file is be rotated.<br>
+	    The &lt;num&gt; value must be larger than 128.</dd>
+
+	<dt class="macro">'halt'</dt>
+	<dd>The log rotation is stopped.</dd>
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+getspecialfolder str "Desktop"
+changedir str
+logopen 'teraterm_sample.log' 0 0
+; Start log rotation
+logrotate 'size' 2048
+pause 600
+; Stop log rotation
+logrotate 'halt'
+pause 600
+logclose
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="logopen.html">logopen</a></li>
+</ul>
+
+</body>
+</html>
