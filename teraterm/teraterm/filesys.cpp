@@ -655,9 +655,10 @@ void CommentLogToFile(char *buf, int size)
 // (2013.3.21 yutaka)
 static void LogRotate(void)
 {
-	const int loopmax = 10000;  // XXX
+	int loopmax = 10000;  // XXX
 	char filename[1024];
-	int i;
+	char newfile[1024], oldfile[1024];
+	int i, k;
 	int dwShareMode = 0;
 
 	if (! LogVar->FileOpen) return;
@@ -680,17 +681,32 @@ static void LogRotate(void)
 	// いったん今のファイルをクローズして、別名のファイルをオープンする。
 	_lclose(LogVar->FileHandle);
 
-	for (i = 1 ; i < loopmax ; i++) {
+	// 世代ローテーションのステップ数の指定があるか
+	if (LogVar->RotateStep > 0)
+		loopmax = LogVar->RotateStep;
+
+	for (i = 1 ; i <= loopmax ; i++) {
 		_snprintf_s(filename, sizeof(filename), _TRUNCATE, "%s.%d", LogVar->FullName, i);
 		if (_access_s(filename, 0) != 0)
 			break;
 	}
-	if (i >= loopmax) {
-		// TODO:
+	if (i > loopmax) {
+		// 世代がいっぱいになったら、最古のファイルから廃棄する。
+		i = loopmax;
 	}
 
 	// 別ファイルにリネーム。
-	rename(LogVar->FullName, filename);
+	for (k = i-1 ; k >= 0 ; k--) {
+		if (k == 0)
+			strncpy_s(oldfile, sizeof(oldfile), LogVar->FullName, _TRUNCATE);
+		else
+			_snprintf_s(oldfile, sizeof(oldfile), _TRUNCATE, "%s.%d", LogVar->FullName, k);
+		_snprintf_s(newfile, sizeof(newfile), _TRUNCATE, "%s.%d", LogVar->FullName, k+1);
+		remove(newfile);
+		if (rename(oldfile, newfile) != 0) {
+			OutputDebugPrintf("%s: rename %d\n", __FUNCTION__, errno);
+		}
+	}
 
 	// 再オープン
 	if (ts.LogLockExclusive) {

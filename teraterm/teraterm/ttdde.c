@@ -518,8 +518,14 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				LogVar->RotateMode = ROTATE_SIZE;
 				LogVar->RotateSize = s;
 
+			} else if (strncmp(p, "rotate", 6) == 0) {
+				s = atoi(&p[7]);
+				LogVar->RotateStep = s;
+
 			} else if (strncmp(p, "halt", 4) == 0) {
 				LogVar->RotateMode = ROTATE_NONE;
+				LogVar->RotateSize = 0;
+				LogVar->RotateStep = 0;
 			}
 		}
 		break;

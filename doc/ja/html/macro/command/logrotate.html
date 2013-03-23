@@ -18,7 +18,8 @@
 </p>
 
 <pre class="macro-syntax">
-logrotate 'size' &lt;num&gt;
+logrotate 'size' &lt;size&gt;
+logrotate 'rotate' &lt;count&gt;
 logrotate 'halt'
 </pre>
 
@@ -26,9 +27,13 @@ logrotate 'halt'
 <h2>パラメータ</h2>
 
 <dl>
-	<dt class="macro">'size' &lt;num&gt;</dt>
-	<dd>ログのサイズが&lt;num&gt;バイトを超えていれば、ローテーションを行う。<br>
-	    &lt;num&gt;は128以上であること。</dd>
+	<dt class="macro">'size' &lt;size&gt;</dt>
+	<dd>ログのサイズが&lt;size&gt;バイトを超えていれば、ローテーションを行う。<br>
+	    &lt;size&gt;は128以上であること。</dd>
+
+	<dt class="macro">'rotate' &lt;count&gt;</dt>
+	<dd>ログファイルの世代を&lt;count&gt;にする。<br>
+	    &lt;count&gt;は1以上であること。</dd>
 
 	<dt class="macro">'halt'</dt>
 	<dd>ローテーションを停止する。</dd>
@@ -38,15 +43,22 @@ logrotate 'halt'
 <h2>例</h2>
 
 <pre class="macro-example">
-getspecialfolder str "Desktop"
+; Open log
+getspecialfolder str "MyDocuments"
 changedir str
 logopen 'teraterm_sample.log' 0 0
+
 ; Start log rotation
 logrotate 'size' 2048
+logrotate 'rotate' 3
+
 pause 600
 ; Stop log rotation
 logrotate 'halt'
+
 pause 600
+
+; Close log
 logclose
 </pre>
 

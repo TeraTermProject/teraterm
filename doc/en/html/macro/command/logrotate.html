@@ -18,16 +18,21 @@ Rotates a log file.
 </p>
 
 <pre class="macro-syntax">
-logrotate 'size' &lt;num&gt;
+logrotate 'size' &lt;size&gt;
+logrotate 'rotate' &lt;count&gt;
 logrotate 'halt'
 </pre>
 
 <h2>Parameters</h2>
 
 <dl>
-	<dt class="macro">'size' &lt;num&gt;</dt>
-	<dd>When a log file size is over &lt;num&gt; byte, the log file is be rotated.<br>
-	    The &lt;num&gt; value must be larger than 128.</dd>
+	<dt class="macro">'size' &lt;size&gt;</dt>
+	<dd>When a log file size is over &lt;size&gt; byte, the log file is be rotated.<br>
+	    The &lt;size&gt; value must be larger than 128.</dd>
+
+	<dt class="macro">'rotate' &lt;count&gt;</dt>
+	<dd>Log files are rotated &lt;count&gt; times before being removed.<br>
+	    The &lt;count&gt; value must be larger than 1.</dd>
 
 	<dt class="macro">'halt'</dt>
 	<dd>The log rotation is stopped.</dd>
@@ -36,15 +41,22 @@ logrotate 'halt'
 <h2>Example</h2>
 
 <pre class="macro-example">
-getspecialfolder str "Desktop"
+; Open log
+getspecialfolder str "MyDocuments"
 changedir str
 logopen 'teraterm_sample.log' 0 0
+
 ; Start log rotation
 logrotate 'size' 2048
+logrotate 'rotate' 3
+
 pause 600
 ; Stop log rotation
 logrotate 'halt'
+
 pause 600
+
+; Close log
 logclose
 </pre>
 

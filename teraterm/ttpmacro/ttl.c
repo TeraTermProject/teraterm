@@ -2864,6 +2864,7 @@ WORD TTLInt2Str()
 
 //
 // logrotate size value
+// logrotate rotate num
 // logrotate halt
 //
 WORD TTLLogRotate() 
@@ -2871,7 +2872,7 @@ WORD TTLLogRotate()
 	WORD Err;
 	char Str[MaxStrLen];
 	char buf[MaxStrLen*2];
-	int size;
+	int size, num;
 
 	Err = 0;
 	GetStrVal(Str, &Err);
@@ -2880,7 +2881,7 @@ WORD TTLLogRotate()
 	if (Err!=0) return Err;
 
 	Err = ErrSyntax;
-	if (strcmp(Str, "size") == 0) {
+	if (strcmp(Str, "size") == 0) {   // ローテートサイズ
 		if (CheckParameterGiven()) {
 			Err = 0;
 			size = 0;
@@ -2889,6 +2890,17 @@ WORD TTLLogRotate()
 				Err = ErrSyntax;
 			if (Err == 0)
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s %u", Str, size);
+		}
+
+	} else if (strcmp(Str, "rotate") == 0) {  // ローテートの世代数
+		if (CheckParameterGiven()) {
+			Err = 0;
+			num = 0;
+			GetIntVal(&num, &Err);
+			if (num <= 0)
+				Err = ErrSyntax;
+			if (Err == 0)
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s %u", Str, num);
 		}
 
 	} else if (strcmp(Str, "halt") == 0) {

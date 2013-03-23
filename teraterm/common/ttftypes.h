@@ -109,6 +109,7 @@ typedef struct {
   // log rotate
   enum rotate_mode RotateMode;
   LONG RotateSize;
+  int RotateStep;
 
 } TFileVar;
 typedef TFileVar far *PFileVar;
