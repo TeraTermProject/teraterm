@@ -2871,8 +2871,9 @@ WORD TTLLogRotate()
 {
 	WORD Err;
 	char Str[MaxStrLen];
+	char Str2[MaxStrLen];
 	char buf[MaxStrLen*2];
-	int size, num;
+	int size, num, len;
 
 	Err = 0;
 	GetStrVal(Str, &Err);
@@ -2885,7 +2886,23 @@ WORD TTLLogRotate()
 		if (CheckParameterGiven()) {
 			Err = 0;
 			size = 0;
-			GetIntVal(&size, &Err);
+			GetStrVal(Str2, &Err);
+			if (Err == 0) {
+				len = strlen(Str2);
+				if (isdigit(Str2[len-1])) {
+					num = 1;
+				} else if (Str2[len-1] == 'K') {
+					Str2[len-1] = 0;
+					num = 1024;
+				} else if (Str2[len-1] == 'M') {
+					Str2[len-1] = 0;
+					num = 1024*1024;
+				} else {
+					Err = ErrSyntax;
+				}
+				size = atoi(Str2) * num;
+			}
+
 			if (size < 128)
 				Err = ErrSyntax;
 			if (Err == 0)

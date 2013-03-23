@@ -18,7 +18,7 @@ Rotates a log file.
 </p>
 
 <pre class="macro-syntax">
-logrotate 'size' &lt;size&gt;
+logrotate 'size' '&lt;size&gt;'
 logrotate 'rotate' &lt;count&gt;
 logrotate 'halt'
 </pre>
@@ -28,7 +28,9 @@ logrotate 'halt'
 <dl>
 	<dt class="macro">'size' &lt;size&gt;</dt>
 	<dd>When a log file size is over &lt;size&gt; byte, the log file is be rotated.<br>
-	    The &lt;size&gt; value must be larger than 128.</dd>
+	    The &lt;size&gt; value must be larger than 128.<br>
+	    If the &lt;size&gt; is followed by K, the size is assumed to be in kilobytes.
+	    If the M is used, the size is in megabytes.</dd>
 
 	<dt class="macro">'rotate' &lt;count&gt;</dt>
 	<dd>Log files are rotated &lt;count&gt; times before being removed.<br>
@@ -47,7 +49,7 @@ changedir str
 logopen 'teraterm_sample.log' 0 0
 
 ; Start log rotation
-logrotate 'size' 2048
+logrotate 'size' '32K'
 logrotate 'rotate' 3
 
 pause 600

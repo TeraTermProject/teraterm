@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-logrotate 'size' &lt;size&gt;
+logrotate 'size' '&lt;size&gt;'
 logrotate 'rotate' &lt;count&gt;
 logrotate 'halt'
 </pre>
@@ -27,9 +27,10 @@ logrotate 'halt'
 <h2>パラメータ</h2>
 
 <dl>
-	<dt class="macro">'size' &lt;size&gt;</dt>
+	<dt class="macro">'size' '&lt;size&gt;'</dt>
 	<dd>ログのサイズが&lt;size&gt;バイトを超えていれば、ローテーションを行う。<br>
-	    &lt;size&gt;は128以上であること。</dd>
+	    &lt;size&gt;は128以上であること。<br>
+	    末尾に"K"があるとキロバイト単位、"M"があるとメガバイト単位になる。</dd>
 
 	<dt class="macro">'rotate' &lt;count&gt;</dt>
 	<dd>ログファイルの世代を&lt;count&gt;にする。<br>
@@ -49,7 +50,7 @@ changedir str
 logopen 'teraterm_sample.log' 0 0
 
 ; Start log rotation
-logrotate 'size' 2048
+logrotate 'size' '32K'
 logrotate 'rotate' 3
 
 pause 600
