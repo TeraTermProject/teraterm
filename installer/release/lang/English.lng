@@ -223,6 +223,10 @@ DLG_TAB_LOG_EDITOR=View log &editor
 DLG_TAB_LOG_FILENAME=Default log &file name(strftime format)
 DLG_TAB_LOG_FILEPATH=Default log &save folder
 DLG_TAB_LOG_AUTOSTART=A&uto start logging
+DLG_TAB_LOG_ROTATE=&Log Rotate
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
+IDC_ROTATE_STEP_TEXT=&Rotate
+
 
 DLG_TAB_CYGWIN_PATH=Cygwin install &path
 

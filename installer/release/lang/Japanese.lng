@@ -223,6 +223,9 @@ DLG_TAB_LOG_EDITOR=ログ表示用エディタ(&E)
 DLG_TAB_LOG_FILENAME=標準ログファイル名(strftimeフォーマット可) (&F)
 DLG_TAB_LOG_FILEPATH=標準のログ保存先フォルダ(&S)
 DLG_TAB_LOG_AUTOSTART=自動的にログ採取を開始する(&U)
+DLG_TAB_LOG_ROTATE=ログのローテート(&L)
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=サイズ(&i)
+IDC_ROTATE_STEP_TEXT=世代(&R)
 
 DLG_TAB_CYGWIN_PATH=Cygwinインストール先のパス(&P)
 

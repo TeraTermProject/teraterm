@@ -1268,15 +1268,16 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_AUTOSTART, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_LOG_AUTOSTART", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_AUTOSTART, ts.UIMsg);
-	// TODO: Log rotate
-#if 0
+	// Log rotate
+	GetDlgItemText(IDC_LOG_ROTATE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_LOG_ROTATE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_LOG_ROTATE, ts.UIMsg);
+	GetDlgItemText(IDC_ROTATE_SIZE_TEXT, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_LOG_ROTATE_SIZE_TEXT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ROTATE_SIZE_TEXT, ts.UIMsg);
+	GetDlgItemText(IDC_ROTATE_STEP_TEXT, uimsg, sizeof(uimsg));
 	get_lang_msg("IDC_ROTATE_STEP_TEXT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ROTATE_STEP_TEXT, ts.UIMsg);
-#endif
 
 
 	// Viewlog Editor path (2005.1.29 yutaka)
