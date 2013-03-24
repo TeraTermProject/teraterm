@@ -532,7 +532,10 @@ BOOL LogStart()
 	}
 	LogVar->ByteCount = 0;
 
-	LogVar->RotateMode = ROTATE_NONE;
+	// Log rotate configuration
+	LogVar->RotateMode = ts.LogRotate;
+	LogVar->RotateSize = ts.LogRotateSize;
+	LogVar->RotateStep = ts.LogRotateStep;
 
 	if (! OpenFTDlg(LogVar)) {
 		FileTransEnd(OpLog);

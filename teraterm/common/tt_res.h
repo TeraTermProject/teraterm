@@ -132,9 +132,11 @@
 #define IDC_PASTEDELAY_EDIT             2510
 #define IDC_SCP_PATH                    2510
 #define IDC_BGIMG_EDIT                  2510
+#define IDC_ROTATE_SIZE                 2510
 #define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
+#define IDC_LOG_ROTATE                  2512
 #define IDC_MOUSEWHEEL_SCROLL_LINE      2513
 #define IDC_WINDOW_CTRL                 2513
 #define IDC_TRANSPROGRESS               2514
@@ -160,7 +162,12 @@
 #define IDC_BUTTON1                     2528
 #define IDC_BGIMG_BUTTON                2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
+#define IDC_ROTATE_SIZE_TYPE            2529
 #define IDC_CLIPBOARD_ACCESS            2530
+#define IDC_ROTATE_STEP                 2530
+#define IDC_ROTATE_STEP_TEXT            2531
+#define IDC_ROTATE_SIZE_TEXT            2532
+#define IDC_ROTATE_GROUP                2533
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -254,7 +261,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2529
+#define _APS_NEXT_CONTROL_VALUE         2534
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

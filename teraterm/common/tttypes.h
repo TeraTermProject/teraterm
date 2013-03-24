@@ -557,6 +557,10 @@ struct tttset {
 	WORD FontQuality;
 	char ScpSendDir[MAXPATHLEN];
 	char BGImageFilePath[MAX_PATH];
+	enum rotate_mode LogRotate;
+	DWORD LogRotateSize;
+	WORD LogRotateSizeType;
+	WORD LogRotateStep;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1012,6 +1016,12 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.78, ttset_memfilemap was replaced with ttset_memfilemap_20.
+ *   added tttset.LogRotate
+ *   added tttset.LogRotateSize
+ *   added tttset.LogRotateSizeType
+ *   added tttset.LogRotateStep
+ *
  * - At version 4.74, ttset_memfilemap was replaced with ttset_memfilemap_19.
  *   added tttset.FontQuality
  *   added tttset.ScpSenDir
@@ -1127,4 +1137,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_19"
+#define TT_FILEMAPNAME "ttset_memfilemap_20"

@@ -775,6 +775,13 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Auto start logging (2007.5.31 maya) */
 	ts->LogAutoStart = GetOnOff(Section, "LogAutoStart", FName, FALSE);
 
+	/* Log Rotate (2013.3.24 yutaka) */
+	ts->LogRotate = GetPrivateProfileInt(Section, "LogRotate", 0, FName);
+	ts->LogRotateSize = GetPrivateProfileInt(Section, "LogRotateSize", 0, FName);
+	ts->LogRotateSizeType = GetPrivateProfileInt(Section, "LogRotateSizeType", 0, FName);
+	ts->LogRotateStep = GetPrivateProfileInt(Section, "LogRotateStep", 0, FName);
+
+
 	/* XMODEM option */
 	GetPrivateProfileString(Section, "XmodemOpt", "",
 	                        Temp, sizeof(Temp), FName);
@@ -2105,6 +2112,12 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	/* Auto start logging (2007.5.31 maya) */
 	WriteOnOff(Section, "LogAutoStart", FName, ts->LogAutoStart);
+
+	/* Log Rotate (2013.3.24 yutaka) */
+	WriteInt(Section, "LogRotate", FName, ts->LogRotate);
+	WriteInt(Section, "LogRotateSize", FName, ts->LogRotateSize);
+	WriteInt(Section, "LogRotateSizeType", FName, ts->LogRotateSizeType);
+	WriteInt(Section, "LogRotateStep", FName, ts->LogRotateStep);
 
 	/* XMODEM option */
 	switch (ts->XmodemOpt) {

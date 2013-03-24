@@ -12,6 +12,7 @@
 #include "tttypes.h"
 #include "ttwinman.h"
 #include "ttcommon.h"
+#include "ttftypes.h"
 
 mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1208,10 +1209,25 @@ END_MESSAGE_MAP()
 
 // CLogPropPageDlg メッセージ ハンドラ
 
+#define LOG_ROTATE_SIZETYPE_NUM 3
+static char *LogRotateSizeType[] = {
+	"Byte", "KB", "MB"
+};
+
+static char *GetLogRotateSizeType(int val)
+{
+	if (val >= LOG_ROTATE_SIZETYPE_NUM)
+		val = 0;
+
+	return LogRotateSizeType[val];
+}
+
 BOOL CLogPropPageDlg::OnInitDialog()
 {
 	char uimsg[MAX_UIMSG];
 	CButton *btn;
+	CComboBox *combo;
+	int i;
 
 	CPropertyPage::OnInitDialog();
 
@@ -1227,6 +1243,14 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_DEFAULTPATH_EDITOR, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_DEFAULTPATH_PUSH, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_AUTOSTART, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+
+		// Log rotate
+		SendDlgItemMessage(IDC_LOG_ROTATE, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ROTATE_SIZE_TEXT, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ROTATE_SIZE, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ROTATE_SIZE_TYPE, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ROTATE_STEP_TEXT, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ROTATE_STEP, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgLogFont = NULL;
@@ -1244,6 +1268,16 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_AUTOSTART, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_LOG_AUTOSTART", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_AUTOSTART, ts.UIMsg);
+	// TODO: Log rotate
+#if 0
+	get_lang_msg("DLG_TAB_LOG_ROTATE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_LOG_ROTATE, ts.UIMsg);
+	get_lang_msg("DLG_TAB_LOG_ROTATE_SIZE_TEXT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ROTATE_SIZE_TEXT, ts.UIMsg);
+	get_lang_msg("IDC_ROTATE_STEP_TEXT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ROTATE_STEP_TEXT, ts.UIMsg);
+#endif
+
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	SetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
@@ -1257,6 +1291,33 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	/* Auto start logging (2007.5.31 maya) */
 	btn = (CButton *)GetDlgItem(IDC_AUTOSTART);
 	btn->SetCheck(ts.LogAutoStart);
+
+	// Log rotate
+	btn = (CButton *)GetDlgItem(IDC_LOG_ROTATE);
+	btn->SetCheck(ts.LogRotate != ROTATE_NONE);
+
+	combo = (CComboBox *)GetDlgItem(IDC_ROTATE_SIZE_TYPE);
+	for (i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
+		combo->AddString(LogRotateSizeType[i]);
+	}
+
+	SetDlgItemInt(IDC_ROTATE_SIZE, ts.LogRotateSize, FALSE);
+	combo->SelectString(-1, GetLogRotateSizeType(ts.LogRotateSizeType));
+	SetDlgItemInt(IDC_ROTATE_STEP, ts.LogRotateStep, FALSE);
+	if (ts.LogRotate == ROTATE_NONE) {
+		GetDlgItem(IDC_ROTATE_SIZE_TEXT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_ROTATE_SIZE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_ROTATE_SIZE_TYPE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_ROTATE_STEP_TEXT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(FALSE);
+	} else {
+		GetDlgItem(IDC_ROTATE_SIZE_TEXT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_ROTATE_SIZE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_ROTATE_SIZE_TYPE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_ROTATE_STEP_TEXT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(TRUE);
+	}
+
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_VIEWLOG_EDITOR));
@@ -1300,6 +1361,27 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			SetDlgItemText(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath);
 
 			return TRUE;
+
+		case IDC_LOG_ROTATE | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_LOG_ROTATE);
+				if (btn->GetCheck()) {
+					GetDlgItem(IDC_ROTATE_SIZE_TEXT)->EnableWindow(TRUE);
+					GetDlgItem(IDC_ROTATE_SIZE)->EnableWindow(TRUE);
+					GetDlgItem(IDC_ROTATE_SIZE_TYPE)->EnableWindow(TRUE);
+					GetDlgItem(IDC_ROTATE_STEP_TEXT)->EnableWindow(TRUE);
+					GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(TRUE);
+				} else {
+					GetDlgItem(IDC_ROTATE_SIZE_TEXT)->EnableWindow(FALSE);
+					GetDlgItem(IDC_ROTATE_SIZE)->EnableWindow(FALSE);
+					GetDlgItem(IDC_ROTATE_SIZE_TYPE)->EnableWindow(FALSE);
+					GetDlgItem(IDC_ROTATE_STEP_TEXT)->EnableWindow(FALSE);
+					GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(FALSE);
+				}			
+
+			}
+			return TRUE;
 	}
 
 	return CPropertyPage::OnCommand(wParam, lParam);
@@ -1312,6 +1394,8 @@ void CLogPropPageDlg::OnOK()
 	struct tm *tm_local;
 	char uimsg[MAX_UIMSG];
 	CButton *btn;
+	CString str;
+	int i;
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	GetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, sizeof(ts.ViewlogEditor));
@@ -1351,6 +1435,32 @@ void CLogPropPageDlg::OnOK()
 	/* Auto start logging (2007.5.31 maya) */
 	btn = (CButton *)GetDlgItem(IDC_AUTOSTART);
 	ts.LogAutoStart = btn->GetCheck();
+
+	/* Log Rotate */
+	btn = (CButton *)GetDlgItem(IDC_LOG_ROTATE);
+	if (btn->GetCheck()) {  /* on */
+		ts.LogRotate = ROTATE_SIZE;
+
+		((CComboBox*)GetDlgItem(IDC_ROTATE_SIZE_TYPE))->GetWindowText(str);
+		for (i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
+			if (strcmp(str, LogRotateSizeType[i]) == 0) 
+				break;
+		}
+		if (i >= LOG_ROTATE_SIZETYPE_NUM)
+			i = 0;
+		ts.LogRotateSizeType = i;
+
+		ts.LogRotateSize = GetDlgItemInt(IDC_ROTATE_SIZE);
+		for (i = 0 ; i < ts.LogRotateSizeType ; i++)
+			ts.LogRotateSize *= 1024;
+
+		ts.LogRotateStep = GetDlgItemInt(IDC_ROTATE_STEP);
+
+	} else { /* off */
+		ts.LogRotate = ROTATE_NONE;
+		/* 残りのメンバーは意図的に設定を残す。*/
+	}
+
 }
 
 
