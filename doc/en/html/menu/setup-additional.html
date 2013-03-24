@@ -333,6 +333,26 @@ SYNOPSIS:
       <dd>
     Start logging automaticaly when connecting. Default Log File Name is used for log file name.
       </dd>
+
+      <dt>Log Rotate</dt>
+      <dd>
+    The log rotation is enabled. The extension of the rotated file is added .1, .2, .3 etc.
+      </dd>
+    
+      <ul>
+        <dt>Size</dt>
+        <dd>
+        The log file is rotated when it grows bigger than Size bytes. If the size is followed by KB, 
+        the size is assumed to be in kilobytes. If the MB is used, the size is in megabytes.
+        </dd>
+        
+        <dt>Rotate</dt>
+        <dd>
+        The log file is rotated Rotate times before being removed. If the Rotate is 0,
+        the old version is not removed rather than rotated.
+        </dd>
+      </ul>
+
     </dl>
 
 
