@@ -156,6 +156,12 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		if (_stricmp(Str,"call")==0) *WordId = RsvCall;
 		else if (_stricmp(Str,"callmenu")==0) *WordId = RsvCallMenu;
 		else if (_stricmp(Str,"changedir")==0) *WordId = RsvChangeDir;
+		else if (_stricmp(Str,"checksum8")==0) *WordId = RsvChecksum8;
+		else if (_stricmp(Str,"checksum8file")==0) *WordId = RsvChecksum8File;
+		else if (_stricmp(Str,"checksum16")==0) *WordId = RsvChecksum16;
+		else if (_stricmp(Str,"checksum16file")==0) *WordId = RsvChecksum16File;
+		else if (_stricmp(Str,"checksum32")==0) *WordId = RsvChecksum32;
+		else if (_stricmp(Str,"checksum32file")==0) *WordId = RsvChecksum32File;
 		else if (_stricmp(Str,"clearscreen")==0) *WordId = RsvClearScreen;
 		else if (_stricmp(Str,"clipb2var")==0) *WordId = RsvClipb2Var;  // add 'clipb2var' (2006.9.17 maya)
 		else if (_stricmp(Str,"closesbox")==0) *WordId = RsvCloseSBox;
@@ -163,6 +169,8 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"code2str")==0) *WordId = RsvCode2Str;
 		else if (_stricmp(Str,"connect")==0) *WordId = RsvConnect;
 		else if (_stricmp(Str,"continue")==0) *WordId = RsvContinue;
+		else if (_stricmp(Str,"crc16")==0) *WordId = RsvCrc16;
+		else if (_stricmp(Str,"crc16file")==0) *WordId = RsvCrc16File;
 		else if (_stricmp(Str,"crc32")==0) *WordId = RsvCrc32;
 		else if (_stricmp(Str,"crc32file")==0) *WordId = RsvCrc32File;
 		else if (_stricmp(Str,"cygconnect")==0) *WordId = RsvCygConnect;

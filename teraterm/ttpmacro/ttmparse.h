@@ -228,6 +228,14 @@
 #define RsvGetIPv4Addr  199
 #define RsvGetIPv6Addr  200
 #define RsvLogRotate    201
+#define RsvCrc16        202
+#define RsvCrc16File    203
+#define RsvChecksum8    204
+#define RsvChecksum8File    205
+#define RsvChecksum16   206
+#define RsvChecksum16File   207
+#define RsvChecksum32   208
+#define RsvChecksum32File   209
 
 #define RsvOperator     1000
 #define RsvBNot         1001

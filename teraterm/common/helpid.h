@@ -168,6 +168,13 @@
 #define HlpMacroCommandCall             92004
 #define HlpMacroCommandCallmenu         92125
 #define HlpMacroCommandChangedir        92005
+#define HlpMacroCommandChecksum8        92204
+#define HlpMacroCommandChecksum8file    92205
+#define HlpMacroCommandChecksum16       92206
+#define HlpMacroCommandChecksum16file   92207
+#define HlpMacroCommandChecksum32       92208
+#define HlpMacroCommandChecksum32file   92209
+
 #define HlpMacroCommandClearscreen      92006
 #define HlpMacroCommandClipb2var        92113
 #define HlpMacroCommandClosesbox        92007
@@ -175,6 +182,8 @@
 #define HlpMacroCommandCode2str         92009
 #define HlpMacroCommandConnect          92010
 #define HlpMacroCommandContinue         92155
+#define HlpMacroCommandCrc16            92202
+#define HlpMacroCommandCrc16File        92203
 #define HlpMacroCommandCrc32            92138
 #define HlpMacroCommandCrc32File        92139
 #define HlpMacroCommandCygConnect       92130

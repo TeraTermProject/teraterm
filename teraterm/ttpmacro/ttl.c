@@ -634,31 +634,77 @@ WORD TTLConnect(WORD mode)
 	return Err;
 }
 
+
 /*
  * cf. http://oku.edu.mie-u.ac.jp/~okumura/algo/
  */
-#define CRCPOLY1 0x04C11DB7UL
-	/* x^{32}+x^{26}+x^{23}+x^{22}+x^{16}+x^{12}+x^{11]+
-	   x^{10}+x^8+x^7+x^5+x^4+x^2+x^1+1 */
-#define CRCPOLY2 0xEDB88320UL  /* 左右逆転 */
 
-static unsigned long crc1(int n, unsigned char c[])
+enum checksum_type {
+	CHECKSUM8,
+	CHECKSUM16,
+	CHECKSUM32,
+	CRC16,
+	CRC32
+};
+
+static unsigned int checksum32(int n, unsigned char c[])
 {
+	unsigned long value = 0;
+	int i;
+
+	for (i = 0; i < n; i++) {
+		value += (c[i] & 0xFF);
+	}
+	return (value & 0xFFFFFFFF);
+}
+
+static unsigned int checksum16(int n, unsigned char c[])
+{
+	unsigned long value = 0;
+	int i;
+
+	for (i = 0; i < n; i++) {
+		value += (c[i] & 0xFF);
+	}
+	return (value & 0xFFFF);
+}
+
+static unsigned int checksum8(int n, unsigned char c[])
+{
+	unsigned long value = 0;
+	int i;
+
+	for (i = 0; i < n; i++) {
+		value += (c[i] & 0xFF);
+	}
+	return (value & 0xFF);
+}
+
+// CRC-16-CCITT
+static unsigned int crc16(int n, unsigned char c[])
+{
+#define CRC16POLY1  0x1021U  /* x^{16}+x^{12}+x^5+1 */
+#define CRC16POLY2  0x8408U  /* 左右逆転 */
+
 	int i, j;
 	unsigned long r;
 
-	r = 0xFFFFFFFFUL;
+	r = 0xFFFFU;
 	for (i = 0; i < n; i++) {
-		r ^= (unsigned long)c[i] << (32 - CHAR_BIT);
+		r ^= c[i];
 		for (j = 0; j < CHAR_BIT; j++)
-			if (r & 0x80000000UL) r = (r << 1) ^ CRCPOLY1;
-			else                  r <<= 1;
+			if (r & 1) r = (r >> 1) ^ CRC16POLY2;
+			else       r >>= 1;
 	}
-	return ~r & 0xFFFFFFFFUL;
+	return r ^ 0xFFFFU;
 }
 
-static unsigned long crc2(int n, unsigned char c[])
+static unsigned long crc32(int n, unsigned char c[])
 {
+#define CRC32POLY1 0x04C11DB7UL
+	/* x^{32}+x^{26}+x^{23}+x^{22}+x^{16}+x^{12}+x^{11]+
+	   x^{10}+x^8+x^7+x^5+x^4+x^2+x^1+1 */
+#define CRC32POLY2 0xEDB88320UL  /* 左右逆転 */
 	int i, j;
 	unsigned long r;
 
@@ -666,21 +712,19 @@ static unsigned long crc2(int n, unsigned char c[])
 	for (i = 0; i < n; i++) {
 		r ^= c[i];
 		for (j = 0; j < CHAR_BIT; j++)
-			if (r & 1) r = (r >> 1) ^ CRCPOLY2;
+			if (r & 1) r = (r >> 1) ^ CRC32POLY2;
 			else       r >>= 1;
 	}
 	return r ^ 0xFFFFFFFFUL;
 }
 
-// CRC32の計算を行う。
-//
-// 書式: crc32 intvar str
-//
-WORD TTLCrc32()
+// チェックサムアルゴリズム・共通ルーチン
+WORD TTLDoChecksum(enum checksum_type type)
 {
 	TStrVal Str;
 	WORD Err;
 	TVarId VarId;
+	DWORD cksum;
 
 	Err = 0;
 	GetIntVar(&VarId, &Err);
@@ -690,16 +734,33 @@ WORD TTLCrc32()
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
 
-	SetIntVal(VarId, crc2(strlen(Str), Str));
+	switch (type) {
+		case CHECKSUM8:
+			cksum = checksum8(strlen(Str), Str);
+			break;
+		case CHECKSUM16:
+			cksum = checksum16(strlen(Str), Str);
+			break;
+		case CHECKSUM32:
+			cksum = checksum32(strlen(Str), Str);
+			break;
+		case CRC16:
+			cksum = crc16(strlen(Str), Str);
+			break;
+		case CRC32:
+			cksum = crc32(strlen(Str), Str);
+			break;
+		default:
+			cksum = 0;
+			break;
+	}
+
+	SetIntVal(VarId, cksum);
 
 	return Err;
 }
 
-// CRC32の計算を行う。
-//
-// 書式: crc32file intvar filename
-//
-WORD TTLCrc32File()
+WORD TTLDoChecksumFile(enum checksum_type type)
 {
 	TStrVal Str;
 	int result = 0;
@@ -708,6 +769,7 @@ WORD TTLCrc32File()
 	HANDLE fh = INVALID_HANDLE_VALUE, hMap = NULL;
 	LPBYTE lpBuf = NULL;
 	DWORD fsize;
+	DWORD cksum;
 
 	Err = 0;
 	GetIntVar(&VarId, &Err);
@@ -739,7 +801,28 @@ WORD TTLCrc32File()
 
 	fsize = GetFileSize(fh,NULL);
 
-	SetIntVal(VarId, crc2(fsize, lpBuf));
+	switch (type) {
+		case CHECKSUM8:
+			cksum = checksum8(fsize, lpBuf);
+			break;
+		case CHECKSUM16:
+			cksum = checksum16(fsize, lpBuf);
+			break;
+		case CHECKSUM32:
+			cksum = checksum32(fsize, lpBuf);
+			break;
+		case CRC16:
+			cksum = crc16(fsize, lpBuf);
+			break;
+		case CRC32:
+			cksum = crc32(fsize, lpBuf);
+			break;
+		default:
+			cksum = 0;
+			break;
+	}
+
+	SetIntVal(VarId, cksum);
 
 error:
 	if (lpBuf != NULL) {
@@ -5304,6 +5387,18 @@ int ExecCmnd()
 			Err = TTLCommCmdInt(CmdCallMenu,0); break;
 		case RsvChangeDir:
 			Err = TTLCommCmdFile(CmdChangeDir,0); break;
+		case RsvChecksum8:
+			Err = TTLDoChecksum(CHECKSUM8); break;
+		case RsvChecksum8File:
+			Err = TTLDoChecksumFile(CHECKSUM8); break;
+		case RsvChecksum16:
+			Err = TTLDoChecksum(CHECKSUM16); break;
+		case RsvChecksum16File:
+			Err = TTLDoChecksumFile(CHECKSUM16); break;
+		case RsvChecksum32:
+			Err = TTLDoChecksum(CHECKSUM32); break;
+		case RsvChecksum32File:
+			Err = TTLDoChecksumFile(CHECKSUM32); break;
 		case RsvClearScreen:
 			Err = TTLCommCmdInt(CmdClearScreen,0); break;
 		case RsvClipb2Var:
@@ -5317,10 +5412,14 @@ int ExecCmnd()
 		case RsvConnect:
 		case RsvCygConnect:
 			Err = TTLConnect(WId); break;
+		case RsvCrc16:
+			Err = TTLDoChecksum(CRC16); break;
+		case RsvCrc16File:
+			Err = TTLDoChecksumFile(CRC16); break;
 		case RsvCrc32:
-			Err = TTLCrc32(); break;
+			Err = TTLDoChecksum(CRC32); break;
 		case RsvCrc32File:
-			Err = TTLCrc32File(); break;
+			Err = TTLDoChecksumFile(CRC32); break;
 		case RsvDelPassword:
 			Err = TTLDelPassword(); break;
 		case RsvDirname:
