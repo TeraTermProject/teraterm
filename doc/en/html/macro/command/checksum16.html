@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>checksum16, checksum16file</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>checksum16, checksum16file</h1>
+
+<p>
+Calculates the 16bit-checksum of a string or a file.
+</p>
+
+<pre class="macro-syntax">
+checksum16 &lt;intvar&gt; &lt;string&gt;
+checksum16file &lt;intvar&gt; &lt;filename&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+This macro function calculates the checksum(16bit) of a string or a file. 
+<br><br>
+
+The calculated value stores the variable "intvar" as mathematical value.<br>
+If the &lt;filename&gt; file can not open by using checksum16file, the system variable "result" is set to -1.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+str = 'this is a test string to be checksum16ed'
+checksum16 crc str
+
+; Display checksum16 result asHEX
+sprintf '0x%08X' crc
+messagebox inputstr 'checksum16 = '
+
+checksum16file crc 'foo.bin'
+if result = -1 then
+    messagebox 'file open error' 'checksum16 = '
+else
+    sprintf '0x%08X' crc
+    messagebox inputstr 'checksum16 = '
+endif
+</pre>
+
+</body>
+</html>

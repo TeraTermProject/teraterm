@@ -1358,6 +1358,30 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="checksum8">
+					<param name="Local" value="html\macro\command\checksum8.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="checksum8file">
+					<param name="Local" value="html\macro\command\checksum8.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="checksum16">
+					<param name="Local" value="html\macro\command\checksum16.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="checksum16file">
+					<param name="Local" value="html\macro\command\checksum16.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="checksum32">
+					<param name="Local" value="html\macro\command\checksum32.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="checksum32file">
+					<param name="Local" value="html\macro\command\checksum32.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="closesbox">
 					<param name="Local" value="html\macro\command\closesbox.html">
 					<param name="ImageNumber" value="11">
@@ -1366,6 +1390,14 @@
 					<param name="Name" value="clipb2var">
 					<param name="Local" value="html\macro\command\clipb2var.html">
 					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="crc16">
+					<param name="Local" value="html\macro\command\crc16.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="crc16file">
+					<param name="Local" value="html\macro\command\crc16.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="crc32">

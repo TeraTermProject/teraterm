@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>checksum32, checksum32file</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>checksum32, checksum32file</h1>
+
+<p>
+32bit checksumを計算する。
+</p>
+
+<pre class="macro-syntax">
+checksum32 &lt;intvar&gt; &lt;string&gt;
+checksum32file &lt;intvar&gt; &lt;filename&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+引数の文字列およびファイルから加算サム(32bit)を計算する。
+<br><br>
+
+計算結果は intvar 変数に数値として格納される。<br>
+checksum32file でファイルが開けなかった場合は、result 変数に -1 が格納される。
+</p>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+str = 'this is a test string to be checksum32ed'
+checksum32 crc str
+
+; Display checksum32 result asHEX
+sprintf '0x%08X' crc
+messagebox inputstr 'checksum32 = '
+
+checksum32file crc 'foo.bin'
+if result = -1 then
+    messagebox 'file open error' 'checksum32file = '
+else
+    sprintf '0x%08X' crc
+    messagebox inputstr 'checksum32file = '
+endif
+</pre>
+
+</body>
+</html>

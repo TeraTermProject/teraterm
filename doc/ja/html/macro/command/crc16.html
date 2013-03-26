@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>crc16, crc16file</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>crc16, crc16file</h1>
+
+<p>
+CRC-16-IBMを計算する。
+</p>
+
+<pre class="macro-syntax">
+crc16 &lt;intvar&gt; &lt;string&gt;
+crc16file &lt;intvar&gt; &lt;filename&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+引数の文字列およびファイルからCRC(Cyclic Redundancy Checking)を計算する。多項式（右回り）は以下のとおり。
+<br><br>
+
+0xA001 (x<sup>16</sup>+x<sup>15</sup>+x<sup>2</sup>+x<sup>0</sup>)
+<br><br>
+
+計算結果は intvar 変数に数値として格納される。<br>
+crc16file でファイルが開けなかった場合は、result 変数に -1 が格納される。
+</p>
+
+CRCアルゴリズムの実装（C言語）を以下に示す。
+<pre>
+<code>
+static unsigned int crc16(int n, unsigned char c[])
+{
+#define CRC16POLY2  0x8408U  /* 左右逆転 */
+
+	int i, j;
+	unsigned long r;
+
+	r = 0xFFFFU;
+	for (i = 0; i < n; i++) {
+		r ^= c[i];
+		for (j = 0; j < CHAR_BIT; j++)
+			if (r & 1) r = (r >> 1) ^ CRC16POLY2;
+			else       r >>= 1;
+	}
+	return r ^ 0xFFFFU;
+}
+</code></pre>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+str = 'this is a test string to be CRC16ed'
+crc16 crc str
+
+; Display CRC16 result asHEX
+sprintf '0x%08X' crc
+messagebox inputstr 'CRC16 = '
+
+crc16file crc 'foo.bin'
+if result = -1 then
+    messagebox 'file open error' 'CRC16 = '
+else
+    sprintf '0x%08X' crc
+    messagebox inputstr 'CRC16 = '
+endif
+</pre>
+
+</body>
+</html>

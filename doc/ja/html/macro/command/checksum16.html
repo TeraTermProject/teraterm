@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>checksum16, checksum16file</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>checksum16, checksum16file</h1>
+
+<p>
+16bit checksumを計算する。
+</p>
+
+<pre class="macro-syntax">
+checksum16 &lt;intvar&gt; &lt;string&gt;
+checksum16file &lt;intvar&gt; &lt;filename&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+引数の文字列およびファイルから加算サム(16bit)を計算する。
+<br><br>
+
+計算結果は intvar 変数に数値として格納される。<br>
+checksum16file でファイルが開けなかった場合は、result 変数に -1 が格納される。
+</p>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+str = 'this is a test string to be checksum16ed'
+checksum16 crc str
+
+; Display checksum16 result asHEX
+sprintf '0x%08X' crc
+messagebox inputstr 'checksum16 = '
+
+checksum16file crc 'foo.bin'
+if result = -1 then
+    messagebox 'file open error' 'checksum16file = '
+else
+    sprintf '0x%08X' crc
+    messagebox inputstr 'checksum16file = '
+endif
+</pre>
+
+</body>
+</html>
