@@ -224,6 +224,10 @@ DLG_TAB_LOG_EDITOR=Prog affich journal
 DLG_TAB_LOG_FILENAME=Nom par défaut du fichier journal (format strftime)
 DLG_TAB_LOG_FILEPATH=Répertoire par défaut de sauvegarde du journal
 DLG_TAB_LOG_AUTOSTART=Démarrage auto. du journal
+DLG_TAB_LOG_ROTATE=&Log Rotate
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
+IDC_ROTATE_STEP_TEXT=&Rotate
+
 
 DLG_TAB_CYGWIN_PATH=Répertoire d'install. de Cygwin
 

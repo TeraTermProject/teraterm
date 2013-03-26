@@ -224,6 +224,10 @@ DLG_TAB_LOG_EDITOR=&–едактор лог-файла
 DLG_TAB_LOG_FILENAME=&»м€ лог-файла по умолчанию
 DLG_TAB_LOG_FILEPATH=&ѕапка дл€ хранени€ лог-файла по умолчанию
 DLG_TAB_LOG_AUTOSTART=&јвтостарт лог-файла
+DLG_TAB_LOG_ROTATE=&Log Rotate
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
+IDC_ROTATE_STEP_TEXT=&Rotate
+
 
 DLG_TAB_CYGWIN_PATH=&ѕуть инсталл€ции Cygwin
 

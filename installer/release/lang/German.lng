@@ -224,6 +224,10 @@ DLG_TAB_LOG_EDITOR=&Auswahl-Editor
 DLG_TAB_LOG_FILENAME=&Standardprotokoll-Name
 DLG_TAB_LOG_FILEPATH=Standardprotokoll-Ordner
 DLG_TAB_LOG_AUTOSTART=&Automatisch protokollieren
+DLG_TAB_LOG_ROTATE=&Log Rotate
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
+IDC_ROTATE_STEP_TEXT=&Rotate
+
 
 DLG_TAB_CYGWIN_PATH=Cygwin-Installationspfad
 
