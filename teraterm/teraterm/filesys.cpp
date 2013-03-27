@@ -494,8 +494,8 @@ BOOL LogStart()
 	if (ts.Append > 0)
 	{
 		int dwShareMode = 0;
-		if (ts.LogLockExclusive) {
-			dwShareMode = FILE_SHARE_READ;
+		if (!ts.LogLockExclusive) {
+			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 		}
 		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 		                                     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -510,8 +510,8 @@ BOOL LogStart()
 	}
 	else {
 		int dwShareMode = 0;
-		if (ts.LogLockExclusive) {
-			dwShareMode = FILE_SHARE_READ;
+		if (!ts.LogLockExclusive) {
+			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 		}
 		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 		                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -712,8 +712,8 @@ static void LogRotate(void)
 	}
 
 	// ÄƒI[ƒvƒ“
-	if (ts.LogLockExclusive) {
-		dwShareMode = FILE_SHARE_READ;
+	if (!ts.LogLockExclusive) {
+		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
 	LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 	                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
