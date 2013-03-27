@@ -65,7 +65,7 @@ BOOL CErrDlg::OnInitDialog()
 	SetDlgItemText(IDC_ERRMSG,MsgStr);
 	SetDlgItemText(IDC_ERRLINE,LineStr);
 
-	if (PosX<=-100) {
+	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		GetWindowRect(&R);
 		TmpDC = ::GetDC(GetSafeHwnd());
 		PosX = (GetDeviceCaps(TmpDC,HORZRES)-R.right+R.left) / 2;

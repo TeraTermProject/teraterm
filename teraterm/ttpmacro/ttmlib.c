@@ -187,3 +187,29 @@ int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
 	}
 	return 1;
 }
+
+int GetMonitorLeftmost(int PosX, int PosY)
+{
+	OSVERSIONINFO osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
+	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10) ) {
+		// // NT4.0, 95 はマルチモニタAPIに非対応
+		return 0;
+	}
+	else {
+		HMONITOR hm;
+		POINT pt;
+		MONITORINFO mi;
+
+		pt.x = PosX;
+		pt.y = PosY;
+		hm = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+
+		mi.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hm, &mi);
+		return mi.rcWork.left;
+	}
+}

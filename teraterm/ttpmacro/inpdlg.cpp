@@ -175,7 +175,7 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 
 	SendDlgItemMessage(IDC_INPEDIT, EM_LIMITTEXT, MaxStrLen, 0);
 
-	if (PosX<=-100) {
+	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		GetWindowRect(&R);
 		TmpDC = ::GetDC(GetSafeHwnd());
 		PosX = (GetDeviceCaps(TmpDC,HORZRES)-R.right+R.left) / 2;

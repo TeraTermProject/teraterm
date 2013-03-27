@@ -37,7 +37,7 @@ BOOL SleepFlag;
 int ParamCnt;   /* ˆø”‚ÌŒÂ” */
 }
 
-static int DlgPosX = -1000;
+static int DlgPosX = -10000;
 static int DlgPosY = 0;
 
 static PStatDlg StatDlg = NULL;

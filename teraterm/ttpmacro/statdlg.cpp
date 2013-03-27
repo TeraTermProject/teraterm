@@ -200,7 +200,7 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 		::MoveWindow(HText,(TW-s.cx)/2,5,TW,TH,TRUE);
 	}
 
-	if (PosX<=-100) {
+	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		TmpDC = ::GetDC(GetSafeHwnd());
 		PosX = (GetDeviceCaps(TmpDC,HORZRES)-WW) / 2;
 		PosY = (GetDeviceCaps(TmpDC,VERTRES)-WH) / 2;
