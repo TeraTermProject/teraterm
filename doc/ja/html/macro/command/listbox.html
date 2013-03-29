@@ -44,6 +44,28 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
 	
 </dl>
 
+<h2>解説</h2>
+
+<p>
+listbox マクロコマンドは &lt;string array&gt; の配列要素をすべて選択項目として表示します。<br />
+以下のように、表示しようとする選択項目数より大きい要素数で &lt;string array&gt; を定義すると、最後に空文字列が表示されます。
+</p>
+
+<pre>
+strdim msg 4
+msg[0] = 'バナナ' 
+msg[1] = 'りんご' 
+msg[2] = 'みかん'
+listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
+
+; 選択肢が4つ表示される
+バナナ
+りんご
+みかん
+[空文字列]
+</pre>
+
+
 <h2>例</h2>
 
 <pre class="macro-example">
