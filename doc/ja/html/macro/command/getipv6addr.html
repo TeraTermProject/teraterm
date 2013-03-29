@@ -26,34 +26,44 @@ getipv6addr &lt;string array&gt;
 <dl>
 	<dt class="macro">配列 &lt;string array&gt;</dt>
 	<dd>IPアドレスを格納する文字型配列。</dd>
+
+	<dt class="macro">整数型変数 &lt;num&gt;</dt>
+	<dd>IPアドレスの個数を格納する整数型変数。IPアドレスが存在しない場合、0が格納される。</dd>
 </dl>
 
 <h2>返り値</h2>
 
 <dl>
 	<dt class="macro">システム変数 &lt;result&gt;</dt>
-	<dd>IPアドレスの個数が格納される。<br>
-	    IPアドレスが存在しない場合、0が格納される。
+	<dd>IPアドレスの取得に成功した場合、1が格納される。<br>
+	    IPアドレスの個数が&lt;string array&gt;の要素数より大きい場合、0が格納される。<br>
 	    IPアドレスの取得に失敗した場合、-1が格納される。Windows 2000 以前では常に失敗する。</dd>
-	
 </dl>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-strdim ipaddr 10
+ipaddr_size = 10
+strdim ipaddr ipaddr_size
 
-getipv6addr ipaddr
+getipv6addr ipaddr num
 if result = -1 then
-	messagebox 'Error' 'IPv6 address'
+    messagebox 'Error' 'IPv6 address'
 elseif result = 0 then
-	messagebox 'Not found' 'IPv6 address'
+    N = ipaddr_size - 1
+    for i 0 N
+        messagebox ipaddr[i] "IPv6 address"
+    next
+    N = num - ipaddr_size
+    sprintf2 str "And %d address(es)." N
+    messagebox str "IPv6 address"
 else
-	N = result - 1
-	for i 0 N
-		messagebox ipaddr[i] "IPv6 address"
-	next
+    N = num - 1
+    for i 0 N
+        messagebox ipaddr[i] "IPv6 address"
+    next
 endif
+
 </pre>
 
 <h2>参照</h2>

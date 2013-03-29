@@ -26,34 +26,49 @@ getipv6addr &lt;string array&gt;
 <dl>
 	<dt class="macro">Array &lt;string array&gt;</dt>
 	<dd>IP addresses are stored in the string array.</dd>
+
+<--
+	<dt class="macro">®”Œ^•Ï” &lt;num&gt;</dt>
+	<dd>IPƒAƒhƒŒƒX‚ÌŒÂ”‚ğŠi”[‚·‚é®”Œ^•Ï”BIPƒAƒhƒŒƒX‚ª‘¶İ‚µ‚È‚¢ê‡A0‚ªŠi”[‚³‚ê‚éB</dd>
+-->
 </dl>
 
 <h2>Return Value</h2>
 
 <dl>
 	<dt class="macro">System variable &lt;result&gt;</dt>
-	<dd>It is set to the IP address number.<br>
-	    If the IP address is nothing, it is set to 0.<br>
+	<dd>
+<!--
+        IPƒAƒhƒŒƒX‚Ìæ“¾‚É¬Œ÷‚µ‚½ê‡A1‚ªŠi”[‚³‚ê‚éB<br>
+	    IPƒAƒhƒŒƒX‚ÌŒÂ”‚ª&lt;string array&gt;‚Ì—v‘f”‚æ‚è‘å‚«‚¢ê‡A0‚ªŠi”[‚³‚ê‚éB<br>
+-->
 	    When the IP address can not retrieve, it is set to -1. It is always failed on Windows 2000 or earlier.</dd>
-	
 </dl>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-strdim ipaddr 10
+ipaddr_size = 10
+strdim ipaddr ipaddr_size
 
-getipv6addr ipaddr
+getipv6addr ipaddr num
 if result = -1 then
-	messagebox 'Error' 'IPv6 address'
+    messagebox 'Error' 'IPv6 address'
 elseif result = 0 then
-	messagebox 'Not found' 'IPv6 address'
+    N = ipaddr_size - 1
+    for i 0 N
+        messagebox ipaddr[i] "IPv6 address"
+    next
+    N = num - ipaddr_size
+    sprintf2 str "And %d address(es)." N
+    messagebox str "IPv6 address"
 else
-	N = result - 1
-	for i 0 N
-		messagebox ipaddr[i] "IPv6 address"
-	next
+    N = num - 1
+    for i 0 N
+        messagebox ipaddr[i] "IPv6 address"
+    next
 endif
+
 </pre>
 
 <h2>See also</h2>

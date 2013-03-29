@@ -2256,23 +2256,23 @@ WORD TTLGetHostname()
 #define MAX_IPADDR 30
 /*
  strdim ipaddr 10
- getipv4addr ipaddr
- result = N
+ getipv4addr ipaddr num
  */
 WORD TTLGetIPv4Addr()
 {
 	WORD Err;
-	TVarId VarId, id;
+	TVarId VarId, VarId2, id;
 	WSADATA ws;
 	INTERFACE_INFO info[MAX_IPADDR];
 	SOCKET sock;
 	DWORD socknum;
-	int num;
+	int num, result, arysize;
 	int i, n;
 	IN_ADDR addr;
 
 	Err = 0;
 	GetStrAryVar(&VarId,&Err);
+	GetIntVar(&VarId2, &Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2280,9 +2280,12 @@ WORD TTLGetIPv4Addr()
 	// 自分自身の全IPv4アドレスを取得する。
 	if (WSAStartup(MAKEWORD(2,2), &ws) != 0) {
 		SetResult(-1);
+		SetIntVal(VarId2, 0);
 		return Err;
 	}
+	arysize = GetStrAryVarSize(VarId);
 	num = 0;
+	result = 1;
 	sock = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, 0);
 	if (WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, info, sizeof(info), &socknum, NULL, NULL) != SOCKET_ERROR) {
 		n = socknum / sizeof(info[0]);
@@ -2293,19 +2296,21 @@ WORD TTLGetIPv4Addr()
 				continue;
 			addr = info[i].iiAddress.AddressIn.sin_addr;
 
-			id = GetStrVarFromArray(VarId, num, &Err);
-			if (Err == 0) {
+			if (num < arysize) {
+				id = GetStrVarFromArray(VarId, num, &Err);
 				SetStrVal(id, inet_ntoa(addr));
-				num++;
-			} else {
-				break;
 			}
+			else {
+				result = 0;
+			}
+			num++;
 		}
 	}
 	closesocket(sock);
 	WSACleanup();
 
-	SetResult(num);
+	SetResult(result);
+	SetIntVal(VarId2, num);
 
 	return Err;
 }
@@ -2338,8 +2343,8 @@ typedef DWORD (__stdcall *pGetAdaptersAddresses)(ULONG Family,
 WORD TTLGetIPv6Addr()
 {
 	WORD Err;
-	TVarId VarId, id;
-	int num;
+	TVarId VarId, VarId2, id;
+	int num, result, arysize;
     DWORD ret;
     IP_ADAPTER_ADDRESSES addr[256];/* XXX */
     ULONG len = sizeof(addr);
@@ -2349,22 +2354,26 @@ WORD TTLGetIPv6Addr()
 
 	Err = 0;
 	GetStrAryVar(&VarId,&Err);
+	GetIntVar(&VarId2, &Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
 	// 自分自身の全IPv6アドレスを取得する。
 	if ((h = LoadLibrary("iphlpapi.dll")) == NULL) {
-		int err = GetLastError();
 		SetResult(-1);
+		SetIntVal(VarId2, 0);
 		return Err;
 	}
 	if ((pfunc = (pGetAdaptersAddresses)GetProcAddress(h, "GetAdaptersAddresses")) == NULL) {
 		FreeLibrary(h);
 		SetResult(-1);
+		SetIntVal(VarId2, 0);
 		return Err;
 	}
+	arysize = GetStrAryVarSize(VarId);
 	num = 0;
+	result = 1;
 	ret = pfunc(AF_INET6, 0, NULL, addr, &len);
 	if (ret == ERROR_SUCCESS) {
 		IP_ADAPTER_ADDRESSES *padap = &addr[0];
@@ -2385,17 +2394,21 @@ WORD TTLGetIPv6Addr()
 				sa = (struct sockaddr_in6*)addr.lpSockaddr;
 				myInetNtop(AF_INET6, (char*)&sa->sin6_addr, ipv6str, sizeof(ipv6str));
 
-				id = GetStrVarFromArray(VarId, num, &Err);
-				if (Err == 0) {
+				if (num < arysize) {
+					id = GetStrVarFromArray(VarId, num, &Err);
 					SetStrVal(id, ipv6str);
-					num++;
 				}
+				else {
+					result = 0;
+				}
+				num++;
 
 			} while ((uni = uni->Next));
 		} while ((padap = padap->Next));
 	}
 
-	SetResult(num);
+	SetResult(result);
+	SetIntVal(VarId2, num);
 
 	FreeLibrary(h);
 	return Err;
