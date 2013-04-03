@@ -236,6 +236,7 @@
 #define RsvChecksum16File   207
 #define RsvChecksum32   208
 #define RsvChecksum32File   209
+#define RsvBringupMacro 210
 
 #define RsvOperator     1000
 #define RsvBNot         1001

@@ -150,6 +150,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"bplusrecv")==0) *WordId = RsvBPlusRecv;
 		else if (_stricmp(Str,"bplussend")==0) *WordId = RsvBPlusSend;
 		else if (_stricmp(Str,"break")==0) *WordId = RsvBreak;
+		else if (_stricmp(Str,"bringupmacro")==0) *WordId = RsvBringupMacro;
 		else if (_stricmp(Str,"basename")==0) *WordId = RsvBasename;
 		break;
 	case 'c':

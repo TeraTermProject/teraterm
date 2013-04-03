@@ -57,6 +57,36 @@ static char ParamSecondFileName[MaxStrLen];
 
 #define CBBufSize TermWidthMax
 
+
+static void BringupMacroWindow(BOOL flash_flag)
+{
+	HWND hwnd;
+	DWORD pid_macro, pid;
+	DWORD targetid;
+	DWORD currentActiveThreadId;
+
+	currentActiveThreadId = GetWindowThreadProcessId(GetForegroundWindow(), &pid);
+
+	GetWindowThreadProcessId(HWndDdeCli, &pid_macro);
+	hwnd = GetTopWindow(NULL);
+	while (hwnd) {
+		targetid = GetWindowThreadProcessId(hwnd, &pid);
+		if (pid == pid_macro) {
+			if (flash_flag)
+				FlashWindow(hwnd, TRUE);
+
+			SendMessage(hwnd, MY_FORCE_FOREGROUND_MESSAGE, (WPARAM)hwnd, 0);
+		}
+		hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
+	}
+
+	// マクロウィンドウ本体
+	ShowWindow(HWndDdeCli, SW_NORMAL);
+	SetForegroundWindow(HWndDdeCli);
+	BringWindowToTop(HWndDdeCli);
+}
+
+
 void GetClientHWnd(PCHAR HWndStr)
 {
 	int i;
@@ -338,6 +368,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdDispStr      'U'
 #define CmdLogInfo      'V'
 #define CmdLogRotate    'W'
+#define CmdBringupMacro 'X'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -936,6 +967,10 @@ scp_rcv_error:
 		}
 		break;
 
+	case CmdBringupMacro:
+		BringupMacroWindow(FALSE);
+		break;
+
 	default:
 		return DDE_FNOTPROCESSED;
 	}
@@ -1146,30 +1181,7 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	// 該当する"ttpmacro"をフラッシュする。
 	// (2010.4.2 yutaka, maya)
 	if ((FName == NULL && Startup == FALSE) && ConvH != 0) {
-		HWND hwnd;
-		DWORD pid_macro, pid;
-		DWORD targetid;
-		DWORD currentActiveThreadId;
-
-		currentActiveThreadId = GetWindowThreadProcessId(GetForegroundWindow(), &pid);
-
-		GetWindowThreadProcessId(HWndDdeCli, &pid_macro);
-		hwnd = GetTopWindow(NULL);
-		while (hwnd) {
-			targetid = GetWindowThreadProcessId(hwnd, &pid);
-			if (pid == pid_macro) {
-				FlashWindow(hwnd, TRUE);
-
-				SendMessage(hwnd, MY_FORCE_FOREGROUND_MESSAGE, (WPARAM)hwnd, 0);
-			}
-			hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
-		}
-
-		// マクロウィンドウ本体
-		ShowWindow(HWndDdeCli, SW_NORMAL);
-		SetForegroundWindow(HWndDdeCli);
-		BringWindowToTop(HWndDdeCli);
-
+		BringupMacroWindow(TRUE);
 		return;
 	}
 
