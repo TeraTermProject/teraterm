@@ -57,6 +57,10 @@ BOOL CListDlg::OnInitDialog()
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+	int ListMaxWidth = 0;
+	int ListWidth;
+	CDC *pDC;
+	CFont *pOldFont;
 
 	CDialog::OnInitDialog();
 
@@ -77,12 +81,23 @@ BOOL CListDlg::OnInitDialog()
 	get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 	SetDlgItemText(IDCANCEL, uimsg);
 
+	pDC = m_xcList.GetDC(); // リストボックスを横スクロールできるように最大幅を取得
+	pOldFont = pDC->SelectObject(m_xcList.GetFont());
+
 	p = m_Lists;
 	while (*p) {
 		m_xcList.InsertString(-1, _T(*p));
+		ListWidth = pDC->GetTextExtent(*p).cx;
+		if (ListWidth > ListMaxWidth) {
+			ListMaxWidth = ListWidth;
+		}
 		p++;
 	}
-    UpdateData(FALSE);
+	UpdateData(FALSE);
+
+	m_xcList.SetHorizontalExtent(ListMaxWidth + 5);
+	pDC->SelectObject(pOldFont);
+	ReleaseDC(pDC);
 
 	// 1つめを選択状態にする。
 	m_xcList.SetCurSel(0);
