@@ -306,7 +306,7 @@ int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists)
 {
 	int ret = -1;
 
-	CListDlg ListDlg(Text, Caption, Lists);
+	CListDlg ListDlg(Text,Caption,Lists,DlgPosX,DlgPosY);
 	if (ListDlg.DoModal() == IDOK) {
 		ret = ListDlg.m_SelectItem;
 	}

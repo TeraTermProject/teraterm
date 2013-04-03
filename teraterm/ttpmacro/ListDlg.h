@@ -9,7 +9,7 @@ class CListDlg : public CDialog
 	DECLARE_DYNAMIC(CListDlg)
 
 public:
-	CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists);   // 標準コンストラクタ
+	CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int x, int y);
 	virtual ~CListDlg();
 
 // ダイアログ データ
@@ -20,7 +20,11 @@ protected:
 	PCHAR m_Caption;
 	CHAR **m_Lists;
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
+	int PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW, LW, LH;
+	SIZE s;
 	HFONT DlgFont;
+
+	void Relocation(BOOL is_init, int WW);
 
 	DECLARE_MESSAGE_MAP()
 public:

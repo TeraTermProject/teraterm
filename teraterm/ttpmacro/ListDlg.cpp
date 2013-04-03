@@ -16,12 +16,14 @@
 
 IMPLEMENT_DYNAMIC(CListDlg, CDialog)
 
-CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists)
+CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int x, int y)
 	: CDialog(CListDlg::IDD)
 {
 	m_Text = Text;
 	m_Caption = Caption;
 	m_Lists = Lists;
+	PosX = x;
+	PosY = y;
 	DlgFont = NULL;
 }
 
@@ -56,11 +58,14 @@ BOOL CListDlg::OnInitDialog()
 	char **p;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
-	HFONT font;
+	HFONT font, tmpfont;
 	int ListMaxWidth = 0;
 	int ListWidth;
 	CDC *pDC;
 	CFont *pOldFont;
+	RECT R;
+	HDC TmpDC;
+	HWND HList, HOk;
 
 	CDialog::OnInitDialog();
 
@@ -106,6 +111,35 @@ BOOL CListDlg::OnInitDialog()
 	SetDlgItemText(IDC_STATIC, m_Text);
 	SetWindowText(m_Caption);
 
+
+	TmpDC = ::GetDC(GetDlgItem(IDC_STATIC)->GetSafeHwnd());
+	if (DlgFont) {
+		tmpfont = (HFONT)SelectObject(TmpDC, DlgFont);
+	}
+	CalcTextExtent(TmpDC,m_Text,&s);
+	if (DlgFont && tmpfont != NULL) {
+		SelectObject(TmpDC, tmpfont);
+	}
+	::ReleaseDC(GetDlgItem(IDC_STATIC)->GetSafeHwnd(),TmpDC);
+	TW = s.cx + s.cx/10;
+	TH = s.cy;
+
+	HList = ::GetDlgItem(GetSafeHwnd(), IDC_LISTBOX);
+	::GetWindowRect(HList,&R);
+	LW = R.right-R.left;
+	LH = R.bottom-R.top;
+
+	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
+	::GetWindowRect(HOk,&R);
+	BW = R.right-R.left;
+	BH = R.bottom-R.top;
+
+	GetWindowRect(&R);
+	WW = R.right-R.left;
+	WH = R.bottom-R.top;
+
+	Relocation(TRUE, WW);
+
 	SetForegroundWindow();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -116,4 +150,57 @@ void CListDlg::OnBnClickedCancel()
 {
 	// TODO: ここにコントロール通知ハンドラ コードを追加します。
 	OnCancel();
+}
+
+void CListDlg::Relocation(BOOL is_init, int new_WW)
+{
+	RECT R;
+	HDC TmpDC;
+	HWND HText, HOk, HCancel, HList;
+	int CW, CH;
+
+	GetClientRect(&R);
+	CW = R.right-R.left;
+	CH = R.bottom-R.top;
+
+	// 初回のみ
+	if (is_init) {
+		// テキストコントロールサイズを補正
+		if (TW < CW) {
+			TW = CW;
+		}
+		// ウインドウサイズの計算
+		WW = TW + (WW - CW);
+		WH = TH + LH + (int)(BH*1.5) + (WH - CH);
+		init_WW = WW;
+		// リストボックスサイズの計算
+		if (LW < WW - BW - 14*3) {
+			LW = WW - BW - 14*3;
+		}
+	}
+	else {
+		TW = CW;
+		WW = new_WW;
+	}
+
+	HText = ::GetDlgItem(GetSafeHwnd(), IDC_STATIC);
+	HOk = ::GetDlgItem(GetSafeHwnd(), IDOK);
+	HCancel = ::GetDlgItem(GetSafeHwnd(), IDCANCEL);
+	HList = ::GetDlgItem(GetSafeHwnd(), IDC_LISTBOX);
+
+	::MoveWindow(HText,(TW-s.cx)/2,LH+BH,TW,TH,TRUE);
+	::MoveWindow(HList,14,BH/2,LW,LH,TRUE);
+	::MoveWindow(HOk,14+14+LW,BH/2,BW,BH,TRUE);
+	::MoveWindow(HCancel,14+14+LW,BH*2,BW,BH,TRUE);
+
+	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
+		GetWindowRect(&R);
+		TmpDC = ::GetDC(GetSafeHwnd());
+		PosX = (GetDeviceCaps(TmpDC,HORZRES)-R.right+R.left) / 2;
+		PosY = (GetDeviceCaps(TmpDC,VERTRES)-R.bottom+R.top) / 2;
+		::ReleaseDC(GetSafeHwnd(),TmpDC);
+	}
+	SetWindowPos(&wndTop,PosX,PosY,WW,WH,0);
+
+	InvalidateRect(NULL);
 }
