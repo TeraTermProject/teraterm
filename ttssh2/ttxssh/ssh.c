@@ -8031,7 +8031,7 @@ reply:
 	return TRUE;
 }
 
-
+// cf. response()#scp.c
 static void SSH2_scp_response(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
 	if (c->scp.dir == FROMREMOTE) {
@@ -8051,18 +8051,36 @@ error:
 	{  // error
 		char msg[2048];
 		unsigned int i, max;
+		int offset, resp;
+
+		resp = data[0];
+
+		// エラーコードにより文字列の格納場所が若干異なる。
+		if (resp == 1 || /* error, followed by error msg */
+			resp == 2) {  /* fatal error, "" */
+			offset = 1;
+		} else {
+			offset = 0;
+		}
 
 		if (buflen > sizeof(msg))
 			max = sizeof(msg);
 		else
 			max = buflen - 1;
 		for (i = 0 ; i < max ; i++) {
-			msg[i] = data[i + 1];
+			msg[i] = data[i + offset];
 		}
 		msg[i] = '\0';
 
-		ssh2_channel_send_close(pvar, c);
-		//ssh2_channel_delete(c);  // free channel
+		// よく分からないエラーの場合は、自身でチャネルをクローズする。
+		// .bashrc に"stty stop undef"が定義されていると、TTSSHが落ちる問題への暫定処置。
+		// 落ちる原因は分かっていない。
+		// (2013.4.5 yutaka)
+		if (resp == 1) {
+			ssh2_channel_send_close(pvar, c);
+		} else {
+			ssh2_channel_delete(c);  // free channel
+		}
 
 		MessageBox(NULL, msg, "TTSSH: SCP error", MB_OK | MB_ICONEXCLAMATION);
 	}
