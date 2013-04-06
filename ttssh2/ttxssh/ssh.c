@@ -8066,7 +8066,7 @@ error:
 		if (buflen > sizeof(msg))
 			max = sizeof(msg);
 		else
-			max = buflen - 1;
+			max = buflen - offset;
 		for (i = 0 ; i < max ; i++) {
 			msg[i] = data[i + offset];
 		}
@@ -8079,7 +8079,8 @@ error:
 		if (resp == 1) {
 			ssh2_channel_send_close(pvar, c);
 		} else {
-			ssh2_channel_delete(c);  // free channel
+			//ssh2_channel_delete(c);  // free channel
+			//ssh2_channel_send_close(pvar, c);
 		}
 
 		MessageBox(NULL, msg, "TTSSH: SCP error", MB_OK | MB_ICONEXCLAMATION);
