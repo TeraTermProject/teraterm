@@ -1,6 +1,6 @@
 * Development Environment
 - OS
-  Windows XP Professional
+  Windows XP Professional / Windows 8 Pro
 - Compiler
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
     Note: The executable program which was compiled by Visual Studio 2008 Standard Edition (or higher edition) does not work on Windows NT 4.0, 95, 98 and Me.
@@ -37,6 +37,10 @@
 
 - Should not have opened checkout file.
   SVN commit procedure may be failure while checkout file will have been opened.
+
+- Edit language files
+  Use the text editor supporting multi languages(vim, EmEditor, Notepad++, etc) to edit the language files(installer\release\lang\*.lng).
+
 
 * Add entry to TERATERM.INI
 - Entry name
@@ -89,6 +93,7 @@ Example: adding a TTSSH menu under File menu
    The value is internal ID + 92000.
    ... teraterm/common/helpid.h
 -- make the alias between context ID and calling file.
+   Open the .hhp file by using Text Editor, added a html line in [ALIAS] tag.
    ... doc/LANG/teraterm.hhp
 
 

@@ -1,6 +1,6 @@
 ■ 開発環境
 - OS
-  Windows XP Professional
+  Windows XP Professional / Windows 8 Pro
 - コンパイラ
   Visual Studio 2005 SP1 (Standard Edition 以上)
     注: Visual Studio 2008 (Standard Edition 以上) でコンパイルした実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
@@ -37,6 +37,9 @@
 
 - アップデート・コミット時の注意
   svnの処理が失敗することがあるので、ファイルをエディタ等で開いたままで行わないでください。
+
+- 言語ファイル編集時の注意
+  言語ファイル(installer\release\lang\*.lng)は多言語対応エディタ(vim, EmEditor, Notepad++等)で編集してください。
 
 
 ■ TERATERM.INI への項目追加
@@ -92,7 +95,8 @@
 -- ヘルプページのコンテキスト ID を採番する
    値は コマンドの内部 ID + 92000
    ... teraterm/common/helpid.h
--- コンテキスト ID と呼び出すファイルのエイリアスを作成する
+-- コンテキスト ID と呼び出すファイルのエイリアスを作成する。
+   テキストエディタで直接開き、[ALIAS]にHTMLを追加する。
    ... doc/LANG/teraterm.hhp
 
 
