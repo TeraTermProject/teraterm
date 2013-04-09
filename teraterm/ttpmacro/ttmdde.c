@@ -19,10 +19,7 @@
 
 #include "wait4all.h"
 
-// Oniguruma: Regular expression library
-#define ONIG_EXTERN extern
-#include "oniguruma.h"
-#undef ONIG_EXTERN
+#include "ttmonig.h"
 
 BOOL Linked = FALSE;
 WORD ComReady = 0;
@@ -31,6 +28,10 @@ int OutLen;
   // for "WaitRecv" command
 TStrVal Wait2Str;
 BOOL Wait2Found;
+
+OnigOptionType RegexOpt = ONIG_OPTION_NONE;
+OnigEncoding RegexEnc = ONIG_ENCODING_ASCII;
+OnigSyntaxType *RegexSyntax = ONIG_SYNTAX_RUBY;
 
 #define ServiceName "TERATERM"
 #define ItemName "DATA"
@@ -539,7 +540,7 @@ int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 
 
 	r = onig_new(&reg, pattern, pattern + regex_len,
-		ONIG_OPTION_DEFAULT, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT, &einfo);
+		RegexOpt, RegexEnc, RegexSyntax, &einfo);
 	if (r != ONIG_NORMAL) {
 		char s[ONIG_MAX_ERROR_MESSAGE_LEN];
 		onig_error_code_to_str(s, r, &einfo);

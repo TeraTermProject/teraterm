@@ -294,6 +294,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'r':
 		if (_stricmp(Str,"random")==0) *WordId = RsvRandom;    // add 'random' (2006.2.11 yutaka)
 		else if (_stricmp(Str,"recvln")==0) *WordId = RsvRecvLn;
+		else if (_stricmp(Str,"regexoption")==0) *WordId = RsvRegexOption;
 		else if (_stricmp(Str,"restoresetup")==0) *WordId = RsvRestoreSetup;
 		else if (_stricmp(Str,"return")==0) *WordId = RsvReturn;
 		else if (_stricmp(Str,"rotateleft")==0) *WordId = RsvRotateL;   // add 'rotateleft' (2007.8.19 maya)

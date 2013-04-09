@@ -19,6 +19,7 @@
 #include "ttlib.h"
 #include "ttmenc.h"
 #include "tttypes.h"
+#include "ttmonig.h"
 #include <shellapi.h>
 #include <sys/stat.h>
 #include <io.h>
@@ -26,11 +27,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <share.h>
-
-// Oniguruma: Regular expression library
-#define ONIG_EXTERN extern
-#include "oniguruma.h"
-#undef ONIG_EXTERN
 
 // for _findXXXX() functions
 #include <io.h>
@@ -3492,6 +3488,286 @@ WORD TTLRecvLn()
 	return 0;
 }
 
+WORD TTLRegexOption()
+{
+	TStrVal Str;
+	WORD Err;
+	int opt_none_flag = 0;
+	OnigOptionType new_opt = ONIG_OPTION_NONE;
+	OnigEncoding new_enc = ONIG_ENCODING_UNDEF;
+	OnigSyntaxType *new_syntax = NULL;
+
+	Err = 0;
+
+	while (CheckParameterGiven()) {
+		GetStrVal(Str, &Err);
+		if (Err)
+			return Err;
+
+		// Encoding
+		if (_stricmp(Str, "ENCODING_ASCII")==0 || _stricmp(Str, "ASCII")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ASCII;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_1")==0 || _stricmp(Str, "ISO_8859_1")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_1;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_2")==0 || _stricmp(Str, "ISO_8859_2")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_2;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_3")==0 || _stricmp(Str, "ISO_8859_3")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_3;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_4")==0 || _stricmp(Str, "ISO_8859_4")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_4;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_5")==0 || _stricmp(Str, "ISO_8859_5")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_5;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_6")==0 || _stricmp(Str, "ISO_8859_6")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_6;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_7")==0 || _stricmp(Str, "ISO_8859_7")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_7;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_8")==0 || _stricmp(Str, "ISO_8859_8")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_8;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_9")==0 || _stricmp(Str, "ISO_8859_9")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_9;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_10")==0 || _stricmp(Str, "ISO_8859_10")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_10;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_11")==0 || _stricmp(Str, "ISO_8859_11")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_11;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_13")==0 || _stricmp(Str, "ISO_8859_13")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_13;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_14")==0 || _stricmp(Str, "ISO_8859_14")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_14;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_15")==0 || _stricmp(Str, "ISO_8859_15")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_15;
+		}
+		else if (_stricmp(Str, "ENCODING_ISO_8859_16")==0 || _stricmp(Str, "ISO_8859_16")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_ISO_8859_16;
+		}
+		else if (_stricmp(Str, "ENCODING_UTF8")==0 || _stricmp(Str, "UTF8")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_UTF8;
+		}
+		else if (_stricmp(Str, "ENCODING_UTF16_BE")==0 || _stricmp(Str, "UTF16_BE")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_UTF16_BE;
+		}
+		else if (_stricmp(Str, "ENCODING_UTF16_LE")==0 || _stricmp(Str, "UTF16_LE")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_UTF16_LE;
+		}
+		else if (_stricmp(Str, "ENCODING_UTF32_BE")==0 || _stricmp(Str, "UTF32_BE")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_UTF32_BE;
+		}
+		else if (_stricmp(Str, "ENCODING_UTF32_LE")==0 || _stricmp(Str, "UTF32_LE")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_UTF32_LE;
+		}
+		else if (_stricmp(Str, "ENCODING_EUC_JP")==0 || _stricmp(Str, "EUC_JP")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_EUC_JP;
+		}
+		else if (_stricmp(Str, "ENCODING_EUC_TW")==0 || _stricmp(Str, "EUC_TW")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_EUC_TW;
+		}
+		else if (_stricmp(Str, "ENCODING_EUC_KR")==0 || _stricmp(Str, "EUC_KR")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_EUC_KR;
+		}
+		else if (_stricmp(Str, "ENCODING_EUC_CN")==0 || _stricmp(Str, "EUC_CN")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_EUC_CN;
+		}
+		else if (_stricmp(Str, "ENCODING_SJIS")==0 || _stricmp(Str, "SJIS")==0
+		      || _stricmp(Str, "ENCODING_CP932")==0 || _stricmp(Str, "CP932")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_SJIS;
+		}
+		else if (_stricmp(Str, "ENCODING_KOI8_R")==0 || _stricmp(Str, "KOI8_R")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_KOI8_R;
+		}
+		else if (_stricmp(Str, "ENCODING_CP1251")==0 || _stricmp(Str, "CP1251")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_CP1251;
+		}
+		else if (_stricmp(Str, "ENCODING_BIG5")==0 || _stricmp(Str, "BIG5")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_BIG5;
+		}
+		else if (_stricmp(Str, "ENCODING_GB18030")==0 || _stricmp(Str, "GB18030")==0) {
+			if (new_enc != ONIG_ENCODING_UNDEF)
+				return ErrSyntax;
+			new_enc = ONIG_ENCODING_GB18030;
+		}
+
+		// Syntax
+		else if (_stricmp(Str, "SYNTAX_DEFAULT")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_DEFAULT;
+		}
+		else if (_stricmp(Str, "SYNTAX_ASIS")==0 || _stricmp(Str, "ASIS")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_ASIS;
+		}
+		else if (_stricmp(Str, "SYNTAX_POSIX_BASIC")==0 || _stricmp(Str, "POSIX_BASIC")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_POSIX_BASIC;
+		}
+		else if (_stricmp(Str, "SYNTAX_POSIX_EXTENDED")==0 || _stricmp(Str, "POSIX_EXTENDED")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_POSIX_EXTENDED;
+		}
+		else if (_stricmp(Str, "SYNTAX_EMACS")==0 || _stricmp(Str, "EMACS")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_EMACS;
+		}
+		else if (_stricmp(Str, "SYNTAX_GREP")==0 || _stricmp(Str, "GREP")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_GREP;
+		}
+		else if (_stricmp(Str, "SYNTAX_GNU_REGEX")==0 || _stricmp(Str, "GNU_REGEX")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_GNU_REGEX;
+		}
+		else if (_stricmp(Str, "SYNTAX_JAVA")==0 || _stricmp(Str, "JAVA")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_JAVA;
+		}
+		else if (_stricmp(Str, "SYNTAX_PERL")==0 || _stricmp(Str, "PERL")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_PERL;
+		}
+		else if (_stricmp(Str, "SYNTAX_PERL_NG")==0 || _stricmp(Str, "PERL_NG")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_PERL_NG;
+		}
+		else if (_stricmp(Str, "SYNTAX_RUBY")==0 || _stricmp(Str, "RUBY")==0) {
+			if (new_syntax != NULL)
+				return ErrSyntax;
+			new_syntax = ONIG_SYNTAX_RUBY;
+		}
+
+		// Option
+		else if (_stricmp(Str, "OPTION_NONE")==0) {
+			if (new_opt != ONIG_OPTION_NONE || opt_none_flag != 0)
+				return ErrSyntax;
+			new_opt = ONIG_OPTION_NONE;
+			opt_none_flag = 1;
+		}
+		else if (_stricmp(Str, "OPTION_SINGLELINE")==0 || _stricmp(Str, "SINGLELINE")==0) {
+			new_opt |= ONIG_OPTION_SINGLELINE;
+		}
+		else if (_stricmp(Str, "OPTION_MULTILINE")==0 || _stricmp(Str, "MULTILINE")==0) {
+			new_opt |= ONIG_OPTION_MULTILINE;
+		}
+		else if (_stricmp(Str, "OPTION_IGNORECASE")==0 || _stricmp(Str, "IGNORECASE")==0) {
+			new_opt |= ONIG_OPTION_IGNORECASE;
+		}
+		else if (_stricmp(Str, "OPTION_EXTEND")==0 || _stricmp(Str, "EXTEND")==0) {
+			new_opt |= ONIG_OPTION_EXTEND;
+		}
+		else if (_stricmp(Str, "OPTION_FIND_LONGEST")==0 || _stricmp(Str, "FIND_LONGEST")==0) {
+			new_opt |= ONIG_OPTION_FIND_LONGEST;
+		}
+		else if (_stricmp(Str, "OPTION_FIND_NOT_EMPTY")==0 || _stricmp(Str, "FIND_NOT_EMPTY")==0) {
+			new_opt |= ONIG_OPTION_FIND_NOT_EMPTY;
+		}
+		else if (_stricmp(Str, "OPTION_NEGATE_SINGLELINE")==0 || _stricmp(Str, "NEGATE_SINGLELINE")==0) {
+			new_opt |= ONIG_OPTION_NEGATE_SINGLELINE;
+		}
+		else if (_stricmp(Str, "OPTION_DONT_CAPTURE_GROUP")==0 || _stricmp(Str, "DONT_CAPTURE_GROUP")==0) {
+			new_opt |= ONIG_OPTION_DONT_CAPTURE_GROUP;
+		}
+		else if (_stricmp(Str, "OPTION_CAPTURE_GROUP")==0 || _stricmp(Str, "CAPTURE_GROUP")==0) {
+			new_opt |= ONIG_OPTION_CAPTURE_GROUP;
+		}
+
+		else {
+			return ErrSyntax;
+		}
+	}
+
+
+	if (new_enc != ONIG_ENCODING_UNDEF) {
+		RegexEnc = new_enc;
+	}
+	if (new_syntax != NULL) {
+		RegexSyntax = new_syntax;
+	}
+	if (new_opt != ONIG_OPTION_NONE || opt_none_flag != 0) {
+		RegexOpt = new_opt;
+	}
+
+	return 0;
+}
+
 WORD TTLReturn()
 {
 	if (GetFirstChar()==0)
@@ -3986,7 +4262,7 @@ WORD TTLSprintf(int getvar)
 	pattern = (UChar* )"^%[-+0 #]*(?:[1-9][0-9]*)?(?:\\.[0-9]*)?$";
 
 	r = onig_new(&reg, pattern, pattern + strlen(pattern),
-	             ONIG_OPTION_DEFAULT, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT,
+	             ONIG_OPTION_NONE, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT,
 	             &einfo);
 	if (r != ONIG_NORMAL) {
 		char s[ONIG_MAX_ERROR_MESSAGE_LEN];
@@ -5631,6 +5907,8 @@ int ExecCmnd()
 			Err = TTLRecvRandom(); break;   // add 'random'
 		case RsvRecvLn:
 			Err = TTLRecvLn(); break;
+		case RsvRegexOption:
+			Err = TTLRegexOption(); break;
 		case RsvRestoreSetup:
 			Err = TTLCommCmdFile(CmdRestoreSetup,0); break;
 		case RsvReturn:
