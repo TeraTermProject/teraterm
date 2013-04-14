@@ -79,7 +79,9 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	PrnDlg.hwndOwner = HWin;
 	PrnDlg.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_SHOWHELP;
 	if (! *Sel) {
-		PrnDlg.Flags = PrnDlg.Flags | PD_NOSELECTION;
+		PrnDlg.Flags = PrnDlg.Flags | PD_NOSELECTION;	/* when there is nothing select, gray out the "Selection" radio button */
+	} else {
+		PrnDlg.Flags = PrnDlg.Flags | PD_SELECTION;	/* when there is something select, select the "Selection" radio button by default */
 	}
 	PrnDlg.nCopies = 1;
 
