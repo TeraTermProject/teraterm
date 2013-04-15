@@ -1049,6 +1049,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="regexoption">
+					<param name="Local" value="html\macro\command\regexoption.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sprintf">
 					<param name="Local" value="html\macro\command\sprintf.html">
 					<param name="ImageNumber" value="11">

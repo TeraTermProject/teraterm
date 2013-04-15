@@ -263,6 +263,7 @@ HlpMacroCommandQuickvanrecv=html\macro\command\quickvanrecv.html
 HlpMacroCommandQuickvansend=html\macro\command\quickvansend.html
 HlpMacroCommandRandom=html\macro\command\random.html
 HlpMacroCommandRecvln=html\macro\command\recvln.html
+HlpMacroCommandRegexption=html\macro\command\regexoption.html
 HlpMacroCommandRestoresetup=html\macro\command\restoresetup.html
 HlpMacroCommandReturn=html\macro\command\return.html
 HlpMacroCommandRotateleft=html\macro\command\rotateleft.html

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>regexoption</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>regexoption</h1>
+
+<p>
+正規表現のエンコーディングを指定する。
+</p>
+
+<pre class="macro-syntax">
+regexoption &lt;encoding string&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<ul>
+ <li>ENCODING_ASCII, ASCII</li>
+ <li>ENCODING_ISO_8859_1, ISO_8859_1</li>
+ <li>ENCODING_ISO_8859_2, ISO_8859_2</li>
+ <li>ENCODING_ISO_8859_3, ISO_8859_3</li>
+ <li>ENCODING_ISO_8859_4, ISO_8859_4</li>
+ <li>ENCODING_ISO_8859_5, ISO_8859_5</li>
+ <li>ENCODING_ISO_8859_6, ISO_8859_6</li>
+ <li>ENCODING_ISO_8859_7, ISO_8859_7</li>
+ <li>ENCODING_ISO_8859_8, ISO_8859_8</li>
+ <li>ENCODING_ISO_8859_9, ISO_8859_9</li>
+ <li>ENCODING_ISO_8859_10, ISO_8859_10</li>
+ <li>ENCODING_ISO_8859_11, ISO_8859_11</li>
+ <li>ENCODING_ISO_8859_13, ISO_8859_13</li>
+ <li>ENCODING_ISO_8859_14, ISO_8859_14</li>
+ <li>ENCODING_ISO_8859_15, ISO_8859_15</li>
+ <li>ENCODING_ISO_8859_16, ISO_8859_16</li>
+ <li>ENCODING_UTF8, UTF8</li>
+ <li>ENCODING_UTF16_BE, UTF16_BE</li>
+ <li>ENCODING_UTF16_LE, UTF16_LE</li>
+ <li>ENCODING_UTF32_BE, UTF32_BE</li>
+ <li>ENCODING_UTF32_LE, UTF32_LE</li>
+ <li>ENCODING_EUC_JP, EUC_JP</li>
+ <li>ENCODING_EUC_TW, EUC_TW</li>
+ <li>ENCODING_EUC_KR, EUC_KR</li>
+ <li>ENCODING_EUC_CN, EUC_CN</li>
+ <li>ENCODING_SJIS, SJIS, ENCODING_CP932, CP932</li>
+ <li>ENCODING_KOI8_R, KOI8_R</li>
+ <li>ENCODING_CP1251, CP1251</li>
+ <li>ENCODING_BIG5, BIG5</li>
+ <li>ENCODING_GB18030, GB18030</li>
+</ul>
+
+
+<h2>返り値</h2>
+なし。
+
+<h2>例</h2>
+
+<pre class="macro-example">
+regexoption "SJIS"
+strmatch "対象データ" "データ"
+</pre>
+
+<h2>参照</h2>
+<a href="strreplace.html">strreplace</a><br>
+<a href="strmatch.html">strmatch</a><br>
+<a href="waitregex.html">waitregex</a><br>
+
+</body>
+</html>

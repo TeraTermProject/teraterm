@@ -272,6 +272,7 @@
 #define HlpMacroCommandQuickvansend     92070
 #define HlpMacroCommandRandom           92112
 #define HlpMacroCommandRecvln           92071
+#define HlpMacroCommandRegexoption      92156
 #define HlpMacroCommandRestoresetup     92072
 #define HlpMacroCommandReturn           92073
 #define HlpMacroCommandRotateleft       92122
