@@ -65,6 +65,10 @@ waitregex &lt;string1 with regular expression&gt; [&lt;string2 with regular expr
 変数 groupmatchstr1～groupmatchstr9 にはグループマッチしたパターンが格納される。
 </p>
 
+<p>
+日本語等のマルチバイト文字列を待つ場合、事前に<a href="regexoption.html">regexoption</a>で適切なエンコーディングを設定しておく必要がある。
+</p>
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -75,6 +79,12 @@ messagebox s 'result'
 messagebox inputstr 'inputstr'
 messagebox matchstr 'matchstr'
 </pre>
+
+<h2>参照</h2>
+
+<a href="regexoption.html">regexoption</a><br>
+<a href="wait.html">wait</a><br>
+<a href="waitln.html">waitln</a><br>
 
 </body>
 </html>

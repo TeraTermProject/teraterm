@@ -35,6 +35,10 @@ strreplace &lt;strvar&gt; &lt;index&gt; &lt;regex&gt; &lt;newstr&gt;
 置換が失敗した場合は、result 変数が"0"になる。<br>
 </p>
 
+<p>
+日本語等のマルチバイト文字列を検索する場合、事前に<a href="regexoption.html">regexoption</a>で適切なエンコーディングを設定しておく必要がある。
+</p>
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -67,6 +71,7 @@ endif
 <h2>参照</h2>
 
 <a href="../../reference/RE.txt">Oniguruma の正規表現</a><br>
+<a href="regexoption.html">regexoption</a><br>
 <a href="strmatch.html">strmatch</a><br>
 <a href="strinsert.html">strinsert</a><br>
 <a href="strremove.html">strremove</a><br>

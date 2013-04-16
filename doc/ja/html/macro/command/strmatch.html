@@ -50,6 +50,10 @@ strmatch &lt;target string&gt; &lt;string with regular expression&gt;
 なお、マッチしなかった場合には、これらの変数は strmatch 実行前の内容が保持される。
 </p>
 
+<p>
+日本語等のマルチバイト文字列を検索する場合、事前に<a href="regexoption.html">regexoption</a>で適切なエンコーディングを設定しておく必要がある。
+</p>
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -66,6 +70,7 @@ messagebox groupmatchstr4 'groupmatchstr4'   ; 2600
 
 <h2>参照</h2>
 
+<a href="regexoption.html">regexoption</a><br>
 <a href="strreplace.html">strreplace</a><br>
 <a href="strinsert.html">strinsert</a><br>
 <a href="strremove.html">strremove</a><br>

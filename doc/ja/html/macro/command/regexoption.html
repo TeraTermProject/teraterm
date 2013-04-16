@@ -14,62 +14,327 @@
 <h1>regexoption</h1>
 
 <p>
-正規表現のエンコーディングを指定する。
+正規表現の文法、文字エンコーディング、オプションを設定する。
 </p>
 
 <pre class="macro-syntax">
-regexoption &lt;encoding string&gt;
+regexoption &lt;option1&gt; [&lt;option2&gt; ...]
 </pre>
 
-<h2>パラメータ</h2>
+<h2>解説</h2>
 
-<ul>
- <li>ENCODING_ASCII, ASCII</li>
- <li>ENCODING_ISO_8859_1, ISO_8859_1</li>
- <li>ENCODING_ISO_8859_2, ISO_8859_2</li>
- <li>ENCODING_ISO_8859_3, ISO_8859_3</li>
- <li>ENCODING_ISO_8859_4, ISO_8859_4</li>
- <li>ENCODING_ISO_8859_5, ISO_8859_5</li>
- <li>ENCODING_ISO_8859_6, ISO_8859_6</li>
- <li>ENCODING_ISO_8859_7, ISO_8859_7</li>
- <li>ENCODING_ISO_8859_8, ISO_8859_8</li>
- <li>ENCODING_ISO_8859_9, ISO_8859_9</li>
- <li>ENCODING_ISO_8859_10, ISO_8859_10</li>
- <li>ENCODING_ISO_8859_11, ISO_8859_11</li>
- <li>ENCODING_ISO_8859_13, ISO_8859_13</li>
- <li>ENCODING_ISO_8859_14, ISO_8859_14</li>
- <li>ENCODING_ISO_8859_15, ISO_8859_15</li>
- <li>ENCODING_ISO_8859_16, ISO_8859_16</li>
- <li>ENCODING_UTF8, UTF8</li>
- <li>ENCODING_UTF16_BE, UTF16_BE</li>
- <li>ENCODING_UTF16_LE, UTF16_LE</li>
- <li>ENCODING_UTF32_BE, UTF32_BE</li>
- <li>ENCODING_UTF32_LE, UTF32_LE</li>
- <li>ENCODING_EUC_JP, EUC_JP</li>
- <li>ENCODING_EUC_TW, EUC_TW</li>
- <li>ENCODING_EUC_KR, EUC_KR</li>
- <li>ENCODING_EUC_CN, EUC_CN</li>
- <li>ENCODING_SJIS, SJIS, ENCODING_CP932, CP932</li>
- <li>ENCODING_KOI8_R, KOI8_R</li>
- <li>ENCODING_CP1251, CP1251</li>
- <li>ENCODING_BIG5, BIG5</li>
- <li>ENCODING_GB18030, GB18030</li>
-</ul>
+<p>
+<a href="strmatch.html">strmatch</a>, <a href="strreplace.html">strreplace</a>, <a href="waitregex.html">waitregex</a> で使用する正規表現の文法、文字エンコーディング、オプションを設定する。
+</p>
 
+<p>
+オプション option1 [option2 ...] には、以下の中から文法を1つ、エンコーディングを1つ、オプションを複数指定できる。<br>
+各設定のデフォルト値は、文法: SYNTAX_RUBY, エンコーディング: ENCODING_ASCII, オプション: OPTION_NONE となる。
+</p>
 
-<h2>返り値</h2>
-なし。
+<table border="2">
+<tr>
+	<th>種別</th>
+	<th>オプション</th>
+	<th>オプション(省略形)</th>
+	<th>意味</th>
+</tr>
+<tr>
+	<td rowspan="11">文法</td>
+	<td>SYNTAX_DEFAULT</td>
+	<td>-</td>
+	<td>デフォルト(Ruby形式)</td>
+</tr>
+<tr>
+	<td>SYNTAX_ASIS</td>
+	<td>ASIS</td>
+	<td>固定文字列検索</td>
+</tr>
+<tr>
+	<td>SYNTAX_POSIX_BASIC</td>
+	<td>POSIX_BASIC</td>
+	<td>POSIX基本正規表現</td>
+</tr>
+<tr>
+	<td>SYNTAX_POSIX_EXTENDED</td>
+	<td>POSIX_EXTENDED</td>
+	<td>POSIX拡張正規表現</td>
+</tr>
+<tr>
+	<td>SYNTAX_EMACS</td>
+	<td>EMACS</td>
+	<td>Emacs形式正規表現</td>
+</tr>
+<tr>
+	<td>SYNTAX_GREP</td>
+	<td>GREP</td>
+	<td>grep形式正規表現</td>
+</tr>
+<tr>
+	<td>SYNTAX_GNU_REGEX</td>
+	<td>GNU_REGEX</td>
+	<td>GNU Regex形式正規表現</td>
+</tr>
+<tr>
+	<td>SYNTAX_JAVA</td>
+	<td>JAVA</td>
+	<td>Java形式正規表現</td>
+</tr>
+<tr>
+	<td>SYNTAX_PERL</td>
+	<td>PERL</td>
+	<td>Perl形式</td>
+</tr>
+<tr>
+	<td>SYNTAX_PERL_NG</td>
+	<td>PERL_NG</td>
+	<td>Perl形式正規表現 + 名前付き捕獲式集合</td>
+</tr>
+<tr>
+	<td>SYNTAX_RUBY</td>
+	<td>RUBY</td>
+	<td>Ruby形式正規表現</td>
+</tr>
+
+<tr>
+	<td rowspan="30">エンコーディング</td>
+	<td>ENCODING_ASCII</td>
+	<td>ASCII</td>
+	<td>エンコーディング設定を ASCII にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_1</td>
+	<td>ISO_8859_1</td>
+	<td>エンコーディング設定を ISO 8859-1 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_2</td>
+	<td>ISO_8859_2</td>
+	<td>エンコーディング設定を ISO 8859-2 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_3</td>
+	<td>ISO_8859_3</td>
+	<td>エンコーディング設定を ISO 8859-3 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_4</td>
+	<td>ISO_8859_4</td>
+	<td>エンコーディング設定を ISO 8859-4 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_5</td>
+	<td>ISO_8859_5</td>
+	<td>エンコーディング設定を ISO 8859-5 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_6</td>
+	<td>ISO_8859_6</td>
+	<td>エンコーディング設定を ISO 8859-6 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_7</td>
+	<td>ISO_8859_7</td>
+	<td>エンコーディング設定を ISO 8859-7 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_8</td>
+	<td>ISO_8859_8</td>
+	<td>エンコーディング設定を ISO 8859-8 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_9</td>
+	<td>ISO_8859_9</td>
+	<td>エンコーディング設定を ISO 8859-9 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_10</td>
+	<td>ISO_8859_10</td>
+	<td>エンコーディング設定を ISO 8859-10 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_11</td>
+	<td>ISO_8859_11</td>
+	<td>エンコーディング設定を ISO 8859-11 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_13</td>
+	<td>ISO_8859_13</td>
+	<td>エンコーディング設定を ISO 8859-13 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_14</td>
+	<td>ISO_8859_14</td>
+	<td>エンコーディング設定を ISO 8859-14 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_15</td>
+	<td>ISO_8859_15</td>
+	<td>エンコーディング設定を ISO 8859-15 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_ISO_8859_16</td>
+	<td>ISO_8859_16</td>
+	<td>エンコーディング設定を ISO 8859-16 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_UTF8</td>
+	<td>UTF8</td>
+	<td>エンコーディング設定を UTF-8 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_UTF16_BE</td>
+	<td>UTF16_BE</td>
+	<td>エンコーディング設定を UTF-16 (Big Endian) にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_UTF16_LE</td>
+	<td>UTF16_LE</td>
+	<td>エンコーディング設定を UTF-16 (Little Endian) にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_UTF32_BE</td>
+	<td>UTF32_BE</td>
+	<td>エンコーディング設定を UTF-32 (Big Endian) にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_UTF32_LE</td>
+	<td>UTF32_LE</td>
+	<td>エンコーディング設定を UTF-32 (Little Endian) にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_EUC_JP</td>
+	<td>EUC_JP</td>
+	<td>エンコーディング設定を EUC-JP にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_EUC_TW</td>
+	<td>EUC_TW</td>
+	<td>エンコーディング設定を EUC-TW にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_EUC_KR</td>
+	<td>EUC_KR</td>
+	<td>エンコーディング設定を EUC-KR にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_EUC_CN</td>
+	<td>EUC_CN</td>
+	<td>エンコーディング設定を EUC-CN にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_SJIS</td>
+	<td>SJIS</td>
+	<td>エンコーディング設定を Shift_JIS にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_KOI8_R</td>
+	<td>KOI8_R</td>
+	<td>エンコーディング設定を KOI8-R にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_CP1251</td>
+	<td>CP1251</td>
+	<td>エンコーディング設定を CP1251 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_BIG5</td>
+	<td>BIG5</td>
+	<td>エンコーディング設定を Big5 にする。</td>
+</tr>
+<tr>
+	<td>ENCODING_GB18030</td>
+	<td>GB18030</td>
+	<td>エンコーディング設定を GB18030 にする。</td>
+</tr>
+
+<tr>
+	<td rowspan="10">オプション</td>
+	<td>OPTION_NONE</td>
+	<td>-</td>
+	<td>正規表現オプションが指定されていない状態にする。</td>
+</tr>
+<tr>
+	<td>OPTION_SINGLELINE</td>
+	<td>SINGLELINE</td>
+	<td>'^' → '\A', '$' → '\Z'</td>
+</tr>
+<tr>
+	<td>OPTION_MULTILINE</td>
+	<td>MULTILINE</td>
+	<td>'.'が改行にマッチする</td>
+</tr>
+<tr>
+	<td>OPTION_IGNORECASE</td>
+	<td>IGNORECASE</td>
+	<td>大文字/小文字同一視</td>
+</tr>
+<tr>
+	<td>OPTION_EXTEND</td>
+	<td>EXTEND</td>
+	<td>パターン拡張形式</td>
+</tr>
+<tr>
+	<td>OPTION_FIND_LONGEST</td>
+	<td>FIND_LONGEST</td>
+	<td>最長一致</td>
+</tr>
+<tr>
+	<td>OPTION_FIND_NOT_EMPTY</td>
+	<td>FIND_NOT_EMPTY</td>
+	<td>空文字列にマッチしない</td>
+</tr>
+<tr>
+	<td>OPTION_NEGATE_SINGLELINE</td>
+	<td>NEGATE_SINGLELINE</td>
+	<td>OPTION_SINGLELINEを無効にする</td>
+</tr>
+<tr>
+	<td>OPTION_DONT_CAPTURE_GROUP</td>
+	<td>DONT_CAPTURE_GROUP</td>
+	<td>名前付き捕獲式集合のみ捕獲</td>
+</tr>
+<tr>
+	<td>OPTION_CAPTURE_GROUP</td>
+	<td>CAPTURE_GROUP</td>
+	<td>名前無し捕獲式集合も捕獲</td>
+</tr>
+</table>
+
 
 <h2>例</h2>
 
 <pre class="macro-example">
+string="文字データ"
+pattern="データ"
+
+strmatch string pattern
+messagebox result "デフォルト"   ; result -&gt; 0 (Not Match)
+
 regexoption "SJIS"
-strmatch "対象データ" "データ"
+strmatch string pattern
+messagebox result "SJIS"   ; result -&gt; 5 (Match)
+</pre>
+
+<pre class="macro-example">
+string="Test (PaTTerN) String"
+pattern="(pattern)"
+
+regexoption "IGNORECASE"
+strmatch string pattern
+sprintf2 msg 'result=%d, matchstr="%s"' result matchstr
+messagebox msg "IGNORECASE"          ; result=7, matchstr="PaTTerN"
+
+regexoption "ASIS" "IGNORECASE"
+strmatch string pattern
+sprintf2 msg 'result=%d, matchstr="%s"' result matchstr
+messagebox msg "IGNORECASE + ASIS"   ; result=6, matchstr="(PaTTerN)"
 </pre>
 
 <h2>参照</h2>
-<a href="strreplace.html">strreplace</a><br>
+
 <a href="strmatch.html">strmatch</a><br>
+<a href="strreplace.html">strreplace</a><br>
 <a href="waitregex.html">waitregex</a><br>
 
 </body>
