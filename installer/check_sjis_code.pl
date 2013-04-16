@@ -7,6 +7,8 @@
 #  perl check_sjis_code.pl > result.txt
 #
 
+use Encode::Guess qw/shift-jis 7bit-jis/;
+
 get_file_paths('../doc/en/html');
 exit(0);
 
@@ -53,10 +55,21 @@ sub check_sjis_code {
 	while ($line = <FP>) {
 #		$line = chomp($line);
 #		print "$line\n";
-		if ($line =~ /([\xA1-\xDF]|[\x81-\x9F\xE0-\xEF][\x40-\x7E\x80-\xFC])/) {
-			print "$filename:$no: $1\n";
-			print "$line\n";
+		
+		 my $enc = guess_encoding( $line, qw/ euc-jp shiftjis 7bit-jis / );
+
+		if (ref $enc) {
+			#printf "%s\n", $enc->name;
+			if ($enc->name !~ /ascii/) {
+				#printf "%s\n", $enc->name;
+				print "$filename:$no: $1\n";
+				print "$line\n";
+			}
 		}
+#		if ($line =~ /([\xA1-\xDF]|[\x81-\x9F\xE0-\xEF][\x40-\x7E\x80-\xFC])/) {
+#			print "$filename:$no: $1\n";
+#			print "$line\n";
+#		}
 		$no++;
 	}
 	close(FP);
