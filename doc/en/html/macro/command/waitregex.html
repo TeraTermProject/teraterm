@@ -65,6 +65,10 @@ The first matched pattern is stored in the system variable "matchstr".<br>
 Group matched patterns of regular expressions are stored in 9 system variables from "groupmatchstr1" to "groupmatchstr9".
 </p>
 
+<!-- p>
+日本語等のマルチバイト文字列を待つ場合、事前に<a href="regexoption.html">regexoption</a>で適切なエンコーディングを設定しておく必要がある。
+</p -->
+
 <h2>Example</h2>
 
 <pre class="macro-example">
@@ -75,6 +79,12 @@ messagebox s 'result'
 messagebox inputstr 'inputstr'
 messagebox matchstr 'matchstr'
 </pre>
+
+<h2>See also</h2>
+
+<a href="regexoption.html">regexoption</a><br>
+<a href="wait.html">wait</a><br>
+<a href="waitln.html">waitln</a><br>
 
 </body>
 </html>
