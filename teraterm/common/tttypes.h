@@ -561,6 +561,7 @@ struct tttset {
 	DWORD LogRotateSize;
 	WORD LogRotateSizeType;
 	WORD LogRotateStep;
+	WORD DeferredLogWriteMode;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1021,6 +1022,7 @@ typedef TMap far *PMap;
  *   added tttset.LogRotateSize
  *   added tttset.LogRotateSizeType
  *   added tttset.LogRotateStep
+ *   added tttset.DeferredLogWriteMode
  *
  * - At version 4.74, ttset_memfilemap was replaced with ttset_memfilemap_19.
  *   added tttset.FontQuality

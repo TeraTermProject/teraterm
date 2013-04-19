@@ -111,6 +111,9 @@ typedef struct {
   LONG RotateSize;
   int RotateStep;
 
+  HANDLE LogThread;
+  DWORD LogThreadId;
+
 } TFileVar;
 typedef TFileVar far *PFileVar;
 

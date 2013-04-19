@@ -781,6 +781,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->LogRotateSizeType = GetPrivateProfileInt(Section, "LogRotateSizeType", 0, FName);
 	ts->LogRotateStep = GetPrivateProfileInt(Section, "LogRotateStep", 0, FName);
 
+	/* Deferred Log Write Mode (2013.4.20 yutaka) */
+	ts->DeferredLogWriteMode = GetOnOff(Section, "DeferredLogWriteMode", FName, TRUE);
+
 
 	/* XMODEM option */
 	GetPrivateProfileString(Section, "XmodemOpt", "",
@@ -2118,6 +2121,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteInt(Section, "LogRotateSize", FName, ts->LogRotateSize);
 	WriteInt(Section, "LogRotateSizeType", FName, ts->LogRotateSizeType);
 	WriteInt(Section, "LogRotateStep", FName, ts->LogRotateStep);
+
+	/* Deferred Log Write Mode (2013.4.20 yutaka) */
+	WriteOnOff(Section, "DeferredLogWriteMode", FName, ts->DeferredLogWriteMode);
 
 	/* XMODEM option */
 	switch (ts->XmodemOpt) {

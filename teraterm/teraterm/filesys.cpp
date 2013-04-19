@@ -23,6 +23,7 @@
 #include "ftlib.h"
 
 #include <io.h>
+#include <process.h>
 
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
@@ -87,6 +88,13 @@ enum enumLineEnd {
 };
 
 enum enumLineEnd eLineEnd = Line_LineHead;
+
+
+// 遅延書き込み用スレッドのメッセージ
+#define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
+
+static void CloseFileSync(PFileVar ptr);
+
 
 BOOL LoadTTFILE()
 {
@@ -290,7 +298,8 @@ void FreeFileVar(PFileVar *fv)
 {
 	if ((*fv)!=NULL)
 	{
-		if ((*fv)->FileOpen) _lclose((*fv)->FileHandle);
+		CloseFileSync(*fv);
+		//if ((*fv)->FileOpen) _lclose((*fv)->FileHandle);
 		if ((*fv)->FnStrMemHandle>0)
 		{
 			GlobalUnlock((*fv)->FnStrMemHandle);
@@ -362,11 +371,60 @@ void FixLogOption()
 	}
 }
 
+
+// スレッドの終了とファイルのクローズ
+static void CloseFileSync(PFileVar ptr)
+{
+	if (!ptr->FileOpen)
+		return;
+
+	if (ptr->LogThread != (HANDLE)-1) {
+		// スレッドの終了待ち
+		PostThreadMessage(ptr->LogThreadId, WM_QUIT, 0, 0);
+		WaitForSingleObject(ptr->LogThread, INFINITE);
+		CloseHandle(ptr->LogThread);
+		ptr->LogThread = (HANDLE)-1;
+	}
+	_lclose(ptr->FileHandle);
+}
+
+// 遅延書き込み用スレッド
+static unsigned _stdcall DeferredLogWriteThread(void *arg) 
+{
+	MSG msg;
+	PFileVar fv = (PFileVar)arg;
+	PCHAR buf;
+	DWORD buflen;
+
+	PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
+
+	while (GetMessage(&msg, NULL, 0, 0) > 0) {
+		switch (msg.message) {
+			case WM_DPC_LOGTHREAD_SEND:
+				buf = (PCHAR)msg.wParam;
+				buflen = (DWORD)msg.lParam;
+				_lwrite(fv->FileHandle, buf, buflen );
+				free(buf);   // ここでメモリ解放
+				break;
+
+			case WM_QUIT:
+				goto end;
+				break;
+		}
+	}
+
+end:
+	_endthreadex(0);
+	return (0);
+}
+
+
 extern "C" {
 BOOL LogStart()
 {
 	LONG Option;
 	char *logdir;
+	unsigned tid;
 
 	if ((FileLog) || (BinLog)) return FALSE;
 
@@ -542,6 +600,11 @@ BOOL LogStart()
 		return FALSE;
 	}
 
+	// 遅延書き込み用スレッドを起こす。
+	// (2013.4.19 yutaka)
+	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
+	LogVar->LogThreadId = tid;
+
 	return TRUE;
 }
 }
@@ -663,6 +726,7 @@ static void LogRotate(void)
 	char newfile[1024], oldfile[1024];
 	int i, k;
 	int dwShareMode = FILE_SHARE_READ;
+	unsigned tid;
 
 	if (! LogVar->FileOpen) return;
 
@@ -682,7 +746,8 @@ static void LogRotate(void)
 	LogVar->ByteCount = 0;
 
 	// いったん今のファイルをクローズして、別名のファイルをオープンする。
-	_lclose(LogVar->FileHandle);
+	CloseFileSync(LogVar);
+	//_lclose(LogVar->FileHandle);
 
 	// 世代ローテーションのステップ数の指定があるか
 	if (LogVar->RotateStep > 0)
@@ -718,6 +783,11 @@ static void LogRotate(void)
 	LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 	                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
+	// 遅延書き込み用スレッドを起こす。
+	// (2013.4.19 yutaka)
+	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
+	LogVar->LogThreadId = tid;
+
 	logfile_unlock();
 
 }
@@ -727,6 +797,9 @@ void LogToFile()
 	PCHAR Buf;
 	int Start, Count;
 	BYTE b;
+	PCHAR WriteBuf;
+	DWORD WriteBufMax, WriteBufLen;
+	CHAR tmp[128];
 
 	if (! LogVar->FileOpen) return;
 	if (FileLog)
@@ -750,53 +823,98 @@ void LogToFile()
 	// ロックを取る(2004.8.6 yutaka)
 	logfile_lock();
 
-	while (Get1(Buf,&Start,&Count,&b))
-	{
-		if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
-		{
-			// 時刻を書き出す(2006.7.23 maya)
-			// 日付フォーマットを日本ではなく世界標準に変更した (2006.7.23 yutaka)
-			/* 2007.05.24 Gentaro */
-			// ミリ秒も表示するように変更 (2009.5.23 maya)
-			if ( ts.LogTimestamp && eLineEnd ) {
-#if 1
-#if 0
-				SYSTEMTIME	LocalTime;
-				GetLocalTime(&LocalTime);
-				char strtime[27];
-
-				// format time
-				sprintf(strtime, "[%04d/%02d/%02d %02d:%02d:%02d.%03d] ",
-						LocalTime.wYear, LocalTime.wMonth,LocalTime.wDay,
-						LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
-						LocalTime.wMilliseconds);
-#else
-				char *strtime = mctimelocal();
-#endif
-#else
-					time_t tick = time(NULL);
-					char *strtime = ctime(&tick); 
-#endif
-				/* 2007.05.24 Gentaro */
-				if( eLineEnd == Line_FileHead ){
-					_lwrite(LogVar->FileHandle,"\r\n",2);
+	if (ts.DeferredLogWriteMode) {
+		WriteBufMax = 8192;
+		WriteBufLen = 0;
+		WriteBuf = (PCHAR)malloc(WriteBufMax);
+		while (Get1(Buf,&Start,&Count,&b)) {
+			if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
+			{
+				tmp[0] = 0;
+				if ( ts.LogTimestamp && eLineEnd ) {
+					char *strtime = mctimelocal();
+					/* 2007.05.24 Gentaro */
+					if( eLineEnd == Line_FileHead ){
+						strncat_s(tmp, sizeof(tmp), "\r\n", _TRUNCATE);
+					}
+					strncat_s(tmp, sizeof(tmp), "[", _TRUNCATE);
+					strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
+					strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
 				}
-				_lwrite(LogVar->FileHandle,"[",1);
-				_lwrite(LogVar->FileHandle, strtime, strlen(strtime));
-				_lwrite(LogVar->FileHandle,"] ",2);
-			}
-			
-			/* 2007.05.24 Gentaro */
-			if( b == 0x0a ){
-				eLineEnd = Line_LineHead; /* set endmark*/
-			}
-			else {
-				eLineEnd = Line_Other; /* clear endmark*/
-			}
+				
+				/* 2007.05.24 Gentaro */
+				if( b == 0x0a ){
+					eLineEnd = Line_LineHead; /* set endmark*/
+				}
+				else {
+					eLineEnd = Line_Other; /* clear endmark*/
+				}
 
-			_lwrite(LogVar->FileHandle,(PCHAR)&b,1);
-			(LogVar->ByteCount)++;
+				if (WriteBufLen >= (WriteBufMax*4/5)) {
+					WriteBufMax *= 2;
+					WriteBuf = (PCHAR)realloc(WriteBuf, WriteBufMax);
+				}
+				memcpy(&WriteBuf[WriteBufLen], tmp, strlen(tmp));
+				WriteBufLen += strlen(tmp);
+				WriteBuf[WriteBufLen++] = b;
+
+				(LogVar->ByteCount)++;
+			}
 		}
+
+		PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)WriteBuf, WriteBufLen);
+
+	} else {
+
+		while (Get1(Buf,&Start,&Count,&b))
+		{
+			if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
+			{
+				// 時刻を書き出す(2006.7.23 maya)
+				// 日付フォーマットを日本ではなく世界標準に変更した (2006.7.23 yutaka)
+				/* 2007.05.24 Gentaro */
+				// ミリ秒も表示するように変更 (2009.5.23 maya)
+				if ( ts.LogTimestamp && eLineEnd ) {
+	#if 1
+	#if 0
+					SYSTEMTIME	LocalTime;
+					GetLocalTime(&LocalTime);
+					char strtime[27];
+
+					// format time
+					sprintf(strtime, "[%04d/%02d/%02d %02d:%02d:%02d.%03d] ",
+							LocalTime.wYear, LocalTime.wMonth,LocalTime.wDay,
+							LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
+							LocalTime.wMilliseconds);
+	#else
+					char *strtime = mctimelocal();
+	#endif
+	#else
+						time_t tick = time(NULL);
+						char *strtime = ctime(&tick); 
+	#endif
+					/* 2007.05.24 Gentaro */
+					if( eLineEnd == Line_FileHead ){
+						_lwrite(LogVar->FileHandle,"\r\n",2);
+					}
+					_lwrite(LogVar->FileHandle,"[",1);
+					_lwrite(LogVar->FileHandle, strtime, strlen(strtime));
+					_lwrite(LogVar->FileHandle,"] ",2);
+				}
+				
+				/* 2007.05.24 Gentaro */
+				if( b == 0x0a ){
+					eLineEnd = Line_LineHead; /* set endmark*/
+				}
+				else {
+					eLineEnd = Line_Other; /* clear endmark*/
+				}
+
+				_lwrite(LogVar->FileHandle,(PCHAR)&b,1);
+				(LogVar->ByteCount)++;
+			}
+		}
+
 	}
 
 	logfile_unlock();
