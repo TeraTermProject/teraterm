@@ -39,6 +39,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iptypes.h>
+#include <iphlpapi.h>
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -2330,23 +2331,16 @@ static void myInetNtop(int Family, char *pAddr, char *pStringBuf, size_t StringB
 }
 
 
-typedef DWORD (__stdcall *pGetAdaptersAddresses)(ULONG Family,
-                                                 DWORD Flags,
-                                                 PVOID Reserved,
-                                                 PIP_ADAPTER_ADDRESSES pAdapterAddresses,
-                                                 PULONG pOutBufLen);
-
 WORD TTLGetIPv6Addr()
 {
 	WORD Err;
 	TVarId VarId, VarId2, id;
 	int num, result, arysize;
-    DWORD ret;
-    IP_ADAPTER_ADDRESSES addr[256];/* XXX */
-    ULONG len = sizeof(addr);
+	DWORD ret;
+	IP_ADAPTER_ADDRESSES addr[256];/* XXX */
+	ULONG len = sizeof(addr);
 	char ipv6str[64];
-	HMODULE h;
-	pGetAdaptersAddresses pfunc;
+	OSVERSIONINFO osvi;
 
 	Err = 0;
 	GetStrAryVar(&VarId,&Err);
@@ -2355,22 +2349,22 @@ WORD TTLGetIPv6Addr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
+	// IPv6 がサポートされていない OS はここで return
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS ||
+	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ) {
+		// 9x, NT4.0 は IPv6 非対応
+		SetResult(-1);
+		SetIntVal(VarId2, 0);
+		return Err;
+	}
+
 	// 自分自身の全IPv6アドレスを取得する。
-	if ((h = LoadLibrary("iphlpapi.dll")) == NULL) {
-		SetResult(-1);
-		SetIntVal(VarId2, 0);
-		return Err;
-	}
-	if ((pfunc = (pGetAdaptersAddresses)GetProcAddress(h, "GetAdaptersAddresses")) == NULL) {
-		FreeLibrary(h);
-		SetResult(-1);
-		SetIntVal(VarId2, 0);
-		return Err;
-	}
 	arysize = GetStrAryVarSize(VarId);
 	num = 0;
 	result = 1;
-	ret = pfunc(AF_INET6, 0, NULL, addr, &len);
+	ret = GetAdaptersAddresses(AF_INET6, 0, NULL, addr, &len);
 	if (ret == ERROR_SUCCESS) {
 		IP_ADAPTER_ADDRESSES *padap = &addr[0];
 
@@ -2406,7 +2400,6 @@ WORD TTLGetIPv6Addr()
 	SetResult(result);
 	SetIntVal(VarId2, num);
 
-	FreeLibrary(h);
 	return Err;
 }
 

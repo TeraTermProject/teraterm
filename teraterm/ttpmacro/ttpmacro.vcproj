@@ -79,11 +79,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib Version.lib"
+				AdditionalDependencies="onig_s.lib Version.lib iphlpapi.lib"
 				OutputFile="..\Release/ttpmacro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\libs\oniguruma;..\release"
+				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\Release/ttpmacro.pdb"
 				SubSystem="2"
@@ -176,11 +177,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib Version.lib"
+				AdditionalDependencies="onig_sd.lib Version.lib iphlpapi.lib"
 				OutputFile="..\Debug/ttpmacro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\libs\oniguruma;..\debug"
+				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\Debug/ttpmacro.pdb"
 				SubSystem="2"
