@@ -36,7 +36,10 @@
   <li>変更
     <ul>
       <li>ファイル名の不正文字チェックを強化した。</li>
-      <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>に ログ・ローテート 設定項目を追加した。</li>
+      <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>に ログ・ローテート 設定項目を追加した。
+        <ul>
+          <li>teraterm.iniにLogRotate, LogRotateSize, LogRotateSizeType, LogRotateStepエントリを追加した。</li>
+        </ul></li>
       <li>マクロ
         <ul>
           <li><a href="../macro/command/listbox.html">listbox</a>コマンドを追加した。</li>
@@ -55,7 +58,10 @@
           <li><a href="../macro/command/regexoption.html">regexoption</a>コマンドを追加した。</li>
         </ul></li>
       <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝。</li>
-      <li>ネットワーク経由でログ採取しても、Tera Termがスローダウンしないようにした。</li>
+      <li>ネットワーク経由でログ採取しても、Tera Termがスローダウンしないようにした。
+        <ul>
+          <li>teraterm.iniにDeferredLogWriteModeエントリを追加した。</li>
+        </ul></li>
     </ul>
   </li>
 
