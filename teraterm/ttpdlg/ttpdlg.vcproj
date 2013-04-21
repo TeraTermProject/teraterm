@@ -244,6 +244,10 @@
 				>
 			</File>
 			<File
+				RelativePath="svnversion.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\dlglib.h"
 				>
 			</File>
