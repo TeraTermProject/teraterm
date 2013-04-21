@@ -2947,18 +2947,6 @@ WORD TTLInt2Str()
 	return Err;
 }
 
-
-
-WORD TTLBringupMacro() 
-{
-	WORD Err;
-
-	Err = SendCmnd(CmdBringupMacro, 0);
-
-	return Err;
-}
-
-
 //
 // logrotate size value
 // logrotate rotate num
@@ -5672,8 +5660,6 @@ int ExecCmnd()
 			Err = TTLCommCmd(CmdBPlusRecv,IdTTLWaitCmndResult); break;
 		case RsvBPlusSend:
 			Err = TTLCommCmdFile(CmdBPlusSend,IdTTLWaitCmndResult); break;
-		case RsvBringupMacro:
-			Err = TTLBringupMacro(); break;
 		case RsvBreak:
 		case RsvContinue:
 			Err = TTLBreak(WId); break;

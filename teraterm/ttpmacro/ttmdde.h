@@ -61,7 +61,6 @@
 #define CmdDispStr      'U'
 #define CmdLogInfo      'V'
 #define CmdLogRotate    'W'
-#define CmdBringupMacro 'X'
 
 #ifdef __cplusplus
 extern "C" {

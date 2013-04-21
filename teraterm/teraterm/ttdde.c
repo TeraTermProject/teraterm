@@ -368,7 +368,6 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdDispStr      'U'
 #define CmdLogInfo      'V'
 #define CmdLogRotate    'W'
-#define CmdBringupMacro 'X'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -965,10 +964,6 @@ scp_rcv_error:
 			ParamFileName[0] = '0' - 1;
 			ParamFileName[1] = 0;
 		}
-		break;
-
-	case CmdBringupMacro:
-		BringupMacroWindow(FALSE);
 		break;
 
 	default:
