@@ -2,8 +2,8 @@
   "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-  <title>bringupmacro</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>bringupbox</title>
   <meta http-equiv="Content-Style-Type" content="text/css">
   <link rel="stylesheet" href="../../style.css" type="text/css">
 </head>
@@ -11,23 +11,25 @@
 <body>
 
 
-<h1>bringupmacro</h1>
+<h1>bringupbox</h1>
 
 <p>
-MACRO ウィンドウを最前面に表示する。
+<!--
+statusbox コマンドによって開かれたステータスダイアログボックスを最前面に表示する。
+-->
 </p>
 
 <pre class="macro-syntax">
-bringupmacro
+bringupbox
 </pre>
 
-<h2>パラメータ</h2>
-なし。
+<h2>Parameters</h2>
+None.
 
-<h2>返り値</h2>
-なし。
+<h2>Return Value</h2>
+None.
 
-<h2>例</h2>
+<h2>Example</h2>
 
 <pre class="macro-example">
 step = 0
@@ -37,7 +39,7 @@ while 1
   wait '$'
   pause 2
   
-  bringupmacro
+  bringupbox
   
 endwhile
 end
@@ -50,7 +52,11 @@ statusbox timestr s
 return
 </pre>
 
-<h2>参照</h2>
+<h2>See also</h2>
+
+<ul>
+  <li><a href="statusbox.html">statusbox</a></li>
+</ul>
 
 </body>
 </html>

@@ -302,6 +302,16 @@ void CloseStatDlg()
 }
 
 extern "C" {
+void BringupStatDlg()
+{
+	if (StatDlg==NULL) {
+		return;
+	}
+	StatDlg->Bringup();
+}
+}
+
+extern "C" {
 int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists)
 {
 	int ret = -1;

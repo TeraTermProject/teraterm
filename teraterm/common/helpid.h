@@ -174,7 +174,7 @@
 #define HlpMacroCommandChecksum16file   92207
 #define HlpMacroCommandChecksum32       92208
 #define HlpMacroCommandChecksum32file   92209
-#define HlpMacroCommandBringupMacro     92210
+#define HlpMacroCommandBringupbox       92210
 
 #define HlpMacroCommandClearscreen      92006
 #define HlpMacroCommandClipb2var        92113

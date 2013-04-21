@@ -319,6 +319,14 @@ WORD TTLBreak(WORD WId) {
 	return BreakLoop(WId);
 }
 
+WORD TTLBringupBox()
+{
+	if (GetFirstChar()!=0)
+		return ErrSyntax;
+	BringupStatDlg();
+	return 0;
+}
+
 WORD TTLCall()
 {
 	TName LabName;
@@ -5663,6 +5671,8 @@ int ExecCmnd()
 		case RsvBreak:
 		case RsvContinue:
 			Err = TTLBreak(WId); break;
+		case RsvBringupBox:
+			Err = TTLBringupBox(); break;
 		case RsvCall:
 			Err = TTLCall(); break;
 		case RsvCallMenu:

@@ -21,6 +21,7 @@ int OpenErrDlg(PCHAR Msg, PCHAR Line);
 int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo);
 void OpenStatDlg(PCHAR Text, PCHAR Caption);
 void CloseStatDlg();
+void BringupStatDlg();
 
 int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists);
 

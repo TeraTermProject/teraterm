@@ -1362,8 +1362,8 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="bringupmacro">
-					<param name="Local" value="html\macro\command\bringupmacro.html">
+					<param name="Name" value="bringupbox">
+					<param name="Local" value="html\macro\command\bringupbox.html">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum8">
