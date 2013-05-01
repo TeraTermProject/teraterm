@@ -1028,6 +1028,109 @@ HWND FAR PASCAL GetNthWin(int n)
 	}
 }
 
+// マルチモニターを考慮して、タスクバーを除いたディスプレイサイズを取得する。
+static void get_desktop_size_by_multi_monitor(HWND hwnd, RECT *rect)
+{
+	HMONITOR hMon;
+	MONITORINFO mi;
+
+	// FIXME: Windows95では未定義の模様。
+	hMon = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+	ZeroMemory( &mi, sizeof( mi ));
+	mi.cbSize = sizeof( mi );
+	GetMonitorInfo(hMon, &mi);
+	*rect = mi.rcWork;  // タスクバーを除いたディスプレイサイズ
+}
+
+// ウィンドウを左右に並べて表示する(Show Windows Side by Side)
+void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
+{
+	int i, n, width;
+	HWND hwnd[MAXNWIN];
+	RECT rc;
+
+	get_desktop_size_by_multi_monitor(myhwnd, &rc);
+
+	n = 0;
+	for (i = 0 ; i < pm->NWin ; i++) {
+		if (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i]))
+			continue;
+
+		if (pm->WinList[i] == myhwnd) {
+			hwnd[n] = hwnd[0];
+			hwnd[0] = myhwnd;
+		} else {
+			hwnd[n] = pm->WinList[i];
+		}
+		n++;
+	}
+	if (n <= 1)    // 有効なウィンドウが2つ以上の場合に限る
+		goto error;
+
+	width = (rc.right - rc.left) / n;
+	for (i = 0 ; i < n ; i++) {
+		ShowWindow(hwnd[i], SW_RESTORE);
+		SetWindowPos(hwnd[i], 0, 
+			width*i + rc.left,
+			rc.top,
+			width,
+			rc.bottom - rc.top,
+			SWP_NOOWNERZORDER | SWP_NOZORDER);
+	}
+	SetFocus(hwnd[0]);
+
+error:
+	return;
+}
+
+// ウィンドウを上下に並べて表示する(Show Windows Stacked)
+void FAR PASCAL ShowAllWinStacked(HWND myhwnd) 
+{
+	int i, n, height;
+	HWND hwnd[MAXNWIN];
+	RECT rc;
+
+	get_desktop_size_by_multi_monitor(myhwnd, &rc);
+
+	n = 0;
+	for (i = 0 ; i < pm->NWin ; i++) {
+		if (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i]))
+			continue;
+
+		if (pm->WinList[i] == myhwnd) {
+			hwnd[n] = hwnd[0];
+			hwnd[0] = myhwnd;
+		} else {
+			hwnd[n] = pm->WinList[i];
+		}
+		n++;
+	}
+	if (n <= 1)    // 有効なウィンドウが2つ以上の場合に限る
+		goto error;
+
+	height = (rc.bottom - rc.top) / n;
+	for (i = 0 ; i < n ; i++) {
+		ShowWindow(hwnd[i], SW_RESTORE);
+		SetWindowPos(hwnd[i], 0, 
+			rc.left,
+			rc.top + height*i,
+			rc.right - rc.left,
+			height,
+			SWP_NOOWNERZORDER | SWP_NOZORDER);
+	}
+	SetFocus(hwnd[0]);
+
+error:
+	return;
+}
+
+// ウィンドウを重ねて表示する(Cascade)
+void FAR PASCAL ShowAllWinCascade(HWND myhwnd) 
+{
+	// TODO:
+}
+
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 {
 	if ( ! cv->Ready ) {

@@ -47,3 +47,6 @@ EXPORTS
 
   mctimelocal @53
   RestartTeraTerm @55
+  ShowAllWinSidebySide @56
+  ShowAllWinStacked @57
+  ShowAllWinCascade @58
