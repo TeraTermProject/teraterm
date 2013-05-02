@@ -1009,6 +1009,8 @@ typedef struct {
 	 * char[1] : COM16 15 14 13 12 11 10  9 ...
 	 */
 	unsigned char ComFlag[(MAXCOMPORT-1)/CHAR_BIT+1];
+	/* Previous window rect (Tera Term 4.78 or later) */
+	WINDOWPLACEMENT WinPrevRect[MAXNWIN];
 } TMap;
 typedef TMap far *PMap;
 

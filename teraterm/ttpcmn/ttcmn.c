@@ -838,6 +838,7 @@ int FAR PASCAL RegWin(HWND HWinVT, HWND HWinTEK)
 		return 0;
 	}
 	pm->WinList[pm->NWin++] = HWinVT;
+	memset(&pm->WinPrevRect[pm->NWin - 1], 0, sizeof(pm->WinPrevRect[pm->NWin - 1])); // RECT clear
 	if (pm->NWin==1) {
 		return 1;
 	}
@@ -860,6 +861,7 @@ void FAR PASCAL UnregWin(HWND HWin)
 	}
 	for (j=i ; j<pm->NWin-1 ; j++) {
 		pm->WinList[j] = pm->WinList[j+1];
+		pm->WinPrevRect[j] = pm->WinPrevRect[j+1];  // RECT shift
 	}
 	if (pm->NWin>0) {
 		pm->NWin--;
@@ -1012,9 +1014,58 @@ void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 
 void FAR PASCAL ShowAllWin(int stat) {
 	int i;
+	WINDOWPLACEMENT rc0;
+	RECT rc;
+	HMONITOR hMonitor;
+	MONITORINFO mi;
+
+	memset(&rc0, 0, sizeof(rc0));
 
 	for (i=0; i < pm->NWin; i++) {
-		ShowWindow(pm->WinList[i], stat);
+		// 復元指定で、前回の状態が残っている場合は、ウィンドウの状態を元に戻す。
+		if (stat == SW_RESTORE && memcmp(&pm->WinPrevRect[i], &rc0, sizeof(rc0)) != 0) {
+			rc = pm->WinPrevRect[i].rcNormalPosition;
+
+			// 対象モニタの情報を取得
+			hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+			mi.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(hMonitor, &mi);
+
+			// 位置補正（復元前後で解像度が変わっている場合への対策）
+			if (rc.right > mi.rcMonitor.right) {
+				rc.left -= rc.right - mi.rcMonitor.right;
+				rc.right = mi.rcMonitor.right;
+			}
+			if (rc.left < mi.rcMonitor.left) {
+				rc.right += mi.rcMonitor.left - rc.left;
+				rc.left = mi.rcMonitor.left;
+			}
+			if (rc.bottom > mi.rcMonitor.bottom) {
+				rc.top -= rc.bottom - mi.rcMonitor.bottom;
+				rc.bottom = mi.rcMonitor.bottom;
+			}
+			if (rc.top < mi.rcMonitor.top) {
+				rc.bottom += mi.rcMonitor.top - rc.top;
+				rc.top = mi.rcMonitor.top;
+			}
+
+			// ウィンドウ位置復元
+			SetWindowPos(
+				pm->WinList[i], NULL, 
+				rc.left, 
+				rc.top,
+				rc.right - rc.left, 
+				rc.bottom - rc.top,
+				SWP_NOZORDER);
+
+			// 最大化していたか？
+			if (pm->WinPrevRect[i].showCmd == SW_SHOWMAXIMIZED) {
+				ShowWindow(pm->WinList[i], SW_MAXIMIZE);
+			}
+
+		} else {
+			ShowWindow(pm->WinList[i], stat);
+		}
 	}
 }
 
@@ -1028,6 +1079,7 @@ HWND FAR PASCAL GetNthWin(int n)
 	}
 }
 
+#if 0
 // マルチモニターを考慮して、タスクバーを除いたディスプレイサイズを取得する。
 static void get_desktop_size_by_multi_monitor(HWND hwnd, RECT *rect)
 {
@@ -1042,21 +1094,27 @@ static void get_desktop_size_by_multi_monitor(HWND hwnd, RECT *rect)
 	GetMonitorInfo(hMon, &mi);
 	*rect = mi.rcWork;  // タスクバーを除いたディスプレイサイズ
 }
+#endif
 
-// ウィンドウを左右に並べて表示する(Show Windows Side by Side)
-void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
+// 有効なウィンドウを探し、現在位置を記憶させておく。
+static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num)
 {
-	int i, n, width;
-	HWND hwnd[MAXNWIN];
-	RECT rc;
-
-	get_desktop_size_by_multi_monitor(myhwnd, &rc);
+	int i, n;
+	WINDOWPLACEMENT wndPlace;
 
 	n = 0;
 	for (i = 0 ; i < pm->NWin ; i++) {
-		if (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i]))
+		if (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i])) {
+			memset(&pm->WinPrevRect[i], 0, sizeof(pm->WinPrevRect[i]));
 			continue;
+		}
 
+		// 現在位置を覚えておく。
+		wndPlace.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(pm->WinList[i], &wndPlace);
+		pm->WinPrevRect[i] = wndPlace;
+
+		// 自分自身は先頭にする。
 		if (pm->WinList[i] == myhwnd) {
 			hwnd[n] = hwnd[0];
 			hwnd[0] = myhwnd;
@@ -1065,70 +1123,47 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 		}
 		n++;
 	}
-	if (n <= 1)    // 有効なウィンドウが2つ以上の場合に限る
-		goto error;
+	*num = n;
 
-	width = (rc.right - rc.left) / n;
-	for (i = 0 ; i < n ; i++) {
-		ShowWindow(hwnd[i], SW_RESTORE);
-		SetWindowPos(hwnd[i], 0, 
-			width*i + rc.left,
-			rc.top,
-			width,
-			rc.bottom - rc.top,
-			SWP_NOOWNERZORDER | SWP_NOZORDER);
+	// 有効なウィンドウが2つ未満ならば、記憶をクリアする。
+	if (n <= 1) {
+		for (i = 0 ; i < pm->NWin ; i++) {
+			memset(&pm->WinPrevRect[i], 0, sizeof(pm->WinPrevRect[i]));
+		}
 	}
-	SetFocus(hwnd[0]);
+}
 
-error:
-	return;
+// ウィンドウを左右に並べて表示する(Show Windows Side by Side)
+void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
+{
+	int n;
+	HWND hwnd[MAXNWIN];
+
+	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
+	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
+		TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
 }
 
 // ウィンドウを上下に並べて表示する(Show Windows Stacked)
 void FAR PASCAL ShowAllWinStacked(HWND myhwnd) 
 {
-	int i, n, height;
+	int n;
 	HWND hwnd[MAXNWIN];
-	RECT rc;
 
-	get_desktop_size_by_multi_monitor(myhwnd, &rc);
-
-	n = 0;
-	for (i = 0 ; i < pm->NWin ; i++) {
-		if (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i]))
-			continue;
-
-		if (pm->WinList[i] == myhwnd) {
-			hwnd[n] = hwnd[0];
-			hwnd[0] = myhwnd;
-		} else {
-			hwnd[n] = pm->WinList[i];
-		}
-		n++;
-	}
-	if (n <= 1)    // 有効なウィンドウが2つ以上の場合に限る
-		goto error;
-
-	height = (rc.bottom - rc.top) / n;
-	for (i = 0 ; i < n ; i++) {
-		ShowWindow(hwnd[i], SW_RESTORE);
-		SetWindowPos(hwnd[i], 0, 
-			rc.left,
-			rc.top + height*i,
-			rc.right - rc.left,
-			height,
-			SWP_NOOWNERZORDER | SWP_NOZORDER);
-	}
-	SetFocus(hwnd[0]);
-
-error:
-	return;
+	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
+	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
+		TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
 }
 
 // ウィンドウを重ねて表示する(Cascade)
 void FAR PASCAL ShowAllWinCascade(HWND myhwnd) 
 {
-	// TODO:
+	int n;
+	HWND hwnd[MAXNWIN];
+
+	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
+	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
+		CascadeWindows(NULL, MDITILE_SKIPDISABLED, NULL, n, hwnd);
 }
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
