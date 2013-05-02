@@ -930,6 +930,15 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 		get_lang_msg("MENU_WINDOW_MINIMIZEALL", buf, buflen, "&Minimize All", langFile);
 		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, buf);
 
+		get_lang_msg("MENU_WINDOW_CASCADE", buf, buflen, "&Cascade", langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, buf);
+
+		get_lang_msg("MENU_WINDOW_STACKED", buf, buflen, "&Stacked", langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, buf);
+
+		get_lang_msg("MENU_WINDOW_SIDEBYSIDE", buf, buflen, "Side &by Side", langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, buf);
+
 		get_lang_msg("MENU_WINDOW_RESTOREALL", buf, buflen, "&Restore All", langFile);
 		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, buf);
 	}

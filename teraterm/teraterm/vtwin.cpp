@@ -206,6 +206,9 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_CONTROL_SHOW_MACRO, OnShowMacroWindow)
 	ON_COMMAND(ID_WINDOW_WINDOW, OnWindowWindow)
 	ON_COMMAND(ID_WINDOW_MINIMIZEALL, OnWindowMinimizeAll)
+	ON_COMMAND(ID_WINDOW_CASCADEALL, OnWindowCascade)
+	ON_COMMAND(ID_WINDOW_STACKED, OnWindowStacked)
+	ON_COMMAND(ID_WINDOW_SIDEBYSIDE, OnWindowSidebySide)
 	ON_COMMAND(ID_WINDOW_RESTOREALL, OnWindowRestoreAll)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
@@ -5315,6 +5318,21 @@ void CVTWindow::OnWindowWindow()
 void CVTWindow::OnWindowMinimizeAll()
 {
 	ShowAllWin(SW_MINIMIZE);
+}
+
+void CVTWindow::OnWindowCascade()
+{
+	ShowAllWinCascade(HVTWin);
+}
+
+void CVTWindow::OnWindowStacked()
+{
+	ShowAllWinStacked(HVTWin);
+}
+
+void CVTWindow::OnWindowSidebySide()
+{
+	ShowAllWinSidebySide(HVTWin);
 }
 
 void CVTWindow::OnWindowRestoreAll()

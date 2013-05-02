@@ -432,6 +432,9 @@ Menu command                        ID
 [Window] Window                     50810
 [Window] Minimize All               50811
 [Window] Restore All                50812
+[Window] Cascade                    50813
+[Window] Stacked                    50814
+[Window] Side by Side               50815
 [Help] Index                        50910
 [Help] About Tera Term              50990
 

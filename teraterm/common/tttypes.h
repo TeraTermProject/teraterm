@@ -985,6 +985,9 @@ typedef TComVar far *PComVar;
 #define ID_WINDOW_WINDOW       50810
 #define ID_WINDOW_MINIMIZEALL  50811
 #define ID_WINDOW_RESTOREALL   50812
+#define ID_WINDOW_CASCADEALL   50813
+#define ID_WINDOW_STACKED      50814
+#define ID_WINDOW_SIDEBYSIDE   50815
 #define ID_TEKWINDOW_WINDOW    51810
 
 #define ID_TRANSFER      9 // the position on [File] menu
