@@ -1077,10 +1077,8 @@ void FAR PASCAL ShowAllWin(int stat) {
 				rc.bottom - rc.top,
 				SWP_NOZORDER);
 
-			// 最大化していたか？
-			if (pm->WinPrevRect[i].showCmd == SW_SHOWMAXIMIZED) {
-				ShowWindow(pm->WinList[i], SW_MAXIMIZE);
-			}
+			// ウィンドウの状態復元
+			ShowWindow(pm->WinList[i], pm->WinPrevRect[i].showCmd);
 
 		} else {
 			ShowWindow(pm->WinList[i], stat);
@@ -1123,11 +1121,6 @@ static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *nu
 
 	n = 0;
 	for (i = 0 ; i < pm->NWin ; i++) {
-		if (IsIconic(pm->WinList[i]) || !IsWindowVisible(pm->WinList[i])) {
-			memset(&pm->WinPrevRect[i], 0, sizeof(pm->WinPrevRect[i]));
-			continue;
-		}
-
 		// 現在位置を覚えておく。
 		wndPlace.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(pm->WinList[i], &wndPlace);
