@@ -18,6 +18,7 @@
 
 #include "compat_w95.h"
 #include "tt_res.h"
+#include "ttcommon.h"
 
 /* first instance flag */
 static BOOL FirstInstance = TRUE;
@@ -29,6 +30,9 @@ static PMap pm;
 static HANDLE HMap = NULL;
 #define VTCLASSNAME "VTWin32"
 #define TEKCLASSNAME "TEKWin32"
+
+
+static BOOL GetWindowTopMost(HWND myhwnd);
 
 
 void PASCAL CopyShmemToTTSet(PTTSet ts)
@@ -886,7 +890,7 @@ char GetWindowTypeChar(HWND Hw, HWND HWin)
 		return '+';
 }
 
-void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
+void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag, HWND myhwnd)
 {
 	int i;
 	char Temp[MAXPATHLEN];
@@ -941,6 +945,12 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 
 		get_lang_msg("MENU_WINDOW_RESTOREALL", buf, buflen, "&Restore All", langFile);
 		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, buf);
+
+		get_lang_msg("MENU_WINDOW_TOPMOST", buf, buflen, "&TopMost", langFile);
+		if (GetWindowTopMost(myhwnd) == TRUE)
+			AppendMenu(menu, MF_ENABLED | MF_STRING | MFS_CHECKED, ID_WINDOW_TOPMOST, buf);
+		else
+			AppendMenu(menu, MF_ENABLED | MF_STRING | MFS_UNCHECKED, ID_WINDOW_TOPMOST, buf);
 	}
 	else {
 		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, buf);
@@ -1174,6 +1184,32 @@ void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
 	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
 		CascadeWindows(NULL, MDITILE_SKIPDISABLED, NULL, n, hwnd);
 }
+
+// ウィンドウが「常に手前に表示」であるか？
+static BOOL GetWindowTopMost(HWND myhwnd)
+{
+	DWORD val;
+
+	val = (DWORD)GetWindowLongPtr(myhwnd, GWL_EXSTYLE);
+	if (val & WS_EX_TOPMOST)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+// ウィンドウを「常に手前に表示」にするかをトグルで切り替える。
+void FAR PASCAL SwitchWindowTopMost(HWND myhwnd) 
+{
+	HWND style;
+
+	if (GetWindowTopMost(myhwnd) == TRUE)
+		style = HWND_NOTOPMOST;
+	else
+		style = HWND_TOPMOST;
+
+	SetWindowPos(myhwnd, style, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
+}
+
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 {
