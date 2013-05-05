@@ -145,6 +145,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_MESSAGE(WM_USER_PROTOCANCEL,OnProtoEnd)
 	ON_MESSAGE(WM_USER_CHANGETITLE,OnChangeTitle)
 	ON_MESSAGE(WM_COPYDATA,OnReceiveIpcMessage)
+	ON_MESSAGE(WM_USER_NONCONFIRM_CLOSE, OnNonConfirmClose)
 	ON_COMMAND(ID_FILE_NEWCONNECTION, OnFileNewConnection)
 	ON_COMMAND(ID_FILE_DUPLICATESESSION, OnDuplicateSession)
 	ON_COMMAND(ID_FILE_CYGWINCONNECTION, OnCygwinConnection)
@@ -1762,6 +1763,21 @@ void CVTWindow::OnClose()
 
 	SaveVTPos();
 	DestroyWindow();
+}
+
+// 全Tera Termの終了を指示する
+void CVTWindow::OnAllClose()
+{
+	BroadcastClosingMessage(HVTWin);
+}
+
+// 終了問い合わせなしにTera Termを終了する。OnAllClose()受信用。
+LONG CVTWindow::OnNonConfirmClose(UINT wParam, LONG lParam)
+{
+	// ここで ts の内容を意図的に書き換えても、終了時に自動セーブされるわけではないので、特に問題なし。
+	ts.PortFlag &= ~PF_CONFIRMDISCONN;
+	OnClose();
+	return 1;
 }
 
 void CVTWindow::OnDestroy()

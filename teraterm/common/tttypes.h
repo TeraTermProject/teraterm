@@ -154,6 +154,8 @@ typedef TCharAttr *PCharAttr;
 
 #define MY_FORCE_FOREGROUND_MESSAGE	WM_USER+31
 
+#define WM_USER_NONCONFIRM_CLOSE  WM_USER+40
+
   /* port type ID */
 #define IdTCPIP  1
 #define IdSerial 2

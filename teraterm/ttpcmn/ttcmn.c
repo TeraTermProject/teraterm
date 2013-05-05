@@ -1204,6 +1204,30 @@ void FAR PASCAL SwitchWindowTopMost(HWND myhwnd)
 }
 
 
+// 全Tera Termに終了指示を出す。
+void FAR PASCAL BroadcastClosingMessage(HWND myhwnd) 
+{
+	int i, max;
+	HWND hwnd[MAXNWIN];
+
+	// Tera Termを終了させると、共有メモリが変化するため、
+	// いったんバッファにコピーしておく。
+	max = pm->NWin;
+	for (i = 0 ; i < pm->NWin ; i++) {
+		hwnd[i] = pm->WinList[i];
+	}
+
+	for (i = 0 ; i < max ; i++) {
+		// 自分自身は最後にする。
+		if (hwnd[i] == myhwnd) 
+			continue;
+
+		PostMessage(hwnd[i], WM_USER_NONCONFIRM_CLOSE, 0, 0);
+	}
+	PostMessage(myhwnd, WM_USER_NONCONFIRM_CLOSE, 0, 0);
+}
+
+
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 {
 	if ( ! cv->Ready ) {

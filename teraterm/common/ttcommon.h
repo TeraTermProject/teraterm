@@ -39,6 +39,7 @@ void FAR PASCAL ShowAllWinSidebySide(HWND);
 void FAR PASCAL ShowAllWinStacked(HWND);
 void FAR PASCAL ShowAllWinCascade(HWND);
 void FAR PASCAL SwitchWindowTopMost(HWND myhwnd);
+void FAR PASCAL BroadcastClosingMessage(HWND myhwnd);
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
 int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b);

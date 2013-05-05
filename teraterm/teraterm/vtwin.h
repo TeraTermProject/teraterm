@@ -58,6 +58,7 @@ protected:
 	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnClose();
+	afx_msg void OnAllClose();
 	afx_msg void OnDestroy();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
@@ -114,6 +115,7 @@ protected:
 	afx_msg LONG OnProtoEnd(UINT wParam, LONG lParam);
 	afx_msg LONG OnChangeTitle(UINT wParam, LONG lParam);
 	afx_msg LONG OnReceiveIpcMessage(UINT wParam, LONG lParam);
+	afx_msg LONG OnNonConfirmClose(UINT wParam, LONG lParam);
 	afx_msg void OnFileNewConnection();
 	afx_msg void OnDuplicateSession();
 	afx_msg void OnCygwinConnection();
