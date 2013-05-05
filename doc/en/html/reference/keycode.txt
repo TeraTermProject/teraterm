@@ -400,6 +400,7 @@ Menu command                        ID
 [File] Print                        50180
 [File] Disconnect                   50190
 [File] Exit                         50199
+[File] Exit All                     52031
 [Edit] Copy                         50210
 [Edit] Copy table                   50220
 [Edit] Paste                        50230
