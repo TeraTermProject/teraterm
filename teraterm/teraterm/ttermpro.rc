@@ -503,6 +503,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Disconnect\tAlt+I",          ID_FILE_DISCONNECT
         MENUITEM "E&xit\tAlt+Q",                ID_FILE_EXIT
+        MENUITEM "Exit &All",                   ID_FILE_EXITALL
     END
     POPUP "&Edit"
     BEGIN

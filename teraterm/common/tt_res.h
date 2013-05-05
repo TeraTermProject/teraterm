@@ -253,6 +253,7 @@
 #define ID_TEKHELP_ABOUT                51990
 #define ID_EDIT_EXTERNALSETUP           52005
 #define ID_FILE_TERATERMMENU            52006
+#define ID_FILE_EXITALL                 52031
 
 // Next default values for new objects
 // 
@@ -260,7 +261,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        123
-#define _APS_NEXT_COMMAND_VALUE         52031
+#define _APS_NEXT_COMMAND_VALUE         52032
 #define _APS_NEXT_CONTROL_VALUE         2534
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
