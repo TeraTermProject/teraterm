@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt;]]
+exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt; [&lt;current directory&gt;]]]
 </pre>
 
 <h2>解説</h2>
@@ -37,6 +37,10 @@ show ;default parameters when no show command specified.
 
 &lt;wait&gt; パラメータに 1 を指定すると、起動したアプリケーションが終了するまで待つ。アプリケーションの終了コードが result システム変数に格納される。<em>(バージョン 4.63以降)</em>
 
+<p></p>
+&lt;current directory&gt; パラメータは、カレントディレクトリを指定することができる。<em>(バージョン 4.78以降)</em>
+
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -45,6 +49,9 @@ exec 'notepad readme.txt'
 
 ; 「メモ帳」を最大化表示で起動
 exec 'notepad readme.txt' 'maximize'
+
+; 「メモ帳」をカレントディレクトリ指定で起動
+exec 'notepad readme.txt' 'show' 0 'c:\usr'
 </pre>
 
 <pre class="macro-example">

@@ -18,7 +18,7 @@ Runs an application.
 </p>
 
 <pre class="macro-syntax">
-exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt;]]
+exec &lt;command line&gt; [&lt;show&gt; [&lt;wait&gt; [&lt;current directory&gt;]]]
 </pre>
 
 <h2>Remarks</h2>
@@ -37,6 +37,10 @@ show ;default parameters when no show command specified.
 
 When a user specifies the 1 at the &lt;wait&gt; argument, Tera Term waits to finish the launched application. The exit code of the application stores the `result' system variable. <em>(version 4.63 or later)</em>
 
+<p></p>
+A current directory can be specified at the &lt;current directory&gt; argument. <em>(version 4.78 or later)</em>
+
+
 <h2>Example</h2>
 
 <pre class="macro-example">
@@ -45,6 +49,9 @@ exec 'notepad readme.txt'
 
 ; Run "Notepad" and maximize the application.
 exec 'notepad readme.txt' 'maximize'
+
+; Run "Notepad" with the current directory.
+exec 'notepad readme.txt' 'show' 0 'c:\usr'
 </pre>
 
 <pre class="macro-example">
