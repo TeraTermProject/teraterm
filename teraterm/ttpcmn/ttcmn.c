@@ -1153,7 +1153,7 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
 	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
-		TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
+		TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
 }
 
 // ウィンドウを上下に並べて表示する(Show Windows Stacked)
@@ -1164,7 +1164,7 @@ void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
 	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
-		TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
+		TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
 }
 
 // ウィンドウを重ねて表示する(Cascade)
