@@ -1081,10 +1081,15 @@ WORD TTLEndWhile(BOOL mode)
 
 WORD TTLExec()
 {
-	TStrVal Str,Str2;
+	TStrVal Str,Str2, CurDir;
 	int mode = SW_SHOW;
 	int wait = 0, ret;
 	WORD Err;
+	STARTUPINFO sui;
+	PROCESS_INFORMATION pi;
+	BOOL bRet;
+
+	memset(CurDir, 0, sizeof(CurDir));
 
 	Err = 0;
 	GetStrVal(Str,&Err);
@@ -1108,6 +1113,12 @@ WORD TTLExec()
 		if (CheckParameterGiven()) {
 			GetIntVal(&wait, &Err);
 			if (Err!=0) return Err;
+
+			// get 4th arg(optional) if given
+			if (CheckParameterGiven()) {
+				GetStrVal(CurDir, &Err);
+				if (Err!=0) return Err;
+			}
 		}
 	}
 
@@ -1117,16 +1128,15 @@ WORD TTLExec()
 
 	if (Err!=0) return Err;
 
-	if (!wait) {
-		WinExec(Str, mode);
-	}
-	else {
-		STARTUPINFO sui;
-		PROCESS_INFORMATION pi;
-		memset(&sui, 0, sizeof(STARTUPINFO));
-		sui.cb = sizeof(STARTUPINFO);
-		sui.wShowWindow = mode;
-		CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+	memset(&sui, 0, sizeof(STARTUPINFO));
+	sui.cb = sizeof(STARTUPINFO);
+	sui.wShowWindow = mode;
+	if (CurDir[0] == 0)
+		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+	else
+		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDir, &sui, &pi);
+	// TODO: check bRet
+	if (wait) {
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		GetExitCodeProcess(pi.hProcess, &ret);
 		SetResult(ret);
