@@ -1075,6 +1075,9 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	GetMenuString(FileMenu, ID_FILE_EXIT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_FILE_EXIT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(FileMenu, ID_FILE_EXIT, MF_BYCOMMAND, ID_FILE_EXIT, ts.UIMsg);
+	GetMenuString(FileMenu, ID_FILE_EXITALL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
+	get_lang_msg("MENU_FILE_EXITALL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	ModifyMenu(FileMenu, ID_FILE_EXITALL, MF_BYCOMMAND, ID_FILE_EXITALL, ts.UIMsg);
 
 	GetMenuString(FileMenu, 9, uimsg, sizeof(uimsg), MF_BYPOSITION);
 	get_lang_msg("MENU_TRANS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
