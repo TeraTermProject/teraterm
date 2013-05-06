@@ -5635,6 +5635,7 @@ int ExecCmnd()
 		}
 		if (BreakFlag>0 || !ContinueFlag)
 			return Err;
+		ContinueFlag = FALSE;
 	}
 
 	if (EndIfFlag>0) {
