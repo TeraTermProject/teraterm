@@ -92,6 +92,7 @@ Source: release\lang\Japanese.lng; DestDir: {app}\lang; Components: TeraTerm; At
 Source: release\lang\German.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\French.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\Russian.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\Korean.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
@@ -289,6 +290,7 @@ en.msg_language_japanese=&Japanese
 en.msg_language_german=&German
 en.msg_language_french=&French
 en.msg_language_russian=&Russian
+en.msg_language_korean=&Korean
 ja.msg_language_caption=言語の選択
 ja.msg_language_description=ユーザーインターフェースの言語を選択してください。
 ja.msg_language_subcaption=アプリケーションのメニューやダイアログ等の表示言語を選択して、「次へ」をクリックしてください。
@@ -297,6 +299,7 @@ ja.msg_language_japanese=日本語(&J)
 ja.msg_language_german=ドイツ語(&G)
 ja.msg_language_french=フランス語(&F)
 ja.msg_language_russian=ロシア語(&R)
+ja.msg_language_korean=韓国語(&K)
 en.msg_del_confirm=Are you sure that you want to delete %s ?
 ja.msg_del_confirm=%s を削除しますか？
 en.msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
@@ -582,6 +585,8 @@ begin
       SetIniString('Tera Term', 'UILanguageFile', 'lang\French.lng', iniFile);
     4:
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Russian.lng', iniFile);
+    5:
+      SetIniString('Tera Term', 'UILanguageFile', 'lang\Korean.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Default.lng', iniFile);
   end;
@@ -615,6 +620,7 @@ var
   UILangFilePageGerman      : String;
   UILangFilePageFrench      : String;
   UILangFilePageRussian     : String;
+  UILangFilePageKorean      : String;
 begin
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
@@ -624,6 +630,7 @@ begin
   UILangFilePageGerman      := CustomMessage('msg_language_german');
   UILangFilePageFrench      := CustomMessage('msg_language_french');
   UILangFilePageRussian     := CustomMessage('msg_language_russian');
+  UILangFilePageKorean      := CustomMessage('msg_language_korean');
 
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
@@ -633,6 +640,7 @@ begin
   UILangFilePage.Add(UILangFilePageGerman);
   UILangFilePage.Add(UILangFilePageFrench);
   UILangFilePage.Add(UILangFilePageRussian);
+  UILangFilePage.Add(UILangFilePageKorean);
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
@@ -714,6 +722,8 @@ begin
             UILangFilePage.SelectedValueIndex := 3
           else if iniFile = 'lang\russian.lng' then
             UILangFilePage.SelectedValueIndex := 4
+          else if iniFile = 'lang\korean.lng' then
+            UILangFilePage.SelectedValueIndex := 5
           else
             UILangFilePage.SelectedValueIndex := 0;
         end;
