@@ -1086,22 +1086,6 @@ HWND FAR PASCAL GetNthWin(int n)
 	}
 }
 
-#if 0
-// マルチモニターを考慮して、タスクバーを除いたディスプレイサイズを取得する。
-static void get_desktop_size_by_multi_monitor(HWND hwnd, RECT *rect)
-{
-	HMONITOR hMon;
-	MONITORINFO mi;
-
-	// FIXME: Windows95では未定義の模様。
-	hMon = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-
-	ZeroMemory( &mi, sizeof( mi ));
-	mi.cbSize = sizeof( mi );
-	GetMonitorInfo(hMon, &mi);
-	*rect = mi.rcWork;  // タスクバーを除いたディスプレイサイズ
-}
-#endif
 
 // 有効なウィンドウを探し、現在位置を記憶させておく。
 static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num)
@@ -1126,13 +1110,6 @@ static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *nu
 		n++;
 	}
 	*num = n;
-
-	// 有効なウィンドウが2つ未満ならば、記憶をクリアする。
-	if (n <= 1) {
-		for (i = 0 ; i < pm->NWin ; i++) {
-			memset(&pm->WinPrevRect[i], 0, sizeof(pm->WinPrevRect[i]));
-		}
-	}
 }
 
 // ウィンドウを左右に並べて表示する(Show Windows Side by Side)
@@ -1142,8 +1119,7 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 	HWND hwnd[MAXNWIN];
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
-	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
-		TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
+	TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
 }
 
 // ウィンドウを上下に並べて表示する(Show Windows Stacked)
@@ -1153,8 +1129,7 @@ void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 	HWND hwnd[MAXNWIN];
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
-	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
-		TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
+	TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
 }
 
 // ウィンドウを重ねて表示する(Cascade)
@@ -1164,8 +1139,7 @@ void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
 	HWND hwnd[MAXNWIN];
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
-	if (n >= 2)    // 有効なウィンドウが2つ以上の場合に限る
-		CascadeWindows(NULL, MDITILE_SKIPDISABLED, NULL, n, hwnd);
+	CascadeWindows(NULL, MDITILE_SKIPDISABLED, NULL, n, hwnd);
 }
 
 // 全Tera Termに終了指示を出す。
