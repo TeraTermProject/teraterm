@@ -217,7 +217,7 @@ void CTEKWindow::InitMenuPopup(HMENU SubMenu)
 		}
 	}
 	else if ( SubMenu == WinMenu ) {
-		SetWinMenu(WinMenu, ts.UIMsg, sizeof(ts.UIMsg), ts.UILanguageFile, 0, NULL);
+		SetWinMenu(WinMenu, ts.UIMsg, sizeof(ts.UIMsg), ts.UILanguageFile, 0);
 	}
 }
 

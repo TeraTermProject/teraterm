@@ -211,7 +211,6 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_WINDOW_CASCADEALL, OnWindowCascade)
 	ON_COMMAND(ID_WINDOW_STACKED, OnWindowStacked)
 	ON_COMMAND(ID_WINDOW_SIDEBYSIDE, OnWindowSidebySide)
-	ON_COMMAND(ID_WINDOW_TOPMOST, OnWindowTopMost)
 	ON_COMMAND(ID_WINDOW_RESTOREALL, OnWindowRestoreAll)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
@@ -1419,7 +1418,7 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 	}
 	else if (SubMenu == WinMenu)
 	{
-		SetWinMenu(WinMenu, ts.UIMsg, sizeof(ts.UIMsg), ts.UILanguageFile, 1, HVTWin);
+		SetWinMenu(WinMenu, ts.UIMsg, sizeof(ts.UIMsg), ts.UILanguageFile, 1);
 	}
 
 	TTXModifyPopupMenu(SubMenu); /* TTPLUG */
@@ -5354,11 +5353,6 @@ void CVTWindow::OnWindowStacked()
 void CVTWindow::OnWindowSidebySide()
 {
 	ShowAllWinSidebySide(HVTWin);
-}
-
-void CVTWindow::OnWindowTopMost()
-{
-	SwitchWindowTopMost(HVTWin);
 }
 
 void CVTWindow::OnWindowRestoreAll()
