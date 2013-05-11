@@ -512,7 +512,7 @@ void DispSample(HWND Dialog, PTTSet ts, int IAttr)
 	for (i = 0 ; i <= 2 ; i++)
 		DX[i] = FW;
 	GetClientRect(Dialog,&Rect);
-	TestRect.left = Rect.left + (int)((Rect.right-Rect.left)*0.65);
+	TestRect.left = Rect.left + (int)((Rect.right-Rect.left)*0.70);
 	TestRect.right = Rect.left + (int)((Rect.right-Rect.left)*0.93);
 	TestRect.top = Rect.top + (int)((Rect.bottom-Rect.top)*0.54);
 #ifdef USE_NORMAL_BGCOLOR
