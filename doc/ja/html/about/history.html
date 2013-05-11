@@ -55,10 +55,6 @@
           <li><a href="../macro/command/exec.html">exec</a>コマンドに第4引数（カレントディレクトリ）を追加した。</li>
         </ul></li>
       <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝。</li>
-      <li>ネットワーク経由でログ採取しても、Tera Termがスローダウンしないようにした。
-        <ul>
-          <li>teraterm.iniにDeferredLogWriteModeエントリを追加した。</li>
-        </ul></li>
       <li><a href="../menu/window.html">Windowメニュー</a>に「重ねて表示(Cascade)」「上下に並べて表示(Stacked)」「左右に並べて表示(Side By Side)」を追加した。</li>
       <li><a href="../menu/file.html">Fileメニュー</a>に「Tera Termの全終了(Exit All)」を追加した。</li>
     </ul>
@@ -70,6 +66,10 @@
       <li><a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a>をoffにしても排他ロックがかかる問題を修正した。</li>
       <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
       <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
+      <li>ネットワーク経由でログ採取しても、Tera Termがスローダウンしないようにした。
+        <ul>
+          <li>teraterm.iniにDeferredLogWriteModeエントリを追加した。デフォルトはon。</li>
+        </ul></li>
     </ul>
   </li>
 
