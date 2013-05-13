@@ -1059,11 +1059,11 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		                             pvar->ssh_state.sender_sequence_number,
 		                             data, encryption_size,
 		                             data + encryption_size);
-		if (ret == FALSE) { // HMACがまだ設定されていない場合
+		if (ret == FALSE) { // MACがまだ設定されていない場合
 			data_length = encryption_size;
 		}
 
-		// パケットを暗号化する。HMAC以降は暗号化対象外。
+		// パケットを暗号化する。MAC以降は暗号化対象外。
 		CRYPT_encrypt(pvar, data, encryption_size);
 	}
 
@@ -4874,7 +4874,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 
-	// HMAC(Hash Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
+	// MAC(Hash Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
 	for (i = 0; i < size; i++) {
@@ -4888,7 +4888,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	pvar->ctos_hmac = choose_SSH2_hmac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
 	if (pvar->ctos_hmac == HMAC_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown HMAC algorithm: ", _TRUNCATE);
+		strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
@@ -4908,7 +4908,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	pvar->stoc_hmac = choose_SSH2_hmac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
 	if (pvar->stoc_hmac == HMAC_UNKNOWN) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown HMAC algorithm: ", _TRUNCATE);
+		strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;

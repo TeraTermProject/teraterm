@@ -2418,7 +2418,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 			UTIL_get_lang_msg("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
 			append_about_text(dlg, pvar->ts->UIMsg, buf);
 
-			// add HMAC algorithm (2004.12.17 yutaka)
+			// add MAC algorithm (2004.12.17 yutaka)
 			buf[0] = '\0';
 			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->ctos_hmac) , _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_TOSERVER", pvar, " to server,");
@@ -2426,7 +2426,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->stoc_hmac) , _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_FROMSERVER", pvar, " from server");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-			append_about_text(dlg, "HMAC:", buf);
+			append_about_text(dlg, "MAC:", buf);
 
 			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
