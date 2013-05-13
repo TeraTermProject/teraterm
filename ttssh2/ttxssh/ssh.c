@@ -4874,7 +4874,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 
-	// MAC(Hash Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
+	// MAC(Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
 	for (i = 0; i < size; i++) {
