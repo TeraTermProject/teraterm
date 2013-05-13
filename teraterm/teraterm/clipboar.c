@@ -40,6 +40,7 @@ static BOOL CBSendCR;
 static BOOL CBDDE;
 static BOOL CBWIDE;
 static BOOL CBEchoOnly;
+static BOOL CBInsertDelay = FALSE;
 
 static HFONT DlgClipboardFont;
 
@@ -150,7 +151,12 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	CBMemPtr2 = 0;
 	CBDDE = FALSE;
 	CBWIDE = FALSE;
+	CBInsertDelay = FALSE;
+
 	if (BuffSize==0) { //clipboard
+		if (ts.PasteDelayPerLine > 0) {
+			CBInsertDelay = TRUE;
+		}
 		if (OpenClipboard(HWin)) {
 			if (Cf == CF_UNICODETEXT) {
 				// “\‚è•t‚¯ˆ—‚Å‚Í CBMemHandle ‚Å‚Í‚È‚­ dde ‚Æ“¯‚¶‚æ‚¤‚É CBMemPtr ‚ªŽg‚í‚ê‚é
@@ -228,6 +234,13 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	CBMemPtr2 = 0;
 	CBDDE = TRUE;
 	CBWIDE = FALSE;
+
+	if (ts.PasteDelayPerLine > 0) {
+		CBInsertDelay = TRUE;
+	}
+	else {
+		CBInsertDelay = FALSE;
+	}
 
 	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(HWin)) {
 		Cf = CF_UNICODETEXT;
@@ -368,9 +381,11 @@ void CBSend()
 		return;
 	}
 
-	now = GetTickCount();
-	if (now - lastcr < (DWORD)ts.PasteDelayPerLine) {
-		return;
+	if (CBInsertDelay) {
+		now = GetTickCount();
+		if (now - lastcr < (DWORD)ts.PasteDelayPerLine) {
+			return;
+		}
 	}
 
 	if (CBRetrySend) {
@@ -399,7 +414,7 @@ void CBSend()
 		if (CBSendCR && (CBMemPtr[CBMemPtr2]==0x0a)) {
 			CBMemPtr2++;
 			// added PasteDelayPerLine (2009.4.12 maya)
-			if (ts.PasteDelayPerLine > 0) {
+			if (CBInsertDelay) {
 				lastcr = now;
 				CBSendCR = FALSE;
 				SetTimer(HVTWin, IdPasteDelayTimer, ts.PasteDelayPerLine, NULL);
@@ -545,6 +560,7 @@ void CBEndPaste()
 	CBMemPtr2 = 0;
 	CBAddCR = FALSE;
 	CBEchoOnly = FALSE;
+	CBInsertDelay = FALSE;
 }
 
 
