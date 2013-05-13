@@ -457,6 +457,17 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	// ホスト鍵の DNS でのチェック (RFC 4255)
 	settings->VerifyHostKeyDNS = read_BOOL_option(fileName, "VerifyHostKeyDNS", TRUE);
 
+	// icon
+	GetPrivateProfileString("TTSSH", "SSHIcon", "", buf, sizeof(buf), fileName);
+	if ((_stricmp(buf, "old") == 0) ||
+	    (_stricmp(buf, "yellow") == 0) ||
+	    (_stricmp(buf, "securett_yellow") == 0)) {
+		settings->IconID = IDI_SECURETT_YELLOW;
+	}
+	else {
+		settings->IconID = IDI_SECURETT;
+	}
+
 	clear_local_settings(pvar);
 }
 
@@ -764,11 +775,11 @@ void notify_established_secure_connection(PTInstVar pvar)
 	// LoadIcon ではなく LoadImage を使うようにし、
 	// 16x16 のアイコンを明示的に取得するようにした (2006.8.9 maya)
 	if (SecureLargeIcon == NULL) {
-		SecureLargeIcon = LoadImage(hInst, MAKEINTRESOURCE(IDI_SECURETT),
+		SecureLargeIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
 		                            IMAGE_ICON, 0, 0, fuLoad);
 	}
 	if (SecureSmallIcon == NULL) {
-		SecureSmallIcon = LoadImage(hInst, MAKEINTRESOURCE(IDI_SECURETT),
+		SecureSmallIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
 		                            IMAGE_ICON, 16, 16, fuLoad);
 	}
 
@@ -1671,6 +1682,15 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 				pvar->settings.CompressionLevel = 6;
 			} else if (MATCH_STR(option + 4, "-c") == 0) {
 				pvar->settings.CompressionLevel = 0;
+			} else if (MATCH_STR_I(option + 4, "-icon=") == 0) {
+				if ((_stricmp(option+10, "old") == 0) ||
+				    (_stricmp(option+10, "yellow") == 0) ||
+				    (_stricmp(option+10, "securett_yellow") == 0)) {
+					pvar->settings.IconID = IDI_SECURETT_YELLOW;
+				}
+				else {
+					pvar->settings.IconID = IDI_SECURETT;
+				}
 
 			// /ssh1 と /ssh2 オプションの新規追加 (2006.9.16 maya)
 			} else if (MATCH_STR(option + 4, "1") == 0) {
@@ -2466,7 +2486,7 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 				fuLoad = LR_VGACOLOR;
 			}
 
-			hicon = LoadImage(hInst, MAKEINTRESOURCE(IDI_SECURETT),
+			hicon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
 			                  IMAGE_ICON, 32, 32, fuLoad);
 			SendDlgItemMessage(dlg, IDC_TTSSH_ICON, STM_SETICON, (WPARAM)hicon, 0);
 		}

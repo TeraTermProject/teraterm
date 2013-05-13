@@ -147,6 +147,8 @@ typedef struct _TS_SSH {
 	char CompOrder[COMP_MAX+1];
 
 	BOOL VerifyHostKeyDNS;
+
+	int IconID;
 } TS_SSH;
 
 typedef struct _TInstVar {
