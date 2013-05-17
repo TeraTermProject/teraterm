@@ -29,7 +29,7 @@ If clipboad content is too long, copied data was truncated. (cf. <a href="../syn
 </p>
 
 <p>
-If &lt;offset&gt; is specified, copied string starts offset*255-1 bytes.<br>
+If &lt;offset&gt; is specified, copied string starts offset*511-1 bytes.<br>
 When the &lt;offset&gt; is specified not 0, please run the clipb2var command with the offset is nothing or is 0.<br>
 When &lt;offset&gt; is not 0, the clipboard content is not current but the content after the &lt;offset&gt; is nothing or 0.
 </p>
@@ -73,12 +73,12 @@ messagebox data 'clipboard data'
 </pre>
 
 <pre class="macro-example">
-; Load the clipboard data over 255 byte
+; Load the clipboard data over 511 byte
 ; +------------------------------------------------------------------+
-; |  512 bytes clipboard text                                        |
+; |  1024 bytes clipboard text                                       |
 ; +------------------------------------------------------------------+
 ; +-------------------------+--------------------------+-------------+
-; | (1) 255 bytes           | (2) 255 bytes            | (3) 2 bytes | 
+; | (1) 511 bytes           | (2) 511 bytes            | (3) 2 bytes | 
 ; +-------------------------+--------------------------+-------------+
 
 clipb2var data ; (1) stores into the data and the result is 2.
