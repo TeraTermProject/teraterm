@@ -3379,6 +3379,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			/* Disable auto connect to serial when macro mode (2006.9.15 maya) */
 			ts->ComAutoConnect = FALSE;
 		}
+		else if (_stricmp(Temp, "/NOLOG") == 0) {	/* disable auto logging */
+			ts->LogFN[0] = '\0';
+			ts->LogAutoStart = 0;
+		}
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
 			if (sscanf(&Temp[3], "%d", &ParamTCP) != 1)
