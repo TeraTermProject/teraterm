@@ -47,6 +47,7 @@ protected:
 	afx_msg LONG OnDdeComReady(UINT wParam, LONG lParam);
 	afx_msg LONG OnDdeReady(UINT wParam, LONG lParam);
 	afx_msg LONG OnDdeEnd(UINT wParam, LONG lParam);
+	afx_msg LONG OnMacroBringup(UINT wParam, LONG lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

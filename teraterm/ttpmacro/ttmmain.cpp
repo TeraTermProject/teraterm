@@ -199,6 +199,7 @@ BEGIN_MESSAGE_MAP(CCtrlWindow, CDialog)
 	ON_MESSAGE(WM_USER_DDECMNDEND,OnDdeCmndEnd)
 	ON_MESSAGE(WM_USER_DDECOMREADY,OnDdeComReady)
 	ON_MESSAGE(WM_USER_DDEREADY,OnDdeReady)
+	ON_MESSAGE(WM_USER_MACROBRINGUP,OnMacroBringup)
 	ON_MESSAGE(WM_USER_DDEEND,OnDdeEnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -570,6 +571,27 @@ LONG CCtrlWindow::OnDdeEnd(UINT wParam, LONG lParam)
 			TTLStatus = IdTTLRun;
 		}
 		UnlockVar();
+	}
+	return 0;
+}
+
+LONG CCtrlWindow::OnMacroBringup(UINT wParam, LONG lParam)
+{
+	DWORD pid;
+	DWORD thisThreadId;
+	DWORD fgThreadId;
+
+	thisThreadId = GetWindowThreadProcessId(GetSafeHwnd(), &pid);
+	fgThreadId = GetWindowThreadProcessId(::GetForegroundWindow(), &pid);
+
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow();
+		BringWindowToTop();
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow();
+		BringWindowToTop();
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
 	}
 	return 0;
 }

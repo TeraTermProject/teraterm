@@ -4214,8 +4214,10 @@ WORD TTLShow()
 	if (Err!=0) return Err;
 	if (Val==0)
 		ShowWindow(HMainWin,SW_MINIMIZE);
-	else if (Val>0)
+	else if (Val>0) {
 		ShowWindow(HMainWin,SW_RESTORE);
+		PostMessage(HMainWin, WM_USER_MACROBRINGUP, 0, 0);
+	}
 	else
 		ShowWindow(HMainWin,SW_HIDE);
 	return Err;
