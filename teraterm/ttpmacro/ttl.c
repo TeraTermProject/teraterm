@@ -5351,9 +5351,6 @@ WORD TTLWaitN()
 		TimeStart = GetTickCount();
 		SetTimer(HMainWin, IdTimeOutTimer, TIMEOUT_TIMER_MS, NULL);
 	}
-	else {
-		ClearWaitN();
-	}
 
 	return Err;
 }
