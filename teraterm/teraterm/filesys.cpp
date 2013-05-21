@@ -385,7 +385,11 @@ static void CloseFileSync(PFileVar ptr)
 		CloseHandle(ptr->LogThread);
 		ptr->LogThread = (HANDLE)-1;
 	}
+#ifdef FileVarWin16
 	_lclose(ptr->FileHandle);
+#else
+	CloseHandle((HANDLE)ptr->FileHandle);
+#endif
 }
 
 // 遅延書き込み用スレッド
@@ -395,6 +399,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 	PFileVar fv = (PFileVar)arg;
 	PCHAR buf;
 	DWORD buflen;
+	DWORD wrote;
 
 	PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
 
@@ -403,7 +408,11 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 			case WM_DPC_LOGTHREAD_SEND:
 				buf = (PCHAR)msg.wParam;
 				buflen = (DWORD)msg.lParam;
+#ifdef FileVarWin16
 				_lwrite(fv->FileHandle, buf, buflen );
+#else
+				WriteFile((HANDLE)LogVar->FileHandle, buf, buflen, &wrote, NULL);
+#endif
 				free(buf);   // ここでメモリ解放
 				break;
 
@@ -558,7 +567,11 @@ BOOL LogStart()
 		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 		                                     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (LogVar->FileHandle>0){
+#ifdef FileVarWin16
 			_llseek(LogVar->FileHandle,0,2);
+#else
+			SetFilePointer((HANDLE)LogVar->FileHandle, 0, NULL, FILE_END);
+#endif
 			/* 2007.05.24 Gentaro
 				If log file already exists,
 				a newline is inserted before the first timestamp.
@@ -800,6 +813,7 @@ void LogToFile()
 	PCHAR WriteBuf;
 	DWORD WriteBufMax, WriteBufLen;
 	CHAR tmp[128];
+	DWORD wrote;
 
 	if (! LogVar->FileOpen) return;
 	if (FileLog)
@@ -895,11 +909,21 @@ void LogToFile()
 	#endif
 					/* 2007.05.24 Gentaro */
 					if( eLineEnd == Line_FileHead ){
+#ifdef FileVarWin16
 						_lwrite(LogVar->FileHandle,"\r\n",2);
+#else
+						WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &wrote, NULL);
+#endif
 					}
+#ifdef FileVarWin16
 					_lwrite(LogVar->FileHandle,"[",1);
 					_lwrite(LogVar->FileHandle, strtime, strlen(strtime));
 					_lwrite(LogVar->FileHandle,"] ",2);
+#else
+					WriteFile((HANDLE)LogVar->FileHandle, "[", 1, &wrote, NULL);
+					WriteFile((HANDLE)LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
+					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);
+#endif
 				}
 				
 				/* 2007.05.24 Gentaro */
@@ -910,7 +934,11 @@ void LogToFile()
 					eLineEnd = Line_Other; /* clear endmark*/
 				}
 
+#ifdef FileVarWin16
 				_lwrite(LogVar->FileHandle,(PCHAR)&b,1);
+#else
+				WriteFile((HANDLE)LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
+#endif
 				(LogVar->ByteCount)++;
 			}
 		}
