@@ -613,8 +613,7 @@ int FindRegexStringOne(char *regex, int regex_len, char *target, int target_len)
 // 正規表現によるパターンマッチを行う
 int FindRegexString(void)
 {
-	int i, Found = 0;
-	PCHAR Str;
+	int i;
 
 	if (RegexActionType == REGEX_NONE)
 		return 0;  // not match
@@ -622,23 +621,18 @@ int FindRegexString(void)
 	if (RecvLnPtr == 0)
 		return 0;  // not match
 
-	for (i = 9 ; i >= 0 ; i--) {
-		Str = PWaitStr[i]; // regex pattern
-		if (Str!=NULL) {
-			if (FindRegexStringOne(Str, strlen(Str), RecvLnBuff, RecvLnPtr) > 0) { // matched
-				Found = i+1;
+	for (i = 0 ; i < 10 ; i++) {
+		if (PWaitStr[i] && FindRegexStringOne(PWaitStr[i], WaitStrLen[i], RecvLnBuff, RecvLnPtr) > 0) { // matched
+			// マッチした行を inputstr へ格納する
+			LockVar();
+			SetInputStr(GetRecvLnBuff());  // ここでバッファがクリアされる
+			UnlockVar();
 
-				// マッチした行を inputstr へ格納する
-				LockVar();
-				SetInputStr(GetRecvLnBuff());  // ここでバッファがクリアされる
-				UnlockVar();
-
-				break;
-			}
+			return i+1;
 		}
 	}
 
-	return (Found);
+	return 0;
 }
 
 
