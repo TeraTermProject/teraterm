@@ -1060,7 +1060,12 @@ void FileSendStart()
 	else
 		(*SetFileVar)(SendVar);
 
+#ifdef FileVarWin16
 	SendVar->FileHandle = _lopen(SendVar->FullName,OF_READ);
+#else
+	SendVar->FileHandle = (int)CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
+	                                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+#endif
 	SendVar->FileOpen = (SendVar->FileHandle>0);
 	if (! SendVar->FileOpen)
 	{
@@ -1151,6 +1156,7 @@ void FileSend()
 {
 	WORD c, fc;
 	LONG BCOld;
+	DWORD read_bytes;
 
 	if ((SendDlg==NULL) ||
 	    ((cv.FilePause & OpSendFile) !=0))
@@ -1187,11 +1193,21 @@ void FileSend()
 			}
 		}
 		else if (! FileReadEOF) {
+#ifdef FileVarWin16
 			fc = _lread(SendVar->FileHandle,&FileByte,1);
+#else
+			ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
+			fc = LOWORD(read_bytes);
+#endif
 			SendVar->ByteCount = SendVar->ByteCount + fc;
 
 			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
+#ifdef FileVarWin16
 				fc = _lread(SendVar->FileHandle,&FileByte,1);
+#else
+				ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
+				fc = LOWORD(read_bytes);
+#endif
 				SendVar->ByteCount = SendVar->ByteCount + fc;
 			}
 		}
