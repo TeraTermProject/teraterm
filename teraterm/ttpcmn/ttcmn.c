@@ -1024,6 +1024,15 @@ void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 
 void FAR PASCAL ShowAllWin(int stat) {
 	int i;
+
+	for (i=0; i < pm->NWin; i++) {
+		ShowWindow(pm->WinList[i], stat);
+	}
+}
+
+#if 0
+void FAR PASCAL ShowAllWin(int stat) {
+	int i;
 	WINDOWPLACEMENT rc0;
 	RECT rc;
 	HMONITOR hMonitor;
@@ -1076,6 +1085,7 @@ void FAR PASCAL ShowAllWin(int stat) {
 		}
 	}
 }
+#endif
 
 HWND FAR PASCAL GetNthWin(int n)
 {
