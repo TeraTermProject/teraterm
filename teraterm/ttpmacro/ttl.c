@@ -5182,38 +5182,27 @@ WORD TTLWait(BOOL Ln)
 	WORD Err, ValType;
 	TVarId VarId;
 	int i, Val;
-	BOOL NoMore;
 	int TimeOut;
 
 	ClearWait();
 
-	i = 0;
-	do {
+	for (i=0; i<10; i++) {
 		Err = 0;
-		Str[0] = 0;
-		NoMore = FALSE;
-		if (! GetString(Str,&Err))
-		{
-			if (GetExpression(&ValType,&Val,&Err))
-			{
-				if (Err==0)
-				{
-					if (ValType==TypString)
-						strncpy_s(Str, sizeof(Str),StrVarPtr((TVarId)Val), _TRUNCATE);
-					else
-						Err=ErrTypeMismatch;
-				}
-			}
+		if (GetString(Str, &Err)) {
+			SetWait(i+1, Str);
+		}
+		else if (GetExpression(&ValType, &Val, &Err) && Err == 0) {
+			if (ValType == TypString)
+				SetWait(i+1, StrVarPtr((TVarId)Val));
 			else
-				NoMore = TRUE;
+				Err = ErrTypeMismatch;
 		}
+		else
+			break;
 
-		if ((Err==0) && (strlen(Str)>0) && (i<10))
-		{
-			i++;
-			SetWait(i,Str);
-		}
-	} while ((Err==0) && (i<10) && !NoMore);
+		if (Err)
+			break;
+	}
 
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
