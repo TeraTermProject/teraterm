@@ -1491,6 +1491,8 @@ void BuffDumpCurrentLine(BYTE TERM)
 static void markURL(int x)
 {
 #ifdef URL_EMPHASIS
+	CHAR PrevCharAttr;
+
 	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)に準拠する
 	// by sakura editor 1.5.2.1: etc_uty.cpp
 	static const char	url_char[] = {
@@ -1528,9 +1530,10 @@ static void markURL(int x)
 	// TODO: 1つ前の行の終端文字が URL の一部なら、強制的に現在の行頭文字もURLの一部とみなす。
 	// (2005.4.3 yutaka)
 	if (x == 0) {
-		if (AttrLine > AttrBuff && (AttrLine[x-1] & AttrURL)) {
+		PrevCharAttr = AttrBuff[PrevLinePtr(LinePtr) + NumOfColumns-1];
+		if ((PrevCharAttr & AttrURL) && (AttrLine[0] & AttrLineContinued)) {
 			if (!(ch & 0x80 || url_char[ch]==0)) { // かつURL構成文字なら
-				AttrLine[x] |= AttrURL; 
+				AttrLine[0] |= AttrURL; 
 			}
 		}
 		return;
