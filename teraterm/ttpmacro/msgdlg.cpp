@@ -90,7 +90,7 @@ BOOL CMsgDlg::OnInitDialog()
 
 	Relocation(TRUE, WW);
 
-	SetForegroundWindow();
+	Bringup();
 
 	return TRUE;
 }
@@ -211,3 +211,22 @@ BOOL CMsgDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
+void CMsgDlg::Bringup()
+{
+	DWORD pid;
+	DWORD thisThreadId;
+	DWORD fgThreadId;
+
+	thisThreadId = GetWindowThreadProcessId(GetSafeHwnd(), &pid);
+	fgThreadId = GetWindowThreadProcessId(::GetForegroundWindow(), &pid);
+
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow();
+		BringWindowToTop();
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow();
+		BringWindowToTop();
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
+	}
+}

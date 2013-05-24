@@ -31,6 +31,7 @@ protected:
 	afx_msg LONG OnExitSizeMove(UINT wParam, LONG lParam);
 	//}}AFX_MSG
 	void Relocation(BOOL is_init, int WW);
+	void Bringup();
 	DECLARE_MESSAGE_MAP()
 };
 typedef CInpDlg *PInpDlg;

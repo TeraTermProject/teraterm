@@ -100,7 +100,7 @@ BOOL CInpDlg::OnInitDialog()
 
 	Relocation(TRUE, WW);
 
-	SetForegroundWindow();
+	Bringup();
 
 	return TRUE;
 }
@@ -185,4 +185,25 @@ void CInpDlg::Relocation(BOOL is_init, int new_WW)
 	SetWindowPos(&wndTop,PosX,PosY,WW,WH,0);
 
 	InvalidateRect(NULL);
+}
+
+
+void CInpDlg::Bringup()
+{
+	DWORD pid;
+	DWORD thisThreadId;
+	DWORD fgThreadId;
+
+	thisThreadId = GetWindowThreadProcessId(GetSafeHwnd(), &pid);
+	fgThreadId = GetWindowThreadProcessId(::GetForegroundWindow(), &pid);
+
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow();
+		BringWindowToTop();
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow();
+		BringWindowToTop();
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
+	}
 }
