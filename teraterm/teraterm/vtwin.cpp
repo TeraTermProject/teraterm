@@ -250,7 +250,7 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 
 
 // Tera Term起動時とURL文字列mouse over時に呼ばれる (2005.4.2 yutaka)
-extern "C" void SetMouseCursor(char *cursor)
+void SetMouseCursor(char *cursor)
 {
 	HCURSOR hc;
 	LPCTSTR name = NULL;
@@ -2215,8 +2215,10 @@ void CVTWindow::OnMouseMove(UINT nFlags, CPoint point)
 	mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
 
 	if (! (LButton || MButton || RButton)) {
-		// マウスカーソル直下にURL文字列があるかを走査する (2005.4.2 yutaka)
-		BuffChangeSelect(point.x, point.y,0);
+		if (BuffCheckMouseOnURL(point.x, point.y))
+			SetMouseCursor("HAND");
+		else
+			SetMouseCursor(ts.MouseCursorName);
 		return;
 	}
 

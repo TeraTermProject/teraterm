@@ -82,6 +82,7 @@ void BuffSelectiveEraseBox(int XStart, int YStart, int XEnd, int YEnd);
 void BuffScrollLeft(int count);
 void BuffScrollRight(int count);
 int BuffGetCurrentLineData(char *buf, int bufsize);
+BOOL BuffCheckMouseOnURL(int Xw, int Yw);
 
 extern int StatusLine;
 extern int CursorTop, CursorBottom;

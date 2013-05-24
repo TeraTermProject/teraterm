@@ -2749,26 +2749,6 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 		X = NumOfColumns;
 	}
 
-	// check URL string on mouse over(2005/4/3 yutaka)
-	if (NClick == 0) {
-		extern void SetMouseCursor(char *cursor);
-
-		// クリッカブルURLが有効の場合のみ、マウスカーソルを変形させる。(2009.8.27 yutaka)
-		if (ts.EnableClickableUrl) {
-			if ((AttrBuff[TmpPtr+X] & AttrURL)) {
-				SetMouseCursor("HAND");
-
-			} else {
-				SetMouseCursor(ts.MouseCursorName);
-				//SetCursor(LoadCursor(NULL, IDC_IBEAM));
-
-			}
-		}
-
-		UnlockBuffer();
-		return;
-	}
-
 #if 0
 	/* start - ishizaki */
 	if (ts.EnableClickableUrl && (NClick == 2) && (AttrBuff[TmpPtr+X] & AttrURL)) {
@@ -3703,3 +3683,33 @@ int BuffGetCurrentLineData(char *buf, int bufsize)
 	return (CursorX);
 }
 
+BOOL BuffCheckMouseOnURL(int Xw, int Yw)
+{
+	int X, Y;
+	LONG TmpPtr;
+	BOOL Result, Right;
+
+	DispConvWinToScreen(Xw, Yw, &X, &Y, &Right);
+	Y += PageStart;
+
+	if (X < 0)
+		X = 0;
+	else if (X > NumOfColumns)
+		X = NumOfColumns;
+	if (Y < 0)
+		Y = 0;
+	else if (Y >= BuffEnd)
+		Y = BuffEnd - 1;
+
+	TmpPtr = GetLinePtr(Y);
+	LockBuffer();
+
+	if (AttrBuff[TmpPtr+X] & AttrURL)
+		Result = TRUE;
+	else
+		Result = FALSE;
+
+	UnlockBuffer();
+
+	return Result;
+}
