@@ -31,15 +31,19 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
+
 <h3><a name="teraterm_4.78">2013.xx.xx (Ver 4.78)</a></h3>
 <ul class="history">
   <li>変更
     <ul>
-      <li>ファイル名の不正文字チェックを強化した。</li>
-      <li><a href="../menu/setup-additional.html">Additional settings ダイアログ</a>に <a href="../menu/setup-additional.html#logrotate">ログ・ローテート</a> 設定項目を追加した。
+      <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝。</li>
+      <li>Additional settings ダイアログに <a href="../menu/setup-additional.html#logrotate">ログ・ローテート</a> 設定項目を追加した。
         <ul>
           <li>teraterm.iniにLogRotate, LogRotateSize, LogRotateSizeType, LogRotateStepエントリを追加した。</li>
         </ul></li>
+      <li><a href="../menu/file.html">Fileメニュー</a>に「Tera Termの全終了(Exit All)」を追加した。</li>
+      <li><a href="../menu/window.html">Windowメニュー</a>に「重ねて表示(Cascade)」「上下に並べて表示(Stacked)」「左右に並べて表示(Side By Side)」を追加した。</li>
+      <li><a href="../menu/setup-additional.html#autologging">自動ログ取得</a>を無効化する <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションを追加した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/command/listbox.html">listbox</a>コマンドを追加した。</li>
@@ -53,31 +57,33 @@
           <li><a href="../macro/command/bringupbox.html">bringupbox</a>コマンドを追加した。</li>
           <li><a href="../macro/command/regexoption.html">regexoption</a>コマンドを追加した。</li>
           <li><a href="../macro/command/exec.html">exec</a>コマンドに第4引数（カレントディレクトリ）を追加した。</li>
+          <li>'<a href="../macro/command/show.html">show</a> 1' コマンドでマクロウィンドウが最前面に来るようにした。</li>
+          <li><a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/inputbox.html">inputbox</a>, <a href="../macro/command/listbox.html">listbox</a> コマンドを実行したときにダイアログが最前面に来るようにした。</li>
+        <li><a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> コマンドで空文字列を待てるようにした。</li>
+        <li><a href="../macro/command/waitregex.html">waitregex</a> コマンドで複数の文字列が同時にマッチする場合、前の方を優先するようにした。</li>
         </ul></li>
-      <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝。</li>
-      <li><a href="../menu/window.html">Windowメニュー</a>に「重ねて表示(Cascade)」「上下に並べて表示(Stacked)」「左右に並べて表示(Side By Side)」を追加した。</li>
-      <li><a href="../menu/file.html">Fileメニュー</a>に「Tera Termの全終了(Exit All)」を追加した。</li>
-      <li><a href="../menu/setup-additional.html#autologging">自動ログ取得</a>を無効化する <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションを追加した。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>ログファイル名の&amp;hにIPv6アドレスを含めると、ログファイルが作成されない。</li>
-      <li><a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a>をoffにしても排他ロックがかかる問題を修正した。</li>
-      <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
-      <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
+      <li>ログファイル名の&amp;hにIPv6アドレスを含めると、ログファイルが作成されない問題を修正した。</li>
+      <li><a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a>をoffにしてもログファイルに排他ロックがかかる問題を修正した。</li>
       <li>ネットワーク経由でログ採取しても、Tera Termがスローダウンしないようにした。
         <ul>
-          <li>teraterm.iniにDeferredLogWriteModeエントリを追加した。デフォルトはon。</li>
+          <li>teraterm.iniに<a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>エントリを追加した。デフォルトはon。</li>
         </ul></li>
-      <li>マクロからの送信データに対してもPaste delay per line設定が適用される問題を修正した。</li>
+      <li>ウィンドウの右端で URL が終わって改行している場合に、次の行まで URL が続いていると判定される問題を修正した。</li>
+      <li>URL 文字列として判定される領域が左に半分ずれる問題を修正した。</li>
+      <li>マクロからの送信データに対しても<a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a>設定が適用される問題を修正した。</li>
+      <li><a href="../macro/command/waitn.html">waitn</a> マクロコマンドで timeout が 0 のときにデータを待たない問題を修正した。</li>
+      <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
+      <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
     </ul>
   </li>
 
   <li>その他
     <ul>
-      <li></li>
       <li>言語ファイルにロシア語(Russian.lng)を追加した。Sergey Ryumik氏に感謝します。</li>
       <li>言語ファイルに韓国語(Korean.lng)を追加した。Daehong Kim氏に感謝します。</li>
       <li><a href="#ttssh_2.65">TTSSH(2.65)</a>へ差し替えた。</li>
@@ -2051,6 +2057,7 @@
 
   <li>バグ修正
     <ul>
+      <li>PKCS#8形式の鍵を読み込めない問題を修正。</li>
       <li>~/.bashrcに"stty stop undef"という定義があると、SCP送信で不正終了する問題に対処した。</li>
     </ul>
   </li>

@@ -36,11 +36,14 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>Upgraded checking the invalid character of a file name.</li>
-      <li>added the <a href="../menu/setup-additional.html#logrotate">Log Rotate</a> configuration on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.
+      <li>Select "Selection" by default in the printer dialog when there is a selection. Special thanks to tentner.</li>
+      <li>added the <a href="../menu/setup-additional.html#logrotate">Log Rotate</a> configuration on the Additional settings dialog.
         <ul>
           <li>added the LogRotate, LogRotateSize, LogRotateSizeType and LogRotateStep entries in the teraterm.ini file.</li>
         </ul></li>
+      <li>added the Exit All under the <a href="../menu/file.html">File menu</a>.</li>
+      <li>added the Cascade, Stacked and Side By Side under the <a href="../menu/window.html">Window menu</a>.</li>
+      <li>added the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line option to disable the <a href="../menu/setup-additional.html#autologging">Auto start logging</a>.</li>
       <li>Macro
         <ul>
           <li>added the <a href="../macro/command/listbox.html">listbox</a> command.</li>
@@ -54,31 +57,33 @@
           <li>added the <a href="../macro/command/bringupbox.html">bringupbox</a> command.</li>
           <li>added the <a href="../macro/command/regexoption.html">regexoption</a> command.</li>
           <li>added the 4th argument(current directory) at the <a href="../macro/command/exec.html">exec</a> command.</li>
+          <!--li>'<a href="../macro/command/show.html">show</a> 1' コマンドでマクロウィンドウが最前面に来るようにした。</li-->
+          <!--li><a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/inputbox.html">inputbox</a>, <a href="../macro/command/listbox.html">listbox</a> コマンドを実行したときにダイアログが最前面に来るようにした。</li-->
+        <!--li><a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> コマンドで空文字列を待てるようにした。</li-->
+        <!--li><a href="../macro/command/waitregex.html">waitregex</a> コマンドで複数の文字列が同時にマッチする場合、前の方を優先するようにした。</li-->
         </ul></li>
-      <li>Select "Selection" by default in the printer dialog when there is a selection. Special thanks to tentner.</li>
-      <li>added the Cascade, Stacked and Side By Side under the <a href="../menu/window.html">Window menu</a>.</li>
-      <li>added the Exit All under the <a href="../menu/file.html">File menu</a>.</li>
-      <li>added the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line option to disable the <a href="../menu/setup-additional.html#autologging">Auto start logging</a>.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>Can not create a file including the IPv6 address in the &amp;h of the log file.</li>
-      <li>When the <a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a> is off, the exclusive lock remains.</li>
-      <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
-      <li>MARCO: When the break command is inserted after the continue command, the Invalid Control error will be ocurred.</li>
+      <li>When the <a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a> is off, the exclusive lock remains<!--ログファイルに-->.</li>
       <li>When a log file is retrieving on the network path, Tera Term does not go slow.
         <ul>
-          <li>added the DeferredLogWriteMode entry in the teraterm.ini file. The default value is ON.</li>
+          <li>added the <a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a> entry in the teraterm.ini file. The default value is ON.</li>
         </ul></li>
-      <li>MACRO: The send/sendln command can be affected by the Paste delay per line configuration.</li>
+      <!--li>ウィンドウの右端で URL が終わって改行している場合に、次の行まで URL が続いていると判定される問題を修正した。</li-->
+      <!--li>URL 文字列として判定される領域が左に半分ずれる問題を修正した。</li-->
+      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a> configuration.</li>
+      <!--li><a href="../macro/command/waitn.html">waitn</a> マクロコマンドで timeout が 0 のときにデータを待たない問題を修正した。</li-->
+      <li>MARCO: When the break command is inserted after the continue command, the Invalid Control error will be ocurred.</li>
+      <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
     </ul>
   </li>
 
   <li>Misc
     <ul>
-      <li></li>
       <li>added the Russian.lng language file. Special thanks to Sergey Ryumik.</li>
       <li>added the Korean.lng language file. Special thanks to Daehong Kim.</li>
       <li>upgraded TTSSH to <a href="#ttssh_2.65">2.65</a></li>
@@ -2051,6 +2056,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
+      <!--li>PKCS#8形式の鍵を読み込めない問題を修正。</li-->
       <li>When the "stty stop undef" is defined in the ~/.bashrc, an application fault will be ocurred by using SCP sending.</li>
     </ul>
   </li>

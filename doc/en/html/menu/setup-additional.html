@@ -208,7 +208,7 @@ If the configuration is enabled as whole system, execute the upper command with 
 	Inludes delimiter characters for the word selection.
       </dd>
 
-      <dt>Paste delay per line</dt>
+      <dt><a name="pastedelayperline">Paste delay per line</a></dt>
       <dd>
 	A user can delay to send a line data to the remote host when the user pastes multiple lines. The delay time can be specified by this option on the millisecond time scale.
       </dd>
@@ -336,19 +336,19 @@ SYNOPSIS:
     Start logging automaticaly when connecting. Default Log File Name is used for log file name.
       </dd>
 
-      <dt><a name="logrotate">Log Rotate</a></dt>
+      <dt><a name="LogRotate">Log Rotate</a></dt>
       <dd>
     The log rotation is enabled. The extension of the rotated file is added .1, .2, .3 etc.
       </dd>
-    
+
       <ul>
-        <dt>Size</dt>
+        <dt><a name="LogRotateSize">Size</a></dt>
         <dd>
         The log file is rotated when it grows bigger than Size bytes. If the size is followed by KB, 
         the size is assumed to be in kilobytes. If the MB is used, the size is in megabytes.
         </dd>
         
-        <dt>Rotate</dt>
+        <dt><a name="LogRotateStep">Rotate</a></dt>
         <dd>
         The log file is rotated Rotate times before being removed. If the Rotate is 0,
         the old version is not removed rather than rotated.
