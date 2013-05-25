@@ -1183,6 +1183,7 @@ ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
 	ssh2_keyfile_type ret = SSH2_KEYFILE_TYPE_NONE;
 	char filename[2048];
 	char line[200];
+	int i;
 
 	// 相対パスを絶対パスへ変換する。こうすることにより、「ドットで始まる」ディレクトリに
 	// あるファイルを読み込むことができる。(2005.2.7 yutaka)
@@ -1196,26 +1197,14 @@ ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
 	}
 
 	while (fgets(line, sizeof(line), *fp) != NULL) {
-		if (strncmp(line, "-----BEGIN RSA PRIVATE KEY-----", strlen("-----BEGIN RSA PRIVATE KEY-----")) == 0) {
-			ret = SSH2_KEYFILE_TYPE_OPENSSH;
-			break;
+		for (i=0; keyfile_headers[i].type != SSH2_KEYFILE_TYPE_NONE; i++) {
+			if ( strncmp(line, keyfile_headers[i].header, strlen(keyfile_headers[i].header)) == 0) {
+				ret = keyfile_headers[i].type;
+				break;
+			}
 		}
-		else if (strncmp(line, "-----BEGIN DSA PRIVATE KEY-----", strlen("-----BEGIN DSA PRIVATE KEY-----")) == 0) {
-			ret = SSH2_KEYFILE_TYPE_OPENSSH;
+		if (ret != SSH2_KEYFILE_TYPE_NONE)
 			break;
-		}
-		else if (strncmp(line, "-----BEGIN EC PRIVATE KEY-----", strlen("-----BEGIN EC PRIVATE KEY-----")) == 0) {
-			ret = SSH2_KEYFILE_TYPE_OPENSSH;
-			break;
-		}
-		else if (strncmp(line, "PuTTY-User-Key-File-2", strlen("PuTTY-User-Key-File-2")) == 0) {
-			ret = SSH2_KEYFILE_TYPE_PUTTY;
-			break;
-		}
-		else if (strncmp(line, "---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----", strlen("---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----")) == 0) {
-			ret = SSH2_KEYFILE_TYPE_SECSH;
-			break;
-		}
 	}
 	
 	if (ret == SSH2_KEYFILE_TYPE_NONE) {
