@@ -646,7 +646,7 @@ int FindRegexString(void)
 int Wait()
 {
 	BYTE b;
-	int i, Found, ret;
+	int i, j, Found, ret;
 	PCHAR Str;
 
 	Found = 0;
@@ -670,9 +670,18 @@ int Wait()
 						WaitCount[i]++;
 					}
 					else if (WaitCount[i]>0) {
-						WaitCount[i] = 0;
-						if ((BYTE)Str[0]==b) {
-							WaitCount[i] = 1;
+						for (j=WaitCount[i]-1; j>=0; j--) {
+							if ((BYTE)Str[j] == b) {
+								if (j== 0 || strncmp(Str, Str+(WaitCount[i]-j), j)==0) {
+									break;
+								}
+							}
+						}
+						if (j >= 0) {
+							WaitCount[i] = j+1;
+						}
+						else {
+							WaitCount[i] = 0;
 						}
 					}
 					if (WaitCount[i]==WaitStrLen[i]) {
