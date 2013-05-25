@@ -261,10 +261,11 @@ LogLockExclusive=on
 </pre>
 
 
-<h1><!--a name="DeferredLogWriteMode">ログファイルの書き出しを別スレッドにする</a--></h1>
+<h1><a name="DeferredLogWriteMode">Deferred log write mode</a></h1>
 
 <p>
-TBD
+The log file is written on the thread procedure to avoid Tera Term slows down 
+when the log file is recorded on the network drive.
 </p>
 
 <pre>

@@ -288,10 +288,11 @@ LogLockExclusive=on
 </pre>
 
 
-<h1><a name="DeferredLogWriteMode">ログファイルの書き出しを別スレッドにする</a></h1>
+<h1><a name="DeferredLogWriteMode">ログファイルを遅延書き込みする</a></h1>
 
 <p>
-TBD
+ログファイルの書き込みを別スレッドで行うことで、ネットワークドライブ上にログファイルを採取しても、
+Tera Termの動作が遅くならないようにします。
 </p>
 
 <pre>
