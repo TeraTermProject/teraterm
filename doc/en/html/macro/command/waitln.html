@@ -28,6 +28,10 @@ Pauses until a line which contains one of the character strings is received from
 </p>
 
 <p>
+When the empty string is specified, this command will wait an character + CRLF.
+</p>
+
+<p>
 If the system variable "timeout" or "mtimeout" is greater than zero, the timeout occurs when &lt;timeout&gt;.&lt;mtimeout&gt; seconds have passed. If the timeout is less than or equal to zero, the timeout never occurs.
 </p>
 
@@ -64,6 +68,13 @@ These commands return the received line in the system variable "inputstr" and on
 waitln 'cal'
 messagebox inputstr "str"  ; echo aaa cal hoge fuga
 </pre>
+
+
+<h2>Reference</h2>
+
+<a href="wait.html">wait</a><br>
+<a href="waitregex.html">waitregex</a><br>
+
 
 </body>
 </html>
