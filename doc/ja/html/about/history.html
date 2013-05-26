@@ -74,11 +74,12 @@
           <li>teraterm.iniに<a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>エントリを追加した。デフォルトはon。</li>
         </ul></li>
       <li>ウィンドウの右端で URL が終わって改行している場合に、次の行まで URL が続いていると判定される問題を修正した。</li>
-      <li>URL 文字列として判定される領域が左に半分ずれる問題を修正した。</li>
+      <li>URL 文字列としてマウスハンドカーソルの判定される領域が左に半分ずれる問題を修正した。</li>
       <li>マクロからの送信データに対しても<a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a>設定が適用される問題を修正した。</li>
       <li><a href="../macro/command/waitn.html">waitn</a> マクロコマンドで timeout が 0 のときにデータを待たない問題を修正した。</li>
       <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
       <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
+      <li><a href="../macro/command/wait.html">wait</a>で文字列を正しく検出できない問題を修正した(ex. "aaab"に対してwait "aab"がマッチしない)。</li>
     </ul>
   </li>
 
@@ -2064,7 +2065,6 @@
 
   <li>その他
     <ul>
-      <li></li>
       <li>zlib 1.2.8へ差し替えた</li>
     </ul>
   </li>

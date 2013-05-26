@@ -74,11 +74,12 @@
           <li>added the <a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a> entry in the teraterm.ini file. The default value is ON.</li>
         </ul></li>
       <li>When the URL string ends at the right row and return code, the URL string continues to next line by mistake.</li>
-      <li>The URL string shifts to the left with half character by mistake.</li>
+      <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
       <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a> configuration.</li>
       <li>When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
       <li>MARCO: When the break command is inserted after the continue command, the Invalid Control error will be ocurred.</li>
       <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
+      <li>MACRO: The <a href="../macro/command/wait.html">wait</a> command can not detect the right string.(ex. wait "aab" does not work against "aaab")</li>
     </ul>
   </li>
 
@@ -2063,7 +2064,6 @@ SYNOPSIS:
 
   <li>Misc
     <ul>
-      <li></li>
       <li>upgraded zlib to 1.2.8</li>
     </ul>
   </li>
