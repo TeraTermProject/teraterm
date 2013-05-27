@@ -36,7 +36,7 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝。</li>
+      <li>すでに選択されているテキストが存在する場合、プリンタダイアログのデフォルト選択肢を「選択した部分」にするようにした。tentner氏に感謝します。</li>
       <li>Additional settings ダイアログに <a href="../menu/setup-additional.html#logrotate">ログ・ローテート</a> 設定項目を追加した。
         <ul>
           <li>teraterm.iniにLogRotate, LogRotateSize, LogRotateSizeType, LogRotateStepエントリを追加した。</li>
@@ -59,27 +59,27 @@
           <li><a href="../macro/command/exec.html">exec</a>コマンドに第4引数（カレントディレクトリ）を追加した。</li>
           <li>'<a href="../macro/command/show.html">show</a> 1' コマンドでマクロウィンドウが最前面に来るようにした。</li>
           <li><a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/inputbox.html">inputbox</a>, <a href="../macro/command/listbox.html">listbox</a> コマンドを実行したときにダイアログが最前面に来るようにした。</li>
-        <li><a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> コマンドで空文字列を待てるようにした。</li>
-        <li><a href="../macro/command/waitregex.html">waitregex</a> コマンドで複数の文字列が同時にマッチする場合、前の方を優先するようにした。</li>
+        <li><a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a>, <a href="../macro/command/waitregex.html">waitregex</a> コマンドで空文字列を待てるようにした。</li>
+        <li><a href="../macro/command/waitregex.html">waitregex</a> コマンドで複数のパラメータが同時にマッチする場合、前の方を優先するようにした。</li>
         </ul></li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>ログファイル名の&amp;hにIPv6アドレスを含めると、ログファイルが作成されない問題を修正した。</li>
+      <li>ログファイル名に &amp;h を含めている時、IPv6アドレスで接続するとログファイルが作成されない問題を修正した。</li>
       <li><a href="../setup/teraterm-misc.html#LogLockExclusive">LogLockExclusive</a>をoffにしてもログファイルに排他ロックがかかる問題を修正した。</li>
       <li>ネットワーク経由でログ採取しても、Tera Termがスローダウンしないようにした。
         <ul>
           <li>teraterm.iniに<a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>エントリを追加した。デフォルトはon。</li>
         </ul></li>
       <li>ウィンドウの右端で URL が終わって改行している場合に、次の行まで URL が続いていると判定される問題を修正した。</li>
-      <li>URL 文字列としてマウスハンドカーソルの判定される領域が左に半分ずれる問題を修正した。</li>
+      <li>URL 文字列としてマウスハンドカーソルの判定される領域が左に半文字分ずれる問題を修正した。</li>
       <li>マクロからの送信データに対しても<a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a>設定が適用される問題を修正した。</li>
       <li><a href="../macro/command/waitn.html">waitn</a> マクロコマンドで timeout が 0 のときにデータを待たない問題を修正した。</li>
       <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
       <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
-      <li><a href="../macro/command/wait.html">wait</a>で文字列を正しく検出できない問題を修正した(ex. "aaab"に対してwait "aab"がマッチしない)。</li>
+      <li><a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> マクロコマンドで、で文字列を正しく検出できない事がある問題を修正した(ex. "aaab"に対してwait "aab"がマッチしない)。</li>
     </ul>
   </li>
 

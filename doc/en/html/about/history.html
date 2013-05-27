@@ -59,8 +59,8 @@
           <li>added the 4th argument(current directory) at the <a href="../macro/command/exec.html">exec</a> command.</li>
           <li>The '<a href="../macro/command/show.html">show</a> 1' command brings the macro window to the top.</li>
           <li>The <a href="../macro/command/messagebox.html">messagebox</a>, <a href="../macro/command/inputbox.html">inputbox</a> and <a href="../macro/command/listbox.html">listbox</a> commands bring the macro dialog to the top.</li>
-          <li>The <a href="../macro/command/wait.html">wait</a> and <a href="../macro/command/waitln.html">waitln</a> commands can wait an empty strings.</li>
-          <li>When the <a href="../macro/command/waitregex.html">waitregex</a> command matches some strings at the same time, the first matched string is selected.</li>
+          <li>The <a href="../macro/command/wait.html">wait</a>, <a href="../macro/command/waitln.html">waitln</a> and <a href="../marco/command/waitregex.html">waitregex</a> commands can wait an empty strings.</li>
+          <li>When the <a href="../macro/command/waitregex.html">waitregex</a> command matches some parameters at the same time, the first matched parameter is selected.</li>
         </ul></li>
     </ul>
   </li>
@@ -76,10 +76,10 @@
       <li>When the URL string ends at the right row and return code, the URL string continues to next line by mistake.</li>
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
       <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a> configuration.</li>
-      <li>When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
-      <li>MARCO: When the break command is inserted after the continue command, the Invalid Control error will be ocurred.</li>
+      <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
+      <li>MARCO: When the break command is executed after the continue command, the Invalid Control error will be ocurred.</li>
       <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
-      <li>MACRO: The <a href="../macro/command/wait.html">wait</a> command can not detect the right string.(ex. wait "aab" does not work against "aaab")</li>
+      <li>MACRO: The <a href="../macro/command/wait.html">wait</a> and <a href="../macro/command/waitln.html">waitln</a> command can not detect the right string.(ex. wait "aab" does not work against "aaab")</li>
     </ul>
   </li>
 
