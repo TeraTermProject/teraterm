@@ -436,6 +436,7 @@ Menu command                        ID
 [Window] Cascade                    50813
 [Window] Stacked                    50814
 [Window] Side by Side               50815
+[Window] Undo - XXX                 50816
 [Help] Index                        50910
 [Help] About Tera Term              50990
 
