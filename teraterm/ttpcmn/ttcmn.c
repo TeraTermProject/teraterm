@@ -1119,6 +1119,31 @@ HWND FAR PASCAL GetNthWin(int n)
 }
 
 
+// マルチモニターを考慮して、タスクバーを除いたディスプレイサイズを取得する。
+static void get_desktop_size_by_multi_monitor(HWND hwnd, RECT *rect)
+{
+	HMONITOR hMon;
+	MONITORINFO mi;
+	HMODULE mod;
+
+	// Windows95では未定義。
+	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	    (GetProcAddress(mod,"MonitorFromWindow") != NULL)) {
+		hMon = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+		ZeroMemory( &mi, sizeof( mi ));
+		mi.cbSize = sizeof( mi );
+		GetMonitorInfo(hMon, &mi);
+		*rect = mi.rcWork;  // タスクバーを除いたディスプレイサイズ
+
+	} else {
+		// マルチモニタがサポートされていない場合
+		SystemParametersInfo(SPI_GETWORKAREA, 0, rect, 0);
+
+	}
+
+}
+
 // 有効なウィンドウを探し、現在位置を記憶させておく。
 static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num, int style)
 {
@@ -1162,9 +1187,30 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
+	RECT rc;
+	int width, i;
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_SIDEBYSIDE);
+#if 0
 	TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
+#else
+	get_desktop_size_by_multi_monitor(myhwnd, &rc);
+
+	if (n <= 0)
+		return;
+
+	width = (rc.right - rc.left) / n;
+	for (i = 0 ; i < n ; i++) {
+		ShowWindow(hwnd[i], SW_RESTORE);
+		SetWindowPos(hwnd[i], 0, 
+			width*i + rc.left,
+			rc.top,
+			width,
+			rc.bottom - rc.top,
+			SWP_NOOWNERZORDER | SWP_NOZORDER);
+	}
+	SetFocus(hwnd[0]);
+#endif
 }
 
 // ウィンドウを上下に並べて表示する(Show Windows Stacked)
@@ -1172,9 +1218,30 @@ void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
+	RECT rc;
+	int height, i;
 
 	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_STACKED);
+#if 0
 	TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
+#else
+	get_desktop_size_by_multi_monitor(myhwnd, &rc);
+
+	if (n <= 0)
+		return;
+
+	height = (rc.bottom - rc.top) / n;
+	for (i = 0 ; i < n ; i++) {
+		ShowWindow(hwnd[i], SW_RESTORE);
+		SetWindowPos(hwnd[i], 0, 
+			rc.left,
+			rc.top + height*i,
+			rc.right - rc.left,
+			height,
+			SWP_NOOWNERZORDER | SWP_NOZORDER);
+	}
+	SetFocus(hwnd[0]);
+#endif
 }
 
 // ウィンドウを重ねて表示する(Cascade)
