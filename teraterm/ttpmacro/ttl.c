@@ -6113,7 +6113,7 @@ int ExecCmnd()
 					Err = ErrSyntax;
 			}
 		}
-		else Err = ErrSyntax;
+		else Err = ErrNotSupported;
 	}
 	else
 		Err = ErrSyntax;

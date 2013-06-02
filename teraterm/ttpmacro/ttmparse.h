@@ -37,6 +37,7 @@
 #define ErrOutOfRange       17
 #define ErrCloseBracket     18
 #define ErrFewMemory        19
+#define ErrNotSupported     20
 
 #define TypUnknown  0
 #define TypInteger  1

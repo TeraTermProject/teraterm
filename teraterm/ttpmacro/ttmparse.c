@@ -87,6 +87,8 @@ void DispErr(WORD Err)
 	char Msg[41];
 	int i;
 
+	strncpy_s(Msg, sizeof(Msg), "Unknown error message number.", _TRUNCATE);
+
 	switch (Err) {
 		case ErrCloseParent: strncpy_s(Msg, sizeof(Msg),"\")\" expected.", _TRUNCATE); break;
 		case ErrCantCall: strncpy_s(Msg, sizeof(Msg),"Can't call sub.", _TRUNCATE); break;
@@ -107,6 +109,7 @@ void DispErr(WORD Err)
 		case ErrOutOfRange: strncpy_s(Msg, sizeof(Msg), "Index out of range.", _TRUNCATE); break;
 		case ErrCloseBracket: strncpy_s(Msg, sizeof(Msg), "\"]\" expected.", _TRUNCATE); break;
 		case ErrFewMemory: strncpy_s(Msg, sizeof(Msg), "Can't allocate memory.", _TRUNCATE); break;
+		case ErrNotSupported: strncpy_s(Msg, sizeof(Msg), "Command not supported.", _TRUNCATE); break;
 	}
 
 	i = OpenErrDlg(Msg,LineBuff);
