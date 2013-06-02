@@ -181,6 +181,7 @@ protected:
 	afx_msg void OnWindowStacked();
 	afx_msg void OnWindowSidebySide();
 	afx_msg void OnWindowRestoreAll();
+	afx_msg void OnWindowUndo();
 	afx_msg void OnHelpIndex();
 	afx_msg void OnHelpUsing();
 	afx_msg void OnHelpAbout();

@@ -212,6 +212,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_WINDOW_STACKED, OnWindowStacked)
 	ON_COMMAND(ID_WINDOW_SIDEBYSIDE, OnWindowSidebySide)
 	ON_COMMAND(ID_WINDOW_RESTOREALL, OnWindowRestoreAll)
+	ON_COMMAND(ID_WINDOW_UNDO, OnWindowUndo)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
 	//}}AFX_MSG_MAP
@@ -5360,6 +5361,11 @@ void CVTWindow::OnWindowSidebySide()
 void CVTWindow::OnWindowRestoreAll()
 {
 	ShowAllWin(SW_RESTORE);
+}
+
+void CVTWindow::OnWindowUndo()
+{
+	UndoAllWin();
 }
 
 void CVTWindow::OnHelpIndex()

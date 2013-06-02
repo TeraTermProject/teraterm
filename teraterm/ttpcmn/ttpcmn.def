@@ -51,3 +51,4 @@ EXPORTS
   ShowAllWinStacked @57
   ShowAllWinCascade @58
   BroadcastClosingMessage @59
+  UndoAllWin @60

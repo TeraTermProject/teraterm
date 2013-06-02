@@ -31,6 +31,13 @@ static HANDLE HMap = NULL;
 #define TEKCLASSNAME "TEKWin32"
 
 
+enum window_style {
+	WIN_CASCADE,
+	WIN_STACKED,
+	WIN_SIDEBYSIDE,
+};
+
+
 void PASCAL CopyShmemToTTSet(PTTSet ts)
 {
 	// 現在の設定を共有メモリからコピーする
@@ -942,6 +949,18 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 		get_lang_msg("MENU_WINDOW_SIDEBYSIDE", buf, buflen, "Side &by Side", langFile);
 		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, buf);
 
+		if (pm->WinUndoFlag) {
+			if (pm->WinUndoStyle == WIN_CASCADE)
+				get_lang_msg("MENU_WINDOW_CASCADE_UNDO", buf, buflen, "&Undo - Cascade", langFile);
+			else if (pm->WinUndoStyle == WIN_STACKED)
+				get_lang_msg("MENU_WINDOW_STACKED_UNDO", buf, buflen, "&Undo - Stacked", langFile);
+			else
+				get_lang_msg("MENU_WINDOW_SIDEBYSIDE_UNDO", buf, buflen, "&Undo - Side by Side", langFile);
+			AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, buf);
+		} else {
+			RemoveMenu(menu, MF_BYCOMMAND, ID_WINDOW_UNDO);
+		}
+
 	}
 	else {
 		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, buf);
@@ -1030,13 +1049,16 @@ void FAR PASCAL ShowAllWin(int stat) {
 	}
 }
 
-#if 0
-void FAR PASCAL ShowAllWin(int stat) {
+void FAR PASCAL UndoAllWin(void) {
 	int i;
 	WINDOWPLACEMENT rc0;
 	RECT rc;
 	HMONITOR hMonitor;
 	MONITORINFO mi;
+	int stat = SW_RESTORE;
+
+	// 一度、復元したらフラグは落とす。
+	pm->WinUndoFlag = FALSE;
 
 	memset(&rc0, 0, sizeof(rc0));
 
@@ -1085,7 +1107,6 @@ void FAR PASCAL ShowAllWin(int stat) {
 		}
 	}
 }
-#endif
 
 HWND FAR PASCAL GetNthWin(int n)
 {
@@ -1099,10 +1120,23 @@ HWND FAR PASCAL GetNthWin(int n)
 
 
 // 有効なウィンドウを探し、現在位置を記憶させておく。
-static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num)
+static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num, int style)
 {
 	int i, n;
 	WINDOWPLACEMENT wndPlace;
+
+	// 元に戻す(Undo)メニューは一度だけ表示させる。
+	if (pm->WinUndoFlag == FALSE) {
+		pm->WinUndoFlag = TRUE;
+	} else {
+		// すでにメニューが表示されていて、かつ以前と同じスタイルが選択されたら、
+		// メニューを消す。
+		// Windows8では、さらに連続して同じスタイルを選択してもメニューが消えたままだが、
+		// Tera Termではメニューが表示されるため、動作が異なる。
+		if (pm->WinUndoStyle == style)
+			pm->WinUndoFlag = FALSE;
+	}
+	pm->WinUndoStyle = style;
 
 	n = 0;
 	for (i = 0 ; i < pm->NWin ; i++) {
@@ -1129,7 +1163,7 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 	int n;
 	HWND hwnd[MAXNWIN];
 
-	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
+	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_SIDEBYSIDE);
 	TileWindows(NULL, MDITILE_VERTICAL, NULL, n, hwnd);
 }
 
@@ -1139,7 +1173,7 @@ void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 	int n;
 	HWND hwnd[MAXNWIN];
 
-	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
+	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_STACKED);
 	TileWindows(NULL, MDITILE_HORIZONTAL, NULL, n, hwnd);
 }
 
@@ -1149,7 +1183,7 @@ void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
 	int n;
 	HWND hwnd[MAXNWIN];
 
-	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n);
+	get_valid_window_and_memorize_rect(myhwnd, hwnd, &n, WIN_CASCADE);
 	CascadeWindows(NULL, MDITILE_SKIPDISABLED, NULL, n, hwnd);
 }
 

@@ -991,6 +991,7 @@ typedef TComVar far *PComVar;
 #define ID_WINDOW_CASCADEALL   50813
 #define ID_WINDOW_STACKED      50814
 #define ID_WINDOW_SIDEBYSIDE   50815
+#define ID_WINDOW_UNDO         50816
 #define ID_TEKWINDOW_WINDOW    51810
 
 #define ID_TRANSFER      9 // the position on [File] menu
@@ -1017,6 +1018,8 @@ typedef struct {
 	unsigned char ComFlag[(MAXCOMPORT-1)/CHAR_BIT+1];
 	/* Previous window rect (Tera Term 4.78 or later) */
 	WINDOWPLACEMENT WinPrevRect[MAXNWIN];
+	BOOL WinUndoFlag;
+	int WinUndoStyle;
 } TMap;
 typedef TMap far *PMap;
 
@@ -1025,12 +1028,16 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.79, ttset_memfilemap was replaced with ttset_memfilemap_21.
+ *   added TMap.WinUndoFlag
+ *
  * - At version 4.78, ttset_memfilemap was replaced with ttset_memfilemap_20.
  *   added tttset.LogRotate
  *   added tttset.LogRotateSize
  *   added tttset.LogRotateSizeType
  *   added tttset.LogRotateStep
  *   added tttset.DeferredLogWriteMode
+ *   added TMap.WinPrevRect
  *
  * - At version 4.74, ttset_memfilemap was replaced with ttset_memfilemap_19.
  *   added tttset.FontQuality
@@ -1147,4 +1154,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_20"
+#define TT_FILEMAPNAME "ttset_memfilemap_21"
