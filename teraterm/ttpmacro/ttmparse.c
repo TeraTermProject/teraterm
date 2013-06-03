@@ -109,7 +109,7 @@ void DispErr(WORD Err)
 		case ErrOutOfRange: strncpy_s(Msg, sizeof(Msg), "Index out of range.", _TRUNCATE); break;
 		case ErrCloseBracket: strncpy_s(Msg, sizeof(Msg), "\"]\" expected.", _TRUNCATE); break;
 		case ErrFewMemory: strncpy_s(Msg, sizeof(Msg), "Can't allocate memory.", _TRUNCATE); break;
-		case ErrNotSupported: strncpy_s(Msg, sizeof(Msg), "Command not supported.", _TRUNCATE); break;
+		case ErrNotSupported: strncpy_s(Msg, sizeof(Msg), "Unknown command.", _TRUNCATE); break;
 	}
 
 	i = OpenErrDlg(Msg,LineBuff);
