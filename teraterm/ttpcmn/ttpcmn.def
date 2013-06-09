@@ -52,3 +52,5 @@ EXPORTS
   ShowAllWinCascade @58
   BroadcastClosingMessage @59
   UndoAllWin @60
+
+  OpenHelp @61

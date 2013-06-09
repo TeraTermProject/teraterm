@@ -78,12 +78,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib imm32.lib ttpcmn.lib imagehlp.lib"
+				AdditionalDependencies="ws2_32.lib imm32.lib"
 				OutputFile="..\Debug/ttermpro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\debug"
-				DelayLoadDLLs="imagehlp.dll;user32.dll;shell32.dll"
+				DelayLoadDLLs="user32.dll;shell32.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\Debug/ttermpro.pdb"
 				SubSystem="2"
@@ -178,12 +178,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib imm32.lib ttpcmn.lib imagehlp.lib"
+				AdditionalDependencies="ws2_32.lib imm32.lib"
 				OutputFile="..\Release/ttermpro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\release"
-				DelayLoadDLLs="imagehlp.dll;user32.dll;shell32.dll"
+				DelayLoadDLLs="user32.dll;shell32.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\Release/ttermpro.pdb"
 				SubSystem="2"
@@ -377,14 +377,6 @@
 			</File>
 			<File
 				RelativePath="WSAAsyncGetAddrInfo.c"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Lib Files"
-			>
-			<File
-				RelativePath="..\htmlhelp\htmlhelp.lib"
 				>
 			</File>
 		</Filter>

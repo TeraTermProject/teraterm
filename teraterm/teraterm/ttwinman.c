@@ -15,9 +15,6 @@
 #include "i18n.h"
 #include "commlib.h"
 
-/* help file names */
-#define HTML_HELP "teraterm.chm"
-
 HWND HVTWin = NULL;
 HWND HTEKWin = NULL;
 
@@ -278,38 +275,3 @@ void SwitchTitleBar()
   if (H2!=0)
     PostMessage(H2,WM_USER_CHANGETBAR,0,0);
 }
-
-void OpenHelp(HWND HWin, UINT Command, DWORD Data)
-{
-  char HelpFN[MAX_PATH];
-
-  get_lang_msg("HELPFILE", ts.UIMsg, sizeof(ts.UIMsg), HTML_HELP, ts.UILanguageFile);
-
-  // ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
-  HWin = GetDesktopWindow();
-  _snprintf_s(HelpFN, sizeof(HelpFN), _TRUNCATE, "%s\\%s", ts.HomeDir, ts.UIMsg);
-  if (HtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-    char buf[MAX_PATH];
-    get_lang_msg("MSG_OPENHELP_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't open HTML help file(%s).", ts.UILanguageFile);
-    _snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, HelpFN);
-    MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
-  }
-}
-
-// HTML help を開く 
-// HTML Help workshopに含まれる htmlhelp.h と htmlhelp.lib の2つのファイルが、ビルド時に必要。
-// (2006.3.11 yutaka)
-#if 0
-void OpenHtmlHelp(HWND HWin, char *filename)
-{
-	char HelpFN[MAX_PATH];
-
-	_snprintf(HelpFN, sizeof(HelpFN), "%s\\%s", ts.HomeDir, filename);
-	// HTMLヘルプのオーナーをTera Termからデスクトップへ変更 (2006.4.7 yutaka)
-	if (HtmlHelp(GetDesktopWindow(), HelpFN, HH_DISPLAY_TOPIC, 0) == NULL) {
-		char buf[MAX_PATH + 28];
-		_snprintf(buf, sizeof(buf), "Can't open HTML help file(%s).", HelpFN);
-		MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
-	}
-}
-#endif

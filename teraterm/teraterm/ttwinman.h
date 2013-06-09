@@ -13,8 +13,6 @@ void ConvertToCP932(char *str, int len);
 void ChangeTitle();
 void SwitchMenu();
 void SwitchTitleBar();
-void OpenHelp(HWND HWin, UINT Command, DWORD Data);
-void OpenHtmlHelp(HWND HWin, char *filename);
 
 extern HWND HVTWin;
 extern HWND HTEKWin;

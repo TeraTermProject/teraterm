@@ -9,6 +9,10 @@
 #include "ttlib.h"
 #include "ttm_res.h"
 
+#include "tttypes.h"
+#include "ttcommon.h"
+#include "helpid.h"
+
 #include "errdlg.h"
 #include "ttmlib.h"
 
@@ -33,6 +37,7 @@ CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y)
 BEGIN_MESSAGE_MAP(CErrDlg, CDialog)
 	//{{AFX_MSG_MAP(CErrDlg)
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_MACROERRHELP, &CErrDlg::OnBnClickedMacroerrhelp)
 END_MESSAGE_MAP()
 
 // CErrDlg message handler
@@ -61,6 +66,9 @@ BOOL CErrDlg::OnInitDialog()
 	GetDlgItemText(IDCANCEL, uimsg2, sizeof(uimsg2));
 	get_lang_msg("BTN_CONTINUE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 	SetDlgItemText(IDCANCEL, uimsg);
+	GetDlgItemText(IDC_MACROERRHELP, uimsg2, sizeof(uimsg2));
+	get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+	SetDlgItemText(IDC_MACROERRHELP, uimsg);
 
 	SetDlgItemText(IDC_ERRMSG,MsgStr);
 	SetDlgItemText(IDC_ERRLINE,LineStr);
@@ -76,4 +84,9 @@ BOOL CErrDlg::OnInitDialog()
 	SetForegroundWindow();
 
 	return TRUE;
+}
+
+void CErrDlg::OnBnClickedMacroerrhelp()
+{
+	OpenHelp(HH_HELP_CONTEXT,HlpMacroAppendixesError);
 }

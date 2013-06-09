@@ -696,7 +696,7 @@ LONG CTEKWindow::OnChangeTBar(UINT wParam, LONG lParam)
 
 LONG CTEKWindow::OnDlgHelp(UINT wParam, LONG lParam)
 {
-	OpenHelp(tk.HWin,HH_HELP_CONTEXT,HelpId);
+	OpenHelp(HH_HELP_CONTEXT,HelpId);
 	return 0;
 }
 
@@ -819,7 +819,7 @@ void CTEKWindow::OnWindowWindow()
 
 void CTEKWindow::OnHelpIndex()
 {
-	OpenHelp(tk.HWin,HH_DISPLAY_TOPIC,0);
+	OpenHelp(HH_DISPLAY_TOPIC,0);
 }
 
 void CTEKWindow::OnHelpAbout()

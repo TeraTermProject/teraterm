@@ -15,6 +15,7 @@
 #include <tchar.h>
 #include <setupapi.h>
 #include <locale.h>
+#include <htmlhelp.h>
 
 #include "compat_w95.h"
 #include "tt_res.h"
@@ -1105,6 +1106,35 @@ void FAR PASCAL UndoAllWin(void) {
 		} else {
 			ShowWindow(pm->WinList[i], stat);
 		}
+	}
+}
+
+void FAR PASCAL OpenHelp(UINT Command, DWORD Data)
+{
+	char HomeDir[MAX_PATH];
+	char Temp[MAX_PATH];
+	HWND HWin;
+	char HelpFN[MAX_PATH];
+	char UILanguageFile[MAX_PATH];
+	char uimsg[MAX_UIMSG];
+
+	/* Get home directory */
+	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+		return;
+	}
+	ExtractDirName(Temp, HomeDir);
+	
+	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+	get_lang_msg("HELPFILE", uimsg, sizeof(uimsg), "teraterm.chm", UILanguageFile);
+
+	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
+	HWin = GetDesktopWindow();
+	_snprintf_s(HelpFN, sizeof(HelpFN), _TRUNCATE, "%s\\%s", HomeDir, uimsg);
+	if (HtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
+		char buf[MAX_PATH];
+		get_lang_msg("MSG_OPENHELP_ERROR", uimsg, sizeof(uimsg), "Can't open HTML help file(%s).", UILanguageFile);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, uimsg, HelpFN);
+		MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
 	}
 }
 

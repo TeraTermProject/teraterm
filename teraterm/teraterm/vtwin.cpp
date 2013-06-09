@@ -1801,7 +1801,7 @@ void CVTWindow::OnDestroy()
 	}
 	CommClose(&cv);
 
-	OpenHelp(HVTWin,HH_CLOSE_ALL,0);
+	OpenHelp(HH_CLOSE_ALL,0);
 
 	FreeIME();
 	FreeTTSET();
@@ -3461,7 +3461,7 @@ LONG CVTWindow::OnDdeEnd(UINT wParam, LONG lParam)
 
 LONG CVTWindow::OnDlgHelp(UINT wParam, LONG lParam)
 {
-	OpenHelp(HVTWin,HH_HELP_CONTEXT,HelpId);
+	OpenHelp(HH_HELP_CONTEXT,HelpId);
 	return 0;
 }
 
@@ -5370,7 +5370,7 @@ void CVTWindow::OnWindowUndo()
 
 void CVTWindow::OnHelpIndex()
 {
-	OpenHelp(HVTWin,HH_DISPLAY_TOPIC,0);
+	OpenHelp(HH_DISPLAY_TOPIC,0);
 }
 
 void CVTWindow::OnHelpAbout()
