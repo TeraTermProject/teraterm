@@ -55,6 +55,7 @@ void ParseFirst(BYTE b);
 #define DecLocatorButtonUp   8
 #define DecLocatorFiltered   16
 
+void RingBell(int type);
 void VisualBell();
 BOOL DecLocatorReport(int Event, int Button);
 
@@ -159,6 +160,11 @@ int FilterTop, FilterBottom, FilterLeft, FilterRight;
 
 /* IME Status */
 BOOL IMEstat;
+
+/* Beep over-used */
+static DWORD BeepStartTime = 0;
+static DWORD BeepSuppressTime = 0;
+static DWORD BeepOverUsedCount = 0;
 
 /* OSC String buffer */
 #define MAXOSCBUFFSIZE 4096
@@ -293,6 +299,12 @@ void ResetTerminal() /*reset variables but don't update screen */
   // previous received character
   PrevCharacter = -1;	// none
   PrevCRorLFGeneratedCRLF = FALSE;
+
+  // Beep over-used
+  BeepStartTime = GetTickCount();
+  BeepSuppressTime = BeepStartTime - ts.BeepSuppressTime * 1000;
+  BeepStartTime -= (ts.BeepOverUsedTime * 1000);
+  BeepOverUsedCount = ts.BeepOverUsedCount;
 }
 
 void ResetCharSet()
@@ -871,16 +883,8 @@ void ParseControl(BYTE b)
       CommBinaryOut(&cv,&(ts.Answerback[0]),ts.AnswerbackLen);
       break;
     case BEL:
-      switch (ts.Beep) {
-      case IdBeepOff:
-	/* nothing to do */
-        break;
-      case IdBeepOn:
-        MessageBeep(0);
-        break;
-      case IdBeepVisual:
-	VisualBell();
-        break;
+      if (ts.Beep != IdBeepOff) {
+	RingBell(ts.Beep);
       }
       break;
     case BS: BackSpace(); break;
@@ -1370,7 +1374,7 @@ void ParseEscape(BYTE b) /* b is the final char */
 	    CommResetSerial(&ts, &cv, TRUE);
 	  break;
 	case 'g': /* Visual Bell (screen original?) */
-	  VisualBell();
+	  RingBell(IdBeepVisual);
 	  break;
 	case 'n': Glr[0] = 2; break; /* LS2 */
 	case 'o': Glr[0] = 3; break; /* LS3 */
@@ -5129,6 +5133,41 @@ void VisualBell() {
 	CSQExchangeColor();
 	Sleep(10);
 	CSQExchangeColor();
+}
+
+void RingBell(int type) {
+	DWORD now;
+
+	now = GetTickCount();
+	if (now - BeepSuppressTime < ts.BeepSuppressTime * 1000) {
+		BeepSuppressTime = now;
+	}
+	else {
+		if (now - BeepStartTime < ts.BeepOverUsedTime * 1000) {
+			if (BeepOverUsedCount <= 1) {
+				BeepSuppressTime = now;
+			}
+			else {
+				BeepOverUsedCount--;
+			}
+		}
+		else {
+			BeepStartTime = now;
+			BeepOverUsedCount = ts.BeepOverUsedCount;
+		}
+
+		switch (ts.Beep) {
+		  case IdBeepOff:
+			/* nothing to do */
+			break;
+		  case IdBeepOn:
+			MessageBeep(0);
+			break;
+		  case IdBeepVisual:
+			VisualBell();
+			break;
+		}
+	}
 }
 
 void EndTerm() {

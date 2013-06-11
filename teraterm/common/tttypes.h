@@ -566,6 +566,9 @@ struct tttset {
 	WORD LogRotateSizeType;
 	WORD LogRotateStep;
 	WORD DeferredLogWriteMode;
+	DWORD BeepOverUsedCount;
+	DWORD BeepOverUsedTime;
+	DWORD BeepSuppressTime;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1031,9 +1034,10 @@ typedef TMap far *PMap;
  *
  * - At version 4.79, ttset_memfilemap was replaced with ttset_memfilemap_21.
  *   added TMap.WinUndoFlag
- *
- * - At version 4.78,
  *   added tttset.FTHideDialog
+ *   added tttset.BeepOverUsedCount
+ *   added tttset.BeepOverUsedTime
+ *   added tttset.BeepSuppressTime
  *
  * - At version 4.78, ttset_memfilemap was replaced with ttset_memfilemap_20.
  *   added tttset.LogRotate

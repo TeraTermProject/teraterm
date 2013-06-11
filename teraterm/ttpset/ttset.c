@@ -1515,6 +1515,14 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->FontQuality = CLEARTYPE_QUALITY;
 	else
 		ts->FontQuality = DEFAULT_QUALITY;
+
+	// Beep Over Used
+	ts->BeepOverUsedCount =
+		GetPrivateProfileInt(Section, "BeepOverUsedCount", 5, FName);
+	ts->BeepOverUsedTime =
+		GetPrivateProfileInt(Section, "BeepOverUsedTime", 2, FName);
+	ts->BeepSuppressTime =
+		GetPrivateProfileInt(Section, "BeepSuppressTime", 5, FName);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2666,6 +2674,11 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	else
 		strncpy_s(Temp, sizeof(Temp), "default", _TRUNCATE);
 	WritePrivateProfileString(Section, "FontQuality", Temp, FName);
+
+	// Beep Over Used
+	WriteInt(Section, "BeepOverUsedCount", FName, ts->BeepOverUsedCount);
+	WriteInt(Section, "BeepOverUsedTime", FName, ts->BeepOverUsedTime);
+	WriteInt(Section, "BeepSuppressTime", FName, ts->BeepSuppressTime);
 }
 
 #define VTEditor "VT editor keypad"
