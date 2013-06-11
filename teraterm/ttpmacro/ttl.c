@@ -1131,6 +1131,7 @@ WORD TTLExec()
 	memset(&sui, 0, sizeof(STARTUPINFO));
 	sui.cb = sizeof(STARTUPINFO);
 	sui.wShowWindow = mode;
+	sui.dwFlags = STARTF_USESHOWWINDOW;
 	if (CurDir[0] == 0)
 		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
 	else
