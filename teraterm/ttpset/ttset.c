@@ -762,6 +762,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Log without transfer dialog */
 	ts->LogHideDialog = GetOnOff(Section, "LogHideDialog", FName, FALSE);
 
+	/* File Transfer dialog visibility */
+	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
+
 	/* Default Log file name (2006.8.28 maya) */
 	GetPrivateProfileString(Section, "LogDefaultName", "teraterm.log",
 	                        ts->LogDefaultName, sizeof(ts->LogDefaultName),

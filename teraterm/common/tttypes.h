@@ -513,6 +513,7 @@ struct tttset {
 	WORD MouseEventTracking;
 	WORD KillFocusCursor;
 	WORD LogHideDialog;
+	WORD FTHideDialog;
 	int TerminalOldWidth;
 	int TerminalOldHeight;
 	WORD MaximizedBugTweak;
@@ -1030,6 +1031,9 @@ typedef TMap far *PMap;
  *
  * - At version 4.79, ttset_memfilemap was replaced with ttset_memfilemap_21.
  *   added TMap.WinUndoFlag
+ *
+ * - At version 4.78,
+ *   added tttset.FTHideDialog
  *
  * - At version 4.78, ttset_memfilemap was replaced with ttset_memfilemap_20.
  *   added tttset.LogRotate

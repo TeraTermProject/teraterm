@@ -304,8 +304,7 @@ FileSendFilter=
 <h1><a name="draganddrop">Confirmation of File Transfer by Drag &amp; Drop</a></h1>
 
 <p>
-Tera Term displays a message box to confirm the file transfer operation when a file is dragged and dropped in a window as a default.<br>
-If ConfirmFileDragAndDrop line in "Tera Term" section of setup file is modified as follows, a file transfer will be started without a confirmation.
+Tera Term displays a message box to confirm the file transfer operation when a file is dragged and dropped in a window as a default.  If ConfirmFileDragAndDrop line in "Tera Term" section of setup file is modified as follows, a file transfer will be started without a confirmation.
 </p>
 
 <pre>
@@ -316,6 +315,25 @@ ConfirmFileDragAndDrop=off
 default:
 ConfirmFileDragAndDrop=on
 </pre>
+
+
+<!--
+<h1><a name="hidetransdialog">ファイル送信時の転送状況ダイアログを表示しない</a></h1>
+
+<p>
+Tera Term は、ファイル送信時に送信済み容量等の転送状況を表示するダイアログを出します。
+このダイアログを表示しないようにするには、設定ファイルの [Tera Term] セクションの HideFTDialog 行を下記のように変更してください。
+</p>
+
+<pre>
+FTHideDialog=on
+</pre>
+
+<pre>
+default:
+FTHideDialog=off
+</pre>
+-->
 
 
 </BODY>

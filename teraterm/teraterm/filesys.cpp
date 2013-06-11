@@ -207,6 +207,7 @@ BOOL OpenFTDlg(PFileVar fv)
 
 	fv->StartTime = 0;
 	fv->ProgStat = 0;
+	fv->HideDialog = ts.FTHideDialog;
 
 	if (FTDlg!=NULL)
 	{
