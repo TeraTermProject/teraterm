@@ -1970,6 +1970,7 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 									HVTWin, (DLGPROC)OnDragDropDlgProc);
 
 					if (ret == IDOK) {   // sendfile
+						HelpId = HlpFileSend;
 						SendVar->DirLen = 0;
 						ts.TransBin = 0;
 						FileSendStart();
