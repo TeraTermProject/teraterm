@@ -3236,14 +3236,18 @@ void ParseCS(BYTE b) /* b is the final char */
 		} /* end of switch (Prv) */
 		break; /* end of no intermediate char */
 	  case 1: /* one intermediate char */
-		switch (IntChar[1]) {
-		  case ' ': CSSpace(b); break;  /* intermediate char = ' ' */
-		  case '!': CSExc(b); break;    /* intermediate char = '!' */
-		  case '"': CSDouble(b); break; /* intermediate char = '"' */
-		  case '$': CSDol(b); break;    /* intermediate char = '$' */
-		  case '\'': CSQuote(b); break; /* intermediate char = '\'' */
-		}
-		break;
+		switch (Prv) {
+		  case 0:
+			switch (IntChar[1]) {
+			  case ' ': CSSpace(b); break;  /* intermediate char = ' ' */
+			  case '!': CSExc(b); break;    /* intermediate char = '!' */
+			  case '"': CSDouble(b); break; /* intermediate char = '"' */
+			  case '$': CSDol(b); break;    /* intermediate char = '$' */
+			  case '\'': CSQuote(b); break; /* intermediate char = '\'' */
+			}
+			break; /* end of case Prv=0 */
+		} /* end of switch (Prv) */
+		break; /* end of one intermediate char */
 	} /* end of switch (Icount) */
 
 	ParseMode = ModeFirst;
