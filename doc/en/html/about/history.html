@@ -38,14 +38,14 @@
     <ul>
       <li>added the Undo menu under the <a href="../menu/window.html">Window menu</a> when Tera Term's windows are arranged.</li>
       <li>Top Most window is sorted by the Stacked and Side By Side under the <a href="../menu/window.html">Window menu</a>.</li>
-      <!-- li>ファイル送信時、ファイル送信状況ダイアログを表示しないように出来るようにした。
+      <li>The file transferring dialog can not be shown.
         <ul>
-          <li>teraterm.iniに<a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a>エントリを追加した。デフォルトはoff。Special thanks to Teodor Robas.</li>
+          <li>added the <a href="../setup/teraterm-trans.html#hidetransdialog">FTHideDialog</a> entry in the teraterm.ini file. The default value is off. Special thanks to Teodor Robas.</li>
         </ul></li>
-      <li>ベルが短時間に多量に送られて来た時、ベルを鳴らすのを抑制できるようにした。
+      <li>The beep sound can be suppressed when the bell ringing is rushed.
         <ul>
-          <li>teraterm.iniに BellOverUsedTime, BellOverUsedCount, BellSuppressTime エントリを追加した。デフォルトは 2, 5, 5。</li>
-        </ul></li -->
+          <li>added the BellOverUsedTime, BellOverUsedCount and BellSuppressTime entries in the teraterm.ini file. The default value are 2 , 5 and 5.</li>
+        </ul></li>
       <li>Macro
         <ul>
           <li>added the "Command not supported." new message in the <a href="../macro/appendixes/errormessages.html">Error messages</a>.</li>
@@ -53,12 +53,12 @@
     </ul>
   </li>
   
-  <!-- li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>マクロコマンド exec で、wait パラメータが1の時(4.63以降)、および wait パラメータが1以外の時(4.78以降)に show パラメータが無視される問題を修正した。</li>
-      <li>ドラッグ&amp;ドロップでのファイル送信時、ダイアログのヘルプボタンが正しく働かない問題を修正した。</li>
+      <li>MACRO exec: The show parameter will be ignored when the wait parameter is 1(4.63 later) or the parameter is not 1(4.78 later).</li>
+      <li>When the file is sent by D&amp;D, the help button of the dialog can not be worked well.</li>
     </ul> 
-  </li -->
+  </li>
 
   <!-- li>Misc
     <ul>
