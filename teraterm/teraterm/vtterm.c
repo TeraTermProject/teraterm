@@ -2868,6 +2868,287 @@ void CSSetAttr()		// SGR
     }
   }
 
+  void CSDolRequestMode()
+  {
+    char buff[256];
+    char *pp;
+    int len, resp = 0;
+
+    if (NParam == 0)
+      Param[1] = 0;
+
+    switch (Prv) {
+      case 0: /* ANSI Mode */
+	resp = 4;
+	pp = "";
+	switch (Param[1]) {
+	  case 2:	// KAM
+	    if (KeybEnabled)
+	      resp = 2;
+	    else
+	      resp = 1;
+	    break;
+	  case 4:	// IRM
+	    if (InsertMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 12:	// SRM
+	    if (ts.LocalEcho)
+	      resp = 2;
+	    else
+	      resp = 1;
+	    break;
+	  case 20:	// LNM
+	    if (LFMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 33:	// WYSTCURM
+	    if (ts.NonblinkingCursor)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
+	      resp += 2;
+	    break;
+	  case 34:	// WYULCURM
+	    if (ts.CursorShape == IdHCur)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
+	      resp += 2;
+	    break;
+	}
+	break;
+
+      case '?': /* DEC Mode */
+	pp = "?";
+	switch (Param[1]) {
+	  case 1:	// DECCKM
+	    if (AppliCursorMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 3:	// DECCOLM
+	    if (NumOfColumns == 132)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 5:	// DECSCNM
+	    if (ts.ColorFlag & CF_REVERSEVIDEO)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 6:	// DECOM
+	    if (RelativeOrgMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 7:	// DECAWM
+	    if (AutoWrapMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 8:	// DECARM
+	    if (AutoRepeatMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 9:	// XT_MSE_X10 -- X10 Mouse Tracking
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportMode == IdMouseTrackX10)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 12:	// XT_CBLINK -- att610 cursor blinking
+	    if (ts.NonblinkingCursor)
+	      resp = 2;
+	    else
+	      resp = 1;
+	    if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
+	      resp += 2;
+	    break;
+	  case 19:	// DECPEX
+	    if (PrintEX)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 25:	// DECTCEM
+	    if (IsCaretEnabled())
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 38:	// DECTEK
+	    resp = 4;
+	    break;
+	  case 47:	// XT_ALTSCRN -- Alternate Screen / (DECGRPM)
+	    if ((ts.TermFlag & TF_ALTSCR) == 0)
+	      resp = 4;
+	    else if (AltScr)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 59:	// DECKKDM
+	    if (ts.Language!=IdJapanese)
+	      resp = 0;
+	    else if ((ts.KanjiCode == IdJIS) && (!ts.JIS7Katakana))
+	      resp = 4;
+	    else
+	      resp = 3;
+	    break;
+	  case 66:	// DECNKM
+	    if (AppliKeyMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 67:	// DECBKM
+	    if (ts.BSKey==IdBS)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case  1000:	// XT_MSE_X11
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportMode == IdMouseTrackVT200)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1001:	// XT_MSE_HL
+#if 0
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportMode == IdMouseTrackVT200Hl)
+	      resp = 1;
+	    else
+	      resp = 2;
+#else
+	    resp = 4;
+#endif
+	    break;
+	  case 1002:	// XT_MSE_BTN
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportMode == IdMouseTrackBtnEvent)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1003:	// XT_MSE_ANY
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportMode == IdMouseTrackAllEvent)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1004:	// XT_MSE_WIN
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (FocusReportMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1005:	// XT_MSE_UTF
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportExtMode == IdMouseTrackExtUTF8)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1006:	// XT_MSE_SGR
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportExtMode == IdMouseTrackExtSGR)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1015:	// urxvt-style extended mouse tracking
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportExtMode == IdMouseTrackExtURXVT)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1047:	// XT_ALTS_47
+	    if ((ts.TermFlag & TF_ALTSCR) == 0)
+	      resp = 4;
+	    else if (AltScr)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 1048:
+	    if ((ts.TermFlag & TF_ALTSCR) == 0)
+	      resp = 4;
+	    else
+	      resp = 1;
+	    break;
+	  case 1049:	// XT_EXTSCRN
+	    if ((ts.TermFlag & TF_ALTSCR) == 0)
+	      resp = 4;
+	    else if (AltScr)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 2004:	// RL_BRACKET
+	    if (BracketedPaste)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 7727:	// MinTTY Application Escape Mode
+	    if (AppliEscapeMode)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 7786:	// MinTTY Mousewheel reporting
+	    if (!ts.TranslateWheelToCursor)
+	      resp = 4;
+	    else if (AcceptWheelToCursor)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 14001:	// NetTerm Mouse Reporting (TT)
+	    if (!ts.MouseEventTracking)
+	      resp = 4;
+	    else if (MouseReportMode == IdMouseTrackNetTerm)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	}
+	break;
+    }
+
+    len = _snprintf_s(buff, sizeof(buff), _TRUNCATE, "%s%d;%d$y", pp, Param[1], resp);
+    SendCSIstr(buff, len);
+  }
+
   void CSDol(BYTE b)
   {
     TCharAttr attr, mask;
@@ -2875,6 +3156,9 @@ void CSSetAttr()		// SGR
     mask = DefCharAttr;
 
     switch (b) {
+      case 'p': // DECRQM
+	CSDolRequestMode();
+	break;
       case 'r': // DECCARA
       case 't': // DECRARA
 	if (Param[1] < 1 || NParam < 1) Param[1] = 1;
@@ -2998,6 +3282,15 @@ void CSSetAttr()		// SGR
 	  HideStatusLine();
 	else if ((StatusLine==0) && (Param[1]==2))
 	  ShowStatusLine(1); // show
+	break;
+    }
+  }
+
+  void CSQDol(BYTE b)
+  {
+    switch (b) {
+      case 'p':
+	CSDolRequestMode();
 	break;
     }
   }
@@ -3244,6 +3537,11 @@ void ParseCS(BYTE b) /* b is the final char */
 			  case '"': CSDouble(b); break; /* intermediate char = '"' */
 			  case '$': CSDol(b); break;    /* intermediate char = '$' */
 			  case '\'': CSQuote(b); break; /* intermediate char = '\'' */
+			}
+			break; /* end of case Prv=0 */
+		  case '?':
+			switch (IntChar[1]) {
+			  case '$': CSQDol(b); break;    /* intermediate char = '$' */
 			}
 			break; /* end of case Prv=0 */
 		} /* end of switch (Prv) */
