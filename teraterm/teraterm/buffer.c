@@ -782,6 +782,11 @@ void BuffDeleteChars(int Count)
 // Delete characters in current line from cursor
 //   Count: number of characters to be deleted
 {
+	int MoveLen;
+
+	if (CursorX < CursorLeftM || CursorX > CursorRightM)
+		return;
+
 	NewLine(PageStart+CursorY);
 
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
@@ -789,26 +794,25 @@ void BuffDeleteChars(int Count)
 		EraseKanji(1); /* if cursor on right half... */
 	}
 
-	if (Count > NumOfColumns-CursorX) {
-		Count = NumOfColumns-CursorX;
-	}
-	memmove(&(CodeLine[CursorX]),&(CodeLine[CursorX+Count]),
-	        NumOfColumns-Count-CursorX);
-	memmove(&(AttrLine[CursorX]),&(AttrLine[CursorX+Count]),
-	        NumOfColumns-Count-CursorX);
-	memmove(&(AttrLine2[CursorX]),&(AttrLine2[CursorX+Count]),
-	        NumOfColumns-Count-CursorX);
-	memmove(&(AttrLineFG[CursorX]),&(AttrLineFG[CursorX+Count]),
-	        NumOfColumns-Count-CursorX);
-	memmove(&(AttrLineBG[CursorX]),&(AttrLineBG[CursorX+Count]),
-	        NumOfColumns-Count-CursorX);
-	memset(&(CodeLine[NumOfColumns-Count]),0x20,Count);
-	memset(&(AttrLine[NumOfColumns-Count]),AttrDefault,Count);
-	memset(&(AttrLine2[NumOfColumns-Count]),CurCharAttr.Attr2 & Attr2ColorMask, Count);
-	memset(&(AttrLineFG[NumOfColumns-Count]),CurCharAttr.Fore,Count);
-	memset(&(AttrLineBG[NumOfColumns-Count]),CurCharAttr.Back,Count);
+	if (Count > CursorRightM + 1 - CursorX)
+		Count = CursorRightM + 1 - CursorX;
 
-	BuffUpdateRect(CursorX,CursorY,WinOrgX+WinWidth-1,CursorY);
+	MoveLen = CursorRightM + 1 - CursorX - Count;
+
+	if (MoveLen > 0) {
+		memmove(&(CodeLine[CursorX]), &(CodeLine[CursorX+Count]), MoveLen);
+		memmove(&(AttrLine[CursorX]), &(AttrLine[CursorX+Count]), MoveLen);
+		memmove(&(AttrLine2[CursorX]), &(AttrLine2[CursorX+Count]), MoveLen);
+		memmove(&(AttrLineFG[CursorX]), &(AttrLineFG[CursorX+Count]), MoveLen);
+		memmove(&(AttrLineBG[CursorX]), &(AttrLineBG[CursorX+Count]), MoveLen);
+	}
+	memset(&(CodeLine[CursorX + MoveLen]), 0x20, Count);
+	memset(&(AttrLine[CursorX + MoveLen]), AttrDefault, Count);
+	memset(&(AttrLine2[CursorX + MoveLen]), CurCharAttr.Attr2 & Attr2ColorMask, Count);
+	memset(&(AttrLineFG[CursorX + MoveLen]), CurCharAttr.Fore, Count);
+	memset(&(AttrLineBG[CursorX + MoveLen]), CurCharAttr.Back, Count);
+
+	BuffUpdateRect(CursorX, CursorY, CursorRightM, CursorY);
 }
 
 void BuffEraseChars(int Count)

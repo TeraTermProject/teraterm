@@ -1440,7 +1440,7 @@ void EscapeSequence(BYTE b)
   JustAfterESC = FALSE;
 }
 
-  void CSInsertCharacter()
+  void CSInsertCharacter()		// ICH
   {
   // Insert space characters at cursor
     int Count;
@@ -1627,7 +1627,7 @@ void CSQSelScreenErase()
     BuffDeleteLines(Count,YEnd);
   }
 
-  void CSDeleteCharacter()
+  void CSDeleteCharacter()		// DCH
   {
   // Delete characters in current line from cursor
 
@@ -1636,7 +1636,7 @@ void CSQSelScreenErase()
     BuffDeleteChars(Param[1]);
   }
 
-  void CSEraseCharacter()
+  void CSEraseCharacter()		// ECH
   {
     if (Param[1]<1) Param[1] = 1;
     BuffUpdateScroll();
