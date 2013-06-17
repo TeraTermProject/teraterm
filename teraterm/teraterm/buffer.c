@@ -561,22 +561,20 @@ void BuffInsertSpace(int Count)
 // Insert space characters at the current position
 //   Count: Number of characters to be inserted
 {
-	int LineEnd, MoveLen;
+	int MoveLen;
+
+	if (CursorX < CursorLeftM || CursorX > CursorRightM)
+		return;
 
 	NewLine(PageStart+CursorY);
 
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8)
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 
-	if (CursorX > CursorRightM)
-		LineEnd = NumOfColumns - 1;
-	else
-		LineEnd = CursorRightM;
+	if (Count > CursorRightM + 1 - CursorX)
+		Count = CursorRightM + 1 - CursorX;
 
-	if (Count > LineEnd - CursorX)
-		Count = LineEnd + 1 - CursorX;
-
-	MoveLen = LineEnd + 1 - CursorX - Count;
+	MoveLen = CursorRightM + 1 - CursorX - Count;
 
 	if (MoveLen > 0) {
 		memmove(&(CodeLine[CursorX+Count]), &(CodeLine[CursorX]), MoveLen);
@@ -591,15 +589,15 @@ void BuffInsertSpace(int Count)
 	memset(&(AttrLineFG[CursorX]), CurCharAttr.Fore, Count);
 	memset(&(AttrLineBG[CursorX]), CurCharAttr.Back, Count);
 	/* last char in current line is kanji first? */
-	if ((AttrLine[LineEnd] & AttrKanji) != 0) {
+	if ((AttrLine[CursorRightM] & AttrKanji) != 0) {
 		/* then delete it */
-		CodeLine[LineEnd] = 0x20;
-		AttrLine[LineEnd] = AttrDefault;
-		AttrLine2[LineEnd] = CurCharAttr.Attr2;
-		AttrLineFG[LineEnd] = CurCharAttr.Fore;
-		AttrLineBG[LineEnd] = CurCharAttr.Back;
+		CodeLine[CursorRightM] = 0x20;
+		AttrLine[CursorRightM] = AttrDefault;
+		AttrLine2[CursorRightM] = CurCharAttr.Attr2;
+		AttrLineFG[CursorRightM] = CurCharAttr.Fore;
+		AttrLineBG[CursorRightM] = CurCharAttr.Back;
 	}
-	BuffUpdateRect(CursorX, CursorY, LineEnd, CursorY);
+	BuffUpdateRect(CursorX, CursorY, CursorRightM, CursorY);
 }
 
 void BuffEraseCurToEnd()
