@@ -69,6 +69,7 @@ static BOOL LFMode;
 static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
 static BOOL AltScr;
+static BOOL LRMarginMode;
 BOOL BracketedPaste;
 
 static int VTlevel;
@@ -290,6 +291,9 @@ void ResetTerminal() /*reset variables but don't update screen */
   // Alternate Screen Buffer
   AltScr = FALSE;
 
+  // Left/Right Margin Mode
+  LRMarginMode = FALSE;
+
   // Bracketed Paste Mode
   BracketedPaste = FALSE;
 
@@ -387,8 +391,7 @@ void MoveToStatusLine()
 
 void HideStatusLine()
 {
-  if ((StatusLine>0) &&
-      (CursorY==NumOfLines-1))
+  if (isCursorOnStatusLine)
     MoveToMainScreen();
   StatusX = 0;
   StatusWrap = FALSE;
@@ -481,24 +484,16 @@ void SendDCSstr(char *str, int len) {
 
 void BackSpace()
 {
-  if (CursorX == 0)
-  {
-    if ((CursorY>0) &&
-	((ts.TermFlag & TF_BACKWRAP)!=0))
-    {
-      MoveCursor(NumOfColumns-1,CursorY-1);
-//      if (cv.HLogBuf!=0) Log1Byte(BS);
-// (2005.2.20 yutaka)
-	  if (cv.HLogBuf!=0 && !ts.LogTypePlainText) Log1Byte(BS);
-    }
-  }
-  else if (CursorX > 0)
-  {
-    MoveCursor(CursorX-1,CursorY);
-//    if (cv.HLogBuf!=0) Log1Byte(BS);
-// (2005.2.20 yutaka)
-	  if (cv.HLogBuf!=0 && !ts.LogTypePlainText) Log1Byte(BS);
-  }
+	if (CursorX == CursorLeftM || CursorX == 0) {
+		if (CursorY > 0 && (ts.TermFlag & TF_BACKWRAP)) {
+			MoveCursor(CursorRightM, CursorY-1);
+			if (cv.HLogBuf!=0 && !ts.LogTypePlainText) Log1Byte(BS);
+		}
+	}
+	else if (CursorX > 0) {
+		MoveCursor(CursorX-1, CursorY);
+		if (cv.HLogBuf!=0 && !ts.LogTypePlainText) Log1Byte(BS);
+	}
 }
 
 void CarriageReturn(BOOL logFlag)
@@ -508,8 +503,10 @@ void CarriageReturn(BOOL logFlag)
 #endif /* NO_COPYLINE_FIX */
         if (cv.HLogBuf!=0) Log1Byte(CR);
 
-	if (CursorX>0)
-		MoveCursor(0,CursorY);
+	if (RelativeOrgMode || CursorX > CursorLeftM)
+		MoveCursor(CursorLeftM, CursorY);
+	else if (CursorX < CursorLeftM)
+		MoveCursor(0, CursorY);
 }
 
 void LineFeed(BYTE b, BOOL logFlag)
@@ -620,11 +617,12 @@ void PutChar(BYTE b)
 
   BuffPutChar(b, CharAttrTmp, InsertMode);
 
-  if (CursorX < NumOfColumns-1)
-    MoveRight();
-  else {
+  if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
     UpdateStr();
     Wrap = AutoWrapMode;
+  }
+  else {
+    MoveRight();
   }
 }
 
@@ -666,16 +664,18 @@ void PutDecSp(BYTE b)
   CharAttrTmp.Attr |= AttrSpecial;
   BuffPutChar(b, CharAttrTmp, InsertMode);
 
-  if (CursorX < NumOfColumns-1)
-    MoveRight();
-  else {
+  if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
     UpdateStr();
     Wrap = AutoWrapMode;
+  }
+  else {
+    MoveRight();
   }
 }
 
 void PutKanji(BYTE b)
 {
+  int LineEnd;
 #ifndef NO_COPYLINE_FIX
   TCharAttr CharAttrTmp;
 
@@ -699,6 +699,11 @@ void PutKanji(BYTE b)
     return;
   }
 
+  if (CursorX > CursorRightM)
+    LineEnd = NumOfColumns - 1;
+  else
+    LineEnd = CursorRightM;
+
   if (Wrap)
   {
     CarriageReturn(FALSE);
@@ -708,21 +713,24 @@ void PutKanji(BYTE b)
       CharAttrTmp.Attr |= AttrLineContinued;
 #endif /* NO_COPYLINE_FIX */
   }
-  else if (CursorX > NumOfColumns-2)
+  else if (CursorX > LineEnd - 1) {
     if (AutoWrapMode)
     {
 #ifndef NO_COPYLINE_FIX
       if (ts.EnableContinuedLineCopy)
       {
       CharAttrTmp.Attr |= AttrLineContinued;
-      if (CursorX == NumOfColumns-1)
+      if (CursorX == LineEnd)
 	BuffPutChar(0x20, CharAttr, FALSE);
       }
 #endif /* NO_COPYLINE_FIX */
       CarriageReturn(FALSE);
       LineFeed(LF,FALSE);
     }
-    else return;
+    else {
+      return;
+    }
+  }
 
   Wrap = FALSE;
 
@@ -744,8 +752,7 @@ void PutKanji(BYTE b)
   BuffPutKanji(Kanji, CharAttr, InsertMode);
 #endif /* NO_COPYLINE_FIX */
 
-  if (CursorX < NumOfColumns-2)
-  {
+  if (CursorX < LineEnd - 1) {
     MoveRight();
     MoveRight();
   }
@@ -1032,8 +1039,7 @@ void SaveCursor()
   int i;
   PStatusBuff Buff;
 
-  if ((StatusLine>0) &&
-      (CursorY==NumOfLines-1))
+  if (isCursorOnStatusLine)
     Buff = &SBuff2; // for status line
   else if (AltScr) 
     Buff = &SBuff3; // for alternate screen
@@ -1057,8 +1063,7 @@ void  RestoreCursor()
   PStatusBuff Buff;
   UpdateStr();
 
-  if ((StatusLine>0) &&
-      (CursorY==NumOfLines-1))
+  if (isCursorOnStatusLine)
     Buff = &SBuff2; // for status line
   else if (AltScr) 
     Buff = &SBuff3; // for alternate screen
@@ -1153,6 +1158,8 @@ void ESCSharp(BYTE b)
       BuffFillWithE();
       CursorTop = 0;
       CursorBottom = NumOfLines-1-StatusLine;
+      CursorLeftM = 0;
+      CursorRightM = NumOfColumns - 1;
       MoveCursor(0,0);
       ParseMode = ModeFirst;
       break;
@@ -1465,7 +1472,7 @@ void EscapeSequence(BYTE b)
 
   void CSCursorUp1()
   {
-    MoveCursor(0,CursorY);
+    MoveCursor(CursorLeftM, CursorY);
     CSCursorUp();
   }
 
@@ -1490,7 +1497,7 @@ void EscapeSequence(BYTE b)
 
   void CSCursorDown1()
   {
-    MoveCursor(0,CursorY);
+    MoveCursor(CursorLeftM, CursorY);
     CSCursorDown();
   }
 
@@ -1636,7 +1643,7 @@ void CSQSelScreenErase()
     BuffEraseChars(Param[1]);
   }
 
-  void CSScrollUP()
+  void CSScrollUp()
   {
     if (Param[1]<1) Param[1] = 1;
     BuffUpdateScroll();
@@ -1662,31 +1669,62 @@ void CSQSelScreenErase()
     CursorBackwardTab(Param[1]);
   }
 
-  void CSMoveToColumnN()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    Param[1]--;
-    if (Param[1] > NumOfColumns-1) Param[1] = NumOfColumns-1;
-    MoveCursor(Param[1],CursorY);
-  }
+void CSMoveToColumnN()		// CHA / HPA
+{
+	if (Param[1]<1)
+		Param[1] = 1;
+	else if (Param[1] > NumOfColumns-1)
+		Param[1] = NumOfColumns-1;
 
-  void CSCursorRight()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    if (CursorX + Param[1] > NumOfColumns-1)
-      MoveCursor(NumOfColumns-1,CursorY);
-    else
-      MoveCursor(CursorX+Param[1],CursorY);
-  }
+	Param[1]--;
 
-  void CSCursorLeft()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    if (CursorX-Param[1] < 0)
-      MoveCursor(0,CursorY);
-    else
-      MoveCursor(CursorX-Param[1],CursorY);
-  }
+	if (RelativeOrgMode) {
+		if (CursorLeftM + Param[1] > CursorRightM )
+			MoveCursor(CursorRightM, CursorY);
+		else
+			MoveCursor(CursorLeftM + Param[1], CursorY);
+	}
+	else {
+		MoveCursor(Param[1], CursorY);
+	}
+}
+
+void CSCursorRight()		// CUF / HPR
+{
+	int NewX;
+
+	if (Param[1] < 1)
+		Param[1] = 1;
+	else if (Param[1] > NumOfColumns - 1)
+		Param[1] = NumOfColumns - 1;
+
+	NewX = CursorX + Param[1];
+
+	if (CursorX <= CursorRightM && NewX > CursorRightM)
+		NewX = CursorRightM;
+	else if (NewX > NumOfColumns-1)
+		NewX = NumOfColumns-1;
+
+	MoveCursor(NewX, CursorY);
+}
+
+void CSCursorLeft()		// CUB / HPB
+{
+	int NewX;
+
+	if (Param[1] < 1)
+		Param[1] = 1;
+
+	if (CursorX < Param[1])
+		NewX = 0;
+	else
+		NewX = CursorX - Param[1];
+
+	if (CursorX >= CursorLeftM && NewX < CursorLeftM)
+		NewX = CursorLeftM;
+
+	MoveCursor(NewX, CursorY);
+}
 
   void CSMoveToLineN()
   {
@@ -1706,29 +1744,42 @@ void CSQSelScreenErase()
     }
   }
 
-  void CSMoveToXY()
-  {
-    int NewX, NewY;
+void CSMoveToXY()		// CUP / HVP
+{
+	int NewX, NewY;
 
-    if (Param[1]<1) Param[1] = 1;
-    if ((NParam < 2) || (Param[2]<1)) Param[2] = 1;
-    NewX = Param[2] - 1;
-    if (NewX > NumOfColumns-1) NewX = NumOfColumns-1;
+	if (Param[1] < 1)
+		Param[1] = 1;
+	else if (Param[1] > NumOfLines-StatusLine)
+		Param[1] = NumOfLines-StatusLine;
 
-    if ((StatusLine>0) && (CursorY==NumOfLines-1))
-      NewY = CursorY;
-    else if (RelativeOrgMode)
-    {
-      NewY = CursorTop + Param[1] - 1;
-      if (NewY > CursorBottom) NewY = CursorBottom;
-    }
-    else {
-      NewY = Param[1] - 1;
-      if (NewY > NumOfLines-1-StatusLine)
-	NewY = NumOfLines-1-StatusLine;
-    }
-    MoveCursor(NewX,NewY);
-  }
+	if ((NParam < 2) || (Param[2]<1))
+		Param[2] = 1;
+	else if (Param[2] > NumOfColumns)
+		Param[2] = NumOfColumns;
+
+	NewY = Param[1] - 1;
+	NewX = Param[2] - 1;
+
+	if (isCursorOnStatusLine)
+		NewY = CursorY;
+	else if (RelativeOrgMode) {
+		NewX += CursorLeftM;
+		if (NewX > CursorRightM)
+			NewX = CursorRightM;
+
+		NewY += CursorTop;
+		if (NewY > CursorBottom)
+			NewY = CursorBottom;
+	}
+	else {
+		NewY = Param[1] - 1;
+		if (NewY > NumOfLines-1-StatusLine)
+			NewY = NumOfLines-1-StatusLine;
+	}
+
+	MoveCursor(NewX, NewY);
+}
 
   void CSDeleteTabStop()
   {
@@ -1836,10 +1887,10 @@ void CSQSelScreenErase()
 	break;
       case 6:
 	/* Cursor Position Report */
-	Y = CursorY+1;
-	if ((StatusLine>0) &&
-	    (Y==NumOfLines))
+	if (isCursorOnStatusLine)
 	  Y = 1;
+	else
+	  Y = CursorY+1;
 	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%u;%uR", CLocale, Y, CursorX+1);
 	SendCSIstr(Report, len);
 	break;
@@ -2135,9 +2186,7 @@ void CSSetAttr()		// SGR
 
   void CSSetScrollRegion()
   {
-    if ((StatusLine>0) &&
-	(CursorY==NumOfLines-1))
-    {
+    if (isCursorOnStatusLine) {
       MoveCursor(0,CursorY);
       return;
     }
@@ -2156,6 +2205,36 @@ void CSSetAttr()		// SGR
     if (RelativeOrgMode) MoveCursor(0,CursorTop);
 		    else MoveCursor(0,0);
   }
+
+void CSSetLRScrollRegion()
+{
+//	if (isCursorOnStatusLine) {
+//		MoveCursor(0,CursorY);
+//		return;
+//	}
+
+	if (Param[1] < 1)
+		Param[1] =1;
+	else if (Param[1] > NumOfColumns)
+		Param[1] = NumOfColumns;
+
+	if (NParam < 2 || Param[2] < 1 || Param[2] > NumOfColumns)
+		Param[2] = NumOfColumns;
+
+	if (Param[1] >= Param[2])
+		return;
+
+	Param[1]--;
+	Param[2]--;
+
+	CursorLeftM = Param[1];
+	CursorRightM = Param[2];
+
+	if (RelativeOrgMode)
+		MoveCursor(CursorLeftM, CursorTop);
+	else
+		MoveCursor(0, 0);
+}
 
   void CSSunSequence() /* Sun terminal private sequences */
   {
@@ -2509,7 +2588,7 @@ void CSSetAttr()		// SGR
 	      CSQExchangeColor(); /* Exchange text/back color */
 	    break;
 	  case 6: // DECOM
-	    if ((StatusLine>0) && (CursorY==NumOfLines-1))
+	    if (isCursorOnStatusLine)
 	      MoveCursor(0,CursorY);
 	    else {
 	      RelativeOrgMode = TRUE;
@@ -2557,6 +2636,7 @@ void CSSetAttr()		// SGR
 	    break;
 	  case 66: AppliKeyMode = TRUE; break;		// DECNKM
 	  case 67: ts.BSKey = IdBS; break;		// DECBKM
+	  case 69: LRMarginMode = TRUE; break;		// DECLRMM (DECVSSM)
 	  case 1000: // Mouse Tracking
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackVT200;
@@ -2671,7 +2751,7 @@ void CSSetAttr()		// SGR
 	      CSQExchangeColor(); /* Exchange text/back color */
 	    break;
 	  case 6: // DECOM
-	    if ((StatusLine>0) && (CursorY==NumOfLines-1))
+	    if (isCursorOnStatusLine)
 	      MoveCursor(0,CursorY);
 	    else {
 	      RelativeOrgMode = FALSE;
@@ -2712,6 +2792,11 @@ void CSSetAttr()		// SGR
 	    break;
 	  case 66: AppliKeyMode = FALSE; break;		// DECNKM
 	  case 67: ts.BSKey = IdDEL; break;		// DECBKM
+	  case 69: // DECLRMM (DECVSSM)
+	    LRMarginMode = FALSE;
+	    CursorLeftM = 0;
+	    CursorRightM = NumOfColumns - 1;
+	    break;
 	  case 1000: // Mouse Tracking
 	  case 1001: // Hilite Mouse Tracking
 	  case 1002: // Button-Event Mouse Tracking
@@ -2796,11 +2881,12 @@ void CSSetAttr()		// SGR
     AppliCursorMode = FALSE;
     AppliEscapeMode = FALSE;
     AcceptWheelToCursor = ts.TranslateWheelToCursor;
-    if ((StatusLine>0) &&
-	(CursorY == NumOfLines-1))
+    if (isCursorOnStatusLine)
       MoveToMainScreen();
     CursorTop = 0;
     CursorBottom = NumOfLines-1-StatusLine;
+    CursorLeftM = 0;
+    CursorRightM = NumOfColumns - 1;
     ResetCharSet();
 
     /* Attribute */
@@ -3486,7 +3572,7 @@ void ParseCS(BYTE b) /* b is the final char */
 			  case 'P': CSDeleteCharacter(); break;   // DCH
 //			  case 'Q': break;                        // SEE  -- Not support
 //			  case 'R': break;                        // CPR  -- Report only, ignore.
-			  case 'S': CSScrollUP(); break;          // SU
+			  case 'S': CSScrollUp(); break;          // SU
 			  case 'T': CSScrollDown(); break;        // SD
 //			  case 'U': break;                        // NP   -- Not support
 //			  case 'V': break;                        // PP   -- Not support
@@ -3517,7 +3603,12 @@ void ParseCS(BYTE b) /* b is the final char */
 
 			// Private Sequence
 			  case 'r': CSSetScrollRegion(); break;   // DECSTBM
-			  case 's': SaveCursor(); break;          // SCP (Save cursor (ANSI.SYS/SCO?))
+			  case 's':
+			    if (LRMarginMode)
+			      CSSetLRScrollRegion();              // DECSLRM
+			    else
+			      SaveCursor();                       // SCP (Save cursor (ANSI.SYS/SCO?))
+			    break;
 			  case 't': CSSunSequence(); break;       // DECSLPP / Window manipulation(dtterm?)
 			  case 'u': RestoreCursor(); break;       // RCP (Restore cursor (ANSI.SYS/SCO))
 			}

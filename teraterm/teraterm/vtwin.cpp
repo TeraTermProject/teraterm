@@ -4147,7 +4147,7 @@ void CVTWindow::OnEditClearScreen()
 {
 	LockBuffer();
 	BuffClearScreen();
-	if ((StatusLine>0) && (CursorY==NumOfLines-1)) {
+	if (isCursorOnStatusLine) {
 		MoveCursor(0,CursorY);
 	}
 	else {

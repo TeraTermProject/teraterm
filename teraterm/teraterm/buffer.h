@@ -85,9 +85,11 @@ int BuffGetCurrentLineData(char *buf, int bufsize);
 BOOL BuffCheckMouseOnURL(int Xw, int Yw);
 
 extern int StatusLine;
-extern int CursorTop, CursorBottom;
+extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
 extern BOOL Selected;
 extern BOOL Wrap;
+
+#define isCursorOnStatusLine (StatusLine && CursorY == NumOfColumns-1)
 
 #ifdef __cplusplus
 }
