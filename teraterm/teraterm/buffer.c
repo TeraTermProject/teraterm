@@ -3240,21 +3240,26 @@ void SetTabStop()
 }
 
 void CursorForwardTab(int count, BOOL AutoWrapMode) {
-	int i;
+	int i, LineEnd;
 	BOOL WrapState;
 
 	WrapState = Wrap;
+
+	if (CursorX > CursorRightM || CursorY < CursorTop || CursorY > CursorBottom)
+		LineEnd = NumOfColumns - 1;
+	else
+		LineEnd = CursorRightM;
 
 	for (i=0; i<NTabStops && TabStops[i] <= CursorX; i++)
 		;
 
 	i += count - 1;
 
-	if (i < NTabStops) {
+	if (i < NTabStops && TabStops[i] <= LineEnd) {
 		MoveCursor(TabStops[i], CursorY);
 	}
 	else {
-		MoveCursor(NumOfColumns-1, CursorY);
+		MoveCursor(LineEnd, CursorY);
 		if (!ts.VTCompatTab) {
 			Wrap = AutoWrapMode;
 		}
@@ -3265,13 +3270,18 @@ void CursorForwardTab(int count, BOOL AutoWrapMode) {
 }
 
 void CursorBackwardTab(int count) {
-	int i;
+	int i, LineStart;
+
+	if (CursorX < CursorLeftM || CursorY < CursorTop || CursorY > CursorBottom)
+		LineStart = 0;
+	else
+		LineStart = CursorLeftM;
 
 	for (i=0; i<NTabStops && TabStops[i] < CursorX; i++)
 		;
 
-	if (i < count) {
-		MoveCursor(0, CursorY);
+	if (i < count || TabStops[i-count] < LineStart) {
+		MoveCursor(LineStart, CursorY);
 	}
 	else {
 		MoveCursor(TabStops[i-count], CursorY);
