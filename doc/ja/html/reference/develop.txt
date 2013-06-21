@@ -5,9 +5,16 @@
   Visual Studio 2005 SP1 (Standard Edition 以上)
     注: Visual Studio 2008 (Standard Edition 以上) でコンパイルした実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
     注2: Visual Studio 2010 (Professional Edition 以上)でコンパイルした実行ファイルは Windows 2000, NT 4.0, 95, 98, Me で動きません。
+    注3: Visual Studio 2012 (Professional Edition 以上)でコンパイルした実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
+         また、下記のオプション変更が必要です。
+           - プロジェクト -> プロパティ -> 構成プロパティ -> リンカ― -> 詳細設定 ->  "安全な例外ハンドラーを含むイメージ"(/SAFESEH を外す)
+           - プロジェクトのプロパティ -> 構成プロパティ -> マニフェストツール -> 入力と出力 -> 埋め込みマニフェストを”いいえ”に設定する
+           - imagehlp.libをリンクする
+    
   Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
     注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
     注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
+
 - インストーラ
   Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 以上で作成したインストーラは Windows NT 4.0, 9x をサポートしないので不可)
   Inno Setup Preprocessor (ispack-5.4.3 より)
