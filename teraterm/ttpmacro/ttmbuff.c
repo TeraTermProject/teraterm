@@ -188,6 +188,7 @@ BOOL GetRawLine()
 	}
 	LinePtr = 0;
 	LineLen = strlen(LineBuff);
+	LineParsePtr = 0;
 
 	// current line number (2005.7.18 yutaka)
 	LineNo = getCurrentLineNumber(Buff[INest], BuffPtr[INest]); 

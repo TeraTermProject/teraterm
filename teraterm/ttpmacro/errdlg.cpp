@@ -15,6 +15,7 @@
 
 #include "errdlg.h"
 #include "ttmlib.h"
+#include "ttmparse.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -23,7 +24,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // CErrDlg dialog
-CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y)
+CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end)
 	: CDialog(CErrDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CErrDlg)
@@ -32,6 +33,9 @@ CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y)
 	LineStr = Line;
 	PosX = x;
 	PosY = y;
+	LineNo = lineno;
+	StartPos = start;
+	EndPos = end;
 }
 
 BEGIN_MESSAGE_MAP(CErrDlg, CDialog)
@@ -49,6 +53,8 @@ BOOL CErrDlg::OnInitDialog()
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+	char buf[MaxLineLen*2], buf2[10];
+	int i, len;
 
 	CDialog::OnInitDialog();
 	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
@@ -71,7 +77,24 @@ BOOL CErrDlg::OnInitDialog()
 	SetDlgItemText(IDC_MACROERRHELP, uimsg);
 
 	SetDlgItemText(IDC_ERRMSG,MsgStr);
-	SetDlgItemText(IDC_ERRLINE,LineStr);
+
+	// 行番号を先頭につける。
+	// TODO: ファイル名もつけたい。
+	// エラー箇所に印をつける。
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:", LineNo);
+	len = strlen(LineStr);
+	for (i = 0 ; i < len ; i++) {
+		if (i == StartPos)
+			strncat_s(buf, sizeof(buf), "<<<", _TRUNCATE);
+		if (i == EndPos)
+			strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
+		buf2[0] = LineStr[i];
+		buf2[1] = 0;
+		strncat_s(buf, sizeof(buf), buf2, _TRUNCATE);
+	}
+	if (EndPos == len)
+		strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
+	SetDlgItemText(IDC_ERRLINE, buf);
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		GetWindowRect(&R);

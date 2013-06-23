@@ -67,7 +67,7 @@ CAPTION "MACRO: Error"
 FONT 14, "System", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_ERRMSG,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,20,4,141,8
-    CONTROL         "",IDC_ERRLINE,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,20,16,130,8
+    CONTROL         "",IDC_ERRLINE,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,20,16,197,8
     DEFPUSHBUTTON   "&Stop macro",IDOK,27,28,54,14
     PUSHBUTTON      "&Continue",IDCANCEL,92,28,54,14
     PUSHBUTTON      "&Help",IDC_MACROERRHELP,157,28,54,14
@@ -179,4 +179,14 @@ IDI_TTMACRO             ICON                    "ttmacro.ico"
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
 

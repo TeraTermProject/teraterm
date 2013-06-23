@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include "ttmdlg.h"
 #include "ttmparse.h"
+#include "ttmbuff.h"
 
 /* C言語スタイルのコメントをサポートするかどうか (2009.7.2 yutaka) */
 #define SUPPORT_C_STYLE_COMMENT
@@ -19,6 +20,7 @@ WORD TTLStatus = 0;
 char LineBuff[MaxLineLen]; // 行バッファのサイズを拡張した。(2007.6.9 maya)
 WORD LinePtr;
 WORD LineLen;
+WORD LineParsePtr;  // トークンの解析を開始した位置 (2013.6.23 yutaka)
 
 typedef struct {
     int size;
@@ -58,6 +60,14 @@ static PCHAR NameBuff;
 static HANDLE HStrBuff;
 static PCHAR StrBuff;
 static WORD IntVarCount, StrVarCount, LabVarCount, IntAryVarCount, StrAryVarCount;
+
+
+// トークンの解析開始位置を更新する。
+static void UpdateLineParsePtr(void)
+{
+	LineParsePtr = LinePtr;
+}
+
 
 BOOL InitVar()
 {
@@ -112,7 +122,7 @@ void DispErr(WORD Err)
 		case ErrNotSupported: strncpy_s(Msg, sizeof(Msg), "Unknown command.", _TRUNCATE); break;
 	}
 
-	i = OpenErrDlg(Msg,LineBuff);
+	i = OpenErrDlg(Msg, LineBuff, GetLineNo(), LineParsePtr, LinePtr);
 	if (i==IDOK) TTLStatus = IdTTLEnd;
 }
 

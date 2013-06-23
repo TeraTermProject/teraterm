@@ -334,6 +334,7 @@ extern WORD TTLStatus;
 extern char LineBuff[MaxLineLen];
 extern WORD LinePtr;
 extern WORD LineLen;
+extern WORD LineParsePtr;
 
 #ifdef __cplusplus
 }
