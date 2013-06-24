@@ -729,6 +729,10 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="logautoclosemode">
+					<param name="Local" value="html\macro\command\logautoclosemode.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logclose">
 					<param name="Local" value="html\macro\command\logclose.html">
 					<param name="ImageNumber" value="11">
