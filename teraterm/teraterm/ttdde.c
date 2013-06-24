@@ -55,6 +55,8 @@ static WORD ParamAppendFlag;
 static WORD ParamXmodemOpt;
 static char ParamSecondFileName[MaxStrLen];
 
+static BOOL AutoLogClose = FALSE;
+
 #define CBBufSize TermWidthMax
 
 
@@ -368,6 +370,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdDispStr      'U'
 #define CmdLogInfo      'V'
 #define CmdLogRotate    'W'
+#define CmdLogAutoClose 'X'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -558,6 +561,10 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 				LogVar->RotateStep = 0;
 			}
 		}
+		break;
+
+	case CmdLogAutoClose:
+		AutoLogClose = (ParamBinaryFlag!=0);
 		break;
 
 	case CmdLogClose:
@@ -1040,6 +1047,10 @@ HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 			}
 			break;
 		case XTYP_DISCONNECT:
+			// マクロ終了時、ログ採取を自動的に停止する。(2013.6.24 yutaka)
+			if (AutoLogClose) {
+				if (LogVar != NULL) FileTransEnd(OpLog);
+			}
 			ConvH = 0;
 			PostMessage(HVTWin,WM_USER_DDEEND,0,0);
 			break;

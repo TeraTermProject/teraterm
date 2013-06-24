@@ -5860,6 +5860,8 @@ int ExecCmnd()
 			Err = TTLListBox(); break;
 		case RsvLoadKeyMap:
 			Err = TTLCommCmdFile(CmdLoadKeyMap,0); break;
+		case RsvLogAutoClose:
+			Err = TTLCommCmdBin(CmdLogAutoClose, 0); break;
 		case RsvLogClose:
 			Err = TTLCommCmd(CmdLogClose,0); break;
 		case RsvLogInfo:
