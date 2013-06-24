@@ -96,6 +96,7 @@ void DispErr(WORD Err)
 {
 	char Msg[41];
 	int i;
+	int no, start, end;
 
 	strncpy_s(Msg, sizeof(Msg), "Unknown error message number.", _TRUNCATE);
 
@@ -122,7 +123,13 @@ void DispErr(WORD Err)
 		case ErrNotSupported: strncpy_s(Msg, sizeof(Msg), "Unknown command.", _TRUNCATE); break;
 	}
 
-	i = OpenErrDlg(Msg, LineBuff, GetLineNo(), LineParsePtr, LinePtr);
+	no = GetLineNo();
+	start = LineParsePtr;
+	end = LinePtr;
+	if (start == end)
+		end = LineLen;
+
+	i = OpenErrDlg(Msg, LineBuff, no, start, end);
 	if (i==IDOK) TTLStatus = IdTTLEnd;
 }
 
@@ -1601,6 +1608,8 @@ void GetIntVal(int far *Val, LPWORD Err)
 {
 	WORD ValType;
 
+	UpdateLineParsePtr();
+
 	if (*Err != 0) return;
 	if (! GetExpression(&ValType,Val,Err))
 	{
@@ -1670,6 +1679,7 @@ void GetIntVar(PVarId VarId, LPWORD Err)
 
 void GetStrVal(PCHAR Str, LPWORD Err)
 {
+	UpdateLineParsePtr();
 	GetStrVal2(Str, Err, FALSE);
 }
 
