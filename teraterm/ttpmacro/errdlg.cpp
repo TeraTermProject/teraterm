@@ -81,7 +81,7 @@ BOOL CErrDlg::OnInitDialog()
 	// 行番号を先頭につける。
 	// TODO: ファイル名もつけたい。
 	// エラー箇所に印をつける。
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:", LineNo);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d:", LineNo);
 	len = strlen(LineStr);
 	for (i = 0 ; i < len ; i++) {
 		if (i == StartPos)
