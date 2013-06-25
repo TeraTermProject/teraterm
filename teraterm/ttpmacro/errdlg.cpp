@@ -82,7 +82,10 @@ BOOL CErrDlg::OnInitDialog()
 	// TODO: ファイル名もつけたい。
 	// エラー箇所に印をつける。
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d:", LineNo);
+	SetDlgItemText(IDC_ERRLINE, buf);
+
 	len = strlen(LineStr);
+	buf[0] = 0;
 	for (i = 0 ; i < len ; i++) {
 		if (i == StartPos)
 			strncat_s(buf, sizeof(buf), "<<<", _TRUNCATE);
@@ -94,7 +97,7 @@ BOOL CErrDlg::OnInitDialog()
 	}
 	if (EndPos == len)
 		strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
-	SetDlgItemText(IDC_ERRLINE, buf);
+	SetDlgItemText(IDC_EDIT_ERRLINE, buf);
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {
 		GetWindowRect(&R);
