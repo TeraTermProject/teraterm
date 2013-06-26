@@ -1878,7 +1878,7 @@ void CSMoveToXY()		// CUP / HVP
   void CS_n_Mode()		// DSR
   {
     char Report[16];
-    int Y, len;
+    int X, Y, len;
 
     switch (Param[1]) {
       case 5:
@@ -1887,11 +1887,19 @@ void CSMoveToXY()		// CUP / HVP
 	break;
       case 6:
 	/* Cursor Position Report */
-	if (isCursorOnStatusLine)
+	if (isCursorOnStatusLine) {
+	  X = CursorX + 1;
 	  Y = 1;
-	else
+	}
+	else if (RelativeOrgMode) {
+	  X = CursorX - CursorLeftM + 1;
+	  Y = CursorY - CursorTop + 1;
+	}
+	else {
+	  X = CursorX + 1;
 	  Y = CursorY+1;
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%u;%uR", CLocale, Y, CursorX+1);
+	}
+	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%u;%uR", CLocale, Y, X);
 	SendCSIstr(Report, len);
 	break;
     }
