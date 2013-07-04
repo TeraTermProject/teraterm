@@ -1167,7 +1167,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
 		                  "Port \"%s\" is not a valid port number.\n"
 		                  "Either choose a port name from the list, or enter a number between 1 and 65535.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg, new_spec.to_port_name);
+		            pvar->ts->UIMsg, new_spec.from_port_name);
 		notify_nonfatal_error(pvar, buf);
 		return FALSE;
 	}
