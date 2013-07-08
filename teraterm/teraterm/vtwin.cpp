@@ -78,6 +78,8 @@ static HFONT DlgCommentFont;
 static BOOL TCPLocalEchoUsed = FALSE;
 static BOOL TCPCRSendUsed = FALSE;
 
+static BOOL IgnoreRelease = FALSE;
+
 // –{‘Ì‚Í addsetting.cpp
 extern mouse_cursor_t MouseCursor[];
 
@@ -2163,7 +2165,10 @@ void CVTWindow::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CVTWindow::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	MouseReport(IdMouseEventBtnUp, IdLeftButton, point.x, point.y);
+	if (IgnoreRelease)
+		IgnoreRelease = FALSE;
+	else
+		MouseReport(IdMouseEventBtnUp, IdLeftButton, point.x, point.y);
 
 	if (! LButton) {
 		return;
@@ -2185,7 +2190,10 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	BOOL mousereport;
 
-	mousereport = MouseReport(IdMouseEventBtnUp, IdMiddleButton, point.x, point.y);
+	if (IgnoreRelease)
+		IgnoreRelease = FALSE;
+	else
+		mousereport = MouseReport(IdMouseEventBtnUp, IdMiddleButton, point.x, point.y);
 
 	if (! MButton) {
 		return;
@@ -2202,11 +2210,13 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 
 int CVTWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 {
-	if ((ts.SelOnActive==0) &&
-	    (nHitTest==HTCLIENT))   //disable mouse event for text selection
+	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT)) { //disable mouse event for text selection
+		IgnoreRelease = TRUE;
 		return MA_ACTIVATEANDEAT; //     when window is activated
-	else
+	}
+	else {
 		return MA_ACTIVATE;
+	}
 }
 
 void CVTWindow::OnMouseMove(UINT nFlags, CPoint point)
@@ -2214,7 +2224,8 @@ void CVTWindow::OnMouseMove(UINT nFlags, CPoint point)
 	int i;
 	BOOL mousereport;
 
-	mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
+	if (!IgnoreRelease)
+		mousereport = MouseReport(IdMouseEventMove, 0, point.x, point.y);
 
 	if (! (LButton || MButton || RButton)) {
 		if (BuffCheckMouseOnURL(point.x, point.y))
@@ -2359,7 +2370,10 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	BOOL mousereport;
 
-	mousereport = MouseReport(IdMouseEventBtnUp, IdRightButton, point.x, point.y);
+	if (IgnoreRelease)
+		IgnoreRelease = FALSE;
+	else
+		mousereport = MouseReport(IdMouseEventBtnUp, IdRightButton, point.x, point.y);
 
 	if (! RButton) {
 		return;
