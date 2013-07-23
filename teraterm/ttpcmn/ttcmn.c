@@ -958,8 +958,6 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 			else
 				get_lang_msg("MENU_WINDOW_SIDEBYSIDE_UNDO", buf, buflen, "&Undo - Side by Side", langFile);
 			AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, buf);
-		} else {
-			RemoveMenu(menu, MF_BYCOMMAND, ID_WINDOW_UNDO);
 		}
 
 	}
