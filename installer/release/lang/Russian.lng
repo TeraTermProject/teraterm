@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Feb 28 2013)
-; Last translated (Russian language) by Ryumik Sergey (Mar 11 2013)
+; Updated by TeraTerm Project (v4.78 May 31 2013)
+; Last translated (Russian language) by Ryumik Sergey (Jul 07 2013)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -20,7 +20,7 @@ MENU_FILE_LOGMETT=&LogMeTT
 MENU_FILE_PRINT=&Печать...\tAlt+P
 MENU_FILE_DISCONNECT=&Разъединение\tAlt+I
 MENU_FILE_EXIT=&Выход\tAlt+Q
-MENU_FILE_EXITALL=Exit &All
+MENU_FILE_EXITALL=Выход полный
 
 MENU_TRANS=&Трансфер
 MENU_TRANS_KERMIT_RCV=&Готовность
@@ -77,13 +77,13 @@ MENU_CONTROL_SHOW_MACRO=&Показать макросы
 MENU_WINDOW=&Окно
 MENU_WINDOW_WINDOW=&Опции
 MENU_WINDOW_MINIMIZEALL=&Свернуть окна
-MENU_WINDOW_CASCADE=&Cascade
-MENU_WINDOW_STACKED=&Stacked
-MENU_WINDOW_SIDEBYSIDE=Side &By Side
+MENU_WINDOW_CASCADE=&Окна каскадом
+MENU_WINDOW_STACKED=Окна &мозаикой
+MENU_WINDOW_SIDEBYSIDE=Окна &сторона к стороне
 MENU_WINDOW_RESTOREALL=&Восстановить окна
-MENU_WINDOW_CASCADE_UNDO=&Undo - Cascade
-MENU_WINDOW_STACKED_UNDO=&Undo - Stacked
-MENU_WINDOW_SIDEBYSIDE_UNDO=&Undo - Side By Side
+MENU_WINDOW_CASCADE_UNDO=&Восстановить окна каскадом
+MENU_WINDOW_STACKED_UNDO=&Восстановить окна мозаикой
+MENU_WINDOW_SIDEBYSIDE_UNDO=&Восстановить окна сторона к стороне
 
 MENU_HELP=&Помощь
 MENU_HELP_INDEX=&Поиск
@@ -231,9 +231,9 @@ DLG_TAB_LOG_EDITOR=&Редактор лог-файла
 DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
 DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла по умолчанию
 DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла
-DLG_TAB_LOG_ROTATE=&Log Rotate
-DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
-IDC_ROTATE_STEP_TEXT=&Rotate
+DLG_TAB_LOG_ROTATE=&Ротация лог-файла
+DLG_TAB_LOG_ROTATE_SIZE_TEXT=Р&азмер
+IDC_ROTATE_STEP_TEXT=&Ротация
 
 
 DLG_TAB_CYGWIN_PATH=&Путь инсталляции Cygwin
