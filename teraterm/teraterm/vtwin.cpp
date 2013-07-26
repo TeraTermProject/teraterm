@@ -562,7 +562,7 @@ CVTWindow::CVTWindow()
 			/* read keycode map from "keyboard.cnf" */
 			tempkm = (PKeyMap)malloc(sizeof(TKeyMap));
 			if (tempkm!=NULL) {
-				strncpy_s(Temp, sizeof(Temp, ts.HomeDir), ts.HomeDir, _TRUNCATE);
+				strncpy_s(Temp, sizeof(Temp), ts.HomeDir, _TRUNCATE);
 				AppendSlash(Temp,sizeof(Temp));
 				strncat_s(Temp,sizeof(Temp),"KEYBOARD.CNF",_TRUNCATE);
 				(*ReadKeyboardCnf)(Temp,tempkm,TRUE);
