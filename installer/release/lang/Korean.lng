@@ -1,4 +1,5 @@
-; Last translated (Korean language) by Daehong Kim (Jlu 25 2013)
+; Updated by TeraTerm Project (Jul 27 2013)
+; Last translated (Korean language) by Daehong Kim (Jul 25 2013)
 
 [Tera Term]
 DLG_SYSTEM_FONT=굴림,10,128
@@ -455,6 +456,9 @@ BTN_YES=예(&Y)
 BTN_NO=아니요(&N)
 BTN_STOP=매크로 정지(&S)
 BTN_CONTINUE=계속(&C)
+
+MSG_MACRO_CONF=MACRO: confirmation
+MSG_MACRO_HALT_SCRIPT=Are you sure that you want to halt this macro script?
 
 ; common
 MSG_ERROR=ERROR

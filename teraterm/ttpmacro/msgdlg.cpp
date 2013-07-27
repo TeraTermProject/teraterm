@@ -188,9 +188,10 @@ BOOL CMsgDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// メッセージボックスをキャンセルすると、マクロの終了とする。
 			// (2008.8.5 yutaka)	
 			int ret;
-			ret = MessageBox(
-					"Are you sure that you want to halt this macro script?", 
-					"MACRO: confirmation", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
+			char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+			get_lang_msg("MSG_MACRO_CONF", uimsg, sizeof(uimsg), "MACRO: confirmation", UILanguageFile);
+			get_lang_msg("MSG_MACRO_HALT_SCRIPT", uimsg2, sizeof(uimsg2), "Are you sure that you want to halt this macro script?", UILanguageFile);
+			ret = MessageBox(uimsg2, uimsg, MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
 			if (ret == IDYES) {
 				if (YesNoFlag == TRUE) {
 					EndDialog(IDCLOSE);

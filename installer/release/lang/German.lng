@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Feb 28 2013)
+; Updated by TeraTerm Project (Jul 27 2013)
 ; Last translated (German language) by Frederik Schwarzer (May 17 2010)
 
 [Tera Term]
@@ -456,6 +456,9 @@ BTN_YES=Ja
 BTN_NO=Nein
 BTN_STOP=Makro anhalten
 BTN_CONTINUE=Weiter
+
+MSG_MACRO_CONF=MACRO: confirmation
+MSG_MACRO_HALT_SCRIPT=Are you sure that you want to halt this macro script?
 
 ; common
 MSG_ERROR=Fehler

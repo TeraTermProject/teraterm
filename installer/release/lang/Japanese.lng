@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Feb 28 2013)
+; Updated by TeraTerm Project (Jul 27 2013)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -454,6 +454,9 @@ BTN_YES=はい(&Y)
 BTN_NO=いいえ(&N)
 BTN_STOP=マクロ停止(&S)
 BTN_CONTINUE=続行(&C)
+
+MSG_MACRO_CONF=MACRO: 確認
+MSG_MACRO_HALT_SCRIPT=本当にこのマクロスクリプトを停止しますか？
 
 ; common
 MSG_ERROR=エラー
