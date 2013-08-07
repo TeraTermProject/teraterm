@@ -3541,9 +3541,9 @@ void DispResetColor(unsigned int num)
 			ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
 		}
 		if (ts.UseNormalBGColor) {
-			ts.VTBoldColor[1] = ts.VTColor[1];
-			ts.VTBlinkColor[1] = ts.VTColor[1];
-			ts.URLColor[1] = ts.VTColor[1];
+			BGVTBoldColor[1] = ts.VTColor[1];
+			BGVTBlinkColor[1] = ts.VTColor[1];
+			BGURLColor[1] = ts.VTColor[1];
 		}
 		break;
 		break;
