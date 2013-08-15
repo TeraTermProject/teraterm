@@ -3,7 +3,7 @@
 
                 ターミナル・エミュレータで Cygwin を使う。
 
-                Copyright (c) 2006-2011 TeraTerm Project
+                Copyright (c) 2006-2013 TeraTerm Project
                 http://ttssh2.sourceforge.jp/
 
                 Based on CygTerm by Original developer:
@@ -278,9 +278,12 @@
                 zsh 4.3.10
 
 // 変 更 履 歴 //
+v1.07_24 2013/08/15 (by maya)
+        * 64bit Cygwin でも動作するようにした。
+
 v1.07_23 2011/04/18 (by doda)
         * -d オプションで指定されたディレクトリへの移動が失敗した時、
-	  エラーメッセージを表示するおうにした。
+	  エラーメッセージを表示するようにした。
 
 v1.07_22 2011/03/03 (by maya)
         * インストーラから起動チェックをするための mutex を削除した。

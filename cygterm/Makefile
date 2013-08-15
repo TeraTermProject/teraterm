@@ -31,10 +31,17 @@ $(EXE) : $(SRC) $(RES)
 
 $(LAUNCH) : $(LAUNCH_SRC) $(RES)
 	@# gcc 4.3.2? or later doesn't support "-mno-cygwin" flag.
+	@#
+	@# $(CC)                   gcc less than 4.3.2 (supports "-mno-cygwin")
+	@# gcc-3                   gcc3 (supports "-mno-cygwin")
+	@# x86_64-w64-mingw32-gcc  mingw32 gcc  host:64bit target:64bit (64bit cygwin)
+	@# i686-w64-mingw32-gcc    mingw32 gcc  host:32bit target:64bit (32bit cygwin on 64bit Windows)
+	@# i686-pc-mingw32-gcc     mingw32 gcc  host:32bit target:32bit (32bit cygwin)
 	( $(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
 	( gcc-3 $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( i686-pc-mingw32-gcc $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) 
+	( x86_64-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	( i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	( i686-pc-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) 
 	strip $(LAUNCH)
 
 $(RC):

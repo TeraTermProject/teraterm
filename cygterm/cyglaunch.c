@@ -35,6 +35,9 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 	if (strstr(envptr, "cygwin\\bin") != NULL) {
 		goto found_path;
 	}
+	if (strstr(envptr, "cygwin64\\bin") != NULL) {
+		goto found_path;
+	}
 
 	_snprintf(file, MAX_PATH, "%s\\bin", CygwinDirectory);
 	if (GetFileAttributes(file) == -1) { // open error

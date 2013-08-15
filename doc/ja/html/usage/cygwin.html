@@ -14,8 +14,11 @@
 <p>
 ローカルの Cygwin 環境に Tera Term から接続できます。<br>
 <a href="http://www.cygwin.com/">Cygwin</A> は、Windows 上で Linux のような環境を提供するソフトウェアです。<br>
-Cygwin は、オープンソースソフトウェアです。<br>
-※注意： Cygwin 1.5.x は Windows 7 をサポートしていないようです。Windows 7 では Cygwin 1.7.x を利用してください。
+Cygwin は、オープンソースソフトウェアです。
+</p>
+
+<p>
+※注意：Cygwin 1.5.x は Windows 7 をサポートしていないようです。Windows 7 では Cygwin 1.7.x を利用してください。
 </p>
 
 <p>
@@ -29,13 +32,20 @@ Fileメニューから「Cygwin connection」を選択する、もしくはAlt+Gを押下すると、Cygw
 ----------------------------
 ; Cygwin install path
 CygwinDirectory = c:\cygwin
+; 64bit Cygwin
+; CygwinDirectory=c:\cygwin64
 ----------------------------
 </pre>
 
 <p>
 ※注意：<br>
 cygtermがうまく起動しない場合は、cygtermをビルドし直してください。<br>
-最新のソースコードは <a href="http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/ttssh2/cygterm/">sourceforge.jp の ViewCVS</a> からダウンロードできます。
+最新のソースコードは cygterm+.tar.gz として同梱されています。
+</p>
+
+<p>
+※注意：64bit Cygwin について<br />
+64bit Cygwin で利用するには再コンパイルが必要なようです。コンパイルするには Cygwin に mingw64-x86_64-gcc-core をインストールする必要があります。
 </p>
 
 <p>

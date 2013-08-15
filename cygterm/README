@@ -3,7 +3,7 @@
 
                 Using Cygwin with a terminal emulator.
 
-                Copyright (c) 2006-2011 TeraTerm Project
+                Copyright (c) 2006-2013 TeraTerm Project
                 http://ttssh2.sourceforge.jp/
 
                 Based on CygTerm by Original developer:
@@ -266,6 +266,9 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_24 2013/08/15 (by maya)
+        * Support for 64bit Cygwin.
+
 v1.07_23 2011/04/18 (by doda)
         * Display error message when chdir() was failed.
 

@@ -3700,6 +3700,9 @@ void CVTWindow::OnCygwinConnection()
 	if (strstr(envptr, "cygwin\\bin") != NULL) {
 		goto found_path;
 	}
+	if (strstr(envptr, "cygwin64\\bin") != NULL) {
+		goto found_path;
+	}
 
 	_snprintf_s(file, sizeof(file), _TRUNCATE, "%s\\bin", ts.CygwinDirectory);
 	if (GetFileAttributes(file) == -1) { // open error

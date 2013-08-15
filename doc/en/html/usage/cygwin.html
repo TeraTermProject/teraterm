@@ -12,10 +12,13 @@
 <h1>Cygwin connection</h1>
 
 <p>
-  Tera Term can connect to local Cygwin environment.<br>
-  <A HREF="http://www.cygwin.com/">Cygwin</A> is a Linux-like environment for Windows.<br>
-  Cygwin is open source software.<br>
-  [NOTE] Cygwin 1.5.x doesn't seem support Windows 7. Please use Cygwin 1.7.x on Windows 7.
+Tera Term can connect to local Cygwin environment.<br>
+<A HREF="http://www.cygwin.com/">Cygwin</A> is a Linux-like environment for Windows.<br>
+Cygwin is open source software.
+</p>
+
+<p>
+[NOTE] Cygwin 1.5.x doesn't seem support Windows 7. Please use Cygwin 1.7.x on Windows 7.
 </p>
 
 <p>
@@ -29,14 +32,23 @@ The format is "drive-letter:\directory".
 ----------------------------
 ; Cygwin install path
 CygwinDirectory = c:\cygwin
+; 64bit Cygwin
+; CygwinDirectory=c:\cygwin64
 ----------------------------
 </pre>
 
 <p>
 [NOTE]<br>
 If cygterm fails to start you might need to download its source and recompile it.<br>
-Latest source code is available at <a href="http://cvs.sourceforge.jp/cgi-bin/viewcvs.cgi/ttssh2/cygterm/">ViewCVS of sourcefoge.jp</a>.
+Latest source code is included as cygterm+.tar.gz.
 </p>
+
+<!--
+<p>
+[NOTE] About 64bit Cygwin<br />
+64bit Cygwin で利用するには再コンパイルが必要なようです。コンパイルするには Cygwin に mingw64-x86_64-gcc-core をインストールする必要があります。
+</p>
+-->
 
 <p>
 Be careful not to save [Setup] [Save setup] in the situation that it was started by cygterm.exe.<br>
