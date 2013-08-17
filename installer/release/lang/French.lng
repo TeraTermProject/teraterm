@@ -133,6 +133,7 @@ DLG_MAIN_TITLE_CONNECTING=[connexion...]
 DLG_MAIN_TITLE_DISCONNECTED=[déconnecté]
 
 ; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Déconnecter?
 MSG_DANDD_CONF=Etes vous sûr de vouloir envoyer le contenu du fichier?
 MSG_DANDD_CONF_TITLE=Tera Term: Glisser Déplacer le fichier

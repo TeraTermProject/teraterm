@@ -1774,6 +1774,14 @@ void CVTWindow::OnClose()
 // 全Tera Termの終了を指示する
 void CVTWindow::OnAllClose()
 {
+	// 突然終了させると危険なので、かならずユーザに問い合わせを出すようにする。
+	// (2013.8.17 yutaka)
+	get_lang_msg("MSG_ALL_TERMINATE_CONF", ts.UIMsg, sizeof(ts.UIMsg),
+	             "Terminate ALL Tera Term(s)?", ts.UILanguageFile);
+	if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
+	     MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2)==IDCANCEL) 
+		return;
+
 	BroadcastClosingMessage(HVTWin);
 }
 

@@ -133,6 +133,7 @@ DLG_MAIN_TITLE_CONNECTING=[연결...]
 DLG_MAIN_TITLE_DISCONNECTED=[끊어짐]
 
 ; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=연결을 끊을까요?
 MSG_DANDD_CONF=파일 내용을 보낼까요?
 MSG_DANDD_CONF_TITLE=Tera Term: 파일 Drag and Drop

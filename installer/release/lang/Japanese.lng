@@ -132,6 +132,7 @@ DLG_MAIN_TITLE_CONNECTING=[接続中...]
 DLG_MAIN_TITLE_DISCONNECTED=[未接続]
 
 ; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=全Tera Termを強制終了しますか？
 MSG_DISCONNECT_CONF=切断しますか？
 MSG_DANDD_CONF=ファイル転送を行いますか？
 MSG_DANDD_CONF_TITLE=Tera Term: ファイル ドラッグ&ドロップ

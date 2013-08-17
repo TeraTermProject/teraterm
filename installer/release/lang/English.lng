@@ -132,6 +132,7 @@ DLG_MAIN_TITLE_CONNECTING=[connecting...]
 DLG_MAIN_TITLE_DISCONNECTED=[disconnected]
 
 ; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Disconnect?
 MSG_DANDD_CONF=Are you sure that you want to send the file content?
 MSG_DANDD_CONF_TITLE=Tera Term: File Drag and Drop

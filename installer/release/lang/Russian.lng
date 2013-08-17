@@ -133,6 +133,7 @@ DLG_MAIN_TITLE_CONNECTING=[соединяется...]
 DLG_MAIN_TITLE_DISCONNECTED=[разъединено]
 
 ; vtwin.cpp
+MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Разъединить?
 MSG_DANDD_CONF=Вы уверены, что хотите отправить файл?
 MSG_DANDD_CONF_TITLE=Tera Term: Файл "Drag and Drop"
