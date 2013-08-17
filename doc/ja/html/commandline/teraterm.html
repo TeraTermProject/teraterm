@@ -28,6 +28,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
          [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
          [/NAMEDPIPE]
+         [/AUTOWINCLOSE=&lt;flag&gt;]
          [;&lt;comment&gt;]
 </pre>
 
@@ -178,6 +179,13 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="namedpipe">/NAMEDPIPE</dt>
   <dd>名前付きパイプ(\\&lt;ServerName&gt;\pipe\&lt;PipeName&gt;)</dd>
+
+  <dt id="awc">/AUTOWINCLOSE=&lt;flag&gt;</dt>
+  <dd>自動的にウィンドウを閉じる(AutoWinClose)
+      <ul>
+        <li><span class="syntax">/AUTOWINCLOSE=on</span> 切断時、自動的にウィンドウを閉じる。</li>
+        <li><span class="syntax">/AUTOWINCLOSE=off</span> 切断時、自動的にウィンドウを閉じない。</li>
+      </ul></dd>
 
   <dt id="comment">;&lt;comment&gt;</dt>
   <dd>コメント。コマンドラインの最後に置く必要がある。</dd>

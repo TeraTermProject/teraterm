@@ -24,6 +24,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
          [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
          [/NAMEDPIPE]
+         [/AUTOWINCLOSE=&lt;flag&gt;]
          [;&lt;comment&gt;]
 </pre>
 
@@ -173,6 +174,13 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="namedpipe">/NAMEDPIPE</dt>
   <dd>Named pipe(\\&lt;ServerName&gt;\pipe\&lt;PipeName&gt;)</dd>
+
+  <dt id="awc">/AUTOWINCLOSE=&lt;flag&gt;</dt>
+  <dd>AutoWinClose
+      <ul>
+        <li><span class="syntax">/AUTOWINCLOSE=on</span> Automatically close the window on disconnection.</li>
+        <li><span class="syntax">/AUTOWINCLOSE=off</span> Do not close the window on disconnection.</li>
+      </ul></dd>
   
   <dt id="comment">;&lt;comment&gt;</dt>
   <dd>Comment. Should be last in the command line.</dd>
