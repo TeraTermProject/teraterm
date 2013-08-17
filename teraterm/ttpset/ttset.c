@@ -3283,7 +3283,14 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			HostNameFlag = FALSE;
 		}
 
-		if (_strnicmp(Temp, "/NAMEDPIPE", 10) == 0) {	/* 名前付きパイプ */
+		if (_strnicmp(Temp, "/AUTOWINCLOSE=", 14) == 0) {	/* AutoWinClose=on|off */
+			char *s = &Temp[14];
+			if (_stricmp(s, "on") == 0)
+				ts->AutoWinClose = 1;
+			else
+				ts->AutoWinClose = 0;
+		}
+		else if (_strnicmp(Temp, "/NAMEDPIPE", 10) == 0) {	/* 名前付きパイプ */
 			ParamPort = IdNamedPipe;
 		}
 		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
