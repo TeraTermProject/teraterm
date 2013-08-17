@@ -144,6 +144,10 @@
 			Name="Putty Files"
 			>
 			<File
+				RelativePath="..\..\libs\putty\CONF.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\INT64.H"
 				>
 			</File>
@@ -177,6 +181,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libs\putty\SSHBN.C"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libs\putty\TREE234.C"
 				>
 			</File>
 			<File

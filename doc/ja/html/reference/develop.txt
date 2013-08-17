@@ -32,9 +32,7 @@
 - Oniguruma 5.9.4 (http://www.geocities.jp/kosako3/oniguruma/)
 - OpenSSL 1.0.1e (http://www.openssl.org/)
 - zlib 1.2.8 (http://www.zlib.net/)
-- PuTTY 0.62 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
-             -> (http://the.earth.li/~sgtatham/putty/0.62/putty-src.zip)
-             -> (ftp://ftp.chiark.greenend.org.uk/users/sgtatham/putty-0.62/putty-src.zip)
+- PuTTY 0.63 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
 
 ■ SVN コミッターへの注意
