@@ -97,14 +97,15 @@ copy nul %dst%\ttpmenu.ini
 exit /b
 
 :help
-echo Tera Termをビルドするために必要なソースコードをすべてコンパイルします。
+echo Tera Termをビルドするために必要なソースコードをすべてコンパイルします。(Compiling ALL source codes)
 echo.
-echo   %0          通常のビルド
-echo   %0 rebuild  リビルド
-echo   %0 debug    デバッグ情報含むビルド
-echo   %0 plugins  プラグイン情報含むビルド
-echo   %0 release  通常のビルド + プラグインを含む + フォルダ名が特殊
-echo      アーカイブ版リリース作成用
+echo   %0          通常のビルド(Normal building)
+echo   %0 rebuild  リビルド(Re-building)
+echo   %0 debug    デバッグ情報含むビルド(Building with Debug information)
+echo   %0 plugins  プラグイン情報含むビルド(Building with all plugins)
+echo   %0 release  通常のビルド + プラグインを含む + フォルダ名が特殊(Normal + Plugins building + unique folder naming)
+echo      アーカイブ版リリース作成用(for archive version released)
+echo   %0 rebuild ^>build.log 2^>^&1  ビルドログを採取する(Retrieve building log)
 echo.
 exit /b
 
