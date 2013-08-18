@@ -24,7 +24,8 @@ goto create
 
 :snapshot
 rem  for XP or later
-set today=snapshot-%date:~0,4%%date:~5,2%%date:~8,2%
+for /f "delims=" %%a in ('perl -e "($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time); $mon++; printf (1900+$year . substr(\"0\".$mon,-2) . substr(\"0\".$mday,-2));"') do @set today=snapshot-%%a
+
 @for /l %%i in (1,1,10) do @(
 if %%i==1 (
 set dst=%today%
