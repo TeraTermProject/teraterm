@@ -3943,6 +3943,11 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);	
 			strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
 
+			// 受信パスに関しても更新する。(2013.8.18 yutaka)
+			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
+			SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);	
+			strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
+
 			EndDialog(dlg, 0); // dialog close
 			return TRUE;
 
