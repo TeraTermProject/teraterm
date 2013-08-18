@@ -264,7 +264,7 @@ Example: adding a TTSSH menu under File menu
   5. Re-checkout from svn tag.
 
   6. Evaluate executable program file.
-       - Rebuild Tera Term program
+       - Rebuild Tera Term program(using trunk\installer\makearchive.bat)
        - Make installer package
          Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
        - Test Tera Term installation and evaluate it.

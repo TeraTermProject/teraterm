@@ -275,7 +275,7 @@
   5. リリース用のタグでチェックアウトし直す。
 
   6. 動作確認をする
-       プログラムをコンパイルし直す
+       プログラムをコンパイルし直す(trunk\installer\makearchive.bat を使用する)
        インストーラを作成する
          ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
        インストールおよび実行をテストする
