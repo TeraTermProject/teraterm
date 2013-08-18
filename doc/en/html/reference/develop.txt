@@ -208,7 +208,7 @@ Example: adding a TTSSH menu under File menu
   To build  HTML help file is shown in the following step:
 
   1. Intall HTML Help Workshop from below site:
-     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/hwMicrosoftHTMLHelpDownloads.asp
+     http://www.microsoft.com/en-us/download/details.aspx?id=21138
 
   2. Copy document files with batch file on command prompt.
      > cd teraterm\insatller

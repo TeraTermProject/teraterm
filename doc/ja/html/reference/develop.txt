@@ -213,7 +213,7 @@
   ヘルプファイルのビルド方法について以下に示します。
 
   1. HTML Help Workshopを以下のサイトから入手しインストールする。
-     http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/hwMicrosoftHTMLHelpDownloads.asp
+     http://www.microsoft.com/en-us/download/details.aspx?id=21138
 
   2. コマンドプロンプトからバッチファイルを起動し、必要なファイルをコピーする。
      > cd teraterm\insatller
