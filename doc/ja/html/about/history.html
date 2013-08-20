@@ -48,6 +48,7 @@
         </ul></li>
       <li>「Tera Termの全終了(Exit All)」の実行前に、かならずユーザに問い合わせを行うようにした。</li>
       <li><a href="../menu/setup-tcpip.html#autowinclose">Auto window close</a>を制御する <a href="../commandline/teraterm.html#awc">/AUTOWINCLOSE</a> コマンドラインオプションを追加した。</li>
+      <li>DECRQM(モード問い合わせ)制御シーケンスに対応した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/appendixes/errormessages.html">エラーメッセージ</a>に"Command not supported."を追加した。</li>
@@ -62,6 +63,9 @@
       <li>ドラッグ&amp;ドロップでのファイル送信時、ダイアログのヘルプボタンが正しく働かない問題を修正した。</li>
       <li>カーソル位置報告シーケンスで、origin mode有効時に上マージンを考慮していなかった問題を修正した。</li>
       <li><a href="../setup/teraterm-win.html#textselect">SelectOnActivate=off</a>の時、ウィンドウが非アクティブ状態のクリック時にボタンリリースイベントが送られる問題を修正した。</li>
+      <li>複数起動時に、キーボード設定ファイルが正しくよみこまれない場合がある問題を修正した。</li>
+      <li>Intermediate ByteとPrivate Parameterの両方を使用した制御シーケンスを正しく無視できない場合がある問題を修正した。</li>
+      <li>UseNomalBGColor=onの時、OSC 11(標準背景色設定)制御文字列の後のOSC 111(標準背景色リセット)制御文字列で太字等の属性付き文字の背景色が正しくリセットされない問題を修正した。</li>
       <li>マクロコマンド exec で、wait パラメータが1の時(4.63以降)、および wait パラメータが1以外の時(4.78以降)に show パラメータが無視される問題を修正した。</li>
     </ul>
   </li>

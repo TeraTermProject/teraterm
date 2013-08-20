@@ -48,6 +48,7 @@
         </ul></li>
       <li>When the Exit All is called, the user is always confirmed.</li>
       <li>added the <a href="../commandline/teraterm.html#nolog">/AUTOWINCLOSE</a> command line option to control the <a href="../menu/setup-tcpip.html#autowinclose">Auto window close</a>.</li>
+      <!-- li>DECRQM(モード問い合わせ)制御シーケンスに対応した。</li -->
       <li>Macro
         <ul>
           <li>added the "Command not supported." new message in the <a href="../macro/appendixes/errormessages.html">Error messages</a>.</li>
@@ -62,6 +63,9 @@
       <li>When the file is sent by D&amp;D, the help button of the dialog can not be worked well.</li>
       <li>The sequence reporting the cursor change can not recognize the upper margin when the origin mode is enabled.</li>
       <li>When the <a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> is off, the button released event is incorrectly sent by clicking the in-active window.</li>
+      <!-- li>複数起動時に、キーボード設定ファイルが正しくよみこまれない場合がある問題を修正した。</li -->
+      <!-- li>Intermediate ByteとPrivate Parameterの両方を使用した制御シーケンスを正しく無視できない場合がある問題を修正した。</li -->
+      <!-- li>UseNomalBGColor=onの時、OSC 11(標準背景色設定)制御文字列の後のOSC 111(標準背景色リセット)制御文字列で太字等の属性付き文字の背景色が正しくリセットされない問題を修正した。</li -->
       <li>MACRO exec: The show parameter will be ignored when the wait parameter is 1(4.63 later) or the parameter is not 1(4.78 later).</li>
     </ul> 
   </li>
