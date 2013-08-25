@@ -1,7 +1,7 @@
 //
 // Cygterm launcher
 //
-// Copyright (c)2007-2011 TeraTerm Project
+// Copyright (c)2007-2013 TeraTerm Project
 //   http://ttssh2.sourceforge.jp/
 //
 // [How to compile]
