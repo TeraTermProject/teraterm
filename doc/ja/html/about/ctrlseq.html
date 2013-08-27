@@ -218,7 +218,13 @@
 <i>Ps2</i>    ‰ºƒ}[ƒWƒ“‚ÌsˆÊ’uBÈ—ªŽž‚Í‰æ–Ê‰º’[B
 </pre>
 </td></tr>
-<tr><td>CSI s</td>	<td>SCP</td>	<td>Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ð•Û‘¶‚·‚éB</td></tr>
+<tr><td>CSI s</td>	<td>SCP</td>	<td>Œ»Ý‚ÌƒJ[ƒ\ƒ‹ˆÊ’u‚ð•Û‘¶‚·‚éBDECLRMM ‚ªƒŠƒZƒbƒg‚³‚ê‚Ä‚¢‚éŽž‚Ì‚Ý—LŒøB</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> s</td>	<td>DECSLRM</td>	<td>¶‰Eƒ}[ƒWƒ“(ƒXƒNƒ[ƒ‹ƒŠ[ƒWƒ‡ƒ“)‚ðÝ’è‚·‚éBDECLRMM ‚ªƒZƒbƒg‚³‚ê‚Ä‚¢‚éŽž‚Ì‚Ý—LŒøB
+<pre>
+<i>Ps1</i>    ¶ƒ}[ƒWƒ“‚ÌsˆÊ’uBÈ—ªŽž‚Í 1B
+<i>Ps2</i>    ‰Eƒ}[ƒWƒ“‚ÌsˆÊ’uBÈ—ªŽž‚Í‰æ–Ê‰E’[B
+</pre>
+</td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td>ƒEƒBƒ“ƒhƒE‘€ì
 <pre>
 <i>Ps1</i> =  1    ƒEƒBƒ“ƒhƒE‚ð’Êí•\Ž¦ó‘Ô‚É‚·‚éB
@@ -272,9 +278,9 @@
 </pre>
 </td></tr>
 <tr><td>CSI u</td>	<td>RCP</td>	<td>•Û‘¶‚µ‚½ƒJ[ƒ\ƒ‹ˆÊ’u‚ð•œŒ³‚·‚éB</td></tr>
-<tr><td>CSI &lt; r</td>	<td>-</td>	<td> IME ‚ÌŠJ•Âó‘Ô‚ð•œŒ³‚·‚éB</td></tr>
-<tr><td>CSI &lt; s</td>	<td>-</td>	<td> IME ‚ÌŠJ•Âó‘Ô‚ð•Û‘¶‚·‚éB</td></tr>
-<tr><td>CSI &lt; <i>Ps</i> t</td>	<td>-</td>	<td> IME ‚ÌŠJ•Âó‘Ô‚ðÝ’è‚·‚éBÈ—ªŽž‚Ì <i>Ps</i> ‚Ì’l‚Í 0B
+<tr><td>CSI &lt; r</td>	<td>TTIMERS</td>	<td> IME ‚ÌŠJ•Âó‘Ô‚ð•œŒ³‚·‚éB</td></tr>
+<tr><td>CSI &lt; s</td>	<td>TTIMESV</td>	<td> IME ‚ÌŠJ•Âó‘Ô‚ð•Û‘¶‚·‚éB</td></tr>
+<tr><td>CSI &lt; <i>Ps</i> t</td>	<td>TTIMEST</td>	<td> IME ‚ÌŠJ•Âó‘Ô‚ðÝ’è‚·‚éBÈ—ªŽž‚Ì <i>Ps</i> ‚Ì’l‚Í 0B
 <pre>
 <i>Ps</i> = 0      IME ‚ð•Â‚¶‚éB
    = 1      IME ‚ðŠJ‚­B
@@ -375,6 +381,20 @@
 <i>Ps</i> = 0      •ÛŒì‘®«‚Ì‰ðœB‚±‚êˆÈ~‚Éo—Í‚³‚ê‚é•¶Žš‚Í•ÛŒì‚³‚ê‚Ä‚¢‚È‚¢ó‘Ô‚É‚È‚éB
    = 1      •ÛŒì‘®«‚ÌÝ’èB‚±‚êˆÈ~‚Éo—Í‚³‚ê‚é•¶Žš‚Í•ÛŒìó‘Ô‚É‚È‚éB
    = 2      •ÛŒì‘®«‚Ì‰ðœB‚±‚êˆÈ~‚Éo—Í‚³‚ê‚é•¶Žš‚Í•ÛŒì‚³‚ê‚Ä‚¢‚È‚¢ó‘Ô‚É‚È‚éB
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps</i> $ p (Standard)<br>CSI ? <i>Ps</i> $ p (DEC/xterm)</td>	<td>DECRQM</td>	<td>ƒ‚[ƒh–â‚¢‡‚í‚¹B’[––‚Éƒ‚[ƒh(<a href="#mode">•W€</a>, <a href="#decmode">DEC/xtermŠg’£</a>)‚Ìó‘Ô‚ð–â‚¢‡‚í‚¹‚éB
+<pre>
+<i>Ps</i>: –â‚¢‡‚í‚¹‚éƒ‚[ƒhB
+‰ž“š: CSI <i>Ps1</i> ; <i>Ps2</i> $ y     -- •W€ƒ‚[ƒh
+      CSI ? <i>Ps1</i> ; <i>Ps2</i> $ y   -- DEC/xtermŠg’£ƒ‚[ƒh
+  <i>Ps1</i>   –â‚¢‡‚í‚¹‚½ƒ‚[ƒh”Ô†
+  <i>Ps2</i> = 0    ”ñ‘Î‰ž
+      = 1    ƒZƒbƒg
+      = 2    ƒŠƒZƒbƒg
+      = 3    í‚ÉƒZƒbƒg
+      = 4    í‚ÉƒŠƒZƒbƒg
 </pre>
 </td></tr>
 
@@ -635,6 +655,12 @@ filter rectangle ‚Íí‚Éƒƒ“ƒVƒ‡ƒbƒgƒ‚[ƒhˆµ‚¢‚É‚È‚éBˆê“xƒtƒBƒ‹ƒ^ƒCƒxƒ“ƒg‚ð‘—M‚
 	<td> Backspace ƒL[‚Å DEL ‚ð‘—o‚·‚éB</td>
     </tr>
     <tr>
+	<td> 69 </td>
+	<td> DECLRMM </td>
+	<td> ¶‰Eƒ}[ƒWƒ“‚ð—LŒø‚É‚·‚éBDECSLRM ‚É‚æ‚é¶‰Eƒ}[ƒWƒ“Ý’è‚ª—LŒø‚É‚È‚éBSCP ‚É‚æ‚éƒJ[ƒ\ƒ‹ˆÊ’u•Û‘¶‚ª–³Œø‚É‚È‚éB</td>
+	<td> ¶‰Eƒ}[ƒWƒ“‚ð–³Œø‚É‚·‚éBDECSLRM ‚É‚æ‚é¶‰Eƒ}[ƒWƒ“Ý’è‚ª–³Œø‚É‚È‚éBSCP ‚É‚æ‚éƒJ[ƒ\ƒ‹ˆÊ’u•Û‘¶‚ª—LŒø‚É‚È‚éB</td>
+    </tr>
+    <tr>
 	<td> 1000 </td>
 	<td> XT_MSE_X11 </td>
 	<td> ƒ}ƒEƒX•ñƒ‚[ƒh‚ÉÝ’è‚·‚éBƒ}ƒEƒXƒ{ƒ^ƒ“‚Ì‰Ÿ‚µ/—£‚µ,ƒzƒC[ƒ‹‚Ì‰ñ“]‚ð•ñ‚·‚éB </td>
@@ -864,6 +890,10 @@ OSC 4 ; <i>c</i> ; rgb:<i>rr</i>/<i>gg</i>/<i>bb</i> ST
 </pre>
 <i>Pd</i> ‚ª "?" ‚ÌŽž‚Í–â‚¢‡‚í‚¹BƒNƒŠƒbƒvƒ{[ƒh‚Ì“à—e‚ðAÝ’è‚Æ“¯‚¶Œ`Ž®‚Å‰ž“š‚·‚éB
 </td></tr>
+<tr><td> 110 </td>		<td>VTƒEƒBƒ“ƒhƒE‚Ì•¶ŽšF‚ð‰Šú’l‚É–ß‚·B</td></tr>
+<tr><td> 111 </td>		<td>VTƒEƒBƒ“ƒhƒE‚Ì”wŒiF‚ð‰Šú’l‚É–ß‚·B</td></tr>
+<tr><td> 115 </td>		<td>TEKƒEƒBƒ“ƒhƒE‚Ì•¶ŽšF‚ð‰Šú’l‚É–ß‚·B</td></tr>
+<tr><td> 116 </td>		<td>TEKƒEƒBƒ“ƒhƒE‚Ì”wŒiF‚ð‰Šú’l‚É–ß‚·B</td></tr>
 </table>
 
 <h2><a name="SOS">SOSƒV[ƒPƒ“ƒX</a></h2>

@@ -219,7 +219,7 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
               <i>c</i>    Column number.
 </pre>
 </td></tr>
-<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td> Sets top and bottom margin.
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> r</td>	<td>DECSTBM</td>	<td> Set top and bottom margins.
 <pre>
 <i>Ps1</i>    Line number for the top margin.
        The default value is 1.
@@ -227,7 +227,15 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
        The default value is current number of lines per screen.
 </pre>
 </td></tr>
-<tr><td>CSI s</td>	<td>SCP</td>	<td> Save cursor position. Same as DECSC. </td></tr>
+<tr><td>CSI s</td>	<td>SCP</td>	<td> Save cursor position. Same as DECSC. SCP only works when DECLRMM is reset.</td></tr>
+<tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> s</td>	<td>DECSLRM</td>	<td> Set left and right margins. DECSLRM only works when DECLRMM is set.
+<pre>
+<i>Ps1</i>    Column number for the left margin.
+       The default value is 1.
+<i>Ps2</i>    Column number for the right margin.
+       The default value is current number of columns per screen.
+</pre>
+</td></tr>
 <tr><td>CSI <i>Ps1</i> ; <i>Ps2</i> ; <i>Ps3</i> t</td>	<td>(DECSLPP)</td>	<td> Window manipulation.
 <pre>
 <i>Ps1</i> =  1    De-iconify window.
@@ -281,9 +289,9 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 </pre>
 </td></tr>
 <tr><td>CSI u</td>	<td>RCP</td>	<td> Restore cursor position. Same as DECRC. </td></tr>
-<tr><td>CSI &lt; r</td>	<td>-</td>	<td> Restore IME open state. </td></tr>
-<tr><td>CSI &lt; s</td>	<td>-</td>	<td> Save IME open state. </td></tr>
-<tr><td>CSI &lt; <i>Ps</i> t</td>	<td>-</td>	<td> Change IME open state. The default value of <i>Ps</i> is 0.
+<tr><td>CSI &lt; r</td>	<td>TTIMERS</td>	<td> Restore IME open state. </td></tr>
+<tr><td>CSI &lt; s</td>	<td>TTIMESV</td>	<td> Save IME open state. </td></tr>
+<tr><td>CSI &lt; <i>Ps</i> t</td>	<td>TTIMEST</td>	<td> Change IME open state. The default value of <i>Ps</i> is 0.
 <pre>
 <i>Ps</i> = 0      Close IME.
    = 1      Open IME.
@@ -384,6 +392,20 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps</i> = 0      Not protected. DECSED, DECSEL and DECSERA can erase characters.
    = 1      Protected. DECSED, DECSEL and DECSERA cannot erase characters.
    = 2      Same as 0.
+</pre>
+</td></tr>
+
+<tr><td>CSI <i>Ps</i> $ p (Standard)<br>CSI ? <i>Ps</i> $ p (DEC/xterm)</td>    <td>DECRQM</td> <td>Request <a href="#mode">Standard</a> or <a href="#decmode">DEC/xterm specific</a> mode to terminal.
+<pre>
+<i>Ps</i>: Mode number to request.
+Response: CSI <i>Ps1</i> ; <i>Ps2</i> $ y     -- Standard Mode
+          CSI ? <i>Ps1</i> ; <i>Ps2</i> $ y   -- DEC/xterm Extended Mode
+  <i>Ps1</i>   Requested mode number
+  <i>Ps2</i> = 0    Mode not recognized
+      = 1    Set
+      = 2    Reset
+      = 3    Permanently set
+      = 4    Permanently reset
 </pre>
 </td></tr>
 
@@ -639,6 +661,12 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> & w
 	<td> Backspace key sends DEL. </td>
     </tr>
     <tr>
+	<td> 69 </td>
+	<td> DECLRMM </td>
+	<td> Enable left and right margins. DECSLRM can set marings. SCP cannot save cursor position.</td>
+	<td> Disable left and right margins. DECSLRM cannot set marings. SCP can save cursor position.</td>
+    </tr>
+    <tr>
 	<td> 1000 </td>
 	<td> XT_MSE_X11 </td>
 	<td> Enables normal mouse tracking. Send mouse X &amp; Y on button press and release. </td>
@@ -854,10 +882,10 @@ rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
 #<i>rrrrggggbbbb</i>
 </pre>
 </td></tr>
-<tr><td> 10 </td>		<td>Change VT Window's text foreground color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
-<tr><td> 11 </td>		<td>Change VT Window's text background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
-<tr><td> 15 </td>		<td>Change TEK Window's text foreground color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
-<tr><td> 16 </td>		<td>Change TEK Window's text background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 10 </td>		<td>Change VT Window's text color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 11 </td>		<td>Change VT Window's background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 15 </td>		<td>Change TEK Window's text color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 16 </td>		<td>Change TEK Window's background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 52 </td>		<td>Clipboard access.
 <pre>
 <i>Pt</i> = <i>Pc</i> ; <i>Pd</i>
@@ -868,6 +896,11 @@ Change the contents of clipboard <i>Pc</i> to <i>Pd</i>.
 <i>Pc</i>: ignored.
 <i>Pd</i>: new clipboard contents. encoded in base64.
 </pre>
+</td></tr>
+<tr><td> 110 </td>		<td>Reset VT Window's text color. </td></tr>
+<tr><td> 111 </td>		<td>Reset VT Window's background color. </td></tr>
+<tr><td> 115 </td>		<td>Reset TEK Window's text color. </td></tr>
+<tr><td> 116 </td>		<td>Reset TEK Window's background color. </td></tr>
 </table>
 
 <h2><a name="SOS">SOS Sequence</a></h2>
