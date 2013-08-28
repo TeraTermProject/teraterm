@@ -36,6 +36,12 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>added support for the DECRQM(Request Mode) control sequence.</li>
+      <li>added support for left and right margin.
+        <ul>
+          <li>added support for DECLRMM(Left Right Margin Mode), DECSLRM(Set Left and Right Margins) control sequences.</li>
+        </ul></li>
+      <li>When the Exit All is called, the user is always confirmed.</li>
       <li>added the Undo menu under the <a href="../menu/window.html">Window menu</a> when Tera Term's windows are arranged.</li>
       <li>The file transferring dialog can not be shown.
         <ul>
@@ -45,30 +51,24 @@
         <ul>
           <li>added the BellOverUsedTime, BellOverUsedCount and BellSuppressTime entries in the teraterm.ini file. The default value are 2 , 5 and 5.</li>
         </ul></li>
-      <li>When the Exit All is called, the user is always confirmed.</li>
       <li>added the <a href="../commandline/teraterm.html#nolog">/AUTOWINCLOSE</a> command line option to control the <a href="../menu/setup-tcpip.html#autowinclose">Auto window close</a>.</li>
-      <li>added support for the DECRQM(Request Mode) control sequence.</li>
-      <li>added support for left and right margin.
-        <ul>
-          <li>added support for DECLRMM(Left Right Margin Mode), DECSLRM(Set Left and Right Margins) control sequences.</li>
-        </ul></li>
       <li>Macro
         <ul>
           <li>added the "Unknown command." new message in the <a href="../macro/appendixes/errormessages.html">Error messages</a>.</li>
-          <li>added the detail information(line number and error token) on the error dialog.</li>
           <li>added the <a href="../macro/command/logautoclosemode.html">logautoclosemode</a> command.</li>
+          <li>added the detail information(line number and error token) on the error dialog.</li>
         </ul></li>
     </ul>
   </li>
   
   <li>Bug fixes
     <ul>
-      <li>When the file is sent by D&amp;D, the help button of the dialog can not be worked well.</li>
+      <li>When the UseNomalBGColor is on, the OSC 111(Resetting standard background color) control string after the OSC 11(Setting standard background color) can not reset the background color of characters including bold attribute and so on.</li>
       <li>The sequence reporting the cursor change can not recognize the upper margin when the origin mode is enabled.</li>
+      <li>Both the Intermediate Byte and Private Parameter control sequence can not be ignored.</li>
       <li>When the <a href="../setup/teraterm-win.html#textselect">SelectOnActivate</a> is off, the button released event is incorrectly sent by clicking the in-active window.</li>
       <li>When second Tera Term is launched, the keyboard configuration file can not be read.</li>
-      <li>Both the Intermediate Byte and Private Parameter control sequence can not be ignored.</li>
-      <li>When the UseNomalBGColor is on, the OSC 111(Resetting standard background color) control string after the OSC 11(Setting standard background color) can not reset the background color of characters including bold attribute and so on.</li>
+      <li>When the file is sent by D&amp;D, the help button of the dialog can not be worked well.</li>
       <li>MACRO exec: The show parameter will be ignored when the wait parameter is 1(4.63 later) or the parameter is not 1(4.78 later).</li>
     </ul> 
   </li>

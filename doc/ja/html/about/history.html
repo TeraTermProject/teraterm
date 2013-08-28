@@ -36,6 +36,12 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>DECRQM(モード問い合わせ)制御シーケンスに対応した。</li>
+      <li>左右マージン機能に対応した。
+        <ul>
+          <li>DECLRMM(左右マージンモード), DECSLRM(左右マージン設定)制御シーケンスに対応した。</li>
+	</ul></li>
+      <li>「Tera Termの全終了(Exit All)」の実行前に、かならずユーザに問い合わせを行うようにした。</li>
       <li>ウィンドウを並べて表示した後、<a href="../menu/window.html">Windowメニュー</a>に元に戻すメニューを追加した。</li>
       <li>ファイル送信時、ファイル送信状況ダイアログを表示しないように出来るようにした。
         <ul>
@@ -45,30 +51,24 @@
         <ul>
           <li>teraterm.iniに BellOverUsedTime, BellOverUsedCount, BellSuppressTime エントリを追加した。デフォルトは 2, 5, 5。</li>
         </ul></li>
-      <li>「Tera Termの全終了(Exit All)」の実行前に、かならずユーザに問い合わせを行うようにした。</li>
       <li><a href="../menu/setup-tcpip.html#autowinclose">Auto window close</a>を制御する <a href="../commandline/teraterm.html#awc">/AUTOWINCLOSE</a> コマンドラインオプションを追加した。</li>
-      <li>DECRQM(モード問い合わせ)制御シーケンスに対応した。</li>
-      <li>左右マージン機能に対応した。
-        <ul>
-          <li>DECLRMM(左右マージンモード), DECSLRM(左右マージン設定)制御シーケンスに対応した。</li>
-	</ul></li>
       <li>マクロ
         <ul>
           <li><a href="../macro/appendixes/errormessages.html">エラーメッセージ</a>に"Unknown command."を追加した。</li>
-          <li>エラーダイアログに詳細情報（行番号・エラー箇所）を追加した。</li>
           <li><a href="../macro/command/logautoclosemode.html">logautoclosemode</a>コマンドを追加した。</li>
+          <li>エラーダイアログに詳細情報（行番号・エラー箇所）を追加した。</li>
         </ul></li>
     </ul>
   </li>
   
   <li>バグ修正
     <ul>
-      <li>ドラッグ&amp;ドロップでのファイル送信時、ダイアログのヘルプボタンが正しく働かない問題を修正した。</li>
+      <li>UseNomalBGColor=onの時、OSC 11(標準背景色設定)制御文字列の後のOSC 111(標準背景色リセット)制御文字列で太字等の属性付き文字の背景色が正しくリセットされない問題を修正した。</li>
       <li>カーソル位置報告シーケンスで、origin mode有効時に上マージンを考慮していなかった問題を修正した。</li>
+      <li>Intermediate ByteとPrivate Parameterの両方を使用した制御シーケンスを正しく無視できない場合がある問題を修正した。</li>
       <li><a href="../setup/teraterm-win.html#textselect">SelectOnActivate=off</a>の時、ウィンドウが非アクティブ状態のクリック時にボタンリリースイベントが送られる問題を修正した。</li>
       <li>複数起動時に、キーボード設定ファイルが正しくよみこまれない場合がある問題を修正した。</li>
-      <li>Intermediate ByteとPrivate Parameterの両方を使用した制御シーケンスを正しく無視できない場合がある問題を修正した。</li>
-      <li>UseNomalBGColor=onの時、OSC 11(標準背景色設定)制御文字列の後のOSC 111(標準背景色リセット)制御文字列で太字等の属性付き文字の背景色が正しくリセットされない問題を修正した。</li>
+      <li>ドラッグ&amp;ドロップでのファイル送信時、ダイアログのヘルプボタンが正しく働かない問題を修正した。</li>
       <li>マクロコマンド exec で、wait パラメータが1の時(4.63以降)、および wait パラメータが1以外の時(4.78以降)に show パラメータが無視される問題を修正した。</li>
     </ul>
   </li>
