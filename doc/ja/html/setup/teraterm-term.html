@@ -506,5 +506,32 @@ TabStopModifySequence=HTS7,TBC
 TabStopModifySequence=on
 </pre>
 
+
+<h1><a name="BellLimitting">ベル過使用時の一時無効化</a></h1>
+<p>
+ホスト側から BEL 文字 (ASCII $07) が送られて来た時、Tera Term ではビープ音をを鳴らしたり、画面を点滅させたりします。
+</p>
+
+<p>
+誤ってバイナリファイルを表示してしまった時などで多量に BEL 文字が送られて来た時に、自動的にビープ音を鳴らすのを抑制する事が出来ます。<br>
+例えば、設定ファイルの [Tera Term] セクションの BeepOverUsedTime, BeepOverUsedCount, BeepSuppressTime 行を以下のようにすると、
+2 秒間に 5 回 BEL 文字が送られてくると、BEL 文字が 10 秒間送られて来なくなるまでビープ音をならさないようになります。
+</p>
+
+<pre>
+; Beep over-used
+BeepOverUsedTime=2
+BeepOverUsedCount=5
+BeepSuppressTime=10
+</pre>
+
+<pre>
+省略時:
+; Beep over-used
+BeepOverUsedTime=2
+BeepOverUsedCount=5
+BeepSuppressTime=5
+</pre>
+
 </BODY>
 </HTML>
