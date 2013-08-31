@@ -441,16 +441,14 @@ TabStopModifySequence=on
 </pre>
 
 
-<!--
-<h1><a name="BellLimitting">ベル過使用時の一時無効化</a></h1>
+<h1><a name="BellLimitting">Limitted BELL Over</a></h1>
 <p>
-ホスト側から BEL 文字 (ASCII $07) が送られて来た時、Tera Term ではビープ音をを鳴らしたり、画面を点滅させたりします。
+When the BEL character(ASCII $07) is sent from the host server, Tera Term will generate a beep sound and blink a screen.
 </p>
 
 <p>
-誤ってバイナリファイルを表示してしまった時などで多量に BEL 文字が送られて来た時に、自動的にビープ音を鳴らすのを抑制する事が出来ます。<br>
-例えば、設定ファイルの [Tera Term] セクションの BeepOverUsedTime, BeepOverUsedCount, BeepSuppressTime 行を以下のようにすると、
-2 秒間に 5 回 BEL 文字が送られてくると、BEL 文字が 10 秒間送られて来なくなるまでビープ音をならさないようになります。
+When a user shows the binary file by mistake and many BEL characters are sent, much beep sound can suppress automatically.<br>
+For example, when the BeepOverUsedTime, BeepOverUsedCount and BeepSuppressTime are below configured, the beep sound will be suppressed for ten seconds after five BEL characters are sent for two seconds.
 </p>
 
 <pre>
@@ -465,7 +463,6 @@ BeepOverUsedTime=2
 BeepOverUsedCount=5
 BeepSuppressTime=5
 </pre>
--->
 
 
 </BODY>
