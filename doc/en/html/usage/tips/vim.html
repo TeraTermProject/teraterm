@@ -184,24 +184,23 @@ let &amp;t_te .= "\e[23;0t"
 </pre>
 
 
-<!-- h2><a name="VerticalSplit">縦分割時のスクロールの高速化</a></h2>
+<h2><a name="VerticalSplit">Speed up vsplit scrolling</a></h2>
 <p>
-vim で縦分割(vsplit)をすると遅いとかがくがくすると言われる事がよくあります。
-これは多くの端末エミュレータが基準としている VT100 や VT200 シリーズの仕様からくる問題です。
+The vim will slow down by using the vsplit function for a reason of the VT100 and VT200 series specification based on 
+many terminal emulators.
 </p>
 
 <p>
-VT100 にはスクロールする範囲を設定する機能(スクロールリージョン/上下マージン)が有りますが、
-これは例えば上マージンを5行目に、下マージンを20行目にセットする事によってスクロールする範囲を5行目から20行目にするというもので、
-縦方向の桁単位で指定する事は出来ません。<br>
-このため、横分割(split)では上下マージンを利用してスクロールを行う事が出来ますが、
-縦分割ではスクロールが利用できないため、スクロールしたい領域全体を書き直す必要があり、
-スクロールが遅くなります。
+The VT100 specification has the scroll range function(scroll region and vertical margin).
+For example, when the upper margin is fifth line and the lower margin is twentyth line, the scroll region will be
+set from fifth to twentyth line. So, a user can not specify the digit unit of the vertical direction.<br>
+As a result, the scroll speed will be slow down because the scroll range needs to re-paint all region.
 </p>
 
 <p>
-しかし、VT400 シリーズ以降では桁位置によるスクロール範囲設定(左右マージン)機能が追加されており、Tera Term でもバージョン 4.79 からこの機能をサポートしました。
-以下の設定を .vimrc に追加して縦分割時のスクロールに左右マージンを利用するように設定する事によって、縦分割時のスクロールが改善されます。
+However, the VT400 series specification has the scroll range function(horizontal margin), and then Tera Term 4.79 later 
+has supported this function.
+When a user configures below settings in the .vimrc file, the vsplit scroll will be speed up.
 </p>
 
 <pre class="macro-example">
@@ -214,8 +213,10 @@ endif
 </pre>
 
 <p>
-注: この設定を行うと、左右マージンに対応していない端末では縦分割が正しく動かなくなります。xterm や mlterm, RLogin, tanasinn, pangoterm などは左右マージンに対応していますが、それ以外の端末を併用する場合は注意してください。
-</p -->
+NOTE: The terminal emulators not supporting the horizontal margin can not work the vsplit function
+by using this configuration. For example, the xterm, mlterm, RLogin, tanasinn and pangoterm terminal
+emulator can support this function, but other terminal emulators can not support its.
+</p>
 
 
 <h2><a name="withScreen">GNU Screen Notice</a></h2>
