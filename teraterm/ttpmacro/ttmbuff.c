@@ -19,8 +19,11 @@ BOOL ContinueFlag;
 
 #define MAXNESTLEVEL 10
 
+#define MAXFILENAME 32   // .ttlファイル名の最大サイズ
+
 static int INest;
 static HANDLE BuffHandle[MAXNESTLEVEL];
+static CHAR BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // 各階層の.ttlファイル名
 static PCHAR Buff[MAXNESTLEVEL];
 static BINT BuffLen[MAXNESTLEVEL];
 static BINT BuffPtr[MAXNESTLEVEL];
@@ -88,6 +91,7 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 {
 	int F;
 	int dummy_read = 0;
+	char basename[MAX_PATH];
 
 	if ((FileName[0]==0) || (IBuff>MAXNESTLEVEL-1)) {
 		return FALSE;
@@ -95,6 +99,14 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 	if (BuffHandle[IBuff]!=0) {
 		return FALSE;
 	}
+
+	// includeに成功したファイルから、ファイル名を記録する。
+	// マクロのエラーダイアログで、ファイル名を表示したいため。
+	// (2013.9.8 yutaka)
+	if (GetFileTitle(FileName, basename, sizeof(basename)) != 0) 
+		strncpy_s(basename, sizeof(basename), FileName, _TRUNCATE);
+	strncpy_s(&BuffHandleFileName[IBuff][0], MAXFILENAME, basename, _TRUNCATE);
+
 	BuffPtr[IBuff] = 0;
 
 	// get file length
@@ -134,7 +146,15 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 		}
 	}
 	_lclose(F);
+
 	return FALSE;
+}
+
+
+// 現在実行中のマクロファイルのファイル名を返す
+char *GetMacroFileName(void)
+{
+	return &BuffHandleFileName[INest][0];
 }
 
 

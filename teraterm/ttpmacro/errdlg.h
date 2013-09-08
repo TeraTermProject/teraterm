@@ -8,7 +8,7 @@
 class CErrDlg : public CDialog
 {
 public:
-	CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end);
+	CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName);
 
 	//{{AFX_DATA(CErrDlg)
 	enum { IDD = IDD_ERRDLG };
@@ -23,6 +23,7 @@ protected:
 	HFONT DlgFont;
 	int LineNo;
 	int StartPos, EndPos;
+	PCHAR MacroFileName;
 
 	//{{AFX_MSG(CErrDlg)
 	virtual BOOL OnInitDialog();

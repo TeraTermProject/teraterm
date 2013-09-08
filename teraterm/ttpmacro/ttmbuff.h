@@ -33,6 +33,7 @@ int GetLineNo(void);
 char *GetLineBuffer(void);
 int IsUpdateMacroCommand(void);
 WORD BreakLoop(WORD WId);
+char *GetMacroFileName(void);
 
 extern int EndWhileFlag;
 extern int BreakFlag;

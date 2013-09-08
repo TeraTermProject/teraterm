@@ -97,6 +97,7 @@ void DispErr(WORD Err)
 	char Msg[41];
 	int i;
 	int no, start, end;
+	char *filename;
 
 	strncpy_s(Msg, sizeof(Msg), "Unknown error message number.", _TRUNCATE);
 
@@ -129,7 +130,9 @@ void DispErr(WORD Err)
 	if (start == end)
 		end = LineLen;
 
-	i = OpenErrDlg(Msg, LineBuff, no, start, end);
+	filename = GetMacroFileName();
+
+	i = OpenErrDlg(Msg, LineBuff, no, start, end, filename);
 	if (i==IDOK) TTLStatus = IdTTLEnd;
 }
 

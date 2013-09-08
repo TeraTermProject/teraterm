@@ -261,9 +261,9 @@ void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
 }
 
 extern "C" {
-int OpenErrDlg(PCHAR Msg, PCHAR Line, int lineno, int start, int end)
+int OpenErrDlg(PCHAR Msg, PCHAR Line, int lineno, int start, int end, PCHAR FileName)
 {
-	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end);
+	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end, FileName);
 	return ErrDlg.DoModal();
 }
 }

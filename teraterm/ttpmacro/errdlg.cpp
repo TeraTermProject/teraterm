@@ -24,7 +24,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // CErrDlg dialog
-CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end)
+CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName)
 	: CDialog(CErrDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CErrDlg)
@@ -36,6 +36,7 @@ CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int
 	LineNo = lineno;
 	StartPos = start;
 	EndPos = end;
+	MacroFileName = FileName;
 }
 
 BEGIN_MESSAGE_MAP(CErrDlg, CDialog)
@@ -79,9 +80,9 @@ BOOL CErrDlg::OnInitDialog()
 	SetDlgItemText(IDC_ERRMSG,MsgStr);
 
 	// 行番号を先頭につける。
-	// TODO: ファイル名もつけたい。
+	// ファイル名もつける。
 	// エラー箇所に印をつける。
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d:", LineNo);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%d:", MacroFileName, LineNo);
 	SetDlgItemText(IDC_ERRLINE, buf);
 
 	len = strlen(LineStr);
