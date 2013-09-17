@@ -2574,6 +2574,14 @@ WORD TTLGetTime(WORD mode)
 	struct tm *ptm;
 	char *format;
 	BOOL set_result;
+	const char *tz = NULL;
+	char tz_copy[128]; 
+
+	// Save timezone
+	tz = getenv("TZ");
+	tz_copy[0] = 0;
+	if (tz)
+		strncpy_s(tz_copy, sizeof(tz_copy), tz, _TRUNCATE);
 
 	Err = 0;
 	GetStrVar(&VarId,&Err);
@@ -2625,6 +2633,10 @@ WORD TTLGetTime(WORD mode)
 	else {
 		if (set_result) SetResult(1);
 	}
+
+	// Restore timezone
+	_putenv_s("TZ", tz_copy);
+	_tzset();
 
 	return Err;
 }
