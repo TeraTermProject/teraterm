@@ -170,6 +170,7 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SendDlgItemMessage(Dialog, IDC_PLAINTEXT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_TIMESTAMP, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_HIDEDIALOG, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_ALLBUFF_INFIRST, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgFoptFont = NULL;
@@ -193,6 +194,9 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		GetDlgItemText(Dialog, IDC_HIDEDIALOG, uimsg2, sizeof(uimsg2));
 		get_lang_msg("DLG_FOPT_HIDEDIALOG", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 		SetDlgItemText(Dialog, IDC_HIDEDIALOG, uimsg);
+		GetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg2, sizeof(uimsg2));
+		get_lang_msg("DLG_FOPT_ALLBUFFINFIRST", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+		SetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg);
 
 		Lo = LOWORD(*pl) & 1;
 		Hi = HIWORD(*pl);
@@ -227,6 +231,13 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			if (Hi & 0x4000) {
 				SetRB(Dialog,1,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
 			}
+
+			// All Buff in firstチェックボックス (2013.9.29 yutaka)
+			ShowDlgItem(Dialog,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
+			if (Hi & 0x8000) {
+				SetRB(Dialog,1,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
+			}
+
 		}
 		return TRUE;
 
@@ -288,6 +299,12 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				GetRB(Dialog,&val,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
 				if (val > 0) {
 					Hi |= 0x4000;
+				}
+
+				// All Buff in firstチェックボックス (2013.9.29 yutaka)
+				GetRB(Dialog,&val,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
+				if (val > 0) {
+					Hi |= 0x8000;
 				}
 
 				*pl = MAKELONG(Lo,Hi);

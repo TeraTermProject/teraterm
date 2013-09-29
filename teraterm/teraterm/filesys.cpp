@@ -22,6 +22,8 @@
 #include "filesys.h"
 #include "ftlib.h"
 
+#include "buffer.h"
+
 #include <io.h>
 #include <process.h>
 
@@ -438,6 +440,8 @@ BOOL LogStart()
 	LONG Option;
 	char *logdir;
 	unsigned tid;
+	DWORD ofs, size, written_size;
+	char buf[512];
 
 	if ((FileLog) || (BinLog)) return FALSE;
 
@@ -468,12 +472,15 @@ BOOL LogStart()
 		// 0x1000 = plain text (2005.2.20 yutaka)
 		// 0x2000 = timestamp (2006.7.23 maya)
 		// 0x4000 = hide file transfer dialog (2008.1.30 maya)
+		// 0x8000 = All buffer included in first (2013.9.29 yutaka)
 		// teraterm.iniの設定を見てからデフォルトオプションを決める。(2005.5.7 yutaka)
 		Option = MAKELONG(ts.LogBinary,
 		                  ts.Append |
 		                  (0x1000 * ts.LogTypePlainText) |
 		                  (0x2000 * ts.LogTimestamp) |
-		                  (0x4000 * ts.LogHideDialog));
+		                  (0x4000 * ts.LogHideDialog) |
+		                  (0x8000 * ts.LogAllBuffIncludedInFirst)					  
+						  );
 
 		// ログのデフォルトファイル名を設定 (2006.8.28 maya)
 		strncat_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogDefaultName, _TRUNCATE);
@@ -511,6 +518,13 @@ BOOL LogStart()
 		}
 		else {
 			ts.LogHideDialog = 0;
+		}
+
+		if (ts.Append & 0x8000) {
+			ts.LogAllBuffIncludedInFirst = 1;
+		}
+		else {
+			ts.LogAllBuffIncludedInFirst = 0;
 		}
 
 		ts.Append &= 0x1; // 1bitにマスクする
@@ -621,6 +635,19 @@ BOOL LogStart()
 	// (2013.4.19 yutaka)
 	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
 	LogVar->LogThreadId = tid;
+
+	// 現在バッファにあるデータをすべて書き出してから、
+	// ログ採取を開始する。
+	// (2013.9.29 yutaka)
+	if (ts.LogAllBuffIncludedInFirst) {
+		for (ofs = 0 ;  ; ofs++ ) {
+			size = BuffGetAnyLineData(ofs, buf, sizeof(buf));
+			if (size == -1)
+				break;
+			WriteFile((HANDLE)LogVar->FileHandle, buf, size, &written_size, NULL);
+			WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &written_size, NULL);
+		}
+	}
 
 	return TRUE;
 }

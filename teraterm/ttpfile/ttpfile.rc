@@ -15,7 +15,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -86,12 +86,13 @@ BEGIN
     GROUPBOX        "Option",IDC_FOPT,5,2,290,40
     CONTROL         "&Binary",IDC_FOPTBIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,10,60,16
     CONTROL         "&Append",IDC_FOPTAPPEND,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,90,10,60,16
-    CONTROL         "&Plain text",IDC_PLAINTEXT,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,170,10,80,16
+    CONTROL         "&Plain text",IDC_PLAINTEXT,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,179,10,80,16
     CONTROL         "&Timestamp",IDC_TIMESTAMP,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,24,80,16
-    CONTROL         "Hide &dialog",IDC_HIDEDIALOG,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,90,24,113,16
+    CONTROL         "Hide &dialog",IDC_HIDEDIALOG,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,90,24,88,16
+    CONTROL         "All Buff in &first",IDC_ALLBUFF_INFIRST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,179,27,83,10
 END
 
-#endif    // English (U.S.) resources
+#endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

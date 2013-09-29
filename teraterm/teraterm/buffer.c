@@ -3857,6 +3857,24 @@ int BuffGetCurrentLineData(char *buf, int bufsize)
 	return (CursorX);
 }
 
+// 全バッファから指定した行を返す。
+int BuffGetAnyLineData(int offset_y, char *buf, int bufsize)
+{
+	LONG Ptr;
+	int copysize = 0;
+
+	if (offset_y >= BuffEnd)
+		return -1;
+
+	Ptr = GetLinePtr(offset_y);
+	memset(buf, 0, bufsize);
+	copysize = min(NumOfColumns, bufsize - 1);
+	memcpy(buf, &CodeBuff[Ptr], copysize);
+
+	return (copysize);
+}
+
+
 BOOL BuffCheckMouseOnURL(int Xw, int Yw)
 {
 	int X, Y;
