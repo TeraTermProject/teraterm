@@ -442,6 +442,8 @@ BOOL LogStart()
 	unsigned tid;
 	DWORD ofs, size, written_size;
 	char buf[512];
+	const char *crlf = "\r\n";
+	DWORD crlf_len = 2;
 
 	if ((FileLog) || (BinLog)) return FALSE;
 
@@ -641,11 +643,26 @@ BOOL LogStart()
 	// (2013.9.29 yutaka)
 	if (ts.LogAllBuffIncludedInFirst) {
 		for (ofs = 0 ;  ; ofs++ ) {
+			// 1つの行を取得する。文字だけなので、エスケープシーケンスは含まれない。
 			size = BuffGetAnyLineData(ofs, buf, sizeof(buf));
 			if (size == -1)
 				break;
-			WriteFile((HANDLE)LogVar->FileHandle, buf, size, &written_size, NULL);
-			WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &written_size, NULL);
+
+#if 0
+			if (ts.DeferredLogWriteMode) { // 遅延書き込み
+				char *pbuf = (char *)malloc(size + 2);
+				memcpy(pbuf, buf, size);
+				pbuf[size] = '\r';
+				pbuf[size+1] = '\n';
+				Sleep(1);  // スレッドキューが作られるように、コンテキストスイッチを促す。
+				PostThreadMessage(LogVar->LogThreadId, WM_DPC_LOGTHREAD_SEND, (WPARAM)pbuf, size + 2);
+			} else { // 直書き。ネットワーク経由だと遅い。
+#endif
+				WriteFile((HANDLE)LogVar->FileHandle, buf, size, &written_size, NULL);
+				WriteFile((HANDLE)LogVar->FileHandle, crlf, crlf_len, &written_size, NULL);
+#if 0
+			}
+#endif
 		}
 	}
 
