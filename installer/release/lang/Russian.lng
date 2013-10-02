@@ -403,7 +403,7 @@ DLG_FOPT_APPEND=&Дополнение
 DLG_FOPT_PLAIN=&Обычный текст
 DLG_FOPT_TIMESTAMP=&Отметка времени
 DLG_FOPT_HIDEDIALOG=&Скрыть диалог
-DLG_FOPT_ALLBUFFINFIRST=All buffer in &first
+DLG_FOPT_ALLBUFFINFIRST=&Include screen buffer
 
 DLG_XOPT=Опции
 DLG_XOPT_CHECKSUM=&Контрольная сумма

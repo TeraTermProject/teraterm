@@ -402,7 +402,7 @@ DLG_FOPT_APPEND=&Append
 DLG_FOPT_PLAIN=&Plain text
 DLG_FOPT_TIMESTAMP=&Timestamp
 DLG_FOPT_HIDEDIALOG=Hide &dialog
-DLG_FOPT_ALLBUFFINFIRST=All buffer in &first
+DLG_FOPT_ALLBUFFINFIRST=&Include screen buffer
 
 DLG_XOPT=Option
 DLG_XOPT_CHECKSUM=Check&sum
