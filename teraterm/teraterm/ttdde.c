@@ -402,6 +402,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		ts.LogTypePlainText = Command[13] & 1;
 		ts.LogTimestamp     = Command[14] & 1;
 		ts.LogHideDialog    = Command[15] & 1;
+		ts.LogAllBuffIncludedInFirst    = Command[16] & 1;
 		break;
 	case CmdSetXmodemOpt:
 		ParamXmodemOpt = Command[1] & 3;

@@ -3100,6 +3100,14 @@ WORD TTLLogOpen()
 				if (Err!=0) return Err;
 				TmpOpt = (TmpFlag == 0) ? 0 : 1;
 				AppendFlag |= TmpOpt * 0x4000;
+
+				if (CheckParameterGiven()) { // Include screen buffer
+					GetIntVal(&TmpFlag, &Err);
+					if (Err!=0) return Err;
+					TmpOpt = (TmpFlag == 0) ? 0 : 1;
+					AppendFlag |= TmpOpt * 0x8000;
+				}
+
 			}
 		}
 	}
