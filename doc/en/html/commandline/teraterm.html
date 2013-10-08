@@ -14,7 +14,7 @@
 
 <pre class="syntax">
 TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] ]
-         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E]
+         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E] [/ES]
          [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
          [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
@@ -77,6 +77,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="e">/E</dt>
   <dd>Disable TCPLocalEcho and TCPCRSend option</dd>
+
+  <dt id="es">/ES</dt>
+  <dd>Enable displaying the "New connection" dialog on startup</dd>
 
   <dt id="f">/F=&lt;setup file&gt;</dt>
   <dd>Setup file<br>

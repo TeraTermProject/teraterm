@@ -18,7 +18,7 @@ Tera Term Pro を起動するときのコマンドライン(ショートカットのリンク先)の形式
 
 <pre class="syntax">
 TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] ]
-         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E]
+         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E] [/ES]
          [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
          [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
@@ -82,6 +82,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="e">/E</dt>
   <dd>TCPLocalEcho/TCPCRSend の設定を無効にする</dd>
+
+  <dt id="es">/ES</dt>
+  <dd>起動時に "New connection" ダイアログを表示する</dd>
 
   <dt id="f">/F=&lt;setup file&gt;</dt>
   <dd>設定ファイル<br>

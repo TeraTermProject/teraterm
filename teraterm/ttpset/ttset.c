@@ -3323,6 +3323,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		else if (_stricmp(Temp, "/E") == 0) {
 			ts->DisableTCPEchoCR = TRUE;
 		}
+		// "New connection" ダイアログを表示する (2013.10.08 maya)
+		else if (_stricmp(Temp, "/ES") == 0) {
+			ts->HostDialogOnStartup = TRUE;
+		}
 		else if (_strnicmp(Temp, "/FD=", 4) == 0) {	/* file transfer directory */
 			Dequote(&Temp[4], Temp2);
 			if (strlen(Temp2) > 0) {
