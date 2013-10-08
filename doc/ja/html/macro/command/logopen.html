@@ -18,7 +18,7 @@ Tera Term のログを開始する。
 </p>
 
 <pre class="macro-syntax">
-logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt;]]]
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;Include screen buffer&gt;]]]]
 </pre>
 
 <h2>解説</h2>
@@ -46,6 +46,10 @@ logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text
 
 <p>
 &lt;hide dialog flag&gt; が 0 以外の場合、ログ転送のダイアログを表示しない。
+</p>
+
+<p>
+&lt;Include screen buffer&gt; が 0 以外の場合、現在の端末バッファすべてを先にファイルに書き込む。 <em>(バージョン 4.80以降)</em>
 </p>
 
 <p>
