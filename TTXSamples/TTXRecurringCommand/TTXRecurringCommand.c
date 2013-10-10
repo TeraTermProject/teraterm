@@ -40,8 +40,8 @@ typedef struct {
 	int interval;
 	BOOL enable;
 	int cmdLen;
-	unsigned char command[50];
-	unsigned char orgCommand[50];
+	unsigned char command[OutBuffSize];
+	unsigned char orgCommand[OutBuffSize];
 } TInstVar;
 
 typedef TInstVar FAR * PTInstVar;
@@ -329,7 +329,7 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
 // TTXReadIniFile, TTXWriteIniFile -- İ’èƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‘‚«
 //
 void ReadINI(PCHAR fn, PTTSet ts) {
-	char buff[256];
+	char buff[OutBuffSize];
 	char *p;
 
 	if (fn[0] == '\\' || fn[0] == '/' || (fn[0] != 0 && fn[1] == ':')) {
