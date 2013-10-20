@@ -1,6 +1,6 @@
 * Development Environment
 - OS
-  Windows XP Professional / Windows 8 Pro
+  Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro
 - Compiler
   Visual Studio 2005 SP1 Standard Edition (or higher edition)
     Note: The executable program which was compiled by Visual Studio 2008 Standard Edition (or higher edition) does not work on Windows NT 4.0, 95, 98 and Me.
