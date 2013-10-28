@@ -1055,6 +1055,22 @@ void FAR PASCAL UndoAllWin(void) {
 	HMONITOR hMonitor;
 	MONITORINFO mi;
 	int stat = SW_RESTORE;
+	OSVERSIONINFO osvi;
+	int multi_mon = 0;
+
+	// Windowsのバージョンを取得する。
+	// なお、Windows8.1では、GetVersionEx()はdeprecated APIであるため、Windows8(major=6,minor=2)
+	// と返ってくる。Manifestファイルを修正するという回避方法があるようだが、Visual Studio 2005では
+	// 使えないものと思われる。
+	// cf. http://msdn.microsoft.com/en-us/library/windows/desktop/dn302074.aspx
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
+	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10) ) {
+		multi_mon = 0;
+	} else {
+		multi_mon = 1;
+	}
 
 	// 一度、復元したらフラグは落とす。
 	pm->WinUndoFlag = FALSE;
@@ -1066,27 +1082,30 @@ void FAR PASCAL UndoAllWin(void) {
 		if (stat == SW_RESTORE && memcmp(&pm->WinPrevRect[i], &rc0, sizeof(rc0)) != 0) {
 			rc = pm->WinPrevRect[i].rcNormalPosition;
 
-			// 対象モニタの情報を取得
-			hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
-			mi.cbSize = sizeof(MONITORINFO);
-			GetMonitorInfo(hMonitor, &mi);
+			// NT4.0, 95 はマルチモニタAPIに非対応
+			if (multi_mon) {
+				// 対象モニタの情報を取得
+				hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+				mi.cbSize = sizeof(MONITORINFO);
+				GetMonitorInfo(hMonitor, &mi);
 
-			// 位置補正（復元前後で解像度が変わっている場合への対策）
-			if (rc.right > mi.rcMonitor.right) {
-				rc.left -= rc.right - mi.rcMonitor.right;
-				rc.right = mi.rcMonitor.right;
-			}
-			if (rc.left < mi.rcMonitor.left) {
-				rc.right += mi.rcMonitor.left - rc.left;
-				rc.left = mi.rcMonitor.left;
-			}
-			if (rc.bottom > mi.rcMonitor.bottom) {
-				rc.top -= rc.bottom - mi.rcMonitor.bottom;
-				rc.bottom = mi.rcMonitor.bottom;
-			}
-			if (rc.top < mi.rcMonitor.top) {
-				rc.bottom += mi.rcMonitor.top - rc.top;
-				rc.top = mi.rcMonitor.top;
+				// 位置補正（復元前後で解像度が変わっている場合への対策）
+				if (rc.right > mi.rcMonitor.right) {
+					rc.left -= rc.right - mi.rcMonitor.right;
+					rc.right = mi.rcMonitor.right;
+				}
+				if (rc.left < mi.rcMonitor.left) {
+					rc.right += mi.rcMonitor.left - rc.left;
+					rc.left = mi.rcMonitor.left;
+				}
+				if (rc.bottom > mi.rcMonitor.bottom) {
+					rc.top -= rc.bottom - mi.rcMonitor.bottom;
+					rc.bottom = mi.rcMonitor.bottom;
+				}
+				if (rc.top < mi.rcMonitor.top) {
+					rc.bottom += mi.rcMonitor.top - rc.top;
+					rc.top = mi.rcMonitor.top;
+				}
 			}
 
 			// ウィンドウ位置復元
