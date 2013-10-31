@@ -1525,6 +1525,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		GetPrivateProfileInt(Section, "BeepOverUsedTime", 2, FName);
 	ts->BeepSuppressTime =
 		GetPrivateProfileInt(Section, "BeepSuppressTime", 5, FName);
+
+	// Max OSC string buffer size
+	ts->MaxOSCBufferSize =
+		GetPrivateProfileInt(Section, "MaxOSCBufferSize", 4096, FName);
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2683,6 +2687,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteInt(Section, "BeepOverUsedCount", FName, ts->BeepOverUsedCount);
 	WriteInt(Section, "BeepOverUsedTime", FName, ts->BeepOverUsedTime);
 	WriteInt(Section, "BeepSuppressTime", FName, ts->BeepSuppressTime);
+
+	// Max OSC string buffer size
+	WriteInt(Section, "MaxOSCBufferSize", FName, ts->MaxOSCBufferSize);
 }
 
 #define VTEditor "VT editor keypad"

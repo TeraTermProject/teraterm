@@ -570,6 +570,7 @@ struct tttset {
 	DWORD BeepOverUsedTime;
 	DWORD BeepSuppressTime;
 	WORD LogAllBuffIncludedInFirst;
+	int MaxOSCBufferSize;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1035,6 +1036,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.80, ttset_memfilemap was replaced with ttset_memfilemap_22.
  *   added tttset.LogAllBuffIncludedInFirst
+ *   added tttset.MaxOSCBufferSize
  *
  * - At version 4.79, ttset_memfilemap was replaced with ttset_memfilemap_21.
  *   added TMap.WinUndoFlag

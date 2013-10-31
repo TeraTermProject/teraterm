@@ -168,7 +168,6 @@ static DWORD BeepSuppressTime = 0;
 static DWORD BeepOverUsedCount = 0;
 
 /* OSC String buffer */
-#define MAXOSCBUFFSIZE 4096
 static char *OSCStrBuff;
 static unsigned int OSCStrBuffSize;
 
@@ -4353,17 +4352,21 @@ void XSequence(BYTE b)
 				XsParseMode = ModeXsColorSpec;
 				break;
 			case 52:
-				if ((ts.CtrlFlag & CSF_CBRW) == 0) {
+				if ((ts.CtrlFlag & CSF_CBRW) == 0 || ts.MaxOSCBufferSize == 0) {
 					XsParseMode = ModeXsIgnore;
 					break;
 				}
 				if (OSCStrBuff == NULL) {
-					OSCStrBuff = malloc(sizeof(ts.Title));
+					new_size = sizeof(ts.Title);
+					if (new_size > ts.MaxOSCBufferSize) {
+						new_size = ts.MaxOSCBufferSize;
+					}
+					OSCStrBuff = malloc(new_size);
 					if (OSCStrBuff == NULL) {
 						XsParseMode = ModeXsIgnore;
 						break;
 					}
-					OSCStrBuffSize = sizeof(ts.Title);
+					OSCStrBuffSize = new_size;
 				}
 				XsParseMode = ModeXsString;
 				break;
@@ -4424,10 +4427,10 @@ void XSequence(BYTE b)
 				if (StrLen < OSCStrBuffSize - 1) {
 					OSCStrBuff[StrLen++] = b;
 				}
-				else if (!realloc_failed && OSCStrBuffSize < MAXOSCBUFFSIZE) {
+				else if (!realloc_failed && OSCStrBuffSize < ts.MaxOSCBufferSize) {
 					new_size = OSCStrBuffSize * 2;
-					if (new_size > MAXOSCBUFFSIZE) {
-						new_size = MAXOSCBUFFSIZE;
+					if (new_size > ts.MaxOSCBufferSize) {
+						new_size = ts.MaxOSCBufferSize;
 					}
 
 					p = realloc(OSCStrBuff, new_size);
