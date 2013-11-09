@@ -467,14 +467,15 @@ BeepSuppressTime=5
 
 <h1><a name="MaxOSCBufferSize">OSC string buffer size</a></h1>
 <p>
-Tera Term では OSC 文字列の処理時に処理用のバッファが足りなくなると自動的にバッファを拡張するようになっています。
-しかし、バグ等でホスト側が壊れた OSC 文字列送ってきた時などに際限なくメモリを消費するのを防ぐため、
-OSC 文字列処理用のバッファの最大サイズを制限しています。
+Tera Term will expand the buffer size of the OSC string when the buffer size is lack. 
+However, when the remote host sends invalid OSC string by using the host bug, 
+Tera Term will restrict the buffer size to prevent enlarged memory allocation.
 </p>
                                                                                                                                                         <p>
-通常の使用ではまず問題が発生しませんが、OSC 52 (PASTE64) で多量のデータをやり取りする場合に制限にかかり、
-データが途中で切れてしまう場合があります。<br>
-設定ファイルの [Tera Term] セクションの MaxOSCBufferSize 行の値を以下のように増やす事によって、OSC 文字列でより多量のデータを扱えるようになります。
+When the OSC 52 (PASTE64) is used for burst data, the remote host data may be
+abandoned by above restriction. <br>
+So, a user can configure the OSC buffer size in the MaxOSCBufferSize entry of the
+teraterm.ini file.
 </p>
 
 <pre>
