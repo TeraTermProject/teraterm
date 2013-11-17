@@ -2545,6 +2545,8 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		SIZE sz;
 		RECT wr;
 		int ix, iy;
+		HMODULE mod;
+		HMONITOR hm;
 
 		/* calculate the tip's size */
 
@@ -2555,13 +2557,43 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		GetWindowRect(src, &wr);
 
 		ix = wr.left;
-		if (ix < 16) {
-			ix = 16;
-		}
-
 		iy = wr.top - sz.cy;
-		if (iy < 16) {
-			iy = 16;
+
+		if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+		    (GetProcAddress(mod,"MonitorFromPoint") != NULL)) {
+			// マルチモニタがサポートされている場合
+			POINT p;
+			p.x = ix;
+			p.y = iy;
+			hm = MonitorFromPoint(p, MONITOR_DEFAULTTONULL);
+			if (hm == NULL) {
+#if 1
+				// ツールチップがスクリーンからはみ出している場合はマウスのあるモニタに表示する
+				GetCursorPos(&p);
+				hm = MonitorFromPoint(p, MONITOR_DEFAULTTONEAREST);
+#else
+				// ツールチップがスクリーンからはみ出している場合は最も近いモニタに表示する
+				hm = MonitorFromPoint(p, MONITOR_DEFAULTTONEAREST);
+#endif
+			}
+			MONITORINFO mi;
+			mi.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(hm, &mi);
+			if (ix < mi.rcMonitor.left + 16) {
+				ix = mi.rcMonitor.left + 16;
+			}
+			if (iy < mi.rcMonitor.top + 16) {
+				iy = mi.rcMonitor.top + 16;
+			}
+		}
+		else {
+			// マルチモニタがサポートされていない場合
+			if (ix < 16) {
+				ix = 16;
+			}
+			if (iy < 16) {
+				iy = 16;
+			}
 		}
 
 		/* Create the tip window */
