@@ -164,6 +164,7 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 		c->agent_msg = buffer_init();
 		c->agent_request_len = 0;
 	}
+	c->state = 0;
 
 	return (c);
 }
@@ -2741,6 +2742,8 @@ void SSH_notify_disconnecting(PTInstVar pvar, char FAR * reason)
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
+
+		c->state |= SSH_CHANNEL_STATE_CLOSE_SENT;
 
 		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_CLOSE was sent at SSH_notify_disconnecting().", LOG_LEVEL_VERBOSE);
 	}
@@ -7540,6 +7543,11 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 		int len;
 		char log[128];
 
+		// このchannelについてcloseを送信済みなら送らない
+		if (c->state & SSH_CHANNEL_STATE_CLOSE_SENT) {
+			return;
+		}
+
 		// SSH2 serverにchannel closeを伝える
 		msg = buffer_init();
 		if (msg == NULL) {
@@ -7553,6 +7561,8 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
+
+		c->state |= SSH_CHANNEL_STATE_CLOSE_SENT;
 
 		_snprintf_s(log, sizeof(log), _TRUNCATE, "SSH2_MSG_CHANNEL_CLOSE was sent at ssh2_channel_send_close(). local:%d remote:%d", c->self_id, c->remote_id);
 		notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
@@ -8491,6 +8501,10 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 		notify_closed_connection(pvar);
 
 	} else if (c->type == TYPE_PORTFWD) {
+		// CHANNEL_CLOSE を送り返さないとリモートのchannelが開放されない
+		// c.f. RFC 4253 5.3. Closing a Channel
+		ssh2_channel_send_close(pvar, c);
+
 		// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
 		FWD_free_channel(pvar, c->local_num);
 
@@ -8503,7 +8517,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	} else if (c->type == TYPE_AGENT) {
 		ssh2_channel_delete(c);
 
-	} else { // TYPE_PORTFWD
+	} else {
 		ssh2_channel_delete(c);
 
 	}

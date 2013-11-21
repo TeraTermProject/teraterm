@@ -697,6 +697,8 @@ typedef struct channel {
 	buffer_t *agent_msg;
 	int agent_request_len;
 	sftp_t sftp;
+#define SSH_CHANNEL_STATE_CLOSE_SENT 0x00000001
+	unsigned int state;
 } Channel_t;
 
 unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len);
