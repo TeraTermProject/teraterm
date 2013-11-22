@@ -406,6 +406,7 @@ void ChangeTerminalSize(int Nx, int Ny)
   MainY = 0;
   MainTop = 0;
   MainBottom = NumOfColumns-1;
+  LRMarginMode = FALSE;
 }
 
 void SendCSIstr(char *str, int len) {
