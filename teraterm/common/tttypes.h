@@ -570,7 +570,7 @@ struct tttset {
 	DWORD BeepOverUsedTime;
 	DWORD BeepSuppressTime;
 	WORD LogAllBuffIncludedInFirst;
-	int MaxOSCBufferSize;
+	unsigned int MaxOSCBufferSize;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
