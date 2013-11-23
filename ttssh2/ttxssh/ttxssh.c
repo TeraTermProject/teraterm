@@ -61,7 +61,6 @@ static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 #include <Lmcons.h>
 
 // include OpenSSL header file
-#include <openssl/opensslv.h>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
@@ -2361,11 +2360,8 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)
 	// 条件文追加 (2005.5.11 yutaka)
-#ifdef OPENSSL_VERSION_TEXT
-	SendMessage(GetDlgItem(dlg, IDC_OPENSSL_VERSION), WM_SETTEXT, 0, (LPARAM)OPENSSL_VERSION_TEXT);
-#else
-	SendMessage(GetDlgItem(dlg, IDC_OPENSSL_VERSION), WM_SETTEXT, 0, (LPARAM)"Unknown");
-#endif
+	// OPENSSL_VERSION_TEXT マクロ定義ではなく、関数を使ってバージョンを取得する。(2013.11.24 yutaka)
+	SendMessage(GetDlgItem(dlg, IDC_OPENSSL_VERSION), WM_SETTEXT, 0, (LPARAM)SSLeay_version(SSLEAY_VERSION));
 
 	// zlibのバージョンを設定する (2005.5.11 yutaka)
 #ifdef ZLIB_VERSION
