@@ -3792,45 +3792,78 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 
 void BuffScrollLeft(int count)
 {
-	int i;
-	LONG Ptr;
+	int i, MoveLen;
+	LONG LPtr, Ptr;
 
 	UpdateStr();
 
-	Ptr = GetLinePtr(PageStart);
-	for (i = 1; i < NumOfLines - StatusLine; i++) {
-		memmove(&(CodeBuff[Ptr]),   &(CodeBuff[Ptr+count]),   NumOfColumns - count);
-		memmove(&(AttrBuff[Ptr]),   &(AttrBuff[Ptr+count]),   NumOfColumns - count);
-		memmove(&(AttrBuff2[Ptr]),  &(AttrBuff2[Ptr+count]),  NumOfColumns - count);
-		memmove(&(AttrBuffFG[Ptr]), &(AttrBuffFG[Ptr+count]), NumOfColumns - count);
-		memmove(&(AttrBuffBG[Ptr]), &(AttrBuffBG[Ptr+count]), NumOfColumns - count);
+	LPtr = GetLinePtr(PageStart + CursorTop);
+	MoveLen = CursorRightM - CursorLeftM + 1 - count;
+	for (i = CursorTop; i <= CursorBottom; i++) {
+		Ptr = LPtr + CursorLeftM;
 
-		memset(&(CodeBuff[Ptr+NumOfColumns-count]),   0x20,          count);
-		memset(&(AttrBuff[Ptr+NumOfColumns-count]),   AttrDefault,   count);
-		memset(&(AttrBuff2[Ptr+NumOfColumns-count]),  AttrDefault,   count);
-		memset(&(AttrBuffFG[Ptr+NumOfColumns-count]), AttrDefaultFG, count);
-		memset(&(AttrBuffBG[Ptr+NumOfColumns-count]), AttrDefaultBG, count);
+		if (AttrBuff[LPtr + CursorRightM] & AttrKanji) {
+			CodeBuff[LPtr+CursorRightM] = 0x20;
+			AttrBuff[LPtr+CursorRightM] &= ~AttrKanji;
+			if (CursorRightM < NumOfColumns-1) {
+				CodeBuff[LPtr+CursorRightM+1] = 0x20;
+			}
+		}
 
-		Ptr = NextLinePtr(Ptr);
+		if (AttrBuff[Ptr+count-1] & AttrKanji) {
+			CodeBuff[Ptr+count] = 0x20;
+		}
+
+		if (CursorLeftM > 0 && AttrBuff[Ptr-1] & AttrKanji) {
+			CodeBuff[Ptr-1] = 0x20;
+			AttrBuff[Ptr-1] &= ~AttrKanji;
+		}
+
+		memmove(&(CodeBuff[Ptr]),   &(CodeBuff[Ptr+count]),   MoveLen);
+		memmove(&(AttrBuff[Ptr]),   &(AttrBuff[Ptr+count]),   MoveLen);
+		memmove(&(AttrBuff2[Ptr]),  &(AttrBuff2[Ptr+count]),  MoveLen);
+		memmove(&(AttrBuffFG[Ptr]), &(AttrBuffFG[Ptr+count]), MoveLen);
+		memmove(&(AttrBuffBG[Ptr]), &(AttrBuffBG[Ptr+count]), MoveLen);
+
+		memset(&(CodeBuff[Ptr+MoveLen]),   0x20,          count);
+		memset(&(AttrBuff[Ptr+MoveLen]),   AttrDefault,   count);
+		memset(&(AttrBuff2[Ptr+MoveLen]),  AttrDefault,   count);
+		memset(&(AttrBuffFG[Ptr+MoveLen]), AttrDefaultFG, count);
+		memset(&(AttrBuffBG[Ptr+MoveLen]), AttrDefaultBG, count);
+
+		LPtr = NextLinePtr(LPtr);
 	}
 
-	BuffUpdateRect(0, 0, NumOfColumns-1, NumOfLines-1);
+	BuffUpdateRect(CursorLeftM, CursorTop, CursorRightM, CursorBottom);
 }
 
 void BuffScrollRight(int count)
 {
-	int i;
-	LONG Ptr;
+	int i, MoveLen;
+	LONG LPtr, Ptr;
 
 	UpdateStr();
 
-	Ptr = GetLinePtr(PageStart);
-	for (i = 1; i < NumOfLines - StatusLine; i++) {
-		memmove(&(CodeBuff[Ptr+count]),   &(CodeBuff[Ptr]),   NumOfColumns - count);
-		memmove(&(AttrBuff[Ptr+count]),   &(AttrBuff[Ptr]),   NumOfColumns - count);
-		memmove(&(AttrBuff2[Ptr+count]),  &(AttrBuff2[Ptr]),  NumOfColumns - count);
-		memmove(&(AttrBuffFG[Ptr+count]), &(AttrBuffFG[Ptr]), NumOfColumns - count);
-		memmove(&(AttrBuffBG[Ptr+count]), &(AttrBuffBG[Ptr]), NumOfColumns - count);
+	LPtr = GetLinePtr(PageStart + CursorTop);
+	MoveLen = CursorRightM - CursorLeftM + 1 - count;
+	for (i = CursorTop; i <= CursorBottom; i++) {
+		Ptr = LPtr + CursorLeftM;
+
+		if (CursorRightM < NumOfColumns-1 && AttrBuff[LPtr+CursorRightM] & AttrKanji) {
+			CodeBuff[LPtr+CursorRightM+1] = 0x20;
+		}
+
+		if (AttrBuff[Ptr+count-1] & AttrKanji) {
+			CodeBuff[Ptr+count-1] = 0x20;
+			AttrBuff[Ptr+count-1] &= ~AttrKanji;
+			CodeBuff[Ptr+count] = 0x20;
+		}
+
+		memmove(&(CodeBuff[Ptr+count]),   &(CodeBuff[Ptr]),   MoveLen);
+		memmove(&(AttrBuff[Ptr+count]),   &(AttrBuff[Ptr]),   MoveLen);
+		memmove(&(AttrBuff2[Ptr+count]),  &(AttrBuff2[Ptr]),  MoveLen);
+		memmove(&(AttrBuffFG[Ptr+count]), &(AttrBuffFG[Ptr]), MoveLen);
+		memmove(&(AttrBuffBG[Ptr+count]), &(AttrBuffBG[Ptr]), MoveLen);
 
 		memset(&(CodeBuff[Ptr]),   0x20,          count);
 		memset(&(AttrBuff[Ptr]),   AttrDefault,   count);
@@ -3838,10 +3871,15 @@ void BuffScrollRight(int count)
 		memset(&(AttrBuffFG[Ptr]), AttrDefaultFG, count);
 		memset(&(AttrBuffBG[Ptr]), AttrDefaultBG, count);
 
-		Ptr = NextLinePtr(Ptr);
+		if (AttrBuff[LPtr + CursorRightM] & AttrKanji) {
+			CodeBuff[LPtr+CursorRightM] = 0x20;
+			AttrBuff[LPtr+CursorRightM] &= ~AttrKanji;
+		}
+
+		LPtr = NextLinePtr(LPtr);
 	}
 
-	BuffUpdateRect(0, 0, NumOfColumns-1, NumOfLines-1);
+	BuffUpdateRect(CursorLeftM, CursorTop, CursorRightM, CursorBottom);
 }
 
 // 現在行をまるごとバッファに格納する。返り値は現在のカーソル位置(X)。

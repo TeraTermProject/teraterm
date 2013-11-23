@@ -1307,21 +1307,27 @@ void ParseEscape(BYTE b) /* b is the final char */
     case 0:
       switch (b) {
         case '6': // DECBI
-	  if (CursorX == 0) {
-	    BuffScrollRight(1);
+	  if (CursorY >= CursorTop && CursorY <= CursorBottom
+	    && CursorX >= CursorLeftM && CursorX <= CursorRightM)
+	  {
+	    if (CursorX == CursorLeftM)
+	      BuffScrollRight(1);
+	    else
+	      MoveCursor(CursorX-1, CursorY);
 	  }
-	  else {
-	    CursorX--;
-	  }
+	  break;
 	case '7': SaveCursor(); break;
 	case '8': RestoreCursor(); break;
 	case '9': // DECFI
-	  if (CursorX == NumOfColumns-1) {
-	    BuffScrollLeft(1);
+	  if (CursorY >= CursorTop && CursorY <= CursorBottom
+	    && CursorX >= CursorLeftM && CursorX <= CursorRightM)
+	  {
+	    if (CursorX == CursorRightM)
+	      BuffScrollLeft(1);
+	    else
+	      MoveCursor(CursorX+1, CursorY);
 	  }
-	  else {
-	    CursorX++;
-	  }
+	  break;
 	case '=': AppliKeyMode = TRUE; break;
 	case '>': AppliKeyMode = FALSE; break;
 	case 'D': /* IND */
