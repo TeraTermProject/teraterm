@@ -1558,7 +1558,8 @@ void BuffDumpCurrentLine(BYTE TERM)
 static void markURL(int x)
 {
 #ifdef URL_EMPHASIS
-	CHAR PrevCharAttr;
+	LONG PrevCharPtr;
+	CHAR PrevCharAttr, PrevCharCode;
 
 	// RFC3986(Uniform Resource Identifier (URI): Generic Syntax)に準拠する
 	// by sakura editor 1.5.2.1: etc_uty.cpp
@@ -1594,11 +1595,12 @@ static void markURL(int x)
 		return;
 
 	// 直前の行から連結しているか。
-	// TODO: 1つ前の行の終端文字が URL の一部なら、強制的に現在の行頭文字もURLの一部とみなす。
-	// (2005.4.3 yutaka)
 	if (x == 0) {
-		PrevCharAttr = AttrBuff[PrevLinePtr(LinePtr) + NumOfColumns-1];
-		if ((PrevCharAttr & AttrURL) && (AttrLine[0] & AttrLineContinued)) {
+		PrevCharPtr = PrevLinePtr(LinePtr) + NumOfColumns-1;
+		PrevCharCode = CodeBuff[PrevCharPtr];
+		PrevCharAttr = AttrBuff[PrevCharPtr];
+		if (((PrevCharAttr & AttrURL) && (AttrLine[0] & AttrLineContinued))
+		    || (ts.JoinSplitedURL && PrevCharCode == ts.IgnoreCharContinuedLineURL)) {
 			if (!(ch & 0x80 || url_char[ch]==0)) { // かつURL構成文字なら
 				AttrLine[0] |= AttrURL; 
 			}
@@ -1607,7 +1609,7 @@ static void markURL(int x)
 	}
 
 	if ((x-1>=0) && (AttrLine[x-1] & AttrURL) &&
-		!(ch & 0x80 || url_char[ch]==0)) {
+		((!(ch & 0x80 || url_char[ch]==0)) || (x == NumOfColumns - 1 && ch == ts.IgnoreCharContinuedLineURL))) {
 //		!((CodeLine[x] <= ' ') && !(AttrLine[x] & AttrKanji))) {
 			AttrLine[x] |= AttrURL; 
 		return;
@@ -2388,19 +2390,15 @@ static void invokeBrowser(LONG ptr)
 	}
 	end--;
 
-	if (start + (LONG)sizeof(url) <= end) {
-		end = start + sizeof(url) - 1;
-		end--;  // '\0'の分は引いておく。
+	if (start + (LONG)sizeof(url) -1 <= end) {
+		end = start + sizeof(url) - 2;
 	}
 	uptr = url;
 	for (i = 0; i < end - start + 1; i++) {
 		ch = CodeBuff[start + i];
 		if ((start + i) % NumOfColumns == NumOfColumns - 1 
-			&& ch == '\\') {
-			// Emacs対応。行末に \ が来ている場合は、次の行に続くという意味で emacs が
-			// 自動で挿入する文字なので、URLには含めないようにする。
-			// (2007.8.7 yutaka)
-
+			&& ch == ts.IgnoreCharContinuedLineURL) {
+			// 行末が行継続マーク用の文字の場合はスキップする
 		} else {
 			*uptr++ = ch;
 		}

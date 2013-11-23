@@ -1529,6 +1529,11 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Max OSC string buffer size
 	ts->MaxOSCBufferSize =
 		GetPrivateProfileInt(Section, "MaxOSCBufferSize", 4096, FName);
+
+	ts->JoinSplitedURL = GetOnOff(Section, "JoinSplitedURL", FName, FALSE);
+
+	GetPrivateProfileString(Section, "IgnoreCharContinuedLineURL", "\\", Temp, sizeof(Temp), FName);
+	ts->IgnoreCharContinuedLineURL = Temp[0];
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2690,6 +2695,11 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Max OSC string buffer size
 	WriteInt(Section, "MaxOSCBufferSize", FName, ts->MaxOSCBufferSize);
+
+	WriteOnOff(Section, "JoinSplitedURL", FName, ts->JoinSplitedURL);
+
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%c", ts->IgnoreCharContinuedLineURL);
+	WritePrivateProfileString(Section, "IgnoreCharContinuedLineURL", Temp, FName);
 }
 
 #define VTEditor "VT editor keypad"
