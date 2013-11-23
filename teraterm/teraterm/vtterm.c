@@ -1451,55 +1451,55 @@ void EscapeSequence(BYTE b)
     BuffInsertSpace(Count);
   }
 
-  void CSCursorUp()
-  {
-    if (Param[1]<1) Param[1] = 1;
+void CSCursorUp(BOOL AffectMargin)	// CUU / VPB
+{
+	int topMargin, NewY;
 
-    if (CursorY >= CursorTop)
-    {
-      if (CursorY-Param[1] > CursorTop)
-	MoveCursor(CursorX,CursorY-Param[1]);
-      else
-	MoveCursor(CursorX,CursorTop);
-    }
-    else {
-      if (CursorY > 0)
-	MoveCursor(CursorX,CursorY-Param[1]);
-      else
-	MoveCursor(CursorX,0);
-    }
-  }
+	if (Param[1]<1)
+		Param[1] = 1;
 
-  void CSCursorUp1()
-  {
-    MoveCursor(CursorLeftM, CursorY);
-    CSCursorUp();
-  }
+	if (AffectMargin && CursorY >= CursorTop)
+		topMargin = CursorTop;
+	else
+		topMargin = 0;
 
-  void CSCursorDown()
-  {
-    if (Param[1]<1) Param[1] = 1;
+	NewY = CursorY - Param[1];
+	if (NewY < topMargin)
+		NewY = topMargin;
 
-    if (CursorY <= CursorBottom)
-    {
-      if (CursorY+Param[1] < CursorBottom)
-	MoveCursor(CursorX,CursorY+Param[1]);
-      else
-	MoveCursor(CursorX,CursorBottom);
-    }
-    else {
-      if (CursorY < NumOfLines-StatusLine-1)
-	MoveCursor(CursorX,CursorY+Param[1]);
-      else
-	MoveCursor(CursorX,NumOfLines-StatusLine);
-    }
-  }
+	MoveCursor(CursorX, NewY);
+}
 
-  void CSCursorDown1()
-  {
-    MoveCursor(CursorLeftM, CursorY);
-    CSCursorDown();
-  }
+void CSCursorUp1()			// CPL
+{
+	MoveCursor(CursorLeftM, CursorY);
+	CSCursorUp(TRUE);
+}
+
+void CSCursorDown(BOOL AffectMargin)	// CUD / VPR
+{
+	int bottomMargin, NewY;
+
+	if (Param[1]<1)
+		Param[1] = 1;
+
+	if (AffectMargin && CursorY <= CursorBottom)
+		bottomMargin = CursorBottom;
+	else
+		bottomMargin = NumOfLines-StatusLine-1;
+
+	NewY = CursorY + Param[1];
+	if (NewY > bottomMargin)
+		NewY = bottomMargin;
+
+	MoveCursor(CursorX, NewY);
+}
+
+void CSCursorDown1()			// CNL
+{
+	MoveCursor(CursorLeftM, CursorY);
+	CSCursorDown(TRUE);
+}
 
 void CSScreenErase()
 {
@@ -1689,39 +1689,40 @@ void CSMoveToColumnN()		// CHA / HPA
 	}
 }
 
-void CSCursorRight()		// CUF / HPR
+void CSCursorRight(BOOL AffectMargin)	// CUF / HPR
 {
-	int NewX;
+	int NewX, rightMargin;
 
 	if (Param[1] < 1)
 		Param[1] = 1;
-	else if (Param[1] > NumOfColumns - 1)
-		Param[1] = NumOfColumns - 1;
+
+	if (AffectMargin && CursorX <= CursorRightM)
+		rightMargin = CursorRightM;
+	else
+		rightMargin = NumOfColumns-1;
 
 	NewX = CursorX + Param[1];
-
-	if (CursorX <= CursorRightM && NewX > CursorRightM)
-		NewX = CursorRightM;
-	else if (NewX > NumOfColumns-1)
-		NewX = NumOfColumns-1;
+	if (NewX > rightMargin)
+		NewX = rightMargin;
 
 	MoveCursor(NewX, CursorY);
 }
 
-void CSCursorLeft()		// CUB / HPB
+void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
 {
-	int NewX;
+	int NewX, leftMargin;
 
 	if (Param[1] < 1)
 		Param[1] = 1;
 
-	if (CursorX < Param[1])
-		NewX = 0;
+	if (AffectMargin && CursorX >= CursorLeftM)
+		leftMargin = CursorLeftM;
 	else
-		NewX = CursorX - Param[1];
+		leftMargin = 0;
 
-	if (CursorX >= CursorLeftM && NewX < CursorLeftM)
-		NewX = CursorLeftM;
+	NewX = CursorX  - Param[1];
+	if (NewX < leftMargin)
+		NewX = leftMargin;
 
 	MoveCursor(NewX, CursorY);
 }
@@ -3562,10 +3563,10 @@ void ParseCS(BYTE b) /* b is the final char */
 			switch (b) {
 			// ISO/IEC 6429 / ECMA-48 Sequence
 			  case '@': CSInsertCharacter(); break;   // ICH
-			  case 'A': CSCursorUp(); break;          // CUU
-			  case 'B': CSCursorDown(); break;        // CUD
-			  case 'C': CSCursorRight(); break;       // CUF
-			  case 'D': CSCursorLeft(); break;        // CUB
+			  case 'A': CSCursorUp(TRUE); break;      // CUU
+			  case 'B': CSCursorDown(TRUE); break;    // CUD
+			  case 'C': CSCursorRight(TRUE); break;   // CUF
+			  case 'D': CSCursorLeft(TRUE); break;    // CUB
 			  case 'E': CSCursorDown1(); break;       // CNL
 			  case 'F': CSCursorUp1(); break;         // CPL
 			  case 'G': CSMoveToColumnN(); break;     // CHA
@@ -3593,17 +3594,17 @@ void ParseCS(BYTE b) /* b is the final char */
 //			  case ']': break;                        // SDS  -- Not support
 //			  case '^': break;                        // SIMD -- Not support
 			  case '`': CSMoveToColumnN(); break;     // HPA
-			  case 'a': CSCursorRight(); break;       // HPR
+			  case 'a': CSCursorRight(FALSE); break;  // HPR
 //			  case 'b': break;                        // REP  -- Not support
 			  case 'c': AnswerTerminalType(); break;  // DA
 			  case 'd': CSMoveToLineN(); break;       // VPA
-			  case 'e': CSCursorDown(); break;        // VPR
+			  case 'e': CSCursorDown(FALSE); break;   // VPR
 			  case 'f': CSMoveToXY(); break;          // HVP
 			  case 'g': CSDeleteTabStop(); break;     // TBC
 			  case 'h': CS_h_Mode(); break;           // SM
 			  case 'i': CS_i_Mode(); break;           // MC
-			  case 'j': CSCursorLeft(); break;        // HPB
-			  case 'k': CSCursorUp();                 // VPB
+			  case 'j': CSCursorLeft(FALSE); break;   // HPB
+			  case 'k': CSCursorUp(FALSE); break;     // VPB
 			  case 'l': CS_l_Mode(); break;           // RM
 			  case 'm': CSSetAttr(); break;           // SGR
 			  case 'n': CS_n_Mode(); break;           // DSR
