@@ -1599,9 +1599,11 @@ static void markURL(int x)
 		PrevCharPtr = PrevLinePtr(LinePtr) + NumOfColumns-1;
 		PrevCharCode = CodeBuff[PrevCharPtr];
 		PrevCharAttr = AttrBuff[PrevCharPtr];
-		if ((PrevCharAttr & AttrURL) && (!(ch & 0x80) && url_char[ch]) &&
-		   ((AttrLine[0] & AttrLineContinued) || (ts.JoinSplitedURL && PrevCharCode == ts.IgnoreCharContinuedLineURL))) {
-			AttrLine[0] |= AttrURL; 
+		if ((PrevCharAttr & AttrURL) && !(ch & 0x80) && url_char[ch]) {
+			if ((AttrLine[0] & AttrLineContinued) || (ts.JoinSplitedURL &&
+			    (PrevCharCode == ts.IgnoreCharContinuedLineURL || ts.IgnoreCharContinuedLineURL == '\0' ))) {
+				AttrLine[0] |= AttrURL; 
+			}
 		}
 		return;
 	}
