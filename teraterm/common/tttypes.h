@@ -1039,6 +1039,8 @@ typedef TMap far *PMap;
  * - At version 4.80, ttset_memfilemap was replaced with ttset_memfilemap_22.
  *   added tttset.LogAllBuffIncludedInFirst
  *   added tttset.MaxOSCBufferSize
+ *   added tttset.JoinSplitedURL
+ *   added tttset.IgnoreCharContinuedLineURL
  *
  * - At version 4.79, ttset_memfilemap was replaced with ttset_memfilemap_21.
  *   added TMap.WinUndoFlag
