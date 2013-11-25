@@ -42,10 +42,10 @@
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#MaxOSCBufferSize">MaxOSCBufferSize</a> entry in the teraterm.ini file. The default value is 4096.</li>
         </ul></li>
-      <!-- li>URLの途中で改行されている時に、繋がっているものとして扱える設定を追加した。
+      <li>When the URL string is divided at the end of the line, new setting can enable to concatenate the whole string.
         <ul>
-          <li>tearterm.iniにJoinSplitedURL, IgnoreCharContinuedLineURLエントリを追加した。</li>
-        </ul></li -->
+          <li>added the JoinSplitedURL and IgnoreCharContinuedLineURL entries in the teraterm.ini file.</li>
+        </ul></li>
       <li>Macro
         <ul>
           <li>added the TTL filename on the error and execution dialog.</li>
@@ -61,12 +61,12 @@
       <li>Tera Term(ttermpro.exe) can not run on Windows 95/NT4.0.</li>
       <li>When the tool chip is minus position on resizing, the tool chip is shown on the primary monitor with the multi monitor environment.</li>
       <li>When the terminal size is changed, the left and right margin mode (DECLRMM) does not cleared.</li>
-      <!-- li>VPR/VPB/HPR/HPB制御シーケンスがスクロールマージンの影響を受けていた問題を修正した。</li>
-      <li>CUU/VPB制御シーケンスで、画面上端を越えてカーソルが移動する事がある問題を修正した。</li>
-      <li>VPB制御シーケンスで、一部のモードが解除される事がある問題を修正した。</li>
-      <li>DECFI/DECBI制御シーケンスがスクロールマージンを無視していた問題を修正した。</li>
-      <li>DECBI制御シーケンスでカーソル位置の保存が行っていた問題を</li>
-      <li>DECFI制御シーケンスでアプリケーションキーパッドモードに変更される問題を修正した。</li -->
+      <li>The VPR/VPB/HPR/HPB control sequences are affected by the scroll margin.</li>
+      <li>A cursor will be moved to upper screen over by using the CUU/VPB control sequences.</li>
+      <li>The VPB control sequence will be released with a part of mode.</li>
+      <li>The DECFI/DECBI control sequence ignores the scroll margin.</li>
+      <li>The DECBI control sequence mistakes for saving the cursor position.</li>
+      <li>The DECFI control sequence mistakes for changing the application keypad mode.</li>
     </ul>
   </li>
 
