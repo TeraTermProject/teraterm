@@ -271,6 +271,42 @@ ClickableUrlBrowserArg=
 </pre>
 
 
+<h1><a name="JoinSplitURL">改行している URL を継続したものとして扱う</a></h1>
+
+<p>
+端末の右端から次の行に URL が続いている場合、通常は継続した URL として扱われる。しかし、特定の環境では端末の右端で改行を送信するので、URL が次の行に継続したものとして扱われない。<br />
+改行で分割された URL を継続したものとして扱うには、設定ファイルの [Tera Term] セクションの JoinSplitURL を以下のように変更してください。
+</p>
+
+<pre>
+JoinSplitURL=on
+</pre>
+
+<p>
+emacs 等では、ある行が次の行に継続された場合に行末に継続を表す記号を表示する。この記号が URL の一部とみなされると不都合な場合があるので、Tera Term は行末の記号を無視することができる。<br />
+行末の記号を無視しないようにするには、設定ファイルの [Tera Term] セクションの JoinSplitURLIgnoreEOLChar を以下のように変更してください。
+</p>
+
+<pre>
+JoinSplitURLIgnoreEOLChar=
+</pre>
+
+<p>
+また、emacs では継続した行の行末に表示する記号を変更することができる。<br />
+無視する行末の記号を変更するには、設定ファイルの [Tera Term] セクションの JoinSplitURLIgnoreEOLChar を以下のように変更してください。
+</p>
+
+<pre>
+JoinSplitURLIgnoreEOLChar=|
+</pre>
+
+<pre>
+省略時:
+JoinSplitURL=off
+JoinSplitURLIgnoreEOLChar=\
+</pre>
+
+
 <h1><a name="LogLockExclusive">ログファイルを排他ロックする</a></h1>
 
 <p>

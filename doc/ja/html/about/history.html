@@ -40,17 +40,20 @@
         <ul>
           <li>teraterm.iniに<a href="../setup/teraterm-term.html#MaxOSCBufferSize">MaxOSCBufferSize</a>エントリを追加した。デフォルトは4096。</li>
         </ul></li>
-      <li><a href="../menu/file-log.html#LogAllBuffInFirst">ログ採取</a>に"Include screen buffer"オプションを追加した。また、<a href="../setup/teraterm-ini.html#LogAllBuffInFirst">teraterm.ini</a>に LogAllBuffInFirst エントリを追加した。</li>
+      <li><a href="../menu/file-log.html#LogIncludeScreenBuffer">ログ採取</a>に"Include screen buffer"オプションを追加した。
+        <ul>
+          <li><a href="../setup/teraterm-ini.html#LogIncludeScreenBuffer">teraterm.ini</a>に LogIncludeScreenBuffer エントリを追加した。</li>
+          <li>マクロコマンド "<a href="../macro/command/logopen.html">logopen</a>" に"Include screen buffer"オプションを追加した。</li>
+        </ul></li>
       <li>"New connection" ダイアログを表示する <a href="../commandline/teraterm.html#es">/ES</a> コマンドラインオプションを追加した。</li>
       <li>URLの途中で改行されている時に、繋がっているものとして扱える設定を追加した。
         <ul>
-          <li>tearterm.iniにJoinSplitURL, JoinSplitURLIgnoreEOLCharエントリを追加した。</li>
+          <li>tearterm.iniに<a href="../setup/teraterm-misc.html#JoinSplitURL">JoinSplitURL, JoinSplitURLIgnoreEOLChar</a>エントリを追加した。</li>
         </ul></li>
       <li>マクロ
         <ul>
           <li>エラーおよび実行ダイアログに、TTLファイル名を追加した。</li>
           <li><a href="../macro/command/gettime.html">gettime</a>, <a href="../macro/command/getdate.html">getdate</a>コマンドにおいて、マクロ実行前後でタイムゾーンを復元するようにした。</li>
-          <li>マクロコマンド "<a href="../macro/command/logopen.html">logopen</a>" に"Include screen buffer"オプションを追加した。</li>
         </ul></li>
     </ul>
   </li>
@@ -2357,7 +2360,7 @@
 <ul class="history">
   <li>バグ修正
     <ul>
-      <li>SSH2 でポート転送を繰り返すと新たにポートフォワード接続できなくなる問題を修正した。</li>
+      <li>SSH2 でポート転送を繰り返すと新たにポート転送接続できなくなる問題を修正した。</li>
     </ul>
   </li>
 </ul>
