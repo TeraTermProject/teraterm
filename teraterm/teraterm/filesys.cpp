@@ -474,7 +474,7 @@ BOOL LogStart()
 		// 0x1000 = plain text (2005.2.20 yutaka)
 		// 0x2000 = timestamp (2006.7.23 maya)
 		// 0x4000 = hide file transfer dialog (2008.1.30 maya)
-		// 0x8000 = All buffer included in first (2013.9.29 yutaka)
+		// 0x8000 = Include screen buffer (2013.9.29 yutaka)
 		// teraterm.iniの設定を見てからデフォルトオプションを決める。(2005.5.7 yutaka)
 		Option = MAKELONG(ts.LogBinary,
 		                  ts.Append |

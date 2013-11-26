@@ -232,7 +232,7 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				SetRB(Dialog,1,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
 			}
 
-			// All Buff in firstチェックボックス (2013.9.29 yutaka)
+			// Include screen bufferチェックボックス (2013.9.29 yutaka)
 			ShowDlgItem(Dialog,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
 			if (Hi & 0x8000) {
 				SetRB(Dialog,1,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
@@ -301,7 +301,7 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					Hi |= 0x4000;
 				}
 
-				// All Buff in firstチェックボックス (2013.9.29 yutaka)
+				// Include screen bufferチェックボックス (2013.9.29 yutaka)
 				GetRB(Dialog,&val,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
 				if (val > 0) {
 					Hi |= 0x8000;
