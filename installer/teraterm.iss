@@ -747,7 +747,7 @@ var
   iniFile : String;
 begin
   case CurStep of
-    ssDone:
+    ssPostInstall:
       begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
@@ -778,7 +778,7 @@ begin
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
 
-      end; // ssDone
+      end; // ssPostInstall
    end; // case CurStep of
 end; // CurStepChanged
 
