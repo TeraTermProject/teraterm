@@ -762,7 +762,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Log without transfer dialog */
 	ts->LogHideDialog = GetOnOff(Section, "LogHideDialog", FName, FALSE);
 
-	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogAllBuffInFirst", FName, FALSE);
+	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogIncludeScreenBuffer", FName, FALSE);
 
 	/* File Transfer dialog visibility */
 	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
@@ -2127,7 +2127,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Log without transfer dialog */
 	WriteOnOff(Section, "LogHideDialog", FName, ts->LogHideDialog);
 
-	WriteOnOff(Section, "LogAllBuffInFirst", FName, ts->LogAllBuffIncludedInFirst);
+	WriteOnOff(Section, "LogIncludeScreenBuffer", FName, ts->LogAllBuffIncludedInFirst);
 
 	/* Default Log file name (2006.8.28 maya) */
 	WritePrivateProfileString(Section, "LogDefaultName",
