@@ -571,8 +571,8 @@ struct tttset {
 	DWORD BeepSuppressTime;
 	WORD LogAllBuffIncludedInFirst;
 	unsigned int MaxOSCBufferSize;
-	WORD JoinSplitedURL;
-	char IgnoreCharContinuedLineURL;
+	WORD JoinSplitURL;
+	char JoinSplitURLIgnoreEOLChar;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

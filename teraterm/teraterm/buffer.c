@@ -1599,9 +1599,9 @@ static void markURL(int x)
 		PrevCharPtr = PrevLinePtr(LinePtr) + NumOfColumns-1;
 		PrevCharCode = CodeBuff[PrevCharPtr];
 		PrevCharAttr = AttrBuff[PrevCharPtr];
-		if ((PrevCharAttr & AttrURL) && !(ch & 0x80) && url_char[ch]) {
-			if ((AttrLine[0] & AttrLineContinued) || (ts.JoinSplitedURL &&
-			    (PrevCharCode == ts.IgnoreCharContinuedLineURL || ts.IgnoreCharContinuedLineURL == '\0' ))) {
+		if ((PrevCharAttr & AttrURL) && !(AttrLine[0]&(AttrKanji|AttrSpecial)) && !(ch & 0x80) && url_char[ch]) {
+			if ((AttrLine[0] & AttrLineContinued) || (ts.JoinSplitURL &&
+			    (PrevCharCode == ts.JoinSplitURLIgnoreEOLChar || ts.JoinSplitURLIgnoreEOLChar == '\0' ))) {
 				AttrLine[0] |= AttrURL; 
 			}
 		}
@@ -1609,9 +1609,9 @@ static void markURL(int x)
 	}
 
 	if ((x-1>=0) && (AttrLine[x-1] & AttrURL) &&
-		((!(ch & 0x80 || url_char[ch]==0)) || (x == NumOfColumns - 1 && ch == ts.IgnoreCharContinuedLineURL))) {
-//		!((CodeLine[x] <= ' ') && !(AttrLine[x] & AttrKanji))) {
-			AttrLine[x] |= AttrURL; 
+	  !(AttrLine[x] & (AttrKanji|AttrSpecial)) &&
+	  ((!(ch & 0x80) && url_char[ch]) || (x == NumOfColumns - 1 && ch == ts.JoinSplitURLIgnoreEOLChar))) {
+		AttrLine[x] |= AttrURL; 
 		return;
 	}
 
@@ -2397,7 +2397,7 @@ static void invokeBrowser(LONG ptr)
 	for (i = 0; i < end - start + 1; i++) {
 		ch = CodeBuff[start + i];
 		if ((start + i) % NumOfColumns == NumOfColumns - 1 
-			&& ch == ts.IgnoreCharContinuedLineURL) {
+			&& ch == ts.JoinSplitURLIgnoreEOLChar) {
 			// 行末が行継続マーク用の文字の場合はスキップする
 		} else {
 			*uptr++ = ch;
