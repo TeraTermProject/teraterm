@@ -36,12 +36,12 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li><a href="../menu/file-log.html#LogAllBuffInFirst">ログ採取</a>に"Include screen buffer"オプションを追加した。また、<a href="../setup/teraterm-ini.html#LogAllBuffInFirst">teraterm.ini</a>に LogAllBuffInFirst エントリを追加した。</li>
-      <li>"New connection" ダイアログを表示する <a href="../commandline/teraterm.html#es">/ES</a> コマンドラインオプションを追加した。</li>
       <li>OSC文字列処理用バッファの最大サイズを変更できるようにした。
         <ul>
           <li>teraterm.iniに<a href="../setup/teraterm-term.html#MaxOSCBufferSize">MaxOSCBufferSize</a>エントリを追加した。デフォルトは4096。</li>
         </ul></li>
+      <li><a href="../menu/file-log.html#LogAllBuffInFirst">ログ採取</a>に"Include screen buffer"オプションを追加した。また、<a href="../setup/teraterm-ini.html#LogAllBuffInFirst">teraterm.ini</a>に LogAllBuffInFirst エントリを追加した。</li>
+      <li>"New connection" ダイアログを表示する <a href="../commandline/teraterm.html#es">/ES</a> コマンドラインオプションを追加した。</li>
       <li>URLの途中で改行されている時に、繋がっているものとして扱える設定を追加した。
         <ul>
           <li>tearterm.iniにJoinSplitURL, JoinSplitURLIgnoreEOLCharエントリを追加した。</li>
@@ -57,9 +57,6 @@
   
   <li>バグ修正
     <ul>
-      <li>ログ取得時に "ダイアログを非表示" オプションが正しく働かない問題を修正した。</li>
-      <li>Windows 95/NT4.0で起動できなくなっていた問題を修正した。</li>
-      <li>マルチモニタ環境において、ウィンドウのリサイズ中に表示されるツールチップの位置が有効なマイナス座標の場合でもプライマリモニタに表示される問題を修正した。</li>
       <li>端末サイズ変更時に左右マージンモード(DECLRMM)が解除されない問題を修正した。</li>
       <li>VPR/VPB/HPR/HPB制御シーケンスがスクロールマージンの影響を受けていた問題を修正した。</li>
       <li>CUU/VPB制御シーケンスで、画面上端を越えてカーソルが移動する事がある問題を修正した。</li>
@@ -67,6 +64,9 @@
       <li>DECFI/DECBI制御シーケンスがスクロールマージンを無視していた問題を修正した。</li>
       <li>DECBI制御シーケンスでカーソル位置の保存が行われていた問題を修正した。</li>
       <li>DECFI制御シーケンスでアプリケーションキーパッドモードに変更される問題を修正した。</li>
+      <li>ログ取得時に "ダイアログを非表示" オプションが正しく働かない問題を修正した。</li>
+      <li>マルチモニタ環境において、ウィンドウのリサイズ中に表示されるツールチップの位置が有効なマイナス座標の場合でもプライマリモニタに表示される問題を修正した。</li>
+      <li>Windows 95/NT4.0で起動できなくなっていた問題を修正した。</li>
     </ul>
   </li>
 
@@ -2357,7 +2357,7 @@
 <ul class="history">
   <li>バグ修正
     <ul>
-      <li>SSH2 でポートフォワードを繰り返すと新たにポートフォワード接続できなくなる問題を修正した。</li>
+      <li>SSH2 でポート転送を繰り返すと新たにポートフォワード接続できなくなる問題を修正した。</li>
     </ul>
   </li>
 </ul>

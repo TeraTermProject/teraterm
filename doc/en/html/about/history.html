@@ -36,12 +36,12 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added the "Include screen buffer" option in the <a href="../menu/file-log.html#LogAllBuffInFirst">Log dialog box</a>. Also, added the LogAllBuffInFirst entry in the <a href="../setup/teraterm-ini.html#LogAllBuffInFirst">teraterm.ini</a> file.</li>
-      <li>added the <a href="../commandline/teraterm.html#es">/ES</a> command line option. It enables the "New connection" dialog.</li>
       <li>can be changed the maximum size of the OSC string
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#MaxOSCBufferSize">MaxOSCBufferSize</a> entry in the teraterm.ini file. The default value is 4096.</li>
         </ul></li>
+      <li>added the "Include screen buffer" option in the <a href="../menu/file-log.html#LogAllBuffInFirst">Log dialog box</a>. Also, added the LogAllBuffInFirst entry in the <a href="../setup/teraterm-ini.html#LogAllBuffInFirst">teraterm.ini</a> file.</li>
+      <li>added the <a href="../commandline/teraterm.html#es">/ES</a> command line option. It enables the "New connection" dialog.</li>
       <li>When the URL string is divided at the end of the line, new setting can enable to concatenate the whole string.
         <ul>
           <li>added the JoinSplitURL and JoinSplitURLIgnoreEOLChar entries in the teraterm.ini file.</li>
@@ -57,9 +57,6 @@
 
   <li>Bug fixes
     <ul>
-      <li>When the log file is opened, the "Hide dialog" function does not work well.</li>
-      <li>Tera Term(ttermpro.exe) can not run on Windows 95/NT4.0.</li>
-      <li>When the tool chip is minus position on resizing, the tool chip is shown on the primary monitor with the multi monitor environment.</li>
       <li>When the terminal size is changed, the left and right margin mode (DECLRMM) does not cleared.</li>
       <li>The VPR/VPB/HPR/HPB control sequences are affected by the scroll margin.</li>
       <li>A cursor will be moved to upper screen over by using the CUU/VPB control sequences.</li>
@@ -67,6 +64,9 @@
       <li>The DECFI/DECBI control sequence ignores the scroll margin.</li>
       <li>The DECBI control sequence mistakes for saving the cursor position.</li>
       <li>The DECFI control sequence mistakes for changing the application keypad mode.</li>
+      <li>When the log file is opened, the "Hide dialog" function does not work well.</li>
+      <li>When the tool chip is minus position on resizing, the tool chip is shown on the primary monitor with the multi monitor environment.</li>
+      <li>Tera Term(ttermpro.exe) can not run on Windows 95/NT4.0.</li>
     </ul>
   </li>
 
