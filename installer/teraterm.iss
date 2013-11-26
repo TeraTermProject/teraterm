@@ -784,7 +784,7 @@ end; // CurStepChanged
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  ini     : array[0..4] of String;
+  ini     : array[0..5] of String;
   buf     : String;
   conf    : String;
   confmsg : String;
@@ -796,15 +796,16 @@ begin
       begin
         ini[0] := '\TERATERM.INI';
         ini[1] := '\KEYBOARD.CNF';
-        ini[2] := '\ssh_known_hosts';
-        ini[3] := '\cygterm.cfg';
-        ini[4] := '\broadcast.log';
+        ini[2] := '\lang\Default.lng';
+        ini[3] := '\ssh_known_hosts';
+        ini[4] := '\cygterm.cfg';
+        ini[5] := '\broadcast.log';
 
         conf := CustomMessage('msg_del_confirm');
         app  := ExpandConstant('{app}');
 
         // delete config files
-        for i := 0 to 4 do
+        for i := 0 to 5 do
         begin
           buf := app + ini[i];
           if FileExists(buf) then begin
