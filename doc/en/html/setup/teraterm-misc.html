@@ -244,11 +244,14 @@ ClickableUrlBrowserArg=
 </pre>
 
 
-<!--<h1><a name="JoinSplitURL">改行している URL を継続したものとして扱う</a></h1>
+<h1><a name="JoinSplitURL">URL string concatenated of split line</a></h1>
 
 <p>
-端末の右端から次の行に URL が続いている場合、通常は継続した URL として扱われる。しかし、特定の環境では端末の右端で改行を送信するので、URL が次の行に継続したものとして扱われない。<br />
-改行で分割された URL を継続したものとして扱うには、設定ファイルの [Tera Term] セクションの JoinSplitURL を以下のように変更してください。
+When the end of URL string continues to the next line, basically the whole string is recognised as a URL string.
+However, when the carriage return is inserted into the URL string by the end of a line, the whole string 
+can not work well.<br />
+The URL string split by a carriage return can work well to configure the JoinSplitURL entry of the 
+[Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -256,8 +259,11 @@ JoinSplitURL=on
 </pre>
 
 <p>
-emacs 等では、ある行が次の行に継続された場合に行末に継続を表す記号を表示する。この記号が URL の一部とみなされると不都合な場合があるので、Tera Term は行末の記号を無視することができる。<br />
-行末の記号を無視しないようにするには、設定ファイルの [Tera Term] セクションの JoinSplitURLIgnoreEOLChar を以下のように変更してください。
+By using the emacs editor, a special character wil be displayed at the end of the line when 
+the line continues to next line. If this character is recognised with a part of URL string,
+the whole string can not work well with the URL format. <br />
+So, Tera Term can ignore the special character to configure the JoinSplitURLIgnoreEOLChar entry
+of the [Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -265,8 +271,9 @@ JoinSplitURLIgnoreEOLChar=
 </pre>
 
 <p>
-また、emacs では継続した行の行末に表示する記号を変更することができる。<br />
-無視する行末の記号を変更するには、設定ファイルの [Tera Term] セクションの JoinSplitURLIgnoreEOLChar を以下のように変更してください。
+Also, the emacs editor can change the special character to other character.<br />
+When the character is changed, a user configures the JoinSplitURLIgnoreEOLChar entry
+of the [Tera Term] section in the following:
 </p>
 
 <pre>
@@ -277,7 +284,7 @@ JoinSplitURLIgnoreEOLChar=|
 Default:
 JoinSplitURL=off
 JoinSplitURLIgnoreEOLChar=\
-</pre>-->
+</pre>
 
 
 <h1><a name="LogLockExclusive">Exclusive-lock log file</a></h1>
