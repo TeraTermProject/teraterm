@@ -829,6 +829,7 @@ begin
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
 
         // directory is deleted only if empty
+        RemoveDir(app + '\lang');
         RemoveDir(app);
       end;
   end;
