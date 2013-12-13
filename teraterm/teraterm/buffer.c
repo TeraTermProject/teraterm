@@ -3180,6 +3180,7 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 
 	/* Set Cursor */
 	if (ts.TermFlag & TF_CLEARONRESIZE) {
+		CursorX = 0;
 		CursorRightM = NumOfColumns-1;
 		if (St) {
 			CursorY = NumOfLines-1;
@@ -3193,7 +3194,6 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 		}
 	}
 	else {
-		CursorLeftM = 0;
 		CursorRightM = NumOfColumns-1;
 		if (CursorX >= NumOfColumns) {
 			CursorX = NumOfColumns - 1;
@@ -3211,7 +3211,6 @@ void BuffChangeTerminalSize(int Nx, int Ny)
 			CursorBottom = NumOfLines - 1 - StatusLine;
 		}
 	}
-	CursorX = 0;
 	CursorLeftM = 0;
 
 	SelectStart.x = 0;
