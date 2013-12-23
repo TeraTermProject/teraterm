@@ -70,5 +70,49 @@ endwhile
 fileclose fhandle
 </pre>
 
+<pre class="macro-example">
+; ファイルに含まれるキーワードを置換する
+infile = 'testdata.txt'
+outfile = 'testdata_output.txt'
+
+oldkeyword = 'BBB'
+newkeyword = 'zzz'
+
+fileopen ifd infile 0
+fileopen ofd outfile 0
+
+while 1
+	filereadln ifd line
+	if result=1 then
+		break
+	endif
+	strreplace line 1 oldkeyword newkeyword
+	filewriteln ofd line
+endwhile
+
+fileclose ifd
+fileclose ofd
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[testdata.txt]
+AABBBCCCCDDDDD
+###DDCCCBBBBAAAAA####
+1234567890
+
+[testdata_output.txt]
+AAzzzCCCCDDDDD
+###DDCCCzzzBAAAAA####
+1234567890
+</pre>
+
+
+<h2>参照</h2>
+
+<a href="strreplace.html">strreplace</a><br>
+<a href="fileopen.html">fileopen</a><br>
+<a href="filewriteln.html">filewriteln</a><br>
+<a href="fileclose.html">fileclose</a><br>
+
 </body>
 </html>
