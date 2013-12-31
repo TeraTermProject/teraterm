@@ -101,7 +101,7 @@ Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: only
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\libs\logmett\Setup_LogMeTT_2_9_9_2.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
-Source: ..\libs\logmett\Setup_TTLEditor_1_4_45.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
+Source: ..\libs\logmett\Setup_TTLEditor_1_5.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
 Source: release\ttmenu_readme-j.txt; DestDir: {app}; Components: TeraTerm_Menu
 Source: ..\TTProxy\Release\TTXProxy.dll; DestDir: {app}; Components: TTProxy; Flags: ignoreversion
@@ -243,8 +243,8 @@ Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
 Filename: {tmp}\Setup_LogMeTT_2_9_9_2.exe; Flags: skipifsilent; Components: LogMeTT
 Filename: {tmp}\Setup_LogMeTT_2_9_9_2.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: LogMeTT
-Filename: {tmp}\Setup_TTLEditor_1_4_45.exe; Flags: skipifsilent; Components: TTLEdit
-Filename: {tmp}\Setup_TTLEditor_1_4_45.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: TTLEdit
+Filename: {tmp}\Setup_TTLEditor_1_5.exe; Flags: skipifsilent; Components: TTLEdit
+Filename: {tmp}\Setup_TTLEditor_1_5.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: TTLEdit
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
 Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
 
