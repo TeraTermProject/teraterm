@@ -331,6 +331,7 @@ HlpMacroCommandTolower=html\macro\command\tolower.html
 HlpMacroCommandToupper=html\macro\command\toupper.html
 HlpMacroCommandUnlink=html\macro\command\unlink.html
 HlpMacroCommandUntil=html\macro\command\until.html
+HlpMacroCommandUptime=html\macro\command\uptime.html
 HlpMacroCommandVar2clipb=html\macro\command\var2clipb.html
 HlpMacroCommandWait=html\macro\command\wait.html
 HlpMacroCommandWait4all=html\macro\command\wait4all.html

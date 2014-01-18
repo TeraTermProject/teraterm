@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>uptime</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>uptime</h1>
+
+<p>
+OSの稼働時間を取得する。
+</p>
+
+<pre class="macro-syntax">
+uptime &lt;intvar&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+Windows OSの稼働時間（ミリ秒）を &lt;intvar&gt; に格納する。
+</p>
+
+<p>
+※稼働時間が49日を経過すると、0に戻る。
+</p>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; How to get the uptime in Windows
+uptime var
+day = var / 86400000
+var = var % 86400000
+hour = var / 3600000
+var = var % 3600000
+min = var / 60000
+var = var % 60000
+sec = var / 1000
+
+sprintf2 str "System Up Time: %d Days, %d Hours, %d Minutes, %d Seconds" day hour min sec
+messagebox str "uptime"
+</pre>
+
+<pre class="macro-example">
+uptime varstart
+
+; do something...
+
+uptime varend
+diff = varend - varstart
+sprintf2 str "MACRO running time: %d msec" diff
+messagebox str "running time"
+</pre>
+
+
+<h2>参照</h2>
+<ul>
+</ul>
+
+</body>
+</html>
