@@ -6,6 +6,7 @@
 
 #include "teraterm.h"
 #include <string.h>
+#include <stdlib.h>
 #include "ttmparse.h"
 #include "ttlib.h"
 
@@ -27,6 +28,11 @@ static CHAR BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // äeäKëwÇÃ.ttlÉtÉ@É
 static PCHAR Buff[MAXNESTLEVEL];
 static BINT BuffLen[MAXNESTLEVEL];
 static BINT BuffPtr[MAXNESTLEVEL];
+
+// çsèÓïÒîzóÒ
+#define MAX_LINENO 100000
+static BINT *BuffLineNo[MAXNESTLEVEL];
+static BINT BuffLineNoMaxIndex[MAXNESTLEVEL];
 
 #define MAXSP 10
 
@@ -92,6 +98,7 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 	int F;
 	int dummy_read = 0;
 	char basename[MAX_PATH];
+	unsigned int i, n;
 
 	if ((FileName[0]==0) || (IBuff>MAXNESTLEVEL-1)) {
 		return FALSE;
@@ -123,6 +130,10 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 		return FALSE;
 	}
 
+	if (BuffLineNo[IBuff] == NULL) {
+		BuffLineNo[IBuff] = malloc(MAX_LINENO * sizeof(BINT));
+	}
+
 	F = _lopen(FileName,OF_READ);
 	if (F<=0) {
 		return FALSE;
@@ -137,6 +148,30 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 				Buff[IBuff][1] = '\0';
 			}
 			_lclose(F);
+
+			// çsî‘çÜîzóÒÇçÏÇÈÅBÇ±ÇÍÇ…ÇÊÇËÅAÉoÉbÉtÉ@ÇÃÉCÉìÉfÉbÉNÉXÇ©ÇÁçsî‘çÜÇ÷ÇÃïœä∑Ç™
+			// O(N)->O(logN)Ç≈åüçıÇ≈Ç´ÇÈÇÊÇ§Ç…Ç»ÇÈÅB
+			// (2014.1.18 yutaka)
+			n = 0;
+			BuffLineNo[IBuff][n] = 0;
+			for (i = 0 ; i < BuffLen[IBuff] ; i++) {
+				if (Buff[IBuff][i] == 0x0A) {
+					if (i == BuffLen[IBuff] - 1) {
+						// ÉoÉbÉtÉ@ÇÃç≈å„Ç™â¸çsÉRÅ[ÉhÇæÇ¡ÇΩèÍçáÅAÇ‡Ç§éüÇÃçsî‘çÜÇÕë∂ç›ÇµÇ»Ç¢ÅB
+
+					} else {
+						if (n < MAX_LINENO - 1) {
+							n++;
+							BuffLineNo[IBuff][n] = i + 1;
+						} else {
+							// Out of memory
+
+						}
+					}
+				}
+			}
+			BuffLineNoMaxIndex[IBuff] = n;
+
 			GlobalUnlock(BuffHandle[IBuff]);
 			return TRUE;
 		}
@@ -159,18 +194,18 @@ char *GetMacroFileName(void)
 
 
 // åªç›é¿çsíÜÇÃÉ}ÉNÉçÉtÉ@ÉCÉãÇÃçsî‘çÜÇï‘Ç∑ (2005.7.18 yutaka)
-static int getCurrentLineNumber(CHAR *buf, BINT curpos)
+static int getCurrentLineNumber(BINT curpos, BINT *lineno, BINT linenomax)
 {
-	int no;
-	BINT i;
+	BINT i, no;
 
 	no = 0;
-	for (i = 0 ; i < curpos ; i++) {
-		if (buf[i] == 0x0A) { // LF
-			no++;
+	for (i = 0 ; i < linenomax ; i++) {
+		if (curpos < lineno[i]) {
+			no = i;
+			break;
 		}
 	}
-	return (no + 1);
+	return (no);
 }
 
 
@@ -211,7 +246,8 @@ BOOL GetRawLine()
 	LineParsePtr = 0;
 
 	// current line number (2005.7.18 yutaka)
-	LineNo = getCurrentLineNumber(Buff[INest], BuffPtr[INest]); 
+	// ÉoÉbÉtÉ@ÇÃÉCÉìÉfÉbÉNÉXÇ©ÇÁçÇë¨Ç…çsî‘çÜÇà¯ÇØÇÈÇÊÇ§Ç…ÇµÇΩÅB(2014.1.18 yutaka)
+	LineNo = getCurrentLineNumber(BuffPtr[INest], BuffLineNo[INest], BuffLineNoMaxIndex[INest]); 
 
 	while ((BuffPtr[INest]<BuffLen[INest]) &&
 		(b<0x20) && (b!=0x09))
@@ -339,6 +375,9 @@ void CloseBuff(int IBuff)
 			GlobalFree(BuffHandle[i]);
 		}
 		BuffHandle[i] = NULL;
+
+		free(BuffLineNo[i]);
+		BuffLineNoMaxIndex[i] = 0;
 	}
 
 	while ((SP>0) && (LevelStack[SP-1]>=IBuff)) {
