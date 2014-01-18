@@ -330,6 +330,7 @@
 #define HlpMacroCommandToupper          92119
 #define HlpMacroCommandUnlink           92099
 #define HlpMacroCommandUntil            92128
+#define HlpMacroCommandUptime           92212
 #define HlpMacroCommandVar2clipb        92114
 #define HlpMacroCommandWait             92100
 #define HlpMacroCommandWait4all         92148

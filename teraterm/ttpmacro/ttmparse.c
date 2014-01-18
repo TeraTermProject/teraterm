@@ -382,6 +382,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 	case 'u':
 		if (_stricmp(Str,"unlink")==0) *WordId = RsvUnlink;
 		else if (_stricmp(Str,"until")==0) *WordId = RsvUntil;
+		else if (_stricmp(Str,"uptime")==0) *WordId = RsvUptime;
 		break;
 	case 'v':
 		if (_stricmp(Str,"var2clipb")==0) *WordId = RsvVar2Clipb;  // add 'var2clipb' (2006.9.17 maya)

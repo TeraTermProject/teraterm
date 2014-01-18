@@ -5196,6 +5196,29 @@ WORD TTLUnlink()
 }
 
 
+WORD TTLUptime()
+{
+	WORD Err;
+	TVarId VarId;
+	DWORD tick;
+
+	Err = 0;
+	GetIntVar(&VarId,&Err);
+	if ((Err==0) && (GetFirstChar()!=0))
+		Err = ErrSyntax;
+	if (Err!=0) return Err;
+
+	// Windows OSが起動してからの経過時間（ミリ秒）を取得する。ただし、49日を経過すると、0に戻る。
+	// GetTickCount64() API(Vista以降)を使うと、オーバーフローしなくなるが、そもそもTera Termでは
+	// 64bit変数をサポートしていないので、意味がない。
+	tick = GetTickCount();
+
+	SetIntVal(VarId, tick);
+
+	return Err;
+}
+
+
 
 WORD TTLWait(BOOL Ln)
 {
@@ -6028,6 +6051,8 @@ int ExecCmnd()
 			Err = TTLUnlink(); break;
 		case RsvUntil:
 			Err = TTLWhile(FALSE); break;
+		case RsvUptime:
+			Err = TTLUptime(); break;
 		case RsvVar2Clipb:
 			Err = TTLVar2Clipb(); break;    // add 'var2clipb' (2006.9.17 maya)
 		case RsvWaitRegex:

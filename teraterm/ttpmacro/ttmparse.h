@@ -241,6 +241,7 @@
 #define RsvChecksum32File   209
 #define RsvBringupBox   210
 #define RsvLogAutoClose 211
+#define RsvUptime		212
 
 #define RsvOperator     1000
 #define RsvBNot         1001
