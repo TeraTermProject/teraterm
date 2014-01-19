@@ -1051,6 +1051,7 @@ HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
 			// マクロ終了時、ログ採取を自動的に停止する。(2013.6.24 yutaka)
 			if (AutoLogClose) {
 				if (LogVar != NULL) FileTransEnd(OpLog);
+				AutoLogClose = FALSE;
 			}
 			ConvH = 0;
 			PostMessage(HVTWin,WM_USER_DDEEND,0,0);
