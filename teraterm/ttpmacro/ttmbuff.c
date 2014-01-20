@@ -170,7 +170,7 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 					}
 				}
 			}
-			BuffLineNoMaxIndex[IBuff] = n;
+			BuffLineNoMaxIndex[IBuff] = n + 1;
 
 			GlobalUnlock(BuffHandle[IBuff]);
 			return TRUE;
