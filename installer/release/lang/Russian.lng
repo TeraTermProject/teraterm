@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Jul 27 2013)
-; Last translated (Russian language) by Ryumik Sergey (Jul 07 2013)
+; Updated by TeraTerm Project (v4.80, Nov 30 2013)
+; Last translated (Russian language) by Ryumik Sergey (Dec 17 2013)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -133,7 +133,7 @@ DLG_MAIN_TITLE_CONNECTING=[соединяется...]
 DLG_MAIN_TITLE_DISCONNECTED=[разъединено]
 
 ; vtwin.cpp
-MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
+MSG_ALL_TERMINATE_CONF=Остановить все Tera Term(ы)?
 MSG_DISCONNECT_CONF=Разъединить?
 MSG_DANDD_CONF=Вы уверены, что хотите отправить файл?
 MSG_DANDD_CONF_TITLE=Tera Term: Файл "Drag and Drop"
@@ -403,7 +403,7 @@ DLG_FOPT_APPEND=&Дополнение
 DLG_FOPT_PLAIN=&Обычный текст
 DLG_FOPT_TIMESTAMP=&Отметка времени
 DLG_FOPT_HIDEDIALOG=&Скрыть диалог
-DLG_FOPT_ALLBUFFINFIRST=&Include screen buffer
+DLG_FOPT_ALLBUFFINFIRST=&Включить буфер экрана
 
 DLG_XOPT=Опции
 DLG_XOPT_CHECKSUM=&Контрольная сумма
@@ -459,9 +459,8 @@ BTN_NO=&Нет
 BTN_STOP=&Остановить
 BTN_CONTINUE=&Продолжить
 
-MSG_MACRO_CONF=MACRO: confirmation
-MSG_MACRO_HALT_SCRIPT=Are you sure that you want to halt this macro script?
-
+MSG_MACRO_CONF=MACRO: подтверждение
+MSG_MACRO_HALT_SCRIPT=Вы уверены, что хотите остановить этот макрос?
 ; common
 MSG_ERROR=ОШИБКА
 MSG_TT_ERROR=Tera Term: Ошибка
