@@ -7650,9 +7650,15 @@ static int is_canceled_window(HWND hd)
 	// ウィンドウが見えなくなったら、キャンセルされた。
 	if (IsWindow(hd) == 0)
 		return 1;
-	// ウィンドウが非表示の場合、キャンセルされた。
-	if (IsWindowVisible(hd) == 0)
+	// ウィンドウが非表示の場合、キャンセルされた可能性がある。
+	if (IsWindowVisible(hd) == 0) {
+		HWND p = GetParent(hd);
+		// 親ウィンドウが最小化されているときは、キャンセルではない。
+		if (IsIconic(p))
+			return 0;
+
 		return 1;
+	}
 	return 0;
 }
 
