@@ -123,7 +123,122 @@ private:
 		char* p = param;
 		bool inParam = false;
 		bool inQuotes = false;
+		bool inEqual = false;
+		int param_len = strlen(param);
 		char* option = NULL;
+		char *buf;
+		int buflen = 0;
+		int i;
+		char* start = NULL;
+
+#if 1
+		// 解析処理は ttxssh.c よりコピー
+		buf = new char[param_len+1];
+		memset(buf, 0, buflen);
+		for (i=0; i<param_len; i++) {
+			if (inQuotes) {
+				// 現在位置が"の中
+				if (param[i] == '"') {
+					if (param[i+1] == '"') {
+						buf[buflen] = param[i];
+						buflen++;
+						i++;
+					}
+					else {
+						// クォートしているときはここで終わり
+						// "をbufに入れずに解析に渡す
+						switch (parse_option(buf)) {
+							case 1:
+								memset(start, ' ', (param + i) - start + 1);
+								break;
+							case 2:
+								memset(start, ' ', (param + i) - start + 1);
+								buflen = strlen(buf);
+								memcpy(start, buf, buflen);
+								break;
+						}
+						inParam = false;
+						inEqual = false;
+						start = NULL;
+						memset(buf, 0, buflen);
+						buflen = 0;
+						inQuotes = false;
+					}
+				}
+				else {
+					buf[buflen] = param[i];
+					buflen++;
+				}
+			}
+			else {
+				if (!inParam) {
+					// まだパラメータの中にいない
+					if (param[i] == '"') {
+						// " で始まる
+						start = param + i;
+						inParam = true;
+						inQuotes = true;
+					}
+					else if (param[i] != ' ' && param[i] != '\t') {
+						// 普通に始まる
+						buf[buflen] = param[i];
+						buflen++;
+						start = param + i;
+						inParam = true;
+					}
+				}
+				else {
+					// 現在位置がパラメータの中
+					if (param[i] == ' ' || param[i] == '\t') {
+						// クォートしていないときはここで終わり
+						switch (parse_option(buf)) {
+							case 1:
+								memset(start, ' ', (param + i) - start + 1);
+								break;
+							case 2:
+								memset(start, ' ', (param + i) - start + 1);
+								buflen = strlen(buf);
+								memcpy(start, buf, buflen);
+								break;
+						}
+						inParam = false;
+						inEqual = false;
+						start = NULL;
+						memset(buf, 0, buflen);
+						buflen = 0;
+					}
+					else {
+						buf[buflen] = param[i];
+						buflen++;
+						if (!inEqual && param[i] == '=') {
+							inEqual = true;
+							if (param[i+1] == '"') {
+								inQuotes = true;
+								i++;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// buf に残りがあれば解析に渡す
+		//   +1すると最後の'\0'も消してしまうので、上と同じではいけない
+		if (strlen(buf) > 0) {
+			switch (parse_option(buf)) {
+				case 1:
+					memset(start, ' ', (param + i) - start);
+					break;
+				case 2:
+					memset(start, ' ', (param + i) - start);
+					buflen = strlen(buf);
+					memcpy(start, buf, buflen);
+					break;
+			}
+		}
+
+		delete[] buf;
+#else
 		while (*p != '\0') {
 			if (inQuotes ? *p == '"' : (*p == ' ' || *p == '\t')) {
 				if (option != NULL) {
@@ -156,6 +271,8 @@ private:
 				*option = '\0';
 			}
 		}
+#endif
+
 		getInstance().ORIG_ParseParam(param, ts, DDETopic);
 		if (getInstance().ts->HostName[0] == '\0' && getInstance().realhost != NULL) {
 			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
