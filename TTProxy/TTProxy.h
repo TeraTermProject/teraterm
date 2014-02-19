@@ -134,7 +134,7 @@ private:
 #if 1
 		// 解析処理は ttxssh.c よりコピー
 		buf = new char[param_len+1];
-		memset(buf, 0, buflen);
+		memset(buf, 0, param_len+1);
 		for (i=0; i<param_len; i++) {
 			if (inQuotes) {
 				// 現在位置が"の中
