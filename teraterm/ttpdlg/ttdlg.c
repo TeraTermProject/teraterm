@@ -3225,6 +3225,9 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							SetCurrentDirectory(ts->HomeDir);
 							_fullpath(ts->UILanguageFile, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile));
 							SetCurrentDirectory(CurDir);
+
+							// タイトルの更新を行う。(2014.2.23 yutaka)
+							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
 						}
 					}
 
