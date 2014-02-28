@@ -603,8 +603,8 @@ IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,67,0,0
- PRODUCTVERSION 2,67,0,0
+ FILEVERSION 2,68,0,0
+ PRODUCTVERSION 2,68,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -620,12 +620,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "TTXSSH"
-            VALUE "FileVersion", "2, 67, 0, 0"
+            VALUE "FileVersion", "2, 68, 0, 0"
             VALUE "InternalName", "TTXSSH"
             VALUE "LegalCopyright", "(C)2004-2014 TeraTerm Project, (C)1998-1999 Robert O'Callahan"
             VALUE "OriginalFilename", "TTXSSH.dll"
             VALUE "ProductName", "TTSSH"
-            VALUE "ProductVersion", "2, 67, 0, 0"
+            VALUE "ProductVersion", "2, 68, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
