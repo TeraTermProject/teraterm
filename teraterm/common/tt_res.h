@@ -168,6 +168,9 @@
 #define IDC_ROTATE_STEP_TEXT            2531
 #define IDC_ROTATE_SIZE_TEXT            2532
 #define IDC_ROTATE_GROUP                2533
+#define IDC_MULTICAST_LABEL             2534
+#define IDC_EDIT2                       2535
+#define IDC_MULTICAST                   2535
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -262,7 +265,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2534
+#define _APS_NEXT_CONTROL_VALUE         2536
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

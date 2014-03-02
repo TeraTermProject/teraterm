@@ -573,6 +573,7 @@ struct tttset {
 	unsigned int MaxOSCBufferSize;
 	WORD JoinSplitURL;
 	char JoinSplitURLIgnoreEOLChar;
+	char MulticastName[MAX_PATH];
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1036,6 +1037,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.82, ttset_memfilemap was replaced with ttset_memfilemap_23.
+ *   added tttset.MulticastName
+ *
  * - At version 4.80, ttset_memfilemap was replaced with ttset_memfilemap_22.
  *   added tttset.LogAllBuffIncludedInFirst
  *   added tttset.MaxOSCBufferSize
@@ -1172,4 +1176,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_22"
+#define TT_FILEMAPNAME "ttset_memfilemap_23"

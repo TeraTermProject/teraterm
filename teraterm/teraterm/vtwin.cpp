@@ -4836,17 +4836,15 @@ error:
 }
 
 
-static char multicast_name[128];
-
 extern "C"
 void SetMulticastName(char *name)
 {
-	strncpy_s(multicast_name, sizeof(multicast_name), name, _TRUNCATE);
+	strncpy_s(ts.MulticastName, sizeof(ts.MulticastName), name, _TRUNCATE);
 }
 
 static int CompareMulticastName(char *name)
 {
-	return strcmp(multicast_name, name);
+	return strcmp(ts.MulticastName, name);
 }
 
 //

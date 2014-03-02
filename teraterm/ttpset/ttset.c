@@ -1261,6 +1261,12 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->AcceptBroadcast =
 		GetOnOff(Section, "AcceptBroadcast", FName, TRUE);
 
+	// Multicast Name
+	GetPrivateProfileString(Section, "MulticastName", "",
+	                        Temp, sizeof(Temp), FName);
+	strncpy_s(ts->MulticastName, sizeof(ts->MulticastName), Temp,
+	          _TRUNCATE);
+
 	// Confirm send a file when drag and drop (2007.12.28 maya)
 	ts->ConfirmFileDragAndDrop =
 		GetOnOff(Section, "ConfirmFileDragAndDrop", FName, TRUE);
@@ -2468,6 +2474,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// 337: 2007/03/20 Accept Broadcast
 	WriteOnOff(Section, "AcceptBroadcast", FName, ts->AcceptBroadcast);
+
+	// Multicast Name
+	WritePrivateProfileString(Section, "MulticastName",
+		ts->MulticastName, FName);
 
 	// Confirm send a file when drag and drop (2007.12.28 maya)
 	WriteOnOff(Section, "ConfirmFileDragAndDrop", FName,
