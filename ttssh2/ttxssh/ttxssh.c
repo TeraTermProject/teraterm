@@ -76,6 +76,7 @@ static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 #include "buffer.h"
 #include "cipher.h"
 #include "key.h"
+#include "ed25519_crypto_api.h"
 
 #include "sftp.h"
 
@@ -3383,19 +3384,26 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
+	unsigned char *ed25519_sk; 
+	unsigned char *ed25519_pk; 
 	ssh_keytype type;
 } ssh_private_key_t;
 
-static ssh_private_key_t private_key = {NULL, NULL, NULL, KEY_UNSPEC};
+static ssh_private_key_t private_key = {NULL, NULL, NULL, NULL, NULL, KEY_UNSPEC};
 
 typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
+	unsigned char *ed25519_sk; 
+	unsigned char *ed25519_pk; 
 	ssh_keytype type;
 } ssh_public_key_t;
 
-static ssh_public_key_t public_key = {NULL, NULL, NULL, KEY_UNSPEC};
+static ssh_public_key_t public_key = {NULL, NULL, NULL, NULL, NULL, KEY_UNSPEC};
+
+#define	ED25519_SK_SZ	crypto_sign_ed25519_SECRETKEYBYTES
+#define	ED25519_PK_SZ	crypto_sign_ed25519_PUBLICKEYBYTES
 
 static void free_ssh_key(void)
 {
@@ -3414,6 +3422,11 @@ static void free_ssh_key(void)
 	private_key.ecdsa = NULL;
 	EC_KEY_free(public_key.ecdsa);
 	public_key.ecdsa = NULL;
+
+	free(private_key.ed25519_sk);
+	private_key.ed25519_sk = NULL;
+	free(private_key.ed25519_pk);
+	private_key.ed25519_pk = NULL;
 
 	private_key.type = KEY_UNSPEC;
 	public_key.type = KEY_UNSPEC;
@@ -3523,6 +3536,18 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		break;
 	}
 
+	case KEY_ED25519:
+	{
+		private_key.ed25519_pk = malloc(ED25519_PK_SZ);
+		private_key.ed25519_sk = malloc(ED25519_SK_SZ);
+		if (private_key.ed25519_pk == NULL || private_key.ed25519_sk == NULL)
+			goto error;
+
+		//crypto_sign_ed25519_keypair(k->ed25519_pk, k->ed25519_sk);
+
+		break;
+	}
+
 	default:
 		goto error;
 	}
@@ -3599,6 +3624,21 @@ static unsigned int arc4random(void)
 	rc4_ready -= sizeof(r);
 
 	return(r);
+}
+
+static void arc4random_buf(void *_buf, size_t n)
+{
+	size_t i;
+	unsigned int r = 0;
+	char *buf = (char *)_buf;
+
+	for (i = 0; i < n; i++) {
+		if (i % 4 == 0)
+			r = arc4random();
+		buf[i] = r & 0xff;
+		r >>= 8;
+	}
+	i = r = 0;
 }
 
 //
@@ -4089,6 +4129,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_ECDSA256_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ECDSA384_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ECDSA521_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ED25519_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYBITS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYBITS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEY_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
@@ -4168,6 +4209,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				case KEY_ECDSA521:
 					SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
 					break;
+				case KEY_ED25519:
+					bits = 0;
+					break;
 			}
 
 			// passphrase edit box disabled(default)
@@ -4222,6 +4266,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), TRUE);
+				EnableWindow(GetDlgItem(dlg, IDC_ED25519_TYPE), TRUE);
 				if (!isFixedLengthKey(key_type)) {
 					EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				}
@@ -4294,6 +4339,16 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			}
 			key_type = KEY_ECDSA521;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
+			break;
+
+		case IDC_ED25519_TYPE | (BN_CLICKED << 16):
+			/* ED25519 ではビット数を指定できない。*/
+			if (!isFixedLengthKey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
+				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+			}
+			key_type = KEY_ED25519;
+			SetDlgItemInt(dlg, IDC_KEYBITS, 0, FALSE);
 			break;
 
 		// saving public key file
