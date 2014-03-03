@@ -45,7 +45,8 @@ int crypto_hash_sha512(unsigned char *out,const unsigned char *in,unsigned long 
 {
   unsigned char h[64];
   unsigned char padded[256];
-  unsigned int i;
+//  unsigned int i;
+  unsigned long long i;
   unsigned long long bytes = inlen;
 
   for (i = 0;i < 64;++i) h[i] = iv[i];
@@ -60,27 +61,27 @@ int crypto_hash_sha512(unsigned char *out,const unsigned char *in,unsigned long 
 
   if (inlen < 112) {
     for (i = inlen + 1;i < 119;++i) padded[i] = 0;
-    padded[119] = bytes >> 61;
-    padded[120] = bytes >> 53;
-    padded[121] = bytes >> 45;
-    padded[122] = bytes >> 37;
-    padded[123] = bytes >> 29;
-    padded[124] = bytes >> 21;
-    padded[125] = bytes >> 13;
-    padded[126] = bytes >> 5;
-    padded[127] = bytes << 3;
+    padded[119] = (unsigned char)(bytes >> 61);
+    padded[120] = (unsigned char)(bytes >> 53);
+    padded[121] = (unsigned char)(bytes >> 45);
+    padded[122] = (unsigned char)(bytes >> 37);
+    padded[123] = (unsigned char)(bytes >> 29);
+    padded[124] = (unsigned char)(bytes >> 21);
+    padded[125] = (unsigned char)(bytes >> 13);
+    padded[126] = (unsigned char)(bytes >> 5);
+    padded[127] = (unsigned char)(bytes << 3);
     blocks(h,padded,128);
   } else {
     for (i = inlen + 1;i < 247;++i) padded[i] = 0;
-    padded[247] = bytes >> 61;
-    padded[248] = bytes >> 53;
-    padded[249] = bytes >> 45;
-    padded[250] = bytes >> 37;
-    padded[251] = bytes >> 29;
-    padded[252] = bytes >> 21;
-    padded[253] = bytes >> 13;
-    padded[254] = bytes >> 5;
-    padded[255] = bytes << 3;
+    padded[247] = (unsigned char)(bytes >> 61);
+    padded[248] = (unsigned char)(bytes >> 53);
+    padded[249] = (unsigned char)(bytes >> 45);
+    padded[250] = (unsigned char)(bytes >> 37);
+    padded[251] = (unsigned char)(bytes >> 29);
+    padded[252] = (unsigned char)(bytes >> 21);
+    padded[253] = (unsigned char)(bytes >> 13);
+    padded[254] = (unsigned char)(bytes >> 5);
+    padded[255] = (unsigned char)(bytes << 3);
     blocks(h,padded,256);
   }
 

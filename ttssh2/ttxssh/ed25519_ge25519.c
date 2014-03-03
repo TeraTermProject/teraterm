@@ -6,11 +6,11 @@
  * Copied from supercop-20130419/crypto_sign/ed25519/ref/ge25519.c
  */
 
-#include "includes.h"
+//#include "includes.h"
 
-#include "fe25519.h"
-#include "sc25519.h"
-#include "ge25519.h"
+#include "ed25519_fe25519.h"
+#include "ed25519_sc25519.h"
+#include "ed25519_ge25519.h"
 
 /* 
  * Arithmetic on the twisted Edwards curve -x^2 + y^2 = 1 + dx^2y^2 
@@ -164,7 +164,7 @@ static unsigned char negative(signed char b)
 {
   unsigned long long x = b; /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
   x >>= 63; /* 1: yes; 0: no */
-  return x;
+  return (unsigned char)x;
 }
 
 static void choose_t(ge25519_aff *t, unsigned long long pos, signed char b)

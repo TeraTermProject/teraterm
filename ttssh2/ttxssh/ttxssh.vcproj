@@ -253,6 +253,34 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ed25519.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ed25519_blocks.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ed25519_fe25519.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ed25519_ge25519.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ed25519_hash.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ed25519_sc25519.c"
+			>
+		</File>
+		<File
+			RelativePath=".\ed25519_verify.c"
+			>
+		</File>
+		<File
 			RelativePath="fwd.c"
 			>
 		</File>

@@ -3543,7 +3543,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		if (private_key.ed25519_pk == NULL || private_key.ed25519_sk == NULL)
 			goto error;
 
-		//crypto_sign_ed25519_keypair(k->ed25519_pk, k->ed25519_sk);
+		crypto_sign_ed25519_keypair(private_key.ed25519_pk, private_key.ed25519_sk);
 
 		break;
 	}
@@ -3626,7 +3626,7 @@ static unsigned int arc4random(void)
 	return(r);
 }
 
-static void arc4random_buf(void *_buf, size_t n)
+void arc4random_buf(void *_buf, size_t n)
 {
 	size_t i;
 	unsigned int r = 0;
