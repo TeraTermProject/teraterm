@@ -44,14 +44,14 @@ static uint64 load_bigendian(const unsigned char *x)
 
 static void store_bigendian(unsigned char *x,uint64 u)
 {
-  x[7] = u; u >>= 8;
-  x[6] = u; u >>= 8;
-  x[5] = u; u >>= 8;
-  x[4] = u; u >>= 8;
-  x[3] = u; u >>= 8;
-  x[2] = u; u >>= 8;
-  x[1] = u; u >>= 8;
-  x[0] = u;
+  x[7] = (unsigned char)u; u >>= 8;
+  x[6] = (unsigned char)u; u >>= 8;
+  x[5] = (unsigned char)u; u >>= 8;
+  x[4] = (unsigned char)u; u >>= 8;
+  x[3] = (unsigned char)u; u >>= 8;
+  x[2] = (unsigned char)u; u >>= 8;
+  x[1] = (unsigned char)u; u >>= 8;
+  x[0] = (unsigned char)u;
 }
 
 #define SHR(x,c) ((x) >> (c))
@@ -261,6 +261,6 @@ int crypto_hashblocks_sha512(unsigned char *statebytes,const unsigned char *in,u
   store_bigendian(statebytes + 48,state[6]);
   store_bigendian(statebytes + 56,state[7]);
 
-  return inlen;
+  return (int)inlen;
 }
 

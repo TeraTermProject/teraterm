@@ -110,6 +110,15 @@ typedef struct {
   /* WIN32 allows multiple instances of a DLL */
 static TInstVar InstVar;
 
+/* openssh private key file format */
+#define MARK_BEGIN		"-----BEGIN OPENSSH PRIVATE KEY-----\n"
+#define MARK_END		"-----END OPENSSH PRIVATE KEY-----\n"
+#define KDFNAME			"bcrypt"
+#define AUTH_MAGIC		"openssh-key-v1"
+#define SALT_LEN		16
+#define DEFAULT_CIPHERNAME	"aes256-cbc"
+#define	DEFAULT_ROUNDS		16
+
 /*
 This code makes lots of assumptions about the order in which Tera Term
 does things, and how. A key assumption is that the Notification window
@@ -3538,12 +3547,18 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 
 	case KEY_ED25519:
 	{
+		// îÈñßåÆÇçÏÇÈ
 		private_key.ed25519_pk = malloc(ED25519_PK_SZ);
 		private_key.ed25519_sk = malloc(ED25519_SK_SZ);
 		if (private_key.ed25519_pk == NULL || private_key.ed25519_sk == NULL)
 			goto error;
-
 		crypto_sign_ed25519_keypair(private_key.ed25519_pk, private_key.ed25519_sk);
+
+		// åˆäJåÆÇçÏÇÈ
+		public_key.ed25519_pk = malloc(ED25519_PK_SZ);
+		if (public_key.ed25519_pk == NULL)
+			goto error;
+		memcpy(public_key.ed25519_pk, private_key.ed25519_pk, ED25519_PK_SZ);
 
 		break;
 	}
@@ -4707,6 +4722,45 @@ public_error:
 error:;
 				buffer_free(b);
 				buffer_free(enc);
+
+			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 (based on key_private_to_blob2)
+				SSHCipher ciphernameval = SSH2_CIPHER_AES256_CBC;
+				//char *ciphername = DEFAULT_CIPHERNAME;
+				int rounds = DEFAULT_ROUNDS;
+				buffer_t *b = NULL;
+				buffer_t *kdf = NULL;
+				int block_size, keylen, ivlen, authlen; 
+				unsigned char *key = NULL, salt[SALT_LEN];
+				const char *kdfname = KDFNAME;
+				char *passphrase = buf;
+
+				b = buffer_init();
+				if (b == NULL)
+					goto ed25519_error;
+				kdf = buffer_init();
+				if (kdf == NULL)
+					goto ed25519_error;
+
+				block_size = get_cipher_block_size(ciphernameval);
+				keylen = get_cipher_key_len(ciphernameval);
+				ivlen = block_size;
+				authlen = 0;
+				key = calloc(1, keylen + ivlen);
+
+				if (strcmp(kdfname, "none") != 0) {
+					arc4random_buf(salt, SALT_LEN);
+					if (bcrypt_pbkdf(passphrase, strlen(passphrase),
+						salt, SALT_LEN, key, keylen + ivlen, rounds) < 0)
+						//fatal("bcrypt_pbkdf failed");
+						;
+					buffer_put_string(&kdf, salt, SALT_LEN);
+					buffer_put_int(&kdf, rounds);
+				}
+
+ed25519_error:
+				buffer_free(b);
+				buffer_free(kdf);
+				free(key);
 
 			} else { // SSH2 RSA, DSA, ECDSA
 				int len;

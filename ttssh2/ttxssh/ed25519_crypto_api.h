@@ -27,6 +27,20 @@ OF SUCH DAMAGE.
 #ifndef __ED25519_CRYPTO_API_H
 #define __ED25519_CRYPTO_API_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef unsigned char u_int8_t;
+typedef unsigned short int u_int16_t;
+typedef unsigned int u_int32_t;
+typedef long long int int64_t;
+typedef unsigned long long int u_int64_t;
+
+typedef u_int8_t uint8_t;
+typedef u_int16_t uint16_t;
+typedef u_int32_t uint32_t;
+typedef u_int64_t uint64_t;
+
 typedef int crypto_int32;
 typedef unsigned int crypto_uint32;
 
@@ -54,5 +68,8 @@ int	crypto_sign_ed25519(unsigned char *, unsigned long long *,
 int	crypto_sign_ed25519_open(unsigned char *, unsigned long long *,
     const unsigned char *, unsigned long long, const unsigned char *);
 int	crypto_sign_ed25519_keypair(unsigned char *, unsigned char *);
+
+int	bcrypt_pbkdf(const char *, size_t, const u_int8_t *, size_t,
+    u_int8_t *, size_t, unsigned int);
 
 #endif
