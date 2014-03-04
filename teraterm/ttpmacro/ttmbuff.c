@@ -377,6 +377,10 @@ void CloseBuff(int IBuff)
 		BuffHandle[i] = NULL;
 
 		free(BuffLineNo[i]);
+		/* ポインタの初期化漏れを修正した。4.81でのデグレード。
+		 * (2014.3.4 yutaka)
+		 */
+		BuffLineNo[i] = NULL;
 		BuffLineNoMaxIndex[i] = 0;
 	}
 
