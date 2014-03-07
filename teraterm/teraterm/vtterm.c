@@ -1679,8 +1679,8 @@ void CSMoveToColumnN()		// CHA / HPA
 {
 	if (Param[1]<1)
 		Param[1] = 1;
-	else if (Param[1] > NumOfColumns-1)
-		Param[1] = NumOfColumns-1;
+	else if (Param[1] > NumOfColumns)
+		Param[1] = NumOfColumns;
 
 	Param[1]--;
 
