@@ -1733,7 +1733,7 @@ void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
 	MoveCursor(NewX, CursorY);
 }
 
-  void CSMoveToLineN()
+  void CSMoveToLineN()			// VPA
   {
     if (Param[1]<1) Param[1] = 1;
     if (RelativeOrgMode)
@@ -2199,7 +2199,7 @@ void CSSetAttr()		// SGR
 	BuffSetCurCharAttr(CharAttr);
 }
 
-  void CSSetScrollRegion()
+  void CSSetScrollRegion()	// DECSTBM
   {
     if (isCursorOnStatusLine) {
       MoveCursor(0,CursorY);
@@ -2221,7 +2221,7 @@ void CSSetAttr()		// SGR
 		    else MoveCursor(0,0);
   }
 
-void CSSetLRScrollRegion()
+void CSSetLRScrollRegion()	// DECSLRM
 {
 //	if (isCursorOnStatusLine) {
 //		MoveCursor(0,CursorY);
