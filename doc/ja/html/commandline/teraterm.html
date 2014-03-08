@@ -87,12 +87,12 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>起動時に "New connection" ダイアログを表示する</dd>
 
   <dt id="f">/F=&lt;setup file&gt;</dt>
-  <dd>設定ファイル<br>
+  <dd>設定ファイル <a href="#note2">[2]</a><br>
       <span class="syntax">/F=TERATERM.INI</span> (省略時)<br>
       ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
 
   <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
-  <dd>ファイル転送用ディレクトリ</dd>
+  <dd>ファイル転送用ディレクトリ <a href="#note2">[2]</a></dd>
 
   <dt id="h">/H</dt>
   <dd>タイトルバーを隠す</dd>
@@ -101,7 +101,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>起動時にアイコン状態にする</dd>
 
   <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
-  <dd>キーボード設定ファイル<br>
+  <dd>キーボード設定ファイル <a href="#note2">[2]</a><br>
       <span class="syntax">/K=KEYBOARD.CNF</span> (省略時)<br>
       ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
 
@@ -127,7 +127,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
-  <dd>起動時にログを開始</dd>
+  <dd>起動時にログを開始 <a href="#note2">[2]</a></dd>
 
   <dt id="la">/LA=&lt;language&gt;</dt>
   <dd>言語モード
@@ -140,11 +140,11 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
-  <dd>起動時にマクロを実行<br>
+  <dd>起動時にマクロを実行 <a href="#note2">[2]</a><br>
       ファイル名が絶対パスでないときは、ttermpro.exe からの相対パスと見なされます。</dd>
 
   <dt id="mn">/MN=&lt;multicastname&gt;</dt>
-  <dd><a href="../macro/command/sendmulticast.html">sendmulticast</a> マクロコマンドで指定するためのマルチキャスト名</dd>
+  <dd><a href="../macro/command/sendmulticast.html">sendmulticast</a> マクロコマンドで指定するためのマルチキャスト名 <a href="#note2">[2]</a></dd>
 
   <dt id="nolog">/NOLOG</dt>
   <dd>起動時にログを開始しない</dd>
@@ -153,7 +153,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>TCP ポート番号</dd>
 
   <dt id="r">/R=&lt;replay file&gt;</dt>
-  <dd>ファイルを再生</dd>
+  <dd>ファイルを再生 <a href="#note2">[2]</a></dd>
 
   <dt id="t">/T=&lt;telnet flag&gt;</dt>
   <dd><ul>
@@ -173,9 +173,8 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="vticon">/VTICON=&lt;icon name&gt;</dt>
   <dd>VTウインドウのウインドウアイコンを指定する。icon nameには、設定ファイルの<a href="../setup/teraterm-win.html#WindowIcon">VTIcon設定</a>と同じ物が使用できる。</dd>
 
-  <dt id="w">/W="&lt;window title&gt;"</dt>
-  <dd>ウィンドウのタイトル<br>
-      タイトルに " を含めるためには、連続した `"'("") を指定してください。</dd>
+  <dt id="w">/W=&lt;window title&gt;</dt>
+  <dd>ウィンドウのタイトル <a href="#note2">[2]</a></dd>
 
   <dt id="x">/X=&lt;window position (x)&gt;</dt>
   <dd>ウィンドウの位置(水平)</dd>
@@ -245,10 +244,18 @@ TTERMPRO /NAMEDPIPE \\.\pipe\vmware-serial-port
 
 <h2 id="notes">注</h2>
 
-<p>
-&lt;telnet flag&gt; が 1 で、かつ &lt;TCP port#&gt; が 23 のときだけ、Tera Term から自発的に telnet の option negotiation を開始します。それ以外の場合でも Tera Term はホストから送られてきた telnet コマンドに応答することができます。
+<p id="note1">
+[1] &lt;telnet flag&gt; が 1 で、かつ &lt;TCP port#&gt; が 23 のときだけ、Tera Term から自発的に telnet の option negotiation を開始します。それ以外の場合でも Tera Term はホストから送られてきた telnet コマンドに応答することができます。
 </p>
 
+<p id="note2">
+[2] パラメータの値にスペースや `"' を含めるためには、値全体を `"' で囲んでください。この場合、値に " を含めるためには、連続した `"'("") を指定してください。
+<pre>
+/F="C:\Document and Settings\user\My Documents\teraterm\server1.INI"
+/W="Tera Term"
+/W="""Tera Term"""
+</pre>
+</p>
 
 <h2 id="refs">参照</h2>
 

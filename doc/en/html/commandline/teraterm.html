@@ -82,12 +82,12 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Enable displaying the "New connection" dialog on startup</dd>
 
   <dt id="f">/F=&lt;setup file&gt;</dt>
-  <dd>Setup file<br>
+  <dd>Setup file <a href="#note2">[2]</a><br>
       <span class="syntax">/F=TERATERM.INI</span> (default)<br>
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
   <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
-  <dd>File transfer directory</dd>
+  <dd>File transfer directory <a href="#note2">[2]</a></dd>
 
   <dt id="h">/H</dt>
   <dd>Hide title bar.</dd>
@@ -96,7 +96,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Start Tera Term in iconized state.</dd>
 
   <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
-  <dd>Keyboard setup file<br>
+  <dd>Keyboard setup file <a href="#note2">[2]</a><br>
       <span class="syntax">/K=KEYBOARD.CNF</span> (default)<br>
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
@@ -122,7 +122,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
-  <dd>Start Tera Term with logging.</dd>
+  <dd>Start Tera Term with logging. <a href="#note2">[2]</a></dd>
 
   <dt id="la">/LA=&lt;language&gt;</dt>
   <dd>Language mode.
@@ -135,11 +135,11 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
-  <dd>Start Tera Term with macro.<br>
+  <dd>Start Tera Term with macro. <a href="#note2">[2]</a><br>
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
   <dt id="mn">/MN=&lt;multicastname&gt;</dt>
-  <dd>Multicast name for <a href="../macro/command/sendmulticast.html">sendmulticast</a> macro command.</dd>
+  <dd>Multicast name for <a href="../macro/command/sendmulticast.html">sendmulticast</a> macro command. <a href="#note2">[2]</a></dd>
 
   <dt id="nolog">/NOLOG</dt>
   <dd>Start Tera Term without logging.</dd>
@@ -148,7 +148,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>TCP port number</dd>
 
   <dt id="r">/R=&lt;replay file&gt;</dt>
-  <dd>Replay file</dd>
+  <dd>Replay file <a href="#note2">[2]</a></dd>
 
   <dt id="t">/T=&lt;telnet flag&gt;</dt>
   <dd><ul>
@@ -168,8 +168,8 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="vticon">/VTICON=&lt;icon name&gt;</dt>
   <dd>VT window icon. Could be specify the same value of <a href="../setup/teraterm-win.html#WindowIcon">VTIcon of setup file</a>.</dd>
 
-  <dt id="w">/W="&lt;window title&gt;"</dt>
-  <dd>Window title<br>
+  <dt id="w">/W=&lt;window title&gt;</dt>
+  <dd>Window title <a href="#note2">[2]</a><br>
       A user should put the window title in quotations by using `"' character two times to include the character.</dd>
 
   <dt id="x">/X=&lt;window position (x)&gt;</dt>
@@ -240,10 +240,18 @@ Following default values are stored in the Tera Term setup file:
 
 <h2 id="notes">Note</h2>
 
-<p>
-Only if &lt;telnet flag&gt; is 1 (on) and &lt;TCP port#&gt; is 23, Tera Term starts spontaneously sending telnet commands to the host for the option negotiation when the TCP/IP connection is established. In any cases, Tera Term can respond to telnet commands sent by the host.
+<p id="note1">
+[1] Only if &lt;telnet flag&gt; is 1 (on) and &lt;TCP port#&gt; is 23, Tera Term starts spontaneously sending telnet commands to the host for the option negotiation when the TCP/IP connection is established. In any cases, Tera Term can respond to telnet commands sent by the host.
 </p>
 
+<p id="note2">
+[2] <!--パラメータの値にスペースや `"' を含めるためには、値全体を `"' で囲んでください。この場合、-->A user should put the window title in quotations by using `"' character two times to include the character.<br>
+<pre>
+/F="C:\Document and Settings\user\My Documents\teraterm\server1.INI"
+/W="Tera Term"
+/W="""Tera Term"""
+</pre>
+</p>
 
 <h2 id="refs">See also</h2>
 
