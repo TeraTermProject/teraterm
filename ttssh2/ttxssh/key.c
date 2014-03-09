@@ -1244,3 +1244,22 @@ ssh_keytype nid_to_keytype(int nid)
 	}
 	return KEY_UNSPEC;
 }
+
+void key_private_serialize(Key *key, buffer_t *b)
+{
+	char *s;
+	
+	s = get_sshname_from_key(key);
+	buffer_put_cstring(b, s);
+
+	switch (key->type) {
+		case KEY_ED25519:
+			buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
+			buffer_put_string(b, key->ed25519_sk, ED25519_SK_SZ);
+			break;
+
+		default:
+			// TODO: ED25519 以外は未サポート。
+			break;
+	}
+}

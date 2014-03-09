@@ -26,6 +26,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __KEY_H_
+#define __KEY_H_
+
 #include "ttxssh.h"
 #include "ed25519_crypto_api.h"
 
@@ -56,3 +59,7 @@ int kextype_to_cipher_nid(kex_algorithm type);
 int keytype_to_hash_nid(ssh_keytype type);
 int keytype_to_cipher_nid(ssh_keytype type);
 ssh_keytype nid_to_keytype(int nid);
+
+void key_private_serialize(Key *key, buffer_t *b);
+
+#endif

@@ -1422,6 +1422,14 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 	}
 }
 
+//
+// SSH2—pƒAƒ‹ƒSƒŠƒYƒ€‚Ì”jŠü
+//
+void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp)
+{
+	EVP_CIPHER_CTX_cleanup(evp);
+}
+
 
 BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 {

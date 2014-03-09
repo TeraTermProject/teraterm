@@ -4087,6 +4087,101 @@ static void init_password_control(HWND dlg, int item)
 	                            (LONG) password_wnd_proc));
 }
 
+// ED25519 秘密鍵を保存する
+// based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
+static void save_ed25519_private_key(char *passphrase, char *filename, char *comment)
+{
+	SSHCipher ciphernameval = SSH2_CIPHER_AES256_CBC;
+	char *ciphername = DEFAULT_CIPHERNAME;
+	int rounds = DEFAULT_ROUNDS;
+	buffer_t *b = NULL;
+	buffer_t *kdf = NULL;
+	buffer_t *encoded = NULL;
+	int blocksize, keylen, ivlen, authlen, i; 
+	unsigned char *key = NULL, salt[SALT_LEN];
+	char *kdfname = KDFNAME;
+	EVP_CIPHER_CTX cipher_ctx;
+	Key keyblob;
+	unsigned char *cp = NULL;
+	unsigned int len, check;
+
+	b = buffer_init();
+	kdf = buffer_init();
+	encoded = buffer_init();
+	if (b == NULL || kdf == NULL || encoded == NULL)
+		goto ed25519_error;
+
+	blocksize = get_cipher_block_size(ciphernameval);
+	keylen = get_cipher_key_len(ciphernameval);
+	ivlen = blocksize;
+	authlen = 0;  // TODO: とりあえず固定化
+	key = calloc(1, keylen + ivlen);
+
+	if (strcmp(kdfname, "none") != 0) {
+		arc4random_buf(salt, SALT_LEN);
+		if (bcrypt_pbkdf(passphrase, strlen(passphrase),
+			salt, SALT_LEN, key, keylen + ivlen, rounds) < 0)
+			//fatal("bcrypt_pbkdf failed");
+			;
+		buffer_put_string(kdf, salt, SALT_LEN);
+		buffer_put_int(kdf, rounds);
+	}
+	// 暗号化の準備
+	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
+	// ここでは"AES256-CBC"に固定とする。
+	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
+		get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
+	memset(key, 0, keylen + ivlen);
+	free(key);
+
+	buffer_append(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
+	buffer_put_cstring(encoded, ciphername);
+	buffer_put_cstring(encoded, kdfname);
+	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
+	buffer_put_int(encoded, 1);			/* number of keys */
+	// key_to_blob()を一時利用するため、Key構造体を初期化する。
+	keyblob.type = private_key.type;
+	keyblob.ed25519_pk = private_key.ed25519_pk;
+	keyblob.ed25519_sk = private_key.ed25519_sk;
+	key_to_blob(&keyblob, &cp, &len);			/* public key */
+	buffer_put_string(encoded, cp, len);
+
+	memset(cp, 0, len);
+	free(cp);
+
+	/* Random check bytes */
+	check = arc4random();
+	buffer_put_int(b, check);
+	buffer_put_int(b, check);
+
+	/* append private key and comment*/
+	key_private_serialize(&keyblob, b);
+	buffer_put_cstring(b, comment);
+
+	/* padding */
+	i = 0;
+	while (buffer_len(b) % blocksize)
+		buffer_put_char(b, ++i & 0xff);
+
+	/* length */
+	buffer_put_int(encoded, buffer_len(b));
+
+	/* encrypt */
+	buffer_append_space(encoded, buffer_len(b) + authlen);
+	cp = buffer_ptr(encoded);
+	if (EVP_Cipher(&cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
+		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
+		//free(decrypted);
+		//goto error;
+	}
+	cipher_cleanup_SSH2(&cipher_ctx);
+
+ed25519_error:
+	buffer_free(b);
+	buffer_free(kdf);
+	buffer_free(encoded);
+}
+
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
@@ -4719,74 +4814,8 @@ error:;
 				buffer_free(b);
 				buffer_free(enc);
 
-			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 (based on key_private_to_blob2)
-				SSHCipher ciphernameval = SSH2_CIPHER_AES256_CBC;
-				char *ciphername = DEFAULT_CIPHERNAME;
-				int rounds = DEFAULT_ROUNDS;
-				buffer_t *b = NULL;
-				buffer_t *kdf = NULL;
-				buffer_t *encoded = NULL;
-				int block_size, keylen, ivlen, authlen; 
-				unsigned char *key = NULL, salt[SALT_LEN];
-				char *kdfname = KDFNAME;
-				char *passphrase = buf;
-				EVP_CIPHER_CTX cipher_ctx;
-				Key keyblob;
-				unsigned char *cp = NULL;
-				unsigned int len;
-
-				b = buffer_init();
-				if (b == NULL)
-					goto ed25519_error;
-				kdf = buffer_init();
-				if (kdf == NULL)
-					goto ed25519_error;
-
-				block_size = get_cipher_block_size(ciphernameval);
-				keylen = get_cipher_key_len(ciphernameval);
-				ivlen = block_size;
-				authlen = 0;
-				key = calloc(1, keylen + ivlen);
-
-				if (strcmp(kdfname, "none") != 0) {
-					arc4random_buf(salt, SALT_LEN);
-					if (bcrypt_pbkdf(passphrase, strlen(passphrase),
-						salt, SALT_LEN, key, keylen + ivlen, rounds) < 0)
-						//fatal("bcrypt_pbkdf failed");
-						;
-					buffer_put_string(kdf, salt, SALT_LEN);
-					buffer_put_int(kdf, rounds);
-				}
-				// 暗号化の準備
-				// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
-				// ここでは"AES256-CBC"に固定とする。
-				cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
-					get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
-				memset(key, 0, keylen + ivlen);
-				free(key);
-
-				encoded = buffer_init();
-				if (encoded == NULL)
-					goto ed25519_error;
-				buffer_append(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
-				buffer_put_cstring(encoded, ciphername);
-				buffer_put_cstring(encoded, kdfname);
-				buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
-				buffer_put_int(encoded, 1);			/* number of keys */
-				// key_to_blob()を一時利用するため、Key構造体を初期化する。
-				keyblob.type = private_key.type;
-				keyblob.ed25519_pk = private_key.ed25519_pk;
-				keyblob.ed25519_sk = private_key.ed25519_sk;
-				key_to_blob(&keyblob, &cp, &len);			/* public key */
-				buffer_put_string(encoded, cp, len);
-
-				memset(cp, 0, len);
-				free(cp);
-
-ed25519_error:
-				buffer_free(b);
-				buffer_free(kdf);
-				buffer_free(encoded);
+			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
+				save_ed25519_private_key(buf, filename, comment);
 
 			} else { // SSH2 RSA, DSA, ECDSA
 				int len;

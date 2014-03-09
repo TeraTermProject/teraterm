@@ -98,4 +98,6 @@ void cipher_init_SSH2(
 		PTInstVar pvar
 );
 
+void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp);
+
 #endif				/* CIPHER_H */
