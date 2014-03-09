@@ -806,6 +806,10 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 		buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
 		                      EC_KEY_get0_public_key(key->ecdsa));
 		break;
+	case KEY_ED25519:
+		buffer_put_cstring(b, sshname);
+		buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
+		break;
 
 	default:
 		ret = 0;

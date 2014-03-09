@@ -266,6 +266,11 @@ void buffer_put_string(buffer_t *msg, char *ptr, int size)
 	}
 }
 
+void buffer_put_cstring(buffer_t *msg, char *ptr)
+{
+	buffer_put_string(msg, ptr, strlen(ptr));
+}
+
 void buffer_put_char(buffer_t *msg, int value)
 {
 	char ch = value;

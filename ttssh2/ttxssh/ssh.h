@@ -260,6 +260,7 @@ static ssh2_host_key_t ssh2_host_key[] = {
 	{KEY_ECDSA256, "ecdsa-sha2-nistp256"}, // RFC5656
 	{KEY_ECDSA384, "ecdsa-sha2-nistp384"}, // RFC5656
 	{KEY_ECDSA521, "ecdsa-sha2-nistp521"}, // RFC5656
+	{KEY_ED25519,  "ssh-ed25519"},
 	{KEY_UNSPEC,   "ssh-unknown"},
 	{KEY_NONE,     NULL},
 };
@@ -455,6 +456,9 @@ typedef struct Key {
 	int bits;
 	unsigned char *exp;
 	unsigned char *mod;
+	// SSH2 ED25519
+	unsigned char *ed25519_sk;
+	unsigned char *ed25519_pk;
 } Key;
 
 // fingerprint‚ÌŽí•Ê

@@ -27,6 +27,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ttxssh.h"
+#include "ed25519_crypto_api.h"
+
+#define	ED25519_SK_SZ	crypto_sign_ed25519_SECRETKEYBYTES
+#define	ED25519_PK_SZ	crypto_sign_ed25519_PUBLICKEYBYTES
 
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
