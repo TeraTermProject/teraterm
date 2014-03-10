@@ -4089,7 +4089,7 @@ static void init_password_control(HWND dlg, int item)
 
 // ED25519 秘密鍵を保存する
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
-static void save_ed25519_private_key(char *passphrase, char *filename, char *comment)
+static void save_ed25519_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar)
 {
 	SSHCipher ciphernameval = SSH2_CIPHER_AES256_CBC;
 	char *ciphername = DEFAULT_CIPHERNAME;
@@ -4097,18 +4097,22 @@ static void save_ed25519_private_key(char *passphrase, char *filename, char *com
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;
 	buffer_t *encoded = NULL;
-	int blocksize, keylen, ivlen, authlen, i; 
+	buffer_t *blob = NULL;
+	int blocksize, keylen, ivlen, authlen, i, n; 
 	unsigned char *key = NULL, salt[SALT_LEN];
 	char *kdfname = KDFNAME;
 	EVP_CIPHER_CTX cipher_ctx;
 	Key keyblob;
 	unsigned char *cp = NULL;
 	unsigned int len, check;
+	FILE *fp;
+	char uimsg[MAX_UIMSG];
 
 	b = buffer_init();
 	kdf = buffer_init();
 	encoded = buffer_init();
-	if (b == NULL || kdf == NULL || encoded == NULL)
+	blob = buffer_init();
+	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
 		goto ed25519_error;
 
 	blocksize = get_cipher_block_size(ciphernameval);
@@ -4176,10 +4180,54 @@ static void save_ed25519_private_key(char *passphrase, char *filename, char *com
 	}
 	cipher_cleanup_SSH2(&cipher_ctx);
 
+	len = 2 * buffer_len(encoded);
+	cp = malloc(len);
+	n = uuencode(buffer_ptr(encoded), buffer_len(encoded), (char *)cp, len);
+	if (n < 0) {
+		free(cp);
+		goto ed25519_error;
+	}
+
+	buffer_clear(blob);
+	buffer_append(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1);
+	for (i = 0; i < n; i++) {
+		buffer_put_char(blob, cp[i]);
+		if (i % 70 == 69)
+			buffer_put_char(blob, '\n');
+	}
+	if (i % 70 != 69)
+		buffer_put_char(blob, '\n');
+	buffer_append(blob, MARK_END, sizeof(MARK_END) - 1);
+	free(cp);
+
+	len = buffer_len(blob);
+
+	// 秘密鍵をファイルに保存する。
+	fp = fopen(filename, "w");
+	if (fp == NULL) {
+		UTIL_get_lang_msg("MSG_SAVE_KEY_OPENFILE_ERROR", pvar,
+		                  "Can't open key file");
+		strncpy_s(uimsg, sizeof(uimsg), pvar->ts->UIMsg, _TRUNCATE);
+		UTIL_get_lang_msg("MSG_ERROR", pvar, "ERROR");
+		MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
+		goto ed25519_error;
+	}
+	n = fwrite(buffer_ptr(blob), buffer_len(blob), 1, fp);
+	if (n != 1) {
+		UTIL_get_lang_msg("MSG_SAVE_KEY_WRITEFILE_ERROR", pvar,
+		                  "Can't open key file");
+		strncpy_s(uimsg, sizeof(uimsg), pvar->ts->UIMsg, _TRUNCATE);
+		UTIL_get_lang_msg("MSG_ERROR", pvar, "ERROR");
+		MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
+	}
+	fclose(fp);
+
+
 ed25519_error:
 	buffer_free(b);
 	buffer_free(kdf);
 	buffer_free(encoded);
+	buffer_free(blob);
 }
 
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
@@ -4685,6 +4733,15 @@ public_error:
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ecdsa", _TRUNCATE);
 				break;
+			case KEY_ED25519:
+				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER", pvar,
+				                  "SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0");
+				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				ofn.lpstrFilter = uimsg;
+				strncpy_s(filename, sizeof(filename), "id_ed25519", _TRUNCATE);
+				break;
+			default:
+				break;
 			}
 			ofn.lpstrFile = filename;
 			ofn.nMaxFile = sizeof(filename);
@@ -4815,7 +4872,7 @@ error:;
 				buffer_free(enc);
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
-				save_ed25519_private_key(buf, filename, comment);
+				save_ed25519_private_key(buf, filename, comment, dlg, pvar);
 
 			} else { // SSH2 RSA, DSA, ECDSA
 				int len;
