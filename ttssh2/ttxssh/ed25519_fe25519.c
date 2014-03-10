@@ -13,6 +13,8 @@
 
 #include "ed25519_fe25519.h"
 
+#pragma warning(disable : 4146)
+
 static crypto_uint32 equal(crypto_uint32 a,crypto_uint32 b) /* 16-bit inputs */
 {
   crypto_uint32 x = a ^ b; /* 0: yes; 1..65535: no */
