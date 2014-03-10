@@ -4551,6 +4551,15 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ecdsa.pub", _TRUNCATE);
 				break;
+			case KEY_ED25519:
+				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER", pvar,
+				                  "SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0");
+				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				ofn.lpstrFilter = uimsg;
+				strncpy_s(filename, sizeof(filename), "id_ed25519.pub", _TRUNCATE);
+				break;
+			default:
+				break;
 			}
 			ofn.lpstrFile = filename;
 			ofn.nMaxFile = sizeof(filename);
@@ -4632,6 +4641,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					buffer_put_string(b, s, strlen(s));
 					buffer_put_ecpoint(b, EC_KEY_get0_group(ecdsa),
 					                      EC_KEY_get0_public_key(ecdsa));
+					break;
+
+				case KEY_ED25519:
+					keyname = get_ssh_keytype_name(public_key.type);
+					buffer_put_cstring(b, keyname);
+					buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ);
 					break;
 				}
 
