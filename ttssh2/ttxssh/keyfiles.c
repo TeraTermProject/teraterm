@@ -352,27 +352,34 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
                            char *errmsg,
                            int errmsg_len)
 {
+	/* (A) 
+	 * buffer_consume系関数を使う場合は、buffer_lenとbuffer_ptrが使えないので、
+	 *   buffer_len -> buffer_remain_len
+	 *   buffer_ptr -> buffer_tail_ptr
+	 * を代替使用すること。
+	 */
 	buffer_t *blob = NULL;
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;
 	buffer_t *encoded = NULL;
-	buffer_t *copy = NULL;
-	Key *key = NULL;
+	buffer_t *copy_consumed = NULL;     // (A)
+	Key *keyfmt = NULL;
 	unsigned char buf[1024];
 	unsigned char *cp, last;
-	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL;
-	unsigned int len, klen, nkeys, blocksize;
+	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL, *key = NULL, *salt = NULL;
+	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
 	unsigned int check1, check2, m1len, m2len; 
 	int dlen;
 	SSHCipher ciphernameval;
 	size_t authlen;
+	EVP_CIPHER_CTX cipher_ctx;
 
 	blob = buffer_init();
 	b = buffer_init();
 	kdf = buffer_init();
 	encoded = buffer_init();
-	copy = buffer_init();
-	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy == NULL)
+	copy_consumed = buffer_init();
+	if (blob == NULL || b == NULL || kdf == NULL || encoded == NULL || copy_consumed == NULL)
 		goto error;
 
 	// ファイルをすべて読み込む
@@ -417,7 +424,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	// ファイルのスキャンが終わったので、uudecodeする。
 	len = buffer_len(encoded);
-	if ((cp = buffer_append_space(copy, len)) == NULL) {
+	if ((cp = buffer_append_space(copy_consumed, len)) == NULL) {
 		//error("%s: buffer_append_space", __func__);
 		goto error;
 	}
@@ -430,19 +437,19 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	buffer_consume_end(copy, len - dlen);
-	if (buffer_len(copy) < sizeof(AUTH_MAGIC) ||
-	    memcmp(buffer_ptr(copy), AUTH_MAGIC, sizeof(AUTH_MAGIC))) {
+	buffer_consume_end(copy_consumed, len - dlen);
+	if (buffer_remain_len(copy_consumed) < sizeof(AUTH_MAGIC) ||
+	    memcmp(buffer_tail_ptr(copy_consumed), AUTH_MAGIC, sizeof(AUTH_MAGIC))) {
 		//error("%s: bad magic", __func__);
 		goto error;
 	}
-	buffer_consume(copy, sizeof(AUTH_MAGIC));
+	buffer_consume(copy_consumed, sizeof(AUTH_MAGIC));
 
 	/*
 	 * デコードしたデータを解析する。
 	 */
 	// 暗号化アルゴリズムの名前
-	ciphername = buffer_get_string_msg(copy, NULL);
+	ciphername = buffer_get_string_msg(copy_consumed, NULL);
 	ciphernameval = get_cipher_by_name(ciphername);
 	if (ciphernameval == SSH_CIPHER_NONE) {
 		//error("%s: unknown cipher name", __func__);
@@ -454,14 +461,14 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	kdfname = buffer_get_string_msg(copy, NULL);
+	kdfname = buffer_get_string_msg(copy_consumed, NULL);
 	if (kdfname == NULL || strcmp(kdfname, KDFNAME) != 0) {
 		//error("%s: unknown kdf name", __func__);
 		goto error;
 	}
 
 	/* kdf options */
-	kdfp = buffer_get_string_msg(copy, &klen);
+	kdfp = buffer_get_string_msg(copy_consumed, &klen);
 	if (kdfp == NULL) {
 		//error("%s: kdf options not set", __func__);
 		goto error;
@@ -475,7 +482,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* number of keys */
-	if (buffer_get_int_ret(&nkeys, copy) < 0) {
+	if (buffer_get_int_ret(&nkeys, copy_consumed) < 0) {
 		//error("%s: key counter missing", __func__);
 		goto error;
 	}
@@ -485,7 +492,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* pubkey */
-	cp = buffer_get_string_msg(copy, &len);
+	cp = buffer_get_string_msg(copy_consumed, &len);
 	if (cp == NULL) {
 		//error("%s: pubkey not found", __func__);
 		goto error;
@@ -493,7 +500,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	free(cp); /* XXX check pubkey against decrypted private key */
 
 	/* size of encrypted key blob */
-	len = buffer_get_int(copy);
+	len = buffer_get_int(copy_consumed);
 	blocksize = get_cipher_block_size(ciphernameval);
 	authlen = 0;  // TODO: とりあえず固定化
 	if (len < blocksize) {
@@ -505,28 +512,76 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-#if 0
 	/* setup key */
-	keylen = cipher_keylen(c);
-	ivlen = cipher_ivlen(c);
-	key = xcalloc(1, keylen + ivlen);
-	if (!strcmp(kdfname, "bcrypt")) {
-		if ((salt = buffer_get_string_ret(&kdf, &slen)) == NULL) {
-			error("%s: salt not set", __func__);
-			goto out;
+	keylen = get_cipher_key_len(ciphernameval);
+	ivlen = blocksize;
+	key = calloc(1, keylen + ivlen);
+	if (!strcmp(kdfname, KDFNAME)) {
+		salt = buffer_get_string_msg(kdf, &slen);
+		if (salt == NULL) {
+			//error("%s: salt not set", __func__);
+			goto error;
 		}
-		if (buffer_get_int_ret(&rounds, &kdf) < 0) {
-			error("%s: rounds not set", __func__);
-			goto out;
-		}
+		rounds = buffer_get_int(kdf);
+		// TODO: error check
 		if (bcrypt_pbkdf(passphrase, strlen(passphrase), salt, slen,
 		    key, keylen + ivlen, rounds) < 0) {
-			error("%s: bcrypt_pbkdf failed", __func__);
+			//error("%s: bcrypt_pbkdf failed", __func__);
+			goto error;
+		}
+	}
+
+	// 復号化
+	cp = buffer_append_space(b, len);
+	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
+		get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
+	if (EVP_Cipher(&cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
+		cipher_cleanup_SSH2(&cipher_ctx);
+		goto error;
+	}
+	cipher_cleanup_SSH2(&cipher_ctx);
+	buffer_consume(copy_consumed, len);
+
+	if (buffer_remain_len(copy_consumed) != 0) {
+		//error("%s: key blob has trailing data (len = %u)", __func__,
+		//    buffer_len(&copy));
+		goto error;
+	}
+
+	/* check bytes */
+	if (buffer_get_int_ret(&check1, b) < 0 ||
+	    buffer_get_int_ret(&check2, b) < 0) {
+		//error("check bytes missing");
+		goto error;
+	}
+	if (check1 != check2) {
+		//debug("%s: decrypt failed: 0x%08x != 0x%08x", __func__,
+		//    check1, check2);
+		goto error;
+	}
+
+#if 0
+	keyfmt = key_private_deserialize(&b);
+
+	/* comment */
+	comment = buffer_get_cstring_ret(&b, NULL);
+
+	i = 0;
+	while (buffer_len(&b)) {
+		if (buffer_get_char_ret(&pad, &b) == -1 ||
+		    pad != (++i & 0xff)) {
+			error("%s: bad padding", __func__);
+			key_free(k);
+			k = NULL;
 			goto out;
 		}
 	}
-#endif
 
+	if (k && commentp) {
+		*commentp = comment;
+		comment = NULL;
+	}
+#endif
 
 	/* success */
 
@@ -535,14 +590,16 @@ error:
 	buffer_free(b);
 	buffer_free(kdf);
 	buffer_free(encoded);
-	buffer_free(copy);
+	buffer_free(copy_consumed);
 
 	free(ciphername);
 	free(kdfname);
 	free(kdfp);
+	free(key);
+	free(salt);
 
 	// ED25519 ではなかった
-	if (key == NULL) {
+	if (keyfmt == NULL) {
 		fseek(fp, 0, SEEK_SET);
 
 	} else {
@@ -550,7 +607,7 @@ error:
 
 	}
 
-	return (key);
+	return (keyfmt);
 }
 
 

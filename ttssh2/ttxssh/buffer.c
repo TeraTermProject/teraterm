@@ -499,26 +499,22 @@ void buffer_dump(FILE *fp, buffer_t *buf)
 // バッファのオフセットを進める。
 void buffer_consume(buffer_t *buf, int shift_byte)
 {
-	int n;
-
-	n = buf->offset + shift_byte;
-	if (n < buf->maxlen) {
-		buf->offset += shift_byte;
-	} else {
+	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error
+	} else {
+		buf->offset += shift_byte;
+		// lenは変えない。
 	}
 }
 
 // バッファの末尾を縮退する。
 void buffer_consume_end(buffer_t *buf, int shift_byte)
 {
-	int n;
-
-	n = buf->offset - shift_byte;
-	if (n >= 0) {
-		buf->offset -= shift_byte;
-	} else {
+	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error
+	} else {
+		buf->len -= shift_byte;
+		// offsetは変えない。
 	}
 }
 
