@@ -36,6 +36,7 @@ void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point);
 char *buffer_tail_ptr(buffer_t *msg);
 int buffer_overflow_verify(buffer_t *msg, int len);
 void buffer_consume(buffer_t *buf, int shift_byte);
+void buffer_consume_end(buffer_t *buf, int shift_byte);
 int buffer_compress(z_stream *zstream, char *payload, int len, buffer_t *compbuf);
 int buffer_decompress(z_stream *zstream, char *payload, int len, buffer_t *compbuf);
 int buffer_get_ret(buffer_t *msg, void *buf, int len);

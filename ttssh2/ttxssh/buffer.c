@@ -59,7 +59,6 @@ void buffer_free(buffer_t * buf)
 }
 
 // バッファの領域拡張を行う。
-// バッファのオフセットは拡張分だけ後ろにずれる。
 // return: 拡張前のバッファポインター
 void *buffer_append_space(buffer_t * buf, int size)
 {
@@ -84,8 +83,8 @@ void *buffer_append_space(buffer_t * buf, int size)
 	}
 
 	p = buf->buf + buf->offset;
-	buf->offset += size;
-	buf->len = buf->offset;
+	//buf->offset += size;
+	buf->len = buf->offset + size;
 
 	return (p);
 
@@ -509,6 +508,20 @@ void buffer_consume(buffer_t *buf, int shift_byte)
 		// TODO: fatal error
 	}
 }
+
+// バッファの末尾を縮退する。
+void buffer_consume_end(buffer_t *buf, int shift_byte)
+{
+	int n;
+
+	n = buf->offset - shift_byte;
+	if (n >= 0) {
+		buf->offset -= shift_byte;
+	} else {
+		// TODO: fatal error
+	}
+}
+
 
 // パケットの圧縮
 int buffer_compress(z_stream *zstream, char *payload, int len, buffer_t *compbuf)
