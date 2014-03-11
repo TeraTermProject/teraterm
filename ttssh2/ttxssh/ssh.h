@@ -613,6 +613,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
 int get_cipher_block_size(SSHCipher cipher);
 int get_cipher_key_len(SSHCipher cipher);
+SSHCipher get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
