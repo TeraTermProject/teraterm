@@ -58,12 +58,15 @@ void buffer_free(buffer_t * buf)
 	}
 }
 
-// バッファの領域拡張のみを行う。
-void buffer_append_space(buffer_t * buf, int size)
+// バッファの領域拡張を行う。
+// バッファのオフセットは拡張分だけ後ろにずれる。
+// return: 拡張前のバッファポインター
+void *buffer_append_space(buffer_t * buf, int size)
 {
 	int n;
 	int ret = -1;
 	int newlen;
+	void *p;
 
 	n = buf->offset + size;
 	if (n < buf->maxlen) {
@@ -80,13 +83,18 @@ void buffer_append_space(buffer_t * buf, int size)
 		buf->maxlen = newlen;
 	}
 
-	return;
+	p = buf->buf + buf->offset;
+	buf->offset += size;
+	buf->len = buf->offset;
+
+	return (p);
 
 panic:
 	{
 	char *p = NULL;
 	*p = 0; // application fault
 	}
+	return (NULL);
 }
 
 int buffer_append(buffer_t * buf, char *ptr, int size)

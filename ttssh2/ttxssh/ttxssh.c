@@ -4171,8 +4171,7 @@ static void save_ed25519_private_key(char *passphrase, char *filename, char *com
 	buffer_put_int(encoded, buffer_len(b));
 
 	/* encrypt */
-	buffer_append_space(encoded, buffer_len(b) + authlen);
-	cp = buffer_ptr(encoded);
+	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
 	if (EVP_Cipher(&cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
 		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 		//free(decrypted);
