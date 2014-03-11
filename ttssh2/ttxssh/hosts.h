@@ -68,4 +68,7 @@ void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar);
 void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar);
 void HOSTS_notify_disconnecting(PTInstVar pvar);
 void HOSTS_end(PTInstVar pvar);
+
+int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize);
+
 #endif

@@ -301,7 +301,7 @@ static int eat_to_end_of_pattern(char FAR * data)
 // BASE64デコード処理を行う。(rfc1521)
 // srcバッファは null-terminate している必要あり。
 //
-static int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize)
+int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize)
 {
 	char pad = '=';
 	int tarindex, state, ch;
