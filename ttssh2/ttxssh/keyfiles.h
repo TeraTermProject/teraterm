@@ -86,9 +86,22 @@ static keyfile_header_t keyfile_headers[] = {
 	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN DSA PRIVATE KEY-----"},
 	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN EC PRIVATE KEY-----"},
 	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN ENCRYPTED PRIVATE KEY-----"},
+	{SSH2_KEYFILE_TYPE_OPENSSH, "-----BEGIN OPENSSH PRIVATE KEY-----"},
 	{SSH2_KEYFILE_TYPE_PUTTY,   "PuTTY-User-Key-File-2"},
 	{SSH2_KEYFILE_TYPE_SECSH,   "---- BEGIN SSH2 ENCRYPTED PRIVATE KEY ----"},
 	{SSH2_KEYFILE_TYPE_NONE,    NULL},
 
 };
+
+/* openssh private key file format */
+#define MARK_BEGIN		"-----BEGIN OPENSSH PRIVATE KEY-----\n"
+#define MARK_END		"-----END OPENSSH PRIVATE KEY-----\n"
+#define KDFNAME			"bcrypt"
+#define AUTH_MAGIC		"openssh-key-v1"
+#define SALT_LEN		16
+#define DEFAULT_CIPHERNAME	"aes256-cbc"
+#define	DEFAULT_ROUNDS		16
+
+#define MAX_KEY_FILE_SIZE	(1024 * 1024)
+
 #endif
