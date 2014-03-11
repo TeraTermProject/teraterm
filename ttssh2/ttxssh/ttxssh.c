@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ssh.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "keyfiles.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -108,15 +109,6 @@ typedef struct {
 
   /* WIN32 allows multiple instances of a DLL */
 static TInstVar InstVar;
-
-/* openssh private key file format */
-#define MARK_BEGIN		"-----BEGIN OPENSSH PRIVATE KEY-----\n"
-#define MARK_END		"-----END OPENSSH PRIVATE KEY-----\n"
-#define KDFNAME			"bcrypt"
-#define AUTH_MAGIC		"openssh-key-v1"
-#define SALT_LEN		16
-#define DEFAULT_CIPHERNAME	"aes256-cbc"
-#define	DEFAULT_ROUNDS		16
 
 /*
 This code makes lots of assumptions about the order in which Tera Term
@@ -4091,7 +4083,7 @@ static void init_password_control(HWND dlg, int item)
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
 static void save_ed25519_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar)
 {
-	SSHCipher ciphernameval = SSH2_CIPHER_AES256_CBC;
+	SSHCipher ciphernameval = SSH_CIPHER_NONE;
 	char *ciphername = DEFAULT_CIPHERNAME;
 	int rounds = DEFAULT_ROUNDS;
 	buffer_t *b = NULL;
@@ -4115,6 +4107,7 @@ static void save_ed25519_private_key(char *passphrase, char *filename, char *com
 	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
 		goto ed25519_error;
 
+	ciphernameval = get_cipher_by_name(ciphername);
 	blocksize = get_cipher_block_size(ciphernameval);
 	keylen = get_cipher_key_len(ciphernameval);
 	ivlen = blocksize;
