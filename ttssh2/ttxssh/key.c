@@ -524,6 +524,8 @@ ssh_key_type(const Key *k)
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 		return "ECDSA";
+	case KEY_ED25519:
+		return "ED25519";
 	}
 	return "unknown";
 }
@@ -1198,6 +1200,11 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 		buffer_put_ecpoint(msg, EC_KEY_get0_group(keypair->ecdsa),
 		                        EC_KEY_get0_public_key(keypair->ecdsa));
 		break;
+	case KEY_ED25519:
+		s = get_sshname_from_key(keypair);
+		buffer_put_cstring(msg, s);
+		buffer_put_string(msg, keypair->ed25519_pk, ED25519_PK_SZ);
+		break;
 	default:
 		return FALSE;
 	}
@@ -1295,6 +1302,7 @@ Key *key_private_deserialize(buffer_t *blob)
 			k = malloc(sizeof(Key));
 			memset(k, 0, sizeof(Key));
 
+			k->type = type;
 			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
 			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
 			if (pklen != ED25519_PK_SZ) 
