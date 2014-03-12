@@ -365,11 +365,11 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	buffer_t *copy_consumed = NULL;     // (A)
 	Key *keyfmt = NULL;
 	unsigned char buf[1024];
-	unsigned char *cp, last;
-	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL, *key = NULL, *salt = NULL;
+	unsigned char *cp, last, pad;
+	char *ciphername = NULL, *kdfname = NULL, *kdfp = NULL, *key = NULL, *salt = NULL, *comment = NULL;
 	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
 	unsigned int check1, check2, m1len, m2len; 
-	int dlen;
+	int dlen, i;
 	SSHCipher ciphernameval;
 	size_t authlen;
 	EVP_CIPHER_CTX cipher_ctx;
@@ -560,28 +560,23 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-#if 0
-	keyfmt = key_private_deserialize(&b);
+	keyfmt = key_private_deserialize(b);
+	if (keyfmt == NULL)
+		goto error;
 
 	/* comment */
-	comment = buffer_get_cstring_ret(&b, NULL);
+	comment = buffer_get_string_msg(b, NULL);
 
 	i = 0;
-	while (buffer_len(&b)) {
-		if (buffer_get_char_ret(&pad, &b) == -1 ||
+	while (buffer_remain_len(b)) {
+		if (buffer_get_char_ret(&pad, b) == -1 ||
 		    pad != (++i & 0xff)) {
-			error("%s: bad padding", __func__);
-			key_free(k);
-			k = NULL;
-			goto out;
+			//error("%s: bad padding", __func__);
+			key_free(keyfmt);
+			keyfmt = NULL;
+			goto error;
 		}
 	}
-
-	if (k && commentp) {
-		*commentp = comment;
-		comment = NULL;
-	}
-#endif
 
 	/* success */
 
@@ -597,6 +592,7 @@ error:
 	free(kdfp);
 	free(key);
 	free(salt);
+	free(comment);
 
 	// ED25519 ‚Å‚Í‚È‚©‚Á‚½
 	if (keyfmt == NULL) {

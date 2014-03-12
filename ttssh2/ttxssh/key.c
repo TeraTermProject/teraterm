@@ -704,6 +704,19 @@ void key_free(Key *key)
 				EC_KEY_free(key->ecdsa);
 			key->ecdsa = NULL;
 			break;
+
+		case KEY_ED25519:
+			if (key->ed25519_pk) {
+				memset(key->ed25519_pk, 0, ED25519_PK_SZ);
+				free(key->ed25519_pk);
+				key->ed25519_pk = NULL;
+			}
+			if (key->ed25519_sk) {
+				memset(key->ed25519_sk, 0, ED25519_SK_SZ);
+				free(key->ed25519_sk);
+				key->ed25519_sk = NULL;
+			}
+			break;
 	}
 	free(key);
 }
@@ -737,6 +750,8 @@ ssh_keytype get_keytype_from_name(char *name)
 		return KEY_ECDSA384;
 	} else if (strcmp(name, "ecdsa-sha2-nistp521") == 0) {
 		return KEY_ECDSA521;
+	} else if (strcmp(name, "ssh-ed25519") == 0) {
+		return KEY_ED25519;
 	}
 	return KEY_UNSPEC;
 }
@@ -1262,4 +1277,45 @@ void key_private_serialize(Key *key, buffer_t *b)
 			// TODO: ED25519 以外は未サポート。
 			break;
 	}
+}
+
+Key *key_private_deserialize(buffer_t *blob)
+{
+	char *type_name = NULL;
+	Key *k = NULL;
+	unsigned int pklen, sklen;
+	int type;
+	int success = 0;
+
+	type_name = buffer_get_string_msg(blob, NULL);
+	type = get_keytype_from_name(type_name);
+
+	switch (type) {
+		case KEY_ED25519:
+			k = malloc(sizeof(Key));
+			memset(k, 0, sizeof(Key));
+
+			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
+			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
+			if (pklen != ED25519_PK_SZ) 
+				goto error;
+			if (sklen != ED25519_SK_SZ)
+				goto error;
+			break;
+
+		default:
+			// TODO: ED25519 以外は未サポート。
+			break;
+	}
+	success = 1;
+
+error:
+	free(type_name);
+
+	if (success == 0) {
+		key_free(k);
+		k = NULL;
+	}
+
+	return (k);
 }

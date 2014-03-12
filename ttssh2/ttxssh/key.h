@@ -61,5 +61,6 @@ int keytype_to_cipher_nid(ssh_keytype type);
 ssh_keytype nid_to_keytype(int nid);
 
 void key_private_serialize(Key *key, buffer_t *b);
+Key *key_private_deserialize(buffer_t *blob);
 
 #endif
