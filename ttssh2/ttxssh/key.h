@@ -40,6 +40,7 @@ int key_verify(Key *key,
                unsigned char *data, unsigned int datalen);
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
+unsigned char *duplicate_ED25519_PK(unsigned char *src);
 
 char *key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);

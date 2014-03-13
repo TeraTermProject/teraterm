@@ -288,6 +288,7 @@ static void normalize_host_key_order(char FAR * buf)
 		KEY_ECDSA256,
 		KEY_ECDSA384,
 		KEY_ECDSA521,
+		KEY_ED25519,
 		KEY_RSA,
 		KEY_DSA,
 		KEY_NONE,

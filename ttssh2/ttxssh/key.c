@@ -369,6 +369,9 @@ int key_verify(Key *key,
 	case KEY_ECDSA521:
 		ret = ssh_ecdsa_verify(key->ecdsa, key->type, signature, signaturelen, data, datalen);
 		break;
+	case KEY_ED25519:
+		// ‚Ü‚¾
+		break;
 	default:
 		return -1;
 	}
@@ -434,6 +437,17 @@ error:
 	return (dsa);
 }
 
+unsigned char *duplicate_ED25519_PK(unsigned char *src)
+{
+	unsigned char *ptr = NULL;
+
+	ptr = malloc(ED25519_PK_SZ);
+	if (ptr) {
+		memcpy(ptr, src, ED25519_PK_SZ);
+	}
+	return (ptr);
+}
+
 
 char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 {
@@ -481,6 +495,7 @@ char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
+	case KEY_ED25519:
 		key_to_blob(k, &blob, &len);
 		break;
 
@@ -547,6 +562,8 @@ key_size(const Key *k)
 		return 384;
 	case KEY_ECDSA521:
 		return 521;
+	case KEY_ED25519:
+		return 256;	/* XXX */
 	}
 	return 0;
 }
@@ -960,6 +977,10 @@ Key *key_from_blob(char *data, int blen)
 		hostkey->ecdsa = ecdsa;
 		break;
 
+	case KEY_ED25519:
+		// ‚Ü‚¾
+		break;
+
 	default: // unknown key
 		goto error;
 	}
@@ -1145,6 +1166,11 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		break;
 	}
+
+	case KEY_ED25519:
+		// ‚Ü‚¾
+		break;
+
 	default:
 		buffer_free(msg);
 		return FALSE;
