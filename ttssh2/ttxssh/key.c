@@ -351,6 +351,75 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	return ret;
 }
 
+static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen, 
+							  unsigned char *data, unsigned int datalen)
+{
+	buffer_t *b;
+	char *ktype = NULL;
+	unsigned char *sigblob = NULL, *sm = NULL, *m = NULL;
+	unsigned int len;
+	unsigned long long smlen, mlen;
+	int rlen, ret;
+
+	ret = -1;
+	b = buffer_init();
+	if (b == NULL)
+		goto error;
+
+	buffer_append(b, signature, signaturelen);
+	ktype = buffer_get_string_msg(b, NULL);
+	if (strcmp("ssh-ed25519", ktype) != 0) {
+		goto error;
+	}
+	sigblob = buffer_get_string_msg(b, &len);
+	rlen = buffer_remain_len(b);
+	if (rlen != 0) {
+		goto error;
+	}
+	if (len > crypto_sign_ed25519_BYTES) {
+		goto error;
+	}
+
+	smlen = len + datalen;
+	sm = malloc((size_t)smlen);
+	memcpy(sm, sigblob, len);
+	memcpy(sm+len, data, datalen);
+	mlen = smlen;
+	m = malloc((size_t)mlen);
+
+	if ((ret = crypto_sign_ed25519_open(m, &mlen, sm, smlen,
+	    key->ed25519_pk)) != 0) {
+		//debug2("%s: crypto_sign_ed25519_open failed: %d",
+		//    __func__, ret);
+	}
+	if (ret == 0 && mlen != datalen) {
+		//debug2("%s: crypto_sign_ed25519_open "
+		//    "mlen != datalen (%llu != %u)", __func__, mlen, datalen);
+		ret = -1;
+	}
+	/* XXX compare 'm' and 'data' ? */
+
+error:
+	buffer_free(b);
+	free(ktype);
+
+	if (sigblob) {
+		memset(sigblob, 's', len);
+		free(sigblob);
+	}
+	if (sm) {
+		memset(sm, 'S', (size_t)smlen);
+		free(sm);
+	}
+	if (m) {
+		memset(m, 'm', (size_t)smlen); /* NB. mlen may be invalid if ret != 0 */
+		free(m);
+	}
+
+	/* translate return code carefully */
+	return (ret == 0) ? 1 : -1;
+}
+
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen)
@@ -370,7 +439,7 @@ int key_verify(Key *key,
 		ret = ssh_ecdsa_verify(key->ecdsa, key->type, signature, signaturelen, data, datalen);
 		break;
 	case KEY_ED25519:
-		// ‚Ü‚¾
+		ret = ssh_ed25519_verify(key, signature, signaturelen, data, datalen);
 		break;
 	default:
 		return -1;
@@ -875,7 +944,7 @@ error:
 //
 Key *key_from_blob(char *data, int blen)
 {
-	int keynamelen;
+	int keynamelen, len;
 	char key[128];
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
@@ -884,6 +953,7 @@ Key *key_from_blob(char *data, int blen)
 	char *curve = NULL;
 	Key *hostkey;  // hostkey
 	ssh_keytype type;
+	unsigned char *pk = NULL;
 
 	hostkey = malloc(sizeof(Key));
 	if (hostkey == NULL)
@@ -978,7 +1048,15 @@ Key *key_from_blob(char *data, int blen)
 		break;
 
 	case KEY_ED25519:
-		// ‚Ü‚¾
+		pk = buffer_get_string(&data, &len);
+		if (pk == NULL)
+			goto error;
+		if (len != ED25519_PK_SZ)
+			goto error;
+
+		hostkey->type = type;
+		hostkey->ed25519_pk = pk;
+		pk = NULL;
 		break;
 
 	default: // unknown key
@@ -995,7 +1073,45 @@ error:
 	if (ecdsa != NULL)
 		EC_KEY_free(ecdsa);
 
+	free(hostkey);
+
 	return NULL;
+}
+
+
+static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int datalen)
+{
+	char *sig;
+	int slen, len;
+	unsigned long long smlen;
+	int ret;
+	buffer_t *b;
+
+	smlen = slen = datalen + crypto_sign_ed25519_BYTES;
+	sig = malloc(slen);
+
+	if ((ret = crypto_sign_ed25519(sig, &smlen, data, datalen,
+	    key->ed25519_sk)) != 0 || smlen <= datalen) {
+		//error("%s: crypto_sign_ed25519 failed: %d", __func__, ret);
+		free(sig);
+		return -1;
+	}
+	/* encode signature */
+	b = buffer_init();
+	buffer_put_cstring(b, "ssh-ed25519");
+	buffer_put_string(b, sig, (int)(smlen - datalen));
+	len = buffer_len(b);
+	if (lenp != NULL)
+		*lenp = len;
+	if (sigp != NULL) {
+		*sigp = malloc(len);
+		memcpy(*sigp, buffer_ptr(b), len);
+	}
+	buffer_free(b);
+	memset(sig, 's', slen);
+	free(sig);
+
+	return 0;
 }
 
 
@@ -1003,6 +1119,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 {
 	buffer_t *msg = NULL;
 	char *s;
+	int ret;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -1168,7 +1285,9 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 	}
 
 	case KEY_ED25519:
-		// ‚Ü‚¾
+		ret = ssh_ed25519_sign(keypair, sigptr, siglen, data, datalen);
+		if (ret != 0) 
+			goto error;
 		break;
 
 	default:

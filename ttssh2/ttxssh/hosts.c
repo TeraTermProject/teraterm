@@ -645,6 +645,7 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 			pvar->hosts_state.hostkey.dsa = key->dsa;
 			pvar->hosts_state.hostkey.rsa = key->rsa;
 			pvar->hosts_state.hostkey.ecdsa = key->ecdsa;
+			pvar->hosts_state.hostkey.ed25519_pk = key->ed25519_pk;
 
 			index += eat_base64(data + index);
 			index += eat_spaces(data + index);
