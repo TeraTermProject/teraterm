@@ -4080,9 +4080,9 @@ static void init_password_control(HWND dlg, int item)
 	                            (LONG) password_wnd_proc));
 }
 
-// ED25519 秘密鍵を保存する
+// bcrypt KDF形式で秘密鍵を保存する
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
-static void save_ed25519_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar)
+static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar)
 {
 	SSHCipher ciphernameval = SSH_CIPHER_NONE;
 	char *ciphername = DEFAULT_CIPHERNAME;
@@ -4137,11 +4137,16 @@ static void save_ed25519_private_key(char *passphrase, char *filename, char *com
 	buffer_put_cstring(encoded, kdfname);
 	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
 	buffer_put_int(encoded, 1);			/* number of keys */
+
 	// key_to_blob()を一時利用するため、Key構造体を初期化する。
 	keyblob.type = private_key.type;
+	keyblob.rsa = private_key.rsa;
+	keyblob.dsa = private_key.dsa;
+	keyblob.ecdsa = private_key.ecdsa;
 	keyblob.ed25519_pk = private_key.ed25519_pk;
 	keyblob.ed25519_sk = private_key.ed25519_sk;
 	key_to_blob(&keyblob, &cp, &len);			/* public key */
+
 	buffer_put_string(encoded, cp, len);
 
 	memset(cp, 0, len);
@@ -4880,9 +4885,12 @@ error:;
 				buffer_free(enc);
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
-				save_ed25519_private_key(buf, filename, comment, dlg, pvar);
+				save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
 
 			} else { // SSH2 RSA, DSA, ECDSA
+#if 0
+				save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
+#else
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
@@ -4926,6 +4934,7 @@ error:;
 					MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 				}
 				fclose(fp);
+#endif
 			}
 
 

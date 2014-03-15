@@ -1422,34 +1422,198 @@ void key_private_serialize(Key *key, buffer_t *b)
 	buffer_put_cstring(b, s);
 
 	switch (key->type) {
+		case KEY_RSA:
+			buffer_put_bignum2(b, key->rsa->n);
+			buffer_put_bignum2(b, key->rsa->e);
+			buffer_put_bignum2(b, key->rsa->d);
+			buffer_put_bignum2(b, key->rsa->iqmp);
+			buffer_put_bignum2(b, key->rsa->p);
+			buffer_put_bignum2(b, key->rsa->q);
+			break;
+
+		case KEY_DSA:
+			buffer_put_bignum2(b, key->dsa->p);
+			buffer_put_bignum2(b, key->dsa->q);
+			buffer_put_bignum2(b, key->dsa->g);
+			buffer_put_bignum2(b, key->dsa->pub_key);
+			buffer_put_bignum2(b, key->dsa->priv_key);
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			buffer_put_cstring(b, curve_keytype_to_name(key->type));
+			buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
+				EC_KEY_get0_public_key(key->ecdsa));
+			buffer_put_bignum2(b, (BIGNUM *)EC_KEY_get0_private_key(key->ecdsa));
+			break;
+
 		case KEY_ED25519:
 			buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
 			buffer_put_string(b, key->ed25519_sk, ED25519_SK_SZ);
 			break;
 
 		default:
-			// TODO: ED25519 以外は未サポート。
 			break;
 	}
 }
 
+/* calculate p-1 and q-1 */
+static void rsa_generate_additional_parameters(RSA *rsa)
+{
+	BIGNUM *aux = NULL;
+	BN_CTX *ctx = NULL;
+
+	if ((aux = BN_new()) == NULL)
+		goto error;
+	if ((ctx = BN_CTX_new()) == NULL)
+		goto error;
+
+	if ((BN_sub(aux, rsa->q, BN_value_one()) == 0) ||
+	    (BN_mod(rsa->dmq1, rsa->d, aux, ctx) == 0) ||
+	    (BN_sub(aux, rsa->p, BN_value_one()) == 0) ||
+	    (BN_mod(rsa->dmp1, rsa->d, aux, ctx) == 0))
+		goto error;
+
+error:
+	if (aux)
+		BN_clear_free(aux);
+	if (ctx)
+		BN_CTX_free(ctx);
+}
+
+static int key_ec_validate_private(EC_KEY *key)
+{
+	BN_CTX *bnctx = NULL;
+	BIGNUM *order, *tmp;
+	int ret = -1;
+
+	if ((bnctx = BN_CTX_new()) == NULL)
+		goto out;
+	BN_CTX_start(bnctx);
+
+	if ((order = BN_CTX_get(bnctx)) == NULL ||
+	    (tmp = BN_CTX_get(bnctx)) == NULL)
+		goto out;
+
+	/* log2(private) > log2(order)/2 */
+	if (EC_GROUP_get_order(EC_KEY_get0_group(key), order, bnctx) != 1)
+		goto out;
+	if (BN_num_bits(EC_KEY_get0_private_key(key)) <=
+	    BN_num_bits(order) / 2) {
+		goto out;
+	}
+
+	/* private < order - 1 */
+	if (!BN_sub(tmp, order, BN_value_one()))
+		goto out;
+	if (BN_cmp(EC_KEY_get0_private_key(key), tmp) >= 0) {
+		goto out;
+	}
+	ret = 0;
+
+out:
+	if (bnctx)
+		BN_CTX_free(bnctx);
+	return ret;
+}
+
 Key *key_private_deserialize(buffer_t *blob)
 {
+	int success = 0;
 	char *type_name = NULL;
 	Key *k = NULL;
 	unsigned int pklen, sklen;
 	int type;
-	int success = 0;
+	char *data;
 
 	type_name = buffer_get_string_msg(blob, NULL);
 	type = get_keytype_from_name(type_name);
 
-	switch (type) {
-		case KEY_ED25519:
-			k = malloc(sizeof(Key));
-			memset(k, 0, sizeof(Key));
+	k = malloc(sizeof(Key));
+	memset(k, 0, sizeof(Key));
+	k->type = type;
 
-			k->type = type;
+	switch (type) {
+		case KEY_RSA:
+			data = buffer_ptr(blob);
+			buffer_get_bignum2(&data, k->rsa->n);
+			buffer_get_bignum2(&data, k->rsa->e);
+			buffer_get_bignum2(&data, k->rsa->d);
+			buffer_get_bignum2(&data, k->rsa->iqmp);
+			buffer_get_bignum2(&data, k->rsa->p);
+			buffer_get_bignum2(&data, k->rsa->q);
+
+			/* Generate additional parameters */
+			rsa_generate_additional_parameters(k->rsa);
+			break;
+
+		case KEY_DSA:
+			data = buffer_ptr(blob);
+			buffer_get_bignum2(&data, k->dsa->p);
+			buffer_get_bignum2(&data, k->dsa->q);
+			buffer_get_bignum2(&data, k->dsa->g);
+			buffer_get_bignum2(&data, k->dsa->pub_key);
+			buffer_get_bignum2(&data, k->dsa->priv_key);
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			{
+			int success = 0;
+			unsigned int nid;
+			char *curve = NULL;
+			ssh_keytype skt;
+			BIGNUM *exponent = NULL;
+			EC_POINT *q = NULL;
+			char *data;
+
+			data = buffer_ptr(blob);
+
+			nid = keytype_to_hash_nid(type);
+			curve = buffer_get_string(&data, NULL);
+			skt = key_curve_name_to_keytype(curve);
+			if (nid != keytype_to_hash_nid(skt))
+				goto ecdsa_error;
+
+			k->ecdsa = EC_KEY_new_by_curve_name(nid);
+			if (k->ecdsa == NULL)
+				goto ecdsa_error;
+
+			q = EC_POINT_new(EC_KEY_get0_group(k->ecdsa));
+			if (q == NULL)
+				goto ecdsa_error;
+
+			if ((exponent = BN_new()) == NULL)
+				goto ecdsa_error;
+			buffer_get_ecpoint(&data,
+				EC_KEY_get0_group(k->ecdsa), q);
+			buffer_get_bignum2(&data, exponent);
+			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
+				goto ecdsa_error;
+			if (EC_KEY_set_private_key(k->ecdsa, exponent) != 1)
+				goto ecdsa_error;
+			if (key_ec_validate_public(EC_KEY_get0_group(k->ecdsa),
+				EC_KEY_get0_public_key(k->ecdsa)) != 0)
+				goto ecdsa_error;
+			if (key_ec_validate_private(k->ecdsa) != 0)
+				goto ecdsa_error;
+
+			success = 1;
+
+ecdsa_error:
+			free(curve);
+			if (exponent)
+				BN_clear_free(exponent);
+			if (q)
+				EC_POINT_free(q);
+			if (success == 0)
+				goto error;
+			}
+			break;
+
+		case KEY_ED25519:
 			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
 			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
 			if (pklen != ED25519_PK_SZ) 
@@ -1459,7 +1623,7 @@ Key *key_private_deserialize(buffer_t *blob)
 			break;
 
 		default:
-			// TODO: ED25519 以外は未サポート。
+			goto error;
 			break;
 	}
 	success = 1;
