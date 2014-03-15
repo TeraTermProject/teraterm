@@ -360,6 +360,7 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 	unsigned int len;
 	unsigned long long smlen, mlen;
 	int rlen, ret;
+	char *bptr;
 
 	ret = -1;
 	b = buffer_init();
@@ -367,11 +368,12 @@ static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int s
 		goto error;
 
 	buffer_append(b, signature, signaturelen);
-	ktype = buffer_get_string_msg(b, NULL);
+	bptr = buffer_ptr(b);
+	ktype = buffer_get_string(&bptr, NULL);
 	if (strcmp("ssh-ed25519", ktype) != 0) {
 		goto error;
 	}
-	sigblob = buffer_get_string_msg(b, &len);
+	sigblob = buffer_get_string(&bptr, &len);
 	rlen = buffer_remain_len(b);
 	if (rlen != 0) {
 		goto error;
