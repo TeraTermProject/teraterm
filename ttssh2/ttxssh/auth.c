@@ -1505,6 +1505,7 @@ static const char *get_auth_method_name(SSHAuthMethod auth)
 void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 {
 	const char *method = "unknown";
+	char buf[256];
 
 	if (pvar->auth_state.user == NULL) {
 		strncpy_s(dest, len, "None", _TRUNCATE);
@@ -1531,7 +1532,13 @@ void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 
 			} else {
 				if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-					method = ssh_key_type(pvar->auth_state.cur_cred.key_pair);
+					Key *k = pvar->auth_state.cur_cred.key_pair;
+					method = ssh_key_type(k);
+					if (k->bcrypt_kdf) {
+						_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s(bcrypt KDF)", method);
+						method = buf;
+					}
+
 				}
 				else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
 					int len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);

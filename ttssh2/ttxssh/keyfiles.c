@@ -579,6 +579,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* success */
+	keyfmt->bcrypt_kdf = 1;
 
 error:
 	buffer_free(blob);

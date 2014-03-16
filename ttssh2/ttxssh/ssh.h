@@ -459,6 +459,7 @@ typedef struct Key {
 	// SSH2 ED25519
 	unsigned char *ed25519_sk;
 	unsigned char *ed25519_pk;
+	int bcrypt_kdf;
 } Key;
 
 // fingerprint‚ÌŽí•Ê
