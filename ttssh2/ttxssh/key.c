@@ -1722,10 +1722,10 @@ Key *key_private_deserialize(buffer_t *blob)
 			BIGNUM *exponent = NULL;
 			EC_POINT *q = NULL;
 
-			nid = keytype_to_hash_nid(type);
+			nid = keytype_to_cipher_nid(type);
 			curve = buffer_get_string_msg(blob, NULL);
 			skt = key_curve_name_to_keytype(curve);
-			if (nid != keytype_to_hash_nid(skt))
+			if (nid != keytype_to_cipher_nid(skt))
 				goto ecdsa_error;
 
 			k->ecdsa = EC_KEY_new_by_curve_name(nid);
