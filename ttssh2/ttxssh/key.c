@@ -763,6 +763,163 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep)
 	return (retval);
 }
 
+//
+// キーのメモリ領域確保
+//
+static void key_add_private(Key *k)
+{
+	switch (k->type) {
+		case KEY_RSA1:
+		case KEY_RSA:
+			k->rsa->d = BN_new();
+			k->rsa->iqmp = BN_new();
+			k->rsa->q = BN_new();
+			k->rsa->p = BN_new();
+			k->rsa->dmq1 = BN_new();
+			k->rsa->dmp1 = BN_new();
+			if (k->rsa->d == NULL || k->rsa->iqmp == NULL || k->rsa->q == NULL ||
+				k->rsa->p == NULL || k->rsa->dmq1 == NULL || k->rsa->dmp1 == NULL)
+				goto error;
+			break;
+
+		case KEY_DSA:
+			k->dsa->priv_key = BN_new();
+			if (k->dsa->priv_key == NULL)
+				goto error;
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			/* Cannot do anything until we know the group */
+			break;
+
+		case KEY_ED25519:
+			/* no need to prealloc */	
+			break;
+
+		case KEY_UNSPEC:
+			break;
+
+		default:
+			goto error;
+			break;
+	}
+	return;
+
+error:
+	if (k->rsa->d) {
+		BN_free(k->rsa->d);
+		k->rsa->d = NULL;
+	}
+	if (k->rsa->iqmp) {
+		BN_free(k->rsa->iqmp);
+		k->rsa->iqmp = NULL;
+	}
+	if (k->rsa->q) {
+		BN_free(k->rsa->q);
+		k->rsa->q = NULL;
+	}
+	if (k->rsa->p) {
+		BN_free(k->rsa->p);
+		k->rsa->p = NULL;
+	}
+	if (k->rsa->dmq1) {
+		BN_free(k->rsa->dmq1);
+		k->rsa->dmq1 = NULL;
+	}
+	if (k->rsa->dmp1) {
+		BN_free(k->rsa->dmp1);
+		k->rsa->dmp1 = NULL;
+	}
+
+
+	if (k->dsa->priv_key == NULL) {
+		BN_free(k->dsa->priv_key);
+		k->dsa->priv_key = NULL;
+	}
+
+}
+
+Key *key_new_private(int type)
+{
+	Key *k = key_new(type);
+
+	key_add_private(k);
+	return (k);
+}
+
+
+Key *key_new(int type)
+{
+	int success = 0;
+	Key *k = NULL;
+	RSA *rsa;
+	DSA *dsa;
+
+	k = calloc(1, sizeof(Key));
+	if (k == NULL)
+		goto error;
+	k->type = type;
+	k->ecdsa = NULL;
+	k->dsa = NULL;
+	k->rsa = NULL;
+	k->ed25519_pk = NULL;
+	k->ed25519_sk = NULL;
+
+	switch (k->type) {
+		case KEY_RSA1:
+		case KEY_RSA:
+			rsa = RSA_new();
+			if (rsa == NULL)
+				goto error;
+			rsa->n = BN_new();
+			rsa->e = BN_new();
+			if (rsa->n == NULL || rsa->e == NULL)
+				goto error;
+			k->rsa = rsa;
+			break;
+
+		case KEY_DSA:
+			dsa = DSA_new();
+			if (dsa == NULL)
+				goto error;
+			dsa->p = BN_new();
+			dsa->q = BN_new();
+			dsa->g = BN_new();
+			dsa->pub_key = BN_new();
+			if (dsa->p == NULL || dsa->q == NULL || dsa->g == NULL || dsa->pub_key == NULL)
+				goto error;
+			k->dsa = dsa;
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			/* Cannot do anything until we know the group */
+			break;
+
+		case KEY_ED25519:
+			/* no need to prealloc */	
+			break;
+
+		case KEY_UNSPEC:
+			break;
+
+		default:
+			goto error;
+			break;
+	}
+	success = 1;
+
+error:
+	if (success == 0) {
+		key_free(k);
+		k = NULL;
+	}
+	return (k);
+}
+
 
 //
 // キーのメモリ領域解放
@@ -1525,36 +1682,33 @@ Key *key_private_deserialize(buffer_t *blob)
 	Key *k = NULL;
 	unsigned int pklen, sklen;
 	int type;
-	char *data;
 
 	type_name = buffer_get_string_msg(blob, NULL);
+	if (type_name == NULL)
+		goto error;
 	type = get_keytype_from_name(type_name);
 
-	k = malloc(sizeof(Key));
-	memset(k, 0, sizeof(Key));
-	k->type = type;
+	k = key_new_private(type);
 
 	switch (type) {
 		case KEY_RSA:
-			data = buffer_ptr(blob);
-			buffer_get_bignum2(&data, k->rsa->n);
-			buffer_get_bignum2(&data, k->rsa->e);
-			buffer_get_bignum2(&data, k->rsa->d);
-			buffer_get_bignum2(&data, k->rsa->iqmp);
-			buffer_get_bignum2(&data, k->rsa->p);
-			buffer_get_bignum2(&data, k->rsa->q);
+			buffer_get_bignum2_msg(blob, k->rsa->n);
+			buffer_get_bignum2_msg(blob, k->rsa->e);
+			buffer_get_bignum2_msg(blob, k->rsa->d);
+			buffer_get_bignum2_msg(blob, k->rsa->iqmp);
+			buffer_get_bignum2_msg(blob, k->rsa->p);
+			buffer_get_bignum2_msg(blob, k->rsa->q);
 
 			/* Generate additional parameters */
 			rsa_generate_additional_parameters(k->rsa);
 			break;
 
 		case KEY_DSA:
-			data = buffer_ptr(blob);
-			buffer_get_bignum2(&data, k->dsa->p);
-			buffer_get_bignum2(&data, k->dsa->q);
-			buffer_get_bignum2(&data, k->dsa->g);
-			buffer_get_bignum2(&data, k->dsa->pub_key);
-			buffer_get_bignum2(&data, k->dsa->priv_key);
+			buffer_get_bignum2_msg(blob, k->dsa->p);
+			buffer_get_bignum2_msg(blob, k->dsa->q);
+			buffer_get_bignum2_msg(blob, k->dsa->g);
+			buffer_get_bignum2_msg(blob, k->dsa->pub_key);
+			buffer_get_bignum2_msg(blob, k->dsa->priv_key);
 			break;
 
 		case KEY_ECDSA256:
@@ -1567,12 +1721,9 @@ Key *key_private_deserialize(buffer_t *blob)
 			ssh_keytype skt;
 			BIGNUM *exponent = NULL;
 			EC_POINT *q = NULL;
-			char *data;
-
-			data = buffer_ptr(blob);
 
 			nid = keytype_to_hash_nid(type);
-			curve = buffer_get_string(&data, NULL);
+			curve = buffer_get_string_msg(blob, NULL);
 			skt = key_curve_name_to_keytype(curve);
 			if (nid != keytype_to_hash_nid(skt))
 				goto ecdsa_error;
@@ -1587,9 +1738,9 @@ Key *key_private_deserialize(buffer_t *blob)
 
 			if ((exponent = BN_new()) == NULL)
 				goto ecdsa_error;
-			buffer_get_ecpoint(&data,
+			buffer_get_ecpoint_msg(blob,
 				EC_KEY_get0_group(k->ecdsa), q);
-			buffer_get_bignum2(&data, exponent);
+			buffer_get_bignum2_msg(blob, exponent);
 			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
 				goto ecdsa_error;
 			if (EC_KEY_set_private_key(k->ecdsa, exponent) != 1)
@@ -1626,6 +1777,16 @@ ecdsa_error:
 			goto error;
 			break;
 	}
+
+	/* enable blinding */
+	switch (k->type) {
+		case KEY_RSA1:
+		case KEY_RSA:
+			if (RSA_blinding_on(k->rsa, NULL) != 1) 
+				goto error;
+			break;
+	}
+
 	success = 1;
 
 error:

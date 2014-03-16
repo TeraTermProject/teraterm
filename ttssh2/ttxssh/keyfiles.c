@@ -342,7 +342,7 @@ Key *KEYFILES_read_private_key(PTInstVar pvar,
 // SSH2
 //
 
-// ED25519 Œ`Ž®‚Å“Ç‚Þ
+// bcrypt KDF Œ`Ž®‚Å“Ç‚Þ
 // based on key_parse_private2() @ OpenSSH 6.5
 static Key *read_SSH2_private2_key(PTInstVar pvar,
                            FILE * fp,

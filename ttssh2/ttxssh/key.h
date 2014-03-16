@@ -50,6 +50,8 @@ char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
 char *curve_keytype_to_name(ssh_keytype type);
 
+Key *key_new_private(int type);
+Key *key_new(int type);
 void key_free(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
 Key *key_from_blob(char *data, int blen);

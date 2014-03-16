@@ -409,6 +409,17 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 	*data = buf;
 }
 
+void buffer_get_bignum2_msg(buffer_t *msg, BIGNUM *value)
+{
+	char *data, *olddata;
+	int off;
+
+	data = olddata = buffer_tail_ptr(msg);
+	buffer_get_bignum2(&data, value);
+	off = data - olddata;
+	msg->offset += off;
+}
+
 void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
 {
 	char *buf;
@@ -479,6 +490,17 @@ void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 	*data = buf;
 
 	BN_CTX_free(bnctx);
+}
+
+void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
+{
+	char *data, *olddata;
+	int off;
+
+	data = olddata = buffer_tail_ptr(msg);
+	buffer_get_ecpoint(&data, curve, point);
+	off = data - olddata;
+	msg->offset += off;
 }
 
 void buffer_dump(FILE *fp, buffer_t *buf)
