@@ -632,6 +632,7 @@ DLG_KEYGEN_SAVEPUBLIC=Public Key
 DLG_KEYGEN_SAVEPRIVATE=Private Key
 DLG_KEYGEN_GENERATE=Generieren
 DLG_KEYGEN_BITS=Key &Bits:
+DLG_BCRYPT_KDF=bcrypt &KDF format
 
 MSG_KEYBITS_MIN_ERROR=The key bits is too small.
 MSG_KEYGEN_GENERATING="generating key"

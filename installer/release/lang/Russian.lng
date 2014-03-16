@@ -634,6 +634,7 @@ DLG_KEYGEN_SAVEPUBLIC=&Открытый ключ
 DLG_KEYGEN_SAVEPRIVATE=&Закрытый ключ
 DLG_KEYGEN_GENERATE=&Генерация
 DLG_KEYGEN_BITS=&Биты:
+DLG_BCRYPT_KDF=bcrypt &KDF format
 
 MSG_KEYBITS_MIN_ERROR=Битов ключа слишком мало!
 MSG_KEYGEN_GENERATING="Генерация ключа..."

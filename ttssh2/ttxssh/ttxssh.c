@@ -4270,6 +4270,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_BCRYPT_KDF", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, pvar->ts->UIMsg);
 
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -4295,6 +4298,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_SAVE_PRIVATE_KEY, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_CHECK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgHostFont = NULL;
@@ -4322,6 +4326,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		// file saving dialog disabled(default)
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PUBLIC_KEY), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PRIBATE_KEY), FALSE);
+
+		// default bcrypt KDF
+		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 
 		}
 		return TRUE;
@@ -4446,6 +4453,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
 			key_type = KEY_RSA1;
 			break;
 
@@ -4454,6 +4462,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_RSA;
 			break;
 
@@ -4462,6 +4471,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_DSA;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 1024, FALSE);
 			break;
@@ -4471,6 +4481,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_ECDSA256;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
 			break;
@@ -4480,6 +4491,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_ECDSA384;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 384, FALSE);
 			break;
@@ -4489,6 +4501,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_ECDSA521;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
 			break;
@@ -4499,6 +4512,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
 			key_type = KEY_ED25519;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 0, FALSE);
 			break;
@@ -4887,13 +4901,15 @@ error:;
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
 
-			} else { // SSH2 RSA, DSA, ECDSA
-#if 0
-				save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
-#else
+			} else { // SSH2 RSA, DSA, ECDSA			
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
+
+				if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+					save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
+					break;
+				}
 
 				len = strlen(buf);
 				// TODO: range check (len >= 4)
@@ -4934,7 +4950,6 @@ error:;
 					MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
 				}
 				fclose(fp);
-#endif
 			}
 
 

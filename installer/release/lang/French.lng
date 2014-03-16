@@ -634,6 +634,7 @@ DLG_KEYGEN_SAVEPUBLIC=Sauv. clé publique
 DLG_KEYGEN_SAVEPRIVATE=Sauv. clé privée
 DLG_KEYGEN_GENERATE=&Générer
 DLG_KEYGEN_BITS=Nbre &Bits:
+DLG_BCRYPT_KDF=bcrypt &KDF format
 
 MSG_KEYBITS_MIN_ERROR=Nbre de bits trop petit.
 MSG_KEYGEN_GENERATING="génération clé"

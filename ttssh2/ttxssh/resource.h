@@ -95,6 +95,7 @@
 #define IDC_CHECKAUTH                   1055
 #define IDC_CHECKIDENTITY               1055
 #define IDC_FORWARDAGENT                1055
+#define IDC_BCRYPT_KDF_CHECK            1055
 #define IDC_TTSSH_VERSION               1056
 #define IDC_FORWARD_AGENT               1056
 #define IDC_FORWARDAGENTCONFIRM         1056
@@ -199,7 +200,6 @@
 #define IDC_SENDFILE_TO                 1208
 #define IDC_SFTP_CONSOLE                1208
 #define IDC_PUTTY_VERSION               1209
-#define IDC_RADIO2                      1211
 #define IDC_ED25519_TYPE                1211
 
 // Next default values for new objects
