@@ -301,7 +301,7 @@ static int eat_to_end_of_pattern(char FAR * data)
 // BASE64デコード処理を行う。(rfc1521)
 // srcバッファは null-terminate している必要あり。
 //
-static int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize)
+int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize)
 {
 	char pad = '=';
 	int tarindex, state, ch;
@@ -645,6 +645,7 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 			pvar->hosts_state.hostkey.dsa = key->dsa;
 			pvar->hosts_state.hostkey.rsa = key->rsa;
 			pvar->hosts_state.hostkey.ecdsa = key->ecdsa;
+			pvar->hosts_state.hostkey.ed25519_pk = key->ed25519_pk;
 
 			index += eat_base64(data + index);
 			index += eat_spaces(data + index);
@@ -791,6 +792,7 @@ static int match_key(PTInstVar pvar, Key *key)
 	unsigned char FAR * mod;
 	const EC_GROUP *group;
 	const EC_POINT *pa, *pb;
+	Key *a, *b;
 
 	if (pvar->hosts_state.hostkey.type != key->type) {
 		return -1;
@@ -832,6 +834,12 @@ static int match_key(PTInstVar pvar, Key *key)
 		pa = EC_KEY_get0_public_key(key->ecdsa),
 		pb = EC_KEY_get0_public_key(pvar->hosts_state.hostkey.ecdsa);
 		return EC_POINT_cmp(group, pa, pb, NULL) == 0;
+
+	case KEY_ED25519:
+		a = key;
+		b = &pvar->hosts_state.hostkey;
+		return a->ed25519_pk != NULL && b->ed25519_pk != NULL &&
+		    memcmp(a->ed25519_pk, b->ed25519_pk, ED25519_PK_SZ) == 0;
 
 	default:
 		return FALSE;
@@ -943,6 +951,7 @@ static char FAR *format_host_key(PTInstVar pvar)
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
+	case KEY_ED25519:
 	{
 		Key *key = &pvar->hosts_state.hostkey;
 		char *blob = NULL;
@@ -1108,6 +1117,7 @@ static void delete_different_key(PTInstVar pvar)
 		}
 
 		// 接続中のサーバのキーを読み込む
+		memset(&key, 0, sizeof(key));
 		switch (pvar->hosts_state.hostkey.type) {
 		case KEY_RSA1: // SSH1
 			key.type = KEY_RSA1;
@@ -1128,6 +1138,10 @@ static void delete_different_key(PTInstVar pvar)
 		case KEY_ECDSA521:
 			key.type = pvar->hosts_state.hostkey.type;
 			key.ecdsa = EC_KEY_dup(pvar->hosts_state.hostkey.ecdsa);
+			break;
+		case KEY_ED25519:
+			key.type = pvar->hosts_state.hostkey.type;
+			key.ed25519_pk = duplicate_ED25519_PK(pvar->hosts_state.hostkey.ed25519_pk);
 			break;
 		}
 
@@ -1263,6 +1277,9 @@ error2:
 		_unlink(filename);
 
 		finish_read_host_files(pvar, 0);
+
+		// 最後にメモリを解放しておく。
+		key_free(&key);
 	}
 }
 
@@ -1814,6 +1831,9 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 		pvar->hosts_state.hostkey.ecdsa = EC_KEY_dup(key->ecdsa);
+		break;
+	case KEY_ED25519:
+		pvar->hosts_state.hostkey.ed25519_pk = duplicate_ED25519_PK(key->ed25519_pk);
 		break;
 	}
 	free(pvar->hosts_state.prefetched_hostname);

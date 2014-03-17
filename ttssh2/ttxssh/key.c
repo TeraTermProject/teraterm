@@ -351,6 +351,77 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	return ret;
 }
 
+static int ssh_ed25519_verify(Key *key, unsigned char *signature, unsigned int signaturelen, 
+							  unsigned char *data, unsigned int datalen)
+{
+	buffer_t *b;
+	char *ktype = NULL;
+	unsigned char *sigblob = NULL, *sm = NULL, *m = NULL;
+	unsigned int len;
+	unsigned long long smlen, mlen;
+	int rlen, ret;
+	char *bptr;
+
+	ret = -1;
+	b = buffer_init();
+	if (b == NULL)
+		goto error;
+
+	buffer_append(b, signature, signaturelen);
+	bptr = buffer_ptr(b);
+	ktype = buffer_get_string(&bptr, NULL);
+	if (strcmp("ssh-ed25519", ktype) != 0) {
+		goto error;
+	}
+	sigblob = buffer_get_string(&bptr, &len);
+	rlen = buffer_remain_len(b);
+	if (rlen != 0) {
+		goto error;
+	}
+	if (len > crypto_sign_ed25519_BYTES) {
+		goto error;
+	}
+
+	smlen = len + datalen;
+	sm = malloc((size_t)smlen);
+	memcpy(sm, sigblob, len);
+	memcpy(sm+len, data, datalen);
+	mlen = smlen;
+	m = malloc((size_t)mlen);
+
+	if ((ret = crypto_sign_ed25519_open(m, &mlen, sm, smlen,
+	    key->ed25519_pk)) != 0) {
+		//debug2("%s: crypto_sign_ed25519_open failed: %d",
+		//    __func__, ret);
+	}
+	if (ret == 0 && mlen != datalen) {
+		//debug2("%s: crypto_sign_ed25519_open "
+		//    "mlen != datalen (%llu != %u)", __func__, mlen, datalen);
+		ret = -1;
+	}
+	/* XXX compare 'm' and 'data' ? */
+
+error:
+	buffer_free(b);
+	free(ktype);
+
+	if (sigblob) {
+		memset(sigblob, 's', len);
+		free(sigblob);
+	}
+	if (sm) {
+		memset(sm, 'S', (size_t)smlen);
+		free(sm);
+	}
+	if (m) {
+		memset(m, 'm', (size_t)smlen); /* NB. mlen may be invalid if ret != 0 */
+		free(m);
+	}
+
+	/* translate return code carefully */
+	return (ret == 0) ? 1 : -1;
+}
+
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen)
@@ -368,6 +439,9 @@ int key_verify(Key *key,
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 		ret = ssh_ecdsa_verify(key->ecdsa, key->type, signature, signaturelen, data, datalen);
+		break;
+	case KEY_ED25519:
+		ret = ssh_ed25519_verify(key, signature, signaturelen, data, datalen);
 		break;
 	default:
 		return -1;
@@ -434,6 +508,17 @@ error:
 	return (dsa);
 }
 
+unsigned char *duplicate_ED25519_PK(unsigned char *src)
+{
+	unsigned char *ptr = NULL;
+
+	ptr = malloc(ED25519_PK_SZ);
+	if (ptr) {
+		memcpy(ptr, src, ED25519_PK_SZ);
+	}
+	return (ptr);
+}
+
 
 char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 {
@@ -481,6 +566,7 @@ char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
+	case KEY_ED25519:
 		key_to_blob(k, &blob, &len);
 		break;
 
@@ -524,6 +610,8 @@ ssh_key_type(const Key *k)
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
 		return "ECDSA";
+	case KEY_ED25519:
+		return "ED25519";
 	}
 	return "unknown";
 }
@@ -545,6 +633,8 @@ key_size(const Key *k)
 		return 384;
 	case KEY_ECDSA521:
 		return 521;
+	case KEY_ED25519:
+		return 256;	/* XXX */
 	}
 	return 0;
 }
@@ -673,6 +763,163 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep)
 	return (retval);
 }
 
+//
+// キーのメモリ領域確保
+//
+static void key_add_private(Key *k)
+{
+	switch (k->type) {
+		case KEY_RSA1:
+		case KEY_RSA:
+			k->rsa->d = BN_new();
+			k->rsa->iqmp = BN_new();
+			k->rsa->q = BN_new();
+			k->rsa->p = BN_new();
+			k->rsa->dmq1 = BN_new();
+			k->rsa->dmp1 = BN_new();
+			if (k->rsa->d == NULL || k->rsa->iqmp == NULL || k->rsa->q == NULL ||
+				k->rsa->p == NULL || k->rsa->dmq1 == NULL || k->rsa->dmp1 == NULL)
+				goto error;
+			break;
+
+		case KEY_DSA:
+			k->dsa->priv_key = BN_new();
+			if (k->dsa->priv_key == NULL)
+				goto error;
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			/* Cannot do anything until we know the group */
+			break;
+
+		case KEY_ED25519:
+			/* no need to prealloc */	
+			break;
+
+		case KEY_UNSPEC:
+			break;
+
+		default:
+			goto error;
+			break;
+	}
+	return;
+
+error:
+	if (k->rsa->d) {
+		BN_free(k->rsa->d);
+		k->rsa->d = NULL;
+	}
+	if (k->rsa->iqmp) {
+		BN_free(k->rsa->iqmp);
+		k->rsa->iqmp = NULL;
+	}
+	if (k->rsa->q) {
+		BN_free(k->rsa->q);
+		k->rsa->q = NULL;
+	}
+	if (k->rsa->p) {
+		BN_free(k->rsa->p);
+		k->rsa->p = NULL;
+	}
+	if (k->rsa->dmq1) {
+		BN_free(k->rsa->dmq1);
+		k->rsa->dmq1 = NULL;
+	}
+	if (k->rsa->dmp1) {
+		BN_free(k->rsa->dmp1);
+		k->rsa->dmp1 = NULL;
+	}
+
+
+	if (k->dsa->priv_key == NULL) {
+		BN_free(k->dsa->priv_key);
+		k->dsa->priv_key = NULL;
+	}
+
+}
+
+Key *key_new_private(int type)
+{
+	Key *k = key_new(type);
+
+	key_add_private(k);
+	return (k);
+}
+
+
+Key *key_new(int type)
+{
+	int success = 0;
+	Key *k = NULL;
+	RSA *rsa;
+	DSA *dsa;
+
+	k = calloc(1, sizeof(Key));
+	if (k == NULL)
+		goto error;
+	k->type = type;
+	k->ecdsa = NULL;
+	k->dsa = NULL;
+	k->rsa = NULL;
+	k->ed25519_pk = NULL;
+	k->ed25519_sk = NULL;
+
+	switch (k->type) {
+		case KEY_RSA1:
+		case KEY_RSA:
+			rsa = RSA_new();
+			if (rsa == NULL)
+				goto error;
+			rsa->n = BN_new();
+			rsa->e = BN_new();
+			if (rsa->n == NULL || rsa->e == NULL)
+				goto error;
+			k->rsa = rsa;
+			break;
+
+		case KEY_DSA:
+			dsa = DSA_new();
+			if (dsa == NULL)
+				goto error;
+			dsa->p = BN_new();
+			dsa->q = BN_new();
+			dsa->g = BN_new();
+			dsa->pub_key = BN_new();
+			if (dsa->p == NULL || dsa->q == NULL || dsa->g == NULL || dsa->pub_key == NULL)
+				goto error;
+			k->dsa = dsa;
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			/* Cannot do anything until we know the group */
+			break;
+
+		case KEY_ED25519:
+			/* no need to prealloc */	
+			break;
+
+		case KEY_UNSPEC:
+			break;
+
+		default:
+			goto error;
+			break;
+	}
+	success = 1;
+
+error:
+	if (success == 0) {
+		key_free(k);
+		k = NULL;
+	}
+	return (k);
+}
+
 
 //
 // キーのメモリ領域解放
@@ -703,6 +950,19 @@ void key_free(Key *key)
 			if (key->ecdsa != NULL)
 				EC_KEY_free(key->ecdsa);
 			key->ecdsa = NULL;
+			break;
+
+		case KEY_ED25519:
+			if (key->ed25519_pk) {
+				memset(key->ed25519_pk, 0, ED25519_PK_SZ);
+				free(key->ed25519_pk);
+				key->ed25519_pk = NULL;
+			}
+			if (key->ed25519_sk) {
+				memset(key->ed25519_sk, 0, ED25519_SK_SZ);
+				free(key->ed25519_sk);
+				key->ed25519_sk = NULL;
+			}
 			break;
 	}
 	free(key);
@@ -737,6 +997,8 @@ ssh_keytype get_keytype_from_name(char *name)
 		return KEY_ECDSA384;
 	} else if (strcmp(name, "ecdsa-sha2-nistp521") == 0) {
 		return KEY_ECDSA521;
+	} else if (strcmp(name, "ssh-ed25519") == 0) {
+		return KEY_ED25519;
 	}
 	return KEY_UNSPEC;
 }
@@ -806,6 +1068,10 @@ int key_to_blob(Key *key, char **blobp, int *lenp)
 		buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
 		                      EC_KEY_get0_public_key(key->ecdsa));
 		break;
+	case KEY_ED25519:
+		buffer_put_cstring(b, sshname);
+		buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
+		break;
 
 	default:
 		ret = 0;
@@ -837,7 +1103,7 @@ error:
 //
 Key *key_from_blob(char *data, int blen)
 {
-	int keynamelen;
+	int keynamelen, len;
 	char key[128];
 	RSA *rsa = NULL;
 	DSA *dsa = NULL;
@@ -846,6 +1112,7 @@ Key *key_from_blob(char *data, int blen)
 	char *curve = NULL;
 	Key *hostkey;  // hostkey
 	ssh_keytype type;
+	unsigned char *pk = NULL;
 
 	hostkey = malloc(sizeof(Key));
 	if (hostkey == NULL)
@@ -939,6 +1206,18 @@ Key *key_from_blob(char *data, int blen)
 		hostkey->ecdsa = ecdsa;
 		break;
 
+	case KEY_ED25519:
+		pk = buffer_get_string(&data, &len);
+		if (pk == NULL)
+			goto error;
+		if (len != ED25519_PK_SZ)
+			goto error;
+
+		hostkey->type = type;
+		hostkey->ed25519_pk = pk;
+		pk = NULL;
+		break;
+
 	default: // unknown key
 		goto error;
 	}
@@ -953,7 +1232,45 @@ error:
 	if (ecdsa != NULL)
 		EC_KEY_free(ecdsa);
 
+	free(hostkey);
+
 	return NULL;
+}
+
+
+static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int datalen)
+{
+	char *sig;
+	int slen, len;
+	unsigned long long smlen;
+	int ret;
+	buffer_t *b;
+
+	smlen = slen = datalen + crypto_sign_ed25519_BYTES;
+	sig = malloc(slen);
+
+	if ((ret = crypto_sign_ed25519(sig, &smlen, data, datalen,
+	    key->ed25519_sk)) != 0 || smlen <= datalen) {
+		//error("%s: crypto_sign_ed25519 failed: %d", __func__, ret);
+		free(sig);
+		return -1;
+	}
+	/* encode signature */
+	b = buffer_init();
+	buffer_put_cstring(b, "ssh-ed25519");
+	buffer_put_string(b, sig, (int)(smlen - datalen));
+	len = buffer_len(b);
+	if (lenp != NULL)
+		*lenp = len;
+	if (sigp != NULL) {
+		*sigp = malloc(len);
+		memcpy(*sigp, buffer_ptr(b), len);
+	}
+	buffer_free(b);
+	memset(sig, 's', slen);
+	free(sig);
+
+	return 0;
 }
 
 
@@ -961,6 +1278,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 {
 	buffer_t *msg = NULL;
 	char *s;
+	int ret;
 
 	msg = buffer_init();
 	if (msg == NULL) {
@@ -1124,6 +1442,13 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		break;
 	}
+
+	case KEY_ED25519:
+		ret = ssh_ed25519_sign(keypair, sigptr, siglen, data, datalen);
+		if (ret != 0) 
+			goto error;
+		break;
+
 	default:
 		buffer_free(msg);
 		return FALSE;
@@ -1178,6 +1503,11 @@ BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen)
 		buffer_put_string(msg, tmp, strlen(tmp));
 		buffer_put_ecpoint(msg, EC_KEY_get0_group(keypair->ecdsa),
 		                        EC_KEY_get0_public_key(keypair->ecdsa));
+		break;
+	case KEY_ED25519:
+		s = get_sshname_from_key(keypair);
+		buffer_put_cstring(msg, s);
+		buffer_put_string(msg, keypair->ed25519_pk, ED25519_PK_SZ);
 		break;
 	default:
 		return FALSE;
@@ -1239,4 +1569,233 @@ ssh_keytype nid_to_keytype(int nid)
 			return KEY_ECDSA521;
 	}
 	return KEY_UNSPEC;
+}
+
+void key_private_serialize(Key *key, buffer_t *b)
+{
+	char *s;
+	
+	s = get_sshname_from_key(key);
+	buffer_put_cstring(b, s);
+
+	switch (key->type) {
+		case KEY_RSA:
+			buffer_put_bignum2(b, key->rsa->n);
+			buffer_put_bignum2(b, key->rsa->e);
+			buffer_put_bignum2(b, key->rsa->d);
+			buffer_put_bignum2(b, key->rsa->iqmp);
+			buffer_put_bignum2(b, key->rsa->p);
+			buffer_put_bignum2(b, key->rsa->q);
+			break;
+
+		case KEY_DSA:
+			buffer_put_bignum2(b, key->dsa->p);
+			buffer_put_bignum2(b, key->dsa->q);
+			buffer_put_bignum2(b, key->dsa->g);
+			buffer_put_bignum2(b, key->dsa->pub_key);
+			buffer_put_bignum2(b, key->dsa->priv_key);
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			buffer_put_cstring(b, curve_keytype_to_name(key->type));
+			buffer_put_ecpoint(b, EC_KEY_get0_group(key->ecdsa),
+				EC_KEY_get0_public_key(key->ecdsa));
+			buffer_put_bignum2(b, (BIGNUM *)EC_KEY_get0_private_key(key->ecdsa));
+			break;
+
+		case KEY_ED25519:
+			buffer_put_string(b, key->ed25519_pk, ED25519_PK_SZ);
+			buffer_put_string(b, key->ed25519_sk, ED25519_SK_SZ);
+			break;
+
+		default:
+			break;
+	}
+}
+
+/* calculate p-1 and q-1 */
+static void rsa_generate_additional_parameters(RSA *rsa)
+{
+	BIGNUM *aux = NULL;
+	BN_CTX *ctx = NULL;
+
+	if ((aux = BN_new()) == NULL)
+		goto error;
+	if ((ctx = BN_CTX_new()) == NULL)
+		goto error;
+
+	if ((BN_sub(aux, rsa->q, BN_value_one()) == 0) ||
+	    (BN_mod(rsa->dmq1, rsa->d, aux, ctx) == 0) ||
+	    (BN_sub(aux, rsa->p, BN_value_one()) == 0) ||
+	    (BN_mod(rsa->dmp1, rsa->d, aux, ctx) == 0))
+		goto error;
+
+error:
+	if (aux)
+		BN_clear_free(aux);
+	if (ctx)
+		BN_CTX_free(ctx);
+}
+
+static int key_ec_validate_private(EC_KEY *key)
+{
+	BN_CTX *bnctx = NULL;
+	BIGNUM *order, *tmp;
+	int ret = -1;
+
+	if ((bnctx = BN_CTX_new()) == NULL)
+		goto out;
+	BN_CTX_start(bnctx);
+
+	if ((order = BN_CTX_get(bnctx)) == NULL ||
+	    (tmp = BN_CTX_get(bnctx)) == NULL)
+		goto out;
+
+	/* log2(private) > log2(order)/2 */
+	if (EC_GROUP_get_order(EC_KEY_get0_group(key), order, bnctx) != 1)
+		goto out;
+	if (BN_num_bits(EC_KEY_get0_private_key(key)) <=
+	    BN_num_bits(order) / 2) {
+		goto out;
+	}
+
+	/* private < order - 1 */
+	if (!BN_sub(tmp, order, BN_value_one()))
+		goto out;
+	if (BN_cmp(EC_KEY_get0_private_key(key), tmp) >= 0) {
+		goto out;
+	}
+	ret = 0;
+
+out:
+	if (bnctx)
+		BN_CTX_free(bnctx);
+	return ret;
+}
+
+Key *key_private_deserialize(buffer_t *blob)
+{
+	int success = 0;
+	char *type_name = NULL;
+	Key *k = NULL;
+	unsigned int pklen, sklen;
+	int type;
+
+	type_name = buffer_get_string_msg(blob, NULL);
+	if (type_name == NULL)
+		goto error;
+	type = get_keytype_from_name(type_name);
+
+	k = key_new_private(type);
+
+	switch (type) {
+		case KEY_RSA:
+			buffer_get_bignum2_msg(blob, k->rsa->n);
+			buffer_get_bignum2_msg(blob, k->rsa->e);
+			buffer_get_bignum2_msg(blob, k->rsa->d);
+			buffer_get_bignum2_msg(blob, k->rsa->iqmp);
+			buffer_get_bignum2_msg(blob, k->rsa->p);
+			buffer_get_bignum2_msg(blob, k->rsa->q);
+
+			/* Generate additional parameters */
+			rsa_generate_additional_parameters(k->rsa);
+			break;
+
+		case KEY_DSA:
+			buffer_get_bignum2_msg(blob, k->dsa->p);
+			buffer_get_bignum2_msg(blob, k->dsa->q);
+			buffer_get_bignum2_msg(blob, k->dsa->g);
+			buffer_get_bignum2_msg(blob, k->dsa->pub_key);
+			buffer_get_bignum2_msg(blob, k->dsa->priv_key);
+			break;
+
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			{
+			int success = 0;
+			unsigned int nid;
+			char *curve = NULL;
+			ssh_keytype skt;
+			BIGNUM *exponent = NULL;
+			EC_POINT *q = NULL;
+
+			nid = keytype_to_cipher_nid(type);
+			curve = buffer_get_string_msg(blob, NULL);
+			skt = key_curve_name_to_keytype(curve);
+			if (nid != keytype_to_cipher_nid(skt))
+				goto ecdsa_error;
+
+			k->ecdsa = EC_KEY_new_by_curve_name(nid);
+			if (k->ecdsa == NULL)
+				goto ecdsa_error;
+
+			q = EC_POINT_new(EC_KEY_get0_group(k->ecdsa));
+			if (q == NULL)
+				goto ecdsa_error;
+
+			if ((exponent = BN_new()) == NULL)
+				goto ecdsa_error;
+			buffer_get_ecpoint_msg(blob,
+				EC_KEY_get0_group(k->ecdsa), q);
+			buffer_get_bignum2_msg(blob, exponent);
+			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
+				goto ecdsa_error;
+			if (EC_KEY_set_private_key(k->ecdsa, exponent) != 1)
+				goto ecdsa_error;
+			if (key_ec_validate_public(EC_KEY_get0_group(k->ecdsa),
+				EC_KEY_get0_public_key(k->ecdsa)) != 0)
+				goto ecdsa_error;
+			if (key_ec_validate_private(k->ecdsa) != 0)
+				goto ecdsa_error;
+
+			success = 1;
+
+ecdsa_error:
+			free(curve);
+			if (exponent)
+				BN_clear_free(exponent);
+			if (q)
+				EC_POINT_free(q);
+			if (success == 0)
+				goto error;
+			}
+			break;
+
+		case KEY_ED25519:
+			k->ed25519_pk = buffer_get_string_msg(blob, &pklen);
+			k->ed25519_sk = buffer_get_string_msg(blob, &sklen);
+			if (pklen != ED25519_PK_SZ) 
+				goto error;
+			if (sklen != ED25519_SK_SZ)
+				goto error;
+			break;
+
+		default:
+			goto error;
+			break;
+	}
+
+	/* enable blinding */
+	switch (k->type) {
+		case KEY_RSA1:
+		case KEY_RSA:
+			if (RSA_blinding_on(k->rsa, NULL) != 1) 
+				goto error;
+			break;
+	}
+
+	success = 1;
+
+error:
+	free(type_name);
+
+	if (success == 0) {
+		key_free(k);
+		k = NULL;
+	}
+
+	return (k);
 }

@@ -4049,6 +4049,26 @@ int get_cipher_discard_len(SSHCipher cipher)
 	return (val);
 }
 
+// ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€–¼‚©‚çŒŸõ‚·‚éB
+SSHCipher get_cipher_by_name(char *name)
+{
+	ssh2_cipher_t *ptr = ssh2_ciphers;
+	SSHCipher ret = SSH_CIPHER_NONE;
+
+	if (name == NULL)
+		goto error;
+
+	while (ptr->name != NULL) {
+		if (strcmp(ptr->name, name) == 0) {
+			ret = ptr->cipher;
+			break;
+		}
+		ptr++;
+	}
+error:
+	return (ret);
+}
+
 static char * get_cipher_string(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;

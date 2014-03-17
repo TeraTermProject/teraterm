@@ -554,7 +554,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=Host private key &file:
 DLG_AUTHSETUP_CHECKAUTH=&Check the enabled authentication methods before login (SSH2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=Choose a file with the RSA/DSA/ECDSA private key
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=You must specify a file containing the RSA/DSA/ECDSA private key.
 MSG_READKEY_ERROR=read error SSH2 private key file\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.
@@ -634,6 +634,7 @@ DLG_KEYGEN_SAVEPUBLIC=Save publi&c key
 DLG_KEYGEN_SAVEPRIVATE=Save &private key
 DLG_KEYGEN_GENERATE=&Generate
 DLG_KEYGEN_BITS=Key &Bits:
+DLG_BCRYPT_KDF=bcrypt &KDF format
 
 MSG_KEYBITS_MIN_ERROR=The key bits is too small.
 MSG_KEYGEN_GENERATING="generating key"
@@ -644,6 +645,7 @@ FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All
 FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa.pub)\0id_ecdsa.pub\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0
 MSG_SAVE_KEY_OPENFILE_ERROR=Can't open key file
 MSG_SAVE_KEY_WRITEFILE_ERROR=Can't write key file
 MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Two passphrases don't match.
@@ -653,6 +655,7 @@ FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0All Files(
 FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa)\0id_ecdsa\0All Files(*.*)\0*.*\0\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0
 
 ; dlg setup
 DLG_SSHSETUP_TITLE=TTSSH: Setup

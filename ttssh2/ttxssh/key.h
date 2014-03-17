@@ -26,13 +26,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __KEY_H_
+#define __KEY_H_
+
 #include "ttxssh.h"
+#include "ed25519_crypto_api.h"
+
+#define	ED25519_SK_SZ	crypto_sign_ed25519_SECRETKEYBYTES
+#define	ED25519_PK_SZ	crypto_sign_ed25519_PUBLICKEYBYTES
 
 int key_verify(Key *key,
                unsigned char *signature, unsigned int signaturelen,
                unsigned char *data, unsigned int datalen);
 RSA *duplicate_RSA(RSA *src);
 DSA *duplicate_DSA(DSA *src);
+unsigned char *duplicate_ED25519_PK(unsigned char *src);
 
 char *key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
@@ -42,6 +50,8 @@ char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
 char *curve_keytype_to_name(ssh_keytype type);
 
+Key *key_new_private(int type);
+Key *key_new(int type);
 void key_free(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
 Key *key_from_blob(char *data, int blen);
@@ -52,3 +62,8 @@ int kextype_to_cipher_nid(kex_algorithm type);
 int keytype_to_hash_nid(ssh_keytype type);
 int keytype_to_cipher_nid(ssh_keytype type);
 ssh_keytype nid_to_keytype(int nid);
+
+void key_private_serialize(Key *key, buffer_t *b);
+Key *key_private_deserialize(buffer_t *blob);
+
+#endif

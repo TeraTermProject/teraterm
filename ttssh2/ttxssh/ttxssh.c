@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ssh.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "keyfiles.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -287,6 +288,7 @@ static void normalize_host_key_order(char FAR * buf)
 		KEY_ECDSA256,
 		KEY_ECDSA384,
 		KEY_ECDSA521,
+		KEY_ED25519,
 		KEY_RSA,
 		KEY_DSA,
 		KEY_NONE,
@@ -3383,19 +3385,23 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
+	unsigned char *ed25519_sk; 
+	unsigned char *ed25519_pk; 
 	ssh_keytype type;
 } ssh_private_key_t;
 
-static ssh_private_key_t private_key = {NULL, NULL, NULL, KEY_UNSPEC};
+static ssh_private_key_t private_key = {NULL, NULL, NULL, NULL, NULL, KEY_UNSPEC};
 
 typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
+	unsigned char *ed25519_sk; 
+	unsigned char *ed25519_pk; 
 	ssh_keytype type;
 } ssh_public_key_t;
 
-static ssh_public_key_t public_key = {NULL, NULL, NULL, KEY_UNSPEC};
+static ssh_public_key_t public_key = {NULL, NULL, NULL, NULL, NULL, KEY_UNSPEC};
 
 static void free_ssh_key(void)
 {
@@ -3414,6 +3420,11 @@ static void free_ssh_key(void)
 	private_key.ecdsa = NULL;
 	EC_KEY_free(public_key.ecdsa);
 	public_key.ecdsa = NULL;
+
+	free(private_key.ed25519_sk);
+	private_key.ed25519_sk = NULL;
+	free(private_key.ed25519_pk);
+	private_key.ed25519_pk = NULL;
 
 	private_key.type = KEY_UNSPEC;
 	public_key.type = KEY_UNSPEC;
@@ -3523,6 +3534,24 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		break;
 	}
 
+	case KEY_ED25519:
+	{
+		// 秘密鍵を作る
+		private_key.ed25519_pk = malloc(ED25519_PK_SZ);
+		private_key.ed25519_sk = malloc(ED25519_SK_SZ);
+		if (private_key.ed25519_pk == NULL || private_key.ed25519_sk == NULL)
+			goto error;
+		crypto_sign_ed25519_keypair(private_key.ed25519_pk, private_key.ed25519_sk);
+
+		// 公開鍵を作る
+		public_key.ed25519_pk = malloc(ED25519_PK_SZ);
+		if (public_key.ed25519_pk == NULL)
+			goto error;
+		memcpy(public_key.ed25519_pk, private_key.ed25519_pk, ED25519_PK_SZ);
+
+		break;
+	}
+
 	default:
 		goto error;
 	}
@@ -3599,6 +3628,21 @@ static unsigned int arc4random(void)
 	rc4_ready -= sizeof(r);
 
 	return(r);
+}
+
+void arc4random_buf(void *_buf, size_t n)
+{
+	size_t i;
+	unsigned int r = 0;
+	char *buf = (char *)_buf;
+
+	for (i = 0; i < n; i++) {
+		if (i % 4 == 0)
+			r = arc4random();
+		buf[i] = r & 0xff;
+		r >>= 8;
+	}
+	i = r = 0;
 }
 
 //
@@ -4036,6 +4080,154 @@ static void init_password_control(HWND dlg, int item)
 	                            (LONG) password_wnd_proc));
 }
 
+// bcrypt KDF形式で秘密鍵を保存する
+// based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
+static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar)
+{
+	SSHCipher ciphernameval = SSH_CIPHER_NONE;
+	char *ciphername = DEFAULT_CIPHERNAME;
+	int rounds = DEFAULT_ROUNDS;
+	buffer_t *b = NULL;
+	buffer_t *kdf = NULL;
+	buffer_t *encoded = NULL;
+	buffer_t *blob = NULL;
+	int blocksize, keylen, ivlen, authlen, i, n; 
+	unsigned char *key = NULL, salt[SALT_LEN];
+	char *kdfname = KDFNAME;
+	EVP_CIPHER_CTX cipher_ctx;
+	Key keyblob;
+	unsigned char *cp = NULL;
+	unsigned int len, check;
+	FILE *fp;
+	char uimsg[MAX_UIMSG];
+
+	b = buffer_init();
+	kdf = buffer_init();
+	encoded = buffer_init();
+	blob = buffer_init();
+	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
+		goto ed25519_error;
+
+	ciphernameval = get_cipher_by_name(ciphername);
+	blocksize = get_cipher_block_size(ciphernameval);
+	keylen = get_cipher_key_len(ciphernameval);
+	ivlen = blocksize;
+	authlen = 0;  // TODO: とりあえず固定化
+	key = calloc(1, keylen + ivlen);
+
+	if (strcmp(kdfname, "none") != 0) {
+		arc4random_buf(salt, SALT_LEN);
+		if (bcrypt_pbkdf(passphrase, strlen(passphrase),
+			salt, SALT_LEN, key, keylen + ivlen, rounds) < 0)
+			//fatal("bcrypt_pbkdf failed");
+			;
+		buffer_put_string(kdf, salt, SALT_LEN);
+		buffer_put_int(kdf, rounds);
+	}
+	// 暗号化の準備
+	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
+	// ここでは"AES256-CBC"に固定とする。
+	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
+		get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
+	memset(key, 0, keylen + ivlen);
+	free(key);
+
+	buffer_append(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
+	buffer_put_cstring(encoded, ciphername);
+	buffer_put_cstring(encoded, kdfname);
+	buffer_put_string(encoded, buffer_ptr(kdf), buffer_len(kdf));
+	buffer_put_int(encoded, 1);			/* number of keys */
+
+	// key_to_blob()を一時利用するため、Key構造体を初期化する。
+	keyblob.type = private_key.type;
+	keyblob.rsa = private_key.rsa;
+	keyblob.dsa = private_key.dsa;
+	keyblob.ecdsa = private_key.ecdsa;
+	keyblob.ed25519_pk = private_key.ed25519_pk;
+	keyblob.ed25519_sk = private_key.ed25519_sk;
+	key_to_blob(&keyblob, &cp, &len);			/* public key */
+
+	buffer_put_string(encoded, cp, len);
+
+	memset(cp, 0, len);
+	free(cp);
+
+	/* Random check bytes */
+	check = arc4random();
+	buffer_put_int(b, check);
+	buffer_put_int(b, check);
+
+	/* append private key and comment*/
+	key_private_serialize(&keyblob, b);
+	buffer_put_cstring(b, comment);
+
+	/* padding */
+	i = 0;
+	while (buffer_len(b) % blocksize)
+		buffer_put_char(b, ++i & 0xff);
+
+	/* length */
+	buffer_put_int(encoded, buffer_len(b));
+
+	/* encrypt */
+	cp = buffer_append_space(encoded, buffer_len(b) + authlen);
+	if (EVP_Cipher(&cipher_ctx, cp, buffer_ptr(b), buffer_len(b)) == 0) {
+		//strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
+		//free(decrypted);
+		//goto error;
+	}
+	cipher_cleanup_SSH2(&cipher_ctx);
+
+	len = 2 * buffer_len(encoded);
+	cp = malloc(len);
+	n = uuencode(buffer_ptr(encoded), buffer_len(encoded), (char *)cp, len);
+	if (n < 0) {
+		free(cp);
+		goto ed25519_error;
+	}
+
+	buffer_clear(blob);
+	buffer_append(blob, MARK_BEGIN, sizeof(MARK_BEGIN) - 1);
+	for (i = 0; i < n; i++) {
+		buffer_put_char(blob, cp[i]);
+		if (i % 70 == 69)
+			buffer_put_char(blob, '\n');
+	}
+	if (i % 70 != 69)
+		buffer_put_char(blob, '\n');
+	buffer_append(blob, MARK_END, sizeof(MARK_END) - 1);
+	free(cp);
+
+	len = buffer_len(blob);
+
+	// 秘密鍵をファイルに保存する。
+	fp = fopen(filename, "w");
+	if (fp == NULL) {
+		UTIL_get_lang_msg("MSG_SAVE_KEY_OPENFILE_ERROR", pvar,
+		                  "Can't open key file");
+		strncpy_s(uimsg, sizeof(uimsg), pvar->ts->UIMsg, _TRUNCATE);
+		UTIL_get_lang_msg("MSG_ERROR", pvar, "ERROR");
+		MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
+		goto ed25519_error;
+	}
+	n = fwrite(buffer_ptr(blob), buffer_len(blob), 1, fp);
+	if (n != 1) {
+		UTIL_get_lang_msg("MSG_SAVE_KEY_WRITEFILE_ERROR", pvar,
+		                  "Can't open key file");
+		strncpy_s(uimsg, sizeof(uimsg), pvar->ts->UIMsg, _TRUNCATE);
+		UTIL_get_lang_msg("MSG_ERROR", pvar, "ERROR");
+		MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_OK | MB_ICONEXCLAMATION);
+	}
+	fclose(fp);
+
+
+ed25519_error:
+	buffer_free(b);
+	buffer_free(kdf);
+	buffer_free(encoded);
+	buffer_free(blob);
+}
+
 static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
                                      LPARAM lParam)
 {
@@ -4078,6 +4270,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_BCRYPT_KDF", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, pvar->ts->UIMsg);
 
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -4089,6 +4284,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_ECDSA256_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ECDSA384_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ECDSA521_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ED25519_TYPE, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYBITS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEYBITS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_KEY_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
@@ -4102,6 +4298,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_SAVE_PRIVATE_KEY, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_CHECK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgHostFont = NULL;
@@ -4129,6 +4326,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		// file saving dialog disabled(default)
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PUBLIC_KEY), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SAVE_PRIBATE_KEY), FALSE);
+
+		// default bcrypt KDF
+		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 
 		}
 		return TRUE;
@@ -4167,6 +4367,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					break;
 				case KEY_ECDSA521:
 					SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
+					break;
+				case KEY_ED25519:
+					bits = 0;
 					break;
 			}
 
@@ -4222,6 +4425,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), TRUE);
+				EnableWindow(GetDlgItem(dlg, IDC_ED25519_TYPE), TRUE);
 				if (!isFixedLengthKey(key_type)) {
 					EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				}
@@ -4249,6 +4453,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
 			key_type = KEY_RSA1;
 			break;
 
@@ -4257,6 +4462,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_RSA;
 			break;
 
@@ -4265,6 +4471,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_DSA;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 1024, FALSE);
 			break;
@@ -4274,6 +4481,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_ECDSA256;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
 			break;
@@ -4283,6 +4491,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_ECDSA384;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 384, FALSE);
 			break;
@@ -4292,8 +4501,20 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
 			key_type = KEY_ECDSA521;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
+			break;
+
+		case IDC_ED25519_TYPE | (BN_CLICKED << 16):
+			/* ED25519 ではビット数を指定できない。*/
+			if (!isFixedLengthKey(key_type)) {
+				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
+				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
+			}
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
+			key_type = KEY_ED25519;
+			SetDlgItemInt(dlg, IDC_KEYBITS, 0, FALSE);
 			break;
 
 		// saving public key file
@@ -4341,6 +4562,15 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ecdsa.pub", _TRUNCATE);
+				break;
+			case KEY_ED25519:
+				UTIL_get_lang_msg("FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER", pvar,
+				                  "SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0");
+				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				ofn.lpstrFilter = uimsg;
+				strncpy_s(filename, sizeof(filename), "id_ed25519.pub", _TRUNCATE);
+				break;
+			default:
 				break;
 			}
 			ofn.lpstrFile = filename;
@@ -4423,6 +4653,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					buffer_put_string(b, s, strlen(s));
 					buffer_put_ecpoint(b, EC_KEY_get0_group(ecdsa),
 					                      EC_KEY_get0_public_key(ecdsa));
+					break;
+
+				case KEY_ED25519:
+					keyname = get_ssh_keytype_name(public_key.type);
+					buffer_put_cstring(b, keyname);
+					buffer_put_string(b, public_key.ed25519_pk, ED25519_PK_SZ);
 					break;
 				}
 
@@ -4523,6 +4759,15 @@ public_error:
 				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
 				ofn.lpstrFilter = uimsg;
 				strncpy_s(filename, sizeof(filename), "id_ecdsa", _TRUNCATE);
+				break;
+			case KEY_ED25519:
+				UTIL_get_lang_msg("FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER", pvar,
+				                  "SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0");
+				memcpy(uimsg, pvar->ts->UIMsg, sizeof(uimsg));
+				ofn.lpstrFilter = uimsg;
+				strncpy_s(filename, sizeof(filename), "id_ed25519", _TRUNCATE);
+				break;
+			default:
 				break;
 			}
 			ofn.lpstrFile = filename;
@@ -4653,10 +4898,18 @@ error:;
 				buffer_free(b);
 				buffer_free(enc);
 
-			} else { // SSH2 RSA, DSA, ECDSA
+			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
+				save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
+
+			} else { // SSH2 RSA, DSA, ECDSA			
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
+
+				if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+					save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
+					break;
+				}
 
 				len = strlen(buf);
 				// TODO: range check (len >= 4)

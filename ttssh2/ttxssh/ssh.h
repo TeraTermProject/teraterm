@@ -242,10 +242,11 @@ typedef enum {
 	KEY_ECDSA256,
 	KEY_ECDSA384,
 	KEY_ECDSA521,
+	KEY_ED25519,
 	KEY_UNSPEC,
 	KEY_MAX = KEY_UNSPEC,
 } ssh_keytype;
-#define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ECDSA521)
+#define isFixedLengthKey(type)	((type) >= KEY_DSA && (type) <= KEY_ED25519)
 
 typedef struct ssh2_host_key {
 	ssh_keytype type;
@@ -259,6 +260,7 @@ static ssh2_host_key_t ssh2_host_key[] = {
 	{KEY_ECDSA256, "ecdsa-sha2-nistp256"}, // RFC5656
 	{KEY_ECDSA384, "ecdsa-sha2-nistp384"}, // RFC5656
 	{KEY_ECDSA521, "ecdsa-sha2-nistp521"}, // RFC5656
+	{KEY_ED25519,  "ssh-ed25519"},
 	{KEY_UNSPEC,   "ssh-unknown"},
 	{KEY_NONE,     NULL},
 };
@@ -454,6 +456,10 @@ typedef struct Key {
 	int bits;
 	unsigned char *exp;
 	unsigned char *mod;
+	// SSH2 ED25519
+	unsigned char *ed25519_sk;
+	unsigned char *ed25519_pk;
+	int bcrypt_kdf;
 } Key;
 
 // fingerprint‚ÌŽí•Ê
@@ -608,6 +614,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
 int get_cipher_block_size(SSHCipher cipher);
 int get_cipher_key_len(SSHCipher cipher);
+SSHCipher get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);

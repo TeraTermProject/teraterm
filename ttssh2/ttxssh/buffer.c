@@ -58,12 +58,14 @@ void buffer_free(buffer_t * buf)
 	}
 }
 
-// バッファの領域拡張のみを行う。
-void buffer_append_space(buffer_t * buf, int size)
+// バッファの領域拡張を行う。
+// return: 拡張前のバッファポインター
+void *buffer_append_space(buffer_t * buf, int size)
 {
 	int n;
 	int ret = -1;
 	int newlen;
+	void *p;
 
 	n = buf->offset + size;
 	if (n < buf->maxlen) {
@@ -80,13 +82,18 @@ void buffer_append_space(buffer_t * buf, int size)
 		buf->maxlen = newlen;
 	}
 
-	return;
+	p = buf->buf + buf->offset;
+	//buf->offset += size;
+	buf->len = buf->offset + size;
+
+	return (p);
 
 panic:
 	{
 	char *p = NULL;
 	*p = 0; // application fault
 	}
+	return (NULL);
 }
 
 int buffer_append(buffer_t * buf, char *ptr, int size)
@@ -266,6 +273,11 @@ void buffer_put_string(buffer_t *msg, char *ptr, int size)
 	}
 }
 
+void buffer_put_cstring(buffer_t *msg, char *ptr)
+{
+	buffer_put_string(msg, ptr, strlen(ptr));
+}
+
 void buffer_put_char(buffer_t *msg, int value)
 {
 	char ch = value;
@@ -397,6 +409,17 @@ void buffer_get_bignum2(char **data, BIGNUM *value)
 	*data = buf;
 }
 
+void buffer_get_bignum2_msg(buffer_t *msg, BIGNUM *value)
+{
+	char *data, *olddata;
+	int off;
+
+	data = olddata = buffer_tail_ptr(msg);
+	buffer_get_bignum2(&data, value);
+	off = data - olddata;
+	msg->offset += off;
+}
+
 void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
 {
 	char *buf;
@@ -469,6 +492,17 @@ void buffer_get_ecpoint(char **data, const EC_GROUP *curve, EC_POINT *point)
 	BN_CTX_free(bnctx);
 }
 
+void buffer_get_ecpoint_msg(buffer_t *msg, const EC_GROUP *curve, EC_POINT *point)
+{
+	char *data, *olddata;
+	int off;
+
+	data = olddata = buffer_tail_ptr(msg);
+	buffer_get_ecpoint(&data, curve, point);
+	off = data - olddata;
+	msg->offset += off;
+}
+
 void buffer_dump(FILE *fp, buffer_t *buf)
 {
 	int i;
@@ -487,15 +521,25 @@ void buffer_dump(FILE *fp, buffer_t *buf)
 // バッファのオフセットを進める。
 void buffer_consume(buffer_t *buf, int shift_byte)
 {
-	int n;
-
-	n = buf->offset + shift_byte;
-	if (n < buf->maxlen) {
-		buf->offset += shift_byte;
-	} else {
+	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error
+	} else {
+		buf->offset += shift_byte;
+		// lenは変えない。
 	}
 }
+
+// バッファの末尾を縮退する。
+void buffer_consume_end(buffer_t *buf, int shift_byte)
+{
+	if (shift_byte > buf->len - buf->offset) {
+		// TODO: fatal error
+	} else {
+		buf->len -= shift_byte;
+		// offsetは変えない。
+	}
+}
+
 
 // パケットの圧縮
 int buffer_compress(z_stream *zstream, char *payload, int len, buffer_t *compbuf)
