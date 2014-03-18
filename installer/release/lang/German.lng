@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Jul 27 2013)
+; Updated by TeraTerm Project (Mar 18 2014)
 ; Last translated (German language) by Frederik Schwarzer (May 17 2010)
 
 [Tera Term]
@@ -528,7 +528,7 @@ DLG_AUTH_PASSWORD=Passphrase:
 DLG_AUTH_REMEMBER_PASSWORD=Passphrase speichern
 DLG_AUTH_FWDAGENT=F&orward agent
 DLG_AUTH_METHOD_PASSWORD=Passwortauthentifikation verwenden
-DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA-Schlüssel verwenden
+DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTH_METHOD_RHOST=rhosts verwenden (SSH1)
 DLG_AUTH_METHOD_CHALLENGE1=Benutze challenge/response (TIS)
 DLG_AUTH_METHOD_CHALLENGE2=Benutze challenge/response (keyboard-interactive)
@@ -543,7 +543,7 @@ DLG_AUTHSETUP_TITLE=TTSSH: Authentifikation-Einstellungen
 DLG_AUTHSETUP_BANNER=Standard-Einstellungen für Authentifikation:
 DLG_AUTHSETUP_USERNAME=Benutzername:
 DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
-DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA-Schlüssel verwenden
+DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)
 DLG_AUTHSETUP_METHOD_CHALLENGE=Benutze challenge/response (SSH1:&TIS, SSH2:keyboard-interactive)
 DLG_AUTHSETUP_PRIVATEKEY=Schlüssel:
@@ -551,10 +551,10 @@ DLG_AUTHSETUP_LOCALUSER=Lokaler Benutzername:
 DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-Schlüssel:
 DLG_AUTHSETUP_CHECKAUTH=Prüfe die Authentifizierungsmethoden vor dem Logins (SSH2)
 
-FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA-Schlüssel auswählen
+FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA/ED25519-Schlüssel auswählen
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
-MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA-Schlüssel auswählen.
-MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA-Schlüssels\n%s
+MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA/ED25519-Schlüssel auswählen.
+MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA/ED25519-Schlüssels\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.
 MSG_NOAUTHMETHOD_ERROR=Der Server unterstützt keine der von TTSSH angebotenen\nAuthentifizierungs-Optionen. Die Verbindung wird beendet.
 

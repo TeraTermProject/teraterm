@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Jul 27 2013)
+; Updated by TeraTerm Project (Mar 18 2014)
 ; Last translated (Korean language) by Daehong Kim (Jul 25 2013)
 
 [Tera Term]
@@ -529,7 +529,7 @@ DLG_AUTH_PASSWORD=암호(&P):
 DLG_AUTH_REMEMBER_PASSWORD=메모리에 암호기억(&M)
 DLG_AUTH_FWDAGENT=에이전트로 전달(&O)
 DLG_AUTH_METHOD_PASSWORD=일반텍스트 암호 로그인(&L)
-DLG_AUTH_METHOD_RSA=RSA/DSA/ECDSA 키 로그인(&R)
+DLG_AUTH_METHOD_RSA=RSA/DSA/ECDSA/ED25519 키 로그인(&R)
 DLG_AUTH_METHOD_RHOST=rhosts 로그인(SSH1)(&H)
 DLG_AUTH_METHOD_CHALLENGE1=시도/응답 로그인(TIS)(&T)
 DLG_AUTH_METHOD_CHALLENGE2=시도/응답 로그인(TIS)(키보드 입력)(&C)
@@ -545,7 +545,7 @@ DLG_AUTHSETUP_TITLE=TTSSH: 인증 설정
 DLG_AUTHSETUP_BANNER=기본 인증 선택:
 DLG_AUTHSETUP_USERNAME=사용자 이름(&N):
 DLG_AUTHSETUP_METHOD_PASSWORD=일반텍스트 암호 로그인(&L)
-DLG_AUTHSETUP_METHOD_RSA=RSA/DSA/ECDSA 키 로그인(&R)
+DLG_AUTHSETUP_METHOD_RSA=RSA/DSA/ECDSA/ED25519 키 로그인(&R)
 DLG_AUTHSETUP_METHOD_RHOST=rhosts 로그인(SSH1)(&H)
 DLG_AUTHSETUP_METHOD_CHALLENGE=시도/응답 로그인(SSH1:TIS, SSH2:키보드 입력)(&T)
 DLG_AUTHSETUP_METHOD_PAGEANT=Pageant 사용(&A)
@@ -554,9 +554,9 @@ DLG_AUTHSETUP_LOCALUSER=지역사 용자이름(&U):
 DLG_AUTHSETUP_HOST_PRIVATEKEY=호스트 개인키(&F):
 DLG_AUTHSETUP_CHECKAUTH=로그인 전에 활성화된 인증 방법을 확인(SSH2)(&C)
 
-FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA/ECDSA 개인키 파일을 선택하세요
+FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA/ECDSA/ED25519 개인키 파일을 선택하세요
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
-MSG_KEYSPECIFY_ERROR=RSA/DSA/ECDSA 개인키를 포함한 파일을 지정해야만 합니다.
+MSG_KEYSPECIFY_ERROR=RSA/DSA/ECDSA/ED25519 개인키를 포함한 파일을 지정해야만 합니다.
 MSG_READKEY_ERROR=SSH2 개인키 파일 읽기 오류\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts가 기본 인증방법이 아니어서 인증이 실패할 것입니다.\nTTSSH에서 Rhosts 인증을 사용하기 위해, 연결하기 전 설정 메뉴의 "SSH 인증..."에서\n기본값이 되도록 선택하고 TTSSH를 재시작해야 합니다.
 MSG_NOAUTHMETHOD_ERROR=서버가 TTSSH가 제공하는 인증 선택사항 중 어느 것도\n지원하지 않습니다. 이 연결은 종료됩니다.

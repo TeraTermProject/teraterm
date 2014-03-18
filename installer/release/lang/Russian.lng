@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (v4.80, Nov 30 2013)
+; Updated by TeraTerm Project (Mar 18 2014)
 ; Last translated (Russian language) by Ryumik Sergey (Dec 17 2013)
 
 [Tera Term]
@@ -528,7 +528,7 @@ DLG_AUTH_PASSWORD=&Фраза пароля:
 DLG_AUTH_REMEMBER_PASSWORD=&Запомнить пароль в памяти
 DLG_AUTH_FWDAGENT=&Первый агент
 DLG_AUTH_METHOD_PASSWORD=&Вход с простым паролем
-DLG_AUTH_METHOD_RSA=&Вход сключом RSA/DSA/ECDSA
+DLG_AUTH_METHOD_RSA=&Вход сключом RSA/DSA/ECDSA/ED25519
 DLG_AUTH_METHOD_RHOST=Вход с r&hosts (SSH1)
 DLG_AUTH_METHOD_CHALLENGE1=Использовать для входа запрос/ответ (&TIS)
 DLG_AUTH_METHOD_CHALLENGE2=&Использовать для входа запрос/ответ (с клавиатуры)
@@ -544,7 +544,7 @@ DLG_AUTHSETUP_TITLE=TTSSH: Настройка аутентификации
 DLG_AUTHSETUP_BANNER=Выбрать по умолчанию:
 DLG_AUTHSETUP_USERNAME=&Имя:
 DLG_AUTHSETUP_METHOD_PASSWORD=&Вход с простым паролем
-DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA
+DLG_AUTHSETUP_METHOD_RSA=&Вход с ключом RSA/DSA/ECDSA/ED25519
 DLG_AUTHSETUP_METHOD_RHOST=&Вход с rhosts (SSH1)
 DLG_AUTHSETUP_METHOD_CHALLENGE=Использовать для входа запрос/ответ (SSH1:&TIS, SSH2:с клавиатуры)
 DLG_AUTHSETUP_METHOD_PAGEANT=&Использовать Pageant
@@ -553,9 +553,9 @@ DLG_AUTHSETUP_LOCALUSER=&Скрытое имя пользователя:
 DLG_AUTHSETUP_HOST_PRIVATEKEY=&Закрытый ключ хоста:
 DLG_AUTHSETUP_CHECKAUTH=&Проверять до входа, включены ли методы аутентификации (SSH2)
 
-FILEDLG_OPEN_PRIVATEKEY_TITLE=Выбрать файл с закрытым ключом RSA/DSA/ECDSA
+FILEDLG_OPEN_PRIVATEKEY_TITLE=Выбрать файл с закрытым ключом RSA/DSA/ECDSA/ED25519
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
-MSG_KEYSPECIFY_ERROR=Вы должны указать файл, содержащий закрытый ключ RSA/DSA/ECDSA.
+MSG_KEYSPECIFY_ERROR=Вы должны указать файл, содержащий закрытый ключ RSA/DSA/ECDSA/ED25519.
 MSG_READKEY_ERROR=Ошибка чтения файла закрытого ключа SSH2\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Ошибка аутентификации Rhosts, потому, что метод не был установлен по умолчанию.\nДля использования аутентификации Rhosts в TTSSH, вы должны установить его по умолчанию путем перезагрузки\nTTSSH и выбрать "SSH Authentication..." в меню инсталляции перед подключением.
 MSG_NOAUTHMETHOD_ERROR=Сервер не поддерживает ни один из параметров проверки аутентификации\nTTSSH. Это соединение будет закрыто.
