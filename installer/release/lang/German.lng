@@ -532,6 +532,7 @@ DLG_AUTH_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTH_METHOD_RHOST=rhosts verwenden (SSH1)
 DLG_AUTH_METHOD_CHALLENGE1=Benutze challenge/response (TIS)
 DLG_AUTH_METHOD_CHALLENGE2=Benutze challenge/response (keyboard-interactive)
+DLG_AUTH_METHOD_PAGEANT=Benutze Pageant
 DLG_AUTH_PRIVATEKEY=Schlüssel:
 DLG_AUTH_LOCALUSER=Lokaler Benutzername:
 DLG_AUTH_HOST_PRIVATEKEY=rhosts-Schlüssel:
