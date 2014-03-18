@@ -2425,7 +2425,12 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added support for the key exchange of Curve25519 elliptic curve DH(Diffe Hellman) algorithm.</li>
+      <li>added support for the key exchange of Curve25519 elliptic curve DH(Diffe Hellman) algorithm.
+        <ul>
+          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the ED25519 authentication key.</li>
+          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the bcrypt KDF format of the RSA/DSA/ECDSA private key.</li>
+          <li>added the ED25519 into the Host Key algorithm, and then changed the HostKeyOrder entry in the teraterm.ini file.</li>
+        </ul></li>
     </ul>
   </li>
 </ul>

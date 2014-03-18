@@ -2430,7 +2430,12 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>Curve25519楕円曲線DH（Diffe Hellman）アルゴリズムを使った鍵交換をサポートした。</li>
+      <li>Curve25519楕円曲線DH（Diffe Hellman）アルゴリズムを使った鍵交換をサポートした。
+        <ul>
+          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で ED25519 鍵の作成に対応した。</li>
+          <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で RSA/DSA/ECDSA 秘密鍵ファイルに bcrypt KDF 形式を選択可能とした。</li>
+          <li>Host Key algorithmに ED25519 を追加した。teraterm.ini の HostKeyOrder エントリを変更した。</li>
+        </ul></li>
     </ul>
   </li>
 </ul>
