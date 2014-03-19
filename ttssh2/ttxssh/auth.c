@@ -388,7 +388,7 @@ static int get_key_file_name(HWND parent, char FAR * buf, int bufsize, PTInstVar
 	params.lpstrFileTitle = NULL;
 	params.lpstrInitialDir = NULL;
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_TITLE", pvar,
-	                  "Choose a file with the RSA/DSA/ECDSA private key");
+	                  "Choose a file with the RSA/DSA/ECDSA/ED25519 private key");
 	params.lpstrTitle = pvar->ts->UIMsg;
 	params.Flags =
 		OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
@@ -450,7 +450,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		GetDlgItemText(dlg, file_ctl_ID, buf, sizeof(buf));
 		if (buf[0] == 0) {
 			UTIL_get_lang_msg("MSG_KEYSPECIFY_ERROR", pvar,
-			                  "You must specify a file containing the RSA/DSA/ECDSA private key.");
+			                  "You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 			SetFocus(GetDlgItem(dlg, file_ctl_ID));
 			destroy_malloced_string(&password);
