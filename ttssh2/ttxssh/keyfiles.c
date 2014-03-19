@@ -1478,8 +1478,8 @@ ssh2_keyfile_type get_ssh2_keytype(char *relative_name,
 	}
 	
 	if (ret == SSH2_KEYFILE_TYPE_NONE) {
-		fclose(*fp);
 		strncpy_s(errmsg, errmsg_len, "Unknown key file type.", _TRUNCATE);
+		fseek(*fp, 0, SEEK_SET);
 		return ret;
 	}
 	

@@ -520,11 +520,23 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 				default:
 				{
 					char buf[1024];
+
+					// ファイルが開けた場合はファイル形式が不明でも読み込んでみる
+					if (fp != NULL) {
+						key_pair = read_SSH2_private_key(pvar, fp, password,
+						                                 &invalid_passphrase,
+						                                 FALSE,
+						                                 errmsg,
+						                                 sizeof(errmsg)
+						                                );
+						break;
+					}
+
 					UTIL_get_lang_msg("MSG_READKEY_ERROR", pvar,
 					                  "read error SSH2 private key file\r\n%s");
 					_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, errmsg);
 					notify_nonfatal_error(pvar, buf);
-					// ここに来たということは SSH2 秘密鍵が開けない、あるいはファイル形式がおかしいので
+					// ここに来たということは SSH2 秘密鍵ファイルが開けないので
 					// 鍵ファイルの選択ボタンにフォーカスを移す
 					SetFocus(GetDlgItem(dlg, IDC_CHOOSERSAFILE));
 					destroy_malloced_string(&password);
