@@ -1488,9 +1488,9 @@ static const char *get_auth_method_name(SSHAuthMethod auth)
 	case SSH_AUTH_PASSWORD:
 		return "password";
 	case SSH_AUTH_RSA:
-		return "RSA";
+		return "publickey";
 	case SSH_AUTH_PAGEANT:
-		return "RSA (with Pageant)";
+		return "publickey";
 	case SSH_AUTH_RHOSTS:
 		return "rhosts";
 	case SSH_AUTH_RHOSTS_RSA:
@@ -1512,9 +1512,22 @@ void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 	} else if (pvar->auth_state.cur_cred.method != SSH_AUTH_NONE) {
 		if (SSHv1(pvar)) {
 			UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg, pvar->auth_state.user,
+			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+			            pvar->auth_state.user,
 			            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
+			if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+				            "RSA");
+				strncat_s(dest, len, buf, _TRUNCATE);
+			}
+			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
+				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+				            "RSA");
+				strncat_s(dest, len, buf, _TRUNCATE);
+			}
 		} else { 
 			// SSH2:認証メソッドの判別 (2004.12.23 yutaka)
 			// keyboard-interactiveメソッドを追加 (2005.3.12 yutaka)
@@ -1527,39 +1540,40 @@ void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
 					method = get_auth_method_name(pvar->auth_state.cur_cred.method);
 				}
 				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
-				_snprintf_s(dest, len, _TRUNCATE,
-				            pvar->ts->UIMsg, pvar->auth_state.user, method);
-
-			} else {
-				if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-					Key *k = pvar->auth_state.cur_cred.key_pair;
-					method = ssh_key_type(k);
-					if (k->bcrypt_kdf) {
-						_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s(bcrypt KDF)", method);
-						method = buf;
-					}
-
-				}
-				else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-					int len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);
-					char *s = (char *)malloc(len+1);
-					ssh_keytype keytype;
-
-					memcpy(s, pvar->pageant_curkey+4+4, len);
-					s[len] = '\0';
-					keytype = get_keytype_from_name(s);
-					if (keytype == KEY_RSA) {
-						method = "RSA with Pageant";
-					} else if (keytype == KEY_DSA) {
-						method = "DSA with Pageant";
-					}
-					free(s);
-				}
-				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
-				_snprintf_s(dest, len, _TRUNCATE,
-				            pvar->ts->UIMsg, pvar->auth_state.user, method);
+				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+				            pvar->auth_state.user, method);
 			}
+			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
+				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
+				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+				            pvar->auth_state.user,
+				            get_auth_method_name(pvar->auth_state.cur_cred.method));
 
+				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO2", pvar, " with %s key");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+				            ssh_key_type(pvar->auth_state.cur_cred.key_pair->type));
+				strncat_s(dest, len, buf, _TRUNCATE);
+			}
+			else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
+				int key_len = get_uint32_MSBfirst(pvar->pageant_curkey + 4);
+				char *s = (char *)malloc(key_len+1);
+
+				method = get_auth_method_name(pvar->auth_state.cur_cred.method);
+				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO", pvar, "User '%s', using %s");
+				_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+				            pvar->auth_state.user,
+				            get_auth_method_name(pvar->auth_state.cur_cred.method));
+
+				memcpy(s, pvar->pageant_curkey+4+4, key_len);
+				s[key_len] = '\0';
+				UTIL_get_lang_msg("DLG_ABOUT_AUTH_INFO3", pvar, " with %s key from Pageant");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
+				            ssh_key_type(get_keytype_from_name(s)));
+				strncat_s(dest, len, buf, _TRUNCATE);
+
+				free(s);
+			}
 		}
 
 	} else {

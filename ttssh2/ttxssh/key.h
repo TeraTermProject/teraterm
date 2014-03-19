@@ -45,7 +45,7 @@ unsigned char *duplicate_ED25519_PK(unsigned char *src);
 char *key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length);
 char *key_fingerprint(Key *key, enum fp_rep dgst_rep);
 
-const char *ssh_key_type(const Key *k);
+const char *ssh_key_type(ssh_keytype type);
 char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
 char *curve_keytype_to_name(ssh_keytype type);

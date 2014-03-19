@@ -597,9 +597,9 @@ char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 
 
 const char *
-ssh_key_type(const Key *k)
+ssh_key_type(ssh_keytype type)
 {
-	switch (k->type) {
+	switch (type) {
 	case KEY_RSA1:
 		return "RSA1";
 	case KEY_RSA:
@@ -691,7 +691,7 @@ key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 	field[x][y] = len;
 
 	/* fill in retval */
-	_snprintf_s(retval, FLDSIZE_X, _TRUNCATE, "+--[%4s %4u]", ssh_key_type(k), key_size(k));
+	_snprintf_s(retval, FLDSIZE_X, _TRUNCATE, "+--[%4s %4u]", ssh_key_type(k->type), key_size(k));
 	p = strchr(retval, '\0');
 
 	/* output upper border */
