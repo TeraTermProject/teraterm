@@ -890,11 +890,13 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		if (EVP_Cipher(&cipher_ctx, decrypted, prikey->buf, len) == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
 			free(decrypted);
+			cipher_cleanup_SSH2(&cipher_ctx);
 			goto error;
 		}
 		buffer_clear(prikey);
 		buffer_append(prikey, decrypted, len);
 		free(decrypted);
+		cipher_cleanup_SSH2(&cipher_ctx);
 	}
 
 	// verity MAC
@@ -1319,10 +1321,12 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		decrypted = (char *)malloc(len);
 		if (EVP_Cipher(&cipher_ctx, decrypted, blob->buf + blob->offset, len) == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);
+			cipher_cleanup_SSH2(&cipher_ctx);
 			goto error;
 		}
 		buffer_append(blob2, decrypted, len);
 		free(decrypted);
+		cipher_cleanup_SSH2(&cipher_ctx);
 
 		*invalid_passphrase = TRUE;
 	}
