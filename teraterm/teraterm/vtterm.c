@@ -1076,6 +1076,7 @@ void  RestoreCursor()
     Buff->CursorY = NumOfLines-1-StatusLine;
   MoveCursor(Buff->CursorX,Buff->CursorY);
   CharAttr = Buff->Attr;
+  BuffSetCurCharAttr(CharAttr);
   Glr[0] = Buff->Glr[0];
   Glr[1] = Buff->Glr[1];
   for (i=0 ; i<=3; i++)
