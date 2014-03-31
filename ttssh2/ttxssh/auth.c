@@ -842,6 +842,11 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
+			// 認証中にサーバから切断された場合は、キャンセル扱いとする。(2014.3.31 yutaka)
+			if (!pvar->cv->Ready) {
+				goto canceled;
+			}
+
 			// 認証準備ができてから、認証データを送信する。早すぎると、落ちる。(2001.1.25 yutaka)
 			if (pvar->userauth_retry_count == 0 &&
 				((pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) ||
@@ -859,6 +864,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			return end_auth_dlg(pvar, dlg);
 
 		case IDCANCEL:			/* kill the connection */
+canceled:
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar);
 			EndDialog(dlg, 0);

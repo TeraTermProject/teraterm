@@ -1392,6 +1392,11 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
+			// 認証中にサーバから切断された場合は、キャンセル扱いとする。(2014.3.31 yutaka)
+			if (!pvar->cv->Ready) {
+				goto canceled;
+			}
+
 			if (IsDlgButtonChecked(dlg, IDC_ADDTOKNOWNHOSTS)) {
 				add_host_key(pvar);
 			}
@@ -1413,6 +1418,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
+canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar);
 			EndDialog(dlg, 0);
@@ -1535,6 +1541,11 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
+			// 認証中にサーバから切断された場合は、キャンセル扱いとする。(2014.3.31 yutaka)
+			if (!pvar->cv->Ready) {
+				goto canceled;
+			}
+
 			if (IsDlgButtonChecked(dlg, IDC_ADDTOKNOWNHOSTS)) {
 				add_host_key(pvar);
 				delete_different_key(pvar);
@@ -1557,6 +1568,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
+canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar);
 			EndDialog(dlg, 0);
@@ -1682,6 +1694,11 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDC_CONTINUE:
+			// 認証中にサーバから切断された場合は、キャンセル扱いとする。(2014.3.31 yutaka)
+			if (!pvar->cv->Ready) {
+				goto canceled;
+			}
+
 			if (IsDlgButtonChecked(dlg, IDC_ADDTOKNOWNHOSTS)) {
 				add_host_key(pvar);
 			}
@@ -1703,6 +1720,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
+canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar);
 			EndDialog(dlg, 0);
