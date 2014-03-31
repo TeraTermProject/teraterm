@@ -66,6 +66,7 @@ static TCharAttr CharAttr;
 static BOOL RelativeOrgMode;
 static BOOL InsertMode;
 static BOOL LFMode;
+static BOOL ClearThenHome;
 static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
 static BOOL AltScr;
@@ -259,6 +260,7 @@ void ResetTerminal() /*reset variables but don't update screen */
   MouseReportMode = IdMouseTrackNone;
   MouseReportExtMode = IdMouseTrackExtNone;
   DecLocatorFlag = 0;
+  ClearThenHome = FALSE;
 
   ChangeTerminalID();
 
@@ -1538,6 +1540,14 @@ void CSScreenErase()
 		//	Erase screen (scroll out)
 		BuffClearScreen();
 		UpdateWindow(HVTWin);
+		if (ClearThenHome && !isCursorOnStatusLine) {
+			if (RelativeOrgMode) {
+				MoveCursor(0, 0);
+			}
+			else {
+				MoveCursor(CursorLeftM, CursorTop);
+			}
+		}
 		break;
 	}
 }
@@ -2715,6 +2725,9 @@ void CSSetLRScrollRegion()	// DECSLRM
 	      AcceptWheelToCursor = TRUE;
 	    }
 	    break;
+	  case 8200: // ClearThenHome
+	    ClearThenHome = TRUE;
+	    break;
 	  case 14001: // NetTerm mouse mode
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackNetTerm;
@@ -2855,6 +2868,9 @@ void CSSetLRScrollRegion()	// DECSLRM
 	    break;
 	  case 7786: // Wheel to Cursor translation
 	    AcceptWheelToCursor = FALSE;
+	    break;
+	  case 8200: // ClearThenHome
+	    ClearThenHome = FALSE;
 	    break;
 	  case 14001: // NetTerm mouse mode
 	    MouseReportMode = IdMouseTrackNone;
@@ -3231,6 +3247,12 @@ void CSSetLRScrollRegion()	// DECSLRM
 	    if (!ts.TranslateWheelToCursor)
 	      resp = 4;
 	    else if (AcceptWheelToCursor)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 8200:	// ClearThenHome
+	    if (ClearThenHome)
 	      resp = 1;
 	    else
 	      resp = 2;
