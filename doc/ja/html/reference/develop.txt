@@ -228,23 +228,23 @@
   リリースの方法について以下に示します。
 
   1. 依存ライブラリ、ツール、インポート元の最新版をチェックする。
-    Visual Studio
-      http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
-    Inno Setup
-      http://www.jrsoftware.org/isdl.php
-    Oniguruma
-      http://www.geocities.jp/kosako3/oniguruma/
-    OpenSSL
-      http://www.openssl.org/
-    zlib
-      http://www.zlib.net/
-    PuTTY
-      http://www.chiark.greenend.org.uk/~sgtatham/putty/
-    CygTerm
-      http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
-    LogMeTT
-      http://logmett.com/freeware/LogMeTT.php
-      http://logmett.com/freeware/TTLEdit.php
+     Visual Studio
+       http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
+     Inno Setup
+       http://www.jrsoftware.org/isdl.php
+     Oniguruma
+       http://www.geocities.jp/kosako3/oniguruma/
+     OpenSSL
+       http://www.openssl.org/
+     zlib
+       http://www.zlib.net/
+     PuTTY
+       http://www.chiark.greenend.org.uk/~sgtatham/putty/
+     CygTerm
+       http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
+     LogMeTT
+       http://logmett.com/freeware/LogMeTT.php
+       http://logmett.com/freeware/TTLEdit.php
 
   2. ドキュメントを確認する
      - ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。
@@ -263,38 +263,41 @@
      - TTProxy.rc // 変更時のみ
      - ttxkanjimenu.rc // 変更時のみ
      - teraterm.iss
+       AppVer を上げる、snapshot を コメントアウト、バッチファイルの呼び出しを修正
      - html/about/hisotry.html
 
      CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。
      パッチがコミットされると即リリース扱いになり、リリース日はその日付となる。
      これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
 
-  4. SVN のタグを作成する。
-     タグ名は「teraterm-バージョン」。たとえば、v4.62ならば"teraterm-4_62"。
+  4. 動作確認をする
+     - インストーラを作成する
+       ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
+     - インストールおよび実行をテストする
 
-  5. リリース用のタグでチェックアウトし直す。
+  5. SVN のタグを作成する。
+     タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。
+     svn copy -m "Release 4.82" svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/tags/teraterm-4_82
 
-  6. 動作確認をする
-       プログラムをコンパイルし直す(trunk\installer\makearchive.bat を使用する)
-       インストーラを作成する
-         ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
-       インストールおよび実行をテストする
+  6. リリース用のタグでチェックアウトし直す。
 
-  7. SourceForge.jp を更新する
+  7. インストーラを作成する
+     ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
+
+  8. SourceForge.jp を更新する
      - [ダウンロード]-[管理]-[新規作成]
          変更履歴を入力してリリースを作成する
      - [ニュース一覧]-[新規登録]
          ニュース記事を作成する
 
-  8. プロジェクトページを更新する
-
   9. メーリングリストにアナウンスする
 
-  10. フォーラムに告知する
-       - Announcements http://logmett.com/forum/viewforum.php?f=5
-         Announcements に新規投稿する。種類は Announcement
-         一つ前の Announcement の種類を Normal に変更する
-         Announcement は三個残すことになっているので、三つ前の Announcement を削除する
-
+  10. プロジェクトページを更新する
 
   11. スナップショットを削除する
+
+  12. フォーラムに告知する
+      - Announcements http://logmett.com/forum/viewforum.php?f=5
+        Announcements に新規投稿する。種類は Announcement
+        一つ前の Announcement の種類を Normal に変更する
+        Announcement は三個残すことになっているので、三つ前の Announcement を削除する

@@ -223,23 +223,23 @@ Example: adding a TTSSH menu under File menu
   To release Tera Term installation package is shown in the following step:
 
   1. Check latest libraries and tools.
-    Visual Studio
-      http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
-    Inno Setup
-      http://www.jrsoftware.org/isdl.php
-    Oniguruma
-      http://www.geocities.jp/kosako3/oniguruma/
-    OpenSSL
-      http://www.openssl.org/
-    zlib
-      http://www.zlib.net/
-    PuTTY
-      http://www.chiark.greenend.org.uk/~sgtatham/putty/
-    CygTerm
-      http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
-    LogMeTT
-      http://logmett.com/freeware/LogMeTT.php
-      http://logmett.com/freeware/TTLEdit.php
+     Visual Studio
+       http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
+     Inno Setup
+       http://www.jrsoftware.org/isdl.php
+     Oniguruma
+       http://www.geocities.jp/kosako3/oniguruma/
+     OpenSSL
+       http://www.openssl.org/
+     zlib
+       http://www.zlib.net/
+     PuTTY
+       http://www.chiark.greenend.org.uk/~sgtatham/putty/
+     CygTerm
+       http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
+     LogMeTT
+       http://logmett.com/freeware/LogMeTT.php
+       http://logmett.com/freeware/TTLEdit.php
 
   2. Check the document files.
 
@@ -252,35 +252,39 @@ Example: adding a TTSSH menu under File menu
      - TTProxy.rc // only modifying
      - ttxkanjimenu.rc // only modifying
      - teraterm.iss
+       version up AppVer, comment out snapshot, change called batch files
      - html/about/hisotry.html
 
-       Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.
+     Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.
 
-       Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
+     Note: By way of exception, CygTerm+ always upgrades not regarding Tera Term release process when the patch is committed. The release date is the day committed by a developer. The suffix of CygTerm+ version is patchlevel, and then a user can get gcc compiler for free.
 
-  4. Create SVN tag.
-       The naming rule is `teraterm-version'(ex. teraterm-4_62).
+  4. Evaluate executable program file.
+     - Make installer package
+       Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
+     - Test Tera Term installation and evaluate it.
 
-  5. Re-checkout from svn tag.
+  5. Create SVN tag.
+     The naming rule is `teraterm-version'(ex. teraterm-4_82).
+     svn copy -m "Release 4.82" svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/tags/teraterm-4_82
 
-  6. Evaluate executable program file.
-       - Rebuild Tera Term program(using trunk\installer\makearchive.bat)
-       - Make installer package
-         Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
-       - Test Tera Term installation and evaluate it.
+  6. Re-checkout from svn tag.
 
-  7. Update SourceForge.jp project site.
-       - Add new release.
-       - Submit news.
+  7. Make installer package
+     Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
 
-  8. Update SourceForge.jp project home page.
+  8. Update SourceForge.jp project site.
+     - Add new release.
+     - Submit news.
 
   9. Announce release to mailing list(in Japan).
 
-  10. Announce release to forum(in Canada).
-       - Announcements http://logmett.com/forum/viewforum.php?f=5
-         Create new topic in `Announcements' entry.
-         Change the type of previous Announcement from Announcement to Normal.
-         Delete third previous Announcement.
+  10. Update SourceForge.jp project home page.
 
   11. Delete snapshots.
+
+  12. Announce release to forum(in Canada).
+      - Announcements http://logmett.com/forum/viewforum.php?f=5
+        Create new topic in `Announcements' entry.
+        Change the type of previous Announcement from Announcement to Normal.
+        Delete third previous Announcement.
