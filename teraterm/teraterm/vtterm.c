@@ -3888,6 +3888,153 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 	}
 }
 
+int toHexStr(unsigned char *buff, int buffsize, unsigned char *str)
+{
+	int len, i, copylen = 0;
+	unsigned char c;
+
+	len = strlen(str);
+
+	if (buffsize < len*2) {
+		return -1;
+	}
+
+	for (i=0; i<len; i++) {
+		c = str[i] >> 4;
+		if (c <= 9) {
+			c += '0';
+		}
+		else {
+			c += 'a' - 10;
+		}
+		buff[copylen++] = c;
+
+		c = str[i] & 0xf;
+		if (c <= 9) {
+			c += '0';
+		}
+		else {
+			c += 'a' - 10;
+		}
+		buff[copylen++] = c;
+	}
+
+	return copylen;
+}
+
+int TermcapString(unsigned char *buff, int buffsize, unsigned char *capname)
+{
+	int len = 0, l;
+	unsigned char c;
+	unsigned char *capval = NULL;
+
+	if (strcmp(capname, "Co") == 0 || strcmp(capname, "colors") == 0) {
+		if ((ts.ColorFlag & CF_ANSICOLOR) == 0) {
+			return 0;
+		}
+
+		if (ts.ColorFlag & CF_XTERM256) {
+			capval = "256";
+		}
+		else if (ts.ColorFlag & CF_FULLCOLOR) {
+			capval = "16";
+		}
+		else {
+			capval = "8";
+		}
+	}
+
+	if (capval) {
+		if ((len = toHexStr(buff, buffsize, capname)) < 0) {
+			return 0;
+		}
+
+		if (buffsize <= len) {
+			return 0;
+		}
+		buff[len++] = '=';
+
+		if ((l = toHexStr(&buff[len], buffsize-len, capval)) < 0) {
+			return 0;
+		}
+		len += l;
+	}
+
+	return len;
+}
+
+void RequestTermcapString(unsigned char *StrBuff, int StrLen)	// xterm experimental
+{
+	unsigned char RepStr[256];
+	unsigned char CapName[16];
+	int i, len, replen, caplen = 0;
+
+	RepStr[0] = '1';
+	RepStr[1] = '+';
+	RepStr[2] = 'r';
+	replen = 3;
+
+	for (i=0; i<StrLen; i++) {
+		if (StrBuff[i] == ';') {
+			if (replen >= sizeof(RepStr)) {
+				caplen = 0;
+				break;
+			}
+			if (replen > 3) {
+				RepStr[replen++] = ';';
+			}
+			if (caplen > 0 && caplen < sizeof(CapName)) {
+				CapName[caplen] = 0;
+				len = TermcapString(&RepStr[replen], sizeof(RepStr)-replen, CapName);
+				replen += len;
+				caplen = 0;
+				if (len == 0) {
+					break;
+				}
+			}
+			else {
+				caplen = 0;
+				break;
+			}
+		}
+		else if (i+1 < StrLen && isxdigit(StrBuff[i]) && isxdigit(StrBuff[i+1])
+		  && caplen < sizeof(CapName)-1) {
+			if (isdigit(StrBuff[i])) {
+				CapName[caplen] = (StrBuff[i] - '0') * 16;
+			}
+			else {
+				CapName[caplen] = ((StrBuff[i] | 0x20) - 'a' + 10) * 16;
+			}
+			i++;
+			if (isdigit(StrBuff[i])) {
+				CapName[caplen] += (StrBuff[i] - '0');
+			}
+			else {
+				CapName[caplen] += ((StrBuff[i] | 0x20) - 'a' + 10);
+			}
+			caplen++;
+		}
+		else {
+			caplen = 0;
+			break;
+		}
+	}
+
+	if (caplen && caplen < sizeof(CapName) && replen < sizeof(RepStr)) {
+		if (replen > 3) {
+			RepStr[replen++] = ';';
+		}
+		CapName[caplen] = 0;
+		len = TermcapString(&RepStr[replen], sizeof(RepStr)-replen, CapName);
+		replen += len;
+	}
+
+	if (replen == 3) {
+		RepStr[0] = '0';
+	}
+	SendDCSstr(RepStr, replen);
+}
+
 void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
 	switch (ICount) {
 	case 0:
@@ -3912,6 +4059,11 @@ void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
 		case '$':
 			if (Cmd == 'q')  { // DECRQSS
 				RequestStatusString(StrBuff, len);
+			}
+			break;
+		case '+':
+			if (Cmd == 'q') { // Request termcap/terminfo string (xterm)
+				RequestTermcapString(StrBuff, len);
 			}
 			break;
 		default:
