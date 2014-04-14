@@ -2500,7 +2500,7 @@ void CSSetLRScrollRegion()	// DECSLRM
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
 	if (Param[1] < 1) {
-	  SendCSIstr(">32;100;2c", 0); /* VT382 */
+	  SendCSIstr(">32;278;2c", 0); /* VT382(>32) + xterm rev 278 */
 	}
 	break;
       case 'J':	// IO-8256 terminal
