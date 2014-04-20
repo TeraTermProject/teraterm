@@ -177,8 +177,28 @@ typedef struct _BGBLENDFUNCTION
 BOOL (FAR WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
 BOOL (FAR WINAPI *BGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 
+static HBITMAP GetBitmapHandle(char *File);
+
 
 //便利関数☆
+
+// LoadImage() しか使えない環境かどうかを判別する。
+// LoadImage()では .bmp 以外の画像ファイルが扱えないので要注意。
+// (2014.4.20 yutaka)
+static BOOL IsLoadImageOnlyEnabled(void)
+{
+	OSVERSIONINFO osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	// Vista 未満の場合には、今まで通りの読み込みをするようにした
+	// cf. SVN#4571(2011.8.4)
+	if (osvi.dwMajorVersion < 6) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 
 void dprintf(char *format, ...)
 {
@@ -612,9 +632,16 @@ void BGPreloadPicture(BGSrc *src)
 
   GlobalFree(fileBuf);
 
-  //画像をビットマップとして読み込み
+  if (IsLoadImageOnlyEnabled()) {
+    //画像をビットマップとして読み込み
+    hbm = LoadImage(0,src->file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 
-  hbm = LoadImage(0,src->file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+  } else {
+	  // Susie pluginで読み込めないJPEGファイルが存在した場合、
+	  // OLE を利用して読む。
+    hbm = GetBitmapHandle(src->file);
+
+  }
 
   if(hbm)
   {
@@ -835,10 +862,8 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
 
 void BGPreloadWallpaper(BGSrc *src)
 {
-//#define DEBUG_XP
 	HBITMAP       hbm;
 	WallpaperInfo wi;
-	OSVERSIONINFO osvi;
 	int s_width, s_height;
 
 	BGGetWallpaperInfo(&wi);
@@ -847,12 +872,7 @@ void BGPreloadWallpaper(BGSrc *src)
 	strcpy(wi.filename, "c:\\usr\\ttssh2\\1011_01.jpg");
 #endif
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-#ifdef DEBUG_XP
-	osvi.dwMajorVersion = 7;
-#endif
-	if (osvi.dwMajorVersion < 6) {
+	if (IsLoadImageOnlyEnabled()) {
 		//壁紙を読み込み
 		//LR_CREATEDIBSECTION を指定するのがコツ
 		if (wi.pattern == BG_STRETCH) {
@@ -965,31 +985,39 @@ void BGPreloadSrc(BGSrc *src)
 
 void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BOOL bAntiAlias)
 {
-  if(!hdcDest || !src)
-    return;
+	if(!hdcDest || !src)
+		return;
 
-  if(bAntiAlias)
-  {
-    if(src->width != width || src->height != height)
-    {
-      HBITMAP hbm;
+	if(bAntiAlias)
+	{
+		if(src->width != width || src->height != height)
+		{
+			HBITMAP hbm;
 
-      hbm = LoadImage(0,src->file,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
+			if (IsLoadImageOnlyEnabled()) {
+				hbm = LoadImage(0,src->file,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
+			} else {
+				HBITMAP newhbm;
+				hbm = GetBitmapHandle(src->file);
+				newhbm = CreateStretched32BppBitmapBilinear(hbm, width, height);
+				DeleteObject(hbm);
+				hbm = newhbm;
+			}
 
-      if(!hbm)
-        return;
-      
-      DeleteBitmapDC(&(src->hdc));
-      src->hdc = CreateBitmapDC(hbm);
-      src->width  = width;
-      src->height = height;
-    }
-  
-    BitBlt(hdcDest,x,y,width,height,src->hdc,0,0,SRCCOPY);
-  }else{
-    SetStretchBltMode(src->hdc,COLORONCOLOR);
-    StretchBlt(hdcDest,x,y,width,height,src->hdc,0,0,src->width,src->height,SRCCOPY);
-  }
+			if(!hbm)
+				return;
+
+			DeleteBitmapDC(&(src->hdc));
+			src->hdc = CreateBitmapDC(hbm);
+			src->width  = width;
+			src->height = height;
+		}
+
+		BitBlt(hdcDest,x,y,width,height,src->hdc,0,0,SRCCOPY);
+	}else{
+		SetStretchBltMode(src->hdc,COLORONCOLOR);
+		StretchBlt(hdcDest,x,y,width,height,src->hdc,0,0,src->width,src->height,SRCCOPY);
+	}
 }
 
 void BGLoadPicture(HDC hdcDest,BGSrc *src)
