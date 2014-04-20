@@ -3925,7 +3925,6 @@ int toHexStr(unsigned char *buff, int buffsize, unsigned char *str)
 int TermcapString(unsigned char *buff, int buffsize, unsigned char *capname)
 {
 	int len = 0, l;
-	unsigned char c;
 	unsigned char *capval = NULL;
 
 	if (strcmp(capname, "Co") == 0 || strcmp(capname, "colors") == 0) {
