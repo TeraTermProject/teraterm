@@ -771,7 +771,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_ENABLE_URL_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ENABLE_ANSI_COLOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_URL_UNDERLINE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_BGIMG_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_BGIMG_CHECK, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_BGIMG_EDIT, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_BGIMG_BUTTON, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_RESTART, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
@@ -786,9 +786,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_ETERM_LOOKFEEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_ETERM", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ETERM_LOOKFEEL, ts.UIMsg);
-	GetDlgItemText(IDC_BGIMG_LABEL, uimsg, sizeof(uimsg));
+	GetDlgItemText(IDC_BGIMG_CHECK, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_BGIMG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_BGIMG_LABEL, ts.UIMsg);
+	SetDlgItemText(IDC_BGIMG_CHECK, ts.UIMsg);
 	GetDlgItemText(IDC_MOUSE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_MOUSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_MOUSE, ts.UIMsg);
@@ -849,11 +849,20 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	// Eterm look-feelの背景画像指定。
 	SetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath);
 	if (ts.EtermLookfeel.BGEnable) {
-		GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(TRUE);
-		GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
-		GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(TRUE);
+
+		btn = (CButton *)GetDlgItem(IDC_BGIMG_CHECK);
+		if (strcmp(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE) == 0) {
+			btn->SetCheck(BST_CHECKED);
+			GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
+			GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+		} else {
+			btn->SetCheck(BST_UNCHECKED);
+			GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
+			GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+		}
 	} else {
-		GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
 	}
@@ -937,13 +946,38 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// チェックされたら Enable/Disable をトグルする。
 			btn = (CButton *)GetDlgItem(IDC_ETERM_LOOKFEEL);
 			if (btn->GetCheck()) {
-				GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(TRUE);
-				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
-				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+				GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(TRUE);
+				btn = (CButton *)GetDlgItem(IDC_BGIMG_CHECK);
+				if (btn->GetCheck()) {
+					GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
+					GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+				} else {
+					GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
+					GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+				}
 			} else {
-				GetDlgItem(IDC_BGIMG_LABEL)->EnableWindow(FALSE);
+				GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(FALSE);
 				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+
+				// 無効化されたら、BGThemeFile を元に戻す。
+				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
+				// 背景画像も無効化する。
+				SetDlgItemText(IDC_BGIMG_EDIT, "");
+			}
+			return TRUE;
+
+		case IDC_BGIMG_CHECK:
+			btn = (CButton *)GetDlgItem(IDC_BGIMG_CHECK);
+			if (btn->GetCheck()) {
+				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
+				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+
+				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
+			} else {
+				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
+				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+
 				// 無効化されたら、BGThemeFile を元に戻す。
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// 背景画像も無効化する。
@@ -959,7 +993,6 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				if (selDlg.DoModal() == IDOK) {
 					// 背景画像指定が意図的に行われたら、BGThemeFile を固定化する。
 					SetDlgItemText(IDC_BGIMG_EDIT, selDlg.GetPathName());
-					strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
 				}
 			}
 			return TRUE;

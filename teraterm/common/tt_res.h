@@ -137,6 +137,7 @@
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
 #define IDC_LOG_ROTATE                  2512
+#define IDC_BGIMG_CHECK                 2512
 #define IDC_MOUSEWHEEL_SCROLL_LINE      2513
 #define IDC_WINDOW_CTRL                 2513
 #define IDC_TRANSPROGRESS               2514
