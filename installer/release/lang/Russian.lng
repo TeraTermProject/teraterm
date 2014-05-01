@@ -516,6 +516,7 @@ DLG_ABOUT_COMP_INFO2=уровень %d
 DLG_ABOUT_COMP_NONE=нет
 DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
 DLG_ABOUT_AUTH_INFO=Пользователь '%s', использовано %s
+DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth
 DLG_AUTH_TITLE=Аутентификация SSH

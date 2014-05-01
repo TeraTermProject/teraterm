@@ -517,6 +517,7 @@ DLG_ABOUT_COMP_INFO2=等级 %d
 DLG_ABOUT_COMP_NONE=无
 DLG_ABOUT_COMP_UPDOWN=上传 %s; 下载 %s
 DLG_ABOUT_AUTH_INFO=用户 '%s'，%s认证
+DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth
 DLG_AUTH_TITLE=SSH认证

@@ -517,6 +517,7 @@ DLG_ABOUT_COMP_INFO2=niveau %d
 DLG_ABOUT_COMP_NONE=aucun
 DLG_ABOUT_COMP_UPDOWN=Débit montant %s; Dédit descendant %s
 DLG_ABOUT_AUTH_INFO=Utilisateur '%s', utilisant %s
+DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth
 DLG_AUTH_TITLE=SSH Authentification

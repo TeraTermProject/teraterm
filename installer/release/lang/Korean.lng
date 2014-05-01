@@ -517,6 +517,7 @@ DLG_ABOUT_COMP_INFO2=수준 %d
 DLG_ABOUT_COMP_NONE=없슴
 DLG_ABOUT_COMP_UPDOWN=올림 %s; 내림 %s
 DLG_ABOUT_AUTH_INFO=사용자 '%s', %s 사용 중
+DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
 
 ; dlg auth
 DLG_AUTH_TITLE=SSH 인증

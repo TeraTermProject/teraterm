@@ -2346,6 +2346,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	char buf[1024];
 	int a, b, c, d;
 	char uimsg[MAX_UIMSG];
+	char *fp = NULL;
 
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_ABOUT_TITLE", pvar, uimsg);
@@ -2449,8 +2450,32 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 				UTIL_get_lang_msg("DLG_ABOUT_COMP", pvar, "Compression:");
 				append_about_text(dlg, pvar->ts->UIMsg, buf);
 			}
+
+			// ホスト公開鍵のfingerprintを表示する。
+			// Random artの表示が崩れてしまうのが課題。
+			// (2014.5.1 yutaka)
+			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX);
+			UTIL_get_lang_msg("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
+			append_about_text(dlg, pvar->ts->UIMsg, fp);
+			free(fp);
+
+			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART);
+			append_about_text(dlg, "", fp);
+			free(fp);
 		}
 	}
+}
+
+static WNDPROC g_defAboutDlgEditWndProc;
+
+static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
+{
+	// Edit control上で CTRL+A を押下すると、テキストを全選択する。
+	if (msg == WM_KEYDOWN && wp == 'A' && GetKeyState(VK_CONTROL) < 0) {
+		PostMessage(hWnd, EM_SETSEL, 0, -1);
+		return 0;
+    }
+    return CallWindowProc(g_defAboutDlgEditWndProc, hWnd, msg, wp, lp);
 }
 
 static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
@@ -2495,7 +2520,12 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 		init_about_dlg((PTInstVar) lParam, dlg);
 		SetFocus(GetDlgItem(dlg, IDOK));
+
+		// Edit controlをサブクラス化する。
+		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtr(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
+
 		return FALSE;
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:

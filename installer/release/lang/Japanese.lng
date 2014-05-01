@@ -515,6 +515,7 @@ DLG_ABOUT_COMP_INFO2=レベル %d
 DLG_ABOUT_COMP_NONE=なし
 DLG_ABOUT_COMP_UPDOWN=アップロード %s; ダウンロード %s
 DLG_ABOUT_AUTH_INFO=ユーザー '%s', %s認証
+DLG_ABOUT_FINGERPRINT=ホスト鍵の指紋:
 
 ; dlg auth
 DLG_AUTH_TITLE=SSH認証
