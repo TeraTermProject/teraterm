@@ -2450,19 +2450,19 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 				UTIL_get_lang_msg("DLG_ABOUT_COMP", pvar, "Compression:");
 				append_about_text(dlg, pvar->ts->UIMsg, buf);
 			}
-
-			// ホスト公開鍵のfingerprintを表示する。
-			// Random artの表示が崩れてしまうのが課題。
-			// (2014.5.1 yutaka)
-			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX);
-			UTIL_get_lang_msg("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
-			append_about_text(dlg, pvar->ts->UIMsg, fp);
-			free(fp);
-
-			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART);
-			append_about_text(dlg, "", fp);
-			free(fp);
 		}
+
+		// ホスト公開鍵のfingerprintを表示する。
+		// Random artの表示が崩れてしまうのが課題。
+		// (2014.5.1 yutaka)
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX);
+		UTIL_get_lang_msg("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
+		append_about_text(dlg, pvar->ts->UIMsg, fp);
+		free(fp);
+
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART);
+		append_about_text(dlg, "", fp);
+		free(fp);
 	}
 }
 
