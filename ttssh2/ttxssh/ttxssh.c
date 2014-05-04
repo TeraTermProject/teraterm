@@ -2467,15 +2467,51 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	}
 }
 
-static WNDPROC g_defAboutDlgEditWndProc;
+// WM_MOUSEWHEEL は winuser.h ヘッダで宣言されていますが、#define _WIN32_WINNT 0x0400 が宣言されていないと認識されません。
+#define WM_MOUSEWHEEL                   0x020A
+#define WHEEL_DELTA                     120
+#define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
+#define GET_KEYSTATE_WPARAM(wParam)     (LOWORD(wParam))
+
+static WNDPROC g_defAboutDlgEditWndProc;  // Edit Controlのサブクラス化用
+static int g_deltaSumAboutDlg = 0;        // マウスホイールのDelta累積用
 
 static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
 {
-	// Edit control上で CTRL+A を押下すると、テキストを全選択する。
-	if (msg == WM_KEYDOWN && wp == 'A' && GetKeyState(VK_CONTROL) < 0) {
-		PostMessage(hWnd, EM_SETSEL, 0, -1);
-		return 0;
-    }
+	WORD keys;
+	short delta;
+	BOOL page;
+
+	switch (msg) {
+		case WM_KEYDOWN:
+			// Edit control上で CTRL+A を押下すると、テキストを全選択する。
+			if (wp == 'A' && GetKeyState(VK_CONTROL) < 0) {
+				PostMessage(hWnd, EM_SETSEL, 0, -1);
+				return 0;
+			}
+			break;
+
+		case WM_MOUSEWHEEL:
+			// CTRLorSHIFT + マウスホイールの場合、横スクロールさせる。
+			keys = GET_KEYSTATE_WPARAM(wp);
+			delta = GET_WHEEL_DELTA_WPARAM(wp);
+			page = keys & (MK_CONTROL | MK_SHIFT);
+
+			if (page == 0)
+				break;
+
+			g_deltaSumAboutDlg += delta;
+
+			if (g_deltaSumAboutDlg >= WHEEL_DELTA) {
+				g_deltaSumAboutDlg -= WHEEL_DELTA;
+				SendMessage(hWnd, WM_HSCROLL, SB_PAGELEFT , 0);
+			} else if (g_deltaSumAboutDlg <= -WHEEL_DELTA) {
+				g_deltaSumAboutDlg += WHEEL_DELTA;
+				SendMessage(hWnd, WM_HSCROLL, SB_PAGERIGHT, 0);
+			}
+
+			break;
+	}
     return CallWindowProc(g_defAboutDlgEditWndProc, hWnd, msg, wp, lp);
 }
 
@@ -2530,6 +2566,7 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		SetFocus(GetDlgItem(dlg, IDOK));
 
 		// Edit controlをサブクラス化する。
+		g_deltaSumAboutDlg = 0;
 		g_defAboutDlgEditWndProc = (WNDPROC)SetWindowLongPtr(GetDlgItem(dlg, IDC_ABOUTTEXT), GWLP_WNDPROC, (LONG_PTR)AboutDlgEditWindowProc);
 
 		return FALSE;
