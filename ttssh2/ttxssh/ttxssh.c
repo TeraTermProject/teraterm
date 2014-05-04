@@ -96,6 +96,7 @@ static HICON SecureSmallIcon = NULL;
 
 static HFONT DlgHostFont;
 static HFONT DlgAboutFont;
+static HFONT DlgAboutTextFont;
 static HFONT DlgSetupFont;
 static HFONT DlgKeygenFont;
 
@@ -2497,11 +2498,18 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_WEBSITES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CRYPTOGRAPHY, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CREDIT, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgAboutFont = NULL;
+		}
+
+		// Edit controlは等幅フォントで表示したいので、別設定情報からフォントをセットする。
+		// (2014.5.5. yutaka)
+		if (UTIL_get_lang_font("DLG_ABOUT_FONT", dlg, &logfont, &DlgAboutTextFont, pvar)) {
+			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+		} else {
+			DlgAboutTextFont = NULL;
 		}
 
 		// アイコンを動的にセット
@@ -2533,12 +2541,18 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			if (DlgAboutFont != NULL) {
 				DeleteObject(DlgAboutFont);
 			}
+			if (DlgAboutTextFont != NULL) {
+				DeleteObject(DlgAboutTextFont);
+			}
 			return TRUE;
 		case IDCANCEL:			/* there isn't a cancel button, but other Windows
 								   UI things can send this message */
 			EndDialog(dlg, 0);
 			if (DlgAboutFont != NULL) {
 				DeleteObject(DlgAboutFont);
+			}
+			if (DlgAboutTextFont != NULL) {
+				DeleteObject(DlgAboutTextFont);
 			}
 			return TRUE;
 		}

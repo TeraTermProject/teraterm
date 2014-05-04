@@ -486,6 +486,7 @@ MSG_INI_WRITE_ERROR=无法写入 ini 文件
 ; font
 DLG_SYSTEM_FONT=微软雅黑,10,0
 DLG_TAHOMA_FONT=微软雅黑,8,0
+DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
 MENU_ABOUT=关于 &TTSSH...

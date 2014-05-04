@@ -486,6 +486,7 @@ MSG_INI_WRITE_ERROR=ini 파일을 저장할 수 없습니다.
 ; font
 DLG_SYSTEM_FONT=굴림,10,128
 DLG_TAHOMA_FONT=돋움,9,128
+DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
 MENU_ABOUT=TTSSH에 대하여...(&T)
