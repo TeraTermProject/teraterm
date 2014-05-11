@@ -1031,11 +1031,13 @@ private:
             type.addString("TELNET");
             type.addString("SOCKS4");
             type.addString("SOCKS5");
-            type.addString("SSL");
-            type.addString("HTTP+SSL");
-            type.addString("TELNET+SSL");
-            type.addString("SOCKS4+SSL");
-            type.addString("SOCKS5+SSL");
+            if (SSLSocket::isEnabled()) {
+                type.addString("SSL");
+                type.addString("HTTP+SSL");
+                type.addString("TELNET+SSL");
+                type.addString("SOCKS4+SSL");
+                type.addString("SOCKS5+SSL");
+            }
             type.setCurSel(proxy.type);
 
             if (proxy.type != ProxyInfo::TYPE_NONE && proxy.type != ProxyInfo::TYPE_SSL) {
