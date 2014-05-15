@@ -174,7 +174,12 @@ private:
             }
             *dst = '\0';
             const PROXY_TYPE_TABLE* table = proxy_type_table();
+            bool ssl_enabled = SSLSocket::isEnabled();
             while (table->name != NULL) {
+                if (!ssl_enabled && strstr(table->name, "ssl") != NULL) {
+                    table++;
+                    continue;
+                }
                 if (strcmp(buffer, table->name) == 0)
                     return table->type;
                 table++;
