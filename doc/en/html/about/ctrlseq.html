@@ -860,6 +860,15 @@ Response: DCS <i>Ps</i> $ r <i>Pt</i> ST
    = 1    Invalid request. Does not send <i>Pt</i>.
 </pre>
 </td></tr>
+<tr><td>DCS + q <i>Pt</i> ST </td> <td>-</td> <td>Request Termcap/Terminfo string.
+<pre>
+<i>Pt</i>: capability name encoded in hexadecimal (2 digits per character).
+
+Response: DCS <i>Ps</i> + r <i>Pt</i> ST
+<i>Ps</i> = 0   Invalid request. Does not send <i>Pt</i>.
+   = 1   Valid request.
+</pre>
+</td></tr>
 </table>
 
 <h2><a name="OSC">OSC Sequence</a></h2>
