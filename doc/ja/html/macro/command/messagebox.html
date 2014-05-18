@@ -21,13 +21,17 @@
 messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 </pre>
 
-<h2>パラメータ</h2>
+<h2>パラメータ</h2>
+
 <dl>
-	<dt class="macro">文字列 &lt;message&gt;</dt>	<dd>ダイアログボックスに表示されるメッセージ。</dd>
+	<dt class="macro">文字列 &lt;message&gt;</dt>
+	<dd>ダイアログボックスに表示されるメッセージ。</dd>
 	
-	<dt class="macro">文字列 &lt;title&gt;</dt>	<dd>ダイアログボックスのタイトル。</dd>
+	<dt class="macro">文字列 &lt;title&gt;</dt>
+	<dd>ダイアログボックスのタイトル。</dd>
 	
-	<dt class="macro">整数値 &lt;special&gt; (オプション デフォルト=0)</dt>	<dd>0 でない場合は、&lt;message&gt; に含まれる以下の文字列は特殊文字として扱われます。<br>
+	<dt class="macro">整数値 &lt;special&gt; (オプション デフォルト=0)</dt>
+	<dd>0 でない場合は、&lt;message&gt; に含まれる以下の文字列は特殊文字として扱われます。<br>
 	    
 	    <table border="2">
 	     <tr>
@@ -51,7 +55,8 @@ messagebox &lt;message&gt; &lt;title&gt; [&lt;special&gt;]
 	    このオプションの使用は推奨されません。strspecial マクロコマンドを使用して文字列を変換することで同等の結果を得られます。
 	</dd>
 
-</dl>
+</dl>
+
 <h2>例</h2>
 
 <pre class="macro-example">
@@ -62,6 +67,14 @@ message="1行目\n2行目\n3行目\n4行目\n5行目\n"
 strspecial message
 messagebox message title
 </pre>
+
+
+<pre class="macro-example">
+variable = 99
+sprintf2 msg "%d" variable
+messagebox msg "variable ="
+</pre>
+
 
 <h2>参照</h2>
 <ul>
