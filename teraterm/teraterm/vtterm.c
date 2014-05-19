@@ -770,47 +770,43 @@ void PutDebugChar(BYTE b)
 	int i = 0;
 
 	if (DebugFlag!=DEBUG_FLAG_NONE) {
-  InsertMode = FALSE;
-  AutoWrapMode = TRUE;
+		InsertMode = FALSE;
+		AutoWrapMode = TRUE;
 
-	  if (DebugFlag==DEBUG_FLAG_HEXD) {
-		_snprintf(buff,3,"%02X",(unsigned int) b);
+		if (DebugFlag==DEBUG_FLAG_HEXD) {
+			_snprintf(buff, 3, "%02X", (unsigned int) b);
 
-		for (;i<2;i++)
-			PutChar(buff[i]);
-		PutChar(' ');
-	  }
-	  else if (DebugFlag==DEBUG_FLAG_NORM) {
+			for ( ; i<2; i++)
+				PutChar(buff[i]);
+			PutChar(' ');
+		}
+		else if (DebugFlag==DEBUG_FLAG_NORM) {
 
-  if ((b & 0x80) == 0x80)
-  {
-    UpdateStr();
-    CharAttr.Attr = AttrReverse;
-    b = b & 0x7f;
-  }
+			if ((b & 0x80) == 0x80) {
+				UpdateStr();
+				CharAttr.Attr = AttrReverse;
+				b = b & 0x7f;
+			}
 
-  if (b<=US)
-  {
-    PutChar('^');
-    PutChar((char)(b+0x40));
-  }
-  else if (b==DEL)
-  {
-    PutChar('<');
-    PutChar('D');
-    PutChar('E');
-    PutChar('L');
-    PutChar('>');
-  }
-  else
-    PutChar(b);
-	  }
+			if (b<=US) {
+				PutChar('^');
+				PutChar((char)(b+0x40));
+			}
+			else if (b==DEL) {
+				PutChar('<');
+				PutChar('D');
+				PutChar('E');
+				PutChar('L');
+				PutChar('>');
+			}
+			else
+				PutChar(b);
+		}
 
-  if (CharAttr.Attr != AttrDefault)
-  {
-    UpdateStr();
-    CharAttr.Attr = AttrDefault;
-  }
+		if (CharAttr.Attr != AttrDefault) {
+			UpdateStr();
+			CharAttr.Attr = AttrDefault;
+		}
 	}
 }
 
