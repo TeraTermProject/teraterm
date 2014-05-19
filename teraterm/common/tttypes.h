@@ -275,6 +275,13 @@ typedef TCharAttr *PCharAttr;
 #define CSF_CBREAD      2
 #define CSF_CBRW        (CSF_CBREAD | CSF_CBWRITE)
 
+// Debug Flags (used in ts.DebugModes)
+#define DBGF_NONE	0
+#define DBGF_NORM	1
+#define DBGF_HEXD	2
+#define DBGF_NOUT	4
+#define DBGF_ALL	(DBGF_NORM | DBGF_HEXD | DBGF_NOUT)
+
 // Title Reporting Type
 #define IdTitleReportIgnore 0
 #define IdTitleReportAccept 8
@@ -574,6 +581,7 @@ struct tttset {
 	WORD JoinSplitURL;
 	char JoinSplitURLIgnoreEOLChar;
 	char MulticastName[MAX_PATH];
+	WORD DebugModes;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1036,6 +1044,9 @@ typedef TMap far *PMap;
 /*
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
+ *
+ * - At version 4.83, ttset_memfilemap was replaced with ttset_memfilemap_24.
+ *   added tttset.DebugModes
  *
  * - At version 4.82, ttset_memfilemap was replaced with ttset_memfilemap_23.
  *   added tttset.MulticastName

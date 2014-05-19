@@ -1534,6 +1534,28 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	GetPrivateProfileString(Section, "JoinSplitURLIgnoreEOLChar", "\\", Temp, sizeof(Temp), FName);
 	ts->JoinSplitURLIgnoreEOLChar = Temp[0];
+
+	// Debug modes.
+	GetPrivateProfileString(Section, "DebugModes", "all", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "all") == 0)
+		ts->DebugModes = DBGF_ALL;
+	else if (_stricmp(Temp, "off") == 0 || _stricmp(Temp, "none") == 0) {
+		ts->DebugModes = DBGF_NONE;
+		ts->Debug = FALSE;
+	}
+	else {
+		ts->DebugModes = DBGF_NONE;
+		for (i=1; GetNthString(Temp, i, sizeof(Temp2), Temp2); i++) {
+			if (_stricmp(Temp2, "normal") == 0)
+				ts->DebugModes |= DBGF_NORM;
+			else if (_stricmp(Temp2, "hex") == 0)
+				ts->DebugModes |= DBGF_HEXD;
+			else if (_stricmp(Temp2, "noout") == 0)
+				ts->DebugModes |= DBGF_NOUT;
+		}
+		if (ts->DebugModes == DBGF_NONE)
+			ts->Debug = FALSE;
+	}
 }
 
 void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
@@ -2700,6 +2722,38 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%c", ts->JoinSplitURLIgnoreEOLChar);
 	WritePrivateProfileString(Section, "JoinSplitURLIgnoreEOLChar", Temp, FName);
+
+	// Debug modes.
+	if (ts->DebugModes == DBGF_ALL) {
+		strncpy_s(Temp, sizeof(Temp), "all", _TRUNCATE);
+	}
+	else {
+		if (ts->DebugModes & DBGF_NORM) {
+			strncpy_s(Temp, sizeof(Temp), "normal", _TRUNCATE);
+		}
+		else {
+			Temp[0] = 0;
+		}
+
+		if (ts->DebugModes & DBGF_HEXD) {
+			if (Temp[0] != 0) {
+				strncat_s(Temp, sizeof(Temp), ",", _TRUNCATE);
+			}
+			strncat_s(Temp, sizeof(Temp), "hex", _TRUNCATE);
+		}
+
+		if (ts->DebugModes & DBGF_NOUT) {
+			if (Temp[0] != 0) {
+				strncat_s(Temp, sizeof(Temp), ",", _TRUNCATE);
+			}
+			strncat_s(Temp, sizeof(Temp), "noout", _TRUNCATE);
+		}
+
+		if (Temp[0] == 0) {
+			strncpy_s(Temp, sizeof(Temp), "none", _TRUNCATE);
+		}
+	}
+	WritePrivateProfileString(Section, "DebugModes", Temp, FName);
 }
 
 #define VTEditor "VT editor keypad"

@@ -565,9 +565,11 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
       (VKey==VK_MENU)) return KEYDOWN_CONTROL;
 
   /* debug mode */
-  if ((ts.Debug>0) && (VKey == VK_ESCAPE) && ShiftKey()) {
+  if (ts.Debug && (VKey == VK_ESCAPE) && ShiftKey()) {
     MessageBeep(0);
-	DebugFlag = (DebugFlag+1)%DEBUG_FLAG_MAXD;
+    do {
+      DebugFlag = (DebugFlag+1)%DEBUG_FLAG_MAXD;
+    } while (DebugFlag != DEBUG_FLAG_NONE && !((ts.DebugModes >> (DebugFlag-1)) & 1));
     CodeCount = 0;
     PeekMessage((LPMSG)&M,HWin,WM_CHAR,WM_CHAR,PM_REMOVE);
     return KEYDOWN_CONTROL;
