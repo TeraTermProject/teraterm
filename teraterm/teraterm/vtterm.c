@@ -767,16 +767,26 @@ void PutKanji(BYTE b)
 void PutDebugChar(BYTE b)
 {
 	static BYTE buff[3];
-	int i = 0;
+	int i;
+	BOOL svInsertMode, svAutoWrapMode;
+	BYTE svCharAttr;
 
-	if (DebugFlag!=DEBUG_FLAG_NONE) {
+	if (DebugFlag!=DEBUG_FLAG_NOUT) {
+		svInsertMode = InsertMode;
+		svAutoWrapMode = AutoWrapMode;
 		InsertMode = FALSE;
 		AutoWrapMode = TRUE;
+
+		svCharAttr = CharAttr.Attr;
+		if (CharAttr.Attr != AttrDefault) {
+			UpdateStr();
+			CharAttr.Attr = AttrDefault;
+		}
 
 		if (DebugFlag==DEBUG_FLAG_HEXD) {
 			_snprintf(buff, 3, "%02X", (unsigned int) b);
 
-			for ( ; i<2; i++)
+			for (i=0; i<2; i++)
 				PutChar(buff[i]);
 			PutChar(' ');
 		}
@@ -803,10 +813,12 @@ void PutDebugChar(BYTE b)
 				PutChar(b);
 		}
 
-		if (CharAttr.Attr != AttrDefault) {
+		if (CharAttr.Attr != svCharAttr) {
 			UpdateStr();
-			CharAttr.Attr = AttrDefault;
+			CharAttr.Attr = svCharAttr;
 		}
+		InsertMode = svInsertMode;
+		AutoWrapMode = svAutoWrapMode;
 	}
 }
 
