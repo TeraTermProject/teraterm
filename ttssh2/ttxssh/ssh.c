@@ -7137,27 +7137,36 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_put_int(msg, y);  // window height (pixel):
 
 	// TTY mode‚Í‚±‚±‚Å“n‚· (2005.7.17 yutaka)
-#if 0
-	s = "";
-	buffer_put_string(msg, s, strlen(s));
-#else
-	buffer_put_char(ttymsg, 129);  // TTY_OP_OSPEED_PROTO2
+	buffer_put_char(ttymsg, SSH2_TTY_OP_OSPEED);
 	buffer_put_int(ttymsg, 9600);  // baud rate
-	buffer_put_char(ttymsg, 128);  // TTY_OP_ISPEED_PROTO2
+	buffer_put_char(ttymsg, SSH2_TTY_OP_ISPEED);
 	buffer_put_int(ttymsg, 9600);  // baud rate
+
 	// VERASE
-	buffer_put_char(ttymsg, 3);
+	buffer_put_char(ttymsg, SSH2_TTY_KEY_VERASE);
 	if (pvar->ts->BSKey == IdBS) {
 		buffer_put_int(ttymsg, 0x08); // BS key
 	} else {
 		buffer_put_int(ttymsg, 0x7F); // DEL key
 	}
-	// TTY_OP_END
-	buffer_put_char(ttymsg, 0);
+
+	switch (pvar->ts->CRReceive) {
+	  case IdLF:
+		buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR);
+		buffer_put_int(ttymsg, 0);
+		break;
+	  case IdCR:
+		buffer_put_char(ttymsg, SSH2_TTY_OP_ONLCR);
+		buffer_put_int(ttymsg, 1);
+		break;
+	  default:
+		break;
+	}
+
+	buffer_put_char(ttymsg, SSH2_TTY_OP_END); // End of terminal modes
 
 	// SSH2‚Å‚Í•¶š—ñ‚Æ‚µ‚Ä‘‚«‚ŞB
 	buffer_put_string(msg, buffer_ptr(ttymsg), buffer_len(ttymsg));
-#endif
 
 	len = buffer_len(msg);
 	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
