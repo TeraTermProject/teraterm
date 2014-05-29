@@ -61,6 +61,8 @@ def read_values(key):
 
 
 def PrintSectionName(s):
+	# Get rid of bracket
+	s= s.replace('[', '').replace(']', '')
 	write("[%s]\n" % s)
 	return
 
