@@ -34,6 +34,8 @@ exit(0);
 sub PrintSectionName {
 	my($name) = @_;
 	
+	# Get rid of bracket
+	$name =~ tr/[]//d;
 	print "[$name]\n";
 }
 
