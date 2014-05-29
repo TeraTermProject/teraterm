@@ -1187,4 +1187,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_23"
+#define TT_FILEMAPNAME "ttset_memfilemap_24"
