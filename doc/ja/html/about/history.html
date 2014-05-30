@@ -40,6 +40,7 @@
         </ul></li>
       <li>Termcap/Terminfo文字列問い合わせに対応した。</li>
       <li>Eterm look-feel: <a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、背景画像の指定をチェックボックスで行うようにした。</li>
+      <li><a href="../setup/teraterm-term.html#displayall">デバッグモード</a>で使用するモードを設定出来るようにした。</li>
     </ul>
   </li>
 
@@ -47,6 +48,12 @@
     <ul>
       <li>カーソル位置復元後に背景色を正しく描画しない場合がある問題を修正した。</li>
       <li>Eterm look-feel: 背景画像にJPEGファイルが正しく読み込まれない場合がある問題を修正した。</li>
+      <li>デバッグモードでの表示の不具合を修正した。
+        <ul>
+          <li>デバッグモード後に挿入モード,オートラップモードが変更される場合がある問題を修正した。</li>
+          <li>デバッグモードに入った時に文字属性をリセットするようにした。</li>
+          <li>デバッグモードから抜けた時に文字属性がリセットされる場合がある問題を修正した。</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -2445,6 +2452,7 @@
           <li>Host Key algorithmに ED25519 を追加した。teraterm.ini の HostKeyOrder エントリを変更した。</li>
         </ul></li>
       <li>バージョン情報にホスト公開鍵の指紋およびランダムアートを表示するようにした。</li>
+      <li>端末オプションのONLCR設定をサーバに通知するようにした。</li>
     </ul>
   </li>
 
