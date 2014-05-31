@@ -279,6 +279,11 @@ private:
 		}
 	}
 
+	static void copy_UILanguageFile() {
+		strncpy_s(UILanguageFile, sizeof(UILanguageFile),
+		          getInstance().ts->UILanguageFile, _TRUNCATE);
+	}
+
 	static BOOL CALLBACK EnumProc(HMODULE, const char*, const char*, WORD langid, LONG lParam) {
 		*((WORD*) lParam) = langid;
 		return FALSE;
@@ -297,8 +302,7 @@ private:
 		*hooks->ReadIniFile = TTXReadINIFile;
 		*hooks->WriteIniFile = TTXWriteINIFile;
 		*hooks->ParseParam = TTXParseParam;
-		strncpy_s(UILanguageFile, sizeof(UILanguageFile),
-		          getInstance().ts->UILanguageFile, _TRUNCATE);
+		copy_UILanguageFile();
 	}
 
 	static void PASCAL TTXOpenTCP(TTXSockHooks* hooks) {
@@ -325,6 +329,7 @@ private:
 
 	static void PASCAL TTXModifyMenu(HMENU menu) {
 		char uimsg[MAX_UIMSG];
+		copy_UILanguageFile();
 		/* inserts before ID_HELP_ABOUT */
 		UTIL_get_lang_msg("MENU_ABOUT", uimsg, sizeof(uimsg), "About TT&Proxy...");
 		InsertMenu(menu, 50990, MF_BYCOMMAND | MF_ENABLED, ID_ABOUTMENU, uimsg);
@@ -336,9 +341,11 @@ private:
 	static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		switch (cmd) {
 		case ID_ABOUTMENU:
+			copy_UILanguageFile();
 			ProxyWSockHook::aboutDialog(hWin);
 			return 1;
 		case ID_PROXYSETUPMENU:
+			copy_UILanguageFile();
 			ProxyWSockHook::setupDialog(hWin);
 			return 1;
 		case ID_ASYNCMESSAGEBOX:
