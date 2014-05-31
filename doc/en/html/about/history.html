@@ -40,7 +40,10 @@
        </ul></li>
       <li>added support for Termcap/Terminfo string query.</li>
       <li>Eterm look-feel: Changed the background image from label to checkbox style on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
-      <!-- li><a href="../setup/teraterm-term.html#displayall">デバッグモード</a>で使用するモードを設定出来るようにした。</li -->
+      <li>added support for selecting any type of the <a href="../setup/teraterm-term.html#displayall">Debug mode</a>.
+        <ul>
+          <li>added the DebugModes entry in the teraterm.ini file.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -48,12 +51,12 @@
     <ul>
       <li>The background color will not be painted well after the cursor position is restored.</li>
       <li>Eterm look-feel: The background image file will not be drawn by using any JPEG file.</li>
-      <!-- li>デバッグモードでの表示の不具合を修正した。
+      <li>Fixed some bugs regarding Debug mode
         <ul>
-          <li>デバッグモード後に挿入モード,オートラップモードが変更される場合がある問題を修正した。</li>
-          <li>デバッグモードに入った時に文字属性をリセットするようにした。</li>
-          <li>デバッグモードから抜けた時に文字属性がリセットされる場合がある問題を修正した。</li>
-        </ul></li -->
+          <li>When the debug mode is enterd, the insertion mode and the auto-wrap mode may be changed.</li>
+          <li>When the debug mode is enterd, the character attribute can not be reseted.</li>
+          <li>When the debug mode is leaved, the character attribute may be reseted.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -62,7 +65,6 @@
       <li>upgraded TTSSH to <a href="#ttssh_2.69">2.69</a></li>
       <li>upgraded TTProxy to <a href="#ttproxy_1.0.0.20">1.0.0.20</a></li>
       <li>upgraded LogMeTT to 2.10.1.7</li>
-      <li></li>
     </ul>
   </li>
 </ul>
@@ -2447,7 +2449,7 @@ SYNOPSIS:
           <li>added the ED25519 into the Host Key algorithm, and then changed the HostKeyOrder entry in the teraterm.ini file.</li>
         </ul></li>
       <li>added the host key's fingerprint and the random art into the version dialog.</li>
-      <!-- li>端末オプションのONLCR設定をサーバに通知するようにした。</li -->
+      <li>TTY option ONLCR can be sent to the remote server.</li>
     </ul>
   </li>
 
@@ -3568,7 +3570,7 @@ SYNOPSIS:
 
 <h3><a name="ttproxy_1.0.0.20">2014.xx.xx (Ver 1.0.0.20) not released</a></h3>
 <ul class="history">
-      <!--li>言語ファイルが反映されないことがある問題を修正した。</li-->
+      <li>The language file may not be reflected.</li>
       <li>The SSL-type proxy type can not be shown because the feature can not work well.</li>
 </ul>
 
