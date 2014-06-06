@@ -480,7 +480,6 @@ void ZSendFileHdr(PZVar zv)
 void ZSendFileDat(PFileVar fv, PZVar zv)
 {
 	int i, j;
-	struct _stat st;
 
 	if (!fv->FileOpen) {
 		ZSendCancel(zv);
@@ -502,12 +501,12 @@ void ZSendFileDat(PFileVar fv, PZVar zv)
 	fv->FileSize = GetFSize(fv->FullName);
 
 	/* timestamp */
-	_stat(fv->FullName, &st);
+	fv->FileMtime = GetFMtime(fv->FullName);
 
 	// ファイルのタイムスタンプとパーミッションも送るようにした。(2007.12.20 maya, yutaka)
 	_snprintf_s(&(zv->PktOut[zv->PktOutCount]),
 				sizeof(zv->PktOut) - zv->PktOutCount, _TRUNCATE,
-				"%lu %lo %o", fv->FileSize, (long) st.st_mtime,
+				"%lu %lo %o", fv->FileSize, fv->FileMtime,
 				0644 | _S_IFREG);
 	j = strlen(&(zv->PktOut[zv->PktOutCount])) - 1;
 	for (i = 0; i <= j; i++) {
@@ -649,6 +648,7 @@ void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 	fv->StartTime = GetTickCount();
 
 	fv->FileSize = 0;
+	fv->FileMtime = 0;
 
 	zv->PktOutCount = 0;
 	zv->Pos = 0;
@@ -776,6 +776,10 @@ void ZParseRInit(PFileVar fv, PZVar zv)
 	{
 		_lclose(fv->FileHandle);
 		fv->FileOpen = FALSE;
+
+		if (fv->FileMtime > 0) {
+			SetFMtime(fv->FullName, fv->FileMtime);
+		}
 	}
 
 	if (!GetNextFname(fv)) {
@@ -935,6 +939,10 @@ void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 				}
 				_lclose(fv->FileHandle);
 				fv->FileOpen = FALSE;
+
+				if (fv->FileMtime > 0) {
+					SetFMtime(fv->FullName, fv->FileMtime);
+				}
 			}
 			zv->ZState = Z_RecvInit;
 			ZSendRInit(fv, zv);
@@ -952,6 +960,10 @@ BOOL ZParseFile(PFileVar fv, PZVar zv)
 {
 	BYTE b;
 	int i, j;
+	char *p;
+	long modtime;
+	int mode;
+	int ret;
 
 	if ((zv->ZState != Z_RecvInit) && (zv->ZState != Z_RecvInit2))
 		return FALSE;
@@ -978,6 +990,15 @@ BOOL ZParseFile(PFileVar fv, PZVar zv)
 			fv->FileSize = fv->FileSize * 10 + b - 0x30;
 		i++;
 	} while ((b >= 0x30) && (b <= 0x39));
+
+	/* file mtime */
+	p = zv->PktIn + i;
+	if (*p) {
+		ret = sscanf(p, "%lo%o", &modtime, &mode);
+		if (ret >= 1) {
+			fv->FileMtime = modtime;
+		}
+	}
 
 	zv->Pos = 0;
 	fv->ByteCount = 0;

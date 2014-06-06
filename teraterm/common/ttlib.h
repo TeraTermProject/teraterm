@@ -20,6 +20,8 @@ int Hex2Str(PCHAR Hex, PCHAR Str, int MaxLen);
 BOOL DoesFileExist(PCHAR FName);
 BOOL DoesFolderExist(PCHAR FName);
 long GetFSize(PCHAR FName);
+long GetFMtime(PCHAR FName);
+BOOL SetFMtime(PCHAR FName, DWORD mtime);
 void uint2str(UINT i, PCHAR Str, int destlen, int len);
 #ifdef WIN32
 void QuoteFName(PCHAR FName);

@@ -114,6 +114,7 @@ typedef struct {
   HANDLE LogThread;
   DWORD LogThreadId;
 
+  DWORD FileMtime;
 } TFileVar;
 typedef TFileVar far *PFileVar;
 

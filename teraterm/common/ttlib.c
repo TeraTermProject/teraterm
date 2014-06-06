@@ -5,6 +5,7 @@
 /* misc. routines  */
 #include "teraterm.h"
 #include <sys/stat.h>
+#include <sys/utime.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
@@ -418,6 +419,25 @@ long GetFSize(PCHAR FName)
 		return 0;
 	}
 	return (long)st.st_size;
+}
+
+long GetFMtime(PCHAR FName)
+{
+	struct _stat st;
+
+	if (_stat(FName,&st)==-1) {
+		return 0;
+	}
+	return (long)st.st_mtime;
+}
+
+BOOL SetFMtime(PCHAR FName, DWORD mtime)
+{
+	struct _utimbuf filetime;
+
+	filetime.actime = mtime;
+	filetime.modtime = mtime;
+	return _utime(FName, &filetime);
 }
 
 void uint2str(UINT i, PCHAR Str, int destlen, int len)

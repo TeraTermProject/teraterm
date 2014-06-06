@@ -225,12 +225,17 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 	if (yv->YMode == IdYSend) {
 		if (fv->FileOpen) {
 			_lclose(fv->FileHandle);
+
+			if (fv->FileMtime > 0) {
+				SetFMtime(fv->FullName, fv->FileMtime);
+			}
 		}
 		fv->FileHandle = _lopen(fv->FullName,OF_READ);
 		fv->FileSize = GetFSize(fv->FullName);
 	} else {
 		fv->FileHandle = -1;
 		fv->FileSize = 0;
+		fv->FileMtime = 0;
 	}
 	fv->FileOpen = fv->FileHandle>0;
 
@@ -406,6 +411,10 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 					  _lclose(fv->FileHandle);
 					  fv->FileHandle = -1;
 
+					  if (fv->FileMtime > 0) {
+						SetFMtime(fv->FullName, fv->FileMtime);
+					  }
+
 					  // 1回目のEOTに対してNAKを返す
 					  b = NAK;
 					  YWrite(fv,yv,cv,&b, 1);
@@ -523,7 +532,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	if (d == 0 &&
 		yv->SendFileInfo == 0) {
 		long modtime;
-        long bytes_total;
+		long bytes_total;
 		int mode;
 		int ret;
 		BYTE *p;
@@ -541,6 +550,9 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
 			if (ret >= 1) {
 				fv->FileSize = bytes_total;
+			}
+			if (ret >= 2) {
+				fv->FileMtime = modtime;
 			}
 		}
 
@@ -746,7 +758,6 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 			// ブロック0
 			if (yv->SendFileInfo == 0) { // ファイル情報の送信
-				struct _stat st;
 				int ret, total;
 				BYTE buf[1024 + 10];
 
@@ -755,8 +766,8 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				// (2011.3.21 yutaka)
 				//yv->SendFileInfo = 1;   // 送信済みフラグon
 
-			   /* timestamp */
-			   _stat(fv->FullName, &st);
+				/* timestamp */
+				fv->FileMtime = GetFMtime(fv->FullName);
 
 				ret = _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s",
 					&(fv->FullName[fv->DirLen]));
@@ -764,7 +775,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				total = ret + 1;
 
 				ret = _snprintf_s(&(buf[total]), sizeof(buf) - total, _TRUNCATE, "%lu %lo %o",
-					fv->FileSize, (long)st.st_mtime, 0644|_S_IFREG);
+					fv->FileSize, fv->FileMtime, 0644|_S_IFREG);
 				total += ret;
 
 				i = total;
