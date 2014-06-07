@@ -722,6 +722,8 @@ typedef struct scp {
 	// for receiving file
 	long long filetotalsize;
 	long long filercvsize;
+	DWORD filemtime;
+	DWORD fileatime;
 } scp_t;
 
 enum sftp_state {

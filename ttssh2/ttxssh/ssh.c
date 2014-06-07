@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utime.h>
 #include <assert.h>
 
 #include <direct.h>
@@ -159,6 +160,8 @@ static Channel_t *ssh2_channel_new(unsigned int window, unsigned int maxpack,
 		c->scp.progress_window = NULL;
 		c->scp.thread = (HANDLE)-1;
 		c->scp.localfp = NULL;
+		c->scp.filemtime = 0;
+		c->scp.fileatime = 0;
 	}
 	if (type == TYPE_AGENT) {
 		c->agent_msg = buffer_init();
@@ -241,8 +244,17 @@ static void ssh2_channel_delete(Channel_t *c)
 
 	if (c->type == TYPE_SCP) {
 		c->scp.state = SCP_CLOSING;
-		if (c->scp.localfp != NULL)
+		if (c->scp.localfp != NULL) {
 			fclose(c->scp.localfp);
+			if (c->scp.dir == FROMREMOTE) {
+				if (c->scp.fileatime > 0 && c->scp.filemtime > 0) {
+					struct _utimbuf filetime;
+					filetime.actime = c->scp.fileatime;
+					filetime.modtime = c->scp.filemtime;
+					_utime(c->scp.localfilefull, &filetime);
+				}
+			}
+		}
 		if (c->scp.progress_window != NULL) {
 			DestroyWindow(c->scp.progress_window);
 			c->scp.progress_window = NULL;
@@ -7298,7 +7310,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -t %s", c->scp.remotefile);
 
 		} else {		
-			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -f %s", c->scp.remotefile);
+			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -p -f %s", c->scp.remotefile);
 
 		}
 		buffer_put_string(msg, sbuf, strlen(sbuf));
@@ -8008,7 +8020,13 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 		}
 
 		if (data[0] == 'T') {  // Tmtime.sec mtime.usec atime.sec atime.usec
-			// TODO: 
+			DWORD mtime, atime;
+
+			sscanf_s(data, "T%ld 0 %ld 0", &mtime, &atime);
+
+			// タイムスタンプを記録
+			c->scp.filemtime = mtime;
+			c->scp.fileatime = atime;
 
 			// リプライを返す
 			goto reply;
