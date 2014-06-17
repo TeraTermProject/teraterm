@@ -64,6 +64,19 @@ static int send_until_block(PTInstVar pvar, SOCKET s,
 	return total_sent;
 }
 
+/* Tera Termが動作しているPC上の X サーバプログラムに対して、データを送る。
+ * 一度で送れない場合は、リングバッファに格納し、遅延配送する。 
+ *
+ * pvar: 共有リソース
+ * buf: リングバッファ
+ * blocking_write: 同期型のパケット送信関数
+ * socket: 非同期型のソケットハンドル
+ * data: データ
+ * len: データ長
+ *
+ * return TRUE: 送信成功
+ *        FALSE: 送信エラー
+ */
 BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
                               UTILBlockingWriteCallback blocking_write,
                               SOCKET socket, const char FAR * data,
@@ -77,9 +90,14 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 	int first_copy_start;
 	int first_copy_amount;
 
+	// 初回呼び出し時は、かならず下記 if 文に入る。
 	/* Fast path case: buffer is empty, try nonblocking write */
 	if (buf->datalen == 0) {
 #if 1
+		// まずは non-blocking でパケット送信する。一度でも WSAEWOULDBLOCK エラーになったら、
+		// 関数は「送信済みデータ長」を返す。
+		// たとえば、X サーバプログラムとして"xterm"を起動していた場合、xtermの端末内に何か
+		// 文字を表示し続けている状態で、端末のウィンドウをドラッグすると、関数は 0 を返してくる。
 		int sent_amount = send_until_block(pvar, socket, data, len);
 
 		if (sent_amount < 0) {
@@ -106,10 +124,40 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 #endif
 	}
 
+	// 初回呼び出し時の non-blocking 送信で、すべて送り切れたら、即座に成功で返る。
 	if (len == 0) {
 		return TRUE;
 	}
 
+	// リングバッファ(buf)に残存しているデータと、新規送信データを足して(desiredlen)、
+	// 現在のバッファ長(curlen)が足りるかを計算する。
+	//
+	// (1)データが先頭に格納されているケース
+	//
+	//                 <----- buflen ------------->
+	// buf->bufdata -> +--------------------------+
+	//                 |XXXXXXX                   |
+	//                 +--------------------------+ 
+	//                 <------>
+	//                   buf->datalen
+	//                 ^
+	//                 |
+	//                 buf->datastart
+	//
+	//
+	// (2)データが両端に格納されているケース
+	//
+	//                 <----- buflen ------------->
+	// buf->bufdata -> +--------------------------+
+	//                 |XXXX                  XXXX|
+	//                 +--------------------------+ 
+	//                 <--->                  <-->
+	//                  (a)                    (b)
+	//                      (a)+(b) = buf->datalen
+	//                                        ^
+	//                                        |
+	//                                       buf->datastart
+	//
 	/* We blocked or the buffer has data in it. We need to put this data
 	   into the buffer.
 	   First, expand buffer as much as possible and necessary. */
