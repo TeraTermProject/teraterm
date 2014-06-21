@@ -355,6 +355,47 @@ SYNOPSIS:
         </dd>
       </ul>
 
+      <dt><a name="LogOption">Log option</a></dt>
+      <dd>
+      Sepcify the log type.
+      </dd>
+
+      <ul>
+        <dt>Binary</dt>
+        <dd>
+  	If you select this option, received characters are written without
+  	any modifications. Otherwise, new-line codes are converted and
+  	escape sequences are stripped out.
+        </dd>
+
+        <dt>Append</dt>
+        <dd>
+  	If you select this option and the specified log file already exists,
+  	received characters are appended to the file. Otherwise, the file is
+  	overwritten.
+        </dd>
+
+        <dt>Plain text</dt>
+        <dd>
+  	If you select this option, ASCII non-printable characters are not written.
+        </dd>
+
+        <dt>Timestamp</dt>
+        <dd>
+  	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.
+        </dd>
+
+        <dt>Hide dialog</dt>
+        <dd>
+  	If you select this option, "Log" dialog box is not displayed.
+        </dd>
+
+        <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
+        <dd>
+  	If you select this option, the logging starts after current all buffer is written into a log file.
+        </dd>
+      </ul>
+
     </dl>
 
 
