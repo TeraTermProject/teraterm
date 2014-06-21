@@ -1284,6 +1284,15 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_ROTATE_SIZE_TYPE, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ROTATE_STEP_TEXT, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_ROTATE_STEP, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+
+		// Log options
+		SendDlgItemMessage(IDC_LOG_OPTION_GROUP, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_OPT_BINARY, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_OPT_APPEND, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_OPT_PLAINTEXT, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_OPT_TIMESTAMP, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_OPT_HIDEDLG, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_OPT_INCBUF, WM_SETFONT, (WPARAM)DlgLogFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgLogFont = NULL;
@@ -1311,6 +1320,29 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_ROTATE_STEP_TEXT, uimsg, sizeof(uimsg));
 	get_lang_msg("IDC_ROTATE_STEP_TEXT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ROTATE_STEP_TEXT, ts.UIMsg);
+	// Log options
+	// FIXME: メッセージカタログは既存のログオプションのものを流用したが、アクセラレータキーが重複するかもしれない。
+	GetDlgItemText(IDC_LOG_OPTION_GROUP, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_LOG_OPTION_GROUP, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_BINARY, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_BINARY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_BINARY, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_APPEND, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_APPEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_APPEND, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_PLAINTEXT, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_PLAIN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_PLAINTEXT, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_TIMESTAMP, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_TIMESTAMP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_TIMESTAMP, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_HIDEDLG, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_HIDEDIALOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_HIDEDLG, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_INCBUF, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_ALLBUFFINFIRST", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_INCBUF, ts.UIMsg);
 
 
 	// Viewlog Editor path (2005.1.29 yutaka)
@@ -1351,6 +1383,27 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		GetDlgItem(IDC_ROTATE_STEP_TEXT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(TRUE);
 	}
+
+	// Log options
+	btn = (CButton *)GetDlgItem(IDC_OPT_BINARY);
+	btn->SetCheck(ts.LogBinary != 0);
+	if (ts.LogBinary) {
+		GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(FALSE);
+	} else {
+		GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(TRUE);
+	}
+	btn = (CButton *)GetDlgItem(IDC_OPT_APPEND);
+	btn->SetCheck(ts.Append != 0);
+	btn = (CButton *)GetDlgItem(IDC_OPT_PLAINTEXT);
+	btn->SetCheck(ts.LogTypePlainText != 0);
+	btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+	btn->SetCheck(ts.LogTimestamp != 0);
+	btn = (CButton *)GetDlgItem(IDC_OPT_HIDEDLG);
+	btn->SetCheck(ts.LogHideDialog != 0);
+	btn = (CButton *)GetDlgItem(IDC_OPT_INCBUF);
+	btn->SetCheck(ts.LogAllBuffIncludedInFirst != 0);
 
 
 	// ダイアログにフォーカスを当てる
@@ -1414,6 +1467,88 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(FALSE);
 				}			
 
+			}
+			return TRUE;
+
+		case IDC_OPT_BINARY | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				// バイナリオプションが有効の場合、FixLogOption() で無効化している
+				// オプションを、ここでも無効にしなければならない。
+				btn = (CButton *)GetDlgItem(IDC_OPT_BINARY);
+				if (btn->GetCheck()) {
+					ts.LogBinary = 1;
+
+					ts.LogTypePlainText = 0;
+					ts.LogTimestamp = 0;
+					GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(FALSE);
+					GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(FALSE);
+				} else {
+					ts.LogBinary = 0;
+
+					GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(TRUE);
+					GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(TRUE);
+				}
+			}
+			return TRUE;
+
+		case IDC_OPT_APPEND | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_OPT_APPEND);
+				if (btn->GetCheck()) {
+					ts.Append = 1;
+				} else {
+					ts.Append = 0;
+				}
+			}
+			return TRUE;
+
+		case IDC_OPT_PLAINTEXT | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_OPT_PLAINTEXT);
+				if (btn->GetCheck()) {
+					ts.LogTypePlainText = 1;
+				} else {
+					ts.LogTypePlainText = 0;
+				}
+			}
+			return TRUE;
+
+		case IDC_OPT_TIMESTAMP | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+				if (btn->GetCheck()) {
+					ts.LogTimestamp = 1;
+				} else {
+					ts.LogTimestamp = 0;
+				}
+			}
+			return TRUE;
+
+		case IDC_OPT_HIDEDLG | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_OPT_HIDEDLG);
+				if (btn->GetCheck()) {
+					ts.LogHideDialog = 1;
+				} else {
+					ts.LogHideDialog = 0;
+				}
+			}
+			return TRUE;
+
+		case IDC_OPT_INCBUF | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_OPT_INCBUF);
+				if (btn->GetCheck()) {
+					ts.LogAllBuffIncludedInFirst = 1;
+				} else {
+					ts.LogAllBuffIncludedInFirst = 0;
+				}
 			}
 			return TRUE;
 	}
