@@ -990,6 +990,9 @@ BOOL SetDefaultEtcDlg(HWND hWnd)
 BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 {
 	NOTIFYICONDATA	nid;
+	int i;
+	BOOL ret;
+	DWORD ecode;
 
 	memset(&nid, 0, sizeof(nid));
 	nid.cbSize				= sizeof(nid);
@@ -1000,7 +1003,33 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	nid.hIcon				= g_hIconSmall;
 	lstrcpy(nid.szTip, "TeraTerm Menu");
 
-	::Shell_NotifyIcon(dwMessage, &nid);
+	/* Shell_NotifyIcon関数は、シェルへの登録が4秒以内に完了しないとエラーと見なすため、
+	 * リトライ処理を追加する。
+	 *
+	 * Microsoft公式情報によると、WindowsXP～7までが当該仕様の模様。Windows8/8.1では、
+	 * リトライは不要と思われるが、共通処置とする。
+	 * cf. http://support.microsoft.com/kb/418138/ja
+	 * (2014.6.21 yutaka)
+	 */
+	if (dwMessage == NIM_ADD) {
+		for (i = 0 ; i < 3 ; i++) {
+			ret = ::Shell_NotifyIcon(dwMessage, &nid);
+			ecode = GetLastError();
+			if (ret == FALSE && ecode == ERROR_TIMEOUT) {
+				Sleep(1000);
+				ret = ::Shell_NotifyIcon(NIM_MODIFY, &nid);
+				if (ret == TRUE)
+					break;
+
+			} else {
+				break;
+			}
+		}
+
+	} else {
+		::Shell_NotifyIcon(dwMessage, &nid);
+
+	}
 
 	return TRUE;
 }
