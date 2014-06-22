@@ -67,6 +67,20 @@ static int send_until_block(PTInstVar pvar, SOCKET s,
 /* Tera Termが動作しているPC上の X サーバプログラムに対して、データを送る。
  * 一度で送れない場合は、リングバッファに格納し、遅延配送する。 
  *
+ * 動作フローは下記の通り。
+ * (1) 初回のデータが届く。もしくは、リングバッファが空。
+ * (2) non-blockingで送信を試みる。全送信できたらreturn。
+ * (3) 送信できなかったデータはリングバッファへ格納し、return。
+ * (4) 次のデータが届く。
+ * (5) リングバッファへ格納し、return。
+ * (6) 次のデータが届く。
+ * (7) リングバッファがフルになったら、バッファに残っているデータを blocking で送信を試みる。
+ *     送信失敗したら、エラーreturn。
+ * (8) ユーザデータ(data/len)の送信を blocking で送信を試みる。
+ *     送信失敗したら、エラーreturn。 
+ * (9) 送信できなかったユーザデータはリングバッファへ格納し、return。
+ * (10) リングバッファに残っているデータを non-blockingで送信を試みる。
+ *
  * pvar: 共有リソース
  * buf: リングバッファ
  * blocking_write: 同期型のパケット送信関数
@@ -186,6 +200,19 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 	   2) Write data from user
 	   3) Copy remaining user data into buffer
 	 */
+	// バッファがいっぱいになり、新しいデータ(data)が溢れる場合に space_required が正となる。
+	// すなわち、space_requiredは「溢れた分」を表す。
+	//
+	//                                               space_required
+	//                 <----- buflen -------------><-------->
+	// buf->bufdata -> +--------------------------+
+	//                 |XXXXXXXXXXXXXXXXX         |
+	//                 +--------------------------+ 
+	//                 <----------------><------------------>
+	//                   buf->datalen            len
+	//                 ^
+	//                 |
+	//                 buf->datastart
 	space_required = max(0, buf->datalen + len - buf->buflen);
 	amount_to_write_from_buffer = min(buf->datalen, space_required);
 
