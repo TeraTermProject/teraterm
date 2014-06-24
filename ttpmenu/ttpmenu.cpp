@@ -1012,7 +1012,7 @@ BOOL SetTaskTray(HWND hWnd, DWORD dwMessage)
 	 * (2014.6.21 yutaka)
 	 */
 	if (dwMessage == NIM_ADD) {
-		for (i = 0 ; i < 3 ; i++) {
+		for (i = 0 ; i < 10 ; i++) {
 			ret = ::Shell_NotifyIcon(dwMessage, &nid);
 			ecode = GetLastError();
 			if (ret == FALSE && ecode == ERROR_TIMEOUT) {
