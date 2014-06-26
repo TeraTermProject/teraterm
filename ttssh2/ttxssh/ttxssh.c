@@ -470,6 +470,9 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 		settings->IconID = IDI_SECURETT;
 	}
 
+	// エラーおよび警告時のポップアップメッセージを抑止する (2014.6.26 yutaka)
+	settings->DisablePopupMessage = GetPrivateProfileInt("TTSSH", "DisablePopupMessage", 0, fileName);
+
 	clear_local_settings(pvar);
 }
 
@@ -570,6 +573,9 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	// SSH アイコン
 	WritePrivateProfileString("TTSSH", "SSHIcon",
 	                          (settings->IconID==IDI_SECURETT_YELLOW) ? "yellow" : "Default", fileName);
+
+	_itoa(settings->DisablePopupMessage, buf, 10);
+	WritePrivateProfileString("TTSSH", "DisablePopupMessage", buf, fileName);
 }
 
 

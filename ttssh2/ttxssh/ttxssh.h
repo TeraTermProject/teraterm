@@ -97,6 +97,12 @@ HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 #define OPTION_REPLACE  2
 
 /*
+ * DisablePopupMessage 用のビット定義
+ */
+#define POPUP_MSG_default			0
+#define POPUP_MSG_FWD_received_data	(1 << 0)
+
+/*
 These are the fields that WOULD go in Tera Term's 'ts' structure, if
 we could put them there.
 */
@@ -149,6 +155,8 @@ typedef struct _TS_SSH {
 	BOOL VerifyHostKeyDNS;
 
 	int IconID;
+
+	int DisablePopupMessage;
 } TS_SSH;
 
 typedef struct _TInstVar {

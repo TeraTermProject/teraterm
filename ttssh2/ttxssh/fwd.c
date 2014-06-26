@@ -1839,10 +1839,15 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 		if (!UTIL_sock_buffered_write
 			(pvar, &channel->writebuf, blocking_write, s, data, length)) {
 			closed_local_connection(pvar, local_channel_num);
-			UTIL_get_lang_msg("MSG_FWD_COMM_ERROR", pvar,
-			                  "A communications error occurred while sending forwarded data to a local port.\n"
-			                  "The forwarded connection will be closed.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+
+			// ポップアップ抑止指定あれば、関数を呼び出さない。
+			// (2014.6.26 yutaka)
+			if ((pvar->settings.DisablePopupMessage & POPUP_MSG_FWD_received_data) == 0) {
+				UTIL_get_lang_msg("MSG_FWD_COMM_ERROR", pvar,
+								  "A communications error occurred while sending forwarded data to a local port.\n"
+								  "The forwarded connection will be closed.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
 		}
 	}
 
