@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Virtual Store</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Virtual Store</h1>
+
+<h2><a name="virtual_store">Vista以降のファイル仮想化</a></h2>
+<p>
+Windows Vista以降では、特定のファイルやレジストリにデータを読み書きすると、<br>
+自動的に別の場所に読み書きするというしくみが備わっており、"Virtual Store"と呼ばれます。<br>
+OSのユーザアカウント制御(UAC)が有効であり、Tera Termを管理者として実行していない場合に、<br>
+当該機能が有効となります。
+</p>
+
+<p>
+"Virtual Store"機能が有効の場合、Tera Termが「%ProgramFiles(x86)%\teraterm」に読み書きしたファイルは、<br>
+「%LOCALAPPDATA%\VirtualStore\Program Files (x86)\teraterm」にリダイレクトされます。<br>
+対象となるファイルは、teraterm.iniやログファイル、ssh_known_hosts などです。
+</p>
+
+</body>
+</html>
