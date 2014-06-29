@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Delimiter character of word selected by double-click</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+<body>
+
+<h1>Delimiter character of word selected by double-click</h1>
+
+<p>
+When a user double-clicks a word with the mouse, the word can be selected.<br>
+A delimiter character can be changed by using the DelimList entry in the [Tera Term] 
+section of the teraterm.in file.
+</p>
+
+<pre>
+DelimList=&lt;delimiter characters&gt;
+</pre>
+
+<p>
+For example,
+</p>
+
+<pre>
+DelimList=&lt;&gt;()[]
+</pre>
+
+<p>
+can specify six delimiters("&lt;", "&gt;", "(", ")", "[", "]"). 
+However, the space character and "$" character must be specified the "$20", "$24".
+</p>
+
+<pre>
+DelimList=$20 ; space character
+
+Default value:
+DelimList=$20!"#$24%&amp;'()*+,-./:;&lt;=&gt;?@[\]^`{|}~
+</pre>
+
+<p>
+The "DelimList" entry can be specified only one-byte character(what is called half-size character).
+The two-bytes character(what is called double-byte character) is treated as the delimiter character.<br>
+If the two-bytes character is not treated as the delimiter, please configure the DelimDBCS entry in the following:
+</p>
+
+<pre>
+DelimDBCS=off
+
+Default value:
+DelimDBCS=on
+</pre>
+
+<p>
+For your reference, here is the older Tera Term configuration.
+</p>
+
+<pre>
+DelimList=$20
+DelimDBCS=off
+</pre>
+
+<p>
+</p>
+
+</body>
+</html>
