@@ -2508,7 +2508,7 @@ void CSSetLRScrollRegion()	// DECSLRM
     switch (b) {
       case 'c': /* second terminal report (Secondary DA) */
 	if (Param[1] < 1) {
-	  SendCSIstr(">32;278;2c", 0); /* VT382(>32) + xterm rev 278 */
+	  SendCSIstr(">32;278;0c", 0); /* VT382(>32) + xterm rev 278 */
 	}
 	break;
       case 'J':	// IO-8256 terminal
@@ -4351,13 +4351,13 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 			color = DispGetColor(colornum);
 			if (mode == 4 || mode == 5) {
 				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-					"%d;%d;rgb:%02x/%02x/%02x", CLocale, mode, ColorNumber,
-					GetRValue(color), GetGValue(color), GetBValue(color));
+					"%d;%d;rgb:%04x/%04x/%04x", CLocale, mode, ColorNumber,
+					GetRValue(color)*257, GetGValue(color)*257, GetBValue(color)*257);
 			}
 			else {
 				len =_snprintf_s_l(StrBuff, sizeof(StrBuff), _TRUNCATE,
-					"%d;rgb:%02x/%02x/%02x", CLocale, mode,
-					GetRValue(color), GetGValue(color), GetBValue(color));
+					"%d;rgb:%04x/%04x/%04x", CLocale, mode,
+					GetRValue(color)*257, GetGValue(color)*257, GetBValue(color)*257);
 			}
 			SendOSCstr(StrBuff, len);
 		}
