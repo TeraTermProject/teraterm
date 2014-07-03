@@ -19,7 +19,8 @@
 #include "keyboard.h"
 
 BOOL AutoRepeatMode;
-BOOL AppliKeyMode, AppliCursorMode, AppliEscapeMode;
+BOOL AppliKeyMode, AppliCursorMode;
+int AppliEscapeMode;
 BOOL Send8BitMode;
 BYTE DebugFlag = DEBUG_FLAG_NONE;
 
@@ -142,11 +143,34 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
       break;
     case VK_ESCAPE: // Escape Key
       if (Single) {
-	if (AppliEscapeMode) {
+	switch (AppliEscapeMode) {
+	case 1:
 	  CodeLength = 3;
 	  Code[0] = 0x1B;
 	  Code[1] = 'O';
 	  Code[2] = '[';
+	  break;
+	case 2:
+	  CodeLength = 2;
+	  Code[0] = 0x1B;
+	  Code[1] = 0x1B;
+	  break;
+	case 3:
+	  CodeLength = 2;
+	  Code[0] = 0x1B;
+	  Code[1] = 0x00;
+	  break;
+	case 4:
+	  CodeLength = 8;
+	  Code[0] = 0x1B;
+	  Code[1] = 0x1B;
+	  Code[2] = '[';
+	  Code[3] = '=';
+	  Code[4] = '2';
+	  Code[5] = '7';
+	  Code[6] = '%';
+	  Code[7] = '~';
+	  break;
 	}
       }
       break;
@@ -478,15 +502,38 @@ int VKey2KeyStr(WORD VKey, HWND HWin, char *Code, size_t CodeSize, WORD *CodeTyp
     case '3':
       if (Control && !ts.StrictKeyMapping) {
 	// Ctrl-3 -> ESC
-	if (AppliEscapeMode) {
+	switch (AppliEscapeMode) {
+	case 1:
 	  CodeLength = 3;
 	  Code[0] = 0x1B;
 	  Code[1] = 'O';
 	  Code[2] = '[';
-	}
-	else {
+	  break;
+	case 2:
+	  CodeLength = 2;
+	  Code[0] = 0x1B;
+	  Code[1] = 0x1B;
+	  break;
+	case 3:
+	  CodeLength = 2;
+	  Code[0] = 0x1B;
+	  Code[1] = 0x00;
+	  break;
+	case 4:
+	  CodeLength = 8;
+	  Code[0] = 0x1B;
+	  Code[1] = 0x1B;
+	  Code[2] = '[';
+	  Code[3] = '=';
+	  Code[4] = '2';
+	  Code[5] = '7';
+	  Code[6] = '%';
+	  Code[7] = '~';
+	  break;
+	default:
 	  CodeLength = 1;
 	  Code[0] = 0x1b;
+	  break;
 	}
       }
       break;

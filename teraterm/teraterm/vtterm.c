@@ -2726,7 +2726,7 @@ void CSSetLRScrollRegion()	// DECSLRM
 	    BracketedPaste = TRUE;
 	    break;
 	  case 7727: // mintty Application Escape Mode
-	    AppliEscapeMode = TRUE;
+	    AppliEscapeMode = 1;
 	    break;
 	  case 7786: // Wheel to Cursor translation
 	    if (ts.TranslateWheelToCursor) {
@@ -2739,6 +2739,11 @@ void CSSetLRScrollRegion()	// DECSLRM
 	  case 14001: // NetTerm mouse mode
 	    if (ts.MouseEventTracking)
 	      MouseReportMode = IdMouseTrackNetTerm;
+	    break;
+	  case 14002: // test Application Escape Mode 2
+	  case 14003: // test Application Escape Mode 3
+	  case 14004: // test Application Escape Mode 4
+	    AppliEscapeMode = Param[i] - 14000;
 	    break;
 	}
     }
@@ -2872,7 +2877,7 @@ void CSSetLRScrollRegion()	// DECSLRM
 	    BracketedPaste = FALSE;
 	    break;
 	  case 7727: // mintty Application Escape Mode
-	    AppliEscapeMode = FALSE;
+	    AppliEscapeMode = 0;
 	    break;
 	  case 7786: // Wheel to Cursor translation
 	    AcceptWheelToCursor = FALSE;
@@ -2882,6 +2887,11 @@ void CSSetLRScrollRegion()	// DECSLRM
 	    break;
 	  case 14001: // NetTerm mouse mode
 	    MouseReportMode = IdMouseTrackNone;
+	    break;
+	  case 14002: // test Application Escape Mode 2
+	  case 14003: // test Application Escape Mode 3
+	  case 14004: // test Application Escape Mode 4
+	    AppliEscapeMode = 0;
 	    break;
 	}
     }
@@ -3246,7 +3256,7 @@ void CSSetLRScrollRegion()	// DECSLRM
 	      resp = 2;
 	    break;
 	  case 7727:	// MinTTY Application Escape Mode
-	    if (AppliEscapeMode)
+	    if (AppliEscapeMode == 1)
 	      resp = 1;
 	    else
 	      resp = 2;
@@ -3269,6 +3279,14 @@ void CSSetLRScrollRegion()	// DECSLRM
 	    if (!ts.MouseEventTracking)
 	      resp = 4;
 	    else if (MouseReportMode == IdMouseTrackNetTerm)
+	      resp = 1;
+	    else
+	      resp = 2;
+	    break;
+	  case 14002:	// test Application Escape Mode 2
+	  case 14003:	// test Application Escape Mode 3
+	  case 14004:	// test Application Escape Mode 4
+	    if (AppliEscapeMode == Param[1] - 14000)
 	      resp = 1;
 	    else
 	      resp = 2;
