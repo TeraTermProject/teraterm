@@ -1126,13 +1126,13 @@ void FAR PASCAL UndoAllWin(void) {
 	}
 }
 
-void FAR PASCAL OpenHelp(UINT Command, DWORD Data)
+void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 {
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
 	HWND HWin;
 	char HelpFN[MAX_PATH];
-	char UILanguageFile[MAX_PATH];
+//	char UILanguageFile[MAX_PATH];
 	char uimsg[MAX_UIMSG];
 
 	/* Get home directory */
@@ -1141,7 +1141,7 @@ void FAR PASCAL OpenHelp(UINT Command, DWORD Data)
 	}
 	ExtractDirName(Temp, HomeDir);
 	
-	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+//	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
 	get_lang_msg("HELPFILE", uimsg, sizeof(uimsg), "teraterm.chm", UILanguageFile);
 
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)

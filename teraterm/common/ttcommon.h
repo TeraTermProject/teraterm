@@ -40,7 +40,7 @@ void FAR PASCAL ShowAllWinStacked(HWND);
 void FAR PASCAL ShowAllWinCascade(HWND);
 void FAR PASCAL BroadcastClosingMessage(HWND myhwnd);
 void FAR PASCAL UndoAllWin();
-void FAR PASCAL OpenHelp(UINT Command, DWORD Data);
+void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
 
 int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
 int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b);

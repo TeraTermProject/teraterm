@@ -115,5 +115,5 @@ BOOL CErrDlg::OnInitDialog()
 
 void CErrDlg::OnBnClickedMacroerrhelp()
 {
-	OpenHelp(HH_HELP_CONTEXT,HlpMacroAppendixesError);
+	OpenHelp(HH_HELP_CONTEXT, HlpMacroAppendixesError, UILanguageFile);
 }
