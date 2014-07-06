@@ -8071,9 +8071,20 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 	} else if (c->scp.state == SCP_DATA) {  // payloadの受信
 		unsigned char *newdata = malloc(buflen);
 		BOOL ret;
+		DWORD texit;
 		if (newdata != NULL) {
 			memcpy(newdata, data, buflen);
 			do {
+				// SCPファイル受信中に、ファイル受信を中断すると、無限ループに陥ることがあるため、
+				// スレッドが終了しているかどうかを判別する。
+				// (2014.7.6 yutaka)
+				texit = STILL_ACTIVE;
+				GetExitCodeThread(c->scp.thread, &texit);
+				if (texit != STILL_ACTIVE) {
+					texit = texit;
+					break;
+				}
+
 				// スレッドがキューを作っていない場合、メッセージポストが失敗することがあるので、
 				// 無限リトライする。MSDNにそうしろと書いてある。
 				// (2011.6.15 yutaka)
