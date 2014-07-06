@@ -205,6 +205,12 @@ static int getCurrentLineNumber(BINT curpos, BINT *lineno, BINT linenomax)
 			break;
 		}
 	}
+	// 最後の行をパースした際、行番号を返せていなかった問題を修正した。
+	// (2014.7.6 yutaka)
+	if (no == 0 && i == linenomax) {
+		no = linenomax;
+	}
+
 	return (no);
 }
 
