@@ -237,6 +237,9 @@ endif
 </p>
 
 
+<hr>
+
+<h1>vim の設定</h1>
 
 <h2><a name="background">背景色</a></h2>
 <p>
@@ -244,7 +247,8 @@ Tera Term 4.83からxtermのTermcap String Queryに対応したことにより、vimは起動時、
 256色対応であることを自動で認識できるようになりました。そのため、vimの背景色に応じたハイライトカラーを
 描画するために、適切に background の設定を行う必要性があります。<br>
 
-たとえば、Tera Termの背景色を黒(RGB=0,0,0)、256色に設定している場合、.vimrcに下記のように設定する必要があります。
+背景色が暗い色(例えば黒)の時は dark、明るい色(例えば白)の時は light にして、いずれかの設定を
+試してみてください。
 </p>
 
 <pre class="macro-example">
@@ -255,6 +259,10 @@ set background=dark
 background は端末の背景色を vim に伝えるための設定であり、正しく設定されていないと
 ハイライト等で文字色と背景色に似た色を使い見づらくなる場合があります。<br>
 色数の自動認識を止めるには set t_RV= を .vimrc に追加してください。ただし、マウスタイプ等の自動認識も止まります。
+</p>
+
+<p>
+なお、backgroundオプションの詳細は、vimで :help 'background'を参照願います。
 </p>
 
 </body>
