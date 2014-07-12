@@ -240,11 +240,36 @@ However, the screen can not work to switch the window because the sequence can n
 </p>
 
 
+<hr>
+
+<h1>Vim Configuration</h1>
+
 <h2><a name="background">Background color</a></h2>
 <p>
-TBD
+The vim editor can automatically recognize the terminal color number, namely the 256 color
+supporting because the Tera Term 4.83 or later supports the Termcap String Query of xterm. 
+So, a user must properly configure the background setting to draw the highlight color 
+regarding the vim background color. <br>
+
+When the background color is the dark color(i.e, black), specify the dark setting. Also,
+when the background color is the bright color(i.e, white), specify the light setting. 
 </p>
 
+<pre class="macro-example">
+set background=dark
+</pre>
+
+<p>
+With above setting, the vim can know the terminal background color. So, if the 
+configuration is mistaken, the highlight color will be indistinct because 
+the text and the background color is almost same. <br>
+If the vim automatic recognition of color is stopped, add the set t_RV= entry 
+in the .vimrc file. However, the automatic recognition of mouse type is stopped.
+</p>
+
+<p>
+Also, refer to the :help 'background' on the vim editor for details.
+</p>
 
 
 </body>
