@@ -7309,8 +7309,10 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 		if (c->scp.dir == TOREMOTE) {
 			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -t %s", c->scp.remotefile);
 
-		} else {		
-			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -p -f %s", c->scp.remotefile);
+		} else {
+			// ファイル名に空白を含まれていてもよいように、ファイル名を二重引用符で囲む。
+			// (2014.7.13 yutaka)
+			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -p -f \"%s\"", c->scp.remotefile);
 
 		}
 		buffer_put_string(msg, sbuf, strlen(sbuf));
