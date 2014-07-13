@@ -8010,6 +8010,8 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 	char filename[MAX_PATH];
 	char ch;
 	HWND hDlgWnd;
+	char msg[256];
+	int copylen;
 
 	if (buflen == 0)
 		return FALSE;
@@ -8064,7 +8066,12 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			goto reply;
 
 		} else {
-			// TODO: 
+			// サーバからのデータが不定の場合は、エラー表示を行う。
+			// (2014.7.13 yutaka)
+			copylen = min(buflen, sizeof(msg));
+			memcpy(msg, data, copylen);
+			msg[copylen - 1] = 0;
+			MessageBox(NULL, msg, "TTSSH: SCP error(SCP_INIT)", MB_OK | MB_ICONEXCLAMATION);
 
 		}
 
