@@ -7615,6 +7615,7 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 
 #define WM_SENDING_FILE (WM_USER + 1)
 #define WM_CHANNEL_CLOSE (WM_USER + 2)
+#define WM_GET_CLOSED_STATUS (WM_USER + 3)
 
 typedef struct scp_dlg_parm {
 	Channel_t *c;
@@ -7625,9 +7626,11 @@ typedef struct scp_dlg_parm {
 
 static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+	static int closed = 0;
 
 	switch (msg) {
 		case WM_INITDIALOG:
+			closed = 0;
 			return FALSE;
 
 		// SCPファイル受信(remote-to-local)時、使用する。
@@ -7666,6 +7669,7 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 					//EndDialog(hWnd, 0);
 					//DestroyWindow(hWnd);
 					ShowWindow(hWnd, SW_HIDE);
+					closed = 1;
 					return TRUE;
 				default:
 					return FALSE;
@@ -7679,6 +7683,16 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 		case WM_DESTROY:
 			return TRUE;
 
+		case WM_GET_CLOSED_STATUS:
+			{
+			int *flag = (int *)wp;
+
+
+
+			*flag = closed;
+			}
+			return TRUE;
+
 		default:
 			return FALSE;
 	}
@@ -7687,22 +7701,13 @@ static LRESULT CALLBACK ssh_scp_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, LPARAM 
 
 static int is_canceled_window(HWND hd)
 {
-	// 最小化されているときは、キャンセルではない。
-	if (IsIconic(hd))
-		return 0;
-	// ウィンドウが見えなくなったら、キャンセルされた。
-	if (IsWindow(hd) == 0)
-		return 1;
-	// ウィンドウが非表示の場合、キャンセルされた可能性がある。
-	if (IsWindowVisible(hd) == 0) {
-		HWND p = GetParent(hd);
-		// 親ウィンドウが最小化されているときは、キャンセルではない。
-		if (IsIconic(p))
-			return 0;
+	int closed = 0;
 
+	SendMessage(hd, WM_GET_CLOSED_STATUS, (WPARAM)&closed, 0);
+	if (closed)
 		return 1;
-	}
-	return 0;
+	else
+		return 0;
 }
 
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
