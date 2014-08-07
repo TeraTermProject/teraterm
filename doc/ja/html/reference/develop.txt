@@ -30,7 +30,7 @@
 
 ¡ ƒ‰ƒCƒuƒ‰ƒŠ
 - Oniguruma 5.9.5 (http://www.geocities.jp/kosako3/oniguruma/)
-- OpenSSL 1.0.1h (http://www.openssl.org/)
+- OpenSSL 1.0.1i (http://www.openssl.org/)
 - zlib 1.2.8 (http://www.zlib.net/)
 - PuTTY 0.63 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
