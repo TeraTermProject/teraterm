@@ -21,7 +21,8 @@ ARCHIVE = cygterm+.tar.gz
 
 all : $(EXE) $(LAUNCH) $(ARCHIVE)
 
-$(EXE) : $(SRC) $(RES)
+$(EXE) : $(SRC) $(ICO) $(RC)
+	windres -O coff -o $(RES) $(RC)
   ifeq (0, $(shell nm /usr/lib/crt0.o | grep -c WinMainCRTStartup))
 	$(CC) $(CFLAGS) $(LDFLAGS) -DNO_WIN_MAIN -o $(EXE) $(SRC) $(RES)
   else
@@ -29,26 +30,29 @@ $(EXE) : $(SRC) $(RES)
   endif
 	strip $(EXE)
 
-$(LAUNCH) : $(LAUNCH_SRC) $(RES)
+$(LAUNCH) : $(LAUNCH_SRC) $(ICO) $(RC)
 	@# gcc 4.3.2? or later doesn't support "-mno-cygwin" flag.
 	@#
 	@# $(CC)                   gcc less than 4.3.2 (supports "-mno-cygwin")
 	@# gcc-3                   gcc3 (supports "-mno-cygwin")
-	@# x86_64-w64-mingw32-gcc  mingw32 gcc  host:64bit target:64bit (64bit cygwin)
-	@# i686-w64-mingw32-gcc    mingw32 gcc  host:32bit target:64bit (32bit cygwin on 64bit Windows)
-	@# i686-pc-mingw32-gcc     mingw32 gcc  host:32bit target:32bit (32bit cygwin)
-	( $(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( gcc-3 $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( x86_64-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	@# i686-pc-mingw32-gcc     mingw-gcc-core
+	@# i686-w64-mingw32-gcc    mingw64-i686-gcc-core
+	@# x86_64-w64-mingw32-gcc  mingw64-x86_64-gcc-core
+  ifeq (i686, $(shell uname -m))
+	windres -O coff -o $(RES) $(RC)
+	( i686-pc-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
 	( i686-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
-	( i686-pc-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) 
+	( $(CC) $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) ) || \
+	( gcc-3 $(CFLAGS) $(LDFLAGS) -mno-cygwin -o $(LAUNCH) $(LAUNCH_SRC) $(RES) )
 	strip $(LAUNCH)
+  else
+	x86_64-w64-mingw32-windres -O coff -o $(RES) $(RC)
+	x86_64-w64-mingw32-gcc $(CFLAGS) $(LDFLAGS) -o $(LAUNCH) $(LAUNCH_SRC) $(RES)
+	x86_64-w64-mingw32-strip $(LAUNCH)
+  endif
 
 $(RC):
 	echo 'icon ICON $(ICO)' > $(RC)
-
-$(RES): $(ICO) $(RC)
-	windres -O coff -o $(RES) $(RC)
 
 clean :
 	rm -f $(EXE) $(RC) $(RES) $(LAUNCH) $(ARCHIVE)

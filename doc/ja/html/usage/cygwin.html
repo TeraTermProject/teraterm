@@ -40,13 +40,25 @@ CygwinDirectory = c:\cygwin
 <p>
 ※注意：<br>
 cygtermがうまく起動しない場合は、cygtermをビルドし直してください。<br>
+64bit Cygwin で利用するには、cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term インストールフォルダに上書きするか、cygtermをビルドし直してください。<br>
 最新のソースコードは cygterm+.tar.gz として同梱されています。
 </p>
 
-<p>
-※注意：64bit Cygwin について<br />
-64bit Cygwin で利用するには、cygtermの再コンパイルが必要です。コンパイルするには Cygwin に mingw64-x86_64-gcc-core をインストールする必要があります。
-</p>
+<table border="1">
+  <caption>ビルドに必要なパッケージ</caption>
+  <tr>
+    <th>32bit Cygwin</th>
+    <th>64bit Cygwin</th>
+  </tr>
+  <tr>
+    <td>Devel/gcc-g++<br>
+        Devel/make<br>
+        Devel/mingw-gcc-core</td>
+    <td>Devel/gcc-g++<br>
+        Devel/make<br>
+        Devel/mingw64-x86_64-gcc-core</td>
+  </tr>
+</table>
 
 <p>
 cygterm.exe から起動された状態で設定保存 [Setup][Save setup] を行わないよう注意してください。TCP/IP設定の Telnetポート番号が 23 以外で保存され、通常の Telnet目的の実行時に接続できず、慌てることになってしまいます。<br>

@@ -40,13 +40,25 @@ CygwinDirectory = c:\cygwin
 <p>
 [NOTE]<br>
 If cygterm fails to start you might need to download its source and recompile it.<br>
+<!--64bit Cygwin で利用するには、cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term インストールフォルダに上書きするか、cygtermをビルドし直してください。<br>-->
 Latest source code is included as cygterm+.tar.gz.
 </p>
 
-<p>
-[NOTE] About 64bit Cygwin<br />
-Your cygterm needs to rebuild on the 64bit Cygwin environment. The re-compiling requires the mingw64-x86_64-gcc-core package into your cygwin environment.
-</p>
+<table border="1">
+  <!--caption>ビルドに必要なパッケージ</caption-->
+  <tr>
+    <th>32bit Cygwin</th>
+    <th>64bit Cygwin</th>
+  </tr>
+  <tr>
+    <td>Devel/gcc-g++<br>
+        Devel/make<br>
+        Devel/mingw-gcc-core</td>
+    <td>Devel/gcc-g++<br>
+        Devel/make<br>
+        Devel/mingw64-x86_64-gcc-core</td>
+  </tr>
+</table>
 
 <p>
 Be careful not to save [Setup] [Save setup] in the situation that it was started by cygterm.exe.<br>

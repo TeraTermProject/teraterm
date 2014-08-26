@@ -100,6 +100,8 @@ Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
+Source: ..\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: ..\cygterm\cygterm+-x86_64\cyglaunch.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
 Source: ..\libs\logmett\Setup_LogMeTT_2_10_2.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
 Source: ..\libs\logmett\Setup_TTLEditor_1_5_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
