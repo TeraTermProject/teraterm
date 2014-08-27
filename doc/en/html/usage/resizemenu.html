@@ -30,7 +30,7 @@ Next, a user must register the menu entry in the teraterm.ini file.
 
 Add a [Resize Menu] section in the teraterm.ini file, and describe the "ResizeMenuN = X, Y" entry. N is an 1-origin number.<br>
 When X or Y equals zero, the value is not changed. For example, (X, Y)=(0, 37) means that the width is not changed and the height is changed into 37 lines.<br>
-<!-- X または Y の値を -1 にした場合、画面サイズを超えない範囲での最大値として扱われます。<br> -->
+When the X or Y value is -1, the value is regarded as the maximum value not exceeding the screen size.<br>
 These value maximum is 20.
 </p>
 
