@@ -47,9 +47,9 @@ copy /y ..\cygterm\cygterm.exe %dst%
 copy /y ..\cygterm\cygterm.cfg %dst%
 copy /y ..\cygterm\cyglaunch.exe %dst%
 copy /y "..\cygterm\cygterm+.tar.gz" %dst%
-mkdir %dst%\cygterm+-x86_64
-copy /y ..\cygterm\cygterm+-x86_64\cygterm.exe %dst%\cygterm+-x86_64
-copy /y ..\cygterm\cygterm+-x86_64\cyglaunch.exe %dst%\cygterm+-x86_64
+mkdir "%dst%\cygterm+-x86_64"
+copy /y "..\cygterm\cygterm+-x86_64\cygterm.exe" "%dst%\cygterm+-x86_64"
+copy /y "..\cygterm\cygterm+-x86_64\cyglaunch.exe" "%dst%\cygterm+-x86_64"
 copy /y ..\ttpmenu\Release\ttpmenu.exe %dst%
 copy /y ..\TTProxy\Release\TTXProxy.dll %dst%
 copy /y ..\TTXKanjiMenu\Release\ttxkanjimenu.dll %dst%
