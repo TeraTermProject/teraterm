@@ -13,12 +13,12 @@
 
     <h2>"Serial port setup" ダイアログボックス</h2>
     <dl>
-      <dt>Port</dt>
+      <dt id="ComPort">Port</dt>
       <dd>
 	使用するポート。
       </dd>
 
-      <dt>Data, Stop, Baud rate, Flow control, Parity</dt>
+      <dt id="BaudRate">Baud rate, Data, Parity, Stop, Flow control</dt>
       <dd>
 	シリアルポートのパラメータです。
 	接続するモデム等の設定にあわせてください。
@@ -33,7 +33,7 @@
 	</p>
       </dd>
 
-      <dt>Transmit delay</dt>
+      <dt id="Delay">Transmit delay</dt>
       <dd>
 	Tera Term が文字(行)を送出したあと次の文字(行)を送出するまでの待ち時間。
 	単位はミリ秒です。1文字(行)ごとの待ち時間を設定できます。<br>

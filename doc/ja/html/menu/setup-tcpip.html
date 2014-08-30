@@ -32,7 +32,7 @@
       </pre>
 
 	<dl>
-	  <dt><a name="history">History</a></dt>
+	  <dt id="HistoryList">History</dt>
 	  <dd>
 	    このオプションを選択すると、<a href="file-new.html">[File] New connection</a>
 	    ダイアログボックスで入力されたホスト名がホストリストの先頭に追加されます。
@@ -40,28 +40,28 @@
 	</dl>
       </dd>
 
-      <dt><a name="autowinclose">Auto window close</a></dt>
+      <dt id="AutoWinClose">Auto window close</dt>
       <dd>
 	このオプションを選択すると、ホストとの接続が切れたとき自動的に
 	Tera Term を終了します。
       </dd>
 
-      <dt><a name="tcpport">TCP port#</a></dt>
+      <dt id="TCPPort">TCP port#</dt>
       <dd>
 	ポート番号。Telnet を使用するときは、通常23にします。
       </dd>
 
-      <dt><a name="telnet">Telnet</a></dt>
+      <dt id="Telnet">Telnet</dt>
       <dd>
 	Telnet プロトコルを使用します。通常は選択してください。
       </dd>
 
-      <dt><a name="keepalive">Keep alive</a></dt>
+      <dt id="TelKeepAliveInterval">Keep alive</dt>
       <dd>
 	一定間隔で Telnet サーバに対して、NOP(IAC NOP: 255 241)を送信します。キープアライブ(ハートビート)機能とも呼ばれます。0で当該機能は無効となります。デフォルトは300秒(5分)です。
       </dd>
 
-      <dt><a name="termtype">Terminal type</a></dt>
+      <dt id="TermType">Terminal type</dt>
       <dd>
 	Telnet プロトコルで接続したときホストに報告する terminal type。<br>
 	TermTypeを"xterm"に設定することにより、ANSIカラーに対応しているvim6などでカラー表示をさせることができます。これはオリジナルからある機能です。<br>

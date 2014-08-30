@@ -14,38 +14,38 @@
 
     <h2>"General" タブ</h2>
     <dl>
-      <dt>Enable clickable URL</dt>
+      <dt id="EnableClickableUrl">Enable clickable URL</dt>
       <dd>
 	URL をダブルクリックしたときにブラウザを起動する機能を有効にします。
       </dd>
 
-      <dt>Disable accelerator send break</dt>
+      <dt id="DisableAcceleratorSendBreak">Disable accelerator send break</dt>
       <dd>
 	Alt-B で break を送信する機能を無効にします。
       </dd>
 
-      <dt>Accept broadcast</dt>
+      <dt id="AcceptBroadcast">Accept broadcast</dt>
       <dd>
 	<a href="./control-broadcast.html">ブロードキャストコマンド</a>を受け入れます。<br>
 	この設定は "Realtime mode" が off のブロードキャスト送信に対して有効です。"Realtime mode" が on のブロードキャスト送信は、この設定値にかかわらず受信されます。
       </dd>
 
-      <dt>Mouse wheel scroll line</dt>
+      <dt id="MouseWheelScrollLine">Mouse wheel scroll line</dt>
       <dd>
 	マウスホイールによるスクロール行数を設定します。
       </dd>
 
-      <dt>Auto scroll only in bottom line</dt>
+      <dt id="AutoScrollOnlyInBottomLine">Auto scroll only in bottom line</dt>
       <dd>
 	最下行を表示していない状態では自動的にスクロールしないようにします。
       </dd>
 
-      <dt>Clear display when window resized</dt>
+      <dt id="ClearOnResize">Clear display when window resized</dt>
       <dd>
 	VTウィンドウのサイズを変更した時に、表示内容をクリアするかどうかを設定します。
       </dd>
 
-      <dt>Change cursor shape with IME state</dt>
+      <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
       <dd>
         IMEがonの時に、カーソルを網掛けにするか設定します。
       </dd>
@@ -55,18 +55,18 @@
 
     <h2>"Control Sequence" タブ</h2>
     <dl>
-      <dt>Accept mouse event tracking</dt>
+      <dt id="MouseEventTracking">Accept mouse event tracking</dt>
       <dd>
         ホスト側のアプリケーションによって、VT window がマウストラッキングモードに変更された場合、Tera Term はマウス操作をホストへ報告するようになります。<br>
         マウストラッキングモードはxtermの拡張機能ですので、TERM環境変数が"xterm"以外だとホスト側のアプリケーションはこの機能を使わないかもしれません。
       </dd>
 
-      <dt>Disable mouse event tracking when Control is pressed</dt>
+      <dt id="DisableMouseTrackingByCtrl">Disable mouse event tracking when Control is pressed</dt>
       <dd>
         マウストラッキングモード時、Controlキーが押されている間はマウス操作を通知しないようにします。
       </dd>
 
-      <dt>Accept window title change request</dt>
+      <dt id="AcceptTitleChangeRequest">Accept window title change request</dt>
       <dd>
         リモートからのウィンドウタイトル変更要求を受け入れるかを設定します。
         <dl>
@@ -81,7 +81,7 @@
         </dl>
       </dd>
 
-      <dt>Window title report</dt>
+      <dt id="TitleReportSequence">Window title report</dt>
       <dd>
         dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。
         <dl>
@@ -94,18 +94,18 @@
         </dl>
       </dd>
 
-      <dt>Window control sequence</dt>
+      <dt id="WindowCtrlSequence">Window control sequence</dt>
       <dd>
         この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面移動, 最背面移動, リフレッシュ, ウィンドウサイズ変更(ピクセル単位, 文字単位) が有効になります。
       </dd>
 
-      <dt>Window report sequence</dt>
+      <dt id="WindowReportSequence">Window report sequence</dt>
       <dd>
         この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。<br>
         セキュリティ上の理由等でウィンドウの情報を報告したくない場合は無効にしてください。
       </dd>
 
-      <dt>Cursor control sequence</dt>
+      <dt id="CursorCtrlSequence">Cursor control sequence</dt>
       <dd>
       カーソル形状を制御するシーケンスを使用するかどうかを設定します。<br>
       この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。<br><br>
@@ -140,7 +140,7 @@ cvvis=\E[?12;25h
 </pre>
       </dd>
 
-      <dt>Clipboard access from remote</dt>
+      <dt id="ClipboardAccessFromRemote">Clipboard access from remote</dt>
       <dd>
         ホストからのクリップボードへのアクセスを許可するか設定します。
         <dl>
@@ -160,35 +160,35 @@ cvvis=\E[?12;25h
 
     <h2>"Copy and Paste" タブ</h2>
     <dl>
-      <dt><a name="continuedline">Enable continued line copy</a></dt>
+      <dt id="EnableContinuedLineCopy"><a name="continuedline">Enable continued line copy</a></dt>
       <dd>
 	継続している行を改行せずにコピーする機能を有効にします。
       </dd>
 
-      <dt>Disable mouse R button paste</dt>
+      <dt id="DisablePasteMouseRButton">Disable mouse R button paste</dt>
       <dd>
 	右クリックでクリップボードの内容を貼り付ける機能を無効にします。
       </dd>
 
-      <dt>Confirm mouse R button paste</dt>
+      <dt id="ConfirmPasteMouseRButton">Confirm mouse R button paste</dt>
       <dd>
 	右クリックでクリップボードの内容を貼り付けるとき、
 	ポップアップメニューで確認する機能を有効にします。
       </dd>
 
-      <dt>Select only by L button</dt>
+      <dt id="SelectOnlyByLButton">Select only by L button</dt>
       <dd>
 	マウスドラッグによる選択を、左ボタンでのみ有効にする。
       </dd>
 
-      <dt>Confirm change paste</dt>
+      <dt id="ConfirmChangePaste">Confirm change paste</dt>
       <dd>
 	クリップボードに改行コード(CR/LF)を含む場合、マウスの右クリックおよびAlt+Vで
 	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
 	誤操作により、端末へ予期せぬコマンド投入を防ぐことができます。
       </dd>
 
-      <dt>String file</dt>
+      <dt id="ConfirmChangePasteStringFile">String file</dt>
       <dd>
 	クリップボードに、この設定で指定したファイル内に存在するテキストが含まれる場合、マウスの右クリックおよびAlt+Vで
 	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
@@ -206,7 +206,7 @@ cvvis=\E[?12;25h
 	単語選択の区切り文字を設定します。
       </dd>
 
-      <dt><a name="pastedelayperline">Paste delay per line</a></dt>
+      <dt><a name="PasteDelayPerLine">Paste delay per line</a></dt>
       <dd>
 	複数行のデータを貼り付けるとき、改行が現れるごとにデータの送信を遅延させることができます。遅延する時間をミリ秒で設定します。
       </dd>
@@ -216,7 +216,7 @@ cvvis=\E[?12;25h
 
     <h2>"Visual" タブ</h2>
     <dl>
-      <dt>AlphaBlend</dt>
+      <dt id="AlphaBlend">AlphaBlend</dt>
       <dd>
 	透明度は0～255の範囲で指定することができ、
 	値を小さくするほど透明度は強くなります。
@@ -240,7 +240,7 @@ cvvis=\E[?12;25h
     </dl>
 
     <dl>
-      <dt>MouseCursor</dt>
+      <dt id="MouseCursor">MouseCursor</dt>
       <dd>
 	マウスカーソルの種別を設定することができます。
 <pre>
@@ -251,7 +251,7 @@ HAND  = ハンドカーソル
 </pre>
       </dd>
 
-      <dt>Font quality</dt>
+      <dt id="FontQuality">Font quality</dt>
       <dd>
 	フォントの品質を設定することができます。OSが対応している種類のみ有効に動作します。
 <pre>
@@ -262,20 +262,20 @@ ClearType       = ClearTypeを利用する
 </pre>
       </dd>
 
-      <dt>ANSI color</dt>
+      <dt id="ANSIColor">ANSI color</dt>
       <dd>PC形式およびaixterm形式の16色モードで使用する色のRGB値を設定します。</dd>
 
-      <dt>Enable Bold attribute color</dt>
-      <dt>Enable Blink attribute color</dt>
-      <dt>Enable Reverse attribute color</dt>
-      <dt>Enable URL attribute color</dt>
-      <dt>Enable ANSI color</dt>
+      <dt id="EnableBoldAttrColor">Enable Bold attribute color</dt>
+      <dt id="EnableBlinkAttrColor">Enable Blink attribute color</dt>
+      <dt id="EnableReverseAttrColor">Enable Reverse attribute color</dt>
+      <dt id="EnableURLColor">Enable URL attribute color</dt>
+      <dt id="EnableANSIColor">Enable ANSI color</dt>
       <dd>
         それぞれの色属性および色設定を有効にします。<br>
 	もしANSI colorを無効にした場合、16色および256色モードも無効になります。
       </dd>
 
-      <dt>Underline URL string</dt>
+      <dt id="URLUnderline">Underline URL string</dt>
       <dd>
         URL 文字列に下線属性を有効にします。
       </dd>
@@ -285,12 +285,12 @@ ClearType       = ClearTypeを利用する
 
     <h2>"Log" タブ</h2>
     <dl>
-      <dt>View log editor</dt>
+      <dt id="ViewlogEditor">View log editor</dt>
       <dd>
 	ログを表示するエディタを指定します。
       </dd>
 
-      <dt>Default log file name(strftime format)</dt>
+      <dt id="LogDefaultName">Default log file name(strftime format)</dt>
       <dd>
 	標準のログファイル名を指定します。strftime の書式が使用できます。
 <pre>
@@ -323,66 +323,66 @@ ClearType       = ClearTypeを利用する
 </pre>
       </dd>
 
-      <dt>Default log save folder</dt>
+      <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
 	標準のログ保存先を指定します。ログファイルがフルパスで指定されなかったときに使用されます。
       </dd>
 
-      <dt><a name="autologging">Auto start logging</a></dt>
+      <dt id="LogAutoStart">Auto start logging</dt>
       <dd>
     接続時に自動的にログ採取を開始する機能を有効にします。ログファイル名には、標準のログファイル名が使用されます。<br>
     <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションが指定されていると、当該機能は無効化されます。
       </dd>
 
-      <dt><a name="LogRotate">Log Rotate</a></dt>
+      <dt><a id="LogRotate">Log Rotate</a></dt>
       <dd>
     ログのローテートを有効にします。ローテートされたログファイルには、拡張子に .1, .2, .3 … と付与されます。
       </dd>
 
       <ul>
-        <dt><a name="LogRotateSize">Size</a></dt>
+        <dt><a id="LogRotateSize">Size</a></dt>
         <dd>
         ログをローテートさせる上限サイズを設定します。単位に"KB", "MB"を指定することもできます。
         </dd>
         
-        <dt><a name="LogRotateStep">Rotate</a></dt>
+        <dt><a id="LogRotateStep">Rotate</a></dt>
         <dd>
         ログをローテートさせる世代数を設定します。"0"の場合は、世代管理をしません。
         </dd>
       </ul>
 
-      <dt><a name="LogOption">Log option</a></dt>
+      <dt><a id="LogOption">Log option</a></dt>
       <dd>
       ログファイルの種別を設定します。
       </dd>
 
       <ul>
-        <dt>Binary</dt>
+        <dt id="LogBinary">Binary</dt>
         <dd>
   	ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
   	選択しない場合は、漢字コード、改行文字は変換され、
   	エスケープシーケンスは取り除かれてから書き込まれます。
         </dd>
 
-        <dt>Append</dt>
+        <dt id="LogAppend">Append</dt>
         <dd>
   	すでに存在するファイルに追加して書き込みたい場合は選択してください。
   	選択しない場合は上書きされます。
         </dd>
 
-        <dt>Plain text</dt>
+        <dt id="LogTypePlainText">Plain text</dt>
         <dd>
   	ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
         </dd>
 
-        <dt>Timestamp</dt>
+        <dt id="LogTimestamp">Timestamp</dt>
         <dd>
   	ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
         </dd>
 
-        <dt>Hide dialog</dt>
+        <dt id="LogHideDialog">Hide dialog</dt>
         <dd>
   	ログ転送のダイアログを表示したくない場合は選択してください。
         </dd>
@@ -398,7 +398,7 @@ ClearType       = ClearTypeを利用する
 
     <h2>"Cygwin" タブ</h2>
     <dl>
-      <dt>Cygwin install path</dt>
+      <dt id="CygwinDirectory">Cygwin install path</dt>
       <dd>
 	Cygwin のインストール先を指定します。
       </dd>

@@ -14,38 +14,38 @@
 
     <h2>"General" Tab</h2>
     <dl>
-      <dt>Enable clickable URL</dt>
+      <dt id="EnableClickableUrl">Enable clickable URL</dt>
       <dd>
 	Launches the web browser by clicking URL string.
       </dd>
 
-      <dt>Disable accelerator send break</dt>
+      <dt id="DisableAcceleratorSendBreak">Disable accelerator send break</dt>
       <dd>
 	Disables accelerator key of send break.
       </dd>
 
-      <dt>Accept broadcast</dt>
+      <dt id="AcceptBroadcast">Accept broadcast</dt>
       <dd>
 	Accept the <a href="./control-broadcast.html">broadcast command</a>.<br>
 	Can be only enabled when the "Realtime mode" is off. However, this option is always ignored when the "Realtime mode" is on.
       </dd>
 
-      <dt>Mouse wheel scroll line</dt>
+      <dt id="MouseWheelScrollLine">Mouse wheel scroll line</dt>
       <dd>
 	Configures the mouse wheel scroll line.
       </dd>
 
-      <dt>Auto scroll only in bottom line</dt>
+      <dt id="AutoScrollOnlyInBottomLine">Auto scroll only in bottom line</dt>
       <dd>
 	Stop auto scrolling except when the bottom line is displayed.
       </dd>
 
-      <dt>Clear display when window resized</dt>
+      <dt id="ClearOnResize">Clear display when window resized</dt>
       <dd>
         The current screen is cleared when the VT window resizes.
       </dd>
 
-      <dt>Change cursor shape with IME state</dt>
+      <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
       <dd>
         When the IME is enabled, the caret is gray.
       </dd>
@@ -55,18 +55,18 @@
 
     <h2>"Control Sequence" Tab</h2>
     <dl>
-      <dt>Accept mouse event tracking</dt>
+      <dt id="MouseEventTracking">Accept mouse event tracking</dt>
       <dd>
 	Tera Term would send the escape sequence of the mouse operation when VT window is changed to the mouse tracking mode by the host application.<br>
 	However, TERM environment variable should be "xterm" type.
       </dd>
 
-      <dt>Disable mouse event tracking when Control is pressed</dt>
+      <dt id="DisableMouseTrackingByCtrl">Disable mouse event tracking when Control is pressed</dt>
       <dd>
         The mouse tracking mode is enabled, TeraTerm does not send the mouse operation while the control key is pressed.
       </dd>
 
-      <dt>Accept window title change request</dt>
+      <dt id="AcceptTitleChangeRequest">Accept window title change request</dt>
       <dd>
         Configures whether a user accepts the window title changing.
         <dl>
@@ -81,7 +81,7 @@
         </dl>
       </dd>
 
-      <dt>Window title report</dt>
+      <dt id="TitleReportSequence">Window title report</dt>
       <dd>
         A user can configurate how Tera Term can respond to the ddterm window title and icon label reporting request. 
         <dl>
@@ -94,18 +94,18 @@
         </dl>
       </dd>
 
-      <dt>Window control sequence</dt>
+      <dt id="WindowCtrlSequence">Window control sequence</dt>
       <dd>
         added support for the position moving, the minimization, the maximization, the most front, the most back, the refresh and the window size changing(per pixel and character) control sequences regarding the dtterm window operation.
       </dd>
 
-      <dt>Window report sequence</dt>
+      <dt id="WindowReportSequence">Window report sequence</dt>
       <dd>
         This function enables the ddterm control sequence such as the window status reporting, the window position reporting, the window size(in pixcel and character) reporting and the root window size reporting, among the window information reporting features.<br>
         If you do not want window informations to be sent to remote host by some reason such as security, please disable this setting.
       </dd>
 
-      <dt>Cursor control sequence</dt>
+      <dt id="CursorCtrlSequence">Cursor control sequence</dt>
       <dd>
       Enables the control sequence for the cursor shape.<br>
       This function enables cursor shape change by cursor change seqnence of DECSCUSR(cursor shape change), WYSTCURM(Wyse no-blinking cursor), WYULCURM(Wyse underlined cursor) and AT&amp;T 610 blinking cursor.<br><br>
@@ -141,7 +141,7 @@ If the configuration is enabled as whole system, execute the upper command with 
 </pre>
       </dd>
 
-      <dt>Clipboard access from remote</dt>
+      <dt id="ClipboardAccessFromRemote">Clipboard access from remote</dt>
       <dd>
         permits the host to access the clipboard.
         <dl>
@@ -161,36 +161,36 @@ If the configuration is enabled as whole system, execute the upper command with 
 
     <h2>"Copy and Paste" Tab</h2>
     <dl>
-      <dt><a name="continuedline">Enable continued line copy</a></dt>
+      <dt id="EnableContinuedLineCopy"><a name="continuedline">Enable continued line copy</a></dt>
       <dd>
 	Concatenates current line with the next line including word
 	characters when the whole line is stepped over.
       </dd>
 
-      <dt>Disable mouse R button paste</dt>
+      <dt id="DisablePasteMouseRButton">Disable mouse R button paste</dt>
       <dd>
 	Disables pasting clipboard data when mouse right button is clicked.
       </dd>
 
-      <dt>Confirm mouse R button paste</dt>
+      <dt id="ConfirmPasteMouseRButton">Confirm mouse R button paste</dt>
       <dd>
 	Displays popup menu and confirm pasting clipboard data when mouse
 	right button is clicked.
       </dd>
 
-      <dt>Select only by L button</dt>
+      <dt id="SelectOnlyByLButton">Select only by L button</dt>
       <dd>
 	Enable selection by mouse drag only with left button.
       </dd>
 
-      <dt>ConfirmChangePaste</dt>
+      <dt id="ConfirmChangePaste">Confirm change paste</dt>
       <dd>
 	When the Clipboard includes CR/LF, the confirmation
 	dialog can be shown to paste by right-click or Alt+V.
 	This is a foolproof way.
       </dd>
 
-      <dt>String file</dt>
+      <dt id="ConfirmChangePasteStringFile">String file</dt>
       <dd>
 	When the Clipboard includes any strings in the specified file, 
 	the confirmation dialog can be shown to paste by right-click or Alt+V.
@@ -208,7 +208,7 @@ If the configuration is enabled as whole system, execute the upper command with 
 	Inludes delimiter characters for the word selection.
       </dd>
 
-      <dt><a name="pastedelayperline">Paste delay per line</a></dt>
+      <dt><a name="PasteDelayPerLine">Paste delay per line</a></dt>
       <dd>
 	A user can delay to send a line data to the remote host when the user pastes multiple lines. The delay time can be specified by this option on the millisecond time scale.
       </dd>
@@ -218,7 +218,7 @@ If the configuration is enabled as whole system, execute the upper command with 
 
     <h2>"Visual" tab</h2>
     <dl>
-      <dt>AlphaBlend</dt>
+      <dt id="AlphaBlend">AlphaBlend</dt>
       <dd>
 	You can setup the value of transparency. The range of transparency
 	is from 0 to 255. The more transparency reduces the value, the more
@@ -242,7 +242,7 @@ If the configuration is enabled as whole system, execute the upper command with 
     </dl>
 
     <dl>
-      <dt>MouseCursor</dt>
+      <dt id="MouseCursor">MouseCursor</dt>
       <dd>
 	Mouse cursor can have one of the 4 shapes listed below:
 <pre>
@@ -253,7 +253,7 @@ HAND  = hand cursor
 </pre>
       </dd>
 
-      <dt>Font quality</dt>
+      <dt id="FontQuality">Font quality</dt>
       <dd>
 	Specifies the font quality. This feature will work well only if the operating system supports.
 <pre>
@@ -264,20 +264,20 @@ ClearType       = Use the ClearType.
 </pre>
       </dd>
 
-      <dt>ANSI color</dt>
+      <dt id="ANSIColor">ANSI color</dt>
       <dd>Specifies the RGB value of the color for PC style and aixterm style 16 colors mode.</dd>
 
-      <dt>Enable Bold attribute color</dt>
-      <dt>Enable Blink attribute color</dt>
-      <dt>Enable Reverse attribute color</dt>
-      <dt>Enable URL attribute color</dt>
-      <dt>Enable ANSI color</dt>
+      <dt id="EnableBoldAttrColor">Enable Bold attribute color</dt>
+      <dt id="EnableBlinkAttrColor">Enable Blink attribute color</dt>
+      <dt id="EnableReverseAttrColor">Enable Reverse attribute color</dt>
+      <dt id="EnableURLColor">Enable URL attribute color</dt>
+      <dt id="EnableANSIColor">Enable ANSI color</dt>
       <dd>
         Enables each color attributes and color setting.<br>
 	If ANSI color is disabled, 16 colors and 256 colors modes are also disabled.
       </dd>
 
-      <dt>Underline URL string</dt>
+      <dt id="URLUnderline">Underline URL string</dt>
       <dd>
         Enables Underline attribute on URL string.
       </dd>
@@ -287,12 +287,12 @@ ClearType       = Use the ClearType.
 
     <h2>"Log" tab</h2>
     <dl>
-      <dt>View log editor</dt>
+      <dt id="ViewlogEditor">View log editor</dt>
       <dd>
 	Specify the editor that is used for display log file
       </dd>
 
-      <dt>Default log file name(strftime format)</dt>
+      <dt id="LogDefaultName">Default log file name(strftime format)</dt>
       <dd>
 	Specify default log file name. It can include a format of strftime.
 <pre>
@@ -330,64 +330,64 @@ SYNOPSIS:
 	Specify default path to save log file. It is used when the log file name is not a full path.
       </dd>
 
-      <dt><a name="autologging">Auto start logging</a></dt>
+      <dt><a id="LogAutoStart">Auto start logging</a></dt>
       <dd>
     Start logging automaticaly when connecting. Default Log File Name is used for log file name.<br>
     When the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line is specified, this feature is always disabled.
       </dd>
 
-      <dt><a name="LogRotate">Log Rotate</a></dt>
+      <dt><a id="LogRotate">Log Rotate</a></dt>
       <dd>
     The log rotation is enabled. The extension of the rotated file is added .1, .2, .3 etc.
       </dd>
 
       <ul>
-        <dt><a name="LogRotateSize">Size</a></dt>
+        <dt><a id="LogRotateSize">Size</a></dt>
         <dd>
         The log file is rotated when it grows bigger than Size bytes. If the size is followed by KB, 
         the size is assumed to be in kilobytes. If the MB is used, the size is in megabytes.
         </dd>
         
-        <dt><a name="LogRotateStep">Rotate</a></dt>
+        <dt><a id="LogRotateStep">Rotate</a></dt>
         <dd>
         The log file is rotated Rotate times before being removed. If the Rotate is 0,
         the old version is not removed rather than rotated.
         </dd>
       </ul>
 
-      <dt><a name="LogOption">Log option</a></dt>
+      <dt><a id="LogOption">Log option</a></dt>
       <dd>
       Sepcify the log type.
       </dd>
 
       <ul>
-        <dt>Binary</dt>
+        <dt id="LogBinary">Binary</dt>
         <dd>
   	If you select this option, received characters are written without
   	any modifications. Otherwise, new-line codes are converted and
   	escape sequences are stripped out.
         </dd>
 
-        <dt>Append</dt>
+        <dt id="LogAppend">Append</dt>
         <dd>
   	If you select this option and the specified log file already exists,
   	received characters are appended to the file. Otherwise, the file is
   	overwritten.
         </dd>
 
-        <dt>Plain text</dt>
+        <dt id="LogTypePlainText">Plain text</dt>
         <dd>
   	If you select this option, ASCII non-printable characters are not written.<br>
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
         </dd>
 
-        <dt>Timestamp</dt>
+        <dt id="LogTimestamp">Timestamp</dt>
         <dd>
   	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
         </dd>
 
-        <dt>Hide dialog</dt>
+        <dt id="LogHideDialog">Hide dialog</dt>
         <dd>
   	If you select this option, "Log" dialog box is not displayed.
         </dd>
@@ -403,7 +403,7 @@ SYNOPSIS:
 
     <h2>"Cygwin" tab</h2>
     <dl>
-      <dt>Cygwin install path</dt>
+      <dt id="CygwinDirectory">Cygwin install path</dt>
       <dd>
 	Specify the install directory of Cygwin.
       </dd>

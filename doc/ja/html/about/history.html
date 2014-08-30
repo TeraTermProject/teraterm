@@ -221,7 +221,7 @@
         <ul>
           <li>teraterm.iniに <a href="../setup/teraterm-term.html#BellLimitting">BellOverUsedTime, BellOverUsedCount, BellSuppressTime</a> エントリを追加した。デフォルトは 2, 5, 5。</li>
         </ul></li>
-      <li><a href="../menu/setup-tcpip.html#autowinclose">Auto window close</a>を制御する <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> コマンドラインオプションを追加した。</li>
+      <li><a href="../menu/setup-tcpip.html#AutoWinClose">Auto window close</a>を制御する <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> コマンドラインオプションを追加した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/appendixes/errormessages.html">エラーメッセージ</a>に"Unknown command."を追加した。</li>
@@ -263,7 +263,7 @@
         </ul></li>
       <li><a href="../menu/file.html">Fileメニュー</a>に「Tera Termの全終了(Exit All)」を追加した。</li>
       <li><a href="../menu/window.html">Windowメニュー</a>に「重ねて表示(Cascade)」「上下に並べて表示(Stacked)」「左右に並べて表示(Side By Side)」を追加した。</li>
-      <li><a href="../menu/setup-additional.html#autologging">自動ログ取得</a>を無効化する <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションを追加した。</li>
+      <li><a href="../menu/setup-additional.html#LogAutoStart">自動ログ取得</a>を無効化する <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションを追加した。</li>
       <li>マクロ
         <ul>
           <li><a href="../macro/command/listbox.html">listbox</a>コマンドを追加した。</li>
@@ -295,7 +295,7 @@
         </ul></li>
       <li>ウィンドウの右端で URL が終わって改行している場合に、次の行まで URL が続いていると判定される問題を修正した。</li>
       <li>URL 文字列としてマウスハンドカーソルの判定される領域が左に半文字分ずれる問題を修正した。</li>
-      <li>マクロからの送信データに対しても<a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a>設定が適用される問題を修正した。</li>
+      <li>マクロからの送信データに対しても<a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a>設定が適用される問題を修正した。</li>
       <li><a href="../macro/command/waitn.html">waitn</a> マクロコマンドで timeout が 0 のときにデータを待たない問題を修正した。</li>
       <li>マクロでcontinue後にbreakするとInvalid Controlエラーが発生する問題を修正した。</li>
       <li>マルチディスプレイ環境で box 系マクロコマンドのダイアログ表示位置がおかしくなる問題を修正した。</li>
@@ -1475,7 +1475,7 @@
       <li>サーバから送信されるタイトル文字列の末尾 1 文字が削られる問題を修正した。</li>
       <li>New connection ダイアログから Telnet 接続を開始したとき、TCPLocalEcho/TCPCRSend の設定が使用されてしまうことがある問題を修正した。</li>
       <li><a href="../menu/setup-additional.html#continuedline">継続行連結コピー</a>を有効に設定している時、<a href="../menu/edit.html#copytable">テーブルをコピー</a>が正しく動作しない場合がある問題を修正した。</li>
-      <li><a href="../menu/setup-keyboard.html#delkey">DeleteキーでDELを送信する</a>設定で Num Lock の状態が Off の時、数値キーパッドの"."でDELが送信されていたのを修正した。</li>
+      <li><a href="../menu/setup-keyboard.html#DeleteKey">DeleteキーでDELを送信する</a>設定で Num Lock の状態が Off の時、数値キーパッドの"."でDELが送信されていたのを修正した。</li>
       <li>マクロの <a href="../macro/command/wait.html">wait</a> コマンドが長い文字列を待てなくなっていたのを修正した。4.54でのエンバグ。</li>
       <li><a href="../menu/setup-window.html">ウィンドウの設定ダイアログ</a>のカラー設定で、値が15以下の時にPageUpキーを押すと255になるのを修正した。</li>
       <li>COMポート番号を強制付け替えした場合に、レジストリに残っている古いFriendlyNameが表示されてしまう問題を修正した。パッチ作成に感謝します＞xoxo氏</li>

@@ -221,7 +221,7 @@
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#BellLimitting">BellOverUsedTime, BellOverUsedCount and BellSuppressTime</a> entries in the teraterm.ini file. The default value are 2 , 5 and 5.</li>
         </ul></li>
-      <li>added the <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> command line option to control the <a href="../menu/setup-tcpip.html#autowinclose">Auto window close</a>.</li>
+      <li>added the <a href="../commandline/teraterm.html#autowinclose">/AUTOWINCLOSE</a> command line option to control the <a href="../menu/setup-tcpip.html#AutoWinClose">Auto window close</a>.</li>
       <li>Macro
         <ul>
           <li>added the "Unknown command." new message in the <a href="../macro/appendixes/errormessages.html">Error messages</a>.</li>
@@ -263,7 +263,7 @@
         </ul></li>
       <li>added the Exit All under the <a href="../menu/file.html">File menu</a>.</li>
       <li>added the Cascade, Stacked and Side By Side under the <a href="../menu/window.html">Window menu</a>.</li>
-      <li>added the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line option to disable the <a href="../menu/setup-additional.html#autologging">Auto start logging</a>.</li>
+      <li>added the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line option to disable the <a href="../menu/setup-additional.html#LogAutoStart">Auto start logging</a>.</li>
       <li>Macro
         <ul>
           <li>added the <a href="../macro/command/listbox.html">listbox</a> command.</li>
@@ -295,7 +295,7 @@
         </ul></li>
       <li>When the URL string ends at the right row and return code, the URL string continues to next line by mistake.</li>
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
-      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#pastedelayperline">Paste delay per line</a> configuration.</li>
+      <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
       <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
       <li>MARCO: When the break command is executed after the continue command, the Invalid Control error will be ocurred.</li>
       <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
@@ -1476,7 +1476,7 @@
       <li>Bug fix: last 1 character of title string that is sent from server is deleted.</li>
       <li>Bug fix: TeraTerm would use the configuration of TCPLocalEcho/TCPCRSend when the user start telnet connection on New connection dialog.</li>
       <li>Bug fix: when <a href="../menu/setup-additional.html#continuedline">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
-      <li>Bug fix: when <a href="../menu/setup-keyboard.html#delkey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
+      <li>Bug fix: when <a href="../menu/setup-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
       <li>Bug fix: '<a href="../macro/command/wait.html">wait</a>' macro command can't wait a long string. Enbuged at 4.54.</li>
       <li>Bug fix: The color value on <a href="../menu/setup-window.html">Window setup dialog</a> would become 255 when the value is less than 16 and the user pushes PageUP key.</li>
       <li>Bug fix: COM port description would be wrong when COM port number is forced to switch another number. Special thanks to xoxo-san.</li>

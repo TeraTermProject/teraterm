@@ -13,19 +13,19 @@
 
     <h2>"Terminal setup" ダイアログボックス</h2>
     <dl>
-      <dt>Terminal size</dt>
+      <dt id="TerminalSize">Terminal size</dt>
       <dd>
 	ターミナルサイズ(端末画面の論理サイズ)。
 	横 X 縦 の文字数で指定します。
 	ウインドウサイズ(実際の画面の大きさ)と必ずしも同じではありません。
       </dd>
 
-      <dt>Term size = win size</dt>
+      <dt id="TermIsWin">Term size = win size</dt>
       <dd>
 	このオプションを選択した場合、ターミナルサイズとウィンドウサイズを常に等しくします。
       </dd>
 
-      <dt>Auto window resize</dt>
+      <dt id="AutoWinResize">Auto window resize</dt>
       <dd>
 	このオプションを選択した場合、ターミナルサイズが変更されたときに、
 	ウインドウサイズも同じ大きさに自動的に変更されます。
@@ -53,7 +53,7 @@
         </dl>
       </dd>
 
-      <dt>New-line (transmit)</dt>
+      <dt id="CRSend">New-line (transmit)</dt>
       <dd>
         <dl>
           <dt>CR</dt>
@@ -64,7 +64,7 @@
         </dl>
       </dd>
 
-      <dt><a name="TerminalID">Terminal ID</a></dt>
+      <dt id="TerminalID">Terminal ID</dt>
       <dd>
 	ホストに報告する Terminal ID。Terminal ID は telnet の
 	terminal type とは違います。Telnet の terminal type を変更するには
@@ -72,12 +72,12 @@
 	コマンドを使用してください。
       </dd>
 
-      <dt>Local echo</dt>
+      <dt id="LocalEcho">Local echo</dt>
       <dd>
 	キー入力等により送出する文字をそのまま画面に表示します。
       </dd>
 
-      <dt><a name="answerback">Answerback</a></dt>
+      <dt id="Answerback">Answerback</dt>
       <dd>
 	ホストから ENQ ($05) 文字が送られてきた時に、送り返す文字列。
 	文字列中に含まれる表示不可能な文字(制御文字)は、"$" と それにつづく
@@ -89,37 +89,37 @@
 	</p>
       </dd>
 
-      <dt>Auto switch (VT&lt;-&gt;TEK)</dt>
+      <dt id="AutoWinSwitch">Auto switch (VT&lt;-&gt;TEK)</dt>
       <dd>
 	エスケープシーケンスを判別して、自動的に VT window から
 	TEK window へ制御を移します(逆も同様)。
       </dd>
 
-      <dt>Kanji (receive)</dt>
+      <dt id="KanjiReceive">Kanji (receive)</dt>
       <dd>
 	ホストから送られてくる漢字コード (SJIS, EUC, JIS, UTF-8, UTF-8m の5種類)。
       </dd>
 
-      <dt>7bit katakana (receive)</dt>
+      <dt id="KatakanaReceive">7bit katakana (receive)</dt>
       <dd>
 	ホストから送られてくる"半角"片仮名コードが 7 bit で表現されている
 	(SO/SI を用いたシフト制御を用いている)場合に選択してください。
 	Kanji (receive) が JIS の場合のみ有効です。
       </dd>
 
-      <dt>Kanji (transmit)</dt>
+      <dt id="KanjiSend">Kanji (transmit)</dt>
       <dd>
 	送出する漢字コード (SJIS, EUC, JIS, UTF-8 の4種類)。
       </dd>
 
-      <dt>7bit katakana (transmit)</dt>
+      <dt id="KatakanaSend">7bit katakana (transmit)</dt>
       <dd>
 	送出する"半角"片仮名コードを7bitで表現する
 	(SO/SI を用いたシフト制御を用いる)場合に選択してください。
 	Kanji (transmit) が JIS の場合のみ有効です。
       </dd>
 
-      <dt>Kanji-in (transmit)</dt>
+      <dt id="KanjiIn">Kanji-in (transmit)</dt>
       <dd>
 	Kanji (transmit) が JIS のときに使用するエスケープシーケンス
 	(漢字コードを G0 に指示するシーケンス。
@@ -127,7 +127,7 @@
 	ホストから送られてくるエスケープシーケンスはどちらでも構いません。
       </dd>
 
-      <dt>Kanji-out (transmit)</dt>
+      <dt id="KanjiOut">Kanji-out (transmit)</dt>
       <dd>
 	Kanji (transmit) が JIS のときに使用するエスケープシーケンス
 	(ASCII または JIS ローマ字コードを G0 に指示するシーケンス。

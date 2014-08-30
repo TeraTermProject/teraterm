@@ -13,14 +13,14 @@
 
     <h2>"Terminal setup" dialog box</h2>
     <dl>
-      <dt>Terminal size</dt>
+      <dt id="TerminalSize">Terminal size</dt>
       <dd>
 	The logical size of the terminal (numbers of columns and lines).
 	Note that the window size (real screen size) is not necessarily
 	equal to the terminal size.
       </dd>
 
-      <dt>Term size = win size</dt>
+      <dt id="TermIsWin">Term size = win size</dt>
       <dd>
 	Forces the terminal size to be always equal to the window size.
       </dd>
@@ -53,7 +53,7 @@
         </dl>
       </dd>
 
-      <dt>New-line (transmit)</dt>
+      <dt id="CRSend">New-line (transmit)</dt>
       <dd>
         <dl>
           <dt>CR</dt>
@@ -72,12 +72,12 @@
 	<a href="setup-tcpip.html">[Setup] TCP/IP</a> command.
       </dd>
 
-      <dt>Local echo</dt>
+      <dt id="LocalEcho">Local echo</dt>
       <dd>
 	Enables local echoing of characters sent.
       </dd>
 
-      <dt><a name="answerback">Answerback</a></dt>
+      <dt><a name="Answerback">Answerback</a></dt>
       <dd>
 	The string to be answered back to the host, when the ENQ ($05)
 	character is received. Each non-printable character in the string
@@ -89,7 +89,7 @@
 	</p>
       </dd>
 
-      <dt>Auto switch (VT&lt;-&gt;TEK)</dt>
+      <dt id="AutoWinSwitch">Auto switch (VT&lt;-&gt;TEK)</dt>
       <dd>
 	Enables auto switching between VT and TEK emulations.
       </dd>

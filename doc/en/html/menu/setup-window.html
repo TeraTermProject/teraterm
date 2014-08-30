@@ -13,22 +13,22 @@
 
     <h2>"Window setup" dialog box</h2>
     <dl>
-      <dt>Title</dt>
+      <dt id="Title">Title</dt>
       <dd>
 	Text displayed in the window title.
       </dd>
 
-      <dt>Cursor shape</dt>
+      <dt id="CursorShape">Cursor shape</dt>
       <dd>
 	Cursor shape. Block, Vertical line or Horizontal line.
       </dd>
 
-      <dt>Enable bold font</dt>
+      <dt id="EnableBold">Enable bold font</dt>
       <dd>
 	Enables the use of bold style font for characters with the bold attribute.
       </dd>
 
-      <dt>Hide title bar</dt>
+      <dt id="HideTitle">Hide title bar</dt>
       <dd>
 	Hides the title bar and menu bar. You can move the window by
 	dragging it with the left mouse button while pressing the Alt key.
@@ -37,13 +37,13 @@
 	pressing the Ctrl key causes the pop-up menu to appear. 
       </dd>
 
-      <dt>Hide menu bar</dt>
+      <dt id="PopupMenu">Hide menu bar</dt>
       <dd>
 	Hides the menu bar. Clicking the left mouse button while pressing
 	the Ctrl key causes the pop-up menu to appear.
       </dd>
 
-      <dt>16 Colors (PC style)</dt>
+      <dt id="PcBoldColor">16 Colors (PC style)</dt>
       <dd>
 	Enables the PC style mapping of bold color.  In this mode, the bold (blink)
 	attribute is used as a color attribute bit for text (background).
@@ -51,7 +51,7 @@
 	background specified by escape sequences twice, from 8 to 16.
       </dd>
 
-      <dt>16 Colors (aixterm style)</dt>
+      <dt id="Aixterm16Color">16 Colors (aixterm style)</dt>
       <dd>
 	Enables aixterm style 16 colors mode.
 	This option increases the number of colors for text and
@@ -61,7 +61,7 @@
 	If a user does not like this behavior, turn off this option.
       </dd>
 
-      <dt>256 Colors (xterm style)</dt>
+      <dt id="Xterm256Color">256 Colors (xterm style)</dt>
       <dd>
 	Enables xterm style 256 colors mode.
 	This option increases the number of colors for text and
@@ -69,7 +69,7 @@
 	Also, a user can change the color table by the escape sequence.
       </dd>
 
-      <dt>Scroll buffer</dt>
+      <dt id="ScrollBuffSize">Scroll buffer</dt>
       <dd>
 	Enables the scroll buffer. If enabled, the number of lines in the
 	scroll buffer (including the displayed area) can be specified.
@@ -91,7 +91,7 @@
 	    Background color.
 	  </dd>
 
-	  <dt>Attribute</dt>
+	  <dt id="Attribute">Attribute</dt>
 	  <dd>
 	    Attribute of characters (Normal, Bold, Blink, Reverse or URL) whose colors
 	    are being changed.<br>
@@ -108,7 +108,7 @@
 	    Specifies the RGB value of the character color.
 	  </dd>
 
-	  <dt>Always use Normal text's BG</td>
+	  <dt id="UseNormalBGColor">Always use Normal text's BG</td>
 	  <dd>
 	    If this option is ON, Tera Term uses Normal background color instead of Bold, Blink and URL's background color.
 	  </dd>
