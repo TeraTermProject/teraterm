@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Mar 18 2014)
-; Last translated (Russian language) by Ryumik Sergey (Mar 20 2014)
+; Updated by TeraTerm Project (Aug 31 2014)
+; Last translated (Russian language) by Ryumik Sergey (Sep 03 2014)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -230,7 +230,7 @@ DLG_TAB_VISUAL_RESTART=(*) Необходимо сохранить настройки и перезапустить Tera T
 
 DLG_TAB_LOG_EDITOR=&Редактор лог-файла
 DLG_TAB_LOG_FILENAME=&Имя лог-файла по умолчанию
-DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла по умолчанию
+DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла
 DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла
 DLG_TAB_LOG_ROTATE=&Ротация лог-файла
 DLG_TAB_LOG_ROTATE_SIZE_TEXT=Р&азмер
@@ -403,7 +403,7 @@ DLG_FOPT_APPEND=&Дополнение
 DLG_FOPT_PLAIN=&Обычный текст
 DLG_FOPT_TIMESTAMP=&Отметка времени
 DLG_FOPT_HIDEDIALOG=&Скрыть диалог
-DLG_FOPT_ALLBUFFINFIRST=&Включить буфер экрана
+DLG_FOPT_ALLBUFFINFIRST=&Включить буфер экр.
 
 DLG_XOPT=Опции
 DLG_XOPT_CHECKSUM=&Контрольная сумма
@@ -517,7 +517,7 @@ DLG_ABOUT_COMP_INFO2=уровень %d
 DLG_ABOUT_COMP_NONE=нет
 DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
 DLG_ABOUT_AUTH_INFO=Пользователь '%s', использовано %s
-DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
+DLG_ABOUT_FINGERPRINT=Отпечаток ключа хоста:
 
 ; dlg auth
 DLG_AUTH_TITLE=Аутентификация SSH
@@ -566,14 +566,14 @@ MSG_NOAUTHMETHOD_ERROR=Сервер не поддерживает ни один из параметров проверки аут
 DLG_DIFFERENTKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_DIFFERENTKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ КЛЮЧ, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_DIFFERENTKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
-DLG_DIFFERENTKEY_FINGERPRINT=Ключ сервера хоста:
+DLG_DIFFERENTKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
 DLG_DIFFERENTKEY_REPLACE=&Заменить существующий ключ новым ключом
 
 ; dlg diff type key
 DLG_DIFFERENTTYPEKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_DIFFERENTTYPEKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ ТИП КЛЮЧА, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_DIFFERENTTYPEKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
-DLG_DIFFERENTTYPEKEY_FINGERPRINT=Ключ сервера хоста:
+DLG_DIFFERENTTYPEKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
 DLG_DIFFERENTTYPEKEY_ADD=&Добавить этот компьютер и его ключ в список известных хостов
 
 ; dlg fwd edit
@@ -632,17 +632,17 @@ DLG_KEYGEN_KEYTYPE=Тип ключа
 DLG_KEYGEN_PASSPHRASE=Ключевая фраза:
 DLG_KEYGEN_PASSPHRASE2=Подтвердить фразу:
 DLG_KEYGEN_COMMENT=&Комментарии:
-DLG_KEYGEN_SAVEPUBLIC=&Открытый ключ
+DLG_KEYGEN_SAVEPUBLIC=&Публичный ключ
 DLG_KEYGEN_SAVEPRIVATE=&Закрытый ключ
 DLG_KEYGEN_GENERATE=&Генерация
 DLG_KEYGEN_BITS=&Биты:
-DLG_BCRYPT_KDF=bcrypt &KDF формат
+DLG_BCRYPT_KDF=хеш "bcrypt" &KDF
 
 MSG_KEYBITS_MIN_ERROR=Битов ключа слишком мало!
 MSG_KEYGEN_GENERATING="Генерация ключа..."
 MSG_KEYGEN_GENERATED="Ключ сгенерирован успешно!"
 
-FILEDLG_SAVE_PUBLICKEY_TITLE=Сохранить открытый ключ как:
+FILEDLG_SAVE_PUBLICKEY_TITLE=Сохранить публичный ключ как:
 FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
@@ -693,7 +693,7 @@ DLG_SSHSETUP_HEARTBEAT_UNIT=сек.(0 - выключить)
 DLG_SSHSETUP_PASSWORD=&Запомнить пароль в памяти
 DLG_SSHSETUP_FORWARDAGENT=&Включить агент пересылки
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=&Подтвердить агента пересылки
-DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста по DNS
+DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста в DNS
 DLG_SSHSETUP_NOTICE=Все параметры вступят в силу в следующей сессии.
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Выберите файл чтения/записи известных хостов
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы добавить
@@ -711,8 +711,8 @@ DLG_UNKNOWNHOST_ADD=&Добавьте этот компьютер и его ключ в список известных хосто
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=Не найден ключ хоста в DNS.
 DLG_HOSTKEY_SSHFP_MATCH=Соответствующий ключ хоста найден в DNS.
-DLG_HOSTKEY_SSHFP_MISMATCH=Несоответствие ключа хоста найдено в DNS.
-DLG_HOSTKEY_SSHFP_DIFFTYPE=Несоответствие типа ключа хоста найдено в DNS.
+DLG_HOSTKEY_SSHFP_MISMATCH=Несоответствие ключа хоста в DNS.
+DLG_HOSTKEY_SSHFP_DIFFTYPE=Несоответствие типа ключа хоста в DNS.
 DLG_HOSTKEY_DNSSEC_NG=Найден ненадежный пароль в DNS.
 DLG_HOSTKEY_DNSSEC_OK=Найден надежный пароль в DNS.
 
@@ -832,7 +832,7 @@ BTN_CONTINUE=&Продолжение
 DLG_TAHOMA_FONT=Tahoma,8,0
 
 NEMU_SETUP=&Proxy...
-MENU_ABOUT=&Информация о TTProxy...
+MENU_ABOUT=Информация о TT&Proxy...
 
 DLG_SETUP_TITLE=Настройка Proxy
 DLG_SETUP_URL=URL
@@ -864,7 +864,7 @@ DLG_OTHER_ERROR=&Сообщение об ошибке
 DLG_ABOUT_TITLE=Информация о TTProxy
 DLG_ABOUT_EXTENTION=Tera Term расширенное прокси
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
-DLG_ABOUT_HOMEPAGE=TTProxy домашняя страница
+DLG_ABOUT_HOMEPAGE=TTProxy home page
 
 MSG_EMPTY_HOSTNAME=Пустое имя хоста!
 MSG_ILLEGAL_PORT=Неверный номер порта!
