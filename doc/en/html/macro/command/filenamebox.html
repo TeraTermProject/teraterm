@@ -18,7 +18,7 @@ Displays a dialog box prompting user to input a string.
 </p>
 
 <pre class="macro-syntax">
-filenamebox &lt;title&gt; [&lt;dialogtype&gt;]
+filenamebox &lt;title&gt; [&lt;dialogtype&gt; [&lt;initialdir&gt;]]
 </pre>
 
 <h2>Parameters</h2>
@@ -31,6 +31,10 @@ filenamebox &lt;title&gt; [&lt;dialogtype&gt;]
 	<dd>Specifies the type of dialog box.<br>
 	    If this parameter is zero, creates [Open] dialog box.<br>
 	    If this parameter is nonzero, creates [Save] dialog box.</dd>
+
+	<dt class="macro">string &lt;initialdir&gt; (optional default="") (version 4.85 or later)</dt>
+	<--dd>ダイアログボックスの初期ディレクトリを指定する。<br>
+	    空文字列や無効なパスを指定すると、Windows の仕様(OPENFILENAME構造体のlpstrInitialDirの仕様)により初期ディレクトリが決定される。</dd-->
 </dl>
 
 <h2>Return Value</h2>

@@ -1417,15 +1417,23 @@ WORD TTLFilenameBox()
 	OPENFILENAME ofn;
 	char uimsg[MAX_UIMSG];
 	BOOL SaveFlag = FALSE;
+	TStrVal InitDir = "";
 	BOOL ret;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
 	if (Err!=0) return Err;
 
+	// get 2nd arg(optional) if given
 	if (CheckParameterGiven()) { // dialogtype
 		GetIntVal(&SaveFlag, &Err);
 		if (Err!=0) return Err;
+
+		// get 3rd arg(optional) if given
+		if (CheckParameterGiven()) { // initdir
+			GetStrVal(InitDir, &Err);
+			if (Err!=0) return Err;
+		}
 	}
 
 	if ((Err==0) && (GetFirstChar()!=0))
@@ -1444,6 +1452,9 @@ WORD TTLFilenameBox()
 		get_lang_msg("FILEDLG_ALL_FILTER", uimsg, sizeof(uimsg), "All(*.*)\\0*.*\\0\\0", UILanguageFile);
 		ofn.lpstrFilter     = uimsg;
 		ofn.lpstrInitialDir = NULL;
+		if (strlen(InitDir) > 0) {
+			ofn.lpstrInitialDir = InitDir;
+		}
 		if (SaveFlag) {
 			ofn.Flags = OFN_OVERWRITEPROMPT;
 			ret = GetSaveFileName(&ofn);
