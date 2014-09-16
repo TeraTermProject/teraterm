@@ -3745,19 +3745,31 @@ void CVTWindow::OnCygwinConnection()
 	}
 
 	_snprintf_s(file, sizeof(file), _TRUNCATE, "%s\\bin", ts.CygwinDirectory);
-	if (GetFileAttributes(file) == -1) { // open error
-		for (c = 'C' ; c <= 'Z' ; c++) {
-			file[0] = c;
-			if (GetFileAttributes(file) != -1) { // open success
-				goto found_dll;
-			}
-		}
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_FIND_CYGTERM_DIR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't find Cygwin directory.", ts.UILanguageFile);
-		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
-		return;
+	if (GetFileAttributes(file) != -1) { // open success
+		goto found_dll;
 	}
+
+	_snprintf_s(file, sizeof(file), _TRUNCATE, "C:\\cygwin\\bin");
+	for (c = 'C' ; c <= 'Z' ; c++) {
+		file[0] = c;
+		if (GetFileAttributes(file) != -1) { // open success
+			goto found_dll;
+		}
+	}
+	_snprintf_s(file, sizeof(file), _TRUNCATE, "C:\\cygwin64\\bin");
+	for (c = 'C' ; c <= 'Z' ; c++) {
+		file[0] = c;
+		if (GetFileAttributes(file) != -1) { // open success
+			goto found_dll;
+		}
+	}
+
+	get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
+	get_lang_msg("MSG_FIND_CYGTERM_DIR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
+	             "Can't find Cygwin directory.", ts.UILanguageFile);
+	::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+	return;
+
 found_dll:;
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)

@@ -40,16 +40,28 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 	}
 
 	_snprintf(file, MAX_PATH, "%s\\bin", CygwinDirectory);
-	if (GetFileAttributes(file) == -1) { // open error
-		for (c = 'C' ; c <= 'Z' ; c++) {
-			file[0] = c;
-			if (GetFileAttributes(file) != -1) { // open success
-				goto found_dll;
-			}
-		}
-		MessageBox(NULL, "Can't find Cygwin directory.", "ERROR", MB_OK | MB_ICONWARNING);
-		return;
+	if (GetFileAttributes(file) != -1) { // open success
+		goto found_dll;
 	}
+
+	strcpy(file, "C:\\cygwin\\bin");
+	for (c = 'C' ; c <= 'Z' ; c++) {
+		file[0] = c;
+		if (GetFileAttributes(file) != -1) { // open success
+			goto found_dll;
+		}
+	}
+	strcpy(file, "C:\\cygwin64\\bin");
+	for (c = 'C' ; c <= 'Z' ; c++) {
+		file[0] = c;
+		if (GetFileAttributes(file) != -1) { // open success
+			goto found_dll;
+		}
+	}
+
+	MessageBox(NULL, "Can't find Cygwin directory.", "ERROR", MB_OK | MB_ICONWARNING);
+	return;
+
 found_dll:;
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
