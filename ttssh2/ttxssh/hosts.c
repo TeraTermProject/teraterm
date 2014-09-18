@@ -1084,6 +1084,7 @@ static void delete_different_key(PTInstVar pvar)
 	}
 	else {
 		Key key; // 接続中のホストのキー
+		Key *key_freed;
 		int length;
 		char filename[MAX_PATH];
 		char tmp[L_tmpnam];
@@ -1279,7 +1280,9 @@ error2:
 		finish_read_host_files(pvar, 0);
 
 		// 最後にメモリを解放しておく。
-		key_free(&key);
+		key_freed = key_new(KEY_UNSPEC);
+		memcpy(key_freed, &key, sizeof(Key));
+		key_free(key_freed);
 	}
 }
 
