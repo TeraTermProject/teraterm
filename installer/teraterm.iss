@@ -96,12 +96,12 @@ Source: release\lang\Korean.lng; DestDir: {app}\lang; Components: TeraTerm; Attr
 Source: release\lang\Simplified Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
-Source: ..\cygterm\cygterm.exe; DestDir: {app}; Components: cygterm
+Source: ..\cygterm\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
 Source: ..\cygterm\cygterm.cfg; DestDir: {app}; Components: cygterm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cyglaunch.exe; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+.tar.gz; DestDir: {app}; Components: cygterm
 Source: ..\cygterm\cygterm+-x86_64\cygterm.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
-Source: ..\cygterm\cygterm+-x86_64\cyglaunch.exe; DestDir: {app}\cygterm+-x86_64; Components: cygterm
+Source: cygtool\cygtool.dll; Components: cygterm; Flags: dontcopy
 Source: ..\libs\logmett\Setup_LogMeTT_2_10_2.exe; DestDir: {tmp}; Components: LogMeTT; Flags: deleteafterinstall
 Source: ..\libs\logmett\Setup_TTLEditor_1_5_1.exe; DestDir: {tmp}; Components: TTLEdit; Flags: deleteafterinstall
 Source: ..\ttpmenu\Release\ttpmenu.exe; DestDir: {app}; Components: TeraTerm_Menu; Flags: ignoreversion
@@ -334,9 +334,18 @@ ja.msg_AppRunningError=ÉZÉbÉgÉAÉbÉvÇÕé¿çsíÜÇÃ %s ÇåüèoÇµÇ‹ÇµÇΩÅB%n%näJÇ¢ÇƒÇ¢ÇÈÉ
 const
   SHCNF_IDLIST = $0000;
   SHCNE_ASSOCCHANGED = $08000000;
+  IMAGE_FILE_MACHINE_UNKNOWN = $0000;
+  IMAGE_FILE_MACHINE_I386 = $014c;
+  IMAGE_FILE_MACHINE_AMD64 = $8664;
 
 procedure SHChangeNotify(wEventId, uFlags, dwItem1, dwItem2: Integer);
 external 'SHChangeNotify@shell32.dll stdcall';
+
+function FindCygwinPath(CygwinDirectory, CygwinDir: AnsiString; Dirlen: Cardinal): Integer;
+external 'FindCygwinPath@files:cygtool.dll stdcall setuponly';
+
+function CygwinMachine(CygwinDir: AnsiString): Integer;
+external 'CygwinMachine@files:cygtool.dll stdcall setuponly';
 
 var
   UILangFilePage: TInputOptionWizardPage;
@@ -747,12 +756,38 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   iniFile : String;
+  CygDir  : String;
+  CygPath : String;
+  CygDll  : String;
+  Cygterm : String;
+  Res     : Integer;
+  Machine : Integer;
 begin
   case CurStep of
     ssPostInstall:
       begin
         iniFile := GetDefaultIniFilename();
         SetIniFile(iniFile);
+
+        if IsComponentSelected('cygterm') then
+        begin;
+            Cygterm := ExpandConstant('{app}') + '\cygterm.exe';
+            if not FileExists(Cygterm) then
+            begin;
+                CygDir := GetIniString('Tera Term', 'CygwinDirectory', 'C:\cygwin', iniFile);
+                SetLength(CygPath, 256);
+                Res := FindCygwinPath(CygDir, CygPath, 256);
+                If Res = 1 then
+                begin;
+                    CygDll := Copy(CygPath, 1, Pos(#0, CygPath) - 1) + '\bin\cygwin1.dll';
+                    Machine := CygwinMachine(CygDll);
+                    if Machine = IMAGE_FILE_MACHINE_AMD64 then
+                        FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, True)
+                    else
+                        FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, True);
+                end;
+            end;
+        end;
 
         if not IsTaskSelected('cygtermhere') then
         begin;
@@ -863,3 +898,7 @@ Name: {app}\ttermpj.hlp; Type: files
 Name: {app}\copyfont.bat; Type: files
 Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
+Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
+
+[UninstallDelete]
+Name: {app}\cygterm.exe; Type: files

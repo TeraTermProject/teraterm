@@ -28,3 +28,8 @@ pushd ..\cygterm
 if "%BUILD%" == "rebuild" make clean
 make
 popd
+
+rem cygtool ‚ðƒRƒ“ƒpƒCƒ‹
+pushd cygtool
+nmake -f cygtool.mak
+popd
