@@ -94,6 +94,7 @@ Source: release\lang\French.lng; DestDir: {app}\lang; Components: TeraTerm; Attr
 Source: release\lang\Russian.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\Korean.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: release\lang\Simplified Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
+Source: release\lang\Traditional Chinese.lng; DestDir: {app}\lang; Components: TeraTerm; Attribs: readonly; Flags: uninsremovereadonly overwritereadonly
 Source: ..\ttssh2\ttxssh\Release\ttxssh.dll; DestDir: {app}; Components: TTSSH; Flags: ignoreversion
 Source: release\ssh_known_hosts; DestDir: {app}; Components: TTSSH; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: ..\cygterm\cygterm.exe; DestDir: {app}\cygterm+-i686; Components: cygterm
@@ -295,6 +296,7 @@ en.msg_language_french=&French
 en.msg_language_russian=&Russian
 en.msg_language_korean=&Korean
 en.msg_language_chinese=&Chinese(Simplified)
+en.msg_language_tchinese=Chinese(&Traditional)
 ja.msg_language_caption=言語の選択
 ja.msg_language_description=ユーザーインターフェースの言語を選択してください。
 ja.msg_language_subcaption=アプリケーションのメニューやダイアログ等の表示言語を選択して、「次へ」をクリックしてください。
@@ -305,6 +307,7 @@ ja.msg_language_french=フランス語(&F)
 ja.msg_language_russian=ロシア語(&R)
 ja.msg_language_korean=韓国語(&K)
 ja.msg_language_chinese=簡体字中国語(&C)
+ja.msg_language_tchinese=繁体字中国語(&T)
 en.msg_del_confirm=Are you sure that you want to delete %s ?
 ja.msg_del_confirm=%s を削除しますか？
 en.msg_uninstall_confirm=It seems a former version is installed. You are recommended to uninstall it previously. Do you uninstall former version ?
@@ -510,12 +513,26 @@ begin
   case GetUILanguage and $3FF of
   $04: // Chinese
     begin
+
+      case GetUILanguage of
+      $c04, $1404, $404: // Hong Kong, Macao, Taiwan
+        begin
+          if Length(Locale) = 0 then
+            SetIniString('Tera Term', 'Locale', 'cht', iniFile);
+          if CodePage = 0 then
+            SetIniInt('Tera Term', 'CodePage', 950, iniFile);
+        end;
+      else
+        begin
+          if Length(Locale) = 0 then
+            SetIniString('Tera Term', 'Locale', 'chs', iniFile);
+          if CodePage = 0 then
+            SetIniInt('Tera Term', 'CodePage', 936, iniFile);
+        end;
+      end;
+
       if Length(Language) = 0 then
         SetIniString('Tera Term', 'Language', 'UTF-8', iniFile);
-      if Length(Locale) = 0 then
-        SetIniString('Tera Term', 'Locale', 'chs', iniFile);
-      if CodePage = 0 then
-        SetIniInt('Tera Term', 'CodePage', 936, iniFile);
       if Length(VTFont) = 0 then
         SetIniString('Tera Term', 'VTFont', 'Terminal,0,-12,255', iniFile);
       if Length(TEKFont) = 0 then
@@ -603,6 +620,8 @@ begin
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Korean.lng', iniFile);
     6:
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Simplified Chinese.lng', iniFile);
+    7:
+      SetIniString('Tera Term', 'UILanguageFile', 'lang\Traditional Chinese.lng', iniFile);
     else
       SetIniString('Tera Term', 'UILanguageFile', 'lang\Default.lng', iniFile);
   end;
@@ -638,6 +657,7 @@ var
   UILangFilePageRussian     : String;
   UILangFilePageKorean      : String;
   UILangFilePageChinese     : String;
+  UILangFilePageTChinese    : String;
 begin
   UILangFilePageCaption     := CustomMessage('msg_language_caption');
   UILangFilePageDescription := CustomMessage('msg_language_description');
@@ -649,6 +669,7 @@ begin
   UILangFilePageRussian     := CustomMessage('msg_language_russian');
   UILangFilePageKorean      := CustomMessage('msg_language_korean');
   UILangFilePageChinese     := CustomMessage('msg_language_chinese');
+  UILangFilePageTChinese    := CustomMessage('msg_language_tchinese');
 
   UILangFilePage := CreateInputOptionPage(wpSelectComponents,
     UILangFilePageCaption, UILangFilePageDescription,
@@ -660,6 +681,7 @@ begin
   UILangFilePage.Add(UILangFilePageRussian);
   UILangFilePage.Add(UILangFilePageKorean);
   UILangFilePage.Add(UILangFilePageChinese);
+  UILangFilePage.Add(UILangFilePageTChinese);
   case ActiveLanguage of
     'ja':
       UILangFilePage.SelectedValueIndex := 1;
@@ -745,6 +767,8 @@ begin
             UILangFilePage.SelectedValueIndex := 5
           else if iniFile = 'lang\simplified chinese.lng' then
             UILangFilePage.SelectedValueIndex := 6
+          else if iniFile = 'lang\traditional chinese.lng' then
+            UILangFilePage.SelectedValueIndex := 7
           else
             UILangFilePage.SelectedValueIndex := 0;
         end;
