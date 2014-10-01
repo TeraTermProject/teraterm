@@ -56,7 +56,8 @@
       For example, the OpenSSH client will be able to login to the server without regard to the difference the password and the keyboard-interactive authentication. However, the TTSSH can not login to the server with the keyboard-interactive and public key authentication by using the password authentication.
     </p>
     <ul>
-      <li>If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.</li>
+      <li>If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.<!--<br>
+          ※パスワード送信時の SSH パケットは暗号化されているので、TELNET のようにパスワードが平文で送信されることはありません。--></li>
       <li>When using public key authentication, check [RSA/DSA/ECDSA/ED25519 key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
           Note: The passphrase can include the control character(0x01 - 0x1F).<br />
           Note: TTSSH 2.63(Tera Term 4.76) later can support the PuTTY format and SECSH(ssh.com) format of the SSH2 private key.</li>
