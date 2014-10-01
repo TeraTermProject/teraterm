@@ -8556,6 +8556,11 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
 
 	if (c->type == TYPE_SHELL) {
+		// notify_closed_connection() から呼ばれる SSH_notify_disconnecting() の中で
+		// SSH2_MSG_CHANNEL_CLOSE が送信されるのに任せる。
+		// クライアントから SSH2_MSG_DISCONNECT を送らなくても、すべての CHANNEL が閉じれば
+		// サーバから SSH2_MSG_DISCONNECT が送られてくることを期待する。
+		/*
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
@@ -8574,6 +8579,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 		buffer_free(msg);
 
 		notify_verbose_message(pvar, "SSH2_MSG_DISCONNECT was sent at handle_SSH2_channel_close().", LOG_LEVEL_VERBOSE);
+		*/
 
 		// TCP connection closed
 		notify_closed_connection(pvar);
