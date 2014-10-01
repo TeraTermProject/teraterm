@@ -3727,7 +3727,7 @@ void CVTWindow::OnDuplicateSession()
 //
 void CVTWindow::OnCygwinConnection()
 {
-	char file[MAX_PATH];
+	char file[MAX_PATH], *filename;
 	char c, *envptr, *envbuff=NULL;
 	int envbufflen;
 	char *exename = "cygterm.exe";
@@ -3736,30 +3736,20 @@ void CVTWindow::OnCygwinConnection()
 	PROCESS_INFORMATION pi;
 	char uimsg[MAX_UIMSG];
 
-	envptr = getenv("PATH");
-	if (strstr(envptr, "cygwin\\bin") != NULL) {
-		goto found_path;
-	}
-	if (strstr(envptr, "cygwin64\\bin") != NULL) {
-		goto found_path;
-	}
-
-	_snprintf_s(file, sizeof(file), _TRUNCATE, "%s\\bin", ts.CygwinDirectory);
-	if (GetFileAttributes(file) != -1) { // open success
-		goto found_dll;
-	}
-
-	_snprintf_s(file, sizeof(file), _TRUNCATE, "C:\\cygwin\\bin");
-	for (c = 'C' ; c <= 'Z' ; c++) {
-		file[0] = c;
-		if (GetFileAttributes(file) != -1) { // open success
+	if (strlen(ts.CygwinDirectory) > 0) {
+		if (SearchPath(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
-	_snprintf_s(file, sizeof(file), _TRUNCATE, "C:\\cygwin64\\bin");
+
+	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+		goto found_path;
+	}
+
 	for (c = 'C' ; c <= 'Z' ; c++) {
-		file[0] = c;
-		if (GetFileAttributes(file) != -1) { // open success
+		char tmp[MAX_PATH];
+		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
+		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
@@ -3771,6 +3761,8 @@ void CVTWindow::OnCygwinConnection()
 	return;
 
 found_dll:;
+	envptr = getenv("PATH");
+	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {

@@ -23,7 +23,7 @@ char *FName = "TERATERM.INI";
 //
 void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 {
-	char file[MAX_PATH];
+	char file[MAX_PATH], *filename;
 	char c, *envptr, *envbuff;
 	int envbufflen;
 	char *exename = "cygterm.exe";
@@ -31,30 +31,20 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
-	envptr = getenv("PATH");
-	if (strstr(envptr, "cygwin\\bin") != NULL) {
-		goto found_path;
-	}
-	if (strstr(envptr, "cygwin64\\bin") != NULL) {
-		goto found_path;
-	}
-
-	_snprintf(file, MAX_PATH, "%s\\bin", CygwinDirectory);
-	if (GetFileAttributes(file) != -1) { // open success
-		goto found_dll;
-	}
-
-	strcpy(file, "C:\\cygwin\\bin");
-	for (c = 'C' ; c <= 'Z' ; c++) {
-		file[0] = c;
-		if (GetFileAttributes(file) != -1) { // open success
+	if (strlen(CygwinDirectory) > 0) {
+		if (SearchPath(CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
-	strcpy(file, "C:\\cygwin64\\bin");
+
+	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+		goto found_path;
+	}
+
 	for (c = 'C' ; c <= 'Z' ; c++) {
-		file[0] = c;
-		if (GetFileAttributes(file) != -1) { // open success
+		char tmp[MAX_PATH];
+		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
+		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
@@ -63,6 +53,9 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 	return;
 
 found_dll:;
+	envptr = getenv("PATH");
+	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
+		MessageBox(NULL, file, "a", MB_OK);
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff=malloc(envbufflen)) == NULL) {

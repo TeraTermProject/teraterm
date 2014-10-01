@@ -7,38 +7,32 @@
 
 int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
 {
-	char c, *envptr, *p, *p2;
+	char file[MAX_PATH], *filename;
+	char c;
 
-	envptr = getenv("PATH");
-	if (envptr == NULL) {
-		return 0;
-	}
+	if (strlen(CygwinDirectory) > 0) {
+		if (SearchPath(CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 #ifdef EXE
-	printf("  PATH => %s\n", envptr);
+			printf("  %s from CygwinDirectory\n", file);
 #endif
-	if ((p = strstr(envptr, "cygwin\\bin")) != NULL) {
-		goto found_path;
-	}
-	if ((p = strstr(envptr, "cygwin64\\bin")) != NULL) {
-		goto found_path;
-	}
-
-	_snprintf_s(Dir, Dirlen, _TRUNCATE, "%s\\bin", CygwinDirectory);
-	if (GetFileAttributes(Dir) != -1) { // open success
-		goto found_dll;
-	}
-
-	_snprintf_s(Dir, Dirlen, _TRUNCATE, "C:\\cygwin\\bin");
-	for (c = 'C' ; c <= 'Z' ; c++) {
-		Dir[0] = c;
-		if (GetFileAttributes(Dir) != -1) { // open success
 			goto found_dll;
 		}
 	}
-	_snprintf_s(Dir, Dirlen, _TRUNCATE, "C:\\cygwin64\\bin");
+
+	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+#ifdef EXE
+		printf("  %s from PATH\n", file);
+		goto found_dll;
+#endif
+	}
+
 	for (c = 'C' ; c <= 'Z' ; c++) {
-		Dir[0] = c;
-		if (GetFileAttributes(Dir) != -1) { // open success
+		char tmp[MAX_PATH];
+		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
+		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+#ifdef EXE
+			printf("  %s from %c:\\\n", file, c);
+#endif
 			goto found_dll;
 		}
 	}
@@ -46,28 +40,11 @@ int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
 	return 0;
 
 found_dll:;
-	Dir[strlen(Dir)-4] = '\0'; // delete "\\bin"
-	return 1;
-
-found_path:;
-	if ((p2 = strchr(p, ';')) == NULL) {
-		p2 += strlen(p);
+	memset(Dir, '\0', Dirlen);
+	if (Dirlen <= strlen(file) - 16) {
+		return 0;
 	}
-	else {
-		p2--;
-	}
-	while (envptr < p) {
-		p--;
-		if (*p == ';') {
-			p++;
-			break;
-		}
-	}
-	strncpy_s(Dir, Dirlen, p, _TRUNCATE);
-	if (p2 - p < Dirlen-1) {
-		Dir[p2 - p + 1] = '\0';
-	}
-	Dir[strlen(Dir)-4] = '\0'; // delete "\\bin"
+	memcpy(Dir, file, strlen(file) - 16); // delete "\\bin\\cygwin1.dll"
 	return 1;
 }
 
@@ -157,7 +134,7 @@ int main(void)
 	int res;
 	
 	printf("FindCygwinPath()\n");
-	res = FindCygwinPath("C:\\cygwin", file, file_len);
+	res = FindCygwinPath("", file, file_len);
 	printf("  result => %d\n", res);
 	if (!res) {
 		printf("\n");
