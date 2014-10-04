@@ -298,9 +298,9 @@ typedef struct _TInstVar {
 #define SSHv2(pvar) ((pvar)->protocol_major == 2)
 
 void notify_established_secure_connection(PTInstVar pvar);
-void notify_closed_connection(PTInstVar pvar);
+void notify_closed_connection(PTInstVar pvar, char FAR * send_msg);
 void notify_nonfatal_error(PTInstVar pvar, char FAR * msg);
-void notify_fatal_error(PTInstVar pvar, char FAR * msg);
+void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect);
 void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level);
 
 void get_teraterm_dir_relative_name(char FAR * buf, int bufsize, char FAR * basename);

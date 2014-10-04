@@ -246,7 +246,7 @@ int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen)
 				// 実際にはデータ化けで復号失敗時に、誤認識することが多い。
 				UTIL_get_lang_msg("MSG_PKT_OVERSIZED_ERROR", pvar,
 				                  "Oversized packet received from server; connection will close.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			} else {
 				int amount_read =
 					recv_data(pvar, max(total_packet_size, READAMOUNT));

@@ -120,7 +120,7 @@ void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ )
 	return;
 
 error:;
-	notify_fatal_error(pvar, "error occurred @ dh_gen_key()");
+	notify_fatal_error(pvar, "error occurred @ dh_gen_key()", TRUE);
 
 }
 

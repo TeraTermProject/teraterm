@@ -614,7 +614,7 @@ static int buffer_packet_data(PTInstVar pvar, int limit)
 			default:
 				UTIL_get_lang_msg("MSG_SSH_INVALID_COMPDATA_ERROR", pvar,
 				                  "Invalid compressed data in received packet");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 				return -1;
 			}
 		}
@@ -646,7 +646,7 @@ static BOOL grab_payload(PTInstVar pvar, int num_bytes)
 			                  "Received truncated packet (%ld > %d) @ grab_payload()");
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->ssh_state.payload_grabbed, in_buffer);
-			notify_fatal_error(pvar, buf);
+			notify_fatal_error(pvar, buf, TRUE);
 			return FALSE;
 		} else {
 			return TRUE;
@@ -670,7 +670,7 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
 			                  "Received truncated packet (%ld > %d) @ grab_payload_limited()");
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 			            pvar->ssh_state.payload_grabbed, in_buffer);
-			notify_fatal_error(pvar, buf);
+			notify_fatal_error(pvar, buf, TRUE);
 			return FALSE;
 		} else {
 			return TRUE;
@@ -696,7 +696,7 @@ static int prep_packet(PTInstVar pvar, char FAR * data, int len,
 		if (CRYPT_detect_attack(pvar, pvar->ssh_state.payload, len)) {
 			UTIL_get_lang_msg("MSG_SSH_COREINS_ERROR", pvar,
 			                  "'CORE insertion attack' detected.  Aborting connection.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		}
 
 		CRYPT_decrypt(pvar, pvar->ssh_state.payload, len);
@@ -705,7 +705,7 @@ static int prep_packet(PTInstVar pvar, char FAR * data, int len,
 			get_uint32_MSBfirst(pvar->ssh_state.payload + len - 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar,
 			                  "Detected corrupted data; connection terminating.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			return SSH_MSG_NONE;
 		}
 
@@ -727,7 +727,7 @@ static int prep_packet(PTInstVar pvar, char FAR * data, int len,
 			 data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar,
 			                  "Detected corrupted data; connection terminating.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			return SSH_MSG_NONE;
 		}
 
@@ -890,7 +890,7 @@ static BOOL send_packet_blocking(PTInstVar pvar, char FAR * data, int len)
 		UTIL_get_lang_msg("MSG_SSH_SEND_PKT_ERROR", pvar,
 		                  "A communications error occurred while sending an SSH packet.\n"
 		                  "The connection will close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -928,7 +928,7 @@ error:
 	                  "The connection will close. (%s:%d)");
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg,
 	            kind, code);
-	notify_fatal_error(pvar, buf);
+	notify_fatal_error(pvar, buf, TRUE);
 	return FALSE;
 #endif
 }
@@ -960,7 +960,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 				                  "An error occurred while compressing packet data.\n"
 				                  "The connection will close.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 				return;
 			}
 		}
@@ -1025,7 +1025,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 				                  "An error occurred while compressing packet data.\n"
 				                  "The connection will close.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 				return;
 			}
 			data = buffer_ptr(msg);
@@ -1421,7 +1421,15 @@ static BOOL handle_disconnect(PTInstVar pvar)
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 		            pvar->ts->UIMsg, explanation);
 	}
-	notify_fatal_error(pvar, buf);
+
+	if (SSHv2(pvar)) {
+		// SSH2_MSG_DISCONNECT を受け取ったあとは何も送信してはいけない
+		notify_fatal_error(pvar, buf, FALSE);
+	}
+	else {
+		// SSH1 の場合の仕様が分からないので、以前のままにしておく
+		notify_fatal_error(pvar, buf, TRUE);
+	}
 
 	return TRUE;
 }
@@ -1724,19 +1732,19 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 			if (!parse_protocol_ID(pvar, ID)) {
 				UTIL_get_lang_msg("MSG_SSH_VERSION_ERROR", pvar,
 				                  "This program does not understand the server's version of the protocol.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			}
 			else if ((negotiate = negotiate_protocol(pvar)) == 1) {
 				UTIL_get_lang_msg("MSG_SSH_VERSION_ERROR", pvar,
 				                  "This program does not understand the server's version of the protocol.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			}
 			else if (negotiate == -1) {
 				UTIL_get_lang_msg("MSG_SSH_VERSION_MISMATCH", pvar,
 				                  "Protocol version mismatch. server:%d.%d client:%d");
 				_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, pvar->ts->UIMsg,
 				            pvar->protocol_major, pvar->protocol_minor, pvar->settings.ssh_protocol_version);
-				notify_fatal_error(pvar, uimsg);
+				notify_fatal_error(pvar, uimsg, TRUE);
 			}
 			else {
 				char TTSSH_ID[1024];
@@ -1770,7 +1778,7 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 					UTIL_get_lang_msg("MSG_SSH_SEND_ID_ERROR", pvar,
 					                  "An error occurred while sending the SSH ID string.\n"
 					                  "The connection will close.");
-					notify_fatal_error(pvar, pvar->ts->UIMsg);
+					notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 				} else {
 					// 改行コードの除去 (2004.8.4 yutaka)
 					pvar->client_version_string[--TTSSH_ID_len] = 0; // \n
@@ -1807,7 +1815,7 @@ static BOOL handle_exit(PTInstVar pvar)
 	if (grab_payload(pvar, 4)) {
 		begin_send_packet(pvar, SSH_CMSG_EXIT_CONFIRMATION, 0);
 		finish_send_packet(pvar);
-		notify_closed_connection(pvar);
+		notify_closed_connection(pvar, "disconnected by server request");
 	}
 	return TRUE;
 }
@@ -2080,7 +2088,7 @@ void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len,
 								  "Unexpected SSH2 message(%d) on current stage(%d)");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 					pvar->ts->UIMsg, message, handle_message_stage);
-				notify_fatal_error(pvar, buf);
+				notify_fatal_error(pvar, buf, TRUE);
 				// abort
 			}
 		}
@@ -2093,7 +2101,7 @@ void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len,
 				                  "Unexpected packet type received: %d");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 					pvar->ts->UIMsg, message, handle_message_stage);
-				notify_fatal_error(pvar, buf);
+				notify_fatal_error(pvar, buf, TRUE);
 			} else {
 				unsigned char FAR *outmsg =
 					begin_send_packet(pvar, SSH2_MSG_UNIMPLEMENTED, 4);
@@ -2223,7 +2231,7 @@ static void enable_send_compression(PTInstVar pvar)
 		UTIL_get_lang_msg("MSG_SSH_SETUP_COMP_ERROR", pvar,
 		                  "An error occurred while setting up compression.\n"
 		                  "The connection will close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return;
 	} else {
 		// SSH2では圧縮・展開処理をSSH1とは別に行うので、下記フラグは落としておく。(2005.7.9 yutaka)
@@ -2252,7 +2260,7 @@ static void enable_recv_compression(PTInstVar pvar)
 		UTIL_get_lang_msg("MSG_SSH_SETUP_COMP_ERROR", pvar,
 		                  "An error occurred while setting up compression.\n"
 		                  "The connection will close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return;
 	} else {
 		// SSH2では圧縮・展開処理をSSH1とは別に行うので、下記フラグは落としておく。(2005.7.9 yutaka)
@@ -2362,7 +2370,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 				UTIL_get_lang_msg("MSG_SSH_DECRYPT_RSA_ERROR", pvar,
 								  "An error occurred while decrypting the RSA challenge.\n"
 								  "Perhaps the key file is corrupted.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			}
 		}
 		else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
@@ -2580,7 +2588,7 @@ static void try_send_credentials(PTInstVar pvar)
 		default:
 			UTIL_get_lang_msg("MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR", pvar,
 			                  "Internal error: unsupported authentication method");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			return;
 		}
 
@@ -2734,32 +2742,28 @@ void SSH_notify_disconnecting(PTInstVar pvar, char FAR * reason)
 	} else { // for SSH2(yutaka)
 		buffer_t *msg;
 		unsigned char *outmsg;
+		char *s;
 		int len;
-		Channel_t *c;
 
-		c = ssh2_channel_lookup(pvar->shell_id);
-		if (c == NULL)
-			return;
-
-		// SSH2 serverにchannel closeを伝える
+		// SSH2 serverにdisconnectを伝える
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
 			return;
 		}
-		buffer_put_int(msg, c->remote_id);
+		buffer_put_int(msg, SSH2_DISCONNECT_BY_APPLICATION);
+		buffer_put_string(msg, reason, strlen(reason));
+		s = "";
+		buffer_put_string(msg, s, strlen(s));
 
 		len = buffer_len(msg);
-		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_CLOSE, len);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_DISCONNECT, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		c->state |= SSH_CHANNEL_STATE_CLOSE_SENT;
-
-		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_CLOSE was sent at SSH_notify_disconnecting().", LOG_LEVEL_VERBOSE);
+		notify_verbose_message(pvar, "SSH2_MSG_DISCONNECT was sent at SSH_notify_disconnecting().", LOG_LEVEL_VERBOSE);
 	}
-
 }
 
 void SSH_notify_host_OK(PTInstVar pvar)
@@ -2971,7 +2975,7 @@ void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen
 				if (deflate(&pvar->ssh_state.compress_stream, Z_NO_FLUSH) != Z_OK) {
 					UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 									  "Error compressing packet data");
-					notify_fatal_error(pvar, pvar->ts->UIMsg);
+					notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 					return;
 				}
 
@@ -2982,7 +2986,7 @@ void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen
 				if (deflate(&pvar->ssh_state.compress_stream, Z_SYNC_FLUSH) != Z_OK) {
 					UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 					                  "Error compressing packet data");
-					notify_fatal_error(pvar, pvar->ts->UIMsg);
+					notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 					return;
 				}
 			} else {
@@ -3022,7 +3026,7 @@ int SSH_extract_payload(PTInstVar pvar, unsigned char FAR * dest, int len)
 		if (inflate(&pvar->ssh_state.decompress_stream, Z_SYNC_FLUSH) != Z_OK) {
 			UTIL_get_lang_msg("MSG_SSH_INVALID_COMPDATA_ERROR", pvar,
 			                  "Invalid compressed data in received packet");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			return 0;
 		}
 	}
@@ -3324,7 +3328,7 @@ void SSH_channel_send(PTInstVar pvar, int channel_num,
 			if (deflate(&pvar->ssh_state.compress_stream, Z_NO_FLUSH) != Z_OK) {
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 				                  "Error compressing packet data");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 				return;
 			}
 
@@ -3336,7 +3340,7 @@ void SSH_channel_send(PTInstVar pvar, int channel_num,
 				Z_OK) {
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
 				                  "Error compressing packet data");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 				return;
 			}
 		} else {
@@ -3810,7 +3814,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		goto error;
 	}
 
@@ -3950,7 +3954,7 @@ int SSH_sftp_transaction(PTInstVar pvar)
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		goto error;
 	}
 
@@ -5066,7 +5070,7 @@ error:;
 	buffer_free(pvar->peer_kex);
 	pvar->peer_kex = NULL;
 
-	notify_fatal_error(pvar, msg);
+	notify_fatal_error(pvar, msg, TRUE);
 
 	return FALSE;
 }
@@ -5127,7 +5131,7 @@ error:;
 	DH_free(dh);
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, "error occurred @ SSH2_dh_kex_init()");
+	notify_fatal_error(pvar, "error occurred @ SSH2_dh_kex_init()", TRUE);
 }
 
 
@@ -5192,7 +5196,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 error:;
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, "error occurred @ SSH2_dh_gex_kex_init()");
+	notify_fatal_error(pvar, "error occurred @ SSH2_dh_gex_kex_init()", TRUE);
 }
 
 
@@ -5333,7 +5337,7 @@ error:;
 	EC_KEY_free(client_key);
 	buffer_free(msg);
 
-	notify_fatal_error(pvar, "error occurred @ SSH2_ecdh_kex_init()");
+	notify_fatal_error(pvar, "error occurred @ SSH2_ecdh_kex_init()", TRUE);
 }
 
 
@@ -5572,7 +5576,7 @@ error:
 	if (dh_buf != NULL) free(dh_buf);
 	BN_free(share_key);
 
-	notify_fatal_error(pvar, emsg);
+	notify_fatal_error(pvar, emsg, TRUE);
 
 	return FALSE;
 }
@@ -5806,7 +5810,7 @@ error:
 	if (dh_buf != NULL) free(dh_buf);
 	BN_free(share_key);
 
-	notify_fatal_error(pvar, emsg);
+	notify_fatal_error(pvar, emsg, TRUE);
 
 	return FALSE;
 }
@@ -6052,7 +6056,7 @@ error:
 	if (ecdh_buf != NULL) free(ecdh_buf);
 	BN_free(share_key);
 
-	notify_fatal_error(pvar, emsg);
+	notify_fatal_error(pvar, emsg, TRUE);
 
 	return FALSE;
 }
@@ -6622,7 +6626,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	}
 	// シェルのIDを取っておく
@@ -6682,7 +6686,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	if (cstring == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR", pvar,
 		                  "The server doesn't have valid authentication method.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	}
 
@@ -6763,7 +6767,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 				strncat_s(uimsg, sizeof(uimsg), pvar->ts->UIMsg, _TRUNCATE);
 			}
 		}
-		notify_fatal_error(pvar, uimsg);
+		notify_fatal_error(pvar, uimsg, TRUE);
 		return TRUE;
 	}
 
@@ -8528,9 +8532,6 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	char *data;
 	int id;
 	Channel_t *c;
-	buffer_t *msg;
-	char *s;
-	unsigned char *outmsg;
 	char log[128];
 
 	// コネクション切断時に、パケットダンプをファイルへ掃き出す。
@@ -8556,33 +8557,10 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
 
 	if (c->type == TYPE_SHELL) {
-		// notify_closed_connection() から呼ばれる SSH_notify_disconnecting() の中で
-		// SSH2_MSG_CHANNEL_CLOSE が送信されるのに任せる。
-		// クライアントから SSH2_MSG_DISCONNECT を送らなくても、すべての CHANNEL が閉じれば
-		// サーバから SSH2_MSG_DISCONNECT が送られてくることを期待する。
-		/*
-		msg = buffer_init();
-		if (msg == NULL) {
-			// TODO: error check
-			return FALSE;
-		}
-		buffer_put_int(msg, SSH2_DISCONNECT_PROTOCOL_ERROR);
-		s = "disconnected by server request";
-		buffer_put_string(msg, s, strlen(s));
-		s = "";
-		buffer_put_string(msg, s, strlen(s));
-
-		len = buffer_len(msg);
-		outmsg = begin_send_packet(pvar, SSH2_MSG_DISCONNECT, len);
-		memcpy(outmsg, buffer_ptr(msg), len);
-		finish_send_packet(pvar);
-		buffer_free(msg);
-
-		notify_verbose_message(pvar, "SSH2_MSG_DISCONNECT was sent at handle_SSH2_channel_close().", LOG_LEVEL_VERBOSE);
-		*/
+		ssh2_channel_send_close(pvar, c);
 
 		// TCP connection closed
-		notify_closed_connection(pvar);
+		notify_closed_connection(pvar, "disconnected by server request");
 
 	} else if (c->type == TYPE_PORTFWD) {
 		// CHANNEL_CLOSE を送り返さないとリモートのchannelが開放されない

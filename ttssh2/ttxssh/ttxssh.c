@@ -820,15 +820,14 @@ void notify_established_secure_connection(PTInstVar pvar)
 	                       LOG_LEVEL_VERBOSE);
 }
 
-void notify_closed_connection(PTInstVar pvar)
+void notify_closed_connection(PTInstVar pvar, char FAR * send_msg)
 {
-	SSH_notify_disconnecting(pvar, NULL);
+	SSH_notify_disconnecting(pvar, send_msg);
 	AUTH_notify_disconnecting(pvar);
 	HOSTS_notify_disconnecting(pvar);
 
 	PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY,
 	            pvar->socket, MAKELPARAM(FD_CLOSE, 0));
-
 }
 
 static void add_err_msg(PTInstVar pvar, char FAR * msg)
@@ -869,7 +868,7 @@ void notify_nonfatal_error(PTInstVar pvar, char FAR * msg)
 	}
 }
 
-void notify_fatal_error(PTInstVar pvar, char FAR * msg)
+void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect)
 {
 	if (msg[0] != 0) {
 		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
@@ -879,7 +878,9 @@ void notify_fatal_error(PTInstVar pvar, char FAR * msg)
 	if (!pvar->fatal_error) {
 		pvar->fatal_error = TRUE;
 
-		SSH_notify_disconnecting(pvar, msg);
+		if (send_disconnect) {
+			SSH_notify_disconnecting(pvar, msg);
+		}
 		AUTH_notify_disconnecting(pvar);
 		HOSTS_notify_disconnecting(pvar);
 

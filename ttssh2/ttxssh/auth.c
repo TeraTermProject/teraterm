@@ -866,7 +866,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->auth_state.auth_dialog = NULL;
-			notify_closed_connection(pvar);
+			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
 
 			if (DlgAuthFont != NULL) {
@@ -969,7 +969,7 @@ int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 		UTIL_get_lang_msg("MSG_NOAUTHMETHOD_ERROR", pvar,
 		                  "Server does not support any of the authentication options\n"
 		                  "provided by TTSSH. This connection will now close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return 0;
 	} else {
 		if (pvar->auth_state.auth_dialog != NULL) {
@@ -1189,7 +1189,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDCANCEL:			/* kill the connection */
 			pvar->auth_state.auth_dialog = NULL;
-			notify_closed_connection(pvar);
+			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
 
 			if (DlgTisFont != NULL) {
@@ -1232,7 +1232,7 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 			UTIL_get_lang_msg("MSG_CREATEWINDOW_AUTH_ERROR", pvar,
 			                  "Unable to display authentication dialog box.\n"
 			                  "Connection terminated.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		}
 	}
 }

@@ -676,7 +676,7 @@ static int read_host_key(PTInstVar pvar,
 				UTIL_get_lang_msg("MSG_HOSTS_HOSTNAME_INVALID_ERROR", pvar,
 				                  "The host name contains an invalid character.\n"
 				                  "This session will be terminated.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg);
+				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			}
 			return 0;
 		}
@@ -687,7 +687,7 @@ static int read_host_key(PTInstVar pvar,
 			UTIL_get_lang_msg("MSG_HOSTS_HOSTNAME_EMPTY_ERROR", pvar,
 			                  "The host name should not be empty.\n"
 			                  "This session will be terminated.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg);
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		}
 		return 0;
 	}
@@ -1423,7 +1423,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
-			notify_closed_connection(pvar);
+			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
 
 			if (DlgHostsAddFont != NULL) {
@@ -1573,7 +1573,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
-			notify_closed_connection(pvar);
+			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
 
 			if (DlgHostsReplaceFont != NULL) {
@@ -1725,7 +1725,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:			/* kill the connection */
 canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
-			notify_closed_connection(pvar);
+			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
 
 			if (DlgHostsAddFont != NULL) {

@@ -235,7 +235,7 @@ static void cAES128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s encrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "AES128/192/256", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -243,7 +243,7 @@ static void cAES128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "AES128/192/256");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -283,7 +283,7 @@ static void cAES128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s decrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "AES128/192/256", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -291,7 +291,7 @@ static void cAES128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "AES128/192/256");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -333,7 +333,7 @@ static void c3DES_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s encrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "3DES-CBC", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -341,7 +341,7 @@ static void c3DES_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "3DES-CBC");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -381,7 +381,7 @@ static void c3DES_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s decrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "3DES-CBC", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -389,7 +389,7 @@ static void c3DES_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "3DES-CBC");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -430,7 +430,7 @@ static void cBlowfish_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s encrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Blowfish", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -438,7 +438,7 @@ static void cBlowfish_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Blowfish");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -469,7 +469,7 @@ static void cBlowfish_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s decrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Blowfish", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -477,7 +477,7 @@ static void cBlowfish_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Blowfish");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -509,7 +509,7 @@ static void cArcfour_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s encrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Arcfour", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -517,7 +517,7 @@ static void cArcfour_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Arcfour");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -548,7 +548,7 @@ static void cArcfour_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s decrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Arcfour", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -556,7 +556,7 @@ static void cArcfour_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Arcfour");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -588,7 +588,7 @@ static void cCast128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s encrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "CAST128", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -596,7 +596,7 @@ static void cCast128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "CAST128");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -627,7 +627,7 @@ static void cCast128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s decrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "CAST128", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -635,7 +635,7 @@ static void cCast128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "CAST128");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -666,7 +666,7 @@ static void cCamellia_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s encrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Camellia128/192/256", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -674,7 +674,7 @@ static void cCamellia_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Camellia128/192/256");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -705,7 +705,7 @@ static void cCamellia_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		                  "%s decrypt error(1): bytes %d (%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Camellia128/192/256", bytes, block_size);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 	}
 
@@ -713,7 +713,7 @@ static void cCamellia_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Camellia128/192/256");
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		goto error;
 
 	} else {
@@ -881,7 +881,7 @@ RSA FAR *make_key(PTInstVar pvar,
 	if (key == NULL || key->e == NULL || key->n == NULL) {
 		UTIL_get_lang_msg("MSG_RSAKEY_SETUP_ERROR", pvar,
 		                  "Error setting up RSA keys");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 
 		if (key != NULL) {
 			if (key->e != NULL) {
@@ -981,14 +981,14 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		                  "The server does not support any of the TTSSH encryption algorithms.\n"
 		                  "A secure connection cannot be made in the TTSSH-to-server direction.\n"
 		                  "The connection will be closed.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	} else if (receiver_ciphers == 0) {
 		UTIL_get_lang_msg("MSG_UNAVAILABLE_CIPHERS_ERROR", pvar,
 		                  "The server does not support any of the TTSSH encryption algorithms.\n"
 		                  "A secure connection cannot be made in the TTSSH-to-server direction.\n"
 		                  "The connection will be closed.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -1160,7 +1160,7 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 		                  "To communicate with this server, you will have to enable some more ciphers\n"
 		                  "in the TTSSH Setup dialog box when you run Tera Term again.\n"
 		                  "This connection will now close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -1204,7 +1204,7 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 	if (bit_delta < 128 || server_key_bits < 512 || host_key_bits < 512) {
 		UTIL_get_lang_msg("MSG_RASKEY_TOOWEAK_ERROR", pvar,
 		                  "Server RSA keys are too weak. A secure connection cannot be established.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return 0;
 	} else {
 		/* following Goldberg's code, I'm using MD5(servkey->n || hostkey->n || cookie)
@@ -1381,7 +1381,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
 		                  "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
 
@@ -1391,7 +1391,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
 			                  "Cipher initialize error(%d)");
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
-			notify_fatal_error(pvar, tmp);
+			notify_fatal_error(pvar, tmp, TRUE);
 			return;
 		}
 	}
@@ -1399,7 +1399,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
 		                  "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
-		notify_fatal_error(pvar, tmp);
+		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
 
@@ -1412,7 +1412,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 			                  "Cipher initialize error(%d)");
 			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
 			            pvar->ts->UIMsg, 3);
-			notify_fatal_error(pvar, tmp);
+			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {
 			memset(discard, 0, discard_len);
@@ -1781,7 +1781,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 	if (!isOK) {
 		UTIL_get_lang_msg("MSG_CHPHER_NOTSELECTED_ERROR", pvar,
 		                  "No cipher selected!");
-		notify_fatal_error(pvar, pvar->ts->UIMsg);
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	} else {
 		memset(encryption_key, 0, CRYPT_KEY_LENGTH);
