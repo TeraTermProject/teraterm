@@ -2552,7 +2552,19 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_ABOUT_FONT", dlg, &logfont, &DlgAboutTextFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
 		} else {
-			DlgAboutTextFont = NULL;
+			// 読み込めなかった場合は等幅フォントを指定する。
+			// エディットコントロールはダイアログと同じフォントを持っており
+			// 等幅フォントではないため。
+			strncpy_s(logfont.lfFaceName, sizeof(logfont.lfFaceName), "Courier New", _TRUNCATE);
+			logfont.lfCharSet = 0;
+			logfont.lfHeight = MulDiv(8, GetDeviceCaps(GetDC(dlg),LOGPIXELSY) * -1, 72);
+			logfont.lfWidth = 0;
+			if ((DlgAboutTextFont = CreateFontIndirect(&logfont)) != NULL) {
+				SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETFONT, (WPARAM)DlgAboutTextFont, MAKELPARAM(TRUE,0));
+			}
+			else {
+				DlgAboutTextFont = NULL;
+			}
 		}
 
 		// アイコンを動的にセット
