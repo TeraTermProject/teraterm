@@ -18,13 +18,55 @@ Cygwin は、オープンソースソフトウェアです。
 </p>
 
 <p>
-※注意：Cygwin 1.5.x は Windows 7 をサポートしていないようです。Windows 7 では Cygwin 1.7.x を利用してください。
+※注意：Cygwin 1.5.x は Windows 7 をサポートしていないようです。Windows 7 以降では Cygwin 1.7.x を利用してください。
 </p>
 
+
+
+<h2>Cygterm+</h2>
+
 <p>
-ローカルのCygwinへ接続することができます。内部でCygtermを利用しています。<br>
-Fileメニューから「Cygwin connection」を選択する、もしくはAlt+Gを押下すると、Cygwinへ接続します。<br>
-あらかじめ、teraterm.iniファイルの[Tera Term]セクションに、Cygwinのインストールパスを設定しておく必要があります。<br>
+Tera Term は Cygwin に接続するために、内部で Cygterm+ を利用しています。<br>
+Fileメニューから「Cygwin connection」を選択する、もしくは Alt+G を押下すると、Cygwin へ接続します。
+</p>
+
+<h3>設定の保存</h3>
+
+<p>
+cygterm.exe から起動された状態で設定保存 [Setup] [Save setup] を行わないよう注意してください。TCP/IP設定の Telnetポート番号が 23 以外で保存され、通常の Telnet目的の実行時に接続できず、慌てることになってしまいます。<br>
+TCP/IP Port# に 23 を指定して設定保存し直せば元に戻ります。
+</p>
+
+<h3>Cygwin の探し方</h3>
+
+<p>
+Cygterm+ を起動するには Cygwin のインストールパスを見つける必要があります。Tera Term と cyglaunch は次の順序で Cygwin のインストールパスを探します。
+
+</p>
+
+<ol>
+  <li>TERATERM.INI
+    <ol>
+      <li>teraterm.exe が読み込んでいる TERATERM.INI、あるいは cyglaunch.exe のフォルダにある TERATERM.INI の CygwinDirectory エントリを読む</li>
+      <li>CygwinDirectory の下に bin\cygwin1.dll があるか調べる</li>
+      <li>bin\cygwin1.dll があれば PATH 環境変数にパスを追加する</li>
+      <li>cygterm.exe を起動する</li>
+    </ol></li>
+  <li>PATH 環境変数
+    <ol>
+      <li>PATH 環境変数に通っているフォルダに bin\cygwin1.dll があるか調べる</li>
+      <li>cygterm.exe を起動する</li>
+    </ol></li>
+  <li>ドライブルート総当たり
+    <ol>
+      <li>C から Z まで、ドライブルート直下の cygwin あるいは cygwin64 フォルダに bin\cygwin1.dll があるか調べる</li>
+      <li>bin\cygwin1.dll があれば PATH 環境変数にパスを追加する</li>
+      <li>cygterm.exe を起動する</li>
+    </ol></li>
+</ol>
+
+<p>
+1. の「TERATERM.INI の CygwinDirectory」の設定は、インストール時には空文字列になっているので無視されます。自動検索がうまくいかない場合は手動で Cygwin のインストールパスを設定してください。<br>
 フォーマットは「ドライブ名：￥ディレクトリ」です。
 </p>
 
@@ -37,10 +79,17 @@ CygwinDirectory = c:\cygwin
 ----------------------------
 </pre>
 
+<h3>64bit Cygwin</h3>
+
 <p>
-※注意：<br>
-cygtermがうまく起動しない場合は、cygtermをビルドし直してください。<br>
-64bit Cygwin で利用するには、cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term インストールフォルダに上書きするか、cygtermをビルドし直してください。<br>
+64bit Cygwin に接続するには 64 bit Cygwin でビルドされた実行ファイルが必要です。通常はTera Termのインストーラが、インストールされているCygwinのバージョンを判定して適切な実行ファイルをコピーします。<br>
+インストーラに不具合がある場合は手動で cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term のインストールフォルダに上書きするか、自分でCygterm+をビルドし直してください。
+</p>
+
+<h3>Cygterm+をビルドする</h3>
+
+<p>
+Tera Term に同梱されている実行ファイルに問題があってうまく起動しない場合は、Cygterm+ をビルドし直してください。<br>
 最新のソースコードは cygterm+.tar.gz として同梱されています。
 </p>
 
@@ -59,11 +108,6 @@ cygtermがうまく起動しない場合は、cygtermをビルドし直してください。<br>
         Devel/mingw64-x86_64-gcc-core</td>
   </tr>
 </table>
-
-<p>
-cygterm.exe から起動された状態で設定保存 [Setup][Save setup] を行わないよう注意してください。TCP/IP設定の Telnetポート番号が 23 以外で保存され、通常の Telnet目的の実行時に接続できず、慌てることになってしまいます。<br>
-TCP/IP Port# に 23 を指定して設定保存し直せば元に戻ります。
-</p>
 
 
 
