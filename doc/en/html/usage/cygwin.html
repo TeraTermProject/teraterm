@@ -26,11 +26,11 @@ Cygwin is open source software.
 <h2>Cygterm+</h2>
 
 <p>
-<!--Tera Term は Cygwin に接続するために、内部で Cygterm+ を利用しています。-->This package makes it possible to connect local Cygwin by using built in Cygterm.<br>
+Tera Term uses the Cygterm+ program to connect local Cygwin.<br>
 Select "Cygwin connection" from "File" menu or press "Alt + G " to connect to Cygwin.
 </p>
 
-<!--h3>設定の保存</h3-->
+<h3>Saving configuration</h3>
 
 <p>
 Be careful not to save [Setup] [Save setup] in the situation that it was started by cygterm.exe.<br>
@@ -82,14 +82,13 @@ CygwinDirectory = c:\cygwin
 <h3>64bit Cygwin</h3>
 
 <p>
-<!--
-64bit Cygwin に接続するには 64 bit Cygwin でビルドされた実行ファイルが必要です。通常はTera Termのインストーラが、インストールされているCygwinのバージョンを判定して適切な実行ファイルをコピーします。<br>
-インストーラに不具合がある場合は手動で cygterm+-x86_64 フォルダ内の実行ファイルを Tera Term のインストールフォルダに上書きするか、自分でCygterm+をビルドし直してください。
--->
-If cygterm fails to start you might need to download its source and recompile it.<br>
-If a user uses the 64bit Cygwin, please overwrite an execution file of the cygterm+-x86_64 folder at the 
-Tera Term installation folder. Or, rebuild the cygterm program.<br>
-
+A user needs an execution file by 
+Tera Term needs the cygterm+ program built on the 64bit Cygwin environment to connect 64bit Cygwin.
+Basically, Tera Term installation program will recognize the installed Cygwin version and copy an 
+appropriate cygterm+ program.<br>
+If the Tera Term installer makes an error in determination, please overwrite the cygterm.exe in the 
+cygterm+-x86_64 directory to the Tera Term installation directory. Moreover, please rebuild the 
+Cygterm+ source code.
 </p>
 
 <h3>Build Cygterm+</h3>
