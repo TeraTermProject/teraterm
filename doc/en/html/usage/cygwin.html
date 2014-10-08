@@ -37,38 +37,39 @@ Be careful not to save [Setup] [Save setup] in the situation that it was started
 Otherwise telnet port number of TCP/IP is saved but 23 you will be confused by connection failure when you normally run Tera Term to do telnet.  In that case it will be recovered by saving the setting with specifying TCP/IP Port# 23.
 </p>
 
-<!--h3>Cygwin の探し方</h3>
+<h3>How to search Cygwin</h3>
 
 <p>
-Cygterm+ を起動するには Cygwin のインストールパスを見つける必要があります。Tera Term と cyglaunch は次の順序で Cygwin のインストールパスを探します。
-
+Tera Term must need to find the Cygwin installation path to launch the Cygterm+ program.
+So, Tera Term and cyglaunch will search the installation path in the following order.
 </p>
 
 <ol>
   <li>TERATERM.INI
     <ol>
-      <li>teraterm.exe が読み込んでいる TERATERM.INI、あるいは cyglaunch.exe のフォルダにある TERATERM.INI の CygwinDirectory エントリを読む</li>
-      <li>CygwinDirectory の下に bin\cygwin1.dll があるか調べる</li>
-      <li>bin\cygwin1.dll があれば PATH 環境変数にパスを追加する</li>
-      <li>cygterm.exe を起動する</li>
+      <li>Reads the CygwinDirectory entry in the TERATERM.INI file which is placed in the directory loaded by the teraterm.exe and the cyglaunch.exe directory.</li>
+      <li>Searches the bin\cygwin1.dll file under the CygwinDirectory folder.</li>
+      <li>Adds the bin\cygwin1.dll file into the PATH environment variable if the file exists.</li>
+      <li>Launch the cygterm.exe program.</li>
     </ol></li>
-  <li>PATH 環境変数
+  <li>PATH environment variable
     <ol>
-      <li>PATH 環境変数に通っているフォルダに bin\cygwin1.dll があるか調べる</li>
-      <li>cygterm.exe を起動する</li>
+      <li>Searches the bin\cygwin1.dll file into the directory included in the PATH environment variable.</li>
+      <li>Launch the cygterm.exe program.</li>
     </ol></li>
-  <li>ドライブルート総当たり
+  <li>Round robin drive root
     <ol>
-      <li>C から Z まで、ドライブルート直下の cygwin あるいは cygwin64 フォルダに bin\cygwin1.dll があるか調べる</li>
-      <li>bin\cygwin1.dll があれば PATH 環境変数にパスを追加する</li>
-      <li>cygterm.exe を起動する</li>
+      <li>Searches the bin\cygwin1.dll file under cygwin and cygwin64 directory of the drive direct root from C: to Z:.</li>
+      <li>Searches the bin\cygwin1.dll file into the directory included in the PATH environment variable.</li>
+      <li>Launch the cygterm.exe program.</li>
     </ol></li>
 </ol>
 
 <p>
-1. の「TERATERM.INI の CygwinDirectory」の設定は、インストール時には空文字列になっているので無視されます。自動検索がうまくいかない場合は手動で Cygwin のインストールパスを設定してください。<br>
+The CygwinDirectory entry in the TERATERM.INI file will be empty when Tera Term is newly installed.
+If the automatic retrieval is failed, please configure the CygwinDirectory entry.<br>
 The format is "drive-letter:\directory".
-</p-->
+</p>
 
 <pre>
 ----------------------------
@@ -94,7 +95,7 @@ Cygterm+ source code.
 <h3>Build Cygterm+</h3>
 
 <p>
-Tera Term に同梱されている実行ファイルに問題があってうまく起動しない場合は、Cygterm+ をビルドし直してください。<br>
+When the cygterm.exe program can not work well, please rebuild the Cygterm+ source code.<br>
 Latest source code is included as cygterm+.tar.gz.
 </p>
 
