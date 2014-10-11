@@ -186,6 +186,8 @@
 #define ID_ACC_AREYOUTHERE              50007
 #define ID_ACC_PASTE                    50008
 #define ID_ACC_DISCONNECT               50009
+#define ID_ACC_DUPLICATESESSION         50010
+#define ID_ACC_CYGWINCONNECTION         50011
 #define ID_FILE_NEWCONNECTION           50110
 #define ID_FILE_DUPLICATESESSION        50111
 #define ID_FILE_CYGWINCONNECTION        50112

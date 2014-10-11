@@ -1364,6 +1364,12 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->DisableAcceleratorDuplicateSession =
 		GetOnOff(Section, "DisableAcceleratorDuplicateSession", FName, FALSE);
 
+	ts->AcceleratorNewConnection =
+		GetOnOff(Section, "AcceleratorNewConnection", FName, TRUE);
+
+	ts->AcceleratorCygwinConnection =
+		GetOnOff(Section, "AcceleratorCygwinConnection", FName, TRUE);
+
 	// added DisableMenuDuplicateSession (2010.8.3 maya)
 	ts->DisableMenuDuplicateSession =
 		GetOnOff(Section, "DisableMenuDuplicateSession", FName, FALSE);
@@ -2565,6 +2571,12 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// DisableAcceleratorDuplicateSession
 	WriteOnOff(Section, "DisableAcceleratorDuplicateSession", FName,
 	           ts->DisableAcceleratorDuplicateSession);
+
+	WriteOnOff(Section, "AcceleratorNewConnection", FName,
+	           ts->AcceleratorNewConnection);
+
+	WriteOnOff(Section, "AcceleratorCygwinConnection", FName,
+	           ts->AcceleratorCygwinConnection);
 
 	// DisableMenuDuplicateSession
 	WriteOnOff(Section, "DisableMenuDuplicateSession", FName,

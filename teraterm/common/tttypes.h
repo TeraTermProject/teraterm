@@ -582,6 +582,8 @@ struct tttset {
 	char JoinSplitURLIgnoreEOLChar;
 	char MulticastName[MAX_PATH];
 	WORD DebugModes;
+	WORD AcceleratorNewConnection;
+	WORD AcceleratorCygwinConnection;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1045,6 +1047,10 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.85, ttset_memfilemap was replaced with ttset_memfilemap_25.
+ *   added tttset.AcceleratorNewConnection
+ *   added tttset.AcceleratorCygwinConnection
+ *
  * - At version 4.83, ttset_memfilemap was replaced with ttset_memfilemap_24.
  *   added tttset.DebugModes
  *
@@ -1187,4 +1193,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_24"
+#define TT_FILEMAPNAME "ttset_memfilemap_25"

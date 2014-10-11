@@ -1637,7 +1637,7 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			case ID_ACC_DISCONNECT:
 				Disconnect(TRUE);
 				return TRUE;
-			case ID_FILE_DUPLICATESESSION:
+			case ID_ACC_DUPLICATESESSION:
 				// added DisableAcceleratorDuplicateSession (2009.4.6 maya)
 				if (!ts.DisableAcceleratorDuplicateSession)
 					OnDuplicateSession();
@@ -1646,7 +1646,12 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 		if (ActiveWin==IdVT) {
 			switch (wID) {
 				case ID_ACC_NEWCONNECTION:
-					OnFileNewConnection();
+					if (ts.AcceleratorNewConnection)
+						OnFileNewConnection();
+					return TRUE;
+				case ID_ACC_CYGWINCONNECTION:
+					if (ts.AcceleratorCygwinConnection)
+						OnCygwinConnection();
 					return TRUE;
 				case ID_ACC_COPY:
 					OnEditCopy();
