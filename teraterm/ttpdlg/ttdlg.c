@@ -3029,14 +3029,16 @@ static char **LangUIList = NULL;
 #define LANG_PATH "lang"
 #define LANG_EXT ".lng"
 
-static void make_sel_lang_ui(void)
+static void make_sel_lang_ui(char *HomeDir)
 {
 	int    i;
 	int    file_num;
-	char   fullpath[1024] = LANG_PATH "\\*" LANG_EXT;
+	char   fullpath[1024];
 	HANDLE hFind;
 	WIN32_FIND_DATA fd;
 	char **p;
+
+	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, LANG_PATH, LANG_EXT);
 
 	// メモリフリー
 	if (LangUIList) {
@@ -3176,7 +3178,7 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			}
 
 			// 最初に指定されている言語ファイルの番号を覚えておく。
-			make_sel_lang_ui();
+			make_sel_lang_ui(ts->HomeDir);
 			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFile_ini);
 			SetDropDownList(Dialog, IDC_GENLANG_UI, LangUIList, langui_sel);
 			if (LangUIList[0] == NULL) {
