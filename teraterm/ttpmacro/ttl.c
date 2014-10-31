@@ -4374,12 +4374,17 @@ WORD TTLSprintf(int getvar)
 
 					strncat_s(subFmt, sizeof(subFmt), p, 1);
 
-					if (type == STRING) {
+					if (type == STRING || type == DOUBLE) {
 						// •¶Žš—ñ‚Æ‚µ‚Ä“Ç‚ß‚é‚©ƒgƒ‰ƒC
 						TmpErr = 0;
 						GetStrVal(Str, &TmpErr);
 						if (TmpErr == 0) {
-							_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Str);
+							if (type == STRING) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Str);
+							}
+							else { // DOUBLE
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, atof(Str));
+							}
 						}
 						else {
 							SetResult(3);
@@ -4392,12 +4397,7 @@ WORD TTLSprintf(int getvar)
 						TmpErr = 0;
 						GetIntVal(&Num, &TmpErr);
 						if (TmpErr == 0) {
-							if (type == INTEGER) {
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Num);
-							}
-							else {
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, (double)Num);
-							}
+							_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Num);
 						}
 						else {
 							SetResult(3);
