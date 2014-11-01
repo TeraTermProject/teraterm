@@ -4262,12 +4262,14 @@ WORD TTLShow()
 WORD TTLSprintf(int getvar)
 {
 	TStrVal Fmt;
-	int Num;
+	int Num, NumWidth, NumPrecision;
 	TStrVal Str;
 	WORD Err = 0, TmpErr;
 	TVarId VarId;
 	char buf[MaxStrLen];
 	char *p, subFmt[MaxStrLen], buf2[MaxStrLen];
+	int width_asterisk, precision_asterisk, reg_beg, reg_end, reg_len, i;
+	char *match_str;
 
 	enum arg_type {
 		INTEGER,
@@ -4292,7 +4294,11 @@ WORD TTLSprintf(int getvar)
 		}
 	}
 
-	pattern = (UChar* )"^%[-+0 #]*(?:[1-9][0-9]*)?(?:\\.[0-9]*)?$";
+//	pattern = (UChar* )"^%[-+0 #]*(?:[1-9][0-9]*)?(?:\\.[0-9]*)?$";
+	pattern = (UChar* )"^%[-+0 #]*([1-9][0-9]*|\\*)?(?:\\.([0-9]*|\\*))?$";
+	//               flags--------
+	//                       width------------------
+	//                                     precision--------------------
 
 	r = onig_new(&reg, pattern, pattern + strlen(pattern),
 	             ONIG_OPTION_NONE, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT,
@@ -4374,16 +4380,87 @@ WORD TTLSprintf(int getvar)
 
 					strncat_s(subFmt, sizeof(subFmt), p, 1);
 
+					// width, precision が * かどうかチェック
+					width_asterisk = precision_asterisk = 0;
+					if (region->num_regs != 3) {
+						SetResult(-1);
+						goto exit2;
+					}
+					reg_beg = region->beg[1];
+					reg_end = region->end[1];
+					reg_len = reg_end - reg_beg;
+					match_str = (char*)calloc(reg_len + 1, sizeof(char));
+					for (i = 0; i < reg_len; i++) {
+						match_str[i] = str[reg_beg + i];
+					}
+					if (strcmp(match_str, "*") == 0) {
+						width_asterisk = 1;
+					}
+					free(match_str);
+					reg_beg = region->beg[2];
+					reg_end = region->end[2];
+					reg_len = reg_end - reg_beg;
+					match_str = (char*)calloc(reg_len + 1, sizeof(char));
+					for (i = 0; i < reg_len; i++) {
+						match_str[i] = str[reg_beg + i];
+					}
+					if (strcmp(match_str, "*") == 0) {
+						precision_asterisk = 1;
+					}
+					free(match_str);
+
+					// * に対応する引数を取得
+					if (width_asterisk) {
+						TmpErr = 0;
+						GetIntVal(&NumWidth, &TmpErr);
+						if (TmpErr != 0) {
+							SetResult(3);
+							Err = TmpErr;
+							goto exit1;
+						}
+					}
+					if (precision_asterisk) {
+						TmpErr = 0;
+						GetIntVal(&NumPrecision, &TmpErr);
+						if (TmpErr != 0) {
+							SetResult(3);
+							Err = TmpErr;
+							goto exit1;
+						}
+					}
+
 					if (type == STRING || type == DOUBLE) {
 						// 文字列として読めるかトライ
 						TmpErr = 0;
 						GetStrVal(Str, &TmpErr);
 						if (TmpErr == 0) {
 							if (type == STRING) {
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Str);
+								if (!width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Str);
+								}
+								else if (width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, Str);
+								}
+								else if (!width_asterisk && precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumPrecision, Str);
+								}
+								else { // width_asterisk && precision_asterisk
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, Str);
+								}
 							}
 							else { // DOUBLE
-								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, atof(Str));
+								if (!width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, atof(Str));
+								}
+								else if (width_asterisk && !precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, atof(Str));
+								}
+								else if (!width_asterisk && precision_asterisk) {
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumPrecision, atof(Str));
+								}
+								else { // width_asterisk && precision_asterisk
+									_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, atof(Str));
+								}
 							}
 						}
 						else {
@@ -4397,7 +4474,18 @@ WORD TTLSprintf(int getvar)
 						TmpErr = 0;
 						GetIntVal(&Num, &TmpErr);
 						if (TmpErr == 0) {
-							_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Num);
+							if (!width_asterisk && !precision_asterisk) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, Num);
+							}
+							else if (width_asterisk && !precision_asterisk) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, Num);
+							}
+							else if (!width_asterisk && precision_asterisk) {
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumPrecision, Num);
+							}
+							else { // width_asterisk && precision_asterisk
+								_snprintf_s(buf2, sizeof(buf2), _TRUNCATE, subFmt, NumWidth, NumPrecision, Num);
+							}
 						}
 						else {
 							SetResult(3);
@@ -4408,6 +4496,7 @@ WORD TTLSprintf(int getvar)
 
 					strncat_s(buf, sizeof(buf), buf2, _TRUNCATE);
 					memset(subFmt, 0, sizeof(subFmt));
+					onig_region_free(region, 0);
 					break;
 
 				default:
