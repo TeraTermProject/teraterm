@@ -19,7 +19,7 @@ void CommClose(PComVar cv);
 void CommProcRRQ(PComVar cv);
 void CommReceive(PComVar cv);
 void CommSend(PComVar cv);
-void CommSendBreak(PComVar cv);
+void CommSendBreak(PComVar cv, int msec);
 void CommResetSerial(PTTSet ts, PComVar cv, BOOL ClearBuffer);
 void CommLock(PTTSet ts, PComVar cv, BOOL Lock);
 BOOL PrnOpen(PCHAR DevName);

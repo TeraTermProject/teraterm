@@ -1033,6 +1033,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Send 8bit control sequence -- special option */
 	ts->Send8BitCtrl = GetOnOff(Section, "Send8BitCtrl", FName, FALSE);
 
+	/* SendBreak time (in msec) -- special option */
+	ts->SendBreakTime =
+		GetPrivateProfileInt(Section, "SendBreakTime", 1000, FName);
+
 	/* Startup macro -- special option */
 	GetPrivateProfileString(Section, "StartupMacro", "",
 	                        ts->MacroFN, sizeof(ts->MacroFN), FName);
@@ -2363,6 +2367,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	/* Send 8bit control sequence -- special option */
 	WriteOnOff(Section, "Send8BitCtrl", FName, ts->Send8BitCtrl);
+
+	/* SendBreak time (in msec) -- special option */
+	WriteInt(Section, "SendBreakTime", FName, ts->SendBreakTime);
 
 	/* Startup macro -- special option */
 	WritePrivateProfileString(Section, "StartupMacro", ts->MacroFN, FName);

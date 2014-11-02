@@ -584,6 +584,7 @@ struct tttset {
 	WORD DebugModes;
 	WORD AcceleratorNewConnection;
 	WORD AcceleratorCygwinConnection;
+	int SendBreakTime;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1050,6 +1051,7 @@ typedef TMap far *PMap;
  * - At version 4.85, ttset_memfilemap was replaced with ttset_memfilemap_25.
  *   added tttset.AcceleratorNewConnection
  *   added tttset.AcceleratorCygwinConnection
+ *   added tttset.SendBreakTime
  *
  * - At version 4.83, ttset_memfilemap was replaced with ttset_memfilemap_24.
  *   added tttset.DebugModes

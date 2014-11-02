@@ -1218,7 +1218,7 @@ void CommSend(PComVar cv)
 	}
 }
 
-void CommSendBreak(PComVar cv)
+void CommSendBreak(PComVar cv, int msec)
 /* for only serial ports */
 {
 	MSG DummyMsg;
@@ -1233,7 +1233,7 @@ void CommSendBreak(PComVar cv)
 			SetCommBreak(cv->ComID);
 
 			/* pause for 1 sec */
-			if (SetTimer(cv->HWin, IdBreakTimer, 1000, NULL) != 0) {
+			if (SetTimer(cv->HWin, IdBreakTimer, msec, NULL) != 0) {
 				GetMessage(&DummyMsg,cv->HWin,WM_TIMER,WM_TIMER);
 			}
 

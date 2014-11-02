@@ -4576,7 +4576,7 @@ void CVTWindow::OnControlSendBreak()
 				TelSendBreak();
 				break;
 			case IdSerial:
-				CommSendBreak(&cv);
+				CommSendBreak(&cv, ts.SendBreakTime);
 				break;
 		}
 }
