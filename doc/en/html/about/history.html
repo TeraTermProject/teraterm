@@ -34,11 +34,11 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <!--li>シリアルポートで SendBreak を送出する時間の長さを設定できるようにした。
+      <li>added support for the pause time while the break signal is sending to the serial port.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-com.html#SendBreakTime">SendBreakTime</a> エントリを追加した。</li>
+          <li>added the <a href="../setup/teraterm-com.html#SendBreakTime">SendBreakTime</a> entry in the teraterm.ini file.</li>
         </ul></li>
-      <li>アクセラレータキー Alt+D と Alt+I が VT ウィンドウでのみ反応するようにした。</a-->
+      <li>The Alt+D and Alt+I accelerator key can only be worked on the VT window.</li>
       <li>added new optional setting that can disable accelerator key of New Connection.
         <ul>
           <li>added <a href="../setup/teraterm-misc.html#AcceleratorNewConnection">AcceleratorNewConnection</a> entry to teraterm.ini.</li>
@@ -54,8 +54,8 @@
   <li>Bug fixes
     <ul>
       <li>The language file will not be shown in the General setup.</li>
-      <!--li><a href="../macro/command/sprintf.html">sprintf</a>, <a href="../macro/command/sprintf2.html">sprintf2</a> マクロコマンドに浮動小数点数を渡せない問題を修正した。</li>
-      <li><a href="../macro/command/sprintf.html">sprintf</a>, <a href="../macro/command/sprintf2.html">sprintf2</a> マクロコマンドの書式指定の文字幅指定と精度指定で * が使えない問題を修正した。</li-->
+      <li>The floating point number can not be specified in the <a href="../macro/command/sprintf.html">sprintf</a>, <a href="../macro/command/sprintf2.html">sprintf2</a> macro command.</li>
+      <li>The character width and precision specifying of the format style can not use the * character in the <a href="../macro/command/sprintf.html">sprintf</a>, <a href="../macro/command/sprintf2.html">sprintf2</a> macro command.</li>
     </ul>
   </li>
 
