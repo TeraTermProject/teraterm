@@ -34,6 +34,11 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>シリアルポートで SendBreak を送出する時間の長さを設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#SendBreakTime">SendBreakTime</a> エントリを追加した。</li>
+        </ul></li>
+      <li>アクセラレータキー Alt+D と Alt+I が VT ウィンドウでのみ反応するようにした。</a>
       <li>New Connection のアクセラレータキーを無効にできるようにした。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-misc.html#AcceleratorNewConnection">AcceleratorNewConnection</a> エントリを追加した。</li>
@@ -49,6 +54,8 @@
   <li>バグ修正
     <ul>
       <li>General setupに言語ファイルが表示されないことがある問題を修正した。</li>
+      <li><a href="../macro/command/sprintf.html">sprintf</a>, <a href="../macro/command/sprintf2.html">sprintf2</a> マクロコマンドに浮動小数点数を渡せない問題を修正した。</li>
+      <li><a href="../macro/command/sprintf.html">sprintf</a>, <a href="../macro/command/sprintf2.html">sprintf2</a> マクロコマンドの書式指定の文字幅指定と精度指定で * が使えない問題を修正した。</li>
     </ul>
   </li>
 

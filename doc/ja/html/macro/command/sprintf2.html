@@ -40,16 +40,21 @@ C言語の書式指定にしたがって、引数の数値や文字列をフォーマットして、文字列型変数 
 </tr>
 <tr>
   <th>幅(オプション)</th>
-  <td>10進整数</td>
+  <td>10進整数 または *</td>
 </tr>
 <tr>
   <th>精度(オプション)</th>
-  <td>ピリオド (.) に続けて、負でない10進整数(オプション)</td>
+  <td>ピリオド (.) に続けて、負でない10進整数 または *(オプション)</td>
 </tr>
 </table>
 
 <p>
-このコマンドの結果、以下のうちの一つの値がシステム変数 result に格納される。 </p>
+TTL は浮動小数点型を持たないので、浮動小数点数の書式には、対応する小数を文字列変数あるいは文字列で引数に指定する。
+</p>
+
+<p>
+このコマンドの結果、以下のうちの一つの値がシステム変数 result に格納される。
+</p>
 
 <table>
 <tr>
@@ -89,6 +94,15 @@ messagebox win 'sprintf test(2)'
 
 sprintf2 test '%s=%d %s=0x%x' 'dec' 10 'hex' 33
 messagebox test 'sprintf test macro(3)'
+
+sprintf 'pi=%f' "3.14159"
+messagebox inputstr 'sprintf test macro(4)'
+
+sprintf 'pi=%.4e' "3.14159"
+messagebox inputstr 'sprintf test macro(5)'
+
+sprintf 'pi=%.4g' "3.14159"
+messagebox inputstr 'sprintf test macro(6)'
 </pre>
 
 <h2>参照</h2>

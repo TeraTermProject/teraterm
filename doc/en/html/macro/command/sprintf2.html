@@ -40,13 +40,17 @@ The output string is stored in the string variable &lt;strvar&gt;.
 </tr>
 <tr>
   <th>width(option)</th>
-  <td>decimal integer</td>
+  <td>decimal integer or *</td>
 </tr>
 <tr>
   <th>precision(option)</th>
-  <td>nonnegative decimal integer(option), preceded by a period(.)</td>
+  <td>nonnegative decimal integer or *(option), preceded by a period(.)</td>
 </tr>
 </table>
+
+<!--p>
+TTL は浮動小数点型を持たないので、浮動小数点数の書式には、対応する小数を文字列変数あるいは文字列で引数に指定する。
+</p-->
 
 <p>
 As a result of this command, the system variable "result" is set to one of the following values.
@@ -90,6 +94,15 @@ messagebox win 'sprintf test(2)'
 
 sprintf2 test '%s=%d %s=0x%x' 'dec' 10 'hex' 33
 messagebox test 'sprintf test macro(3)'
+
+sprintf 'pi=%f' "3.14159"
+messagebox inputstr 'sprintf test macro(4)'
+
+sprintf 'pi=%.4e' "3.14159"
+messagebox inputstr 'sprintf test macro(5)'
+
+sprintf 'pi=%.4g' "3.14159"
+messagebox inputstr 'sprintf test macro(6)'
 </pre>
 
 <h2>See also</h2>
