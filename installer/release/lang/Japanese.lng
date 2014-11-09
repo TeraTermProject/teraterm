@@ -396,18 +396,18 @@ MSG_FIND_DIR_ERROR=ディレクトリが見つかりません
 ; ttpfile
 ; ttfile.c
 DLG_FOPT=オプション
-DLG_FOPT_BINARY=バイナリ(&B)
+DLG_FOPT_BINARY=バイナリ(&R)
 DLG_FOPT_APPEND=追記(&A)
 DLG_FOPT_PLAIN=プレーンテキスト(&P)
 DLG_FOPT_TIMESTAMP=タイムスタンプ(&T)
 DLG_FOPT_HIDEDIALOG=ダイアログを非表示(&D)
-DLG_FOPT_ALLBUFFINFIRST=現在バッファを含む(&I)
+DLG_FOPT_ALLBUFFINFIRST=現在バッファを含む(&C)
 
 DLG_XOPT=オプション
 DLG_XOPT_CHECKSUM=チェックサム(&S)
 DLG_XOPT_CRC=&CRC
 DLG_XOPT_1K=1&K
-DLG_XOPT_BINARY=バイナリ(&B)
+DLG_XOPT_BINARY=バイナリ(&R)
 
 FILEDLG_KEYBOARD_FILTER=キーボード設定ファイル (*.cnf)\0*.cnf\0\0
 FILEDLG_SETUP_FILTER=設定ファイル (*.ini)\0*.ini\0\0

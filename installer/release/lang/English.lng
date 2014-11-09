@@ -397,18 +397,18 @@ MSG_FIND_DIR_ERROR=Cannot find directory
 ; ttpfile
 ; ttfile.c
 DLG_FOPT=Option
-DLG_FOPT_BINARY=&Binary
+DLG_FOPT_BINARY=Bina&ry
 DLG_FOPT_APPEND=&Append
 DLG_FOPT_PLAIN=&Plain text
 DLG_FOPT_TIMESTAMP=&Timestamp
 DLG_FOPT_HIDEDIALOG=Hide &dialog
-DLG_FOPT_ALLBUFFINFIRST=&Include screen buffer
+DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer
 
 DLG_XOPT=Option
 DLG_XOPT_CHECKSUM=Check&sum
 DLG_XOPT_CRC=&CRC
 DLG_XOPT_1K=1&K
-DLG_XOPT_BINARY=&Binary
+DLG_XOPT_BINARY=Bina&ry
 
 FILEDLG_KEYBOARD_FILTER=keyboard setup files (*.cnf)\0*.cnf\0\0
 FILEDLG_SETUP_FILTER=setup files (*.ini)\0*.ini\0\0
