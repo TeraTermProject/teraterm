@@ -1741,25 +1741,11 @@ void DispApplyANSIColor() {
 void InitColorTable()
 {
   int i;
-#ifndef NO_ANSI_COLOR_EXTENSION
+
   DispApplyANSIColor();
-#else /* NO_ANSI_COLOR_EXTENSION */
-  for (i=0; i<=15; i++) {
-    ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
-  }
-#endif /* NO_ANSI_COLOR_EXTENSION */
+
   for (i=16; i<=255; i++) {
     ANSIColor[i] = RGB(DefaultColorTable[i][0], DefaultColorTable[i][1], DefaultColorTable[i][2]);
-  }
-
-  if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
-#ifdef ALPHABLEND_TYPE2
-    ANSIColor[IdBack ] = BGVTColor[1]; // use background color for "Black"
-    ANSIColor[IdFore ] = BGVTColor[0]; // use text color for "white"
-#else
-    ANSIColor[IdBack ] = ts.VTColor[1]; // use background color for "Black"
-    ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
-#endif
   }
 }
 
@@ -2494,13 +2480,8 @@ void DispChangeWin()
 
   if ((ts.ColorFlag & CF_USETEXTCOLOR)==0)
   {
-#ifndef NO_ANSI_COLOR_EXTENSION
     ANSIColor[IdFore ]   = ts.ANSIColor[IdFore ];
     ANSIColor[IdBack ]   = ts.ANSIColor[IdBack ];
-#else /* NO_ANSI_COLOR_EXTENSION */
-    ANSIColor[IdFore ]   = RGB(255,255,255);
-    ANSIColor[IdBack ]   = RGB(  0,  0,  0);
-#endif /* NO_ANSI_COLOR_EXTENSION */
   }
   else { // use text (background) color for "white (black)"
     ANSIColor[IdFore ]   = ts.VTColor[0];
@@ -3602,11 +3583,7 @@ void DispResetColor(unsigned int num)
 #endif
 			}
 			else {
-#ifndef NO_ANSI_COLOR_EXTENSION
 				ANSIColor[IdBack] = ts.ANSIColor[IdBack];
-#else /* NO_ANSI_COLOR_EXTENSION */
-				ANSIColor[IdBack] = RGB(DefaultColorTable[IdBack][0], DefaultColorTable[IdBack][1], DefaultColorTable[IdBack][2]);
-#endif
 			}
 			DispSetNearestColors(num, num, NULL);
 		}
@@ -3619,20 +3596,12 @@ void DispResetColor(unsigned int num)
 #endif
 			}
 			else {
-#ifndef NO_ANSI_COLOR_EXTENSION
 				ANSIColor[IdFore] = ts.ANSIColor[IdFore];
-#else /* NO_ANSI_COLOR_EXTENSION */
-				ANSIColor[IdFore] = RGB(DefaultColorTable[IdFore][0], DefaultColorTable[IdFore][1], DefaultColorTable[IdFore][2]);
-#endif
 			}
 			DispSetNearestColors(num, num, NULL);
 		}
   		else if (num <= 15) {
-#ifndef NO_ANSI_COLOR_EXTENSION
 			ANSIColor[num] = ts.ANSIColor[num];
-#else /* NO_ANSI_COLOR_EXTENSION */
-			ANSIColor[num] = RGB(DefaultColorTable[num][0], DefaultColorTable[num][1], DefaultColorTable[num][2]);
-#endif
 			DispSetNearestColors(num, num, NULL);
 		}
 		else if (num <= 255) {

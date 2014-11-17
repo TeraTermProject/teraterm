@@ -467,9 +467,7 @@ struct tttset {
 #ifndef NO_COPYLINE_FIX
 	WORD EnableContinuedLineCopy;
 #endif /* NO_COPYLINE_FIX */
-#ifndef NO_ANSI_COLOR_EXTENSION
 	COLORREF ANSIColor[16];
-#endif /* NO_ANSI_COLOR_EXTENSION */
 #ifndef NO_INET6
 	/* protocol used in connect() */
 	int ProtocolFamily;

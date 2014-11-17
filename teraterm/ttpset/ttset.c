@@ -539,7 +539,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		                      (BYTE) ts->TmpColor[0][i * 3 + 1],
 		                      (BYTE) ts->TmpColor[0][i * 3 + 2]);
 
-#ifndef NO_ANSI_COLOR_EXTENSION
 	/* ANSI color definition (in the case FullColor=on)  -- special option
 	   o UseTextColor should be off, or the background and foreground color of
 	   VTColor are assigned to color-number 0 and 7 respectively, even if
@@ -580,7 +579,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 				RGB((BYTE) r, (BYTE) g, (BYTE) b);
 		}
 	}
-#endif						/* NO_ANSI_COLOR_EXTENSION */
 
 	TmpDC = GetDC(0);			/* Get screen device context */
 	for (i = 0; i <= 1; i++)
@@ -595,10 +593,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	for (i = 0; i <= 1; i++)
 		ts->URLColor[i] = GetNearestColor(TmpDC, ts->URLColor[i]);
 	/* end - ishizaki */
-#ifndef NO_ANSI_COLOR_EXTENSION
 	for (i = 0; i < 16; i++)
 		ts->ANSIColor[i] = GetNearestColor(TmpDC, ts->ANSIColor[i]);
-#endif						/* NO_ANSI_COLOR_EXTENSION */
 	ReleaseDC(0, TmpDC);
 	if (GetOnOff(Section, "EnableANSIColor", FName, TRUE))
 		ts->ColorFlag |= CF_ANSICOLOR;
