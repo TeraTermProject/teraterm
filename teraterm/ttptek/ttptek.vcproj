@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -41,21 +41,16 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Debug/ttptek.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Debug/ttptek.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -68,7 +63,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -76,15 +71,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ttpcmn.lib"
-				OutputFile="..\Debug/ttptek.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\debug"
+				AdditionalLibraryDirectories="$(OutDir)"
 				ModuleDefinitionFile=".\ttptek.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Debug/ttptek.pdb"
 				SubSystem="2"
-				ImportLibrary="..\Debug/ttptek.lib"
+				ImportLibrary="$(OutDir)\ttptek.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -114,8 +107,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -139,7 +132,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Release/ttptek.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -147,16 +140,11 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/ttptek.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				CompileAs="0"
@@ -168,7 +156,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -176,15 +164,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ttpcmn.lib"
-				OutputFile="..\Release/ttptek.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\release"
+				AdditionalLibraryDirectories="$(OutDir)"
 				ModuleDefinitionFile=".\ttptek.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Release/ttptek.pdb"
 				SubSystem="2"
-				ImportLibrary="..\Release/ttptek.lib"
+				ImportLibrary="$(OutDir)\ttptek.lib"
 				TargetMachine="1"
 			/>
 			<Tool

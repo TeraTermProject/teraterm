@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
 			>
@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\libs\putty;..\..\libs\putty\windows"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\putty;$(SolutionDir)..\libs\putty\windows"
 				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SECURITY_WIN32"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -78,8 +78,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="0"
@@ -101,7 +101,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\libs\putty;..\..\libs\putty\windows"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\putty;$(SolutionDir)..\libs\putty\windows"
 				PreprocessorDefinitions="_WINDOWS;_CRT_SECURE_NO_DEPRECATE;SECURITY_WIN32"
 				RuntimeLibrary="0"
 				WarningLevel="3"

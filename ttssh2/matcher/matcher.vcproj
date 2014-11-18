@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/matcher.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,11 +49,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/matcher.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -70,10 +65,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Release/matcher.exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/matcher.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -104,8 +98,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -126,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Debug/matcher.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName)matcher.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -134,11 +128,6 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Debug/matcher.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -156,11 +145,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Debug/matcher.exe"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/matcher.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>

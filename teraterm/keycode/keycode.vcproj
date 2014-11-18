@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -41,20 +41,16 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Release/keycode.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;&#x0D;&#x0A;"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
-				PrecompiledHeaderFile=".\Release/keycode.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				CompileAs="0"
@@ -72,10 +68,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\Release/keycode.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile="..\Release/keycode.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -106,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -131,20 +125,16 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Debug/keycode.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\Debug/keycode.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -163,11 +153,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\Debug/keycode.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Debug/keycode.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>

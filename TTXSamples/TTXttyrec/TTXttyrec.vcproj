@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="rec.$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\teraterm\common;..\..\teraterm\teraterm"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -93,7 +93,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="rec.$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\teraterm\common;..\..\teraterm\teraterm"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"

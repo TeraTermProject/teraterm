@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -41,7 +41,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/ttpmenu.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,16 +49,11 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="1"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\teraterm\common"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/ttpmenu.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -76,11 +71,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib"
-				OutputFile=".\Release/ttpmenu.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Release/ttpmenu.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -111,8 +104,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -136,7 +129,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/ttpmenu.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -144,16 +137,11 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				InlineFunctionExpansion="0"
-				AdditionalIncludeDirectories="..\teraterm\common"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				StringPooling="false"
 				RuntimeLibrary="1"
 				EnableFunctionLevelLinking="false"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/ttpmenu.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -172,11 +160,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib version.lib"
-				OutputFile=".\Debug/ttpmenu.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/ttpmenu.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>

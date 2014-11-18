@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -41,7 +41,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/ttssh.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,11 +49,6 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Debug/ttssh.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -71,11 +66,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Debug/ttssh.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/ttssh.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -106,8 +99,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -131,7 +124,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/ttssh.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -142,11 +135,6 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/ttssh.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -163,10 +151,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Release/ttssh.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/ttssh.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>

@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -42,7 +42,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Release/ttpmacro.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -50,17 +50,11 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;&#x0D;&#x0A;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\libs\oniguruma;..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma;$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="teraterm.h"
-				PrecompiledHeaderFile=".\Release/ttpmacro.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				CompileAs="0"
@@ -72,7 +66,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -80,13 +74,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="onig_s.lib Version.lib iphlpapi.lib"
-				OutputFile="..\Release/ttpmacro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\libs\oniguruma;..\release"
+				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma;$(OutDir)"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Release/ttpmacro.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -117,8 +109,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
@@ -142,22 +134,16 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Debug/ttpmacro.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\libs\oniguruma;..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma;$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderThrough="teraterm.h"
-				PrecompiledHeaderFile=".\Debug/ttpmacro.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -170,7 +156,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -178,13 +164,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="onig_sd.lib Version.lib iphlpapi.lib"
-				OutputFile="..\Debug/ttpmacro.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\libs\oniguruma;..\debug"
+				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma;$(OutDir)"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Debug/ttpmacro.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>

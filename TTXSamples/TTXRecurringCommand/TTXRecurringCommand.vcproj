@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\teraterm\common;..\..\teraterm\teraterm"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\teraterm\debug\ttpcmn.lib"
+				AdditionalDependencies="$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -94,7 +94,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="0"
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\teraterm\common;..\..\teraterm\teraterm"
+				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\teraterm\teraterm"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\teraterm\release\ttpcmn.lib"
+				AdditionalDependencies="$(SolutionDir)..\teraterm\$(ConfigurationName)\ttpcmn.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"

@@ -16,8 +16,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -41,7 +41,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Release/ttpcmn.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,16 +49,11 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\common;..\htmlhelp"
+				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)htmlhelp"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/ttpcmn.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				CompileAs="0"
@@ -70,7 +65,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -78,15 +73,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib htmlhelp.lib"
-				OutputFile="..\Release/ttpcmn.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ttpcmn.def"
 				DelayLoadDLLs="setupapi.dll; user32.dll"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Release/ttpcmn.pdb"
 				SubSystem="2"
-				ImportLibrary="..\Release/ttpcmn.lib"
+				ImportLibrary="$(OutDir)\ttpcmn.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -116,8 +109,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -141,21 +134,16 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName="..\Debug/ttpcmn.tlb"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\common;..\htmlhelp"
+				AdditionalIncludeDirectories="$(SolutionDir)common;$(SolutionDir)htmlhelp"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Debug/ttpcmn.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
@@ -168,7 +156,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\common"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -176,16 +164,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="setupapi.lib htmlhelp.lib"
-				OutputFile="..\Debug/ttpcmn.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\htmlhelp"
+				AdditionalLibraryDirectories="$(SolutionDir)htmlhelp"
 				ModuleDefinitionFile=".\ttpcmn.def"
 				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\Debug/ttpcmn.pdb"
 				SubSystem="2"
-				ImportLibrary="..\Debug/ttpcmn.lib"
+				ImportLibrary="$(OutDir)\ttpcmn.lib"
 				TargetMachine="1"
 			/>
 			<Tool
