@@ -73,10 +73,10 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(OutDir)"
-				ModuleDefinitionFile=".\ttptek.def"
+				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\ttptek.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -165,10 +165,10 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(OutDir)"
-				ModuleDefinitionFile=".\ttptek.def"
+				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\ttptek.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

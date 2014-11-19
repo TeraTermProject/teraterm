@@ -76,10 +76,10 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma;$(OutDir)"
-				ModuleDefinitionFile=".\ttpdlg.def"
+				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\ttpdlg.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -167,10 +167,10 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma;$(OutDir)"
-				ModuleDefinitionFile=".\ttpdlg.def"
+				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\ttpdlg.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

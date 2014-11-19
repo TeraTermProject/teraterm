@@ -74,11 +74,11 @@
 				AdditionalDependencies="setupapi.lib htmlhelp.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ModuleDefinitionFile=".\ttpcmn.def"
+				ModuleDefinitionFile="$(ProjectName).def"
 				DelayLoadDLLs="setupapi.dll; user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\ttpcmn.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -165,11 +165,11 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)htmlhelp"
-				ModuleDefinitionFile=".\ttpcmn.def"
+				ModuleDefinitionFile="$(ProjectName).def"
 				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)\ttpcmn.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

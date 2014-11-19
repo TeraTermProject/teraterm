@@ -80,7 +80,6 @@
 				ModuleDefinitionFile="TTX.def"
 				GenerateDebugInformation="true"
 				GenerateMapFile="true"
-				MapFileName="$(OutDir)\$(ProjectName).map"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
