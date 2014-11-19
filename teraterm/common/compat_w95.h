@@ -3,6 +3,9 @@
 //
 // cf.http://jet2.u-abel.net/program/tips/forceimp.htm
 
+
+#if _MSC_VER == 1400
+
 // 装飾された名前のアドレスを作るための仮定義
 // (これだけでインポートを横取りしている)
 #ifdef __cplusplus
@@ -70,3 +73,18 @@ int s_DoCover_IsDebuggerPresent
     = (int) (DoCover_IsDebuggerPresent(), 0);
 }
 #endif
+
+#else /* _MSC_VER */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void __stdcall DoCover_IsDebuggerPresent()
+{
+	// NOP
+}
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _MSC_VER */
