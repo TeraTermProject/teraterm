@@ -542,6 +542,7 @@ LONG CCtrlWindow::OnDdeReady(UINT wParam, LONG lParam)
 		LockVar();
 		SetResult(0);
 		UnlockVar();
+		TopicName[0] = 0;
 		TTLStatus = IdTTLRun;
 	}
 	return 0;
