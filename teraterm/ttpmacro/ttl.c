@@ -1471,13 +1471,17 @@ WORD TTLFileOpen()
 {
 	WORD Err;
 	TVarId VarId;
-	int Append, FH;
+	int Append, FH, ReadonlyFlag=0;
 	TStrVal FName;
 
 	Err = 0;
 	GetIntVar(&VarId, &Err);
 	GetStrVal(FName, &Err);
 	GetIntVal(&Append, &Err);
+	// get 4nd arg(optional) if given
+	if (CheckParameterGiven()) { // readonly
+		GetIntVal(&ReadonlyFlag, &Err);
+	}
 	if ((Err==0) &&
 	    ((strlen(FName)==0) || (GetFirstChar()!=0)))
 		Err = ErrSyntax;
@@ -1487,7 +1491,13 @@ WORD TTLFileOpen()
 		SetIntVal(VarId, -1);
 		return Err;
 	}
-	FH = _lopen(FName,OF_READWRITE);
+
+	if (ReadonlyFlag) {
+		FH = _lopen(FName,OF_READ);
+	}
+	else {
+		FH = _lopen(FName,OF_READWRITE);
+	}
 	if (FH<0)
 		FH = _lcreat(FName,0);
 	if (FH<0) FH = -1;
