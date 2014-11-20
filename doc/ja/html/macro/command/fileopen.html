@@ -18,16 +18,33 @@
 </p>
 
 <pre class="macro-syntax">
-fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt;
+fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly flag&gt;]
 </pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">整数変数 &lt;file handle&gt;</dt>
+	<dd>もしファイルが正しくオープンされた場合、ファイルハンドルが格納される。<br />
+        それ以外の場合、&lt;file handle&gt; に-1が格納される。</dd>
+
+	<dt class="macro">文字列 &lt;filename&gt;</dt>
+	<dd>開くファイル名を指定する。<br />
+	    ファイルが存在しない場合は、新たに作成されてからオープンされる。</dd>
+
+	<dt class="macro">整数 &lt;append flag&gt;</dt>
+	<dd>0を指定すると、ファイルポインタの位置はファイルの始めにセットされる。<br />
+	    0以外を指定すると、ファイルポインタはファイルの最後にセットされる。</dd>
+
+	<dt class="macro">整数 &lt;readonly flag&gt; (オプション デフォルト=0) (バージョン 4.85 以降)</dt>
+	<dd>0を指定すると、読み書きモードでファイルを開く。<br />
+	    0以外を指定すると、読み取り専用モードでファイルを開く。</dd>
+</dl>
 
 <h2>解説</h2>
 
 <p>
-ファイル &lt;filename&gt; を開く。<br>
-ファイルが存在しない場合は、新たに作成されてからオープンされる。もしファイルが正しくオープンされた場合、ファイルハンドルが整数変数 &lt;file handle&gt; に格納される。それ以外の場合、&lt;file handle&gt; に-1が格納される。<br>
-&lt;append flag&gt; が0の場合、ファイルポインタの位置はファイルの始めにセットされる。&lt;append flag&gt; が0以外の場合、ファイルポインタはファイルの最後にセットされる。<br>
-なお、ファイルはバイナリモードでオープンされる。
+ファイルはバイナリモードでオープンされる。
 </p>
 
 <h2>例</h2>

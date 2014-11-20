@@ -18,16 +18,33 @@ Opens a file.
 </p>
 
 <pre class="macro-syntax">
-fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt;
+fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly flag&gt;]
 </pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">integer variable &lt;file handle&gt;</dt>
+	<dd>If the file is successfully opened, the file handle is returned in this variable.<br />
+        Otherwise, &lt;file handle&gt; is set to -1.</dd>
+
+	<dt class="macro">string &lt;filename&gt;</dt>
+	<dd><!--開くファイル名を指定する。--><br />
+	    If the file does not exist, it is created and then opened.</dd>
+
+	<dt class="macro">integer &lt;append flag&gt;</dt>
+	<dd>If this parameter is zero, the file pointer is set to the beginning of the file.<br />
+	    If this parameter is nonzero, the file pointer is set to the end of the file.</dd>
+
+	<dt class="macro">integer &lt;readonly flag&gt; (optional default=0) (version 4.85 or later)</dt>
+	<dd>If this parameter is zero, <!--読み書きモードでファイルを開く。--><br />
+	    If this parameter is nonzero, <!--読み取り専用モードでファイルを開く。--></dd>
+</dl>
 
 <h2>Remarks</h2>
 
 <p>
-Opens a file specified by &lt;file name&gt;.<br>
-If the file does not exist, it is created and then opened. If the file is successfully opened, the file handle is returned in the integer variable &lt;file handle&gt;. Otherwise, &lt;file handle&gt; is set to -1.<br>
-If &lt;append flag&gt; is zero, the file pointer is set to the beginning of the file. If &lt;append flag&gt; is non-zero, the file pointer is set to the end of the file.<br>
-Also, the file is opened in the binary mode.
+The file is opened in the binary mode.
 </p>
 
 <h2>Example</h2>
