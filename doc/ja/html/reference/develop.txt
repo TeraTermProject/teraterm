@@ -16,6 +16,9 @@
     注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
     注2: SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
 
+  MFC MBCS DLL アドオン
+    注: Visual Studio Community 2013に上記アドオンを導入する必要があります。
+
 - インストーラ
   Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 以上で作成したインストーラは Windows NT 4.0, 9x をサポートしないので不可)
   Inno Setup Preprocessor (ispack-5.4.3 より)
