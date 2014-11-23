@@ -29,7 +29,7 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly 
         Otherwise, &lt;file handle&gt; is set to -1.</dd>
 
 	<dt class="macro">string &lt;filename&gt;</dt>
-	<dd><!--開くファイル名を指定する。--><br />
+	<dd>Specify an opened file name<br />
 	    If the file does not exist, it is created and then opened.</dd>
 
 	<dt class="macro">integer &lt;append flag&gt;</dt>
@@ -37,8 +37,8 @@ fileopen &lt;file handle&gt; &lt;filename&gt; &lt;append flag&gt; [&lt;readonly 
 	    If this parameter is nonzero, the file pointer is set to the end of the file.</dd>
 
 	<dt class="macro">integer &lt;readonly flag&gt; (optional default=0) (version 4.85 or later)</dt>
-	<dd>If this parameter is zero, <!--読み書きモードでファイルを開く。--><br />
-	    If this parameter is nonzero, <!--読み取り専用モードでファイルを開く。--></dd>
+	<dd>If this parameter is zero, it requests opening the file read/write.<br />
+	    If this parameter is nonzero, it requests opening the file read-only.</dd>
 </dl>
 
 <h2>Remarks</h2>
