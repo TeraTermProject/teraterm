@@ -44,7 +44,7 @@ devenv /%BUILD% release %TTSSHSLN%
 devenv /%BUILD% release %TTPROXYSLN%
 devenv /%BUILD% release %TTXKANJISLN%
 devenv /%BUILD% release %TTPMENUSLN%
-devenv /%BUILD% release 
+devenv /%BUILD% release %TTXSAMPLESLN%
 
 rem cygterm ‚ðƒRƒ“ƒpƒCƒ‹
 pushd ..\cygterm
