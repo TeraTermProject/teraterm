@@ -11,6 +11,7 @@
            - プロジェクト -> プロパティ -> 構成プロパティ -> リンカ― -> 詳細設定 ->  "安全な例外ハンドラーを含むイメージ"(/SAFESEH を外す)
            - プロジェクトのプロパティ -> 構成プロパティ -> マニフェストツール -> 入力と出力 -> 埋め込みマニフェストを”いいえ”に設定する
            - imagehlp.libをリンクする
+    注4: Visual Studio 2013 でコンパイルした実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
     
   Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
     注: Visual Studio 2005 Standard Editionでは、OpenSSL 0.9.8iのビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。

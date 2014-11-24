@@ -11,6 +11,7 @@
              - Project - Property - Configuration Properties - Linker - Advanced - "Image Has Safe Exception Handlers": No(/SAFESEH:NO)
              - Project - Property - Configuration Properties - Manifest Tool - Input and Output - "Embed Manifest": No
              - Linked imagehlp.lib
+    Note4: The executable program which was compiled by Visual Studio 2013 does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 
   Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
     Note: The OpenSSL 0.9.8i will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.
