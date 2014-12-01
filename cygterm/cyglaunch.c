@@ -55,7 +55,6 @@ void OnCygwinConnection(char *CygwinDirectory, char *cmdline)
 found_dll:;
 	envptr = getenv("PATH");
 	file[strlen(file)-12] = '\0'; // delete "\\cygwin1.dll"
-		MessageBox(NULL, file, "a", MB_OK);
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff=malloc(envbufflen)) == NULL) {
