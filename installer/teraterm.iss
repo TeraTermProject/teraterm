@@ -810,6 +810,12 @@ begin
                     else
                         FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, True);
                 end;
+            end else begin
+                Machine := PortableExecutableMachine(Cygterm);
+                if Machine = IMAGE_FILE_MACHINE_AMD64 then
+                    FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, False)
+                else
+                    FileCopy(ExpandConstant('{app}') + '\cygterm+-i686\cygterm.exe', Cygterm, False);
             end;
         end;
 
