@@ -48,7 +48,7 @@ found_dll:;
 	return 1;
 }
 
-int __stdcall CygwinMachine(char *file)
+int __stdcall PortableExecutableMachine(char *file)
 {
 	FILE *fp;
 	unsigned char buf[4];
@@ -143,10 +143,10 @@ int main(void)
 	printf("  Cygwin directory => %s\n", file);
 	printf("\n");
 	
-	printf("CygwinMachine()\n");
+	printf("PortableExecutableMachine()\n");
 	strncat_s(file, sizeof(file), "\\bin\\cygwin1.dll", _TRUNCATE);
 	printf("  Cygwin DLL => %s\n", file);
-	res = CygwinMachine(file);
+	res = PortableExecutableMachine(file);
 	printf("  Machine => x%04x", res);
 	switch (res) {
 		case IMAGE_FILE_MACHINE_I386:

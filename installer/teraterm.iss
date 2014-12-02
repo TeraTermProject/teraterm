@@ -347,8 +347,8 @@ external 'SHChangeNotify@shell32.dll stdcall';
 function FindCygwinPath(CygwinDirectory, CygwinDir: AnsiString; Dirlen: Cardinal): Integer;
 external 'FindCygwinPath@files:cygtool.dll stdcall setuponly';
 
-function CygwinMachine(CygwinDir: AnsiString): Integer;
-external 'CygwinMachine@files:cygtool.dll stdcall setuponly';
+function PortableExecutableMachine(CygwinDir: AnsiString): Integer;
+external 'PortableExecutableMachine@files:cygtool.dll stdcall setuponly';
 
 var
   UILangFilePage: TInputOptionWizardPage;
@@ -804,7 +804,7 @@ begin
                 If Res = 1 then
                 begin;
                     CygDll := Copy(CygPath, 1, Pos(#0, CygPath) - 1) + '\bin\cygwin1.dll';
-                    Machine := CygwinMachine(CygDll);
+                    Machine := PortableExecutableMachine(CygDll);
                     if Machine = IMAGE_FILE_MACHINE_AMD64 then
                         FileCopy(ExpandConstant('{app}') + '\cygterm+-x86_64\cygterm.exe', Cygterm, True)
                     else
