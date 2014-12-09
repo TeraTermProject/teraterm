@@ -3543,7 +3543,6 @@ void DispResetColor(unsigned int num)
 			ANSIColor[IdFore ] = ts.VTColor[0]; // use text color for "white"
 		}
 		break;
-		break;
 	case CS_VT_NORMALBG:
 		BGVTColor[1] = ts.VTColor[1];
 		if ((ts.ColorFlag & CF_USETEXTCOLOR)!=0) {
@@ -3554,7 +3553,6 @@ void DispResetColor(unsigned int num)
 			BGVTBlinkColor[1] = ts.VTColor[1];
 			BGURLColor[1] = ts.VTColor[1];
 		}
-		break;
 		break;
 	case CS_VT_BOLDFG:    BGVTBoldColor[0] = ts.VTBoldColor[0]; break;
 	case CS_VT_BOLDBG:    BGVTBoldColor[1] = ts.VTBoldColor[1]; break;
@@ -3569,7 +3567,33 @@ void DispResetColor(unsigned int num)
 		break;
 	case CS_TEK_BG:
 		break;
+	case CS_ANSICOLOR_ALL:
+		InitColorTable();
+		DispSetNearestColors(0, 255, NULL);
+		break;
 	case CS_ALL:
+		// VT color Foreground
+		BGVTColor[0] = ts.VTColor[0];
+		BGVTBoldColor[0] = ts.VTBoldColor[0];
+		BGVTBlinkColor[0] = ts.VTBlinkColor[0];
+		BGVTReverseColor[0] = ts.VTReverseColor[0];
+		BGURLColor[0] = ts.URLColor[0];
+
+		// VT color Background
+		BGVTColor[1] = ts.VTColor[1];
+		BGVTReverseColor[1] = ts.VTReverseColor[1];
+		if (ts.UseNormalBGColor) {
+			BGVTBoldColor[1] = ts.VTColor[1];
+			BGVTBlinkColor[1] = ts.VTColor[1];
+			BGURLColor[1] = ts.VTColor[1];
+		}
+		else {
+			BGVTBoldColor[1] = ts.VTBoldColor[1];
+			BGVTBlinkColor[1] = ts.VTBlinkColor[1];
+			BGURLColor[1] = ts.URLColor[1];
+		}
+
+		// ANSI Color / xterm 256 color
 		InitColorTable();
 		DispSetNearestColors(0, 255, NULL);
 		break;

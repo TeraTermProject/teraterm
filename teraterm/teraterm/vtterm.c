@@ -4515,7 +4515,7 @@ void XSequence(BYTE b)
 	  	if (CheckST(b, utf8_stat)) {
 			switch (Param[1]) {
 			case 104:
-				DispResetColor(CS_ALL);
+				DispResetColor(CS_ANSICOLOR_ALL);
 				break;
 			case 110:
 			case 111:

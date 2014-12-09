@@ -4536,6 +4536,7 @@ void CVTWindow::OnControlResetTerminal()
 	HideStatusLine();
 	DispScrollHomePos();
 	ResetTerminal();
+	DispResetColor(CS_ALL);
 	UnlockBuffer();
 
 	LButton = FALSE;
