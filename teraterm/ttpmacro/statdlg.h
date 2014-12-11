@@ -10,6 +10,7 @@ public:
 	BOOL Create(PCHAR Text, PCHAR Title, int x, int y);
 	void Update(PCHAR Text, PCHAR Title, int x, int y);
 	void Bringup();
+	virtual BOOL CheckAutoCenter();
 
 	//{{AFX_DATA(CStatDlg)
 	enum { IDD = IDD_STATDLG };

@@ -230,3 +230,10 @@ void CStatDlg::Bringup()
 		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
 	}
 }
+
+BOOL CStatDlg::CheckAutoCenter()
+{
+	// CenterWindow() is called when x=0 && y=0
+	// Don't call CenterWindow()
+	return FALSE;
+}
