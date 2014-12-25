@@ -10,6 +10,11 @@ int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
 	char file[MAX_PATH], *filename;
 	char c;
 
+	/* zero-length string from Inno Setup is NULL */
+	if (CygwinDirectory == NULL) {
+		goto search_path;
+	}
+
 	if (strlen(CygwinDirectory) > 0) {
 		if (SearchPath(CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 #ifdef EXE
@@ -19,6 +24,7 @@ int __stdcall FindCygwinPath(char *CygwinDirectory, char *Dir, int Dirlen)
 		}
 	}
 
+search_path:;
 	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 #ifdef EXE
 		printf("  %s from PATH\n", file);
