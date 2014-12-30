@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 resources
+// 日本語 (日本) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -42,7 +40,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_SFTP_DIALOG, DIALOG
     BEGIN
@@ -54,7 +52,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 日本語 resources
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -62,10 +60,8 @@ END
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -349,7 +345,7 @@ BEGIN
     CONTROL         "ECDSA-&384",IDC_ECDSA384_TYPE,"Button",BS_AUTORADIOBUTTON,80,29,55,10
     CONTROL         "ECDSA-&521",IDC_ECDSA521_TYPE,"Button",BS_AUTORADIOBUTTON,17,41,55,10
     CONTROL         "ED25519",IDC_ED25519_TYPE,"Button",BS_AUTORADIOBUTTON,80,42,45,10
-    CONTROL         "bcrypt KDF format",IDC_BCRYPT_KDF_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,58,75,10
+    CONTROL         "bcrypt KDF format",IDC_BCRYPT_KDF_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,58,93,10
     RTEXT           "Key &Bits:",IDC_KEYBITS_LABEL,143,14,40,10,NOT WS_GROUP
     EDITTEXT        IDC_KEYBITS,155,26,25,12,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     LTEXT           "",IDC_KEYGEN_PROGRESS_LABEL,40,74,172,8
@@ -441,7 +437,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTDIALOG, DIALOG
     BEGIN
