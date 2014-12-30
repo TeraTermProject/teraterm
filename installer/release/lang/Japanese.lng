@@ -484,7 +484,7 @@ MSG_INI_WRITE_ERROR=iniファイルに書き込みができません
 ; font
 DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
-DLG_ABOUT_FONT=Courier New,8,0
+DLG_ABOUT_FONT=ＭＳ ゴシック,9,128
 
 ; menu
 MENU_ABOUT=&TTSSHについて...
