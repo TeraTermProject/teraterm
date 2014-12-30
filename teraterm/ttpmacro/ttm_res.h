@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ttpmacro.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// ttpmacro.rc で使用
 //
 #define IDD_CTRLWIN                     100
 #define IDI_TTMACRO                     100
@@ -22,6 +22,7 @@
 #define IDC_MACROERRHELP                603
 #define IDC_EDIT1                       604
 #define IDC_EDIT_ERRLINE                604
+#define IDC_FILENAME                    605
 
 // Next default values for new objects
 // 
@@ -29,7 +30,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        601
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         605
+#define _APS_NEXT_CONTROL_VALUE         606
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

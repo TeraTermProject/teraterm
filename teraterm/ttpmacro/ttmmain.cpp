@@ -365,7 +365,9 @@ void CCtrlWindow::OnPaint()
 	// line number (2005.7.18 yutaka)
 	// added line buffer (2005.7.22 yutaka)
 	// added MACRO filename (2013.9.8 yutaka)
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%d:%s", GetMacroFileName(), GetLineNo(), GetLineBuffer());
+	// ファイル名の末尾は省略表示とする。(2014.12.30 yutaka)
+	SetDlgItemText(IDC_FILENAME, GetMacroFileName());
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
 	SetDlgItemText(IDC_LINENO, buf);
 
 	OldMapMode = dc.GetMapMode();

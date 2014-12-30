@@ -16,10 +16,8 @@
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -58,7 +56,8 @@ FONT 14, "System", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&Pau&se",IDC_CTRLPAUSESTART,21,14,30,14
     PUSHBUTTON      "&End",IDC_CTRLEND,65,14,30,14
-    LTEXT           "LineNo:",IDC_LINENO,4,32,108,8
+    LTEXT           "LineNo:",IDC_LINENO,42,32,70,8
+    RTEXT           "FILENAME",IDC_FILENAME,3,32,35,8,SS_ENDELLIPSIS
 END
 
 IDD_ERRDLG DIALOGEX 20, 20, 263, 49
@@ -117,11 +116,19 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
+    IDD_CTRLWIN, DIALOG
+    BEGIN
+    END
+
     IDD_ERRDLG, DIALOG
     BEGIN
         RIGHTMARGIN, 260
+    END
+
+    IDD_STATDLG, DIALOG
+    BEGIN
     END
 
     IDD_LISTDLG, DIALOG
