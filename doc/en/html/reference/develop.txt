@@ -2,25 +2,21 @@
 - OS
   Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro
 - Compiler
-  Visual Studio 2005 SP1 Standard Edition (or higher edition)
-  Visual Studio Community 2013
-    Note: The executable program which was compiled by Visual Studio 2008 Standard Edition (or higher edition) does not work on Windows NT 4.0, 95, 98 and Me.
-    Note2: The executable program which was compiled by Visual Studio 2010 Professional Edition (or higher edition) does not work on Windows 2000, NT 4.0, 95, 98 and Me.
-    Note3: The executable program which was compiled by Visual Studio 2012 Professional Edition (or higher edition) does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
-           Also, please change below options.
-             - Project - Property - Configuration Properties - Linker - Advanced - "Image Has Safe Exception Handlers": No(/SAFESEH:NO)
-             - Project - Property - Configuration Properties - Manifest Tool - Input and Output - "Embed Manifest": No
-             - Linked imagehlp.lib
-    Note4: The executable program which was compiled by Visual Studio 2013 does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
-
-  Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
-    Note: The OpenSSL 0.9.8i will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.
-    Note2: Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
-
-  MFC MBCS DLL Add-on
-    Note: Above add-on must be installed into the Visual Studio Community 2013.
-
-
+-- Visual Studio 2005 SP1 Standard Edition (or higher edition)
+   Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
+   Note: The OpenSSL will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.
+         Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
+         e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
+              LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
+-- Visual Studio 2008 SP1 Standard Edition (or higher edition)
+   Note: The executable program which was compiled by this version does not work on Windows NT 4.0, 95, 98 and Me.
+-- Visual Studio 2010 SP1 Professional Edition (or higher edition)
+   Note: The executable program which was compiled by this version does not work on Windows 2000, NT 4.0, 95, 98 and Me.
+-- Visual Studio 2012 Update 4 Professional Edition (or higher edition)
+   Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+-- Visual Studio Community 2013 Update 4
+   MFC MBCS DLL Add-on
+   Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 - Installer
   Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 or higher doesn't support Windows NT 4.0 and 9x)
   Inno Setup Preprocessor (from ispack-5.4.3)
