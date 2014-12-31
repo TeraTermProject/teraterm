@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{eb3d1ba1-167a-4e37-a4e9-3e9fc2c2525b}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{796fc23d-119a-4f71-8589-f8cecb6dedab}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="YCL">
+      <UniqueIdentifier>{acf36d21-cda5-488d-b619-f009676dce0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{c983f4ff-e528-4f87-88bb-4c1ec664c6ca}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TTProxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YCL\include\YCL\libc.cpp">
+      <Filter>YCL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TTProxy.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Hooker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProxyWSockHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SSLSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TTProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Array.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\ComboBoxCtrl.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\common.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Dialog.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\DynamicLinkLibrary.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\EditBoxCtrl.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Enumeration.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\FileVersion.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\HASHCODE.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Hashtable.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\IniFile.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Integer.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Object.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Pointer.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Resource.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\StringBuffer.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\StringUtil.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\ValueCtrl.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Vector.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+    <ClInclude Include="YCL\include\YCL\Window.h">
+      <Filter>YCL</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="TTX.def">
+      <Filter>Source Files</Filter>
+    </CustomBuildStep>
+  </ItemGroup>
+</Project>

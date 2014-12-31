@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{f8bf9435-4753-4d62-aa50-51fabb827552}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{54379270-ef62-4c53-af6b-e0355f0a809d}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{31aa38b9-762c-4915-8487-63e7f672329c}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Def File">
+      <UniqueIdentifier>{1060be25-ad74-4118-901a-f23f02774f75}</UniqueIdentifier>
+      <Extensions>def</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bplus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ftlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kermit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="quickvan.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ttlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xmodem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ymodem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zmodem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bplus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\dlglib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="file_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ftlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kermit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quickvan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xmodem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zmodem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Ttpfile.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ttpfile.def">
+      <Filter>Def File</Filter>
+    </None>
+  </ItemGroup>
+</Project>
