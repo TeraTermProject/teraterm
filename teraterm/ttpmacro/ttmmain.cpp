@@ -49,6 +49,7 @@ BOOL CCtrlWindow::OnIdle()
 	char Temp[2];
 
 	if (TTLStatus==IdTTLEnd) {
+		::DestroyWindow(m_hStatus);
 		DestroyWindow();
 		return FALSE;
 	}
@@ -193,6 +194,8 @@ BEGIN_MESSAGE_MAP(CCtrlWindow, CDialog)
 	ON_WM_DESTROY()
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
+	ON_WM_SIZE()
+	ON_WM_GETMINMAXINFO()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_SYSCOLORCHANGE()
 	ON_WM_TIMER()
@@ -218,6 +221,8 @@ BOOL CCtrlWindow::OnInitDialog()
 	LOGFONT logfont;
 	HFONT font;
 	int fuLoad = LR_DEFAULTCOLOR;
+	RECT rc_dlg, rc_filename, rc_lineno;
+	LONG dlg_len, len;
 
 	CDialog::OnInitDialog();
 
@@ -286,6 +291,32 @@ BOOL CCtrlWindow::OnInitDialog()
 	// send the initialization signal to TT
 	SendCmnd(CmdInit,0);
 
+	// ダイアログの初期サイズを保存
+	GetWindowRect(&rc_dlg);
+	m_init_width = rc_dlg.right - rc_dlg.left;
+	m_init_height = rc_dlg.bottom - rc_dlg.top;
+
+	/* マクロウィンドウをリサイズ可能にする。
+	 * (2015.1.2 yutaka)
+	 */
+	// 現在サイズから必要な値を計算
+	GetClientRect(&rc_dlg);
+	ClientToScreen(&rc_dlg);
+	dlg_len = rc_dlg.right - rc_dlg.left;
+
+	GetDlgItem(IDC_FILENAME)->GetWindowRect(&rc_filename);
+	len = rc_filename.right - rc_filename.left;
+	m_filename_ratio = len*100 / dlg_len;
+
+	GetDlgItem(IDC_LINENO)->GetWindowRect(&rc_lineno);
+	len = rc_lineno.right - rc_lineno.left;
+	m_lineno_ratio = len * 100 / dlg_len;
+
+	// リサイズアイコンを右下に表示させたいので、ステータスバーを付ける。
+	m_hStatus = CreateStatusWindow(
+		WS_CHILD | WS_VISIBLE |
+		CCS_BOTTOM | SBARS_SIZEGRIP, NULL, GetSafeHwnd(), 1);
+
 	if (VOption) {
 		return TRUE;
 	}
@@ -296,11 +327,13 @@ BOOL CCtrlWindow::OnInitDialog()
 		CmdShow = SW_SHOWDEFAULT;
 	}
 	ShowWindow(CmdShow);
+
 	return TRUE;
 }
 
 void CCtrlWindow::OnCancel( )
 {
+	::DestroyWindow(m_hStatus);
 	DestroyWindow();
 }
 
@@ -377,6 +410,56 @@ void CCtrlWindow::OnPaint()
 	SendMessage(WM_ICONERASEBKGND,(UINT)(dc.m_hDC));
 	dc.DrawIcon(0, 0, m_hIcon);
 	dc.SetMapMode(OldMapMode);
+}
+
+// マクロウィンドウをリサイズ可能とするために、OnSizeハンドラをoverrideする。
+// (2015.1.1 yutaka)
+void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
+{
+	RECT rc_dlg, rc_filename, rc_lineno;
+	LONG new_w, new_h, new_x, new_y;
+	LONG len;
+
+	GetClientRect(&rc_dlg);
+	ClientToScreen(&rc_dlg);
+	len = rc_dlg.right - rc_dlg.left;
+
+	// TTLファイル名の再配置
+	GetDlgItem(IDC_FILENAME)->GetWindowRect(&rc_filename);
+	ScreenToClient(&rc_filename);
+	new_w = (len * m_filename_ratio) / 100;
+	new_h = rc_filename.bottom - rc_filename.top;
+	GetDlgItem(IDC_FILENAME)->SetWindowPos(&CWnd::wndBottom,
+		0, 0, new_w, new_h,
+		SWP_NOMOVE | SWP_NOZORDER
+	);
+	new_x = rc_filename.left + new_w;
+
+	// 行番号の再配置
+	GetDlgItem(IDC_LINENO)->GetWindowRect(&rc_lineno);
+	ScreenToClient(&rc_lineno);
+	new_w = (len * m_lineno_ratio) / 100;
+	new_h = rc_lineno.bottom - rc_lineno.top;
+	new_y = rc_lineno.top;
+	GetDlgItem(IDC_LINENO)->SetWindowPos(&CWnd::wndBottom,
+		new_x, new_y, new_w, new_h,
+		SWP_NOZORDER
+		);
+
+	// status bar
+	::SendMessage(m_hStatus, WM_SIZE, cx, cy);
+}
+
+// マクロウィンドウをリサイズ可能とするために、OnGetMinMaxInfoハンドラをoverrideする。
+// (2015.1.1 yutaka)
+void CCtrlWindow::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	LPMINMAXINFO lpmmi;
+
+	// ダイアログの初期サイズより小さくできないようにする
+	lpmmi = (LPMINMAXINFO)lpMMI;
+	lpmmi->ptMinTrackSize.x = m_init_width;
+	lpmmi->ptMinTrackSize.y = m_init_height;
 }
 
 // for icon drawing in Win NT 3.5

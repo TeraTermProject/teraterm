@@ -34,12 +34,18 @@ protected:
 	HICON m_hIcon;
 	HFONT DlgFont;
 
+	LONG m_init_width, m_init_height;
+	LONG m_filename_ratio, m_lineno_ratio;
+	HWND m_hStatus;
+
 	//{{AFX_MSG(CCtrlWindow)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnClose();
 	afx_msg void OnDestroy();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnSysColorChange();
 	afx_msg void OnTimer(UINT nIDEvent);

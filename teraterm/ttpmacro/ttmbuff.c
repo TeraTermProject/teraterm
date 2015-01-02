@@ -20,7 +20,7 @@ BOOL ContinueFlag;
 
 #define MAXNESTLEVEL 10
 
-#define MAXFILENAME 32   // .ttlファイル名の最大サイズ
+#define MAXFILENAME 128   // .ttlファイル名の最大サイズ
 
 static int INest;
 static HANDLE BuffHandle[MAXNESTLEVEL];
