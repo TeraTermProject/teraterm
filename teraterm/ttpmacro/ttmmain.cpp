@@ -454,12 +454,16 @@ void CCtrlWindow::OnSize(UINT nType, int cx, int cy)
 // (2015.1.1 yutaka)
 void CCtrlWindow::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
+	// 下記の処理があると、Release build版で Tera Term から ttpmacro.exe を呼び出すと、
+	// ストールするため、いったん無効化する。
+#if 0
 	LPMINMAXINFO lpmmi;
 
 	// ダイアログの初期サイズより小さくできないようにする
 	lpmmi = (LPMINMAXINFO)lpMMI;
 	lpmmi->ptMinTrackSize.x = m_init_width;
 	lpmmi->ptMinTrackSize.y = m_init_height;
+#endif
 }
 
 // for icon drawing in Win NT 3.5
