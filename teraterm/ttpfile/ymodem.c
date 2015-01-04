@@ -541,13 +541,17 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		BYTE *p;
 		char *name, *nameend;
 
-		p = &(yv->PktIn[3]);
+		p = (BYTE *)malloc(yv->DataLen + 1);
+		memset(p, 0, yv->DataLen + 1);
+		memcpy(p, &(yv->PktIn[3]), yv->DataLen);
 		name = p;
 		strncpy_s(&(fv->FullName[fv->DirLen]),
 		          sizeof(fv->FullName) - fv->DirLen, name,
 		          _TRUNCATE);
-		if (!FTCreateFile(fv))
+		if (!FTCreateFile(fv)) {
+			free(p);
 			return FALSE;
+		}
 		nameend = name + 1 + strlen(name);
 		if (*nameend) {
 			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
@@ -566,6 +570,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		// 次のファイル送信を促すため、'C'を送る。
 		YSendNAK(fv,yv,cv);
 
+		free(p);
 		return TRUE;
 	}
 
