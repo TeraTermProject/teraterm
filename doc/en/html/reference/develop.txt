@@ -3,6 +3,7 @@
   Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro
 - Compiler
 -- Visual Studio 2005 SP1 Standard Edition (or higher edition)
+   Microsoft Visual Studio 2005 Service Pack 1 MFC Security Update
    Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
    Note: The OpenSSL will not able to build by using the Visual Studio 2005 Standard Edition. So, install the Windows Server 2003 R2 Platform SDK to link the "Crypt32.Lib" library.
          Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
@@ -27,7 +28,7 @@
     converts character-code and return-code of documents for building OpenSSL.
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     Use the compatible version for checkouted svn version.
-    Copy the "svnversion.exe" to the libs\svn\bin directory.
+    Copy the "svn.exe" to the libs\svn\bin directory.
 
 
 * Libraries

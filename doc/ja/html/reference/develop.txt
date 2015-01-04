@@ -3,6 +3,7 @@
   Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro
 - コンパイラ
 -- Visual Studio 2005 SP1 (Standard Edition 以上)
+   Microsoft Visual Studio 2005 Service Pack 1 MFC セキュリティ更新プログラム
    Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
    注: Visual Studio 2005 Standard Editionでは、OpenSSL のビルドが失敗します。Windows Server 2003 R2 Platform SDK をインストールし、"Crypt32.Lib"をリンクできるようにしておく必要があります。
        SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
@@ -27,7 +28,7 @@
     OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     ソースのチェックアウトに使った svn と互換性のあるバージョン
-    "svnversion.exe"を libs\svn\bin 配下にコピーしてください。
+    "svn.exe"を libs\svn\bin 配下にコピーしてください。
 
 
 ■ ライブラリ
