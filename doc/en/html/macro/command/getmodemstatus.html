@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>getmodemstatus</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getmodemstatus</h1>
+
+<p>
+Retrieves the modem control-register values.
+</p>
+
+<pre class="macro-syntax">
+getmodemstatus &lt;intvar&gt;
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Retrieves the modem control-register values from the serial port.
+</p>
+
+The &lt;intvar&gt; variable can be one or more of the following values.
+<pre>
+1  The CTS (clear-to-send) signal is on.
+2  The DSR (data-set-ready) signal is on.
+4  The ring indicator signal is on.
+8  The RLSD (receive-line-signal-detect) signal is on.
+</pre>
+
+<p>
+If the command succeeds, the system variable "result" is set to 0.
+If the command fails, the variable is set to 1.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+testlink
+if result=0 then
+  connect '/C=1'
+  pause 3
+endif
+
+getmodemstatus val
+
+if result=0 then
+  sprintf2 str "val = %d(%x)" val val
+  messagebox str "Result value"
+  if val & 2 > 0 then
+    ; DSR signal is enabled.
+    messagebox "DSR on" "Message"
+  endif
+else
+  messagebox "failed" "ERROR"
+endif
+</pre>
+
+<h2>Reference</h2>
+
+<a href="setbaud.html">setbaud</a><br>
+<a href="setdtr.html">setdtr</a><br>
+<a href="setrts.html">setrts</a><br>
+
+</body>
+</html>

@@ -235,6 +235,7 @@ HlpMacroCommandGetfileattr=html\macro\command\getfileattr.html
 HlpMacroCommandGethostname=html\macro\command\gethostname.html
 HlpMacroCommandGetipv4addr=html\macro\command\getipv4addr.html
 HlpMacroCommandGetipv6addr=html\macro\command\getipv6addr.html
+HlpMacroCommandGetmodemstatus=html\macro\command\getmodemstatus.html
 HlpMacroCommandGetpassword=html\macro\command\getpassword.html
 HlpMacroCommandGetspecialfolder=html\macro\command\getspecialfolder.html
 HlpMacroCommandGettime=html\macro\command\gettime.html

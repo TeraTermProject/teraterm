@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>getmodemstatus</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>getmodemstatus</h1>
+
+<p>
+モデムの制御レジスタ値を取得する。
+</p>
+
+<pre class="macro-syntax">
+getmodemstatus &lt;intvar&gt;
+</pre>
+
+<h2>解説</h2>
+
+<p>
+シリアルポートからモデム制御レジスタの値を読み出す。
+</p>
+
+&lt;intvar&gt; 変数は、下記の定数の組み合わせとなる。
+<pre>
+1  CTS（ 送信可）信号がオンです。
+2  DSR（ データセットレディ）信号がオンです。
+4  呼び出し信号がオンです。
+8  RLSD（ 受信線信号検出）信号がオンです。
+</pre>
+
+<p>
+読み出しに成功した場合は result 変数が 0 となるが、失敗した場合は 1 となる。
+</p>
+
+
+<h2>例</h2>
+
+<pre class="macro-example">
+testlink
+if result=0 then
+  connect '/C=1'
+  pause 3
+endif
+
+getmodemstatus val
+
+if result=0 then
+  sprintf2 str "val = %d(%x)" val val
+  messagebox str "Result value"
+  if val & 2 > 0 then
+    ; DSR信号がオン時の処理
+    messagebox "DSR on" "Message"
+  endif
+else
+  messagebox "failed" "ERROR"
+endif
+</pre>
+
+
+<h2>参照</h2>
+
+<a href="setbaud.html">setbaud</a><br>
+<a href="setdtr.html">setdtr</a><br>
+<a href="setrts.html">setrts</a><br>
+
+</body>
+</html>
