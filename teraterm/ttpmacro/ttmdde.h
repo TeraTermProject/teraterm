@@ -62,6 +62,7 @@
 #define CmdLogInfo      'V'
 #define CmdLogRotate    'W'
 #define CmdLogAutoClose 'X'
+#define CmdGetModemStatus 'Y'
 
 #ifdef __cplusplus
 extern "C" {

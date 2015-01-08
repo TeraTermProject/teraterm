@@ -235,6 +235,7 @@
 #define HlpMacroCommandGethostname      92141
 #define HlpMacroCommandGetipv4addr      92199
 #define HlpMacroCommandGetipv6addr      92200
+#define HlpMacroCommandGetmodemstatus   92213
 #define HlpMacroCommandGetpassword      92046
 #define HlpMacroCommandGetspecialfolder 92195
 #define HlpMacroCommandGettime          92047

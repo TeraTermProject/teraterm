@@ -371,6 +371,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdLogInfo      'V'
 #define CmdLogRotate    'W'
 #define CmdLogAutoClose 'X'
+#define CmdGetModemStatus 'Y'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -927,6 +928,30 @@ scp_rcv_error:
 		else {
 			ret = EscapeCommFunction(cv.ComID, SETDTR);
 		}
+		}
+		break;
+
+	case CmdGetModemStatus: // add 'getmodemstatus' (2015.1.8 yutaka)
+		{
+		DWORD val, n;
+
+		if (!cv.Open || cv.PortType != IdSerial)
+			return DDE_FNOTPROCESSED;
+
+		if (GetCommModemStatus(cv.ComID, &val) == 0) // error
+			return DDE_FNOTPROCESSED;
+		//val = MS_CTS_ON | MS_DSR_ON | MS_RING_ON | MS_RLSD_ON;
+		n = 0;
+		if (val & MS_CTS_ON)
+			n |= 0x01;
+		if (val & MS_DSR_ON)
+			n |= 0x02;
+		if (val & MS_RING_ON)
+			n |= 0x04;
+		if (val & MS_RLSD_ON)
+			n |= 0x08;
+
+		_snprintf_s(ParamFileName, sizeof(ParamFileName), _TRUNCATE, "%d", n);
 		}
 		break;
 

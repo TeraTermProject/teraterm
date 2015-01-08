@@ -259,6 +259,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"gethostname")==0) *WordId = RsvGetHostname;
 		else if (_stricmp(Str,"getipv4addr")==0) *WordId = RsvGetIPv4Addr;
 		else if (_stricmp(Str,"getipv6addr")==0) *WordId = RsvGetIPv6Addr;
+		else if (_stricmp(Str,"getmodemstatus") == 0) *WordId = RsvGetModemStatus;
 		else if (_stricmp(Str,"getpassword")==0) *WordId = RsvGetPassword;
 		else if (_stricmp(Str,"getspecialfolder")==0) *WordId = RsvGetSpecialFolder;
 		else if (_stricmp(Str,"gettime")==0) *WordId = RsvGetTime;

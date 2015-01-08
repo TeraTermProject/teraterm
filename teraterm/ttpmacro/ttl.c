@@ -2706,6 +2706,37 @@ WORD TTLGetTTDir()
 	return Err;
 }
 
+// COMポートからレジスタ値を読む。
+// (2015.1.8 yutaka)
+WORD TTLGetModemStatus()
+{
+	TVarId VarId;
+	WORD Err;
+	char Str[MaxStrLen];
+	int Num;
+
+	Err = 0;
+	GetIntVar(&VarId, &Err);
+	if ((Err == 0) && (GetFirstChar() != 0))
+		Err = ErrSyntax;
+	if ((Err == 0) && (!Linked))
+		Err = ErrLinkFirst;
+	if (Err != 0) return Err;
+
+	memset(Str, 0, sizeof(Str));
+	Err = GetTTParam(CmdGetModemStatus, Str, sizeof(Str));
+	if (Err == 0) {
+		Num = atoi(Str);
+		SetIntVal(VarId, Num);
+		SetResult(0);
+	}
+	else {
+		SetResult(1);
+	}
+
+	return Err;
+}
+
 // 実行ファイルからバージョン情報を得る (2005.2.28 yutaka)
 static void get_file_version(char *exefile, int *major, int *minor, int *release, int *build)
 {
@@ -5972,6 +6003,8 @@ int ExecCmnd()
 			Err = TTLGetIPv4Addr(); break;
 		case RsvGetIPv6Addr:
 			Err = TTLGetIPv6Addr(); break;
+		case RsvGetModemStatus:
+			Err = TTLGetModemStatus(); break;
 		case RsvGetPassword:
 			Err = TTLGetPassword(); break;
 		case RsvSetPassword:
