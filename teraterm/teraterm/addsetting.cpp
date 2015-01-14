@@ -1260,7 +1260,7 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	char uimsg[MAX_UIMSG];
 	CButton *btn;
 	CComboBox *combo;
-	int i;
+	int i, TmpLogRotateSize;
 
 	CPropertyPage::OnInitDialog();
 
@@ -1367,7 +1367,10 @@ BOOL CLogPropPageDlg::OnInitDialog()
 		combo->AddString(LogRotateSizeType[i]);
 	}
 
-	SetDlgItemInt(IDC_ROTATE_SIZE, ts.LogRotateSize, FALSE);
+	TmpLogRotateSize = ts.LogRotateSize;
+	for (i = 0 ; i < ts.LogRotateSizeType ; i++)
+		TmpLogRotateSize /= 1024;
+	SetDlgItemInt(IDC_ROTATE_SIZE, TmpLogRotateSize, FALSE);
 	combo->SelectString(-1, GetLogRotateSizeType(ts.LogRotateSizeType));
 	SetDlgItemInt(IDC_ROTATE_STEP, ts.LogRotateStep, FALSE);
 	if (ts.LogRotate == ROTATE_NONE) {
