@@ -637,9 +637,12 @@ DLG_KEYGEN_SAVEPUBLIC=공개키 저장(&C)
 DLG_KEYGEN_SAVEPRIVATE=개인키 저장(&P)
 DLG_KEYGEN_GENERATE=생성(&G)
 DLG_KEYGEN_BITS=키비트(&B):
-DLG_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
 
 MSG_KEYBITS_MIN_ERROR=키 비트가 너무 작습니다.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING="키 생성 중"
 MSG_KEYGEN_GENERATED="키 생성됨"
 

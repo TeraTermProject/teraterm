@@ -13,11 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
+// 日本語 resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -40,7 +42,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_SFTP_DIALOG, DIALOG
     BEGIN
@@ -52,7 +54,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 日本語 (日本) resources
+#endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -60,8 +62,10 @@ END
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -345,18 +349,20 @@ BEGIN
     CONTROL         "ECDSA-&384",IDC_ECDSA384_TYPE,"Button",BS_AUTORADIOBUTTON,80,29,55,10
     CONTROL         "ECDSA-&521",IDC_ECDSA521_TYPE,"Button",BS_AUTORADIOBUTTON,17,41,55,10
     CONTROL         "&ED25519",IDC_ED25519_TYPE,"Button",BS_AUTORADIOBUTTON,80,42,45,10
-    CONTROL         "bcrypt KDF format",IDC_BCRYPT_KDF_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,58,93,10
     RTEXT           "Key &Bits:",IDC_KEYBITS_LABEL,143,14,40,10,NOT WS_GROUP
     EDITTEXT        IDC_KEYBITS,155,26,25,12,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    LTEXT           "",IDC_KEYGEN_PROGRESS_LABEL,40,74,172,8
-    RTEXT           "Key passphrase:",IDC_KEY_LABEL,14,89,80,8
-    EDITTEXT        IDC_KEY_EDIT,100,87,108,12,ES_PASSWORD | ES_AUTOHSCROLL
-    RTEXT           "Confirm passphrase:",IDC_CONFIRM_LABEL,14,104,80,8
-    EDITTEXT        IDC_CONFIRM_EDIT,100,103,108,12,ES_PASSWORD | ES_AUTOHSCROLL
-    RTEXT           "C&omment:",IDC_COMMENT_LABEL,14,119,80,8
-    EDITTEXT        IDC_COMMENT_EDIT,100,118,108,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Save publi&c key",IDC_SAVE_PUBLIC_KEY,49,136,68,14
-    PUSHBUTTON      "Save &private key",IDC_SAVE_PRIVATE_KEY,133,136,68,14
+    LTEXT           "",IDC_KEYGEN_PROGRESS_LABEL,40,58,172,8
+    RTEXT           "Key passphrase:",IDC_KEY_LABEL,14,73,80,8
+    EDITTEXT        IDC_KEY_EDIT,100,72,108,12,ES_PASSWORD | ES_AUTOHSCROLL
+    RTEXT           "Confirm passphrase:",IDC_CONFIRM_LABEL,14,88,80,8
+    EDITTEXT        IDC_CONFIRM_EDIT,100,87,108,12,ES_PASSWORD | ES_AUTOHSCROLL
+    RTEXT           "C&omment:",IDC_COMMENT_LABEL,14,103,80,8
+    EDITTEXT        IDC_COMMENT_EDIT,100,102,108,12,ES_AUTOHSCROLL
+    CONTROL         "bcrypt &KDF format",IDC_BCRYPT_KDF_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,118,80,10
+    RTEXT           "&Number of rounds:",IDC_BCRYPT_KDF_ROUNDS_LABEL,100,118,77,10,NOT WS_GROUP
+    EDITTEXT        IDC_BCRYPT_KDF_ROUNDS,182,117,25,12,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
+    PUSHBUTTON      "Save publi&c key",IDC_SAVE_PUBLIC_KEY,49,135,68,14
+    PUSHBUTTON      "Save &private key",IDC_SAVE_PRIVATE_KEY,133,135,68,14
 END
 
 IDD_SSHSCP DIALOGEX 0, 0, 279, 125
@@ -437,7 +443,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_ABOUTDIALOG, DIALOG
     BEGIN

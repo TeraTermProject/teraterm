@@ -334,6 +334,9 @@ static ssh2_host_key_t ssh2_host_key[] = {
 #define SSH_RSA_MINIMUM_KEY_SIZE   768
 #define SSH_DSA_MINIMUM_KEY_SIZE  1024
 
+#define SSH_KEYGEN_MINIMUM_ROUNDS       1
+#define SSH_KEYGEN_MAXIMUM_ROUNDS INT_MAX
+
 
 typedef struct ssh2_cipher {
 	SSHCipher cipher;

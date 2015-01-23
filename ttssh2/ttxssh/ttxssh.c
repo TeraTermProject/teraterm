@@ -4182,11 +4182,10 @@ static void init_password_control(HWND dlg, int item)
 
 // bcrypt KDFŒ`Ž®‚Å”é–§Œ®‚ð•Û‘¶‚·‚é
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
-static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar)
+static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
 	SSHCipher ciphernameval = SSH_CIPHER_NONE;
 	char *ciphername = DEFAULT_CIPHERNAME;
-	int rounds = DEFAULT_ROUNDS;
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;
 	buffer_t *encoded = NULL;
@@ -4371,8 +4370,11 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		UTIL_get_lang_msg("BTN_CLOSE", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_BCRYPT_KDF", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_KDF", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_KEYGEN_BCRYPT_ROUNDS", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, pvar->ts->UIMsg);
 
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -4399,6 +4401,8 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_CHECK, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_ROUNDS_LABEL, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_ROUNDS, WM_SETFONT, (WPARAM)DlgKeygenFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgHostFont = NULL;
@@ -4429,6 +4433,9 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 
 		// default bcrypt KDF
 		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+		EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+		SetDlgItemInt(dlg, IDC_BCRYPT_KDF_ROUNDS, DEFAULT_ROUNDS, FALSE);
+		SendDlgItemMessage(dlg, IDC_BCRYPT_KDF_ROUNDS, EM_LIMITTEXT, 4, 0);
 
 		}
 		return TRUE;
@@ -4555,6 +4562,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			}
 			SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_SETCHECK, BST_UNCHECKED, 0);
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
 			key_type = KEY_RSA1;
 			break;
 
@@ -4564,6 +4572,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+			}
 			key_type = KEY_RSA;
 			break;
 
@@ -4573,6 +4587,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+			}
 			key_type = KEY_DSA;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 1024, FALSE);
 			break;
@@ -4583,6 +4603,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+			}
 			key_type = KEY_ECDSA256;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
 			break;
@@ -4593,6 +4619,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+			}
 			key_type = KEY_ECDSA384;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 384, FALSE);
 			break;
@@ -4603,6 +4635,12 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+			}
 			key_type = KEY_ECDSA521;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
 			break;
@@ -4615,8 +4653,18 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			}
 			SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
 			key_type = KEY_ED25519;
 			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
+			break;
+
+		case IDC_BCRYPT_KDF_CHECK | (BN_CLICKED << 16):
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+			}
+			else {
+				EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
+			}
 			break;
 
 		// saving public key file
@@ -4795,7 +4843,7 @@ public_error:
 		case IDC_SAVE_PRIVATE_KEY:
 			{
 			char buf[1024], buf_conf[1024];  // passphrase
-			int ret;
+			int ret, rounds;
 			OPENFILENAME ofn;
 			char filename[MAX_PATH];
 			char comment[1024]; // comment string in private key
@@ -4823,6 +4871,25 @@ public_error:
 				ret = MessageBox(dlg, uimsg, pvar->ts->UIMsg, MB_YESNO | MB_ICONWARNING);
 				if (ret == IDNO)
 					break;
+			}
+
+			// number of rounds
+			if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				rounds = GetDlgItemInt(dlg, IDC_BCRYPT_KDF_ROUNDS, NULL, FALSE);
+				if (rounds < SSH_KEYGEN_MINIMUM_ROUNDS) {
+					UTIL_get_lang_msg("MSG_BCRYPT_ROUNDS_MIN_ERROR", pvar,
+					                  "The number of rounds is too small.");
+					MessageBox(dlg, pvar->ts->UIMsg,
+					           "Tera Term", MB_OK | MB_ICONEXCLAMATION);
+					break;
+				}
+				if (rounds > SSH_KEYGEN_MAXIMUM_ROUNDS) {
+					UTIL_get_lang_msg("MSG_BCRYPT_ROUNDS_MAX_ERROR", pvar,
+					                  "The number of rounds is too large.");
+					MessageBox(dlg, pvar->ts->UIMsg,
+					           "Tera Term", MB_OK | MB_ICONEXCLAMATION);
+					break;
+				}
 			}
 
 			ssh_make_comment(comment, sizeof(comment));
@@ -5001,7 +5068,7 @@ error:;
 				buffer_free(enc);
 
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519 
-				save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
+				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
 
 			} else { // SSH2 RSA, DSA, ECDSA			
 				int len;
@@ -5009,7 +5076,7 @@ error:;
 				const EVP_CIPHER *cipher;
 
 				if (SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) {
-					save_bcrypt_private_key(buf, filename, comment, dlg, pvar);
+					save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
 					break;
 				}
 

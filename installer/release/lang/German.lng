@@ -635,9 +635,12 @@ DLG_KEYGEN_SAVEPUBLIC=Public Key
 DLG_KEYGEN_SAVEPRIVATE=Private Key
 DLG_KEYGEN_GENERATE=Generieren
 DLG_KEYGEN_BITS=Key &Bits:
-DLG_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
 
 MSG_KEYBITS_MIN_ERROR=The key bits is too small.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING="generating key"
 MSG_KEYGEN_GENERATED="key generated"
 

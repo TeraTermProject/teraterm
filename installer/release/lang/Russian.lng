@@ -636,9 +636,12 @@ DLG_KEYGEN_SAVEPUBLIC=&Публичный ключ
 DLG_KEYGEN_SAVEPRIVATE=&Закрытый ключ
 DLG_KEYGEN_GENERATE=&Генерация
 DLG_KEYGEN_BITS=&Биты:
-DLG_BCRYPT_KDF=хеш "bcrypt" &KDF
+DLG_KEYGEN_BCRYPT_KDF=хеш "bcrypt" &KDF
+DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
 
 MSG_KEYBITS_MIN_ERROR=Битов ключа слишком мало!
+MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING="Генерация ключа..."
 MSG_KEYGEN_GENERATED="Ключ сгенерирован успешно!"
 

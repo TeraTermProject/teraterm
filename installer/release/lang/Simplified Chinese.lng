@@ -637,9 +637,12 @@ DLG_KEYGEN_SAVEPUBLIC=保存为公共密钥(&C)
 DLG_KEYGEN_SAVEPRIVATE=保存为私有密钥(&P)
 DLG_KEYGEN_GENERATE=生成(&G)
 DLG_KEYGEN_BITS=密钥字节数(&B)：
-DLG_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
+DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
 
 MSG_KEYBITS_MIN_ERROR=密钥字节数太小
+MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING=正在生成密钥
 MSG_KEYGEN_GENERATED=已生成密钥
 

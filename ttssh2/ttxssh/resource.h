@@ -181,7 +181,9 @@
 #define IDC_KEYBITS                     1106
 #define IDC_KEYGEN_PROGRESS_LABEL       1107
 #define IDC_PROGBAR                     1108
+#define IDC_BCRYPT_KDF_ROUNDS_LABEL     1108
 #define IDC_PROGTIME                    1109
+#define IDC_BCRYPT_KDF_ROUNDS           1109
 #define IDC_HOSTSSHFPCHECK              1110
 #define IDC_HOSTSSHFPDNSSEC             1111
 #define IDC_VERIFYHOSTKEYDNS            1112
