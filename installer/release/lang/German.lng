@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Mar 18 2014)
+; Updated by TeraTerm Project (Jan 23 2015)
 ; Last translated (German language) by Frederik Schwarzer (May 17 2010)
 
 [Tera Term]
@@ -816,6 +816,7 @@ MSG_NONFAITAL_ERROR=Tera Term: not fatal error
 
 BTN_OK=OK
 BTN_CANCEL=Abbrechen
+BTN_CLOSE=Schlieﬂen
 BTN_DISCONNECT=&Trennen
 BTN_CONTINUE=&Fortsetzen
 

@@ -1,3 +1,4 @@
+; Updated by TeraTerm Project (Jan 23 2015)
 ; Traditional Chinese Language by kikiqqp (Sep 20 2014) 
 
 [Tera Term]
@@ -825,6 +826,7 @@ MSG_NONFAITAL_ERROR=Tera Term: 非致命錯誤
 
 BTN_OK=確定
 BTN_CANCEL=取消
+BTN_CLOSE=關閉
 BTN_DISCONNECT=中斷連接(&D)
 BTN_CONTINUE=繼續(&C)
 

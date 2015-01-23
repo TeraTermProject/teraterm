@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Mar 18 2014)
+; Updated by TeraTerm Project (Jan 23 2015)
 ; Last translated (Korean language) by Daehong Kim (Jul 25 2013)
 
 [Tera Term]
@@ -826,6 +826,7 @@ MSG_NONFAITAL_ERROR=Tera Term: 치명적 오류 아님
 
 BTN_OK=확인
 BTN_CANCEL=취소
+BTN_CLOSE=닫기
 BTN_DISCONNECT=연결끊음(&D)
 BTN_CONTINUE=계속(&C)
 

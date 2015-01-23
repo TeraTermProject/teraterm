@@ -4368,7 +4368,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 		UTIL_get_lang_msg("DLG_KEYGEN_GENERATE", pvar, uimsg);
 		SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
+		UTIL_get_lang_msg("BTN_CLOSE", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_BCRYPT_KDF_CHECK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_BCRYPT_KDF", pvar, uimsg);
@@ -4469,7 +4469,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					SetDlgItemInt(dlg, IDC_KEYBITS, 521, FALSE);
 					break;
 				case KEY_ED25519:
-					bits = 0;
+					SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
 					break;
 			}
 
@@ -4553,6 +4553,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), TRUE);
 				SetDlgItemInt(dlg, IDC_KEYBITS, saved_key_bits, FALSE);
 			}
+			SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_SETCHECK, BST_UNCHECKED, 0);
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
 			key_type = KEY_RSA1;
 			break;
@@ -4612,9 +4613,10 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 				saved_key_bits = GetDlgItemInt(dlg, IDC_KEYBITS, NULL, FALSE);
 			}
+			SendMessage(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
 			key_type = KEY_ED25519;
-			SetDlgItemInt(dlg, IDC_KEYBITS, 0, FALSE);
+			SetDlgItemInt(dlg, IDC_KEYBITS, 256, FALSE);
 			break;
 
 		// saving public key file

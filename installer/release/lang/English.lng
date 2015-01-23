@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Mar 18 2014)
+; Updated by TeraTerm Project (Jan 23 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -825,6 +825,7 @@ MSG_NONFAITAL_ERROR=Tera Term: not fatal error
 
 BTN_OK=OK
 BTN_CANCEL=Cancel
+BTN_CLOSE=Close
 BTN_DISCONNECT=&Disconnect
 BTN_CONTINUE=&Continue
 

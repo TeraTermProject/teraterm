@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Mar 18 2014)
+; Updated by TeraTerm Project (Jan 23 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -824,6 +824,7 @@ MSG_NONFAITAL_ERROR=Tera Term: 致命的でないエラー
 
 BTN_OK=OK
 BTN_CANCEL=キャンセル
+BTN_CLOSE=閉じる(&C)
 BTN_DISCONNECT=接続断(&D)
 BTN_CONTINUE=続行(&C)
 

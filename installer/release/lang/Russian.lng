@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Aug 31 2014)
+; Updated by TeraTerm Project (Jan 23 2015)
 ; Last translated (Russian language) by Ryumik Sergey (Sep 03 2014)
 
 [Tera Term]
@@ -824,6 +824,7 @@ MSG_NONFAITAL_ERROR=Tera Term: Ошибка не фатальная
 
 BTN_OK=OK
 BTN_CANCEL=Выход
+BTN_CLOSE=Закрыть
 BTN_DISCONNECT=&Разъединение
 BTN_CONTINUE=&Продолжение
 
