@@ -4447,6 +4447,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			int bits;
 			cbarg_t cbarg;
 			char comment[1024]; // comment string in private key
+			int enable_bcrypt_kdf = 0, enable_bcrypt_rounds = 0;
 
 			cbarg.cnt = 0;
 			cbarg.type = key_type;
@@ -4497,9 +4498,15 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 			EnableWindow(GetDlgItem(dlg, IDC_ECDSA256_TYPE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_ECDSA384_TYPE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_ECDSA521_TYPE), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_ED25519_TYPE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_KEYBITS), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDOK), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDCANCEL), FALSE);
+
+			enable_bcrypt_kdf = IsWindowEnabled(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK));
+			enable_bcrypt_rounds = IsWindowEnabled(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS));
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), FALSE);
 
 			if (generate_ssh_key(key_type, bits, keygen_progress, &cbarg)) {
 				MSG msg;
@@ -4538,6 +4545,13 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				}
 				EnableWindow(GetDlgItem(dlg, IDOK), TRUE);
 				EnableWindow(GetDlgItem(dlg, IDCANCEL), TRUE);
+
+				if (enable_bcrypt_kdf) {
+					EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_CHECK), TRUE);
+				}
+				if (enable_bcrypt_rounds) {
+					EnableWindow(GetDlgItem(dlg, IDC_BCRYPT_KDF_ROUNDS), TRUE);
+				}
 
 				// set focus to passphrase edit control (2007.1.27 maya)
 				SetFocus(GetDlgItem(dlg, IDC_KEY_EDIT));
