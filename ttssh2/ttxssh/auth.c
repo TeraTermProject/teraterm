@@ -442,13 +442,13 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	if (method == SSH_AUTH_RSA || method == SSH_AUTH_RHOSTS_RSA) {
-		char buf[2048];
+		char keyfile[2048];
 		int file_ctl_ID =
 			method == SSH_AUTH_RSA ? IDC_RSAFILENAME : IDC_HOSTRSAFILENAME;
 
-		buf[0] = 0;
-		GetDlgItemText(dlg, file_ctl_ID, buf, sizeof(buf));
-		if (buf[0] == 0) {
+		keyfile[0] = 0;
+		GetDlgItemText(dlg, file_ctl_ID, keyfile, sizeof(keyfile));
+		if (keyfile[0] == 0) {
 			UTIL_get_lang_msg("MSG_KEYSPECIFY_ERROR", pvar,
 			                  "You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
@@ -460,7 +460,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		if (SSHv1(pvar)) {
 			BOOL invalid_passphrase = FALSE;
 
-			key_pair = KEYFILES_read_private_key(pvar, buf, password,
+			key_pair = KEYFILES_read_private_key(pvar, keyfile, password,
 			                                     &invalid_passphrase,
 			                                     FALSE);
 
@@ -485,7 +485,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 
 			memset(errmsg, 0, sizeof(errmsg));
 
-			keyfile_type = get_ssh2_keytype(buf, &fp, errmsg, sizeof(errmsg));
+			keyfile_type = get_ssh2_keytype(keyfile, &fp, errmsg, sizeof(errmsg));
 			switch (keyfile_type) {
 				case SSH2_KEYFILE_TYPE_OPENSSH:
 				{

@@ -595,7 +595,7 @@ error:
 	free(salt);
 	free(comment);
 
-	// ED25519 ‚Å‚Í‚È‚©‚Á‚½
+	// KDF ‚Å‚Í‚È‚©‚Á‚½
 	if (keyfmt == NULL) {
 		fseek(fp, 0, SEEK_SET);
 
