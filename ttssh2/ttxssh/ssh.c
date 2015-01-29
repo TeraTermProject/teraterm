@@ -4023,7 +4023,7 @@ Newkeys current_keys[MODE_MAX];
 int get_cipher_block_size(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	int val = 0;
+	int val = 8;
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {

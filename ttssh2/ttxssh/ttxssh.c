@@ -4207,6 +4207,11 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	if (b == NULL || kdf == NULL || encoded == NULL || blob == NULL)
 		goto ed25519_error;
 
+	if (passphrase == NULL || !strlen(passphrase)) {
+		ciphername = "none";
+		kdfname = "none";
+	}
+
 	ciphernameval = get_cipher_by_name(ciphername);
 	blocksize = get_cipher_block_size(ciphernameval);
 	keylen = get_cipher_key_len(ciphernameval);

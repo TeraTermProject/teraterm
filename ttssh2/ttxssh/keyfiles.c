@@ -451,19 +451,25 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// 暗号化アルゴリズムの名前
 	ciphername = buffer_get_string_msg(copy_consumed, NULL);
 	ciphernameval = get_cipher_by_name(ciphername);
-	if (ciphernameval == SSH_CIPHER_NONE) {
+	if (ciphernameval == SSH_CIPHER_NONE && strcmp(ciphername, "none") != 0) {
 		//error("%s: unknown cipher name", __func__);
 		goto error;
 	}
-	// パスフレーズのチェック。空のパスワードは認めない。
-	if (passphrase == NULL || strlen(passphrase) == 0) {
+	// パスフレーズのチェック。暗号化が none でない場合は空のパスワードを認めない。
+	if ((passphrase == NULL || strlen(passphrase) == 0) &&
+	    strcmp(ciphername, "none") != 0) {
 		/* passphrase required */
 		goto error;
 	}
 
 	kdfname = buffer_get_string_msg(copy_consumed, NULL);
-	if (kdfname == NULL || strcmp(kdfname, KDFNAME) != 0) {
+	if (kdfname == NULL ||
+	    (!strcmp(kdfname, "none") && !strcmp(kdfname, KDFNAME))) {
 		//error("%s: unknown kdf name", __func__);
+		goto error;
+	}
+	if (!strcmp(kdfname, "none") && strcmp(ciphername, "none") != 0) {
+		//error("%s: cipher %s requires kdf", __func__, ciphername);
 		goto error;
 	}
 
