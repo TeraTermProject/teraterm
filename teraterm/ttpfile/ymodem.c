@@ -751,10 +751,8 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			// Clear the flag.
 			yv->LastSendEot = 0;
 
-			if (yv->DataLen == SOH_DATALEN)
-				yv->PktOut[0] = SOH;
-			else
-				yv->PktOut[0] = STX;
+			yv->DataLen = SOH_DATALEN;
+			yv->PktOut[0] = SOH;
 			yv->PktOut[1] = 0;
 			yv->PktOut[2] = ~0;
 
