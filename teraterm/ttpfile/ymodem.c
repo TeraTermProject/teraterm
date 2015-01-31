@@ -3,13 +3,15 @@ Copyright(C) 2008-2010 TeraTerm Project
 All rights reserved. */
 
 /* TTFILE.DLL, YMODEM protocol */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <assert.h>
+#include <stdio.h>
+#include <time.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
-#include <stdio.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "tt_res.h"
 #include "ttcommon.h"
@@ -87,17 +89,20 @@ void YSetOpt(PFileVar fv, PYVar yv, WORD Opt)
 	switch (yv->YOpt) {
 	case Yopt1K: /* YMODEM */
 		strncat_s(Tmp,sizeof(Tmp),"1k)",_TRUNCATE);
-		yv->DataLen = 1024;
+		yv->__DataLen = STX_DATALEN;
+		yv->DataLen = STX_DATALEN;
 		yv->CheckLen = 2;
 		break;
 	case YoptG: /* YMODEM-g */
 		strncat_s(Tmp,sizeof(Tmp),"-g)",_TRUNCATE);
-		yv->DataLen = 1024;
+		yv->__DataLen = STX_DATALEN;
+		yv->DataLen = STX_DATALEN;
 		yv->CheckLen = 2;
 		break;
 	case YoptSingle: /* YMODEM(-g) single mode */
 		strncat_s(Tmp,sizeof(Tmp),"single mode)",_TRUNCATE);
-		yv->DataLen = 1024;
+		yv->__DataLen = STX_DATALEN;
+		yv->DataLen = STX_DATALEN;
 		yv->CheckLen = 2;
 		break;
 	}
@@ -187,7 +192,7 @@ void YSendNAKTimeout(PFileVar fv, PYVar yv, PComVar cv)
 	FTSetTimeOut(fv,t);
 }
 
-WORD YCalcCheck(PYVar yv, PCHAR PktBuf)
+WORD YCalcCheck(PYVar yv, const PCHAR PktBuf, const WORD len)
 {
 	int i;
 	WORD Check;
@@ -197,7 +202,7 @@ WORD YCalcCheck(PYVar yv, PCHAR PktBuf)
 	{
 		// Calc sum.
 		Check = 0;
-		for (i = 0 ; i <= yv->DataLen-1 ; i++)
+		for (i = 0 ; i <= len - 1 ; i++)
 			Check = Check + (BYTE)(PktBuf[3 + i]);
 		return (Check & 0xff);
 	}
@@ -205,23 +210,23 @@ WORD YCalcCheck(PYVar yv, PCHAR PktBuf)
 	{
 		// CRC.
 		Check = 0;
-		for (i = 0 ; i <= yv->DataLen-1 ; i++)
+		for (i = 0 ; i <= len - 1 ; i++)
 			Check = UpdateCRC(PktBuf[3 + i],Check);
 		return (Check);
 	}
 }
 
-BOOL YCheckPacket(PYVar yv)
+BOOL YCheckPacket(PYVar yv, const WORD len)
 {
 	WORD Check;
 
-	Check = YCalcCheck(yv, yv->PktIn);
+	Check = YCalcCheck(yv, yv->PktIn, len);
 	// Checksum.
 	if (1 == yv->CheckLen)
-		return ((BYTE)Check == yv->PktIn[yv->DataLen + 3]);
+		return ((BYTE)Check == yv->PktIn[len + 3]);
 	else
-		return ((HIBYTE(Check) == yv->PktIn[yv->DataLen + 3]) &&
-		        (LOBYTE(Check) == yv->PktIn[yv->DataLen + 4]));  
+		return ((HIBYTE(Check) == yv->PktIn[len + 3]) &&
+		        (LOBYTE(Check) == yv->PktIn[len + 4]));
 }
 
 static void initialize_file_info(PFileVar fv, PYVar yv)
@@ -260,6 +265,7 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 	yv->SendFileInfo = 0;
 	yv->SendEot = 0;
 	yv->LastSendEot = 0;
+	yv->LastMessage = 0;
 }
 
 void YInit
@@ -396,14 +402,14 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			{
 				yv->PktIn[0] = b;
 				yv->PktReadMode = XpktBLK;
-				yv->DataLen = SOH_DATALEN;
+				yv->__DataLen = SOH_DATALEN;
 				FTSetTimeOut(fv,yv->TOutShort);
 			}
 			else if (b==STX)
 			{
 				yv->PktIn[0] = b;
 				yv->PktReadMode = XpktBLK;
-				yv->DataLen = STX_DATALEN;
+				yv->__DataLen = STX_DATALEN;
 				FTSetTimeOut(fv,yv->TOutShort);
 			}
 			else if (b==EOT)
@@ -461,7 +467,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			if (nak == 0)
 			{
 				yv->PktBufPtr = 3;
-				yv->PktBufCount = yv->DataLen + yv->CheckLen;
+				yv->PktBufCount = yv->__DataLen + yv->CheckLen;
 				yv->PktReadMode = XpktDATA;
 				FTSetTimeOut(fv,yv->TOutShort);
 			}
@@ -488,7 +494,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 	if (! GetPkt) return TRUE;
 
-	GetPkt = YCheckPacket(yv);
+	GetPkt = YCheckPacket(yv, yv->__DataLen);
 	if (! GetPkt)
 	{
 		YSendNAK(fv,yv,cv);
@@ -499,7 +505,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	if (yv->PktIn[1] == 0x00 && yv->PktIn[2] == 0xFF &&
 		yv->SendFileInfo == 0
 		) {
-		c = yv->DataLen;
+		c = yv->__DataLen;
 		while ((c>0) && (yv->PktIn[2+c]==0x00))
 			c--;
 		if (c == 0) {
@@ -541,9 +547,9 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 		BYTE *p;
 		char *name, *nameend;
 
-		p = (BYTE *)malloc(yv->DataLen + 1);
-		memset(p, 0, yv->DataLen + 1);
-		memcpy(p, &(yv->PktIn[3]), yv->DataLen);
+		p = (BYTE *)malloc(yv->__DataLen + 1);
+		memset(p, 0, yv->__DataLen + 1);
+		memcpy(p, &(yv->PktIn[3]), yv->__DataLen);
 		name = p;
 		strncpy_s(&(fv->FullName[fv->DirLen]),
 		          sizeof(fv->FullName) - fv->DirLen, name,
@@ -577,7 +583,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 	if (yv->PktNum==0)
 		yv->PktNumOffset = yv->PktNumOffset + 256;
 
-	c = yv->DataLen;
+	c = yv->__DataLen;
 	if (yv->TextFlag>0)
 		while ((c>0) && (yv->PktIn[2+c]==0x1A))
 			c--;
@@ -615,24 +621,19 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 // ファイル送信(local-to-remote)時に、YMODEMサーバからデータが送られてきたときに呼び出される。
 BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 {
-	BYTE b;
-	int i;
-	BOOL SendFlag;
-	WORD Check;
-	BYTE firstch, lastrx;
-
-	SendFlag = FALSE;
+	// If current buffer is empty.
 	if (0 == yv->PktBufCount)
 	{
 		// Main read loop.
-		i = YRead1Byte(fv,yv,cv,&b);
-		do
+		BOOL continue_read = TRUE;
+		while (continue_read)
 		{
-			if (i==0) return TRUE;
-			firstch = b;
+			BYTE isym = 0;
+			int is_success = YRead1Byte(fv, yv, cv, &isym);
+			if (0 == is_success) return TRUE;
 
 			// Analyze responce.
-			switch (b)
+			switch (isym)
 			{
 			case ACK:
 				// 1回目のEOT送信後のACK受信で、「1ファイル送信」の終わりとする。
@@ -661,6 +662,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				if (!fv->FileOpen)
 				{
 					fv->Success = TRUE;
+					yv->LastMessage = isym;
 					return FALSE;
 				}
 				// 次のブロックを送る
@@ -673,13 +675,13 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 						// It is an ACK for file info, wait for 'C' by some reason (?).
 						// 送信済みフラグon
 						yv->SendFileInfo = 1;
-						SendFlag = FALSE;
+						continue_read = TRUE;
 						break;
 					}
 					yv->PktNum = yv->PktNumSent;
 					if (0 == yv->PktNum)
 						yv->PktNumOffset = yv->PktNumOffset + 256;
-					SendFlag = TRUE;
+					continue_read = FALSE;
 				}
 				break;
 
@@ -692,14 +694,19 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 						yv->PktNumOffset = yv->PktNumOffset + 256;
 				}
 
-				SendFlag = TRUE;
+				continue_read = FALSE;
 				break;
 
 			case CAN:
+				// 直前も CAN の場合はキャンセル
+				if (yv->LastMessage == CAN) {
+					fv->Success = FALSE;       // failure
+					return FALSE;
+				}
 				break;
 
-			case 0x43:  // 'C'(43h)
-			case 0x47:  // 'G'(47h)
+			case 'C':
+			case 'G':
 				// 'C'を受け取ると、ブロックの送信を開始する。
 				if ((0 == yv->PktNum) && (0 == yv->PktNumOffset))
 				{
@@ -711,20 +718,28 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 							yv->PktNumOffset = yv->PktNumOffset + 256;
 					}
 
-					SendFlag = TRUE;
+					continue_read = FALSE;
 				}
 				else if (yv->LastSendEot)
 				{
-					SendFlag = TRUE;
+					continue_read = FALSE;
+				}
+				else
+				{
+					// TODO: analyze else branch.
 				}
 				break;
+
+			default:
+				assert(0);
+				break;
 			}
-			if (! SendFlag) i = YRead1Byte(fv,yv,cv,&b);
-		} while (!SendFlag);
+			yv->LastMessage = isym;
+		}
 
 		// reset timeout timer
 		FTSetTimeOut(fv, TimeOutVeryLong);
-
+#if 0
 		// 後続のサーバからのデータを読み捨てる。
 		do
 		{
@@ -741,6 +756,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				}
 			}
 		} while (i != 0);
+#endif
 
 		//================================
 		// Last packet case.
@@ -748,34 +764,40 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		// オールゼロのブロックを送信して、もうファイルがないことを知らせる。
 		if (yv->LastSendEot)
 		{
+			WORD Check;
+			// Always 128 bytes for the last packet.
+			WORD last_packet_size = SOH_DATALEN;
+			int i;
+
 			// Clear the flag.
 			yv->LastSendEot = 0;
 
-			yv->DataLen = SOH_DATALEN;
+			yv->__DataLen = last_packet_size;
 			yv->PktOut[0] = SOH;
 			yv->PktOut[1] = 0;
 			yv->PktOut[2] = ~0;
 
 			i = 0;
-			while (i < yv->DataLen)
+			while (i < last_packet_size)
 			{
 				yv->PktOut[i+3] = 0x00;
 				i++;
 			}
 
-			Check = YCalcCheck(yv, yv->PktOut);
+			Check = YCalcCheck(yv, yv->PktOut, last_packet_size);
+			// TODO: move checksum calculation to a function.
 			if (1 == yv->CheckLen)
 			{
-				yv->PktOut[yv->DataLen + 3] = (BYTE)Check;
+				yv->PktOut[last_packet_size + 3] = (BYTE)Check;
 			}
 			else
 			{
-				yv->PktOut[yv->DataLen + 3] = HIBYTE(Check);
-				yv->PktOut[yv->DataLen + 4] = LOBYTE(Check);
+				yv->PktOut[last_packet_size + 3] = HIBYTE(Check);
+				yv->PktOut[last_packet_size + 4] = LOBYTE(Check);
 			}
 
-			yv->PktBufCount = 3 + yv->DataLen + yv->CheckLen;
-			//fv->Success = TRUE;
+			// TODO: remove magic number.
+			yv->PktBufCount = 3 + last_packet_size + yv->CheckLen;
 		}
 
 		//================================
@@ -788,8 +810,9 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			 /* make a new packet */
 			BYTE *dataptr = &yv->PktOut[3];
 			int eot = 0;  // End Of Transfer
+			WORD current_packet_size = yv->DataLen;
 
-			if (SOH_DATALEN == yv->DataLen)
+			if (SOH_DATALEN == current_packet_size)
 				yv->PktOut[0] = SOH;
 			else
 				yv->PktOut[0] = STX;
@@ -807,12 +830,14 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			if (yv->SendFileInfo == 0)
 			{
 				int ret, total;
+				size_t idx;
+				// TODO: remove magic number.
 				BYTE buf[1024 + 10];
 
-				// ACK を受けてからフラグをonとする。そうしないと、ACKを受けずに、'C'のみ
-				// 受け取ったとしても、ブロック1の送信を始めてしまう。
-				// (2011.3.21 yutaka)
-				//yv->SendFileInfo = 1;   // 送信済みフラグon
+				// 128 bytes for the first packet.
+				current_packet_size = SOH_DATALEN;
+				yv->__DataLen = current_packet_size;
+				yv->PktOut[0] = SOH;
 
 				// Timestamp.
 				fv->FileMtime = GetFMtime(fv->FullName);
@@ -827,17 +852,23 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 				                  fv->FileSize, fv->FileMtime, 0644|_S_IFREG);
 				total += ret;
 
+				// if bloack0 is long, expand to 1024 bytes.
+				if (total > SOH_DATALEN) {
+					current_packet_size = STX_DATALEN;
+					yv->__DataLen = current_packet_size;
+					yv->PktOut[0] = STX;
+				}
+
 				// Padding.
-				i = total;
-				while (i <= yv->DataLen)
+				idx = total;
+				while (idx <= current_packet_size)
 				{
-					buf[i] = 0x00;
-					i++;
+					buf[idx] = 0x00;
+					++idx;
 				}
 
 				// データコピー
-				memcpy(dataptr, buf, yv->DataLen);
-
+				memcpy(dataptr, buf, current_packet_size);
 			}
 
 			//================================
@@ -846,26 +877,24 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 
 			else
 			{
-				i = 1;
-				while ((i<=yv->DataLen) && fv->FileOpen &&
-				       (1 == _lread(fv->FileHandle, &b, 1)))
+				BYTE fsym = 0;
+				size_t idx = 1;
+
+				yv->__DataLen = current_packet_size;
+
+				while ((idx <= current_packet_size) && fv->FileOpen &&
+				       (1 == _lread(fv->FileHandle, &fsym, 1)))
 				{
-					yv->PktOut[2+i] = b;
-					i++;
+					// TODO: remove magic number.
+					yv->PktOut[2 + idx] = fsym;
+					++idx;
 					fv->ByteCount++;
 				}
 
-
-				if (i>1)
+				// No bytes were read.
+				if (1 == idx)
 				{
-					while (i<=yv->DataLen)
-					{
-						yv->PktOut[2+i] = 0x1A;
-						i++;
-					}
-
-				}
-				else { /* send EOT */
+					// Close file handle.
 					if (fv->FileOpen)
 					{
 						_lclose(fv->FileHandle);
@@ -873,24 +902,35 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 						fv->FileOpen = FALSE;
 					}
 
+					// Send EOT.
 					eot = 1;
 				}
-
+				else
+				{
+					// Padding.
+					while (idx <= current_packet_size)
+					{
+						// TODO: remove magic number.
+						yv->PktOut[2 + idx] = 0x1A;
+						++idx;
+					}
+				}
 			}
 
 			// データブロック
 			if (0 == eot)
 			{
 				// Add CRC if not End-of-Tranfer.
-				Check = YCalcCheck(yv, yv->PktOut);
+				WORD Check = YCalcCheck(yv, yv->PktOut, current_packet_size);
 				// Checksum.
 				if (1 == yv->CheckLen)
-					yv->PktOut[yv->DataLen + 3] = (BYTE)Check;
+					yv->PktOut[current_packet_size + 3] = (BYTE)Check;
 				else {
-					yv->PktOut[yv->DataLen + 3] = HIBYTE(Check);
-					yv->PktOut[yv->DataLen + 4] = LOBYTE(Check);
+					yv->PktOut[current_packet_size + 3] = HIBYTE(Check);
+					yv->PktOut[current_packet_size + 4] = LOBYTE(Check);
 				}
-				yv->PktBufCount = 3 + yv->DataLen + yv->CheckLen;
+				// TODO: remove magic number.
+				yv->PktBufCount = 3 + current_packet_size + yv->CheckLen;
 
 			}
 			else
@@ -912,12 +952,13 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		else
 		{
 			// Resend packet.
-			yv->PktBufCount = 3 + yv->DataLen + yv->CheckLen;
+			yv->PktBufCount = 3 + yv->__DataLen + yv->CheckLen;
 		}
 
 		// Reset counter.
 		yv->PktBufPtr = 0;
 	}
+#if 0
 	/* a NAK or C could have arrived while we were buffering.  Consume it. */
 	// 後続のサーバからのデータを読み捨てる。
 	do {
@@ -934,19 +975,20 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 			}
 		}
 	} while (i != 0);
-
+#endif
 
 	// Write bytes to COM.
-	i = 1;
-	while ((yv->PktBufCount>0) && (i>0))
+	while (yv->PktBufCount > 0)
 	{
-		b = yv->PktOut[yv->PktBufPtr];
-		i = YWrite(fv, yv, cv, &b, 1);
-		if (i > 0)
+		BYTE osym = yv->PktOut[yv->PktBufPtr];
+		int is_success = YWrite(fv, yv, cv, &osym, 1);
+		if (is_success > 0)
 		{
 			--yv->PktBufCount;
 			++yv->PktBufPtr;
 		}
+		else
+			break;
 	}
 
 	// Update dialog window.

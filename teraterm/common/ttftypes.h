@@ -208,13 +208,15 @@ typedef struct {
   WORD YMode, YOpt, TextFlag;
   WORD NAKMode;
   int NAKCount;
-  WORD DataLen, CheckLen;
+  WORD __DataLen, CheckLen;
   BOOL CRRecv;
   int TOutShort;
   int TOutLong;
   int SendFileInfo;
   int SendEot;
   int LastSendEot;
+  WORD DataLen;
+  BYTE LastMessage;
 } TYVar;
 typedef TYVar far *PYVar;
 
