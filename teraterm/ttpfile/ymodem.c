@@ -245,6 +245,7 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 		fv->FileHandle = -1;
 		fv->FileSize = 0;
 		fv->FileMtime = 0;
+		yv->RecvFilesize = FALSE;
 	}
 	fv->FileOpen = fv->FileHandle>0;
 
@@ -563,6 +564,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			ret = sscanf(nameend, "%ld%lo%o", &bytes_total, &modtime, &mode);
 			if (ret >= 1) {
 				fv->FileSize = bytes_total;
+				yv->RecvFilesize = TRUE;
 			}
 			if (ret >= 2) {
 				fv->FileMtime = modtime;
@@ -589,7 +591,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 			c--;
 
 	// 最終ブロックの余分なデータを除去する
-	if (fv->ByteCount + c > fv->FileSize) {
+	if (yv->RecvFilesize && fv->ByteCount + c > fv->FileSize) {
 		c = fv->FileSize - fv->ByteCount;
 	}
 

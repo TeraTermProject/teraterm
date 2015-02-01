@@ -217,6 +217,7 @@ typedef struct {
   int LastSendEot;
   WORD DataLen;
   BYTE LastMessage;
+  BOOL RecvFilesize;
 } TYVar;
 typedef TYVar far *PYVar;
 
