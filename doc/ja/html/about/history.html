@@ -35,8 +35,8 @@
   <li>変更
     <ul>
       <li><a href="../menu/control.html">[Control]</a> メニューの [Reset Terminal] で OSC 10/11 で設定した色もリセットするようにした。</li>
-      <li>YMODEM で送信する送信終了を意味するパケットのサイズを必要最小限にした。mlukoshkov に感謝します</li>
-      <li>YMODEM で送信するファイル情報のパケットを、必要なときのみ長いパケットになるようにした</li>
+      <li>YMODEM で送信する送信終了を意味するパケット(block0)のサイズを必要最小限(128byte)にした。mlukoshkov に感謝します</li>
+      <li>YMODEM で送信するファイル情報のパケットを、必要なときのみ長いパケット(128 or 1024byte)になるようにした</li>
       <li><a href="../macro/command/getmodemstatus.html">getmodemstatus</a> マクロコマンドを追加した。</li>
     </ul>
   </li>
