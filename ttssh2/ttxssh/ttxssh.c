@@ -3987,13 +3987,13 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 
 		// SCPファイル送信先を表示する
 		if (sendfiledir[0] == '\0') {
-			_snprintf_s(sendfiledir, MAX_PATH, _TRUNCATE, pvar->ts->ScpSendDir); // home directory
+			_snprintf_s(sendfiledir, sizeof(sendfiledir), _TRUNCATE, pvar->ts->ScpSendDir); // home directory
 		}
 		SendMessage(GetDlgItem(dlg, IDC_SENDFILE_TO), WM_SETTEXT, 0, (LPARAM)sendfiledir);
 
 		// SCPファイル受信先を表示する
 		if (recvdir[0] == '\0') {
-			_snprintf_s(recvdir, MAX_PATH, _TRUNCATE, "%s", pvar->ts->FileDir);
+			_snprintf_s(recvdir, sizeof(recvdir), _TRUNCATE, "%s", pvar->ts->FileDir);
 		}
 		SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
 
@@ -4054,8 +4054,13 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 		case IDC_RECVDIR_SELECT | (BN_CLICKED << 16):
 			{
-			doSelectFolder(dlg, recvdir, MAX_PATH, "Choose destination directory");
-			SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
+			char buf[MAX_PATH], buf2[MAX_PATH];
+			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
+			SendMessage(hWnd, WM_GETTEXT , sizeof(buf), (LPARAM)buf);
+			if (doSelectFolder(dlg, buf2, sizeof(buf2), buf, "Choose destination directory")) {
+				strncpy_s(recvdir, sizeof(recvdir), buf2, _TRUNCATE);
+				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_SETTEXT, 0, (LPARAM)recvdir);
+			}
 			}
 			return TRUE;
 		}
@@ -4067,7 +4072,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			if (sendfile[0] != '\0') {
 				// 送信パスを取り出し、teraterm.ini も合わせて更新する。
 				hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
-				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);	
+				SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
 				strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
 
 				SSH_start_scp(pvar, sendfile, sendfiledir);
@@ -4080,12 +4085,12 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 		case IDCANCEL:
 			// 送信パスを取り出し、teraterm.ini も合わせて更新する。
 			hWnd = GetDlgItem(dlg, IDC_SENDFILE_TO);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);	
+			SendMessage(hWnd, WM_GETTEXT , sizeof(sendfiledir), (LPARAM)sendfiledir);
 			strncpy_s(pvar->ts->ScpSendDir, sizeof(pvar->ts->ScpSendDir), sendfiledir, _TRUNCATE);
 
 			// 受信パスに関しても更新する。(2013.8.18 yutaka)
 			hWnd = GetDlgItem(dlg, IDC_RECVFILE_TO);
-			SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);	
+			SendMessage(hWnd, WM_GETTEXT , sizeof(recvdir), (LPARAM)recvdir);
 			strncpy_s(pvar->ts->FileDir, sizeof(pvar->ts->FileDir), recvdir, _TRUNCATE);
 
 			EndDialog(dlg, 0); // dialog close
@@ -4101,7 +4106,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 					return FALSE;
 				}
 				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_GETTEXT, sizeof(recvdir), (LPARAM)recvdir);
-				_snprintf_s(recvpath, MAX_PATH, _TRUNCATE, "%s\\%s", recvdir, fn ? (fn + 1) : szFileName);
+				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir, fn ? (fn + 1) : szFileName);
 				SSH_scp_transaction(pvar, szFileName, recvpath, FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;

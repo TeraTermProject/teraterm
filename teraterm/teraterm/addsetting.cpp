@@ -1418,6 +1418,7 @@ BOOL CLogPropPageDlg::OnInitDialog()
 BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	char uimsg[MAX_UIMSG];
+	char buf[MAX_PATH], buf2[MAX_PATH];
 
 	switch (wParam) {
 		case IDC_VIEWLOG_PATH | (BN_CLICKED << 16):
@@ -1446,9 +1447,10 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// ログディレクトリの選択ダイアログ
 			get_lang_msg("FILEDLG_SELECT_LOGDIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
 			             "Select log folder", ts.UILanguageFile);
-			doSelectFolder(GetSafeHwnd(), ts.LogDefaultPath, sizeof(ts.LogDefaultPath),
-			               ts.UIMsg);
-			SetDlgItemText(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath);
+			GetDlgItemText(IDC_DEFAULTPATH_EDITOR, buf, sizeof(buf));
+			if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
+				SetDlgItemText(IDC_DEFAULTPATH_EDITOR, buf2);
+			}
 
 			return TRUE;
 
@@ -1800,15 +1802,17 @@ BOOL CCygwinPropPageDlg::OnInitDialog()
 
 BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
+	char buf[MAX_PATH], buf2[MAX_PATH];
+
 	switch (wParam) {
 		case IDC_SELECT_FILE | (BN_CLICKED << 16):
 			// Cygwin install ディレクトリの選択ダイアログ
 			get_lang_msg("DIRDLG_CYGTERM_DIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
 			             "Select Cygwin directory", ts.UILanguageFile);
-			doSelectFolder(GetSafeHwnd(), ts.CygwinDirectory, sizeof(ts.CygwinDirectory),
-			               ts.UIMsg);
-			// Cygwin install path
-			SetDlgItemText(IDC_CYGWIN_PATH, ts.CygwinDirectory);
+			GetDlgItemText(IDC_CYGWIN_PATH, buf, sizeof(buf));
+			if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
+				SetDlgItemText(IDC_CYGWIN_PATH, buf2);
+			}
 			return TRUE;
 	}
 

@@ -2232,6 +2232,7 @@ BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	POINT D, B, S;
 	int WX, WY, WW, WH, CW, DW, DH, BW, BH, SW, SH;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+	char buf[MAX_PATH], buf2[MAX_PATH];
 	LOGFONT logfont;
 	HFONT font;
 
@@ -2384,9 +2385,10 @@ BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				case IDC_SELECT_DIR:
 					get_lang_msg("DLG_SELECT_DIR_TITLE", uimsg, sizeof(uimsg),
 					             "Select new directory", UILanguageFile);
-					GetDlgItemText(Dialog, IDC_DIRCURRENT, uimsg2, sizeof(uimsg2));
-					doSelectFolder(Dialog, uimsg2, sizeof(uimsg2), uimsg);
-					SetDlgItemText(Dialog, IDC_DIRNEW, uimsg2);
+					GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
+					if (doSelectFolder(Dialog, buf2, sizeof(buf2), buf, uimsg)) {
+						SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+					}
 					return TRUE;
 
 				case IDC_DIRHELP:

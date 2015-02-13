@@ -903,12 +903,13 @@ int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData
 	return 0;
 }
 
-void doSelectFolder(HWND hWnd, char *path, int pathlen, char *msg)
+BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
 {
 	BROWSEINFO      bi;
 	LPITEMIDLIST    pidlRoot;      // ブラウズのルートPIDL
 	LPITEMIDLIST    pidlBrowse;    // ユーザーが選択したPIDL
 	char buf[MAX_PATH];
+	BOOL ret = FALSE;
 
 	// ダイアログ表示時のルートフォルダのPIDLを取得
 	// ※以下はデスクトップをルートとしている。デスクトップをルートとする
@@ -916,7 +917,7 @@ void doSelectFolder(HWND hWnd, char *path, int pathlen, char *msg)
 	//   殊フォルダをルートとする事もできる。詳細はSHGetSpecialFolderLoca
 	//   tionのヘルプを参照の事。
 	if (!SUCCEEDED(SHGetSpecialFolderLocation(hWnd, CSIDL_DESKTOP, &pidlRoot))) {
-			return;
+		return FALSE;
 	}
 
 	// BROWSEINFO構造体の初期値設定
@@ -927,7 +928,7 @@ void doSelectFolder(HWND hWnd, char *path, int pathlen, char *msg)
 	bi.lpszTitle = msg;
 	bi.ulFlags = 0;
 	bi.lpfn = setDefaultFolder;
-	bi.lParam = (LPARAM)path;
+	bi.lParam = (LPARAM)def;
 	// フォルダ選択ダイアログの表示 
 	pidlBrowse = SHBrowseForFolder(&bi);
 	if (pidlBrowse != NULL) {  
@@ -935,12 +936,15 @@ void doSelectFolder(HWND hWnd, char *path, int pathlen, char *msg)
 		if (SHGetPathFromIDList(pidlBrowse, buf)) {
 			// 取得成功
 			strncpy_s(path, pathlen, buf, _TRUNCATE);
+			ret = TRUE;
 		}
 		// SHBrowseForFolderの戻り値PIDLを解放
 		CoTaskMemFree(pidlBrowse);
 	}
 	// クリーンアップ処理
 	CoTaskMemFree(pidlRoot);
+
+	return ret;
 }
 
 void OutputDebugPrintf(char *fmt, ...) {
