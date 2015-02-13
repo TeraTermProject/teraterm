@@ -1437,6 +1437,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="dirnamebox">
+					<param name="Local" value="html\macro\command\dirnamebox.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filenamebox">
 					<param name="Local" value="html\macro\command\filenamebox.html">
 					<param name="ImageNumber" value="11">
