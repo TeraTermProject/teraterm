@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>dirnamebox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>dirnamebox</h1>
+
+<p>
+<!--ƒfƒBƒŒƒNƒgƒŠ–¼‚ð‘I‘ð‚·‚éƒ_ƒCƒAƒƒOƒ{ƒbƒNƒX‚ðŠJ‚­B-->
+</p>
+
+<pre class="macro-syntax">
+dirnamebox &lt;title&gt; [&lt;initialdir&gt;]
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">string &lt;title&gt;</dt>
+	<dd>The titie of dialog box</dd>
+
+	<dt class="macro">string &lt;initialdir&gt; (optional default="")</dt>
+	<!--dd>ƒ_ƒCƒAƒƒOƒ{ƒbƒNƒX‚Ì‰ŠúƒfƒBƒŒƒNƒgƒŠ‚ðŽw’è‚·‚éB<br>
+	    ‹ó•¶Žš—ñ‚â–³Œø‚ÈƒpƒX‚ðŽw’è‚·‚é‚ÆAƒfƒXƒNƒgƒbƒv‚ª‰ŠúƒfƒBƒŒƒNƒgƒŠ‚É‚È‚éB</dd-->
+</dd>
+</dl>
+
+<h2>Return Value</h2>
+
+<dl>
+	<dt class="macro">System variable &lt;result&gt;</dt>
+	<dd>If the user specifies a directory name and clicks OK button, set to 1. The directory name is stored in "inputstr."<br>
+	    If the user cancels or closes the dialog, set to zero.</dd>
+
+	<dt class="macro">System variable &lt;inputstr&gt;</dt>
+	<dd>The directory name entered by the user</dd>
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+dirnamebox 'select a directory'
+if result&lt;&gt;0 then
+	messagebox inputstr 'selected directory'
+endif
+</pre>
+
+</body>
+</html>

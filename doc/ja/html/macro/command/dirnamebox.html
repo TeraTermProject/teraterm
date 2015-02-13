@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>dirnamebox</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>dirnamebox</h1>
+
+<p>
+ディレクトリ名を選択するダイアログボックスを開く。
+</p>
+
+<pre class="macro-syntax">
+dirnamebox &lt;title&gt; [&lt;initialdir&gt;]
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">文字列 &lt;title&gt;</dt>
+	<dd>ダイアログボックスのタイトル</dd>
+
+	<dt class="macro">文字列 &lt;initialdir&gt; (オプション デフォルト="")</dt>
+	<dd>ダイアログボックスの初期ディレクトリを指定する。<br>
+	    空文字列や無効なパスを指定すると、デスクトップが初期ディレクトリになる。</dd>
+</dl>
+
+<h2>返り値</h2>
+
+<dl>
+	<dt class="macro">システム変数 &lt;result&gt;</dt>
+	<dd>ユーザがディレクトリ名を選択してOKボタンを押すと1が格納され、inputstrにフォルダ名が格納される。<br>
+	    ユーザがダイアログをキャンセルしたり閉じたりすると0が格納される。</dd>
+
+	<dt class="macro">システム変数 &lt;inputstr&gt;</dt>
+	<dd>選択されたディレクトリ名</dd>
+</dl>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+dirnamebox 'select a directory'
+if result&lt;&gt;0 then
+	messagebox inputstr 'selected directory'
+endif
+</pre>
+
+</body>
+</html>
