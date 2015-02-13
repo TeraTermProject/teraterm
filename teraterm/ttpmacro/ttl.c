@@ -3322,6 +3322,44 @@ WORD TTLDirname()
 	return Err;
 }
 
+WORD TTLDirnameBox()
+{
+	TStrVal Title;
+	WORD Err, ValType;
+	TVarId VarId;
+	char buf[MAX_PATH];
+	TStrVal InitDir = "";
+	BOOL ret;
+
+	Err = 0;
+	GetStrVal(Title, &Err);
+	if (Err != 0) return Err;
+
+	// get 2nd arg(optional) if given
+	if (CheckParameterGiven()) { // initdir
+		GetStrVal(InitDir, &Err);
+		if (Err != 0) return Err;
+	}
+
+	if ((Err == 0) && (GetFirstChar() != 0))
+		Err = ErrSyntax;
+	if (Err != 0) return Err;
+
+	SetInputStr("");
+	if (CheckVar("inputstr", &ValType, &VarId) &&
+		(ValType == TypString)) {
+		if (doSelectFolder(HMainWin, buf, sizeof(buf), InitDir, Title)) {
+			SetInputStr(buf);
+			ret = 1;
+		}
+		else {
+			ret = 0;
+		}
+		SetResult(ret);
+	}
+	return Err;
+}
+
 #define IdMsgBox 1
 #define IdYesNoBox 2
 #define IdStatusBox 3
@@ -5900,6 +5938,8 @@ int ExecCmnd()
 			Err = TTLDelPassword(); break;
 		case RsvDirname:
 			Err = TTLDirname(); break;
+		case RsvDirnameBox:
+			Err = TTLDirnameBox(); break;
 		case RsvDisconnect:
 			Err = TTLDisconnect(); break;
 		case RsvDispStr:

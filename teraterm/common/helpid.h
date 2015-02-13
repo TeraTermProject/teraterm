@@ -190,6 +190,7 @@
 #define HlpMacroCommandCygConnect       92130
 #define HlpMacroCommandDelpassword      92011
 #define HlpMacroCommandDirname          92188
+#define HlpMacroCommandDirnameBox       92214
 #define HlpMacroCommandDisconnect       92012
 #define HlpMacroCommandDispstr          92149
 #define HlpMacroCommandDo               92126

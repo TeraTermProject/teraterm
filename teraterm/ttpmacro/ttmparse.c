@@ -205,6 +205,7 @@ BOOL CheckReservedWord(PCHAR Str, LPWORD WordId)
 		else if (_stricmp(Str,"dispstr")==0) *WordId = RsvDispStr;
 		else if (_stricmp(Str,"do")==0) *WordId = RsvDo;
 		else if (_stricmp(Str,"dirname")==0) *WordId = RsvDirname;
+		else if (_stricmp(Str, "dirnamebox") == 0) *WordId = RsvDirnameBox;
 		break;
 	case 'e':
 		if (_stricmp(Str,"else")==0) *WordId = RsvElse;
