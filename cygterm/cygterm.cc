@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // CygTerm+ - yet another Cygwin console
-// Copyright (c) 2006-2011 TeraTerm Project
+// Copyright (c) 2006-2015 TeraTerm Project
 // Copyright (C) 2000-2006 NSym.
 //---------------------------------------------------------------------------
 // This program is free software; you can redistribute it and/or modify it
@@ -120,9 +120,17 @@
 // patch level 23 - display errormessage when chdir failed.
 //   Written by IWAMOTO Kouichi. (doda)
 //
+/////////////////////////////////////////////////////////////////////////////
+// patch level 24 - support for 64bit Cygwin
+//   Written by NAGATA Shinya. (maya)
+//
+/////////////////////////////////////////////////////////////////////////////
+// patch level 25 - 
+//   Written by IWAMOTO Kouichi. (doda)
+//
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_23 (2011/4/18)";
+static char Version[] = "version 1.07_25 (2015/02/21)";
 
 #include <stdio.h>
 #include <stdlib.h>
