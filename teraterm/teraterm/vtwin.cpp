@@ -512,10 +512,12 @@ CVTWindow::CVTWindow()
 #ifdef ALPHABLEND_TYPE2
 	DWORD ExStyle;
 #endif
-	char Temp[MAX_PATH];
 	char *Param;
 	int CmdShow;
+#ifdef SHARED_KEYMAP
+	char Temp[MAX_PATH];
 	PKeyMap tempkm;
+#endif
 	int fuLoad = LR_DEFAULTCOLOR;
 
 #ifdef _DEBUG
@@ -536,6 +538,7 @@ CVTWindow::CVTWindow()
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
 			(*ReadIniFile)(ts.SetupFName, &ts);
+#ifdef SHARED_KEYMAP
 			/* read keycode map from "keyboard.cnf" */
 			tempkm = (PKeyMap)malloc(sizeof(TKeyMap));
 			if (tempkm!=NULL) {
@@ -544,7 +547,9 @@ CVTWindow::CVTWindow()
 				strncat_s(Temp,sizeof(Temp),"KEYBOARD.CNF",_TRUNCATE);
 				(*ReadKeyboardCnf)(Temp,tempkm,TRUE);
 			}
+#endif
 			FreeTTSET();
+#ifdef SHARED_KEYMAP
 			/* store default sets in TTCMN */
 #if 0
 			ChangeDefaultSet(&ts,tempkm);
@@ -552,6 +557,7 @@ CVTWindow::CVTWindow()
 			ChangeDefaultSet(NULL,tempkm);
 #endif
 			if (tempkm!=NULL) free(tempkm);
+#endif
 		}
 
 	} else {
@@ -559,6 +565,7 @@ CVTWindow::CVTWindow()
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
 			(*ReadIniFile)(ts.SetupFName, &ts);
+#ifdef SHARED_KEYMAP
 			/* read keycode map from "keyboard.cnf" */
 			tempkm = (PKeyMap)malloc(sizeof(TKeyMap));
 			if (tempkm!=NULL) {
@@ -567,11 +574,14 @@ CVTWindow::CVTWindow()
 				strncat_s(Temp,sizeof(Temp),"KEYBOARD.CNF",_TRUNCATE);
 				(*ReadKeyboardCnf)(Temp,tempkm,TRUE);
 			}
+#endif
 			FreeTTSET();
+#ifdef SHARED_KEYMAP
 			/* store default sets in TTCMN */
 			if (tempkm!=NULL) {
 				free(tempkm);
 			}
+#endif
 		}
 
 	}

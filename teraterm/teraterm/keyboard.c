@@ -45,7 +45,13 @@ void SetKeyMap()
   char TempDir[MAXPATHLEN];
   char TempName[MAX_PATH];
 
+#ifdef SHARED_KEYMAP
   if ( strlen(ts.KeyCnfFN)==0 ) return;
+#else
+  if ( strlen(ts.KeyCnfFN)==0 ) {
+    strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN),"KEYBOARD.CNF", _TRUNCATE);
+  }
+#endif
   ExtractFileName(ts.KeyCnfFN,TempName,sizeof(TempName));
   ExtractDirName(ts.KeyCnfFN,TempDir);
   if (TempDir[0]==0)
@@ -64,6 +70,7 @@ void SetKeyMap()
       (*ReadKeyboardCnf)(ts.KeyCnfFN, KeyMap, TRUE);
     FreeTTSET();
   }
+#ifdef SHARED_KEYMAP
   if ((_stricmp(TempDir,ts.HomeDir)==0) &&
       (_stricmp(TempName,"KEYBOARD.CNF")==0))
   {
@@ -71,6 +78,7 @@ void SetKeyMap()
      free(KeyMap);
      KeyMap = NULL;
   }
+#endif
 }
 
 void ClearUserKey()
