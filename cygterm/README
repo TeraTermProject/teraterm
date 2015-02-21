@@ -3,7 +3,7 @@
 
                 Using Cygwin with a terminal emulator.
 
-                Copyright (c) 2006-2013 TeraTerm Project
+                Copyright (c) 2006-2015 TeraTerm Project
                 http://ttssh2.sourceforge.jp/
 
                 Based on CygTerm by Original developer:
@@ -266,6 +266,9 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_25 2015/02/21 (by doda)
+        * 
+
 v1.07_24 2013/08/15 (by maya)
         * Support for 64bit Cygwin.
 
