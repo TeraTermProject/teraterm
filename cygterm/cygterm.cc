@@ -901,6 +901,7 @@ void get_argv(char **argv, int maxc, char *s)
 //-----------------//
 int exec_shell(int* sh_pid)
 {
+    char env_term[64];
     // open pty master
     int master;
     if ((master = open(DEVPTY, O_RDWR)) < 0) {
@@ -938,7 +939,6 @@ int exec_shell(int* sh_pid)
         // set env vars
         if (*term_type != 0) {
             // set terminal type to $TERM
-            char env_term[64];
             sprintf(env_term, "TERM=%s", term_type);
             putenv(env_term);
         }
