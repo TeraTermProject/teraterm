@@ -473,6 +473,8 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	// エラーおよび警告時のポップアップメッセージを抑止する (2014.6.26 yutaka)
 	settings->DisablePopupMessage = GetPrivateProfileInt("TTSSH", "DisablePopupMessage", 0, fileName);
 
+	READ_STD_STRING_OPTION(X11Display);
+
 	clear_local_settings(pvar);
 }
 
@@ -576,6 +578,8 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	_itoa(settings->DisablePopupMessage, buf, 10);
 	WritePrivateProfileString("TTSSH", "DisablePopupMessage", buf, fileName);
+
+	WritePrivateProfileString("TTSSH", "X11Display", settings->X11Display, fileName);
 }
 
 
@@ -1654,6 +1658,10 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 					          sizeof(pvar->settings.DefaultForwarding),
 					          option + 5, _TRUNCATE);
 				}
+			} else if (MATCH_STR(option + 4, "-display=") == 0) {
+				strncpy_s(pvar->settings.X11Display,
+				          sizeof(pvar->settings.X11Display),
+				          option + 13, _TRUNCATE);
 			} else if (MATCH_STR(option + 4, "-f=") == 0) {
 				read_ssh_options_from_user_file(pvar, option + 7);
 			} else if (MATCH_STR(option + 4, "-v") == 0) {

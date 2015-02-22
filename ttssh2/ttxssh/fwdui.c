@@ -382,7 +382,7 @@ static void make_X_forwarding_spec(FWDRequestSpec FAR * spec, PTInstVar pvar)
 {
 	spec->type = FWD_REMOTE_X11_TO_LOCAL;
 	spec->from_port = -1;
-	X11_get_DISPLAY_info(spec->to_host, sizeof(spec->to_host),
+	X11_get_DISPLAY_info(pvar, spec->to_host, sizeof(spec->to_host),
 	                     &spec->to_port, &spec->x11_screen);
 	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSERVER", pvar, "remote X server");
 	strncpy_s(spec->from_port_name, sizeof(spec->from_port_name),

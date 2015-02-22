@@ -157,6 +157,8 @@ typedef struct _TS_SSH {
 	int IconID;
 
 	int DisablePopupMessage;
+
+	char X11Display[128];
 } TS_SSH;
 
 typedef struct _TInstVar {

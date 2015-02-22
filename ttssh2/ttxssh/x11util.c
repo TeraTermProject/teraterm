@@ -41,11 +41,9 @@ typedef struct {
 	int init_data_len;
 } X11UnspoofingFilterClosure;
 
-void X11_get_DISPLAY_info(char FAR * name_buf, int name_buf_len,
-                          int FAR * port, int FAR * screen)
+void parse_DISPLAY_str(char FAR * name_buf, int name_buf_len,
+                          int FAR * port, int FAR * screen, char *DISPLAY)
 {
-	char FAR *DISPLAY = getenv("DISPLAY");
-
 	strncpy_s(name_buf, name_buf_len, "localhost", _TRUNCATE);
 	*port = 6000;
 	*screen = 0;
@@ -74,6 +72,20 @@ void X11_get_DISPLAY_info(char FAR * name_buf, int name_buf_len,
 		}
 	}
 }
+
+void X11_get_DISPLAY_info(PTInstVar pvar, char FAR * name_buf, int name_buf_len,
+                          int FAR * port, int FAR * screen)
+{
+	char FAR *DISPLAY = getenv("DISPLAY");
+
+	if (pvar->settings.X11Display[0] != 0) {
+		parse_DISPLAY_str(name_buf, name_buf_len, port, screen, pvar->settings.X11Display);
+	}
+	else {
+		parse_DISPLAY_str(name_buf, name_buf_len, port, screen, DISPLAY);
+	}
+}
+
 
 X11AuthData FAR *X11_load_local_auth_data(int screen_num)
 {
