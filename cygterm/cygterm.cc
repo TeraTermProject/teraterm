@@ -127,7 +127,7 @@ void msg_print(const char* msg)
 //=========================//
 // Win32-API error message //
 //-------------------------//
-void api_error(const char* string = "")
+void api_error(const char* string = NULL)
 {
     char msg[1024];
     char *ptr = msg;
@@ -144,7 +144,7 @@ void api_error(const char* string = "")
 //=========================//
 // C-runtime error message //
 //-------------------------//
-void c_error(const char* string = "")
+void c_error(const char* string = NULL)
 {
     char msg[1024];
     char *ptr = msg;
