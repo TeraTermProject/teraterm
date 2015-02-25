@@ -113,8 +113,18 @@ You can use the following command line parameters on TTSSH.
       if &lt;listen_addr&gt; is omitted, it listens at localhost.<br>
       &lt;listen_addr&gt; is not used with SSH1 protocol.</dd>
 
-  <dt id="ssh-x">/ssh-X</dt>
-  <dd>X11 port-fowarding</dd>
+  <dt id="ssh-x">/ssh-X[[&lt;host&gt;]:&lt;display&gt;[.&lt;screen&gt;]]</dt>
+  <dd>enable X11 fowarding<br>
+  <!--
+    転送先を指定した場合はその転送先へX11接続を転送する<br>
+    転送先を指定しなかった場合は以下の優先順位で転送先が決定される。
+    <ol>
+      <li>設定ファイルの [TTSSH] セクションの X11Display 設定</li>
+      <li>環境変数 DISPLAY の値</li>
+      <li>localhost:0.0</li>
+    </ol>
+  -->
+  </dd>
 
   <dt id="ssh-noagent">/ssh-A</dt>
   <dd>enable agent forwarding</dd>
@@ -164,6 +174,7 @@ If the value includes the `"' character, the user should write the `"' character
 <pre>
 ttermpro.exe server1:22 /ssh /ssh-L30025:smtpsrv1:25 /ssh-L30110:pop3srv1:110
 ttermpro.exe server2:22 /ssh /ssh-X
+ttermpro.exe server2:22 /ssh /ssh-Xlocalhost:3.0
 ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest
 ttermpro.exe server4:22 /ssh /2 /auth=publickey /user=admin /keyfile=pathofkeyfile /ask4passwd
 ttermpro.exe ssh://user:password@server5/ /auth=password

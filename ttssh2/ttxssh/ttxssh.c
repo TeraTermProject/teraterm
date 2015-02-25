@@ -1636,6 +1636,22 @@ static void percent_decode(char *dst, int dstlen, char *src) {
 	return;
 }
 
+void add_forward_param(PTInstVar pvar, char *param)
+{
+	if (pvar->settings.DefaultForwarding[0] == 0) {
+		strncpy_s(pvar->settings.DefaultForwarding,
+		          sizeof(pvar->settings.DefaultForwarding),
+		          param, _TRUNCATE);
+	} else {
+		strncat_s(pvar->settings.DefaultForwarding,
+		          sizeof(pvar->settings.DefaultForwarding),
+		          ";", _TRUNCATE);
+		strncat_s(pvar->settings.DefaultForwarding,
+		          sizeof(pvar->settings.DefaultForwarding),
+		          param, _TRUNCATE);
+	}
+}
+
 /* returns 1 if the option text must be deleted */
 static int parse_option(PTInstVar pvar, char FAR * option)
 {
@@ -1646,22 +1662,12 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			} else if (MATCH_STR(option + 4, "-L") == 0 ||
 			           MATCH_STR(option + 4, "-R") == 0 ||
 			           _stricmp(option + 4, "-X") == 0) {
-				if (pvar->settings.DefaultForwarding[0] == 0) {
-					strncpy_s(pvar->settings.DefaultForwarding,
-					          sizeof(pvar->settings.DefaultForwarding),
-					          option + 5, _TRUNCATE);
-				} else {
-					strncat_s(pvar->settings.DefaultForwarding,
-					          sizeof(pvar->settings.DefaultForwarding),
-					          ";", _TRUNCATE);
-					strncat_s(pvar->settings.DefaultForwarding,
-					          sizeof(pvar->settings.DefaultForwarding),
-					          option + 5, _TRUNCATE);
-				}
-			} else if (MATCH_STR(option + 4, "-display=") == 0) {
+				add_forward_param(pvar, option+5);
+			} else if (MATCH_STR(option + 4, "-X") == 0) {
+				add_forward_param(pvar, "X");
 				strncpy_s(pvar->settings.X11Display,
 				          sizeof(pvar->settings.X11Display),
-				          option + 13, _TRUNCATE);
+				          option + 6, _TRUNCATE);
 			} else if (MATCH_STR(option + 4, "-f=") == 0) {
 				read_ssh_options_from_user_file(pvar, option + 7);
 			} else if (MATCH_STR(option + 4, "-v") == 0) {
