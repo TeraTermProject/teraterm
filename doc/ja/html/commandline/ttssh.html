@@ -113,10 +113,10 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
       &lt;listen_addr&gt;を省略すると、localhostでリッスンする<br>
       SSH1プロトコルでは&lt;listen_addr&gt;は利用されない</dd>
 
-  <dt id="ssh-x">/ssh-X[[&lt;host&gt;]:&lt;display&gt;[.&lt;screen&gt;]]</dt>
+  <dt id="ssh-x">/ssh-X[[&lt;hostname&gt;]:&lt;displaynumber&gt;[.&lt;screennumber&gt;]]</dt>
   <dd>X11転送を有効にする<br>
-    転送先を指定した場合はその転送先へX11接続を転送する<br>
-    転送先を指定しなかった場合は以下の優先順位で転送先が決定される。
+    転送先ディスプレイを指定した場合は、その転送先へX11接続を転送する。<br>
+    転送先ディスプレイを指定しなかった場合は、以下の優先順位で転送先が決定される。
     <ol>
       <li>設定ファイルの [TTSSH] セクションの X11Display 設定</li>
       <li>環境変数 DISPLAY の値</li>

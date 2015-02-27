@@ -113,17 +113,15 @@ You can use the following command line parameters on TTSSH.
       if &lt;listen_addr&gt; is omitted, it listens at localhost.<br>
       &lt;listen_addr&gt; is not used with SSH1 protocol.</dd>
 
-  <dt id="ssh-x">/ssh-X[[&lt;host&gt;]:&lt;display&gt;[.&lt;screen&gt;]]</dt>
+  <dt id="ssh-x">/ssh-X[[&lt;hostname&gt;]:&lt;displaynumber&gt;[.&lt;screennumber&gt;]]</dt>
   <dd>enable X11 fowarding<br>
-  <!--
-    転送先を指定した場合はその転送先へX11接続を転送する<br>
-    転送先を指定しなかった場合は以下の優先順位で転送先が決定される。
+    When the destination display is specified, the X11 connection is transferred to the display.<br>
+    Or when the display is not specified, the transferred display will be determined.
     <ol>
-      <li>設定ファイルの [TTSSH] セクションの X11Display 設定</li>
-      <li>環境変数 DISPLAY の値</li>
+      <li>The X11Display entry of the [TTSSH] section in the teraterm.ini file</li>
+      <li>The DISPLAY environment variable</li>
       <li>localhost:0.0</li>
     </ol>
-  -->
   </dd>
 
   <dt id="ssh-noagent">/ssh-A</dt>
