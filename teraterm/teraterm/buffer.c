@@ -3801,7 +3801,7 @@ void BuffScrollLeft(int count)
 	for (i = CursorTop; i <= CursorBottom; i++) {
 		Ptr = LPtr + CursorLeftM;
 
-		if (AttrBuff[LPtr + CursorRightM] & AttrKanji) {
+		if (AttrBuff[LPtr+CursorRightM] & AttrKanji) {
 			CodeBuff[LPtr+CursorRightM] = 0x20;
 			AttrBuff[LPtr+CursorRightM] &= ~AttrKanji;
 			if (CursorRightM < NumOfColumns-1) {
@@ -3833,7 +3833,7 @@ void BuffScrollLeft(int count)
 		LPtr = NextLinePtr(LPtr);
 	}
 
-	BuffUpdateRect(CursorLeftM, CursorTop, CursorRightM, CursorBottom);
+	BuffUpdateRect(CursorLeftM-(CursorLeftM>0), CursorTop, CursorRightM+(CursorRightM<NumOfColumns-1), CursorBottom);
 }
 
 void BuffScrollRight(int count)
@@ -3852,10 +3852,10 @@ void BuffScrollRight(int count)
 			CodeBuff[LPtr+CursorRightM+1] = 0x20;
 		}
 
-		if (AttrBuff[Ptr+count-1] & AttrKanji) {
-			CodeBuff[Ptr+count-1] = 0x20;
-			AttrBuff[Ptr+count-1] &= ~AttrKanji;
-			CodeBuff[Ptr+count] = 0x20;
+		if (CursorLeftM > 0 && AttrBuff[Ptr-1] & AttrKanji) {
+			CodeBuff[Ptr-1] = 0x20;
+			AttrBuff[Ptr-1] &= ~AttrKanji;
+			CodeBuff[Ptr] = 0x20;
 		}
 
 		memmove(&(CodeBuff[Ptr+count]),   &(CodeBuff[Ptr]),   MoveLen);
@@ -3870,7 +3870,7 @@ void BuffScrollRight(int count)
 		memset(&(AttrBuffFG[Ptr]), AttrDefaultFG, count);
 		memset(&(AttrBuffBG[Ptr]), AttrDefaultBG, count);
 
-		if (AttrBuff[LPtr + CursorRightM] & AttrKanji) {
+		if (AttrBuff[LPtr+CursorRightM] & AttrKanji) {
 			CodeBuff[LPtr+CursorRightM] = 0x20;
 			AttrBuff[LPtr+CursorRightM] &= ~AttrKanji;
 		}
@@ -3878,7 +3878,7 @@ void BuffScrollRight(int count)
 		LPtr = NextLinePtr(LPtr);
 	}
 
-	BuffUpdateRect(CursorLeftM, CursorTop, CursorRightM, CursorBottom);
+	BuffUpdateRect(CursorLeftM-(CursorLeftM>0), CursorTop, CursorRightM+(CursorRightM<NumOfColumns-1), CursorBottom);
 }
 
 // 現在行をまるごとバッファに格納する。返り値は現在のカーソル位置(X)。
