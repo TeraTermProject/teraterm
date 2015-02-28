@@ -167,7 +167,7 @@ BEGIN
             VALUE "FileDescription", "TTPMACRO"
             VALUE "FileVersion", "4, 86, 0, 0"
             VALUE "InternalName", "TTPMACRO"
-            VALUE "LegalCopyright", "Copyright (C) TeraTerm Project 2004-2014, T. Teranishi 1994-1998"
+            VALUE "LegalCopyright", "Copyright (C) TeraTerm Project 2004-2015, T. Teranishi 1994-1998"
             VALUE "OriginalFilename", "TTPMACRO.EXE"
             VALUE "ProductName", "TTPMACRO"
             VALUE "ProductVersion", "4, 86, 0, 0"
