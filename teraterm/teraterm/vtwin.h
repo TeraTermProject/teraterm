@@ -164,6 +164,7 @@ protected:
 	afx_msg void OnSetupGeneral();
 	afx_msg void OnSetupSave();
 	afx_msg void OnSetupRestore();
+	afx_msg void OnOpenSetupDirectory();
 	afx_msg void OnSetupLoadKeyMap();
 	afx_msg void OnControlResetTerminal();
 	afx_msg void OnControlResetRemoteTitle();

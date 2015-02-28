@@ -420,6 +420,7 @@ Menu command                        ID
 [Setup] Additional settings         50375
 [Setup] Save setup                  50380
 [Setup] Restore setup               50390
+[Setup] Setup directory             50391
 [Setup] Load key map                50395
 [Control] Reset terminal            50410
 [Control] Are you there             50420

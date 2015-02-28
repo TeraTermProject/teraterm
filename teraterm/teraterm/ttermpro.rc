@@ -16,10 +16,8 @@
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -262,7 +260,7 @@ BEGIN
     LTEXT           "Elapsed time:",IDC_PROT_ELAPSED,12,48,46,8
     RTEXT           "",IDC_PROTOELAPSEDTIME,60,48,70,8
     RTEXT           "",IDC_PROTOPERCENT,104,61,26,8,0,WS_EX_TRANSPARENT
-    CONTROL         "",IDC_PROTOPROGRESS,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER | 0x1,12,58,92,14,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_PROTOPROGRESS,"msctls_progress32",PBS_SMOOTH | NOT WS_VISIBLE | WS_BORDER,12,58,92,14,WS_EX_TRANSPARENT
     DEFPUSHBUTTON   "Cancel",IDCANCEL,51,77,40,14
 END
 
@@ -283,7 +281,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DAD_DIALOG, DIALOG
     BEGIN
@@ -455,7 +453,7 @@ END
 // Menu
 //
 
-IDR_MENU MENU 
+IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -541,6 +539,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Save setup...",              ID_SETUP_SAVE
         MENUITEM "&Restore setup...",           ID_SETUP_RESTORE
+        MENUITEM "Setup d&irectory...",         ID_OPEN_SETUP
         MENUITEM SEPARATOR
         MENUITEM "&Load key map...",            ID_SETUP_LOADKEYMAP
     END
@@ -568,7 +567,7 @@ BEGIN
     END
 END
 
-IDR_TEKMENU MENU 
+IDR_TEKMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -599,7 +598,7 @@ BEGIN
     END
 END
 
-IDR_PASTEMENU MENU 
+IDR_PASTEMENU MENU
 BEGIN
     MENUITEM "&Paste",                      ID_EDIT_PASTE2
     MENUITEM "Paste<C&R>",                  ID_EDIT_PASTECR
@@ -611,7 +610,7 @@ END
 // Accelerator
 //
 
-IDR_ACC ACCELERATORS 
+IDR_ACC ACCELERATORS
 BEGIN
     "T",            ID_ACC_AREYOUTHERE,     VIRTKEY, ALT, NOINVERT
     "C",            ID_ACC_COPY,            VIRTKEY, ALT, NOINVERT

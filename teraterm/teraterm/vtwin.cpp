@@ -197,6 +197,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_SETUP_GENERAL, OnSetupGeneral)
 	ON_COMMAND(ID_SETUP_SAVE, OnSetupSave)
 	ON_COMMAND(ID_SETUP_RESTORE, OnSetupRestore)
+	ON_COMMAND(ID_OPEN_SETUP, OnOpenSetupDirectory)
 	ON_COMMAND(ID_SETUP_LOADKEYMAP, OnSetupLoadKeyMap)
 	ON_COMMAND(ID_CONTROL_RESETTERMINAL, OnControlResetTerminal)
 	ON_COMMAND(ID_CONTROL_RESETREMOTETITLE, OnControlResetRemoteTitle)
@@ -1207,6 +1208,9 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	GetMenuString(SetupMenu, ID_SETUP_RESTORE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_SETUP_RESTORE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(SetupMenu, ID_SETUP_RESTORE, MF_BYCOMMAND, ID_SETUP_RESTORE, ts.UIMsg);
+	GetMenuString(SetupMenu, ID_OPEN_SETUP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
+	get_lang_msg("MENU_OPEN_SETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	ModifyMenu(SetupMenu, ID_OPEN_SETUP, MF_BYCOMMAND, ID_OPEN_SETUP, ts.UIMsg);
 	GetMenuString(SetupMenu, ID_SETUP_LOADKEYMAP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_SETUP_LOADKEYMAP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(SetupMenu, ID_SETUP_LOADKEYMAP, MF_BYCOMMAND, ID_SETUP_LOADKEYMAP, ts.UIMsg);
@@ -4521,6 +4525,71 @@ void CVTWindow::OnSetupRestore()
 		RestoreSetup();
 	}
 }
+
+
+//
+// エクスプローラでパスを開く。
+//
+// return TRUE: success
+//        FALSE: failure
+//
+static BOOL openDirectoryWithExplorer(char *path, int pathlen)
+{
+	LPSHELLFOLDER pDesktopFolder;
+	LPMALLOC pMalloc;
+	LPITEMIDLIST pIDL;
+	WCHAR pwszDisplayName[1024];
+	size_t szRet, DisplayNameMax;
+	SHELLEXECUTEINFO si;
+	BOOL ret = FALSE;
+
+	DisplayNameMax = sizeof(pwszDisplayName) / sizeof(pwszDisplayName[0]);
+
+	if (SHGetDesktopFolder(&pDesktopFolder) == S_OK) {
+		if (SHGetMalloc(&pMalloc) == S_OK) {
+			szRet = mbstowcs(pwszDisplayName, path, DisplayNameMax - 1);
+			if (szRet != -1) {
+				pwszDisplayName[szRet] = L'\0';
+
+				if (pDesktopFolder->ParseDisplayName(NULL, NULL, pwszDisplayName, NULL, &pIDL, NULL) == S_OK) {
+					::ZeroMemory(&si, sizeof(si));
+					si.cbSize = sizeof(si);
+					si.fMask = SEE_MASK_IDLIST;
+					si.lpVerb = _T("open");
+					si.lpIDList = pIDL;
+					si.nShow = SW_SHOWNORMAL;
+					::ShellExecuteEx(&si);
+					pMalloc->Free((void*)pIDL);
+
+					ret = TRUE;
+				}
+
+			}
+			pMalloc->Release();
+		}
+		pDesktopFolder->Release();
+	}
+
+	return (ret);
+}
+
+
+//
+// 現在読み込まれている teraterm.ini ファイルが格納されている
+// フォルダをエクスプローラで開く。
+//
+// (2015.2.28 yutaka)
+//
+void CVTWindow::OnOpenSetupDirectory()
+{
+	char path[MAX_PATH];
+
+	// 設定ファイルのパスを取得する。
+	ExtractDirName(ts.SetupFName, path);
+
+	openDirectoryWithExplorer(path, sizeof(path));
+}
+
 
 void CVTWindow::OnSetupLoadKeyMap()
 {

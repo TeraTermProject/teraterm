@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by c:\usr\ttssh2\trunk\teraterm\teraterm\ttermpro.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// C:\usr\ttssh2\trunk\teraterm\teraterm\ttermpro.rc で使用
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -236,6 +236,7 @@
 #define ID_SETUP_ADDITIONALSETTINGS     50375
 #define ID_SETUP_SAVE                   50380
 #define ID_SETUP_RESTORE                50390
+#define ID_OPEN_SETUP                   50391
 #define ID_SETUP_LOADKEYMAP             50395
 #define ID_CONTROL_RESETTERMINAL        50410
 #define ID_CONTROL_RESETREMOTETITLE     50411

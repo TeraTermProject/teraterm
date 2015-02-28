@@ -60,6 +60,7 @@ MENU_SETUP_GENERAL=&Grundeinstellungen
 MENU_SETUP_ADDITION=&Erweiterte Einstellungen
 MENU_SETUP_SAVE=&Setup sichern
 MENU_SETUP_RESTORE=&Setup laden
+MENU_OPEN_SETUP=Setup d&irectory...
 MENU_SETUP_LOADKEYMAP=&Keyboard-Layout einstellen
 
 MENU_CONTROL=Ste&uerung
