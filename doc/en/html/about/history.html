@@ -30,7 +30,7 @@
 <hr>
 
 <h2><a name="teraterm">Tera Term</a></h2>
-<h3><a name="teraterm_4.86">2015.xx.xx (Ver 4.86) not released</a></h3>
+<h3><a name="teraterm_4.86">2015.02.28 (Ver 4.86)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>
@@ -44,12 +44,12 @@
 
   <li>Bug fixes
     <ul>
+      <li>When the DECBI control sequence is used on the left of the screen, the wide character of the left screen will be incorrectly removed.</li>
       <li>The KEYBOARD.CNF file can not be loaded when the Tera Term is performed with the macro script.</li>
       <li>YMODEM: When the data is sent, the CANCEL command from the remote host does not work well.</li>
       <li>YMODEM: When the received file information contains only a file name, an end of the file name is broken.</li>
       <li>YMODEM: When the received file information does not include the file size, the file data can not be recorded well.</li>
       <li>The setting value of the <a href="../menu/setup-additional.html#logrotate">Log Rotate</a> will not display well.</li>
-      <li>When the DECBI control sequence is used on the left of the screen, the wide character of the left screen will be incorrectly removed.</li>
       <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> marco command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
       <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be resizable.</li>
     </ul>
@@ -2548,7 +2548,7 @@ SYNOPSIS:
 
 <h2><a name="ttssh">TTSSH</a></h2>
 
-<h3><a name="ttssh_2.72">2015.xx.xx (Ver 2.72)</a></h3>
+<h3><a name="ttssh_2.72">2015.02.28 (Ver 2.72)</a></h3>
 <ul class="history">
   <li>Changes
     <ul>

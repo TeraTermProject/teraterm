@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// ttpmacro.rc で使用
+// Microsoft Visual C++ generated include file.
+// Used by ttpmacro.rc
 //
 #define IDD_CTRLWIN                     100
 #define IDI_TTMACRO                     100
