@@ -4575,6 +4575,91 @@ static BOOL openDirectoryWithExplorer(char *path, int pathlen)
 
 
 //
+// Virtual Storeを開く。
+//
+// return TRUE: success
+//        FALSE: failure
+//
+static BOOL openVirtualStore(char *path, int pathlen)
+{
+	BOOL ret = FALSE;
+	char *s, **p;
+	char *virstore_env[] = {
+		"ProgramFiles",
+		"ProgramData",
+		"SystemRoot",
+		NULL
+	};
+	char shPath[1024] = "";
+	LPITEMIDLIST pidl;
+	int CSIDL;
+	OSVERSIONINFO osvi;
+	HANDLE          hToken;
+	DWORD           dwLength;
+	TOKEN_ELEVATION tokenElevation;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	// Windows Vista以前は無視する。
+	if (!(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6))
+		goto error;
+
+	// TODO: UACが有効かどうか。
+	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
+
+	// UACが有効時、プロセスが管理者権限に昇格しているか。
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
+		if (GetTokenInformation(hToken, TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
+			// (0は昇格していない、非0は昇格している)。
+			if (tokenElevation.TokenIsElevated != 0) {
+				// 管理者権限を持っているのであれば、Virtual Storeは働かない。
+				CloseHandle(hToken);
+				goto error;
+			}
+		}
+		CloseHandle(hToken);
+	}
+
+	// Virtual Store対象となるフォルダか。
+	p = virstore_env;
+	while (*p) {
+		s = getenv(*p);
+		if (s != NULL && strstr(path, s) != NULL) {
+			break;
+		}
+		p++;
+	}
+	if (*p == NULL)
+		goto error;
+
+	CSIDL = CSIDL_LOCAL_APPDATA;
+	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
+		goto error;
+	}
+	SHGetPathFromIDList(pidl, shPath);
+	CoTaskMemFree(pidl);
+
+	// Virtual Storeパスを作る。
+	strncat_s(shPath, sizeof(shPath), "\\VirtualStore", _TRUNCATE);
+
+	// 不要なドライブレターを除去する。
+	// ドライブレターは一文字とは限らない点に注意。
+	s = strstr(path, ":\\");
+	if (s != NULL) {
+		strncat_s(shPath, sizeof(shPath), s+1, _TRUNCATE);
+	}
+	openDirectoryWithExplorer(shPath, sizeof(shPath));
+
+	ret = TRUE;
+	return (ret);
+
+error:
+	openDirectoryWithExplorer(path, sizeof(path));
+
+	return (ret);
+}
+
+//
 // 現在読み込まれている teraterm.ini ファイルが格納されている
 // フォルダをエクスプローラで開く。
 //
@@ -4582,12 +4667,30 @@ static BOOL openDirectoryWithExplorer(char *path, int pathlen)
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	char path[MAX_PATH];
+	char path[MAX_PATH], inipath[MAX_PATH];
+//	char Temp[MAX_PATH];
 
-	// 設定ファイルのパスを取得する。
-	ExtractDirName(ts.SetupFName, path);
+	// 設定ファイル(teraterm.ini)のパスを取得する。
+	ExtractDirName(ts.SetupFName, inipath);
+	openDirectoryWithExplorer(inipath, sizeof(inipath));
+	//openVirtualStore(inipath, sizeof(inipath));
 
-	openDirectoryWithExplorer(path, sizeof(path));
+#if 0
+	// cygterm.cfg
+	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) != 0) {
+		ExtractDirName(Temp, path);
+		// teraterm.iniと異なるパスの場合、新しく開く。
+		if (strcmp(inipath, path) != 0) {
+			openVirtualStore(path, sizeof(path));
+		}
+	}
+
+	// KEYBOARD.CNF
+	//ExtractDirName(ts.KeyCnfFN, path);
+	//openDirectoryWithExplorer(path, sizeof(path));
+
+	// ssh_known_hosts
+#endif
 }
 
 
