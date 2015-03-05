@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\libs\putty\WINDOWS\WINPGNTC.C">
       <Filter>Putty Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\putty\WINDOWS\WINSECUR.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
     <ClCompile Include="libputty.c" />
   </ItemGroup>
   <ItemGroup>

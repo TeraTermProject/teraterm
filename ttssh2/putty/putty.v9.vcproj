@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libs\putty\WINDOWS\WINSECUR.C"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libs\putty\WINDOWS\WINSTUFF.H"
 				>
 			</File>

@@ -76,6 +76,7 @@
     <ClCompile Include="..\..\libs\putty\TREE234.C" />
     <ClCompile Include="..\..\libs\putty\WINDOWS\WINMISC.C" />
     <ClCompile Include="..\..\libs\putty\WINDOWS\WINPGNTC.C" />
+    <ClCompile Include="..\..\libs\putty\WINDOWS\WINSECUR.C" />
     <ClCompile Include="libputty.c" />
   </ItemGroup>
   <ItemGroup>
