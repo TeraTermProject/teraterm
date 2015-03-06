@@ -1,7 +1,7 @@
 body { 
 	margin: 5ex;
 	background: rgb(255, 255, 240);
-	font-family: "MS US Gothic";
+	font-family: 'Segoe UI', 'MS Sans Serif', Helvetica, Verdana, sans-serif, 'MS US Gothic';
 }
 
 h1 {
