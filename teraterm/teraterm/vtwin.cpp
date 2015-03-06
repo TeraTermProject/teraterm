@@ -4700,6 +4700,112 @@ error:
 	return (ret);
 }
 
+
+static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	static char teratermexepath[MAX_PATH];
+	static char inipath[MAX_PATH], inifilename[MAX_PATH];
+	static char keycnfpath[MAX_PATH], keycnffilename[MAX_PATH];
+	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH];
+	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH];
+	static char eterm2path[MAX_PATH], eterm2filename[MAX_PATH];
+	static char eterm3path[MAX_PATH], eterm3filename[MAX_PATH];
+	char temp[MAX_PATH];
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		if (GetModuleFileName(NULL, temp, sizeof(temp)) != 0) {
+			ExtractDirName(temp, teratermexepath);
+		}
+
+		// 設定ファイル(teraterm.ini)のパスを取得する。
+		ExtractFileName(ts.SetupFName, inifilename, sizeof(inifilename));
+		ExtractDirName(ts.SetupFName, inipath);
+		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, inifilename);
+		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT, inipath);
+
+		// 設定ファイル(KEYBOARD.CNF)のパスを取得する。
+		ExtractFileName(ts.KeyCnfFN, keycnffilename, sizeof(keycnfpath));
+		ExtractDirName(ts.KeyCnfFN, keycnfpath);
+		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC, keycnffilename);
+		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, keycnfpath);
+
+		// cygterm.cfg は ttermpro.exe 配下に位置する。
+		strncpy_s(cygtermfilename, sizeof(cygtermfilename), "cygterm.cfg", _TRUNCATE);
+		strncpy_s(cygtermpath, sizeof(cygtermpath), teratermexepath, _TRUNCATE);
+		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, cygtermfilename);
+		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, cygtermpath);
+
+		// TODO: Eterm look-feel 関連は BGThemeFile エントリから取得する。
+		strncpy_s(eterm1filename, sizeof(eterm1filename), "ImageFile.INI", _TRUNCATE);
+		_snprintf_s(eterm1path, sizeof(eterm1path), "%s\\theme", teratermexepath);
+		SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_STATIC, eterm1filename);
+		SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_EDIT, eterm1path);
+
+		strncpy_s(eterm2filename, sizeof(eterm2filename), "Scale.INI", _TRUNCATE);
+		_snprintf_s(eterm2path, sizeof(eterm2path), "%s\\theme", teratermexepath);
+		SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_STATIC, eterm2filename);
+		SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_EDIT, eterm2path);
+
+		strncpy_s(eterm3filename, sizeof(eterm3filename), "Tile.INI", _TRUNCATE);
+		_snprintf_s(eterm3path, sizeof(eterm3path), "%s\\theme", teratermexepath);
+		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_STATIC, eterm3filename);
+		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_EDIT, eterm3path);
+
+		// TODO: ssh_known_hosts
+
+
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wp)) {
+		case IDC_INI_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			openVirtualStore(inipath, inifilename);
+			return TRUE;
+
+		case IDC_KEYCNF_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			openVirtualStore(keycnfpath, keycnfpath);
+			return TRUE;
+
+		case IDC_CYGTERM_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			openVirtualStore(cygtermpath, cygtermfilename);
+			return TRUE;
+
+		case IDC_ETERM1_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			openVirtualStore(eterm1path, eterm1filename);
+			return TRUE;
+
+		case IDC_ETERM2_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			openVirtualStore(eterm2path, eterm2filename);
+			return TRUE;
+
+		case IDC_ETERM3_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			openVirtualStore(eterm3path, eterm3filename);
+			return TRUE;
+
+		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
+			// TODO:
+			return TRUE;
+
+		case IDCANCEL:
+			EndDialog(hDlgWnd, IDCANCEL);
+			break;
+
+		default:
+			return FALSE;
+		}
+
+	case WM_CLOSE:
+		EndDialog(hDlgWnd, 0);
+		return TRUE;
+
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
+
+
 //
 // 現在読み込まれている teraterm.ini ファイルが格納されている
 // フォルダをエクスプローラで開く。
@@ -4708,31 +4814,11 @@ error:
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	char path[MAX_PATH], inipath[MAX_PATH];
-	char filename[MAX_PATH];
+	int ret;
 
-	// 設定ファイル(teraterm.ini)のパスを取得する。
-	ExtractFileName(ts.SetupFName, filename, sizeof(filename));
-	ExtractDirName(ts.SetupFName, inipath);
-	//strcpy(inipath, "C:\\Program Files (x86)\\teraterm");
-	openVirtualStore(inipath, filename);
+	ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
+		HVTWin, (DLGPROC)OnSetupDirectoryDlgProc);
 
-#if 0
-	// cygterm.cfg
-	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) != 0) {
-		ExtractDirName(Temp, path);
-		// teraterm.iniと異なるパスの場合、新しく開く。
-		if (strcmp(inipath, path) != 0) {
-			openVirtualStore(path, sizeof(path));
-		}
-	}
-
-	// KEYBOARD.CNF
-	//ExtractDirName(ts.KeyCnfFN, path);
-	//openDirectoryWithExplorer(path, sizeof(path));
-
-	// ssh_known_hosts
-#endif
 }
 
 

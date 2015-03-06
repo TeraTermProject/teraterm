@@ -22,6 +22,7 @@
 #define IDD_CLIPBOARD_DIALOG            120
 #define IDD_TABSHEET_SEQUENCE           121
 #define IDD_DAD_DIALOG                  122
+#define IDD_SETUP_DIR_DIALOG            123
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -133,16 +134,23 @@
 #define IDC_SCP_PATH                    2510
 #define IDC_BGIMG_EDIT                  2510
 #define IDC_ROTATE_SIZE                 2510
+#define IDC_INI_SETUPDIR_EDIT           2510
+#define IDC_KEYCNF_SETUPDIR_EDIT        2511
 #define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
 #define IDC_LOG_ROTATE                  2512
 #define IDC_BGIMG_CHECK                 2512
+#define IDC_CYGTERM_SETUPDIR_EDIT       2512
 #define IDC_MOUSEWHEEL_SCROLL_LINE      2513
 #define IDC_WINDOW_CTRL                 2513
+#define IDC_ETERM1_SETUPDIR_EDIT        2513
 #define IDC_TRANSPROGRESS               2514
 #define IDC_WINDOW_REPORT               2514
+#define IDC_ETERM2_SETUPDIR_EDIT        2514
 #define IDC_PROTOPROGRESS               2515
+#define IDC_ETERM3_SETUPDIR_EDIT        2515
+#define IDC_SSH_SETUPDIR_EDIT           2516
 #define IDC_ACCEPT_TITLE_CHANGING_LABEL 2517
 #define IDC_PASTEDELAY_LABEL            2518
 #define IDC_TITLE_REPORT_LABEL          2518
@@ -162,14 +170,22 @@
 #define IDC_TRANS_ETIME                 2528
 #define IDC_BUTTON1                     2528
 #define IDC_BGIMG_BUTTON                2528
+#define IDC_INI_SETUPDIR_BUTTON         2528
 #define IDC_CLIPBOARD_ACCESS_LABEL      2529
 #define IDC_ROTATE_SIZE_TYPE            2529
+#define IDC_KEYCNF_SETUPDIR_BUTTON      2529
 #define IDC_CLIPBOARD_ACCESS            2530
 #define IDC_ROTATE_STEP                 2530
+#define IDC_CYGTERM_SETUPDIR_BUTTON     2530
 #define IDC_ROTATE_STEP_TEXT            2531
+#define IDC_ETERM1_SETUPDIR_BUTTON      2531
 #define IDC_ROTATE_SIZE_TEXT            2532
+#define IDC_ETERM2_SETUPDIR_BUTTON      2532
 #define IDC_ROTATE_GROUP                2533
+#define IDC_ETERM3_SETUPDIR_BUTTON      2533
 #define IDC_LOG_OPTION_GROUP            2534
+#define IDC_SSH_BUTTON                  2534
+#define IDC_SSH_SETUPDIR_BUTTON         2534
 #define IDC_OPT_BINARY                  2535
 #define IDC_OPT_APPEND                  2536
 #define IDC_OPT_PLAINTEXT               2537
@@ -177,6 +193,13 @@
 #define IDC_OPT_HIDEDLG                 2539
 #define IDC_CHECK7                      2540
 #define IDC_OPT_INCBUF                  2540
+#define IDC_INI_SETUPDIR_STATIC         2541
+#define IDC_KEYCNF_SETUPDIR_STATIC      2542
+#define IDC_CYGTERM_SETUPDIR_STATIC     2543
+#define IDC_ETERM1_SETUPDIR_STATIC      2544
+#define IDC_ETERM2_SETUPDIR_STATIC      2545
+#define IDC_ETERM3_SETUPDIR_STATIC      2546
+#define IDC_SSH_SETUPDIR_STATIC         2547
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -272,9 +295,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_RESOURCE_VALUE        124
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2541
+#define _APS_NEXT_CONTROL_VALUE         2548
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

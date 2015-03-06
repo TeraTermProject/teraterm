@@ -13,6 +13,69 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETUP_DIR_DIALOG DIALOGEX 0, 0, 385, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Setup directory"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "TERATERM.INI",IDC_INI_SETUPDIR_STATIC,7,18,49,8
+    EDITTEXT        IDC_INI_SETUPDIR_EDIT,73,16,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_INI_SETUPDIR_BUTTON,338,16,26,14
+    LTEXT           "KEYBOARD.CNF",IDC_KEYCNF_SETUPDIR_STATIC,7,38,52,8
+    EDITTEXT        IDC_KEYCNF_SETUPDIR_EDIT,73,37,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_KEYCNF_SETUPDIR_BUTTON,338,37,26,14
+    LTEXT           "cygterm.cfg",IDC_CYGTERM_SETUPDIR_STATIC,7,59,40,8
+    EDITTEXT        IDC_CYGTERM_SETUPDIR_EDIT,73,58,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_CYGTERM_SETUPDIR_BUTTON,338,58,26,14
+    LTEXT           "ImageFile.INI",IDC_ETERM1_SETUPDIR_STATIC,7,81,44,8
+    EDITTEXT        IDC_ETERM1_SETUPDIR_EDIT,73,80,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_ETERM1_SETUPDIR_BUTTON,338,80,26,14
+    LTEXT           "Scale.INI",IDC_ETERM2_SETUPDIR_STATIC,7,103,30,8
+    EDITTEXT        IDC_ETERM2_SETUPDIR_EDIT,73,102,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_ETERM2_SETUPDIR_BUTTON,338,102,26,14
+    LTEXT           "Tile.INI",IDC_ETERM3_SETUPDIR_STATIC,7,127,24,8
+    EDITTEXT        IDC_ETERM3_SETUPDIR_EDIT,73,126,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_ETERM3_SETUPDIR_BUTTON,338,126,26,14
+    LTEXT           "ssh_known_hosts",IDC_SSH_SETUPDIR_STATIC,9,151,58,8
+    EDITTEXT        IDC_SSH_SETUPDIR_EDIT,73,150,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_SSH_SETUPDIR_BUTTON,338,150,26,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SETUP_DIR_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 378
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 175
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
