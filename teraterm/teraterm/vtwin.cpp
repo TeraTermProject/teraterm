@@ -4580,9 +4580,10 @@ static BOOL openDirectoryWithExplorer(char *path, int pathlen)
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openVirtualStore(char *path, int pathlen)
+static BOOL openVirtualStore(char *path, char *filename)
 {
 	BOOL ret = FALSE;
+	int flag = 0;
 	char *s, **p;
 	char *virstore_env[] = {
 		"ProgramFiles",
@@ -4591,12 +4592,19 @@ static BOOL openVirtualStore(char *path, int pathlen)
 		NULL
 	};
 	char shPath[1024] = "";
+	char shFullPath[1024] = "";
 	LPITEMIDLIST pidl;
 	int CSIDL;
 	OSVERSIONINFO osvi;
 	HANDLE          hToken;
 	DWORD           dwLength;
 	TOKEN_ELEVATION tokenElevation;
+	LONG lRet;
+	HKEY hKey;
+	TCHAR lpData[256];
+	DWORD dwDataSize;
+	DWORD dwType;
+	BYTE bValue;
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
@@ -4604,21 +4612,47 @@ static BOOL openVirtualStore(char *path, int pathlen)
 	if (!(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6))
 		goto error;
 
-	// TODO: UACが有効かどうか。
+	// UACが有効かどうか。
 	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
+	flag = 0;
+	lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+		TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"),
+		NULL, KEY_QUERY_VALUE, &hKey
+		);
+	if (lRet == ERROR_SUCCESS) {
+		dwDataSize = sizeof(lpData) / sizeof(lpData[0]);
+		lRet = RegQueryValueEx(
+			hKey,
+			TEXT("EnableLUA"),
+			0,
+			&dwType,
+			(LPBYTE)lpData,
+			&dwDataSize);
+		if (lRet == ERROR_SUCCESS) {
+			bValue = ((LPBYTE)lpData)[0];
+			if (bValue == 1)
+				// UACが有効の場合、Virtual Storeが働く。
+				flag = 1;
+		}
+		RegCloseKey(hKey);
+	}
+	if (flag == 0)
+		goto error;
 
 	// UACが有効時、プロセスが管理者権限に昇格しているか。
+	flag = 0;
 	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
 		if (GetTokenInformation(hToken, TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
 			// (0は昇格していない、非0は昇格している)。
-			if (tokenElevation.TokenIsElevated != 0) {
-				// 管理者権限を持っているのであれば、Virtual Storeは働かない。
-				CloseHandle(hToken);
-				goto error;
+			if (tokenElevation.TokenIsElevated == 0) {
+				// 管理者権限を持っていなければ、Virtual Storeが働く。
+				flag = 1;
 			}
 		}
 		CloseHandle(hToken);
 	}
+	if (flag == 0)
+		goto error;
 
 	// Virtual Store対象となるフォルダか。
 	p = virstore_env;
@@ -4648,6 +4682,13 @@ static BOOL openVirtualStore(char *path, int pathlen)
 	if (s != NULL) {
 		strncat_s(shPath, sizeof(shPath), s+1, _TRUNCATE);
 	}
+
+	// 最後に、Virtual Storeにファイルがあるかどうかを調べる。
+	_snprintf_s(shFullPath, sizeof(shFullPath), "%s\\%s", shPath, filename);
+	if (_access(shFullPath, 0) != 0) {
+		goto error;
+	}
+
 	openDirectoryWithExplorer(shPath, sizeof(shPath));
 
 	ret = TRUE;
@@ -4668,12 +4709,13 @@ error:
 void CVTWindow::OnOpenSetupDirectory()
 {
 	char path[MAX_PATH], inipath[MAX_PATH];
-//	char Temp[MAX_PATH];
+	char filename[MAX_PATH];
 
 	// 設定ファイル(teraterm.ini)のパスを取得する。
+	ExtractFileName(ts.SetupFName, filename, sizeof(filename));
 	ExtractDirName(ts.SetupFName, inipath);
-	openDirectoryWithExplorer(inipath, sizeof(inipath));
-	//openVirtualStore(inipath, sizeof(inipath));
+	//strcpy(inipath, "C:\\Program Files (x86)\\teraterm");
+	openVirtualStore(inipath, filename);
 
 #if 0
 	// cygterm.cfg
