@@ -4728,36 +4728,40 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		// 設定ファイル(teraterm.ini)のパスを取得する。
 		ExtractFileName(ts.SetupFName, inifilename, sizeof(inifilename));
 		ExtractDirName(ts.SetupFName, inipath);
-		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, inifilename);
-		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT, inipath);
+		//SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, inifilename);
+		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT, ts.SetupFName);
 
 		// 設定ファイル(KEYBOARD.CNF)のパスを取得する。
 		ExtractFileName(ts.KeyCnfFN, keycnffilename, sizeof(keycnfpath));
 		ExtractDirName(ts.KeyCnfFN, keycnfpath);
-		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC, keycnffilename);
-		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, keycnfpath);
+		//SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC, keycnffilename);
+		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, ts.KeyCnfFN);
 
 		// cygterm.cfg は ttermpro.exe 配下に位置する。
 		strncpy_s(cygtermfilename, sizeof(cygtermfilename), "cygterm.cfg", _TRUNCATE);
 		strncpy_s(cygtermpath, sizeof(cygtermpath), teratermexepath, _TRUNCATE);
-		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, cygtermfilename);
-		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, cygtermpath);
+		//SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, cygtermfilename);
+		_snprintf_s(temp, sizeof(temp), "%s\\%s", cygtermpath, cygtermfilename);
+		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, temp);
 
 		// TODO: Eterm look-feel 関連は BGThemeFile エントリから取得する。
 		strncpy_s(eterm1filename, sizeof(eterm1filename), "ImageFile.INI", _TRUNCATE);
 		_snprintf_s(eterm1path, sizeof(eterm1path), "%s\\theme", teratermexepath);
-		SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_STATIC, eterm1filename);
-		SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_EDIT, eterm1path);
+		//SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_STATIC, eterm1filename);
+		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm1path, eterm1filename);
+		SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_EDIT, temp);
 
 		strncpy_s(eterm2filename, sizeof(eterm2filename), "Scale.INI", _TRUNCATE);
 		_snprintf_s(eterm2path, sizeof(eterm2path), "%s\\theme", teratermexepath);
-		SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_STATIC, eterm2filename);
-		SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_EDIT, eterm2path);
+		//SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_STATIC, eterm2filename);
+		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm2path, eterm2filename);
+		SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_EDIT, temp);
 
 		strncpy_s(eterm3filename, sizeof(eterm3filename), "Tile.INI", _TRUNCATE);
 		_snprintf_s(eterm3path, sizeof(eterm3path), "%s\\theme", teratermexepath);
-		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_STATIC, eterm3filename);
-		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_EDIT, eterm3path);
+		//SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_STATIC, eterm3filename);
+		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm3path, eterm3filename);
+		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_EDIT, temp);
 
 		// TODO: ssh_known_hosts
 
