@@ -4582,6 +4582,13 @@ static BOOL openDirectoryWithExplorer(char *path, int pathlen)
 //
 static BOOL openVirtualStore(char *path, char *filename)
 {
+#if _MSC_VER == 1400
+	typedef struct _TOKEN_ELEVATION {
+		DWORD TokenIsElevated;
+	} TOKEN_ELEVATION, *PTOKEN_ELEVATION;
+	int TokenElevation = 20;
+#endif
+
 	BOOL ret = FALSE;
 	int flag = 0;
 	char *s, **p;
@@ -4642,7 +4649,7 @@ static BOOL openVirtualStore(char *path, char *filename)
 	// UACが有効時、プロセスが管理者権限に昇格しているか。
 	flag = 0;
 	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
-		if (GetTokenInformation(hToken, TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
+		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
 			// (0は昇格していない、非0は昇格している)。
 			if (tokenElevation.TokenIsElevated == 0) {
 				// 管理者権限を持っていなければ、Virtual Storeが働く。
