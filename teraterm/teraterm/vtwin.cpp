@@ -4718,6 +4718,10 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	static char eterm2path[MAX_PATH], eterm2filename[MAX_PATH];
 	static char eterm3path[MAX_PATH], eterm3filename[MAX_PATH];
 	char temp[MAX_PATH];
+	typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
+	PSSH_read_known_hosts_file func = NULL;
+	HMODULE h = NULL;
+	static char hostsfilepath[MAX_PATH], hostsfilename[MAX_PATH];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -4763,8 +4767,20 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm3path, eterm3filename);
 		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_EDIT, temp);
 
-		// TODO: ssh_known_hosts
-
+		// ssh_known_hosts
+		if (func == NULL) {
+			if (((h = GetModuleHandle("ttxssh.dll")) != NULL)) {
+				func = (PSSH_read_known_hosts_file)GetProcAddress(h, "TTXReadKnownHostsFile");
+				if (func) {
+					int ret = func(hostsfilename, sizeof(hostsfilename));
+					if (ret) {
+						strncpy_s(hostsfilepath, sizeof(hostsfilepath), teratermexepath, _TRUNCATE);
+						_snprintf_s(temp, sizeof(temp), "%s\\%s", hostsfilepath, hostsfilename);
+						SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, temp);
+					}
+				}
+			}
+		}
 
 		return TRUE;
 
@@ -4795,7 +4811,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			return TRUE;
 
 		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			// TODO:
+			openVirtualStore(hostsfilepath, hostsfilename);
 			return TRUE;
 
 		case IDCANCEL:

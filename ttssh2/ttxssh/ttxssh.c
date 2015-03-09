@@ -4148,6 +4148,30 @@ __declspec(dllexport) int CALLBACK TTXScpReceivefile(char *remotefile, char *loc
 	return SSH_scp_transaction(pvar, remotefile, localfile, FROMREMOTE);
 }
 
+
+// TTSSH‚ÌÝ’è“à—e(known hosts file)‚ð•Ô‚·B
+//
+// return TRUE: •Ô‹p¬Œ÷
+//        FALSE: Ž¸”s
+// (2015.3.9 yutaka)
+__declspec(dllexport) int CALLBACK TTXReadKnownHostsFile(char *filename, int maxlen)
+{
+	int ret = FALSE;
+	char *p;
+
+	if (pvar->settings.Enabled) {
+		strncpy_s(filename, maxlen, pvar->session_settings.KnownHostsFiles, _TRUNCATE);
+		p = strchr(filename, ';');
+		if (p)
+			*p = 0;
+
+		ret = TRUE;
+	}
+
+	return (ret);
+}
+
+
 static void keygen_progress(int phase, int count, cbarg_t *cbarg) {
 	char buff[1024];
 	static char msg[1024];

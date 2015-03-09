@@ -3,4 +3,5 @@ LIBRARY	"ttxssh"
 EXPORTS
 	TTXScpSendfile @1
 	TTXScpReceivefile @2
+	TTXReadKnownHostsFile @3
 	
