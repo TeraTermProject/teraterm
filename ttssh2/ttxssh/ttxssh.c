@@ -4160,7 +4160,7 @@ __declspec(dllexport) int CALLBACK TTXReadKnownHostsFile(char *filename, int max
 	char *p;
 
 	if (pvar->settings.Enabled) {
-		strncpy_s(filename, maxlen, pvar->session_settings.KnownHostsFiles, _TRUNCATE);
+		strncpy_s(filename, maxlen, pvar->settings.KnownHostsFiles, _TRUNCATE);
 		p = strchr(filename, ';');
 		if (p)
 			*p = 0;
