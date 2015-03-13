@@ -5855,7 +5855,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	data += 4;
 	server_host_key_blob = data; // for hash
 
-	push_memdump("DH_GEX_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
+	push_memdump("KEX_ECDH_REPLY", "server_host_key_blob", server_host_key_blob, bloblen);
 
 	hostkey = key_from_blob(data, bloblen);
 	if (hostkey == NULL) {
