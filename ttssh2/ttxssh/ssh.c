@@ -5402,7 +5402,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	hostkey = key_from_blob(data, bloblen);
 	if (hostkey == NULL) {
-		emsg = "key_from_blob error @ handle_SSH2_dh_gex_reply()";
+		emsg = "key_from_blob error @ handle_SSH2_dh_kex_reply()";
 		goto error;
 	}
 	data += bloblen;
