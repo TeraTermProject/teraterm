@@ -1,5 +1,5 @@
 ; Updated by TeraTerm Project (Jan 23 2015)
-; Last translated (Russian language) by Ryumik Sergey (Sep 03 2014)
+; Last translated (Russian language) by Ryumik Sergey (Mar 14 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -60,7 +60,7 @@ MENU_SETUP_GENERAL=&Общие...
 MENU_SETUP_ADDITION=&Дополнительные настройки...
 MENU_SETUP_SAVE=&Сохранить настройки...
 MENU_SETUP_RESTORE=&Восстановить настройки...
-MENU_OPEN_SETUP=Setup d&irectory...
+MENU_OPEN_SETUP=&Папка настроек...
 MENU_SETUP_LOADKEYMAP=&Загрузить настройки клавиш...
 
 MENU_CONTROL=&Управление
@@ -638,11 +638,11 @@ DLG_KEYGEN_SAVEPRIVATE=&Закрытый ключ
 DLG_KEYGEN_GENERATE=&Генерация
 DLG_KEYGEN_BITS=&Биты:
 DLG_KEYGEN_BCRYPT_KDF=хеш "bcrypt" &KDF
-DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
+DLG_KEYGEN_BCRYPT_ROUNDS=&Количество раундов:
 
 MSG_KEYBITS_MIN_ERROR=Битов ключа слишком мало!
-MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
-MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=Раундов слишком мало.
+MSG_BCRYPT_ROUNDS_MAX_ERROR=Раундов слишком много.
 MSG_KEYGEN_GENERATING="Генерация ключа..."
 MSG_KEYGEN_GENERATED="Ключ сгенерирован успешно!"
 
