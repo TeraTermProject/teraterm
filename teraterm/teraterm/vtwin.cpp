@@ -4772,10 +4772,20 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			if (((h = GetModuleHandle("ttxssh.dll")) != NULL)) {
 				func = (PSSH_read_known_hosts_file)GetProcAddress(h, "TTXReadKnownHostsFile");
 				if (func) {
-					int ret = func(hostsfilename, sizeof(hostsfilename));
+					int ret = func(temp, sizeof(temp));
 					if (ret) {
-						strncpy_s(hostsfilepath, sizeof(hostsfilepath), teratermexepath, _TRUNCATE);
-						_snprintf_s(temp, sizeof(temp), "%s\\%s", hostsfilepath, hostsfilename);
+						char *s = strstr(temp, ":\\");
+
+						if (s) { // full path
+							ExtractFileName(temp, hostsfilename, sizeof(hostsfilename));
+							ExtractDirName(temp, hostsfilepath);
+						}
+						else { // relative path
+							strncpy_s(hostsfilepath, sizeof(hostsfilepath), teratermexepath, _TRUNCATE);
+							strncpy_s(hostsfilename, sizeof(hostsfilename), temp, _TRUNCATE);
+							_snprintf_s(temp, sizeof(temp), "%s\\%s", hostsfilepath, hostsfilename);
+						}
+
 						SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, temp);
 					}
 				}
