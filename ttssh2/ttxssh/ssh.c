@@ -100,6 +100,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar);
 static BOOL handle_SSH2_userauth_banner(PTInstVar pvar);
 static BOOL handle_SSH2_open_confirm(PTInstVar pvar);
 static BOOL handle_SSH2_open_failure(PTInstVar pvar);
+static BOOL handle_SSH2_client_global_request(PTInstVar pvar);
 static BOOL handle_SSH2_request_success(PTInstVar pvar);
 static BOOL handle_SSH2_request_failure(PTInstVar pvar);
 static BOOL handle_SSH2_channel_success(PTInstVar pvar);
@@ -1669,7 +1670,7 @@ static void init_protocol(PTInstVar pvar)
 		enque_handler(pvar, SSH2_MSG_CHANNEL_WINDOW_ADJUST, handle_SSH2_window_adjust);
 		enque_handler(pvar, SSH2_MSG_CHANNEL_SUCCESS, handle_SSH2_channel_success);
 		enque_handler(pvar, SSH2_MSG_CHANNEL_FAILURE, handle_SSH2_channel_failure);
-//		enque_handler(pvar, SSH2_MSG_GLOBAL_REQUEST, handle_unimplemented);
+		enque_handler(pvar, SSH2_MSG_GLOBAL_REQUEST, handle_SSH2_client_global_request);
 		enque_handler(pvar, SSH2_MSG_REQUEST_FAILURE, handle_SSH2_request_failure);
 		enque_handler(pvar, SSH2_MSG_REQUEST_SUCCESS, handle_SSH2_request_success);
 
@@ -6094,7 +6095,7 @@ static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar)
 	pvar->rekeying = 0;
 
 	SSH2_dispatch_init(6);
-	SSH2_dispatch_add_range_message(SSH2_MSG_REQUEST_SUCCESS, SSH2_MSG_CHANNEL_FAILURE);
+	SSH2_dispatch_add_range_message(SSH2_MSG_GLOBAL_REQUEST, SSH2_MSG_CHANNEL_FAILURE);
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX
 	// OpenSSH 3.9ではデータ通信中のDH鍵交換要求が、サーバから送られてくることがある。
 	SSH2_dispatch_add_message(SSH2_MSG_KEXINIT);
@@ -7414,6 +7415,49 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	// チャネルの解放漏れを修正 (2007.5.1 maya)
 	ssh2_channel_delete(c);
+
+	return TRUE;
+}
+
+
+// SSH2_MSG_GLOBAL_REQUEST for OpenSSH 6.8
+static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
+{
+	int len;
+	char *data;
+	char *rtype;
+	int want_reply;
+	int success = 0;
+	buffer_t *msg;
+	unsigned char *outmsg;
+	int type;
+
+	notify_verbose_message(pvar, "SSH2_MSG_GLOBAL_REQUEST was received.", LOG_LEVEL_VERBOSE);
+
+	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	data = pvar->ssh_state.payload;
+	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
+	len = pvar->ssh_state.payloadlen;
+
+	rtype = buffer_get_string(&data, NULL);
+	want_reply = data[0];
+
+	// OpenSSH 6.8では、サーバのホスト鍵が更新されると、下記の通知が来る。
+	if (strcmp(rtype, "hostkeys-00@openssh.com") == 0) {
+		// TODO: 現状、Tera Termとしては未サポートなので、失敗で返す。
+		success = 0;
+	}
+	free(rtype);
+
+	msg = buffer_init();
+	if (msg) {
+		len = buffer_len(msg);
+		type = success ? SSH2_MSG_REQUEST_SUCCESS : SSH2_MSG_REQUEST_FAILURE;
+		outmsg = begin_send_packet(pvar, type, len);
+		memcpy(outmsg, buffer_ptr(msg), len);
+		finish_send_packet(pvar);
+		buffer_free(msg);
+	}
 
 	return TRUE;
 }
