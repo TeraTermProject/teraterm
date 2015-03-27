@@ -7452,14 +7452,19 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 	}
 	free(rtype);
 
-	msg = buffer_init();
-	if (msg) {
-		len = buffer_len(msg);
-		type = success ? SSH2_MSG_REQUEST_SUCCESS : SSH2_MSG_REQUEST_FAILURE;
-		outmsg = begin_send_packet(pvar, type, len);
-		memcpy(outmsg, buffer_ptr(msg), len);
-		finish_send_packet(pvar);
-		buffer_free(msg);
+	if (want_reply) {
+		msg = buffer_init();
+		if (msg) {
+			len = buffer_len(msg);
+			type = success ? SSH2_MSG_REQUEST_SUCCESS : SSH2_MSG_REQUEST_FAILURE;
+			if (type == SSH2_MSG_REQUEST_SUCCESS) {
+				// TBD
+			}
+			outmsg = begin_send_packet(pvar, type, len);
+			memcpy(outmsg, buffer_ptr(msg), len);
+			finish_send_packet(pvar);
+			buffer_free(msg);
+		}
 	}
 
 	return TRUE;
