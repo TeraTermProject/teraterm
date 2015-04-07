@@ -1961,39 +1961,43 @@ end:
 	return Err;
 }
 
-WORD TTLFileWrite()
+WORD TTLFileWrite(BOOL addCRLF)
 {
-	WORD Err;
-	int FH;
+	WORD Err, P;
+	int FH, Val;
 	TStrVal Str;
 
 	Err = 0;
-	GetIntVal(&FH,&Err);
-	GetStrVal(Str,&Err);
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if (Err!=0) return Err;
+	GetIntVal(&FH, &Err);
+	if (Err) return Err;
 
-	_lwrite(FH,Str,strlen(Str));
-	return Err;
-}
+	P = LinePtr;
+	GetStrVal(Str, &Err);
+	if (!Err) {
+		if (GetFirstChar())
+			return ErrSyntax;
 
-WORD TTLFileWriteLn()
-{
-	WORD Err;
-	int FH;
-	TStrVal Str;
+		_lwrite(FH, Str, strlen(Str));
+	}
+	else if (Err == ErrTypeMismatch) {
+		Err = 0;
+		LinePtr = P;
+		GetIntVal(&Val, &Err);
+		if (Err) return Err;
+		if (GetFirstChar())
+			return ErrSyntax;
 
-	Err = 0;
-	GetIntVal(&FH,&Err);
-	GetStrVal(Str,&Err);
-	if ((Err==0) && (GetFirstChar()!=0))
-		Err = ErrSyntax;
-	if (Err!=0) return Err;
+		Str[0] = Val & 0xff;
+		_lwrite(FH, Str, 1);
+	}
+	else {
+		return Err;
+	}
 
-	_lwrite(FH,Str,strlen(Str));
-	_lwrite(FH,"\015\012",2);
-	return Err;
+	if (addCRLF) {
+		_lwrite(FH,"\015\012",2);
+	}
+	return 0;
 }
 
 WORD TTLFindClose()
@@ -6009,9 +6013,9 @@ int ExecCmnd()
 		case RsvFileTruncate:
 			Err = TTLFileTruncate(); break;
 		case RsvFileWrite:
-			Err = TTLFileWrite(); break;
+			Err = TTLFileWrite(FALSE); break;
 		case RsvFileWriteLn:
-			Err = TTLFileWriteLn(); break;
+			Err = TTLFileWrite(TRUE); break;
 		case RsvFindClose:
 			Err = TTLFindClose(); break;
 		case RsvFindFirst:
