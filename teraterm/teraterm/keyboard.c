@@ -49,6 +49,9 @@ void SetKeyMap()
   if ( strlen(ts.KeyCnfFN)==0 ) return;
 #else
   if ( strlen(ts.KeyCnfFN)==0 ) {
+    if ( KeyMap != NULL ) {
+        return;
+    }
     strncpy_s(ts.KeyCnfFN, sizeof(ts.KeyCnfFN),"KEYBOARD.CNF", _TRUNCATE);
   }
 #endif
