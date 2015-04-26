@@ -248,13 +248,25 @@ char *buffer_get_string(char **data_ptr, int *buflen_ptr)
 void *buffer_get_string_msg(buffer_t *msg, int *buflen_ptr)
 {
 	char *data, *olddata;
-	void *ret;
+	void *ret = NULL;
 	int off;
+	int len, datalen;
+
+	// Check size
+	len = buffer_remain_len(msg);
+	if (len < 4)
+		goto error;
 
 	data = olddata = buffer_tail_ptr(msg);
+	datalen = get_uint32_MSBfirst(data);
+	if (len - 4 < datalen)
+		goto error;
+
 	ret = buffer_get_string(&data, buflen_ptr);
 	off = data - olddata;
 	msg->offset += off;
+
+error:;
 	return (ret);
 }
 
