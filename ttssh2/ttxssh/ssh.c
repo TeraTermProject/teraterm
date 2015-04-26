@@ -7426,7 +7426,7 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 // SSH2_MSG_GLOBAL_REQUEST for OpenSSH 6.8
 static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 {
-	int len;
+	int len, n;
 	char *data;
 	char *rtype;
 	int want_reply;
@@ -7437,18 +7437,33 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 
 	notify_verbose_message(pvar, "SSH2_MSG_GLOBAL_REQUEST was received.", LOG_LEVEL_VERBOSE);
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	// SSH2 packet format:
+	// [size(4) + padding size(1) + type(1)] + [payload(N) + padding(X)]
+	//  header                                     body
+	//                                         ^data
+	//            <-----------------size------------------------------->
+	//                              <---------len-------->
+	//
+	// data = payload(N) + padding(X): パディングも含めたボディすべてを指す。
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
+	// len = size - (padding size + 1): パディングを除くボディ。typeが先頭に含まれる。
 	len = pvar->ssh_state.payloadlen;
 
-	rtype = buffer_get_string(&data, NULL);
+	len--;   // type 分を除く
+
+	rtype = buffer_get_string(&data, &n);
+	len -= (n + 4);
+
 	want_reply = data[0];
+	data++;
+	len--;
 
 	// OpenSSH 6.8では、サーバのホスト鍵が更新されると、下記の通知が来る。
 	if (strcmp(rtype, "hostkeys-00@openssh.com") == 0) {
-		// TODO: 現状、Tera Termとしては未サポートなので、失敗で返す。
-		success = 0;
+		// OpenSSH 6.8の実装では、常に成功で返すようになっているため、
+		// それに合わせて Tera Term でも成功と返すことにする。
+		success = update_client_input_hostkeys(pvar, data, len);
+
 	}
 	free(rtype);
 
@@ -7457,9 +7472,6 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 		if (msg) {
 			len = buffer_len(msg);
 			type = success ? SSH2_MSG_REQUEST_SUCCESS : SSH2_MSG_REQUEST_FAILURE;
-			if (type == SSH2_MSG_REQUEST_SUCCESS) {
-				// TBD
-			}
 			outmsg = begin_send_packet(pvar, type, len);
 			memcpy(outmsg, buffer_ptr(msg), len);
 			finish_send_packet(pvar);

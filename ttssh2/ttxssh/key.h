@@ -66,4 +66,6 @@ ssh_keytype nid_to_keytype(int nid);
 void key_private_serialize(Key *key, buffer_t *b);
 Key *key_private_deserialize(buffer_t *blob);
 
+int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen);
+
 #endif

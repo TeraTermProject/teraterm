@@ -36,6 +36,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define INTBLOB_LEN 20
 #define SIGBLOB_LEN (2*INTBLOB_LEN)
 
+
+struct hostkeys_update_ctx {
+	/* The hostname and (optionally) IP address string for the server */
+	char *host_str, *ip_str;
+
+	/*
+	* Keys received from the server and a flag for each indicating
+	* whether they already exist in known_hosts.
+	* keys_seen is filled in by hostkeys_find() and later (for new
+	* keys) by client_global_hostkeys_private_confirm().
+	*/
+	Key **keys;
+	int *keys_seen;
+	size_t nkeys;
+
+	size_t nnew;
+
+	/*
+	* Keys that are in known_hosts, but were not present in the update
+	* from the server (i.e. scheduled to be deleted).
+	* Filled in by hostkeys_find().
+	*/
+	Key **old_keys;
+	size_t nold;
+};
+
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // Key verify function
@@ -1110,9 +1137,12 @@ Key *key_from_blob(char *data, int blen)
 	EC_KEY *ecdsa = NULL;
 	EC_POINT *q = NULL;
 	char *curve = NULL;
-	Key *hostkey;  // hostkey
+	Key *hostkey = NULL;  // hostkey
 	ssh_keytype type;
 	unsigned char *pk = NULL;
+
+	if (data == NULL)
+		goto error;
 
 	hostkey = malloc(sizeof(Key));
 	if (hostkey == NULL)
@@ -1798,4 +1828,85 @@ error:
 	}
 
 	return (k);
+}
+
+
+static void hostkeys_update_ctx_free(struct hostkeys_update_ctx *ctx)
+{
+	size_t i;
+
+	if (ctx == NULL)
+		return;
+	for (i = 0; i < ctx->nkeys; i++)
+		key_free(ctx->keys[i]);
+	free(ctx->keys);
+	free(ctx->keys_seen);
+	for (i = 0; i < ctx->nold; i++)
+		key_free(ctx->old_keys[i]);
+	free(ctx->old_keys);
+	free(ctx->host_str);
+	free(ctx->ip_str);
+	free(ctx);
+}
+
+//
+// SSHサーバホスト鍵(known_hosts)の自動更新(OpenSSH 6.8 or later: host key rotation support)
+//
+// return 1: success
+//        0: fail
+//
+int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
+{
+	int success = 1;  // OpenSSH 6.8の実装では、常に成功で返すようになっているため、
+	                  // それに合わせて Tera Term でも成功と返すことにする。
+	int len;
+	char *cp, *fp;
+	char msg[128];
+	unsigned char *blob = NULL;
+	buffer_t *b = NULL;
+	struct hostkeys_update_ctx *ctx = NULL;
+	Key *key = NULL;
+
+	// TODO: Tera Termの設定で、当該機能のオンオフを制御できるようにする。
+
+	ctx = calloc(1, sizeof(struct hostkeys_update_ctx));
+	if (ctx == NULL)
+		goto error;
+
+	b = buffer_init();
+	if (b == NULL)
+		goto error;
+
+	cp = buffer_append_space(b, datalen);
+	memcpy(cp, dataptr, datalen);
+
+	while (buffer_remain_len(b) > 0) {
+		key_free(key);
+		key = NULL;
+
+		blob = buffer_get_string_msg(b, &len);
+		key = key_from_blob(blob, len);
+		if (key == NULL) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not found key into blob %p (%d)", blob, len);
+			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+			goto error;
+		}
+		free(blob);
+		blob = NULL;
+
+		fp = key_fingerprint(key, SSH_FP_HEX);
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "SSH2_MSG_GLOBAL_REQUEST: received %s key %s", 
+			get_sshname_from_key(key), fp);
+		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		free(fp);
+	}
+
+	success = 1;
+
+error:
+	buffer_free(b);
+	hostkeys_update_ctx_free(ctx);
+	free(blob);
+
+	return (success);
 }
