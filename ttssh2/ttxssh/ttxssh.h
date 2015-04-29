@@ -159,6 +159,8 @@ typedef struct _TS_SSH {
 	int DisablePopupMessage;
 
 	char X11Display[128];
+
+	BOOL UpdateHostkeys;
 } TS_SSH;
 
 typedef struct _TInstVar {

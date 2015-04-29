@@ -1867,7 +1867,12 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	struct hostkeys_update_ctx *ctx = NULL;
 	Key *key = NULL;
 
-	// TODO: Tera Termの設定で、当該機能のオンオフを制御できるようにする。
+	// Tera Termの設定で、当該機能のオンオフを制御できるようにする。
+	if (pvar->settings.UpdateHostkeys == 0) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because ts.UpdateHostkeys is disabled.");
+		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		goto error;
+	}
 
 	ctx = calloc(1, sizeof(struct hostkeys_update_ctx));
 	if (ctx == NULL)
