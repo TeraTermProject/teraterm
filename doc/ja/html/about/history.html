@@ -2582,7 +2582,10 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>OpenSSH 6.8で接続エラーが出ないようにするため、"SSH2_MSG_GLOBAL_REQUEST"メッセージに暫定対応した。</li>
+      <li>OpenSSH 6.8で接続エラーが出ないようにするため、"SSH2_MSG_GLOBAL_REQUEST"メッセージに暫定対応した。
+        <ul>
+          <li>teraterm.iniに UpdateHostkeys エントリ(ホスト公開鍵の更新有無)を追加した。デフォルトはオフ。</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -2604,7 +2607,10 @@
   <li>変更
     <ul>
       <li>SSH 鍵生成ダイアログで秘密鍵を保存するとき、bcrypt KDF のラウンド数を指定できるようにした</li>
-      <li>X11転送を指定するコマンドラインオプション <a href="../commandline/ttssh.html#ssh-x">/ssh-X</a> で、転送先ディスプレイを指定できるようにした。</li>
+      <li>X11転送を指定するコマンドラインオプション <a href="../commandline/ttssh.html#ssh-x">/ssh-X</a> で、転送先ディスプレイを指定できるようにした。
+        <ul>
+          <li>teraterm.iniに X11Display エントリを追加した。デフォルトは空。</li>
+        </ul></li>
     </ul>
   </li>
 

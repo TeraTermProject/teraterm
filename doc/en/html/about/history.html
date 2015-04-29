@@ -2577,7 +2577,10 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added minimum support for the "SSH2_MSG_GLOBAL_REQUEST" message because a user can not connect to the OpenSSH 6.8 server.</li>
+      <li>added minimum support for the "SSH2_MSG_GLOBAL_REQUEST" message because a user can not connect to the OpenSSH 6.8 server.
+        <ul>
+          <li>added the UpdateHostkeys entry regarding the server public key updating in the teraterm.ini file. The default value is disabled.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -2600,7 +2603,10 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>When the private key is saved on the SSH key generator dialog, the round number of the bcrypt KDF can be specified.</li>
-      <li>added support for specifying the X11 destination display with the <a href="../commandline/ttssh.html#ssh-x">/ssh-X</a> command line option.</li>
+      <li>added support for specifying the X11 destination display with the <a href="../commandline/ttssh.html#ssh-x">/ssh-X</a> command line option.
+        <ul>
+          <li>added the X11Display entry in the teraterm.ini file. The default value is empty.</li>
+        </ul></li>
     </ul>
   </li>
 
