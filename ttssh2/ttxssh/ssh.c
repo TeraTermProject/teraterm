@@ -4211,16 +4211,17 @@ char* get_ssh2_comp_name(compression_type type)
 char* get_ssh_keytype_name(ssh_keytype type)
 {
 	ssh2_host_key_t *ptr = ssh2_host_key;
-	static char buf[32];
+	char *p = "ssh-unknown";
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			// ssh2_host_key[]はグローバル変数なので、そのまま返り値にできる。
+			p = ptr->name;
 			break;
 		}
 		ptr++;
 	}
-	return buf;
+	return p;
 }
 
 

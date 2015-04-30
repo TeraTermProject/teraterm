@@ -1849,6 +1849,29 @@ static void hostkeys_update_ctx_free(struct hostkeys_update_ctx *ctx)
 	free(ctx);
 }
 
+
+// 許可されたホスト鍵アルゴリズムかをチェックする。
+//
+// return 1: matched
+//        0: not matched
+//
+static int check_hostkey_algorithm(PTInstVar pvar, Key *key)
+{
+	int ret = 0;
+	int i, index;
+
+	for (i = 0; pvar->settings.HostKeyOrder[i] != 0; i++) {
+		index = pvar->settings.HostKeyOrder[i] - '0';
+		if (index == KEY_NONE) // disabled line
+			break;
+
+		if (strcmp(get_sshname_from_key(key), get_ssh_keytype_name(index)) == 0)
+			return 1;
+	}
+
+	return (ret);
+}
+
 //
 // SSHサーバホスト鍵(known_hosts)の自動更新(OpenSSH 6.8 or later: host key rotation support)
 //
@@ -1892,7 +1915,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		blob = buffer_get_string_msg(b, &len);
 		key = key_from_blob(blob, len);
 		if (key == NULL) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not found key into blob %p (%d)", blob, len);
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not found host key into blob %p (%d)", blob, len);
 			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
 			goto error;
 		}
@@ -1900,10 +1923,20 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		blob = NULL;
 
 		fp = key_fingerprint(key, SSH_FP_HEX);
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "SSH2_MSG_GLOBAL_REQUEST: received %s key %s", 
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Received %s host key %s", 
 			get_sshname_from_key(key), fp);
 		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
 		free(fp);
+
+		// 許可されたホストキーアルゴリズムかをチェックする。
+		if (check_hostkey_algorithm(pvar, key) == 0) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "%s host key is not permitted by ts.HostKeyOrder",
+				get_sshname_from_key(key));
+			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+			continue;
+		}
+
+
 	}
 
 	success = 1;
