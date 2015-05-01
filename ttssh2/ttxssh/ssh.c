@@ -4363,7 +4363,8 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), c_str, _TRUNCATE);
 	}
 	len = strlen(buf);
-	buf[len - 1] = '\0';  // get rid of comma
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
 	myproposal[PROPOSAL_ENC_ALGS_CTOS] = buf;  // Client To Server
 	myproposal[PROPOSAL_ENC_ALGS_STOC] = buf;  // Server To Client
 }
@@ -4390,7 +4391,8 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
-	buf[len - 1] = '\0';  // get rid of comma
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
 
 	// ˆ³kŽw’è‚ª‚È‚¢ê‡‚ÍAˆ³kƒŒƒxƒ‹‚ð–³ðŒ‚Éƒ[ƒ‚É‚·‚éB
 	if (buf[0] == '\0') {
@@ -4428,7 +4430,8 @@ void SSH2_update_kex_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
-	buf[len - 1] = '\0';  // get rid of comma
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
 	myproposal[PROPOSAL_KEX_ALGS] = buf; 
 }
 
@@ -4481,7 +4484,8 @@ void SSH2_update_hmac_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
-	buf[len - 1] = '\0';  // get rid of comma
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
 	myproposal[PROPOSAL_MAC_ALGS_CTOS] = buf; 
 	myproposal[PROPOSAL_MAC_ALGS_STOC] = buf; 
 }
