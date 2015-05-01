@@ -781,11 +781,14 @@ static BOOL equal_mp_ints(unsigned char FAR * num1,
 	}
 }
 
-// ŒöŠJŒ®‚ª“™‚µ‚¢‚©‚ðŒŸØ‚·‚é
+
+// ŒöŠJŒ®‚Ì”äŠr‚ðs‚¤B
+//
+// return
 //   -1 ... Œ®‚ÌŒ^‚ªˆá‚¤
 //    0 ... “™‚µ‚­‚È‚¢
 //    1 ... “™‚µ‚¢
-static int match_key(PTInstVar pvar, Key *key)
+int HOSTS_compare_public_key(Key *src, Key *key)
 {
 	int bits;
 	unsigned char FAR * exp;
@@ -794,7 +797,7 @@ static int match_key(PTInstVar pvar, Key *key)
 	const EC_POINT *pa, *pb;
 	Key *a, *b;
 
-	if (pvar->hosts_state.hostkey.type != key->type) {
+	if (src->type != key->type) {
 		return -1;
 	}
 
@@ -805,46 +808,55 @@ static int match_key(PTInstVar pvar, Key *key)
 		mod = key->mod;
 
 		/* just check for equal exponent and modulus */
-		return equal_mp_ints(exp, pvar->hosts_state.hostkey.exp)
-		    && equal_mp_ints(mod, pvar->hosts_state.hostkey.mod);
+		return equal_mp_ints(exp, src->exp)
+			&& equal_mp_ints(mod, src->mod);
 		/*
 		return equal_mp_ints(exp, pvar->hosts_state.key_exp)
-			&& equal_mp_ints(mod, pvar->hosts_state.key_mod);
-			*/
+		&& equal_mp_ints(mod, pvar->hosts_state.key_mod);
+		*/
 
 	case KEY_RSA: // SSH2 RSA host public key
-		return key->rsa != NULL && pvar->hosts_state.hostkey.rsa != NULL &&
-		       BN_cmp(key->rsa->e, pvar->hosts_state.hostkey.rsa->e) == 0 && 
-		       BN_cmp(key->rsa->n, pvar->hosts_state.hostkey.rsa->n) == 0;
+		return key->rsa != NULL && src->rsa != NULL &&
+			BN_cmp(key->rsa->e, src->rsa->e) == 0 &&
+			BN_cmp(key->rsa->n, src->rsa->n) == 0;
 
 	case KEY_DSA: // SSH2 DSA host public key
-		return key->dsa != NULL && pvar->hosts_state.hostkey.dsa && 
-		       BN_cmp(key->dsa->p, pvar->hosts_state.hostkey.dsa->p) == 0 && 
-		       BN_cmp(key->dsa->q, pvar->hosts_state.hostkey.dsa->q) == 0 &&
-		       BN_cmp(key->dsa->g, pvar->hosts_state.hostkey.dsa->g) == 0 &&
-		       BN_cmp(key->dsa->pub_key, pvar->hosts_state.hostkey.dsa->pub_key) == 0;
+		return key->dsa != NULL && src->dsa &&
+			BN_cmp(key->dsa->p, src->dsa->p) == 0 &&
+			BN_cmp(key->dsa->q, src->dsa->q) == 0 &&
+			BN_cmp(key->dsa->g, src->dsa->g) == 0 &&
+			BN_cmp(key->dsa->pub_key, src->dsa->pub_key) == 0;
 
 	case KEY_ECDSA256:
 	case KEY_ECDSA384:
 	case KEY_ECDSA521:
-		if (key->ecdsa == NULL || pvar->hosts_state.hostkey.ecdsa == NULL) {
+		if (key->ecdsa == NULL || src->ecdsa == NULL) {
 			return FALSE;
 		}
 		group = EC_KEY_get0_group(key->ecdsa);
 		pa = EC_KEY_get0_public_key(key->ecdsa),
-		pb = EC_KEY_get0_public_key(pvar->hosts_state.hostkey.ecdsa);
+			pb = EC_KEY_get0_public_key(src->ecdsa);
 		return EC_POINT_cmp(group, pa, pb, NULL) == 0;
 
 	case KEY_ED25519:
 		a = key;
-		b = &pvar->hosts_state.hostkey;
+		b = src;
 		return a->ed25519_pk != NULL && b->ed25519_pk != NULL &&
-		    memcmp(a->ed25519_pk, b->ed25519_pk, ED25519_PK_SZ) == 0;
+			memcmp(a->ed25519_pk, b->ed25519_pk, ED25519_PK_SZ) == 0;
 
 	default:
 		return FALSE;
 	}
+}
 
+
+// ŒöŠJŒ®‚ª“™‚µ‚¢‚©‚ðŒŸØ‚·‚é
+//   -1 ... Œ®‚ÌŒ^‚ªˆá‚¤
+//    0 ... “™‚µ‚­‚È‚¢
+//    1 ... “™‚µ‚¢
+static int match_key(PTInstVar pvar, Key *key)
+{
+	return HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key);
 }
 
 static void init_hosts_dlg(PTInstVar pvar, HWND dlg)

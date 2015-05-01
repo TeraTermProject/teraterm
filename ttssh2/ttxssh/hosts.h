@@ -71,4 +71,6 @@ void HOSTS_end(PTInstVar pvar);
 
 int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize);
 
+int HOSTS_compare_public_key(Key *src, Key *key);
+
 #endif

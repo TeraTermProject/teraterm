@@ -1883,18 +1883,19 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	int success = 1;  // OpenSSH 6.8の実装では、常に成功で返すようになっているため、
 	                  // それに合わせて Tera Term でも成功と返すことにする。
 	int len;
+	size_t i;
 	char *cp, *fp;
 	char msg[128];
 	unsigned char *blob = NULL;
 	buffer_t *b = NULL;
 	struct hostkeys_update_ctx *ctx = NULL;
-	Key *key = NULL;
+	Key *key = NULL, **tmp;
 
 	// Tera Termの設定で、当該機能のオンオフを制御できるようにする。
 	if (pvar->settings.UpdateHostkeys == 0) {
 		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because ts.UpdateHostkeys is disabled.");
 		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
-		goto error;
+		return 1;
 	}
 
 	ctx = calloc(1, sizeof(struct hostkeys_update_ctx));
@@ -1916,7 +1917,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		key = key_from_blob(blob, len);
 		if (key == NULL) {
 			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not found host key into blob %p (%d)", blob, len);
-			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+			notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
 			goto error;
 		}
 		free(blob);
@@ -1936,7 +1937,35 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 			continue;
 		}
 
+		// Skip certs: Tera Termでは証明書認証は未サポート。
 
+		// 重複したキーを受信したらエラーとする。
+		for (i = 0; i < ctx->nkeys; i++) {
+			if (HOSTS_compare_public_key(key, ctx->keys[i]) == 1) {
+				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Received duplicated %s host key",
+					get_sshname_from_key(key));
+				notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
+				goto error;
+			}
+		}
+
+		// キーを登録する。
+		tmp = realloc(ctx->keys, (ctx->nkeys + 1)*sizeof(*ctx->keys));
+		if (tmp == NULL) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not memory: realloc ctx->keys %d",
+				ctx->nkeys);
+			notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+			goto error;
+		}
+		ctx->keys = tmp;
+		ctx->keys[ctx->nkeys++] = key;
+		key = NULL;
+	}
+
+	if (ctx->nkeys == 0) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "No host rotation key");
+		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		goto error;
 	}
 
 	success = 1;
