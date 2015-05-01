@@ -2577,7 +2577,7 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added minimum support for the "SSH2_MSG_GLOBAL_REQUEST" message because a user can not connect to the OpenSSH 6.8 server.
+      <li>added minimum support for the host key rotation(derived from OpenSSH 6.8).
         <ul>
           <li>added the UpdateHostkeys entry regarding the server public key updating in the teraterm.ini file. The default value is disabled.</li>
         </ul></li>
@@ -2586,6 +2586,8 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
+      <li>A user can not connect to the OpenSSH 6.8 server.</li>
+      <li>When the 0(disabled line) is located at the front end of any algorithm(CipherOrder, KexOrder, HostKeyOrder, MacOrder and CompOrder), an application fault is occurred.</li>
     </ul>
   </li>
 

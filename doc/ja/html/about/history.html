@@ -2582,7 +2582,7 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>OpenSSH 6.8で接続エラーが出ないようにするため、"SSH2_MSG_GLOBAL_REQUEST"メッセージに暫定対応した。
+      <li>ホスト公開鍵の自動更新(OpenSSH 6.8)に暫定対応した。
         <ul>
           <li>teraterm.iniに UpdateHostkeys エントリ(ホスト公開鍵の更新有無)を追加した。デフォルトはオフ。</li>
         </ul></li>
@@ -2591,6 +2591,8 @@
 
   <li>バグ修正
     <ul>
+      <li>OpenSSH 6.8に接続できない問題を修正した。</li>
+      <li>各種アルゴリズム(CipherOrder, KexOrder, HostKeyOrder, MacOrder, CompOrder)の一番先頭に0(disabled line)が来ると、アプリケーションが落ちる問題を修正した。</li>
     </ul>
   </li>
 
