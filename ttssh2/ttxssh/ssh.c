@@ -4454,7 +4454,8 @@ void SSH2_update_host_key_myproposal(PTInstVar pvar)
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
-	buf[len - 1] = '\0';  // get rid of comma
+	if (len > 0)
+		buf[len - 1] = '\0';  // get rid of comma
 	myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = buf; 
 }
 
