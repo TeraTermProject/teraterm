@@ -55,6 +55,8 @@ typedef struct {
   HWND hosts_dialog;
 } HOSTSState;
 
+typedef int hostkeys_foreach_fn(void *ctx);
+
 void HOSTS_init(PTInstVar pvar);
 void HOSTS_open(PTInstVar pvar);
 void HOSTS_prefetch_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport);
@@ -72,5 +74,6 @@ void HOSTS_end(PTInstVar pvar);
 int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize);
 
 int HOSTS_compare_public_key(Key *src, Key *key);
+int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *ctx);
 
 #endif

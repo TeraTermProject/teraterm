@@ -765,6 +765,213 @@ void HOSTS_prefetch_host_key(PTInstVar pvar, char FAR * hostname, unsigned short
 	finish_read_host_files(pvar, 1);
 }
 
+
+// known_hostsファイルから該当するキー情報を取得する。
+//
+// return:
+//   *keyptr != NULL  取得成功
+//
+static int parse_hostkey_file(PTInstVar pvar, char FAR * hostname,
+	unsigned short tcpport, char FAR * data, Key **keyptr)
+{
+	int index = eat_spaces(data);
+	int matched = 0;
+	int keybits = 0;
+	ssh_keytype ktype;
+
+	*keyptr = NULL;
+
+	if (data[index] == '#') {
+		return index + eat_to_end_of_line(data + index);
+	}
+
+	/* if we find an empty line, then it won't have any patterns matching the hostname
+	and so we skip it */
+	index--;
+	do {
+		int negated;
+		int bracketed;
+		char *end_bracket;
+		int host_matched = 0;
+		unsigned short keyfile_port = 22;
+
+		index++;
+		negated = data[index] == '!';
+
+		if (negated) {
+			index++;
+			bracketed = data[index] == '[';
+			if (bracketed) {
+				end_bracket = strstr(data + index + 1, "]:");
+				if (end_bracket != NULL) {
+					*end_bracket = ' ';
+					index++;
+				}
+			}
+			host_matched = match_pattern(data + index, hostname);
+			if (bracketed && end_bracket != NULL) {
+				*end_bracket = ']';
+				keyfile_port = atoi(end_bracket + 2);
+			}
+			if (host_matched && keyfile_port == tcpport) {
+				return index + eat_to_end_of_line(data + index);
+			}
+		}
+		else {
+			bracketed = data[index] == '[';
+			if (bracketed) {
+				end_bracket = strstr(data + index + 1, "]:");
+				if (end_bracket != NULL) {
+					*end_bracket = ' ';
+					index++;
+				}
+			}
+			host_matched = match_pattern(data + index, hostname);
+			if (bracketed && end_bracket != NULL) {
+				*end_bracket = ']';
+				keyfile_port = atoi(end_bracket + 2);
+			}
+			if (host_matched && keyfile_port == tcpport) {
+				matched = 1;
+			}
+		}
+
+		index += eat_to_end_of_pattern(data + index);
+	} while (data[index] == ',');
+
+	if (!matched) {
+		return index + eat_to_end_of_line(data + index);
+	}
+	else {
+		// 鍵の種類によりフォーマットが異なる
+		// また、最初に一致したエントリを取得することになる。
+		/*
+		[SSH1]
+		192.168.1.2 1024 35 13032....
+
+		[SSH2]
+		192.168.1.2 ssh-rsa AAAAB3NzaC1....
+		192.168.1.2 ssh-dss AAAAB3NzaC1....
+		192.168.1.2 rsa AAAAB3NzaC1....
+		192.168.1.2 dsa AAAAB3NzaC1....
+		192.168.1.2 rsa1 AAAAB3NzaC1....
+		*/
+		int rsa1_key_bits;
+
+		index += eat_spaces(data + index);
+
+		rsa1_key_bits = atoi(data + index);
+		if (rsa1_key_bits > 0) { // RSA1である
+			if (!SSHv1(pvar)) { // SSH2接続であれば無視する
+				return index + eat_to_end_of_line(data + index);
+			}
+			index += eat_digits(data + index);
+			index += eat_spaces(data + index);
+
+			index += eat_digits(data + index);
+			index += eat_spaces(data + index);
+
+		}
+		else {
+			char *cp, *p;
+			Key *key;
+
+			if (!SSHv2(pvar)) { // SSH1接続であれば無視する
+				return index + eat_to_end_of_line(data + index);
+			}
+
+			cp = data + index;
+			p = strchr(cp, ' ');
+			if (p == NULL) {
+				return index + eat_to_end_of_line(data + index);
+			}
+			index += (p - cp);  // setup index
+			*p = '\0';
+			ktype = get_keytype_from_name(cp);
+			*p = ' ';
+
+			index += eat_spaces(data + index);  // update index
+
+			// uudecode
+			key = parse_uudecode(data + index);
+			if (key == NULL) {
+				return index + eat_to_end_of_line(data + index);
+			}
+
+			// setup
+			*keyptr = key;
+
+			index += eat_base64(data + index);
+			index += eat_spaces(data + index);
+		}
+
+		return index + eat_to_end_of_line(data + index);
+	}
+}
+
+// known_hostsファイルからホスト公開鍵を取得する。
+// 既存の処理を改変したくないので、Host key rotation用に新規に用意する。
+//
+// return 1: success
+//        0: fail
+int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *ctx)
+{
+	int success = 0;
+	int suppress_errors = 1;
+	unsigned short tcpport;
+	char FAR *filename;
+	char *hostname;
+	Key *key;
+
+	if (!begin_read_host_files(pvar, 1)) {
+		goto error;
+	}
+
+	// Host key rotationでは、known_hosts ファイルを書き換えるので、
+	// 検索するのは1つめのファイルのみでよい（2つめのファイルはReadOnlyのため）。
+	filename = pvar->hosts_state.file_names[pvar->hosts_state.file_num];
+	pvar->hosts_state.file_num++;
+
+	pvar->hosts_state.file_data_index = -1;
+	if (filename[0] != 0) {
+		if (begin_read_file(pvar, filename, suppress_errors)) {
+			pvar->hosts_state.file_data_index = 0;
+		}
+	}
+	if (pvar->hosts_state.file_data_index == -1)
+		goto error;
+
+	// 検索対象となるホスト名とポート番号。
+	hostname = pvar->ssh_state.hostname;
+	tcpport = pvar->ssh_state.tcpport;
+
+	// known_hostsファイルの内容がすべて pvar->hosts_state.file_data に読み込まれている。
+	// 末尾は \0 。
+	while (pvar->hosts_state.file_data[pvar->hosts_state.file_data_index] != 0) {
+		key = NULL;
+
+		pvar->hosts_state.file_data_index +=
+			parse_hostkey_file(pvar, hostname, tcpport,
+				pvar->hosts_state.file_data +
+				pvar->hosts_state.file_data_index,
+				&key);
+
+		if (key != NULL) {
+			key = key;
+			key_free(key);
+		}
+
+	}
+
+	success = 1;
+
+error:
+	finish_read_host_files(pvar, 1);
+
+	return (success);
+}
+
+
 static BOOL equal_mp_ints(unsigned char FAR * num1,
                           unsigned char FAR * num2)
 {

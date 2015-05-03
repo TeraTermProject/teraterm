@@ -1968,6 +1968,8 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		goto error;
 	}
 
+	//HOSTS_hostkey_foreach(pvar, NULL, ctx);
+
 	success = 1;
 
 error:
