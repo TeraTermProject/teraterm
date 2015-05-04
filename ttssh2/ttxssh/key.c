@@ -2017,6 +2017,26 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 
 	HOSTS_hostkey_foreach(pvar, hostkeys_find, ctx);
 
+	// サーバが送ってきた鍵候補群から、いくつの鍵を新規追加するのかを数える。
+	ctx->nnew = 0;
+	for (i = 0; i < ctx->nkeys; i++) {
+		if (!ctx->keys_seen[i])
+			ctx->nnew++;
+	}
+	_snprintf_s(msg, sizeof(msg), _TRUNCATE, "%u keys from server: %u new, %u retained. %u to remove",
+		ctx->nkeys, ctx->nnew, ctx->nkeys - ctx->nnew, ctx->nold);
+	notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+
+	// 新規追加する鍵はゼロだが、deprecatedな鍵が存在する。
+	if (ctx->nnew == 0 && ctx->nold != 0) {
+		// TODO:
+
+	}
+	else if (ctx->nnew != 0) { // 新規追加するべき鍵が存在する。
+		// TODO:
+
+	}
+
 	success = 1;
 
 error:
