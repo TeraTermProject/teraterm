@@ -55,7 +55,7 @@ typedef struct {
   HWND hosts_dialog;
 } HOSTSState;
 
-typedef int hostkeys_foreach_fn(void *ctx);
+typedef int hostkeys_foreach_fn(Key *key, void *ctx);
 
 void HOSTS_init(PTInstVar pvar);
 void HOSTS_open(PTInstVar pvar);

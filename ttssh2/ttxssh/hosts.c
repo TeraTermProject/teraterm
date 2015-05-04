@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This code is copyright (C) 1998-1999 Robert O'Callahan.
 See LICENSE.TXT for the license.
 */
-
 #include "ttxssh.h"
 #include "util.h"
 #include "resource.h"
@@ -778,6 +777,7 @@ static int parse_hostkey_file(PTInstVar pvar, char FAR * hostname,
 	int matched = 0;
 	int keybits = 0;
 	ssh_keytype ktype;
+	Key *key;
 
 	*keyptr = NULL;
 
@@ -865,16 +865,24 @@ static int parse_hostkey_file(PTInstVar pvar, char FAR * hostname,
 			if (!SSHv1(pvar)) { // SSH2接続であれば無視する
 				return index + eat_to_end_of_line(data + index);
 			}
-			index += eat_digits(data + index);
-			index += eat_spaces(data + index);
+
+			key = key_new(KEY_RSA1);
+			key->bits = rsa1_key_bits;
 
 			index += eat_digits(data + index);
 			index += eat_spaces(data + index);
+			key->exp = parse_bignum(data + index);
+
+			index += eat_digits(data + index);
+			index += eat_spaces(data + index);
+			key->mod = parse_bignum(data + index);
+
+			// setup
+			*keyptr = key;
 
 		}
 		else {
 			char *cp, *p;
-			Key *key;
 
 			if (!SSHv2(pvar)) { // SSH1接続であれば無視する
 				return index + eat_to_end_of_line(data + index);
@@ -956,11 +964,11 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 				pvar->hosts_state.file_data_index,
 				&key);
 
+		// 該当する鍵が見つかったら、コールバック関数を呼び出す。
 		if (key != NULL) {
-			key = key;
-			key_free(key);
+			if (callback(key, ctx) == 0) 
+				key_free(key);
 		}
-
 	}
 
 	success = 1;

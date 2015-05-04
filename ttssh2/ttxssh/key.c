@@ -25,7 +25,6 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 #include "key.h"
 #include "kex.h"
 
@@ -1872,6 +1871,47 @@ static int check_hostkey_algorithm(PTInstVar pvar, Key *key)
 	return (ret);
 }
 
+// Callback function
+//
+// argument:
+//   key: known_hostsに登録されている鍵
+//   _ctx: サーバから送られてきた鍵候補群
+//
+// return:
+//   1: deprecated keyのため、呼び元でkey領域の解放禁止。
+//   0: 呼び元でのkey領域の解放が必要。
+static int hostkeys_find(Key *key, void *_ctx)
+{
+	struct hostkeys_update_ctx *ctx = (struct hostkeys_update_ctx *)_ctx;
+	int ret = 0;
+	size_t i;
+	Key **tmp;
+
+	// SSH1は対象外。
+	if (key->type == KEY_RSA1)
+		goto error;
+
+	// すでに登録済みの鍵がないかを探す。
+	for (i = 0; i < ctx->nkeys; i++) {
+		if (HOSTS_compare_public_key(key, ctx->keys[i]) == 1) {
+			ctx->keys_seen[i] = 1;
+			goto error;
+		}
+	}
+
+	// deprecatedな鍵は、古いものリストに入れておく。
+	tmp = realloc(ctx->old_keys, (ctx->nold + 1)*sizeof(*ctx->old_keys));
+	if (tmp != NULL) {
+		ctx->old_keys = tmp;
+		ctx->old_keys[ctx->nold++] = key;
+	}
+
+	ret = 1;
+
+error:
+	return (ret);
+}
+
 //
 // SSHサーバホスト鍵(known_hosts)の自動更新(OpenSSH 6.8 or later: host key rotation support)
 //
@@ -1968,7 +2008,14 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		goto error;
 	}
 
-	//HOSTS_hostkey_foreach(pvar, NULL, ctx);
+	if ((ctx->keys_seen = calloc(ctx->nkeys, sizeof(*ctx->keys_seen))) == NULL) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not memory: calloc ctx->keys %d",
+			ctx->nkeys);
+		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		goto error;
+	}
+
+	HOSTS_hostkey_foreach(pvar, hostkeys_find, ctx);
 
 	success = 1;
 
