@@ -475,7 +475,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 
 	READ_STD_STRING_OPTION(X11Display);
 
-	settings->UpdateHostkeys = read_BOOL_option(fileName, "UpdateHostkeys", FALSE);
+	settings->UpdateHostkeys = GetPrivateProfileInt("TTSSH", "UpdateHostkeys", 0, fileName);
 
 	clear_local_settings(pvar);
 }
@@ -583,8 +583,9 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	WritePrivateProfileString("TTSSH", "X11Display", settings->X11Display, fileName);
 
-	WritePrivateProfileString("TTSSH", "UpdateHostkeys",
-		settings->UpdateHostkeys ? "1" : "0", fileName);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+		"%d", settings->UpdateHostkeys);
+	WritePrivateProfileString("TTSSH", "UpdateHostkeys", buf, fileName);
 }
 
 

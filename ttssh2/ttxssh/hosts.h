@@ -75,5 +75,7 @@ int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize
 
 int HOSTS_compare_public_key(Key *src, Key *key);
 int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *ctx);
+void HOSTS_add_host_key(PTInstVar pvar, Key *key);
+void HOSTS_delete_all_hostkeys(PTInstVar pvar);
 
 #endif

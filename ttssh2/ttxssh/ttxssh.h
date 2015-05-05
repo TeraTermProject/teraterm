@@ -102,6 +102,15 @@ HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 #define POPUP_MSG_default			0
 #define POPUP_MSG_FWD_received_data	(1 << 0)
 
+
+/*
+ * Host key rotation 
+ */
+#define SSH_UPDATE_HOSTKEYS_NO	0
+#define SSH_UPDATE_HOSTKEYS_YES	1
+#define SSH_UPDATE_HOSTKEYS_ASK	2
+
+
 /*
 These are the fields that WOULD go in Tera Term's 'ts' structure, if
 we could put them there.

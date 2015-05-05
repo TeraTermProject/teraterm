@@ -1231,6 +1231,103 @@ error:
 	return result;
 }
 
+static char FAR *format_specified_host_key(Key *key, char *hostname, unsigned short tcpport)
+{
+	int host_len = strlen(hostname);
+	char *result = NULL;
+	int index;
+	ssh_keytype type = key->type;
+
+	switch (type) {
+	case KEY_RSA1:
+	{
+		int result_len = host_len + 50 + 8 +
+			get_ushort16_MSBfirst(key->exp) / 3 +
+			get_ushort16_MSBfirst(key->mod) / 3;
+		result = (char FAR *) malloc(result_len);
+
+		if (tcpport == 22) {
+			strncpy_s(result, result_len, hostname, _TRUNCATE);
+			index = host_len;
+		}
+		else {
+			_snprintf_s(result, result_len, _TRUNCATE, "[%s]:%d",
+				hostname,
+				tcpport);
+			index = strlen(result);
+		}
+
+		_snprintf_s(result + index, result_len - host_len, _TRUNCATE,
+			" %d ", key->bits);
+		index += strlen(result + index);
+		index += print_mp_int(result + index, key->exp);
+		result[index] = ' ';
+		index++;
+		index += print_mp_int(result + index, key->mod);
+		strncpy_s(result + index, result_len - index, " \r\n", _TRUNCATE);
+
+		break;
+	}
+
+	case KEY_RSA:
+	case KEY_DSA:
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+	case KEY_ED25519:
+	{
+		//Key *key = &pvar->hosts_state.hostkey;
+		char *blob = NULL;
+		int blen, uulen, msize;
+		char *uu = NULL;
+		int n;
+
+		key_to_blob(key, &blob, &blen);
+		uulen = 2 * blen;
+		uu = malloc(uulen);
+		if (uu == NULL) {
+			goto error;
+		}
+		n = uuencode(blob, blen, uu, uulen);
+		if (n > 0) {
+			msize = host_len + 50 + uulen;
+			result = malloc(msize);
+			if (result == NULL) {
+				goto error;
+			}
+
+			// setup
+			if (tcpport == 22) {
+				_snprintf_s(result, msize, _TRUNCATE, "%s %s %s\r\n",
+					hostname,
+					get_sshname_from_key(key),
+					uu);
+			}
+			else {
+				_snprintf_s(result, msize, _TRUNCATE, "[%s]:%d %s %s\r\n",
+					hostname,
+					tcpport,
+					get_sshname_from_key(key),
+					uu);
+			}
+		}
+	error:
+		if (blob != NULL)
+			free(blob);
+		if (uu != NULL)
+			free(uu);
+
+		break;
+	}
+
+	default:
+		return NULL;
+
+	}
+
+	return result;
+}
+
 static void add_host_key(PTInstVar pvar)
 {
 	char FAR *name = NULL;
@@ -1278,6 +1375,66 @@ static void add_host_key(PTInstVar pvar)
 			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
 			                  "An error occurred while trying to write the host key.\n"
 			                  "The host key could not be written.");
+			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		}
+	}
+}
+
+// 指定したキーを known_hosts に追加する。
+void HOSTS_add_host_key(PTInstVar pvar, Key *key)
+{
+	char FAR *name = NULL;
+	char *hostname;
+	unsigned short tcpport;
+
+	hostname = pvar->ssh_state.hostname;
+	tcpport = pvar->ssh_state.tcpport;
+
+	if (pvar->hosts_state.file_names != NULL)
+		name = pvar->hosts_state.file_names[0];
+
+	if (name == NULL || name[0] == 0) {
+		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
+			"The host and its key cannot be added, because no known-hosts file has been specified.\n"
+			"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
+		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+	}
+	else {
+		char FAR *keydata = format_specified_host_key(key, hostname, tcpport);
+		int length = strlen(keydata);
+		int fd;
+		int amount_written;
+		int close_result;
+		char buf[FILENAME_MAX];
+
+		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
+		fd = _open(buf,
+			_O_APPEND | _O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY,
+			_S_IREAD | _S_IWRITE);
+		if (fd == -1) {
+			if (errno == EACCES) {
+				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
+					"An error occurred while trying to write the host key.\n"
+					"You do not have permission to write to the known-hosts file.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
+			else {
+				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+					"An error occurred while trying to write the host key.\n"
+					"The host key could not be written.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
+			return;
+		}
+
+		amount_written = _write(fd, keydata, length);
+		free(keydata);
+		close_result = _close(fd);
+
+		if (amount_written != length || close_result == -1) {
+			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+				"An error occurred while trying to write the host key.\n"
+				"The host key could not be written.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 		}
 	}
@@ -1512,6 +1669,225 @@ error2:
 		key_free(key_freed);
 	}
 }
+
+
+void HOSTS_delete_all_hostkeys(PTInstVar pvar)
+{
+	char FAR *name = pvar->hosts_state.file_names[0];
+	char *hostname;
+	unsigned short tcpport;
+
+	hostname = pvar->ssh_state.hostname;
+	tcpport = pvar->ssh_state.tcpport;
+
+	if (name == NULL || name[0] == 0) {
+		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
+			"The host and its key cannot be added, because no known-hosts file has been specified.\n"
+			"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
+		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+	}
+	else {
+		Key key; // 接続中のホストのキー
+		Key *key_freed;
+		int length;
+		char filename[MAX_PATH];
+		char tmp[L_tmpnam];
+		int fd;
+		int amount_written = 0;
+		int close_result;
+		int data_index = 0;
+		char buf[FILENAME_MAX];
+
+		// 書き込み一時ファイルを開く
+		_getcwd(filename, sizeof(filename));
+		tmpnam_s(tmp, sizeof(tmp));
+		strcat_s(filename, sizeof(filename), tmp);
+		fd = _open(filename,
+			_O_CREAT | _O_WRONLY | _O_SEQUENTIAL | _O_BINARY | _O_TRUNC,
+			_S_IREAD | _S_IWRITE);
+
+		if (fd == -1) {
+			if (errno == EACCES) {
+				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
+					"An error occurred while trying to write the host key.\n"
+					"You do not have permission to write to the known-hosts file.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
+			else {
+				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+					"An error occurred while trying to write the host key.\n"
+					"The host key could not be written.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			}
+			return;
+		}
+
+		// 接続中のサーバのキーを読み込む
+		memset(&key, 0, sizeof(key));
+		switch (pvar->hosts_state.hostkey.type) {
+		case KEY_RSA1: // SSH1
+			key.type = KEY_RSA1;
+			key.bits = pvar->hosts_state.hostkey.bits;
+			key.exp = copy_mp_int(pvar->hosts_state.hostkey.exp);
+			key.mod = copy_mp_int(pvar->hosts_state.hostkey.mod);
+			break;
+		case KEY_RSA: // SSH2 RSA
+			key.type = KEY_RSA;
+			key.rsa = duplicate_RSA(pvar->hosts_state.hostkey.rsa);
+			break;
+		case KEY_DSA: // SSH2 DSA
+			key.type = KEY_DSA;
+			key.dsa = duplicate_DSA(pvar->hosts_state.hostkey.dsa);
+			break;
+		case KEY_ECDSA256:
+		case KEY_ECDSA384:
+		case KEY_ECDSA521:
+			key.type = pvar->hosts_state.hostkey.type;
+			key.ecdsa = EC_KEY_dup(pvar->hosts_state.hostkey.ecdsa);
+			break;
+		case KEY_ED25519:
+			key.type = pvar->hosts_state.hostkey.type;
+			key.ed25519_pk = duplicate_ED25519_PK(pvar->hosts_state.hostkey.ed25519_pk);
+			break;
+		}
+
+		// ファイルから読み込む
+		begin_read_host_files(pvar, 0);
+		do {
+			int host_index = 0;
+			int matched = 0;
+			int keybits = 0;
+			char FAR *data;
+			int do_write = 0;
+			length = amount_written = 0;
+
+			if (!read_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, 0, 1)) {
+				break;
+			}
+
+			if (data_index == pvar->hosts_state.file_data_index) {
+				// index が進まない == 最後まで読んだ
+				break;
+			}
+
+			data = pvar->hosts_state.file_data + data_index;
+			host_index = eat_spaces(data);
+
+			if (data[host_index] == '#') {
+				do_write = 1;
+			}
+			else {
+				// ホストの照合
+				host_index--;
+				do {
+					int negated;
+					int bracketed;
+					char *end_bracket;
+					int host_matched = 0;
+					unsigned short keyfile_port = 22;
+
+					host_index++;
+					negated = data[host_index] == '!';
+
+					if (negated) {
+						host_index++;
+						bracketed = data[host_index] == '[';
+						if (bracketed) {
+							end_bracket = strstr(data + host_index + 1, "]:");
+							if (end_bracket != NULL) {
+								*end_bracket = ' ';
+								host_index++;
+							}
+						}
+						host_matched = match_pattern(data + host_index, pvar->ssh_state.hostname);
+						if (bracketed && end_bracket != NULL) {
+							*end_bracket = ']';
+							keyfile_port = atoi(end_bracket + 2);
+						}
+						if (host_matched && keyfile_port == pvar->ssh_state.tcpport) {
+							matched = 0;
+							// 接続バージョンチェックのために host_index を進めてから抜ける
+							host_index--;
+							do {
+								host_index++;
+								host_index += eat_to_end_of_pattern(data + host_index);
+							} while (data[host_index] == ',');
+							break;
+						}
+					}
+					else {
+						bracketed = data[host_index] == '[';
+						if (bracketed) {
+							end_bracket = strstr(data + host_index + 1, "]:");
+							if (end_bracket != NULL) {
+								*end_bracket = ' ';
+								host_index++;
+							}
+						}
+						host_matched = match_pattern(data + host_index, pvar->ssh_state.hostname);
+						if (bracketed && end_bracket != NULL) {
+							*end_bracket = ']';
+							keyfile_port = atoi(end_bracket + 2);
+						}
+						if (host_matched && keyfile_port == pvar->ssh_state.tcpport) {
+							matched = 1;
+						}
+					}
+					host_index += eat_to_end_of_pattern(data + host_index);
+				} while (data[host_index] == ',');
+
+				// ホストが等しくない
+				if (!matched) {
+					do_write = 1;
+				}
+				// ホストが等しい
+				else {
+					// 一切書き込みをしない。
+
+				}
+			}
+
+			// 書き込み処理
+			if (do_write) {
+				length = pvar->hosts_state.file_data_index - data_index;
+				amount_written =
+					_write(fd, pvar->hosts_state.file_data + data_index,
+					length);
+
+				if (amount_written != length) {
+					goto error1;
+				}
+			}
+			data_index = pvar->hosts_state.file_data_index;
+		} while (1); // 最後まで読む
+
+	error1:
+		close_result = _close(fd);
+		if (amount_written != length || close_result == -1) {
+			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
+				"An error occurred while trying to write the host key.\n"
+				"The host key could not be written.");
+			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			goto error2;
+		}
+
+		// 書き込み一時ファイルからリネーム
+		get_teraterm_dir_relative_name(buf, sizeof(buf), name);
+		_unlink(buf);
+		rename(filename, buf);
+
+	error2:
+		_unlink(filename);
+
+		finish_read_host_files(pvar, 0);
+
+		// 最後にメモリを解放しておく。
+		key_freed = key_new(KEY_UNSPEC);
+		memcpy(key_freed, &key, sizeof(Key));
+		key_free(key_freed);
+	}
+}
+
 
 //
 // Unknown hostのホスト公開鍵を known_hosts ファイルへ保存するかどうかを

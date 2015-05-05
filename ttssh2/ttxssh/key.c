@@ -1912,6 +1912,44 @@ error:
 	return (ret);
 }
 
+static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
+{
+	size_t i;
+	char msg[128];
+	int dlgresult;
+
+	// "/nosecuritywarning"が指定されている場合、更新は一切行わない。
+	if (pvar->nocheck_known_hosts) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because `/nosecuritywarning' option was specified.");
+		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		goto error;
+	}
+
+	// known_hostsファイルの更新を行うため、ユーザに問い合わせを行う。
+	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Accept updated hostkeys? (yes/no)");
+		dlgresult = MessageBox(NULL, msg, "TTSSH: confirm", MB_YESNO | MB_ICONWARNING);
+		if (dlgresult != IDYES) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because a user cancelled.");
+			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+			goto error;
+		}
+	}
+
+	// 古いキーをすべて削除する。
+	HOSTS_delete_all_hostkeys(pvar);
+
+	// 新しいキーをすべて登録する。
+	for (i = 0; i < ctx->nkeys; i++) {
+		HOSTS_add_host_key(pvar, ctx->keys[i]);
+	}
+	_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was successfully updated to known_hosts file.");
+	notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+
+error:
+	return;
+}
+
 //
 // SSHサーバホスト鍵(known_hosts)の自動更新(OpenSSH 6.8 or later: host key rotation support)
 //
@@ -1932,7 +1970,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	Key *key = NULL, **tmp;
 
 	// Tera Termの設定で、当該機能のオンオフを制御できるようにする。
-	if (pvar->settings.UpdateHostkeys == 0) {
+	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_NO) {
 		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because ts.UpdateHostkeys is disabled.");
 		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
 		return 1;
@@ -2029,11 +2067,12 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 
 	// 新規追加する鍵はゼロだが、deprecatedな鍵が存在する。
 	if (ctx->nnew == 0 && ctx->nold != 0) {
-		// TODO:
+		update_known_hosts(pvar, ctx);
 
 	}
 	else if (ctx->nnew != 0) { // 新規追加するべき鍵が存在する。
 		// TODO:
+		update_known_hosts(pvar, ctx);
 
 	}
 
