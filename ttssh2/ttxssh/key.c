@@ -1950,6 +1950,15 @@ error:
 	return;
 }
 
+static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_int32_t seq, void *_ctx)
+{
+	struct hostkeys_update_ctx *ctx = (struct hostkeys_update_ctx *)_ctx;
+
+	update_known_hosts(pvar, ctx);
+
+	hostkeys_update_ctx_free(ctx);
+}
+
 //
 // SSHサーバホスト鍵(known_hosts)の自動更新(OpenSSH 6.8 or later: host key rotation support)
 //
@@ -1968,6 +1977,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	buffer_t *b = NULL;
 	struct hostkeys_update_ctx *ctx = NULL;
 	Key *key = NULL, **tmp;
+	unsigned char *outmsg;
 
 	// Tera Termの設定で、当該機能のオンオフを制御できるようにする。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_NO) {
@@ -2071,9 +2081,28 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 
 	}
 	else if (ctx->nnew != 0) { // 新規追加するべき鍵が存在する。
-		// TODO:
-		update_known_hosts(pvar, ctx);
+		buffer_clear(b);
 
+		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
+		buffer_put_char(b, 1);  /* bool: want reply */
+
+		for (i = 0; i < ctx->nkeys; i++) {
+			if (ctx->keys_seen[i])
+				continue;
+			key_to_blob(ctx->keys[i], &blob, &len);
+			buffer_put_string(b, blob, len);
+			free(blob);
+			blob = NULL;
+		}
+
+		len = buffer_len(b);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_GLOBAL_REQUEST, len);
+		memcpy(outmsg, buffer_ptr(b), len);
+		finish_send_packet(pvar);
+
+		// SSH2_MSG_GLOBAL_REQUESTのレスポンスに対応するハンドラを登録する。
+		client_register_global_confirm(client_global_hostkeys_private_confirm, ctx);
+		ctx = NULL;   // callbackで解放するので、ここではNULLでつぶしておく。
 	}
 
 	success = 1;

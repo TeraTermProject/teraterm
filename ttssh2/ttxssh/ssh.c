@@ -78,6 +78,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CHANNEL_MAX 100
 
 
+static struct global_confirm global_confirms;
+
 static Channel_t channels[CHANNEL_MAX];
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
@@ -120,6 +122,39 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 static void start_ssh_heartbeat_thread(PTInstVar pvar);
 void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c);
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num, unsigned char *data, unsigned int buflen);
+
+//
+// Global request confirm
+//
+static void client_init_global_confirm(void)
+{
+	memset(&global_confirms, 0, sizeof(global_confirms));
+	global_confirms.ref_count = 0;
+}
+
+void client_register_global_confirm(global_confirm_cb *cb, void *ctx)
+{
+	struct global_confirm *gc = &global_confirms;
+
+	if (gc->ref_count == 0) {
+		gc->cb = cb;
+		gc->ctx = ctx;
+		gc->ref_count = 1;
+	}
+}
+
+static int client_global_request_reply(PTInstVar pvar, int type, unsigned int seq, void *ctxt)
+{
+	struct global_confirm *gc = &global_confirms;
+
+	if (gc->ref_count >= 1) {
+		if (gc->cb)
+			gc->cb(pvar, type, seq, gc->ctx);
+		gc->ref_count = 0;
+	}
+
+	return 0;
+}
 
 //
 // channel function
@@ -1673,6 +1708,8 @@ static void init_protocol(PTInstVar pvar)
 		enque_handler(pvar, SSH2_MSG_GLOBAL_REQUEST, handle_SSH2_client_global_request);
 		enque_handler(pvar, SSH2_MSG_REQUEST_FAILURE, handle_SSH2_request_failure);
 		enque_handler(pvar, SSH2_MSG_REQUEST_SUCCESS, handle_SSH2_request_success);
+
+		client_init_global_confirm();
 
 	}
 }
@@ -7495,6 +7532,8 @@ static BOOL handle_SSH2_request_success(PTInstVar pvar)
 	// 必要であればログを取る。特に何もしなくてもよい。
 	notify_verbose_message(pvar, "SSH2_MSG_REQUEST_SUCCESS was received.", LOG_LEVEL_VERBOSE);
 
+	client_global_request_reply(pvar, SSH2_MSG_REQUEST_SUCCESS, 0, NULL);
+
 	return TRUE;
 }
 
@@ -7503,6 +7542,8 @@ static BOOL handle_SSH2_request_failure(PTInstVar pvar)
 {	
 	// 必要であればログを取る。特に何もしなくてもよい。
 	notify_verbose_message(pvar, "SSH2_MSG_REQUEST_FAILURE was received.", LOG_LEVEL_VERBOSE);
+
+	client_global_request_reply(pvar, SSH2_MSG_REQUEST_FAILURE, 0, NULL);
 
 	return TRUE;
 }

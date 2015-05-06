@@ -787,4 +787,15 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * bu
 #define get_ushort16(buf) get_ushort16_MSBfirst((buf))
 ///
 
+/* Global request confirmation callbacks */
+typedef void global_confirm_cb(PTInstVar pvar, int type, unsigned int seq, void *ctx);
+void client_register_global_confirm(global_confirm_cb *cb, void *ctx);
+
+/* Global request success/failure callbacks */
+struct global_confirm {
+	global_confirm_cb *cb;
+	void *ctx;
+	int ref_count;
+};
+
 #endif
