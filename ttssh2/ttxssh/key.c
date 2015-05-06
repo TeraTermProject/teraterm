@@ -1953,9 +1953,95 @@ error:
 static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_int32_t seq, void *_ctx)
 {
 	struct hostkeys_update_ctx *ctx = (struct hostkeys_update_ctx *)_ctx;
+	char msg[128];
+	char *data;
+	int len;
+	unsigned char *blob = NULL;
+	int bloblen;
+	buffer_t *b = NULL;
+	buffer_t *bsig = NULL;
+	char *cp, *sig;
+	size_t i, ndone, siglen;
+	int ret;
+
+	// SSH2 packet format:
+	// [size(4) + padding size(1) + type(1)] + [payload(N) + padding(X)]
+	//  header                                     body
+	//                                         ^data
+	//            <-----------------size------------------------------->
+	//                              <---------len-------->
+	//
+	// data = payload(N) + padding(X): パディングも含めたボディすべてを指す。
+	data = pvar->ssh_state.payload;
+	// len = size - (padding size + 1): パディングを除くボディ。typeが先頭に含まれる。
+	len = pvar->ssh_state.payloadlen;
+	len--;   // type 分を除く
+
+	bsig = buffer_init();
+	if (bsig == NULL)
+		goto error;
+	cp = buffer_append_space(bsig, len);
+	memcpy(cp, data, len);
+
+	if (ctx->nnew == 0) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey can not be updated because ctx->nnew %d(program bug).", ctx->nnew);
+		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		goto error;
+	}
+	if (type != SSH2_MSG_REQUEST_SUCCESS) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Server failed to confirm ownership of private host keys(type %d)", type);
+		notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
+		goto error;
+	}
+	if (pvar->session_id_len == 0) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey can not be updated because pvar->session_id_len %d(program bug).", pvar->session_id_len);
+		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		goto error;
+	}
+
+	b = buffer_init();
+	if (b == NULL)
+		goto error;
+
+	ndone = 0;
+	for (i = 0; i < ctx->nkeys; i++) {
+		if (ctx->keys_seen[i])
+			continue;
+
+		buffer_clear(b);
+		buffer_put_cstring(b, "hostkeys-prove-00@openssh.com");
+		buffer_put_string(b, pvar->session_id, pvar->session_id_len);
+		key_to_blob(ctx->keys[i], &blob, &bloblen);
+		buffer_put_string(b, blob, bloblen);
+		free(blob);
+		blob = NULL;
+
+		sig = buffer_get_string_msg(bsig, &siglen);
+		// Verify signature
+		ret = key_verify(ctx->keys[i], sig, siglen, buffer_ptr(b), buffer_len(b));
+		free(sig);
+		sig = NULL;
+		if (ret != 1) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "server gave bad signature for %s key %u", 
+				get_sshname_from_key(ctx->keys[i]), i);
+			notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
+			goto error;
+		}
+		ndone++;
+	}
+
+	if (ndone != ctx->nnew) {
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey can not be updated because ndone != ctx->nnew (%u / %u)(program bug).",
+			ndone, ctx->nnew);
+		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		goto error;
+	}
 
 	update_known_hosts(pvar, ctx);
 
+error:
+	buffer_free(b);
+	buffer_free(bsig);
 	hostkeys_update_ctx_free(ctx);
 }
 
