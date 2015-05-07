@@ -1915,8 +1915,9 @@ error:
 static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 {
 	size_t i;
-	char msg[128];
 	int dlgresult;
+	char msg[1024];
+	char *fp;
 
 	// "/nosecuritywarning"が指定されている場合、更新は一切行わない。
 	if (pvar->nocheck_known_hosts) {
@@ -1927,8 +1928,25 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 
 	// known_hostsファイルの更新を行うため、ユーザに問い合わせを行う。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Accept updated hostkeys? (yes/no)");
-		dlgresult = MessageBox(NULL, msg, "TTSSH: confirm", MB_YESNO | MB_ICONWARNING);
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, 
+			"Are you sure you want to accept updated hostkeys?\n\n"
+			"A user has been received complete hostkeys from a remote server.\n"
+			"Your known_hosts file can be updated to the latest public hostkeys \n"
+			"because the file does not contain in the following keys:\n\n"
+			);
+
+		for (i = 0; i < ctx->nkeys; i++) {
+			if (ctx->keys_seen[i])
+				continue;
+			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
+			strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->keys[i]));
+			strcat_s(msg, sizeof(msg), " ");
+			strcat_s(msg, sizeof(msg), fp);
+			strcat_s(msg, sizeof(msg), "\n");
+			free(fp);
+		}
+
+		dlgresult = MessageBox(NULL, msg, "TTSSH: confirm", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
 		if (dlgresult != IDYES) {
 			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because a user cancelled.");
 			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
