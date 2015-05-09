@@ -1916,8 +1916,11 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 {
 	size_t i;
 	int dlgresult;
-	char msg[1024];
+	char msg[1024], tmp[128];
 	char *fp;
+	char *host;
+
+	host = pvar->ssh_state.hostname;
 
 	// "/nosecuritywarning"が指定されている場合、更新は一切行わない。
 	if (pvar->nocheck_known_hosts) {
@@ -1929,24 +1932,28 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 	// known_hostsファイルの更新を行うため、ユーザに問い合わせを行う。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
 		_snprintf_s(msg, sizeof(msg), _TRUNCATE, 
-			"Are you sure you want to accept updated hostkeys?\n\n"
-			"A user has been received complete hostkeys from a remote server.\n"
-			"Your known_hosts file can be updated to the latest public hostkeys \n"
-			"because the file does not contain in the following keys:\n\n"
+			"Remote server \"%s\" sent the set of host keys which are absent in your list of known hosts. \n"
+			"The machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\n"
+			"If you approve to add %u latest keys and remove %u osbolete keys from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
+			, host, ctx->nnew, ctx->nold
 			);
 
-		for (i = 0; i < ctx->nkeys; i++) {
-			if (ctx->keys_seen[i])
-				continue;
-			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
-			strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->keys[i]));
-			strcat_s(msg, sizeof(msg), " ");
-			strcat_s(msg, sizeof(msg), fp);
-			strcat_s(msg, sizeof(msg), "\n");
-			free(fp);
+		if (ctx->nnew > 0) {
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%u latest keys:\n", ctx->nnew);
+			strcat_s(msg, sizeof(msg), tmp);
+			for (i = 0; i < ctx->nkeys; i++) {
+				if (ctx->keys_seen[i])
+					continue;
+				fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
+				strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->keys[i]));
+				strcat_s(msg, sizeof(msg), " ");
+				strcat_s(msg, sizeof(msg), fp);
+				strcat_s(msg, sizeof(msg), "\n");
+				free(fp);
+			}
 		}
 
-		dlgresult = MessageBox(NULL, msg, "TTSSH: confirm", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
+		dlgresult = MessageBox(NULL, msg, "TTSSH: SECURITY WARNING", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
 		if (dlgresult != IDYES) {
 			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because a user cancelled.");
 			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
