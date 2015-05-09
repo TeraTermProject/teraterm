@@ -1931,11 +1931,13 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 
 	// known_hostsファイルの更新を行うため、ユーザに問い合わせを行う。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, 
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, 
 			"Remote server \"%s\" sent the set of host keys which are absent in your list of known hosts. \n"
 			"The machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\n"
-			"If you approve to add %u latest keys and remove %u osbolete keys from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
-			, host, ctx->nnew, ctx->nold
+			"If you approve to add %u latest keys and remove %u obsolete keys from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
+			);
+		_snprintf_s(msg, sizeof(msg), _TRUNCATE, 
+			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
 			);
 
 		if (ctx->nnew > 0) {

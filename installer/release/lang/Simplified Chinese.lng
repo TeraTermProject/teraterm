@@ -722,6 +722,8 @@ DLG_HOSTKEY_SSHFP_DIFFTYPE=DNS中找到了密钥指纹信息，但是与主机密钥类型不一致！
 DLG_HOSTKEY_DNSSEC_NG=DNS中发现弱密码。
 DLG_HOSTKEY_DNSSEC_OK=DNS中发现强密码。
 
+DLG_HOSTKEY_ROTATION_WARNING=Remote server "%s" sent the set of host keys which are absent in your list of known hosts. \nThe machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\nIf you approve to add %u latest keys and remove %u obsolete keys from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n
+
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s加密错误(1): bytes %d (%d)
 MSG_ENCRYPT_ERROR2=%s加密错误(2)
