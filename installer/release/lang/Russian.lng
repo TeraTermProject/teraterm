@@ -462,6 +462,7 @@ BTN_CONTINUE=&Продолжить
 
 MSG_MACRO_CONF=MACRO: подтверждение
 MSG_MACRO_HALT_SCRIPT=Вы уверены, что хотите остановить этот макрос?
+
 ; common
 MSG_ERROR=ОШИБКА
 MSG_TT_ERROR=Tera Term: Ошибка
@@ -699,6 +700,7 @@ DLG_SSHSETUP_FORWARDAGENT=&Включить агент пересылки
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=&Подтвердить агента пересылки
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста в DNS
 DLG_SSHSETUP_NOTICE=Все параметры вступят в силу в следующей сессии.
+
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Выберите файл чтения/записи известных хостов
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы добавить
 

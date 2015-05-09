@@ -236,6 +236,7 @@ DLG_TAB_LOG_ROTATE=ログのローテート(&L)
 DLG_TAB_LOG_ROTATE_SIZE_TEXT=サイズ(&i)
 IDC_ROTATE_STEP_TEXT=世代(&R)
 
+
 DLG_TAB_CYGWIN_PATH=Cygwinインストール先のパス(&P)
 
 DLG_COMMENT_TITLE=ログにコメントを付加
