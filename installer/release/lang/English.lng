@@ -721,7 +721,7 @@ DLG_HOSTKEY_SSHFP_DIFFTYPE=Mismatching host key type found in DNS.
 DLG_HOSTKEY_DNSSEC_NG=Found insecure fingerprint in DNS.
 DLG_HOSTKEY_DNSSEC_OK=Found secure fingerprint in DNS.
 
-DLG_HOSTKEY_ROTATION_WARNING=Remote server "%s" sent the set of host keys which are absent in your list of known hosts. \nThe machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\nIf you approve to add %u latest keys and remove %u obsolete keys from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n
+DLG_HOSTKEY_ROTATION_WARNING=Remote server "%s" sent the set of host keys which are absent in your list of known hosts. \nThe machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\nIf you choose to add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list and continue, then you will not receive this warning again.\n\nDo you want to update known hosts file with new key(s)?\n\n
 
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s encrypt error(1): bytes %d (%d)

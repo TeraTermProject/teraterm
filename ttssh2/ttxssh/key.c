@@ -1934,20 +1934,36 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, 
 			"Remote server \"%s\" sent the set of host keys which are absent in your list of known hosts. \n"
 			"The machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\n"
-			"If you approve to add %u latest keys and remove %u obsolete keys from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
+			"If you choose to add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
+			"Do you want to update known hosts file with new key(s)?\n\n"
 			);
 		_snprintf_s(msg, sizeof(msg), _TRUNCATE, 
 			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
 			);
 
 		if (ctx->nnew > 0) {
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%u latest keys:\n", ctx->nnew);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%u latest key(s):\n", ctx->nnew);
 			strcat_s(msg, sizeof(msg), tmp);
 			for (i = 0; i < ctx->nkeys; i++) {
 				if (ctx->keys_seen[i])
 					continue;
 				fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
 				strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->keys[i]));
+				strcat_s(msg, sizeof(msg), " ");
+				strcat_s(msg, sizeof(msg), fp);
+				strcat_s(msg, sizeof(msg), "\n");
+				free(fp);
+			}
+		}
+
+		if (ctx->nold > 0) {
+			strcat_s(msg, sizeof(msg), "\n");
+
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%u obsolete key(s):\n", ctx->nold);
+			strcat_s(msg, sizeof(msg), tmp);
+			for (i = 0; i < ctx->nold; i++) {
+				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX);
+				strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->old_keys[i]));
 				strcat_s(msg, sizeof(msg), " ");
 				strcat_s(msg, sizeof(msg), fp);
 				strcat_s(msg, sizeof(msg), "\n");
