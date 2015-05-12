@@ -40,7 +40,7 @@
 
 * Notice for SVN commiter
 - SVN repository for commiter is followings:
-  svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk
+  svn+ssh://svn.osdn.jp/svnroot/ttssh2/trunk
 
 - Should not edit checkout file in copying directory.
   The other modification code may be deleted in SVN server when you commit checkout file. Also, fix it carefully when the conflicting occurs.
@@ -132,7 +132,7 @@ Example: adding a TTSSH menu under File menu
   To build Tera Term source code is shown in the following step:
   And you should use Visual Studio 2005 Standard Edition later version to build Tera Term because Tera Term program links MFC library (Visual Studio 2005 Express Edition can't be used).
 
-  1. Checkout Tera Term source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  1. Checkout Tera Term source code from osdn(http://osdn.jp/projects/ttssh2/).
   2. Open teraterm\visualc\ttermpro.sln with Visual Studio.
      The linefeed code of .sln file must be "CR+LF".
   3. Build Tera Term solution.
@@ -140,14 +140,14 @@ Example: adding a TTSSH menu under File menu
 
 
 * How to build TeraTerm Menu
-  1. Checkout TeraTerm Menu source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  1. Checkout TeraTerm Menu source code from osdn(http://osdn.jp/projects/ttssh2/).
   2. Open ttpmenu\ttpmenu.sln with Visual Studio.
   3. Build ttpmenu solution.
   4. ttpmenu.exe will be generated in Release directory if the building is successful.
 
 
 * How to build TTXKanjiMenu
-  1. Checkout TTXKanjiMenu source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  1. Checkout TTXKanjiMenu source code from osdn(http://osdn.jp/projects/ttssh2/).
   2. Open TTXKanjiMenu\ttxkanjimenu.sln with Visual Studio.
   3. Build ttpmenu solution.
   4. ttxkanjimenu.dll will be generated in TTXKanjiMenu directory if the building is successful.
@@ -157,7 +157,7 @@ Example: adding a TTSSH menu under File menu
   To build TTProxy source code is shown in the following step:
   And you need Visual Studio 2005(VC++8.0) to build.
 
-  1. Checkout TTProxy source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  1. Checkout TTProxy source code from osdn(http://osdn.jp/projects/ttssh2/).
   2. Open TTProxy\TTProxy.sln with Visual Studio.
   3. Build TTProxy solution.
   4. TTProxy DLL module will be generated in TTProxy directory if the building is successful.
@@ -178,7 +178,7 @@ Example: adding a TTSSH menu under File menu
       + #include <windows.h>
       + #define IDC_STATIC -1
 
-  1. Checkout TTSSH source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  1. Checkout TTSSH source code from osdn(http://osdn.jp/projects/ttssh2/).
   2. Open ttssh2\ttssh.sln with Visual Studio.
   3. Build TTSSH solution.
   4. TTSSH DLL will be generated in ttssh2\ttxssh directory if the building is successful.
@@ -201,7 +201,7 @@ Example: adding a TTSSH menu under File menu
   And you need Visual Studio 2005(VC++8.0) to build.
   VS2005 Express Edition is able to build TTXSamples.
 
-  1. Checkout TTXSamples source code from SourceForge(http://sourceforge.jp/projects/ttssh2/).
+  1. Checkout TTXSamples source code from osdn(http://osdn.jp/projects/ttssh2/).
   2. Open TTXSamples\TTXSamples.sln with Visual Studio.
   3. Build TTXSamples solution.
   4. TTXSamples DLL module will be generated in TTXSamples directory if the building is successful.
@@ -269,20 +269,20 @@ Example: adding a TTSSH menu under File menu
 
   5. Create SVN tag.
      The naming rule is `teraterm-version'(ex. teraterm-4_82).
-     svn copy -m "Release 4.82" svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/tags/teraterm-4_82
+     svn copy -m "Release 4.82" svn+ssh://svn.osdn.jp/svnroot/ttssh2/trunk svn+ssh://svn.osdn.jp/svnroot/ttssh2/tags/teraterm-4_82
 
   6. Re-checkout from svn tag.
 
   7. Make installer package
      Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
 
-  8. Update SourceForge.jp project site.
+  8. Update osdn.jp project site.
      - Add new release.
      - Submit news.
 
   9. Announce release to mailing list(in Japan).
 
-  10. Update SourceForge.jp project home page.
+  10. Update osdn.jp project home page.
 
   11. Delete snapshots.
 

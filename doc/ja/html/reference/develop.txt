@@ -40,7 +40,7 @@
 
 ■ SVN コミッターへの注意
 - SVN リポジトリは一般向けとは違い、以下の通りです。
-  svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk
+  svn+ssh://svn.osdn.jp/svnroot/ttssh2/trunk
 
 - ファイルを別のディレクトリで編集しないでください。
   コミットしたときに別の人の修正を削除してしまうことがあります。
@@ -135,7 +135,7 @@
   Tera Termのビルド方法について以下に示します。
   ビルドにはVisual Studio 2005 Standard Edition以上が必要です（Visual Studio 2005 Express Editionは不可）。
 
-  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
+  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする。
   2. teraterm\visualc\ttermpro.sln をVisual Studioで開く。
      .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。
   3. ソリューションをビルドする
@@ -143,14 +143,14 @@
 
 
 ■ TeraTerm Menuのビルド方法
-  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. ttpmenu\ttpmenu.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると ttpmenu ディレクトリに ttpmenu.exe が生成される
 
 
 ■ TTXKanjiMenuのビルド方法
-  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると TTXKanjiMenu ディレクトリに ttxkanjimenu.dll が生成される
@@ -160,7 +160,7 @@
   TTProxyのビルド方法について以下に示します。
   ビルドにはVisual Studio 2005(VC++8.0)が必要です。
 
-  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. TTProxy\TTProxy.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると TTProxy ディレクトリにDLLが生成される
@@ -181,7 +181,7 @@
       + #include <windows.h>
       + #define IDC_STATIC -1
 
-  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする。
+  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする。
   2. ttssh2\ttssh.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される
@@ -205,7 +205,7 @@
   TTXSamplesのビルドにはVisual Studio 2005(VC++8.0)が必要です。
   Tera Term本体とは違い、Express Editionでもビルド可能です。
 
-  1. ソースコードをSourceForge(http://sourceforge.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. TTXSamples\TTXSamples.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると TTXSamples ディレクトリにDLLが生成される
@@ -280,14 +280,14 @@
 
   5. SVN のタグを作成する。
      タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。
-     svn copy -m "Release 4.82" svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/trunk svn+ssh://svn.sourceforge.jp/svnroot/ttssh2/tags/teraterm-4_82
+     svn copy -m "Release 4.82" svn+ssh://svn.osdn.jp/svnroot/ttssh2/trunk svn+ssh://svn.osdn.jp/svnroot/ttssh2/tags/teraterm-4_82
 
   6. リリース用のタグでチェックアウトし直す。
 
   7. インストーラを作成する
      ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
 
-  8. SourceForge.jp を更新する
+  8. osdn.jp を更新する
      - [ダウンロード]-[管理]-[新規作成]
          変更履歴を入力してリリースを作成する
      - [ニュース一覧]-[新規登録]
