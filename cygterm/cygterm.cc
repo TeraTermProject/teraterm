@@ -24,7 +24,7 @@
 //   Using Cygwin with a terminal emulator.
 //   
 //   Writtern by TeraTerm Project.
-//            http://ttssh2.sourceforge.jp/
+//            http://ttssh2.osdn.jp/
 //   
 //   Original written by NSym.
 //                         *** Web Pages ***
