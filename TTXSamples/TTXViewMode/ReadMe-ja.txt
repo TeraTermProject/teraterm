@@ -23,4 +23,4 @@ ToDo:
 
 その他:
   このプラグインは、以下の要望を元にして作られました。
-  http://sourceforge.jp/tracker/index.php?func=detail&aid=8850&group_id=1412&atid=5336
+  http://osdn.jp/tracker/index.php?func=detail&aid=8850&group_id=1412&atid=5336
