@@ -84,7 +84,7 @@ BEGIN
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
     LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,181,8
     LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,207,8
-    LTEXT           "Tera Term Project:     http://ttssh2.sourceforge.jp/",IDC_WEBSITES,6,99,248,13,SS_SUNKEN
+    LTEXT           "Tera Term Project:     http://ttssh2.osdn.jp/",IDC_WEBSITES,6,99,248,13,SS_SUNKEN
     LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,116,248,26
     LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,140,248,27
     EDITTEXT        IDC_ABOUTTEXT,6,171,248,87,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
