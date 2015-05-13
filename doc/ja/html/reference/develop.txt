@@ -135,7 +135,7 @@
   Tera Termのビルド方法について以下に示します。
   ビルドにはVisual Studio 2005 Standard Edition以上が必要です（Visual Studio 2005 Express Editionは不可）。
 
-  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする。
+  1. ソースコードをOSDN(http://osdn.jp/projects/ttssh2/)からチェックアウトする。
   2. teraterm\visualc\ttermpro.sln をVisual Studioで開く。
      .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。
   3. ソリューションをビルドする
@@ -143,14 +143,14 @@
 
 
 ■ TeraTerm Menuのビルド方法
-  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをOSDN(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. ttpmenu\ttpmenu.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると ttpmenu ディレクトリに ttpmenu.exe が生成される
 
 
 ■ TTXKanjiMenuのビルド方法
-  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをOSDN(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると TTXKanjiMenu ディレクトリに ttxkanjimenu.dll が生成される
@@ -160,7 +160,7 @@
   TTProxyのビルド方法について以下に示します。
   ビルドにはVisual Studio 2005(VC++8.0)が必要です。
 
-  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする
+  1. ソースコードをOSDN(http://osdn.jp/projects/ttssh2/)からチェックアウトする
   2. TTProxy\TTProxy.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功すると TTProxy ディレクトリにDLLが生成される
@@ -181,7 +181,7 @@
       + #include <windows.h>
       + #define IDC_STATIC -1
 
-  1. ソースコードをosdn(http://osdn.jp/projects/ttssh2/)からチェックアウトする。
+  1. ソースコードをOSDN(http://osdn.jp/projects/ttssh2/)からチェックアウトする。
   2. ttssh2\ttssh.sln をVisual Studioで開く
   3. ソリューションをビルドする
   4. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される
@@ -287,7 +287,7 @@
   7. インストーラを作成する
      ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
 
-  8. osdn.jp を更新する
+  8. OSDN を更新する
      - [ダウンロード]-[管理]-[新規作成]
          変更履歴を入力してリリースを作成する
      - [ニュース一覧]-[新規登録]
