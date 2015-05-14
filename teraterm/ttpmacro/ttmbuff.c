@@ -93,6 +93,22 @@ int IsUpdateMacroCommand(void)
 }
 
 
+// マクロファイルの先頭にある BOM を除去する。
+static void TrimUnicodeBOM(CHAR *pbuf, BINT *plen)
+{
+	BYTE *buf = pbuf;
+	BINT len = *plen;
+
+	// UTF-8 BOM
+	if (len > 3) {
+		if (buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF) {
+			memmove_s(&buf[0], len, &buf[3], len - 3);
+			*plen = len - 3;
+		}
+	}
+}
+
+
 BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 {
 	int F;
@@ -148,6 +164,10 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 				Buff[IBuff][1] = '\0';
 			}
 			_lclose(F);
+
+			// for UTF-8 BOM
+			// (2015.5.15 yutaka)
+			TrimUnicodeBOM(Buff[IBuff], &BuffLen[IBuff]);
 
 			// 行番号配列を作る。これにより、バッファのインデックスから行番号への変換が
 			// O(N)->O(logN)で検索できるようになる。
