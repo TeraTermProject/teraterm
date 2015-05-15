@@ -481,7 +481,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 }
 
 static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
-							  TS_SSH FAR * settings, BOOL copy_forward)
+                              TS_SSH FAR * settings, BOOL copy_forward)
 {
 	char buf[1024];
 
@@ -1004,7 +1004,7 @@ static void enable_dlg_items(HWND dlg, int from, int to, BOOL enabled)
 // サブクラス化するためのウインドウプロシージャ
 WNDPROC OrigHostnameEditProc; // Original window procedure
 LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
-                                         WPARAM wParam, LPARAM lParam)
+                                  WPARAM wParam, LPARAM lParam)
 {
 	HWND parent;
 	int  max, select, len;
@@ -1594,32 +1594,6 @@ static void read_ssh_options_from_user_file(PTInstVar pvar,
 	FWDUI_load_settings(pvar);
 }
 
-#ifdef USE_ATCMDLINE
-// @をブランクに置換する。 (2005.1.26 yutaka)
-static void replace_to_blank(char *src, char *dst, int dst_len)
-{
-	int len, i;
-
-	len = strlen(src);
-	if (dst_len < len) // buffer overflow check
-		return;
-
-	for (i = 0 ; i < len ; i++) {
-		if (src[i] == '@') { // @ が登場したら
-			if (i < len - 1 && src[i + 1] == '@') { // その次も @ ならアットマークと認識する
-				*dst++ = '@';
-				i++;
-			} else {
-				*dst++ = ' '; // 空白に置き換える
-			}
-		} else {
-			*dst++ = src[i];
-		}
-	}
-	*dst = '\0';
-}
-#endif
-
 // Percent-encodeされた文字列srcをデコードしてdstにコピーする。
 // dstlenはdstのサイズ。これより結果が長い場合、その分は切り捨てられる。
 static void percent_decode(char *dst, int dstlen, char *src) {
@@ -1817,28 +1791,13 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 			}
 
 		} else if (MATCH_STR(option + 1, "user=") == 0) {
-#ifdef USE_ATCMDLINE
-			replace_to_blank(option + 6, pvar->ssh2_username, sizeof(pvar->ssh2_username));
-			//_snprintf(pvar->ssh2_username, sizeof(pvar->ssh2_username), "%s", option + 6);
-
-#else
 			_snprintf_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), _TRUNCATE, "%s", option + 6);
-#endif
 
 		} else if (MATCH_STR(option + 1, "passwd=") == 0) {
-#ifdef USE_ATCMDLINE
-			replace_to_blank(option + 8, pvar->ssh2_password, sizeof(pvar->ssh2_password));
-			//_snprintf(pvar->ssh2_password, sizeof(pvar->ssh2_password), "%s", option + 8);
-#else
 			_snprintf_s(pvar->ssh2_password, sizeof(pvar->ssh2_password), _TRUNCATE, "%s", option + 8);
-#endif
 
 		} else if (MATCH_STR(option + 1, "keyfile=") == 0) {
-#ifdef USE_ATCMDLINE
-			replace_to_blank(option + 9, pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile));
-#else
 			_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%s", option + 9);
-#endif
 
 		} else if (MATCH_STR(option + 1, "ask4passwd") == 0) {
 			// パスワードを聞く (2006.9.18 maya)
@@ -1966,7 +1925,6 @@ static int parse_option(PTInstVar pvar, char FAR * option)
 static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts,
                                      PCHAR DDETopic)
 {
-#ifndef USE_ATCMDLINE
 	int i;
 	BOOL inParam = FALSE;
 	BOOL inQuotes = FALSE;
@@ -2082,124 +2040,6 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts,
 		}
 	}
 	free(buf);
-#else
-	// スペースを含むファイル名を認識するように修正 (2006.10.7 maya)
-	int i, buflen;
-	BOOL inParam = FALSE;
-	BOOL inQuotes = FALSE;
-	BOOL inFileParam = FALSE;
-	PCHAR option = NULL;
-
-	if (pvar->hostdlg_activated) {
-		pvar->settings.Enabled = pvar->hostdlg_Enabled;
-	}
-
-	for (i = 0; param[i] != 0; i++) {
-		if (inQuotes ? param[i] == '"'
-		             : (param[i] == ' ' || param[i] == '\t')) {
-			if (option != NULL) {
-				char ch = param[i];
-				PCHAR Equal;
-
-				param[i] = 0;
-				Equal = strchr(option, '=');
-				if (inFileParam && Equal != NULL && *(Equal + 1) == '"') {
-					int buf_len = strlen(option) * sizeof(char);
-					char *buf = (char *)calloc(strlen(option), sizeof(char));
-					char c = option[Equal - option + 1];
-					option[Equal - option + 1] = 0;
-					strncat_s(buf, buf_len, option, _TRUNCATE);
-					option[Equal - option + 1] = c;
-					strncat_s(buf, buf_len, Equal + 2, _TRUNCATE);
-					switch (parse_option(pvar, *buf == '"' ? buf + 1 : buf)) {
-					  case OPTION_CLEAR:
-						memset(option, ' ', i + 1 - (option - param));
-						break;
-					  case OPTION_REPLACE:
-						buflen = strlen(buf);
-						memcpy(option, buf, buflen);
-						memset(option + buflen, ' ', i + 1 - buflen - (option - param));
-						break;
-					  default:
-						param[i] = ch;
-					}
-					free(buf);
-				}
-				else {
-					switch (parse_option(pvar, *option == '"' ? option + 1 : option)) {
-					  case OPTION_CLEAR:
-						memset(option, ' ', i + 1 - (option - param));
-						break;
-					  default:
-						param[i] = ch;
-					}
-				}
-				option = NULL;
-			}
-			inParam = FALSE;
-			inQuotes = FALSE;
-			inFileParam = FALSE;
-		} else if (!inParam) {
-			if (param[i] == '"') {
-				inQuotes = TRUE;
-				inParam = TRUE;
-				option = param + i;
-			} else if (param[i] != ' ' && param[i] != '\t') {
-				inParam = TRUE;
-				option = param + i;
-			}
-		} else {
-			if (option == NULL) {
-				continue;
-			}
-			if ((option[0] == '-' || option[0] == '/') &&
-			    (MATCH_STR(option + 1, "ssh-f=") == 0 ||       // ttssh option
-			     MATCH_STR(option + 1, "ssh-consume=") == 0 || // ttssh option
-			     MATCH_STR_I(option + 1, "f=") == 0 ||         // Tera Term option
-			     MATCH_STR_I(option + 1, "fd=") == 0 ||        // Tera Term option
-			     MATCH_STR_I(option + 1, "k=") == 0 ||         // Tera Term option
-			     MATCH_STR_I(option + 1, "l=") == 0 ||         // Tera Term option
-			     MATCH_STR_I(option + 1, "m=") == 0 ||         // Tera Term option
-			     MATCH_STR_I(option + 1, "r=") == 0 ||         // Tera Term option
-			     MATCH_STR_I(option + 1, "w=") == 0 ||         // Tera Term option
-			     MATCH_STR(option + 1, "keyfile=") == 0)) {	   // ttssh option
-				if (param[i] == '"') {
-					inQuotes = TRUE;
-				}
-				inFileParam = TRUE;
-			}
-		}
-	}
-
-	if (option != NULL) {
-		PCHAR Equal = strchr(option, '=');
-		if (inFileParam && Equal != NULL && *(Equal + 1) == '"') {
-			int buf_len = strlen(option) * sizeof(char);
-			char *buf = (char *)calloc(strlen(option), sizeof(char));
-			char c = option[Equal - option + 1];
-			option[Equal - option + 1] = 0;
-			strncat_s(buf, buf_len, option, _TRUNCATE);
-			option[Equal - option + 1] = c;
-			strncat_s(buf, buf_len, Equal + 2, _TRUNCATE);
-			switch (parse_option(pvar, *buf == '"' ? buf + 1 : buf)) {
-			  case OPTION_CLEAR:
-				memset(option, ' ', i + 1 - (option - param));
-				break;
-			  case OPTION_REPLACE:
-				strcpy_s(option, i - (param - option), buf);
-				break;
-			}
-			free(buf);
-		}
-		else {
-			switch (parse_option(pvar, option)) {
-			  case OPTION_CLEAR:
-				memset(option, ' ', i - (option - param));
-				break;
-			}
-		}
-	}
-#endif
 
 	FWDUI_load_settings(pvar);
 
@@ -5385,42 +5225,8 @@ static void dquote_string(char *str, char *dst, int dst_len)
 	strncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-#ifdef USE_ATCMDLINE
-// 以下はTeraTerm Menuのコード(ttpmenu.cpp)と同一。
-// 空白を @ に置き換える。@自身は@@にする。(2005.1.28 yutaka)
-static void replace_blank_to_mark(char *str, char *dst, int dst_len)
-{
-	int i, len, n;
-
-	len = strlen(str);
-	n = 0;
-	for (i = 0 ; i < len ; i++) {
-		if (str[i] == '@')
-			n++;
-	}
-	if (dst_len < (len + 2*n))
-		return;
-
-	for (i = 0 ; i < len ; i++) {
-		if (str[i] == '@') {
-			*dst++ = '@';
-			*dst++ = '@';
-
-		} else if (str[i] == ' ') {
-			*dst++ = '@';
-
-		} else {
-			*dst++ = str[i];
-
-		}
-	}
-	*dst = '\0';
-
-}
-#endif
-
 static void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen,
-										 PGetHNRec rec)
+                                         PGetHNRec rec)
 {
 	char tmpFile[MAX_PATH];
 	char tmpPath[1024];
@@ -5494,41 +5300,25 @@ static void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen,
 			// パスワードを覚えている場合のみ、コマンドラインに渡す。(2006.8.3 yutaka)
 			if (pvar->settings.remember_password &&
 			    pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
-#ifdef USE_ATCMDLINE
-				replace_blank_to_mark(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-#else
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-#endif
 				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
 				            " /auth=password /user=%s /passwd=%s", pvar->auth_state.user, mark);
 				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
-#ifdef USE_ATCMDLINE
-				replace_blank_to_mark(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-#else
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-#endif
 				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
 				            " /auth=publickey /user=%s /passwd=%s", pvar->auth_state.user, mark);
 				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
-#ifdef USE_ATCMDLINE
-				replace_blank_to_mark(pvar->session_settings.DefaultRSAPrivateKeyFile, mark, sizeof(mark));
-#else
 				dquote_string(pvar->session_settings.DefaultRSAPrivateKeyFile, mark, sizeof(mark));
-#endif
 				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, " /keyfile=%s", mark);
 				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
 
 			} else if (pvar->settings.remember_password &&
 			           pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-#ifdef USE_ATCMDLINE
-				replace_blank_to_mark(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-#else
 				dquote_string(pvar->auth_state.cur_cred.password, mark, sizeof(mark));
-#endif
 				_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
 				            " /auth=challenge /user=%s /passwd=%s", pvar->auth_state.user, mark);
 				strncat_s(cmd, cmdlen, tmp, _TRUNCATE);
