@@ -16,6 +16,11 @@ class TTProxy : public DynamicLinkLibrary<TTProxy> {
 		ID_PROXYSETUPMENU  = 53310,
 		ID_ASYNCMESSAGEBOX = 63001,
 	};
+	enum {
+		OPTION_NONE    = 0,
+		OPTION_CLEAR   = 1,
+		OPTION_REPLACE = 2,
+	};
 public:
 	TTProxy():initialized(false), showing_error_message(false) {
 	}
@@ -81,7 +86,35 @@ private:
 		buffer.append(basename);
 		return buffer.toString();
 	}
+#if 1
+	// TTXSamples/TTXCommandLineOpt/TTXCommandLineOpt.c と同じ
+	static PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
+		int i = 0;
+		BOOL quoted = FALSE;
 
+		while (*param == ' ' || *param == '\t') {
+			param++;
+		}
+
+		if (*param == '\0' || *param == ';') {
+			return NULL;
+		}
+
+		while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+			if (*param == '"' && (*++param != '"' || !quoted)) {
+				quoted = !quoted;
+				continue;
+			}
+			else if (i < size - 1) {
+				buff[i++] = *param;
+			}
+			param++;
+		}
+
+		buff[i] = '\0';
+		return (param);
+	}
+#else
 	static int parse_option(char* option) {
 		if ((*option == '/' || *option == '-')) {
 			if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
@@ -111,6 +144,7 @@ private:
 		}
 		return 0;
 	}
+#endif
 	static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts) {
 		getInstance().ORIG_ReadIniFile(fileName, ts);
 		read_options(fileName);
@@ -119,6 +153,87 @@ private:
 		getInstance().ORIG_WriteIniFile(fileName, ts);
 		write_options(fileName);
 	}
+#if 1
+	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
+		int param_len=strlen(param);
+		char option[1024];
+		int opt_len = sizeof(option);
+		int action;
+		PCHAR cur, next;
+
+		memset(&option, '\0', opt_len);
+
+		cur = param;
+		while (next = GetParam(option, opt_len, cur)) {
+			action = OPTION_NONE;
+
+			if ((option[0] == '-' || option[0] == '/')) {
+				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
+					read_options(get_teraterm_dir_relative_name(option + 3));
+				}
+			}
+
+			switch (action) {
+				case OPTION_CLEAR:
+					memset(cur, ' ', next-cur);
+					break;
+				case OPTION_REPLACE:
+					memset(cur, ' ', next-cur);
+					memcpy(cur+1, option, strlen(option));
+					break;
+			}
+
+			cur = next;
+		}
+
+		cur = param;
+		while (next = GetParam(option, opt_len, cur)) {	
+			action = OPTION_NONE;
+
+			if ((option[0] == '-' || option[0] == '/')) {
+				if (strlen(option + 1) >= 6 && option[6] == '=') {
+					option[6] = '\0';
+					if (_stricmp(option + 1, "proxy") == 0) {
+						ProxyWSockHook::parseURL(option + 7, TRUE);
+						action = OPTION_CLEAR;
+					}else{
+						option[6] = '=';
+					}
+				}
+			}else{
+				String realhost = ProxyWSockHook::parseURL(option, FALSE);
+				if (realhost != NULL) {
+					getInstance().realhost = realhost;
+					if (realhost.indexOf("://") == -1) {
+						action = OPTION_CLEAR;
+					}
+					else {
+						// -proxy= なしで、proto://proxy:port/ 以降の実ホストが含まれていない
+						// ttermpro で処理してもらうため、TTXParseParam で消さない
+						action = OPTION_REPLACE;
+					}
+				}
+			}
+
+			switch (action) {
+				case OPTION_CLEAR:
+					memset(cur, ' ', next-cur);
+					break;
+				case OPTION_REPLACE:
+					memset(cur, ' ', next-cur);
+					memcpy(cur+1, option, strlen(option));
+					break;
+			}
+
+			cur = next;
+		}
+
+		getInstance().ORIG_ParseParam(param, ts, DDETopic);
+		if (getInstance().ts->HostName[0] == '\0' && getInstance().realhost != NULL) {
+			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
+		}
+	}
+#else
 	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		char* p = param;
 		bool inParam = false;
@@ -278,6 +393,7 @@ private:
 			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
 		}
 	}
+#endif
 
 	static void copy_UILanguageFile() {
 		strncpy_s(UILanguageFile, sizeof(UILanguageFile),
