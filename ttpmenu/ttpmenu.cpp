@@ -1134,9 +1134,10 @@ static void _dquote_string(char *str, char *dst, int dst_len)
 
 static void dquote_string(char *str, char *dst, int dst_len)
 {
-	// ",スペース,^A-^_ が含まれる場合にはクオートする
+	// ",スペース,;,^A-^_ が含まれる場合にはクオートする
 	if (strchr(str, '"') != NULL ||
 	    strchr(str, ' ') != NULL ||
+	    strchr(str, ';') != NULL ||
 	    strchr(str, 0x01) != NULL ||
 	    strchr(str, 0x02) != NULL ||
 	    strchr(str, 0x03) != NULL ||
