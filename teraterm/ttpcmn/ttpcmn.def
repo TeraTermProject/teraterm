@@ -54,3 +54,5 @@ EXPORTS
   UndoAllWin @60
 
   OpenHelp @61
+
+  GetParam @62

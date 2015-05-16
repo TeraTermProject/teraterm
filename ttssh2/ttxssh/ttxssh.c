@@ -1633,34 +1633,6 @@ void add_forward_param(PTInstVar pvar, char *param)
 }
 
 #if 1
-// TTXSamples/TTXCommandLineOpt/TTXCommandLineOpt.c ‚Æ“¯‚¶
-static PCHAR GetParam(PCHAR buff, int size, PCHAR param) {
-	int i = 0;
-	BOOL quoted = FALSE;
-
-	while (*param == ' ' || *param == '\t') {
-		param++;
-	}
-
-	if (*param == '\0' || *param == ';') {
-		return NULL;
-	}
-
-	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
-		if (*param == '"' && (*++param != '"' || !quoted)) {
-			quoted = !quoted;
-			continue;
-		}
-		else if (i < size - 1) {
-			buff[i++] = *param;
-		}
-		param++;
-	}
-
-	buff[i] = '\0';
-	return (param);
-}
-
 static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	int param_len=strlen(param);
 	int opt_len = param_len+1;

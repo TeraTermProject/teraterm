@@ -1155,6 +1155,34 @@ void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	}
 }
 
+PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
+{
+	int i = 0;
+	BOOL quoted = FALSE;
+
+	while (*param == ' ' || *param == '\t') {
+		param++;
+	}
+
+	if (*param == '\0' || *param == ';') {
+		return NULL;
+	}
+
+	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+		if (*param == '"' && (*++param != '"' || !quoted)) {
+			quoted = !quoted;
+			continue;
+		}
+		else if (i < size - 1) {
+			buff[i++] = *param;
+		}
+		param++;
+	}
+
+	buff[i] = '\0';
+	return (param);
+}
+
 HWND FAR PASCAL GetNthWin(int n)
 {
 	if (n<pm->NWin) {
