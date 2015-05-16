@@ -43,43 +43,39 @@ static int DlgPosY = 0;
 static PStatDlg StatDlg = NULL;
 
 extern "C" {
-BOOL NextParam(PCHAR Param, int *i, PCHAR Buff, int BuffSize)
+BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 {
 	int j;
-	char c, q;
+	char c;
 	BOOL Quoted;
 
-	if ( *i >= (int)strlen(Param)) {
+	if ((unsigned int) (*i) >= strlen(Param)) {
 		return FALSE;
 	}
 	j = 0;
 
-	while (Param[*i]==' ') {
+	while (Param[*i] == ' ' || Param[*i] == '\t') {
 		(*i)++;
 	}
 
+	Quoted = FALSE;
 	c = Param[*i];
-	Quoted = ((c=='"') || (c=='\''));
-	q = 0;
-	if (Quoted) {
-		q = c; 
-	   (*i)++;
-		c = Param[*i];
-	}
 	(*i)++;
-	while ((c!=0) && (c!=q) && (Quoted || (c!=' ')) &&
-	       (Quoted || (c!=';')) && (j<BuffSize-1)) {
-		Buff[j] = c;
+	while ((c != 0) && (j < Size - 1) &&
+	       (Quoted || ((c != ' ') && (c != ';') && (c != '\t')))) {
+		if (c == '"')
+			Quoted = !Quoted;
+		Temp[j] = c;
 		j++;
 		c = Param[*i];
 		(*i)++;
 	}
-	if (! Quoted && (c==';')) {
+	if (!Quoted && (c == ';')) {
 		(*i)--;
 	}
 
-	Buff[j] = 0;
-	return (strlen(Buff)>0);
+	Temp[j] = 0;
+	return (strlen(Temp) > 0);
 }
 }
 
@@ -135,31 +131,31 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		else {
 			j++;
 			if (j==1) {
-				strncpy_s(FileName, sizeof(FileName),Temp, _TRUNCATE);
+				DequoteParam(FileName, sizeof(FileName), Temp);
 			}
 			else if (j==2) {
-				strncpy_s(Param2, sizeof(Param2),Temp, _TRUNCATE);
+				DequoteParam(Param2, sizeof(Param2), Temp);
 			}
 			else if (j==3) {
-				strncpy_s(Param3, sizeof(Param3),Temp, _TRUNCATE);
+				DequoteParam(Param3, sizeof(Param3), Temp);
 			}
 			else if (j==4) {
-				strncpy_s(Param4, sizeof(Param4),Temp, _TRUNCATE);
+				DequoteParam(Param4, sizeof(Param4), Temp);
 			}
 			else if (j==5) {
-				strncpy_s(Param5, sizeof(Param5),Temp, _TRUNCATE);
+				DequoteParam(Param5, sizeof(Param5), Temp);
 			}
 			else if (j==6) {
-				strncpy_s(Param6, sizeof(Param6),Temp, _TRUNCATE);
+				DequoteParam(Param6, sizeof(Param6), Temp);
 			}
 			else if (j==7) {
-				strncpy_s(Param7, sizeof(Param7),Temp, _TRUNCATE);
+				DequoteParam(Param7, sizeof(Param7), Temp);
 			}
 			else if (j==8) {
-				strncpy_s(Param8, sizeof(Param8),Temp, _TRUNCATE);
+				DequoteParam(Param8, sizeof(Param8), Temp);
 			}
 			else if (j==9) {
-				strncpy_s(Param9, sizeof(Param9),Temp, _TRUNCATE);
+				DequoteParam(Param9, sizeof(Param9), Temp);
 			}
 		}
 	}

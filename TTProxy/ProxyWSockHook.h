@@ -15,7 +15,6 @@ using namespace yebisuya;
 #include "Logger.h"
 #include "SSLSocket.h"
 
-#include "ttcommon.h"
 #include "ttlib.h"
 #include "i18n.h"
 

@@ -54,6 +54,9 @@ char *mctimelocal();
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 int b64decode(PCHAR dst, int dsize, PCHAR src);
 
+PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param);
+void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
+
 #ifdef __cplusplus
 }
 #endif

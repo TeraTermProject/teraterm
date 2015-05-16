@@ -56,3 +56,4 @@ EXPORTS
   OpenHelp @61
 
   GetParam @62
+  DequoteParam @63

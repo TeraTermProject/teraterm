@@ -3156,12 +3156,14 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 	char c;
 	BOOL Quoted;
 
-	if ((unsigned int) (*i) >= strlen(Param))
+	if ((unsigned int) (*i) >= strlen(Param)) {
 		return FALSE;
+	}
 	j = 0;
 
-	while (Param[*i] == ' ' || Param[*i] == '\t')
+	while (Param[*i] == ' ' || Param[*i] == '\t') {
 		(*i)++;
+	}
 
 	Quoted = FALSE;
 	c = Param[*i];
@@ -3175,57 +3177,13 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 		c = Param[*i];
 		(*i)++;
 	}
-	if (!Quoted && (c == ';'))
+	if (!Quoted && (c == ';')) {
 		(*i)--;
+	}
 
 	Temp[j] = 0;
 	return (strlen(Temp) > 0);
 }
-
-void Dequote(PCHAR Source, PCHAR Dest)
-{
-	int i, j;
-	char q, c;
-
-	Dest[0] = 0;
-	if (Source[0] == 0)
-		return;
-	i = 0;
-	/* quoting char */
-	q = Source[i];
-	/* only '"' is used as quoting char */
-	if (q == '"')
-		i++;
-
-	c = Source[i];
-	i++;
-	j = 0;
-	while ((c != 0)) {
-		if (c != '"') {
-			Dest[j] = c;
-			j++;
-		}
-		else {
-			if (q == '"' && Source[i] == '"') {
-				Dest[j] = c;
-				j++;
-				i++;
-			}
-			else if (q == '"' && Source[i] == '\0') {
-				break;
-			}
-			else {
-				Dest[j] = c;
-				j++;
-			}
-		}
-		c = Source[i];
-		i++;
-	}
-
-	Dest[j] = 0;
-}
-
 
 #ifndef NO_INET6
 static void ParseHostName(char *HostStr, WORD * port)
@@ -3353,7 +3311,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 
 	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
 		if (_strnicmp(Temp, "/F=", 3) == 0) {	/* setup filename */
-			Dequote(&Temp[3], Temp2);
+			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
 			if (strlen(Temp2) > 0) {
 				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".INI", Temp,
 				          sizeof(Temp));
@@ -3414,7 +3372,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ts->HostDialogOnStartup = TRUE;
 		}
 		else if (_strnicmp(Temp, "/FD=", 4) == 0) {	/* file transfer directory */
-			Dequote(&Temp[4], Temp2);
+			DequoteParam(Temp2, sizeof(Temp2), &Temp[4]);
 			if (strlen(Temp2) > 0) {
 				_getcwd(TempDir, sizeof(TempDir));
 				if (_chdir(Temp2) == 0)
@@ -3428,7 +3386,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		else if (_stricmp(Temp, "/I") == 0)	/* iconize */
 			ts->Minimize = 1;
 		else if (_strnicmp(Temp, "/K=", 3) == 0) {	/* Keyboard setup file */
-			Dequote(&Temp[3], Temp2);
+			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
 			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".CNF",
 			          ts->KeyCnfFN, sizeof(ts->KeyCnfFN));
 		}
@@ -3457,7 +3415,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_strnicmp(Temp, "/L=", 3) == 0) {	/* log file */
-			Dequote(&Temp[3], Temp2);
+			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
 			strncpy_s(ts->LogFN, sizeof(ts->LogFN), Temp2, _TRUNCATE);
 		}
 		else if (_strnicmp(Temp, "/LA=", 4) == 0) {	/* language */
@@ -3480,14 +3438,14 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_strnicmp(Temp, "/MN=", 4) == 0) {	/* multicastname */
-			Dequote(&Temp[4], ts->MulticastName);
+			DequoteParam(ts->MulticastName, sizeof(ts->MulticastName), &Temp[4]);
 		}
 		else if (_strnicmp(Temp, "/M=", 3) == 0) {	/* macro filename */
 			if ((Temp[3] == 0) || (Temp[3] == '*'))
 				strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*",
 				          _TRUNCATE);
 			else {
-				Dequote(&Temp[3], Temp2);
+				DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
 				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".TTL",
 				          ts->MacroFN, sizeof(ts->MacroFN));
 			}
@@ -3509,7 +3467,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				ParamTCP = 65535;
 		}
 		else if (_strnicmp(Temp, "/R=", 3) == 0) {	/* Replay filename */
-			Dequote(&Temp[3], Temp2);
+			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
 			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), "", ts->HostName,
 			          sizeof(ts->HostName));
 			if (strlen(ts->HostName) > 0)
@@ -3533,7 +3491,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ts->HideWindow = 1;
 		}
 		else if (_strnicmp(Temp, "/W=", 3) == 0) {	/* Window title */
-			Dequote(&Temp[3], ts->Title);
+			DequoteParam(ts->Title, sizeof(ts->Title), &Temp[3]);
 		}
 		else if (_strnicmp(Temp, "/X=", 3) == 0) {	/* Window pos (X) */
 			if (sscanf(&Temp[3], "%d", &pos) == 1) {
