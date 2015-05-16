@@ -1175,40 +1175,6 @@ static void dquote_string(char *str, char *dst, int dst_len)
 	strncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-#ifdef USE_ATCMDLINE
-// 空白を @ に置き換える。@自身は@@にする。(2005.1.28 yutaka)
-static void replace_blank_to_mark(char *str, char *dst, int dst_len)
-{
-	int i, len, n;
-
-	len = strlen(str);
-	n = 0;
-	for (i = 0 ; i < len ; i++) {
-		if (str[i] == '@')
-			n++;
-	}
-	if (dst_len < (len + 2*n)) 
-		return;
-
-	for (i = 0 ; i < len ; i++) {
-		if (str[i] == '@') {
-			*dst++ = '@';
-			*dst++ = '@';
-
-		} else if (str[i] == ' ') {
-			*dst++ = '@';
-
-		} else {
-			*dst++ = str[i];
-
-		}
-	}
-	*dst = '\0';
-
-}
-#endif
-
-
 /* ==========================================================================
 	Function Name	: (BOOL) ConnectHost()
 	Outline			: 自動ログインまたはアプリケーションの実行をする。
@@ -1303,13 +1269,8 @@ BOOL ConnectHost(HWND hWnd, UINT idItem, char *szJobName)
 			char passwd[MAX_PATH], keyfile[MAX_PATH];
 
 			strcpy(tmp, szArgment);
-#ifdef USE_ATCMDLINE
-			replace_blank_to_mark(jobInfo.szPassword, passwd, sizeof(passwd));
-			replace_blank_to_mark(jobInfo.PrivateKeyFile, keyfile, sizeof(keyfile));
-#else
 			dquote_string(jobInfo.szPassword, passwd, sizeof(passwd));
 			dquote_string(jobInfo.PrivateKeyFile, keyfile, sizeof(keyfile));
-#endif
 
 			if (jobInfo.bChallenge) { // keyboard-interactive
 				_snprintf(szArgment, sizeof(szArgment), "%s:22 /ssh /auth=challenge /user=%s /passwd=%s %s", 
