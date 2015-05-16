@@ -1638,13 +1638,16 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	int opt_len = param_len+1;
 	char *option = (char *)calloc(opt_len, sizeof(char));
 	int action;
-	PCHAR cur, next;
+	PCHAR start, cur, next;
 
 	if (pvar->hostdlg_activated) {
 		pvar->settings.Enabled = pvar->hostdlg_Enabled;
 	}
 
-	cur = param;
+	/* the first term shuld be executable filename of Tera Term */
+	start = GetParam(option, opt_len, param);
+
+	cur = start;
 	while (next = GetParam(option, opt_len, cur)) {
 		action = OPTION_NONE;
 
@@ -1679,7 +1682,7 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		cur = next;
 	}
 
-	cur = param;
+	cur = start;
 	while (next = GetParam(option, opt_len, cur)) {	
 		action = OPTION_NONE;
 

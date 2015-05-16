@@ -131,11 +131,14 @@ private:
 		char option[1024];
 		int opt_len = sizeof(option);
 		int action;
-		PCHAR cur, next;
+		PCHAR start, cur, next;
 
 		memset(&option, '\0', opt_len);
 
-		cur = param;
+		/* the first term shuld be executable filename of Tera Term */
+		start = GetParam(option, opt_len, param);
+
+		cur = start;
 		while (next = GetParam(option, opt_len, cur)) {
 			action = OPTION_NONE;
 
@@ -158,7 +161,7 @@ private:
 			cur = next;
 		}
 
-		cur = param;
+		cur = start;
 		while (next = GetParam(option, opt_len, cur)) {	
 			action = OPTION_NONE;
 

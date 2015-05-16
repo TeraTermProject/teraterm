@@ -57,10 +57,13 @@ BOOL ColorStr2ColorRef(COLORREF *color, PCHAR Str) {
 
 static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
   char buff[1024];
-  PCHAR cur, next;
+  PCHAR start, cur, next;
   int x, y;
 
-  cur = Param;
+  /* the first term shuld be executable filename of Tera Term */
+  start = GetParam(buff, sizeof(buff), Param);
+
+  cur = start;
   while (next = GetParam(buff, sizeof(buff), cur)) {
     if (_strnicmp(buff, "/FG=", 4) == 0) {
       ColorStr2ColorRef(&(ts->VTColor[0]), &buff[4]);
