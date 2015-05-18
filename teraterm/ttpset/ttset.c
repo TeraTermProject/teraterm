@@ -3292,7 +3292,8 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	BOOL JustAfterHost = FALSE;
 
 	ts->HostName[0] = 0;
-	ts->KeyCnfFN[0] = 0;
+	//ts->KeyCnfFN[0] = 0;
+
 	/* Set AutoConnect true as default (2008.2.16 by steven)*/
 	ts->ComAutoConnect = TRUE;
 

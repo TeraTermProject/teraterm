@@ -80,6 +80,10 @@ BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
 	_chdir(ts->HomeDir);
 	GetDefaultSetupFName(ts->HomeDir, ts->SetupFName, sizeof(ts->SetupFName));
 
+	strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), ts->HomeDir, _TRUNCATE);
+	AppendSlash(ts->KeyCnfFN, sizeof(ts->KeyCnfFN));
+	strncat_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN), "KEYBOARD.CNF", _TRUNCATE);
+
 	if (FirstInstance) {
 		FirstInstance = FALSE;
 		return TRUE;
