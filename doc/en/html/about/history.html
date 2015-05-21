@@ -2585,7 +2585,7 @@ SYNOPSIS:
         <ul>
           <li>added the UpdateHostkeys entry regarding the server public key updating in the teraterm.ini file. The default value is disabled.</li>
         </ul></li>
-      <!--li><a href="../commandline/ttssh.html#f">/f=</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f=</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume=</a> コマンドラインオプションをほかのオプションよりも先に読み込むようにした。</li-->
+      <li>The <a href="../commandline/ttssh.html#f">/f=</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f=</a> and <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume=</a> command option can be read earlier than other option.</li>
     </ul>
   </li>
 
@@ -2593,8 +2593,8 @@ SYNOPSIS:
     <ul>
       <li>A user can not connect to the OpenSSH 6.8 server.</li>
       <li>When the 0(disabled line) is located at the front end of any algorithm(CipherOrder, KexOrder, HostKeyOrder, MacOrder and CompOrder), an application fault is occurred.</li>
-      <!--li>コマンドラインオプションの <a href="../commandline/teraterm.html#comment">;</a> 以降がコメントとして認識されない問題を修正した。</li>
-      <li>セッションの複製時に引き渡すファイル名・パスワード値に ; が含まれるときにクォートされない問題を修正した。</li-->
+      <li>A command line option after <a href="../commandline/teraterm.html#comment">;</a> can not be recognized as remark.</li>
+      <li>When the filename and password value contains a semicolon(;) by using the session duplication, the semicolon can not be quoted.</li>
     </ul>
   </li>
 
@@ -3814,7 +3814,7 @@ SYNOPSIS:
 
 <h3><a name="ttproxy_1.0.0.21">2015.xx.xx (Ver 1.0.0.21)</a></h3>
 <ul class="history">
-      <!--li>/F= コマンドラインオプションをほかのオプションよりも先に読み込むようにした。</li-->
+      <li>The /F= command option can be read earlier than other option.</li>
 </ul>
 
 <h3><a name="ttproxy_1.0.0.20">2014.06.01 (Ver 1.0.0.20)</a></h3>
@@ -3901,7 +3901,7 @@ SYNOPSIS:
 
 <h3><a name="ttmenu_1.13">2015.xx.xx (Ver 1.13)</a></h3>
 <ul class="history">
-      <!--li>SSH セッションの開始時に引き渡すファイル名・パスワード値に ; が含まれるときにクォートされない問題を修正した。</li==>
+      <li>When the filename and password value contains a semicolon(;) on SSH connection, the semicolon can not be quoted.</li>
 </ul>
 
 <h3><a name="ttmenu_1.12">2014.08.31 (Ver 1.12)</a></h3>
