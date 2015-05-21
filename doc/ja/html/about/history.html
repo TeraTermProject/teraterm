@@ -49,6 +49,8 @@
   <li>その他
     <ul>
       <li><a href="#ttssh_2.73">TTSSH(2.73)</a>へ差し替えた。</li>
+      <li><a href="#ttproxy_1.0.0.21">TTProxy(1.0.0.21)</a>へ差し替えた。</li>
+      <li><a href="#ttmenu_1.13">TeraTerm Menu(1.13)</a>へ差し替えた。</li>
       <li>LogMeTT 2.10.3 へ差し替えた。</li>
       <li>SourceForge.jpからOSDNへのドメイン変更に対応した。</li>
     </ul>
@@ -2588,6 +2590,7 @@
         <ul>
           <li>teraterm.iniに UpdateHostkeys エントリ(ホスト公開鍵の更新有無)を追加した。デフォルトはオフ。</li>
         </ul></li>
+      <li><a href="../commandline/ttssh.html#f">/f=</a>, <a href="../commandline/ttssh.html#ssh-f">/ssh-f=</a>, <a href="../commandline/ttssh.html#ssh-consume">/ssh-consume=</a> コマンドラインオプションをほかのオプションよりも先に読み込むようにした。</li>
     </ul>
   </li>
 
@@ -2595,6 +2598,8 @@
     <ul>
       <li>OpenSSH 6.8に接続できない問題を修正した。</li>
       <li>各種アルゴリズム(CipherOrder, KexOrder, HostKeyOrder, MacOrder, CompOrder)の一番先頭に0(disabled line)が来ると、アプリケーションが落ちる問題を修正した。</li>
+      <li>コマンドラインオプションの <a href="../commandline/teraterm.html#comment">;</a> 以降がコメントとして認識されない問題を修正した。</li>
+      <li>セッションの複製時に引き渡すファイル名・パスワード値に ; が含まれるときにクォートされない問題を修正した。</li>
     </ul>
   </li>
 
@@ -3812,6 +3817,11 @@
 
 <h2><a name="ttproxy">TTProxy</a></h2>
 
+<h3><a name="ttproxy_1.0.0.21">2015.xx.xx (Ver 1.0.0.21)</a></h3>
+<ul class="history">
+      <li>/F= コマンドラインオプションをほかのオプションよりも先に読み込むようにした。</li>
+</ul>
+
 <h3><a name="ttproxy_1.0.0.20">2014.06.01 (Ver 1.0.0.20)</a></h3>
 <ul class="history">
       <li>言語ファイルが反映されないことがある問題を修正した。</li>
@@ -3895,6 +3905,11 @@
 
 
 <h2><a name="ttmenu">TeraTerm Menu</a></h2>
+
+<h3><a name="ttmenu_1.13">2015.xx.xx (Ver 1.13)</a></h3>
+<ul class="history">
+      <li>SSH セッションの開始時に引き渡すファイル名・パスワード値に ; が含まれるときにクォートされない問題を修正した。</li>
+</ul>
 
 <h3><a name="ttmenu_1.12">2014.08.31 (Ver 1.12)</a></h3>
 <ul class="history">
