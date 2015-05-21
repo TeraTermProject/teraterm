@@ -14,17 +14,19 @@
 <h1>filewriteln</h1>
 
 <p>
-Writes a string with new-line to a file.
+Writes a data with new-line to a file.
 </p>
 
 <pre class="macro-syntax">
-filewriteln &lt;file handle&gt; &lt;string&gt;
+filewriteln &lt;file handle&gt; &lt;data&gt;
 </pre>
 
 <h2>Remarks</h2>
 
 <p>
-Writes &lt;string&gt; and the new-line characters (CR+LF) to the file specified by &lt;file handle&gt;.
+Writes &lt;data&gt; and the new-line characters (CR+LF) to the file specified by &lt;file handle&gt;.<br />
+<!--&lt;data&gt; が文字列型の場合、文字列を書き込む。<br />
+&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を書き込む。-->
 </p>
 
 <h2>Example</h2>
