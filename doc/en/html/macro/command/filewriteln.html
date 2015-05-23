@@ -25,8 +25,9 @@ filewriteln &lt;file handle&gt; &lt;data&gt;
 
 <p>
 Writes &lt;data&gt; and the new-line characters (CR+LF) to the file specified by &lt;file handle&gt;.<br />
-<!--&lt;data&gt; が文字列型の場合、文字列を書き込む。<br />
-&lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を書き込む。-->
+When the &lt;data&gt; type is the character string, the data is written as string.<br />
+When the &lt;data&gt; type is the integer, the least significant byte(0-255) regards as the ASCII code and
+the ASCII character is written.
 </p>
 
 <h2>Example</h2>
