@@ -3149,7 +3149,7 @@ void FAR PASCAL AddHostToList(PCHAR FName, PCHAR Host)
 {
 	AddValueToList(FName, Host, "Hosts", "Host", MAXHOSTLIST);
 }
-
+#if 0
 BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 {
 	int j;
@@ -3184,7 +3184,7 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 	Temp[j] = 0;
 	return (strlen(Temp) > 0);
 }
-
+#endif
 #ifndef NO_INET6
 static void ParseHostName(char *HostStr, WORD * port)
 {
@@ -3290,6 +3290,9 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	DWORD ParamBaud = BaudNone;
 	BOOL HostNameFlag = FALSE;
 	BOOL JustAfterHost = FALSE;
+#if 1
+	PCHAR start, cur, next;
+#endif
 
 	ts->HostName[0] = 0;
 	//ts->KeyCnfFN[0] = 0;
@@ -3307,10 +3310,19 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		DDETopic[0] = 0;
 	i = 0;
 	/* the first term shuld be executable filename of Tera Term */
+#if 1
+	start = GetParam(Temp, sizeof(Temp), Param);
+#else
 	NextParam(Param, &i, Temp, sizeof(Temp));
-	param_top = i;
+#endif
 
+#if 1
+	cur = start;
+	while (next = GetParam(Temp, sizeof(Temp), cur)) {
+#else
+	param_top = i;
 	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
+#endif
 		if (_strnicmp(Temp, "/F=", 3) == 0) {	/* setup filename */
 			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
 			if (strlen(Temp2) > 0) {
@@ -3323,10 +3335,18 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				}
 			}
 		}
+#if 1
+		cur = next;
+#endif
 	}
 
+#if 1
+	cur = start;
+	while (next = GetParam(Temp, sizeof(Temp), cur)) {
+#else
 	i = param_top;
 	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
+#endif
 		if (HostNameFlag) {
 			JustAfterHost = TRUE;
 			HostNameFlag = FALSE;
@@ -3540,6 +3560,9 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		JustAfterHost = FALSE;
+#if 1
+		cur = next;
+#endif
 	}
 
 	// Language Ç™ïœçXÇ≥ÇÍÇΩÇ©Ç‡ÇµÇÍÇ»Ç¢ÇÃÇ≈ÅA

@@ -1637,6 +1637,7 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	int param_len=strlen(param);
 	int opt_len = param_len+1;
 	char *option = (char *)calloc(opt_len, sizeof(char));
+	char *option2 = (char *)calloc(opt_len, sizeof(char));
 	int action;
 	PCHAR start, cur, next;
 
@@ -1654,17 +1655,20 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		if ((option[0] == '-' || option[0] == '/')) {
 			if (MATCH_STR(option + 1, "ssh") == 0) {
 				if (MATCH_STR(option + 4, "-f=") == 0) {
-					read_ssh_options_from_user_file(pvar, option + 7);
+					DequoteParam(option2, opt_len, option + 7);
+					read_ssh_options_from_user_file(pvar, option2);
 					action = OPTION_CLEAR;
 				} else if (MATCH_STR(option + 4, "-consume=") == 0) {
-					read_ssh_options_from_user_file(pvar, option + 13);
-					DeleteFile(option + 13);
+					DequoteParam(option2, opt_len, option + 13);
+					read_ssh_options_from_user_file(pvar, option2);
+					DeleteFile(option2);
 					action = OPTION_CLEAR;
 				}
 
 			// ttermpro.exe の /F= 指定でも TTSSH の設定を読む (2006.10.11 maya)
 			} else if (MATCH_STR_I(option + 1, "f=") == 0) {
-				read_ssh_options_from_user_file(pvar, option + 3);
+				DequoteParam(option2, opt_len, option + 3);
+				read_ssh_options_from_user_file(pvar, option2);
 				// Tera Term側でも解釈する必要があるので消さない
 			}
 		}
@@ -1832,13 +1836,16 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				}
 
 			} else if (MATCH_STR(option + 1, "user=") == 0) {
-				_snprintf_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), _TRUNCATE, "%s", option + 6);
+				DequoteParam(option2, opt_len, option + 6);
+				_snprintf_s(pvar->ssh2_username, sizeof(pvar->ssh2_username), _TRUNCATE, "%s", option2);
 
 			} else if (MATCH_STR(option + 1, "passwd=") == 0) {
-				_snprintf_s(pvar->ssh2_password, sizeof(pvar->ssh2_password), _TRUNCATE, "%s", option + 8);
+				DequoteParam(option2, opt_len, option + 8);
+				_snprintf_s(pvar->ssh2_password, sizeof(pvar->ssh2_password), _TRUNCATE, "%s", option2);
 
 			} else if (MATCH_STR(option + 1, "keyfile=") == 0) {
-				_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%s", option + 9);
+				DequoteParam(option2, opt_len, option + 9);
+				_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%s", option2);
 
 			} else if (MATCH_STR(option + 1, "ask4passwd") == 0) {
 				// パスワードを聞く (2006.9.18 maya)

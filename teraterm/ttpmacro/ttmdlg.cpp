@@ -42,6 +42,7 @@ static int DlgPosY = 0;
 
 static PStatDlg StatDlg = NULL;
 
+#if 0
 extern "C" {
 BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 {
@@ -78,6 +79,7 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 	return (strlen(Temp) > 0);
 }
 }
+#endif
 
 extern "C" {
 void ParseParam(PBOOL IOption, PBOOL VOption)
@@ -85,6 +87,9 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	int i, j, k;
 	char *Param;
 	char Temp[MaxStrLen];
+#if 1
+	PCHAR start, cur, next;
+#endif
 
 	// Get home directory
 	if (GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName)) == 0) {
@@ -112,10 +117,19 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	Param = GetCommandLine();
 	i = 0;
 	// the first term shuld be executable filename of TTMACRO
+#if 1
+	start = GetParam(Temp, sizeof(Temp), Param);
+#else
 	NextParam(Param, &i, Temp, sizeof(Temp));
+#endif
 	j = 0;
 
+#if 1
+	cur = start;
+	while (next = GetParam(Temp, sizeof(Temp), cur)) {
+#else
 	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
+#endif
 		if (_strnicmp(Temp,"/D=",3)==0) { // DDE option
 			strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);  // BOFëŒçÙ
 		}
@@ -158,6 +172,9 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 				DequoteParam(Param9, sizeof(Param9), Temp);
 			}
 		}
+#if 1
+		cur = next;
+#endif
 	}
 
 	ParamCnt = j;

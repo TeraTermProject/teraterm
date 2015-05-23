@@ -129,6 +129,7 @@ private:
 	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		int param_len=strlen(param);
 		char option[1024];
+		char option2[1024];
 		int opt_len = sizeof(option);
 		int action;
 		PCHAR start, cur, next;
@@ -144,7 +145,8 @@ private:
 
 			if ((option[0] == '-' || option[0] == '/')) {
 				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
-					read_options(get_teraterm_dir_relative_name(option + 3));
+					DequoteParam(option2, sizeof(option2), option + 3);
+					read_options(get_teraterm_dir_relative_name(option2));
 				}
 			}
 
@@ -169,7 +171,8 @@ private:
 				if (strlen(option + 1) >= 6 && option[6] == '=') {
 					option[6] = '\0';
 					if (_stricmp(option + 1, "proxy") == 0) {
-						ProxyWSockHook::parseURL(option + 7, TRUE);
+						DequoteParam(option2, sizeof(option2), option + 7);
+						ProxyWSockHook::parseURL(option2, TRUE);
 						action = OPTION_CLEAR;
 					}else{
 						option[6] = '=';

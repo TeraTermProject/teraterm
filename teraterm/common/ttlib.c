@@ -1070,6 +1070,28 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 		return NULL;
 	}
 
+#if 1
+	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
+		if (*param == '"') {
+			if ((!quoted && *(param+1) != '"') || (quoted && *(param+1) != '"')) {
+				quoted = !quoted;
+			}
+			else {
+				if (i < size - 1) {
+					buff[i++] = *param;
+				}
+				param++;
+			}
+		}
+		if (i < size - 1) {
+			buff[i++] = *param;
+		}
+		param++;
+	}
+	if (!quoted && (buff[i-1] == ';')) {
+		i--;
+	}
+#else
 	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
 		if (*param == '"' && (*++param != '"' || !quoted)) {
 			quoted = !quoted;
@@ -1080,6 +1102,7 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 		}
 		param++;
 	}
+#endif
 
 	buff[i] = '\0';
 	return (param);
