@@ -147,9 +147,7 @@
 #define IDC_ETERM1_SETUPDIR_EDIT        2513
 #define IDC_TRANSPROGRESS               2514
 #define IDC_WINDOW_REPORT               2514
-#define IDC_ETERM2_SETUPDIR_EDIT        2514
 #define IDC_PROTOPROGRESS               2515
-#define IDC_ETERM3_SETUPDIR_EDIT        2515
 #define IDC_SSH_SETUPDIR_EDIT           2516
 #define IDC_ACCEPT_TITLE_CHANGING_LABEL 2517
 #define IDC_PASTEDELAY_LABEL            2518
@@ -178,13 +176,9 @@
 #define IDC_ROTATE_STEP                 2530
 #define IDC_CYGTERM_SETUPDIR_BUTTON     2530
 #define IDC_ROTATE_STEP_TEXT            2531
-#define IDC_ETERM1_SETUPDIR_BUTTON      2531
 #define IDC_ROTATE_SIZE_TEXT            2532
-#define IDC_ETERM2_SETUPDIR_BUTTON      2532
 #define IDC_ROTATE_GROUP                2533
-#define IDC_ETERM3_SETUPDIR_BUTTON      2533
 #define IDC_LOG_OPTION_GROUP            2534
-#define IDC_SSH_BUTTON                  2534
 #define IDC_SSH_SETUPDIR_BUTTON         2534
 #define IDC_OPT_BINARY                  2535
 #define IDC_OPT_APPEND                  2536
@@ -196,9 +190,6 @@
 #define IDC_INI_SETUPDIR_STATIC         2541
 #define IDC_KEYCNF_SETUPDIR_STATIC      2542
 #define IDC_CYGTERM_SETUPDIR_STATIC     2543
-#define IDC_ETERM1_SETUPDIR_STATIC      2544
-#define IDC_ETERM2_SETUPDIR_STATIC      2545
-#define IDC_ETERM3_SETUPDIR_STATIC      2546
 #define IDC_SSH_SETUPDIR_STATIC         2547
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002

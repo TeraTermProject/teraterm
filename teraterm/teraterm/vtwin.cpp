@@ -4715,8 +4715,6 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	static char keycnfpath[MAX_PATH], keycnffilename[MAX_PATH];
 	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH];
 	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH];
-	static char eterm2path[MAX_PATH], eterm2filename[MAX_PATH];
-	static char eterm3path[MAX_PATH], eterm3filename[MAX_PATH];
 	char temp[MAX_PATH];
 	typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
 	PSSH_read_known_hosts_file func = NULL;
@@ -4747,25 +4745,6 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		//SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, cygtermfilename);
 		_snprintf_s(temp, sizeof(temp), "%s\\%s", cygtermpath, cygtermfilename);
 		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, temp);
-
-		// TODO: Eterm look-feel 関連は BGThemeFile エントリから取得する。
-		strncpy_s(eterm1filename, sizeof(eterm1filename), "ImageFile.INI", _TRUNCATE);
-		_snprintf_s(eterm1path, sizeof(eterm1path), "%s\\theme", teratermexepath);
-		//SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_STATIC, eterm1filename);
-		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm1path, eterm1filename);
-		SetDlgItemText(hDlgWnd, IDC_ETERM1_SETUPDIR_EDIT, temp);
-
-		strncpy_s(eterm2filename, sizeof(eterm2filename), "Scale.INI", _TRUNCATE);
-		_snprintf_s(eterm2path, sizeof(eterm2path), "%s\\theme", teratermexepath);
-		//SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_STATIC, eterm2filename);
-		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm2path, eterm2filename);
-		SetDlgItemText(hDlgWnd, IDC_ETERM2_SETUPDIR_EDIT, temp);
-
-		strncpy_s(eterm3filename, sizeof(eterm3filename), "Tile.INI", _TRUNCATE);
-		_snprintf_s(eterm3path, sizeof(eterm3path), "%s\\theme", teratermexepath);
-		//SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_STATIC, eterm3filename);
-		_snprintf_s(temp, sizeof(temp), "%s\\%s", eterm3path, eterm3filename);
-		SetDlgItemText(hDlgWnd, IDC_ETERM3_SETUPDIR_EDIT, temp);
 
 		// ssh_known_hosts
 		if (func == NULL) {
@@ -4806,18 +4785,6 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		case IDC_CYGTERM_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
 			openVirtualStore(cygtermpath, cygtermfilename);
-			return TRUE;
-
-		case IDC_ETERM1_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(eterm1path, eterm1filename);
-			return TRUE;
-
-		case IDC_ETERM2_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(eterm2path, eterm2filename);
-			return TRUE;
-
-		case IDC_ETERM3_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(eterm3path, eterm3filename);
 			return TRUE;
 
 		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
