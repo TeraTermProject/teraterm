@@ -127,11 +127,13 @@ error:;
 
 int dh_estimate(int bits)
 {
+	if (bits <= 112)
+		return 2048;
 	if (bits <= 128)
-		return (1024);  /* O(2**86) */
+		return 3072;
 	if (bits <= 192)
-		return (2048);  /* O(2**116) */
-	return (4096);      /* O(2**156) */
+		return 7680;
+	return 8192;
 }
 
 
