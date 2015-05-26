@@ -24,7 +24,10 @@ filewrite &lt;file handle&gt; &lt;data&gt;
 <h2>Remarks</h2>
 
 <p>
-Writes &lt;data&gt; to the file specified by &lt;file handle&gt;.<br />
+Writes &lt;data&gt; to the file specified by &lt;file handle&gt;.
+</p>
+
+<p>
 When the &lt;data&gt; type is the character string, the data is written as string.<br />
 When the &lt;data&gt; type is the integer, the least significant byte(0-255) regards as the ASCII code and
 the ASCII character is written.
@@ -34,6 +37,11 @@ the ASCII character is written.
 
 <pre class="macro-example">
 filewrite fhandle '---------cut here---------'#13#10
+</pre>
+
+<pre class="macro-example">
+; write a NUL character (0x00).
+filewrite fhandle 0
 </pre>
 
 </body>

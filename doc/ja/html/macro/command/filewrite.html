@@ -24,7 +24,10 @@ filewrite &lt;file handle&gt; &lt;data&gt;
 <h2>解説</h2>
 
 <p>
-ファイルハンドル &lt;file handle&gt; で指定されるファイルへ、&lt;data&gt; を書き込む。<br />
+ファイルハンドル &lt;file handle&gt; で指定されるファイルへ、&lt;data&gt; を書き込む。
+</p>
+
+<p>
 &lt;data&gt; が文字列型の場合、文字列を書き込む。<br />
 &lt;data&gt; が整数型の場合は、その値の下位バイト(0-255)を ASCII コードとみなし、その文字を書き込む。
 </p>
@@ -33,6 +36,11 @@ filewrite &lt;file handle&gt; &lt;data&gt;
 
 <pre class="macro-example">
 filewrite fhandle '---------cut here---------'#13#10
+</pre>
+
+<pre class="macro-example">
+; NUL文字(0x00)を書き込む
+filewrite fhandle 0
 </pre>
 
 </body>
