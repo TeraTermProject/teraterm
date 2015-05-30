@@ -13,11 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
+// 日本語 resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -50,7 +52,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_SETUP_DIR_DIALOG, DIALOG
     BEGIN
@@ -62,7 +64,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 日本語 (日本) resources
+#endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -70,8 +72,10 @@ END
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -335,7 +339,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_DAD_DIALOG, DIALOG
     BEGIN
@@ -469,8 +473,8 @@ IDI_CYGTERM             ICON                    "..\\..\\cygterm\\cygterm.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,86,0,0
- PRODUCTVERSION 4,86,0,0
+ FILEVERSION 4,87,0,0
+ PRODUCTVERSION 4,87,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -487,12 +491,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "TeraTerm Project T. Teranishi"
             VALUE "FileDescription", "Tera Term"
-            VALUE "FileVersion", "4, 86, 0, 0"
+            VALUE "FileVersion", "4, 87, 0, 0"
             VALUE "InternalName", "TTERMPRO"
             VALUE "LegalCopyright", "(C)TeraTerm Project 2004-2015, (C)T. Teranishi 1994-1998"
             VALUE "OriginalFilename", "TTERMPRO.EXE"
             VALUE "ProductName", "Tera Term"
-            VALUE "ProductVersion", "4, 86, 0, 0"
+            VALUE "ProductVersion", "4, 87, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -507,7 +511,7 @@ END
 // Menu
 //
 
-IDR_MENU MENU
+IDR_MENU MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -621,7 +625,7 @@ BEGIN
     END
 END
 
-IDR_TEKMENU MENU
+IDR_TEKMENU MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -652,7 +656,7 @@ BEGIN
     END
 END
 
-IDR_PASTEMENU MENU
+IDR_PASTEMENU MENU 
 BEGIN
     MENUITEM "&Paste",                      ID_EDIT_PASTE2
     MENUITEM "Paste<C&R>",                  ID_EDIT_PASTECR
@@ -664,7 +668,7 @@ END
 // Accelerator
 //
 
-IDR_ACC ACCELERATORS
+IDR_ACC ACCELERATORS 
 BEGIN
     "T",            ID_ACC_AREYOUTHERE,     VIRTKEY, ALT, NOINVERT
     "C",            ID_ACC_COPY,            VIRTKEY, ALT, NOINVERT
