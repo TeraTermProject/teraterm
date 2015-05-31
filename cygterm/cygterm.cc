@@ -53,6 +53,7 @@ static char Version[] = "version 1.07_25 (2015/02/21)";
 #include <arpa/inet.h>
 #include <windows.h>
 #include <pwd.h>
+#include <sys/select.h>
 
 // pageant support (ssh-agent proxy)
 //----------------------------------
