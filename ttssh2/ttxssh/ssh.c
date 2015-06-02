@@ -5200,9 +5200,23 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	}
 
 	// サーバが保証すべき最低限のビット数を求める（we_needはバイト）。
+	if (pvar->settings.GexMinimalGroupSize < GEX_GRP_MINSIZE) {
+		min = GEX_GRP_MINSIZE;
+	}
+	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_MAXSIZE) {
+		min = GEX_GRP_MAXSIZE;
+	}
+	else {
+		min = pvar->settings.GexMinimalGroupSize;
+	}
+	max = GEX_GRP_MAXSIZE;
 	bits = dh_estimate(pvar->we_need * 8);
-	min = 1024;
-	max = 8192;
+	if (bits < min) {
+		bits = min;
+	}
+	else if (bits > max) {
+		bits = max;
+	}
 
 	// サーバへgroup sizeを送って、p と g を作ってもらう。
 	buffer_put_int(msg, min);

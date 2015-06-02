@@ -477,6 +477,8 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 
 	settings->UpdateHostkeys = GetPrivateProfileInt("TTSSH", "UpdateHostkeys", 0, fileName);
 
+	settings->GexMinimalGroupSize = GetPrivateProfileInt("TTSSH", "GexMinimalGroupSize", 0, fileName);
+
 	clear_local_settings(pvar);
 }
 
@@ -586,6 +588,9 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 		"%d", settings->UpdateHostkeys);
 	WritePrivateProfileString("TTSSH", "UpdateHostkeys", buf, fileName);
+
+	_itoa_s(settings->GexMinimalGroupSize, buf, sizeof(buf), 10);
+	WritePrivateProfileString("TTSSH", "GexMinimalGroupSize", buf, fileName);
 }
 
 

@@ -170,6 +170,8 @@ typedef struct _TS_SSH {
 	char X11Display[128];
 
 	BOOL UpdateHostkeys;
+
+	int GexMinimalGroupSize;
 } TS_SSH;
 
 typedef struct _TInstVar {

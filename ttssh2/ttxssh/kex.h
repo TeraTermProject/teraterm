@@ -28,6 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ttxssh.h"
 
+#define GEX_GRP_MINSIZE 1024
+#define GEX_GRP_MAXSIZE 8192
+
 DH *dh_new_group1(void);
 DH *dh_new_group14(void);
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ );
