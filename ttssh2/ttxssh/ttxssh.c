@@ -2928,9 +2928,21 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	HWND hostkeyControl = GetDlgItem(dlg, IDC_SSHHOST_KEY_LIST);
 	HWND macControl = GetDlgItem(dlg, IDC_SSHMAC_LIST);
 	HWND compControl = GetDlgItem(dlg, IDC_SSHCOMP_LIST);
+	HWND hostkeyRotationControl = GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_STATIC);
+	HWND hostkeyRotationControlList = GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_COMBO);
 	int i;
 	int ch;
 	char uimsg[MAX_UIMSG];
+	char *rotationItem[SSH_UPDATE_HOSTKEYS_MAX] = {
+		"No",
+		"Yes",
+		"Ask",
+	};
+	char *rotationItemKey[SSH_UPDATE_HOSTKEYS_MAX] = {
+		"DLG_SSHSETUP_HOSTKEY_ROTATION_NO",
+		"DLG_SSHSETUP_HOSTKEY_ROTATION_YES",
+		"DLG_SSHSETUP_HOSTKEY_ROTATION_ASK",
+	};
 
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_SSHSETUP_TITLE", pvar, uimsg);
@@ -3034,6 +3046,10 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+
+	GetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_SSHSETUP_HOSTKEY_ROTATION", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_HOSTKEY_ROTATION_STATIC, pvar->ts->UIMsg);
 
 	SendMessage(compressionControl, TBM_SETRANGE, TRUE, MAKELONG(0, 9));
 	SendMessage(compressionControl, TBM_SETPOS, TRUE,
@@ -3176,6 +3192,17 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	if (pvar->settings.VerifyHostKeyDNS) {
 		CheckDlgButton(dlg, IDC_VERIFYHOSTKEYDNS, TRUE);
 	}
+
+	// hostkey rotation(OpenSSH 6.8)
+	for (i = 0; i < SSH_UPDATE_HOSTKEYS_MAX; i++) {
+		UTIL_get_lang_msg(rotationItemKey[i], pvar, rotationItem[i]);
+		SendMessage(hostkeyRotationControlList, CB_INSERTSTRING, i, (LPARAM)pvar->ts->UIMsg);
+	}
+	ch = pvar->settings.UpdateHostkeys;
+	if (!(ch >= 0 && ch < SSH_UPDATE_HOSTKEYS_MAX))
+		ch = 0;
+	SendMessage(hostkeyRotationControlList, CB_SETCURSEL, ch, 0);
+
 }
 
 void get_teraterm_dir_relative_name(char FAR * buf, int bufsize,
@@ -3429,6 +3456,12 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 	pvar->settings.ForwardAgent = IsDlgButtonChecked(dlg, IDC_FORWARDAGENT);
 	pvar->settings.ForwardAgentConfirm = IsDlgButtonChecked(dlg, IDC_FORWARDAGENTCONFIRM);
 	pvar->settings.VerifyHostKeyDNS = IsDlgButtonChecked(dlg, IDC_VERIFYHOSTKEYDNS);
+
+	// hostkey rotation(OpenSSH 6.8)
+	i = SendMessage(GetDlgItem(dlg, IDC_HOSTKEY_ROTATION_COMBO), CB_GETCURSEL, 0, 0);
+	if (!(i >= 0 && i < SSH_UPDATE_HOSTKEYS_MAX))
+		i = 0;
+	pvar->settings.UpdateHostkeys = i;
 }
 
 static void move_cur_sel_delta(HWND listbox, int delta)
@@ -3584,6 +3617,9 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_NOTICEBANNER, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE,0));
+
+			SendDlgItemMessage(dlg, IDC_HOSTKEY_ROTATION_STATIC, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_HOSTKEY_ROTATION_COMBO, WM_SETFONT, (WPARAM)DlgSetupFont, MAKELPARAM(TRUE, 0));
 		}
 		else {
 			DlgSetupFont = NULL;

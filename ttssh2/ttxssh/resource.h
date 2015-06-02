@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by ttxssh.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// ttxssh.rc で使用
 //
 #define IDC_ADD                         3
 #define IDC_REMOVE                      4
@@ -84,6 +84,7 @@
 #define IDC_HOSTTCPPROTOCOL             1047
 #define IDC_COMBO1                      1049
 #define IDC_SSH_VERSION                 1049
+#define IDC_HOSTKEY_ROTATION_COMBO      1049
 #define IDC_SSH_VERSION_LABEL           1050
 #define IDC_OPENSSL_VERSION             1051
 #define IDC_HEARTBEATLABEL              1052
@@ -203,6 +204,8 @@
 #define IDC_SFTP_CONSOLE                1208
 #define IDC_PUTTY_VERSION               1209
 #define IDC_ED25519_TYPE                1211
+#define IDC_HOSTKEY_ROTATION_STATIC     1212
+#define IDC_LIST1                       1213
 
 // Next default values for new objects
 // 
@@ -210,7 +213,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        111
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1212
+#define _APS_NEXT_CONTROL_VALUE         1214
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

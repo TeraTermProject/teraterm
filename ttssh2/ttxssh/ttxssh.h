@@ -109,6 +109,7 @@ HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 #define SSH_UPDATE_HOSTKEYS_NO	0
 #define SSH_UPDATE_HOSTKEYS_YES	1
 #define SSH_UPDATE_HOSTKEYS_ASK	2
+#define SSH_UPDATE_HOSTKEYS_MAX	3
 
 
 /*
@@ -169,7 +170,7 @@ typedef struct _TS_SSH {
 
 	char X11Display[128];
 
-	BOOL UpdateHostkeys;
+	int UpdateHostkeys;
 
 	int GexMinimalGroupSize;
 } TS_SSH;

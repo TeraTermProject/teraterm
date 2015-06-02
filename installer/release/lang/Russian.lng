@@ -700,6 +700,10 @@ DLG_SSHSETUP_FORWARDAGENT=&Включить агент пересылки
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=&Подтвердить агента пересылки
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста в DNS
 DLG_SSHSETUP_NOTICE=Все параметры вступят в силу в следующей сессии.
+DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Ask
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Выберите файл чтения/записи известных хостов
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы добавить
