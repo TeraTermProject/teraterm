@@ -450,20 +450,20 @@ static void channel_opening_error(PTInstVar pvar, int channel_num, int err)
 		UTIL_get_lang_msg("MSG_FWD_CHANNEL_OPEN_X_ERROR", pvar,
 		                  "The server attempted to forward a connection through this machine.\n"
 		                  "It requested a connection to the X server on %s (display %d:%d).\n"
-		                  "%s.\n" "The forwarded connection will be closed.");
+		                  "%s(code %d).\n" "The forwarded connection will be closed.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 		            pvar->ts->UIMsg,
 		            request->spec.to_host, request->spec.to_port - 6000, request->spec.x11_screen,
-		            uimsg);
+		            uimsg, err);
 	} else {
 		UTIL_get_lang_msg("MSG_FWD_CHANNEL_OPEN_ERROR", pvar,
 		                  "The server attempted to forward a connection through this machine.\n"
-		                  "It requested a connection to %s (port %s).\n" "%s.\n"
+		                  "It requested a connection to %s (port %s).\n" "%s(code %d).\n"
 		                  "The forwarded connection will be closed.");
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 		            pvar->ts->UIMsg,
 		            request->spec.to_host, request->spec.to_port_name,
-		            uimsg);
+		            uimsg, err);
 	}
 	notify_nonfatal_error(pvar, buf);
 	FWD_free_channel(pvar, channel_num);
