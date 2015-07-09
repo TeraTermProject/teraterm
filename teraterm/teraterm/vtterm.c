@@ -4321,20 +4321,36 @@ BOOL XsParseColor(char *colspec, COLORREF *color)
 	return TRUE;
 }
 
-void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
-	COLORREF color;
-	char StrBuff[256];
+unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 	unsigned int colornum = CS_UNSPEC;
-	int len;
 
+	if (mode > 100) {
+		mode -= 100;
+	}
 	switch (mode) {
 	case 4:
-		if (ColorNumber <= 255) {
-			colornum = ColorNumber;
+		switch (xt_color) {
+		case 256:
+			colornum = CS_VT_BOLDFG;
+			break;
+		case 257:
+			// Underline -- not supported.
+			// colornum = CS_VT_UNDERFG;
+			break;
+		case 258:
+			colornum = CS_VT_BLINKFG;
+			break;
+		case 259:
+			colornum = CS_VT_REVERSEBG;
+			break;
+		default:
+			if (xt_color <= 255) {
+				colornum = xt_color;
+			}
 		}
 		break;
 	case 5:
-		switch (ColorNumber) {
+		switch (xt_color) {
 		case 0:
 			colornum = CS_VT_BOLDFG;
 			break;
@@ -4363,6 +4379,16 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 		colornum = CS_TEK_BG;
 		break;
 	}
+	return colornum;
+}
+
+void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
+	COLORREF color;
+	char StrBuff[256];
+	unsigned int colornum = CS_UNSPEC;
+	int len;
+
+	colornum = XtColor2TTColor(mode, ColorNumber);
 
 	if (colornum != CS_UNSPEC) {
 		if (strcmp(ColorSpec, "?") == 0) {
@@ -4382,46 +4408,6 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 		else if (XsParseColor(ColorSpec, &color)) {
 			DispSetColor(colornum, color);
 		}
-	}
-}
-
-void XsResetColor(int mode, unsigned int color)
-{
-	switch (mode) {
-	case 104:
-		if (color < 256) {
-			DispResetColor(color);
-		}
-		break;
-	case 105:
-		switch (color) {
-		case 0:
-			DispResetColor(CS_VT_BOLDFG);
-			break;
-		case 1:
-			// Underline -- not supported.
-			// DispResetColor(CS_VT_UNDERFG);
-			break;
-		case 2:
-			DispResetColor(CS_VT_BLINKFG);
-			break;
-		case 3:
-			DispResetColor(CS_VT_REVERSEBG);
-			break;
-		}
-		break;
-	case 110:
-		DispResetColor(CS_VT_NORMALFG);
-		break;
-	case 111:
-		DispResetColor(CS_VT_NORMALBG);
-		break;
-	case 115:
-		DispResetColor(CS_TEK_FG);
-		break;
-	case 116:
-		DispResetColor(CS_TEK_FG);
-		break;
 	}
 }
 
@@ -4521,7 +4507,7 @@ void XSequence(BYTE b)
 			case 111:
 			case 115:
 			case 116:
-				XsResetColor(Param[1], 0);
+				DispResetColor(XtColor2TTColor(Param[1], 0));
 				break;
 			}
 			ParseMode = ModeFirst;
@@ -4582,7 +4568,7 @@ void XSequence(BYTE b)
 			case 111:
 			case 115:
 			case 116:
-				XsResetColor(Param[1], 0);
+				DispResetColor(XtColor2TTColor(Param[1], 0));
 				break;
 			default:
 				XsParseMode = ModeXsString;
@@ -4662,7 +4648,7 @@ void XSequence(BYTE b)
 	  case ModeXsColorNum:
 	  	if (CheckST(b, utf8_stat)) {
 			if (Param[1] == 104 || Param[1] == 105) {
-				XsResetColor(Param[1], ColorNumber);
+				DispResetColor(XtColor2TTColor(Param[1], ColorNumber));
 			}
 			ColorNumber = 0;
 			ParseMode = ModeFirst;
@@ -4684,7 +4670,7 @@ void XSequence(BYTE b)
 		}
 		else if (b == ';') {
 			if (Param[1] == 104 || Param[1] == 105) {
-				XsResetColor(Param[1], ColorNumber);
+				DispResetColor(XtColor2TTColor(Param[1], ColorNumber));
 				ColorNumber = 0;
 			}
 			else {
