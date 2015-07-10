@@ -363,6 +363,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 {
 	char buf[1024];
 	TS_SSH FAR *settings = pvar->ts_SSH;
+	size_t i;
 
 #define READ_STD_STRING_OPTION(name) \
 	read_string_option(fileName, #name, "", settings->name, sizeof(settings->name))
@@ -378,7 +379,15 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	}
 
 	READ_STD_STRING_OPTION(DefaultUserName);
+
 	READ_STD_STRING_OPTION(DefaultForwarding);
+	// “à•”‚Å‚Í ; ‚Å‹æØ‚Á‚Ä‚¢‚é‚Ì‚ÅA, ‚ğ ; ‚É•ÏŠ·‚·‚é
+	for (i=0; i<strlen(settings->DefaultForwarding); i++) {
+		if (settings->DefaultForwarding[i] == ',') {
+			settings->DefaultForwarding[i] = ';';
+		}
+	}
+
 	READ_STD_STRING_OPTION(DefaultRhostsLocalUserName);
 	READ_STD_STRING_OPTION(DefaultRhostsHostPrivateKeyFile);
 	READ_STD_STRING_OPTION(DefaultRSAPrivateKeyFile);
@@ -497,8 +506,17 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	                          settings->DefaultUserName, fileName);
 
 	if (copy_forward) {
+		char DefaultForwarding[2048];
+		size_t i;
+		strncpy_s(DefaultForwarding, sizeof(DefaultForwarding), settings->DefaultForwarding, _TRUNCATE);
+		// “à•”‚Å‚Í ; ‚Å‹æØ‚Á‚Ä‚¢‚é‚Ì‚ÅA; ‚ğ , ‚É•ÏŠ·‚·‚é
+		for (i=0; i<strlen(DefaultForwarding); i++) {
+			if (DefaultForwarding[i] == ';') {
+				DefaultForwarding[i] = ',';
+			}
+		}
 		WritePrivateProfileString("TTSSH", "DefaultForwarding",
-		                          settings->DefaultForwarding, fileName);
+		                          DefaultForwarding, fileName);
 	}
 
 	WritePrivateProfileString("TTSSH", "CipherOrder",
@@ -1645,6 +1663,7 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	char *option2 = (char *)calloc(opt_len, sizeof(char));
 	int action;
 	PCHAR start, cur, next;
+	size_t i;
 
 	if (pvar->hostdlg_activated) {
 		pvar->settings.Enabled = pvar->hostdlg_Enabled;
@@ -1703,7 +1722,14 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				} else if (MATCH_STR(option + 4, "-L") == 0 ||
 				           MATCH_STR(option + 4, "-R") == 0 ||
 				           _stricmp(option + 4, "-X") == 0) {
-					add_forward_param(pvar, option+5);
+					// “à•”‚Å‚Í ; ‚Å‹æØ‚Á‚Ä‚¢‚é‚Ì‚ÅA, ‚ğ ; ‚É•ÏŠ·‚·‚é
+					strncpy_s(option2, opt_len, option+5, _TRUNCATE);
+					for (i=0; i<strlen(option2); i++) {
+						if (option2[i] == ',') {
+							option2[i] = ';';
+						}
+					}
+					add_forward_param(pvar, option2);
 				} else if (MATCH_STR(option + 4, "-X") == 0) {
 					add_forward_param(pvar, "X");
 					strncpy_s(pvar->settings.X11Display,
