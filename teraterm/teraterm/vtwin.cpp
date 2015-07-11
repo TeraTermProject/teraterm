@@ -3688,13 +3688,49 @@ void CVTWindow::OnDuplicateSession()
 	char *exec = "ttermpro";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
+	char cygterm_cfg[MAX_PATH];
+	FILE *fp;
+	char buf[256], *head, *body;
+	int cygterm_PORT_START = 20000;
+	int cygterm_PORT_RANGE = 40;
+	int is_cygwin_port = 0;
 	
 	// 現在の設定内容を共有メモリへコピーしておく
 	CopyTTSetToShmem(&ts);
 
-	if (ts.TCPPort != 23 && (strcmp(ts.HostName, "127.0.0.1") == 0 ||
+	// cygterm.cfg を読み込む
+	strncpy_s(cygterm_cfg, sizeof(cygterm_cfg), ts.HomeDir, _TRUNCATE);
+	AppendSlash(cygterm_cfg, sizeof(cygterm_cfg));
+	strncat_s(cygterm_cfg, sizeof(cygterm_cfg), "cygterm.cfg", _TRUNCATE);
+	fp = fopen(cygterm_cfg, "r");
+	if (fp != NULL) {
+		while (fgets(buf, sizeof(buf), fp) != NULL) {
+			int len = strlen(buf);
+
+			if (buf[len - 1] == '\n')
+				buf[len - 1] = '\0';
+
+			split_buffer(buf, '=', &head, &body);
+			if (head == NULL || body == NULL)
+				continue;
+
+			if (_stricmp(head, "PORT_START") == 0) {
+				cygterm_PORT_START = atoi(body);
+			} else if (_stricmp(head, "PORT_RANGE") == 0) {
+				cygterm_PORT_RANGE = atoi(body);
+			}
+		}
+		fclose(fp);
+	}
+	// Cygterm のポート範囲内かどうか
+	if (ts.TCPPort >= cygterm_PORT_START &&
+	    ts.TCPPort <= cygterm_PORT_START+cygterm_PORT_RANGE) {
+		is_cygwin_port = 1;
+	}
+
+	if (is_cygwin_port && (strcmp(ts.HostName, "127.0.0.1") == 0 ||
 	    strcmp(ts.HostName, "localhost") == 0)) {
-		// localhostへの接続でポートが23以外の時はcygwin接続とみなす。
+		// localhostへの接続でポートがcygterm.cfgの範囲内の時はcygwin接続とみなす。
 		OnCygwinConnection();
 		return;
 	} else if (cv.TelFlag) { // telnet

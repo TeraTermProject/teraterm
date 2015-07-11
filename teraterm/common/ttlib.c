@@ -1151,3 +1151,30 @@ void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 
 	dest[j] = 0;
 }
+
+void split_buffer(char *buffer, int delimiter, char **head, char **body)
+{
+	char *p1, *p2;
+
+	*head = *body = NULL;
+
+	if (!isalnum(*buffer) || (p1 = strchr(buffer, delimiter)) == NULL) {
+		return;
+	}
+
+	*head = buffer;
+
+	p2 = buffer;
+	while (p2 < p1 && !isspace(*p2)) {
+		p2++;
+	}
+
+	*p2 = '\0';
+
+	p1++;
+	while (*p1 && isspace(*p1)) {
+		p1++;
+	}
+
+	*body = p1;
+}
