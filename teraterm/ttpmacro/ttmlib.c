@@ -213,3 +213,22 @@ int GetMonitorLeftmost(int PosX, int PosY)
 		return mi.rcWork.left;
 	}
 }
+
+void BringupWindow(HWND hWnd)
+{
+	DWORD thisThreadId;
+	DWORD fgThreadId;
+
+	thisThreadId = GetWindowThreadProcessId(hWnd, NULL);
+	fgThreadId = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+
+	if (thisThreadId == fgThreadId) {
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+	} else {
+		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
+		SetForegroundWindow(hWnd);
+		BringWindowToTop(hWnd);
+		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
+	}
+}

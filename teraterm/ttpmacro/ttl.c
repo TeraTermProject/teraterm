@@ -1455,6 +1455,7 @@ WORD TTLFilenameBox()
 		if (strlen(InitDir) > 0) {
 			ofn.lpstrInitialDir = InitDir;
 		}
+		BringupWindow(HMainWin);
 		if (SaveFlag) {
 			ofn.Flags = OFN_OVERWRITEPROMPT;
 			ret = GetSaveFileName(&ofn);
@@ -3351,7 +3352,8 @@ WORD TTLDirnameBox()
 
 	SetInputStr("");
 	if (CheckVar("inputstr", &ValType, &VarId) &&
-		(ValType == TypString)) {
+	    (ValType == TypString)) {
+		BringupWindow(HMainWin);
 		if (doSelectFolder(HMainWin, buf, sizeof(buf), InitDir, Title)) {
 			SetInputStr(buf);
 			ret = 1;
