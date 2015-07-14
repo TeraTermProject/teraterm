@@ -95,6 +95,7 @@ typedef TCharAttr *PCharAttr;
 #define CS_TEK_FG          268
 #define CS_TEK_BG          269
 #define CS_ANSICOLOR_ALL   270
+#define CS_SP_ALL          271
 #define CS_UNSPEC          0xffffffff
 #define CS_ALL             CS_UNSPEC
 
