@@ -3532,6 +3532,10 @@ void DispSetColor(unsigned int num, COLORREF color)
 void DispResetColor(unsigned int num)
 {
 	HDC TmpDC;
+
+	if (num == CS_UNSPEC) {
+		return;
+	}
 	
 	TmpDC = GetDC(NULL);
 	
@@ -3570,6 +3574,11 @@ void DispResetColor(unsigned int num)
 	case CS_ANSICOLOR_ALL:
 		InitColorTable();
 		DispSetNearestColors(0, 255, NULL);
+		break;
+	case CS_SP_ALL:
+		BGVTBoldColor[0] = ts.VTBoldColor[0];
+		BGVTBlinkColor[0] = ts.VTBlinkColor[0];
+		BGVTReverseColor[1] = ts.VTReverseColor[1];
 		break;
 	case CS_ALL:
 		// VT color Foreground

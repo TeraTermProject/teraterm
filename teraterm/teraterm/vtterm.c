@@ -43,6 +43,7 @@ void ParseFirst(BYTE b);
 #define ModeXS    6
 #define ModeDLE   7
 #define ModeCAN   8
+#define ModeIgnore 9
 
 #define NParamMax  16
 #define NSParamMax 16
@@ -167,10 +168,6 @@ BOOL IMEstat;
 static DWORD BeepStartTime = 0;
 static DWORD BeepSuppressTime = 0;
 static DWORD BeepOverUsedCount = 0;
-
-/* OSC String buffer */
-static char *OSCStrBuff;
-static unsigned int OSCStrBuffSize;
 
 static _locale_t CLocale = NULL;
 
@@ -432,7 +429,7 @@ void SendCSIstr(char *str, int len) {
 	CommBinaryOut(&cv, str, l);
 }
 
-void SendOSCstr(char *str, int len) {
+void SendOSCstr(char *str, int len, char TermChar) {
 	int l;
 
 	if (str == NULL || len < 0)
@@ -445,7 +442,12 @@ void SendOSCstr(char *str, int len) {
 		l = len;
 	}
 
-	if (Send8BitMode) {
+	if (TermChar == BEL) {
+		CommBinaryOut(&cv,"\033]", 2);
+		CommBinaryOut(&cv, str, l);
+		CommBinaryOut(&cv,"\007", 1);
+	}
+	else if (Send8BitMode) {
 		CommBinaryOut(&cv,"\235", 1);
 		CommBinaryOut(&cv, str, l);
 		CommBinaryOut(&cv,"\234", 1);
@@ -1025,7 +1027,7 @@ void ParseControl(BYTE b)
       break;
     case SOS:
       ESCFlag = FALSE;
-      ParseMode = ModeSOS;
+      ParseMode = ModeIgnore;
       break;
     case CSI:
       ClearParams();
@@ -1039,7 +1041,7 @@ void ParseControl(BYTE b)
     case PM:
     case APC:
       ESCFlag = FALSE;
-      ParseMode = ModeSOS;
+      ParseMode = ModeIgnore;
       break;
   }
 }
@@ -1368,8 +1370,10 @@ void ParseEscape(BYTE b) /* b is the final char */
 	  ParseMode = ModeDCS;
 	  return;
 	case 'X': /* SOS */
+	case '^': /* APC */
+	case '_': /* PM  */
 	  ESCFlag = FALSE;
-	  ParseMode = ModeSOS;
+	  ParseMode = ModeIgnore;
 	  return;
 	case 'Z': /* DECID */
 	  AnswerTerminalType();
@@ -1383,11 +1387,6 @@ void ParseEscape(BYTE b) /* b is the final char */
 	case ']': /* XTERM sequence (OSC) */
 	  ClearParams();
 	  ParseMode = ModeXS;
-	  return;
-	case '^':
-	case '_': /* PM, APC */
-	  ESCFlag = FALSE;
-	  ParseMode = ModeSOS;
 	  return;
 	case 'c': /* Hardware reset */
 	  HideStatusLine();
@@ -2386,10 +2385,10 @@ void CSSetLRScrollRegion()	// DECSLRM
 	          len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, cv.TitleRemote);
 	        }
 	    }
-	    SendOSCstr(Report, len);
+	    SendOSCstr(Report, len, ST);
 	    break;
 	  default: // IdTitleReportEmpty:
-	    SendOSCstr("L", 0);
+	    SendOSCstr("L", 0, ST);
 	    break;
 	}
         break;
@@ -2417,10 +2416,10 @@ void CSSetLRScrollRegion()	// DECSLRM
 	          len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, cv.TitleRemote);
 	        }
 	    }
-	    SendOSCstr(Report, len);
+	    SendOSCstr(Report, len, ST);
 	    break;
 	  default: // IdTitleReportEmpty:
-	    SendOSCstr("l", 0);
+	    SendOSCstr("l", 0, ST);
 	    break;
 	}
         break;
@@ -4165,7 +4164,7 @@ void DeviceControl(BYTE b)
 			}
 		}
 		else {
-			ParseMode = ModeSOS;
+			ParseMode = ModeIgnore;
 			utf8_stat = 0;
 			IgnoreString(b);
 		}
@@ -4324,10 +4323,7 @@ BOOL XsParseColor(char *colspec, COLORREF *color)
 unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 	unsigned int colornum = CS_UNSPEC;
 
-	if (mode > 100) {
-		mode -= 100;
-	}
-	switch (mode) {
+	switch ((mode>=100) ? mode-100 : mode) {
 	case 4:
 		switch (xt_color) {
 		case 256:
@@ -4342,6 +4338,11 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 			break;
 		case 259:
 			colornum = CS_VT_REVERSEBG;
+			break;
+		case CS_UNSPEC:
+			if (mode == 104) {
+				colornum = CS_ANSICOLOR_ALL;
+			}
 			break;
 		default:
 			if (xt_color <= 255) {
@@ -4364,6 +4365,11 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 		case 3:
 			colornum = CS_VT_REVERSEBG;
 			break;
+		case CS_UNSPEC:
+			if (mode == 105) {
+				colornum = CS_SP_ALL;
+			}
+			break;
 		}
 		break;
 	case 10:
@@ -4382,10 +4388,10 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 	return colornum;
 }
 
-void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
+void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermChar) {
 	COLORREF color;
 	char StrBuff[256];
-	unsigned int colornum = CS_UNSPEC;
+	unsigned int colornum;
 	int len;
 
 	colornum = XtColor2TTColor(mode, ColorNumber);
@@ -4403,7 +4409,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec) {
 					"%d;rgb:%04x/%04x/%04x", CLocale, mode,
 					GetRValue(color)*257, GetGValue(color)*257, GetBValue(color)*257);
 			}
-			SendOSCstr(StrBuff, len);
+			SendOSCstr(StrBuff, len, TermChar);
 		}
 		else if (XsParseColor(ColorSpec, &color)) {
 			DispSetColor(colornum, color);
@@ -4477,289 +4483,240 @@ void XsProcClipboard(PCHAR buff)
 	}
 }
 
-#define ModeXsFirst     1
-#define ModeXsString    2
-#define ModeXsColorNum  3
-#define ModeXsColorSpec 4
-#define ModeXsEsc       5
-#define ModeXsIgnore    6
-
-#define CheckST(b,uf)	(((b)==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS) && (uf)==0) || (b)==BEL)
-
 void XSequence(BYTE b)
 {
-	static BYTE XsParseMode = ModeXsFirst, PrevMode;
-	static char StrBuff[sizeof(ts.Title)];
-	static unsigned int ColorNumber, StrLen;
+	static char *StrBuff = NULL;
+	static unsigned int StrLen = 0, StrBuffSize = 0;
 	static int utf8_stat = 0;
 	static char realloc_failed = FALSE;
-	char *p;
+	static BOOL ESCflag = FALSE, HasParamStr = FALSE;
+	char *p, *color_spec;
 	unsigned int new_size;
+	int color_num;
+	BYTE TermChar;
 
-	switch (XsParseMode) {
-	  case ModeXsFirst:
-	  	if (CheckST(b, utf8_stat)) {
-			switch (Param[1]) {
-			case 104:
-				DispResetColor(CS_ANSICOLOR_ALL);
-				break;
-			case 110:
-			case 111:
-			case 115:
-			case 116:
-				DispResetColor(XtColor2TTColor(Param[1], 0));
-				break;
-			}
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
+	TermChar = 0;
+
+	if (ESCflag) {
+		ESCflag = FALSE;
+		if (b == '\\') {
+			TermChar = ST;
 		}
-		else if (b == ESC) { /* Escape */
-			PrevMode = ModeXsFirst;
-			XsParseMode = ModeXsEsc;
-			utf8_stat = 0;
+		else {	// Invalid Sequence
+			ParseMode = ModeIgnore;
+			HasParamStr = FALSE;
+			IgnoreString(b);
+			return;
 		}
-		else if (b <= US) { /* Other control character -- invalid sequence */
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
-		}
-		else if (isdigit(b)) {
-			Param[1] = Param[1]*10 + b - '0';
-		}
-		else if (b == ';') {
-			StrBuff[0] = '\0';
-			StrLen = 0;
-			switch (Param[1]) {
-			case 4:
-			case 5:
-			case 104:
-			case 105:
-				ColorNumber = 0;
-				XsParseMode = ModeXsColorNum;
-				break;
-			case 10:
-			case 11:
-			case 15:
-			case 16:
-				ColorNumber = 0;
-				XsParseMode = ModeXsColorSpec;
-				break;
-			case 52:
-				if ((ts.CtrlFlag & CSF_CBRW) == 0 || ts.MaxOSCBufferSize == 0) {
-					XsParseMode = ModeXsIgnore;
-					break;
-				}
-				if (OSCStrBuff == NULL) {
-					new_size = sizeof(ts.Title);
-					if (new_size > ts.MaxOSCBufferSize) {
-						new_size = ts.MaxOSCBufferSize;
-					}
-					OSCStrBuff = malloc(new_size);
-					if (OSCStrBuff == NULL) {
-						XsParseMode = ModeXsIgnore;
-						break;
-					}
-					OSCStrBuffSize = new_size;
-				}
-				XsParseMode = ModeXsString;
-				break;
-			case 110:
-			case 111:
-			case 115:
-			case 116:
-				DispResetColor(XtColor2TTColor(Param[1], 0));
-				break;
-			default:
-				XsParseMode = ModeXsString;
-			}
-		}
-		else {
-			XsParseMode = ModeXsIgnore;
-			XSequence(b);
-		}
-		break;
-	  case ModeXsString:
-	  	if (CheckST(b, utf8_stat)) {
-			switch (Param[1]) {
-			  case 0: /* Change window title and icon name */
-			  case 1: /* Change icon name */
-			  case 2: /* Change window title */
+	}
+	else if (b == BEL) {
+		TermChar = BEL;
+	}
+	else if (b==ST && Accept8BitCtrl && !(ts.Language==IdJapanese && ts.KanjiCode==IdSJIS) && utf8_stat==0) {
+		TermChar = ST;
+	}
+
+	if (TermChar) {
+		if (StrBuff) {
+			if (StrLen < StrBuffSize) {
 				StrBuff[StrLen] = '\0';
-				if (ts.AcceptTitleChangeRequest) {
-					strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
-					// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
-					ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
-					ChangeTitle();
-				}
-				break;
-			  case 52: /* Clipboard access */
-			  	OSCStrBuff[StrLen] = '\0';
-				XsProcClipboard(OSCStrBuff);
-
-				break;
-			  default:
-				/* nothing to do */;
 			}
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
+			else {
+				StrBuff[StrBuffSize-1] = '\0';
+			}
 		}
-		else if (b == ESC) { /* Escape */
-			PrevMode = ModeXsString;
-			XsParseMode = ModeXsEsc;
-			utf8_stat = 0;
-		}
-		else if (b <= US) { /* Other control character -- invalid sequence */
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
-		}
-		else {
-			utf8_stat = CheckUTF8Seq(b, utf8_stat);
-			if (Param[1] == 52) {
-				if (StrLen < OSCStrBuffSize - 1) {
-					OSCStrBuff[StrLen++] = b;
-				}
-				else if (!realloc_failed && OSCStrBuffSize < ts.MaxOSCBufferSize) {
-					new_size = OSCStrBuffSize * 2;
-					if (new_size > ts.MaxOSCBufferSize) {
-						new_size = ts.MaxOSCBufferSize;
-					}
-
-					p = realloc(OSCStrBuff, new_size);
-					if (p == NULL) {
-						realloc_failed = TRUE;
+		switch (Param[1]) {
+		case 0: /* Change window title and icon name */
+		case 1: /* Change icon name */
+		case 2: /* Change window title */
+			if (StrBuff && ts.AcceptTitleChangeRequest) {
+				strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
+				// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
+				ConvertToCP932(cv.TitleRemote, sizeof(cv.TitleRemote));
+				ChangeTitle();
+			}
+			break;
+		case 4: /* Change/Query color palette */
+		case 5: /* Change/Query special color */
+			if (StrBuff) {
+				color_num = 0;
+				color_spec = NULL;
+				for (p = StrBuff; *p; p++) {
+					if (color_spec == NULL) {
+						if (isdigit(*p)) {
+							color_num = color_num * 10 + *p - '0';
+						}
+						else if (*p == ';') {
+							color_spec = p+1;
+						}
+						else {
+							break;
+						}
 					}
 					else {
-						OSCStrBuff = p;
-						OSCStrBuffSize = new_size;
-						if (StrLen < OSCStrBuffSize - 1) {
-							OSCStrBuff[StrLen++] = b;
+						if (*p == ';') {
+							*p = '\0';
+							XsProcColor(Param[1], color_num, color_spec, TermChar);
+							color_num = 0;
+							color_spec = NULL;
 						}
 					}
 				}
+				if (color_spec) {
+					XsProcColor(Param[1], color_num, color_spec, TermChar);
+				}
 			}
-			else if (StrLen < sizeof(StrBuff) - 1) {
-				StrBuff[StrLen++] = b;
+			break;
+		case 10: /* Change/Query VT-Window foreground color */
+		case 11: /* Change/Query VT-Window background color */
+		case 12: /* Change/Query VT-Window cursor color */
+		case 13: /* Change/Query mouse cursor foreground color */
+		case 14: /* Change/Query mouse cursor background color */
+		case 15: /* Change/Query Tek-Window foreground color */
+		case 16: /* Change/Query Tek-Window foreground color */
+		case 17: /* Change/Query highlight background color */
+		case 18: /* Change/Query Tek-Window cursor color */
+		case 19: /* Change/Query highlight foreground color */
+			if (StrBuff) {
+				color_num = Param[1];
+				color_spec = StrBuff;
+				for (p = StrBuff; *p; p++) {
+					if (*p == ';') {
+						*p = '\0';
+						XsProcColor(color_num, 0, color_spec, TermChar);
+						color_num++;
+						color_spec = p+1;
+					}
+				}
+				XsProcColor(color_num, 0, color_spec, TermChar);
 			}
-		}
-		break;
-	  case ModeXsColorNum:
-	  	if (CheckST(b, utf8_stat)) {
-			if (Param[1] == 104 || Param[1] == 105) {
-				DispResetColor(XtColor2TTColor(Param[1], ColorNumber));
+			break;
+		case 52: /* Manipulate Clipboard data */
+			if (StrBuff) {
+				XsProcClipboard(StrBuff);
 			}
-			ColorNumber = 0;
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
-		}
-		else if (b == ESC) { /* Escape */
-			PrevMode = ModeXsColorNum;
-			XsParseMode = ModeXsEsc;
-			utf8_stat = 0;
-		}
-		else if (b <= US) { /* Other control character -- invalid sequence */
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
-		}
-		else if (isdigit(b)) {
-			ColorNumber = ColorNumber*10 + b - '0';
-		}
-		else if (b == ';') {
-			if (Param[1] == 104 || Param[1] == 105) {
-				DispResetColor(XtColor2TTColor(Param[1], ColorNumber));
-				ColorNumber = 0;
+			break;
+		case 104: /* Reset color palette */
+		case 105: /* Reset special color */
+			if (HasParamStr) {
+				if (StrBuff) {
+					color_num = 0;
+					for (p = StrBuff; *p; p++) {
+						if (isdigit(*p)) {
+							color_num = color_num * 10 + *p - '0';
+						}
+						else if (*p == ';') {
+							DispResetColor(XtColor2TTColor(Param[1], color_num));
+							color_num = 0;
+						}
+						else {
+							color_num = CS_UNSPEC;
+						}
+					}
+					if (color_num != CS_UNSPEC) {
+						DispResetColor(XtColor2TTColor(Param[1], color_num));
+					}
+				}
 			}
 			else {
-				XsParseMode = ModeXsColorSpec;
+				DispResetColor(XtColor2TTColor(Param[1], CS_UNSPEC));
 			}
+			break;
+		case 110: /* Reset VT-Window foreground color */
+		case 111: /* Reset VT-Window background color */
+		case 112: /* Reset VT-Window cursor color */
+		case 113: /* Reset mouse cursor foreground color */
+		case 114: /* Reset mouse cursor background color */
+		case 115: /* Reset Tek-Window foreground color */
+		case 116: /* Reset Tek-Window foreground color */
+		case 117: /* Reset highlight background color */
+		case 118: /* Reset Tek-Window cursor color */
+		case 119: /* Reset highlight foreground color */
+			DispResetColor(XtColor2TTColor(Param[1], CS_UNSPEC));
+			if (HasParamStr && StrBuff) {
+				color_num = 0;
+				for (p = StrBuff; *p; p++) {
+					if (isdigit(*p)) {
+						color_num = color_num * 10 + *p - '0';
+					}
+					else if (*p == ';') {
+						DispResetColor(XtColor2TTColor(color_num, CS_UNSPEC));
+						color_num = 0;
+					}
+					else {
+						color_num = CS_UNSPEC;
+						break;
+					}
+				}
+				if (color_num != CS_UNSPEC) {
+					DispResetColor(XtColor2TTColor(color_num, CS_UNSPEC));
+				}
+			}
+			break;
 		}
-		else {
-			XsParseMode = ModeXsIgnore;
-			XSequence(b);
-		}
-		break;
-	  case ModeXsColorSpec:
-	  	if (CheckST(b, utf8_stat)) {
-			StrBuff[StrLen] = '\0';
-			XsProcColor(Param[1], ColorNumber, StrBuff);
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-		}
-		else if (b == ESC) {
-			PrevMode = ModeXsColorSpec;
-			XsParseMode = ModeXsEsc;
-		}
-		else if (b <= US) { /* Other control character -- invalid sequence */
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-		}
-		else if (b == ';') {
-			StrBuff[StrLen] = '\0';
-			XsProcColor(Param[1], ColorNumber, StrBuff);
-
-			ColorNumber = 0;
+		if (StrBuff) {
 			StrBuff[0] = '\0';
 			StrLen = 0;
-
-			switch (Param[1]) {
-			case 4:
-			case 5:
-				XsParseMode = ModeXsColorNum;
-				break;
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-			case 15:
-			case 16:
-			case 17:
-				XsParseMode = ModeXsColorSpec;
-				Param[1]++;
-				break;
-			default:
-				XsParseMode = ModeXsIgnore;
-				break;
-			}
 		}
-		else if (b >= 0x80) {
-		}
-		else if (StrLen < sizeof(StrBuff) - 1) {
+		ParseMode = ModeFirst;
+		HasParamStr = FALSE;
+		utf8_stat = 0;
+	}
+	else if (b == ESC) {
+		ESCflag = TRUE;
+		utf8_stat = 0;
+	}
+	else if (b <= US) { // Invalid Character
+		ParseMode = ModeFirst;
+		HasParamStr = FALSE;
+		utf8_stat = 0;
+	}
+	else if (HasParamStr) {
+		utf8_stat = CheckUTF8Seq(b, utf8_stat);
+		if (StrLen + 1 < StrBuffSize) {
 			StrBuff[StrLen++] = b;
 		}
-		break;
-	  case ModeXsEsc:
-		if (b == '\\') { /* String Terminator */
-			XsParseMode = PrevMode;
-			XSequence(BEL);
+		else if (!realloc_failed && StrBuffSize < ts.MaxOSCBufferSize) {
+			if (StrBuff == NULL || StrBuffSize == 0) {
+				new_size = sizeof(ts.Title);
+			}
+			else {
+				new_size = StrBuffSize * 2;
+			}
+			if (new_size > ts.MaxOSCBufferSize) {
+				new_size = ts.MaxOSCBufferSize;
+			}
+
+			p = realloc(StrBuff, new_size);
+			if (p == NULL) {
+				if (StrBuff==NULL) {
+					StrBuffSize = 0;
+					ParseMode = ModeIgnore;
+					HasParamStr = FALSE;
+					IgnoreString(b);
+					return;
+				}
+				realloc_failed = TRUE;
+			}
+			else {
+				StrBuff = p;
+				StrBuffSize = new_size;
+				if (StrLen + 1 < StrBuffSize) {
+					StrBuff[StrLen++] = b;
+				}
+			}
 		}
-		else { /* Other character -- invalid sequence */
-			ICount = 0;
-			JustAfterESC = TRUE;
-			ParseMode = ModeESC;
-			XsParseMode = ModeXsFirst;
-			utf8_stat = 0;
-			EscapeSequence(b);
-		}
-		break;
-	  case ModeXsIgnore:
-	  	if (CheckST(b, utf8_stat)) {
-			ParseMode = ModeFirst;
-			XsParseMode = ModeXsFirst;
-		}
-		else if (b == ESC) {
-			utf8_stat = 0;
-			PrevMode = ModeXsIgnore;
-			XsParseMode = ModeXsEsc;
-		}
-		else {
-			utf8_stat = CheckUTF8Seq(b, utf8_stat);
-		}
-		break;
+	}
+	else if (isdigit(b)) {
+		Param[1] = Param[1] * 10 + b - '0';
+	}
+	else if (b == ';') {
+		HasParamStr = TRUE;
+	}
+	else {
+		ParseMode = ModeIgnore;
+		HasParamStr = FALSE;
+		IgnoreString(b);
 	}
 }
 
@@ -5416,6 +5373,7 @@ int VTParse()
 	case ModeXS:  XSequence(b); break;
 	case ModeDLE: DLESeen(b); break;
 	case ModeCAN: CANSeen(b); break;
+	case ModeIgnore: IgnoreString(b); break;
 	default:
 	  ParseMode = ModeFirst;
 	  ParseFirst(b);
@@ -5771,11 +5729,6 @@ void RingBell(int type) {
 void EndTerm() {
 	if (CLocale) {
 		_free_locale(CLocale);
-	}
-	if (OSCStrBuff) {
-		free(OSCStrBuff);
-		OSCStrBuff = NULL;
-		OSCStrBuffSize = 0;
 	}
 	CLocale = NULL;
 }
