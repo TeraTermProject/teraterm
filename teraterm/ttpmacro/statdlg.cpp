@@ -213,22 +213,7 @@ void CStatDlg::Relocation(BOOL is_init, int new_WW)
 
 void CStatDlg::Bringup()
 {
-	DWORD pid;
-	DWORD thisThreadId;
-	DWORD fgThreadId;
-
-	thisThreadId = GetWindowThreadProcessId(GetSafeHwnd(), &pid);
-	fgThreadId = GetWindowThreadProcessId(::GetForegroundWindow(), &pid);
-
-	if (thisThreadId == fgThreadId) {
-		SetForegroundWindow();
-		BringWindowToTop();
-	} else {
-		AttachThreadInput(thisThreadId, fgThreadId, TRUE);
-		SetForegroundWindow();
-		BringWindowToTop();
-		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
-	}
+	BringupWindow(this->m_hWnd);
 }
 
 BOOL CStatDlg::CheckAutoCenter()

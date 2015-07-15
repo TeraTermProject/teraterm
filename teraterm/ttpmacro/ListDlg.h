@@ -25,7 +25,6 @@ protected:
 	HFONT DlgFont;
 
 	void Relocation(BOOL is_init, int WW);
-	void Bringup();
 
 	DECLARE_MESSAGE_MAP()
 public:
