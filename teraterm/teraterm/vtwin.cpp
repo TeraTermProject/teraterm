@@ -2824,11 +2824,7 @@ void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if ((nChar==VK_F10) ||
-	   ((ts.MetaKey == IdMetaOn) && (nFlags & 0x2000) ||
-	    (ts.MetaKey == IdMetaLeft) && (nFlags & 0x2100) == 0x2000 ||
-	    (ts.MetaKey == IdMetaRight) && (nFlags & 0x2100) == 0x2100) &&
-	   ((MainMenu==NULL) || (nChar!=VK_MENU))) {
+	if ((nChar==VK_F10) || MetaKey(ts.MetaKey) && ((MainMenu==NULL) || (nChar!=VK_MENU))) {
 		KeyDown(HVTWin,nChar,nRepCnt,nFlags & 0x1ff);
 		// OnKeyDown(nChar,nRepCnt,nFlags);
 	}
