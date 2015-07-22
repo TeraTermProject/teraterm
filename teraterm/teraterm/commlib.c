@@ -595,7 +595,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				InvalidHost = TRUE;
 
 				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, 
-					"Invalid pipe name\n\n"
+					"Invalid pipe name (%d)\n\n"
 					"A valid pipe name has the form\n"
 					"\"\\\\<ServerName>\\pipe\\<PipeName>\"", 
 					GetLastError());
