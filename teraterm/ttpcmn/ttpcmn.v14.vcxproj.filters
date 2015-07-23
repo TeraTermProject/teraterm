@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{961353de-481a-43ea-a3f7-3aa6a40ecc0c}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ffbe82db-a752-43d2-9655-1a279ac14ec8}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Def File">
+      <UniqueIdentifier>{1faecde1-7990-40de-9a84-08c3801f8730}</UniqueIdentifier>
+      <Extensions>def</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{9abee5ab-c47d-4b80-a1d5-18fcc30c29b2}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\i18n.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="language.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttcmn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ttlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\i18n.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="language.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ttlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ttpcmn.def">
+      <Filter>Def File</Filter>
+    </None>
+  </ItemGroup>
+</Project>

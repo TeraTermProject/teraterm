@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Putty Files">
+      <UniqueIdentifier>{6907d95d-706b-4797-acc8-556c5fc25181}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libs\putty\CONF.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\MISC.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\SSHBN.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\TREE234.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\WINDOWS\WINMISC.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\WINDOWS\WINPGNTC.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\putty\WINDOWS\WINSECUR.C">
+      <Filter>Putty Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libputty.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libs\putty\INT64.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\MISC.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\NETWORK.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\PUTTY.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\PUTTYMEM.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\puttyps.h">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\SSH.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\TREE234.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\WINDOWS\WINHELP.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libs\putty\WINDOWS\WINSTUFF.H">
+      <Filter>Putty Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libputty.h" />
+  </ItemGroup>
+</Project>
