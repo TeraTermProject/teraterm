@@ -10,7 +10,11 @@ echo %VSINSTALLDIR% | find "Studio 11"
 if not ERRORLEVEL 1 goto vs2012
 echo %VSINSTALLDIR% | find "Studio 12"
 if not ERRORLEVEL 1 goto vs2013
+echo %VSINSTALLDIR% | find "Studio 14"
+if not ERRORLEVEL 1 goto vs2015
 
+echo Unknown Visual Studio version
+exit /b
 
 :vs2005
 set TERATERMSLN=..\teraterm\ttermpro.sln
@@ -55,6 +59,15 @@ set TTPROXYSLN=..\TTProxy\TTProxy.v12.sln
 set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v12.sln
 set TTPMENUSLN=..\ttpmenu\ttpmenu.v12.sln
 set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v12.sln
+goto vsend
+
+:vs2015
+set TERATERMSLN=..\teraterm\ttermpro.v14.sln
+set TTSSHSLN=..\ttssh2\ttssh.v14.sln
+set TTPROXYSLN=..\TTProxy\TTProxy.v14.sln
+set TTXKANJISLN=..\TTXKanjiMenu\ttxkanjimenu.v14.sln
+set TTPMENUSLN=..\ttpmenu\ttpmenu.v14.sln
+set TTXSAMPLESLN=..\TTXSamples\TTXSamples.v14.sln
 goto vsend
 
 :vsend
