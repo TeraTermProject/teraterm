@@ -5262,11 +5262,12 @@ error:;
 static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 {
 	char *data;
-	int len;
+	int len, grp_bits;
 	BIGNUM *p = NULL, *g = NULL;
 	DH *dh = NULL;
 	buffer_t *msg = NULL;
 	unsigned char *outmsg;
+	char tmpbuf[256];
 
 	notify_verbose_message(pvar, "SSH2_MSG_KEX_DH_GEX_GROUP was received.", LOG_LEVEL_VERBOSE);
 
@@ -5282,6 +5283,61 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	buffer_get_bignum2(&data, p); // 素数の取得
 	buffer_get_bignum2(&data, g); // 生成元の取得
+
+	grp_bits = BN_num_bits(p);
+	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "DH-GEX: Request: %d / %d / %d, Received: %d",
+	            pvar->kexgex_min, pvar->kexgex_bits, pvar->kexgex_max, BN_num_bits(p));
+	notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_VERBOSE);
+
+	//
+	// (1) < GEX_GRP_MINSIZE <= (2) < kexgex_min <= (3) < kexgex_bits <= (4) <= kexgex_max < (5) <= GEX_GRP_MAXSIZE < (6)
+	//
+	if (grp_bits < GEX_GRP_MINSIZE || grp_bits > GEX_GRP_MAXSIZE) {
+	// (1), (6) プロトコルで認められている範囲(1024 <= grp_bits <= 8192)の外。強制切断。
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "Received group size out of range: %d", grp_bits);
+		notify_fatal_error(pvar, tmpbuf, FALSE);
+		goto error;
+	}
+	else if (grp_bits < pvar->kexgex_min) {
+	// (2) プロトコルで認められている範囲内だが、こちらの設定した最小値より小さい。確認ダイアログを出す。
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "DH-GEX: grp_bits(%d) < kexgex_min(%d)", grp_bits, pvar->kexgex_min);
+		    notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "Received group size is smaller than requested minimal.\nrequested: %d, received:%d\nAccept this?",
+		    pvar->kexgex_min, grp_bits);
+	}
+	else if (grp_bits < pvar->kexgex_bits) {
+	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログ。
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "DH-GEX: grp_bits(%d) < kexgex_bits(%d)", grp_bits, pvar->kexgex_bits);
+		    notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "Received group size is smaller than requested.\nrequested: %d, received: %d\nAccept this?",
+		    pvar->kexgex_bits, grp_bits);
+	}
+	else if (grp_bits <= pvar->kexgex_max) {
+	// (4) 要求値以上、かつ要求の最大値以下。問題なし。
+		tmpbuf[0] = 0; // no message
+	}
+	else {
+	// (5) こちらの設定した最大値より大きい。確認ダイアログを出す。
+	//     ただし現状では kexgex_max == GEX_GRP_MAXSIZE(8192) である為この状況になる事は無い。
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "DH-GEX: grp_bits(%d) > kexgex_max(%d)", grp_bits, pvar->kexgex_max);
+		    notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
+		    "Received group size is larger than requested maximal.\nrequested: %d, received: %d\nAccept this?",
+		    pvar->kexgex_max, grp_bits);
+	}
+	
+	if (tmpbuf[0] != 0) {
+		if (MessageBox(NULL, tmpbuf, "TTSSH: confirm GEX group size", MB_YESNO | MB_ICONERROR) == IDNO) {
+			notify_fatal_error(pvar, "connection canceled.", FALSE);
+			goto error;
+		}
+	}
 
 	dh = DH_new();
 	if (dh == NULL)
