@@ -1714,6 +1714,24 @@ static void init_protocol(PTInstVar pvar)
 	}
 }
 
+void server_version_check(PTInstVar pvar)
+{
+	char *server_swver;
+
+	pvar->server_compat_flag = 0;
+
+	if ((server_swver = strchr(pvar->server_version_string+4, '-')) == NULL) {
+		notify_verbose_message(pvar, "Can't get server software version string.", LOG_LEVEL_WARNING);
+		return;
+	}
+	server_swver++;
+
+	if (strncmp(server_swver, "Cisco-1", 7) == 0) {
+		pvar->server_compat_flag |= SSH_BUG_DHGEX_LARGE;
+		notify_verbose_message(pvar, "Server version string is matched to \"Cisco-1\", compatibility flag SSH_BUG_DHGEX_LARGE is enabled.", LOG_LEVEL_INFO);
+	}
+}
+
 BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 {
 	static char prefix[64];
@@ -1738,17 +1756,6 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 		chop_newlines(buf);
 		notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 		free(buf);
-
-
-		// ここでのコピーは削除 (2005.3.9 yutaka)
-#if 0
-		// for calculate SSH2 hash
-		// サーババージョンの保存（改行は取り除くこと）
-		if (ID_len >= sizeof(pvar->server_version_string))
-			return FALSE;
-		strncpy(pvar->server_version_string, ID, ID_len);
-#endif
-
 
 		if (ID[ID_len - 1] != '\n') {
 			pvar->ssh_state.status_flags |= STATUS_IN_PARTIAL_ID_STRING;
@@ -1810,6 +1817,9 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 				_snprintf_s(pvar->server_version_string,
 				            sizeof(pvar->server_version_string), _TRUNCATE,
 				            "%s", pvar->ssh_state.server_ID);
+
+				// サーババージョンのチェック
+				server_version_check(pvar);
 
 				if ((pvar->Psend) (pvar->socket, TTSSH_ID, TTSSH_ID_len,
 				                   0) != TTSSH_ID_len) {
@@ -5216,6 +5226,14 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	}
 	else if (bits > max) {
 		bits = max;
+	}
+	if (pvar->server_compat_flag & SSH_BUG_DHGEX_LARGE && bits > 4096) {
+		unsigned char tmp[256];
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, 
+		            "SSH_BUG_DHGEX_LARGE is enabled. DH-GEX group size is limited to 4096. (Original size is %d)",
+			    bits);
+		notify_verbose_message(pvar, tmp, LOG_LEVEL_NOTIFY);
+		bits = 4096;
 	}
 
 	// サーバへgroup sizeを送って、p と g を作ってもらう。

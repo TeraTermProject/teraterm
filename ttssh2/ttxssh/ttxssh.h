@@ -111,6 +111,11 @@ HANDLE hInst; /* Instance handle of TTXSSH.DLL */
 #define SSH_UPDATE_HOSTKEYS_ASK	2
 #define SSH_UPDATE_HOSTKEYS_MAX	3
 
+/*
+ * Server compatibility flag
+ */
+#define SSH_BUG_DHGEX_LARGE 0x00000001
+
 
 /*
 These are the fields that WOULD go in Tera Term's 'ts' structure, if
@@ -301,6 +306,8 @@ typedef struct _TInstVar {
 	EC_KEY *ecdh_client_key;
 
 	int dns_key_check;
+
+	unsigned int server_compat_flag;
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5
