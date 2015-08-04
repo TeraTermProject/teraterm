@@ -307,6 +307,8 @@ typedef struct _TInstVar {
 #define LOG_LEVEL_ERROR      10
 #define LOG_LEVEL_URGENT     20
 #define LOG_LEVEL_WARNING    30
+#define LOG_LEVEL_NOTIFY     50
+#define LOG_LEVEL_INFO       80
 #define LOG_LEVEL_VERBOSE    100
 #define LOG_LEVEL_SSHDUMP    200
 
