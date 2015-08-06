@@ -35,17 +35,17 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>teraterm.iniのLogLevelに"LOG_LEVEL_NOTIFY"と"LOG_LEVEL_INFO"の定義を追加した。</li>
       <li>パレット番号 256-259(OSC 4) を Special color として扱うようにした。</li>
       <li>マクロ: filenamebox と dirnamebox を最前面に表示するために、マクロウィンドウを最前面にするようにした。</li>
-      <li>OSC文字列のparse処理を全面的に書き換えた。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
       <li>localhostの23番ポート以外の場合、セッションの複製(Alt+D)でCygwin接続となる問題を修正した。</li>
+<!--
       <li>Meta=left/right時に、KEYBOARD.CNFでのAlt+カーソルキー設定が正しく使えない問題を修正した。</li>
+-->
     </ul>
   </li>
 
@@ -2614,13 +2614,17 @@
   <li>変更
     <ul>
       <li>"<a href="../menu/setup-ssh.html">SSH 設定</a>" ダイアログにホスト公開鍵の更新(Hostkey rotation)を追加した。</li>
+<!--
       <li>DH-GEXで要求するgroupサイズの最小値を指定できるようにした。
         <ul>
           <li>teraterm.ini に GexMinimalGroupSize エントリを追加した。デフォルトは0。</li>
         </ul></li>
+-->
       <li>X11転送失敗時のエラーメッセージにエラー番号を含めるようにした。</li>
       <li>SSH ポートフォワーディング(teraterm.iniのDefaultForwarding)の区切り記号をセミコロン(;)からカンマ(,)に変更した。</li>
+<!--
       <li>teraterm.iniの CipherOrder で暗号アルゴリズムArcfour系をデフォルトで無効化した。</li>
+-->
     </ul>
   </li>
 

@@ -36,17 +36,17 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added the "LOG_LEVEL_NOTIFY" and "LOG_LEVEL_INFO" definition on the LogLevel entry of the teraterm.ini file.</li>
       <li>The palette number from 256 to 259(OSC 4) are emulated as the Special color.</li>
       <li>MACRO: The macro window brings up by using the filenamebox and dirnamebox command.</li>
-      <li>The OSC string parsing procedure is refactoring code.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>When the port number is not 23 on local connection, the Cygwin connection starts by Alt+D(Duplicate session) key.</li>
+<!--
       <li>The Alt + cursor key in the KEYBOARD.CNF can not work well when the Meta=left/right is configured.</li>
+-->
     </ul>
   </li>
 
@@ -2612,13 +2612,17 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>added the "Hostkey rotation" entry on the "<a href="../menu/setup-ssh.html">TTSSH: Setup</a>" dialog box.</li>
+<!--
       <li>A minimum value of the group size DH-GEX requested can be specified.
         <ul>
           <li>added the GexMinimalGroupSize entry in the teraterm.ini file. The default value is 0.</li>
         </ul></li>
+-->
       <li>An error number can be included in the error message regarding the X11 port-forwarding failure.</li>
       <li>The DefaultForwarding entry in the teraterm.ini file as a means of the SSH port-forwarding changes own delimiter from semicolon(;) to comma(,).</li>
+<!--
       <li>The Arcfour series cipher algorithm is disabled by default in the CipherOrder entry of the teraterm.ini file.</li>
+-->
     </ul>
   </li>
 
