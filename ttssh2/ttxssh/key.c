@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "key.h"
 #include "kex.h"
+#include "resource.h"
 
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
@@ -1912,12 +1913,119 @@ error:
 	return (ret);
 }
 
+static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	static HFONT DlgHostsAddFont;
+	PTInstVar pvar;
+	LOGFONT logfont;
+	HFONT font;
+	char buf[1024];
+	char *host;
+	struct hostkeys_update_ctx *ctx;
+	char *fp;
+	size_t i;
+
+	switch (msg) {
+	case WM_INITDIALOG:
+		pvar = (PTInstVar)lParam;
+		SetWindowLong(dlg, DWL_USER, lParam);
+
+		host = pvar->ssh_state.hostname;
+		ctx = pvar->hostkey_ctx;
+
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar,
+			"Remote server \"%s\" sent the set of host keys which are absent in your list of known hosts. \n"
+			"The machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\n"
+			"If you choose to add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
+			"Do you want to update known hosts file with new key(s)?\n\n"
+			);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
+			);
+		SetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, buf);
+
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%u latest key(s):\n", ctx->nnew);
+		SetDlgItemText(dlg, IDC_ADDKEY_TEXT, buf);
+		for (i = 0; i < ctx->nkeys; i++) {
+			if (ctx->keys_seen[i])
+				continue;
+			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
+			buf[0] = 0;
+			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->keys[i]));
+			strcat_s(buf, sizeof(buf), " ");
+			strcat_s(buf, sizeof(buf), fp);
+			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
+			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
+			free(fp);
+		}
+
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%u obsolete key(s):\n", ctx->nold);
+		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
+		for (i = 0; i < ctx->nold; i++) {
+			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX);
+			buf[0] = 0;
+			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->old_keys[i]));
+			strcat_s(buf, sizeof(buf), " ");
+			strcat_s(buf, sizeof(buf), fp);
+			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
+			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
+			free(fp);
+		}
+
+		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
+			SendDlgItemMessage(dlg, IDC_HOSTKEY_MESSAGE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_ADDKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_REMOVEKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			//SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			//SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+		}
+		else {
+			DlgHostsAddFont = NULL;
+		}
+
+		return TRUE;			/* because we do not set the focus */
+
+	case WM_COMMAND:
+		pvar = (PTInstVar)GetWindowLong(dlg, DWL_USER);
+
+		switch (LOWORD(wParam)) {
+		case IDOK:
+
+			EndDialog(dlg, 1);
+
+			if (DlgHostsAddFont != NULL) {
+				DeleteObject(DlgHostsAddFont);
+			}
+
+			return TRUE;
+
+		case IDCANCEL:			/* kill the connection */
+			EndDialog(dlg, 0);
+
+			if (DlgHostsAddFont != NULL) {
+				DeleteObject(DlgHostsAddFont);
+			}
+
+			return TRUE;
+
+		default:
+			return FALSE;
+		}
+
+	default:
+		return FALSE;
+	}
+}
+
 static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 {
 	size_t i;
 	int dlgresult;
-	char msg[1024], tmp[128];
-	char *fp;
+	char msg[1024];
 	char *host;
 
 	host = pvar->ssh_state.hostname;
@@ -1931,48 +2039,13 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 
 	// known_hostsファイルの更新を行うため、ユーザに問い合わせを行う。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_ASK) {
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, 
-			"Remote server \"%s\" sent the set of host keys which are absent in your list of known hosts. \n"
-			"The machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\n"
-			"If you choose to add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
-			"Do you want to update known hosts file with new key(s)?\n\n"
-			);
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, 
-			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
-			);
+		HWND cur_active = GetActiveWindow();
 
-		if (ctx->nnew > 0) {
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%u latest key(s):\n", ctx->nnew);
-			strcat_s(msg, sizeof(msg), tmp);
-			for (i = 0; i < ctx->nkeys; i++) {
-				if (ctx->keys_seen[i])
-					continue;
-				fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
-				strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->keys[i]));
-				strcat_s(msg, sizeof(msg), " ");
-				strcat_s(msg, sizeof(msg), fp);
-				strcat_s(msg, sizeof(msg), "\n");
-				free(fp);
-			}
-		}
-
-		if (ctx->nold > 0) {
-			strcat_s(msg, sizeof(msg), "\n");
-
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%u obsolete key(s):\n", ctx->nold);
-			strcat_s(msg, sizeof(msg), tmp);
-			for (i = 0; i < ctx->nold; i++) {
-				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX);
-				strcat_s(msg, sizeof(msg), get_sshname_from_key(ctx->old_keys[i]));
-				strcat_s(msg, sizeof(msg), " ");
-				strcat_s(msg, sizeof(msg), fp);
-				strcat_s(msg, sizeof(msg), "\n");
-				free(fp);
-			}
-		}
-
-		dlgresult = MessageBox(NULL, msg, "TTSSH: SECURITY WARNING", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
-		if (dlgresult != IDYES) {
+		pvar->hostkey_ctx = ctx;
+		dlgresult = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHUPDATE_HOSTKEY),
+			cur_active != NULL ? cur_active : pvar->NotificationWindow,
+			hosts_updatekey_dlg_proc, (LPARAM)pvar);
+		if (dlgresult != 1) {
 			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because a user cancelled.");
 			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
 			goto error;

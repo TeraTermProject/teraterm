@@ -16,6 +16,7 @@
 #define IDD_SSHPASSWD_INPUT             108
 #define IDD_SFTP_DIALOG                 109
 #define IDI_SECURETT_YELLOW             110
+#define IDD_SSHUPDATE_HOSTKEY           111
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDD_SSHDIFFERENTKEY             601
@@ -121,6 +122,7 @@
 #define IDC_PASSWD                      1069
 #define IDC_ECDSA521_TYPE               1069
 #define IDC_SFTP_EDIT                   1069
+#define IDC_ADDKEY_EDIT                 1069
 #define IDC_STATIC1                     1070
 #define IDC_COMPRESSLABEL               1070
 #define IDC_SSHVERSIONS                 1070
@@ -202,18 +204,23 @@
 #define IDC_NEW_PASSWD                  1208
 #define IDC_SENDFILE_TO                 1208
 #define IDC_SFTP_CONSOLE                1208
+#define IDC_REMOVEKEY_EDIT              1208
 #define IDC_PUTTY_VERSION               1209
 #define IDC_ED25519_TYPE                1211
 #define IDC_HOSTKEY_ROTATION_STATIC     1212
 #define IDC_LIST1                       1213
+#define IDC_MESSAGE                     1214
+#define IDC_HOSTKEY_MESSAGE             1214
+#define IDC_ADDKEY_TEXT                 1215
+#define IDC_REMOVEKEY_TEXT              1216
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        111
+#define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1214
+#define _APS_NEXT_CONTROL_VALUE         1217
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

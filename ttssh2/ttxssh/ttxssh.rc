@@ -33,6 +33,20 @@ BEGIN
     EDITTEXT        IDC_SFTP_CONSOLE,7,33,252,110,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
 END
 
+IDD_SSHUPDATE_HOSTKEY DIALOGEX 0, 0, 309, 256
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SECURITY WARNING"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "YES",IDOK,87,233,50,14
+    DEFPUSHBUTTON   "NO",IDCANCEL,159,233,50,14
+    LTEXT           "#####",IDC_HOSTKEY_MESSAGE,7,16,295,85
+    LTEXT           "latest key(s):",IDC_ADDKEY_TEXT,7,106,139,8
+    EDITTEXT        IDC_ADDKEY_EDIT,7,118,295,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    LTEXT           "obsolete key(s):",IDC_REMOVEKEY_TEXT,7,170,130,8
+    EDITTEXT        IDC_REMOVEKEY_EDIT,7,183,295,43,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -49,8 +63,27 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 143
     END
+
+    IDD_SSHUPDATE_HOSTKEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 247
+    END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SSHUPDATE_HOSTKEY AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 #endif    // “ú–{Œê (“ú–{) resources
 /////////////////////////////////////////////////////////////////////////////

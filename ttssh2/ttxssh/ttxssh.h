@@ -308,6 +308,8 @@ typedef struct _TInstVar {
 	int dns_key_check;
 
 	unsigned int server_compat_flag;
+
+	void *hostkey_ctx;
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5
