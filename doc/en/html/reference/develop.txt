@@ -1,6 +1,6 @@
 * Development Environment
 - OS
-  Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro
+  Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro / Windows 10 Pro
 - Compiler
 -- Visual Studio 2005 SP1 Standard Edition (or higher edition)
    Microsoft Visual Studio 2005 Service Pack 1 MFC Security Update

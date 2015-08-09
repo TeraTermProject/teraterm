@@ -1,6 +1,6 @@
 ■ 開発環境
 - OS
-  Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro
+  Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro / Windows 10 Pro
 - コンパイラ
 -- Visual Studio 2005 SP1 (Standard Edition 以上)
    Microsoft Visual Studio 2005 Service Pack 1 MFC セキュリティ更新プログラム
