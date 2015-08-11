@@ -15,11 +15,11 @@
    Note: The executable program which was compiled by this version does not work on Windows 2000, NT 4.0, 95, 98 and Me.
 -- Visual Studio 2012 Update 4 Professional Edition (or higher edition)
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
--- Visual Studio Community 2013 Update 4
+-- Visual Studio Community 2013 Update 5
    MFC MBCS DLL Add-on
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 -- Visual Studio Community 2015
-   Note: The executable program which was compiled by this version does not work on Windows 2000, NT 4.0, 95, 98 and Me.
+   Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 - Installer
   Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 or higher doesn't support Windows NT 4.0 and 9x)
   Inno Setup Preprocessor (from ispack-5.4.3)
