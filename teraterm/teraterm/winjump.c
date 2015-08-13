@@ -408,6 +408,7 @@ static IShellLink *make_shell_link(const char *appname,
 	IPropertyStore *pPS;
 	PROPVARIANT pv;
 	int len;
+	HRESULT result;
 
 	/* Retrieve path to executable. */
 	if (!tt_path[0])
@@ -431,27 +432,41 @@ static IShellLink *make_shell_link(const char *appname,
 		return NULL;
 
 	/* Set path, parameters, icon and description. */
-	ret->lpVtbl->SetPath(ret, app_path);
+	result = ret->lpVtbl->SetPath(ret, app_path);
+	if (result != S_OK)
+		OutputDebugPrintf("SetPath failed. (%ld)\n", result);
 
 	param_string = _strdup(sessionname);
-	ret->lpVtbl->SetArguments(ret, param_string);
+	result = ret->lpVtbl->SetArguments(ret, param_string);
+	if (result != S_OK)
+		OutputDebugPrintf("SetArguments failed. (%ld)\n", result);
 	free(param_string);
 
 	desc_string = _strdup("Connect to Tera Term session");
-	ret->lpVtbl->SetDescription(ret, desc_string);
+	result = ret->lpVtbl->SetDescription(ret, desc_string);
+	if (result != S_OK)
+		OutputDebugPrintf("SetDescription failed. (%ld)\n", result);
 	free(desc_string);
 
-	ret->lpVtbl->SetIconLocation(ret, app_path, 0);
+	result = ret->lpVtbl->SetIconLocation(ret, app_path, 0);
+	if (result != S_OK)
+		OutputDebugPrintf("SetIconLocation failed. (%ld)\n", result);
 
 	/* To set the link title, we require the property store of the link. */
 	if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret, COMPTR(IPropertyStore, &pPS)))) {
 		PropVariantInit(&pv);
 		pv.vt = VT_LPSTR;
 		pv.pszVal = _strdup(sessionname);
-		pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
+		result = pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
+		if (result != S_OK)
+			OutputDebugPrintf("SetValue failed. (%ld)\n", result);
 		free(pv.pszVal);
-		pPS->lpVtbl->Commit(pPS);
-		pPS->lpVtbl->Release(pPS);
+		result = pPS->lpVtbl->Commit(pPS);
+		if (result != S_OK)
+			OutputDebugPrintf("Commit failed. (%ld)\n", result);
+		result = pPS->lpVtbl->Release(pPS);
+		if (result != S_OK)
+			OutputDebugPrintf("Release shell link failed. (%ld)\n", result);
 	}
 
 	return ret;
@@ -467,6 +482,7 @@ static void update_jumplist_from_registry(void)
 	UINT num_items;
 	UINT nremoved;
 	int i;
+	HRESULT result;
 
 	/* Variables used by the cleanup code must be initialised to NULL,
 	 * so that we don't try to free or release them if they were never
@@ -542,15 +558,21 @@ static void update_jumplist_from_registry(void)
 						!strcmp(desc1, desc2)) {
 						found = TRUE;
 					}
-					rlink->lpVtbl->Release(rlink);
+					result = rlink->lpVtbl->Release(rlink);
+					if (result != S_OK)
+						OutputDebugPrintf("Release rlink failed. (%ld)\n", result);
 				}
 			}
 
 			if (!found) {
-				collection->lpVtbl->AddObject(collection, (IUnknown *)link);
+				result = collection->lpVtbl->AddObject(collection, (IUnknown *)link);
+				if (result != S_OK)
+					OutputDebugPrintf("AddObject link failed. (%ld)\n", result);
 			}
 
-			link->lpVtbl->Release(link);
+			result = link->lpVtbl->Release(link);
+			if (result != S_OK)
+				OutputDebugPrintf("Release link failed. (%ld)\n", result);
 			link = NULL;
 		}
 	}
@@ -563,7 +585,9 @@ static void update_jumplist_from_registry(void)
 		(collection, COMPTR(IObjectArray, &array))))
 		goto cleanup;
 
-	pCDL->lpVtbl->AppendCategory(pCDL, L"Recent Sessions", array);
+	result = pCDL->lpVtbl->AppendCategory(pCDL, L"Recent Sessions", array);
+	if (result != S_OK)
+		OutputDebugPrintf("AppendCategory array failed. (%ld)\n", result);
 
 	/*
 	 * Create an object collection to form the 'Tasks' category on the
@@ -582,15 +606,21 @@ static void update_jumplist_from_registry(void)
 		(collection, COMPTR(IObjectArray, &array))))
 		goto cleanup;
 
-	pCDL->lpVtbl->AddUserTasks(pCDL, array);
+	result = pCDL->lpVtbl->AddUserTasks(pCDL, array);
+	if (result != S_OK)
+		OutputDebugPrintf("AddUserTasks array failed. (0x%x)\n", result);
 
 	/*
 	 * Now we can clean up the array and collection variables, so as
 	 * to be able to reuse them.
 	 */
-	array->lpVtbl->Release(array);
+	result = array->lpVtbl->Release(array);
+	if (result != S_OK)
+		OutputDebugPrintf("Release array failed. (%ld)\n", result);
 	array = NULL;
-	collection->lpVtbl->Release(collection);
+	result = collection->lpVtbl->Release(collection);
+	if (result != S_OK)
+		OutputDebugPrintf("Release collection failed. (%ld)\n", result);
 	collection = NULL;
 
 	/*
@@ -610,21 +640,29 @@ static void update_jumplist_from_registry(void)
 		(collection, COMPTR(IObjectArray, &array))))
 		goto cleanup;
 
-	pCDL->lpVtbl->AddUserTasks(pCDL, array);
+	result = pCDL->lpVtbl->AddUserTasks(pCDL, array);
+	if (result != S_OK)
+		OutputDebugPrintf("AddUserTasks array2 failed. (0x%x)\n", result);
 
 	/*
 	 * Now we can clean up the array and collection variables, so as
 	 * to be able to reuse them.
 	 */
-	array->lpVtbl->Release(array);
+	result = array->lpVtbl->Release(array);
+	if (result != S_OK)
+		OutputDebugPrintf("Release array2 failed. (%ld)\n", result);
 	array = NULL;
-	collection->lpVtbl->Release(collection);
+	result = collection->lpVtbl->Release(collection);
+	if (result != S_OK)
+		OutputDebugPrintf("Release collection2 failed. (%ld)\n", result);
 	collection = NULL;
 
 	/*
 	 * Commit the jump list.
 	 */
-	pCDL->lpVtbl->CommitList(pCDL);
+	result = pCDL->lpVtbl->CommitList(pCDL);
+	if (result != S_OK)
+		OutputDebugPrintf("CommitList failed. (%ld)\n", result);
 	need_abort = FALSE;
 
 	/*
