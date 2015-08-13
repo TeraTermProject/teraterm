@@ -401,242 +401,242 @@ BOOL isJumpListSupported(void)
 static IShellLink *make_shell_link(const char *appname,
                                    const char *sessionname)
 {
-    IShellLink *ret;
-    char *app_path, *param_string, *desc_string, *tmp_ptr;
-    static char tt_path[2048];
-    //void *psettings_tmp;
-    IPropertyStore *pPS;
-    PROPVARIANT pv;
-    int len;
+	IShellLink *ret;
+	char *app_path, *param_string, *desc_string, *tmp_ptr;
+	static char tt_path[2048];
+	//void *psettings_tmp;
+	IPropertyStore *pPS;
+	PROPVARIANT pv;
+	int len;
 
-    /* Retrieve path to executable. */
-    if (!tt_path[0])
-        GetModuleFileName(NULL, tt_path, sizeof(tt_path) - 1);
+	/* Retrieve path to executable. */
+	if (!tt_path[0])
+		GetModuleFileName(NULL, tt_path, sizeof(tt_path) - 1);
 
-    if (appname) {
-	tmp_ptr = strrchr(tt_path, '\\');
-	len = (tmp_ptr - tt_path) + strlen(appname) + 2;
-	app_path = malloc(len);
-	strncpy_s(app_path, len, tt_path, (tmp_ptr - tt_path + 1));
-	strcat_s(app_path, len, appname);
-    }
-    else {
-	app_path = _strdup(tt_path);
-    }
+	if (appname) {
+		tmp_ptr = strrchr(tt_path, '\\');
+		len = (tmp_ptr - tt_path) + strlen(appname) + 2;
+		app_path = malloc(len);
+		strncpy_s(app_path, len, tt_path, (tmp_ptr - tt_path + 1));
+		strcat_s(app_path, len, appname);
+	}
+	else {
+		app_path = _strdup(tt_path);
+	}
 
-    /* Create the new item. */
-    if (!SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL,
-                                    CLSCTX_INPROC_SERVER,
-                                    COMPTR(IShellLink, &ret))))
-        return NULL;
+	/* Create the new item. */
+	if (!SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL,
+		CLSCTX_INPROC_SERVER,
+		COMPTR(IShellLink, &ret))))
+		return NULL;
 
-    /* Set path, parameters, icon and description. */
-    ret->lpVtbl->SetPath(ret, app_path);
+	/* Set path, parameters, icon and description. */
+	ret->lpVtbl->SetPath(ret, app_path);
 
 	param_string = _strdup(sessionname);
-    ret->lpVtbl->SetArguments(ret, param_string);
-    free(param_string);
+	ret->lpVtbl->SetArguments(ret, param_string);
+	free(param_string);
 
 	desc_string = _strdup("Connect to Tera Term session");
-    ret->lpVtbl->SetDescription(ret, desc_string);
-    free(desc_string);
+	ret->lpVtbl->SetDescription(ret, desc_string);
+	free(desc_string);
 
-    ret->lpVtbl->SetIconLocation(ret, app_path, 0);
+	ret->lpVtbl->SetIconLocation(ret, app_path, 0);
 
-    /* To set the link title, we require the property store of the link. */
-    if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret, COMPTR(IPropertyStore, &pPS)))) {
-	PropVariantInit(&pv);
-	pv.vt = VT_LPSTR;
-	pv.pszVal = _strdup(sessionname);
-	pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
-	free(pv.pszVal);
-	pPS->lpVtbl->Commit(pPS);
-	pPS->lpVtbl->Release(pPS);
-    }
+	/* To set the link title, we require the property store of the link. */
+	if (SUCCEEDED(ret->lpVtbl->QueryInterface(ret, COMPTR(IPropertyStore, &pPS)))) {
+		PropVariantInit(&pv);
+		pv.vt = VT_LPSTR;
+		pv.pszVal = _strdup(sessionname);
+		pPS->lpVtbl->SetValue(pPS, &PKEY_Title, &pv);
+		free(pv.pszVal);
+		pPS->lpVtbl->Commit(pPS);
+		pPS->lpVtbl->Release(pPS);
+	}
 
-    return ret;
+	return ret;
 }
 
 /* Updates jumplist from registry. */
 static void update_jumplist_from_registry(void)
 {
-    char EntName[128];
-    char TempHost[1024];
+	char EntName[128];
+	char TempHost[1024];
 
-    const char *piterator = TempHost;
-    UINT num_items;
-    UINT nremoved;
-    int i;
+	const char *piterator = TempHost;
+	UINT num_items;
+	UINT nremoved;
+	int i;
 
-    /* Variables used by the cleanup code must be initialised to NULL,
-     * so that we don't try to free or release them if they were never
-     * set up. */
-    ICustomDestinationList *pCDL = NULL;
-    IObjectCollection *collection = NULL;
-    IObjectArray *array = NULL;
-    IShellLink *link = NULL;
-    IObjectArray *pRemoved = NULL;
-    int need_abort = FALSE;
+	/* Variables used by the cleanup code must be initialised to NULL,
+	 * so that we don't try to free or release them if they were never
+	 * set up. */
+	ICustomDestinationList *pCDL = NULL;
+	IObjectCollection *collection = NULL;
+	IObjectArray *array = NULL;
+	IShellLink *link = NULL;
+	IObjectArray *pRemoved = NULL;
+	int need_abort = FALSE;
 
-    /*
-     * Create an ICustomDestinationList: the top-level object which
-     * deals with jump list management.
-     */
-    if (!SUCCEEDED(CoCreateInstance(&CLSID_DestinationList, NULL,
-                                    CLSCTX_INPROC_SERVER,
-                                    COMPTR(ICustomDestinationList, &pCDL))))
-        goto cleanup;
+	/*
+	 * Create an ICustomDestinationList: the top-level object which
+	 * deals with jump list management.
+	 */
+	if (!SUCCEEDED(CoCreateInstance(&CLSID_DestinationList, NULL,
+		CLSCTX_INPROC_SERVER,
+		COMPTR(ICustomDestinationList, &pCDL))))
+		goto cleanup;
 
-    /*
-     * Call its BeginList method to start compiling a list. This gives
-     * us back 'num_items' (a hint derived from systemwide
-     * configuration about how many things to put on the list) and
-     * 'pRemoved' (user configuration about things to leave off the
-     * list).
-     */
-    if (!SUCCEEDED(pCDL->lpVtbl->BeginList(pCDL, &num_items,
-                                           COMPTR(IObjectArray, &pRemoved))))
-        goto cleanup;
-    need_abort = TRUE;
-    if (!SUCCEEDED(pRemoved->lpVtbl->GetCount(pRemoved, &nremoved)))
-	nremoved = 0;
+	/*
+	 * Call its BeginList method to start compiling a list. This gives
+	 * us back 'num_items' (a hint derived from systemwide
+	 * configuration about how many things to put on the list) and
+	 * 'pRemoved' (user configuration about things to leave off the
+	 * list).
+	 */
+	if (!SUCCEEDED(pCDL->lpVtbl->BeginList(pCDL, &num_items,
+		COMPTR(IObjectArray, &pRemoved))))
+		goto cleanup;
+	need_abort = TRUE;
+	if (!SUCCEEDED(pRemoved->lpVtbl->GetCount(pRemoved, &nremoved)))
+		nremoved = 0;
 
-    /*
-     * Create an object collection to form the 'Recent Sessions'
-     * category on the jump list.
-     */
-    if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
-                                    NULL, CLSCTX_INPROC_SERVER,
-                                    COMPTR(IObjectCollection, &collection))))
-        goto cleanup;
+	/*
+	 * Create an object collection to form the 'Recent Sessions'
+	 * category on the jump list.
+	 */
+	if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
+		NULL, CLSCTX_INPROC_SERVER,
+		COMPTR(IObjectCollection, &collection))))
+		goto cleanup;
 
-    /*
-     * Go through the jump list entries from the registry and add each
-     * one to the collection.
-     */
-    for (i=1; i<=MAX_JUMPLIST_ITEMS; i++) {
-	_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-	GetPrivateProfileString("Hosts", EntName, "", TempHost, sizeof(TempHost), IniFile);
-	if (strlen(TempHost) == 0) {
-	    break;
-	}
-
-	OutputDebugPrintf("%s\n", piterator);
-	link = make_shell_link(NULL, piterator);
-	if (link) {
-	    UINT j;
-	    int found;
-
-	    /*
-	     * Check that the link isn't in the user-removed list.
-	     */
-	    for (j = 0, found = FALSE; j < nremoved && !found; j++) {
-		IShellLink *rlink;
-		if (SUCCEEDED(pRemoved->lpVtbl->GetAt
-			      (pRemoved, j, COMPTR(IShellLink, &rlink)))) {
-		    char desc1[2048], desc2[2048];
-		    if (SUCCEEDED(link->lpVtbl->GetDescription
-		                  (link, desc1, sizeof(desc1)-1)) &&
-		        SUCCEEDED(rlink->lpVtbl->GetDescription
-			          (rlink, desc2, sizeof(desc2)-1)) &&
-		        !strcmp(desc1, desc2)) {
-			found = TRUE;
-		    }
-		    rlink->lpVtbl->Release(rlink);
+	/*
+	 * Go through the jump list entries from the registry and add each
+	 * one to the collection.
+	 */
+	for (i = 1; i <= MAX_JUMPLIST_ITEMS; i++) {
+		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
+		GetPrivateProfileString("Hosts", EntName, "", TempHost, sizeof(TempHost), IniFile);
+		if (strlen(TempHost) == 0) {
+			break;
 		}
-	    }
 
-	    if (!found) {
-		collection->lpVtbl->AddObject(collection, (IUnknown *)link);
-	    }
+		OutputDebugPrintf("%s\n", piterator);
+		link = make_shell_link(NULL, piterator);
+		if (link) {
+			UINT j;
+			int found;
 
-	    link->lpVtbl->Release(link);
-	    link = NULL;
+			/*
+			 * Check that the link isn't in the user-removed list.
+			 */
+			for (j = 0, found = FALSE; j < nremoved && !found; j++) {
+				IShellLink *rlink;
+				if (SUCCEEDED(pRemoved->lpVtbl->GetAt
+					(pRemoved, j, COMPTR(IShellLink, &rlink)))) {
+					char desc1[2048], desc2[2048];
+					if (SUCCEEDED(link->lpVtbl->GetDescription
+						(link, desc1, sizeof(desc1) - 1)) &&
+						SUCCEEDED(rlink->lpVtbl->GetDescription
+							(rlink, desc2, sizeof(desc2) - 1)) &&
+						!strcmp(desc1, desc2)) {
+						found = TRUE;
+					}
+					rlink->lpVtbl->Release(rlink);
+				}
+			}
+
+			if (!found) {
+				collection->lpVtbl->AddObject(collection, (IUnknown *)link);
+			}
+
+			link->lpVtbl->Release(link);
+			link = NULL;
+		}
 	}
-    }
 
-    /*
-     * Get the array form of the collection we've just constructed,
-     * and put it in the jump list.
-     */
-    if (!SUCCEEDED(collection->lpVtbl->QueryInterface
-                   (collection, COMPTR(IObjectArray, &array))))
-	goto cleanup;
+	/*
+	 * Get the array form of the collection we've just constructed,
+	 * and put it in the jump list.
+	 */
+	if (!SUCCEEDED(collection->lpVtbl->QueryInterface
+		(collection, COMPTR(IObjectArray, &array))))
+		goto cleanup;
 
-    pCDL->lpVtbl->AppendCategory(pCDL, L"Recent Sessions", array);
+	pCDL->lpVtbl->AppendCategory(pCDL, L"Recent Sessions", array);
 
-    /*
-     * Create an object collection to form the 'Tasks' category on the
-     * jump list.
-     */
-    if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
-                                    NULL, CLSCTX_INPROC_SERVER,
-                                    COMPTR(IObjectCollection, &collection))))
-	goto cleanup;
+	/*
+	 * Create an object collection to form the 'Tasks' category on the
+	 * jump list.
+	 */
+	if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
+		NULL, CLSCTX_INPROC_SERVER,
+		COMPTR(IObjectCollection, &collection))))
+		goto cleanup;
 
-    /*
-     * Get the array form of the collection we've just constructed,
-     * and put it in the jump list.
-     */
-    if (!SUCCEEDED(collection->lpVtbl->QueryInterface
-                   (collection, COMPTR(IObjectArray, &array))))
-	goto cleanup;
+	/*
+	 * Get the array form of the collection we've just constructed,
+	 * and put it in the jump list.
+	 */
+	if (!SUCCEEDED(collection->lpVtbl->QueryInterface
+		(collection, COMPTR(IObjectArray, &array))))
+		goto cleanup;
 
-    pCDL->lpVtbl->AddUserTasks(pCDL, array);
+	pCDL->lpVtbl->AddUserTasks(pCDL, array);
 
-    /*
-     * Now we can clean up the array and collection variables, so as
-     * to be able to reuse them.
-     */
-    array->lpVtbl->Release(array);
-    array = NULL;
-    collection->lpVtbl->Release(collection);
-    collection = NULL;
+	/*
+	 * Now we can clean up the array and collection variables, so as
+	 * to be able to reuse them.
+	 */
+	array->lpVtbl->Release(array);
+	array = NULL;
+	collection->lpVtbl->Release(collection);
+	collection = NULL;
 
-    /*
-     * Create another object collection to form the user tasks
-     * category.
-     */
-    if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
-                                    NULL, CLSCTX_INPROC_SERVER,
-                                    COMPTR(IObjectCollection, &collection))))
-	goto cleanup;
+	/*
+	 * Create another object collection to form the user tasks
+	 * category.
+	 */
+	if (!SUCCEEDED(CoCreateInstance(&CLSID_EnumerableObjectCollection,
+		NULL, CLSCTX_INPROC_SERVER,
+		COMPTR(IObjectCollection, &collection))))
+		goto cleanup;
 
-    /*
-     * Get the array form of the collection we've just constructed,
-     * and put it in the jump list.
-     */
-    if (!SUCCEEDED(collection->lpVtbl->QueryInterface
-                   (collection, COMPTR(IObjectArray, &array))))
-	goto cleanup;
+	/*
+	 * Get the array form of the collection we've just constructed,
+	 * and put it in the jump list.
+	 */
+	if (!SUCCEEDED(collection->lpVtbl->QueryInterface
+		(collection, COMPTR(IObjectArray, &array))))
+		goto cleanup;
 
-    pCDL->lpVtbl->AddUserTasks(pCDL, array);
+	pCDL->lpVtbl->AddUserTasks(pCDL, array);
 
-    /*
-     * Now we can clean up the array and collection variables, so as
-     * to be able to reuse them.
-     */
-    array->lpVtbl->Release(array);
-    array = NULL;
-    collection->lpVtbl->Release(collection);
-    collection = NULL;
+	/*
+	 * Now we can clean up the array and collection variables, so as
+	 * to be able to reuse them.
+	 */
+	array->lpVtbl->Release(array);
+	array = NULL;
+	collection->lpVtbl->Release(collection);
+	collection = NULL;
 
-    /*
-     * Commit the jump list.
-     */
-    pCDL->lpVtbl->CommitList(pCDL);
-    need_abort = FALSE;
+	/*
+	 * Commit the jump list.
+	 */
+	pCDL->lpVtbl->CommitList(pCDL);
+	need_abort = FALSE;
 
-    /*
-     * Clean up.
-     */
-  cleanup:
-    if (pRemoved) pRemoved->lpVtbl->Release(pRemoved);
-    if (pCDL && need_abort) pCDL->lpVtbl->AbortList(pCDL);
-    if (pCDL) pCDL->lpVtbl->Release(pCDL);
-    if (collection) collection->lpVtbl->Release(collection);
-    if (array) array->lpVtbl->Release(array);
-    if (link) link->lpVtbl->Release(link);
+	/*
+	 * Clean up.
+	 */
+cleanup:
+	if (pRemoved) pRemoved->lpVtbl->Release(pRemoved);
+	if (pCDL && need_abort) pCDL->lpVtbl->AbortList(pCDL);
+	if (pCDL) pCDL->lpVtbl->Release(pCDL);
+	if (collection) collection->lpVtbl->Release(collection);
+	if (array) array->lpVtbl->Release(array);
+	if (link) link->lpVtbl->Release(link);
 }
 
 void add_to_recent_docs(const char * const sessionname)
@@ -653,36 +653,36 @@ void add_to_recent_docs(const char * const sessionname)
 /* Clears the entire jumplist. */
 void clear_jumplist(void)
 {
-    ICustomDestinationList *pCDL;
+	ICustomDestinationList *pCDL;
 
-    if (CoCreateInstance(&CLSID_DestinationList, NULL, CLSCTX_INPROC_SERVER,
-                         COMPTR(ICustomDestinationList, &pCDL)) == S_OK) {
-	pCDL->lpVtbl->DeleteList(pCDL, NULL);
-	pCDL->lpVtbl->Release(pCDL);
-    }
+	if (CoCreateInstance(&CLSID_DestinationList, NULL, CLSCTX_INPROC_SERVER,
+		COMPTR(ICustomDestinationList, &pCDL)) == S_OK) {
+		pCDL->lpVtbl->DeleteList(pCDL, NULL);
+		pCDL->lpVtbl->Release(pCDL);
+	}
 
 }
 
 /* Adds a saved session to the Windows 7 jumplist. */
 void add_session_to_jumplist(const char * const sessionname, char *inifile)
 {
-    if (!isJumpListSupported())
-	return;                        /* do nothing on pre-Win7 systems */
+	if (!isJumpListSupported())
+		return;                        /* do nothing on pre-Win7 systems */
 
-//    add_to_recent_docs(sessionname);
+	//    add_to_recent_docs(sessionname);
 
-    IniFile = inifile;
+	IniFile = inifile;
 
-    update_jumplist_from_registry();
-    return;
+	update_jumplist_from_registry();
+	return;
 }
 
 /* Removes a saved session from the Windows jumplist. */
 void remove_session_from_jumplist(const char * const sessionname)
 {
-    if (!isJumpListSupported())
-	return;                        /* do nothing on pre-Win7 systems */
+	if (!isJumpListSupported())
+		return;                        /* do nothing on pre-Win7 systems */
 
-    update_jumplist_from_registry();
-    return;
+	update_jumplist_from_registry();
+	return;
 }
