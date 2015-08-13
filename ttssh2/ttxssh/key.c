@@ -762,6 +762,8 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep)
 
 	// fingerprintのハッシュ値（バイナリ）を求める
 	dgst_raw = key_fingerprint_raw(key, SSH_FP_MD5, &dgst_raw_len);
+	if (dgst_raw == NULL)
+		return NULL;
 
 	if (dgst_rep == SSH_FP_HEX) {
 		// 16進表記へ変換する
