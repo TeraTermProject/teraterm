@@ -13,36 +13,34 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 resources
+// 日本語 (日本) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_SETUP_DIR_DIALOG DIALOGEX 0, 0, 385, 115
+IDD_SETUP_DIR_DIALOG DIALOGEX 0, 0, 419, 125
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Setup directory"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "INI",IDC_INI_SETUPDIR_STATIC,7,18,11,8
+    LTEXT           "Tera Term Configuration File",IDC_INI_SETUPDIR_STATIC,7,15,57,17
     EDITTEXT        IDC_INI_SETUPDIR_EDIT,73,16,253,14,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",IDC_INI_SETUPDIR_BUTTON,338,16,26,14
-    LTEXT           "CNF",IDC_KEYCNF_SETUPDIR_STATIC,7,38,14,8
-    EDITTEXT        IDC_KEYCNF_SETUPDIR_EDIT,73,37,253,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "...",IDC_KEYCNF_SETUPDIR_BUTTON,338,37,26,14
-    LTEXT           "cygterm.cfg",IDC_CYGTERM_SETUPDIR_STATIC,7,59,40,8
-    EDITTEXT        IDC_CYGTERM_SETUPDIR_EDIT,73,58,253,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "...",IDC_CYGTERM_SETUPDIR_BUTTON,338,58,26,14
-    LTEXT           "ssh_known_hosts",IDC_SSH_SETUPDIR_STATIC,9,82,58,8
-    EDITTEXT        IDC_SSH_SETUPDIR_EDIT,73,81,253,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "...",IDC_SSH_SETUPDIR_BUTTON,338,81,26,14
+    LTEXT           "Keyboard Configuration File",IDC_KEYCNF_SETUPDIR_STATIC,7,42,61,17
+    EDITTEXT        IDC_KEYCNF_SETUPDIR_EDIT,73,41,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_KEYCNF_SETUPDIR_BUTTON,338,41,26,14
+    LTEXT           "CygTerm Configuration File",IDC_CYGTERM_SETUPDIR_STATIC,7,68,60,17
+    EDITTEXT        IDC_CYGTERM_SETUPDIR_EDIT,73,67,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_CYGTERM_SETUPDIR_BUTTON,338,67,26,14
+    LTEXT           "Known_hosts File",IDC_SSH_SETUPDIR_STATIC,9,94,54,15
+    EDITTEXT        IDC_SSH_SETUPDIR_EDIT,73,93,253,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_SSH_SETUPDIR_BUTTON,338,93,26,14
 END
 
 
@@ -52,19 +50,19 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_SETUP_DIR_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 378
+        RIGHTMARGIN, 412
         TOPMARGIN, 7
-        BOTTOMMARGIN, 108
+        BOTTOMMARGIN, 118
     END
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 日本語 resources
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -72,10 +70,8 @@ END
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -339,7 +335,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DAD_DIALOG, DIALOG
     BEGIN
@@ -511,7 +507,7 @@ END
 // Menu
 //
 
-IDR_MENU MENU 
+IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -625,7 +621,7 @@ BEGIN
     END
 END
 
-IDR_TEKMENU MENU 
+IDR_TEKMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -656,7 +652,7 @@ BEGIN
     END
 END
 
-IDR_PASTEMENU MENU 
+IDR_PASTEMENU MENU
 BEGIN
     MENUITEM "&Paste",                      ID_EDIT_PASTE2
     MENUITEM "Paste<C&R>",                  ID_EDIT_PASTECR
@@ -668,7 +664,7 @@ END
 // Accelerator
 //
 
-IDR_ACC ACCELERATORS 
+IDR_ACC ACCELERATORS
 BEGIN
     "T",            ID_ACC_AREYOUTHERE,     VIRTKEY, ALT, NOINVERT
     "C",            ID_ACC_COPY,            VIRTKEY, ALT, NOINVERT

@@ -265,6 +265,11 @@ DLG_FILETRANS_START=&Старт
 DLG_FILETRANS_PAUSE=&Пауза
 DLG_FILETRANS_CLOSE=Закрыть
 
+DLG_SETUPDIR_INIFILE=Tera Term Configuration File
+DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
+DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
+DLG_SETUPDIR_KNOWNHOSTSFILE=Known_hosts File
+
 ; commonlib.c
 MSG_WINSOCK_ERROR=Не удается использовать winsock
 MSG_INVALID_HOST_ERROR=Неверный хост

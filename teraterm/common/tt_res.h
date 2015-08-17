@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ で生成されたインクルード ファイル。
-// C:\usr\ttssh2\trunk\teraterm\teraterm\ttermpro.rc で使用
+// C:\usr\ttssh2_vc2015\trunk\teraterm\teraterm\ttermpro.rc で使用
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
