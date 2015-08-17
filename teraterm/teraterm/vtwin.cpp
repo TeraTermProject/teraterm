@@ -4565,7 +4565,7 @@ void CVTWindow::OnSetupRestore()
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openDirectoryWithExplorer(char *path, int pathlen)
+static BOOL openDirectoryWithExplorer(char *path)
 {
 	LPSHELLFOLDER pDesktopFolder;
 	LPMALLOC pMalloc;
@@ -4728,13 +4728,13 @@ static BOOL openVirtualStore(char *path, char *filename)
 		goto error;
 	}
 
-	openDirectoryWithExplorer(shPath, sizeof(shPath));
+	openDirectoryWithExplorer(shPath);
 
 	ret = TRUE;
 	return (ret);
 
 error:
-	openDirectoryWithExplorer(path, sizeof(path));
+	openDirectoryWithExplorer(path);
 
 	return (ret);
 }
