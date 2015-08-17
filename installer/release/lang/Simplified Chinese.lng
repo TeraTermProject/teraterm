@@ -270,6 +270,8 @@ DLG_SETUPDIR_INIFILE=Tera Term Configuration File
 DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
 DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
 DLG_SETUPDIR_KNOWNHOSTSFILE=Known_hosts File
+DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=无法使用 Winsock

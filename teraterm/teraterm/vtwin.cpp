@@ -4560,6 +4560,59 @@ void CVTWindow::OnSetupRestore()
 
 
 //
+// 指定したアプリケーションでファイルを開く。
+//
+// return TRUE: success
+//        FALSE: failure
+//
+static BOOL openFileWithApplication(char *pathname, char *filename, char *editor)
+{
+	char command[1024]; 
+	char fullpath[1024];
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	BOOL ret = FALSE;
+	char buf[80];
+	char uimsg[MAX_UIMSG];
+
+	SetLastError(NO_ERROR);
+
+	_snprintf_s(fullpath, sizeof(fullpath), "%s\\%s", pathname, filename);
+	if (_access(fullpath, 0) != 0) { // ファイルが存在しない
+		DWORD no = GetLastError();
+		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
+		get_lang_msg("DLG_SETUPDIR_NOFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
+			"File does not exist.(%d)", ts.UILanguageFile);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
+		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		goto error;
+	}
+
+	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s \"%s\"", editor, fullpath);
+
+	memset(&si, 0, sizeof(si));
+	GetStartupInfo(&si);
+	memset(&pi, 0, sizeof(pi));
+
+	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
+		NULL, NULL, &si, &pi) == 0) { // 起動失敗
+		DWORD no = GetLastError();
+		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
+		get_lang_msg("DLG_SETUPDIR_OPENFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
+			"Cannot open file.(%d)", ts.UILanguageFile);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
+		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
+		goto error;
+	}
+
+	ret = TRUE;
+
+error:;
+	return (ret);
+}
+
+
+//
 // エクスプローラでパスを開く。
 //
 // return TRUE: success
@@ -4612,9 +4665,9 @@ static BOOL openDirectoryWithExplorer(char *path)
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openVirtualStore(char *path, char *filename)
+static BOOL openVirtualStore(char *path, char *filename, BOOL open_directory_only, char *open_editor)
 {
-#if _MSC_VER == 1400
+#if _MSC_VER == 1400  // VSC2005(VC8.0)
 	typedef struct _TOKEN_ELEVATION {
 		DWORD TokenIsElevated;
 	} TOKEN_ELEVATION, *PTOKEN_ELEVATION;
@@ -4644,6 +4697,8 @@ static BOOL openVirtualStore(char *path, char *filename)
 	DWORD dwDataSize;
 	DWORD dwType;
 	BYTE bValue;
+
+	OutputDebugPrintf("[%s][%s] open_directory_only %d\n", path, filename, open_directory_only);
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
@@ -4728,13 +4783,23 @@ static BOOL openVirtualStore(char *path, char *filename)
 		goto error;
 	}
 
-	openDirectoryWithExplorer(shPath);
+	if (open_directory_only) {
+		openDirectoryWithExplorer(shPath);
+	}
+	else {
+		openFileWithApplication(shPath, filename, open_editor);
+	}
 
 	ret = TRUE;
 	return (ret);
 
 error:
-	openDirectoryWithExplorer(path);
+	if (open_directory_only) {
+		openDirectoryWithExplorer(path);
+	}
+	else {
+		openFileWithApplication(path, filename, open_editor);
+	}
 
 	return (ret);
 }
@@ -4752,6 +4817,9 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	PSSH_read_known_hosts_file func = NULL;
 	HMODULE h = NULL;
 	static char hostsfilepath[MAX_PATH], hostsfilename[MAX_PATH];
+	char *path_p, *filename_p;
+	BOOL open_dir;
+	int button_pressed;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -4827,22 +4895,59 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		return TRUE;
 
 	case WM_COMMAND:
+		button_pressed = 0;
 		switch (LOWORD(wp)) {
 		case IDC_INI_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(inipath, inifilename);
-			return TRUE;
+			open_dir = TRUE;
+			path_p = inipath;
+			filename_p = inifilename;
+			button_pressed = 1;
+			break;
+		case IDC_INI_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			open_dir = FALSE;
+			path_p = inipath;
+			filename_p = inifilename;
+			button_pressed = 1;
+			break;
 
 		case IDC_KEYCNF_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(keycnfpath, keycnfpath);
-			return TRUE;
+			open_dir = TRUE;
+			path_p = keycnfpath;
+			filename_p = keycnffilename;
+			button_pressed = 1;
+			break;
+		case IDC_KEYCNF_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			open_dir = FALSE;
+			path_p = keycnfpath;
+			filename_p = keycnffilename;
+			button_pressed = 1;
+			break;
 
 		case IDC_CYGTERM_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(cygtermpath, cygtermfilename);
-			return TRUE;
+			open_dir = TRUE;
+			path_p = cygtermpath;
+			filename_p = cygtermfilename;
+			button_pressed = 1;
+			break;
+		case IDC_CYGTERM_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			open_dir = FALSE;
+			path_p = cygtermpath;
+			filename_p = cygtermfilename;
+			button_pressed = 1;
+			break;
 
 		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
-			openVirtualStore(hostsfilepath, hostsfilename);
-			return TRUE;
+			open_dir = TRUE;
+			path_p = hostsfilepath;
+			filename_p = hostsfilename;
+			button_pressed = 1;
+			break;
+		case IDC_SSH_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
+			open_dir = FALSE;
+			path_p = hostsfilepath;
+			filename_p = hostsfilename;
+			button_pressed = 1;
+			break;
 
 		case IDCANCEL:
 			EndDialog(hDlgWnd, IDCANCEL);
@@ -4850,6 +4955,18 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		default:
 			return FALSE;
+		}
+
+		if (button_pressed) {
+			char *app = NULL;
+
+			if (open_dir)
+				app = NULL;
+			else
+				app = ts.ViewlogEditor;
+
+			openVirtualStore(path_p, filename_p, open_dir, app);
+			return TRUE;
 		}
 
 	case WM_CLOSE:
