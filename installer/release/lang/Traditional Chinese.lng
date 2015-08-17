@@ -265,6 +265,7 @@ DLG_FILETRANS_START=¶}©l(&S)
 DLG_FILETRANS_PAUSE=¼È°±(&S)
 DLG_FILETRANS_CLOSE=Ãö³¬
 
+DLG_SETUPDIR_CAPTION=Tera Term: Setup directory
 DLG_SETUPDIR_INIFILE=Tera Term Configuration File
 DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
 DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File

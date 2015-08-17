@@ -4756,6 +4756,10 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	switch (msg) {
 	case WM_INITDIALOG:
 		// I18N
+		get_lang_msg("DLG_SETUPDIR_CAPTION", ts.UIMsg, sizeof(ts.UIMsg),
+			"Tera Term: Setup directory", ts.UILanguageFile);
+		SetWindowText(hDlgWnd, ts.UIMsg);
+
 		get_lang_msg("DLG_SETUPDIR_INIFILE", ts.UIMsg, sizeof(ts.UIMsg),
 			"Tera Term Configuration File", ts.UILanguageFile);
 		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, ts.UIMsg);
