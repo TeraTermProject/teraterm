@@ -37,7 +37,7 @@
   <li>Changes
     <ul>
       <li>When the color palette is changed and inquired with the OSC 4, the palette number(256, 258, 259) is treated as the highlight, blinking and reverse attribute color.</li>
-      <li>When the color is inquired with the OSC 4 and 10, the terminal character is matched to the requested character.</li>
+      <li>When the color is inquired with the OSC 4, OSC 10 and so on, the terminal character is matched to the requested character.</li>
       <li>The all attribute color is resetted to the initial status with the OSC 105 ST.</li>
       <li>MACRO: A dialog of the filenamebox and dirnamebox is on top of all the other windows.</li>
       <li>Setup directory
@@ -2637,7 +2637,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>added a workaround that the Tera Term 4.87(TTSSH 2.73) can not connect to the Cisco router.</li>
+      <li>added a workaround for IOS SSH server bug because the Tera Term 4.87(TTSSH 2.73) can not connect to the Cisco device.</li>
       <li>When the known_hosts file is updated by the host key rotation, an appliction fault will be occurred after the fingerprint display of the version dialog.</li>
     </ul>
   </li>
