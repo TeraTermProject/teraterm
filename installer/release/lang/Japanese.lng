@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Jan 23 2015)
+; Updated by TeraTerm Project (Aug 25 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -820,6 +820,11 @@ MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=サーバに有効な認証方式がありません.
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nサーバでサポートされていない認証方法です.
 MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE を受信しました. \nチャネル [%d]: 理由: %s(%d) メッセージ: %s
 MSG_SSH_NO_FREE_CHANNEL=新しいチャネルを開けません. チャネルがすべて使用中です.
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: GEX グループサイズを確認してください
+MSG_SSH_GEX_SIZE_CANCEL=接続はキャンセルされました.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=受信したグループサイズが許容範囲外です: %d
+MSG_SSH_GEX_SIZE_SMALLER=受信したグループサイズが要求した最小サイズより小さいです. \n要求したサイズ: %d, 受信したサイズ: %d\nこのグループサイズを受け入れますか？
+MSG_SSH_GEX_SIZE_LARGER=受信したグループサイズが要求した最大サイズより大きいです. \n要求したサイズ: %d, 受信したサイズ: %d\nこのグループサイズを受け入れますか？
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=無効なコマンドラインオプション: %s

@@ -5312,8 +5312,9 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	//
 	if (grp_bits < GEX_GRP_MINSIZE || grp_bits > GEX_GRP_MAXSIZE) {
 	// (1), (6) プロトコルで認められている範囲(1024 <= grp_bits <= 8192)の外。強制切断。
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-		    "Received group size out of range: %d", grp_bits);
+		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_OUTOFRANGE", pvar,
+		                  "Received group size out of range: %d");
+		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->ts->UIMsg, grp_bits);
 		notify_fatal_error(pvar, tmpbuf, FALSE);
 		goto error;
 	}
@@ -5321,10 +5322,11 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	// (2) プロトコルで認められている範囲内だが、こちらの設定した最小値より小さい。確認ダイアログを出す。
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    "DH-GEX: grp_bits(%d) < kexgex_min(%d)", grp_bits, pvar->kexgex_min);
-		    notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_SMALLER", pvar,
+		                  "Received group size is smaller than requested minimal.\nrequested: %d, received: %d\nAccept this?");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-		    "Received group size is smaller than requested minimal.\nrequested: %d, received:%d\nAccept this?",
-		    pvar->kexgex_min, grp_bits);
+		    pvar->ts->UIMsg, pvar->kexgex_min, grp_bits);
 	}
 	else if (grp_bits < pvar->kexgex_bits) {
 	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログは出さない。
@@ -5348,15 +5350,20 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	//     ただし現状では kexgex_max == GEX_GRP_MAXSIZE(8192) である為この状況になる事は無い。
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    "DH-GEX: grp_bits(%d) > kexgex_max(%d)", grp_bits, pvar->kexgex_max);
-		    notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_LARGER", pvar,
+		                  "Received group size is larger than requested maximal.\nrequested: %d, received: %d\nAccept this?");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-		    "Received group size is larger than requested maximal.\nrequested: %d, received: %d\nAccept this?",
-		    pvar->kexgex_max, grp_bits);
+		    pvar->ts->UIMsg, pvar->kexgex_max, grp_bits);
 	}
 	
 	if (tmpbuf[0] != 0) {
-		if (MessageBox(NULL, tmpbuf, "TTSSH: confirm GEX group size", MB_YESNO | MB_ICONERROR) == IDNO) {
-			notify_fatal_error(pvar, "connection canceled.", FALSE);
+		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_TITLE", pvar,
+		                  "TTSSH: confirm GEX group size");
+		if (MessageBox(NULL, tmpbuf, pvar->ts->UIMsg, MB_YESNO | MB_ICONERROR) == IDNO) {
+			UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_CANCEL", pvar,
+			                  "Connection cancelled.");
+			notify_fatal_error(pvar, pvar->ts->UIMsg, FALSE);
 			goto error;
 		}
 	}

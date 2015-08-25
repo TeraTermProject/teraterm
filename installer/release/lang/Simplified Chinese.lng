@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Jan 23 2015)
+; Updated by TeraTerm Project (Aug 25 2015)
 ; Last translated (Simplified Chinese language) by LiShaohui (Nov 18 2013)
 
 [Tera Term]
@@ -821,6 +821,11 @@ MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=没有有效用于该服务器的认证方式。
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\n服务器不支持该认证方式。
 MSG_SSH_CHANNEL_OPEN_ERROR=收到 SSH2_MSG_CHANNEL_OPEN_FAILURE。\n通道 [%d]: 原因: %s(%d) 消息: %s
 MSG_SSH_NO_FREE_CHANNEL=无法打开新通道。TTSSH 已经打开了全部通道。
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: confirm GEX group size
+MSG_SSH_GEX_SIZE_CANCEL=Connection cancelled.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size out of range: %d
+MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than requested minimal.\nrequested: %d, received: %d\nAccept this?
+MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than requested maximal.\nrequested: %d, received: %d\nAccept this?
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=无效的命令行选项：%s
