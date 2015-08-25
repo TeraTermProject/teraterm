@@ -5327,13 +5327,17 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		    pvar->kexgex_min, grp_bits);
 	}
 	else if (grp_bits < pvar->kexgex_bits) {
-	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログ。
+	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログは出さない。
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    "DH-GEX: grp_bits(%d) < kexgex_bits(%d)", grp_bits, pvar->kexgex_bits);
-		    notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
+		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_NOTIFY);
+#if 1
+		tmpbuf[0] = 0; // no message
+#else
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    "Received group size is smaller than requested.\nrequested: %d, received: %d\nAccept this?",
 		    pvar->kexgex_bits, grp_bits);
+#endif
 	}
 	else if (grp_bits <= pvar->kexgex_max) {
 	// (4) 要求値以上、かつ要求の最大値以下。問題なし。
