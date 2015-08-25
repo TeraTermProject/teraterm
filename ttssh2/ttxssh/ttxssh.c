@@ -1720,21 +1720,31 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				if (option[4] == 0) {
 					pvar->settings.Enabled = 1;
 				} else if (MATCH_STR(option + 4, "-L") == 0 ||
-				           MATCH_STR(option + 4, "-R") == 0 ||
-				           _stricmp(option + 4, "-X") == 0) {
-					// ì‡ïîÇ≈ÇÕ ; Ç≈ãÊêÿÇ¡ÇƒÇ¢ÇÈÇÃÇ≈ÅA, Ç ; Ç…ïœä∑Ç∑ÇÈ
-					strncpy_s(option2, opt_len, option+5, _TRUNCATE);
-					for (i=0; i<strlen(option2); i++) {
-						if (option2[i] == ',') {
-							option2[i] = ';';
+				           MATCH_STR(option + 4, "-R") == 0) {
+					char *p = option + 5;
+					option2[0] = *p;
+					i = 1;
+					while (*++p) {
+						if (*p == ';' || *p == ',') {
+							option2[i] = 0;
+							add_forward_param(pvar, option2);
+							i = 1;
+						}
+						else {
+							option2[i++] = *p;
 						}
 					}
-					add_forward_param(pvar, option2);
+					if (i > 1) {
+						option2[i] = 0;
+						add_forward_param(pvar, option2);
+					}
 				} else if (MATCH_STR(option + 4, "-X") == 0) {
 					add_forward_param(pvar, "X");
-					strncpy_s(pvar->settings.X11Display,
-					          sizeof(pvar->settings.X11Display),
-					          option + 6, _TRUNCATE);
+					if (option+6 != 0) {
+						strncpy_s(pvar->settings.X11Display,
+						          sizeof(pvar->settings.X11Display),
+						          option + 6, _TRUNCATE);
+					}
 				} else if (MATCH_STR(option + 4, "-v") == 0) {
 					pvar->settings.LogLevel = LOG_LEVEL_VERBOSE;
 				} else if (_stricmp(option + 4, "-autologin") == 0 ||
