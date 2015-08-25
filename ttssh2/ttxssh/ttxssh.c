@@ -363,7 +363,6 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 {
 	char buf[1024];
 	TS_SSH FAR *settings = pvar->ts_SSH;
-	size_t i;
 
 #define READ_STD_STRING_OPTION(name) \
 	read_string_option(fileName, #name, "", settings->name, sizeof(settings->name))
@@ -379,15 +378,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	}
 
 	READ_STD_STRING_OPTION(DefaultUserName);
-
 	READ_STD_STRING_OPTION(DefaultForwarding);
-	// “à•”‚Å‚Í ; ‚Å‹æØ‚Á‚Ä‚¢‚é‚Ì‚ÅA, ‚ğ ; ‚É•ÏŠ·‚·‚é
-	for (i=0; i<strlen(settings->DefaultForwarding); i++) {
-		if (settings->DefaultForwarding[i] == ',') {
-			settings->DefaultForwarding[i] = ';';
-		}
-	}
-
 	READ_STD_STRING_OPTION(DefaultRhostsLocalUserName);
 	READ_STD_STRING_OPTION(DefaultRhostsHostPrivateKeyFile);
 	READ_STD_STRING_OPTION(DefaultRSAPrivateKeyFile);
@@ -506,17 +497,8 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	                          settings->DefaultUserName, fileName);
 
 	if (copy_forward) {
-		char DefaultForwarding[2048];
-		size_t i;
-		strncpy_s(DefaultForwarding, sizeof(DefaultForwarding), settings->DefaultForwarding, _TRUNCATE);
-		// “à•”‚Å‚Í ; ‚Å‹æØ‚Á‚Ä‚¢‚é‚Ì‚ÅA; ‚ğ , ‚É•ÏŠ·‚·‚é
-		for (i=0; i<strlen(DefaultForwarding); i++) {
-			if (DefaultForwarding[i] == ';') {
-				DefaultForwarding[i] = ',';
-			}
-		}
 		WritePrivateProfileString("TTSSH", "DefaultForwarding",
-		                          DefaultForwarding, fileName);
+		                          settings->DefaultForwarding, fileName);
 	}
 
 	WritePrivateProfileString("TTSSH", "CipherOrder",
