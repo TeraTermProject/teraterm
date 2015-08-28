@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Aug 25 2015)
+; Updated by TeraTerm Project (Aug 28 2015)
 ; Last translated (Korean language) by Daehong Kim (Jul 25 2013)
 
 [Tera Term]
@@ -821,11 +821,11 @@ MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=이 서버는 유효한 인증방법을 가지고 있지 않습
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\n인증방법이 서버에 의해 지원되지 않습니다.
 MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE를 받았습니다.\n채널 [%d]: 원인: %s(%d) 메시지: %s
 MSG_SSH_NO_FREE_CHANNEL=새 채널을 열 수 없습니다. TTSSH가 이미 너무 많은 채널을 열고 있습니다.
-MSG_SSH_GEX_SIZE_TITLE=TTSSH: confirm GEX group size
-MSG_SSH_GEX_SIZE_CANCEL=Connection cancelled.
-MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size out of range: %d
-MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than requested minimal.\nrequested: %d, received: %d\nAccept this?
-MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than requested maximal.\nrequested: %d, received: %d\nAccept this?
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: Confirm GEX group size
+MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
+MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?
+MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=인식되지 않는 명령행 옵션: %s

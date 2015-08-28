@@ -5313,7 +5313,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	if (grp_bits < GEX_GRP_MINSIZE || grp_bits > GEX_GRP_MAXSIZE) {
 	// (1), (6) プロトコルで認められている範囲(1024 <= grp_bits <= 8192)の外。強制切断。
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_OUTOFRANGE", pvar,
-		                  "Received group size out of range: %d");
+		                  "Received group size is out of range: %d");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->ts->UIMsg, grp_bits);
 		notify_fatal_error(pvar, tmpbuf, FALSE);
 		goto error;
@@ -5324,7 +5324,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		    "DH-GEX: grp_bits(%d) < kexgex_min(%d)", grp_bits, pvar->kexgex_min);
 		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_SMALLER", pvar,
-		                  "Received group size is smaller than requested minimal.\nrequested: %d, received: %d\nAccept this?");
+		                  "Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    pvar->ts->UIMsg, pvar->kexgex_min, grp_bits);
 	}
@@ -5352,17 +5352,17 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		    "DH-GEX: grp_bits(%d) > kexgex_max(%d)", grp_bits, pvar->kexgex_max);
 		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_WARNING);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_LARGER", pvar,
-		                  "Received group size is larger than requested maximal.\nrequested: %d, received: %d\nAccept this?");
+		                  "Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?");
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    pvar->ts->UIMsg, pvar->kexgex_max, grp_bits);
 	}
 	
 	if (tmpbuf[0] != 0) {
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_TITLE", pvar,
-		                  "TTSSH: confirm GEX group size");
+		                  "TTSSH: Confirm GEX group size");
 		if (MessageBox(NULL, tmpbuf, pvar->ts->UIMsg, MB_YESNO | MB_ICONERROR) == IDNO) {
 			UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_CANCEL", pvar,
-			                  "Connection cancelled.");
+			                  "New connection is cancelled.");
 			notify_fatal_error(pvar, pvar->ts->UIMsg, FALSE);
 			goto error;
 		}
