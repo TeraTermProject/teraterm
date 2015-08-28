@@ -13,83 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_SFTP_DIALOG DIALOGEX 0, 0, 266, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "TTSSH: SFTP console"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    EDITTEXT        IDC_SFTP_EDIT,7,7,252,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_SFTP_CONSOLE,7,33,252,110,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
-END
-
-IDD_SSHUPDATE_HOSTKEY DIALOGEX 0, 0, 309, 256
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SECURITY WARNING"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    PUSHBUTTON      "&YES",IDOK,87,233,50,14
-    DEFPUSHBUTTON   "&NO",IDCANCEL,159,233,50,14
-    LTEXT           "#####",IDC_HOSTKEY_MESSAGE,7,16,295,85
-    LTEXT           "latest key(s):",IDC_ADDKEY_TEXT,7,106,139,8
-    EDITTEXT        IDC_ADDKEY_EDIT,7,118,295,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    LTEXT           "obsolete key(s):",IDC_REMOVEKEY_TEXT,7,170,130,8
-    EDITTEXT        IDC_REMOVEKEY_EDIT,7,183,295,43,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_SFTP_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 259
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 143
-    END
-
-    IDD_SSHUPDATE_HOSTKEY, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 302
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 247
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_SSHUPDATE_HOSTKEY AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-#endif    // 日本語 (日本) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -467,6 +390,29 @@ BEGIN
     PUSHBUTTON      "&Disconnect",IDCANCEL,115,246,50,14,WS_GROUP
 END
 
+IDD_SFTP_DIALOG DIALOGEX 0, 0, 266, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "TTSSH: SFTP console"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_SFTP_EDIT,7,7,252,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SFTP_CONSOLE,7,33,252,110,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+END
+
+IDD_SSHUPDATE_HOSTKEY DIALOGEX 0, 0, 309, 256
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SECURITY WARNING"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&YES",IDOK,87,233,50,14
+    DEFPUSHBUTTON   "&NO",IDCANCEL,159,233,50,14
+    LTEXT           "#####",IDC_HOSTKEY_MESSAGE,7,16,295,85
+    LTEXT           "latest key(s):",IDC_ADDKEY_TEXT,7,106,139,8
+    EDITTEXT        IDC_ADDKEY_EDIT,7,118,295,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    LTEXT           "obsolete key(s):",IDC_REMOVEKEY_TEXT,7,170,130,8
+    EDITTEXT        IDC_REMOVEKEY_EDIT,7,183,295,43,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -593,6 +539,22 @@ BEGIN
         RIGHTMARGIN, 208
         TOPMARGIN, 7
         BOTTOMMARGIN, 236
+    END
+
+    IDD_SFTP_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 259
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+
+    IDD_SSHUPDATE_HOSTKEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 247
     END
 END
 #endif    // APSTUDIO_INVOKED
