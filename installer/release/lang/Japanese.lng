@@ -733,7 +733,10 @@ DLG_HOSTKEY_SSHFP_DIFFTYPE=DNSで鍵指紋情報が見つかりましたが、ホスト鍵と鍵の種類
 DLG_HOSTKEY_DNSSEC_NG=DNSの鍵指紋情報はDNSSECで認証されて*いません*。
 DLG_HOSTKEY_DNSSEC_OK=DNSの鍵指紋情報はDNSSECで認証されています。
 
-DLG_HOSTKEY_ROTATION_WARNING=接続先のサーバ"%s"が, サーバホスト鍵の自動更新機能を利用して, known hostsリストに存在しないホスト鍵を送付してきました.\n悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性がありますので, 十分注意してください. \n\n自動更新を許可すると, %u個の最新ホスト鍵の追加および%u個の旧式ホスト鍵の削除を行い, 次回からこの警告は出なくなります.\n\nknown hostsリストを更新しますか?\n\n
+DLG_HOSTKEY_ROTATION_TITLE=サーバホスト鍵の更新
+DLG_HOSTKEY_ROTATION_WARNING=接続先のサーバ`%s'からホスト鍵一覧を受信しました.\n更新すると, known hostsリストに%u個の新しいホスト鍵を追加し、%u個の廃止されたホスト鍵を削除します.\nknown hostsリストを更新しますか?
+DLG_HOSTKEY_ROTATION_ADD=%u個の新しいホスト鍵:
+DLG_HOSTKEY_ROTATION_REMOVE=%u個の廃止されたホスト鍵:
 
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s暗号化エラー(1): bytes %d (%d)

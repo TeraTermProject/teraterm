@@ -1926,27 +1926,30 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	struct hostkeys_update_ctx *ctx;
 	char *fp;
 	size_t i;
+	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
 		pvar = (PTInstVar)lParam;
 		SetWindowLong(dlg, DWL_USER, lParam);
 
+		GetWindowText(dlg, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_TITLE", pvar, uimsg);
+		SetWindowText(dlg, pvar->ts->UIMsg);
+
 		host = pvar->ssh_state.hostname;
 		ctx = pvar->hostkey_ctx;
-
-		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar,
-			"Remote server \"%s\" sent the set of host keys which are absent in your list of known hosts. \n"
-			"The machine you have contacted may be a hostile machine pretending to be the server, or legitimate server supporting host key rotation. \n\n"
-			"If you choose to add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list and continue, then you will not receive this warning again.\n\n"
-			"Do you want to update known hosts file with new key(s)?\n\n"
-			);
+		
+		GetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
 			);
 		SetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, buf);
 
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%u latest key(s):\n", ctx->nnew);
+		GetDlgItemText(dlg, IDC_ADDKEY_TEXT, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_ADD", pvar, uimsg);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nnew);
 		SetDlgItemText(dlg, IDC_ADDKEY_TEXT, buf);
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
@@ -1961,7 +1964,9 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			free(fp);
 		}
 
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%u obsolete key(s):\n", ctx->nold);
+		GetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_REMOVE", pvar, uimsg);
+		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
 		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
 		for (i = 0; i < ctx->nold; i++) {
 			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX);

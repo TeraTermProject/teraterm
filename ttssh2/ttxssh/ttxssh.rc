@@ -401,15 +401,15 @@ END
 
 IDD_SSHUPDATE_HOSTKEY DIALOGEX 0, 0, 309, 256
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SECURITY WARNING"
+CAPTION "Hostkey rotation"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "&YES",IDOK,87,233,50,14
     DEFPUSHBUTTON   "&NO",IDCANCEL,159,233,50,14
-    LTEXT           "#####",IDC_HOSTKEY_MESSAGE,7,16,295,85
-    LTEXT           "latest key(s):",IDC_ADDKEY_TEXT,7,106,139,8
+    LTEXT           "Received the set of host keys from remote server `%s'.\nIf you choose yes, add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nDo you want to update known hosts file?",IDC_HOSTKEY_MESSAGE,7,16,295,85
+    LTEXT           "%u new key(s):",IDC_ADDKEY_TEXT,7,106,139,8
     EDITTEXT        IDC_ADDKEY_EDIT,7,118,295,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    LTEXT           "obsolete key(s):",IDC_REMOVEKEY_TEXT,7,170,130,8
+    LTEXT           "%u obsolete key(s):",IDC_REMOVEKEY_TEXT,7,170,130,8
     EDITTEXT        IDC_REMOVEKEY_EDIT,7,183,295,43,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
 END
 
