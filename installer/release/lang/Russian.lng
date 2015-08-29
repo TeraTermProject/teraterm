@@ -855,6 +855,8 @@ BTN_CANCEL=Выход
 BTN_CLOSE=Закрыть
 BTN_DISCONNECT=&Разъединение
 BTN_CONTINUE=&Продолжение
+BTN_YES=&Yes
+BTN_NO=&No
 
 
 [TTProxy]

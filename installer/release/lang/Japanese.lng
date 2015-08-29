@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Aug 25 2015)
+; Updated by TeraTerm Project (Aug 29 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -854,6 +854,8 @@ BTN_CANCEL=キャンセル
 BTN_CLOSE=閉じる(&C)
 BTN_DISCONNECT=接続断(&D)
 BTN_CONTINUE=続行(&C)
+BTN_YES=はい(&Y)
+BTN_NO=いいえ(&N)
 
 
 [TTProxy]

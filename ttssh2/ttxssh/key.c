@@ -1979,6 +1979,13 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			free(fp);
 		}
 
+		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("BTN_YES", pvar, uimsg);
+		SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("BTN_NO", pvar, uimsg);
+		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
@@ -1987,8 +1994,8 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_REMOVEKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			//SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
-			//SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 		}
 		else {
 			DlgHostsAddFont = NULL;

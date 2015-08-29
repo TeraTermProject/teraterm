@@ -855,6 +855,8 @@ BTN_CANCEL=取消
 BTN_CLOSE=關閉
 BTN_DISCONNECT=中斷連接(&D)
 BTN_CONTINUE=繼續(&C)
+BTN_YES=&Yes
+BTN_NO=&No
 
 
 [TTProxy]

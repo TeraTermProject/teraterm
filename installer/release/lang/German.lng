@@ -853,6 +853,8 @@ BTN_CANCEL=Abbrechen
 BTN_CLOSE=Schlieﬂen
 BTN_DISCONNECT=&Trennen
 BTN_CONTINUE=&Fortsetzen
+BTN_YES=&Yes
+BTN_NO=&No
 
 
 [TTProxy]
