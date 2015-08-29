@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Aug 25 2015)
+; Updated by TeraTerm Project (Aug 29 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -734,7 +734,7 @@ DLG_HOSTKEY_DNSSEC_NG=Found insecure fingerprint in DNS.
 DLG_HOSTKEY_DNSSEC_OK=Found secure fingerprint in DNS.
 
 DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
-DLG_HOSTKEY_ROTATION_WARNING=Received the set of host keys from remote server `%s'.\nIf you choose yes, add %u latest key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nDo you want to update known hosts file?
+DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
 DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
 DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
 
@@ -826,8 +826,8 @@ MSG_SSH_NO_FREE_CHANNEL=Could not open new channel. TTSSH is already opening too
 MSG_SSH_GEX_SIZE_TITLE=TTSSH: Confirm GEX group size
 MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
 MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
-MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?
-MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accecpt received group?
+MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Unrecognized command-line option: %s
