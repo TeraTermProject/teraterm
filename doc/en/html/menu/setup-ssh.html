@@ -13,81 +13,84 @@
 
     <h2>"TTSSH: Setup" Dialog box</h2>
     <dl>
-      <dt>Prefered cihper order</dt>
+      <dt id="CipherOrder">Prefered cihper order</dt>
       <dd>
 	Specify the type of encryption for SSH with the order.<br>
 	&lt;ciphers below this line are disabled&gt;
       </dd>
 
-      <dt>SSH Known Hosts</dt>
+      <dt id="KnownHosts">SSH Known Hosts</dt>
       <dd>
 	Specify the file which includes a name of Host connected via SSH
 	(and Public key for Host).
       </dd>
 
-	<dt>Hostkey rotation</dt>
-	<dd>
-	Configure the hostkey rotation feature(OpenSSH 6.8 or later).<br>
-		<ul>
-		  No = Do not update the known hosts file.<br>
-		  Yes = Automatically update the known hosts file.<br>
-		  Ask = A user is asked to confirm the modifications to the known hosts file.<br>
-		</ul>  
-	</dd>
+      <dt id="HostkeyRotation">Hostkey rotation</dt>
+      <dd>
+	Configure the hostkey rotation feature(OpenSSH 6.8 or later).
+	<dl>
+	  <dt>No</dt>
+	  <dd>Do not update the known hosts file.</dd>
+	  <dt>Yes</dt>
+	  <dd>Automatically update the known hosts file.</dd>
+	  <dt>Ask</dt>
+	  <dd>A user is asked to confirm the modifications to the known hosts file.</dd>
+	</dl>
+      </dd>
 
-      <dt>HeartBeat (keep-alive)</dt>
+      <dt id="KeepAlive">HeartBeat (keep-alive)</dt>
       <dd>
 	A Keep-alive packet is sent ona regular basis to maintain the
 	connection (particularly useful under NAT). If 0 is specified,
 	this feature is disabled.
       </dd>
 
-      <dt>Remember password in memory</dt>
+      <dt id="RememberPassword">Remember password in memory</dt>
       <dd>
 	The user password is preserved in the memory. The password in the memory is used by "Duplicate session" function. The password is deleted in the memory when Tera Term session disconnects.
       </dd>
 
-      <dt>Enable agent forwarding</dt>
+      <dt id="AgentForwarding">Enable agent forwarding</dt>
       <dd>
       The SSH agent forwarding is enabled using by the Pageant application.
       </dd>
 
-      <dt>Confirm agent forwarding</dt>
+      <dt id="AgentForwardingConfirm">Confirm agent forwarding</dt>
       <dd>
 	When the SSH agent-forwarding is requested, a user will confirm contacting the Pageant.
       </dd>
 
-      <dt>Verify hostkey fingerprint by DNS</dt>
+      <dt id="SSHFP">Verify hostkey fingerprint by DNS</dt>
       <dd>
 	The host key of the SSH server is verified by using the <a href="../usage/ssh.html#SSHFP">SSHFP Resource Record</a>.<br />
 	The result of this verification should be used only as a guide.
       </dd>
 
-      <dt>KEX order (SSH2 only)</dt>
+      <dt id="KexOrder">KEX order (SSH2 only)</dt>
       <dd>
 	Specify the type of KEX(Key Exchange) for SSH2 with the order.<br>
 	&lt;KEXs below this line are disabled&gt;
       </dd>
 
-      <dt>MAC order (SSH2 only)</dt>
+      <dt id="MacOrder">MAC order (SSH2 only)</dt>
       <dd>
 	Specify the type of MAC for SSH2 with the order.<br>
 	&lt;MACs below this line are disabled&gt;
       </dd>
 
-      <dt>Host key order (SSH2 only)</dt>
+      <dt id="HostKeyOrder">Host key order (SSH2 only)</dt>
       <dd>
 	Specify the type of host key for SSH2 with the order.<br>
 	&lt;Host keys below this line are disabled&gt;
       </dd>
 
-      <dt>Compression order (SSH2 only)</dt>
+      <dt id="CompressionOrder">Compression order (SSH2 only)</dt>
       <dd>
 	Specify the type of compression key for SSH2 with the order.<br>
 	&lt;Compressions below this line are disabled&gt;
       </dd>
 
-      <dt>Compression level</dt>
+      <dt id="CompressionLevel">Compression level</dt>
       <dd>
 	Specify the level of compression for transmission. The more right,
 	the more compression is done (note: it may degrade the throughout
