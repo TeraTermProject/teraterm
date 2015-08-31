@@ -13,79 +13,82 @@
 
     <h2>"TTSSH: Setup" ダイアログボックス</h2>
     <dl>
-      <dt>Prefered cihper order</dt>
+      <dt id="CipherOrder">Prefered cihper order</dt>
       <dd>
 	SSH 接続で使用する暗号の種類を順序を付けて指定します。<br>
 	&lt;ciphers below this line are disabled&gt;以下の暗号は使用されません。
       </dd>
 
-      <dt>SSH Known Hosts</dt>
+      <dt id="KnownHosts">SSH Known Hosts</dt>
       <dd>
 	SSH で接続したホスト (とホスト公開鍵) が格納されるファイルを指定します。
       </dd>
 
-	<dt>Hostkey rotation</dt>
-	<dd>
-	ホスト公開鍵の自動更新(OpenSSH 6.8以降)を実施するかどうかを設定することができます。<br>
-		<ul>
-		  無効=自動更新を行いません<br>
-		  有効=known hostsファイルを自動更新します<br>
-		  確認付き有効=known hostsファイルを更新する際、問い合わせを行います。<br>
-		</ul>  
-	</dd>
+      <dt id="HostkeyRotation">Hostkey rotation</dt>
+      <dd>
+	ホスト公開鍵の自動更新(OpenSSH 6.8以降)を実施するかどうかを設定することができます。
+	<dl>
+	  <dt>無効</dt>
+	  <dd>自動更新を行いません</dd>
+	  <dt>有効</dt>
+	  <dd>known hostsファイルを自動更新します</dd>
+	  <dt>確認付き有効</dt>
+	  <dd>known hostsファイルを更新する際、問い合わせを行います。</dd>
+	</dl>  
+      </dd>
 
-      <dt>HeartBeat (keep-alive)</dt>
+      <dt id="KeepAlive">HeartBeat (keep-alive)</dt>
       <dd>
 	一定時間ごとにパケットをホストに送信し、接続を維持します。
 	(特に NAT 環境下で有効。) 0を指定すると当該機能を無効化します。
       </dd>
 
-      <dt>Remember password in memory</dt>
+      <dt id="RememberPassword">Remember password in memory</dt>
       <dd>
 	認証に成功したパスワードをメモリ上に保存します。保存されたパスワードは "Duplicate session" をしたときに使用されます。Tera Termのセッションが切断される際に、メモリは消去されます。
       </dd>
 
-      <dt>Enable agent forwarding</dt>
+      <dt id="AgentForwarding">Enable agent forwarding</dt>
       <dd>
 	Pageant を利用した SSH エージェント転送を有効にします。
       </dd>
 
-      <dt>Confirm agent forwarding</dt>
+      <dt id="AgentForwardingConfirm">Confirm agent forwarding</dt>
       <dd>
 	リモートから SSH エージェント転送が要求されたとき、要求に応えて Pageant に問い合わせるかどうかユーザに確認します。
       </dd>
 
-      <dt>Verify hostkey fingerprint by DNS</dt>
+      <dt id="SSHFP">Verify hostkey fingerprint by DNS</dt>
       <dd>
 	<a href="../usage/ssh.html#SSHFP">SSHFP リソースレコード</a>を利用して SSH サーバホスト鍵を検証するか指定します。<br />
 	この検証結果は参考程度の位置づけです。
       </dd>
 
-      <dt>KEX order (SSH2 only)</dt>
+      <dt id="KexOrder">KEX order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用するKEX(鍵交換)の種類を順序を付けて指定します。<br>
 	&lt;KEXs below this line are disabled&gt;以下の暗号は使用されません。
       </dd>
 
-      <dt>MAC order (SSH2 only)</dt>
+      <dt id="MacOrder">MAC order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用するMACの種類を順序を付けて指定します。<br>
 	&lt;MACs below this line are disabled&gt;以下の暗号は使用されません。
       </dd>
 
-      <dt>Host key order (SSH2 only)</dt>
+      <dt id="HostKeyOrder">Host key order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用するホスト鍵の種類を順序を付けて指定します。<br>
 	&lt;Host keys below this line are disabled&gt;以下の暗号は使用されません。
       </dd>
 
-      <dt>Compression order (SSH2 only)</dt>
+      <dt id="CompressionOrder">Compression order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用する圧縮方式を順序を付けて指定します。<br>
 	&lt;Compressions below this line are disabled&gt;以下の暗号は使用されません。
       </dd>
 
-      <dt>Compression level</dt>
+      <dt id="CompressionLevel">Compression level</dt>
       <dd>
 	通信路の圧縮レベルを指定します。
 	右にスライドさせるほど圧縮が強くかかります。
