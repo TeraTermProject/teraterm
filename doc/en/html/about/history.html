@@ -49,6 +49,7 @@
       <li>When the port number is not 23 on local connection, the Cygwin connection starts by Alt+D(Duplicate session) key.</li>
 <!--
       <li>The Alt + cursor key in the KEYBOARD.CNF can not work well when the Meta=left/right is configured.</li>
+      <li><a href="../menu/setup-keyboard.html#MetaKey">Metaキー設定</a>をleftまたはrightに設定している時に、KEYBOARD.CNFで設定したAltキーとカーソルキーやInsert等の編集キーパッドとの組み合わせが正しく使えない問題を修正した。</li>
 -->
     </ul>
   </li>
@@ -2615,14 +2616,15 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added the "Hostkey rotation" entry on the "<a href="../menu/setup-ssh.html">TTSSH: Setup</a>" dialog box.</li>
+      <li>added the "Hostkey rotation" entry on the "<a href="../menu/setup-ssh.html#HostkeyRotation">TTSSH: Setup</a>" dialog box.</li>
       <li>The host key rotation(derived from OpenSSH 6.8 or later) dialog is changed from MessageBox to DialogBox(same as <a href="../usage/ssh.html#securitywarning">Security Warning</a>).</li>
-      <li>A minimum value of the group size DH-GEX requested can be specified.
+      <li>A minimum value of the group size DH-GEX requested can be specified.<!-- Diffie-Hellman group exchange 鍵交換方式で、要求するグループサイズの最小値を指定できるようにした。 -->
         <ul>
           <li>added the GexMinimalGroupSize entry in the teraterm.ini file. The default value is 0.</li>
         </ul></li>
 <!--
       <li>The Arcfour series cipher algorithm is disabled by default in the CipherOrder entry of the teraterm.ini file.</li>
+      <li>デフォルトの<a href="../menu/setup-ssh.html#CipherOrder">優先ずる暗号アルゴリズムの順</a>で、Arcfour系の暗号がが無効になるよう優先順位を変更した。</li>
 -->
       <li>An error number can be included in the error message regarding the X11 port-forwarding failure.</li>
     </ul>
