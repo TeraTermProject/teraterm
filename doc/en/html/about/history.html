@@ -2624,7 +2624,7 @@ SYNOPSIS:
         </ul></li>
 <!--
       <li>The Arcfour series cipher algorithm is disabled by default in the CipherOrder entry of the teraterm.ini file.</li>
-      <li>デフォルトの<a href="../menu/setup-ssh.html#CipherOrder">優先ずる暗号アルゴリズムの順</a>で、Arcfour系の暗号がが無効になるよう優先順位を変更した。</li>
+      <li>デフォルトの<a href="../menu/setup-ssh.html#CipherOrder">優先する暗号アルゴリズムの順</a>で、Arcfour系の暗号が無効になるよう優先順位を変更した。</li>
 -->
       <li>An error number can be included in the error message regarding the X11 port-forwarding failure.</li>
     </ul>
@@ -2632,7 +2632,10 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
+<!--
       <li>added a workaround for IOS SSH server bug because the Tera Term 4.87(TTSSH 2.73) can not connect to the Cisco device.</li>
+      <li>Tera Term 4.87(TTSSH 2.73) で一部の Cisco の機器へ接続できない問題への処置を追加した。</li>
+-->
       <li>When the known_hosts file is updated by the host key rotation, an appliction fault will be occurred after the fingerprint display of the version dialog.</li>
     </ul>
   </li>
