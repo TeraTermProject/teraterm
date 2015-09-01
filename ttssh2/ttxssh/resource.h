@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// ttxssh.rc で使用
+// Microsoft Visual C++ generated include file.
+// Used by ttxssh.rc
 //
 #define IDC_ADD                         3
 #define IDC_REMOVE                      4
