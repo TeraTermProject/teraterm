@@ -341,6 +341,11 @@
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Setup directory">
+				<param name="Local" value="html\menu\setup-directory.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Load key map">
 				<param name="Local" value="html\menu\setup-loadkeymap.html">
 				<param name="ImageNumber" value="11">

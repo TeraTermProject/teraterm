@@ -104,6 +104,7 @@ HlpMenuSetupTcpip=html\menu\setup-tcpip.html
 HlpMenuSetupAdditional=html\menu\setup-additional.html
 HlpMenuSetupSave=html\menu\setup-save.html
 HlpMenuSetupRestore=html\menu\setup-restore.html
+HlpMenuSetupDir=html\menu\setup-directory.html
 HlpMenuSetupKeymap=html\menu\setup-loadkeymap.html
 HlpMenuControl=html\menu\control.html
 HlpMenuWindow=html\menu\window.html
