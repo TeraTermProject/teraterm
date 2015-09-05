@@ -29,7 +29,7 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="オリジナルとの差分">
+			<param name="Name" value="2.3との差分">
 			<param name="Local" value="html\about\difference.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
@@ -52,6 +52,10 @@
 			<param name="Name" value="エミュレーション ">
 			<param name="Local" value="html\about\emulations.html">
 			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="対応制御シーケンス">
+			<param name="Local" value="html\about\ctrlseq.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Q &amp; A ">
@@ -123,11 +127,6 @@
 			<param name="Local" value="html\usage\TTMenu\TTMenu.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="ヒント">
-			<param name="Local" value="html\usage\tips\index.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Unicode設定">
 			<param name="Local" value="html\usage\unicode.html">
 			<param name="ImageNumber" value="11">
@@ -135,6 +134,11 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="透過ウィンドウ">
 			<param name="Local" value="html\usage\transparent.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ヒント">
+			<param name="Local" value="html\usage\tips\index.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -521,6 +525,10 @@
 			<param name="Name" value="CygTerm+ 設定ファイル">
 			<param name="Local" value="html\setup\cygterm.html">
 			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="言語ファイル">
+			<param name="Local" value="html\setup\lng.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -1036,13 +1044,13 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="until, enduntil">
-					<param name="Local" value="html\macro\command\until.html">
+					<param name="Name" value="return">
+					<param name="Local" value="html\macro\command\return.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="return">
-					<param name="Local" value="html\macro\command\return.html">
+					<param name="Name" value="until, enduntil">
+					<param name="Local" value="html\macro\command\until.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1533,13 +1541,13 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="setexitcode">
-					<param name="Local" value="html\macro\command\setexitcode.html">
+					<param name="Name" value="setenv">
+					<param name="Local" value="html\macro\command\setenv.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="setenv">
-					<param name="Local" value="html\macro\command\setenv.html">
+					<param name="Name" value="setexitcode">
+					<param name="Local" value="html\macro\command\setexitcode.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1598,6 +1606,10 @@
 				<param name="Name" value="負の整数定数についての注意">
 				<param name="Local" value="html\macro\appendixes\negative.html">
 				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="切断後すぐに接続する場合の注意点">
+				<param name="Local" value="html\macro\appendixes\disconnecttiming.html">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="ASCII コード表">
