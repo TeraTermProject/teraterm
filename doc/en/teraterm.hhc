@@ -54,6 +54,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Supported Control Sequences">
+			<param name="Local" value="html\about\ctrlseq.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Q &amp; A ">
 			<param name="Local" value="html\about\qanda.html">
 			<param name="ImageNumber" value="11">
@@ -120,11 +125,6 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Tips">
-			<param name="Local" value="html\usage\tips\index.html">
-			<param name="ImageNumber" value="11">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Unicode">
 			<param name="Local" value="html\usage\unicode.html">
 			<param name="ImageNumber" value="11">
@@ -132,6 +132,11 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Background transparency">
 			<param name="Local" value="html\usage\transparent.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tips">
+			<param name="Local" value="html\usage\tips\index.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -512,6 +517,11 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="CygTerm+ setup file">
 			<param name="Local" value="html\setup\cygterm.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Language file">
+			<param name="Local" value="html\setup\lng.html">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 	</UL>
@@ -1028,13 +1038,13 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="until, enduntil">
-					<param name="Local" value="html\macro\command\until.html">
+					<param name="Name" value="return">
+					<param name="Local" value="html\macro\command\return.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="return">
-					<param name="Local" value="html\macro\command\return.html">
+					<param name="Name" value="until, enduntil">
+					<param name="Local" value="html\macro\command\until.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1542,13 +1552,13 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="setexitcode">
-					<param name="Local" value="html\macro\command\setexitcode.html">
+					<param name="Name" value="setenv">
+					<param name="Local" value="html\macro\command\setenv.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
-					<param name="Name" value="setenv">
-					<param name="Local" value="html\macro\command\setenv.html">
+					<param name="Name" value="setexitcode">
+					<param name="Local" value="html\macro\command\setexitcode.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -1607,6 +1617,11 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Note on negative integer constants">
 				<param name="Local" value="html\macro\appendixes\negative.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="NOTICE: Immediately re-connect the server after disconnection">
+				<param name="Local" value="html\macro\appendixes\disconnecttiming.html">
 				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
