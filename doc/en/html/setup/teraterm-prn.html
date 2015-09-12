@@ -12,7 +12,7 @@
 <h1><a name="delay">Delay of path-through printing</a></h1>
 
 <p>
-You can set the delay of pass-through printng. A pass-through sequence is initiated by ESC[5i and terminated by ESC[4i. The received data between ESC[5i and ESC[4i are printed when the delay time has passed since Tera Term received ESC[4i. If the second ESC[5i is received before the delay of the first pass-through sequence has passed, the first and second printing data are combined and printed at once after the delay of the second sequence has passed. Namely, multiple consecutive sequences with intervals less than the delay are treated as one printing sequence. To change the delay of pass-through printing, edit the PassThruDelay line in the [Tera Term] section of the setup file like the following:
+You can set the delay of pass-through printing. A pass-through sequence is initiated by ESC[5i and terminated by ESC[4i. The received data between ESC[5i and ESC[4i are printed when the delay time has passed since Tera Term received ESC[4i. If the second ESC[5i is received before the delay of the first pass-through sequence has passed, the first and second printing data are combined and printed at once after the delay of the second sequence has passed. Namely, multiple consecutive sequences with intervals less than the delay are treated as one printing sequence. To change the delay of pass-through printing, edit the PassThruDelay line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>

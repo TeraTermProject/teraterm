@@ -40,7 +40,7 @@ Beep=off
 </pre>
 
 <p>
-Also, the terminal screen will flush instead of souding the beep in the following configuration.
+Also, the terminal screen will flush instead of sounding the beep in the following configuration.
 </p>
 
 <pre>
@@ -173,7 +173,7 @@ EnableStatusLine=on
 <h1><a name="tekgin">Mouse code in TEK GIN report</a></h1>
 
 <p>
-In TEK GIN mode, the cross hair cursor appears in the TEK window. When you press a key or click the left mouse button, the key code (ASCII code) is sent with the the coordinate of the cursor.
+In TEK GIN mode, the cross hair cursor appears in the TEK window. When you press a key or click the left mouse button, the key code (ASCII code) is sent with the coordinate of the cursor.
 </p>
 
 <p>
@@ -216,7 +216,7 @@ A user can configure whether the current buffer scrolls down when the screen is 
 </p>
 
 <p>
-If this configuration value is on, the current buffer will scroll down as well as &lt;ESC&gt;[2J escape sequenc.<br>
+If this configuration value is on, the current buffer will scroll down as well as &lt;ESC&gt;[2J escape sequence.<br>
 If this configuration value is off, the current buffer will not scroll down. Instead, some buffers from the cursor position to the end of the screen.
 </p>
 
@@ -244,9 +244,9 @@ UnknownUnicodeCharacterAsWide=off
 <h1><a name="UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a></h1>
 
 <p>
-Tera Term in Japanese mode will display a ruled line and some symbols as 2-cloumns wide. However, some host applications may assume these characters will be displayed as 1-column wide character which results in incorrect display image.<br> 
-In addition, a ruler may be displayed by using +-| and some unsupproted characters may be displayed as ?? in English mode.<br> 
-Tera Term can be configured to display these charcaters by similar code of DEC sepcial characters (if any exists) to minimize the incorrect display iamge.<br> 
+Tera Term in Japanese mode will display a ruled line and some symbols as 2-columns wide. However, some host applications may assume these characters will be displayed as 1-column wide character which results in incorrect display image.<br> 
+In addition, a ruler may be displayed by using +-| and some unsupported characters may be displayed as ?? in English mode.<br> 
+Tera Term can be configured to display these characters by similar code of DEC special characters (if any exists) to minimize the incorrect display image.<br> 
 However this feature causes a side effect that characters selected by mouse will be copied as different characters in a clipboard.<br> 
 This configuration takes effect only when received Kanji code are either UTF-8 or UTF-8. 
 </p>
@@ -263,7 +263,7 @@ Value: 1
 </pre>
 
 <pre>
-Type B: The character that is displayd "??" up to version 4.58 
+Type B: The character that is displayed "??" up to version 4.58 
 (it includes undisplayed characters in English environment).
 
 Value: 2
@@ -274,11 +274,11 @@ Value: 2
   Dark shade (75%) (U+2593)
   Black small square (U+25AA)
   Black vertical rectangle (U+25AE)
-  Black verty small square (U+2B1D)
+  Black very small square (U+2B1D)
 </pre>
 
 <pre>
-Type C: The character that is displayd as bullet(wide character) 
+Type C: The character that is displayed as bullet(wide character) 
 in Japanese environment, and is displayed as Middle dot in English environment.<br>
 NOTICE: A user is recommended to not specifying this option unless in Japanese environment.
 
@@ -298,7 +298,7 @@ UnicodeToDecSpMapping=3
 <h1><a name="StrictKeyMapping">Mapping of the function key</a></h1>
 
 <p>
-A use can change the default action of the function key and the editor keypad from Tera Term 4.62. When a user can use this feature, the key sequence like as the VT termianl sends to the server without the keyboard configuration file.
+A use can change the default action of the function key and the editor keypad from Tera Term 4.62. When a user can use this feature, the key sequence like as the VT terminal sends to the server without the keyboard configuration file.
 </p>
 
 <p>
@@ -441,7 +441,7 @@ TabStopModifySequence=on
 </pre>
 
 
-<h1><a name="BellLimitting">Limitted BELL Over</a></h1>
+<h1><a name="BellLimitting">Limited BELL Over</a></h1>
 <p>
 When the BEL character(ASCII $07) is sent from the host server, Tera Term will generate a beep sound and blink a screen.
 </p>
