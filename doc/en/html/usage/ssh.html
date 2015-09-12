@@ -61,7 +61,7 @@
       <li>When using public key authentication, check [RSA/DSA/ECDSA/ED25519 key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
           Note: The passphrase can include the control character(0x01 - 0x1F).<br />
           Note: TTSSH 2.63(Tera Term 4.76) later can support the PuTTY format and SECSH(ssh.com) format of the SSH2 private key.</li>
-      <li>When the keyboard-interactive authentication is used, check the [Use challange/response to log in(keyboard-interactive)] and input your user name.<br>
+      <li>When the keyboard-interactive authentication is used, check the [Use challenge/response to log in(keyboard-interactive)] and input your user name.<br>
           Next, the dialog with the server prompt and string is shown and input your password.</li>
       <li>When the Pageant is used, check the [Use Pageant] and input your user name.</li>
     </ul>
@@ -91,7 +91,7 @@
 
     <p>When a user is using SSH to connect to a server, the user can use SSHFP RR (Secure SHell FingerPrint Resource Record) defined in RFC 4255. However, this feature is experimentally implemented because the current Tera Term can not do the DNSSEC verification.</p>
 
-    <p>A domain owner can regist the SSHFP record into the DNS zone. The client software(Tera Term) can get the SSHFP record on connection and verify the record with the server's host key. <br />
+    <p>A domain owner can register the SSHFP record into the DNS zone. The client software(Tera Term) can get the SSHFP record on connection and verify the record with the server's host key. <br />
        However, this feature can be used on Windows 2000 or later by the limitation of the Windows resolver.</p>
 
     <p>Please refer to below one sentence in RFC 4255. <br />
@@ -115,11 +115,11 @@ button, [Save private key] button to save these keys. File name can be left as d
     </p>
 
     <p>
-For this file, when it is saved as default, all files which have an extension of [pub] (public key) will be stored in the specified location in the server (usually, it is (home dir)/.ssh/authorized_keys). All files which have NOT an extension are recognized as private key and you have to specify it at login.
+For this file, when it is saved as default, all files which have an extension of [pub] (public key) will be stored in the specified location in the server (usually, it is (home directory)/.ssh/authorized_keys). All files which have NOT an extension are recognized as private key and you have to specify it at login.
  </p>
 
     <p>
-      <em>Note: </em>Since Private key should not be disclosed to other party, please be careful to make it secret. Please makre that it is NOT sent to server by accident.
+      <em>Note: </em>Since Private key should not be disclosed to other party, please be careful to make it secret. Please make that it is NOT sent to server by accident.
     </p>
 
   </body>
