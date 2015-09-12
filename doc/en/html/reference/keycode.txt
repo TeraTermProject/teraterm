@@ -276,7 +276,7 @@ If you are in trouble with the keyboard configuration, please
 read this text and Tera Term help carefully.
 Please do not ask the author questions about the keyboard configuration.
 
-Q. Everytime I run Tera Term, the warning message
+Q. Every time I run Tera Term, the warning message
    "Key code XXX is used more than once" is displayed.
 A. See "3.2 NOTE".
 
