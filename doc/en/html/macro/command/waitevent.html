@@ -59,7 +59,7 @@ The unlink event occurs when Tera Term is closed.
 </p>
 
 <p>
-The disconnection (connection) event occurs when the communication between Tera Term and the host is closed (opend).
+The disconnection (connection) event occurs when the communication between Tera Term and the host is closed (opened).
 </p>
 
 <p>
@@ -73,9 +73,9 @@ These commands return the identifier of the actual event in the system variable 
 waitevent 4
 ; Wait the unlink or connection events
 waitevent 2 or 8
-; The unlink event occured
+; The unlink event occurred
 if result=2 goto label1
-; The connection event occured
+; The connection event occurred
 if result=8 goto label2
 </pre>
 
