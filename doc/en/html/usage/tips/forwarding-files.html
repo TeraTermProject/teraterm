@@ -16,9 +16,9 @@ When a user logins to a remote host and continuously login to another host, a fi
 </p>
 
 <p>
-Tera Term developer was never meant to support the file trasnfer on above situation.
+Tera Term developer was never meant to support the file transfer on above situation.
 So, it is recommended other methods of directly connecting to the end-point server means 1, 
-transfering to the intermediate server means 2, using the ftp protocol means 3.
+transferring to the intermediate server means 2, using the ftp protocol means 3.
 </p>
 
 <p>
@@ -45,14 +45,14 @@ By using the kermit protocol, it has no problem. By using the B-Plus and ZMODEM 
 </p>
 
 <p>
-When a user connects from the intermediate server to the remote host by using the telnet command, a part of the control characters Tera Term sending will lost. These characters will be assigned to the telnet features such as the "echo", "escape", "erase", "flushoutput", "interrupt", "kill", "quit" and "areyouthere". If a user can download the file from the remote server but can not upload the file to the server, it has the above possible cause. To resolve this problem, cancel the control character feature or esacpe all control characters by using the B-Plus and ZMODEM protocol. However, it will not work well by using the telnet protocol.
+When a user connects from the intermediate server to the remote host by using the telnet command, a part of the control characters Tera Term sending will lost. These characters will be assigned to the telnet features such as the "echo", "escape", "erase", "flushoutput", "interrupt", "kill", "quit" and "areyouthere". If a user can download the file from the remote server but can not upload the file to the server, it has the above possible cause. To resolve this problem, cancel the control character feature or escape all control characters by using the B-Plus and ZMODEM protocol. However, it will not work well by using the telnet protocol.
 </p>
 
 </div>
 
 <p>
 In each case, Tera Term can not configure the communication setting between the intermediate server and the remote host.<br>
-This transferring problem is difficult. Unfornately, Tera Term developer team may not be able to resolve the problem.<br>
+This transferring problem is difficult. Unfortunately, Tera Term developer team may not be able to resolve the problem.<br>
 The problem can not be resolved through a trial and error process, please give up your problem solving.
 </p>
 
