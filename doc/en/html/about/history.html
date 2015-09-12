@@ -38,7 +38,7 @@
     <ul>
       <li>When the color palette is changed and inquired with the OSC 4, the palette number(256, 258, 259) is treated as the highlight, blinking and reverse attribute color.</li>
       <li>When the color is inquired with the OSC 4, OSC 10 and so on, the terminal character is matched to the requested character.</li>
-      <li>The all attribute color is resetted to the initial status with the OSC 105 ST.</li>
+      <li>The all attribute color is reset to the initial status with the OSC 105 ST.</li>
       <li>added the button to open a configuration file to <a href="../menu/setup-directory.html">Setup directory</a>.</li>
       <li>MACRO: A dialog of the filenamebox and dirnamebox is on top of all the other windows.</li>
     </ul>
@@ -111,7 +111,7 @@
       <li>YMODEM: When the received file information does not include the file size, the file data can not be recorded well.</li>
       <li>The setting value of the <a href="../menu/setup-additional.html#logrotate">Log Rotate</a> will not display well.</li>
       <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> marco command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
-      <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be resizable.</li>
+      <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be re-sizable.</li>
     </ul>
   </li>
 
@@ -172,7 +172,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>When a file is received by using YMODEM or ZMODEM protocol, the file timestamp is updated.</li>
+      <li>When a file is received by using YMODEM or ZMODEM protocol, the file time-stamp is updated.</li>
       <li>added the log type configuration on the Log tab of the <a href="../menu/setup-additional.html#LogOption">Additional settings dialog</a>.</li>
     </ul>
   </li>
@@ -189,7 +189,7 @@
       <li>added support for Microsoft Windows Server 2012 R2.</li>
       <li>upgraded TTSSH to <a href="#ttssh_2.70">2.70</a></li>
       <li>upgraded TeraTerm Menu to <a href="#ttmenu_1.12">1.12</a></li>
-      <li>upgraded TTXResizeMenu Plugin to <a href="#resizemenu_1.03">1.03</a></li>
+      <li>upgraded TTXResizeMenu Plug-in to <a href="#resizemenu_1.03">1.03</a></li>
       <li>upgraded LogMeTT to 2.10.2</li>
       <li>added the 64bit cygterm.exe and cyglaunch.exe into the installation directory.</li>
     </ul>
@@ -209,7 +209,7 @@
         <ul>
           <li>Refer to the <a href="../usage/tips/vim.html#background">Background color</a> for the vim user.</li>
         </ul></li>
-      <li>Eterm look-feel: Changed the background image from label to checkbox style on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+      <li>Eterm look-feel: Changed the background image from label to check-box style on the Visual tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
       <li>added support for selecting any type of the <a href="../setup/teraterm-term.html#displayall">Debug mode</a>.
         <ul>
           <li>added the DebugModes entry in the teraterm.ini file.</li>
@@ -223,8 +223,8 @@
       <li>Eterm look-feel: The background image file will not be drawn by using any JPEG file.</li>
       <li>Fixed some bugs regarding Debug mode
         <ul>
-          <li>When the debug mode is enterd, the insertion mode and the auto-wrap mode may be changed.</li>
-          <li>When the debug mode is enterd, the character attribute can not be reseted.</li>
+          <li>When the debug mode is entered, the insertion mode and the auto-wrap mode may be changed.</li>
+          <li>When the debug mode is entered, the character attribute can not be reseted.</li>
           <li>When the debug mode is leaved, the character attribute may be reseted.</li>
         </ul></li>
     </ul>
@@ -333,7 +333,7 @@
   <li>Misc
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.67">2.67</a></li>
-      <li>upgraded TTXRecurringCommand Plugin to <a href="#recurringcommand_1.03">1.03</a></li>
+      <li>upgraded TTXRecurringCommand Plug-in to <a href="#recurringcommand_1.03">1.03</a></li>
       <li>added support for Microsoft Windows 8.1.</li>
       <li>upgraded Oniguruma to 5.9.5.</li>
       <li>added the Simplified Chinese.lng language file. Special thanks to LiShaohui.</li>
@@ -436,7 +436,7 @@
       <li>The URL string on the mouse hand cursor shifts to the left with half character by mistake.</li>
       <li>MACRO: The send/sendln command can be affected by the <a href="../menu/setup-additional.html#PasteDelayPerLine">Paste delay per line</a> configuration.</li>
       <li>MACRO: When the timeout is 0, the <a href="../macro/command/waitn.html">waitn</a> command can not wait any character.</li>
-      <li>MARCO: When the break command is executed after the continue command, the Invalid Control error will be ocurred.</li>
+      <li>MARCO: When the break command is executed after the continue command, the Invalid Control error will be occurred.</li>
       <li>MARCO: The box-style macro command can not show the dialog position well on the multi display.</li>
       <li>MACRO: The <a href="../macro/command/wait.html">wait</a> and <a href="../macro/command/waitln.html">waitln</a> command can not detect the right string.(ex. wait "aab" does not work against "aaab")</li>
     </ul>
@@ -477,8 +477,8 @@
   <li>Misc
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.64">2.64</a></li>
-      <li>upgraded TTXResizeMenu Plugin to <a href="#resizemenu_1.02">1.02</a></li>
-      <li>upgraded TTXKCodeChange Plugin to <a href="#kcodechange_1.01">1.01</a></li>
+      <li>upgraded TTXResizeMenu Plug-in to <a href="#resizemenu_1.02">1.02</a></li>
+      <li>upgraded TTXKCodeChange Plug-in to <a href="#kcodechange_1.01">1.01</a></li>
     </ul>
   </li>
 </ul>
@@ -519,7 +519,7 @@
       <li>A button value is changed from 3 to 35 while the button is not pressed at the Any Event Tracking mode.</li>
       <li>added the 0; character at the reply head by requesting the character attribute of the DECRQSS.</li>
       <li>At requesting the character attribute of the DECRQSS, the color attribute is not included in reply when the <a href="../menu/setup-additional.html">Enable ANSI Color</a> is off.</li>
-      <li>When the host number is discontinous value, Tera Term can read the [Hosts] section in the teraterm.ini file.</li>
+      <li>When the host number is discontinuous value, Tera Term can read the [Hosts] section in the teraterm.ini file.</li>
       <li>Macro
         <ul>
           <li>added the <a href="../macro/command/setpassword.html">setpassword</a> command.</li>
@@ -532,11 +532,11 @@
     <ul>
       <li>Named pipe: The pipe can not be disconnected when the Oracle Virtual Box is terminated.</li>
       <li>COM port: The default setting can not be saved in the teraterm.ini file.</li>
-      <li>YMODEM: When the receiving a file is temporarily stopped, Tera Term can not send a NAK after timeout. So, the transfering can not be continued.</li>
+      <li>YMODEM: When the receiving a file is temporarily stopped, Tera Term can not send a NAK after timeout. So, the transferring can not be continued.</li>
       <li>Macro command: The send and sendln can not transmit a character #01.</li>
       <li>Macro command regarding file using: A relative path will not be recognized.
         <ul>
-          <li>The base of a relatvie path will be a path existing a macro file or Tera Term installation directory. By using this bugfix, the relative path can be a path existing a macro file.</li>
+          <li>The base of a relative path will be a path existing a macro file or Tera Term installation directory. By using this bug fix, the relative path can be a path existing a macro file.</li>
         </ul></li>
     </ul>
   </li>
@@ -578,7 +578,7 @@
         <ul>
           <li>Environment variable strings(%variableName%) can be included in the ini file path.</li>
           <li>added an image file specified configuration(theme\ImageFile.INI). Also, a background image file can be specified on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
-          <li>Enabled the "Eterm lookfeel" checkbox on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
+          <li>Enabled the "Eterm lookfeel" check-box on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
         </ul></li>
       <li>added the LanguageUI entry on the <a href="..\menu\setup-general.html">General setup dialog</a>.</li>
       <li>A message dialog is shown when the cygterm.cfg has been saved on the Cygwin tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
@@ -630,7 +630,7 @@
         </ul></li>
       <li>added support for reading the Clipboard by using the OSC 52(clipboard accessing) control sequence.</li>
       <li>added support for xterm(UTF-8), xterm(SGR) and rxvt-unicode style extended mouse tracking mode.</li>
-      <li>When the receiving file is empty, the file name is assigned to noname.</li>
+      <li>When the receiving file is empty, the file name is assigned to no-name.</li>
       <li>When the receiving file name contains banned characters, these characters are replaced to _.</li>
       <li>KERMIT protocol
         <ul>
@@ -673,12 +673,12 @@
         <ul>
           <li>added the Clipboard access from remote entry on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
         </ul></li>
-      <li>added support for configurating the control sequence to change permitted tabstops.
+      <li>added support for configuring the control sequence to change permitted tab-stops.
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#TabStopModify">TabStopModifySequence</a> entry in the teraterm.ini file. The default is on.</li>
         </ul></li>
       <li>Broadcast Command: When a user uses the real time mode, the input characters does not show on the edit control.</li>
-      <li>added support for specifying an any browser as the clickable URL.
+      <li>added support for specifying an any browser as the click-able URL.
         <ul>
           <li>added the <a href="../setup/teraterm-misc.html#ClickableUrlBrowser">ClickableUrlBrowser</a> and ClickableUrlBrowserArg entries in the teraterm.ini file. The default value is empty.</li>
         </ul></li>
@@ -713,7 +713,7 @@
         </ul></li>
       <li>upgraded TTSSH to <a href="#ttssh_2.59">2.59</a></li>
       <li>upgraded TeraTerm Menu to <a href="#ttmenu_1.11">1.11</a></li>
-      <li>upgraded TTXRecurringCommand Plugin to <a href="#recurringcommand_1.02">1.02</a></li>
+      <li>upgraded TTXRecurringCommand Plug-in to <a href="#recurringcommand_1.02">1.02</a></li>
       <li>upgraded TTLEditor to 1.4</li>
     </ul>
   </li>
@@ -723,7 +723,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>When the OSC string includes a control sequence, the control sequence can be procedured.</li>
+      <li>When the OSC string includes a control sequence, the control sequence can be proceeded.</li>
       <li>Eterm look-feel: The wallpaper file format can support any format other than BMP on Windows Vista or later.</li>
       <li>"<a href="../macro/command/getpassword.html">getpassword</a>" macro command is updated.
         <ul>
@@ -765,7 +765,7 @@
       <li>The Meta Key can be only assigned to the left ALT or the right ALT key.</li>
       <li>By using the broadcast command in the real time mode, the Submit button has the only function of acting as &lt;Enter&gt; key.</li>
       <li>The /k option is inherited by using the Duplicate Session.</li>
-      <li>added the elapsed time and the trasnfer speed on the file sending dialog.</li>
+      <li>added the elapsed time and the transfer speed on the file sending dialog.</li>
       <li>added support for Windows7 jump list.</li>
       <li>Resurrected the special argument of the box-style macro command. However, this option is obsolete. The default is 0 because of backward compatibility.</li>
     </ul>
@@ -777,7 +777,7 @@
       <li>When the 10000 over mode is specified on the DECSET/DECRST control sequence, Tera Term would not be able to ignore.</li>
       <li>The invalid result may be responded for the window position reporting.</li>
       <li>YMODEM: When a file is sent, the block1 can be sent not waiting the ACK from the YMODEM server.</li>
-      <li>When a last one byte of a string is removed by using the strremove macro command, the BOF will be ocurred.</li>
+      <li>When a last one byte of a string is removed by using the strremove macro command, the BOF will be occurred.</li>
     </ul>
   </li>
 
@@ -805,7 +805,7 @@
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#TerminalUID">TerminalUID</a> entry in the teraterm.ini file. The default value is FFFFFFFF.</li>
         </ul></li>
-      <li>added support for the DECSTUI (Change Terminal Unique ID) control sequece.
+      <li>added support for the DECSTUI (Change Terminal Unique ID) control sequence.
         <ul>
           <li>added the <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> entry in the teraterm.ini file. The default value is on.</li>
         </ul></li>
@@ -831,7 +831,7 @@
       <li>When <a href="../setup/teraterm-prn.html#direct">PassThruPort</a> is specified as a local device mapping the network share, Tera Term printing does not work. cf.<a href="http://logmett.com/forum/viewtopic.php?f=2&amp;t=1383">print with WINDOWS 7 net use LPT PERSISTENT:Yes </a></li>
       <li>Tera Term can not ignore the unsupported OSC control string. </li>
       <li>Tera Term can not understand a character after the DCS, SOS, APC and PM Control string.</li>
-      <li>When a log file is opend by writable mode, the file is existing and writing by another process can be opend.</li>
+      <li>When a log file is opened by writable mode, the file is existing and writing by another process can be opened.</li>
       <li>When 8-bit string is received, the string is recognized as the control sequence by mistake.</li>
       <li>Tera Term can not properly send a broadcast message to selected windows by using the broadcast command. cf.<a href="http://logmett.com/forum/viewtopic.php?f=8&amp;t=1601">Broadcast command issue in 4.68 </a></li>
     </ul>
@@ -871,17 +871,17 @@
           <li># Hidden window</li>
         </ul></li>
       <li>Extended the maximum number of Tera Term window from 50 to 256.</li>
-      <li>Extended the maximum number of Tera Term plugins from 16 to 32.</li>
+      <li>Extended the maximum number of Tera Term plug-ins from 16 to 32.</li>
       <li>added an argument of the "<a href="../macro/command/beep.html">beep</a>" macro command.</li>
       <li><ins>Deleted the special argument of the box-style macro command.</ins></li>
-      <li>The WSAAsyncGetAddrInfo function can be hooked by using plugin.</li>
-      <li>The freeaddrinfo function can be hooked by using plugin.</li>
+      <li>The WSAAsyncGetAddrInfo function can be hooked by using plug-in.</li>
+      <li>The freeaddrinfo function can be hooked by using plug-in.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>Security fix: A class of vulnerabilities affecting applications that load DLL's in an insecure mannber.</li>
+      <li>Security fix: A class of vulnerabilities affecting applications that load DLL's in an insecure manner.</li>
       <li>The baud rate can not be properly selected on the <a href="../menu/setup-serialport.html">[Setup]-[Serial port]</a> dialog.</li>
       <li><a href="../setup/teraterm-term.html#beep">Beep setting</a> does not work.</li>
       <li>The scroll region can not be cleared by using the DECALN (DEC Screen Alignment Test) control sequence.</li>
@@ -917,7 +917,7 @@
           <li>added the IMERelatedCursor in the teraterm.ini file. The default is off.</li>
         </ul></li>
       <li>added support for the motion event of xterm style mouse event tracking.</li>
-      <li>added support for the DEC Locator Mode style mouse event tracking.</li>
+      <li>added support for the DEC Locater Mode style mouse event tracking.</li>
       <li>The ttymouse can automatically setup the xterm2 to modify the response of the Secondary DA. </li>
       <li>added the "<a href="../macro/command/filetruncate.html">filetruncate</a>" macro command.</li>
       <li>added the "<a href="../macro/command/dispstr.html">dispstr</a>" macro command.</li>
@@ -936,7 +936,7 @@
       <li>The YMODEM sending and receiving procedure does not work for the HyperTerminal.</li>
       <li>The file sending is slowing.</li>
       <li>The retransmission EOT does not work well by using the XMODEM protocol.</li>
-      <li>In xterm style mouse event tracking mode, the Control and Alt(Meta) keys are reported been swaped.</li>
+      <li>In xterm style mouse event tracking mode, the Control and Alt(Meta) keys are reported been swapped.</li>
       <li>The color setup and request control sequence does not work well.</li>
       <li>A statusbox is closed by performing the OK button action.</li>
     </ul>
@@ -1008,7 +1008,7 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>expanded the maximun number of saved host to 500.</li>
+      <li>expanded the maximum number of saved host to 500.</li>
       <li>expanded the maximum number of serial connection to 4096.</li>
       <li>added support for the tab character as the command line delimiter.</li>
       <li>enabled the [Show Log dialog] of the <a href="../menu/file.html">[File]</a> menu while the log window is shown.</li>
@@ -1020,10 +1020,10 @@
       <li>added support for overwritten confirmation at the "<a href="../macro/command/filenamebox.html">filenamebox</a>" macro command.</li>
       <li>added support for replying an empty string at the window title and the icon label reporting control sequence.
         <ul>
-          <li>Changed to the ccept, ignore and empty value in the TitleReportSequence entry in the teraterm.ini file.</li>
+          <li>Changed to the accept, ignore and empty value in the TitleReportSequence entry in the teraterm.ini file.</li>
           <li>changed the default value of "TitleReportSequence" to "empty".</li>
         </ul></li>
-      <li>added Contorl Sequence tab on the <a href="../menu/setup-additional.html">Additional settings dialog</a>
+      <li>added Control Sequence tab on the <a href="../menu/setup-additional.html">Additional settings dialog</a>
         <ul>
           <li>moved "Accept mouse event tracking request", "Disable mouse event tracking when Control is pressed" and "Accept window title change request" from General tab.</li>
           <li>added "Title report sequence", "Window control sequence", "Window report sequence" and "Cursor control sequence".</li>
@@ -1043,7 +1043,7 @@
       <li>When the multiple files are sent or received by the Kermit, ZMODEM and QuickVAN protocol, the progress bar can not be reset after the second file. </li>
       <li>The `/*' characters in the macro string-type constants are falsely recognized as a beginning of the C language-style comment.</li>
       <li>Workaround: When the Eterm look-feel is enabled, the screen display can not work after the Reverse Video (DECSCNM) set/reset.</li>
-      <li>When the width of the window is shrinked, the invalid character remains at the end of each line.</li>
+      <li>When the width of the window is shrunk, the invalid character remains at the end of each line.</li>
     </ul>
   </li>
 
@@ -1052,9 +1052,9 @@
       <li>stopped to write the new entry to the user's teraterm.ini file by the installer.</li>
       <li>stopped to write the language configuration selected by a user to the user's teraterm.ini file by the installer.</li>
       <li>upgraded CygTerm+ to <a href="#cygterm_1.07_19">1.07_19</a></li>
-      <li>upgraded TTXRecurringCommand Plugin to <a href="#recurringcommand_1.01">1.01</a></li>
-      <li>upgraded TTXResizeMenu Plugin to <a href="#resizemenu_1.01">1.01</a></li>
-      <li>upgraded TTXttyrec Plugin to <a href="#ttyrec_1.02">1.02</a></li>
+      <li>upgraded TTXRecurringCommand Plug-in to <a href="#recurringcommand_1.01">1.01</a></li>
+      <li>upgraded TTXResizeMenu Plug-in to <a href="#resizemenu_1.01">1.01</a></li>
+      <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.02">1.02</a></li>
       <li>added support for Microsoft Windows 7.</li>
       <li>updated the screencapture.ttl file.</li>
       <li>upgraded Oniguruma to 5.9.2</li>
