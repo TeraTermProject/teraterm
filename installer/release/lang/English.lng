@@ -568,7 +568,7 @@ FILEDLG_OPEN_PRIVATEKEY_TITLE=Choose a file with the RSA/DSA/ECDSA/ED25519 priva
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.
 MSG_READKEY_ERROR=read error SSH2 private key file\n%s
-MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.
+MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menu before connecting.
 MSG_NOAUTHMETHOD_ERROR=Server does not support any of the authentication options\nprovided by TTSSH. This connection will now close.
 
 ; dlg diff key
@@ -598,10 +598,10 @@ DLG_FWD_REMOTE_LISTEN=li&sten
 DLG_FWD_REMOTE_LOCAL=to local m&achine
 DLG_FWD_REMOTE_LOCAL_PORT=p&ort
 
-MSG_SAME_SERVERPORT_ERROR=You cannot have two forwardings from the same server port (%d).
-MSG_SAME_LOCALPORT_ERROR=You cannot have two forwardings from the same local port (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=The following forwardings were not specified when this SSH session began:\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwardings will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwardings should work.
+MSG_SAME_SERVERPORT_ERROR=You cannot have two forwarding from the same server port (%d).
+MSG_SAME_LOCALPORT_ERROR=You cannot have two forwarding from the same local port (%d).
+MSG_UNSPECIFYIED_FWD_ERROR1=The following forwarding were not specified when this SSH session began:\n\n
+MSG_UNSPECIFYIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
 MSG_INVALID_PORT_ERROR=Port "%s" is not a valid port number.\nEither choose a port name from the list, or enter a number between 1 and 65535.
 
 ; dlg fwd setup
@@ -792,7 +792,7 @@ MSG_KEYFILES_PRIVATEKEY_LENGTH_ERROR=The specified key file cannot be decrypted 
 MSG_KEYFILES_PRIVATEKEY_NOCIPHER_ERROR=The specified key file cannot be decrypted using the passphrase.\nThe cipher type used to encrypt the file is not supported by TTSSH for this purpose.
 MSG_KEYFILES_PASSPHRASE_EMPTY_ERROR=The specified key file cannot be decrypted using the empty passphrase.\nFor auto-login, you must create a key file with no passphrase.\nBEWARE: This means the key can easily be stolen.
 MSG_KEYFILES_PASSPHRASE_ERROR=The specified key file cannot be decrypted using the passphrase.\nThe passphrase is incorrect.
-MSG_KEYFILES_CRYPTOLIB_ERROR=Error in crytography library.\nPerhaps the stored key is invalid.
+MSG_KEYFILES_CRYPTOLIB_ERROR=Error in cryptography library.\nPerhaps the stored key is invalid.
 
 ; pkt.c
 MSG_PKT_OVERSIZED_ERROR=Oversized packet received from server; connection will close.
@@ -818,7 +818,7 @@ MSG_SSH_ALLOC_TERMINAL_ERROR=The server cannot allocate a pseudo-terminal. You m
 MSG_SSH_SETUP_COMP_ERROR=An error occurred while setting up compression.\nThe connection will close.
 MSG_SSH_DECRYPT_RSA_ERROR=An error occurred while decrypting the RSA challenge.\nPerhaps the key file is corrupted.
 MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=Internal error: unsupported authentication method
-MSG_SSH_AUTH_FAILURE_ERROR=SSH2 autologin error: user authentication failed.
+MSG_SSH_AUTH_FAILURE_ERROR=SSH2 auto-login error: user authentication failed.
 MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=The server doesn't have valid authentication method.
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nAuthentication method is not supported by server.
 MSG_SSH_CHANNEL_OPEN_ERROR=SSH2_MSG_CHANNEL_OPEN_FAILURE was received.\nchannel [%d]: reason: %s(%d) message: %s
@@ -904,7 +904,7 @@ MSG_PROXY_BAD_REQUEST=Proxy prevent this connection!
 MSG_TYPE_NONE=Without Proxy
 MSG_LOGFILE_SELECT=Select Logfile
 MSG_UNABLE_TO_GET_ISSUER_CERT=Unable to get Issuer Certificate
-MSG_UNABLE_TO_GET_CRL=Unable to get Ceritifcate CRL
+MSG_UNABLE_TO_GET_CRL=Unable to get Certificate CRL
 MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE=Unable to decrypt Certificate's Signature
 MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE=Unable to decrypt CRL's Signature
 MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY=Unable to decode Issuer Public Key
@@ -933,7 +933,7 @@ MSG_CERT_REJECTED=Certificate rejected
 MSG_SUBJECT_ISSUER_MISMATCH=Subject Issuer mismatch
 MSG_AKID_SKID_MISMATCH=Authority and Subject Key Identifier mismatch
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Authority and Issuer Serial Number mismatch
-MSG_KEYUSAGE_NO_CERTSIGN=Key usage does not include Ceritifcate signing
+MSG_KEYUSAGE_NO_CERTSIGN=Key usage does not include Certificate signing
 MSG_APPLICATION_VERIFICATION=Application verification failure
 MSG_UNMATCH_COMMON_NAME=Umatch Common Name
 MSG_UNABLE_TO_GET_COMMON_NAME=Unable to get Common Name
@@ -959,7 +959,7 @@ MENU_NOTRAY=(none)
 DLG_ABOUT_TITLE=Version Information
 DLG_ABOUT_APPNAME=launch tool
 
-DLG_CONFIG_TITLE=List Cofiguration
+DLG_CONFIG_TITLE=List Configuration
 DLG_CONFIG_ITEM=List Item
 DLG_CONFIG_CONFIG=Configuration
 DLG_CONFIG_NAME=Name
@@ -981,7 +981,7 @@ DLG_ETC_TITLE=Configuration Details
 DLG_ETC_APP=Application
 DLG_ETC_OPTION=Option
 DLG_ETC_CONFIG=Tera Term Configuration File(except launching)
-DLG_ETC_AUTO=Configuration for autologin
+DLG_ETC_AUTO=Configuration for auto-login
 DLG_ETC_LOGFILE=log file
 DLG_ETC_PROMPT=Prompt
 DLG_ETC_USER=User Name

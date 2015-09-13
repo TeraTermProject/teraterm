@@ -1923,7 +1923,7 @@ private:                                                   \
                                               "Unable to get Issuer Certificate");
                         case IDS_UNABLE_TO_GET_CRL:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_GET_CRL", uimsg, sizeof(uimsg),
-                                              "Unable to get Ceritifcate CRL");
+                                              "Unable to get Certificate CRL");
                         case IDS_UNABLE_TO_DECRYPT_CERT_SIGNATURE:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE", uimsg, sizeof(uimsg),
                                               "Unable to decrypt Certificate's Signature");
@@ -2010,7 +2010,7 @@ private:                                                   \
                                               "Authority and Issuer Serial Number mismatch");
                         case IDS_KEYUSAGE_NO_CERTSIGN:
                             UTIL_get_lang_msg("MSG_KEYUSAGE_NO_CERTSIGN", uimsg, sizeof(uimsg),
-                                              "Key usage does not include Ceritifcate signing");
+                                              "Key usage does not include Certificate signing");
                         case IDS_APPLICATION_VERIFICATION:
                             UTIL_get_lang_msg("MSG_APPLICATION_VERIFICATION", uimsg, sizeof(uimsg),
                                               "Application verification failure");

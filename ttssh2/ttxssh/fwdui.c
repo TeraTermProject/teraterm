@@ -921,13 +921,13 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 			switch (specs[i].type) {
 			case FWD_REMOTE_TO_LOCAL:
 				UTIL_get_lang_msg("MSG_SAME_SERVERPORT_ERROR", pvar,
-				                  "You cannot have two forwardings from the same server port (%d).");
+				                  "You cannot have two forwarding from the same server port (%d).");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 				            pvar->ts->UIMsg, specs[i].from_port);
 				break;
 			case FWD_LOCAL_TO_REMOTE:
 				UTIL_get_lang_msg("MSG_SAME_LOCALPORT_ERROR", pvar,
-				                  "You cannot have two forwardings from the same local port (%d).");
+				                  "You cannot have two forwarding from the same local port (%d).");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 				            pvar->ts->UIMsg, specs[i].from_port);
 				break;
@@ -946,7 +946,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 
 	if (num_unspecified_forwardings > 0) {
 		UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR1", pvar,
-		                  "The following forwarding(s) was not specified when this SSH session began:\n\n");
+		                  "The following forwarding was not specified when this SSH session began:\n\n");
 		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 
 		for (i = 0; i < num_specs; i++) {
@@ -962,7 +962,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 		}
 
 		UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR2", pvar,
-		                  "\nDue to a limitation of the SSH protocol, this forwarding(s) will not work in the current SSH session.\n"
+		                  "\nDue to a limitation of the SSH protocol, this forwarding will not work in the current SSH session.\n"
 		                  "If you save these settings and start a new SSH session, the forwarding should work.");
 		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 

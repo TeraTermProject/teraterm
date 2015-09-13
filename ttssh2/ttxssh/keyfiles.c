@@ -301,7 +301,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 
 	if (!normalize_key(key)) {
 		UTIL_get_lang_msg("MSG_KEYFILES_CRYPTOLIB_ERROR", pvar,
-		                  "Error in crytography library.\n"
+		                  "Error in cryptography library.\n"
 		                  "Perhaps the stored key is invalid.");
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 

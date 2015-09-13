@@ -635,7 +635,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			                  "the default authentication method.\n"
 			                  "To use Rhosts authentication "
 			                  "in TTSSH, you need to set it to be the default by restarting\n"
-			                  "TTSSH and selecting \"SSH Authentication...\" from the Setup menu"
+			                  "TTSSH and selecting \"SSH Authentication...\" from the Setup menu "
 			                  "before connecting.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 		}

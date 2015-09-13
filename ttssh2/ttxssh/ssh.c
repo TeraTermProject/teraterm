@@ -6902,7 +6902,7 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 		char uimsg[MAX_UIMSG];
 		// SSH2自動ログインが有効の場合は、リトライは行わない。(2004.12.4 yutaka)
 		UTIL_get_lang_msg("MSG_SSH_AUTH_FAILURE_ERROR", pvar,
-		                  "SSH2 autologin error: user authentication failed.");
+		                  "SSH2 auto-login error: user authentication failed.");
 		strncpy_s(uimsg, sizeof(uimsg), pvar->ts->UIMsg, _TRUNCATE);
 
 		if (pvar->ssh2_authlist != NULL || strlen(pvar->ssh2_authlist) != 0) {

@@ -16,10 +16,8 @@
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +61,7 @@ ICON_RIGHT              ICON                    "right.ico"
 // Menu
 //
 
-TTERM_MENU MENU 
+TTERM_MENU MENU
 BEGIN
     POPUP "MENU"
     BEGIN
@@ -142,7 +140,7 @@ BEGIN
     CTEXT           "Option",LBL_OPTION,8,24,44,12,SS_CENTERIMAGE | SS_SUNKEN
     EDITTEXT        EDIT_OPTION,56,24,148,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Default",BUTTON_DEFAULT,120,156,42,14
-    GROUPBOX        "Configuration for autologin",GRP_AUTOLOGIN,8,84,199,68
+    GROUPBOX        "Configuration for auto-login",GRP_AUTOLOGIN,8,84,199,68
     GROUPBOX        "TeraTerm Configuration File(except launching)",GRP_INITFILE,8,44,196,32
     EDITTEXT        EDIT_LOG,60,96,124,12,ES_AUTOHSCROLL
     CTEXT           "log file",LBL_LOG,12,96,44,12,SS_CENTERIMAGE | SS_SUNKEN
@@ -168,7 +166,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     DIALOG_CONFIG, DIALOG
     BEGIN
