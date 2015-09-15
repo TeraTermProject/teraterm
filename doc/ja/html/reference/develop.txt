@@ -241,7 +241,7 @@
      Inno Setup
        http://www.jrsoftware.org/isdl.php
      Oniguruma
-       http://www.geocities.jp/kosako3/oniguruma/
+       https://github.com/kkos/oniguruma
      OpenSSL
        http://www.openssl.org/
      zlib
