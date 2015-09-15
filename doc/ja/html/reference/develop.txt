@@ -249,7 +249,7 @@
      PuTTY
        http://www.chiark.greenend.org.uk/~sgtatham/putty/
      CygTerm
-       http://www.dd.iij4u.or.jp/~nsym/cygwin/cygterm/
+       https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index.html
      LogMeTT
        http://logmett.com/freeware/LogMeTT.php
        http://logmett.com/freeware/TTLEdit.php
