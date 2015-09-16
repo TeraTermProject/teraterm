@@ -1312,7 +1312,7 @@
     </ul></li>
   <li>Bug fixes
     <ul>
-      <li>Bug fix: The following problems about the character attribute. These bugs are software regression in 4.58.
+      <li>Bug fix: The following problems about the character attribute. These bugs were introduced in 4.58.
         <ul>
           <li>The high brightness, the under line, the blinking and the reverse attribute apply in the erase area.</li>
           <li>On the Edit menu and then point to clear screen and clear buffer,  the terminal screen is cleared with the current background color.</li>
@@ -1616,7 +1616,7 @@
       <li>Bug fix: TeraTerm would use the configuration of TCPLocalEcho/TCPCRSend when the user start telnet connection on New connection dialog.</li>
       <li>Bug fix: when <a href="../menu/setup-additional.html#continuedline">continued line copy</a> is enabled, <a href="../menu/edit.html#copytable">Copy Table</a> does not work correctly</li>
       <li>Bug fix: when <a href="../menu/setup-keyboard.html#DeleteKey">Transmit DEL by Delete key</a> is enabled and Num Lock status is off, Numeric Keypad "." sends DEL.</li>
-      <li>Bug fix: '<a href="../macro/command/wait.html">wait</a>' macro command can't wait a long string. Regressed at 4.54.</li>
+      <li>Bug fix: '<a href="../macro/command/wait.html">wait</a>' macro command can't wait a long string. This bug was introduced in 4.54.</li>
       <li>Bug fix: The color value on <a href="../menu/setup-window.html">Window setup dialog</a> would become 255 when the value is less than 16 and the user pushes PageUP key.</li>
       <li>Bug fix: COM port description would be wrong when COM port number is forced to switch another number. Special thanks to xoxo-san.</li>
       <li>Bug fix: On TEK Window's <a href="../menutek/setup-window.html">Setup Window dialog</a>, "Always use Normal text's BG" check-box is displayed.</li>
@@ -3200,7 +3200,7 @@ SYNOPSIS:
     </ul></li>
   <li>Bug fixes
     <ul>
-      <li>Bug fix: The general protection fault would occur on SSH1 connection. Regressed at 2.48.</li>
+      <li>Bug fix: The general protection fault would occur on SSH1 connection. This bus was introduced in 2.48.</li>
       <li>Bug fix: When the CheckAuthListFirst is enabled on SSH2 connection, TeraTerm disconnects after pushing the OK button of the dialog before the valid authentication method receives.</li>
       <li>Bug fix: X11 forwarding does not work when DISPLAY environment variable configures.</li>
       <li>Bug fix: History check-box has not been enable or disabled on a new connection.</li>
@@ -3253,7 +3253,7 @@ SYNOPSIS:
          <li>Only support for SSH2 protocol.</li>
          <li>Not supporting for SFTP(SSH File Transfer Protocol).</li>
        </ul></li>
-      <li>Bug fix: TCP disconnection was mis-detected in the packet sending. This problem is a regression from TTSSH 1.01 because SSH heartbeat thread is not thread-safe.</li>
+      <li>Bug fix: TCP disconnection was mis-detected in the packet sending. This bug was introduced in in TSSH 1.01 because SSH heartbeat thread was not thread-safe.</li>
       <li>Bug fix: SSH is disabled when "/ssh1" or "/ssh2" is included in host name on New Connection dialog.</li>
       <li>Bug fix: Twice sending SSH2_MSG_SERVICE_REQUEST packet when the user default is not specified and the user authentication method is challenge, /ask4passwd is specified at command line parameter.</li>
       <li>Bug fix: TIS authentication dialog would not appear when CheckAuthListFirst entry is off and the user authentication method is challenge, /ask4passwd is specified at command line parameter.</li>
@@ -3280,7 +3280,7 @@ SYNOPSIS:
         </ul></li>
       <li>Changed for " /ssh", " /nossh", " /telnet" specified as Host in "New connection" dialog to be given priority over "validate/invalidate" of SSH by radio button.</li>
       <li>Bug fix: TTSSH crashes when all server supports encryption algorithm that is not supported by TTSSH.</li>
-      <li>Bug fix: SSH2 packet was occurred as "Bad packet length". This bug is software regression in TTSSH 2.42.
+      <li>Bug fix: SSH2 packet was occurred as "Bad packet length". This bug was introduced in TTSSH 2.42.
         <ul>
           <li><del>Bug fix: TCP disconnection was mis-detected in the packet sending.</del></li>
         </ul></li>
@@ -3360,8 +3360,8 @@ SYNOPSIS:
 
 <h3><a name="ttssh_2.35">2006.10.28 (Ver 2.35)</a></h3>
 <ul class="history">
-      <li>Bug fix: TTSSH settings wasn't read from ini file which is specified by /F parameter of ttermpro.exe. Regressed at 2.34.</li>
-      <li>Bug fix: Couldn't start a telnet session from 'New connection' dialog when main windows is connected with SSH protocol. Regressed at 2.34.</li>
+      <li>Bug fix: TTSSH settings wasn't read from ini file which is specified by /F parameter of ttermpro.exe. This bug was introduced in 2.34.</li>
+      <li>Bug fix: Couldn't start a telnet session from 'New connection' dialog when main windows is connected with SSH protocol. This bug was introduced in 2.34.</li>
       <li>Bug fix: invalid freeing DH memory in KEX_DH_GRP1_SHA1 or KEX_DH_GRP14_SHA1 sequence.</li>
 </ul>
 
