@@ -42,8 +42,8 @@
 <h2><a name="skillset">Skill Sets</a></h2>
     Most program included in the Tera Term package are described with the C language.
     A part of code is described with the C++ language and used by MFC(Microsoft Foundation Class).
-    The Win32 API knowledge is required because the souce code uses a lot of Win32 API to process the Windows specific function. <br>
-    The Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, the Express Edition can not build the source code because the edition can not support the MFC feature. Also, Other compilers like the C++Builder, Turbo C++ Explorer and gcc can not be supported. <br>
+    The Win32 API knowledge is required because the source code uses a lot of Win32 API to process the Windows specific function. <br>
+    The Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, the Express Edition can not build the source code because the Edition can not support the MFC feature. Also, Other compilers like the C++Builder, Turbo C++ Explorer and gcc can not be supported. <br>
     The Windows programming know-how is at the MSDN library provided by Microsoft Corporation.
     A user will often refer the MSDN library while the user is developing the software. <br>
 
@@ -107,18 +107,19 @@
 -->
     
 
-    <!--
-<h2><a name="plugin">プラグインサポート</a></h2>
-　Tera Termでは、DLLという形式でプラグインのしくみをサポートしています。プラグイン形式のDLLファイルを、Tera Termがインストールされているディレクトリへ設置するだけで、Tera Termのソースコードを修正することなく、機能追加を行うことができます。代表的なプラグインとして、TTSSHがあります。<br>
-　プラグインを作成するためのサンプルコードとして、TTXSamples\ttxtest\ttxtest.c というソースファイルが用意されています。プラグインを開発するときは、このソースファイルをひな形とするとよいでしょう。実践的なプラグインとして、"TTX KanjiMenu"のソースコード（TTXKanjiMenu\配下）がシンプルで分かりやすいです。<br><br>
+<h2><a name="plugin">Supporting Plug-in</a></h2>
+    Tera Term can support the plug-in mechanism by using the DLL module. 
+    A user can add new feature without source code modifying when the DLL plug-in module is copied into the Tera Term installation directory. The TTSSH module is typical plug-in module. <br>
+    A sample code for plug-in programming is into the TTXSamples\ttxtest\ttxtest.c file. It is recommended that a user develop the plug-in module based on this file. The "TTX KanjiMenu" source code(TTXKanjiMenu\ directory) is practical and simple module. <br><br>
 
-　プラグインは、Tera Term("ttermpro.exe")の起動時に読み込まれます。TTXInit()#ttplug.c が読み込みを行う関数で、カレントディレクトリから"TTX*.DLL"というワイルドカードに合致するDLLファイルが読み込み対象となります。<br>
-　複数のDLLが存在する場合は、Tera Term本体からチェインするような形で、各DLLのエクスポート関数が連結されます。連結される順番は、それぞれのDLLが定義するオーダー値（TTXExports構造体のloadOrderメンバ）で決定され、現状下記の通りとなっています。　
+    The plug-in module is loaded on the Tera Term("ttermpro.exe") startup. The TTXInit()#ttplug.c function loads the module. Some DLL files matched the "TTX*.DLL" wildcard character will be loaded.<br>
+    When multiple DLL modules are found, an export function of each DLL module is concatenated from Tera Term body. The concatenating order is determined according to the defined order(loadOrder member of TTXExports structure) in the following order:
+        
 <p>
 <table border=1 align=center>
 <tr>
-  <th>モジュール</th>
-  <th>オーダー</th>
+  <th>Module</th>
+  <th>Order</th>
 </tr>
 
 <tr>
@@ -137,17 +138,18 @@
 </tr>
 </table>
  </p>
-
-オーダー値が小さいほど、Tera Term本体側に近くなります。たとえば、Tera Term本体からTTXModifyMenu()が呼び出された場合、
+    
+    The smaller order value is nearer to the Tera Term body. For example, the TTXModifyMenu() is called:
 　
 　<ul>
-　 <li>TTXModifyMenu()#ttplug.c → TTProxyのTTXModifyMenu()  → TTSSHのTTXModifyMenu()  → TTX Kanji MenuのTTXModifyMenu()</li>
+　 <li>TTXModifyMenu()#ttplug.c -> TTProxy@TTXModifyMenu() -> TTSSH@TTXModifyMenu() -> TTX Kanji Menu@TTXModifyMenu()</li>
 　</ul><br>
 　
-という順番で、各DLLの関数が呼び出されていくことになります。
+    Above function of the DLL module are called in order.
 　<br>
-
-　各DLLが、Tera Term本体側から呼び出してもらうためにエクスポートする関数群は、TTXExports構造体で定義し、TTXBind()で渡します。たとえば、TTX Kanji Menuのエクスポート関数は以下のとおりです。不要な関数は NULL で定義してあります。
+    
+    The export function called by Tera Term body is defined as the TTXExports structure, and the TTXBind() sends the export table to the Tera Term body. For example, the export function of the TTX Kanji Menu plug-in module are as follows:<br>
+    Unnecessary function is defined as NULL pointer.
 
 <pre class=code>
 static TTXExports Exports = {
@@ -171,30 +173,30 @@ static TTXExports Exports = {
 	NULL  /* TTXSetCommandLine */
 };
 </pre>
-
-　原則、プラグインのエクスポート関数は、他のプラグインと干渉しないように設計をするべきです。また、Tera Term本体側からの呼び出しが、自分宛てであるかどうかを判断する必要がある場合もあります。<br>
-　プラグインがエクスポートする関数について、以下に示します。
+    
+    Basically, the export function of the plug-in module should be designed not to interfere other plug-in modules. Also, when the plug-in module is called by Tera Term body, the module needs to check the request for own module. <br> 
+    Every export function of plug-in module are as follows:
 　
 <p>
 <table border=1 align=center>
 <tr>
-  <th>関数</th>
-  <th>意味</th>
+  <th>Function</th>
+  <th>Description</th>
 </tr>
 
 <tr>
   <td>TTXBind</td>
-  <td>一番始めに呼び出される関数であり、エクスポート関数のテーブルを渡す。</td>
+  <td>This function is called at first. The function sends the export function table to the Tera Term body.</td>
 </tr>
 
 <tr>
   <td>TTXInit</td>
-  <td>TTXBind()の呼び出し後にすぐに実行される関数で、Tera Term本体のグローバル変数(ts, cv)を受け取り、プラグインの初期化を行う。</td>
+  <td>This function is quickly called after the TTXBind() calling. The function received the global variables(ts and cv) of the Tera Term body, and initialized own plug-in module.</td>
 </tr>
 
 <tr>
   <td>TTXGetUIHooks</td>
-  <td>ダイアログのハンドルをフックするための関数。Tera Term本体のダイアログインターフェイスを変更したい場合に使う。フック対象の関数は以下のとおり。<br>
+  <td>This function can hook the dialog handle. The function is used to change the dialog interface of Tera term. The hook target is in the following:<br>
       &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, 
       &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,   
       &ChooseFontDlg, &SetupGeneral, &WindowWindow                 
@@ -203,7 +205,7 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXGetSetupHooks</td>
-  <td>セットアップルーチンをフックするための関数。フックした側は、元の関数も責任を持って呼び出す必要がある。複数のプラグインが存在する場合、関数がチェインされていく。フック対象の関数は以下のとおり。<br>
+  <td>This function can hook the setup routine. The hooked function should call the original function. When some plug-in module exists, each function is called in order. The hook target is in the following:<br>
       &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,   
       &AddHostToList, &ParseParam                                     
   </td>
@@ -211,7 +213,7 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXOpenTCP</td>
-  <td>TCP接続を行うときに呼び出される関数。シリアル接続のときは呼び出されない。また、以下のソケットインターフェイスをフックすることもできる。<br>
+  <td>This function is called on TCP connection, and is not called on Serial connection. Also, the function can hook the socket interface in the following:<br>
       &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   
       &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     
       &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       
@@ -221,7 +223,7 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXCloseTCP</td>
-  <td>TCPコネクションが切断されるときに呼び出される関数。シリアル接続のときは呼び出されない。下記のうちフックしたインターフェイスがあるならば、元に戻す必要がある。<br>
+  <td>This function is called on TCP disconnection, and is not called on Serial connection. When below hooked interface exists, the function should restore an original interface.<br>
       &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   
       &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     
       &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       
@@ -231,34 +233,33 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXSetWinSize</td>
-  <td>Tera Termウィンドウの画面サイズが変更されたときに呼び出される関数。</td>
+  <td>This function is called when the terminal screen is resized.</td>
 </tr>
 
 <tr>
   <td>TTXModifyMenu</td>
-  <td>Tera Termのメニューが初期化されるときに呼び出される関数。プラグイン用のメニューを挿入したい場合に使われる。
-  </td>
+  <td>This function is called when the Tera Term menu is initialized. The function can insert new menu on the original menu list.</td>
 </tr>
 
 <tr>
   <td>TTXModifyPopupMenu</td>
-  <td>Tera Termのポップアップメニューが初期化されるときに呼び出される関数。プラグイン用のポップアップメニューを挿入したい場合に使われる。</td>
+  <td>This function is called when the Tera Term pop-up menu is initialized. The function can insert new pop-up menu on the original pop-up menu list.</td>
 </tr>
 
 <tr>
   <td>TTXProcessCommand</td>
-  <td>メニューが呼び出されたときに実行される関数。プラグイン用のメニューを処理したいときに使われる。
+  <td>This function is called when the Tera Term menu is executed. The function can process the plug-in module menu.
   </td>
 </tr>
 
 <tr>
   <td>TTXEnd</td>
-  <td>Tera Term本体が終了するときに呼び出される関数。</td>
+  <td>This function is called when the Tera Term terminates.</td>
 </tr>
 
 <tr>
   <td>TTXSetCommandLine</td>
-  <td>新規接続やセッションの複製を行うときに、コマンドラインパラメータの処理を行うときに呼び出される関数。プラグイン独自のオプションを追加したときは、ここで処理される。
+  <td>This function is called when the command line parameter is processed on new connection and duplicating connection. An original parameter of the plug-in module is processed.
   </td>
 </tr>
 
@@ -267,7 +268,6 @@ static TTXExports Exports = {
 　
 
 <hr>
--->
 
 
     <!--
