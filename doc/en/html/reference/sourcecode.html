@@ -112,7 +112,7 @@
     A user can add new feature without source code modifying when the DLL plug-in module is copied into the Tera Term installation directory. The TTSSH module is typical plug-in module. <br>
     A sample code for plug-in programming is into the TTXSamples\ttxtest\ttxtest.c file. It is recommended that a user develop the plug-in module based on this file. The "TTX KanjiMenu" source code(TTXKanjiMenu\ directory) is practical and simple module. <br><br>
 
-    The plug-in module is loaded on the Tera Term("ttermpro.exe") startup. The TTXInit()#ttplug.c function loads the module. Some DLL files matched the "TTX*.DLL" wildcard character will be loaded.<br>
+    The plug-in module is loaded on the Tera Term("ttermpro.exe") startup. The TTXInit()#ttplug.c function loads the module. Some DLL files matched the "TTX*.DLL" wild-card character will be loaded.<br>
     When multiple DLL modules are found, an export function of each DLL module is concatenated from Tera Term body. The concatenating order is determined according to the defined order(loadOrder member of TTXExports structure) in the following order:
         
 <p>
@@ -140,13 +140,13 @@
  </p>
     
     The smaller order value is nearer to the Tera Term body. For example, the TTXModifyMenu() is called:
-　
-　<ul>
-　 <li>TTXModifyMenu()#ttplug.c -> TTProxy@TTXModifyMenu() -> TTSSH@TTXModifyMenu() -> TTX Kanji Menu@TTXModifyMenu()</li>
-　</ul><br>
-　
+
+  <ul>
+   <li>TTXModifyMenu()#ttplug.c -> TTProxy@TTXModifyMenu() -> TTSSH@TTXModifyMenu() -> TTX Kanji Menu@TTXModifyMenu()</li>
+  </ul><br>
+
     Above function of the DLL module are called in order.
-　<br>
+  <br>
     
     The export function called by Tera Term body is defined as the TTXExports structure, and the TTXBind() sends the export table to the Tera Term body. For example, the export function of the TTX Kanji Menu plug-in module are as follows:<br>
     Unnecessary function is defined as NULL pointer.
