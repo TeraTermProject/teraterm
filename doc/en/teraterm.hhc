@@ -560,6 +560,11 @@
 			<param name="Local" value="html\reference\develop.txt">
 			<param name="ImageNumber" value="11">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Source Code Overview">
+			<param name="Local" value="html\reference\sourcecode.html">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="MACRO help">
