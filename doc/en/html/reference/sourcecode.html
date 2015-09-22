@@ -16,8 +16,8 @@
 <ol>
   <li><a href="#foreword">Foreword</a></li>
   <li><a href="#skillset">Skill Sets</a></li>
-<!--  <li><a href="#module">モジュール構成</a></li>
-  <li><a href="#library">ライブラリ構成</a></li>-->
+  <li><a href="#module">Module Composition</a></li>
+<!--  <li><a href="#library">ライブラリ構成</a></li>-->
   <li><a href="#plugin">Supporting Plug-in</a></li>
 <!--  <li><a href="#configuration">設定ファイルの読み書き</a></li>
   <li><a href="#secure">セキュアプログラミング</a></li>
@@ -61,31 +61,30 @@
 <hr>
 
 
-    <!--
-<h2><a name="module">モジュール構成</a></h2>
-  Tera Termパッケージに含まれる実行モジュール（.exeと.dll）の関連図を以下に示します。実行ファイルの拡張子は".exe"になっており、必要に応じてDLLが動的リンクされます。いずれも32ビットプログラム(x86)であるために、x86-64やIA-64といった64ビット環境ではそのまま動作するかどうかは評価されていません。
+<h2><a name="module">Module Composition</a></h2>
+    Tera Term contains many executable module(.exe and .dll) and the association figure are below shown. An extension of an executable file is ".exe" and any DLL files are dynamically linked as needed.  Every module is the 32-bit program(x86) and the developer team will not validate the Tera Term software on the 64-bit environmentlike the x86-64 and IA-64. 
   
 <div align="center">
 <img src="image/module_relation.png" width=720 height=540>
 </div>
-
-  通常、ユーザがデスクトップやスタートメニューからアプリケーションを起動するときに、呼び出される実行ファイルは"ttermpro.exe"になります。実行ファイルはさらに5つのDLLとダイナミックリンクしています。静的リンクを行い、単一のEXEファイルにしていないのは、1つのプロセスのメモリ占有率を抑えるためです。Tera Termでは多数の起動が行われることが想定されるため、初期設計段階からDLLに分割されています。一度読み込まれたDLLは、複数のプロセス間で共有することができます。<br>
+    
+    Basically, when a user launches the Tera Term from the Desktop and Start Menu, the "ttermpro.exe" file is executed at first. Additionally, the executable file calls five DLL files by the dynamic link. The "ttermpro.exe" file is not an all-in-one file by using the static link because the memory consumption of one process suppresses. Is is assumed that a number of Tera Term starts, and the Tera Term is divided to any DLL files from the initial design of a program. A DLL file is shared among a number of process after the DLL file is loaded into the system memory. <br>
+  <br>
+    
+    When a macro script is called, another "ttpmacro.exe" program is launched. A macro script can be executed by myself because the Tera Term divides into the "ttermpro.exe" and the "ttpmacro.exe" program. So, the process communication mechanism is needed for two processes communication. Tera Term uses the DDE(Dynamic Data Exchange) mechanism which is the legacy system on current Windows. Windows will not support the DDE mechanism in the future, so the macro script will not be able to execute. <br>
+  <br>
+    
+    A plug-in DLL like the TTSSH, TTProxy and TTXKanjiMenu is dynamically loaded by using the LoadLibrary() API on Tera Term startup. A DLL filename is selected by the "TTX*.DLL" pattern matching by the TTXInit()#ttplug.c function. <br>
   <br>
   
-  マクロスクリプトを実行する際は、"ttpmacro.exe"というまったく別のプロセスが呼び出されます。"ttermpro.exe"とプロセス単位で分けられているのは、マクロを単体で実行できるようにするためです。両プロセス間で、データのやりとりを行うためには、プロセス間通信が必要です。Tera Termでは、DDE(Dynamic Data Exchange)と呼ばれる現在ではレガシーとなってしまったしくみが採用されています。将来のWindowsではDDEがサポートされなくなる可能性があり、その場合Tera Term上でマクロを実行することは一切できなくなります。<br>
+    The "keycode.exe", "ttpmenu.exe" and "LogMeTT.exe" are another process.<br>
   <br>
   
-  TTSSHやTTProxy、TTXKanjiMenuといったプラグイン形式のDLLは、Tera Termの起動時に明示的に LoadLibrary() を使ってダイナミックロードされます。ロード対象となるDLLのファイル名は、TTXInit()#ttplug.c において、"TTX*.DLL"というパターンにマッチしたものとなります。<br>
-  <br>
-  
-  "keycode.exe"と"ttpmenu.exe"、"LogMeTT.exe"は単体アプリケーションです。<br>
-  <br>
-  
-  Cygwin接続のしくみについては、別の節で説明します。
+    The Cygwin connection mechanism is described at another chapter.
 
 <hr>
 
-
+    <!--
 <h2><a name="library">ライブラリ構成</a></h2>
   高度な機能を実現するために、フルスクラッチで実装することは効率がいいとは言えません。Tera Termでは開発効率化を図るために、オープンソースのライブラリを積極的に利用しています。ただし、オープンソース製品のライセンスによる競合には注意を払う必要があります（特にGPL）。<br>
   下図に、オープンソースのライブラリをリンクしているモジュールと、そのリンク状況を示します。Tera Termマクロプログラムにおいて、"waitregex"や"sprintf"コマンドにおいて正規表現を利用するために、Onigurumaと呼ばれる正規表現ライブラリをリンクしています。Tera Term本体では、バージョンダイアログにOnigurumaのバージョンを表示するためだけにリンクをしています。
