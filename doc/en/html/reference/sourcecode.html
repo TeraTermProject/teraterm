@@ -17,7 +17,7 @@
   <li><a href="#foreword">Foreword</a></li>
   <li><a href="#skillset">Skill Sets</a></li>
   <li><a href="#module">Module Composition</a></li>
-<!--  <li><a href="#library">ライブラリ構成</a></li>-->
+  <li><a href="#library">Library Composition</a></li>
   <li><a href="#plugin">Supporting Plug-in</a></li>
 <!--  <li><a href="#configuration">設定ファイルの読み書き</a></li>
   <li><a href="#secure">セキュアプログラミング</a></li>
@@ -84,18 +84,17 @@
 
 <hr>
 
-    <!--
-<h2><a name="library">ライブラリ構成</a></h2>
-  高度な機能を実現するために、フルスクラッチで実装することは効率がいいとは言えません。Tera Termでは開発効率化を図るために、オープンソースのライブラリを積極的に利用しています。ただし、オープンソース製品のライセンスによる競合には注意を払う必要があります（特にGPL）。<br>
-  下図に、オープンソースのライブラリをリンクしているモジュールと、そのリンク状況を示します。Tera Termマクロプログラムにおいて、"waitregex"や"sprintf"コマンドにおいて正規表現を利用するために、Onigurumaと呼ばれる正規表現ライブラリをリンクしています。Tera Term本体では、バージョンダイアログにOnigurumaのバージョンを表示するためだけにリンクをしています。
+<h2><a name="library">Library Composition</a></h2>
+    It is not efficiently performed to build a software from scratch for advanced feature. So, Tera Term actively uses the open source library. However, we need to be careful with the license violation,  especially GPL. <br>
+    Some modules linked with the open source library and the linkage status are below shown. The macro program links the regular expression library that is called Oniguruma to use the regular expression by the "waitregex" and "sprintf" macro command. Also, Tera Term program links the same library to display the Oniguruma version on the version dialog.
   
 <p>
-  SSHモジュールである"TTSSH"は、暗号処理を行うためにOpenSSLを利用しています。"OpenSSL"というネーミングからWebアクセスに使われるSSL(Secure Socket Layer)プロトコル専用のライブラリかと思われがちですが、基本的な暗号アルゴリズムをサポートしていることから、TTSSHではOpenSSLに含まれる低レイヤのルーチンを利用するだけに留まっています。このことは、すなわちOpenSSLライブラリにセキュリティホールが発見されたとしても、TTSSHへの影響は極めて低いということです。<br>
-  zlibライブラリは、SSHパケットの圧縮を行うために利用しています。ただし、ダイヤルアップ回線などの低速度なネットワークにおいては、パケット圧縮は有効ですが、昨今の高速回線ではむしろ速度低下を招く足かせとなります。ゆえに、デフォルトではパケット圧縮機能は無効化されています。
-  PuTTYは世界標準であるフリーのターミナルエミュレータです。PuTTYに含まれるPageantと呼ばれるSSH認証エージェントがあるのですが、TTSSHでPageantによる公開鍵認証をサポートするために、PuTTYのソースコードを利用しています。
+    The "TTSSH" module uses the OpenSSL library to perform the cryptograph processing. Is seems that the OpenSSL library has only the SSL(Secure Socket Layer) protocol function for web accessing, however that is wrong. The OpenSSL library supports basic cipher algorithm and the "TTSSH" module uses only basic function. In other words, the "TTSSH" module will not be almost affected when the OpenSSL library has the security hole. <br>
+    The zlib library is used to compress the SSH packet. So, the packet compression is effective on lower network throughput like the dial-up connection, however the performance is not good on high-speed network. So, the packet compression function is disable by default. <br>
+    The PuTTY is a terminal emulator for free, and defacto standard in world-wide. The Pageant program of the PuTTY package is the SSH authentication agent, and the TTSSH uses the PuTTY source code to support the Pageant authentication method.
 </p>
-  
-  なお、いずれのライブラリも静的リンク(static link)としています。ライブラリのコンパイルオプションには"/MT"を付加しています。動的リンク(dynamic link)を行うと、一部のユーザ環境でTera Termが起動できないという現象が発生したために、現在では動的リンクは行っていません。
+    
+    Carefully, every library is the static link not the dynamic link. The compile option of the library is added the "/MT" option. Currently, the dynamic link is not supported because a part of user environment can not launch the Tera Term by using the dynamic link.
   
 
 <div align="center">
@@ -103,7 +102,6 @@
 </div>
 
 <hr>
--->
     
 
 <h2><a name="plugin">Supporting Plug-in</a></h2>
