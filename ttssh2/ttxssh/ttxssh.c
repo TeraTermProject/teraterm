@@ -185,7 +185,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 {
 	char listed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
 	char allowed[max(KEX_DH_MAX,max(SSH_CIPHER_MAX,max(KEY_MAX,max(HMAC_MAX,COMP_MAX)))) + 1];
-	int i, j;
+	int i, j, k=-1;
 
 	memset(listed, 0, sizeof(listed));
 	memset(allowed, 0, sizeof(allowed));
@@ -204,8 +204,38 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 		} else {
 			listed[num] = 1;
 		}
+
+		if (num == 0) {
+			k = i;
+		}
 	}
 
+#if 1
+	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
+		int num = default_strings[j];
+
+		if (!listed[num] && k >= 0) {
+			memmove(buf + k + 1, buf + k, strlen(buf + k + 1) + 1);
+			buf[k] = num + '0';
+			k++;
+			i++;
+		}
+	}
+	if (k < 0) {
+		j = 0;
+	}
+	else {
+		j++;
+	}
+	for (; j < default_strings_len ; j++) {
+		int num = default_strings[j];
+
+		if (!listed[num]) {
+			buf[i] = num + '0';
+			i++;
+		}
+	}
+#else
 	for (j = 0; j < default_strings_len ; j++) {
 		int num = default_strings[j];
 
@@ -214,6 +244,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 			i++;
 		}
 	}
+#endif
 
 	buf[i] = 0;
 }
