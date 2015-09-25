@@ -163,7 +163,7 @@ TTSSHでは以下のコマンドラインオプションが使用できます。
 
 </dl>
 
-<p>値にスペースを含めるためには、値全体を `"' で囲んでください。<br>
+<p>値にスペースやセミコロンを含めるためには、値全体を `"' で囲んでください。<br>
 値に `"' を含めるためには、連続した `"'("") を指定してください。</p>
 
 
@@ -176,6 +176,8 @@ ttermpro.exe server2:22 /ssh /ssh-Xlocalhost:3.0
 ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest
 ttermpro.exe server4:22 /ssh /2 /auth=publickey /user=admin /keyfile=pathofkeyfile /ask4passwd
 ttermpro.exe ssh://user:password@server5/ /auth=password
+ttermpro.exe server6:22 /ssh /2 /auth=publickey /user=guest /keyfile="C:\Users\foo\Documents\My keys\id_ed25519" /passwd="Yu/eA;G2"
+ttermpro.exe server7:22 /ssh /2 /auth=password /user=guest /passwd="foo""bar"
 </pre>
 
 

@@ -163,7 +163,7 @@ You can use the following command line parameters on TTSSH.
 
 </dl>
 
-<p>If the value can include the space character, a user should put the value in quotations by using `"' character.<br>
+<p>If the value can include the space character and semicolon, a user should put the value in quotations by using `"' character.<br>
 If the value includes the `"' character, the user should write the `"' character two times.</p>
 
 
@@ -176,6 +176,8 @@ ttermpro.exe server2:22 /ssh /ssh-Xlocalhost:3.0
 ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest
 ttermpro.exe server4:22 /ssh /2 /auth=publickey /user=admin /keyfile=pathofkeyfile /ask4passwd
 ttermpro.exe ssh://user:password@server5/ /auth=password
+ttermpro.exe server6:22 /ssh /2 /auth=publickey /user=guest /keyfile="C:\Users\foo\Documents\My keys\id_ed25519" /passwd="Yu/eA;G2"
+ttermpro.exe server7:22 /ssh /2 /auth=password /user=guest /passwd="foo""bar"
 </pre>
 
 
