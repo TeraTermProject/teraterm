@@ -499,6 +499,7 @@ var
   FileDir       : String;
   TCPPort       : integer;
   ViewlogEditor : String;
+  CipherOrder   : String;
 
 begin
   Language       := GetIniString('Tera Term', 'Language', '', iniFile);
@@ -509,6 +510,7 @@ begin
   FileDir        := GetIniString('Tera Term', 'FileDir', '', iniFile);
   TCPPort        := GetIniInt('Tera Term', 'TCPPort', 0, 0, 65535, iniFile)
   ViewlogEditor  := GetIniString('Tera Term', 'ViewlogEditor', '', iniFile);
+  CipherOrder    := GetIniString('TTSSH', 'CipherOrder', '', iniFile);
 
   case GetUILanguage and $3FF of
   $04: // Chinese
@@ -642,6 +644,21 @@ begin
     ViewlogEditor := ExpandConstant('{win}') + '\' + 'notepad.exe';
     SetIniString('Tera Term', 'ViewlogEditor', ViewlogEditor, iniFile);
   end;
+
+  if IsComponentSelected('TTSSH') then
+    begin
+      CipherOrder := GetIniString('TTSSH', 'CipherOrder', '', iniFile);
+      if (CompareStr(CipherOrder, 'K>H:J=G9I<F8C7D;A@?EB3062') = 0) or
+         (CompareStr(CipherOrder, '>:=9<8C7D;A@?EB3062') = 0) or
+         (CompareStr(CipherOrder, '>:=9<87;A@?B3026') = 0) or
+         (CompareStr(CipherOrder, '>:=9<87;A@?3026') = 0) or
+         (CompareStr(CipherOrder, '>:=9<87;?3026') = 0) or
+         (CompareStr(CipherOrder, '<8=9>:7;3026') = 0) or
+         (CompareStr(CipherOrder, '87;9:<=>3026') = 0) or
+         (CompareStr(CipherOrder, '87;9:3026') = 0) or
+         (CompareStr(CipherOrder, '873026') = 0) then
+        SetIniString('TTSSH', 'CipherOrder', 'K>H:J=G9I<F8C7D;EB30A@?62', iniFile)
+    end;
 
 end;
 
