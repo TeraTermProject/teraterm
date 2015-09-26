@@ -9,6 +9,8 @@
 
 use Encode::Guess qw/shift-jis 7bit-jis/;
 
+my @exclude_files = qw(sourcecode.html);
+
 get_file_paths('../doc/en/html');
 exit(0);
 
@@ -33,12 +35,30 @@ sub get_file_paths {
 		if( -d "$top_dir/$path" ){                      #-- ディレクトリの場合は自分自身を呼び出す
 			&get_file_paths("$full_path");
 			
+		} elsif (&check_exclude_file($path)) {
+			print "$full_path skipped\n";
+			next;
+			
 		} else {
 			check_sjis_code($full_path);
 		
 		}
 	}
 	return \@paths;
+}
+
+
+# 調査対象外のファイルかを調べる
+sub check_exclude_file {
+	my($fn) = shift;
+	my($s);
+	
+	foreach $s (@exclude_files) {
+		if ($fn eq $s) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 
@@ -56,12 +76,12 @@ sub check_sjis_code {
 #		$line = chomp($line);
 #		print "$line\n";
 		
-		 my $enc = guess_encoding( $line, qw/ euc-jp shiftjis 7bit-jis / );
+		 my $enc = guess_encoding( $line, qw/ euc-jp shiftjis 7bit-jis utf8 / );
 
 		if (ref $enc) {
-			#printf "%s\n", $enc->name;
+#			printf "%s\n", $enc->name;
 			if ($enc->name !~ /ascii/) {
-				#printf "%s\n", $enc->name;
+#				printf "%s\n", $enc->name;
 				print "$filename:$no: $1\n";
 				print "$line\n";
 			}
