@@ -19,8 +19,8 @@
   <li><a href="#module">Module Composition</a></li>
   <li><a href="#library">Library Composition</a></li>
   <li><a href="#plugin">Supporting Plug-in</a></li>
-<!--  <li><a href="#configuration">設定ファイルの読み書き</a></li>
-  <li><a href="#secure">セキュアプログラミング</a></li>
+  <li><a href="#configuration">Read and Write Configuration File</a></li>
+<!--  <li><a href="#secure">セキュアプログラミング</a></li>
   <li><a href="#compatibility">古いバージョンのWindowsとの互換性維持</a></li>
   <li><a href="#debug">デバッグ手法</a></li>
   <li><a href="#thread">マルチスレッド</a></li>
@@ -62,7 +62,7 @@
 
 
 <h2><a name="module">Module Composition</a></h2>
-    Tera Term contains many executable module(.exe and .dll) and the association figure are below shown. An extension of an executable file is ".exe" and any DLL files are dynamically linked as needed.  Every module is the 32-bit program(x86) and the developer team will not validate the Tera Term software on the 64-bit environmentlike the x86-64 and IA-64. 
+    Tera Term contains many executable module(.exe and .dll) and the association figure are below shown. An extension of an executable file is ".exe" and any DLL files are dynamically linked as needed.  Every module is the 32-bit program(x86) and the developer team will not validate the Tera Term software on the 64-bit environment like the x86-64 and IA-64. 
   
 <div align="center">
 <img src="image/module_relation.png" width=720 height=540>
@@ -89,7 +89,7 @@
     Some modules linked with the open source library and the linkage status are below shown. The macro program links the regular expression library that is called Oniguruma to use the regular expression by the "waitregex" and "sprintf" macro command. Also, Tera Term program links the same library to display the Oniguruma version on the version dialog.
   
 <p>
-    The "TTSSH" module uses the OpenSSL library to perform the cryptograph processing. Is seems that the OpenSSL library has only the SSL(Secure Socket Layer) protocol function for web accessing, however that is wrong. The OpenSSL library supports basic cipher algorithm and the "TTSSH" module uses only basic function. In other words, the "TTSSH" module will not be almost affected when the OpenSSL library has the security hole. <br>
+    The "TTSSH" module uses the OpenSSL library to perform the cryptography processing. Is seems that the OpenSSL library has only the SSL(Secure Socket Layer) protocol function for web accessing, however that is wrong. The OpenSSL library supports basic cipher algorithm and the "TTSSH" module uses only basic function. In other words, the "TTSSH" module will not be almost affected when the OpenSSL library has the security hole. <br>
     The zlib library is used to compress the SSH packet. So, the packet compression is effective on lower network throughput like the dial-up connection, however the performance is not good on high-speed network. So, the packet compression function is disable by default. <br>
     The PuTTY is a terminal emulator for free, and defacto standard in world-wide. The Pageant program of the PuTTY package is the SSH authentication agent, and the TTSSH uses the PuTTY source code to support the Pageant authentication method.
 </p>
@@ -267,33 +267,35 @@ static TTXExports Exports = {
 <hr>
 
 
-    <!--
 
-<h2><a name="configuration">設定ファイルの読み書き</a></h2>
-  Windowsではアプリケーションのデータ保存のために、レジストリが伝統的に利用されていますが、Tera Termではその誕生がWindows 3.1までに遡るために、.iniファイルによるローカルディレクトリへの保存方法が標準となっています。<br>
-  パッケージに同梱されるCollectorやLogMeTT、CygTermに関してもローカルディレクトリへデータが保存されます。<br>
-  例外として、TeraTerm Menuはデフォルトでレジストリへ保存をします。カレントディレクトリに"ttpmenu.ini"（0バイトで可）を設置することで、レジストリの代わりに.iniファイルを使うようにすることもできます。ただし、レジストリから.iniファイルへの移行は自動で行いませんので、手動で再登録してください。<br>
+<h2><a name="configuration">Read and Write Configuration File</a></h2>
+    The registry system is traditionally used on the general Windows application to record the application data. However, Tera Term basically uses the .ini file to reading and writing the application data because the Tera Term's birth goes back to the Windows 3.1. <br>
+    The Collector, LogMeTT and CygTerm program included in the Tera Term package are recording the application data to the local storage. <br>
+    The TeraTerm Menu records the application data to the registry as an exception. However, the application uses the .ini file instead of the registry when the "ttpmenu.ini"(it is possible to 0 byte) is created on the current directory. Note that your registry data is automatically translated to the .ini file, so you need to configure again. <br>
   <br>
   
-  teraterm.iniファイルにエントリを追加した場合は、ReadIniFile()#ttset.cに設定を読み込みするようにします。
+    When new entry is added in the teraterm.ini file, the ReadIniFile()#ttset.c is implemented to read the file.
 
 <pre class=code>
 	ts->ConfirmChangePaste =
 		GetOnOff(Section, "ConfirmChangePaste", FName, TRUE);
 </pre>
-
-  WriteIniFile()#ttset.c に設定を書き込みするようにします。
+    
+    Also, the WriteIniFile()#ttset.c is implemented to write the file.
 
 <pre class=code>
 	WriteOnOff(Section, "ConfirmChangePaste", FName,
 		ts->ConfirmChangePaste);
 </pre>
 
-  エントリに文字列を設定する場合は、Win32APIのGetPrivateProfileString()とWritePrivateProfileString()を使います。数値を扱いたい場合は、GetPrivateProfileInt()とWriteInt()を使います。
+    When the entry is set as a string, use the GetPrivateProfileString() and WritePrivateProfileString() Win32 API. 
+    However, when the entry is set as an integer, use the GetPrivateProfileInt() and とWriteInt() Win32 API. 
+
 
 <hr>
 
 
+    <!--
 
 <h2><a name="secure">セキュアプログラミング</a></h2>
 
