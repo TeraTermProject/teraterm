@@ -22,8 +22,8 @@
   <li><a href="#configuration">Read and Write Configuration File</a></li>
   <li><a href="#secure">Secure Programming</a></li>
   <li><a href="#compatibility">Compatible with obsolete Windows</a></li>
+  <li><a href="#debug">Debugging Method</a></li>
 <!--
-  <li><a href="#debug">デバッグ手法</a></li>
   <li><a href="#thread">マルチスレッド</a></li>
   <li><a href="#dde">DDEによるプロセス間通信</a></li>
   <li><a href="#ttssh">TTSSHによるSSHの設計と実装</a></li>
@@ -402,16 +402,16 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 </pre>
     However, it is too much like work to define a function prototype declaration manually. So, it eliminates complicated procedure by using DLL delay loading.
 
-        <!--
 
 
 <h3>Windows 95</h3>
-
-Visual Studio 2005になってから、Windows 95のサポートが打ち切られました。よって、必然的にVisual Studio 2005でビルドしたバイナリは、Windows 95では動かないことになります。参考までに、Visual Studio 2008では Windows 98 と NT4.0 、2000 のサポートが打ち切られ、Visual Studio 2010でも同様です。今後は、Windows XPもサポートされなくなることが予想されます。<p>
-
-現在、Tera TermではVisual Studio 2005によりビルドされていますが、とある工夫により Windows 95 でも動作するようになっています。もちろん、Microsoft非公認の方法であるため、Microsoftからの正式なサポートは受けられません。<br>
-そもそも、Visual Studio 2005 でビルドされたバイナリは、デフォルトで IsDebuggerPresent 関数にリンクしてしまっています。当該関数は Windows 98 からサポートされたAPIであるため、Windows 95ではリンクエラーとなるわけです。<br>
-そこで、Windows 95において、ダミーで IsDebuggerPresent 関数のシンボルを定義してあげれば、プログラムの起動時にエラーになることはなくなるのです。詳細は"comapt_w95.h"ヘッダを参照してください。<br>
+    
+    The Visual Studio 2005 or later no longer support the Microsoft Windows 95. Basically, the binary program built by the Visual Studio 2005 can not work on the Windows 95. For your information, the Visual Studio 2008 and 2010 no longer support the Windows 98, NT4.0 and 2000. The Windows XP will not support in the future.
+  <p>
+      
+      Currently, Tera Term can work on the Windows 95 with a method despite Tera Term is built by the Visual Studio 2005. Certainly, this is Microsoft unofficial method. <br>
+      The binary program built by the Visual Studio 2005 links the IsDebuggerPresent function by default. The program can not work on the Windows 95 with link error because the function is added from the Windows 98. <br>
+      So, this problem can be avoided to define dummy symbol of the IsDebuggerPresent function on the Windows 95. For details, refer to the "comapt_w95.h" header. <br>
 
 <ul>
   <li><a href="https://osdn.jp/projects/ttssh2/svn/view/trunk/teraterm/common/compat_w95.h?view=markup&root=ttssh2">comapt_w95.h</a></li>
@@ -419,8 +419,9 @@ Visual Studio 2005になってから、Windows 95のサポートが打ち切ら�
 
 <hr>
 
+        <!--
 
-<h2><a name="debug">デバッグ手法</a></h2>
+<h2><a name="debug">Debugging Method</a></h2>
 <h3>debug printf</h3>
   Windowsアプリケーションでは printf() が使えません。標準出力がどこにも割り当てられていないからです。AllocConsole()とfreopen()を使えば、Windowsアプリケーションにおいても printf() を利用することができます。<br>
   OutputDebugString()というAPIがあります。これは Visual Studio のデバッグコンソールにメッセージ出力することができる関数です。当該APIは、"Debug build"および"Release build"に関係なく、デバッガが存在すれば、メッセージを送信します。ゆえに、 Visual Studioがなくとも、<a href="http://www.vector.co.jp/soft/win95/prog/se046776.html">DBCon</a>のようなツールを使えば、アプリケーションの単体起動においても、OutputDebugString()によるメッセージを拾うことができます。<br>
