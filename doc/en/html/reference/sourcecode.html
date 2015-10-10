@@ -419,13 +419,13 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 
 <hr>
 
-        <!--
 
 <h2><a name="debug">Debugging Method</a></h2>
-<h3>debug printf</h3>
-  Windowsアプリケーションでは printf() が使えません。標準出力がどこにも割り当てられていないからです。AllocConsole()とfreopen()を使えば、Windowsアプリケーションにおいても printf() を利用することができます。<br>
-  OutputDebugString()というAPIがあります。これは Visual Studio のデバッグコンソールにメッセージ出力することができる関数です。当該APIは、"Debug build"および"Release build"に関係なく、デバッガが存在すれば、メッセージを送信します。ゆえに、 Visual Studioがなくとも、<a href="http://www.vector.co.jp/soft/win95/prog/se046776.html">DBCon</a>のようなツールを使えば、アプリケーションの単体起動においても、OutputDebugString()によるメッセージを拾うことができます。<br>
-  Tera Termでは、可変長引数を扱えるようにラッパー関数を用意しています。
+<h3>Debug printf</h3>
+    The Windows application can not generally use the printf() function because the standard output is not assigned anywhere on the application. However, the application can use the printf() function by using the AllocConsole() and freopen(). <br>
+    The application can display the message on the debug console of the Visual Studio by using the OutputDebugString() API. When the debugger launches, the debugging message can be shown regardless of the "Debug build" and "Release build". So, when a user uses the debugger like as the <a href="http://www.vector.co.jp/soft/win95/prog/se046776.html">DBCon</a> by not using the Visual Studio, the debugging message of the application can be caught. <br>
+    
+    Tera Term prepares a wrapper function to support the variable argument.
   
 <pre class=code>
 void OutputDebugPrintf(char *fmt, ...) {
@@ -437,19 +437,20 @@ void OutputDebugPrintf(char *fmt, ...) {
 }
 </pre>
 
-<h3>memory leak</h3>
-  malloc()等による確保したヒープメモリの解放し忘れによる「メモリリーク」を、自動で検出するしくみが Visual Studio には用意されています。プログラムの起動時に、以下のコードを挿入するだけです。プログラムの終了時に、解放していないヒープメモリがあれば、 Visual Studio の「出力」ウィンドウにリストアップされます。
+<h3>Memory leak</h3>
+    The memory leak that the heap memory by using malloc() series forgets to free the memory can be automatically detected on the Visual Studio. Below code is inserted on program startup. When the heap memory not freed remains, the Visual Studio will list up the result into the output window of Visual Studio.
 
 <pre class=code>
 #ifdef _DEBUG
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 </pre>
-
-  なお、Windowsのように仮想記憶で動くアプリケーションプログラムに関しては、プログラムの終了時に解放されていないメモリが存在した場合、OSが面倒を見て、メモリが解放されるようになっています。
+    
+    So, an application program works on the virtual memory like as Windows. When the memory leak exists on terminating the program, the operation system frees the not freed memory.
 
 <hr>
 
+        <!--
 
 <h2><a name="thread">マルチスレッド</a></h2>
   Windowsのアプリケーションはマルチスレッドで設計されることがほとんどですが、Windows 3.1から95の時代ではあまり一般的ではありませんでした。そのため、元々Tera Termはマルチスレッド化されていません。ソースコードを見ると分かるように、グローバル変数が多用されているため、ほとんどの処理がスレッドセーフではありません。<br>
