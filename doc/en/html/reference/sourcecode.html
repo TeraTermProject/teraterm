@@ -21,8 +21,8 @@
   <li><a href="#plugin">Supporting Plug-in</a></li>
   <li><a href="#configuration">Read and Write Configuration File</a></li>
   <li><a href="#secure">Secure Programming</a></li>
+  <li><a href="#compatibility">Compatible with obsolete Windows</a></li>
 <!--
-  <li><a href="#compatibility">古いバージョンのWindowsとの互換性維持</a></li>
   <li><a href="#debug">デバッグ手法</a></li>
   <li><a href="#thread">マルチスレッド</a></li>
   <li><a href="#dde">DDEによるプロセス間通信</a></li>
@@ -301,8 +301,8 @@ static TTXExports Exports = {
 <h2><a name="secure">Secure Programming</a></h2>
 
 <h3>String Operation</h3>
-    A default account of Microsoft Windows has the Administrator privilege except the Windows Vista. When an application has a bug regarding the buffer overflow, the third party will illegally obtain the Administrator privilege. <br>
-    Traditionally, the string operation of C language will happen the buffer overflow problem. So, Microsoft devlops the enhanced string operation from Visual Studio 2005. <br>
+    A default account of Microsoft Windows has the Administrator privilege except the Windows Vista. When an application has a bug regarding the buffer overflow, the third-party will illegally obtain the Administrator privilege. <br>
+    Traditionally, the string operation of C language will happen the buffer overflow problem. So, Microsoft develops the enhanced string operation from Visual Studio 2005. <br>
   <br>
 
 <ul>
@@ -337,13 +337,13 @@ static TTXExports Exports = {
   <br>
   
     These functions cat not work well when the default locale is applied, Tera Term uses the _snprintf_s_l() function instead. <br>
-    Every function name has _s("secure") postfix, the function is visually recognised. Rightly, these functions are not compatible with the ANSI C specification. <br>
+    Every function name has _s("secure") postfix, the function is visually recognized. Rightly, these functions are not compatible with the ANSI C specification. <br>
   <br>
     Also, the Count argument(maximum number of chars to store) is specified to the "_TRUNCATE" macro. When the buffer overflow happens, the copied buffer forcibly truncates.
 <p>
     
     Example of using the strncpy_s() function is below shown. The second argument(numberOfElements) is specified with the buffer size <b>including the terminating null(\0)</b>.
-    The writting buffer has only three bytes, five bytes data specified by the third argument(strSource) truncates to two bytes. As a result, the buf[] stores the "he\0" string.
+    The writing buffer has only three bytes, five bytes data specified by the third argument(strSource) truncates to two bytes. As a result, the buf[] stores the "he\0" string.
 
 <pre class=code>
 char buf[3];
@@ -369,15 +369,13 @@ _snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
 
 <hr>
 
-    <!--
 
 
-<h2><a name="compatibility">古いバージョンのWindowsとの互換性維持</a></h2>
+<h2><a name="compatibility">Compatible with obsolete Windows</a></h2>
 
-<h3>ダイナミックローディング</h3>
-
-  Windowsのアプリケーションプログラムは、単一のバイナリファイルを変更することなく、新旧のバージョンのWindows上で起動できるようにするためには、アプリケーションプログラム側での工夫が必要です。<br>
-  たとえば、Windows2000で導入された SetLayeredWindowAttributes() APIを直接呼び出すと、WindowsNT4.0や98などではアプリケーションの起動に失敗するようになります。そのため、新しいAPIを呼び出すときは、LoadLibrary()を使って動的ロードするようにします。<br>
+<h3>Dynamic Loading</h3>
+    Microsoft Windows application can work well on every Windows version by using same executing program, however it is necessary to devise a way to make a programming.<br>
+    For example, when the SetLayeredWindowAttributes() API supported on Windows 2000 is directly called, the application can not execute on Windows NT4.0, 98 and so on. So, new API is called by using the LoadLibrary() for dynamic loading. <br>
 
 <pre class=code>
 static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
@@ -402,8 +400,9 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 	                                     bAlpha, dwFlags);
 }
 </pre>
+    However, it is too much like work to define a function prototype declaration manually. So, it eliminates complicated procedure by using DLL delay loading.
 
-  いちいち、手で関数プロトタイプを書いていくのは面倒である場合は、「DLLの遅延読み込み」というしくみを利用すると、上記のような手順は不要です。いきなり、関数を呼び出すことができます。ダイレクトに呼び出したい関数がある場合、それが古いWindowsではサポートされていないものであるならば、Visual Studioのプロジェクト設定で、「DLLの遅延読み込み」に該当するDLLを指定しておきます。
+        <!--
 
 
 <h3>Windows 95</h3>
