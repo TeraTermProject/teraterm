@@ -24,8 +24,8 @@
   <li><a href="#compatibility">Compatible with obsolete Windows</a></li>
   <li><a href="#debug">Debugging Method</a></li>
   <li><a href="#thread">Multithreading</a></li>
+  <li><a href="#dde">DDE Communication</a></li>
 <!--
-  <li><a href="#dde">DDEによるプロセス間通信</a></li>
   <li><a href="#ttssh">TTSSHによるSSHの設計と実装</a></li>
   <li><a href="#macro">マクロ言語の設計と実装</a></li>
   <li><a href="#caret">キャレット制御</a></li>
@@ -578,68 +578,68 @@ void TelStartKeepAliveThread() {
 
 <hr>
 
-        <!--
 
-<h2><a name="dde">DDEによるプロセス間通信</a></h2>
-  <h3>概要</h3>
-  DDE(Dynamic Data Exchange)の誕生は、1987年のWindows 2.0までに遡ります。DDEはプロセス間通信を行うためのしくみですが、現在ではレガシーな方式であり、ほとんどのアプリケーションでは利用されていません。Windowsにおけるプロセス間通信といえば、メールスロットや名前付きパイプ、OLEなどが定番です。<br>
-  かつては、DDEによるプロセス間の通信データをキャプチャすることができる「DDEスパイ」(DDESPY.EXE)というツールがVisual Studioに付属していましたが、現在のVisual Studioにはもはや含まれていません。<br>
-  DDEに関するリファレンスはMSDNライブラリから参照することができます。<br>
+<h2><a name="dde">DDE Communication</a></h2>
+  <h3>Overview</h3>
+The DDE(Dynamic Data Exchange) mechanism was born in 1987 of Windows 2.0. The DDE can communicate with process, however the DDE can hardly use now because the DDE is legacy method. The standard interprocess communications are the mailslot, namaed pipe and OLE. <br>
+The DDE spy tool(DDESPY.EXE) that can capture the communication data with the DDE mechanism was once attached in the Visual Studio, however the tool was not found now. <br>
+Please refer to the MSDN library for DDE details. <br>
 
 <p>
 <ul>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648711(VS.85).aspx">Dynamic Data Exchange（MSDNライブラリ）</a></li>
-  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648712(VS.85).aspx">Dynamic Data Exchange Management Library（MSDNライブラリ）</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648711(VS.85).aspx">Dynamic Data Exchange(MSDN library)</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/ms648712(VS.85).aspx">Dynamic Data Exchange Management Library(MSDN library)</a></li>
 </ul>
 </p>
 
-  DDEは、TCPによるネットワーク通信と似ており、サーバとクライアント間を一対一で接続し、通信を行います。アプリケーションがDDEによる通信を行うために、DDEML(Dynamic Data Exchange Management Library)と呼ばれるライブラリをWin32 APIとして提供されています。<br>
-  DDE通信を行うために、一方がサーバとなり、他方がクライアントになる必要があります。また、通信のセッションをシステム全体でユニークとするために、識別情報が必要です。TCP通信ではIPアドレスとポート番号が使われますが、DDE通信では「サービス名」と「トピック名」の組み合わせが使われます。Tera Termではサービス名は"TERATERM"という文字列が使われ、トピック名はTera Term本体のウィンドウハンドル(HVTWin)の16進数値を文字列化したものが使われています。<br>
-  このようなしくみになっているために、マクロスクリプトからまったく別のTera Termへコマンドを送ることはできません。<br>
+The DDE and TCP communication are similar because the protocol connects between a server and a client with peer-to-peer and communicates. The application can use the DDE communication by using the DDEL(Dynamic Data Exchange Management Library) library like as the Win32 API. <br>
+One process becomes the server and the other process becomes the client for the DDE communication. Also, the session identification needs to unique the communication session in the system. The TCP communication uses an IP address and a port number, however the DDE communication uses a service name and a topic name. On Tera Term's DDE communication, the service name uses the "TERATERM" string and the topic name uses the string formatted hexadecimal digits which is the window handle(HVTWin) of the Tera Term core. <br>
+A macro script can not send the command to quite another Tera Term. <br>
 
 <div align="center">
 <img src="image/dde.png" width=720 height=540>
 </div>
 
-  上図に示すように、Tera Term本体("ttermpro.exe")がDDEサーバとなり、マクロプログラム("ttpmacro.exe")がDDEクライアントとなります。DDEでは、やりとりするデータの塊のことを「トランザクション」と呼びます。トランザクションには以下に示すような何種類かがあります。タイプは"ddeml.h"でマクロ定義されています。<br>
+The Tera Term core("ttermpro.exe") becomes the DDE server and the macro program("ttpmacro.exe") becomes the DDE client on above figure. The DDE payload is called the transaction. The transaction has below some types. The type is defined as macro in the "ddeml.h" file. <br>
 
 <p>
 <table border=1 align=center>
 <tr>
-  <th>タイプ</th>
-  <th>意味</th>
+  <th>Type</th>
+  <th>Description</th>
 </tr>
 
 <tr>
   <td>XTYP_ADVREQ</td>
-  <td>DDEサーバがクライアントへデータを送るために、DDEサーバが自分自身に送るメッセージ。</td>
+  <td>The DDE server sends this message to own in order to send the message from the DDE server to client. </td>
 </tr>
 
 <tr>
   <td>XTYP_POKE</td>
-  <td>DDEクライアントからサーバへデータを送る。</td>
+  <td>The DDE client sends the data to the DDE server.</td>
 </tr>
 
 <tr>
   <td>XTYP_ADVSTART</td>
-  <td>DDEサーバに対してアドバイズループの開始を指示する。</td>
+  <td>The advise loop starts on the DDE server.</td>
 </tr>
 
 <tr>
   <td>XTYP_ADVDATA</td>
-  <td>DDEクライアントにデータを定期的に送る。</td>
+  <td>This message periodically sends the data to the DDE client.</td>
 </tr>
 
 <tr>
   <td>XTYP_EXECUTE</td>
-  <td>DDEサーバに文字列を送り、何らかの処理をサーバに指示する。</td>
+  <td>This message sends a string to the DDE server for specifying the server.</td>
 </tr>
 
 </table>
 </p>
 
-  DDE通信の特徴として、アドバイズループ(advise loop)という概念があります。DDEサーバがアドバイズループに入ると、クライアントはサーバから定期的にデータを受け取り続けることができます。Tera Termでは、リモートホストからの受信データを、マクロプログラムへ渡すために、アドバイズループが使われています。<br>
+The DDE communication has as a feature regarding the advise loop. When the DDE server enters the advise loop, the client can periodically receive the data. So, Tera Term uses the advise loop because the received data from the remote host is sent to the macro program. <br>
 
+<!--
   <h3>ライブラリ</h3>
   Tera Termで使われているDDEMLについて、以下に示します。
   
@@ -762,7 +762,9 @@ void TelStartKeepAliveThread() {
   
   なお、Tera Term本体において、DDE通信用のバッファと、ログ採取用のバッファは cv.LogBuf[] で共有されています。バッファの先頭とデータサイズを表すインデックスは、DDE通信の場合は"DStart"と"Dcount"、ログ採取の場合は"LStart"と"Lcount"と区別されています。実際には、1つのバッファを共有しているわけなので、それぞれのインデックスが食い違うと、誤動作する原因となるため、常に同期を取っておくことになります。<br>
 <hr>
+-->
 
+        <!--
 
 <h2><a name="ttssh">TTSSHによるSSHの設計と実装</a></h2>
   <h3>概要</h3>
