@@ -639,66 +639,65 @@ The Tera Term core("ttermpro.exe") becomes the DDE server and the macro program(
 
 The DDE communication has as a feature regarding the advise loop. When the DDE server enters the advise loop, the client can periodically receive the data. So, Tera Term uses the advise loop because the received data from the remote host is sent to the macro program. <br>
 
-<!--
-  <h3>ライブラリ</h3>
-  Tera Termで使われているDDEMLについて、以下に示します。
+  <h3>Library</h3>
+The DDEML that is used on Tera Term is described as follows.
   
   
 <p>
 <table border=1 align=center>
 <tr>
-  <th>関数名</th>
-  <th>機能</th>
+  <th>Function</th>
+  <th>Description</th>
 </tr>
 
 <tr>
   <td>DdeInitialize</td>
-  <td>DDEを初期化し、コールバック関数を登録する。初期化できるとインスタンスを返す。</td>
+  <td>This function initialized the DDE and registers the callback function. If the function succeeds, the instance returns.</td>
 </tr>
 
 <tr>
   <td>DdeCreateStringHandle</td>
-  <td>文字列リテラルからハンドルを作成する。ハンドルはサーバとクライアントの通信用に使われる。</td>
+  <td>This function creates a handle from  a string. The handle is used for communications the server and client. </td>
 </tr>
 
 <tr>
   <td>DdeNameService</td>
-  <td>インスタンスとサービス名("TERATERM")をサーバに登録する。登録後、XTYP_REGISTERトランザクションがクライアントへ送られる。登録解除する際にも使われる。</td>
+  <td>This function registers the instance and the service name("TERATERM") on the DDE server. If the registration succeeds, the XTYP_REGISTER transaction is send to the DDE client. Also, this function uses for unregistration. </td>
 </tr>
 
 <tr>
   <td>DdeCmpStringHandles</td>
-  <td>2つの文字列ハンドルを比較する。</td>
+  <td>This function compares two string handles.</td>
 </tr>
 
 <tr>
   <td>DdeClientTransaction</td>
-  <td>クライアントからサーバへトランザクションを送ることができる。トランザクションタイプとして、XTYP_REQUEST・XTYP_EXECUTE・XTYP_ADVSTART・XTYP_POKEなどが指定できる。サーバからのACKを待つまでのタイムアウト時間を指定することができ、Tera Termではほとんど"1000ミリ秒（1秒）"が指定されている。ただし、ACKを確認するケースにおいては"5000ミリ秒（5秒）"が指定されている。</td>
+  <td>This function sends a transaction from client to server. The type of transactions can be specified with the XTYP_REQUEST, XTYP_EXECUTE, XTYP_ADVSTART, XTYP_POKE and so on. A timeout value that can wait until a server's ACK, and the value is almost specified with the 1000 milliseconds(1 second). However, the 5000 milliseconds(5 seconds) is specified when the Tera Term confirms the ACK. </td>   
 </tr>
 
 <tr>
   <td>DdeAccessData</td>
-  <td>DDEハンドルから実際のデータへのポインタを取得する。データの取り出しが終わったら、DdeUnaccessData()を呼び出すこと。</td>
+  <td>This function retrieves a point of data from the DDE handle. If the pointer is not required, the DdeUnaccessData() must be called. </td>
 </tr>
 
 <tr>
   <td>DdeCreateDataHandle</td>
-  <td>DDEオブジェクトを作成し、ハンドルを返す。DDEサーバのアドバイズループや、XTYP_REQUESTトランザクション受信時に、DDEクライアントへデータを送るために使われている。</td>
+  <td>This function creates the DDE object and returns the handle. The handle is used for the DDE server's advise loop, also sending a data to the DDE client when the XTYP_REQUEST transaction is received. </td>
 </tr>
 
 <tr>
   <td>DdeGetData</td>
-  <td>DDEオブジェクトからバッファへコピーする。</td>
+  <td>This function copies from the DDE object to th buffer.</td>
 </tr>
 
 <tr>
   <td>DdeDisconnect</td>
-  <td>DDE通信を終了する</td>
+  <td>This function terminates the DDE communication.</td>
 </tr>
 
 <tr>
   <td>DdePostAdvise</td>
-  <td>DDEサーバ側で使われる関数で、自分自身に XTYP_ADVREQ トランザクションを送る。</td>
+  <td>This function uses at the DDE server and sends the XTYP_ADVREQ transaction to own. </td>
 </tr>
 
 </table>
@@ -706,10 +705,10 @@ The DDE communication has as a feature regarding the advise loop. When the DDE s
 
 
 
-  <h3>実装</h3>
-  DDEサーバ側の実装について見ていきます。Tera Term本体("ttermpro.exe")がDDEサーバとなり、かならずDDEサーバから起動されます。マクロプログラム("ttpmacro.exe")から直接マクロスクリプトが実行されるケースにおいても、"connect"マクロによりDDE接続をしないと、通信が開始できません。<br>
-  Tera TermのControlメニューからMacroを呼び出した場合、RunMacro()#ttdde.c がコールされます。<br>
-  HVTWinウィンドウハンドルからトピック名（8バイト）を作成し、DDEの初期化とサーバの登録を行います。また、このタイミングでDDEバッファ（1KB）を作成しています。その後、"ttpmacro.exe"を /D= オプションでトピック名を渡しつつ、起動をします。<br>
+  <h3>Implementation</h3>
+The DDE server implementation are described in this chapter. The Tera Term core("ttermpro.exe") becomes the DDE server, so the DDE server is launched at first. When the macro program("ttpmacro.exe") is directly called the macro script, the DDE communication can not start until the DDE connects by using the "connect" macro command. <br>
+When the Macro menu is called under the Control menu in Tera Term, the RunMacro()#ttdde.c is called. <br>
+A topic name(8 bytes) is created from the HVTWin window handle, and the DDE is initialized and the server is registered. Also, the DDE buffer(1KB) is created at this timing. At last, the "ttpmacro.exe" with /D option is passed the topic name and launched. <br>
   
 <pre class=code>
 	SetTopic();
@@ -717,6 +716,8 @@ The DDE communication has as a feature regarding the advise loop. When the DDE s
 	strncpy_s(Cmnd, sizeof(Cmnd),"TTPMACRO /D=", _TRUNCATE);
 	strncat_s(Cmnd,sizeof(Cmnd),TopicName,_TRUNCATE);
 </pre>
+
+<!--
 
   DDEサーバに、DDEクライアントからトランザクションが送られてきたときは、DdeCallbackProcコールバック関数が呼び出されます。コールバック関数は、DdeInitialize()でDDEの初期化を行うときに登録されます。<br><br>
   
