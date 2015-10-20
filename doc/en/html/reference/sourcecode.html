@@ -717,12 +717,10 @@ A topic name(8 bytes) is created from the HVTWin window handle, and the DDE is i
 	strncat_s(Cmnd,sizeof(Cmnd),TopicName,_TRUNCATE);
 </pre>
 
-<!--
+When the transaction is sent to th DDE sever from the DDE client, the DdeCallbackProc callback function executes. The callback function is registered when the DDE is initialized by the DdeInitialize(). <br><br>
 
-  DDEサーバに、DDEクライアントからトランザクションが送られてきたときは、DdeCallbackProcコールバック関数が呼び出されます。コールバック関数は、DdeInitialize()でDDEの初期化を行うときに登録されます。<br><br>
-  
-  次に、DDEクライアントについて見てみましょう。マクロプログラムの起動時、InitDDE()#ttmdde.c が呼び出され、DDEクライアントとして初期化が行われます。DDEの初期化は、DdeInitialize()で行われ、同時にDdeCallbackProcコールバック関数が登録されます。DDEサーバから届いたトランザクションは、コールバック関数で処理されます。<br>
-  DDE通信を始めるためには、DdeConnect()を呼び出し、サーバと接続する必要があります。次に、"ttpmacro.exe"のウィンドウハンドル(HWin)をサーバへ通知するために、XTYP_EXECUTEトランザクションで送ります。最後に、XTYP_ADVSTARTトランザクションをサーバへ送り、アドバイズループを開始します。<br>
+Next, please see the DDE client implementation. The InitDDE()#ttmdde.c is called on the macro program startup, and the DDE client is initialized. The DdeInitialize() initializes the DDE and registers the DdeCallbackProc callback function. The transaction which is sent from the DDE server is processed in the callback. <br>
+When the DDE communication starts, the DdeConnect() must be called and connect to the DDE server. Next, the XTYP_EXECUTE transaction sends to notify the window handle(HWin) of the "ttpmacro.exe". Finally, the XTYP_ADVSTART transaction sends to the server and starts the advise loop. <br>
 
 <pre class=code>
   ConvH = DdeConnect(Inst, Service, Topic, NULL);
@@ -743,12 +741,14 @@ A topic name(8 bytes) is created from the HVTWin window handle, and the DDE is i
 </pre>
 
 
-  <h3>バッファの管理</h3>
-  マクロプログラムでは"wait"コマンド等で、リモートホストから送られてきたデータを監視するための機能が用意されています。この機能を実現するためには、Tera Term本体とマクロプログラムのそれぞれにおいて、バッファを用意する必要があり、プロセス間通信（DDEトランザクション）により、Tera Term本体からマクロプログラムへリモートホストからの受信データを送らなければなりません。<br>
+  <h3>Buffer Management</h3>
+The macro program can snoop the data which is sent from the remote host by using "wait" like commands. Regarding this feature, both the Tera Term core and the macro program prepares the buffer, and the Tera Term core sends the received data from the remote host to the macro program by using the DDE communication(DDE transaction). <br>
 
 <div align="center">
 <img src="image/dde_flowcontrol.png" width=720 height=540>
 </div>
+
+<!--
 
   まず、Tera Term本体におけるリモートホストからのTCPパケット受信は、アイドルループ OnIdle()#teraterm.cpp にて行われます。OnIdle()から呼び出される CommReceive()#commlib.c において、TCPパケットデータをバッファ(cv->InBuff[])に格納します。このバッファは 1KB の大きさを持ちます。また、リングバッファではないため、バッファフルになった場合は、TCPパケットの受信をしません。ただし、バッファフル状態が長く続くと、Windowsカーネル内にTCPパケットが溜まっていき、いずれはリモートホストからのパケットを受信できなくなる可能性があります。<br>
   エスケープシーケンスの解析処理を行う過程で、「ログ採取」か「マクロ実行」を行っている場合は、LogPut1()が呼び出され、DDEバッファ(cv.LogBuf[])へ受信データが格納されます。すなわち、ログ採取とマクロ実行におけるバッファは共通です。このバッファは1KBの大きさを持つリングバッファであり、バッファフルになった場合は、最古のデータから上書きされてゆきます。<br>
