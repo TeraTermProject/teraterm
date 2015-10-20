@@ -50,6 +50,7 @@ See LICENSE.TXT for the license.
 #include <malloc.h> /* prevent of conflict stdlib.h */
 #endif /* NO_INET6 */
 #include <stdlib.h>
+#include <stdarg.h>
 #include <crtdbg.h>
 
 #include "i18n.h"
@@ -329,6 +330,7 @@ void notify_closed_connection(PTInstVar pvar, char FAR * send_msg);
 void notify_nonfatal_error(PTInstVar pvar, char FAR * msg);
 void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect);
 void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level);
+void logprintf(PTInstVar pvar, int level, char *fmt, ...);
 
 void get_teraterm_dir_relative_name(char FAR * buf, int bufsize, char FAR * basename);
 int copy_teraterm_dir_relative_path(char FAR * dest, int destsize, char FAR * basename);
