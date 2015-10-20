@@ -51,7 +51,7 @@ int is_numeric_hostname(const char *hostname)
 	return 0;
 }
 
-int verify_hostkey_dns(char FAR *hostname, Key *key)
+int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key)
 {
 	DNS_STATUS status;
 	PDNS_RECORD rec, p;
@@ -86,6 +86,7 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	default: // Un-supported algorithm
 		hostkey_alg = SSHFP_KEY_RESERVED;
 	}
+	logprintf(pvar, LOG_LEVEL_VERBOSE, "verify_hostkey_dns: key type = %d, SSHFP type = %d", key->type, hostkey_alg);
 
 	status = DnsQuery(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
 
@@ -93,17 +94,29 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 		for (p=rec; p!=NULL; p=p->pNext) {
 			if (p->wType == DNS_TYPE_SSHFP) {
 				t = (PDNS_SSHFP_DATA)&(p->Data.Null);
-				if (t->Algorithm == SSHFP_KEY_RESERVED)
+				logprintf(pvar, LOG_LEVEL_VERBOSE,
+				          "verify_hostkey_dns: SSHFP RR: Algorithm = %d, Digest type = %d",
+				          t->Algorithm, t->DigestType);
+				if (t->Algorithm == SSHFP_KEY_RESERVED) {
+					notify_verbose_message(pvar, "verify_hostkey_dns: Invalid key algorithm (SSHFP_KEY_RESERVED)", LOG_LEVEL_WARNING);
 					continue; // skip invalid record
+				}
 				if (t->Algorithm == hostkey_alg) {
 					if (hostkey_digest == NULL || t->DigestType != hostkey_dtype) {
 						switch (t->DigestType) {
 						case SSHFP_HASH_SHA1:
-							if (hostkey_alg != SSHFP_KEY_RSA && hostkey_alg != SSHFP_KEY_DSA)
+							if (hostkey_alg != SSHFP_KEY_RSA && hostkey_alg != SSHFP_KEY_DSA) {
 								// SHA1 does not allowed to use with ECDSA and ED25519 key
+								logprintf(pvar, LOG_LEVEL_VERBOSE,
+								          "verify_hostkey_dns: not allowed digest type. "
+								          "Algorithm = %d, Digest type = %d",
+								          t->Algorithm,
+									  t->DigestType);
 								fp_type = -1;
-							else
+							}
+							else {
 								fp_type = SSH_FP_SHA1;
+							}
 							break;
 						case SSHFP_HASH_SHA256:
 							fp_type = SSH_FP_SHA256;
@@ -123,8 +136,10 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 					}
 					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
 						found = DNS_VERIFY_MATCH;
+						notify_verbose_message(pvar, "verify_hostkey_dns: key matched", LOG_LEVEL_INFO);
 					}
 					else {
+						notify_verbose_message(pvar, "verify_hostkey_dns: key mismatched", LOG_LEVEL_WARNING);
 						found = DNS_VERIFY_MISMATCH;
 						break;
 					}
@@ -134,8 +149,14 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 						found = DNS_VERIFY_DIFFERENTTYPE;
 				}
 			}
+			else {
+				logprintf(pvar, LOG_LEVEL_VERBOSE, "verify_hostkey_dns: not SSHFP RR (%d)", p->wType);
+			}
 		}
 		DnsRecordListFree(rec, DnsFreeRecordList);
+	}
+	else {
+		notify_verbose_message(pvar, "verify_hostkey_dns: DnsQuery failed.", LOG_LEVEL_VERBOSE);
 	}
 
 	free(hostkey_digest);
