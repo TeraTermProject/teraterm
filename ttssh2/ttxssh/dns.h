@@ -32,16 +32,17 @@ OF SUCH DAMAGE.
 #define DNS_TYPE_SSHFP	44
 
 enum sshfp_types {
-        SSHFP_KEY_RESERVED,
-        SSHFP_KEY_RSA,
-        SSHFP_KEY_DSA,
-        SSHFP_KEY_ECDSA
+        SSHFP_KEY_RESERVED = 0,  // RFC4255
+        SSHFP_KEY_RSA = 1,       // RFC4255
+        SSHFP_KEY_DSA = 2,       // RFC4255
+        SSHFP_KEY_ECDSA = 3,     // RFC6594
+        SSHFP_KEY_ED25519 = 4    // RFC7479
 };
 
 enum sshfp_hashes {
-        SSHFP_HASH_RESERVED,
-        SSHFP_HASH_SHA1,
-        SSHFP_HASH_SHA256
+        SSHFP_HASH_RESERVED = 0, // RFC4255
+        SSHFP_HASH_SHA1 = 1,     // RFC4255
+        SSHFP_HASH_SHA256 = 2    // RFC6594
 };
 
 enum verifydns_result {

@@ -80,6 +80,9 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 	case KEY_ECDSA521:
 		hostkey_alg = SSHFP_KEY_ECDSA;
 		break;
+	case KEY_ED25519:
+		hostkey_alg = SSHFP_KEY_ED25519;
+		break;
 	default: // Un-supported algorithm
 		hostkey_alg = SSHFP_KEY_RESERVED;
 	}
@@ -97,7 +100,8 @@ int verify_hostkey_dns(char FAR *hostname, Key *key)
 						switch (t->DigestType) {
 						case SSHFP_HASH_SHA1:
 							if (hostkey_alg != SSHFP_KEY_RSA && hostkey_alg != SSHFP_KEY_DSA)
-								fp_type = -1; // SHA1 does not allowed to use with ECDSA key
+								// SHA1 does not allowed to use with ECDSA and ED25519 key
+								fp_type = -1;
 							else
 								fp_type = SSH_FP_SHA1;
 							break;
