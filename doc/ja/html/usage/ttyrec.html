@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>端末画面レコーダー/プレイヤー</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>端末画面レコーダー/プレイヤー</h1>
+
+<p>端末画面の表示を録画/再生する</p>
+
+<h2>機能</h2>
+
+<p>
+TTXttyrec は、端末の画面表示を録画しファイルに保存します。
+ファイルメニューの TTY Record を選択すると保存ダイアログが出るので、ファイルを指定すると録画が始まります。
+再度 TTY Record を選択すると録画を終了します。
+</p>
+
+<p>
+このバージョンでは、TCP 接続以外にシリアル接続の録画にも対応しています。
+ただし、シリアル接続を録画するためには Tera Term 4.60 以降が必要です。
+4.60 以前でもこのプラグインは使えますが、TCP 接続のみ対応となります。
+その場合、シリアル接続時に録画を行ってもなにも記録されません。
+</p>
+
+<p>
+TTXttyplay は、TTXttyrec で保存されたデータを再生します。
+ファイルメニューの TTY Replay を選択するとファイル選択ダイアログが出るので、録画したデータを選択すると再生が始まります。
+TTXttyplay を使用するには、Tera Term 4.60 以降が必要です。
+</p>
+
+<p>
+データ形式は <a href="http://0xcc.net/ttyrec/">ttyrec</a> と同じですので、TTXttyrec で録画したデータを ttyplay で再生したり、ttyrec で録画したデータを TTXttyplay で再生する事も可能です。
+</p>
+
+<h2>解説</h2>
+
+<p>
+TCP 接続の通信内容をフックするサンプルプラグインです。
+Precvを フックして、現在の時刻情報と受信データを ttyrec の形式でファイルに書き込んでいるだけです。
+シリアル接続の録画は、Tera Term 4.60 で追加されたシリアル接続のフックを利用しています。
+</p>
+
+<p>
+TTXttyplay は、Tera Term 4.60 で追加されたログ再生のフックを利用しています。
+ログ再生時には通常は順次データを読み込む所を、ERROR_IO_PENDING を返す事によってウェイトを入れています。
+</p>
+
+<p>
+Windowsには gettimeofday() がないので、関数を書き起こしています。
+</p>
+
+<h2>バグ</h2>
+
+<ul>
+  <li>時間精度はあまりよくありません。</li>
+</ul>
+
+</body>
+</html>
