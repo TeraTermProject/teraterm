@@ -748,22 +748,23 @@ The macro program can snoop the data which is sent from the remote host by using
 <img src="image/dde_flowcontrol.png" width=720 height=540>
 </div>
 
-<!--
+First, the Tera Term core which receives the TCP packet from the remote host is implemented at the OnIdle()#teraterm.cpp file. The CommReceive()#commlib.c which is called from the OnIdle() stores the TCP packet data into the buffer(cv->InBuff[]). This buffer size is 1KB. Also, when the buffer is full, the TCP packet does not store to the buffer because the buffer is not ring buffer. However, when the buffer full state continues for a long time, the TCP packet will gather at the Windows internal kernel and the Tera Term will not receive the data from the remote host. <br>
 
-  まず、Tera Term本体におけるリモートホストからのTCPパケット受信は、アイドルループ OnIdle()#teraterm.cpp にて行われます。OnIdle()から呼び出される CommReceive()#commlib.c において、TCPパケットデータをバッファ(cv->InBuff[])に格納します。このバッファは 1KB の大きさを持ちます。また、リングバッファではないため、バッファフルになった場合は、TCPパケットの受信をしません。ただし、バッファフル状態が長く続くと、Windowsカーネル内にTCPパケットが溜まっていき、いずれはリモートホストからのパケットを受信できなくなる可能性があります。<br>
-  エスケープシーケンスの解析処理を行う過程で、「ログ採取」か「マクロ実行」を行っている場合は、LogPut1()が呼び出され、DDEバッファ(cv.LogBuf[])へ受信データが格納されます。すなわち、ログ採取とマクロ実行におけるバッファは共通です。このバッファは1KBの大きさを持つリングバッファであり、バッファフルになった場合は、最古のデータから上書きされてゆきます。<br>
-  なお、バイナリモードでログ採取においては、cv.BinBuf[] という別のバッファへデータが格納されますので、DDEバッファとは別物です。言い換えると、バイナリモードにおけるデータをDDE通信させることはできないということです。単純な"wait"コマンドでは、バイナリデータ（制御コードなど）を待つことはできません。<br>
-  Tera Term本体のDDEバッファのデータは、エスケープシーケンスの解析処理が完了後、DDEAdv()#ttdde.c がすぐに呼び出され、自分自身（DDEサーバ）へ XTYP_ADVREQ トランザクションを送ります。XTYP_ADVREQを受け取ったら、DDEコールバック関数 DdeCallbackProc() が呼び出され、マクロプログラムへのデータ送信を行います。ここでアドバイズループが使われています。<br>
+When the log is retrieving and the macro is executing in analyzing the escape sequence process, the LogPut1() stores the received data to the DDE buffer(cv.LogBuf[]). In other words, the logging and the macro executing are common buffer. The buffer size is 1KB and ring buffer, so the oldest data is overwritten when the buffer is full. <br>
+
+Also, when the logging is enabled by the binary mode, the data is stored into the other cv.BinBuf[]. In other words, the data of the binary mode can not communicate with the DDE mechanism. So, the binary data can not wait by using the "wait" series command. <br>
+
+When the escape sequence finishes analyzing, the DDEAdv()#ttdde.c is called soon and the XTYP_ADVREQ transaction is sent to own(DDE server). When the XTYP_ADVREQ transaction is received, the DdeCallbackProc() is called and the DDE buffer of the Tera Term core are sent to the macro program. The advise loop is used in here. <br>
 
 <div align="center">
 <img src="image/dde_buffer.png" width=720 height=540>
 </div>
 
-  アドバイズループによりDDEサーバよりデータが送られてくると、DDEクライアントであるマクロプログラムにおいては、XTYP_ADVDATAトランザクションがDDEコールバック関数 DdeCallbackProc()#ttmdde.c により処理されます。<br>
+The data is received from the DDE server at the advise loop and the XTYP_ADVDATA transaction is processed at the DdeCallbackProc()#ttmdde.c of the macro program as the DDE client. <br>
+
+Also, the DDE communication buffer and the log buffer are shared in the cv.LogBuf[] on the Tera Term core. The buffer head and size index are "DStart" and "Dcount" in case of the DDE communication, "LStart" and "Lcount" in case of the logging. Actually, if each index is differ, the program will not work well, so the two indexes must always synchronize. <br>
   
-  なお、Tera Term本体において、DDE通信用のバッファと、ログ採取用のバッファは cv.LogBuf[] で共有されています。バッファの先頭とデータサイズを表すインデックスは、DDE通信の場合は"DStart"と"Dcount"、ログ採取の場合は"LStart"と"Lcount"と区別されています。実際には、1つのバッファを共有しているわけなので、それぞれのインデックスが食い違うと、誤動作する原因となるため、常に同期を取っておくことになります。<br>
 <hr>
--->
 
         <!--
 
@@ -1253,8 +1254,10 @@ void CaretKillFocus(BOOL show)
 <hr>
 
 
-<h2><a name="serial">シリアルポート</a></h2>
-  <h3>概要</h3>
+<h2><a name="serial">Serial Port</a></h2>
+  <h3>Overview</h3>
+Tera Term supports the UART(16550A) compatible serial port. The serial port is also called the COM(Communication Port). The COM port that is detected by the operation system are named for the "COM1", "COM2" and so on. The 
+
   Tera TermはUART(16550A)互換のシリアルポートに対応しているため、シリアルコンソールが使用できます。シリアルポートのことを、COM(Communication Port)ポートと呼ぶこともあります。OSが検出したCOMポートは、順に"COM1"、"COM2"といった名前が付けられ、アプリケーションから利用することができます。Microsoft Windows XPでは、最大256個のCOMポート（COM1～COM256）までが利用可能です。<br>
   パソコンに搭載されるCOMポートは、せいぜい1つ、多くても2つであり、最近ではまったくCOMポートがないパソコンも存在します。そのため、USB接続によるシリアルポートを実現する「USBシリアル変換ケーブル」が発売されています。こういった製品の特徴として、OSに認識させるCOMポートの番号を、ユーザが自由に設定できるようになっています。すなわち、Tera Term見えには、2つのCOMポートがあった場合、それぞれ"COM1"、"COM2"として認識できるとは限らず、"COM1"、"COM7"といったふうに認識できるようになる必要があります。<br>
   
