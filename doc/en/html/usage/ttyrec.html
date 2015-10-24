@@ -3,65 +3,62 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" cntent="text/html; charset=iso-8859-1">
-<title>TTY Recorder <!-- ’[––‰æ–ÊƒŒƒR[ƒ_[/ƒvƒŒƒCƒ„[ --></title>
+<title>TTY Recorder and Player</title>
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
 
-<!--
-<h1>’[––‰æ–ÊƒŒƒR[ƒ_[/ƒvƒŒƒCƒ„[</h1>
+<h1>TTY Recorder and Player</h1>
 
-<p>’[––‰æ–Ê‚Ì•\Ž¦‚ð˜^‰æ/Ä¶‚·‚é</p>
+<p>Terminal screen buffer is recorded and replayed.</p>
 
-<h2>‹@”\</h2>
+<h2>Feature</h2>
 
 <p>
-TTXttyrec ‚ÍA’[––‚Ì‰æ–Ê•\Ž¦‚ð˜^‰æ‚µƒtƒ@ƒCƒ‹‚É•Û‘¶‚µ‚Ü‚·B
-ƒtƒ@ƒCƒ‹ƒƒjƒ…[‚Ì TTY Record ‚ð‘I‘ð‚·‚é‚Æ•Û‘¶ƒ_ƒCƒAƒƒO‚ªo‚é‚Ì‚ÅAƒtƒ@ƒCƒ‹‚ðŽw’è‚·‚é‚Æ˜^‰æ‚ªŽn‚Ü‚è‚Ü‚·B
-Ä“x TTY Record ‚ð‘I‘ð‚·‚é‚Æ˜^‰æ‚ðI—¹‚µ‚Ü‚·B
+    The TTXttyrec plug-in records the screen buffer as a binary file.
+    Select the TTY Record under File menu and the saving dialog is shown. Specify a file on the dialog and the recording will start.
+    Again, select the TTY Record entry and the recording will stop.
 </p>
 
 <p>
-‚±‚Ìƒo[ƒWƒ‡ƒ“‚Å‚ÍATCP Ú‘±ˆÈŠO‚ÉƒVƒŠƒAƒ‹Ú‘±‚Ì˜^‰æ‚É‚à‘Î‰ž‚µ‚Ä‚¢‚Ü‚·B
-‚½‚¾‚µAƒVƒŠƒAƒ‹Ú‘±‚ð˜^‰æ‚·‚é‚½‚ß‚É‚Í Tera Term 4.60 ˆÈ~‚ª•K—v‚Å‚·B
-4.60 ˆÈ‘O‚Å‚à‚±‚Ìƒvƒ‰ƒOƒCƒ“‚ÍŽg‚¦‚Ü‚·‚ªATCP Ú‘±‚Ì‚Ý‘Î‰ž‚Æ‚È‚è‚Ü‚·B
-‚»‚Ìê‡AƒVƒŠƒAƒ‹Ú‘±Žž‚É˜^‰æ‚ðs‚Á‚Ä‚à‚È‚É‚à‹L˜^‚³‚ê‚Ü‚¹‚ñB
+    This plug-in supports for recording the serial console.
+    However, the Tera Term 4.60 or later needs to do it.
+    So, the Tera Term before 4.60 supports this plug-in and only TCP connection. 
 </p>
 
 <p>
-TTXttyplay ‚ÍATTXttyrec ‚Å•Û‘¶‚³‚ê‚½ƒf[ƒ^‚ðÄ¶‚µ‚Ü‚·B
-ƒtƒ@ƒCƒ‹ƒƒjƒ…[‚Ì TTY Replay ‚ð‘I‘ð‚·‚é‚Æƒtƒ@ƒCƒ‹‘I‘ðƒ_ƒCƒAƒƒO‚ªo‚é‚Ì‚ÅA˜^‰æ‚µ‚½ƒf[ƒ^‚ð‘I‘ð‚·‚é‚ÆÄ¶‚ªŽn‚Ü‚è‚Ü‚·B
-TTXttyplay ‚ðŽg—p‚·‚é‚É‚ÍATera Term 4.60 ˆÈ~‚ª•K—v‚Å‚·B
+    The TTXttyplay plug-in replays the data recorded by the TTXttyrec plug-in.
+    Select the TTY Replay under File menu and the opening dialog is shown. Sepcify a recorded file and the recorded data wil replay.
+    The Tera Term 4.60 or later needs to use the TTXttyplay plug-in.
 </p>
 
 <p>
-ƒf[ƒ^Œ`Ž®‚Í <a href="http://0xcc.net/ttyrec/">ttyrec</a> ‚Æ“¯‚¶‚Å‚·‚Ì‚ÅATTXttyrec ‚Å˜^‰æ‚µ‚½ƒf[ƒ^‚ð ttyplay ‚ÅÄ¶‚µ‚½‚èAttyrec ‚Å˜^‰æ‚µ‚½ƒf[ƒ^‚ð TTXttyplay ‚ÅÄ¶‚·‚éŽ–‚à‰Â”\‚Å‚·B
+    The data format is same as the the <a href="http://0xcc.net/ttyrec/index.html.en">ttyrec</a>. The data recorded by the TTXttyrec plug-in can replay by using the ttyplay command. The data recorded by the ttyrec command can replay by using the TTXttyplay plug-in.
 </p>
 
-<h2>‰ðà</h2>
+<h2>Description</h2>
 
 <p>
-TCP Ú‘±‚Ì’ÊM“à—e‚ðƒtƒbƒN‚·‚éƒTƒ“ƒvƒ‹ƒvƒ‰ƒOƒCƒ“‚Å‚·B
-Precv‚ð ƒtƒbƒN‚µ‚ÄAŒ»Ý‚ÌŽžî•ñ‚ÆŽóMƒf[ƒ^‚ð ttyrec ‚ÌŒ`Ž®‚Åƒtƒ@ƒCƒ‹‚É‘‚«ž‚ñ‚Å‚¢‚é‚¾‚¯‚Å‚·B
-ƒVƒŠƒAƒ‹Ú‘±‚Ì˜^‰æ‚ÍATera Term 4.60 ‚Å’Ç‰Á‚³‚ê‚½ƒVƒŠƒAƒ‹Ú‘±‚ÌƒtƒbƒN‚ð—˜—p‚µ‚Ä‚¢‚Ü‚·B
-</p>
-
-<p>
-TTXttyplay ‚ÍATera Term 4.60 ‚Å’Ç‰Á‚³‚ê‚½ƒƒOÄ¶‚ÌƒtƒbƒN‚ð—˜—p‚µ‚Ä‚¢‚Ü‚·B
-ƒƒOÄ¶Žž‚É‚Í’Êí‚Í‡ŽŸƒf[ƒ^‚ð“Ç‚Ýž‚ÞŠ‚ðAERROR_IO_PENDING ‚ð•Ô‚·Ž–‚É‚æ‚Á‚ÄƒEƒFƒCƒg‚ð“ü‚ê‚Ä‚¢‚Ü‚·B
+    This is a sample plug-in which can hook the communication of TCP connection.
+    The Precv is hooked, the current timestamp and the received data are saved to a file as the ttyrec format.
+    The serial console uses the hook mechanism of the serial connection at the Tera Term 4.60.
 </p>
 
 <p>
-Windows‚É‚Í gettimeofday() ‚ª‚È‚¢‚Ì‚ÅAŠÖ”‚ð‘‚«‹N‚±‚µ‚Ä‚¢‚Ü‚·B
+    The TTXttyplay plug-in uses the hook mechanism of the log replaying at the Tera Term 4.60.
+    When the log is replayed, the wait time is inserted into the sequential reading by returning the ERROR_IO_PENDING.
 </p>
 
-<h2>ƒoƒO</h2>
+<p>
+    The function is implemented because the gettimeofday() not exist on the Windows.
+</p>
+
+<h2>Bug</h2>
 
 <ul>
-  <li>ŽžŠÔ¸“x‚Í‚ ‚Ü‚è‚æ‚­‚ ‚è‚Ü‚¹‚ñB</li>
+  <li>The accuracy in a delay time is not good.</li>
 </ul>
--->
 
 </body>
 </html>
