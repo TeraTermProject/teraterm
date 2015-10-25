@@ -1259,15 +1259,13 @@ void CaretKillFocus(BOOL show)
 
 
 <h2><a name="serial">Serial Port</a></h2>
-<!--
   <h3>Overview</h3>
-Tera Term supports the UART(16550A) compatible serial port. The serial port is also called the COM(Communication Port). The COM port that is detected by the operation system are named for the "COM1", "COM2" and so on. The 
+Tera Term supports the UART(16550A) compatible serial port. The serial port is also called the COM(Communication Port). The COM port that is detected by the operation system are named for the "COM1", "COM2" and so on. At most 256 COM ports(COM1 - 256) can be available on the Microsoft Windows XP. <br>
 
-  Tera TermはUART(16550A)互換のシリアルポートに対応しているため、シリアルコンソールが使用できます。シリアルポートのことを、COM(Communication Port)ポートと呼ぶこともあります。OSが検出したCOMポートは、順に"COM1"、"COM2"といった名前が付けられ、アプリケーションから利用することができます。Microsoft Windows XPでは、最大256個のCOMポート（COM1～COM256）までが利用可能です。<br>
-  パソコンに搭載されるCOMポートは、せいぜい1つ、多くても2つであり、最近ではまったくCOMポートがないパソコンも存在します。そのため、USB接続によるシリアルポートを実現する「USBシリアル変換ケーブル」が発売されています。こういった製品の特徴として、OSに認識させるCOMポートの番号を、ユーザが自由に設定できるようになっています。すなわち、Tera Term見えには、2つのCOMポートがあった場合、それぞれ"COM1"、"COM2"として認識できるとは限らず、"COM1"、"COM7"といったふうに認識できるようになる必要があります。<br>
-  
-  <h3>COMポートのリストアップ</h3>
-  かつてのTera Termでは、"COM1"から"COM256"までのすべてのCOMポートを、接続ダイアログにリストアップしていましたが、使い勝手がよくありませんでした。そこで、接続ダイアログを呼び出したタイミングにおいて（Tera Term起動時のみでは不十分）、OSが認識しているCOMポートを検出するようにして、必要なCOMポートのみを表示させるようにしました。その検出ロジックが、DetectComPorts()#ttcmn.c です。QueryDosDevice() APIを使用し、MS-DOSデバイス名から"COM"を探します。<br>
+The COM port of the personal computer has not more than two, recently the personal computer has no COM port. So, the USB serial converter cable is released. This product has as a feature that a user can change the number of COM port. Namely, when the two COM ports exist on the system, the Tera Term will not detect two COM ports as the "COM1" and "COM2", but the "COM1" and "COM7". <br>
+ 
+  <h3>List up COM ports</h3>
+The former Tera Term lists up all COM ports from the "COM1" to "COM256" on the connection dialog, so it is not easy to use. When the connection dialog is called, the Tera Term always scans the COM ports recognized by the operating system and lists up available COM ports. The detection logic is the DetectComPorts()#ttcmn.c file. The QueryDosDevice() API can search the "COM" from the MS-DOS device name. <br>
 
 <pre class=code>
 	if (((h = GetModuleHandle("kernel32.dll")) != NULL) &&
@@ -1284,9 +1282,8 @@ Tera Term supports the UART(16550A) compatible serial port. The serial port is a
 		}
 </pre>
 
-  <h3>COMポートのフルネーム取得</h3>
-
-  上記の処理だけでもユーザビリティは向上するのですが、さらなる欲求として、各COMポートに付けられる「フルネーム」を同時に表示したくなります。COMポートの番号とともに、フルネームも付加表示できると、さらに使い勝手がよくなることが期待されます。この課題を解決するのが、ListupSerialPort()#ttcmn.c です。<br>
+  <h3>Retrieve COM port full name</h3>
+Additionally, the ListupSerialPort()#ttcmn.c can retrieve the full name of every COM port. <br>
   
 <pre class=code>
 static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDesc, int ComPortMax)
@@ -1347,12 +1344,12 @@ static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDe
 				RegCloseKey(hKey);
 			}
 
-			if (_strnicmp(szPortName, "COM", 3) == 0) {  // COMポートドライバを発見
+			if (_strnicmp(szPortName, "COM", 3) == 0) {  // Found COM port driver
 				int port = atoi(&szPortName[3]);
 				int i;
 
 				for (i = 0 ; i < comports ; i++) {
-					if (ComPortTable[i] == port) {  // 接続を確認
+					if (ComPortTable[i] == port) {  // Confirm COM connection
 						ComPortDesc[i] = _strdup(szFriendlyName);
 						break;
 					}
@@ -1366,7 +1363,6 @@ cleanup:
 }
 </pre>
 
--->
 
 <hr>
 
