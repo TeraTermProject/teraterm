@@ -25,13 +25,11 @@
   <li><a href="#debug">Debugging Method</a></li>
   <li><a href="#thread">Multithreading</a></li>
   <li><a href="#dde">DDE Communication</a></li>
-<!--
-  <li><a href="#ttssh">TTSSHによるSSHの設計と実装</a></li>
-  <li><a href="#macro">マクロ言語の設計と実装</a></li>
-  <li><a href="#caret">キャレット制御</a></li>
-  <li><a href="#serial">シリアルポート</a></li>
-  <li><a href="#xyzmodem">バイナリ転送プロトコル</a></li>
--->
+  <li><a href="#ttssh">SSH Design and Implementation by TTSSH</a></li>
+  <li><a href="#macro">Macro Language Design and Implementation</a></li>
+  <li><a href="#caret">Caret Control</a></li>
+  <li><a href="#serial">Serial Port</a></li>
+  <li><a href="#xyzmodem">Binary Transfer Protocol</a></li>
 </ol>
 
 <hr width=80% align=center>
@@ -766,9 +764,10 @@ Also, the DDE communication buffer and the log buffer are shared in the cv.LogBu
   
 <hr>
 
-        <!--
+        
 
-<h2><a name="ttssh">TTSSHによるSSHの設計と実装</a></h2>
+<h2><a name="ttssh">SSH Design and Implementation by TTSSH</a></h2>
+<!--
   <h3>概要</h3>
   オリジナルのTTSSHは<a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a>氏（現在は<a href="http://weblogs.mozillazine.org/roc/">Mozilla hacker</a>として活躍）により開発されたプラグインです。SSH1へ対応しており、ポートフォワーディングやzlibによるパケット圧縮もサポートしていました。TTSSHは、Tera Termをセキュア通信に対応させるためのプラグインであったために、SCPやSFTP等には未対応でした。オリジナルTera Termが1998年に開発凍結後も、2001年ごろまでメンテナンスが続けられていました。<br>
   TTSSHのSSH2対応を実現するために、TeraTerm Projectにより2004年から設計と実装が始められました。3年の歳月をかけて、ほぼSSH2プロトコルのフルサポートを実現しました。現在ではSCPへも対応しています。将来的にはSFTPへも対応されるかもしれません。<br>
@@ -1034,10 +1033,12 @@ DISPLAY=localhost:10.0
   ここまで準備が整うと、SSHサーバ上でXアプリケーションを起動させることができます。XアプリケーションからXサーバ、すなわちSSHサーバからTera Termへ送られてくるデータは、SSH2_MSG_CHANNEL_DATA メッセージ形式となります。当該メッセージは FWD_received_data() で処理され、Xサーバ(TCP/6000)へ送られます。Xサーバのソケットは channel->local_socket で、ノンブロッキングモードで扱われます。そのため、一度でパケットを全部送れない場合があるため、送れなかったデータは内部バッファに溜めておく必要があります。また、channel->local_socket にパケットをsendすることにより、FD_WRITE メッセージが発生し、write_local_connection_buffer() が呼び出されます。ここでは、前回送れなかったデータがあれば、内部バッファから取り出し、再度Xサーバへの送信を試みます。<br>
   反対に、Xサーバ、すなわちX11の画面上で何らかの操作が行われた場合、Tera TermからSSHサーバにデータを送信する必要があります。このとき、Tera Termへは FD_READ メッセージが発生し、read_local_connection() が呼び出されます。ここでは、Xサーバから送られてきたデータを SSH2_MSG_CHANNEL_DATA メッセージ形式に載せて、SSHサーバへ送ります。
 
+-->
 <hr>
 
 
-<h2><a name="macro">マクロ言語の設計と実装</a></h2>
+<h2><a name="macro">Macro Language Design and Implementation</a></h2>
+<!--
   <h3>概要</h3>
   Tera Termのマクロスクリプトは、BASIC風の言語仕様となっています。BisonやFlexといったしくみは利用しておらず、力業的な独自の構文解析（再帰的下降法）により実装されています。そのため、本格的なスクリプト言語としての記述はできない側面があります。<br>
   
@@ -1143,13 +1144,15 @@ WORD LineLen;       /* バッファサイズ */
   文字列かどうかは GetString() で判定します。文字列は’か”でクォートされているため、取り出すのは容易です。<br>
   計算式の判定は、GetExpression() で行います。ここでは再帰的下降法により、構文解析されます。<br>
   左辺値が定義済みの変数かどうかは CheckVar() でチェックし、数値もしくは文字列をセットします。そうではない場合は NewStrVar() で、新しい変数として登録します。
+-->
   
 
 <hr>
 
 
 
-<h2><a name="caret">キャレット制御</a></h2>
+<h2><a name="caret">Caret Control</a></h2>
+<!--
   <h3>概要</h3>
   ユーザが端末上でキーボード入力を行うと、カーソルが移動しますが、サーバからのエスケープシーケンスにより、キーボード入力なしにカーソルを移動させる必要があります。また、ウィンドウが非アクティブ状態の場合においても、カーソルを表示させることにより、ブロードキャストモードにおいて、複数端末の同時操作性を向上させています。
 <br>
@@ -1250,11 +1253,13 @@ void CaretKillFocus(BOOL show)
 
 <br>
 
+-->
 
 <hr>
 
 
 <h2><a name="serial">Serial Port</a></h2>
+<!--
   <h3>Overview</h3>
 Tera Term supports the UART(16550A) compatible serial port. The serial port is also called the COM(Communication Port). The COM port that is detected by the operation system are named for the "COM1", "COM2" and so on. The 
 
@@ -1361,11 +1366,13 @@ cleanup:
 }
 </pre>
 
+-->
 
 <hr>
 
 
-<h2><a name="xyzmodem">バイナリ転送プロトコル</a></h2>
+<h2><a name="xyzmodem">Binary Transfer Protocol</a></h2>
+<!--
   <h3>概要</h3>
 パソコン通信時代に、バイナリファイルを転送するためのプロトコルが多数開発され、Tera Termではいくつかの転送方式をサポートしています。これらのプロトコルは、今となってはレガシー仕様であり、ほとんど利用されることはありません。現在では、ルータなどの組み込み機器において、ファームウェアのアップロードに使われるぐらいです。
 本節では、XMODEM/YMODEM/ZMODEMに関して説明します。<br>
@@ -2025,6 +2032,7 @@ G   Generic Kermit Command. Data field contains a single character subcommand, f
     J Journal &lt;%command[%argument]&gt;
     V Variable &lt;%command[%argument[%argument]]&gt;
 </pre>
+
 -->
 
 
