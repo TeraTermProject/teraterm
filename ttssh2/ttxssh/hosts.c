@@ -2469,7 +2469,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	}
 
 	if (pvar->settings.VerifyHostKeyDNS && !is_numeric_hostname(hostname)) {
-		pvar->dns_key_check = verify_hostkey_dns(hostname, key);
+		pvar->dns_key_check = verify_hostkey_dns(pvar, hostname, key);
 	}
 
 	// known_hostsダイアログは同期的に表示させ、この時点においてユーザに確認
