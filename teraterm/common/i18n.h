@@ -1,5 +1,5 @@
 /* Tera Term
- Copyright(C) 2006 TeraTerm Project
+ (C) 2006 TeraTerm Project
  All rights reserved. */
 
 #ifndef __I18N_H

@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "TTX KanjiMenu Plug-in"
             VALUE "FileVersion", "0, 1, 6, 0"
             VALUE "InternalName", "ttxkanjimenu"
-            VALUE "LegalCopyright", "Copyright (C) 2007-2009 TeraTerm Project, Copyright (C) 2007 Sunao HARA"
+            VALUE "LegalCopyright", "Copyright (C) 2007 Sunao HARA, (C) 2007-2009 TeraTerm Project"
             VALUE "OriginalFilename", "ttxkanjimenu.dll"
             VALUE "ProductName", "TTX KanjiMenu Plug-in"
             VALUE "ProductVersion", "0, 1, 6, 0"

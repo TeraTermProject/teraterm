@@ -34,11 +34,11 @@ BEGIN
     LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
     ICON            "",IDC_TTSSH_ICON,234,7,20,20
     LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
-    LTEXT           "Includes:\r\nTTSSH 1.5.4 (Robert O'Callahan roc+tt@cs.cmu.edu), 1998-2001\r\nIPv6 extention version 0.81 (kato@win6.jp), 2000-2003\r\nSSH2 support (Tera Term Project), 2004-2015",IDC_INCLUDES,6,36,248,34
+    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2015 TeraTerm Project",IDC_INCLUDES,6,36,248,34
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
     LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,181,8
     LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,207,8
-    LTEXT           "Tera Term Project:     http://ttssh2.osdn.jp/",IDC_WEBSITES,6,99,248,13,SS_SUNKEN
+    LTEXT           "TeraTerm Project:     http://ttssh2.osdn.jp/",IDC_WEBSITES,6,99,248,13,SS_SUNKEN
     LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,116,248,26
     LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,140,248,27
     EDITTEXT        IDC_ABOUTTEXT,6,171,248,87,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
@@ -623,7 +623,7 @@ BEGIN
             VALUE "FileDescription", "TTXSSH"
             VALUE "FileVersion", "2, 74, 0, 0"
             VALUE "InternalName", "TTXSSH"
-            VALUE "LegalCopyright", "(C)2004-2015 TeraTerm Project, (C)1998-1999 Robert O'Callahan"
+            VALUE "LegalCopyright", "(C)1998-2001 Robert O'Callahan, (C) 2000-2003 Jun-ya KATO, (C) 2004-2015 TeraTerm Project"
             VALUE "OriginalFilename", "TTXSSH.dll"
             VALUE "ProductName", "TTSSH"
             VALUE "ProductVersion", "2, 74, 0, 0"

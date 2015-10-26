@@ -1,5 +1,5 @@
 /* Tera Term
- Copyright(C) 2006 TeraTerm Project
+ (C) 2006 TeraTerm Project
  All rights reserved. */
 
 #include "i18n.h"

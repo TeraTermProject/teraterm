@@ -163,11 +163,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "TeraTerm Project T. Teranishi"
+            VALUE "CompanyName", "T. Teranishi, TeraTerm Project"
             VALUE "FileDescription", "TTPMACRO"
             VALUE "FileVersion", "4, 88, 0, 0"
             VALUE "InternalName", "TTPMACRO"
-            VALUE "LegalCopyright", "Copyright (C) TeraTerm Project 2004-2015, T. Teranishi 1994-1998"
+            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2015 TeraTerm Project"
             VALUE "OriginalFilename", "TTPMACRO.EXE"
             VALUE "ProductName", "TTPMACRO"
             VALUE "ProductVersion", "4, 88, 0, 0"

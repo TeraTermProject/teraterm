@@ -464,11 +464,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "TeraTerm Project T. Teranishi"
+            VALUE "CompanyName", "T. Teranishi, TeraTerm Project"
             VALUE "FileDescription", "Tera Term"
             VALUE "FileVersion", "4, 88, 0, 0"
             VALUE "InternalName", "TTERMPRO"
-            VALUE "LegalCopyright", "(C)TeraTerm Project 2004-2015, (C)T. Teranishi 1994-1998"
+            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2015 TeraTerm Project"
             VALUE "OriginalFilename", "TTERMPRO.EXE"
             VALUE "ProductName", "Tera Term"
             VALUE "ProductVersion", "4, 88, 0, 0"

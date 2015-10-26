@@ -1,7 +1,7 @@
 /* Tera Term
 Copyright(C) 1994-1998 T. Teranishi
 All rights reserved. 
-Copyright(C) 2004-2012 Tera Term Project
+(C) 2004-2012 TeraTerm Project
 All rights reserved. 
 
   Kermit specification: http://www.kermitproject.org/

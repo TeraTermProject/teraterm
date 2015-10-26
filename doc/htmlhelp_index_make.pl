@@ -20,7 +20,7 @@ sub do_main {
 	print << 'EOD';
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <HTML><HEAD>
-<meta name="GENERATOR" content="Tera Term Project">
+<meta name="GENERATOR" content="TeraTerm Project">
 <!-- Sitemap 1.0 -->
 </HEAD><BODY>
 <UL>

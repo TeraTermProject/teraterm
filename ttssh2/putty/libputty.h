@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 TeraTerm Project
+ * (C) 2008 TeraTerm Project
  */
 // PuTTY is copyright 1997-2007 Simon Tatham.
 

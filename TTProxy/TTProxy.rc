@@ -99,11 +99,11 @@ BEGIN
         BLOCK "041104b0"
         BEGIN
             VALUE "Comments", "プロキシ経由での通信をサポートするプラグイン。"
-            VALUE "CompanyName", "TeraTerm Project, 蛭子屋本舗"
+            VALUE "CompanyName", "蛭子屋本舗, TeraTerm Project"
             VALUE "FileDescription", "プロキシプラグイン"
             VALUE "FileVersion", "1, 0, 0, 21"
             VALUE "InternalName", "TTProxy"
-            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2014, Copyright (C) 2003-2006 蛭子屋本舗"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2006 蛭子屋本舗, (C) 2004-2015 TeraTerm Project"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "蛭子屋本舗プロキシプラグイン集"
             VALUE "ProductVersion", "1, 0, 0, 21"
@@ -151,11 +151,11 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "Plug-in that supports communication by way of proxy"
-            VALUE "CompanyName", "TeraTerm Project, Yebisuya Hompo"
+            VALUE "CompanyName", "Yebisuya Hompo, TeraTerm Project"
             VALUE "FileDescription", "Proxy plug-in"
             VALUE "FileVersion", "1, 0, 0, 21"
             VALUE "InternalName", "TTProxy"
-            VALUE "LegalCopyright", "(C)TeraTerm Project 2006-2014, Copyright (C) 2003-2006 Yebisuya Hompo"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2006 Yebisuya Hompo, (C) 2004-2015 TeraTerm Project"
             VALUE "OriginalFilename", "TTXProxy.dll"
             VALUE "ProductName", "Proxy plug-in collection of Yebisuya Hompo"
             VALUE "ProductVersion", "1, 0, 0, 21"
@@ -231,7 +231,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About TTProxy"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "TTProxy\n%s, %d.%d.%d.%d\nCopyright (C) 2006-2009 TeraTerm Project\nTeraTerm Project: http://ttssh2.osdn.jp/\nCopyright (C) 2003-2006 %s\n%s: http://yebisuya.dip.jp/Software/TTProxy/",IDC_VERSION,7,7,212,52
+    LTEXT           "TTProxy\n%s, %d.%d.%d.%d\nCopyright (C) 2003-2006 %s\n%s: http://yebisuya.dip.jp/Software/TTProxy/\n(C) 2006-2015 TeraTerm Project\nTeraTerm Project: http://ttssh2.osdn.jp/",IDC_VERSION,7,7,212,52
     DEFPUSHBUTTON   "OK",IDOK,82,63,50,14
 END
 

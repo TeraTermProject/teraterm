@@ -1,6 +1,6 @@
 /* Tera Term
  Copyright(C) 1994-1998 T. Teranishi
- Copyright(C) 2010 Tera Term Project
+ (C) 2010 TeraTerm Project
  All rights reserved. */
 
 /*

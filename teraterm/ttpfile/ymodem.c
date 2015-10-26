@@ -1,5 +1,5 @@
 /* Tera Term
-Copyright(C) 2008-2010 TeraTerm Project
+(C) 2008-2010 TeraTerm Project
 All rights reserved. */
 
 /* TTFILE.DLL, YMODEM protocol */
