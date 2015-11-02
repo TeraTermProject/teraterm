@@ -1073,7 +1073,7 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 #if 1
 	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
 		if (*param == '"') {
-			if ((!quoted && *(param+1) != '"') || (quoted && *(param+1) != '"')) {
+			if (*(param+1) != '"') {
 				quoted = !quoted;
 			}
 			else {
