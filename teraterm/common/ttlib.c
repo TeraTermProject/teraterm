@@ -1070,7 +1070,6 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 		return NULL;
 	}
 
-#if 1
 	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
 		if (*param == '"') {
 			if (*(param+1) != '"') {
@@ -1091,18 +1090,6 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 	if (!quoted && (buff[i-1] == ';')) {
 		i--;
 	}
-#else
-	while (*param != '\0' && (quoted || (*param != ';' && *param != ' ' && *param != '\t'))) {
-		if (*param == '"' && (*++param != '"' || !quoted)) {
-			quoted = !quoted;
-			continue;
-		}
-		else if (i < size - 1) {
-			buff[i++] = *param;
-		}
-		param++;
-	}
-#endif
 
 	buff[i] = '\0';
 	return (param);
@@ -1126,7 +1113,7 @@ void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 	c = src[i];
 	i++;
 	j = 0;
-	while ((c != 0 && j<dest_len)) {
+	while (c != 0 && j<dest_len) {
 		if (c != '"') {
 			dest[j] = c;
 			j++;
