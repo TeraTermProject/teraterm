@@ -44,6 +44,15 @@ BOOL DDELog = FALSE;
 static BOOL FileRetrySend, FileRetryEcho, FileCRSend, FileReadEOF, BinaryMode;
 static BYTE FileByte;
 
+#define FILE_SEND_BUF_SIZE  8192
+struct FileSendHandler {
+	CHAR buf[FILE_SEND_BUF_SIZE];
+	int pos;
+	int end;
+};
+static struct FileSendHandler FileSendHandler;
+static int FileDlgRefresh;
+
 static int FileBracketMode = FS_BRACKET_NONE;
 static int FileBracketPtr = 0;
 static char BracketStartStr[] = "\033[200~";
@@ -1112,7 +1121,7 @@ void FileSendStart()
 	SendVar->FileHandle = _lopen(SendVar->FullName,OF_READ);
 #else
 	SendVar->FileHandle = (int)CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
-	                                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	                                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 #endif
 	SendVar->FileOpen = (SendVar->FileHandle>0);
 	if (! SendVar->FileOpen)
@@ -1128,6 +1137,9 @@ void FileSendStart()
 	FileRetryEcho = FALSE;
 	FileCRSend = FALSE;
 	FileReadEOF = FALSE;
+	FileSendHandler.pos = 0;
+	FileSendHandler.end = 0;
+	FileDlgRefresh = 0;
 
 	if (BracketedPasteMode()) {
 		FileBracketMode = FS_BRACKET_START;
@@ -1200,11 +1212,84 @@ int FSEcho1(BYTE b)
 }
 
 extern "C" {
+// ˆÈ‰º‚ÌŽž‚Í‚±‚¿‚ç‚ÌŠÖ”‚ðŽg‚¤
+// - BinaryMode == true
+// - FileRetryEcho == false
+// - FileBracketMode == false
+// - cv.TelFlag == false
+// - ts.LocalEcho == 0
+void FileSendBinayBoost() 
+{
+	WORD c, fc;
+	LONG BCOld;
+	DWORD read_bytes;
+
+	if ((SendDlg == NULL) ||
+		((cv.FilePause & OpSendFile) != 0))
+		return;
+
+	BCOld = SendVar->ByteCount;
+
+	if (FileRetrySend)
+	{
+		c = CommRawOut(&cv, &(FileSendHandler.buf[FileSendHandler.pos]),
+			FileSendHandler.end - FileSendHandler.pos);
+		FileSendHandler.pos += c;
+		FileRetrySend = (FileSendHandler.end != FileSendHandler.pos);
+		if (FileRetrySend)
+			return;
+	}
+
+	do {
+		if (FileSendHandler.pos == FileSendHandler.end) {
+#ifdef FileVarWin16
+			fc = _lread(SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf));
+#else
+			ReadFile((HANDLE)SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
+			fc = LOWORD(read_bytes);
+#endif
+			FileSendHandler.pos = 0;
+			FileSendHandler.end = fc;
+		} else {
+			fc = FileSendHandler.end - FileSendHandler.end;
+		}
+
+		if (fc != 0)
+		{
+			c = CommRawOut(&cv, &(FileSendHandler.buf[FileSendHandler.pos]),
+				FileSendHandler.end - FileSendHandler.pos);
+			FileSendHandler.pos += c;
+			FileRetrySend = (FileSendHandler.end != FileSendHandler.pos);
+			SendVar->ByteCount = SendVar->ByteCount + c;
+			if (FileRetrySend)
+			{
+				if (SendVar->ByteCount != BCOld)
+					SendDlg->RefreshNum();
+				return;
+			}
+		}
+		FileDlgRefresh = SendVar->ByteCount;
+		SendDlg->RefreshNum();
+		BCOld = SendVar->ByteCount;
+		if (fc != 0)
+			return;
+	} while (fc != 0);
+
+	FileTransEnd(OpSendFile);
+}
+}
+
+extern "C" {
 void FileSend()
 {
 	WORD c, fc;
 	LONG BCOld;
 	DWORD read_bytes;
+
+	if (BinaryMode && !FileRetryEcho && !FileBracketMode && !cv.TelFlag &&
+		(ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
+		return FileSendBinayBoost();
+	}
 
 	if ((SendDlg==NULL) ||
 	    ((cv.FilePause & OpSendFile) !=0))

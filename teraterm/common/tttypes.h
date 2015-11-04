@@ -914,7 +914,7 @@ typedef TKeyMap far *PKeyMap;
 #define APC  0x9F
 
 #define InBuffSize  1024
-#define OutBuffSize 1024
+#define OutBuffSize (1024*16)
 
 typedef struct {
 	BYTE InBuff[InBuffSize];
