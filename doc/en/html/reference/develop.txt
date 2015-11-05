@@ -243,8 +243,8 @@ Example: adding a TTSSH menu under File menu
      CygTerm
        https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html
      LogMeTT
-       http://logmett.com/freeware/LogMeTT.php
-       http://logmett.com/freeware/TTLEdit.php
+       http://logmett.com/logmett-freeware
+       http://logmett.com/ttleditor
 
   2. Check the document files.
 
@@ -289,7 +289,7 @@ Example: adding a TTSSH menu under File menu
   11. Delete snapshots.
 
   12. Announce release to forum(in Canada).
-      - Announcements http://logmett.com/forum/viewforum.php?f=5
+      - Announcements http://logmett.com/support-forums/5
         Create new topic in `Announcements' entry.
         Change the type of previous Announcement from Announcement to Normal.
         Delete third previous Announcement.

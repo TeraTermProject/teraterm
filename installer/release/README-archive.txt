@@ -17,6 +17,6 @@ UILanguageFile=lang\Japanese.lng
 - Many plugins are included. Please remove the plugin unless necessary.
 
 - The LogMeTT and TTLEdit are not included. Please download below site.
-  http://logmett.com/freeware/LogMeTT.php
-  http://logmett.com/freeware/TTLEdit.php
+  http://logmett.com/logmett-freeware
+  http://logmett.com/ttleditor
 

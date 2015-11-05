@@ -22,6 +22,6 @@ UILanguageFile=lang\Japanese.lng
   同梱されています。不要なものは削除・リネームしてください。
 
 - LogMeTT, TTLEdit は含まれていません。必要な場合は入手してください。
-  http://logmett.com/freeware/LogMeTT.php
-  http://logmett.com/freeware/TTLEdit.php
+  http://logmett.com/logmett-freeware
+  http://logmett.com/ttleditor
 

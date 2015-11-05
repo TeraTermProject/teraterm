@@ -243,7 +243,7 @@ BEGIN
     RTEXT           "Author:",IDC_AUTHOR_LABEL,5,106,28,8
     LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,106,128,8,SS_NOTIFY | WS_TABSTOP
     RTEXT           "Forum:",IDC_FORUM_LABEL,8,115,25,8
-    LTEXT           "http://www.logmett.com/forum/index.php",IDC_FORUM_URL,36,115,136,8,SS_NOTIFY | WS_TABSTOP
+    LTEXT           "http://logmett.com/support-forums",IDC_FORUM_URL,36,115,136,8,SS_NOTIFY | WS_TABSTOP
     LTEXT           "Oniguruma: ",IDC_ONIGURUMA_LABEL,38,35,114,8
     LTEXT           "Built using Microsoft Visual C++",IDC_BUILDTOOL,7,87,172,10
     LTEXT           "Build time: ",IDC_BUILDTIME,7,97,165,8
