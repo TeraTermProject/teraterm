@@ -586,6 +586,7 @@ struct tttset {
 	WORD AcceleratorCygwinConnection;
 	int SendBreakTime;
 	WORD FileSendBulkPacket;
+	WORD AutoComDisReConnect;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1051,6 +1052,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.89, ttset_memfilemap was replaced with ttset_memfilemap_26.
  *   added tttset.FileSendBulkPacket
+ *   added tttset.AutoComDisReConnect
  *
  * - At version 4.85, ttset_memfilemap was replaced with ttset_memfilemap_25.
  *   added tttset.AcceleratorNewConnection

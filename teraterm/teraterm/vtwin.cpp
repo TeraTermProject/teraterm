@@ -2982,6 +2982,10 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
 	if (nEventType == DBT_DEVICEARRIVAL || nEventType ==DBT_DEVICEREMOVECOMPLETE) {
 		if (ts.PortType == IdSerial) {
+			if (!ts.AutoComDisReConnect) {
+				return CFrameWnd::OnDeviceChange(nEventType, dwData);
+			}
+
 			if (cv.Open != 0) {
 				/* ê⁄ë±íÜ */
 				if (CheckComPort(cv.ComPort) == 0) {

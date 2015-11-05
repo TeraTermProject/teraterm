@@ -839,6 +839,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	    (ts->KanjiOut == IdKanjiOutH))
 		ts->KanjiOut = IdKanjiOutJ;
 
+	// Detect disconnect/reconnect of serial port --- special option
+	ts->AutoComDisReConnect = GetOnOff(Section, "AutoComDisReConnect", FName, TRUE);
+
 	// Auto file renaming --- special option
 	if (GetOnOff(Section, "AutoFileRename", FName, FALSE))
 		ts->FTFlag |= FT_RENAME;
@@ -2217,6 +2220,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Wrong sequence flag  -- special option */
 	WriteOnOff(Section, "AllowWrongSequence", FName,
 	           (WORD) (ts->TermFlag & TF_ALLOWWRONGSEQUENCE));
+
+	/* Detect disconnect/reconnect of serial port --- special option */
+	WriteOnOff(Section, "AutoComDisReConnect", FName, ts->AutoComDisReConnect);
 
 	/* Auto file renaming --- special option */
 	WriteOnOff(Section, "AutoFileRename", FName,
