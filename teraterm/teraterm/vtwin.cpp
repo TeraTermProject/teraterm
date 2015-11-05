@@ -49,6 +49,7 @@
 
 #include <windowsx.h>
 #include <imm.h>
+#include <Dbt.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -79,6 +80,8 @@ static BOOL TCPLocalEchoUsed = FALSE;
 static BOOL TCPCRSendUsed = FALSE;
 
 static BOOL IgnoreRelease = FALSE;
+
+static int AutoDisconnectedPort = -1;
 
 // ñ{ëÃÇÕ addsetting.cpp
 extern mouse_cursor_t MouseCursor[];
@@ -123,6 +126,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_WM_SYSKEYUP()
 	ON_WM_TIMER()
 	ON_WM_VSCROLL()
+	ON_WM_DEVICECHANGE()
 	ON_MESSAGE(WM_IME_COMPOSITION,OnIMEComposition)
 	ON_MESSAGE(WM_INPUTLANGCHANGE,OnIMEInputChange)
 	ON_MESSAGE(WM_IME_NOTIFY,OnIMENotify)
@@ -2974,6 +2978,33 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	DispVScroll(Func,nPos);
 }
 
+BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
+{
+	if (nEventType == DBT_DEVICEARRIVAL || nEventType ==DBT_DEVICEREMOVECOMPLETE) {
+		if (ts.PortType == IdSerial) {
+			if (cv.Open != 0) {
+				/* ê⁄ë±íÜ */
+				if (CheckComPort(cv.ComPort) == 0) {
+					AutoDisconnectedPort = cv.ComPort;
+					Disconnect(TRUE);
+					return 0;
+				}
+			}
+			else {
+				/* ñ¢ê⁄ë± */
+				if (AutoDisconnectedPort == cv.ComPort && CheckComPort(cv.ComPort) == 1) {
+					AutoDisconnectedPort = -1;
+					Connecting = TRUE;
+					ChangeTitle();
+					CommOpen(HVTWin, &ts, &cv);
+					return 0;
+				}
+			}
+		}
+	}
+	return CFrameWnd::OnDeviceChange(nEventType, dwData);
+}
+
 //<!--by AKASI
 LONG CVTWindow::OnWindowPosChanging(UINT wParam, LONG lParam)
 {
@@ -3408,6 +3439,8 @@ LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
 
 LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 {
+	AutoDisconnectedPort = -1;
+
 	CommStart(&cv,lParam,&ts);
 #ifndef NO_INET6
 	if (ts.PortType == IdTCPIP && cv.RetryWithOtherProtocol == TRUE) {

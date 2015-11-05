@@ -91,6 +91,7 @@ protected:
 	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData);
 //<!--by AKASI
 	afx_msg LONG OnWindowPosChanging(UINT wParam, LONG lParam);
 	afx_msg LONG OnSettingChange(UINT wParam, LONG lParam);

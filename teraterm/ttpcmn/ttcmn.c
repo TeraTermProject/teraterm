@@ -2307,6 +2307,32 @@ int PASCAL DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 	return comports;
 }
 
+int PASCAL CheckComPort(WORD ComPort)
+{
+	HMODULE h;
+	TCHAR   devicesBuff[65535];
+	char    com_str[64];
+
+	_snprintf_s(com_str, sizeof(com_str), _TRUNCATE, "COM%d", ComPort);
+
+	if (((h = GetModuleHandle("kernel32.dll")) == NULL) | (GetProcAddress(h, "QueryDosDeviceA") == NULL) ) {
+		/* ERROR */
+		return -1;
+	}
+	if (QueryDosDevice(com_str, devicesBuff, 65535) != 0) {
+		return 1;
+	}
+	else {
+		DWORD err = GetLastError();
+		if (err == ERROR_FILE_NOT_FOUND) {
+			/* NOT FOUND */
+			return 0;
+		}
+		/* ERROR */
+		return -1;
+	}
+}
+
 BOOL WINAPI DllMain(HANDLE hInstance,
                     ULONG ul_reason_for_call,
                     LPVOID lpReserved)

@@ -57,3 +57,5 @@ EXPORTS
 
   GetParam @62
   DequoteParam @63
+
+  CheckComPort @64
