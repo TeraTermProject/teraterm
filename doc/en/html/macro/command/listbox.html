@@ -18,7 +18,7 @@ Displays a list box, and ask an item to user.
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 </pre>
 
 <h2>Parameters</h2>
@@ -30,9 +30,11 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
 	<dt class="macro">string &lt;title&gt;</dt>
 	<dd>It is displayed as the list box title.</dd>
 	
-	<dt class="macro">array&lt;string array&gt;</dt>
+	<dt class="macro">array &lt;string array&gt;</dt>
 	<dd>It is displayed as the list box items.</dd>
 
+	<dt class="macro">integer &lt;selected&gt;</dt>
+	<!-- dd>初期選択項目。省略可能。</dd -->
 </dl>
 
 <h2>Return Value</h2>
@@ -63,8 +65,13 @@ listbox 'Select your favorite food.' 'Confirmation' msg
 Banana
 Apple
 Orange
-[Enpty string]
+[Empty string]
 </pre>
+
+<!-- p>
+&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事が出来ます。<br />
+省略した場合は 0 (先頭)が指定された物として扱われます。
+</p -->
 
 
 <h2>Example</h2>

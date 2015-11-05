@@ -18,7 +18,7 @@
 </p>
 
 <pre class="macro-syntax">
-listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
+listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 </pre>
 
 <h2>パラメータ</h2>
@@ -30,9 +30,11 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt;
 	<dt class="macro">文字列 &lt;title&gt;</dt>
 	<dd>リストボックスのタイトル。</dd>
 	
-	<dt class="macro">文字型文字列 &lt;string array&gt;</dt>
+	<dt class="macro">文字列型配列 &lt;string array&gt;</dt>
 	<dd>リストボックスの選択項目。</dd>
 
+	<dt class="macro">整数値 &lt;selected&gt;</dt>
+	<dd>初期選択項目。省略可能。</dd>
 </dl>
 
 <h2>返り値</h2>
@@ -64,6 +66,11 @@ listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 みかん
 [空文字列]
 </pre>
+
+<p>
+&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事が出来ます。<br />
+省略した場合は 0 (先頭)が指定された物として扱われます。
+</p>
 
 
 <h2>例</h2>
