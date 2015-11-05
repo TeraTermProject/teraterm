@@ -56,6 +56,7 @@ int b64decode(PCHAR dst, int dsize, PCHAR src);
 
 PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param);
 void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
+void FAR PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
 

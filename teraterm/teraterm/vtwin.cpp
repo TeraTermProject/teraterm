@@ -3638,7 +3638,7 @@ void CVTWindow::OnFileNewConnection()
 			}
 			else {
 				char tcpport[6];
-				strncpy_s(Command2, sizeof(Command2), &Command[9], _TRUNCATE);
+				DeleteComment(Command2, sizeof(Command2), &Command[9]);
 				Command[9] = 0;
 				if (GetHNRec.Telnet==0)
 					strncat_s(Command,sizeof(Command)," /T=0",_TRUNCATE);

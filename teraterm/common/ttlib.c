@@ -1139,6 +1139,29 @@ void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 	dest[j] = 0;
 }
 
+void FAR PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src)
+{
+	BOOL quoted = FALSE;
+	PCHAR tail = dest + dest_size - 1;
+
+	while (*src != '\0' && dest < tail && (quoted || *src != ';')) {
+		*dest++ = *src;
+
+		if (*src++ == '"') {
+			if (*src == '"' && dest < tail) {
+				*dest++ = *src++;
+			}
+			else {
+				quoted = !quoted;
+			}
+		}
+	}
+
+	*dest = '\0';
+
+	return;
+}
+
 void split_buffer(char *buffer, int delimiter, char **head, char **body)
 {
 	char *p1, *p2;
