@@ -3379,6 +3379,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 	int ret;
 	char **s;
 	int i, ary_size;
+	int sel = 0;
 	TVarId VarId, VarId2;
 
 	*Err = 0;
@@ -3403,14 +3404,14 @@ int MessageCommand(int BoxId, LPWORD Err)
 	if (BoxId==IdMsgBox) {
 		ret = OpenMsgDlg(Str1,Str2,FALSE);
 		// メッセージボックスをキャンセルすると、マクロの終了とする。
-		// (2008.8.5 yutaka)		
+		// (2008.8.5 yutaka)
 		if (ret == IDCANCEL) {
 			TTLStatus = IdTTLEnd;
 		}
 	} else if (BoxId==IdYesNoBox) {
 		ret = OpenMsgDlg(Str1,Str2,TRUE);
 		// メッセージボックスをキャンセルすると、マクロの終了とする。
-		// (2008.8.6 yutaka)		
+		// (2008.8.6 yutaka)
 		if (ret == IDCLOSE) {
 			TTLStatus = IdTTLEnd;
 		}
@@ -3422,9 +3423,19 @@ int MessageCommand(int BoxId, LPWORD Err)
 	} else if (BoxId==IdListBox) {
 		//  リストボックスの選択肢を取得する。
 		GetStrAryVar(&VarId, Err);
+
+		if (CheckParameterGiven()) {
+			GetIntVal(&sel, Err);
+		}
+		if (*Err==0 && GetFirstChar()!=0)
+			*Err = ErrSyntax;
 		if (*Err!=0) return 0;
 
 		ary_size = GetStrAryVarSize(VarId);
+		if (sel < 0 || sel >= ary_size) {
+			sel = 0;
+		}
+
 		s = (char **)calloc(ary_size + 1, sizeof(char *));
 		if (s == NULL) {
 			*Err = ErrFewMemory;
@@ -3443,7 +3454,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 		// return 
 		//   0以上: 選択項目
 		//   -1: キャンセル
-		ret = OpenListDlg(Str1, Str2, s);
+		ret = OpenListDlg(Str1, Str2, s, sel);
 
 		for (i = 0 ; i < ary_size ; i++) {
 			free(s[i]);

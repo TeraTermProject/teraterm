@@ -23,7 +23,7 @@ void OpenStatDlg(PCHAR Text, PCHAR Caption);
 void CloseStatDlg();
 void BringupStatDlg();
 
-int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists);
+int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected);
 
 extern char HomeDir[MAXPATHLEN];
 extern char FileName[MAX_PATH];

@@ -325,11 +325,11 @@ void BringupStatDlg()
 }
 
 extern "C" {
-int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists)
+int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected)
 {
 	int ret = -1;
 
-	CListDlg ListDlg(Text,Caption,Lists,DlgPosX,DlgPosY);
+	CListDlg ListDlg(Text, Caption, Lists, Selected, DlgPosX, DlgPosY);
 	if (ListDlg.DoModal() == IDOK) {
 		ret = ListDlg.m_SelectItem;
 	}

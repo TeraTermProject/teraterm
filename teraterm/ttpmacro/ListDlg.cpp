@@ -16,12 +16,13 @@
 
 IMPLEMENT_DYNAMIC(CListDlg, CDialog)
 
-CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int x, int y)
+CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected, int x, int y)
 	: CDialog(CListDlg::IDD)
 {
 	m_Text = Text;
 	m_Caption = Caption;
 	m_Lists = Lists;
+	m_Selected = Selected;
 	PosX = x;
 	PosY = y;
 	DlgFont = NULL;
@@ -61,6 +62,7 @@ BOOL CListDlg::OnInitDialog()
 	HFONT font, tmpfont;
 	int ListMaxWidth = 0;
 	int ListWidth;
+	int ListCount = 0;
 	CDC *pDC;
 	CFont *pOldFont;
 	RECT R;
@@ -96,6 +98,7 @@ BOOL CListDlg::OnInitDialog()
 		if (ListWidth > ListMaxWidth) {
 			ListMaxWidth = ListWidth;
 		}
+		ListCount++;
 		p++;
 	}
 	UpdateData(FALSE);
@@ -104,8 +107,10 @@ BOOL CListDlg::OnInitDialog()
 	pDC->SelectObject(pOldFont);
 	ReleaseDC(pDC);
 
-	// 1つめを選択状態にする。
-	m_xcList.SetCurSel(0);
+	if (m_Selected < 0 || m_Selected >= ListCount) {
+		m_Selected = 0;
+	}
+	m_xcList.SetCurSel(m_Selected);
 
 	// 本文とタイトル
 	SetDlgItemText(IDC_STATIC, m_Text);
