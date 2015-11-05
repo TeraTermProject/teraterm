@@ -3287,7 +3287,8 @@ static void ParseHostName(char *HostStr, WORD * port)
 
 void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 {
-	int i, pos, c, param_top;
+	int i, pos, c;
+	//int param_top;
 #ifdef NO_INET6
 	BYTE b;
 #endif							/* NO_INET6 */
