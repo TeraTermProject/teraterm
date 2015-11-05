@@ -33,8 +33,8 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 	<dt class="macro">array &lt;string array&gt;</dt>
 	<dd>It is displayed as the list box items.</dd>
 
-	<dt class="macro">integer &lt;selected&gt;</dt>
-	<!-- dd>初期選択項目。省略可能。</dd -->
+	<dt class="macro">integer &lt;selected&gt; (version 4.89 or later)</dt>
+	<dd>It is selected firt item by specifying the zero-based index of the array. This argument is optional.</dd>
 </dl>
 
 <h2>Return Value</h2>
@@ -68,10 +68,11 @@ Orange
 [Empty string]
 </pre>
 
-<!-- p>
-&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事が出来ます。<br />
-省略した場合は 0 (先頭)が指定された物として扱われます。
-</p -->
+<p>
+<i>(version 4.89 or later)</i><br>
+When the &lt;selected&gt; parameter is specified, an item of the list box can be selected at first. <br />
+If the parameter is not omitted, the default value is 0.
+</p>
 
 
 <h2>Example</h2>

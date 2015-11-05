@@ -33,8 +33,8 @@ listbox &lt;message&gt; &lt;title&gt; &lt;string array&gt; [&lt;selected&gt;]
 	<dt class="macro">文字列型配列 &lt;string array&gt;</dt>
 	<dd>リストボックスの選択項目。</dd>
 
-	<dt class="macro">整数値 &lt;selected&gt;</dt>
-	<dd>初期選択項目。省略可能。</dd>
+	<dt class="macro">整数値 &lt;selected&gt; (バージョン 4.89 以降)</dt>
+	<dd>初期選択項目(0オリジンインデックス)。省略可能。</dd>
 </dl>
 
 <h2>返り値</h2>
@@ -68,8 +68,9 @@ listbox '好きな食べ物を選んでください' 'あなたへの問い' msg
 </pre>
 
 <p>
-&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事が出来ます。<br />
-省略した場合は 0 (先頭)が指定された物として扱われます。
+<i>(バージョン 4.89 以降)</i><br>
+&lt;selected&gt; を指定する事で、初期状態で選択されている項目を指定する事ができます。<br />
+省略した場合は 0 (先頭)が指定されたものとして扱われます。
 </p>
 
 
