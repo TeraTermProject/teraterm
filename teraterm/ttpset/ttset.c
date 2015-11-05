@@ -920,6 +920,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "EnableStatusLine", FName, TRUE))
 		ts->TermFlag |= TF_ENABLESLINE;
 
+	// Enable multiple bytes send -- special option
+	ts->FileSendBulkPacket = GetOnOff(Section, "FileSendBulkPacket", FName, TRUE);
+
 	// fixed JIS --- special
 	if (GetOnOff(Section, "FixedJIS", FName, FALSE))
 		ts->TermFlag |= TF_FIXEDJIS;
@@ -2291,6 +2294,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Enable the status line -- special option */
 	WriteOnOff(Section, "EnableStatusLine", FName,
 	           (WORD) (ts->TermFlag & TF_ENABLESLINE));
+
+	/* Enable multiple bytes send -- special option */
+	WriteOnOff(Section, "FileSendBulkPacket", FName, ts->FileSendBulkPacket);
 
 	/* IME Flag  -- special option */
 	WriteOnOff(Section, "IME", FName, ts->UseIME);

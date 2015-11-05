@@ -1286,8 +1286,9 @@ void FileSend()
 	LONG BCOld;
 	DWORD read_bytes;
 
-	if (BinaryMode && !FileRetryEcho && !FileBracketMode && !cv.TelFlag &&
-		(ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
+	if (ts.FileSendBulkPacket &&
+	    BinaryMode && !FileRetryEcho && !FileBracketMode && !cv.TelFlag &&
+	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
 		return FileSendBinayBoost();
 	}
 
