@@ -275,5 +275,30 @@ SendBreakTime=1000
 </pre>
 
 
+<h1><a name="AutoComDisReConnect">シリアルポートの切断・再接続を検出する</a></h1>
+
+<p>
+接続中の USB シリアルケーブルが抜かれたことを検出した場合に Tera Term のシリアル接続を切断し、
+再度シリアルケーブルが接続されたことを検出したら Tera Term のシリアル接続を再接続します。
+</p>
+
+<p>
+この機能は Windows XP 以降で有効です。
+</p>
+
+<p>
+この機能を使用しないようにするためには、設定ファイルの [Tera Term] セクションの AutoComDisReConnect 行を下記のように変更してください。
+</p>
+
+<pre>
+AutoComDisReConnect=off
+</pre>
+
+<pre>
+省略時:
+AutoComDisReConnect=on
+</pre>
+
+
 </BODY>
 </HTML>

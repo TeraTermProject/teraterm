@@ -410,5 +410,37 @@ FTHideDialog=off
 </pre>
 
 
+<h1><a name="FileSendBulkPacket">ファイル送信を1バイトずつではなくまとめて送る</a></h1>
+
+<p>
+Tera Term は、ファイル送信時に内容を1バイトずつ送ります。
+ただし、通信速度が速いのに1バイトずつ送ると送信速度が遅くなるので、特定の条件下ではある程度まとめて(8KB)送信します。
+</p>
+
+<pre>
+条件:
+シリアル接続
+バイナリフラグ on
+FileRetryEcho = false
+FileBracketMode = false
+Telnetフラグ off
+LocalEcho off
+ボーレート 115200以上
+</pre>
+
+<p>
+この動作のために問題が出る場合には 1 バイトずつ送るように、設定ファイルの [Tera Term] セクションの FileSendBulkPacket 行を下記のように変更してください。
+</p>
+
+<pre>
+FileSendBulkPacket=off
+</pre>
+
+<pre>
+省略時:
+FileSendBulkPacket=on
+</pre>
+
+
 </BODY>
 </HTML>
