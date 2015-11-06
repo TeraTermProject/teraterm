@@ -4654,7 +4654,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	len = buffer_len(blob);
 
 	// 秘密鍵をファイルに保存する。
-	fp = fopen(filename, "w");
+	fp = fopen(filename, "wb");
 	if (fp == NULL) {
 		UTIL_get_lang_msg("MSG_SAVE_KEY_OPENFILE_ERROR", pvar,
 		                  "Can't open key file");
