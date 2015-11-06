@@ -37,13 +37,20 @@
   <li>Changes
     <ul>
       <li>MACRO: added new parameter which can specify an index of selected item at the <a href="../macro/command/listbox.html">listbox</a> macro command.</li>
+      <li>When the baud rate is high speed on the serial connection, the file transfer can be accelerated.
+        <ul>
+          <li>added the <a href="../setup/teraterm-trans.html#FileSendBulkPacket">FileSendBulkPacket</a> entry in the teraterm.ini file. The default value is on.</li>
+        </ul></li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>When the host name includes a comment on new connection dialog, it will not connect to the remote host.</li>
-      <li>When the USB serial cable is inserted and extracted while the serial connection is doing, new serial connection will be failed. However, this fix is supported on the Windows XP or later. </li>
+      <li>When the USB serial cable is inserted and extracted while the serial connection is doing, new serial connection will be failed. However, this fix is supported on the Windows XP or later. 
+        <ul>
+          <li>added the <a href="../setup/teraterm-com.html#AutoComDisReConnect">AutoComDisReConnect</a> entry in the teraterm.ini file. The default value is on.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -2646,11 +2653,11 @@ SYNOPSIS:
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>KDF フォーマットで保存した SSH 秘密鍵が OpenSSH で読み込めない問題を修正した</li>
+      <li>The OpenSSH can not read the SSH private key file of the KDF format.</li>
     </ul>
-  </li-->
+  </li>
 
   <!--li>Misc
     <ul>

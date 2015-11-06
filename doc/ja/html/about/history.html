@@ -37,13 +37,20 @@
   <li>変更
     <ul>
       <li><a href="../macro/command/listbox.html">listbox</a> マクロコマンドで、初期状態で選択している項目を指定できるようにした。</li>
+      <li>シリアル接続でボーレートが高速な場合、ファイル送信を高速化する。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-trans.html#FileSendBulkPacket">FileSendBulkPacket</a> エントリを追加した。デフォルトはオン。</li>
+        </ul></li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
       <li>新しい接続ダイアログのホスト欄にコメントを含めた時に正しく接続出来ない事がある問題を修正した。</li>
-      <li>USBシリアルに接続中にUSBシリアルケーブルを抜き差しするとCOMに接続できなくなる問題を修正した。(WindowsXP以降のみ修正)</li>
+      <li>USBシリアルに接続中にUSBシリアルケーブルを抜き差しするとCOMに接続できなくなる問題を修正した。(WindowsXP以降のみ修正)
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#AutoComDisReConnect">AutoComDisReConnect</a> エントリを追加した。デフォルトはオン。</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -2652,8 +2659,7 @@
 
   <li>バグ修正
     <ul>
-      <li></li>
-      <li>KDF フォーマットで保存した SSH 秘密鍵が OpenSSH で読み込めない問題を修正した</li>
+      <li>KDF フォーマットで保存した SSH 秘密鍵が OpenSSH で読み込めない問題を修正した。</li>
     </ul>
   </li>
 
