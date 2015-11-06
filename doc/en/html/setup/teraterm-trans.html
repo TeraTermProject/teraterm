@@ -337,8 +337,9 @@ FTHideDialog=off
 <!--<h1><a name="FileSendBulkPacket">ファイル送信を1バイトずつではなくまとめて送る</a></h1>
 
 <p>
-Tera Term は、ファイル送信時に内容を1バイトずつ送ります。
-ただし、通信速度が速いのに1バイトずつ送ると送信速度が遅くなるので、特定の条件下ではある程度まとめて(8KB)送信します。
+Tera Term は、ファイル送信時に内容を1バイトずつ送ります。<br />
+しかし、通信速度が速いのに1バイトずつ送信していると、ファイルの転送が遅くなってしまいます。<br />
+高速に送信するために、特定の条件下ではファイルの内容をある程度まとめて(8KBずつ)送信します。
 </p>
 
 <pre>
@@ -359,6 +360,11 @@ LocalEcho off
 <pre>
 FileSendBulkPacket=off
 </pre>
+
+<p>
+この機能は <a href="../menu/file.html">[File]</a>-<a href="../menu/file-sendfile.html">[Send file...]</a> によるファイル送信において適用されます。<br />
+<a href="../menu/file.html">[File]</a>-<a href="../menu/file-transfer.html">[Transfer]</a> 以下の各種ファイル転送プロトコルでの送信や、SSH SCP には適用されません。
+</p>
 
 <pre>
 default:
