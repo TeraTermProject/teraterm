@@ -587,6 +587,7 @@ struct tttset {
 	int SendBreakTime;
 	WORD FileSendBulkPacket;
 	WORD AutoComDisReConnect;
+	WORD BGImgBrightness;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1053,6 +1054,7 @@ typedef TMap far *PMap;
  * - At version 4.89, ttset_memfilemap was replaced with ttset_memfilemap_26.
  *   added tttset.FileSendBulkPacket
  *   added tttset.AutoComDisReConnect
+ *   added tttset.BGImgBrightness
  *
  * - At version 4.85, ttset_memfilemap was replaced with ttset_memfilemap_25.
  *   added tttset.AcceleratorNewConnection

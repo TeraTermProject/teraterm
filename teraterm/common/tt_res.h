@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by c:\work\ttssh2\teraterm\teraterm\ttermpro.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// C:\usr\ttssh2_vc2015\trunk\teraterm\teraterm\ttermpro.rc で使用
 //
 #define IDI_TTERM                       100
 #define IDR_ACC                         100
@@ -196,6 +196,9 @@
 #define IDC_CYGTERM_SETUPDIR_BUTTON_FILE 2550
 #define IDC_CYGTERM_SETUPDIR_BUTTON_FILE2 2551
 #define IDC_SSH_SETUPDIR_BUTTON_FILE    2551
+#define IDC_BGIMG_BRIGHTNESS            2551
+#define IDC_EDIT2                       2552
+#define IDC_EDIT_BGIMG_BRIGHTNESS       2552
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -293,7 +296,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        124
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2550
+#define _APS_NEXT_CONTROL_VALUE         2553
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

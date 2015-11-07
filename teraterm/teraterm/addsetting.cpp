@@ -748,6 +748,8 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_BGIMG_EDIT, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_BGIMG_BUTTON, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_RESTART, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_BGIMG_BRIGHTNESS, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
+		SendDlgItemMessage(IDC_EDIT_BGIMG_BRIGHTNESS, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
 	}
 	else {
 		DlgVisualFont = NULL;
@@ -762,6 +764,9 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_BGIMG_CHECK, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_BGIMG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_BGIMG_CHECK, ts.UIMsg);
+	GetDlgItemText(IDC_BGIMG_BRIGHTNESS, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_BGIMG_BRIGHTNESS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_BGIMG_BRIGHTNESS, ts.UIMsg);
 	GetDlgItemText(IDC_MOUSE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_MOUSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_MOUSE, ts.UIMsg);
@@ -821,6 +826,10 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 
 	// Eterm look-feelÇÃîwåiâÊëúéwíËÅB
 	SetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath);
+
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.BGImgBrightness);
+	SetDlgItemText(IDC_EDIT_BGIMG_BRIGHTNESS, buf);
+
 	if (ts.EtermLookfeel.BGEnable) {
 		GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(TRUE);
 
@@ -829,15 +838,24 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 			btn->SetCheck(BST_CHECKED);
 			GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
 			GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+
+			GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(TRUE);
+			GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(TRUE);
 		} else {
 			btn->SetCheck(BST_UNCHECKED);
 			GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 			GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+
+			GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+			GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
 		}
 	} else {
 		GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+
+		GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
 	}
 
 	// (3)Mouse cursor type
@@ -924,19 +942,29 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				if (btn->GetCheck()) {
 					GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
 					GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
+
+					GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(TRUE);
+					GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(TRUE);
 				} else {
 					GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 					GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
+
+					GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+					GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
 				}
 			} else {
 				GetDlgItem(IDC_BGIMG_CHECK)->EnableWindow(FALSE);
 				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
 
+				GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+				GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+
 				// ñ≥å¯âªÇ≥ÇÍÇΩÇÁÅABGThemeFile Çå≥Ç…ñﬂÇ∑ÅB
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// îwåiâÊëúÇ‡ñ≥å¯âªÇ∑ÇÈÅB
 				SetDlgItemText(IDC_BGIMG_EDIT, "");
+				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
 			}
 			return TRUE;
 
@@ -946,15 +974,22 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(TRUE);
 				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(TRUE);
 
+				GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(TRUE);
+				GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(TRUE);
+
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE, sizeof(ts.EtermLookfeel.BGThemeFile));
 			} else {
 				GetDlgItem(IDC_BGIMG_EDIT)->EnableWindow(FALSE);
 				GetDlgItem(IDC_BGIMG_BUTTON)->EnableWindow(FALSE);
 
+				GetDlgItem(IDC_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+				GetDlgItem(IDC_EDIT_BGIMG_BRIGHTNESS)->EnableWindow(FALSE);
+
 				// ñ≥å¯âªÇ≥ÇÍÇΩÇÁÅABGThemeFile Çå≥Ç…ñﬂÇ∑ÅB
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// îwåiâÊëúÇ‡ñ≥å¯âªÇ∑ÇÈÅB
 				SetDlgItemText(IDC_BGIMG_EDIT, "");
+				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
 			}
 			return TRUE;
 
@@ -1092,6 +1127,13 @@ void CVisualPropPageDlg::OnOK()
 		GetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath, sizeof(ts.BGImageFilePath));
 	} else {
 		strncpy_s(ts.BGImageFilePath, sizeof(ts.BGImageFilePath), "%SystemRoot%\\Web\\Wallpaper\\*.bmp", _TRUNCATE);
+	}
+
+	GetDlgItemText(IDC_EDIT_BGIMG_BRIGHTNESS, buf, sizeof(buf));
+	if (isdigit(buf[0])) {
+		ts.BGImgBrightness = atoi(buf);
+		ts.BGImgBrightness = max(0, ts.BGImgBrightness);
+		ts.BGImgBrightness = min(255, ts.BGImgBrightness);
 	}
 
 	// (3)

@@ -2495,6 +2495,8 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	                          ts->EtermLookfeel.BGThemeFile, FName);
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s\\%s", ts->HomeDir, BG_THEME_IMAGEFILE);
 	WritePrivateProfileString(BG_SECTION, BG_DESTFILE, ts->BGImageFilePath, Temp);
+	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, Temp, ts->BGImgBrightness);
+	WriteInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS2, Temp, ts->BGImgBrightness);
 
 #ifdef USE_NORMAL_BGCOLOR
 	// UseNormalBGColor

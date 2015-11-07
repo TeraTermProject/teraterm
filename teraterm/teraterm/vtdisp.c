@@ -1502,6 +1502,10 @@ void BGInitialize(void)
 	  // ”wŒi‰æ‘œ‚Ì“Ç‚İ‚İ
 	  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
 	  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
+
+	  // ”wŒi‰æ‘œ‚Ì–¾‚é‚³‚Ì“Ç‚İ‚İB
+	  // BGSrc1Alpha ‚Æ BGSrc2Alpha‚Í“¯’l‚Æ‚µ‚Äˆµ‚¤B
+	  ts.BGImgBrightness = GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
   } 
 
   if(!BGEnable)
