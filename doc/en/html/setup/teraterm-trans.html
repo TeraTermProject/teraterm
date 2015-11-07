@@ -334,27 +334,27 @@ FTHideDialog=off
 </pre>
 
 
-<!--<h1><a name="FileSendBulkPacket">ファイル送信を1バイトずつではなくまとめて送る</a></h1>
+<h1><a name="FileSendBulkPacket">High Speed File Transfer</a></h1>
 
 <p>
-Tera Term は、ファイル送信時に内容を1バイトずつ送ります。<br />
-しかし、通信速度が速いのに1バイトずつ送信していると、ファイルの転送が遅くなってしまいます。<br />
-高速に送信するために、特定の条件下ではファイルの内容をある程度まとめて(8KBずつ)送信します。
+Basically, the file content is sent as one byte at a time. <br />
+However, the transfer speed will be slow because of byte by byte.<br />
+The file content is sent as 8KB at at time on the special condition to resolve the performance problem.
 </p>
 
 <pre>
-条件:
-シリアル接続
-バイナリフラグ on
+Condition:
+Serial connection
+Binary flag on
 FileRetryEcho = false
 FileBracketMode = false
-Telnetフラグ off
+Telnet flag off
 LocalEcho off
-ボーレート 115200以上
+Baud rate 115200 over
 </pre>
 
 <p>
-この動作のために問題が出る場合には 1 バイトずつ送るように、設定ファイルの [Tera Term] セクションの FileSendBulkPacket 行を下記のように変更してください。
+If this feature is always disabled, please change the FileSendBulkPacket entry of the [Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -362,14 +362,14 @@ FileSendBulkPacket=off
 </pre>
 
 <p>
-この機能は <a href="../menu/file.html">[File]</a>-<a href="../menu/file-sendfile.html">[Send file...]</a> によるファイル送信において適用されます。<br />
-<a href="../menu/file.html">[File]</a>-<a href="../menu/file-transfer.html">[Transfer]</a> 以下の各種ファイル転送プロトコルでの送信や、SSH SCP には適用されません。
+This feature applies to the file transfer by the <a href="../menu/file.html">[File]</a>-<a href="../menu/file-sendfile.html">[Send file...]</a>.<br />
+Also, the feature does not apply to the <a href="../menu/file.html">[File]</a>-<a href="../menu/file-transfer.html">[Transfer]</a> and the SSH SCP.
 </p>
 
 <pre>
 default:
 FileSendBulkPacket=on
-</pre>-->
+</pre>
 
 
 </BODY>
