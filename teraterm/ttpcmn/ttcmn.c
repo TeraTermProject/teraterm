@@ -2312,6 +2312,12 @@ int PASCAL CheckComPort(WORD ComPort)
 	HMODULE h;
 	TCHAR   devicesBuff[65535];
 	char    com_str[64];
+	BOOL bRet;
+	GUID ClassGuid[1];
+	DWORD dwRequiredSize;
+	HDEVINFO DeviceInfoSet = NULL;
+	SP_DEVINFO_DATA DeviceInfoData;
+	int found = 0;
 
 	_snprintf_s(com_str, sizeof(com_str), _TRUNCATE, "COM%d", ComPort);
 
@@ -2319,10 +2325,8 @@ int PASCAL CheckComPort(WORD ComPort)
 		/* ERROR */
 		return -1;
 	}
-	if (QueryDosDevice(com_str, devicesBuff, 65535) != 0) {
-		return 1;
-	}
-	else {
+
+	if (QueryDosDevice(com_str, devicesBuff, 65535) == 0) {
 		DWORD err = GetLastError();
 		if (err == ERROR_FILE_NOT_FOUND) {
 			/* NOT FOUND */
@@ -2331,6 +2335,45 @@ int PASCAL CheckComPort(WORD ComPort)
 		/* ERROR */
 		return -1;
 	}
+
+	/* QueryDosDeviceで切断を検知できない環境があるでさらにチェック */
+	bRet = SetupDiClassGuidsFromName(_T("PORTS"), (LPGUID) & ClassGuid, 1, &dwRequiredSize);
+	if (bRet == FALSE) {
+		return -1;
+	}
+
+	DeviceInfoSet = SetupDiGetClassDevs(&ClassGuid[0], NULL, NULL, DIGCF_PRESENT | DIGCF_PROFILE);
+	if (DeviceInfoSet == NULL) {
+		return -1;
+	}
+
+	if (DeviceInfoSet) {
+		DWORD dwMemberIndex = 0;
+		HKEY hKey = NULL;
+		TCHAR szPortName[MAX_PATH];
+		DWORD dwReqSize;
+		DWORD dwType;
+
+		DeviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+		while (SetupDiEnumDeviceInfo(DeviceInfoSet, dwMemberIndex, &DeviceInfoData)) {
+			hKey = SetupDiOpenDevRegKey(DeviceInfoSet, &DeviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);
+			if (hKey) {
+				long lRet;
+				dwReqSize = sizeof(szPortName);
+				lRet = RegQueryValueEx(hKey, _T("PortName"), 0, &dwType, (LPBYTE)& szPortName, &dwReqSize);
+				RegCloseKey(hKey);
+				if (_stricmp(szPortName, com_str) == 0) {
+					found = TRUE;
+					break;
+				}
+			}
+			dwMemberIndex++;
+		}
+	}
+
+	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
+
+	return found;
 }
 
 BOOL WINAPI DllMain(HANDLE hInstance,

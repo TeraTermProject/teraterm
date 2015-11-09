@@ -56,6 +56,9 @@
 #include "addsetting.h"
 #include "winjump.h"
 
+#include "initguid.h"
+#include "Usbiodef.h"
+
 #define VTClassName "VTWin32"
 
 #ifdef _DEBUG
@@ -80,6 +83,8 @@ static BOOL TCPLocalEchoUsed = FALSE;
 static BOOL TCPCRSendUsed = FALSE;
 
 static BOOL IgnoreRelease = FALSE;
+
+static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
 
@@ -310,6 +315,38 @@ void SetWindowStyle(TTTSet *ts)
 	}
 }
 
+void RegDeviceNotify(HWND hWnd)
+{
+	typedef HDEVNOTIFY (WINAPI *PRegisterDeviceNotification)(HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags);
+	HMODULE h;
+	PRegisterDeviceNotification pRegisterDeviceNotification;
+	DEV_BROADCAST_DEVICEINTERFACE filter;
+
+	if (((h = GetModuleHandle("user32.dll")) == NULL) ||
+			((pRegisterDeviceNotification = (PRegisterDeviceNotification)GetProcAddress(h, "RegisterDeviceNotificationA")) == NULL)) {
+		return;
+	}
+
+	ZeroMemory(&filter, sizeof(filter));
+	filter.dbcc_size = sizeof(filter);
+	filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+	filter.dbcc_classguid = GUID_DEVINTERFACE_USB_DEVICE;
+	hDevNotify = pRegisterDeviceNotification(hWnd, &filter, DEVICE_NOTIFY_WINDOW_HANDLE);
+}
+
+void UnRegDeviceNotify(HWND hWnd)
+{
+	typedef BOOL (WINAPI *PUnregisterDeviceNotification)(HDEVNOTIFY Handle);
+	HMODULE h;
+	PUnregisterDeviceNotification pUnregisterDeviceNotification;
+
+	if (((h = GetModuleHandle("user32.dll")) == NULL) ||
+			((pUnregisterDeviceNotification = (PUnregisterDeviceNotification)GetProcAddress(h, "UnregisterDeviceNotification")) == NULL)) {
+		return;
+	}
+
+	pUnregisterDeviceNotification(hDevNotify);
+}
 
 //
 // 例外ハンドラのフック（スタックトレースのダンプ）
@@ -697,6 +734,9 @@ CVTWindow::CVTWindow()
 	}
 //-->
 #endif
+
+	// USBデバイス変化通知登録
+	RegDeviceNotify(HVTWin);
 
 	if (is_NT4()) {
 		fuLoad = LR_VGACOLOR;
@@ -1821,6 +1861,9 @@ void CVTWindow::OnDestroy()
 {
 	// remove this window from the window list
 	UnregWin(HVTWin);
+
+	// USBデバイス変化通知解除
+	UnRegDeviceNotify(HVTWin);
 
 	EndKeyboard();
 
@@ -2980,7 +3023,7 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
-	if (nEventType == DBT_DEVICEARRIVAL || nEventType ==DBT_DEVICEREMOVECOMPLETE) {
+	if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
 		if (ts.PortType == IdSerial) {
 			if (!ts.AutoComDisReConnect) {
 				return CFrameWnd::OnDeviceChange(nEventType, dwData);
@@ -2988,20 +3031,18 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 
 			if (cv.Open != 0) {
 				/* 接続中 */
-				if (CheckComPort(cv.ComPort) == 0) {
+				if (AutoDisconnectedPort == -1 && CheckComPort(cv.ComPort) == 0) {
 					AutoDisconnectedPort = cv.ComPort;
 					Disconnect(TRUE);
-					return 0;
 				}
 			}
 			else {
 				/* 未接続 */
-				if (AutoDisconnectedPort == cv.ComPort && CheckComPort(cv.ComPort) == 1) {
+				if (AutoDisconnectedPort == ts.ComPort && CheckComPort(ts.ComPort) == 1) {
 					AutoDisconnectedPort = -1;
 					Connecting = TRUE;
 					ChangeTitle();
 					CommOpen(HVTWin, &ts, &cv);
-					return 0;
 				}
 			}
 		}
