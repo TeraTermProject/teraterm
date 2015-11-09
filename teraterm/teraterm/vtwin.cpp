@@ -4697,12 +4697,31 @@ static BOOL openDirectoryWithExplorer(char *path)
 
 
 //
-// Virtual Storeを開く。
+// フォルダもしくはファイルを開く。
+//
+static void openFileDirectory(char *path, char *filename, BOOL open_directory_only, char *open_editor)
+{
+	if (open_directory_only) {
+		openDirectoryWithExplorer(path);
+	}
+	else {
+		openFileWithApplication(path, filename, open_editor);
+	}
+}
+
+
+//
+// Virtual Storeパスに変換する。
+//
+// path: IN
+// filename: IN
+// vstore_path: OUT
+// vstore_pathlen: IN
 //
 // return TRUE: success
 //        FALSE: failure
 //
-static BOOL openVirtualStore(char *path, char *filename, BOOL open_directory_only, char *open_editor)
+static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, int vstore_pathlen)
 {
 #if _MSC_VER == 1400  // VSC2005(VC8.0)
 	typedef struct _TOKEN_ELEVATION {
@@ -4735,7 +4754,7 @@ static BOOL openVirtualStore(char *path, char *filename, BOOL open_directory_onl
 	DWORD dwType;
 	BYTE bValue;
 
-	OutputDebugPrintf("[%s][%s] open_directory_only %d\n", path, filename, open_directory_only);
+	OutputDebugPrintf("[%s][%s]\n", path, filename);
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
@@ -4811,7 +4830,7 @@ static BOOL openVirtualStore(char *path, char *filename, BOOL open_directory_onl
 	// ドライブレターは一文字とは限らない点に注意。
 	s = strstr(path, ":\\");
 	if (s != NULL) {
-		strncat_s(shPath, sizeof(shPath), s+1, _TRUNCATE);
+		strncat_s(shPath, sizeof(shPath), s + 1, _TRUNCATE);
 	}
 
 	// 最後に、Virtual Storeにファイルがあるかどうかを調べる。
@@ -4820,43 +4839,33 @@ static BOOL openVirtualStore(char *path, char *filename, BOOL open_directory_onl
 		goto error;
 	}
 
-	if (open_directory_only) {
-		openDirectoryWithExplorer(shPath);
-	}
-	else {
-		openFileWithApplication(shPath, filename, open_editor);
-	}
+	strncpy_s(vstore_path, vstore_pathlen, shPath, _TRUNCATE);
 
 	ret = TRUE;
 	return (ret);
 
 error:
-	if (open_directory_only) {
-		openDirectoryWithExplorer(path);
-	}
-	else {
-		openFileWithApplication(path, filename, open_editor);
-	}
-
 	return (ret);
 }
+
 
 
 static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static char teratermexepath[MAX_PATH];
-	static char inipath[MAX_PATH], inifilename[MAX_PATH];
-	static char keycnfpath[MAX_PATH], keycnffilename[MAX_PATH];
-	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH];
-	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH];
+	static char inipath[MAX_PATH], inifilename[MAX_PATH], inipath_vstore[1024];
+	static char keycnfpath[MAX_PATH], keycnffilename[MAX_PATH], keycnfpath_vstore[1024];
+	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH], cygtermpath_vstore[1024];
+	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH], eterm1path_vstore[1024];
 	char temp[MAX_PATH];
 	typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
 	PSSH_read_known_hosts_file func = NULL;
 	HMODULE h = NULL;
-	static char hostsfilepath[MAX_PATH], hostsfilename[MAX_PATH];
+	static char hostsfilepath[MAX_PATH], hostsfilename[MAX_PATH], hostsfilepath_vstore[1024];
 	char *path_p, *filename_p;
-	BOOL open_dir;
+	BOOL open_dir, ret;
 	int button_pressed;
+	HWND hWnd;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -4886,23 +4895,78 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 
 		// 設定ファイル(teraterm.ini)のパスを取得する。
+		/// (1)
 		ExtractFileName(ts.SetupFName, inifilename, sizeof(inifilename));
 		ExtractDirName(ts.SetupFName, inipath);
 		//SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, inifilename);
 		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT, ts.SetupFName);
+		/// (2) Virutal Storeへの変換
+		memset(inipath_vstore, 0, sizeof(inipath_vstore));
+		ret = convertVirtualStore(inipath, inifilename, inipath_vstore, sizeof(inipath_vstore));
+		if (ret) {
+			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
+			EnableWindow(hWnd, TRUE);
+			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
+			EnableWindow(hWnd, TRUE);
+			SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, inipath_vstore);
+		}
+		else {
+			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
+			EnableWindow(hWnd, FALSE);
+			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
+			EnableWindow(hWnd, FALSE);
+			SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, "");
+		}
 
 		// 設定ファイル(KEYBOARD.CNF)のパスを取得する。
+		/// (1)
 		ExtractFileName(ts.KeyCnfFN, keycnffilename, sizeof(keycnfpath));
 		ExtractDirName(ts.KeyCnfFN, keycnfpath);
 		//SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC, keycnffilename);
 		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, ts.KeyCnfFN);
+		/// (2) Virutal Storeへの変換
+		memset(keycnfpath_vstore, 0, sizeof(keycnfpath_vstore));
+		ret = convertVirtualStore(keycnfpath, keycnffilename, keycnfpath_vstore, sizeof(keycnfpath_vstore));
+		if (ret) {
+			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
+			EnableWindow(hWnd, TRUE);
+			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
+			EnableWindow(hWnd, TRUE);
+			SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, keycnfpath_vstore);
+		}
+		else {
+			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
+			EnableWindow(hWnd, FALSE);
+			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
+			EnableWindow(hWnd, FALSE);
+			SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, "");
+		}
+
 
 		// cygterm.cfg は ttermpro.exe 配下に位置する。
+		/// (1)
 		strncpy_s(cygtermfilename, sizeof(cygtermfilename), "cygterm.cfg", _TRUNCATE);
 		strncpy_s(cygtermpath, sizeof(cygtermpath), teratermexepath, _TRUNCATE);
 		//SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, cygtermfilename);
 		_snprintf_s(temp, sizeof(temp), "%s\\%s", cygtermpath, cygtermfilename);
 		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, temp);
+		/// (2) Virutal Storeへの変換
+		memset(cygtermpath_vstore, 0, sizeof(cygtermpath_vstore));
+		ret = convertVirtualStore(cygtermpath, cygtermfilename, cygtermpath_vstore, sizeof(cygtermpath_vstore));
+		if (ret) {
+			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
+			EnableWindow(hWnd, TRUE);
+			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
+			EnableWindow(hWnd, TRUE);
+			SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, cygtermpath_vstore);
+		}
+		else {
+			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
+			EnableWindow(hWnd, FALSE);
+			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
+			EnableWindow(hWnd, FALSE);
+			SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, "");
+		}
 
 		// ssh_known_hosts
 		if (func == NULL) {
@@ -4924,6 +4988,25 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 						}
 
 						SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, temp);
+
+						/// (2) Virutal Storeへの変換
+						memset(hostsfilepath_vstore, 0, sizeof(hostsfilepath_vstore));
+						ret = convertVirtualStore(hostsfilepath, hostsfilename, hostsfilepath_vstore, sizeof(hostsfilepath_vstore));
+						if (ret) {
+							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
+							EnableWindow(hWnd, TRUE);
+							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
+							EnableWindow(hWnd, TRUE);
+							SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, hostsfilepath_vstore);
+						}
+						else {
+							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
+							EnableWindow(hWnd, FALSE);
+							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
+							EnableWindow(hWnd, FALSE);
+							SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
+						}
+
 					}
 				}
 			}
@@ -4937,12 +5020,16 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		case IDC_INI_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
 			open_dir = TRUE;
 			path_p = inipath;
+			if (inipath_vstore[0])
+				path_p = inipath_vstore;
 			filename_p = inifilename;
 			button_pressed = 1;
 			break;
 		case IDC_INI_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
 			open_dir = FALSE;
 			path_p = inipath;
+			if (inipath_vstore[0])
+				path_p = inipath_vstore;
 			filename_p = inifilename;
 			button_pressed = 1;
 			break;
@@ -4950,12 +5037,16 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		case IDC_KEYCNF_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
 			open_dir = TRUE;
 			path_p = keycnfpath;
+			if (keycnfpath_vstore[0])
+				path_p = keycnfpath_vstore;
 			filename_p = keycnffilename;
 			button_pressed = 1;
 			break;
 		case IDC_KEYCNF_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
 			open_dir = FALSE;
 			path_p = keycnfpath;
+			if (keycnfpath_vstore[0])
+				path_p = keycnfpath_vstore;
 			filename_p = keycnffilename;
 			button_pressed = 1;
 			break;
@@ -4963,12 +5054,16 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		case IDC_CYGTERM_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
 			open_dir = TRUE;
 			path_p = cygtermpath;
+			if (cygtermpath_vstore[0])
+				path_p = cygtermpath_vstore;
 			filename_p = cygtermfilename;
 			button_pressed = 1;
 			break;
 		case IDC_CYGTERM_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
 			open_dir = FALSE;
 			path_p = cygtermpath;
+			if (cygtermpath_vstore[0])
+				path_p = cygtermpath_vstore;
 			filename_p = cygtermfilename;
 			button_pressed = 1;
 			break;
@@ -4976,12 +5071,16 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		case IDC_SSH_SETUPDIR_BUTTON | (BN_CLICKED << 16) :
 			open_dir = TRUE;
 			path_p = hostsfilepath;
+			if (hostsfilepath_vstore[0])
+				path_p = hostsfilepath_vstore;
 			filename_p = hostsfilename;
 			button_pressed = 1;
 			break;
 		case IDC_SSH_SETUPDIR_BUTTON_FILE | (BN_CLICKED << 16) :
 			open_dir = FALSE;
 			path_p = hostsfilepath;
+			if (hostsfilepath_vstore[0])
+				path_p = hostsfilepath_vstore;
 			filename_p = hostsfilename;
 			button_pressed = 1;
 			break;
@@ -5002,7 +5101,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			else
 				app = ts.ViewlogEditor;
 
-			openVirtualStore(path_p, filename_p, open_dir, app);
+			openFileDirectory(path_p, filename_p, open_dir, app);
 			return TRUE;
 		}
 
