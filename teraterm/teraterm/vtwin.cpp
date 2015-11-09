@@ -4858,6 +4858,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH], cygtermpath_vstore[1024];
 	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH], eterm1path_vstore[1024];
 	char temp[MAX_PATH];
+	char tmpbuf[1024];
 	typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
 	PSSH_read_known_hosts_file func = NULL;
 	HMODULE h = NULL;
@@ -4908,7 +4909,8 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			EnableWindow(hWnd, TRUE);
 			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE);
 			EnableWindow(hWnd, TRUE);
-			SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, inipath_vstore);
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", inipath_vstore, inifilename);
+			SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, tmpbuf);
 		}
 		else {
 			hWnd = GetDlgItem(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE);
@@ -4932,7 +4934,8 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			EnableWindow(hWnd, TRUE);
 			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE);
 			EnableWindow(hWnd, TRUE);
-			SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, keycnfpath_vstore);
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", keycnfpath_vstore, keycnffilename);
+			SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, tmpbuf);
 		}
 		else {
 			hWnd = GetDlgItem(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE);
@@ -4958,7 +4961,8 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			EnableWindow(hWnd, TRUE);
 			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE);
 			EnableWindow(hWnd, TRUE);
-			SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, cygtermpath_vstore);
+			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", cygtermpath_vstore, cygtermfilename);
+			SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, tmpbuf);
 		}
 		else {
 			hWnd = GetDlgItem(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE);
@@ -4997,7 +5001,8 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 							EnableWindow(hWnd, TRUE);
 							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
 							EnableWindow(hWnd, TRUE);
-							SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, hostsfilepath_vstore);
+							_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, "%s\\%s", hostsfilepath_vstore, hostsfilename);
+							SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, tmpbuf);
 						}
 						else {
 							hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
