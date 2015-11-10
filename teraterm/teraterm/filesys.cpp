@@ -1214,7 +1214,6 @@ int FSEcho1(BYTE b)
 extern "C" {
 // ˆÈ‰º‚ÌŽž‚Í‚±‚¿‚ç‚ÌŠÖ”‚ðŽg‚¤
 // - BinaryMode == true
-// - FileRetryEcho == false
 // - FileBracketMode == false
 // - cv.TelFlag == false
 // - ts.LocalEcho == 0
@@ -1286,8 +1285,8 @@ void FileSend()
 	LONG BCOld;
 	DWORD read_bytes;
 
-	if (ts.FileSendBulkPacket &&
-	    BinaryMode && !FileRetryEcho && !FileBracketMode && !cv.TelFlag &&
+	if (cv.PortType == IdSerial && ts.FileSendBulkPacket &&
+	    BinaryMode && !FileBracketMode && !cv.TelFlag &&
 	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
 		return FileSendBinayBoost();
 	}
