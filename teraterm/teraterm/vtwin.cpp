@@ -80,6 +80,7 @@ static char THIS_FILE[] = __FILE__;
 
 static HFONT DlgBroadcastFont;
 static HFONT DlgCommentFont;
+static HFONT DlgSetupdirFont;
 
 static BOOL TCPLocalEchoUsed = FALSE;
 static BOOL TCPCRSendUsed = FALSE;
@@ -4910,10 +4911,43 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	BOOL open_dir, ret;
 	int button_pressed;
 	HWND hWnd;
+	LOGFONT logfont;
+	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
 		// I18N
+		font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+		if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgSetupdirFont, ts.UILanguageFile)) {
+			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
+		} else {
+			DlgSetupdirFont = NULL;
+		}
+
 		get_lang_msg("DLG_SETUPDIR_CAPTION", ts.UIMsg, sizeof(ts.UIMsg),
 			"Tera Term: Setup directory", ts.UILanguageFile);
 		SetWindowText(hDlgWnd, ts.UIMsg);
@@ -5134,6 +5168,9 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			break;
 
 		case IDCANCEL:
+			if (DlgSetupdirFont != NULL) {
+				DeleteObject(DlgSetupdirFont);
+			}
 			EndDialog(hDlgWnd, IDCANCEL);
 			break;
 
