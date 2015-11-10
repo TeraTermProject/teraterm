@@ -4913,6 +4913,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	HWND hWnd;
 	LOGFONT logfont;
 	HFONT font;
+	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -4948,24 +4949,24 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			DlgSetupdirFont = NULL;
 		}
 
-		get_lang_msg("DLG_SETUPDIR_CAPTION", ts.UIMsg, sizeof(ts.UIMsg),
-			"Tera Term: Setup directory", ts.UILanguageFile);
+		GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
+		get_lang_msg("DLG_SETUPDIR_CAPTION", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetWindowText(hDlgWnd, ts.UIMsg);
 
-		get_lang_msg("DLG_SETUPDIR_INIFILE", ts.UIMsg, sizeof(ts.UIMsg),
-			"Tera Term Configuration File", ts.UILanguageFile);
+		GetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
+		get_lang_msg("DLG_SETUPDIR_INIFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_GROUP, ts.UIMsg);
 
-		get_lang_msg("DLG_SETUPDIR_KEYBOARDFILE", ts.UIMsg, sizeof(ts.UIMsg),
-			"Keyboard Configuration File", ts.UILanguageFile);
+		GetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
+		get_lang_msg("DLG_SETUPDIR_KEYBOARDFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, ts.UIMsg);
 
-		get_lang_msg("DLG_SETUPDIR_CYGTERMFILE", ts.UIMsg, sizeof(ts.UIMsg),
-			"CygTerm Configuration File", ts.UILanguageFile);
+		GetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
+		get_lang_msg("DLG_SETUPDIR_CYGTERMFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, ts.UIMsg);
 
-		get_lang_msg("DLG_SETUPDIR_KNOWNHOSTSFILE", ts.UIMsg, sizeof(ts.UIMsg),
-			"Known_hosts File", ts.UILanguageFile);
+		GetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
+		get_lang_msg("DLG_SETUPDIR_KNOWNHOSTSFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, ts.UIMsg);
 
 		if (GetModuleFileName(NULL, temp, sizeof(temp)) != 0) {
