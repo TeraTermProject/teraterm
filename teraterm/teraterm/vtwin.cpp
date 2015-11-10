@@ -5093,6 +5093,20 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 					}
 				}
 			}
+			else {
+				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT);
+				EnableWindow(hWnd, FALSE);
+				SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, "");
+				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON);
+				EnableWindow(hWnd, FALSE);
+				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON_FILE);
+				EnableWindow(hWnd, FALSE);
+				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE);
+				EnableWindow(hWnd, FALSE);
+				hWnd = GetDlgItem(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE);
+				EnableWindow(hWnd, FALSE);
+				SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, "");
+			}
 		}
 
 		return TRUE;
