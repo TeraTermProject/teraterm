@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Aug 29 2015)
+; Updated by TeraTerm Project (Oct 10 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -269,7 +269,7 @@ DLG_SETUPDIR_CAPTION=Tera Term: 設定フォルダ
 DLG_SETUPDIR_INIFILE=Tera Term設定ファイル
 DLG_SETUPDIR_KEYBOARDFILE=キーボード設定ファイル
 DLG_SETUPDIR_CYGTERMFILE=CygTerm設定ファイル
-DLG_SETUPDIR_KNOWNHOSTSFILE=Known_hostsファイル
+DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hostsファイル
 DLG_SETUPDIR_NOFILE_ERROR=ファイルが存在しません(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=ファイルが開けません(%d)
 

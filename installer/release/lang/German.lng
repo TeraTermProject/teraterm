@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Aug 29 2015)
+; Updated by TeraTerm Project (Oct 10 2015)
 ; Last translated (German language) by Frederik Schwarzer (May 17 2010)
 
 [Tera Term]
@@ -270,7 +270,7 @@ DLG_SETUPDIR_CAPTION=Tera Term: Setup directory
 DLG_SETUPDIR_INIFILE=Tera Term Configuration File
 DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
 DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
-DLG_SETUPDIR_KNOWNHOSTSFILE=Known_hosts File
+DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
 DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
 
