@@ -4920,19 +4920,19 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		get_lang_msg("DLG_SETUPDIR_INIFILE", ts.UIMsg, sizeof(ts.UIMsg),
 			"Tera Term Configuration File", ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_STATIC, ts.UIMsg);
+		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_GROUP, ts.UIMsg);
 
 		get_lang_msg("DLG_SETUPDIR_KEYBOARDFILE", ts.UIMsg, sizeof(ts.UIMsg),
 			"Keyboard Configuration File", ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC, ts.UIMsg);
+		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, ts.UIMsg);
 
 		get_lang_msg("DLG_SETUPDIR_CYGTERMFILE", ts.UIMsg, sizeof(ts.UIMsg),
 			"CygTerm Configuration File", ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC, ts.UIMsg);
+		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, ts.UIMsg);
 
 		get_lang_msg("DLG_SETUPDIR_KNOWNHOSTSFILE", ts.UIMsg, sizeof(ts.UIMsg),
 			"Known_hosts File", ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_STATIC, ts.UIMsg);
+		SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, ts.UIMsg);
 
 		if (GetModuleFileName(NULL, temp, sizeof(temp)) != 0) {
 			ExtractDirName(temp, teratermexepath);
