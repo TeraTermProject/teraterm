@@ -3028,7 +3028,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
 	if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
 		if (ts.PortType == IdSerial) {
-			if (!ts.AutoComDisReConnect) {
+			if (!ts.AutoComPortReconnect) {
 				return CFrameWnd::OnDeviceChange(nEventType, dwData);
 			}
 

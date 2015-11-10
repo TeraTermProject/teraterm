@@ -1285,7 +1285,7 @@ void FileSend()
 	LONG BCOld;
 	DWORD read_bytes;
 
-	if (cv.PortType == IdSerial && ts.FileSendBulkPacket &&
+	if (cv.PortType == IdSerial && ts.FileSendHighSpeedMode &&
 	    BinaryMode && !FileBracketMode && !cv.TelFlag &&
 	    (ts.LocalEcho == 0) && (ts.Baud >= 115200)) {
 		return FileSendBinayBoost();

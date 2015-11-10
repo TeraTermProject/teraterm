@@ -840,7 +840,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->KanjiOut = IdKanjiOutJ;
 
 	// Detect disconnect/reconnect of serial port --- special option
-	ts->AutoComDisReConnect = GetOnOff(Section, "AutoComDisReConnect", FName, TRUE);
+	ts->AutoComPortReconnect = GetOnOff(Section, "AutoComPortReconnect", FName, TRUE);
 
 	// Auto file renaming --- special option
 	if (GetOnOff(Section, "AutoFileRename", FName, FALSE))
@@ -924,7 +924,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->TermFlag |= TF_ENABLESLINE;
 
 	// Enable multiple bytes send -- special option
-	ts->FileSendBulkPacket = GetOnOff(Section, "FileSendBulkPacket", FName, TRUE);
+	ts->FileSendHighSpeedMode = GetOnOff(Section, "FileSendHighSpeedMode", FName, TRUE);
 
 	// fixed JIS --- special
 	if (GetOnOff(Section, "FixedJIS", FName, FALSE))
@@ -2222,7 +2222,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           (WORD) (ts->TermFlag & TF_ALLOWWRONGSEQUENCE));
 
 	/* Detect disconnect/reconnect of serial port --- special option */
-	WriteOnOff(Section, "AutoComDisReConnect", FName, ts->AutoComDisReConnect);
+	WriteOnOff(Section, "AutoComPortReconnect", FName, ts->AutoComPortReconnect);
 
 	/* Auto file renaming --- special option */
 	WriteOnOff(Section, "AutoFileRename", FName,
@@ -2302,7 +2302,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           (WORD) (ts->TermFlag & TF_ENABLESLINE));
 
 	/* Enable multiple bytes send -- special option */
-	WriteOnOff(Section, "FileSendBulkPacket", FName, ts->FileSendBulkPacket);
+	WriteOnOff(Section, "FileSendHighSpeedMode", FName, ts->FileSendHighSpeedMode);
 
 	/* IME Flag  -- special option */
 	WriteOnOff(Section, "IME", FName, ts->UseIME);

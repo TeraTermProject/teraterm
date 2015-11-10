@@ -410,7 +410,7 @@ FTHideDialog=off
 </pre>
 
 
-<h1><a name="FileSendBulkPacket">シリアル接続における高速なファイル転送</a></h1>
+<h1><a name="FileSendHighSpeedMode">シリアル接続における高速なファイル転送</a></h1>
 
 <p>
 Tera Term は、ファイル送信時に内容を1バイトずつ送ります。<br />
@@ -429,11 +429,11 @@ LocalEcho が off である
 </pre>
 
 <p>
-この動作のために問題が出る場合には 1 バイトずつ送るように、設定ファイルの [Tera Term] セクションの FileSendBulkPacket 行を下記のように変更してください。
+この動作のために問題が出る場合には 1 バイトずつ送るように、設定ファイルの [Tera Term] セクションの FileSendHighSpeedMode 行を下記のように変更してください。
 </p>
 
 <pre>
-FileSendBulkPacket=off
+FileSendHighSpeedMode=off
 </pre>
 
 <p>
@@ -443,7 +443,7 @@ FileSendBulkPacket=off
 
 <pre>
 省略時:
-FileSendBulkPacket=on
+FileSendHighSpeedMode=on
 </pre>
 
 
