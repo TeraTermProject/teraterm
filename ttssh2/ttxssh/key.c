@@ -666,6 +666,27 @@ key_size(const Key *k)
 	return 0;
 }
 
+static char *
+key_fingerprint_hash(u_char *dgst_raw, u_int dgst_raw_len)
+{
+	char *retval;
+	unsigned int i, retval_len;
+
+	retval_len = dgst_raw_len * 3 + 1;
+	retval = malloc(retval_len);
+	retval[0] = '\0';
+	for (i = 0; i < dgst_raw_len; i++) {
+		char hex[4];
+		_snprintf_s(hex, sizeof(hex), _TRUNCATE, "%02x:", dgst_raw[i]);
+		strncat_s(retval, retval_len, hex, _TRUNCATE);
+	}
+
+	/* Remove the trailing ':' character */
+	retval[(dgst_raw_len * 3) - 1] = '\0';
+
+	return (retval);
+}
+
 // based on OpenSSH 5.1
 #define	FLDBASE		8
 #define	FLDSIZE_Y	(FLDBASE + 1)
@@ -753,31 +774,19 @@ key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 //
 // fingerprint（指紋：ホスト公開鍵のハッシュ）を生成する
 //
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep)
+char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum fp_type dgst_type)
 {
 	char *retval = NULL;
 	unsigned char *dgst_raw;
 	int dgst_raw_len;
-	int i, retval_len;
 
 	// fingerprintのハッシュ値（バイナリ）を求める
-	dgst_raw = key_fingerprint_raw(key, SSH_FP_MD5, &dgst_raw_len);
+	dgst_raw = key_fingerprint_raw(key, dgst_type, &dgst_raw_len);
 	if (dgst_raw == NULL)
 		return NULL;
 
 	if (dgst_rep == SSH_FP_HEX) {
-		// 16進表記へ変換する
-		retval_len = dgst_raw_len * 3 + 1;
-		retval = malloc(retval_len);
-		retval[0] = '\0';
-		for (i = 0; i < dgst_raw_len; i++) {
-			char hex[4];
-			_snprintf_s(hex, sizeof(hex), _TRUNCATE, "%02x:", dgst_raw[i]);
-			strncat_s(retval, retval_len, hex, _TRUNCATE);
-		}
-
-		/* Remove the trailing ':' character */
-		retval[(dgst_raw_len * 3) - 1] = '\0';
+		retval = key_fingerprint_hash(dgst_raw, dgst_raw_len);
 
 	} else if (dgst_rep == SSH_FP_RANDOMART) {
 		retval = key_fingerprint_randomart(dgst_raw, dgst_raw_len, key);
@@ -1954,7 +1963,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
 				continue;
-			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX);
+			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, SSH_FP_MD5);
 			buf[0] = 0;
 			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->keys[i]));
 			strcat_s(buf, sizeof(buf), " ");
@@ -1969,7 +1978,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
 		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
 		for (i = 0; i < ctx->nold; i++) {
-			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX);
+			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, SSH_FP_MD5);
 			buf[0] = 0;
 			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->old_keys[i]));
 			strcat_s(buf, sizeof(buf), " ");
@@ -2227,7 +2236,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		free(blob);
 		blob = NULL;
 
-		fp = key_fingerprint(key, SSH_FP_HEX);
+		fp = key_fingerprint(key, SSH_FP_HEX, SSH_FP_MD5);
 		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Received %s host key %s", 
 			get_sshname_from_key(key), fp);
 		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);

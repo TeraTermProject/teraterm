@@ -1097,12 +1097,12 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 	SetDlgItemText(dlg, IDC_HOSTWARNING, buf2);
 
 	// fingerprintを設定する
-	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX);
+	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, SSH_FP_MD5);
 	SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
 	free(fp);
 
 	// ビジュアル化fingerprintを表示する
-	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART);
+	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, SSH_FP_MD5);
 	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
 	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), TRUE);
 	free(fp);

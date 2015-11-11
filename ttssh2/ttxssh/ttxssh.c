@@ -2747,12 +2747,12 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 		// ホスト公開鍵のfingerprintを表示する。
 		// Random artの表示が崩れてしまうのが課題。
 		// (2014.5.1 yutaka)
-		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX);
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, SSH_FP_MD5);
 		UTIL_get_lang_msg("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
 		append_about_text(dlg, pvar->ts->UIMsg, fp);
 		free(fp);
 
-		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART);
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, SSH_FP_MD5);
 		append_about_text(dlg, "", fp);
 		free(fp);
 	}
