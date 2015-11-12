@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
 #include <openssl/ecdsa.h>
+#include <openssl/buffer.h>
 
 #define INTBLOB_LEN 20
 #define SIGBLOB_LEN (2*INTBLOB_LEN)
@@ -667,7 +668,39 @@ key_size(const Key *k)
 }
 
 static char *
-key_fingerprint_hash(u_char *dgst_raw, u_int dgst_raw_len)
+key_fingerprint_b64(u_char *dgst_raw, u_int dgst_raw_len)
+{
+	char *retval;
+	unsigned int i, retval_len;
+	BIO *bio, *b64;
+	BUF_MEM *bufferPtr;
+
+	retval_len = ((dgst_raw_len + 2) / 3) * 4 + 1;
+	retval = malloc(retval_len);
+	retval[0] = '\0';
+
+	b64 = BIO_new(BIO_f_base64());
+	bio = BIO_new(BIO_s_mem());
+	bio = BIO_push(b64, bio);
+
+	BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
+	BIO_write(bio, dgst_raw, dgst_raw_len);
+	BIO_flush(bio);
+	BIO_get_mem_ptr(bio, &bufferPtr);
+	strncat_s(retval, retval_len, bufferPtr->data, _TRUNCATE);
+	BIO_set_close(bio, BIO_NOCLOSE);
+	BIO_free_all(bio);
+
+	/* Remove the trailing '=' character */
+	for (i = strlen(retval) - 1; retval[i] == '='; i--) {
+		retval[i] = '\0';
+	}
+
+	return (retval);
+}
+
+static char *
+key_fingerprint_hex(u_char *dgst_raw, u_int dgst_raw_len)
 {
 	char *retval;
 	unsigned int i, retval_len;
@@ -785,14 +818,16 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum fp_type dgst_type)
 	if (dgst_raw == NULL)
 		return NULL;
 
-	if (dgst_rep == SSH_FP_HEX) {
-		retval = key_fingerprint_hash(dgst_raw, dgst_raw_len);
-
-	} else if (dgst_rep == SSH_FP_RANDOMART) {
+	switch (dgst_rep) {
+	case SSH_FP_HEX:
+		retval = key_fingerprint_hex(dgst_raw, dgst_raw_len);
+		break;
+	case SSH_FP_BASE64:
+		retval = key_fingerprint_b64(dgst_raw, dgst_raw_len);
+		break;
+	case SSH_FP_RANDOMART:
 		retval = key_fingerprint_randomart(dgst_raw, dgst_raw_len, key);
-
-	} else {
-
+		break;
 	}
 
 	memset(dgst_raw, 0, dgst_raw_len);

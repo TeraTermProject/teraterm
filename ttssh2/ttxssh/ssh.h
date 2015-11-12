@@ -529,7 +529,9 @@ typedef struct Key {
 
 // fingerprint‚ÌŽí•Ê
 enum fp_rep {
+	SSH_FP_DEFAULT = 0,
 	SSH_FP_HEX,
+	SSH_FP_BASE64,
 	SSH_FP_BUBBLEBABBLE,
 	SSH_FP_RANDOMART
 };
