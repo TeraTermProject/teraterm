@@ -1674,14 +1674,9 @@ BEGIN_MESSAGE_MAP(CCygwinPropPageDlg, CPropertyPage)
 END_MESSAGE_MAP()
 
 // CCygwinPropPageDlg メッセージ ハンドラ
-#define CYGTERM_FILE "cygterm.cfg"  // CygTerm configuration file
 
 BOOL CCygwinPropPageDlg::OnInitDialog()
 {
-	char *cfgfile = CYGTERM_FILE; // CygTerm configuration file
-	char cfg[MAX_PATH];
-	FILE *fp;
-	char buf[256], *head, *body;
 	char uimsg[MAX_UIMSG];
 	CButton *btn;
 
@@ -1720,78 +1715,8 @@ BOOL CCygwinPropPageDlg::OnInitDialog()
 	get_lang_msg("DLG_TAB_CYGWIN_PATH", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CYGWIN_PATH_LABEL, ts.UIMsg);
 
-	// try to read CygTerm config file
-	memset(&settings, 0, sizeof(settings));
-	_snprintf_s(settings.term, sizeof(settings.term), _TRUNCATE, "ttermpro.exe %%s %%d /E /KR=SJIS /KT=SJIS /VTICON=CygTerm /nossh");
-	_snprintf_s(settings.term_type, sizeof(settings.term_type), _TRUNCATE, "vt100");
-	_snprintf_s(settings.port_start, sizeof(settings.port_start), _TRUNCATE, "20000");
-	_snprintf_s(settings.port_range, sizeof(settings.port_range), _TRUNCATE, "40");
-	_snprintf_s(settings.shell, sizeof(settings.shell), _TRUNCATE, "auto");
-	_snprintf_s(settings.env1, sizeof(settings.env1), _TRUNCATE, "MAKE_MODE=unix");
-	_snprintf_s(settings.env2, sizeof(settings.env2), _TRUNCATE, "");
-	settings.login_shell = FALSE;
-	settings.home_chdir = FALSE;
-	settings.agent_proxy = FALSE;
+	memcpy(&settings, &ts.CygtermSettings, sizeof(cygterm_t));
 
-	strncpy_s(cfg, sizeof(cfg), ts.HomeDir, _TRUNCATE);
-	AppendSlash(cfg, sizeof(cfg));
-	strncat_s(cfg, sizeof(cfg), cfgfile, _TRUNCATE);
-
-	fp = fopen(cfg, "r");
-	if (fp != NULL) { 
-		while (fgets(buf, sizeof(buf), fp) != NULL) {
-			int len = strlen(buf);
-
-			if (buf[len - 1] == '\n')
-				buf[len - 1] = '\0';
-
-			split_buffer(buf, '=', &head, &body);
-			if (head == NULL || body == NULL)
-				continue;
-
-			if (_stricmp(head, "TERM") == 0) {
-				_snprintf_s(settings.term, sizeof(settings.term), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "TERM_TYPE") == 0) {
-				_snprintf_s(settings.term_type, sizeof(settings.term_type), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "PORT_START") == 0) {
-				_snprintf_s(settings.port_start, sizeof(settings.port_start), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "PORT_RANGE") == 0) {
-				_snprintf_s(settings.port_range, sizeof(settings.port_range), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "SHELL") == 0) {
-				_snprintf_s(settings.shell, sizeof(settings.shell), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "ENV_1") == 0) {
-				_snprintf_s(settings.env1, sizeof(settings.env1), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "ENV_2") == 0) {
-				_snprintf_s(settings.env2, sizeof(settings.env2), _TRUNCATE, "%s", body);
-
-			} else if (_stricmp(head, "LOGIN_SHELL") == 0) {
-				if (strchr("YyTt", *body)) {
-					settings.login_shell = TRUE;
-				}
-
-			} else if (_stricmp(head, "HOME_CHDIR") == 0) {
-				if (strchr("YyTt", *body)) {
-					settings.home_chdir = TRUE;
-				}
-
-			} else if (_stricmp(head, "SSH_AGENT_PROXY") == 0) {
-				if (strchr("YyTt", *body)) {
-					settings.agent_proxy = TRUE;
-				}
-
-			} else {
-				// TODO: error check
-
-			}
-		}
-		fclose(fp);
-	}
 	SetDlgItemText(IDC_TERM_EDIT, settings.term);
 	SetDlgItemText(IDC_TERM_TYPE, settings.term_type);
 	SetDlgItemText(IDC_PORT_START, settings.port_start);
@@ -1836,14 +1761,6 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CCygwinPropPageDlg::OnOK()
 {
-	char *cfgfile = CYGTERM_FILE; // CygTerm configuration file
-	char *tmpfile = "cygterm.tmp";
-	char cfg[MAX_PATH];
-	char tmp[MAX_PATH];
-	FILE *fp;
-	FILE *tmp_fp;
-	char buf[256], *head, *body;
-	char uimsg[MAX_UIMSG];
 	CButton *btn;
 
 	// writing to CygTerm config file
@@ -1861,140 +1778,10 @@ void CCygwinPropPageDlg::OnOK()
 	btn = (CButton *)GetDlgItem(IDC_AGENT_PROXY);
 	settings.agent_proxy = btn->GetCheck();
 
-	strncpy_s(cfg, sizeof(cfg), ts.HomeDir, _TRUNCATE);
-	AppendSlash(cfg, sizeof(cfg));
-	strncat_s(cfg, sizeof(cfg), cfgfile, _TRUNCATE);
+	memcpy(&ts.CygtermSettings, &settings, sizeof(cygterm_t));
 
-	strncpy_s(tmp, sizeof(tmp), ts.HomeDir, _TRUNCATE);
-	AppendSlash(tmp, sizeof(tmp));
-	strncat_s(tmp, sizeof(tmp), tmpfile, _TRUNCATE);
-
-	fp = fopen(cfg, "r");
-	tmp_fp = fopen(tmp, "w");
-	if (tmp_fp == NULL) { 
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_CYGTERM_CONF_WRITEFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't write CygTerm configuration file (%d).", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-		MessageBox(buf, uimsg, MB_ICONEXCLAMATION);
-	} else {
-		if (fp != NULL) {
-			while (fgets(buf, sizeof(buf), fp) != NULL) {
-				int len = strlen(buf);
-
-				if (buf[len - 1] == '\n')
-					buf[len - 1] = '\0';
-
-				split_buffer(buf, '=', &head, &body);
-				if (head == NULL || body == NULL) {
-					fprintf(tmp_fp, "%s\n", buf);
-				}
-				else if (_stricmp(head, "TERM") == 0) {
-					fprintf(tmp_fp, "TERM = %s\n", settings.term);
-					settings.term[0] = '\0';
-				}
-				else if (_stricmp(head, "TERM_TYPE") == 0) {
-					fprintf(tmp_fp, "TERM_TYPE = %s\n", settings.term_type);
-					settings.term_type[0] = '\0';
-				}
-				else if (_stricmp(head, "PORT_START") == 0) {
-					fprintf(tmp_fp, "PORT_START = %s\n", settings.port_start);
-					settings.port_start[0] = '\0';
-				}
-				else if (_stricmp(head, "PORT_RANGE") == 0) {
-					fprintf(tmp_fp, "PORT_RANGE = %s\n", settings.port_range);
-					settings.port_range[0] = '\0';
-				}
-				else if (_stricmp(head, "SHELL") == 0) {
-					fprintf(tmp_fp, "SHELL = %s\n", settings.shell);
-					settings.shell[0] = '\0';
-				}
-				else if (_stricmp(head, "ENV_1") == 0) {
-					fprintf(tmp_fp, "ENV_1 = %s\n", settings.env1);
-					settings.env1[0] = '\0';
-				}
-				else if (_stricmp(head, "ENV_2") == 0) {
-					fprintf(tmp_fp, "ENV_2 = %s\n", settings.env2);
-					settings.env2[0] = '\0';
-				}
-				else if (_stricmp(head, "LOGIN_SHELL") == 0) {
-					fprintf(tmp_fp, "LOGIN_SHELL = %s\n", (settings.login_shell == TRUE) ? "yes" : "no");
-					settings.login_shell = FALSE;
-				}
-				else if (_stricmp(head, "HOME_CHDIR") == 0) {
-					fprintf(tmp_fp, "HOME_CHDIR = %s\n", (settings.home_chdir == TRUE) ? "yes" : "no");
-					settings.home_chdir = FALSE;
-				}
-				else if (_stricmp(head, "SSH_AGENT_PROXY") == 0) {
-					fprintf(tmp_fp, "SSH_AGENT_PROXY = %s\n", (settings.agent_proxy == TRUE) ? "yes" : "no");
-					settings.agent_proxy = FALSE;
-				}
-				else {
-					fprintf(tmp_fp, "%s = %s\n", head, body);
-				}
-			}
-			fclose(fp);
-		}
-		else {
-			fputs("# CygTerm setting\n", tmp_fp);
-			fputs("\n", tmp_fp);
-		}
-		if (settings.term[0] != '\0') {
-			fprintf(tmp_fp, "TERM = %s\n", settings.term);
-		}
-		if (settings.term_type[0] != '\0') {
-			fprintf(tmp_fp, "TERM_TYPE = %s\n", settings.term_type);
-		}
-		if (settings.port_start[0] != '\0') {
-			fprintf(tmp_fp, "PORT_START = %s\n", settings.port_start);
-		}
-		if (settings.port_range[0] != '\0') {
-			fprintf(tmp_fp, "PORT_RANGE = %s\n", settings.port_range);
-		}
-		if (settings.shell[0] != '\0') {
-			fprintf(tmp_fp, "SHELL = %s\n", settings.shell);
-		}
-		if (settings.env1[0] != '\0') {
-			fprintf(tmp_fp, "ENV_1 = %s\n", settings.env1);
-		}
-		if (settings.env2[0] != '\0') {
-			fprintf(tmp_fp, "ENV_2 = %s\n", settings.env2);
-		}
-		if (settings.login_shell) {
-			fprintf(tmp_fp, "LOGIN_SHELL = yes\n");
-		}
-		if (settings.home_chdir) {
-			fprintf(tmp_fp, "HOME_CHDIR = yes\n");
-		}
-		if (settings.agent_proxy) {
-			fprintf(tmp_fp, "SSH_AGENT_PROXY = yes\n");
-		}
-		fclose(tmp_fp);
-
-		if (remove(cfg) != 0 && errno != ENOENT) {
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_CONF_REMOVEFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Can't remove old CygTerm configuration file (%d).", ts.UILanguageFile);
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-			MessageBox(buf, uimsg, MB_ICONEXCLAMATION);
-		}
-		else if (rename(tmp, cfg) != 0) {
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_CONF_RENAMEFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Can't rename CygTerm configuration file (%d).", ts.UILanguageFile);
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
-			MessageBox(buf, uimsg, MB_ICONEXCLAMATION);
-		} else {
-			// cygterm.cfg ファイルへの保存が成功したら、メッセージダイアログを表示する。
-			// 改めて、Save setupを実行する必要はないことを注意喚起する。
-			// (2012.5.1 yutaka)
-			get_lang_msg("MSG_TT_NOTICE", uimsg, sizeof(uimsg), "MSG_TT_NOTICE", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_CONF_SAVED_NOTICE", ts.UIMsg, sizeof(ts.UIMsg),
-			             "%s has been saved. Do not do save setup.", ts.UILanguageFile);
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, CYGTERM_FILE);
-			MessageBox(buf, uimsg, MB_OK | MB_ICONINFORMATION);
-		}
-	}
+	// 設定を書き込むためフラグを立てておく。
+	ts.CygtermSettings.update_flag = TRUE;
 
 	// Cygwin install path
 	GetDlgItemText(IDC_CYGWIN_PATH, ts.CygwinDirectory, sizeof(ts.CygwinDirectory));

@@ -4,6 +4,7 @@
 
 /* Constants and types for Tera Term */
 #include <locale.h>
+#include "teraterm.h"
 
 #define IdBreakTimer         1
 #define IdDelayTimer         2
@@ -588,6 +589,7 @@ struct tttset {
 	WORD FileSendHighSpeedMode;
 	WORD AutoComPortReconnect;
 	WORD BGImgBrightness;
+	cygterm_t CygtermSettings;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1055,6 +1057,7 @@ typedef TMap far *PMap;
  *   added tttset.FileSendHighSpeedMode
  *   added tttset.AutoComPortReconnect
  *   added tttset.BGImgBrightness
+ *   added tttset.CygtermSettings
  *
  * - At version 4.85, ttset_memfilemap was replaced with ttset_memfilemap_25.
  *   added tttset.AcceleratorNewConnection

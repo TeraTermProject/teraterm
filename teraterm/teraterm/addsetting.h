@@ -1,25 +1,13 @@
 #pragma once
 
 #include "tt_res.h"
+#include "teraterm.h"
 
 
 typedef struct {
 	char *name;
 	LPCTSTR id;
 } mouse_cursor_t;
-
-typedef struct cygterm {
-	char term[128];
-	char term_type[80];
-	char port_start[80];
-	char port_range[80];
-	char shell[80];
-	char env1[128];
-	char env2[128];
-	BOOL login_shell;
-	BOOL home_chdir;
-	BOOL agent_proxy;
-} cygterm_t;
 
 
 
