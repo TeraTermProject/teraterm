@@ -340,7 +340,7 @@ static void WriteCygtermConfFile(PTTSet ts)
 			if (buf[len - 1] == '\n')
 				buf[len - 1] = '\0';
 			if (i < CYGTERM_FILE_MAXLINE)
-				line[i++] = strdup(buf);
+				line[i++] = _strdup(buf);
 			else
 				break;
 		}
