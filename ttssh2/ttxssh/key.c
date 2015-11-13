@@ -548,7 +548,7 @@ unsigned char *duplicate_ED25519_PK(unsigned char *src)
 }
 
 
-char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
+char* key_fingerprint_raw(Key *k, enum digest_algorithm dgst_alg, int *dgst_raw_length)
 {
 	const EVP_MD *md = NULL;
 	EVP_MD_CTX ctx;
@@ -560,14 +560,14 @@ char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 
 	*dgst_raw_length = 0;
 
-	switch (dgst_type) {
-	case SSH_FP_MD5:
+	switch (dgst_alg) {
+	case SSH_DIGEST_MD5:
 		md = EVP_md5();
 		break;
-	case SSH_FP_SHA1:
+	case SSH_DIGEST_SHA1:
 		md = EVP_sha1();
 		break;
-	case SSH_FP_SHA256:
+	case SSH_DIGEST_SHA256:
 		md = EVP_sha256();
 		break;
 	default:
@@ -603,7 +603,7 @@ char* key_fingerprint_raw(Key *k, enum fp_type dgst_type, int *dgst_raw_length)
 		break;
 
 	default:
-		//fatal("key_fingerprint_raw: bad key type %d", k->type);
+		//fatal("key_fingerprint_raw: bad key type %d", dgst_alg);
 		break;
 	}
 
@@ -667,17 +667,21 @@ key_size(const Key *k)
 	return 0;
 }
 
+// based on OpenSSH 7.1
 static char *
-key_fingerprint_b64(u_char *dgst_raw, u_int dgst_raw_len)
+key_fingerprint_b64(const char *alg, u_char *dgst_raw, u_int dgst_raw_len)
 {
 	char *retval;
 	unsigned int i, retval_len;
 	BIO *bio, *b64;
 	BUF_MEM *bufferPtr;
 
-	retval_len = ((dgst_raw_len + 2) / 3) * 4 + 1;
+	retval_len = strlen(alg) + 1 + ((dgst_raw_len + 2) / 3) * 4 + 1;
 	retval = malloc(retval_len);
 	retval[0] = '\0';
+
+	strncat_s(retval, retval_len, alg, _TRUNCATE);
+	strncat_s(retval, retval_len, ":", _TRUNCATE);
 
 	b64 = BIO_new(BIO_f_base64());
 	bio = BIO_new(BIO_s_mem());
@@ -700,14 +704,18 @@ key_fingerprint_b64(u_char *dgst_raw, u_int dgst_raw_len)
 }
 
 static char *
-key_fingerprint_hex(u_char *dgst_raw, u_int dgst_raw_len)
+key_fingerprint_hex(const char *alg, u_char *dgst_raw, u_int dgst_raw_len)
 {
 	char *retval;
 	unsigned int i, retval_len;
 
-	retval_len = dgst_raw_len * 3 + 1;
+	retval_len = strlen(alg) + 1 + dgst_raw_len * 3 + 1;
 	retval = malloc(retval_len);
 	retval[0] = '\0';
+
+	strncat_s(retval, retval_len, alg, _TRUNCATE);
+	strncat_s(retval, retval_len, ":", _TRUNCATE);
+
 	for (i = 0; i < dgst_raw_len; i++) {
 		char hex[4];
 		_snprintf_s(hex, sizeof(hex), _TRUNCATE, "%02x:", dgst_raw[i]);
@@ -720,25 +728,25 @@ key_fingerprint_hex(u_char *dgst_raw, u_int dgst_raw_len)
 	return (retval);
 }
 
-// based on OpenSSH 5.1
 #define	FLDBASE		8
 #define	FLDSIZE_Y	(FLDBASE + 1)
 #define	FLDSIZE_X	(FLDBASE * 2 + 1)
 static char *
-key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
+key_fingerprint_randomart(const char *alg, u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 {
 	/*
-	 * Chars to be used after each other every time the worm
-	 * intersects with itself.  Matter of taste.
-	 */
+	* Chars to be used after each other every time the worm
+	* intersects with itself.  Matter of taste.
+	*/
 	char	*augmentation_string = " .o+=*BOX@%&#/^SE";
-	char	*retval, *p;
+	char	*retval, *p, title[FLDSIZE_X], hash[FLDSIZE_X];
 	unsigned char	 field[FLDSIZE_X][FLDSIZE_Y];
-	unsigned int	 i, b;
-	int	 x, y;
+	size_t	 i, tlen, hlen;
+	unsigned int	 b;
+	int	 x, y, r;
 	size_t	 len = strlen(augmentation_string) - 1;
 
-	retval = calloc(1, (FLDSIZE_X + 3 + 1) * (FLDSIZE_Y + 2));
+	retval = calloc((FLDSIZE_X + 3 + 1), (FLDSIZE_Y + 2));
 
 	/* initialize field */
 	memset(field, 0, FLDSIZE_X * FLDSIZE_Y * sizeof(char));
@@ -762,7 +770,8 @@ key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 			y = min(y, FLDSIZE_Y - 1);
 
 			/* augment the field */
-			field[x][y]++;
+			if (field[x][y] < len - 2)
+				field[x][y]++;
 			input = input >> 2;
 		}
 	}
@@ -771,12 +780,27 @@ key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 	field[FLDSIZE_X / 2][FLDSIZE_Y / 2] = len - 1;
 	field[x][y] = len;
 
-	/* fill in retval */
-	_snprintf_s(retval, FLDSIZE_X, _TRUNCATE, "+--[%4s %4u]", ssh_key_type(k->type), key_size(k));
-	p = strchr(retval, '\0');
+	/* assemble title */
+	r = _snprintf_s(title, sizeof(title), _TRUNCATE, "[%s %u]",
+	                ssh_key_type(k->type), key_size(k));
+	/* If [type size] won't fit, then try [type]; fits "[ED25519-CERT]" */
+	if (r < 0 || r >(int)sizeof(title))
+		r = _snprintf_s(title, sizeof(title), _TRUNCATE, "[%s]",
+		                ssh_key_type(k->type));
+	tlen = (r <= 0) ? 0 : strlen(title);
+
+	/* assemble hash ID. */
+	r = _snprintf_s(hash, sizeof(hash), _TRUNCATE, "[%s]", alg);
+	hlen = (r <= 0) ? 0 : strlen(hash);
 
 	/* output upper border */
-	for (i = p - retval - 1; i < FLDSIZE_X; i++)
+	p = retval;
+	*p++ = '+';
+	for (i = 0; i < (FLDSIZE_X - tlen) / 2; i++)
+		*p++ = '-';
+	memcpy(p, title, tlen);
+	p += tlen;
+	for (i += tlen; i < FLDSIZE_X; i++)
 		*p++ = '-';
 	*p++ = '+';
 	*p++ = '\r';
@@ -794,7 +818,11 @@ key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 
 	/* output lower border */
 	*p++ = '+';
-	for (i = 0; i < FLDSIZE_X; i++)
+	for (i = 0; i < (FLDSIZE_X - hlen) / 2; i++)
+		*p++ = '-';
+	memcpy(p, hash, hlen);
+	p += hlen;
+	for (i += hlen; i < FLDSIZE_X; i++)
 		*p++ = '-';
 	*p++ = '+';
 
@@ -807,26 +835,28 @@ key_fingerprint_randomart(u_char *dgst_raw, u_int dgst_raw_len, const Key *k)
 //
 // fingerprint（指紋：ホスト公開鍵のハッシュ）を生成する
 //
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum fp_type dgst_type)
+char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum digest_algorithm dgst_alg)
 {
-	char *retval = NULL;
+	char *retval = NULL, *alg;
 	unsigned char *dgst_raw;
 	int dgst_raw_len;
 
 	// fingerprintのハッシュ値（バイナリ）を求める
-	dgst_raw = key_fingerprint_raw(key, dgst_type, &dgst_raw_len);
+	dgst_raw = key_fingerprint_raw(key, dgst_alg, &dgst_raw_len);
 	if (dgst_raw == NULL)
 		return NULL;
 
+	alg = get_digest_algorithm_name(dgst_alg);
+
 	switch (dgst_rep) {
 	case SSH_FP_HEX:
-		retval = key_fingerprint_hex(dgst_raw, dgst_raw_len);
+		retval = key_fingerprint_hex(alg, dgst_raw, dgst_raw_len);
 		break;
 	case SSH_FP_BASE64:
-		retval = key_fingerprint_b64(dgst_raw, dgst_raw_len);
+		retval = key_fingerprint_b64(alg, dgst_raw, dgst_raw_len);
 		break;
 	case SSH_FP_RANDOMART:
-		retval = key_fingerprint_randomart(dgst_raw, dgst_raw_len, key);
+		retval = key_fingerprint_randomart(alg, dgst_raw, dgst_raw_len, key);
 		break;
 	}
 
@@ -1998,7 +2028,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (ctx->keys_seen[i])
 				continue;
-			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, SSH_FP_MD5);
+			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, SSH_DIGEST_MD5);
 			buf[0] = 0;
 			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->keys[i]));
 			strcat_s(buf, sizeof(buf), " ");
@@ -2013,7 +2043,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
 		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
 		for (i = 0; i < ctx->nold; i++) {
-			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, SSH_FP_MD5);
+			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, SSH_DIGEST_MD5);
 			buf[0] = 0;
 			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->old_keys[i]));
 			strcat_s(buf, sizeof(buf), " ");
@@ -2271,7 +2301,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		free(blob);
 		blob = NULL;
 
-		fp = key_fingerprint(key, SSH_FP_HEX, SSH_FP_MD5);
+		fp = key_fingerprint(key, SSH_FP_HEX, SSH_DIGEST_MD5);
 		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Received %s host key %s", 
 			get_sshname_from_key(key), fp);
 		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);

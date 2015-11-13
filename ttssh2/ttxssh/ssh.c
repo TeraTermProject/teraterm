@@ -4271,6 +4271,20 @@ char* get_ssh_keytype_name(ssh_keytype type)
 	return p;
 }
 
+char* get_digest_algorithm_name(digest_algorithm id)
+{
+	ssh_digest_t *ptr = ssh_digests;
+	static char buf[16];
+
+	while (ptr->name != NULL) {
+		if (id == ptr->id) {
+			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			break;
+		}
+		ptr++;
+	}
+	return buf;
+}
 
 static void do_write_buffer_file(void *buf, int len, char *file, int lineno)
 {

@@ -56,7 +56,8 @@ int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key)
 	DNS_STATUS status;
 	PDNS_RECORD rec, p;
 	PDNS_SSHFP_DATA t;
-	int hostkey_alg, hostkey_dtype, hostkey_dlen, fp_type;
+	int hostkey_alg, hostkey_dtype, hostkey_dlen;
+	digest_algorithm dgst_alg;
 	BYTE *hostkey_digest = NULL;
 	int found = DNS_VERIFY_NOTFOUND;
 	OSVERSIONINFO osvi;
@@ -112,25 +113,25 @@ int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key)
 								          "Algorithm = %d, Digest type = %d",
 								          t->Algorithm,
 									  t->DigestType);
-								fp_type = -1;
+								dgst_alg = -1;
 							}
 							else {
-								fp_type = SSH_FP_SHA1;
+								dgst_alg = SSH_DIGEST_SHA1;
 							}
 							break;
 						case SSHFP_HASH_SHA256:
-							fp_type = SSH_FP_SHA256;
+							dgst_alg = SSH_DIGEST_SHA256;
 							break;
 						default:
-							fp_type = -1;
+							dgst_alg = -1;
 						}
 
-						if (fp_type == -1)
+						if (dgst_alg == -1)
 							continue; // skip invalid/un-supported hash type.
 
 						hostkey_dtype = t->DigestType;
 						free(hostkey_digest);
-						hostkey_digest = key_fingerprint_raw(key, fp_type, &hostkey_dlen);
+						hostkey_digest = key_fingerprint_raw(key, dgst_alg, &hostkey_dlen);
 						if (!hostkey_digest)
 							continue;
 					}

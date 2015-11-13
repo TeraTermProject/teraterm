@@ -535,11 +535,37 @@ enum fp_rep {
 	SSH_FP_BUBBLEBABBLE,
 	SSH_FP_RANDOMART
 };
-
+/*
 enum fp_type {
 	SSH_FP_MD5,
 	SSH_FP_SHA1,
 	SSH_FP_SHA256
+};
+*/
+typedef enum {
+	SSH_DIGEST_MD5,
+	SSH_DIGEST_RIPEMD160,
+	SSH_DIGEST_SHA1,
+	SSH_DIGEST_SHA256,
+	SSH_DIGEST_SHA384,
+	SSH_DIGEST_SHA512,
+	SSH_DIGEST_MAX,
+} digest_algorithm;
+
+typedef struct ssh_digest {
+	digest_algorithm id;
+	const char *name;
+} ssh_digest_t;
+
+/* NB. Indexed directly by algorithm number */
+static ssh_digest_t ssh_digests[] = {
+	{ SSH_DIGEST_MD5,	"MD5" },
+	{ SSH_DIGEST_RIPEMD160,	"RIPEMD160" },
+	{ SSH_DIGEST_SHA1,	"SHA1" },
+	{ SSH_DIGEST_SHA256,	"SHA256" },
+	{ SSH_DIGEST_SHA384,	"SHA384" },
+	{ SSH_DIGEST_SHA512,	"SHA512" },
+	{ SSH_DIGEST_MAX, NULL },
 };
 
 enum scp_dir {
@@ -690,6 +716,7 @@ const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type);
 int get_ssh2_mac_truncatebits(hmac_type type);
 char* get_ssh2_comp_name(compression_type type);
 char* get_ssh_keytype_name(ssh_keytype type);
+char* get_digest_algorithm_name(digest_algorithm id);
 int get_cipher_discard_len(SSHCipher cipher);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
