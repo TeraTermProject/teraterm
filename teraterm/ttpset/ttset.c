@@ -14,6 +14,7 @@
 #include <string.h>
 #include <direct.h>
 #include <ctype.h>
+#include <errno.h>
 #include "ttlib.h"
 #include "tt_res.h"
 
