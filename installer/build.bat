@@ -91,11 +91,17 @@ devenv /build release %TERATERMSLN% /project svnrev /projectconfig release
 
 :build
 devenv /%BUILD% release %TERATERMSLN%
+if ERRORLEVEL 1 goto fail
 devenv /%BUILD% release %TTSSHSLN%
+if ERRORLEVEL 1 goto fail
 devenv /%BUILD% release %TTPROXYSLN%
+if ERRORLEVEL 1 goto fail
 devenv /%BUILD% release %TTXKANJISLN%
+if ERRORLEVEL 1 goto fail
 devenv /%BUILD% release %TTPMENUSLN%
+if ERRORLEVEL 1 goto fail
 devenv /%BUILD% release %TTXSAMPLESLN%
+if ERRORLEVEL 1 goto fail
 
 rem cygterm をコンパイル
 pushd ..\cygterm
@@ -107,3 +113,9 @@ rem cygtool をコンパイル
 pushd cygtool
 nmake -f cygtool.mak
 popd
+
+exit /b 0
+
+:fail
+exit /b 1
+

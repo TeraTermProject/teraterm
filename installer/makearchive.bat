@@ -14,6 +14,7 @@ if "%1"=="release" SET release=yes
 
 CALL makechm.bat
 CALL build.bat %rebuild%
+if ERRORLEVEL 1 goto fail
 
 rem  change folder name
 if not "%release%"=="yes" goto snapshot
@@ -113,5 +114,14 @@ echo   %0 release  通常のビルド + プラグインを含む + フォルダ名が特殊(Normal + P
 echo      アーカイブ版リリース作成用(for archive version released)
 echo   %0 rebuild ^>build.log 2^>^&1  ビルドログを採取する(Retrieve building log)
 echo.
+exit /b
+
+:fail
+@echo off
+echo ===================================================
+echo ================= E R R O R =======================
+echo ===================================================
+echo.
+echo ビルドに失敗しました (Failed to build source code)
 exit /b
 
