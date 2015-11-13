@@ -203,6 +203,7 @@ void WriteFont(PCHAR Sect, PCHAR Key, PCHAR FName,
 
 
 #define CYGTERM_FILE "cygterm.cfg"  // CygTerm configuration file
+#define CYGTERM_FILE_MAXLINE 100
 
 static void ReadCygtermConfFile(PTTSet ts)
 {
@@ -309,6 +310,8 @@ static void WriteCygtermConfFile(PTTSet ts)
 	char buf[256], *head, *body;
 	char uimsg[MAX_UIMSG];
 	cygterm_t settings;
+	char *line[CYGTERM_FILE_MAXLINE];
+	int i, linenum, len;
 
 	// Cygwin設定が変更されていない場合は、ファイルを書き込まない。
 	if (ts->CygtermSettings.update_flag == FALSE)
@@ -326,8 +329,26 @@ static void WriteCygtermConfFile(PTTSet ts)
 	AppendSlash(tmp, sizeof(tmp));
 	strncat_s(tmp, sizeof(tmp), tmpfile, _TRUNCATE);
 
+	// cygterm.cfg が存在すれば、いったんメモリにすべて読み込む。
+	memset(line, 0, sizeof(line));
+	linenum = 0;
 	fp = fopen(cfg, "r");
-	tmp_fp = fopen(tmp, "w");
+	if (fp) {
+		i = 0;
+		while (fgets(buf, sizeof(buf), fp) != NULL) {
+			len = strlen(buf);
+			if (buf[len - 1] == '\n')
+				buf[len - 1] = '\0';
+			if (i < CYGTERM_FILE_MAXLINE)
+				line[i++] = strdup(buf);
+			else
+				break;
+		}
+		linenum = i;
+		fclose(fp);
+	}
+
+	tmp_fp = fopen(cfg, "w");
 	if (tmp_fp == NULL) {
 		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts->UILanguageFile);
 		get_lang_msg("MSG_CYGTERM_CONF_WRITEFILE_ERROR", ts->UIMsg, sizeof(ts->UIMsg),
@@ -336,16 +357,11 @@ static void WriteCygtermConfFile(PTTSet ts)
 		MessageBox(NULL, buf, uimsg, MB_ICONEXCLAMATION);
 	}
 	else {
-		if (fp != NULL) {
-			while (fgets(buf, sizeof(buf), fp) != NULL) {
-				int len = strlen(buf);
-
-				if (buf[len - 1] == '\n')
-					buf[len - 1] = '\0';
-
-				split_buffer(buf, '=', &head, &body);
+		if (linenum > 0) {
+			for (i = 0; i < linenum; i++) {
+				split_buffer(line[i], '=', &head, &body);
 				if (head == NULL || body == NULL) {
-					fprintf(tmp_fp, "%s\n", buf);
+					fprintf(tmp_fp, "%s\n", line[i]);
 				}
 				else if (_stricmp(head, "TERM") == 0) {
 					fprintf(tmp_fp, "TERM = %s\n", settings.term);
@@ -391,7 +407,6 @@ static void WriteCygtermConfFile(PTTSet ts)
 					fprintf(tmp_fp, "%s = %s\n", head, body);
 				}
 			}
-			fclose(fp);
 		}
 		else {
 			fputs("# CygTerm setting\n", tmp_fp);
@@ -429,6 +444,8 @@ static void WriteCygtermConfFile(PTTSet ts)
 		}
 		fclose(tmp_fp);
 
+		// ダイレクトにファイルに書き込むようにしたので、下記処理は不要。
+#if 0
 		if (remove(cfg) != 0 && errno != ENOENT) {
 			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts->UILanguageFile);
 			get_lang_msg("MSG_CYGTERM_CONF_REMOVEFILE_ERROR", ts->UIMsg, sizeof(ts->UIMsg),
@@ -450,15 +467,20 @@ static void WriteCygtermConfFile(PTTSet ts)
 			// Save setup 実行時に、CygTermの設定を保存するようにしたことにより、
 			// ダイアログ表示が不要となるため、削除する。
 			// (2015.11.12 yutaka)
-#if 0
 			get_lang_msg("MSG_TT_NOTICE", uimsg, sizeof(uimsg), "MSG_TT_NOTICE", ts->UILanguageFile);
 			get_lang_msg("MSG_CYGTERM_CONF_SAVED_NOTICE", ts->UIMsg, sizeof(ts->UIMsg),
 				"%s has been saved. Do not do save setup.", ts->UILanguageFile);
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts->UIMsg, CYGTERM_FILE);
 			MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONINFORMATION);
-#endif
 		}
+#endif
 	}
+
+	// 忘れずにメモリフリーしておく。
+	for (i = 0; i < linenum; i++) {
+		free(line[i]);
+	}
+
 }
 
 void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
