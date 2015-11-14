@@ -549,6 +549,85 @@ error:
 }
 
 
+// Virtual Storeが有効であるかどうかを判別する。
+//
+// [Windows 95-XP]
+// return FALSE (always)
+//
+// [Windows Vista-10]
+// return TRUE:  Virtual Store Enabled
+//        FALSE: Virtual Store Disabled or Unknown
+//
+BOOL GetVirtualStoreEnvironment(void)
+{
+	BOOL ret = FALSE;
+	int flag = 0;
+	OSVERSIONINFO osvi;
+	HANDLE          hToken;
+	DWORD           dwLength;
+	TOKEN_ELEVATION tokenElevation;
+	LONG lRet;
+	HKEY hKey;
+	TCHAR lpData[256];
+	DWORD dwDataSize;
+	DWORD dwType;
+	BYTE bValue;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	// Windows Vista以前は無視する。
+	if (!(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6))
+		goto error;
+
+	// UACが有効かどうか。
+	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
+	flag = 0;
+	lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+		TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"),
+		NULL, KEY_QUERY_VALUE, &hKey
+		);
+	if (lRet == ERROR_SUCCESS) {
+		dwDataSize = sizeof(lpData) / sizeof(lpData[0]);
+		lRet = RegQueryValueEx(
+			hKey,
+			TEXT("EnableLUA"),
+			0,
+			&dwType,
+			(LPBYTE)lpData,
+			&dwDataSize);
+		if (lRet == ERROR_SUCCESS) {
+			bValue = ((LPBYTE)lpData)[0];
+			if (bValue == 1)
+				// UACが有効の場合、Virtual Storeが働く。
+				flag = 1;
+		}
+		RegCloseKey(hKey);
+	}
+	if (flag == 0)
+		goto error;
+
+	// UACが有効時、プロセスが管理者権限に昇格しているか。
+	flag = 0;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
+		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
+			// (0は昇格していない、非0は昇格している)。
+			if (tokenElevation.TokenIsElevated == 0) {
+				// 管理者権限を持っていなければ、Virtual Storeが働く。
+				flag = 1;
+			}
+		}
+		CloseHandle(hToken);
+	}
+	if (flag == 0)
+		goto error;
+
+	ret = TRUE;
+	return (ret);
+
+error:
+	return (ret);
+}
+
 CVTWindow::CVTWindow()
 {
 	WNDCLASS wc;
@@ -795,6 +874,10 @@ CVTWindow::CVTWindow()
 	}
 	ShowWindow(CmdShow);
 	ChangeCaret();
+
+	// Tera Termの起動時、Virtual Storeが働くかどうかを覚えておく。
+	// (2015.11.14 yutaka)
+	cv.VirtualStoreEnabled = GetVirtualStoreEnvironment();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -4767,13 +4850,6 @@ static void openFileDirectory(char *path, char *filename, BOOL open_directory_on
 //
 static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, int vstore_pathlen)
 {
-#if _MSC_VER == 1400  // VSC2005(VC8.0)
-	typedef struct _TOKEN_ELEVATION {
-		DWORD TokenIsElevated;
-	} TOKEN_ELEVATION, *PTOKEN_ELEVATION;
-	int TokenElevation = 20;
-#endif
-
 	BOOL ret = FALSE;
 	int flag = 0;
 	char *s, **p;
@@ -4787,65 +4863,10 @@ static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, i
 	char shFullPath[1024] = "";
 	LPITEMIDLIST pidl;
 	int CSIDL;
-	OSVERSIONINFO osvi;
-	HANDLE          hToken;
-	DWORD           dwLength;
-	TOKEN_ELEVATION tokenElevation;
-	LONG lRet;
-	HKEY hKey;
-	TCHAR lpData[256];
-	DWORD dwDataSize;
-	DWORD dwType;
-	BYTE bValue;
 
 	OutputDebugPrintf("[%s][%s]\n", path, filename);
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	// Windows Vista以前は無視する。
-	if (!(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6))
-		goto error;
-
-	// UACが有効かどうか。
-	// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SystemのEnableLUA(DWORD値)が0かどうかで判断できます(0はUAC無効、1はUAC有効)。
-	flag = 0;
-	lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-		TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"),
-		NULL, KEY_QUERY_VALUE, &hKey
-		);
-	if (lRet == ERROR_SUCCESS) {
-		dwDataSize = sizeof(lpData) / sizeof(lpData[0]);
-		lRet = RegQueryValueEx(
-			hKey,
-			TEXT("EnableLUA"),
-			0,
-			&dwType,
-			(LPBYTE)lpData,
-			&dwDataSize);
-		if (lRet == ERROR_SUCCESS) {
-			bValue = ((LPBYTE)lpData)[0];
-			if (bValue == 1)
-				// UACが有効の場合、Virtual Storeが働く。
-				flag = 1;
-		}
-		RegCloseKey(hKey);
-	}
-	if (flag == 0)
-		goto error;
-
-	// UACが有効時、プロセスが管理者権限に昇格しているか。
-	flag = 0;
-	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &hToken)) {
-		if (GetTokenInformation(hToken, (TOKEN_INFORMATION_CLASS)TokenElevation, &tokenElevation, sizeof(TOKEN_ELEVATION), &dwLength)) {
-			// (0は昇格していない、非0は昇格している)。
-			if (tokenElevation.TokenIsElevated == 0) {
-				// 管理者権限を持っていなければ、Virtual Storeが働く。
-				flag = 1;
-			}
-		}
-		CloseHandle(hToken);
-	}
-	if (flag == 0)
+	if (cv.VirtualStoreEnabled == FALSE)
 		goto error;
 
 	// Virtual Store対象となるフォルダか。

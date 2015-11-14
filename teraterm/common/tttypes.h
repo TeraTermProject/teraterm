@@ -1000,6 +1000,7 @@ typedef struct {
 
 	BOOL TelLineMode;
 	_locale_t locale;
+	BOOL VirtualStoreEnabled;
 } TComVar;
 typedef TComVar far *PComVar;
 
