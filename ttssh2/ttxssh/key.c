@@ -723,7 +723,7 @@ key_fingerprint_hex(const char *alg, u_char *dgst_raw, u_int dgst_raw_len)
 	}
 
 	/* Remove the trailing ':' character */
-	retval[(dgst_raw_len * 3) - 1] = '\0';
+	retval[retval_len - 2] = '\0';
 
 	return (retval);
 }
