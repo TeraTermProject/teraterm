@@ -560,6 +560,12 @@ error:
 //
 BOOL GetVirtualStoreEnvironment(void)
 {
+#if _MSC_VER == 1400  // VSC2005(VC8.0)
+	typedef struct _TOKEN_ELEVATION {
+		DWORD TokenIsElevated;
+	} TOKEN_ELEVATION, *PTOKEN_ELEVATION;
+	int TokenElevation = 20;
+#endif
 	BOOL ret = FALSE;
 	int flag = 0;
 	OSVERSIONINFO osvi;
