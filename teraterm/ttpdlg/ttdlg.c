@@ -2502,8 +2502,10 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		}
 #endif
 
-	case WM_LBUTTONDBLCLK:
-		{
+	// シングルクリックでブラウザが起動するように変更する。(2015.11.16 yutaka)
+	//case WM_LBUTTONDBLCLK:
+	case WM_LBUTTONDOWN:
+	{
 			char url[128];
 
 			// get URL
