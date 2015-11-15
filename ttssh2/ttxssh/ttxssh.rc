@@ -26,23 +26,26 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_ABOUTDIALOG DIALOGEX 0, 0, 263, 285
+IDD_ABOUTDIALOG DIALOGEX 0, 0, 275, 332
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About TTSSH"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
     LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
-    ICON            "",IDC_TTSSH_ICON,234,7,20,20
+    ICON            "",IDC_TTSSH_ICON,248,7,20,20
     LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
-    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2015 TeraTerm Project",IDC_INCLUDES,6,36,248,34
+    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2015 TeraTerm Project",IDC_INCLUDES,6,36,262,34
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
-    LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,181,8
-    LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,207,8
-    LTEXT           "TeraTerm Project:     https://ttssh2.osdn.jp/",IDC_WEBSITES,6,99,248,13,SS_SUNKEN
-    LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,116,248,26
-    LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,140,248,27
-    EDITTEXT        IDC_ABOUTTEXT,6,171,248,87,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,106,263,50,14
+    LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,175,8
+    LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,175,8
+    LTEXT           "TeraTerm Project:     https://ttssh2.osdn.jp/",IDC_WEBSITES,6,99,262,13,SS_SUNKEN
+    LTEXT           "THIS EXTENSION INCORPORATES STRONG CRYPTOGRAPHY. POSESSION, USE, AND/OR EXPORT OF THIS EXTENSION MAY BE ILLEGAL IN YOUR COUNTRY.",IDC_CRYPTOGRAPHY,6,116,262,26
+    LTEXT           "This extension uses OpenSSH code by OpenBSD Project. Thanks also to Ian Goldberg for his Pilot SSH code, which was a very handy reference. Special thanks to Takashi Teranishi for his cooperation.",IDC_CREDIT,6,140,262,27
+    LTEXT           "Fingerprint hash algorithm:",IDC_FP_HASH_ALG,6,171,100,8,0,WS_EX_RIGHT
+    CONTROL         "&MD5",IDC_FP_HASH_ALG_MD5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,110,171,30,10
+    CONTROL         "&SHA256",IDC_FP_HASH_ALG_SHA256,"Button",BS_AUTORADIOBUTTON,145,171,40,10
+    EDITTEXT        IDC_ABOUTTEXT,6,185,262,120,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,112,310,50,14
 END
 
 IDD_SSHAUTH DIALOGEX 0, 0, 309, 262
@@ -163,40 +166,46 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,118,266,50,14
 END
 
-IDD_SSHUNKNOWNHOST DIALOGEX 0, 0, 215, 266
+IDD_SSHUNKNOWNHOST DIALOGEX 0, 0, 260, 276
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SECURITY WARNING"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "There is no entry for the server ""#####################################"" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.",IDC_HOSTWARNING,15,7,184,41
-    LTEXT           "If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,26
-    LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,184,16
-    LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,184,8
-    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,99,176,8
-    EDITTEXT        IDC_FINGER_PRINT,15,110,179,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_FP_RANDOMART,14,129,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    LTEXT           "There is no entry for the server ""#####################################"" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.",IDC_HOSTWARNING,15,7,229,41
+    LTEXT           "If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,229,26
+    LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,229,16
+    LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,229,8
+    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,100,229,8
+    LTEXT           "Fingerprint hash algorithm:",IDC_FP_HASH_ALG,15,110,100,8,0,WS_EX_RIGHT
+    CONTROL         "&MD5",IDC_FP_HASH_ALG_MD5,"Button",BS_AUTORADIOBUTTON,120,110,30,10
+    CONTROL         "&SHA256",IDC_FP_HASH_ALG_SHA256,"Button",BS_AUTORADIOBUTTON,155,110,40,10
+    EDITTEXT        IDC_FINGER_PRINT,15,120,229,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_FP_RANDOMART,15,139,229,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
     CONTROL         "&Add this machine and its key to the known hosts list",IDC_ADDTOKNOWNHOSTS,
-                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,231,181,13
-    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,50,246,50,14,WS_GROUP
-    PUSHBUTTON      "&Disconnect",IDCANCEL,115,246,50,14,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,241,221,13
+    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,65,256,50,14,WS_GROUP
+    PUSHBUTTON      "&Disconnect",IDCANCEL,145,256,50,14,WS_GROUP
 END
 
-IDD_SSHDIFFERENTKEY DIALOGEX 0, 0, 215, 266
+IDD_SSHDIFFERENTKEY DIALOGEX 0, 0, 260, 276
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SECURITY WARNING"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,184,43
-    LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,24
-    LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,184,16
-    LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,184,8
-    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,99,176,8
-    EDITTEXT        IDC_FINGER_PRINT,15,110,179,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_FP_RANDOMART,14,129,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,229,43
+    LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,229,24
+    LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,229,16
+    LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,229,8
+    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,100,229,8
+    LTEXT           "Fingerprint hash algorithm:",IDC_FP_HASH_ALG,15,110,100,8,0,WS_EX_RIGHT
+    CONTROL         "&MD5",IDC_FP_HASH_ALG_MD5,"Button",BS_AUTORADIOBUTTON,120,110,30,10
+    CONTROL         "&SHA256",IDC_FP_HASH_ALG_SHA256,"Button",BS_AUTORADIOBUTTON,155,110,40,10
+    EDITTEXT        IDC_FINGER_PRINT,15,120,229,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_FP_RANDOMART,15,139,229,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
     CONTROL         "&Replace the exist key with this new key",IDC_ADDTOKNOWNHOSTS,
-                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,34,231,153,13
-    PUSHBUTTON      "&Continue",IDC_CONTINUE,50,246,50,14,WS_GROUP
-    DEFPUSHBUTTON   "&Disconnect",IDCANCEL,115,246,50,14,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,241,221,13
+    PUSHBUTTON      "&Continue",IDC_CONTINUE,65,256,50,14,WS_GROUP
+    DEFPUSHBUTTON   "&Disconnect",IDCANCEL,145,256,50,14,WS_GROUP
 END
 
 IDD_SSHAUTHSETUP DIALOGEX 0, 0, 309, 228
@@ -374,22 +383,25 @@ BEGIN
     EDITTEXT        IDC_CONFIRM_PASSWD,67,56,99,14,ES_PASSWORD | ES_AUTOHSCROLL
 END
 
-IDD_SSHDIFFERENTTYPEKEY DIALOGEX 0, 0, 215, 266
+IDD_SSHDIFFERENTTYPEKEY DIALOGEX 0, 0, 260, 276
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SECURITY WARNING"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,184,43
-    LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,184,24
-    LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,184,16
-    LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,184,8
-    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,99,176,8
-    EDITTEXT        IDC_FINGER_PRINT,15,110,179,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_FP_RANDOMART,14,129,181,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    LTEXT           "Your known hosts list has an entry for the server ""####################################"", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.",IDC_HOSTWARNING,15,7,229,43
+    LTEXT           "If you choose to add this new key to the known hosts list and continue, then you will not receive this warning again.",IDC_HOSTWARNING2,15,48,229,24
+    LTEXT           "",IDC_HOSTSSHFPCHECK,15,72,229,16
+    LTEXT           "",IDC_HOSTSSHFPDNSSEC,15,88,229,8
+    LTEXT           "The server's host key fingerprint is:",IDC_HOSTFINGERPRINT,15,100,229,8
+    LTEXT           "Fingerprint hash algorithm:",IDC_FP_HASH_ALG,15,110,100,8,0,WS_EX_RIGHT
+    CONTROL         "&MD5",IDC_FP_HASH_ALG_MD5,"Button",BS_AUTORADIOBUTTON,120,110,30,10
+    CONTROL         "&SHA256",IDC_FP_HASH_ALG_SHA256,"Button",BS_AUTORADIOBUTTON,155,110,40,10
+    EDITTEXT        IDC_FINGER_PRINT,15,120,229,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_FP_RANDOMART,15,139,229,97,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
     CONTROL         "&Add this machine and its key to the known hosts list",IDC_ADDTOKNOWNHOSTS,
-                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,231,181,13
-    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,50,246,50,14,WS_GROUP
-    PUSHBUTTON      "&Disconnect",IDCANCEL,115,246,50,14,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,19,241,221,13
+    DEFPUSHBUTTON   "&Continue",IDC_CONTINUE,65,256,50,14,WS_GROUP
+    PUSHBUTTON      "&Disconnect",IDCANCEL,145,256,50,14,WS_GROUP
 END
 
 IDD_SFTP_DIALOG DIALOGEX 0, 0, 266, 150
@@ -401,18 +413,21 @@ BEGIN
     EDITTEXT        IDC_SFTP_CONSOLE,7,33,252,110,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
 END
 
-IDD_SSHUPDATE_HOSTKEY DIALOGEX 0, 0, 309, 216
+IDD_SSHUPDATE_HOSTKEY DIALOGEX 0, 0, 320, 216
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Hostkey rotation"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    LTEXT           "You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?",IDC_HOSTKEY_MESSAGE,15,7,280,45
-    LTEXT           "%u new key(s):",IDC_ADDKEY_TEXT,7,66,295,8
-    EDITTEXT        IDC_ADDKEY_EDIT,7,78,295,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    LTEXT           "%u obsolete key(s):",IDC_REMOVEKEY_TEXT,7,130,295,8
-    EDITTEXT        IDC_REMOVEKEY_EDIT,7,142,295,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
-    PUSHBUTTON      "&Yes",IDOK,93,193,50,14
-    DEFPUSHBUTTON   "&No",IDCANCEL,165,193,50,14
+    LTEXT           "You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?",IDC_HOSTKEY_MESSAGE,15,7,290,45
+    LTEXT           "Fingerprint hash algorithm:",IDC_FP_HASH_ALG,15,56,100,8,0,WS_EX_RIGHT
+    CONTROL         "&MD5",IDC_FP_HASH_ALG_MD5,"Button",BS_AUTORADIOBUTTON,120,56,30,10
+    CONTROL         "&SHA256",IDC_FP_HASH_ALG_SHA256,"Button",BS_AUTORADIOBUTTON,155,56,40,10
+    LTEXT           "%u new key(s):",IDC_ADDKEY_TEXT,15,66,290,8
+    EDITTEXT        IDC_ADDKEY_EDIT,15,78,290,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    LTEXT           "%u obsolete key(s):",IDC_REMOVEKEY_TEXT,15,130,290,8
+    EDITTEXT        IDC_REMOVEKEY_EDIT,15,142,290,44,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON      "&Yes",IDOK,95,193,50,14
+    DEFPUSHBUTTON   "&No",IDCANCEL,175,193,50,14
 END
 
 
@@ -427,9 +442,9 @@ BEGIN
     IDD_ABOUTDIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 6
-        RIGHTMARGIN, 254
+        RIGHTMARGIN, 268
         TOPMARGIN, 7
-        BOTTOMMARGIN, 277
+        BOTTOMMARGIN, 324
     END
 
     IDD_SSHAUTH, DIALOG
@@ -458,17 +473,17 @@ BEGIN
     IDD_SSHUNKNOWNHOST, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 208
+        RIGHTMARGIN, 253
         TOPMARGIN, 7
-        BOTTOMMARGIN, 236
+        BOTTOMMARGIN, 270
     END
 
     IDD_SSHDIFFERENTKEY, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 208
+        RIGHTMARGIN, 253
         TOPMARGIN, 7
-        BOTTOMMARGIN, 236
+        BOTTOMMARGIN, 270
     END
 
     IDD_SSHAUTHSETUP, DIALOG
@@ -538,9 +553,9 @@ BEGIN
     IDD_SSHDIFFERENTTYPEKEY, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 208
+        RIGHTMARGIN, 253
         TOPMARGIN, 7
-        BOTTOMMARGIN, 236
+        BOTTOMMARGIN, 270
     END
 
     IDD_SFTP_DIALOG, DIALOG
@@ -554,7 +569,7 @@ BEGIN
     IDD_SSHUPDATE_HOSTKEY, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 302
+        RIGHTMARGIN, 314
         TOPMARGIN, 7
         BOTTOMMARGIN, 207
     END

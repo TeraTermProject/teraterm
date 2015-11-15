@@ -213,6 +213,9 @@
 #define IDC_HOSTKEY_MESSAGE             1214
 #define IDC_ADDKEY_TEXT                 1215
 #define IDC_REMOVEKEY_TEXT              1216
+#define IDC_FP_HASH_ALG                 1217
+#define IDC_FP_HASH_ALG_MD5             1218
+#define IDC_FP_HASH_ALG_SHA256          1219
 
 // Next default values for new objects
 // 
@@ -220,7 +223,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1217
+#define _APS_NEXT_CONTROL_VALUE         1220
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

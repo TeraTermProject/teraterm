@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Oct 10 2015)
+; Updated by TeraTerm Project (Nov 15 2015)
 ; Traditional Chinese Language by kikiqqp (Sep 20 2014) 
 
 [Tera Term]
@@ -507,6 +507,7 @@ MENU_SSH_KEYGEN=SSH 密鑰生成(&N)...
 
 ; dlg about
 DLG_ABOUT_TITLE=關於 TTSSH
+DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_ABOUT_SERVERID=伺服器ID：
 DLG_ABOUT_PROTOCOL=協定版本：
 DLG_ABOUT_ENCRYPTION=加密方案：
@@ -578,6 +579,7 @@ DLG_DIFFERENTKEY_TITLE=安全警告
 DLG_DIFFERENTKEY_WARNING=伺服器"####################################"已存在於主機列表中，但是提供了一個不同的密鑰，這可能是惡意人士所偽造的。
 DLG_DIFFERENTKEY_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_DIFFERENTKEY_FINGERPRINT=伺服器密鑰指紋：
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTKEY_REPLACE=使用新的密鑰更換現有密鑰(&R)
 
 ; dlg diff type key
@@ -585,6 +587,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=安全警告
 DLG_DIFFERENTTYPEKEY_WARNING=伺服器"####################################"已存在於主機列表中，但是提供了一個不同的密鑰，這可能是惡意人士所偽造的。
 DLG_DIFFERENTTYPEKEY_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=伺服器密鑰指紋：
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTTYPEKEY_ADD=追加到已知主機列表中(&A)
 
 ; dlg fwd edit
@@ -726,6 +729,7 @@ DLG_UNKNONWHOST_TITLE=安全警告
 DLG_UNKNOWNHOST_WARNING=伺服器"#####################################"不再已知主機列表中。它可能是敵對伺服器偽裝的，請小心！
 DLG_UNKNOWNHOST_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_UNKNOWNHOST_FINGERPRINT=伺服器端主機密鑰指紋：
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_UNKNOWNHOST_ADD=追加到已知主機列表中(&A)
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=DNS中未找到密鑰的指紋資訊。
@@ -737,6 +741,7 @@ DLG_HOSTKEY_DNSSEC_OK=DNS中發現強密碼。
 
 DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
 DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
 DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
 

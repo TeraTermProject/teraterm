@@ -2633,49 +2633,15 @@ error:
 	*major = *minor = *release = *build = 0;
 }
 
-static void init_about_dlg(PTInstVar pvar, HWND dlg)
+static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
 {
 	char buf[1024];
-	int a, b, c, d;
-	char uimsg[MAX_UIMSG];
 	char *fp = NULL;
-
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_ABOUT_TITLE", pvar, uimsg);
-	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
-	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-
-	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
-	get_file_version("ttxssh.dll", &a, &b, &c, &d);
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", a, b);
-	SendMessage(GetDlgItem(dlg, IDC_TTSSH_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
-
-	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)
-	// 条件文追加 (2005.5.11 yutaka)
-	// OPENSSL_VERSION_TEXT マクロ定義ではなく、関数を使ってバージョンを取得する。(2013.11.24 yutaka)
-	SendMessage(GetDlgItem(dlg, IDC_OPENSSL_VERSION), WM_SETTEXT, 0, (LPARAM)SSLeay_version(SSLEAY_VERSION));
-
-	// zlibのバージョンを設定する (2005.5.11 yutaka)
-#ifdef ZLIB_VERSION
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "ZLib %s", ZLIB_VERSION);
-#else
-	_snprintf(buf, sizeof(buf), "ZLib Unknown");
-#endif
-	SendMessage(GetDlgItem(dlg, IDC_ZLIB_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
-
-	// PuTTYのバージョンを設定する (2011.7.26 yutaka)
-#ifdef PUTTYVERSION
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "PuTTY %s", PUTTYVERSION);
-#else
-	_snprintf(buf, sizeof(buf), "PuTTY Unknown");
-#endif
-	SendMessage(GetDlgItem(dlg, IDC_PUTTY_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
 	// TTSSHダイアログに表示するSSHに関する情報 (2004.10.30 yutaka)
 	if (pvar->socket != INVALID_SOCKET) {
+		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
+
 		if (SSHv1(pvar)) {
 			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_SERVERID", pvar, "Server ID:");
@@ -2715,10 +2681,10 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 
 			// add MAC algorithm (2004.12.17 yutaka)
 			buf[0] = '\0';
-			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->ctos_hmac) , _TRUNCATE);
+			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->ctos_hmac), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_TOSERVER", pvar, " to server,");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->stoc_hmac) , _TRUNCATE);
+			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->stoc_hmac), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_FROMSERVER", pvar, " from server");
 			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 			append_about_text(dlg, "MAC:", buf);
@@ -2745,17 +2711,72 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 		}
 
 		// ホスト公開鍵のfingerprintを表示する。
-		// Random artの表示が崩れてしまうのが課題。
 		// (2014.5.1 yutaka)
-		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, SSH_DIGEST_MD5);
 		UTIL_get_lang_msg("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
-		append_about_text(dlg, pvar->ts->UIMsg, fp);
-		free(fp);
+		append_about_text(dlg, "", pvar->ts->UIMsg);
 
-		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, SSH_DIGEST_MD5);
-		append_about_text(dlg, "", fp);
+		switch (dgst_alg) {
+		case SSH_DIGEST_MD5:
+			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, dgst_alg);
+			append_about_text(dlg, "", fp);
+			free(fp);
+			break;
+		case SSH_DIGEST_SHA256:
+			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, dgst_alg);
+			append_about_text(dlg, "", fp);
+			free(fp);
+			break;
+		}
+
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
+		// 末尾に改行は不要なので append_about_text() は使用しない
+		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, EM_REPLACESEL, 0, (LPARAM)fp);
 		free(fp);
 	}
+}
+
+static void init_about_dlg(PTInstVar pvar, HWND dlg)
+{
+	char buf[1024];
+	int a, b, c, d;
+	char uimsg[MAX_UIMSG];
+
+	GetWindowText(dlg, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_ABOUT_TITLE", pvar, uimsg);
+	SetWindowText(dlg, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_ABOUT_FP_HASH_ALGORITHM", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
+	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
+
+	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
+	get_file_version("ttxssh.dll", &a, &b, &c, &d);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", a, b);
+	SendMessage(GetDlgItem(dlg, IDC_TTSSH_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
+
+	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)
+	// 条件文追加 (2005.5.11 yutaka)
+	// OPENSSL_VERSION_TEXT マクロ定義ではなく、関数を使ってバージョンを取得する。(2013.11.24 yutaka)
+	SendMessage(GetDlgItem(dlg, IDC_OPENSSL_VERSION), WM_SETTEXT, 0, (LPARAM)SSLeay_version(SSLEAY_VERSION));
+
+	// zlibのバージョンを設定する (2005.5.11 yutaka)
+#ifdef ZLIB_VERSION
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "ZLib %s", ZLIB_VERSION);
+#else
+	_snprintf(buf, sizeof(buf), "ZLib Unknown");
+#endif
+	SendMessage(GetDlgItem(dlg, IDC_ZLIB_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
+
+	// PuTTYのバージョンを設定する (2011.7.26 yutaka)
+#ifdef PUTTYVERSION
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "PuTTY %s", PUTTYVERSION);
+#else
+	_snprintf(buf, sizeof(buf), "PuTTY Unknown");
+#endif
+	SendMessage(GetDlgItem(dlg, IDC_PUTTY_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 }
 
 // WM_MOUSEWHEEL は winuser.h ヘッダで宣言されていますが、#define _WIN32_WINNT 0x0400 が宣言されていないと認識されません。
@@ -2825,6 +2846,9 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_WEBSITES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CRYPTOGRAPHY, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CREDIT, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 		}
 		else {
@@ -2865,7 +2889,9 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_TTSSH_ICON, STM_SETICON, (WPARAM)hicon, 0);
 		}
 
-		init_about_dlg((PTInstVar) lParam, dlg);
+		init_about_dlg(pvar, dlg);
+		CheckDlgButton(dlg, IDC_FP_HASH_ALG_MD5, TRUE);
+		about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_MD5);
 		SetFocus(GetDlgItem(dlg, IDOK));
 
 		// Edit controlをサブクラス化する。
@@ -2894,6 +2920,12 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			if (DlgAboutTextFont != NULL) {
 				DeleteObject(DlgAboutTextFont);
 			}
+			return TRUE;
+		case IDC_FP_HASH_ALG_MD5:
+			about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_MD5);
+			return TRUE;
+		case IDC_FP_HASH_ALG_SHA256:
+			about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_SHA256);
 			return TRUE;
 		}
 		break;

@@ -1989,6 +1989,56 @@ error:
 	return (ret);
 }
 
+static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
+{
+	char buf[1024];
+	char *fp;
+	size_t i;
+	struct hostkeys_update_ctx *ctx;
+	
+	ctx = pvar->hostkey_ctx;
+
+	SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
+	for (i = 0; i < ctx->nkeys; i++) {
+		if (ctx->keys_seen[i])
+			continue;
+		switch (dgst_alg) {
+		case SSH_DIGEST_MD5:
+			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, dgst_alg);
+			break;
+		case SSH_DIGEST_SHA256:
+			fp = key_fingerprint(ctx->keys[i], SSH_FP_BASE64, dgst_alg);
+			break;
+		}			
+		buf[0] = 0;
+		strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->keys[i]));
+		strcat_s(buf, sizeof(buf), " ");
+		strcat_s(buf, sizeof(buf), fp);
+		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
+		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
+		free(fp);
+	}
+
+	SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
+	for (i = 0; i < ctx->nold; i++) {
+		switch (dgst_alg) {
+		case SSH_DIGEST_MD5:
+			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, dgst_alg);
+			break;
+		case SSH_DIGEST_SHA256:
+			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_BASE64, dgst_alg);
+			break;
+		}
+		buf[0] = 0;
+		strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->old_keys[i]));
+		strcat_s(buf, sizeof(buf), " ");
+		strcat_s(buf, sizeof(buf), fp);
+		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
+		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
+		free(fp);
+	}
+}
+
 static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static HFONT DlgHostsAddFont;
@@ -1998,8 +2048,6 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	char buf[1024];
 	char *host;
 	struct hostkeys_update_ctx *ctx;
-	char *fp;
-	size_t i;
 	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
@@ -2021,37 +2069,22 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			);
 		SetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, buf);
 
+		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
+
 		GetDlgItemText(dlg, IDC_ADDKEY_TEXT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_ADD", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nnew);
 		SetDlgItemText(dlg, IDC_ADDKEY_TEXT, buf);
-		for (i = 0; i < ctx->nkeys; i++) {
-			if (ctx->keys_seen[i])
-				continue;
-			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, SSH_DIGEST_MD5);
-			buf[0] = 0;
-			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->keys[i]));
-			strcat_s(buf, sizeof(buf), " ");
-			strcat_s(buf, sizeof(buf), fp);
-			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
-			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
-			free(fp);
-		}
 
 		GetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_REMOVE", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
 		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
-		for (i = 0; i < ctx->nold; i++) {
-			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, SSH_DIGEST_MD5);
-			buf[0] = 0;
-			strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->old_keys[i]));
-			strcat_s(buf, sizeof(buf), " ");
-			strcat_s(buf, sizeof(buf), fp);
-			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
-			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
-			free(fp);
-		}
+
+		CheckDlgButton(dlg, IDC_FP_HASH_ALG_MD5, TRUE);
+		hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
 
 		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_YES", pvar, uimsg);
@@ -2065,6 +2098,9 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_HOSTKEY_MESSAGE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_ADDKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_REMOVEKEY_TEXT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
@@ -2098,6 +2134,14 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 				DeleteObject(DlgHostsAddFont);
 			}
 
+			return TRUE;
+
+		case IDC_FP_HASH_ALG_MD5:
+			hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
+			return TRUE;
+
+		case IDC_FP_HASH_ALG_SHA256:
+			hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 			return TRUE;
 
 		default:

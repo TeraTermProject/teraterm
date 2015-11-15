@@ -1074,13 +1074,36 @@ static int match_key(PTInstVar pvar, Key *key)
 	return HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key);
 }
 
+static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
+{
+	char *fp = NULL;
+
+	// fingerprintを設定する
+	switch (dgst_alg) {
+	case SSH_DIGEST_MD5:
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, dgst_alg);
+		SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
+		free(fp);
+		break;
+	case SSH_DIGEST_SHA256:
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, dgst_alg);
+		SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
+		free(fp);
+		break;
+	}
+
+	// ビジュアル化fingerprintを表示する
+	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
+	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
+	free(fp);
+}
+
 static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 {
 	char buf[1024];
 	char buf2[2048];
 	int i, j;
 	int ch;
-	char *fp = NULL;
 
 	// static textの # 部分をホスト名に置換する
 	GetDlgItemText(dlg, IDC_HOSTWARNING, buf, sizeof(buf));
@@ -1096,16 +1119,10 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 
 	SetDlgItemText(dlg, IDC_HOSTWARNING, buf2);
 
-	// fingerprintを設定する
-	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, SSH_DIGEST_MD5);
-	SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
-	free(fp);
-
-	// ビジュアル化fingerprintを表示する
-	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, SSH_DIGEST_MD5);
-	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
 	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), TRUE);
-	free(fp);
+
+	CheckDlgButton(dlg, IDC_FP_HASH_ALG_MD5, TRUE);
+	hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
 }
 
 static int print_mp_int(char FAR * buf, unsigned char FAR * mp)
@@ -1922,6 +1939,9 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_FINGERPRINT", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_UNKNOWNHOST_FP_HASH_ALGORITHM", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_ADD", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
@@ -1979,7 +1999,10 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
@@ -2035,6 +2058,14 @@ canceled:
 
 			return TRUE;
 
+		case IDC_FP_HASH_ALG_MD5:
+			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
+			return TRUE;
+
+		case IDC_FP_HASH_ALG_SHA256:
+			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
+			return TRUE;
+
 		default:
 			return FALSE;
 		}
@@ -2074,6 +2105,9 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTKEY_FINGERPRINT", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTKEY_FP_HASH_ALGORITHM", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTKEY_REPLACE", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
@@ -2128,10 +2162,13 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsReplaceFont, pvar)) {
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTWARNING2, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsReplaceFont, MAKELPARAM(TRUE,0));
 		}
@@ -2185,6 +2222,14 @@ canceled:
 
 			return TRUE;
 
+		case IDC_FP_HASH_ALG_MD5:
+			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
+			return TRUE;
+
+		case IDC_FP_HASH_ALG_SHA256:
+			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
+			return TRUE;
+
 		default:
 			return FALSE;
 		}
@@ -2224,6 +2269,9 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_FINGERPRINT", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
+		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_ADD", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_ADDTOKNOWNHOSTS, pvar->ts->UIMsg);
@@ -2281,7 +2329,10 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_HOSTSSHFPCHECK, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTSSHFPDNSSEC, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_HOSTFINGERPRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_MD5, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG_SHA256, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_FINGER_PRINT, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_ADDTOKNOWNHOSTS, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CONTINUE, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgHostsAddFont, MAKELPARAM(TRUE,0));
@@ -2335,6 +2386,14 @@ canceled:
 				DeleteObject(DlgHostsAddFont);
 			}
 
+			return TRUE;
+
+		case IDC_FP_HASH_ALG_MD5:
+			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
+			return TRUE;
+
+		case IDC_FP_HASH_ALG_SHA256:
+			hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 			return TRUE;
 
 		default:

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Oct 10 2015)
+; Updated by TeraTerm Project (Nov 15 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -506,6 +506,7 @@ MENU_SSH_KEYGEN=SSH鍵生成(&N)...
 
 ; dlg about
 DLG_ABOUT_TITLE=TTSSHについて
+DLG_ABOUT_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
 DLG_ABOUT_SERVERID=サーバID:
 DLG_ABOUT_PROTOCOL=プロトコルのバージョン:
 DLG_ABOUT_ENCRYPTION=暗号化方式:
@@ -577,6 +578,7 @@ DLG_DIFFERENTKEY_TITLE=セキュリティ警告
 DLG_DIFFERENTKEY_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
 DLG_DIFFERENTKEY_WARNING2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_DIFFERENTKEY_FINGERPRINT=サーバ側のホスト鍵指紋:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
 DLG_DIFFERENTKEY_REPLACE=既存の鍵を, 新しい鍵で上書きする(&R)
 
 ; dlg diff type key
@@ -584,6 +586,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=セキュリティ警告
 DLG_DIFFERENTTYPEKEY_WARNING=knows hostsリスト中のサーバ"####################################"のエントリと, 接続先のホスト鍵の種類が *一致していません* 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください.
 DLG_DIFFERENTTYPEKEY_WARNING2=known hostsリストにこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=サーバ側のホスト鍵指紋:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
 DLG_DIFFERENTTYPEKEY_ADD=このホストをknown hostsリストに追加する(&A)
 
 ; dlg fwd edit
@@ -725,6 +728,7 @@ DLG_UNKNONWHOST_TITLE=セキュリティ警告
 DLG_UNKNOWNHOST_WARNING=known hostsリストにサーバ"#####################################"のエントリはありません. 悪意を持ったホストが, 接続しようとしているサーバのふりをしている可能性もありますので, 十分注意してください！
 DLG_UNKNOWNHOST_WARNING2=known hostsリストのこのホストを追加して続行すると, 次回からこの警告は出なくなります.
 DLG_UNKNOWNHOST_FINGERPRINT=サーバ側のホスト鍵指紋:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
 DLG_UNKNOWNHOST_ADD=このホストをknown hostsリストに追加する(&A)
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=DNSで鍵指紋情報が見つかりませんでした。
@@ -736,6 +740,7 @@ DLG_HOSTKEY_DNSSEC_OK=DNSの鍵指紋情報はDNSSECで認証されています。
 
 DLG_HOSTKEY_ROTATION_TITLE=サーバホスト鍵の更新
 DLG_HOSTKEY_ROTATION_WARNING=接続先のサーバ`%s'からホスト鍵一覧を受信しました.\n更新すると, known hostsリストに%u個の新しいホスト鍵を追加し、%u個の廃止されたホスト鍵を削除します.\nknown hostsリストを更新しますか?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=鍵指紋ハッシュアルゴリズム:
 DLG_HOSTKEY_ROTATION_ADD=%u個の新しいホスト鍵:
 DLG_HOSTKEY_ROTATION_REMOVE=%u個の廃止されたホスト鍵:
 

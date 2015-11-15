@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Oct 10 2015)
+; Updated by TeraTerm Project (Nov 15 2015)
 ; Last translated (German language) by Frederik Schwarzer (May 17 2010)
 
 [Tera Term]
@@ -507,6 +507,7 @@ MENU_SSH_KEYGEN=&SSH-Keygenerator
 
 ; dlg about
 DLG_ABOUT_TITLE=Über TTSSH
+DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_ABOUT_SERVERID=Server-ID:
 DLG_ABOUT_PROTOCOL=Verwendetes Protokoll:
 DLG_ABOUT_ENCRYPTION=Verschlüsselung:
@@ -577,6 +578,7 @@ DLG_DIFFERENTKEY_TITLE=SICHERHEITSWARNUNG
 DLG_DIFFERENTKEY_WARNING=Der Server ("####################################") ist in der "known hosts"-Liste bereits mit einem anderen Schlüssel eingetragen.
 DLG_DIFFERENTKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_DIFFERENTKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTKEY_REPLACE=Den vorhanden Schlüssel durch den neuen ersetzen.
 
 ; dlg diff type key
@@ -584,6 +586,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=SICHERHEITSWARNUNG
 DLG_DIFFERENTTYPEKEY_WARNING=Your known hosts list has an entry for the server "####################################", but the machine you have contacted has presented a DIFFERENT TYPE KEY to the one in your known hosts list. A hostile machine may be pretending to be the server.
 DLG_DIFFERENTTYPEKEY_WARNING2=Wenn Sie auf 'Continue'  klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=Der Fingerabdruck des Schlüssels:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTTYPEKEY_ADD=Den Server zur "known hosts"-Liste hinzufügen.
 
 ; dlg fwd edit
@@ -724,6 +727,7 @@ DLG_UNKNONWHOST_TITLE=SICHERHEITSWARNUNG
 DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.
 DLG_UNKNOWNHOST_WARNING2=Wenn Sie auf 'Continue' klicken, wird der Server in die Liste aufgenommen und die Fehlermeldung erscheint nicht mehr.
 DLG_UNKNOWNHOST_FINGERPRINT=Der Fingerabdruck des Schlüssels:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_UNKNOWNHOST_ADD=Den Server zur "known hosts"-Liste hinzufügen.
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=No host key fingerprint found in DNS.
@@ -735,6 +739,7 @@ DLG_HOSTKEY_DNSSEC_OK=Found secure fingerprint in DNS.
 
 DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
 DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
 DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
 

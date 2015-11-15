@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Oct 10 2015)
+; Updated by TeraTerm Project (Nov 15 2015)
 ; Last translated (Russian language) by Ryumik Sergey (Mar 14 2015)
 
 [Tera Term]
@@ -507,6 +507,7 @@ MENU_SSH_KEYGEN=&Генератор ключа SSH...
 
 ; dlg информация
 DLG_ABOUT_TITLE=Информация о TTSSH
+DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_ABOUT_SERVERID=Сервер ID:
 DLG_ABOUT_PROTOCOL=Протокол:
 DLG_ABOUT_ENCRYPTION=Шифрование:
@@ -578,6 +579,7 @@ DLG_DIFFERENTKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_DIFFERENTKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ КЛЮЧ, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_DIFFERENTKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_DIFFERENTKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTKEY_REPLACE=&Заменить существующий ключ новым ключом
 
 ; dlg diff type key
@@ -585,6 +587,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_DIFFERENTTYPEKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ ТИП КЛЮЧА, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_DIFFERENTTYPEKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTTYPEKEY_ADD=&Добавить этот компьютер и его ключ в список известных хостов
 
 ; dlg fwd edit
@@ -726,6 +729,7 @@ DLG_UNKNONWHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "####################################" в списке известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_UNKNOWNHOST_WARNING2=Если вы добавите этот компьютер в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_UNKNOWNHOST_FINGERPRINT=Ключ сервера хоста:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_UNKNOWNHOST_ADD=&Добавьте этот компьютер и его ключ в список известных хостов
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=Не найден ключ хоста в DNS.
@@ -737,6 +741,7 @@ DLG_HOSTKEY_DNSSEC_OK=Найден надежный пароль в DNS.
 
 DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
 DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
 DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
 
