@@ -2647,13 +2647,14 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
+      <!--li>サーバホスト鍵の指紋を表示するときに使うハッシュアルゴリズムを、MD5 だけでなく SHA256 も選択できるようにした。</li-->
+      <li>Added support for the ED25519 key by using the host key verifying(SSHFP) of DNS.</li>
       <li>The key exchange, host key, cipher, MAC and compression method which are not shown in the teraterm.ini file
           is changed for inserting position in the following:
         <ul>
           <li>Enabled method by default ... The method is inserted at the end of using methods.</li>
           <li>Disabled method by default ... The method is inserted at the end of not using methods.</li>
         </ul></li>
-      <li>Added support for the ED25519 key by using the host key verifying(SSHFP) of DNS.</li>
     </ul>
   </li>
 
