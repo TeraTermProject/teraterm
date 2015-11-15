@@ -2564,15 +2564,6 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
 	}
 }
 
-static void append_about_text(HWND dlg, char FAR * prefix, char FAR * msg)
-{
-	SendDlgItemMessage(dlg, IDC_ABOUTTEXT, EM_REPLACESEL, 0,
-	                   (LPARAM) prefix);
-	SendDlgItemMessage(dlg, IDC_ABOUTTEXT, EM_REPLACESEL, 0, (LPARAM) msg);
-	SendDlgItemMessage(dlg, IDC_ABOUTTEXT, EM_REPLACESEL, 0,
-	                   (LPARAM) (char FAR *) "\r\n");
-}
-
 // 実行ファイルからバージョン情報を得る (2005.2.28 yutaka)
 void get_file_version(char *exefile, int *major, int *minor, int *release, int *build)
 {
@@ -2635,103 +2626,160 @@ error:
 
 static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
 {
-	char buf[1024];
+	char buf[1024], buf2[2048];
 	char *fp = NULL;
 
 	// TTSSHダイアログに表示するSSHに関する情報 (2004.10.30 yutaka)
 	if (pvar->socket != INVALID_SOCKET) {
-		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
+		buf2[0] = '\0';
 
 		if (SSHv1(pvar)) {
-			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_SERVERID", pvar, "Server ID:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
-			SSH_get_protocol_version_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
-			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
-			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_SERVERKEY", pvar, "Server keys:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
-			AUTH_get_auth_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_AUTH", pvar, "Authentication:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
-			SSH_get_compression_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			AUTH_get_auth_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_COMP", pvar, "Compression:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_compression_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 		} else { // SSH2
-			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_SERVERID", pvar, "Server ID:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_server_ID_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_CLIENTID", pvar, "Client ID:");
-			append_about_text(dlg, pvar->ts->UIMsg, pvar->client_version_string);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->client_version_string, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			SSH_get_protocol_version_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_PROTOCOL", pvar, "Using protocol:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_protocol_version_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			append_about_text(dlg, "KEX:", get_kex_algorithm_name(pvar->kex_type));
+			UTIL_get_lang_msg("DLG_ABOUT_KEX", pvar, "Key exchange algorithm:");
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_kex_algorithm_name(pvar->kex_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			strncpy_s(buf, sizeof(buf), get_ssh_keytype_name(pvar->hostkey_type), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_HOSTKEY", pvar, "Host Key:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh_keytype_name(pvar->hostkey_type), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			// add MAC algorithm (2004.12.17 yutaka)
-			buf[0] = '\0';
-			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->ctos_hmac), _TRUNCATE);
+			UTIL_get_lang_msg("DLG_ABOUT_MAC", pvar, "MAC algorithm:");
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_mac_name(pvar->ctos_hmac), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_TOSERVER", pvar, " to server,");
-			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf, sizeof(buf), get_ssh2_mac_name(pvar->stoc_hmac), _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), get_ssh2_mac_name(pvar->stoc_hmac), _TRUNCATE);
 			UTIL_get_lang_msg("DLG_ABOUT_FROMSERVER", pvar, " from server");
-			strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
-			append_about_text(dlg, "MAC:", buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
-			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
 			UTIL_get_lang_msg("DLG_ABOUT_KEXKEY", pvar, "Key exchange keys:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			CRYPT_get_server_key_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			AUTH_get_auth_info(pvar, buf, sizeof(buf));
 			UTIL_get_lang_msg("DLG_ABOUT_AUTH", pvar, "Authentication:");
-			append_about_text(dlg, pvar->ts->UIMsg, buf);
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			AUTH_get_auth_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			SSH_get_compression_info(pvar, buf, sizeof(buf));
 			if (pvar->ctos_compression == COMP_DELAYED) { // 遅延パケット圧縮の場合 (2006.6.23 yutaka)
 				UTIL_get_lang_msg("DLG_ABOUT_COMPDELAY", pvar, "Delayed Compression:");
-				append_about_text(dlg, pvar->ts->UIMsg, buf);
 			} else {
 				UTIL_get_lang_msg("DLG_ABOUT_COMP", pvar, "Compression:");
-				append_about_text(dlg, pvar->ts->UIMsg, buf);
 			}
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_compression_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 		}
 
 		// ホスト公開鍵のfingerprintを表示する。
 		// (2014.5.1 yutaka)
 		UTIL_get_lang_msg("DLG_ABOUT_FINGERPRINT", pvar, "Host key's fingerprint:");
-		append_about_text(dlg, "", pvar->ts->UIMsg);
+		strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+		strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
 		switch (dgst_alg) {
 		case SSH_DIGEST_MD5:
 			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, dgst_alg);
-			append_about_text(dlg, "", fp);
+			strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 			free(fp);
 			break;
 		case SSH_DIGEST_SHA256:
 			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, dgst_alg);
-			append_about_text(dlg, "", fp);
+			strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 			free(fp);
 			break;
 		}
 
 		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
-		// 末尾に改行は不要なので append_about_text() は使用しない
-		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, EM_REPLACESEL, 0, (LPARAM)fp);
+		strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
 		free(fp);
+
+		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETTEXT, 0, (LPARAM)(char FAR *)buf2);
 	}
 }
 

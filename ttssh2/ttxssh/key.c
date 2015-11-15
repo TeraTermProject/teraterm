@@ -1991,51 +1991,62 @@ error:
 
 static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
 {
-	char buf[1024];
-	char *fp;
+	char *fp, *buf;
 	size_t i;
+	int buf_len;
 	struct hostkeys_update_ctx *ctx;
 	
 	ctx = pvar->hostkey_ctx;
 
-	SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
-	for (i = 0; i < ctx->nkeys; i++) {
-		if (ctx->keys_seen[i])
-			continue;
-		switch (dgst_alg) {
-		case SSH_DIGEST_MD5:
-			fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, dgst_alg);
-			break;
-		case SSH_DIGEST_SHA256:
-			fp = key_fingerprint(ctx->keys[i], SSH_FP_BASE64, dgst_alg);
-			break;
-		}			
-		buf[0] = 0;
-		strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->keys[i]));
-		strcat_s(buf, sizeof(buf), " ");
-		strcat_s(buf, sizeof(buf), fp);
-		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
-		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
-		free(fp);
+	if (ctx->nkeys > 0) {
+		buf_len = 100 * ctx->nkeys;
+		buf = calloc(100, ctx->nkeys);
+		for (i = 0; i < ctx->nkeys; i++) {
+			if (ctx->keys_seen[i])
+				continue;
+			switch (dgst_alg) {
+			case SSH_DIGEST_MD5:
+				fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, dgst_alg);
+				break;
+			case SSH_DIGEST_SHA256:
+				fp = key_fingerprint(ctx->keys[i], SSH_FP_BASE64, dgst_alg);
+				break;
+			}
+			strncat_s(buf, buf_len, get_sshname_from_key(ctx->keys[i]), _TRUNCATE);
+			strncat_s(buf, buf_len, " ", _TRUNCATE);
+			strncat_s(buf, buf_len, fp, _TRUNCATE);
+			free(fp);
+			if (i < ctx->nkeys - 1) {
+				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
+			}
+		}
+		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)buf);
+		free(buf);
 	}
 
-	SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
-	for (i = 0; i < ctx->nold; i++) {
-		switch (dgst_alg) {
-		case SSH_DIGEST_MD5:
-			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, dgst_alg);
-			break;
-		case SSH_DIGEST_SHA256:
-			fp = key_fingerprint(ctx->old_keys[i], SSH_FP_BASE64, dgst_alg);
-			break;
+	if (ctx->nold > 0) {
+		buf_len = 100 * ctx->nold;
+		buf = calloc(100, ctx->nold);
+		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
+		for (i = 0; i < ctx->nold; i++) {
+			switch (dgst_alg) {
+			case SSH_DIGEST_MD5:
+				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, dgst_alg);
+				break;
+			case SSH_DIGEST_SHA256:
+				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_BASE64, dgst_alg);
+				break;
+			}
+			strncat_s(buf, buf_len, get_sshname_from_key(ctx->old_keys[i]), _TRUNCATE);
+			strncat_s(buf, buf_len, " ", _TRUNCATE);
+			strncat_s(buf, buf_len, fp, _TRUNCATE);
+			free(fp);
+			if (i < ctx->nold - 1) {
+				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
+			}
 		}
-		buf[0] = 0;
-		strcat_s(buf, sizeof(buf), get_sshname_from_key(ctx->old_keys[i]));
-		strcat_s(buf, sizeof(buf), " ");
-		strcat_s(buf, sizeof(buf), fp);
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)buf);
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, EM_REPLACESEL, 0, (LPARAM)"\r\n");
-		free(fp);
+		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)buf);
+		free(buf);
 	}
 }
 
