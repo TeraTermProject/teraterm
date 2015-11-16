@@ -14,6 +14,7 @@
     <ProjectGuid>{5638BB89-44E3-4D55-BA98-A01142B4223E}</ProjectGuid>
     <RootNamespace>ttxssh</RootNamespace>
     <ProjectName>ttxssh</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -189,11 +190,11 @@
     <ResourceCompile Include="ttxssh.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\puttyrev\puttyrev.v12.vcxproj">
+    <ProjectReference Include="..\puttyrev\puttyrev.v14.vcxproj">
       <Project>{61eb955f-2794-4607-860f-0aa296fa58bd}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\putty\putty.v12.vcxproj">
+    <ProjectReference Include="..\putty\putty.v14.vcxproj">
       <Project>{98ca1284-8f6c-4791-bf57-7e5fad33744e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
