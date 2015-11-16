@@ -86,37 +86,7 @@ private:
 		buffer.append(basename);
 		return buffer.toString();
 	}
-#if 0
-	static int parse_option(char* option) {
-		if ((*option == '/' || *option == '-')) {
-			if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
-				read_options(get_teraterm_dir_relative_name(option + 3));
-			}else if (strlen(option + 1) >= 6 && option[6] == '=') {
-				option[6] = '\0';
-				if (_stricmp(option + 1, "proxy") == 0) {
-					ProxyWSockHook::parseURL(option + 7, TRUE);
-					return 1;
-				}else{
-					option[6] = '=';
-				}
-			}
-		}else{
-			String realhost = ProxyWSockHook::parseURL(option, FALSE);
-			if (realhost != NULL) {
-				getInstance().realhost = realhost;
-				if (realhost.indexOf("://") == -1) {
-					return 1;
-				}
-				else {
-					// -proxy= なしで、proto://proxy:port/ 以降の実ホストが含まれていない
-					// ttermpro で処理してもらうため、TTXParseParam で消さない
-					return 2;
-				}
-			}
-		}
-		return 0;
-	}
-#endif
+
 	static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts) {
 		getInstance().ORIG_ReadIniFile(fileName, ts);
 		read_options(fileName);
@@ -125,11 +95,10 @@ private:
 		getInstance().ORIG_WriteIniFile(fileName, ts);
 		write_options(fileName);
 	}
-#if 1
+
 	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 		int param_len=strlen(param);
 		char option[1024];
-		char option2[1024];
 		int opt_len = sizeof(option);
 		int action;
 		PCHAR start, cur, next;
@@ -141,12 +110,12 @@ private:
 
 		cur = start;
 		while (next = GetParam(option, opt_len, cur)) {
+			DequoteParam(option, opt_len, option);
 			action = OPTION_NONE;
 
 			if ((option[0] == '-' || option[0] == '/')) {
 				if ((option[1] == 'F' || option[1] == 'f') && option[2] == '=') {
-					DequoteParam(option2, sizeof(option2), option + 3);
-					read_options(get_teraterm_dir_relative_name(option2));
+					read_options(get_teraterm_dir_relative_name(option + 3));
 				}
 			}
 
@@ -164,15 +133,15 @@ private:
 		}
 
 		cur = start;
-		while (next = GetParam(option, opt_len, cur)) {	
+		while (next = GetParam(option, opt_len, cur)) {
+			DequoteParam(option, opt_len, option);
 			action = OPTION_NONE;
 
 			if ((option[0] == '-' || option[0] == '/')) {
 				if (strlen(option + 1) >= 6 && option[6] == '=') {
 					option[6] = '\0';
 					if (_stricmp(option + 1, "proxy") == 0) {
-						DequoteParam(option2, sizeof(option2), option + 7);
-						ProxyWSockHook::parseURL(option2, TRUE);
+						ProxyWSockHook::parseURL(option + 7, TRUE);
 						action = OPTION_CLEAR;
 					}else{
 						option[6] = '=';
@@ -211,167 +180,6 @@ private:
 			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
 		}
 	}
-#else
-	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
-		char* p = param;
-		bool inParam = false;
-		bool inQuotes = false;
-		bool inEqual = false;
-		int param_len = strlen(param);
-		char* option = NULL;
-		char *buf;
-		int buflen = 0;
-		int i;
-		char* start = NULL;
-
-#if 1
-		// 解析処理は ttxssh.c よりコピー
-		buf = new char[param_len+1];
-		memset(buf, 0, param_len+1);
-		for (i=0; i<param_len; i++) {
-			if (inQuotes) {
-				// 現在位置が"の中
-				if (param[i] == '"') {
-					if (param[i+1] == '"') {
-						buf[buflen] = param[i];
-						buflen++;
-						i++;
-					}
-					else {
-						// クォートしているときはここで終わり
-						// "をbufに入れずに解析に渡す
-						switch (parse_option(buf)) {
-							case 1:
-								memset(start, ' ', (param + i) - start + 1);
-								break;
-							case 2:
-								memset(start, ' ', (param + i) - start + 1);
-								buflen = strlen(buf);
-								memcpy(start, buf, buflen);
-								break;
-						}
-						inParam = false;
-						inEqual = false;
-						start = NULL;
-						memset(buf, 0, buflen);
-						buflen = 0;
-						inQuotes = false;
-					}
-				}
-				else {
-					buf[buflen] = param[i];
-					buflen++;
-				}
-			}
-			else {
-				if (!inParam) {
-					// まだパラメータの中にいない
-					if (param[i] == '"') {
-						// " で始まる
-						start = param + i;
-						inParam = true;
-						inQuotes = true;
-					}
-					else if (param[i] != ' ' && param[i] != '\t') {
-						// 普通に始まる
-						buf[buflen] = param[i];
-						buflen++;
-						start = param + i;
-						inParam = true;
-					}
-				}
-				else {
-					// 現在位置がパラメータの中
-					if (param[i] == ' ' || param[i] == '\t') {
-						// クォートしていないときはここで終わり
-						switch (parse_option(buf)) {
-							case 1:
-								memset(start, ' ', (param + i) - start + 1);
-								break;
-							case 2:
-								memset(start, ' ', (param + i) - start + 1);
-								buflen = strlen(buf);
-								memcpy(start, buf, buflen);
-								break;
-						}
-						inParam = false;
-						inEqual = false;
-						start = NULL;
-						memset(buf, 0, buflen);
-						buflen = 0;
-					}
-					else {
-						buf[buflen] = param[i];
-						buflen++;
-						if (!inEqual && param[i] == '=') {
-							inEqual = true;
-							if (param[i+1] == '"') {
-								inQuotes = true;
-								i++;
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		// buf に残りがあれば解析に渡す
-		//   +1すると最後の'\0'も消してしまうので、上と同じではいけない
-		if (strlen(buf) > 0) {
-			switch (parse_option(buf)) {
-				case 1:
-					memset(start, ' ', (param + i) - start);
-					break;
-				case 2:
-					memset(start, ' ', (param + i) - start);
-					buflen = strlen(buf);
-					memcpy(start, buf, buflen);
-					break;
-			}
-		}
-
-		delete[] buf;
-#else
-		while (*p != '\0') {
-			if (inQuotes ? *p == '"' : (*p == ' ' || *p == '\t')) {
-				if (option != NULL) {
-					char ch = *p;
-					*p = '\0';
-					if (parse_option(*option == '"' ? option + 1 : option) == 1) {
-						memset(option, ' ', p - option + 1);
-					} else {
-						*p = ch;
-					}
-					option = NULL;
-				}
-				inParam = false;
-				inQuotes = false;
-			} else if (!inParam) {
-				if (*p == '"') {
-					inQuotes = true;
-					inParam = true;
-					option = p;
-				} else if (*p != ' ' && *p != '\t') {
-					inParam = true;
-					option = p;
-				}
-			}
-			p++;
-		}
-		
-		if (option != NULL) {
-			if (parse_option(option) == 1) {
-				*option = '\0';
-			}
-		}
-#endif
-
-		getInstance().ORIG_ParseParam(param, ts, DDETopic);
-		if (getInstance().ts->HostName[0] == '\0' && getInstance().realhost != NULL) {
-			strcpy_s(getInstance().ts->HostName, sizeof getInstance().ts->HostName, getInstance().realhost);
-		}
-	}
-#endif
 
 	static void copy_UILanguageFile() {
 		strncpy_s(UILanguageFile, sizeof(UILanguageFile),
