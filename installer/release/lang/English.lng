@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 15 2015)
+; Updated by TeraTerm Project (Nov 16 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -518,8 +518,7 @@ DLG_ABOUT_CLIENTID=Client ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
 DLG_ABOUT_HOSTKEY=Host Key:
 DLG_ABOUT_MAC=MAC algorithm:
-DLG_ABOUT_TOSERVER=" to server,"
-DLG_ABOUT_FROMSERVER=" from server"
+DLG_ABOUT_MAC_INFO=%s to server, %s from server
 DLG_ABOUT_COMPDELAY=Delayed Compression:
 DLG_ABOUT_CIPHER_INFO=%s to server, %s from server
 DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key

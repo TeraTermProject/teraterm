@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 15 2015)
+; Updated by TeraTerm Project (Nov 16 2015)
 ; Last translated (Korean language) by Daehong Kim (Jul 25 2013)
 
 [Tera Term]
@@ -519,8 +519,7 @@ DLG_ABOUT_CLIENTID=클라이언트 ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
 DLG_ABOUT_HOSTKEY=호스트 키:
 DLG_ABOUT_MAC=MAC algorithm:
-DLG_ABOUT_TOSERVER=" 서버로,"
-DLG_ABOUT_FROMSERVER=" 서버로부터"
+DLG_ABOUT_MAC_INFO=%s to server, %s from server
 DLG_ABOUT_COMPDELAY=지연된 압축:
 DLG_ABOUT_CIPHER_INFO=%s를 서버로, %s를 서버로부터
 DLG_ABOUT_KEY_INFO=%d-bit 서버 키, %d-bit 호스트 키

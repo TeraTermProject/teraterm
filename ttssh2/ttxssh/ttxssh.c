@@ -2708,22 +2708,29 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), get_ssh_keytype_name(pvar->hostkey_type), _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
-			UTIL_get_lang_msg("DLG_ABOUT_MAC", pvar, "MAC algorithm:");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh2_mac_name(pvar->ctos_hmac), _TRUNCATE);
-			UTIL_get_lang_msg("DLG_ABOUT_TOSERVER", pvar, " to server,");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), get_ssh2_mac_name(pvar->stoc_hmac), _TRUNCATE);
-			UTIL_get_lang_msg("DLG_ABOUT_FROMSERVER", pvar, " from server");
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
-
 			UTIL_get_lang_msg("DLG_ABOUT_ENCRYPTION", pvar, "Encryption:");
 			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			CRYPT_get_cipher_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
+			UTIL_get_lang_msg("DLG_ABOUT_MAC", pvar, "MAC algorithm:");
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_mac_info(pvar, buf, sizeof(buf));
+			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
+
+			if (pvar->ctos_compression == COMP_DELAYED) { // ’x‰„ƒpƒPƒbƒgˆ³k‚Ìê‡ (2006.6.23 yutaka)
+				UTIL_get_lang_msg("DLG_ABOUT_COMPDELAY", pvar, "Delayed Compression:");
+			}
+			else {
+				UTIL_get_lang_msg("DLG_ABOUT_COMP", pvar, "Compression:");
+			}
+			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
+			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
+			SSH_get_compression_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 
@@ -2738,17 +2745,6 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
 			AUTH_get_auth_info(pvar, buf, sizeof(buf));
-			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
-
-			if (pvar->ctos_compression == COMP_DELAYED) { // ’x‰„ƒpƒPƒbƒgˆ³k‚Ìê‡ (2006.6.23 yutaka)
-				UTIL_get_lang_msg("DLG_ABOUT_COMPDELAY", pvar, "Delayed Compression:");
-			} else {
-				UTIL_get_lang_msg("DLG_ABOUT_COMP", pvar, "Compression:");
-			}
-			strncat_s(buf2, sizeof(buf2), pvar->ts->UIMsg, _TRUNCATE);
-			strncat_s(buf2, sizeof(buf2), " ", _TRUNCATE);
-			SSH_get_compression_info(pvar, buf, sizeof(buf));
 			strncat_s(buf2, sizeof(buf2), buf, _TRUNCATE);
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
 		}

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 15 2015)
+; Updated by TeraTerm Project (Nov 16 2015)
 ; Last translated (German language) by Frederik Schwarzer (May 17 2010)
 
 [Tera Term]
@@ -519,8 +519,7 @@ DLG_ABOUT_CLIENTID=Client-ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
 DLG_ABOUT_HOSTKEY=Client-Schlüssel:
 DLG_ABOUT_MAC=MAC algorithm:
-DLG_ABOUT_TOSERVER=" zum Server,"
-DLG_ABOUT_FROMSERVER=" vom Server"
+DLG_ABOUT_MAC_INFO=%s zum Server, %s vom Server
 DLG_ABOUT_COMPDELAY=Delayed Compression:
 DLG_ABOUT_CIPHER_INFO=%s zum Server, %s vom Server
 DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key

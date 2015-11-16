@@ -3165,6 +3165,15 @@ void SSH_get_protocol_version_info(PTInstVar pvar, char FAR * dest,
 	}
 }
 
+void SSH_get_mac_info(PTInstVar pvar, char FAR * dest, int len)
+{
+	UTIL_get_lang_msg("DLG_ABOUT_MAC_INFO", pvar,
+	                  "%s to server, %s from server");
+	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+	            get_ssh2_mac_name(pvar->ctos_hmac),
+	            get_ssh2_mac_name(pvar->stoc_hmac));
+}
+
 void SSH_end(PTInstVar pvar)
 {
 	int i;

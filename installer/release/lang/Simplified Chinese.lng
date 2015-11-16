@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 15 2015)
+; Updated by TeraTerm Project (Nov 16 2015)
 ; Last translated (Simplified Chinese language) by LiShaohui (Nov 18 2013)
 
 [Tera Term]
@@ -519,8 +519,7 @@ DLG_ABOUT_CLIENTID=客户端ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
 DLG_ABOUT_HOSTKEY=主机密钥:
 DLG_ABOUT_MAC=MAC algorithm:
-DLG_ABOUT_TOSERVER=" TTSSH→服务器,"
-DLG_ABOUT_FROMSERVER=" 服务器→TTSSH"
+DLG_ABOUT_MAC_INFO=%s 到服务器，%s 来自服务器
 DLG_ABOUT_COMPDELAY=延时压缩状况:
 DLG_ABOUT_CIPHER_INFO=%s 到服务器，%s 来自服务器
 DLG_ABOUT_KEY_INFO=%d字节服务器密钥，%d字节主机密钥

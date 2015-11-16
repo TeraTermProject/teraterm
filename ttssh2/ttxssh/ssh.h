@@ -667,6 +667,7 @@ void SSH_end(PTInstVar pvar);
 void SSH_get_server_ID_info(PTInstVar pvar, char FAR * dest, int len);
 void SSH_get_protocol_version_info(PTInstVar pvar, char FAR * dest, int len);
 void SSH_get_compression_info(PTInstVar pvar, char FAR * dest, int len);
+void SSH_get_mac_info(PTInstVar pvar, char FAR * dest, int len);
 
 /* len must be <= SSH_MAX_SEND_PACKET_SIZE */
 void SSH_channel_send(PTInstVar pvar, int channel_num,

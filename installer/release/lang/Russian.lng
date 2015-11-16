@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 15 2015)
+; Updated by TeraTerm Project (Nov 16 2015)
 ; Last translated (Russian language) by Ryumik Sergey (Mar 14 2015)
 
 [Tera Term]
@@ -519,8 +519,7 @@ DLG_ABOUT_CLIENTID=Клиент ID:
 DLG_ABOUT_KEX=Key exchange algorithm:
 DLG_ABOUT_HOSTKEY=Ключ хоста:
 DLG_ABOUT_MAC=MAC algorithm:
-DLG_ABOUT_TOSERVER=" к серверу,"
-DLG_ABOUT_FROMSERVER=" от сервера"
+DLG_ABOUT_MAC_INFO=%s к серверу, %s от сервера
 DLG_ABOUT_COMPDELAY=Задержка сжатия:
 DLG_ABOUT_CIPHER_INFO=%s к серверу, %s от сервера
 DLG_ABOUT_KEY_INFO=%d-бит ключ сервера, %d-бит ключ хоста

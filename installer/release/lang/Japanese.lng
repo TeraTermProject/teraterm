@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 15 2015)
+; Updated by TeraTerm Project (Nov 16 2015)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -518,13 +518,12 @@ DLG_ABOUT_CLIENTID=クライアントID:
 DLG_ABOUT_KEX=鍵交換アルゴリズム:
 DLG_ABOUT_HOSTKEY=ホスト鍵:
 DLG_ABOUT_MAC=MACアルゴリズム:
-DLG_ABOUT_TOSERVER=" TTSSH→サーバ,"
-DLG_ABOUT_FROMSERVER=" サーバ→TTSSH"
+DLG_ABOUT_MAC_INFO=%s でサーバへ, %s でサーバから
 DLG_ABOUT_COMPDELAY=遅延圧縮状況:
 DLG_ABOUT_CIPHER_INFO=%s でサーバへ, %s でサーバから
-DLG_ABOUT_KEY_INFO=%d-bit server key, %d-bit host key
-DLG_ABOUT_KEY_INFO2=%d-bit client key, %d-bit server key
-DLG_ABOUT_KEY_NONE=None
+DLG_ABOUT_KEY_INFO=%dビット サーバ鍵, %dビット ホスト鍵
+DLG_ABOUT_KEY_INFO2=%dビット クライアント鍵, %dビット サーバ鍵
+DLG_ABOUT_KEY_NONE=なし
 DLG_ABOUT_COMP_INFO=レベル %d; 圧縮比 %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=レベル %d
 DLG_ABOUT_COMP_NONE=なし
