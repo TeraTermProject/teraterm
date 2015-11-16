@@ -3595,9 +3595,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	DWORD ParamBaud = BaudNone;
 	BOOL HostNameFlag = FALSE;
 	BOOL JustAfterHost = FALSE;
-#if 1
 	PCHAR start, cur, next;
-#endif
 
 	ts->HostName[0] = 0;
 	//ts->KeyCnfFN[0] = 0;
@@ -3615,21 +3613,13 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		DDETopic[0] = 0;
 	i = 0;
 	/* the first term shuld be executable filename of Tera Term */
-#if 1
 	start = GetParam(Temp, sizeof(Temp), Param);
-#else
-	NextParam(Param, &i, Temp, sizeof(Temp));
-#endif
 
-#if 1
 	cur = start;
 	while (next = GetParam(Temp, sizeof(Temp), cur)) {
-#else
-	param_top = i;
-	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
-#endif
+		DequoteParam(Temp, sizeof(Temp), Temp);
 		if (_strnicmp(Temp, "/F=", 3) == 0) {	/* setup filename */
-			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
+			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
 			if (strlen(Temp2) > 0) {
 				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".INI", Temp,
 				          sizeof(Temp));
@@ -3640,18 +3630,13 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				}
 			}
 		}
-#if 1
 		cur = next;
-#endif
 	}
 
-#if 1
 	cur = start;
 	while (next = GetParam(Temp, sizeof(Temp), cur)) {
-#else
-	i = param_top;
-	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
-#endif
+		DequoteParam(Temp, sizeof(Temp), Temp);
+
 		if (HostNameFlag) {
 			JustAfterHost = TRUE;
 			HostNameFlag = FALSE;
@@ -3698,7 +3683,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ts->HostDialogOnStartup = TRUE;
 		}
 		else if (_strnicmp(Temp, "/FD=", 4) == 0) {	/* file transfer directory */
-			DequoteParam(Temp2, sizeof(Temp2), &Temp[4]);
+			strncpy_s(Temp2, sizeof(Temp2), &Temp[4], _TRUNCATE);
 			if (strlen(Temp2) > 0) {
 				_getcwd(TempDir, sizeof(TempDir));
 				if (_chdir(Temp2) == 0)
@@ -3712,7 +3697,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		else if (_stricmp(Temp, "/I") == 0)	/* iconize */
 			ts->Minimize = 1;
 		else if (_strnicmp(Temp, "/K=", 3) == 0) {	/* Keyboard setup file */
-			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
+			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
 			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".CNF",
 			          ts->KeyCnfFN, sizeof(ts->KeyCnfFN));
 		}
@@ -3741,8 +3726,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_strnicmp(Temp, "/L=", 3) == 0) {	/* log file */
-			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
-			strncpy_s(ts->LogFN, sizeof(ts->LogFN), Temp2, _TRUNCATE);
+			strncpy_s(ts->LogFN, sizeof(ts->LogFN), &Temp[3], _TRUNCATE);
 		}
 		else if (_strnicmp(Temp, "/LA=", 4) == 0) {	/* language */
 			switch (Temp[4]) {
@@ -3764,14 +3748,14 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		else if (_strnicmp(Temp, "/MN=", 4) == 0) {	/* multicastname */
-			DequoteParam(ts->MulticastName, sizeof(ts->MulticastName), &Temp[4]);
+			strncpy_s(ts->MulticastName, sizeof(ts->MulticastName), &Temp[4], _TRUNCATE);
 		}
 		else if (_strnicmp(Temp, "/M=", 3) == 0) {	/* macro filename */
 			if ((Temp[3] == 0) || (Temp[3] == '*'))
 				strncpy_s(ts->MacroFN, sizeof(ts->MacroFN), "*",
 				          _TRUNCATE);
 			else {
-				DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
+				strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
 				ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), ".TTL",
 				          ts->MacroFN, sizeof(ts->MacroFN));
 			}
@@ -3793,7 +3777,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 				ParamTCP = 65535;
 		}
 		else if (_strnicmp(Temp, "/R=", 3) == 0) {	/* Replay filename */
-			DequoteParam(Temp2, sizeof(Temp2), &Temp[3]);
+			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
 			ConvFName(ts->HomeDir, Temp2, sizeof(Temp2), "", ts->HostName,
 			          sizeof(ts->HostName));
 			if (strlen(ts->HostName) > 0)
@@ -3817,7 +3801,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ts->HideWindow = 1;
 		}
 		else if (_strnicmp(Temp, "/W=", 3) == 0) {	/* Window title */
-			DequoteParam(ts->Title, sizeof(ts->Title), &Temp[3]);
+			strncpy_s(ts->Title, sizeof(ts->Title), &Temp[3], _TRUNCATE);
 		}
 		else if (_strnicmp(Temp, "/X=", 3) == 0) {	/* Window pos (X) */
 			if (sscanf(&Temp[3], "%d", &pos) == 1) {
@@ -3865,9 +3849,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			}
 		}
 		JustAfterHost = FALSE;
-#if 1
 		cur = next;
-#endif
 	}
 
 	// Language Ç™ïœçXÇ≥ÇÍÇΩÇ©Ç‡ÇµÇÍÇ»Ç¢ÇÃÇ≈ÅA

@@ -387,15 +387,14 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 
 static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	char buff[1024];
-	char option2[1024];
 	PCHAR next;
 	pvar->origParseParam(Param, ts, DDETopic);
 
 	next = Param;
 	while (next = GetParam(buff, sizeof(buff), next)) {
+		DequoteParam(buff, sizeof(buff), buff);
 		if (_strnicmp(buff, "/F=", 3) == 0) {
-			DequoteParam(option2, sizeof(option2), buff + 3);
-			ReadINI(option2, ts);
+			ReadINI(buff+3, ts);
 		}
 	}
 

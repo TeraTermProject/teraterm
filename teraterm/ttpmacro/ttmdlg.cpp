@@ -42,54 +42,13 @@ static int DlgPosY = 0;
 
 static PStatDlg StatDlg = NULL;
 
-#if 0
-extern "C" {
-BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
-{
-	int j;
-	char c;
-	BOOL Quoted;
-
-	if ((unsigned int) (*i) >= strlen(Param)) {
-		return FALSE;
-	}
-	j = 0;
-
-	while (Param[*i] == ' ' || Param[*i] == '\t') {
-		(*i)++;
-	}
-
-	Quoted = FALSE;
-	c = Param[*i];
-	(*i)++;
-	while ((c != 0) && (j < Size - 1) &&
-	       (Quoted || ((c != ' ') && (c != ';') && (c != '\t')))) {
-		if (c == '"')
-			Quoted = !Quoted;
-		Temp[j] = c;
-		j++;
-		c = Param[*i];
-		(*i)++;
-	}
-	if (!Quoted && (c == ';')) {
-		(*i)--;
-	}
-
-	Temp[j] = 0;
-	return (strlen(Temp) > 0);
-}
-}
-#endif
-
 extern "C" {
 void ParseParam(PBOOL IOption, PBOOL VOption)
 {
 	int i, j, k;
 	char *Param;
 	char Temp[MaxStrLen];
-#if 1
 	PCHAR start, cur, next;
-#endif
 
 	// Get home directory
 	if (GetModuleFileName(AfxGetInstanceHandle(),FileName,sizeof(FileName)) == 0) {
@@ -112,26 +71,18 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	SleepFlag = FALSE;
 	*IOption = FALSE;
 	*VOption = FALSE;
-	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
-	// 落ちるバグを修正。(2007.5.25 yutaka)
 	Param = GetCommandLine();
 	i = 0;
+
 	// the first term shuld be executable filename of TTMACRO
-#if 1
 	start = GetParam(Temp, sizeof(Temp), Param);
-#else
-	NextParam(Param, &i, Temp, sizeof(Temp));
-#endif
 	j = 0;
 
-#if 1
 	cur = start;
 	while (next = GetParam(Temp, sizeof(Temp), cur)) {
-#else
-	while (NextParam(Param, &i, Temp, sizeof(Temp))) {
-#endif
+		DequoteParam(Temp, sizeof(Temp), Temp);
 		if (_strnicmp(Temp,"/D=",3)==0) { // DDE option
-			strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);  // BOF対策
+			strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);
 		}
 		else if (_strnicmp(Temp,"/I",2)==0) {
 			*IOption = TRUE;
@@ -143,38 +94,20 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 			*VOption = TRUE;
 		}
 		else {
-			j++;
-			if (j==1) {
-				DequoteParam(FileName, sizeof(FileName), Temp);
-			}
-			else if (j==2) {
-				DequoteParam(Param2, sizeof(Param2), Temp);
-			}
-			else if (j==3) {
-				DequoteParam(Param3, sizeof(Param3), Temp);
-			}
-			else if (j==4) {
-				DequoteParam(Param4, sizeof(Param4), Temp);
-			}
-			else if (j==5) {
-				DequoteParam(Param5, sizeof(Param5), Temp);
-			}
-			else if (j==6) {
-				DequoteParam(Param6, sizeof(Param6), Temp);
-			}
-			else if (j==7) {
-				DequoteParam(Param7, sizeof(Param7), Temp);
-			}
-			else if (j==8) {
-				DequoteParam(Param8, sizeof(Param8), Temp);
-			}
-			else if (j==9) {
-				DequoteParam(Param9, sizeof(Param9), Temp);
+			switch (++j) {
+				case 1: strncpy_s(FileName, sizeof(FileName), Temp, _TRUNCATE); break;
+				case 2: strncpy_s(Param2,   sizeof(Param2),   Temp, _TRUNCATE); break;
+				case 3: strncpy_s(Param3,   sizeof(Param3),   Temp, _TRUNCATE); break;
+				case 4: strncpy_s(Param4,   sizeof(Param4),   Temp, _TRUNCATE); break;
+				case 5: strncpy_s(Param5,   sizeof(Param5),   Temp, _TRUNCATE); break;
+				case 6: strncpy_s(Param6,   sizeof(Param6),   Temp, _TRUNCATE); break;
+				case 7: strncpy_s(Param7,   sizeof(Param7),   Temp, _TRUNCATE); break;
+				case 8: strncpy_s(Param8,   sizeof(Param8),   Temp, _TRUNCATE); break;
+				case 9: strncpy_s(Param9,   sizeof(Param9),   Temp, _TRUNCATE); break;
+				default: ;/* nothing to do */
 			}
 		}
-#if 1
 		cur = next;
-#endif
 	}
 
 	ParamCnt = j;

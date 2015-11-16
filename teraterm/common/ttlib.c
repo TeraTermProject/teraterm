@@ -1097,58 +1097,37 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 
 void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 {
-	int i, j;
-	char q, c;
+	BOOL quoted = FALSE;
+	PCHAR dest_end = dest + dest_len - 1;
 
-	dest[0] = 0;
-	if (src[0] == 0)
-		return;
-	i = 0;
-	/* quoting char */
-	q = src[i];
-	/* only '"' is used as quoting char */
-	if (q == '"')
-		i++;
-
-	c = src[i];
-	i++;
-	j = 0;
-	while (c != 0 && j<dest_len) {
-		if (c != '"') {
-			dest[j] = c;
-			j++;
+	if (src == dest) {
+		while (*src != '\0' && *src != '"' && dest < dest_end) {
+			src++; dest++;
 		}
-		else {
-			if (q == '"' && src[i] == '"') {
-				dest[j] = c;
-				j++;
-				i++;
-			}
-			else if (q == '"' && src[i] == '\0') {
-				break;
-			}
-			else {
-				dest[j] = c;
-				j++;
-			}
-		}
-		c = src[i];
-		i++;
 	}
 
-	dest[j] = 0;
+	while (*src != '\0' && dest < dest_end) {
+		if (*src != '"' || (*++src == '"' && quoted)) {
+			*dest++ = *src++;
+		}
+		else {
+			quoted = !quoted;
+		}
+	}
+
+	*dest = '\0';
 }
 
 void FAR PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src)
 {
 	BOOL quoted = FALSE;
-	PCHAR tail = dest + dest_size - 1;
+	PCHAR dest_end = dest + dest_size - 1;
 
-	while (*src != '\0' && dest < tail && (quoted || *src != ';')) {
+	while (*src != '\0' && dest < dest_end && (quoted || *src != ';')) {
 		*dest++ = *src;
 
 		if (*src++ == '"') {
-			if (*src == '"' && dest < tail) {
+			if (*src == '"' && dest < dest_end) {
 				*dest++ = *src++;
 			}
 			else {
