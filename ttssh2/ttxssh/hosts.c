@@ -1121,8 +1121,8 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 
 	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), TRUE);
 
-	CheckDlgButton(dlg, IDC_FP_HASH_ALG_MD5, TRUE);
-	hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
+	CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
+	hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 }
 
 static int print_mp_int(char FAR * buf, unsigned char FAR * mp)
@@ -1519,33 +1519,7 @@ static void delete_different_key(PTInstVar pvar)
 		}
 
 		// 接続中のサーバのキーを読み込む
-		memset(&key, 0, sizeof(key));
-		switch (pvar->hosts_state.hostkey.type) {
-		case KEY_RSA1: // SSH1
-			key.type = KEY_RSA1;
-			key.bits = pvar->hosts_state.hostkey.bits;
-			key.exp = copy_mp_int(pvar->hosts_state.hostkey.exp);
-			key.mod = copy_mp_int(pvar->hosts_state.hostkey.mod);
-			break;
-		case KEY_RSA: // SSH2 RSA
-			key.type = KEY_RSA;
-			key.rsa = duplicate_RSA(pvar->hosts_state.hostkey.rsa);
-			break;
-		case KEY_DSA: // SSH2 DSA
-			key.type = KEY_DSA;
-			key.dsa = duplicate_DSA(pvar->hosts_state.hostkey.dsa);
-			break;
-		case KEY_ECDSA256:
-		case KEY_ECDSA384:
-		case KEY_ECDSA521:
-			key.type = pvar->hosts_state.hostkey.type;
-			key.ecdsa = EC_KEY_dup(pvar->hosts_state.hostkey.ecdsa);
-			break;
-		case KEY_ED25519:
-			key.type = pvar->hosts_state.hostkey.type;
-			key.ed25519_pk = duplicate_ED25519_PK(pvar->hosts_state.hostkey.ed25519_pk);
-			break;
-		}
+		key_copy(&key, &(pvar->hosts_state.hostkey));
 
 		// ファイルから読み込む
 		begin_read_host_files(pvar, 0);
@@ -1740,33 +1714,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		}
 
 		// 接続中のサーバのキーを読み込む
-		memset(&key, 0, sizeof(key));
-		switch (pvar->hosts_state.hostkey.type) {
-		case KEY_RSA1: // SSH1
-			key.type = KEY_RSA1;
-			key.bits = pvar->hosts_state.hostkey.bits;
-			key.exp = copy_mp_int(pvar->hosts_state.hostkey.exp);
-			key.mod = copy_mp_int(pvar->hosts_state.hostkey.mod);
-			break;
-		case KEY_RSA: // SSH2 RSA
-			key.type = KEY_RSA;
-			key.rsa = duplicate_RSA(pvar->hosts_state.hostkey.rsa);
-			break;
-		case KEY_DSA: // SSH2 DSA
-			key.type = KEY_DSA;
-			key.dsa = duplicate_DSA(pvar->hosts_state.hostkey.dsa);
-			break;
-		case KEY_ECDSA256:
-		case KEY_ECDSA384:
-		case KEY_ECDSA521:
-			key.type = pvar->hosts_state.hostkey.type;
-			key.ecdsa = EC_KEY_dup(pvar->hosts_state.hostkey.ecdsa);
-			break;
-		case KEY_ED25519:
-			key.type = pvar->hosts_state.hostkey.type;
-			key.ed25519_pk = duplicate_ED25519_PK(pvar->hosts_state.hostkey.ed25519_pk);
-			break;
-		}
+		key_copy(&key, &(pvar->hosts_state.hostkey));
 
 		// ファイルから読み込む
 		begin_read_host_files(pvar, 0);
@@ -2497,28 +2445,8 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	}
 
 	// known_hosts に存在しないキーはあとでファイルへ書き込むために、ここで保存しておく。
-	pvar->hosts_state.hostkey.type = key->type;
-	switch (key->type) {
-	case KEY_RSA1: // SSH1
-		pvar->hosts_state.hostkey.bits = key->bits;
-		pvar->hosts_state.hostkey.exp = copy_mp_int(key->exp);
-		pvar->hosts_state.hostkey.mod = copy_mp_int(key->mod);
-		break;
-	case KEY_RSA: // SSH2 RSA
-		pvar->hosts_state.hostkey.rsa = duplicate_RSA(key->rsa);
-		break;
-	case KEY_DSA: // SSH2 DSA
-		pvar->hosts_state.hostkey.dsa = duplicate_DSA(key->dsa);
-		break;
-	case KEY_ECDSA256: // SSH2 ECDSA
-	case KEY_ECDSA384:
-	case KEY_ECDSA521:
-		pvar->hosts_state.hostkey.ecdsa = EC_KEY_dup(key->ecdsa);
-		break;
-	case KEY_ED25519:
-		pvar->hosts_state.hostkey.ed25519_pk = duplicate_ED25519_PK(key->ed25519_pk);
-		break;
-	}
+	key_copy(&(pvar->hosts_state.hostkey), key);
+
 	free(pvar->hosts_state.prefetched_hostname);
 	pvar->hosts_state.prefetched_hostname = _strdup(hostname);
 

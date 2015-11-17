@@ -2933,8 +2933,8 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_about_dlg(pvar, dlg);
-		CheckDlgButton(dlg, IDC_FP_HASH_ALG_MD5, TRUE);
-		about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_MD5);
+		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
+		about_dlg_set_abouttext(pvar, dlg, SSH_DIGEST_SHA256);
 		SetFocus(GetDlgItem(dlg, IDOK));
 
 		// Edit controlをサブクラス化する。

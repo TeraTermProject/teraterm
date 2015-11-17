@@ -478,6 +478,18 @@ int key_verify(Key *key,
 	return (ret);   // success
 }
 
+static char FAR *copy_mp_int(char FAR * num)
+{
+	int len = (get_ushort16_MSBfirst(num) + 7) / 8 + 2;
+	char FAR *result = (char FAR *) malloc(len);
+
+	if (result != NULL) {
+		memcpy(result, num, len);
+	}
+
+	return result;
+}
+
 //
 // RSA\‘¢‘Ì‚Ì•¡»
 //
@@ -547,6 +559,38 @@ unsigned char *duplicate_ED25519_PK(unsigned char *src)
 	return (ptr);
 }
 
+BOOL key_copy(Key *dest, Key *src)
+{
+	switch (src->type) {
+	case KEY_RSA1: // SSH1
+		dest->type = KEY_RSA1;
+		dest->bits = src->bits;
+		dest->exp = copy_mp_int(src->exp);
+		dest->mod = copy_mp_int(src->mod);
+		break;
+	case KEY_RSA: // SSH2 RSA
+		dest->type = KEY_RSA;
+		dest->rsa = duplicate_RSA(src->rsa);
+		break;
+	case KEY_DSA: // SSH2 DSA
+		dest->type = KEY_DSA;
+		dest->dsa = duplicate_DSA(src->dsa);
+		break;
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+		dest->type = src->type;
+		dest->ecdsa = EC_KEY_dup(src->ecdsa);
+		break;
+	case KEY_ED25519:
+		dest->type = src->type;
+		dest->ed25519_pk = duplicate_ED25519_PK(src->ed25519_pk);
+		break;
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
 
 char* key_fingerprint_raw(Key *k, enum digest_algorithm dgst_alg, int *dgst_raw_length)
 {
@@ -2094,8 +2138,8 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
 		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
 
-		CheckDlgButton(dlg, IDC_FP_HASH_ALG_MD5, TRUE);
-		hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_MD5);
+		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
+		hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 
 		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_YES", pvar, uimsg);
