@@ -54,6 +54,7 @@ char *curve_keytype_to_name(ssh_keytype type);
 Key *key_new_private(int type);
 Key *key_new(int type);
 void key_free(Key *key);
+void key_init(Key *key);
 int key_to_blob(Key *key, char **blobp, int *lenp);
 Key *key_from_blob(char *data, int blen);
 BOOL get_SSH2_publickey_blob(PTInstVar pvar, buffer_t **blobptr, int *bloblen);

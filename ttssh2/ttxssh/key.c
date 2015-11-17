@@ -561,6 +561,7 @@ unsigned char *duplicate_ED25519_PK(unsigned char *src)
 
 BOOL key_copy(Key *dest, Key *src)
 {
+	key_init(dest);
 	switch (src->type) {
 	case KEY_RSA1: // SSH1
 		dest->type = KEY_RSA1;
@@ -1077,42 +1078,49 @@ void key_free(Key *key)
 		return;
 	}
 
-	switch (key->type) {
-		case KEY_RSA1:
-		case KEY_RSA:
-			if (key->rsa != NULL)
-				RSA_free(key->rsa);
-			key->rsa = NULL;
-			break;
+	key_init(key);
 
-		case KEY_DSA:
-			if (key->dsa != NULL)
-				DSA_free(key->dsa);
-			key->dsa = NULL;
-			break;
-
-		case KEY_ECDSA256:
-		case KEY_ECDSA384:
-		case KEY_ECDSA521:
-			if (key->ecdsa != NULL)
-				EC_KEY_free(key->ecdsa);
-			key->ecdsa = NULL;
-			break;
-
-		case KEY_ED25519:
-			if (key->ed25519_pk) {
-				memset(key->ed25519_pk, 0, ED25519_PK_SZ);
-				free(key->ed25519_pk);
-				key->ed25519_pk = NULL;
-			}
-			if (key->ed25519_sk) {
-				memset(key->ed25519_sk, 0, ED25519_SK_SZ);
-				free(key->ed25519_sk);
-				key->ed25519_sk = NULL;
-			}
-			break;
-	}
 	free(key);
+}
+
+void key_init(Key *key)
+{
+	key->type = KEY_UNSPEC;
+
+	// SSH1
+	key->bits = 0;
+	if (key->exp != NULL) {
+		free(key->exp);
+		key->exp = NULL;
+	}
+	if (key->mod != NULL) {
+		free(key->mod);
+		key->mod = NULL;
+	}
+
+	// SSH2
+	if (key->dsa != NULL) {
+		DSA_free(key->dsa);
+		key->dsa = NULL;
+	}
+	if (key->rsa != NULL) {
+		RSA_free(key->rsa);
+		key->rsa = NULL;
+	}
+	if (key->ecdsa != NULL) {
+		EC_KEY_free(key->ecdsa);
+		key->ecdsa = NULL;
+	}
+	if (key->ed25519_pk != NULL) {
+		memset(key->ed25519_pk, 0, ED25519_PK_SZ);
+		free(key->ed25519_pk);
+		key->ed25519_pk = NULL;
+	}
+	if (key->ed25519_sk) {
+		memset(key->ed25519_sk, 0, ED25519_SK_SZ);
+		free(key->ed25519_sk);
+		key->ed25519_sk = NULL;
+	}
 }
 
 //

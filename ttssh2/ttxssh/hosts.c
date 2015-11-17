@@ -59,38 +59,6 @@ static HFONT DlgHostsReplaceFont;
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
-// ホストキーの初期化 (2006.3.21 yutaka)
-static void init_hostkey(Key *key)
-{
-	key->type = KEY_UNSPEC;
-
-	// SSH1
-	key->bits = 0;
-	if (key->exp != NULL) {
-		free(key->exp);
-		key->exp = NULL;
-	}
-	if (key->mod != NULL) {
-		free(key->mod);
-		key->mod = NULL;
-	}
-
-	// SSH2
-	if (key->dsa != NULL) {
-		DSA_free(key->dsa);
-		key->dsa = NULL;
-	}
-	if (key->rsa != NULL) {
-		RSA_free(key->rsa);
-		key->rsa = NULL;
-	}
-	if (key->ecdsa != NULL) {
-		EC_KEY_free(key->ecdsa);
-		key->ecdsa = NULL;
-	}
-}
-
-
 static char FAR *FAR * parse_multi_path(char FAR * buf)
 {
 	int i;
@@ -130,7 +98,7 @@ static char FAR *FAR * parse_multi_path(char FAR * buf)
 void HOSTS_init(PTInstVar pvar)
 {
 	pvar->hosts_state.prefetched_hostname = NULL;
-	init_hostkey(&pvar->hosts_state.hostkey);
+	key_init(&pvar->hosts_state.hostkey);
 	pvar->hosts_state.hosts_dialog = NULL;
 	pvar->hosts_state.file_names = NULL;
 }
@@ -692,7 +660,7 @@ static int read_host_key(PTInstVar pvar,
 	}
 
 	// hostkey type is KEY_UNSPEC.
-	init_hostkey(&pvar->hosts_state.hostkey);
+	key_init(&pvar->hosts_state.hostkey);
 
 	do {
 		if (pvar->hosts_state.file_data == NULL
@@ -1473,7 +1441,6 @@ static void delete_different_key(PTInstVar pvar)
 	}
 	else {
 		Key key; // 接続中のホストのキー
-		Key *key_freed;
 		int length;
 		char filename[MAX_PATH];
 		char tmp[L_tmpnam];
@@ -1507,7 +1474,8 @@ static void delete_different_key(PTInstVar pvar)
 		}
 
 		// 接続中のサーバのキーを読み込む
-		key_copy(&key, &(pvar->hosts_state.hostkey));
+		memset(&key, 0, sizeof(key));
+		key_copy(&key, &pvar->hosts_state.hostkey);
 
 		// ファイルから読み込む
 		begin_read_host_files(pvar, 0);
@@ -1643,9 +1611,7 @@ error2:
 		finish_read_host_files(pvar, 0);
 
 		// 最後にメモリを解放しておく。
-		key_freed = key_new(KEY_UNSPEC);
-		memcpy(key_freed, &key, sizeof(Key));
-		key_free(key_freed);
+		key_init(&key);
 	}
 }
 
@@ -1667,7 +1633,6 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 	}
 	else {
 		Key key; // 接続中のホストのキー
-		Key *key_freed;
 		int length;
 		char filename[MAX_PATH];
 		char tmp[L_tmpnam];
@@ -1702,7 +1667,8 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		}
 
 		// 接続中のサーバのキーを読み込む
-		key_copy(&key, &(pvar->hosts_state.hostkey));
+		memset(&key, 0, sizeof(key));
+		key_copy(&key, &pvar->hosts_state.hostkey);
 
 		// ファイルから読み込む
 		begin_read_host_files(pvar, 0);
@@ -1835,9 +1801,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		finish_read_host_files(pvar, 0);
 
 		// 最後にメモリを解放しておく。
-		key_freed = key_new(KEY_UNSPEC);
-		memcpy(key_freed, &key, sizeof(Key));
-		key_free(key_freed);
+		key_init(&key);
 	}
 }
 
@@ -2433,7 +2397,7 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	}
 
 	// known_hosts に存在しないキーはあとでファイルへ書き込むために、ここで保存しておく。
-	key_copy(&(pvar->hosts_state.hostkey), key);
+	key_copy(&pvar->hosts_state.hostkey, key);
 
 	free(pvar->hosts_state.prefetched_hostname);
 	pvar->hosts_state.prefetched_hostname = _strdup(hostname);
@@ -2478,7 +2442,7 @@ void HOSTS_end(PTInstVar pvar)
 	int i;
 
 	free(pvar->hosts_state.prefetched_hostname);
-	init_hostkey(&pvar->hosts_state.hostkey);
+	key_init(&pvar->hosts_state.hostkey);
 
 	if (pvar->hosts_state.file_names != NULL) {
 		for (i = 0; pvar->hosts_state.file_names[i] != NULL; i++) {
