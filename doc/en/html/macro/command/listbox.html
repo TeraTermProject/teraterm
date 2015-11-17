@@ -92,6 +92,21 @@ messagebox var "result"
 ;    2: Orange
 </pre>
 
+<pre class="macro-example">
+strdim msg 7
+msg[0] = 'Sunny' 
+msg[1] = 'Cloudy' 
+msg[2] = 'Rainy'
+msg[3] = 'Windy'
+msg[4] = 'Snowy'
+msg[5] = 'Foggy'
+msg[6] = 'Unknown'
+; The seventh entry is selected by default.
+listbox "How's today's weather?" 'Confirmation' msg 6
+sprintf2 var "%d" result
+messagebox var "result"
+</pre>
+
 <h2>See also</h2>
 <ul>
   <li><a href="yesnobox.html">yesnobox</a></li>

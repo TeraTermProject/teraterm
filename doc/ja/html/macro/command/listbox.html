@@ -91,6 +91,21 @@ messagebox var "result"
 ;    2: みかん
 </pre>
 
+<pre class="macro-example">
+strdim msg 7
+msg[0] = '晴れ' 
+msg[1] = '曇り' 
+msg[2] = '雨'
+msg[3] = '風'
+msg[4] = '雪'
+msg[5] = '霧'
+msg[6] = '分かりません'
+; デフォルトで7番目の項目が選択される
+listbox '今日の天気はどうですか?' 'あなたへの問い' msg 6
+sprintf2 var "%d" result
+messagebox var "result"
+</pre>
+
 <h2>参照</h2>
 <ul>
   <li><a href="yesnobox.html">yesnobox</a></li>
