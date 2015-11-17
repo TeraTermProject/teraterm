@@ -1457,18 +1457,6 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 	}
 }
 
-static char FAR *copy_mp_int(char FAR * num)
-{
-	int len = (get_ushort16_MSBfirst(num) + 7) / 8 + 2;
-	char FAR *result = (char FAR *) malloc(len);
-
-	if (result != NULL) {
-		memcpy(result, num, len);
-	}
-
-	return result;
-}
-
 //
 // 同じホストで内容の異なるキーを削除する
 // add_host_key のあとに呼ぶこと
