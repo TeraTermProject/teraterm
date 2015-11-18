@@ -110,7 +110,12 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		cur = next;
 	}
 
-	ParamCnt = j;
+	if (j > 9) {
+		ParamCnt = 9;
+	}
+	else {
+		ParamCnt = j;
+	}
 
 	if (FileName[0]=='*') {
 		FileName[0] = 0;
