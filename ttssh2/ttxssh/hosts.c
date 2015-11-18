@@ -471,7 +471,8 @@ static char FAR *parse_bignum(char FAR * data)
 // known_hostsファイルの内容を解析し、指定したホストの公開鍵を探す。
 //
 static int check_host_key(PTInstVar pvar, char FAR * hostname,
-                          unsigned short tcpport, char FAR * data)
+                          unsigned short tcpport, char FAR * data,
+                          Key *key)
 {
 	int index = eat_spaces(data);
 	int matched = 0;
@@ -560,30 +561,21 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 				return index + eat_to_end_of_line(data + index);
 			}
 
-			pvar->hosts_state.hostkey.type = KEY_RSA1;
+			key->type = KEY_RSA1;
 
-			pvar->hosts_state.hostkey.bits = rsa1_key_bits;
+			key->bits = rsa1_key_bits;
 			index += eat_digits(data + index);
 			index += eat_spaces(data + index);
 
-			pvar->hosts_state.hostkey.exp = parse_bignum(data + index);
+			key->exp = parse_bignum(data + index);
 			index += eat_digits(data + index);
 			index += eat_spaces(data + index);
 
-			pvar->hosts_state.hostkey.mod = parse_bignum(data + index);
-
-			/*
-			if (pvar->hosts_state.key_bits < 0
-				|| pvar->hosts_state.key_exp == NULL
-				|| pvar->hosts_state.key_mod == NULL) {
-				pvar->hosts_state.key_bits = 0;
-				free(pvar->hosts_state.key_exp);
-				free(pvar->hosts_state.key_mod);
-			}*/
-
+			key->mod = parse_bignum(data + index);
 		} else {
 			char *cp, *p;
-			Key *key;
+			Key *key2;
+			ssh_keytype key_type;
 
 			if (!SSHv2(pvar)) { // SSH1接続であれば無視する
 				return index + eat_to_end_of_line(data + index);
@@ -596,29 +588,29 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 			}
 			index += (p - cp);  // setup index
 			*p = '\0';
-			pvar->hosts_state.hostkey.type = get_keytype_from_name(cp);
+			key_type = get_keytype_from_name(cp);
 			*p = ' ';
 
 			index += eat_spaces(data + index);  // update index
 
 			// uudecode
-			key = parse_uudecode(data + index);
-			if (key == NULL) {
+			key2 = parse_uudecode(data + index);
+			if (key2 == NULL) {
 				return index + eat_to_end_of_line(data + index);
 			}
 
 			// setup
-			pvar->hosts_state.hostkey.type = key->type;
-			pvar->hosts_state.hostkey.dsa = key->dsa;
-			pvar->hosts_state.hostkey.rsa = key->rsa;
-			pvar->hosts_state.hostkey.ecdsa = key->ecdsa;
-			pvar->hosts_state.hostkey.ed25519_pk = key->ed25519_pk;
+			key->type = key2->type;
+			key->dsa = key2->dsa;
+			key->rsa = key2->rsa;
+			key->ecdsa = key2->ecdsa;
+			key->ed25519_pk = key2->ed25519_pk;
 
 			index += eat_base64(data + index);
 			index += eat_spaces(data + index);
 
 			// Key構造体自身を解放する (2008.3.2 yutaka)
-			free(key);
+			free(key2);
 		}
 
 		return index + eat_to_end_of_line(data + index);
@@ -627,10 +619,14 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 
 //
 // known_hostsファイルからホスト名に合致する行を読む
+//   return_always
+//     0: 見つかるまで探す
+//     1: 1行だけ探して戻る
 //
 static int read_host_key(PTInstVar pvar,
                          char FAR * hostname, unsigned short tcpport,
-                         int suppress_errors, int return_always)
+                         int suppress_errors, int return_always,
+                         Key *key)
 {
 	int i;
 	int while_flg;
@@ -660,7 +656,7 @@ static int read_host_key(PTInstVar pvar,
 	}
 
 	// hostkey type is KEY_UNSPEC.
-	key_init(&pvar->hosts_state.hostkey);
+	key_init(key);
 
 	do {
 		if (pvar->hosts_state.file_data == NULL
@@ -694,11 +690,12 @@ static int read_host_key(PTInstVar pvar,
 		pvar->hosts_state.file_data_index +=
 			check_host_key(pvar, hostname, tcpport,
 			               pvar->hosts_state.file_data +
-			               pvar->hosts_state.file_data_index);
+			               pvar->hosts_state.file_data_index,
+			               key);
 
 		if (!return_always) {
 			// 有効なキーが見つかるまで
-			while_flg = (pvar->hosts_state.hostkey.type == KEY_UNSPEC);
+			while_flg = (key->type == KEY_UNSPEC);
 		}
 		else {
 			while_flg = 0;
@@ -718,13 +715,19 @@ static void finish_read_host_files(PTInstVar pvar, int suppress_errors)
 // サーバへ接続する前に、known_hostsファイルからホスト公開鍵を先読みしておく。
 void HOSTS_prefetch_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport)
 {
+	Key key; // known_hostsに登録されている鍵
+
 	if (!begin_read_host_files(pvar, 1)) {
 		return;
 	}
 
-	if (!read_host_key(pvar, hostname, tcpport, 1, 0)) {
+	memset(&key, 0, sizeof(key));
+	if (!read_host_key(pvar, hostname, tcpport, 1, 0, &key)) {
 		return;
 	}
+
+	key_copy(&pvar->hosts_state.hostkey, &key);
+	key_init(&key);
 
 	free(pvar->hosts_state.prefetched_hostname);
 	pvar->hosts_state.prefetched_hostname = _strdup(hostname);
@@ -1032,8 +1035,8 @@ int HOSTS_compare_public_key(Key *src, Key *key)
 	}
 }
 
-
-// 公開鍵が等しいかを検証する
+#if 0
+// pvar->hosts_state.hostkey と渡された公開鍵が等しいかを検証する
 //   -1 ... 鍵の型が違う
 //    0 ... 等しくない
 //    1 ... 等しい
@@ -1041,6 +1044,7 @@ static int match_key(PTInstVar pvar, Key *key)
 {
 	return HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key);
 }
+#endif
 
 static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
 {
@@ -1440,7 +1444,7 @@ static void delete_different_key(PTInstVar pvar)
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 	}
 	else {
-		Key key; // 接続中のホストのキー
+		Key key; // known_hostsに登録されている鍵
 		int length;
 		char filename[MAX_PATH];
 		char tmp[L_tmpnam];
@@ -1473,11 +1477,8 @@ static void delete_different_key(PTInstVar pvar)
 			return;
 		}
 
-		// 接続中のサーバのキーを読み込む
-		memset(&key, 0, sizeof(key));
-		key_copy(&key, &pvar->hosts_state.hostkey);
-
 		// ファイルから読み込む
+		memset(&key, 0, sizeof(key));
 		begin_read_host_files(pvar, 0);
 		do {
 			int host_index = 0;
@@ -1487,7 +1488,7 @@ static void delete_different_key(PTInstVar pvar)
 			int do_write = 0;
 			length = amount_written = 0;
 
-			if (!read_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, 0, 1)) {
+			if (!read_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, 0, 1, &key)) {
 				break;
 			}
 
@@ -1569,7 +1570,7 @@ static void delete_different_key(PTInstVar pvar)
 				// ホストが等しい
 				else {
 					// 鍵の形式が違う or 合致するキー
-					if (match_key(pvar, &key) != 0) {
+					if (HOSTS_compare_public_key(&pvar->hosts_state.hostkey, &key) != 0) {
 						do_write = 1;
 					}
 					// 鍵の形式が同じで合致しないキーはスキップされる
@@ -1632,7 +1633,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 	}
 	else {
-		Key key; // 接続中のホストのキー
+		Key key; // known_hostsに登録されている鍵
 		int length;
 		char filename[MAX_PATH];
 		char tmp[L_tmpnam];
@@ -1666,11 +1667,8 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 			return;
 		}
 
-		// 接続中のサーバのキーを読み込む
-		memset(&key, 0, sizeof(key));
-		key_copy(&key, &pvar->hosts_state.hostkey);
-
 		// ファイルから読み込む
+		memset(&key, 0, sizeof(key));
 		begin_read_host_files(pvar, 0);
 		do {
 			int host_index = 0;
@@ -1680,7 +1678,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 			int do_write = 0;
 			length = amount_written = 0;
 
-			if (!read_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, 0, 1)) {
+			if (!read_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, 0, 1, &key)) {
 				break;
 			}
 
@@ -2340,19 +2338,21 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 
 //
 // サーバから送られてきたホスト公開鍵の妥当性をチェックする
+//   key: サーバからの公開鍵
 //
 // SSH2対応を追加 (2006.3.24 yutaka)
 //
 BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key)
 {
 	int found_different_key = 0, found_different_type_key = 0;
+	Key key2; // known_hostsに登録されている鍵
 
 	pvar->dns_key_check = DNS_VERIFY_NONE;
 
 	// すでに known_hosts ファイルからホスト公開鍵を読み込んでいるなら、それと比較する。
 	if (pvar->hosts_state.prefetched_hostname != NULL
 	 && _stricmp(pvar->hosts_state.prefetched_hostname, hostname) == 0
-	 && match_key(pvar, key) == 1) {
+	 && HOSTS_compare_public_key(&pvar->hosts_state.hostkey, key) == 1) {
 
 		if (SSHv1(pvar)) {
 			SSH_notify_host_OK(pvar);
@@ -2363,14 +2363,15 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 	}
 
 	// 先読みされていない場合は、この時点でファイルから読み込む
+	memset(&key2, 0, sizeof(key2));
 	if (begin_read_host_files(pvar, 0)) {
 		do {
-			if (!read_host_key(pvar, hostname, tcpport, 0, 0)) {
+			if (!read_host_key(pvar, hostname, tcpport, 0, 0, &key2)) {
 				break;
 			}
 
-			if (pvar->hosts_state.hostkey.type != KEY_UNSPEC) {
-				int match = match_key(pvar, key);
+			if (key2.type != KEY_UNSPEC) {
+				int match = HOSTS_compare_public_key(&key2, key);
 				if (match == 1) {
 					finish_read_host_files(pvar, 0);
 					// すべてのエントリを参照して、合致するキーが見つかったら戻る。
@@ -2391,8 +2392,9 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tc
 					found_different_type_key = 1;
 				}
 			}
-		} while (pvar->hosts_state.hostkey.type != KEY_UNSPEC);  // キーが見つかっている間はループする
+		} while (key2.type != KEY_UNSPEC);  // キーが見つかっている間はループする
 
+		key_init(&key2);
 		finish_read_host_files(pvar, 0);
 	}
 

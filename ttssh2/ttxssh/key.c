@@ -1070,7 +1070,9 @@ error:
 
 
 //
-// キーのメモリ領域解放
+// Key 構造体のメンバのメモリ領域と key 自体を解放する
+//   key_new() などで malloc された結果のポインタを渡す
+//   Key 構造体を渡してはいけない
 //
 void key_free(Key *key)
 {
@@ -1083,6 +1085,10 @@ void key_free(Key *key)
 	free(key);
 }
 
+//
+// Key 構造体のメンバのメモリ領域解放
+//   メンバのみを解放し、key 自体は解放しない
+//
 void key_init(Key *key)
 {
 	key->type = KEY_UNSPEC;
