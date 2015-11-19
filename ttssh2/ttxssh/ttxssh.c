@@ -2763,10 +2763,13 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 			free(fp);
 			break;
 		case SSH_DIGEST_SHA256:
-			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, dgst_alg);
-			strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
+		default:
+			fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, SSH_DIGEST_SHA256);
+			if (fp != NULL) {
+				strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
+				free(fp);
+			}
 			strncat_s(buf2, sizeof(buf2), "\r\n", _TRUNCATE);
-			free(fp);
 			break;
 		}
 

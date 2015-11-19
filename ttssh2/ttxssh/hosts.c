@@ -1054,20 +1054,27 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 	switch (dgst_alg) {
 	case SSH_DIGEST_MD5:
 		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, dgst_alg);
-		SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
-		free(fp);
+		if (fp != NULL) {
+			SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
+			free(fp);
+		}
 		break;
 	case SSH_DIGEST_SHA256:
-		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, dgst_alg);
-		SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
-		free(fp);
+	default:
+		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, SSH_DIGEST_SHA256);
+		if (fp != NULL) {
+			SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
+			free(fp);
+		}
 		break;
 	}
 
 	// ビジュアル化fingerprintを表示する
 	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
-	SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
-	free(fp);
+	if (fp != NULL) {
+		SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
+		free(fp);
+	}
 }
 
 static void init_hosts_dlg(PTInstVar pvar, HWND dlg)

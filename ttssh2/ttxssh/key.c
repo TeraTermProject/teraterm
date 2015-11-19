@@ -2067,13 +2067,16 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				fp = key_fingerprint(ctx->keys[i], SSH_FP_HEX, dgst_alg);
 				break;
 			case SSH_DIGEST_SHA256:
-				fp = key_fingerprint(ctx->keys[i], SSH_FP_BASE64, dgst_alg);
+			default:
+				fp = key_fingerprint(ctx->keys[i], SSH_FP_BASE64, SSH_DIGEST_SHA256);
 				break;
 			}
 			strncat_s(buf, buf_len, get_sshname_from_key(ctx->keys[i]), _TRUNCATE);
 			strncat_s(buf, buf_len, " ", _TRUNCATE);
-			strncat_s(buf, buf_len, fp, _TRUNCATE);
-			free(fp);
+			if (fp != NULL) {
+				strncat_s(buf, buf_len, fp, _TRUNCATE);
+				free(fp);
+			}
 			if (i < ctx->nkeys - 1) {
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
@@ -2092,13 +2095,16 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_HEX, dgst_alg);
 				break;
 			case SSH_DIGEST_SHA256:
-				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_BASE64, dgst_alg);
+			default:
+				fp = key_fingerprint(ctx->old_keys[i], SSH_FP_BASE64, SSH_DIGEST_SHA256);
 				break;
 			}
 			strncat_s(buf, buf_len, get_sshname_from_key(ctx->old_keys[i]), _TRUNCATE);
 			strncat_s(buf, buf_len, " ", _TRUNCATE);
-			strncat_s(buf, buf_len, fp, _TRUNCATE);
-			free(fp);
+			if (fp != NULL) {
+				strncat_s(buf, buf_len, fp, _TRUNCATE);
+				free(fp);
+			}
 			if (i < ctx->nold - 1) {
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
