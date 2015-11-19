@@ -45,6 +45,7 @@
       <li><a href="../menu/setup-directory.html">設定フォルダ(Setup directory)</a>に Virtual Store パスを追加した。</li>
       <li><a href="../menu/setup-additional.html#CygTerm">Addtional settingsのCygTerm設定</a>で、ダイアログを閉じた時に設定を保存するのではなく、Save setup時に cygterm.cfg を保存するように変更した。</li>
       <li>バージョン情報ダイアログのURLをシングルクリックでブラウザが起動するようにした。</li>
+      <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
     </ul>
   </li>
 
@@ -62,6 +63,8 @@
   <li>その他
     <ul>
       <li><a href="#ttssh_2.75">TTSSH(2.75)</a>へ差し替えた。</li>
+      <li><a href="#ttproxy_1.0.0.22">TTProxy(1.0.0.22)</a>へ差し替えた。</li>
+      <li><a href="#recurringcommand_1.04">TTXRecurringCommand Plugin(1.04)</a>へ差し替えた。</li>
       <li>LogMeTT 2.11 へ差し替えた。</li>
     </ul>
   </li>
@@ -2661,6 +2664,7 @@
           <li>プログラムのデフォルトで有効な方式...使用される方式の末尾に追加</li>
           <li>プログラムのデフォルトで無効な方式...使用されない方式の末尾に追加</li>
         </ul></li>
+      <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
     </ul>
   </li>
 
@@ -3946,6 +3950,11 @@
 
 <h2><a name="ttproxy">TTProxy</a></h2>
 
+<h3><a name="ttproxy_1.0.0.22">2015.xx.xx (Ver 1.0.0.22)</a></h3>
+<ul class="history">
+      <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
+</ul>
+
 <h3><a name="ttproxy_1.0.0.21">2015.05.31 (Ver 1.0.0.21)</a></h3>
 <ul class="history">
       <li>/F= コマンドラインオプションをほかのオプションよりも先に読み込むようにした。</li>
@@ -4223,6 +4232,11 @@
 </ul>
 
 <h2><a name="recurringcommand">TTXRecurringCommand</a></h2>
+<h3><a name="recurringcommand_1.04">2015.xx.xx (Ver 1.04)</a></h3>
+<ul class="history">
+  <li>コマンドラインオプションのパース処理を変更し、パラメータの途中からでも '"' によるクオートを可能にした。</li>
+</ul>
+
 <h3><a name="recurringcommand_1.03">2013.11.30 (Ver 1.03)</a></h3>
 <ul class="history">
   <li>コマンド用のバッファを50バイトから1024バイトに変更した。</li>
