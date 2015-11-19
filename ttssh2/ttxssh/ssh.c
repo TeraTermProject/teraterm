@@ -4145,16 +4145,16 @@ error:
 static char * get_cipher_string(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	static char buf[32];
+	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {
-			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			p = ptr->name;
 			break;
 		}
 		ptr++;
 	}
-	return buf;
+	return p;
 }
 
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher)
@@ -4177,16 +4177,16 @@ const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher)
 char* get_kex_algorithm_name(kex_algorithm kextype)
 {
 	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
-	static char buf[64];
+	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (kextype == ptr->kextype) {
-			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			p = ptr->name;
 			break;
 		}
 		ptr++;
 	}
-	return buf;
+	return p;
 }
 
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
@@ -4207,16 +4207,16 @@ const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
 char* get_ssh2_mac_name(hmac_type type)
 {
 	ssh2_mac_t *ptr = ssh2_macs;
-	static char buf[64];
+	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			p = ptr->name;
 			break;
 		}
 		ptr++;
 	}
-	return buf;
+	return p;
 }
 
 const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type)
@@ -4252,16 +4252,16 @@ int get_ssh2_mac_truncatebits(hmac_type type)
 char* get_ssh2_comp_name(compression_type type)
 {
 	ssh2_comp_t *ptr = ssh2_comps;
-	static char buf[32];
+	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			p = ptr->name;
 			break;
 		}
 		ptr++;
 	}
-	return buf;
+	return p;
 }
 
 char* get_ssh_keytype_name(ssh_keytype type)
@@ -4283,16 +4283,16 @@ char* get_ssh_keytype_name(ssh_keytype type)
 char* get_digest_algorithm_name(digest_algorithm id)
 {
 	ssh_digest_t *ptr = ssh_digests;
-	static char buf[16];
+	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (id == ptr->id) {
-			strncpy_s(buf, sizeof(buf), ptr->name, _TRUNCATE);
+			p = ptr->name;
 			break;
 		}
 		ptr++;
 	}
-	return buf;
+	return p;
 }
 
 static void do_write_buffer_file(void *buf, int len, char *file, int lineno)

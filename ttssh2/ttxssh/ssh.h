@@ -554,18 +554,18 @@ typedef enum {
 
 typedef struct ssh_digest {
 	digest_algorithm id;
-	const char *name;
+	char *name;
 } ssh_digest_t;
 
 /* NB. Indexed directly by algorithm number */
 static ssh_digest_t ssh_digests[] = {
-	{ SSH_DIGEST_MD5,	"MD5" },
-	{ SSH_DIGEST_RIPEMD160,	"RIPEMD160" },
-	{ SSH_DIGEST_SHA1,	"SHA1" },
-	{ SSH_DIGEST_SHA256,	"SHA256" },
-	{ SSH_DIGEST_SHA384,	"SHA384" },
-	{ SSH_DIGEST_SHA512,	"SHA512" },
-	{ SSH_DIGEST_MAX, NULL },
+	{ SSH_DIGEST_MD5,       "MD5" },
+	{ SSH_DIGEST_RIPEMD160, "RIPEMD160" },
+	{ SSH_DIGEST_SHA1,      "SHA1" },
+	{ SSH_DIGEST_SHA256,    "SHA256" },
+	{ SSH_DIGEST_SHA384,    "SHA384" },
+	{ SSH_DIGEST_SHA512,    "SHA512" },
+	{ SSH_DIGEST_MAX,       NULL },
 };
 
 enum scp_dir {
