@@ -3532,7 +3532,7 @@ void CSSetLRScrollRegion()	// DECSLRM
 
   void CSSpace(BYTE b) {
     switch (b) {
-      case 'q':
+      case 'q': // DECSCUSR
         if (ts.WindowFlag & WF_CURSORCHANGE) {
           if (NParam > 0) {
             switch (Param[1]) {
@@ -3802,8 +3802,31 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 {
 	unsigned char RepStr[256];
 	int len = 0;
+	int tmp = 0;
 
 	switch (StrBuff[0]) {
+	case ' ':
+		switch (StrBuff[1]) {
+		case 'q': // DECSCUSR
+			switch (ts.CursorShape) {
+			case IdBlkCur:
+				tmp = 1;
+				break;
+			case IdHCur:
+				tmp = 3;
+				break;
+			case IdVCur:
+				tmp = 5;
+				break;
+			default:
+				tmp = 1;
+			}
+			if (ts.NonblinkingCursor) {
+				tmp++;
+			}
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d q", CLocale, tmp);
+		}
+		break;
 	case '"':
 		switch (StrBuff[1]) {
 		case 'p': // DECSCL
@@ -3896,21 +3919,27 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%dr", CLocale, CursorTop+1, CursorBottom+1);
 		}
 		break;
+	case 's':	// DECSLRM
+		if (StrBuff[1] == 0) {
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%ds", CLocale, CursorLeftM+1, CursorRightM+1);
+		}
+		break;
 	}
-	if (len > 0) {
-		if (ts.TermFlag & TF_INVALIDDECRPSS) {
+	if (len == 0) {
+		if (strncpy_s(RepStr, sizeof(RepStr), "1$r", _TRUNCATE)) {
+			return;
+		}
+		len = 3;
+	}
+	if (ts.TermFlag & TF_INVALIDDECRPSS) {
+		if (RepStr[0] == '0') {
 			RepStr[0] = '1';
 		}
-		SendDCSstr(RepStr, len);
-	}
-	else {
-		if (ts.TermFlag & TF_INVALIDDECRPSS) {
-			SendDCSstr("0$r", 0);
-		}
 		else {
-			SendDCSstr("1$r", 0);
+			RepStr[0] = '0';
 		}
 	}
+	SendDCSstr(RepStr, len);
 }
 
 int toHexStr(unsigned char *buff, int buffsize, unsigned char *str)
