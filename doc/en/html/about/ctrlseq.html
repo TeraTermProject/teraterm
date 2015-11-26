@@ -899,10 +899,23 @@ rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
 #<i>rrrrggggbbbb</i>
 </pre>
 </td></tr>
+<tr><td> 5 </td>		<td>Change color.
+<pre>
+<i>Pt</i> = <i>c</i> ; <i>spec</i>
+</pre>
+Change special color number <i>c</i> to the color specified by <i>spec</i>.<br>
+Format of <i>spec</i> is same as OSC 4's <i>spec</i>.
+</td></tr>
 <tr><td> 10 </td>		<td>Change VT Window's text color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 11 </td>		<td>Change VT Window's background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 12 </td>		<td>Change VT Window's cursor color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 13 </td>		<td>Change VT Window's mouse cursor color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 14 </td>		<td>Change VT Window's mouse cursor background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 15 </td>		<td>Change TEK Window's text color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 16 </td>		<td>Change TEK Window's background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 17 </td>		<td>Change hightlight background color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 18 </td>		<td>Change TEK Window's cursor color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
+<tr><td> 19 </td>		<td>Change hightlight text color to <i>Pt</i>. Format of <i>Pt</i> is same as OSC 4's <i>spec</i>. </td></tr>
 <tr><td> 52 </td>		<td>Clipboard access.
 <pre>
 <i>Pt</i> = <i>Pc</i> ; <i>Pd</i>
@@ -914,10 +927,18 @@ Change the contents of clipboard <i>Pc</i> to <i>Pd</i>.
 <i>Pd</i>: new clipboard contents. encoded in base64.
 </pre>
 </td></tr>
+<tr><td> 104 </td>		<td>Reset color number <i>Pt</i>. </td></tr>
+<tr><td> 105 </td>		<td>Reset special color number <i>Pt</i>. </td></tr>
 <tr><td> 110 </td>		<td>Reset VT Window's text color. </td></tr>
 <tr><td> 111 </td>		<td>Reset VT Window's background color. </td></tr>
+<tr><td> 112 </td>		<td>Reset VT Window's cursor color. </td></tr>
+<tr><td> 113 </td>		<td>Reset VT Window's mouse cursor color. </td></tr>
+<tr><td> 114 </td>		<td>Reset VT Window's mouse cursor background color. </td></tr>
 <tr><td> 115 </td>		<td>Reset TEK Window's text color. </td></tr>
 <tr><td> 116 </td>		<td>Reset TEK Window's background color. </td></tr>
+<tr><td> 117 </td>		<td>Reset hightlight background color. </td></tr>
+<tr><td> 118 </td>		<td>Reset TEK Window's cursor text color. </td></tr>
+<tr><td> 119 </td>		<td>Reset hightlight text color. </td></tr>
 </table>
 
 <h2><a name="SOS">SOS Sequence</a></h2>

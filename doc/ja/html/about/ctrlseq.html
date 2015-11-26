@@ -875,7 +875,8 @@ OSC <i>Ps</i> ; <i>Pt</i> BEL
 <table border="1">
 <tr><th> <i>Ps</i> </th>	<th>機能</th></tr>
 <tr><td> 0, 1, 2 </td>		<td>ウィンドウタイトルを <i>Pt</i> に変更する。</td></tr>
-<tr><td> 4 </td>		<td>色設定。<i>Pt</i> は <i>c</i> ; <i>spec</i> という書式で、色番号 <i>c</i> の色を <i>spec</i> に設定する。<br>
+<tr><td> 4 </td>		<td>色設定。
+<i>Pt</i> は <i>c</i> ; <i>spec</i> という書式で、色番号 <i>c</i> の色を <i>spec</i> に設定する。<br>
 <i>spec</i> は以下の形式を受け付ける。
 <pre>
 rgb:<i>r</i>/<i>g</i>/<i>b</i>
@@ -893,10 +894,20 @@ rgb:<i>rrrr</i>/<i>gggg</i>/<i>bbbb</i>
 OSC 4 ; <i>c</i> ; rgb:<i>rr</i>/<i>gg</i>/<i>bb</i> ST
 </pre>
 </td></tr>
+<tr><td> 5 </td>		<td>色設定。
+<i>Pt</i> は <i>c</i> ; <i>spec</i> という書式で、特別の色番号 <i>c</i> の色を <i>spec</i> に設定する。<br>
+<i>spec</i> の形式は、OSC 4 の <i>spec</i> と同じ。
+</td></tr>
 <tr><td> 10 </td>		<td>VTウィンドウの文字色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <tr><td> 11 </td>		<td>VTウィンドウの背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
+<tr><td> 12 </td>		<td>VTウィンドウのカーソル色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
+<tr><td> 13 </td>		<td>VTウィンドウのマウスカーソル色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
+<tr><td> 14 </td>		<td>VTウィンドウのマウスカーソル背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <tr><td> 15 </td>		<td>TEKウィンドウの文字色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <tr><td> 16 </td>		<td>TEKウィンドウの背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
+<tr><td> 17 </td>		<td>強調文字背景色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
+<tr><td> 18 </td>		<td>TEKウィンドウのカーソル色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
+<tr><td> 19 </td>		<td>強調文字色を <i>Pt</i> に設定する。<i>Pt</i> の形式は、OSC 4 の <i>spec</i> と同じ。</td></tr>
 <tr><td> 52 </td>		<td>クリップボードへのアクセス。
 <pre>
 <i>Pt</i> = <i>Pc</i> ; <i>Pd</i>
@@ -908,10 +919,18 @@ OSC 4 ; <i>c</i> ; rgb:<i>rr</i>/<i>gg</i>/<i>bb</i> ST
 </pre>
 <i>Pd</i> が "?" の時は問い合わせ。クリップボードの内容を、設定と同じ形式で応答する。
 </td></tr>
+<tr><td> 104 </td>		<td>色番号 <i>Pt</i> を初期値に戻す。</td></tr>
+<tr><td> 105 </td>		<td>特別の色番号 <i>Pt</i> を初期値に戻す。</td></tr>
 <tr><td> 110 </td>		<td>VTウィンドウの文字色を初期値に戻す。</td></tr>
 <tr><td> 111 </td>		<td>VTウィンドウの背景色を初期値に戻す。</td></tr>
+<tr><td> 112 </td>		<td>VTウィンドウのカーソル色を初期値に戻す。</td></tr>
+<tr><td> 113 </td>		<td>VTウィンドウのマウスカーソル色を初期値に戻す。</td></tr>
+<tr><td> 114 </td>		<td>VTウィンドウのマウスカーソル背景色を初期値に戻す。</td></tr>
 <tr><td> 115 </td>		<td>TEKウィンドウの文字色を初期値に戻す。</td></tr>
 <tr><td> 116 </td>		<td>TEKウィンドウの背景色を初期値に戻す。</td></tr>
+<tr><td> 117 </td>		<td>強調文字背景色を初期値に戻す。</td></tr>
+<tr><td> 118 </td>		<td>TEKウィンドウのカーソル色を初期値に戻す。</td></tr>
+<tr><td> 119 </td>		<td>強調文字色を初期値に戻す。</td></tr>
 </table>
 
 <h2><a name="SOS">SOSシーケンス</a></h2>
