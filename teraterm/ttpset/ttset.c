@@ -1374,7 +1374,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	/* Title format -- special option */
 	ts->TitleFormat =
-		GetPrivateProfileInt(Section, "TitleFormat", 5, FName);
+		GetPrivateProfileInt(Section, "TitleFormat", 13, FName);
 
 	/* VT Compatible Tab -- special option */
 	ts->VTCompatTab = GetOnOff(Section, "VTCompatTab", FName, FALSE);
