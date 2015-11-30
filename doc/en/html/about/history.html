@@ -36,7 +36,8 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added support for querying the DECSLRM and DECSCUSR of the DECRQSS.</li>
+      <!-- li>制御シーケンスのパラメータチェックを強化した。</li -->
+      <li>added support for querying the status of DECSLRM and DECSCUSR by using the DECRQSS control sequence.</li>
       <li>When the baud rate is high speed on the serial connection, the file transfer can be accelerated.
         <ul>
           <li>added the <a href="../setup/teraterm-trans.html#FileSendHighSpeedMode">FileSendHighSpeedMode</a> entry in the teraterm.ini file. The default value is on.</li>
@@ -58,6 +59,7 @@
           <li>added the <a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a> entry in the teraterm.ini file. The default value is on.</li>
         </ul></li>
       <li>The cygterm.cfg file can not be saved in the Virtual Store environment.</li>
+      <!-- li>ステータスラインが正しく働かない問題を修正した。</li -->
     </ul>
   </li>
 
