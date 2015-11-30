@@ -90,7 +90,7 @@ extern int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
 extern BOOL Selected;
 extern BOOL Wrap;
 
-#define isCursorOnStatusLine (StatusLine && CursorY == NumOfColumns-1)
+#define isCursorOnStatusLine (StatusLine && CursorY == NumOfLines-1)
 
 #ifdef __cplusplus
 }
