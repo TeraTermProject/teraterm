@@ -309,3 +309,7 @@
         Announcements に新規投稿する。種類は Announcement
         一つ前の Announcement の種類を Normal に変更する
         Announcement は三個残すことになっているので、三つ前の Announcement を削除する
+
+  13. Twitter に告知する
+      https://twitter.com/Tera_Term
+      リリース告知をツイートして固定する
