@@ -1437,35 +1437,35 @@ void ParseEscape(BYTE b) /* b is the final char */
 
 void EscapeSequence(BYTE b)
 {
-  if (b<=US)
-    ParseControl(b);
-  else if ((b>=0x20) && (b<=0x2F))
-  {
-    if (ICount<IntCharMax) ICount++;
-    IntChar[ICount] = b;
-  }
-  else if ((b>=0x30) && (b<=0x7E))
-    ParseEscape(b);
-  else if ((b>=0x80) && (b<=0x9F))
-    ParseControl(b);
-  else if (b>=0xA0) {
-    ParseMode=ModeFirst;
-    ParseFirst(b);
-  }
+	if (b<=US)
+		ParseControl(b);
+	else if ((b>=0x20) && (b<=0x2F)) {
+		if (ICount<IntCharMax)
+			ICount++;
+		IntChar[ICount] = b;
+	}
+	else if ((b>=0x30) && (b<=0x7E))
+		ParseEscape(b);
+	else if ((b>=0x80) && (b<=0x9F))
+		ParseControl(b);
+	else if (b>=0xA0) {
+		ParseMode=ModeFirst;
+		ParseFirst(b);
+	}
 
-  JustAfterESC = FALSE;
+	JustAfterESC = FALSE;
 }
 
-  void CSInsertCharacter()		// ICH
-  {
-  // Insert space characters at cursor
-    int Count;
+void CSInsertCharacter()		// ICH
+{
+	// Insert space characters at cursor
+	int Count;
 
-    BuffUpdateScroll();
-    if (Param[1]<1) Param[1] = 1;
-    Count = Param[1];
-    BuffInsertSpace(Count);
-  }
+	BuffUpdateScroll();
+	if (Param[1]<1) Param[1] = 1;
+	Count = Param[1];
+	BuffInsertSpace(Count);
+}
 
 void CSCursorUp(BOOL AffectMargin)	// CUU / VPB
 {
@@ -1521,30 +1521,30 @@ void CSScreenErase()
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
-	case 0:
+	  case 0:
 		// <ESC>[H(Cursor in left upper corner)によりカーソルが左上隅を指している場合、
 		// <ESC>[Jは<ESC>[2Jと同じことなので、処理を分け、現行バッファをスクロールアウト
 		// させるようにする。(2005.5.29 yutaka)
 		// コンフィグレーションで切り替えられるようにした。(2008.5.3 yutaka)
 		if (ts.ScrollWindowClearScreen && 
 			(CursorX == 0 && CursorY == 0)) {
-			//	Erase screen (scroll out)
+			// Erase screen (scroll out)
 			BuffClearScreen();
 			UpdateWindow(HVTWin);
 
 		} else {
-			//	Erase characters from cursor to the end of screen
+			// Erase characters from cursor to the end of screen
 			BuffEraseCurToEnd();
 		}
 		break;
 
-	case 1:
-		//	Erase characters from home to cursor
+	  case 1:
+		// Erase characters from home to cursor
 		BuffEraseHomeToCur();
 		break;
 
-	case 2:
-		//	Erase screen (scroll out)
+	  case 2:
+		// Erase screen (scroll out)
 		BuffClearScreen();
 		UpdateWindow(HVTWin);
 		if (ClearThenHome && !isCursorOnStatusLine) {
@@ -1563,135 +1563,143 @@ void CSQSelScreenErase()
 {
 	BuffUpdateScroll();
 	switch (Param[1]) {
-	case 0:
-		//	Erase characters from cursor to end
+	  case 0:
+		// Erase characters from cursor to end
 		BuffSelectedEraseCurToEnd();
 		break;
 
-	case 1:
-		//	Erase characters from home to cursor
+	  case 1:
+		// Erase characters from home to cursor
 		BuffSelectedEraseHomeToCur();
 		break;
 
-	case 2:
-		//	Erase entire screen
+	  case 2:
+		// Erase entire screen
 		BuffSelectedEraseScreen();
 		break;
 	}
 }
 
-  void CSInsertLine()
-  {
-  // Insert lines at current position
-    int Count, YEnd;
+void CSInsertLine()
+{
+	// Insert lines at current position
+	int Count, YEnd;
 
-    if (CursorY < CursorTop) return;
-    if (CursorY > CursorBottom) return;
-    if (Param[1]<1) Param[1] = 1;
-    Count = Param[1];
+	if (CursorY < CursorTop)
+		return;
+	if (CursorY > CursorBottom)
+		return;
+	if (Param[1]<1)
+		Param[1] = 1;
 
-    YEnd = CursorBottom;
-    if (CursorY > YEnd) YEnd = NumOfLines-1-StatusLine;
-    if (Count > YEnd+1 - CursorY) Count = YEnd+1 - CursorY;
+	Count = Param[1];
 
-    BuffInsertLines(Count,YEnd);
-  }
+	YEnd = CursorBottom;
+	if (CursorY > YEnd)
+		YEnd = NumOfLines-1-StatusLine;
+	if (Count > YEnd+1 - CursorY)
+		Count = YEnd+1 - CursorY;
 
-  void CSLineErase()
-  {
-    BuffUpdateScroll();
-    switch (Param[1]) {
-      /* erase char from cursor to end of line */
-      case 0:
-	BuffEraseCharsInLine(CursorX,NumOfColumns-CursorX);
-	break;
-      /* erase char from start of line to cursor */
-      case 1:
-	BuffEraseCharsInLine(0,CursorX+1);
-	break;
-      /* erase entire line */
-      case 2:
-	BuffEraseCharsInLine(0,NumOfColumns);
-	break;
-    }
-  }
+	BuffInsertLines(Count,YEnd);
+}
 
-  void CSQSelLineErase()
-  {
-    BuffUpdateScroll();
-    switch (Param[1]) {
-      /* erase char from cursor to end of line */
-      case 0:
-	BuffSelectedEraseCharsInLine(CursorX,NumOfColumns-CursorX);
-	break;
-      /* erase char from start of line to cursor */
-      case 1:
-	BuffSelectedEraseCharsInLine(0,CursorX+1);
-	break;
-      /* erase entire line */
-      case 2:
-	BuffSelectedEraseCharsInLine(0,NumOfColumns);
-	break;
-    }
-  }
+void CSLineErase()
+{
+	BuffUpdateScroll();
+	switch (Param[1]) {
+	  case 0: /* erase char from cursor to end of line */
+		BuffEraseCharsInLine(CursorX,NumOfColumns-CursorX);
+		break;
 
-  void CSDeleteNLines()
-  // Delete lines from current line
-  {
-    int Count, YEnd;
+	  case 1: /* erase char from start of line to cursor */
+		BuffEraseCharsInLine(0,CursorX+1);
+		break;
 
-    if (CursorY < CursorTop) return;
-    if (CursorY > CursorBottom) return;
-    Count = Param[1];
-    if (Count<1) Count = 1;
+	  case 2: /* erase entire line */
+		BuffEraseCharsInLine(0,NumOfColumns);
+		break;
+	}
+}
 
-    YEnd = CursorBottom;
-    if (CursorY > YEnd) YEnd = NumOfLines-1-StatusLine;
-    if (Count > YEnd+1-CursorY) Count = YEnd+1-CursorY;
-    BuffDeleteLines(Count,YEnd);
-  }
+void CSQSelLineErase()
+{
+	BuffUpdateScroll();
+	switch (Param[1]) {
+	  case 0: /* erase char from cursor to end of line */
+		BuffSelectedEraseCharsInLine(CursorX,NumOfColumns-CursorX);
+		break;
 
-  void CSDeleteCharacter()		// DCH
-  {
-  // Delete characters in current line from cursor
+	  case 1: /* erase char from start of line to cursor */
+		BuffSelectedEraseCharsInLine(0,CursorX+1);
+		break;
 
-    if (Param[1]<1) Param[1] = 1;
-    BuffUpdateScroll();
-    BuffDeleteChars(Param[1]);
-  }
+	  case 2: /* erase entire line */
+		BuffSelectedEraseCharsInLine(0,NumOfColumns);
+		break;
+	}
+}
 
-  void CSEraseCharacter()		// ECH
-  {
-    if (Param[1]<1) Param[1] = 1;
-    BuffUpdateScroll();
-    BuffEraseChars(Param[1]);
-  }
+void CSDeleteNLines()
+// Delete lines from current line
+{
+	int Count, YEnd;
 
-  void CSScrollUp()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    BuffUpdateScroll();
-    BuffRegionScrollUpNLines(Param[1]);
-  }
+	if (CursorY < CursorTop)
+		return;
+	if (CursorY > CursorBottom)
+		return;
+	Count = Param[1];
+	if (Count<1) Count = 1;
 
-  void CSScrollDown()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    BuffUpdateScroll();
-    BuffRegionScrollDownNLines(Param[1]);
-  }
+	YEnd = CursorBottom;
+	if (CursorY > YEnd)
+		YEnd = NumOfLines-1-StatusLine;
+	if (Count > YEnd+1-CursorY)
+		Count = YEnd+1-CursorY;
+	BuffDeleteLines(Count,YEnd);
+}
 
-  void CSForwardTab()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    CursorForwardTab(Param[1], AutoWrapMode);
-  }
+void CSDeleteCharacter()	// DCH
+{
+// Delete characters in current line from cursor
 
-  void CSBackwardTab()
-  {
-    if (Param[1]<1) Param[1] = 1;
-    CursorBackwardTab(Param[1]);
-  }
+	if (Param[1]<1) Param[1] = 1;
+	BuffUpdateScroll();
+	BuffDeleteChars(Param[1]);
+}
+
+void CSEraseCharacter()		// ECH
+{
+	if (Param[1]<1) Param[1] = 1;
+	BuffUpdateScroll();
+	BuffEraseChars(Param[1]);
+}
+
+void CSScrollUp()
+{
+	if (Param[1]<1) Param[1] = 1;
+	BuffUpdateScroll();
+	BuffRegionScrollUpNLines(Param[1]);
+}
+
+void CSScrollDown()
+{
+	if (Param[1]<1) Param[1] = 1;
+	BuffUpdateScroll();
+	BuffRegionScrollDownNLines(Param[1]);
+}
+
+void CSForwardTab()
+{
+	if (Param[1]<1) Param[1] = 1;
+	CursorForwardTab(Param[1], AutoWrapMode);
+}
+
+void CSBackwardTab()
+{
+	if (Param[1]<1) Param[1] = 1;
+	CursorBackwardTab(Param[1]);
+}
 
 void CSMoveToColumnN()		// CHA / HPA
 {
@@ -1751,23 +1759,22 @@ void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
 	MoveCursor(NewX, CursorY);
 }
 
-  void CSMoveToLineN()			// VPA
-  {
-    if (Param[1]<1) Param[1] = 1;
-    if (RelativeOrgMode)
-    {
-      if (CursorTop+Param[1]-1 > CursorBottom)
-	MoveCursor(CursorX,CursorBottom);
-      else
-	MoveCursor(CursorX,CursorTop+Param[1]-1);
-    }
-    else {
-      if (Param[1] > NumOfLines-StatusLine)
-	MoveCursor(CursorX,NumOfLines-1-StatusLine);
-      else
-	MoveCursor(CursorX,Param[1]-1);
-    }
-  }
+void CSMoveToLineN()			// VPA
+{
+	if (Param[1]<1) Param[1] = 1;
+	if (RelativeOrgMode) {
+		if (CursorTop+Param[1]-1 > CursorBottom)
+			MoveCursor(CursorX,CursorBottom);
+		else
+			MoveCursor(CursorX,CursorTop+Param[1]-1);
+	}
+	else {
+		if (Param[1] > NumOfLines-StatusLine)
+			MoveCursor(CursorX,NumOfLines-1-StatusLine);
+		else
+			MoveCursor(CursorX,Param[1]-1);
+	}
+}
 
 void CSMoveToXY()		// CUP / HVP
 {
@@ -1806,129 +1813,129 @@ void CSMoveToXY()		// CUP / HVP
 	MoveCursor(NewX, NewY);
 }
 
-  void CSDeleteTabStop()
-  {
-    ClearTabStop(Param[1]);
-  }
+void CSDeleteTabStop()
+{
+	ClearTabStop(Param[1]);
+}
 
-  void CS_h_Mode()		// SM
-  {
-    switch (Param[1]) {
-      case 2:	// KAM
-        KeybEnabled = FALSE; break;
-      case 4:	// IRM
-        InsertMode = TRUE; break;
-      case 12:	// SRM
-        ts.LocalEcho = 0;
-        if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
-          TelChangeEcho();
-        break;
-      case 20:	// LF/NL
-        LFMode = TRUE;
-        ts.CRSend = IdCRLF;
-        cv.CRSend = IdCRLF;
-        break;
-      case 33:	// WYSTCURM
-        if (ts.WindowFlag & WF_CURSORCHANGE) {
-          ts.NonblinkingCursor = TRUE;
-          ChangeCaret();
-        }
-        break;
-      case 34:	// WYULCURM
-        if (ts.WindowFlag & WF_CURSORCHANGE) {
-          ts.CursorShape = IdHCur;
-          ChangeCaret();
-        }
-        break;
-    }
-  }
+void CS_h_Mode()		// SM
+{
+	switch (Param[1]) {
+	  case 2:	// KAM
+		KeybEnabled = FALSE; break;
+	  case 4:	// IRM
+		InsertMode = TRUE; break;
+	  case 12:	// SRM
+		ts.LocalEcho = 0;
+		if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+			TelChangeEcho();
+		break;
+	  case 20:	// LF/NL
+		LFMode = TRUE;
+		ts.CRSend = IdCRLF;
+		cv.CRSend = IdCRLF;
+		break;
+	  case 33:	// WYSTCURM
+		if (ts.WindowFlag & WF_CURSORCHANGE) {
+			ts.NonblinkingCursor = TRUE;
+			ChangeCaret();
+		}
+		break;
+	  case 34:	// WYULCURM
+		if (ts.WindowFlag & WF_CURSORCHANGE) {
+			ts.CursorShape = IdHCur;
+			ChangeCaret();
+		}
+		break;
+	}
+}
 
-  void CS_i_Mode()		// MC
-  {
-    switch (Param[1]) {
-      /* print screen */
-	//  PrintEX --	TRUE: print screen
-	//		FALSE: scroll region
-      case 0:
-	if (ts.TermFlag&TF_PRINTERCTRL) {
-	  BuffPrint(! PrintEX);
+void CS_i_Mode()		// MC
+{
+	switch (Param[1]) {
+	  /* print screen */
+	  //  PrintEX -- TRUE: print screen
+	  //             FALSE: scroll region
+	  case 0:
+		if (ts.TermFlag&TF_PRINTERCTRL) {
+			BuffPrint(! PrintEX);
+		}
+		break;
+	  /* printer controller mode off */
+	  case 4: break; /* See PrnParseCS() */
+	  /* printer controller mode on */
+	  case 5:
+		if (ts.TermFlag&TF_PRINTERCTRL) {
+			if (! AutoPrintMode)
+				OpenPrnFile();
+			DirectPrn = (ts.PrnDev[0]!=0);
+			PrinterMode = TRUE;
+		}
+		break;
 	}
-	break;
-      /* printer controller mode off */
-      case 4: break; /* See PrnParseCS() */
-      /* printer controller mode on */
-      case 5:
-	if (ts.TermFlag&TF_PRINTERCTRL) {
-	  if (! AutoPrintMode)
-	    OpenPrnFile();
-	  DirectPrn = (ts.PrnDev[0]!=0);
-	  PrinterMode = TRUE;
-	}
-	break;
-    }
-  }
+}
 
-  void CS_l_Mode()		// RM
-  {
-    switch (Param[1]) {
-      case 2:	// KAM
-        KeybEnabled = TRUE; break;
-      case 4:	// IRM
-        InsertMode = FALSE; break;
-      case 12:	// SRM
-        ts.LocalEcho = 1;
-        if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
-          TelChangeEcho();
-        break;
-      case 20:	// LF/NL
-        LFMode = FALSE;
-        ts.CRSend = IdCR;
-        cv.CRSend = IdCR;
-        break;
-      case 33:	// WYSTCURM
-        if (ts.WindowFlag & WF_CURSORCHANGE) {
-          ts.NonblinkingCursor = FALSE;
-          ChangeCaret();
-        }
-        break;
-      case 34:	// WYULCURM
-        if (ts.WindowFlag & WF_CURSORCHANGE) {
-          ts.CursorShape = IdBlkCur;
-          ChangeCaret();
-        }
-        break;
-    }
-  }
+void CS_l_Mode()		// RM
+{
+	switch (Param[1]) {
+	  case 2:	// KAM
+		KeybEnabled = TRUE; break;
+	  case 4:	// IRM
+		InsertMode = FALSE; break;
+	  case 12:	// SRM
+		ts.LocalEcho = 1;
+		if (cv.Ready && cv.TelFlag && (ts.TelEcho>0))
+			TelChangeEcho();
+		break;
+	  case 20:	// LF/NL
+		LFMode = FALSE;
+		ts.CRSend = IdCR;
+		cv.CRSend = IdCR;
+		break;
+	  case 33:	// WYSTCURM
+		if (ts.WindowFlag & WF_CURSORCHANGE) {
+			ts.NonblinkingCursor = FALSE;
+			ChangeCaret();
+		}
+		break;
+	  case 34:	// WYULCURM
+		if (ts.WindowFlag & WF_CURSORCHANGE) {
+			ts.CursorShape = IdBlkCur;
+			ChangeCaret();
+		}
+		break;
+	}
+}
 
-  void CS_n_Mode()		// DSR
-  {
-    char Report[16];
-    int X, Y, len;
+void CS_n_Mode()		// DSR
+{
+	char Report[16];
+	int X, Y, len;
 
-    switch (Param[1]) {
-      case 5:
-	/* Device Status Report -> Ready */
-	SendCSIstr("0n", 0);
-	break;
-      case 6:
-	/* Cursor Position Report */
-	if (isCursorOnStatusLine) {
-	  X = CursorX + 1;
-	  Y = 1;
+	switch (Param[1]) {
+	  case 5:
+		/* Device Status Report -> Ready */
+		SendCSIstr("0n", 0);
+		break;
+	  case 6:
+		/* Cursor Position Report */
+		if (isCursorOnStatusLine) {
+			X = CursorX + 1;
+			Y = 1;
+		}
+		else if (RelativeOrgMode) {
+			X = CursorX - CursorLeftM + 1;
+			Y = CursorY - CursorTop + 1;
+		}
+		else {
+			X = CursorX + 1;
+			Y = CursorY+1;
+		}
+		len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%u;%uR", CLocale, Y, X);
+		SendCSIstr(Report, len);
+		break;
 	}
-	else if (RelativeOrgMode) {
-	  X = CursorX - CursorLeftM + 1;
-	  Y = CursorY - CursorTop + 1;
-	}
-	else {
-	  X = CursorX + 1;
-	  Y = CursorY+1;
-	}
-	len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%u;%uR", CLocale, Y, X);
-	SendCSIstr(Report, len);
-	break;
-    }
-  }
+}
 
 void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 {
@@ -1939,11 +1946,10 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 		mask = &dummy;
 	}
 
-	for (i=start ; i<=NParam ; i++)
-	{
+	for (i=start ; i<=NParam ; i++) {
 		P = Param[i];
 		switch (P) {
-		case   0:	/* Clear all */
+		  case   0:	/* Clear all */
 			attr->Attr = DefCharAttr.Attr;
 			attr->Attr2 = DefCharAttr.Attr2 | (attr->Attr2&Attr2Protect);
 			attr->Fore = DefCharAttr.Fore;
@@ -1952,60 +1958,60 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 			mask->Attr2 = Attr2ColorMask;
 			break;
 
-		case   1:	/* Bold */
+		  case   1:	/* Bold */
 			attr->Attr |= AttrBold;
 			mask->Attr |= AttrBold;
 			break;
 
-		case   4:	/* Under line */
+		  case   4:	/* Under line */
 			attr->Attr |= AttrUnder;
 			mask->Attr |= AttrUnder;
 			break;
 
-		case   5:	/* Blink */
+		  case   5:	/* Blink */
 			attr->Attr |= AttrBlink;
 			mask->Attr |= AttrBlink;
 			break;
 
-		case   7:	/* Reverse */
+		  case   7:	/* Reverse */
 			attr->Attr |= AttrReverse;
 			mask->Attr |= AttrReverse;
 			break;
 
-		case  22:	/* Bold off */
+		  case  22:	/* Bold off */
 			attr->Attr &= ~ AttrBold;
 			mask->Attr |= AttrBold;
 			break;
 
-		case  24:	/* Under line off */
+		  case  24:	/* Under line off */
 			attr->Attr &= ~ AttrUnder;
 			mask->Attr |= AttrUnder;
 			break;
 
-		case  25:	/* Blink off */
+		  case  25:	/* Blink off */
 			attr->Attr &= ~ AttrBlink;
 			mask->Attr |= AttrBlink;
 			break;
 
-		case  27:	/* Reverse off */
+		  case  27:	/* Reverse off */
 			attr->Attr &= ~ AttrReverse;
 			mask->Attr |= AttrReverse;
 			break;
 
-		case  30:
-		case  31:
-		case  32:
-		case  33:
-		case  34:
-		case  35:
-		case  36:
-		case  37:	/* text color */
+		  case  30:
+		  case  31:
+		  case  32:
+		  case  33:
+		  case  34:
+		  case  35:
+		  case  36:
+		  case  37:	/* text color */
 			attr->Attr2 |= Attr2Fore;
 			mask->Attr2 |= Attr2Fore;
 			attr->Fore = P - 30;
 			break;
 
-		case  38:	/* text color (256color mode) */
+		  case  38:	/* text color (256color mode) */
 			if (ts.ColorFlag & CF_XTERM256) {
 				/*
 				 * Change foreground color. accept following formats.
@@ -2031,7 +2037,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 					}
 				}
 				switch (P) {
-				case 2:
+				  case 2:
 					r = g = b = 0;
 					if (NSParam[i] > 0) {
 						if (j < NSParam[i]) {
@@ -2060,7 +2066,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 						color = DispFindClosestColor(r, g, b);
 					}
 					break;
-				case 5:
+				  case 5:
 					if (NSParam[i] > 0) {
 						if (j < NSParam[i]) {
 							color = SubParam[i][++j];
@@ -2079,26 +2085,26 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 			}
 			break;
 
-		case  39:	/* Reset text color */
+		  case  39:	/* Reset text color */
 			attr->Attr2 &= ~ Attr2Fore;
 			mask->Attr2 |= Attr2Fore;
 			attr->Fore = AttrDefaultFG;
 			break;
 
-		case  40:
-		case  41:
-		case  42:
-		case  43:
-		case  44:
-		case  45:
-		case  46:
-		case  47:	/* Back color */
+		  case  40:
+		  case  41:
+		  case  42:
+		  case  43:
+		  case  44:
+		  case  45:
+		  case  46:
+		  case  47:	/* Back color */
 			attr->Attr2 |= Attr2Back;
 			mask->Attr2 |= Attr2Back;
 			attr->Back = P - 40;
 			break;
 
-		case  48:	/* Back color (256color mode) */
+		  case  48:	/* Back color (256color mode) */
 			if (ts.ColorFlag & CF_XTERM256) {
 				color = -1;
 				j = 0;
@@ -2113,7 +2119,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 					}
 				}
 				switch (P) {
-				case 2:
+				  case 2:
 					r = g = b = 0;
 					if (NSParam[i] > 0) {
 						if (j < NSParam[i]) {
@@ -2142,7 +2148,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 						color = DispFindClosestColor(r, g, b);
 					}
 					break;
-				case 5:
+				  case 5:
 					if (NSParam[i] > 0) {
 						if (j < NSParam[i]) {
 							color = SubParam[i][++j];
@@ -2161,20 +2167,20 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 			}
 			break;
 
-		case  49:	/* Reset back color */
+		  case  49:	/* Reset back color */
 			attr->Attr2 &= ~ Attr2Back;
 			mask->Attr2 |= Attr2Back;
 			attr->Back = AttrDefaultBG;
 			break;
 
-		case 90:
-		case 91:
-		case 92:
-		case 93:
-		case 94:
-		case 95:
-		case 96:
-		case 97:	/* aixterm style text color */
+		  case 90:
+		  case 91:
+		  case 92:
+		  case 93:
+		  case 94:
+		  case 95:
+		  case 96:
+		  case 97:	/* aixterm style text color */
 			if (ts.ColorFlag & CF_AIXTERM16) {
 				attr->Attr2 |= Attr2Fore;
 				mask->Attr2 |= Attr2Fore;
@@ -2182,7 +2188,7 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 			}
 			break;
 
-		case 100:
+		  case 100:
 			if (! (ts.ColorFlag & CF_AIXTERM16)) {
 				/* Reset text and back color */
 				attr->Attr2 &= ~ (Attr2Fore | Attr2Back);
@@ -2193,13 +2199,13 @@ void ParseSGRParams(PCharAttr attr, PCharAttr mask, int start)
 			}
 			/* fall through to aixterm style back color */
 
-		case 101:
-		case 102:
-		case 103:
-		case 104:
-		case 105:
-		case 106:
-		case 107:	/* aixterm style back color */
+		  case 101:
+		  case 102:
+		  case 103:
+		  case 104:
+		  case 105:
+		  case 106:
+		  case 107:	/* aixterm style back color */
 			if (ts.ColorFlag & CF_AIXTERM16) {
 				attr->Attr2 |= Attr2Back;
 				mask->Attr2 |= Attr2Back;
@@ -2217,27 +2223,27 @@ void CSSetAttr()		// SGR
 	BuffSetCurCharAttr(CharAttr);
 }
 
-  void CSSetScrollRegion()	// DECSTBM
-  {
-    if (isCursorOnStatusLine) {
-      MoveCursor(0,CursorY);
-      return;
-    }
-    if (Param[1]<1) Param[1] =1;
-    if ((NParam < 2) | (Param[2]<1))
-      Param[2] = NumOfLines-StatusLine;
-    Param[1]--;
-    Param[2]--;
-    if (Param[1] > NumOfLines-1-StatusLine)
-      Param[1] = NumOfLines-1-StatusLine;
-    if (Param[2] > NumOfLines-1-StatusLine)
-      Param[2] = NumOfLines-1-StatusLine;
-    if (Param[1] >= Param[2]) return;
-    CursorTop = Param[1];
-    CursorBottom = Param[2];
-    if (RelativeOrgMode) MoveCursor(0,CursorTop);
-		    else MoveCursor(0,0);
-  }
+void CSSetScrollRegion()	// DECSTBM
+{
+	if (isCursorOnStatusLine) {
+		MoveCursor(0,CursorY);
+		return;
+	}
+	if (Param[1]<1) Param[1] =1;
+	if ((NParam < 2) | (Param[2]<1))
+		Param[2] = NumOfLines-StatusLine;
+	Param[1]--;
+	Param[2]--;
+	if (Param[1] > NumOfLines-1-StatusLine)
+		Param[1] = NumOfLines-1-StatusLine;
+	if (Param[2] > NumOfLines-1-StatusLine)
+		Param[2] = NumOfLines-1-StatusLine;
+	if (Param[1] >= Param[2]) return;
+	CursorTop = Param[1];
+	CursorBottom = Param[2];
+	if (RelativeOrgMode) MoveCursor(0,CursorTop);
+	                else MoveCursor(0,0);
+}
 
 void CSSetLRScrollRegion()	// DECSLRM
 {
@@ -2269,1338 +2275,1340 @@ void CSSetLRScrollRegion()	// DECSLRM
 		MoveCursor(0, 0);
 }
 
-  void CSSunSequence() /* Sun terminal private sequences */
-  {
-    int x, y, len;
-    char Report[TitleBuffSize*2+10];
-    PTStack t;
+void CSSunSequence() /* Sun terminal private sequences */
+{
+	int x, y, len;
+	char Report[TitleBuffSize*2+10];
+	PTStack t;
 
-    switch (Param[1]) {
-      case 1: // De-iconify window
-	if (ts.WindowFlag & WF_WINDOWCHANGE)
-	  DispShowWindow(WINDOW_RESTORE);
-	break;
-      case 2: // Iconify window
-	if (ts.WindowFlag & WF_WINDOWCHANGE)
-	  DispShowWindow(WINDOW_MINIMIZE);
-	break;
-      case 3: // set window position
-	if (ts.WindowFlag & WF_WINDOWCHANGE) {
-	  if (NParam < 2) Param[2] = 0;
-	  if (NParam < 3) Param[3] = 0;
-	  DispMoveWindow(Param[2], Param[3]);
-	}
-	break;
-      case 4: // set window size
-	if (ts.WindowFlag & WF_WINDOWCHANGE) {
-          if (NParam < 2) Param[2] = 0;
-	  if (NParam < 3) Param[3] = 0;
-	  DispResizeWin(Param[3], Param[2]);
-	}
-	break;
-      case 5: // Raise window
-	if (ts.WindowFlag & WF_WINDOWCHANGE)
-	  DispShowWindow(WINDOW_RAISE);
-	break;
-      case 6: // Lower window
-	if (ts.WindowFlag & WF_WINDOWCHANGE)
-	  DispShowWindow(WINDOW_LOWER);
-	break;
-      case 7: // Refresh window
-	if (ts.WindowFlag & WF_WINDOWCHANGE)
-	  DispShowWindow(WINDOW_REFRESH);
-	break;
-      case 8: /* set terminal size */
-	if (ts.WindowFlag & WF_WINDOWCHANGE) {
-	  if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
-	  if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;
-	  ChangeTerminalSize(Param[3],Param[2]);
-	}
-	break;
-      case 9: // Maximize/Restore window
-	if (ts.WindowFlag & WF_WINDOWCHANGE) {
-	  if (NParam < 2 || Param[2] == 0) {
-	    DispShowWindow(WINDOW_RESTORE);
-	  }
-	  else if (Param[2] == 1) {
-	    DispShowWindow(WINDOW_MAXIMIZE);
-	  }
-	}
-	break;
-      case 11: // Report window state
-	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
-	  SendCSIstr(Report, len);
-	}
-	break;
-      case 13: // Report window position
-	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  DispGetWindowPos(&x, &y);
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%u;%ut", CLocale, (unsigned int)x, (unsigned int)y);
-	  SendCSIstr(Report, len);
-	}
-	break;
-      case 14: /* get window size */
-	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  DispGetWindowSize(&x, &y);
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "4;%d;%dt", CLocale, y, x);
-	  SendCSIstr(Report, len);
-	}
-	break;
-      case 18: /* get terminal size */
-	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%ut", CLocale,
-	                      NumOfLines-StatusLine, NumOfColumns);
-	  SendCSIstr(Report, len);
-	}
-	break;
-      case 19: // Report display size (character)
-	if (ts.WindowFlag & WF_WINDOWREPORT) {
-	  DispGetRootWinSize(&x, &y);
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
-	  SendCSIstr(Report, len);
-	}
-	break;
-      case 20: // Report icon label
-        switch (ts.WindowFlag & WF_TITLEREPORT) {
-	  case IdTitleReportIgnore:
-	    // nothing to do
-	    break;
-	  case IdTitleReportAccept:
-	    switch (ts.AcceptTitleChangeRequest) {
-	      case IdTitleChangeRequestOff:
-	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
-	        break;
-	      case IdTitleChangeRequestAhead:
-	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, cv.TitleRemote, ts.Title);
-	        break;
-	      case IdTitleChangeRequestLast:
-	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, ts.Title, cv.TitleRemote);
-	        break;
-	      default:
-	        if (cv.TitleRemote[0] == 0) {
-	          len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
-	        }
-	        else {
-	          len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, cv.TitleRemote);
-	        }
-	    }
-	    SendOSCstr(Report, len, ST);
-	    break;
-	  default: // IdTitleReportEmpty:
-	    SendOSCstr("L", 0, ST);
-	    break;
-	}
-        break;
-      case 21: // Report window title
-        switch (ts.WindowFlag & WF_TITLEREPORT) {
-	  case IdTitleReportIgnore:
-	    // nothing to do
-	    break;
-	  case IdTitleReportAccept:
-	    switch (ts.AcceptTitleChangeRequest) {
-	      case IdTitleChangeRequestOff:
-	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
-	        break;
-	      case IdTitleChangeRequestAhead:
-	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, cv.TitleRemote, ts.Title);
-	        break;
-	      case IdTitleChangeRequestLast:
-	        len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, ts.Title, cv.TitleRemote);
-	        break;
-	      default:
-	        if (cv.TitleRemote[0] == 0) {
-	          len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
-	        }
-	        else {
-	          len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, cv.TitleRemote);
-	        }
-	    }
-	    SendOSCstr(Report, len, ST);
-	    break;
-	  default: // IdTitleReportEmpty:
-	    SendOSCstr("l", 0, ST);
-	    break;
-	}
-        break;
-    case 22: // Push Title
-      if (NParam < 2) {
-	Param[2] = 0;
-      }
-      switch (Param[2]) {
-      case 0:
-      case 1:
-      case 2:
-	if (ts.AcceptTitleChangeRequest && (t=malloc(sizeof(TStack))) != NULL) {
-	  if ((t->title = _strdup(cv.TitleRemote)) != NULL) {
-	    t->next = TitleStack;
-	    TitleStack = t;
-	  }
-	  else {
-	    free(t);
-	  }
-	}
-	break;
-      }
-      break;
-    case 23: // Pop Title
-      if (NParam < 2) {
-	Param[2] = 0;
-      }
-      switch (Param[2]) {
-      case 0:
-      case 1:
-      case 2:
-	if (ts.AcceptTitleChangeRequest && TitleStack != NULL) {
-	  t = TitleStack;
-	  TitleStack = t->next;
-	  strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), t->title, _TRUNCATE);
-	  ChangeTitle();
-	  free(t->title);
-	  free(t);
-	}
-	break;
-      }
-    }
-  }
-
-  void CSLT(BYTE b)
-  {
-    switch (b) {
-      case 'r':
-	if (CanUseIME()) {
-	  SetIMEOpenStatus(IMEstat);
-	}
-	break;
-
-      case 's':
-	if (CanUseIME()) {
-	  IMEstat = GetIMEOpenStatus();
-	}
-	break;
-
-      case 't':
-	if (CanUseIME()) {
-	  SetIMEOpenStatus(Param[1] == 1);
-	}
-	break;
-    }
-  }
-
-  void CSEQ(BYTE b)
-  {
-    char Report[16];
-    int len;
-
-    switch (b) {
-      case 'c': /* Tertiary terminal report (Tertiary DA) */
-	if (Param[1] < 1) {
-	  len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "!|%8s", CLocale, ts.TerminalUID);
-	  SendDCSstr(Report, len);
-	}
-	break;
-    }
-  }
-
-  void CSGT(BYTE b)
-  {
-    switch (b) {
-      case 'c': /* second terminal report (Secondary DA) */
-	if (Param[1] < 1) {
-	  SendCSIstr(">32;278;0c", 0); /* VT382(>32) + xterm rev 278 */
-	}
-	break;
-      case 'J':	// IO-8256 terminal
-	if (Param[1]==3) {
-	  if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-	  if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-	  if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
-	  if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
-	  BuffEraseBox(Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
-	}
-	break;
-      case 'K':	// IO-8256 terminal
-        switch (Param[1]) {
-	  case 3:
-	    if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-	    if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-	    BuffEraseCharsInLine(Param[2]-1, Param[3]-Param[2]+1);
-	    break;
-	  case 5:
-	    if (NParam < 2) Param[2] = 0;
-	    if (NParam < 3) Param[3] = 0;
-	    switch (Param[2]) {
-	      case 3:
-	      case 4:
-	      case 5:
-	      case 6: // Draw Line
-		BuffDrawLine(CharAttr, Param[2], Param[3]);
+	switch (Param[1]) {
+	  case 1: // De-iconify window
+		if (ts.WindowFlag & WF_WINDOWCHANGE)
+			DispShowWindow(WINDOW_RESTORE);
 		break;
-
-	      case 12: // Text color
-		if ((Param[3]>=0) && (Param[3]<=7)) {
-		  switch (Param[3]) {
-		    case 3: CharAttr.Fore = IdBlue; break;
-		    case 4: CharAttr.Fore = IdCyan; break;
-		    case 5: CharAttr.Fore = IdYellow; break;
-		    case 6: CharAttr.Fore = IdMagenta; break;
-		    default: CharAttr.Fore = Param[3]; break;
-		  }
-		  CharAttr.Attr2 |= Attr2Fore;
-		  BuffSetCurCharAttr(CharAttr);
+	  case 2: // Iconify window
+		if (ts.WindowFlag & WF_WINDOWCHANGE)
+			DispShowWindow(WINDOW_MINIMIZE);
+		break;
+	  case 3: // set window position
+		if (ts.WindowFlag & WF_WINDOWCHANGE) {
+			if (NParam < 2) Param[2] = 0;
+			if (NParam < 3) Param[3] = 0;
+			DispMoveWindow(Param[2], Param[3]);
 		}
 		break;
-	    }
-	    break;
+	  case 4: // set window size
+		if (ts.WindowFlag & WF_WINDOWCHANGE) {
+			if (NParam < 2) Param[2] = 0;
+			if (NParam < 3) Param[3] = 0;
+			DispResizeWin(Param[3], Param[2]);
+		}
+		break;
+	  case 5: // Raise window
+		if (ts.WindowFlag & WF_WINDOWCHANGE)
+			DispShowWindow(WINDOW_RAISE);
+		break;
+	  case 6: // Lower window
+		if (ts.WindowFlag & WF_WINDOWCHANGE)
+			DispShowWindow(WINDOW_LOWER);
+		break;
+	  case 7: // Refresh window
+		if (ts.WindowFlag & WF_WINDOWCHANGE)
+			DispShowWindow(WINDOW_REFRESH);
+		break;
+	  case 8: /* set terminal size */
+		if (ts.WindowFlag & WF_WINDOWCHANGE) {
+			if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
+			if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;
+			ChangeTerminalSize(Param[3],Param[2]);
+		}
+		break;
+	  case 9: // Maximize/Restore window
+		if (ts.WindowFlag & WF_WINDOWCHANGE) {
+			if (NParam < 2 || Param[2] == 0) {
+				DispShowWindow(WINDOW_RESTORE);
+			}
+			else if (Param[2] == 1) {
+				DispShowWindow(WINDOW_MAXIMIZE);
+			}
+		}
+		break;
+	  case 11: // Report window state
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
+			SendCSIstr(Report, len);
+		}
+		break;
+	  case 13: // Report window position
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			DispGetWindowPos(&x, &y);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%u;%ut", CLocale, (unsigned int)x, (unsigned int)y);
+			SendCSIstr(Report, len);
+		}
+		break;
+	  case 14: /* get window size */
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			DispGetWindowSize(&x, &y);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "4;%d;%dt", CLocale, y, x);
+			SendCSIstr(Report, len);
+		}
+		break;
+	  case 18: /* get terminal size */
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%ut", CLocale,
+			                    NumOfLines-StatusLine, NumOfColumns);
+			SendCSIstr(Report, len);
+		}
+		break;
+	  case 19: // Report display size (character)
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			DispGetRootWinSize(&x, &y);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
+			SendCSIstr(Report, len);
+		}
+		break;
+	  case 20: // Report icon label
+		switch (ts.WindowFlag & WF_TITLEREPORT) {
+		  case IdTitleReportIgnore:
+			// nothing to do
+			break;
+		  case IdTitleReportAccept:
+			switch (ts.AcceptTitleChangeRequest) {
+			  case IdTitleChangeRequestOff:
+				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
+				break;
+			  case IdTitleChangeRequestAhead:
+				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, cv.TitleRemote, ts.Title);
+				break;
+			  case IdTitleChangeRequestLast:
+				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, ts.Title, cv.TitleRemote);
+				break;
+			  default:
+				if (cv.TitleRemote[0] == 0) {
+					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
+				}
+				else {
+					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, cv.TitleRemote);
+				}
+			}
+			SendOSCstr(Report, len, ST);
+			break;
+		  default: // IdTitleReportEmpty:
+			SendOSCstr("L", 0, ST);
+			break;
+		}
+		break;
+	  case 21: // Report window title
+		switch (ts.WindowFlag & WF_TITLEREPORT) {
+		  case IdTitleReportIgnore:
+			// nothing to do
+			break;
+		  case IdTitleReportAccept:
+			switch (ts.AcceptTitleChangeRequest) {
+			  case IdTitleChangeRequestOff:
+				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
+				break;
+			  case IdTitleChangeRequestAhead:
+				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, cv.TitleRemote, ts.Title);
+				break;
+			  case IdTitleChangeRequestLast:
+				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, ts.Title, cv.TitleRemote);
+				break;
+			  default:
+				if (cv.TitleRemote[0] == 0) {
+					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
+				}
+				else {
+					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, cv.TitleRemote);
+				}
+			}
+			SendOSCstr(Report, len, ST);
+			break;
+		  default: // IdTitleReportEmpty:
+			SendOSCstr("l", 0, ST);
+			break;
+		}
+		break;
+	  case 22: // Push Title
+		if (NParam < 2) {
+			Param[2] = 0;
+		}
+		switch (Param[2]) {
+		  case 0:
+		  case 1:
+		  case 2:
+			if (ts.AcceptTitleChangeRequest && (t=malloc(sizeof(TStack))) != NULL) {
+				if ((t->title = _strdup(cv.TitleRemote)) != NULL) {
+					t->next = TitleStack;
+					TitleStack = t;
+				}
+				else {
+					free(t);
+				}
+			}
+			break;
+		}
+		break;
+	  case 23: // Pop Title
+		if (NParam < 2) {
+			Param[2] = 0;
+		}
+		switch (Param[2]) {
+		  case 0:
+		  case 1:
+		  case 2:
+			if (ts.AcceptTitleChangeRequest && TitleStack != NULL) {
+				t = TitleStack;
+				TitleStack = t->next;
+				strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), t->title, _TRUNCATE);
+				ChangeTitle();
+				free(t->title);
+				free(t);
+			}
+			break;
+		}
 	}
-	break;
-    }
-  }
+}
 
-    void CSQExchangeColor()		// DECSCNM / Visual Bell
-    {
-      COLORREF ColorRef;
+void CSLT(BYTE b)
+{
+	switch (b) {
+	  case 'r':
+		if (CanUseIME()) {
+			SetIMEOpenStatus(IMEstat);
+		}
+		break;
 
-      BuffUpdateScroll();
+	  case 's':
+		if (CanUseIME()) {
+			IMEstat = GetIMEOpenStatus();
+		}
+		break;
 
-      if (ts.ColorFlag & CF_REVERSECOLOR) {
-        ColorRef = ts.VTColor[0];
-        ts.VTColor[0] = ts.VTReverseColor[0];
-        ts.VTReverseColor[0] = ColorRef;
-        ColorRef = ts.VTColor[1];
-        ts.VTColor[1] = ts.VTReverseColor[1];
-        ts.VTReverseColor[1] = ColorRef;
-      }
-      else {
-        ColorRef = ts.VTColor[0];
-        ts.VTColor[0] = ts.VTColor[1];
-        ts.VTColor[1] = ColorRef;
-      }
+	  case 't':
+		if (CanUseIME()) {
+			SetIMEOpenStatus(Param[1] == 1);
+		}
+		break;
+	}
+}
 
-      ColorRef = ts.VTBoldColor[0];
-      ts.VTBoldColor[0] = ts.VTBoldColor[1];
-      ts.VTBoldColor[1] = ColorRef;
+void CSEQ(BYTE b)
+{
+	char Report[16];
+	int len;
 
-      ColorRef = ts.VTBlinkColor[0];
-      ts.VTBlinkColor[0] = ts.VTBlinkColor[1];
-      ts.VTBlinkColor[1] = ColorRef;
+	switch (b) {
+	  case 'c': /* Tertiary terminal report (Tertiary DA) */
+		if (Param[1] < 1) {
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "!|%8s", CLocale, ts.TerminalUID);
+			SendDCSstr(Report, len);
+		}
+		break;
+	}
+}
 
-      ColorRef = ts.URLColor[0];
-      ts.URLColor[0] = ts.URLColor[1];
-      ts.URLColor[1] = ColorRef;
+void CSGT(BYTE b)
+{
+	switch (b) {
+	  case 'c': /* second terminal report (Secondary DA) */
+		if (Param[1] < 1) {
+			SendCSIstr(">32;278;0c", 0); /* VT382(>32) + xterm rev 278 */
+		}
+		break;
+	  case 'J': // IO-8256 terminal
+		if (Param[1]==3) {
+			if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+			if (Param[3] < 1 || NParam < 3) Param[3] = 1;
+			if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
+			if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
+			BuffEraseBox(Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
+		}
+		break;
+	  case 'K': // IO-8256 terminal
+		switch (Param[1]) {
+		  case 3:
+			if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+			if (Param[3] < 1 || NParam < 3) Param[3] = 1;
+			BuffEraseCharsInLine(Param[2]-1, Param[3]-Param[2]+1);
+			break;
+		  case 5:
+			if (NParam < 2) Param[2] = 0;
+			if (NParam < 3) Param[3] = 0;
+			switch (Param[2]) {
+			  case 3:
+			  case 4:
+			  case 5:
+			  case 6: // Draw Line
+				BuffDrawLine(CharAttr, Param[2], Param[3]);
+				break;
 
-      ts.ColorFlag ^= CF_REVERSEVIDEO;
+			  case 12: // Text color
+				if ((Param[3]>=0) && (Param[3]<=7)) {
+					switch (Param[3]) {
+					  case 3: CharAttr.Fore = IdBlue; break;
+					  case 4: CharAttr.Fore = IdCyan; break;
+					  case 5: CharAttr.Fore = IdYellow; break;
+					  case 6: CharAttr.Fore = IdMagenta; break;
+					  default: CharAttr.Fore = Param[3]; break;
+					}
+					CharAttr.Attr2 |= Attr2Fore;
+					BuffSetCurCharAttr(CharAttr);
+				}
+				break;
+			}
+			break;
+		}
+		break;
+	}
+}
+
+void CSQExchangeColor()		// DECSCNM / Visual Bell
+{
+	COLORREF ColorRef;
+
+	BuffUpdateScroll();
+
+	if (ts.ColorFlag & CF_REVERSECOLOR) {
+		ColorRef = ts.VTColor[0];
+		ts.VTColor[0] = ts.VTReverseColor[0];
+		ts.VTReverseColor[0] = ColorRef;
+		ColorRef = ts.VTColor[1];
+		ts.VTColor[1] = ts.VTReverseColor[1];
+		ts.VTReverseColor[1] = ColorRef;
+	}
+	else {
+		ColorRef = ts.VTColor[0];
+		ts.VTColor[0] = ts.VTColor[1];
+		ts.VTColor[1] = ColorRef;
+	}
+
+	ColorRef = ts.VTBoldColor[0];
+	ts.VTBoldColor[0] = ts.VTBoldColor[1];
+	ts.VTBoldColor[1] = ColorRef;
+
+	ColorRef = ts.VTBlinkColor[0];
+	ts.VTBlinkColor[0] = ts.VTBlinkColor[1];
+	ts.VTBlinkColor[1] = ColorRef;
+
+	ColorRef = ts.URLColor[0];
+	ts.URLColor[0] = ts.URLColor[1];
+	ts.URLColor[1] = ColorRef;
+
+	ts.ColorFlag ^= CF_REVERSEVIDEO;
 
 #ifdef ALPHABLEND_TYPE2
-      BGExchangeColor();
+	BGExchangeColor();
 #endif
-      DispChangeBackground();
-      UpdateWindow(HVTWin);
-    }
+	DispChangeBackground();
+	UpdateWindow(HVTWin);
+}
 
-    void CSQChangeColumnMode(int width)		// DECCOLM
-    {
-      ChangeTerminalSize(width, NumOfLines-StatusLine);
-      if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
-        MoveCursor(0, 0);
-        BuffClearScreen();
-        UpdateWindow(HVTWin);
-      }
-    }
-
-    void CSQ_h_Mode() // DECSET
-    {
-      int i;
-
-      for (i = 1 ; i<=NParam ; i++)
-	switch (Param[i]) {
-	  case 1: AppliCursorMode = TRUE; break;		// DECCKM
-	  case 3: CSQChangeColumnMode(132); break;		// DECCOLM
-	  case 5: /* Reverse Video (DECSCNM) */
-	    if (!(ts.ColorFlag & CF_REVERSEVIDEO))
-	      CSQExchangeColor(); /* Exchange text/back color */
-	    break;
-	  case 6: // DECOM
-	    if (isCursorOnStatusLine)
-	      MoveCursor(0,CursorY);
-	    else {
-	      RelativeOrgMode = TRUE;
-	      MoveCursor(0,CursorTop);
-	    }
-	    break;
-	  case 7: AutoWrapMode = TRUE; break;		// DECAWM
-	  case 8: AutoRepeatMode = TRUE; break;		// DECARM
-	  case 9: /* X10 Mouse Tracking */
-	    if (ts.MouseEventTracking)
-	      MouseReportMode = IdMouseTrackX10;
-	    break;
-	  case 12: /* att610 cursor blinking */ 
-	    if (ts.WindowFlag & WF_CURSORCHANGE) {
-	      ts.NonblinkingCursor = FALSE;
-	      ChangeCaret();
-	    }
-	    break;
-	  case 19: PrintEX = TRUE; break;		// DECPEX
-	  case 25: DispEnableCaret(TRUE); break;	// cursor on (DECTCEM)
-	  case 38: // DECTEK
-	    if (ts.AutoWinSwitch>0)
-	      ChangeEmu = IdTEK; /* Enter TEK Mode */
-	    break;
-	  case 47: // Alternate Screen Buffer
-	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
-	      BuffSaveScreen();
-	      AltScr = TRUE;
-	    }
-	    break;
-	  case 59:
-	    if (ts.Language==IdJapanese)
-	    { /* kanji terminal */
-	      Gn[0] = IdASCII;
-	      Gn[1] = IdKatakana;
-	      Gn[2] = IdKatakana;
-	      Gn[3] = IdKanji;
-	      Glr[0] = 0;
-	      if ((ts.KanjiCode==IdJIS) &&
-		  (ts.JIS7Katakana==0))
-		Glr[1] = 2;  // 8-bit katakana
-	      else
-		Glr[1] = 3;
-	    }
-	    break;
-	  case 66: AppliKeyMode = TRUE; break;		// DECNKM
-	  case 67: ts.BSKey = IdBS; break;		// DECBKM
-	  case 69: LRMarginMode = TRUE; break;		// DECLRMM (DECVSSM)
-	  case 1000: // Mouse Tracking
-	    if (ts.MouseEventTracking)
-	      MouseReportMode = IdMouseTrackVT200;
-	    break;
-	  case 1001: // Hilite Mouse Tracking
-	    if (ts.MouseEventTracking)
-	      MouseReportMode = IdMouseTrackVT200Hl;
-	    break;
-	  case 1002: // Button-Event Mouse Tracking
-	    if (ts.MouseEventTracking)
-	      MouseReportMode = IdMouseTrackBtnEvent;
-	    break;
-	  case 1003: // Any-Event Mouse Tracking
-	    if (ts.MouseEventTracking)
-	      MouseReportMode = IdMouseTrackAllEvent;
-	    break;
-	  case 1004: // Focus Report
-	    if (ts.MouseEventTracking)
-	      FocusReportMode = TRUE;
-	    break;
-	  case 1005: // Extended Mouse Tracking (UTF-8)
-	    if (ts.MouseEventTracking)
-	      MouseReportExtMode = IdMouseTrackExtUTF8;
-	    break;
-	  case 1006: // Extended Mouse Tracking (SGR)
-	    if (ts.MouseEventTracking)
-	      MouseReportExtMode = IdMouseTrackExtSGR;
-	    break;
-	  case 1015: // Extended Mouse Tracking (rxvt-unicode)
-	    if (ts.MouseEventTracking)
-	      MouseReportExtMode = IdMouseTrackExtURXVT;
-	    break;
-	  case 1047: // Alternate Screen Buffer
-	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
-	      BuffSaveScreen();
-	      AltScr = TRUE;
-	    }
-	    break;
-	  case 1048: // Save Cursor Position (Alternate Screen Buffer)
-	    if (ts.TermFlag & TF_ALTSCR) {
-	      SaveCursor();
-	    }
-	    break;
-	  case 1049: // Alternate Screen Buffer
-	    if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
-	      SaveCursor();
-	      BuffSaveScreen();
-	      BuffClearScreen();
-	      AltScr = TRUE;
-	    }
-	    break;
-	  case 2004: // Bracketed Paste Mode
-	    BracketedPaste = TRUE;
-	    break;
-	  case 7727: // mintty Application Escape Mode
-	    AppliEscapeMode = 1;
-	    break;
-	  case 7786: // Wheel to Cursor translation
-	    if (ts.TranslateWheelToCursor) {
-	      AcceptWheelToCursor = TRUE;
-	    }
-	    break;
-	  case 8200: // ClearThenHome
-	    ClearThenHome = TRUE;
-	    break;
-	  case 14001: // NetTerm mouse mode
-	    if (ts.MouseEventTracking)
-	      MouseReportMode = IdMouseTrackNetTerm;
-	    break;
-	  case 14002: // test Application Escape Mode 2
-	  case 14003: // test Application Escape Mode 3
-	  case 14004: // test Application Escape Mode 4
-	    AppliEscapeMode = Param[i] - 14000;
-	    break;
+void CSQChangeColumnMode(int width)		// DECCOLM
+{
+	ChangeTerminalSize(width, NumOfLines-StatusLine);
+	if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
+		MoveCursor(0, 0);
+		BuffClearScreen();
+		UpdateWindow(HVTWin);
 	}
-    }
+}
 
-    void CSQ_i_Mode()		// DECMC
-    {
-      switch (Param[1]) {
-	case 1:
-	  if (ts.TermFlag&TF_PRINTERCTRL) {
-	    OpenPrnFile();
-	    BuffDumpCurrentLine(LF);
-	    if (! AutoPrintMode)
-	      ClosePrnFile();
-	  }
-	  break;
-	/* auto print mode off */
-	case 4:
-	  if (AutoPrintMode)
-	  {
-	    ClosePrnFile();
-	    AutoPrintMode = FALSE;
-	  }
-	  break;
-	/* auto print mode on */
-	case 5:
-	  if (ts.TermFlag&TF_PRINTERCTRL) {
-	    if (! AutoPrintMode)
-	    {
-	      OpenPrnFile();
-	      AutoPrintMode = TRUE;
-	    }
-	  }
-	  break;
-      }
-    }
+void CSQ_h_Mode() // DECSET
+{
+	int i;
 
-    void CSQ_l_Mode()		// DECRST
-    {
-      int i;
-
-      for (i = 1 ; i <= NParam ; i++)
-	switch (Param[i]) {
-	  case 1: AppliCursorMode = FALSE; break;		// DECCKM
-	  case 3: CSQChangeColumnMode(80); break;		// DECCOLM
-	  case 5: /* Normal Video (DECSCNM) */
-	    if (ts.ColorFlag & CF_REVERSEVIDEO)
-	      CSQExchangeColor(); /* Exchange text/back color */
-	    break;
-	  case 6: // DECOM
-	    if (isCursorOnStatusLine)
-	      MoveCursor(0,CursorY);
-	    else {
-	      RelativeOrgMode = FALSE;
-	      MoveCursor(0,0);
-	    }
-	    break;
-	  case 7: AutoWrapMode = FALSE; break;		// DECAWM
-	  case 8: AutoRepeatMode = FALSE; break;	// DECARM
-	  case 9: MouseReportMode = IdMouseTrackNone; break; /* X10 Mouse Tracking */
-	  case 12: /* att610 cursor blinking */ 
-	    if (ts.WindowFlag & WF_CURSORCHANGE) {
-	      ts.NonblinkingCursor = TRUE;
-	      ChangeCaret();
-	    }
-	    break;
-	  case 19: PrintEX = FALSE; break;		// DECPEX
-	  case 25: DispEnableCaret(FALSE); break;	// cursor off (DECTCEM)
-	  case 47: // Alternate Screen Buffer
-	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
-	      BuffRestoreScreen();
-	      AltScr = FALSE;
-	    }
-	    break;
-	  case 59:
-	    if (ts.Language==IdJapanese)
-	    { /* katakana terminal */
-	      Gn[0] = IdASCII;
-	      Gn[1] = IdKatakana;
-	      Gn[2] = IdKatakana;
-	      Gn[3] = IdKanji;
-	      Glr[0] = 0;
-	      if ((ts.KanjiCode==IdJIS) &&
-		  (ts.JIS7Katakana==0))
-		Glr[1] = 2;  // 8-bit katakana
-	      else
-		Glr[1] = 3;
-	    }
-	    break;
-	  case 66: AppliKeyMode = FALSE; break;		// DECNKM
-	  case 67: ts.BSKey = IdDEL; break;		// DECBKM
-	  case 69: // DECLRMM (DECVSSM)
-	    LRMarginMode = FALSE;
-	    CursorLeftM = 0;
-	    CursorRightM = NumOfColumns - 1;
-	    break;
-	  case 1000: // Mouse Tracking
-	  case 1001: // Hilite Mouse Tracking
-	  case 1002: // Button-Event Mouse Tracking
-	  case 1003: // Any-Event Mouse Tracking
-	    MouseReportMode = IdMouseTrackNone;
-	    break;
-	  case 1004: // Focus Report
-	    FocusReportMode = FALSE;
-	    break;
-	  case 1005: // Extended Mouse Tracking (UTF-8)
-	  case 1006: // Extended Mouse Tracking (SGR)
-	  case 1015: // Extended Mouse Tracking (rxvt-unicode)
-	      MouseReportExtMode = IdMouseTrackExtNone;
-	    break;
-	  case 1047: // Alternate Screen Buffer
-	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
-	      BuffClearScreen();
-	      BuffRestoreScreen();
-	      AltScr = FALSE;
-	    }
-	    break;
-	  case 1048: // Save Cursor Position (Alternate Screen Buffer)
-	    if (ts.TermFlag & TF_ALTSCR) {
-	      RestoreCursor();
-	    }
-	    break;
-	  case 1049: // Alternate Screen Buffer
-	    if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
-	      BuffClearScreen();
-	      BuffRestoreScreen();
-	      AltScr = FALSE;
-	      RestoreCursor();
-	    }
-	    break;
-	  case 2004: // Bracketed Paste Mode
-	    BracketedPaste = FALSE;
-	    break;
-	  case 7727: // mintty Application Escape Mode
-	    AppliEscapeMode = 0;
-	    break;
-	  case 7786: // Wheel to Cursor translation
-	    AcceptWheelToCursor = FALSE;
-	    break;
-	  case 8200: // ClearThenHome
-	    ClearThenHome = FALSE;
-	    break;
-	  case 14001: // NetTerm mouse mode
-	    MouseReportMode = IdMouseTrackNone;
-	    break;
-	  case 14002: // test Application Escape Mode 2
-	  case 14003: // test Application Escape Mode 3
-	  case 14004: // test Application Escape Mode 4
-	    AppliEscapeMode = 0;
-	    break;
+	for (i = 1 ; i<=NParam ; i++) {
+		switch (Param[i]) {
+		  case 1: AppliCursorMode = TRUE; break;		// DECCKM
+		  case 3: CSQChangeColumnMode(132); break;		// DECCOLM
+		  case 5: /* Reverse Video (DECSCNM) */
+			if (!(ts.ColorFlag & CF_REVERSEVIDEO))
+				CSQExchangeColor(); /* Exchange text/back color */
+			break;
+		  case 6: // DECOM
+			if (isCursorOnStatusLine)
+				MoveCursor(0,CursorY);
+			else {
+				RelativeOrgMode = TRUE;
+				MoveCursor(0,CursorTop);
+			}
+			break;
+		  case 7: AutoWrapMode = TRUE; break;		// DECAWM
+		  case 8: AutoRepeatMode = TRUE; break;		// DECARM
+		  case 9: /* X10 Mouse Tracking */
+			if (ts.MouseEventTracking)
+				MouseReportMode = IdMouseTrackX10;
+			break;
+		  case 12: /* att610 cursor blinking */ 
+			if (ts.WindowFlag & WF_CURSORCHANGE) {
+				ts.NonblinkingCursor = FALSE;
+				ChangeCaret();
+			}
+			break;
+		  case 19: PrintEX = TRUE; break;		// DECPEX
+		  case 25: DispEnableCaret(TRUE); break;	// cursor on (DECTCEM)
+		  case 38: // DECTEK
+			if (ts.AutoWinSwitch>0)
+				ChangeEmu = IdTEK; /* Enter TEK Mode */
+			break;
+		  case 47: // Alternate Screen Buffer
+			if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
+				BuffSaveScreen();
+				AltScr = TRUE;
+			}
+			break;
+		  case 59:
+			if (ts.Language==IdJapanese) {
+				/* kanji terminal */
+				Gn[0] = IdASCII;
+				Gn[1] = IdKatakana;
+				Gn[2] = IdKatakana;
+				Gn[3] = IdKanji;
+				Glr[0] = 0;
+				if ((ts.KanjiCode==IdJIS) &&
+				    (ts.JIS7Katakana==0))
+					Glr[1] = 2;  // 8-bit katakana
+				else
+					Glr[1] = 3;
+			}
+			break;
+		  case 66: AppliKeyMode = TRUE; break;		// DECNKM
+		  case 67: ts.BSKey = IdBS; break;		// DECBKM
+		  case 69: LRMarginMode = TRUE; break;		// DECLRMM (DECVSSM)
+		  case 1000: // Mouse Tracking
+			if (ts.MouseEventTracking)
+				MouseReportMode = IdMouseTrackVT200;
+			break;
+		  case 1001: // Hilite Mouse Tracking
+			if (ts.MouseEventTracking)
+				MouseReportMode = IdMouseTrackVT200Hl;
+			break;
+		  case 1002: // Button-Event Mouse Tracking
+			if (ts.MouseEventTracking)
+				MouseReportMode = IdMouseTrackBtnEvent;
+			break;
+		  case 1003: // Any-Event Mouse Tracking
+			if (ts.MouseEventTracking)
+				MouseReportMode = IdMouseTrackAllEvent;
+			break;
+		  case 1004: // Focus Report
+			if (ts.MouseEventTracking)
+				FocusReportMode = TRUE;
+			break;
+		  case 1005: // Extended Mouse Tracking (UTF-8)
+			if (ts.MouseEventTracking)
+				MouseReportExtMode = IdMouseTrackExtUTF8;
+			break;
+		  case 1006: // Extended Mouse Tracking (SGR)
+			if (ts.MouseEventTracking)
+				MouseReportExtMode = IdMouseTrackExtSGR;
+			break;
+		  case 1015: // Extended Mouse Tracking (rxvt-unicode)
+			if (ts.MouseEventTracking)
+				MouseReportExtMode = IdMouseTrackExtURXVT;
+			break;
+		  case 1047: // Alternate Screen Buffer
+			if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
+				BuffSaveScreen();
+				AltScr = TRUE;
+			}
+			break;
+		  case 1048: // Save Cursor Position (Alternate Screen Buffer)
+			if (ts.TermFlag & TF_ALTSCR) {
+				SaveCursor();
+			}
+			break;
+		  case 1049: // Alternate Screen Buffer
+			if ((ts.TermFlag & TF_ALTSCR) && !AltScr) {
+				SaveCursor();
+				BuffSaveScreen();
+				BuffClearScreen();
+				AltScr = TRUE;
+			}
+			break;
+		  case 2004: // Bracketed Paste Mode
+			BracketedPaste = TRUE;
+			break;
+		  case 7727: // mintty Application Escape Mode
+			AppliEscapeMode = 1;
+			break;
+		  case 7786: // Wheel to Cursor translation
+			if (ts.TranslateWheelToCursor) {
+				AcceptWheelToCursor = TRUE;
+			}
+			break;
+		  case 8200: // ClearThenHome
+			ClearThenHome = TRUE;
+			break;
+		  case 14001: // NetTerm mouse mode
+			if (ts.MouseEventTracking)
+				MouseReportMode = IdMouseTrackNetTerm;
+			break;
+		  case 14002: // test Application Escape Mode 2
+		  case 14003: // test Application Escape Mode 3
+		  case 14004: // test Application Escape Mode 4
+			AppliEscapeMode = Param[i] - 14000;
+			break;
+		}
 	}
-    }
+}
 
-    void CSQ_n_Mode()		// DECDSR
-    {
-      switch (Param[1]) {
-	case 53:
-	case 55:
-	  /* Locator Device Status Report -> Ready */
-	  SendCSIstr("?50n", 0);
-	  break;
-      }
-    }
-
-  void CSQuest(BYTE b)
-  {
-    switch (b) {
-      case 'J': CSQSelScreenErase(); break;	// DECSED
-      case 'K': CSQSelLineErase(); break;	// DECSEL
-      case 'h': CSQ_h_Mode(); break;		// DECSET
-      case 'i': CSQ_i_Mode(); break;		// DECMC
-      case 'l': CSQ_l_Mode(); break;		// DECRST
-      case 'n': CSQ_n_Mode(); break;		// DECDSR
-    }
-  }
-
-  void SoftReset()
-  // called by software-reset escape sequence handler
-  {
-    UpdateStr();
-    AutoRepeatMode = TRUE;
-    DispEnableCaret(TRUE); // cursor on
-    InsertMode = FALSE;
-    RelativeOrgMode = FALSE;
-    AppliKeyMode = FALSE;
-    AppliCursorMode = FALSE;
-    AppliEscapeMode = FALSE;
-    AcceptWheelToCursor = ts.TranslateWheelToCursor;
-    if (isCursorOnStatusLine)
-      MoveToMainScreen();
-    CursorTop = 0;
-    CursorBottom = NumOfLines-1-StatusLine;
-    CursorLeftM = 0;
-    CursorRightM = NumOfColumns - 1;
-    ResetCharSet();
-
-    /* Attribute */
-    CharAttr = DefCharAttr;
-    Special = FALSE;
-    BuffSetCurCharAttr(CharAttr);
-
-    // status buffers
-    ResetCurSBuffer();
-
-    // Saved IME status
-    IMEstat = FALSE;
-  }
-
-  void CSExc(BYTE b)
-  {
-    switch (b) {
-      case 'p':
-	/* Software reset */
-	SoftReset();
-	break;
-    }
-  }
-
-  void CSDouble(BYTE b)
-  {
-    switch (b) {
-      case 'p': // DECSCL
-	/* Select terminal mode (software reset) */
-	SoftReset();
-	if (NParam > 0) {
-	  ChangeTerminalID();
-	  if (Param[1] >= 61 && Param[1] <= 65) {
-	    if (VTlevel > Param[1] - 60) {
-	      VTlevel = Param[1] - 60;
-	    }
-	  }
-	  else {
-	    VTlevel = 1;
-	  }
-
-	  if (VTlevel < 2 || (NParam > 1 && Param[2] == 1))
-	    Send8BitMode = FALSE;
-	  else
-	    Send8BitMode = TRUE;
-	}
-	break;
-
-      case 'q': // DECSCA
+void CSQ_i_Mode()		// DECMC
+{
 	switch (Param[1]) {
-	  case 0:
-	  case 2:
-	    CharAttr.Attr2 &= ~Attr2Protect;
-	    BuffSetCurCharAttr(CharAttr);
-	    break;
 	  case 1:
-	    CharAttr.Attr2 |= Attr2Protect;
-	    BuffSetCurCharAttr(CharAttr);
-	    break;
-	  default:
-	    /* nothing to do */
-	    break;
-	}
-	break;
-    }
-  }
-
-  void CSDolRequestMode()
-  {
-    char buff[256];
-    char *pp;
-    int len, resp = 0;
-
-    if (NParam == 0)
-      Param[1] = 0;
-
-    switch (Prv) {
-      case 0: /* ANSI Mode */
-	resp = 4;
-	pp = "";
-	switch (Param[1]) {
-	  case 2:	// KAM
-	    if (KeybEnabled)
-	      resp = 2;
-	    else
-	      resp = 1;
-	    break;
-	  case 4:	// IRM
-	    if (InsertMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 12:	// SRM
-	    if (ts.LocalEcho)
-	      resp = 2;
-	    else
-	      resp = 1;
-	    break;
-	  case 20:	// LNM
-	    if (LFMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 33:	// WYSTCURM
-	    if (ts.NonblinkingCursor)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
-	      resp += 2;
-	    break;
-	  case 34:	// WYULCURM
-	    if (ts.CursorShape == IdHCur)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
-	      resp += 2;
-	    break;
-	}
-	break;
-
-      case '?': /* DEC Mode */
-	pp = "?";
-	switch (Param[1]) {
-	  case 1:	// DECCKM
-	    if (AppliCursorMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 3:	// DECCOLM
-	    if (NumOfColumns == 132)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 5:	// DECSCNM
-	    if (ts.ColorFlag & CF_REVERSEVIDEO)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 6:	// DECOM
-	    if (RelativeOrgMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 7:	// DECAWM
-	    if (AutoWrapMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 8:	// DECARM
-	    if (AutoRepeatMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 9:	// XT_MSE_X10 -- X10 Mouse Tracking
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportMode == IdMouseTrackX10)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 12:	// XT_CBLINK -- att610 cursor blinking
-	    if (ts.NonblinkingCursor)
-	      resp = 2;
-	    else
-	      resp = 1;
-	    if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
-	      resp += 2;
-	    break;
-	  case 19:	// DECPEX
-	    if (PrintEX)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 25:	// DECTCEM
-	    if (IsCaretEnabled())
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 38:	// DECTEK
-	    resp = 4;
-	    break;
-	  case 47:	// XT_ALTSCRN -- Alternate Screen / (DECGRPM)
-	    if ((ts.TermFlag & TF_ALTSCR) == 0)
-	      resp = 4;
-	    else if (AltScr)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 59:	// DECKKDM
-	    if (ts.Language!=IdJapanese)
-	      resp = 0;
-	    else if ((ts.KanjiCode == IdJIS) && (!ts.JIS7Katakana))
-	      resp = 4;
-	    else
-	      resp = 3;
-	    break;
-	  case 66:	// DECNKM
-	    if (AppliKeyMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 67:	// DECBKM
-	    if (ts.BSKey==IdBS)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case  1000:	// XT_MSE_X11
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportMode == IdMouseTrackVT200)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1001:	// XT_MSE_HL
-#if 0
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportMode == IdMouseTrackVT200Hl)
-	      resp = 1;
-	    else
-	      resp = 2;
-#else
-	    resp = 4;
-#endif
-	    break;
-	  case 1002:	// XT_MSE_BTN
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportMode == IdMouseTrackBtnEvent)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1003:	// XT_MSE_ANY
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportMode == IdMouseTrackAllEvent)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1004:	// XT_MSE_WIN
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (FocusReportMode)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1005:	// XT_MSE_UTF
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportExtMode == IdMouseTrackExtUTF8)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1006:	// XT_MSE_SGR
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportExtMode == IdMouseTrackExtSGR)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1015:	// urxvt-style extended mouse tracking
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportExtMode == IdMouseTrackExtURXVT)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1047:	// XT_ALTS_47
-	    if ((ts.TermFlag & TF_ALTSCR) == 0)
-	      resp = 4;
-	    else if (AltScr)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 1048:
-	    if ((ts.TermFlag & TF_ALTSCR) == 0)
-	      resp = 4;
-	    else
-	      resp = 1;
-	    break;
-	  case 1049:	// XT_EXTSCRN
-	    if ((ts.TermFlag & TF_ALTSCR) == 0)
-	      resp = 4;
-	    else if (AltScr)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 2004:	// RL_BRACKET
-	    if (BracketedPaste)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 7727:	// MinTTY Application Escape Mode
-	    if (AppliEscapeMode == 1)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 7786:	// MinTTY Mousewheel reporting
-	    if (!ts.TranslateWheelToCursor)
-	      resp = 4;
-	    else if (AcceptWheelToCursor)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 8200:	// ClearThenHome
-	    if (ClearThenHome)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 14001:	// NetTerm Mouse Reporting (TT)
-	    if (!ts.MouseEventTracking)
-	      resp = 4;
-	    else if (MouseReportMode == IdMouseTrackNetTerm)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	  case 14002:	// test Application Escape Mode 2
-	  case 14003:	// test Application Escape Mode 3
-	  case 14004:	// test Application Escape Mode 4
-	    if (AppliEscapeMode == Param[1] - 14000)
-	      resp = 1;
-	    else
-	      resp = 2;
-	    break;
-	}
-	break;
-    }
-
-    len = _snprintf_s(buff, sizeof(buff), _TRUNCATE, "%s%d;%d$y", pp, Param[1], resp);
-    SendCSIstr(buff, len);
-  }
-
-  void CSDol(BYTE b)
-  {
-    TCharAttr attr, mask;
-    attr = DefCharAttr;
-    mask = DefCharAttr;
-
-    switch (b) {
-      case 'p': // DECRQM
-	CSDolRequestMode();
-	break;
-      case 'r': // DECCARA
-      case 't': // DECRARA
-	if (Param[1] < 1 || NParam < 1) Param[1] = 1;
-	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-	if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
-	if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
-	if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
-	  if (RelativeOrgMode) {
-	    Param[1] += CursorTop;
-	    if (Param[1] > CursorBottom) {
-	      Param[1] = CursorBottom + 1;
-	    }
-	    Param[3] += CursorTop;
-	    if (Param[3] > CursorBottom) {
-	      Param[3] = CursorBottom + 1;
-	    }
-	  }
-	}
-	ParseSGRParams(&attr, &mask, 5);
-	if (b == 'r') { // DECCARA
-	  attr.Attr &= AttrSgrMask;
-	  mask.Attr &= AttrSgrMask;
-	  attr.Attr2 &= Attr2ColorMask;
-	  mask.Attr2 &= Attr2ColorMask;
-	  BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
-	}
-	else { // DECRARA
-	  attr.Attr &= AttrSgrMask;
-	  BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
-	}
-	break;
-      case 'v': // DECCRA
-	if (Param[1] < 1 || NParam < 1) Param[1] = 1;
-	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-	if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
-	if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
-	if (Param[5] < 1 || NParam < 5) Param[5] = 1;
-	if (Param[6] < 1 || NParam < 6) Param[6] = 1;
-	if (Param[7] < 1 || NParam < 7) Param[7] = 1;
-	if (Param[8] < 1 || NParam < 8) Param[8] = 1;
-	if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
-	  if (RelativeOrgMode) {
-	    Param[1] += CursorTop;
-	    if (Param[1] > CursorBottom) {
-	      Param[1] = CursorBottom + 1;
-	    }
-	    Param[3] += CursorTop;
-	    if (Param[3] > CursorBottom) {
-	      Param[3] = CursorBottom + 1;
-	    }
-	    Param[6] += CursorTop;
-	    if (Param[6] > CursorBottom) {
-	      Param[6] = CursorBottom + 1;
-	    }
-	    if (Param[6] + Param[3] - Param[1] > CursorBottom) {
-	      Param[3] = Param[1] + CursorBottom - Param[6] + 1;
-	    }
-	  }
-	  BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
-	}
-	break;
-      case 'x': // DECFRA
-	if (NParam < 1 || Param[1] < 32 || (Param[1] > 127 && Param[1] < 160) || Param[1] > 255) {
-	  return;
-	}
-	if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-	if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-	if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
-	if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
-	if (Param[2] > Param[4] || Param[3] > Param[5]) {
-	  return;
-	}
-	if (RelativeOrgMode) {
-	  Param[2] += CursorTop;
-	  if (Param[2] > CursorBottom) {
-	    Param[2] = CursorBottom + 1;
-	  }
-	  Param[4] += CursorTop;
-	  if (Param[4] > CursorBottom) {
-	    Param[4] = CursorBottom + 1;
-	  }
-	}
-	BuffFillBox(Param[1], Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
-	break;
-
-      case 'z': // DECERA
-      case '{': // DECSERA
-	if (Param[1] < 1 || NParam < 1) Param[1]=1;
-	if (Param[2] < 1 || NParam < 2) Param[2]=1;
-	if (Param[3] < 1 || NParam < 3) Param[3]=NumOfLines-StatusLine;
-	if (Param[4] < 1 || NParam < 4) Param[4]=NumOfColumns;
-	if (RelativeOrgMode) {
-	  Param[1] += CursorTop;
-	  if (Param[1] > CursorBottom) {
-	    Param[1] = CursorBottom + 1;
-	  }
-	  Param[3] += CursorTop;
-	  if (Param[3] > CursorBottom) {
-	    Param[3] = CursorBottom + 1;
-	  }
-	}
-	if (b == 'z') {
-	  BuffEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
-	}
-	else {
-	  BuffSelectiveEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
-	}
-	break;
-
-      case '}': // DECSASD
-	if ((ts.TermFlag & TF_ENABLESLINE)==0) return;
-	if (StatusLine==0) return;
-	if ((Param[1]<1) && (CursorY==NumOfLines-1))
-	  MoveToMainScreen();
-	else if ((Param[1]==1) && (CursorY<NumOfLines-1))
-	  MoveToStatusLine();
-	break;
-      case '~': // DECSSDT
-	if ((ts.TermFlag & TF_ENABLESLINE)==0) return;
-	if (Param[1]<=1)
-	  HideStatusLine();
-	else if ((StatusLine==0) && (Param[1]==2))
-	  ShowStatusLine(1); // show
-	break;
-    }
-  }
-
-  void CSQDol(BYTE b)
-  {
-    switch (b) {
-      case 'p':
-	CSDolRequestMode();
-	break;
-    }
-  }
-
-  void CSQuote(BYTE b)
-  {
-    int i, x, y;
-    switch (b) {
-      case 'w': // Enable Filter Rectangle (DECEFR)
-	if (MouseReportMode == IdMouseTrackDECELR) {
-	  if (DecLocatorFlag & DecLocatorPixel) {
-	    x = LastX + 1;
-	    y = LastY + 1;
-	  }
-	  else {
-	    DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
-	    x++;
-	    y++;
-	  }
-	  FilterTop    = (NParam<1 || Param[1]<1)? y : Param[1];
-	  FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
-	  FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
-	  FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
-	  if (FilterTop > FilterBottom) {
-	    i = FilterTop; FilterTop = FilterBottom; FilterBottom = i;
-	  }
-	  if (FilterLeft > FilterRight) {
-	    i = FilterLeft; FilterLeft = FilterRight; FilterRight = i;
-	  }
-	  DecLocatorFlag |= DecLocatorFiltered;
-	  DecLocatorReport(IdMouseEventMove, 0);
-	}
-	break;
-
-      case 'z': // Enable DEC Locator reporting (DECELR)
-	switch (Param[1]) {
-	case 0:
-	  if (MouseReportMode == IdMouseTrackDECELR) {
-	    MouseReportMode = IdMouseTrackNone;
-	  }
-	  break;
-	case 1:
-	  if (ts.MouseEventTracking) {
-	    MouseReportMode = IdMouseTrackDECELR;
-	    DecLocatorFlag &= ~DecLocatorOneShot;
-	  }
-	  break;
-	case 2:
-	  if (ts.MouseEventTracking) {
-	    MouseReportMode = IdMouseTrackDECELR;
-	    DecLocatorFlag |= DecLocatorOneShot;
-	  }
-	  break;
-	}
-	if (NParam > 1 && Param[2] == 1) {
-	  DecLocatorFlag |= DecLocatorPixel;
-	}
-	else {
-	  DecLocatorFlag &= ~DecLocatorPixel;
-	}
-	break;
-
-      case '{': // Select Locator Events (DECSLE)
-	for (i=1; i<=NParam; i++) {
-	  switch (Param[i]) {
-	  case 0:
-	    DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown | DecLocatorFiltered);
-	    break;
-	  case 1:
-	    DecLocatorFlag |= DecLocatorButtonDown;
-	    break;
-	  case 2:
-	    DecLocatorFlag &= ~DecLocatorButtonDown;
-	    break;
-	  case 3:
-	    DecLocatorFlag |= DecLocatorButtonUp;
-	    break;
+		if (ts.TermFlag&TF_PRINTERCTRL) {
+			OpenPrnFile();
+			BuffDumpCurrentLine(LF);
+			if (! AutoPrintMode)
+				ClosePrnFile();
+		}
+		break;
+	  /* auto print mode off */
 	  case 4:
-	    DecLocatorFlag &= ~DecLocatorButtonUp;
-	    break;
-	  }
+		if (AutoPrintMode) {
+			ClosePrnFile();
+			AutoPrintMode = FALSE;
+		}
+		break;
+	  /* auto print mode on */
+	  case 5:
+		if (ts.TermFlag&TF_PRINTERCTRL) {
+			if (! AutoPrintMode) {
+				OpenPrnFile();
+				AutoPrintMode = TRUE;
+			}
+		}
+		break;
 	}
-	break;
+}
 
-      case '|': // Request Locator Position (DECRQLP)
-	DecLocatorReport(IdMouseEventCurStat, 0);
-	break;
-    }
-  }
+void CSQ_l_Mode()		// DECRST
+{
+	int i;
 
-  void CSSpace(BYTE b) {
-    switch (b) {
-      case 'q': // DECSCUSR
-        if (ts.WindowFlag & WF_CURSORCHANGE) {
-          if (NParam > 0) {
-            switch (Param[1]) {
-              case 0:
-              case 1:
-                ts.CursorShape = IdBlkCur;
-                ts.NonblinkingCursor = FALSE;
-                break;
-              case 2:
-                ts.CursorShape = IdBlkCur;
-                ts.NonblinkingCursor = TRUE;
-                break;
-              case 3:
-                ts.CursorShape = IdHCur;
-                ts.NonblinkingCursor = FALSE;
-                break;
-              case 4:
-                ts.CursorShape = IdHCur;
-                ts.NonblinkingCursor = TRUE;
-                break;
-              case 5:
-                ts.CursorShape = IdVCur;
-                ts.NonblinkingCursor = FALSE;
-                break;
-              case 6:
-                ts.CursorShape = IdVCur;
-                ts.NonblinkingCursor = TRUE;
-                break;
-              default:
-                return;
-            }
-            ChangeCaret();
-          }
-        }
-        break;
-    }
-  }
+	for (i = 1 ; i <= NParam ; i++) {
+		switch (Param[i]) {
+		  case 1: AppliCursorMode = FALSE; break;	// DECCKM
+		  case 3: CSQChangeColumnMode(80); break;	// DECCOLM
+		  case 5: /* Normal Video (DECSCNM) */
+			if (ts.ColorFlag & CF_REVERSEVIDEO)
+				CSQExchangeColor(); /* Exchange text/back color */
+			break;
+		  case 6: // DECOM
+			if (isCursorOnStatusLine)
+				MoveCursor(0,CursorY);
+			else {
+				RelativeOrgMode = FALSE;
+				MoveCursor(0,0);
+			}
+			break;
+		  case 7: AutoWrapMode = FALSE; break;		// DECAWM
+		  case 8: AutoRepeatMode = FALSE; break;	// DECARM
+		  case 9: MouseReportMode = IdMouseTrackNone; break; /* X10 Mouse Tracking */
+		  case 12: /* att610 cursor blinking */ 
+			if (ts.WindowFlag & WF_CURSORCHANGE) {
+				ts.NonblinkingCursor = TRUE;
+				ChangeCaret();
+			}
+			break;
+		  case 19: PrintEX = FALSE; break;		// DECPEX
+		  case 25: DispEnableCaret(FALSE); break;	// cursor off (DECTCEM)
+		  case 47: // Alternate Screen Buffer
+			if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
+				BuffRestoreScreen();
+				AltScr = FALSE;
+			}
+			break;
+		  case 59:
+			if (ts.Language==IdJapanese) {
+				/* katakana terminal */
+				Gn[0] = IdASCII;
+				Gn[1] = IdKatakana;
+				Gn[2] = IdKatakana;
+				Gn[3] = IdKanji;
+				Glr[0] = 0;
+				if ((ts.KanjiCode==IdJIS) &&
+				    (ts.JIS7Katakana==0))
+					Glr[1] = 2;	// 8-bit katakana
+				else
+					Glr[1] = 3;
+			}
+			break;
+		  case 66: AppliKeyMode = FALSE; break;		// DECNKM
+		  case 67: ts.BSKey = IdDEL; break;		// DECBKM
+		  case 69: // DECLRMM (DECVSSM)
+			LRMarginMode = FALSE;
+			CursorLeftM = 0;
+			CursorRightM = NumOfColumns - 1;
+			break;
+		  case 1000: // Mouse Tracking
+		  case 1001: // Hilite Mouse Tracking
+		  case 1002: // Button-Event Mouse Tracking
+		  case 1003: // Any-Event Mouse Tracking
+			MouseReportMode = IdMouseTrackNone;
+			break;
+		  case 1004: // Focus Report
+			FocusReportMode = FALSE;
+			break;
+		  case 1005: // Extended Mouse Tracking (UTF-8)
+		  case 1006: // Extended Mouse Tracking (SGR)
+		  case 1015: // Extended Mouse Tracking (rxvt-unicode)
+			MouseReportExtMode = IdMouseTrackExtNone;
+			break;
+		  case 1047: // Alternate Screen Buffer
+			if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
+				BuffClearScreen();
+				BuffRestoreScreen();
+				AltScr = FALSE;
+			}
+			break;
+		  case 1048: // Save Cursor Position (Alternate Screen Buffer)
+			if (ts.TermFlag & TF_ALTSCR) {
+				RestoreCursor();
+			}
+			break;
+		  case 1049: // Alternate Screen Buffer
+			if ((ts.TermFlag & TF_ALTSCR) && AltScr) {
+				BuffClearScreen();
+				BuffRestoreScreen();
+				AltScr = FALSE;
+				RestoreCursor();
+			}
+			break;
+		  case 2004: // Bracketed Paste Mode
+			BracketedPaste = FALSE;
+			break;
+		  case 7727: // mintty Application Escape Mode
+			AppliEscapeMode = 0;
+			break;
+		  case 7786: // Wheel to Cursor translation
+			AcceptWheelToCursor = FALSE;
+			break;
+		  case 8200: // ClearThenHome
+			ClearThenHome = FALSE;
+			break;
+		  case 14001: // NetTerm mouse mode
+			MouseReportMode = IdMouseTrackNone;
+			break;
+		  case 14002: // test Application Escape Mode 2
+		  case 14003: // test Application Escape Mode 3
+		  case 14004: // test Application Escape Mode 4
+			AppliEscapeMode = 0;
+			break;
+		}
+	}
+}
+
+void CSQ_n_Mode()		// DECDSR
+{
+	switch (Param[1]) {
+	  case 53:
+	  case 55:
+		/* Locator Device Status Report -> Ready */
+		SendCSIstr("?50n", 0);
+		break;
+	}
+}
+
+void CSQuest(BYTE b)
+{
+	switch (b) {
+	  case 'J': CSQSelScreenErase(); break;	// DECSED
+	  case 'K': CSQSelLineErase(); break;	// DECSEL
+	  case 'h': CSQ_h_Mode(); break;	// DECSET
+	  case 'i': CSQ_i_Mode(); break;	// DECMC
+	  case 'l': CSQ_l_Mode(); break;	// DECRST
+	  case 'n': CSQ_n_Mode(); break;	// DECDSR
+	}
+}
+
+void SoftReset()
+// called by software-reset escape sequence handler
+{
+	UpdateStr();
+	AutoRepeatMode = TRUE;
+	DispEnableCaret(TRUE); // cursor on
+	InsertMode = FALSE;
+	RelativeOrgMode = FALSE;
+	AppliKeyMode = FALSE;
+	AppliCursorMode = FALSE;
+	AppliEscapeMode = FALSE;
+	AcceptWheelToCursor = ts.TranslateWheelToCursor;
+	if (isCursorOnStatusLine)
+		MoveToMainScreen();
+	CursorTop = 0;
+	CursorBottom = NumOfLines-1-StatusLine;
+	CursorLeftM = 0;
+	CursorRightM = NumOfColumns - 1;
+	ResetCharSet();
+
+	/* Attribute */
+	CharAttr = DefCharAttr;
+	Special = FALSE;
+	BuffSetCurCharAttr(CharAttr);
+
+	// status buffers
+	ResetCurSBuffer();
+
+	// Saved IME status
+	IMEstat = FALSE;
+}
+
+void CSExc(BYTE b)
+{
+	switch (b) {
+	  case 'p':
+		/* Software reset */
+		SoftReset();
+		break;
+	}
+}
+
+void CSDouble(BYTE b)
+{
+	switch (b) {
+	  case 'p': // DECSCL
+		/* Select terminal mode (software reset) */
+		SoftReset();
+		if (NParam > 0) {
+			ChangeTerminalID();
+			if (Param[1] >= 61 && Param[1] <= 65) {
+				if (VTlevel > Param[1] - 60) {
+					VTlevel = Param[1] - 60;
+				}
+			}
+			else {
+				VTlevel = 1;
+			}
+
+			if (VTlevel < 2 || (NParam > 1 && Param[2] == 1))
+				Send8BitMode = FALSE;
+			else
+				Send8BitMode = TRUE;
+		}
+		break;
+
+	  case 'q': // DECSCA
+		switch (Param[1]) {
+		  case 0:
+		  case 2:
+			CharAttr.Attr2 &= ~Attr2Protect;
+			BuffSetCurCharAttr(CharAttr);
+			break;
+		  case 1:
+			CharAttr.Attr2 |= Attr2Protect;
+			BuffSetCurCharAttr(CharAttr);
+			break;
+		  default:
+			/* nothing to do */
+			break;
+		}
+		break;
+	}
+}
+
+void CSDolRequestMode()
+{
+	char buff[256];
+	char *pp;
+	int len, resp = 0;
+
+	if (NParam == 0)
+		Param[1] = 0;
+
+	switch (Prv) {
+	  case 0: /* ANSI Mode */
+		resp = 4;
+		pp = "";
+		switch (Param[1]) {
+		  case 2:	// KAM
+			if (KeybEnabled)
+				resp = 2;
+			else
+				resp = 1;
+			break;
+		  case 4:	// IRM
+			if (InsertMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 12:	// SRM
+			if (ts.LocalEcho)
+				resp = 2;
+			else
+				resp = 1;
+			break;
+		  case 20:	// LNM
+			if (LFMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 33:	// WYSTCURM
+			if (ts.NonblinkingCursor)
+				resp = 1;
+			else
+				resp = 2;
+			if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
+				resp += 2;
+			break;
+		  case 34:	// WYULCURM
+			if (ts.CursorShape == IdHCur)
+				resp = 1;
+			else
+				resp = 2;
+			if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
+				resp += 2;
+			break;
+		}
+		break;
+
+	  case '?': /* DEC Mode */
+		pp = "?";
+		switch (Param[1]) {
+		  case 1:	// DECCKM
+			if (AppliCursorMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 3:	// DECCOLM
+			if (NumOfColumns == 132)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 5:	// DECSCNM
+			if (ts.ColorFlag & CF_REVERSEVIDEO)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 6:	// DECOM
+			if (RelativeOrgMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 7:	// DECAWM
+			if (AutoWrapMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 8:	// DECARM
+			if (AutoRepeatMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 9:	// XT_MSE_X10 -- X10 Mouse Tracking
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportMode == IdMouseTrackX10)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 12:	// XT_CBLINK -- att610 cursor blinking
+			if (ts.NonblinkingCursor)
+				resp = 2;
+			else
+				resp = 1;
+			if ((ts.WindowFlag & WF_CURSORCHANGE) == 0)
+				resp += 2;
+			break;
+		  case 19:	// DECPEX
+			if (PrintEX)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 25:	// DECTCEM
+			if (IsCaretEnabled())
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 38:	// DECTEK
+			resp = 4;
+			break;
+		  case 47:	// XT_ALTSCRN -- Alternate Screen / (DECGRPM)
+			if ((ts.TermFlag & TF_ALTSCR) == 0)
+				resp = 4;
+			else if (AltScr)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 59:	// DECKKDM
+			if (ts.Language!=IdJapanese)
+				resp = 0;
+			else if ((ts.KanjiCode == IdJIS) && (!ts.JIS7Katakana))
+				resp = 4;
+			else
+				resp = 3;
+			break;
+		  case 66:	// DECNKM
+			if (AppliKeyMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 67:	// DECBKM
+			if (ts.BSKey==IdBS)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case	1000:	// XT_MSE_X11
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportMode == IdMouseTrackVT200)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1001:	// XT_MSE_HL
+#if 0
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportMode == IdMouseTrackVT200Hl)
+				resp = 1;
+			else
+				resp = 2;
+#else
+			resp = 4;
+#endif
+			break;
+		  case 1002:	// XT_MSE_BTN
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportMode == IdMouseTrackBtnEvent)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1003:	// XT_MSE_ANY
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportMode == IdMouseTrackAllEvent)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1004:	// XT_MSE_WIN
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (FocusReportMode)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1005:	// XT_MSE_UTF
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportExtMode == IdMouseTrackExtUTF8)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1006:	// XT_MSE_SGR
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportExtMode == IdMouseTrackExtSGR)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1015:	// urxvt-style extended mouse tracking
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportExtMode == IdMouseTrackExtURXVT)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1047:	// XT_ALTS_47
+			if ((ts.TermFlag & TF_ALTSCR) == 0)
+				resp = 4;
+			else if (AltScr)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 1048:
+			if ((ts.TermFlag & TF_ALTSCR) == 0)
+				resp = 4;
+			else
+				resp = 1;
+			break;
+		  case 1049:	// XT_EXTSCRN
+			if ((ts.TermFlag & TF_ALTSCR) == 0)
+				resp = 4;
+			else if (AltScr)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 2004:	// RL_BRACKET
+			if (BracketedPaste)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 7727:	// MinTTY Application Escape Mode
+			if (AppliEscapeMode == 1)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 7786:	// MinTTY Mousewheel reporting
+			if (!ts.TranslateWheelToCursor)
+				resp = 4;
+			else if (AcceptWheelToCursor)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 8200:	// ClearThenHome
+			if (ClearThenHome)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 14001:	// NetTerm Mouse Reporting (TT)
+			if (!ts.MouseEventTracking)
+				resp = 4;
+			else if (MouseReportMode == IdMouseTrackNetTerm)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 14002:	// test Application Escape Mode 2
+		  case 14003:	// test Application Escape Mode 3
+		  case 14004:	// test Application Escape Mode 4
+			if (AppliEscapeMode == Param[1] - 14000)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		}
+		break;
+	}
+
+	len = _snprintf_s(buff, sizeof(buff), _TRUNCATE, "%s%d;%d$y", pp, Param[1], resp);
+	SendCSIstr(buff, len);
+}
+
+void CSDol(BYTE b)
+{
+	TCharAttr attr, mask;
+	attr = DefCharAttr;
+	mask = DefCharAttr;
+
+	switch (b) {
+	  case 'p': // DECRQM
+		CSDolRequestMode();
+		break;
+	  case 'r': // DECCARA
+	  case 't': // DECRARA
+		if (Param[1] < 1 || NParam < 1) Param[1] = 1;
+		if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+		if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
+		if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
+		if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
+			if (RelativeOrgMode) {
+				Param[1] += CursorTop;
+				if (Param[1] > CursorBottom) {
+					Param[1] = CursorBottom + 1;
+				}
+				Param[3] += CursorTop;
+				if (Param[3] > CursorBottom) {
+					Param[3] = CursorBottom + 1;
+				}
+			}
+		}
+		ParseSGRParams(&attr, &mask, 5);
+		if (b == 'r') { // DECCARA
+			attr.Attr &= AttrSgrMask;
+			mask.Attr &= AttrSgrMask;
+			attr.Attr2 &= Attr2ColorMask;
+			mask.Attr2 &= Attr2ColorMask;
+			BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
+		}
+		else { // DECRARA
+			attr.Attr &= AttrSgrMask;
+			BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
+		}
+		break;
+	  case 'v': // DECCRA
+		if (Param[1] < 1 || NParam < 1) Param[1] = 1;
+		if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+		if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
+		if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
+		if (Param[5] < 1 || NParam < 5) Param[5] = 1;
+		if (Param[6] < 1 || NParam < 6) Param[6] = 1;
+		if (Param[7] < 1 || NParam < 7) Param[7] = 1;
+		if (Param[8] < 1 || NParam < 8) Param[8] = 1;
+		if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
+			if (RelativeOrgMode) {
+				Param[1] += CursorTop;
+				if (Param[1] > CursorBottom) {
+					Param[1] = CursorBottom + 1;
+				}
+				Param[3] += CursorTop;
+				if (Param[3] > CursorBottom) {
+					Param[3] = CursorBottom + 1;
+				}
+				Param[6] += CursorTop;
+				if (Param[6] > CursorBottom) {
+					Param[6] = CursorBottom + 1;
+				}
+				if (Param[6] + Param[3] - Param[1] > CursorBottom) {
+					Param[3] = Param[1] + CursorBottom - Param[6] + 1;
+				}
+			}
+			BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
+		}
+		break;
+	  case 'x': // DECFRA
+		if (NParam < 1 || Param[1] < 32 || (Param[1] > 127 && Param[1] < 160) || Param[1] > 255) {
+			return;
+		}
+		if (Param[2] < 1 || NParam < 2) Param[2] = 1;
+		if (Param[3] < 1 || NParam < 3) Param[3] = 1;
+		if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
+		if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
+		if (Param[2] > Param[4] || Param[3] > Param[5]) {
+			return;
+		}
+		if (RelativeOrgMode) {
+			Param[2] += CursorTop;
+			if (Param[2] > CursorBottom) {
+				Param[2] = CursorBottom + 1;
+			}
+			Param[4] += CursorTop;
+			if (Param[4] > CursorBottom) {
+				Param[4] = CursorBottom + 1;
+			}
+		}
+		BuffFillBox(Param[1], Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
+		break;
+
+	  case 'z': // DECERA
+	  case '{': // DECSERA
+		if (Param[1] < 1 || NParam < 1) Param[1]=1;
+		if (Param[2] < 1 || NParam < 2) Param[2]=1;
+		if (Param[3] < 1 || NParam < 3) Param[3]=NumOfLines-StatusLine;
+		if (Param[4] < 1 || NParam < 4) Param[4]=NumOfColumns;
+		if (RelativeOrgMode) {
+			Param[1] += CursorTop;
+			if (Param[1] > CursorBottom) {
+				Param[1] = CursorBottom + 1;
+			}
+			Param[3] += CursorTop;
+			if (Param[3] > CursorBottom) {
+				Param[3] = CursorBottom + 1;
+			}
+		}
+		if (b == 'z') {
+			BuffEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
+		}
+		else {
+			BuffSelectiveEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
+		}
+		break;
+
+	  case '}': // DECSASD
+		if ((ts.TermFlag & TF_ENABLESLINE)==0)
+			return;
+		if (StatusLine==0)
+			return;
+		if ((Param[1]<1) && (CursorY==NumOfLines-1))
+			MoveToMainScreen();
+		else if ((Param[1]==1) && (CursorY<NumOfLines-1))
+			MoveToStatusLine();
+		break;
+	  case '~': // DECSSDT
+		if ((ts.TermFlag & TF_ENABLESLINE)==0)
+			return;
+		if (Param[1]<=1)
+			HideStatusLine();
+		else if ((StatusLine==0) && (Param[1]==2))
+			ShowStatusLine(1); // show
+		break;
+	}
+}
+
+void CSQDol(BYTE b)
+{
+	switch (b) {
+	  case 'p':
+		CSDolRequestMode();
+		break;
+	}
+}
+
+void CSQuote(BYTE b)
+{
+	int i, x, y;
+	switch (b) {
+	  case 'w': // Enable Filter Rectangle (DECEFR)
+		if (MouseReportMode == IdMouseTrackDECELR) {
+			if (DecLocatorFlag & DecLocatorPixel) {
+				x = LastX + 1;
+				y = LastY + 1;
+			}
+			else {
+				DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+				x++;
+				y++;
+			}
+			FilterTop    = (NParam<1 || Param[1]<1)? y : Param[1];
+			FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
+			FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
+			FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
+			if (FilterTop > FilterBottom) {
+				i = FilterTop; FilterTop = FilterBottom; FilterBottom = i;
+			}
+			if (FilterLeft > FilterRight) {
+				i = FilterLeft; FilterLeft = FilterRight; FilterRight = i;
+			}
+			DecLocatorFlag |= DecLocatorFiltered;
+			DecLocatorReport(IdMouseEventMove, 0);
+		}
+		break;
+
+	  case 'z': // Enable DEC Locator reporting (DECELR)
+		switch (Param[1]) {
+		  case 0:
+			if (MouseReportMode == IdMouseTrackDECELR) {
+				MouseReportMode = IdMouseTrackNone;
+			}
+			break;
+		  case 1:
+			if (ts.MouseEventTracking) {
+				MouseReportMode = IdMouseTrackDECELR;
+				DecLocatorFlag &= ~DecLocatorOneShot;
+			}
+			break;
+		  case 2:
+			if (ts.MouseEventTracking) {
+				MouseReportMode = IdMouseTrackDECELR;
+				DecLocatorFlag |= DecLocatorOneShot;
+			}
+			break;
+		}
+		if (NParam > 1 && Param[2] == 1) {
+			DecLocatorFlag |= DecLocatorPixel;
+		}
+		else {
+			DecLocatorFlag &= ~DecLocatorPixel;
+		}
+		break;
+
+	  case '{': // Select Locator Events (DECSLE)
+		for (i=1; i<=NParam; i++) {
+			switch (Param[i]) {
+			  case 0:
+				DecLocatorFlag &= ~(DecLocatorButtonUp | DecLocatorButtonDown | DecLocatorFiltered);
+				break;
+			  case 1:
+				DecLocatorFlag |= DecLocatorButtonDown;
+				break;
+			  case 2:
+				DecLocatorFlag &= ~DecLocatorButtonDown;
+				break;
+			  case 3:
+				DecLocatorFlag |= DecLocatorButtonUp;
+				break;
+			  case 4:
+				DecLocatorFlag &= ~DecLocatorButtonUp;
+				break;
+			}
+		}
+		break;
+
+	  case '|': // Request Locator Position (DECRQLP)
+		DecLocatorReport(IdMouseEventCurStat, 0);
+		break;
+	}
+}
+
+void CSSpace(BYTE b) {
+	switch (b) {
+	  case 'q': // DECSCUSR
+		if (ts.WindowFlag & WF_CURSORCHANGE) {
+			if (NParam > 0) {
+				switch (Param[1]) {
+				  case 0:
+				  case 1:
+					ts.CursorShape = IdBlkCur;
+					ts.NonblinkingCursor = FALSE;
+					break;
+				  case 2:
+					ts.CursorShape = IdBlkCur;
+					ts.NonblinkingCursor = TRUE;
+					break;
+				  case 3:
+					ts.CursorShape = IdHCur;
+					ts.NonblinkingCursor = FALSE;
+					break;
+				  case 4:
+					ts.CursorShape = IdHCur;
+					ts.NonblinkingCursor = TRUE;
+					break;
+				  case 5:
+					ts.CursorShape = IdVCur;
+					ts.NonblinkingCursor = FALSE;
+					break;
+				  case 6:
+					ts.CursorShape = IdVCur;
+					ts.NonblinkingCursor = TRUE;
+					break;
+				  default:
+					return;
+				}
+				ChangeCaret();
+			}
+		}
+		break;
+	}
+}
 
 void PrnParseCS(BYTE b) // printer mode
 {
-  ParseMode = ModeFirst;
-  switch (ICount) {
-    /* no intermediate char */
-    case 0:
-      switch (Prv) {
-	/* no private parameter */
-	case 0:
-	  switch (b) {
-	    case 'i':
-	      if (Param[1]==4)
-	      {
-		PrinterMode = FALSE;
-		// clear prn buff
-		WriteToPrnFile(0,FALSE);
-		if (! AutoPrintMode)
-		  ClosePrnFile();
-		return;
-	      }
-	      break;
-	  } /* of case Prv=0 */
-	  break;
-      }
-      break;
-    /* one intermediate char */
-    case 1: break;
-  } /* of case Icount */
+	ParseMode = ModeFirst;
+	switch (ICount) {
+	  /* no intermediate char */
+	  case 0:
+		switch (Prv) {
+		/* no private parameter */
+		  case 0:
+			switch (b) {
+			  case 'i':
+				if (Param[1]==4) {
+					PrinterMode = FALSE;
+					// clear prn buff
+					WriteToPrnFile(0,FALSE);
+					if (! AutoPrintMode)
+						ClosePrnFile();
+					return;
+				}
+				break;
+			} /* of case Prv=0 */
+			break;
+		}
+		break;
+	  /* one intermediate char */
+	  case 1: break;
+	} /* of case Icount */
 
-  WriteToPrnFile(b,TRUE);
+	WriteToPrnFile(b,TRUE);
 }
 
 void ParseCS(BYTE b) /* b is the final char */
@@ -3805,20 +3813,20 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 	int tmp = 0;
 
 	switch (StrBuff[0]) {
-	case ' ':
+	  case ' ':
 		switch (StrBuff[1]) {
-		case 'q': // DECSCUSR
+		  case 'q': // DECSCUSR
 			switch (ts.CursorShape) {
-			case IdBlkCur:
+			  case IdBlkCur:
 				tmp = 1;
 				break;
-			case IdHCur:
+			  case IdHCur:
 				tmp = 3;
 				break;
-			case IdVCur:
+			  case IdVCur:
 				tmp = 5;
 				break;
-			default:
+			  default:
 				tmp = 1;
 			}
 			if (ts.NonblinkingCursor) {
@@ -3827,9 +3835,9 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d q", CLocale, tmp);
 		}
 		break;
-	case '"':
+	  case '"':
 		switch (StrBuff[1]) {
-		case 'p': // DECSCL
+		  case 'p': // DECSCL
 			if (VTlevel > 1 && Send8BitMode) {
 				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r6%d;0\"p", CLocale, VTlevel);
 			}
@@ -3838,7 +3846,7 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			}
 			break;
 
-		case 'q': // DECSCA
+		  case 'q': // DECSCA
 			if (CharAttr.Attr2 & Attr2Protect) {
 				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r1\"q", CLocale);
 			}
@@ -3848,7 +3856,7 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			break;
 		}
 		break;
-	case 'm':	// SGR
+	  case 'm':	// SGR
 		if (StrBuff[1] == 0) {
 			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r0", CLocale);
 			if (CharAttr.Attr & AttrBold) {
@@ -3914,12 +3922,12 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			RepStr[len] = 0;
 		}
 		break;
-	case 'r':	// DECSTBM
+	  case 'r':	// DECSTBM
 		if (StrBuff[1] == 0) {
 			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%dr", CLocale, CursorTop+1, CursorBottom+1);
 		}
 		break;
-	case 's':	// DECSLRM
+	  case 's':	// DECSLRM
 		if (StrBuff[1] == 0) {
 			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%ds", CLocale, CursorLeftM+1, CursorRightM+1);
 		}
@@ -4090,11 +4098,11 @@ void RequestTermcapString(unsigned char *StrBuff, int StrLen)	// xterm experimen
 
 void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
 	switch (ICount) {
-	case 0:
+	  case 0:
 		break;
-	case 1:
+	  case 1:
 		switch (IntChar[1]) {
-		case '!':
+		  case '!':
 			if (Cmd == '{') { // DECSTUI
 				if (! (ts.TermFlag & TF_LOCKTUID)) {
 					int i;
@@ -4109,21 +4117,21 @@ void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
 				}
 			}
 			break;
-		case '$':
+		  case '$':
 			if (Cmd == 'q')  { // DECRQSS
 				RequestStatusString(StrBuff, len);
 			}
 			break;
-		case '+':
+		  case '+':
 			if (Cmd == 'q') { // Request termcap/terminfo string (xterm)
 				RequestTermcapString(StrBuff, len);
 			}
 			break;
-		default:
+		  default:
 			break;
 		}
 		break;
-	default:
+	  default:
 		break;
 	}
 }
@@ -4163,7 +4171,7 @@ void DeviceControl(BYTE b)
 	utf8_stat = CheckUTF8Seq(b, utf8_stat);
 
 	switch (DcsParseMode) {
-	case ModeDcsFirst:
+	  case ModeDcsFirst:
 		if (b<=US) {
 			ParseControl(b);
 		}
@@ -4199,7 +4207,7 @@ void DeviceControl(BYTE b)
 		}
 		break;
 
-	case ModeDcsString:
+	  case ModeDcsString:
 		if (b <= US && b != HT && b != CR) {
 			ESCFlag = FALSE;
 			ParseMode = ModeFirst;
@@ -4353,64 +4361,64 @@ unsigned int XtColor2TTColor(int mode, unsigned int xt_color) {
 	unsigned int colornum = CS_UNSPEC;
 
 	switch ((mode>=100) ? mode-100 : mode) {
-	case 4:
+	  case 4:
 		switch (xt_color) {
-		case 256:
+		  case 256:
 			colornum = CS_VT_BOLDFG;
 			break;
-		case 257:
+		  case 257:
 			// Underline -- not supported.
 			// colornum = CS_VT_UNDERFG;
 			break;
-		case 258:
+		  case 258:
 			colornum = CS_VT_BLINKFG;
 			break;
-		case 259:
+		  case 259:
 			colornum = CS_VT_REVERSEBG;
 			break;
-		case CS_UNSPEC:
+		  case CS_UNSPEC:
 			if (mode == 104) {
 				colornum = CS_ANSICOLOR_ALL;
 			}
 			break;
-		default:
+		  default:
 			if (xt_color <= 255) {
 				colornum = xt_color;
 			}
 		}
 		break;
-	case 5:
+	  case 5:
 		switch (xt_color) {
-		case 0:
+		  case 0:
 			colornum = CS_VT_BOLDFG;
 			break;
-		case 1:
+		  case 1:
 			// Underline -- not supported.
 			// colornum = CS_VT_UNDERFG;
 			break;
-		case 2:
+		  case 2:
 			colornum = CS_VT_BLINKFG;
 			break;
-		case 3:
+		  case 3:
 			colornum = CS_VT_REVERSEBG;
 			break;
-		case CS_UNSPEC:
+		  case CS_UNSPEC:
 			if (mode == 105) {
 				colornum = CS_SP_ALL;
 			}
 			break;
 		}
 		break;
-	case 10:
+	  case 10:
 		colornum = CS_VT_NORMALFG;
 		break;
-	case 11:
+	  case 11:
 		colornum = CS_VT_NORMALBG;
 		break;
-	case 15:
+	  case 15:
 		colornum = CS_TEK_FG;
 		break;
-	case 16:
+	  case 16:
 		colornum = CS_TEK_BG;
 		break;
 	}
@@ -4555,9 +4563,9 @@ void XSequence(BYTE b)
 			}
 		}
 		switch (Param[1]) {
-		case 0: /* Change window title and icon name */
-		case 1: /* Change icon name */
-		case 2: /* Change window title */
+		  case 0: /* Change window title and icon name */
+		  case 1: /* Change icon name */
+		  case 2: /* Change window title */
 			if (StrBuff && ts.AcceptTitleChangeRequest) {
 				strncpy_s(cv.TitleRemote, sizeof(cv.TitleRemote), StrBuff, _TRUNCATE);
 				// (2006.6.15 maya) タイトルに渡す文字列をSJISに変換
@@ -4565,8 +4573,8 @@ void XSequence(BYTE b)
 				ChangeTitle();
 			}
 			break;
-		case 4: /* Change/Query color palette */
-		case 5: /* Change/Query special color */
+		  case 4: /* Change/Query color palette */
+		  case 5: /* Change/Query special color */
 			if (StrBuff) {
 				color_num = 0;
 				color_spec = NULL;
@@ -4596,16 +4604,16 @@ void XSequence(BYTE b)
 				}
 			}
 			break;
-		case 10: /* Change/Query VT-Window foreground color */
-		case 11: /* Change/Query VT-Window background color */
-		case 12: /* Change/Query VT-Window cursor color */
-		case 13: /* Change/Query mouse cursor foreground color */
-		case 14: /* Change/Query mouse cursor background color */
-		case 15: /* Change/Query Tek-Window foreground color */
-		case 16: /* Change/Query Tek-Window foreground color */
-		case 17: /* Change/Query highlight background color */
-		case 18: /* Change/Query Tek-Window cursor color */
-		case 19: /* Change/Query highlight foreground color */
+		  case 10: /* Change/Query VT-Window foreground color */
+		  case 11: /* Change/Query VT-Window background color */
+		  case 12: /* Change/Query VT-Window cursor color */
+		  case 13: /* Change/Query mouse cursor foreground color */
+		  case 14: /* Change/Query mouse cursor background color */
+		  case 15: /* Change/Query Tek-Window foreground color */
+		  case 16: /* Change/Query Tek-Window foreground color */
+		  case 17: /* Change/Query highlight background color */
+		  case 18: /* Change/Query Tek-Window cursor color */
+		  case 19: /* Change/Query highlight foreground color */
 			if (StrBuff) {
 				color_num = Param[1];
 				color_spec = StrBuff;
@@ -4620,13 +4628,13 @@ void XSequence(BYTE b)
 				XsProcColor(color_num, 0, color_spec, TermChar);
 			}
 			break;
-		case 52: /* Manipulate Clipboard data */
+		  case 52: /* Manipulate Clipboard data */
 			if (StrBuff) {
 				XsProcClipboard(StrBuff);
 			}
 			break;
-		case 104: /* Reset color palette */
-		case 105: /* Reset special color */
+		  case 104: /* Reset color palette */
+		  case 105: /* Reset special color */
 			if (HasParamStr) {
 				if (StrBuff) {
 					color_num = 0;
@@ -4651,16 +4659,16 @@ void XSequence(BYTE b)
 				DispResetColor(XtColor2TTColor(Param[1], CS_UNSPEC));
 			}
 			break;
-		case 110: /* Reset VT-Window foreground color */
-		case 111: /* Reset VT-Window background color */
-		case 112: /* Reset VT-Window cursor color */
-		case 113: /* Reset mouse cursor foreground color */
-		case 114: /* Reset mouse cursor background color */
-		case 115: /* Reset Tek-Window foreground color */
-		case 116: /* Reset Tek-Window foreground color */
-		case 117: /* Reset highlight background color */
-		case 118: /* Reset Tek-Window cursor color */
-		case 119: /* Reset highlight foreground color */
+		  case 110: /* Reset VT-Window foreground color */
+		  case 111: /* Reset VT-Window background color */
+		  case 112: /* Reset VT-Window cursor color */
+		  case 113: /* Reset mouse cursor foreground color */
+		  case 114: /* Reset mouse cursor background color */
+		  case 115: /* Reset Tek-Window foreground color */
+		  case 116: /* Reset Tek-Window foreground color */
+		  case 117: /* Reset highlight background color */
+		  case 118: /* Reset Tek-Window cursor color */
+		  case 119: /* Reset highlight foreground color */
 			DispResetColor(XtColor2TTColor(Param[1], CS_UNSPEC));
 			if (HasParamStr && StrBuff) {
 				color_num = 0;
