@@ -1068,6 +1068,9 @@ void BuffFillBox(char ch, int XStart, int YStart, int XEnd, int YEnd)
 	BuffUpdateRect(XStart, YStart, XEnd, YEnd);
 }
 
+//
+// TODO: 1 origin ‚É‚È‚Á‚Ä‚é‚Ì‚ð 0 origin ‚É’¼‚·
+//
 void BuffCopyBox(
 	int SrcXStart, int SrcYStart, int SrcXEnd, int SrcYEnd, int SrcPage,
 	int DstX, int DstY, int DstPage)

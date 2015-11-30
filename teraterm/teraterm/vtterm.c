@@ -1440,6 +1440,7 @@ void EscapeSequence(BYTE b)
 	if (b<=US)
 		ParseControl(b);
 	else if ((b>=0x20) && (b<=0x2F)) {
+		// TODO: ICount が IntCharMax に達した時、最後の IntChar を置き換えるのは妥当?
 		if (ICount<IntCharMax)
 			ICount++;
 		IntChar[ICount] = b;
@@ -1456,23 +1457,42 @@ void EscapeSequence(BYTE b)
 	JustAfterESC = FALSE;
 }
 
+#define CheckParamVal(p,m) \
+	if ((p) == 0) { \
+		(p) = 1; \
+	} \
+	else if ((p) > (m) || p < 0) { \
+		(p) = (m); \
+	}
+
+#define CheckParamValMax(p,m) \
+	if ((p) > (m) || p <= 0) { \
+		(p) = (m); \
+	}
+
+#define RequiredParams(n) \
+	if ((n) > 1) { \
+		while (NParam < n) { \
+			NParam++; \
+			Param[NParam] = 0; \
+			NSParam[NParam] = 0; \
+		} \
+	}
+
 void CSInsertCharacter()		// ICH
 {
 	// Insert space characters at cursor
-	int Count;
+	CheckParamVal(Param[1], NumOfColumns);
 
 	BuffUpdateScroll();
-	if (Param[1]<1) Param[1] = 1;
-	Count = Param[1];
-	BuffInsertSpace(Count);
+	BuffInsertSpace(Param[1]);
 }
 
 void CSCursorUp(BOOL AffectMargin)	// CUU / VPB
 {
 	int topMargin, NewY;
 
-	if (Param[1]<1)
-		Param[1] = 1;
+	CheckParamVal(Param[1], CursorY);
 
 	if (AffectMargin && CursorY >= CursorTop)
 		topMargin = CursorTop;
@@ -1496,13 +1516,12 @@ void CSCursorDown(BOOL AffectMargin)	// CUD / VPR
 {
 	int bottomMargin, NewY;
 
-	if (Param[1]<1)
-		Param[1] = 1;
-
 	if (AffectMargin && CursorY <= CursorBottom)
 		bottomMargin = CursorBottom;
 	else
 		bottomMargin = NumOfLines-StatusLine-1;
+
+	CheckParamVal(Param[1], bottomMargin);
 
 	NewY = CursorY + Param[1];
 	if (NewY > bottomMargin)
@@ -1585,18 +1604,18 @@ void CSInsertLine()
 	// Insert lines at current position
 	int Count, YEnd;
 
-	if (CursorY < CursorTop)
+	if (CursorY < CursorTop || CursorY > CursorBottom) {
 		return;
-	if (CursorY > CursorBottom)
-		return;
-	if (Param[1]<1)
-		Param[1] = 1;
+	}
+
+	CheckParamVal(Param[1], NumOfLines);
 
 	Count = Param[1];
 
 	YEnd = CursorBottom;
 	if (CursorY > YEnd)
 		YEnd = NumOfLines-1-StatusLine;
+
 	if (Count > YEnd+1 - CursorY)
 		Count = YEnd+1 - CursorY;
 
@@ -1644,69 +1663,72 @@ void CSDeleteNLines()
 {
 	int Count, YEnd;
 
-	if (CursorY < CursorTop)
+	if (CursorY < CursorTop || CursorY > CursorBottom) {
 		return;
-	if (CursorY > CursorBottom)
-		return;
+	}
+
+	CheckParamVal(Param[1], NumOfLines);
 	Count = Param[1];
-	if (Count<1) Count = 1;
 
 	YEnd = CursorBottom;
 	if (CursorY > YEnd)
 		YEnd = NumOfLines-1-StatusLine;
+
 	if (Count > YEnd+1-CursorY)
 		Count = YEnd+1-CursorY;
+
 	BuffDeleteLines(Count,YEnd);
 }
 
 void CSDeleteCharacter()	// DCH
 {
 // Delete characters in current line from cursor
+	CheckParamVal(Param[1], NumOfColumns);
 
-	if (Param[1]<1) Param[1] = 1;
 	BuffUpdateScroll();
 	BuffDeleteChars(Param[1]);
 }
 
 void CSEraseCharacter()		// ECH
 {
-	if (Param[1]<1) Param[1] = 1;
+	CheckParamVal(Param[1], NumOfColumns);
+
 	BuffUpdateScroll();
 	BuffEraseChars(Param[1]);
 }
 
 void CSScrollUp()
 {
-	if (Param[1]<1) Param[1] = 1;
+	// TODO: スクロールの最大値を端末行数に制限すべきか要検討
+	CheckParamVal(Param[1], INT_MAX);
+
 	BuffUpdateScroll();
 	BuffRegionScrollUpNLines(Param[1]);
 }
 
 void CSScrollDown()
 {
-	if (Param[1]<1) Param[1] = 1;
+	CheckParamVal(Param[1], NumOfLines);
+
 	BuffUpdateScroll();
 	BuffRegionScrollDownNLines(Param[1]);
 }
 
 void CSForwardTab()
 {
-	if (Param[1]<1) Param[1] = 1;
+	CheckParamVal(Param[1], NumOfColumns);
 	CursorForwardTab(Param[1], AutoWrapMode);
 }
 
 void CSBackwardTab()
 {
-	if (Param[1]<1) Param[1] = 1;
+	CheckParamVal(Param[1], NumOfColumns);
 	CursorBackwardTab(Param[1]);
 }
 
 void CSMoveToColumnN()		// CHA / HPA
 {
-	if (Param[1]<1)
-		Param[1] = 1;
-	else if (Param[1] > NumOfColumns)
-		Param[1] = NumOfColumns;
+	CheckParamVal(Param[1], NumOfColumns);
 
 	Param[1]--;
 
@@ -1725,13 +1747,14 @@ void CSCursorRight(BOOL AffectMargin)	// CUF / HPR
 {
 	int NewX, rightMargin;
 
-	if (Param[1] < 1)
-		Param[1] = 1;
+	CheckParamVal(Param[1], NumOfColumns);
 
-	if (AffectMargin && CursorX <= CursorRightM)
+	if (AffectMargin && CursorX <= CursorRightM) {
 		rightMargin = CursorRightM;
-	else
+	}
+	else {
 		rightMargin = NumOfColumns-1;
+	}
 
 	NewX = CursorX + Param[1];
 	if (NewX > rightMargin)
@@ -1744,24 +1767,27 @@ void CSCursorLeft(BOOL AffectMargin)	// CUB / HPB
 {
 	int NewX, leftMargin;
 
-	if (Param[1] < 1)
-		Param[1] = 1;
+	CheckParamVal(Param[1], NumOfColumns);
 
-	if (AffectMargin && CursorX >= CursorLeftM)
+	if (AffectMargin && CursorX >= CursorLeftM) {
 		leftMargin = CursorLeftM;
-	else
+	}
+	else {
 		leftMargin = 0;
+	}
 
 	NewX = CursorX  - Param[1];
-	if (NewX < leftMargin)
+	if (NewX < leftMargin) {
 		NewX = leftMargin;
+	}
 
 	MoveCursor(NewX, CursorY);
 }
 
-void CSMoveToLineN()			// VPA
+void CSMoveToLineN()		// VPA
 {
-	if (Param[1]<1) Param[1] = 1;
+	CheckParamVal(Param[1], NumOfLines-StatusLine);
+
 	if (RelativeOrgMode) {
 		if (CursorTop+Param[1]-1 > CursorBottom)
 			MoveCursor(CursorX,CursorBottom);
@@ -1780,15 +1806,9 @@ void CSMoveToXY()		// CUP / HVP
 {
 	int NewX, NewY;
 
-	if (Param[1] < 1)
-		Param[1] = 1;
-	else if (Param[1] > NumOfLines-StatusLine)
-		Param[1] = NumOfLines-StatusLine;
-
-	if ((NParam < 2) || (Param[2]<1))
-		Param[2] = 1;
-	else if (Param[2] > NumOfColumns)
-		Param[2] = NumOfColumns;
+	RequiredParams(2);
+	CheckParamVal(Param[1], NumOfLines-StatusLine);
+	CheckParamVal(Param[2], NumOfColumns);
 
 	NewY = Param[1] - 1;
 	NewX = Param[2] - 1;
@@ -1805,7 +1825,6 @@ void CSMoveToXY()		// CUP / HVP
 			NewY = CursorBottom;
 	}
 	else {
-		NewY = Param[1] - 1;
 		if (NewY > NumOfLines-1-StatusLine)
 			NewY = NumOfLines-1-StatusLine;
 	}
@@ -2229,45 +2248,41 @@ void CSSetScrollRegion()	// DECSTBM
 		MoveCursor(0,CursorY);
 		return;
 	}
-	if (Param[1]<1) Param[1] =1;
-	if ((NParam < 2) | (Param[2]<1))
-		Param[2] = NumOfLines-StatusLine;
-	Param[1]--;
-	Param[2]--;
-	if (Param[1] > NumOfLines-1-StatusLine)
-		Param[1] = NumOfLines-1-StatusLine;
-	if (Param[2] > NumOfLines-1-StatusLine)
-		Param[2] = NumOfLines-1-StatusLine;
-	if (Param[1] >= Param[2]) return;
-	CursorTop = Param[1];
-	CursorBottom = Param[2];
-	if (RelativeOrgMode) MoveCursor(0,CursorTop);
-	                else MoveCursor(0,0);
+
+	RequiredParams(2);
+	CheckParamVal(Param[1], NumOfLines-StatusLine);
+	CheckParamValMax(Param[2], NumOfLines-StatusLine);
+
+	if (Param[1] >= Param[2])
+		return;
+
+	CursorTop = Param[1] - 1;
+	CursorBottom = Param[2] - 1;
+
+	if (RelativeOrgMode)
+		// TODO: 左マージンを無視してる。要実機確認。
+		MoveCursor(0, CursorTop);
+	else
+		MoveCursor(0, 0);
 }
 
 void CSSetLRScrollRegion()	// DECSLRM
 {
+//	TODO: ステータスライン上での挙動確認。
 //	if (isCursorOnStatusLine) {
 //		MoveCursor(0,CursorY);
 //		return;
 //	}
 
-	if (Param[1] < 1)
-		Param[1] =1;
-	else if (Param[1] > NumOfColumns)
-		Param[1] = NumOfColumns;
-
-	if (NParam < 2 || Param[2] < 1 || Param[2] > NumOfColumns)
-		Param[2] = NumOfColumns;
+	RequiredParams(2);
+	CheckParamVal(Param[1], NumOfColumns);
+	CheckParamValMax(Param[2], NumOfColumns);
 
 	if (Param[1] >= Param[2])
 		return;
 
-	Param[1]--;
-	Param[2]--;
-
-	CursorLeftM = Param[1];
-	CursorRightM = Param[2];
+	CursorLeftM = Param[1] - 1;
+	CursorRightM = Param[2] - 1;
 
 	if (RelativeOrgMode)
 		MoveCursor(CursorLeftM, CursorTop);
@@ -2286,46 +2301,54 @@ void CSSunSequence() /* Sun terminal private sequences */
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
 			DispShowWindow(WINDOW_RESTORE);
 		break;
+
 	  case 2: // Iconify window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
 			DispShowWindow(WINDOW_MINIMIZE);
 		break;
+
 	  case 3: // set window position
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
-			if (NParam < 2) Param[2] = 0;
-			if (NParam < 3) Param[3] = 0;
+			RequiredParams(3);
 			DispMoveWindow(Param[2], Param[3]);
 		}
 		break;
+
 	  case 4: // set window size
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
-			if (NParam < 2) Param[2] = 0;
-			if (NParam < 3) Param[3] = 0;
+			RequiredParams(3);
 			DispResizeWin(Param[3], Param[2]);
 		}
 		break;
+
 	  case 5: // Raise window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
 			DispShowWindow(WINDOW_RAISE);
 		break;
+
 	  case 6: // Lower window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
 			DispShowWindow(WINDOW_LOWER);
 		break;
+
 	  case 7: // Refresh window
 		if (ts.WindowFlag & WF_WINDOWCHANGE)
 			DispShowWindow(WINDOW_REFRESH);
 		break;
+
 	  case 8: /* set terminal size */
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
-			if ((Param[2]<=1) || (NParam<2)) Param[2] = 24;
-			if ((Param[3]<=1) || (NParam<3)) Param[3] = 80;
-			ChangeTerminalSize(Param[3],Param[2]);
+			RequiredParams(3);
+			if (Param[2] <= 1) Param[2] = 24;
+			if (Param[3] <= 1) Param[3] = 80;
+			ChangeTerminalSize(Param[3], Param[2]);
 		}
 		break;
+
 	  case 9: // Maximize/Restore window
 		if (ts.WindowFlag & WF_WINDOWCHANGE) {
-			if (NParam < 2 || Param[2] == 0) {
+			RequiredParams(2);
+			if (Param[2] == 0) {
 				DispShowWindow(WINDOW_RESTORE);
 			}
 			else if (Param[2] == 1) {
@@ -2333,12 +2356,14 @@ void CSSunSequence() /* Sun terminal private sequences */
 			}
 		}
 		break;
+
 	  case 11: // Report window state
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
 			SendCSIstr(Report, len);
 		}
 		break;
+
 	  case 13: // Report window position
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			DispGetWindowPos(&x, &y);
@@ -2346,6 +2371,7 @@ void CSSunSequence() /* Sun terminal private sequences */
 			SendCSIstr(Report, len);
 		}
 		break;
+
 	  case 14: /* get window size */
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			DispGetWindowSize(&x, &y);
@@ -2353,6 +2379,7 @@ void CSSunSequence() /* Sun terminal private sequences */
 			SendCSIstr(Report, len);
 		}
 		break;
+
 	  case 18: /* get terminal size */
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%ut", CLocale,
@@ -2360,6 +2387,7 @@ void CSSunSequence() /* Sun terminal private sequences */
 			SendCSIstr(Report, len);
 		}
 		break;
+
 	  case 19: // Report display size (character)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			DispGetRootWinSize(&x, &y);
@@ -2367,22 +2395,27 @@ void CSSunSequence() /* Sun terminal private sequences */
 			SendCSIstr(Report, len);
 		}
 		break;
+
 	  case 20: // Report icon label
 		switch (ts.WindowFlag & WF_TITLEREPORT) {
 		  case IdTitleReportIgnore:
 			// nothing to do
 			break;
+
 		  case IdTitleReportAccept:
 			switch (ts.AcceptTitleChangeRequest) {
 			  case IdTitleChangeRequestOff:
 				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
 				break;
+
 			  case IdTitleChangeRequestAhead:
 				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, cv.TitleRemote, ts.Title);
 				break;
+
 			  case IdTitleChangeRequestLast:
 				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s %s", CLocale, ts.Title, cv.TitleRemote);
 				break;
+
 			  default:
 				if (cv.TitleRemote[0] == 0) {
 					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "L%s", CLocale, ts.Title);
@@ -2393,27 +2426,33 @@ void CSSunSequence() /* Sun terminal private sequences */
 			}
 			SendOSCstr(Report, len, ST);
 			break;
+
 		  default: // IdTitleReportEmpty:
 			SendOSCstr("L", 0, ST);
 			break;
 		}
 		break;
+
 	  case 21: // Report window title
 		switch (ts.WindowFlag & WF_TITLEREPORT) {
 		  case IdTitleReportIgnore:
 			// nothing to do
 			break;
+
 		  case IdTitleReportAccept:
 			switch (ts.AcceptTitleChangeRequest) {
 			  case IdTitleChangeRequestOff:
 				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
 				break;
+
 			  case IdTitleChangeRequestAhead:
 				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, cv.TitleRemote, ts.Title);
 				break;
+
 			  case IdTitleChangeRequestLast:
 				len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s %s", CLocale, ts.Title, cv.TitleRemote);
 				break;
+
 			  default:
 				if (cv.TitleRemote[0] == 0) {
 					len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "l%s", CLocale, ts.Title);
@@ -2424,15 +2463,15 @@ void CSSunSequence() /* Sun terminal private sequences */
 			}
 			SendOSCstr(Report, len, ST);
 			break;
+
 		  default: // IdTitleReportEmpty:
 			SendOSCstr("l", 0, ST);
 			break;
 		}
 		break;
+
 	  case 22: // Push Title
-		if (NParam < 2) {
-			Param[2] = 0;
-		}
+		RequiredParams(2);
 		switch (Param[2]) {
 		  case 0:
 		  case 1:
@@ -2449,10 +2488,9 @@ void CSSunSequence() /* Sun terminal private sequences */
 			break;
 		}
 		break;
+
 	  case 23: // Pop Title
-		if (NParam < 2) {
-			Param[2] = 0;
-		}
+		RequiredParams(2);
 		switch (Param[2]) {
 		  case 0:
 		  case 1:
@@ -2500,7 +2538,7 @@ void CSEQ(BYTE b)
 
 	switch (b) {
 	  case 'c': /* Tertiary terminal report (Tertiary DA) */
-		if (Param[1] < 1) {
+		if (Param[1] == 0) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "!|%8s", CLocale, ts.TerminalUID);
 			SendDCSstr(Report, len);
 		}
@@ -2512,29 +2550,43 @@ void CSGT(BYTE b)
 {
 	switch (b) {
 	  case 'c': /* second terminal report (Secondary DA) */
-		if (Param[1] < 1) {
+		if (Param[1] == 0) {
 			SendCSIstr(">32;278;0c", 0); /* VT382(>32) + xterm rev 278 */
 		}
 		break;
+
 	  case 'J': // IO-8256 terminal
 		if (Param[1]==3) {
-			if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-			if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-			if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
-			if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
+			RequiredParams(5);
+			CheckParamVal(Param[2], NumOfLines-StatusLine);
+			CheckParamVal(Param[3], NumOfColumns);
+			CheckParamValMax(Param[4], NumOfLines-StatusLine);
+			CheckParamValMax(Param[5], NumOfColumns);
+
+			if (Param[2] > Param[4] || Param[3] > Param[5]) {
+				return;
+			}
+
 			BuffEraseBox(Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
 		}
 		break;
+
 	  case 'K': // IO-8256 terminal
 		switch (Param[1]) {
 		  case 3:
-			if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-			if (Param[3] < 1 || NParam < 3) Param[3] = 1;
+			RequiredParams(3);
+			CheckParamVal(Param[2], NumOfColumns);
+			CheckParamVal(Param[3], NumOfColumns);
+
+			if (Param[2] > Param[3]) {
+				return;
+			}
+
 			BuffEraseCharsInLine(Param[2]-1, Param[3]-Param[2]+1);
 			break;
+
 		  case 5:
-			if (NParam < 2) Param[2] = 0;
-			if (NParam < 3) Param[3] = 0;
+			RequiredParams(3);
 			switch (Param[2]) {
 			  case 3:
 			  case 4:
@@ -2971,23 +3023,23 @@ void CSDouble(BYTE b)
 	switch (b) {
 	  case 'p': // DECSCL
 		/* Select terminal mode (software reset) */
-		SoftReset();
-		if (NParam > 0) {
-			ChangeTerminalID();
-			if (Param[1] >= 61 && Param[1] <= 65) {
-				if (VTlevel > Param[1] - 60) {
-					VTlevel = Param[1] - 60;
-				}
-			}
-			else {
-				VTlevel = 1;
-			}
+		RequiredParams(2);
 
-			if (VTlevel < 2 || (NParam > 1 && Param[2] == 1))
-				Send8BitMode = FALSE;
-			else
-				Send8BitMode = TRUE;
+		SoftReset();
+		ChangeTerminalID();
+		if (Param[1] >= 61 && Param[1] <= 65) {
+			if (VTlevel > Param[1] - 60) {
+				VTlevel = Param[1] - 60;
+			}
 		}
+		else {
+			VTlevel = 1;
+		}
+
+		if (VTlevel < 2 || Param[2] == 1)
+			Send8BitMode = FALSE;
+		else
+			Send8BitMode = TRUE;
 		break;
 
 	  case 'q': // DECSCA
@@ -3014,9 +3066,6 @@ void CSDolRequestMode()
 	char buff[256];
 	char *pp;
 	int len, resp = 0;
-
-	if (NParam == 0)
-		Param[1] = 0;
 
 	switch (Prv) {
 	  case 0: /* ANSI Mode */
@@ -3314,24 +3363,32 @@ void CSDol(BYTE b)
 	  case 'p': // DECRQM
 		CSDolRequestMode();
 		break;
+
 	  case 'r': // DECCARA
 	  case 't': // DECRARA
-		if (Param[1] < 1 || NParam < 1) Param[1] = 1;
-		if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-		if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
-		if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
-		if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
-			if (RelativeOrgMode) {
-				Param[1] += CursorTop;
-				if (Param[1] > CursorBottom) {
-					Param[1] = CursorBottom + 1;
-				}
-				Param[3] += CursorTop;
-				if (Param[3] > CursorBottom) {
-					Param[3] = CursorBottom + 1;
-				}
-			}
+		RequiredParams(4);
+		CheckParamVal(Param[1], NumOfLines-StatusLine);
+		CheckParamVal(Param[2], NumOfColumns);
+		CheckParamValMax(Param[3], NumOfLines-StatusLine);
+		CheckParamValMax(Param[4], NumOfColumns);
+
+		if (Param[1] > Param[3] || Param[2] > Param[4]) {
+			return;
 		}
+
+		if (RelativeOrgMode) {
+			Param[1] += CursorTop;
+			if (Param[1] > CursorBottom) {
+				Param[1] = CursorBottom + 1;
+			}
+			Param[3] += CursorTop;
+			if (Param[3] > CursorBottom) {
+				Param[3] = CursorBottom + 1;
+			}
+
+			// TODO: 左右マージンのチェックを行う。
+		}
+
 		ParseSGRParams(&attr, &mask, 5);
 		if (b == 'r') { // DECCARA
 			attr.Attr &= AttrSgrMask;
@@ -3345,66 +3402,22 @@ void CSDol(BYTE b)
 			BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
 		}
 		break;
-	  case 'v': // DECCRA
-		if (Param[1] < 1 || NParam < 1) Param[1] = 1;
-		if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-		if (Param[3] < 1 || NParam < 3) Param[3] = NumOfLines-StatusLine;
-		if (Param[4] < 1 || NParam < 4) Param[4] = NumOfColumns;
-		if (Param[5] < 1 || NParam < 5) Param[5] = 1;
-		if (Param[6] < 1 || NParam < 6) Param[6] = 1;
-		if (Param[7] < 1 || NParam < 7) Param[7] = 1;
-		if (Param[8] < 1 || NParam < 8) Param[8] = 1;
-		if (Param[1] <= Param[3] && Param[2] <= Param[4]) {
-			if (RelativeOrgMode) {
-				Param[1] += CursorTop;
-				if (Param[1] > CursorBottom) {
-					Param[1] = CursorBottom + 1;
-				}
-				Param[3] += CursorTop;
-				if (Param[3] > CursorBottom) {
-					Param[3] = CursorBottom + 1;
-				}
-				Param[6] += CursorTop;
-				if (Param[6] > CursorBottom) {
-					Param[6] = CursorBottom + 1;
-				}
-				if (Param[6] + Param[3] - Param[1] > CursorBottom) {
-					Param[3] = Param[1] + CursorBottom - Param[6] + 1;
-				}
-			}
-			BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
-		}
-		break;
-	  case 'x': // DECFRA
-		if (NParam < 1 || Param[1] < 32 || (Param[1] > 127 && Param[1] < 160) || Param[1] > 255) {
-			return;
-		}
-		if (Param[2] < 1 || NParam < 2) Param[2] = 1;
-		if (Param[3] < 1 || NParam < 3) Param[3] = 1;
-		if (Param[4] < 1 || NParam < 4) Param[4] = NumOfLines-StatusLine;
-		if (Param[5] < 1 || NParam < 5) Param[5] = NumOfColumns;
-		if (Param[2] > Param[4] || Param[3] > Param[5]) {
-			return;
-		}
-		if (RelativeOrgMode) {
-			Param[2] += CursorTop;
-			if (Param[2] > CursorBottom) {
-				Param[2] = CursorBottom + 1;
-			}
-			Param[4] += CursorTop;
-			if (Param[4] > CursorBottom) {
-				Param[4] = CursorBottom + 1;
-			}
-		}
-		BuffFillBox(Param[1], Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
-		break;
 
-	  case 'z': // DECERA
-	  case '{': // DECSERA
-		if (Param[1] < 1 || NParam < 1) Param[1]=1;
-		if (Param[2] < 1 || NParam < 2) Param[2]=1;
-		if (Param[3] < 1 || NParam < 3) Param[3]=NumOfLines-StatusLine;
-		if (Param[4] < 1 || NParam < 4) Param[4]=NumOfColumns;
+	  case 'v': // DECCRA
+		RequiredParams(8);
+		CheckParamVal(Param[1], NumOfLines-StatusLine);		// Src Y-start
+		CheckParamVal(Param[2], NumOfColumns);			// Src X-start
+		CheckParamValMax(Param[3], NumOfLines-StatusLine);	// Src Y-end
+		CheckParamValMax(Param[4], NumOfColumns);		// Src X-end
+		CheckParamVal(Param[5], 1);				// Src Page
+		CheckParamVal(Param[6], NumOfLines-StatusLine);		// Dest Y
+		CheckParamVal(Param[7], NumOfColumns);			// Dest X
+		CheckParamVal(Param[8], 1);				// Dest Page
+
+		if (Param[1] > Param[3] || Param[2] > Param[4]) {
+			return;
+		}
+
 		if (RelativeOrgMode) {
 			Param[1] += CursorTop;
 			if (Param[1] > CursorBottom) {
@@ -3414,7 +3427,76 @@ void CSDol(BYTE b)
 			if (Param[3] > CursorBottom) {
 				Param[3] = CursorBottom + 1;
 			}
+			Param[6] += CursorTop;
+			if (Param[6] > CursorBottom) {
+				Param[6] = CursorBottom + 1;
+			}
+			if (Param[6] + Param[3] - Param[1] > CursorBottom) {
+				Param[3] = Param[1] + CursorBottom - Param[6] + 1;
+			}
+
+			// TODO: 左右マージンのチェックを行う。
 		}
+
+		// TODO: 1 origin になっている。0 origin に直す。
+		BuffCopyBox(Param[2], Param[1], Param[4], Param[3], Param[5], Param[7], Param[6], Param[8]);
+		break;
+
+	  case 'x': // DECFRA
+	  	RequiredParams(5);
+		if (Param[1] < 32 || (Param[1] > 127 && Param[1] < 160) || Param[1] > 255) {
+			return;
+		}
+		CheckParamVal(Param[2], NumOfLines-StatusLine);
+		CheckParamVal(Param[3], NumOfColumns);
+		CheckParamValMax(Param[4], NumOfLines-StatusLine);
+		CheckParamValMax(Param[5], NumOfColumns);
+
+		if (Param[2] > Param[4] || Param[3] > Param[5]) {
+			return;
+		}
+
+		if (RelativeOrgMode) {
+			Param[2] += CursorTop;
+			if (Param[2] > CursorBottom) {
+				Param[2] = CursorBottom + 1;
+			}
+			Param[4] += CursorTop;
+			if (Param[4] > CursorBottom) {
+				Param[4] = CursorBottom + 1;
+			}
+
+			// TODO: 左右マージンのチェックを行う。
+		}
+
+		BuffFillBox(Param[1], Param[3]-1, Param[2]-1, Param[5]-1, Param[4]-1);
+		break;
+
+	  case 'z': // DECERA
+	  case '{': // DECSERA
+	  	RequiredParams(4);
+		CheckParamVal(Param[1], NumOfLines-StatusLine);
+		CheckParamVal(Param[2], NumOfColumns);
+		CheckParamValMax(Param[3], NumOfLines-StatusLine);
+		CheckParamValMax(Param[4], NumOfColumns);
+
+		if (Param[1] > Param[3] || Param[2] > Param[4]) {
+			return;
+		}
+
+		if (RelativeOrgMode) {
+			Param[1] += CursorTop;
+			if (Param[1] > CursorBottom) {
+				Param[1] = CursorBottom + 1;
+			}
+			Param[3] += CursorTop;
+			if (Param[3] > CursorBottom) {
+				Param[3] = CursorBottom + 1;
+			}
+
+			// TODO: 左右マージンのチェックを行う。
+		}
+
 		if (b == 'z') {
 			BuffEraseBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1);
 		}
@@ -3424,22 +3506,41 @@ void CSDol(BYTE b)
 		break;
 
 	  case '}': // DECSASD
-		if ((ts.TermFlag & TF_ENABLESLINE)==0)
+		if ((ts.TermFlag & TF_ENABLESLINE) == 0 || !StatusLine) {
 			return;
-		if (StatusLine==0)
-			return;
-		if ((Param[1]<1) && (CursorY==NumOfLines-1))
-			MoveToMainScreen();
-		else if ((Param[1]==1) && (CursorY<NumOfLines-1))
-			MoveToStatusLine();
+		}
+
+		switch (Param[1]) {
+		  case 0:
+			if (isCursorOnStatusLine) {
+				MoveToMainScreen();
+			}
+			break;
+
+		  case 1:
+			if (!isCursorOnStatusLine) {
+				MoveToStatusLine();
+			}
+			break;
+		}
 		break;
+
 	  case '~': // DECSSDT
-		if ((ts.TermFlag & TF_ENABLESLINE)==0)
+		if ((ts.TermFlag & TF_ENABLESLINE)==0) {
 			return;
-		if (Param[1]<=1)
+		}
+
+		switch (Param[1]) {
+		  case 0:
+		  case 1:
 			HideStatusLine();
-		else if ((StatusLine==0) && (Param[1]==2))
-			ShowStatusLine(1); // show
+			break;
+		  case 2:
+			if (!StatusLine) {
+				ShowStatusLine(1); // show
+			}
+			break;
+		}
 		break;
 	}
 }
@@ -3459,6 +3560,7 @@ void CSQuote(BYTE b)
 	switch (b) {
 	  case 'w': // Enable Filter Rectangle (DECEFR)
 		if (MouseReportMode == IdMouseTrackDECELR) {
+			RequiredParams(4);
 			if (DecLocatorFlag & DecLocatorPixel) {
 				x = LastX + 1;
 				y = LastY + 1;
@@ -3468,10 +3570,10 @@ void CSQuote(BYTE b)
 				x++;
 				y++;
 			}
-			FilterTop    = (NParam<1 || Param[1]<1)? y : Param[1];
-			FilterLeft   = (NParam<2 || Param[2]<1)? x : Param[2];
-			FilterBottom = (NParam<3 || Param[3]<1)? y : Param[3];
-			FilterRight  = (NParam<4 || Param[4]<1)? x : Param[4];
+			FilterTop    = (Param[1]==0)? y : Param[1];
+			FilterLeft   = (Param[2]==0)? x : Param[2];
+			FilterBottom = (Param[3]==0)? y : Param[3];
+			FilterRight  = (Param[4]==0)? x : Param[4];
 			if (FilterTop > FilterBottom) {
 				i = FilterTop; FilterTop = FilterBottom; FilterBottom = i;
 			}
@@ -3543,38 +3645,36 @@ void CSSpace(BYTE b) {
 	switch (b) {
 	  case 'q': // DECSCUSR
 		if (ts.WindowFlag & WF_CURSORCHANGE) {
-			if (NParam > 0) {
-				switch (Param[1]) {
-				  case 0:
-				  case 1:
-					ts.CursorShape = IdBlkCur;
-					ts.NonblinkingCursor = FALSE;
-					break;
-				  case 2:
-					ts.CursorShape = IdBlkCur;
-					ts.NonblinkingCursor = TRUE;
-					break;
-				  case 3:
-					ts.CursorShape = IdHCur;
-					ts.NonblinkingCursor = FALSE;
-					break;
-				  case 4:
-					ts.CursorShape = IdHCur;
-					ts.NonblinkingCursor = TRUE;
-					break;
-				  case 5:
-					ts.CursorShape = IdVCur;
-					ts.NonblinkingCursor = FALSE;
-					break;
-				  case 6:
-					ts.CursorShape = IdVCur;
-					ts.NonblinkingCursor = TRUE;
-					break;
-				  default:
-					return;
-				}
-				ChangeCaret();
+			switch (Param[1]) {
+			  case 0:
+			  case 1:
+				ts.CursorShape = IdBlkCur;
+				ts.NonblinkingCursor = FALSE;
+				break;
+			  case 2:
+				ts.CursorShape = IdBlkCur;
+				ts.NonblinkingCursor = TRUE;
+				break;
+			  case 3:
+				ts.CursorShape = IdHCur;
+				ts.NonblinkingCursor = FALSE;
+				break;
+			  case 4:
+				ts.CursorShape = IdHCur;
+				ts.NonblinkingCursor = TRUE;
+				break;
+			  case 5:
+				ts.CursorShape = IdVCur;
+				ts.NonblinkingCursor = FALSE;
+				break;
+			  case 6:
+				ts.CursorShape = IdVCur;
+				ts.NonblinkingCursor = TRUE;
+				break;
+			  default:
+				return;
 			}
+			ChangeCaret();
 		}
 		break;
 	}
@@ -3728,11 +3828,24 @@ void ControlSequence(BYTE b)
 			IntChar[ICount] = b;
 		}
 		else if ((b>=0x30) && (b<=0x39)) { /* parameter value */
+#define ParamIncr(p, b) \
+	do { \
+		unsigned int ptmp; \
+		if ((p) != (int)UINT_MAX) { \
+			ptmp = (unsigned int)(p); \
+			if (ptmp > UINT_MAX / 10 || ptmp * 10 > UINT_MAX - (b - 0x30)) { \
+				(p) = (int)UINT_MAX; \
+			} \
+			else { \
+				(p) = (int)(ptmp * 10 + b - 0x30); \
+			} \
+		} \
+	} while (0);
 			if (NSParam[NParam] > 0) {
-				SubParam[NParam][NSParam[NParam]] = SubParam[NParam][NSParam[NParam]]*10 + b - 0x30;
+				ParamIncr(SubParam[NParam][NSParam[NParam]], b);
 			}
 			else {
-				Param[NParam] = Param[NParam]*10 + b - 0x30;
+				ParamIncr(Param[NParam], b);
 			}
 		}
 		else if (b==0x3A) { /* ':' Subparameter delimiter */
