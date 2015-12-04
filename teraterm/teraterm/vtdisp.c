@@ -741,6 +741,12 @@ static HBITMAP GetBitmapHandle(char *File)
 
 	OleLoadPicture(iStream,nFileSize,FALSE,&IID_IPicture,(LPVOID*)&iPicture);
 
+	// 画像ファイルではないバイナリファイルを指定した場合に、
+	// プログラムが落ちる問題を修正した。
+	// (2015.12.5 yutaka)
+	if (iPicture == NULL)
+		return (hBitmap);
+
 	iStream->lpVtbl->Release((IStream *)iPicture);
 
 	iPicture->lpVtbl->get_Type(iPicture,&type);
