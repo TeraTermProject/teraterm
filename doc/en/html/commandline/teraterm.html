@@ -82,12 +82,12 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Enable displaying the "New connection" dialog on startup</dd>
 
   <dt id="f">/F=&lt;setup file&gt;</dt>
-  <dd>Setup file <a href="#note2">[2]</a><br>
+  <dd>Setup file</a><br>
       <span class="syntax">/F=TERATERM.INI</span> (default)<br>
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
   <dt id="fd">/FD=&lt;file transfer directory&gt;</dt>
-  <dd>File transfer directory <a href="#note2">[2]</a></dd>
+  <dd>File transfer directory</dd>
 
   <dt id="h">/H</dt>
   <dd>Hide title bar.</dd>
@@ -96,7 +96,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Iconify Tera Term window.</dd>
 
   <dt id="k">/K=&lt;keyboard setup file&gt;</dt>
-  <dd>Keyboard setup file <a href="#note2">[2]</a><br>
+  <dd>Keyboard setup file<br>
       <span class="syntax">/K=KEYBOARD.CNF</span> (default)<br>
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
@@ -122,7 +122,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="l">/L=&lt;log file&gt;</dt>
-  <dd>Start Tera Term with logging. <a href="#note2">[2]</a></dd>
+  <dd>Start Tera Term with logging.</dd>
 
   <dt id="la">/LA=&lt;language&gt;</dt>
   <dd>Language mode.
@@ -135,11 +135,11 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
       </ul></dd>
 
   <dt id="m">/M=&lt;macro file&gt;</dt>
-  <dd>Start Tera Term with macro. <a href="#note2">[2]</a><br>
+  <dd>Start Tera Term with macro.<br>
       If this value is not a full path, it is understood as a relative path from ttermpro.exe.</dd>
 
   <dt id="mn">/MN=&lt;multicastname&gt;</dt>
-  <dd>Multicast name for <a href="../macro/command/sendmulticast.html">sendmulticast</a> macro command. <a href="#note2">[2]</a></dd>
+  <dd>Multicast name for <a href="../macro/command/sendmulticast.html">sendmulticast</a> macro command.</dd>
 
   <dt id="nolog">/NOLOG</dt>
   <dd>Start Tera Term without logging.</dd>
@@ -148,7 +148,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>TCP port number</dd>
 
   <dt id="r">/R=&lt;replay file&gt;</dt>
-  <dd>Replay file <a href="#note2">[2]</a></dd>
+  <dd>Replay file</dd>
 
   <dt id="t">/T=&lt;telnet flag&gt;</dt>
   <dd><ul>
@@ -169,8 +169,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>VT window icon. Could be specified the same value of <a href="../setup/teraterm-win.html#WindowIcon">VTIcon of setup file</a>.</dd>
 
   <dt id="w">/W=&lt;window title&gt;</dt>
-  <dd>Window title <a href="#note2">[2]</a><br>
-      A user should put the window title in quotations by using `"' character two times to include the character.</dd>
+  <dd>Window title</dd>
 
   <dt id="x">/X=&lt;window position (x)&gt;</dt>
   <dd>Windows position (horizontal)</dd>
@@ -245,13 +244,16 @@ Following default values are stored in the Tera Term setup file:
 </p>
 
 <p id="note2">
-[2] Quote the multicast name when the name includes the space and `"' character. And then, a user should put the window title in quotations by using `"' character two times to include the character.<br>
+[2] If the parameter value can include the space character and semicolon, a user should put the value in quotations by using `"' character.<br />
+If the value includes the `"' character, the user should write the `"' character two times.
+</p>
+
 <pre>
 /F="C:\Document and Settings\user\My Documents\teraterm\server1.INI"
 /W="Tera Term"
 /W="""Tera Term"""
+/W="Tera;Term"
 </pre>
-</p>
 
 <h2 id="refs">See also</h2>
 
