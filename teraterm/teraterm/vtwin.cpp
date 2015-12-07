@@ -282,7 +282,7 @@ void SetMouseCursor(char *cursor)
 		return;
 	}
 
-	hc = (HCURSOR)LoadImage(NULL, MAKEINTRESOURCE(name), IMAGE_CURSOR,
+	hc = (HCURSOR)LoadImage(NULL, (LPCTSTR)MAKEINTRESOURCE(name), IMAGE_CURSOR,
 	                        0, 0, LR_DEFAULTSIZE | LR_SHARED);
 
 	if (hc != NULL) {

@@ -1158,7 +1158,7 @@ WORD TTLExecCmnd()
 		return ErrSyntax;
 
 	strncpy_s(LineBuff, sizeof(LineBuff),NextLine, _TRUNCATE);
-	LineLen = strlen(LineBuff);
+	LineLen = (WORD)strlen(LineBuff);
 	LinePtr = 0;
 	b = GetFirstChar();
 	LinePtr--;

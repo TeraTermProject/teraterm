@@ -1040,12 +1040,12 @@ BOOL KmtSendNextFileAttr(PFileVar fv, PKmtVar kv, PComVar cv)
 	}
 	if ( (kv->FileAttrFlag & KMT_ATTR_MODE) != 0 ) {
 		_snprintf_s(t, sizeof(t), _TRUNCATE, "%03o", kv->FileMode & 0777);
-		_snprintf_s(s, sizeof(s), _TRUNCATE, ",%c%s", KmtChar(strlen(t)), t);
+		_snprintf_s(s, sizeof(s), _TRUNCATE, ",%c%s", KmtChar((BYTE)strlen(t)), t);
 		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
 	}
 	if ( (kv->FileAttrFlag & KMT_ATTR_SIZE) != 0 ) {
 		_snprintf_s(t, sizeof(t), _TRUNCATE, "%I64d", kv->FileSize);
-		_snprintf_s(s, sizeof(s), _TRUNCATE, "1%c%s", KmtChar(strlen(t)), t);
+		_snprintf_s(s, sizeof(s), _TRUNCATE, "1%c%s", KmtChar((BYTE)strlen(t)), t);
 		strncat_s(buf, sizeof(buf), s, _TRUNCATE);
 	}
 

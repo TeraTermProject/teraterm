@@ -3091,7 +3091,7 @@ void GetInt(PKeyMap KeyMap, int KeyId, PCHAR Sect, PCHAR Key, PCHAR FName)
 		Num = 0xFFFF;
 	else if (_stricmp(Temp, "off") == 0)
 		Num = 0xFFFF;
-	else if (sscanf(Temp, "%d", &Num) != 1)
+	else if (sscanf(Temp, "%hd", &Num) != 1)
 		Num = 0xFFFF;
 
 	KeyMap->Map[KeyId - 1] = Num;
@@ -3566,7 +3566,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 	} while (b != '\0' && b != ':');
 	if (b == ':') {
 		s[i - 1] = '\0';
-		if (sscanf(&(s[i]), "%d", port) != 1)
+		if (sscanf(&(s[i]), "%hd", port) != 1)
 			*port = 65535;
 		is_port = 1;
 	}
@@ -3773,7 +3773,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
-			if (sscanf(&Temp[3], "%d", &ParamTCP) != 1)
+			if (sscanf(&Temp[3], "%hd", &ParamTCP) != 1)
 				ParamTCP = 65535;
 		}
 		else if (_strnicmp(Temp, "/R=", 3) == 0) {	/* Replay filename */
