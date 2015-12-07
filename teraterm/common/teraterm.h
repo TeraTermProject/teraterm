@@ -12,6 +12,23 @@
 #endif /* NO_INET6 */
 #include <windows.h>
 
+/* _MSC_VER の値
+Visual C++ 8.0 (Visual Studio 2005)  1400
+Visual C++ 9.0 (Visual Studio 2008)  1500
+Visual C++ 10.0 (Visual Studio 2010) 1600
+Visual C++ 11.0 (Visual Studio 2012) 1700
+Visual C++ 12.0 (Visual Studio 2013) 1800
+Visual C++ 14.0 (Visual Studio 2015) 1900
+*/
+
+/* VS2015(VC14.0)だと、WSASocketA(), inet_ntoa() などのAPIがdeprecatedであると
+ * 警告するために、警告を抑止する。代替関数に置換すると、VS2005(VC8.0)でビルド
+ * できなくなるため、警告を抑止するだけとする。
+ */
+#if _MSC_VER >= 1800  // VSC2013(VC12.0) or later
+	#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
+
 // AKASI氏によるEterm風透過ウィンドウ
 #define ALPHABLEND_TYPE2
 
