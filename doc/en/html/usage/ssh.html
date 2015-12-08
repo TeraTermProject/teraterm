@@ -59,12 +59,22 @@
       <li>If you want to use Password authentication, then make sure that [Use plain password to log in] is chcked and type in username and password. If they are correct, you can login.<br>
           NOTE: The password can not be sent as plain text like TELNET protocol because the SSH packet including the password data is encrypted.</li>
       <li>When using public key authentication, check [RSA/DSA/ECDSA/ED25519 key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
-          Note: The passphrase can include the control character(0x01 - 0x1F).<br />
           Note: TTSSH 2.63(Tera Term 4.76) later can support the PuTTY format and SECSH(ssh.com) format of the SSH2 private key.</li>
       <li>When the keyboard-interactive authentication is used, check the [Use challenge/response to log in(keyboard-interactive)] and input your user name.<br>
           Next, the dialog with the server prompt and string is shown and input your password.</li>
       <li>When the Pageant is used, check the [Use Pageant] and input your user name.</li>
     </ul>
+
+<!--
+    <h3><a name="passwd_input">パスワード / パスフレーズ入力</a></h3>
+    <p>
+      パスワード / パスフレーズの入力欄は、通常のダイアログと違い以下のような動作となります。
+    </p>
+    <ul>
+      <li>Control + A ～ Z, [, \, ], ^, _ で制御文字 (0x01 - 0x1F) を入力できます。</li>
+      <li>Control + V は SYN (0x16) の入力となりますので、貼り付けには利用できません。貼り付けを行うには Shift + Insert を使用してください。</li>
+    </ul>
+-->
 
     <h2><a name="securitywarning">Security Warning</a></h2>
 
