@@ -37,8 +37,9 @@ show ;default parameters when no show command specified.
 
 When a user specifies the 1 at the &lt;wait&gt; argument, Tera Term waits to finish the launched application. The exit code of the application stores the `result' system variable. <em>(version 4.63 or later)</em>
 
-<p></p>
+<p>
 A current directory can be specified at the &lt;current directory&gt; argument. <em>(version 4.78 or later)</em>
+</p>
 
 
 <h2>Example</h2>
@@ -73,6 +74,26 @@ getdate logdir "log-%Y%m%d"
 sprintf2 cmd 'cmd /c mkdir "%s\My Documents\%s"' userprof logdir
 exec cmd "HIDE"
 </pre>
+
+<h2>Note</h2>
+
+<!--p>
+64bit Windows 上でマクロを実行している場合、WOW64 に対応したアプリケーションを起動すると思わぬ動作をすることがある。<br />
+<br />
+ttpmacro.exe は 32bit なので、32bit のアプリケーションが起動する。アプリケーションによっては 64bit OS 上で 32bit のプロセスが起動されると、64bit のプロセスを起動し直すことがある。<br />
+このため &lt;wait&gt; を指定しても、マクロが起動した 32bit のアプリケーションはすぐに終了してしまうため、意図せず次のマクロコマンドに進んでしまうことがある。<br />
+<br />
+この現象を回避するには、以下のように sysnative エイリアスを用いてネイティブのシステムディレクトリのアプリケーションを起動する。
+</p-->
+
+<pre class="macro-example">
+; fail
+exec 'mstsc /v 192.0.2.0 /w 1024 /h 768 /admin' 'show' 1
+
+; succeed
+exec 'C:\windows\sysnative\mstsc /v 192.0.2.0 /w 1024 /h 768 /admin' 'show' 1
+</pre>
+
 
 </body>
 </html>
