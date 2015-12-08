@@ -3550,7 +3550,7 @@ WORD TTLRecvRandom()
 	TVarId VarId;
 	WORD Err;
 	int MaxNum, Num;
-	double d;
+	//double d;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
@@ -3567,9 +3567,10 @@ WORD TTLRecvRandom()
 		srand((unsigned int)time(NULL));
 	}
 	//d = (1.0 / (RAND_MAX + 1.0)) * (rand() + 0.5);
-	d = rand();
-	d = (rand() / (double)RAND_MAX) * MaxNum;
-	Num = (int)d;
+	//d = rand();
+	//d = (rand() / (double)RAND_MAX) * MaxNum;
+	//Num = (int)d;
+	Num = (int)(rand() / (RAND_MAX + 1.0) * (MaxNum + 1));
 
 	SetIntVal(VarId,Num);
 
