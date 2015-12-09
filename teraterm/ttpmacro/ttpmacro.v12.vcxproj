@@ -144,6 +144,7 @@
     <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmparse.c" />
     <ClCompile Include="wait4all.c" />
+    <ClCompile Include="SFMT.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\ttlib.h" />
@@ -164,6 +165,10 @@
     <ClInclude Include="ttmmsg.h" />
     <ClInclude Include="ttmparse.h" />
     <ClInclude Include="ttm_res.h" />
+    <ClInclude Include="SFMT.h" />
+    <ClInclude Include="SFMT-common.h" />
+    <ClInclude Include="SFMT-params.h" />
+    <ClInclude Include="SFMT-params19937.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Ttmacro.ico" />

@@ -35,6 +35,7 @@
 #include <mbctype.h>
 
 #include "ttl.h"
+#include "SFMT.h"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -3544,13 +3545,14 @@ WORD TTLMilliPause()
 // This command generates the random value from 0 to <value> and
 // stores the value to <intvar>.
 // (2006.2.11 yutaka)
-WORD TTLRecvRandom()
+WORD TTLRandom()
 {
-	static int srand_init = 0;
+	static int init_done = 0;
+	static sfmt_t sfmt;
 	TVarId VarId;
 	WORD Err;
-	int MaxNum, Num;
-	//double d;
+	int MaxNum;
+	unsigned int Num, RandMin;
 
 	Err = 0;
 	GetIntVar(&VarId,&Err);
@@ -3560,23 +3562,24 @@ WORD TTLRecvRandom()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// 乱数 0 ～ <intvar> を生成する
-	if (srand_init == 0) {
-		srand_init = 1;
-		// VS2005では time_t が64ビット化されたので、キャストを追加。(2006.2.18 yutaka)
-		srand((unsigned int)time(NULL));
-	}
-	//d = (1.0 / (RAND_MAX + 1.0)) * (rand() + 0.5);
-	//d = rand();
-	//d = (rand() / (double)RAND_MAX) * MaxNum;
-	//Num = (int)d;
-	Num = (int)(rand() / (RAND_MAX + 1.0) * (MaxNum + 1));
+	MaxNum++;
 
-	SetIntVal(VarId,Num);
+	/* 2**32 % x == (2**32 - x) % x */
+	RandMin = (unsigned int) -MaxNum % MaxNum;
+
+	if (!init_done) {
+		init_done = 1;
+		sfmt_init_gen_rand(&sfmt, (unsigned int)time(NULL));
+	}
+
+	do {
+		Num = sfmt_genrand_uint32(&sfmt);
+	} while (Num < RandMin);
+
+	SetIntVal(VarId, (int)(Num % MaxNum));
 
 	return Err;
 }
-
 
 WORD TTLRecvLn()
 {
@@ -6139,7 +6142,7 @@ int ExecCmnd()
 		case RsvQuickVANSend:
 			Err = TTLCommCmdFile(CmdQVSend,IdTTLWaitCmndResult); break;
 		case RsvRandom:
-			Err = TTLRecvRandom(); break;   // add 'random'
+			Err = TTLRandom(); break;
 		case RsvRecvLn:
 			Err = TTLRecvLn(); break;
 		case RsvRegexOption:

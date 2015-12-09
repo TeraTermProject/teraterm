@@ -312,6 +312,22 @@
 				RelativePath="ttmparse.h"
 				>
 			</File>
+			<File
+				RelativePath="SFMT.h"
+				>
+			</File>
+			<File
+				RelativePath="SFMT-common.h"
+				>
+			</File>
+			<File
+				RelativePath="SFMT-params.h"
+				>
+			</File>
+			<File
+				RelativePath="SFMT-params19937.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -386,6 +402,10 @@
 			</File>
 			<File
 				RelativePath=".\wait4all.c"
+				>
+			</File>
+			<File
+				RelativePath="SFMT.c"
 				>
 			</File>
 		</Filter>
