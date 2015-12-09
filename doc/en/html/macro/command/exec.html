@@ -77,14 +77,16 @@ exec cmd "HIDE"
 
 <h2>Note</h2>
 
-<!--p>
-64bit Windows 上でマクロを実行している場合、WOW64 に対応したアプリケーションを起動すると思わぬ動作をすることがある。<br />
+<p>
+When the macro script is executed on the 64bit Windows, an WOW64's application will not work well.<br />
 <br />
-ttpmacro.exe は 32bit なので、32bit のアプリケーションが起動する。アプリケーションによっては 64bit OS 上で 32bit のプロセスが起動されると、64bit のプロセスを起動し直すことがある。<br />
-このため &lt;wait&gt; を指定しても、マクロが起動した 32bit のアプリケーションはすぐに終了してしまうため、意図せず次のマクロコマンドに進んでしまうことがある。<br />
+The 32bit application can launch because the ttpmacro.exe is the 32bit program. An application will launch 
+the 64bit programm again when the 32bit program is executed on the 64bit operating system. <br />
+If the &lt;wait&gt; is specified, the exec macro will continue to next step because the 32bit program launched by the
+macro script terminates soon. <br />
 <br />
-この現象を回避するには、以下のように sysnative エイリアスを用いてネイティブのシステムディレクトリのアプリケーションを起動する。
-</p-->
+Please use the sysnative alias and launches the native application in the system directory to resolve this problem.
+</p>
 
 <pre class="macro-example">
 ; fail
