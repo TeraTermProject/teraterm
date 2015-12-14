@@ -266,6 +266,9 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_26 2015/12/14 (by doda)
+        * Add multiple connections support for the ssh-agent proxy.
+
 v1.07_25 2015/02/21 (by doda)
         * Bug fix: The TERM environment variable can not be configured.
 

@@ -33,7 +33,7 @@
 //
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_25 (2015/02/21)";
+static char Version[] = "version 1.07_26 (2015/12/14)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -525,17 +525,67 @@ void sighandler(int sig) {
 	exit(0);
 };
 
-//=================//
-// ssh-agent proxy //
-//-----------------//
+struct connList {
+	int sock;
+	int recvlen;
+	int sendlen;
+	struct connList *next;
+	unsigned char ibuff[AGENT_MAX_MSGLEN];
+	unsigned char obuff[AGENT_MAX_MSGLEN];
+};
+
+int proc_recvd(struct connList *conn)
+{
+	int reqlen, len;
+
+	if (conn->sendlen > 0) {
+		return 0;
+	}
+
+	if (conn->recvlen < 4) {
+		return 0;
+	}
+
+	reqlen = get_uint32(conn->ibuff) + 4;
+	if (conn->recvlen < reqlen) {
+		return 0;
+	}
+
+	len = agent_request(conn->obuff, sizeof(conn->obuff), conn->ibuff);
+
+	if (len > 0) {
+		conn->sendlen = len;
+	}
+	else {
+		set_uint32(conn->obuff, 1);
+		conn->obuff[4] = 5; // SSH_AGENT_FAILURE
+		conn->sendlen = 1;
+	}
+
+	if (conn->recvlen == reqlen) {
+		conn->recvlen = 0;
+	}
+	else {
+		conn->recvlen -= reqlen;
+		memmove(conn->ibuff, conn->ibuff + reqlen, conn->recvlen);
+	}
+
+	return 1;
+}
+
 void agent_proxy()
 {
-	int sock, asock;
-	unsigned long readlen, reqlen, recvlen;
+	int sock, asock, ret;
+	long len;
+	unsigned long reqlen;
 	struct sockaddr_un addr;
-	unsigned char buff[AGENT_MAX_MSGLEN];
+	unsigned char tmpbuff[AGENT_MAX_MSGLEN];
+	struct connList connections, *new_conn, *prev, *cur;
+	fd_set readfds, writefds, rfds, wfds;
 	struct sigaction act;
 	sigset_t blk;
+
+	connections.next = NULL;
 
 	if ((sock = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
 		msg_print("socket failed.");
@@ -564,46 +614,113 @@ void agent_proxy()
 	sigaction(SIGHUP, &act, NULL);
 	sigaction(SIGQUIT, &act, NULL);
 
+	FD_ZERO(&readfds);
+	FD_ZERO(&writefds);
+	FD_SET(sock, &readfds);
+
 	while (1) {
-		if ((asock = accept(sock, NULL, NULL)) < 0) {
-			switch (errno) {
-			case EINTR:
-			case ECONNABORTED:
-				continue;
-			}
-			break;
-		}
-		recvlen = 0;
-		while ((readlen = read(asock, buff+recvlen, 4-recvlen)) > 0) {
-			recvlen += readlen;
-			if (recvlen < 4) {
-				continue;
-			}
-			recvlen = 0;
-			reqlen = get_uint32(buff);
-			while ((readlen = read(asock, buff+4+recvlen, reqlen-recvlen)) > 0) {
-				recvlen += readlen;
-				if (recvlen < reqlen) {
-					continue;
+		memcpy(&rfds, &readfds, sizeof(fd_set));
+		memcpy(&wfds, &writefds, sizeof(fd_set));
+
+		select(FD_SETSIZE, &rfds, &wfds, NULL, NULL);
+
+		if (FD_ISSET(sock, &rfds)) {
+			asock = accept(sock, NULL, NULL);
+			if (asock < 0) {
+				if (!(errno == EINTR || errno == ECONNABORTED)) {
+					break;
 				}
-
-				sigprocmask(SIG_BLOCK, &blk, NULL);
-				readlen = agent_request(buff, sizeof(buff), buff);
-				sigprocmask(SIG_UNBLOCK, &blk, NULL);
-
-				if (readlen > 0) {
-					write(asock, buff, readlen);
+			}
+			else {
+				new_conn = (struct connList *)malloc(sizeof(struct connList));
+				if (new_conn == NULL) {
+					// no memory
+					close(sock);
 				}
 				else {
-					set_uint32(buff, 1);
-					buff[4] = 5; // SSH_AGENT_FAILURE
-					write(asock, buff, 5);
+					new_conn->sock = asock;
+					new_conn->recvlen = 0;
+					new_conn->sendlen = 0;
+					new_conn->next = connections.next;
+					connections.next = new_conn;
+					FD_SET(asock, &readfds);
 				}
 			}
-			recvlen = 0;
 		}
-		shutdown(asock, SHUT_RDWR);
-		close(asock);
+
+		prev = &connections;
+		for (cur=connections.next; cur != NULL; cur = cur->next) {
+			if (FD_ISSET(cur->sock, &wfds)) {
+				if (cur->sendlen > 0) {
+					len = send(cur->sock, cur->obuff, cur->sendlen, 0);
+					if (len < 0) {
+						// write error
+						prev->next = cur->next;
+						shutdown(cur->sock, SHUT_RDWR);
+						close(cur->sock);
+						FD_CLR(cur->sock, &writefds);
+						FD_CLR(cur->sock, &readfds);
+						free(cur);
+						cur = prev;
+						continue;
+					}
+					else if (len >= cur->sendlen) {
+						cur->sendlen = 0;
+
+						sigprocmask(SIG_BLOCK, &blk, NULL);
+						ret = proc_recvd(cur);
+						sigprocmask(SIG_UNBLOCK, &blk, NULL);
+
+						if (ret) {
+							FD_SET(cur->sock, &writefds);
+							FD_CLR(cur->sock, &readfds);
+						}
+						else {
+							FD_CLR(cur->sock, &writefds);
+							FD_SET(cur->sock, &readfds);
+						}
+					}
+					else if (len > 0) {
+						cur->sendlen -= len;
+						memmove(cur->obuff, cur->obuff+len, cur->sendlen);
+					}
+				}
+				else {
+					FD_CLR(cur->sock, &writefds);
+				}
+			}
+
+			if (FD_ISSET(cur->sock, &rfds)) {
+				len = recv(cur->sock, cur->ibuff + cur->recvlen, sizeof(cur->ibuff) - cur->recvlen, 0);
+				if (len > 0) {
+					cur->recvlen += len;
+
+					sigprocmask(SIG_BLOCK, &blk, NULL);
+					ret = proc_recvd(cur);
+					sigprocmask(SIG_UNBLOCK, &blk, NULL);
+
+					if (ret) {
+						FD_SET(cur->sock, &writefds);
+						FD_CLR(cur->sock, &readfds);
+					}
+					else {
+						FD_CLR(cur->sock, &writefds);
+						FD_SET(cur->sock, &readfds);
+					}
+				}
+				else if (len < 0) {
+					// read error
+					prev->next = cur->next;
+					shutdown(cur->sock, SHUT_RDWR);
+					close(cur->sock);
+					FD_CLR(cur->sock, &readfds);
+					FD_CLR(cur->sock, &writefds);
+					free(cur);
+					cur = prev;
+					continue;
+				}
+			}
+		}
 	}
 
 agent_thread_cleanup:
