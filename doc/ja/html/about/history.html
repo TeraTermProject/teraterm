@@ -42,7 +42,11 @@
   <li>バグ修正
     <ul>
       <li>Eterm look-feel: 不適切な画像ファイルを背景に指定すると、プログラムが落ちる問題を修正した。</li>
-      <li><a href="../macro/command/random.html">random</a> マクロコマンドが、指定した最大値を返す確率が極めて低い問題を修正</li>
+      <li><a href="../macro/command/random.html">random</a> マクロコマンドが返す値が偏る問題を修正した。
+        <ul>
+          <li>指定した最大値を返す確率が極めて低かった。</li>
+          <li>最大値に32768以上を指定した時、絶対に返さない値が有った。</li>
+        </ul></li>
     </ul>
   </li>
 
