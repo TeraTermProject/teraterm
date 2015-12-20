@@ -1155,13 +1155,12 @@ WORD LineLen;       /* バッファサイズ */
 
 
 <h2><a name="caret">Caret Control</a></h2>
-<!--
-  <h3>概要</h3>
-  ユーザが端末上でキーボード入力を行うと、カーソルが移動しますが、サーバからのエスケープシーケンスにより、キーボード入力なしにカーソルを移動させる必要があります。また、ウィンドウが非アクティブ状態の場合においても、カーソルを表示させることにより、ブロードキャストモードにおいて、複数端末の同時操作性を向上させています。
+  <h3>Overview</h3>
+Usually user moves the cursor by pressing corresponding keys on the keyboard, but if server needs to move the cursor, it sends out escape sequences (sets of characters that start with ESC code). Furthermore, terminal window may be in inactive mode, for example while running in broadcast mode, but it still should be able to move the cursor to simultaneously update multiple terminal windows.
 <br>
 
-  <h3>システムキャレット</h3>
-  Tera Termにおけるカーソル描画には、システムキャレットを利用しています。Tera Termで使用されているシステムキャレットを制御するAPIを以下に示します。
+  <h3>System Caret</h3>
+Tera Term uses system caret to draw the cursor. For this purpose Tera Term utilizes API functions listed below. 
 
 <p><ul>
   <li>CreateCaret</li>
@@ -1173,26 +1172,26 @@ WORD LineLen;       /* バッファサイズ */
   <li>ShowCaret</li>
 </ul></p>
 
-  <a href="http://msdn.microsoft.com/library/ja/default.asp?url=/library/ja/jpwinui/html/_win32_createcaret.asp">CreateCaretのドキュメント</a>によると、
+According to MSDN Library description of <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms648399(v=vs.85).aspx">CreateCaret function</a>, 
 
 <pre>
-システムは 1 つのキューにつき 1 つのキャレットを提供します。ウィンドウが
-キーボードフォーカスを備えているとき、またはアクティブな状態のときにだけ、
-キャレットを作成するべきです。また、キーボードフォーカスを失ったり非アク
-ティブになる前に、キャレットを破棄するべきです。
+The system provides one caret per queue. A window should create 
+a caret only when it has the keyboard focus or is active. 
+The window should destroy the caret before losing the keyboard 
+focus or becoming inactive. 
 </pre>
 
-とあるため、ウィンドウがアクティブになったタイミングで CreateCaret() を呼び出し、フォーカスが外れ、非アクティブになるタイミングで DestroyCaret() を呼び出す必要があることを意味しています。<br>
-  キャレットの表示は CaretOn()#vtdisp.c で、消去は CaretOff()#vtdisp.c で実装されています。CaretOn()やCaretOff()が呼び出されるタイミングは、エスケープシーケンス処理 VTParse() の箇所以外にも、マウスボタンを押したときやウィンドウのリサイズを行っているときなどがあります。<br>
+Above requirement means that CreateCaret() can be called only when the window is active and DestroyCaret() should be called before the window becomes inactive. <br>
+Caret is displayed by CaretOn()#vtdisp.c function and erased by CaretOff()#vtdisp.c function. These functions are usually called as the result of processing escape sequences parsed by VTParse() function, or when user resizes terminal window with own mouse. <br>
 
 
+  <h3>Displaying Caret in Inactive Mode </h3>
+In inactive windows system caret is invisible. The top window on Windows desktop is the only window that shows the caret. In most cases such behavior is acceptable and doesn't cause problems. <br>
+However, when Tera Term is in broadcast mode, active Tera Term window can receive and show commands simultaneously with other inactive Tera Term windows and it will look awkward if during this process the caret in inactive windows is hidden. <br>
+Therefore, even if the window is inactive, we have to find a way to draw the caret in it. Since system caret cannot be used, we need to draw our own caret. In this case inactive Tera Term window will be able to show and move cursor in response to escape sequences received from remote host, or following user's input from the keyboard.  <br><br>
 
-  <h3>非アクティブ時のカーソル表示</h3>
-  ウィンドウが非アクティブの場合は、カーソルが消滅します。Windowsの上ではユーザが操作できうるウィンドウは1つであるため、システムキャレットも1つのみ用意されています。通常のオペレーションにおいては、この動作で問題がありません。<br>
-  しかし、ブロードキャストモードを利用する場合、非アクティブのTera Termウィンドウに対して、コマンドを投入することになります。特に、viなどで複数の端末を同時操作するときは、カーソルが消えていると不都合があります。<br>
-  そこで、ウィンドウが非アクティブの場合においても、カーソルを描画するようにしています。ただし、システムキャレットは使えないので、自前でカーソルを描画する必要があります。Tera Termのウィンドウが非アクティブの場合においても、リモートホストから送られてくるエスケープシーケンスを処理するためにメインエンジンは動いており、常にカーソル位置は更新されています。現在のカーソル位置は、CursorXとCursorYに設定されています。<br>
-  非アクティブ時のカーソル表示は CaretKillFocus() で行っています。このときに表示されるカーソルを「ポリゴンカーソル」と呼んでいます。ts.VTColor[0] は Text color です。非アクティブ状態でカーソル位置が更新されるときは、以前に描いたカーソルを消す必要があるので、そのときは ts.VTColor[1] で表される Background color で再描画することで、以前のカーソルを消去しています。<br>
-  Background colorでポリゴンカーソルを描画すると、ちょうどそのとき背景にあった文字の一部が欠けることがあります。そのため、その文字の再描画を行う必要があり、UpdateCaretKillFocus() で実現しています。当該関数では InvalidateRect() で WM_PAINT を送ることにより、文字の再描画を促しています。<br>
+Current cursor position is stored in CursorX and CursorY. CaretKillFocus() function is called for inactive window. Then custom "polygon cursor" is displayed. Variable ts.VTColor[0] contains the color of the cursor. When cursor position needs to be updated, it is necessary to erase the cursor drawn previously and restore the background color that was previously backed up in ts.VTColor[1]. <br>
+While drawing polygon cursor in a position that already contains a character, this character will be overwritten. Therefore, it is necessary to re-drawing the character. This can be done by using UpdateCaretKillFocus() function. This function sends WM_PAINT message and triggers InvalidateRect(), which then redraws the character. <br>
 
 <pre class=code>
 void CaretKillFocus(BOOL show)
@@ -1225,7 +1224,7 @@ void CaretKillFocus(BOOL show)
   p[4].x = CaretX;
   p[4].y = CaretY;
 
-  if (show) {  // ポリゴンカーソルを表示（非フォーカス時）
+  if (show) {  // Show polygon cursor (non-focused)
 	  oldpen = SelectObject(hdc, CreatePen(PS_SOLID, 0, ts.VTColor[0]));
   } else {
 	  oldpen = SelectObject(hdc, CreatePen(PS_SOLID, 0, ts.VTColor[1]));
@@ -1239,24 +1238,23 @@ void CaretKillFocus(BOOL show)
 </pre>
 
 
-  <h3>非アクティブ時のカーソル表示タイミング</h3>
-  非アクティブ時のカーソル表示のタイミングは、いくつかのパターンがあるため、漏れなく対処しておく必要があります。表示タイミングとしては以下のとおりです。
+  <h3>Handling Inactive Window Cursor States </h3>
+Since inactive window cursor may be in different states, we need to properly handle cursor state changes. Below is the list of possible cases. 
 
 <p>
 <ul>
-  <li>ウィンドウがアクティブ(Active == TRUE)の場合は、ポリゴンキャレット描画関数(CaretKillFocus)を一切呼ばないようにする。</li>
-  <li>CaretOn()では、非アクティブ(Active == FALSE)の場合、ShowCaret()を呼ぶタイミングで、ポリゴンキャレット描画関数(true)を呼ぶ。</li>
-  <li>CaretOff()では、非アクティブ(Active == FALSE)の場合、HideCaret()を呼ぶタイミングで、ポリゴンキャレット描画関数(false)を呼ぶ。</li>
-  <li>IsCaretOn()の判定論理に、(!Active && (CaretStatus==0)) のORを追加する。</li>
-  <li>ChangeCaret()は何もしない</li>
-  <li>WM_KILLFOCUSされるタイミングでは、IsCaretOn()が真であれば、ポリゴンキャレット描画関数(true)を呼ぶ。</li>
-  <li>WM_ACTIVEされるタイミングでは、IsCaretOn()が真であれば、ポリゴンキャレット描画関数(false)を呼ぶ。</li>
+  <li>Window is active (Active == TRUE), so there is no need to draw polygon caret (CaretKillFocus).</li>
+  <li>When CaretOn() is called for non-active (Active == FALSE) window, ShowCaret() has to launch polygon caret drawing function and pass it argument TRUE.</li>
+  <li>When CaretOff() is called for non-active (Active == FALSE) window, ShowCaret() has to launch polygon caret drawing function and pass it argument FALSE.</li>
+  <li>While retrieving caret state with IsCaretOn() function, additional condition needs to be added: OR (! Active && (CaretStatus == 0)).</li>
+  <li>Call to ChangeCaret() does nothing and can be ignored.</li>
+  <li>When WM_KILLFOCUS message is received while IsCaretOn() is TRUE, polygon caret drawing function has to be launched with argument TRUE.</li>
+  <li>When WM_ACTIVE message is received while IsCaretOn() is TRUE, polygon caret drawing function has to be launched with argument FALSE.</li>
 </ul>
 </p>
 
 <br>
 
--->
 
 <hr>
 
