@@ -3115,22 +3115,21 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
-	if (nEventType == DBT_DEVICEARRIVAL || nEventType == DBT_DEVICEREMOVECOMPLETE) {
-		if (ts.PortType == IdSerial) {
-			if (!ts.AutoComPortReconnect) {
-				return CFrameWnd::OnDeviceChange(nEventType, dwData);
-			}
+	PDEV_BROADCAST_PORT pDevPort;
 
-			if (cv.Open != 0) {
-				/* 接続中 */
-				if (AutoDisconnectedPort == -1 && CheckComPort(cv.ComPort) == 0) {
-					AutoDisconnectedPort = cv.ComPort;
-					Disconnect(TRUE);
-				}
-			}
-			else {
-				/* 未接続 */
-				if (AutoDisconnectedPort == ts.ComPort && CheckComPort(ts.ComPort) == 1) {
+	pDevPort = (PDEV_BROADCAST_PORT)dwData;
+
+	switch (nEventType) {
+	case DBT_DEVICEARRIVAL:
+		//OutputDebugPrintf("DBT_DEVICEARRIVAL %d\n", pDevPort->dbcp_devicetype);
+		if (pDevPort->dbcp_devicetype == DBT_DEVTYP_PORT &&
+		    ts.PortType == IdSerial &&
+		    ts.AutoComPortReconnect &&
+		    AutoDisconnectedPort == ts.ComPort) {
+			if (!cv.Open) {
+				/* Tera Term 未接続 */
+				if (CheckComPort(ts.ComPort) == 1) {
+					/* ポートが有効 */
 					AutoDisconnectedPort = -1;
 					Connecting = TRUE;
 					ChangeTitle();
@@ -3138,7 +3137,25 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 				}
 			}
 		}
+		break;
+	case DBT_DEVICEREMOVECOMPLETE:
+		//OutputDebugPrintf("DBT_DEVICEREMOVECOMPLETE %d\n", pDevPort->dbcp_devicetype);
+		if (pDevPort->dbcp_devicetype == DBT_DEVTYP_PORT &&
+		    ts.PortType == IdSerial &&
+		    ts.AutoComPortReconnect &&
+		    AutoDisconnectedPort == -1) {
+			if (cv.Open) {
+				/* Tera Term 接続中 */
+				if (CheckComPort(cv.ComPort) == 0) {
+					/* ポートが無効 */
+					AutoDisconnectedPort = cv.ComPort;
+					Disconnect(TRUE);
+				}
+			}
+		}
+		break;
 	}
+
 	return CFrameWnd::OnDeviceChange(nEventType, dwData);
 }
 
