@@ -3116,16 +3116,25 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
 	PDEV_BROADCAST_PORT pDevPort;
+#ifdef DEBUG
+	char port_name[8]; /* COMxxxx + NULL */
+#endif
 
 	pDevPort = (PDEV_BROADCAST_PORT)dwData;
 
 	switch (nEventType) {
 	case DBT_DEVICEARRIVAL:
-		//OutputDebugPrintf("DBT_DEVICEARRIVAL %d\n", pDevPort->dbcp_devicetype);
+#ifdef DEBUG
+		OutputDebugPrintf("DBT_DEVICEARRIVAL devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevPort->dbcp_devicetype, ts.PortType, AutoDisconnectedPort);
+#endif
 		if (pDevPort->dbcp_devicetype == DBT_DEVTYP_PORT &&
 		    ts.PortType == IdSerial &&
 		    ts.AutoComPortReconnect &&
 		    AutoDisconnectedPort == ts.ComPort) {
+#ifdef DEBUG
+			strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
+			OutputDebugPrintf("%s\n", port_name);
+#endif
 			if (!cv.Open) {
 				/* Tera Term –¢Ú‘± */
 				if (CheckComPort(ts.ComPort) == 1) {
@@ -3139,11 +3148,17 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		}
 		break;
 	case DBT_DEVICEREMOVECOMPLETE:
-		//OutputDebugPrintf("DBT_DEVICEREMOVECOMPLETE %d\n", pDevPort->dbcp_devicetype);
+#ifdef DEBUG
+		OutputDebugPrintf("DBT_DEVICEREMOVECOMPLETE devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevPort->dbcp_devicetype, ts.PortType, AutoDisconnectedPort);
+#endif
 		if (pDevPort->dbcp_devicetype == DBT_DEVTYP_PORT &&
 		    ts.PortType == IdSerial &&
 		    ts.AutoComPortReconnect &&
 		    AutoDisconnectedPort == -1) {
+#ifdef DEBUG
+			strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
+			OutputDebugPrintf("%s\n", port_name);
+#endif
 			if (cv.Open) {
 				/* Tera Term Ú‘±’† */
 				if (CheckComPort(cv.ComPort) == 0) {
