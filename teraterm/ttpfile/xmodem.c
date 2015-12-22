@@ -83,10 +83,15 @@ void XSetOpt(PFileVar fv, PXVar xv, WORD Opt)
 		xv->DataLen = 128;
 		xv->CheckLen = 2;
 		break;
-	case Xopt1K:				/* 1K */
-		strncat_s(Tmp, sizeof(Tmp), "1K)", _TRUNCATE);
+	case Xopt1kCRC:				/* 1k */
+		strncat_s(Tmp, sizeof(Tmp), "1k)", _TRUNCATE);
 		xv->DataLen = 1024;
 		xv->CheckLen = 2;
+		break;
+	case Xopt1kCksum:			/* 1k with Checksum (unofficial) */
+		strncat_s(Tmp, sizeof(Tmp), "1k*)", _TRUNCATE);
+		xv->DataLen = 1024;
+		xv->CheckLen = 1;
 		break;
 	}
 	SetDlgItemText(fv->HWin, IDC_PROTOPROT, Tmp);
@@ -263,13 +268,18 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 			if (b == SOH) {
 				xv->PktIn[0] = b;
 				xv->PktReadMode = XpktBLK;
-				if (xv->XOpt == Xopt1K)
+				if (xv->XOpt == Xopt1kCRC)
 					XSetOpt(fv, xv, XoptCRC);
+				else if (xv->XOpt == Xopt1kCksum)
+					XSetOpt(fv, xv, XoptCheck);
 				FTSetTimeOut(fv, xv->TOutShort);
 			} else if (b == STX) {
 				xv->PktIn[0] = b;
 				xv->PktReadMode = XpktBLK;
-				XSetOpt(fv, xv, Xopt1K);
+				if (xv->XOpt == XoptCRC)
+					XSetOpt(fv, xv, Xopt1kCRC);
+				else if (xv->XOpt == XoptCheck)
+					XSetOpt(fv, xv, Xopt1kCksum);
 				FTSetTimeOut(fv, xv->TOutShort);
 			} else if (b == EOT) {
 				b = ACK;
@@ -406,11 +416,15 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				}
 				break;
 			case NAK:
-				if (xv->PktNum == 0 && xv->XOpt == Xopt1K) {
-					/* we wanted 1k with CRC, but the other end specified checksum */
-					/* keep the 1k block, but move back to checksum mode.          */
-					xv->XOpt = XoptCheck;
-					xv->CheckLen = 1;
+				if (xv->PktNum == 0) {
+					if (xv->XOpt == XoptCRC) {
+						// receiver wants to use checksum.
+						XSetOpt(fv, xv, XoptCheck);
+					} else if (xv->XOpt == Xopt1kCRC) {
+						/* we wanted 1k with CRC, but the other end specified checksum */
+						/* keep the 1k block, but move back to checksum mode.          */
+						XSetOpt(fv, xv, Xopt1kCksum);
+					}
 				}
 				SendFlag = TRUE;
 				break;

@@ -167,9 +167,10 @@ typedef TCharAttr *PCharAttr;
 #define IdNamedPipe   4
 
   /* XMODEM option */
-#define XoptCheck 1
-#define XoptCRC   2
-#define Xopt1K    3
+#define XoptCheck   1
+#define XoptCRC     2
+#define Xopt1kCRC   3
+#define Xopt1kCksum 4
 
   /* YMODEM option */
 #define Yopt1K 1
