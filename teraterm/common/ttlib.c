@@ -16,6 +16,29 @@
 // for _ismbblead
 #include <mbctype.h>
 
+/* OS version with GetVersionEx(*1)
+
+                dwMajorVersion   dwMinorVersion    dwPlatformId
+Windows95       4                0                 VER_PLATFORM_WIN32_WINDOWS
+Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS 
+WindowsMe       4                90                VER_PLATFORM_WIN32_WINDOWS
+WindowsNT4.0    4                0                 VER_PLATFORM_WIN32_NT
+Windows2000     5                0                 VER_PLATFORM_WIN32_NT
+WindowsXP       5                1                 VER_PLATFORM_WIN32_NT
+WindowsXPx64    5                2                 VER_PLATFORM_WIN32_NT
+WindowsVista    6                0                 VER_PLATFORM_WIN32_NT
+Windows7        6                1                 VER_PLATFORM_WIN32_NT
+Windows8        6                2                 VER_PLATFORM_WIN32_NT
+Windows8.1(*2)  6                2                 VER_PLATFORM_WIN32_NT
+Windows8.1(*3)  6                3                 VER_PLATFORM_WIN32_NT
+Windows10(*2)   6                2                 VER_PLATFORM_WIN32_NT
+Windows10(*3)   10               0                 VER_PLATFORM_WIN32_NT
+
+(*1) GetVersionEx()が c4996 warning となるのは、VS2013(_MSC_VER=1800) からです。
+(*2) manifestに supportedOS Id を追加していない。
+(*3) manifestに supportedOS Id を追加している。
+*/
+
 // for isInvalidFileNameChar / replaceInvalidFileNameChar
 static char *invalidFileNameChars = "\\/:*?\"<>|";
 
@@ -955,8 +978,28 @@ void OutputDebugPrintf(char *fmt, ...) {
 	OutputDebugString(tmp);
 }
 
+// OSが WindowsNT4.0 かどうかを判別する。
+//
+// return TRUE:  NT4.0
+//        FALSE: Not NT4.0
 BOOL is_NT4()
 {
+#if (_MSC_VER >= 1800)
+	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
+	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
+	// 無条件に FALSE を返してもよいかもしれない。
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = 4;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	ret = VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
+	return (ret);
+#else
 	OSVERSIONINFO osvi;
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -966,16 +1009,46 @@ BOOL is_NT4()
 		return TRUE;
 	}
 	return FALSE;
+#endif
 }
 
-int get_OPENFILENAME_SIZE()
+// OSが Windows2000 以降 かどうかを判別する。
+//
+// return TRUE:  
+//        FALSE: 
+BOOL IsWindows2000OrLater(void)
 {
+#if (_MSC_VER >= 1800)
+	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
+	// しかし、VS2013でビルドしたプログラムは、そもそも 2000 では動作しないため、
+	// 無条件に TRUE を返してもよいかもしれない。
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_GREATER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = 5;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	ret = VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
+	return (ret);
+#else
 	OSVERSIONINFO osvi;
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
 	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-	    osvi.dwMajorVersion >= 5) {
+		osvi.dwMajorVersion >= 5) {
+		return TRUE;
+	}
+	return FALSE;
+#endif
+}
+
+int get_OPENFILENAME_SIZE()
+{
+	if (IsWindows2000OrLater()) {
 		return sizeof(OPENFILENAME);
 	}
 	//return OPENFILENAME_SIZE_VERSION_400;
