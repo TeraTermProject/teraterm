@@ -2675,6 +2675,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+	int msc_ver, vs_ver;
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
@@ -2777,8 +2778,19 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			// ビルドしたときに使われたVisual C++のバージョンを設定する。(2009.3.3 yutaka)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using Microsoft Visual C++");
 #ifdef _MSC_FULL_VER
+			// VS2015では Compiler version = 19 だが、Visual Studio version = 14 となっているため、
+			// 減算を調整する。
+			// (2015.12.23 yutaka)
+			msc_ver = (_MSC_FULL_VER / 10000000);
+			if (msc_ver < 19) {
+				vs_ver = msc_ver - 6;
+			}
+			else {
+				vs_ver = msc_ver - 5;
+			}
+
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
-				(_MSC_FULL_VER / 10000000) - 6,
+				vs_ver,
 				(_MSC_FULL_VER / 100000) % 100);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 			if (_MSC_FULL_VER % 100000) {
