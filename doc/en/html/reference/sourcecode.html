@@ -1041,114 +1041,112 @@ DISPLAY=localhost:10.0
 
 
 <h2><a name="macro">Macro Language Design and Implementation</a></h2>
-<!--
-  <h3>概要</h3>
-  Tera Termのマクロスクリプトは、BASIC風の言語仕様となっています。BisonやFlexといったしくみは利用しておらず、力業的な独自の構文解析（再帰的下降法）により実装されています。そのため、本格的なスクリプト言語としての記述はできない側面があります。<br>
+  <h3>Overview</h3>
+Tera Term macro script is BASIC-style language. It does not use Bison or Flex like lexical analyzer and is written entirely from the scratch using recursive descent parsing method. Therefore, from this point of view Tera Term macro can not be called a full-fledged scripting language.<br>
   
-  <h3>ファイルの読み込み</h3>
-  ttpmacro.exeの起動時に、マクロファイル(.ttl)が一括してバッファへ読み込まれます。
+  <h3>Loading Macro File</h3>
+As soon as ttpmacro.exe starts, it reads entire macro file (.ttl) into the buffer.
   
 <p><ul>
   <li>OnInitDialog()#ttmmain.cpp -> InitTTL() -> InitBuff() -> LoadMacroFile()</li>
 </ul></p>
 
-  初めて読み込まれるマクロファイルの全内容は Buff[0] # ttmbuff.c に格納されます。この時点で、ファイルの内容は一括して読み込まれるため、マクロ実行中はファイルを削除してしまっても問題はありません。ただし、"include"で別のファイルを読み込む場合は、includeを実行する時点で、include対象となるファイルの読み込みが発生します。
+When ttpmacro.exe reads the content of macro file, it places it into buffer Buff[0]#ttmbuff.c. At this point, since entire content of macro has been read, even accidental deletion of macro file during macro execution will not cause a problem. However, if macro contains "include" statements, included files should exist at the time when "include" macro command is being executed.
   
 <pre class=code>
-#define MAXNESTLEVEL 10     /* 扱えるファイル数（includeは9つまで）*/
+#define MAXNESTLEVEL 10     /* defines the maximum number of nested files (up to nine includes) */
 
-static int INest;     /* 現在のネスト位置 */
-static HANDLE BuffHandle[MAXNESTLEVEL];   /* GlobalAlloc()によるバッファ */
-static PCHAR Buff[MAXNESTLEVEL];          /* バッファ領域 */
-static BINT BuffLen[MAXNESTLEVEL];        /* ファイルサイズ（バッファサイズ） */
-static BINT BuffPtr[MAXNESTLEVEL];        /* バッファのオフセット（読み込み位置）*/
+static int INest;     /* current nested number */
+static HANDLE BuffHandle[MAXNESTLEVEL];   /* buffer handle received from GlobalAlloc () */
+static PCHAR Buff[MAXNESTLEVEL];          /* buffer area */
+static BINT BuffLen[MAXNESTLEVEL];        /* file size (buffer size) */
+static BINT BuffPtr[MAXNESTLEVEL];        /* offset of buffer (read position) */
 </pre>
 
 
-  <h3>マクロエンジン</h3>
-  マクロ処理はアイドルループ OnIdle()#ttmmain.cpp で行われます。アイドルループでは TTLStatus 変数により、マクロエンジンの動作を変えています。通常の実行状態は IdTTLRun がセットされています。以下に、動作一覧を示します。
+  <h3>Macro Engine</h3>
+Macro script processing is done within idle loop OnIdle()#ttmmain.cpp. Behavior of macro engine changes depending on the value of idle loop variable TTLStatus. Normal execution state is set IdTTLRun. The list of available operations is shown below.
 
 <p>
 <table border=1 align=center>
 <tr>
-  <th>条件</th>
-  <th>処理</th>
+  <th>Condition</th>
+  <th>Handling</th>
 </tr>
 
 <tr>
   <td>TTLStatus==IdTTLEnd</td>
-  <td>マクロプログラムを終了する</td>
+  <td>Ends the macro program</td>
 </tr>
 
 <tr>
-  <td>送信データがある場合（OutLen > 0）</td>
-  <td>Tera Term本体へデータを送る</td>
+  <td>Unhandled Data (OutLine>0)</td>
+  <td>Sends data to Tera Term core</td>
 </tr>
 
 <tr>
   <td>TTLStatus==IdTTLRun</td>
-  <td>一行ずつマクロを実行する</td>
+  <td>Run the macro line by line</td>
 </tr>
 
 <tr>
   <td>TTLStatus==IdTTLWait</td>
-  <td>ウェイトする（'wait'コマンド）</td>
+  <td>Waits ('wait' command)</td>
 </tr>
 
 <tr>
   <td>TTLStatus==IdTTLWaitLn</td>
-  <td>ウェイトする（'waitln'コマンド）</td>
+  <td>Waits ('waitln' command)</td>
 </tr>
 
 <tr>
   <td>TTLStatus==IdTTLWaitNL</td>
-  <td>一行受信する（'recvln'コマンド）</td>
+  <td>Receives line ('recvln' command)</td>
 </tr>
 
 <tr>
   <td>TTLStatus==IdTTLWait2</td>
-  <td>文字列を待つ（'waitrecv'コマンド）</td>
+  <td>Waits for string ('waitrecv' command)</td>
 </tr>
 
 </table>
  </p>
 
 
-  <h3>インタープリタ処理</h3>
-  アイドルループから Exec()#ttl.c が定期的に呼び出される度に、マクロファイルが一行ずつ処理されてゆきます。GetNewLine() では、バッファから一行分を取り出し、LineBuff[]#ttmparse.c へ格納します。行の終わりかどうかは、「ASCIIコードが0x20未満で、かつタブ(0x09)以外」のコードが出現したタイミングで判定しています。先頭の空白やタブは無視されます。セミコロン(;)が出現すると、以降の処理をスキップするため、コメントは行の途中でも付けられることになります。<br>
+  <h3>Command Interpretation</h3>
+Every time function Exec()#ttl.c is called from the idle loop, the next line of the loaded macro will be processed. GetNewLine() takes one row out of the buffer and saves it in LineBuff[]#ttmparse.c. Any code with ASCII value below 0x20 (whitespace) except 0x09 (tabulation) is considered as the end of line. Leading space and tabulation are ignored. Semicolon (;) is considered as the beginning of a comment and is discarded together with the remaining part of the string. <br>
 
 <pre class=code>
-char LineBuff[MaxLineLen];      /* 1つの行は500バイトまで格納可能 */
-WORD LinePtr;       /* バッファオフセット */
-WORD LineLen;       /* バッファサイズ */
+char LineBuff[MaxLineLen];      /* one row can store up to 500 bytes */
+WORD LinePtr;       /* buffer offset */
+WORD LineLen;       /* buffer size */
 </pre>
 
-  Exec()から呼ばれる ExecCmnd() で、字句解析を行います。字句解析は単純な文字列検索であり、LineBuff[]を1バイトずつ参照していきます。大まかな処理の流れは以下のとおりです。
+ExecCmnd() function called from Exec() performs lexical analysis of the commands. Lexical analysis is done by simple string search within LineBuff[], one byte at a time. High level description of the analysis algorithm is shown below.
 
 <p><ol>
-  <li>endwhileの判定</li>
-  <li>break処理</li>
-  <li>endifの判定</li>
-  <li>elseの判定</li>
-  <li>マクロコマンドの実行</li>
-  <li>識別子の判定</li>
-  <li>文法エラー（上記のいずれでもない場合）</li>
+  <li>Find 'endwhile'</li>
+  <li>Find 'break'</li>
+  <li>Find 'endif'</li>
+  <li>Find 'else'</li>
+  <li>Execute macro command</li>
+  <li>Determine identifier</li>
+  <li>Show error if none of above steps were executed</li>
 </ol></p>
 
-  マクロコマンドかどうかは、GetReservedWord()で判別しています。_stricmp()で比較しているので、アルファベットの大文字・小文字は区別されません(case-insensitive)。マクロコマンドの場合は、TTLxxx() の関数を呼び出します。<br>
-  識別子の判定は、GetIdentifier() で行います。アルファベット(a-z, A-Z)および数値(0-9)、アンダースコア(_)から構成されるトークンを切り出します。トークンは32文字までです。トークンは「変数」として扱われます。左辺値に変数が来る場合は、「変数への代入」しかありえないので、その直後に「イコール(=)」があるかどうかを調べます。<br>
-  イコール以降の判定処理は、以下の順番となります。
+GetReservedWord() function is responsible for detecting whether the input string contains a macro command, or not. Comparison is done by using _stricmp() function, thus the commands are not case sensitive. If supported macro command is detected then corresponding TTLxxx() function is being called. <br>
+
+GetIdentifier() function is responsible for finding identificators. All tokens containing alphanumeric (a-z, A-Z, 0-9) characters, or underscore (_) and not exceeding 32 characters in length will be treated as variables. Statements where a value is assigned to a variable may contain variable name at the left immediately followed by equal sign (=). This complicates variable name detection process. Determination in done in the following order: <br>
   
 <p><ol>
-  <li>文字列の判定</li>
-  <li>計算式の判定</li>
+  <li>Find a string</li>
+  <li>Find a formula</li>
 </ol></p>
 
-  文字列かどうかは GetString() で判定します。文字列は’か”でクォートされているため、取り出すのは容易です。<br>
-  計算式の判定は、GetExpression() で行います。ここでは再帰的下降法により、構文解析されます。<br>
-  左辺値が定義済みの変数かどうかは CheckVar() でチェックし、数値もしくは文字列をセットします。そうではない場合は NewStrVar() で、新しい変数として登録します。
--->
-  
+GetString() function is responsible for finding string values. Since string are surrounded by singe or double quotas ('or "), it is easy to retrieve them. <br>
+GetExpression() function detects the formulas that require calculations. It uses recursive descent method for parsing. <br>
+CheckVar() function can tell whether the variable exists and if it has numeric or string type. If variable not found, NewStrVar() function will register a new variable. <br>
+ 
 
 <hr>
 
