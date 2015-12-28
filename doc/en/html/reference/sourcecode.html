@@ -15,21 +15,21 @@
 
 <ol>
   <li><a href="#foreword">Foreword</a></li>
-  <li><a href="#skillset">Skill Sets</a></li>
-  <li><a href="#module">Module Composition</a></li>
-  <li><a href="#library">Library Composition</a></li>
-  <li><a href="#plugin">Supporting Plug-in</a></li>
-  <li><a href="#configuration">Read and Write Configuration File</a></li>
+  <li><a href="#skillset">Required Skill Sets</a></li>
+  <li><a href="#module">Tera Term Package Content</a></li>
+  <li><a href="#library">Third Party Libraries</a></li>
+  <li><a href="#plugin">Plug-in Support</a></li>
+  <li><a href="#configuration">Reading and Writing Configuration File</a></li>
   <li><a href="#secure">Secure Programming</a></li>
-  <li><a href="#compatibility">Compatible with obsolete Windows</a></li>
-  <li><a href="#debug">Debugging Method</a></li>
+  <li><a href="#compatibility">Compatibility with Obsolete Windows Versions</a></li>
+  <li><a href="#debug">Debugging Methods</a></li>
   <li><a href="#thread">Multithreading</a></li>
   <li><a href="#dde">DDE Communication</a></li>
-  <li><a href="#ttssh">SSH Design and Implementation by TTSSH</a></li>
+  <li><a href="#ttssh">SSH Design and Implementation in TTSSH</a></li>
   <li><a href="#macro">Macro Language Design and Implementation</a></li>
   <li><a href="#caret">Caret Control</a></li>
   <li><a href="#serial">Serial Port</a></li>
-  <li><a href="#xyzmodem">Binary Transfer Protocol</a></li>
+  <li><a href="#xyzmodem">Binary Transfer Protocols</a></li>
 </ol>
 
 <hr width=80% align=center>
@@ -42,7 +42,7 @@
 <hr>
 
 
-<h2><a name="skillset">Skill Sets</a></h2>
+<h2><a name="skillset">Required Skill Sets</a></h2>
     Most program included in the Tera Term package are described with the C language.
     A part of code is described with the C++ language and used by MFC(Microsoft Foundation Class).
     The Win32 API knowledge is required because the source code uses a lot of Win32 API to process the Windows specific function. <br>
@@ -64,7 +64,7 @@
 <hr>
 
 
-<h2><a name="module">Module Composition</a></h2>
+<h2><a name="module">Tera Term Package Content</a></h2>
     Tera Term contains many executable module(.exe and .dll) and the association figure are below shown. An extension of an executable file is ".exe" and any DLL files are dynamically linked as needed.  Every module is the 32-bit program(x86) and the developer team will not validate the Tera Term software on the 64-bit environment like the x86-64 and IA-64. 
   
 <div align="center">
@@ -87,7 +87,7 @@
 
 <hr>
 
-<h2><a name="library">Library Composition</a></h2>
+<h2><a name="library">Third Party Libraries</a></h2>
     It is not efficiently performed to build a software from scratch for advanced feature. So, Tera Term actively uses the open source library. However, we need to be careful with the license violation,  especially GPL. <br>
     Some modules linked with the open source library and the linkage status are below shown. The macro program links the regular expression library that is called Oniguruma to use the regular expression by the "waitregex" and "sprintf" macro command. Also, Tera Term program links the same library to display the Oniguruma version on the version dialog.
   
@@ -107,7 +107,7 @@
 <hr>
     
 
-<h2><a name="plugin">Supporting Plug-in</a></h2>
+<h2><a name="plugin">Plug-in Support</a></h2>
     Tera Term can support the plug-in mechanism by using the DLL module. 
     A user can add new feature without source code modifying when the DLL plug-in module is copied into the Tera Term installation directory. The TTSSH module is typical plug-in module. <br>
     A sample code for plug-in programming is into the TTXSamples\ttxtest\ttxtest.c file. It is recommended that a user develop the plug-in module based on this file. The "TTX KanjiMenu" source code(TTXKanjiMenu\ directory) is practical and simple module. <br><br>
@@ -271,7 +271,7 @@ static TTXExports Exports = {
 
 
 
-<h2><a name="configuration">Read and Write Configuration File</a></h2>
+<h2><a name="configuration">Reading and Writing Configuration File</a></h2>
     The registry system is traditionally used on the general Windows application to record the application data. However, Tera Term basically uses the .ini file to reading and writing the application data because the Tera Term's birth goes back to the Windows 3.1. <br>
     The Collector, LogMeTT and CygTerm program included in the Tera Term package are recording the application data to the local storage. <br>
     The TeraTerm Menu records the application data to the registry as an exception. However, the application uses the .ini file instead of the registry when the "ttpmenu.ini"(it is possible to 0 byte) is created on the current directory. Note that your registry data is automatically translated to the .ini file, so you need to configure again. <br>
@@ -372,7 +372,7 @@ _snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
 
 
 
-<h2><a name="compatibility">Compatible with obsolete Windows</a></h2>
+<h2><a name="compatibility">Compatibility with Obsolete Windows Versions</a></h2>
 
 <h3>Dynamic Loading</h3>
     Microsoft Windows application can work well on every Windows version by using same executing program, however it is necessary to devise a way to make a programming.<br>
@@ -421,7 +421,7 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 <hr>
 
 
-<h2><a name="debug">Debugging Method</a></h2>
+<h2><a name="debug">Debugging Methods</a></h2>
 <h3>Debug printf</h3>
     The Windows application can not generally use the printf() function because the standard output is not assigned anywhere on the application. However, the application can use the printf() function by using the AllocConsole() and freopen(). <br>
     The application can display the message on the debug console of the Visual Studio by using the OutputDebugString() API. When the debugger launches, the debugging message can be shown regardless of the "Debug build" and "Release build". So, when a user uses the debugger like as the <a href="http://www.vector.co.jp/soft/win95/prog/se046776.html">DBCon</a> by not using the Visual Studio, the debugging message of the application can be caught. <br>
@@ -769,7 +769,7 @@ Also, the DDE communication buffer and the log buffer are shared in the cv.LogBu
 
         
 
-<h2><a name="ttssh">SSH Design and Implementation by TTSSH</a></h2>
+<h2><a name="ttssh">SSH Design and Implementation in TTSSH</a></h2>
 <!--
   <h3>概要</h3>
   オリジナルのTTSSHは<a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a>氏（現在は<a href="http://weblogs.mozillazine.org/roc/">Mozilla hacker</a>として活躍）により開発されたプラグインです。SSH1へ対応しており、ポートフォワーディングやzlibによるパケット圧縮もサポートしていました。TTSSHは、Tera Termをセキュア通信に対応させるためのプラグインであったために、SCPやSFTP等には未対応でした。オリジナルTera Termが1998年に開発凍結後も、2001年ごろまでメンテナンスが続けられていました。<br>
@@ -1366,7 +1366,7 @@ cleanup:
 <hr>
 
 
-<h2><a name="xyzmodem">Binary Transfer Protocol</a></h2>
+<h2><a name="xyzmodem">Binary Transfer Protocols</a></h2>
 <!--
   <h3>概要</h3>
 パソコン通信時代に、バイナリファイルを転送するためのプロトコルが多数開発され、Tera Termではいくつかの転送方式をサポートしています。これらのプロトコルは、今となってはレガシー仕様であり、ほとんど利用されることはありません。現在では、ルータなどの組み込み機器において、ファームウェアのアップロードに使われるぐらいです。
