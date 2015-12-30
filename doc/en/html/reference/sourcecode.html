@@ -1371,13 +1371,12 @@ cleanup:
   Creation of personal computers triggered development of communication protocols that would allow to send binary files from one computer to another. Many different protocols were born at that time and most of them have become legacy by now. One of the areas where such protocols are still in demand is communication with embedded devices for uploading or retrieving firmware. Tera Term supports 3 such protocols XMODEM, YMODEM and ZMODEM, which are described in this section. <br>
  
 
-<!--
-  <h3>仕様</h3>
-XMODEMの登場は1977年とかなり古く、また仕様がシンプルであるがゆえ、オリジナルの仕様を改版した亜種が多数存在しました。その後、XMODEMを改良したYMODEMが登場し、さらにYMODEMの欠点を改善したZMODEMが1990年前半に発明されました。<br>
-このように仕様自体が、どこかの団体により規定されたわけではないため、XMODEM/YMODEM/ZMODEMの実装にはクセがあります。Tera TermがサポートするXMODEM/YMODEM/ZMODEMはベーシックなものですが、接続相手によってはうまく動かないことも多く、ユーザによるコンフィグレーションが必要となる場合があります。<br>
+  <h3>Specification</h3>
+  XMODEM protocol is rather old, it is in use since 1977. XMODEM was developed by Ward Christensen, had simple specifications and was easy to implement. Numerous improvements made to XMODEM protocol during the first years of its existence were consolidated by Chuck Forsberg and the result of this work was called YMODEM protocol. Chuck Forsberg did not stop there and kept improving YMODEM protocol that eventually brought to life ZMODEM protocol. This was happened in 1986. <br>
+XMODEM, YMODEM and ZMODEM protocols were so popular that their support was added to almost every communication program developed at that time. Tera Term supports basic XMODEM / YMODEM / ZMODEM functionality. Depending on peer node implementation certain functions may not work correctly, or fine tuning of configuration may be required. <br>
 
-  <h3>階層構造</h3>
-バイナリ転送プロトコルを容易に追加できるようにするため、各モジュールは階層構造になっています。
+  <h3>Hierarchical Structure</h3>
+  In order to simplify binary transfer protocol implementation, hierarchical structure of modules is created.
 
 <pre class=code>
       +-------------------------------------------------------+
@@ -1389,7 +1388,7 @@ XMODEMの登場は1977年とかなり古く、また仕様がシンプルであ�
       +-------+--------+--------+--------+--------+-----------+
 </pre>
 
-たとえば、XMODEMの送信メニューを選択した場合、処理のフローは以下のようになります。
+For example, if you select to send a file via XMODEM, the process flow will be as follows.
 
 <pre class=code>
 filesys.cpp: OnFileXSend() -> XMODEMStart() -> OpenProtoDlg() ->
@@ -1397,7 +1396,7 @@ ttfile.c: ProtoInit() ->
 xmodem.c: XInit()
 </pre>
 
-ZMODEMの受信メニューの処理に関しては、以下のとおりです。
+The processing of received file using ZMODEM is as follows.
 
 <pre class=code>
 filesys.cpp: OnFileZRcv() -> ZMODEMStart() -> OpenProtoDlg() ->
@@ -1405,88 +1404,88 @@ ttfile.c: ProtoInit() ->
 zmodem.c: ZInit()
 </pre>
 
-  <h3>エントリポイント</h3>
-いかなるプロトコルを実装しようとも、ttpfile.dllにおける関数インターフェイス（エントリポイント）が用意されていれば、容易に新規プロトコルとして組み込むことができるようになっています。エントリポイントは、ProtoInit()・ProtoParse()・ProtoTimeOutProc()・ProtoCancel()から呼び出されます。<br>
-XMODEMのエントリポイントについて、以下に示します。
+  <h3>Entry Points</h3>
+  To simplify new protocol implementation all interface functions (entry points) are placed into ttpfile.dll file. Entry points are called ProtoInit(), ProtoParse(), ProtoTimeOutProc() and ProtoCancel(). <br>
+  Entry points of XMODEM are shown below.
+ 
 
 <table border=1 align=center>
 <tr>
-  <th>関数</th>
-  <th>意味</th>
+  <th>Function</th>
+  <th>Meaning</th>
 </tr>
 
 <tr>
   <td>XInit</td>
-  <td>初期化</td>
+  <td>Initialization</td>
 </tr>
 
 <tr>
   <td>XSendPacket</td>
-  <td>ファイル送信</td>
+  <td>File transmission</td>
 </tr>
 
 <tr>
   <td>YReadPacket</td>
-  <td>ファイル受信</td>
+  <td>File reception</td>
 </tr>
 
 <tr>
   <td>XTimeOutProc</td>
-  <td>タイムアウト処理</td>
+  <td>Timeout handling</td>
 </tr>
 
 <tr>
   <td>XCancel</td>
-  <td>キャンセル処理</td>
+  <td>Cancellation</td>
 </tr>
 </table>
 <br>
 
-ZMODEMのエントリポイントについて、以下に示します。
+Entry points of ZMODEM are shown below.
 
 <table border=1 align=center>
 <tr>
-  <th>関数</th>
-  <th>意味</th>
+  <th>Function</th>
+  <th>Meaning</th>
 </tr>
 
 <tr>
   <td>ZInit</td>
-  <td>初期化</td>
+  <td>Initialization</td>
 </tr>
 
 <tr>
   <td>ZParse</td>
-  <td>ファイル送信</td>
+  <td>File transmission</td>
 </tr>
 
 <tr>
   <td>ZParse</td>
-  <td>ファイル受信</td>
+  <td>File reception</td>
 </tr>
 
 <tr>
   <td>ZTimeOutProc</td>
-  <td>タイムアウト処理</td>
+  <td>Timeout handling</td>
 </tr>
 
 <tr>
   <td>ZCancel</td>
-  <td>キャンセル処理</td>
+  <td>Cancellation</td>
 </tr>
 </table>
 
-  <h3>テスト手法</h3>
-  バイナリ転送プロトコルはシリアル回線で利用されることが多いのですが、最近のPCは、シリアルポートが搭載されていないため、シリアル接続でのテストを行うことが難しくなっています。そこで、<a href="http://com0com.sourceforge.net/">com0comというNull-modem emulator</a>を利用すると、1つのPC内で仮想的に2つのCOMポートを生成し、Tera Term同士、Tera Termと別ターミナルソフト同士で、シリアル通信を行うことができます。
-  
+  <h3>Testing Connectivity</h3>
+  Binary transfer protocols are usually used with serial connections. Modern PC-s are rarely equipped with serial ports, which makes testing of these protocols more challenging. One on the options is to use Null-modem emulator like <a href="http://com0com.sourceforge.net/">com0com</a>. It will generate two virtual COM ports on a single PC. Then we can use 2 instances of Tera Term to connect these virtual serial ports, or use Tera Term and another software terminal emulator for this purpose. 
 
 <div align="center">
 <img src="image/devman_com0com.png" width=468 height=171>
 </div>
 
 
-  <h3>記号</h3>
-  バイナリ転送プロトコルでは、ACKやCANといったキャラクタ表記が使われますが、これらはASCIIコード表から来ています。man 7 ascii でASCIIコード一覧が参照できます。以下に代表的な記号と値を引用します。
+  <h3>Characters</h3>
+  Binary transfer protocol uses character notation such as ACK or CAN, which originates from 7-bit ASCII table. You can refer ASCII table by using man 7 ascii. Most frequently used characters are listed below.
   
 
 <pre class=code>
@@ -1501,6 +1500,7 @@ Oct   Dec   Hex   Char                        Oct   Dec   Hex   Char
 </pre>
 
 
+<!--
 
   <h3>XMODEM</h3>
 XMODEMは、ファイルのデータを一定のサイズ（128バイトおよび1024バイト）に分割し、ブロックごとにACKを確認しながら、送信を行うプロトコルです。ブロック単位で、毎回ACKを確認するため、転送速度は速くはありませんが、実装がシンプルとなります。<br>
