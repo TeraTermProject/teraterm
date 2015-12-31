@@ -1500,26 +1500,28 @@ Oct   Dec   Hex   Char                        Oct   Dec   Hex   Char
 </pre>
 
 
-<!--
 
   <h3>XMODEM</h3>
-XMODEMは、ファイルのデータを一定のサイズ（128バイトおよび1024バイト）に分割し、ブロックごとにACKを確認しながら、送信を行うプロトコルです。ブロック単位で、毎回ACKを確認するため、転送速度は速くはありませんが、実装がシンプルとなります。<br>
-最後のブロックが一定のサイズに満たない場合は、満たすようにCPMEOF(0x1A)がパディングされます。すなわち、データを送ると、かならずデータのサイズが一定のサイズの倍数となり、末尾にCPMEOFが付加される場合があるということです。そのため、ファイルの送信に完全性を求める場合は、XMOMDEは使えません。なお、CPMEOFというのは、MS-DOSの前身であるCP/MというOSにおいて、テキストファイルの終端(EOF)を表す値のことです。<br>
-  XMODEMのプロトコルについては、下記サイトが参考になります。
+  XMODEM divides the data files into blocks with predetermined size (128 bytes or 1,024 bytes) and expects ACK after sending each block. At low transmission speeds implementing a mechanism of sending/receiving ACK-s after every single block is not difficult. <br>
+
+If the data is shorter than predetermined block size, it will be padded with CPMEOF (0x1A). In other words, when you send a file, the size of transmitted data is always equal to a multiple of predetermined block size. Therefore, if integrity of transmited file has to be determined, XMOMDEM won't be able to do that. It should be noted that term CPMEOF is related to MS-DOS operating system. Its predecessor - CP/M called this character EOF which meant end of text file. <br>
+
+More information about XMODEM protocol can be found on Wikipedia.
 
 <ul>
-  <li><a href="http://ja.wikipedia.org/wiki/XMODEM">XMODEM - Wikipedia</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/XMODEM">XMODEM - Wikipedia</a></li>
 </ul>
 <br>
 
-  teraterm.ini で XmodemLog エントリを有効にすると、通信ログを採取することができます。通信ログファイルは、ttermpro.exe と同じディレクトリに"XMODEM.LOG"という名前で生成されます。
+If "XmodemLog" entry of teraterm.ini file is set to "On", Tera Term will log communication data in "XMODEM.LOG" file. This file will be created in Tera Term installation directory.
 
 <pre class=code>
 ; XMODEM log
 XmodemLog=on
 </pre>
 
-  簡単な例として、Tera Term(COM10)から<a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a>(COM11)に対して、67バイトのファイルを送信した場合の通信ログを示します。「&lt;&lt;&lt;」行はTera Termがホストから受信したデータで、「&gt;&gt;&gt;」行はTera Termが送信したデータです。
+Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a> (COM11) 67-byte long file using XMODEM protocol is shown below. <br>
+"&lt;&lt;&lt;" indicates the data Tera Term received from the host, "&gt;&gt;&gt;" shows the data Tera Term sent to the host.
   
 <pre class=code>
 &lt;&lt;&lt;
@@ -1546,22 +1548,24 @@ XmodemLog=on
 06 
 </pre>
 
-  上記ログの意味は以下のとおりです。
+Step by step explanation of the above log:
   
 <ol>
- <li>NAK受信</li>
- <li>ブロックデータの送信</li>
- <li>ACK受信</li>
- <li>EOTの送信</li>
- <li>ACK受信</li>
+ <li>NAK is received (15)</li>
+ <li>Data block is sent</li>
+ <li>ACK is received (06)</li>
+ <li>EOT is sent (04)</li>
+ <li>ACK is received (06)</li>
 </ol>
 
-  ブロックデータは、「ヘッダ(3byte)＋データ(128byte)＋CRC(1byte)」から構成されます。この例では、送信データが128byte未満なので、パディングとしてCPMEOF(0x1A)で埋められています。
+Transmitted block contains the header (3byte) + data (128byte) + CRC (1byte). In above example data size was less than 128 bytes and the end of block was filled with CPMEOF (0x1A).
 
 <p></p>
 
-  次はもう少し大きめのサイズ(1772byte)のデータを送信してみます。(1772+127)/128=14 で、14回ブロック転送されるはずです。下記に通信ログを示します。ヘッダの第2バイトがブロック番号（1オリジン）であり、1(0x01)～14(0x0E)まで増加していることが分かります。最後のブロックは128バイトに収まるように、CPMEOFがパディングとして付加されています。<br>
-  このようにXMODEMによる通信では、送信後ファイルの末尾にゴミが付いたように見えるので、厳密にはファイルが壊れます。
+Now lets try to send a bigger file (1772 bytes). It will be divided in (1772 + 127) / 128 = 14 blocks. Communication log for such file transmission is shown below. <br>
+The second byte of the header is a block number (starting form 1). Block number increments from 1 (0x01) to 14 (0x0E). Since the last block is shorter than 128 bytes it is padded with CPMEOF. <br>
+
+All this is done in accordance with XMODEM protocol, however it is easy to see that padding at the end of transmitted file actually can corrupt binary file.
 
 <pre class=code>
 &lt;&lt;&lt;
@@ -1636,23 +1640,24 @@ XmodemLog=on
 
 
   <h3>YMODEM</h3>
-  YMODEMは、XMODEMを改良したプロトコルです。XMODEMとの違いはいくつかありますが、大きな違いの1つとして、ファイル情報が送れるということです。YMODEMでは、ファイル名やファイルサイズをホストに知らせることができるので、送信したファイルの末尾からCPMEOFを除去することができます。<br>
-
-  YMODEMのプロトコルについては、下記サイトが参考になります。
+  YMODEM is more advanced version of XMODEM protocol. Unlike XMODEM, YMODEM can send file name and file size to the host. Knowing file size allows the host to remove CPMEOF characters from the end of transmitted file and avoid possible file corruption. <br>
+ 
+More information about YMODEM protocol can be found on Wikipedia.
 
 <ul>
-  <li><a href="http://ja.wikipedia.org/wiki/YMODEM">YMODEM - Wikipedia</a></li>
+  <li><a href="http://en.wikipedia.org/wiki/YMODEM">YMODEM - Wikipedia</a></li>
 </ul>
 <br>
 
-  teraterm.ini で YmodemLog エントリを有効にすると、通信ログを採取することができます。通信ログファイルは、ttermpro.exe と同じディレクトリに"YMODEM.LOG"という名前で生成されます。
+If "YmodemLog" entry of teraterm.ini file is set to "On", Tera Term will log communication data in "YMODEM.LOG" file. This file will be created in Tera Term installation directory.
 
 <pre class=code>
 ; YMODEM log
 YmodemLog=on
 </pre>
 
-  簡単な例として、Tera Term(COM10)から<a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a>(COM11)に対して、67バイトのファイルを送信した場合の通信ログを示します。「&lt;&lt;&lt;」行はTera Termがホストから受信したデータで、「&gt;&gt;&gt;」行はTera Termが送信したデータです。
+Sample log file where Tera Term (COM10) sends to <a href="http://nanno.dip.jp/softlib/man/rlogin/">RLogin</a> (COM11) 67-byte long file using YMODEM protocol is shown below. <br>
+"&lt;&lt;&lt;" indicates the data Tera Term received from the host, "&gt;&gt;&gt;" shows the data Tera Term sent to the host.
   
 <pre class=code>
 &lt;&lt;&lt;
@@ -1875,20 +1880,20 @@ YmodemLog=on
 06 
 </pre>
 
-  上記ログの意味は以下のとおりです。
+Step by step explanation of the above log:
   
 <ol>
- <li>'C'（送信要求）受信</li>
- <li>ブロック0（ファイル情報）の送信</li>
- <li>ACK受信</li>
- <li>'C'（送信要求）受信</li>
- <li>ブロック1の送信</li>
- <li>ACK受信</li>
- <li>EOTの送信</li>
- <li>ACK受信</li>
- <li>'C'（送信要求）受信</li>
- <li>ブロック0（オールゼロ）の送信</li>
- <li>ACK受信</li>
+ <li>'C' request to send (43)</li>
+ <li>Block 0 is sent (file information)</li>
+ <li>ACK is received (06)</li>
+ <li>'C' request to send (43)</li>
+ <li>Block 1 is sent (file information)</li>
+ <li>ACK is received (06)</li>
+ <li>EOT is sent (04)</li>
+ <li>ACK is received (06)</li>
+ <li>'C' request to send (43)</li>
+ <li>Block 0 is sent (all zeros)</li>
+ <li>ACK is received (06)</li>
 </ol>
 
 
@@ -1900,24 +1905,28 @@ TBD
 
 
   <h3>KERMIT</h3>
-  KERMIT（カーミット：セサミストリートに登場するカエルのマペット）は、1981年にコロンビア大学で開発されたファイル転送プロトコルであり、現在はカーミットプロジェクトによりメンテナンスされています。下記のサイトから仕様書が入手できます。<br>
+KERMIT (Kermit: Frog Muppet from Sesame Street) is a file transfer protocol developed in Columbia University in 1981. It is currently maintained by Kermit project. Specification is available from the following site. <br>  
   
+  More information about KERMIT project can be found on KERMIT project website. 
+
 <ul>
   <li><a href="http://www.kermitproject.org/">The Kermit Project</a></li>
 </ul>
 <br>
 
-  上記サイトでは、ソースコードも配布されており、様々なプラットフォームに実装されています。実装の名称としては、C-KermitやE-Kermit、Kermit95などがあります。<br>
-  teraterm.ini で KmtLog エントリを有効にすると、通信ログを採取することができます。通信ログファイルは、ttermpro.exe と同じディレクトリに"KERMIT.LOG"という名前で生成されます。
+This site distributes KERMIT source code variations for different platforms. The are called C-Kermit, E-Kermit and Kermit95. <br>
+
+If "KmtLog" entry of teraterm.ini file is set to "On", Tera Term will log communication data in "KERMIT.LOG" file. This file will be created in Tera Term installation directory.
   
 <pre class=code>
 ; Kermit log
 KmtLog=on
 </pre>
 
-  KERMITは元々低速なシリアル通信を想定しているため、一度に送れるデータサイズはせいぜい94バイトです。ただし、拡張オプションで数千バイトのデータを扱うことはできますが、クライアントとサーバの両方が当該機能をサポートしている必要があります。<br>
-  パケットのフォーマットは基本形式と拡張形式があり、仕様書の「Appendix I Packet Format and Types」に分かりやすい図解があります。下記に引用します。<br>
-  以下は基本形式です。94バイトまでしか扱えません。
+KERMIT was initially designed for low speed connections that's why it could not send more than 94 bytes of data at a time. However, it now has extended option allowing to transmit several kilobytes of data if both - server and client can support this functionality. <br>
+
+KERMIT has 2 packet formats - basic and extended. They are described in "Appendix 1. Packet Format and Types" of KERMIT specification. Below are the extracts from KERMIT specification. <br>
+Basic KERMIT packet format supporting 94 byte blocks is shown below.
 
 <pre class=code>
 Basic Kermit Packet Layout
@@ -1929,15 +1938,16 @@ Basic Kermit Packet Layout
              |                                 |
              |&lt;--------LEN-32 characters------&gt;|
 
-  MARK   パケットの先頭。CTRL-A(0x01)が入る。
-  LEN    パケットサイズ+32。"LEN+2"バイトが全体サイズとなる。
-  SEQ    「シーケンス番号+32」の剰余64。シーケンス番号は0～63まで。
-  TYPE   大文字アルファベットでパケットの種別を表す。
-  DATA   データ
-  CHECK  加算チェックサム。1,2,3バイトのいずれかの形式を選べる。
+  MARK   A real control character, usually Ctrl-A (0x01).
+  LEN    One character, length of remainder of packet + 32, max 95. "LEN+2" is whole size.
+  SEQ    One character, packet sequence number + 32, modulo 64. The number is from 0 to 63.
+  TYPE   One character, an uppercase letter.
+  DATA   Transmitted data
+  CHECK  One, two or three bytes as negotiated.
+  &lt;terminator&gt;  Any control character required for reading the packet.
 </pre>
 
-  以下は拡張形式です。
+Extended packet format is shown below.
 
 <pre class=code>
 Kermit Extended Packet Layout
@@ -1954,10 +1964,10 @@ Kermit Extended Packet Layout
 HCHECK is a single-character type 1 checksum
 </pre>
 
-  拡張形式では94バイト以上のデータを一度に送れるようにするため、データサイズを表現する領域が2バイトに増えています。基本形式の"LEN"は常にゼロです（32を加算するので、ASCIIコードの空白になる）。また、ヘッダサイズが3バイト増えており、ヘッダ用のチェックサムが追加されています。<br>
+In order to send more than 94 bytes of data, extended format's field containing data size is increased to two bytes. "LEN" is always zero of basic format (after adding 32 it is equal to ASCII code of whitespace character). Additionally, the size of the header increased by 3 bytes and haeder checksum was added. <br>
   <br>
   
-  下記は初期文字列です。
+  Initialization String
   
 <pre class=code>
 Initialization String
@@ -1986,7 +1996,7 @@ MAXLX2
       Low part of extended packet maximum length (mod(max,95)+32)
 </pre>
 
-  下記はパケット種別です。
+Below is the list of packet types.
 
 <pre class=code>
 Packet Types
@@ -2028,7 +2038,6 @@ G   Generic Kermit Command. Data field contains a single character subcommand, f
     V Variable &lt;%command[%argument[%argument]]&gt;
 </pre>
 
--->
 
 </BODY>
 </HTML>

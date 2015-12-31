@@ -1530,11 +1530,11 @@ XmodemLog=on
 　上記ログの意味は以下のとおりです。
 　
 <ol>
- <li>NAK受信</li>
+ <li>NAK受信(15)</li>
  <li>ブロックデータの送信</li>
- <li>ACK受信</li>
- <li>EOTの送信</li>
- <li>ACK受信</li>
+ <li>ACK受信(06)</li>
+ <li>EOTの送信(04)</li>
+ <li>ACK受信(06)</li>
 </ol>
 
 　ブロックデータは、「ヘッダ(3byte)＋データ(128byte)＋CRC(1byte)」から構成されます。この例では、送信データが128byte未満なので、パディングとしてCPMEOF(0x1A)で埋められています。
@@ -1859,17 +1859,17 @@ YmodemLog=on
 　上記ログの意味は以下のとおりです。
 　
 <ol>
- <li>'C'（送信要求）受信</li>
+ <li>'C'（送信要求）受信(43)</li>
  <li>ブロック0（ファイル情報）の送信</li>
- <li>ACK受信</li>
- <li>'C'（送信要求）受信</li>
+ <li>ACK受信(06)</li>
+ <li>'C'（送信要求）受信 (43)</li>
  <li>ブロック1の送信</li>
- <li>ACK受信</li>
- <li>EOTの送信</li>
- <li>ACK受信</li>
- <li>'C'（送信要求）受信</li>
+ <li>ACK受信 (06)</li>
+ <li>EOTの送信 (04)</li>
+ <li>ACK受信(06)</li>
+ <li>'C'（送信要求）受信 (43)</li>
  <li>ブロック0（オールゼロ）の送信</li>
- <li>ACK受信</li>
+ <li>ACK受信(06)</li>
 </ol>
 
 
@@ -1916,6 +1916,7 @@ Basic Kermit Packet Layout
   TYPE   大文字アルファベットでパケットの種別を表す。
   DATA   データ
   CHECK  加算チェックサム。1,2,3バイトのいずれかの形式を選べる。
+  &lt;terminator&gt;   制御コード
 </pre>
 
 　以下は拡張形式です。
