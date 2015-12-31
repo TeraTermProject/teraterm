@@ -1504,7 +1504,7 @@ Oct   Dec   Hex   Char                        Oct   Dec   Hex   Char
   <h3>XMODEM</h3>
   XMODEM divides the data files into blocks with predetermined size (128 bytes or 1,024 bytes) and expects ACK after sending each block. At low transmission speeds implementing a mechanism of sending/receiving ACK-s after every single block is not difficult. <br>
 
-If the data is shorter than predetermined block size, it will be padded with CPMEOF (0x1A). In other words, when you send a file, the size of transmitted data is always equal to a multiple of predetermined block size. Therefore, if integrity of transmited file has to be determined, XMOMDEM won't be able to do that. It should be noted that term CPMEOF is related to MS-DOS operating system. Its predecessor - CP/M called this character EOF which meant end of text file. <br>
+If the data is shorter than predetermined block size, it will be padded with CPMEOF (0x1A). In other words, when you send a file, the size of transmitted data is always equal to a multiple of predetermined block size. Therefore, if integrity of transmitted file has to be determined, XMOMDEM won't be able to do that. It should be noted that term CPMEOF is related to MS-DOS operating system. Its predecessor - CP/M called this character EOF which meant end of text file. <br>
 
 More information about XMODEM protocol can be found on Wikipedia.
 
@@ -1964,7 +1964,7 @@ Kermit Extended Packet Layout
 HCHECK is a single-character type 1 checksum
 </pre>
 
-In order to send more than 94 bytes of data, extended format's field containing data size is increased to two bytes. "LEN" is always zero of basic format (after adding 32 it is equal to ASCII code of whitespace character). Additionally, the size of the header increased by 3 bytes and haeder checksum was added. <br>
+In order to send more than 94 bytes of data, extended format's field containing data size is increased to two bytes. "LEN" is always zero of basic format (after adding 32 it is equal to ASCII code of whitespace character). Additionally, the size of the header increased by 3 bytes and header checksum was added. <br>
   <br>
   
   Initialization String
