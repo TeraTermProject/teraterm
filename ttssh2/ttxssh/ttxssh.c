@@ -4103,7 +4103,7 @@ static void arc4random_stir(void)
 	for(i = 0; i <= 256; i += sizeof(rand_buf))
 		RC4(&rc4, sizeof(rand_buf), rand_buf, rand_buf);
 
-	memset(rand_buf, 0, sizeof(rand_buf));
+	SecureZeroMemory(rand_buf, sizeof(rand_buf));
 
 	rc4_ready = REKEY_BYTES;
 }
@@ -4192,7 +4192,7 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 	if (EVP_CipherInit(&c->k1, EVP_des_cbc(), k1, NULL, enc) == 0 ||
 		EVP_CipherInit(&c->k2, EVP_des_cbc(), k2, NULL, !enc) == 0 ||
 		EVP_CipherInit(&c->k3, EVP_des_cbc(), k3, NULL, enc) == 0) {
-			memset(c, 0, sizeof(*c));
+			SecureZeroMemory(c, sizeof(*c));
 			free(c);
 			EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 			return (0);
@@ -4223,7 +4223,7 @@ static int ssh1_3des_cleanup(EVP_CIPHER_CTX *ctx)
 		EVP_CIPHER_CTX_cleanup(&c->k1);
 		EVP_CIPHER_CTX_cleanup(&c->k2);
 		EVP_CIPHER_CTX_cleanup(&c->k3);
-		memset(c, 0, sizeof(*c));
+		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 	}
@@ -4660,7 +4660,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// Ç±Ç±Ç≈ÇÕ"AES256-CBC"Ç…å≈íËÇ∆Ç∑ÇÈÅB
 	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
 		get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
-	memset(key, 0, keylen + ivlen);
+	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
 	buffer_append(encoded, AUTH_MAGIC, sizeof(AUTH_MAGIC));
@@ -4680,7 +4680,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 
 	buffer_put_string(encoded, cp, len);
 
-	memset(cp, 0, len);
+	SecureZeroMemory(cp, len);
 	free(cp);
 
 	/* Random check bytes */

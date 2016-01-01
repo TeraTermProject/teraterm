@@ -51,7 +51,7 @@ static HFONT DlgAuthSetupFont;
 void destroy_malloced_string(char FAR * FAR * str)
 {
 	if (*str != NULL) {
-		memset(*str, 0, strlen(*str));
+		SecureZeroMemory(*str, strlen(*str));
 		free(*str);
 		*str = NULL;
 	}

@@ -34,6 +34,8 @@
 #include "ed25519_crypto_api.h"
 #define SHA512_DIGEST_LENGTH crypto_hash_sha512_BYTES
 
+#include <windows.h>
+
 /*
  * pkcs #5 pbkdf2 implementation using the "bcrypt" hash
  *
@@ -97,9 +99,9 @@ bcrypt_hash(u_int8_t *sha2pass, u_int8_t *sha2salt, u_int8_t *out)
 	}
 
 	/* zap */
-	memset(ciphertext, 0, sizeof(ciphertext));
-	memset(cdata, 0, sizeof(cdata));
-	memset(&state, 0, sizeof(state));
+	SecureZeroMemory(ciphertext, sizeof(ciphertext));
+	SecureZeroMemory(cdata, sizeof(cdata));
+	SecureZeroMemory(&state, sizeof(state));
 }
 
 int
@@ -161,8 +163,8 @@ bcrypt_pbkdf(const char *pass, size_t passlen, const u_int8_t *salt, size_t salt
 	}
 
 	/* zap */
-	memset(out, 0, sizeof(out));
-	memset(countsalt, 0, saltlen + 4);
+	SecureZeroMemory(out, sizeof(out));
+	SecureZeroMemory(countsalt, saltlen + 4);
 	free(countsalt);
 
 	return 0;

@@ -258,7 +258,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 			                  "The passphrase is incorrect.");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 		}
-		memset(keyfile_data, 0, length);
+		SecureZeroMemory(keyfile_data, length);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -287,7 +287,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 		UTIL_get_lang_msg("MSG_KEYFILES_PRIVATEKEY_TRUNCATE_ERROR", pvar,
 		              "The specified key file has been truncated and does not contain a valid private key.");
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
-		memset(keyfile_data, 0, length);
+		SecureZeroMemory(keyfile_data, length);
 		free(keyfile_data);
 		return NULL;
 	}
@@ -309,7 +309,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 		key = NULL;
 	}
 
-	memset(keyfile_data, 0, length);
+	SecureZeroMemory(keyfile_data, length);
 	free(keyfile_data);
 	return key;
 }

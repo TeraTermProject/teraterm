@@ -134,7 +134,7 @@ int ssh_dss_verify(DSA *key,
 	EVP_DigestFinal(&md, digest, &dlen);
 
 	ret = DSA_do_verify(digest, dlen, sig, key);
-	memset(digest, 'd', sizeof(digest));
+	SecureZeroMemory(digest, sizeof(digest));
 
 	DSA_SIG_free(sig);
 
@@ -308,8 +308,8 @@ int ssh_rsa_verify(RSA *key,
 
 	ret = openssh_RSA_verify(nid, digest, dlen, sigblob, len, key);
 
-	memset(digest, 'd', sizeof(digest));
-	memset(sigblob, 's', len);
+	SecureZeroMemory(digest, sizeof(digest));
+	SecureZeroMemory(sigblob, len);
 	//free(sigblob);
 	//debug("ssh_rsa_verify: signature %scorrect", (ret==0) ? "in" : "");
 
@@ -372,7 +372,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	EVP_DigestFinal(&md, digest, &dlen);
 
 	ret = ECDSA_do_verify(digest, dlen, sig, key);
-	memset(digest, 'd', sizeof(digest));
+	SecureZeroMemory(digest, sizeof(digest));
 
 	ECDSA_SIG_free(sig);
 
@@ -434,15 +434,15 @@ error:
 	free(ktype);
 
 	if (sigblob) {
-		memset(sigblob, 's', len);
+		SecureZeroMemory(sigblob, len);
 		free(sigblob);
 	}
 	if (sm) {
-		memset(sm, 'S', (size_t)smlen);
+		SecureZeroMemory(sm, (size_t)smlen);
 		free(sm);
 	}
 	if (m) {
-		memset(m, 'm', (size_t)smlen); /* NB. mlen may be invalid if ret != 0 */
+		SecureZeroMemory(m, (size_t)smlen); /* NB. mlen may be invalid if ret != 0 */
 		free(m);
 	}
 
@@ -660,7 +660,7 @@ char* key_fingerprint_raw(Key *k, enum digest_algorithm dgst_alg, int *dgst_raw_
 		EVP_DigestInit(&ctx, md);
 		EVP_DigestUpdate(&ctx, blob, len);
 		EVP_DigestFinal(&ctx, retval, dgst_raw_length);
-		memset(blob, 0, len);
+		SecureZeroMemory(blob, len);
 		free(blob);
 	} else {
 		//fatal("key_fingerprint_raw: blob is null");
@@ -905,7 +905,7 @@ char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum digest_algorithm dgst
 		break;
 	}
 
-	memset(dgst_raw, 0, dgst_raw_len);
+	SecureZeroMemory(dgst_raw, dgst_raw_len);
 	free(dgst_raw);
 
 	return (retval);
@@ -1118,12 +1118,12 @@ void key_init(Key *key)
 		key->ecdsa = NULL;
 	}
 	if (key->ed25519_pk != NULL) {
-		memset(key->ed25519_pk, 0, ED25519_PK_SZ);
+		SecureZeroMemory(key->ed25519_pk, ED25519_PK_SZ);
 		free(key->ed25519_pk);
 		key->ed25519_pk = NULL;
 	}
 	if (key->ed25519_sk) {
-		memset(key->ed25519_sk, 0, ED25519_SK_SZ);
+		SecureZeroMemory(key->ed25519_sk, ED25519_SK_SZ);
 		free(key->ed25519_sk);
 		key->ed25519_sk = NULL;
 	}
@@ -1431,7 +1431,7 @@ static int ssh_ed25519_sign(Key *key, char **sigp, int *lenp, char *data, int da
 		memcpy(*sigp, buffer_ptr(b), len);
 	}
 	buffer_free(b);
-	memset(sig, 's', slen);
+	SecureZeroMemory(sig, slen);
 	free(sig);
 
 	return 0;
@@ -1471,7 +1471,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		// 電子署名を計算
 		ok = RSA_sign(nid, digest, dlen, sig, &len, keypair->rsa);
-		memset(digest, 'd', sizeof(digest));
+		SecureZeroMemory(digest, sizeof(digest));
 		if (ok != 1) { // error
 			free(sig);
 			goto error;
@@ -1523,7 +1523,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 
 		// DSA電子署名を計算
 		sig = DSA_do_sign(digest, dlen, keypair->dsa);
-		memset(digest, 'd', sizeof(digest));
+		SecureZeroMemory(digest, sizeof(digest));
 		if (sig == NULL) {
 			goto error;
 		}
@@ -1576,7 +1576,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		EVP_DigestFinal(&md, digest, &dlen);
 
 		sig = ECDSA_do_sign(digest, dlen, keypair->ecdsa);
-		memset(digest, 'd', sizeof(digest));
+		SecureZeroMemory(digest, sizeof(digest));
 
 		if (sig == NULL) {
 			goto error;

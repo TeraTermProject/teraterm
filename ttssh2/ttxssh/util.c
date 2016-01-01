@@ -304,7 +304,7 @@ BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 
 void UTIL_destroy_sock_write_buf(UTILSockWriteBuf FAR * buf)
 {
-	memset(buf->bufdata, 0, buf->buflen);
+	SecureZeroMemory(buf->bufdata, buf->buflen);
 	buf_destroy(&buf->bufdata, &buf->buflen);
 }
 

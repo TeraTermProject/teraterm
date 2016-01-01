@@ -1415,7 +1415,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {
-			memset(discard, 0, discard_len);
+			SecureZeroMemory(discard, discard_len);
 		}
 		free(junk);
 		free(discard);
@@ -1921,21 +1921,21 @@ void CRYPT_end(PTInstVar pvar)
 	destroy_public_key(&pvar->crypt_state.server_key);
 
 	if (pvar->crypt_state.detect_attack_statics.h != NULL) {
-		memset(pvar->crypt_state.detect_attack_statics.h, 0,
+		SecureZeroMemory(pvar->crypt_state.detect_attack_statics.h, 
 		       pvar->crypt_state.detect_attack_statics.n * HASH_ENTRYSIZE);
 		free(pvar->crypt_state.detect_attack_statics.h);
 	}
 
-	memset(pvar->crypt_state.sender_cipher_key, 0,
+	SecureZeroMemory(pvar->crypt_state.sender_cipher_key,
 	       sizeof(pvar->crypt_state.sender_cipher_key));
-	memset(pvar->crypt_state.receiver_cipher_key, 0,
+	SecureZeroMemory(pvar->crypt_state.receiver_cipher_key, 
 	       sizeof(pvar->crypt_state.receiver_cipher_key));
-	memset(pvar->crypt_state.server_cookie, 0,
+	SecureZeroMemory(pvar->crypt_state.server_cookie, 
 	       sizeof(pvar->crypt_state.server_cookie));
-	memset(pvar->crypt_state.client_cookie, 0,
+	SecureZeroMemory(pvar->crypt_state.client_cookie, 
 	       sizeof(pvar->crypt_state.client_cookie));
-	memset(&pvar->crypt_state.enc, 0, sizeof(pvar->crypt_state.enc));
-	memset(&pvar->crypt_state.dec, 0, sizeof(pvar->crypt_state.dec));
+	SecureZeroMemory(&pvar->crypt_state.enc, sizeof(pvar->crypt_state.enc));
+	SecureZeroMemory(&pvar->crypt_state.dec, sizeof(pvar->crypt_state.dec));
 }
 
 int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase,
@@ -2011,10 +2011,10 @@ int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase,
 		break;
 
 	default:
-		memset(passphrase_key, 0, sizeof(passphrase_key));
+		SecureZeroMemory(passphrase_key, sizeof(passphrase_key));
 		return 0;
 	}
 
-	memset(passphrase_key, 0, sizeof(passphrase_key));
+	SecureZeroMemory(passphrase_key, sizeof(passphrase_key));
 	return 1;
 }

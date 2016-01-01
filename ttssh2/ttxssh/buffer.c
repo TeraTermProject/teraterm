@@ -52,7 +52,7 @@ void buffer_free(buffer_t * buf)
 	if (buf != NULL) {
 		// セキュリティ対策 (2006.8.3 yutaka)
 		int len =  buffer_len(buf);
-		memset(buf->buf, 'x', len);
+		SecureZeroMemory(buf->buf, len);
 		free(buf->buf);
 		free(buf);
 	}

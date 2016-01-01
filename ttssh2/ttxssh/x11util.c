@@ -135,10 +135,10 @@ X11AuthData FAR *X11_load_local_auth_data(int screen_num)
 
 void X11_dispose_auth_data(X11AuthData FAR * auth_data)
 {
-	memset(auth_data->local_data, 0, auth_data->local_data_len);
+	SecureZeroMemory(auth_data->local_data, auth_data->local_data_len);
 	free(auth_data->local_data);
 	free(auth_data->spoofed_protocol);
-	memset(auth_data->spoofed_data, 0, auth_data->spoofed_data_len);
+	SecureZeroMemory(auth_data->spoofed_data, auth_data->spoofed_data_len);
 	free(auth_data->spoofed_data);
 	free(auth_data);
 }

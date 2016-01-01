@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <malloc.h>
 #include <string.h>
+#include <windows.h>
 
 #include "config.h"
 
@@ -122,7 +123,7 @@ ssh_aes_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh_aes_ctr_ctx *c;
 
 	if((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		memset(c, 0, sizeof(*c));
+		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 	}
@@ -201,7 +202,7 @@ ssh_des3_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh_des3_ctr_ctx *c;
 
 	if((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		memset(c, 0, sizeof(*c));
+		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 	}
@@ -295,7 +296,7 @@ ssh_bf_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh_blowfish_ctr_ctx *c;
 
 	if((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		memset(c, 0, sizeof(*c));
+		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 	}
@@ -389,7 +390,7 @@ ssh_cast5_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh_cast5_ctr_ctx *c;
 
 	if((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		memset(c, 0, sizeof(*c));
+		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 	}
@@ -463,7 +464,7 @@ ssh_camellia_ctr_cleanup(EVP_CIPHER_CTX *ctx)
 	struct ssh_camellia_ctr_ctx *c;
 
 	if((c = EVP_CIPHER_CTX_get_app_data(ctx)) != NULL) {
-		memset(c, 0, sizeof(*c));
+		SecureZeroMemory(c, sizeof(*c));
 		free(c);
 		EVP_CIPHER_CTX_set_app_data(ctx, NULL);
 	}
