@@ -889,9 +889,27 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			get_lang_msg("DLG_XOPT_BINARY", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_XOPTBIN, uimsg);
 
-			SetRB(Dialog,HIWORD(*pl),IDC_XOPTCHECK,IDC_XOPT1K);
-			if (LOWORD(*pl)!=0xFFFF)
+			if (LOWORD(*pl)==0xFFFF) // Send
 			{
+				ShowDlgItem(Dialog, IDC_XOPT1K, IDC_XOPT1K);
+				Hi = 0;
+				if (HIWORD(*pl) == Xopt1kCRC || HIWORD(*pl) == Xopt1kCksum) {
+					Hi = 1;
+				}
+				SetRB(Dialog, Hi, IDC_XOPT1K, IDC_XOPT1K);
+			}
+			else // Recv
+			{
+				ShowDlgItem(Dialog, IDC_XOPTCHECK, IDC_XOPTCRC);
+				Hi = HIWORD(*pl);
+				if (Hi == Xopt1kCRC) {
+					Hi = XoptCRC;
+				}
+				else if (Hi == Xopt1kCksum) {
+					Hi = XoptCheck;
+				}
+				SetRB(Dialog, Hi, IDC_XOPTCHECK, IDC_XOPTCRC);
+
 				ShowDlgItem(Dialog,IDC_XOPTBIN,IDC_XOPTBIN);
 				SetRB(Dialog,LOWORD(*pl),IDC_XOPTBIN,IDC_XOPTBIN);
 			}
@@ -902,11 +920,23 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
 					if (pl!=NULL)
 					{
-						GetRB(Dialog,&Hi,IDC_XOPTCHECK,IDC_XOPT1K);
-						if (LOWORD(*pl)==0xFFFF)
+						if (LOWORD(*pl)==0xFFFF) // Send
+						{
 							Lo = 0xFFFF;
-						else
-							GetRB(Dialog,&Lo,IDC_XOPTBIN,IDC_XOPTBIN);
+
+							GetRB(Dialog, &Hi, IDC_XOPT1K, IDC_XOPT1K);
+							if (Hi > 0) { // force CRC if 1K
+								Hi = Xopt1kCRC;
+							}
+							else {
+								Hi = XoptCRC;
+							}
+						}
+						else // Recv
+						{
+							GetRB(Dialog, &Lo, IDC_XOPTBIN, IDC_XOPTBIN);
+							GetRB(Dialog, &Hi, IDC_XOPTCHECK, IDC_XOPTCRC);
+						}
 						*pl = MAKELONG(Lo,Hi);
 					}
 					break;
@@ -921,12 +951,24 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
 					if (pl!=NULL)
 					{
-						GetRB(Dialog,&Hi,IDC_XOPTCHECK,IDC_XOPT1K);
-						if (LOWORD(*pl)==0xFFFF)
+						if (LOWORD(*pl) == 0xFFFF) // Send
+						{
 							Lo = 0xFFFF;
-						else
-							GetRB(Dialog,&Lo,IDC_XOPTBIN,IDC_XOPTBIN);
-						*pl = MAKELONG(Lo,Hi);
+
+							GetRB(Dialog, &Hi, IDC_XOPT1K, IDC_XOPT1K);
+							if (Hi > 0) { // force CRC if 1K
+								Hi = Xopt1kCRC;
+							}
+							else {
+								Hi = XoptCRC;
+							}
+						}
+						else // Recv
+						{
+							GetRB(Dialog, &Lo, IDC_XOPTBIN, IDC_XOPTBIN);
+							GetRB(Dialog, &Hi, IDC_XOPTCHECK, IDC_XOPTCRC);
+						}
+						*pl = MAKELONG(Lo, Hi);
 					}
 					if (DlgXoptFont != NULL) {
 						DeleteObject(DlgXoptFont);
