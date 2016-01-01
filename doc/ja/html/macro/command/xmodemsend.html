@@ -29,37 +29,46 @@ XMODEM ƒvƒƒgƒRƒ‹‚Åƒtƒ@ƒCƒ‹ &lt;filename&gt; ‚ğ‘—M‚·‚éB‘—M‚ªI‚í‚é‚Ü‚ÅŸ‚ÌƒRƒ
 </p>
 
 <p>
-&lt;option&gt; ‚É‚æ‚Á‚ÄAXMODEM ‚ÌƒIƒvƒVƒ‡ƒ“‚ğw’è‚·‚éB
+&lt;option&gt; ‚É‚æ‚Á‚ÄAXMODEM ‚ÌƒIƒvƒVƒ‡ƒ“(ƒpƒPƒbƒgƒTƒCƒY)‚ğw’è‚·‚éB<br>
+ƒGƒ‰[ŒŸo‚Ìí—Ş(Checksum/CRC)‚Í‘—M‘¤‚Å‚Ì‚İw’è‚Å‚«‚éB<em>(ƒo[ƒWƒ‡ƒ“ 4.90 ˆÈ~)</em>
 </p>
 
 <table>
  <tr>
   <th>&lt;option&gt;</th>
-  <th>XMODEM ƒIƒvƒVƒ‡ƒ“</th>
+  <th><em>(ƒo[ƒWƒ‡ƒ“ 4.89 ˆÈ‘O)</em></th>
+  <th><em>(ƒo[ƒWƒ‡ƒ“ 4.90 ˆÈ~)</em></th>
  </tr>
  <tr>
   <td>1</td>
   <td>Checksum</td>
+  <td>•W€(128ƒoƒCƒg)</td>
  </tr>
  <tr>
   <td>2</td>
   <td>CRC</td>
+  <td>•W€(128ƒoƒCƒg)</td>
  </tr>
  <tr>
   <td>3</td>
+  <td>1K</td>
   <td>1K</td>
  </tr>
  <tr>
   <td>‚»‚êˆÈŠO</td>
   <td>Checksum</td>
+  <td>•W€(128ƒoƒCƒg)</td>
  </tr>
 </table>
 
 <h2>—á</h2>
 
 <pre class="macro-example">
-<code>; XMODEM send, checksum
+<code>; XMODEM send, default packet size
 xmodemsend 'readme.txt' 1
+
+; XMODEM send, 1K
+xmodemsend 'readme.txt' 3
 </code></pre>
 
 </body>

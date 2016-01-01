@@ -30,29 +30,38 @@ If the file is transferred successfully, the system variable "result" is set to 
 
 <p>
 If the file is a binary file, &lt;binary flag&gt; must be non-zero.<br>
-If the file is a text file, &lt;binary flag&gt; must be zero.<br>
-&lt;option&gt; specifies the XMODEM option, and can be one of the following:
+If the file is a text file, &lt;binary flag&gt; must be zero.
+</p>
+
+<p>
+&lt;option&gt; specifies the XMODEM option (<!--エラー検出の種類-->), and can be one of the following:
+<!--パケットサイズ(1K)は送信側でのみ指定できる。<em>(version 4.90 or later)</em>-->
 </p>
 
 <table>
  <tr>
   <th>&lt;option&gt;</th>
-  <th>XMODEM option</th>
+  <th>(version 4.89 or earlier)</th>
+  <th>(version 4.90 or later)</th>
  </tr>
  <tr>
   <td>1</td>
+  <td>Checksum</td>
   <td>Checksum</td>
  </tr>
  <tr>
   <td>2</td>
   <td>CRC</td>
+  <td>CRC</td>
  </tr>
  <tr>
   <td>3</td>
   <td>1K</td>
+  <td>CRC</td>
  </tr>
  <tr>
   <td>others</td>
+  <td>Checksum</td>
   <td>Checksum</td>
  </tr>
 </table>
