@@ -5664,6 +5664,18 @@ WORD TTLXmodemRecv()
 
 	if (Err!=0) return Err;
 
+	switch (XOption) {
+	case XoptCRC:
+		// NOP
+		break;
+	case Xopt1kCRC:
+		// for compatibility
+		XOption = XoptCRC;
+		break;
+	default:
+		XOption = XoptCheck;
+	}
+
 	SetFile(Str);
 	SetBinary(BinFlag);
 	SetXOption(XOption);
@@ -5683,6 +5695,14 @@ WORD TTLXmodemSend()
 	    ((strlen(Str)==0) || (GetFirstChar()!=0)))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
+
+	switch (XOption) {
+	case Xopt1kCRC:
+		// NOP
+		break;
+	default:
+		XOption = XoptCRC;
+	}
 
 	SetFile(Str);
 	SetXOption(XOption);
