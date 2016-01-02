@@ -187,16 +187,9 @@ static HBITMAP GetBitmapHandle(char *File);
 // (2014.4.20 yutaka)
 static BOOL IsLoadImageOnlyEnabled(void)
 {
-	OSVERSIONINFO osvi;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
 	// Vista ñ¢ñûÇÃèÍçáÇ…ÇÕÅAç°Ç‹Ç≈í ÇËÇÃì«Ç›çûÇ›ÇÇ∑ÇÈÇÊÇ§Ç…ÇµÇΩ
 	// cf. SVN#4571(2011.8.4)
-	if (osvi.dwMajorVersion < 6) {
-		return TRUE;
-	}
-	return FALSE;
+	return !IsWindowsVistaOrLater();
 }
 
 
@@ -1793,25 +1786,8 @@ void InitDisp()
   /* background paintbrush */
   Background = CreateSolidBrush(ts.VTColor[1]);
   /* CRT width & height */
-  {
-	OSVERSIONINFO ver;
-	ZeroMemory( &ver, sizeof(ver) );
-	ver.dwOSVersionInfoSize = sizeof(ver);
-	GetVersionEx( &ver );
-	switch( ver.dwPlatformId ) {
-	// Windows 9x Ç© NT Ç©ÇÃîªíË
-	case VER_PLATFORM_WIN32_WINDOWS:
-		if( ver.dwMajorVersion > 4 ||
-			(ver.dwMajorVersion == 4 && ver.dwMinorVersion >= 10) ) // Windows 98 or later
-			bMultiDisplaySupport = TRUE;
-		break;
-	case VER_PLATFORM_WIN32_NT:
-		if( ver.dwMajorVersion >= 5 ) // Windows 2000 or later
-			bMultiDisplaySupport = TRUE;
-		break;
-	default:
-		break;
-	}
+  if (!IsWindows95() && !IsWindowsNT4()) {
+    bMultiDisplaySupport = TRUE;
   }
   if( bMultiDisplaySupport ) {
 	  VirtualScreen.left = GetSystemMetrics(SM_XVIRTUALSCREEN);

@@ -568,7 +568,6 @@ BOOL GetVirtualStoreEnvironment(void)
 #endif
 	BOOL ret = FALSE;
 	int flag = 0;
-	OSVERSIONINFO osvi;
 	HANDLE          hToken;
 	DWORD           dwLength;
 	TOKEN_ELEVATION tokenElevation;
@@ -579,10 +578,8 @@ BOOL GetVirtualStoreEnvironment(void)
 	DWORD dwType;
 	BYTE bValue;
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
 	// Windows Vista以前は無視する。
-	if (!(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6))
+	if (!IsWindowsVistaOrLater())
 		goto error;
 
 	// UACが有効かどうか。
@@ -826,7 +823,7 @@ CVTWindow::CVTWindow()
 	// USBデバイス変化通知登録
 	RegDeviceNotify(HVTWin);
 
-	if (is_NT4()) {
+	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(HVTWin,WM_SETICON,ICON_SMALL,

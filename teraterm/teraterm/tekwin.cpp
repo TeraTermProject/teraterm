@@ -82,7 +82,7 @@ CTEKWindow::CTEKWindow()
 	// register this window to the window list
 	RegWin(HVTWin,HTEKWin);
 
-	if (is_NT4()) {
+	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(HTEKWin,WM_SETICON,ICON_SMALL,

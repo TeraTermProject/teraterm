@@ -177,7 +177,7 @@ BOOL CFileTransDlg::OnInitDialog()
 	// ログファイルはフルパス表示にする(2004.8.6 yutaka)
 	SetDlgItemText(IDC_EDIT_FULLPATH, &(fv->FullName[0]));
 
-	if (is_NT4()) {
+	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,

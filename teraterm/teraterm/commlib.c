@@ -1280,7 +1280,6 @@ BOOL PrnOpen(PCHAR DevName)
 	DCB dcb;
 	DWORD DErr;
 	COMMTIMEOUTS ctmo;
-	OSVERSIONINFO osvi;
 
 	strncpy_s(Temp, sizeof(Temp),DevName, _TRUNCATE);
 	c = Temp;
@@ -1291,9 +1290,7 @@ BOOL PrnOpen(PCHAR DevName)
 	LPTFlag = (Temp[0]=='L') ||
 	          (Temp[0]=='l');
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+	if (IsWindowsNTKernel()) {
 		// ネットワーク共有にマップされたデバイスが相手の場合、こうしないといけないらしい (2011.01.25 maya)
 		// http://logmett.com/forum/viewtopic.php?f=2&t=1383
 		// http://msdn.microsoft.com/en-us/library/aa363858(v=vs.85).aspx#5

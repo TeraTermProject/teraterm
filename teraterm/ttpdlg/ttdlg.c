@@ -1184,7 +1184,6 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
-	OSVERSIONINFO osvi;
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -1255,11 +1254,9 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetRB(Dialog,ts->DisableAppKeypad,IDC_KEYBAPPKEY,IDC_KEYBAPPKEY);
 			SetRB(Dialog,ts->DisableAppCursor,IDC_KEYBAPPCUR,IDC_KEYBAPPCUR);
 
-			osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-                        GetVersionEx(&osvi);
-                        if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+			if (!IsWindowsNTKernel()) {
 				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList2, ts->MetaKey + 1);
-                        }
+			}
 			else {
 				SetDropDownList(Dialog, IDC_KEYBMETA, MetaList, ts->MetaKey + 1);
 			}
@@ -2730,7 +2727,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				int fuLoad = LR_DEFAULTCOLOR;
 				HICON hicon;
 
-				if (is_NT4()) {
+				if (IsWindowsNT4()) {
 					fuLoad = LR_VGACOLOR;
 				}
 

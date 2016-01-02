@@ -1059,20 +1059,9 @@ void FAR PASCAL UndoAllWin(void) {
 	HMONITOR hMonitor;
 	MONITORINFO mi;
 	int stat = SW_RESTORE;
-	OSVERSIONINFO osvi;
 	int multi_mon = 0;
 
-	// Windowsのバージョンを取得する。
-	// なお、Windows8.1では、GetVersionEx()はdeprecated APIであるため、Windows8(major=6,minor=2)
-	// と返ってくる。Manifestファイルを修正するという回避方法があるようだが、Visual Studio 2005では
-	// 使えないものと思われる。
-	// cf. http://msdn.microsoft.com/en-us/library/windows/desktop/dn302074.aspx
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
-	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10) ) {
-		multi_mon = 0;
-	} else {
+	if (!IsWindows95() && !IsWindowsNT4()) {
 		multi_mon = 1;
 	}
 

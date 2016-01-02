@@ -153,18 +153,13 @@ void UpdateMenu() {
 }
 
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
-  OSVERSIONINFO osvi;
-
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->ReplaceTermDlg = FALSE;
   pvar->ResizeMenu = NULL;
   pvar->MenuItems = 0;
 
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&osvi);
-  if ((osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
-      (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10)) {
+  if (IsWindows95() || IsWindowsNT4()) {
     pvar->useMultiMonitorAPI = FALSE;
   }
   else {

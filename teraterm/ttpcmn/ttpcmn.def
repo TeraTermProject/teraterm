@@ -59,3 +59,10 @@ EXPORTS
   DequoteParam @63
 
   CheckComPort @64
+
+  IsWindows95 @65
+  IsWindowsNT4 @66
+  IsWindowsNTKernel @67
+  IsWindows2000OrLater @68
+  IsWindowsVistaOrLater @69
+  IsWindows7OrLater @70

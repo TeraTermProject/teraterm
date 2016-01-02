@@ -576,7 +576,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	POINT p;
 	RECT rc_dsk, rc_dlg;
 	int dlg_height, dlg_width;
-	OSVERSIONINFO osvi;
 	static int ok2right, edit2ok, edit2bottom;
 	RECT rc_edit, rc_ok, rc_cancel;
 	// for status bar
@@ -622,10 +621,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			// キャレットが画面からはみ出しているときに貼り付けをすると
 			// 確認ウインドウが見えるところに表示されないことがある。
 			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
-			osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-			GetVersionEx(&osvi);
-			if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
-			     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10) ) {
+			if (IsWindows95() || IsWindowsNT4()) {
 				// NT4.0, 95 はマルチモニタAPIに非対応
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rc_dsk, 0);
 			}

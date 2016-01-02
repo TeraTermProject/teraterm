@@ -2385,7 +2385,6 @@ WORD TTLGetIPv6Addr()
 	IP_ADAPTER_ADDRESSES addr[256];/* XXX */
 	ULONG len = sizeof(addr);
 	char ipv6str[64];
-	OSVERSIONINFO osvi;
 
 	Err = 0;
 	GetStrAryVar(&VarId,&Err);
@@ -2395,10 +2394,7 @@ WORD TTLGetIPv6Addr()
 	if (Err!=0) return Err;
 
 	// IPv6 がサポートされていない OS はここで return
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS ||
-	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ) {
+	if (!IsWindowsNTKernel() || IsWindowsNT4()) {
 		// 9x, NT4.0 は IPv6 非対応
 		SetResult(-1);
 		SetIntVal(VarId2, 0);

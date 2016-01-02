@@ -283,15 +283,12 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 	}
 
 	{
-		OSVERSIONINFO osvi;
 		MENUITEMINFO mi;
 
 		pvar->hmEncode = CreateMenu();
 
 		// Windows 95 でメニューが表示されないのでバージョンチェックを入れる (2009.2.18 maya)
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		GetVersionEx(&osvi);
-		if (osvi.dwMajorVersion >= 5) {
+		if (IsWindows2000OrLater()) {
 			memset(&mi, 0, sizeof(MENUITEMINFO));
 			mi.cbSize = sizeof(MENUITEMINFO);
 		}

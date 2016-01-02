@@ -488,7 +488,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	int i;
 	HDC TmpDC;
 	char Temp[MAX_PATH], Temp2[MAX_PATH];
-	OSVERSIONINFO osvi;
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -504,9 +503,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->TelPort = 23;
 
 	ts->DisableTCPEchoCR = FALSE;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
 
 	/* Version number */
 /*  GetPrivateProfileString(Section,"Version","",
@@ -933,7 +929,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	  ts->MetaKey = IdMetaOff;
 
 	// Windows95 Œn‚Í¶‰E‚Ì Alt ‚Ì”»•Ê‚É”ñ‘Î‰ž
-	if ((osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) && ts->MetaKey != IdMetaOff) {
+	if (!IsWindowsNTKernel() && ts->MetaKey != IdMetaOff) {
 	  ts->MetaKey = IdMetaOn;
 	}
 

@@ -252,7 +252,7 @@ BOOL CCtrlWindow::OnInitDialog()
 	               (CRTHeight-Rect.bottom+Rect.top) / 2,
 	               0,0,SWP_NOSIZE | SWP_NOZORDER);
 
-	if (is_NT4()) {
+	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
