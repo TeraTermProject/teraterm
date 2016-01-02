@@ -978,10 +978,81 @@ void OutputDebugPrintf(char *fmt, ...) {
 	OutputDebugString(tmp);
 }
 
+// OSが Windows95 かどうかを判別する。
+//
+// return TRUE:  95
+//        FALSE: Not 95
+BOOL IsWindows95()
+{
+#if (_MSC_VER >= 1800)
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+	osvi.dwMajorVersion = 4;
+	osvi.dwMinorVersion = 0;
+	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, op);
+	ret = VerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
+	return (ret);
+#else
+	OSVERSIONINFO osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS &&
+	    osvi.dwMajorVersion == 4 &&
+	    osvi.dwMinorVersion == 0) {
+		return TRUE;
+	}
+	return FALSE;
+#endif
+}
+
+// OSが WindowsNT カーネルかどうかを判別する。
+//
+// return TRUE:  NT kernel
+//        FALSE: Not NT4 kernel
+BOOL IsWindowsNTKernel()
+{
+#if (_MSC_VER >= 1800)
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
+	ret = VerifyVersionInfo(&osvi, VER_PLATFORMID, dwlConditionMask);
+	return (ret);
+#else
+	OSVERSIONINFO osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+		return TRUE;
+	}
+	return FALSE;
+#endif
+}
+
 // OSが WindowsNT4.0 かどうかを判別する。
 //
 // return TRUE:  NT4.0
 //        FALSE: Not NT4.0
+BOOL IsWindowsNT4()
+{
+	return is_NT4();
+}
+
 BOOL is_NT4()
 {
 #if (_MSC_VER >= 1800)
@@ -995,9 +1066,11 @@ BOOL is_NT4()
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
 	osvi.dwMajorVersion = 4;
+	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
 	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
-	ret = VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
+	ret = VerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION, dwlConditionMask);
 	return (ret);
 #else
 	OSVERSIONINFO osvi;
@@ -1014,8 +1087,8 @@ BOOL is_NT4()
 
 // OSが Windows2000 以降 かどうかを判別する。
 //
-// return TRUE:  
-//        FALSE: 
+// return TRUE:  2000 or later
+//        FALSE: NT4 or earlier
 BOOL IsWindows2000OrLater(void)
 {
 #if (_MSC_VER >= 1800)
@@ -1040,6 +1113,88 @@ BOOL IsWindows2000OrLater(void)
 	GetVersionEx(&osvi);
 	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
 		osvi.dwMajorVersion >= 5) {
+		return TRUE;
+	}
+	return FALSE;
+#endif
+}
+
+// OSが WindowsVista 以降 かどうかを判別する。
+//
+// return TRUE:  Vista or later
+//        FALSE: XP or earlier
+BOOL IsWindowsVistaOrLater(void)
+{
+#if (_MSC_VER >= 1800)
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_GREATER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = 6;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	ret = VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
+	return (ret);
+#else
+	OSVERSIONINFO osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if (osvi.dwMajorVersion >= 6) {
+		return TRUE;
+	}
+	return FALSE;
+#endif
+}
+
+// OSが Windows7 以降 かどうかを判別する。
+//
+// return TRUE:  7 or later
+//        FALSE: Vista or earlier
+BOOL IsWindows7OrLater(void)
+{
+#if (_MSC_VER >= 1800)
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_GREATER;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = 6;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	ret = VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
+	if (ret) {
+		return (ret);
+	}
+
+	dwlConditionMask = 0;
+	op = VER_EQUAL;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	ret = VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask);
+	if (ret) {
+		dwlConditionMask = 0;
+		op = VER_GREATER_EQUAL;
+		osvi.dwMinorVersion = 1;
+		VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, op);
+		ret = VerifyVersionInfo(&osvi, VER_MINORVERSION, dwlConditionMask);
+		if (ret) {
+			return (ret);
+		}
+	}
+
+	return FALSE;
+#else
+	OSVERSIONINFO osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+	if (osvi.dwMajorVersion > 6) {
+		return TRUE;
+	}
+	if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 1) {
 		return TRUE;
 	}
 	return FALSE;
