@@ -12,6 +12,16 @@
 
 #define _WINSOCKAPI_
 
+/* VS2015(VC14.0)だと、WSASocketA(), inet_ntoa() などのAPIがdeprecatedであると
+* 警告するために、警告を抑止する。代替関数に置換すると、VS2005(VC8.0)でビルド
+* できなくなるため、警告を抑止するだけとする。
+*/
+#if _MSC_VER >= 1800  // VSC2013(VC12.0) or later
+#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
+#endif
+
 // この位置にヘッダーを挿入してください
 #include <winsock2.h>
 
