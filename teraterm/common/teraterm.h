@@ -26,7 +26,9 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
  * できなくなるため、警告を抑止するだけとする。
  */
 #if _MSC_VER >= 1800  // VSC2013(VC12.0) or later
-	#define _WINSOCK_DEPRECATED_NO_WARNINGS
+	#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+		#define _WINSOCK_DEPRECATED_NO_WARNINGS
+	#endif
 #endif
 
 // AKASI氏によるEterm風透過ウィンドウ
