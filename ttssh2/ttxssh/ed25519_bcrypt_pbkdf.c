@@ -74,10 +74,10 @@ bcrypt_hash(u_int8_t *sha2pass, u_int8_t *sha2salt, u_int8_t *out)
 
 	/* key expansion */
 	Blowfish_initstate(&state);
-	Blowfish_expandstate(&state, sha2salt, shalen, sha2pass, shalen);
+	Blowfish_expandstate(&state, sha2salt, (u_int16_t)shalen, sha2pass, (u_int16_t)shalen);
 	for (i = 0; i < 64; i++) {
-		Blowfish_expand0state(&state, sha2salt, shalen);
-		Blowfish_expand0state(&state, sha2pass, shalen);
+		Blowfish_expand0state(&state, sha2salt, (u_int16_t)shalen);
+		Blowfish_expand0state(&state, sha2pass, (u_int16_t)shalen);
 	}
 
 	/* encryption */
