@@ -336,6 +336,5 @@ void get_teraterm_dir_relative_name(char FAR * buf, int bufsize, char FAR * base
 int copy_teraterm_dir_relative_path(char FAR * dest, int destsize, char FAR * basename);
 void get_file_version(char *exefile, int *major, int *minor, int *release, int *build);
 int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);
-void arc4random_buf(void *_buf, size_t n);
 
 #endif

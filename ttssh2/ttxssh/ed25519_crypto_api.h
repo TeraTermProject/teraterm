@@ -29,6 +29,7 @@ OF SUCH DAMAGE.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "arc4random.h"
 
 typedef unsigned char u_int8_t;
 typedef unsigned short int u_int16_t;

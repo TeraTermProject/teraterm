@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ttcommon.h"
 #include "ttlib.h"
 #include "keyfiles.h"
+#include "arc4random.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -4064,84 +4065,6 @@ error:
 	return FALSE;
 }
 
-
-//
-// RC4
-//
-
-/* Size of key to use */
-#define SEED_SIZE 20
-
-/* Number of bytes to reseed after */
-#define REKEY_BYTES (1 << 24)
-
-static int rc4_ready = 0;
-static RC4_KEY rc4;
-
-static void seed_rng(void)
-{
-	if (RAND_status() != 1)
-		return;
-}
-
-static void arc4random_stir(void)
-{
-	unsigned char rand_buf[SEED_SIZE];
-	int i;
-
-	memset(&rc4, 0, sizeof(rc4));
-	if (RAND_bytes(rand_buf, sizeof(rand_buf)) <= 0) {
-		//fatal("Couldn't obtain random bytes (error %ld)",
-		//    ERR_get_error());
-	}
-	RC4_set_key(&rc4, sizeof(rand_buf), rand_buf);
-
-	/*
-	 * Discard early keystream, as per recommendations in:
-	 * http://www.wisdom.weizmann.ac.il/~itsik/RC4/Papers/Rc4_ksa.ps
-	 */
-	for(i = 0; i <= 256; i += sizeof(rand_buf))
-		RC4(&rc4, sizeof(rand_buf), rand_buf, rand_buf);
-
-	SecureZeroMemory(rand_buf, sizeof(rand_buf));
-
-	rc4_ready = REKEY_BYTES;
-}
-
-static unsigned int arc4random(void)
-{
-	unsigned int r = 0;
-	static int first_time = 1;
-
-	if (rc4_ready <= 0) {
-		if (first_time) {
-			seed_rng();
-		}
-		first_time = 0;
-		arc4random_stir();
-	}
-
-	RC4(&rc4, sizeof(r), (unsigned char *)&r, (unsigned char *)&r);
-
-	rc4_ready -= sizeof(r);
-
-	return(r);
-}
-
-void arc4random_buf(void *_buf, size_t n)
-{
-	size_t i;
-	unsigned int r = 0;
-	char *buf = (char *)_buf;
-
-	for (i = 0; i < n; i++) {
-		if (i % 4 == 0)
-			r = arc4random();
-		buf[i] = r & 0xff;
-		r >>= 8;
-	}
-	i = r = 0;
-}
 
 //
 // SSH1 3DES
