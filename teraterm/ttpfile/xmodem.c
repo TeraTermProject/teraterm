@@ -190,6 +190,7 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 	xv->PktNumSent = 0;
 	xv->PktBufCount = 0;
 	xv->CRRecv = FALSE;
+	xv->CANCount = 0;
 
 	fv->ByteCount = 0;
 
@@ -399,8 +400,7 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 
 	SendFlag = FALSE;
 	if (xv->PktBufCount == 0) {
-		i = XRead1Byte(fv, xv, cv, &b);
-		do {
+		for (i=XRead1Byte(fv, xv, cv, &b); !SendFlag; i=XRead1Byte(fv, xv, cv, &b)) {
 			if (i == 0)
 				return TRUE;
 			switch (b) {
@@ -429,6 +429,14 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				SendFlag = TRUE;
 				break;
 			case CAN:
+				xv->CANCount++;
+				if (xv->CANCount <= 2) {
+					continue;
+				}
+				else {
+					fv->Success = TRUE;
+					return FALSE;
+				}
 				break;
 			case 0x43:
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
@@ -438,9 +446,8 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				}
 				break;
 			}
-			if (!SendFlag)
-				i = XRead1Byte(fv, xv, cv, &b);
-		} while (!SendFlag);
+			xv->CANCount = 0;
+		}
 		// reset timeout timer
 		FTSetTimeOut(fv, TimeOutVeryLong);
 
