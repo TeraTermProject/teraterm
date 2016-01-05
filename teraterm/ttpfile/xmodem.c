@@ -416,7 +416,7 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				}
 				break;
 			case NAK:
-				if (xv->PktNum == 0) {
+				if (xv->PktNum == 0 && xv->PktNumOffset == 0) {
 					if (xv->XOpt == XoptCRC) {
 						// receiver wants to use checksum.
 						XSetOpt(fv, xv, XoptCheck);
