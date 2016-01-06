@@ -434,7 +434,6 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 					continue;
 				}
 				else {
-					fv->Success = TRUE;
 					return FALSE;
 				}
 				break;
