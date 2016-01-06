@@ -257,16 +257,13 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 {
 	BYTE b, d;
 	int i, c;
-	BOOL GetPkt;
+	BOOL GetPkt = FALSE;
 
-	c = XRead1Byte(fv, xv, cv, &b);
-
-	GetPkt = FALSE;
-
-	while ((c > 0) && (!GetPkt)) {
+	for (c=XRead1Byte(fv, xv, cv, &b); (c > 0) && !GetPkt; c=XRead1Byte(fv, xv, cv, &b)) {
 		switch (xv->PktReadMode) {
 		case XpktSOH:
-			if (b == SOH) {
+			switch (b) {
+			case SOH:
 				xv->PktIn[0] = b;
 				xv->PktReadMode = XpktBLK;
 				if (xv->XOpt == Xopt1kCRC)
@@ -274,7 +271,8 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 				else if (xv->XOpt == Xopt1kCksum)
 					XSetOpt(fv, xv, XoptCheck);
 				FTSetTimeOut(fv, xv->TOutShort);
-			} else if (b == STX) {
+				break;
+			case STX:
 				xv->PktIn[0] = b;
 				xv->PktReadMode = XpktBLK;
 				if (xv->XOpt == XoptCRC)
@@ -282,17 +280,30 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 				else if (xv->XOpt == XoptCheck)
 					XSetOpt(fv, xv, Xopt1kCksum);
 				FTSetTimeOut(fv, xv->TOutShort);
-			} else if (b == EOT) {
+				break;
+			case EOT:
 				b = ACK;
 				fv->Success = TRUE;
 				XWrite(fv, xv, cv, &b, 1);
 				return FALSE;
-			} else {
+				break;
+			case CAN:
+				xv->CANCount++;
+				if (xv->CANCount <= 2) {
+					continue;
+				}
+				else {
+					return FALSE;
+				}
+				break;
+			default:
 				/* flush comm buffer */
 				cv->InBuffCount = 0;
 				cv->InPtr = 0;
 				return TRUE;
+				break;
 			}
+			xv->CANCount = 0;
 			break;
 		case XpktBLK:
 			xv->PktIn[1] = b;
@@ -321,9 +332,6 @@ BOOL XReadPacket(PFileVar fv, PXVar xv, PComVar cv)
 				FTSetTimeOut(fv, xv->TOutShort);
 			break;
 		}
-
-		if (!GetPkt)
-			c = XRead1Byte(fv, xv, cv, &b);
 	}
 
 	if (!GetPkt)
