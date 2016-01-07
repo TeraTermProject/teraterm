@@ -2700,7 +2700,6 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		SIZE sz;
 		RECT wr;
 		int ix, iy;
-		HMODULE mod;
 		HMONITOR hm;
 
 		/* calculate the tip's size */
@@ -2714,8 +2713,7 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		ix = wr.left;
 		iy = wr.top - sz.cy;
 
-		if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
-		    (GetProcAddress(mod,"MonitorFromPoint") != NULL)) {
+		if (HasMultiMonitorSupport()) {
 			// マルチモニタがサポートされている場合
 			POINT p;
 			p.x = ix;

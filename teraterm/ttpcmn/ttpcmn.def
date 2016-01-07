@@ -66,3 +66,5 @@ EXPORTS
   IsWindows2000OrLater @68
   IsWindowsVistaOrLater @69
   IsWindows7OrLater @70
+  HasMultiMonitorSupport @71
+  HasGetAdaptersAddresses @72

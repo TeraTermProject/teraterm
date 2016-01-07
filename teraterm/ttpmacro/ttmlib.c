@@ -104,16 +104,6 @@ int DoGetSpecialFolder(int CSIDL, PCHAR dest, int dest_len)
 	char Path[MAX_PATH] = "";
 	LPITEMIDLIST pidl;
 
-	if (!IsWindowsNTKernel() || IsWindowsNT4()) {
-		switch (CSIDL) {
-			case CSIDL_COMMON_DESKTOPDIRECTORY:
-			case CSIDL_COMMON_STARTMENU:
-			case CSIDL_COMMON_PROGRAMS:
-			case CSIDL_COMMON_STARTUP:
-				return 0;
-		}
-	}
-
 	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
 		return 0;
 	}
@@ -186,7 +176,7 @@ int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
 
 int GetMonitorLeftmost(int PosX, int PosY)
 {
-	if (IsWindows95() || IsWindowsNT4()) {
+	if (!HasMultiMonitorSupport()) {
 		// // NT4.0, 95 はマルチモニタAPIに非対応
 		return 0;
 	}

@@ -1786,7 +1786,7 @@ void InitDisp()
   /* background paintbrush */
   Background = CreateSolidBrush(ts.VTColor[1]);
   /* CRT width & height */
-  if (!IsWindows95() && !IsWindowsNT4()) {
+  if (HasMultiMonitorSupport()) {
     bMultiDisplaySupport = TRUE;
   }
   if( bMultiDisplaySupport ) {

@@ -1061,7 +1061,7 @@ void FAR PASCAL UndoAllWin(void) {
 	int stat = SW_RESTORE;
 	int multi_mon = 0;
 
-	if (!IsWindows95() && !IsWindowsNT4()) {
+	if (HasMultiMonitorSupport()) {
 		multi_mon = 1;
 	}
 

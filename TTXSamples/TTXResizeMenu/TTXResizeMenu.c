@@ -159,7 +159,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->ResizeMenu = NULL;
   pvar->MenuItems = 0;
 
-  if (IsWindows95() || IsWindowsNT4()) {
+  if (!HasMultiMonitorSupport()) {
     pvar->useMultiMonitorAPI = FALSE;
   }
   else {

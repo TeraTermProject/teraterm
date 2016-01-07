@@ -2393,9 +2393,8 @@ WORD TTLGetIPv6Addr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// IPv6 がサポートされていない OS はここで return
-	if (!IsWindowsNTKernel() || IsWindowsNT4()) {
-		// 9x, NT4.0 は IPv6 非対応
+	// GetAdaptersAddresses がサポートされていない OS はここで return
+	if (!HasGetAdaptersAddresses()) {
 		SetResult(-1);
 		SetIntVal(VarId2, 0);
 		return Err;

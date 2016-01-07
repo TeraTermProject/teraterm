@@ -621,7 +621,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			// キャレットが画面からはみ出しているときに貼り付けをすると
 			// 確認ウインドウが見えるところに表示されないことがある。
 			// ウインドウからはみ出した場合に調節する (2008.4.24 maya)
-			if (IsWindows95() || IsWindowsNT4()) {
+			if (!HasMultiMonitorSupport()) {
 				// NT4.0, 95 はマルチモニタAPIに非対応
 				SystemParametersInfo(SPI_GETWORKAREA, 0, &rc_dsk, 0);
 			}
