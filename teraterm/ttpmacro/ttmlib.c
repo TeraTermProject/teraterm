@@ -12,6 +12,31 @@
 
 static char CurrentDir[MAXPATHLEN];
 
+typedef struct {
+	char *name;
+	int csidl;
+} SpFolder;
+
+static SpFolder spfolders[] = {
+	{ "AllUsersDesktop",   CSIDL_COMMON_DESKTOPDIRECTORY },
+	{ "AllUsersStartMenu", CSIDL_COMMON_STARTMENU },
+	{ "AllUsersPrograms",  CSIDL_COMMON_PROGRAMS },
+	{ "AllUsersStartup",   CSIDL_COMMON_STARTUP },
+	{ "Desktop",           CSIDL_DESKTOPDIRECTORY },
+	{ "Favorites",         CSIDL_FAVORITES },
+	{ "Fonts",             CSIDL_FONTS },
+	{ "MyDocuments",       CSIDL_PERSONAL },
+	{ "NetHood",           CSIDL_NETHOOD },
+	{ "PrintHood",         CSIDL_PRINTHOOD },
+	{ "Programs",          CSIDL_PROGRAMS },
+	{ "Recent",            CSIDL_RECENT },
+	{ "SendTo",            CSIDL_SENDTO },
+	{ "StartMenu",         CSIDL_STARTMENU },
+	{ "Startup",           CSIDL_STARTUP },
+	{ "Templates",         CSIDL_TEMPLATES },
+	{ NULL,                -1}
+};
+
 void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s)
 {
   int W, H, i, i0;
@@ -131,61 +156,14 @@ int DoGetSpecialFolder(int CSIDL, PCHAR dest, int dest_len)
 
 int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
 {
-	int CSIDL;
+	SpFolder *p;
 
-	if (_stricmp(type, "AllUsersDesktop") == 0) {
-		CSIDL = CSIDL_COMMON_DESKTOPDIRECTORY;
+	for (p = spfolders; p->name != NULL; p++) {
+		if (_stricmp(type, p->name) == 0) {
+			return DoGetSpecialFolder(p->csidl, dest, dest_len);
+		}
 	}
-	else if (_stricmp(type, "AllUsersStartMenu") == 0) {
-		CSIDL = CSIDL_COMMON_STARTMENU;
-	}
-	else if (_stricmp(type, "AllUsersPrograms") == 0) {
-		CSIDL = CSIDL_COMMON_PROGRAMS;
-	}
-	else if (_stricmp(type, "AllUsersStartup") == 0) {
-		CSIDL = CSIDL_COMMON_STARTUP;
-	}
-	else if (_stricmp(type, "Desktop") == 0) {
-		CSIDL = CSIDL_DESKTOPDIRECTORY;
-	}
-	else if (_stricmp(type, "Favorites") == 0) {
-		CSIDL = CSIDL_FAVORITES;
-	}
-	else if (_stricmp(type, "Fonts") == 0) {
-		CSIDL = CSIDL_FONTS;
-	}
-	else if (_stricmp(type, "MyDocuments") == 0) {
-		CSIDL = CSIDL_PERSONAL;
-	}
-	else if (_stricmp(type, "NetHood") == 0) {
-		CSIDL = CSIDL_NETHOOD;
-	}
-	else if (_stricmp(type, "PrintHood") == 0) {
-		CSIDL = CSIDL_PRINTHOOD;
-	}
-	else if (_stricmp(type, "Programs") == 0) {
-		CSIDL = CSIDL_PROGRAMS;
-	}
-	else if (_stricmp(type, "Recent") == 0) {
-		CSIDL = CSIDL_RECENT;
-	}
-	else if (_stricmp(type, "SendTo") == 0) {
-		CSIDL = CSIDL_SENDTO;
-	}
-	else if (_stricmp(type, "StartMenu") == 0) {
-		CSIDL = CSIDL_STARTMENU;
-	}
-	else if (_stricmp(type, "Startup") == 0) {
-		CSIDL = CSIDL_STARTUP;
-	}
-	else if (_stricmp(type, "Templates") == 0) {
-		CSIDL = CSIDL_TEMPLATES;
-	}
-
-	if (!DoGetSpecialFolder(CSIDL, dest, dest_len)) {
-		return 0;
-	}
-	return 1;
+	return 0;
 }
 
 int GetMonitorLeftmost(int PosX, int PosY)
