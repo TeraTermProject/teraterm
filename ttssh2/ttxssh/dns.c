@@ -61,7 +61,7 @@ int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key)
 	BYTE *hostkey_digest = NULL;
 	int found = DNS_VERIFY_NOTFOUND;
 
-	if (!IsWindows2000OrLater()) {
+	if (!HasDnsQuery()) {
 		// DnsQuery ÇÕ Windows 2000 à»è„Ç≈ÇµÇ©ìÆçÏÇµÇ»Ç¢ÇΩÇﬂ
 		return DNS_VERIFY_NONE;
 	}

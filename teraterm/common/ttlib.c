@@ -1228,6 +1228,19 @@ BOOL HasGetAdaptersAddresses()
 	return FALSE;
 }
 
+// OS が DnsQuery をサポートしているかどうかを判別する。
+//   2000 以降は TRUE を返す
+BOOL HasDnsQuery()
+{
+	HMODULE mod;
+
+	if (((mod = GetModuleHandle("Dnsapi.dll")) != NULL) &&
+		(GetProcAddress(mod, "DnsQuery") != NULL)) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 int get_OPENFILENAME_SIZE()
 {
 	if (IsWindows2000OrLater()) {

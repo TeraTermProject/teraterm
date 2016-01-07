@@ -68,3 +68,4 @@ EXPORTS
   IsWindows7OrLater @70
   HasMultiMonitorSupport @71
   HasGetAdaptersAddresses @72
+  HasDnsQuery @73
