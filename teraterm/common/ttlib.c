@@ -1039,13 +1039,13 @@ BOOL _myVerifyVersionInfo(
 	GetVersionEx(&osvi);
 
 	if (dwTypeMask & VER_BUILDNUMBER) {
-		cond = (WORD)((dwlConditionMask >> 2 * 3) & 0x07);
+		cond = (WORD)((dwlConditionMask >> (2*3)) & 0x07);
 		if (!vercmp(lpVersionInformation->dwBuildNumber, osvi.dwBuildNumber, cond)) {
 			return FALSE;
 		}
 	}
 	if (dwTypeMask & VER_PLATFORMID) {
-		cond = (WORD)((dwlConditionMask >> 3 * 3) & 0x07);
+		cond = (WORD)((dwlConditionMask >> (3*3)) & 0x07);
 		if (!vercmp(lpVersionInformation->dwPlatformId, osvi.dwPlatformId, cond)) {
 			return FALSE;
 		}
@@ -1054,7 +1054,7 @@ BOOL _myVerifyVersionInfo(
 	if (dwTypeMask & (VER_MAJORVERSION | VER_MINORVERSION)) {
 		check_next = TRUE;
 		if (dwTypeMask & VER_MAJORVERSION) {
-			cond = (WORD)((dwlConditionMask >> 1 * 3) & 0x07);
+			cond = (WORD)((dwlConditionMask >> (1*3)) & 0x07);
 			if (cond == VER_EQUAL) {
 				if (!vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, cond)) {
 					return FALSE;
@@ -1062,13 +1062,28 @@ BOOL _myVerifyVersionInfo(
 			}
 			else {
 				ret = vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, cond);
-				if (ret && !vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, VER_EQUAL)) {
+				// ret: result of major version
+				if (!vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, VER_EQUAL)) {
+					// !vercmp(...: result of GRATOR/LESS than (not "GRATOR/LESS than or equal to") of major version
+					// e.g.
+					//   lpvi:5.1 actual:5.0 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.1 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.2 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:6.0 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.1 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.2 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:5.0 cond:VER_GREATER        ret:FALSE !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.1 cond:VER_GREATER        ret:FALSE !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.2 cond:VER_GREATER        ret:FALSE !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:6.0 cond:VER_GREATER        ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.1 cond:VER_GREATER        ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.2 cond:VER_GREATER        ret:TRUE  !vercmp(...:TRUE   must not check minor
 					check_next = FALSE;
 				}
 			}
 		}
 		if (check_next && (dwTypeMask & VER_MINORVERSION)) {
-			cond = (WORD)((dwlConditionMask >> 0 * 3) & 0x07);
+			cond = (WORD)((dwlConditionMask >> (0*3)) & 0x07);
 			if (cond == VER_EQUAL) {
 				if (!vercmp(lpVersionInformation->dwMinorVersion, osvi.dwMinorVersion, cond)) {
 					return FALSE;
