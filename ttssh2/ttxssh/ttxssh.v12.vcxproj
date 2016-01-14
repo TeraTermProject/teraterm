@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c" />
     <ClCompile Include="..\matcher\matcher.c" />
+    <ClCompile Include="arc4random.c" />
     <ClCompile Include="auth.c" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="cipher-ctr.c" />
@@ -174,6 +175,8 @@
     <ClCompile Include="x11util.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="arc4random.h" />
+    <ClCompile Include="chacha_private.h" />
     <ClInclude Include="dns.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ttxssh.h" />

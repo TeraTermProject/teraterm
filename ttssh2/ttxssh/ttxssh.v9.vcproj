@@ -211,11 +211,23 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="arc4random.c"
+			>
+		</File>
+		<File
+			RelativePath="arc4random.h"
+			>
+		</File>
+		<File
 			RelativePath="auth.c"
 			>
 		</File>
 		<File
 			RelativePath="buffer.c"
+			>
+		</File>
+		<File
+			RelativePath="chacha_private.h"
 			>
 		</File>
 		<File
