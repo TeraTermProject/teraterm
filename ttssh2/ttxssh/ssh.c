@@ -5125,6 +5125,9 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	switch (pvar->kex_type) {
 		case KEX_DH_GRP1_SHA1:
 		case KEX_DH_GRP14_SHA1:
+		case KEX_DH_GRP14_SHA256:
+		case KEX_DH_GRP15_SHA256:
+		case KEX_DH_GRP16_SHA256:
 			SSH2_dh_kex_init(pvar);
 			break;
 		case KEX_DH_GEX_SHA1:
@@ -5164,11 +5167,21 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	int len;
 
 	// Diffie-Hellman key agreement
-	if (pvar->kex_type == KEX_DH_GRP1_SHA1) {
+	switch (pvar->kex_type) {
+	case KEX_DH_GRP1_SHA1:
 		dh = dh_new_group1();
-	} else if (pvar->kex_type == KEX_DH_GRP14_SHA1) {
+		break;
+	case KEX_DH_GRP14_SHA1:
+	case KEX_DH_GRP14_SHA256:
 		dh = dh_new_group14();
-	} else {
+		break;
+	case KEX_DH_GRP15_SHA256:
+		dh = dh_new_group15();
+		break;
+	case KEX_DH_GRP16_SHA256:
+		dh = dh_new_group16();
+		break;
+	default:
 		goto error;
 	}
 
@@ -5625,7 +5638,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
-	hash = kex_dh_hash(pvar->client_version_string,
+	hash = kex_dh_hash(get_kex_algorithm_EVP_MD(pvar->kex_type),
+	                   pvar->client_version_string,
 	                   pvar->server_version_string,
 	                   buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
 	                   buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
@@ -6237,6 +6251,9 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 	switch (pvar->kex_type) {
 		case KEX_DH_GRP1_SHA1:
 		case KEX_DH_GRP14_SHA1:
+		case KEX_DH_GRP14_SHA256:
+		case KEX_DH_GRP15_SHA256:
+		case KEX_DH_GRP16_SHA256:
 			handle_SSH2_dh_kex_reply(pvar);
 			break;
 		case KEX_DH_GEX_SHA1:

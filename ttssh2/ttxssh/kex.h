@@ -33,10 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 DH *dh_new_group1(void);
 DH *dh_new_group14(void);
+DH *dh_new_group15(void);
+DH *dh_new_group16(void);
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ );
 int dh_estimate(int bits);
 
-unsigned char *kex_dh_hash(char *client_version_string,
+unsigned char *kex_dh_hash(const EVP_MD *evp_md,
+                           char *client_version_string,
                            char *server_version_string,
                            char *ckexinit, int ckexinitlen,
                            char *skexinit, int skexinitlen,
