@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>$(OutDir)puttyrev.exe</Command>
+      <Command>"$(OutDir)puttyrev.exe"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -99,7 +99,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>$(OutDir)puttyrev.exe</Command>
+      <Command>"$(OutDir)puttyrev.exe"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
