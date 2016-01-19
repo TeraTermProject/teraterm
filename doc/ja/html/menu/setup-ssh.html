@@ -17,6 +17,80 @@
       <dd>
 	SSH 接続で使用する暗号の種類を順序を付けて指定します。<br>
 	&lt;ciphers below this line are disabled&gt;以下の暗号は使用されません。
+	<table border="1">
+	  <tr>
+	    <td>Camellia256-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>AES256-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>Camellia256-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>AES256-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>Camellia192-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>AES192-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>Camellia192-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>AES192-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>Camellia128-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>AES128-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>Camellia128-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>AES128-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>3DES-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>3DES-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>Blowfish-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>Blowfish-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>CAST128-CTR</td>
+	  </tr>
+	  <tr>
+	    <td>CAST128-CBC</td>
+	  </tr>
+	  <tr>
+	    <td>3DES(SSH1)</td>
+	  </tr>
+	  <tr>
+	    <td>Arcfour256</td>
+	  </tr>
+	  <tr>
+	    <td>Arcfour128</td>
+	  </tr>
+	  <tr>
+	    <td>Arcfour</td>
+	  </tr>
+	  <tr>
+	    <td>Blowfish(SSH1)</td>
+	  </tr>
+	  <tr>
+	    <td>DES(SSH1)</td>
+	  </tr>
+	</table>
       </dd>
 
       <dt id="KnownHosts">SSH Known Hosts</dt>
@@ -68,18 +142,75 @@
       <dd>
 	SSH2 接続で使用するKEX(鍵交換)の種類を順序を付けて指定します。<br>
 	&lt;KEXs below this line are disabled&gt;以下の暗号は使用されません。
+	<table border="1">
+	  <tr>
+	    <td>ecdh-sha2-nistp256</td>
+	  </tr>
+	  <tr>
+	    <td>ecdh-sha2-nistp384</td>
+	  </tr>
+	  <tr>
+	    <td>ecdh-sha2-nistp521</td>
+	  </tr>
+	  <tr>
+	    <td>ED25519</td>
+	  </tr>
+	  <tr>
+	    <td>RSA</td>
+	  </tr>
+	  <tr>
+	    <td>DSA</td>
+	  </tr>
+	</table>
       </dd>
 
       <dt id="MacOrder">MAC order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用するMACの種類を順序を付けて指定します。<br>
 	&lt;MACs below this line are disabled&gt;以下の暗号は使用されません。
+	<table border="1">
+	  <tr>
+	    <td>hmac-sha2-512</td>
+	  </tr>
+	  <tr>
+	    <td>hmac-sha2-256</td>
+	  </tr>
+	  <tr>
+	    <td>hmac-sha1</td>
+	  </tr>
+	  <tr>
+	    <td>hmac-ripemd160@openssh.com</td>
+	  </tr>
+	  <tr>
+	    <td>hmac-md5</td>
+	  </tr>
+	  <tr>
+	    <td>hmac-sha1-96</td>
+	  </tr>
+	  <tr>
+	    <td>hmac-md5-96</td>
+	  </tr>
+	</table>
       </dd>
 
       <dt id="HostKeyOrder">Host key order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用するホスト鍵の種類を順序を付けて指定します。<br>
 	&lt;Host keys below this line are disabled&gt;以下の暗号は使用されません。
+	<table border="1">
+	  <tr>
+	    <td>zlib@openssh.com</td>
+	    <td>遅延圧縮(認証完了後に圧縮を開始する)</td>
+	  </tr>
+	  <tr>
+	    <td>zlib</td>
+	    <td></td>
+	  </tr>
+	  <tr>
+	    <td>none</td>
+	    <td>圧縮なし</td>
+	  </tr>
+	</table>
       </dd>
 
       <dt id="CompressionOrder">Compression order (SSH2 only)</dt>
