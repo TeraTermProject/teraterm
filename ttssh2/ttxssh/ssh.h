@@ -322,7 +322,7 @@ static ssh2_host_key_t ssh2_host_key[] = {
 	{KEY_ECDSA256, "ecdsa-sha2-nistp256"}, // RFC5656
 	{KEY_ECDSA384, "ecdsa-sha2-nistp384"}, // RFC5656
 	{KEY_ECDSA521, "ecdsa-sha2-nistp521"}, // RFC5656
-	{KEY_ED25519,  "ssh-ed25519"},
+	{KEY_ED25519,  "ssh-ed25519"},         // draft-bjh21-ssh-ed25519-02
 	{KEY_UNSPEC,   "ssh-unknown"},
 	{KEY_NONE,     NULL},
 };
