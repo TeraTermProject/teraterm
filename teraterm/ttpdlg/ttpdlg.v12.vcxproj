@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>$(OutDir)svnrev.exe "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)svnversion.h"</Command>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)svnversion.h"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -92,7 +92,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>$(OutDir)svnrev.exe "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)svnversion.h"</Command>
+      <Command>"$(OutDir)svnrev.exe" "$(SolutionDir)..\libs\svn\bin\svnversion.exe" "$(SolutionDir).." "$(ProjectDir)svnversion.h"</Command>
     </PreBuildEvent>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
