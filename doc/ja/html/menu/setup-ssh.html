@@ -153,13 +153,25 @@
 	    <td>ecdh-sha2-nistp521</td>
 	  </tr>
 	  <tr>
-	    <td>ED25519</td>
+	    <td>diffie-hellman-group14-sha256</td>
 	  </tr>
 	  <tr>
-	    <td>RSA</td>
+	    <td>diffie-hellman-group15-sha256</td>
 	  </tr>
 	  <tr>
-	    <td>DSA</td>
+	    <td>diffie-hellman-group1-sha256</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group-exchange-sha256</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group-exchange-sha1</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group14-sha1</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group1-sha1</td>
 	  </tr>
 	</table>
       </dd>
@@ -199,16 +211,22 @@
 	&lt;Host keys below this line are disabled&gt;以下の暗号は使用されません。
 	<table border="1">
 	  <tr>
-	    <td>zlib@openssh.com</td>
-	    <td>遅延圧縮(認証完了後に圧縮を開始する)</td>
+	    <td>ecdh-sha2-nistp256</td>
 	  </tr>
 	  <tr>
-	    <td>zlib</td>
-	    <td></td>
+	    <td>ecdh-sha2-nistp384</td>
 	  </tr>
 	  <tr>
-	    <td>none</td>
-	    <td>圧縮なし</td>
+	    <td>ecdh-sha2-nistp521</td>
+	  </tr>
+	  <tr>
+	    <td>ED25519</td>
+	  </tr>
+	  <tr>
+	    <td>RSA</td>
+	  </tr>
+	  <tr>
+	    <td>DSA</td>
 	  </tr>
 	</table>
       </dd>
@@ -226,6 +244,20 @@
 	(但し、ADSL や FTTH 等高速な回線ではレスポンスが悪くなる場合もあります。)<br>
 	SSH1 の場合は、Compression level が 0 であれば圧縮が無効、1 以上であれば圧縮が有効になります。<br>
 	SSH2 の場合は、Compression order で圧縮を有効にします。そのうえで Compression level を 1 以上にすると圧縮が有効になります。
+	<table border="1">
+	  <tr>
+	    <td>zlib@openssh.com</td>
+	    <td>遅延圧縮(認証完了後に圧縮を開始する)</td>
+	  </tr>
+	  <tr>
+	    <td>zlib</td>
+	    <td></td>
+	  </tr>
+	  <tr>
+	    <td>none</td>
+	    <td>圧縮なし</td>
+	  </tr>
+	</table>
       </dd>
     </dl>
   </body>

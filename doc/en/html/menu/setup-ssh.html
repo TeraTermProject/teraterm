@@ -155,13 +155,25 @@
 	    <td>ecdh-sha2-nistp521</td>
 	  </tr>
 	  <tr>
-	    <td>ED25519</td>
+	    <td>diffie-hellman-group14-sha256</td>
 	  </tr>
 	  <tr>
-	    <td>RSA</td>
+	    <td>diffie-hellman-group15-sha256</td>
 	  </tr>
 	  <tr>
-	    <td>DSA</td>
+	    <td>diffie-hellman-group1-sha256</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group-exchange-sha256</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group-exchange-sha1</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group14-sha1</td>
+	  </tr>
+	  <tr>
+	    <td>diffie-hellman-group1-sha1</td>
 	  </tr>
 	</table>
       </dd>
@@ -199,20 +211,6 @@
       <dd>
 	Specify the type of host key for SSH2 with the order.<br>
 	&lt;Host keys below this line are disabled&gt;
-	<table border="1">
-	  <tr>
-	    <td>zlib@openssh.com</td>
-	    <!--td>’x‰„ˆ³k(”FØŠ®—¹Œã‚Éˆ³k‚ğŠJn‚·‚é)</td-->
-	  </tr>
-	  <tr>
-	    <td>zlib</td>
-	    <td></td>
-	  </tr>
-	  <tr>
-	    <td>none</td>
-	    <td>ˆ³k‚È‚µ</td>
-	  </tr>
-	</table>
       </dd>
 
       <dt id="CompressionOrder">Compression order (SSH2 only)</dt>
@@ -228,6 +226,20 @@
 	with a high-speed link such as ADSL or FTTH).<br>
 	By using SSH1 protocol, when the Compression level is 0, the packet compression is disabled, or the Compression level is over 1, the compression is enabled. <br>
 	By using SSH2 protocol, use the Compression order to enable the packet compression. And then, set the Compression level to 1 over.
+	<table border="1">
+	  <tr>
+	    <td>zlib@openssh.com</td>
+	    <!--td>’x‰„ˆ³k(”FØŠ®—¹Œã‚Éˆ³k‚ğŠJn‚·‚é)</td-->
+	  </tr>
+	  <tr>
+	    <td>zlib</td>
+	    <td></td>
+	  </tr>
+	  <tr>
+	    <td>none</td>
+	    <td>ˆ³k‚È‚µ</td>
+	  </tr>
+	</table>
       </dd>
     </dl>
   </body>
