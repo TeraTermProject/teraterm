@@ -806,7 +806,7 @@ Since TTSSH is add-on to Tera Term, it needs to exchange information with Tera T
 </div>
 
   <h3>Transmitting Packets</h3>
-The following code is used when packet is sent to the remote server via SSH2 protocol. Function begin_send_packet() has the return value "pvar-> ssh_state.outbuf + 12", which represents the payload. Payload is pure data; it does not contain packet size, padding, or any other information. <br>
+The following code is used when packet is sent to the remote server via SSH2 protocol. Function begin_send_packet() has the return value "pvar-&gt;ssh_state.outbuf + 12", which represents the payload. Payload is pure data; it does not contain packet size, padding, or any other information. <br>
   
 <pre class=code>
 	buffer_t *msg;
@@ -845,7 +845,7 @@ Format of the packet compressed with zlib library is shown below. Payload portio
 
 When it comes to packet compression, the timing becomes critical. As soon as a client starts SSH connection to a remote server, both hosts begin negotiation process during which will be determined when, or if the packets can be compressed. If mistake is made during this process communication with remote server will not be established. <br>
 
-If normal packet compression is used, compression starts after receiving "SSH2_MSG_KEXINIT". In case of delayed compression, it starts after successful user authentication, i.e. after receiving "SSH2_MSG_USERAUTH_SUCCESS". So, the later method delays data compression after not receiving "SSH2_MSG_KEXINIT" until user authentication is completed. Delayed packet compression is more secure because it doesn’t expose vulnerability of zlib library. If connection was rerouted to an illegal server delayed compression mechanism may protect the client side.
+If normal packet compression is used, compression starts after receiving "SSH2_MSG_KEXINIT". In case of delayed compression, it starts after successful user authentication, i.e. after receiving "SSH2_MSG_USERAUTH_SUCCESS". So, the later method delays data compression after not receiving "SSH2_MSG_KEXINIT" until user authentication is completed. Delayed packet compression is more secure because it doesn't expose vulnerability of zlib library. If connection was rerouted to an illegal server delayed compression mechanism may protect the client side.
 
 <div align="center">
 <img src="image/ssh_packet_format2.png" width=720 height=540>
@@ -900,7 +900,7 @@ The sequence below shows data exchange with the terminal.
 
 
   <h3>Sequence Control</h3>
-SSH protocol allows to encrypt client-server communication by using encryption key. Public-key based encryption (asymmetric) provides higher level of security, however it is more resource intensive and not used with SSH. SSH2 utilizes symetric encryption algorithms with shared key - AES (Advanced Encryption Standard: Rijndael algorithm) and 3DES (Triple Data Encryption Standard). <br>
+SSH protocol allows to encrypt client-server communication by using encryption key. Public-key based encryption (asymmetric) provides higher level of security, however it is more resource intensive and not used with SSH. SSH2 utilizes symmetric encryption algorithms with shared key - AES (Advanced Encryption Standard: Rijndael algorithm) and 3DES (Triple Data Encryption Standard). <br>
 
 The key is securely shared between two parties establishing connection and is unknown to a third party. As per SSH2 protocol, when client opens TCP connection to a remote host (SSH server), unique DH key is generated based on "Diffie-Hellman" algorithm. This key is only known to the client and to the server. <br>
 Prior to creation of DH key, network packets are transmitted unencrypted (as a clear text) and can be captured by a third party, however DH algorithm allows to establish a shared secret between two parties in such a way that it cannot be compromised. <br>
@@ -924,7 +924,7 @@ The next drawing shows the flow of the packets when client explicitly closes the
 <img src="image/ssh2_sequence3.png" width=720 height=540>
 </div>
 
-In addition to password based SSH authentication, TTSSH also supports keyboard-interactive, publickey based and publickey with Pageant authentication methods. Packet flows for each of these methods are shown below. <br>
+In addition to password based SSH authentication, TTSSH also supports keyboard-interactive, public key based and public key with Pageant authentication methods. Packet flows for each of these methods are shown below. <br>
 
 <div align="center">
 <img src="image/ssh2_auth1.png" width=720 height=540>
