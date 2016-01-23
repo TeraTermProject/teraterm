@@ -859,50 +859,55 @@ The function recv() responsible for receiving packets is part of Tera Term core 
 <img src="image/ssh_recv_packet.png" width=720 height=540>
 </div>
 
-<!--
-  TeraTerm本体側は OnIdle()#teraterm.cpp というアイドルループにおいて、常時パケットの受信がないかをポーリングしています。それが CommReceive() で、recv()を呼び出します。recv()はTTSSHによりフックされているので、ソケット関数ではなく、TTXrecv()#ttxssh.c が呼び出されます。<br>
-  CommReceive()は recv() を呼び出す際に、バッファ(cv->InBuff[])の空きポインタとサイズを引数に渡します。バッファサイズは 1KB です。つまり、TTXrecv()のサイズには、1～1024 までの数値が渡される可能性があるということです。<br>
-  TTXrecv()から呼び出される PKT_recv() は、少々複雑なループ処理となっています。SSH接続を初めて行うときのシーケンスを以下に示します。
+Tera Term core contains idle loop OnIdle()#teraterm.cpp that constantly checks if new packets have arrived and need to be processed. CommReceive() function calls recv(). TTSSH adds the hook and replaces socket function recv() with its own function TTXrecv()#ttxssh.c. <br>
+
+When CommReceive() calls recv() and passes free pointer and the size of the buffer (cv->InBuff[]) as the arguments. Buffer size is 1KB, which means buffer size value received by TTXrecv() will be in the range 1-1024 bytes. <br>
+
+Then, when PKT_recv() is called by TTXrecv (), the processing becomes a bit more complicated. Below sequence shows handling of the packets when SSH connection is being established.
   
 <ol>
- <li>recv_data() で本当の recv() を呼び出し、サーバからの受信パケットをカーネルから受け取る。pvar->pkt_state.datalenが更新される。 </li>
- <li>SSH_handle_server_ID() でSSHサーバのバージョンチェックが行われる。pvar->pkt_state.datastart と pvar->pkt_state.datalen を更新する。</li>
- <li>再度、recv_data() が呼ばれるが、サーバからの受信データがもうないので、connection_closed=TRUE として while ループを抜ける。</li>
- <li>TeraTermの recv() は"0"で返ってくる。すなわち、受信データなし。</li>
+ <li>Call the original recv() in recv_data() to get the packet received from the server by kernel. Update the value of par-&gt;pkt_state.datalen.</li> 
+ <li>Perform SSH server version check by using SSH_handle_server_ID(). Update the values of pvar-&gt;pkt_state.datastart and pvar-&gt;pkt_state.datalen.</li>
+ <li>Call recv_data() again and since there was no data received from the server, exit the while loop and set connection_closed = TRUE. </li>
+    <li>Function recv() will return 0 (zero) as no data was received.</li>
 </ol>
 
-  次に、SSH通信のための共通鍵生成までのシーケンスを以下に示します。
+The sequence below shows the next steps up-to a symmetric key generation for SSH connectivity.
 
 <ol>
- <li>recv_data() で本当の recv() を呼び出し、サーバからの受信パケットをカーネルから受け取る。pvar->pkt_state.datalenが更新される。 </li>
- <li>SSH_predecrpyt_packet() で、受信パケットの先頭ブロックのみを復号化する。SSHパケットのサイズを取得する。</li>
- <li>妥当なSSHパケットサイズならば、SSH_handle_packet() を呼び出し、メッセージタイプに応じたハンドラを呼び出す。pvar->ssh_state.payload と pvar->ssh_state.payloadlen を設定する。</li>
- <li>pvar->pkt_state.datastart と pvar->pkt_state.datalen を更新する。</li>
- <li>pvar->pkt_state.datalen がゼロになるまで、SSH_predecrpyt_packet() の処理を繰り返す。</li>
- <li>recv_data() が呼ばれるが、サーバからの受信データがもうないので、connection_closed=TRUE として while ループを抜ける。</li>
- <li>TeraTermの recv() は"0"で返ってくる。すなわち、受信データなし。</li>
+ <li>Call the original recv() in recv_data() to get the packet received from the server by kernel. Update the value of par-&gt;pkt_state.datalen. </li>
+ <li>In SSH_predecrpyt_packet() we want to decrypt only the first block of the received packet. Get the size of the SSH packet. </li>
+ <li>If packet size is valid, call SSH_handle_packet() to handle the packet according to its type. If will set pvar-&gt;ssh_state.payload and pvar-&gt;ssh_state.payloadlen. </li>
+    <li>Update pvar-&gt;pkt_state.datastart and pvar-&gt;pkt_state.datalen. </li>
+    <li>Keep calling SSH_predecrpyt_packet() until pvar-&gt;pkt_state.datalen reaches 0 (zero). </li>
+ <li>Call recv_data() again and since there was no data received from the server, exit the while loop and set connection_closed = TRUE. </li>
+    <li>Function recv() will return 0 (zero) as no new data was received. </li>
 </ol>
 
-  次に、端末データ通信のシーケンスを以下に示します。
+The sequence below shows data exchange with the terminal.
 
 <ol>
- <li>recv_data() で本当の recv() を呼び出し、サーバからの受信パケットをカーネルから受け取る。pvar->pkt_state.datalenが更新される。 </li>
- <li>SSH_predecrpyt_packet() で、受信パケットの先頭ブロックのみを復号化する。SSHパケットのサイズを取得する。</li>
- <li>妥当なSSHパケットサイズならば、SSH_handle_packet() を呼び出し、メッセージタイプに応じたハンドラを呼び出す。pvar->ssh_state.payload と pvar->ssh_state.payloadlen を設定する。</li>
- <li>メッセージタイプがSSH2_MSG_CHANNEL_DATAなので、handle_SSH2_channel_data() を呼び出す。pvar->ssh_state.payload_datalen と pvar->ssh_state.payload_datastart を設定する。</li>
- <li>pvar->pkt_state.datastart と pvar->pkt_state.datalen を更新する。</li>
- <li>SSH_is_any_payload() が真を返すようになり、PKT_recv()に渡されてきたバッファへデータをコピーする。</li>
- <li>TeraTerm側のバッファサイズがいっぱいになった場合は、SSH端末データが残っていたとしても、PKT_recv()は返る。</li>
- <li>TeraTerm側のバッファサイズに余裕がある場合は、recv_data()を呼び出し、サーバからの受信データを取得する。</li>
- <li>TeraTermの recv() は「受信データサイズ」で返ってくる。</li>
+ <li>Call the original recv() in recv_data() to get the packet received from the server by kernel. Update the value of par-&gt;pkt_state.datalen. </li>
+ <li>In SSH_predecrpyt_packet() we want to decrypt only the first block of the received packet. Get the size of the SSH packet. </li>
+ <li>If packet size is valid, call SSH_handle_packet() to handle the packet according to its type. If will set pvar-&gt;ssh_state.payload and pvar-&gt;ssh_state.payloadlen. </li>
+ <li>The message type is SSH2_MSG_CHANNEL_DATA, so call the function handle_SSH2_channel_data(). It will sets the pvar-&gt;ssh_state.payload_datalen and pvar-&gt;ssh_state.payload_datastart. </li>
+    <li>Update pvar-&gt;pkt_state.datastart and pvar-&gt;pkt_state.datalen. </li>
+ <li>If SSH_is_any_payload() returns TRUE, copy the data to the buffer that was passed to PKT_recv().</li>
+ <li>If TeraTerm side buffer becomes full, even if there is more SSH terminal data, return PKT_recv(). </li>
+    <li>If TeraTerm side buffer is not full, call recv_data() and get more data from the server. </li>
+    <li>Tera Term core recv() function returns "received data size". </li>
 </ol>
 
 
-  <h3>シーケンス制御</h3>
-  SSH2接続を行うことで、通信経路を暗号化することができるのが特徴ですが、パケットの暗号化を行うためには、「鍵」が必要です。通信経路の暗号化には、共通鍵による共通鍵暗号が利用されます。公開鍵暗号のほうがセキュリティ強度は高いのですが、暗号処理に多大な時間がかかるため、SSHのような通信性能が要求されるしくみでは採用されません。SSH2では、共通鍵暗号アルゴリズムとして、AES(Advanced Encryption Standard：Rijndaelアルゴリズム)や3DES(Triple DES)などが利用されます。<br>
-  共通鍵は通信を行う二者間でのみに共有される情報であり、第三者に知られてはなりません。SSH2では、クライアントがリモートホスト（SSHサーバ）へTCP接続した時に、"Diffie-Hellman"アルゴリズムをベースとした独自の方式により、クライアントとサーバでしか知り得ないDH(Diffie-Hellman)鍵を生成します。DH鍵生成までの過程は、ネットワーク上をパケットが平文で流れるため、第三者によるパケットキャプチャが可能となっていますが、パケットを覗かれても、DH鍵は理論上第三者には分からないようになっています。<br>
-  共通鍵が生成できたあとは、その鍵を使ってパケットを暗号化します。SSH2では、送受信されるパケットは種類があるため、それぞれに「メッセージ番号」を割り振っています。RFC4250にメッセージ番号の一覧があります。メッセージ名は"SSH2_MSG_xxxx"というネーミングになっており、TTSSH内部でも同じ名前でマクロ定義しています。<br>
-  以下に、クライアントからサーバへTCP接続（ポート22番）してから、パスワード認証でユーザ認証されるまでの流れを示します。<br>
+  <h3>Sequence Control</h3>
+SSH protocol allows to encrypt client-server communication by using encryption key. Public-key based encryption (asymmetric) provides higher level of security, however it is more resource intensive and not used with SSH. SSH2 utilizes symetric encryption algorithms with shared key - AES (Advanced Encryption Standard: Rijndael algorithm) and 3DES (Triple Data Encryption Standard). <br>
+
+The key is securely shared between two parties establishing connection and is unknown to a third party. As per SSH2 protocol, when client opens TCP connection to a remote host (SSH server), unique DH key is generated based on "Diffie-Hellman" algorithm. This key is only known to the client and to the server. <br>
+Prior to creation of DH key, network packets are transmitted unencrypted (as a clear text) and can be captured by a third party, however DH algorithm allows to establish a shared secret between two parties in such a way that it cannot be compromised. <br>
+
+Once shared key has been generated, it can be used to encrypt and decrypt the packets. SSH2 protocol assigns each packet the Message Number in the range 1 to 255. Message number describes the payload of the packet. RFC4250 contains the list of all supported message numbers. SSH messages also have names that start with "SSH2_MSG_". They are defined as macros in TTSSH source code. <br>
+
+The drawing below shows the packet flow for TCP connection from a client to a server on the default SSH port 22 with password based user authentication. <br>
 
 
 <div align="center">
@@ -913,13 +918,13 @@ The function recv() responsible for receiving packets is part of Tera Term core 
 <img src="image/ssh2_sequence2.png" width=720 height=540>
 </div>
 
-  以下は、リモートホストのシェル上で"exit"や"logout"として、クライアントから明示的にシェルをクローズするときの、パケットの流れを示しています。<br>
+The next drawing shows the flow of the packets when client explicitly closes the connection, i.e. enters "exit" or "logout" command in the remote shell. <br>
 
 <div align="center">
 <img src="image/ssh2_sequence3.png" width=720 height=540>
 </div>
 
-  TTSSHは、SSH2でパスワード認証のほかにkeyboard-interactive認証、publickey認証、Pageantを利用したpublickey認証をサポートしています。それぞれの認証方式でどのようなシーケンスで認証が行われるのか、以下に示します。
+In addition to password based SSH authentication, TTSSH also supports keyboard-interactive, publickey based and publickey with Pageant authentication methods. Packet flows for each of these methods are shown below. <br>
 
 <div align="center">
 <img src="image/ssh2_auth1.png" width=720 height=540>
@@ -929,6 +934,7 @@ The function recv() responsible for receiving packets is part of Tera Term core 
 </div>
 
 
+<!--
 
   <h3>疑似端末のしくみ</h3>
   SSH2では、新しく「フロー制御」という概念が取り込まれています。TCPのウィンドウと同じ考え方で、「ウィンドウサイズ」というしくみを導入しています。この機能により、クライアント（Tera Term）とサーバ（SSHデーモン）間において、フロー制御が働くため、原則データが溢れることはありません。<br>
