@@ -770,17 +770,19 @@ Also, the DDE communication buffer and the log buffer are shared in the cv.LogBu
         
 
 <h2><a name="ttssh">SSH Design and Implementation in TTSSH</a></h2>
-<!--
-  <h3>概要</h3>
-  オリジナルのTTSSHは<a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a>氏（現在は<a href="http://weblogs.mozillazine.org/roc/">Mozilla hacker</a>として活躍）により開発されたプラグインです。SSH1へ対応しており、ポートフォワーディングやzlibによるパケット圧縮もサポートしていました。TTSSHは、Tera Termをセキュア通信に対応させるためのプラグインであったために、SCPやSFTP等には未対応でした。オリジナルTera Termが1998年に開発凍結後も、2001年ごろまでメンテナンスが続けられていました。<br>
-  TTSSHのSSH2対応を実現するために、TeraTerm Projectにより2004年から設計と実装が始められました。3年の歳月をかけて、ほぼSSH2プロトコルのフルサポートを実現しました。現在ではSCPへも対応しています。将来的にはSFTPへも対応されるかもしれません。<br>
-  原則、TTSSHの実装は<a href="http://www.openssh.com/">OpenSSH</a>を参考にしています。一部、コードをそのまま流用しているところもあります。ただし、OpenSSHはUNIXのコマンドライン向けに設計されているため、Tera TermのようなWindowsアプリケーションにはそのまま適合しない箇所も多く、フレームワークとしてはOpenSSHと大きく異なったものとなっています。<br>
+  <h3>Overview</h3>
+Original TTSSH plugin for Tera Term was developed by <a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a> (currently works as <a href="http://weblogs.mozillazine.org/roc/">Mozilla hacker</a>). It was supporting SSH1, packet compression and port forwarding. However, it did not support SSH2, SCP or SFTP. Development of the original Tera Term stopped in 1998 and its maintenance ended in 2001. <br>
+
+In 2004 newly formed Tera Term Project team resumed development of TTSSH and added SSH2 support to TTSSH. Over the next 3 year period the team implemented full support of SSH2 and SCP. Tera Term Project team is planning to eventually add SFTP support. <br>
+
+Initial TTTSH design was based on <a href="http://www.openssh.com/">OpenSSH</a> code. However, the main differences were that OpenSSH was written for UNIX command line interface, while TTSSH should work under Microsoft Windows and also communicate with Tera Term. As TTSSH developed, the amount of the differences with OpenSSH was increasing and currently the code of these two programs has very significant differences. <br>
 
 
-  <h3>SSHプロトコル</h3>
-  SSH(Secure Shell)は、バージョン1（厳密には1.5）とバージョン2が存在し、略して"SSH1"および"SSH2"と呼ばれます。それらのバージョン間にはプロトコル仕様としての互換性はありません。SSH1にはセキュリティ上の問題があるために、現在はほとんど利用されません。<br>
-  SSH2プロトコルの仕様に関しては、RFC化されています。
-  
+  <h3>SSH Protocol</h3>
+SSH (Secure Shell) protocols version 1 (version 1.5 to be exact) and version 2 are often referred by short names "SSH1" and "SSH2". These two protocol versions are incompatible with each other. Because of higher security risks associated with SSH1, it is currently barely used. <br>
+
+SSH2 protocol specification is defined in the following Requests for Comment (RFC).
+ 
 <p>
 <ul>
   <li><a href="http://www.ietf.org/rfc/rfc4250.txt">RFC4250: The Secure Shell (SSH) Protocol Assigned Numbers</a></li>
@@ -796,16 +798,15 @@ Also, the DDE communication buffer and the log buffer are shared in the cv.LogBu
 </p>
 
 
-  <h3>接続処理</h3>
-  TTSSHは、Tera Termの一部のコードでもあるため、ネットワーク接続処理はTera TermとTTSSHの間を行き来することになり、処理の流れが複雑になっています。また、SSHプロトコルそのもののフローを熟知していないと、TTSSHのシーケンスを追っていくのが難しくなっています。以下に、リモートホストへの接続を行うまでのフローを示します。<br>
+  <h3>Establishing Connection</h3>
+Since TTSSH is add-on to Tera Term, it needs to exchange information with Tera Term during establishing, maintaining and closing network connection. For those who are not familiar with SSH communication protocol, this may further complicate understanding of the flow. The drawing below demonstrates the flow that takes place while establishing connection to a remote host. <br>
 
 <div align="center">
 <img src="image/ssh.png" width=720 height=540>
 </div>
 
-
-  <h3>送信パケット処理</h3>
-  SSH2プロトコルに載せて、パケットをサーバへ送るときのコードは以下のような書き方となります。begin_send_packet()の呼び出しで、「pvar->ssh_state.outbuf + 12」が返り値となり、それがペイロードを表します。ペイロードは純粋にサーバへ送りたいデータのことで、サイズやパディング等を含みません。<br>
+  <h3>Transmitting Packets</h3>
+The following code is used when packet is sent to the remote server via SSH2 protocol. Function begin_send_packet() has the return value "pvar-> ssh_state.outbuf + 12", which represents the payload. Payload is pure data; it does not contain packet size, padding, or any other information. <br>
   
 <pre class=code>
 	buffer_t *msg;
@@ -829,32 +830,36 @@ Also, the DDE communication buffer and the log buffer are shared in the cv.LogBu
 	}
 </pre>
 
-  SSH通信に載せられて、実際にパケットが送出されるのは、finish_send_packet()から呼び出される finish_send_packet_special() です。パケットを送信するときのフォーマットについて、以下に示します。共通鍵暗号でパケットデータを暗号化する前に、ヘッダとフッタを付ける必要があります。<br>
-  パケットサイズはHMACを除く長さです。パケットサイズそのものはビッグエンディアン形式で、4バイト分格納しますが、その"4"バイトは含まれません。ペイロードの直後にパディングを埋めるのは、共通鍵暗号で暗号化するときに「ブロックサイズ単位」になっていなければ、アルゴリズム的に暗号化できないからです。ブロックサイズは暗号アルゴリズムにより異なり、たとえば3DES-CBCならば24バイト、AES128ならば16バイトです。<br>
-  HMAC(Keyed-Hashing for Message Authentication)は、暗号化本文に対するハッシュです。ハッシュのアルゴリズムは選択可能であり、"MD5"や"SHA-1"がよく使われています。HMACを付加することにより、「第三者によるデータの改ざん」を検出することができます。HMACは、暗号化対象となる本文を秘密鍵とシーケンス番号を加え、ハッシュ値を計算します。秘密鍵とシーケンス番号を加えることにより、第三者がデータをまるごと差し替えたとしても、送信者が生成したハッシュ値を復元することは理論上できません。<br>
-  
+Once ready, SSH packet is sent by finish_send_packet_special() function, which is called from finish_send_packet(). Format of transmitted packet is shows below. Before encrypting the packet using symmetric key, we must create header and footer. <br>
+
+Packet size is the length of Payload and optional Padding data. It does not include optional 20-byte-long HMAC (keyed-Hashing for Message Authentication) field. Packet size is stored in 4 bytes in big-endian format. These 4 bytes are not included in the size value. <br>
+While using symmetric key based encryption, payload size must be equal to "block size", otherwise encryption algorithm will not work. Block size depends on encryption algorithm. For example, for 3DES-CBC block size is 24 bytes (192 bits), for AES128 it is 16 bytes (128 bits). If payload size is less than the block size, the end of payload has to be padded to reach the block size. <br>
+
+HMAC creates a hash value for encrypted data. Often used hash algorithm examples are "MD5" and "SHA-1". Adding HMAC to the packet allows to detect "falsification of data by a third party." HMAC generates encrypted text by using cryptographic hash function in combination with a secret cryptographic key and a sequence number. Adding a secret key and a sequence number makes it theoretically impossible for a third party to generate HMAC even if the actual payload was altered. <br> 
 
 <div align="center">
 <img src="image/ssh_packet_format1.png" width=720 height=540>
 </div>
 
-  zlibによるパケット圧縮を行う場合における、パケットを送信するときのフォーマットについて、以下に示します。パケット圧縮を行うのは、「ペイロード」の部分のみで、残りは通常の送信パケットとフォーマットは同じです。なお、パケットを圧縮したとしても、かならずしも元のサイズよりも小さくなるとは限らないので、そのことを考慮したバッファ管理が必要です。<br>
-  パケット圧縮送信で難しいのは、圧縮を開始するタイミングです。ローカルホストからリモートホストへのSSH接続を開始すると、実にたくさんのネゴシエーションが行われますが、パケットを圧縮してよいのは決められたタイミングであり、このタイミングを間違えると、サーバとまったく通信ができなくなります。<br>
-  通常のパケット圧縮の場合は、"SSH2_MSG_KEXINIT"を受信したタイミングです。遅延パケット圧縮の場合は、ユーザ認証が成功したタイミング（"SSH2_MSG_USERAUTH_SUCCESS"を受信した時）です。遅延パケット圧縮というのは、それまで"SSH2_MSG_KEXINIT"を受信したタイミングで圧縮を開始していたのを、ユーザ認証が完了するまで延長する方式です。遅延パケット圧縮は、zlibライブラリのセキュリティホールにより、不正なSSHサーバへ接続しただけで、クライアント側に影響が出るのを回避するためのしくみです。
+Format of the packet compressed with zlib library is shown below. Payload portion of the packet is the only part that is being compressed; other parts remain unchanged. In some cases compressed payload may not reduce the size of the original since compression involves buffering. <br>
 
+When it comes to packet compression, the timing becomes critical. As soon as a client starts SSH connection to a remote server, both hosts begin negotiation process during which will be determined when, or if the packets can be compressed. If mistake is made during this process communication with remote server will not be established. <br>
+
+If normal packet compression is used, compression starts after receiving "SSH2_MSG_KEXINIT". In case of delayed compression, it starts after successful user authentication, i.e. after receiving "SSH2_MSG_USERAUTH_SUCCESS". So, the later method delays data compression after not receiving "SSH2_MSG_KEXINIT" until user authentication is completed. Delayed packet compression is more secure because it doesn’t expose vulnerability of zlib library. If connection was rerouted to an illegal server delayed compression mechanism may protect the client side.
 
 <div align="center">
 <img src="image/ssh_packet_format2.png" width=720 height=540>
 </div>
 
 
-  <h3>受信パケット処理</h3>
-  パケットの受信は、TeraTerm本体側からは recv ソケット関数を呼び出した場合に、それがTELNETなのかSSHなのかを意識させないような設計になっていることと、 recv ソケット関数の呼び出しでは、かならずしも十分なバッファサイズが指定されてくるとは限らないため、少々実装が複雑になっています。<br>
+  <h3>Receiving Packets</h3>
+The function recv() responsible for receiving packets is part of Tera Term core and is unaware whether the packet was sent via TELNET or SSH protocol. Additionally, buffer size is not always specified, which further complicates the implementation. <br>
 
 <div align="center">
 <img src="image/ssh_recv_packet.png" width=720 height=540>
 </div>
 
+<!--
   TeraTerm本体側は OnIdle()#teraterm.cpp というアイドルループにおいて、常時パケットの受信がないかをポーリングしています。それが CommReceive() で、recv()を呼び出します。recv()はTTSSHによりフックされているので、ソケット関数ではなく、TTXrecv()#ttxssh.c が呼び出されます。<br>
   CommReceive()は recv() を呼び出す際に、バッファ(cv->InBuff[])の空きポインタとサイズを引数に渡します。バッファサイズは 1KB です。つまり、TTXrecv()のサイズには、1～1024 までの数値が渡される可能性があるということです。<br>
   TTXrecv()から呼び出される PKT_recv() は、少々複雑なループ処理となっています。SSH接続を初めて行うときのシーケンスを以下に示します。
