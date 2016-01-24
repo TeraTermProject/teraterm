@@ -9,7 +9,8 @@
 
 use Encode::Guess qw/shift-jis 7bit-jis/;
 
-my @exclude_files = qw(sourcecode.html);
+#my @exclude_files = qw(sourcecode.html);
+my @exclude_files = qw();
 
 get_file_paths('../doc/en/html');
 exit(0);
