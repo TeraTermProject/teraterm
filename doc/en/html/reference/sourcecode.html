@@ -934,120 +934,128 @@ In addition to password based SSH authentication, TTSSH also supports keyboard-i
 </div>
 
 
-<!--
 
-  <h3>疑似端末のしくみ</h3>
-  SSH2では、新しく「フロー制御」という概念が取り込まれています。TCPのウィンドウと同じ考え方で、「ウィンドウサイズ」というしくみを導入しています。この機能により、クライアント（Tera Term）とサーバ（SSHデーモン）間において、フロー制御が働くため、原則データが溢れることはありません。<br>
-  ところで、SSH2におけるフロー制御があるにも関わらず、大量のクリップボードをTeraTermの端末へペーストすると、サーバ側での「データの取りこぼし」が発生することがあります。この現象を理解するためには、UNIXにおける疑似端末（PTY: pseudo-terminal）の動作原理を知る必要があります。
+  <h3>Pseudo-Terminal</h3>
+SSH2 contains "flow control" mechanism. It is similar to TCP windowing and is implemented by introducing "windows size" concept. Flow control allows to avoid buffer overflows during communication between the client (Tera Term) and the server (SSH daemon). <br>
+
+Despite the flow control, pasting large amounts of data from Clipboard into Tera Term window may cause server to drop part of the data. Knowledge of UNIX Pseudo-Terminal (PTY) in required to understand this behavior. <br>
+The mechanism of pseudo-terminal allowing to connected sshd with shell is shown below.
 
 <div align="center">
 <img src="image/pty.png" width=720 height=540>
 </div>
 
-  SSHデーモン(sshd)はクライアントに対して、あたかもサーバ側のシェルが直接接続されているかのように見せる必要があります。逆に、シェル上で動くプログラムは、文字を送りたいときは printf(3) を、文字を受け取りたい場合は scanf(3) といったCライブラリ関数を呼び出すだけでよく、その先がシリアルコンソールなのか、VGAコンソールなのか、SSH接続されているのかは、一切気にしなくてよいようになっています。<br>
-  sshdは、クライアントからの接続要求があったタイミングで、openpty(3)を使って、疑似端末の初期化を行います。疑似端末では、カーネル空間でクライアントとサーバをつなぐために、「マスターデバイスドライバ」と「スレーブデバイスドライバ」が用意されます。マスターデバイスドライバが担当するデバイスファイルは"/dev/ptyXX"、スレーブデバイスドライバでは"/dev/ttyXX"です。つまり、sshdはマスターデバイスドライバへアクセスすることで、シェルとお話をすることができます。シェルは、sshdからforkされて子プロセスとなり、親プロセス(sshd)が初期化済みのスレーブデバイスドライバとお話をすることになります。この疑似端末のしくみにより、sshdとシェルが接続されます。<br>
-  なお、端末ラインディシプリン(line discipline: 回線規約)というのは、たとえばプログラムが getchar() を呼び出したときに、Enterキーを押下するまで、プログラムに制御が渡りません。端末ラインディシプリンは、プログラム実行中での「行内編集」を可能とするためのモジュールです。Linuxでは、端末ラインディシプリンは /proc/tty/ldiscs で確認できます（N_TTYが標準的に利用される）。
+SSH daemon on the server (sshd) needs to show to the client that it is directly connected to the shell. From another side shell program does not care if the request to print a character, or read a character came from legacy serial console, VGA terminal, or SSH connection; shell just calls corresponding functions printf(3), or scanf(3) from C library. <br>
+
+When sshd receives connection request from a client, it calls openpty(3) function to initialize pseudo-terminal. In order to connect a client with a server, pseudo-terminal provides "master device" and "slave device" kernel drivers. Device file representing master device is "/dev/pty[p-za-e][0-9a-f] ". Device file representing the slave device is "/dev/tty[p-za-e][0-9a-f] ". In other words to reach the shell, sshd needs to access master device. Shell process in being forked by sshd and becomes its child process. Shell then communicates with already initialized slave device driver. <br>
+
+Terminal line discipline is the module allowing to perform "inline editing" during command input, i.e. the program receives data via getchar() function, however the processing won't start until user hits Enter key. Linux systems support 16 different line disciplines that can be found in the file /proc/tty/ldiscs. N_TTY is used as the default discipline.
 
 
   <h3>SCP(Secure Copy)</h3>
-  SCPは OpenSSH パッケージに含まれるプログラムの1つであり、SSHセッションを使ってファイルの送受信を行うことができます。SCPを利用するためには、リモートサーバに"sshd"だけではなく、"scp"コマンドも導入されている必要があります。OpenSSHのSCPは、sshd デーモンから"scp"コマンドが子プロセスとして起動されることで実現されています。なお、SCPとSFTP(Secure File Transfer Program)はまったく別のプロトコルで、互換性はなく、SCPは純粋にファイルの「送信」と「受信」しかできません。<br>
-  SSHセッション上でファイル転送を行うには、クライアントからサーバへ接続が成功したあとに、シェルオープン(pty-req)の代わりに、「外部コマンドの実行」(exec)という形式で、SCPが利用できるようになります。
+SCP is one of the programs included in OpenSSH package. It allows to transmit and receive files within SSH session. In order to use the secure copy, in addition to "sshd" the server should support "scp" command. In OpenSSH implementation "scp" is started by sshd daemon as a child process. It should be noted that SCP and SFTP (Secure File Transfer Protocol) are completely different protocols incompatible with each other. SCP can perform only file "receive" or "send" operations. <br>
+
+To transfer files within SSH session, after establishing successful connection between the client and the server, the function responsible for executing external commands (exec) must call "scp".
   
-  <p><font size=3>・SSH2の場合</font></p>
-  SSH2_MSG_CHANNEL_REQUEST をサーバへ送るときに、"pty-req"の代わりに"exec"をサービス名として指定すると、外部コマンドを実行することができます。
+  <p><font size=3>SCP via SSH2</font></p>
+When you send SSH2_MSG_CHANNEL_REQUEST message to the server, you can run an external command by specifying the service name "exec" instead of "pty-req".
+
 <pre>
-    ユーザ認証成功後
+    After successful user authentication
          ----&gt; SSH2_MSG_CHANNEL_OPEN(90)
          &lt;---- SSH2_MSG_CHANNEL_OPEN_CONFIRMATION(91)
-         ----&gt; SSH2_MSG_CHANNEL_REQUEST(98)  サービス名&quot;exec&quot;で外部コマンド送信(&quot;scp -f&quot;)
-         &lt;---- SSH2_MSG_CHANNEL_WINDOW_ADJUST  (remote_window+=131072バイト)
-         &lt;---- SSH2_MSG_CHANNEL_EXTENDED_DATA  (local_window-=36バイト)
+         ----&gt; SSH2_MSG_CHANNEL_REQUEST(98)  external command sent in the service name "exec" ("scp -f")
+         &lt;---- SSH2_MSG_CHANNEL_WINDOW_ADJUST  (remote_window+=131072 bytes)
+         &lt;---- SSH2_MSG_CHANNEL_EXTENDED_DATA  (local_window-=36 bytes)
          &lt;---- SSH2_MSG_CHANNEL_DATA(94)
 </pre>
 
-  <p><font size=3>・SSH1の場合</font></p>
-    セッションを開くときに、SSH_CMSG_EXEC_CMD をサーバへ送ると、外部コマンドを実行することができます。
-  
-  <p><font size=3>・外部コマンドの書式</font></p>
+  <p><font size=3>SCP via SSH1</font></p>
+Sending SSH_CMSG_EXEC_CMD to the server allows to run an external command during SSH1 session.
+ 
+  <p><font size=3>External command has the following format:</font></p>
 <pre>
-  * "scp [-v] [-r] [-p] [-d] -t ファイル名"  ローカルからリモートへのコピー
-  * "scp [-v] [-r] [-p] [-d] -f ファイル名"  リモートからローカルへのコピー
+  * "scp [-v] [-r] [-p] [-d] -t file name"  ;copy Local-to-Remote
+  * "scp [-v] [-r] [-p] [-d] -f file name"  ;copy Remote-to-Local
      -v verbose
-     -r リカーシブ
-     -p タイムスタンプ保持
-     -d ディレクトリ
-     -t Local-to-Remoteへコピー
-     -f Remote-to-Localへコピー
+     -r recursive
+     -p keep time stamp
+     -d directory
+     -t copy Local-to-Remote
+     -f copy Remote-to-Local
 </pre>
 
-  <p><font size=3>・データ転送</font></p>
-    外部コマンドの送信が完了したあとに、ファイルの内容を送信および受信することができます。
+  <p><font size=3>Data Transfer</font></p>
+As soon as transmission of external command has been completed, we can start sending or receiving the file content.
+
 <pre>
-    １．送信の流れ
-      ・"Tタイムスタンプ 0 タイムスタンプ 0"を送信（オプション）
-      ・"C0666 サイズ ファイル名"を送信
-      ・ファイルの内容を送信
-      ・セッションクローズ
+    1. File Sending Flow
+      &lt;---- Send timestamp (optional)
+      &lt;---- Send "C0664 file_size filename" ; 664 in this example is file permission at destination
+      &lt;---- Send content of the file
+      &lt;---&gt; Close session
 
-    ２．受信の流れ
-      ・"Tタイムスタンプ 0 タイムスタンプ 0"を受信（オプション）
-      ・0を送信
-      ・"C0666 サイズ ファイル名"を受信
-      ・0を送信
-      ・ファイルの内容を受信
-      ・ファイルのタイムスタンプを設定（オプション）
-      ・0を送信
-      ・セッションクローズ
+    2. File Receiving Flow
+      ----&gt; Receive timestamp (optional)
+      &lt;---- Send 0
+      ----&gt; Receive "C0664 file_size filename"
+      &lt;---- Send 0
+      ----&gt; Receive content of the file
+      ----- Set file timestamp (optional)
+      &lt;---- Send 0
+      &lt;---&gt; Close session
 </pre>
 
-  <p><font size=3>・注意事項</font></p>
-    ファイル名にディレクトリが含まれるときは、パスの区切りは「/」となります。「\」は受け付けないので、変換が必要です。
+  <p><font size=3>Note</font></p>
+When file name contains full path, forward slash ("/") must be used as directory separator. Backslashes ("\") are not supported and should be replaced with forward slashes.
 
 
+  <h3>X11 Forwarding</h3>
+X11 forwarding (X11 port forwarding) allows to launch X Window applications on SSH server and bring application GUI to the local PC, where Tera Term is running. By using this mechanism user can run remote applications such as "xeyes", "firefox" or "xemacs" through SSH session. Note, that X server application, such as Xming, must be running on local PC before SSH session with X11 forwarding is established. <br>
 
-  <h3>X11転送</h3>
-  X11転送(X11 port forwarding)は、SSHサーバ上でXウィンドウアプリケーションを起動し、アプリケーションのGUI画面をTera Termが動作しているコンソールPCに飛ばすしくみです。このしくみを使うと、SSHセッション上で"xeyes"や"firefox"、"xemacs"などのソフトウェアを動かすことができるようになります。なお、コンソールPC上には、Xming(http://sourceforge.net/projects/xming/)などのXサーバをあらかじめ用意しておく必要があります。<br>
-  下図にX11転送のフローを示します。図を見ると分かるように、Tera Term(TTSSH)はXアプリケーションとXサーバをつなぐ橋渡しの役目を持ちます。このようなTera Termのことを"Redirector"や"Port forwarder"、"TCP proxy"と呼びます。
+The drawing below shows the packet flow during X11 forwarding. As it can be seen, Tera Term (TTSSH) acts as a bridge between X application and X server. Tera Term's "redirector" or "port forwarder" is called "TCP Proxy".
 
 <div align="center">
 <img src="image/x11forward.png" width=720 height=540>
 </div>
 
-  X11転送を利用するためには、Tera TermおよびSSHサーバの双方に事前設定が必要です。まず、Tera Termのほうはteraterm.iniに下記の設定が必要です。
+In order to use X11 forwarding, certain configuration changes have to be done on both - Tera Term and SSH server. <br>
+
+On Tera Term side the following value needs to be set in teraterm.ini file.
 
 <pre class=code>
 [TTSSH]
 DefaultForwarding=X
 </pre>
 
-  SSHサーバのほうは、OpenSSHを例に挙げると、"sshd_config"に下記の設定が必要です。デフォルトは"no"になっているため、通常はデフォルトではX11転送が使えません。
+On the server side, in case of using OpenSSH, X11Forwarding value needs to be set to “yes” in "sshd_config" file. Default value is "no", which disables support of X11 forwarding.
 
 <pre class=code>
 X11Forwarding=yes
 </pre>
 
-  Tera TermはX11転送が有効であると、spec.typeに"FWD_REMOTE_X11_TO_LOCAL"を設定します。これはSSHサーバ側からTera Term側に向かって、X11転送を行うことを意味します。Tera Termは、リモートホストにSSH接続する際、セッションオープン後の"SSH2_MSG_CHANNEL_OPEN_CONFIRMATION"において、X11転送の初期化を行います。
+When X11 forwarding is enabled, Tera Term sets request type to "FWD_REMOTE_X11_TO_LOCAL". This means the forwarding will be performed from SSH server towards Tera Term. After opening the session, Tera Term sends "SSH2_MSG_CHANNEL_OPEN_CONFIRMATION" message to the remote host to initialize X11 transfer.
 
 <pre class=code>
 	if (c->type == TYPE_SHELL) {
-		// ポートフォワーディングの準備 (2005.2.26, 2005.6.21 yutaka)
-		// シェルオープンしたあとに X11 の要求を出さなくてはならない。(2005.7.3 yutaka)
+        // Preparing port forwarding (2005.2.26, 2005.6.21 yutaka)
+        // X11 request must be issued after opening the shell (2005.7.3 yutaka)
 		FWD_prep_forwarding(pvar);
 		FWD_enter_interactive_mode(pvar);
 	}
 </pre>
 
-  FWD_prep_forwarding()では、"x11-req"サービス名と"MIT-MAGIC-COOKIE-1"をSSHサーバに送信し、SSHサーバ側のX11転送の初期化を促します。SSH接続時にX11の初期化が完了すると、SSHサーバ側に環境変数"DISPLAY"が自動的に設定されます。
+FWD_prep_forwarding() function sends "x11-req" service name and "MIT-MAGIC-COOKIE-1" to SSH server. This initializes X11 forwarding on the server. After completing initialization of X11 server will automatically set environment variable "DISPLAY".
 
 <pre class=code>
 # echo $DISPLAY
 DISPLAY=localhost:10.0
 </pre>
 
-  ここまで準備が整うと、SSHサーバ上でXアプリケーションを起動させることができます。XアプリケーションからXサーバ、すなわちSSHサーバからTera Termへ送られてくるデータは、SSH2_MSG_CHANNEL_DATA メッセージ形式となります。当該メッセージは FWD_received_data() で処理され、Xサーバ(TCP/6000)へ送られます。Xサーバのソケットは channel->local_socket で、ノンブロッキングモードで扱われます。そのため、一度でパケットを全部送れない場合があるため、送れなかったデータは内部バッファに溜めておく必要があります。また、channel->local_socket にパケットをsendすることにより、FD_WRITE メッセージが発生し、write_local_connection_buffer() が呼び出されます。ここでは、前回送れなかったデータがあれば、内部バッファから取り出し、再度Xサーバへの送信を試みます。<br>
-  反対に、Xサーバ、すなわちX11の画面上で何らかの操作が行われた場合、Tera TermからSSHサーバにデータを送信する必要があります。このとき、Tera Termへは FD_READ メッセージが発生し、read_local_connection() が呼び出されます。ここでは、Xサーバから送られてきたデータを SSH2_MSG_CHANNEL_DATA メッセージ形式に載せて、SSHサーバへ送ります。
+When local PC is ready, user can activate X application on SSH server. The server sends X application data to Tera Term in SSH2_MSG_CHANNEL_DATA message format. This data is processed by FWD_received_data() function, which then forwards it to X server (TCP/6000). X server will receive the data in channel->local_socket and will treat it in non-blocking mode. Furthermore, since not all packets may be sent at once, prior to being processed further, the data must be accumulated in an internal buffer. Once channel->local_socket receives the data it sends out FD_WRITE message and calls write_local_connection_buffer() function. If there is a data in the buffer that has not been sent the last time, it will be read from the buffer and another attempt will be made to send it. <br>
 
--->
+When user performs an operation in X11 screen, X server needs to send data via Tera Term to SSH server. In this case FD_READ message is generated by Tera Term and read_local_connection() function is called. Then Tera Term puts the data received form X server into SSH2_MSG_CHANNEL_DATA message format and forwards it to SSH server.
+
 <hr>
 
 
