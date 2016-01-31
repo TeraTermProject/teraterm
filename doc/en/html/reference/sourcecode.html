@@ -43,44 +43,44 @@
 
 
 <h2><a name="skillset">Required Skill Sets</a></h2>
-    Most program included in the Tera Term package are described with the C language.
-    A part of code is described with the C++ language and used by MFC(Microsoft Foundation Class).
-    The Win32 API knowledge is required because the source code uses a lot of Win32 API to process the Windows specific function. <br>
-    The Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, the Express Edition can not build the source code because the Edition can not support the MFC feature. Also, Other compilers like the C++Builder, Turbo C++ Explorer and gcc can not be supported. <br>
-    The Windows programming know-how is at the MSDN library provided by Microsoft Corporation.
-    A user will often refer the MSDN library while the user is developing the software. <br>
-
+    Most programs included in Tera Term package are written in programming language C. Part of the code is written in C++ and uses Microsoft Foundation Classes (MFC). Knowledge of Win32 API is also required because the source code contains lots of calls to Windows platform specific functions from Win32 API. <br>
+    
+    Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, Express Edition cannot be used as it does not support MFC. Other compilers like C++ Builder, Turbo C++ Explorer and gcc cannot be used either. <br>
+    
+    The main source of information about programming for Windows is MSDN Library provided by Microsoft. Tera Term developers often use MSDN Library as a reference. <br>
+    
 <ul>
   <li><a href="http://msdn2.microsoft.com/en-us/library/default.aspx">MSDN library</a></li>
   <li><a href="http://msdn2.microsoft.com/ja-jp/library/default.aspx">MSDN library(Japanese)</a></li>
 </ul>
 
 <p>
-    However, the CygTerm is built with the gcc compiler of the Cygwin package. So, the CygTerm program is implemented by using the gcc feature. The source code is the C language.
+    The core of Tera Term is written on C++. This should not cause a problem for those who only knows C language because the syntax of both languages is very close. Microsoft Visual C++ (VC++) supports the original ANSI C standard (C89) and does not support newer standard C99. VC++ has its own implementation of C99-like functions. The names of these functions start with underscore (_), which makes it easy to identify them. For example, the _snprintf() of VC++ is different from the snprintf() of ANSI C(C99). 
 </p>
-
-    The main engine of Tera Term is implemented by using the C++ language. It is no problem that your programming skill is only C language because the code is C-like programming. However, the Microsoft Visual C++(VC++) supports the ANSI C standard(C89) and not support the C99 version. The C99-like feature is uniquely supported by VC++. The C99-like function adds the underscore(_) to the initial name of function in order to distinguish easily. For example, the _snprintf() of VC++ is different from the snprintf() of ANSI C(C99). <br>
+    
+    CygTerm is written in C language and should be compiled using gcc compiler included in Cygwin package.
 
 <hr>
 
 
 <h2><a name="module">Tera Term Package Content</a></h2>
-    Tera Term contains many executable module(.exe and .dll) and the association figure are below shown. An extension of an executable file is ".exe" and any DLL files are dynamically linked as needed.  Every module is the 32-bit program(x86) and the developer team will not validate the Tera Term software on the 64-bit environment like the x86-64 and IA-64. 
-  
+    Tera Term installation package contains several binary files (.exe and .dll) and their relationship is shown on the drawing below. Executable files have extension ".exe". Dynamically linked libraries (DLL) that are called only when needed, have extension ".dll". All binary files are 32-bit programs (x86) and Tera Term developers currently do not test them in 64-bit OS environments like x86-64, or IA-64.
+     
 <div align="center">
 <img src="image/module_relation.png" width=720 height=540>
 </div>
     
-    Basically, when a user launches the Tera Term from the Desktop and Start Menu, the "ttermpro.exe" file is executed at first. Additionally, the executable file calls five DLL files by the dynamic link. The "ttermpro.exe" file is not an all-in-one file by using the static link because the memory consumption of one process suppresses. Is is assumed that a number of Tera Term starts, and the Tera Term is divided to any DLL files from the initial design of a program. A DLL file is shared among a number of process after the DLL file is loaded into the system memory. <br>
+When a user launches Tera Term from desktop shortcut or from Start Menu, "ttermpro.exe" file is executed. Then "ttermpro.exe" calls five DLL files. Tera Term was not designed as all-in-one application intentionally to reduce memory consumption. In the initial design of the program is was assumed that when a number of Tera Term instances start they will share the same DLL files, i.e. only one instance of each DDL file will be loaded into the system memory. <br>
   <br>
     
-    When a macro script is called, another "ttpmacro.exe" program is launched. A macro script can be executed by myself because the Tera Term divides into the "ttermpro.exe" and the "ttpmacro.exe" program. So, the process communication mechanism is needed for two processes communication. Tera Term uses the DDE(Dynamic Data Exchange) mechanism which is the legacy system on current Windows. Windows will not support the DDE mechanism in the future, so the macro script will not be able to execute. <br>
+Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be executed by themselves because the Tera Term contains 2 separate programs: "ttermpro.exe" and "ttpmacro.exe". These two programs need to communicate with each other and they use Dynamic Data Exchange (DDE) as their communication mechanism. DDE is considered legacy in current Windows operating systems. If Microsoft decides to stop supporting DDE mechanism in future Windows releases, macro script execution will be impossible. <br>    
   <br>
     
-    A plug-in DLL like the TTSSH, TTProxy and TTXKanjiMenu is dynamically loaded by using the LoadLibrary() API on Tera Term startup. A DLL filename is selected by the "TTX*.DLL" pattern matching by the TTXInit()#ttplug.c function. <br>
+    Plug-in DLL-s, like TTSSH, TTProxy and TTXKanjiMenu, are dynamically loaded by LoadLibrary() API call at Tera Term startup. DLL filename should follow the pattern "TTX*.DLL" defined in TTXInit()#ttplug.c function. <br>
   <br>
-  
-    The "keycode.exe", "ttpmenu.exe" and "LogMeTT.exe" are another process.<br>
+
+        The "keycode.exe", "ttpmenu.exe", "LogMeTT.exe" and "TTLEdit.exe" are separate applications that are not in direct communication with Tera Term.
+
   <br>
   
     The Cygwin connection mechanism is described at another chapter.
@@ -88,16 +88,18 @@
 <hr>
 
 <h2><a name="library">Third Party Libraries</a></h2>
-    It is not efficiently performed to build a software from scratch for advanced feature. So, Tera Term actively uses the open source library. However, we need to be careful with the license violation,  especially GPL. <br>
-    Some modules linked with the open source library and the linkage status are below shown. The macro program links the regular expression library that is called Oniguruma to use the regular expression by the "waitregex" and "sprintf" macro command. Also, Tera Term program links the same library to display the Oniguruma version on the version dialog.
-  
+    It is inefficient to build advanced software from scratch, that's why Tera Term actively uses open source libraries. This, however, requires from developers to be careful and avoid license violations, especially GPL. <br>
+    
+    Several Tera Term modules are linked to open source libraries as shown on the drawing below. The macro program is linked to regular expression library "Oniguruma", which allows to handle regular expressions in "waitregex" and "sprintf" macro commands. Tera Term also calls this library to display Oniguruma version information in "About Tera Term" dialog box. <br>    
 <p>
-    The "TTSSH" module uses the OpenSSL library to perform the cryptography processing. Is seems that the OpenSSL library has only the SSL(Secure Socket Layer) protocol function for web accessing, however that is wrong. The OpenSSL library supports basic cipher algorithm and the "TTSSH" module uses only basic function. In other words, the "TTSSH" module will not be almost affected when the OpenSSL library has the security hole. <br>
-    The zlib library is used to compress the SSH packet. So, the packet compression is effective on lower network throughput like the dial-up connection, however the performance is not good on high-speed network. So, the packet compression function is disable by default. <br>
-    The PuTTY is a terminal emulator for free, and defacto standard in world-wide. The Pageant program of the PuTTY package is the SSH authentication agent, and the TTSSH uses the PuTTY source code to support the Pageant authentication method.
+    "TTSSH" module uses OpenSSL library to perform cryptography related operations. One may think that OpenSSL library contains only Secure Socket Layer (SSL) protocol related functions used for secure web access, however that is wrong assumption. OpenSSL library also supports basic cipher algorithms, which are utilized by "TTSSH" module. Since Secure Layer related functions of the library are not used, it is very unlikely that "TTSSH" module will be compromised if a security hole is found in OpenSSL library. <br>
+    
+    Zlib library is used to compress SSH packets. Packet compression is effective on low speed networks like for example with dial-up connections, however in high speed networks it may slow down communication. That's why packet compression function is disabled by default. <br>
+
+    "PuTTY" is another free terminal emulator that became a de-facto standard worldwide. PuTTY package contains SSH authentication agent called "Pageant". TTSSH uses part of PuTTY source code to support Pageant based authentication method.    
 </p>
     
-    Carefully, every library is the static link not the dynamic link. The compile option of the library is added the "/MT" option. Currently, the dynamic link is not supported because a part of user environment can not launch the Tera Term by using the dynamic link.
+Note that these libraries are called statically (not via dynamic link). When compiling the source code with these libraries use "/MT" option. Tera Term doesn't use dynamic calls to the libraries because not all user environments can support such calls, which may cause Tera Term to crash.
   
 
 <div align="center">
@@ -108,12 +110,11 @@
     
 
 <h2><a name="plugin">Plug-in Support</a></h2>
-    Tera Term can support the plug-in mechanism by using the DLL module. 
-    A user can add new feature without source code modifying when the DLL plug-in module is copied into the Tera Term installation directory. The TTSSH module is typical plug-in module. <br>
-    A sample code for plug-in programming is into the TTXSamples\ttxtest\ttxtest.c file. It is recommended that a user develop the plug-in module based on this file. The "TTX KanjiMenu" source code(TTXKanjiMenu\ directory) is practical and simple module. <br><br>
-
-    The plug-in module is loaded on the Tera Term("ttermpro.exe") startup. The TTXInit()#ttplug.c function loads the module. Some DLL files matched the "TTX*.DLL" wild-card character will be loaded.<br>
-    When multiple DLL modules are found, an export function of each DLL module is concatenated from Tera Term body. The concatenating order is determined according to the defined order(loadOrder member of TTXExports structure) in the following order:
+    Tera Term supports external plug-in functionality. Plug-ins should be written and compiled as dynamically linked libraries (DLL files). This allows developers to add new features to Tera Term without modifying its source code. Presence of a plug-in (.dll file) in Tera Term installation directory is enough for it to work. <br>
+    
+    TTSSH is typical example of Tera Term plug-in module. TTXSamples\ttxtest\ttxtest.c file contains a sample plug-in code. It is recommended to develop plug-ins based on this sample. "TTX KanjiMenu" source code (TTXKanjiMenu\ directory) is another example of practical and simple plug-in module.<br><br>
+    
+    Plug-in modules are loaded at Tera Term (ttermpro.exe) startup by TTXInit()#ttplug.c function. All DLL files matching "TTX*.DLL" naming pattern will be loaded. When multiple DLL modules are found, export function of each DLL module is loaded by Tera Term core in the order defined by "loadOrder" member of TTXExports structure as follows:
         
 <p>
 <table border=1 align=center>
@@ -139,7 +140,7 @@
 </table>
  </p>
     
-    The smaller order value is nearer to the Tera Term body. For example, the TTXModifyMenu() is called:
+    The lower is order number value - the higher is corresponding module's priority, i.e. the module with the lowest order number will be contacted by Tera Term core the first. For example, TTXModifyMenu() is called in the following order:    
 
   <ul>
    <li>TTXModifyMenu()#ttplug.c -> TTProxy@TTXModifyMenu() -> TTSSH@TTXModifyMenu() -> TTX Kanji Menu@TTXModifyMenu()</li>
@@ -148,8 +149,7 @@
     Above function of the DLL module are called in order.
   <br>
     
-    The export function called by Tera Term body is defined as the TTXExports structure, and the TTXBind() sends the export table to the Tera Term body. For example, the export function of the TTX Kanji Menu plug-in module are as follows:<br>
-    Unnecessary function is defined as NULL pointer.
+    Export function of a plug-in should be defined as TTXExports structure, which is sent to Tera Term core by TTXBind() function. For example, TTXExports structure of TTX Kanji Menu plug-in looks like shown below. All unused functions are replaced with NULL pointers. <br>    
 
 <pre class=code>
 static TTXExports Exports = {
@@ -173,9 +173,10 @@ static TTXExports Exports = {
 	NULL  /* TTXSetCommandLine */
 };
 </pre>
+
+    The export function of the plug-in module should be designed in such a way that it does not interfere with other plug-ins. Also, when the plug-in module is called by Tera Term core, the module needs to check whether the request was sent to it, or to another module. <br>
     
-    Basically, the export function of the plug-in module should be designed not to interfere other plug-in modules. Also, when the plug-in module is called by Tera Term body, the module needs to check the request for own module. <br> 
-    Every export function of plug-in module are as follows:
+    The table below contains the complete list of plug-in export functions.    
 
 <p>
 <table border=1 align=center>
@@ -186,48 +187,39 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXBind</td>
-  <td>This function is called at first. The function sends the export function table to the Tera Term body.</td>
+  <td>This function is called at first. The function sends export function structure to Tera Term core.</td>
 </tr>
 
 <tr>
   <td>TTXInit</td>
-  <td>This function is quickly called after the TTXBind() calling. The function received the global variables(ts and cv) of the Tera Term body, and initialized own plug-in module.</td>
+  <td>This function is called right after TTXBind(). The function receives global variables (ts and cv) from Tera Term core and initialized plug-in module. </td>      
 </tr>
 
 <tr>
   <td>TTXGetUIHooks</td>
-  <td>This function can hook the dialog handle. The function is used to change the dialog interface of Tera term. The hook target is in the following:<br>
-      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, 
-      &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog,   
-      &ChooseFontDlg, &SetupGeneral, &WindowWindow                 
+  <td>This function can hook a dialog handle. The function is used to change the dialog interface of Tera Term. The hook targets are: <br>
+      &SetupTerminal, &SetupWin, &SetupKeyboard, &SetupSerialPort, &SetupTCPIP, &GetHostName, &ChangeDirectory, &AboutDialog, &ChooseFontDlg, &SetupGeneral, &WindowWindow      
   </td>
 </tr>
 
 <tr>
   <td>TTXGetSetupHooks</td>
-  <td>This function can hook the setup routine. The hooked function should call the original function. When some plug-in module exists, each function is called in order. The hook target is in the following:<br>
-      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList,   
-      &AddHostToList, &ParseParam                                     
+  <td>This function can hook to setup routine. The hooked function should call the original function. When several plug-in modules exist, each function is called in accordance with order number. The hook targets are: <br>
+      &ReadIniFile, &WriteIniFile, &ReadKeyboardCnf, &CopyHostList, &AddHostToList, &ParseParam      
   </td>
 </tr>
 
 <tr>
   <td>TTXOpenTCP</td>
-  <td>This function is called on TCP connection, and is not called on Serial connection. Also, the function can hook the socket interface in the following:<br>
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   
-      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     
-      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       
-      &PWSACancelAsyncRequest, &PWSAGetLastError                 
+  <td>This function is called only for TCP connections; it should not be used for Serial connections. The function can hook to the socket interfaces: <br>
+      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr, &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt, &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName, &PWSACancelAsyncRequest, &PWSAGetLastError      
   </td>
 </tr>
 
 <tr>
   <td>TTXCloseTCP</td>
-  <td>This function is called on TCP disconnection, and is not called on Serial connection. When below hooked interface exists, the function should restore an original interface.<br>
-      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr,   
-      &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt,     
-      &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName,       
-      &PWSACancelAsyncRequest, &PWSAGetLastError                 
+  <td>This function is called only for TCP connections; it should not be used for Serial connections. If there is a hook to one of the following socket interfaces, the function must restore the original interface prior to exit: <br>
+      &Pclosesocket, &Pconnect, &Phtonl, &Phtons, &Pinet_addr, &Pioctlsocket, &Precv, &Pselect, &Psend, &Psetsockopt, &Psocket, &PWSAAsyncSelect, &PWSAAsyncGetHostByName, &PWSACancelAsyncRequest, &PWSAGetLastError      
   </td>
 </tr>
 
@@ -238,28 +230,28 @@ static TTXExports Exports = {
 
 <tr>
   <td>TTXModifyMenu</td>
-  <td>This function is called when the Tera Term menu is initialized. The function can insert new menu on the original menu list.</td>
+  <td>This function is called when Tera Term menu is initialized. The function allows to insert new menu item into original Tera Term menu.</td>
 </tr>
 
 <tr>
   <td>TTXModifyPopupMenu</td>
-  <td>This function is called when the Tera Term pop-up menu is initialized. The function can insert new pop-up menu on the original pop-up menu list.</td>
+  <td>This function is called when Tera Term pop-up menu is initialized. The function can add new pop-up menu item to the original pop-up menu.</td>
 </tr>
 
 <tr>
   <td>TTXProcessCommand</td>
-  <td>This function is called when the Tera Term menu is executed. The function can process the plug-in module menu.
+  <td>This function is called when Tera Term menu is executed. The function can process the plug-in module menu.
   </td>
 </tr>
 
 <tr>
   <td>TTXEnd</td>
-  <td>This function is called when the Tera Term terminates.</td>
+  <td>This function is called when Tera Term exits.</td>
 </tr>
 
 <tr>
   <td>TTXSetCommandLine</td>
-  <td>This function is called when the command line parameter is processed on new connection and duplicating connection. An original parameter of the plug-in module is processed.
+  <td>This function is called when the command line parameter is processed during set up of new connection and also while duplicating existing connection. The original parameter of plug-in module is processed.
   </td>
 </tr>
 
