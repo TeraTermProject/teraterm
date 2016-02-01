@@ -268,7 +268,7 @@ BOOL GetRawLine()
 			b = (Buff[INest])[BuffPtr[INest]];
 	}
 	LinePtr = 0;
-	LineLen = strlen(LineBuff);
+	LineLen = (WORD)strlen(LineBuff);
 	LineParsePtr = 0;
 
 	// current line number (2005.7.18 yutaka)

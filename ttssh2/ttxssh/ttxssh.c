@@ -830,7 +830,7 @@ void notify_established_secure_connection(PTInstVar pvar)
 {
 	int fuLoad = LR_DEFAULTCOLOR;
 
-	if (is_NT4()) {
+	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 
@@ -2930,7 +2930,7 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			int fuLoad = LR_DEFAULTCOLOR;
 			HICON hicon;
 
-			if (is_NT4()) {
+			if (IsWindowsNT4()) {
 				fuLoad = LR_VGACOLOR;
 			}
 

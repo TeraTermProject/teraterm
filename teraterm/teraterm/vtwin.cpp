@@ -282,7 +282,7 @@ void SetMouseCursor(char *cursor)
 		return;
 	}
 
-	hc = (HCURSOR)LoadImage(NULL, MAKEINTRESOURCE(name), IMAGE_CURSOR,
+	hc = (HCURSOR)LoadImage(NULL, name, IMAGE_CURSOR,
 	                        0, 0, LR_DEFAULTSIZE | LR_SHARED);
 
 	if (hc != NULL) {
@@ -568,7 +568,6 @@ BOOL GetVirtualStoreEnvironment(void)
 #endif
 	BOOL ret = FALSE;
 	int flag = 0;
-	OSVERSIONINFO osvi;
 	HANDLE          hToken;
 	DWORD           dwLength;
 	TOKEN_ELEVATION tokenElevation;
@@ -579,10 +578,8 @@ BOOL GetVirtualStoreEnvironment(void)
 	DWORD dwType;
 	BYTE bValue;
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
 	// Windows Vista以前は無視する。
-	if (!(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 6))
+	if (!IsWindowsVistaOrLater())
 		goto error;
 
 	// UACが有効かどうか。
@@ -826,7 +823,7 @@ CVTWindow::CVTWindow()
 	// USBデバイス変化通知登録
 	RegDeviceNotify(HVTWin);
 
-	if (is_NT4()) {
+	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	::PostMessage(HVTWin,WM_SETICON,ICON_SMALL,
@@ -2703,7 +2700,6 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		SIZE sz;
 		RECT wr;
 		int ix, iy;
-		HMODULE mod;
 		HMONITOR hm;
 
 		/* calculate the tip's size */
@@ -2717,8 +2713,7 @@ static void UpdateSizeTip(HWND src, int cx, int cy)
 		ix = wr.left;
 		iy = wr.top - sz.cy;
 
-		if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
-		    (GetProcAddress(mod,"MonitorFromPoint") != NULL)) {
+		if (HasMultiMonitorSupport()) {
 			// マルチモニタがサポートされている場合
 			POINT p;
 			p.x = ix;

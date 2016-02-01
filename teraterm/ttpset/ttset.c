@@ -488,7 +488,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	int i;
 	HDC TmpDC;
 	char Temp[MAX_PATH], Temp2[MAX_PATH];
-	OSVERSIONINFO osvi;
 
 	ts->Minimize = 0;
 	ts->HideWindow = 0;
@@ -504,9 +503,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->TelPort = 23;
 
 	ts->DisableTCPEchoCR = FALSE;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
 
 	/* Version number */
 /*  GetPrivateProfileString(Section,"Version","",
@@ -933,7 +929,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	  ts->MetaKey = IdMetaOff;
 
 	// Windows95 Œn‚Í¶‰E‚Ì Alt ‚Ì”»•Ê‚É”ñ‘Î‰ž
-	if ((osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) && ts->MetaKey != IdMetaOff) {
+	if (!IsWindowsNTKernel() && ts->MetaKey != IdMetaOff) {
 	  ts->MetaKey = IdMetaOn;
 	}
 
@@ -3092,7 +3088,7 @@ void GetInt(PKeyMap KeyMap, int KeyId, PCHAR Sect, PCHAR Key, PCHAR FName)
 		Num = 0xFFFF;
 	else if (_stricmp(Temp, "off") == 0)
 		Num = 0xFFFF;
-	else if (sscanf(Temp, "%d", &Num) != 1)
+	else if (sscanf(Temp, "%hd", &Num) != 1)
 		Num = 0xFFFF;
 
 	KeyMap->Map[KeyId - 1] = Num;
@@ -3567,7 +3563,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 	} while (b != '\0' && b != ':');
 	if (b == ':') {
 		s[i - 1] = '\0';
-		if (sscanf(&(s[i]), "%d", port) != 1)
+		if (sscanf(&(s[i]), "%hd", port) != 1)
 			*port = 65535;
 		is_port = 1;
 	}
@@ -3774,7 +3770,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
-			if (sscanf(&Temp[3], "%d", &ParamTCP) != 1)
+			if (sscanf(&Temp[3], "%hd", &ParamTCP) != 1)
 				ParamTCP = 65535;
 		}
 		else if (_strnicmp(Temp, "/R=", 3) == 0) {	/* Replay filename */

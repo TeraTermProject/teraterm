@@ -126,22 +126,8 @@ BOOL GetAbsPath(PCHAR FName, int destlen)
 
 int DoGetSpecialFolder(int CSIDL, PCHAR dest, int dest_len)
 {
-	OSVERSIONINFO osvi;
 	char Path[MAX_PATH] = "";
 	LPITEMIDLIST pidl;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
-	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) ) {
-		switch (CSIDL) {
-			case CSIDL_COMMON_DESKTOPDIRECTORY:
-			case CSIDL_COMMON_STARTMENU:
-			case CSIDL_COMMON_PROGRAMS:
-			case CSIDL_COMMON_STARTUP:
-				return 0;
-		}
-	}
 
 	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
 		return 0;
@@ -168,12 +154,7 @@ int GetSpecialFolder(PCHAR dest, int dest_len, PCHAR type)
 
 int GetMonitorLeftmost(int PosX, int PosY)
 {
-	OSVERSIONINFO osvi;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if ( (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4) ||
-	     (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS && osvi.dwMinorVersion < 10) ) {
+	if (!HasMultiMonitorSupport()) {
 		// // NT4.0, 95 はマルチモニタAPIに非対応
 		return 0;
 	}

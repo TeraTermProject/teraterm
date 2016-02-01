@@ -754,7 +754,7 @@ int KeyDown(HWND HWin, WORD VKey, WORD Count, WORD Scan)
 	break;
       case IdCommand:
 	Code[CodeLength] = 0;
-	if (sscanf(Code, "%d", &wId) == 1)
+	if (sscanf(Code, "%hd", &wId) == 1)
 	  PostMessage(HWin,WM_COMMAND,MAKELONG(wId,0),0);
 	break;
     }

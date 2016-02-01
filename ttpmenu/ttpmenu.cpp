@@ -2645,7 +2645,7 @@ int WINAPI WinMain(HINSTANCE hI, HINSTANCE, LPSTR nCmdLine, int nCmdShow)
 
 	g_hI			= hI;
 
-	if (is_NT4()){
+	if (IsWindowsNT4()){
 		fuLoad = LR_VGACOLOR;
 	}
 	g_hIcon			= (HICON)::LoadImage(g_hI, MAKEINTRESOURCE(TTERM_ICON), IMAGE_ICON, 32, 32, fuLoad);

@@ -16,6 +16,29 @@
 // for _ismbblead
 #include <mbctype.h>
 
+/* OS version with GetVersionEx(*1)
+
+                dwMajorVersion   dwMinorVersion    dwPlatformId
+Windows95       4                0                 VER_PLATFORM_WIN32_WINDOWS
+Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS 
+WindowsMe       4                90                VER_PLATFORM_WIN32_WINDOWS
+WindowsNT4.0    4                0                 VER_PLATFORM_WIN32_NT
+Windows2000     5                0                 VER_PLATFORM_WIN32_NT
+WindowsXP       5                1                 VER_PLATFORM_WIN32_NT
+WindowsXPx64    5                2                 VER_PLATFORM_WIN32_NT
+WindowsVista    6                0                 VER_PLATFORM_WIN32_NT
+Windows7        6                1                 VER_PLATFORM_WIN32_NT
+Windows8        6                2                 VER_PLATFORM_WIN32_NT
+Windows8.1(*2)  6                2                 VER_PLATFORM_WIN32_NT
+Windows8.1(*3)  6                3                 VER_PLATFORM_WIN32_NT
+Windows10(*2)   6                2                 VER_PLATFORM_WIN32_NT
+Windows10(*3)   10               0                 VER_PLATFORM_WIN32_NT
+
+(*1) GetVersionEx()が c4996 warning となるのは、VS2013(_MSC_VER=1800) からです。
+(*2) manifestに supportedOS Id を追加していない。
+(*3) manifestに supportedOS Id を追加している。
+*/
+
 // for isInvalidFileNameChar / replaceInvalidFileNameChar
 static char *invalidFileNameChars = "\\/:*?\"<>|";
 
@@ -955,14 +978,290 @@ void OutputDebugPrintf(char *fmt, ...) {
 	OutputDebugString(tmp);
 }
 
-BOOL is_NT4()
+#if (_MSC_VER < 1800)
+BOOL vercmp(
+	DWORD cond_val,
+	DWORD act_val,
+	DWORD dwTypeMask)
+{
+	switch (dwTypeMask) {
+	case VER_EQUAL:
+		if (act_val == cond_val) {
+			return TRUE;
+		}
+		break;
+	case VER_GREATER:
+		if (act_val > cond_val) {
+			return TRUE;
+		}
+		break;
+	case VER_GREATER_EQUAL:
+		if (act_val >= cond_val) {
+			return TRUE;
+		}
+		break;
+	case VER_LESS:
+		if (act_val < cond_val) {
+			return TRUE;
+		}
+		break;
+	case VER_LESS_EQUAL:
+		if (act_val <= cond_val) {
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
+}
+
+/*
+DWORDLONG dwlConditionMask
+| 000 | 000 | 000 | 000 | 000 | 000 | 000 | 000 |
+   |     |     |     |     |     |     |     +- condition of dwMinorVersion
+   |     |     |     |     |     |     +------- condition of dwMajorVersion
+   |     |     |     |     |     +------------- condition of dwBuildNumber
+   |     |     |     |     +------------------- condition of dwPlatformId
+   |     |     |     +------------------------- condition of wServicePackMinor
+   |     |     +------------------------------- condition of wServicePackMajor
+   |     +------------------------------------- condition of wSuiteMask
+   +------------------------------------------- condition of wProductType
+*/
+BOOL _myVerifyVersionInfo(
+	LPOSVERSIONINFOEX lpVersionInformation,
+	DWORD dwTypeMask,
+	DWORDLONG dwlConditionMask)
 {
 	OSVERSIONINFO osvi;
+	WORD cond;
+	BOOL ret, check_next;
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
-	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-	    osvi.dwMajorVersion == 4) {
+
+	if (dwTypeMask & VER_BUILDNUMBER) {
+		cond = (WORD)((dwlConditionMask >> (2*3)) & 0x07);
+		if (!vercmp(lpVersionInformation->dwBuildNumber, osvi.dwBuildNumber, cond)) {
+			return FALSE;
+		}
+	}
+	if (dwTypeMask & VER_PLATFORMID) {
+		cond = (WORD)((dwlConditionMask >> (3*3)) & 0x07);
+		if (!vercmp(lpVersionInformation->dwPlatformId, osvi.dwPlatformId, cond)) {
+			return FALSE;
+		}
+	}
+	ret = TRUE;
+	if (dwTypeMask & (VER_MAJORVERSION | VER_MINORVERSION)) {
+		check_next = TRUE;
+		if (dwTypeMask & VER_MAJORVERSION) {
+			cond = (WORD)((dwlConditionMask >> (1*3)) & 0x07);
+			if (cond == VER_EQUAL) {
+				if (!vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, cond)) {
+					return FALSE;
+				}
+			}
+			else {
+				ret = vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, cond);
+				// ret: result of major version
+				if (!vercmp(lpVersionInformation->dwMajorVersion, osvi.dwMajorVersion, VER_EQUAL)) {
+					// !vercmp(...: result of GRATOR/LESS than (not "GRATOR/LESS than or equal to") of major version
+					// e.g.
+					//   lpvi:5.1 actual:5.0 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.1 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.2 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:6.0 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.1 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.2 cond:VER_GREATER_EQUAL  ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:5.0 cond:VER_GREATER        ret:FALSE !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.1 cond:VER_GREATER        ret:FALSE !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:5.2 cond:VER_GREATER        ret:FALSE !vercmp(...:FALSE  must check minor
+					//   lpvi:5.1 actual:6.0 cond:VER_GREATER        ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.1 cond:VER_GREATER        ret:TRUE  !vercmp(...:TRUE   must not check minor
+					//   lpvi:5.1 actual:6.2 cond:VER_GREATER        ret:TRUE  !vercmp(...:TRUE   must not check minor
+					check_next = FALSE;
+				}
+			}
+		}
+		if (check_next && (dwTypeMask & VER_MINORVERSION)) {
+			cond = (WORD)((dwlConditionMask >> (0*3)) & 0x07);
+			if (cond == VER_EQUAL) {
+				if (!vercmp(lpVersionInformation->dwMinorVersion, osvi.dwMinorVersion, cond)) {
+					return FALSE;
+				}
+			}
+			else {
+				ret = vercmp(lpVersionInformation->dwMinorVersion, osvi.dwMinorVersion, cond);
+			}
+		}
+	}
+	return ret;
+}
+#endif
+
+BOOL myVerifyVersionInfo(
+	LPOSVERSIONINFOEX lpVersionInformation,
+	DWORD dwTypeMask,
+	DWORDLONG dwlConditionMask)
+{
+#if (_MSC_VER >= 1800)
+	return VerifyVersionInfo(lpVersionInformation, dwTypeMask, dwlConditionMask);
+#else
+	return _myVerifyVersionInfo(lpVersionInformation, dwTypeMask, dwlConditionMask);
+#endif
+}
+
+// OSが Windows95 かどうかを判別する。
+//
+// return TRUE:  95
+//        FALSE: Not 95
+BOOL IsWindows95()
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
+	osvi.dwMajorVersion = 4;
+	osvi.dwMinorVersion = 0;
+	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, op);
+	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
+	return (ret);
+}
+
+// OSが WindowsNT カーネルかどうかを判別する。
+//
+// return TRUE:  NT kernel
+//        FALSE: Not NT4 kernel
+BOOL IsWindowsNTKernel()
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
+	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID, dwlConditionMask);
+	return (ret);
+}
+
+// OSが WindowsNT4.0 かどうかを判別する。
+//
+// return TRUE:  NT4.0
+//        FALSE: Not NT4.0
+BOOL IsWindowsNT4()
+{
+	return is_NT4();
+}
+
+BOOL is_NT4()
+{
+	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
+	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
+	// 無条件に FALSE を返してもよいかもしれない。
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+	osvi.dwMajorVersion = 4;
+	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION, dwlConditionMask);
+	return (ret);
+}
+
+// OSが 指定されたバージョン以降 かどうかを判別する。
+
+BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_GREATER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, op);
+	ret = myVerifyVersionInfo(&osvi, VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
+	return (ret);
+}
+
+// OSが Windows2000 以降 かどうかを判別する。
+//
+// return TRUE:  2000 or later
+//        FALSE: NT4 or earlier
+BOOL IsWindows2000OrLater(void)
+{
+	return IsWindowsVerOrLater(5, 0);
+}
+
+// OSが WindowsVista 以降 かどうかを判別する。
+//
+// return TRUE:  Vista or later
+//        FALSE: XP or earlier
+BOOL IsWindowsVistaOrLater(void)
+{
+	return IsWindowsVerOrLater(6, 0);
+}
+
+// OSが Windows7 以降 かどうかを判別する。
+//
+// return TRUE:  7 or later
+//        FALSE: Vista or earlier
+BOOL IsWindows7OrLater(void)
+{
+	return IsWindowsVerOrLater(6, 1);
+}
+
+// OS がマルチモニタ API をサポートしているかどうかを判別する。
+//   98 以降/2000 以降は TRUE を返す
+BOOL HasMultiMonitorSupport()
+{
+	HMODULE mod;
+
+	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	    (GetProcAddress(mod, "MonitorFromPoint") != NULL)) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+// OS が GetAdaptersAddresses をサポートしているかどうかを判別する。
+//   XP 以降は TRUE を返す
+//   2000 以降は IPv6 に対応しているが GetAdaptersAddresses がない
+BOOL HasGetAdaptersAddresses()
+{
+	HMODULE mod;
+
+	if (((mod = GetModuleHandle("iphlpapi.dll")) != NULL) &&
+		(GetProcAddress(mod, "GetAdaptersAddresses") != NULL)) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+// OS が DnsQuery をサポートしているかどうかを判別する。
+//   2000 以降は TRUE を返す
+BOOL HasDnsQuery()
+{
+	HMODULE mod;
+
+	if (((mod = GetModuleHandle("Dnsapi.dll")) != NULL) &&
+		(GetProcAddress(mod, "DnsQuery") != NULL)) {
 		return TRUE;
 	}
 	return FALSE;
@@ -970,12 +1269,7 @@ BOOL is_NT4()
 
 int get_OPENFILENAME_SIZE()
 {
-	OSVERSIONINFO osvi;
-
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-	    osvi.dwMajorVersion >= 5) {
+	if (IsWindows2000OrLater()) {
 		return sizeof(OPENFILENAME);
 	}
 	//return OPENFILENAME_SIZE_VERSION_400;

@@ -60,11 +60,8 @@ int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key)
 	digest_algorithm dgst_alg;
 	BYTE *hostkey_digest = NULL;
 	int found = DNS_VERIFY_NOTFOUND;
-	OSVERSIONINFO osvi;
 
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-	if (osvi.dwMajorVersion < 5) {
+	if (!HasDnsQuery()) {
 		// DnsQuery ‚Í Windows 2000 ˆÈã‚Å‚µ‚©“®ì‚µ‚È‚¢‚½‚ß
 		return DNS_VERIFY_NONE;
 	}

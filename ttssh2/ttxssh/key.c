@@ -822,8 +822,8 @@ key_fingerprint_randomart(const char *alg, u_char *dgst_raw, u_int dgst_raw_len,
 	}
 
 	/* mark starting point and end point*/
-	field[FLDSIZE_X / 2][FLDSIZE_Y / 2] = len - 1;
-	field[x][y] = len;
+	field[FLDSIZE_X / 2][FLDSIZE_Y / 2] = (unsigned char)(len - 1);
+	field[x][y] = (unsigned char)len;
 
 	/* assemble title */
 	r = _snprintf_s(title, sizeof(title), _TRUNCATE, "[%s %u]",

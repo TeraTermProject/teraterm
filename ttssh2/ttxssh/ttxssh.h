@@ -36,6 +36,16 @@ See LICENSE.TXT for the license.
 
 #pragma warning(3 : 4035)
 
+/* VS2015(VC14.0)‚¾‚ÆAWSASocketA(), inet_ntoa() ‚È‚Ç‚ÌAPI‚ªdeprecated‚Å‚ ‚é‚Æ
+* Œx‚·‚é‚½‚ß‚ÉAŒx‚ð—}Ž~‚·‚éB‘ã‘ÖŠÖ”‚É’uŠ·‚·‚é‚ÆAVS2005(VC8.0)‚Åƒrƒ‹ƒh
+* ‚Å‚«‚È‚­‚È‚é‚½‚ßAŒx‚ð—}Ž~‚·‚é‚¾‚¯‚Æ‚·‚éB
+*/
+#if _MSC_VER >= 1800  // VSC2013(VC12.0) or later
+	#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+		#define _WINSOCK_DEPRECATED_NO_WARNINGS
+	#endif
+#endif
+
 #ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>

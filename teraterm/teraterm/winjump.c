@@ -369,17 +369,7 @@ static char *IniFile = NULL;
 
 BOOL isJumpListSupported(void)
 {
-	static OSVERSIONINFO osVersion;
-
-	if (osVersion.dwOSVersionInfoSize != sizeof(OSVERSIONINFO)) {
- 		osVersion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		GetVersionEx(&osVersion);
-	}
-	if ((osVersion.dwMajorVersion < 6) ||
-	    (osVersion.dwMajorVersion == 6 && osVersion.dwMinorVersion < 1))
-		return FALSE;
-	else
-		return TRUE;
+	return IsWindows7OrLater();
 }
 
 /*
