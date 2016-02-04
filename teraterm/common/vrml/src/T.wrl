@@ -1,0 +1,866 @@
+#VRML V2.0 utf8
+
+Background {
+	skyColor 0.8 0.8 1
+}
+
+Viewpoint {
+	position -0 -30 350
+}
+
+# T Logo
+DEF T Transform {
+	children [
+		Transform { 
+			translation 0 0 -1
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0 0 1
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-40	40	3,
+							-40	30	3,
+							40	30	3,
+							40	40	3,
+							-6	30	3,
+							-6	-40	3,
+							6	-40	3,
+							6	30	3
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1,
+							4,5,6,7,-1
+						]
+					}
+				}
+			]
+		}
+	]
+}
+
+DEF monitor Transform {
+	children [
+		#Back ground 01
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+#							transparency   0.2
+							diffuseColor 1 0.9 0.5
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	55	0,
+							-75	50	0,
+							75	50	0,
+							75	55	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 02
+		Transform { 
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.89 0.45
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	50	0,
+							-75	45	0,
+							75	45	0,
+							75	50	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 03
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.88 0.4
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	45	0,
+							-75	40	0,
+							75	40	0,
+							75	45	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 04
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.87 0.35
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	40	0,
+							-75	35	0,
+							75	35	0,
+							75	40	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 05
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.86 0.3
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	35	0,
+							-75	30	0,
+							75	30	0,
+							75	35	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 06
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.85 0.25
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	30	0,
+							-75	25	0,
+							75	25	0,
+							75	30	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 07
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.84 0.2
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	25	0,
+							-75	20	0,
+							75	20	0,
+							75	25	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 08
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.83 0.15
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	20	0,
+							-75	15	0,
+							75	15	0,
+							75	20	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 09
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.82 0.1
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	15	0,
+							-75	10	0,
+							75	10	0,
+							75	15	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 10
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.81 0.05
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	10	0,
+							-75	5	0,
+							75	5	0,
+							75	10	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 11
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 0.8 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	5	0,
+							-75	0	0,
+							75	0	0,
+							75	5	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 12
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.99 0.79 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	0	0,
+							-75	-5	0,
+							75	-5	0,
+							75	0	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 13
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.98 0.78 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-5	0,
+							-75	-10	0,
+							75	-10	0,
+							75	-5	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 14
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.97 0.77 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-10	0,
+							-75	-15	0,
+							75	-15	0,
+							75	-10	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 15
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.96 0.76 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-15	0,
+							-75	-20	0,
+							75	-20	0,
+							75	-15	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 16
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.95 0.75 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-20	0,
+							-75	-25	0,
+							75	-25	0,
+							75	-20	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 17
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.94 0.74 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-25	0,
+							-75	-30	0,
+							75	-30	0,
+							75	-25	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 18
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.93 0.73 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-30	0,
+							-75	-35	0,
+							75	-35	0,
+							75	-30	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 19
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.92 0.72 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-35	0,
+							-75	-40	0,
+							75	-40	0,
+							75	-35	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 20
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.91 0.71 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-40	0,
+							-75	-45	0,
+							75	-45	0,
+							75	-40	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		#Back ground 21
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.9 0.7 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-45	0,
+							-75	-50	0,
+							75	-50	0,
+							75	-45	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+		Transform {
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.89 0.69 0
+						}
+					}
+					geometry IndexedFaceSet {
+						solid TRUE
+						coord Coordinate{
+							point	[
+							-75	-50	0,
+							-75	-55	0,
+							75	-55	0,
+							75	-50	0
+							]
+						}
+						coordIndex	[
+							0,1,2,3,-1
+						]
+					}
+				}
+			]
+		}
+
+		# monitor
+#		Transform { 
+#			translation 0 0 -0.2
+#			children [
+#				Shape {
+#					appearance Appearance {
+#						material Material {
+#							transparency   0
+#							diffuseColor 0.8 0.8 0.4
+#						}
+#						texture ImageTexture{
+#							url "yellow_grad.jpg"
+#						}
+#					}
+#					geometry Box {size 150 110 0.2}
+#				}
+#			]
+#		}
+		Transform {
+			translation -80 -60 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Cylinder {radius 5 height 1}
+				}
+			]
+		}
+		Transform {
+			translation 80 -60 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Cylinder {radius 5 height 1}
+				}
+			]
+		}
+		Transform {
+			translation -80 60 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Cylinder {radius 5 height 1}
+				}
+			]
+		}
+		Transform {
+			translation 80 60 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Cylinder {radius 5 height 1}
+				}
+			]
+		}
+		#TOP Bezel
+		Transform { 
+			translation 0 60 0
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Box {size 160 10 1}
+				}
+			]
+		}
+		#BOTTOM Bezel
+		Transform { 
+			translation 0 -60 0
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Box {size 160 10 1}
+				}
+			]
+		}
+		#LEFT Bezel
+		Transform { 
+			translation -80 0 0
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Box {size 10 120 1}
+				}
+			]
+		}
+		#Right Bezel
+		Transform { 
+			translation 80 0 0
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 0.6 0.6 0.6
+						}
+					}
+					geometry Box {size 10 120 1}
+				}
+			]
+		}
+	]
+}
+
+DEF keyboad Transform {
+	translation 0 -90 60
+	rotation 1 0 0 5.0
+	children [
+		Transform {
+			translation -80 -30 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.3 0.3 0.3
+						}
+					}
+					geometry Cylinder {radius 5 height 2}
+				}
+			]
+		}
+		Transform {
+			translation 80 -30 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.3 0.3 0.3
+						}
+					}
+					geometry Cylinder {radius 5 height 2}
+				}
+			]
+		}
+		Transform {
+			translation -80 50 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.3 0.3 0.3
+						}
+					}
+					geometry Cylinder {radius 5 height 2}
+				}
+			]
+		}
+		Transform {
+			translation 80 50 0
+			rotation 1 0 0 1.57
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.3 0.3 0.3
+						}
+					}
+					geometry Cylinder {radius 5 height 2}
+				}
+			]
+		}
+		#SIDE FIT
+		Transform { 
+			translation 0 10 0
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.3 0.3 0.3
+						}
+					}
+					geometry Box {size 170 80 2}
+				}
+			]
+		}
+		#TATE FIT
+		Transform { 
+			translation 0 10 0
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.3 0.3 0.3
+						}
+					}
+					geometry Box {size 160 90 2}
+				}
+			]
+		}
+		#KEY TOP
+		Transform { 
+			translation 0 12 2
+			children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor 1 1 1
+							emissiveColor 0.5 0.5 0.5
+						}
+					}
+					geometry Box {size 150 45 1}
+				}
+			]
+		}
+	]
+}
