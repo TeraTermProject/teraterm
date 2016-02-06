@@ -264,28 +264,28 @@ static TTXExports Exports = {
 
 
 <h2><a name="configuration">Reading and Writing Configuration File</a></h2>
-    The registry system is traditionally used on the general Windows application to record the application data. However, Tera Term basically uses the .ini file to reading and writing the application data because the Tera Term's birth goes back to the Windows 3.1. <br>
-    The Collector, LogMeTT and CygTerm program included in the Tera Term package are recording the application data to the local storage. <br>
-    The TeraTerm Menu records the application data to the registry as an exception. However, the application uses the .ini file instead of the registry when the "ttpmenu.ini"(it is possible to 0 byte) is created on the current directory. Note that your registry data is automatically translated to the .ini file, so you need to configure again. <br>
+Modern Windows applications use system Registry to store their settings. Tera Term, however, stores its configuration in .ini file because that was the common practice back in the days when Tera Term was created. <br>
+
+Collector, LogMeTT, TTLEdit and CygTerm programs included in Tera Term package store their configurations in the local file. <br>
+
+Unlike other applications, Tera Term Menu stores its configuration in Registry, but if current directory contains "ttpmenu.ini" file, it will try to read configuration from this file even if the file is empty (0 bytes in size). Note that the tool does not migrate settings from Registry to .ini file, so you may need to re-create them if you decide to use .ini file. <br>
   <br>
-  
-    When new entry is added in the teraterm.ini file, the ReadIniFile()#ttset.c is implemented to read the file.
+
+When new entry is added to TERATERM.INI file it can be read with ReadIniFile()#ttset.c
 
 <pre class=code>
 	ts->ConfirmChangePaste =
 		GetOnOff(Section, "ConfirmChangePaste", FName, TRUE);
 </pre>
     
-    Also, the WriteIniFile()#ttset.c is implemented to write the file.
+Use WriteIniFile()#ttset.c to write into .ini file.
 
 <pre class=code>
 	WriteOnOff(Section, "ConfirmChangePaste", FName,
 		ts->ConfirmChangePaste);
 </pre>
 
-    When the entry is set as a string, use the GetPrivateProfileString() and WritePrivateProfileString() Win32 API. 
-    However, when the entry is set as an integer, use the GetPrivateProfileInt() and WriteInt() Win32 API. 
-
+To read or write string entries use GetPrivateProfileString() and WritePrivateProfileString() Win32 API functions. For integer values use GetPrivateProfileInt() and WriteInt() from Win32 API.
 
 <hr>
 
@@ -294,8 +294,8 @@ static TTXExports Exports = {
 <h2><a name="secure">Secure Programming</a></h2>
 
 <h3>String Operation</h3>
-    A default account of Microsoft Windows has the Administrator privilege except the Windows Vista. When an application has a bug regarding the buffer overflow, the third-party will illegally obtain the Administrator privilege. <br>
-    Traditionally, the string operation of C language will happen the buffer overflow problem. So, Microsoft develops the enhanced string operation from Visual Studio 2005. <br>
+Prior to Windows Vista default user account in Microsoft Windows had Administrator privileges. When an application run by administrator contains a bug causing buffer overflow error, a third-party can illegally obtain Administrator level privileges. <br>
+Traditionally string operations were causing majority of buffer overflow errors in C language. To address this Microsoft developed enhanced, more secure string operation functions and made them available in Visual Studio 2005. <br>
   <br>
 
 <ul>
@@ -303,7 +303,8 @@ static TTXExports Exports = {
 </ul>
 <br>
     
-    Tera Term has replaced every string operation to enhanced version for security problem. Some alternative functions are below shown. <br>
+In order to increase Tera Term security every string operation related function was replaced in the source code with it's secure equivalent. Few examples of such replacements are shown in the table below. <br>
+
   <br>
 
 <table border=1 align=center>
@@ -329,21 +330,22 @@ static TTXExports Exports = {
 </table>
   <br>
   
-    These functions cat not work well when the default locale is applied, Tera Term uses the _snprintf_s_l() function instead. <br>
-    Every function name has _s("secure") postfix, the function is visually recognized. Rightly, these functions are not compatible with the ANSI C specification. <br>
+Since these functions do not work well when default locale changes, Tera Term uses _snprintf_s_l() and similar functions instead. <br>
+
+Each of these functions have suffix "_s" (secure) in their names, which makes it easy to recognize them. Obviously, these functions are not compatible with ANSI C specification. <br>
   <br>
-    Also, the Count argument(maximum number of chars to store) is specified to the "_TRUNCATE" macro. When the buffer overflow happens, the copied buffer forcibly truncates.
+
+It should be noted that in these functions "count" argument (the maximum number of characters to store) is enforced by "_TRUNCATE" macro. If the buffer overflow can occurs, the string will be truncated to avoid this to happen.
 <p>
     
-    Example of using the strncpy_s() function is below shown. The second argument(numberOfElements) is specified with the buffer size <b>including the terminating null(\0)</b>.
-    The writing buffer has only three bytes, five bytes data specified by the third argument(strSource) truncates to two bytes. As a result, the buf[] stores the "he\0" string.
+    An example of strncpy_s() function use is shown below. The second argument (numberOfElements) specifies the buffer size including terminating null (\0). Since the write buffer size is only three bytes, five bytes of data specified in the third argument (strSource) are truncates down to two bytes and null is added to the end. After executing these commands buf[] will contain the string "he\0". <br>
 
 <pre class=code>
 char buf[3];
 strncpy_s(buf, sizeof(buf), "hello", _TRUNCATE);
 </pre>
 
-    Next, example of using the strncat_s() function is shown. The first argument(strDest) should have terminating null to concatenate strings. The second argument(numberOfElements) of the strncpy_s() function is specified with the buffer size including terminating null. For below example, when the first code is executed, five bytes(four chars + null) is stored. When the second code is executed, two chars are only copied into the buffer because the buffer size has two bytes. Finally, the buffer stores the "TeraTe"(4 chars + 2 chars + null).
+Below is an example of using strncat_s() function. The first argument (strDest) of strncat_s() function must have terminating null to concatenate strings. The second argument (numberOfElements) is specified with the buffer size that includes terminating null. In this example, when the first strncat_s() function is executed, five bytes (four chars + null) will be stored in str[]. When the second strncat_s() is executed, only two chars will be copied into the buffer, because there are only two free bytes remaining. After executing below code the buffer will contain "TeraTe\0" (4 chars + 2 chars + null).
   
 <pre class=code>
 char str[7];
@@ -352,7 +354,7 @@ strncat_s(str, sizeof(str), "Tera", _TRUNCATE);
 strncat_s(str, sizeof(str), "Term", _TRUNCATE);
 </pre>
     
-    Finally, the _snprintf_s() function uses. Confusingly, the _snprintf() does not use because terminating null may not be added into the buffer. Example of the _snprintf_s() function is below shown. The buf[] has the "ab\0".
+The final example demonstartes the use of _snprintf_s() function. Don't confuse this function with _snprintf() that doesn't add terminating null to the buffer. After execution of the code shown below buf[] will contain "ab\0".
 
 <pre class=code>
 char buf[3];
@@ -367,8 +369,7 @@ _snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
 <h2><a name="compatibility">Compatibility with Obsolete Windows Versions</a></h2>
 
 <h3>Dynamic Loading</h3>
-    Microsoft Windows application can work well on every Windows version by using same executing program, however it is necessary to devise a way to make a programming.<br>
-    For example, when the SetLayeredWindowAttributes() API supported on Windows 2000 is directly called, the application can not execute on Windows NT4.0, 98 and so on. So, new API is called by using the LoadLibrary() for dynamic loading. <br>
+The same Microsoft Windows application executable file can work fine under different Windows versions if certain programming techniques are applied. For example, if we call API function SetLayeredWindowAttributes() that was introduced in Windows 2000, our application will fail under older Windows versions such as Windows NT4.0, or Windows 98. To be able to use newer API-s we need to dynamically load them with LoadLibrary() function. <br>
 
 <pre class=code>
 static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
@@ -393,18 +394,15 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 	                                     bAlpha, dwFlags);
 }
 </pre>
-    However, it is too much like work to define a function prototype declaration manually. So, it eliminates complicated procedure by using DLL delay loading.
-
+The downside of this approach is - too much work creating prototypes for every function that will be used. The easier way to achieve the same result is to use a mechanism called "lazy loading DLL". If the function you want to use is not supported by older Windows version, you can specify it in Visual Studio project settings; mark the function as lazy loaded DLL.
+    
 
 
 <h3>Windows 95</h3>
-    
-    The Visual Studio 2005 or later no longer support the Microsoft Windows 95. Basically, the binary program built by the Visual Studio 2005 can not work on the Windows 95. For your information, the Visual Studio 2008 and 2010 no longer support the Windows 98, NT4.0 and 2000. The Windows XP will not support in the future.
+Visual Studio 2005 and later versions no longer support Microsoft Windows 95. Binary executable files built by Visual Studio 2005 won't run on Windows 95. Visual Studio 2008 and 2010 no longer support Windows 98, NT4.0 and 2000. Windows XP support will also end in near future.
+
   <p>
-      
-      Currently, Tera Term can work on the Windows 95 with a method despite Tera Term is built by the Visual Studio 2005. Certainly, this is Microsoft unofficial method. <br>
-      The binary program built by the Visual Studio 2005 links the IsDebuggerPresent function by default. The program can not work on the Windows 95 with link error because the function is added from the Windows 98. <br>
-      So, this problem can be avoided to define dummy symbol of the IsDebuggerPresent function on the Windows 95. For details, refer to the "comapt_w95.h" header. <br>
+      Currently Tera Term can run on Windows 95 despite the fact that it is compiled using Visual Studio 2005. The binary program built by Visual Studio 2005 by default contains link to IsDebuggerPresent function. This causes program to fail under Windows 95 because this function was first introduced in Windows 98. To resolve this issue dummy symbol replacing IsDebuggerPresent function was defined. This is certainly "unofficial" method not supported by Microsoft. For more details please check the header file comapt_w95.h. <br>      
 
 <ul>
   <li><a href="https://osdn.jp/projects/ttssh2/svn/view/trunk/teraterm/common/compat_w95.h?view=markup&root=ttssh2">comapt_w95.h</a></li>
@@ -415,10 +413,11 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 
 <h2><a name="debug">Debugging Methods</a></h2>
 <h3>Debug printf</h3>
-    The Windows application can not generally use the printf() function because the standard output is not assigned anywhere on the application. However, the application can use the printf() function by using the AllocConsole() and freopen(). <br>
-    The application can display the message on the debug console of the Visual Studio by using the OutputDebugString() API. When the debugger launches, the debugging message can be shown regardless of the "Debug build" and "Release build". So, when a user uses the debugger like as the <a href="http://www.vector.co.jp/soft/win95/prog/se046776.html">DBCon</a> by not using the Visual Studio, the debugging message of the application can be caught. <br>
-    
-    Tera Term prepares a wrapper function to support the variable argument.
+In general, Windows applications cannot use printf() function for debugging, because in these applications standard output is not defined. However, application can use printf() together with AllocConsole() and freopen(). <br>
+
+Applications can also display messages in debug console of Visual Studio by using OutputDebugString() API calls. When debugger starts, such debug message can be shown regardless of "Debug build" or "Release build" setting. Furthermore, if external debugger is used, like for example DBCon, debug messages generated by OutputDebugString() will still be displayed. <br>
+
+Tera Term contains wrapper function allowing to send variable length arguments to OutputDebugString().
   
 <pre class=code>
 void OutputDebugPrintf(char *fmt, ...) {
@@ -431,22 +430,23 @@ void OutputDebugPrintf(char *fmt, ...) {
 </pre>
 
 <h3>Memory leak</h3>
-    The memory leak that the heap memory by using malloc() series forgets to free the memory can be automatically detected on the Visual Studio. Below code is inserted on program startup. When the heap memory not freed remains, the Visual Studio will list up the result into the output window of Visual Studio.
+Memory leaks occur when developer uses malloc() or similar function to allocate heap memory and then forgets to free it. Visual Studio has mechanism to automatically detect memory leaks. You just need to add below code to the beginning of your program. If any part of heap memory remains unreleased when the program terminates, Visual Studio will show it in the output window.
 
 <pre class=code>
 #ifdef _DEBUG
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 </pre>
-    
-    So, an application program works on the virtual memory like as Windows. When the memory leak exists on terminating the program, the operation system frees the not freed memory.
+
+It should be noted that Windows allocates separate virtual memory region for each running process. If program ends and leaves unreleased memory, operating system will still release it.
 
 <hr>
 
 
 <h2><a name="thread">Multithreading</a></h2>
-    Generally, the Windows application will be designed for multithreading, however the multithreading model is not popular from Windows 3.1 to Windows 95. So, Tera Term is not implemented for multithreading model. It comes to understand that Tera Term's source code uses many global variables. In other words, most procedures are not thread-safe. <br>
-    However, a part of procedure uses the multithread by using the _beginthreadex() API. Some places generating the thread are in the following:
+Vast majority of modern Windows application use multithreading, however back in the days of Windows 3.1 and Windows 95 when Tera Term was born, this technique was considered a gimmick. Generally speaking Tera Term is singlethreaded application. As it can be seen from the source code, Tera Term uses lots of global variables and most of the procedures are not thread-safe. <br>
+
+However, there are few procedures that utilize _beginthreadex() API function to implement multithreading. The cases where multithreading is used are listed in the tables below.
 
 <p>
 <div align=center><b>Tera Term</b></div>
@@ -498,9 +498,9 @@ void OutputDebugPrintf(char *fmt, ...) {
 </table>
 </p>
 
-    As already mentioned, the Tera Term including the TTSSH is not thread-safe, so any problem will be happened when new thread is created and the transceiver procedure works on the thread. <br>
-    For example, a packet needs to transmit periodically in order to the keep-alive(heart-beat) mechanism for the TELNET and SSH protocol. Also, when the file is transmitted on the SCP protocol, the multithread model is necessary to keep the terminal throughput of the user operation. <br>
-    When the multithread model is used on the Tera Term, the mode less window is hidden created and a thread is generated by using the _beginthreadex() API. Next, the actual procedure works on the mode less window. For this method, the thread-safe keeps up while multithreading. The sample code is in the following: <br>
+As mentioned above, Tera Term and TTSSH are not thread-safe and problems may occur when new thread is created, or when send and receive procedures are interacting with the thread. However, there are cases when multithreading cannot be avoided. For example, a packet needs to be transmitted periodically in order to implement keep-alive (heartbeat) mechanism for TELNET and SSH protocols. Another example - while a file is being sent or received via SCP, user should be able to continue working in terminal window.<br>
+
+When Tera Term uses multithread model, hidden modeless window is created and a thread is generated by using the _beginthreadex() API function. Then the actual procedure works with this modeless window. While this method uses multithreading, it allows to keep the thread safe. The sample code is shown below. <br>
 
 <pre class=code>
 #define WM_SEND_HEARTBEAT (WM_USER + 1)
