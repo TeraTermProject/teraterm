@@ -1278,12 +1278,12 @@ Since inactive window cursor may be in different states, we need to properly han
 
 <h2><a name="serial">Serial Port</a></h2>
   <h3>Overview</h3>
-Tera Term supports the UART(16550A) compatible serial port. The serial port is also called the COM(Communication Port). The COM port that is detected by the operation system are named for the "COM1", "COM2" and so on. At most 256 COM ports(COM1 - 256) can be available on the Microsoft Windows XP. <br>
+Tera Term supports UART (16550A) compatible serial ports. Serial ports are also known as Communication Ports, or COM ports. When operating system detects COM port, it assigns it sequential number starting 1 and uses this number in port name like "COM1", "COM2", etc. Microsoft Windows XP supports up-to 256 COM ports (COM1 - COM256). <br>
 
-The COM port of the personal computer has not more than two, recently the personal computer has no COM port. So, the USB serial converter cable is released. This product has as a feature that a user can change the number of COM port. Namely, when the two COM ports exist on the system, the Tera Term will not detect two COM ports as the "COM1" and "COM2", but the "COM1" and "COM7". <br>
+In the past most personal computers had one or two COM ports. Modern computers do not have COM ports and if such port is needed, USB to Serial converter is being utilized instead. These converters allow user to choose port number. For example, instead of having ports "COM1" and "COM2", there might be 2 ports "COM1" and "COM7". Tera Term can handle such setup and properly detect port numbers (i.e. "COM1" and "COM7"). <br>
  
-  <h3>List up COM ports</h3>
-The former Tera Term lists up all COM ports from the "COM1" to "COM256" on the connection dialog, so it is not easy to use. When the connection dialog is called, the Tera Term always scans the COM ports recognized by the operating system and lists up available COM ports. The detection logic is the DetectComPorts()#ttcmn.c file. The QueryDosDevice() API can search the "COM" from the MS-DOS device name. <br>
+  <h3>List of COM Ports</h3>
+Older versions of Tera Term would present in connection dialog all possible COM ports from "COM1" to "COM256" and then user had to choose the right port from this huge list. This was not easy. Currently, when connection dialog is called, Tera Term first looks for the COM ports recognized by the operating system and then shows in the list only those ports that are currently available. The detection of available ports is done in DetectComPorts()#ttcmn.c file. API function QueryDosDevice() searches for string "COM" among all MS-DOS device names. <br>
 
 <pre class=code>
 	if (((h = GetModuleHandle("kernel32.dll")) != NULL) &&
@@ -1300,8 +1300,8 @@ The former Tera Term lists up all COM ports from the "COM1" to "COM256" on the c
 		}
 </pre>
 
-  <h3>Retrieve COM port full name</h3>
-Additionally, the ListupSerialPort()#ttcmn.c can retrieve the full name of every COM port. <br>
+  <h3>Retrieve COM Port's Full Name</h3>
+Additionally, ListupSerialPort()#ttcmn.c can retrieve the full name of each COM port. <br>
   
 <pre class=code>
 static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDesc, int ComPortMax)
