@@ -574,9 +574,11 @@ void TelStartKeepAliveThread() {
 
 <h2><a name="dde">DDE Communication</a></h2>
   <h3>Overview</h3>
-The DDE(Dynamic Data Exchange) mechanism was born in 1987 of Windows 2.0. The DDE can communicate with process, however the DDE can hardly use now because the DDE is legacy method. The standard interprocess communications are the mailslot, named pipe and OLE. <br>
-The DDE spy tool(DDESPY.EXE) that can capture the communication data with the DDE mechanism was once attached in the Visual Studio, however the tool was not found now. <br>
-Please refer to the MSDN library for DDE details. <br>
+Dynamic Data Exchange (DDE) mechanism was introduced in 1987 in Windows 2.0. While DDE allows to establish communication between processes, it is currently considered as legacy technique and is rarely used. Modern methods of inter-process communication are mailslot, named pipes and OLE. <br>
+
+Earlier versions of Microsoft Visual Studio contained DDE spy tool (DDESPY.EXE) that could capture DDE traffic, however this tool is not part of VS anymore. <br>
+
+More information about DDE is available from MSDN Library on Microsoft web site:
 
 <p>
 <ul>
@@ -585,15 +587,17 @@ Please refer to the MSDN library for DDE details. <br>
 </ul>
 </p>
 
-The DDE and TCP communication are similar because the protocol connects between a server and a client with peer-to-peer and communicates. The application can use the DDE communication by using the DDEL(Dynamic Data Exchange Management Library) library like as the Win32 API. <br>
-One process becomes the server and the other process becomes the client for the DDE communication. Also, the session identification needs to unique the communication session in the system. The TCP communication uses an IP address and a port number, however the DDE communication uses a service name and a topic name. On Tera Term's DDE communication, the service name uses the "TERATERM" string and the topic name uses the string formatted hexadecimal digits which is the window handle(HVTWin) of the Tera Term core. <br>
-A macro script can not send the command to quite another Tera Term. <br>
+DDE communication is similar to TCP - both protocols allow to open peer-to-peer, client-server connection. Applications can establish DDE connectivity by calling functions from Dynamic Data Exchange Management Library (DDEML). Calls to DDEML functions are done the same way as the calls to Win32 API functions. <br>
+
+During DDE communication one process acts as a server and another acts as a client. Each DDE connection must have system-wide unique session identifier. TCP uses IP address and port number combination for this purpose, while DDE uses service name and topic name. DDE service name for Tera Term is constant string "TERATERM". Topic name is generated dynamically by translating the handle (HVTWin) of Tera Term core process into hexadecimal string. <br>
+
+Due to the nature of DDE, macro application can only communicate with one instance of Tera Term.
 
 <div align="center">
 <img src="image/dde.png" width=720 height=540>
 </div>
 
-The Tera Term core("ttermpro.exe") becomes the DDE server and the macro program("ttpmacro.exe") becomes the DDE client on above figure. The DDE payload is called the transaction. The transaction has below some types. The type is defined as macro in the "ddeml.h" file. <br>
+Tera Term core (ttermpro.exe) acts as DDE server and macro program (ttpmacro.exe) acts as DDE client as shown on the drawing above. DDE payload is called "transaction". Transactions can be of several different types that are listed in the following table. They are defined as macros in file "ddeml.h". <br>
 
 <p>
 <table border=1 align=center>
@@ -604,37 +608,37 @@ The Tera Term core("ttermpro.exe") becomes the DDE server and the macro program(
 
 <tr>
   <td>XTYP_ADVREQ</td>
-  <td>The DDE server sends this message to own in order to send the message from the DDE server to client. </td>
+  <td>Informs the server that an advise transaction is outstanding for the specific topic name. The system sends this transaction to DDE callback function DdeCallback, then the server calls the DdePostAdvise function. </td>
 </tr>
 
 <tr>
   <td>XTYP_POKE</td>
-  <td>The DDE client sends the data to the DDE server.</td>
+  <td>DDE client uses XTYP_POKE transaction to send unsolicited data to the server.</td>
 </tr>
 
 <tr>
   <td>XTYP_ADVSTART</td>
-  <td>The advise loop starts on the DDE server.</td>
+  <td>Advise loop starts on the DDE server.</td>
 </tr>
 
 <tr>
   <td>XTYP_ADVDATA</td>
-  <td>This message periodically sends the data to the DDE client.</td>
+  <td>Informs periodically the client that the value of the data item has changed.</td>
 </tr>
 
 <tr>
   <td>XTYP_EXECUTE</td>
-  <td>This message sends a string to the DDE server for specifying the server.</td>
+  <td>DDE client uses XTYP_EXECUTE transaction to send a command string to the server.</td>
 </tr>
 
 </table>
 </p>
 
-The DDE communication has as a feature regarding the advise loop. When the DDE server enters the advise loop, the client can periodically receive the data. So, Tera Term uses the advise loop because the received data from the remote host is sent to the macro program. <br>
+DDE has a feature called "advise loop". When DDE server enters advise loop, client will start receiving data periodically. Tera Term uses advise loop to repeatedly send data from remote host to macro application. <br>
 
-  <h3>Library</h3>
-The DDEML that is used on Tera Term is described as follows.
-  
+  <h3>DDEML Library</h3>
+DDEML Library functions used by Tera Term are listed below.
+ 
   
 <p>
 <table border=1 align=center>
@@ -645,52 +649,52 @@ The DDEML that is used on Tera Term is described as follows.
 
 <tr>
   <td>DdeInitialize</td>
-  <td>This function initialized the DDE and registers the callback function. If the function succeeds, the instance returns.</td>
+  <td>Initializes DDE and registers callback function. If the function succeeds, it returns DMLERR_NO_ERROR.</td>
 </tr>
 
 <tr>
   <td>DdeCreateStringHandle</td>
-  <td>This function creates a handle from  a string. The handle is used for communications the server and client. </td>
+  <td>Creates a handle for a string. The handle is used for communication between the server and the client.</td>
 </tr>
 
 <tr>
   <td>DdeNameService</td>
-  <td>This function registers the instance and the service name("TERATERM") on the DDE server. If the registration succeeds, the XTYP_REGISTER transaction is send to the DDE client. Also, this function uses for unregistration. </td>
+  <td>Registers or unregisters the service name "TERATERM" in DDE server. If the registration succeeds, the XTYP_REGISTER transaction is send to the DDE client.</td>
 </tr>
 
 <tr>
   <td>DdeCmpStringHandles</td>
-  <td>This function compares two string handles.</td>
+  <td>Compares two string handles.</td>
 </tr>
 
 <tr>
   <td>DdeClientTransaction</td>
-  <td>This function sends a transaction from client to server. The type of transactions can be specified with the XTYP_REQUEST, XTYP_EXECUTE, XTYP_ADVSTART, XTYP_POKE and so on. A timeout value that can wait until a server's ACK, and the value is almost specified with the 1000 milliseconds(1 second). However, the 5000 milliseconds(5 seconds) is specified when the Tera Term confirms the ACK. </td>   
+  <td>Sends a transaction from the client to the server. Type of transactions can be specified. Examples of transaction types are: XTYP_REQUEST, XTYP_EXECUTE, XTYP_ADVSTART, XTYP_POKE. Timeout value can be set to define the maximum amount of time in milliseconds that the client will wait for a response (ACK) from the server. Tera Term uses timeout value of 5000 milliseconds (5 seconds).</td>   
 </tr>
 
 <tr>
   <td>DdeAccessData</td>
-  <td>This function retrieves a point of data from the DDE handle. If the pointer is not required, the DdeUnaccessData() must be called. </td>
+  <td>Provides access to the data in the specified DDE object. An application must call the DdeUnaccessData function when it has finished accessing the data in the object.</td>
 </tr>
 
 <tr>
   <td>DdeCreateDataHandle</td>
-  <td>This function creates the DDE object and returns the handle. The handle is used for the DDE server's advise loop, also sending a data to the DDE client when the XTYP_REQUEST transaction is received. </td>
+  <td>Creates the DDE object and returns the handle. The handle is used for the DDE server's advise loop, also to send data to DDE client when XTYP_REQUEST transaction is received.</td>
 </tr>
 
 <tr>
   <td>DdeGetData</td>
-  <td>This function copies from the DDE object to th buffer.</td>
+  <td>Copies data from the specified DDE object to the specified local buffer.</td>
 </tr>
 
 <tr>
   <td>DdeDisconnect</td>
-  <td>This function terminates the DDE communication.</td>
+  <td>Terminates DDE communication.</td>
 </tr>
 
 <tr>
   <td>DdePostAdvise</td>
-  <td>This function uses at the DDE server and sends the XTYP_ADVREQ transaction to own. </td>
+  <td>Causes the system to send XTYP_ADVREQ transaction to the calling (server) application's DDE callback function for each client with an active advise loop on the specified topic and item. A server application should call this function whenever the data associated with the topic name or item name pair changes.</td>
 </tr>
 
 </table>
@@ -698,10 +702,12 @@ The DDEML that is used on Tera Term is described as follows.
 
 
 
-  <h3>Implementation</h3>
-The DDE server implementation are described in this chapter. The Tera Term core("ttermpro.exe") becomes the DDE server, so the DDE server is launched at first. When the macro program("ttpmacro.exe") is directly called the macro script, the DDE communication can not start until the DDE connects by using the "connect" macro command. <br>
-When the Macro menu is called under the Control menu in Tera Term, the RunMacro()#ttdde.c is called. <br>
-A topic name(8 bytes) is created from the HVTWin window handle, and the DDE is initialized and the server is registered. Also, the DDE buffer(1KB) is created at this timing. At last, the "ttpmacro.exe" with /D option is passed the topic name and launched. <br>
+  <h3>DDE Server Implementation</h3>
+During DDE communication Tera Term core (ttermpro.exe) acts as DDE server that's why it needs to be launched the first. <br>
+
+When macro program (ttpmacro.exe), which is DDE client, processes a macro script, it will start DDE communication with DDE server only when it reaches "connect" macro command. <br>
+
+If a macro is executed from Tera Term's menu "Control" - "Macro", RunMacro()#ttdde.c function will be called. Then topic name (8 bytes) is created from window handle (HVTWin), DDE is initialized and the server is registered. At the same time DDE buffer (1KB) is created. Finally, topic name is passed to "ttpmacro.exe" in /D argument and "ttpmacro.exe" is launched. <br>
   
 <pre class=code>
 	SetTopic();
@@ -710,10 +716,12 @@ A topic name(8 bytes) is created from the HVTWin window handle, and the DDE is i
 	strncat_s(Cmnd,sizeof(Cmnd),TopicName,_TRUNCATE);
 </pre>
 
-When the transaction is sent to th DDE sever from the DDE client, the DdeCallbackProc callback function executes. The callback function is registered when the DDE is initialized by the DdeInitialize(). <br><br>
+Every time a transaction is sent from DDE client to DDE sever DdeCallbackProc callback function is being executed. The callback function is registered during DDE initialization with DdeInitialize().
+<br><br>
 
-Next, please see the DDE client implementation. The InitDDE()#ttmdde.c is called on the macro program startup, and the DDE client is initialized. The DdeInitialize() initializes the DDE and registers the DdeCallbackProc callback function. The transaction which is sent from the DDE server is processed in the callback. <br>
-When the DDE communication starts, the DdeConnect() must be called and connect to the DDE server. Next, the XTYP_EXECUTE transaction sends to notify the window handle(HWin) of the "ttpmacro.exe". Finally, the XTYP_ADVSTART transaction sends to the server and starts the advise loop. <br>
+  <h3>DDE Client Implementation</h3>
+Function InitDDE()#ttmdde.c called on macro program (ttpmacro.exe) startup initializes DDE client. DdeInitialize() function initializes DDE and registers DdeCallbackProc callback function. The transactions received from DDE server are processed by callback function. <br>
+When DDE communication starts, DdeConnect() must be called to connect to DDE server. Then XTYP_EXECUTE transaction is sent to "ttermpro.exe" window handle (HWin) as notification. Finally, XTYP_ADVSTART transaction is sent to the server that starts the advise loop. <br>
 
 <pre class=code>
   ConvH = DdeConnect(Inst, Service, Topic, NULL);
@@ -735,27 +743,27 @@ When the DDE communication starts, the DdeConnect() must be called and connect t
 
 
   <h3>Buffer Management</h3>
-The macro program can snoop the data which is sent from the remote host by using "wait" like commands. Regarding this feature, both the Tera Term core and the macro program prepares the buffer, and the Tera Term core sends the received data from the remote host to the macro program by using the DDE communication(DDE transaction). <br>
+Certain macro commands (like "wait" and few others) need to analyze the data received from the remote host to make the decision on how to proceed. To implement this functionality both Tera Term core and the macro program need to have buffers. <br>
 
 <div align="center">
 <img src="image/dde_flowcontrol.png" width=720 height=540>
 </div>
 
-First, the Tera Term core which receives the TCP packet from the remote host is implemented at the OnIdle()#teraterm.cpp file. The CommReceive()#commlib.c which is called from the OnIdle() stores the TCP packet data into the buffer(cv->InBuff[]). This buffer size is 1KB. Also, when the buffer is full, the TCP packet does not store to the buffer because the buffer is not ring buffer. However, when the buffer full state continues for a long time, the TCP packet will gather at the Windows internal kernel and the Tera Term will not receive the data from the remote host. <br>
+Tera Term core sends the data from the remote host to macro program via DDE communication (DDE transaction). Initially TCP packet received from a remote host will be detected by OnIdle()#teraterm.cpp loop. OnIdle() then calls CommReceive()#commlib.c which places TCP packet into the buffer (cv->InBuff[]). The size of this buffer is 1KB. It is not a ring buffer and once it fills up, it won't be able to store more packets. If this happens Windows kernel will start accumulating received TCP packets, but if the buffer remains full for a long time, eventually we will start loosing packets from the remote host. <br>
 
-When the log is retrieving and the macro is executing in analyzing the escape sequence process, the LogPut1() stores the received data to the DDE buffer(cv.LogBuf[]). In other words, the logging and the macro executing are common buffer. The buffer size is 1KB and ring buffer, so the oldest data is overwritten when the buffer is full. <br>
+Log collection, escape sequence analysis and macro execution related operations require data buffering. In all these cases Tera Term uses LogPut1() function to place data into DDE buffer cv.LogBuf[]. In other words, the logging and macro executing functions share the same buffer. The size of this buffer is 1KB and this is ring buffer, i.e the oldest data will be overwritten if the buffer is full. <br>
 
-Also, when the logging is enabled by the binary mode, the data is stored into the other cv.BinBuf[]. In other words, the data of the binary mode can not communicate with the DDE mechanism. So, the binary data can not wait by using the "wait" series command. <br>
+Additionally, when logging mode is binary, the data is stored in another buffer cv.BinBuf[], which is not related to DDE. So, the binary data cannot be passed to DDE client. This means "wait" and similar macro commands cannot be used to wait for a binary data or escape sequences. <br>
 
-When the escape sequence finishes analyzing, the DDEAdv()#ttdde.c is called soon and the XTYP_ADVREQ transaction is sent to own(DDE server). When the XTYP_ADVREQ transaction is received, the DdeCallbackProc() is called and the DDE buffer of the Tera Term core are sent to the macro program. The advise loop is used in here. <br>
+When the escape sequence analysis is complete, DDEAdv()#ttdde.c function is called and XTYP_ADVREQ type transaction is sent by DDE server to itself. When server receives XTYP_ADVREQ, it will call DdeCallbackProc() function to pass the data to macro program. Advise loop is being used during this process. <br>
 
 <div align="center">
 <img src="image/dde_buffer.png" width=720 height=540>
 </div>
 
-The data is received from the DDE server at the advise loop and the XTYP_ADVDATA transaction is processed at the DdeCallbackProc()#ttmdde.c of the macro program as the DDE client. <br>
+DDE server's advise loop sends the data in XTYP_ADVDATA transaction type. DDE client (ttpmacro.exe) receives this data and processed it in DdeCallbackProc()#ttmdde.c function. <br>
 
-Also, the DDE communication buffer and the log buffer are shared in the cv.LogBuf[] on the Tera Term core. The buffer head and size index are "DStart" and "Dcount" in case of the DDE communication, "LStart" and "Lcount" in case of the logging. Actually, if each index is differ, the program will not work well, so the two indexes must always synchronize. <br>
+As it has been mentioned earlier DDE communication buffer and log buffer in Tera Term core are the same (cv.LogBuf[]). For DDE communication the buffer start index is stored in "DStart" and buffer length is "Dcount". For logging corresponding variables are "LStart" and "Lcount". Since the buffer is shared, to avoid data loss, these variables must always be synchronized, i.e. DStart=LStart and Dcount=Lcount. <br>
   
 <hr>
 
