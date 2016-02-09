@@ -33,7 +33,7 @@
 //
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_26 (2015/12/14)";
+static char Version[] = "version 1.07_27 (2016/02/09)";
 
 #include <stdio.h>
 #include <stdlib.h>
