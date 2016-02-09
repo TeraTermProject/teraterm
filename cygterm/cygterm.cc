@@ -987,18 +987,19 @@ int exec_shell(int* sh_pid)
         for (e = sh_env.next; e != NULL; e = e->next) {
             putenv(e->env);
         }
-        if (home_chdir) {
-            // chdir to home directory
-            const char *home_dir = getenv("HOME");
-            // ignore chdir(2) system-call error.
-            chdir(home_dir);
-        }
-        else if (change_dir[0] != 0) {
+	// change directory
+        if (change_dir[0] != 0) {
 	    if (chdir(change_dir) < 0) {
 		char tmp[256];
 		snprintf(tmp, 256, "Can't chdir to \"%s\".", change_dir);
 		c_error(tmp);
 	    }
+        }
+        else if (home_chdir) {
+            // chdir to home directory
+            const char *home_dir = getenv("HOME");
+            // ignore chdir(2) system-call error.
+            chdir(home_dir);
         }
         // execute a shell
         char *argv[32];
@@ -1311,6 +1312,13 @@ int main(int argc, char** argv)
     if (cmd_term[0] == 0 && cl_port <= 0) {
         msg_print("missing terminal");
         return 0;
+    }
+
+    if (change_dir[0] != 0) {
+	home_chdir = false;
+	if (enable_loginshell) {
+	    add_env(&sh_envp, "CHERE_INVOKING=y", NULL);
+	}
     }
 
     // terminal side connection
