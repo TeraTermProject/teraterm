@@ -725,7 +725,7 @@ void agent_proxy()
 						FD_SET(cur->sock, &readfds);
 					}
 				}
-				else if (len < 0) {
+				else if (len <= 0) {
 					// read error
 					prev->next = cur->next;
 					shutdown(cur->sock, SHUT_RDWR);
