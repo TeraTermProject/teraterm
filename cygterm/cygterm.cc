@@ -117,6 +117,33 @@ struct sh_env_t {
 
 sh_env_t* sh_envp = &sh_env;
 
+int add_env(sh_env_t** envp, const char* str, const char* str2)
+{
+	int len;
+	sh_env_t* e;
+
+	len = strlen(str);
+	if (str2) {
+		len += strlen(str2) + 1;
+	}
+
+	e = (sh_env_t*)malloc(sizeof(sh_env_t) + len);
+	if (e) {
+		if (str2) {
+			snprintf(e->env, len + 1, "%s=%s", str, str2);
+		}
+		else {
+			strcpy(e->env, str);
+		}
+		e->next = NULL;
+		*envp = ((*envp)->next = e);
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
 //================//
 // message output //
 //----------------//
@@ -209,12 +236,7 @@ void parse_cfg_line(char *buf)
     }
     else if (!strncasecmp(name, "ENV_", 4)) {
         // additional env vars given to a shell
-        sh_env_t* e = (sh_env_t*)malloc(sizeof(sh_env_t)+strlen(val));
-        if (e != NULL) {
-            strcpy(e->env, val);
-            e->next = NULL;
-            sh_envp = (sh_envp->next = e);
-        }
+	add_env(&sh_envp, val, NULL);
     }
     else if (!strcasecmp(name, "HOME_CHDIR")) {
         // change directory to home
@@ -409,12 +431,7 @@ void get_args(int argc, char** argv)
         else if (!strcmp(*argv, "-v")) {        // -v <additional env var>
             if (*(argv+1) != NULL) {
                 ++argv;
-                sh_env_t* e = (sh_env_t*)malloc(sizeof(sh_env_t)+strlen(*argv));
-                if (e != NULL) {
-                    strcpy(e->env, *argv);
-                    e->next = NULL;
-                    sh_envp = (sh_envp->next = e);
-                }
+		add_env(&sh_envp, *argv, NULL);
             }
         }
         else if (!strcmp(*argv, "-d")) {        // -d <exec directory>
@@ -736,7 +753,6 @@ agent_thread_cleanup:
 int exec_agent_proxy()
 {
 	int pid;
-	sh_env_t *e;
 	int malloc_size;
 
 	if (mkdtemp(sockdir) == NULL) {
@@ -744,15 +760,10 @@ int exec_agent_proxy()
 	}
 	snprintf(sockname, sizeof(sockname), "%s/agent.%ld", sockdir, getpid());
 
-	malloc_size = sizeof(sh_env_t) + strlen(sockname) + 15;
-	e = (sh_env_t*)malloc(malloc_size);
-	if (!e) {
+	if (!add_env(&sh_envp, "SSH_AUTH_SOCK", sockname)) {
 		return -1;
 	}
-	snprintf(e->env, malloc_size - sizeof(sh_env_t), "SSH_AUTH_SOCK=%s", sockname);
-	e->next = NULL;
-	sh_envp = (sh_envp->next = e);
-	
+
 	if ((pid = fork()) < 0) {
 		return -1;
 	}
