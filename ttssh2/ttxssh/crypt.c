@@ -1038,7 +1038,7 @@ int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 // ※本関数は SSH2 でのみ使用される。
 // (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
-                               char FAR * data, int len, char FAR * MAC)
+	char FAR * data, int len, char FAR * MAC)
 {
 	HMAC_CTX c;
 	unsigned char m[EVP_MAX_MD_SIZE];
@@ -1048,14 +1048,19 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	mac = &pvar->ssh2_keys[MODE_IN].mac;
 
 	// HMACがまだ有効でない場合は、検証OKとして返す。
-	if (mac == NULL || mac->enabled == 0) 
+	if (mac == NULL || mac->enabled == 0)
 		return TRUE;
 
-	if (mac->key == NULL)
+	if (mac->key == NULL) {
+		logprintf(pvar, LOG_LEVEL_VERBOSE, "HMAC key is NULL(seq %lu len %d)", sequence_number, len);
 		goto error;
+	}
 
-	if ((u_int)mac->mac_len > sizeof(m))
+	if ((u_int)mac->mac_len > sizeof(m)) {
+		logprintf(pvar, LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
+			mac->mac_len, sizeof(m), sequence_number, len);
 		goto error;
+	}
 
 	HMAC_Init(&c, mac->key, mac->key_len, mac->md);
 	set_uint32_MSBfirst(b, sequence_number);
@@ -1065,6 +1070,9 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	HMAC_cleanup(&c);
 
 	if (memcmp(m, MAC, mac->mac_len)) {
+		logprintf(pvar, LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
+		logprintf_hexdump(pvar, LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:");
+		logprintf_hexdump(pvar, LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:");
 		goto error;
 	}
 

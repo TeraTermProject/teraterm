@@ -341,6 +341,8 @@ void notify_nonfatal_error(PTInstVar pvar, char FAR * msg);
 void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect);
 void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level);
 void logprintf(PTInstVar pvar, int level, char *fmt, ...);
+void logprintf_hexdump(PTInstVar pvar, int level, char *data, int len, char *fmt, ...);
+
 
 void get_teraterm_dir_relative_name(char FAR * buf, int bufsize, char FAR * basename);
 int copy_teraterm_dir_relative_path(char FAR * dest, int destsize, char FAR * basename);

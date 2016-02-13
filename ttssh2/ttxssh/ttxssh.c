@@ -980,6 +980,87 @@ void logprintf(PTInstVar pvar, int level, char *fmt, ...)
 	}
 }
 
+static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int byte_cnt)
+{
+	int i, c;
+	char tmp[128];
+
+	buf[0] = 0;
+
+	/* 先頭のアドレス表示 */
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%08X : ", addr);
+	strncat_s(buf, buflen, tmp, _TRUNCATE);
+
+	/* バイナリ表示（4バイトごとに空白を挿入）*/
+	for (i = 0; i < byte_cnt; i++) {
+		if (i > 0 && i % 4 == 0) {
+			strncat_s(buf, buflen, " ", _TRUNCATE);
+		}
+
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02X", bytes[i]);
+		strncat_s(buf, buflen, tmp, _TRUNCATE);
+	}
+
+	/* ASCII表示部分までの空白を補う */
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "   %*s%*s", (16 - byte_cnt) * 2 + 1, " ", (16 - byte_cnt + 3) / 4, " ");
+	strncat_s(buf, buflen, tmp, _TRUNCATE);
+
+	/* ASCII表示 */
+	for (i = 0; i < byte_cnt; i++) {
+		c = bytes[i];
+		if (isprint(c)) {
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%c", c);
+			strncat_s(buf, buflen, tmp, _TRUNCATE);
+		}
+		else {
+			strncat_s(buf, buflen, ".", _TRUNCATE);
+		}
+	}
+
+	//strncat_s(buf, buflen, "\n", _TRUNCATE);
+}
+
+void logprintf_hexdump(PTInstVar pvar, int level, char *data, int len, char *fmt, ...)
+{
+	char buff[4096];
+	va_list params;
+	int c, addr;
+	int bytes[16], *ptr;
+	int byte_cnt;
+	int i;
+
+	if (level <= pvar->session_settings.LogLevel) {
+		va_start(params, fmt);
+		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
+		va_end(params);
+
+		notify_verbose_message(pvar, buff, level);
+
+		addr = 0;
+		byte_cnt = 0;
+		ptr = bytes;
+		for (i = 0; i < len; i++) {
+			c = data[i];
+			*ptr++ = c & 0xff;
+			byte_cnt++;
+
+			if (byte_cnt == 16) {
+				format_line_hexdump(buff, sizeof(buff), addr, bytes, byte_cnt);
+				notify_verbose_message(pvar, buff, level);
+
+				addr += 16;
+				byte_cnt = 0;
+				ptr = bytes;
+			}
+		}
+
+		if (byte_cnt > 0) {
+			format_line_hexdump(buff, sizeof(buff), addr, bytes, byte_cnt);
+			notify_verbose_message(pvar, buff, level);
+		}
+	}
+}
+
 static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks)
 {
 	if (pvar->settings.Enabled) {
