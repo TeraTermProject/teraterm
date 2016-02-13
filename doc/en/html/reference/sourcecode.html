@@ -83,7 +83,6 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 
   <br>
   
-    The Cygwin connection mechanism is described at another chapter.
 
 <hr>
 
@@ -266,7 +265,8 @@ static TTXExports Exports = {
 <h2><a name="configuration">Reading and Writing Configuration File</a></h2>
 Modern Windows applications use system Registry to store their settings. Tera Term, however, stores its configuration in .ini file because that was the common practice back in the days when Tera Term was created. <br>
 
-Collector, LogMeTT, TTLEdit and CygTerm programs included in Tera Term package store their configurations in the local file. <br>
+LogMeTT and TTLEdit programs included in Tera Term package store their configurations in system Registry. <br>
+Collector and CygTerm programs included in Tera Term package store their configurations in the local file. <br>
 
 Unlike other applications, Tera Term Menu stores its configuration in Registry, but if current directory contains "ttpmenu.ini" file, it will try to read configuration from this file even if the file is empty (0 bytes in size). Note that the tool does not migrate settings from Registry to .ini file, so you may need to re-create them if you decide to use .ini file. <br>
   <br>
@@ -1445,7 +1445,7 @@ zmodem.c: ZInit()
 </tr>
 
 <tr>
-  <td>YReadPacket</td>
+  <td>XReadPacket</td>
   <td>File reception</td>
 </tr>
 
@@ -1933,7 +1933,7 @@ KERMIT (Kermit: Frog Muppet from Sesame Street) is a file transfer protocol deve
 </ul>
 <br>
 
-This site distributes KERMIT source code variations for different platforms. The are called C-Kermit, E-Kermit and Kermit95. <br>
+This site distributes KERMIT source code variations for different platforms. They are called C-Kermit, E-Kermit and Kermit95. <br>
 
 If "KmtLog" entry of teraterm.ini file is set to "On", Tera Term will log communication data in "KERMIT.LOG" file. This file will be created in Tera Term installation directory.
   

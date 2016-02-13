@@ -266,7 +266,8 @@ static TTXExports Exports = {
 
 <h2><a name="configuration">設定ファイルの読み書き</a></h2>
 　Windowsではアプリケーションのデータ保存のために、レジストリが伝統的に利用されていますが、Tera Termではその誕生がWindows 3.1までに遡るために、.iniファイルによるローカルディレクトリへの保存方法が標準となっています。<br>
-　パッケージに同梱されるCollectorやLogMeTT、CygTermに関してもローカルディレクトリへデータが保存されます。<br>
+　パッケージに同梱されるCollectorやCygTermに関してもローカルディレクトリへデータが保存されます。<br>
+　LogMeTTとTTLEditはレジストリへ保存されます。<br>
 　例外として、TeraTerm Menuはデフォルトでレジストリへ保存をします。カレントディレクトリに"ttpmenu.ini"（0バイトで可）を設置することで、レジストリの代わりに.iniファイルを使うようにすることもできます。ただし、レジストリから.iniファイルへの移行は自動で行いませんので、手動で再登録してください。<br>
 　<br>
 　
@@ -1407,7 +1408,7 @@ XMODEMのエントリポイントについて、以下に示します。
 </tr>
 
 <tr>
-  <td>YReadPacket</td>
+  <td>XReadPacket</td>
   <td>ファイル受信</td>
 </tr>
 
