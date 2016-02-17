@@ -33,7 +33,7 @@
 //
 
 static char Program[] = "CygTerm+";
-static char Version[] = "version 1.07_27 (2016/02/09)";
+static char Version[] = "version 1.07_28 (2016/02/17)";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,6 +108,10 @@ bool enable_agent_proxy = false;
 char term_type[41] = "";
 struct winsize win_size = {0,0,0,0};
 
+// debug mode
+//-----------
+bool debug_flag = false;
+
 // additional env vars given to a shell
 //-------------------------------------
 struct sh_env_t {
@@ -180,6 +184,16 @@ void c_error(const char* string = NULL)
         ptr += snprintf(ptr, sizeof(msg), "%s\n\n", string);
     snprintf(ptr, sizeof(msg)-(ptr-msg), "%s\n", strerror(errno));
     msg_print(msg);
+}
+
+//======================//
+// debug message output //
+//======================//
+void debug_msg_print(const char* msg)
+{
+    if (debug_flag) {
+        msg_print(msg);
+    }
 }
 
 //==================================//
@@ -258,6 +272,12 @@ void parse_cfg_line(char *buf)
         // ssh-agent proxy
         if (strchr("YyTt", *val) != NULL || atoi(val) > 0) {
             enable_agent_proxy = true;
+        }
+    }
+    else if (!strcasecmp(name, "DEBUG")) {
+        // debug mode
+        if (strchr("YyTt", *val) != NULL || atoi(val) > 0) {
+            debug_flag = true;
         }
     }
 
@@ -452,6 +472,9 @@ void get_args(int argc, char** argv)
                 cmd_termopt[sizeof(cmd_termopt)-1] = '\0';
             }
         }
+        else if (!strcmp(*argv, "-debug")) {    // -debug
+            debug_flag = true;
+        }
     }
 }
 
@@ -605,7 +628,7 @@ void agent_proxy()
 	connections.next = NULL;
 
 	if ((sock = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
-		msg_print("socket failed.");
+		c_error("agent_proxy: socket failed.");
 		exit(0);
 	}
 	memset(&addr, 0, sizeof(addr));
@@ -852,24 +875,29 @@ int accept_telnet(int lsock)
     tm.tv_sec = telsock_timeout;
     tm.tv_usec = 0;
     if (select(FD_SETSIZE, &rbits, 0, 0, &tm) <= 0) {
+        c_error("accept_telnet: select failed");
         return -1;
     }
     if (!FD_ISSET(lsock, &rbits)) {
+        c_error("accept_telnet: FD_ISSET failed");
         return -1;
     }
     int asock;
     struct sockaddr_in addr;
     int len = sizeof(addr);
     if ((asock = accept(lsock, (struct sockaddr *)&addr, &len)) < 0) {
+        c_error("accept_telnet: accept failed");
         return -1;
     }
     if (getpeername(asock, (struct sockaddr *)&addr, &len) != 0) {
+        c_error("accept_telnet: getpeername failed");
         shutdown(asock, 2);
         close(asock);
         return -1;
     }
     if (addr.sin_addr.s_addr != htonl(INADDR_LOOPBACK)) {
         // reject it except local connection
+        msg_print("not local connection");
         shutdown(asock, 2);
         close(asock);
         return -1;
@@ -945,10 +973,12 @@ int exec_shell(int* sh_pid)
     // open pty master
     int master;
     if ((master = open(DEVPTY, O_RDWR)) < 0) {
+        c_error("exec_shell: master pty open error");
         return -1;
     }
     int pid;
     if ((pid = fork()) < 0) {
+        c_error("exec_shell: fork failed");
         return -1;
     }
     if (pid == 0) {
@@ -957,6 +987,7 @@ int exec_shell(int* sh_pid)
         // open pty slave
         int slave;
         if ((slave = open(ptsname(master), O_RDWR)) < 0) {
+            c_error("exec_shell: slave pty open error");
             exit(0);
         }
         // stdio redirection
@@ -991,7 +1022,8 @@ int exec_shell(int* sh_pid)
         if (change_dir[0] != 0) {
 	    if (chdir(change_dir) < 0) {
 		char tmp[256];
-		snprintf(tmp, 256, "Can't chdir to \"%s\".", change_dir);
+		snprintf(tmp, 256, "exec_shell: Can't chdir to \"%s\".", change_dir);
+		tmp[255] = 0;
 		c_error(tmp);
 	    }
         }
@@ -1012,9 +1044,11 @@ int exec_shell(int* sh_pid)
                         *pos = '-';
                         argv[0] = pos;
                 }
+                debug_msg_print(shell_path);
                 execv(shell_path, argv);
         }
         else {
+                debug_msg_print(argv[0]);
                 execv(argv[0], argv);
         }
         // no error, exec() doesn't return
@@ -1335,11 +1369,13 @@ int main(int argc, char** argv)
         in_addr addr;
         addr.s_addr = htonl(INADDR_LOOPBACK);
         char tmp[256];
+        debug_msg_print("execute terminal");
         snprintf(tmp, sizeof(tmp), cmd_term, inet_ntoa(addr), (int)ntohs(listen_port));
         snprintf(cmd_term, sizeof(cmd_term), "%s %s", tmp, cmd_termopt);
 
         // execute a terminal emulator
         if ((hTerm = exec_term()) == NULL) {
+            api_error("exec_term failed");
             goto cleanup;
         }
         // accept connection from the terminal emulator
@@ -1361,7 +1397,9 @@ int main(int argc, char** argv)
     }
 
     // execute a shell
+    debug_msg_print("execute shell");
     if ((sh_pty = exec_shell(&sh_pid)) < 0) {
+        debug_msg_print("exec_shell failed");
         goto cleanup;
     }
     // set initial pty window size
@@ -1369,6 +1407,7 @@ int main(int argc, char** argv)
         ioctl(sh_pty, TIOCSWINSZ, &win_size);
     }
 
+    debug_msg_print("entering telnet session");
     // relay the terminal emulator and the shell
     telnet_session(te_sock, sh_pty);
 
