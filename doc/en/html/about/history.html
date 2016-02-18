@@ -36,29 +36,27 @@
 <ul class="history">
   <li>Changes
     <ul>
-<!--
-      <li>XMODEM に指定できるオプションを修正した。
+      <li>Changed XMODEM options
         <ul>
-          <li>送信時は エラー検出の種類(Checksum/CRC) を指定できる。</li>
-          <li>受信時は パケットサイズ(1K) を指定できる。</li>
-          <li><a href="../macro/command/xmodemrecv.html">xmodemrecv</a>, <a href="../macro/command/xmodemsend.html">xmodemsend</a> マクロコマンドの引数も同様。</li>
+          <li>Error detection type(Checksum/CRC) can be specified at sending.</li>
+          <li>Packet size(1K) can be specified at receiving.</li>
+          <li>The <a href="../macro/command/xmodemrecv.html">xmodemrecv</a> and <a href="../macro/command/xmodemsend.html">xmodemsend</a> macro argument is the same.</li>
         </ul></li>
-      <li>XMODEM 送受信時のリモートからのキャンセルを、転送失敗として扱うようにした。</li>
-      <li>XMODEM 受信時に、Checksum なのに相手が 1K のパケットを送信しきてた場合に Checksum/1K として受信するようにした。</li>
-      <li>XMODEM で CRC 送信時に相手が NAK を送信してきた場合は Checksum として送信するようにした。</li>
--->
+      <li>Cancel from remote host at XMODEM transmitter becomes as trasnfer failure.</li>
+      <li>When remote host sends 1K packet against Checksum at XMODEM receiving, Tera Term receives data as Checksum/1K.</li>
+      <li>When remote host sends NAK at XMODEM CRC sending, Tera Term sends data as Checksum.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>Eterm look-feel: When invalid image file is specified as background, an application fault occurs.</li>
-      <!--li>XMODEM で CRC 送信時に途中から Checksum 送信になってしまうことがある問題を修正した。</li-->
+      <li>XMODEM: When CRC sends, Checksum may send half way incorrectly.</li>
       <li>The return value of <a href="../macro/command/random.html">random</a> macro command is the deviation of the pseudo random number.
         <ul>
           <li>The specified maximum value will be a very low probability.</li>
           <li>When the maximum value is specified as over 32768 number, any value can not be generated.</li>
-          <!--li>乱数生成に SFMT を利用するようにした。</li-->
+          <li>Random generation is used for SFMT.</li>
         </ul></li>
       <li>When invalid folder type is specified on the <a href="../macro/command/getspecialfolder.html">getspecialfolder</a> macro command, the desktop folder is returned by mistake. </li>
       <li>MACRO: When <a href="../macro/command/getipv6addr.html">getipv6addr</a> command is called on Windows 2000, an application _ttpmacro.exe_ fault occurs.</li>
@@ -3783,13 +3781,11 @@ SYNOPSIS:
       <li>Add debug mode.</li>
 </ul>
 
-<!--
 <h3><a name="cygterm_1.07_27">v1.07_27 2016/02/09 (by doda)</a></h3>
 <ul class="history">
-      <li>-cd オプション(HOME_CHDIR=y) より -d オプションでのディレクトリ指定を優先するようにした。</li>
-      <li>-ls オプション(LOGIN_SHELL=y) の指定時に -d オプションを指定した場合、CHERE_INVOKING=y をセットするようにした。</li>
+      <li>The directory selection by -d option is prior to -cd option(HOME_CHDIR=y).</li>
+      <li>When -d option is specified by using -ls option(LOGIN_SHELL=y), CHERE_INVOKING=y is set.</li>
 </ul>
--->
 
 <h3><a name="cygterm_1.07_26">v1.07_26 2015/12/14 (by doda)</a></h3>
 <ul class="history">
