@@ -90,6 +90,7 @@ void DispGetWindowPos(int *x, int *y);
 void DispGetWindowSize(int *width, int *height);
 void DispGetRootWinSize(int *x, int *y);
 int DispFindClosestColor(int red, int green, int blue);
+void UpdateBGBrush(void);
 
 extern int WinWidth, WinHeight;
 extern HFONT VTFont[AttrFontMask+1];

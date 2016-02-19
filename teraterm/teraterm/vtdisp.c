@@ -3511,6 +3511,8 @@ void DispSetColor(unsigned int num, COLORREF color)
 		break;
 	}
 
+	UpdateBGBrush();
+
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
 			InvalidateRect(HTEKWin, NULL, FALSE);
@@ -3634,6 +3636,8 @@ void DispResetColor(unsigned int num)
 		}
 	}
 
+	UpdateBGBrush();
+
 	if (num == CS_TEK_FG || num == CS_TEK_BG) {
 		if (HTEKWin)
 			InvalidateRect(HTEKWin, NULL, FALSE);
@@ -3675,6 +3679,10 @@ COLORREF DispGetColor(unsigned int num)
 
 void DispSetCurCharAttr(TCharAttr Attr) {
   CurCharAttr = Attr;
+  UpdateBGBrush();
+}
+
+void UpdateBGBrush() {
   if (Background != NULL) DeleteObject(Background);
 
   if ((CurCharAttr.Attr2 & Attr2Back) != 0) {
