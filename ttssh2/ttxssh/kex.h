@@ -35,6 +35,8 @@ DH *dh_new_group1(void);
 DH *dh_new_group14(void);
 DH *dh_new_group15(void);
 DH *dh_new_group16(void);
+DH *dh_new_group17(void);
+DH *dh_new_group18(void);
 void dh_gen_key(PTInstVar pvar, DH *dh, int we_need /* bytes */ );
 int dh_estimate(int bits);
 

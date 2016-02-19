@@ -5126,8 +5126,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		case KEX_DH_GRP1_SHA1:
 		case KEX_DH_GRP14_SHA1:
 		case KEX_DH_GRP14_SHA256:
-		case KEX_DH_GRP15_SHA256:
-		case KEX_DH_GRP16_SHA256:
+		case KEX_DH_GRP16_SHA512:
+		case KEX_DH_GRP18_SHA512:
 			SSH2_dh_kex_init(pvar);
 			break;
 		case KEX_DH_GEX_SHA1:
@@ -5157,7 +5157,7 @@ error:;
 
 
 //
-// KEX_DH_GRP1_SHA1 or KEX_DH_GRP14_SHA1
+// ŒÅ’è DH Groups (RFC 4253, draft-baushke-ssh-dh-group-sha2-04)
 //
 static void SSH2_dh_kex_init(PTInstVar pvar)
 {
@@ -5175,11 +5175,11 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	case KEX_DH_GRP14_SHA256:
 		dh = dh_new_group14();
 		break;
-	case KEX_DH_GRP15_SHA256:
-		dh = dh_new_group15();
-		break;
-	case KEX_DH_GRP16_SHA256:
+	case KEX_DH_GRP16_SHA512:
 		dh = dh_new_group16();
+		break;
+	case KEX_DH_GRP18_SHA512:
+		dh = dh_new_group18();
 		break;
 	default:
 		goto error;
@@ -5227,10 +5227,7 @@ error:;
 
 
 //
-// KEX_DH_GEX_SHA1 or KEX_DH_GEX_SHA256
-//
-// cf.  Diffie-Hellman Group Exchange for the SSH Transport Layer Protocol
-//      (draft-ietf-secsh-dh-group-exchange-04.txt)
+// DH-GEX (RFC 4419)
 //
 
 static void SSH2_dh_gex_kex_init(PTInstVar pvar)
@@ -6252,8 +6249,8 @@ static BOOL handle_SSH2_dh_common_reply(PTInstVar pvar)
 		case KEX_DH_GRP1_SHA1:
 		case KEX_DH_GRP14_SHA1:
 		case KEX_DH_GRP14_SHA256:
-		case KEX_DH_GRP15_SHA256:
-		case KEX_DH_GRP16_SHA256:
+		case KEX_DH_GRP16_SHA512:
+		case KEX_DH_GRP18_SHA512:
 			handle_SSH2_dh_kex_reply(pvar);
 			break;
 		case KEX_DH_GEX_SHA1:
