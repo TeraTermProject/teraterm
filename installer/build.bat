@@ -1,13 +1,12 @@
 
 rem Visual Studioのバージョン判別
-set TMPVAL=""
-FOR /F "delims=" %%H IN ("%VSINSTALLDIR%") DO FOR /F "tokens=3,4 delims=. " %%I IN ("%%~nH") DO set TMPVAL="%%I %%J"
-if %TMPVAL% == "Studio 8" goto vs2005
-if %TMPVAL% == "Studio 9" goto vs2008
-if %TMPVAL% == "Studio 10" goto vs2010
-if %TMPVAL% == "Studio 11" goto vs2012
-if %TMPVAL% == "Studio 12" goto vs2013
-if %TMPVAL% == "Studio 14" goto vs2015
+FOR /F "tokens=1,2 delims=\. " %%H IN ("%VSINSTALLDIR:*Visual Studio =Studio %") DO set VSVERSTR="%%H %%I"
+if %VSVERSTR% == "Studio 8" goto vs2005
+if %VSVERSTR% == "Studio 9" goto vs2008
+if %VSVERSTR% == "Studio 10" goto vs2010
+if %VSVERSTR% == "Studio 11" goto vs2012
+if %VSVERSTR% == "Studio 12" goto vs2013
+if %VSVERSTR% == "Studio 14" goto vs2015
 
 rem 期待通りに動かなかった場合の為、旧判定条件も残しておく
 echo %VSINSTALLDIR% | find "Studio 8"
