@@ -1,5 +1,6 @@
 
 rem Visual StudioÇÃÉoÅ[ÉWÉáÉìîªï 
+set TMPVAL=""
 FOR /F "delims=" %%H IN ("%VSINSTALLDIR%") DO FOR /F "tokens=3,4 delims=. " %%I IN ("%%~nH") DO set TMPVAL="%%I %%J"
 if %TMPVAL% == "Studio 8" goto vs2005
 if %TMPVAL% == "Studio 9" goto vs2008
