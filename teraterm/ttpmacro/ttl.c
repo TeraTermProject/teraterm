@@ -2936,7 +2936,9 @@ WORD TTLIf()
 		if (Val==0)
 			ElseFlag = 1; // Skip until 'Else' or 'EndIf'
 	}
-	else { // single line lf command
+	else { // single line If command
+		if (!CheckParameterGiven())
+			return ErrSyntax;
 		if (Val==0)
 			return 0;
 		LinePtr = Tmp;
