@@ -591,6 +591,11 @@ struct tttset {
 	WORD AutoComPortReconnect;
 	WORD BGImgBrightness;
 	cygterm_t CygtermSettings;
+	int XmodemTimeOutInit;
+	int XmodemTimeOutInitCRC;
+	int XmodemTimeOutShort;
+	int XmodemTimeOutLong;
+	int XmodemTimeOutVLong;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

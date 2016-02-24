@@ -185,6 +185,9 @@ typedef struct {
   BOOL CRRecv;
   int TOutShort;
   int TOutLong;
+  int TOutInit;
+  int TOutInitCRC;
+  int TOutVLong;
   int CANCount;
 } TXVar;
 typedef TXVar far *PXVar;

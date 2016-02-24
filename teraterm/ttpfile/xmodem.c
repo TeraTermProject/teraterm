@@ -16,12 +16,6 @@
 
 #include "xmodem.h"
 
-#define TimeOutInit  10
-#define TimeOutC     3
-#define TimeOutShort 10
-#define TimeOutLong  20
-#define TimeOutVeryLong 60
-
 int XRead1Byte(PFileVar fv, PXVar xv, PComVar cv, LPBYTE b)
 {
 	if (CommRead1Byte(cv, b) == 0)
@@ -121,12 +115,12 @@ void XSendNAK(PFileVar fv, PXVar xv, PComVar cv)
 	if (xv->NAKMode == XnakNAK) {
 		b = NAK;
 		if ((xv->PktNum == 0) && (xv->PktNumOffset == 0))
-			t = TimeOutInit;
+			t = xv->TOutInit;
 		else
 			t = xv->TOutLong;
 	} else {
 		b = 'C';
-		t = TimeOutC;
+		t = xv->TOutInitCRC;
 	}
 	XWrite(fv, xv, cv, &b, 1);
 	xv->PktReadMode = XpktSOH;
@@ -194,12 +188,16 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 
 	fv->ByteCount = 0;
 
+	xv->TOutInit = ts->XmodemTimeOutInit;
+	xv->TOutInitCRC = ts->XmodemTimeOutInitCRC;
+	xv->TOutVLong = ts->XmodemTimeOutVLong;
+
 	if (cv->PortType == IdTCPIP) {
-		xv->TOutShort = TimeOutVeryLong;
-		xv->TOutLong = TimeOutVeryLong;
+		xv->TOutShort = ts->XmodemTimeOutVLong;
+		xv->TOutLong = ts->XmodemTimeOutVLong;
 	} else {
-		xv->TOutShort = TimeOutShort;
-		xv->TOutLong = TimeOutLong;
+		xv->TOutShort = ts->XmodemTimeOutShort;
+		xv->TOutLong = ts->XmodemTimeOutLong;
 	}
 
 	XSetOpt(fv, xv, xv->XOpt);
@@ -224,7 +222,7 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 			XWrite(fv, xv, cv, inistr, strlen(inistr));
 		}
 
-		FTSetTimeOut(fv, TimeOutVeryLong);
+		FTSetTimeOut(fv, xv->TOutVLong);
 		break;
 	case IdXReceive:
 		XSendNAK(fv, xv, cv);
@@ -456,7 +454,7 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 			xv->CANCount = 0;
 		}
 		// reset timeout timer
-		FTSetTimeOut(fv, TimeOutVeryLong);
+		FTSetTimeOut(fv, xv->TOutVLong);
 
 		do {
 			i = XRead1Byte(fv, xv, cv, &b);

@@ -1849,6 +1849,28 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 			ts->Debug = FALSE;
 	}
 
+	// Xmodem Timeout
+	GetPrivateProfileString(Section, "XmodemTimeouts", "10,3,10,20,60", Temp, sizeof(Temp), FName);
+	ts->XmodemTimeOutInit    = GetNthNum2(Temp, 1, 10);
+	if (ts->XmodemTimeOutInit < 1)
+		ts->XmodemTimeOutInit = 1;
+	ts->XmodemTimeOutInitCRC = GetNthNum2(Temp, 2, 3);
+	if (ts->XmodemTimeOutInitCRC < 1)
+		ts->XmodemTimeOutInitCRC = 1;
+	ts->XmodemTimeOutShort   = GetNthNum2(Temp, 3, 10);
+	if (ts->XmodemTimeOutShort < 1)
+		ts->XmodemTimeOutShort = 1;
+	ts->XmodemTimeOutLong    = GetNthNum2(Temp, 4, 20);
+	if (ts->XmodemTimeOutLong < 1)
+		ts->XmodemTimeOutLong = 1;
+	ts->XmodemTimeOutVLong   = GetNthNum2(Temp, 5, 60);
+	if (ts->XmodemTimeOutVLong < 1)
+		ts->XmodemTimeOutVLong = 1;
+
+	GetPrivateProfileString(Section, "VTPos", "-2147483648,-2147483648", Temp, sizeof(Temp), FName);	/* default: random position */
+	GetNthNum(Temp, 1, (int far *) (&ts->VTPos.x));
+	GetNthNum(Temp, 2, (int far *) (&ts->VTPos.y));
+
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
 }
@@ -3067,6 +3089,16 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		}
 	}
 	WritePrivateProfileString(Section, "DebugModes", Temp, FName);
+
+	// Xmodem Timeout
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d,%d,%d,%d",
+		ts->XmodemTimeOutInit,
+		ts->XmodemTimeOutInitCRC,
+		ts->XmodemTimeOutShort,
+		ts->XmodemTimeOutLong,
+		ts->XmodemTimeOutVLong
+	);
+	WritePrivateProfileString(Section, "XmodemTimeouts", Temp, FName);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);

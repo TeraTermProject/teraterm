@@ -804,6 +804,19 @@ void GetNthNum(PCHAR Source, int Nth, int far *Num)
 	}
 }
 
+int GetNthNum2(PCHAR Source, int Nth, int defval)
+{
+	char T[15];
+	int v;
+
+	GetNthString(Source, Nth, sizeof(T), T);
+	if (sscanf(T, "%d", &v) != 1) {
+		v = defval;
+	}
+	
+	return v;
+}
+
 void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen)
 {
 	// My Documents Ç… file Ç™Ç†ÇÈèÍçáÅA
