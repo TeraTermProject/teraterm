@@ -35,11 +35,6 @@
 #include "ttcommon.h"
 #include "ttlib.h"
 
-//#define NormalTimeOut 10
-//#define TCPIPTimeOut 0
-//#define IniTimeOut 10
-//#define FinTimeOut 3
-
 #define ZPAD   '*'
 #define ZDLE   0x18
 #define ZDLEE  0x58
