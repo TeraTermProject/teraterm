@@ -21,12 +21,6 @@ All rights reserved. */
 
 #include "ymodem.h"
 
-#define TimeOutInit  10
-#define TimeOutC     3
-#define TimeOutShort 10
-#define TimeOutLong  20
-#define TimeOutVeryLong 60
-
 // データ転送サイズ。YMODEMでは 128 or 1024 byte をサポートする。
 #define SOH_DATALEN	128
 #define STX_DATALEN	1024
@@ -137,13 +131,13 @@ void YSendNAK(PFileVar fv, PYVar yv, PComVar cv)
 	{
 		b = NAK;
 		if ((yv->PktNum==0) && (yv->PktNumOffset==0))
-			t = TimeOutInit;
+			t = yv->TOutInit;
 		else
 			t = yv->TOutLong;
 	}
 	else {
 		b = 'C';
-		t = TimeOutC;
+		t = yv->TOutInitCRC;
 	}
 	YWrite(fv,yv,cv,&b,1);
 	yv->PktReadMode = XpktSOH;
@@ -179,13 +173,13 @@ void YSendNAKTimeout(PFileVar fv, PYVar yv, PComVar cv)
 	{
 		b = NAK;
 		if ((yv->PktNum==0) && (yv->PktNumOffset==0))
-			t = TimeOutInit;
+			t = yv->TOutInit;
 		else
 			t = yv->TOutLong;
 	}
 	else {
 		b = 'C';
-		t = TimeOutC;
+		t = yv->TOutInitCRC;
 	}
 	YWrite(fv,yv,cv,&b,1);
 	yv->PktReadMode = XpktSOH;
@@ -290,14 +284,18 @@ void YInit
 
 	initialize_file_info(fv, yv);
 
+	yv->TOutInit = ts->YmodemTimeOutInit;
+	yv->TOutInitCRC = ts->YmodemTimeOutInitCRC;
+	yv->TOutVLong = ts->YmodemTimeOutVLong;
+
 	if (cv->PortType==IdTCPIP)
 	{
-		yv->TOutShort = TimeOutVeryLong;
-		yv->TOutLong  = TimeOutVeryLong;
+		yv->TOutShort = ts->YmodemTimeOutVLong;
+		yv->TOutLong = ts->YmodemTimeOutVLong;
 	}
 	else {
-		yv->TOutShort = TimeOutShort;
-		yv->TOutLong  = TimeOutLong;
+		yv->TOutShort = ts->YmodemTimeOutShort;
+		yv->TOutLong = ts->YmodemTimeOutLong;
 	}  
 
 	YSetOpt(fv,yv,yv->YOpt);
@@ -334,7 +332,7 @@ void YInit
 			YWrite(fv,yv,cv, inistr , strlen(inistr));
 		}
 
-		FTSetTimeOut(fv,TimeOutVeryLong);
+		FTSetTimeOut(fv, yv->TOutVLong);
 		break;
 
 	case IdYReceive:
@@ -740,7 +738,7 @@ BOOL YSendPacket(PFileVar fv, PYVar yv, PComVar cv)
 		}
 
 		// reset timeout timer
-		FTSetTimeOut(fv, TimeOutVeryLong);
+		FTSetTimeOut(fv, yv->TOutVLong);
 #if 0
 		// 後続のサーバからのデータを読み捨てる。
 		do

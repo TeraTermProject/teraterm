@@ -1867,6 +1867,39 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (ts->XmodemTimeOutVLong < 1)
 		ts->XmodemTimeOutVLong = 1;
 
+	// Ymodem Timeout
+	GetPrivateProfileString(Section, "YmodemTimeouts", "10,3,10,20,60", Temp, sizeof(Temp), FName);
+	ts->YmodemTimeOutInit = GetNthNum2(Temp, 1, 10);
+	if (ts->YmodemTimeOutInit < 1)
+		ts->YmodemTimeOutInit = 1;
+	ts->YmodemTimeOutInitCRC = GetNthNum2(Temp, 2, 3);
+	if (ts->YmodemTimeOutInitCRC < 1)
+		ts->YmodemTimeOutInitCRC = 1;
+	ts->YmodemTimeOutShort = GetNthNum2(Temp, 3, 10);
+	if (ts->YmodemTimeOutShort < 1)
+		ts->YmodemTimeOutShort = 1;
+	ts->YmodemTimeOutLong = GetNthNum2(Temp, 4, 20);
+	if (ts->YmodemTimeOutLong < 1)
+		ts->YmodemTimeOutLong = 1;
+	ts->YmodemTimeOutVLong = GetNthNum2(Temp, 5, 60);
+	if (ts->YmodemTimeOutVLong < 1)
+		ts->YmodemTimeOutVLong = 1;
+
+	// Zmodem Timeout
+	GetPrivateProfileString(Section, "ZmodemTimeouts", "10,0,10,3", Temp, sizeof(Temp), FName);
+	ts->ZmodemTimeOutNormal = GetNthNum2(Temp, 1, 10);
+	if (ts->ZmodemTimeOutNormal < 1)
+		ts->ZmodemTimeOutNormal = 1;
+	ts->ZmodemTimeOutTCPIP = GetNthNum2(Temp, 2, 0);
+	if (ts->ZmodemTimeOutTCPIP < 0)
+		ts->ZmodemTimeOutTCPIP = 0;
+	ts->ZmodemTimeOutInit = GetNthNum2(Temp, 3, 10);
+	if (ts->ZmodemTimeOutInit < 1)
+		ts->ZmodemTimeOutInit = 1;
+	ts->ZmodemTimeOutFin = GetNthNum2(Temp, 4, 3);
+	if (ts->ZmodemTimeOutFin < 1)
+		ts->ZmodemTimeOutFin = 1;
+
 	GetPrivateProfileString(Section, "VTPos", "-2147483648,-2147483648", Temp, sizeof(Temp), FName);	/* default: random position */
 	GetNthNum(Temp, 1, (int far *) (&ts->VTPos.x));
 	GetNthNum(Temp, 2, (int far *) (&ts->VTPos.y));
@@ -3099,6 +3132,25 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		ts->XmodemTimeOutVLong
 	);
 	WritePrivateProfileString(Section, "XmodemTimeouts", Temp, FName);
+
+	// Ymodem Timeout
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d,%d,%d,%d",
+		ts->YmodemTimeOutInit,
+		ts->YmodemTimeOutInitCRC,
+		ts->YmodemTimeOutShort,
+		ts->YmodemTimeOutLong,
+		ts->YmodemTimeOutVLong
+		);
+	WritePrivateProfileString(Section, "YmodemTimeouts", Temp, FName);
+
+	// Zmodem Timeout
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d,%d,%d",
+		ts->ZmodemTimeOutNormal,
+		ts->ZmodemTimeOutTCPIP,
+		ts->ZmodemTimeOutInit,
+		ts->ZmodemTimeOutFin
+		);
+	WritePrivateProfileString(Section, "ZmodemTimeouts", Temp, FName);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);

@@ -596,6 +596,15 @@ struct tttset {
 	int XmodemTimeOutShort;
 	int XmodemTimeOutLong;
 	int XmodemTimeOutVLong;
+	int YmodemTimeOutInit;
+	int YmodemTimeOutInitCRC;
+	int YmodemTimeOutShort;
+	int YmodemTimeOutLong;
+	int YmodemTimeOutVLong;
+	int ZmodemTimeOutNormal;
+	int ZmodemTimeOutTCPIP;
+	int ZmodemTimeOutInit;
+	int ZmodemTimeOutFin;
 };
 
 typedef struct tttset TTTSet, *PTTSet;

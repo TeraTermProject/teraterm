@@ -35,10 +35,10 @@
 #include "ttcommon.h"
 #include "ttlib.h"
 
-#define NormalTimeOut 10
-#define TCPIPTimeOut 0
-#define IniTimeOut 10
-#define FinTimeOut 3
+//#define NormalTimeOut 10
+//#define TCPIPTimeOut 0
+//#define IniTimeOut 10
+//#define FinTimeOut 3
 
 #define ZPAD   '*'
 #define ZDLE   0x18
@@ -376,7 +376,7 @@ void ZSendRInit(PFileVar fv, PZVar zv)
 	if (zv->CtlEsc)
 		zv->TxHdr[ZF0] = zv->TxHdr[ZF0] | ESCCTL;
 	ZShHdr(zv, ZRINIT);
-	FTSetTimeOut(fv, IniTimeOut);
+	FTSetTimeOut(fv, zv->TOutInit);
 }
 
 void ZSendRQInit(PFileVar fv, PZVar zv, PComVar cv)
@@ -663,12 +663,15 @@ void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 	if (zv->MaxDataLen < 64)
 		zv->MaxDataLen = 64;
 
+	zv->TOutInit = ts->ZmodemTimeOutInit;
+	zv->TOutFin = ts->ZmodemTimeOutFin;
+
 	/* Time out & Max block size */
 	if (cv->PortType == IdTCPIP) {
-		zv->TimeOut = TCPIPTimeOut;
+		zv->TimeOut = ts->ZmodemTimeOutTCPIP;
 		Max = 1024;
 	} else {
-		zv->TimeOut = NormalTimeOut;
+		zv->TimeOut = ts->ZmodemTimeOutNormal;
 		if (ts->Baud <= 110) {
 			Max = 64;
 		}
@@ -835,7 +838,7 @@ void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 	case ZSINIT:
 		zv->ZPktState = Z_PktGetData;
 		if (zv->ZState == Z_RecvInit)
-			FTSetTimeOut(fv, IniTimeOut);
+			FTSetTimeOut(fv, zv->TOutInit);
 		break;
 	case ZACK:
 		switch (zv->ZState) {
@@ -857,7 +860,7 @@ void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 		zv->ZPktState = Z_PktGetData;
 		if ((zv->ZState == Z_RecvInit) || (zv->ZState == Z_RecvInit2)) {
 			zv->BinFlag = zv->RxHdr[ZF0] != ZCNL;
-			FTSetTimeOut(fv, IniTimeOut);
+			FTSetTimeOut(fv, zv->TOutInit);
 		}
 		break;
 	case ZSKIP:
@@ -898,7 +901,7 @@ void ZParseHdr(PFileVar fv, PZVar zv, PComVar cv)
 			zv->ZState = Z_RecvFIN;
 			ZSendFIN(zv);
 			zv->CanCount = 2;
-			FTSetTimeOut(fv, FinTimeOut);
+			FTSetTimeOut(fv, zv->TOutFin);
 		} else {
 			zv->ZState = Z_End;
 			ZWrite(fv, zv, cv, "OO", 2);

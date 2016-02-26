@@ -216,6 +216,9 @@ typedef struct {
   BOOL CRRecv;
   int TOutShort;
   int TOutLong;
+  int TOutInit;
+  int TOutInitCRC;
+  int TOutVLong;
   int SendFileInfo;
   int SendEot;
   int LastSendEot;
@@ -253,6 +256,8 @@ typedef struct {
   WORD CRC;
   LONG CRC3, Pos, LastPos, WinSize;
   BYTE LastSent;
+  int TOutInit;
+  int TOutFin;
 } TZVar;
 typedef TZVar far *PZVar;
 
