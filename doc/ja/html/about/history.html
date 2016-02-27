@@ -45,7 +45,12 @@
       <li>XMODEM 送受信時のリモートからのキャンセルを、転送失敗として扱うようにした。</li>
       <li>XMODEM 受信時に、Checksum なのに相手が 1K のパケットを送信しきてた場合に Checksum/1K として受信するようにした。</li>
       <li>XMODEM で CRC 送信時に相手が NAK を送信してきた場合は Checksum として送信するようにした。</li>
-      <li>XMODEM, YMODEM, ZMODEM のタイムアウト値を設定できるようにした。</li>
+      <li>XMODEM, YMODEM, ZMODEM のタイムアウト値を設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-trans.html#XmodemTimeouts">XmodemTimeouts</a> エントリを追加した。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-trans.html#YmodemTimeouts">YmodemTimeouts</a> エントリを追加した。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-trans.html#ZmodemTimeouts">ZmodemTimeouts</a> エントリを追加した。</li>
+        </ul></li>
       <li>マクロコマンドの 1 行形式の if 文で、実行コマンドが無い時は条件が偽でもエラーとなるようにした。</li>
     </ul>
   </li>

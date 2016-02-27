@@ -45,14 +45,19 @@
       <li>Cancel from remote host at XMODEM transmitter becomes as trasnfer failure.</li>
       <li>When remote host sends 1K packet against Checksum at XMODEM receiving, Tera Term receives data as Checksum/1K.</li>
       <li>When remote host sends NAK at XMODEM CRC sending, Tera Term sends data as Checksum.</li>
-      <!--li>XMODEM, YMODEM, ZMODEM のタイムアウト値を設定できるようにした。</li-->
-      <!--li>マクロコマンドの 1 行形式の if 文で、実行コマンドが無い時は条件が偽でもエラーとなるようにした。</li-->
+      <li>added configuration for XMODEM, YMODEM and ZMODEM timeout value.
+        <ul>
+          <li>added the <a href="../setup/teraterm-trans.html#XmodemTimeouts">XmodemTimeouts</a> entry in the teraterm.ini file. </li>
+          <li>added the <a href="../setup/teraterm-trans.html#YmodemTimeouts">YmodemTimeouts</a> entry in the teraterm.ini file. </li>
+          <li>added the <a href="../setup/teraterm-trans.html#ZmodemTimeouts">ZmodemTimeouts</a> entry in the teraterm.ini file. </li>
+        </ul></li>
+      <li>MACRO: When if does not have statement, macro error always occurs.</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <!--li>OSC 4/11/104/ 111 制御シーケンスで BCE 用の情報の更新が反映されない問題を修正した。</li-->
+      <li>BCE information does not be updated at OSC 4/11/104/ 111 control sequence.</li>
       <li>Eterm look-feel: When invalid image file is specified as background, an application fault occurs.</li>
       <li>XMODEM: When CRC sends, Checksum may send half way incorrectly.</li>
       <li>The return value of <a href="../macro/command/random.html">random</a> macro command is the deviation of the pseudo random number.
