@@ -1900,10 +1900,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (ts->ZmodemTimeOutFin < 1)
 		ts->ZmodemTimeOutFin = 1;
 
-	GetPrivateProfileString(Section, "VTPos", "-2147483648,-2147483648", Temp, sizeof(Temp), FName);	/* default: random position */
-	GetNthNum(Temp, 1, (int far *) (&ts->VTPos.x));
-	GetNthNum(Temp, 2, (int far *) (&ts->VTPos.y));
-
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
 }
