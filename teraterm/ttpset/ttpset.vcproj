@@ -219,7 +219,7 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
-				RelativePath="..\common\Teraterm.h"
+				RelativePath="..\common\teraterm.h"
 				>
 			</File>
 			<File
@@ -227,7 +227,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\Tttypes.h"
+				RelativePath="..\common\tttypes.h"
 				>
 			</File>
 		</Filter>

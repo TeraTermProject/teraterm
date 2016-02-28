@@ -98,7 +98,7 @@ SOURCE=..\..\source\ttset\ttset.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=..\..\Source\Common\Teraterm.h
+SOURCE=..\..\Source\Common\teraterm.h
 # End Source File
 # Begin Source File
 
@@ -106,7 +106,7 @@ SOURCE=..\..\source\common\ttlib.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\Source\Common\Tttypes.h
+SOURCE=..\..\Source\Common\tttypes.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

@@ -27,13 +27,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\Teraterm.h">
+    <ClInclude Include="..\common\teraterm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\ttlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\Tttypes.h">
+    <ClInclude Include="..\common\tttypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

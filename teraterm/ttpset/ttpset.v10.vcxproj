@@ -126,9 +126,9 @@
     <ClCompile Include="ttset.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\Teraterm.h" />
+    <ClInclude Include="..\common\teraterm.h" />
     <ClInclude Include="..\common\ttlib.h" />
-    <ClInclude Include="..\common\Tttypes.h" />
+    <ClInclude Include="..\common\tttypes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpset.def" />
