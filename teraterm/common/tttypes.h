@@ -1069,6 +1069,22 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.90, ttset_memfilemap was replaced with ttset_memfilemap_27.
+ *   added tttset.XmodemTimeOutInit
+ *   added tttset.XmodemTimeOutInitCRC
+ *   added tttset.XmodemTimeOutShort
+ *   added tttset.XmodemTimeOutLong
+ *   added tttset.XmodemTimeOutVLong
+ *   added tttset.YmodemTimeOutInit
+ *   added tttset.YmodemTimeOutInitCRC
+ *   added tttset.YmodemTimeOutShort
+ *   added tttset.YmodemTimeOutLong
+ *   added tttset.YmodemTimeOutVLong
+ *   added tttset.ZmodemTimeOutNormal
+ *   added tttset.ZmodemTimeOutTCPIP
+ *   added tttset.ZmodemTimeOutInit
+ *   added tttset.ZmodemTimeOutFin
+ *
  * - At version 4.89, ttset_memfilemap was replaced with ttset_memfilemap_26.
  *   added tttset.FileSendHighSpeedMode
  *   added tttset.AutoComPortReconnect
@@ -1222,4 +1238,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_26"
+#define TT_FILEMAPNAME "ttset_memfilemap_27"
