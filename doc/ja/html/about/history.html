@@ -51,13 +51,14 @@
           <li>teraterm.ini に <a href="../setup/teraterm-trans.html#YmodemTimeouts">YmodemTimeouts</a> エントリを追加した。</li>
           <li>teraterm.ini に <a href="../setup/teraterm-trans.html#ZmodemTimeouts">ZmodemTimeouts</a> エントリを追加した。</li>
         </ul></li>
+      <li>XMODEM 送信/受信ダイアログでのオプション選択が、他方のオプション状態に影響しないようにした。</li>
       <li>マクロコマンドの 1 行形式の if 文で、実行コマンドが無い時は条件が偽でもエラーとなるようにした。</li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>OSC 4/11/104/ 111 制御シーケンスで BCE 用の情報の更新が反映されない問題を修正した。</li>
+      <li>OSC 4/11/104/111 制御文字列で BCE 用の情報の更新が反映されない問題を修正した。</li>
       <li>Eterm look-feel: 不適切な画像ファイルを背景に指定すると、プログラムが落ちる問題を修正した。</li>
       <li>XMODEM で CRC 送信時に途中から Checksum 送信になってしまうことがある問題を修正した。</li>
       <li><a href="../macro/command/random.html">random</a> マクロコマンドが返す値が偏る問題を修正した。
