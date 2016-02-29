@@ -1663,9 +1663,6 @@ void KermitStart(int mode)
 }
 }
 
-#define IsXoptCRC(x)	((x) & 2)
-#define IsXopt1k(x)	(((x)-1) & 2)
-
 extern "C" {
 void XMODEMStart(int mode)
 {
