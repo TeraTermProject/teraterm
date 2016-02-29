@@ -1663,10 +1663,14 @@ void KermitStart(int mode)
 }
 }
 
+#define IsXoptCRC(x)	((x) & 2)
+#define IsXopt1k(x)	(((x)-1) & 2)
+
 extern "C" {
 void XMODEMStart(int mode)
 {
 	LONG Option;
+	int tmp;
 
 	if (! ProtoStart())
 		return;
@@ -1685,8 +1689,44 @@ void XMODEMStart(int mode)
 			ProtoEnd();
 			return;
 		}
-		ts.XmodemOpt = HIWORD(Option);
-		ts.XmodemBin = LOWORD(Option);
+		tmp = HIWORD(Option);
+		if (mode == IdXReceive) {
+			if (IsXoptCRC(tmp)) {
+				if (IsXopt1k(ts.XmodemOpt)) {
+					ts.XmodemOpt = Xopt1kCRC;
+				}
+				else {
+					ts.XmodemOpt = XoptCRC;
+				}
+			}
+			else {
+				if (IsXopt1k(ts.XmodemOpt)) {
+					ts.XmodemOpt = Xopt1kCksum;
+				}
+				else {
+					ts.XmodemOpt = XoptCheck;
+				}
+			}
+			ts.XmodemBin = LOWORD(Option);
+		}
+		else {
+			if (IsXopt1k(tmp)) {
+				if (IsXoptCRC(ts.XmodemOpt)) {
+					ts.XmodemOpt = Xopt1kCRC;
+				}
+				else {
+					ts.XmodemOpt = Xopt1kCksum;
+				}
+			}
+			else {
+				if (IsXoptCRC(ts.XmodemOpt)) {
+					ts.XmodemOpt = XoptCRC;
+				}
+				else {
+					ts.XmodemOpt = XoptCheck;
+				}
+			}
+		}
 	}
 	else
 		(*SetFileVar)(FileVar);

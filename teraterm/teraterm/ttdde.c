@@ -718,7 +718,23 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 			FileVar->DirLen = 0;
 			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			ts.XmodemOpt = ParamXmodemOpt;
+			if (IsXopt1k(ts.XmodemOpt)) {
+				if (IsXoptCRC(ParamXmodemOpt)) {
+					// CRC
+					ts.XmodemOpt = Xopt1kCRC;
+				}
+				else {	// Checksum
+					ts.XmodemOpt = Xopt1kCksum;
+				}
+			}
+			else {
+				if (IsXoptCRC(ParamXmodemOpt)) {
+					ts.XmodemOpt = XoptCRC;
+				}
+				else {
+					ts.XmodemOpt = XoptCheck;
+				}
+			}
 			ts.XmodemBin = ParamBinaryFlag;
 			FileVar->NoMsg = TRUE;
 			DdeCmnd = TRUE;
@@ -732,7 +748,22 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		{
 			FileVar->DirLen = 0;
 			strncpy_s(FileVar->FullName, sizeof(FileVar->FullName),ParamFileName, _TRUNCATE);
-			ts.XmodemOpt = ParamXmodemOpt;
+			if (IsXoptCRC(ts.XmodemOpt)) {
+				if (IsXopt1k(ParamXmodemOpt)) {
+					ts.XmodemOpt = Xopt1kCRC;
+				}
+				else {
+					ts.XmodemOpt = XoptCRC;
+				}
+			}
+			else {
+				if (IsXopt1k(ParamXmodemOpt)) {
+					ts.XmodemOpt = Xopt1kCksum;
+				}
+				else {
+					ts.XmodemOpt = XoptCheck;
+				}
+			}
 			FileVar->NoMsg = TRUE;
 			DdeCmnd = TRUE;
 			XMODEMStart(IdXSend);

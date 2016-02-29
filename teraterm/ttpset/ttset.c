@@ -1073,6 +1073,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->XmodemOpt = XoptCRC;
 	else if (_stricmp(Temp, "1k") == 0)
 		ts->XmodemOpt = Xopt1kCRC;
+	else if (_stricmp(Temp, "1ksum") == 0)
+		ts->XmodemOpt = Xopt1kCksum;
 	else
 		ts->XmodemOpt = XoptCheck;
 
@@ -2523,8 +2525,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		strncpy_s(Temp, sizeof(Temp), "crc", _TRUNCATE);
 		break;
 	case Xopt1kCRC:
-	case Xopt1kCksum: /* Checksum/1k ÇÕê≥ãKÇÃï®Ç≈ÇÕÇ»Ç¢à◊ÅAê›íËï€ë∂éûÇÕ CRC/1k Ç∆Ç∑ÇÈ */
 		strncpy_s(Temp, sizeof(Temp), "1k", _TRUNCATE);
+		break;
+	case Xopt1kCksum:
+		strncpy_s(Temp, sizeof(Temp), "1ksum", _TRUNCATE);
 		break;
 	default:
 		strncpy_s(Temp, sizeof(Temp), "checksum", _TRUNCATE);

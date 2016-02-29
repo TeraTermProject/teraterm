@@ -202,7 +202,7 @@ void XInit(PFileVar fv, PXVar xv, PComVar cv, PTTSet ts) {
 
 	XSetOpt(fv, xv, xv->XOpt);
 
-	if (xv->XOpt == XoptCheck) {
+	if (xv->XOpt == XoptCheck || xv->XOpt == Xopt1kCksum) {
 		xv->NAKMode = XnakNAK;
 		xv->NAKCount = 10;
 	} else {
@@ -445,8 +445,12 @@ BOOL XSendPacket(PFileVar fv, PXVar xv, PComVar cv)
 				break;
 			case 0x43:
 				if ((xv->PktNum == 0) && (xv->PktNumOffset == 0) && (xv->PktNumSent == 0)) {
-					 if ((xv->XOpt == XoptCheck))
+					if ((xv->XOpt == XoptCheck)) {
 						XSetOpt(fv, xv, XoptCRC);
+					}
+					else if ((xv->XOpt == Xopt1kCksum)) {
+						XSetOpt(fv, xv, Xopt1kCRC);
+					}
 					SendFlag = TRUE;
 				}
 				break;

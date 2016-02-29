@@ -172,6 +172,9 @@ typedef TCharAttr *PCharAttr;
 #define Xopt1kCRC   3
 #define Xopt1kCksum 4
 
+#define IsXoptCRC(x)	((x) & 2)
+#define IsXopt1k(x)	(((x)-1) & 2)
+
   /* YMODEM option */
 #define Yopt1K 1
 #define YoptG   2
