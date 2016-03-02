@@ -38,7 +38,7 @@
 
 ¡ ƒ‰ƒCƒuƒ‰ƒŠ
 - Oniguruma 5.9.6 (https://github.com/kkos/oniguruma)
-- OpenSSL 1.0.2f (http://www.openssl.org/)
+- OpenSSL 1.0.2g (http://www.openssl.org/)
 - zlib 1.2.8 (http://www.zlib.net/)
 - PuTTY 0.66 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
