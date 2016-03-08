@@ -2937,11 +2937,11 @@ WORD TTLIf()
 			ElseFlag = 1; // Skip until 'Else' or 'EndIf'
 	}
 	else { // single line If command
+		LinePtr = Tmp;
 		if (!CheckParameterGiven())
 			return ErrSyntax;
 		if (Val==0)
 			return 0;
-		LinePtr = Tmp;
 		return ExecCmnd();
 	}
 	return Err;
