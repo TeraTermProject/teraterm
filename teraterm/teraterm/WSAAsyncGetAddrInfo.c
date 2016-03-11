@@ -33,7 +33,7 @@ HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 	ga->wMsg = wMsg;
 	ga->hostname = _strdup(hostname); // ポインタだけ渡すと、スレッド先で不定となる。(2012.11.7 yutaka)
 	ga->portname = _strdup(portname);
-	ga->hints = hints;
+	ga->hints = *hints; // ポインタだけ渡すと、スレッド先で不定となる。(2016.3.11 yutaka)
 	ga->res = res;
 
 	ga->lpHandle = (HANDLE FAR *)malloc(sizeof(HANDLE));
@@ -76,7 +76,7 @@ static unsigned __stdcall getaddrinfo_thread(void FAR * p)
 	wMsg = ga->wMsg;
 	hostname = ga->hostname;
 	portname = ga->portname;
-	hints = ga->hints;
+	hints = &ga->hints;
 	res = ga->res;
 
 	/* call getaddrinfo */
