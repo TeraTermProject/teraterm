@@ -96,6 +96,26 @@ else
 endif
 </pre>
 
+
+<h3>*) NOTICE</h3>
+
+<em>(version 4.90 or later)</em><br>
+By using Format 2(if - endif), the synax error occurs when then is not described.
+
+<pre class="macro-example">
+code = 100
+if code != 100
+	messagebox 'The code value is not 100.' 'error'
+	goto error
+else
+	messagebox 'The code value is 100.' 'OK'
+endif
+
+:error
+end
+</pre>
+
+
 <h2>Reference</h2>
 
 <a href="../syntax/expressions.html">Expressions and operators</a><br>

@@ -97,6 +97,26 @@ endif
 </pre>
 
 
+
+<h3>*) 注意事項</h3>
+
+<em>(バージョン 4.90 以降)</em><br>
+書式2(if - endif)において、thenの記述なしは文法エラーとなる。
+
+<pre class="macro-example">
+code = 100
+if code != 100
+	messagebox 'The code value is not 100.' 'error'
+	goto error
+else
+	messagebox 'The code value is 100.' 'OK'
+endif
+
+:error
+end
+</pre>
+
+
 <h2>参照</h2>
 
 <a href="../syntax/expressions.html">式と演算子</a><br>
