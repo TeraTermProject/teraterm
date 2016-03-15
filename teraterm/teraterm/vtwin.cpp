@@ -351,6 +351,11 @@ void UnRegDeviceNotify(HWND hWnd)
 	pUnregisterDeviceNotification(hDevNotify);
 }
 
+void SetAutoConnectPort(int port)
+{
+	AutoDisconnectedPort = port;
+}
+
 //
 // 例外ハンドラのフック（スタックトレースのダンプ）
 //
@@ -3110,25 +3115,29 @@ void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
-	PDEV_BROADCAST_PORT pDevPort;
+	PDEV_BROADCAST_HDR pDevHdr;
 #ifdef DEBUG
 	char port_name[8]; /* COMxxxx + NULL */
 #endif
 
-	pDevPort = (PDEV_BROADCAST_PORT)dwData;
+	pDevHdr = (PDEV_BROADCAST_HDR)dwData;
 
 	switch (nEventType) {
 	case DBT_DEVICEARRIVAL:
 #ifdef DEBUG
-		OutputDebugPrintf("DBT_DEVICEARRIVAL devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevPort->dbcp_devicetype, ts.PortType, AutoDisconnectedPort);
+		OutputDebugPrintf("DBT_DEVICEARRIVAL devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevHdr->dbch_devicetype, ts.PortType, AutoDisconnectedPort);
 #endif
-		if (pDevPort->dbcp_devicetype == DBT_DEVTYP_PORT &&
+		if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT || pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
 		    ts.PortType == IdSerial &&
 		    ts.AutoComPortReconnect &&
 		    AutoDisconnectedPort == ts.ComPort) {
 #ifdef DEBUG
-			strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
-			OutputDebugPrintf("%s\n", port_name);
+			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+				PDEV_BROADCAST_PORT pDevPort;
+				pDevPort = (PDEV_BROADCAST_PORT)pDevHdr;
+				strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
+				OutputDebugPrintf("%s\n", port_name);
+			}
 #endif
 			if (!cv.Open) {
 				/* Tera Term 未接続 */
@@ -3144,15 +3153,19 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		break;
 	case DBT_DEVICEREMOVECOMPLETE:
 #ifdef DEBUG
-		OutputDebugPrintf("DBT_DEVICEREMOVECOMPLETE devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevPort->dbcp_devicetype, ts.PortType, AutoDisconnectedPort);
+		OutputDebugPrintf("DBT_DEVICEREMOVECOMPLETE devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevHdr->dbch_devicetype, ts.PortType, AutoDisconnectedPort);
 #endif
-		if (pDevPort->dbcp_devicetype == DBT_DEVTYP_PORT &&
+		if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT || pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
 		    ts.PortType == IdSerial &&
 		    ts.AutoComPortReconnect &&
 		    AutoDisconnectedPort == -1) {
 #ifdef DEBUG
-			strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
-			OutputDebugPrintf("%s\n", port_name);
+			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
+				PDEV_BROADCAST_PORT pDevPort;
+				pDevPort = (PDEV_BROADCAST_PORT)pDevHdr;
+				strncpy_s(port_name, sizeof(port_name), pDevPort->dbcp_name, _TRUNCATE);
+				OutputDebugPrintf("%s\n", port_name);
+			}
 #endif
 			if (cv.Open) {
 				/* Tera Term 接続中 */
@@ -3712,6 +3725,12 @@ LONG CVTWindow::OnCommStart(UINT wParam, LONG lParam)
 	else {
 		Connecting = TRUE;
 		ChangeTitle();
+		if (ts.AutoComPortReconnect && ts.PortType == IdSerial) {
+			if (CheckComPort(ts.ComPort) == 0) {
+				SetAutoConnectPort(ts.ComPort);
+				return 0;
+			}
+		}
 		CommOpen(HVTWin,&ts,&cv);
 	}
 	return 0;
