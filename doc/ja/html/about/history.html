@@ -34,17 +34,12 @@
 
 <h3><a name="teraterm_4.91">2016.xx.xx (Ver 4.91)</a></h3>
 <ul class="history">
-  <!-- li>変更
-    <ul>
-      <li></li>
-    </ul>
-  </li -->
   <li>変更
     <ul>
-      <li>/C=でシリアルポートを指定して起動する場合にポートがなければポートの接続を待つようにした。
+      <li>/C=でシリアルポートを指定した場合、ポートが存在しなれば、ポートの接続を待つようにした。
         <ul>
-          <li><a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=onの時に有効</li>
-          <li>接続を待つ場合、接続エラーメッセージは表示されません。</li>
+          <li><a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=onの時に有効となる</li>
+          <li>接続を待つ場合、接続エラーメッセージは表示されない。</li>
         </ul>
       </li>
     </ul>
@@ -53,7 +48,7 @@
   <li>バグ修正
     <ul>
       <li>マクロコマンドの 1 行形式の <a href="../macro/command/ifthenelseif.html">if</a> 文で、パラメータの無いマクロコマンドがエラーとなる問題を修正した。</li>
-      <li>一部の機器でUSBシリアルポートの接続・切断が検出できない不具合を修正した。</li>
+      <li><a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=onの場合において、一部の機器でUSBシリアルポートの接続・切断が検出できない問題を修正した。</li>
     </ul>
   </li>
 
