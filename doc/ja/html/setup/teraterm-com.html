@@ -300,5 +300,31 @@ AutoComPortReconnect=on
 </pre>
 
 
+
+<h1><a name="WaitCom">シリアルポートの接続を待つ</a></h1>
+
+<p>
+接続しようとしたシリアルポートが未接続の場合、接続されるまで待ちます。
+</p>
+
+<p>
+この機能は Windows XP 以降で有効です。 <br>
+AutoComPortReconnect=on である必要があります。
+</p>
+
+<p>
+この機能を使用しないようにするためには、設定ファイルの [Tera Term] セクションの WaitCom 行を下記のように変更してください。
+</p>
+
+<pre>
+WaitCom=off
+</pre>
+
+<pre>
+省略時:
+WaitCom=off
+</pre>
+
+
 </BODY>
 </HTML>
