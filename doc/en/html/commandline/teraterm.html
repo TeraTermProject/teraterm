@@ -21,7 +21,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
          [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/T=&lt;telnet flag&gt;]
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
-         [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
+         [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"] [/WAITCOM]
          [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
          [/NAMEDPIPE]
          [/AUTOWINCLOSE=&lt;flag&gt;]
@@ -170,6 +170,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="w">/W=&lt;window title&gt;</dt>
   <dd>Window title</dd>
+
+  <dt id="waitcom">/WAITCOM</dt>
+  <dd>When serial port is specified with with /C= option and the port does not exist, Tera Term will wait for port connection.</dd>
 
   <dt id="x">/X=&lt;window position (x)&gt;</dt>
   <dd>Windows position (horizontal)</dd>

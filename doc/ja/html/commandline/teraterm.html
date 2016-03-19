@@ -25,7 +25,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
          [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/T=&lt;telnet flag&gt;]
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
-         [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"]
+         [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"] [/WAITCOM]
          [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
          [/NAMEDPIPE]
          [/AUTOWINCLOSE=&lt;flag&gt;]
@@ -175,6 +175,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="w">/W=&lt;window title&gt;</dt>
   <dd>ウィンドウのタイトル</dd>
+
+  <dt id="waitcom">/WAITCOM</dt>
+  <dd>起動時に/Cで指定されたシリアルポートが存在しない場合、シリアルポートの接続を待ちます。</dd>
 
   <dt id="x">/X=&lt;window position (x)&gt;</dt>
   <dd>ウィンドウの位置(水平)</dd>

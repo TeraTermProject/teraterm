@@ -608,6 +608,7 @@ struct tttset {
 	int ZmodemTimeOutTCPIP;
 	int ZmodemTimeOutInit;
 	int ZmodemTimeOutFin;
+	WORD WaitCom;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1072,6 +1073,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.91, ttset_memfilemap was replaced with ttset_memfilemap_28.
+ *   added tttset.ComConnRetry
+ *
  * - At version 4.90, ttset_memfilemap was replaced with ttset_memfilemap_27.
  *   added tttset.XmodemTimeOutInit
  *   added tttset.XmodemTimeOutInitCRC
@@ -1241,4 +1245,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_27"
+#define TT_FILEMAPNAME "ttset_memfilemap_28"

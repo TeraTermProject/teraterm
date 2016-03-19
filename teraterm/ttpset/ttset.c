@@ -1173,6 +1173,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->ClearComBuffOnOpen =
 		GetOnOff(Section, "ClearComBuffOnOpen", FName, TRUE);
 
+	/* When serial port is specified with with /C= option and the port does not exist, Tera Term will wait for port connection.  */
+	ts->WaitCom = GetOnOff(Section, "WaitCom", FName, FALSE);
+
 	/* Confirm disconnection -- special option */
 	if (GetOnOff(Section, "ConfirmDisconnect", FName, TRUE))
 		ts->PortFlag |= PF_CONFIRMDISCONN;
@@ -2605,6 +2608,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Clear serial port buffer when port opening -- special option */
 	WriteOnOff(Section, "ClearComBuffOnOpen", FName, ts->ClearComBuffOnOpen);
 
+	/* When serial port is specified with with /C= option and the port does not exist, Tera Term will wait for port connection.  */
+	WriteOnOff(Section, "WaitCom", FName, ts->WaitCom);
+
 	/* Confirm disconnection -- special option */
 	WriteOnOff(Section, "ConfirmDisconnect", FName,
 	           (WORD) (ts->PortFlag & PF_CONFIRMDISCONN));
@@ -3746,6 +3752,9 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ParamCom = atoi(&Temp[3]);
 			if ((ParamCom < 1) || (ParamCom > ts->MaxComPort))
 				ParamCom = 0;
+		}
+		else if (_stricmp(Temp, "/WAITCOM") == 0) {	/* wait COM arrival */
+			ts->WaitCom = 1;
 		}
 		else if (_strnicmp(Temp, "/D=", 3) == 0) {
 			if (DDETopic != NULL)
