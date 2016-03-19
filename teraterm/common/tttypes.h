@@ -1074,7 +1074,7 @@ typedef TMap far *PMap;
  * when you change TMap or member of TMap.
  *
  * - At version 4.91, ttset_memfilemap was replaced with ttset_memfilemap_28.
- *   added tttset.ComConnRetry
+ *   added tttset.WaitCom
  *
  * - At version 4.90, ttset_memfilemap was replaced with ttset_memfilemap_27.
  *   added tttset.XmodemTimeOutInit
