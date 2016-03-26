@@ -3129,7 +3129,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 #endif
 		if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT || pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
 		    ts.PortType == IdSerial &&
-		    (ts.AutoComPortReconnect || ts.WaitCom) &&
+		    ts.AutoComPortReconnect &&
 		    AutoDisconnectedPort == ts.ComPort) {
 #ifdef DEBUG
 			if (pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT) {
@@ -3725,7 +3725,7 @@ LONG CVTWindow::OnCommStart(UINT wParam, LONG lParam)
 	else {
 		Connecting = TRUE;
 		ChangeTitle();
-		if (ts.WaitCom && ts.PortType == IdSerial) {
+		if (ts.AutoComPortReconnect && ts.WaitCom && ts.PortType == IdSerial) {
 			if (CheckComPort(ts.ComPort) == 0) {
 				SetAutoConnectPort(ts.ComPort);
 				return 0;
