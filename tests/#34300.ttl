@@ -1,0 +1,14 @@
+for x 1 3
+    sprintf "Test %d"  x
+
+   ;dispstr inputstr #13 #10
+
+    ;dispstr inputstr
+    ;dispstr #13 #10
+
+    dispstr inputstr #13
+    dispstr #10
+
+    ;dispstr inputstr #13
+    ;dispstr inputstr #10
+next

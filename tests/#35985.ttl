@@ -1,0 +1,18 @@
+cmd = 'true;echo "STATUS:$?"'
+sendln cmd
+wait 'STATUS:0'
+messagebox '' result
+recvln
+messagebox inputstr ''
+
+sendln cmd
+waitln 'STATUS:0'
+messagebox inputstr result
+recvln ; âΩÇ‡ÇµÇ»Ç¢Ç∆êiÇ‹Ç»Ç¢
+messagebox inputstr ''
+
+sendln cmd
+waitregex '^STATUS'
+messagebox inputstr result
+recvln ; âΩÇ‡ÇµÇ»Ç¢Ç∆êiÇ‹Ç»Ç¢
+messagebox inputstr ''

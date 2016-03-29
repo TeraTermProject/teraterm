@@ -1,0 +1,6 @@
+var = '%WINDIR% hoge'
+expandenv var
+messagebox var '1'
+
+expandenv var '%OS% fuga'
+messagebox var '2'

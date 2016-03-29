@@ -1,0 +1,27 @@
+ifdefined messagebox
+messagebox result ''
+
+ifdefined 1
+messagebox result ''
+ifdefined '2'
+messagebox result ''
+
+
+a = 1
+b = '2'
+intdim c 2
+strdim d 2
+
+ifdefined a
+messagebox result 'a'
+ifdefined b
+messagebox result 'b'
+ifdefined c
+messagebox result 'c'
+ifdefined d
+messagebox result 'd'
+ifdefined c[0]
+messagebox result 'c[0]'
+ifdefined d[0]
+messagebox result 'd[0]'
+

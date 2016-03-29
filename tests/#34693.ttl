@@ -1,0 +1,12 @@
+setdlgpos 0 0
+statusbox 'First setdlgpos 0 0' 'setdlgpos'
+mpause 5000
+
+setdlgpos 0 0
+statusbox 'Second setdlgpos 0 0' 'setdlgpos'
+mpause 5000
+
+closesbox
+setdlgpos 0 0
+statusbox 'After closesbox setdlgpos 0 0' 'setdlgpos'
+mpause 5000

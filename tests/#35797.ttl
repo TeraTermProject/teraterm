@@ -1,0 +1,7 @@
+;exec 'C:\windows\system32\mstsc.exe /V 192.168.30.23 /w 1364 /h 710 /admin' 'show' 1
+;exec 'C:\windows\sysnative\mstsc.exe /V 192.168.30.23 /w 1364 /h 710 /admin' 'show' 1
+;exec 'dfrgui' 'show' 1
+exec 'notepad' 'show' 1
+; sendln
+; wait 'hoge'
+messagebox result 'wait'

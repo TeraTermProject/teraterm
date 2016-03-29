@@ -1,0 +1,8 @@
+connect 'shell.sourceforge.jp /ssh2 /auth=pageant /user=maya'
+
+getdir d
+messagebox d 'getdir'
+
+getttdir d
+messagebox d 'getttdir'
+

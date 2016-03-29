@@ -1,0 +1,21 @@
+var = 'hoge\nhoge1'
+strspecial var
+messagebox var '1'
+
+strspecial var 'fuga\nfuga1'
+messagebox var '2'
+
+vvar = 'hoge\nhoge2'
+strspecial var vvar
+messagebox var vvar
+
+var = 'hoge\nhoge2'
+strspecial var var
+messagebox var var
+
+; must be error
+strspecial var 'a\nb' 'a'
+
+; must be error
+var = 'fuga\nfuga2'
+strspecial var 1

@@ -1,0 +1,19 @@
+path = 'D:\WINDOWS\TTL\test2\01ini'
+INI = 'TERATERM.INI'
+makepath INIPATH path INI
+cmd = 'XXX.XXX.XXX.XXX:22 /ssh /auth=passwd /user=root /passwd=XXXXX'
+strconcat cmd ' /F='
+strconcat cmd INIPATH
+; connect cmd
+messagebox cmd ''
+
+path = 'D:\WINDOWS\TTL\test2\01ini'
+INI = 'TERATERM.INI'
+makepath INIPATH path INI
+cmd = 'XXX.XXX.XXX.XXX:22 /ssh /auth=passwd /user=root /passwd=XXXXX'
+strconcat cmd ' /F="'
+strconcat cmd INIPATH
+strconcat cmd '"'
+; connect cmd
+messagebox cmd ''
+

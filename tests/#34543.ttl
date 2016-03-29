@@ -1,0 +1,83 @@
+
+sprintf2 hoge "[%d %2d]" 1 1
+messagebox hoge ""
+
+; sprintf2 hoge "[%*d]" 2 1
+; messagebox hoge ""
+
+sprintf2 hoge "[%.1d]" 1
+messagebox hoge ""
+
+sprintf2 hoge "[%.2f]" "3.14159"
+messagebox hoge ""
+
+; sprintf2 hoge "[%.*f]" 2 "3.14159"
+; messagebox hoge ""
+
+sprintf2 hoge "[%.d]" 1
+messagebox hoge ""
+
+
+sprintf2 hoge "[%d]" 3
+messagebox hoge "%d"
+
+sprintf2 hoge "[%2d]" 3
+messagebox hoge "%2d"
+
+sprintf2 hoge "[%02d]" 3
+messagebox hoge "%02d"
+
+sprintf2 hoge "[%*d]" 2 3
+messagebox hoge "%*d"
+
+sprintf2 hoge "[%0*d]" 2 3
+messagebox hoge "%0*d"
+
+sprintf2 hoge "[%.*f]" 2 "3.1415926535"
+messagebox hoge "%.*f"
+
+sprintf2 hoge "[%.3d]" 12
+messagebox hoge "%.3d"
+
+sprintf2 hoge "[%1.3d]" 23
+messagebox hoge "%1.3d"
+
+sprintf2 hoge "[%.0d]" 0
+messagebox hoge "%.0d"
+
+sprintf2 hoge "[%f]" "3.1415926535"
+messagebox hoge "%f"
+
+sprintf2 hoge "[%e]" "3.1415926535"
+messagebox hoge "%e"
+
+sprintf2 hoge "[%f]" "314.15926535"
+messagebox hoge "%f"
+
+sprintf2 hoge "[%e]" "314.15926535"
+messagebox hoge "%e"
+
+sprintf2 hoge "[%.0f]" "3.1415926535"
+messagebox hoge "%.0f"
+
+sprintf2 hoge "[%.0e]" "3.1415926535"
+messagebox hoge "%.0e"
+
+sprintf2 hoge "[%.3g]" "1.2345"
+messagebox hoge "%.3g"
+
+sprintf2 hoge "[%.3g]" "0.12345"
+messagebox hoge "%.3g"
+
+sprintf2 hoge "[%.3g]" "0.0000012345"
+messagebox hoge "%.3g"
+
+sprintf2 hoge "[%.10s]" "123456789012"
+messagebox hoge "%.10s"
+
+sprintf2 hoge "[%.*s]" 10 "123456789012"
+messagebox hoge "%.*s"
+
+sprintf2 hoge "[%*.*s]" 15 10 "123456789012"
+messagebox hoge "%*.*s"
+

@@ -1,0 +1,25 @@
+intdim res 11
+
+for i 1 1000000
+	random val 10
+	res[val] = res[val] + 1
+next
+
+str = ''
+for i 0 10
+	sprintf2 tmp '%d\t%d' i res[i]
+	strconcat str tmp
+	strconcat str #10
+next
+strspecial str
+messagebox str 'result'
+
+uptime time
+int2str str_time time
+strconcat filename '35822_'
+strconcat filename str_time
+strconcat filename '.txt'
+
+fileopen fp filename 0
+filewrite fp str
+fileclose fp

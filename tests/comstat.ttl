@@ -1,0 +1,5 @@
+filestat 'com100' s m d
+messagebox result 'result'
+messagebox s 's'
+messagebox m 'm'
+messagebox d 'd'

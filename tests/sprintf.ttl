@@ -1,0 +1,152 @@
+sprintf ':%c:%4c:%04c:%-4c:%-04c:%+c:% c:' 49 50 51 52 53 54 55
+if result = 0 then
+  messagebox inputstr 'c'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%d:%4d:%04d:%-4d:%-04d:%+d:% d:' 1 2 3 4 5 6 7
+if result = 0 then
+  messagebox inputstr 'd'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%i:%4i:%04i:%-4i:%-04i:%+i:% i:' 1 2 3 4 5 6 7
+if result = 0 then
+  messagebox inputstr 'i'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%o:%4o:%04o:%-4o:%-04o:%+o:% o:' 4 5 6 7 8 9 10
+if result = 0 then
+  messagebox inputstr 'o'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%u:%4u:%04u:%-4u:%-04u:%+u:% u:' 1 2 3 4 5 6 7
+if result = 0 then
+  messagebox inputstr 'u'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%x:%4x:%04x:%-4x:%-04x:%+x:% x:' 9 10 11 12 13 14 15
+if result = 0 then
+  messagebox inputstr 'x'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%X:%4X:%04X:%-4X:%-04X:%+X:% X:' 9 10 11 12 13 14 15
+if result = 0 then
+  messagebox inputstr 'X'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf ':%s:%4s:%04s:%-4s:%-04s:%+s:% s:' 'a' 'b' 'c' 'd' 'e' 'f' 'g'
+if result = 0 then
+  messagebox inputstr 's'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%%:%p'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+
+sprintf '%c' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%d' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%i' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%o' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%u' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%x' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%X' 'a'
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%s' 49
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%=d' 32
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf
+if result = 0 then
+  messagebox inputstr ''
+else
+  int2str buf result
+  messagebox buf 'error'
+endif

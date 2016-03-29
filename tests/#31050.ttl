@@ -1,0 +1,13 @@
+; open or create
+fileopen fh 'z:\tmpa.txt' 0
+fileclose fh
+
+; open with readonly=false
+fileopen fh 'z:\tmpa.txt' 0 0
+messagebox 'a' 'a'
+fileclose fh
+
+; open with readonly=true
+fileopen fh 'z:\tmpa.txt' 0 1
+messagebox 'a' 'a'
+fileclose fh

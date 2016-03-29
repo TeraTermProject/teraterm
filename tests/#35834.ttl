@@ -1,0 +1,46 @@
+; Checksum / CRC 受信側が指定する
+; 1K 送信側が指定する
+
+
+; XMODEM 受信
+sendln 'lsx 1.mp3'
+xmodemrecv 'z:\1.mp3' 1 1
+
+sendln 'lsx 1.mp3'
+xmodemrecv 'z:\1.mp3' 1 2
+
+sendln 'lsx 1.mp3'
+xmodemrecv 'z:\1.mp3' 1 3
+
+; 1Kと判定されるけど転送されない
+sendln 'lsx -k 1.mp3'
+xmodemrecv 'z:\1.mp3' 1 1
+
+; 1Kで転送される
+sendln 'lsx -k 1.mp3'
+xmodemrecv 'z:\1.mp3' 1 2
+
+sendln 'lsx -k 1.mp3'
+xmodemrecv 'z:\1.mp3' 1 3
+
+
+; XMODEM 送信
+sendln 'lrx 2.mp3'
+xmodemsend 'z:\2.mp3' 1
+
+sendln 'lrx 2.mp3'
+xmodemsend 'z:\2.mp3' 2
+
+; 1Kで転送される
+sendln 'lrx 2.mp3'
+xmodemsend 'z:\2.mp3' 3
+
+sendln 'lrx -c 2.mp3'
+xmodemsend 'z:\2.mp3' 1
+
+sendln 'lrx -c 2.mp3'
+xmodemsend 'z:\2.mp3' 2
+
+sendln 'lrx -c 2.mp3'
+xmodemsend 'z:\2.mp3' 3
+

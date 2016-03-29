@@ -1,0 +1,55 @@
+sprintf '%+012d' 1
+if result = 0 then
+  messagebox inputstr 'd'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%8d' 1
+if result = 0 then
+  messagebox inputstr 'd'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%#x' 1
+if result = 0 then
+  messagebox inputstr 'x'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%#X' 1
+if result = 0 then
+  messagebox inputstr 'X'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%s' 'a'
+if result = 0 then
+  messagebox inputstr 's'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%.10f' 1
+if result = 0 then
+  messagebox inputstr 'd'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif
+
+sprintf '%e' 1
+if result = 0 then
+  messagebox inputstr 'e'
+else
+  int2str buf result
+  messagebox buf 'error'
+endif

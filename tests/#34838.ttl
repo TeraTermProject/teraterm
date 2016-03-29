@@ -1,0 +1,10 @@
+test1 = 'a,b,c'
+strsplit test1 ','
+sss2 = 'YYYY.tgz'
+
+strreplace sss2 1 '.tgz' '.gz'
+
+messagebox groupmatchstr1 'test'
+messagebox groupmatchstr2 'test'
+messagebox groupmatchstr3 'test'
+messagebox sss2 'test'

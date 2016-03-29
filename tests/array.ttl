@@ -1,0 +1,33 @@
+intdim intarray 3
+strdim strarray 4
+
+intarray[0] = 0
+intarray[2] = 2
+; intarray[3] = 3
+strarray[0] = '0'
+strarray[3] = '3'
+; strarray[4] = '4'
+
+messagebox intarray[2] 'intarray'
+messagebox strarray[3] 'strarray'
+
+messagebox strarray[3 'strarray'
+
+
+
+isize = 256
+; ssize = 257
+ssize = 100000
+intdim ar_int isize
+strdim ar_str ssize
+
+for i 0 isize-1
+	ar_int[i] = i
+next
+
+for i 0 ssize-1
+	sprintf2 ar_str[i] 'ar_str[%d]=%d' i i
+next
+
+messagebox ar_int[isize-1] 'ar_int[MAX]'
+messagebox ar_str[ssize-1] 'ar_str[MAX]'

@@ -1,0 +1,10 @@
+timeout = 3
+
+; /usr/local/apache/bin/httpd
+; |<----------27----------->|
+; |<---12--->|
+
+sendln 'ps ax'
+flushrecv
+waitrecv 'apache' 27 12
+messagebox inputstr result

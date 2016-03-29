@@ -1,0 +1,8 @@
+; GetOpenFileName
+filenamebox 'a'
+
+; GetOpenFileName
+filenamebox 'a' 0
+
+; GetSaveFileName
+filenamebox 'a' 1

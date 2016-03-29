@@ -1,0 +1,15 @@
+num = $A5 ;10100101
+cnt = 4
+
+; left 8bit rotate shift
+rotleft = ((num << cnt) & $FF) + (((num << cnt) & $FF00) >> 8)
+
+sprintf '0x%X' rotleft
+messagebox inputstr ''
+
+
+; right 8bit rotate shift
+rotright = (num >> cnt) + ((num << (8 - cnt)) & $FF)
+
+sprintf '0x%X' rotright
+messagebox inputstr ''

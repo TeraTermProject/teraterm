@@ -1,0 +1,34 @@
+messagebox 'msg\tbox' 'title'
+messagebox 'msg\tbox' 'title' 0
+messagebox 'msg\tbox' 'title' 1
+
+yesnobox 'yesno\tbox' 'title'
+yesnobox 'yesno\tbox' 'title' 0
+yesnobox 'yesno\tbox' 'title' 1
+
+inputbox 'inp\tbox' 'title'
+inputbox 'inp\tbox' 'title' 'default'
+inputbox 'inp\tbox' 'title' 'default' 0
+inputbox 'inp\tbox' 'title' 'default' 1
+
+passwordbox 'pass\tbox' 'title'
+passwordbox 'pass\tbox' 'title' 0
+passwordbox 'pass\tbox' 'title' 1
+
+statusbox 'stat\tbox' 'title'
+pause 1
+closesbox
+statusbox 'stat\tbox' 'title' 0
+pause 1
+closesbox
+statusbox 'stat\tbox' 'title' 1
+pause 1
+closesbox
+
+statusbox 'stat\tbox' 'title'
+pause 1
+statusbox 'stat\tbox' 'title' 0
+pause 1
+statusbox 'stat\tbox' 'title' 1
+pause 1
+closesbox

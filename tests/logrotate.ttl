@@ -1,0 +1,6 @@
+changedir 'z:'
+
+logopen 'teraterm_sample.log' 0 0
+
+logrotate 'size' '1K'
+logrotate 'rotate' 3

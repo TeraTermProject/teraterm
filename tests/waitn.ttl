@@ -1,0 +1,22 @@
+timeout = 3
+
+sendln 'ls'
+flushrecv
+waitn 5
+messagebox inputstr result
+
+sendln 'ps ax'
+flushrecv
+waitn 100
+messagebox inputstr result
+
+;sprintf2 cmd 'perl -e %cfor($i=0;$i<100;$i++){print "hoge"}%c' 39 39
+;sendln cmd
+;flushrecv
+;waitn 300
+;messagebox inputstr result
+
+sendln 'ls -lA'
+flushrecv
+waitn 200
+messagebox inputstr result

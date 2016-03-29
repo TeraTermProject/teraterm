@@ -1,0 +1,3 @@
+sendln 'ps ax'
+messagebox 'modal' ''
+sendln 'date'

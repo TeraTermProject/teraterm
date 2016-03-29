@@ -1,0 +1,14 @@
+fileopen fh1 '#32621_in.txt' 0
+fileopen fh2 '#32621_out.txt' 0
+
+while 1
+    filereadln fh1 line
+    if result=1 then 
+        break
+    endif
+    strreplace line 1 '‚ ‚¢‚¤‚¦‚¨' '‚í‚ð‚ñ'
+    filewriteln fh2 line
+endwhile
+
+fileclose fh1
+fileclose fh2
