@@ -4482,7 +4482,7 @@ void SSH2_update_compression_myproposal(PTInstVar pvar)
 // (2011.2.28 yutaka)
 void SSH2_update_kex_myproposal(PTInstVar pvar)
 {
-	static char buf[256]; // TODO: malloc()‚É‚·‚×‚«
+	static char buf[512]; // TODO: malloc()‚É‚·‚×‚«
 	int index;
 	int len, i;
 
