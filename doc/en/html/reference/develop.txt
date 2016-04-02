@@ -18,7 +18,7 @@
 -- Visual Studio Community 2013 Update 5
    MFC MBCS DLL Add-on
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
--- Visual Studio Community 2015 Update 1
+-- Visual Studio Community 2015 Update 2
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 - Installer
   Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 or higher doesn't support Windows NT 4.0 and 9x)
