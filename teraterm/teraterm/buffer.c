@@ -3827,11 +3827,11 @@ void BuffScrollLeft(int count)
 		memmove(&(AttrBuffFG[Ptr]), &(AttrBuffFG[Ptr+count]), MoveLen);
 		memmove(&(AttrBuffBG[Ptr]), &(AttrBuffBG[Ptr+count]), MoveLen);
 
-		memset(&(CodeBuff[Ptr+MoveLen]),   0x20,          count);
-		memset(&(AttrBuff[Ptr+MoveLen]),   AttrDefault,   count);
-		memset(&(AttrBuff2[Ptr+MoveLen]),  AttrDefault,   count);
-		memset(&(AttrBuffFG[Ptr+MoveLen]), AttrDefaultFG, count);
-		memset(&(AttrBuffBG[Ptr+MoveLen]), AttrDefaultBG, count);
+		memset(&(CodeBuff[Ptr+MoveLen]),   0x20,             count);
+		memset(&(AttrBuff[Ptr+MoveLen]),   AttrDefault,      count);
+		memset(&(AttrBuff2[Ptr+MoveLen]),  CurCharAttr.Attr2 & Attr2ColorMask, count);
+		memset(&(AttrBuffFG[Ptr+MoveLen]), CurCharAttr.Fore, count);
+		memset(&(AttrBuffBG[Ptr+MoveLen]), CurCharAttr.Back, count);
 
 		LPtr = NextLinePtr(LPtr);
 	}
@@ -3867,11 +3867,11 @@ void BuffScrollRight(int count)
 		memmove(&(AttrBuffFG[Ptr+count]), &(AttrBuffFG[Ptr]), MoveLen);
 		memmove(&(AttrBuffBG[Ptr+count]), &(AttrBuffBG[Ptr]), MoveLen);
 
-		memset(&(CodeBuff[Ptr]),   0x20,          count);
-		memset(&(AttrBuff[Ptr]),   AttrDefault,   count);
-		memset(&(AttrBuff2[Ptr]),  AttrDefault,   count);
-		memset(&(AttrBuffFG[Ptr]), AttrDefaultFG, count);
-		memset(&(AttrBuffBG[Ptr]), AttrDefaultBG, count);
+		memset(&(CodeBuff[Ptr]),   0x20,             count);
+		memset(&(AttrBuff[Ptr]),   AttrDefault,      count);
+		memset(&(AttrBuff2[Ptr]),  CurCharAttr.Attr2 & Attr2ColorMask, count);
+		memset(&(AttrBuffFG[Ptr]), CurCharAttr.Fore, count);
+		memset(&(AttrBuffBG[Ptr]), CurCharAttr.Back, count);
 
 		if (AttrBuff[LPtr+CursorRightM] & AttrKanji) {
 			CodeBuff[LPtr+CursorRightM] = 0x20;
