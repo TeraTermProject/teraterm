@@ -612,11 +612,19 @@ void ZInit(PFileVar fv, PZVar zv, PComVar cv, PTTSet ts) {
 	zv->WinSize = ts->ZmodemWinSize;
 	fv->LogFlag = ((ts->LogFlag & LOG_Z) != 0);
 
-	if (zv->ZMode == IdZAuto) {
+	if (zv->ZMode == IdZAutoR || zv->ZMode == IdZAutoS) {
+		if (zv->ZMode == IdZAutoR) {
+			zv->ZMode = IdZReceive;
+			CommInsert1Byte(cv, '0');
+		}
+		else {
+			zv->ZMode = IdZSend;
+			CommInsert1Byte(cv, '1');
+		}
+		CommInsert1Byte(cv, '0');
 		CommInsert1Byte(cv, 'B');
 		CommInsert1Byte(cv, ZDLE);
 		CommInsert1Byte(cv, ZPAD);
-		zv->ZMode = IdZReceive;
 	}
 
 	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption), "Tera Term: ",

@@ -117,7 +117,8 @@ typedef TCharAttr *PCharAttr;
   /* ZMODEM function id */
 #define IdZReceive 1
 #define IdZSend    2
-#define IdZAuto    3
+#define IdZAutoR   3
+#define IdZAutoS   4
 
   /* B-Plus function id */
 #define IdBPReceive 1

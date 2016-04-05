@@ -4880,10 +4880,35 @@ void DLESeen(BYTE b)
 
 void CANSeen(BYTE b)
 {
-  ParseMode = ModeFirst;
-  if (((ts.FTFlag & FT_ZAUTO)!=0) && (b=='B'))
-    ZMODEMStart(IdZAuto); /* Auto ZMODEM activation */
-  ChangeEmu = -1;
+	static int state = 0;
+
+	if (ts.FTFlag & FT_ZAUTO) {
+		if (state == 0 && b == 'B') {
+			state = 1;
+		}
+		else if (state == 1 && b == '0') {
+			state = 2;
+		}
+		else {
+			if (state == 2) {
+				if (b =='0') { // ZRQINIT
+					/* Auto ZMODEM activation (Receive) */
+					ZMODEMStart(IdZAutoR);
+				}
+				else if (b == '1') { // ZRINIT
+					/* Auto ZMODEM activation (Send) */
+					ZMODEMStart(IdZAutoS);
+				}
+			}
+			ParseMode = ModeFirst;
+			ChangeEmu = -1;
+			state = 0;
+		}
+	}
+	else {
+		ParseMode = ModeFirst;
+		ChangeEmu = -1;
+	}
 }
 
 BOOL CheckKanji(BYTE b)

@@ -1802,7 +1802,7 @@ void ZMODEMStart(int mode)
 	if (! ProtoStart())
 		return;
 
-	if (mode==IdZSend)
+	if (mode == IdZSend || mode == IdZAutoS)
 	{
 		Opt = ts.XmodemBin;
 		FileVar->OpId = OpZSend;
@@ -1819,7 +1819,7 @@ void ZMODEMStart(int mode)
 		else
 		(*SetFileVar)(FileVar);
 	}
-	else /* IdZReceive or IdZAuto */
+	else /* IdZReceive or IdZAutoR */
 		FileVar->OpId = OpZRcv;
 
 	TalkStatus = IdTalkQuiet;
