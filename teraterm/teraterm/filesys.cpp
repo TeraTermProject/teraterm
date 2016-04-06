@@ -1811,6 +1811,9 @@ void ZMODEMStart(int mode)
 			if (! (*GetMultiFname)(FileVar,ts.FileDir,GMF_Z,&Opt) ||
 			    (FileVar->NumFname==0))
 			{
+				if (mode == IdZAutoS) {
+					CommRawOut(&cv, "\030\030\030\030\030\030\030\030\b\b\b\b\b\b\b\b\b\b", 18);
+				}
 				ProtoEnd();
 				return;
 			}
