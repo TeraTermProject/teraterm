@@ -637,6 +637,15 @@ BOOL LogStart()
 	LogVar->RotateSize = ts.LogRotateSize;
 	LogVar->RotateStep = ts.LogRotateStep;
 
+	// Log rotateが有効の場合、初期ファイルサイズを設定する。
+	// 最初のファイルが設定したサイズでローテートしない問題の修正。
+	// (2016.4.9 yutaka)
+	if (LogVar->RotateMode != ROTATE_NONE) {
+		size = GetFileSize((HANDLE)LogVar->FileHandle, NULL);
+		if (size != -1)
+			LogVar->ByteCount = size;
+	}
+
 	if (! OpenFTDlg(LogVar)) {
 		FileTransEnd(OpLog);
 		return FALSE;
