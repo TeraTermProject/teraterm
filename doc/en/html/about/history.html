@@ -49,6 +49,7 @@
       <li>When <a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=on is enabled, Tera Term can not recognize a part of device regarding USB serial port connection and disconnection.</li>
       <li>The background color erase(BCE) does not work with DECFI, DECBI control sequence.</li>
       <li>MACRO: When <a href="../macro/command/ifthenelseif.html">if</a> has macro command without parameter, syntax error occurs.</li>
+      <li>When <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> is enabled and an existing file is logged, first file can not be rotated by specified size.</li>
     </ul>
   </li>
 
@@ -228,7 +229,7 @@
       <li>YMODEM: When the data is sent, the CANCEL command from the remote host does not work well.</li>
       <li>YMODEM: When the received file information contains only a file name, an end of the file name is broken.</li>
       <li>YMODEM: When the received file information does not include the file size, the file data can not be recorded well.</li>
-      <li>The setting value of the <a href="../menu/setup-additional.html#logrotate">Log Rotate</a> will not display well.</li>
+      <li>The setting value of the <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> will not display well.</li>
       <li>When the x=0,y=0 is specified by the <a href="../macro/command/setdlgpos.html">setdlgpos</a> marco command, the <a href="../macro/command/statusbox.html">statusbox</a> will be newly opened and however the statusbox can not be properly shown.</li>
       <li>When the macro filename is so longer, the currently executing line number can not be shown. And also, the macro window can be re-sizable.</li>
     </ul>
@@ -515,7 +516,7 @@
   <li>Changes
     <ul>
       <li>Select "Selection" by default in the printer dialog when there is a selection. Special thanks to tentner.</li>
-      <li>added the <a href="../menu/setup-additional.html#logrotate">Log Rotate</a> configuration on the Additional settings dialog.
+      <li>added the <a href="../menu/setup-additional.html#LogRotate">Log Rotate</a> configuration on the Additional settings dialog.
         <ul>
           <li>added the LogRotate, LogRotateSize, LogRotateSizeType and LogRotateStep entries in the teraterm.ini file.</li>
         </ul></li>
