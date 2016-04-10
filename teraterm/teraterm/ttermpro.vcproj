@@ -86,6 +86,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles=".\teraterm.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -178,6 +179,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				AdditionalManifestFiles=".\teraterm.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -381,24 +383,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="teraterm.manifest"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-		</File>
 	</Files>
 	<Globals>
 		<Global

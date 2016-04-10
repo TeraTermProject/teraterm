@@ -145,7 +145,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="teraterm.manifest" />
-  </ItemGroup>
 </Project>
