@@ -597,10 +597,15 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* CR Send */
 	GetPrivateProfileString(Section, "CRSend", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "CRLF") == 0)
+	if (_stricmp(Temp, "CRLF") == 0) {
 		ts->CRSend = IdCRLF;
-	else
+	}
+	else if (_stricmp(Temp, "LF") == 0) {
+		ts->CRSend = IdLF;
+	}
+	else {
 		ts->CRSend = IdCR;
+	}
 	ts->CRSend_ini = ts->CRSend;
 
 	/* Local echo */
@@ -1992,10 +1997,15 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "CRReceive", Temp, FName);
 
 	/* CR Send */
-	if (ts->CRSend == IdCRLF)
+	if (ts->CRSend == IdCRLF) {
 		strncpy_s(Temp, sizeof(Temp), "CRLF", _TRUNCATE);
-	else
+	}
+	else if (ts->CRSend == IdLF) {
+		strncpy_s(Temp, sizeof(Temp), "LF", _TRUNCATE);
+	}
+	else {
 		strncpy_s(Temp, sizeof(Temp), "CR", _TRUNCATE);
+	}
 	WritePrivateProfileString(Section, "CRSend", Temp, FName);
 
 	/* Local echo */

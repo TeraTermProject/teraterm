@@ -1649,6 +1649,9 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen++] = 0;
 				}
+				else if (cv->CRSend == IdLF) {
+					TempStr[TempLen-1] = 0x0a;
+				}
 				if (cv->TelLineMode) {
 					cv->Flush = TRUE;
 				}
@@ -1659,7 +1662,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 						cv->LineModeBuffCount--;
 					}
 				}
-		  		else {
+				else {
 					TempStr[TempLen++] = d;
 				}
 			}
@@ -1667,7 +1670,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 				if (cv->TelLineMode) {
 					cv->LineModeBuffCount = cv->FlushLen;
 				}
-		  		else {
+				else {
 					TempStr[TempLen++] = d;
 				}
 			}
@@ -1778,6 +1781,9 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 			}
 			else if (cv->CRSend==IdCR && cv->TelFlag && ! cv->TelBinSend) {
 				TempStr[TempLen++] = 0;
+			}
+			else if (cv->CRSend == IdLF) {
+				TempStr[TempLen-1] = 0x0a;
 			}
 			if (cv->TelLineMode) {
 				cv->Flush = TRUE;
@@ -2004,6 +2010,9 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 				          cv->TelFlag && ! cv->TelBinSend) {
 					TempStr[TempLen++] = 0;
 				}
+				else if (cv->CRSend == IdLF) {
+					TempStr[TempLen-1] = 0x0a;
+				}
 			}
 			else if (d==0x15) { // Ctrl-U
 				if (cv->TelLineMode) {
@@ -2099,6 +2108,9 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 			}
 			else if (cv->CRSend==IdCR && cv->TelFlag && ! cv->TelBinSend) {
 				TempStr[TempLen++] = 0;
+			}
+			else if (cv->CRSend == IdLF) {
+				TempStr[TempLen-1] = 0x0a;
 			}
 			break;
 		  

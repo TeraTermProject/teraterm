@@ -50,7 +50,7 @@ static HFONT DlgWinlistFont;
 char UILanguageFile[MAX_PATH];
 
 static PCHAR far NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
-static PCHAR far NLList[] = {"CR","CR+LF", NULL};
+static PCHAR far NLList[] = {"CR","CR+LF", "LF", NULL};
 static PCHAR far TermList[] =
 	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",
 	 "VT420", "VT520", "VT525", NULL};
