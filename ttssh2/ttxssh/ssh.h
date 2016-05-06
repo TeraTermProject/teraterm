@@ -361,7 +361,7 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, EVP_rc4},              // RFC4345
 	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, EVP_cast5_cbc},        // RFC4253
 	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, evp_des3_ctr},         // RFC4344
-	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 16,    0, evp_bf_ctr},           // RFC4344
+	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 32,    0, evp_bf_ctr},           // RFC4344
 	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, evp_cast5_ctr},        // RFC4344
 	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
 	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
