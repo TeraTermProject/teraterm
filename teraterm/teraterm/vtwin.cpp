@@ -3127,6 +3127,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 #ifdef DEBUG
 		OutputDebugPrintf("DBT_DEVICEARRIVAL devicetype=%d PortType=%d AutoDisconnectedPort=%d\n", pDevHdr->dbch_devicetype, ts.PortType, AutoDisconnectedPort);
 #endif
+		// DBT_DEVTYP_PORT ‚ð“Š‚°‚¸ DBT_DEVTYP_DEVICEINTERFACE ‚µ‚©“Š‚°‚È‚¢ƒhƒ‰ƒCƒo‚ª‚ ‚é‚½‚ß
 		if ((pDevHdr->dbch_devicetype == DBT_DEVTYP_PORT || pDevHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) &&
 		    ts.PortType == IdSerial &&
 		    ts.AutoComPortReconnect &&
