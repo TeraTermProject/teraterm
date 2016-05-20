@@ -209,10 +209,10 @@ YmodemTimeouts=10,3,10,20,60
 </pre>
 
 
-<h1><a name="zmauto">Auto activation of ZMODEM Receive</a></h1>
+<h1><a name="zmauto">Auto activation of ZMODEM Receive / Send</a></h1>
 
 <p>
-To enable the auto activation of the ZMODEM Receive command, edit the ZmodemAuto line in the [Tera Term] section of the setup file like the following:
+To enable the auto activation of the ZMODEM Receive / Send command, edit the ZmodemAuto line in the [Tera Term] section of the setup file like the following:
 </p>
 
 <pre>
@@ -220,11 +220,8 @@ ZmodemAuto=on
 </pre>
 
 <p>
-If you run the ZMODEM Send command at the host, the ZMODEM Receive command of Tera Term is automatically activated.
-</p>
-
-<p>
-Note: If you turn this option on, executing the ZMODEM Receive command at the host may activate also the ZMODEM Receive (not Send) command of Tera Term. This problem is unavoidable. If you don't like this behavior, turn this option off.
+If you run the ZMODEM Send command at the host, the ZMODEM Receive command of Tera Term is automatically activated. <br />
+<!-- また、ホスト側の ZMODEM 受信(アップロード)コマンドを実行した時は、ZMODEM 送信のファイル選択ダイアログが開くようになります。 -->
 </p>
 
 <pre>
