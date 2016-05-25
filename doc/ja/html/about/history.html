@@ -47,11 +47,10 @@
 
   <li>バグ修正
     <ul>
-      <li><a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=onの場合において、一部の機器でUSBシリアルポートの接続・切断が検出できない問題を修正した。</li>
       <li>DECFI, DECBI 制御シーケンスで、背景色消去(BCE)が適用されない問題を修正した。</li>
+      <li><a href="../setup/teraterm-com.html#AutoComPortReconnect">AutoComPortReconnect</a>=onの場合において、一部の機器でUSBシリアルポートの接続・切断が検出できない問題を修正した。</li>
+      <li><a href="../menu/setup-additional.html#LogRotate">ログ・ローテート</a>が有効で、既存のファイルをログ採取する場合、最初のファイルが指定したサイズで回転しない問題を修正した。</li>
       <li>マクロコマンドの 1 行形式の <a href="../macro/command/ifthenelseif.html">if</a> 文で、パラメータの無いマクロコマンドがエラーとなる問題を修正した。</li>
-      <li>
-      <a href="../menu/setup-additional.html#LogRotate">ログ・ローテート</a>が有効で、既存のファイルをログ採取する場合、最初のファイルが指定したサイズで回転しない問題を修正した。</li>
     </ul>
   </li>
 
@@ -2740,9 +2739,9 @@
 <ul class="history">
   <li>バグ修正
     <ul>
-      <li>X11転送の開始が接続エラー(WSANO_RECOVERY: 11003)で失敗することがある問題を修正した。</li>
-      <li>鍵交換方式ですべての方式を有効にしている時に最後の方式が使われない問題を修正した。</li>
       <li>blowfish-ctr 共通鍵暗号で使用する鍵の鍵長を <a href="http://tools.ietf.org/html/rfc4344">RFC 4344</a> に合わせて 256 ビットに変更した。</li>
+      <li>鍵交換方式ですべての方式を有効にしている時に最後の方式が使われない問題を修正した。</li>
+      <li>X11転送の開始が接続エラー(WSANO_RECOVERY: 11003)で失敗することがある問題を修正した。</li>
     </ul>
   </li>
 
