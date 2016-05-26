@@ -29,6 +29,7 @@ protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
       <li>telnet</li>
       <li>socks4</li>
       <li>socks5</li>
+      <li>none</li>
       <!--li>ssl</li>
       <li>http+ssl</li>
       <li>telnet+ssl</li>
@@ -56,6 +57,7 @@ protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
 <pre>
 ttermpro.exe -proxy=socks5://user:pass@proxy:1080 sshserver /ssh
 ttermpro.exe -proxy=telnet://proxy:8023 telnetserver:23 /nossh
+ttermpro.exe -proxy=none:// sshserver /ssh
 </pre>
 
 <h2 id="notes">Note</h2>
