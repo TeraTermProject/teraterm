@@ -32,13 +32,13 @@ Removes all occurrences of a set of characters specified in the &lt;trimchars&gt
 <h2>Example</h2>
 
 <pre class="macro-example">
-src='   '#9' #include <stdio.h>      '#9' '
+src='   '#9' #include &lt;stdio.h&gt;      '#9' '
 strtrim src ' \t'
-messagebox src 'result'          ; '#include <stdio.h>'
+messagebox src 'result'          ; '#include &lt;stdio.h&gt;'
 
-src='         #include <stdio.h>         '
+src='         #include &lt;stdio.h&gt;         '
 strtrim src ' '
-messagebox src 'result'          ; '#include <stdio.h>'
+messagebox src 'result'          ; '#include &lt;stdio.h&gt;'
 
 src='*;|@123***456@|;'
 strtrim src '*;|@'
