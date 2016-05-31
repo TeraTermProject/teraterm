@@ -23,6 +23,8 @@
 #define IDD_TABSHEET_SEQUENCE           121
 #define IDD_DAD_DIALOG                  122
 #define IDD_SETUP_DIR_DIALOG            123
+#define IDI_TTERM_3D                    124
+#define IDI_VT_3D                       125
 #define IDR_TEKMENU                     1000
 #define IDC_EDIT_COMMENT                1000
 #define IDC_EDIT_FULLPATH               1001
@@ -306,7 +308,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        124
+#define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         52031
 #define _APS_NEXT_CONTROL_VALUE         2564
 #define _APS_NEXT_SYMED_VALUE           101

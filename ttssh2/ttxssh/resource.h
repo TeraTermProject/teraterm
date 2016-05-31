@@ -17,6 +17,7 @@
 #define IDD_SFTP_DIALOG                 109
 #define IDI_SECURETT_YELLOW             110
 #define IDD_SSHUPDATE_HOSTKEY           111
+#define IDI_SECURETT_GREEN              113
 #define IDD_HOSTDLG                     600
 #define IDC_HOSTTCPIP                   601
 #define IDD_SSHDIFFERENTKEY             601
@@ -221,7 +222,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        114
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1220
 #define _APS_NEXT_SYMED_VALUE           101

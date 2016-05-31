@@ -501,6 +501,10 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	    (_stricmp(buf, "securett_yellow") == 0)) {
 		settings->IconID = IDI_SECURETT_YELLOW;
 	}
+	else if ((_stricmp(buf, "green") == 0) ||
+	         (_stricmp(buf, "securett_green") == 0)) {
+		settings->IconID = IDI_SECURETT_GREEN;
+	}
 	else {
 		settings->IconID = IDI_SECURETT;
 	}
@@ -612,8 +616,15 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 	                          settings->VerifyHostKeyDNS ? "1" : "0", fileName);
 
 	// SSH ƒAƒCƒRƒ“
-	WritePrivateProfileString("TTSSH", "SSHIcon",
-	                          (settings->IconID==IDI_SECURETT_YELLOW) ? "yellow" : "Default", fileName);
+	if (settings->IconID==IDI_SECURETT_YELLOW) {
+		WritePrivateProfileString("TTSSH", "SSHIcon", "yellow", fileName);
+	}
+	else if (settings->IconID==IDI_SECURETT_GREEN) {
+		WritePrivateProfileString("TTSSH", "SSHIcon", "green", fileName);
+	}
+	else {
+		WritePrivateProfileString("TTSSH", "SSHIcon", "Default", fileName);
+	}
 
 	_itoa(settings->DisablePopupMessage, buf, 10);
 	WritePrivateProfileString("TTSSH", "DisablePopupMessage", buf, fileName);
@@ -1899,6 +1910,10 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					    (_stricmp(option+10, "yellow") == 0) ||
 					    (_stricmp(option+10, "securett_yellow") == 0)) {
 						pvar->settings.IconID = IDI_SECURETT_YELLOW;
+					}
+					else if ((_stricmp(option+10, "green") == 0) ||
+					         (_stricmp(option+10, "securett_green") == 0)) {
+						pvar->settings.IconID = IDI_SECURETT_GREEN;
 					}
 					else {
 						pvar->settings.IconID = IDI_SECURETT;

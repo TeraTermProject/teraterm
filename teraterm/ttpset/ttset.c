@@ -84,6 +84,12 @@ int IconName2IconId(const char *name) {
 	else if (_stricmp(name, "vt_classic") == 0) {
 		id = IDI_VT_CLASSIC;
 	}
+	else if (_stricmp(name, "tterm_3d") == 0) {
+		id = IDI_TTERM_3D;
+	}
+	else if (_stricmp(name, "vt_3d") == 0) {
+		id = IDI_VT_3D;
+	}
 	else if (_stricmp(name, "cygterm") == 0) {
 		id = IDI_CYGTERM;
 	}
@@ -110,6 +116,12 @@ void IconId2IconName(char *name, int len, int id) {
 			break;
 		case IDI_VT_CLASSIC:
 			icon = "vt_classic";
+			break;
+		case IDI_TTERM_3D:
+			icon = "tterm_3d";
+			break;
+		case IDI_VT_3D:
+			icon = "vt_3d";
 			break;
 		case IDI_CYGTERM:
 			icon = "cygterm";

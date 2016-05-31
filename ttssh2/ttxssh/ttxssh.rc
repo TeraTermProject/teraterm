@@ -611,6 +611,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_SECURETT            ICON                    "ttsecure.ico"
+IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
 IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
 
 /////////////////////////////////////////////////////////////////////////////

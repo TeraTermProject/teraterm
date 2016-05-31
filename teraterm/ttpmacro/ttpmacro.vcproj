@@ -257,6 +257,22 @@
 				>
 			</File>
 			<File
+				RelativePath="SFMT-common.h"
+				>
+			</File>
+			<File
+				RelativePath="SFMT-params.h"
+				>
+			</File>
+			<File
+				RelativePath="SFMT-params19937.h"
+				>
+			</File>
+			<File
+				RelativePath="SFMT.h"
+				>
+			</File>
+			<File
 				RelativePath="statdlg.h"
 				>
 			</File>
@@ -312,22 +328,6 @@
 				RelativePath="ttmparse.h"
 				>
 			</File>
-			<File
-				RelativePath="SFMT.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT-common.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT-params.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT-params19937.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -335,6 +335,10 @@
 			>
 			<File
 				RelativePath="Ttmacro.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\ttmacro_3d.ico"
 				>
 			</File>
 			<File
@@ -366,6 +370,10 @@
 			>
 			<File
 				RelativePath="..\common\i18n.c"
+				>
+			</File>
+			<File
+				RelativePath="SFMT.c"
 				>
 			</File>
 			<File
@@ -402,10 +410,6 @@
 			</File>
 			<File
 				RelativePath=".\wait4all.c"
-				>
-			</File>
-			<File
-				RelativePath="SFMT.c"
 				>
 			</File>
 		</Filter>

@@ -270,6 +270,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\teraterm_3d.ico"
+				>
+			</File>
+			<File
 				RelativePath="..\common\teraterm_classic.ico"
 				>
 			</File>
@@ -279,6 +283,10 @@
 			</File>
 			<File
 				RelativePath="..\common\vt.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\common\vt_3d.ico"
 				>
 			</File>
 			<File

@@ -451,6 +451,8 @@ IDI_VT                  ICON                    "..\\common\\vt.ico"
 IDI_TEK                 ICON                    "..\\common\\tek.ico"
 IDI_TTERM_CLASSIC       ICON                    "..\\common\\teraterm_classic.ico"
 IDI_VT_CLASSIC          ICON                    "..\\common\\vt_classic.ico"
+IDI_TTERM_3D            ICON                    "..\\common\\teraterm_3d.ico"
+IDI_VT_3D               ICON                    "..\\common\\vt_3d.ico"
 IDI_CYGTERM             ICON                    "..\\..\\cygterm\\cygterm.ico"
 
 /////////////////////////////////////////////////////////////////////////////

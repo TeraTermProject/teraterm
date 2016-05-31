@@ -220,27 +220,15 @@
 				>
 			</File>
 			<File
-				RelativePath="chacha_private.h"
-				>
-			</File>
-			<File
-				RelativePath="dns.h"
-				>
-			</File>
-			<File
-				RelativePath="resource.h"
-				>
-			</File>
-			<File
-				RelativePath="ttxssh.h"
-				>
-			</File>
-			<File
 				RelativePath="auth.h"
 				>
 			</File>
 			<File
 				RelativePath="buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="chacha_private.h"
 				>
 			</File>
 			<File
@@ -253,6 +241,10 @@
 			</File>
 			<File
 				RelativePath="crypt.h"
+				>
+			</File>
+			<File
+				RelativePath="dns.h"
 				>
 			</File>
 			<File
@@ -304,11 +296,19 @@
 				>
 			</File>
 			<File
+				RelativePath="resource.h"
+				>
+			</File>
+			<File
 				RelativePath="sftp.h"
 				>
 			</File>
 			<File
 				RelativePath="ssh.h"
+				>
+			</File>
+			<File
+				RelativePath="ttxssh.h"
 				>
 			</File>
 			<File
@@ -446,6 +446,10 @@
 			>
 			<File
 				RelativePath="ttsecure.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\ttsecure_green.ico"
 				>
 			</File>
 			<File

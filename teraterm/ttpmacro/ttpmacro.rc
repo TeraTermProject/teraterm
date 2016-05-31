@@ -188,6 +188,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_TTMACRO             ICON                    "ttmacro.ico"
+IDI_TTMACRO_3D          ICON                    "ttmacro_3d.ico"
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
