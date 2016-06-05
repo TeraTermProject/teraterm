@@ -1123,6 +1123,80 @@ BOOL myVerifyVersionInfo(
 #endif
 }
 
+ULONGLONG _myVerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask)
+{
+	ULONGLONG result, mask;
+	BYTE op = dwConditionMask & 0x07;
+
+	switch (dwTypeBitMask) {
+		case VER_MINORVERSION:
+			mask = 0x07 << (0 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (0 * 3);
+			break;
+		case VER_MAJORVERSION:
+			mask = 0x07 << (1 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (1 * 3);
+			break;
+		case VER_BUILDNUMBER:
+			mask = 0x07 << (2 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (2 * 3);
+			break;
+		case VER_PLATFORMID:
+			mask = 0x07 << (3 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (3 * 3);
+			break;
+		case VER_SERVICEPACKMINOR:
+			mask = 0x07 << (4 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (4 * 3);
+			break;
+		case VER_SERVICEPACKMAJOR:
+			mask = 0x07 << (5 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (5 * 3);
+			break;
+		case VER_SUITENAME:
+			mask = 0x07 << (6 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (6 * 3);
+			break;
+		case VER_PRODUCT_TYPE:
+			mask = 0x07 << (7 * 3);
+			result = dwlConditionMask & ~mask;
+			result |= op << (7 * 3);
+			break;
+	}
+
+	return result;
+}
+
+ULONGLONG myVerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask, BYTE dwConditionMask)
+{
+	typedef ULONGLONG(WINAPI *func)(ULONGLONG, DWORD, BYTE);
+	static HMODULE hmodKernel32 = NULL;
+	static func pVerSetConditionMask = NULL;
+	char kernel32_dll[MAX_PATH];
+
+	GetSystemDirectory(kernel32_dll, sizeof(kernel32_dll));
+	strncat_s(kernel32_dll, sizeof(kernel32_dll), "\\kernel32.dll", _TRUNCATE);
+	if (hmodKernel32 == NULL) {
+		hmodKernel32 = LoadLibrary(kernel32_dll);
+		if (hmodKernel32 != NULL) {
+			pVerSetConditionMask = (func)GetProcAddress(hmodKernel32, "VerSetConditionMask");
+		}
+	}
+
+	if (pVerSetConditionMask == NULL) {
+		return _myVerSetConditionMask(dwlConditionMask, dwTypeBitMask, dwConditionMask);
+	}
+
+	return pVerSetConditionMask(dwlConditionMask, dwTypeBitMask, dwConditionMask);
+}
+
 // OS‚ª Windows95 ‚©‚Ç‚¤‚©‚ð”»•Ê‚·‚éB
 //
 // return TRUE:  95
@@ -1139,9 +1213,9 @@ BOOL IsWindows95()
 	osvi.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
 	osvi.dwMajorVersion = 4;
 	osvi.dwMinorVersion = 0;
-	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
-	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MINORVERSION, op);
 	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
 	return (ret);
 }
@@ -1160,7 +1234,7 @@ BOOL IsWindowsNTKernel()
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
-	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
 	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID, dwlConditionMask);
 	return (ret);
 }
@@ -1188,8 +1262,8 @@ BOOL is_NT4()
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
 	osvi.dwMajorVersion = 4;
-	VER_SET_CONDITION(dwlConditionMask, VER_PLATFORMID, op);
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
 	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION, dwlConditionMask);
 	return (ret);
 }
@@ -1207,8 +1281,8 @@ BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	osvi.dwMajorVersion = dwMajorVersion;
 	osvi.dwMinorVersion = dwMinorVersion;
-	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, op);
-	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MINORVERSION, op);
 	ret = myVerifyVersionInfo(&osvi, VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
 	return (ret);
 }
