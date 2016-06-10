@@ -1,0 +1,114 @@
+if paramcnt <= 1 goto error
+
+;
+; params[] 未実装のバージョン用の params[] エミュレート
+;
+ifdefined params
+if result = 0 then
+	strdim params paramcnt+1
+
+	for i 1 paramcnt
+		sprintf2 cmd 'params[%d] = param%d' i i
+		execcmnd cmd
+	next
+endif
+
+testnum = 0
+
+for i 2 paramcnt
+	if testnum = 0 then
+		strmatch params[i] "test[1-9]"
+		if result then
+			testnum = i
+			break
+		endif
+	endif
+next
+
+if testnum then
+	sprintf2 cmd 'goto %s' params[testnum]
+	execcmnd cmd
+endif
+
+goto error
+
+
+:test1
+; ttpmacro.exe macrofile /vxx /ixx /v /i test1
+;
+; とりあえず以下のように解釈する事にする
+;   paramcnt: 4
+;   param2: /vxx
+;   param3: /ixx
+;   param4: test1
+;
+if paramcnt <> 4 goto error
+strcompare param2 "/vxx"
+if result <> 0 goto error
+strcompare param3 "/ixx"
+if result <> 0 goto error
+strcompare param4 "test1"
+if result <> 0 goto error
+
+goto end
+
+:test2
+; ttpmacro.exe macrofile /v /i test2
+;
+; paramcnt: 2
+; param2: test2
+;
+if paramcnt <> 2 goto error
+strcompare param2 "test2"
+if result <> 0 goto error
+
+goto end
+
+:test3
+; ttpmacro.exe macrofile test3 /vxx /ixx /v /i
+;
+; これも暫定で以下とする
+;   paramcnt: 4
+;   param2: test3
+;   param3: /vxx
+;   param4: /ixx
+;
+if paramcnt <> 4 goto error
+strcompare param2 "test3"
+if result <> 0 goto error
+strcompare param3 "/vxx"
+if result <> 0 goto error
+strcompare param4 "/ixx"
+if result <> 0 goto error
+
+goto end
+
+:test4
+; 未実装
+goto end
+
+:test5
+; 未実装
+goto end
+
+:test6
+; 未実装
+goto end
+
+:test7
+; 未実装
+goto end
+
+:test8
+; 未実装
+goto end
+
+:test9
+; 未実装
+goto end
+
+:error
+setexitcode 1
+
+:end
+end

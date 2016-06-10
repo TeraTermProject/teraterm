@@ -84,13 +84,13 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		if (_strnicmp(Temp,"/D=",3)==0) { // DDE option
 			strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);
 		}
-		else if (_strnicmp(Temp,"/I",2)==0) {
+		else if (_stricmp(Temp, "/I")==0) {
 			*IOption = TRUE;
 		}
-		else if (_strnicmp(Temp,"/S",2)==0) {
+		else if (_stricmp(Temp, "/S")==0) {
 			SleepFlag = TRUE;
 		}
-		else if (_strnicmp(Temp,"/V",2)==0) {
+		else if (_stricmp(Temp, "/V")==0) {
 			*VOption = TRUE;
 		}
 		else {
