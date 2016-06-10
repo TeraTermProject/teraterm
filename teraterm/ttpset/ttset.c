@@ -3758,7 +3758,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			else
 				ts->AutoWinClose = 0;
 		}
-		else if (_strnicmp(Temp, "/NAMEDPIPE", 10) == 0) {	/* 名前付きパイプ */
+		else if (_stricmp(Temp, "/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
 			ParamPort = IdNamedPipe;
 		}
 		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
