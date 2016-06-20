@@ -5014,7 +5014,7 @@ WORD TTLStrReplace()
 	ret = FindRegexStringOne(oldstr, oldlen, p, strlen(p));
 	// FindRegexStringOneの中でUnlockVar()されてしまうので、LockVar()しなおす。
 	LockVar();
-	if (ret == 0) {
+	if (ret <= 0) {
 		// 見つからなかった場合は、"0"で戻る。
 		result = 0;
 		goto error;
