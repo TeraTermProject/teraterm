@@ -3,7 +3,7 @@
 BINDIR = $(HOME)/bin
 
 CC = gcc
-CFLAGS = -O2 -fno-exceptions
+CFLAGS = -D_GNU_SOURCE -O2 -fno-exceptions
 #CFLAGS = -g -fno-exceptions
 LDFLAGS = -mwindows
 
