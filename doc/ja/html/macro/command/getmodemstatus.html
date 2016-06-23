@@ -54,7 +54,7 @@ getmodemstatus val
 if result=0 then
   sprintf2 str "val = %d(%x)" val val
   messagebox str "Result value"
-  if val & 2 > 0 then
+  if val &amp; 2 &gt; 0 then
     ; DSRM†‚ªƒIƒ“‚Ìˆ—
     messagebox "DSR on" "Message"
   endif
@@ -65,10 +65,11 @@ endif
 
 
 <h2>QÆ</h2>
-
-<a href="setbaud.html">setbaud</a><br>
-<a href="setdtr.html">setdtr</a><br>
-<a href="setrts.html">setrts</a><br>
+<ul>
+  <li><a href="setbaud.html">setbaud</a></li>
+  <li><a href="setdtr.html">setdtr</a></li>
+  <li><a href="setrts.html">setrts</a></li>
+</ul>
 
 </body>
 </html>

@@ -310,11 +310,11 @@ pattern="à"
 
 regexoption "IGNORECASE"
 strmatch string pattern
-messagebox result "ASCII"        ; result -> 0 (Not Match)
+messagebox result "ASCII"        ; result -&gt; 0 (Not Match)
 
 regexoption "ISO_8859_1" "IGNORECASE"
 strmatch string pattern
-messagebox result "ISO_8859_1"   ; result -> 6 (Match)
+messagebox result "ISO_8859_1"   ; result -&gt; 6 (Match)
 </pre>
 
 <pre class="macro-example">
@@ -334,9 +334,9 @@ messagebox msg "IGNORECASE + ASIS"   ; result=6, matchstr="(PaTTerN)"
 
 <h2>See also</h2>
 <ul>
-<li><a href="strmatch.html">strmatch</a></li>
-<li><a href="strreplace.html">strreplace</a></li>
-<li><a href="waitregex.html">waitregex</a></li>
+  <li><a href="strmatch.html">strmatch</a></li>
+  <li><a href="strreplace.html">strreplace</a></li>
+  <li><a href="waitregex.html">waitregex</a></li>
 </ul>
 
 </body>

@@ -56,7 +56,7 @@ dispstr #$1b"[8;24;80t"
 ; demo
 for y 24 30
   x = 80
-  while x < 100
+  while x &lt; 100
     sprintf #$1b"[8;%d;%dt" y x
     dispstr inputstr
     x = x + 5

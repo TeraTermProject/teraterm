@@ -46,11 +46,11 @@ static unsigned int crc16(int n, unsigned char c[])
 	unsigned long r;
 
 	r = 0xFFFFU;
-	for (i = 0; i < n; i++) {
+	for (i = 0; i &lt; n; i++) {
 		r ^= c[i];
-		for (j = 0; j < CHAR_BIT; j++)
-			if (r & 1) r = (r >> 1) ^ CRC16POLY2;
-			else       r >>= 1;
+		for (j = 0; j &lt; CHAR_BIT; j++)
+			if (r &amp; 1) r = (r &gt;&gt; 1) ^ CRC16POLY2;
+			else       r &gt;&gt;= 1;
 	}
 	return r ^ 0xFFFFU;
 }

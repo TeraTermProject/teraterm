@@ -55,7 +55,7 @@ end
 :dec2base
 basenum=''
 tmp=decnum      ;modified so not destructive of decnum
-while tmp>0
+while tmp &gt; 0
    strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
    strconcat basedig basenum
    basenum=basedig
@@ -71,7 +71,7 @@ for i 1 len
    strcopy basenum i 1 basedig
    decnum=decnum*base
    strscan '0123456789ABCDEFabcdef' basedig
-   if result>16 result=result-6      ;take care of lower case
+   if result&gt;16 result=result-6      ;take care of lower case
    decnum=decnum+result-1
 next
 return
@@ -82,21 +82,21 @@ return
 ; IPアドレスのネットワークアドレスとサブネットマスクを求める
 ip='192.168.1.189'
 sn='255.255.255.248'
-bits=0          ;calculate bits & first address in sn
+bits=0          ;calculate bits &amp; first address in sn
 bitstr='000 128 192 224 240 248 252 254 255'    ;lookup table for # bits
 do
     str2int isn sn
     int2str stmp isn
     strscan bitstr stmp     ;use lookup table to find bits
-    bits=bits+(result-1)/4  
+    bits=bits+(result-1)/4
     str2int tmp ip      ;find net by bitwise AND of ip and mask
-    sprintf2 net '%s%d' net tmp&isn
+    sprintf2 net '%s%d' net tmp&amp;isn
     strscan sn '.'
     strcopy sn result+1 999 sn
     strscan ip '.'
     strcopy ip result+1 999 ip
-    if result>0 strconcat net '.'           
-loop while result>0
+    if result&gt;0 strconcat net '.'
+loop while result&gt;0
 messagebox bits 'bits'
 messagebox net 'net'
 </pre>
