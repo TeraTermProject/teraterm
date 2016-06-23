@@ -31,8 +31,8 @@ If the &lt;newstr&gt; is ''(empty), the &lt;regex&gt; string is removed from &lt
 </p>
 
 <p>
-When the replacing succeeds, the result variable is 1 and the matched string by the &lt;regex&gt; is stored into the matchstr variable. <br>
-When the replacing fails, the result variable is 0.
+When the replacing succeeds, the system variable "result" is set to 1 and the matched string by the &lt;regex&gt; is stored into the system variable "matchstr". <br>
+When the replacing fails, the system variable "result" is set to 0.
 </p>
 
 <p>
@@ -40,7 +40,7 @@ When a user searches the multi-byte string like as Japanese, the user must confi
 </p>
 
 <p>
-NOTE: When this macro command is performed, the groupmatchstr system variable is cleared.
+NOTE: When this macro command is performed, the 9 system variables from "groupmatchstr1" to "groupmatchstr9" are cleared.
 </p>
 
 <h2>Example</h2>

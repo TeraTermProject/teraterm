@@ -26,7 +26,7 @@ strsplit &lt;strval&gt; &lt;separator&gt; [&lt;count&gt;]
 <h2>解説</h2>
 
 <p>
-文字列 &lt;strval&gt; から、区切り記号 &lt;separator&gt; で区切られた部分文字列を取り出して、groupmatchstr1～groupmatchstr9に返す。
+文字列 &lt;strval&gt; から、区切り記号 &lt;separator&gt; で区切られた部分文字列を取り出して、システム変数 groupmatchstr1 ～ groupmatchstr9 に返す。
 </p>
 
 <p>
@@ -35,8 +35,8 @@ strsplit &lt;strval&gt; &lt;separator&gt; [&lt;count&gt;]
 
 <p>
 &lt;count&gt; には、取得する部分文字列の最大数（9以下）を指定する。 <br>
-文字列中の部分文字列の数が &lt;count&gt; 未満であるとき、部分文字列が代入されなかったgroupmatchstrには、""(空文字列) が代入される。<br>
-文字列中の部分文字列の数が &lt;count&gt; を超えるとき、最後のgroupmatchstrには残りの文字列がすべて代入される。
+文字列中の部分文字列の数が &lt;count&gt; 未満であるとき、部分文字列が代入されなかった groupmatchstr には、""(空文字列) が代入される。<br>
+文字列中の部分文字列の数が &lt;count&gt; を超えるとき、最後の groupmatchstr には残りの文字列がすべて代入される。
 </p>
 
 <p>
