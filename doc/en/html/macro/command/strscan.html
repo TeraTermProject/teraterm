@@ -55,7 +55,7 @@ end
 :dec2base
 basenum=''
 tmp=decnum      ;modified so not destructive of decnum
-while tmp&gt;0
+while tmp &gt; 0
    strcopy '0123456789ABCDEF' (tmp%base)+1 1 basedig
    strconcat basedig basenum
    basenum=basedig
@@ -100,7 +100,6 @@ loop while result&gt;0
 messagebox bits 'bits'
 messagebox net 'net'
 </pre>
-
 
 
 </body>

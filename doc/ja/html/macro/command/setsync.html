@@ -43,15 +43,12 @@ MACRO は初期状態が「非同期モード」である。このモードでは、受信文字を処理するコマ
 複数行にわたる受信した文字を、一文字も失うことなく処理する、というような信頼性が要求されるマクロ処理の場合、同期モードに入る必要がある。<br>
 しかし、同期モードでは Tera Term の文字受信速度が遅くなり、また受信文字を処理するコマンドが長い間実行されない場合は、Tera Term の文字受信が停止したままになってしまう。<br>
 一方、単純なマクロ処理(例えば自動ログイン)ならば非同期モードでもほとんど問題なく動作する。この場合、バッファサイズは十分大きく(16Kバイト)、受信したすべての文字はバッファがあふれる前にコマンドによって処理される。
-<p>
+</p>
 
 <div align="center">
 <img src="image/setsync.png" width=720 height=540>
 </div>
 
-<p>
-バッファのクリアについては "<a href="flushrecv.html">flushrecv</a>" を参照。
-</p>
 
 <h2>例</h2>
 
@@ -71,9 +68,9 @@ end
 
 <pre class="macro-example">
 connect '/C=1'
- 
-setsync 1 
- 
+
+setsync 1
+
 while 1
   ; Request data
   sendln  'REQ'
@@ -84,6 +81,13 @@ while 1
   flushrecv
 endwhile
 </pre>
+
+
+<h2>参照</h2>
+<ul>
+  <li><a href="flushrecv.html">flushrecv</a></li>
+</ul>
+
 
 </body>
 </html>
