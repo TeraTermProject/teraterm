@@ -132,7 +132,7 @@ cvvis=\E[?12;25h
       If a user want to blink the cursor, turn off the CursorCtrlSequence entry or do in the following commands:
 
 <pre>
-% infocmp xterm > xterm.ti
+% infocmp xterm &gt; xterm.ti
 Open the xterm.ti file, change from a value of cnorm and cvvis to \E?25h.
 % tic -o ~/.terminfo xterm.ti
 Execute the tic command.
@@ -304,8 +304,8 @@ ClearType       = Use the ClearType.
 	Specify default log file name. It can include a format of strftime.
 <pre>
 SYNOPSIS:
-&h      Host name(or empty when not connecting)
-&p      TCP port number(or empty when not connecting, not TCP connection)
+&amp;h      Host name(or empty when not connecting)
+&amp;p      TCP port number(or empty when not connecting, not TCP connection)
 %a      Abbreviated weekday name
 %A      Full weekday name
 %b      Abbreviated month name

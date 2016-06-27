@@ -132,7 +132,7 @@ cvvis=\E[?12;25h
       対応としては、カーソルの点滅制御を無視する為に CursorCtrlSequence を off に設定するか、カーソル表示状態変更時に点滅状態を変更しないように以下の手順をホスト側で実施してください。
 
 <pre>
-% infocmp xterm > xterm.ti
+% infocmp xterm &gt; xterm.ti
 生成されたxterm.tiを編集し、cnorm, cvvisの値を \E?25h に変更する
 % tic -o ~/.terminfo xterm.ti
 システム全体に反映させるためには root で以下を実行
@@ -301,8 +301,8 @@ ClearType       = ClearTypeを利用する
 	標準のログファイル名を指定します。strftime の書式が使用できます。
 <pre>
 書式:
-&h      ホスト名。未接続の場合は空。
-&p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
+&amp;h      ホスト名。未接続の場合は空。
+&amp;p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
 %a      曜日の省略形。
 %A      曜日の正式名。
 %b      月の省略形。
