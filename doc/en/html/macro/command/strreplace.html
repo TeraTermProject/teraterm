@@ -34,6 +34,12 @@ If the &lt;newstr&gt; is ''(empty), the &lt;regex&gt; string is removed from &lt
 When the replacing succeeds, the system variable "result" is set to 1 and the matched string by the &lt;regex&gt; is stored into the system variable "matchstr". <br>
 When the replacing fails, the system variable "result" is set to 0.
 </p>
+<!-- p>
+置換が成功すると、システム変数 result に "1" が格納され、正規表現 &lt;regex&gt; でマッチした文字列はシステム変数 matchs
+tr に格納される。<br>
+&lt;regex&gt; が &lt;strvar&gt; の内容にマッチせず置換が行われなかった場合は、result に "0" が格納される。<br>
+&lt;regex&gt; の書式が正しくない等でエラーとなった場合は、result に "-1" が格納される。
+</p -->
 
 <p>
 When a user searches the multi-byte string like as Japanese, the user must configure the regular encoding by using the <a href="regexoption.html">regexoption</a> previously.

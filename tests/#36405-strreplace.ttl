@@ -1,0 +1,62 @@
+error_count = 0
+
+orgstr = "1234[test]1234"
+str = orgstr
+
+; "[" は正規表現として正しくないのでエラーとなるべき
+strreplace str 1 "[" "("
+repl_result = result
+
+strcompare str orgstr
+compare_result = result
+
+if repl_result == 1 then
+	; 置換成功 -- 正しくない動作
+	error_count = error_count + 1
+	msg =  "エラーとなるべき検索条件でエラーになりませんでした"
+	if compare_result <> 0 then
+		; 文字列が壊された
+		error_count = error_count + 1
+		strconcat msg #13#10"元文字列も壊れています"
+	endif
+	messagebox msg "エラー"
+
+elseif repl_result == 0 then
+	; not found (暫定修正時の動作)
+	error_count = error_count + 1
+	msg = "検索結果が not found となりました"
+	if compare_result <> 0 then
+		; 文字列が壊された
+		error_count = error_count + 1
+		strconcat msg #13#10"元文字列も壊れています"
+	endif
+	messagebox msg "エラー"
+
+elseif repl_result == -1 then
+	; strreplace がエラーとなった -- 正しい動作
+	if compare_result <> 0 then
+		; 文字列が壊された
+		error_count = error_count + 1
+		messagebox "文字列が壊れています" "エラー"
+	endif
+else
+	; strreplace の result が異常
+	error_count = error_count + 1
+	sprintf2 msg "strreplaceの返り値が異常です(%d)" repl_result
+	if compare_result <> 0 then
+		; 文字列が壊された
+		error_count = error_count + 1
+		strconcat msg #13#10"元文字列も壊れています"
+	endif
+	messagebox msg "エラー"
+endif
+
+if error_count == 0 then
+	messagebox "正常終了" "結果"
+else
+	sprintf2 msg "%d 件のエラーが発生しました" error_count
+	messagebox msg "結果"
+	setexitcode 1
+endif
+
+end
