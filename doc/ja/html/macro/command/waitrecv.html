@@ -29,6 +29,7 @@ waitrecv &lt;sub-string&gt; &lt;len&gt; &lt;pos&gt;
 
 <p>
 その条件とは、文字列の長さが &lt;len&gt; 文字で、文字列がその &lt;pos&gt; 文字目（1オリジン）から始まる副文字列 &lt;sub-string&gt; を含んでいるということ。<br>
+コマンドは &lt;len&gt; バイトの文字列を受信するたびに、条件を満たすかどうかを確認する。<br>
 例えば、&lt;sub-string&gt; が "def"、&lt;len&gt; が 9 、&lt;pos&gt; が 4 のとき、文字列 "abcdefghi" は条件を満たす。
 </p>
 
