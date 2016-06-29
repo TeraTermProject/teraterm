@@ -916,8 +916,6 @@ int CVTWindow::Parse()
 void CVTWindow::ButtonUp(BOOL Paste)
 {
 	BOOL disableBuffEndSelect = false;
-	BOOL pasteRButton = RButton && Paste;
-	BOOL pasteMButton = MButton && Paste;
 
 	/* disable autoscrolling */
 	::KillTimer(HVTWin,IdScrollTimer);
@@ -942,22 +940,9 @@ void CVTWindow::ButtonUp(BOOL Paste)
 		BuffEndSelect();
 	}
 
-	// added ConfirmPasteMouseRButton (2007.3.17 maya)
-	if (pasteRButton && !ts.ConfirmPasteMouseRButton) {
+	if (Paste) {
 		if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
 			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
-			/* 最下行でだけ自動スクロールする設定の場合
-			   ペースト処理でスクロールさせる */
-			if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
-				DispVScroll(SCROLL_BOTTOM, 0);
-			}
-		}
-	}
-	else if (pasteMButton) {
-		if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
-			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
-			/* 最下行でだけ自動スクロールする設定の場合
-			   ペースト処理でスクロールさせる */
 			if (ts.AutoScrollOnlyInBottomLine != 0 && WinOrgY != 0) {
 				DispVScroll(SCROLL_BOTTOM, 0);
 			}
@@ -2547,8 +2532,14 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	// 右ボタン押下でのペーストを禁止する (2005.3.16 yutaka)
-	if (ts.DisablePasteMouseRButton || mousereport) {
+	/*
+	 *  ペースト条件:
+	 *  ・ts.DisableMouseRButton      -> 右ボタンによるペースト無効
+	 *  ・ts.ConfirmPasteMouseRButton -> 表示されたメニューからペーストを行うので、
+	 *                                   右ボタンアップによるペーストは行わない
+	 *  ・mousereport                 -> マウストラッキング中はペーストを行わない
+	 */
+	if (ts.DisablePasteMouseRButton || ts.ConfirmPasteMouseRButton || mousereport) {
 		ButtonUp(FALSE);
 	} else {
 		ButtonUp(TRUE);
