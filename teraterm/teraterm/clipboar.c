@@ -563,6 +563,55 @@ void CBEndPaste()
 	CBInsertDelay = FALSE;
 }
 
+BOOL CBSetClipboard(HWND owner, HGLOBAL hMem)
+{
+	char *buf;
+	int wide_len;
+	HGLOBAL wide_hMem;
+	LPWSTR wide_buf;
+
+	if (OpenClipboard(owner) == 0)
+		return FALSE;
+
+	buf = GlobalLock(hMem);
+
+	wide_len = MultiByteToWideChar(CP_ACP, 0, buf, -1, NULL, 0);
+	wide_hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
+	if (wide_hMem) {
+		wide_buf = (LPWSTR)GlobalLock(wide_hMem);
+		MultiByteToWideChar(CP_ACP, 0, buf, -1, wide_buf, wide_len);
+		GlobalUnlock(wide_hMem);
+	}
+
+	GlobalUnlock(hMem);
+
+	EmptyClipboard();
+	SetClipboardData(CF_TEXT, hMem);
+	if (wide_buf) {
+		SetClipboardData(CF_UNICODETEXT, wide_hMem);
+	}
+	CloseClipboard();
+
+	return TRUE;
+}
+
+HGLOBAL CBAllocClipboardMem(char *text)
+{
+	HGLOBAL hMem;
+	char *buf;
+	int len;
+
+	len = strlen(text);
+
+	hMem = GlobalAlloc(GMEM_MOVEABLE, len+1);
+	if (hMem) {
+		buf = GlobalLock(hMem);
+		strncpy_s(buf, len+1, text, _TRUNCATE);
+		GlobalUnlock(hMem);
+	}
+
+	return hMem;
+}
 
 static char *ClipboardPtr = NULL;
 static int PasteCanceled = 0;
@@ -694,31 +743,18 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 					int len = SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXTLENGTH, 0, 0);
 					HGLOBAL hMem;
 					char *buf;
-					int wide_len;
-					HGLOBAL wide_hMem;
-					LPWSTR wide_buf;
 
-					if (OpenClipboard(hDlgWnd) != 0) {
-						hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
+					hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
+					if (hMem) {
 						buf = GlobalLock(hMem);
 						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, len + 1, (LPARAM)buf);
-						wide_len = MultiByteToWideChar(CP_ACP, 0, buf, -1, NULL, 0);
-						wide_hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
-						if (wide_hMem) {
-							wide_buf = (LPWSTR)GlobalLock(wide_hMem);
-							MultiByteToWideChar(CP_ACP, 0, buf, -1, wide_buf, wide_len);
-							GlobalUnlock(wide_hMem);
-						}
-
 						GlobalUnlock(hMem);
 
-						EmptyClipboard();
-						SetClipboardData(CF_TEXT, hMem);
-						if (wide_buf) {
-							SetClipboardData(CF_UNICODETEXT, wide_hMem);
+						if (! CBSetClipboard(hDlgWnd, hMem)) {
+							// クリップボードへのセットが失敗した時は hMem を破棄する
+							// 成功した場合はクリップボードが所持しているので、破棄してはいけない
+							GlobalFree(hMem);
 						}
-						CloseClipboard();
-						// hMemはクリップボードが保持しているので、破棄してはいけない。
 					}
 
 					if (DlgClipboardFont != NULL) {
@@ -865,15 +901,15 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 {
 	UINT Cf;
 	HANDLE hText;
-	char *pText;
+	char *pText, *tail;
 	int pos;
 	int ret = 0;
-	BOOL confirm = FALSE;
+	BOOL confirm = FALSE, need_writeback = FALSE;
 	HANDLE wide_hText;
 	LPWSTR wide_buf;
 	int mb_len;
 
-	if (ts.ConfirmChangePaste == 0)
+	if (!ts.ConfirmChangePaste && !ts.TrimTrailingNLonPaste)
 		return 1;
 
 	if (! cv.Ready) 
@@ -922,6 +958,18 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	}
 	CloseClipboard();
 
+	if (ts.TrimTrailingNLonPaste) {
+		for (tail=ClipboardPtr+strlen(ClipboardPtr)-1; tail >= ClipboardPtr; tail--) {
+			if (*tail == '\r' || *tail == '\n') {
+				*tail = '\0';
+				need_writeback = TRUE;
+			}
+			else {
+				break;
+			}
+		}
+	}
+
 	if (AddCR) {
 		if (ts.ConfirmChangePasteCR) {
 			confirm = TRUE;
@@ -950,6 +998,17 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 		if (PasteCanceled) {
 			ret = 0;
 			goto error;
+		}
+	}
+	else if (need_writeback) {
+		HGLOBAL hMem;
+		hMem = CBAllocClipboardMem(ClipboardPtr);
+		if (hMem) {
+			if (! CBSetClipboard(NULL, hMem)) {
+				// クリップボードへのセットが失敗した時は hMem を破棄する
+				// 成功した場合はクリップボードが所持しているので、破棄してはいけない
+				GlobalFree(hMem);
+			}
 		}
 	}
 

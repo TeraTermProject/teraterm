@@ -489,6 +489,7 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_CONFIRM_PASTE_RBUTTON, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_DISABLE_PASTE_MBUTTON, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_SELECT_LBUTTON, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TRIMNLCHAR, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CONFIRM_CHANGE_PASTE, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CONFIRM_STRING_FILE_LABEL, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CONFIRM_STRING_FILE, WM_SETFONT, (WPARAM)DlgCopypasteFont, MAKELPARAM(TRUE,0));
@@ -518,6 +519,9 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_SELECT_LBUTTON, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_SELECTLBUTTON", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_SELECT_LBUTTON, ts.UIMsg);
+	GetDlgItemText(IDC_TRIMNLCHAR, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_COPYPASTE_TRIM_TRAILING_NL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TRIMNLCHAR, ts.UIMsg);
 	GetDlgItemText(IDC_CONFIRM_CHANGE_PASTE, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CONFIRM_CHANGE_PASTE, ts.UIMsg);
@@ -559,7 +563,11 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	btn = (CButton *)GetDlgItem(IDC_SELECT_LBUTTON);
 	btn->SetCheck(ts.SelectOnlyByLButton);
 
-	// (6)ConfirmChangePaste 
+	// (6)TrimTrailingNLonPaste
+	btn = (CButton *)GetDlgItem(IDC_TRIMNLCHAR);
+	btn->SetCheck(ts.TrimTrailingNLonPaste);
+
+	// (7)ConfirmChangePaste 
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
 	btn->SetCheck(ts.ConfirmChangePaste);
 
@@ -575,10 +583,10 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 		btn->EnableWindow(FALSE);
 	}
 
-	// (7)delimiter characters
+	// (8)delimiter characters
 	SetDlgItemText(IDC_DELIM_LIST, ts.DelimList);
 
-	// (8)PasteDelayPerLine
+	// (9)PasteDelayPerLine
 	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
 	SetDlgItemText(IDC_PASTEDELAY_EDIT, buf);
 
@@ -670,15 +678,19 @@ void CCopypastePropPageDlg::OnOK()
 	btn = (CButton *)GetDlgItem(IDC_SELECT_LBUTTON);
 	ts.SelectOnlyByLButton = btn->GetCheck();
 
-	// (6)IDC_CONFIRM_CHANGE_PASTE
+	// (6)
+	btn = (CButton *)GetDlgItem(IDC_TRIMNLCHAR);
+	ts.TrimTrailingNLonPaste = btn->GetCheck();
+
+	// (7)IDC_CONFIRM_CHANGE_PASTE
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
 	ts.ConfirmChangePaste = btn->GetCheck();
 	GetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
 
-	// (7)
+	// (8)
 	GetDlgItemText(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
 
-	// (8)
+	// (9)
 	GetDlgItemText(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
 	val = atoi(buf);
 	ts.PasteDelayPerLine = min(max(0, val), 5000);

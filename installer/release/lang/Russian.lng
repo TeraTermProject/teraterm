@@ -202,6 +202,7 @@ DLG_TAB_COPYPASTE_MOUSEPASTE=&Отключить вставку правой кнопкой мыши
 DLG_TAB_COPYPASTE_CONFIRMPASTE=&Разрешить вставку правой кнопкой мыши
 DLG_TAB_COPYPASTE_MOUSEPASTEM=&Отключить вставку средней кнопкой мыши
 DLG_TAB_COPYPASTE_SELECTLBUTTON=&Использовать только левую кнопку мыши
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=&Разрешить вставку изменения
 DLG_TAB_CONFIRM_STRING_FILE=&Текстовый файл
 DLG_TAB_COPYPASTE_DELIMITER=&Разделитель символов

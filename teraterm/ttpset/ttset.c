@@ -1922,6 +1922,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (ts->ZmodemTimeOutFin < 1)
 		ts->ZmodemTimeOutFin = 1;
 
+	// Trim trailing new line character when pasting
+	ts->TrimTrailingNLonPaste =
+		GetOnOff(Section, "TrimTrailingNLonPaste", FName, FALSE);
+
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
 }
@@ -3179,6 +3183,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		ts->ZmodemTimeOutFin
 		);
 	WritePrivateProfileString(Section, "ZmodemTimeouts", Temp, FName);
+
+	// Trim trailing new line character when pasting
+	WriteOnOff(Section, "TrimTrailingNLonPaste", FName, ts->TrimTrailingNLonPaste);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
