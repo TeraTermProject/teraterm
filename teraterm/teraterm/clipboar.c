@@ -702,8 +702,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 						hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
 						buf = GlobalLock(hMem);
 						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, len + 1, (LPARAM)buf);
-						GlobalUnlock(hMem);
-
 						wide_len = MultiByteToWideChar(CP_ACP, 0, buf, -1, NULL, 0);
 						wide_hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
 						if (wide_hMem) {
@@ -711,6 +709,8 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 							MultiByteToWideChar(CP_ACP, 0, buf, -1, wide_buf, wide_len);
 							GlobalUnlock(wide_hMem);
 						}
+
+						GlobalUnlock(hMem);
 
 						EmptyClipboard();
 						SetClipboardData(CF_TEXT, hMem);
