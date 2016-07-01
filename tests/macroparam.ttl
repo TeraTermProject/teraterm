@@ -30,61 +30,98 @@ if testnum then
 	execcmnd cmd
 endif
 
+
 goto error
 
 
 :test1
-; ttpmacro.exe macrofile /vxx /ixx /v /i test1
+; ttpmacro.exe macrofile /vxx /ixx /V /i test1
 ;
-; ‚Æ‚è‚ ‚¦‚¸ˆÈ‰º‚Ì‚æ‚¤‚É‰ðŽß‚·‚éŽ–‚É‚·‚é
-;   paramcnt: 4
+; ˆÈ‰º‚Ì‚æ‚¤‚É‰ðŽß‚·‚éŽ–‚É‚·‚é
+;   paramcnt: 6
 ;   param2: /vxx
 ;   param3: /ixx
-;   param4: test1
+;   param4: /V
+;   param5: /i
+;   param6: test1
 ;
-if paramcnt <> 4 goto error
+if paramcnt <> 6 goto error
 strcompare param2 "/vxx"
 if result <> 0 goto error
 strcompare param3 "/ixx"
 if result <> 0 goto error
-strcompare param4 "test1"
+strcompare param4 "/V"
+if result <> 0 goto error
+strcompare param5 "/i"
+if result <> 0 goto error
+strcompare param6 "test1"
 if result <> 0 goto error
 
 goto end
 
 :test2
-; ttpmacro.exe macrofile /v /i test2
+; ttpmacro.exe /V /i macrofile /v /I test2
 ;
-; paramcnt: 2
-; param2: test2
+; paramcnt: 4
+; param2: /v
+; param3: /I
+; param4: test2
 ;
-if paramcnt <> 2 goto error
-strcompare param2 "test2"
+if paramcnt <> 4 goto error
+strcompare param2 "/v"
+if result <> 0 goto error
+strcompare param3 "/I"
+if result <> 0 goto error
+strcompare param4 "test2"
 if result <> 0 goto error
 
 goto end
 
 :test3
-; ttpmacro.exe macrofile test3 /vxx /ixx /v /i
+; ttpmacro.exe /I macrofile test3 /Vxx /ixx /V /i
 ;
-; ‚±‚ê‚àŽb’è‚ÅˆÈ‰º‚Æ‚·‚é
-;   paramcnt: 4
+; ˆÈ‰º‚Ì‰ðŽß‚Æ‚·‚é
+;   paramcnt: 6
 ;   param2: test3
-;   param3: /vxx
+;   param3: /Vxx
 ;   param4: /ixx
+;   param5: /V
+;   param6: /i
 ;
-if paramcnt <> 4 goto error
+if paramcnt <> 6 goto error
 strcompare param2 "test3"
 if result <> 0 goto error
-strcompare param3 "/vxx"
+strcompare param3 "/Vxx"
 if result <> 0 goto error
 strcompare param4 "/ixx"
+if result <> 0 goto error
+strcompare param5 "/V"
+if result <> 0 goto error
+strcompare param6 "/i"
 if result <> 0 goto error
 
 goto end
 
 :test4
-; –¢ŽÀ‘•
+; ttpmacro.exe /i macrofile test4 /V /Vxx /ixx
+;
+; ˆÈ‰º‚Ì‰ðŽß‚Æ‚·‚é
+;   paramcnt: 5
+;   param2: test4
+;   param3: /V
+;   param4: /Vxx
+;   param5: /ixx
+;
+if paramcnt <> 5 goto error
+strcompare param2 "test4"
+if result <> 0 goto error
+strcompare param3 "/V"
+if result <> 0 goto error
+strcompare param4 "/Vxx"
+if result <> 0 goto error
+strcompare param5 "/ixx"
+if result <> 0 goto error
+
 goto end
 
 :test5
