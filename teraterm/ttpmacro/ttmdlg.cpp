@@ -45,7 +45,7 @@ static PStatDlg StatDlg = NULL;
 extern "C" {
 void ParseParam(PBOOL IOption, PBOOL VOption)
 {
-	int i, j, k;
+	int dirlen, fnpos;
 	char *Param;
 	char Temp[MaxStrLen];
 	PCHAR start, cur, next;
@@ -121,13 +121,13 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 		FileName[0] = 0;
 	}
 	else if (FileName[0]!=0) {
-		if (GetFileNamePos(FileName,&j,&k)) {
-			FitFileName(&FileName[k],sizeof(FileName)-k,".TTL");
-			strncpy_s(ShortName, sizeof(ShortName),&FileName[k], _TRUNCATE);
-			if (j==0) {
-				strncpy_s(FileName, sizeof(FileName),HomeDir, _TRUNCATE);
-				AppendSlash(FileName,sizeof(FileName));
-				strncat_s(FileName,sizeof(FileName),ShortName,_TRUNCATE);
+		if (GetFileNamePos(FileName, &dirlen, &fnpos)) {
+			FitFileName(&FileName[fnpos], sizeof(FileName) - fnpos, ".TTL");
+			strncpy_s(ShortName, sizeof(ShortName), &FileName[fnpos], _TRUNCATE);
+			if (dirlen==0) {
+				strncpy_s(FileName, sizeof(FileName), HomeDir, _TRUNCATE);
+				AppendSlash(FileName, sizeof(FileName));
+				strncat_s(FileName, sizeof(FileName), ShortName, _TRUNCATE);
 			}
 		}
 		else {
