@@ -26,7 +26,7 @@
 
       <dt id="AcceptBroadcast">Accept broadcast</dt>
       <dd>
-	<a href="./control-broadcast.html">ブロードキャストコマンド</a>を受け入れます。<br>
+	<a href="control-broadcast.html">ブロードキャストコマンド</a>を受け入れます。<br>
 	この設定は "Realtime mode" が off のブロードキャスト送信に対して有効です。"Realtime mode" が on のブロードキャスト送信は、この設定値にかかわらず受信されます。
       </dd>
 
@@ -47,7 +47,7 @@
 
       <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
       <dd>
-        IMEがonの時に、カーソルを網掛けにするか設定します。
+	IMEがonの時に、カーソルを網掛けにするか設定します。
       </dd>
 
     </dl>
@@ -57,60 +57,62 @@
     <dl>
       <dt id="MouseEventTracking">Accept mouse event tracking</dt>
       <dd>
-        ホスト側のアプリケーションによって、VT window がマウストラッキングモードに変更された場合、Tera Term はマウス操作をホストへ報告するようになります。<br>
-        マウストラッキングモードはxtermの拡張機能ですので、TERM環境変数が"xterm"以外だとホスト側のアプリケーションはこの機能を使わないかもしれません。
+	ホスト側のアプリケーションによって、VT window がマウストラッキングモードに変更された場合、Tera Term はマウス操作をホストへ報告するようになります。<br>
+	マウストラッキングモードはxtermの拡張機能ですので、TERM環境変数が"xterm"以外だとホスト側のアプリケーションはこの機能を使わないかもしれません。
       </dd>
 
       <dt id="DisableMouseTrackingByCtrl">Disable mouse event tracking when Control is pressed</dt>
       <dd>
-        マウストラッキングモード時、Controlキーが押されている間はマウス操作を通知しないようにします。
+	マウストラッキングモード時、Controlキーが押されている間はマウス操作を通知しないようにします。
       </dd>
 
       <dt id="AcceptTitleChangeRequest">Accept window title change request</dt>
       <dd>
-        リモートからのウィンドウタイトル変更要求を受け入れるかを設定します。
-        <dl>
-          <dt>off</dt>
-          <dd>受け入れない</dd>
-          <dt>overwrite</dt>
-          <dd>受け入れ、リモートからのウインドウタイトルのみを表示する</dd>
-          <dt>ahead</dt>
-          <dd>受け入れ、リモートからのウインドウタイトルを標準のタイトルの前に追加する</dd>
-          <dt>last</dt>
-          <dd>受け入れ、リモートからのウインドウタイトルを標準のタイトルの後ろに追加する</dd>
-        </dl>
+	リモートからのウィンドウタイトル変更要求を受け入れるかを設定します。
+	<dl>
+	  <dt>off</dt>
+	  <dd>受け入れない</dd>
+	  <dt>overwrite</dt>
+	  <dd>受け入れ、リモートからのウインドウタイトルのみを表示する</dd>
+	  <dt>ahead</dt>
+	  <dd>受け入れ、リモートからのウインドウタイトルを標準のタイトルの前に追加する</dd>
+	  <dt>last</dt>
+	  <dd>受け入れ、リモートからのウインドウタイトルを標準のタイトルの後ろに追加する</dd>
+	</dl>
       </dd>
 
       <dt id="TitleReportSequence">Window title report</dt>
       <dd>
-        dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。
-        <dl>
-          <dt>ignore</dt>
-          <dd>報告要求に対して何も応答しないようにする</dd>
-          <dt>accept</dt>
-          <dd>現在のウィンドウタイトルを報告する。ただし、現在の現在のウィンドウタイトルを報告するのはセキュリティ上危険ですので、本当に必要な時のみこの設定を行うようにしてください。</dd>
-          <dt>empty</dt>
-          <dd>ウィンドウタイトルは空だと報告する</dd>
-        </dl>
+	dtterm のウィンドウタイトルおよびアイコンラベル報告要求に対して、どのように応答するかを変更できます。
+	<dl>
+	  <dt>ignore</dt>
+	  <dd>報告要求に対して何も応答しないようにする</dd>
+	  <dt>accept</dt>
+	  <dd>現在のウィンドウタイトルを報告する。現在のウィンドウタイトルを報告するのはセキュリティ上危険ですので、本当に必要な時のみこの設定を行うようにしてください。</dd>
+	  <dt>empty</dt>
+	  <dd>ウィンドウタイトルは空だと報告する</dd>
+	</dl>
       </dd>
 
       <dt id="WindowCtrlSequence">Window control sequence</dt>
       <dd>
-        この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面移動, 最背面移動, リフレッシュ, ウィンドウサイズ変更(ピクセル単位, 文字単位) が有効になります。
+	この設定が on になっていると、dttermのウィンドウ操作制御シーケンスの内、位置移動, 最小化, 最大化, 最前面移動, 最背面移動, リフレッシュ, ウィンドウサイズ変更(ピクセル単位, 文字単位) が有効になります。
       </dd>
 
       <dt id="WindowReportSequence">Window report sequence</dt>
       <dd>
-        この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。<br>
-        セキュリティ上の理由等でウィンドウの情報を報告したくない場合は無効にしてください。
+	この設定が on になっていると、dttermのウィンドウ情報報告の制御シーケンスの内、ウィンドウ状態報告, ウィンドウ位置報告, ウィンドウサイズ報告(ピクセル単位, 文字単位), ルートウィンドウサイズ報告 が有効になります。<br>
+	セキュリティ上の理由等でウィンドウの情報を報告したくない場合は無効にしてください。
       </dd>
 
       <dt id="CursorCtrlSequence">Cursor control sequence</dt>
       <dd>
-      カーソル形状を制御するシーケンスを使用するかどうかを設定します。<br>
-      この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。<br><br>
-      
-      vimを使用している場合、この機能を on にして ~/.vimrc に以下のように追加すると入力モードに応じてカーソル形状が変わるようになります。
+	カーソル形状を制御するシーケンスを使用するかどうかを設定します。<br>
+	この設定が on になっていると、DECSCUSR(カーソル形状変更), WYSTCURM(Wyse非点滅カーソル), WYULCURM(Wyse下線カーソル), AT&amp;T 610のカーソル点滅制御シーケンスに応じて、カーソル形状が変更されます。
+
+	<p>
+	  vimを使用している場合、この機能を on にして ~/.vimrc に以下のように追加すると入力モードに応じてカーソル形状が変わるようになります。
+	</p>
 
 <pre>
 set t_SI=^[[3\ q
@@ -118,8 +120,8 @@ set t_EI=^[[1\ q
 注: ^[ はControl-V Control-[で入力する
 </pre>
 
-      アプリケーション終了後に、カーソルを点滅状態に戻すには、以下のように設定をします。<br>
-      ncurses 5.7 の terminfo では xterm のカーソルの非表示(civis)/通常表示(cnorm)/強調表示(cvvis)はそれぞれ以下のようになっています。
+	アプリケーション終了後に、カーソルを点滅状態に戻すには、以下のように設定をします。<br>
+	ncurses 5.7 の terminfo では xterm のカーソルの非表示(civis)/通常表示(cnorm)/強調表示(cvvis)はそれぞれ以下のようになっています。
 
 <pre>
 civis=\E[?25l
@@ -127,9 +129,9 @@ cnorm=\E[?12l\E[?25h
 cvvis=\E[?12;25h
 </pre>
 
-      この設定だと、カーソルの通常表示時は非点滅に、強調表示時は点滅するようになります。
-      このため terminfo 対応のアプリケーションがカーソルを通常表示しようとした時に点滅しなくなります。<br>
-      対応としては、カーソルの点滅制御を無視する為に CursorCtrlSequence を off に設定するか、カーソル表示状態変更時に点滅状態を変更しないように以下の手順をホスト側で実施してください。
+	この設定だと、カーソルの通常表示時は非点滅に、強調表示時は点滅するようになります。
+	このため terminfo 対応のアプリケーションがカーソルを通常表示しようとした時に点滅しなくなります。<br>
+	対応としては、カーソルの点滅制御を無視する為に CursorCtrlSequence を off に設定するか、カーソル表示状態変更時に点滅状態を変更しないように以下の手順をホスト側で実施してください。
 
 <pre>
 % infocmp xterm &gt; xterm.ti
@@ -142,17 +144,17 @@ cvvis=\E[?12;25h
 
       <dt id="ClipboardAccessFromRemote">Clipboard access from remote</dt>
       <dd>
-        ホストからのクリップボードへのアクセスを許可するか設定します。
-        <dl>
-          <dt>off</dt>
-          <dd>クリップボードへのアクセスを許可しない</dd>
-          <dt>write only</dt>
-          <dd>クリップボードへの書き込みを許可する</dd>
-          <dt>read only</dt>
-          <dd>クリップボードへの読み込みを許可する</dd>
-          <dt>read/write</dt>
-          <dd>クリップボードへの読み書き両方を許可する</dd>
-        </dl>
+	ホストからのクリップボードへのアクセスを許可するか設定します。
+	<dl>
+	  <dt>off</dt>
+	  <dd>クリップボードへのアクセスを許可しない</dd>
+	  <dt>write only</dt>
+	  <dd>クリップボードへの書き込みを許可する</dd>
+	  <dt>read only</dt>
+	  <dd>クリップボードへの読み込みを許可する</dd>
+	  <dt>read/write</dt>
+	  <dd>クリップボードへの読み書き両方を許可する</dd>
+	</dl>
       </dd>
 
     </dl>
@@ -160,7 +162,7 @@ cvvis=\E[?12;25h
 
     <h2>"Copy and Paste" タブ</h2>
     <dl>
-      <dt id="EnableContinuedLineCopy"><a name="continuedline">Enable continued line copy</a></dt>
+      <dt id="EnableContinuedLineCopy">Enable continued line copy</dt>
       <dd>
 	継続している行を改行せずにコピーする機能を有効にします。
       </dd>
@@ -198,20 +200,15 @@ cvvis=\E[?12;25h
 	クリップボードに、この設定で指定したファイル内に存在するテキストが含まれる場合、マウスの右クリックおよびAlt+Vで
 	Tera Termウィンドウへ貼り付けようとするタイミングで、確認ダイアログを表示させることができます。
 	誤操作により、端末へ予期せぬコマンド投入を防ぐことができます。<br>
-    この設定は、ConfirmChangePasteの設定が有効な場合に作用します。
+	この設定は、ConfirmChangePasteの設定が有効な場合に作用します。
       </dd>
 
-      <dt>Confirm change paste string file</dt>
-      <dd>
-	ペースト時に、改行コード以外に警告したいキーワードを列挙したファイルを指定することができます。
-      </dd>
-
-      <dt>Delimiter characters</dt>
+      <dt id="DelimiterChar">Delimiter characters</dt>
       <dd>
 	単語選択の区切り文字を設定します。
       </dd>
 
-      <dt><a name="PasteDelayPerLine">Paste delay per line</a></dt>
+      <dt id="PasteDelayPerLine">Paste delay per line</dt>
       <dd>
 	複数行のデータを貼り付けるとき、改行が現れるごとにデータの送信を遅延させることができます。遅延する時間をミリ秒で設定します。
       </dd>
@@ -243,12 +240,11 @@ cvvis=\E[?12;25h
 	値が小さいほど明るくなります。
       </dd>
 
+    </dl>
     <p>
       詳しくは「<a href="../usage/transparent.html">透過ウインドウ</a>」
       を参照してください。
     </p>
-
-    </dl>
 
     <dl>
       <dt id="MouseCursor">MouseCursor</dt>
@@ -282,13 +278,13 @@ ClearType       = ClearTypeを利用する
       <dt id="EnableURLColor">Enable URL attribute color</dt>
       <dt id="EnableANSIColor">Enable ANSI color</dt>
       <dd>
-        それぞれの色属性および色設定を有効にします。<br>
+	それぞれの色属性および色設定を有効にします。<br>
 	もしANSI colorを無効にした場合、16色および256色モードも無効になります。
       </dd>
 
       <dt id="URLUnderline">Underline URL string</dt>
       <dd>
-        URL 文字列に下線属性を有効にします。
+	URL 文字列に下線属性を有効にします。
       </dd>
 
     </dl>
@@ -329,7 +325,7 @@ ClearType       = ClearTypeを利用する
 %y      10 進数で表す西暦の下 2 桁 (00 ～ 99)。
 %Y      10 進数で表す 4 桁の西暦。
 %z, %Z  レジストリの設定に応じて、タイム ゾーンの名前または省略形を指定します。
-        タイム ゾーンが不明な場合は指定しません。
+	タイム ゾーンが不明な場合は指定しません。
 %%      パーセント記号。
 </pre>
       </dd>
@@ -341,68 +337,66 @@ ClearType       = ClearTypeを利用する
 
       <dt id="LogAutoStart">Auto start logging</dt>
       <dd>
-    接続時に自動的にログ採取を開始する機能を有効にします。ログファイル名には、標準のログファイル名が使用されます。<br>
-    <a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションが指定されていると、当該機能は無効化されます。
+	接続時に自動的にログ採取を開始する機能を有効にします。ログファイル名には、標準のログファイル名が使用されます。<br>
+	<a href="../commandline/teraterm.html#nolog">/nolog</a> コマンドラインオプションが指定されていると、当該機能は無効化されます。
       </dd>
 
-      <dt><a id="LogRotate">Log Rotate</a></dt>
+      <dt id="LogRotate">Log Rotate</dt>
       <dd>
-    ログのローテートを有効にします。ローテートされたログファイルには、拡張子に .1, .2, .3 … と付与されます。
+	ログのローテートを有効にします。ローテートされたログファイルには、拡張子に .1, .2, .3 … と付与されます。
+	<dl>
+	  <dt id="LogRotateSize">Size</dt>
+	  <dd>
+	    ログをローテートさせる上限サイズを設定します。単位に"KB", "MB"を指定することもできます。
+	  </dd>
+
+	  <dt id="LogRotateStep">Rotate</dt>
+	  <dd>
+	    ログをローテートさせる世代数を設定します。"0"の場合は、世代管理をしません。
+	  </dd>
+	</dl>
       </dd>
 
-      <ul>
-        <dt><a id="LogRotateSize">Size</a></dt>
-        <dd>
-        ログをローテートさせる上限サイズを設定します。単位に"KB", "MB"を指定することもできます。
-        </dd>
-        
-        <dt><a id="LogRotateStep">Rotate</a></dt>
-        <dd>
-        ログをローテートさせる世代数を設定します。"0"の場合は、世代管理をしません。
-        </dd>
-      </ul>
-
-      <dt><a id="LogOption">Log option</a></dt>
+      <dt id="LogOption">Log option</dt>
       <dd>
-      ログファイルの種別を設定します。
+	ログファイルの種別を設定します。
+	<dl>
+	  <dt id="LogBinary">Binary</dt>
+	  <dd>
+	    ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
+	    選択しない場合は、漢字コード、改行文字は変換され、
+	    エスケープシーケンスは取り除かれてから書き込まれます。
+	  </dd>
+
+	  <dt id="LogAppend">Append</dt>
+	  <dd>
+	    すでに存在するファイルに追加して書き込みたい場合は選択してください。
+	    選択しない場合は上書きされます。
+	  </dd>
+
+	  <dt id="LogTypePlainText">Plain text</dt>
+	  <dd>
+	    ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
+	    ※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+	  </dd>
+
+	  <dt id="LogTimestamp">Timestamp</dt>
+	  <dd>
+	    ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
+	    ※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+	  </dd>
+
+	  <dt id="LogHideDialog">Hide dialog</dt>
+	  <dd>
+	    ログ転送のダイアログを表示したくない場合は選択してください。
+	  </dd>
+
+	  <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
+	  <dd>
+	    現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
+	  </dd>
+	</dl>
       </dd>
-
-      <ul>
-        <dt id="LogBinary">Binary</dt>
-        <dd>
-  	ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
-  	選択しない場合は、漢字コード、改行文字は変換され、
-  	エスケープシーケンスは取り除かれてから書き込まれます。
-        </dd>
-
-        <dt id="LogAppend">Append</dt>
-        <dd>
-  	すでに存在するファイルに追加して書き込みたい場合は選択してください。
-  	選択しない場合は上書きされます。
-        </dd>
-
-        <dt id="LogTypePlainText">Plain text</dt>
-        <dd>
-  	ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
-	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
-        </dd>
-
-        <dt id="LogTimestamp">Timestamp</dt>
-        <dd>
-  	ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
-	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
-        </dd>
-
-        <dt id="LogHideDialog">Hide dialog</dt>
-        <dd>
-  	ログ転送のダイアログを表示したくない場合は選択してください。
-        </dd>
-
-        <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
-        <dd>
-  	現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
-        </dd>
-      </ul>
 
     </dl>
 
@@ -416,10 +410,10 @@ ClearType       = ClearTypeを利用する
 
       <dt id="CygTerm">CygTerm</dt>
       <dd>
-	CygTerm の設定をします。<br><br>
-	
-	<em>(version 4.88以前)</em><br>
-	設定後、即座に設定ファイル(cygterm.cfg)を更新します。Save setup を行う必要はありません。
+	CygTerm の設定をします。各項目の意味については、<a href="../setup/cygterm.html">CygTerm+ 設定ファイル</a> を参照して下さい。
+	<p>注: 以前のバージョンでは設定後に自動でcygterm.cfgを更新していましたが、version 4.89以降では自動での更新を行わないようになりました。<br>
+	  <em>cygterm.cfgを更新する為には Setup - Save Setup を行う必要があります。</em>
+	</p>
       </dd>
     </dl>
   </body>

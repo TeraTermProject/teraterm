@@ -26,7 +26,7 @@
 
       <dt id="AcceptBroadcast">Accept broadcast</dt>
       <dd>
-	Accept the <a href="./control-broadcast.html">broadcast command</a>.<br>
+	Accept the <a href="control-broadcast.html">broadcast command</a>.<br>
 	Can be only enabled when the "Realtime mode" is off. However, this option is always ignored when the "Realtime mode" is on.
       </dd>
 
@@ -42,12 +42,12 @@
 
       <dt id="ClearOnResize">Clear display when window resized</dt>
       <dd>
-        The current screen is cleared when the VT window resizes.
+	The current screen is cleared when the VT window resizes.
       </dd>
 
       <dt id="IMERelatedCursor">Change cursor shape with IME state</dt>
       <dd>
-        When the IME is enabled, the caret is gray.
+	When the IME is enabled, the caret is gray.
       </dd>
 
     </dl>
@@ -63,54 +63,56 @@
 
       <dt id="DisableMouseTrackingByCtrl">Disable mouse event tracking when Control is pressed</dt>
       <dd>
-        The mouse tracking mode is enabled, TeraTerm does not send the mouse operation while the control key is pressed.
+	The mouse tracking mode is enabled, TeraTerm does not send the mouse operation while the control key is pressed.
       </dd>
 
       <dt id="AcceptTitleChangeRequest">Accept window title change request</dt>
       <dd>
-        Configures whether a user accepts the window title changing.
-        <dl>
-          <dt>off</dt>
-          <dd>Do not accept it.</dd>
-          <dt>overwrite</dt>
-          <dd>Accept it, and then display only the window tile.</dd>
-          <dt>ahead</dt>
-          <dd>Accept it, and then insert the window title before the canonical title.</dd>
-          <dt>last</dt>
-          <dd>Accept it, and then insert the window title after the canonical title.</dd>
-        </dl>
+	Configures whether a user accepts the window title changing.
+	<dl>
+	  <dt>off</dt>
+	  <dd>Do not accept it.</dd>
+	  <dt>overwrite</dt>
+	  <dd>Accept it, and then display only the window tile.</dd>
+	  <dt>ahead</dt>
+	  <dd>Accept it, and then insert the window title before the canonical title.</dd>
+	  <dt>last</dt>
+	  <dd>Accept it, and then insert the window title after the canonical title.</dd>
+	</dl>
       </dd>
 
       <dt id="TitleReportSequence">Window title report</dt>
       <dd>
-        A user can configure how Tera Term can respond to the dtterm window title and icon label reporting request. 
-        <dl>
-          <dt>ignore</dt>
-          <dd>Ignore a window title reporting request.</dd>
-          <dt>accept</dt>
-          <dd>Tera Term reports the current window title. However, be careful about using this feature because the security problem will occur.</dd>
-          <dt>empty</dt>
-          <dd>Report empty string.</dd>
-        </dl>
+	A user can configure how Tera Term can respond to the dtterm window title and icon label reporting request.
+	<dl>
+	  <dt>ignore</dt>
+	  <dd>Ignore a window title reporting request.</dd>
+	  <dt>accept</dt>
+	  <dd>Tera Term reports the current window title. However, be careful about using this feature because the security problem will occur.</dd>
+	  <dt>empty</dt>
+	  <dd>Report empty string.</dd>
+	</dl>
       </dd>
 
       <dt id="WindowCtrlSequence">Window control sequence</dt>
       <dd>
-        added support for the position moving, the minimization, the maximization, the most front, the most back, the refresh and the window size changing(per pixel and character) control sequences regarding the dtterm window operation.
+	added support for the position moving, the minimization, the maximization, the most front, the most back, the refresh and the window size changing(per pixel and character) control sequences regarding the dtterm window operation.
       </dd>
 
       <dt id="WindowReportSequence">Window report sequence</dt>
       <dd>
-        This function enables the dtterm control sequence such as the window status reporting, the window position reporting, the window size(in pixel and character) reporting and the root window size reporting, among the window information reporting features.<br>
-        If you do not want window information to be sent to remote host by some reason such as security, please disable this setting.
+	This function enables the dtterm control sequence such as the window status reporting, the window position reporting, the window size(in pixel and character) reporting and the root window size reporting, among the window information reporting features.<br>
+	If you do not want window information to be sent to remote host by some reason such as security, please disable this setting.
       </dd>
 
       <dt id="CursorCtrlSequence">Cursor control sequence</dt>
       <dd>
-      Enables the control sequence for the cursor shape.<br>
-      This function enables cursor shape change by cursor change sequence of DECSCUSR(cursor shape change), WYSTCURM(Wyse no-blinking cursor), WYULCURM(Wyse underlined cursor) and AT&amp;T 610 blinking cursor.<br><br>
-      
-      If a user uses the vim editor, write below entries in the ~/.vimrc to enable this feature.
+	Enables the control sequence for the cursor shape.<br>
+	This function enables cursor shape change by cursor change sequence of DECSCUSR(cursor shape change), WYSTCURM(Wyse no-blinking cursor), WYULCURM(Wyse underlined cursor) and AT&amp;T 610 blinking cursor.
+
+	<p>
+	  If a user uses the vim editor, write below entries in the ~/.vimrc to enable this feature.
+	</p>
 
 <pre>
 set t_SI=^[[3\ q
@@ -118,8 +120,8 @@ set t_EI=^[[1\ q
 NOTE: Input ^[ by using Control-V Control-[.
 </pre>
 
-      If the cursor periodically blinks after an application exits, a user should configure as follows.<br>
-      In the ncurses 5.7 terminfo, the invisible(civis)/normal display(cnorm)/highlighting(cvvis) of the xterm cursor are as follows:
+	If the cursor periodically blinks after an application exits, a user should configure as follows.<br>
+	In the ncurses 5.7 terminfo, the invisible(civis)/normal display(cnorm)/highlighting(cvvis) of the xterm cursor are as follows:
 
 <pre>
 civis=\E[?25l
@@ -127,9 +129,9 @@ cnorm=\E[?12l\E[?25h
 cvvis=\E[?12;25h
 </pre>
 
-      When the upper configuration is enabled, the normal cursor displays with the non-blinking mode and the emphasis cursor displays with the blinking mode.
-      So, the cursor does not blink when the terminfo application displays the own cursor.<br>
-      If a user want to blink the cursor, turn off the CursorCtrlSequence entry or do in the following commands:
+	When the upper configuration is enabled, the normal cursor displays with the non-blinking mode and the emphasis cursor displays with the blinking mode.
+	So, the cursor does not blink when the terminfo application displays the own cursor.<br>
+	If a user want to blink the cursor, turn off the CursorCtrlSequence entry or do in the following commands:
 
 <pre>
 % infocmp xterm &gt; xterm.ti
@@ -143,17 +145,17 @@ If the configuration is enabled as whole system, execute the upper command with 
 
       <dt id="ClipboardAccessFromRemote">Clipboard access from remote</dt>
       <dd>
-        permits the host to access the clipboard.
-        <dl>
-          <dt>off</dt>
-          <dd>can not permit</dd>
-          <dt>write only</dt>
-          <dd>can permit a clipboard to write</dd>
-          <dt>read only</dt>
-          <dd>can permit a clipboard to read</dd>
-          <dt>read/write</dt>
-          <dd>can permit a clipboard to write and read</dd>
-        </dl>
+	permits the host to access the clipboard.
+	<dl>
+	  <dt>off</dt>
+	  <dd>can not permit</dd>
+	  <dt>write only</dt>
+	  <dd>can permit a clipboard to write</dd>
+	  <dt>read only</dt>
+	  <dd>can permit a clipboard to read</dd>
+	  <dt>read/write</dt>
+	  <dd>can permit a clipboard to write and read</dd>
+	</dl>
       </dd>
 
     </dl>
@@ -161,7 +163,7 @@ If the configuration is enabled as whole system, execute the upper command with 
 
     <h2>"Copy and Paste" Tab</h2>
     <dl>
-      <dt id="EnableContinuedLineCopy"><a name="continuedline">Enable continued line copy</a></dt>
+      <dt id="EnableContinuedLineCopy">Enable continued line copy</dt>
       <dd>
 	Concatenates current line with the next line including word
 	characters when the whole line is stepped over.
@@ -197,23 +199,18 @@ If the configuration is enabled as whole system, execute the upper command with 
 
       <dt id="ConfirmChangePasteStringFile">String file</dt>
       <dd>
-	When the Clipboard includes any strings in the specified file, 
+	When the Clipboard includes any strings in the specified file,
 	the confirmation dialog can be shown to paste by right-click or Alt+V.
 	This is a foolproof way.<br>
-    This function works when the ConfirmChangePaste is enabled.
+	This function works when the ConfirmChangePaste is enabled.
       </dd>
 
-      <dt>Confirm change paste string file</dt>
-      <dd>
-	When a user pastes, the user can specify a keyword file for ConfirmChangePaste except the CR/LF.
-      </dd>
-
-      <dt>Delimiter characters</dt>
+      <dt id="DelimiterChar">Delimiter characters</dt>
       <dd>
 	Includes delimiter characters for the word selection.
       </dd>
 
-      <dt><a name="PasteDelayPerLine">Paste delay per line</a></dt>
+      <dt id="PasteDelayPerLine">Paste delay per line</dt>
       <dd>
 	A user can delay to send a line data to the remote host when the user pastes multiple lines. The delay time can be specified by this option on the millisecond time scale.
       </dd>
@@ -234,7 +231,7 @@ If the configuration is enabled as whole system, execute the upper command with 
       <dd>
 	Tera Term window looks like Eterm look-feel background transparency.
       </dd>
-      
+
       <dt>Background Image</dt>
       <dd>
 	When the Eterm look-feel feature is enabled, an image file can be specified as background.
@@ -246,12 +243,11 @@ If the configuration is enabled as whole system, execute the upper command with 
 	The range of value is from 0 to 255. <br>
 	The more brightness reduces the value, the more image brightens.
       </dd>
-      
+
+    </dl>
     <p>
       See also <a href="../usage/transparent.html">Background transparency</a>.
     </p>
-      
-    </dl>
 
     <dl>
       <dt id="MouseCursor">MouseCursor</dt>
@@ -285,13 +281,13 @@ ClearType       = Use the ClearType.
       <dt id="EnableURLColor">Enable URL attribute color</dt>
       <dt id="EnableANSIColor">Enable ANSI color</dt>
       <dd>
-        Enables each color attributes and color setting.<br>
+	Enables each color attributes and color setting.<br>
 	If ANSI color is disabled, 16 colors and 256 colors modes are also disabled.
       </dd>
 
       <dt id="URLUnderline">Underline URL string</dt>
       <dd>
-        Enables Underline attribute on URL string.
+	Enables Underline attribute on URL string.
       </dd>
 
     </dl>
@@ -332,83 +328,81 @@ SYNOPSIS:
 %y      Year without century, as decimal number (00 - 99)
 %Y      Year with century, as decimal number
 %z, %Z  Either the time-zone name or time zone abbreviation, depending on registry settings;
-        no characters if time zone is unknown
+	no characters if time zone is unknown
 %%      Percent sign
 </pre>
       </dd>
 
-      <dt>Default log save folder</dt>
+      <dt id="LogDefaultPath">Default log save folder</dt>
       <dd>
 	Specify default path to save log file. It is used when the log file name is not a full path.
       </dd>
 
-      <dt><a id="LogAutoStart">Auto start logging</a></dt>
+      <dt id="LogAutoStart">Auto start logging</dt>
       <dd>
-    Start logging automatically when connecting. Default Log File Name is used for log file name.<br>
-    When the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line is specified, this feature is always disabled.
+	Start logging automatically when connecting. Default Log File Name is used for log file name.<br>
+	When the <a href="../commandline/teraterm.html#nolog">/nolog</a> command line is specified, this feature is always disabled.
       </dd>
 
-      <dt><a id="LogRotate">Log Rotate</a></dt>
+      <dt id="LogRotate">Log Rotate</dt>
       <dd>
-    The log rotation is enabled. The extension of the rotated file is added .1, .2, .3 etc.
+	The log rotation is enabled. The extension of the rotated file is added .1, .2, .3 etc.
+	<dl>
+	  <dt id="LogRotateSize">Size</dt>
+	  <dd>
+	    The log file is rotated when it grows bigger than Size bytes. If the size is followed by KB,
+	    the size is assumed to be in kilobytes. If the MB is used, the size is in megabytes.
+	  </dd>
+
+	  <dt id="LogRotateStep">Rotate</dt>
+	  <dd>
+	    The log file is rotated Rotate times before being removed. If the Rotate is 0,
+	    the old version is not removed rather than rotated.
+	  </dd>
+	</dl>
       </dd>
 
-      <ul>
-        <dt><a id="LogRotateSize">Size</a></dt>
-        <dd>
-        The log file is rotated when it grows bigger than Size bytes. If the size is followed by KB, 
-        the size is assumed to be in kilobytes. If the MB is used, the size is in megabytes.
-        </dd>
-        
-        <dt><a id="LogRotateStep">Rotate</a></dt>
-        <dd>
-        The log file is rotated Rotate times before being removed. If the Rotate is 0,
-        the old version is not removed rather than rotated.
-        </dd>
-      </ul>
-
-      <dt><a id="LogOption">Log option</a></dt>
+      <dt id="LogOption">Log option</a></dt>
       <dd>
-      Specify the log type.
+	Specify the log type.
+	<dl>
+	  <dt id="LogBinary">Binary</dt>
+	  <dd>
+	    If you select this option, received characters are written without
+	    any modifications. Otherwise, new-line codes are converted and
+	    escape sequences are stripped out.
+	  </dd>
+
+	  <dt id="LogAppend">Append</dt>
+	  <dd>
+	    If you select this option and the specified log file already exists,
+	    received characters are appended to the file. Otherwise, the file is
+	    overwritten.
+	  </dd>
+
+	  <dt id="LogTypePlainText">Plain text</dt>
+	  <dd>
+	    If you select this option, ASCII non-printable characters are not written.<br>
+	    NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
+	  </dd>
+
+	  <dt id="LogTimestamp">Timestamp</dt>
+	  <dd>
+	    If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
+	    NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
+	  </dd>
+
+	  <dt id="LogHideDialog">Hide dialog</dt>
+	  <dd>
+	    If you select this option, "Log" dialog box is not displayed.
+	  </dd>
+
+	  <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
+	  <dd>
+	    If you select this option, the logging starts after current all buffer is written into a log file.
+	  </dd>
+	</dl>
       </dd>
-
-      <ul>
-        <dt id="LogBinary">Binary</dt>
-        <dd>
-  	If you select this option, received characters are written without
-  	any modifications. Otherwise, new-line codes are converted and
-  	escape sequences are stripped out.
-        </dd>
-
-        <dt id="LogAppend">Append</dt>
-        <dd>
-  	If you select this option and the specified log file already exists,
-  	received characters are appended to the file. Otherwise, the file is
-  	overwritten.
-        </dd>
-
-        <dt id="LogTypePlainText">Plain text</dt>
-        <dd>
-  	If you select this option, ASCII non-printable characters are not written.<br>
-	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
-        </dd>
-
-        <dt id="LogTimestamp">Timestamp</dt>
-        <dd>
-  	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
-	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
-        </dd>
-
-        <dt id="LogHideDialog">Hide dialog</dt>
-        <dd>
-  	If you select this option, "Log" dialog box is not displayed.
-        </dd>
-
-        <dt id="LogIncludeScreenBuffer">Include screen buffer</dt>
-        <dd>
-  	If you select this option, the logging starts after current all buffer is written into a log file.
-        </dd>
-      </ul>
 
     </dl>
 
@@ -422,10 +416,11 @@ SYNOPSIS:
 
       <dt id="CygTerm">CygTerm</dt>
       <dd>
-	Configure CygTerm settings.<br><br>
-	
-	<em>(version 4.88 or earlier)</em><br>
-	The CygTerm configuration file(cygterm.cfg) will be immediately written after your configuration. So, you need not to do the save setup.
+	Configure CygTerm settings. <!-- 各項目の意味については、<a href="../setup/cygterm.html">CygTerm+ setup file</a> を参照して下さい。-->
+        <!-- p>
+	  注: 以前のバージョンでは設定後に自動でcygterm.cfgを更新していましたが、version 4.89以降では自動での更新を行わないようになりました。<br>
+          <em>cygterm.cfgを更新する為には Setup - Save Setup を行う必要があります。</em>
+	</p -->
       </dd>
     </dl>
   </body>
