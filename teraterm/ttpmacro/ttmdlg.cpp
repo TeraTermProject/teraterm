@@ -72,7 +72,6 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	*IOption = FALSE;
 	*VOption = FALSE;
 	Param = GetCommandLine();
-	i = 0;
 
 	// the first term shuld be executable filename of TTMACRO
 	start = GetParam(Temp, sizeof(Temp), Param);
