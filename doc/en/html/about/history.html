@@ -36,15 +36,15 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <!-- li>貼り付け時に末尾の改行を削除する機能を追加した。デフォルトでは無効。
+      <li>added new feature which removes carriage return from end of line with pasting. The default value is off.
         <ul>
-          <li><a href="../menu/setup-additional.html#TrimTrailingNL">Additional settingsダイアログ</a>の Copy and Paste タブで設定を有効化できるようにした。</li>
-        </ul></li -->
-      <!-- li><a href="../macro/commandline.html">マクロのコマンドライン</a>の扱い方を変更した。
+          <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional.html#TrimTrailingNL">Additional settings dialog</a>.</li>
+        </ul></li>
+      <li>changed <a href="../macro/commandline.html">macro command line</a> behavior.
         <ul>
-          <li>コマンドラインオプションの識別を厳密にした。/Vxx のようにコマンドラインオプションの後ろに余計な文字列が付>いている場合はオプションとして扱わなくした。</li>
-          <li>マクロのコマンドラインオプションを指定出来る場所をファイル名の前に限定した。ファイル名より後に指定した場合はマクロのパラメータとして扱われる。</li>
-        </ul></li -->
+          <li>Strictly checked the syntax of command line option. When an unnecessary option is added at option back like as /Vxx, the option is not recognized.</li>
+          <li>The option placement can be only specified before a filename. When the option is specified after the filename, the option is recognized as macro parameter.</li>
+        </ul></li>
     </ul>
   </li>
 
