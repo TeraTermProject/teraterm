@@ -76,45 +76,45 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 
 	// the first term shuld be executable filename of TTMACRO
 	start = GetParam(Temp, sizeof(Temp), Param);
-	j = 0;
+	ParamCnt = 0;
 
-	cur = start;
-	while (next = GetParam(Temp, sizeof(Temp), cur)) {
+	for (cur = start; next = GetParam(Temp, sizeof(Temp), cur); cur = next) {
 		DequoteParam(Temp, sizeof(Temp), Temp);
-		if (_strnicmp(Temp,"/D=",3)==0) { // DDE option
-			strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);
-		}
-		else if (_stricmp(Temp, "/I")==0) {
-			*IOption = TRUE;
-		}
-		else if (_stricmp(Temp, "/S")==0) {
-			SleepFlag = TRUE;
-		}
-		else if (_stricmp(Temp, "/V")==0) {
-			*VOption = TRUE;
-		}
-		else {
-			switch (++j) {
-				case 1: strncpy_s(FileName, sizeof(FileName), Temp, _TRUNCATE); break;
-				case 2: strncpy_s(Param2,   sizeof(Param2),   Temp, _TRUNCATE); break;
-				case 3: strncpy_s(Param3,   sizeof(Param3),   Temp, _TRUNCATE); break;
-				case 4: strncpy_s(Param4,   sizeof(Param4),   Temp, _TRUNCATE); break;
-				case 5: strncpy_s(Param5,   sizeof(Param5),   Temp, _TRUNCATE); break;
-				case 6: strncpy_s(Param6,   sizeof(Param6),   Temp, _TRUNCATE); break;
-				case 7: strncpy_s(Param7,   sizeof(Param7),   Temp, _TRUNCATE); break;
-				case 8: strncpy_s(Param8,   sizeof(Param8),   Temp, _TRUNCATE); break;
-				case 9: strncpy_s(Param9,   sizeof(Param9),   Temp, _TRUNCATE); break;
-				default: ;/* nothing to do */
+		if (ParamCnt == 0) {
+			if (_strnicmp(Temp,"/D=",3)==0) { // DDE option
+				strncpy_s(TopicName, sizeof(TopicName), &Temp[3], _TRUNCATE);
+				continue;
+			}
+			else if (_stricmp(Temp, "/I")==0) {
+				*IOption = TRUE;
+				continue;
+			}
+			else if (_stricmp(Temp, "/S")==0) {
+				SleepFlag = TRUE;
+				continue;
+			}
+			else if (_stricmp(Temp, "/V")==0) {
+				*VOption = TRUE;
+				continue;
 			}
 		}
-		cur = next;
+
+		switch (++ParamCnt) {
+			case 1: strncpy_s(FileName, sizeof(FileName), Temp, _TRUNCATE); break;
+			case 2: strncpy_s(Param2,   sizeof(Param2),   Temp, _TRUNCATE); break;
+			case 3: strncpy_s(Param3,   sizeof(Param3),   Temp, _TRUNCATE); break;
+			case 4: strncpy_s(Param4,   sizeof(Param4),   Temp, _TRUNCATE); break;
+			case 5: strncpy_s(Param5,   sizeof(Param5),   Temp, _TRUNCATE); break;
+			case 6: strncpy_s(Param6,   sizeof(Param6),   Temp, _TRUNCATE); break;
+			case 7: strncpy_s(Param7,   sizeof(Param7),   Temp, _TRUNCATE); break;
+			case 8: strncpy_s(Param8,   sizeof(Param8),   Temp, _TRUNCATE); break;
+			case 9: strncpy_s(Param9,   sizeof(Param9),   Temp, _TRUNCATE); break;
+			default: ;/* nothing to do */
+		}
 	}
 
-	if (j > 9) {
+	if (ParamCnt > 9) {
 		ParamCnt = 9;
-	}
-	else {
-		ParamCnt = j;
 	}
 
 	if (FileName[0]=='*') {
