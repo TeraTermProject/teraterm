@@ -1859,12 +1859,6 @@ TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
 	return ((VarId+1) << 16) | Index;
 }
 
-// 配列の要素変数から、配列全体のVarIDを返す。
-TVarId GetArrayVarId(TVarId VarId)
-{
-	return ((VarId>>16)-1);
-}
-
 void GetIntAryVar(PVarId VarId, LPWORD Err)
 {
 	TName Name;
