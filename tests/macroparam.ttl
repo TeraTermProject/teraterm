@@ -46,15 +46,15 @@ goto error
 ;   param6: test1
 ;
 if paramcnt <> 6 goto error
-strcompare param2 "/vxx"
+strcompare params[2] "/vxx"
 if result <> 0 goto error
-strcompare param3 "/ixx"
+strcompare params[3] "/ixx"
 if result <> 0 goto error
-strcompare param4 "/V"
+strcompare params[4] "/V"
 if result <> 0 goto error
-strcompare param5 "/i"
+strcompare params[5] "/i"
 if result <> 0 goto error
-strcompare param6 "test1"
+strcompare params[6] "test1"
 if result <> 0 goto error
 
 goto end
@@ -68,11 +68,11 @@ goto end
 ; param4: test2
 ;
 if paramcnt <> 4 goto error
-strcompare param2 "/v"
+strcompare params[2] "/v"
 if result <> 0 goto error
-strcompare param3 "/I"
+strcompare params[3] "/I"
 if result <> 0 goto error
-strcompare param4 "test2"
+strcompare params[4] "test2"
 if result <> 0 goto error
 
 goto end
@@ -89,15 +89,15 @@ goto end
 ;   param6: /i
 ;
 if paramcnt <> 6 goto error
-strcompare param2 "test3"
+strcompare params[2] "test3"
 if result <> 0 goto error
-strcompare param3 "/Vxx"
+strcompare params[3] "/Vxx"
 if result <> 0 goto error
-strcompare param4 "/ixx"
+strcompare params[4] "/ixx"
 if result <> 0 goto error
-strcompare param5 "/V"
+strcompare params[5] "/V"
 if result <> 0 goto error
-strcompare param6 "/i"
+strcompare params[6] "/i"
 if result <> 0 goto error
 
 goto end
@@ -113,13 +113,13 @@ goto end
 ;   param5: /ixx
 ;
 if paramcnt <> 5 goto error
-strcompare param2 "test4"
+strcompare params[2] "test4"
 if result <> 0 goto error
-strcompare param3 "/V"
+strcompare params[3] "/V"
 if result <> 0 goto error
-strcompare param4 "/Vxx"
+strcompare params[4] "/Vxx"
 if result <> 0 goto error
-strcompare param5 "/ixx"
+strcompare params[5] "/ixx"
 if result <> 0 goto error
 
 goto end
