@@ -324,8 +324,8 @@ void GetVarType(LPWORD ValType, int far *Val, LPWORD Err);
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
 BOOL GetIndex(int *Index, LPWORD Err);
-void GetIntAryVar(PVarId VarId, LPWORD Err);
-void GetStrAryVar(PVarId VarId, LPWORD Err);
+void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err);
+void GetAryVarByName(PVarId VarId, PCHAR Name, WORD VarType, LPWORD Err);
 int GetIntAryVarSize(TVarId VarId);
 int GetStrAryVarSize(TVarId VarId);
 
@@ -338,3 +338,8 @@ extern WORD LineParsePtr;
 #ifdef __cplusplus
 }
 #endif
+
+#define GetIntAryVar(VarId, Err)		GetAryVar(VarId, TypIntArray, Err)
+#define GetStrAryVar(VarId, Err)		GetAryVar(VarId, TypStrArray, Err)
+#define GetIntAryVarByName(VarId, Name, Err)	GetAryVarByName(VarId, Name, TypIntArray, Err)
+#define GetStrAryVarByName(VarId, Name, Err)	GetAryVarByName(VarId, Name, TypStrArray, Err)

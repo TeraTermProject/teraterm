@@ -24,16 +24,10 @@ char HomeDir[MAXPATHLEN];
 char FileName[MAX_PATH];
 char TopicName[11];
 char ShortName[MAX_PATH];
-char Param2[MaxStrLen];
-char Param3[MaxStrLen];
-char Param4[MaxStrLen];
-char Param5[MaxStrLen];
-char Param6[MaxStrLen];
-char Param7[MaxStrLen];
-char Param8[MaxStrLen];
-char Param9[MaxStrLen];
+char **Params = NULL;
+int ParamCnt;
+int ParamsSize;
 BOOL SleepFlag;
-int ParamCnt;   /* ˆø”‚ÌŒÂ” */
 }
 
 static int DlgPosX = -10000;
@@ -45,7 +39,7 @@ extern "C" {
 void ParseParam(PBOOL IOption, PBOOL VOption)
 {
 	int dirlen, fnpos;
-	char *Param;
+	char *Param, **ptmp;
 	char Temp[MaxStrLen];
 	PCHAR start, cur, next;
 
@@ -59,18 +53,17 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	// Get command line parameters
 	FileName[0] = 0;
 	TopicName[0] = 0;
-	Param2[0] = 0;
-	Param3[0] = 0;
-	Param4[0] = 0;
-	Param5[0] = 0;
-	Param6[0] = 0;
-	Param7[0] = 0;
-	Param8[0] = 0;
-	Param9[0] = 0;
 	SleepFlag = FALSE;
 	*IOption = FALSE;
 	*VOption = FALSE;
 	Param = GetCommandLine();
+
+	ParamsSize = 50;
+	Params = (char **)malloc(sizeof(char*) * ParamsSize);
+	if (Params) {
+		Params[0] = _strdup(Param);
+		Params[1] = NULL;
+	}
 
 	// the first term shuld be executable filename of TTMACRO
 	start = GetParam(Temp, sizeof(Temp), Param);
@@ -97,22 +90,24 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 			}
 		}
 
-		switch (++ParamCnt) {
-			case 1: strncpy_s(FileName, sizeof(FileName), Temp, _TRUNCATE); break;
-			case 2: strncpy_s(Param2,   sizeof(Param2),   Temp, _TRUNCATE); break;
-			case 3: strncpy_s(Param3,   sizeof(Param3),   Temp, _TRUNCATE); break;
-			case 4: strncpy_s(Param4,   sizeof(Param4),   Temp, _TRUNCATE); break;
-			case 5: strncpy_s(Param5,   sizeof(Param5),   Temp, _TRUNCATE); break;
-			case 6: strncpy_s(Param6,   sizeof(Param6),   Temp, _TRUNCATE); break;
-			case 7: strncpy_s(Param7,   sizeof(Param7),   Temp, _TRUNCATE); break;
-			case 8: strncpy_s(Param8,   sizeof(Param8),   Temp, _TRUNCATE); break;
-			case 9: strncpy_s(Param9,   sizeof(Param9),   Temp, _TRUNCATE); break;
-			default: ;/* nothing to do */
+		if (++ParamCnt == 1) {
+			strncpy_s(FileName, sizeof(FileName), Temp, _TRUNCATE);
+			if (Params == NULL) {
+				break;
+			}
 		}
-	}
-
-	if (ParamCnt > 9) {
-		ParamCnt = 9;
+		else {
+			if (ParamsSize <= ParamCnt) {
+				ParamsSize += 10;
+				ptmp = (char **)realloc(Params, sizeof(char*) * ParamsSize);
+				if (ptmp == NULL) {
+					ParamCnt--;
+					break;
+				}
+				Params = ptmp;
+			}
+			Params[ParamCnt] = _strdup(Temp);
+		}
 	}
 
 	if (FileName[0]=='*') {
@@ -126,6 +121,10 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 				strncpy_s(FileName, sizeof(FileName), HomeDir, _TRUNCATE);
 				AppendSlash(FileName, sizeof(FileName));
 				strncat_s(FileName, sizeof(FileName), ShortName, _TRUNCATE);
+			}
+
+			if (Params) {
+				Params[1] = _strdup(ShortName);
 			}
 		}
 		else {

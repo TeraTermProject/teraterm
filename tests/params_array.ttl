@@ -1,0 +1,94 @@
+if paramcnt <= 1 goto error
+
+testlabel = "testnotfound"
+
+; param1～9 と params[] が同じである事の確認
+for i 1 paramcnt
+	if i <= 9 then
+		sprintf2 cmd "paramval = param%d" i
+		execcmnd cmd
+		strcompare params[i] paramval
+		if result <> 0 then
+			sprintf2 msg "params[%d] と param%d の値が違います" i i
+			sprintf2 tmp #10"params[%d]: '%s'" i params[i]
+			strconcat msg tmp
+			sprintf2 tmp #10"param%d: '%s'" i paramval
+			strconcat msg tmp
+			messagebox msg "エラー"
+		endif
+	endif
+next
+
+; テスト番号の検出
+for i 2 paramcnt
+	strmatch params[i] "^test[0-9]+$"
+	if result then
+		testlabel = matchstr
+		break
+	endif
+next
+
+; テストの存在確認
+sprintf2 cmd 'ifdefined %s' testlabel
+execcmnd cmd
+if result = 4 then
+	sprintf2 cmd 'goto %s' testlabel
+	execcmnd cmd
+endif
+
+; テストが未実装
+sprintf2 msg "%s: 未実装のテストです" testlabel
+messagebox msg "エラー"
+goto error
+
+; テスト番号が検出できない場合
+:testnotfound
+messagebox "テスト番号の指定がありません" "エラー"
+goto error
+
+:test1
+; ttpmacro.exe macrofile /vxx /ixx /V /i test1
+; ttpmacro.exe macrofile /vxx /ixx /V /i test1 "param 7" "" param9 10 eleven
+;
+; 以下のように解釈する事にする
+;   paramcnt: 11
+;   params[2]: /vxx
+;   params[3]: /ixx
+;   params[4]: /V
+;   params[5]: /i
+;   params[6]: test1
+;   params[7]: param 7
+;   params[8]: 空文字列
+;   params[9]: param9
+;   params[10]: 10
+;   params[11]: eleven
+;
+if paramcnt <> 11 goto error
+strcompare params[2] "/vxx"
+if result <> 0 goto error
+strcompare params[3] "/ixx"
+if result <> 0 goto error
+strcompare params[4] "/V"
+if result <> 0 goto error
+strcompare params[5] "/i"
+if result <> 0 goto error
+strcompare params[6] "test1"
+if result <> 0 goto error
+strcompare params[7] "param 7"
+if result <> 0 goto error
+strcompare params[8] ""
+if result <> 0 goto error
+strcompare params[9] "param9"
+if result <> 0 goto error
+strcompare params[10] "10"
+if result <> 0 goto error
+strcompare params[11] "eleven"
+if result <> 0 goto error
+
+goto end
+
+:error
+setexitcode 1
+
+:end
+end

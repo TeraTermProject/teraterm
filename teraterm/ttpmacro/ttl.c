@@ -76,6 +76,9 @@ BOOL InitTTL(HWND HWin)
 {
 	int i;
 	TStrVal Dir;
+	TVarId ParamsVarId, id;
+	char tmpname[10];
+	WORD Err;
 
 	HMainWin = HWin;
 
@@ -98,16 +101,39 @@ BOOL InitTTL(HWND HWin)
 	NewStrVar("groupmatchstr8","");   // for 'waitregex' command (2005.10.15 yutaka)
 	NewStrVar("groupmatchstr9","");   // for 'waitregex' command (2005.10.15 yutaka)
 
-	NewStrVar("param1",ShortName);  // マクロファイル名 (2012.4.14 yutaka)
-	NewStrVar("param2",Param2);
-	NewStrVar("param3",Param3);
-	NewStrVar("param4",Param4);
-	NewStrVar("param5",Param5);
-	NewStrVar("param6",Param6);
-	NewStrVar("param7",Param7);
-	NewStrVar("param8",Param8);
-	NewStrVar("param9",Param9);
 	NewIntVar("paramcnt",ParamCnt);  // ファイル名も含む引数の個数 (2012.4.10 yutaka)
+
+	// 旧形式のパラメータ設定 (param1 ～ param9)
+	NewStrVar("param1", ShortName);
+	if (Params) {
+		for (i=2; i<=9; i++) {
+			_snprintf_s(tmpname, sizeof(tmpname), _TRUNCATE, "param%d", i);
+			if (ParamCnt >= i && Params[i] != NULL) {
+				NewStrVar(tmpname, Params[i]);
+			}
+			else {
+				NewStrVar(tmpname, "");
+			}
+		}
+	}
+
+	// 新形式のパラメータ設定 (params[1～ParamCnt])
+	if (NewStrAryVar("params", ParamCnt+1) == 0) {
+		Err = 0;
+		GetStrAryVarByName(&ParamsVarId, "params", &Err);
+		if (Err == 0 && Params) {
+			for (i=0; i<=ParamCnt; i++) {
+				if (Params[i]) {
+					Err = 0;
+					id = GetStrVarFromArray(ParamsVarId, i, &Err);
+					SetStrVal(id, Params[i]);
+					free(Params[i]);
+				}
+			}
+			free(Params);
+			Params = NULL;
+		}
+	}
 
 	ParseAgain = FALSE;
 	IfNest = 0;

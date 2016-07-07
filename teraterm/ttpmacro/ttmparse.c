@@ -1859,46 +1859,32 @@ TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err)
 	return ((VarId+1) << 16) | Index;
 }
 
-void GetIntAryVar(PVarId VarId, LPWORD Err)
+void GetAryVar(PVarId VarId, WORD VarType, LPWORD Err)
 {
 	TName Name;
-	WORD VarType;
 
 	if (*Err!=0) return;
 
 	if (GetIdentifier(Name)) {
-		if (CheckVar(Name, &VarType, VarId)) {
-			if (VarType != TypIntArray) {
-				*Err = ErrTypeMismatch;
-			}
-		}
-		else {
-			*Err = ErrTypeMismatch;
-		}
+		GetAryVarByName(VarId, Name, VarType, Err);
 	}
-	else
+	else {
 		*Err = ErrSyntax;
+	}
 }
 
-void GetStrAryVar(PVarId VarId, LPWORD Err)
+void GetAryVarByName(PVarId VarId, PCHAR Name, WORD VarType, LPWORD Err)
 {
-	TName Name;
-	WORD VarType;
+	WORD typ;
 
-	if (*Err!=0) return;
-
-	if (GetIdentifier(Name)) {
-		if (CheckVar(Name, &VarType, VarId)) {
-			if (VarType != TypStrArray) {
-				*Err = ErrTypeMismatch;
-			}
-		}
-		else {
+	if (CheckVar(Name, &typ, VarId)) {
+		if (typ != VarType) {
 			*Err = ErrTypeMismatch;
 		}
 	}
-	else
-		*Err = ErrSyntax;
+	else {
+		*Err = ErrVarNotInit;
+	}
 }
 
 int GetIntAryVarSize(TVarId VarId)

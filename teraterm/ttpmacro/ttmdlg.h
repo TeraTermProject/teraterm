@@ -29,16 +29,9 @@ extern char HomeDir[MAXPATHLEN];
 extern char FileName[MAX_PATH];
 extern char TopicName[11];
 extern char ShortName[MAX_PATH];
-extern char Param2[MaxStrLen];
-extern char Param3[MaxStrLen];
-extern char Param4[MaxStrLen];
-extern char Param5[MaxStrLen];
-extern char Param6[MaxStrLen];
-extern char Param7[MaxStrLen];
-extern char Param8[MaxStrLen];
-extern char Param9[MaxStrLen];
-extern BOOL SleepFlag;
+extern char **Params;
 extern int ParamCnt;
+extern BOOL SleepFlag;
 
 #ifdef __cplusplus
 }
