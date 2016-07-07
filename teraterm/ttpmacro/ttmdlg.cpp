@@ -11,14 +11,13 @@
 #include "tttypes.h"
 #include "ttlib.h"
 #include <commdlg.h>
+#include "ttmdef.h"
 #include "errdlg.h"
 #include "inpdlg.h"
 #include "msgdlg.h"
 #include "statdlg.h"
 #include "ListDlg.h"
 #include "ttmlib.h"
-
-#define MaxStrLen 512
 
 extern "C" {
 char HomeDir[MAXPATHLEN];

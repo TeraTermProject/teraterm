@@ -7,12 +7,11 @@
 #include "stdafx.h"
 #include "teraterm.h"
 #include "ttlib.h"
+#include "ttmdef.h"
 #include "ttm_res.h"
 #include "ttmlib.h"
 
 #include "inpdlg.h"
-
-#define MaxStrLen 512
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

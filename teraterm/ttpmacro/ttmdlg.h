@@ -4,12 +4,12 @@
 
 /* TTMACRO.EXE, dialog boxes */
 
+#pragma once
+
+#include "ttmdef.h"
+
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef MaxStrLen	// ttmparse.h‚Å‚à’è‹`‚µ‚Ä‚¢‚é‚½‚ß“ñd’è‹`–h~
-#define MaxStrLen (LONG)512
 #endif
 
 void ParseParam(PBOOL IOption, PBOOL VOption);

@@ -4,6 +4,10 @@
 
 /* TTMACRO.EXE, TTL parser */
 
+#pragma once
+
+#include "ttmdef.h"
+
 #define IdTTLRun            1
 #define IdTTLWait           2
 #define IdTTLWaitLn         3
@@ -272,14 +276,6 @@
 
 // integer type for buffer pointer
 typedef DWORD BINT;
-
-#define MaxNameLen (LONG)32
-#ifndef MaxStrLen	// ttmdlg.h‚Å‚à’è‹`‚µ‚Ä‚¢‚é‚½‚ß“ñd’è‹`–h~
-#define MaxStrLen (LONG)512
-#endif
-#define MaxLineLen (LONG)1024
-
-#define INT_BIT (CHAR_BIT * sizeof(int))
 
 typedef char TName[MaxNameLen];
 typedef TName far *PName;
