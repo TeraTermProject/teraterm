@@ -1878,7 +1878,7 @@ LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 									str[select] = '\0';
 
 								}
-							} 
+							}
 
 							if (wParam == 0x55) { // カーソルより左側をすべて消す
 								if (select >= len) {
@@ -1991,7 +1991,7 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 			// ファイルおよび名前付きパイプの場合、TCP/IP扱いとする。
 			if ( GetHNRec->PortType==IdFile ||
- 				 GetHNRec->PortType==IdNamedPipe
+				 GetHNRec->PortType==IdNamedPipe
 				) {
 				GetHNRec->PortType = IdTCPIP;
 			}
@@ -2283,7 +2283,7 @@ BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			D.x = R.left;
 			D.y = R.top;
 			ScreenToClient(Dialog,&D);
-			DH = R.bottom-R.top;  
+			DH = R.bottom-R.top;
 			TmpDC = GetDC(Dialog);
 			GetTextExtentPoint32(TmpDC,CurDir,strlen(CurDir),&s);
 			ReleaseDC(Dialog,TmpDC);
@@ -2422,7 +2422,7 @@ static void get_file_version(char *exefile, int *major, int *minor, int *release
 		goto error;
 	}
 
-	ret = VerQueryValue(buf, "\\VarFileInfo\\Translation", 
+	ret = VerQueryValue(buf, "\\VarFileInfo\\Translation",
 	                    (LPVOID *)&lplgcode, &unLen);
 	if (ret == FALSE) {
 		goto error;
@@ -2561,7 +2561,7 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 		}
 		break;
 
-	case WM_PAINT: 
+	case WM_PAINT:
 		{
 		// ウィンドウの描画
 		PAINTSTRUCT ps;
@@ -2762,7 +2762,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 #endif
 			SendMessage(GetDlgItem(Dialog, IDC_TT_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
-			// Onigurumaのバージョンを設定する 
+			// Onigurumaのバージョンを設定する
 			// バージョンの取得は onig_version() を呼び出すのが適切だが、そのためだけにライブラリを
 			// リンクしたくなかったので、以下のようにした。Onigurumaのバージョンが上がった場合、
 			// ビルドエラーとなるかもしれない。
@@ -2952,11 +2952,11 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				hdc = BeginPaint(Dialog, &ps);
 
 				if (fullcolor) {
-					BitBlt(hdc, 
-						ps.rcPaint.left, ps.rcPaint.top, 
+					BitBlt(hdc,
+						ps.rcPaint.left, ps.rcPaint.top,
 						ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
-						dlgdc, 
-						ps.rcPaint.left, ps.rcPaint.top, 
+						dlgdc,
+						ps.rcPaint.left, ps.rcPaint.top,
 						SRCCOPY);
 				}
 
@@ -2972,7 +2972,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				static int idx = 0;
 				short amplitudes[4] = {250, 425, 350, 650};
 
-				xpos = LOWORD(lParam); 
+				xpos = LOWORD(lParam);
 				ypos = HIWORD(lParam);
 
 				wavemap[POS(xpos,ypos)] = amplitudes[idx++];
@@ -2981,7 +2981,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_TIMER:
-			if (wParam == ID_EFFECT_TIMER) 
+			if (wParam == ID_EFFECT_TIMER)
 			{
 				int x, y;
 				short height, xdiff;
@@ -3001,7 +3001,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				// cf. http://freespace.virgin.net/hugo.elias/graphics/x_water.htm
 				for (y = 1; y < dlgh - 1 ; y++) {
 					for (x = 1; x < dlgw - 1 ; x++) {
-						height = (p_new[POS(x,y-1)] + 
+						height = (p_new[POS(x,y-1)] +
 							      p_new[POS(x-1,y)] +
 							      p_new[POS(x+1,y)] +
 							      p_new[POS(x,y+1)]) / 2 - p_old[POS(x,y)];
@@ -3020,9 +3020,9 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 #if 0
 				hdc = GetDC(Dialog);
-				BitBlt(hdc, 
+				BitBlt(hdc,
 					0, 0, dlgw, dlgh,
-					dlgdc, 
+					dlgdc,
 					0, 0,
 					SRCCOPY);
 				ReleaseDC(Dialog, hdc);
@@ -3233,7 +3233,7 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						if (w != langui_sel) {
 							char CurDir[MAX_PATH];
 
-							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE, 
+							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
 								"%s\\%s", LANG_PATH, LangUIList[w - 1]);
 
 							GetCurrentDirectory(sizeof(CurDir), CurDir);

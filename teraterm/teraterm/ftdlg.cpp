@@ -197,7 +197,7 @@ void CFileTransDlg::OnCancel( )
 	::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
 }
 
-BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam) 
+BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam)) {
 		case IDCANCEL:

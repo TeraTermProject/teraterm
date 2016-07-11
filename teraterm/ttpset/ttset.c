@@ -542,8 +542,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 			ts->Language = IdRussian;
 			break;
 		case LANG_KOREAN:	// HKS
-			ts->Language = IdKorean; 
-			break; 
+			ts->Language = IdKorean;
+			break;
 		default:
 			ts->Language = IdEnglish;
 		}
@@ -1508,7 +1508,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->ConnectingTimeout =
 		GetPrivateProfileInt(Section, "ConnectingTimeout", 0, FName);
 
-	// mouse cursor 
+	// mouse cursor
 	GetPrivateProfileString(Section, "MouseCursor", "IBEAM",
 	                        Temp, sizeof(Temp), FName);
 	strncpy_s(ts->MouseCursorName, sizeof(ts->MouseCursorName), Temp,
@@ -1767,7 +1767,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Lock Terminal UID
 	if (GetOnOff(Section, "LockTUID", FName, TRUE))
 		ts->TermFlag |= TF_LOCKTUID;
-	
+
 	// Confirm PasteCR
 	ts->ConfirmChangePasteCR = GetOnOff(Section, "ConfirmChangePasteCR", FName, TRUE);
 
@@ -1957,16 +1957,16 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		strncpy_s(Temp, sizeof(Temp), "Japanese", _TRUNCATE);
 		break;
 	case IdKorean:
-	  	strncpy_s(Temp, sizeof(Temp), "Korean",   _TRUNCATE);
+		strncpy_s(Temp, sizeof(Temp), "Korean",   _TRUNCATE);
 		break;
 	case IdRussian:
-	  	strncpy_s(Temp, sizeof(Temp), "Russian",  _TRUNCATE);
+		strncpy_s(Temp, sizeof(Temp), "Russian",  _TRUNCATE);
 		break;
 	case IdUtf8:
-	  	strncpy_s(Temp, sizeof(Temp), "UTF-8",  _TRUNCATE);
+		strncpy_s(Temp, sizeof(Temp), "UTF-8",  _TRUNCATE);
 		break;
 	default:
-	  	strncpy_s(Temp, sizeof(Temp), "English",  _TRUNCATE);
+		strncpy_s(Temp, sizeof(Temp), "English",  _TRUNCATE);
 	}
 
 	WritePrivateProfileString(Section, "Language", Temp, FName);
@@ -4022,8 +4022,8 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		ts->PortType = IdSerial;
 		if (ParamCom > 0) {
 			ts->ComPort = ParamCom;
-			/* Don't display new connection dialog if COM port is specified explicitly (2006.9.15 maya) */ 
-			ts->ComAutoConnect = TRUE; 
+			/* Don't display new connection dialog if COM port is specified explicitly (2006.9.15 maya) */
+			ts->ComAutoConnect = TRUE;
 		}
 		if (ParamBaud != BaudNone)
 			ts->Baud = ParamBaud;

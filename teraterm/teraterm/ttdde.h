@@ -22,7 +22,7 @@ extern char TopicName[21];
 extern HCONV ConvH;
 extern BOOL AdvFlag;
 extern BOOL CloseTT;
-extern HWND HWndLog; //steven add 
+extern HWND HWndLog; //steven add
 
 #ifdef __cplusplus
 }

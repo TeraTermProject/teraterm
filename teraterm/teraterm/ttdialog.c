@@ -131,7 +131,7 @@ BOOL LoadTTDLG()
 BOOL FreeTTDLG()
 {
 	if (TTDLGUseCount==0) {
-		return FALSE; 
+		return FALSE;
 	}
 	TTDLGUseCount--;
 	if (TTDLGUseCount>0) {

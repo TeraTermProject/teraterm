@@ -103,12 +103,12 @@ void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts)
 	char uimsg[MAX_UIMSG];
 	int ret;
 
-	get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg), 
+	get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg),
 		"This option takes effect the next time a session is started.\n"
 		"Are you sure that you want to relaunch Tera Term?"
 		, ts->UILanguageFile);
 	ret = MessageBox(hwnd, uimsg, "Tera Term: Configuration Warning", MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
-	if (ret != IDYES) 
+	if (ret != IDYES)
 		return;
 
 	SendMessage(hwnd, WM_COMMAND, ID_SETUP_SAVE, 0);
@@ -880,7 +880,7 @@ void FAR PASCAL UnregWin(HWND HWin)
 	}
 }
 
-char GetWindowTypeChar(HWND Hw, HWND HWin) 
+char GetWindowTypeChar(HWND Hw, HWND HWin)
 {
 #if 0
 	if (HWin == Hw)
@@ -1103,10 +1103,10 @@ void FAR PASCAL UndoAllWin(void) {
 
 			// ウィンドウ位置復元
 			SetWindowPos(
-				pm->WinList[i], NULL, 
-				rc.left, 
+				pm->WinList[i], NULL,
+				rc.left,
 				rc.top,
-				rc.right - rc.left, 
+				rc.right - rc.left,
 				rc.bottom - rc.top,
 				SWP_NOZORDER);
 
@@ -1133,7 +1133,7 @@ void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 		return;
 	}
 	ExtractDirName(Temp, HomeDir);
-	
+
 //	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
 	get_lang_msg("HELPFILE", uimsg, sizeof(uimsg), "teraterm.chm", UILanguageFile);
 
@@ -1208,7 +1208,7 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 }
 
 // ウィンドウを上下に並べて表示する(Show Windows Stacked)
-void FAR PASCAL ShowAllWinStacked(HWND myhwnd) 
+void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
@@ -1218,7 +1218,7 @@ void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 }
 
 // ウィンドウを重ねて表示する(Cascade)
-void FAR PASCAL ShowAllWinCascade(HWND myhwnd) 
+void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
@@ -1228,7 +1228,7 @@ void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
 }
 
 // 全Tera Termに終了指示を出す。
-void FAR PASCAL BroadcastClosingMessage(HWND myhwnd) 
+void FAR PASCAL BroadcastClosingMessage(HWND myhwnd)
 {
 	int i, max;
 	HWND hwnd[MAXNWIN];
@@ -1242,7 +1242,7 @@ void FAR PASCAL BroadcastClosingMessage(HWND myhwnd)
 
 	for (i = 0 ; i < max ; i++) {
 		// 自分自身は最後にする。
-		if (hwnd[i] == myhwnd) 
+		if (hwnd[i] == myhwnd)
 			continue;
 
 		PostMessage(hwnd[i], WM_USER_NONCONFIRM_CLOSE, 0, 0);
@@ -1530,7 +1530,7 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 	return TempLen;
 }
 
-// 
+//
 // MBCSから各種漢字コードへ変換して出力する。
 //
 int TextOutMBCS(PComVar cv, PCHAR B, int C)
@@ -1562,7 +1562,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 			else {
 				switch (cv->Language) {
 				  case IdJapanese:
-				  	switch (cv->KanjiCodeSend) {
+					switch (cv->KanjiCodeSend) {
 					  case IdEUC:
 						K = SJIS2EUC(K);
 						break;
@@ -1579,7 +1579,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 					}
 					break;
 				  case IdKorean:
-				  	break;
+					break;
 				}
 				TempStr[TempLen++] = HIBYTE(K);
 				TempStr[TempLen++] = LOBYTE(K);
@@ -1771,7 +1771,7 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 	while (! Full && (i < C)) {
 		TempLen = 0;
 		d = (BYTE)B[i];
-	
+
 		switch (d) {
 		  case CR:
 			TempStr[TempLen] = 0x0d;
@@ -1796,7 +1796,7 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 					cv->LineModeBuffCount--;
 				}
 			}
-		  	else {
+			else {
 				TempStr[TempLen++] = d;
 			}
 			break;
@@ -2113,7 +2113,7 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 				TempStr[TempLen-1] = 0x0a;
 			}
 			break;
-		  
+
 		  case 0x15: // Ctrl-U
 			if (cv->TelLineMode) {
 				// Move to top of line (CHA "\033[G") and erase line (EL "\033[K")
@@ -2146,7 +2146,7 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-// listup serial port driver 
+// listup serial port driver
 // cf. http://www.codeproject.com/system/setupdi.asp?df=100&forumid=4368&exp=0&select=479661
 // (2007.8.17 yutaka)
 static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDesc, int ComPortMax)

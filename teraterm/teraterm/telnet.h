@@ -28,7 +28,7 @@
 #define BINARY     0
 #define ECHO	   1
 #define RECONNECT  2
-#define SGA 	   3
+#define SGA	   3
 #define AMSN	   4
 #define STATUS     5
 #define TIMING     6

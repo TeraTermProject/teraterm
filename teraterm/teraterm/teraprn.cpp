@@ -181,7 +181,7 @@ int VTPrintInit(int PrnFlag)
 //	= IdPrnSelectedText	(user selects "print selection")
 //	= IdPrnScrollRegion	(always when PrnFlag=IdPrnScrollRegion)
 //	= IdPrnFile		(always when PrnFlag=IdPrnFile)
-{	
+{
 	BOOL Sel;
 	TEXTMETRIC Metrics;
 	POINT PPI, PPI2;

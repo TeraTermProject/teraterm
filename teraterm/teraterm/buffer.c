@@ -29,7 +29,7 @@
 #define BuffSizeMax (BuffYMax * 80)
 
 // status line
-int StatusLine;	//0: none 1: shown 
+int StatusLine;	//0: none 1: shown
 /* top, bottom, left & right margin */
 int CursorTop, CursorBottom, CursorLeftM, CursorRightM;
 BOOL Selected;
@@ -1593,7 +1593,7 @@ static void markURL(int x)
 	};
 	unsigned char ch = CodeLine[x];
 
-	if (ts.EnableClickableUrl == FALSE && 
+	if (ts.EnableClickableUrl == FALSE &&
 		(ts.ColorFlag & CF_URLCOLOR) == 0)
 		return;
 
@@ -1605,7 +1605,7 @@ static void markURL(int x)
 		if ((PrevCharAttr & AttrURL) && !(AttrLine[0]&(AttrKanji|AttrSpecial)) && !(ch & 0x80) && url_char[ch]) {
 			if ((AttrLine[0] & AttrLineContinued) || (ts.JoinSplitURL &&
 			    (PrevCharCode == ts.JoinSplitURLIgnoreEOLChar || ts.JoinSplitURLIgnoreEOLChar == '\0' ))) {
-				AttrLine[0] |= AttrURL; 
+				AttrLine[0] |= AttrURL;
 			}
 		}
 		return;
@@ -1614,7 +1614,7 @@ static void markURL(int x)
 	if ((x-1>=0) && (AttrLine[x-1] & AttrURL) &&
 	  !(AttrLine[x] & (AttrKanji|AttrSpecial)) &&
 	  ((!(ch & 0x80) && url_char[ch]) || (x == NumOfColumns - 1 && ch == ts.JoinSplitURLIgnoreEOLChar))) {
-		AttrLine[x] |= AttrURL; 
+		AttrLine[x] |= AttrURL;
 		return;
 	}
 
@@ -1628,7 +1628,7 @@ static void markURL(int x)
 			len = strlen(*p) - 1;
 			if ((x-len>=0) && !strncmp(&CodeLine[x-len], *p, len)) {
 				for (i = 0; i <= len; i++) {
-					AttrLine[x-i] |= AttrURL; 
+					AttrLine[x-i] |= AttrURL;
 				}
 				break;
 			}
@@ -2399,7 +2399,7 @@ static void invokeBrowser(LONG ptr)
 	uptr = url;
 	for (i = 0; i < end - start + 1; i++) {
 		ch = CodeBuff[start + i];
-		if ((start + i) % NumOfColumns == NumOfColumns - 1 
+		if ((start + i) % NumOfColumns == NumOfColumns - 1
 			&& ch == ts.JoinSplitURLIgnoreEOLChar) {
 			// 行末が行継続マーク用の文字の場合はスキップする
 		} else {
@@ -2696,7 +2696,7 @@ void BuffDblClk(int Xw, int Yw)
 					MoveCharPtr(TmpPtr,&IStart,1);
 				}
 			}
-			
+
 			// 行が移動しているかもしれないので、クリックした行を取り直す
 			TmpPtr = GetLinePtr(YEnd);
 			i = 1;
@@ -2972,7 +2972,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 				ChangeSelectRegion();
 				SelectStart = DblClkEnd;
 				SelectEnd.x = X;
-				SelectEnd.y = Y; 
+				SelectEnd.y = Y;
 			}
 			if (IsDelimiter(TmpPtr,SelectEnd.x)) {
 				b = CodeBuff[TmpPtr+SelectEnd.x];
@@ -2995,7 +2995,7 @@ void BuffChangeSelect(int Xw, int Yw, int NClick)
 					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,-1); // move left
 				}
 				if (IsDelimiter(TmpPtr,SelectEnd.x)) {
-					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1); 
+					MoveCharPtr(TmpPtr,(int *)&SelectEnd.x,1);
 				}
 			}
 		}

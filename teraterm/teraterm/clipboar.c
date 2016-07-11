@@ -859,7 +859,7 @@ static int search_clipboard(char *filename, char *text)
 	FILE *fp = NULL;
 	char buf[256];
 	int len;
-	
+
 	if (filename == NULL || filename[0] == '\0')
 		goto error;
 
@@ -870,7 +870,7 @@ static int search_clipboard(char *filename, char *text)
 	// TODO: àÍçsÇ™256byteÇí¥Ç¶ÇƒÇ¢ÇÈèÍçáÇÃçló∂
 	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		len = strlen(buf);
-		if (buf[len - 1] == '\n') 
+		if (buf[len - 1] == '\n')
 			buf[len - 1] = '\0';
 		if (buf[0] == '\0')
 			continue;
@@ -912,7 +912,7 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	if (!ts.ConfirmChangePaste && !ts.TrimTrailingNLonPaste)
 		return 1;
 
-	if (! cv.Ready) 
+	if (! cv.Ready)
 		goto error;
 	if (TalkStatus!=IdTalkKeyb)
 		goto error;
@@ -923,10 +923,10 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 		Cf = CF_TEXT;
 	else if (IsClipboardFormatAvailable(CF_OEMTEXT))
 		Cf = CF_OEMTEXT;
-	else 
+	else
 		goto error;
 
-	if (!OpenClipboard(HWin)) 
+	if (!OpenClipboard(HWin))
 		goto error;
 
 	if (Cf == CF_UNICODETEXT) {

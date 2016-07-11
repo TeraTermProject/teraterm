@@ -177,7 +177,7 @@ void ChangeTitle()
 			if (ts.TitleFormat & 8) {
 				_snprintf_s(TempTitle, sizeof(TempTitle), _TRUNCATE, "%s - %s", str, TempTitleWithRemote);
 			} else {
-				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE); 
+				strncat_s(TempTitle, sizeof(TempTitle), str, _TRUNCATE);
 			}
 		}
 		else if (cv.PortType == IdNamedPipe)

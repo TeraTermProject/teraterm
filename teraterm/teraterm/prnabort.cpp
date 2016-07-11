@@ -60,7 +60,7 @@ void CPrnAbortDlg::OnCancel()
 	DestroyWindow();
 }
 
-BOOL CPrnAbortDlg::OnCommand(WPARAM wParam, LPARAM lParam) 
+BOOL CPrnAbortDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	*Abort = TRUE;
 	DestroyWindow();
@@ -68,12 +68,12 @@ BOOL CPrnAbortDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	return CDialog::OnCommand(wParam, lParam);
 }
 
-void CPrnAbortDlg::PostNcDestroy() 
+void CPrnAbortDlg::PostNcDestroy()
 {
 	delete this;
 }
 
-BOOL CPrnAbortDlg::DestroyWindow() 
+BOOL CPrnAbortDlg::DestroyWindow()
 {
 	HWND HParent;
 

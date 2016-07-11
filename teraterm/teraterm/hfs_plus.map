@@ -5,7 +5,7 @@ typedef struct hfsplus_codemap {
 } hfsplus_codemap_t;
 
 /*
- * cf. http://developer.apple.com/technotes/tn/tn1150table.html 
+ * cf. http://developer.apple.com/technotes/tn/tn1150table.html
  *
  */
 static hfsplus_codemap_t mapHFSPlusUnicode[] = {

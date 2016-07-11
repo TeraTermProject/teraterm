@@ -865,7 +865,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			func(ParamFileName, ParamSecondFileName);
 			EndDdeCmnd(1);     // マクロ実行を終了させる。本来なら、SCP転送が完了してから呼び出したほうが望ましい。
 			break;
-		} 
+		}
 
 scp_send_error:
 		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
@@ -901,7 +901,7 @@ scp_send_error:
 			func(ParamFileName, ParamSecondFileName);
 			EndDdeCmnd(1);     // マクロ実行を終了させる。本来なら、SCP転送が完了してから呼び出したほうが望ましい。
 			break;
-		} 
+		}
 
 scp_rcv_error:
 		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
@@ -1139,7 +1139,7 @@ BOOL InitDDE()
 	else
 		Ok = FALSE;
 
-	SyncMode = FALSE;  
+	SyncMode = FALSE;
 	CloseTT = FALSE;
 	StartupFlag = FALSE;
 	DDELog = FALSE;
@@ -1166,7 +1166,7 @@ void EndDDE()
 
 	if (ConvH != 0)
 		DdeDisconnect(ConvH);
-	ConvH = 0;  
+	ConvH = 0;
 	SyncMode = FALSE;
 	StartupFlag = FALSE;
 
@@ -1296,7 +1296,7 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	if (CreateProcess(
 		NULL,
 		Cmnd,
-		NULL, 
+		NULL,
 		NULL,
 		FALSE,
 		pri,

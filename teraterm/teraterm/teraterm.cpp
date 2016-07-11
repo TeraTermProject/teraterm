@@ -98,8 +98,8 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 			if (cv.ProtoFlag) Change = ProtoDlgParse();
 			else {
 				switch (ActiveWin) {
-				case IdVT: 
-					Change =  ((CVTWindow*)pVTWin)->Parse(); 
+				case IdVT:
+					Change =  ((CVTWindow*)pVTWin)->Parse();
 					// TEK windowのアクティブ中に pause を使うと、CPU使用率100%となる
 					// 現象への暫定対処。(2006.2.6 yutaka)
 					// 待ち時間をなくし、コンテキストスイッチだけにする。(2006.3.20 yutaka)

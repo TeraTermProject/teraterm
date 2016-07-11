@@ -491,7 +491,7 @@ void CTEKWindow::OnRButtonUp(UINT nFlags, CPoint point)
 void CTEKWindow::OnSetFocus(CWnd* pOldWnd)
 {
 	TEKChangeCaret(&tk,&ts);
-	CFrameWnd::OnSetFocus(pOldWnd);	
+	CFrameWnd::OnSetFocus(pOldWnd);
 }
 
 void CTEKWindow::OnSize(UINT nType, int cx, int cy)

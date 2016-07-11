@@ -586,7 +586,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 		case IdNamedPipe:
 			InitFileIO(IdNamedPipe);  /* TTPLUG */
 			TTXOpenFile(); /* TTPLUG */
-			
+
 			memset(P, 0, sizeof(P));
 			strncpy_s(P, sizeof(P), ts->HostName, _TRUNCATE);
 
@@ -594,10 +594,10 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			if (CheckNamedPipeFormat(P, strlen(P)) < 0) {
 				InvalidHost = TRUE;
 
-				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, 
+				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE,
 					"Invalid pipe name (%d)\n\n"
 					"A valid pipe name has the form\n"
-					"\"\\\\<ServerName>\\pipe\\<PipeName>\"", 
+					"\"\\\\<ServerName>\\pipe\\<PipeName>\"",
 					GetLastError());
 				get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
 				MessageBox(cv->HWin,ErrMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
@@ -675,7 +675,7 @@ void NamedPipeThread(void *arg)
 			WaitForSingleObject(REnd,INFINITE);
 		}
 		else {
-			DErr = GetLastError();  
+			DErr = GetLastError();
 			// [VMware] this returns 109 (broken pipe) if a named pipe is removed.
 			// [Virtual Box] this returns 233 (pipe not connected) if a named pipe is removed.
 			if (! cv->Ready || ERROR_BROKEN_PIPE == DErr || ERROR_PIPE_NOT_CONNECTED == DErr) {
@@ -1089,7 +1089,7 @@ void CommSend(PComVar cv)
 	DWORD DErr;
 
 	if ((! cv->Open) || (! cv->Ready)) {
-		cv->OutBuffCount = 0;  
+		cv->OutBuffCount = 0;
 		return;
 	}
 

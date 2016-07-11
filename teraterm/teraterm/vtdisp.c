@@ -355,17 +355,17 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
 
   //ファイルを数える
   hFind = FindFirstFile(fullpath,&fd);
-  
+
   file_num = 0;
 
   if(hFind != INVALID_HANDLE_VALUE && filePart)
   {
 
     do{
-    
+
       if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
         file_num ++;
-    
+
     }while(FindNextFile(hFind,&fd));
 
   }
@@ -385,10 +385,10 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
     i = 0;
 
     do{
-    
+
       if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
         i ++;
-    
+
     }while(i < file_num && FindNextFile(hFind,&fd));
 
   }else{
@@ -470,13 +470,13 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
     return FALSE;
 
   bmiSize = pbmi->bmiHeader.biSize;
-  
+
   switch(pbmi->bmiHeader.biBitCount)
   {
     case 1:
       bmiSize += pbmi->bmiHeader.biClrUsed ? sizeof(RGBQUAD) * 2 : 0;
       break;
-    
+
     case 2 :
       bmiSize += sizeof(RGBQUAD) * 4;
       break;
@@ -485,7 +485,7 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
       bmiSize += sizeof(RGBQUAD) * 16;
       break;
 
-    case 8 : 
+    case 8 :
       bmiSize += sizeof(RGBQUAD) * 256;
       break;
   }
@@ -563,7 +563,7 @@ void BGPreloadPicture(BGSrc *src)
 
   if(hPictureFile == INVALID_HANDLE_VALUE)
     return;
-  
+
   fileSize = GetFileSize(hPictureFile,0);
 
   //最低 2kb は確保 (Susie plugin の仕様より)
@@ -613,7 +613,7 @@ void BGPreloadPicture(BGSrc *src)
 
         LocalFree(hbmi);
         LocalFree(hbuf);
-    
+
         strncpy_s(src->file, sizeof(src->file),src->fileTmp, _TRUNCATE);
 
         break;
@@ -791,7 +791,7 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
         bi.bmiHeader.biPlanes = 1;
         bi.bmiHeader.biBitCount = 32;
         fAlpha = (bm.bmBitsPixel == 32);
-        pbBits = (BYTE *)HeapAlloc(GetProcessHeap(), 0, 
+        pbBits = (BYTE *)HeapAlloc(GetProcessHeap(), 0,
                                    nWidthBytes * bm.bmHeight);
         if (pbBits == NULL)
             return NULL;
@@ -829,17 +829,17 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
                     c10 = ((LPDWORD)pbLine0)[x1];
                     c11 = ((LPDWORD)pbLine1)[x1];
 
-                    b0 = ((ex0 * (c00 & 0xFF)) + 
+                    b0 = ((ex0 * (c00 & 0xFF)) +
                           (ex1 * (c10 & 0xFF))) >> 8;
-                    b1 = ((ex0 * (c01 & 0xFF)) + 
+                    b1 = ((ex0 * (c01 & 0xFF)) +
                           (ex1 * (c11 & 0xFF))) >> 8;
-                    g0 = ((ex0 * ((c00 >> 8) & 0xFF)) + 
+                    g0 = ((ex0 * ((c00 >> 8) & 0xFF)) +
                           (ex1 * ((c10 >> 8) & 0xFF))) >> 8;
-                    g1 = ((ex0 * ((c01 >> 8) & 0xFF)) + 
+                    g1 = ((ex0 * ((c01 >> 8) & 0xFF)) +
                           (ex1 * ((c11 >> 8) & 0xFF))) >> 8;
-                    r0 = ((ex0 * ((c00 >> 16) & 0xFF)) + 
+                    r0 = ((ex0 * ((c00 >> 16) & 0xFF)) +
                           (ex1 * ((c10 >> 16) & 0xFF))) >> 8;
-                    r1 = ((ex0 * ((c01 >> 16) & 0xFF)) + 
+                    r1 = ((ex0 * ((c01 >> 16) & 0xFF)) +
                           (ex1 * ((c11 >> 16) & 0xFF))) >> 8;
                     b0 = (ey0 * b0 + ey1 * b1) >> 8;
                     g0 = (ey0 * g0 + ey1 * g1) >> 8;
@@ -847,13 +847,13 @@ static HBITMAP CreateStretched32BppBitmapBilinear(HBITMAP hbm, INT cxNew, INT cy
 
                     if (fAlpha)
                     {
-                        a0 = ((ex0 * ((c00 >> 24) & 0xFF)) + 
+                        a0 = ((ex0 * ((c00 >> 24) & 0xFF)) +
                               (ex1 * ((c10 >> 24) & 0xFF))) >> 8;
-                        a1 = ((ex0 * ((c01 >> 24) & 0xFF)) + 
+                        a1 = ((ex0 * ((c01 >> 24) & 0xFF)) +
                               (ex1 * ((c11 >> 24) & 0xFF))) >> 8;
                         a0 = (ey0 * a0 + ey1 * a1) >> 8;
                     }
-                    ((LPDWORD)pbNewLine)[ix] = 
+                    ((LPDWORD)pbNewLine)[ix] =
                         MAKELONG(MAKEWORD(b0, g0), MAKEWORD(r0, a0));
                 }
             }
@@ -896,9 +896,9 @@ void BGPreloadWallpaper(BGSrc *src)
 		}
 
 #ifdef DEBUG_XP
-		//wi.pattern = BG_STRETCH; 
-		//wi.pattern = BG_FIT_WIDTH; 
-		//wi.pattern = BG_FIT_HEIGHT; 
+		//wi.pattern = BG_STRETCH;
+		//wi.pattern = BG_FIT_WIDTH;
+		//wi.pattern = BG_FIT_HEIGHT;
 #endif
 
 		GetObject(hbm,sizeof(bm),&bm);
@@ -944,7 +944,7 @@ void BGPreloadWallpaper(BGSrc *src)
 			DeleteObject(hbm);
 			hbm = newhbm;
 
-			wi.pattern = BG_STRETCH; 
+			wi.pattern = BG_STRETCH;
 		}
 	}
 
@@ -1053,7 +1053,7 @@ void BGLoadPicture(HDC hdcDest,BGSrc *src)
 
       height = (src->height * ScreenWidth) / src->width;
       y      = (ScreenHeight - height) / 2;
-      
+
       BGStretchPicture(hdcDest,src,0,y,ScreenWidth,height,src->antiAlias);
       break;
 
@@ -1131,7 +1131,7 @@ BOOL CALLBACK BGLoadWallpaperEnumFunc(HMONITOR hMonitor,HDC hdcMonitor,LPRECT lp
 
       break;
     case BG_TILE :
-      
+
       SetWindowOrgEx(lws->src->hdc,0,0,NULL);
 
       for(x = rectDest.left - (rectDest.left % lws->src->width ) - lws->src->width ;
@@ -1183,7 +1183,7 @@ void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
     (*BGEnumDisplayMonitors)(NULL,NULL,BGLoadWallpaperEnumFunc,(LPARAM)&lws);
   }else{
     RECT rectMonitor;
-  
+
     SetRect(&rectMonitor,0,0,CRTWidth,CRTHeight);
     BGLoadWallpaperEnumFunc(NULL,NULL,&rectMonitor,(LPARAM)&lws);
   }
@@ -1222,7 +1222,7 @@ void BGSetupPrimary(BOOL forceSetup)
   point.x = 0;
   point.y = 0;
   ClientToScreen(HVTWin,&point);
-  
+
   GetClientRect(HVTWin,&rect);
   OffsetRect(&rect,point.x,point.y);
 
@@ -1401,7 +1401,7 @@ void BGReadIniFile(char *file)
 
   GetPrivateProfileString(BG_SECTION,"BGSrc1File",BGSrc1.file,path,MAX_PATH,file);
   RandomFile(path,BGSrc1.file,sizeof(BGSrc1.file));
-  
+
   //Src2 の読み出し
   BGSrc2.type      = BGGetType("BGSrc2Type",BGSrc2.type,file);
   BGSrc2.pattern   = BGGetPattern("BGSrc2Pattern",BGSrc2.pattern,file);
@@ -1510,7 +1510,7 @@ void BGInitialize(void)
 	  // 背景画像の明るさの読み込み。
 	  // BGSrc1Alpha と BGSrc2Alphaは同値として扱う。
 	  ts.BGImgBrightness = GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
-  } 
+  }
 
   if(!BGEnable)
     return;
@@ -1524,7 +1524,7 @@ void BGInitialize(void)
   BGNoFrame = ts.EtermLookfeel.BGNoFrame;
   BGFastSizeMove = ts.EtermLookfeel.BGFastSizeMove;
   BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
-  
+
 #if 0
   GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
   strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
@@ -1535,7 +1535,7 @@ void BGInitialize(void)
   GetTempFileName(tempPath,"ttAK",0,BGDest.fileTmp);
   GetTempFileName(tempPath,"ttAK",0,BGSrc1.fileTmp);
   GetTempFileName(tempPath,"ttAK",0,BGSrc2.fileTmp);
-  
+
   //デフォルト値
   BGDest.type      = BG_PICTURE;
   BGDest.pattern   = BG_STRETCH;
@@ -1570,7 +1570,7 @@ void BGInitialize(void)
   if(strcmp(config_file,""))
   {
     char dir[MAX_PATH],prevDir[MAX_PATH];
-    
+
     //INIファイルのあるディレクトリに一時的に移動
     GetCurrentDirectory(MAX_PATH,prevDir);
 
@@ -1962,7 +1962,7 @@ void ChangeFont()
   TmpDC = GetDC(HVTWin);
 
   SelectObject(TmpDC, VTFont[0]);
-  GetTextMetrics(TmpDC, &Metrics); 
+  GetTextMetrics(TmpDC, &Metrics);
   FontWidth = Metrics.tmAveCharWidth + ts.FontDW;
   FontHeight = Metrics.tmHeight + ts.FontDH;
 
@@ -2058,11 +2058,11 @@ void ChangeCaret()
   DestroyCaret();
   switch (ts.CursorShape) {
     case IdVCur:
-  	CreateCaret(HVTWin, 0, CurWidth, FontHeight);
-  	break;
+	CreateCaret(HVTWin, 0, CurWidth, FontHeight);
+	break;
     case IdHCur:
-  	CreateCaret(HVTWin, 0, FontWidth, CurWidth);
-  	break;
+	CreateCaret(HVTWin, 0, FontWidth, CurWidth);
+	break;
   }
   if (CaretEnabled) {
 	CaretStatus = 1;
@@ -2312,7 +2312,7 @@ void DispChangeWinSize(int Nx, int Ny)
   GetClientRect(HVTWin,&R);
   dW = ScreenWidth - R.right + R.left;
   dH = ScreenHeight - R.bottom + R.top;
-  
+
   if ((dW!=0) || (dH!=0))
   {
 	AdjustSize = TRUE;
@@ -2425,7 +2425,7 @@ void DispClearWin()
     {
       SetScrollRange(HVTWin,SB_VERT,0,1,FALSE);
     }
-    else 
+    else
       SetScrollRange(HVTWin,SB_VERT,0,NumOfLines-WinHeight,FALSE);
 
     SetScrollPos(HVTWin,SB_HORZ,0,TRUE);
@@ -2550,7 +2550,7 @@ void DispSetupDC(TCharAttr Attr, BOOL Reverse)
   }
   DCAttr = Attr;
   DCReverse = Reverse;
-     
+
   SelectObject(VTDC, VTFont[(Attr.Attr & AttrFontMask) | (isURLUnderlined(Attr)?AttrUnder:0)]);
 
   if ((ts.ColorFlag & CF_FULLCOLOR) == 0) {
@@ -2796,7 +2796,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
         eto_options |= ETO_OPAQUE;
       }
     }
-    
+
     ExtTextOut(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect,Buff,Count,&Dx[0]);
     BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
 
@@ -2860,7 +2860,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 	RText.top = Y;
 	RText.bottom = Y+FontHeight;
 	RText.left = *X;
-	RText.right = *X + Count*FontWidth; // 
+	RText.right = *X + Count*FontWidth; //
 
 	// Unicodeで出力する。
 #if 1
@@ -3105,7 +3105,7 @@ void AdjustScrollBar() /* called by ChangeWindowSize() */
   SetScrollPos(HVTWin,SB_HORZ,ScrollPosX,TRUE);
   SetScrollPos(HVTWin,SB_VERT,ScrollPosY,TRUE);
 
-  DontChangeSize = FALSE;  
+  DontChangeSize = FALSE;
 }
 
 void DispScrollToCursor(int CurX, int CurY)
@@ -3390,7 +3390,7 @@ void DispSetWinPos()
 
 #ifdef ALPHABLEND_TYPE2
    if(BGEnable)
-   	InvalidateRect(HVTWin, NULL, FALSE);
+	InvalidateRect(HVTWin, NULL, FALSE);
 #endif
 }
 
@@ -3529,9 +3529,9 @@ void DispResetColor(unsigned int num)
 	if (num == CS_UNSPEC) {
 		return;
 	}
-	
+
 	TmpDC = GetDC(NULL);
-	
+
 	switch(num) {
 #ifdef ALPHABLEND_TYPE2
 	case CS_VT_NORMALFG:
@@ -3626,7 +3626,7 @@ void DispResetColor(unsigned int num)
 			}
 			DispSetNearestColors(num, num, NULL);
 		}
-  		else if (num <= 15) {
+		else if (num <= 15) {
 			ANSIColor[num] = ts.ANSIColor[num];
 			DispSetNearestColors(num, num, NULL);
 		}
@@ -3718,7 +3718,7 @@ void DispShowWindow(int mode) {
 		SetWindowPos(HVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 		break;
 	  case WINDOW_REFRESH:
-	  	InvalidateRect(HVTWin, NULL, FALSE);
+		InvalidateRect(HVTWin, NULL, FALSE);
 		break;
 	}
 }
@@ -3755,7 +3755,7 @@ void DispGetWindowPos(int *x, int *y) {
 		*y = wndpl.ptMaxPosition.y;
 		break;
 	  default:
-	  	*x = wndpl.rcNormalPosition.left;
+		*x = wndpl.rcNormalPosition.left;
 		*y = wndpl.rcNormalPosition.top;
 	}
 

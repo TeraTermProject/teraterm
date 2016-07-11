@@ -609,7 +609,7 @@ BOOL FAR PASCAL GetMultiFname
 		ofn.lCustData = (DWORD)Option;
 		ofn.lpfnHook = (LPOFNHOOKPROC)(&TFn2Hook);
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
-	} else 	if (FuncId==GMF_Y) {
+	} else if (FuncId==GMF_Y) {
 		// TODO: YMODEM
 
 	}

@@ -181,7 +181,7 @@ HGLOBAL GetConvString(UINT wParam, LPARAM lParam)
 	hIMC = (*PImmGetContext)(HVTWin);
 	if (hIMC==0) return NULL;
 
-	if ((lParam & GCS_RESULTSTR)==0) 
+	if ((lParam & GCS_RESULTSTR)==0)
 		goto skip;
 
 	// Get the size of the result string.

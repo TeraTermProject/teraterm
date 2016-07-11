@@ -173,7 +173,7 @@ void CGeneralPropPageDlg::OnOK()
 	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
 	GetDlgItemText(IDC_SCROLL_LINE, buf, sizeof(buf));
 	val = atoi(buf);
-	if (val > 0) 
+	if (val > 0)
 		ts.MouseWheelScrollLine = val;
 
 	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
@@ -567,7 +567,7 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	btn = (CButton *)GetDlgItem(IDC_TRIMNLCHAR);
 	btn->SetCheck(ts.TrimTrailingNLonPaste);
 
-	// (7)ConfirmChangePaste 
+	// (7)ConfirmChangePaste
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
 	btn->SetCheck(ts.ConfirmChangePaste);
 
@@ -931,7 +931,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	btn = (CButton *)GetDlgItem(IDC_URL_UNDERLINE);
 	btn->SetCheck((ts.FontFlag&FF_URLUNDERLINE) != 0);
 
-	// ダイアログにフォーカスを当てる 
+	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND));
 
 	return FALSE;
@@ -1497,7 +1497,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					GetDlgItem(IDC_ROTATE_SIZE_TYPE)->EnableWindow(FALSE);
 					GetDlgItem(IDC_ROTATE_STEP_TEXT)->EnableWindow(FALSE);
 					GetDlgItem(IDC_ROTATE_STEP)->EnableWindow(FALSE);
-				}			
+				}
 
 			}
 			return TRUE;
@@ -1644,7 +1644,7 @@ void CLogPropPageDlg::OnOK()
 
 		((CComboBox*)GetDlgItem(IDC_ROTATE_SIZE_TYPE))->GetWindowText(str);
 		for (i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
-			if (strcmp(str, LogRotateSizeType[i]) == 0) 
+			if (strcmp(str, LogRotateSizeType[i]) == 0)
 				break;
 		}
 		if (i >= LOG_ROTATE_SIZETYPE_NUM)

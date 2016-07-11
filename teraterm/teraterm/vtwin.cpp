@@ -260,7 +260,7 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 		return FALSE;
 	}
 
-	return g_pSetLayeredWindowAttributes(hwnd, crKey, 
+	return g_pSetLayeredWindowAttributes(hwnd, crKey,
 	                                     bAlpha, dwFlags);
 }
 
@@ -450,20 +450,20 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 
 	/* シンボルハンドラの初期化 */
 	SymInitialize(hProcess, NULL, TRUE);
-	
+
 	// レジスタダンプ
 	msg[0] = '\0';
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "eax=%08X ebx=%08X ecx=%08X edx=%08X esi=%08X edi=%08X\r\n"
 		   "ebp=%08X esp=%08X eip=%08X efl=%08X\r\n"
 		   "cs=%04X ss=%04X ds=%04X es=%04X fs=%04X gs=%04X\r\n",
-		   ExInfo->ContextRecord->Eax, 
-		   ExInfo->ContextRecord->Ebx, 
-		   ExInfo->ContextRecord->Ecx, 
-		   ExInfo->ContextRecord->Edx, 
-		   ExInfo->ContextRecord->Esi, 
-		   ExInfo->ContextRecord->Edi, 
-		   ExInfo->ContextRecord->Ebp, 
-		   ExInfo->ContextRecord->Esp, 
+		   ExInfo->ContextRecord->Eax,
+		   ExInfo->ContextRecord->Ebx,
+		   ExInfo->ContextRecord->Ecx,
+		   ExInfo->ContextRecord->Edx,
+		   ExInfo->ContextRecord->Esi,
+		   ExInfo->ContextRecord->Edi,
+		   ExInfo->ContextRecord->Ebp,
+		   ExInfo->ContextRecord->Esp,
 		   ExInfo->ContextRecord->Eip,
 		   ExInfo->ContextRecord->EFlags,
 		   ExInfo->ContextRecord->SegCs,
@@ -489,21 +489,21 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			hProcess,
 			hThread,
 			&sf,
-			NULL, 
+			NULL,
 			NULL,
 			SymFunctionTableAccess,
 			SymGetModuleBase,
 			NULL);
 
 		/* 失敗ならば、ループを抜ける */
-		if (!bResult || sf.AddrFrame.Offset == 0) 
+		if (!bResult || sf.AddrFrame.Offset == 0)
 			break;
-		
+
 		frame++;
 
 		/* プログラムカウンタ（仮想アドレス）から関数名とオフセットを取得 */
 		bResult = SymGetSymFromAddr(hProcess, sf.AddrPC.Offset, &Disp, pSym);
-		
+
 		/* 取得結果を表示 */
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "#%d  0x%08x in ", frame, sf.AddrPC.Offset);
 		strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
@@ -514,7 +514,7 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, " --- ");
 			strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		}
-		
+
 		// 実行ファイル名の取得
 		ZeroMemory( &(ih_module), sizeof(ih_module) );
 		ih_module.SizeOfStruct = sizeof(ih_module);
@@ -527,7 +527,7 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s ", "<Unknown Module>" );
 			strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		}
-		
+
 		// ファイル名と行番号の取得
 		ZeroMemory( &(ih_line), sizeof(ih_line) );
 		ih_line.SizeOfStruct = sizeof(ih_line);
@@ -537,7 +537,7 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%lu", ih_line.FileName, ih_line.LineNumber );
 			strncat_s(msg, sizeof(msg), buf, _TRUNCATE);
 		}
-		
+
 		strncat_s(msg, sizeof(msg), "\n", _TRUNCATE);
 	}
 
@@ -1921,7 +1921,7 @@ void CVTWindow::OnAllClose()
 	get_lang_msg("MSG_ALL_TERMINATE_CONF", ts.UIMsg, sizeof(ts.UIMsg),
 	             "Terminate ALL Tera Term(s)?", ts.UILanguageFile);
 	if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
-	     MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2)==IDCANCEL) 
+	     MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2)==IDCANCEL)
 		return;
 
 	BroadcastClosingMessage(HVTWin);
@@ -2151,7 +2151,7 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 						if (func != NULL) {
 							func(SendVar->FullName, ts.ScpSendDir);
 							goto send_success;
-						} 
+						}
 
 scp_send_error:
 						::MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
@@ -2206,7 +2206,7 @@ void CVTWindow::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		case SB_PAGEDOWN:
 			Func = SCROLL_PAGEDOWN;
 			break;
-		case SB_PAGEUP: 
+		case SB_PAGEUP:
 			Func = SCROLL_PAGEUP;
 			break;
 		case SB_THUMBPOSITION:
@@ -2555,7 +2555,7 @@ void CVTWindow::OnSetFocus(CWnd* pOldWnd)
 
 //
 // リサイズツールチップ(based on PuTTY sizetip.c)
-// 
+//
 static ATOM tip_class = 0;
 static HFONT tip_font;
 static COLORREF tip_bg;
@@ -3339,7 +3339,7 @@ LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
 			memcpy(newbuf + cx, comp, complen);
 			memcpy(newbuf + cx + complen, buf + cx, size - cx);
 			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-	        
+
 			pReconv->dwSize            = sizeof(RECONVERTSTRING);
 			pReconv->dwVersion         = 0;
 			pReconv->dwStrLen          = newsize - 1;
@@ -3348,7 +3348,7 @@ LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
 			pReconv->dwCompStrOffset   = cx;
 			pReconv->dwTargetStrLen    = complen;
 			pReconv->dwTargetStrOffset = cx;
-	        
+
 			memcpy(pszParagraph, newbuf, newsize);
 			//OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
 		}
@@ -3897,7 +3897,7 @@ void CVTWindow::OnDuplicateSession()
 	int cygterm_PORT_START = 20000;
 	int cygterm_PORT_RANGE = 40;
 	int is_cygwin_port = 0;
-	
+
 	// 現在の設定内容を共有メモリへコピーしておく
 	CopyTTSetToShmem(&ts);
 
@@ -3938,14 +3938,14 @@ void CVTWindow::OnDuplicateSession()
 		return;
 	} else if (cv.TelFlag) { // telnet
 		_snprintf_s(Command, sizeof(Command), _TRUNCATE,
-		            "%s %s:%d /DUPLICATE /nossh", 
+		            "%s %s:%d /DUPLICATE /nossh",
 		            exec, ts.HostName, ts.TCPPort);
 
 	} else if (cv.isSSH) { // SSH
 		// ここの処理は TTSSH 側にやらせるべき (2004.12.7 yutaka)
 		// TTSSH側でのオプション生成を追加。(2005.4.8 yutaka)
 		_snprintf_s(Command, sizeof(Command), _TRUNCATE,
-		            "%s %s:%d /DUPLICATE", 
+		            "%s %s:%d /DUPLICATE",
 		            exec, ts.HostName, ts.TCPPort);
 
 		TTXSetCommandLine(Command, sizeof(Command), NULL); /* TTPLUG */
@@ -4269,7 +4269,7 @@ void CVTWindow::OnReplayLog()
 	get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", uimsg, sizeof(uimsg),
 	             "Select replay log file with binary mode", ts.UILanguageFile);
 	ofn.lpstrTitle = uimsg;
-	if(GetOpenFileName(&ofn) == 0) 
+	if(GetOpenFileName(&ofn) == 0)
 		return;
 
 
@@ -4358,7 +4358,7 @@ void CVTWindow::OnFileZSend()
 
 void CVTWindow::OnFileBPRcv()
 {
-	BPStart(IdBPReceive); 
+	BPStart(IdBPReceive);
 }
 
 void CVTWindow::OnFileBPSend()
@@ -4369,7 +4369,7 @@ void CVTWindow::OnFileBPSend()
 
 void CVTWindow::OnFileQVRcv()
 {
-	QVStart(IdQVReceive); 
+	QVStart(IdQVReceive);
 }
 
 void CVTWindow::OnFileQVSend()
@@ -4772,7 +4772,7 @@ void CVTWindow::OnSetupRestore()
 //
 static BOOL openFileWithApplication(char *pathname, char *filename, char *editor)
 {
-	char command[1024]; 
+	char command[1024];
 	char fullpath[1024];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -5354,7 +5354,7 @@ void CVTWindow::OnControlSendBreak()
 					if (TTXProcessCommand(HVTWin, ID_CONTROL_SENDBREAK)) {
 						break;
 					}
-				} 
+				}
 
 				TelSendBreak();
 				break;
@@ -5537,7 +5537,7 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 
 	// すべてのTera Termにメッセージとデータを送る
 	count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
-	for (i = 0 ; i < count ; i++) { 
+	for (i = 0 ; i < count ; i++) {
 		hd = NULL;
 		if (parent_only) {
 			hd = GetParent(hWnd);
@@ -6024,7 +6024,7 @@ skip:;
 				n = GetApplicationInstanceCount();
 				if (n != prev_instances) {
 					prev_instances = n;
-					UpdateBroadcastWindowList(BroadcastWindowList);	
+					UpdateBroadcastWindowList(BroadcastWindowList);
 				}
 			}
 			return TRUE;
@@ -6122,7 +6122,7 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 		name = msg;
 		nlen = strlen(name) + 1;
 		buf = msg + nlen;
-		buflen = msglen - nlen; 
+		buflen = msglen - nlen;
 
 		// マルチキャスト名をチェックする
 		if (CompareMulticastName(name) == 0) {  // 同じ

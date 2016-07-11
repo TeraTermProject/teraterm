@@ -64,7 +64,7 @@ void CProtoDlg::OnCancel( )
 	::PostMessage(fv->HMainWin,WM_USER_PROTOCANCEL,0,0);
 }
 
-BOOL CProtoDlg::OnCommand(WPARAM wParam, LPARAM lParam) 
+BOOL CProtoDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam)) {
 		case IDCANCEL:

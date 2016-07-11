@@ -60,7 +60,7 @@ static char BracketEndStr[] = "\033[201~";
 
 static BOOL FSend = FALSE;
 
-HWND HWndLog = NULL; //steven add 
+HWND HWndLog = NULL; //steven add
 
 static HMODULE HTTFILE = NULL;
 static int TTFILECount = 0;
@@ -181,7 +181,7 @@ BOOL LoadTTFILE()
 	{
 		FreeLibrary(HTTFILE);
 		HTTFILE = NULL;
-		return FALSE; 
+		return FALSE;
 	}
 	else {
 		TTFILECount = 1;
@@ -228,7 +228,7 @@ BOOL OpenFTDlg(PFileVar fv)
 		FTDlg->Create(fv, &cv, &ts);
 		FTDlg->RefreshNum();
 		if (fv->OpId == OpLog) {
-			HWndLog = FTDlg->m_hWnd; // steven add 
+			HWndLog = FTDlg->m_hWnd; // steven add
 		}
 	}
 
@@ -408,7 +408,7 @@ static void CloseFileSync(PFileVar ptr)
 }
 
 // 遅延書き込み用スレッド
-static unsigned _stdcall DeferredLogWriteThread(void *arg) 
+static unsigned _stdcall DeferredLogWriteThread(void *arg)
 {
 	MSG msg;
 	PFileVar fv = (PFileVar)arg;
@@ -490,8 +490,8 @@ BOOL LogStart()
 		                  (0x1000 * ts.LogTypePlainText) |
 		                  (0x2000 * ts.LogTimestamp) |
 		                  (0x4000 * ts.LogHideDialog) |
-		                  (0x8000 * ts.LogAllBuffIncludedInFirst)					  
-						  );
+		                  (0x8000 * ts.LogAllBuffIncludedInFirst)
+		         );
 
 		// ログのデフォルトファイル名を設定 (2006.8.28 maya)
 		strncat_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogDefaultName, _TRUNCATE);
@@ -813,7 +813,7 @@ static void LogRotate(void)
 		return;
 
 	if (LogVar->RotateMode == ROTATE_SIZE) {
-		if (LogVar->ByteCount <= LogVar->RotateSize) 
+		if (LogVar->ByteCount <= LogVar->RotateSize)
 			return;
 		//OutputDebugPrintf("%s: mode %d size %ld\n", __FUNCTION__, LogVar->RotateMode, LogVar->ByteCount);
 	} else {
@@ -921,7 +921,7 @@ void LogToFile()
 					strncat_s(tmp, sizeof(tmp), strtime, _TRUNCATE);
 					strncat_s(tmp, sizeof(tmp), "] ", _TRUNCATE);
 				}
-				
+
 				/* 2007.05.24 Gentaro */
 				if( b == 0x0a ){
 					eLineEnd = Line_LineHead; /* set endmark*/
@@ -971,7 +971,7 @@ void LogToFile()
 	#endif
 	#else
 						time_t tick = time(NULL);
-						char *strtime = ctime(&tick); 
+						char *strtime = ctime(&tick);
 	#endif
 					/* 2007.05.24 Gentaro */
 					if( eLineEnd == Line_FileHead ){
@@ -991,7 +991,7 @@ void LogToFile()
 					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);
 #endif
 				}
-				
+
 				/* 2007.05.24 Gentaro */
 				if( b == 0x0a ){
 					eLineEnd = Line_LineHead; /* set endmark*/
@@ -1101,7 +1101,7 @@ void FileSendStart()
 		return;
 	}
 
-	if (! LoadTTFILE()) 
+	if (! LoadTTFILE())
 		return;
 	if (! NewFileVar(&SendVar))
 	{
@@ -1178,7 +1178,7 @@ void FileTransEnd(WORD OpId)
 		{
 			FLogDlg->DestroyWindow();
 			FLogDlg = NULL;
-			HWndLog = NULL; // steven add 
+			HWndLog = NULL; // steven add
 		}
 		FreeFileVar(&LogVar);
 		FreeLogBuf();
@@ -1226,7 +1226,7 @@ extern "C" {
 // - FileBracketMode == false
 // - cv.TelFlag == false
 // - ts.LocalEcho == 0
-void FileSendBinayBoost() 
+void FileSendBinayBoost()
 {
 	WORD c, fc;
 	LONG BCOld;
@@ -1459,7 +1459,7 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 			((PXVar)ProtoVar)->XOpt = Opt1;
 			((PXVar)ProtoVar)->TextFlag = 1 - (Opt2 & 1);
 			break;
-		case PROTO_YM:  
+		case PROTO_YM:
 			((PYVar)ProtoVar)->YMode = Mode;
 			((PYVar)ProtoVar)->YOpt = Opt1;
 			break;
@@ -1524,7 +1524,7 @@ void CloseProtoDlg()
 		    (((PQVVar)ProtoVar)->QVMode==IdQVSend))
 			CommTextOut(&cv,"\015",1);
 		if (FileVar->LogFlag)
-			_lclose(FileVar->LogFile); 
+			_lclose(FileVar->LogFile);
 		FileVar->LogFile = 0;
 		if (ProtoVar!=NULL)
 		{
@@ -1645,7 +1645,7 @@ void KermitStart(int mode)
 			FileVar->OpId = OpKmtSend;
 			if (strlen(&(FileVar->FullName[FileVar->DirLen]))==0)
 			{
-				if (! (*GetGetFname)(FileVar->HMainWin,FileVar) || 
+				if (! (*GetGetFname)(FileVar->HMainWin,FileVar) ||
 				    (strlen(FileVar->FullName)==0))
 				{
 					ProtoEnd();

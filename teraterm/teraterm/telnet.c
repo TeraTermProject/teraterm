@@ -44,7 +44,7 @@ typedef TelRec *PTelRec;
 static TelRec tr;
 
 static HANDLE keepalive_thread = (HANDLE)-1L;
-static HWND keepalive_dialog = NULL; 
+static HWND keepalive_dialog = NULL;
 int nop_interval = 0;
 
 void DefaultTelRec()
@@ -323,7 +323,7 @@ void ParseTelWill(BYTE b)
 	else
 	  SendBack(DONTTEL,b);
 	break;
-  
+
       case WantNo:
 	switch (tr.HisOpt[b].Que) {
 	  case Empty:

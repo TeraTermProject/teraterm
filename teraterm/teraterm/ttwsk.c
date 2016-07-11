@@ -65,8 +65,8 @@ void CheckWinsock()
 
 #define IdCLOSESOCKET	  3
 #define IdCONNECT	  4
-#define IdHTONL 	  8
-#define IdHTONS 	  9
+#define IdHTONL		  8
+#define IdHTONS		  9
 #define IdINET_ADDR	  10
 #define IdIOCTLSOCKET	  12
 #define IdRECV		  16

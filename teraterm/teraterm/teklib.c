@@ -65,7 +65,7 @@ BOOL LoadTTTEK()
   TEKInit = (PTEKInit)GetProcAddress(HTTTEK,
     MAKEINTRESOURCE(IdTEKInit));
   if (TEKInit==NULL) Err = TRUE;
-  
+
   TEKResizeWindow = (PTEKResizeWindow)GetProcAddress(HTTTEK,
     MAKEINTRESOURCE(IdTEKResizeWindow));
   if (TEKResizeWindow==NULL) Err = TRUE;

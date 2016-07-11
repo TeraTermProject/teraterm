@@ -1053,7 +1053,7 @@ void SaveCursor()
 
   if (isCursorOnStatusLine)
     Buff = &SBuff2; // for status line
-  else if (AltScr) 
+  else if (AltScr)
     Buff = &SBuff3; // for alternate screen
   else
     Buff = &SBuff1; // for main screen
@@ -1077,7 +1077,7 @@ void  RestoreCursor()
 
   if (isCursorOnStatusLine)
     Buff = &SBuff2; // for status line
-  else if (AltScr) 
+  else if (AltScr)
     Buff = &SBuff3; // for alternate screen
   else
     Buff = &SBuff1; // for main screen
@@ -1545,7 +1545,7 @@ void CSScreenErase()
 		// <ESC>[Jは<ESC>[2Jと同じことなので、処理を分け、現行バッファをスクロールアウト
 		// させるようにする。(2005.5.29 yutaka)
 		// コンフィグレーションで切り替えられるようにした。(2008.5.3 yutaka)
-		if (ts.ScrollWindowClearScreen && 
+		if (ts.ScrollWindowClearScreen &&
 			(CursorX == 0 && CursorY == 0)) {
 			// Erase screen (scroll out)
 			BuffClearScreen();
@@ -2692,7 +2692,7 @@ void CSQ_h_Mode() // DECSET
 			if (ts.MouseEventTracking)
 				MouseReportMode = IdMouseTrackX10;
 			break;
-		  case 12: /* att610 cursor blinking */ 
+		  case 12: /* att610 cursor blinking */
 			if (ts.WindowFlag & WF_CURSORCHANGE) {
 				ts.NonblinkingCursor = FALSE;
 				ChangeCaret();
@@ -2859,7 +2859,7 @@ void CSQ_l_Mode()		// DECRST
 		  case 7: AutoWrapMode = FALSE; break;		// DECAWM
 		  case 8: AutoRepeatMode = FALSE; break;	// DECARM
 		  case 9: MouseReportMode = IdMouseTrackNone; break; /* X10 Mouse Tracking */
-		  case 12: /* att610 cursor blinking */ 
+		  case 12: /* att610 cursor blinking */
 			if (ts.WindowFlag & WF_CURSORCHANGE) {
 				ts.NonblinkingCursor = TRUE;
 				ChangeCaret();
@@ -3443,7 +3443,7 @@ void CSDol(BYTE b)
 		break;
 
 	  case 'x': // DECFRA
-	  	RequiredParams(5);
+		RequiredParams(5);
 		if (Param[1] < 32 || (Param[1] > 127 && Param[1] < 160) || Param[1] > 255) {
 			return;
 		}
@@ -3474,7 +3474,7 @@ void CSDol(BYTE b)
 
 	  case 'z': // DECERA
 	  case '{': // DECSERA
-	  	RequiredParams(4);
+		RequiredParams(4);
 		CheckParamVal(Param[1], NumOfLines-StatusLine);
 		CheckParamVal(Param[2], NumOfColumns);
 		CheckParamValMax(Param[3], NumOfLines-StatusLine);
@@ -5449,18 +5449,18 @@ void ParseFirst(BYTE b)
 {
 	switch (ts.Language) {
 	  case IdUtf8:
-	  	ParseFirstUTF8(b, ts.KanjiCode == IdUTF8m);
+		ParseFirstUTF8(b, ts.KanjiCode == IdUTF8m);
 		return;
 
 	  case IdJapanese:
-	  	switch (ts.KanjiCode) {
+		switch (ts.KanjiCode) {
 		  case IdUTF8:
-		  	if (ParseFirstUTF8(b, 0)) {
+			if (ParseFirstUTF8(b, 0)) {
 				return;
 			}
 			break;
 		  case IdUTF8m:
-		  	if (ParseFirstUTF8(b, 1)) {
+			if (ParseFirstUTF8(b, 1)) {
 				return;
 			}
 			break;
@@ -5472,14 +5472,14 @@ void ParseFirst(BYTE b)
 		break;
 
 	  case IdKorean:
-	  	switch (ts.KanjiCode) {
+		switch (ts.KanjiCode) {
 		  case IdUTF8:
-		  	if (ParseFirstUTF8(b, 0)) {
+			if (ParseFirstUTF8(b, 0)) {
 				return;
 			}
 			break;
 		  case IdUTF8m:
-		  	if (ParseFirstUTF8(b, 1)) {
+			if (ParseFirstUTF8(b, 1)) {
 				return;
 			}
 			break;

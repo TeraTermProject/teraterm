@@ -790,7 +790,7 @@ void KeyCodeSend(WORD KCode, WORD Count)
     { /* shift */
       State = State | 2; /* bit 1 */
     }
-    
+
     if ((KCode & 1024) != 0)
     { /* control */
       State = State | 4; /* bit 2 */
