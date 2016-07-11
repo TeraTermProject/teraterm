@@ -1,6 +1,9 @@
-if paramcnt <= 1 goto error
-
 testlabel = "testnotfound"
+
+if paramcnt = 0 then
+	messagebox "paramcnt が 0 です" "エラー"
+	end
+endif
 
 ; param1～9 と params[] が同じである事の確認
 for i 1 paramcnt
@@ -18,6 +21,11 @@ for i 1 paramcnt
 		endif
 	endif
 next
+
+if paramcnt = 1 then
+	messagebox "パラメータなしで起動されました" params[1]
+	end
+endif
 
 ; テスト番号の検出
 for i 2 paramcnt

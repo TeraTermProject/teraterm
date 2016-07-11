@@ -76,7 +76,7 @@ BOOL InitTTL(HWND HWin)
 {
 	int i;
 	TStrVal Dir;
-	TVarId ParamsVarId, id;
+	TVarId ParamsVarId;
 	char tmpname[10];
 	WORD Err;
 
@@ -101,6 +101,9 @@ BOOL InitTTL(HWND HWin)
 	NewStrVar("groupmatchstr8","");   // for 'waitregex' command (2005.10.15 yutaka)
 	NewStrVar("groupmatchstr9","");   // for 'waitregex' command (2005.10.15 yutaka)
 
+	if (ParamCnt == 0) {
+		ParamCnt++;
+	}
 	NewIntVar("paramcnt",ParamCnt);  // ファイル名も含む引数の個数 (2012.4.10 yutaka)
 
 	// 旧形式のパラメータ設定 (param1 ～ param9)
@@ -121,17 +124,23 @@ BOOL InitTTL(HWND HWin)
 	if (NewStrAryVar("params", ParamCnt+1) == 0) {
 		Err = 0;
 		GetStrAryVarByName(&ParamsVarId, "params", &Err);
-		if (Err == 0 && Params) {
-			for (i=0; i<=ParamCnt; i++) {
-				if (Params[i]) {
-					Err = 0;
-					id = GetStrVarFromArray(ParamsVarId, i, &Err);
-					SetStrVal(id, Params[i]);
-					free(Params[i]);
-				}
+		if (Err == 0) {
+			if (ShortName[0] != 0) {
+				SetStrValInArray(ParamsVarId, 1, ShortName, &Err);
 			}
-			free(Params);
-			Params = NULL;
+			if (Params) {
+				for (i=0; i<=ParamCnt; i++) {
+					if (i == 1) {
+						continue;
+					}
+					if (Params[i]) {
+						SetStrValInArray(ParamsVarId, i, Params[i], &Err);
+						free(Params[i]);
+					}
+				}
+				free(Params);
+				Params = NULL;
+			}
 		}
 	}
 
