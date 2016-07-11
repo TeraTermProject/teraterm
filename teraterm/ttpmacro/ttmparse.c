@@ -1887,6 +1887,26 @@ void GetAryVarByName(PVarId VarId, PCHAR Name, WORD VarType, LPWORD Err)
 	}
 }
 
+void SetIntValInArray(TVarId VarId, int Index, int Val, LPWORD Err)
+{
+	TVarId id;
+
+	id = GetIntVarFromArray(VarId, Index, Err);
+	if (*Err == 0) {
+		SetIntVal(id, Val);
+	}
+}
+
+void SetStrValInArray(TVarId VarId, int Index, PCHAR Str, LPWORD Err)
+{
+	TVarId id;
+
+	id = GetStrVarFromArray(VarId, Index, Err);
+	if (*Err == 0) {
+		SetStrVal(id, Str);
+	}
+}
+
 int GetIntAryVarSize(TVarId VarId)
 {
 	return IntAryVal[VarId].size;
