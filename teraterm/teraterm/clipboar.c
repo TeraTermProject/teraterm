@@ -108,12 +108,48 @@ void CBClose()
 	CBCopyWideHandle = NULL;
 }
 
-void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
-                  int BuffSize, PCHAR DataPtr, int DataSize)
-//
-//  DataPtr and DataSize are used only for DDE
-//	  For clipboard, BuffSize should be 0
-//	  DataSize should be <= BuffSize
+void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
+{
+	if (! cv.Ready) {
+		return;
+	}
+	if (TalkStatus!=IdTalkKeyb) {
+		return;
+	}
+
+	CBAddCR = FALSE;
+	CBBracketed = CB_BRACKET_NONE;
+
+	CBEchoOnly = EchoOnly;
+
+	CBMemHandle = NULL;
+	CBMemPtr = NULL;
+
+	CBMemPtr2 = 0;
+	CBDDE = TRUE;
+	CBWIDE = FALSE;
+
+	CBInsertDelay = FALSE;
+
+	CBRetrySend = FALSE;
+	CBRetryEcho = FALSE;
+	CBSendCR = FALSE;
+
+	if ((CBMemHandle = GlobalAlloc(GHND, DataSize)) != NULL) {
+		if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+			memcpy(CBMemPtr, DataPtr, DataSize);
+			GlobalUnlock(CBMemHandle);
+			CBMemPtr=NULL;
+			TalkStatus=IdTalkCB;
+		}
+	}
+
+	if (TalkStatus != IdTalkCB) {
+		CBEndPaste();
+	}
+}
+
+void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	UINT Cf;
 
@@ -129,19 +165,17 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 		CBBracketed = CB_BRACKET_START;
 	}
 
-	if (BuffSize==0) { // for clipboar
-		if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
-			Cf = CF_UNICODETEXT;
-		}
-		else if (IsClipboardFormatAvailable(CF_TEXT)) {
-			Cf = CF_TEXT;
-		}
-		else if (IsClipboardFormatAvailable(CF_OEMTEXT)) {
-			Cf = CF_OEMTEXT;
-		}
-		else {
-			return;
-		}
+	if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+		Cf = CF_UNICODETEXT;
+	}
+	else if (IsClipboardFormatAvailable(CF_TEXT)) {
+		Cf = CF_TEXT;
+	}
+	else if (IsClipboardFormatAvailable(CF_OEMTEXT)) {
+		Cf = CF_OEMTEXT;
+	}
+	else {
+		return;
 	}
 
 	CBEchoOnly = FALSE;
@@ -153,59 +187,46 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed,
 	CBWIDE = FALSE;
 	CBInsertDelay = FALSE;
 
-	if (BuffSize==0) { //clipboard
-		if (ts.PasteDelayPerLine > 0) {
-			CBInsertDelay = TRUE;
-		}
-		if (OpenClipboard(HWin)) {
-			if (Cf == CF_UNICODETEXT) {
-				// 貼り付け処理では CBMemHandle ではなく dde と同じように CBMemPtr が使われる
-				HGLOBAL TmpHandle = GetClipboardData(Cf);
-				CBWIDE = TRUE;
-				if (TmpHandle) {
-					LPWSTR TmpPtr = (LPWSTR)GlobalLock(TmpHandle);
-					int mb_len = WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, 0, 0, NULL, NULL);
+	CBRetrySend = FALSE;
+	CBRetryEcho = FALSE;
+	CBSendCR = FALSE;
 
-					CBMemHandle = GlobalAlloc(GHND, mb_len);
-					if (CBMemHandle != NULL) {
-						CBMemPtr = GlobalLock(CBMemHandle);
-						if (CBMemPtr != NULL) {
-							WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, CBMemPtr, mb_len, NULL, NULL);
-
-							GlobalUnlock(CBMemHandle);
-							CBMemPtr=NULL;
-							TalkStatus=IdTalkCB;
-						}
-
-						GlobalUnlock(TmpHandle);
-						CloseClipboard();
-					}
-				}
-			}
-			else {
-				CBMemHandle = GetClipboardData(Cf);
-				if (CBMemHandle!=NULL) {
-					TalkStatus=IdTalkCB;
-				}
-			}
-		}
+	if (ts.PasteDelayPerLine > 0) {
+		CBInsertDelay = TRUE;
 	}
-	else { // dde
-		CBMemHandle = GlobalAlloc(GHND,BuffSize);
-		if (CBMemHandle != NULL) {
-			CBDDE = TRUE;
-			CBMemPtr = GlobalLock(CBMemHandle);
-			if (CBMemPtr != NULL) {
-				memcpy(CBMemPtr,DataPtr,DataSize);
-				GlobalUnlock(CBMemHandle);
-				CBMemPtr=NULL;
+	if (OpenClipboard(HWin)) {
+		if (Cf == CF_UNICODETEXT) {
+			// 貼り付け処理では CBMemHandle ではなく dde と同じように CBMemPtr が使われる
+			HGLOBAL TmpHandle = GetClipboardData(Cf);
+			CBWIDE = TRUE;
+			if (TmpHandle) {
+				LPWSTR TmpPtr = (LPWSTR)GlobalLock(TmpHandle);
+				int mb_len = WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, 0, 0, NULL, NULL);
+
+				CBMemHandle = GlobalAlloc(GHND, mb_len);
+				if (CBMemHandle != NULL) {
+					CBMemPtr = GlobalLock(CBMemHandle);
+					if (CBMemPtr != NULL) {
+						WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, CBMemPtr, mb_len, NULL, NULL);
+
+						GlobalUnlock(CBMemHandle);
+						CBMemPtr=NULL;
+						TalkStatus=IdTalkCB;
+					}
+
+					GlobalUnlock(TmpHandle);
+					CloseClipboard();
+				}
+			}
+		}
+		else {
+			CBMemHandle = GetClipboardData(Cf);
+			if (CBMemHandle!=NULL) {
 				TalkStatus=IdTalkCB;
 			}
 		}
 	}
-	CBRetrySend = FALSE;
-	CBRetryEcho = FALSE;
-	CBSendCR = FALSE;
+
 	if (TalkStatus != IdTalkCB) {
 		CBEndPaste();
 	}
@@ -320,36 +341,6 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	CBRetrySend = FALSE;
 	CBRetryEcho = FALSE;
 	CBSendCR = FALSE;
-	if (TalkStatus != IdTalkCB) {
-		CBEndPaste();
-	}
-}
-
-void CBStartEcho(PCHAR DataPtr, int DataSize)
-{
-	if (! cv.Ready) {
-		return;
-	}
-	if (TalkStatus!=IdTalkKeyb) {
-		return;
-	}
-
-	CBEchoOnly = TRUE;
-	CBMemPtr2 = 0;
-	CBRetryEcho = FALSE;
-	CBSendCR = FALSE;
-	CBWIDE = FALSE;
-
-	CBDDE = TRUE;
-	if ((CBMemHandle = GlobalAlloc(GHND, DataSize)) != NULL) {
-		if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
-			memcpy(CBMemPtr, DataPtr, DataSize);
-			GlobalUnlock(CBMemHandle);
-			CBMemPtr=NULL;
-			TalkStatus=IdTalkCB;
-		}
-	}
-
 	if (TalkStatus != IdTalkCB) {
 		CBEndPaste();
 	}

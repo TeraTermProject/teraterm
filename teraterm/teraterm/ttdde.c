@@ -57,9 +57,6 @@ static char ParamSecondFileName[MaxStrLen];
 
 static BOOL AutoLogClose = FALSE;
 
-#define CBBufSize TermWidthMax
-
-
 static void BringupMacroWindow(BOOL flash_flag)
 {
 	HWND hwnd;
@@ -288,7 +285,7 @@ HDDEDATA AcceptPoke(HSZ ItemHSz, UINT ClipFmt,
 
 	DataPtr = DdeAccessData(Data,&DataSize);
 	if (DataPtr==NULL) return DDE_FNOTPROCESSED;
-	CBStartPaste(NULL, FALSE, FALSE, CBBufSize, DataPtr, DataSize);
+	CBStartSend(DataPtr, DataSize, FALSE);
 	DdeUnaccessData(Data);
 	if (TalkStatus==IdTalkCB)
 		return (HDDEDATA)DDE_FACK;
@@ -1016,7 +1013,7 @@ scp_rcv_error:
 		break;
 
 	case CmdDispStr:
-		CBStartEcho(ParamFileName, sizeof(ParamFileName));
+		CBStartSend(ParamFileName, sizeof(ParamFileName), TRUE);
 		break;
 
 	case CmdLogInfo:

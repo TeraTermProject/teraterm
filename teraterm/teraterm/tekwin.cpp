@@ -485,7 +485,7 @@ void CTEKWindow::OnPaint()
 
 void CTEKWindow::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	CBStartPaste(tk.HWin, FALSE, FALSE, 0, NULL, 0);
+	CBStartPaste(tk.HWin, FALSE, FALSE);
 }
 
 void CTEKWindow::OnSetFocus(CWnd* pOldWnd)
@@ -743,12 +743,12 @@ void CTEKWindow::OnEditCopyScreen()
 
 void CTEKWindow::OnEditPaste()
 {
-	CBStartPaste(tk.HWin, FALSE, FALSE, 0, NULL, 0);
+	CBStartPaste(tk.HWin, FALSE, FALSE);
 }
 
 void CTEKWindow::OnEditPasteCR()
 {
-	CBStartPaste(tk.HWin, TRUE, FALSE, 0, NULL, 0);
+	CBStartPaste(tk.HWin, TRUE, FALSE);
 }
 
 void CTEKWindow::OnEditClearScreen()

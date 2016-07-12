@@ -942,7 +942,7 @@ void CVTWindow::ButtonUp(BOOL Paste)
 
 	if (Paste) {
 		if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
-			CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
+			CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
 			// スクロール位置をリセット
 			if (WinOrgY != 0) {
 				DispVScroll(SCROLL_BOTTOM, 0);
@@ -4440,7 +4440,7 @@ void CVTWindow::OnEditPaste()
 {
 	// add confirm (2008.2.4 yutaka)
 	if (CBStartPasteConfirmChange(HVTWin, FALSE)) {
-		CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), 0, NULL, 0);
+		CBStartPaste(HVTWin, FALSE, BracketedPasteMode());
 		// スクロール位置をリセット
 		if (WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
@@ -4452,7 +4452,7 @@ void CVTWindow::OnEditPasteCR()
 {
 	// add confirm (2008.3.11 maya)
 	if (CBStartPasteConfirmChange(HVTWin, TRUE)) {
-		CBStartPaste(HVTWin, TRUE, BracketedPasteMode(), 0, NULL, 0);
+		CBStartPaste(HVTWin, TRUE, BracketedPasteMode());
 		// スクロール位置をリセット
 		if (WinOrgY != 0) {
 			DispVScroll(SCROLL_BOTTOM, 0);
@@ -6133,7 +6133,7 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 	if (sending) {
 		// 端末へ文字列を送り込む
 		// DDE通信に使う関数に変更。(2006.2.7 yutaka)
-		CBStartPaste(HVTWin, FALSE, BracketedPasteMode(), TermWidthMax/*CBBufSize*/, buf, buflen);
+		CBStartSend(buf, buflen, FALSE);
 		// 送信データがある場合は送信する
 		if (TalkStatus == IdTalkCB) {
 			CBSend();
