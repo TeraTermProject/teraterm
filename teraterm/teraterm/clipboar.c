@@ -296,7 +296,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 						}
 						tmpPtr = (char *)calloc(sizeof(char), mb_len);
 						WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, tmpPtr, mb_len, NULL, NULL);
-						b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, mb_len);
+						b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, mb_len-1);
 						free(tmpPtr);
 						if (flen > 0) {
 							strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
