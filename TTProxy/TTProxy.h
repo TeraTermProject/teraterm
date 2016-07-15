@@ -289,8 +289,8 @@ private:
 			/* This must contain the size of the structure. See below for its usage. */
 			sizeof EXPORTS,
 			/* load first */
-			0,
-			
+			10,
+
 			/* Now we just list the functions that we've implemented. */
 			TTProxy::TTXInit,
 			NULL,
@@ -308,7 +308,7 @@ private:
 		int size = sizeof EXPORTS - sizeof exports->size;
 		/* do version checking if necessary */
 		/* if (Version!=TTVERSION) return FALSE; */
-		
+
 		if (size > exports->size) {
 			size = exports->size;
 		}
