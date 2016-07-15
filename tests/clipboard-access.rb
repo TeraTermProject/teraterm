@@ -122,7 +122,7 @@ def testClipboard
   msgout "端末のクリップボードアクセスのテストを行います。"
   msgout "「設定」⇒「その他の設定」⇒「制御シーケンス」にある"
   msgout "「リモートからのクリップボードアクセス」を“読込/書込”にして下さい。"
-  msgout "準備が出来たらリターンキーをおして下さい。"
+  msgout "準備が出来たらリターンキーを押して下さい。"
   STDIN.gets
 
   rwClipboard "Clipboard Test"
@@ -145,7 +145,7 @@ when "--test"
 else
   check_kcode
   msgout "使い方: #$0 [ --set | --get | --test ] [ パラメータ ]"
-  msgout "  --set	パラメータに指定した文字列をクリップボードに設定する"
-  msgout "  --get	クリップボードの内容を取得する"
-  msgout "  --test	端末のクリップボードアクセス機能のテストを行う"
+  msgout "  --set     パラメータに指定した文字列をクリップボードに設定する"
+  msgout "  --get     クリップボードの内容を取得する"
+  msgout "  --test    端末のクリップボードアクセス機能のテストを行う"
 end
