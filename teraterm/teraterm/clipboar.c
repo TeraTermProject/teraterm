@@ -24,21 +24,14 @@ static PCHAR CBCopyPtr = NULL;
 static HGLOBAL CBCopyWideHandle = NULL;
 static LPWSTR CBCopyWidePtr = NULL;
 
-#define CB_BRACKET_NONE  0
-#define CB_BRACKET_START 1
-#define CB_BRACKET_END   2
 // for clipboard paste
 static HGLOBAL CBMemHandle = NULL;
 static PCHAR CBMemPtr = NULL;
 static LONG CBMemPtr2 = 0;
-static BOOL CBAddCR = FALSE;
-static int CBBracketed = CB_BRACKET_NONE;
 static BYTE CBByte;
 static BOOL CBRetrySend;
 static BOOL CBRetryEcho;
 static BOOL CBSendCR;
-static BOOL CBDDE;
-static BOOL CBWIDE;
 static BOOL CBEchoOnly;
 static BOOL CBInsertDelay = FALSE;
 
@@ -117,17 +110,12 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 		return;
 	}
 
-	CBAddCR = FALSE;
-	CBBracketed = CB_BRACKET_NONE;
-
 	CBEchoOnly = EchoOnly;
 
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 
 	CBMemPtr2 = 0;
-	CBDDE = TRUE;
-	CBWIDE = FALSE;
 
 	CBInsertDelay = FALSE;
 
@@ -151,18 +139,19 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
+	static char BracketStart[] = "\033[200~";
+	static char BracketEnd[] = "\033[201~";
 	UINT Cf;
+	PCHAR TmpPtr;
+	LPWSTR TmpPtrW;
+	HGLOBAL TmpHandle;
+	int BuffLen, BracketLen;
 
 	if (! cv.Ready) {
 		return;
 	}
 	if (TalkStatus!=IdTalkKeyb) {
 		return;
-	}
-
-	CBAddCR = AddCR;
-	if (Bracketed) {
-		CBBracketed = CB_BRACKET_START;
 	}
 
 	if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
@@ -183,48 +172,72 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
-	CBDDE = FALSE;
-	CBWIDE = FALSE;
-	CBInsertDelay = FALSE;
+
+	if (ts.PasteDelayPerLine > 0) {
+		CBInsertDelay = TRUE;
+	}
+	else {
+		CBInsertDelay = FALSE;
+	}
 
 	CBRetrySend = FALSE;
 	CBRetryEcho = FALSE;
 	CBSendCR = FALSE;
 
-	if (ts.PasteDelayPerLine > 0) {
-		CBInsertDelay = TRUE;
-	}
 	if (OpenClipboard(HWin)) {
-		if (Cf == CF_UNICODETEXT) {
-			// “\‚è•t‚¯ˆ—‚Å‚Í CBMemHandle ‚Å‚Í‚È‚­ dde ‚Æ“¯‚¶‚æ‚¤‚É CBMemPtr ‚ªŽg‚í‚ê‚é
-			HGLOBAL TmpHandle = GetClipboardData(Cf);
-			CBWIDE = TRUE;
-			if (TmpHandle) {
-				LPWSTR TmpPtr = (LPWSTR)GlobalLock(TmpHandle);
-				int mb_len = WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, 0, 0, NULL, NULL);
+		if ((TmpHandle = GetClipboardData(Cf)) != NULL) {
+			if (Cf == CF_UNICODETEXT) {
+				TmpPtrW = (LPWSTR)GlobalLock(TmpHandle);
+				BuffLen = WideCharToMultiByte(CP_ACP, 0, TmpPtrW, -1, 0, 0, NULL, NULL);
+			}
+			else {
+				TmpPtr = (PCHAR)GlobalLock(TmpHandle);
+				BuffLen = strlen(TmpPtr) + 1;
+			}
 
-				CBMemHandle = GlobalAlloc(GHND, mb_len);
-				if (CBMemHandle != NULL) {
-					CBMemPtr = GlobalLock(CBMemHandle);
-					if (CBMemPtr != NULL) {
-						WideCharToMultiByte(CP_ACP, 0, TmpPtr, -1, CBMemPtr, mb_len, NULL, NULL);
+			if (Bracketed) {
+				BuffLen += sizeof(BracketStart) + sizeof(BracketEnd);
+			}
 
-						GlobalUnlock(CBMemHandle);
-						CBMemPtr=NULL;
-						TalkStatus=IdTalkCB;
+			if (AddCR) {
+				BuffLen++;
+			}
+
+			if ((CBMemHandle = GlobalAlloc(GHND, BuffLen)) != NULL) {
+				if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+					if (Bracketed) {
+						strncpy_s(CBMemPtr, BuffLen, BracketStart, _TRUNCATE);
+						BracketLen = strlen(CBMemPtr);
+					}
+					else {
+						BracketLen = 0;
 					}
 
-					GlobalUnlock(TmpHandle);
-					CloseClipboard();
+					if (Cf == CF_UNICODETEXT) {
+						WideCharToMultiByte(CP_ACP, 0, TmpPtrW, -1, CBMemPtr+BracketLen, BuffLen-BracketLen, NULL, NULL);
+					}
+					else {
+						strncat_s(CBMemPtr, BuffLen, TmpPtr, _TRUNCATE);
+					}
+
+					if (Bracketed) {
+						strncat_s(CBMemPtr, BuffLen, BracketEnd, _TRUNCATE);
+					}
+
+					if (AddCR) {
+						strncat_s(CBMemPtr, BuffLen, "\r", _TRUNCATE);
+					}
+
+					CBMemPtr = NULL;
+
+					TalkStatus = IdTalkCB;
 				}
+				GlobalUnlock(CBMemHandle);
+				CBMemPtr = NULL;
 			}
+			GlobalUnlock(TmpHandle);
 		}
-		else {
-			CBMemHandle = GetClipboardData(Cf);
-			if (CBMemHandle!=NULL) {
-				TalkStatus=IdTalkCB;
-			}
-		}
+		CloseClipboard();
 	}
 
 	if (TalkStatus != IdTalkCB) {
@@ -252,8 +265,6 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
-	CBDDE = TRUE;
-	CBWIDE = FALSE;
 
 	if (ts.PasteDelayPerLine > 0) {
 		CBInsertDelay = TRUE;
@@ -261,6 +272,10 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 	else {
 		CBInsertDelay = FALSE;
 	}
+
+	CBRetrySend = FALSE;
+	CBRetryEcho = FALSE;
+	CBSendCR = FALSE;
 
 	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(HWin)) {
 		Cf = CF_UNICODETEXT;
@@ -280,7 +295,6 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 			CloseClipboard();
 		}
 	}
-
 
 	if (tmpHandle) {
 		if (Cf == CF_UNICODETEXT) {
@@ -332,9 +346,6 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		CloseClipboard();
 	}
 
-	CBRetrySend = FALSE;
-	CBRetryEcho = FALSE;
-	CBSendCR = FALSE;
 	if (TalkStatus != IdTalkCB) {
 		CBEndPaste();
 	}
@@ -352,9 +363,6 @@ void CBSend()
 	int c;
 	BOOL EndFlag;
 	static DWORD lastcr;
-	static char BracketStart[] = "\033[200~";
-	static char BracketEnd[] = "\033[201~";
-	static int BracketPtr = 0;
 	DWORD now;
 
 	if (CBMemHandle==NULL) {
@@ -408,14 +416,7 @@ void CBSend()
 		}
 
 		EndFlag = (CBMemPtr[CBMemPtr2]==0);
-		if (CBBracketed == CB_BRACKET_START) {
-			CBByte = BracketStart[BracketPtr++];
-			if (BracketPtr >= sizeof(BracketStart) - 1) {
-				CBBracketed = CB_BRACKET_END;
-				BracketPtr = 0;
-			}
-		}
-		else if (! EndFlag) {
+		if (! EndFlag) {
 			CBByte = CBMemPtr[CBMemPtr2];
 			CBMemPtr2++;
 // Decoding characters which are encoded by MACRO
@@ -428,19 +429,6 @@ void CBSend()
 				CBByte = CBMemPtr[CBMemPtr2];
 				CBMemPtr2++;
 				CBByte = CBByte - 1; // character just after 0x01
-			}
-		}
-		else if (CBAddCR) {
-			EndFlag = FALSE;
-			CBAddCR = FALSE;
-			CBByte = 0x0d;
-		}
-		else if (CBBracketed == CB_BRACKET_END) {
-			EndFlag = FALSE;
-			CBByte = BracketEnd[BracketPtr++];
-			if (BracketPtr >= sizeof(BracketEnd) - 1) {
-				CBBracketed = CB_BRACKET_NONE;
-				BracketPtr = 0;
 			}
 		}
 		else {
@@ -530,20 +518,12 @@ void CBEndPaste()
 		if (CBMemPtr!=NULL) {
 			GlobalUnlock(CBMemHandle);
 		}
-		if (CBDDE || CBWIDE) {
-			GlobalFree(CBMemHandle);
-		}
-	}
-	if (!CBDDE && !CBWIDE) {
-		CloseClipboard();
+		GlobalFree(CBMemHandle);
 	}
 
-	CBDDE = FALSE;
-	CBWIDE = FALSE;
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
-	CBAddCR = FALSE;
 	CBEchoOnly = FALSE;
 	CBInsertDelay = FALSE;
 }
