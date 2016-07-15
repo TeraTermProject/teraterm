@@ -52,8 +52,8 @@
     <ul>
       <li>Tera Term(ttermpro.exe) can not run on Windows 95/98/Me/NT4.0.</li>
       <li>When the clipboard is read from remote host, unnecessary NUL character is added at the end of the string.</li>
-      <!-- li>リモートからのクリップボード書き込みで、空文字列がセット出来ない問題を修正した。</li -->
-      <!-- li>クリップボードの内容が空文字列の時、<a href="../usage/tips/vim.html#Bracketed">Bracketed Paste Mode</a> 有効時の貼り付けで終了 Bracket のみが送られる問題を修正した。</li -->
+      <li>When the clipboard is written from remote host, empty string can not be set.</li>
+      <li>When the clipboard is empty string and <a href="../usage/tips/vim.html#Bracketed">Bracketed Paste Mode</a> is enabled, final Bracket is only sent by pasting.</li>
       <li>MACRO: When invalid regular expression is specified at the <a href="../macro/command/strreplace.html">strreplace</a> command, source string is corrupted.
         <ul>
           <li>The result variable returns -1 when invalid regular expression is specified.</li>
@@ -4127,7 +4127,7 @@ SYNOPSIS:
 
 <h3><a name="ttproxy_1.0.0.23">2016.xx.xx (Ver 1.0.0.23)</a></h3>
 <ul class="history">
-      <!-- li>TTX ロード時の優先順位 (order) を 0 から 10 に変更した。</li -->
+      <li>The priority(order) of loading TTX plugin is changed from 0 to 10.</li>
 </ul>
 
 <h3><a name="ttproxy_1.0.0.22">2015.12.01 (Ver 1.0.0.22)</a></h3>
