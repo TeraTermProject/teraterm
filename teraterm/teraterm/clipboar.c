@@ -236,10 +236,9 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 {
 	HANDLE tmpHandle = NULL;
 	char *tmpPtr = NULL;
-	int len, hlen, flen, blen;
+	int len, header_len, footer_len, b64_len;
 	UINT Cf;
 	LPWSTR tmpPtrWide = NULL;
-	int mb_len;
 
 	if (! cv.Ready) {
 		return;
@@ -282,60 +281,55 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 		}
 	}
 
-	if (Cf == CF_UNICODETEXT) {
-		if (tmpHandle) {
+
+	if (tmpHandle) {
+		if (Cf == CF_UNICODETEXT) {
 			if ((tmpPtrWide = GlobalLock(tmpHandle)) != NULL) {
-				hlen = strlen(header);
-				flen = strlen(footer);
-				mb_len = WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, 0, 0, NULL, NULL);
-				blen = (mb_len + 2) / 3 * 4 + hlen + flen + 1;
-				if ((CBMemHandle = GlobalAlloc(GHND, blen)) != NULL) {
-					if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
-						if (hlen > 0) {
-							strncpy_s(CBMemPtr, blen, header, _TRUNCATE);
-						}
-						tmpPtr = (char *)calloc(sizeof(char), mb_len);
-						WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, tmpPtr, mb_len, NULL, NULL);
-						b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, mb_len-1);
-						free(tmpPtr);
-						if (flen > 0) {
-							strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
-						}
-						TalkStatus=IdTalkCB;
-						GlobalUnlock(CBMemPtr);
-						CBMemPtr = NULL;
-					}
+				len = WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, 0, 0, NULL, NULL);
+				if ((tmpPtr = (char *)calloc(sizeof(char), len)) != NULL) {
+					WideCharToMultiByte(CP_ACP, 0, tmpPtrWide, -1, tmpPtr, len, NULL, NULL);
 				}
+				// WideCharToMultiByte で得られるのは末尾の \0 込みの長さ
+				// \0 をエンコード対象に含めない為に 1 減らす
+				len--;
 				GlobalUnlock(tmpPtrWide);
 			}
-			CloseClipboard();
 		}
-	}
-	else {
-		if (tmpHandle) {
+		else {
 			if ((tmpPtr = GlobalLock(tmpHandle)) != NULL) {
-				hlen = strlen(header);
-				flen = strlen(footer);
 				len = strlen(tmpPtr);
-				blen = (len + 2) / 3 * 4 + hlen + flen + 1;
-				if ((CBMemHandle = GlobalAlloc(GHND, blen)) != NULL) {
-					if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
-						if (hlen > 0) {
-							strncpy_s(CBMemPtr, blen, header, _TRUNCATE);
-						}
-						b64encode(CBMemPtr + hlen, blen - hlen, tmpPtr, len);
-						if (flen > 0) {
-							strncat_s(CBMemPtr, blen, footer, _TRUNCATE);
-						}
-						TalkStatus=IdTalkCB;
-						GlobalUnlock(CBMemPtr);
-						CBMemPtr = NULL;
+			}
+		}
+
+		if (tmpPtr) {
+			header_len = strlen(header);
+			footer_len = strlen(footer);
+
+			b64_len = (len + 2) / 3 * 4 + header_len + footer_len + 1;
+
+			if ((CBMemHandle = GlobalAlloc(GHND, b64_len)) != NULL) {
+				if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
+					if (header_len > 0) {
+						strncpy_s(CBMemPtr, b64_len, header, _TRUNCATE);
 					}
+					b64encode(CBMemPtr + header_len, b64_len - header_len, tmpPtr, len);
+					if (footer_len > 0) {
+						strncat_s(CBMemPtr, b64_len, footer, _TRUNCATE);
+					}
+					TalkStatus=IdTalkCB;
+					GlobalUnlock(CBMemPtr);
+					CBMemPtr = NULL;
 				}
+			}
+
+			if (Cf == CF_UNICODETEXT) {
+				free(tmpPtr);
+			}
+			else {
 				GlobalUnlock(tmpPtr);
 			}
-			CloseClipboard();
 		}
+		CloseClipboard();
 	}
 
 	CBRetrySend = FALSE;
