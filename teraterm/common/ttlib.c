@@ -137,7 +137,7 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 	int len = 0, state = 0;
 
 	if (src == NULL || dst == NULL || dsize == 0)
-		return 0;
+		return -1;
 
 	while (1) {
 		if (isspace(*src)) {

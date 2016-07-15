@@ -126,6 +126,8 @@ def testClipboard
   STDIN.gets
 
   rwClipboard "Clipboard Test"
+  puts ""
+  rwClipboard ""
 end
 
 case ARGV.shift

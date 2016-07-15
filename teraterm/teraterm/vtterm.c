@@ -4604,7 +4604,7 @@ void XsProcClipboard(PCHAR buff)
 
 			len = b64decode(cbbuff, blen, p);
 
-			if (len == 0 || len >= blen) {
+			if (len < 0 || len >= blen) {
 				GlobalUnlock(cbmem);
 				GlobalFree(cbmem);
 				return;
