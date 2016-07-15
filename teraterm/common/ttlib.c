@@ -176,6 +176,12 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 		if (dsize > len)
 			dst[len++] = (b >> 8) & 0xff;
 	}
+	if (len < dsize) {
+		dst[len] = 0;
+	}
+	else {
+		dst[dsize-1] = 0;
+	}
 	return len;
 }
 
