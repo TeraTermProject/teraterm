@@ -4522,11 +4522,20 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			if (szFileName[0] != '\0') {
 				char recvpath[MAX_PATH] = "";
 				char* fn = strrchr(szFileName, '/');
-				if (fn && fn[1] == '\0') {
-					return FALSE;
+				char recvfn[sizeof(szFileName)];
+				if (fn) {
+					fn++;
+					if (*fn == '\0') {
+						return FALSE;
+					}
 				}
+				else {
+					fn = szFileName;
+				}
+				strncpy_s(recvfn, sizeof(recvfn), fn, _TRUNCATE);
+				replaceInvalidFileNameChar(recvfn, '_');
 				SendMessage(GetDlgItem(dlg, IDC_RECVFILE_TO), WM_GETTEXT, sizeof(recvdir), (LPARAM)recvdir);
-				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir, fn ? (fn + 1) : szFileName);
+				_snprintf_s(recvpath, sizeof(recvpath), _TRUNCATE, "%s\\%s", recvdir, recvfn);
 				SSH_scp_transaction(pvar, szFileName, recvpath, FROMREMOTE);
 				EndDialog(dlg, 1); // dialog close
 				return TRUE;

@@ -27,6 +27,7 @@ EXPORTS
   DetectComPorts @42
   GetDefaultFName @47
   ExtractFileName @48
+  replaceInvalidFileNameChar @74
   
   SJIS2JIS @30
   SJIS2EUC @31
