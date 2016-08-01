@@ -1075,7 +1075,7 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
- * - At version 4.91, ttset_memfilemap was replaced with ttset_memfilemap_28.
+ * - At version 4.92, ttset_memfilemap was replaced with ttset_memfilemap_29.
  *   added tttset.TrimTrailingNLonPaste
  *
  * - At version 4.91, ttset_memfilemap was replaced with ttset_memfilemap_28.
