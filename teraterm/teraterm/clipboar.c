@@ -112,9 +112,11 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 
 	CBEchoOnly = EchoOnly;
 
+	if (CBMemHandle) {
+		GlobalFree(CBMemHandle);
+	}
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
-
 	CBMemPtr2 = 0;
 
 	CBInsertDelay = FALSE;
@@ -169,6 +171,9 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 	CBEchoOnly = FALSE;
 
+	if (CBMemHandle) {
+		GlobalFree(CBMemHandle);
+	}
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
@@ -262,6 +267,9 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 
 	CBEchoOnly = FALSE;
 
+	if (CBMemHandle) {
+		GlobalFree(CBMemHandle);
+	}
 	CBMemHandle = NULL;
 	CBMemPtr = NULL;
 	CBMemPtr2 = 0;
