@@ -17,7 +17,6 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer);
 void CBSend();
 void CBEcho();
 void CBEndPaste();
-int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR);
 
 #ifdef __cplusplus
 }

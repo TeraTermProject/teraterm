@@ -37,6 +37,8 @@ static BOOL CBInsertDelay = FALSE;
 
 static HFONT DlgClipboardFont;
 
+static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+
 PCHAR CBOpen(LONG MemSize)
 {
 	if (MemSize==0) {
@@ -154,6 +156,105 @@ BOOL TrimTrailingNL(BOOL AddCR, BOOL Bracketed) {
 	return TRUE;
 }
 
+// ファイルに定義された文字列が、textに含まれるかを調べる。
+BOOL search_dict(char *filename, char *text)
+{
+	BOOL ret = FALSE;
+	FILE *fp = NULL;
+	char buf[256];
+	int len;
+
+	if (filename == NULL || filename[0] == '\0')
+		return FALSE;
+
+	if ((fp = fopen(filename, "r")) == NULL)
+		return FALSE;
+
+	// TODO: 一行が256byteを超えている場合の考慮
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		len = strlen(buf);
+		if (len <= 1) {
+			continue;
+		}
+		if (buf[len - 1] == '\n') {
+			buf[len - 1] = '\0';
+		}
+		if (strstr(text, buf)) { // hit
+			ret = 1;
+			break;
+		}
+	}
+
+	fclose(fp);
+
+	return (ret);
+}
+
+/*
+ * クリップボードの内容を確認し、貼り付けを行うか確認ダイアログを出す。
+ *
+ * 返り値:
+ *   TRUE  -> 問題なし、貼り付けを実施
+ *   FALSE -> 貼り付け中止
+ */
+BOOL CheckClipboardContent(BOOL AddCR, BOOL Bracketed)
+{
+	int pos;
+	int ret = IDOK;
+	BOOL confirm = FALSE;
+
+	if (!ts.ConfirmChangePaste) {
+		return TRUE;
+	}
+
+/*
+ * ConfirmChangePasteCR の挙動問題
+ * 以下の動作で問題ないか。
+ *
+ *		ChangePasteCR	!ChangePasteCR
+ *		AddCR	!AddCR	AddCR	!AddCR
+ * 改行あり	o	o	x(2)	o
+ * 改行無し	o(1)	x	x	x
+ *
+ * ChangePasteCR は AddCR の時に確認を行うか(1で確認する)という設定だが、
+ * !ChangePasteCR の時を考えると、AddCR の時は常に CR が入っているのに
+ * 確認を行わない事から 2 の場合でも確認は不用という意思表示ともとれる。
+ * 2 の動作はどちらがいいか?
+ */
+
+	if (AddCR) {
+		if (ts.ConfirmChangePasteCR) {
+			confirm = TRUE;
+		}
+	}
+	else {
+		pos = strcspn(CBMemPtr, "\r\n");  // 改行が含まれていたら
+		if (CBMemPtr[pos] != '\0') {
+			confirm = TRUE;
+		}
+	}
+
+	// 辞書をサーチする
+	if (!confirm && search_dict(ts.ConfirmChangePasteStringFile, CBMemPtr)) {
+		confirm = TRUE;
+	}
+
+	if (confirm) {
+		ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
+		                HVTWin, (DLGPROC)OnClipboardDlgProc);
+		/*
+		 * 以前はダイアログの内容をクリップボードに書き戻していたけれど、必要?
+		 */
+	}
+
+	if (ret == IDOK) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
 #define BracketStartLen	(sizeof(BracketStart)-1)
 #define BracketEndLen	(sizeof(BracketEnd)-1)
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
@@ -253,6 +354,11 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	// 貼り付け前にクリップボードの内容を確認/加工等する場合はここで行う
 
 	if (!TrimTrailingNL(AddCR, Bracketed)) {
+		CBEndPaste();
+		return;
+	}
+
+	if (!CheckClipboardContent(AddCR, Bracketed)) {
 		CBEndPaste();
 		return;
 	}
@@ -633,15 +739,11 @@ HGLOBAL CBAllocClipboardMem(char *text)
 	return hMem;
 }
 
-static char *ClipboardPtr = NULL;
-static int PasteCanceled = 0;
-
 static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	LOGFONT logfont;
 	HFONT font;
 	char uimsg[MAX_UIMSG];
-	//char *p;
 	POINT p;
 	RECT rc_dsk, rc_dlg;
 	int dlg_height, dlg_width;
@@ -653,14 +755,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 	switch (msg) {
 		case WM_INITDIALOG:
-#if 0
-			for (p = ClipboardPtr; *p ; p++) {
-				char buf[20];
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%02x ", *p);
-				OutputDebugString(buf);
-			}
-#endif
-
 			font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
 			GetObject(font, sizeof(LOGFONT), &logfont);
 			if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgClipboardFont, ts.UILanguageFile)) {
@@ -682,7 +776,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			get_lang_msg("BTN_OK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 			SetDlgItemText(hDlgWnd, IDOK, ts.UIMsg);
 
-			SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_SETTEXT, 0, (LPARAM)ClipboardPtr);
+			SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_SETTEXT, 0, (LPARAM)CBMemPtr);
 
 			DispConvScreenToWin(CursorX, CursorY, &p.x, &p.y);
 			ClientToScreen(HVTWin, &p);
@@ -760,21 +854,46 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			switch (LOWORD(wp)) {
 				case IDOK:
 				{
-					int len = SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXTLENGTH, 0, 0);
+					unsigned len = SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXTLENGTH, 0, 0);
 					HGLOBAL hMem;
-					char *buf;
+					INT_PTR result = IDCANCEL;
 
-					hMem = GlobalAlloc(GMEM_MOVEABLE, len + 1);
-					if (hMem) {
-						buf = GlobalLock(hMem);
-						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, len + 1, (LPARAM)buf);
-						GlobalUnlock(hMem);
-
-						if (! CBSetClipboard(hDlgWnd, hMem)) {
-							// クリップボードへのセットが失敗した時は hMem を破棄する
-							// 成功した場合はクリップボードが所持しているので、破棄してはいけない
-							GlobalFree(hMem);
+					if (CBMemHandle == NULL) {
+						CBMemHandle = GlobalAlloc(GHND, len+1);
+					}
+					else if (GlobalSize(CBMemHandle) <= len) {
+						if (CBMemPtr) {
+							GlobalUnlock(CBMemHandle);
+							CBMemPtr = NULL;
 						}
+						hMem = GlobalReAlloc(CBMemHandle, len+1, 0);
+						if (hMem) {
+							CBMemHandle = hMem;
+							CBMemPtr = GlobalLock(CBMemHandle);
+						}
+						else {
+							/*
+							 * メモリが確保できなかった場合はどうするべきか。
+							 *
+							 * ダイアログで書き換えが行われた場合を考えると
+							 * キャンセル扱いにする方が無難だが、大抵は書き換えを
+							 * 行わないと思われるので、その場合は旧領域の内容を
+							 * 貼り付けた方が親切。
+							 *
+							 * 取りあえずは安全側に倒し、旧領域を開放して貼り付けが
+							 * 行われないようにする。
+							 */
+							GlobalFree(CBMemHandle);
+							CBMemHandle = NULL;
+						}
+					}
+
+					if (CBMemHandle) {
+						if (CBMemPtr == NULL) {
+							CBMemPtr = GlobalLock(CBMemHandle);
+						}
+						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, GlobalSize(CBMemHandle), (LPARAM)CBMemPtr);
+						result = IDOK;
 					}
 
 					if (DlgClipboardFont != NULL) {
@@ -782,13 +901,11 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 					}
 
 					DestroyWindow(hStatus);
-					EndDialog(hDlgWnd, IDOK);
+					EndDialog(hDlgWnd, result);
 				}
 					break;
 
 				case IDCANCEL:
-					PasteCanceled = 1;
-
 					if (DlgClipboardFont != NULL) {
 						DeleteObject(DlgClipboardFont);
 					}
@@ -800,13 +917,6 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				default:
 					return FALSE;
 			}
-
-#if 0
-		case WM_CLOSE:
-			PasteCanceled = 1;
-			EndDialog(hDlgWnd, 0);
-			return TRUE;
-#endif
 
 		case WM_SIZE:
 			{
@@ -870,151 +980,4 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			return FALSE;
 	}
 	return TRUE;
-}
-
-// ファイルに定義された文字列が、textに含まれるかを調べる。
-static int search_clipboard(char *filename, char *text)
-{
-	int ret = 0;  // no hit
-	FILE *fp = NULL;
-	char buf[256];
-	int len;
-
-	if (filename == NULL || filename[0] == '\0')
-		goto error;
-
-	fp = fopen(filename, "r");
-	if (fp == NULL)
-		goto error;
-
-	// TODO: 一行が256byteを超えている場合の考慮
-	while (fgets(buf, sizeof(buf), fp) != NULL) {
-		len = strlen(buf);
-		if (buf[len - 1] == '\n')
-			buf[len - 1] = '\0';
-		if (buf[0] == '\0')
-			continue;
-		if (strstr(text, buf)) { // hit
-			ret = 1;
-			break;
-		}
-	}
-
-error:
-	if (fp)
-		fclose(fp);
-
-	return (ret);
-}
-
-
-//
-// クリップボードに改行コードが含まれていたら、確認ダイアログを表示する。
-// クリップボードの変更も可能。
-//
-// return 0: Cancel
-//        1: Paste OK
-//
-// (2008.2.3 yutaka)
-//
-int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
-{
-	UINT Cf;
-	HANDLE hText;
-	char *pText;
-	int pos;
-	int ret = 0;
-	BOOL confirm = FALSE;
-	HANDLE wide_hText;
-	LPWSTR wide_buf;
-	int mb_len;
-
-	if (!ts.ConfirmChangePaste)
-		return 1;
-
-	if (! cv.Ready)
-		goto error;
-	if (TalkStatus!=IdTalkKeyb)
-		goto error;
-
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT))
-		Cf = CF_UNICODETEXT;
-	else if (IsClipboardFormatAvailable(CF_TEXT))
-		Cf = CF_TEXT;
-	else if (IsClipboardFormatAvailable(CF_OEMTEXT))
-		Cf = CF_OEMTEXT;
-	else
-		goto error;
-
-	if (!OpenClipboard(HWin))
-		goto error;
-
-	if (Cf == CF_UNICODETEXT) {
-		wide_hText = GetClipboardData(CF_UNICODETEXT);
-		if (wide_hText != NULL) {
-			wide_buf = GlobalLock(wide_hText);
-			mb_len = WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, NULL, 0, NULL, NULL);
-			ClipboardPtr = (char *)calloc(sizeof(char), mb_len);
-			WideCharToMultiByte(CP_ACP, 0, wide_buf, -1, ClipboardPtr, mb_len, NULL, NULL);
-			GlobalUnlock(wide_hText);
-		}
-		else {
-			CloseClipboard();
-			goto error;
-		}
-	}
-	else {
-		hText = GetClipboardData(Cf);
-		if (hText != NULL) {
-			pText = (char *)GlobalLock(hText);
-			ClipboardPtr = (char *)calloc(sizeof(char), strlen(pText)+1);
-			memcpy(ClipboardPtr, pText, strlen(pText));
-			GlobalUnlock(hText);
-		}
-		else {
-			CloseClipboard();
-			goto error;
-		}
-	}
-	CloseClipboard();
-
-	if (AddCR) {
-		if (ts.ConfirmChangePasteCR) {
-			confirm = TRUE;
-		}
-	}
-	else {
-		pos = strcspn(ClipboardPtr, "\r\n");  // 改行が含まれていたら
-		if (ClipboardPtr[pos] != '\0' || AddCR) {
-			confirm = TRUE;
-		}
-	}
-
-	// 辞書をサーチする
-	if (!confirm && search_clipboard(ts.ConfirmChangePasteStringFile, ClipboardPtr)) {
-		confirm = TRUE;
-	}
-
-	if (confirm) {
-		PasteCanceled = 0;
-		ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-		                HVTWin, (DLGPROC)OnClipboardDlgProc);
-		if (ret == 0 || ret == -1) {
-			ret = GetLastError();
-		}
-
-		if (PasteCanceled) {
-			ret = 0;
-			goto error;
-		}
-	}
-
-	ret = 1;
-
-error:
-	if (ClipboardPtr != NULL) {
-		free(ClipboardPtr);
-		ClipboardPtr = NULL;
-	}
-	return (ret);
 }
