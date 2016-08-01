@@ -1121,7 +1121,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        FName);
 
 	/* SCP‘—MæƒpƒX (2012.4.6 yutaka) */
-	GetPrivateProfileString(Section, "ScpSendDir", "~/",
+	GetPrivateProfileString(Section, "ScpSendDir", "",
 	                        ts->ScpSendDir, sizeof(ts->ScpSendDir), FName);
 
 
