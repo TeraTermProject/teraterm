@@ -139,6 +139,8 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 	}
 }
 
+#define BracketStartLen	(sizeof(BracketStart)-1)
+#define BracketEndLen	(sizeof(BracketEnd)-1)
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	static char BracketStart[] = "\033[200~";
@@ -147,7 +149,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	PCHAR TmpPtr;
 	LPWSTR TmpPtrW;
 	HGLOBAL TmpHandle;
-	int BuffLen, BracketLen;
+	unsigned int StrLen = 0, BuffLen = 0;
 
 	if (! cv.Ready) {
 		return;
@@ -201,7 +203,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 			}
 
 			if (Bracketed) {
-				BuffLen += sizeof(BracketStart) + sizeof(BracketEnd);
+				BuffLen += BracketStartLen + BracketEndLen;
 			}
 
 			if (AddCR) {
@@ -210,44 +212,69 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 			if ((CBMemHandle = GlobalAlloc(GHND, BuffLen)) != NULL) {
 				if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
-					if (Bracketed) {
-						strncpy_s(CBMemPtr, BuffLen, BracketStart, _TRUNCATE);
-						BracketLen = strlen(CBMemPtr);
-					}
-					else {
-						BracketLen = 0;
-					}
-
 					if (Cf == CF_UNICODETEXT) {
-						WideCharToMultiByte(CP_ACP, 0, TmpPtrW, -1, CBMemPtr+BracketLen, BuffLen-BracketLen, NULL, NULL);
+						WideCharToMultiByte(CP_ACP, 0, TmpPtrW, -1, CBMemPtr, BuffLen, NULL, NULL);
 					}
 					else {
-						strncat_s(CBMemPtr, BuffLen, TmpPtr, _TRUNCATE);
+						strncpy_s(CBMemPtr, BuffLen, TmpPtr, _TRUNCATE);
 					}
-
-					if (Bracketed) {
-						strncat_s(CBMemPtr, BuffLen, BracketEnd, _TRUNCATE);
-					}
-
-					if (AddCR) {
-						strncat_s(CBMemPtr, BuffLen, "\r", _TRUNCATE);
-					}
-
-					CBMemPtr = NULL;
 
 					TalkStatus = IdTalkCB;
 				}
-				GlobalUnlock(CBMemHandle);
-				CBMemPtr = NULL;
 			}
 			GlobalUnlock(TmpHandle);
 		}
 		CloseClipboard();
 	}
 
+	// 貼り付けの準備が正常に出来た場合は IdTalkCB となる
+
 	if (TalkStatus != IdTalkCB) {
+		// 準備が行えなかった場合は貼り付けを中断する
 		CBEndPaste();
+		return;
 	}
+
+	// 貼り付け前にクリップボードの内容を確認/加工等する場合はここで行う
+
+	// AddCR / Bracket 用の領域があるかの確認、無ければ追加確保
+	StrLen = strlen(CBMemPtr);
+	BuffLen = StrLen + 1; // strlen + NUL
+	if (AddCR) {
+		BuffLen++;
+	}
+	if (Bracketed) {
+		BuffLen += BracketStartLen + BracketEndLen;
+	}
+
+	if (GlobalSize(CBMemHandle) < BuffLen) {
+		GlobalUnlock(CBMemHandle);
+		CBMemPtr = NULL;
+		if ((TmpHandle = GlobalReAlloc(CBMemHandle, BuffLen, 0)) == NULL) {
+			/*
+			 * 不足分の確保失敗した時は CR/Bracket 無しで貼り付けを行うべきか、
+			 * それとも貼り付け自体を中止する(CBEndPaste()を呼ぶ)べきか。
+			 */
+			// CBEndPaste();
+			return;
+		}
+		CBMemHandle = TmpHandle;
+		CBMemPtr = GlobalLock(CBMemHandle);
+	}
+
+	if (AddCR) {
+		CBMemPtr[StrLen++] = '\r';
+	}
+
+	if (Bracketed) {
+		BuffLen = GlobalSize(CBMemHandle);
+		memmove_s(CBMemPtr+BracketStartLen, BuffLen-BracketStartLen, CBMemPtr, StrLen);
+		memcpy_s(CBMemPtr, BuffLen, BracketStart, BracketStartLen);
+		strncat_s(CBMemPtr, BuffLen, BracketEnd, _TRUNCATE);
+	}
+
+	GlobalUnlock(CBMemHandle);
+	CBMemPtr = NULL;
 }
 
 void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
