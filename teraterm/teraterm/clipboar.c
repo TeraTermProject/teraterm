@@ -139,6 +139,21 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 	}
 }
 
+// クリップボードバッファの末尾にある CR / LF をすべて削除する
+BOOL TrimTrailingNL(BOOL AddCR, BOOL Bracketed) {
+	PCHAR tail;
+	if (ts.TrimTrailingNLonPaste) {
+		for (tail = CBMemPtr+strlen(CBMemPtr)-1; tail >= CBMemPtr; tail--) {
+			if (*tail != '\r' && *tail != '\n') {
+				break;
+			}
+			*tail = '\0';
+		}
+	}
+
+	return TRUE;
+}
+
 #define BracketStartLen	(sizeof(BracketStart)-1)
 #define BracketEndLen	(sizeof(BracketEnd)-1)
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
@@ -236,6 +251,11 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	}
 
 	// 貼り付け前にクリップボードの内容を確認/加工等する場合はここで行う
+
+	if (!TrimTrailingNL(AddCR, Bracketed)) {
+		CBEndPaste();
+		return;
+	}
 
 	// AddCR / Bracket 用の領域があるかの確認、無ければ追加確保
 	StrLen = strlen(CBMemPtr);
@@ -901,15 +921,15 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 {
 	UINT Cf;
 	HANDLE hText;
-	char *pText, *tail;
+	char *pText;
 	int pos;
 	int ret = 0;
-	BOOL confirm = FALSE, need_writeback = FALSE;
+	BOOL confirm = FALSE;
 	HANDLE wide_hText;
 	LPWSTR wide_buf;
 	int mb_len;
 
-	if (!ts.ConfirmChangePaste && !ts.TrimTrailingNLonPaste)
+	if (!ts.ConfirmChangePaste)
 		return 1;
 
 	if (! cv.Ready)
@@ -958,18 +978,6 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 	}
 	CloseClipboard();
 
-	if (ts.TrimTrailingNLonPaste) {
-		for (tail=ClipboardPtr+strlen(ClipboardPtr)-1; tail >= ClipboardPtr; tail--) {
-			if (*tail == '\r' || *tail == '\n') {
-				*tail = '\0';
-				need_writeback = TRUE;
-			}
-			else {
-				break;
-			}
-		}
-	}
-
 	if (AddCR) {
 		if (ts.ConfirmChangePasteCR) {
 			confirm = TRUE;
@@ -998,17 +1006,6 @@ int CBStartPasteConfirmChange(HWND HWin, BOOL AddCR)
 		if (PasteCanceled) {
 			ret = 0;
 			goto error;
-		}
-	}
-	else if (need_writeback) {
-		HGLOBAL hMem;
-		hMem = CBAllocClipboardMem(ClipboardPtr);
-		if (hMem) {
-			if (! CBSetClipboard(NULL, hMem)) {
-				// クリップボードへのセットが失敗した時は hMem を破棄する
-				// 成功した場合はクリップボードが所持しているので、破棄してはいけない
-				GlobalFree(hMem);
-			}
 		}
 	}
 
