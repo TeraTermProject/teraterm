@@ -467,7 +467,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 				// WideCharToMultiByte で得られるのは末尾の \0 込みの長さ
 				// \0 をエンコード対象に含めない為に 1 減らす
 				len--;
-				GlobalUnlock(tmpPtrWide);
+				GlobalUnlock(tmpHandle);
 			}
 		}
 		else {
@@ -501,7 +501,7 @@ void CBStartPasteB64(HWND HWin, PCHAR header, PCHAR footer)
 				free(tmpPtr);
 			}
 			else {
-				GlobalUnlock(tmpPtr);
+				GlobalUnlock(tmpHandle);
 			}
 		}
 		CloseClipboard();
