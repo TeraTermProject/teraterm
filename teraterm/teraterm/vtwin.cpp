@@ -1761,14 +1761,8 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 				if (!ts.DisableAcceleratorSendBreak)
 					OnControlSendBreak();
 				return TRUE;
-			case ID_ACC_PASTECR:
-				OnEditPasteCR();
-				return TRUE;
 			case ID_ACC_AREYOUTHERE:
 				OnControlAreYouThere();
-				return TRUE;
-			case ID_ACC_PASTE:
-				OnEditPaste();
 				return TRUE;
 		}
 		if (ActiveWin==IdVT) {
@@ -1792,6 +1786,12 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 				case ID_ACC_COPY:
 					OnEditCopy();
 					return TRUE;
+				case ID_ACC_PASTECR:
+					OnEditPasteCR();
+					return TRUE;
+				case ID_ACC_PASTE:
+					OnEditPaste();
+					return TRUE;
 				case ID_ACC_PRINT:
 					OnFilePrint();
 					return TRUE;
@@ -1804,6 +1804,12 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 			switch (wID) {
 				case ID_ACC_COPY:
 					::PostMessage(HTEKWin,WM_COMMAND,ID_TEKEDIT_COPY,0);
+					return TRUE;
+				case ID_ACC_PASTECR:
+					::PostMessage(HTEKWin,WM_COMMAND,ID_TEKEDIT_PASTECR,0);
+					return TRUE;
+				case ID_ACC_PASTE:
+					::PostMessage(HTEKWin,WM_COMMAND,ID_TEKEDIT_PASTE,0);
 					return TRUE;
 				case ID_ACC_PRINT:
 					::PostMessage(HTEKWin,WM_COMMAND,ID_TEKFILE_PRINT,0);

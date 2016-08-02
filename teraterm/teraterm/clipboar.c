@@ -197,7 +197,7 @@ BOOL search_dict(char *filename, char *text)
  *   TRUE  -> 問題なし、貼り付けを実施
  *   FALSE -> 貼り付け中止
  */
-BOOL CheckClipboardContent(BOOL AddCR, BOOL Bracketed)
+BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
 	int pos;
 	int ret = IDOK;
@@ -241,7 +241,7 @@ BOOL CheckClipboardContent(BOOL AddCR, BOOL Bracketed)
 
 	if (confirm) {
 		ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_CLIPBOARD_DIALOG),
-		                HVTWin, (DLGPROC)OnClipboardDlgProc);
+		                HWin, (DLGPROC)OnClipboardDlgProc);
 		/*
 		 * 以前はダイアログの内容をクリップボードに書き戻していたけれど、必要?
 		 */
@@ -358,7 +358,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 		return;
 	}
 
-	if (!CheckClipboardContent(AddCR, Bracketed)) {
+	if (!CheckClipboardContent(HWin, AddCR, Bracketed)) {
 		CBEndPaste();
 		return;
 	}
@@ -778,8 +778,23 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 
 			SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_SETTEXT, 0, (LPARAM)CBMemPtr);
 
-			DispConvScreenToWin(CursorX, CursorY, &p.x, &p.y);
-			ClientToScreen(HVTWin, &p);
+			if (ActiveWin == IdVT) { // VT Window
+				/*
+				 * Caret off 時に GetCaretPos() で正確な場所が取れないので、
+				 * vtdisp.c 内部で管理している値から計算する
+				 */
+				DispConvScreenToWin(CursorX, CursorY, &p.x, &p.y);
+			}
+			else if (!GetCaretPos(&p)) { // Tek Window
+				/*
+				 * Tek Window は内部管理の値を取るのが面倒なので GetCaretPos() を使う
+				 * GetCaretPos() がエラーになった場合は念のため 0, 0 を入れておく
+				 */
+				p.x = 0;
+				p.y = 0;
+			}
+
+			ClientToScreen(GetParent(hDlgWnd), &p);
 
 			// キャレットが画面からはみ出しているときに貼り付けをすると
 			// 確認ウインドウが見えるところに表示されないことがある。
