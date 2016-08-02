@@ -794,6 +794,12 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 				p.y = 0;
 			}
 
+			// x, y の両方が 0 の時は親ウィンドウの中央に移動させられるので、
+			// それを防ぐ為に x を 1 にする
+			if (p.x == 0 && p.y == 0) {
+				p.x = 1;
+			}
+
 			ClientToScreen(GetParent(hDlgWnd), &p);
 
 			// キャレットが画面からはみ出しているときに貼り付けをすると
