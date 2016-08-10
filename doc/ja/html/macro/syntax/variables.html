@@ -1,13 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
   "http://www.w3.org/TR/html4/strict.dtd">
-<HTML>
-<HEAD>
+<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<TITLE>変数</TITLE>
-<META http-equiv="Content-Style-Type" content="text/css">
+<title>変数</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../../style.css" type="text/css">
-</HEAD>
-<BODY>
+</head>
+<body>
 
 <h1>変数</h1>
 
@@ -64,10 +64,22 @@
     </td>
   </tr>
   <tr>
-    <td>param1, param2 ... param9, paramcnt</td>
-    <td>文字列、整数</td>
-    <td>*1</td>
-    <td>*1</td>
+    <td>param1, param2 ... param9</td>
+    <td>文字列</td>
+    <td><a name="ref1" href="#note1">*1</a></td>
+    <td><a href="#note1">*1</a></td>
+  </tr>
+  <tr>
+    <td>params</td>
+    <td>文字列型配列</td>
+    <td><a href="#note1">*1</a></td>
+    <td><a href="#note1">*1</a></td>
+  </tr>
+  <tr>
+    <td>paramcnt</td>
+    <td>整数</td>
+    <td><a href="#note1">*1</a></td>
+    <td><a href="#note1">*1</a></td>
   </tr>
   <tr>
     <td>result</td>
@@ -142,7 +154,7 @@
         <a href="../command/waitregex.html">waitregex</a></td>
   </tr>
   <tr>
-    <td>mtimeout *2</td>
+    <td>mtimeout <a name="ref2" href="#note2">*2</a></td>
     <td>整数</td>
     <td>0</td>
     <td><a href="../command/recvln.html">recvln</a>,
@@ -156,10 +168,15 @@
   </tr>
 </table>
 
-<p>
-*1 MACRO 起動時のコマンドラインパラメータの2 ～ 9番目がシステム変数 param2 ～ param9 の初期値となる。1番目のパラメータ(param1)はマクロファイル名となる。"paramcnt"は1番目のパラメータも含む、引数の個数。<A HREF="../commandline.html">"コマンドライン"</A> 参照。<br>
-*2 精度は 50 msec 程度。
-</p>
+<ul>
+<li><a name="note1" href="#ref1">*1</a>
+  MACRO 起動時のコマンドラインパラメータの内、最初のパラメータ(マクロファイル名)が param1 および params[1] に入る。
+  マクロファイル名に続く 2 ～ 9 番目のパラメータは param2 ～ param9 および params[2] ～ params[9] に入る。
+  10 番目以降のパラメータは params[10] 以降に入る。
+  <a href="../commandline.html">コマンドライン</a>も参照。
+</li>
+<li><a name="note2" href="#ref2">*2</a> 精度は 50 msec 程度。</li>
+</ul>
 
-</BODY>
-</HTML>
+</body>
+</html>

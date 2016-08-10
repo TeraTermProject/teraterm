@@ -1,13 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
   "http://www.w3.org/TR/html4/strict.dtd">
-<HTML>
-<HEAD>
+<html>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<TITLE>Variables</TITLE>
-<META http-equiv="Content-Style-Type" content="text/css">
+<title>Variables</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="../../style.css" type="text/css">
-</HEAD>
-<BODY>
+</head>
+<body>
 
 <h1>Variables</h1>
 
@@ -64,10 +64,22 @@ Each system variable has a predefined type and value. Used with particular comma
     </td>
   </tr>
   <tr>
-    <td>param1, param2 ... param9, paramcnt</td>
+    <td>param1, param2 ... param9</td>
     <td>string, integer</td>
-    <td>*1</td>
-    <td>*1</td>
+    <td><a name="ref1" href="#note1">*1</a></td>
+    <td><a href="#note1">*1</a></td>
+  </tr>
+  <tr>
+    <td>params</td>
+    <td>string array</td>
+    <td><a href="#note1">*1</a></td>
+    <td><a href="#note1">*1</a></td>
+  </tr>
+  <tr>
+    <td>paramcnt</td>
+    <td>integer</td>
+    <td><a href="#note1">*1</a></td>
+    <td><a href="#note1">*1</a></td>
   </tr>
   <tr>
     <td>result</td>
@@ -142,11 +154,12 @@ Each system variable has a predefined type and value. Used with particular comma
         <a href="../command/waitregex.html">waitregex</a></td>
   </tr>
   <tr>
-    <td>mtimeout *2</td>
+    <td>mtimeout <a name="ref2" href="#note2">*2</a></td>
     <td>integer</td>
     <td>0</td>
     <td><a href="../command/recvln.html">recvln</a>,
         <a href="../command/wait.html">wait</a>,
+        <a href="../command/wait4all.html">wait4all</a>,
         <a href="../command/waitevent.html">waitevent</a>,
         <a href="../command/waitn.html">waitn</a>,
         <a href="../command/waitln.html">waitln</a>,
@@ -155,10 +168,17 @@ Each system variable has a predefined type and value. Used with particular comma
   </tr>
 </table>
 
-<p>
-*1 The second to ninth command line parameter of MACRO. The first parameter (param1) is the macro file name. "paramcnt" is a number of parameter counter including the first parameter. See "<A HREF="../commandline.html">Command line</A>".<br>
-*2 Precision is about 50 msec.
-</p>
+<ul>
+<li><a name="note1" href="#ref1">*1</a>
+<!--
+  MACRO ‹N“®Žž‚ÌƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒpƒ‰ƒ[ƒ^‚Ì“àAÅ‰‚Ìƒpƒ‰ƒ[ƒ^(ƒ}ƒNƒƒtƒ@ƒCƒ‹–¼)‚ª param1 ‚¨‚æ‚Ñ params[1] ‚É“ü‚éB
+  ƒ}ƒNƒƒtƒ@ƒCƒ‹–¼‚É‘±‚­ 2 ` 9 ”Ô–Ú‚Ìƒpƒ‰ƒ[ƒ^‚Í param2 ` param9 ‚¨‚æ‚Ñ params[2] ` params[9] ‚É“ü‚éB
+  10 ”Ô–ÚˆÈ~‚Ìƒpƒ‰ƒ[ƒ^‚Í params[10] ˆÈ~‚É“ü‚éB
+  <a href="../commandline.html">ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“</a>‚àŽQÆB
+-->
+</li>
+<li><a name="note2" href="#ref2">*2</a> Precision is about 50 msec.</li>
+</ul>
 
-</BODY>
-</HTML>
+</body>
+</html>

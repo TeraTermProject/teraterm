@@ -13,7 +13,7 @@
 <h1>コマンドライン</h1>
 
 <pre>
-<span class="syntax">TTPMACRO.EXE [/I] [/V] [&lt;macro file&gt; [&lt;second param&gt; [&lt;third param&gt; [&lt;fourth param&gt; [&lt;fifth param&gt; [&lt;sixth param&gt; [&lt;seventh param&gt; [&lt;eighth param&gt; [&lt;ninth param&gt;]]]]]]]]]</span>
+<span class="syntax">TTPMACRO.EXE [/I] [/V] [&lt;macro file&gt; [&lt;parameters&gt;...]]</span>
 </pre>
 
 
@@ -21,49 +21,47 @@
 
 <dl>
   <dt>/I</dt>
-  <dd>起動時に MACRO をアイコン化</dd>
+  <dd>起動時に MACRO をアイコン化する</dd>
 
   <dt>/V</dt>
   <dd>起動時に MACRO を隠す</dd>
 
   <dt>&lt;macro file&gt;</dt>
   <dd>マクロファイル名<br>
-      ファイル名が絶対パスでないときは、ttpmacro.exe からの相対パスと見なされます。<br>
-      ファイル名（パスを除く）はシステム変数 param1 に格納される。
-      </dd>
+      ファイル名が絶対パスでないときは、ttpmacro.exe からの相対パスと見なされる。<br>
+      ファイル名（パスを除く）はシステム変数 param1 および params[1] に格納される。
+  </dd>
 
-  <dt>&lt;second param&gt;</dt>
-  <dd>システム変数 param2 に格納される文字列</dd>
-
-  <dt>&lt;third param&gt;</dt>
-  <dd>システム変数 param3 に格納される文字列</dd>
-
-  <dt>&lt;fourth param&gt;</dt>
-  <dd>システム変数 param4 に格納される文字列</dd>
-
-  <dt>&lt;fifth param&gt;</dt>
-  <dd>システム変数 param5 に格納される文字列</dd>
-
-  <dt>&lt;sixth param&gt;</dt>
-  <dd>システム変数 param6 に格納される文字列</dd>
-
-  <dt>&lt;seventh param&gt;</dt>
-  <dd>システム変数 param7 に格納される文字列</dd>
-
-  <dt>&lt;eighth param&gt;</dt>
-  <dd>システム変数 param8 に格納される文字列</dd>
-
-  <dt>&lt;ninth param&gt;</dt>
-  <dd>システム変数 param9 に格納される文字列</dd>
-
-  <dt>paramcnt</dt>
-  <dd>システム変数 param1..9 に格納された文字列の個数</dd>
+  <dt>&lt;parameters&gt;</dt>
+  <dd>マクロファイルへ渡されるパラメータ。<br>
+      先頭からシステム変数 params の 3 番目の要素(params[2])から順番に格納される。<br>
+      同時に param2 ～ param9 にも格納される。
+  </dd>
 </dl>
 
+<h2>システム変数</h2>
 <p>
-システム変数 param1, param2 ～ param9, paramcnt については<A HREF="./syntax/variables.html">"変数"</A> 参照。
+コマンドラインに応じて以下の<a href="syntax/variables.html">システム変数</a>が設定される。
 </p>
+<dl>
+  <dt>params</dt>
+  <dd>パラメータが格納される文字列型配列。<br>
+      params[0] にはコマンドライン文字列全体が格納され、params[1] にはマクロファイル名が格納される。<br>
+      params[2] 以降はマクロファイルに渡されるパラメータが順番に格納される。
+  </dd>
 
+  <dt>param1</dt>
+  <dd>params[1] と同じ。マクロファイル名が格納される。</dd>
+
+  <dt>param2 ～ param9 </dt>
+  <dd>params[2] ～ params[9] と同じ。<br>
+      マクロファイルに渡されるパラメータが順番に格納される。<br>
+      params[10] 以降に相当する変数は無い。
+  </dd>
+
+  <dt>paramcnt</dt>
+  <dd>params に格納されたパラメータの数。マクロファイル名を表す params[1] の分も含む。</dd>
+</dl>
 
 </body>
 </html>
