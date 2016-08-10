@@ -19,6 +19,7 @@ TTProxy では、以下のコマンドラインパラメータが使用できます。
 <pre class="syntax">
 -proxy=protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport
 protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
+-noproxy
 </pre>
 
 <dl>
@@ -51,6 +52,9 @@ protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
 
   <dt id="password">password</dt>
   <dd>プロキシで認証が必要な場合のパスワード</dd>
+
+  <dt id="noproxy">-noproxy</dt>
+  <dd>プロキシ設定を無効化する。-proxy=none:// と同じ。</dd>
 </dl>
 
 <h2 id="example">使用例</h2>
@@ -58,6 +62,7 @@ protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
 ttermpro.exe -proxy=socks5://user:pass@proxy:1080 sshserver /ssh
 ttermpro.exe -proxy=telnet://proxy:8023 telnetserver:23 /nossh
 ttermpro.exe -proxy=none:// sshserver /ssh
+ttermpro.exe -noproxy sshserver /ssh
 </pre>
 
 <h2 id="notes">注意</h2>

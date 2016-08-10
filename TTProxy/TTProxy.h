@@ -147,6 +147,11 @@ private:
 						option[6] = '=';
 					}
 				}
+				else if (_stricmp(option+1, "noproxy") == 0) {
+					// -noproxy ‚Í -proxy=none:// ‚Ì•Ê–¼
+					ProxyWSockHook::parseURL("none://", TRUE);
+					action = OPTION_CLEAR;
+				}
 			}else{
 				String realhost = ProxyWSockHook::parseURL(option, FALSE);
 				if (realhost != NULL) {

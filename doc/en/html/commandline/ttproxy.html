@@ -19,6 +19,7 @@ You can use the following command line parameters on TTProxy.
 <pre class="syntax">
 -proxy=protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport
 protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
+-noproxy
 </pre>
 
 <dl>
@@ -51,6 +52,9 @@ protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
 
   <dt id="password">password</dt>
   <dd>Password for proxy authentication</dd>
+
+  <dt id="noproxy">-noproxy</dt>
+  <dd>Disable proxy setting. Same as "-proxy=none://"</dd>
 </dl>
 
 <h2 id="example">Example</h2>
@@ -58,6 +62,7 @@ protocol://&lt;user&lt;:password&gt;@&gt;proxyserver:proxyport/realhost
 ttermpro.exe -proxy=socks5://user:pass@proxy:1080 sshserver /ssh
 ttermpro.exe -proxy=telnet://proxy:8023 telnetserver:23 /nossh
 ttermpro.exe -proxy=none:// sshserver /ssh
+ttermpro.exe -noproxy sshserver /ssh
 </pre>
 
 <h2 id="notes">Note</h2>
