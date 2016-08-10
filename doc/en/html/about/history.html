@@ -40,13 +40,13 @@
         <ul>
           <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional.html#TrimTrailingNL">Additional settings dialog</a>.</li>
         </ul></li>
-      <!-- li>ZMODEM 送信で、デフォルトのエスケープ対象文字に LF と GS を追加した。</li -->
+      <li>ZMODEM: The default escaped character are added LF and GS by sending.</li>
       <li>changed <a href="../macro/commandline.html">macro command line</a> behavior.
         <ul>
           <li>Strictly checked the syntax of command line option. When an unnecessary option is added at option back like as /Vxx, the option is not recognized.</li>
           <li>The option placement can be only specified before a filename. When the option is specified after the filename, the option is recognized as macro parameter.</li>
         </ul></li>
-      <!-- li>マクロで、コマンドラインで指定されたパラメータが格納される文字列型配列 params を追加した。</li -->
+      <li>MACRO: The `params' string-typed array that is stored command line parameter(s).</li>
     </ul>
   </li>
 
@@ -2777,7 +2777,7 @@ SYNOPSIS:
   <li>Changes
     <ul>
       <li>When the filename includes invalid character by SCP receiving, the character is be replaced to '_'.</li>
-      <!-- li>ScpSendDir のデフォルト値を "~/" から "" (空文字列) に変更した。</li -->
+      <li>The default value of ScpSendDir entry is changed from "~/" to ""(empty string).</li>
     </ul>
   </li>
 
@@ -4152,7 +4152,7 @@ SYNOPSIS:
 
 <h3><a name="ttproxy_1.0.0.23">2016.xx.xx (Ver 1.0.0.23)</a></h3>
 <ul class="history">
-      <!-- li><a href="../commandline/ttproxy.html">コマンドラインオプション</a>に -noproxy を追加した。-proxy=none:// と同>様にデフォルトのプロキシ設定を無効化する。</li -->
+      <li>The `-noproxy' option is added at <a href="../commandline/ttproxy.html">command line</a>. The function is same as `-proxy=none://' option that is disabled proxy configuration.</li>
       <li>The priority(order) of loading TTX plugin is changed from 0 to 10.</li>
 </ul>
 

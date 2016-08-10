@@ -33,37 +33,36 @@
   </dd>
 
   <dt>&lt;parameters&gt;</dt>
-  <!-- dd>マクロファイルへ渡されるパラメータ。<br>
-      先頭からシステム変数 params の 3 番目の要素(params[2])から順番に格納される。<br>
-      同時に param2 ～ param9 にも格納される。
-  </dd -->
+  <dd>Parameter(s) is passed to macro file.<br>
+      The third argument of params system variable is stored into params[2] in a sequence.<br>
+      Simultaneously, from param2 to param9 variables are also stored.
+  </dd>
 </dl>
 
-<!--
 <h2>System variables</h2>
 <p>
-コマンドラインに応じて以下の<a href="syntax/variables.html">システム変数</a>が設定される。
+<a href="syntax/variables.html">System variables</a> of command line configuration
+are as follow.
 </p>
 <dl>
   <dt>params</dt>
-  <dd>パラメータが格納される文字列型配列。<br>
-      params[0] にはコマンドライン文字列全体が格納され、params[1] にはマクロファイル名が格納される。<br>
-      params[2] 以降はマクロファイルに渡されるパラメータが順番に格納される。
+  <dd>String type array that parameters are stored<br>
+      Whole string of command line is stored in params[0]. A macro filename is stored in params[1]. <br>
+      The third argument is stored into params[2] in a sequence.
   </dd>
 
   <dt>param1</dt>
-  <dd>params[1] と同じ。マクロファイル名が格納される。</dd>
+  <dd>This is same as params[1]. A macro filename is stored.</dd>
 
-  <dt>param2 ～ param9 </dt>
-  <dd>params[2] ～ params[9] と同じ。<br>
-      マクロファイルに渡されるパラメータが順番に格納される。<br>
-      params[10] 以降に相当する変数は無い。
+  <dt>From param2 to param9</dt>
+  <dd>Same as from params[2] to params[9].<br>
+      The third argument is stored into variable in a sequence. <br>
+      The variable that corresponds to params[10] or later does not exist.
   </dd>
 
   <dt>paramcnt</dt>
-  <dd>params に格納されたパラメータの数。マクロファイル名を表す params[1] の分も含む。</dd>
+  <dd>The number of params array. The params[1] that stores a macro filename counts.</dd>
 </dl>
--->
 
 </body>
 </html>
