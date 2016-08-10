@@ -286,10 +286,21 @@ void ZShHdr(PZVar zv, BYTE HdrType)
 }
 
 void ZPutBin(PZVar zv, int *i, BYTE b)
+/*
+ * lrzsz では ZDLE(CAN), DLE, XON, XOFF, @ の直後の CR, およびこれらの
+ * MSB が立った文字がエスケープ対象となっている。
+ * Tera Term では以前は lrzsz と同じだったようだが、何らかの理由で
+ * CR は常にエスケープ対象に変わっている。
+ *
+ * 接続先からさらに ssh / telnet 接続した場合に問題を起こさないよう、
+ * LF および GS もデフォルトのエスケープ対象に加える。
+ * ssh: LF または CR の直後の ~ がエスケープ文字扱い
+ * telnet: GS がエスケープ文字
+ */
 {
 	switch (b) {
-	case 0x0D:
-	case 0x8D:
+	case 0x0D: // CR
+	case 0x8D: // CR | 0x80
 		/* if (zv->CtlEsc ||
 		   ((zv->LastSent & 0x7f) == '@')) */
 //  {
@@ -298,13 +309,17 @@ void ZPutBin(PZVar zv, int *i, BYTE b)
 		b = b ^ 0x40;
 //  }
 		break;
-	case 0x10:
-	case 0x11:
-	case 0x13:
-	case ZDLE:
-	case 0x90:
-	case 0x91:
-	case 0x93:
+	case 0x0A: // LF
+	case 0x10: // DLE
+	case 0x11: // XON
+	case 0x13: // XOFF
+	case 0x1d: // GS
+	case ZDLE: // CAN(0x18)
+	case 0x8A: // LF | 0x80
+	case 0x90: // DLE | 0x80
+	case 0x91: // XON | 0x80
+	case 0x93: // XOFF | 0x80
+	case 0x9d: // GS | 0x80
 		zv->PktOut[*i] = ZDLE;
 		(*i)++;
 		b = b ^ 0x40;
