@@ -1257,11 +1257,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->ScrollBuffMax = 10000;
 
 	/* Max com port number -- special option */
-	ts->MaxComPort = GetPrivateProfileInt(Section, "MaxComPort", 4, FName);
+	ts->MaxComPort = GetPrivateProfileInt(Section, "MaxComPort", 256, FName);
 	if (ts->MaxComPort < 4)
 		ts->MaxComPort = 4;
-	// COM16‚©‚ç99‚ÖŠg’£ (2005.11.30 yutaka)
-	// 99‚©‚ç200‚ÖŠg’£ (2007.7.23 maya)
 	if (ts->MaxComPort > MAXCOMPORT)
 		ts->MaxComPort = MAXCOMPORT;
 	if ((ts->ComPort < 1) || (ts->ComPort > ts->MaxComPort))
