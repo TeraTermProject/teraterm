@@ -1869,7 +1869,7 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 						          sizeof(pvar->settings.X11Display),
 						          option + 6, _TRUNCATE);
 					}
-				} else if (MATCH_STR(option + 4, "-v") == 0) {
+				} else if (strcmp(option + 4, "-v") == 0) {
 					pvar->settings.LogLevel = LOG_LEVEL_VERBOSE;
 				} else if (_stricmp(option + 4, "-autologin") == 0 ||
 				           _stricmp(option + 4, "-autologon") == 0) {
@@ -1885,11 +1885,9 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					else {
 						pvar->settings.ForwardAgentConfirm = 1;
 					}
-
-				// -axxより上にしてはだめ
-				} else if (MATCH_STR(option + 4, "-a") == 0) {
+				} else if (strcmp(option + 4, "-a") == 0) {
 					pvar->settings.ForwardAgent = FALSE;
-				} else if (MATCH_STR(option + 4, "-A") == 0) {
+				} else if (strcmp(option + 4, "-A") == 0) {
 					pvar->settings.ForwardAgent = TRUE;
 
 				} else if (MATCH_STR(option + 4, "-C=") == 0) {
@@ -1900,9 +1898,9 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					else if (pvar->settings.CompressionLevel > 9) {
 						pvar->settings.CompressionLevel = 9;
 					}
-				} else if (MATCH_STR(option + 4, "-C") == 0) {
+				} else if (strcmp(option + 4, "-C") == 0) {
 					pvar->settings.CompressionLevel = 6;
-				} else if (MATCH_STR(option + 4, "-c") == 0) {
+				} else if (strcmp(option + 4, "-c") == 0) {
 					pvar->settings.CompressionLevel = 0;
 				} else if (MATCH_STR_I(option + 4, "-icon=") == 0) {
 					if ((_stricmp(option+10, "old") == 0) ||
@@ -1919,10 +1917,10 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					}
 
 				// /ssh1 と /ssh2 オプションの新規追加 (2006.9.16 maya)
-				} else if (MATCH_STR(option + 4, "1") == 0) {
+				} else if (strcmp(option + 4, "1") == 0) {
 					pvar->settings.Enabled = 1;
 					pvar->settings.ssh_protocol_version = 1;
-				} else if (MATCH_STR(option + 4, "2") == 0) {
+				} else if (strcmp(option + 4, "2") == 0) {
 					pvar->settings.Enabled = 1;
 					pvar->settings.ssh_protocol_version = 2;
 
@@ -1947,28 +1945,28 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				}
 
 			// /1 および /2 オプションの新規追加 (2004.10.3 yutaka)
-			} else if (MATCH_STR(option + 1, "1") == 0) {
+			} else if (strcmp(option + 1, "1") == 0) {
 				// command line: /ssh /1 is SSH1 only
 				pvar->settings.ssh_protocol_version = 1;
 
-			} else if (MATCH_STR(option + 1, "2") == 0) {
+			} else if (strcmp(option + 1, "2") == 0) {
 				// command line: /ssh /2 is SSH2 & SSH1
 				pvar->settings.ssh_protocol_version = 2;
 
-			} else if (MATCH_STR(option + 1, "nossh") == 0) {
+			} else if (strcmp(option + 1, "nossh") == 0) {
 				// '/nossh' オプションの追加。
 				// TERATERM.INI でSSHが有効になっている場合、うまくCygtermが起動しないことが
 				// あることへの対処。(2004.10.11 yutaka)
 				pvar->settings.Enabled = 0;
 
-			} else if (MATCH_STR(option + 1, "telnet") == 0) {
+			} else if (strcmp(option + 1, "telnet") == 0) {
 				// '/telnet' が指定されているときには '/nossh' と同じく
 				// SSHを無効にする (2006.9.16 maya)
 				pvar->settings.Enabled = 0;
 				// Tera Term の Telnet フラグも付ける
 				pvar->ts->Telnet = 1;
 
-			} else if (MATCH_STR(option + 1, "auth") == 0) {
+			} else if (MATCH_STR(option + 1, "auth=") == 0) {
 				// SSH2自動ログインオプションの追加
 				//
 				// SYNOPSIS: /ssh /auth=passowrd /user=ユーザ名 /passwd=パスワード
@@ -1980,26 +1978,25 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				//
 				pvar->ssh2_autologin = 1; // for SSH2 (2004.11.30 yutaka)
 
-				if (MATCH_STR(option + 5, "=password") == 0) { // パスワード
+				if (_stricmp(option + 6, "password") == 0) { // パスワード
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_PASSWORD;
 					pvar->ssh2_authmethod = SSH_AUTH_PASSWORD;
 
 				// /auth=challenge を追加 (2007.10.5 maya)
-				} else if (MATCH_STR(option + 5, "=challenge") == 0) { // keyboard-interactive認証
+				} else if (_stricmp(option + 6, "challenge") == 0) { // keyboard-interactive認証
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 					pvar->ssh2_authmethod = SSH_AUTH_TIS;
 
-				} else if (MATCH_STR(option + 5, "=publickey") == 0) { // 公開鍵認証
+				} else if (_stricmp(option + 6, "publickey") == 0) { // 公開鍵認証
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_RSA;
 					pvar->ssh2_authmethod = SSH_AUTH_RSA;
 
-				} else if (MATCH_STR(option + 5, "=pageant") == 0) { // 公開鍵認証 by Pageant
+				} else if (_stricmp(option + 6, "pageant") == 0) { // 公開鍵認証 by Pageant
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_RSA;
 					pvar->ssh2_authmethod = SSH_AUTH_PAGEANT;
 
 				} else {
 					// TODO:
-
 				}
 
 			} else if (MATCH_STR(option + 1, "user=") == 0) {
@@ -2011,11 +2008,11 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			} else if (MATCH_STR(option + 1, "keyfile=") == 0) {
 				_snprintf_s(pvar->ssh2_keyfile, sizeof(pvar->ssh2_keyfile), _TRUNCATE, "%s", option+9);
 
-			} else if (MATCH_STR(option + 1, "ask4passwd") == 0) {
+			} else if (strcmp(option + 1, "ask4passwd") == 0) {
 				// パスワードを聞く (2006.9.18 maya)
 				pvar->ask4passwd = 1;
 
-			} else if (MATCH_STR(option + 1, "nosecuritywarning") == 0) {
+			} else if (strcmp(option + 1, "nosecuritywarning") == 0) {
 				// known_hostsチェックをしない。当該オプションを使うと、セキュリティ性が低下する
 				// ため、隠しオプション扱いとする。
 				// (2009.10.4 yutaka)
