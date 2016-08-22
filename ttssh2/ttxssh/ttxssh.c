@@ -1973,12 +1973,10 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				//
 				// SYNOPSIS: /ssh /auth=passowrd /user=ユーザ名 /passwd=パスワード
 				//           /ssh /auth=publickey /user=ユーザ名 /passwd=パスワード /keyfile=パス
-				// EXAMPLE: /ssh /auth=password /user=nike /passwd=a@bc
+				// EXAMPLE: /ssh /auth=password /user=nike /passwd="a b""c"  ; パスワード: 「a b"c」
 				//          /ssh /auth=publickey /user=foo /passwd=bar /keyfile=d:\tmp\id_rsa
-				// NOTICE: パスワードやパスに空白が含む場合は、ブランクの代わりに @ を使うこと。
-				//
-				// (2004.11.30 yutaka)
-				// (2005.1.26 yutaka) 空白対応。公開鍵認証サポート。
+				// NOTICE: パスワードやパスに空白やセミコロンが含まれる場合はダブルクォート " で囲む
+				//         パスワードにダブルクォートが含まれる場合は連続したダブルクォート "" に置き換える
 				//
 				pvar->ssh2_autologin = 1; // for SSH2 (2004.11.30 yutaka)
 
