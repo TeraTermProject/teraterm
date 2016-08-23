@@ -40,7 +40,7 @@
         <ul>
           <li>The function can be enabled at Copy and Paste tab of <a href="../menu/setup-additional.html#TrimTrailingNL">Additional settings dialog</a>.</li>
         </ul></li>
-      <!-- li>スクロールバックしている時、キー入力で常にスクロール状態をリセットするようにした。</li -->
+      <li>When scroll back is used, scroll state is always reseted with user input.</li>
       <li>ZMODEM: The default escaped character are added LF and GS by sending.</li>
       <li>The default value of <a href="../setup/teraterm-com.html#maxport">MaxComPort</a> setting is increased from 4 to 256.</li>
       <li>changed <a href="../macro/commandline.html">macro command line</a> behavior.
@@ -58,7 +58,7 @@
       <li>When the clipboard is read from remote host, unnecessary NUL character is added at the end of the string.</li>
       <li>When the clipboard is written from remote host, empty string can not be set.</li>
       <li>When the clipboard is empty string and <a href="../usage/tips/vim.html#Bracketed">Bracketed Paste Mode</a> is enabled, final Bracket is only sent by pasting.</li>
-      <!-- li>ZMODEM 受信で、ZMODEM ヘッダパケットに含まれるエスケープされた 0x7f, 0xff を復元しない問題を修正した。</li -->
+      <li>ZMODEM: The escaped 0x7f and 0xff that is included in ZMODEM header packet can not be restored.</li>
       <li>MACRO: When invalid regular expression is specified at the <a href="../macro/command/strreplace.html">strreplace</a> command, source string is corrupted.
         <ul>
           <li>The result variable returns -1 when invalid regular expression is specified.</li>
