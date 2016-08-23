@@ -1239,7 +1239,16 @@ BOOL ZParse(PFileVar fv, PZVar zv, PComVar cv)
 					break;
 				default:
 					if (zv->Quoted) {
-						b = b ^ 0x40;
+						switch (b) {
+						case ZRUB0:
+							b = 0x7f;
+							break;
+						case ZRUB1:
+							b = 0xff;
+							break;
+						default:
+							b = b ^ 0x40;
+						}
 						zv->Quoted = FALSE;
 					}
 					zv->PktIn[zv->PktInPtr] = b;
