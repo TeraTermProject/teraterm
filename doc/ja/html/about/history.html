@@ -54,14 +54,14 @@
 
   <li>バグ修正
     <ul>
-      <li>Windows 95/98/Me/NT4.0で起動できなくなっていた問題を修正した。</li>
       <li>リモートからのクリップボード読み取りに対して、末尾に余計な NUL 文字を付加していた問題を修正した。</li>
       <li>リモートからのクリップボード書き込みで、空文字列がセット出来ない問題を修正した。</li>
       <li>クリップボードの内容が空文字列の時、<a href="../usage/tips/vim.html#Bracketed">Bracketed Paste Mode</a> 有効時の貼り付けで終了 Bracket のみが送られる問題を修正した。</li>
       <li>ZMODEM 受信で、ZMODEM ヘッダパケットに含まれるエスケープされた 0x7f, 0xff を復元しない問題を修正した。</li>
+      <li>Windows 95/98/Me/NT4.0で起動できなくなっていた問題を修正した。</li>
       <li><a href="../macro/command/strreplace.html">strreplace</a> マクロコマンドで、正しくない正規表現を指定した時に元文字列が壊れる問題を修正した。
         <ul>
-          <li>正しく無い正規表現を指定した時は result で -1 を返すようにした。</li>
+          <li>正しくない正規表現を指定した時は result で -1 を返すようにした。</li>
         </ul></li>
     </ul>
   </li>
