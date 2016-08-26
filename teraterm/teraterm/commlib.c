@@ -1136,7 +1136,7 @@ void CommSend(PComVar cv)
 			if ( cv->CRSend==IdCR ) {
 				LineEnd = 0x0d;
 			}
-			else {
+			else { // CRLF or LF
 				LineEnd = 0x0a;
 			}
 			C = 1;
