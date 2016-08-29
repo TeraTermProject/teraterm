@@ -1,4 +1,4 @@
-cd onig-6.0.0\src
+cd onig-6.1.0\src
 
 if exist "Makefile" goto build
 del onig_sd.lib
