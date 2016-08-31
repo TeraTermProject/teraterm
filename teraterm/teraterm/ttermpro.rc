@@ -319,7 +319,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
+GUIDELINES DESIGNINFO 
 BEGIN
     IDD_DAD_DIALOG, DIALOG
     BEGIN
@@ -421,18 +421,18 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "..\\common\\tt_res.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -463,8 +463,8 @@ IDI_CYGTERM             ICON                    "..\\..\\cygterm\\cygterm.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,91,0,0
- PRODUCTVERSION 4,91,0,0
+ FILEVERSION 4,92,0,0
+ PRODUCTVERSION 4,92,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -481,12 +481,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "T. Teranishi, TeraTerm Project"
             VALUE "FileDescription", "Tera Term"
-            VALUE "FileVersion", "4, 91, 0, 0"
+            VALUE "FileVersion", "4, 92, 0, 0"
             VALUE "InternalName", "TTERMPRO"
             VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2016 TeraTerm Project"
             VALUE "OriginalFilename", "TTERMPRO.EXE"
             VALUE "ProductName", "Tera Term"
-            VALUE "ProductVersion", "4, 91, 0, 0"
+            VALUE "ProductVersion", "4, 92, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -501,7 +501,7 @@ END
 // Menu
 //
 
-IDR_MENU MENU
+IDR_MENU MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -615,7 +615,7 @@ BEGIN
     END
 END
 
-IDR_TEKMENU MENU
+IDR_TEKMENU MENU 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -646,7 +646,7 @@ BEGIN
     END
 END
 
-IDR_PASTEMENU MENU
+IDR_PASTEMENU MENU 
 BEGIN
     MENUITEM "&Paste",                      ID_EDIT_PASTE2
     MENUITEM "Paste<C&R>",                  ID_EDIT_PASTECR
@@ -658,7 +658,7 @@ END
 // Accelerator
 //
 
-IDR_ACC ACCELERATORS
+IDR_ACC ACCELERATORS 
 BEGIN
     "T",            ID_ACC_AREYOUTHERE,     VIRTKEY, ALT, NOINVERT
     "C",            ID_ACC_COPY,            VIRTKEY, ALT, NOINVERT
