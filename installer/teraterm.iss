@@ -873,7 +873,8 @@ var
   conf    : String;
   confmsg : String;
   app     : String;
-  i, res  : integer;
+  i, res  : Integer;
+  silent  : Boolean;
 begin
   case CurUninstallStep of
     usPostUninstall:
@@ -888,26 +889,37 @@ begin
         conf := CustomMessage('msg_del_confirm');
         app  := ExpandConstant('{app}');
 
-        // delete config files
-        for i := 0 to 5 do
+        silent := false;
+        for i := 0 to ParamCount() do
         begin
-          buf := app + ini[i];
-          if FileExists(buf) then begin
-            confmsg := Format(conf, [buf]);
-            res := MsgBox(confmsg, mbInformation, MB_YESNO or MB_DEFBUTTON2);
-            if res = IDYES then
-              DeleteFile(buf);
-          end;
+          if (CompareText('/SUPPRESSMSGBOXES', ParamStr(i)) = 0) then
+            silent := true;
         end;
 
-        // delete registory
-        if RegKeyExists(HKEY_CURRENT_USER, 'Software\ShinpeiTools\TTermMenu') then begin
-          confmsg := Format(conf, ['HKEY_CURRENT_USER' + '\Software\ShinpeiTools\TTermMenu']);
-          res := MsgBox(confmsg, mbInformation, MB_YESNO or MB_DEFBUTTON2);
-          if res = IDYES then begin
-            RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\ShinpeiTools\TTermMenu');
-            RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\ShinpeiTools');
+        if not silent then begin
+
+          // delete config files
+          for i := 0 to 5 do
+          begin
+            buf := app + ini[i];
+            if FileExists(buf) then begin
+              confmsg := Format(conf, [buf]);
+              res := MsgBox(confmsg, mbInformation, MB_YESNO or MB_DEFBUTTON2);
+              if res = IDYES then
+                DeleteFile(buf);
+            end;
           end;
+
+          // delete registory
+          if RegKeyExists(HKEY_CURRENT_USER, 'Software\ShinpeiTools\TTermMenu') then begin
+            confmsg := Format(conf, ['HKEY_CURRENT_USER' + '\Software\ShinpeiTools\TTermMenu']);
+            res := MsgBox(confmsg, mbInformation, MB_YESNO or MB_DEFBUTTON2);
+            if res = IDYES then begin
+              RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\ShinpeiTools\TTermMenu');
+              RegDeleteKeyIfEmpty(HKEY_CURRENT_USER, 'Software\ShinpeiTools');
+            end;
+          end;
+
         end;
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
