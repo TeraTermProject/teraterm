@@ -390,13 +390,22 @@ void FixLogOption()
 // スレッドの終了とファイルのクローズ
 static void CloseFileSync(PFileVar ptr)
 {
+	BOOL ret;
+	DWORD code;
+
 	if (!ptr->FileOpen)
 		return;
 
 	if (ptr->LogThread != (HANDLE)-1) {
 		// スレッドの終了待ち
-		PostThreadMessage(ptr->LogThreadId, WM_QUIT, 0, 0);
-		WaitForSingleObject(ptr->LogThread, INFINITE);
+		ret = PostThreadMessage(ptr->LogThreadId, WM_QUIT, 0, 0);
+		if (ret != 0) {
+			// スレッドキューにエンキューできた場合のみ待ち合わせを行う。
+			WaitForSingleObject(ptr->LogThread, INFINITE);
+		}
+		else {
+			code = GetLastError();
+		}
 		CloseHandle(ptr->LogThread);
 		ptr->LogThread = (HANDLE)-1;
 	}
@@ -417,6 +426,11 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 	DWORD wrote;
 
 	PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE);
+
+	// スレッドキューの作成が終わったことをスレッド生成元へ通知する。
+	if (fv->LogThreadEvent != NULL) {
+		SetEvent(fv->LogThreadEvent);
+	}
 
 	while (GetMessage(&msg, NULL, 0, 0) > 0) {
 		switch (msg.message) {
@@ -653,8 +667,20 @@ BOOL LogStart()
 
 	// 遅延書き込み用スレッドを起こす。
 	// (2013.4.19 yutaka)
+	// DeferredLogWriteThread スレッドが起床して、スレッドキューが作成されるより前に、
+	// ログファイルのクローズ(CloseFileSync)が行われると、エンキューが失敗し、デッドロック
+	// するという問題を修正した。
+	// スレッド間の同期を行うため、名前なしイベントオブジェクトを使って、スレッドキューの
+	// 作成まで待ち合わせするようにした。名前付きイベントオブジェクトを使う場合は、
+	// システム(Windows OS)上でユニークな名前にする必要がある。
+	// (2016.9.23 yutaka)
+	LogVar->LogThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
 	LogVar->LogThreadId = tid;
+	if (LogVar->LogThreadEvent != NULL) {
+		WaitForSingleObject(LogVar->LogThreadEvent, INFINITE);
+		CloseHandle(LogVar->LogThreadEvent);
+	}
 
 	// 現在バッファにあるデータをすべて書き出してから、
 	// ログ採取を開始する。
