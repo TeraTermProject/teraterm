@@ -107,6 +107,20 @@ if result &lt;&gt; -1 then
 endif
 </pre>
 
+<pre class="macro-example">
+name = "C:\test"
+
+getfileattr name
+
+if result &lt; 0 then
+	messagebox "Not found" name
+elseif result &amp; $10 then
+	messagebox "Directory" name
+else
+	messagebox "File" name
+endif
+</pre>
+
 <h2>See also</h2>
 <ul>
   <li><a href="setfileattr.html">setfileattr</a></li>
