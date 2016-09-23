@@ -14,7 +14,7 @@
 <h1>filestat</h1>
 
 <p>
-Gets status information on a file.
+Gets status information on a file or folder.
 </p>
 
 <pre class="macro-syntax">
@@ -25,9 +25,9 @@ filestat &lt;filename&gt; &lt;size&gt; [&lt;mtime&gt;] [&lt;drive&gt;]
 
 <p>
 Obtains information about the file or directory specified by &lt;filename&gt;.<br>
-&lt;size&gt; is set to the size of the file in bytes.
-&lt;mtime&gt; is set to the time of last modification of file.
-&lt;drive&gt; is set to the drive number of the disk containing the file.
+&lt;size&gt; is set to the size of the file in bytes.<br>
+&lt;mtime&gt; is set to the time of last modification of file or folder.<br>
+&lt;drive&gt; is set to the drive number of the disk containing the file or folder.<br>
 <br>
 The system variable "result" value of -1 indicates an error.
 </p>
@@ -44,6 +44,24 @@ else
 	messagebox str 'filestat'
 endif
 </pre>
+
+<pre class="macro-example">
+filestat 'Macro' size time drive
+
+if result = -1 then
+	messagebox 'Directory open error' 'filestat'
+else
+	sprintf2 str 'Directory size=%d Time modified=%s Drive=%s' size time drive
+	messagebox str 'filestat'
+	; ex. Directory size=0 Time modified=2014-03-04 22:44:47 Drive=C
+endif
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="foldersearch.html">foldersearch</a></li>
+  <li><a href="getfileattr.html">getfileattr</a></li>
+</ul>
 
 </body>
 </html>
