@@ -890,8 +890,20 @@ static void LogRotate(void)
 
 	// 遅延書き込み用スレッドを起こす。
 	// (2013.4.19 yutaka)
+	// DeferredLogWriteThread スレッドが起床して、スレッドキューが作成されるより前に、
+	// ログファイルのクローズ(CloseFileSync)が行われると、エンキューが失敗し、デッドロック
+	// するという問題を修正した。
+	// スレッド間の同期を行うため、名前なしイベントオブジェクトを使って、スレッドキューの
+	// 作成まで待ち合わせするようにした。名前付きイベントオブジェクトを使う場合は、
+	// システム(Windows OS)上でユニークな名前にする必要がある。
+	// (2016.9.26 yutaka)
+	LogVar->LogThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	LogVar->LogThread = (HANDLE)_beginthreadex(NULL, 0, DeferredLogWriteThread, LogVar, 0, &tid);
 	LogVar->LogThreadId = tid;
+	if (LogVar->LogThreadEvent != NULL) {
+		WaitForSingleObject(LogVar->LogThreadEvent, INFINITE);
+		CloseHandle(LogVar->LogThreadEvent);
+	}
 
 	logfile_unlock();
 
