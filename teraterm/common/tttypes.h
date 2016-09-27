@@ -309,6 +309,7 @@ typedef TCharAttr *PCharAttr;
 #define IdTitleChangeRequestOverwrite 1
 #define IdTitleChangeRequestAhead     2
 #define IdTitleChangeRequestLast      3
+#define IdTitleChangeRequestMax       IdTitleChangeRequestLast
 
 // Meta8Bit mode
 #define IdMeta8BitOff   0

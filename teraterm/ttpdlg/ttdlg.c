@@ -361,7 +361,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						if ( ts->TerminalWidth<1 ) {
 							ts->TerminalWidth = 1;
 						}
-						if ( ts->TerminalWidth>TermWidthMax ) {
+						else if ( ts->TerminalWidth>TermWidthMax ) {
 							ts->TerminalWidth = TermWidthMax;
 						}
 
@@ -369,22 +369,27 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						if ( ts->TerminalHeight<1 ) {
 							ts->TerminalHeight = 1;
 						}
-						if ( ts->TerminalHeight>TermHeightMax ) {
+						else if ( ts->TerminalHeight>TermHeightMax ) {
 							ts->TerminalHeight = TermHeightMax;
 						}
 
 						GetRB(Dialog,&ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);
 						GetRB(Dialog,&ts->AutoWinResize,IDC_TERMRESIZE,IDC_TERMRESIZE);
 
-						ts->CRReceive = (WORD)GetCurSel(Dialog, IDC_TERMCRRCV);
-						ts->CRSend = (WORD)GetCurSel(Dialog, IDC_TERMCRSEND);
-
-						w = (WORD)GetCurSel(Dialog, IDC_TERMID);
-						if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
-							if ((w==0) || (w > sizeof(Term_TermJ)/sizeof(WORD))) w = 1;
-							w = Term_TermJ[w-1];
+						if ((w = (WORD)GetCurSel(Dialog, IDC_TERMCRRCV)) > 0) {
+							ts->CRReceive = w;
 						}
-						ts->TerminalID = w;
+						if ((w = (WORD)GetCurSel(Dialog, IDC_TERMCRSEND)) > 0) {
+							ts->CRSend = w;
+						}
+
+						if ((w = (WORD)GetCurSel(Dialog, IDC_TERMID)) > 0) {
+							if ( ts->Language!=IdJapanese ) { /* non-Japanese mode */
+								if (w > sizeof(Term_TermJ)/sizeof(WORD)) w = 1;
+								w = Term_TermJ[w-1];
+							}
+							ts->TerminalID = w;
+						}
 
 						GetRB(Dialog,&ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
 
@@ -398,30 +403,45 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						if (ts->Language==IdJapanese) {
 							BOOL ret;
 
-							ts->KanjiCode = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
+								ts->KanjiCode = w;
+							}
 							GetRB(Dialog,&ts->JIS7Katakana,IDC_TERMKANA,IDC_TERMKANA);
-							ts->KanjiCodeSend = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND)) > 0) {
+								ts->KanjiCodeSend = w;
+							}
 							GetRB(Dialog,&ts->JIS7KatakanaSend,IDC_TERMKANASEND,IDC_TERMKANASEND);
-							ts->KanjiIn = (WORD)GetCurSel(Dialog, IDC_TERMKIN);
-							ts->KanjiOut = (WORD)GetCurSel(Dialog, IDC_TERMKOUT);
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKIN)) > 0) {
+								ts->KanjiIn = w;
+							}
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKOUT)) > 0) {
+								ts->KanjiOut = w;
+							}
 
 							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
 							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
 						}
 						else if (ts->Language==IdRussian) {
-							ts->RussHost = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST);
-							ts->RussClient = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT);
-							ts->RussFont = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT);
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST)) > 0) {
+								ts->RussHost = w;
+							}
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSCLIENT)) > 0) {
+								ts->RussClient = w;
+							}
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSFONT)) > 0) {
+								ts->RussFont = w;
+							}
 						}
 						else if (ts->Language==IdKorean || // HKS
 						         ts->Language==IdUtf8) {
 							BOOL ret;
-							WORD listId;
 
-							listId = (WORD)GetCurSel(Dialog, IDC_TERMKANJI);
-							ts->KanjiCode = List2KanjiCode(ts->Language,listId);
-							listId = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND);
-							ts->KanjiCodeSend = List2KanjiCode(ts->Language,listId);
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
+								ts->KanjiCode = List2KanjiCode(ts->Language, w);
+							}
+							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJISEND)) > 0) {
+								ts->KanjiCodeSend = List2KanjiCode(ts->Language, w);
+							}
 
 							ts->JIS7KatakanaSend=0;
 							ts->JIS7Katakana=0;
@@ -1272,15 +1292,21 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				case IDOK:
 					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
 					if ( ts!=NULL ) {
+						WORD w;
+
 						GetRB(Dialog,&ts->BSKey,IDC_KEYBBS,IDC_KEYBBS);
 						ts->BSKey++;
 						GetRB(Dialog,&ts->DelKey,IDC_KEYBDEL,IDC_KEYBDEL);
-						GetRB(Dialog,&ts->MetaKey,IDC_KEYBMETA,IDC_KEYBMETA);
 						GetRB(Dialog,&ts->DisableAppKeypad,IDC_KEYBAPPKEY,IDC_KEYBAPPKEY);
 						GetRB(Dialog,&ts->DisableAppCursor,IDC_KEYBAPPCUR,IDC_KEYBAPPCUR);
-						ts->MetaKey = (WORD)GetCurSel(Dialog, IDC_KEYBMETA) - 1;
-						if (ts->Language==IdRussian)
-							ts->RussKeyb = (WORD)GetCurSel(Dialog, IDC_KEYBKEYB);
+						if ((w = (WORD)GetCurSel(Dialog, IDC_KEYBMETA)) > 0) {
+							ts->MetaKey = w - 1;
+						}
+						if (ts->Language==IdRussian) {
+							if ((w = (WORD)GetCurSel(Dialog, IDC_KEYBKEYB)) > 0) {
+								ts->RussKeyb = w;
+							}
+						}
 					}
 					EndDialog(Dialog, 1);
 					if (DlgKeybFont != NULL) {
@@ -1465,18 +1491,24 @@ BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						GetDlgItemText(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
 						if (strncmp(Temp, "COM", 3) == 0 && Temp[3] != '\0') {
 							ts->ComPort = (WORD)atoi(&Temp[3]);
-						} else {
-							ts->ComPort = 0;
 						}
 
 						GetDlgItemText(Dialog, IDC_SERIALBAUD, Temp, sizeof(Temp)-1);
 						if (atoi(Temp) != 0) {
 							ts->Baud = (DWORD)atoi(Temp);
 						}
-						ts->DataBit = (WORD)GetCurSel(Dialog, IDC_SERIALDATA);
-						ts->Parity = (WORD)GetCurSel(Dialog, IDC_SERIALPARITY);
-						ts->StopBit = (WORD)GetCurSel(Dialog, IDC_SERIALSTOP);
-						ts->Flow = (WORD)GetCurSel(Dialog, IDC_SERIALFLOW);
+						if ((w = (WORD)GetCurSel(Dialog, IDC_SERIALDATA)) > 0) {
+							ts->DataBit = w;
+						}
+						if ((w = (WORD)GetCurSel(Dialog, IDC_SERIALPARITY)) > 0) {
+							ts->Parity = w;
+						}
+						if ((w = (WORD)GetCurSel(Dialog, IDC_SERIALSTOP)) > 0) {
+							ts->StopBit = w;
+						}
+						if ((w = (WORD)GetCurSel(Dialog, IDC_SERIALFLOW)) > 0) {
+							ts->Flow = w;
+						}
 
 						ts->DelayPerChar = GetDlgItemInt(Dialog,IDC_SERIALDELAYCHAR,NULL,FALSE);
 

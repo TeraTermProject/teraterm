@@ -383,6 +383,7 @@ void CSequencePropPageDlg::OnOK()
 {
 	CButton *btn;
 	CComboBox *cmb;
+	int sel;
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
@@ -394,7 +395,10 @@ void CSequencePropPageDlg::OnOK()
 
 	// (3)IDC_ACCEPT_TITLE_CHANGING
 	cmb = (CComboBox *)GetDlgItem(IDC_ACCEPT_TITLE_CHANGING);
-	ts.AcceptTitleChangeRequest = cmb->GetCurSel();
+	sel = cmb->GetCurSel();
+	if (0 <= sel && sel <= IdTitleChangeRequestMax) {
+		ts.AcceptTitleChangeRequest = sel;
+	}
 
 	// (4)IDC_TITLE_REPORT
 	cmb = (CComboBox *)GetDlgItem(IDC_TITLE_REPORT);
@@ -406,8 +410,10 @@ void CSequencePropPageDlg::OnOK()
 			ts.WindowFlag &= ~WF_TITLEREPORT;
 			ts.WindowFlag |= IdTitleReportAccept;
 			break;
-		default: // 2
+		case 2:
 			ts.WindowFlag |= IdTitleReportEmpty;
+			break;
+		default: // Invalid value.
 			break;
 	}
 
@@ -429,7 +435,7 @@ void CSequencePropPageDlg::OnOK()
 		ts.WindowFlag ^= WF_CURSORCHANGE;
 	}
 
-	// (8)IDC_TITLE_REPORT
+	// (8)IDC_CLIPBOARD_ACCESS
 	cmb = (CComboBox *)GetDlgItem(IDC_CLIPBOARD_ACCESS);
 	switch (cmb->GetCurSel()) {
 		case 0: // off
@@ -443,8 +449,10 @@ void CSequencePropPageDlg::OnOK()
 			ts.CtrlFlag &= ~CSF_CBRW;
 			ts.CtrlFlag |= CSF_CBREAD;
 			break;
-		default: // read/write
+		case 3: // read/write
 			ts.CtrlFlag |= CSF_CBRW;
+			break;
+		default: // Invalid value.
 			break;
 	}
 }
@@ -1167,8 +1175,10 @@ void CVisualPropPageDlg::OnOK()
 		case 2:
 			ts.FontQuality = ANTIALIASED_QUALITY;
 			break;
-		default: // 3
+		case 3:
 			ts.FontQuality = CLEARTYPE_QUALITY;
+			break;
+		default: // Invalid value.
 			break;
 	}
 
