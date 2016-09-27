@@ -356,7 +356,7 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 	}
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
+	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
 
 	return FALSE;
 }
