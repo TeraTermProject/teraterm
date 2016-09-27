@@ -3042,7 +3042,7 @@ static char **LangUIList = NULL;
 #define LANG_PATH "lang"
 #define LANG_EXT ".lng"
 
-static void make_sel_lang_ui(char *HomeDir)
+static int make_sel_lang_ui(char *HomeDir)
 {
 	int    i;
 	int    file_num;
@@ -3068,8 +3068,9 @@ static void make_sel_lang_ui(char *HomeDir)
 	hFind = FindFirstFile(fullpath,&fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
-		  if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			file_num ++;
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				file_num++;
+			}
 		} while(FindNextFile(hFind,&fd));
 		FindClose(hFind);
 	}
@@ -3084,11 +3085,12 @@ static void make_sel_lang_ui(char *HomeDir)
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				LangUIList[i++] = _strdup(fd.cFileName);
 			}
-		} while(FindNextFile(hFind,&fd));
+		} while(FindNextFile(hFind,&fd) && i < file_num);
 		FindClose(hFind);
 	}
-	LangUIList[i++] = NULL;
+	LangUIList[i] = NULL;
 
+	return i;
 }
 
 static int get_sel_lang_ui(char **list, char *selstr)
@@ -3113,7 +3115,7 @@ static int get_sel_lang_ui(char **list, char *selstr)
 
 BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
-	static int langui_sel = 1;
+	static int langui_sel = 1, uilist_count = 0;
 	PTTSet ts;
 	WORD w;
 	char Temp[8];
@@ -3191,7 +3193,7 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			}
 
 			// 最初に指定されている言語ファイルの番号を覚えておく。
-			make_sel_lang_ui(ts->HomeDir);
+			uilist_count = make_sel_lang_ui(ts->HomeDir);
 			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFile_ini);
 			SetDropDownList(Dialog, IDC_GENLANG_UI, LangUIList, langui_sel);
 			if (LangUIList[0] == NULL) {
@@ -3213,24 +3215,26 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						else {
 							ts->PortType = IdTCPIP;
 						}
+
 						if ((ts->MenuFlag & MF_NOLANGUAGE)==0) {
 							WORD language = (WORD)GetCurSel(Dialog, IDC_GENLANG);
 
 							// Language が変更されたとき、
 							// KanjiCode/KanjiCodeSend を変更先の Language に存在する値に置き換える
-							if (language != ts->Language) {
+							if (1 <= language && language <= IdLangMax && language != ts->Language) {
 								WORD KanjiCode = ts->KanjiCode;
 								WORD KanjiCodeSend = ts->KanjiCodeSend;
 								ts->KanjiCode = KanjiCodeTranslate(language,KanjiCode);
 								ts->KanjiCodeSend = KanjiCodeTranslate(language,KanjiCodeSend);
+
+								ts->Language = language;
 							}
 
-							ts->Language = language;
 						}
 
 						// 言語ファイルが変更されていた場合
 						w = (WORD)GetCurSel(Dialog, IDC_GENLANG_UI);
-						if (w != langui_sel) {
+						if (1 <= w && w <= uilist_count && w != langui_sel) {
 							char CurDir[MAX_PATH];
 
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
