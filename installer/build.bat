@@ -1,4 +1,46 @@
 
+if not "%VSINSTALLDIR%" == "" goto vsinstdir
+
+if "%VS80COMNTOOLS%" == "" goto check_2008
+if not exist "%VS80COMNTOOLS%\vsvars32.bat" goto check_2008
+call "%VS80COMNTOOLS%\vsvars32.bat"
+goto vs2005
+
+:check_2008
+if "%VS90COMNTOOLS%" == "" goto check_2010
+if not exist "%VS90COMNTOOLS%\vsvars32.bat" goto check_2010
+call "%VS90COMNTOOLS%\vsvars32.bat"
+goto vs2008
+
+:check_2010
+if "%VS100COMNTOOLS%" == "" goto check_2012
+if not exist "%VS100COMNTOOLS%\vsvars32.bat" goto check_2012
+call "%VS100COMNTOOLS%\vsvars32.bat"
+goto vs2010
+
+:check_2012
+if "%VS110COMNTOOLS%" == "" goto check_2013
+if not exist "%VS110COMNTOOLS%\VsDevCmd.bat" goto check_2013
+call "%VS110COMNTOOLS%\VsDevCmd.bat"
+goto vs2012
+
+:check_2013
+if "%VS120COMNTOOLS%" == "" goto check_2015
+if not exist "%VS120COMNTOOLS%\VsDevCmd.bat" goto check_2015
+call "%VS120COMNTOOLS%\VsDevCmd.bat"
+goto vs2013
+
+:check_2015
+if "%VS140COMNTOOLS%" == "" goto novs
+if not exist "%VS140COMNTOOLS%\VsDevCmd.bat" goto novs
+call "%VS140COMNTOOLS%\VsDevCmd.bat"
+goto vs2015
+
+:novs
+echo "Can't find Visual Studio"
+exit /b
+
+:vsinstdir
 rem Visual StudioÇÃÉoÅ[ÉWÉáÉìîªï 
 FOR /F "tokens=1,2 delims=\. " %%H IN ("%VSINSTALLDIR:*Visual Studio =Studio %") DO set VSVERSTR="%%H %%I"
 if %VSVERSTR% == "Studio 8" goto vs2005
