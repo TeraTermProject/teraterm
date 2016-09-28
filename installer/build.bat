@@ -42,27 +42,15 @@ exit /b
 
 :vsinstdir
 rem Visual Studioのバージョン判別
-FOR /F "tokens=1,2 delims=\. " %%H IN ("%VSINSTALLDIR:*Visual Studio =Studio %") DO set VSVERSTR="%%H %%I"
-if %VSVERSTR% == "Studio 8" goto vs2005
-if %VSVERSTR% == "Studio 9" goto vs2008
-if %VSVERSTR% == "Studio 10" goto vs2010
-if %VSVERSTR% == "Studio 11" goto vs2012
-if %VSVERSTR% == "Studio 12" goto vs2013
-if %VSVERSTR% == "Studio 14" goto vs2015
+set VSCMNDIR="%VSINSTALLDIR%\Common7\Tools\"
+set VSCMNDIR=%VSCMNDIR:\\=\%
 
-rem 期待通りに動かなかった場合の為、旧判定条件も残しておく
-echo %VSINSTALLDIR% | find "Studio 8"
-if not ERRORLEVEL 1 goto vs2005
-echo %VSINSTALLDIR% | find "Studio 9"
-if not ERRORLEVEL 1 goto vs2008
-echo %VSINSTALLDIR% | find "Studio 10"
-if not ERRORLEVEL 1 goto vs2010
-echo %VSINSTALLDIR% | find "Studio 11"
-if not ERRORLEVEL 1 goto vs2012
-echo %VSINSTALLDIR% | find "Studio 12"
-if not ERRORLEVEL 1 goto vs2013
-echo %VSINSTALLDIR% | find "Studio 14"
-if not ERRORLEVEL 1 goto vs2015
+if /I %VSCMNDIR% EQU "%VS80COMNTOOLS%" goto vs2005
+if /I %VSCMNDIR% EQU "%VS90COMNTOOLS%" goto vs2008
+if /I %VSCMNDIR% EQU "%VS100COMNTOOLS%" goto vs2010
+if /I %VSCMNDIR% EQU "%VS110COMNTOOLS%" goto vs2012
+if /I %VSCMNDIR% EQU "%VS120COMNTOOLS%" goto vs2013
+if /I %VSCMNDIR% EQU "%VS140COMNTOOLS%" goto vs2015
 
 echo Unknown Visual Studio version
 exit /b
