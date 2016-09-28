@@ -113,6 +113,7 @@ goto vsend
 
 set BUILD=build
 if "%1" == "rebuild" (set BUILD=rebuild)
+pushd %~dp0
 
 rem ライブラリをコンパイル
 pushd ..\libs
@@ -153,8 +154,9 @@ pushd cygtool
 nmake -f cygtool.mak
 popd
 
+popd
 exit /b 0
 
 :fail
+popd
 exit /b 1
-
