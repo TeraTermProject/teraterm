@@ -216,6 +216,13 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CFileTransDlg::PostNcDestroy()
 {
+	// CreateFontIndirect()で作成した論理フォントを削除する。
+	// (2016.10.13 yutaka)
+	if (DlgFont) {
+		DeleteObject(DlgFont);
+		DlgFont = NULL;
+	}
+
 	delete this;
 }
 

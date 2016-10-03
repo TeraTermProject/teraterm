@@ -19,6 +19,10 @@ private:
 #endif
 
 public:
+	CFileTransDlg() {
+		DlgFont = NULL;
+	}
+
 #ifndef NO_I18N
 	BOOL Create(PFileVar pfv, PComVar pcv, PTTSet pts);
 #else
