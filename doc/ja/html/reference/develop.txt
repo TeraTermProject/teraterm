@@ -39,7 +39,7 @@
   ActivePerl 5.8 以上
     OpenSSL のコンパイル、ドキュメントファイルの文字コード・改行コード変換に必要です。
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
-    ソースのチェックアウトに使った svn と互換性のあるバージョン
+    ソースのチェックアウトに使った svn と互換性のあるバージョン。
     "svn.exe"を libs\svn\bin 配下にコピーしてください。
 
 
@@ -99,23 +99,23 @@
   Tera Termマクロを新設するときの作業手順について、以下に示します。
 
 １．ソースコードの修正
--- コマンドの内部 ID を採番する（「内部 ID」は"helpid.h"にも使用される）
+-- コマンドの内部 ID を採番する。（「内部 ID」は"helpid.h"にも使用される）
    ... teraterm/ttmacro/ttmparse.h
--- コマンド名を走査して内部 ID に変換する
+-- コマンド名を走査して内部 ID に変換する。
    ... CheckReservedWord@teraterm/ttmacro/ttmparse.c
--- コマンドの内部 ID から実際に処理をする関数を呼ぶ
+-- コマンドの内部 ID から実際に処理をする関数を呼ぶ。
    ... ExecCmnd@teraterm/ttmacro/ttl.c
--- 処理する関数を作る
+-- 処理する関数を作る。
 
 ２． ヘルプ(言語ごと)
--- コマンドのヘルプを作る
+-- コマンドのヘルプを作る。
    ... doc/LANG/html/macro/command/hogefunc.html
--- コマンド一覧ページに追加する
+-- コマンド一覧ページに追加する。
    ... doc/LANG/html/macro/command/index.html
--- ヘルプトピックに追加する
+-- ヘルプトピックに追加する。
    ... doc/LANG/teraterm.hhc
--- ヘルプページのコンテキスト ID を採番する
-   値は コマンドの内部 ID + 92000
+-- ヘルプページのコンテキスト ID を採番する。
+   値は コマンドの内部 ID + 92000。
    ... teraterm/common/helpid.h
 -- コンテキスト ID と呼び出すファイルのエイリアスを作成する。
    テキストエディタで直接開き、[ALIAS]にHTMLを追加する。
@@ -145,37 +145,37 @@
 
 ■ Tera Termのビルド方法
   Tera Termのビルド方法について以下に示します。
-  ビルドにはVisual Studio 2005 Standard Edition以上が必要です（Visual Studio 2005 Express Editionは不可）。
+  ビルドにはVisual Studio 2005 Standard Edition以上が必要です。（Visual Studio 2005 Express Editionは不可）
 
   1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。
   2. teraterm\visualc\ttermpro.sln をVisual Studioで開く。
      .slnファイルの改行コードが"LF"になっていると、Visual Studioが起動しないので注意願います。
-  3. ソリューションをビルドする
-  4. ビルドに成功するとteraterm ディレクトリに実行プログラムが生成される
+  3. ソリューションをビルドする。
+  4. ビルドに成功するとteraterm ディレクトリに実行プログラムが生成される。
 
 
 ■ TeraTerm Menuのビルド方法
-  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする
-  2. ttpmenu\ttpmenu.sln をVisual Studioで開く
-  3. ソリューションをビルドする
-  4. ビルドに成功すると ttpmenu ディレクトリに ttpmenu.exe が生成される
+  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。
+  2. ttpmenu\ttpmenu.sln をVisual Studioで開く。
+  3. ソリューションをビルドする。
+  4. ビルドに成功すると ttpmenu ディレクトリに ttpmenu.exe が生成される。
 
 
 ■ TTXKanjiMenuのビルド方法
-  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする
-  2. TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く
-  3. ソリューションをビルドする
-  4. ビルドに成功すると TTXKanjiMenu ディレクトリに ttxkanjimenu.dll が生成される
+  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。
+  2. TTXKanjiMenu\ttxkanjimenu.sln をVisual Studioで開く。
+  3. ソリューションをビルドする。
+  4. ビルドに成功すると TTXKanjiMenu ディレクトリに ttxkanjimenu.dll が生成される。
 
 
 ■ TTProxyのビルド方法
   TTProxyのビルド方法について以下に示します。
   ビルドにはVisual Studio 2005(VC++8.0)が必要です。
 
-  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする
-  2. TTProxy\TTProxy.sln をVisual Studioで開く
-  3. ソリューションをビルドする
-  4. ビルドに成功すると TTProxy ディレクトリにDLLが生成される
+  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。
+  2. TTProxy\TTProxy.sln をVisual Studioで開く。
+  3. ソリューションをビルドする。
+  4. ビルドに成功すると TTProxy ディレクトリにDLLが生成される。
 
 
 ■ TTSSHのビルド方法
@@ -194,20 +194,20 @@
       + #define IDC_STATIC -1
 
   1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。
-  2. ttssh2\ttssh.sln をVisual Studioで開く
-  3. ソリューションをビルドする
-  4. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される
+  2. ttssh2\ttssh.sln をVisual Studioで開く。
+  3. ソリューションをビルドする。
+  4. ビルドに成功するとttssh2\ttxssh ディレクトリにDLLが生成される。
 
 
 ■ CygTermのビルド方法
   CygTermのビルド方法について以下に示します。
 
-   1. Cygwin(http://www.cygwin.com/win-9x.html)をインストールする
+   1. Cygwin(http://www.cygwin.com/win-9x.html)をインストールする。
       注意: 1.7.x は Windows 9x をサポートしていないので、1.5.x を利用する。
             1.5.x は Windows 7 をサポートしていないようだが、1.5.x でコンパイルされたバイナリは 1.7.x 環境で実行できる。
    2. Cygwinのシェルを起動し、cygterm ディレクトリへ移動する。
       # cd cygterm
-   3. CygTermをコンパイルする
+   3. CygTermをコンパイルする。
       # make
 
 
@@ -217,10 +217,10 @@
   TTXSamplesのビルドにはVisual Studio 2005(VC++8.0)が必要です。
   Tera Term本体とは違い、Express Editionでもビルド可能です。
 
-  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする
-  2. TTXSamples\TTXSamples.sln をVisual Studioで開く
-  3. ソリューションをビルドする
-  4. ビルドに成功すると TTXSamples ディレクトリにDLLが生成される
+  1. ソースコードをOSDN(https://ja.osdn.net/projects/ttssh2/)からチェックアウトする。
+  2. TTXSamples\TTXSamples.sln をVisual Studioで開く。
+  3. ソリューションをビルドする。
+  4. ビルドに成功すると TTXSamples ディレクトリにDLLが生成される。
   各TTXの詳細については、プロジェクト内のReadMe-ja.txtを参照してください。
 
 
@@ -234,9 +234,9 @@
      > cd teraterm\insatller
      > convtext.bat
 
-  3. FileのOpenから doc\en\teraterm.hhp および doc\jp\teratermj.hhp を開く
+  3. FileのOpenから doc\en\teraterm.hhp および doc\jp\teratermj.hhp を開く。
 
-  4. FileのCompileでヘルプファイルをコンパイルする
+  4. FileのCompileでヘルプファイルをコンパイルする。
 
 
 ■ リリースの方法
@@ -261,13 +261,13 @@
        http://logmett.com/logmett-freeware
        http://logmett.com/ttleditor
 
-  2. ドキュメントを確認する
+  2. ドキュメントを確認する。
      - ダイアログ上の設定項目・UIのない特別オプション・コマンドラインパラメータ・新規マクロコマンドなど、対応するドキュメントに漏れがないか確認する。
      - 変更履歴の書き忘れを確認する。
        おおむね変更した順に追記される変更履歴の順番を変更する。だいたいの指針としては、ターミナルエミュレーション関係・アプリケーションとしての変更・マクロの順。
      - ドキュメント差分が翻訳されていることを確認する。
 
-  3. バージョンを上げ、日付を変更する
+  3. バージョンを上げ、日付を変更する。
      リリース作業時に、バージョンを一つインクリメントする。
      リリースされる前にバージョン番号が上がったファイルが出回るのを避けるため。
      バグレポートなどで混乱の元になりそうなので、リリースまではバージョン番号を上げないこと。
@@ -278,7 +278,7 @@
      - TTProxy.rc // 変更時のみ
      - ttxkanjimenu.rc // 変更時のみ
      - teraterm.iss
-       AppVer を上げる、snapshot を コメントアウト、バッチファイルの呼び出しを修正
+       AppVer を上げる、snapshot を コメントアウト、バッチファイルの呼び出しを修正。
      - html/about/hisotry.html
 
      CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。
@@ -286,9 +286,9 @@
      これは、バージョンの末尾が patchlevel であり、コンパイラの入手が容易なため。
 
   4. 動作確認をする
-     - インストーラを作成する
-       ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
-     - インストールおよび実行をテストする
+     - インストーラを作成する。
+       ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される。
+     - インストールおよび実行をテストする。
 
   5. SVN のタグを作成する。
      タグ名は「teraterm-バージョン」。たとえば、v4.82ならば"teraterm-4_82"。
@@ -296,27 +296,27 @@
 
   6. リリース用のタグでチェックアウトし直す。
 
-  7. インストーラを作成する
+  7. インストーラを作成する。
      ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
 
-  8. OSDN を更新する
+  8. OSDN を更新する。
      - [ダウンロード]-[管理]-[新規作成]
-         変更履歴を入力してリリースを作成する
+         変更履歴を入力してリリースを作成する。
      - [ニュース一覧]-[新規登録]
-         ニュース記事を作成する
+         ニュース記事を作成する。
 
-  9. メーリングリストにアナウンスする
+  9. メーリングリストにアナウンスする。
 
-  10. プロジェクトページを更新する
+  10. プロジェクトページを更新する。
 
-  11. スナップショットを削除する
+  11. スナップショットを削除する。
 
-  12. フォーラムに告知する
+  12. フォーラムに告知する。
       - Announcements http://logmett.com/support-forums/5
-        Announcements に新規投稿する。種類は Announcement
-        一つ前の Announcement の種類を Normal に変更する
-        Announcement は三個残すことになっているので、三つ前の Announcement を削除する
+        Announcements に新規投稿する。種類は Announcement。
+        一つ前の Announcement の種類を Normal に変更する。
+        Announcement は三個残すことになっているので、三つ前の Announcement を削除する。
 
-  13. Twitter に告知する
+  13. Twitter に告知する。
       https://twitter.com/Tera_Term
-      リリース告知をツイートして固定する
+      リリース告知をツイートして固定する。
