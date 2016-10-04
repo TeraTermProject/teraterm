@@ -23,4 +23,4 @@ ToDo:
 
 その他:
   このプラグインは、以下の要望を元にして作られました。
-  https://osdn.jp/ticket/browse.php?group_id=1412&tid=8850
+  https://ja.osdn.net/ticket/browse.php?group_id=1412&tid=8850

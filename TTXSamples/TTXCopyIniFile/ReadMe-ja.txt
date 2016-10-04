@@ -18,7 +18,7 @@ TTXCopyIniFile -- 設定ファイルの事前コピー
   手抜きのため、保存先ファイルの存在チェックは行っていません。
   代わりに、CopyFile()の引数でファイルが存在する時はコピーが行われない
   ようにしています。
-  https://osdn.jp/forum/forum.php?thread_id=19996&forum_id=5841
+  https://ja.osdn.net/forum/forum.php?thread_id=19996&forum_id=5841
 
 バグ:
   ・まだあまりテストされていません。
@@ -26,4 +26,4 @@ TTXCopyIniFile -- 設定ファイルの事前コピー
 
 その他:
   このプラグインは、以下の要望を元にして作られました。
-  https://osdn.jp/forum/forum.php?thread_id=19996&forum_id=5841
+  https://ja.osdn.net/forum/forum.php?thread_id=19996&forum_id=5841
