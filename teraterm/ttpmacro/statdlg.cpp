@@ -122,6 +122,14 @@ BOOL CStatDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CStatDlg::PostNcDestroy()
 {
+	// statusboxとclosesboxを繰り返すと、GDIリソースリークとなる問題を修正した。
+	//   - CreateFontIndirect()で作成した論理フォントを削除する。
+	// (2016.10.5 yutaka)
+	if (DlgFont) {
+		DeleteObject(DlgFont);
+		DlgFont = NULL;
+	}
+
 	delete this;
 }
 
