@@ -180,14 +180,17 @@ BOOL CFileTransDlg::OnInitDialog()
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
-	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_SMALL,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
-	                                MAKEINTRESOURCE(IDI_TTERM),
-	                                IMAGE_ICON,16,16,fuLoad));
-	::PostMessage(GetSafeHwnd(),WM_SETICON,ICON_BIG,
-	              (LPARAM)LoadImage(AfxGetInstanceHandle(),
-	                                MAKEINTRESOURCE(IDI_TTERM),
-	                                IMAGE_ICON, 0, 0, fuLoad));
+	SmallIcon = LoadImage(AfxGetInstanceHandle(),
+		MAKEINTRESOURCE(IDI_TTERM),
+		IMAGE_ICON, 16, 16, fuLoad);
+	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_SMALL,
+		(LPARAM)SmallIcon);
+
+	BigIcon = LoadImage(AfxGetInstanceHandle(),
+			MAKEINTRESOURCE(IDI_TTERM),
+			IMAGE_ICON, 0, 0, fuLoad);
+	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
+		(LPARAM)BigIcon);
 
 	return 1;
 }
@@ -216,11 +219,23 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CFileTransDlg::PostNcDestroy()
 {
-	// CreateFontIndirect()で作成した論理フォントを削除する。
-	// (2016.10.13 yutaka)
+	// logopenとlogcloseを繰り返すと、GDIリソースリークとなる問題を修正した。
+	//   - CreateFontIndirect()で作成した論理フォントを削除する。
+	//   - LoadImage()によるアイコンリソースを解放する。
+	// (2016.10.5 yutaka)
 	if (DlgFont) {
 		DeleteObject(DlgFont);
 		DlgFont = NULL;
+	}
+
+	if (SmallIcon) {
+		DestroyIcon((HICON)SmallIcon);
+		SmallIcon = NULL;
+	}
+
+	if (BigIcon) {
+		DestroyIcon((HICON)BigIcon);
+		BigIcon = NULL;
 	}
 
 	delete this;

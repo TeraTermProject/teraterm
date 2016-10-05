@@ -17,10 +17,14 @@ private:
 	PTTSet ts;
 	HFONT DlgFont;
 #endif
+	HANDLE SmallIcon;
+	HANDLE BigIcon;
 
 public:
 	CFileTransDlg() {
 		DlgFont = NULL;
+		SmallIcon = NULL;
+		BigIcon = NULL;
 	}
 
 #ifndef NO_I18N
