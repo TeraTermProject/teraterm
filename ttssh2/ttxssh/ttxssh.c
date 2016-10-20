@@ -190,10 +190,22 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 
 	memset(listed, 0, sizeof(listed));
 	memset(allowed, 0, sizeof(allowed));
+
+	// 許可されている文字のリストを作る。
 	for (i = 0; i < default_strings_len ; i++) {
 		allowed[default_strings[i]] = 1;
 	}
 
+	// 指定された文字列を走査し、許可されていない文字、重複する文字は削除する。
+	// 
+	// ex. (i=5 の文字を削除する)
+	// i=012345
+	//   >:=9<87;A@?B3026(\0)
+	//         i+1
+	//         <------------>
+	//       ↓
+	//   >:=9<7;A@?B3026(\0)
+	//         
 	for (i = 0; buf[i] != 0; i++) {
 		int num = buf[i] - '0';
 
@@ -206,17 +218,33 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 			listed[num] = 1;
 		}
 
+		// disabled lineがあれば、位置を覚えておく。
 		if (num == 0) {
 			k = i;
 		}
 	}
 
 #if 1
+	// 指定されていない文字があれば、disabled lineの直前に挿入する。
+	// 
+	// ex. (Zを挿入する)
+	//                k
+	//   >:=9<87;A@?B3026(\0)
+	//                 k+1
+	//                 <---->
+	//       ↓       k
+	//   >:=9<87;A@?B30026(\0)
+	//       ↓        k
+	//   >:=9<87;A@?B3Z026(\0)
+	//       
 	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
 		int num = default_strings[j];
 
 		if (!listed[num] && k >= 0) {
-			memmove(buf + k + 1, buf + k, strlen(buf + k + 1) + 1);
+			int copylen = strlen(buf + k + 1) + 1;
+
+			memmove(buf + k + 1, buf + k, copylen);
+			buf[k + 1 + copylen] = '\0';   // 終端を忘れずに付ける。
 			buf[k] = num + '0';
 			k++;
 			i++;
@@ -228,6 +256,8 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 	else {
 		j++;
 	}
+
+	// disabled lineが存在しない場合は、そのまま末尾に追加する。
 	for (; j < default_strings_len ; j++) {
 		int num = default_strings[j];
 
