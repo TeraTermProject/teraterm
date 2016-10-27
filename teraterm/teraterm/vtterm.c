@@ -341,6 +341,7 @@ void ResetCharSet()
   EUCkanaIn = FALSE;
   EUCsupIn = FALSE;
   SSflag = FALSE;
+  ConvJIS = FALSE;
 
   cv.Language = ts.Language;
   cv.CRSend = ts.CRSend;
