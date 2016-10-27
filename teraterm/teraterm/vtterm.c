@@ -4914,42 +4914,41 @@ void CANSeen(BYTE b)
 
 BOOL CheckKanji(BYTE b)
 {
-  BOOL Check;
+	BOOL Check;
 
-  if (ts.Language!=IdJapanese) return FALSE;
+	if (ts.Language!=IdJapanese)
+		return FALSE;
 
-  ConvJIS = FALSE;
+	ConvJIS = FALSE;
 
-  if (ts.KanjiCode==IdSJIS)
-  {
-    if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd))
-      return TRUE; // SJIS kanji
-    if ((0xa1<=b) && (b<=0xdf))
-      return FALSE; // SJIS katakana
-  }
+	if (ts.KanjiCode==IdSJIS) {
+		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
+			return TRUE; // SJIS kanji
+		}
+		if ((0xa1<=b) && (b<=0xdf)) {
+			return FALSE; // SJIS katakana
+		}
+	}
 
-  if ((b>=0x21) && (b<=0x7e))
-  {
-    Check = (Gn[Glr[0]]==IdKanji);
-    ConvJIS = Check;
-  }
-  else if ((b>=0xA1) && (b<=0xFE))
-  {
-    Check = (Gn[Glr[1]]==IdKanji);
-    if (ts.KanjiCode==IdEUC)
-      Check = TRUE;
-    else if (ts.KanjiCode==IdJIS)
-    {
-      if (((ts.TermFlag & TF_FIXEDJIS)!=0) &&
-	  (ts.JIS7Katakana==0))
-	Check = FALSE; // 8-bit katakana
-    }
-    ConvJIS = Check;
-  }
-  else
-    Check = FALSE;
+	if ((b>=0x21) && (b<=0x7e)) {
+		Check = (Gn[Glr[0]]==IdKanji);
+		ConvJIS = Check;
+	}
+	else if ((b>=0xA1) && (b<=0xFE)) {
+		Check = (Gn[Glr[1]]==IdKanji);
+		if (ts.KanjiCode==IdEUC) {
+			Check = TRUE;
+		}
+		else if (ts.KanjiCode==IdJIS && ((ts.TermFlag & TF_FIXEDJIS)!=0) && (ts.JIS7Katakana==0)) {
+			Check = FALSE; // 8-bit katakana
+		}
+		ConvJIS = Check;
+	}
+	else {
+		Check = FALSE;
+	}
 
-  return Check;
+	return Check;
 }
 
 BOOL CheckKorean(BYTE b)
