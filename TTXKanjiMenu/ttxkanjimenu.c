@@ -15,6 +15,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
+#include "tt_res.h"
 #include "i18n.h"
 
 #include <stdlib.h>
@@ -49,6 +50,7 @@ typedef struct {
 	PReadIniFile origReadIniFile;
 	PWriteIniFile origWriteIniFile;
 	BOOL UseOneSetting;
+	BOOL NeedResetCharSet;
 } TInstVar;
 
 static TInstVar FAR * pvar;
@@ -65,6 +67,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 	pvar->origReadIniFile = NULL;
 	pvar->origWriteIniFile = NULL;
 	pvar->UseOneSetting = TRUE;
+	pvar->NeedResetCharSet = FALSE;
 }
 
 static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
@@ -98,8 +101,16 @@ static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	return ret;
 }
 
+static BOOL FAR PASCAL ResetCharSet(HWND parent, PTTSet ts) {
+	pvar->NeedResetCharSet = FALSE;
+	return TRUE;
+}
+
 static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
-	if (pvar->UseOneSetting && (pvar->ts->Language == IdJapanese || pvar->ts->Language == IdKorean)) {
+	if (pvar->NeedResetCharSet) {
+		*hooks->SetupTerminal = ResetCharSet;
+	}
+	else if (pvar->UseOneSetting && (pvar->ts->Language == IdJapanese || pvar->ts->Language == IdKorean)) {
 		pvar->origSetupTermDlg = *hooks->SetupTerminal;
 		*hooks->SetupTerminal = TTXKanjiMenuSetupTerminal;
 	}
@@ -390,6 +401,8 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 			}
 			pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 		}
+		pvar->NeedResetCharSet = TRUE;
+		SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
 		return UpdateRecvMenu(pvar->ts->KanjiCode)?1:0;
 	}
 	else if ((cmd > ID_MI_KANJISEND) && (cmd <= ID_MI_KANJISEND+IdUTF8)) {
@@ -397,9 +410,13 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 		pvar->cv->KanjiCodeSend = pvar->ts->KanjiCodeSend = val;
 		if (pvar->UseOneSetting) {
 			pvar->cv->KanjiCodeEcho = pvar->ts->KanjiCode = val;
+			pvar->NeedResetCharSet = TRUE;
+			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
 			return UpdateRecvMenu(pvar->ts->KanjiCode)?1:0;
 		}
 		else {
+			pvar->NeedResetCharSet = TRUE;
+			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
 			return UpdateSendMenu(pvar->ts->KanjiCodeSend)?1:0;
 		}
 	}
