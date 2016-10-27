@@ -5156,6 +5156,11 @@ BOOL ParseFirstKR(BYTE b)
 
 static void ParseASCII(BYTE b)
 {
+	if (ts.Language == IdJapanese) {
+		ParseFirstJP(b);
+		return;
+	}
+
 	if (SSflag) {
 		PutChar(b);
 		SSflag = FALSE;
