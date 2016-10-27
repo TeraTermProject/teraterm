@@ -5187,12 +5187,12 @@ extern unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int 
 
 
 //
-// UTF-8 for Mac OS X(HFS plus)
+// Unicode Combining Character Support
 //
-#include "hfs_plus.map"
+#include "uni_combining.map"
 
-unsigned short GetIllegalUnicode(int start_index, unsigned short first_code, unsigned short code,
-								 hfsplus_codemap_t *table, int tmax)
+unsigned short GetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code,
+								 combining_map_t *table, int tmax)
 {
 	unsigned short result = 0;
 	int i;
@@ -5203,7 +5203,7 @@ unsigned short GetIllegalUnicode(int start_index, unsigned short first_code, uns
 		}
 
 		if (table[i].second_code == code) {
-			result = table[i].illegal_code;
+			result = table[i].precomposed;
 			break;
 		}
 	}
@@ -5211,7 +5211,7 @@ unsigned short GetIllegalUnicode(int start_index, unsigned short first_code, uns
 	return (result);
 }
 
-int GetIndexOfHFSPlusFirstCode(unsigned short code, hfsplus_codemap_t *table, int tmax)
+int GetIndexOfCombiningFirstCode(unsigned short code, combining_map_t *table, int tmax)
 {
 	int low, mid, high;
 	int index = -1;
@@ -5296,13 +5296,13 @@ static void UnicodeToCP932(unsigned int code)
 }
 
 // UTF-8で受信データを処理する
-BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
+BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
 {
 	static BYTE buf[3];
 	static int count = 0;
-	static int maybe_hfsplus = 0;
+	static int can_combining = 0;
 	static unsigned int first_code;
 	static int first_code_index;
 
@@ -5317,9 +5317,9 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 		// 1バイト目および2バイト目がASCIIの場合は、すべてASCII出力とする。
 		// 1バイト目がC1制御文字(0x80-0x9f)の場合も同様。
 		if (count == 0 || count == 1) {
-			if (hfsplus_mode == 1 && maybe_hfsplus == 1) {
+			if (proc_combining == 1 && can_combining == 1) {
 				UnicodeToCP932(first_code);
-				maybe_hfsplus = 0;
+				can_combining = 0;
 			}
 
 			if (count == 1) {
@@ -5343,9 +5343,9 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 	if ((buf[0] & 0xe0) == 0xc0) {
 		if ((buf[1] & 0xc0) == 0x80) {
 
-			if (hfsplus_mode == 1 && maybe_hfsplus == 1) {
+			if (proc_combining == 1 && can_combining == 1) {
 				UnicodeToCP932(first_code);
-				maybe_hfsplus = 0;
+				can_combining = 0;
 			}
 
 			code = ((buf[0] & 0x1f) << 6);
@@ -5378,32 +5378,32 @@ BOOL ParseFirstUTF8(BYTE b, int hfsplus_mode)
 		code |= ((buf[1] & 0x3f) << 6);
 		code |= ((buf[2] & 0x3f));
 
-		if (hfsplus_mode == 1) {
-			if (maybe_hfsplus == 0) {
-				if ((first_code_index = GetIndexOfHFSPlusFirstCode(
-						code, mapHFSPlusUnicode, MAPSIZE(mapHFSPlusUnicode)
+		if (proc_combining == 1) {
+			if (can_combining == 0) {
+				if ((first_code_index = GetIndexOfCombiningFirstCode(
+						code, mapCombiningToPrecomposed, MAPSIZE(mapCombiningToPrecomposed)
 						)) != -1) {
-					maybe_hfsplus = 1;
+					can_combining = 1;
 					first_code = code;
 					count = 0;
 					return (TRUE);
 				}
 			} else {
-				maybe_hfsplus = 0;
-				cset = GetIllegalUnicode(first_code_index, first_code, code, mapHFSPlusUnicode, MAPSIZE(mapHFSPlusUnicode));
+				can_combining = 0;
+				cset = GetPrecomposedChar(first_code_index, first_code, code, mapCombiningToPrecomposed, MAPSIZE(mapCombiningToPrecomposed));
 				if (cset != 0) { // success
 					code = cset;
 
 				} else { // error
 					// 2つめの文字が半濁点の1文字目に相当する場合は、再度検索を続ける。(2005.10.15 yutaka)
-					if ((first_code_index = GetIndexOfHFSPlusFirstCode(
-							code, mapHFSPlusUnicode, MAPSIZE(mapHFSPlusUnicode)
+					if ((first_code_index = GetIndexOfCombiningFirstCode(
+							code, mapCombiningToPrecomposed, MAPSIZE(mapCombiningToPrecomposed)
 							)) != -1) {
 
 						// 1つめの文字はそのまま出力する
 						UnicodeToCP932(first_code);
 
-						maybe_hfsplus = 1;
+						can_combining = 1;
 						first_code = code;
 						count = 0;
 						return (TRUE);
