@@ -1064,3 +1064,4 @@ DLG_TITLE=повторение команды
 DLG_ENABLE=&Разрешено
 DLG_INTERVAL=&Интервал(сек)
 DLG_COMMAND=&Команда
+DLG_ADD_NEWLINE=&Add new line

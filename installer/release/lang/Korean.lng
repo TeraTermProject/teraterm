@@ -1063,3 +1063,4 @@ DLG_TITLE=되풀이 명령
 DLG_ENABLE=활성화(&E)
 DLG_INTERVAL=간격(sec)(&I)
 DLG_COMMAND=명령(&C)
+DLG_ADD_NEWLINE=&Add new line

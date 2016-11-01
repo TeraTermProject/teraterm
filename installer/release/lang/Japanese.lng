@@ -1063,3 +1063,4 @@ DLG_TITLE=繰り返しコマンド
 DLG_ENABLE=有効(&E)
 DLG_INTERVAL=間隔(秒)(&I)
 DLG_COMMAND=コマンド(&C)
+DLG_ADD_NEWLINE=改行を追加(&A)

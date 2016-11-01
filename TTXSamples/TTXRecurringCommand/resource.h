@@ -8,3 +8,4 @@
 #define IDC_INTERVAL_LABEL                      2003
 #define IDC_COMMAND                             2004
 #define IDC_COMMAND_LABEL                       2005
+#define IDC_ADD_NL                              2006

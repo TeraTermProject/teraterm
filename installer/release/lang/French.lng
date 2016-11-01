@@ -1063,3 +1063,4 @@ DLG_TITLE=Commande récurrente
 DLG_ENABLE=&Valider
 DLG_INTERVAL=&Intervalle(sec)
 DLG_COMMAND=&Commande
+DLG_ADD_NEWLINE=&Add new line

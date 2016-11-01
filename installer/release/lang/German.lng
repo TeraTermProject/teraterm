@@ -1062,3 +1062,4 @@ DLG_TITLE=Recurring command
 DLG_ENABLE=&Aktivieren
 DLG_INTERVAL=&Intervall (sek)
 DLG_COMMAND=&Befehl
+DLG_ADD_NEWLINE=&Add new line

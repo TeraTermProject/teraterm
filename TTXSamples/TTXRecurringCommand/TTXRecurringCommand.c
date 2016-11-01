@@ -40,6 +40,7 @@ typedef struct {
 	int interval;
 	BOOL enable;
 	int cmdLen;
+	BOOL add_nl;
 	unsigned char command[OutBuffSize];
 	unsigned char orgCommand[OutBuffSize];
 } TInstVar;
@@ -350,6 +351,12 @@ void ReadINI(PCHAR fn, PTTSet ts) {
 	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
 
+	pvar->add_nl = GetOnOff(SECTION, "AddNewLine", sect, FALSE);
+	if (pvar->add_nl && pvar->cmdLen < sizeof(pvar->command) - 1) {
+		pvar->command[pvar->cmdLen++] = '\n';
+		pvar->command[pvar->cmdLen] = '\0';
+	}
+
 	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, sect);
 	if (pvar->interval < MINIMUM_INTERVAL) {
 		pvar->interval = MINIMUM_INTERVAL;
@@ -376,6 +383,8 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 
 	_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d", pvar->interval);
 	WritePrivateProfileString(SECTION, "Interval", buff, fn);
+
+	WritePrivateProfileString(SECTION, "AddNewLine", pvar->add_nl?"on":"off", fn);
 
 	return;
 }
@@ -473,6 +482,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 			SendDlgItemMessage(dlg, IDC_INTERVAL_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_COMMAND, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_COMMAND_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_ADD_NL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgFont = NULL;
@@ -494,10 +504,16 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		GetI18nStr(SECTION, "DLG_COMMAND", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
 		SetDlgItemText(dlg, IDC_COMMAND_LABEL, pvar->ts->UIMsg);
 
+		GetDlgItemText(dlg, IDC_ADD_NL, uimsg, sizeof(uimsg));
+		GetI18nStr(SECTION, "DLG_ADD_NEWLINE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
+		SetDlgItemText(dlg, IDC_ADD_NL, pvar->ts->UIMsg);
+
 		SendMessage(GetDlgItem(dlg, IDC_ENABLE), BM_SETCHECK,
 		            pvar->enable?BST_CHECKED:BST_UNCHECKED, 0);
 		SetDlgItemInt(dlg, IDC_INTERVAL, pvar->interval, FALSE);
 		SetDlgItemText(dlg, IDC_COMMAND, pvar->orgCommand);
+		SendMessage(GetDlgItem(dlg, IDC_ADD_NL), BM_SETCHECK,
+		            pvar->add_nl?BST_CHECKED:BST_UNCHECKED, 0);
 
 		return TRUE;
 	  case WM_COMMAND:
@@ -514,6 +530,12 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 			strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 			UnEscapeStr(pvar->command);
 			pvar->cmdLen = (int)strlen(pvar->command);
+
+			pvar->add_nl = IsDlgButtonChecked(dlg, IDC_ADD_NL) == BST_CHECKED;
+			if (pvar->add_nl && pvar->cmdLen < sizeof(pvar->command) - 1) {
+				pvar->command[pvar->cmdLen++] = '\n';
+				pvar->command[pvar->cmdLen] = '\0';
+			}
 
 			if (pvar->cv->Ready) {
 				if (pvar->enable) {
