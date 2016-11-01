@@ -5313,7 +5313,6 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 	static int first_code_index;
 
 	unsigned int code;
-	char mbchar[32];
 	unsigned short cset;
 
 	if ((b & 0x80) != 0x80 || ((b & 0xe0) == 0x80 && count == 0)) {
@@ -5339,8 +5338,6 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 	if (count < 2) {
 		return TRUE;
 	}
-
-	memset(mbchar, 0, sizeof(mbchar));
 
 	// 2バイトコードの場合
 	if ((buf[0] & 0xe0) == 0xc0) {
