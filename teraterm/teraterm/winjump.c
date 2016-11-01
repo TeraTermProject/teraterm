@@ -52,7 +52,9 @@ typedef PROPVARIANT *REFPROPVARIANT;
 #define PropVariantInit(pvar) memset((pvar),0,sizeof(PROPVARIANT))
 #endif
 
-#if !(_MSC_VER >= 1600)  // VC2010(VC10.0) or later
+#ifndef __ICustomDestinationList_INTERFACE_DEFINED__
+#define __ICustomDestinationList_INTERFACE_DEFINED__
+// #if !(_MSC_VER >= 1600)  // VC2010(VC10.0) or later
 typedef struct ICustomDestinationListVtbl {
     HRESULT ( __stdcall *QueryInterface ) (
         /* [in] ICustomDestinationList*/ void *This,
@@ -109,7 +111,10 @@ typedef struct ICustomDestinationList
 {
     ICustomDestinationListVtbl *lpVtbl;
 } ICustomDestinationList;
+#endif
 
+#ifndef __IObjectArray_INTERFACE_DEFINED__
+#define __IObjectArray_INTERFACE_DEFINED__
 typedef struct IObjectArrayVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -139,7 +144,10 @@ typedef struct IObjectArray
 {
     IObjectArrayVtbl *lpVtbl;
 } IObjectArray;
+#endif
 
+#ifndef __IShellLink_INTERFACE_DEFINED__
+#define __IShellLink_INTERFACE_DEFINED__
 typedef struct IShellLinkVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -237,7 +245,10 @@ typedef struct IShellLinkVtbl
         /* [string][in] */ LPCSTR pszFile);
 
 } IShellLinkVtbl;
+#endif
 
+#ifndef __IObjectCollection_INTERFACE_DEFINED__
+#define __IObjectCollection_INTERFACE_DEFINED__
 typedef struct IObjectCollectionVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
@@ -284,7 +295,9 @@ typedef struct IObjectCollection
 } IObjectCollection;
 #endif
 
-#if !(_MSC_VER >= 1500)  // VC2008(VC9.0) or later
+#ifndef __IPropertyStore_INTERFACE_DEFINED__
+#define __IPropertyStore_INTERFACE_DEFINED__
+// #if !(_MSC_VER >= 1500)  // VC2008(VC9.0) or later
 typedef struct IPropertyStoreVtbl
 {
     HRESULT ( __stdcall *QueryInterface )(
