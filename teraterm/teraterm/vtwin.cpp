@@ -2083,7 +2083,6 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 			if (attr != -1 && (attr & FILE_ATTRIBUTE_DIRECTORY)) {
 				ptr = SendVar->FullName;
 				// ƒpƒX‚Ì‹æØ‚è‚ð \ -> / ‚Ö
-				setlocale(LC_ALL, ts.Locale);
 				while (*ptr) {
 					if (isleadbyte(*ptr)) { // multi-byte
 						ptr += 2;
