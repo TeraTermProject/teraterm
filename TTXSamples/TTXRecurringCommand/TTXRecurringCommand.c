@@ -329,32 +329,33 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
 // TTXReadIniFile, TTXWriteIniFile -- 設定ファイルの読み書き
 //
 void ReadINI(PCHAR fn, PTTSet ts) {
-	char buff[OutBuffSize];
+	char sect[OutBuffSize];
 	char *p;
 
+	// DLL ファイル名から、INI のセクション名を決める
 	if (fn[0] == '\\' || fn[0] == '/' || (fn[0] != 0 && fn[1] == ':')) {
-		strncpy_s(buff, sizeof(buff), fn, _TRUNCATE);
+		strncpy_s(sect, sizeof(sect), fn, _TRUNCATE);
 	}
 	else {
-		GetModuleFileName(NULL, buff, sizeof(buff));
-		p = strrchr(buff, '\\');
+		GetModuleFileName(NULL, sect, sizeof(sect));
+		p = strrchr(sect, '\\');
 		if (!p) {
 			return;
 		}
-		strncpy_s(p+1, sizeof(buff) - ((p+1)-buff), fn, _TRUNCATE);
+		strncpy_s(p+1, sizeof(sect) - ((p+1)-sect), fn, _TRUNCATE);
 	}
 
-	GetPrivateProfileString(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), buff);
+	GetPrivateProfileString(SECTION, "Command", "", pvar->orgCommand, sizeof(pvar->orgCommand), sect);
 	strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 	UnEscapeStr(pvar->command);
 	pvar->cmdLen = (int)strlen(pvar->command);
 
-	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, buff);
+	pvar->interval = GetPrivateProfileInt(SECTION, "Interval", DEFAULT_INTERVAL, sect);
 	if (pvar->interval < MINIMUM_INTERVAL) {
 		pvar->interval = MINIMUM_INTERVAL;
 	}
 
-	pvar->enable = GetOnOff(SECTION, "Enable", buff, FALSE);
+	pvar->enable = GetOnOff(SECTION, "Enable", sect, FALSE);
 }
 
 static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
