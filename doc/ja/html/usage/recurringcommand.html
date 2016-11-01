@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>TTXRecurringCommand (繰り返しコマンド)</title>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</head>
+<body>
+
+<h1>TTXRecurringCommand (繰り返しコマンド)</h1>
+
+<p>定期的にコマンドを送信する。</p>
+
+<h2>機能</h2>
+
+<p>
+TTXRecurringCommand は、定期的にコマンドを送信する為のプラグインです。<br />
+Tera Term へのキー入力が無い時、一定時間毎に指定した文字列を送信します。
+</p>
+
+<h2>メニュー項目</h2>
+
+<p>
+TTXRecurringCommand プラグインを入れると、Tera Term に以下のメニュー項目が追加されます。
+</p>
+
+<dl>
+    <dt>設定 (Setup) - 繰り返しコマンド (Recurring command)</dt>
+    <dd><a href="#setupdialog">設定ダイアログ</a>を開きます。</dd>
+
+    <dt>コントロール (Control) - 繰り返しコマンド (Recurring command)</dt>
+    <dd>プラグインの有効/無効を切り替えます。</dd>
+</dl>
+
+<h2 id="setupdialog">設定ダイアログ</h2>
+
+<dl>
+    <dt>有効 (Enable)</dt>
+    <dd>プラグインの有効/無効を切り替えます。</dd>
+
+    <dt>間隔(秒) (Interval(sec))</dt>
+    <dd>コマンドを送信する間隔を指定します。ここで指定した秒数の間 Tera Term への入力が無い場合にコマンドを送信します。</dd>
+
+    <dt>コマンド (Command)</dt>
+    <dd>
+	送信するコマンド(文字列)を指定します。コマンドに以下の文字列が含まれている場合、対応する文字に置き換えられます
+	<table border="1">
+	    <tbody>
+		<tr><th>シーケンス</th>	<th> 送信文字 </ht></tr>
+		<tr><td> \\ </td>	<td> \ </td></tr>
+		<tr><td> \n </td>	<td> 改行 (LF) </td></tr>
+		<tr><td> \t </td>	<td> 水平タブ (HT) </td></tr>
+		<tr><td> \a </td>	<td> ベル (BEL) </td></tr>
+		<tr><td> \b </td>	<td> バックスペース (BS) </td></tr>
+		<tr><td> \f </td>	<td> 改頁 (FF) </td></tr>
+		<tr><td> \r </td>	<td> 復帰 (CR) </td></tr>
+		<tr><td> \v </td>	<td> 垂直タブ (VT) </td></tr>
+		<tr><td> \e </td>	<td> エスケープ (ESC) </td></tr>
+		<tr><td> \NNN </td>	<td>8進数 NNN が表す文字</td></tr>
+		<tr><td> \xHH </td>	<td>16進数 HH が表す文字</td></tr>
+	    </tbody>
+	</table>
+    </dd>
+</dl>
+
+</body>
+</html>
