@@ -1402,9 +1402,9 @@ private:
             char *dst = encoded;
             int bits = 0;
             int data = 0;
-            strcpy_s(auth, userlen + 1, proxy.user);
+            strcpy_s(auth, authlen + 1, proxy.user);
             auth[userlen] = ':';
-            strcpy_s(auth + userlen + 1, passlen, proxy.pass);
+            strcpy_s(auth + userlen + 1, passlen + 1, proxy.pass);
         
             /* make base64 string */
             while (*src != '\0') {
