@@ -1416,6 +1416,10 @@ private:
                     encodedlen--;
                 }
             }
+            if (bits > 0) {
+                *dst++ = base64_table[0x3F & (data << (6 - bits))];
+                encodedlen--;
+            }
             while (encodedlen-- > 0) { 
                 *dst++ = '=';
             }
