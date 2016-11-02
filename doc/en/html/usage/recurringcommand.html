@@ -11,45 +11,44 @@
 
 <h1>TTXRecurringCommand (Recurring command)</h1>
 
-<!--
-<p>定期的にコマンドを送信する。</p>
+<p>Sending a command periodically</p>
 
-<h2>機能</h2>
+<h2>Feature</h2>
 
 <p>
-TTXRecurringCommand は、定期的にコマンドを送信する為のプラグインです。<br />
-Tera Term へのキー入力が無い時、一定時間毎に指定した文字列を送信します。
+TTXRecurringCommand is plug-in module that can send a command periodically. <br />
+A specified string is sent at regular intervals while no key is input to Tera Term.
 </p>
 
 <h2>Menu items</h2>
 
 <p>
-TTXRecurringCommand プラグインを入れると、Tera Term に以下のメニュー項目が追加されます。
+When TTXRecurringCommand plug-in is installed, below menu items are added on Tera Term.
 </p>
 
 <dl>
     <dt>Setup - Recurring command</dt>
-    <dd><a href="#setupdialog">設定ダイアログ</a>を開きます。</dd>
+    <dd><a href="#setupdialog">Setting dialog</a> is opened.</dd>
 
     <dt>Control - Recurring command</dt>
-    <dd>プラグインの有効/無効を切り替えます。</dd>
+    <dd>Switch plug-in to enabling or disabling.</dd>
 </dl>
 
-<h2 id="setupdialog">設定ダイアログ</h2>
+<h2 id="setupdialog">Setting dialog</h2>
 
 <dl>
     <dt>Enable</dt>
-    <dd>プラグインの有効/無効を切り替えます。</dd>
+    <dd>Switch plug-in to enabling or disabling.</dd>
 
     <dt>Interval(sec)</dt>
-    <dd>コマンドを送信する間隔を指定します。ここで指定した秒数の間 Tera Term への入力が無い場合にコマンドを送信します。</dd>
+    <dd>Specify an interval sending a command. The command is sent at the interval while no key is input to Tera Term.</dd>
 
     <dt>Command</dt>
     <dd>
-	送信するコマンド(文字列)を指定します。コマンドに以下の文字列が含まれている場合、対応する文字に置き換えられます
+	Specify sending command(string). When the command includes below string, the string is replaced to corresponding character.
 	<table border="1">
 	    <tbody>
-		<tr><th>Sequence</th>	<th> 送信文字 </ht></tr>
+		<tr><th>Sequence</th>	<th> Sending character </ht></tr>
 		<tr><td> \\ </td>	<td> \ </td></tr>
 		<tr><td> \n </td>	<td> Line feed (LF) </td></tr>
 		<tr><td> \t </td>	<td> Horizontal tab (HT) </td></tr>
@@ -59,16 +58,15 @@ TTXRecurringCommand プラグインを入れると、Tera Term に以下のメニュー項目が追加さ
 		<tr><td> \r </td>	<td> Carriage return (CR) </td></tr>
 		<tr><td> \v </td>	<td> Vertical tab (VT) </td></tr>
 		<tr><td> \e </td>	<td> Escape (ESC) </td></tr>
-		<tr><td> \NNN </td>	<td>8進数 NNN が表す文字</td></tr>
-		<tr><td> \xHH </td>	<td>16進数 HH が表す文字</td></tr>
+		<tr><td> \NNN </td>	<td> A character is represented by base 8 NNN </td></tr>
+		<tr><td> \xHH </td>	<td> A character is represented by base 16 HH </td></tr>
 	    </tbody>
 	</table>
     </dd>
 
-    <dt>改行を追加 (Add new line)</dt>
-    <dd>on にすると送信するコマンドの末尾に改行を追加します。</dd>
+    <dt>Add new line</dt>
+    <dd>A carriage return can be added at end of sending command when this option is checked.</dd>
 </dl>
--->
 
 </body>
 </html>
