@@ -750,6 +750,12 @@ typedef struct bufchain {
 	struct bufchain *next;
 } bufchain_t;
 
+typedef struct PacketList {
+	char *buf;
+	unsigned int buflen;
+	struct PacketList *next;
+} PacketList_t;
+
 typedef struct scp {
 	enum scp_dir dir;              // transfer direction
 	enum scp_state state;          // SCP state 
@@ -767,6 +773,8 @@ typedef struct scp {
 	long long filercvsize;
 	DWORD filemtime;
 	DWORD fileatime;
+	PacketList_t *pktlist_head;
+	PacketList_t *pktlist_tail;
 } scp_t;
 
 enum sftp_state {

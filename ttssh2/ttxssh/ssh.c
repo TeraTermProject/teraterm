@@ -84,6 +84,8 @@ static Channel_t channels[CHANNEL_MAX];
 
 static char ssh_ttymodes[] = "\x01\x03\x02\x1c\x03\x08\x04\x15\x05\x04";
 
+static CRITICAL_SECTION g_ssh_scp_lock;   /* SCP受信用ロック */
+
 static void try_send_credentials(PTInstVar pvar);
 static void prep_compression(PTInstVar pvar);
 
@@ -122,6 +124,9 @@ int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
 static void start_ssh_heartbeat_thread(PTInstVar pvar);
 void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c);
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num, unsigned char *data, unsigned int buflen);
+static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned int *buflen);
+static void ssh2_scp_free_packetlist(Channel_t *c);
+
 
 //
 // Global request confirm
@@ -300,6 +305,8 @@ static void ssh2_channel_delete(Channel_t *c)
 			CloseHandle(c->scp.thread);
 			c->scp.thread = (HANDLE)-1L;
 		}
+
+		ssh2_scp_free_packetlist(c);
 	}
 	if (c->type == TYPE_AGENT) {
 		buffer_free(c->agent_msg);
@@ -8182,11 +8189,14 @@ static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
 		if (is_canceled_window(hWnd))
 			goto cancel_abort;
 
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) != 0) {
+		ssh2_scp_get_packetlist(c, &data, &buflen);
+		if (data && buflen) {
+			msg.message = WM_RECEIVING_FILE;
+
 			switch (msg.message) {
 			case WM_RECEIVING_FILE:
-				data = (unsigned char *)msg.wParam;
-				buflen = (unsigned int)msg.lParam;
+				//data = (unsigned char *)msg.wParam;
+				//buflen = (unsigned int)msg.lParam;
 				eof = 0;
 
 				if (c->scp.filercvsize >= c->scp.filetotalsize) { // EOF
@@ -8261,6 +8271,86 @@ cancel_abort:
 	return 0;
 }
 
+static void ssh2_scp_add_packetlist(Channel_t *c, unsigned char *buf, unsigned int buflen)
+{
+	PacketList_t *p, *old;
+
+	EnterCriticalSection(&g_ssh_scp_lock);
+
+	// allocate new buffer
+	p = malloc(sizeof(PacketList_t));
+	if (p == NULL)
+		goto error;
+	p->buf = buf;
+	p->buflen = buflen;
+	p->next = NULL;
+
+	if (c->scp.pktlist_head == NULL) {
+		c->scp.pktlist_head = p;
+		c->scp.pktlist_tail = p;
+	}
+	else {
+		old = c->scp.pktlist_tail;
+		old->next = p;
+		c->scp.pktlist_tail = p;
+	}
+
+error:;
+	LeaveCriticalSection(&g_ssh_scp_lock);
+}
+
+static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned int *buflen)
+{
+	PacketList_t *p;
+
+	EnterCriticalSection(&g_ssh_scp_lock);
+
+	if (c->scp.pktlist_head == NULL) {
+		*buf = NULL;
+		*buflen = 0;
+		goto end;
+	}
+
+	p = c->scp.pktlist_head;
+	*buf = p->buf;
+	*buflen = p->buflen;
+
+	c->scp.pktlist_head = p->next;
+
+	if (c->scp.pktlist_head == NULL)
+		c->scp.pktlist_tail = NULL;
+
+	free(p);
+
+end:;
+	LeaveCriticalSection(&g_ssh_scp_lock);
+}
+
+static void ssh2_scp_alloc_packetlist(Channel_t *c)
+{
+	c->scp.pktlist_head = NULL;
+	c->scp.pktlist_tail = NULL;
+	InitializeCriticalSection(&g_ssh_scp_lock);
+}
+
+static void ssh2_scp_free_packetlist(Channel_t *c)
+{
+	PacketList_t *p, *old;
+
+	p = c->scp.pktlist_head;
+	while (p) {
+		old = p;
+		p = p->next;
+
+		free(old->buf);
+		free(old);
+	}
+
+	c->scp.pktlist_head = NULL;
+	c->scp.pktlist_tail = NULL;
+	DeleteCriticalSection(&g_ssh_scp_lock);
+}
+
 static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *data, unsigned int buflen)
 {
 	int permission;
@@ -8314,6 +8404,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 				ShowWindow(hDlgWnd, SW_SHOW);
 			}
 
+			ssh2_scp_alloc_packetlist(c);
 			thread = (HANDLE)_beginthreadex(NULL, 0, ssh_scp_receive_thread, c, 0, &tid);
 			if (thread == (HANDLE)-1) {
 				// TODO:
@@ -8335,26 +8426,15 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 
 	} else if (c->scp.state == SCP_DATA) {  // payloadの受信
 		unsigned char *newdata = malloc(buflen);
-		BOOL ret;
-		DWORD texit;
 		if (newdata != NULL) {
 			memcpy(newdata, data, buflen);
-			do {
-				// SCPファイル受信中に、ファイル受信を中断すると、無限ループに陥ることがあるため、
-				// スレッドが終了しているかどうかを判別する。
-				// (2014.7.6 yutaka)
-				texit = STILL_ACTIVE;
-				GetExitCodeThread(c->scp.thread, &texit);
-				if (texit != STILL_ACTIVE) {
-					texit = texit;
-					break;
-				}
 
-				// スレッドがキューを作っていない場合、メッセージポストが失敗することがあるので、
-				// 無限リトライする。MSDNにそうしろと書いてある。
-				// (2011.6.15 yutaka)
-				ret = PostThreadMessage(c->scp.thread_id, WM_RECEIVING_FILE, (WPARAM)newdata, (LPARAM)buflen);
-			} while (ret == FALSE);
+			// SCP受信処理のスピードが速い場合、スレッドのメッセージキューがフル(10000個)に
+			// なり、かつスレッド上での SendMessage がブロックすることにより、Tera Term(TTSSH)
+			// 自体がストールしてしまう。この問題を回避するため、スレッドのメッセージキューを
+			// 使うのをやめて、リンクドリスト方式に切り替える。
+			// (2016.11.3 yutaka)
+			ssh2_scp_add_packetlist(c, newdata, buflen);
 		}
 
 	} else if (c->scp.state == SCP_CLOSING) {  // EOFの受信
