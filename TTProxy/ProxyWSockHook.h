@@ -1389,7 +1389,9 @@ private:
         static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         char buf[1024];
         int status_code;
-        if (sendToSocketFormat(s, strchr(realhost,':')?"CONNECT [%s]:%d HTTP/1.0\r\n":"CONNECT %s:%d HTTP/1.0\r\n", realhost, realport) == SOCKET_ERROR)
+        if (sendToSocketFormat(s, strchr(realhost,':')?"CONNECT [%s]:%d HTTP/1.1\r\n":"CONNECT %s:%d HTTP/1.1\r\n", realhost, realport) == SOCKET_ERROR)
+            return SOCKET_ERROR;
+        if (sendToSocketFormat(s, strchr(realhost,':')?"Host: [%s]:%d\r\n":"Host: %s:%d\r\n", realhost, realport) == SOCKET_ERROR)
             return SOCKET_ERROR;
         if (proxy.user != NULL) {
             int userlen = strlen(proxy.user);
