@@ -36,8 +36,21 @@ send 'ABC'
 
 ; Send "ABC". (ASCII code of the character "A" is 65.)
 send  65 66 67
+
 myname='Tera Term'
 send 'My name is ' myname '.'
+
+; "ABC"
+send $41 $42 $43
+
+; "1"
+value = $31
+send value
+
+; "31"
+value = $31
+sprintf2 command "%02X" value
+send command
 </pre>
 
 
@@ -56,6 +69,12 @@ send #9
 <p>
 See also "<a href="setsync.html">setsync</a>" for the synchronous mode.
 </p>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="sendln.html">sendln</a></li>
+  <li><a href="../syntax/formats.html">Formats of constants</a></li>
+</ul>
 
 </body>
 </html>
