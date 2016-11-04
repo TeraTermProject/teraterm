@@ -1007,17 +1007,21 @@ void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level)
 	}
 }
 
-void logprintf(PTInstVar pvar, int level, char *fmt, ...)
+void logprintf(PTInstVar pv, int level, char *fmt, ...)
 {
 	char buff[4096];
 	va_list params;
 
-	if (level <= pvar->session_settings.LogLevel) {
+	if (pv == NULL) {
+		pv = pvar;
+	}
+
+	if (level <= pv->session_settings.LogLevel) {
 		va_start(params, fmt);
 		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
 		va_end(params);
 
-		notify_verbose_message(pvar, buff, level);
+		notify_verbose_message(pv, buff, level);
 	}
 }
 
