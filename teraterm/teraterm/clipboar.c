@@ -127,9 +127,11 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 	CBRetryEcho = FALSE;
 	CBSendCR = FALSE;
 
-	if ((CBMemHandle = GlobalAlloc(GHND, DataSize)) != NULL) {
+	if ((CBMemHandle = GlobalAlloc(GHND, DataSize+1)) != NULL) {
 		if ((CBMemPtr = GlobalLock(CBMemHandle)) != NULL) {
 			memcpy(CBMemPtr, DataPtr, DataSize);
+			// WM_COPYDATA で送られて来たデータは NUL Terminate されていないので NUL を付加する
+			CBMemPtr[DataSize] = 0;
 			GlobalUnlock(CBMemHandle);
 			CBMemPtr=NULL;
 			TalkStatus=IdTalkCB;
