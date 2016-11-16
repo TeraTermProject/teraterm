@@ -351,8 +351,6 @@ void ResetCharSet()
   cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
   cv.KanjiIn = ts.KanjiIn;
   cv.KanjiOut = ts.KanjiOut;
-
-  setlocale(LC_ALL, ts.Locale);
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
@@ -5314,6 +5312,9 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 
 	unsigned int code;
 	unsigned short cset;
+	char *locptr;
+
+	locptr = setlocale(LC_ALL, ts.Locale);
 
 	if ((b & 0x80) != 0x80 || ((b & 0xe0) == 0x80 && count == 0)) {
 		// 1バイト目および2バイト目がASCIIの場合は、すべてASCII出力とする。

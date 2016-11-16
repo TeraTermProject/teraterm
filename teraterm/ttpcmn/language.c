@@ -50,6 +50,7 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 	*byte = 2;
 
 	// CP932‚©‚çUTF-16LE‚Ö•ÏŠ·‚·‚é
+	setlocale(LC_ALL, locale);
 
 	buf[0] = KCode >> 8;
 	if (buf[0] > 0) {
