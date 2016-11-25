@@ -1,4 +1,4 @@
-cd onig-6.1.0\src
+cd oniguruma\src
 
 if exist "Makefile" goto build
 del onig_sd.lib
