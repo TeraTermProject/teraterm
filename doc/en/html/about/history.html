@@ -41,11 +41,11 @@
 
   <li>Bug fixes
     <ul>
-      <li>When <a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>=on is enabled and a log file is closed soon after opening the file, Tera Term rarely halts by dead-lock.</li>
-      <li>Windows 7 and Vista: When special operation is done on <a href="..\menu\setup-general.html">General setup dialog</a>, an application fault occurs.</li>
-      <li>When <a href="../menu/file-log.html">Log dialog</a> is closed, the memory leak of Tera Term core(ttermpro.exe) is happened.</li>
       <li>After Kanji(receive) is set to EUC and UTF-8 string is shown, new Kanji(Chinese character) may be properly shown when Kanji(receive)  is set to UTF-8.</li>
       <li>When Kanji(receive) is set to UTF-8, ISO-2022-JP Kanji can not be properly shown with Japanese language setting.</li>
+      <li>When <a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>=on is enabled and a log file is closed soon after opening the file, Tera Term rarely halts by dead-lock.</li>
+      <li>When <a href="../menu/file-log.html">Log dialog</a> is closed, the memory leak of Tera Term core(ttermpro.exe) is happened.</li>
+      <li>Windows 7 and Vista: When special operation is done on <a href="..\menu\setup-general.html">General setup dialog</a>, an application fault occurs.</li>
       <li>When the real time mode is off by using broadcast command, invalid character will be added at the end of string.</li>
       <li>MACRO: When <a href="../macro/command/closesbox.html">closesbox</a> command is executed, the memory leak of Macro core(ttpmacro.exe) is happened.</li>
       <li>MACRO: The gethostname, gettitle, getmodemstatus, loginfo and logopen command will rarely be wrong.</li>
