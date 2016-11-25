@@ -266,14 +266,17 @@
                 zsh 4.3.10
 
 // C H A N G E S //
+v1.07_28 2016/11/26 (by maya)
+        * アイコンを変更した。
+
 v1.07_28 2016/02/17 (by doda)
         * Add debug mode.
 
 v1.07_27 2016/02/09 (by doda)
-        * -cd オプション(HOME_CHDIR=y) より -d オプションでのディレク
-          トリ指定を優先するようにした。
-        * -ls オプション(LOGIN_SHELL=y) の指定時に -d オプションを指定
-          した場合、CHERE_INVOKING=y をセットするようにした。
+        * The directory selection by -d option is prior to -cd option
+          (HOME_CHDIR=y).
+        * When -d option is specified by using -ls option(LOGIN_SHELL=y),
+           CHERE_INVOKING=y is set.
 
 v1.07_26 2015/12/14 (by doda)
         * Add multiple connections support for the ssh-agent proxy.
