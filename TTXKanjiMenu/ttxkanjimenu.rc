@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,6,0
- PRODUCTVERSION 0,1,6,0
+ FILEVERSION 0,1,7,0
+ PRODUCTVERSION 0,1,7,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
         BLOCK "041104b0"
         BEGIN
             VALUE "FileDescription", "TTX KanjiMenu Plug-in"
-            VALUE "FileVersion", "0, 1, 6, 0"
+            VALUE "FileVersion", "0, 1, 7, 0"
             VALUE "InternalName", "ttxkanjimenu"
-            VALUE "LegalCopyright", "Copyright (C) 2007 Sunao HARA, (C) 2007-2009 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 2007 Sunao HARA, (C) 2007-2016 TeraTerm Project"
             VALUE "OriginalFilename", "ttxkanjimenu.dll"
             VALUE "ProductName", "TTX KanjiMenu Plug-in"
-            VALUE "ProductVersion", "0, 1, 6, 0"
+            VALUE "ProductVersion", "0, 1, 7, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -84,7 +84,7 @@ BEGIN
     END
 END
 
-#endif    // English (U.S.) resources
+#endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
