@@ -129,7 +129,7 @@
   2. Oniguruma (used by Tera Term Macro)
      (1) oniguruma のソースを libs/oniguruma の中に展開する。
      (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma.bat を実行する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma6.bat を実行する。
 
   3. OpenSSL (used by TTSSH)
      (1) openssl のソースを libs/openssl の中に展開する。
