@@ -1,4 +1,4 @@
-cd openssl-1.1.0
+cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
 perl Configure no-asm no-async VC-WIN32 --debug
