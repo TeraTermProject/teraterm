@@ -239,7 +239,7 @@ static void cAES128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "AES128/192/256");
@@ -287,7 +287,7 @@ static void cAES128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "AES128/192/256");
@@ -337,7 +337,7 @@ static void c3DES_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "3DES-CBC");
@@ -385,7 +385,7 @@ static void c3DES_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "3DES-CBC");
@@ -434,7 +434,7 @@ static void cBlowfish_encrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Blowfish");
@@ -473,7 +473,7 @@ static void cBlowfish_decrypt2(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Blowfish");
@@ -513,7 +513,7 @@ static void cArcfour_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Arcfour");
@@ -552,7 +552,7 @@ static void cArcfour_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Arcfour");
@@ -592,7 +592,7 @@ static void cCast128_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "CAST128");
@@ -631,7 +631,7 @@ static void cCast128_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "CAST128");
@@ -670,7 +670,7 @@ static void cCamellia_encrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Camellia128/192/256");
@@ -709,7 +709,7 @@ static void cCamellia_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 		goto error;
 	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            "Camellia128/192/256");
@@ -1454,7 +1454,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
 				                 CIPHER_ENCRYPT,
@@ -1480,7 +1480,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
 				                 CIPHER_ENCRYPT,
@@ -1501,7 +1501,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
 				                 CIPHER_ENCRYPT,
@@ -1523,7 +1523,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
 				                 CIPHER_ENCRYPT,
@@ -1543,7 +1543,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
 				                 CIPHER_ENCRYPT,
@@ -1567,7 +1567,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
+				cipher_init_SSH2(pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.sender_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.sender_cipher),
 				                 CIPHER_ENCRYPT,
@@ -1624,7 +1624,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
 				                 CIPHER_DECRYPT,
@@ -1650,7 +1650,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
 				                 CIPHER_DECRYPT,
@@ -1671,7 +1671,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
 				                 CIPHER_DECRYPT,
@@ -1693,7 +1693,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
 				                 CIPHER_DECRYPT,
@@ -1714,7 +1714,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
 				                 CIPHER_DECRYPT,
@@ -1739,7 +1739,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				struct Enc *enc;
 
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
-				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
+				cipher_init_SSH2(pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(pvar->crypt_state.receiver_cipher),
 				                 enc->iv, get_cipher_block_size(pvar->crypt_state.receiver_cipher),
 				                 CIPHER_DECRYPT,

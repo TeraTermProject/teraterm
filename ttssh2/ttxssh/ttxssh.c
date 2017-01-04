@@ -140,6 +140,9 @@ static void init_TTSSH(PTInstVar pvar)
 	FWDUI_init(pvar);
 
 	ssh_heartbeat_lock_initialize();
+
+	pvar->evpcip[MODE_IN] = EVP_CIPHER_CTX_new();
+	pvar->evpcip[MODE_OUT] = EVP_CIPHER_CTX_new();
 }
 
 static void uninit_TTSSH(PTInstVar pvar)
@@ -168,6 +171,9 @@ static void uninit_TTSSH(PTInstVar pvar)
 	}
 
 	ssh_heartbeat_lock_finalize();
+
+	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_IN]);
+	EVP_CIPHER_CTX_free(pvar->evpcip[MODE_OUT]);
 }
 
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv)
