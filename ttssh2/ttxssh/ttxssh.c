@@ -3897,6 +3897,7 @@ void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
 
 const EVP_CIPHER *evp_ssh1_3des(void)
 {
+#if OPENSSL_VERSION_NUMBER < 0x10100000UL 
 	static EVP_CIPHER ssh1_3des;
 
 	memset(&ssh1_3des, 0, sizeof(EVP_CIPHER));
@@ -3909,6 +3910,21 @@ const EVP_CIPHER *evp_ssh1_3des(void)
 	ssh1_3des.do_cipher = ssh1_3des_cbc;
 	ssh1_3des.flags = EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH;
 	return (&ssh1_3des);
+#else
+	static EVP_CIPHER *p = NULL;
+
+	if (p == NULL) {
+		p = EVP_CIPHER_meth_new(NID_undef, /*block_size*/8, /*key_len*/16);
+	}
+	if (p) {
+		EVP_CIPHER_meth_set_iv_length(p, 0);
+		EVP_CIPHER_meth_set_init(p, ssh1_3des_init);
+		EVP_CIPHER_meth_set_cleanup(p, ssh1_3des_cleanup);
+		EVP_CIPHER_meth_set_do_cipher(p, ssh1_3des_cbc);
+		EVP_CIPHER_meth_set_flags(p, EVP_CIPH_CBC_MODE | EVP_CIPH_VARIABLE_LENGTH);
+	}
+	return (p);
+#endif
 }
 
 static void ssh_make_comment(char *comment, int maxlen)
