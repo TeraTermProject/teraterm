@@ -286,7 +286,11 @@ unsigned char *kex_dh_hash(const EVP_MD *evp_md,
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL)
+		goto error;
 
 	b = buffer_init();
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
@@ -308,15 +312,19 @@ unsigned char *kex_dh_hash(const EVP_MD *evp_md,
 	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(&md, digest, NULL);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestFinal(md, digest, NULL);
 
 	buffer_free(b);
 
 	//write_buffer_file(digest, EVP_MD_size(evp_md));
 
 	*hashlen = EVP_MD_size(evp_md);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return digest;
 }
@@ -341,7 +349,11 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL)
+		goto error;
 
 	b = buffer_init();
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
@@ -373,15 +385,19 @@ unsigned char *kex_dh_gex_hash(const EVP_MD *evp_md,
 	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(&md, digest, NULL);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestFinal(md, digest, NULL);
 
 	buffer_free(b);
 
 	//write_buffer_file(digest, EVP_MD_size(evp_md));
 
 	*hashlen = EVP_MD_size(evp_md);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return digest;
 }
@@ -401,7 +417,11 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
 {
 	buffer_t *b;
 	static unsigned char digest[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL)
+		goto error;
 
 	b = buffer_init();
 	buffer_put_string(b, client_version_string, strlen(client_version_string));
@@ -424,15 +444,19 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
 	// yutaka
 	//debug_print(38, buffer_ptr(b), buffer_len(b));
 
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestFinal(&md, digest, NULL);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestFinal(md, digest, NULL);
 
 	buffer_free(b);
 
 	//write_buffer_file(digest, EVP_MD_size(evp_md));
 
 	*hashlen = EVP_MD_size(evp_md);
+
+error:
+	if (md)
+		EVP_MD_CTX_free(md);
 
 	return digest;
 }
@@ -544,11 +568,15 @@ static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
                           const EVP_MD *evp_md)
 {
 	buffer_t *b;
-	EVP_MD_CTX md;
+	EVP_MD_CTX *md = NULL;
 	char c = id;
 	int have;
 	int mdsz = EVP_MD_size(evp_md);
 	u_char *digest = malloc(roundup(need, mdsz));
+
+	md = EVP_MD_CTX_new();
+	if (md == NULL)
+		goto skip;
 
 	if (digest == NULL)
 		goto skip;
@@ -560,12 +588,12 @@ static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
 	buffer_put_bignum2(b, shared_secret);
 
 	/* K1 = HASH(K || H || "A" || session_id) */
-	EVP_DigestInit(&md, evp_md);
-	EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
-	EVP_DigestUpdate(&md, hash, mdsz);
-	EVP_DigestUpdate(&md, &c, 1);
-	EVP_DigestUpdate(&md, session_id, session_id_len);
-	EVP_DigestFinal(&md, digest, NULL);
+	EVP_DigestInit(md, evp_md);
+	EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+	EVP_DigestUpdate(md, hash, mdsz);
+	EVP_DigestUpdate(md, &c, 1);
+	EVP_DigestUpdate(md, session_id, session_id_len);
+	EVP_DigestFinal(md, digest, NULL);
 
 	/*
 	 * expand key:
@@ -573,15 +601,18 @@ static u_char *derive_key(int id, int need, u_char *hash, BIGNUM *shared_secret,
 	 * Key = K1 || K2 || ... || Kn
 	 */
 	for (have = mdsz; need > have; have += mdsz) {
-		EVP_DigestInit(&md, evp_md);
-		EVP_DigestUpdate(&md, buffer_ptr(b), buffer_len(b));
-		EVP_DigestUpdate(&md, hash, mdsz);
-		EVP_DigestUpdate(&md, digest, have);
-		EVP_DigestFinal(&md, digest + have, NULL);
+		EVP_DigestInit(md, evp_md);
+		EVP_DigestUpdate(md, buffer_ptr(b), buffer_len(b));
+		EVP_DigestUpdate(md, hash, mdsz);
+		EVP_DigestUpdate(md, digest, have);
+		EVP_DigestFinal(md, digest + have, NULL);
 	}
 	buffer_free(b);
 
 skip:;
+	if (md)
+		EVP_MD_CTX_free(md);
+
 	return digest;
 }
 

@@ -877,22 +877,26 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	// decrypt prikey with aes256-cbc
 	if (strcmp(encname, "aes256-cbc") == 0) {
 		const EVP_MD *md = EVP_sha1();
-		EVP_MD_CTX ctx;
+		EVP_MD_CTX *ctx = NULL;
 		unsigned char key[40], iv[32];
 		EVP_CIPHER_CTX *cipher_ctx = NULL;
 		char *decrypted = NULL;
 
+		ctx = EVP_MD_CTX_new();
+		if (ctx == NULL)
+			goto error;
+
 		cipher_ctx = EVP_CIPHER_CTX_new();
 
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, "\0\0\0\0", 4);
-		EVP_DigestUpdate(&ctx, passphrase, strlen(passphrase));
-		EVP_DigestFinal(&ctx, key, &len);
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, "\0\0\0\0", 4);
+		EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
+		EVP_DigestFinal(ctx, key, &len);
 
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, "\0\0\0\1", 4);
-		EVP_DigestUpdate(&ctx, passphrase, strlen(passphrase));
-		EVP_DigestFinal(&ctx, key + 20, &len);
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, "\0\0\0\1", 4);
+		EVP_DigestUpdate(ctx, passphrase, strlen(passphrase));
+		EVP_DigestFinal(ctx, key + 20, &len);
 
 		memset(iv, 0, sizeof(iv));
 
@@ -905,6 +909,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			free(decrypted);
 			cipher_cleanup_SSH2(cipher_ctx);
 			EVP_CIPHER_CTX_free(cipher_ctx);
+			EVP_MD_CTX_free(ctx);
 			goto error;
 		}
 		buffer_clear(prikey);
@@ -912,6 +917,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		free(decrypted);
 		cipher_cleanup_SSH2(cipher_ctx);
 		EVP_CIPHER_CTX_free(cipher_ctx);
+		EVP_MD_CTX_free(ctx);
 	}
 
 	// verity MAC
@@ -940,44 +946,57 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		unsigned char mackey[20];
 		char header[] = "putty-private-key-file-mac-key";
 		const EVP_MD *md = EVP_sha1();
-		EVP_MD_CTX ctx;
+		EVP_MD_CTX *ctx = NULL;
 
-		EVP_DigestInit(&ctx, md);
-		EVP_DigestUpdate(&ctx, header, sizeof(header)-1);
+		ctx = EVP_MD_CTX_new();
+		if (ctx == NULL)
+			goto error;
+
+		EVP_DigestInit(ctx, md);
+		EVP_DigestUpdate(ctx, header, sizeof(header)-1);
 		len = strlen(passphrase);
 		if (strcmp(encname, "aes256-cbc") == 0 && len > 0) {
-			EVP_DigestUpdate(&ctx, passphrase, len);
+			EVP_DigestUpdate(ctx, passphrase, len);
 		}
-		EVP_DigestFinal(&ctx, mackey, &len);
+		EVP_DigestFinal(ctx, mackey, &len);
+		EVP_MD_CTX_free(ctx);
 
 		//hmac_sha1_simple(mackey, sizeof(mackey), macdata->buf, macdata->len, binary);
 		{
-		EVP_MD_CTX ctx[2];
+		EVP_MD_CTX *ctx[2] = { 0 };
 		unsigned char intermediate[20];
 		unsigned char foo[64];
 		int i;
+
+		ctx[0] = EVP_MD_CTX_new();
+		ctx[1] = EVP_MD_CTX_new();
+		if (ctx[0] == NULL || ctx[1] == NULL)
+			goto error;
 
 		memset(foo, 0x36, sizeof(foo));
 		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
 			foo[i] ^= mackey[i];
 		}
-		EVP_DigestInit(&ctx[0], md);
-		EVP_DigestUpdate(&ctx[0], foo, sizeof(foo));
+		EVP_DigestInit(ctx[0], md);
+		EVP_DigestUpdate(ctx[0], foo, sizeof(foo));
 
 		memset(foo, 0x5C, sizeof(foo));
 		for (i = 0; i < sizeof(mackey) && i < sizeof(foo); i++) {
 			foo[i] ^= mackey[i];
 		}
-		EVP_DigestInit(&ctx[1], md);
-		EVP_DigestUpdate(&ctx[1], foo, sizeof(foo));
+		EVP_DigestInit(ctx[1], md);
+		EVP_DigestUpdate(ctx[1], foo, sizeof(foo));
 
 		memset(foo, 0, sizeof(foo));
 
-		EVP_DigestUpdate(&ctx[0], macdata->buf, macdata->len);
-		EVP_DigestFinal(&ctx[0], intermediate, &len);
+		EVP_DigestUpdate(ctx[0], macdata->buf, macdata->len);
+		EVP_DigestFinal(ctx[0], intermediate, &len);
 
-		EVP_DigestUpdate(&ctx[1], intermediate, sizeof(intermediate));
-		EVP_DigestFinal(&ctx[1], binary, &len);
+		EVP_DigestUpdate(ctx[1], intermediate, sizeof(intermediate));
+		EVP_DigestFinal(ctx[1], binary, &len);
+
+		EVP_MD_CTX_free(ctx[0]);
+		EVP_MD_CTX_free(ctx[1]);
 		}
 
 		memset(mackey, 0, sizeof(mackey));
