@@ -3657,6 +3657,8 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 	{
 		RSA *priv = NULL;
 		RSA *pub = NULL;
+		BIGNUM *e, *n;
+		BIGNUM *p_e, *p_n;
 
 		// private key
 		priv =  RSA_generate_key(bits, 35, cbfunc, cbarg);
@@ -3666,15 +3668,18 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 
 		// public key
 		pub = RSA_new();
-		pub->n = BN_new();
-		pub->e = BN_new();
-		if (pub->n == NULL || pub->e == NULL) {
+		n = BN_new();
+		e = BN_new();
+		RSA_set0_key(pub, e, n, NULL);
+		if (n == NULL || e == NULL) {
 			RSA_free(pub);
 			goto error;
 		}
 
-		BN_copy(pub->n, priv->n);
-		BN_copy(pub->e, priv->e);
+		RSA_get0_key(priv, &p_n, &p_e, NULL);
+
+		BN_copy(n, p_n);
+		BN_copy(e, p_e);
 		public_key.rsa = pub;
 		break;
 	}
@@ -4875,15 +4880,18 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				RSA *rsa = public_key.rsa;
 				int bits;
 				char *buf;
+				BIGNUM *e, *n;
 
-				bits = BN_num_bits(rsa->n);
+				RSA_get0_key(rsa, &n, &e, NULL);
+
+				bits = BN_num_bits(n);
 				fprintf(fp, "%u", bits);
 
-				buf = BN_bn2dec(rsa->e);
+				buf = BN_bn2dec(e);
 				fprintf(fp, " %s", buf);
 				OPENSSL_free(buf);
 
-				buf = BN_bn2dec(rsa->n);
+				buf = BN_bn2dec(n);
 				fprintf(fp, " %s", buf);
 				OPENSSL_free(buf);
 
@@ -4897,6 +4905,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				char *blob;
 				char *uuenc; // uuencode data
 				int uulen;
+				BIGNUM *e, *n;
 
 				b = buffer_init();
 				if (b == NULL)
@@ -4913,10 +4922,11 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 					break;
 
 				case KEY_RSA: // RSA
+					RSA_get0_key(rsa, &n, &e, NULL);
 					keyname = "ssh-rsa";
 					buffer_put_string(b, keyname, strlen(keyname));
-					buffer_put_bignum2(b, rsa->e);
-					buffer_put_bignum2(b, rsa->n);
+					buffer_put_bignum2(b, e);
+					buffer_put_bignum2(b, n);
 					break;
 
 				case KEY_ECDSA256: // ECDSA
@@ -5089,6 +5099,7 @@ public_error:
 				EVP_CIPHER_CTX *cipher_ctx = NULL;
 				FILE *fp;
 				char wrapped[4096];
+				BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
 
 				if (passphrase[0] == '\0') { // passphrase is empty
 					cipher_num = SSH_CIPHER_NONE;
@@ -5117,10 +5128,14 @@ public_error:
 
 				// set private key
 				rsa = private_key.rsa;
-				buffer_put_bignum(b, rsa->d);
-				buffer_put_bignum(b, rsa->iqmp);
-				buffer_put_bignum(b, rsa->q);
-				buffer_put_bignum(b, rsa->p);
+				RSA_get0_key(rsa, &n, &e, &d);
+				RSA_get0_factors(rsa, &p, &q);
+				RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
+
+				buffer_put_bignum(b, d);
+				buffer_put_bignum(b, iqmp);
+				buffer_put_bignum(b, q);
+				buffer_put_bignum(b, p);
 
 				// padding with 8byte align
 				while (buffer_len(b) % 8) {
@@ -5143,9 +5158,9 @@ public_error:
 				buffer_put_int(enc, 0);  // type is 'int'!! (For future extension)
 
 				/* Store public key.  This will be in plain text. */
-				buffer_put_int(enc, BN_num_bits(rsa->n));
-				buffer_put_bignum(enc, rsa->n);
-				buffer_put_bignum(enc, rsa->e);
+				buffer_put_int(enc, BN_num_bits(n));
+				buffer_put_bignum(enc, n);
+				buffer_put_bignum(enc, e);
 				buffer_put_string(enc, comment, strlen(comment));
 
 				// setup the MD5ed passphrase to cipher encryption key

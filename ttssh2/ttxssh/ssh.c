@@ -2429,24 +2429,35 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			}
 		}
 		else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
-			int server_key_bits = BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
-			int host_key_bits = BN_num_bits(pvar->crypt_state.host_key.RSA_key->n);
-			int server_key_bytes = (server_key_bits + 7) / 8;
-			int host_key_bytes = (host_key_bits + 7) / 8;
-			int session_buf_len = server_key_bytes + host_key_bytes + 8;
-			char FAR *session_buf = (char FAR *) malloc(session_buf_len);
+			int server_key_bits;
+			int host_key_bits;
+			int server_key_bytes;
+			int host_key_bytes;
+			int session_buf_len;
+			char FAR *session_buf;
 			unsigned char session_id[16];
+			BIGNUM *server_n, *host_n;
 
 			unsigned char *hash;
 			int pubkeylen, hashlen;
+
+			RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
+			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
+
+			server_key_bits = BN_num_bits(server_n);
+			host_key_bits = BN_num_bits(host_n);
+			server_key_bytes = (server_key_bits + 7) / 8;
+			host_key_bytes = (host_key_bits + 7) / 8;
+			session_buf_len = server_key_bytes + host_key_bytes + 8;
+			session_buf = (char FAR *) malloc(session_buf_len);
 
 			/* Pageant にハッシュを計算してもらう */
 			// 公開鍵の長さ
 			pubkeylen = putty_get_ssh1_keylen(pvar->pageant_curkey,
 			                                  pvar->pageant_keylistlen);
 			// セッションIDを作成
-			BN_bn2bin(pvar->crypt_state.host_key.RSA_key->n, session_buf);
-			BN_bn2bin(pvar->crypt_state.server_key.RSA_key->n,
+			BN_bn2bin(host_n, session_buf);
+			BN_bn2bin(server_n,
 			          session_buf + host_key_bytes);
 			memcpy(session_buf + server_key_bytes + host_key_bytes,
 			       pvar->crypt_state.server_cookie, 8);
@@ -2474,6 +2485,8 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 
 static void try_send_credentials(PTInstVar pvar)
 {
+	BIGNUM *e, *n;
+
 	if ((pvar->ssh_state.status_flags & STATUS_DONT_SEND_CREDENTIALS) == 0) {
 		AUTHCred FAR *cred = AUTH_get_cur_cred(pvar);
 		static const int RSA_msgs[] =
@@ -2530,8 +2543,12 @@ static void try_send_credentials(PTInstVar pvar)
 				break;
 			}
 		case SSH_AUTH_RSA:{
-				int len = BN_num_bytes(cred->key_pair->rsa->n);
-				unsigned char FAR *outmsg =
+				int len;
+				unsigned char FAR *outmsg;
+
+				RSA_get0_key(cred->key_pair->rsa, &n, NULL, NULL);
+				len = BN_num_bytes(n);
+				outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RSA, 2 + len);
 
 				notify_verbose_message(pvar,
@@ -2539,17 +2556,23 @@ static void try_send_credentials(PTInstVar pvar)
 				                       LOG_LEVEL_VERBOSE);
 
 				set_ushort16_MSBfirst(outmsg, len * 8);
-				BN_bn2bin(cred->key_pair->rsa->n, outmsg + 2);
+				BN_bn2bin(n, outmsg + 2);
 				/* don't destroy the current credentials yet */
 				enque_handlers(pvar, 2, RSA_msgs, RSA_handlers);
 				break;
 			}
 		case SSH_AUTH_RHOSTS_RSA:{
-				int mod_len = BN_num_bytes(cred->key_pair->rsa->n);
-				int name_len = strlen(cred->rhosts_client_user);
-				int exp_len = BN_num_bytes(cred->key_pair->rsa->e);
+				int mod_len;
+				int name_len;
+				int exp_len;
 				int index;
-				unsigned char FAR *outmsg =
+				unsigned char FAR *outmsg;
+
+				RSA_get0_key(cred->key_pair->rsa, &n, &e, NULL);
+				mod_len = BN_num_bytes(n);
+				name_len = strlen(cred->rhosts_client_user);
+				exp_len = BN_num_bytes(e);
+				outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RHOSTS_RSA,
 					                  12 + mod_len + name_len + exp_len);
 
@@ -2563,11 +2586,11 @@ static void try_send_credentials(PTInstVar pvar)
 
 				set_uint32(outmsg + index, 8 * mod_len);
 				set_ushort16_MSBfirst(outmsg + index + 4, 8 * exp_len);
-				BN_bn2bin(cred->key_pair->rsa->e, outmsg + index + 6);
+				BN_bn2bin(e, outmsg + index + 6);
 				index += 6 + exp_len;
 
 				set_ushort16_MSBfirst(outmsg + index, 8 * mod_len);
-				BN_bn2bin(cred->key_pair->rsa->n, outmsg + index + 2);
+				BN_bn2bin(n, outmsg + index + 2);
 				/* don't destroy the current credentials yet */
 				enque_handlers(pvar, 2, RSA_msgs, RSA_handlers);
 				break;
@@ -5684,9 +5707,11 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
+				BIGNUM *n;
+				RSA_get0_key(hostkey->rsa, &n, NULL, NULL);
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_dh_kex_reply()", BN_num_bits(hostkey->rsa->n));
+				            "@ handle_SSH2_dh_kex_reply()", BN_num_bits(n));
 			}
 			else {
 				goto cont;
@@ -5919,9 +5944,11 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
+				BIGNUM *n;
+				RSA_get0_key(hostkey->rsa, &n, NULL, NULL);
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_dh_gex_reply()", BN_num_bits(hostkey->rsa->n));
+				            "@ handle_SSH2_dh_gex_reply()", BN_num_bits(n));
 			}
 			else {
 				goto cont;
@@ -6151,9 +6178,11 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
 		if (ret == -3 && hostkey->type == KEY_RSA) {
 			if (!pvar->settings.EnableRsaShortKeyServer) {
+				BIGNUM *n;
+				RSA_get0_key(hostkey->rsa, &n, NULL, NULL);
 				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
 				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_ecdh_kex_reply()", BN_num_bits(hostkey->rsa->n));
+				            "@ handle_SSH2_ecdh_kex_reply()", BN_num_bits(n));
 			}
 			else {
 				goto cont;

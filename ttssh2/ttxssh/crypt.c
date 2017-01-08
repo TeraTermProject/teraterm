@@ -872,23 +872,27 @@ RSA FAR *make_key(PTInstVar pvar,
                   unsigned char FAR * mod)
 {
 	RSA FAR *key = RSA_new();
+	BIGNUM *e = NULL, *n = NULL;
 
 	if (key != NULL) {
-		key->e = get_bignum(exp);
-		key->n = get_bignum(mod);
+		// OpenSSL 1.1.0ではRSA構造体のメンバーに直接アクセスできないため、
+		// RSA_get0_key関数で取得する必要がある。
+		e = get_bignum(exp);
+		n = get_bignum(mod);
+		RSA_set0_key(key, n, e, NULL);
 	}
 
-	if (key == NULL || key->e == NULL || key->n == NULL) {
+	if (key == NULL || e == NULL || n == NULL) {
 		UTIL_get_lang_msg("MSG_RSAKEY_SETUP_ERROR", pvar,
 		                  "Error setting up RSA keys");
 		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 
 		if (key != NULL) {
-			if (key->e != NULL) {
-				BN_free(key->e);
+			if (e != NULL) {
+				BN_free(e);
 			}
-			if (key->n != NULL) {
-				BN_free(key->n);
+			if (n != NULL) {
+				BN_free(n);
 			}
 			RSA_free(key);
 		}
@@ -1192,11 +1196,20 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 
 int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 {
-	int server_key_bits =
-		BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
-	int host_key_bits = BN_num_bits(pvar->crypt_state.host_key.RSA_key->n);
-	int server_key_bytes = (server_key_bits + 7) / 8;
-	int host_key_bytes = (host_key_bits + 7) / 8;
+	int server_key_bits;
+	int host_key_bits;
+	int server_key_bytes;
+	int host_key_bytes;
+	BIGNUM *n;
+
+	RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &n, NULL, NULL);
+	server_key_bits = BN_num_bits(n);
+
+	RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &n, NULL, NULL);
+	host_key_bits = BN_num_bits(n);
+
+	server_key_bytes = (server_key_bits + 7) / 8;
+	host_key_bytes = (host_key_bits + 7) / 8;
 
 	if (server_key_bits < host_key_bits) {
 		return host_key_bytes;
@@ -1208,13 +1221,22 @@ int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 int CRYPT_choose_session_key(PTInstVar pvar,
                              unsigned char FAR * encrypted_key_buf)
 {
-	int server_key_bits =
-		BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
-	int host_key_bits = BN_num_bits(pvar->crypt_state.host_key.RSA_key->n);
-	int server_key_bytes = (server_key_bits + 7) / 8;
-	int host_key_bytes = (host_key_bits + 7) / 8;
+	int server_key_bits;
+	int host_key_bits;
+	int server_key_bytes;
+	int host_key_bytes;
 	int encrypted_key_bytes;
 	int bit_delta;
+	BIGNUM *server_n, *host_n;
+
+	RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
+	server_key_bits = BN_num_bits(server_n);
+
+	RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
+	host_key_bits = BN_num_bits(host_n);
+
+	server_key_bytes = (server_key_bits + 7) / 8;
+	host_key_bytes = (host_key_bits + 7) / 8;
 
 	if (server_key_bits < host_key_bits) {
 		encrypted_key_bytes = host_key_bytes;
@@ -1237,8 +1259,8 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 		char session_id[16];
 		int i;
 
-		BN_bn2bin(pvar->crypt_state.host_key.RSA_key->n, session_buf);
-		BN_bn2bin(pvar->crypt_state.server_key.RSA_key->n,
+		BN_bn2bin(host_n, session_buf);
+		BN_bn2bin(server_n,
 		          session_buf + host_key_bytes);
 		memcpy(session_buf + server_key_bytes + host_key_bytes,
 		       pvar->crypt_state.server_cookie, 8);
@@ -1308,15 +1330,26 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
                                           int challenge_len,
                                           unsigned char FAR * response)
 {
-	int server_key_bits =
-		BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
-	int host_key_bits = BN_num_bits(pvar->crypt_state.host_key.RSA_key->n);
-	int server_key_bytes = (server_key_bits + 7) / 8;
-	int host_key_bytes = (host_key_bits + 7) / 8;
-	int session_buf_len = server_key_bytes + host_key_bytes + 8;
-	char FAR *session_buf = (char FAR *) malloc(session_buf_len);
+	int server_key_bits;
+	int host_key_bits;
+	int server_key_bytes;
+	int host_key_bytes;
+	int session_buf_len;
+	char FAR *session_buf;
 	char decrypted_challenge[48];
 	int decrypted_challenge_len;
+	BIGNUM *server_n, *host_n;
+
+	RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
+	server_key_bits = BN_num_bits(server_n);
+
+	RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
+	host_key_bits = BN_num_bits(host_n);
+
+	server_key_bytes = (server_key_bits + 7) / 8;
+	host_key_bytes = (host_key_bits + 7) / 8;
+	session_buf_len = server_key_bytes + host_key_bytes + 8;
+	session_buf = (char FAR *) malloc(session_buf_len);
 
 	decrypted_challenge_len =
 		RSA_private_decrypt(challenge_len, challenge, challenge,
@@ -1338,8 +1371,8 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 		       decrypted_challenge_len);
 	}
 
-	BN_bn2bin(pvar->crypt_state.host_key.RSA_key->n, session_buf);
-	BN_bn2bin(pvar->crypt_state.server_key.RSA_key->n,
+	BN_bn2bin(host_n, session_buf);
+	BN_bn2bin(server_n,
 	          session_buf + host_key_bytes);
 	memcpy(session_buf + server_key_bytes + host_key_bytes,
 	       pvar->crypt_state.server_cookie, 8);
@@ -1903,17 +1936,22 @@ void CRYPT_get_cipher_info(PTInstVar pvar, char FAR * dest, int len)
 
 void CRYPT_get_server_key_info(PTInstVar pvar, char FAR * dest, int len)
 {
+	BIGNUM *server_n, *host_n;
+
 	if (SSHv1(pvar)) {
 		if (pvar->crypt_state.server_key.RSA_key == NULL
 		 || pvar->crypt_state.host_key.RSA_key == NULL) {
 			UTIL_get_lang_msg("DLG_ABOUT_KEY_NONE", pvar, "None");
 			strncpy_s(dest, len, pvar->ts->UIMsg, _TRUNCATE);
 		} else {
+			RSA_get0_key(pvar->crypt_state.server_key.RSA_key, &server_n, NULL, NULL);
+			RSA_get0_key(pvar->crypt_state.host_key.RSA_key, &host_n, NULL, NULL);
+
 			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO", pvar,
 			                  "%d-bit server key, %d-bit host key");
 			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
-			            BN_num_bits(pvar->crypt_state.server_key.RSA_key->n),
-			            BN_num_bits(pvar->crypt_state.host_key.RSA_key->n));
+			            BN_num_bits(server_n),
+			            BN_num_bits(host_n));
 		}
 	} else { // SSH2
 			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO2", pvar,
