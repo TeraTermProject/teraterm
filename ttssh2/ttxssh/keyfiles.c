@@ -1092,6 +1092,8 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	case KEY_DSA:
 	{
 		char *pubkey_type, *pub, *pri;
+		BIGNUM *p, *q, *g, *pub_key, *priv_key;
+
 		pub = pubkey->buf;
 		pri = prikey->buf;
 		pubkey_type = buffer_get_string(&pub, NULL);
@@ -1107,26 +1109,30 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->dsa->p = BN_new();
-		result->dsa->q = BN_new();
-		result->dsa->g = BN_new();
-		result->dsa->pub_key = BN_new();
-		result->dsa->priv_key = BN_new();
-		if (result->dsa->p == NULL ||
-		    result->dsa->q == NULL ||
-		    result->dsa->g == NULL ||
-		    result->dsa->pub_key == NULL ||
-		    result->dsa->priv_key == NULL) {
+		p = BN_new();
+		q = BN_new();
+		g = BN_new();
+		DSA_set0_pqg(result->dsa, p, q, g);
+
+		pub_key = BN_new();
+		priv_key = BN_new();
+		DSA_set0_key(result->dsa, pub_key, priv_key);
+
+		if (p == NULL ||
+		    q == NULL ||
+		    g == NULL ||
+		    pub_key == NULL ||
+		    priv_key == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
 
-		buffer_get_bignum2(&pub, result->dsa->p);
-		buffer_get_bignum2(&pub, result->dsa->q);
-		buffer_get_bignum2(&pub, result->dsa->g);
-		buffer_get_bignum2(&pub, result->dsa->pub_key);
+		buffer_get_bignum2(&pub, p);
+		buffer_get_bignum2(&pub, q);
+		buffer_get_bignum2(&pub, g);
+		buffer_get_bignum2(&pub, pub_key);
 
-		buffer_get_bignum2(&pri, result->dsa->priv_key);
+		buffer_get_bignum2(&pri, priv_key);
 
 		break;
 	}
@@ -1439,22 +1445,27 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	case KEY_DSA:
 	{
 		int param;
+		BIGNUM *p, *q, *g, *pub_key, *priv_key;
 
 		result->dsa = DSA_new();
 		if (result->dsa == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
-		result->dsa->p = BN_new();
-		result->dsa->q = BN_new();
-		result->dsa->g = BN_new();
-		result->dsa->pub_key = BN_new();
-		result->dsa->priv_key = BN_new();
-		if (result->dsa->p == NULL ||
-		    result->dsa->q == NULL ||
-		    result->dsa->g == NULL ||
-		    result->dsa->pub_key == NULL ||
-		    result->dsa->priv_key == NULL) {
+		p = BN_new();
+		q = BN_new();
+		g = BN_new();
+		DSA_set0_pqg(result->dsa, p, q, g);
+
+		pub_key = BN_new();
+		priv_key = BN_new();
+		DSA_set0_key(result->dsa, pub_key, priv_key);
+
+		if (p == NULL ||
+		    q == NULL ||
+		    g == NULL ||
+		    pub_key == NULL ||
+		    priv_key == NULL) {
 			strncpy_s(errmsg, errmsg_len, "key init error", _TRUNCATE);
 			goto error;
 		}
@@ -1464,11 +1475,11 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 			strncpy_s(errmsg, errmsg_len, "predefined DSA parameters not supported", _TRUNCATE);
 			goto error;
 		}
-		buffer_get_bignum_SECSH(blob2, result->dsa->p);
-		buffer_get_bignum_SECSH(blob2, result->dsa->g);
-		buffer_get_bignum_SECSH(blob2, result->dsa->q);
-		buffer_get_bignum_SECSH(blob2, result->dsa->pub_key);
-		buffer_get_bignum_SECSH(blob2, result->dsa->priv_key);
+		buffer_get_bignum_SECSH(blob2, p);
+		buffer_get_bignum_SECSH(blob2, g);
+		buffer_get_bignum_SECSH(blob2, q);
+		buffer_get_bignum_SECSH(blob2, pub_key);
+		buffer_get_bignum_SECSH(blob2, priv_key);
 
 		break;
 	}
