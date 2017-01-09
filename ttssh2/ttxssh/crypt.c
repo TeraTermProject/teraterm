@@ -1397,7 +1397,7 @@ static void c3DES_init(char FAR * session_key, Cipher3DESState FAR * state)
 
 static void cDES_init(char FAR * session_key, CipherDESState FAR * state)
 {
-	DES_set_key((const_des_cblock FAR *) session_key, &state->k);
+	DES_set_key((const_DES_cblock FAR *) session_key, &state->k);
 	memset(state->ivec, 0, 8);
 }
 
