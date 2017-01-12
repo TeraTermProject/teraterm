@@ -85,6 +85,7 @@ int ssh_dss_verify(DSA *key,
 	unsigned int len, dlen;
 	int ret = -1;
 	char *ptr;
+	BIGNUM *r, *s;
 
 	OpenSSL_add_all_digests();
 
@@ -125,12 +126,13 @@ int ssh_dss_verify(DSA *key,
 	/* parse signature */
 	if ((sig = DSA_SIG_new()) == NULL)
 		return -5;
-	if ((sig->r = BN_new()) == NULL)
+	if ((r = BN_new()) == NULL)
 		return -6;
-	if ((sig->s = BN_new()) == NULL)
+	if ((s = BN_new()) == NULL)
 		return -7;
-	BN_bin2bn(sigblob, INTBLOB_LEN, sig->r);
-	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, sig->s);
+	DSA_SIG_set0(sig, r, s);
+	BN_bin2bn(sigblob, INTBLOB_LEN, r);
+	BN_bin2bn(sigblob+ INTBLOB_LEN, INTBLOB_LEN, s);
 
 	/* sha1 the data */
 	EVP_DigestInit(md, evp_md);
@@ -1595,6 +1597,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		const EVP_MD *evp_md = EVP_sha1();
 		u_char digest[EVP_MAX_MD_SIZE], sigblob[SIGBLOB_LEN];
 		u_int rlen, slen, len, dlen;
+		BIGNUM *bignum_r, *bignum_s;
 
 		// ダイジェストの計算
 		EVP_DigestInit(md, evp_md);
@@ -1609,15 +1612,16 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		}
 
 		// BIGNUMからバイナリ値への変換
-		rlen = BN_num_bytes(sig->r);
-		slen = BN_num_bytes(sig->s);
+		DSA_SIG_get0(sig, &bignum_r, &bignum_s);
+		rlen = BN_num_bytes(bignum_r);
+		slen = BN_num_bytes(bignum_s);
 		if (rlen > INTBLOB_LEN || slen > INTBLOB_LEN) {
 			DSA_SIG_free(sig);
 			goto error;
 		}
 		memset(sigblob, 0, SIGBLOB_LEN);
-		BN_bn2bin(sig->r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
-		BN_bn2bin(sig->s, sigblob+ SIGBLOB_LEN - slen);
+		BN_bn2bin(bignum_r, sigblob+ SIGBLOB_LEN - INTBLOB_LEN - rlen);
+		BN_bn2bin(bignum_s, sigblob+ SIGBLOB_LEN - slen);
 		DSA_SIG_free(sig);
 
 		// setting
