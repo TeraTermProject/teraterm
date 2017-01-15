@@ -347,6 +347,7 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	unsigned int len, dlen;
 	int ret, nid = NID_undef;
 	char *ptr;
+	BIGNUM *r, *s;
 
 	OpenSSL_add_all_digests();
 
@@ -375,13 +376,14 @@ int ssh_ecdsa_verify(EC_KEY *key, ssh_keytype keytype,
 	/* parse signature */
 	if ((sig = ECDSA_SIG_new()) == NULL)
 		return -4;
-	if ((sig->r = BN_new()) == NULL)
+	if ((r = BN_new()) == NULL)
 		return -5;
-	if ((sig->s = BN_new()) == NULL)
+	if ((s = BN_new()) == NULL)
 		return -6;
+	ECDSA_SIG_set0(sig, r, s);
 
-	buffer_get_bignum2(&sigblob, sig->r);
-	buffer_get_bignum2(&sigblob, sig->s);
+	buffer_get_bignum2(&sigblob, r);
+	buffer_get_bignum2(&sigblob, s);
 	if (sigblob != ptr) {
 		return -7;
 	}
@@ -1649,6 +1651,7 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 		u_char digest[EVP_MAX_MD_SIZE];
 		u_int len, dlen, nid;
 		buffer_t *buf2 = NULL;
+		BIGNUM *br, *bs;
 
 		nid = keytype_to_hash_nid(keypair->type);
 		if ((evp_md = EVP_get_digestbynid(nid)) == NULL) {
@@ -1670,8 +1673,9 @@ BOOL generate_SSH2_keysign(Key *keypair, char **sigptr, int *siglen, char *data,
 			// TODO: error check
 			goto error;
 		}
-		buffer_put_bignum2(buf2, sig->r);
-		buffer_put_bignum2(buf2, sig->s);
+		ECDSA_SIG_get0(sig, &br, &bs);
+		buffer_put_bignum2(buf2, br);
+		buffer_put_bignum2(buf2, bs);
 		ECDSA_SIG_free(sig);
 
 		s = get_sshname_from_key(keypair);
