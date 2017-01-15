@@ -1043,7 +1043,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 	case KEY_RSA:
 	{
 		char *pubkey_type, *pub, *pri;
-		BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
 		pub = pubkey->buf;
 		pri = prikey->buf;
@@ -1407,7 +1407,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	switch (result->type) {
 	case KEY_RSA:
 	{
-		BIGNUM *e, *n, *d, *dmp1, *dmq1, *iqmp, *p, *q;
+		BIGNUM *e, *n, *d, *iqmp, *p, *q;
 
 		result->rsa = RSA_new();
 		if (result->rsa == NULL) {
