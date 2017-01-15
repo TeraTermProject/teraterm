@@ -1,7 +1,12 @@
+rem 
+rem [no-capieng]
+rem CAPIエンジン(engines/e_capi.c)はCrypt32.lib(XP以降)を利用するため、除外する。
+rem 
+
 cd openssl
 
 if exist "out32.dbg\libcrypto.lib" goto build_dbg_end
-perl Configure no-asm no-async VC-WIN32 --debug
+perl Configure no-asm no-async no-shared no-capieng VC-WIN32 --debug
 perl -e "open(IN,'makefile');while(<IN>){s| /MDd| /MTd|;print $_;}close(IN);" > makefile.tmp
 if exist "makefile.dbg" del makefile.dbg
 ren makefile.tmp makefile.dbg
@@ -13,7 +18,7 @@ move libssl.lib out32.dbg
 :build_dbg_end
 
 if exist "out32\libcrypto.lib" goto build_end
-perl Configure no-asm no-async VC-WIN32
+perl Configure no-asm no-async no-shared no-capieng VC-WIN32
 perl -e "open(IN,'makefile');while(<IN>){s| /MD| /MT|;print $_;}close(IN);" > makefile.tmp
 if exist "makefile" del makefile
 ren makefile.tmp makefile
