@@ -3833,7 +3833,7 @@ static int ssh1_3des_init(EVP_CIPHER_CTX *ctx, const u_char *key, const u_char *
 	if (key == NULL)
 		return (1);
 	if (enc == -1)
-		enc = ctx->encrypt;
+		enc = EVP_CIPHER_CTX_encrypting(ctx); 
 	k1 = k2 = k3 = (u_char *) key;
 	k2 += 8;
 	if (EVP_CIPHER_CTX_key_length(ctx) >= 16+8) {
@@ -3906,14 +3906,14 @@ void ssh1_3des_iv(EVP_CIPHER_CTX *evp, int doset, u_char *iv, int len)
 
 	if (doset) {
 		//debug3("%s: Installed 3DES IV", __func__);
-		memcpy(c->k1.iv, iv, 8);
-		memcpy(c->k2.iv, iv + 8, 8);
-		memcpy(c->k3.iv, iv + 16, 8);
+		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k1), iv, 8);
+		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k2), iv + 8, 8);
+		memcpy(EVP_CIPHER_CTX_iv_noconst(c->k3), iv + 16, 8);
 	} else {
 		//debug3("%s: Copying 3DES IV", __func__);
-		memcpy(iv, c->k1.iv, 8);
-		memcpy(iv + 8, c->k2.iv, 8);
-		memcpy(iv + 16, c->k3.iv, 8);
+		memcpy(iv, EVP_CIPHER_CTX_iv(c->k1), 8);
+		memcpy(iv + 8, EVP_CIPHER_CTX_iv(c->k2), 8);
+		memcpy(iv + 16, EVP_CIPHER_CTX_iv(c->k3), 8);
 	}
 }
 
