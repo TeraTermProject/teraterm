@@ -1451,7 +1451,9 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 			return;
 		}
 	}
-	if (EVP_CipherInit(evp, NULL, (u_char *)key, NULL, -1) == 0) {
+	// OpenSSL 1.1.0では、EVP_CipherInit関数は毎度以前の設定をクリアするため、
+	// EVP_CipherInit関数がエラーするため、代替としてEVP_CipherInit_ex関数を使う。
+	if (EVP_CipherInit_ex(evp, NULL, NULL, (u_char *)key, NULL, -1) == 0) {
 		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
 		                  "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
