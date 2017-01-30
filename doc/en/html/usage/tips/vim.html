@@ -63,10 +63,10 @@ let &amp;t_EI .= "\e[1 q"
 
 
 <h2><a name="Bracketed">Auto indent can be disabled on pasting from clipboard</a></h2>
-<!-- p class="notice">
-注: Vim 8.0.0238 より Vim 本体で Bracketed Paste Mode に対応した為、下記の設定を追加しなくても貼り付け時には自動インデントや補完等が無効になります。<br>
-しかし、tmux 利用時には Bracketed Paste Mode が有効にならないので、tmux を併用する場合は依然として下記の設定が必要になります。
-</p -->
+<p class="notice">
+NOTE: When text is pasted by using Vim 8.0.0238 or later , auto indent and completion are disabled not below configuration becasue the vim editor supports Bracketed Paste Mode. <br>
+However, when tmux is used, below configuration is needed because Bracketed Paste Mode is not enabled.
+</p>
 
 <p>
 Basically, the host application can not recognize the difference between the user input and pasting from clipboard.
@@ -79,12 +79,9 @@ The vim configuration is described below. The following will use xterm's bracket
 
 <pre class="macro-example">
 if has("patch-8.0.0238")
-<!--
-    " Bracketed Paste Mode対応バージョン(8.0.0238以降)では、特に設定しない
-    " 場合はTERMがxtermの時のみBracketed Paste Modeが使われる。
-    " tmux利用時はTERMがscreenなので、Bracketed Paste Modeを利用するには
-    " 以下の設定が必要となる。
--->
+    " When below configuration is not set by using Bracketed Paste Mode supporting version(8.0.0238 or later),
+    " the Bracketed Paste Mode is used while TERM is xterm.
+    " When tmux is used, below configuration is needed because TERM is screen.
     if &amp;term =~ "screen"
         let &amp;t_BE = "\e[?2004h"
         let &amp;t_BD = "\e[?2004l"
@@ -92,18 +89,14 @@ if has("patch-8.0.0238")
         exec "set t_PE=\e[201~"
     endif
 else
-<!--
-    " 8.0.0210 ～ 8.0.0237 ではVim本体でのBracketed Paste Mode対応の挙動が
-    " 望ましくない(自動インデントが無効にならない)ので、Vim本体側での対応を
-    " 無効にする。
--->
+    " The Bracketed Paste Mode motion of Vim core will not work well, 
+    " auto indent does not become to disabling, with Vim from 8.0.0210 to 8.0.0237 version.
+    " So, Vim core function is disabled.
     if has("patch-8.0.0210")
         set t_BE=
     endif
 
-<!--
-    " Vim本体がBracketed Paste Modeに対応していない時の為の設定。
--->
+    " When Vim core does not support Bracketed Paste Mode, below configuration works.
     if &amp;term =~ "xterm" || &amp;term =~ "screen"
         let &amp;t_ti .= "\e[?2004h"
         let &amp;t_te .= "\e[?2004l"
