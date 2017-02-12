@@ -304,7 +304,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	n = get_bignum(keyfile_data + N_index);
 	e = get_bignum(keyfile_data + E_index);
 	d = get_bignum(keyfile_data + D_index);
-	RSA_set0_key(key, e, n, d);
+	RSA_set0_key(key, n, e, d);
 	p = get_bignum(keyfile_data + P_index);
 	q = get_bignum(keyfile_data + Q_index);
 	RSA_set0_factors(key, p, q);
@@ -1063,7 +1063,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		e = BN_new();
 		n = BN_new();
 		d = BN_new();
-		RSA_set0_key(result->rsa, e, n, d);
+		RSA_set0_key(result->rsa, n, e, d);
 
 		p = BN_new();
 		q = BN_new();
@@ -1417,7 +1417,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		e = BN_new();
 		n = BN_new();
 		d = BN_new();
-		RSA_set0_key(result->rsa, e, n, d);
+		RSA_set0_key(result->rsa, n, e, d);
 
 		p = BN_new();
 		q = BN_new();

@@ -3670,7 +3670,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		pub = RSA_new();
 		n = BN_new();
 		e = BN_new();
-		RSA_set0_key(pub, e, n, NULL);
+		RSA_set0_key(pub, n, e, NULL);
 		if (n == NULL || e == NULL) {
 			RSA_free(pub);
 			goto error;
