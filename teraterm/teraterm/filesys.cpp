@@ -331,6 +331,8 @@ void ConvertLogname(char *c, int destlen)
 {
 	char buf[MAXPATHLEN], buf2[MAXPATHLEN], *p = c;
 	char tmphost[1024];
+	char tmpuser[256+1];
+	DWORD len_user = sizeof(tmpuser);
 
 	memset(buf, 0, sizeof(buf));
 
@@ -361,6 +363,11 @@ void ConvertLogname(char *c, int destlen)
 						_snprintf_s(port, sizeof(port), _TRUNCATE, "%d", ts.TCPPort);
 						strncat_s(buf,sizeof(buf),port,_TRUNCATE);
 					}
+				}
+				break;
+			  case 'u':
+				if (GetUserName(tmpuser, &len_user) != 0) {
+					strncat_s(buf,sizeof(buf),tmpuser,_TRUNCATE);
 				}
 				break;
 			  default:
