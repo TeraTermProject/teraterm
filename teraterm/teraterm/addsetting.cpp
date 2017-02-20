@@ -553,19 +553,20 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 	// (2)DisablePasteMouseRButton
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_PASTE_RBUTTON);
 	btn2 = (CButton *)GetDlgItem(IDC_CONFIRM_PASTE_RBUTTON);
-	btn->SetCheck(ts.DisablePasteMouseRButton);
-	if (ts.DisablePasteMouseRButton) {
+	if (ts.PasteFlag & CPF_DISABLE_RBUTTON) {
+		btn->SetCheck(BST_CHECKED);
 		btn2->EnableWindow(FALSE);
 	} else {
+		btn->SetCheck(BST_UNCHECKED);
 		btn2->EnableWindow(TRUE);
 	}
 
 	// (3)ConfirmPasteMouseRButton
-	btn2->SetCheck(ts.ConfirmPasteMouseRButton);
+	btn2->SetCheck((ts.PasteFlag & CPF_CONFIRM_RBUTTON)?BST_CHECKED:BST_UNCHECKED);
 
 	// (4)DisablePasteMouseMButton
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_PASTE_MBUTTON);
-	btn->SetCheck(ts.DisablePasteMouseMButton);
+	btn->SetCheck((ts.PasteFlag & CPF_DISABLE_MBUTTON)?BST_CHECKED:BST_UNCHECKED);
 
 	// (5)SelectOnlyByLButton
 	btn = (CButton *)GetDlgItem(IDC_SELECT_LBUTTON);
@@ -573,17 +574,17 @@ BOOL CCopypastePropPageDlg::OnInitDialog()
 
 	// (6)TrimTrailingNLonPaste
 	btn = (CButton *)GetDlgItem(IDC_TRIMNLCHAR);
-	btn->SetCheck(ts.TrimTrailingNLonPaste);
+	btn->SetCheck((ts.PasteFlag & CPF_TRIM_TRAILING_NL)?BST_CHECKED:BST_UNCHECKED);
 
 	// (7)ConfirmChangePaste
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
-	btn->SetCheck(ts.ConfirmChangePaste);
+	btn->SetCheck((ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE)?BST_CHECKED:BST_UNCHECKED);
 
 	// ファイルパス
 	SetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
 	edit = (CEdit *)GetDlgItem(IDC_CONFIRM_STRING_FILE);
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_STRING_FILE_PATH);
-	if (ts.ConfirmChangePaste) {
+	if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) {
 		edit->EnableWindow(TRUE);
 		btn->EnableWindow(TRUE);
 	} else {
@@ -672,15 +673,30 @@ void CCopypastePropPageDlg::OnOK()
 
 	// (2)
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_PASTE_RBUTTON);
-	ts.DisablePasteMouseRButton = btn->GetCheck();
+	if (btn->GetCheck()) {
+		ts.PasteFlag |= CPF_DISABLE_RBUTTON;
+	}
+	else {
+		ts.PasteFlag &= ~CPF_DISABLE_RBUTTON;
+	}
 
 	// (3)
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_PASTE_RBUTTON);
-	ts.ConfirmPasteMouseRButton = btn->GetCheck();
+	if (btn->GetCheck()) {
+		ts.PasteFlag |= CPF_CONFIRM_RBUTTON;
+	}
+	else {
+		ts.PasteFlag &= ~CPF_CONFIRM_RBUTTON;
+	}
 
 	// (4)
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_PASTE_MBUTTON);
-	ts.DisablePasteMouseMButton = btn->GetCheck();
+	if (btn->GetCheck()) {
+		ts.PasteFlag |= CPF_DISABLE_MBUTTON;
+	}
+	else {
+		ts.PasteFlag &= ~CPF_DISABLE_MBUTTON;
+	}
 
 	// (5)
 	btn = (CButton *)GetDlgItem(IDC_SELECT_LBUTTON);
@@ -688,11 +704,21 @@ void CCopypastePropPageDlg::OnOK()
 
 	// (6)
 	btn = (CButton *)GetDlgItem(IDC_TRIMNLCHAR);
-	ts.TrimTrailingNLonPaste = btn->GetCheck();
+	if (btn->GetCheck()) {
+		ts.PasteFlag |= CPF_TRIM_TRAILING_NL;
+	}
+	else {
+		ts.PasteFlag &= ~CPF_TRIM_TRAILING_NL;
+	}
 
 	// (7)IDC_CONFIRM_CHANGE_PASTE
 	btn = (CButton *)GetDlgItem(IDC_CONFIRM_CHANGE_PASTE);
-	ts.ConfirmChangePaste = btn->GetCheck();
+	if (btn->GetCheck()) {
+		ts.PasteFlag |= CPF_CONFIRM_CHANGEPASTE;
+	}
+	else {
+		ts.PasteFlag &= ~CPF_CONFIRM_CHANGEPASTE;
+	}
 	GetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
 
 	// (8)

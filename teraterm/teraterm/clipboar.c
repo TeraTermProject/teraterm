@@ -146,7 +146,7 @@ void CBStartSend(PCHAR DataPtr, int DataSize, BOOL EchoOnly)
 // クリップボードバッファの末尾にある CR / LF をすべて削除する
 BOOL TrimTrailingNL(BOOL AddCR, BOOL Bracketed) {
 	PCHAR tail;
-	if (ts.TrimTrailingNLonPaste) {
+	if (ts.PasteFlag & CPF_TRIM_TRAILING_NL) {
 		for (tail = CBMemPtr+strlen(CBMemPtr)-1; tail >= CBMemPtr; tail--) {
 			if (*tail != '\r' && *tail != '\n') {
 				break;
@@ -205,7 +205,7 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	int ret = IDOK;
 	BOOL confirm = FALSE;
 
-	if (!ts.ConfirmChangePaste) {
+	if ((ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) == 0) {
 		return TRUE;
 	}
 
@@ -225,7 +225,7 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
  */
 
 	if (AddCR) {
-		if (ts.ConfirmChangePasteCR) {
+		if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE_CR) {
 			confirm = TRUE;
 		}
 	}

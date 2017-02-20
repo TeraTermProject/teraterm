@@ -1002,8 +1002,8 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 
 	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	if ((LMR == IdRightButton) &&
-		!ts.DisablePasteMouseRButton &&
-		ts.ConfirmPasteMouseRButton &&
+		(ts.PasteFlag & CPF_DISABLE_RBUTTON) == 0 &&
+		(ts.PasteFlag & CPF_CONFIRM_RBUTTON) != 0 &&
 		cv.Ready &&
 		!mousereport &&
 		(SendVar==NULL) && (FileVar==NULL) &&
@@ -2357,7 +2357,7 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 	}
 
 	// added DisablePasteMouseMButton (2008.3.2 maya)
-	if (ts.DisablePasteMouseMButton || mousereport) {
+	if ((ts.PasteFlag & CPF_DISABLE_MBUTTON) || mousereport) {
 		ButtonUp(FALSE);
 	}
 	else {
@@ -2538,12 +2538,12 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 
 	/*
 	 *  ペースト条件:
-	 *  ・ts.DisableMouseRButton      -> 右ボタンによるペースト無効
-	 *  ・ts.ConfirmPasteMouseRButton -> 表示されたメニューからペーストを行うので、
-	 *                                   右ボタンアップによるペーストは行わない
-	 *  ・mousereport                 -> マウストラッキング中はペーストを行わない
+	 *  ・ts.PasteFlag & CPF_DISABLE_RBUTTON -> 右ボタンによるペースト無効
+	 *  ・ts.PasteFlag & CPF_CONFIRM_RBUTTON -> 表示されたメニューからペーストを行うので、
+	 *                                          右ボタンアップによるペーストは行わない
+	 *  ・mousereport                        -> マウストラッキング中はペーストを行わない
 	 */
-	if (ts.DisablePasteMouseRButton || ts.ConfirmPasteMouseRButton || mousereport) {
+	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON) || mousereport) {
 		ButtonUp(FALSE);
 	} else {
 		ButtonUp(TRUE);
