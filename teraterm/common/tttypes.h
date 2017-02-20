@@ -298,6 +298,7 @@ typedef TCharAttr *PCharAttr;
 #define CPF_CONFIRM_CHANGEPASTE    0x0010
 #define CPF_CONFIRM_CHANGEPASTE_CR 0x0020
 #define CPF_TRIM_TRAILING_NL       0x0100
+#define CPF_NORMALIZE_LINEBREAK    0x0200
 
 // Title Reporting Type
 #define IdTitleReportIgnore 0
@@ -1085,6 +1086,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.94, ttset_memfilemap was replaced with ttset_memfilemap_30.
+ *   paste related settings are integrated into tttset.PasteFlag
+ *
  * - At version 4.92, ttset_memfilemap was replaced with ttset_memfilemap_29.
  *   added tttset.TrimTrailingNLonPaste
  *
@@ -1260,4 +1264,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_29"
+#define TT_FILEMAPNAME "ttset_memfilemap_30"

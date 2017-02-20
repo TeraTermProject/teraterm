@@ -158,6 +158,96 @@ BOOL TrimTrailingNL(BOOL AddCR, BOOL Bracketed) {
 	return TRUE;
 }
 
+// 改行を CR+LF に正規化する
+BOOL NormalizeLineBreak(BOOL AddCR, BOOL Bracketed) {
+	char *p, *p2;
+	unsigned int len, need_len, alloc_len;
+	HGLOBAL TmpHandle;
+
+	if (!(ts.PasteFlag & CPF_NORMALIZE_LINEBREAK)) {
+		return TRUE;
+	}
+
+	p = CBMemPtr;
+
+	// 貼り付けデータの長さ(len)、および正規化後のデータの長さ(need_len)のカウント
+	for (len=0, need_len=0, p=CBMemPtr; *p != '\0'; p++, len++, need_len++) {
+		if (*p == CR) {
+			need_len++;
+			if (*(p+1) == LF) {
+				len++;
+				p++;
+			}
+		}
+		else if (*p == LF) {
+			need_len++;
+		}
+	}
+
+	// 正規化後もデータ長が変わらない => 正規化は必要なし
+	if (need_len == len) {
+		return TRUE;
+	}
+
+	// AddCR / Bracketed の時はその分のバッファも計算に入れる
+	// あまりここではやりたくないんだけれど
+	alloc_len = need_len + 1;
+	if (AddCR) {
+		alloc_len++;
+	}
+	if (Bracketed) {
+		// 手抜き
+		alloc_len += 12;
+	}
+
+	// バッファサイズが正規化後に必要となる値より小さい場合はバッファを確保し直す
+	if (GlobalSize(CBMemHandle) < alloc_len) {
+		GlobalUnlock(CBMemHandle);
+		CBMemPtr = NULL;
+		if ((TmpHandle = GlobalReAlloc(CBMemHandle, alloc_len, 0)) == NULL) {
+			// メモリ再割り当て失敗
+			CBMemPtr = GlobalLock(CBMemHandle);
+
+			// とりあえず正規化なしで貼り付ける事にする
+			return TRUE;
+		}
+		CBMemHandle = TmpHandle;
+		CBMemPtr = GlobalLock(CBMemHandle);
+	}
+
+	p = CBMemPtr + len - 1;
+	p2 = CBMemPtr + need_len;
+	*p2-- = '\0';
+
+	while (len > 0 && p < p2) {
+		if (*p == LF) {
+			*p2-- = *p--;
+			if (--len == 0) {
+				*p2 = CR;
+				break;
+			}
+			if (*p != CR) {
+				*p2-- = CR;
+				if (p2 <= p) {
+					break;
+				}
+				else {
+					continue;
+				}
+			}
+		}
+		else if (*p == CR) {
+			*p2-- = LF;
+			if (p == p2)
+				break;
+		}
+		*p2-- = *p--;
+		len--;
+	}
+
+	return TRUE;
+}
+
 // ファイルに定義された文字列が、textに含まれるかを調べる。
 BOOL search_dict(char *filename, char *text)
 {
@@ -356,6 +446,11 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	// 貼り付け前にクリップボードの内容を確認/加工等する場合はここで行う
 
 	if (!TrimTrailingNL(AddCR, Bracketed)) {
+		CBEndPaste();
+		return;
+	}
+
+	if (!NormalizeLineBreak(AddCR, Bracketed)) {
 		CBEndPaste();
 		return;
 	}

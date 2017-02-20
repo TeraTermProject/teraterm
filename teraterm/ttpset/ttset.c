@@ -1923,6 +1923,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "TrimTrailingNLonPaste", FName, FALSE))
 		ts->PasteFlag |= CPF_TRIM_TRAILING_NL;
 
+	// Normalize line break when pasting
+	if (GetOnOff(Section, "NormalizeLineBreakOnPaste", FName, FALSE))
+		ts->PasteFlag |= CPF_NORMALIZE_LINEBREAK;
+
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
 }
@@ -3183,6 +3187,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Trim trailing new line character when pasting
 	WriteOnOff(Section, "TrimTrailingNLonPaste", FName,
 		(WORD) (ts->PasteFlag & CPF_TRIM_TRAILING_NL));
+
+	// Normalize line break when pasting
+	WriteOnOff(Section, "NormalizeLineBreakOnPaste", FName,
+		(WORD) (ts->PasteFlag & CPF_NORMALIZE_LINEBREAK));
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
