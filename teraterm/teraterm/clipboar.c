@@ -392,6 +392,7 @@ void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 
 	if (AddCR) {
 		CBMemPtr[StrLen++] = '\r';
+		CBMemPtr[StrLen++] = 0;
 	}
 
 	if (Bracketed) {
