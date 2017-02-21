@@ -36,17 +36,17 @@
   <li>Changes
     <ul>
       <li>added `&amp;u' parameter to log file name that can convert the logon user name.</li>
-      <!-- li>貼り付け時に改行を正規化する機能を追加した。デフォルトでは無効。
+      <li>added new line normalization on pasting. The default is off.
         <ul>
-          <li><a href="../menu/setup-additional.html#NormalizeLineBreak">Additional settingsダイアログ</a>のCopy and Paste タブで設定を有効化できるようにした。</li>
-        </ul></li -->
+          <li>This feature can be enabled on Copy and Paste tab of <a href="../menu/setup-additional.html#NormalizeLineBreak">Additional settings dialog</a>.</li>
+        </ul></li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
       <li>When Restore setup is called, the AlphaBlend can not be restored immediately.</li>
-      <!-- li>貼り付け&lt;CR&gt;で、データの末尾にゴミが付く問題を修正した。</li -->
+      <li>When Paste&lt;CR&gt; works, the end of data will be added invalid character.</li>
     </ul>
   </li>
 
@@ -55,7 +55,7 @@
       <li>upgraded TTSSH to <a href="#ttssh_2.80">2.80</a></li>
       <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.03">1.03</a></li>
       <li>upgraded Oniguruma to 6.1.3.</li>
-      <!-- li>LogMeTT, TTLEditor のインストーラの起動方法を変更した。</li -->
+      <li>changed starting method of LogMeTT and TTLEditor installer.</li>
     </ul>
   </li>
 </ul>
@@ -4542,7 +4542,7 @@ SYNOPSIS:
 <h2><a name="ttyrec">TTXttyrec</a></h2>
 <h3><a name="ttyrec_1.03">2017.x.xx (Ver 1.03)</a></h3>
 <ul class="history">
-  <!-- li>再生終了後、再度再生する為の [Replay again] を [File] メニューに追加するようにした。</li -->
+  <li>added [Replay again] entry under [File] menu that can replay again after one relaying.</li>
 </ul>
 
 <h3><a name="ttyrec_1.02">2010.2.20 (Ver 1.02)</a></h3>
