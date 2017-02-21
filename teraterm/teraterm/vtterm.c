@@ -4921,7 +4921,7 @@ BOOL CheckKanji(BYTE b)
 
 	ConvJIS = FALSE;
 
-	if (ts.KanjiCode==IdSJIS) {
+	if (ts.KanjiCode==IdSJIS || ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m) {
 		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
 			return TRUE; // SJIS kanji
 		}
