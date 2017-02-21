@@ -20,6 +20,7 @@
 
 #define ORDER 6001
 #define ID_MENU_REPLAY 55302
+#define ID_MENU_AGAIN  55303
 
 #define BUFFSIZE 2000
 
@@ -42,6 +43,7 @@ typedef struct {
 	BOOL enable;
 	BOOL ChangeTitle;
 	BOOL ReplaceHostDlg;
+	BOOL played;
 	HMENU FileMenu;
 	HMENU ControlMenu;
 	int maxwait;
@@ -107,6 +109,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 	pvar->enable = FALSE;
 	pvar->ChangeTitle = FALSE;
 	pvar->ReplaceHostDlg = FALSE;
+	pvar->played = FALSE;
 	gettimeofday(&(pvar->last), NULL);
 	pvar->wait.tv_sec = 0;
 	pvar->wait.tv_usec = 1;
@@ -315,6 +318,7 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
 	if (pvar->enable) {
 		RestoreOLDTitle();
 		pvar->enable = FALSE;
+		pvar->played = TRUE;
 	}
 }
 
@@ -328,6 +332,9 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 		flag |= MF_GRAYED;
 	}
 	InsertMenu(pvar->FileMenu, ID_FILE_PRINT2, flag, ID_MENU_REPLAY, "TTY R&eplay");
+	if (pvar->played) {
+		InsertMenu(pvar->FileMenu, ID_FILE_PRINT2, flag, ID_MENU_AGAIN, "Replay again");
+	}
 	InsertMenu(pvar->FileMenu, ID_FILE_PRINT2, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
 //	InsertMenu(menu, ID_HELPMENU, MF_ENABLED, ID_MENU_REPLAY, "&t");
@@ -395,6 +402,16 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 				// Call New-Connection dialog
 				SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 			}
+		}
+		return 1;
+	case ID_MENU_AGAIN:
+		if (pvar->played) {
+			// Clear Buffer
+			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_EDIT_CLEARBUFFER, 0), 0);
+			pvar->played = FALSE;
+			pvar->ReplaceHostDlg = TRUE;
+			// Call New-Connection dialog
+			SendMessage(hWin, WM_COMMAND, MAKELONG(ID_FILE_NEWCONNECTION, 0), 0);
 		}
 		return 1;
 	}
