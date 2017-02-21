@@ -506,7 +506,7 @@ struct tttset {
 	char LogDefaultPath[MAX_PATH];
 	WORD LogAutoStart;
 	unsigned int PasteFlag;
-	WORD Dummy1;		// ‹ŒConfirmPasteMouseRButton. PasteFlag‚É“‡‚µ‚½‚½‚ß”p~B‘¼‚Ö“]—p
+	WORD FallbackToCP932;	// ConfirmPasteMouseRButton ‚ª”p~‚É‚È‚Á‚½‚Ì‚Å“]—p
 	WORD DisableAcceleratorSendBreak;
 	int EnableClickableUrl;
 	eterm_lookfeel_t EtermLookfeel;

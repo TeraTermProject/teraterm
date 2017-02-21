@@ -1927,6 +1927,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "NormalizeLineBreakOnPaste", FName, FALSE))
 		ts->PasteFlag |= CPF_NORMALIZE_LINEBREAK;
 
+
+	// Fallback to CP932 (Experimental)
+	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
+
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
 }

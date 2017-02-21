@@ -4929,7 +4929,8 @@ BOOL CheckKanji(BYTE b)
 
 	ConvJIS = FALSE;
 
-	if (ts.KanjiCode==IdSJIS || ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m) {
+	if (ts.KanjiCode==IdSJIS ||
+	   (ts.FallbackToCP932 && (ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m))) {
 		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
 			Fallbacked = TRUE;
 			return TRUE; // SJIS kanji
@@ -5325,7 +5326,7 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 
 	locptr = setlocale(LC_ALL, ts.Locale);
 
-	if (Fallbacked) {
+	if (ts.FallbackToCP932 && Fallbacked) {
 		ParseFirstJP(b);
 		return;
 	}
