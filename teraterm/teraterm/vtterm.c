@@ -132,6 +132,7 @@ static BOOL SSflag;
 /* JIS -> SJIS conversion flag */
 static BOOL ConvJIS;
 static WORD Kanji;
+static BOOL Fallbacked;
 
 // variables for status line mode
 static int StatusX=0;
@@ -342,6 +343,7 @@ void ResetCharSet()
   EUCsupIn = FALSE;
   SSflag = FALSE;
   ConvJIS = FALSE;
+  Fallbacked = FALSE;
 
   cv.Language = ts.Language;
   cv.CRSend = ts.CRSend;
@@ -512,6 +514,8 @@ void CarriageReturn(BOOL logFlag)
 		MoveCursor(CursorLeftM, CursorY);
 	else if (CursorX < CursorLeftM)
 		MoveCursor(0, CursorY);
+
+	Fallbacked = FALSE;
 }
 
 void LineFeed(BYTE b, BOOL logFlag)
@@ -537,6 +541,8 @@ void LineFeed(BYTE b, BOOL logFlag)
 #endif /* NO_COPYLINE_FIX */
 
 	if (LFMode) CarriageReturn(logFlag);
+
+	Fallbacked = FALSE;
 }
 
 void Tab()
@@ -1801,6 +1807,7 @@ void CSMoveToLineN()		// VPA
 		else
 			MoveCursor(CursorX,Param[1]-1);
 	}
+	Fallbacked = FALSE;
 }
 
 void CSMoveToXY()		// CUP / HVP
@@ -1831,6 +1838,7 @@ void CSMoveToXY()		// CUP / HVP
 	}
 
 	MoveCursor(NewX, NewY);
+	Fallbacked = FALSE;
 }
 
 void CSDeleteTabStop()
@@ -4923,6 +4931,7 @@ BOOL CheckKanji(BYTE b)
 
 	if (ts.KanjiCode==IdSJIS || ts.KanjiCode==IdUTF8 || ts.KanjiCode==IdUTF8m) {
 		if ((0x80<b) && (b<0xa0) || (0xdf<b) && (b<0xfd)) {
+			Fallbacked = TRUE;
 			return TRUE; // SJIS kanji
 		}
 		if ((0xa1<=b) && (b<=0xdf)) {
@@ -5315,6 +5324,11 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 	char *locptr;
 
 	locptr = setlocale(LC_ALL, ts.Locale);
+
+	if (Fallbacked) {
+		ParseFirstJP(b);
+		return;
+	}
 
 	if ((b & 0x80) != 0x80 || ((b & 0xe0) == 0x80 && count == 0)) {
 		// 1バイト目および2バイト目がASCIIの場合は、すべてASCII出力とする。
