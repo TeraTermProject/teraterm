@@ -79,7 +79,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Disable TCPLocalEcho and TCPCRSend option</dd>
 
   <dt id="es">/ES</dt>
-  <dd>Enable displaying the "New connection" dialog on startup</dd>
+  <dd>Enable displaying the "<a href="../menu/file-new.html">New connection</a>" dialog on startup<br>
+      <!-- Tera Term はポートの種類が TCP/IP の場合に "New connection" ダイアログを表示しますが、<a href="../setup/teraterm-ini.html#HostDialogOnStartup">HostDialogOnStartup</a> を off にすることでダイアログを表示しないようにできます。/ES オプションは HostDialogOnStartup が off になっていても "New connection" ダイアログを表示させるために用います。<br>
+      Tera Term はポートの種類が Serial の場合には "New connection" ダイアログを表示しません。ポートの種類が Serial の場合に /ES オプションはなにも作用しません。 --></dd>
 
   <dt id="f">/F=&lt;setup file&gt;</dt>
   <dd>Setup file</a><br>
