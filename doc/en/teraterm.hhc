@@ -872,6 +872,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setflowctrl">
+					<param name="Local" value="html\macro\command\setflowctrl.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setmulticastname">
 					<param name="Local" value="html\macro\command\setmulticastname.html">
 					<param name="ImageNumber" value="11">

@@ -301,6 +301,7 @@
 #define HlpMacroCommandSetecho          92082
 #define HlpMacroCommandSetexitcode      92083
 #define HlpMacroCommandSetfileattr      92190
+#define HlpMacroCommandSetflowctrl      92215
 #define HlpMacroCommandSetMulticastName 92146
 #define HlpMacroCommandSetPassword      92196
 #define HlpMacroCommandSetrts           92136
