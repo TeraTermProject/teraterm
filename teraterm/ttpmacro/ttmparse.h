@@ -248,6 +248,7 @@
 #define RsvUptime		212
 #define RsvGetModemStatus	213
 #define RsvDirnameBox   214
+#define RsvSetFlowCtrl   215
 
 #define RsvOperator     1000
 #define RsvBNot         1001

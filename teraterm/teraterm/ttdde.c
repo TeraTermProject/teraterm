@@ -369,6 +369,7 @@ WORD HexStr2Word(PCHAR Str)
 #define CmdLogRotate    'W'
 #define CmdLogAutoClose 'X'
 #define CmdGetModemStatus 'Y'
+#define CmdSetFlowCtrl  'Z'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
@@ -924,6 +925,24 @@ scp_rcv_error:
 		}
 		}
 		break;
+
+	case CmdSetFlowCtrl:
+		{
+		int val;
+
+		if (!cv.Open || cv.PortType != IdSerial)
+			return DDE_FNOTPROCESSED;
+
+		val = atoi(ParamFileName);
+		switch(val) {
+			case 1:
+			case 2:
+			case 3:
+				ts.Flow = val;
+				break;
+		}
+		break;
+		}
 
 	case CmdSetRts:  // add 'setrts' (2008.3.12 maya)
 		{
