@@ -5327,8 +5327,7 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 	locptr = setlocale(LC_ALL, ts.Locale);
 
 	if (ts.FallbackToCP932 && Fallbacked) {
-		ParseFirstJP(b);
-		return;
+		return ParseFirstJP(b);
 	}
 
 	if ((b & 0x80) != 0x80 || ((b & 0xe0) == 0x80 && count == 0)) {
