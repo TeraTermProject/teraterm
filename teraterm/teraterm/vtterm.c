@@ -5050,19 +5050,29 @@ BOOL ParseFirstJP(BYTE b)
 		ParseControl(b);
 	}
 	else if (b==0x8E) { // SS2
-		if (ts.KanjiCode==IdEUC) {
+		switch (ts.KanjiCode) {
+		case IdEUC:
 			EUCkanaIn = TRUE;
-		}
-		else {
+			break;
+		case IdUTF8:
+		case IdUTF8m:
+			PutChar('?');
+			break;
+		default:
 			ParseControl(b);
 		}
 	}
 	else if (b==0x8F) { // SS3
-		if (ts.KanjiCode==IdEUC) {
+		switch (ts.KanjiCode) {
+		case IdEUC:
 			EUCcount = 2;
 			EUCsupIn = TRUE;
-		}
-		else {
+			break;
+		case IdUTF8:
+		case IdUTF8m:
+			PutChar('?');
+			break;
+		default:
 			ParseControl(b);
 		}
 	}
@@ -5183,6 +5193,8 @@ static void ParseASCII(BYTE b)
 		//Kanji = 0;
 		//PutKanji(b);
 		PutChar(b);
+	} else if ((b==0x8E) || (b==0x8F)) {
+		PutChar('?');
 	} else if ((b>=0x80) && (b<=0x9F)) {
 		ParseControl(b);
 	} else if (b>=0xA0) {
