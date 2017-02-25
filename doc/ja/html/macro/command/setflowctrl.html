@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>setflowctrl</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setflowctrl</h1>
+
+<p>
+シリアルポートのフロー制御を変更する。
+</p>
+
+<pre class="macro-syntax">
+setflowctrl &lt;value&gt;
+</pre>
+
+<h2>パラメータ</h2>
+
+<dl>
+	<dt class="macro">整数 &lt;value&gt;</dt>
+	<dd>以下のフラグにより、シリアルポートのフロー制御を指定する。
+
+<table>
+ <tr>
+  <th>値</th>
+  <th>意味</th>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Xon/Xoff</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>hardware</td>
+ </tr>
+ <tr>
+  <td>3</td>
+  <td>none</td>
+ </tr>
+</table>
+
+	</dd>
+</dl>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+; change flow control to "none"
+setflowctrl 3
+</pre>
+
+</body>
+</html>
