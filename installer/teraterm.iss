@@ -1,5 +1,5 @@
 #define AppName "Tera Term"
-#define AppVer "4.94-RC1"
+#define AppVer "4.94"
 ;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
@@ -27,7 +27,7 @@ Name: build.bat; Parameters: rebuild
 Name: makearchive.bat; Parameters: release
 
 [Setup]
-AppCopyright=(C) 2004-2016 TeraTerm Project
+AppCopyright=(C) 2004-2017 TeraTerm Project
 AppName={#AppName}
 #ifndef snapshot
 AppVerName={#AppName} {#AppVer}
