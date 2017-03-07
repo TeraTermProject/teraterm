@@ -2019,16 +2019,24 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 			SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)ts.ScpSendDir);
 
-			// キャンセルボタンをデフォルトにし、無意識にEnterキーを押下しても、何もしないようにする。
-			SetFocus(GetDlgItem(hDlgWnd, IDCANCEL));
-			PostMessage(GetDlgItem(hDlgWnd, IDCANCEL), WM_NEXTDLGCTL, 0, 0L) ;
-
 			// SSH2 接続ではない場合には "SCP" を無効化する。
 			if (cv.isSSH != 2) {
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE), FALSE);
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_STATIC), FALSE);
+
+				// フォーカスの初期状態を Cancel にする。
+				// 後で WM_NEXTDLGCTL を送るので、 Cancel の一つ前の Send file (IDOK) に
+				// フォーカスを当てる。(SCP は無効になっている為)
+				SetFocus(GetDlgItem(hDlgWnd, IDOK));
 			}
+			else {
+				// SSH2 接続時は SCP (IDC_DAD_SENDFILE) が一つ前
+				SetFocus(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE));
+			}
+
+			// フォーカスを次のボタン(Cancel)に移す
+			PostMessage(hDlgWnd, WM_NEXTDLGCTL, 0, 0L);
 
 			// TRUEにするとボタンにフォーカスが当たらない。
 			return FALSE;
