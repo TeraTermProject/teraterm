@@ -264,128 +264,8 @@ static int eat_to_end_of_pattern(char FAR * data)
 	return index;
 }
 
-// 
-// BASE64デコード処理を行う。(rfc1521)
-// srcバッファは null-terminate している必要あり。
-//
-int uudecode(unsigned char *src, int srclen, unsigned char *target, int targsize)
-{
-	char pad = '=';
-	int tarindex, state, ch;
-	char *pos;
-
-	state = 0;
-	tarindex = 0;
-
-	while ((ch = *src++) != '\0') {
-		if (isspace(ch))	/* Skip whitespace anywhere. */
-			continue;
-
-		if (ch == pad)
-			break;
-
-		pos = strchr(base64, ch);
-		if (pos == 0) 		/* A non-base64 character. */
-			return (-1);
-
-		switch (state) {
-		case 0:
-			if (target) {
-				if (tarindex >= targsize)
-					return (-1);
-				target[tarindex] = (pos - base64) << 2;
-			}
-			state = 1;
-			break;
-		case 1:
-			if (target) {
-				if (tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex]   |=  (pos - base64) >> 4;
-				target[tarindex+1]  = ((pos - base64) & 0x0f) << 4 ;
-			}
-			tarindex++;
-			state = 2;
-			break;
-		case 2:
-			if (target) {
-				if (tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex]   |=  (pos - base64) >> 2;
-				target[tarindex+1]  = ((pos - base64) & 0x03) << 6;
-			}
-			tarindex++;
-			state = 3;
-			break;
-		case 3:
-			if (target) {
-				if (tarindex >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - base64);
-			}
-			tarindex++;
-			state = 0;
-			break;
-		}
-	}
-
-	/*
-	 * We are done decoding Base-64 chars.  Let's see if we ended
-	 * on a byte boundary, and/or with erroneous trailing characters.
-	 */
-
-	if (ch == pad) {		/* We got a pad char. */
-		ch = *src++;		/* Skip it, get next. */
-		switch (state) {
-		case 0:		/* Invalid = in first position */
-		case 1:		/* Invalid = in second position */
-			return (-1);
-
-		case 2:		/* Valid, means one byte of info */
-			/* Skip any number of spaces. */
-			for (; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					break;
-			/* Make sure there is another trailing = sign. */
-			if (ch != pad)
-				return (-1);
-			ch = *src++;		/* Skip the = */
-			/* Fall through to "single trailing =" case. */
-			/* FALLTHROUGH */
-
-		case 3:		/* Valid, means two bytes of info */
-			/*
-			 * We know this char is an =.  Is there anything but
-			 * whitespace after it?
-			 */
-			for (; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					return (-1);
-
-			/*
-			 * Now make sure for cases 2 and 3 that the "extra"
-			 * bits that slopped past the last full byte were
-			 * zeros.  If we don't check them, they become a
-			 * subliminal channel.
-			 */
-			if (target && target[tarindex] != 0)
-				return (-1);
-		}
-	} else {
-		/*
-		 * We ended by seeing the end of the string.  Make sure we
-		 * have no partial bytes lying around.
-		 */
-		if (state != 0)
-			return (-1);
-	}
-
-	return (tarindex);
-}
-
-
 // SSH2鍵は BASE64 形式で格納されている
-static Key *parse_uudecode(char *data)
+static Key *parse_base64data(char *data)
 {
 	int count;
 	unsigned char *blob = NULL;
@@ -403,7 +283,7 @@ static Key *parse_uudecode(char *data)
 	// BASE64デコード
 	ch = data[count];
 	data[count] = '\0';  // ここは改行コードのはずなので書き潰しても問題ないはず
-	n = uudecode(data, count, blob, len);
+	n = b64decode(blob, len, data);
 	data[count] = ch;
 	if (n < 0) {
 		goto error;
@@ -593,8 +473,8 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 
 			index += eat_spaces(data + index);  // update index
 
-			// uudecode
-			key2 = parse_uudecode(data + index);
+			// base64 decode
+			key2 = parse_base64data(data + index);
 			if (key2 == NULL) {
 				return index + eat_to_end_of_line(data + index);
 			}
@@ -871,8 +751,8 @@ static int parse_hostkey_file(PTInstVar pvar, char FAR * hostname,
 
 			index += eat_spaces(data + index);  // update index
 
-			// uudecode
-			key = parse_uudecode(data + index);
+			// base64 decode
+			key = parse_base64data(data + index);
 			if (key == NULL) {
 				return index + eat_to_end_of_line(data + index);
 			}

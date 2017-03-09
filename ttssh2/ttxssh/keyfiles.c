@@ -393,7 +393,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 			break;
 	}
 
-	/* uudecode */
+	/* base64 decode */
 	m1len = sizeof(MARK_BEGIN) - 1;
 	m2len = sizeof(MARK_END) - 1;
 	cp = buffer_ptr(blob);
@@ -422,18 +422,18 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 		goto error;
 	}
 
-	// ファイルのスキャンが終わったので、uudecodeする。
+	// ファイルのスキャンが終わったので、base64 decodeする。
 	len = buffer_len(encoded);
 	if ((cp = buffer_append_space(copy_consumed, len)) == NULL) {
 		//error("%s: buffer_append_space", __func__);
 		goto error;
 	}
-	if ((dlen = uudecode(buffer_ptr(encoded), buffer_len(encoded), cp, len)) < 0) {
-		//error("%s: uudecode failed", __func__);
+	if ((dlen = b64decode(cp, len, buffer_ptr(encoded))) < 0) {
+		//error("%s: base64 decode failed", __func__);
 		goto error;
 	}
 	if ((unsigned int)dlen > len) {
-		//error("%s: crazy uudecode length %d > %u", __func__, dlen, len);
+		//error("%s: crazy base64 length %d > %u", __func__, dlen, len);
 		goto error;
 	}
 
