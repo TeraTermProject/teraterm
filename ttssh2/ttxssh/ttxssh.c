@@ -2601,7 +2601,8 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 			SendDlgItemMessage(dlg, IDC_INCLUDES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_OPENSSL_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_ZLIB_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_WEBSITES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_PUTTY_VERSION, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
+			SendDlgItemMessage(dlg, IDC_WEBSITES, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
 			SendDlgItemMessage(dlg, IDC_CRYPTOGRAPHY, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_CREDIT, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_FP_HASH_ALG, WM_SETFONT, (WPARAM)DlgAboutFont, MAKELPARAM(TRUE, 0));
