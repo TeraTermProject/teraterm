@@ -3,6 +3,9 @@
  */
 // PuTTY is copyright 1997-2007 Simon Tatham.
 
+// MISC.C
+extern void safefree(void *);
+
 // WINDOWS\WINPGNTC.C
 extern int agent_exists(void);
 extern int agent_query(void *in, int inlen, void **out, int *outlen,
@@ -21,8 +24,6 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
                                 int *outlen);
 int putty_get_ssh1_keylen(unsigned char *key,
                           int maxlen);
-
-void safefree(void *);
 
 static void *get_keylist1(int *length);
 static void *get_keylist2(int *length);

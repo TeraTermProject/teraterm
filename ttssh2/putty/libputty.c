@@ -6,8 +6,16 @@
 #include <windows.h>
 #include <assert.h>
 
+#include "sshbn.h"
+
+// from SSHBN.C (ver 0.60)
+#define BIGNUM_INTERNAL
+typedef BignumInt *Bignum;
+
 #include "ssh.h"
+
 #include "libputty.h"
+
 
 /*
  * for SSH2
@@ -58,8 +66,10 @@ void *putty_sign_ssh2_key(unsigned char *pubkey,
 	retval = agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
 	assert(retval == 1);
 	response = vresponse;
-	if (resplen < 5 || response[4] != SSH2_AGENT_SIGN_RESPONSE)
+	if (resplen < 5 || response[4] != SSH2_AGENT_SIGN_RESPONSE) {
+		sfree(response);
 		return NULL;
+	}
 
 	ret = snewn(resplen-5, unsigned char);
 	memcpy(ret, response+5, resplen-5);
@@ -131,8 +141,10 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
 	retval = agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
 	assert(retval == 1);
 	response = vresponse;
-	if (resplen < 5 || response[4] != SSH1_AGENT_RSA_RESPONSE)
+	if (resplen < 5 || response[4] != SSH1_AGENT_RSA_RESPONSE) {
+		sfree(response);
 		return NULL;
+	}
 
 	ret = snewn(resplen-5, unsigned char);
 	memcpy(ret, response+5, resplen-5);
@@ -155,8 +167,76 @@ int putty_get_ssh1_keylen(unsigned char *key,
  * Following functions are copied from putty source.
  */
 
+// from SSHBN.C (ver 0.63)
+static Bignum newbn(int length)
+{
+	Bignum b;
 
-// SSHRSA.C
+	assert(length >= 0 && length < INT_MAX / BIGNUM_INT_BITS);
+
+	b = snewn(length + 1, BignumInt);
+	if (!b)
+		abort();		       /* FIXME */
+	memset(b, 0, (length + 1) * sizeof(*b));
+	b[0] = length;
+	return b;
+}
+
+// from SSHBN.C (ver 0.65)
+Bignum bignum_from_bytes(const unsigned char *data, int nbytes)
+{
+	Bignum result;
+	int w, i;
+
+	assert(nbytes >= 0 && nbytes < INT_MAX / 8);
+
+	w = (nbytes + BIGNUM_INT_BYTES - 1) / BIGNUM_INT_BYTES; /* bytes->words */
+
+	result = newbn(w);
+	for (i = 1; i <= w; i++)
+		result[i] = 0;
+	for (i = nbytes; i--;) {
+		unsigned char byte = *data++;
+		result[1 + i / BIGNUM_INT_BYTES] |=
+			(BignumInt)byte << (8 * i % BIGNUM_INT_BITS);
+	}
+
+	while (result[0] > 1 && result[result[0]] == 0)
+		result[0]--;
+	return result;
+}
+
+// from SSHBN.C (ver 0.60)
+/*
+* Read an SSH-1-format bignum from a data buffer. Return the number
+* of bytes consumed, or -1 if there wasn't enough data.
+*/
+int ssh1_read_bignum(const unsigned char *data, int len, Bignum * result)
+{
+	const unsigned char *p = data;
+	int i;
+	int w, b;
+
+	if (len < 2)
+		return -1;
+
+	w = 0;
+	for (i = 0; i < 2; i++)
+		w = (w << 8) + *p++;
+	b = (w + 7) / 8;		       /* bits -> bytes */
+
+	if (len < b + 2)
+		return -1;
+
+	if (!result)		       /* just return length */
+		return b + 2;
+
+	*result = bignum_from_bytes(p, b);
+
+	return p + b - data;
+}
+
+// from SSHRSA.C (putty 0.60)
 /* Given a public blob, determine its length. */
 int rsa_public_blob_len(void *data, int maxlen)
 {
@@ -181,7 +261,7 @@ int rsa_public_blob_len(void *data, int maxlen)
 	return p - (unsigned char *)data;
 }
 
-// WINDOWS\WINPGNT.C
+// from WINDOWS\WINPGNT.C (putty 0.63)
 /*
  * Acquire a keylist1 from the primary Pageant; this means either
  * calling make_keylist1 (if that's us) or sending a message to the
@@ -195,13 +275,15 @@ static void *get_keylist1(int *length)
 	void *vresponse;
 	int resplen, retval;
 	request[4] = SSH1_AGENTC_REQUEST_RSA_IDENTITIES;
-	PUT_32BIT(request, 4);
+	PUT_32BIT(request, 1);
 
 	retval = agent_query(request, 5, &vresponse, &resplen, NULL, NULL);
 	assert(retval == 1);
 	response = vresponse;
-	if (resplen < 5 || response[4] != SSH1_AGENT_RSA_IDENTITIES_ANSWER)
+	if (resplen < 5 || response[4] != SSH1_AGENT_RSA_IDENTITIES_ANSWER) {
+		sfree(response);
 		return NULL;
+	}
 
 	ret = snewn(resplen-5, unsigned char);
 	memcpy(ret, response+5, resplen-5);
@@ -213,6 +295,7 @@ static void *get_keylist1(int *length)
 	return ret;
 }
 
+// from WINDOWS\WINPGNT.C (putty 0.63)
 /*
  * Acquire a keylist2 from the primary Pageant; this means either
  * calling make_keylist2 (if that's us) or sending a message to the
@@ -227,13 +310,15 @@ static void *get_keylist2(int *length)
 	int resplen, retval;
 
 	request[4] = SSH2_AGENTC_REQUEST_IDENTITIES;
-	PUT_32BIT(request, 4);
+	PUT_32BIT(request, 1);
 
 	retval = agent_query(request, 5, &vresponse, &resplen, NULL, NULL);
 	assert(retval == 1);
 	response = vresponse;
-	if (resplen < 5 || response[4] != SSH2_AGENT_IDENTITIES_ANSWER)
+	if (resplen < 5 || response[4] != SSH2_AGENT_IDENTITIES_ANSWER) {
+		sfree(response);
 		return NULL;
+	}
 
 	ret = snewn(resplen-5, unsigned char);
 	memcpy(ret, response+5, resplen-5);
@@ -245,7 +330,7 @@ static void *get_keylist2(int *length)
 	return ret;
 }
 
-// WINDOWS\WINDOW.C
+// from WINDOWS\WINDOW.C (putty 0.60)
 /*
  * Print a modal (Really Bad) message box and perform a fatal exit.
  */

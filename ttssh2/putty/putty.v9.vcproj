@@ -149,39 +149,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libs\putty\INT64.H"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libs\putty\MISC.C"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\MISC.H"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\NETWORK.H"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\PUTTY.H"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\PUTTYMEM.H"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\puttyps.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\SSH.H"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\SSHBN.C"
 				>
 			</File>
 			<File
@@ -189,7 +157,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libs\putty\TREE234.H"
+				RelativePath="..\..\libs\putty\VERSION.C"
 				>
 			</File>
 			<File
@@ -206,10 +174,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libs\putty\WINDOWS\WINSECUR.C"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libs\putty\WINDOWS\WINSTUFF.H"
 				>
 			</File>
 		</Filter>
