@@ -24,6 +24,7 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
                                 int *outlen);
 int putty_get_ssh1_keylen(unsigned char *key,
                           int maxlen);
+const char *putty_get_version();
 
 static void *get_keylist1(int *length);
 static void *get_keylist2(int *length);

@@ -2529,11 +2529,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	SendMessage(GetDlgItem(dlg, IDC_ZLIB_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
 	// PuTTYÇÃÉoÅ[ÉWÉáÉìÇê›íËÇ∑ÇÈ (2011.7.26 yutaka)
-#ifdef PUTTYVERSION
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "PuTTY %s", PUTTYVERSION);
-#else
-	_snprintf(buf, sizeof(buf), "PuTTY Unknown");
-#endif
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "PuTTY %s", putty_get_version());
 	SendMessage(GetDlgItem(dlg, IDC_PUTTY_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 }
 

@@ -162,6 +162,11 @@ int putty_get_ssh1_keylen(unsigned char *key,
 	return rsa_public_blob_len(key, maxlen);
 }
 
+const char *putty_get_version()
+{
+	extern const char ver[]; /* in version.c */
+	return ver;
+}
 
 /*
  * Following functions are copied from putty source.
