@@ -83,7 +83,7 @@ static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #include "compat_w95.h"
 
-#include "puttyversion.h"
+#include "libputty.h"
 
 #define MATCH_STR(s, o) strncmp((s), (o), NUM_ELEM(o) - 1)
 #define MATCH_STR_I(s, o) _strnicmp((s), (o), NUM_ELEM(o) - 1)
