@@ -78,7 +78,7 @@
 <tr><td>0x98</td>	<td> ESC X </td>	<td> SOS </td>	<td> Start of string. Introduces a <a href="#SOS">SOS Sequence</a>. </td></tr>
 <tr><td>0x99</td>	<td> </td>	<td> SGCI </td>	<td></td></tr>
 <tr><td>0x9a</td>	<td> </td>	<td> SCI </td>	<td></td></tr>
-<tr><td>0x9b</td>	<td> ESC [ </td>	<td> CSI </td>	<td> Contros Sequence Introducer. Intruduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
+<tr><td>0x9b</td>	<td> ESC [ </td>	<td> CSI </td>	<td> Control Sequence Introducer. Introduces a <a href="#CSI">CSI Sequence</a>. </td></tr>
 <tr><td>0x9c</td>	<td> ESC \ </td>	<td> ST  </td>	<td> String terminator. Ends a DCS, SOS, OSC, PM and APC sequence. </td></tr>
 <tr><td>0x9d</td>	<td> ESC ] </td>	<td> OSC </td>	<td> Operating System Command. Introduces a <a href="#OSC">OSC Sequence</a>. </td></tr>
 <tr><td>0x9e</td>	<td> ESC ^ </td>	<td> PM  </td>	<td> Privacy Message. Introduces a <a href="#PM">PM Sequence</a>. </td></tr>
@@ -160,7 +160,7 @@
    = 2      Erase the complete of line.
 </pre>
 </td></tr>
-<tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td> Inserts <i>Ps</i> lines, stgarting at the cursor. The default value of <i>Ps</i> is 1. </td></tr>
+<tr><td>CSI <i>Ps</i> L</td>	<td>IL</td>	<td> Inserts <i>Ps</i> lines, starting at the cursor. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> M</td>	<td>DL</td>	<td> Deletes <i>Ps</i> lines in the scrolling region, starting with the line that has the cursor. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> P</td>	<td>DCH</td>	<td> Deletes <i>Ps</i> characters from the cursor position to the right. The default value of <i>Ps</i> is 1. </td></tr>
 <tr><td>CSI <i>Ps</i> S</td>	<td>SU</td>	<td> Scroll up <i>Ps</i> lines. The default value of <i>Ps</i> is 1. </td></tr>
@@ -586,11 +586,11 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 	<td> 6 </td>
 	<td> DECOM </td>
 	<td> Enable origin mode.<br>
-             - The home cursor position is at the upper-left corner of ther screen, with in the margins.<br>
+             - The home cursor position is at the upper-left corner of the screen, with in the margins.<br>
              - The starting point for line numbers depends on the current top margin setting.<br>
              - The cursor <em>cannot</em> move outside of the margins.</td>
 	<td> Disables origin mode.<br>
-             - The home cursor position is at the upper-left corner of ther screen.<br>
+             - The home cursor position is at the upper-left corner of the screen.<br>
              - The starting point for line numbers independent of the margins.<br>
              - The cursor <em>can</em> move outside of the margins.</td>
     </tr>
@@ -663,8 +663,8 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
     <tr>
 	<td> 69 </td>
 	<td> DECLRMM </td>
-	<td> Enable left and right margins. DECSLRM can set marings. SCP cannot save cursor position.</td>
-	<td> Disable left and right margins. DECSLRM cannot set marings. SCP can save cursor position.</td>
+	<td> Enable left and right margins. DECSLRM can set margins. SCP cannot save cursor position.</td>
+	<td> Disable left and right margins. DECSLRM cannot set margins. SCP can save cursor position.</td>
     </tr>
     <tr>
 	<td> 1000 </td>
@@ -766,7 +766,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 <tr><td> 4</td>		<td>Underlined</td></tr>
 <tr><td> 5</td>		<td>Blink</td></tr>
 <tr><td> 7</td>		<td>Inverse</td></tr>
-<tr><td>22</td>		<td>Normal (neigher bold nor faint)</td></tr>
+<tr><td>22</td>		<td>Normal (neither bold nor faint)</td></tr>
 <tr><td>24</td>		<td>Not underlined</td></tr>
 <tr><td>25</td>		<td>Steady (not blinking)</td></tr>
 <tr><td>27</td>		<td>Positive (not inverse)</td></tr>
@@ -842,7 +842,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 <i>Pt</i>         Key definition.
 </pre -->
 </td></tr>
-<tr><td>DCS ! { <i>Pt</i> ST </td> <td>DECSTUI</td> <td>Change <a href="../setup/teraterm-term.html#TerminalUID">Terminal Unique ID</a> to <i>Pt</i>. DECSTUI works only when <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> LockUID setting is off.</td>
+<tr><td>DCS ! { <i>Pt</i> ST </td> <td>DECSTUI</td> <td>Change <a href="../setup/teraterm-term.html#TerminalUID">Terminal Unique ID</a> to <i>Pt</i>. DECSTUI works only when <a href="../setup/teraterm-term.html#LockTUID">LockTUID</a> LockTUID setting is off.</td>
 <tr><td>DCS $ q <i>Pt</i> ST</td>       <td>DECRQSS</td>        <td>Request selection or setting.
 <pre>
 <i>Pt</i>: the setting that the host asks about.

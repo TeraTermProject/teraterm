@@ -5,7 +5,7 @@ if exist "%Programfiles(x86)%\HTML Help Workshop\hhc.exe" (
 	set HELP_COMPILER=C:\progra~1\htmlhe~1\hhc.exe
 )
 
-REM for winxp installation on other drive or other languaje
+REM for winxp installation on other drive or other language
 if exist "%Programfiles%\HTML Help Workshop\hhc.exe" (
 set HELP_COMPILER="%Programfiles%\HTML Help Workshop\hhc.exe"
 )
