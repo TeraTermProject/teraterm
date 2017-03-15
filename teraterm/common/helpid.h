@@ -148,6 +148,8 @@
 #define HlpRefOpenssl   80003
 #define HlpRefOpenssh   80004
 #define HlpRefDev       80005
+#define HlpRefPutty     80006
+#define HlpRefSource    80007
 
 #define HlpMacro                        90000
 #define HlpMacroExec                    90001
