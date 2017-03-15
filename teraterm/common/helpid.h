@@ -150,6 +150,9 @@
 #define HlpRefDev       80005
 #define HlpRefPutty     80006
 #define HlpRefSource    80007
+#define HlpRefOniguruma 80008
+#define HlpRefSFMT      80009
+#define HlpRefCygterm   80010
 
 #define HlpMacro                        90000
 #define HlpMacroExec                    90001

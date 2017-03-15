@@ -556,6 +556,21 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="License of Oniguruma">
+			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="License of SFMT">
+			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="License of CygTerm+">
+			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="For developer">
 			<param name="Local" value="html\reference\develop.txt">
 			<param name="ImageNumber" value="11">

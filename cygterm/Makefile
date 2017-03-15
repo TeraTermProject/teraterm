@@ -68,4 +68,4 @@ uninstall :
 	rm -f $(BINDIR)/$(CFG)
 
 $(ARCHIVE) : $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) README README-j Makefile
-	tar cf - $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) README README-j Makefile | gzip > $(ARCHIVE)
+	tar cf - $(SRC) $(ICO) $(CFG) $(LAUNCH_SRC) COPYING README README-j Makefile | gzip > $(ARCHIVE)

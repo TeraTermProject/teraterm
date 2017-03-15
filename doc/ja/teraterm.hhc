@@ -565,6 +565,21 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="鬼車 ライセンス">
+			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="SFMT ライセンス">
+			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="CygTerm+ ライセンス">
+			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="開発者向け">
 			<param name="Local" value="html\reference\develop.txt">
 			<param name="ImageNumber" value="11">
