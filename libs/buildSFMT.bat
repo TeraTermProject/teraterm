@@ -1,6 +1,6 @@
 cd SFMT
 
-if not exist "Makefile.msc.release" goto end_mk_release
+if exist "Makefile.msc.release" goto end_mk_release
 echo CFLAGS = /MT /O2 /nologo> Makefile.msc.release
 echo;>> Makefile.msc.release
 echo SFMT.lib: SFMT.c>> Makefile.msc.release
@@ -11,7 +11,7 @@ echo clean:>> Makefile.msc.release
 echo 	del *.lib *.obj>> Makefile.msc.release
 :end_mk_release
 
-if not exist "Makefile.msc.release" goto end_mk_debug
+if exist "Makefile.msc.debug" goto end_mk_debug
 echo CFLAGS = /MTd /Od /nologo> Makefile.msc.debug
 echo;>> Makefile.msc.debug
 echo SFMTd.lib: SFMT.c>> Makefile.msc.debug
