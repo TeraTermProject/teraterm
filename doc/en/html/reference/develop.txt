@@ -20,6 +20,8 @@
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 -- Visual Studio Community 2015 Update 3
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+-- Visual Studio Community 2017 
+   Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 -- How to build with batch file
    Please execute the batch file on command prompt of Visual Studio. Otherwise, please configure 
    below environment variables.
