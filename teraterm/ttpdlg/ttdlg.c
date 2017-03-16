@@ -2704,7 +2704,7 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
-	int msc_ver, vs_ver;
+	int msc_ver, vs_ver, msc_low_ver;
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
@@ -2811,16 +2811,25 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			// å∏éZÇí≤êÆÇ∑ÇÈÅB
 			// (2015.12.23 yutaka)
 			msc_ver = (_MSC_FULL_VER / 10000000);
+			msc_low_ver = (_MSC_FULL_VER / 100000) % 100;
 			if (msc_ver < 19) {
 				vs_ver = msc_ver - 6;
 			}
 			else {
-				vs_ver = msc_ver - 5;
+				// 1900 = VS2015(VC++14)
+				// 1910 = VS2017(VC++15)
+				if (msc_low_ver == 10) {
+					vs_ver = msc_ver - 4;
+					msc_low_ver = 0;
+				} 
+				else {
+					vs_ver = msc_ver - 5;
+				}
 			}
 
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " %d.%d",
 				vs_ver,
-				(_MSC_FULL_VER / 100000) % 100);
+				msc_low_ver);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 			if (_MSC_FULL_VER % 100000) {
 				_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " build %d",
