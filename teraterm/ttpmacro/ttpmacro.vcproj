@@ -49,7 +49,7 @@
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;&#x0D;&#x0A;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -72,10 +72,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib Version.lib iphlpapi.lib"
+				AdditionalDependencies="onig_s.lib SFMT.lib Version.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
+				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -139,7 +139,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)common"
+				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(SolutionDir)common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				RuntimeLibrary="1"
 				WarningLevel="3"
@@ -161,10 +161,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib Version.lib iphlpapi.lib"
+				AdditionalDependencies="onig_sd.lib SFMTd.lib Version.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
+				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -254,22 +254,6 @@
 			</File>
 			<File
 				RelativePath="msgdlg.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT-common.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT-params.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT-params19937.h"
-				>
-			</File>
-			<File
-				RelativePath="SFMT.h"
 				>
 			</File>
 			<File
@@ -370,10 +354,6 @@
 			>
 			<File
 				RelativePath="..\common\i18n.c"
-				>
-			</File>
-			<File
-				RelativePath="SFMT.c"
 				>
 			</File>
 			<File
