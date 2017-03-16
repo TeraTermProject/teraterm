@@ -9,7 +9,7 @@ str = ''
 for i 0 10
 	sprintf2 tmp '%d\t%d' i res[i]
 	strconcat str tmp
-	strconcat str #10
+	strconcat str #13#10
 next
 strspecial str
 messagebox str 'result'
