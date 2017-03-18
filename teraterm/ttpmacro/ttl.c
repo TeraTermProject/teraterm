@@ -6254,6 +6254,8 @@ int ExecCmnd()
 			Err = TTLSetExitCode(); break;
 		case RsvSetFileAttr:
 			Err = TTLSetFileAttr(); break;
+		case RsvSetFlowCtrl:
+			Err = TTLCommCmdInt(CmdSetFlowCtrl,0); break;
 		case RsvSetRts:
 			Err = TTLCommCmdInt(CmdSetRts,0); break;
 		case RsvSetSync:

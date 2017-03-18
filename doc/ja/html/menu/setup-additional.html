@@ -188,6 +188,11 @@ cvvis=\E[?12;25h
 	貼り付け時に末尾の改行を削除する。
       </dd>
 
+      <dt id="NormalizeLineBreak">Normalize line break when pasting</dt>
+      <dd>
+	貼り付け時に改行を正規化します。クリップボードの内容の改行が CR や LF だった時に、すべて CR+LF に変換します。
+      </dd>
+
       <dt id="ConfirmChangePaste">Confirm change paste</dt>
       <dd>
 	クリップボードに改行コード(CR/LF)を含む場合、マウスの右クリックおよびAlt+Vで
@@ -304,6 +309,7 @@ ClearType       = ClearTypeを利用する
 書式:
 &amp;h      ホスト名。未接続の場合は空。
 &amp;p      TCP ポート番号。未接続の場合は空。TCP 接続でないときも空。
+&amp;u      ログオン中のユーザ名。
 %a      曜日の省略形。
 %A      曜日の正式名。
 %b      月の省略形。

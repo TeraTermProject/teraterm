@@ -291,6 +291,15 @@ typedef TCharAttr *PCharAttr;
 #define DBGF_NOUT	4
 #define DBGF_ALL	(DBGF_NORM | DBGF_HEXD | DBGF_NOUT)
 
+// Clipboard Paste Flags (used in ts.PasteFlag)
+#define CPF_DISABLE_RBUTTON        0x0001
+#define CPF_CONFIRM_RBUTTON        0x0002
+#define CPF_DISABLE_MBUTTON        0x0004
+#define CPF_CONFIRM_CHANGEPASTE    0x0010
+#define CPF_CONFIRM_CHANGEPASTE_CR 0x0020
+#define CPF_TRIM_TRAILING_NL       0x0100
+#define CPF_NORMALIZE_LINEBREAK    0x0200
+
 // Title Reporting Type
 #define IdTitleReportIgnore 0
 #define IdTitleReportAccept 8
@@ -496,8 +505,8 @@ struct tttset {
 	char LogDefaultName[80];
 	char LogDefaultPath[MAX_PATH];
 	WORD LogAutoStart;
-	int DisablePasteMouseRButton;
-	WORD ConfirmPasteMouseRButton;
+	unsigned int PasteFlag;
+	WORD FallbackToCP932;	// ConfirmPasteMouseRButton Ç™îpé~Ç…Ç»Ç¡ÇΩÇÃÇ≈ì]óp
 	WORD DisableAcceleratorSendBreak;
 	int EnableClickableUrl;
 	eterm_lookfeel_t EtermLookfeel;
@@ -532,9 +541,9 @@ struct tttset {
 	int TerminalOldWidth;
 	int TerminalOldHeight;
 	WORD MaximizedBugTweak;
-	WORD ConfirmChangePaste;
+	WORD Dummy2;		// ãåConfirmChangePaste. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
 	WORD SaveVTWinPos;
-	WORD DisablePasteMouseMButton;
+	WORD Dummy3;		// ãåDisablePasteMouseMButton. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
 	int MouseWheelScrollLine;
 	WORD CRSend_ini;
 	WORD LocalEcho_ini;
@@ -565,7 +574,7 @@ struct tttset {
 	WORD DisableMenuDuplicateSession;
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
-	WORD ConfirmChangePasteCR;
+	WORD Dummy4;		// ãåConfirmChangePasteCR. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
 	WORD JumpList;
 	WORD TabStopFlag;
 	DWORD CtrlFlag;
@@ -612,7 +621,7 @@ struct tttset {
 	int ZmodemTimeOutInit;
 	int ZmodemTimeOutFin;
 	WORD WaitCom;
-	WORD TrimTrailingNLonPaste;
+	WORD Dummy5;	// ãåTrimTrailingNLonPaste. PasteFlagÇ…ìùçáÇµÇΩà◊îpé~ÅBëºÇ÷ì]óp
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1077,6 +1086,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.94, ttset_memfilemap was replaced with ttset_memfilemap_30.
+ *   paste related settings are integrated into tttset.PasteFlag
+ *
  * - At version 4.92, ttset_memfilemap was replaced with ttset_memfilemap_29.
  *   added tttset.TrimTrailingNLonPaste
  *
@@ -1252,4 +1264,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_29"
+#define TT_FILEMAPNAME "ttset_memfilemap_30"

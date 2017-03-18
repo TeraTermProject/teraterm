@@ -31,6 +31,39 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
+<h3><a name="teraterm_4.94">2017.02.28 (Ver 4.94)</a></h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>added `&amp;u' parameter to log file name that can convert the logon user name.</li>
+      <li>added new line normalization on pasting. The default is off.
+        <ul>
+          <li>This feature can be enabled on Copy and Paste tab of <a href="../menu/setup-additional.html#NormalizeLineBreak">Additional settings dialog</a>.</li>
+        </ul></li>
+      <li>added the <a href="../macro/command/setflowctrl.html">setflowctrl</a> command.</li>
+    </ul>
+  </li>
+
+  <li>Bug fixes
+    <ul>
+      <li>When Restore setup is called, the AlphaBlend can not be restored immediately.</li>
+      <li>When Paste&lt;CR&gt; works, the end of data will be added invalid character.</li>
+      <li>When Kanji(receive) is set to UTF-8, garbled characters will be shown after invalid byte characters are received.</li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded TTSSH to <a href="#ttssh_2.80">2.80</a></li>
+      <li>upgraded TTXttyrec Plug-in to <a href="#ttyrec_1.03">1.03</a></li>
+      <li>upgraded Oniguruma to 6.1.3.</li>
+      <li>upgraded SFMT to 1.5.</li>
+      <li>changed starting method of LogMeTT and TTLEditor installer.</li>
+    </ul>
+  </li>
+</ul>
+
+
 <h3><a name="teraterm_4.93">2016.11.30 (Ver 4.93)</a></h3>
 <ul class="history">
   <li>Changes
@@ -1117,7 +1150,7 @@
           <li>added the IMERelatedCursor in the teraterm.ini file. The default is off.</li>
         </ul></li>
       <li>added support for the motion event of xterm style mouse event tracking.</li>
-      <li>added support for the DEC Locater Mode style mouse event tracking.</li>
+      <li>added support for the DEC Locator Mode style mouse event tracking.</li>
       <li>The ttymouse can automatically setup the xterm2 to modify the response of the Secondary DA. </li>
       <li>added the "<a href="../macro/command/filetruncate.html">filetruncate</a>" macro command.</li>
       <li>added the "<a href="../macro/command/dispstr.html">dispstr</a>" macro command.</li>
@@ -2809,6 +2842,51 @@ SYNOPSIS:
 <h2><a name="ttssh">TTSSH</a></h2>
 
 
+<h3><a name="ttssh_2.81">2017.05.xx (Ver 2.81)</a></h3>
+<ul class="history">
+  <!-- li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li -->
+
+  <!--li>Bug fixes
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>Misc
+    <ul>
+      <li>upgraded PuTTY to 0.68</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h3><a name="ttssh_2.80">2017.02.28 (Ver 2.80)</a></h3>
+<ul class="history">
+  <!-- li>Changes
+    <ul>
+      <li></li>
+    </ul>
+  </li -->
+
+  <li>Bug fixes
+    <ul>
+      <li>When SCP receiving is failed, a local file is removed.</li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded OpenSSL to 1.0.2k</li>
+      <li>upgraded zlib to 1.2.11</li>
+    </ul>
+  </li>
+</ul>
+
+
 <h3><a name="ttssh_2.79">2016.11.30 (Ver 2.79)</a></h3>
 <ul class="history">
   <!-- li>Changes
@@ -4487,6 +4565,11 @@ SYNOPSIS:
 </ul>
 
 <h2><a name="ttyrec">TTXttyrec</a></h2>
+<h3><a name="ttyrec_1.03">2017.02.28 (Ver 1.03)</a></h3>
+<ul class="history">
+  <li>added [Replay again] entry under [File] menu that can replay again after one relaying.</li>
+</ul>
+
 <h3><a name="ttyrec_1.02">2010.2.20 (Ver 1.02)</a></h3>
 <ul class="history">
   <li>changed the default value of "RecordStartSize" to On.</li>

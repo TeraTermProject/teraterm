@@ -20,6 +20,8 @@
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 -- Visual Studio Community 2015 Update 3
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
+-- Visual Studio Community 2017 
+   Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 -- How to build with batch file
    Please execute the batch file on command prompt of Visual Studio. Otherwise, please configure 
    below environment variables.
@@ -43,10 +45,10 @@
 
 
 * Libraries
-- Oniguruma 6.1.2 (https://github.com/kkos/oniguruma)
+- Oniguruma 6.1.3 (https://github.com/kkos/oniguruma)
 - OpenSSL 1.1.0e (http://www.openssl.org/)
-- zlib 1.2.8 (http://www.zlib.net/)
-- PuTTY 0.67 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+- zlib 1.2.11 (http://www.zlib.net/)
+- PuTTY 0.68 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
 
 * Notice for SVN commiter
@@ -125,7 +127,7 @@ Example: adding a TTSSH menu under File menu
   2. Oniguruma (used by Tera Term Macro)
      (1) Extract oniguruma source into libs/oniguruma directory.
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
-     (3) Move 'libs' directory on the command prompt. And run buildoniguruma.bat.
+     (3) Move 'libs' directory on the command prompt. And run buildoniguruma6.bat.
 
   3. OpenSSL (used by TTSSH)
      (1) Extract openssl source into libs/openssl directory.

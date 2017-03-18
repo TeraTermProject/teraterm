@@ -1,0 +1,37 @@
+intdim res 11
+
+statusbox "0% done." "stat"
+
+uptime stime
+
+for i 1 100
+	for j 1 110000
+		random val 10
+		res[val] = res[val] + 1
+	next
+	sprintf2 stat "%d%% done." i
+	statusbox stat "stat"
+next
+
+uptime etime
+
+str = ''
+for i 0 10
+	sprintf2 tmp '%d\t%d' i res[i]
+	strconcat str tmp
+	strconcat str #13#10
+next
+
+sprintf2 tmp #13#10"%d ms."#13#10 etime - stime
+strconcat str tmp
+
+strspecial str
+;closesbox
+messagebox str 'result'
+
+; gettime filename "35822_%Y%m%d%H%M%S.txt"
+sprintf2 filename "35822_%d.txt" stime
+
+fileopen fp filename 0
+filewrite fp str
+fileclose fp

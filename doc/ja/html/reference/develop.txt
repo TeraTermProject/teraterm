@@ -23,6 +23,9 @@
 -- Visual Studio Community 2015 Update 3
    注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
        Windows Vista, XP をサポートするには v140_xp を指定してください。
+-- Visual Studio Community 2017 
+   注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
+       Windows Vista, XP をサポートするには v141_xp を指定してください。
 -- バッチファイルからビルドするために
    Visual Studio のコマンドプロンプトからバッチファイルを実行するか、以下のように環境変数を設定してください。
    使用したいバージョンの Visual Studio の "(x86) Native Tools Command Prompt" を実行し、コンパイラのパスに関係する PATH と VSINSTALLDIR 変数を環境変数に登録してください。
@@ -44,10 +47,10 @@
 
 
 ■ ライブラリ
-- Oniguruma 6.1.2 (https://github.com/kkos/oniguruma)
-- OpenSSL 1.1.0e (http://www.openssl.org/)
-- zlib 1.2.8 (http://www.zlib.net/)
-- PuTTY 0.67 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+- Oniguruma 6.1.3 (https://github.com/kkos/oniguruma)
+- OpenSSL 1.0.2k (http://www.openssl.org/)
+- zlib 1.2.11 (http://www.zlib.net/)
+- PuTTY 0.68 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 
 
 ■ SVN コミッターへの注意
@@ -129,7 +132,7 @@
   2. Oniguruma (used by Tera Term Macro)
      (1) oniguruma のソースを libs/oniguruma の中に展開する。
      (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
-     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma.bat を実行する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildoniguruma6.bat を実行する。
 
   3. OpenSSL (used by TTSSH)
      (1) openssl のソースを libs/openssl の中に展開する。

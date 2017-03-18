@@ -190,6 +190,11 @@ If the configuration is enabled as whole system, execute the upper command with 
 	Remove trailing new line character when pasting.
       </dd>
 
+      <dt id="NormalizeLineBreak">Normalize line break when pasting</dt>
+      <dd>
+	Normalize new line on pasting. When new line of clipboard is CR and LF, every new line is changed to CR+LF.
+      </dd>
+
       <dt id="ConfirmChangePaste">Confirm change paste</dt>
       <dd>
 	When the Clipboard includes CR/LF, the confirmation
@@ -307,6 +312,7 @@ ClearType       = Use the ClearType.
 SYNOPSIS:
 &amp;h      Host name(or empty when not connecting)
 &amp;p      TCP port number(or empty when not connecting, not TCP connection)
+&amp;u      Logon user name
 %a      Abbreviated weekday name
 %A      Full weekday name
 %b      Abbreviated month name

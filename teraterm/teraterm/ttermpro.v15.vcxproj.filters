@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c944ea9f-5e84-4cb4-9662-58a9031ec1be}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{9f09ffc2-cdc3-4159-92f7-e637db2a2927}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Source Files %28C%29">
+      <UniqueIdentifier>{962df722-a84a-4837-a367-5e66f4d40803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e3efecca-9842-408d-979e-a4c7af432f65}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="addsetting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filesys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ftdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prnabort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protodlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tekwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teraprn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="teraterm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vtwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="clipboar.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="commlib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="teklib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="telnet.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttdde.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttdialog.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttfileio.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttime.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ttlib.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttplug.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttsetup.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttwinman.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ttwsk.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="vtdisp.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="vtterm.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="winjump.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+    <ClCompile Include="WSAAsyncGetAddrInfo.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\cygterm\cygterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\tek.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\Teraterm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\teraterm_classic.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\common\vt_classic.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttermpro.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="addsetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tt_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttfileio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

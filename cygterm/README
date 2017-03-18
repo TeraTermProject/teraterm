@@ -75,13 +75,14 @@
 
     README       -  this file
     README-j     -  original README in Japanese
+    COPYING      -  GNU General Pulic License (GPL) Version 2
     Makefile     -  MAKEFILE for installation
     cygterm.cc   -  program source code
     cygterm.cfg  -  configuration file
 
     * CygTerm is a free software distributed under the terms of the GNU
       General Public License (GPL) published by Free Software Foundation.
-      See http://www.gnu.org/copyleft/gpl.html.
+      See COPYING. (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 
       Note: Any program including non-GPL program can invoke the CygTerm
             executable (cygterm.exe) and communicate with it.

@@ -148,6 +148,11 @@
 #define HlpRefOpenssl   80003
 #define HlpRefOpenssh   80004
 #define HlpRefDev       80005
+#define HlpRefPutty     80006
+#define HlpRefSource    80007
+#define HlpRefOniguruma 80008
+#define HlpRefSFMT      80009
+#define HlpRefCygterm   80010
 
 #define HlpMacro                        90000
 #define HlpMacroExec                    90001
@@ -301,6 +306,7 @@
 #define HlpMacroCommandSetecho          92082
 #define HlpMacroCommandSetexitcode      92083
 #define HlpMacroCommandSetfileattr      92190
+#define HlpMacroCommandSetflowctrl      92215
 #define HlpMacroCommandSetMulticastName 92146
 #define HlpMacroCommandSetPassword      92196
 #define HlpMacroCommandSetrts           92136

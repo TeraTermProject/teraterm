@@ -76,7 +76,7 @@ There are differences between Tera Term(Tera Term 4.58) and Tera Term Pro 2.3 in
 <tr>
 	<td>Linked library</td>
 	<td>SSLeay, zlib</td>
-	<td>OpenSSL, zlib, Oniguruma, PuTTY</td>
+	<td>OpenSSL(used as the encryption library, but not used as TLS)<br />zlib<br />Oniguruma<br />PuTTY(used for cooperation with Pageant, but not used for SSH communication)</td>
 </tr>
 
 <tr>
@@ -190,7 +190,7 @@ There are differences between Tera Term(Tera Term 4.58) and Tera Term Pro 2.3 in
 <tr>
 	<td>Proxy</td>
 	<td>No</td>
-	<td>Yes[*9](HTTP, TELNET, SOCKS4, SOCKS5, SSL, HTTP+SSL, TELNET+SSL, SOCKS4+SSL, SOCKS5+SSL)</td>
+	<td>Yes[*9](HTTP, TELNET, SOCKS4, SOCKS5)</td>
 </tr>
 
 <tr>
@@ -222,7 +222,7 @@ Other new features are shown below.
 <ul>
   <li>ANSI color change and continued-line copy.</li>
   <li>Changing mouse cursor type.</li>
-  <li>Adding a comment to loggin file.</li>
+  <li>Adding a comment to logging file.</li>
   <li>Broadcast command feature.</li>
   <li>Selecting all buffer.</li>
   <li>Extend the maximum length of the host name.</li>

@@ -72,24 +72,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\libs\putty\CONF.C" />
     <ClCompile Include="..\..\libs\putty\MISC.C" />
-    <ClCompile Include="..\..\libs\putty\SSHBN.C" />
     <ClCompile Include="..\..\libs\putty\TREE234.C" />
+    <ClCompile Include="..\..\libs\putty\VERSION.C" />
     <ClCompile Include="..\..\libs\putty\WINDOWS\WINMISC.C" />
     <ClCompile Include="..\..\libs\putty\WINDOWS\WINPGNTC.C" />
     <ClCompile Include="..\..\libs\putty\WINDOWS\WINSECUR.C" />
     <ClCompile Include="libputty.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libs\putty\INT64.H" />
-    <ClInclude Include="..\..\libs\putty\MISC.H" />
-    <ClInclude Include="..\..\libs\putty\NETWORK.H" />
-    <ClInclude Include="..\..\libs\putty\PUTTY.H" />
-    <ClInclude Include="..\..\libs\putty\PUTTYMEM.H" />
-    <ClInclude Include="..\..\libs\putty\puttyps.h" />
-    <ClInclude Include="..\..\libs\putty\SSH.H" />
-    <ClInclude Include="..\..\libs\putty\TREE234.H" />
-    <ClInclude Include="..\..\libs\putty\WINDOWS\WINHELP.H" />
-    <ClInclude Include="..\..\libs\putty\WINDOWS\WINSTUFF.H" />
     <ClInclude Include="libputty.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

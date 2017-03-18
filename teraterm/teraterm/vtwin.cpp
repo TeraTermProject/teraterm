@@ -1002,8 +1002,8 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 
 	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	if ((LMR == IdRightButton) &&
-		!ts.DisablePasteMouseRButton &&
-		ts.ConfirmPasteMouseRButton &&
+		(ts.PasteFlag & CPF_DISABLE_RBUTTON) == 0 &&
+		(ts.PasteFlag & CPF_CONFIRM_RBUTTON) != 0 &&
 		cv.Ready &&
 		!mousereport &&
 		(SendVar==NULL) && (FileVar==NULL) &&
@@ -1603,9 +1603,10 @@ void CVTWindow::ResetSetup()
 	BGSetupPrimary(TRUE);
 	// 2006/03/17 by 337 : Alpha値も即時変更
 	// Layered窓になっていない場合は効果が無い
-	if (ts.EtermLookfeel.BGUseAlphaBlendAPI) {
-		MySetLayeredWindowAttributes(HVTWin, 0, ts.AlphaBlend, LWA_ALPHA);
-	}
+	//
+	// AlphaBlend を即時反映できるようにする。
+	// (2016.12.24 yutaka)
+	SetWindowStyle(&ts);
 #else
 	DispApplyANSIColor();
 #endif
@@ -2018,16 +2019,24 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 			SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)ts.ScpSendDir);
 
-			// キャンセルボタンをデフォルトにし、無意識にEnterキーを押下しても、何もしないようにする。
-			SetFocus(GetDlgItem(hDlgWnd, IDCANCEL));
-			PostMessage(GetDlgItem(hDlgWnd, IDCANCEL), WM_NEXTDLGCTL, 0, 0L) ;
-
 			// SSH2 接続ではない場合には "SCP" を無効化する。
 			if (cv.isSSH != 2) {
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE), FALSE);
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_STATIC), FALSE);
+
+				// フォーカスの初期状態を Cancel にする。
+				// 後で WM_NEXTDLGCTL を送るので、 Cancel の一つ前の Send file (IDOK) に
+				// フォーカスを当てる。(SCP は無効になっている為)
+				SetFocus(GetDlgItem(hDlgWnd, IDOK));
 			}
+			else {
+				// SSH2 接続時は SCP (IDC_DAD_SENDFILE) が一つ前
+				SetFocus(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE));
+			}
+
+			// フォーカスを次のボタン(Cancel)に移す
+			PostMessage(hDlgWnd, WM_NEXTDLGCTL, 0, 0L);
 
 			// TRUEにするとボタンにフォーカスが当たらない。
 			return FALSE;
@@ -2356,7 +2365,7 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 	}
 
 	// added DisablePasteMouseMButton (2008.3.2 maya)
-	if (ts.DisablePasteMouseMButton || mousereport) {
+	if ((ts.PasteFlag & CPF_DISABLE_MBUTTON) || mousereport) {
 		ButtonUp(FALSE);
 	}
 	else {
@@ -2537,12 +2546,12 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 
 	/*
 	 *  ペースト条件:
-	 *  ・ts.DisableMouseRButton      -> 右ボタンによるペースト無効
-	 *  ・ts.ConfirmPasteMouseRButton -> 表示されたメニューからペーストを行うので、
-	 *                                   右ボタンアップによるペーストは行わない
-	 *  ・mousereport                 -> マウストラッキング中はペーストを行わない
+	 *  ・ts.PasteFlag & CPF_DISABLE_RBUTTON -> 右ボタンによるペースト無効
+	 *  ・ts.PasteFlag & CPF_CONFIRM_RBUTTON -> 表示されたメニューからペーストを行うので、
+	 *                                          右ボタンアップによるペーストは行わない
+	 *  ・mousereport                        -> マウストラッキング中はペーストを行わない
 	 */
-	if (ts.DisablePasteMouseRButton || ts.ConfirmPasteMouseRButton || mousereport) {
+	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON) || mousereport) {
 		ButtonUp(FALSE);
 	} else {
 		ButtonUp(TRUE);

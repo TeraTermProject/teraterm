@@ -56,6 +56,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="対応制御シーケンス">
 			<param name="Local" value="html\about\ctrlseq.html">
+			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Q &amp; A ">
@@ -125,6 +126,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Tera Term Menu">
 			<param name="Local" value="html\usage\TTMenu\TTMenu.html">
+			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Unicode設定">
@@ -529,6 +531,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="言語ファイル">
 			<param name="Local" value="html\setup\lng.html">
+			<param name="ImageNumber" value="11">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -562,6 +565,21 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="鬼車 ライセンス">
+			<param name="Local" value="html\reference\Oniguruma-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="SFMT ライセンス">
+			<param name="Local" value="html\reference\SFMT-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="CygTerm+ ライセンス">
+			<param name="Local" value="html\reference\CygTerm+-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="開発者向け">
 			<param name="Local" value="html\reference\develop.txt">
 			<param name="ImageNumber" value="11">
@@ -569,6 +587,7 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="ソースコード解説">
 			<param name="Local" value="html\reference\sourcecode.html">
+			<param name="ImageNumber" value="11">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -714,6 +733,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getmodemstatus">
 					<param name="Local" value="html\macro\command\getmodemstatus.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="gettitle">
@@ -748,6 +768,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logautoclosemode">
 					<param name="Local" value="html\macro\command\logautoclosemode.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logclose">
@@ -772,6 +793,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logrotate">
 					<param name="Local" value="html\macro\command\logrotate.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="logstart">
@@ -871,6 +893,11 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setecho">
 					<param name="Local" value="html\macro\command\setecho.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setflowctrl">
+					<param name="Local" value="html\macro\command\setflowctrl.html">
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
@@ -992,6 +1019,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="continue">
 					<param name="Local" value="html\macro\command\continue.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="do, loop">
@@ -1082,6 +1110,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="regexoption">
 					<param name="Local" value="html\macro\command\regexoption.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sprintf">
@@ -1222,6 +1251,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filelock">
 					<param name="Local" value="html\macro\command\filelock.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filemarkptr">
@@ -1286,6 +1316,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="fileunlock">
 					<param name="Local" value="html\macro\command\fileunlock.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="filewrite">
@@ -1361,6 +1392,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="ispassword">
 					<param name="Local" value="html\macro\command\ispassword.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="passwordbox">
@@ -1370,6 +1402,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setpassword">
 					<param name="Local" value="html\macro\command\setpassword.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 			</UL>
 			<LI> <OBJECT type="text/sitemap">
@@ -1385,30 +1418,37 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="bringupbox">
 					<param name="Local" value="html\macro\command\bringupbox.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum8">
 					<param name="Local" value="html\macro\command\checksum8.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum8file">
 					<param name="Local" value="html\macro\command\checksum8.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum16">
 					<param name="Local" value="html\macro\command\checksum16.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum16file">
 					<param name="Local" value="html\macro\command\checksum16.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum32">
 					<param name="Local" value="html\macro\command\checksum32.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="checksum32file">
 					<param name="Local" value="html\macro\command\checksum32.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="closesbox">
@@ -1423,10 +1463,12 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="crc16">
 					<param name="Local" value="html\macro\command\crc16.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="crc16file">
 					<param name="Local" value="html\macro\command\crc16.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="crc32">
@@ -1466,10 +1508,12 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getipv4addr">
 					<param name="Local" value="html\macro\command\getipv4addr.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getipv6addr">
 					<param name="Local" value="html\macro\command\getipv6addr.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="getspecialfolder">
@@ -1509,6 +1553,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="listbox">
 					<param name="Local" value="html\macro\command\listbox.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="messagebox">
@@ -1573,6 +1618,7 @@
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="uptime">
 					<param name="Local" value="html\macro\command\uptime.html">
+					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="var2clipb">
@@ -1610,6 +1656,7 @@
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="切断後すぐに接続する場合の注意点">
 				<param name="Local" value="html\macro\appendixes\disconnecttiming.html">
+				<param name="ImageNumber" value="11">
 				</OBJECT>
 			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="ASCII コード表">

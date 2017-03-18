@@ -512,6 +512,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->PortFlag = 0;			// Port flags
 	ts->WindowFlag = 0;			// Window flags
 	ts->CtrlFlag = 0;			// Control sequence flags
+	ts->PasteFlag = 0;			// Clipboard Paste flags
 	ts->TelPort = 23;
 
 	ts->DisableTCPEchoCR = FALSE;
@@ -1465,28 +1466,29 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        ts->ZModemRcvCommand, sizeof(ts->ZModemRcvCommand), FName);
 
 #ifndef NO_COPYLINE_FIX
-
 	/* Enable continued-line copy  -- special option */
 	ts->EnableContinuedLineCopy =
 		GetOnOff(Section, "EnableContinuedLineCopy", FName, FALSE);
 #endif							/* NO_COPYLINE_FIX */
 
-	ts->DisablePasteMouseRButton =
-		GetOnOff(Section, "DisablePasteMouseRButton", FName, FALSE);
+	if (GetOnOff(Section, "DisablePasteMouseRButton", FName, FALSE))
+		ts->PasteFlag |= CPF_DISABLE_RBUTTON;
 
-	// added DisablePasteMouseMButton (2008.3.2 maya)
-	ts->DisablePasteMouseMButton =
-		GetOnOff(Section, "DisablePasteMouseMButton", FName, TRUE);
+	if (GetOnOff(Section, "DisablePasteMouseMButton", FName, TRUE))
+		ts->PasteFlag |= CPF_DISABLE_MBUTTON;
 
-	// added ConfirmPasteMouseRButton (2007.3.17 maya)
-	ts->ConfirmPasteMouseRButton =
-		GetOnOff(Section, "ConfirmPasteMouseRButton", FName, FALSE);
+	if (GetOnOff(Section, "ConfirmPasteMouseRButton", FName, FALSE))
+		ts->PasteFlag |= CPF_CONFIRM_RBUTTON;
 
-	// added ConfirmChangePaste (2008.2.3 yutaka)
-	ts->ConfirmChangePaste =
-		GetOnOff(Section, "ConfirmChangePaste", FName, TRUE);
+	if (GetOnOff(Section, "ConfirmChangePaste", FName, TRUE))
+		ts->PasteFlag |= CPF_CONFIRM_CHANGEPASTE;
+
+	if (GetOnOff(Section, "ConfirmChangePasteCR", FName, TRUE))
+		ts->PasteFlag |= CPF_CONFIRM_CHANGEPASTE_CR;
+
 	GetPrivateProfileString(Section, "ConfirmChangePasteStringFile", "",
 	                        Temp, sizeof(Temp), FName);
+
 	strncpy_s(ts->ConfirmChangePasteStringFile, sizeof(ts->ConfirmChangePasteStringFile), Temp,
 	          _TRUNCATE);
 
@@ -1766,9 +1768,6 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "LockTUID", FName, TRUE))
 		ts->TermFlag |= TF_LOCKTUID;
 
-	// Confirm PasteCR
-	ts->ConfirmChangePasteCR = GetOnOff(Section, "ConfirmChangePasteCR", FName, TRUE);
-
 	// Jump List
 	ts->JumpList = GetOnOff(Section, "JumpList", FName, TRUE);
 
@@ -1921,8 +1920,16 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		ts->ZmodemTimeOutFin = 1;
 
 	// Trim trailing new line character when pasting
-	ts->TrimTrailingNLonPaste =
-		GetOnOff(Section, "TrimTrailingNLonPaste", FName, FALSE);
+	if (GetOnOff(Section, "TrimTrailingNLonPaste", FName, FALSE))
+		ts->PasteFlag |= CPF_TRIM_TRAILING_NL;
+
+	// Normalize line break when pasting
+	if (GetOnOff(Section, "NormalizeLineBreakOnPaste", FName, FALSE))
+		ts->PasteFlag |= CPF_NORMALIZE_LINEBREAK;
+
+
+	// Fallback to CP932 (Experimental)
+	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
 
 	// CygTerm Configuration File
 	ReadCygtermConfFile(ts);
@@ -2126,19 +2133,21 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteInt(Section, "ConnectingTimeout", FName, ts->ConnectingTimeout);
 
 	WriteOnOff(Section, "DisablePasteMouseRButton", FName,
-	           ts->DisablePasteMouseRButton);
+	           (WORD) (ts->PasteFlag & CPF_DISABLE_RBUTTON));
 
-	// added DisablePasteMouseMButton (2008.3.2 maya)
 	WriteOnOff(Section, "DisablePasteMouseMButton", FName,
-	           ts->DisablePasteMouseMButton);
+	           (WORD) (ts->PasteFlag & CPF_DISABLE_MBUTTON));
 
-	// added ConfirmPasteMouseRButton (2007.3.17 maya)
 	WriteOnOff(Section, "ConfirmPasteMouseRButton", FName,
-	           ts->ConfirmPasteMouseRButton);
+	           (WORD) (ts->PasteFlag & CPF_CONFIRM_RBUTTON));
 
 	// added ConfirmChangePaste
 	WriteOnOff(Section, "ConfirmChangePaste", FName,
-	           ts->ConfirmChangePaste);
+	           (WORD) (ts->PasteFlag & CPF_CONFIRM_CHANGEPASTE));
+
+	WriteOnOff(Section, "ConfirmChangePasteCR", FName,
+	           (WORD) (ts->PasteFlag & CPF_CONFIRM_CHANGEPASTE_CR));
+
 	WritePrivateProfileString(Section, "ConfirmChangePasteStringFile",
 	                          ts->ConfirmChangePasteStringFile, FName);
 
@@ -3034,9 +3043,6 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Lock Terminal UID
 	WriteOnOff(Section, "LockTUID", FName, ts->TermFlag & TF_LOCKTUID);
 
-	// Confirm PasteCR
-	WriteOnOff(Section, "ConfirmChangePasteCR", FName, ts->ConfirmChangePasteCR);
-
 	// Jump List
 	WriteOnOff(Section, "JumpList", FName, ts->JumpList);
 
@@ -3183,7 +3189,12 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "ZmodemTimeouts", Temp, FName);
 
 	// Trim trailing new line character when pasting
-	WriteOnOff(Section, "TrimTrailingNLonPaste", FName, ts->TrimTrailingNLonPaste);
+	WriteOnOff(Section, "TrimTrailingNLonPaste", FName,
+		(WORD) (ts->PasteFlag & CPF_TRIM_TRAILING_NL));
+
+	// Normalize line break when pasting
+	WriteOnOff(Section, "NormalizeLineBreakOnPaste", FName,
+		(WORD) (ts->PasteFlag & CPF_NORMALIZE_LINEBREAK));
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);

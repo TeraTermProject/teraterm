@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>setflowctrl</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>setflowctrl</h1>
+
+<p>
+Causes Tera Term to change flow control. 
+</p>
+
+<pre class="macro-syntax">
+setflowctrl &lt;value&gt;
+</pre>
+
+<h2>Parameters</h2>
+
+<dl>
+	<dt class="macro">integer &lt;value&gt;</dt>
+	<dd>Set the flow control of serial port by using below flags.
+
+<table>
+ <tr>
+  <th>Value</th>
+  <th>Meaning</th>
+ </tr>
+ <tr>
+  <td>1</td>
+  <td>Xon/Xoff</td>
+ </tr>
+ <tr>
+  <td>2</td>
+  <td>hardware</td>
+ </tr>
+ <tr>
+  <td>3</td>
+  <td>none</td>
+ </tr>
+</table>
+
+	</dd>
+</dl>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+; change flow control to "none"
+setflowctrl 3
+</pre>
+
+</body>
+</html>

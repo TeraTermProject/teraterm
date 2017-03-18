@@ -63,6 +63,11 @@ let &amp;t_EI .= "\e[1 q"
 
 
 <h2><a name="Bracketed">Auto indent can be disabled on pasting from clipboard</a></h2>
+<p class="notice">
+NOTE: When text is pasted by using Vim 8.0.0238 or later , auto indent and completion are disabled not below configuration becasue the vim editor supports Bracketed Paste Mode. <br>
+However, when tmux is used, below configuration is needed because Bracketed Paste Mode is not enabled.
+</p>
+
 <p>
 Basically, the host application can not recognize the difference between the user input and pasting from clipboard.
 However, when a user uses the Bracketed Paste Mode as the xterm extension, the application can recognize its difference and a user can change the behavior of pasting from clipboard.
@@ -73,20 +78,41 @@ The vim configuration is described below. The following will use xterm's bracket
 </p>
 
 <pre class="macro-example">
-if &amp;term =~ "xterm"
-    let &amp;t_ti .= "\e[?2004h"
-    let &amp;t_te .= "\e[?2004l"
-    let &amp;pastetoggle = "\e[201~"
+if has("patch-8.0.0238")
+    " When below configuration is not set by using Bracketed Paste Mode supporting version(8.0.0238 or later),
+    " the Bracketed Paste Mode is used while TERM is xterm.
+    " When tmux is used, below configuration is needed because TERM is screen.
+    if &amp;term =~ "screen"
+        let &amp;t_BE = "\e[?2004h"
+        let &amp;t_BD = "\e[?2004l"
+        exec "set t_PS=\e[200~"
+        exec "set t_PE=\e[201~"
+    endif
+else
+    " The Bracketed Paste Mode motion of Vim core will not work well, 
+    " auto indent does not become to disabling, with Vim from 8.0.0210 to 8.0.0237 version.
+    " So, Vim core function is disabled.
+    if has("patch-8.0.0210")
+        set t_BE=
+    endif
 
-    function XTermPasteBegin(ret)
-        set paste
-        return a:ret
-    endfunction
+    " When Vim core does not support Bracketed Paste Mode, below configuration works.
+    if &amp;term =~ "xterm" || &amp;term =~ "screen"
+        let &amp;t_ti .= "\e[?2004h"
+        let &amp;t_te .= "\e[?2004l"
 
-    noremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
-    inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
-    cnoremap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
-    cnoremap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+        function XTermPasteBegin(ret)
+            set pastetoggle=&lt;Esc&gt;[201~
+            set paste
+            return a:ret
+        endfunction
+
+        noremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
+        inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
+        vnoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("c")
+        cnoremap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
+        cnoremap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+    endif
 endif
 </pre>
 
@@ -99,9 +125,9 @@ Also, refer to the <a href="#withScreen">GNU Screen Notice</a>.
 if &amp;term =~ "xterm"
     let &amp;t_SI .= "\e[?2004h"
     let &amp;t_EI .= "\e[?2004l"
-    let &amp;pastetoggle = "\e[201~"
 
     function XTermPasteBegin(ret)
+        set pastetoggle=&lt;Esc&gt;[201~
         set paste
         return a:ret
     endfunction

@@ -273,6 +273,7 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 static void ssh2_channel_delete(Channel_t *c)
 {
 	bufchain_t *ch, *ptr;
+	enum scp_state prev_state;
 
 	ch = c->bufchain;
 	while (ch) {
@@ -284,6 +285,9 @@ static void ssh2_channel_delete(Channel_t *c)
 	}
 
 	if (c->type == TYPE_SCP) {
+		// SCP処理の最後の状態を保存する。
+		prev_state = c->scp.state;
+
 		c->scp.state = SCP_CLOSING;
 		if (c->scp.localfp != NULL) {
 			fclose(c->scp.localfp);
@@ -294,6 +298,11 @@ static void ssh2_channel_delete(Channel_t *c)
 					filetime.modtime = c->scp.filemtime;
 					_utime(c->scp.localfilefull, &filetime);
 				}
+
+				// SCP受信が成功していなければ、ローカルに作ったファイルの残骸を削除する。
+				// (2017.2.12 yutaka)
+				if (prev_state != SCP_CLOSING)
+					remove(c->scp.localfilefull);
 			}
 		}
 		if (c->scp.progress_window != NULL) {

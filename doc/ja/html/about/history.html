@@ -31,6 +31,39 @@
 
 <h2><a name="teraterm">Tera Term</a></h2>
 
+<h3><a name="teraterm_4.94">2017.02.28 (Ver 4.94)</a></h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>ログファイル名中の &amp;u を、ログオン中のユーザ名に変換する機能を追加した。</li>
+      <li>貼り付け時に改行を正規化する機能を追加した。デフォルトでは無効。
+        <ul>
+          <li><a href="../menu/setup-additional.html#NormalizeLineBreak">Additional settingsダイアログ</a>のCopy and Paste タブで設定を有効化できるようにした。</li>
+        </ul></li>
+      <li><a href="../macro/command/setflowctrl.html">setflowctrl</a> マクロコマンドを追加した。</li>
+    </ul>
+  </li>
+
+  <li>バグ修正
+    <ul>
+      <li>Restore setupでAlphaBlendが即時反映されない問題を修正した。</li>
+      <li>貼り付け&lt;CR&gt;で、データの末尾にゴミが付く問題を修正した。</li>
+      <li>受信漢字コードが UTF-8 設定の時に、UTF-8 としては正しくない壊れたバイト列を受信した後に文字化けが起きる問題を修正した。</li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_2.80">TTSSH(2.80)</a>へ差し替えた。</li>
+      <li><a href="#ttyrec_1.03">TTXttyrec Plugin(1.03)</a>へ差し替えた。</li>
+      <li>Oniguruma 6.1.3へ差し替えた</li>
+      <li>SFMT 1.5へ差し替えた</li>
+      <li>LogMeTT, TTLEditor のインストーラの起動方法を変更した。</li>
+    </ul>
+  </li>
+</ul>
+
+
 <h3><a name="teraterm_4.93">2016.11.30 (Ver 4.93)</a></h3>
 <ul class="history">
   <li>変更
@@ -2814,6 +2847,51 @@
 <h2><a name="ttssh">TTSSH</a></h2>
 
 
+<h3><a name="ttssh_2.81">2017.05.xx (Ver 2.81)</a></h3>
+<ul class="history">
+  <!-- li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li -->
+
+  <!--li>バグ修正
+    <ul>
+      <li></li>
+    </ul>
+  </li-->
+
+  <li>その他
+    <ul>
+      <li>PuTTY 0.68 へ差し替えた</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h3><a name="ttssh_2.80">2017.02.28 (Ver 2.80)</a></h3>
+<ul class="history">
+  <!-- li>変更
+    <ul>
+      <li></li>
+    </ul>
+  </li -->
+
+  <li>バグ修正
+    <ul>
+      <li>SCPによるファイル受信が失敗した場合、ローカルファイルの残骸を削除するようにした。</li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li>OpenSSL 1.0.2kへ差し替えた</li>
+      <li>zlib 1.2.11へ差し替えた</li>
+    </ul>
+  </li>
+</ul>
+
+
 <h3><a name="ttssh_2.79">2016.11.30 (Ver 2.79)</a></h3>
 <ul class="history">
   <!-- li>変更
@@ -4493,6 +4571,11 @@
 </ul>
 
 <h2><a name="ttyrec">TTXttyrec</a></h2>
+<h3><a name="ttyrec_1.03">2017.02.28 (Ver 1.03)</a></h3>
+<ul class="history">
+  <li>再生終了後、再度再生する為の [Replay again] を [File] メニューに追加するようにした。</li>
+</ul>
+
 <h3><a name="ttyrec_1.02">2010.2.20 (Ver 1.02)</a></h3>
 <ul class="history">
   <li>teraterm.ini の RecordStartSize エントリのデフォルトを on に変更した。</li>

@@ -63,6 +63,11 @@ let &amp;t_EI .= "\e[1 q"
 
 
 <h2><a name="Bracketed">クリップボードからの貼り付け時に自動インデントを無効にする</a></h2>
+<p class="notice">
+注: Vim 8.0.0238 より Vim 本体で Bracketed Paste Mode に対応した為、下記の設定を追加しなくても貼り付け時には自動インデントや補完等が無効になります。<br>
+しかし、tmux 利用時には Bracketed Paste Mode が有効にならないので、tmux を併用する場合は依然として下記の設定が必要になります。
+</p>
+
 <p>
 通常、ホスト側のアプリケーション (vim 等) からは、ユーザのキー入力とクリップボードからの貼り付けを区別できません。
 しかし xterm の拡張機能である Bracketed Paste Mode を利用するとこれらを区別出来るようになるため、クリップボードからの貼り付け時は動作を変える事ができます。
@@ -73,20 +78,42 @@ let &amp;t_EI .= "\e[1 q"
 </p>
 
 <pre class="macro-example">
-if &amp;term =~ "xterm"
-    let &amp;t_ti .= "\e[?2004h"
-    let &amp;t_te .= "\e[?2004l"
-    let &amp;pastetoggle = "\e[201~"
+if has("patch-8.0.0238")
+    " Bracketed Paste Mode対応バージョン(8.0.0238以降)では、特に設定しない
+    " 場合はTERMがxtermの時のみBracketed Paste Modeが使われる。
+    " tmux利用時はTERMがscreenなので、Bracketed Paste Modeを利用するには
+    " 以下の設定が必要となる。
+    if &amp;term =~ "screen"
+        let &amp;t_BE = "\e[?2004h"
+        let &amp;t_BD = "\e[?2004l"
+        exec "set t_PS=\e[200~"
+        exec "set t_PE=\e[201~"
+    endif
+else
+    " 8.0.0210 ～ 8.0.0237 ではVim本体でのBracketed Paste Mode対応の挙動が
+    " 望ましくない(自動インデントが無効にならない)ので、Vim本体側での対応を
+    " 無効にする。
+    if has("patch-8.0.0210")
+        set t_BE=
+    endif
 
-    function XTermPasteBegin(ret)
-        set paste
-        return a:ret
-    endfunction
+    " Vim本体がBracketed Paste Modeに対応していない時の為の設定。
+    if &amp;term =~ "xterm" || &amp;term =~ "screen"
+        let &amp;t_ti .= "\e[?2004h"
+        let &amp;t_te .= "\e[?2004l"
 
-    noremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
-    inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
-    cnoremap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
-    cnoremap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+        function XTermPasteBegin(ret)
+            set pastetoggle=&lt;Esc&gt;[201~
+            set paste
+            return a:ret
+        endfunction
+
+        noremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("0i")
+        inoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("")
+        vnoremap &lt;special&gt; &lt;expr&gt; &lt;Esc&gt;[200~ XTermPasteBegin("c")
+        cnoremap &lt;special&gt; &lt;Esc&gt;[200~ &lt;nop&gt;
+        cnoremap &lt;special&gt; &lt;Esc&gt;[201~ &lt;nop&gt;
+    endif
 endif
 </pre>
 
@@ -99,9 +126,9 @@ endif
 if &amp;term =~ "xterm"
     let &amp;t_SI .= "\e[?2004h"
     let &amp;t_EI .= "\e[?2004l"
-    let &amp;pastetoggle = "\e[201~"
 
     function XTermPasteBegin(ret)
+        set pastetoggle=&lt;Esc&gt;[201~
         set paste
         return a:ret
     endfunction

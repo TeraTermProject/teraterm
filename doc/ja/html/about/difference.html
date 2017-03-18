@@ -76,7 +76,7 @@ Tera Term(Tera Term 4.58)とTera Term Pro 2.3との機能差分について以下に示します。
 <tr>
 	<td>リンクライブラリ</td>
 	<td>SSLeay, zlib</td>
-	<td>OpenSSL, zlib, Oniguruma, PuTTY</td>
+	<td>OpenSSL(暗号化ライブラリとして使用。TLSのためには使用していない)<br />zlib<br />Oniguruma<br />PuTTY(Pageantとの連携のために使用。SSH通信のためには使用していない)</td>
 </tr>
 
 <tr>
@@ -190,7 +190,7 @@ Tera Term(Tera Term 4.58)とTera Term Pro 2.3との機能差分について以下に示します。
 <tr>
 	<td>プロキシ</td>
 	<td>No</td>
-	<td>Yes[*9](HTTP, TELNET, SOCKS4, SOCKS5, SSL, HTTP+SSL, TELNET+SSL, SOCKS4+SSL, SOCKS5+SSL)</td>
+	<td>Yes[*9](HTTP, TELNET, SOCKS4, SOCKS5)</td>
 </tr>
 
 <tr>

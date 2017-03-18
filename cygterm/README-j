@@ -73,13 +73,14 @@
 
     README-j     -  このファイル
     README       -  README-j英訳
+    COPYING      -  GNU General Public License (GPL) Version 2
     Makefile     -  メイクファイル
     cygterm.cc   -  ソースコード
     cygterm.cfg  -  設定ファイル
 
     ※ Free Software Foundation 発行 GNU General Public License (GPL)
        に準拠するフリーソフトウェアとして配布します。
-       http://www.gnu.org/copyleft/gpl.html 参照。
+       COPYING 参照。(https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 
        補足: 他プログラムが CygTerm実行形式(cygterm.exe)を起動し通信して
              使用することは、それが非GPLプログラムの場合でも許可されます。

@@ -1,33 +1,33 @@
 #define AppName "Tera Term"
-#define AppVer "4.93"
-;#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
+#define AppVer "4.94"
+#define snapshot GetDateTimeString('yyyymmdd_hhnnss', '', '');
 
 [InnoIDE_PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [InnoIDE_PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [PreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [PostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [_ISToolPreCompile]
 Name: makechm.bat
-;Name: build.bat
-Name: build.bat; Parameters: rebuild
+Name: build.bat
+;Name: build.bat; Parameters: rebuild
 
 [_ISToolPostCompile]
-Name: makearchive.bat; Parameters: release
+;Name: makearchive.bat; Parameters: release
 
 [Setup]
-AppCopyright=(C) 2004-2016 TeraTerm Project
+AppCopyright=(C) 2004-2017 TeraTerm Project
 AppName={#AppName}
 #ifndef snapshot
 AppVerName={#AppName} {#AppVer}
@@ -244,10 +244,10 @@ Name: ttyplayassoc; Description: {cm:task_ttyplayassoc}; Components: Additional_
 
 [Run]
 Filename: {app}\ttermpro.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_teraterm}; Components: TeraTerm
-Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Flags: skipifsilent; Components: LogMeTT
-Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: LogMeTT
-Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Flags: skipifsilent; Components: TTLEdit
-Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Parameters: /SILENT; Flags: skipifnotsilent; Components: TTLEdit
+Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Flags: skipifsilent runasoriginaluser; Components: LogMeTT
+Filename: {tmp}\Setup_LogMeTT_2_12_1.exe; Parameters: /SILENT; Flags: skipifnotsilent runasoriginaluser; Components: LogMeTT
+Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Flags: skipifsilent runasoriginaluser; Components: TTLEdit
+Filename: {tmp}\Setup_TTLEditor_1_5_1.exe; Parameters: /SILENT; Flags: skipifnotsilent runasoriginaluser; Components: TTLEdit
 Filename: {app}\ttpmenu.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_ttmenu}; Components: TeraTerm_Menu
 Filename: {app}\Collector\Collector.exe; Flags: nowait postinstall skipifsilent unchecked; Description: {cm:launch_collector}; Components: Collector
 
