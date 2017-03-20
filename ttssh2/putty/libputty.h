@@ -8,7 +8,7 @@ extern void safefree(void *);
 
 // WINDOWS\WINPGNTC.C
 extern int agent_exists(void);
-extern int agent_query(void *in, int inlen, void **out, int *outlen,
+extern void *agent_query(void *in, int inlen, void **out, int *outlen,
                        void (*callback)(void *, void *, int), void *callback_ctx);
 
 int putty_get_ssh2_keylist(unsigned char **keylist);
