@@ -9085,8 +9085,8 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	}
 
 	req_len = get_uint32_MSBfirst(data);
-	retval = agent_query(data, req_len + 4, &response, &resplen, NULL, NULL);
-	if (retval != 1 || resplen < 5) {
+	agent_query(data, req_len + 4, &response, &resplen, NULL, NULL);
+	if (response == NULL || resplen < 5) {
 		// ‚±‚Ì channel ‚ð•Â‚¶‚é
 		if (SSHv2(pvar)) {
 			ssh2_channel_send_close(pvar, c);

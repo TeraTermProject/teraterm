@@ -46,7 +46,7 @@ void *putty_sign_ssh2_key(unsigned char *pubkey,
 
 	unsigned char *request, *response;
 	void *vresponse;
-	int resplen, retval;
+	int resplen;
 	int pubkeylen, datalen, reqlen;
 
 	pubkeylen = GET_32BIT(pubkey);
@@ -63,8 +63,8 @@ void *putty_sign_ssh2_key(unsigned char *pubkey,
 	// sign data (length + data)
 	memcpy(request + 5 + 4 + pubkeylen, data, 4 + datalen);
 
-	retval = agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
-	assert(retval == 1);
+	agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
+
 	response = vresponse;
 	if (resplen < 5 || response[4] != SSH2_AGENT_SIGN_RESPONSE) {
 		sfree(response);
@@ -113,7 +113,7 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
 
 	unsigned char *request, *response, *p;
 	void *vresponse;
-	int resplen, retval;
+	int resplen;
 	int reqlen;
 
 	reqlen = 4 + 1 + pubkeylen + datalen + 16 + 4;
@@ -138,8 +138,8 @@ void *putty_hash_ssh1_challenge(unsigned char *pubkey,
 	// terminator?
 	PUT_32BIT(p, 1);
 
-	retval = agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
-	assert(retval == 1);
+	agent_query(request, reqlen, &vresponse, &resplen, NULL, NULL);
+
 	response = vresponse;
 	if (resplen < 5 || response[4] != SSH1_AGENT_RSA_RESPONSE) {
 		sfree(response);
@@ -278,12 +278,12 @@ static void *get_keylist1(int *length)
 
 	unsigned char request[5], *response;
 	void *vresponse;
-	int resplen, retval;
+	int resplen;
 	request[4] = SSH1_AGENTC_REQUEST_RSA_IDENTITIES;
 	PUT_32BIT(request, 1);
 
-	retval = agent_query(request, 5, &vresponse, &resplen, NULL, NULL);
-	assert(retval == 1);
+	agent_query(request, 5, &vresponse, &resplen, NULL, NULL);
+
 	response = vresponse;
 	if (resplen < 5 || response[4] != SSH1_AGENT_RSA_IDENTITIES_ANSWER) {
 		sfree(response);
@@ -312,13 +312,13 @@ static void *get_keylist2(int *length)
 
 	unsigned char request[5], *response;
 	void *vresponse;
-	int resplen, retval;
+	int resplen;
 
 	request[4] = SSH2_AGENTC_REQUEST_IDENTITIES;
 	PUT_32BIT(request, 1);
 
-	retval = agent_query(request, 5, &vresponse, &resplen, NULL, NULL);
-	assert(retval == 1);
+	agent_query(request, 5, &vresponse, &resplen, NULL, NULL);
+
 	response = vresponse;
 	if (resplen < 5 || response[4] != SSH2_AGENT_IDENTITIES_ANSWER) {
 		sfree(response);
