@@ -69,8 +69,10 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
         <li><span class="syntax">/C=256</span> COM256</li>
       </ul></dd>
 
+<!--
   <dt id="duplicate">/DUPLICATE</dt>
   <dd>Internal use(must not specify this option)</dd>
+-->
 
   <dt id="ds">/DS</dt>
   <dd>Disable displaying the "New connection" dialog on startup</dd>
@@ -80,7 +82,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="es">/ES</dt>
   <dd>Enable displaying the "<a href="../menu/file-new.html">New connection</a>" dialog on startup<br>
-      When the port type is TCP/IP, "New connection"  dialog is shown basically. 
+      When the port type is TCP/IP, "New connection"  dialog is shown basically.
       However, the dialog can be not shown when <a href="../setup/teraterm-ini.html#HostDialogOnStartup">HostDialogOnStartup</a> is off.
       The /ES option can be forced to show the "New connection" dialog regardless of the setting. <br>
       When the port type is Serial, the "New connection" dialog does not be shown. Also, the /ES option can not be effected.
@@ -196,7 +198,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
         <li><span class="syntax">/AUTOWINCLOSE=on</span> Automatically close the window on disconnection.</li>
         <li><span class="syntax">/AUTOWINCLOSE=off</span> Do not close the window on disconnection.</li>
       </ul></dd>
-  
+
   <dt id="comment">;&lt;comment&gt;</dt>
   <dd>Comment. Should be last in the command line.</dd>
 </dl>
@@ -206,14 +208,14 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
 <pre>
 TTERMPRO
-TTERMPRO myhost.mydomain
-TTERMPRO myhost.mydomain:23
-TTERMPRO myhost.mydomain 23
-TTERMPRO 111.111.11.11
-TTERMPRO myhost.mydomain /T=0 /P=7
+TTERMPRO myhost.example.com
+TTERMPRO myhost.example.com:23
+TTERMPRO myhost.example.com 23
+TTERMPRO 192.0.2.1
+TTERMPRO myhost.example.com /T=0 /P=7
 TTERMPRO /C=1
 TTERMPRO /F=TELNET.INI
-TTERMPRO foohost.foodomain /F=FOOHOST.INI
+TTERMPRO foohost.example.org /F=FOOHOST.INI
 TTERMPRO /C=2 /BAUD=9600 /F=MYSETUP.INI
 TTERMPRO /K=MYKEY.CNF /W="My host"
 TTERMPRO /R=README.TXT ; replay a file
@@ -264,6 +266,7 @@ If the value includes the `"' character, the user should write the `"' character
 /W="""Tera Term"""
 /W="Tera;Term"
 </pre>
+
 
 <h2 id="refs">See also</h2>
 
