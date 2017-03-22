@@ -145,6 +145,7 @@ HlpRefSource=html\reference\sourcecode.html
 HlpRefOniguruma=html\reference\Oniguruma-LICENSE.txt
 HlpRefSFMT=html\reference\SFMT-LICENSE.txt
 HlpRefCygterm=html\reference\CygTerm+-LICENSE.txt
+HlpRefZlib=html\reference\zlib-LICENSE.txt
 HlpMacro=html\macro\index.html
 HlpMacroExec=html\macro\howtorun.html
 HlpMacroCommandline=html\macro\commandline.html

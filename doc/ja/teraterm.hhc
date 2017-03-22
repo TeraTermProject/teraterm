@@ -560,6 +560,11 @@
 			<param name="ImageNumber" value="11">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="zlib ライセンス">
+			<param name="Local" value="html\reference\zlib-LICENSE.txt">
+			<param name="ImageNumber" value="11">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="PuTTY ライセンス">
 			<param name="Local" value="html\reference\PuTTY-LICENSE.txt">
 			<param name="ImageNumber" value="11">

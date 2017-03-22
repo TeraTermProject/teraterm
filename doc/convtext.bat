@@ -1,4 +1,5 @@
 set TOSJIS=perl ..\installer\2sjis.pl
+set ZLIBCP=perl ..\installer\copy-zliblicense.pl
 set REF_E=en\html\reference
 set REF_J=ja\html\reference
 %TOSJIS% -i ..\libs\oniguruma\COPYING   -o %REF_E%\Oniguruma-LICENSE.txt -l unix
@@ -13,3 +14,5 @@ set REF_J=ja\html\reference
 %TOSJIS% -i ..\libs\SFMT\LICENSE.txt    -o %REF_J%\SFMT-LICENSE.txt      -l unix
 %TOSJIS% -i ..\cygterm\COPYING          -o %REF_E%\CygTerm+-LICENSE.txt  -l unix
 %TOSJIS% -i ..\cygterm\COPYING          -o %REF_J%\CygTerm+-LICENSE.txt  -l unix
+%ZLIBCP% -i ..\libs\zlib\README         -o %REF_E%\zlib-LICENSE.txt      -l unix
+%ZLIBCP% -i ..\libs\zlib\README         -o %REF_J%\zlib-LICENSE.txt      -l unix
