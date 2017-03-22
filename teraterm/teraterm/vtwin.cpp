@@ -2025,17 +2025,19 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_STATIC), FALSE);
 
-				// フォーカスの初期状態を Cancel にする。
-				// 後で WM_NEXTDLGCTL を送るので、 Cancel の一つ前の Send file (IDOK) に
-				// フォーカスを当てる。(SCP は無効になっている為)
+				// フォーカスの初期状態を Cancel にする為、この時点では Send File (IDOK)に
+				// フォーカスを当てる。後で WM_NEXTDLGCTL でフォーカスが次のボタンになる。
 				SetFocus(GetDlgItem(hDlgWnd, IDOK));
 			}
 			else {
-				// SSH2 接続時は SCP (IDC_DAD_SENDFILE) が一つ前
-				SetFocus(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE));
+				// SSH2 接続時は Cancel にフォーカスを当て、最終的に SCP PATH にフォーカスが
+				// 当たるようにする。
+				SetFocus(GetDlgItem(hDlgWnd, IDCANCEL));
 			}
 
-			// フォーカスを次のボタン(Cancel)に移す
+			// フォーカスを次のボタンに移す
+			// SetFocus() で直接フォーカスを当てるとタブキーの動作等に問題が出るため、
+			// このメッセージを併用する
 			PostMessage(hDlgWnd, WM_NEXTDLGCTL, 0, 0L);
 
 			// TRUEにするとボタンにフォーカスが当たらない。
