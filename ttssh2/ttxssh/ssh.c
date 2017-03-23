@@ -6455,18 +6455,14 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 		// Pageant
 		SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_PK_OK);
 	}
+	else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
+		SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ);
+	}
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_SUCCESS);
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_FAILURE);
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_BANNER);
 	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);  // support for authorized_keys command (2006.2.23 yutaka)
 
-	// XXX: パスワード変更対応。
-	// ただし、OpenSSHやOpenSolaris(SSH-2.0-Sun_SSH_1.3)では、このメッセージを送ってこないため、
-	// 未評価。ゆえに、実装はしたが、開放はしない。
-	// (2010.11.11 yutaka)
-#if 0
-	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ);
-#endif
 
 	return do_SSH2_authrequest(pvar);
 }
@@ -7008,9 +7004,7 @@ BOOL handle_SSH2_userauth_msg60(PTInstVar pvar)
 		return handle_SSH2_userauth_pkok(pvar);
 	}
 	else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
-		// TODO
-		// return handle_SSH2_userauth_passwd_changereq(pvar) {
-		return FALSE;
+		return handle_SSH2_userauth_passwd_changereq(pvar);
 	}
 	else {
 		return FALSE;
@@ -7235,10 +7229,11 @@ struct change_password {
 static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	char retype_passwd[PASSWD_MAXLEN];
-	struct change_password *cp = (struct change_password *)lParam;
+	static struct change_password *cp;
 
 	switch (msg) {
 	case WM_INITDIALOG:
+		cp = (struct change_password *)lParam;
 		return TRUE;
 
 	case WM_COMMAND:
