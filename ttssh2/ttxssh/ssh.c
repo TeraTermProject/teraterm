@@ -5281,7 +5281,7 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, 
 		            "SSH_BUG_DHGEX_LARGE is enabled. DH-GEX group size is limited to 4096. (Original size is %d)",
 			    bits);
-		notify_verbose_message(pvar, tmp, LOG_LEVEL_NOTIFY);
+		notify_verbose_message(pvar, tmp, LOG_LEVEL_NOTICE);
 		bits = 4096;
 	}
 
@@ -5381,7 +5381,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログは出さない。
 		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
 		    "DH-GEX: grp_bits(%d) < kexgex_bits(%d)", grp_bits, pvar->kexgex_bits);
-		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_NOTIFY);
+		notify_verbose_message(pvar, tmpbuf, LOG_LEVEL_NOTICE);
 #if 1
 		tmpbuf[0] = 0; // no message
 #else
