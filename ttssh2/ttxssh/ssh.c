@@ -1704,8 +1704,7 @@ static void init_protocol(PTInstVar pvar)
 		enque_handler(pvar, SSH2_MSG_USERAUTH_SUCCESS, handle_SSH2_userauth_success);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_FAILURE, handle_SSH2_userauth_failure);
 		enque_handler(pvar, SSH2_MSG_USERAUTH_BANNER, handle_SSH2_userauth_banner);
-		enque_handler(pvar, SSH2_MSG_USERAUTH_INFO_REQUEST, handle_SSH2_userauth_inforeq);
-		enque_handler(pvar, SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ, handle_SSH2_userauth_passwd_changereq);
+		enque_handler(pvar, SSH2_MSG_USERAUTH_INFO_REQUEST, handle_SSH2_userauth_msg60);
 
 		enque_handler(pvar, SSH2_MSG_UNIMPLEMENTED, handle_unimplemented);
 
@@ -6989,125 +6988,139 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 }
 
 
-// SSH2 keyboard-interactive methodの SSH2_MSG_USERAUTH_INFO_REQUEST 処理関数
+// SSH2 メッセージ 60 番の処理関数
+//
+// SSH2 では以下のメッセージが 60 番へ重複して割り当てられている。
 // 
+// * SSH2_MSG_USERAUTH_INFO_REQUEST (keyboard-interactive)
+// * SSH2_MSG_USERAUTH_PK_OK (publickey / Tera Term では Pageant 認証のみ)
+// * SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ (password)
+//
 // 現状の実装では同じメッセージ番号が存在できないので、
-// SSH2 publickey で Pageant を使っているときの
-// SSH2_MSG_USERAUTH_PK_OK もこの関数で処理する。(2007.2.12 maya)
+// 60 番はこの関数で受け、method によって対応するハンドラ関数に振り分ける。
 // 
-//
-// ※メモ：OpenSSHでPAMを有効にする方法
-//・ビルド
-//# ./configure --with-pam
-//# make
-//
-//・/etc/ssh/sshd_config に下記のように書く。
-//PasswordAuthentication no
-//PermitEmptyPasswords no
-//ChallengeResponseAuthentication yes
-//UsePAM yes
-//
-// (2005.1.23 yutaka)
-BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
+BOOL handle_SSH2_userauth_msg60(PTInstVar pvar)
 {
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-		// SSH2_MSG_USERAUTH_INFO_REQUEST
-		int len;
-		char *data;
-		int slen = 0, num, echo;
-		char *s, *prompt = NULL;
-		buffer_t *msg;
-		unsigned char *outmsg;
-		int i;
-		char *name, *inst, *lang;
-		char lprompt[512];
-
-		notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.", LOG_LEVEL_VERBOSE);
-
-		// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
-		data = pvar->ssh_state.payload;
-		// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
-		len = pvar->ssh_state.payloadlen;
-
-		//debug_print(10, data, len);
-
-		///////// step1
-		// get string
-		name = buffer_get_string(&data, NULL);
-		inst = buffer_get_string(&data, NULL);
-		lang = buffer_get_string(&data, NULL);
-		lprompt[0] = 0;
-		if (strlen(inst) > 0) {
-			strncat_s(lprompt, sizeof(lprompt), inst, _TRUNCATE);
-			strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
-		}
-		if (strlen(lang) > 0) {
-			strncat_s(lprompt, sizeof(lprompt), lang, _TRUNCATE);
-			strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
-		}
-		free(name);
-		free(inst);
-		free(lang);
-
-		// num-prompts
-		num = get_uint32_MSBfirst(data);
-		data += 4;
-
-		///////// step2
-		// サーバへパスフレーズを送る
-		msg = buffer_init();
-		if (msg == NULL) {
-			// TODO: error check
-			return FALSE;
-		}
-		buffer_put_int(msg, num);
-
-		// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
-		if (num == 0) {
-			if (strlen(lprompt) > 0) 
-				MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
-		}
-
-		// プロンプトの数だけ prompt & echo が繰り返される。
-		for (i = 0 ; i < num ; i++) {
-			// get string
-			slen = get_uint32_MSBfirst(data);
-			data += 4;
-			prompt = data;  // prompt
-			data += slen;
-
-			// get boolean
-			echo = data[0];
-			data += 1;
-
-			// keyboard-interactive method (2005.3.12 yutaka)
-			if (pvar->keyboard_interactive_password_input == 0 &&
-				pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-				AUTH_set_TIS_mode(pvar, prompt, slen);
-				AUTH_advance_to_next_cred(pvar);
-				pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
-				//try_send_credentials(pvar);
-				buffer_free(msg);
-				return TRUE;
-			}
-
-			// TODO: ここでプロンプトを表示してユーザから入力させるのが正解。
-			s = pvar->auth_state.cur_cred.password;
-			buffer_put_string(msg, s, strlen(s));
-
-			// リトライに対応できるよう、フラグをクリアする。(2010.11.11 yutaka)
-			pvar->keyboard_interactive_password_input = 0;
-		}
-
-		len = buffer_len(msg);
-		outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_INFO_RESPONSE, len);
-		memcpy(outmsg, buffer_ptr(msg), len);
-		finish_send_packet(pvar);
-		buffer_free(msg);
-
-		notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent at handle_SSH2_userauth_inforeq().", LOG_LEVEL_VERBOSE);
+		return handle_SSH2_userauth_inforeq(pvar);
 	}
-	else { // SSH_AUTH_PAGEANT
+	else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PAGEANT) {
+		return handle_SSH2_userauth_pkok(pvar);
+	}
+	else if (pvar->auth_state.cur_cred.method == SSH_AUTH_PASSWORD) {
+		// TODO
+		// return handle_SSH2_userauth_passwd_changereq(pvar) {
+		return FALSE;
+	}
+	else {
+		return FALSE;
+	}
+
+	return TRUE; // not reached
+}
+
+BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
+{
+	// SSH2_MSG_USERAUTH_INFO_REQUEST
+	int len;
+	char *data;
+	int slen = 0, num, echo;
+	char *s, *prompt = NULL;
+	buffer_t *msg;
+	unsigned char *outmsg;
+	int i;
+	char *name, *inst, *lang;
+	char lprompt[512];
+
+	notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_INFO_REQUEST was received.", LOG_LEVEL_VERBOSE);
+
+	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	data = pvar->ssh_state.payload;
+	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
+	len = pvar->ssh_state.payloadlen;
+
+	//debug_print(10, data, len);
+
+	///////// step1
+	// get string
+	name = buffer_get_string(&data, NULL);
+	inst = buffer_get_string(&data, NULL);
+	lang = buffer_get_string(&data, NULL);
+	lprompt[0] = 0;
+	if (strlen(inst) > 0) {
+		strncat_s(lprompt, sizeof(lprompt), inst, _TRUNCATE);
+		strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
+	}
+	if (strlen(lang) > 0) {
+		strncat_s(lprompt, sizeof(lprompt), lang, _TRUNCATE);
+		strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
+	}
+	free(name);
+	free(inst);
+	free(lang);
+
+	// num-prompts
+	num = get_uint32_MSBfirst(data);
+	data += 4;
+
+	///////// step2
+	// サーバへパスフレーズを送る
+	msg = buffer_init();
+	if (msg == NULL) {
+		// TODO: error check
+		return FALSE;
+	}
+	buffer_put_int(msg, num);
+
+	// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
+	if (num == 0) {
+		if (strlen(lprompt) > 0) 
+			MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
+	}
+
+	// プロンプトの数だけ prompt & echo が繰り返される。
+	for (i = 0 ; i < num ; i++) {
+		// get string
+		slen = get_uint32_MSBfirst(data);
+		data += 4;
+		prompt = data;  // prompt
+		data += slen;
+
+		// get boolean
+		echo = data[0];
+		data += 1;
+
+		// keyboard-interactive method (2005.3.12 yutaka)
+		if (pvar->keyboard_interactive_password_input == 0 &&
+			pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
+			AUTH_set_TIS_mode(pvar, prompt, slen);
+			AUTH_advance_to_next_cred(pvar);
+			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
+			//try_send_credentials(pvar);
+			buffer_free(msg);
+			return TRUE;
+		}
+
+		// TODO: ここでプロンプトを表示してユーザから入力させるのが正解。
+		s = pvar->auth_state.cur_cred.password;
+		buffer_put_string(msg, s, strlen(s));
+
+		// リトライに対応できるよう、フラグをクリアする。(2010.11.11 yutaka)
+		pvar->keyboard_interactive_password_input = 0;
+	}
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_USERAUTH_INFO_RESPONSE, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+	buffer_free(msg);
+
+	notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent at handle_SSH2_userauth_inforeq().", LOG_LEVEL_VERBOSE);
+	return TRUE;
+}
+
+BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
+{
 		// SSH2_MSG_USERAUTH_PK_OK
 		buffer_t *msg = NULL;
 		char *s, *username;
@@ -7208,10 +7221,9 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_REQUEST was sent at handle_SSH2_userauth_inforeq().", LOG_LEVEL_VERBOSE);
 
 		pvar->pageant_keyfinal = TRUE;
-	}
 
-	return TRUE;
-}
+		return TRUE;
+	}
 
 #define PASSWD_MAXLEN 150
 
