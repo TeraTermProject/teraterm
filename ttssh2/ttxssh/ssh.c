@@ -2153,7 +2153,7 @@ void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len,
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 					pvar->ts->UIMsg, message, handle_message_stage);
 				notify_fatal_error(pvar, buf, TRUE);
-				// abort
+				return;
 			}
 		}
 
