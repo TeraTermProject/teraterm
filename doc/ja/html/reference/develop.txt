@@ -51,6 +51,7 @@
 - OpenSSL 1.0.2k (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.68 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+- SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
 
 
 ■ SVN コミッターへの注意
@@ -144,6 +145,11 @@
      (1) zlib のソースを libs/zlib の中に展開する。
      (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
      (3) コマンドプロンプト上から libs ディレクトリに移動し、buildzlib.bat を実行する。
+
+  5. SFMT (used by Tera Term Macro)
+     (1) SFMT のソースを libs/SFMT の中に展開する。
+     (2) スタートメニューから「Visual Studio 2005 コマンド プロンプト」を起動する。
+     (3) コマンドプロンプト上から libs ディレクトリに移動し、buildSFMT.bat を実行する。
 
 
 ■ Tera Termのビルド方法
@@ -258,6 +264,8 @@
        http://www.zlib.net/
      PuTTY
        http://www.chiark.greenend.org.uk/~sgtatham/putty/
+     SFMT
+       http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html
      CygTerm
        https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index.html
      LogMeTT

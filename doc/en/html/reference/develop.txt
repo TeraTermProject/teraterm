@@ -49,6 +49,7 @@
 - OpenSSL 1.0.2k (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.68 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
+- SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index-jp.html)
 
 
 * Notice for SVN commiter
@@ -139,6 +140,11 @@ Example: adding a TTSSH menu under File menu
      (1) Extract zlib source into libs/zlib directory.
      (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
      (3) Move 'libs' directory on the command prompt. And run buildzlib.bat.
+
+  5. SFMT (used by Tera Term Macro)
+     (1) Extract SFMT source into libs/SFMT directory.
+     (2) Launch 'Visual Studio 2005 Command Prompt' batch file from start menu.
+     (3) Move 'libs' directory on the command prompt. And run buildSFMT.bat.
 
 
 * How to build Tera Term
@@ -251,6 +257,8 @@ Example: adding a TTSSH menu under File menu
        http://www.zlib.net/
      PuTTY
        http://www.chiark.greenend.org.uk/~sgtatham/putty/
+     SFMT
+       http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html
      CygTerm
        https://googledrive.com/host/0B1s-dM6d6yC4fmhEZ3c0VTNFWEFtV3daUlRGQmFHVnBmVHRybUNnUVliNWktNDRlZ2NnZTQ/index-e.html
      LogMeTT
