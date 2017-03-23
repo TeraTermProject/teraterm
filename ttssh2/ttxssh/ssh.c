@@ -9057,7 +9057,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	buffer_t *agent_msg;
 	int *agent_request_len;
 	unsigned char *response;
-	int resplen, retval;
+	int resplen;
 
 	req_len = get_uint32_MSBfirst(data);
 
