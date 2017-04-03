@@ -150,6 +150,7 @@ typedef TCharAttr *PCharAttr;
 #define WM_USER_KEYCODE      WM_USER+12
 #define WM_USER_GETSERIALNO  WM_USER+13
 #define WM_USER_CHANGETITLE  WM_USER+14
+#define WM_USER_NOTIFYICON   WM_USER+15
 
 #define WM_USER_DDEREADY     WM_USER+21
 #define WM_USER_DDECMNDEND   WM_USER+22
@@ -1033,6 +1034,8 @@ typedef struct {
 	BOOL TelLineMode;
 	_locale_t locale;
 	BOOL VirtualStoreEnabled;
+
+	NOTIFYICONDATA *NotifyIcon;
 } TComVar;
 typedef TComVar far *PComVar;
 

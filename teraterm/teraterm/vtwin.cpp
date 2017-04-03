@@ -160,6 +160,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_MESSAGE(WM_USER_CHANGETITLE,OnChangeTitle)
 	ON_MESSAGE(WM_COPYDATA,OnReceiveIpcMessage)
 	ON_MESSAGE(WM_USER_NONCONFIRM_CLOSE, OnNonConfirmClose)
+	ON_MESSAGE(WM_USER_NOTIFYICON, OnNotifyIcon)
 	ON_COMMAND(ID_FILE_NEWCONNECTION, OnFileNewConnection)
 	ON_COMMAND(ID_FILE_DUPLICATESESSION, OnDuplicateSession)
 	ON_COMMAND(ID_FILE_CYGWINCONNECTION, OnCygwinConnection)
@@ -1982,6 +1983,8 @@ void CVTWindow::OnDestroy()
 
 	CFrameWnd::OnDestroy();
 	TTXEnd(); /* TTPLUG */
+
+	DeleteNotifyIcon(&cv);
 }
 
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -3785,6 +3788,41 @@ LONG CVTWindow::OnChangeTitle(UINT wParam, LONG lParam)
 	ChangeTitle();
 	return 0;
 }
+
+
+LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
+{
+	char buff[512];
+
+	if (wParam == 1) {
+		switch (lParam) {
+		  case WM_MOUSEMOVE:
+		  case WM_LBUTTONDOWN:
+		  case WM_LBUTTONUP:
+		  case WM_LBUTTONDBLCLK:
+		  case WM_RBUTTONDOWN:
+		  case WM_RBUTTONUP:
+		  case WM_RBUTTONDBLCLK:
+		  case WM_CONTEXTMENU:
+		  case NIN_BALLOONSHOW:
+		  case NIN_BALLOONHIDE:
+		  case NIN_KEYSELECT:
+		  case NIN_SELECT:
+			// nothing to do
+			break;
+		  case NIN_BALLOONTIMEOUT:
+			HideNotifyIcon(&cv);
+			break;
+		  case NIN_BALLOONUSERCLICK:
+			::SetForegroundWindow(HVTWin);
+			HideNotifyIcon(&cv);
+			break;
+		}
+	}
+
+	return 0;
+}
+
 
 void CVTWindow::OnFileNewConnection()
 {

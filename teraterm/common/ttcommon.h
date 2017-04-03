@@ -53,6 +53,13 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C);
 int FAR PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
 int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);
 
+void FAR PASCAL CreateNotifyIcon(PComVar cv);
+void FAR PASCAL DeleteNotifyIcon(PComVar cv);
+void FAR PASCAL NotifyMessage(PComVar cv, PCHAR message, PCHAR title);
+void FAR PASCAL ShowNotifyIcon(PComVar cv);
+void FAR PASCAL HideNotifyIcon(PComVar cv);
+void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
+
 WORD FAR PASCAL SJIS2JIS(WORD KCode);
 WORD FAR PASCAL SJIS2EUC(WORD KCode);
 WORD FAR PASCAL JIS2SJIS(WORD KCode);

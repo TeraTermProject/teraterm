@@ -2,6 +2,10 @@
  Copyright(C) 1994-1998 T. Teranishi
  All rights reserved. */
 
+#ifndef _WIN32_IE
+#define _WIN32_IE 0x501
+#endif
+
 /* TTCMN.DLL, main */
 #include "teraterm.h"
 #include "tttypes.h"
@@ -2375,6 +2379,107 @@ int PASCAL CheckComPort(WORD ComPort)
 	SetupDiDestroyDeviceInfoList(DeviceInfoSet);
 
 	return found;
+}
+
+// Notify Icon ŠÖ˜A
+static NOTIFYICONDATA notify_icon = {0};
+
+void FAR PASCAL CreateNotifyIcon(PComVar cv)
+{
+	if (cv->NotifyIcon == NULL) {
+		notify_icon.cbSize = sizeof(notify_icon);
+		notify_icon.hWnd = cv->HWin;
+		notify_icon.uID = 1;
+		notify_icon.uFlags = NIF_ICON | NIF_MESSAGE;
+		notify_icon.uCallbackMessage = WM_USER_NOTIFYICON;
+		notify_icon.hIcon = (HICON)SendMessage(cv->HWin, WM_GETICON, ICON_SMALL, 0);
+		notify_icon.szTip[0] = '\0';
+		notify_icon.dwState = 0;
+		notify_icon.dwStateMask = 0;
+		notify_icon.szInfo[0] = '\0';
+		notify_icon.uTimeout = 0;
+		notify_icon.szInfoTitle[0] = '\0';
+		notify_icon.dwInfoFlags = 0;
+
+		cv->NotifyIcon = &notify_icon;
+
+		Shell_NotifyIcon(NIM_ADD, cv->NotifyIcon);
+	}
+
+	return;
+}
+
+void FAR PASCAL DeleteNotifyIcon(PComVar cv)
+{
+	if (cv->NotifyIcon) {
+		Shell_NotifyIcon(NIM_DELETE, cv->NotifyIcon);
+		cv->NotifyIcon = NULL;
+	}
+
+	return;
+}
+
+void FAR PASCAL ShowNotifyIcon(PComVar cv)
+{
+	if (cv->NotifyIcon == NULL) {
+		CreateNotifyIcon(cv);
+	}
+
+	cv->NotifyIcon->uFlags = NIF_STATE;
+	cv->NotifyIcon->dwState = 0;
+	cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
+	Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+	return;
+}
+
+void FAR PASCAL HideNotifyIcon(PComVar cv)
+{
+	if (cv->NotifyIcon) {
+		cv->NotifyIcon->uFlags = NIF_STATE;
+		cv->NotifyIcon->dwState = NIS_HIDDEN;
+		cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
+		Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+	}
+	return;
+}
+
+void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver)
+{
+	if (cv->NotifyIcon) {
+		cv->NotifyIcon->uVersion = ver;
+		Shell_NotifyIcon(NIM_SETVERSION, cv->NotifyIcon);
+	}
+	return;
+}
+
+void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title)
+{
+	if (msg == NULL) {
+		return;
+	}
+
+	if (cv->NotifyIcon == NULL) {
+		CreateNotifyIcon(cv);
+	}
+
+	cv->NotifyIcon->uFlags = NIF_INFO | NIF_STATE;
+	cv->NotifyIcon->dwState = 0;
+	cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
+
+	if (title) {
+		cv->NotifyIcon->dwInfoFlags = NIIF_INFO;
+		strncpy_s(cv->NotifyIcon->szInfoTitle, sizeof(cv->NotifyIcon->szInfoTitle), title, _TRUNCATE);
+	}
+	else {
+		cv->NotifyIcon->dwInfoFlags = NIIF_NONE;
+		cv->NotifyIcon->szInfoTitle[0] = 0;
+	}
+
+	strncpy_s(cv->NotifyIcon->szInfo, sizeof(cv->NotifyIcon->szInfo), msg, _TRUNCATE);
+
+	Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+
+	return;
 }
 
 BOOL WINAPI DllMain(HANDLE hInstance,

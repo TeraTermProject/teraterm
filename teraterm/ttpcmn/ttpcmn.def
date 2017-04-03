@@ -30,6 +30,12 @@ EXPORTS
   replaceInvalidFileNameChar @74
   b64encode @75
   b64decode @76
+  CreateNotifyIcon @77
+  DeleteNotifyIcon @78
+  ShowNotifyIcon @80
+  HideNotifyIcon @81
+  SetVerNotifyIcon @82
+  NotifyMessage @79
   
   SJIS2JIS @30
   SJIS2EUC @31

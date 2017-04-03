@@ -117,6 +117,7 @@ protected:
 	afx_msg LONG OnChangeTitle(UINT wParam, LONG lParam);
 	afx_msg LONG OnReceiveIpcMessage(UINT wParam, LONG lParam);
 	afx_msg LONG OnNonConfirmClose(UINT wParam, LONG lParam);
+	afx_msg LONG OnNotifyIcon(UINT wParam, LONG lParam);
 	afx_msg void OnFileNewConnection();
 	afx_msg void OnDuplicateSession();
 	afx_msg void OnCygwinConnection();

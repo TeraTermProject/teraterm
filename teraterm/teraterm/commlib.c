@@ -125,6 +125,8 @@ void CommInit(PComVar cv)
 	cv->ProtoFlag = FALSE;
 /* message flag */
 	cv->NoMsg = 0;
+
+	cv->NotifyIcon = NULL;
 }
 
 /* reset a serial port which is already open */
