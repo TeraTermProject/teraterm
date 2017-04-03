@@ -60,7 +60,7 @@ MENU_SETUP_GENERAL=&Общие...
 MENU_SETUP_ADDITION=&Дополнительные настройки...
 MENU_SETUP_SAVE=&Сохранить настройки...
 MENU_SETUP_RESTORE=&Восстановить настройки...
-MENU_OPEN_SETUP=&Папка настроек...
+MENU_SETUP_OPENSETUP=&Папка настроек...
 MENU_SETUP_LOADKEYMAP=&Загрузить настройки клавиш...
 
 MENU_CONTROL=&Управление
@@ -205,7 +205,7 @@ DLG_TAB_COPYPASTE_SELECTLBUTTON=&Использовать только левую кнопку мыши
 DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
 DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=&Разрешить вставку изменения
-DLG_TAB_CONFIRM_STRING_FILE=&Текстовый файл
+DLG_TAB_COPYPASTE_STRINGFILE=&Текстовый файл
 DLG_TAB_COPYPASTE_DELIMITER=&Разделитель символов
 DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку перед строкой
 DLG_TAB_COPYPASTE_PASTEDELAY2=мс
@@ -238,7 +238,7 @@ DLG_TAB_LOG_FILEPATH=&Папка для хранения лог-файла
 DLG_TAB_LOG_AUTOSTART=&Автостарт лог-файла
 DLG_TAB_LOG_ROTATE=&Ротация лог-файла
 DLG_TAB_LOG_ROTATE_SIZE_TEXT=Р&азмер
-IDC_ROTATE_STEP_TEXT=&Ротация
+DLG_TAB_LOG_ROTATESTEP=&Ротация
 
 
 DLG_TAB_CYGWIN_PATH=&Путь инсталляции Cygwin
@@ -268,7 +268,7 @@ DLG_FILETRANS_START=&Старт
 DLG_FILETRANS_PAUSE=&Пауза
 DLG_FILETRANS_CLOSE=Закрыть
 
-DLG_SETUPDIR_CAPTION=Tera Term: Setup directory
+DLG_SETUPDIR_TITLE=Tera Term: Setup directory
 DLG_SETUPDIR_INIFILE=Tera Term Configuration File
 DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
 DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File

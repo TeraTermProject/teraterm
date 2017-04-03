@@ -1331,7 +1331,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 	get_lang_msg("MENU_SETUP_RESTORE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(SetupMenu, ID_SETUP_RESTORE, MF_BYCOMMAND, ID_SETUP_RESTORE, ts.UIMsg);
 	GetMenuString(SetupMenu, ID_OPEN_SETUP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_OPEN_SETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("MENU_SETUP_OPENSETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	ModifyMenu(SetupMenu, ID_OPEN_SETUP, MF_BYCOMMAND, ID_OPEN_SETUP, ts.UIMsg);
 	GetMenuString(SetupMenu, ID_SETUP_LOADKEYMAP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
 	get_lang_msg("MENU_SETUP_LOADKEYMAP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
@@ -5023,7 +5023,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 
 		GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
-		get_lang_msg("DLG_SETUPDIR_CAPTION", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+		get_lang_msg("DLG_SETUPDIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetWindowText(hDlgWnd, ts.UIMsg);
 
 		GetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_GROUP, uimsg, sizeof(uimsg));

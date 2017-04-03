@@ -60,7 +60,7 @@ MENU_SETUP_GENERAL=&Grundeinstellungen
 MENU_SETUP_ADDITION=&Erweiterte Einstellungen
 MENU_SETUP_SAVE=&Setup sichern
 MENU_SETUP_RESTORE=&Setup laden
-MENU_OPEN_SETUP=Setup d&irectory...
+MENU_SETUP_OPENSETUP=Setup d&irectory...
 MENU_SETUP_LOADKEYMAP=&Keyboard-Layout einstellen
 
 MENU_CONTROL=Ste&uerung
@@ -205,7 +205,7 @@ DLG_TAB_COPYPASTE_SELECTLBUTTON=&Auswahl nur über Button
 DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
 DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=Confirm change &paste
-DLG_TAB_CONFIRM_STRING_FILE=&String file
+DLG_TAB_COPYPASTE_STRINGFILE=&String file
 DLG_TAB_COPYPASTE_DELIMITER=&Begrenzungszeichen
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
@@ -238,7 +238,7 @@ DLG_TAB_LOG_FILEPATH=Standardprotokoll-Ordner
 DLG_TAB_LOG_AUTOSTART=&Automatisch protokollieren
 DLG_TAB_LOG_ROTATE=&Log Rotate
 DLG_TAB_LOG_ROTATE_SIZE_TEXT=S&ize
-IDC_ROTATE_STEP_TEXT=&Rotate
+DLG_TAB_LOG_ROTATESTEP=&Rotate
 
 
 DLG_TAB_CYGWIN_PATH=Cygwin-Installationspfad
@@ -268,7 +268,7 @@ DLG_FILETRANS_START=&Start
 DLG_FILETRANS_PAUSE=Pau&se
 DLG_FILETRANS_CLOSE=Schließen
 
-DLG_SETUPDIR_CAPTION=Tera Term: Setup directory
+DLG_SETUPDIR_TITLE=Tera Term: Setup directory
 DLG_SETUPDIR_INIFILE=Tera Term Configuration File
 DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
 DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
