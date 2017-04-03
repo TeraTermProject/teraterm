@@ -2452,7 +2452,7 @@ void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver)
 	return;
 }
 
-void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title)
+void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
 {
 	if (msg == NULL) {
 		return;
@@ -2467,7 +2467,7 @@ void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title)
 	cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
 
 	if (title) {
-		cv->NotifyIcon->dwInfoFlags = NIIF_INFO;
+		cv->NotifyIcon->dwInfoFlags = flag;
 		strncpy_s(cv->NotifyIcon->szInfoTitle, sizeof(cv->NotifyIcon->szInfoTitle), title, _TRUNCATE);
 	}
 	else {

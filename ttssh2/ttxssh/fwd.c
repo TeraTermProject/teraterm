@@ -1936,7 +1936,7 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 	HWND cur_active = GetActiveWindow();
 
 	if (pvar->session_settings.ForwardAgentNotify) {
-		NotifyMessage(pvar->cv, "Remote host access to agent", "Agent Forwarding");
+		NotifyInfoMessage(pvar->cv, "Remote host access to agent", "Agent Forwarding");
 	}
 
 	if (pvar->session_settings.ForwardAgentConfirm) {

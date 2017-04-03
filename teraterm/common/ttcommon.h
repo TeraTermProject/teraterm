@@ -55,10 +55,14 @@ int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);
 
 void FAR PASCAL CreateNotifyIcon(PComVar cv);
 void FAR PASCAL DeleteNotifyIcon(PComVar cv);
-void FAR PASCAL NotifyMessage(PComVar cv, PCHAR message, PCHAR title);
+void FAR PASCAL NotifyMessage(PComVar cv, PCHAR message, PCHAR title, DWORD flag);
 void FAR PASCAL ShowNotifyIcon(PComVar cv);
 void FAR PASCAL HideNotifyIcon(PComVar cv);
 void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
+
+#define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
+#define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)
+#define NotifyErrorMessage(cv, msg, title) NotifyMessage(cv, msg, title, 3)
 
 WORD FAR PASCAL SJIS2JIS(WORD KCode);
 WORD FAR PASCAL SJIS2EUC(WORD KCode);
