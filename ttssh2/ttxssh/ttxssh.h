@@ -172,6 +172,9 @@ typedef struct _TS_SSH {
 	// Confirm Agent forwarding
 	BOOL ForwardAgentConfirm;
 
+	// Confirm Agent forwarding
+	BOOL ForwardAgentNotify;
+
 	// KEX order(derived from teraterm.ini)
 	char KexOrder[KEX_DH_MAX+1];
 	char HostKeyOrder[KEY_MAX+1];

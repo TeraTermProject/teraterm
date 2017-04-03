@@ -37,6 +37,8 @@ See LICENSE.TXT for the license.
 
 #include "fwd.h"
 
+#include "ttcommon.h"
+
 #include <assert.h>
 #ifndef NO_INET6
 #include "WSAAsyncGetAddrInfo.h"
@@ -1932,6 +1934,11 @@ void FWD_end(PTInstVar pvar)
 BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 {
 	HWND cur_active = GetActiveWindow();
+
+	if (pvar->session_settings.ForwardAgentNotify) {
+		NotifyMessage(pvar->cv, "Remote host access to agent", "Agent Forwarding");
+	}
+
 	if (pvar->session_settings.ForwardAgentConfirm) {
 		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
 		                  "Are you sure you want to accept agent-forwarding request?");
