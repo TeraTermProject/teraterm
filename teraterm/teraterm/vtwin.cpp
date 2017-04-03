@@ -3792,8 +3792,6 @@ LONG CVTWindow::OnChangeTitle(UINT wParam, LONG lParam)
 
 LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
 {
-	char buff[512];
-
 	if (wParam == 1) {
 		switch (lParam) {
 		  case WM_MOUSEMOVE:
