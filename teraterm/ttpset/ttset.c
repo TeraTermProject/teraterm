@@ -1804,6 +1804,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	else if (_stricmp(Temp, "write") == 0)
 		ts->CtrlFlag |= CSF_CBWRITE;
 
+	// Notify Clipboard Access from Remote
+	ts->NotifyClipboardAccess = GetOnOff(Section, "NotifyClipboardAccess", FName, TRUE);
+
 	// Use invalid DECRPSS (for testing)
 	if (GetOnOff(Section, "UseInvalidDECRQSSResponse", FName, FALSE))
 		ts->TermFlag |= TF_INVALIDDECRPSS;
@@ -3095,6 +3098,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		WritePrivateProfileString(Section, "ClipboardAccessFromRemote", "off", FName);
 		break;
 	}
+
+	// Notify Clipboard Access from Remote
+	WriteOnOff(Section, "NotifyClipboardAccess", FName, ts->NotifyClipboardAccess);
 
 	// ClickableUrlBrowser
 	WritePrivateProfileString(Section, "ClickableUrlBrowser", ts->ClickableUrlBrowser, FName);

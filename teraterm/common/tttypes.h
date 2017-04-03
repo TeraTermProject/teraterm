@@ -542,7 +542,7 @@ struct tttset {
 	int TerminalOldWidth;
 	int TerminalOldHeight;
 	WORD MaximizedBugTweak;
-	WORD Dummy2;		// ãåConfirmChangePaste. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
+	WORD NotifyClipboardAccess;
 	WORD SaveVTWinPos;
 	WORD Dummy3;		// ãåDisablePasteMouseMButton. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
 	int MouseWheelScrollLine;
@@ -1089,6 +1089,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.95, ttset_memfilemap was replaced with ttset_memfilemap_31.
+ *   added tttset.NotifyClipboardAccess
+ *
  * - At version 4.94, ttset_memfilemap was replaced with ttset_memfilemap_30.
  *   paste related settings are integrated into tttset.PasteFlag
  *
@@ -1267,4 +1270,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_30"
+#define TT_FILEMAPNAME "ttset_memfilemap_31"

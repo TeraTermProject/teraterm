@@ -4579,7 +4579,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
-	char *p, *cbbuff, hdr[20];
+	char *p, *cbbuff, hdr[20], notify_buff[130];
 	HGLOBAL cbmem;
 	int wide_len;
 	HGLOBAL wide_cbmem;
@@ -4593,10 +4593,16 @@ void XsProcClipboard(PCHAR buff)
 	if (*p++ == ';') {
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
+				if (ts.NotifyClipboardAccess) {
+					NotifyInfoMessage(&cv, "remote host reads clipboard contents", "Clipboard Access");
+				}
 				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
 				if (strncat_s(hdr, sizeof(hdr), buff, p - buff) == 0) {
 					CBStartPasteB64(HVTWin, hdr, "\033\\");
 				}
+			}
+			else if (ts.NotifyClipboardAccess) {
+				NotifyWarnMessage(&cv, "Reject clipboard read access from remote", "Rejected Clipboard Access");
 			}
 		}
 		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access
@@ -4622,6 +4628,11 @@ void XsProcClipboard(PCHAR buff)
 			cbbuff[len] = 0;
 			GlobalUnlock(cbmem);
 
+			if (ts.NotifyClipboardAccess) {
+				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "remote host writes clipboard.\n--\n%s", cbbuff);
+				NotifyInfoMessage(&cv, notify_buff, "Clipboard Access");
+			}
+
 			wide_len = MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, NULL, 0);
 			wide_cbmem = GlobalAlloc(GMEM_MOVEABLE, sizeof(WCHAR) * wide_len);
 			if (wide_cbmem) {
@@ -4638,6 +4649,9 @@ void XsProcClipboard(PCHAR buff)
 				}
 				CloseClipboard();
 			}
+		}
+		else if (ts.NotifyClipboardAccess) {
+			NotifyWarnMessage(&cv, "Reject clipboard write access from remote", "Rejected Clipboard Access");
 		}
 	}
 }
