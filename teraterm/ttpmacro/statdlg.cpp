@@ -24,7 +24,7 @@ static char THIS_FILE[] = __FILE__;
 BEGIN_MESSAGE_MAP(CStatDlg, CDialog)
 	//{{AFX_MSG_MAP(CStatDlg)
 	ON_MESSAGE(WM_EXITSIZEMOVE, OnExitSizeMove)
-	ON_MESSAGE(MY_FORCE_FOREGROUND_MESSAGE, OnSetForceForegroundWindow)
+	ON_MESSAGE(WM_USER_MSTATBRINGUP, OnSetForceForegroundWindow)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 

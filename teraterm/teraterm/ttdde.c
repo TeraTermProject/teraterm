@@ -74,7 +74,7 @@ static void BringupMacroWindow(BOOL flash_flag)
 			if (flash_flag)
 				FlashWindow(hwnd, TRUE);
 
-			SendMessage(hwnd, MY_FORCE_FOREGROUND_MESSAGE, (WPARAM)hwnd, 0);
+			SendMessage(hwnd, WM_USER_MSTATBRINGUP, (WPARAM)hwnd, 0);
 		}
 		hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
 	}
