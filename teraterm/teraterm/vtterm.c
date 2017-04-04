@@ -4594,7 +4594,7 @@ void XsProcClipboard(PCHAR buff)
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
 				if (ts.NotifyClipboardAccess) {
-					NotifyInfoMessage(&cv, "remote host reads clipboard contents", "Clipboard Access");
+					NotifyInfoMessage(&cv, "Remote host reads clipboard contents", "Clipboard Access");
 				}
 				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
 				if (strncat_s(hdr, sizeof(hdr), buff, p - buff) == 0) {
@@ -4629,7 +4629,7 @@ void XsProcClipboard(PCHAR buff)
 			GlobalUnlock(cbmem);
 
 			if (ts.NotifyClipboardAccess) {
-				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "remote host writes clipboard.\n--\n%s", cbbuff);
+				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "Remote host writes clipboard.\n--\n%s", cbbuff);
 				NotifyInfoMessage(&cv, notify_buff, "Clipboard Access");
 			}
 
