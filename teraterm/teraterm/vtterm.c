@@ -4579,7 +4579,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
-	char *p, *cbbuff, hdr[20], notify_buff[130];
+	char *p, *cbbuff, hdr[20], notify_buff[256];
 	HGLOBAL cbmem;
 	int wide_len;
 	HGLOBAL wide_cbmem;
