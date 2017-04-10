@@ -1586,8 +1586,14 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		GetOnOff(Section, "MouseEventTracking", FName, TRUE);
 
 	// Maximized bug tweak
-	ts->MaximizedBugTweak =
-		GetOnOff(Section, "MaximizedBugTweak", FName, TRUE);
+	GetPrivateProfileString(Section, "MaximizedBugTweak", "1", Temp,
+	                        sizeof(Temp), FName);
+	if (_stricmp(Temp, "on") == 0) {
+		ts->MaximizedBugTweak = 1;
+	}
+	else {
+		ts->MaximizedBugTweak = atoi(Temp);
+	}
 
 	// Convert Unicode symbol characters to DEC Special characters
 	ts->UnicodeDecSpMapping =
@@ -2912,7 +2918,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	           ts->MouseEventTracking);
 
 	// Maximized bug tweak
-	WriteOnOff(Section, "MaximizedBugTweak", FName, ts->MaximizedBugTweak);
+	WriteInt(Section, "MaximizedBugTweak", FName, ts->MaximizedBugTweak);
 
 	// Convert Unicode symbol characters to DEC Special characters
 	WriteUint(Section, "UnicodeToDecSpMapping", FName, ts->UnicodeDecSpMapping);

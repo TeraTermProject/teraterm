@@ -2480,7 +2480,7 @@ void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
 
 	CWnd::OnNcCalcSize(valid, sizeinfo);
 
-	if (valid && IsZoomed()) {
+	if (valid && IsZoomed() && ts.MaximizedBugTweak == 2) {
 		// ウィンドウ最大化時に文字が欠ける場合がある事への対処
 		// クライアント領域の高さが文字の高さで割り切れず
 		// ウィンドウ最下部に一行未満の隙間が出来る事が原因。

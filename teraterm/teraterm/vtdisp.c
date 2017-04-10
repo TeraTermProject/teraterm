@@ -1654,7 +1654,7 @@ void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
 	if (BGEnable) {
 		InvalidateRect(HVTWin, ClipRect, FALSE);
 	}
-	else if (ts.MaximizedBugTweak && IsZoomed(hwnd)) {
+	else if (ts.MaximizedBugTweak == 1 && IsZoomed(hwnd)) {
 		// ウィンドウ最大化時の文字欠け対策
 		// 有効時は ScrollWindow を使わずにすべて書き直す
 		InvalidateRect(HVTWin, ClipRect, FALSE);
