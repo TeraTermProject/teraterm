@@ -737,6 +737,13 @@ FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы до
 DLG_TIS_TITLE=SSH вызов аутентификации
 DLG_TIS_BANNER=Вести лог в %s
 
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: Change Password
+DLG_PASSCHG_MESSAGE=Server requests to change password
+DLG_PASSCHG_OLDPASSWD=&Old Password
+DLG_PASSCHG_NEWPASSWD=&New Password
+DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "####################################" в списке известных хостов. Враждебный компьютер может притворяться сервером!

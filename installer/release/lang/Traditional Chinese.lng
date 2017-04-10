@@ -737,6 +737,13 @@ FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=追加一個只讀的hosts文件
 DLG_TIS_TITLE=SSH 認證挑戰
 DLG_TIS_BANNER=登錄到：%s
 
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: Change Password
+DLG_PASSCHG_MESSAGE=Server requests to change password
+DLG_PASSCHG_OLDPASSWD=&Old Password
+DLG_PASSCHG_NEWPASSWD=&New Password
+DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=安全警告
 DLG_UNKNOWNHOST_WARNING=伺服器"#####################################"不再已知主機列表中。它可能是敵對伺服器偽裝的，請小心！

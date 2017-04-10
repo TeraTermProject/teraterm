@@ -7222,6 +7222,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 #define PASSWD_MAXLEN 150
 
 struct change_password {
+	PTInstVar pvar;
 	char passwd[PASSWD_MAXLEN];
 	char new_passwd[PASSWD_MAXLEN];
 };
@@ -7230,21 +7231,65 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 {
 	char retype_passwd[PASSWD_MAXLEN];
 	static struct change_password *cp;
+	LOGFONT logfont;
+	HFONT font;
+	static HFONT DlgChgPassFont;
+	char uimsg[MAX_UIMSG];
+	static PTInstVar pvar;
+
 
 	switch (msg) {
 	case WM_INITDIALOG:
 		cp = (struct change_password *)lParam;
+		pvar = cp->pvar;
+
+		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
+		GetObject(font, sizeof(LOGFONT), &logfont);
+
+		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgChgPassFont, pvar)) {
+			SendDlgItemMessage(dlg, IDC_OLD_PASSWD_LABEL, WM_SETFONT, (WPARAM)DlgChgPassFont, MAKELPARAM(TRUE,0));
+		}
+		else {
+			DlgChgPassFont = NULL;
+		}
+
+		GetWindowText(dlg, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_PASSCHG_TITLE", pvar, uimsg);
+		SetWindowText(dlg, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_PASSWD_CHANGEREQ_MSG, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_PASSCHG_MESSAGE", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_PASSWD_CHANGEREQ_MSG, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_OLD_PASSWD_LABEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_PASSCHG_OLDPASSWD", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_OLD_PASSWD_LABEL, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_NEW_PASSWD_LABEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_PASSCHG_NEWPASSWD", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_NEW_PASSWD_LABEL, pvar->ts->UIMsg);
+
+		GetDlgItemText(dlg, IDC_CONFIRM_PASSWD_LABEL, uimsg, sizeof(uimsg));
+		UTIL_get_lang_msg("DLG_PASSCHG_CONFIRMPASSWD", pvar, uimsg);
+		SetDlgItemText(dlg, IDC_CONFIRM_PASSWD_LABEL, pvar->ts->UIMsg);
+
 		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			SendMessage(GetDlgItem(dlg, IDC_PASSWD), WM_GETTEXT , sizeof(cp->passwd), (LPARAM)cp->passwd);
+			SendMessage(GetDlgItem(dlg, IDC_OLD_PASSWD), WM_GETTEXT , sizeof(cp->passwd), (LPARAM)cp->passwd);
 			SendMessage(GetDlgItem(dlg, IDC_NEW_PASSWD), WM_GETTEXT , sizeof(cp->new_passwd), (LPARAM)cp->new_passwd);
 			SendMessage(GetDlgItem(dlg, IDC_CONFIRM_PASSWD), WM_GETTEXT , sizeof(retype_passwd), (LPARAM)retype_passwd);
 
 			if (strcmp(cp->new_passwd, retype_passwd) == 0) {
 				EndDialog(dlg, 1); // dialog close
+
+				if (DlgChgPassFont != NULL) {
+					DeleteObject(DlgChgPassFont);
+					DlgChgPassFont = NULL;
+				}
+
 				return TRUE;
 			} 
 			MessageBox(NULL, "Mismatch; try again.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
@@ -7252,6 +7297,12 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 
 		case IDCANCEL:
 			EndDialog(dlg, 0); // dialog close
+
+			if (DlgChgPassFont != NULL) {
+				DeleteObject(DlgChgPassFont);
+				DlgChgPassFont = NULL;
+			}
+
 			return TRUE;
 		}
 	}
@@ -7273,6 +7324,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ was received.", LOG_LEVEL_VERBOSE);
 
+	cp.pvar = pvar;
 	DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
 
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード

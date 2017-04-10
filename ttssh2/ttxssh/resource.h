@@ -202,7 +202,6 @@
 #define IDC_SSHUSETIS2                  1206
 #define IDC_REMEMBERPASSWORD            1207
 #define IDC_EDIT2                       1208
-#define IDC_NEW_PASSWD                  1208
 #define IDC_SENDFILE_TO                 1208
 #define IDC_SFTP_CONSOLE                1208
 #define IDC_REMOVEKEY_EDIT              1208
@@ -218,6 +217,12 @@
 #define IDC_FP_HASH_ALG_MD5             1218
 #define IDC_FP_HASH_ALG_SHA256          1219
 #define IDC_FORWARDAGENTNOTIFY          1220
+#define IDC_OLD_PASSWD                  1221
+#define IDC_OLD_PASSWD_LABEL            1222
+#define IDC_NEW_PASSWD                  1223
+#define IDC_NEW_PASSWD_LABEL            1224
+#define IDC_CONFIRM_PASSWD_LABEL        1225
+#define IDC_PASSWD_CHANGEREQ_MSG        1226
 
 // Next default values for new objects
 // 
@@ -225,7 +230,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        114
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1221
+#define _APS_NEXT_CONTROL_VALUE         1227
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

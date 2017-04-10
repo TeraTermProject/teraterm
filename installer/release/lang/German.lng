@@ -735,6 +735,13 @@ FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Choose a read-only known-hosts file to add
 DLG_TIS_TITLE=SSH Authentication Challenge
 DLG_TIS_BANNER=Logging in to %s
 
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: Change Password
+DLG_PASSCHG_MESSAGE=Server requests to change password
+DLG_PASSCHG_OLDPASSWD=&Old Password
+DLG_PASSCHG_NEWPASSWD=&New Password
+DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=SICHERHEITSWARNUNG
 DLG_UNKNOWNHOST_WARNING=Es gibt für diesen Server ("#####################################") keinen Eintrag in der "known hosts"-Liste.

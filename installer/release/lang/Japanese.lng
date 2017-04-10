@@ -736,6 +736,13 @@ FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=’Ç‰Á‚·‚é“Ç‚ÝŽæ‚èê—pknownhostsƒtƒ@ƒCƒ‹‚ð‘I‘ð‚µ‚
 DLG_TIS_TITLE=SSH ”FØƒ`ƒƒƒŒƒ“ƒW
 DLG_TIS_BANNER=ƒƒOƒCƒ“’†: %s
 
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: ƒpƒXƒ[ƒh•ÏX
+DLG_PASSCHG_MESSAGE=ƒT[ƒo‚ÍƒpƒXƒ[ƒh‚Ì•ÏX‚ð—v‹‚µ‚Ä‚¢‚Ü‚·.
+DLG_PASSCHG_OLDPASSWD=‹ŒƒpƒXƒ[ƒh(&O)
+DLG_PASSCHG_NEWPASSWD=VƒpƒXƒ[ƒh(&N)
+DLG_PASSCHG_CONFIRMPASSWD=VƒpƒXƒ[ƒhŠm”F(&C)
+
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=ƒZƒLƒ…ƒŠƒeƒBŒx
 DLG_UNKNOWNHOST_WARNING=known hostsƒŠƒXƒg‚ÉƒT[ƒo"#####################################"‚ÌƒGƒ“ƒgƒŠ‚Í‚ ‚è‚Ü‚¹‚ñ. ˆ«ˆÓ‚ðŽ‚Á‚½ƒzƒXƒg‚ª, Ú‘±‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚éƒT[ƒo‚Ì‚Ó‚è‚ð‚µ‚Ä‚¢‚é‰Â”\«‚à‚ ‚è‚Ü‚·‚Ì‚Å, \•ª’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢I

@@ -736,6 +736,13 @@ FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=추가하기 위한 읽기전용의 known-host 파일을 선택
 DLG_TIS_TITLE=SSH 인증 시도
 DLG_TIS_BANNER=%s으로 로그인 중
 
+; dlg passwd change
+DLG_PASSCHG_TITLE=TTSSH: Change Password
+DLG_PASSCHG_MESSAGE=Server requests to change password
+DLG_PASSCHG_OLDPASSWD=&Old Password
+DLG_PASSCHG_NEWPASSWD=&New Password
+DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=보안 경고
 DLG_UNKNOWNHOST_WARNING=당신의 known-host 목록에는 서버 "#####################################" 항목이 없습니다. 당신이 접속한 컴퓨터는 그 서버를 흉내내는 악의적인 컴퓨터일 수 있습니다.
