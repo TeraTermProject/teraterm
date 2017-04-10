@@ -1651,13 +1651,28 @@ void BGFillRect(HDC hdc,RECT *R,HBRUSH brush)
 
 void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
 {
+	RECT r;
+
 	if (BGEnable) {
 		InvalidateRect(HVTWin, ClipRect, FALSE);
 	}
-	else if (ts.MaximizedBugTweak == 1 && IsZoomed(hwnd)) {
+	else if (IsZoomed(hwnd)) {
 		// ウィンドウ最大化時の文字欠け対策
-		// 有効時は ScrollWindow を使わずにすべて書き直す
-		InvalidateRect(HVTWin, ClipRect, FALSE);
+		switch (ts.MaximizedBugTweak) {
+		case 1: // type 1: ScrollWindow を使わずにすべて書き直す
+			InvalidateRect(HVTWin, ClipRect, FALSE);
+			break;
+		case 3: // type 3: スクロール領域が全体(NULL)の時は隙間部分を除いた領域に差し替える
+			if (Rect == NULL) {
+				GetClientRect(hwnd, &r);
+				r.bottom -= r.bottom % ts.TerminalHeight;
+				Rect = &r;
+			}
+			/* FALLTHROUGH */
+		default:
+			ScrollWindow(hwnd, xa, ya, Rect, ClipRect);
+			break;
+		}
 	}
 	else {
 		ScrollWindow(hwnd, xa, ya, Rect, ClipRect);
