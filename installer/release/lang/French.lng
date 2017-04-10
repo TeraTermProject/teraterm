@@ -133,6 +133,14 @@ MSG_LOAD_EXT_ERROR=Impossible de charger l'extension %s (%d)
 DLG_MAIN_TITLE_CONNECTING=[connexion...]
 DLG_MAIN_TITLE_DISCONNECTED=[déconnecté]
 
+; vtterm.c
+MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
+MSG_CBACCESS_READ=Remote host reads clipboard contents.
+MSG_CBACCESS_WRITE=Remote host writes clipboard.
+MSG_CBACCESS_READ_REJECT=Reject clipboard read access from remote.
+MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
+
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Déconnecter?

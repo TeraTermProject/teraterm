@@ -133,6 +133,14 @@ MSG_LOAD_EXT_ERROR=无法载入扩展 %s (%d)
 DLG_MAIN_TITLE_CONNECTING=[正在连接...]
 DLG_MAIN_TITLE_DISCONNECTED=[未连接]
 
+; vtterm.c
+MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
+MSG_CBACCESS_READ=Remote host reads clipboard contents.
+MSG_CBACCESS_WRITE=Remote host writes clipboard.
+MSG_CBACCESS_READ_REJECT=Reject clipboard read access from remote.
+MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
+
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=退出全部 Tera Term 会话？
 MSG_DISCONNECT_CONF=断开连接？

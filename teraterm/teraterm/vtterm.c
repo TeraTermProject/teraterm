@@ -4579,7 +4579,7 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
-	char *p, *cbbuff, hdr[20], notify_buff[256];
+	char *p, *cbbuff, hdr[20], notify_buff[256], notify_title[MAX_UIMSG];
 	HGLOBAL cbmem;
 	int wide_len;
 	HGLOBAL wide_cbmem;
@@ -4594,7 +4594,11 @@ void XsProcClipboard(PCHAR buff)
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
 				if (ts.NotifyClipboardAccess) {
-					NotifyInfoMessage(&cv, "Remote host reads clipboard contents", "Clipboard Access");
+					get_lang_msg("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
+					             "Clipboard Access", ts.UILanguageFile);
+					get_lang_msg("MSG_CBACCESS_READ", notify_buff, sizeof(notify_buff),
+					             "Remote host reads clipboard contents.", ts.UILanguageFile);
+					NotifyInfoMessage(&cv, notify_buff, notify_title);
 				}
 				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
 				if (strncat_s(hdr, sizeof(hdr), buff, p - buff) == 0) {
@@ -4602,7 +4606,11 @@ void XsProcClipboard(PCHAR buff)
 				}
 			}
 			else if (ts.NotifyClipboardAccess) {
-				NotifyWarnMessage(&cv, "Reject clipboard read access from remote", "Rejected Clipboard Access");
+				get_lang_msg("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
+				             "Rejected Clipboard Access", ts.UILanguageFile);
+				get_lang_msg("MSG_CBACCESS_READ_REJECT", notify_buff, sizeof(notify_buff),
+				             "Reject clipboard read access from remote.", ts.UILanguageFile);
+				NotifyWarnMessage(&cv, notify_buff, notify_title);
 			}
 		}
 		else if (ts.CtrlFlag & CSF_CBWRITE) { // Write access
@@ -4629,8 +4637,12 @@ void XsProcClipboard(PCHAR buff)
 			GlobalUnlock(cbmem);
 
 			if (ts.NotifyClipboardAccess) {
-				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "Remote host writes clipboard.\n--\n%s", cbbuff);
-				NotifyInfoMessage(&cv, notify_buff, "Clipboard Access");
+				get_lang_msg("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
+				             "Clipboard Access", ts.UILanguageFile);
+				get_lang_msg("MSG_CBACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg),
+				             "Remote host wirtes clipboard.", ts.UILanguageFile);
+				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "%s\n--\n%s", ts.UIMsg, cbbuff);
+				NotifyInfoMessage(&cv, notify_buff, notify_title);
 			}
 
 			wide_len = MultiByteToWideChar(CP_ACP, 0, cbbuff, -1, NULL, 0);
@@ -4651,7 +4663,11 @@ void XsProcClipboard(PCHAR buff)
 			}
 		}
 		else if (ts.NotifyClipboardAccess) {
-			NotifyWarnMessage(&cv, "Reject clipboard write access from remote", "Rejected Clipboard Access");
+			get_lang_msg("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
+			             "Rejected Clipboard Access", ts.UILanguageFile);
+			get_lang_msg("MSG_CBACCESS_WRITE_REJECT", notify_buff, sizeof(notify_buff),
+			             "Reject clipboard write access from remote.", ts.UILanguageFile);
+			NotifyWarnMessage(&cv, notify_buff, notify_title);
 		}
 	}
 }

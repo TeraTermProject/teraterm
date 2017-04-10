@@ -132,6 +132,14 @@ MSG_LOAD_EXT_ERROR=Cannot load extension %s (%d)
 DLG_MAIN_TITLE_CONNECTING=[接続中...]
 DLG_MAIN_TITLE_DISCONNECTED=[未接続]
 
+; vtterm.c
+MSG_CBACCESS_TITLE=クリップボードアクセス
+MSG_CBACCESS_REJECT_TITLE=クリップボードアクセスの拒否
+MSG_CBACCESS_READ=リモートホストがクリップボードの内容を読み取りました。
+MSG_CBACCESS_WRITE=リモートホストがクリップボードに書き込みました。
+MSG_CBACCESS_READ_REJECT=リモートホストからのクリップボード読み取りを拒否しました。
+MSG_CBACCESS_WRITE_REJECT=リモートホストからのクリップボード書き込みを拒否しました。
+
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=全Tera Termを強制終了しますか？
 MSG_DISCONNECT_CONF=切断しますか？
