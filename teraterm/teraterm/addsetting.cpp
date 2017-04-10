@@ -238,6 +238,7 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_CURSOR_CTRL_SEQ, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CLIPBOARD_ACCESS_LABEL, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_CLIPBOARD_NOTIFY, WM_SETFONT, (WPARAM)DlgSequenceFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgSequenceFont = NULL;
@@ -294,6 +295,10 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", ts.UIMsg, sizeof(ts.UIMsg), "read/write", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+
+	GetDlgItemText(IDC_CLIPBOARD_NOTIFY, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_CLIPBOARD_NOTIFY, ts.UIMsg);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	btn = (CButton *)GetDlgItem(IDC_ACCEPT_MOUSE_EVENT_TRACKING);
@@ -354,6 +359,10 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 			cmb->SetCurSel(0);
 			break;
 	}
+
+	// (9)IDC_CLIPBOARD_NOTIFY
+	btn = (CButton *)GetDlgItem(IDC_CLIPBOARD_NOTIFY);
+	btn->SetCheck(ts.NotifyClipboardAccess);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));
@@ -455,6 +464,10 @@ void CSequencePropPageDlg::OnOK()
 		default: // Invalid value.
 			break;
 	}
+
+	// (9)IDC_CLIPBOARD_ACCESS
+	btn = (CButton *)GetDlgItem(IDC_CLIPBOARD_NOTIFY);
+	ts.NotifyClipboardAccess = btn->GetCheck();
 }
 
 
