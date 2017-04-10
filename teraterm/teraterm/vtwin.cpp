@@ -121,6 +121,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_WM_MOVE()
 	ON_WM_NCLBUTTONDBLCLK()
 	ON_WM_NCRBUTTONDOWN()
+	ON_WM_NCCALCSIZE()
 	ON_WM_PAINT()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
@@ -2473,6 +2474,26 @@ BOOL CVTWindow::OnMouseWheel(
 	return (TRUE);
 }
 
+void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
+{
+	int fontheight, gap;
+
+	CWnd::OnNcCalcSize(valid, sizeinfo);
+
+	if (valid && IsZoomed()) {
+		// ウィンドウ最大化時に文字が欠ける場合がある事への対処
+		// クライアント領域の高さが文字の高さで割り切れず
+		// ウィンドウ最下部に一行未満の隙間が出来る事が原因。
+		// 隙間の分、クライアント領域の高さを減らす。
+		fontheight = abs(ts.VTFontSize.y);
+		if (fontheight > 0) {
+			gap = (sizeinfo->rgrc[0].bottom - sizeinfo->rgrc[0].top) % fontheight;
+			sizeinfo->rgrc[0].bottom -= gap;
+		}
+	}
+
+	return;
+}
 
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 {
