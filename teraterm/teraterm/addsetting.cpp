@@ -244,55 +244,55 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 	}
 
 	GetDlgItemText(IDC_ACCEPT_MOUSE_EVENT_TRACKING, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_MOUSE_EVENT_TRACKING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.UIMsg);
 	GetDlgItemText(IDC_DISABLE_MOUSE_TRACKING_CTRL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_DISABLE_MOUSE_TRACKING_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_DISABLE_MOUSE_TRACKING_CTRL, ts.UIMsg);
 	GetDlgItemText(IDC_ACCEPT_TITLE_CHANGING_LABEL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ACCEPT_TITLE_CHANGING_LABEL, ts.UIMsg);
 
-	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", ts.UIMsg, sizeof(ts.UIMsg), "overwrite", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", ts.UIMsg, sizeof(ts.UIMsg), "overwrite", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_AHEAD", ts.UIMsg, sizeof(ts.UIMsg), "ahead", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", ts.UIMsg, sizeof(ts.UIMsg), "ahead", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_ACCEPT_TITLE_CHANGING_LAST", ts.UIMsg, sizeof(ts.UIMsg), "last", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", ts.UIMsg, sizeof(ts.UIMsg), "last", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
 	GetDlgItemText(IDC_CURSOR_CTRL_SEQ, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_CURSOR_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_CURSOR_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CURSOR_CTRL_SEQ, ts.UIMsg);
 	GetDlgItemText(IDC_WINDOW_CTRL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_WINDOW_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_WINDOW_CTRL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_WINDOW_CTRL, ts.UIMsg);
 	GetDlgItemText(IDC_WINDOW_REPORT, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_WINDOW_REPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_WINDOW_REPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_WINDOW_REPORT, ts.UIMsg);
 	GetDlgItemText(IDC_TITLE_REPORT_LABEL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_TITLE_REPORT_LABEL, ts.UIMsg);
 
-	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_IGNORE", ts.UIMsg, sizeof(ts.UIMsg), "ignore", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", ts.UIMsg, sizeof(ts.UIMsg), "ignore", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_ACCEPT", ts.UIMsg, sizeof(ts.UIMsg), "accept", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", ts.UIMsg, sizeof(ts.UIMsg), "accept", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_TITLE_REPORT_EMPTY", ts.UIMsg, sizeof(ts.UIMsg), "empty", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", ts.UIMsg, sizeof(ts.UIMsg), "empty", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
 	GetDlgItemText(IDC_CLIPBOARD_ACCESS_LABEL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CLIPBOARD_ACCESS_LABEL, ts.UIMsg);
 
-	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg), "write only", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg), "write only", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_READ", ts.UIMsg, sizeof(ts.UIMsg), "read only", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", ts.UIMsg, sizeof(ts.UIMsg), "read only", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQENCE_CLIPBOARD_ACCESS_ON", ts.UIMsg, sizeof(ts.UIMsg), "read/write", ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", ts.UIMsg, sizeof(ts.UIMsg), "read/write", ts.UILanguageFile);
 	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
