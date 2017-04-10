@@ -788,6 +788,8 @@ MSG_FWD_DENIED_X_ERROR=서버가 이 컴퓨터를 통해 연결을 포워딩하려고 합니다.\n지역
 MSG_FWD_DENIED_BY_SERVER_ERROR=지역 컴퓨터에 있는 프로그램이 포워드된 포트로 연결하려고 합니다.\n포워딩 요청은 서버에 의해 거부됐습니다. 이 연결은 종료됩니다.
 MSG_FWD_COMM_ERROR=지역 포트로 포워드된 데이터를 보내는 중 통신 에러가 발생했습니다.\n포워드된 연결이 종료됩니다.
 MSG_FWD_AGENT_FORWARDING_CONFIRM=agent-forwarding 요청을 수락하시겠습니까?
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=known-host 파일을 읽는 중 오류가 발생했습니다.\n지정된 파일이 존재하지 않습니다.

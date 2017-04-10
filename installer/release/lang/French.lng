@@ -788,6 +788,8 @@ MSG_FWD_DENIED_X_ERROR=Le serveur a essayé de rediriger une connexion à travers 
 MSG_FWD_DENIED_BY_SERVER_ERROR=Un programme sur la machine locale a essayé de se connecter à un port redirigé.\nLa demande de redirection a été refusée par le serveur. La connexion a été fermée.
 MSG_FWD_COMM_ERROR=Une erreur de communication est survenue lors de l'envoi de données redirigées vers un port local.\nLa connexion redirigée va être fermée.
 MSG_FWD_AGENT_FORWARDING_CONFIRM=Are you sure you want to accept agent-forwarding request?
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=Une erreur est apparue lors d'une tentative de lecture d'un fichier d'hôtes connus.\nLe nom de fichier n'existe pas.

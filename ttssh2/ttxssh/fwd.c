@@ -1933,10 +1933,14 @@ void FWD_end(PTInstVar pvar)
 
 BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 {
+	char title[MAX_UIMSG];
 	HWND cur_active = GetActiveWindow();
 
 	if (pvar->session_settings.ForwardAgentNotify) {
-		NotifyInfoMessage(pvar->cv, "Remote host access to agent", "Agent Forwarding");
+		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY_TITLE", pvar, "Agent Forwarding");
+		strncpy_s(title, sizeof(title), pvar->ts->UIMsg, _TRUNCATE);
+		UTIL_get_lang_msg("MSG_FWD_AGENT_NOTIFY", pvar, "Remote host access to agent");
+		NotifyInfoMessage(pvar->cv, pvar->ts->UIMsg, title);
 	}
 
 	if (pvar->session_settings.ForwardAgentConfirm) {

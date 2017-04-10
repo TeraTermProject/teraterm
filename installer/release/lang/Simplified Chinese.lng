@@ -789,6 +789,8 @@ MSG_FWD_DENIED_X_ERROR=服务器试图通过本机转发一个连接。\n它请求到本地X服务器的连
 MSG_FWD_DENIED_BY_SERVER_ERROR=本机上的一个程序试图连接到一个转发端口。\n由于服务器拒绝转发请求，连接已关闭。
 MSG_FWD_COMM_ERROR=发送转发数据到本地端口时，发生通讯错误。\n转发连接已关闭。
 MSG_FWD_AGENT_FORWARDING_CONFIRM=确定接受代理转发请求？
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=尝试读取已知主机列表文件时，发生错误。 \n指定的文件不存在。

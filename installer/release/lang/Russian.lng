@@ -789,6 +789,8 @@ MSG_FWD_DENIED_X_ERROR=Сервер попытался перенаправить соединение через этот комп
 MSG_FWD_DENIED_BY_SERVER_ERROR=Программа на локальном компьютере пыталась подключиться к порту.\nПросьба была отклонена сервером. Соединение будет закрыто.
 MSG_FWD_COMM_ERROR=Ошибка связи при отправке данных в локальный порт.\nСоединение будет закрыто.
 MSG_FWD_AGENT_FORWARDING_CONFIRM=Вы уверены, что хотите принять просьбу агента пересылки?
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=Произошла ошибка при попытке чтения файла известных хостов.\nУказанный файл не существует.

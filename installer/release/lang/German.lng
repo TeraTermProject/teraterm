@@ -787,6 +787,8 @@ MSG_FWD_DENIED_X_ERROR=The server attempted to forward a connection through this
 MSG_FWD_DENIED_BY_SERVER_ERROR=A program on the local machine attempted to connect to a forwarded port.\nThe forwarding request was denied by the server. The connection has been closed.
 MSG_FWD_COMM_ERROR=A communications error occurred while sending forwarded data to a local port.\nThe forwarded connection will be closed.
 MSG_FWD_AGENT_FORWARDING_CONFIRM=Are you sure you want to accept agent-forwarding request?
+MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
+MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=An error occurred while trying to read a known_hosts file.\nThe specified filename does not exist.

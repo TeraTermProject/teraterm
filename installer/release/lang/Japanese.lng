@@ -788,6 +788,8 @@ MSG_FWD_DENIED_X_ERROR=サーバはこのマシンに転送を試みました.\nローカルのX サーバ
 MSG_FWD_DENIED_BY_SERVER_ERROR=ローカルマシン上のプログラムは転送先ポートに接続しました.\n転送要求はサーバ側で拒否されました. 接続を閉じます.
 MSG_FWD_COMM_ERROR=ローカルポートに転送データを送信中, 通信エラーが発生しました.\n転送接続を閉じます.
 MSG_FWD_AGENT_FORWARDING_CONFIRM=エージェント転送要求を受け入れますか？
+MSG_FWD_AGENT_NOTIFY=リモートホストがエージェントにアクセスしました。
+MSG_FWD_AGENT_NOTIFY_TITLE=エージェント転送
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=known_hosts 読み込み中にエラーが発生しました. \n指定されたファイル名は存在しません.
