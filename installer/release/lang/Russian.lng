@@ -722,6 +722,7 @@ DLG_SSHSETUP_HEARTBEAT_UNIT=сек.(0 - выключить)
 DLG_SSHSETUP_PASSWORD=&Запомнить пароль в памяти
 DLG_SSHSETUP_FORWARDAGENT=&Включить агент пересылки
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=&Подтвердить агента пересылки
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста в DNS
 DLG_SSHSETUP_NOTICE=Все параметры вступят в силу в следующей сессии.
 DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n

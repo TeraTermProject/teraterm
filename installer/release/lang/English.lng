@@ -721,6 +721,7 @@ DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 to turn off)
 DLG_SSHSETUP_PASSWORD=Remember password on &memory
 DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Verify hostkey fingerprint by DNS
 DLG_SSHSETUP_NOTICE=All options take effect the next time a session is started.
 DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
