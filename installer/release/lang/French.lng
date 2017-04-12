@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Nov 16 2015)
-; Last translated (French language) by Francois MOCQ (Jul 21 2010)
+; Updated by TeraTerm Project (2017-04-12)
+; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -505,8 +505,8 @@ MSG_INI_WRITE_ERROR=Cannot write ini file.
 
 [TTSSH]
 ; font
-DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
@@ -564,6 +564,7 @@ DLG_AUTH_LOCALUSER=Nom d'utilisateur local:
 DLG_AUTH_HOST_PRIVATEKEY=Fichier clé privée hôte
 MSG_PAGEANT_NOTFOUND=Impossible de trouver Pageant.
 MSG_PAGEANT_NOKEY=Pageant n'a pas de clé valide.
+
 ; dlg auth setup
 DLG_AUTHSETUP_TITLE=TTSSH: Configuration de l'authentification
 DLG_AUTHSETUP_BANNER=Configuration par défaut:

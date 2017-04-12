@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Nov 16 2015)
-; Last translated (German language) by Frederik Schwarzer (May 17 2010)
+; Updated by TeraTerm Project (2017-04-12)
+; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -12,8 +12,8 @@ MENU_FILE_GYGWIN=&Cygwin-Verbindung\tAlt+G
 MENU_FILE_LOG=&Log...
 MENU_FILE_COMMENTLOG=&Kommentar zum Log
 MENU_FILE_VIEWLOG=Log ansehen
+MENU_FILE_SHOWLOGDIALOG=Sho&w Log dialog...
 MENU_FILE_SENDFILE=Datei &senden
-MENU_FILE_TRANSFER=&Transfer
 MENU_FILE_CHANGEDIR=&Verzeichnis wechseln
 MENU_FILE_REPLAYLOG=&Log abspielen
 MENU_FILE_LOGMETT=Log&MeTT
@@ -505,8 +505,8 @@ MSG_INI_WRITE_ERROR=Cannot write ini file.
 
 [TTSSH]
 ; font
-DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
@@ -573,6 +573,7 @@ DLG_AUTHSETUP_METHOD_PASSWORD=Passwortauthentifikation verwenden
 DLG_AUTHSETUP_METHOD_RSA=DSA/RSA/ECDSA/ED25519-Schlüssel verwenden
 DLG_AUTHSETUP_METHOD_RHOST=rhosts verwenden (SSH1)
 DLG_AUTHSETUP_METHOD_CHALLENGE=Benutze challenge/response (SSH1:&TIS, SSH2:keyboard-interactive)
+DLG_AUTHSETUP_METHOD_PAGEANT=Use P&ageant
 DLG_AUTHSETUP_PRIVATEKEY=Schlüssel:
 DLG_AUTHSETUP_LOCALUSER=Lokaler Benutzername:
 DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-Schlüssel:
@@ -670,7 +671,7 @@ MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
 MSG_KEYGEN_GENERATING="generating key"
 MSG_KEYGEN_GENERATED="key generated"
 
-DLG_SAVE_PUBLICKEY_TITLE=Public Key speichern:
+FILEDLG_SAVE_PUBLICKEY_TITLE=Public Key speichern:
 FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
@@ -718,6 +719,7 @@ DLG_SSHSETUP_KNOWNHOST_RW=Read/&write file:
 DLG_SSHSETUP_KNOWNHOST_RO=&Read-only files:
 DLG_SSHSETUP_HEARTBEAT=HeartBeat(&keep-alive)
 DLG_SSHSETUP_HEARTBEAT_UNIT=sec.(0 to turn off)
+DLG_SSHSETUP_PASSWORD=Remember password on &memory
 DLG_SSHSETUP_FORWARDAGENT=Enable &agent forwarding
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=C&onfirm agent forwarding
 DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent

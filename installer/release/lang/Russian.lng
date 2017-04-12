@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Nov 16 2015)
-; Last translated (Russian language) by Ryumik Sergey (Mar 14 2015)
+; Updated by TeraTerm Project (2017-04-12)
+; Last translated (Russian language) by Ryumik Sergey (2015-03-14)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -505,8 +505,8 @@ MSG_INI_WRITE_ERROR=Не удается записать ini-файл.
 
 [TTSSH]
 ; font
-DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_SYSTEM_FONT=System,14,0
+DLG_TAHOMA_FONT=Tahoma,8,0
 DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu

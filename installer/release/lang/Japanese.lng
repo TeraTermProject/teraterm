@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (Nov 16 2015)
+; Updated by TeraTerm Project (2017-04-12)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -504,8 +504,8 @@ MSG_INI_WRITE_ERROR=iniファイルに書き込みができません
 
 [TTSSH]
 ; font
-DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
+DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
 DLG_ABOUT_FONT=ＭＳ ゴシック,9,128
 
 ; menu
@@ -685,7 +685,7 @@ FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0すべてのフ
 FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0すべてのファイル(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0すべてのファイル(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa)\0id_ecdsa\0すべてのファイル(*.*)\0*.*\0\0
-SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0すべてのファイル(*.*)\\0*.*\\0\\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0すべてのファイル(*.*)\\0*.*\\0\\0
 
 ; dlg setup
 DLG_SSHSETUP_TITLE=TTSSH: 設定

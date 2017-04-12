@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (Nov 16 2015)
-; Last translated (Korean language) by Daehong Kim (Jul 25 2013)
+; Updated by TeraTerm Project (2017-04-12)
+; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
 DLG_SYSTEM_FONT=굴림,10,128
@@ -599,6 +599,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=보안 경고
 DLG_DIFFERENTTYPEKEY_WARNING=당신의 known-host 목록는 서버 "####################################"에 대한 정보를 가지고 있습니다, 하지만 당신이 접속했던 컴퓨터는 당신의 known-host 목록의 것과 다른 키를 가지고 있습니다. 악의적 컴퓨터가 해당 서버를 흉내내는 것일 수 있습니다.
 DLG_DIFFERENTTYPEKEY_WARNING2=만약 이 새로운 키를 known-host 목록에 추가하도록 선택하고 계속 진행하다면, 다시는 경고 메시지를 받지 않습니다.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=이 서버의 호스트키 지문은:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
 DLG_DIFFERENTTYPEKEY_ADD=이 컴퓨터와 그 키를 known-host 목록에 추가(&A)
 
 ; dlg fwd edit
