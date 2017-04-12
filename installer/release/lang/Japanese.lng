@@ -772,7 +772,7 @@ MSG_DECRYPT_ERROR2=%s復号エラー(2)
 MSG_CIPHER_INIT_ERROR=暗号初期化エラー(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 鍵設定エラー
 MSG_UNAVAILABLE_CIPHERS_ERROR=このサーバはTTSSH 暗号アルゴリズムをサポートしていません.\nTTSSHとサーバ間のセキュアな接続を確立できません.\n接続を閉じます.
-MSG_CHIPHER_NONE_ERROR=このプログラムで使用可能な暗号化アルゴリズムと, サーバーが理解可能な暗号化アルゴリズムが異なっています. \nこのサーバーと通信するためには, 利用可能な暗号化アルゴリズムを増やさなければなりません. \nTTSSH セットアップダイアログボックス内を変更し, Tera Term を再起動してください.\n接続を閉じます.
+MSG_CIPHER_NONE_ERROR=このプログラムで使用可能な暗号化アルゴリズムと, サーバーが理解可能な暗号化アルゴリズムが異なっています. \nこのサーバーと通信するためには, 利用可能な暗号化アルゴリズムを増やさなければなりません. \nTTSSH セットアップダイアログボックス内を変更し, Tera Term を再起動してください.\n接続を閉じます.
 MSG_RASKEY_TOOWEAK_ERROR=サーバ RSA 鍵が極めて脆弱です. 安全な接続を確立できません.
 MSG_CIPHER_NOTSELECTED_ERROR=暗号アルゴリズムが未選択です
 

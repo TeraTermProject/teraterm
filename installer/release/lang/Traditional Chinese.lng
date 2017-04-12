@@ -773,7 +773,7 @@ MSG_DECRYPT_ERROR2=%s解密錯誤(2)
 MSG_CIPHER_INIT_ERROR=加密初始化錯誤(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 密鑰設定錯誤
 MSG_UNAVAILABLE_CIPHERS_ERROR=該伺服器不支持 TTSSH 的加密算法。\nTTSSH 無法與之建立連接。\n連線將被中斷。
-MSG_CHIPHER_NONE_ERROR=該程式和伺服器已知的加密算法已全部被禁用。\n要連接該伺服器，您必須在再次啟動 TeraTerm 的時候，在 TTSSH 設定對話框中，啟用更多的加密算法。\n現在將關閉連接。
+MSG_CIPHER_NONE_ERROR=該程式和伺服器已知的加密算法已全部被禁用。\n要連接該伺服器，您必須在再次啟動 TeraTerm 的時候，在 TTSSH 設定對話框中，啟用更多的加密算法。\n現在將關閉連接。
 MSG_RASKEY_TOOWEAK_ERROR=伺服器RSA密鑰太弱。無法建立一個安全的連接。
 MSG_CIPHER_NOTSELECTED_ERROR=未選擇加密算法！
 

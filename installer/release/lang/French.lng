@@ -772,9 +772,9 @@ MSG_DECRYPT_ERROR2=%s erreur décryptage(2)
 MSG_CIPHER_INIT_ERROR=Erreur initialisation chiffrement(%d)
 MSG_RSAKEY_SETUP_ERROR=Erreur configurations clés RSA
 MSG_UNAVAILABLE_CIPHERS_ERROR=Le serveur ne suppote aucun des algorithmes de cryptage TTSSH.\nUne connexion sécurisée ne peut être établie avec le serveur.\nLa connexion va être fermée.
-MSG_CHIPHER_NONE_ERROR=Tous les algorithmes de codage que ce programme et le serveur comprennent ont été dévalidés.\nPour communiquer avec ce serveur, vous devrez autoriser d'autres méthodes de chiffrement\ndans la boîte de dialogue TTSSH quand vous relancerez Tera Term.\nCette connexion va être fermée.
+MSG_CIPHER_NONE_ERROR=Tous les algorithmes de codage que ce programme et le serveur comprennent ont été dévalidés.\nPour communiquer avec ce serveur, vous devrez autoriser d'autres méthodes de chiffrement\ndans la boîte de dialogue TTSSH quand vous relancerez Tera Term.\nCette connexion va être fermée.
 MSG_RASKEY_TOOWEAK_ERROR=Les clés RSA du serveur sont trop faibles. Impossible d'établir une connexion sécurisée.
-MSG_CHPHER_NOTSELECTED_ERROR=No cipher selected!
+MSG_CIPHER_NOTSELECTED_ERROR=No cipher selected!
 
 ; fwd.c
 MSG_FWD_LOCAL_CHANNEL_ERROR=Le serveur a essayé de manipuler un canal de transmission inexistant.\nSoit le serveur a un bug, soit il est hostile. Vous devriez mettre fin à la connexion.

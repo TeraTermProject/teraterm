@@ -772,9 +772,9 @@ MSG_DECRYPT_ERROR2=%s 해독 오류(2)
 MSG_CIPHER_INIT_ERROR=암호 초기화 오류(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 키 설정 오류
 MSG_UNAVAILABLE_CIPHERS_ERROR=서버가 TTSSH의 암호화 알고리즘 중 어떤 것도 지원하지 않습니다.\nTTSSH에서 서버로 안전한 연결을 만들 수 없습니다.\n이 연결은 닫힙니다.
-MSG_CHIPHER_NONE_ERROR=이 프로그램과 서버 모두 사용할 수 있는 모든 암호화 알고리즘이 비활성화 되어 있습니다.\n서버와 통신하기 위해 Tera Term 재실행시 TTSSH\n설정 다이얼로그에서 추가적인 암호들을 활성화 시켜야합니다.\n이 연결은 종료됩니다.
+MSG_CIPHER_NONE_ERROR=이 프로그램과 서버 모두 사용할 수 있는 모든 암호화 알고리즘이 비활성화 되어 있습니다.\n서버와 통신하기 위해 Tera Term 재실행시 TTSSH\n설정 다이얼로그에서 추가적인 암호들을 활성화 시켜야합니다.\n이 연결은 종료됩니다.
 MSG_RASKEY_TOOWEAK_ERROR=서버 RSA키가 너무 약합니다. 안전한 연결을 만들 수 없습니다.
-MSG_CHPHER_NOTSELECTED_ERROR=암호가 선택되지 않았슴!
+MSG_CIPHER_NOTSELECTED_ERROR=암호가 선택되지 않았슴!
 
 ; fwd.c
 MSG_FWD_LOCAL_CHANNEL_ERROR=이 서버가 존재하지 않는 포워드 채널을 조작하려고 합니다.\n서버에 버그가 있거나 악의적일 수 있습니다. 이 연결을 종료하세요.

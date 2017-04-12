@@ -1163,7 +1163,7 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 
 	if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE
 		|| pvar->crypt_state.receiver_cipher == SSH_CIPHER_NONE) {
-		UTIL_get_lang_msg("MSG_CHIPHER_NONE_ERROR", pvar,
+		UTIL_get_lang_msg("MSG_CIPHER_NONE_ERROR", pvar,
 		                  "All the encryption algorithms that this program and the server both understand have been disabled.\n"
 		                  "To communicate with this server, you will have to enable some more ciphers\n"
 		                  "in the TTSSH Setup dialog box when you run Tera Term again.\n"
@@ -1787,7 +1787,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 
 
 	if (!isOK) {
-		UTIL_get_lang_msg("MSG_CHPHER_NOTSELECTED_ERROR", pvar,
+		UTIL_get_lang_msg("MSG_CIPHER_NOTSELECTED_ERROR", pvar,
 		                  "No cipher selected!");
 		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
