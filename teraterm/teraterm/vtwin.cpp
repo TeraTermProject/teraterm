@@ -3810,16 +3810,13 @@ LONG CVTWindow::OnChangeTitle(UINT wParam, LONG lParam)
 	return 0;
 }
 
-
 LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
 {
 	if (wParam == 1) {
 		switch (lParam) {
 		  case WM_MOUSEMOVE:
-		  case WM_LBUTTONDOWN:
 		  case WM_LBUTTONUP:
 		  case WM_LBUTTONDBLCLK:
-		  case WM_RBUTTONDOWN:
 		  case WM_RBUTTONUP:
 		  case WM_RBUTTONDBLCLK:
 		  case WM_CONTEXTMENU:
@@ -3828,6 +3825,10 @@ LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
 		  case NIN_KEYSELECT:
 		  case NIN_SELECT:
 			// nothing to do
+			break;
+		  case WM_LBUTTONDOWN:
+		  case WM_RBUTTONDOWN:
+			HideNotifyIcon(&cv);
 			break;
 		  case NIN_BALLOONTIMEOUT:
 			HideNotifyIcon(&cv);
@@ -3841,7 +3842,6 @@ LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
 
 	return 0;
 }
-
 
 void CVTWindow::OnFileNewConnection()
 {
