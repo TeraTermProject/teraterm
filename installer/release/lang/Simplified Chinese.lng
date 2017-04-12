@@ -1,5 +1,5 @@
 ; Updated by TeraTerm Project (Nov 16 2015)
-; Last translated (Simplified Chinese language) by LiShaohui (Nov 18 2013)
+; Last translated (Simplified Chinese language) by LiShaohui (Apr 11 2017)
 
 [Tera Term]
 DLG_SYSTEM_FONT=微软雅黑,10,0
@@ -60,7 +60,7 @@ MENU_SETUP_GENERAL=常规(&G)...
 MENU_SETUP_ADDITION=附加设置(&D)...
 MENU_SETUP_SAVE=保存配置(&S)...
 MENU_SETUP_RESTORE=载入配置(&R)...
-MENU_SETUP_OPENSETUP=Setup d&irectory...
+MENU_SETUP_OPENSETUP=配置目录(&I)...
 MENU_SETUP_LOADKEYMAP=导入键盘映射(&L)...
 
 MENU_CONTROL=控制(&O)
@@ -134,12 +134,12 @@ DLG_MAIN_TITLE_CONNECTING=[正在连接...]
 DLG_MAIN_TITLE_DISCONNECTED=[未连接]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboad Access
-MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
-MSG_CBACCESS_READ=Remote host reads clipboard contents.
-MSG_CBACCESS_WRITE=Remote host writes clipboard.
-MSG_CBACCESS_READ_REJECT=Reject clipboard read access from remote.
-MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
+MSG_CBACCESS_TITLE=剪贴板访问
+MSG_CBACCESS_REJECT_TITLE=已拒绝的剪贴板访问
+MSG_CBACCESS_READ=远程主机读取剪贴板内容。
+MSG_CBACCESS_WRITE=远程主机写入剪贴板。
+MSG_CBACCESS_READ_REJECT=拒绝从远程读取访问剪贴板。
+MSG_CBACCESS_WRITE_REJECT=拒绝从远程写入访问剪贴板。
 
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=退出全部 Tera Term 会话？
@@ -204,15 +204,15 @@ DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=关闭
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=读写
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=只读
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=只写
-DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notify clipboard access from remote
+DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=远程通知剪贴板访问(&N)
 
 DLG_TAB_COPYPASTE_CONTINUE=多行复制(&L)
 DLG_TAB_COPYPASTE_MOUSEPASTE=禁用右键单击粘贴(&D)
 DLG_TAB_COPYPASTE_CONFIRMPASTE=启用右键单击粘贴(&C)
 DLG_TAB_COPYPASTE_MOUSEPASTEM=禁用中键单击粘贴(&M)
 DLG_TAB_COPYPASTE_SELECTLBUTTON=仅用鼠标左键(&O)
-DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
-DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=粘贴时修剪换行符(&T)
+DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=粘贴时规范化换行符(&N)
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=“危险粘贴剪贴板”确认(&P)
 DLG_TAB_COPYPASTE_STRINGFILE=关键字文件(&S)
 DLG_TAB_COPYPASTE_DELIMITER=分隔符(&I)
@@ -222,7 +222,7 @@ DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
 DLG_TAB_VISUAL_ALHPA=透明度(&A)
 DLG_TAB_VISUAL_ETERM=&Eterm 风格 (*)
 DLG_TAB_VISUAL_BGIMG=背景图像(&I)
-DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
+DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=图像亮度(&T)
 DLG_TAB_VISUAL_MOUSE=光标(&M)
 DLG_TAB_VISUAL_FONT_QUALITY=字体质量(&F)
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=默认
@@ -259,7 +259,7 @@ DLG_BROADCAST_HISTORY=历史
 DLG_BROADCAST_PARENTONLY=仅发送
 DLG_BROADCAST_ENTER=Enter键
 DLG_BROADCAST_SUBMIT=提交
-DLG_BROADCAST_REALTIME=实时的
+DLG_BROADCAST_REALTIME=实时模式
 
 DLG_PRNABORT_PRINTING=打印中
 
@@ -277,13 +277,13 @@ DLG_FILETRANS_START=开始(&S)
 DLG_FILETRANS_PAUSE=暂停(&S)
 DLG_FILETRANS_CLOSE=关闭
 
-DLG_SETUPDIR_TITLE=Tera Term: Setup directory
-DLG_SETUPDIR_INIFILE=Tera Term Configuration File
-DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
-DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
-DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
-DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
-DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+DLG_SETUPDIR_TITLE=Tera Term：设置目录
+DLG_SETUPDIR_INIFILE=Tera Term 配置文件
+DLG_SETUPDIR_KEYBOARDFILE=键盘配置文件
+DLG_SETUPDIR_CYGTERMFILE=CygTerm 配置文件
+DLG_SETUPDIR_KNOWNHOSTSFILE=SSH 已知主机列表文件
+DLG_SETUPDIR_NOFILE_ERROR=文件不存在。(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=无法打开文件。(%d)
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=无法使用 Winsock
@@ -518,20 +518,20 @@ MENU_SSH_KEYGEN=SSH 密钥生成(&N)...
 
 ; dlg about
 DLG_ABOUT_TITLE=关于 TTSSH
-DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_ABOUT_SERVERID=服务器ID:
-DLG_ABOUT_PROTOCOL=协议版本:
-DLG_ABOUT_ENCRYPTION=加密方案:
-DLG_ABOUT_SERVERKEY=服务器密钥:
-DLG_ABOUT_KEXKEY=密钥交换密钥:
-DLG_ABOUT_AUTH=认证方式:
-DLG_ABOUT_COMP=压缩状况:
-DLG_ABOUT_CLIENTID=客户端ID:
-DLG_ABOUT_KEX=Key exchange algorithm:
-DLG_ABOUT_HOSTKEY=主机密钥:
-DLG_ABOUT_MAC=MAC algorithm:
+DLG_ABOUT_FP_HASH_ALGORITHM=指纹散列算法：
+DLG_ABOUT_SERVERID=服务器ID：
+DLG_ABOUT_PROTOCOL=协议版本：
+DLG_ABOUT_ENCRYPTION=加密方案：
+DLG_ABOUT_SERVERKEY=服务器密钥：
+DLG_ABOUT_KEXKEY=密钥交换密钥：
+DLG_ABOUT_AUTH=认证方式：
+DLG_ABOUT_COMP=压缩状况：
+DLG_ABOUT_CLIENTID=客户端ID：
+DLG_ABOUT_KEX=密钥交换算法：
+DLG_ABOUT_HOSTKEY=主机密钥：
+DLG_ABOUT_MAC=MAC 算法：
 DLG_ABOUT_MAC_INFO=%s 到服务器，%s 来自服务器
-DLG_ABOUT_COMPDELAY=延时压缩状况:
+DLG_ABOUT_COMPDELAY=延时压缩状况：
 DLG_ABOUT_CIPHER_INFO=%s 到服务器，%s 来自服务器
 DLG_ABOUT_KEY_INFO=%d字节服务器密钥，%d字节主机密钥
 DLG_ABOUT_KEY_INFO2=%d字节客户端密钥，%d字节服务器密钥
@@ -541,7 +541,7 @@ DLG_ABOUT_COMP_INFO2=等级 %d
 DLG_ABOUT_COMP_NONE=无
 DLG_ABOUT_COMP_UPDOWN=上传 %s; 下载 %s
 DLG_ABOUT_AUTH_INFO=用户 '%s'，%s认证
-DLG_ABOUT_FINGERPRINT=Host key's fingerprint:
+DLG_ABOUT_FINGERPRINT=主机密钥指纹：
 
 ; dlg auth
 DLG_AUTH_TITLE=SSH认证
@@ -583,7 +583,7 @@ FILEDLG_OPEN_PRIVATEKEY_TITLE=选择 RSA/DSA/ECDSA/ED25519 密钥文件
 FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=请选择一个包含 RSA/DSA/ECDSA/ED25519 密钥的文件。
 MSG_READKEY_ERROR=RSA/DSA/ECDSA/ED25519 密钥读取错误\n%s
-MSG_RHOSTS_NOTDEFAULT_ERROR=rhosts文件的身份认证可能会失败，因为它不是默认的身份认证方法。\n要在TTSSH中使用rhosts认证，你需要通过重启TTSSH，从设置菜单选择“SSH 认证...”，将它设置为默认，然后再连接。
+MSG_RHOSTS_NOTDEFAULT_ERROR=rhosts文件的身份认证可能会失败，因为它不是默认的身份认证方法。\n要在TTSSH中使用rhosts认证，您需要通过重启TTSSH，从设置菜单选择“SSH 认证...”，将它设置为默认，然后再连接。
 MSG_NOAUTHMETHOD_ERROR=服务器不支持 TTSSH 提供的认证方式。\n连接将被中止。
 
 ; dlg diff key
@@ -591,7 +591,7 @@ DLG_DIFFERENTKEY_TITLE=安全警告
 DLG_DIFFERENTKEY_WARNING=服务器"####################################"已存在于主机列表中，但是提供了一个不同的密钥，这可能是敌对方伪装的。
 DLG_DIFFERENTKEY_WARNING2=将该服务器追加到已知主机列表中后，将不再提示本警告。
 DLG_DIFFERENTKEY_FINGERPRINT=服务器密钥指纹：
-DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=指纹散列算法：
 DLG_DIFFERENTKEY_REPLACE=使用新的密钥更换现有密钥(&R)
 
 ; dlg diff type key
@@ -599,7 +599,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=安全警告
 DLG_DIFFERENTTYPEKEY_WARNING=服务器"####################################"已存在于主机列表中，但是提供了一个不同的密钥，这可能是敌对方伪装的。
 DLG_DIFFERENTTYPEKEY_WARNING2=将该服务器追加到已知主机列表中后，将不再提示本警告。
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=服务器密钥指纹：
-DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=指纹散列算法：
 DLG_DIFFERENTTYPEKEY_ADD=追加到已知主机列表中(&A)
 
 ; dlg fwd edit
@@ -662,12 +662,12 @@ DLG_KEYGEN_SAVEPUBLIC=保存为公共密钥(&I)
 DLG_KEYGEN_SAVEPRIVATE=保存为私有密钥(&P)
 DLG_KEYGEN_GENERATE=生成(&G)
 DLG_KEYGEN_BITS=密钥字节数(&B)：
-DLG_KEYGEN_BCRYPT_KDF=bcrypt &KDF format
-DLG_KEYGEN_BCRYPT_ROUNDS=&Number of rounds:
+DLG_KEYGEN_BCRYPT_KDF=bcrypt KDF 格式(&K)
+DLG_KEYGEN_BCRYPT_ROUNDS=轮数(&N)：
 
 MSG_KEYBITS_MIN_ERROR=密钥字节数太小
-MSG_BCRYPT_ROUNDS_MIN_ERROR=The number of rounds is too small.
-MSG_BCRYPT_ROUNDS_MAX_ERROR=The number of rounds is too large.
+MSG_BCRYPT_ROUNDS_MIN_ERROR=轮数太小。
+MSG_BCRYPT_ROUNDS_MAX_ERROR=轮数太大。
 MSG_KEYGEN_GENERATING=正在生成密钥
 MSG_KEYGEN_GENERATED=已生成密钥
 
@@ -690,45 +690,45 @@ FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\\0id_ed25519
 
 ; dlg setup
 DLG_SSHSETUP_TITLE=TTSSH：设置
-DLG_SSHSETUP_COMPRESS=压缩等级(&C):
+DLG_SSHSETUP_COMPRESS=压缩等级(&C)：
 DLG_SSHSETUP_COMPRESS_NONE=无
 DLG_SSHSETUP_COMPRESS_HIGHEST=最高
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1：压缩开关由压缩等级决定。\nSSH2：压缩开关由压缩算法和压缩等级决定。
 DLG_SSHSETUP_CHIPER=加密算法优先级(&P)
 DLG_SSHSETUP_CHIPER_UP=上移(&1)
 DLG_SSHSETUP_CHIPER_DOWN=下移(&2)
-DLG_SSHSETUP_CIPHER_BORDER=<该条线以下的加密算法被禁用>
+DLG_SSHSETUP_CIPHER_BORDER=<该行以下的加密算法被禁用>
 DLG_SSHSETUP_KEX=密钥交换算法优先级(&E) (只有 SSH2 支持)
 DLG_SSHSETUP_KEX_UP=上移(&3)
 DLG_SSHSETUP_KEX_DOWN=下移(&4)
-DLG_SSHSETUP_KEX_BORDER=<该条线以下的密钥交换算法被禁用>
+DLG_SSHSETUP_KEX_BORDER=<该行以下的密钥交换算法被禁用>
 DLG_SSHSETUP_HOST_KEY=主机密钥算法优先级(&S) (只有 SSH2 支持)
 DLG_SSHSETUP_HOST_KEY_UP=上移(&5)
 DLG_SSHSETUP_HOST_KEY_DOWN=下移(&6)
-DLG_SSHSETUP_HOST_KEY_BORDER=<该条线以下的主机密钥算法被禁用>
+DLG_SSHSETUP_HOST_KEY_BORDER=<该行以下的主机密钥算法被禁用>
 DLG_SSHSETUP_MAC=MAC算法(&D) (只有 SSH2 支持)
 DLG_SSHSETUP_MAC_UP=上移(&7)
 DLG_SSHSETUP_MAC_DOWN=下移(&8)
-DLG_SSHSETUP_MAC_BORDER=<该条线以下的MAC算法被禁用>
+DLG_SSHSETUP_MAC_BORDER=<该行以下的MAC算法被禁用>
 DLG_SSHSETUP_COMP=压缩算法优先级(&I) (只有 SSH2 支持)
 DLG_SSHSETUP_COMP_UP=上移(&9)
 DLG_SSHSETUP_COMP_DOWN=下移(&0)
-DLG_SSHSETUP_COMP_BORDER=<该条线以下的压缩算法被禁用>
+DLG_SSHSETUP_COMP_BORDER=<该行以下的压缩算法被禁用>
 DLG_SSHSETUP_KNOWNHOST=SSH 已知主机
-DLG_SSHSETUP_KNOWNHOST_RW=读写(&W):
-DLG_SSHSETUP_KNOWNHOST_RO=只读(&R):
+DLG_SSHSETUP_KNOWNHOST_RW=读写(&W)：
+DLG_SSHSETUP_KNOWNHOST_RO=只读(&R)：
 DLG_SSHSETUP_HEARTBEAT=心跳(&keep-alive)
 DLG_SSHSETUP_HEARTBEAT_UNIT=秒(0表示禁用)
 DLG_SSHSETUP_PASSWORD=保存在内存中的密码(&M)
 DLG_SSHSETUP_FORWARDAGENT=启用代理转发(&A)
 DLG_SSHSETUP_FORWARDAGENTCONFIRM=确认代理转发(&O)
-DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
+DLG_SSHSETUP_FORWARDAGENTNOTIFY=通知转发代理访问(&T)
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=DNS验证主机密钥指纹(&V)
 DLG_SSHSETUP_NOTICE=所有更改都将在下次会话时生效。
-DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
-DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
-DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
-DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Ask
+DLG_SSHSETUP_HOSTKEY_ROTATION=主机密钥轮换(&N)
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=否
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=是
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=询问
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=选择一个可读写的hosts文件
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=追加一个只读的hosts文件
@@ -738,18 +738,18 @@ DLG_TIS_TITLE=SSH 认证挑战
 DLG_TIS_BANNER=登录到：%s
 
 ; dlg passwd change
-DLG_PASSCHG_TITLE=TTSSH: Change Password
-DLG_PASSCHG_MESSAGE=Server requests to change password
-DLG_PASSCHG_OLDPASSWD=&Old Password
-DLG_PASSCHG_NEWPASSWD=&New Password
-DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+DLG_PASSCHG_TITLE=TTSSH：修改密码
+DLG_PASSCHG_MESSAGE=服务器请求更改密码
+DLG_PASSCHG_OLDPASSWD=旧密码(&O)
+DLG_PASSCHG_NEWPASSWD=新密码(&N)
+DLG_PASSCHG_CONFIRMPASSWD=确认密码(&C)
 
 ; dlg unknown host
 DLG_UNKNONWHOST_TITLE=安全警告
 DLG_UNKNOWNHOST_WARNING=服务器"#####################################"不再已知主机列表中。它可能是敌对服务器伪装的，请小心！
 DLG_UNKNOWNHOST_WARNING2=将该服务器追加到已知主机列表中后，将不再提示本警告。
 DLG_UNKNOWNHOST_FINGERPRINT=服务器端主机密钥指纹：
-DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=指纹散列算法：
 DLG_UNKNOWNHOST_ADD=追加到已知主机列表中(&A)
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=DNS中未找到密钥的指纹信息。
@@ -759,23 +759,23 @@ DLG_HOSTKEY_SSHFP_DIFFTYPE=DNS中找到了密钥指纹信息，但是与主机密钥类型不一致！
 DLG_HOSTKEY_DNSSEC_NG=DNS中发现弱密码。
 DLG_HOSTKEY_DNSSEC_OK=DNS中发现强密码。
 
-DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
-DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
-DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
-DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
+DLG_HOSTKEY_ROTATION_TITLE=主机密钥轮换
+DLG_HOSTKEY_ROTATION_WARNING=收到来自远程服务器 %s 的主机密钥列表。\n您可以选择从这台机器添加 %u 个新密钥并移除 %u 个废弃密钥到已知主机列表。\n确定要更新已知主机列表文件吗？
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=指纹散列算法：
+DLG_HOSTKEY_ROTATION_ADD=%u 新密钥：
+DLG_HOSTKEY_ROTATION_REMOVE=%u 废弃密钥：
 
 ; crypt.c
-MSG_ENCRYPT_ERROR1=%s加密错误(1): bytes %d (%d)
+MSG_ENCRYPT_ERROR1=%s加密错误(1)：bytes %d (%d)
 MSG_ENCRYPT_ERROR2=%s加密错误(2)
-MSG_DECRYPT_ERROR1=%s解密错误(1): bytes %d (%d)
+MSG_DECRYPT_ERROR1=%s解密错误(1)：bytes %d (%d)
 MSG_DECRYPT_ERROR2=%s解密错误(2)
 MSG_CIPHER_INIT_ERROR=加密初始化错误(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 密钥设置错误
 MSG_UNAVAILABLE_CIPHERS_ERROR=该服务器不支持 TTSSH 的加密算法。\nTTSSH 无法与之建立连接。\n连接将被断开。
 MSG_CHIPHER_NONE_ERROR=该程序和服务器已知的加密算法已全部被禁用。\n要连接该服务器，您必须在再次启动 TeraTerm 的时候，在 TTSSH 设置对话框中，启用更多的加密算法。\n现在将关闭连接。
 MSG_RASKEY_TOOWEAK_ERROR=服务器RSA密钥太弱。无法建立一个安全的连接。
-MSG_CIPHER_NOTSELECTED_ERROR=未选择加密算法！
+MSG_CHPHER_NOTSELECTED_ERROR=未选择加密算法！
 
 ; fwd.c
 MSG_FWD_LOCAL_CHANNEL_ERROR=服务器试图处理的转发信道不存在。\n无论这是服务器缺陷还是恶意程序导致的，您都应该关闭该连接。
@@ -786,7 +786,7 @@ MSG_FWD_MACHINEDOWN_ERROR=设备无法连接（可能设备未启动）
 MSG_FWD_ADDRNOTFOUTD_ERROR=未找到设备地址
 MSG_FWD_CONNECT_ERROR=无法建立转发连接
 MSG_FWD_CHANNEL_ERROR=通信错误，发生在 %s 转发本地 %s 时。\n%s（代码 %d）。\n转发连接将被关闭。
-MSG_FWD_CHANNEL_OPEN_X_ERROR=服务器试图通过本机转发一个连接。\n它请求到 %s X服务器的连接（显示 %d:%d）。\n%s(code %d)。\n转发连接将被关闭。
+MSG_FWD_CHANNEL_OPEN_X_ERROR=服务器试图通过本机转发一个连接。\n它请求到 %s X服务器的连接（显示 %d：%d）。\n%s(code %d)。\n转发连接将被关闭。
 MSG_FWD_CHANNEL_OPEN_ERROR=服务器试图通过本机转发一个连接。\n它请求到 %s 的连接（端口 %s）。\n%s(code %d).\n转发连接将被关闭。
 DLG_FWDMON_TITLE=TTSSH 端口转发监视器
 MSG_FWD_HOSTILE_ATTACK_ERROR=IP 为 %s 的主机在试图连接到本地转发端口 %d。\n这可能是某种恶意攻击。
@@ -798,8 +798,8 @@ MSG_FWD_DENIED_X_ERROR=服务器试图通过本机转发一个连接。\n它请求到本地X服务器的连
 MSG_FWD_DENIED_BY_SERVER_ERROR=本机上的一个程序试图连接到一个转发端口。\n由于服务器拒绝转发请求，连接已关闭。
 MSG_FWD_COMM_ERROR=发送转发数据到本地端口时，发生通讯错误。\n转发连接已关闭。
 MSG_FWD_AGENT_FORWARDING_CONFIRM=确定接受代理转发请求？
-MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
-MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
+MSG_FWD_AGENT_NOTIFY=远程主机访问代理。
+MSG_FWD_AGENT_NOTIFY_TITLE=代理转发
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=尝试读取已知主机列表文件时，发生错误。 \n指定的文件不存在。
@@ -833,7 +833,7 @@ MSG_SSH_TRUNCATED_PKT_LIM_ERROR=收到的数据包不完整（%ld > %d）@ grab_payload_lim
 MSG_SSH_COREINS_ERROR=检测到“CORE 插入攻击”，连接中断。
 MSG_SSH_CORRUPTDATA_ERROR=检测到已损坏的数据，连接终止。
 MSG_SSH_DECOMPRESS_ERROR=内部错误：一个包未能完全解压。\n这是一个缺陷，请反馈。
-MSG_SSH_SEND_PKT_ERROR=发送 SSH 包时，发生通讯错误。\n连接将被关闭。（%s:%d）
+MSG_SSH_SEND_PKT_ERROR=发送 SSH 包时，发生通讯错误。\n连接将被关闭。（%s：%d）
 MSG_SSH_COMP_ERROR=解压数据包时，发生错误。\n连接将被关闭。
 MSG_SSH_UNABLE_FWD_ERROR=\n可能由于您从服务器请求的转发端口无法转发而导致无法连接。\n这通常发生在有人已经在使用该端口进行转发的时候。
 MSG_SSH_SERVER_DISCON_ERROR=服务器无法连接，消息：“%s”。%s
@@ -850,13 +850,13 @@ MSG_SSH_UNSUPPORT_AUTH_METHOD_ERROR=内部错误：不支持的认证方式。
 MSG_SSH_AUTH_FAILURE_ERROR=SSH2 自动登录错误：用户身份认证失败。
 MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=没有有效用于该服务器的认证方式。
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\n服务器不支持该认证方式。
-MSG_SSH_CHANNEL_OPEN_ERROR=收到 SSH2_MSG_CHANNEL_OPEN_FAILURE。\n通道 [%d]: 原因: %s(%d) 消息: %s
+MSG_SSH_CHANNEL_OPEN_ERROR=收到 SSH2_MSG_CHANNEL_OPEN_FAILURE。\n通道 [%d]：原因：%s(%d) 消息：%s
 MSG_SSH_NO_FREE_CHANNEL=无法打开新通道。TTSSH 已经打开了全部通道。
-MSG_SSH_GEX_SIZE_TITLE=TTSSH: Confirm GEX group size
-MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
-MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
-MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
-MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_GEX_SIZE_TITLE=TTSSH：确认 GEX 组大小
+MSG_SSH_GEX_SIZE_CANCEL=新建连接已取消。
+MSG_SSH_GEX_SIZE_OUTOFRANGE=接收到的组大小超出范围：%d
+MSG_SSH_GEX_SIZE_SMALLER=接收到的组大小小于请求的最小值。\n请求：%d，收到：%d\n确定要接受收到的组吗？
+MSG_SSH_GEX_SIZE_LARGER=接收到的组大小大于请求的最大值。\n请求：%d，收到：%d\n确定要接受收到的组吗？
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=无效的命令行选项：%s
@@ -876,7 +876,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=无法显示对话框，错误号：%d
 MSG_WARNING=警告
 MSG_ERROR=错误
 MSG_TTSSH_ERROR=TTSSH 错误
-MSG_NONFAITAL_ERROR=Tera Term: 非致命错误
+MSG_NONFAITAL_ERROR=Tera Term：非致命错误
 
 BTN_OK=确定
 BTN_CANCEL=取消
@@ -1050,24 +1050,24 @@ BTN_DEFAULT=默认
 [TTXKanjiMenu]
 MENU_KANJI=汉字编码(&K)
 MENU_KANJI_K=字符编码(&K)
-MENU_RECV_SJIS=接收: &Shift_JIS
-MENU_RECV_EUCJP=接收: &EUC-JP
-MENU_RECV_JIS=接收: &JIS
-MENU_RECV_UTF8=接收: &UTF-8
-MENU_RECV_UTF8m=接收: UTF-8&m
-MENU_RECV_KS5601=接收: &KS5601
-MENU_SEND_SJIS=发送: S&hift_JIS
-MENU_SEND_EUCJP=发送: EU&C-JP
-MENU_SEND_JIS=发送: J&IS
-MENU_SEND_UTF8=发送: U&TF-8
-MENU_SEND_KS5601=发送: K&S5601
+MENU_RECV_SJIS=接收：&Shift_JIS
+MENU_RECV_EUCJP=接收：&EUC-JP
+MENU_RECV_JIS=接收：&JIS
+MENU_RECV_UTF8=接收：&UTF-8
+MENU_RECV_UTF8m=接收：UTF-8&m
+MENU_RECV_KS5601=接收：&KS5601
+MENU_SEND_SJIS=发送：S&hift_JIS
+MENU_SEND_EUCJP=发送：EU&C-JP
+MENU_SEND_JIS=发送：J&IS
+MENU_SEND_UTF8=发送：U&TF-8
+MENU_SEND_KS5601=发送：K&S5601
 MENU_USE_ONE_SETTING=收发使用同样的参数(&o)
-MENU_SJIS=收发: &Shift_JIS
-MENU_EUCJP=收发: &EUC-JP
-MENU_JIS=收发: &JIS
-MENU_UTF8=收发: &UTF-8
-MENU_UTF8m=接收: UTF-8&m/发送: UTF-8
-MENU_KS5601=收发: &KS5601
+MENU_SJIS=收发：&Shift_JIS
+MENU_EUCJP=收发：&EUC-JP
+MENU_JIS=收发：&JIS
+MENU_UTF8=收发：&UTF-8
+MENU_UTF8m=接收：UTF-8&m/发送：UTF-8
+MENU_KS5601=收发：&KS5601
 
 
 [TTXAlwaysOnTop]
@@ -1084,4 +1084,4 @@ DLG_TITLE=重复命令
 DLG_ENABLE=启用(&E)
 DLG_INTERVAL=间隔(秒)(&I)
 DLG_COMMAND=命令(&C)
-DLG_ADD_NEWLINE=&Add new line
+DLG_ADD_NEWLINE=添加新行(&A)
