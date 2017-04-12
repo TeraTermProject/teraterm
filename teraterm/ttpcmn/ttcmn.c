@@ -2383,6 +2383,7 @@ int PASCAL CheckComPort(WORD ComPort)
 
 // Notify Icon ŠÖ˜A
 static NOTIFYICONDATA notify_icon = {0};
+static int NotifyIconShowCount = 0;
 
 void FAR PASCAL CreateNotifyIcon(PComVar cv)
 {
@@ -2404,6 +2405,8 @@ void FAR PASCAL CreateNotifyIcon(PComVar cv)
 		cv->NotifyIcon = &notify_icon;
 
 		Shell_NotifyIcon(NIM_ADD, cv->NotifyIcon);
+
+		NotifyIconShowCount = 0;
 	}
 
 	return;
@@ -2414,6 +2417,7 @@ void FAR PASCAL DeleteNotifyIcon(PComVar cv)
 	if (cv->NotifyIcon) {
 		Shell_NotifyIcon(NIM_DELETE, cv->NotifyIcon);
 		cv->NotifyIcon = NULL;
+		NotifyIconShowCount = 0;
 	}
 
 	return;
@@ -2429,17 +2433,26 @@ void FAR PASCAL ShowNotifyIcon(PComVar cv)
 	cv->NotifyIcon->dwState = 0;
 	cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
 	Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+	NotifyIconShowCount += 1;
+
 	return;
 }
 
 void FAR PASCAL HideNotifyIcon(PComVar cv)
 {
-	if (cv->NotifyIcon) {
-		cv->NotifyIcon->uFlags = NIF_STATE;
-		cv->NotifyIcon->dwState = NIS_HIDDEN;
-		cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
-		Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+	if (NotifyIconShowCount > 1) {
+		NotifyIconShowCount -= 1;
 	}
+	else {
+		if (cv->NotifyIcon) {
+			cv->NotifyIcon->uFlags = NIF_STATE;
+			cv->NotifyIcon->dwState = NIS_HIDDEN;
+			cv->NotifyIcon->dwStateMask = NIS_HIDDEN;
+			Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+		}
+		NotifyIconShowCount = 0;
+	}
+
 	return;
 }
 
@@ -2478,6 +2491,8 @@ void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
 	strncpy_s(cv->NotifyIcon->szInfo, sizeof(cv->NotifyIcon->szInfo), msg, _TRUNCATE);
 
 	Shell_NotifyIcon(NIM_MODIFY, cv->NotifyIcon);
+
+	NotifyIconShowCount += 1;
 
 	return;
 }
