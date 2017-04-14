@@ -1203,11 +1203,8 @@ ULONGLONG myVerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask,
 	return pVerSetConditionMask(dwlConditionMask, dwTypeBitMask, dwConditionMask);
 }
 
-// OSが Windows95 かどうかを判別する。
-//
-// return TRUE:  95
-//        FALSE: Not 95
-BOOL IsWindows95()
+// OSが 指定されたバージョンと等しい かどうかを判別する。
+BOOL IsWindowsVer(DWORD dwPlatformId, DWORD dwMajorVersion, DWORD dwMinorVersion)
 {
 	OSVERSIONINFOEX osvi;
 	DWORDLONG dwlConditionMask = 0;
@@ -1216,9 +1213,9 @@ BOOL IsWindows95()
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
-	osvi.dwMajorVersion = 4;
-	osvi.dwMinorVersion = 0;
+	osvi.dwPlatformId = dwPlatformId;
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
 	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
 	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
 	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MINORVERSION, op);
@@ -1226,56 +1223,9 @@ BOOL IsWindows95()
 	return (ret);
 }
 
-// OSが WindowsNT カーネルかどうかを判別する。
-//
-// return TRUE:  NT kernel
-//        FALSE: Not NT4 kernel
-BOOL IsWindowsNTKernel()
-{
-	OSVERSIONINFOEX osvi;
-	DWORDLONG dwlConditionMask = 0;
-	int op = VER_EQUAL;
-	BOOL ret;
-
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
-	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
-	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID, dwlConditionMask);
-	return (ret);
-}
-
-// OSが WindowsNT4.0 かどうかを判別する。
-//
-// return TRUE:  NT4.0
-//        FALSE: Not NT4.0
-BOOL IsWindowsNT4()
-{
-	return is_NT4();
-}
-
-BOOL is_NT4()
-{
-	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
-	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
-	// 無条件に FALSE を返してもよいかもしれない。
-	OSVERSIONINFOEX osvi;
-	DWORDLONG dwlConditionMask = 0;
-	int op = VER_EQUAL;
-	BOOL ret;
-
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
-	osvi.dwMajorVersion = 4;
-	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
-	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MAJORVERSION, op);
-	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID | VER_MAJORVERSION, dwlConditionMask);
-	return (ret);
-}
-
 // OSが 指定されたバージョン以降 かどうかを判別する。
-
+//   dwPlatformId を見ていないので NT カーネル内でしか比較できない
+//   5.0 以上で比較すること
 BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
 {
 	OSVERSIONINFOEX osvi;
@@ -1291,6 +1241,45 @@ BOOL IsWindowsVerOrLater(DWORD dwMajorVersion, DWORD dwMinorVersion)
 	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_MINORVERSION, op);
 	ret = myVerifyVersionInfo(&osvi, VER_MAJORVERSION | VER_MINORVERSION, dwlConditionMask);
 	return (ret);
+}
+
+// OSが WindowsNT カーネルかどうかを判別する。
+//
+// return TRUE:  NT kernel
+//        FALSE: Not NT kernel
+BOOL IsWindowsNTKernel()
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+	int op = VER_EQUAL;
+	BOOL ret;
+
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+	dwlConditionMask = myVerSetConditionMask(dwlConditionMask, VER_PLATFORMID, op);
+	ret = myVerifyVersionInfo(&osvi, VER_PLATFORMID, dwlConditionMask);
+	return (ret);
+}
+
+// OSが Windows95 かどうかを判別する。
+BOOL IsWindows95()
+{
+	return IsWindowsVer(VER_PLATFORM_WIN32_WINDOWS, 4, 0);
+}
+
+// OSが WindowsNT4.0 かどうかを判別する。
+BOOL IsWindowsNT4()
+{
+	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
+}
+
+BOOL is_NT4()
+{
+	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
+	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
+	// 無条件に FALSE を返してもよいかもしれない。
+	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
 }
 
 // OSが Windows2000 以降 かどうかを判別する。
