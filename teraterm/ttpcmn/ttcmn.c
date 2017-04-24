@@ -2487,6 +2487,10 @@ void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
 		return;
 	}
 
+	if (! (IsWindows2000OrLater() || IsWindowsMe())) {
+		return;
+	}
+
 	if (cv->NotifyIcon == NULL) {
 		CreateNotifyIcon(cv);
 	}
