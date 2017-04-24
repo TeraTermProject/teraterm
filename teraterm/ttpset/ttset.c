@@ -3786,9 +3786,6 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			else
 				ts->AutoWinClose = 0;
 		}
-		else if (_stricmp(Temp, "/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
-			ParamPort = IdNamedPipe;
-		}
 		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
 			ParamPort = IdSerial;
 			ParamBaud = atoi(&Temp[6]);
@@ -3915,6 +3912,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			ParamPort = IdTCPIP;
 			if (sscanf(&Temp[3], "%hd", &ParamTCP) != 1)
 				ParamTCP = 65535;
+		}
+		else if (_stricmp(Temp, "/PIPE") == 0 ||
+		         _stricmp(Temp, "/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
+			ParamPort = IdNamedPipe;
 		}
 		else if (_strnicmp(Temp, "/R=", 3) == 0) {	/* Replay filename */
 			strncpy_s(Temp2, sizeof(Temp2), &Temp[3], _TRUNCATE);
