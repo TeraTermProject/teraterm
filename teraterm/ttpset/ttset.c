@@ -3732,7 +3732,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	DWORD ParamBaud = BaudNone;
 	BOOL HostNameFlag = FALSE;
 	BOOL JustAfterHost = FALSE;
-	PCHAR start, cur, next;
+	PCHAR start, cur, next, p;
 
 	ts->HostName[0] = 0;
 	//ts->KeyCnfFN[0] = 0;
@@ -4054,6 +4054,16 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		ts->PortType = IdFile;
 		break;
 	case IdNamedPipe:
+		if (ts->HostName[0] != 0 && ts->HostName[0] != '\\') {
+			if (p = strchr(ts->HostName, '\\')) {
+				*p++ = '\0';
+				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "\\\\%s\\pipe\\%s", ts->HostName, p);
+			}
+			else {
+				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "\\\\.\\pipe\\%s", ts->HostName);
+			}
+			strncpy_s(ts->HostName, sizeof(ts->HostName), Temp, _TRUNCATE);
+		}
 		ts->PortType = IdNamedPipe;
 		ts->ComPort = 0;
 		break;
