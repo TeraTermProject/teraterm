@@ -553,12 +553,8 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	/* Port type */
 	GetPrivateProfileString(Section, "Port", "",
 	                        Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "tcpip") == 0)
-		ts->PortType = IdTCPIP;
-	else if (_stricmp(Temp, "serial") == 0)
+	if (_stricmp(Temp, "serial") == 0)
 		ts->PortType = IdSerial;
-	else if (_stricmp(Temp, "namedpipe") == 0)
-		ts->PortType = IdNamedPipe;
 	else {
 		ts->PortType = IdTCPIP;
 	}
@@ -1986,14 +1982,7 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "Language", Temp, FName);
 
 	/* Port type */
-	if (ts->PortType == IdSerial)
-		strncpy_s(Temp, sizeof(Temp), "serial", _TRUNCATE);
-	else if (ts->PortType == IdNamedPipe)
-		strncpy_s(Temp, sizeof(Temp), "namedpipe", _TRUNCATE);
-	else						/* IdFile -> IdTCPIP */
-		strncpy_s(Temp, sizeof(Temp), "tcpip", _TRUNCATE);
-
-	WritePrivateProfileString(Section, "Port", Temp, FName);
+	WritePrivateProfileString(Section, "Port", (ts->PortType==IdSerial)?"serial":"tcpip", FName);
 
 	/* Save win position */
 	if (ts->SaveVTWinPos) {
