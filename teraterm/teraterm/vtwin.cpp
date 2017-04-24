@@ -845,6 +845,12 @@ CVTWindow::CVTWindow()
 	                                MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
 	                                IMAGE_ICON, 0, 0, fuLoad));
 
+	SetCustomNotifyIcon(
+		(HICON)LoadImage(
+			AfxGetInstanceHandle(),
+			MAKEINTRESOURCE((ts.VTIcon!=IdIconDefault)?ts.VTIcon:IDI_VT),
+			IMAGE_ICON, 16, 16, LR_VGACOLOR|LR_SHARED));
+
 	MainMenu = NULL;
 	WinMenu = NULL;
 	if ((ts.HideTitle==0) && (ts.PopupMenu==0)) {

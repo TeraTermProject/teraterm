@@ -59,6 +59,7 @@ void FAR PASCAL NotifyMessage(PComVar cv, PCHAR message, PCHAR title, DWORD flag
 void FAR PASCAL ShowNotifyIcon(PComVar cv);
 void FAR PASCAL HideNotifyIcon(PComVar cv);
 void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
+void FAR PASCAL SetCustomNotifyIcon(HICON icon);
 
 #define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
 #define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)

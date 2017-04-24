@@ -2384,6 +2384,12 @@ int PASCAL CheckComPort(WORD ComPort)
 // Notify Icon ŠÖ˜A
 static NOTIFYICONDATA notify_icon = {0};
 static int NotifyIconShowCount = 0;
+static HICON CustomIcon = NULL;
+
+void FAR PASCAL SetCustomNotifyIcon(HICON icon)
+{
+	CustomIcon = icon;
+}
 
 void FAR PASCAL CreateNotifyIcon(PComVar cv)
 {
@@ -2393,7 +2399,12 @@ void FAR PASCAL CreateNotifyIcon(PComVar cv)
 		notify_icon.uID = 1;
 		notify_icon.uFlags = NIF_ICON | NIF_MESSAGE;
 		notify_icon.uCallbackMessage = WM_USER_NOTIFYICON;
-		notify_icon.hIcon = (HICON)SendMessage(cv->HWin, WM_GETICON, ICON_SMALL, 0);
+		if (CustomIcon) {
+			notify_icon.hIcon = CustomIcon;
+		}
+		else {
+			notify_icon.hIcon = (HICON)SendMessage(cv->HWin, WM_GETICON, ICON_SMALL, 0);
+		}
 		notify_icon.szTip[0] = '\0';
 		notify_icon.dwState = 0;
 		notify_icon.dwStateMask = 0;
