@@ -394,7 +394,7 @@ static char FAR *describe_socket_error(PTInstVar pvar, int code)
 	case WSANO_RECOVERY:
 	case WSANO_ADDRESS:
 	case WSAHOST_NOT_FOUND:
-		UTIL_get_lang_msg("MSG_FWD_ADDRNOTFOUTD_ERROR", pvar,
+		UTIL_get_lang_msg("MSG_FWD_ADDRNOTFOUND_ERROR", pvar,
 		                  "No address was found for the machine");
 		return pvar->ts->UIMsg;
 	default:

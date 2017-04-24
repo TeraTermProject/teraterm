@@ -3357,7 +3357,7 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 			get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDCANCEL, uimsg);
 			GetDlgItemText(Dialog, IDC_WINLISTCLOSE, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_WINLSIT_CLOSEWIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+			get_lang_msg("DLG_WINLIST_CLOSEWIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetDlgItemText(Dialog, IDC_WINLISTCLOSE, uimsg);
 			GetDlgItemText(Dialog, IDC_WINLISTHELP, uimsg2, sizeof(uimsg2));
 			get_lang_msg("BTN_HELP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);

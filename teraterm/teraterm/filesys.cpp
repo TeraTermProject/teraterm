@@ -1532,7 +1532,7 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 	Hpd=pd->GetSafeHwnd();
 
 	GetDlgItemText(Hpd, IDC_PROT_FILENAME, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PROT_FIELNAME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_PROT_FILENAME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(Hpd, IDC_PROT_FILENAME, ts.UIMsg);
 	GetDlgItemText(Hpd, IDC_PROT_PROT, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_PROT_PROTO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);

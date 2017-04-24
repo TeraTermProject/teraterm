@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-12)
+; Updated by TeraTerm Project (2017-04-24)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -134,7 +134,7 @@ DLG_MAIN_TITLE_CONNECTING=[connexion...]
 DLG_MAIN_TITLE_DISCONNECTED=[déconnecté]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_TITLE=Clipboard Access
 MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
 MSG_CBACCESS_READ=Remote host reads clipboard contents.
 MSG_CBACCESS_WRITE=Remote host writes clipboard.
@@ -219,7 +219,7 @@ DLG_TAB_COPYPASTE_DELIMITER=Caractères délimiteurs
 DLG_TAB_COPYPASTE_PASTEDELAY=Délai avant de coller la ligne
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
-DLG_TAB_VISUAL_ALHPA=Mélange alpha
+DLG_TAB_VISUAL_ALPHA=Mélange alpha
 DLG_TAB_VISUAL_ETERM=Apparence Eterm(*)
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
@@ -263,7 +263,7 @@ DLG_BROADCAST_REALTIME=Mode tps-réel
 
 DLG_PRNABORT_PRINTING=Impression
 
-DLG_PROT_FIELNAME=Nom de fichier:
+DLG_PROT_FILENAME=Nom de fichier:
 DLG_PROT_PROTO=Protocole:
 DLG_PROT_PACKET=N° Paquet:
 DLG_PROT_TRANS=Octets transférés:
@@ -412,7 +412,7 @@ DLG_CHOOSEFONT_STC6=La sélection d'un "Style de police" ici n'affectera pas l'as
 DLG_WINLIST_TITLE=Tera Term: Fenêtres
 DLG_WINLIST_LABEL=&Fenêtre:
 DLG_WINLIST_OPEN=&Ouvrir
-DLG_WINLSIT_CLOSEWIN=Fermer
+DLG_WINLIST_CLOSEWIN=Fermer
 
 MSG_FIND_DIR_ERROR=Impossible de trouver le répertoire
 
@@ -617,8 +617,8 @@ DLG_FWD_REMOTE_LOCAL_PORT=p&ort
 
 MSG_SAME_SERVERPORT_ERROR=Vous ne pouvez pas avoir deux mappages sur le même port de serveur (%d).
 MSG_SAME_LOCALPORT_ERROR=Vous ne pouvez pas avoir deux mappages sur le même port local (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=Les mappages suivants n'étaient pas spécifiés lors du démarrage de cette session SSH:\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\nA cause d'une limitation du protocole SSH, ces mappages ne fonctionneront pas dans la session SSH courante.\nSi vous sauvegardez cette configuration et ouvrez une nouvelle session SSH, les mappages devraient fonctionner.
+MSG_UNSPECIFIED_FWD_ERROR1=Les mappages suivants n'étaient pas spécifiés lors du démarrage de cette session SSH:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nA cause d'une limitation du protocole SSH, ces mappages ne fonctionneront pas dans la session SSH courante.\nSi vous sauvegardez cette configuration et ouvrez une nouvelle session SSH, les mappages devraient fonctionner.
 MSG_INVALID_PORT_ERROR=Le port "%s" n'est pas un N° de port valide.\nChoisissez un nom de port dans la liste, ou entrez un nombre entre 1 et 65535.
 
 ; dlg fwd setup
@@ -628,7 +628,7 @@ DLG_FWDSETUP_ADD=&Ajouter...
 DLG_FWDSETUP_EDIT=&Editer...
 DLG_FWDSETUP_REMOVE=&Supprimer
 DLG_FWDSETUP_CHECKIDENTITY=Les ports locaux a&cceptent des connexions des autres hôtes
-DLD_FWDSETUP_X=X Mappage
+DLG_FWDSETUP_X=X Mappage
 DLG_FWDSETUP_XAPP=Afficher les applis distantes sur les serveur X local
 
 MSG_FWD_REMOTE_XSERVER=serveur X distant
@@ -694,9 +694,9 @@ DLG_SSHSETUP_COMPRESS=&Taux compression:
 DLG_SSHSETUP_COMPRESS_NONE=Sans
 DLG_SSHSETUP_COMPRESS_HIGHEST=Maxi
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.
-DLG_SSHSETUP_CHIPER=Ordre de Chffrement &Préféré
-DLG_SSHSETUP_CHIPER_UP=Monter(&1)
-DLG_SSHSETUP_CHIPER_DOWN=Descendre(&2)
+DLG_SSHSETUP_CIPHER=Ordre de Chffrement &Préféré
+DLG_SSHSETUP_CIPHER_UP=Monter(&1)
+DLG_SSHSETUP_CIPHER_DOWN=Descendre(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<chiffrements sous cette ligne dévalidés>
 DLG_SSHSETUP_KEX=K&EX order (SSH2 only)
 DLG_SSHSETUP_KEX_UP=Move Up(&3)
@@ -713,7 +713,7 @@ DLG_SSHSETUP_MAC_BORDER=<MACs below this line are disabled>
 DLG_SSHSETUP_COMP=Compress&ion order (SSH2 only)
 DLG_SSHSETUP_COMP_UP=Move Up(&9)
 DLG_SSHSETUP_COMP_DOWN=Move Down(&0)
-DLG_SSHSETUP_COMP_BORDER=<Compressions below this line are disabled>
+DLG_SSHSETUP_COMP_BORDER=<Compression methods below this line are disabled>
 DLG_SSHSETUP_KNOWNHOST=SSH Hôtes connus
 DLG_SSHSETUP_KNOWNHOST_RW=Fichier R/W:
 DLG_SSHSETUP_KNOWNHOST_RO=Fichier Lect seule:
@@ -745,7 +745,7 @@ DLG_PASSCHG_NEWPASSWD=&New Password
 DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
 
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=ALERTE DE SECURITE
+DLG_UNKNOWNHOST_TITLE=ALERTE DE SECURITE
 DLG_UNKNOWNHOST_WARNING=Il n'y a pas d'entrée pour le serveur "#####################################" dans votre liste d'hôtes connus. La machine que vous avez contactée pourrait être une machine hostile se faisant passer pour le serveur.
 DLG_UNKNOWNHOST_WARNING2=Si vous choisissez d'ajouter cette machine à la liste d'hôtes connus et de continuer, vous ne recevrez plus cet avertissement.
 DLG_UNKNOWNHOST_FINGERPRINT=L'empreinte de la clé du serveur est:
@@ -774,7 +774,7 @@ MSG_CIPHER_INIT_ERROR=Erreur initialisation chiffrement(%d)
 MSG_RSAKEY_SETUP_ERROR=Erreur configurations clés RSA
 MSG_UNAVAILABLE_CIPHERS_ERROR=Le serveur ne suppote aucun des algorithmes de cryptage TTSSH.\nUne connexion sécurisée ne peut être établie avec le serveur.\nLa connexion va être fermée.
 MSG_CIPHER_NONE_ERROR=Tous les algorithmes de codage que ce programme et le serveur comprennent ont été dévalidés.\nPour communiquer avec ce serveur, vous devrez autoriser d'autres méthodes de chiffrement\ndans la boîte de dialogue TTSSH quand vous relancerez Tera Term.\nCette connexion va être fermée.
-MSG_RASKEY_TOOWEAK_ERROR=Les clés RSA du serveur sont trop faibles. Impossible d'établir une connexion sécurisée.
+MSG_RSAKEY_TOOWEAK_ERROR=Les clés RSA du serveur sont trop faibles. Impossible d'établir une connexion sécurisée.
 MSG_CIPHER_NOTSELECTED_ERROR=No cipher selected!
 
 ; fwd.c
@@ -783,7 +783,7 @@ MSG_FWD_REQUEST_ERROR=Erreurs de communication lors de l'écoute d'une connexion\
 MSG_FWD_REFUSED_ERROR=Connexion refusée (le service n'est peut être pas démarré actuellement)
 MSG_FWD_NETDOWN_ERROR=La machine ne peut pas être contactée (problème de réseau possible)
 MSG_FWD_MACHINEDOWN_ERROR=La machine ne peut pas être contactée (la machine est peut-être arrêtée)
-MSG_FWD_ADDRNOTFOUTD_ERROR=Pas d'adresse trouvée pour la machine
+MSG_FWD_ADDRNOTFOUND_ERROR=Pas d'adresse trouvée pour la machine
 MSG_FWD_CONNECT_ERROR=La connexion n'a pas pu être établie
 MSG_FWD_CHANNEL_ERROR=Erreur de communication %s redirigé en local %s.\n%s (code %d).\nLa connexion redirigée va être fermée.
 MSG_FWD_CHANNEL_OPEN_X_ERROR=Le serveur a essayé de rediriger une connexion à travers cette machine.\nIl a demandé une connexion au serveur X sur %s (display %d:%d).\n%s(code %d).\nLa connection redirigée va être fermée.
@@ -876,7 +876,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Impossible d'afficher la boîte de dialogue Fic
 MSG_WARNING=ATTENTION
 MSG_ERROR=ERRRREUR
 MSG_TTSSH_ERROR=TTSSH Erreur
-MSG_NONFAITAL_ERROR=Tera Term: erreur non fatale
+MSG_NONFATAL_ERROR=Tera Term: erreur non fatale
 
 BTN_OK=OK
 BTN_CANCEL=Effacer
@@ -890,7 +890,7 @@ BTN_NO=&No
 [TTProxy]
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-NEMU_SETUP=&Proxy...
+MENU_SETUP=&Proxy...
 MENU_ABOUT=Apropos de TT&Proxy...
 
 DLG_SETUP_TITLE=Config. Proxy
@@ -921,7 +921,7 @@ DLG_OTHER_CONNECT=Message de &Connexion
 DLG_OTHER_ERROR=Message d'&Erreur
 
 DLG_ABOUT_TITLE=A propos de TTProxy
-DLG_ABOUT_EXTENTION=Tera Term extension proxy
+DLG_ABOUT_EXTENSION=Tera Term extension proxy
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
 DLG_ABOUT_HOMEPAGE=TTProxy home page
 

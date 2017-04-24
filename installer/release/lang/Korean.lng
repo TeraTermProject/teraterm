@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-12)
+; Updated by TeraTerm Project (2017-04-24)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -134,7 +134,7 @@ DLG_MAIN_TITLE_CONNECTING=[연결...]
 DLG_MAIN_TITLE_DISCONNECTED=[끊어짐]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_TITLE=Clipboard Access
 MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
 MSG_CBACCESS_READ=Remote host reads clipboard contents.
 MSG_CBACCESS_WRITE=Remote host writes clipboard.
@@ -219,7 +219,7 @@ DLG_TAB_COPYPASTE_DELIMITER=구분자 문자(&I)
 DLG_TAB_COPYPASTE_PASTEDELAY=줄당 붙여넣기 지연(&A)
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
-DLG_TAB_VISUAL_ALHPA=투명도(&A)
+DLG_TAB_VISUAL_ALPHA=투명도(&A)
 DLG_TAB_VISUAL_ETERM=Eterm 느낌(*)(&E)
 DLG_TAB_VISUAL_BGIMG=배경그림(&I)
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
@@ -263,7 +263,7 @@ DLG_BROADCAST_REALTIME=실시간 모드
 
 DLG_PRNABORT_PRINTING=인쇄
 
-DLG_PROT_FIELNAME=파일이름:
+DLG_PROT_FILENAME=파일이름:
 DLG_PROT_PROTO=프로토콜:
 DLG_PROT_PACKET=패킷#:
 DLG_PROT_TRANS=전송된 바이트:
@@ -412,7 +412,7 @@ DLG_CHOOSEFONT_STC6=여기서 "글꼴 스타일" 선택은 실제 글꼴 모양에 영향을 주지 않�
 DLG_WINLIST_TITLE=Tera Term: 창 목록
 DLG_WINLIST_LABEL=창(&W):
 DLG_WINLIST_OPEN=열기(&O)
-DLG_WINLSIT_CLOSEWIN=창 닫기(&C)
+DLG_WINLIST_CLOSEWIN=창 닫기(&C)
 
 MSG_FIND_DIR_ERROR=디렉토리를 찾을 수 없습니다
 
@@ -617,8 +617,8 @@ DLG_FWD_REMOTE_LOCAL_PORT=포트(&O)
 
 MSG_SAME_SERVERPORT_ERROR=같은 서버 포트로 부터 2개의 포워딩을 할 수 없습니다(%d).
 MSG_SAME_LOCALPORT_ERROR=같은 로컬 포트로 부터 2개의 포워딩을 할 수 없습니다(%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=이 SSH 세션이 시작할 때 다음 포워딩이 지정되지 않았습니다:\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\nSSH 프로토콜 한계 때문에, 이 포워딩들은 현재 SSH 세션에서 동작하지 않습니다.\n만약 이 설정들을 저장하고 새로운 SSH 세션을 시작하면, 이 포워딩들은 동작합니다.
+MSG_UNSPECIFIED_FWD_ERROR1=이 SSH 세션이 시작할 때 다음 포워딩이 지정되지 않았습니다:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nSSH 프로토콜 한계 때문에, 이 포워딩들은 현재 SSH 세션에서 동작하지 않습니다.\n만약 이 설정들을 저장하고 새로운 SSH 세션을 시작하면, 이 포워딩들은 동작합니다.
 MSG_INVALID_PORT_ERROR=포트 "%s"는 유효한 포트 번호가 아닙니다.\n목록에서 포트 이름을 고르거나 1에서 65535 사이의 숫자를 입력하세요.
 
 ; dlg fwd setup
@@ -628,7 +628,7 @@ DLG_FWDSETUP_ADD=추가...(&A)
 DLG_FWDSETUP_EDIT=수정...(&E)
 DLG_FWDSETUP_REMOVE=삭제(&R)
 DLG_FWDSETUP_CHECKIDENTITY=다른 호스트로부터 지역 포트 연결을 허용합니다.(&C)
-DLD_FWDSETUP_X=X 포워딩
+DLG_FWDSETUP_X=X 포워딩
 DLG_FWDSETUP_XAPP=지역 X 서버에 원격 어플리케이션을 표시(&X)
 
 MSG_FWD_REMOTE_XSERVER=원격 X 서버
@@ -694,9 +694,9 @@ DLG_SSHSETUP_COMPRESS=압축수준(&C):
 DLG_SSHSETUP_COMPRESS_NONE=없슴
 DLG_SSHSETUP_COMPRESS_HIGHEST=최고
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: '압축수준'은 압축 켜기/끄기를 결정합니다.\nSSH2: '압축순서'와 '압축수준'은 압축 켜기/끄기를 결정합니다.
-DLG_SSHSETUP_CHIPER=선호하는 암호 순서(&P)
-DLG_SSHSETUP_CHIPER_UP=위로 이동(&1)
-DLG_SSHSETUP_CHIPER_DOWN=아래로 이동(&2)
+DLG_SSHSETUP_CIPHER=선호하는 암호 순서(&P)
+DLG_SSHSETUP_CIPHER_UP=위로 이동(&1)
+DLG_SSHSETUP_CIPHER_DOWN=아래로 이동(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<이 줄 밑의 암호들은 비활성화>
 DLG_SSHSETUP_KEX=K&EX 순서 (SSH2만)
 DLG_SSHSETUP_KEX_UP=위로 이동(&3)
@@ -745,7 +745,7 @@ DLG_PASSCHG_NEWPASSWD=&New Password
 DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
 
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=보안 경고
+DLG_UNKNOWNHOST_TITLE=보안 경고
 DLG_UNKNOWNHOST_WARNING=당신의 known-host 목록에는 서버 "#####################################" 항목이 없습니다. 당신이 접속한 컴퓨터는 그 서버를 흉내내는 악의적인 컴퓨터일 수 있습니다.
 DLG_UNKNOWNHOST_WARNING2=known-host 목록에 이 컴퓨터를 추가하고 계속 진행하면 다시는 경고 메시지를 받지 않습니다.
 DLG_UNKNOWNHOST_FINGERPRINT=서버의 호스트키 지문은:
@@ -774,7 +774,7 @@ MSG_CIPHER_INIT_ERROR=암호 초기화 오류(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 키 설정 오류
 MSG_UNAVAILABLE_CIPHERS_ERROR=서버가 TTSSH의 암호화 알고리즘 중 어떤 것도 지원하지 않습니다.\nTTSSH에서 서버로 안전한 연결을 만들 수 없습니다.\n이 연결은 닫힙니다.
 MSG_CIPHER_NONE_ERROR=이 프로그램과 서버 모두 사용할 수 있는 모든 암호화 알고리즘이 비활성화 되어 있습니다.\n서버와 통신하기 위해 Tera Term 재실행시 TTSSH\n설정 다이얼로그에서 추가적인 암호들을 활성화 시켜야합니다.\n이 연결은 종료됩니다.
-MSG_RASKEY_TOOWEAK_ERROR=서버 RSA키가 너무 약합니다. 안전한 연결을 만들 수 없습니다.
+MSG_RSAKEY_TOOWEAK_ERROR=서버 RSA키가 너무 약합니다. 안전한 연결을 만들 수 없습니다.
 MSG_CIPHER_NOTSELECTED_ERROR=암호가 선택되지 않았슴!
 
 ; fwd.c
@@ -783,7 +783,7 @@ MSG_FWD_REQUEST_ERROR=포워드를 위한 연결 듣기 중 통신 오류가 발생했습니다.\n듣기
 MSG_FWD_REFUSED_ERROR=연결 거절됨 (아마도 서비스가 실행 중이 아닌것 같습니다)
 MSG_FWD_NETDOWN_ERROR=이 컴퓨터에 연결할 수 없습니다 (네트웍 문제일 가능성 있슴)
 MSG_FWD_MACHINEDOWN_ERROR=이 컴퓨터에 연결할 수 없습니다 (컴퓨터가 동작하지 않았을 가능성 있슴)
-MSG_FWD_ADDRNOTFOUTD_ERROR=이 컴퓨터의 주소를 찾을 수 없습니다
+MSG_FWD_ADDRNOTFOUND_ERROR=이 컴퓨터의 주소를 찾을 수 없습니다
 MSG_FWD_CONNECT_ERROR=포워드 연결을 설정할 수 없습니다
 MSG_FWD_CHANNEL_ERROR=통신 오류 %s 포워드된 지역 포트 %s.\n%s (코드 %d).\n포워드된 연결이 종료됩니다.
 MSG_FWD_CHANNEL_OPEN_X_ERROR=서버가 이 컴퓨터를 통해 연결을 포워드 하려고 합니다.\n%s에 있는 X 서버로 연결을 요청했습니다 (표시 %d:%d).\n%s(code %d).\n포워드된 연결이 종료됩니다.
@@ -876,7 +876,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=파일 다이얼로그를 표시할 수 없슴: 오류 %d
 MSG_WARNING=경고
 MSG_ERROR=오류
 MSG_TTSSH_ERROR=TTSSH 오류
-MSG_NONFAITAL_ERROR=Tera Term: 치명적 오류 아님
+MSG_NONFATAL_ERROR=Tera Term: 치명적 오류 아님
 
 BTN_OK=확인
 BTN_CANCEL=취소
@@ -890,7 +890,7 @@ BTN_NO=&No
 [TTProxy]
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-NEMU_SETUP=&Proxy...
+MENU_SETUP=&Proxy...
 MENU_ABOUT=TTProxy에 대하여...(&P)
 
 DLG_SETUP_TITLE=Proxy 설정
@@ -921,7 +921,7 @@ DLG_OTHER_CONNECT=연결된 메시지(&C)
 DLG_OTHER_ERROR=오류 메시지(&E)
 
 DLG_ABOUT_TITLE=TTProxy에 대하여
-DLG_ABOUT_EXTENTION=Tera Term proxy 확장
+DLG_ABOUT_EXTENSION=Tera Term proxy 확장
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
 DLG_ABOUT_HOMEPAGE=TTProxy 홈페이지
 

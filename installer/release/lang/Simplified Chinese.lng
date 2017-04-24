@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-12)
+; Updated by TeraTerm Project (2017-04-24)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -219,7 +219,7 @@ DLG_TAB_COPYPASTE_DELIMITER=分隔符(&I)
 DLG_TAB_COPYPASTE_PASTEDELAY=粘贴行间延时(&A)
 DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
 
-DLG_TAB_VISUAL_ALHPA=透明度(&A)
+DLG_TAB_VISUAL_ALPHA=透明度(&A)
 DLG_TAB_VISUAL_ETERM=&Eterm 风格 (*)
 DLG_TAB_VISUAL_BGIMG=背景图像(&I)
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=图像亮度(&T)
@@ -263,7 +263,7 @@ DLG_BROADCAST_REALTIME=实时模式
 
 DLG_PRNABORT_PRINTING=打印中
 
-DLG_PROT_FIELNAME=文件名：
+DLG_PROT_FILENAME=文件名：
 DLG_PROT_PROTO=协议：
 DLG_PROT_PACKET=包号：
 DLG_PROT_TRANS=传输字节数：
@@ -412,7 +412,7 @@ DLG_CHOOSEFONT_STC6=这里的字体选项不会影响实际的字体外观
 DLG_WINLIST_TITLE=Tera Term：窗口列表
 DLG_WINLIST_LABEL=窗口(&W)：
 DLG_WINLIST_OPEN=打开
-DLG_WINLSIT_CLOSEWIN=关闭
+DLG_WINLIST_CLOSEWIN=关闭
 
 MSG_FIND_DIR_ERROR=未找到目录
 
@@ -617,8 +617,8 @@ DLG_FWD_REMOTE_LOCAL_PORT=端口(&O)
 
 MSG_SAME_SERVERPORT_ERROR=不能在同一远程端口设置两个或更多的转发 (%d).
 MSG_SAME_LOCALPORT_ERROR=不能在同一本地端口设置两个或更多的转发 (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=SSH会话开始时，未指定以下转发：\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\n由于SSH协议的限制，这些转发将不会在本次会话中生效。\n保存这些设置，它们将在新的SSH会话开始时生效。
+MSG_UNSPECIFIED_FWD_ERROR1=SSH会话开始时，未指定以下转发：\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\n由于SSH协议的限制，这些转发将不会在本次会话中生效。\n保存这些设置，它们将在新的SSH会话开始时生效。
 MSG_INVALID_PORT_ERROR="%s"不是一个有效的端口号。\n您可以选择列表中的端口名称，或者指定1到65535之间的端口号。
 
 ; dlg fwd setup
@@ -628,7 +628,7 @@ DLG_FWDSETUP_ADD=添加(&A)...
 DLG_FWDSETUP_EDIT=编辑(&E)...
 DLG_FWDSETUP_REMOVE=删除(&R)
 DLG_FWDSETUP_CHECKIDENTITY=本地端口接受来自其他主机的连接(&C)
-DLD_FWDSETUP_X=X转发
+DLG_FWDSETUP_X=X转发
 DLG_FWDSETUP_XAPP=在本地X服务器显示远程X应用程序
 
 MSG_FWD_REMOTE_XSERVER=远程X服务器
@@ -694,9 +694,9 @@ DLG_SSHSETUP_COMPRESS=压缩等级(&C)：
 DLG_SSHSETUP_COMPRESS_NONE=无
 DLG_SSHSETUP_COMPRESS_HIGHEST=最高
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1：压缩开关由压缩等级决定。\nSSH2：压缩开关由压缩算法和压缩等级决定。
-DLG_SSHSETUP_CHIPER=加密算法优先级(&P)
-DLG_SSHSETUP_CHIPER_UP=上移(&1)
-DLG_SSHSETUP_CHIPER_DOWN=下移(&2)
+DLG_SSHSETUP_CIPHER=加密算法优先级(&P)
+DLG_SSHSETUP_CIPHER_UP=上移(&1)
+DLG_SSHSETUP_CIPHER_DOWN=下移(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<该行以下的加密算法被禁用>
 DLG_SSHSETUP_KEX=密钥交换算法优先级(&E) (只有 SSH2 支持)
 DLG_SSHSETUP_KEX_UP=上移(&3)
@@ -745,7 +745,7 @@ DLG_PASSCHG_NEWPASSWD=新密码(&N)
 DLG_PASSCHG_CONFIRMPASSWD=确认密码(&C)
 
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=安全警告
+DLG_UNKNOWNHOST_TITLE=安全警告
 DLG_UNKNOWNHOST_WARNING=服务器"#####################################"不再已知主机列表中。它可能是敌对服务器伪装的，请小心！
 DLG_UNKNOWNHOST_WARNING2=将该服务器追加到已知主机列表中后，将不再提示本警告。
 DLG_UNKNOWNHOST_FINGERPRINT=服务器端主机密钥指纹：
@@ -774,7 +774,7 @@ MSG_CIPHER_INIT_ERROR=加密初始化错误(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 密钥设置错误
 MSG_UNAVAILABLE_CIPHERS_ERROR=该服务器不支持 TTSSH 的加密算法。\nTTSSH 无法与之建立连接。\n连接将被断开。
 MSG_CIPHER_NONE_ERROR=该程序和服务器已知的加密算法已全部被禁用。\n要连接该服务器，您必须在再次启动 TeraTerm 的时候，在 TTSSH 设置对话框中，启用更多的加密算法。\n现在将关闭连接。
-MSG_RASKEY_TOOWEAK_ERROR=服务器RSA密钥太弱。无法建立一个安全的连接。
+MSG_RSAKEY_TOOWEAK_ERROR=服务器RSA密钥太弱。无法建立一个安全的连接。
 MSG_CIPHER_NOTSELECTED_ERROR=未选择加密算法！
 
 ; fwd.c
@@ -783,7 +783,7 @@ MSG_FWD_REQUEST_ERROR=侦听转发连接时，通信错误。\n侦听端口将被关闭。
 MSG_FWD_REFUSED_ERROR=连接被拒绝（也许当前服务并未运行）
 MSG_FWD_NETDOWN_ERROR=设备无法连接（可能是网络问题）
 MSG_FWD_MACHINEDOWN_ERROR=设备无法连接（可能设备未启动）
-MSG_FWD_ADDRNOTFOUTD_ERROR=未找到设备地址
+MSG_FWD_ADDRNOTFOUND_ERROR=未找到设备地址
 MSG_FWD_CONNECT_ERROR=无法建立转发连接
 MSG_FWD_CHANNEL_ERROR=通信错误，发生在 %s 转发本地 %s 时。\n%s（代码 %d）。\n转发连接将被关闭。
 MSG_FWD_CHANNEL_OPEN_X_ERROR=服务器试图通过本机转发一个连接。\n它请求到 %s X服务器的连接（显示 %d：%d）。\n%s(code %d)。\n转发连接将被关闭。
@@ -876,7 +876,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=无法显示对话框，错误号：%d
 MSG_WARNING=警告
 MSG_ERROR=错误
 MSG_TTSSH_ERROR=TTSSH 错误
-MSG_NONFAITAL_ERROR=Tera Term：非致命错误
+MSG_NONFATAL_ERROR=Tera Term：非致命错误
 
 BTN_OK=确定
 BTN_CANCEL=取消
@@ -890,7 +890,7 @@ BTN_NO=&No
 [TTProxy]
 DLG_TAHOMA_FONT=微软雅黑,8,0
 
-NEMU_SETUP=代理(&P)...
+MENU_SETUP=代理(&P)...
 MENU_ABOUT=关于 TT&Proxy...
 
 DLG_SETUP_TITLE=代理设置
@@ -921,7 +921,7 @@ DLG_OTHER_CONNECT=连接信息(&C)
 DLG_OTHER_ERROR=错误信息(&E)
 
 DLG_ABOUT_TITLE=关于 TTProxy
-DLG_ABOUT_EXTENTION=Tera Term 代理扩展
+DLG_ABOUT_EXTENSION=Tera Term 代理扩展
 DLG_ABOUT_YEBISUYA=惠比寿本铺
 DLG_ABOUT_HOMEPAGE=TTProxy 主页
 

@@ -832,7 +832,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	}
 
 	GetDlgItemText(IDC_ALPHABLEND, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_TAB_VISUAL_ALHPA", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	get_lang_msg("DLG_TAB_VISUAL_ALPHA", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ALPHABLEND, ts.UIMsg);
 	GetDlgItemText(IDC_ETERM_LOOKFEEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_ETERM", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);

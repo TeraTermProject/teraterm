@@ -1713,7 +1713,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
-		UTIL_get_lang_msg("DLG_UNKNONWHOST_TITLE", pvar, uimsg);
+		UTIL_get_lang_msg("DLG_UNKNOWNHOST_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING", pvar, uimsg);

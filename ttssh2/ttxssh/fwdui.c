@@ -838,7 +838,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	UTIL_get_lang_msg("DLG_FWDSETUP_REMOVE", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_REMOVE, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_XFORWARD, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLD_FWDSETUP_X", pvar, uimsg);
+	UTIL_get_lang_msg("DLG_FWDSETUP_X", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_XFORWARD, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHFWDX11, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWDSETUP_XAPP", pvar, uimsg);
@@ -945,7 +945,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	if (num_unspecified_forwardings > 0) {
-		UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR1", pvar,
+		UTIL_get_lang_msg("MSG_UNSPECIFIED_FWD_ERROR1", pvar,
 		                  "The following forwarding was not specified when this SSH session began:\n\n");
 		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 
@@ -961,7 +961,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 			}
 		}
 
-		UTIL_get_lang_msg("MSG_UNSPECIFYIED_FWD_ERROR2", pvar,
+		UTIL_get_lang_msg("MSG_UNSPECIFIED_FWD_ERROR2", pvar,
 		                  "\nDue to a limitation of the SSH protocol, this forwarding will not work in the current SSH session.\n"
 		                  "If you save these settings and start a new SSH session, the forwarding should work.");
 		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);

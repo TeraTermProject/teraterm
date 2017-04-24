@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-12)
+; Updated by TeraTerm Project (2017-04-24)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -133,7 +133,7 @@ DLG_MAIN_TITLE_CONNECTING=[connecting...]
 DLG_MAIN_TITLE_DISCONNECTED=[disconnected]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_TITLE=Clipboard Access
 MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
 MSG_CBACCESS_READ=Remote host reads clipboard contents.
 MSG_CBACCESS_WRITE=Remote host writes clipboard.
@@ -218,7 +218,7 @@ DLG_TAB_COPYPASTE_DELIMITER=Del&imiter characters
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
-DLG_TAB_VISUAL_ALHPA=&Alpha blend
+DLG_TAB_VISUAL_ALPHA=&Alpha blend
 DLG_TAB_VISUAL_ETERM=&Eterm lookfeel(*)
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
@@ -262,15 +262,15 @@ DLG_BROADCAST_REALTIME=Realtime mode
 
 DLG_PRNABORT_PRINTING=Printing
 
-DLG_PROT_FIELNAME=Filename:
+DLG_PROT_FILENAME=Filename:
 DLG_PROT_PROTO=Protocol:
 DLG_PROT_PACKET=Packet#:
-DLG_PROT_TRANS=Bytes transfered:
+DLG_PROT_TRANS=Bytes transferred:
 DLG_PROT_ELAPSED=Elapsed time:
 
 DLG_FILETRANS_FILENAME=Filename:
 DLG_FILETRANS_FULLPATH=Fullpath:
-DLG_FILETRANS_TRNAS=Bytes transfered:
+DLG_FILETRANS_TRNAS=Bytes transferred:
 DLG_FILETRANS_ELAPSED=Elapsed time:
 DLG_FILETRANS_START=&Start
 DLG_FILETRANS_PAUSE=Pau&se
@@ -411,7 +411,7 @@ DLG_CHOOSEFONT_STC6="Font style" selection here won't affect actual font appeara
 DLG_WINLIST_TITLE=Tera Term: Window list
 DLG_WINLIST_LABEL=&Window:
 DLG_WINLIST_OPEN=&Open
-DLG_WINLSIT_CLOSEWIN=&Close window
+DLG_WINLIST_CLOSEWIN=&Close window
 
 MSG_FIND_DIR_ERROR=Cannot find directory
 
@@ -616,8 +616,8 @@ DLG_FWD_REMOTE_LOCAL_PORT=p&ort
 
 MSG_SAME_SERVERPORT_ERROR=You cannot have two forwarding from the same server port (%d).
 MSG_SAME_LOCALPORT_ERROR=You cannot have two forwarding from the same local port (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=The following forwarding were not specified when this SSH session began:\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
+MSG_UNSPECIFIED_FWD_ERROR1=The following forwarding were not specified when this SSH session began:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nDue to a limitation of the SSH protocol, these forwarding will not work in the current SSH session.\nIf you save these settings and start a new SSH session, the forwarding should work.
 MSG_INVALID_PORT_ERROR=Port "%s" is not a valid port number.\nEither choose a port name from the list, or enter a number between 1 and 65535.
 
 ; dlg fwd setup
@@ -627,7 +627,7 @@ DLG_FWDSETUP_ADD=&Add...
 DLG_FWDSETUP_EDIT=&Edit...
 DLG_FWDSETUP_REMOVE=&Remove
 DLG_FWDSETUP_CHECKIDENTITY=Local ports a&ccept connections from other hosts
-DLD_FWDSETUP_X=X Forwarding
+DLG_FWDSETUP_X=X Forwarding
 DLG_FWDSETUP_XAPP=Display remote &X applications on local X server
 
 MSG_FWD_REMOTE_XSERVER=remote X server
@@ -693,9 +693,9 @@ DLG_SSHSETUP_COMPRESS=&Compression level:
 DLG_SSHSETUP_COMPRESS_NONE=None
 DLG_SSHSETUP_COMPRESS_HIGHEST=Highest
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: 'Compression level' determines compression on/off.\nSSH2: 'Compression order' and 'Compression level' determines compression on/off.
-DLG_SSHSETUP_CHIPER=&Preferred cipher order
-DLG_SSHSETUP_CHIPER_UP=Move Up(&1)
-DLG_SSHSETUP_CHIPER_DOWN=Move Down(&2)
+DLG_SSHSETUP_CIPHER=&Preferred cipher order
+DLG_SSHSETUP_CIPHER_UP=Move Up(&1)
+DLG_SSHSETUP_CIPHER_DOWN=Move Down(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<ciphers below this line are disabled>
 DLG_SSHSETUP_KEX=K&EX order (SSH2 only)
 DLG_SSHSETUP_KEX_UP=Move Up(&3)
@@ -712,7 +712,7 @@ DLG_SSHSETUP_MAC_BORDER=<MACs below this line are disabled>
 DLG_SSHSETUP_COMP=Compress&ion order (SSH2 only)
 DLG_SSHSETUP_COMP_UP=Move Up(&9)
 DLG_SSHSETUP_COMP_DOWN=Move Down(&0)
-DLG_SSHSETUP_COMP_BORDER=<Compressions below this line are disabled>
+DLG_SSHSETUP_COMP_BORDER=<Compression methods below this line are disabled>
 DLG_SSHSETUP_KNOWNHOST=SSH Known Hosts
 DLG_SSHSETUP_KNOWNHOST_RW=Read/&write file:
 DLG_SSHSETUP_KNOWNHOST_RO=&Read-only files:
@@ -744,7 +744,7 @@ DLG_PASSCHG_NEWPASSWD=&New Password
 DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
 
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=SECURITY WARNING
+DLG_UNKNOWNHOST_TITLE=SECURITY WARNING
 DLG_UNKNOWNHOST_WARNING=There is no entry for the server "#####################################" in your list of known hosts. The machine you have contacted may be a hostile machine pretending to be the server.
 DLG_UNKNOWNHOST_WARNING2=If you choose to add this machine to the known hosts list and continue, then you will not receive this warning again.
 DLG_UNKNOWNHOST_FINGERPRINT=The server's host key fingerprint is:
@@ -773,7 +773,7 @@ MSG_CIPHER_INIT_ERROR=Cipher initialize error(%d)
 MSG_RSAKEY_SETUP_ERROR=Error setting up RSA keys
 MSG_UNAVAILABLE_CIPHERS_ERROR=The server does not support any of the TTSSH encryption algorithms.\nA secure connection cannot be made in the TTSSH-to-server direction.\nThe connection will be closed.
 MSG_CIPHER_NONE_ERROR=All the encryption algorithms that this program and the server both understand have been disabled.\nTo communicate with this server, you will have to enable some more ciphers\nin the TTSSH Setup dialog box when you run Tera Term again.\nThis connection will now close.
-MSG_RASKEY_TOOWEAK_ERROR=Server RSA keys are too weak. A secure connection cannot be established.
+MSG_RSAKEY_TOOWEAK_ERROR=Server RSA keys are too weak. A secure connection cannot be established.
 MSG_CIPHER_NOTSELECTED_ERROR=No cipher selected!
 
 ; fwd.c
@@ -782,7 +782,7 @@ MSG_FWD_REQUEST_ERROR=Communications error while listening for a connection to f
 MSG_FWD_REFUSED_ERROR=Connection refused (perhaps the service is not currently running)
 MSG_FWD_NETDOWN_ERROR=The machine could not be contacted (possibly a network problem)
 MSG_FWD_MACHINEDOWN_ERROR=The machine could not be contacted (possibly the machine is down)
-MSG_FWD_ADDRNOTFOUTD_ERROR=No address was found for the machine
+MSG_FWD_ADDRNOTFOUND_ERROR=No address was found for the machine
 MSG_FWD_CONNECT_ERROR=The forwarding connection could not be established
 MSG_FWD_CHANNEL_ERROR=Communications error %s forwarded local %s.\n%s (code %d).\nThe forwarded connection will be closed.
 MSG_FWD_CHANNEL_OPEN_X_ERROR=The server attempted to forward a connection through this machine.\nIt requested a connection to the X server on %s (display %d:%d).\n%s(code %d).\nThe forwarded connection will be closed.
@@ -875,7 +875,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Unable to display file dialog box: error %d
 MSG_WARNING=WARNING
 MSG_ERROR=ERROR
 MSG_TTSSH_ERROR=TTSSH Error
-MSG_NONFAITAL_ERROR=Tera Term: not fatal error
+MSG_NONFATAL_ERROR=Tera Term: not fatal error
 
 BTN_OK=OK
 BTN_CANCEL=Cancel
@@ -889,7 +889,7 @@ BTN_NO=&No
 [TTProxy]
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-NEMU_SETUP=&Proxy...
+MENU_SETUP=&Proxy...
 MENU_ABOUT=About TT&Proxy...
 
 DLG_SETUP_TITLE=Proxy Setup
@@ -920,7 +920,7 @@ DLG_OTHER_CONNECT=&Connected message
 DLG_OTHER_ERROR=&Error message
 
 DLG_ABOUT_TITLE=About TTProxy
-DLG_ABOUT_EXTENTION=Tera Term proxy extension
+DLG_ABOUT_EXTENSION=Tera Term proxy extension
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
 DLG_ABOUT_HOMEPAGE=TTProxy home page
 
@@ -963,7 +963,7 @@ MSG_AKID_SKID_MISMATCH=Authority and Subject Key Identifier mismatch
 MSG_AKID_ISSUER_SERIAL_MISMATCH=Authority and Issuer Serial Number mismatch
 MSG_KEYUSAGE_NO_CERTSIGN=Key usage does not include Certificate signing
 MSG_APPLICATION_VERIFICATION=Application verification failure
-MSG_UNMATCH_COMMON_NAME=Umatch Common Name
+MSG_UNMATCH_COMMON_NAME=Unmatch Common Name
 MSG_UNABLE_TO_GET_COMMON_NAME=Unable to get Common Name
 
 BTN_OK=OK

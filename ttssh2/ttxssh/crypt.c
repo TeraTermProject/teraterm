@@ -1210,7 +1210,7 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 	}
 
 	if (bit_delta < 128 || server_key_bits < 512 || host_key_bits < 512) {
-		UTIL_get_lang_msg("MSG_RASKEY_TOOWEAK_ERROR", pvar,
+		UTIL_get_lang_msg("MSG_RSAKEY_TOOWEAK_ERROR", pvar,
 		                  "Server RSA keys are too weak. A secure connection cannot be established.");
 		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return 0;

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-12)
+; Updated by TeraTerm Project (2017-04-24)
 ; Last translated (Russian language) by Ryumik Sergey (2015-03-14)
 
 [Tera Term]
@@ -134,7 +134,7 @@ DLG_MAIN_TITLE_CONNECTING=[соединяется...]
 DLG_MAIN_TITLE_DISCONNECTED=[разъединено]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_TITLE=Clipboard Access
 MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
 MSG_CBACCESS_READ=Remote host reads clipboard contents.
 MSG_CBACCESS_WRITE=Remote host writes clipboard.
@@ -219,7 +219,7 @@ DLG_TAB_COPYPASTE_DELIMITER=&Разделитель символов
 DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку перед строкой
 DLG_TAB_COPYPASTE_PASTEDELAY2=мс
 
-DLG_TAB_VISUAL_ALHPA=&Прозрачный
+DLG_TAB_VISUAL_ALPHA=&Прозрачный
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
 DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
@@ -263,7 +263,7 @@ DLG_BROADCAST_REALTIME=Реальн. время
 
 DLG_PRNABORT_PRINTING=Печать
 
-DLG_PROT_FIELNAME=Имя файла:
+DLG_PROT_FILENAME=Имя файла:
 DLG_PROT_PROTO=Протокол:
 DLG_PROT_PACKET=Пакет#:
 DLG_PROT_TRANS=Переданные байты:
@@ -412,7 +412,7 @@ DLG_CHOOSEFONT_STC6=Выбор "Стиль шрифта" не повлияет на фактический внешний вид 
 DLG_WINLIST_TITLE=Tera Term: Опции окон
 DLG_WINLIST_LABEL=&Окно:
 DLG_WINLIST_OPEN=&Открыть окно
-DLG_WINLSIT_CLOSEWIN=&Закрыть окно
+DLG_WINLIST_CLOSEWIN=&Закрыть окно
 
 MSG_FIND_DIR_ERROR=Не удается найти папку
 
@@ -617,8 +617,8 @@ DLG_FWD_REMOTE_LOCAL_PORT=&Порт
 
 MSG_SAME_SERVERPORT_ERROR=Вы не можете иметь два перенаправления из одного и того же порта сервера (%d).
 MSG_SAME_LOCALPORT_ERROR=Вы не можете иметь два перенаправление из одного и того же порта (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=Следующие перенаправления не были указаны в начале сессии SSH:\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\nВ связи с ограничением протокола SSH, эти пересылки не будут работать в текущем сеансе SSH.\nЕсли вы сохраните эти настройки и создадите новую сессию SSH, то перенаправление должно работать.
+MSG_UNSPECIFIED_FWD_ERROR1=Следующие перенаправления не были указаны в начале сессии SSH:\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\nВ связи с ограничением протокола SSH, эти пересылки не будут работать в текущем сеансе SSH.\nЕсли вы сохраните эти настройки и создадите новую сессию SSH, то перенаправление должно работать.
 MSG_INVALID_PORT_ERROR=Порт "%s" имеет недопустимый номер.\nВыберите имя порта из списка или введите число от 1 до 65535.
 
 ; dlg fwd setup
@@ -628,7 +628,7 @@ DLG_FWDSETUP_ADD=&Добавить...
 DLG_FWDSETUP_EDIT=&Править...
 DLG_FWDSETUP_REMOVE=&Удалить
 DLG_FWDSETUP_CHECKIDENTITY=&Локальные порты принимают соединения от других хостов
-DLD_FWDSETUP_X=X-пересылка
+DLG_FWDSETUP_X=X-пересылка
 DLG_FWDSETUP_XAPP=&Отображение удаленных приложений X на локальном X-сервере
 
 MSG_FWD_REMOTE_XSERVER=Удаленный X-сервер
@@ -694,9 +694,9 @@ DLG_SSHSETUP_COMPRESS=&Степень сжатия:
 DLG_SSHSETUP_COMPRESS_NONE=Ниже
 DLG_SSHSETUP_COMPRESS_HIGHEST=Выше
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1: вкл./выкл. через "Степень сжатия".\nSSH2: вкл./выкл. через "Степень сжатия" и "Тип сжатия".
-DLG_SSHSETUP_CHIPER=&Шифр
-DLG_SSHSETUP_CHIPER_UP=Сдвиг вверх(&1)
-DLG_SSHSETUP_CHIPER_DOWN=Сдвиг вниз(&2)
+DLG_SSHSETUP_CIPHER=&Шифр
+DLG_SSHSETUP_CIPHER_UP=Сдвиг вверх(&1)
+DLG_SSHSETUP_CIPHER_DOWN=Сдвиг вниз(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<Шифры ниже этой линии отключены>
 DLG_SSHSETUP_KEX=K&EX (только для SSH2)
 DLG_SSHSETUP_KEX_UP=Сдвиг вверх(&3)
@@ -745,7 +745,7 @@ DLG_PASSCHG_NEWPASSWD=&New Password
 DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
 
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
+DLG_UNKNOWNHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "####################################" в списке известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_UNKNOWNHOST_WARNING2=Если вы добавите этот компьютер в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_UNKNOWNHOST_FINGERPRINT=Ключ сервера хоста:
@@ -774,7 +774,7 @@ MSG_CIPHER_INIT_ERROR=Ошибка инициализации шифра (%d)
 MSG_RSAKEY_SETUP_ERROR=Ошибка создания ключа RSA
 MSG_UNAVAILABLE_CIPHERS_ERROR=Сервер не поддерживает ни один из TTSSH-алгоритмов шифрования.\nЗащищенное соединение не может быть создано в направлении TTSSH-сервера.\nСоединение будет закрыто.
 MSG_CIPHER_NONE_ERROR=Все алгоритмы шифрования для этой программы и сервера были отключены.\nЧтобы общаться с этим сервером, Вы должны включить несколько шифров\nв диалоговом окне "Настройка TTSSH" при новом запуске Tera Term.\nСоединение будет закрыто.
-MSG_RASKEY_TOOWEAK_ERROR=Ключ сервера RSA слишком слабый. Защищенное соединение не может быть установлено.
+MSG_RSAKEY_TOOWEAK_ERROR=Ключ сервера RSA слишком слабый. Защищенное соединение не может быть установлено.
 MSG_CIPHER_NOTSELECTED_ERROR=Не выбран шифр!
 
 ; fwd.c
@@ -783,7 +783,7 @@ MSG_FWD_REQUEST_ERROR=Ошибка связи во время прослушивания подключения пересылки.
 MSG_FWD_REFUSED_ERROR=Отказ в подключении (возможно, что служба в настоящее время не работает)
 MSG_FWD_NETDOWN_ERROR=Компьютеру не удалось связаться (возможны проблемы с сетью)
 MSG_FWD_MACHINEDOWN_ERROR=Компьютеру не удалось связаться (возможно, что компьютер выключен)
-MSG_FWD_ADDRNOTFOUTD_ERROR=Не найден адрес компьютера
+MSG_FWD_ADDRNOTFOUND_ERROR=Не найден адрес компьютера
 MSG_FWD_CONNECT_ERROR=Соединение пересылки не может быть установлено
 MSG_FWD_CHANNEL_ERROR=Ошибка связи %s локальной пересылки %s.\n%s (код %d).\nСоединение пересылки будет закрыто
 MSG_FWD_CHANNEL_OPEN_X_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения с X-сервером %s (экран %d:%d).\n%s(code %d).\nСоединение пересылки будет закрыто.
@@ -876,7 +876,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=Не удается отобразить диалог файлов: ошибка %d
 MSG_WARNING=ВНИМАНИЕ
 MSG_ERROR=ОШИБКА
 MSG_TTSSH_ERROR=Ошибка TTSSH
-MSG_NONFAITAL_ERROR=Tera Term: Ошибка не фатальная
+MSG_NONFATAL_ERROR=Tera Term: Ошибка не фатальная
 
 BTN_OK=OK
 BTN_CANCEL=Выход
@@ -890,7 +890,7 @@ BTN_NO=&No
 [TTProxy]
 DLG_TAHOMA_FONT=Tahoma,8,0
 
-NEMU_SETUP=&Proxy...
+MENU_SETUP=&Proxy...
 MENU_ABOUT=Информация о TT&Proxy...
 
 DLG_SETUP_TITLE=Настройка Proxy
@@ -921,7 +921,7 @@ DLG_OTHER_CONNECT=&Сообщение о соединении
 DLG_OTHER_ERROR=&Сообщение об ошибке
 
 DLG_ABOUT_TITLE=Информация о TTProxy
-DLG_ABOUT_EXTENTION=Tera Term расширенное прокси
+DLG_ABOUT_EXTENSION=Tera Term расширенное прокси
 DLG_ABOUT_YEBISUYA=YebisuyaHompo
 DLG_ABOUT_HOMEPAGE=TTProxy home page
 

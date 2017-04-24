@@ -1218,7 +1218,7 @@ private:
             UTIL_get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2);
             SetWindowText(uimsg);
 
-            UTIL_get_lang_msg("DLG_ABOUT_EXTENTION", uimsg, sizeof(uimsg),
+            UTIL_get_lang_msg("DLG_ABOUT_EXTENSION", uimsg, sizeof(uimsg),
                               "Tera Term proxy extension");
             UTIL_get_lang_msg("DLG_ABOUT_YEBISUYA", uimsg2, sizeof(uimsg2),
                               "YebisuyaHompo");
@@ -2022,7 +2022,7 @@ private:                                                   \
                                               "Application verification failure");
                         case IDS_UNMATCH_COMMON_NAME:
                             UTIL_get_lang_msg("MSG_UNMATCH_COMMON_NAME", uimsg, sizeof(uimsg),
-                                              "Umatch Common Name");
+                                              "Unmatch Common Name");
                         case IDS_UNABLE_TO_GET_COMMON_NAME:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_GET_COMMON_NAME", uimsg, sizeof(uimsg),
                                               "Unable to get Common Name");

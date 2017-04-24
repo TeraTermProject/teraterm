@@ -241,7 +241,7 @@ private:
 		UTIL_get_lang_msg("MENU_ABOUT", uimsg, sizeof(uimsg), "About TT&Proxy...");
 		InsertMenu(menu, 50990, MF_BYCOMMAND | MF_ENABLED, ID_ABOUTMENU, uimsg);
 		/* inserts before ID_SETUP_TCPIP */
-		UTIL_get_lang_msg("NEMU_SETUP", uimsg, sizeof(uimsg), "&Proxy...");
+		UTIL_get_lang_msg("MENU_SETUP", uimsg, sizeof(uimsg), "&Proxy...");
 		InsertMenu(menu, 50360, MF_BYCOMMAND | MF_ENABLED, ID_PROXYSETUPMENU, uimsg);
 	}
 

@@ -484,7 +484,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		KeybEnabled = (ParamBinaryFlag!=0);
 		break;
 	case CmdGetTitle:
-		// title is transfered later by XTYP_REQUEST
+		// title is transferred later by XTYP_REQUEST
 		strncpy_s(ParamFileName, sizeof(ParamFileName),ts.Title, _TRUNCATE);
 		break;
 	case CmdInit: // initialization signal from TTMACRO

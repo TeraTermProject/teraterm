@@ -950,7 +950,7 @@ void notify_nonfatal_error(PTInstVar pvar, char FAR * msg)
 		// 未接続の状態では通知先ウィンドウがないので、デスクトップをオーナーとして
 		// メッセージボックスを出現させる。(2006.6.11 yutaka)
 		if (pvar->NotificationWindow == NULL) {
-			UTIL_get_lang_msg("MSG_ERROR_NONFAITAL", pvar,
+			UTIL_get_lang_msg("MSG_NONFATAL_ERROR", pvar,
 			                  "Tera Term: not fatal error");
 			MessageBox(NULL, msg, pvar->ts->UIMsg, MB_OK|MB_ICONINFORMATION);
 			msg[0] = '\0';
@@ -2818,13 +2818,13 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	SetDlgItemText(dlg, IDC_COMPRESSNOTE, pvar->ts->UIMsg);
 
 	GetDlgItemText(dlg, IDC_CIPHERORDER, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_CHIPER", pvar, uimsg);
+	UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_CIPHERORDER, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHMOVECIPHERUP, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_CHIPER_UP", pvar, uimsg);
+	UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_UP", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHMOVECIPHERUP, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDC_SSHMOVECIPHERDOWN, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_SSHSETUP_CHIPER_DOWN", pvar, uimsg);
+	UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_DOWN", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHMOVECIPHERDOWN, pvar->ts->UIMsg);
 
 	GetDlgItemText(dlg, IDC_KEX_ORDER, uimsg, sizeof(uimsg));
@@ -3001,7 +3001,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 		if (index == 0)	{
 			UTIL_get_lang_msg("DLG_SSHSETUP_COMP_BORDER", pvar,
-							  "<Compressions below this line are disabled>");
+							  "<Compression methods below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
 			name = get_ssh2_comp_name(index);

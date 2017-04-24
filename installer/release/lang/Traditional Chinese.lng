@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-12)
+; Updated by TeraTerm Project (2017-04-24)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -134,7 +134,7 @@ DLG_MAIN_TITLE_CONNECTING=[正在連線...]
 DLG_MAIN_TITLE_DISCONNECTED=[未連線]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboad Access
+MSG_CBACCESS_TITLE=Clipboard Access
 MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
 MSG_CBACCESS_READ=Remote host reads clipboard contents.
 MSG_CBACCESS_WRITE=Remote host writes clipboard.
@@ -219,7 +219,7 @@ DLG_TAB_COPYPASTE_DELIMITER=分隔符(&I)
 DLG_TAB_COPYPASTE_PASTEDELAY=貼上時隔行延時(&A)
 DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
 
-DLG_TAB_VISUAL_ALHPA=透明度(&A)
+DLG_TAB_VISUAL_ALPHA=透明度(&A)
 DLG_TAB_VISUAL_ETERM=&Eterm 風格 (*)
 DLG_TAB_VISUAL_BGIMG=背景圖像(&I)
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
@@ -263,7 +263,7 @@ DLG_BROADCAST_REALTIME=實時的
 
 DLG_PRNABORT_PRINTING=列印中
 
-DLG_PROT_FIELNAME=文件名：
+DLG_PROT_FILENAME=文件名：
 DLG_PROT_PROTO=協定：
 DLG_PROT_PACKET=包號：
 DLG_PROT_TRANS=傳輸字節數：
@@ -412,7 +412,7 @@ DLG_CHOOSEFONT_STC6=這裡的字型選項不會影響實際的字型外觀
 DLG_WINLIST_TITLE=Tera Term：視窗列表
 DLG_WINLIST_LABEL=視窗(&W)：
 DLG_WINLIST_OPEN=打開
-DLG_WINLSIT_CLOSEWIN=關閉
+DLG_WINLIST_CLOSEWIN=關閉
 
 MSG_FIND_DIR_ERROR=未找到目錄
 
@@ -617,8 +617,8 @@ DLG_FWD_REMOTE_LOCAL_PORT=端口(&O)
 
 MSG_SAME_SERVERPORT_ERROR=不能在同一遠端端口設定兩個或更多的連線 (%d).
 MSG_SAME_LOCALPORT_ERROR=不能在同一本地端口設定兩個或更多的連線 (%d).
-MSG_UNSPECIFYIED_FWD_ERROR1=SSH連線開始時，未指定以下轉發：\n\n
-MSG_UNSPECIFYIED_FWD_ERROR2=\n由於SSH協定的限制，這些轉發將不會在本次連線中生效。\n儲存這些設定，它們將在新的SSH連線開始時生效。
+MSG_UNSPECIFIED_FWD_ERROR1=SSH連線開始時，未指定以下轉發：\n\n
+MSG_UNSPECIFIED_FWD_ERROR2=\n由於SSH協定的限制，這些轉發將不會在本次連線中生效。\n儲存這些設定，它們將在新的SSH連線開始時生效。
 MSG_INVALID_PORT_ERROR="%s"不是一個有效的端口號。\n您可以選擇列表中的端口名稱，或者指定1到65535之間的端口號。
 
 ; dlg fwd setup
@@ -628,7 +628,7 @@ DLG_FWDSETUP_ADD=添加(&A)...
 DLG_FWDSETUP_EDIT=編輯(&E)...
 DLG_FWDSETUP_REMOVE=刪除(&R)
 DLG_FWDSETUP_CHECKIDENTITY=本地端口接受來自其他主機的連接(&C)
-DLD_FWDSETUP_X=X轉發
+DLG_FWDSETUP_X=X轉發
 DLG_FWDSETUP_XAPP=在本地X伺服器顯示遠端X應用程式
 
 MSG_FWD_REMOTE_XSERVER=遠端X伺服器
@@ -694,9 +694,9 @@ DLG_SSHSETUP_COMPRESS=壓縮等級(&C):
 DLG_SSHSETUP_COMPRESS_NONE=無
 DLG_SSHSETUP_COMPRESS_HIGHEST=最高
 DLG_SSHSETUP_COMPRESS_NOTE=SSH1：壓縮開關由壓縮等級決定。\nSSH2：壓縮開關由壓縮算法和壓縮等級決定。
-DLG_SSHSETUP_CHIPER=加密算法優先級(&P)
-DLG_SSHSETUP_CHIPER_UP=上移(&1)
-DLG_SSHSETUP_CHIPER_DOWN=下移(&2)
+DLG_SSHSETUP_CIPHER=加密算法優先級(&P)
+DLG_SSHSETUP_CIPHER_UP=上移(&1)
+DLG_SSHSETUP_CIPHER_DOWN=下移(&2)
 DLG_SSHSETUP_CIPHER_BORDER=<該條線以下的加密算法被禁用>
 DLG_SSHSETUP_KEX=密鑰交換算法優先級(&E) (只有 SSH2 支持)
 DLG_SSHSETUP_KEX_UP=上移(&3)
@@ -745,7 +745,7 @@ DLG_PASSCHG_NEWPASSWD=&New Password
 DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
 
 ; dlg unknown host
-DLG_UNKNONWHOST_TITLE=安全警告
+DLG_UNKNOWNHOST_TITLE=安全警告
 DLG_UNKNOWNHOST_WARNING=伺服器"#####################################"不再已知主機列表中。它可能是敵對伺服器偽裝的，請小心！
 DLG_UNKNOWNHOST_WARNING2=將該伺服器追加到已知主機列表中後，將不再提示本警告。
 DLG_UNKNOWNHOST_FINGERPRINT=伺服器端主機密鑰指紋：
@@ -774,7 +774,7 @@ MSG_CIPHER_INIT_ERROR=加密初始化錯誤(%d)
 MSG_RSAKEY_SETUP_ERROR=RSA 密鑰設定錯誤
 MSG_UNAVAILABLE_CIPHERS_ERROR=該伺服器不支持 TTSSH 的加密算法。\nTTSSH 無法與之建立連接。\n連線將被中斷。
 MSG_CIPHER_NONE_ERROR=該程式和伺服器已知的加密算法已全部被禁用。\n要連接該伺服器，您必須在再次啟動 TeraTerm 的時候，在 TTSSH 設定對話框中，啟用更多的加密算法。\n現在將關閉連接。
-MSG_RASKEY_TOOWEAK_ERROR=伺服器RSA密鑰太弱。無法建立一個安全的連接。
+MSG_RSAKEY_TOOWEAK_ERROR=伺服器RSA密鑰太弱。無法建立一個安全的連接。
 MSG_CIPHER_NOTSELECTED_ERROR=未選擇加密算法！
 
 ; fwd.c
@@ -783,7 +783,7 @@ MSG_FWD_REQUEST_ERROR=偵聽轉發連接時，通信錯誤。\n偵聽端口將被關閉。
 MSG_FWD_REFUSED_ERROR=連接被拒絕（也許當前服務並未運行）
 MSG_FWD_NETDOWN_ERROR=設備無法連接（可能是網路問題）
 MSG_FWD_MACHINEDOWN_ERROR=設備無法連接（可能設備未啟動）
-MSG_FWD_ADDRNOTFOUTD_ERROR=未找到設備地址
+MSG_FWD_ADDRNOTFOUND_ERROR=未找到設備地址
 MSG_FWD_CONNECT_ERROR=無法建立轉發連接
 MSG_FWD_CHANNEL_ERROR=通信錯誤，發生在 %s 轉發本地 %s 時。\n%s（代碼 %d）。\n轉發連接將被關閉。
 MSG_FWD_CHANNEL_OPEN_X_ERROR=伺服器試圖通過本機轉發一個連接。\n它請求到 %s X伺服器的連接（顯示 %d:%d）。\n%s(code %d)。\n轉發連接將被關閉。
@@ -876,7 +876,7 @@ MSG_OPEN_FILEDLG_KNOWNHOSTS_ERROR=無法顯示對話框，錯誤號：%d
 MSG_WARNING=警告
 MSG_ERROR=錯誤
 MSG_TTSSH_ERROR=TTSSH 錯誤
-MSG_NONFAITAL_ERROR=Tera Term: 非致命錯誤
+MSG_NONFATAL_ERROR=Tera Term: 非致命錯誤
 
 BTN_OK=確定
 BTN_CANCEL=取消
@@ -890,7 +890,7 @@ BTN_NO=&No
 [TTProxy]
 DLG_TAHOMA_FONT=新細明體,8,0
 
-NEMU_SETUP=代理(&P)...
+MENU_SETUP=代理(&P)...
 MENU_ABOUT=關於 TT&Proxy...
 
 DLG_SETUP_TITLE=代理設定
@@ -921,7 +921,7 @@ DLG_OTHER_CONNECT=連接資訊(&C)
 DLG_OTHER_ERROR=錯誤資訊(&E)
 
 DLG_ABOUT_TITLE=關於 TTProxy
-DLG_ABOUT_EXTENTION=Tera Term 代理擴展
+DLG_ABOUT_EXTENSION=Tera Term 代理擴展
 DLG_ABOUT_YEBISUYA=惠比壽本鋪
 DLG_ABOUT_HOMEPAGE=TTProxy 網頁
 
