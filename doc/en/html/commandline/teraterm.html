@@ -13,7 +13,7 @@
 <h1>Tera Term command line</h1>
 
 <pre class="syntax">
-TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] ]
+TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] | \\&lt;server&gt;\pipe\&lt;pipe name&gt;]
          [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E] [/ES]
          [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
@@ -22,8 +22,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/T=&lt;telnet flag&gt;]
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"] [/WAITCOM]
-         [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)]
-         [/NAMEDPIPE]
+         [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)] [/PIPE]
          [/AUTOWINCLOSE=&lt;flag&gt;]
          [;&lt;comment&gt;]
 </pre>
@@ -33,7 +32,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
 <dl>
   <dt id="host">&lt;host&gt;</dt>
-  <dd>Host name or IP address or Named pipe.</dd>
+  <dd>Host name or IP address.</dd>
 
   <dt>&lt;host&gt;:&lt;TCP port#&gt;</dt>
   <dd>&lt;host&gt; with a TCP port number.<br>
@@ -48,6 +47,14 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>URL style - for telnet handler<br>
       TCP port number and "/" at the end are optional.<br>
       If TCP port number is omitted, use 23. (TCPPort setting in setup file is ignored.)
+  </dd>
+
+  <dt>\\&lt;server&gt;\pipe\&lt;pipe name&gt;</dt>
+  <dd>Pipe name in UNC format.<br>
+  <!--
+      &lt;server&gt; 上の名前付きパイプ &lt;pipe name&gt; に接続する。<br>
+      \\.\pipe\&lt;pipe name&gt; とした場合はローカルの名前付きパイプに接続する。
+  -->
   </dd>
 
   <dt id="b">/B</dt>
@@ -189,8 +196,14 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="y">/Y=&lt;window position (y)&gt;</dt>
   <dd>Windows position (vertical)</dd>
 
-  <dt id="namedpipe">/NAMEDPIPE</dt>
-  <dd>Named pipe(\\&lt;ServerName&gt;\pipe\&lt;PipeName&gt;)</dd>
+  <dt id="pipe">/PIPE</dt>
+  <!-- dd>名前付きパイプへ接続する。このオプションを指定すると、以下のルールでホスト名(パイプ名)が補われる。
+      <ul>
+        <li>ホスト名が \ で始まる場合はそのまま使われる。</li>
+        <li>ホスト名に \ が含まれない場合は先頭に \\.\pipe\ が付加される。</li>
+        <li>ホスト名の先頭以外に \ が有る場合は、それより前をサーバ名、後ろをパイプ名として扱う。</li>
+      </ul>
+  </dd -->
 
   <dt id="autowinclose">/AUTOWINCLOSE=&lt;flag&gt;</dt>
   <dd>AutoWinClose
@@ -213,6 +226,7 @@ TTERMPRO myhost.example.com:23
 TTERMPRO myhost.example.com 23
 TTERMPRO 192.0.2.1
 TTERMPRO myhost.example.com /T=0 /P=7
+TTERMPRO \\.\pipe\vmware-serial-port
 TTERMPRO /C=1
 TTERMPRO /F=TELNET.INI
 TTERMPRO foohost.example.org /F=FOOHOST.INI
@@ -220,7 +234,7 @@ TTERMPRO /C=2 /BAUD=9600 /F=MYSETUP.INI
 TTERMPRO /K=MYKEY.CNF /W="My host"
 TTERMPRO /R=README.TXT ; replay a file
 TTERMPRO myhost /B /X=100 /Y=50
-TTERMPRO /NAMEDPIPE \\.\pipe\vmware-serial-port
+TTERMPRO /PIPE pipename ; same as \\.\pipe\pipename
 </pre>
 
 
