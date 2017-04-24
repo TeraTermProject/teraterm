@@ -2391,6 +2391,11 @@ void FAR PASCAL SetCustomNotifyIcon(HICON icon)
 	CustomIcon = icon;
 }
 
+HICON FAR PASCAL GetCustomNotifyIcon()
+{
+	return CustomIcon;
+}
+
 void FAR PASCAL CreateNotifyIcon(PComVar cv)
 {
 	if (cv->NotifyIcon == NULL) {

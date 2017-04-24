@@ -94,6 +94,8 @@ static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 static HICON SecureLargeIcon = NULL;
 static HICON SecureSmallIcon = NULL;
+static HICON SecureNotifyIcon = NULL;
+static HICON OldNotifyIcon = NULL;
 
 static HFONT DlgHostFont;
 static HFONT DlgAboutFont;
@@ -165,6 +167,9 @@ static void uninit_TTSSH(PTInstVar pvar)
 		PostMessage(pvar->NotificationWindow, WM_SETICON, ICON_SMALL,
 		            (LPARAM) pvar->OldSmallIcon);
 		pvar->OldSmallIcon = NULL;
+	}
+	if (OldNotifyIcon) {
+		SetCustomNotifyIcon(OldNotifyIcon);
 	}
 
 	ssh_heartbeat_lock_finalize();
@@ -912,6 +917,15 @@ void notify_established_secure_connection(PTInstVar pvar)
 		            (LPARAM) SecureLargeIcon);
 		PostMessage(pvar->NotificationWindow, WM_SETICON, ICON_SMALL,
 		            (LPARAM) SecureSmallIcon);
+	}
+
+	if (IsWindows2000()) {
+		if (SecureNotifyIcon == NULL) {
+			SecureNotifyIcon = LoadImage(hInst, MAKEINTRESOURCE(pvar->settings.IconID),
+			                             IMAGE_ICON, 0, 0, LR_VGACOLOR | LR_SHARED);
+		}
+		OldNotifyIcon = GetCustomNotifyIcon();
+		SetCustomNotifyIcon(SecureNotifyIcon);
 	}
 
 	notify_verbose_message(pvar, "Entering secure mode",
