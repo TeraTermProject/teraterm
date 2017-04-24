@@ -70,7 +70,9 @@ EXPORTS
   CheckComPort @64
 
   IsWindows95 @65
+  IsWindowsMe @83
   IsWindowsNT4 @66
+  IsWindows2000 @84
   IsWindowsNTKernel @67
   IsWindows2000OrLater @68
   IsWindowsVistaOrLater @69

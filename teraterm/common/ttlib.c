@@ -1268,6 +1268,12 @@ BOOL IsWindows95()
 	return IsWindowsVer(VER_PLATFORM_WIN32_WINDOWS, 4, 0);
 }
 
+// OSが WindowsMe かどうかを判別する。
+BOOL IsWindowsMe()
+{
+	return IsWindowsVer(VER_PLATFORM_WIN32_WINDOWS, 4, 90);
+}
+
 // OSが WindowsNT4.0 かどうかを判別する。
 BOOL IsWindowsNT4()
 {
@@ -1280,6 +1286,12 @@ BOOL is_NT4()
 	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
 	// 無条件に FALSE を返してもよいかもしれない。
 	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
+}
+
+// OSが Windows2000 かどうかを判別する。
+BOOL IsWindows2000()
+{
+	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 5, 0);
 }
 
 // OSが Windows2000 以降 かどうかを判別する。
