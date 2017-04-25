@@ -3,23 +3,13 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-    <title>Terminal ([Setup] メニュー)</title>
+    <title>Terminal ([Setup] メニュー; 英語モード)</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
 
   <body>
-    <h1>Terminal ([Setup] メニュー; 日本語モード)</h1>
-
-このページは Setup - General で Language に Japanese を選択した時の説明です。
-他の言語モード使用時は以下のページを参照してください。
-
-    <p>
-      <a href="setup-terminalen.html">英語モードのヘルプ</a><br>
-      <a href="setup-terminalr.html">ロシア語モードのヘルプ</a><br>
-      <a href="setup-terminalk.html">韓国語モードのヘルプ</a><br>
-      <a href="setup-terminalutf8.html">UTF-8モードのヘルプ</a><br>
-    </p>
+    <h1>Terminal ([Setup] メニュー; 英語モード)</h1>
 
     <h2>"Terminal setup" ダイアログボックス</h2>
     <dl>
@@ -108,62 +98,6 @@
 	TEK window へ制御を移します(逆も同様)。
       </dd>
 
-      <dt id="KanjiReceive">Kanji (receive)</dt>
-      <dd>
-	ホストから送られてくる漢字コード (SJIS, EUC, JIS, UTF-8, UTF-8m の5種類)。
-      </dd>
-
-      <dt id="KatakanaReceive">7bit katakana (receive)</dt>
-      <dd>
-	ホストから送られてくる"半角"片仮名コードが 7 bit で表現されている
-	(SO/SI を用いたシフト制御を用いている)場合に選択してください。
-	Kanji (receive) が JIS の場合のみ有効です。
-      </dd>
-
-      <dt id="KanjiSend">Kanji (transmit)</dt>
-      <dd>
-	送出する漢字コード (SJIS, EUC, JIS, UTF-8 の4種類)。
-      </dd>
-
-      <dt id="KatakanaSend">7bit katakana (transmit)</dt>
-      <dd>
-	送出する"半角"片仮名コードを7bitで表現する
-	(SO/SI を用いたシフト制御を用いる)場合に選択してください。
-	Kanji (transmit) が JIS の場合のみ有効です。
-      </dd>
-
-      <dt id="KanjiIn">Kanji-in (transmit)</dt>
-      <dd>
-	Kanji (transmit) が JIS のときに使用するエスケープシーケンス
-	(漢字コードを G0 に指示するシーケンス。
-	^[$@ または ^[$B )。
-	ホストから送られてくるエスケープシーケンスはどちらでも構いません。
-      </dd>
-
-      <dt id="KanjiOut">Kanji-out (transmit)</dt>
-      <dd>
-	Kanji (transmit) が JIS のときに使用するエスケープシーケンス
-	(ASCII または JIS ローマ字コードを G0 に指示するシーケンス。
-	^[(B または ^[(J )。
-	ホストから送られてくるエスケープシーケンスはどちらでも構いません。
-	<p>
-	  注意: ^[(H は初期設定では選択できません。<br>
-	  <a href="../usage/tips/incorrect-kanjiout.html">→ ^[(H を選択可能にする。</a>
-	</p>
-      </dd>
-      
-      <dt id="locale">locale</dt>
-      <dd>
-	ロケール。
-	詳細は<a href="../usage/unicode.html">Unicode設定</a>を参照。
-      </dd>
-      
-      <dt id="CodePage">CodePage</dt>
-      <dd>
-	コードページ。
-	詳細は<a href="../usage/unicode.html">Unicode設定</a>を参照。
-      </dd>
-      
     </dl>
 
   </body>
