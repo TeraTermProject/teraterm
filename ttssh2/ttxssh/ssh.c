@@ -9115,8 +9115,8 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	FWDChannel *fc;
 	buffer_t *agent_msg;
 	unsigned int *agent_request_len;
-	unsigned char *response;
-	unsigned int resplen;
+	unsigned char *response = NULL;
+	unsigned int resplen = 0;
 
 
 	// 分割された CHANNEL_DATA の受信に対応 (2008.11.30 maya)
@@ -9177,6 +9177,9 @@ error:
 	else {
 		SSH_channel_send(pvar, local_channel_num, fc->remote_num,
 		                 SSH_AGENT_FAILURE_MSG, sizeof(SSH_AGENT_FAILURE_MSG), 0);
+	}
+	if (response) {
+		safefree(response);
 	}
 
 	// 使い終わったバッファをクリア
