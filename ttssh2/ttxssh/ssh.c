@@ -9170,12 +9170,13 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	return TRUE;
 
 error:
-	// エラー時は channel を閉じる
+	// エラー時は SSH_AGENT_FAILURE を返す
 	if (SSHv2(pvar)) {
-		ssh2_channel_send_close(pvar, c);
+		SSH2_send_channel_data(pvar, c, SSH_AGENT_FAILURE_MSG, sizeof(SSH_AGENT_FAILURE_MSG), 0);
 	}
 	else {
-		SSH_channel_input_eof(pvar, fc->remote_num, local_channel_num);
+		SSH_channel_send(pvar, local_channel_num, fc->remote_num,
+		                 SSH_AGENT_FAILURE_MSG, sizeof(SSH_AGENT_FAILURE_MSG), 0);
 	}
 
 	// 使い終わったバッファをクリア

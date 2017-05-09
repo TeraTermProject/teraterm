@@ -8,6 +8,9 @@
 // 関数のプロトタイプ宣言もここにあるので取りあえずここで。
 #define AGENT_MAX_MSGLEN 8192
 
+// エラー応答用
+#define SSH_AGENT_FAILURE_MSG "\x00\x00\x00\x01\x05"
+
 // MISC.C
 extern void safefree(void *);
 
