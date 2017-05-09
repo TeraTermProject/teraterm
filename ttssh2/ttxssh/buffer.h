@@ -12,6 +12,11 @@ typedef struct buffer {
 	int len;        /* バッファに含まれる有効なデータサイズ */
 } buffer_t;
 
+/* buffer_t.buf の拡張の上限値 (16MB) */
+#define BUFFER_SIZE_MAX 0x1000000
+/* buffer_t.buf の拡張時に追加で確保する量 (32KB) */
+#define BUFFER_INCREASE_MARGIN (32*1024)
+
 void buffer_clear(buffer_t *buf);
 buffer_t *buffer_init(void);
 void buffer_free(buffer_t *buf);

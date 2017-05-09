@@ -72,8 +72,8 @@ void *buffer_append_space(buffer_t * buf, int size)
 		// 
 	} else {
 		// バッファが足りないので補充する。(2005.7.2 yutaka)
-		newlen = buf->maxlen + size + 32*1024;
-		if (newlen > 0xa00000) { // 1MB over is not supported
+		newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
+		if (newlen > BUFFER_SIZE_MAX) {
 			goto panic;
 		}
 		buf->buf = realloc(buf->buf, newlen);
@@ -113,8 +113,8 @@ int buffer_append(buffer_t * buf, char *ptr, int size)
 
 		} else {
 			// バッファが足りないので補充する。(2005.7.2 yutaka)
-			newlen = buf->maxlen + size + 32*1024;
-			if (newlen > 0xa00000) { // 1MB over is not supported
+			newlen = buf->maxlen + size + BUFFER_INCREASE_MARGIN;
+			if (newlen > BUFFER_SIZE_MAX) {
 				goto panic;
 			}
 			buf->buf = realloc(buf->buf, newlen);
