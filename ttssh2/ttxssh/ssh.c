@@ -9111,14 +9111,13 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num,
                                unsigned char *data, unsigned int buflen)
 {
-	int req_len;
+	unsigned int req_len;
 	FWDChannel *fc;
 	buffer_t *agent_msg;
-	int *agent_request_len;
+	unsigned int *agent_request_len;
 	unsigned char *response;
-	int resplen;
+	unsigned int resplen;
 
-	req_len = get_uint32_MSBfirst(data);
 
 	// 分割された CHANNEL_DATA の受信に対応 (2008.11.30 maya)
 	if (SSHv2(pvar)) {
@@ -9130,30 +9129,31 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 		agent_msg = fc->agent_msg;
 		agent_request_len = &fc->agent_request_len;
 	}
-	if (agent_msg->len > 0 || req_len + 4 != buflen) {
-		if (agent_msg->len == 0) {
-			*agent_request_len = req_len + 4;
+
+	if (agent_msg->len == 0) {
+		req_len = get_uint32_MSBfirst(data);
+		if (req_len > AGENT_MAX_MSGLEN - 4) {
+			goto error;
 		}
+
+		*agent_request_len = req_len + 4;
+
+		if (*agent_request_len > buflen) {
+			buffer_put_raw(agent_msg, data, buflen);
+			return TRUE;
+		}
+	}
+	else {
 		buffer_put_raw(agent_msg, data, buflen);
 		if (*agent_request_len > agent_msg->len) {
 			return TRUE;
 		}
-		else {
-			data = agent_msg->buf;
-		}
+		data = agent_msg->buf;
 	}
 
-	req_len = get_uint32_MSBfirst(data);
-	agent_query(data, req_len + 4, &response, &resplen, NULL, NULL);
+	agent_query(data, *agent_request_len, &response, &resplen, NULL, NULL);
 	if (response == NULL || resplen < 5) {
-		// この channel を閉じる
-		if (SSHv2(pvar)) {
-			ssh2_channel_send_close(pvar, c);
-		}
-		else {
-			SSH_channel_input_eof(pvar, fc->remote_num, local_channel_num);
-		}
-		goto exit;
+		goto error;
 	}
 
 	if (SSHv2(pvar)) {
@@ -9165,7 +9165,19 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	}
 	safefree(response);
 
-exit:
+	// 使い終わったバッファをクリア
+	buffer_clear(agent_msg);
+	return TRUE;
+
+error:
+	// エラー時は channel を閉じる
+	if (SSHv2(pvar)) {
+		ssh2_channel_send_close(pvar, c);
+	}
+	else {
+		SSH_channel_input_eof(pvar, fc->remote_num, local_channel_num);
+	}
+
 	// 使い終わったバッファをクリア
 	buffer_clear(agent_msg);
 	return TRUE;

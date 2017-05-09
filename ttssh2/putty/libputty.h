@@ -3,6 +3,11 @@
  */
 // PuTTY is copyright 1997-2007 Simon Tatham.
 
+// pageant.h
+// 本当は pageant.h を include 出来るようにする方がいいのかもしれないけれど
+// 関数のプロトタイプ宣言もここにあるので取りあえずここで。
+#define AGENT_MAX_MSGLEN 8192
+
 // MISC.C
 extern void safefree(void *);
 
