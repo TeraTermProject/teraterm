@@ -70,7 +70,7 @@ if result == -1 then
 
 elseif result &amp; 8 == 0 then
 	flags = result
-	; When the log timestamp is disabled, a new log with timestamp is re-opend.
+	; When the log timestamp is disabled, a new log with timestamp is re-opened.
 	logclose
 	logopen logfile 0 1 flags&amp;4 1 flags&amp;16
 endif

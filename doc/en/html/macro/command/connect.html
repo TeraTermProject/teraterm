@@ -138,13 +138,13 @@ Above 3 ways allow to skip popup dialog and pass username directly from macro.
 </p>
 
 <pre class=".code">
-<code>connect '<em>myserve</em> /ssh /auth=password /user=<em>username</em> /ask4passwd'
+<code>connect '<em>myserver</em> /ssh /auth=password /user=<em>username</em> /ask4passwd'
 connect '<em>myserver</em> /ssh /1 /auth=password /user=<em>username</em> /ask4passwd'
 connect '<em>myserver</em> /ssh /2 /auth=password /user=<em>username</em> /ask4passwd'
 connect '<em>myserver</em> /ssh /auth=publickey /user=<em>username</em> /ask4passwd /keyfile=<em>private-key-file</em>'
 connect '<em>myserver</em> /ssh /1 /auth=publickey /user=<em>username</em> /ask4passwd /keyfile=<em>private-key-file</em>'
 connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /ask4passwd /keyfile=<em>private-key-file</em>'
-connect '<em>myserve</em> /ssh /auth=challenge /user=<em>username</em> /ask4passwd'
+connect '<em>myserver</em> /ssh /auth=challenge /user=<em>username</em> /ask4passwd'
 connect '<em>myserver</em> /ssh /1 /auth=challenge /user=<em>username</em> /ask4passwd'
 connect '<em>myserver</em> /ssh /2 /auth=challenge /user=<em>username</em> /ask4passwd'
 </code></pre>
@@ -210,7 +210,7 @@ connect '<em>myserver</em> /ssh /2 /auth=publickey /user=<em>username</em> /pass
 ; authentication, and not prompt for user name and password and use private key file.
 connect '<em>myserver</em> /ssh /auth=pageant /user=<em>username</em>'
 
-; RunTera Term and open serial port connection. Port number is x=1..256
+; Run Tera Term and open serial port connection. Port number is x=1..256
 connect '/C=x'
 
 CommandLine = '111.111.11.11'
