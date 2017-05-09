@@ -11,27 +11,39 @@
   <body>
     <h1>Terminal ([Setup] メニュー; ロシア語モード)</h1>
 
+    <p>
+      このページは <a href="setup-general.html">Setup - General</a> で <a href="setup-general.html#Language">Language</a> に Russian を選択した時の説明です。
+      他の言語モード使用時は以下のページを参照してください。
+    </p>
+
+    <ul>
+      <li><a href="setup-terminalen.html">英語モードのヘルプ</a></li>
+      <li><a href="setup-terminalr.html">ロシア語モードのヘルプ</a></li>
+      <li><a href="setup-terminalk.html">韓国語モードのヘルプ</a></li>
+      <li><a href="setup-terminalutf8.html">UTF-8モードのヘルプ</a></li>
+    </ul>
+
     <h2>"Terminal setup" ダイアログボックス</h2>
     <dl>
-      <dt>Terminal size</dt>
+      <dt id="TerminalSize">Terminal size</dt>
       <dd>
 	ターミナルサイズ(端末画面の論理サイズ)。
 	横 X 縦 の文字数で指定します。
 	ウインドウサイズ(実際の画面の大きさ)と必ずしも同じではありません。
       </dd>
 
-      <dt>Term size = win size</dt>
+      <dt id="TermIsWin">Term size = win size</dt>
       <dd>
 	このオプションを選択した場合、ターミナルサイズとウィンドウサイズを常に等しくします。
       </dd>
 
-      <dt>Auto window resize</dt>
+      <dt id="AutoWinResize">Auto window resize</dt>
       <dd>
 	このオプションを選択した場合、ターミナルサイズが変更されたときに、
 	ウインドウサイズも同じ大きさに自動的に変更されます。
       </dd>
 
-      <dt>New-line (receive)</dt>
+      <dt id="CRReceive">New-line (receive)</dt>
       <dd>
         <dl>
           <dt>CR</dt>
@@ -53,7 +65,7 @@
         </dl>
       </dd>
 
-      <dt>New-line (transmit)</dt>
+      <dt id="CRSend">New-line (transmit)</dt>
       <dd>
         <dl>
           <dt>CR</dt>
@@ -61,10 +73,13 @@
 
           <dt>CR+LF</dt>
           <dd>送信時に改行文字 CR ($0D) を CR+LF ($0D $0A) に変換します。</dd>
+
+          <dt>LF</dt>
+          <dd>送信時に改行文字 CR ($0D) を LF ($0A) に変換します。</dd>
         </dl>
       </dd>
 
-      <dt>Terminal ID</dt>
+      <dt id="TerminalID">Terminal ID</dt>
       <dd>
 	ホストに報告する Terminal ID。Terminal ID は telnet の
 	terminal type とは違います。Telnet の terminal type を変更するには
@@ -72,12 +87,12 @@
 	コマンドを使用してください。
       </dd>
 
-      <dt>Local echo</dt>
+      <dt id="LocalEcho">Local echo</dt>
       <dd>
 	キー入力等により送出する文字をそのまま画面に表示します。
       </dd>
 
-      <dt>Answerback</dt>
+      <dt id="Answerback">Answerback</dt>
       <dd>
 	ホストから ENQ ($05) 文字が送られてきた時に、送り返す文字列。
 	文字列中に含まれる表示不可能な文字(制御文字)は、"$" と それにつづく
@@ -89,13 +104,13 @@
 	</p>
       </dd>
 
-      <dt>Auto switch (VT&lt;-&gt;TEK)</dt>
+      <dt id="AutoWinSwitch">Auto switch (VT&lt;-&gt;TEK)</dt>
       <dd>
 	エスケープシーケンスを判別して、自動的に VT window から
 	TEK window へ制御を移します(逆も同様)。
       </dd>
 
-      <dt>Character set</dt>
+      <dt id="RussCharSet">Character set</dt>
       <dd>
 	<dl>
 	  <dt id="RussHost">Host</dt>
@@ -112,11 +127,11 @@
 	    を選択すべきです。
 	  </dd>
 
-      <dt id="RussFont">Font</dt>
-      <dd>
-	指定されたフォントの文字コードを、Windows (CP 1251), KOI8-R,
-	CP 866, ISO 8859-5 の中から選択します。
-      </dd>
+	  <dt id="RussFont">Font</dt>
+	  <dd>
+	    指定されたフォントの文字コードを、Windows (CP 1251), KOI8-R,
+	    CP 866, ISO 8859-5 の中から選択します。
+	  </dd>
 	</dl>
       </dd>
     </dl>
