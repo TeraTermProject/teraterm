@@ -28,7 +28,7 @@ buffer_t *buffer_init(void)
 {
 	void *ptr;
 	buffer_t *buf;
-	int size = 4096;
+	unsigned int size = 4096;
 
 	buf = malloc(sizeof(buffer_t));
 	ptr = malloc(size);
@@ -60,11 +60,10 @@ void buffer_free(buffer_t * buf)
 
 // バッファの領域拡張を行う。
 // return: 拡張前のバッファポインター
-void *buffer_append_space(buffer_t * buf, int size)
+void *buffer_append_space(buffer_t * buf, size_t size)
 {
-	int n;
-	int ret = -1;
-	int newlen;
+	unsigned int n;
+	unsigned int newlen;
 	void *p;
 
 	n = buf->offset + size;
@@ -90,17 +89,17 @@ void *buffer_append_space(buffer_t * buf, int size)
 
 panic:
 	{
-	char *p = NULL;
-	*p = 0; // application fault
+		char *p = NULL;
+		*p = 0; // application fault
 	}
 	return (NULL);
 }
 
 int buffer_append(buffer_t * buf, char *ptr, int size)
 {
-	int n;
+	unsigned int n;
 	int ret = -1;
-	int newlen;
+	unsigned int newlen;
 
 	for (;;) {
 		n = buf->offset + size;
@@ -158,11 +157,11 @@ void buffer_put_raw(buffer_t *msg, char *ptr, int size)
 	ret = buffer_append(msg, ptr, size);
 }
 
-int buffer_get_ret(buffer_t *msg, void *buf, int len)
+int buffer_get_ret(buffer_t *msg, void *buf, size_t len)
 {
 	if (len > msg->len - msg->offset) {
 		// TODO: エラー処理
-		OutputDebugPrintf("buffer_get_ret: trying to get more bytes %d than in buffer %d",
+		OutputDebugPrintf("buffer_get_ret: trying to get more bytes %u than in buffer %u",
 		    len, msg->len - msg->offset);
 		return (-1);
 	}
@@ -171,7 +170,7 @@ int buffer_get_ret(buffer_t *msg, void *buf, int len)
 	return (0);
 }
 
-int buffer_get_int_ret(int *ret, buffer_t *msg)
+int buffer_get_int_ret(unsigned int *ret, buffer_t *msg)
 {
 	unsigned char buf[4];
 
@@ -182,13 +181,13 @@ int buffer_get_int_ret(int *ret, buffer_t *msg)
 	return (0);
 }
 
-int buffer_get_int(buffer_t *msg)
+unsigned int buffer_get_int(buffer_t *msg)
 {
-	int ret = -1;
+	unsigned int ret = 0;
 
 	if (buffer_get_int_ret(&ret, msg) == -1) {
 		// TODO: エラー処理
-		OutputDebugPrintf("buffer_get_int: buffer error");
+		logprintf(NULL, LOG_LEVEL_ERROR, "buffer_get_int: buffer error");
 	}
 	return (ret);
 }
@@ -435,7 +434,7 @@ void buffer_get_bignum2_msg(buffer_t *msg, BIGNUM *value)
 void buffer_get_bignum_SECSH(buffer_t *buffer, BIGNUM *value)
 {
 	char *buf;
-	int bits, bytes;
+	unsigned int bits, bytes;
 
 	bits = buffer_get_int(buffer);
 	bytes = (bits + 7) / 8;
@@ -531,7 +530,7 @@ void buffer_dump(FILE *fp, buffer_t *buf)
 }
 
 // バッファのオフセットを進める。
-void buffer_consume(buffer_t *buf, int shift_byte)
+void buffer_consume(buffer_t *buf, size_t shift_byte)
 {
 	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error
@@ -542,7 +541,7 @@ void buffer_consume(buffer_t *buf, int shift_byte)
 }
 
 // バッファの末尾を縮退する。
-void buffer_consume_end(buffer_t *buf, int shift_byte)
+void buffer_consume_end(buffer_t *buf, size_t shift_byte)
 {
 	if (shift_byte > buf->len - buf->offset) {
 		// TODO: fatal error

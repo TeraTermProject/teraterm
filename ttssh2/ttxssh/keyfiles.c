@@ -1189,7 +1189,8 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 {
 	Key *result = NULL;
 	unsigned long err = 0;
-	int i, len, len2;
+	int i, len2;
+	unsigned int len;
 	int encflag;
 	char *encname = NULL;
 	buffer_t *blob = NULL, *blob2 = NULL;
@@ -1266,7 +1267,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		goto error;
 	}
 	len = buffer_get_int(blob);
-	if (len <= 0 || len > blob->len) {
+	if (len == 0 || len > blob->len) {
 		strncpy_s(errmsg, errmsg_len, "body size error", _TRUNCATE);
 		goto error;
 	}
