@@ -7281,7 +7281,8 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 
 				return TRUE;
 			} 
-			MessageBox(NULL, "Mismatch; try again.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+			UTIL_get_lang_msg("MSG_PASSCHG_MISMATCH", pvar, "Mismatch; try again.");
+			MessageBox(NULL, pvar->ts->UIMsg, "ERROR", MB_OK | MB_ICONEXCLAMATION);
 			return FALSE;
 
 		case IDCANCEL:

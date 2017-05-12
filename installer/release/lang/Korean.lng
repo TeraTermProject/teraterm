@@ -743,6 +743,7 @@ DLG_PASSCHG_MESSAGE=Server requests to change password
 DLG_PASSCHG_OLDPASSWD=&Old Password
 DLG_PASSCHG_NEWPASSWD=&New Password
 DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
+MSG_PASSCHG_MISMATCH=Mismatch; try again.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=보안 경고

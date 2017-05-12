@@ -742,6 +742,7 @@ DLG_PASSCHG_MESSAGE=サーバはパスワードの変更を要求しています.
 DLG_PASSCHG_OLDPASSWD=旧パスワード(&O)
 DLG_PASSCHG_NEWPASSWD=新パスワード(&N)
 DLG_PASSCHG_CONFIRMPASSWD=新パスワード確認(&C)
+MSG_PASSCHG_MISMATCH=新パスワードが一致しません.
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=セキュリティ警告
