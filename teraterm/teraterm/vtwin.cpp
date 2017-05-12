@@ -3827,10 +3827,12 @@ LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
 		  case WM_RBUTTONDBLCLK:
 		  case WM_CONTEXTMENU:
 		  case NIN_BALLOONSHOW:
-		  case NIN_BALLOONHIDE:
 		  case NIN_KEYSELECT:
 		  case NIN_SELECT:
 			// nothing to do
+			break;
+		  case NIN_BALLOONHIDE:
+			HideNotifyIcon(&cv);
 			break;
 		  case WM_LBUTTONDOWN:
 		  case WM_RBUTTONDOWN:
