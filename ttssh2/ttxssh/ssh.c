@@ -766,13 +766,8 @@ static int prep_packet(PTInstVar pvar, char FAR * data, int len,
 	} else {
 		int already_decrypted = get_predecryption_amount(pvar);
 
-#if 0
-		CRYPT_decrypt(pvar, data + already_decrypted,
-		              len - already_decrypted);
-#else
 		CRYPT_decrypt(pvar, data + already_decrypted,
 		              (4 + len) - already_decrypted);
-#endif
 
 		if (!CRYPT_verify_receiver_MAC
 			(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4,
@@ -6395,18 +6390,6 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 		return do_SSH2_authrequest(pvar);
 		/* NOT REACHED */
 	}
-
-	// この時点でMACや圧縮を有効にするのは間違いだったので削除。(2006.10.30 yutaka)
-#if 0
-	for (mode = 0 ; mode < MODE_MAX ; mode++) {
-		pvar->ssh2_keys[mode].mac.enabled = 1;
-		pvar->ssh2_keys[mode].comp.enabled = 1;
-	}
-
-	// パケット圧縮が有効なら初期化する。(2005.7.9 yutaka)
-	prep_compression(pvar);
-	enable_compression(pvar);
-#endif
 
 	// start user authentication
 	msg = buffer_init();

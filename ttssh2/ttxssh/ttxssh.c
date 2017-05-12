@@ -229,7 +229,6 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 		}
 	}
 
-#if 1
 	// 指定されていない文字があれば、disabled lineの直前に挿入する。
 	// 
 	// ex. (Zを挿入する)
@@ -271,16 +270,6 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 			i++;
 		}
 	}
-#else
-	for (j = 0; j < default_strings_len ; j++) {
-		int num = default_strings[j];
-
-		if (!listed[num]) {
-			buf[i] = num + '0';
-			i++;
-		}
-	}
-#endif
 
 	buf[i] = 0;
 }
@@ -293,14 +282,6 @@ static void normalize_cipher_order(char FAR * buf)
 {
 	/* SSH_CIPHER_NONE means that all ciphers below that one are disabled.
 	   We *never* allow no encryption. */
-#if 0
-	static char default_strings[] = {
-		SSH_CIPHER_3DES,
-		SSH_CIPHER_NONE,
-		SSH_CIPHER_DES, SSH_CIPHER_BLOWFISH
-	};
-#else
-	// for SSH2(yutaka)
 	static char default_strings[] = {
 		SSH2_CIPHER_CAMELLIA256_CTR,
 		SSH2_CIPHER_AES256_CTR,
@@ -329,7 +310,6 @@ static void normalize_cipher_order(char FAR * buf)
 		SSH_CIPHER_DES,
 		0, 0, 0 // Dummy for SSH_CIPHER_IDEA, SSH_CIPHER_TSS, SSH_CIPHER_RC4
 	};
-#endif
 
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
@@ -800,13 +780,8 @@ static int PASCAL FAR TTXconnect(SOCKET s,
 		case AF_INET6:
 			len = sizeof(struct sockaddr_in6);
 			((struct sockaddr_in6 FAR *) &ss)->sin6_family = AF_INET6;
-#if 0							/* symbol "in6addr_any" is not included in wsock32.lib */
-			/* if wsock32.lib will be linked, we can't refer "in6addr_any" */
-			((struct sockaddr_in6 FAR *) &ss)->sin6_addr = in6addr_any;
-#else
 			memset(&((struct sockaddr_in6 FAR *) &ss)->sin6_addr, 0,
 			       sizeof(struct in_addr6));
-#endif							/* 0 */
 			((struct sockaddr_in6 FAR *) &ss)->sin6_port =
 				htons(find_local_port(pvar));
 			break;
@@ -899,16 +874,9 @@ void notify_established_secure_connection(PTInstVar pvar)
 	}
 
 	if (SecureLargeIcon != NULL && SecureSmallIcon != NULL) {
-#if 0
-		// 大きいアイコンは WNDCLASS にセットしているので取り出し方が違う (2006.8.10 maya)
-		pvar->OldLargeIcon =
-			(HICON) GetClassLong(pvar->NotificationWindow, GCL_HICON);
-#else
-		// Tera Term 側が WM_SETICON するようになったので普通に取り出す (2009.6.9 maya)
 		pvar->OldLargeIcon =
 			(HICON) SendMessage(pvar->NotificationWindow, WM_GETICON,
 			                    ICON_BIG, 0);
-#endif
 		pvar->OldSmallIcon =
 			(HICON) SendMessage(pvar->NotificationWindow, WM_GETICON,
 			                    ICON_SMALL, 0);
@@ -1630,15 +1598,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 					GetDlgItemText(dlg, IDC_HOSTCOM, EntName,
 					               sizeof(EntName) - 1);
 					if (strncmp(EntName, "COM", 3) == 0 && EntName[3] != '\0') {
-#if 0
-						GetHNRec->ComPort = (BYTE) (EntName[3]) - 0x30;
-						if (strlen(EntName) > 4)
-							GetHNRec->ComPort =
-								GetHNRec->ComPort * 10 + (BYTE) (EntName[4]) -
-								0x30;
-#else
 						GetHNRec->ComPort = atoi(&EntName[3]);
-#endif
 						if (GetHNRec->ComPort > GetHNRec->MaxComPort)
 							GetHNRec->ComPort = 1;
 					} else {
@@ -5334,19 +5294,8 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd)
 
 			pvar->showing_err = TRUE;
 			pvar->err_msg = NULL;
-#if 0
-			// XXX: "SECURITY WARINIG" dialogで ESC キーを押下すると、
-			// なぜかアプリケーションエラーとなるため、下記APIは削除。(2004.12.16 yutaka)
-			if (!SSHv1(pvar)) {
-				MessageBox(NULL, msg, "TTSSH",
-						MB_TASKMODAL | MB_ICONEXCLAMATION);
-			}
-#else
-			// 問題なさそうなので SSH1 でもメッセージを
-			// 表示するように戻した。(2008.2.16 maya)
 			MessageBox(NULL, msg, "TTSSH",
 					   MB_TASKMODAL | MB_ICONEXCLAMATION);
-#endif
 			free(msg);
 			pvar->showing_err = FALSE;
 
