@@ -363,6 +363,12 @@ BOOL CSequencePropPageDlg::OnInitDialog()
 	// (9)IDC_CLIPBOARD_NOTIFY
 	btn = (CButton *)GetDlgItem(IDC_CLIPBOARD_NOTIFY);
 	btn->SetCheck(ts.NotifyClipboardAccess);
+	if (HasBalloonTipSupport()) {
+		btn->EnableWindow(TRUE);
+	}
+	else {
+		btn->EnableWindow(FALSE);
+	}
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ACCEPT_MOUSE_EVENT_TRACKING));

@@ -58,6 +58,7 @@ BOOL IsWindows7OrLater();
 BOOL HasMultiMonitorSupport();
 BOOL HasGetAdaptersAddresses();
 BOOL HasDnsQuery();
+BOOL HasBalloonTipSupport();
 int KanjiCode2List(int lang, int kcode);
 int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);

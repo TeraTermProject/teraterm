@@ -82,3 +82,4 @@ EXPORTS
   HasMultiMonitorSupport @71
   HasGetAdaptersAddresses @72
   HasDnsQuery @73
+  HasBalloonTipSupport @87

@@ -3064,9 +3064,14 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	if (pvar->settings.ForwardAgentConfirm) {
 		CheckDlgButton(dlg, IDC_FORWARDAGENTCONFIRM, TRUE);
 	}
+
 	if (pvar->settings.ForwardAgentNotify) {
 		CheckDlgButton(dlg, IDC_FORWARDAGENTNOTIFY, TRUE);
 	}
+	if (!HasBalloonTipSupport()) {
+		EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTNOTIFY), FALSE);
+	}
+
 	if (pvar->settings.VerifyHostKeyDNS) {
 		CheckDlgButton(dlg, IDC_VERIFYHOSTKEYDNS, TRUE);
 	}
@@ -3605,7 +3610,9 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 			}
 			else {
 				EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTCONFIRM), TRUE);
-				EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTNOTIFY), TRUE);
+				if (HasBalloonTipSupport()) {
+					EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTNOTIFY), TRUE);
+				}
 			}
 			return TRUE;
 		}

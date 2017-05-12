@@ -1361,6 +1361,13 @@ BOOL HasDnsQuery()
 	return FALSE;
 }
 
+// 通知アイコンでのバルーンチップに対応しているか判別する。
+// Me/2000 以降で TRUE を返す
+BOOL HasBalloonTipSupport()
+{
+	return IsWindows2000OrLater() || IsWindowsMe();
+}
+
 int get_OPENFILENAME_SIZE()
 {
 	if (IsWindows2000OrLater()) {
