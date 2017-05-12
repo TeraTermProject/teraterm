@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-24)
+; Updated by TeraTerm Project (2017-05-12)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -856,6 +856,7 @@ MSG_SSH_GEX_SIZE_CANCEL=接続はキャンセルされました.
 MSG_SSH_GEX_SIZE_OUTOFRANGE=受信したグループサイズが範囲外です: %d
 MSG_SSH_GEX_SIZE_SMALLER=受信したグループサイズが要求した最小サイズより小さいです. \n要求したサイズ: %d, 受信したサイズ: %d\n受信したグループを受け入れますか？
 MSG_SSH_GEX_SIZE_LARGER=受信したグループサイズが要求した最大サイズより大きいです. \n要求したサイズ: %d, 受信したサイズ: %d\n受信したグループを受け入れますか？
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=サブシステムの要求が失敗しました. (%s)
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=無効なコマンドラインオプション: %s

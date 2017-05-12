@@ -7844,7 +7844,10 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 	if (pvar->shell_id == channel_id) {
 		if (c->type == TYPE_SUBSYSTEM_GEN) {
 			// サブシステムの起動に失敗したので切る。
-			notify_fatal_error(pvar, "subsystem request failed.", 1);
+			char errmsg[MAX_UIMSG];
+			UTIL_get_lang_msg("MSG_SSH_SUBSYSTEM_REQUEST_ERROR", pvar, "subsystem request failed. (%s)");
+			_snprintf_s(errmsg, sizeof(errmsg), _TRUNCATE, pvar->ts->UIMsg, pvar->subsystem_name);
+			notify_fatal_error(pvar, errmsg, TRUE);
 			return TRUE;
 		}
 		else { // TYPE_SHELL

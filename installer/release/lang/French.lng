@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-04-24)
+; Updated by TeraTerm Project (2017-05-12)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -857,6 +857,7 @@ MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
 MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
 MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
 MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Option inconnue sur la ligne de commande: %s
