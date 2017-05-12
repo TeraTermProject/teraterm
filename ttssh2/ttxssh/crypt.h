@@ -36,8 +36,6 @@ See LICENSE.TXT for the license.
 
 #include <openssl/rsa.h>
 #include <openssl/des.h>
-#include <openssl/idea.h>
-#include <openssl/rc4.h>
 #include <openssl/blowfish.h>
 
 #define SSH_SESSION_KEY_LENGTH    32
@@ -58,18 +56,9 @@ typedef struct {
 } Cipher3DESState;
 
 typedef struct {
-  IDEA_KEY_SCHEDULE k;
-  unsigned char ivec[8];
-} CipherIDEAState;
-
-typedef struct {
   DES_key_schedule k;
   DES_cblock ivec;
 } CipherDESState;
-
-typedef struct {
-  RC4_KEY k;
-} CipherRC4State;
 
 typedef struct {
   BF_KEY k;
@@ -87,9 +76,7 @@ typedef struct {
 
 typedef union {
   Cipher3DESState c3DES;
-  CipherIDEAState cIDEA;
   CipherDESState cDES;
-  CipherRC4State cRC4;
   CipherBlowfishState cBlowfish;
 } CRYPTCipherState;
 

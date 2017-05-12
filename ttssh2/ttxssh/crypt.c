@@ -191,15 +191,10 @@ BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char FAR * buf,
                          int bytes)
 {
 	if (SSHv1(pvar)) {
-		switch (pvar->crypt_state.sender_cipher) {
-		case SSH_CIPHER_NONE:
+		if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE) {
 			return FALSE;
-		case SSH_CIPHER_IDEA:
-			return detect_attack(&pvar->crypt_state.detect_attack_statics,
-			                     buf, bytes,
-			                     pvar->crypt_state.dec.cIDEA.ivec) ==
-			       DEATTACK_DETECTED;
-		default:
+		}
+		else {
 			return detect_attack(&pvar->crypt_state.detect_attack_statics,
 			                     buf, bytes, NULL) == DEATTACK_DETECTED;
 		}
@@ -769,26 +764,6 @@ static void cDES_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 	                 &decryptstate->k, &decryptstate->ivec, DES_DECRYPT);
 }
 
-static void cIDEA_encrypt(PTInstVar pvar, unsigned char FAR * buf,
-                          int bytes)
-{
-	CipherIDEAState FAR *encryptstate = &pvar->crypt_state.enc.cIDEA;
-	int num = 0;
-
-	idea_cfb64_encrypt(buf, buf, bytes, &encryptstate->k,
-	                   encryptstate->ivec, &num, IDEA_ENCRYPT);
-}
-
-static void cIDEA_decrypt(PTInstVar pvar, unsigned char FAR * buf,
-                          int bytes)
-{
-	CipherIDEAState FAR *decryptstate = &pvar->crypt_state.dec.cIDEA;
-	int num = 0;
-
-	idea_cfb64_encrypt(buf, buf, bytes, &decryptstate->k,
-	                   decryptstate->ivec, &num, IDEA_DECRYPT);
-}
-
 static void flip_endianness(unsigned char FAR * cbuf, int bytes)
 {
 	uint32 FAR *buf = (uint32 FAR *) cbuf;
@@ -826,24 +801,6 @@ static void cBlowfish_decrypt(PTInstVar pvar, unsigned char FAR * buf,
 	BF_cbc_encrypt(buf, buf, bytes, &decryptstate->k, decryptstate->ivec,
 	               BF_DECRYPT);
 	flip_endianness(buf, bytes);
-}
-
-static void cRC4_encrypt(PTInstVar pvar, unsigned char FAR * buf,
-                         int bytes)
-{
-	CipherRC4State FAR *encryptstate = &pvar->crypt_state.enc.cRC4;
-	int num = 0;
-
-	RC4(&encryptstate->k, bytes, buf, buf);
-}
-
-static void cRC4_decrypt(PTInstVar pvar, unsigned char FAR * buf,
-                         int bytes)
-{
-	CipherRC4State FAR *decryptstate = &pvar->crypt_state.dec.cRC4;
-	int num = 0;
-
-	RC4(&decryptstate->k, bytes, buf, buf);
 }
 
 void CRYPT_set_random_data(PTInstVar pvar, unsigned char FAR * buf,
@@ -1353,12 +1310,6 @@ static void cDES_init(char FAR * session_key, CipherDESState FAR * state)
 	memset(state->ivec, 0, 8);
 }
 
-static void cIDEA_init(char FAR * session_key, CipherIDEAState FAR * state)
-{
-	idea_set_encrypt_key(session_key, &state->k);
-	memset(state->ivec, 0, 8);
-}
-
 static void cBlowfish_init(char FAR * session_key,
                            CipherBlowfishState FAR * state)
 {
@@ -1587,20 +1538,9 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.encrypt = c3DES_encrypt;
 				break;
 			}
-		case SSH_CIPHER_IDEA:{
-				cIDEA_init(encryption_key, &pvar->crypt_state.enc.cIDEA);
-				pvar->crypt_state.encrypt = cIDEA_encrypt;
-				break;
-			}
 		case SSH_CIPHER_DES:{
 				cDES_init(encryption_key, &pvar->crypt_state.enc.cDES);
 				pvar->crypt_state.encrypt = cDES_encrypt;
-				break;
-			}
-		case SSH_CIPHER_RC4:{
-				RC4_set_key(&pvar->crypt_state.enc.cRC4.k, 16,
-							encryption_key + 16);
-				pvar->crypt_state.encrypt = cRC4_encrypt;
 				break;
 			}
 		case SSH_CIPHER_BLOWFISH:{
@@ -1759,19 +1699,9 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				pvar->crypt_state.decrypt = c3DES_decrypt;
 				break;
 			}
-		case SSH_CIPHER_IDEA:{
-				cIDEA_init(decryption_key, &pvar->crypt_state.dec.cIDEA);
-				pvar->crypt_state.decrypt = cIDEA_decrypt;
-				break;
-			}
 		case SSH_CIPHER_DES:{
 				cDES_init(decryption_key, &pvar->crypt_state.dec.cDES);
 				pvar->crypt_state.decrypt = cDES_decrypt;
-				break;
-			}
-		case SSH_CIPHER_RC4:{
-				RC4_set_key(&pvar->crypt_state.dec.cRC4.k, 16, decryption_key);
-				pvar->crypt_state.decrypt = cRC4_decrypt;
 				break;
 			}
 		case SSH_CIPHER_BLOWFISH:{
@@ -1821,10 +1751,6 @@ static char FAR *get_cipher_name(int cipher)
 		return "3DES (168 key bits)";
 	case SSH_CIPHER_DES:
 		return "DES (56 key bits)";
-	case SSH_CIPHER_IDEA:
-		return "IDEA (128 key bits)";
-	case SSH_CIPHER_RC4:
-		return "RC4 (128 key bits)";
 	case SSH_CIPHER_BLOWFISH:
 		return "Blowfish (256 key bits)";
 
@@ -1975,31 +1901,12 @@ int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase,
 			break;
 		}
 
-	case SSH_CIPHER_IDEA:{
-			CipherIDEAState state;
-			int num = 0;
-
-			cIDEA_init(passphrase_key, &state);
-			idea_cfb64_encrypt(buf, buf, bytes, &state.k, state.ivec,
-			                   &num, IDEA_DECRYPT);
-			break;
-		}
-
 	case SSH_CIPHER_DES:{
 			CipherDESState state;
 
 			cDES_init(passphrase_key, &state);
 			DES_ncbc_encrypt(buf, buf, bytes,
 			                 &state.k, &state.ivec, DES_DECRYPT);
-			break;
-		}
-
-	case SSH_CIPHER_RC4:{
-			CipherRC4State state;
-			int num = 0;
-
-			RC4_set_key(&state.k, 16, passphrase_key);
-			RC4(&state.k, bytes, buf, buf);
 			break;
 		}
 

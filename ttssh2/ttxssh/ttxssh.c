@@ -2717,18 +2717,10 @@ static char FAR *get_cipher_name(int cipher)
 		UTIL_get_lang_msg("DLG_SSHSETUP_CIPHER_BORDER", pvar,
 		                  "<ciphers below this line are disabled>");
 		return pvar->ts->UIMsg;
-	case SSH_CIPHER_RC4:
-		return "RC4(SSH1)";
 	case SSH_CIPHER_3DES:
 		return "3DES(SSH1)";
 	case SSH_CIPHER_DES:
 		return "DES(SSH1)";
-	case SSH_CIPHER_IDEA:
-		return "IDEA(SSH1)";
-	case SSH_CIPHER_TSS:
-		return "TSS(SSH1)";
-	case SSH_CIPHER_BLOWFISH:
-		return "Blowfish(SSH1)";
 
 	// for SSH2(yutaka)
 	case SSH2_CIPHER_AES128_CBC:
