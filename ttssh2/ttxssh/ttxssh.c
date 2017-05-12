@@ -3059,6 +3059,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	}
 	else {
 		EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTCONFIRM), FALSE);
+		EnableWindow(GetDlgItem(dlg, IDC_FORWARDAGENTNOTIFY), FALSE);
 	}
 	if (pvar->settings.ForwardAgentConfirm) {
 		CheckDlgButton(dlg, IDC_FORWARDAGENTCONFIRM, TRUE);
