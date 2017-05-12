@@ -1930,6 +1930,11 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					else {
 						pvar->settings.IconID = IDI_SECURETT;
 					}
+				} else if (MATCH_STR(option + 4, "-subsystem=") == 0) {
+					pvar->use_subsystem = TRUE;
+					strncpy_s(pvar->subsystem_name,
+					          sizeof(pvar->subsystem_name),
+					          option + 15, _TRUNCATE);
 
 				// /ssh1 と /ssh2 オプションの新規追加 (2006.9.16 maya)
 				} else if (strcmp(option + 4, "1") == 0) {

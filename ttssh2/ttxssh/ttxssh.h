@@ -324,6 +324,9 @@ typedef struct _TInstVar {
 	unsigned int server_compat_flag;
 
 	void *hostkey_ctx;
+
+	BOOL use_subsystem;
+	char subsystem_name[256];
 } TInstVar;
 
 #define LOG_LEVEL_FATAL      5

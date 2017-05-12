@@ -6799,7 +6799,13 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	// FWD_prep_forwarding()でshell IDを使うので、先に設定を持ってくる。(2005.7.3 yutaka)
 	// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
 	// changed window size from 32KB to 128KB. (2007.10.29 maya)
-	c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SHELL, -1);
+	if (pvar->use_subsystem) {
+		c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
+	}
+	else {
+		c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SHELL, -1);
+	}
+
 	if (c == NULL) {
 		UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
 		                  "Could not open new channel. TTSSH is already opening too many channels.");
@@ -7541,7 +7547,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	buffer_put_int(msg, remote_id);
 	if (c->type == TYPE_SCP) {
 		s = "exec";
-	} else if (c->type == TYPE_SFTP) {
+	} else if (c->type == TYPE_SFTP || c->type == TYPE_SUBSYSTEM_GEN) {
 		s = "subsystem";
 	} else {
 		s = "";  // NOT REACHED
@@ -7565,6 +7571,10 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	else if (c->type == TYPE_SFTP) {
 		char *sbuf = "sftp";
 		buffer_put_string(msg, sbuf, strlen(sbuf));
+	}
+	else if (c->type == TYPE_SUBSYSTEM_GEN) {
+		buffer_put_string(msg, pvar->subsystem_name, strlen(pvar->subsystem_name));
+		pvar->session_nego_status = 0;
 	}
 
 	len = buffer_len(msg);
@@ -7831,16 +7841,25 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 		return FALSE;
 	}
 
-	if (pvar->session_nego_status == 1 && pvar->shell_id == channel_id) {
-		// リモートで auth-agent-req@openssh.com がサポートされてないので
-		// エラーは気にせず次へ進む
+	if (pvar->shell_id == channel_id) {
+		if (c->type == TYPE_SUBSYSTEM_GEN) {
+			// サブシステムの起動に失敗したので切る。
+			notify_fatal_error(pvar, "subsystem request failed.", 1);
+			return TRUE;
+		}
+		else { // TYPE_SHELL
+			if (pvar->session_nego_status == 1) {
+				// リモートで auth-agent-req@openssh.com がサポートされてないので
+				// エラーは気にせず次へ進む
 
-		strncpy_s(buf, sizeof(buf),
-		          "auth-agent-req@openssh.com is not supported by remote host.",
-		          _TRUNCATE);
-		notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+				strncpy_s(buf, sizeof(buf),
+					  "auth-agent-req@openssh.com is not supported by remote host.",
+					  _TRUNCATE);
+				notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
-		return send_pty_request(pvar, c);
+				return send_pty_request(pvar, c);
+			}
+		}
 	}
 
 	ssh2_channel_delete(c);
@@ -8608,7 +8627,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	}
 
 	// ペイロードとしてクライアント(Tera Term)へ渡す
-	if (c->type == TYPE_SHELL) {
+	if (c->type == TYPE_SHELL || c->type == TYPE_SUBSYSTEM_GEN) {
 		pvar->ssh_state.payload_datalen = str_len;
 		pvar->ssh_state.payload_datastart = 8; // id + strlen
 
@@ -8689,7 +8708,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	}
 
 	// ペイロードとしてクライアント(Tera Term)へ渡す
-	if (c->type == TYPE_SHELL) {
+	if (c->type == TYPE_SHELL || c->type == TYPE_SUBSYSTEM_GEN) {
 		pvar->ssh_state.payload_datalen = strlen;
 		pvar->ssh_state.payload_datastart = 12; // id + data_type + strlen
 
@@ -8934,7 +8953,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	_snprintf_s(log, sizeof(log), _TRUNCATE, "SSH2_MSG_CHANNEL_CLOSE was received. local:%d remote:%d", c->self_id, c->remote_id);
 	notify_verbose_message(pvar, log, LOG_LEVEL_VERBOSE);
 
-	if (c->type == TYPE_SHELL) {
+	if (c->type == TYPE_SHELL || c->type == TYPE_SUBSYSTEM_GEN) {
 		ssh2_channel_send_close(pvar, c);
 
 		// TCP connection closed
