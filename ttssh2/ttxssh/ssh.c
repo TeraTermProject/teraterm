@@ -7218,6 +7218,8 @@ struct change_password {
 
 static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	char old_passwd[PASSWD_MAXLEN];
+	char new_passwd[PASSWD_MAXLEN];
 	char retype_passwd[PASSWD_MAXLEN];
 	static struct change_password *cp;
 	LOGFONT logfont;
@@ -7262,30 +7264,44 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 		UTIL_get_lang_msg("DLG_PASSCHG_CONFIRMPASSWD", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_CONFIRM_PASSWD_LABEL, pvar->ts->UIMsg);
 
-		return TRUE;
+		SetFocus(GetDlgItem(dlg, IDC_OLD_PASSWD));
+
+		return FALSE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			SendMessage(GetDlgItem(dlg, IDC_OLD_PASSWD), WM_GETTEXT , sizeof(cp->passwd), (LPARAM)cp->passwd);
-			SendMessage(GetDlgItem(dlg, IDC_NEW_PASSWD), WM_GETTEXT , sizeof(cp->new_passwd), (LPARAM)cp->new_passwd);
+			SendMessage(GetDlgItem(dlg, IDC_OLD_PASSWD), WM_GETTEXT , sizeof(old_passwd), (LPARAM)old_passwd);
+			SendMessage(GetDlgItem(dlg, IDC_NEW_PASSWD), WM_GETTEXT , sizeof(new_passwd), (LPARAM)new_passwd);
 			SendMessage(GetDlgItem(dlg, IDC_CONFIRM_PASSWD), WM_GETTEXT , sizeof(retype_passwd), (LPARAM)retype_passwd);
 
-			if (strcmp(cp->new_passwd, retype_passwd) == 0) {
-				EndDialog(dlg, 1); // dialog close
+			if (strcmp(new_passwd, retype_passwd) == 1) {
+				UTIL_get_lang_msg("MSG_PASSCHG_MISMATCH", pvar, "Mismatch; try again.");
+				MessageBox(NULL, pvar->ts->UIMsg, "ERROR", MB_OK | MB_ICONEXCLAMATION);
+				return FALSE;
+			}
 
-				if (DlgChgPassFont != NULL) {
-					DeleteObject(DlgChgPassFont);
-					DlgChgPassFont = NULL;
-				}
+			if (old_passwd[0] == 0 || new_passwd[0] == 0) {
+				// ダイアログを開いてすぐに Return を押してしまった時の対策の為、
+				// とりあえず空パスワードをはじいておく。
+				return FALSE;
+			}
 
-				return TRUE;
-			} 
-			UTIL_get_lang_msg("MSG_PASSCHG_MISMATCH", pvar, "Mismatch; try again.");
-			MessageBox(NULL, pvar->ts->UIMsg, "ERROR", MB_OK | MB_ICONEXCLAMATION);
-			return FALSE;
+			strncpy_s(cp->passwd, sizeof(cp->passwd), old_passwd, _TRUNCATE);
+			strncpy_s(cp->new_passwd, sizeof(cp->new_passwd), new_passwd, _TRUNCATE);
+
+			EndDialog(dlg, 1); // dialog close
+
+			if (DlgChgPassFont != NULL) {
+				DeleteObject(DlgChgPassFont);
+				DlgChgPassFont = NULL;
+			}
+
+			return TRUE;
 
 		case IDCANCEL:
+			// 接続を切る
+                        notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0); // dialog close
 
 			if (DlgChgPassFont != NULL) {
@@ -7302,7 +7318,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 
 BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 {
-	int len;
+	int len, ret;
 	char *data;
 	buffer_t *msg = NULL;
 	char *s, *username;
@@ -7314,8 +7330,18 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	notify_verbose_message(pvar, "SSH2_MSG_USERAUTH_PASSWD_CHANGEREQ was received.", LOG_LEVEL_VERBOSE);
 
+	memset(&cp, 0, sizeof(cp));
 	cp.pvar = pvar;
-	DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
+	ret = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
+
+	if (ret == -1) {
+		logprintf(pvar, LOG_LEVEL_WARNING, __FUNCTION__ "%s: DialogBoxParam failed.");
+		return FALSE;
+	}
+	else if (ret == 0) {
+		logprintf(pvar, LOG_LEVEL_NOTICE, __FUNCTION__ "%s: dialog cancelled.");
+		return FALSE;
+	}
 
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
