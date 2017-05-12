@@ -107,7 +107,7 @@
       <li>受信漢字コードが UTF-8 設定の時に ISO-2022-JP 漢字が表示出来ない問題を修正した。(日本語モードのみ)</li>
       <li><a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>=on の場合において、ログファイルのオープン後、すぐにクローズを行うと、まれに Tera Term がデッドロックしてストールするという問題を修正した。</li>
       <li><a href="../menu/file-log.html">ログダイアログ</a>を閉じた時、Tera Term本体(ttermpro.exe)がメモリリークする問題を修正した。</li>
-      <li>Windows 7 / Vista で <a href="..\menu\setup-general.html">General setup ダイアログ</a> で特殊な操作をした時に落ちる問題を修正した。</li>
+      <li>Windows 7 / Vista で <a href="../menu/setup-general.html">General setup ダイアログ</a> で特殊な操作をした時に落ちる問題を修正した。</li>
       <li>ブロードキャストコマンドで、リアルタイムモードが off の時に末尾に余計な文字列が付く問題を修正した。</li>
       <li>MACRO: <a href="../macro/command/closesbox.html">closesbox</a>コマンドの実行時、マクロ本体(ttpmacro.exe)がメモリリークする問題を修正した。</li>
       <li>MACRO: <a href="../macro/command/gethostname.html">gethostname</a>, <a href="../macro/command/gethostname.html">gettitle</a>, <a href="../macro/command/getmodemstatus.html">getmodemstatus</a>, <a href="../macro/command/loginfo.html">loginfo</a>, <a href="../macro/command/logopen.html">logopen</a> コマンドが間欠でエラーになる問題を修正した。</li>
@@ -842,7 +842,7 @@
           <li>画像ファイル指定設定(theme\ImageFile.INI)を追加した。<a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、背景画像を指定できるようにした。</li>
           <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のVisualタブで、有効化できるようにした。</li>
         </ul></li>
-      <li><a href="..\menu\setup-general.html">General setupダイアログ</a>で言語ファイルを指定できるようにした。</li>
+      <li><a href="../menu/setup-general.html">General setupダイアログ</a>で言語ファイルを指定できるようにした。</li>
       <li><a href="../menu/setup-additional.html">Additional settingsダイアログ</a>のCygwinタブで、設定保存できた場合、メッセージダイアログを表示するようにした。</li>
       <li><a href="../usage/tips/ime.html#feedback">IMEの前後参照変換機能</a>に対応した。ATOK2012,MS-IME2002,MS-IME2003で動作確認済み。MS-IME2010では動作不可。"IME=off"(teraterm.ini)の場合は機能無効。</li>
       <li>ウィンドウサイズ問い合わせに対する応答に含まれていた余分な ; を削除した。</li>
@@ -2676,7 +2676,6 @@
   <li>マクロ: どの行でもコメントが置けるようになる</li>
   <li>エスケープシーケンスによる印刷で直接ポートに出力</li>
   <li>特別オプション "AutoFileRename", "BackWrap", "Beep", "EnableStatusLine", "MaxComPort", "PassThruDelay", "PassThruPort", "PrnConvFF", "RussPrint", "TitleFormat"</li>
-</li>
   <li>新 [Setup] TCP/IP ダイアログボックス</li>
   <li>ホストリストにホスト名を自動追加</li>
   <li>ロシア語文字セット追加 (CP 866, ISO 8859-5)</li>
@@ -2700,7 +2699,7 @@
   <li>VT 端末のステータスライン</li>
   <li>エスケープシーケンスによる印刷</li>
   <li>ANSI フルカラー</li>
-  <li>コマンドラインオプション追加 (/I, /L=<log file>, /LA=<language>, /M=<macro file>, /V)</li>
+  <li>コマンドラインオプション追加 (/I, /L=&lt;log file&gt;, /LA=&lt;language&gt;, /M=&lt;macro file&gt;, /V)</li>
   <li>コマンドラインでホスト名のすぐ後のポート番号(例: "myhost.mydomain 23")</li>
   <li>Tera Term 設定ファイルの読み込み専用オプション追加</li>
   <li>キーボード設定ファイルの項目追加</li>
@@ -3016,7 +3015,7 @@
     <ul>
       <li>known_hostsダイアログおよびバージョン情報ダイアログにおいて、サーバホスト鍵の指紋を表示するときに使うハッシュアルゴリズムを、MD5 だけでなく SHA256 も選択できるようにした。</li>
       <li>DNS によるホスト鍵の確認(SSHFP)で ED25519 鍵に対応した。</li>
-      <li>TERATERM.INI の設定値で指定されていない鍵交換・ホスト鍵・暗号化・MAC・圧縮方式の、プログラムでの挿入位置を変更した。</li>
+      <li>TERATERM.INI の設定値で指定されていない鍵交換・ホスト鍵・暗号化・MAC・圧縮方式の、プログラムでの挿入位置を変更した。
         <ul>
           <li>プログラムのデフォルトで有効な方式...使用される方式の末尾に追加される</li>
           <li>プログラムのデフォルトで無効な方式...使用されない方式の末尾に追加される</li>
@@ -3048,7 +3047,7 @@
       <li>ホスト公開鍵の自動更新(OpenSSH 6.8以降)の確認ダイアログを、ホスト鍵の確認(<a href="../usage/ssh.html#securitywarning">セキュリティ警告</a>)ダイアログと同様のものに変更した。</li>
       <li>Diffie-Hellman group exchange 鍵交換方式で、要求するグループサイズの最小値を指定できるようにした。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#GexMinimalGroupSize">GexMinimalGroupSize<a> エントリを追加した。デフォルトは0。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-ini.html#GexMinimalGroupSize">GexMinimalGroupSize</a> エントリを追加した。デフォルトは0。</li>
         </ul></li>
       <li>デフォルトの<a href="../menu/setup-ssh.html#CipherOrder">優先する暗号アルゴリズムの順</a>で、Arcfour系の暗号が無効になるよう優先順位を変更した。</li>
       <li>X11転送失敗時のエラーメッセージにエラー番号を含めるようにした。</li>

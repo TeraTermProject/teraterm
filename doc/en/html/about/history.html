@@ -108,7 +108,7 @@
       <li>When Kanji(receive) is set to UTF-8, ISO-2022-JP Kanji can not be properly shown with Japanese language setting.</li>
       <li>When <a href="../setup/teraterm-misc.html#DeferredLogWriteMode">DeferredLogWriteMode</a>=on is enabled and a log file is closed soon after opening the file, Tera Term rarely halts by dead-lock.</li>
       <li>When <a href="../menu/file-log.html">Log dialog</a> is closed, the memory leak of Tera Term core(ttermpro.exe) is happened.</li>
-      <li>Windows 7 and Vista: When special operation is done on <a href="..\menu\setup-general.html">General setup dialog</a>, an application fault occurs.</li>
+      <li>Windows 7 and Vista: When special operation is done on <a href="../menu/setup-general.html">General setup dialog</a>, an application fault occurs.</li>
       <li>When the real time mode is off by using broadcast command, invalid character will be added at the end of string.</li>
       <li>MACRO: When <a href="../macro/command/closesbox.html">closesbox</a> command is executed, the memory leak of Macro core(ttpmacro.exe) is happened.</li>
       <li>MACRO: The <a href="../macro/command/gethostname.html">gethostname</a>, <a href="../macro/command/gettitle.html">gettitle</a>, <a href="../macro/command/getmodemstatus.html">getmodemstatus</a>, <a href="../macro/command/loginfo.html">loginfo</a> and <a href="../macro/command/logopen.html">logopen</a> command will rarely be wrong.</li>
@@ -843,7 +843,7 @@
           <li>added an image file specified configuration(theme\ImageFile.INI). Also, a background image file can be specified on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
           <li>Enabled the "Eterm lookfeel" check-box on the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
         </ul></li>
-      <li>added the LanguageUI entry on the <a href="..\menu\setup-general.html">General setup dialog</a>.</li>
+      <li>added the LanguageUI entry on the <a href="../menu/setup-general.html">General setup dialog</a>.</li>
       <li>A message dialog is shown when the cygterm.cfg has been saved on the Cygwin tab of the <a href="../menu/setup-additional.html">Additional settings dialog</a>.</li>
       <li>added support for IME feedback back and forth function. The ATOK2012, MS-IME2002 and MS-IME2003 work well. Also, this feature is disabled with "IME=off"(teraterm.ini).</li>
       <li>Removed an extra semicolon(;) included in the window size requesting.</li>
@@ -2666,8 +2666,6 @@ SYNOPSIS:
 
 <h2>Tera Term Pro (Original Version)</h2>
 
-</ul>
-
 <h3><a name="teraterm_2.3">1998.3.10 (Ver 2.3 &amp; 1.4)</a></h3>
 <ul class="history">
   <li>Serial ports larger than COM4</li>
@@ -2701,7 +2699,7 @@ SYNOPSIS:
   <li>Status line of the VT terminal</li>
   <li>Pass-through printing</li>
   <li>ANSI full color</li>
-  <li>New command-line options (/I, /L=<log file>, /LA=<language>, /M=<macro file> and /V)</li>
+  <li>New command-line options (/I, /L=&lt;log file&gt;, /LA=&lt;language&gt;, /M=&lt;macro file&gt; and /V)</li>
   <li>Port number just after a host name in the command line (such as "myhost.mydomain 23")</li>
   <li>New read-only options in the Tera Term setup file</li>
   <li>New items in the keyboard setup file</li>
