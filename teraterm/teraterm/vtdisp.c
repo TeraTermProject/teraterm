@@ -1662,7 +1662,7 @@ void BGScrollWindow(HWND hwnd, int xa, int ya, RECT *Rect, RECT *ClipRect)
 		case 1: // type 1: ScrollWindow を使わずにすべて書き直す
 			InvalidateRect(HVTWin, ClipRect, FALSE);
 			break;
-		case 3: // type 3: スクロール領域が全体(NULL)の時は隙間部分を除いた領域に差し替える
+		case 2: // type 2: スクロール領域が全体(NULL)の時は隙間部分を除いた領域に差し替える
 			if (Rect == NULL) {
 				GetClientRect(hwnd, &r);
 				r.bottom -= r.bottom % ts.TerminalHeight;

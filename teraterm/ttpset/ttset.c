@@ -1582,10 +1582,10 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		GetOnOff(Section, "MouseEventTracking", FName, TRUE);
 
 	// Maximized bug tweak
-	GetPrivateProfileString(Section, "MaximizedBugTweak", "1", Temp,
+	GetPrivateProfileString(Section, "MaximizedBugTweak", "2", Temp,
 	                        sizeof(Temp), FName);
 	if (_stricmp(Temp, "on") == 0) {
-		ts->MaximizedBugTweak = 1;
+		ts->MaximizedBugTweak = 2;
 	}
 	else {
 		ts->MaximizedBugTweak = atoi(Temp);
