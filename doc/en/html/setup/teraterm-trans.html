@@ -107,7 +107,9 @@ To transmit and receive extended-length packets of Kermit, edit the KmtLongPacke
 KmtLongPacket=on
 </pre>
 
+<p>
 However, the kermit server must support this feature.
+</p>
 
 <pre>
 Default:
@@ -125,7 +127,9 @@ To accept file attributes(size, type and timestamp, etc) of Kermit, edit the Kmt
 KmtFileAttr=on
 </pre>
 
+<p>
 However, the kermit server must support this feature.
+</p>
 
 <pre>
 Default:
@@ -176,10 +180,10 @@ XMODEM timeout value can be specified in seconds.
 </p>
 
 <p>
-1st  ... NAK mode: Timeout value for first packet <br />
-2nd  ... CRC mode: Timeout value for first packet <br />
-3rd  ... Timeout short time <br />
-4th  ... Timeout long time <br />
+1st  ... NAK mode: Timeout value for first packet <br>
+2nd  ... CRC mode: Timeout value for first packet <br>
+3rd  ... Timeout short time <br>
+4th  ... Timeout long time <br>
 5th  ... Timeout very long time 
 </p>
 
@@ -196,10 +200,10 @@ YMODEM timeout value can be specified in seconds.
 </p>
 
 <p>
-1st  ... NAK mode: Timeout value for first packet <br />
-2nd  ... CRC mode: Timeout value for first packet <br />
-3rd  ... Timeout short time <br />
-4th  ... Timeout long time <br />
+1st  ... NAK mode: Timeout value for first packet <br>
+2nd  ... CRC mode: Timeout value for first packet <br>
+3rd  ... Timeout short time <br>
+4th  ... Timeout long time <br>
 5th  ... Timeout very long time 
 </p>
 
@@ -220,7 +224,7 @@ ZmodemAuto=on
 </pre>
 
 <p>
-If you run the ZMODEM Send command at the host, the ZMODEM Receive command of Tera Term is automatically activated. <br />
+If you run the ZMODEM Send command at the host, the ZMODEM Receive command of Tera Term is automatically activated. <br>
 When ZMODEM receiving(upload) command of remote host is executed, the file selection dialog of ZMODEM sending is opened.
 </p>
 
@@ -263,9 +267,8 @@ ZmodemDataLen=1024
 ZmodemWinSize=32767
 </pre>
 
-NOTICE
-
 <p>
+NOTICE:
 Please specify the ZmodemDataLen=128 at the Allied Telesis router.
 </p>
 
@@ -329,9 +332,9 @@ ZMODEM timeout value can be specified in seconds.
 </p>
 
 <p>
-1st  ... Timeout value for serial port <br />
-2nd  ... Timeout value for TCP/IP port <br />
-3rd  ... Timeout value for initial packet <br />
+1st  ... Timeout value for serial port <br>
+2nd  ... Timeout value for TCP/IP port <br>
+3rd  ... Timeout value for initial packet <br>
 4th  ... Timeout value for final packet 
 </p>
 
@@ -391,8 +394,8 @@ FTHideDialog=off
 <h1><a name="FileSendHighSpeedMode">High Speed File Transfer on Serial Connection</a></h1>
 
 <p>
-Basically, the file content is sent as one byte at a time. <br />
-However, the transfer speed will be slow because of byte by byte.<br />
+Basically, the file content is sent as one byte at a time. <br>
+However, the transfer speed will be slow because of byte by byte.<br>
 The file content is sent as 8KB at at time on the special condition to resolve the performance problem.
 </p>
 
@@ -415,7 +418,7 @@ FileSendHighSpeedMode=off
 </pre>
 
 <p>
-This feature applies to the file transfer by the <a href="../menu/file.html">[File]</a>-<a href="../menu/file-sendfile.html">[Send file...]</a>.<br />
+This feature applies to the file transfer by the <a href="../menu/file.html">[File]</a>-<a href="../menu/file-sendfile.html">[Send file...]</a>.<br>
 Also, the feature does not apply to the <a href="../menu/file.html">[File]</a>-<a href="../menu/file-transfer.html">[Transfer]</a> and the SSH SCP.
 </p>
 

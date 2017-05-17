@@ -454,9 +454,11 @@ BGThemeFile = theme\*.ini
 
 <h2>Extension of theme file</h2>
 
+<p>
 A user can configure the extension of the theme file based on the theme\Advanced.sample file.<br>
 For example, an image file(sample.jpg) can be drawn in the Tera Term background.
 Please specify the .ini file at the BGThemeFile entry of the teraterm.ini file.
+</p>
 
 <pre>
 [BG]
@@ -494,9 +496,6 @@ BGSrc2Alpha     = 64
 </pre>
 
 
-
-
-
 <h1><a name="maximize">How to scroll the screen when the window size is maximized</a></h1>
 <p>
 You can specify how to scroll the screen when the window size is maximized.<br>
@@ -531,7 +530,7 @@ KillFocusCursor=on
 
 
 <h1><a name="vttekpos">Fix the initial window position</a></h1>
-<!p>
+<p>
 In order to change the default window position, change values of VTPos line(VT Window) and TEKPos line(TEK Window) at [Tera Term] section inside the setup file.<br>
 For example, if you want to set the default VT window position to 200 pixels from the left side of the screen and 100px from the top of the screen, change the setup file as follows.
 </p>
@@ -604,21 +603,21 @@ Following icon names are available:
 </thead>
 
 <tbody>
-  <tr><td>TTERM</td>         <td><img src="../image/tterm.png"></td></tr>
-  <tr><td>VT</td>            <td><img src="../image/vt.png"></td></tr>
-  <tr><td>TEK</td>           <td><img src="../image/tek.png"></td></tr>
-  <tr><td>TTERM_CLASSIC</td> <td><img src="../image/tterm_classic.png"></td></tr>
-  <tr><td>VT_CLASSIC</td>    <td><img src="../image/vt_classic.png"></td></tr>
-  <tr><td>TTERM_3D</td>      <td><img src="../image/tterm_3d.png"></td></tr>
-  <tr><td>VT_3D</td>         <td><img src="../image/vt_3d.png"></td></tr>
-  <tr><td>CYGTERM</td>       <td><img src="../image/cygterm.png"></td></tr>
+  <tr><td>TTERM</td>         <td><img src="../image/tterm.png" ALT="Icon of TTERM"></td></tr>
+  <tr><td>VT</td>            <td><img src="../image/vt.png" ALT="Icon of VT"></td></tr>
+  <tr><td>TEK</td>           <td><img src="../image/tek.png" ALT="Icon of TEK"></td></tr>
+  <tr><td>TTERM_CLASSIC</td> <td><img src="../image/tterm_classic.png" ALT="Icon of TTERM_CLASSIC"></td></tr>
+  <tr><td>VT_CLASSIC</td>    <td><img src="../image/vt_classic.png" ALT="Icon of VT_CLASSIC"></td></tr>
+  <tr><td>TTERM_3D</td>      <td><img src="../image/tterm_3d.png" ALT="Icon of TTERM_3D"></td></tr>
+  <tr><td>VT_3D</td>         <td><img src="../image/vt_3d.png" ALT="Icon of VT_3D"></td></tr>
+  <tr><td>CYGTERM</td>       <td><img src="../image/cygterm.png" ALT="Icon of CYGTERM"></td></tr>
   <tr><td>Default</td>       <td>Default("VT" at VT window, "TEK" at TEK window)</td></tr>
 </tbody>
 </table>
 
 <p>
 Also, the icon of SSH connection can be changed. For example, when the yellow icon(TTSSH2.62 earlier) is specified, please change the SSHIcon entry in the [TTSSH] section in the following:
-<p>
+</p>
 
 <pre>
 SSHIcon=yellow
@@ -634,9 +633,9 @@ The SSHIcon can be specified in the following names:
 </thead>
 
 <tbody>
-  <tr><td>flat</td>          <td><img src="../image/ttssh-flat.png"></tr>
-  <tr><td>green</td>         <td><img src="../image/ttssh-green.png"></tr>
-  <tr><td>yellow</td>        <td><img src="../image/ttssh-yellow.png"></tr>
+  <tr><td>flat</td>          <td><img src="../image/ttssh-flat.png" ALT="flat ttssh icon"></tr>
+  <tr><td>green</td>         <td><img src="../image/ttssh-green.png" ALT="green ttssh icon"></tr>
+  <tr><td>yellow</td>        <td><img src="../image/ttssh-yellow.png" ALT="yellow ttssh icon"></tr>
   <tr><td>Default</td>       <td>A default icon(equal to flat)</td></tr>
 </tbody>
 </table>
