@@ -38,7 +38,7 @@
 
 <h2>[基本的な使い方]</h2>
 <p>
-<span class="qanda">Q.</span> NIFTY-Serve や PC-VAN などの BBS に関する質問。</span><br>
+<span class="qanda">Q.</span> NIFTY-Serve や PC-VAN などの BBS に関する質問。<br>
 <span class="qanda">A.</span> <A HREF="../usage/tips/pc-communication.html">パソコン通信的接続法</A>, 
 <A HREF="../usage/tips/nifty-serve.html">NIFTY-Serve のヒント</A>, 
 <A HREF="../usage/tips/pc_van.html">PC-VAN のヒント</A>を読んでください。
@@ -92,10 +92,12 @@ PPP 接続の場合、シリアルポートは Tera Term ではなく PPP 接続ソフトによって制御さ
 4つともためしてうまくいくものを探してください。より確実にはホストの管理者にどの日本語コードを指定すべきか聞いてください。<br>
 <span class="qanda">A.</span> ホストで使われている日本語コードが JIS 以外の場合で、日本語の入力ができない場合、ホストで 8 bit 文字の入力ができるように設定されていない<br>
 可能性があります。8 bit 文字を入力可能にするには、例えば以下のようなコマンドで設定してください。
+</p>
 <pre>
 stty pass8 -istrip	(SunOS等の unix の場合)
 set term /eight		(VMS の場合)
 </pre>
+<p>
 詳しくは、ホストの管理者等に聞いてください。
 </p>
 
@@ -180,7 +182,7 @@ set term /eight		(VMS の場合)
 <p>
 <span class="qanda">Q.</span> <a href="../menu/setup-font.html">[Setup] Font</a> ダイアログボックスのリストに含まれるフォントの種類が少ないのはなぜ?<br>
 <span class="qanda">Q.</span> <a href="../menu/setup-font.html">[Setup] Font</a> ダイアログボックスでなぜ "Times" フォントが選択できない?<br>
-<span class="qanda">A.</span> Tera Term は"ＭＳ 明朝"や "Terminal" のような固定幅フォントしか使用しません。なぜなら VT 端末を正しくエミュレートするためには文字を等間隔で表示しなければならないからです。"Times" のような可変幅(プロポーショナル)フォントを等間隔に表示させるようにするにはプログラムが複雑になるためTera Term はそれらのフォントを使用していません。</br>
+<span class="qanda">A.</span> Tera Term は"ＭＳ 明朝"や "Terminal" のような固定幅フォントしか使用しません。なぜなら VT 端末を正しくエミュレートするためには文字を等間隔で表示しなければならないからです。"Times" のような可変幅(プロポーショナル)フォントを等間隔に表示させるようにするにはプログラムが複雑になるためTera Term はそれらのフォントを使用していません。<br>
 <span class="qanda">A.</span> Windows 7 では、非表示に設定されたフォントはダイアログボックスでリストに含まれません。コントロールパネルのフォントで、使いたいフォントを表示するように設定してください。
 </p>
 
