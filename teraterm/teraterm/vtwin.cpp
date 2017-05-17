@@ -3931,7 +3931,7 @@ void CVTWindow::OnFileNewConnection()
 					strncat_s(Command,sizeof(Command)," /T=0",_TRUNCATE);
 				else
 					strncat_s(Command,sizeof(Command)," /T=1",_TRUNCATE);
-				if (GetHNRec.TCPPort<65535) {
+				if (GetHNRec.TCPPort != 0) {
 					strncat_s(Command,sizeof(Command)," /P=",_TRUNCATE);
 					_snprintf_s(tcpport, sizeof(tcpport), _TRUNCATE, "%d", GetHNRec.TCPPort);
 					strncat_s(Command,sizeof(Command),tcpport,_TRUNCATE);

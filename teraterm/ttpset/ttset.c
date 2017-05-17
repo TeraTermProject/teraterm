@@ -3715,7 +3715,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	char TempDir[MAXPATHLEN];
 	WORD ParamPort = 0;
 	WORD ParamCom = 0;
-	WORD ParamTCP = 65535;
+	WORD ParamTCP = 0;
 	WORD ParamTel = 2;
 	WORD ParamBin = 2;
 	DWORD ParamBaud = BaudNone;
@@ -3900,7 +3900,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
 			if (sscanf(&Temp[3], "%hd", &ParamTCP) != 1)
-				ParamTCP = 65535;
+				ParamTCP = 0;
 		}
 		else if (_stricmp(Temp, "/PIPE") == 0 ||
 		         _stricmp(Temp, "/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
@@ -4014,7 +4014,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		if (b == ':') {
 			ts->HostName[i - 1] = 0;
 			if (sscanf(&(ts->HostName[i]), "%d", &ParamTCP) != 1)
-				ParamTCP = 65535;
+				ParamTCP = 0;
 		}
 #endif							/* NO_INET6 */
 	}
@@ -4022,7 +4022,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	switch (ParamPort) {
 	case IdTCPIP:
 		ts->PortType = IdTCPIP;
-		if (ParamTCP < 65535)
+		if (ParamTCP != 0)
 			ts->TCPPort = ParamTCP;
 		if (ParamTel < 2)
 			ts->Telnet = ParamTel;
