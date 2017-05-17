@@ -2686,6 +2686,8 @@ static char FAR *get_cipher_name(int cipher)
 		return "3DES(SSH1)";
 	case SSH_CIPHER_DES:
 		return "DES(SSH1)";
+	case SSH_CIPHER_BLOWFISH:
+		return "Blowfish(SSH1)";
 
 	// for SSH2(yutaka)
 	case SSH2_CIPHER_AES128_CBC:
