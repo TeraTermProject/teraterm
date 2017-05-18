@@ -12,7 +12,7 @@
 <h1>中間ホストを経由してホストに接続した場合のファイル転送</h1>
 
 <p>
-あるホストにログインして、そこからさらに他のホストへログインした場合、終端ホストと Tera Term の間のファイル転送 (Kermit, XMODEM, ZMODEM, B-PLUS, Quick-VAN) がうまくいかないことがあります。
+あるホストにログインして、そこからさらに他のホストへログインした場合、終端ホストと Tera Term の間のファイル転送 (Kermit, XMODEM, YMODEM, ZMODEM, B-PLUS, Quick-VAN) がうまくいかないことがあります。
 </p>
 
 <p>
@@ -40,7 +40,7 @@ Telnet 接続の場合、バイナリモードで接続する必要がある場合があります。
 </p>
 
 <p>
-Kermit ではこのことは通常問題になりません。B-Plus と ZMODEM では、すべての制御文字をエスケープすることにより正しくファイル転送ができるようになる可能性があります。XMODEM と Quick-VAN では、すべての 8-bit 文字を通す回線を使用しないと正しくファイル転送ができません。
+Kermit ではこのことは通常問題になりません。<a href="../../setup/teraterm-trans.html#bpesc">B-Plus</a> と <a href="../../setup/teraterm-trans.html#zmesc">ZMODEM</a> では、すべての制御文字をエスケープすることにより正しくファイル転送ができるようになる可能性があります。XMODEM, YMODEM と Quick-VAN では、すべての 8-bit 文字を通す回線を使用しないと正しくファイル転送ができません。
 </p>
 
 <p>
