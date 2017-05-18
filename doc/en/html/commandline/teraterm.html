@@ -51,10 +51,8 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt>\\&lt;server&gt;\pipe\&lt;pipe name&gt;</dt>
   <dd>Pipe name.<br>
-  <!--
-      &lt;server&gt; 上の名前付きパイプ &lt;pipe name&gt; に接続する。<br>
-      \\.\pipe\&lt;pipe name&gt; とした場合はローカルの名前付きパイプに接続する。
-  -->
+      Connects to a named pipe &lt;pipe name&gt; on the &lt;server&gt;. <br>
+      Connects to local named pipe by specifying \\.\pipe\&lt;pipe name&gt;.
   </dd>
 
   <dt id="b">/B</dt>
@@ -197,13 +195,13 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dd>Windows position (vertical)</dd>
 
   <dt id="pipe">/PIPE</dt>
-  <!-- dd>名前付きパイプへ接続する。このオプションを指定すると、以下のルールでホスト名(パイプ名)が補われる。
+  <dd>Connects to a named pipe. The host name(pipe name) is ccomplemented by these rules:
       <ul>
-        <li>ホスト名が \ で始まる場合はそのまま使われる。</li>
-        <li>ホスト名に \ が含まれない場合は先頭に \\.\pipe\ が付加される。</li>
-        <li>ホスト名の先頭以外に \ が有る場合は、それより前をサーバ名、後ろをパイプ名として扱う。</li>
+        <li>If the host name begins with a \, the name is not changed.</li>
+        <li>If the host name does not include a \, the \\.\pipe\ is added at the beginning.</li>
+        <li>If the host name includes a \ anywhere but first, before that is treated as server name and after that is treated as pipe name. </li>
       </ul>
-  </dd -->
+  </dd>
 
   <dt id="autowinclose">/AUTOWINCLOSE=&lt;flag&gt;</dt>
   <dd>AutoWinClose

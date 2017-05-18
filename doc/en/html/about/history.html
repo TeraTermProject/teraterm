@@ -36,26 +36,26 @@
   <li>Changes
     <ul>
       <li>added the notification feature regarding clipboard accessing from remote host. (Windows Me or 2000 or later)</li>
-      <!-- li>コマンドラインオプション /NAMEDPIPE を <a href="../commandline/teraterm.html#pipe">/PIPE</a> へ変更した。</li -->
-      <!-- li>コマンドラインオプション <a href="../commandline/teraterm.html#pipe">/PIPE</a> を使用した時に、以下のルールでホスト名を補うようにした。
+      <li>renamed command line from /NAMEDPIPE to <a href="../commandline/teraterm.html#pipe">/PIPE</a> option.</li>
+      <li>When <a href="../commandline/teraterm.html#pipe">/PIPE</a> option is used as command line, the host name is ccomplemented by these rules:
         <ul>
-          <li>ホスト名が \ で始まる場合はそのまま使われる。</li>
-          <li>ホスト名に \ が含まれない場合は先頭に \\.\pipe\ が付加される。</li>
-          <li>ホスト名の先頭以外に \ が有る場合は、それより前をサーバ名、後ろをパイプ名として扱う。</li>
-        </ul></li -->
-      <!-- li><a href="../setup/teraterm-win.html#maximize">画面最大化時のスクロール方式</a> として新しい方式を追加した。
+          <li>If the host name begins with a \, the name is not changed.</li>
+          <li>If the host name does not include a \, the \\.\pipe\ is added at the beginning.</li>
+          <li>If the host name includes a \ anywhere but first, before that is treated as server name and after that is treated as pipe name. </li>
+        </ul></li>
+      <li>added new feature regarding <a href="../setup/teraterm-win.html#maximize">How to scroll the screen when the window size is maximized</a>.
         <ul>
-          <li>デフォルト設定での動作を新方式に変更した。Tera Term 4.94 までと同じ動作にする場合は MaximizedBugTweak を 1 に変更する。</li>
-          <li>設定ファイルの MaximizedBugTweak 設定で指定する値を、on/off から 0/1/2 に変更した。off は 0、on は 2 として扱われる。</li>
-        </ul></li -->
+          <li>changed default action to new method. If the action behaves in the same manner as Tera Term 4.94, please set MaximizedBugTweak to 1.</li>
+          <li>changed MaximizedBugTweak value from on/off to 0/1/2 combination. The off is treated as 0, and the on is trested as 2.</li>
+        </ul></li>
     </ul>
   </li>
 
-  <!-- li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>コマンドラインオプションでポート番号に 65535 を指定出来ない問題を修正した。</li>
+      <li>The port number can not specify 65535 at the command line option.</li>
     </ul>
-  </li -->
+  </li>
 
   <li>Misc
     <ul>
@@ -2880,18 +2880,18 @@ SYNOPSIS:
     <ul>
       <li>added the notification feature when remote host uses forwarded agent. (Windows Me or 2000 or later)</li>
       <li>added support for changing the user password when using the password authentication.</li>
-      <!--li>接続時にシェルではなくサブシステムを起動する機能を追加した。
+      <li>added subsystem launching instead of shell on connection.
         <ul>
-          <li>コマンドラインオプションに <a href="../commandline/ttssh.html#ssh-subsystem">/ssh-subsystem</a> オプションを追加した。</li>
+          <li>added the <a href="../commandline/ttssh.html#ssh-subsystem">/ssh-subsystem</a> option at the command line.</li>
         </ul></li>
     </ul>
   </li>
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>エージェント転送有効時、リモートホストがエージェントに大きなパケットサイズのリクエストを送ってきた時に落ちる問題を修正した。</li>
+      <li>When agent transfer is enabled, an application fault is occurred after the remote host sends big packet request.</li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>
