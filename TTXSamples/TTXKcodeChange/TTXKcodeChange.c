@@ -7,12 +7,8 @@
 #include "ttplugin.h"
 #include "tt_res.h"
 
-#ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#else
-#include <winsock.h>
-#endif /* NO_INET6 */
 
 #include "compat_w95.h"
 

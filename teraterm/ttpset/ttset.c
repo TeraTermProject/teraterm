@@ -3722,6 +3722,9 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 	/* Set AutoConnect true as default (2008.2.16 by steven)*/
 	ts->ComAutoConnect = TRUE;
 
+	/* user specifies the protocol connecting to the host */
+	/* ts->ProtocolFamily = AF_UNSPEC; */
+
 	/* Get command line parameters */
 	if (DDETopic != NULL)
 		DDETopic[0] = 0;
