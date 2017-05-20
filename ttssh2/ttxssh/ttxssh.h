@@ -46,7 +46,6 @@ See LICENSE.TXT for the license.
 	#endif
 #endif
 
-#ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>
 /* actual body of in6addr_any and in6addr_loopback is disappeared?? */
@@ -58,7 +57,6 @@ See LICENSE.TXT for the license.
          (*(unsigned int *)(&(a)->s6_addr[12]) == ntohl(1)))
 /* work around for MS Platform SDK Oct 2000 */
 #include <malloc.h> /* prevent of conflict stdlib.h */
-#endif /* NO_INET6 */
 #include <stdlib.h>
 #include <stdarg.h>
 #include <crtdbg.h>

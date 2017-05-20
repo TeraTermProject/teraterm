@@ -131,9 +131,7 @@ typedef TCharAttr *PCharAttr;
 
 #define HostNameMaxLength 1024
 //#define HostNameMaxLength 80
-#ifndef NO_INET6
 #define ProtocolFamilyMaxLength 80
-#endif /* NO_INET6 */
 
   /* internal WM_USER messages */
 #define WM_USER_ACCELCOMMAND WM_USER+1
@@ -488,10 +486,8 @@ struct tttset {
 	WORD EnableContinuedLineCopy;
 #endif /* NO_COPYLINE_FIX */
 	COLORREF ANSIColor[16];
-#ifndef NO_INET6
 	/* protocol used in connect() */
 	int ProtocolFamily;
-#endif /* NO_INET6 */
   char MouseCursorName[16];
 	int AlphaBlend;
 	char CygwinDirectory[MAX_PATH];
@@ -755,9 +751,7 @@ typedef struct {
 	WORD Telnet; // non-zero: enable telnet
 	WORD TelPort; // default TCP port# for telnet
 	WORD TCPPort; // TCP port #
-#ifndef NO_INET6
 	WORD ProtocolFamily; // Protocol Family (AF_INET/AF_INET6/AF_UNSPEC)
-#endif /* NO_INET6 */
 	WORD ComPort; // serial port #
 	WORD MaxComPort; // max serial port #
 } TGetHNRec;
@@ -1013,12 +1007,10 @@ typedef struct {
 	BOOL ProtoFlag;
 	/* message flag */
 	WORD NoMsg;
-#ifndef NO_INET6
 	/* if TRUE, teraterm trys to connect other protocol family */
 	BOOL RetryWithOtherProtocol;
 	struct addrinfo FAR * res0;
 	struct addrinfo FAR * res;
-#endif /* NO_INET6 */
 	char *Locale;
 	int *CodePage;
 	int *ConnetingTimeout;

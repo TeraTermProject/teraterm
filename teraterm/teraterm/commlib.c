@@ -16,15 +16,12 @@
 #include "ttplug.h" /* TTPLUG */
 
 #include "commlib.h"
-#ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#endif /* NO_INET6 */
 #include <stdio.h> /* for _snprintf() */
 #include <time.h>
 #include <locale.h>
 
-#ifndef NO_INET6
 static SOCKET OpenSocket(PComVar);
 static void AsyncConnect(PComVar);
 static int CloseSocket(SOCKET);
@@ -74,7 +71,6 @@ static int CloseSocket(SOCKET s)
 {
 	return Pclosesocket(s);
 }
-#endif /* NO_INET6 */
 
 #define CommInQueSize 8192
 #define CommOutQueSize 2048
@@ -258,26 +254,14 @@ error:
 
 void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 {
-#ifdef NO_INET6
-	int Err;
-#endif /* NO_INET6 */
 	char ErrMsg[21+256];
 	char P[50+256];
 
 	MSG Msg;
-#ifndef NO_INET6
 	ADDRINFO hints;
 	char pname[NI_MAXSERV];
-#else
-	char HEntBuff[MAXGETHOSTSTRUCT];
-	u_long addr;
-	SOCKADDR_IN saddr;
-#endif /* NO_INET6 */
 
 	BOOL InvalidHost;
-#ifdef NO_INET6
-	BOOL BBuf;
-#endif /* NO_INET6 */
 
 	char uimsg[MAX_UIMSG];
 
@@ -299,9 +283,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->PortType = ts->PortType;
 	cv->ComPort = 0;
 	cv->RetryCount = 0;
-#ifndef NO_INET6
 	cv->RetryWithOtherProtocol = TRUE;
-#endif /* NO_INET6 */
 	cv->s = INVALID_SOCKET;
 	cv->ComID = INVALID_HANDLE_VALUE;
 	cv->CanSend = TRUE;
@@ -365,7 +347,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			else {
 				TTXOpenTCP(); /* TTPLUG */
 				cv->Open = TRUE;
-#ifndef NO_INET6
 				/* resolving address */
 				memset(&hints, 0, sizeof(hints));
 				hints.ai_family = ts->ProtocolFamily;
@@ -430,104 +411,6 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				break; /* break for-loop immediately */
 			}
 			break;
-#else
-	if ((ts->HostName[0] >= 0x30) && (ts->HostName[0] <= 0x39))
-	{
-	  addr = Pinet_addr(ts->HostName);
-	  InvalidHost = (addr == 0xffffffff);
-	}
-	else {
-	  HAsync = PWSAAsyncGetHostByName(HW,WM_USER_GETHOST,
-	  ts->HostName,HEntBuff,sizeof(HEntBuff));
-	  if (HAsync == 0)
-	    InvalidHost = TRUE;
-	  else {
-	    cv->ComPort = 1; // set "getting host" flag
-			     //  (see CVTWindow::OnSysCommand())
-	    do {
-	      if (GetMessage(&Msg,0,0,0))
-	      {
-		if ((Msg.hwnd==HW) &&
-		    ((Msg.message == WM_SYSCOMMAND) &&
-		     ((Msg.wParam & 0xfff0) == SC_CLOSE) ||
-		     (Msg.message == WM_COMMAND) &&
-		     (LOWORD(Msg.wParam) == ID_FILE_EXIT) ||
-		     (Msg.message == WM_CLOSE)))
-		{ /* Exit when the user closes Tera Term */
-		  PWSACancelAsyncRequest(HAsync);
-		  HAsync = 0;
-		  cv->ComPort = 0; // clear "getting host" flag
-		  PostMessage(HW,Msg.message,Msg.wParam,Msg.lParam);
-		  return;
-		}
-		if (Msg.message != WM_USER_GETHOST)
-		{ /* Prosess messages */
-		  TranslateMessage(&Msg);
-		  DispatchMessage(&Msg);
-		}
-	      }
-	      else {
-		return;
-	      }
-	    } while (Msg.message!=WM_USER_GETHOST);
-	    cv->ComPort = 0; // clear "getting host" flag
-	    HAsync = 0;
-	    InvalidHost = WSAGETASYNCERROR(Msg.lParam) != 0;
-	    if (! InvalidHost)
-	    {
-	      if (((PHOSTENT)HEntBuff)->h_addr_list != NULL)
-		memcpy(&addr,
-		  ((PHOSTENT)HEntBuff)->h_addr_list[0],sizeof(addr));
-	      else
-		InvalidHost = TRUE;
-	    }
-	  }
-
-	}
-
-	if (InvalidHost)
-	{
-	  if (cv->NoMsg==0) {
-	    get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-	    get_lang_msg("MSG_INVALID_HOST_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Invalid host", ts->UILanguageFile);
-	    MessageBox(cv->HWin, ts->UIMsg, uimsg, MB_TASKMODAL | MB_ICONEXCLAMATION);
-	  }
-	}
-	else {
-	  cv->s= Psocket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-	  if (cv->s==INVALID_SOCKET)
-	  {
-	    InvalidHost = TRUE;
-	    if (cv->NoMsg==0) {
-	      get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-	      get_lang_msg("MSG_COMM_TIMEOUT_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot connect the host", ts->UILanguageFile);
-	      MessageBox(cv->HWin, ts->UIMsg, uimsg, MB_TASKMODAL | MB_ICONEXCLAMATION);
-	    }
-	  }
-	  else {
-	    BBuf = TRUE;
-	    Psetsockopt(cv->s,(int)SOL_SOCKET,SO_OOBINLINE,(char FAR *)&BBuf,sizeof(BBuf));
-
-	    PWSAAsyncSelect(cv->s,cv->HWin,WM_USER_COMMOPEN, FD_CONNECT);
-	    saddr.sin_family = AF_INET;
-	    saddr.sin_port = Phtons(ts->TCPPort);
-	    saddr.sin_addr.s_addr = addr;
-	    memset(saddr.sin_zero,0,8);
-
-	    Err = Pconnect(cv->s,(LPSOCKADDR)&saddr,sizeof(saddr));
-	    if (Err!=0 ) Err = PWSAGetLastError();
-	    if (Err==WSAEWOULDBLOCK )
-	    {
-	      /* Do nothing */
-	    }
-	    else if (Err!=0 )
-	      PostMessage(cv->HWin, WM_USER_COMMOPEN,0,
-			  MAKELONG(FD_CONNECT,Err));
-	  }
-	}
-      }
-      break;
-#endif /* NO_INET6 */
 
 		case IdSerial:
 			InitFileIO(IdSerial);  /* TTPLUG */
@@ -630,9 +513,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 
 	} /* end of "switch" */
 
-#ifndef NO_INET6
 BreakSC:
-#endif /* NO_INET6 */
 	if (InvalidHost) {
 		PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
 		if ( (ts->PortType==IdTCPIP) && cv->Open ) {
@@ -757,7 +638,6 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, "%s", ts->UIMsg);
 			}
 			if (HIWORD(lParam)>0) {
-#ifndef NO_INET6
 				/* connect() failed */
 				if (cv->res->ai_next != NULL) {
 					/* try to connect with other protocol */
@@ -784,20 +664,10 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 					cv->RetryWithOtherProtocol = FALSE;
 					return;
 				}
-#else
-	if (cv->NoMsg==0) {
-	  get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-	  MessageBox(cv->HWin, ErrMsg, uimsg, MB_TASKMODAL | MB_ICONEXCLAMATION);
-	}
-	PostMessage(cv->HWin, WM_USER_COMMNOTIFY, 0, FD_CLOSE);
-	return;
-#endif /* NO_INET6 */
 			}
 
-#ifndef NO_INET6
 			/* here is connection established */
 			cv->RetryWithOtherProtocol = FALSE;
-#endif /* NO_INET6 */
 			PWSAAsyncSelect(cv->s,cv->HWin,WM_USER_COMMNOTIFY, FD_READ | FD_OOB | FD_CLOSE);
 			TCPIPClosed = FALSE;
 			break;
@@ -891,9 +761,7 @@ void CommClose(PComVar cv)
 				PWSACancelAsyncRequest(HAsync);
 			}
 			HAsync = 0;
-#ifndef NO_INET6
 			Pfreeaddrinfo(cv->res0);
-#endif /* NO_INET6 */
 			if ( cv->s!=INVALID_SOCKET ) {
 				Pclosesocket(cv->s);
 			}

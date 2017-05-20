@@ -6,9 +6,7 @@
 
 #include "teraterm.h"
 #include "ttwsk.h"
-#ifndef NO_INET6
 #include "WSAAsyncGetAddrInfo.h"
-#endif /* NO_INET6 */
 
 static HANDLE HWinsock = NULL;
 
@@ -152,13 +150,11 @@ BOOL LoadWinsock()
     PWSACleanup = (TWSACleanup)GetProcAddress(HWinsock, MAKEINTRESOURCE(IdWSACLEANUP));
     if (PWSACleanup==NULL) Err = TRUE;
 
-#ifndef NO_INET6
 //    Pgetaddrinfo = (Tgetaddrinfo)GetProcAddress(HWinsock, "getaddrinfo");
 //    if (Pgetaddrinfo==NULL) Err = TRUE;
 
     Pfreeaddrinfo = freeaddrinfo;
     PWSAAsyncGetAddrInfo = WSAAsyncGetAddrInfo;
-#endif /* NO_INET6 */
 
     if (Err)
     {

@@ -53,12 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "resource.h"
 #include <commctrl.h>
 #include <commdlg.h>
-#ifndef NO_INET6
 #include <winsock2.h>
 static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
-#else
-#include <winsock.h>
-#endif							/* NO_INET6 */
 
 #include <Lmcons.h>
 
@@ -666,14 +662,12 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 static unsigned short find_local_port(PTInstVar pvar)
 {
 	int tries;
-#ifndef NO_INET6
 	SOCKET connecter;
 	struct addrinfo hints;
 	struct addrinfo FAR *res;
 	struct addrinfo FAR *res0;
 	unsigned short port;
 	char pname[NI_MAXHOST];
-#endif							/* NO_INET6 */
 
 	if (pvar->session_settings.DefaultAuthMethod != SSH_AUTH_RHOSTS) {
 		return 0;
@@ -686,7 +680,6 @@ static unsigned short find_local_port(PTInstVar pvar)
 	 */
 	srand((unsigned) GetTickCount());
 
-#ifndef NO_INET6
 	for (tries = 20; tries > 0; tries--) {
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = pvar->ts->ProtocolFamily;
@@ -727,41 +720,12 @@ static unsigned short find_local_port(PTInstVar pvar)
 	}
 
 	return 0;
-#else
-	for (tries = 20; tries > 0; tries--) {
-		SOCKET connecter = socket(AF_INET, SOCK_STREAM, 0);
-		struct sockaddr_in connecter_addr;
-
-		connecter_addr.sin_family = AF_INET;
-		connecter_addr.sin_port = (unsigned) rand() % 512 + 512;
-		connecter_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-		if (connecter == INVALID_SOCKET) {
-			return 0;
-		}
-
-		if (bind
-		    (connecter, (struct sockaddr FAR *) &connecter_addr,
-		     sizeof(connecter_addr)) != SOCKET_ERROR) {
-		    closesocket(connecter);
-			return connecter_addr.sin_port;
-		} else if (WSAGetLastError() != WSAEADDRINUSE) {
-			closesocket(connecter);
-			return 0;
-		}
-
-		closesocket(connecter);
-	}
-
-	return 0;
-#endif							/* NO_INET6 */
 }
 
 static int PASCAL FAR TTXconnect(SOCKET s,
                                  const struct sockaddr FAR * name,
                                  int namelen)
 {
-#ifndef NO_INET6
 	if (pvar->socket == INVALID_SOCKET || pvar->socket != s) {
 		struct sockaddr_storage ss;
 		int len;
@@ -792,20 +756,6 @@ static int PASCAL FAR TTXconnect(SOCKET s,
 
 		bind(s, (struct sockaddr FAR *) &ss, len);
 	}
-#else
-	if (pvar->socket == INVALID_SOCKET) {
-		struct sockaddr_in addr;
-
-		pvar->socket = s;
-
-		addr.sin_family = AF_INET;
-		addr.sin_port = htons(find_local_port(pvar));
-		addr.sin_addr.s_addr = INADDR_ANY;
-		memset(addr.sin_zero, 0, sizeof(addr.sin_zero));
-
-		bind(s, (struct sockaddr FAR *) &addr, sizeof(addr));
-	}
-#endif							/* NO_INET6 */
 
 	return (pvar->Pconnect) (s, name, namelen);
 }
@@ -1380,7 +1330,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		                 Telnet ? IDC_HOSTTELNET : IDC_HOSTOTHER);
 		SendDlgItemMessage(dlg, IDC_HOSTTCPPORT, EM_LIMITTEXT, 5, 0);
 		SetDlgItemInt(dlg, IDC_HOSTTCPPORT, GetHNRec->TCPPort, FALSE);
-#ifndef NO_INET6
 		for (i = 0; ProtocolFamilyList[i]; ++i) {
 			SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_ADDSTRING,
 			                   0, (LPARAM) ProtocolFamilyList[i]);
@@ -1388,7 +1337,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, EM_LIMITTEXT,
 		                   ProtocolFamilyMaxLength - 1, 0);
 		SendDlgItemMessage(dlg, IDC_HOSTTCPPROTOCOL, CB_SETCURSEL, 0, 0);
-#endif							/* NO_INET6 */
 
 		/////// SSH version
 		for (i = 0; ssh_version[i]; ++i) {
@@ -1472,7 +1420,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, TRUE); // enabled
 		}
-#ifndef NO_INET6
 		else {
 			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
 			                 FALSE);
@@ -1484,11 +1431,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 			enable_dlg_items(dlg, IDC_HISTORY, IDC_HISTORY, FALSE); // disabled
 		}
-#else
-		else
-			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
-							 FALSE);
-#endif							/* NO_INET6 */
 
 		// Host dialogにフォーカスをあてる (2004.10.2 yutaka)
 		if (GetHNRec->PortType == IdTCPIP) {
@@ -1539,9 +1481,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			GetHNRec = (PGetHNRec) GetWindowLong(dlg, DWL_USER);
 			if (GetHNRec != NULL) {
 				if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
-#ifndef NO_INET6
 					char afstr[BUFSIZ];
-#endif							/* NO_INET6 */
 					i = GetDlgItemInt(dlg, IDC_HOSTTCPPORT, &Ok, FALSE);
 					if (Ok) {
 						GetHNRec->TCPPort = i;
@@ -1552,7 +1492,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 						           "Tera Term", MB_OK | MB_ICONEXCLAMATION);
 						return TRUE;
 					}
-#ifndef NO_INET6
 #define getaf(str) \
 ((strcmp((str), "IPv6") == 0) ? AF_INET6 : \
  ((strcmp((str), "IPv4") == 0) ? AF_INET : AF_UNSPEC))
@@ -1560,7 +1499,6 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 					GetDlgItemText(dlg, IDC_HOSTTCPPROTOCOL, afstr,
 					               sizeof(afstr));
 					GetHNRec->ProtocolFamily = getaf(afstr);
-#endif							/* NO_INET6 */
 					GetHNRec->PortType = IdTCPIP;
 					GetDlgItemText(dlg, IDC_HOSTNAME, GetHNRec->HostName,
 					               HostNameMaxLength);
@@ -1628,10 +1566,8 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		case IDC_HOSTTCPIP:
 			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
 			                 TRUE);
-#ifndef NO_INET6
 			enable_dlg_items(dlg, IDC_HOSTTCPPROTOCOLLABEL,
 			                 IDC_HOSTTCPPROTOCOL, TRUE);
-#endif							/* NO_INET6 */
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, FALSE);
 
 			enable_dlg_items(dlg, IDC_SSH_VERSION_LABEL, IDC_SSH_VERSION_LABEL, TRUE); // disabled (2004.11.23 yutaka)
@@ -1649,10 +1585,8 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			enable_dlg_items(dlg, IDC_HOSTCOMLABEL, IDC_HOSTCOM, TRUE);
 			enable_dlg_items(dlg, IDC_HOSTNAMELABEL, IDC_HOSTTCPPORT,
 			                 FALSE);
-#ifndef NO_INET6
 			enable_dlg_items(dlg, IDC_HOSTTCPPROTOCOLLABEL,
 			                 IDC_HOSTTCPPROTOCOL, FALSE);
-#endif							/* NO_INET6 */
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, FALSE); // disabled
 			enable_dlg_items(dlg, IDC_SSH_VERSION_LABEL, IDC_SSH_VERSION_LABEL, FALSE); // disabled (2004.11.23 yutaka)
 
@@ -2108,12 +2042,8 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 			option[hostlen] = 0;
 
 			// ポート指定が無い時は":22"を足す
-#ifndef NO_INET6
 			if (option[0] == '[' && option[hostlen-1] == ']' ||     // IPv6 raw address without port
 			    option[0] != '[' && _mbschr(option, ':') == NULL) { // hostname or IPv4 raw address without port
-#else
-			if (_mbschr(option, ':') == NULL) {
-#endif							/* NO_INET6 */
 				memcpy_s(option+hostlen, optlen-hostlen, ":22", 3);
 				hostlen += 3;
 			}

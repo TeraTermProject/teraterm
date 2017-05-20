@@ -24,10 +24,8 @@
 #include "oniguruma.h"
 #undef ONIG_EXTERN
 
-#ifndef NO_INET6
 #include <winsock2.h>
 static char FAR * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
-#endif /* NO_INET6 */
 
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
@@ -2054,7 +2052,6 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetRB(Dialog,GetHNRec->Telnet,IDC_HOSTTELNET,IDC_HOSTTELNET);
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPORT, EM_LIMITTEXT,5,0);
 			SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TCPPort,FALSE);
-#ifndef NO_INET6
 			for (i=0; ProtocolFamilyList[i]; ++i) {
 				SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_ADDSTRING,
 				                   0, (LPARAM)ProtocolFamilyList[i]);
@@ -2062,8 +2059,6 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, EM_LIMITTEXT,
 			                   ProtocolFamilyMaxLength-1, 0);
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_SETCURSEL,0,0);
-#endif /* NO_INET6 */
-
 
 			j = 0;
 			w = 1;
@@ -2119,16 +2114,9 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			if ( GetHNRec->PortType==IdTCPIP ) {
 				DisableDlgItem(Dialog,IDC_HOSTCOMLABEL,IDC_HOSTCOM);
 			}
-#ifndef INET6
 			else {
 				DisableDlgItem(Dialog,IDC_HOSTNAMELABEL,IDC_HOSTTCPPORT);
 			}
-#else
-			else {
-				DisableDlgItem(Dialog,IDC_HOSTNAMELABEL,IDC_HOSTTCPPORT);
-				DisableDlgItem(Dialog,IDC_HOSTTCPPROTOCOLLABEL,IDC_HOSTTCPPROTOCOL);
-			}
-#endif /* NO_INET6 */
 
 			return TRUE;
 
@@ -2137,9 +2125,7 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				case IDOK:
 					GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWL_USER);
 					if ( GetHNRec!=NULL ) {
-#ifndef NO_INET6
 						char afstr[BUFSIZ];
-#endif /* NO_INET6 */
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
 						if ( GetHNRec->PortType==IdTCPIP ) {
 							GetDlgItemText(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
@@ -2152,14 +2138,12 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						if (Ok) {
 							GetHNRec->TCPPort = i;
 						}
-#ifndef NO_INET6
 #define getaf(str) \
 	((strcmp((str), "IPv6") == 0) ? AF_INET6 : \
 	((strcmp((str), "IPv4") == 0) ? AF_INET : AF_UNSPEC))
 						memset(afstr, 0, sizeof(afstr));
 						GetDlgItemText(Dialog, IDC_HOSTTCPPROTOCOL, afstr, sizeof(afstr));
 						GetHNRec->ProtocolFamily = getaf(afstr);
-#endif /* NO_INET6 */
 						memset(EntName,0,sizeof(EntName));
 						GetDlgItemText(Dialog, IDC_HOSTCOM, EntName, sizeof(EntName)-1);
 						if (strncmp(EntName, "COM", 3) == 0 && EntName[3] != '\0') {
@@ -2195,18 +2179,14 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				case IDC_HOSTTCPIP:
 					EnableDlgItem(Dialog,IDC_HOSTNAMELABEL,IDC_HOSTTCPPORT);
-#ifndef NO_INET6
 					EnableDlgItem(Dialog,IDC_HOSTTCPPROTOCOLLABEL,IDC_HOSTTCPPROTOCOL);
-#endif /* NO_INET6 */
 					DisableDlgItem(Dialog,IDC_HOSTCOMLABEL,IDC_HOSTCOM);
 					return TRUE;
 
 				case IDC_HOSTSERIAL:
 					EnableDlgItem(Dialog,IDC_HOSTCOMLABEL,IDC_HOSTCOM);
 					DisableDlgItem(Dialog,IDC_HOSTNAMELABEL,IDC_HOSTTCPPORT);
-#ifndef NO_INET6
 					DisableDlgItem(Dialog,IDC_HOSTTCPPROTOCOLLABEL,IDC_HOSTTCPPROTOCOL);
-#endif /* NO_INET6 */
 					break;
 
 				case IDC_HOSTTELNET:

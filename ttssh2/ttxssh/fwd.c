@@ -40,9 +40,7 @@ See LICENSE.TXT for the license.
 #include "ttcommon.h"
 
 #include <assert.h>
-#ifndef NO_INET6
 #include "WSAAsyncGetAddrInfo.h"
-#endif							/* NO_INET6 */
 
 #define WM_SOCK_ACCEPT (WM_APP+9999)
 #define WM_SOCK_IO     (WM_APP+9998)
@@ -56,14 +54,11 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 static int find_request_num(PTInstVar pvar, SOCKET s)
 {
 	int i;
-#ifndef NO_INET6
 	int j;
-#endif							/* NO_INET6 */
 
 	if (s == INVALID_SOCKET)
 		return -1;
 
-#ifndef NO_INET6
 	for (i = 0; i < pvar->fwd_state.num_requests; i++) {
 		for (j = 0; j < pvar->fwd_state.requests[i].num_listening_sockets;
 			 ++j) {
@@ -73,14 +68,6 @@ static int find_request_num(PTInstVar pvar, SOCKET s)
 			}
 		}
 	}
-#else
-	for (i = 0; i < pvar->fwd_state.num_requests; i++) {
-		if ((pvar->fwd_state.requests[i].status & FWD_DELETED) == 0
-			&& pvar->fwd_state.requests[i].listening_socket == s) {
-			return i;
-		}
-	}
-#endif							/* NO_INET6 */
 
 	return -1;
 }
@@ -119,7 +106,6 @@ static int find_request_num_from_async_request(PTInstVar pvar,
 	return -1;
 }
 
-#ifndef NO_INET6
 static int find_listening_socket_num(PTInstVar pvar, int request_num,
                                      SOCKET s)
 {
@@ -133,7 +119,6 @@ static int find_listening_socket_num(PTInstVar pvar, int request_num,
 	/* not found */
 	return -1;
 }
-#endif							/* NO_INET6 */
 
 static void drain_matching_messages(HWND wnd, UINT msg, WPARAM wParam)
 {
@@ -222,15 +207,10 @@ int FWD_check_local_channel_num(PTInstVar pvar, int local_num)
 
 static void request_error(PTInstVar pvar, int request_num, int err)
 {
-#ifndef NO_INET6
 	SOCKET FAR *s =
 		pvar->fwd_state.requests[request_num].listening_sockets;
 	int i;
-#else
-	SOCKET s = pvar->fwd_state.requests[request_num].listening_socket;
-#endif							/* NO_INET6 */
 
-#ifndef NO_INET6
 	for (i = 0;
 	     i < pvar->fwd_state.requests[request_num].num_listening_sockets;
 	     ++i) {
@@ -240,13 +220,6 @@ static void request_error(PTInstVar pvar, int request_num, int err)
 				INVALID_SOCKET;
 		}
 	}
-#else
-	if (s != INVALID_SOCKET) {
-		safe_closesocket(pvar, s);
-		pvar->fwd_state.requests[request_num].listening_socket =
-			INVALID_SOCKET;
-	}
-#endif							/* NO_INET6 */
 
 	UTIL_get_lang_msg("MSG_FWD_REQUEST_ERROR", pvar,
 	                  "Communications error while listening for a connection to forward.\n"
@@ -288,13 +261,9 @@ static void really_delete_request(PTInstVar pvar, int request_num)
 		safe_WSACancelAsyncRequest(pvar, request->to_host_lookup_handle);
 		request->to_host_lookup_handle = 0;
 	}
-#ifndef NO_INET6
+
   /*****/
 	/* freeaddrinfo(); */
-#else
-	free(request->to_host_hostent_buf);
-	request->to_host_hostent_buf = NULL;
-#endif							/* NO_INET6 */
 }
 
 void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
@@ -586,7 +555,7 @@ static void make_local_connection(PTInstVar pvar, int channel_num)
 	FWDChannel FAR *channel = pvar->fwd_state.channels + channel_num;
 	FWDRequest FAR *request =
 		pvar->fwd_state.requests + channel->request_num;
-#ifndef NO_INET6
+
 	for (channel->to_host_addrs = request->to_host_addrs;
 	     channel->to_host_addrs;
 	     channel->to_host_addrs = channel->to_host_addrs->ai_next) {
@@ -619,74 +588,30 @@ static void make_local_connection(PTInstVar pvar, int channel_num)
 	}
 
 	channel_opening_error(pvar, channel_num, WSAGetLastError());
-#else
-	struct sockaddr_in addr;
-
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons((unsigned short) request->spec.to_port);
-	addr.sin_addr.s_addr = htonl(request->to_host_addr);
-
-	if ((channel->local_socket =
-	     socket(AF_INET, SOCK_STREAM, 0)) != INVALID_SOCKET
-	  && WSAAsyncSelect(channel->local_socket, make_accept_wnd(pvar),
-	                    WM_SOCK_IO,
-	                    FD_CONNECT | FD_READ | FD_CLOSE | FD_WRITE) !=
-	     SOCKET_ERROR) {
-		if (connect
-		    (channel->local_socket, (struct sockaddr FAR *) &addr,
-		     sizeof(addr)) != SOCKET_ERROR) {
-			connected_local_connection(pvar, channel_num);
-			return;
-		} else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			/* do nothing, we'll just wait */
-			return;
-		}
-	}
-
-	channel_opening_error(pvar, channel_num, WSAGetLastError());
-#endif							/* NO_INET6 */
 }
 
-#ifndef NO_INET6
 static void accept_local_connection(PTInstVar pvar, int request_num,
                                     int listening_socket_num)
 {
-#else
-static void accept_local_connection(PTInstVar pvar, int request_num)
-{
-#endif							/* NO_INET6 */
 	int channel_num;
 	SOCKET s;
-#ifndef NO_INET6
 	struct sockaddr_storage addr;
 	char hname[NI_MAXHOST];
 	char strport[NI_MAXSERV]; // ws2tcpip.h
-#else
-	struct sockaddr addr;
-#endif							/* NO_INET6 */
 	int addrlen = sizeof(addr);
 	char buf[1024];
-#ifndef INET6
 	BYTE FAR *IP;
-#endif							/* NO_INET6 */
 	FWDChannel FAR *channel;
 	FWDRequest FAR *request = &pvar->fwd_state.requests[request_num];
 	BOOL is_localhost = FALSE;
 
-#ifndef NO_INET6
 	s = accept(request->listening_sockets[listening_socket_num],
 	           (struct sockaddr FAR *) &addr, &addrlen);
-#else
-	s = accept(request->listening_socket, &addr, &addrlen);
-#endif							/* NO_INET6 */
 	if (s == INVALID_SOCKET)
 		return;
 
-#ifndef INET6
 	IP = (BYTE FAR *) & ((struct sockaddr_in *) (&addr))->sin_addr.s_addr;
-#endif
 
-#ifndef NO_INET6
 	// SSH2 port-forwardingに接続元のリモートポートが必要。(2005.2.27 yutaka)
 	if (getnameinfo
 	    ((struct sockaddr FAR *) &addr, addrlen, hname, sizeof(hname),
@@ -697,21 +622,9 @@ static void accept_local_connection(PTInstVar pvar, int request_num)
 	          "Host %s connecting to port %d; forwarding to %s:%d",
 	          hname, request->spec.from_port, request->spec.to_host,
 	          request->spec.to_port);
-#else
-	_snprintf(buf, sizeof(buf),
-	          "Host %d.%d.%d.%d connecting to port %d; forwarding to %s:%d",
-	          IP[0], IP[1], IP[2], IP[3], request->spec.from_port,
-	          request->spec.to_host, request->spec.to_port);
-	buf[NUM_ELEM(buf) - 1] = 0;
-#endif							/* NO_INET6 */
 	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
-#ifndef NO_INET6
 	strncpy_s(buf, sizeof(buf), hname, _TRUNCATE);
-#else
-	_snprintf(buf, sizeof(buf), "%d.%d.%d.%d", IP[0], IP[1], IP[2], IP[3]);
-	buf[NUM_ELEM(buf) - 1] = 0;
-#endif
 
 	channel_num = alloc_channel(pvar, FWD_LOCAL_CONNECTED, request_num);
 	channel = pvar->fwd_state.channels + channel_num;
@@ -809,13 +722,6 @@ static void found_to_host_addr(PTInstVar pvar, int request_num)
 {
 	int i;
 
-#ifdef NO_INET6
-	pvar->fwd_state.requests[request_num].to_host_addr =
-		ntohl(*(uint32 FAR *)
-			  ((HOSTENT FAR *) pvar->fwd_state.requests[request_num].
-			   to_host_hostent_buf)->h_addr_list[0]);
-#endif							/* NO_INET6 */
-
 	for (i = 0; i < pvar->fwd_state.num_channels; i++) {
 		if (pvar->fwd_state.channels[i].request_num == request_num) {
 			make_local_connection(pvar, i);
@@ -844,12 +750,9 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 			if (HIWORD(lParam) != 0) {
 				request_error(pvar, request_num, HIWORD(lParam));
 			} else {
-#ifndef NO_INET6
 				int listening_socket_num;
-#endif							/* NO_INET6 */
 				switch (LOWORD(lParam)) {
 				case FD_ACCEPT:
-#ifndef NO_INET6
 					listening_socket_num =
 						find_listening_socket_num(pvar, request_num,
 						                          (SOCKET) wParam);
@@ -857,9 +760,6 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 						return FALSE;
 					accept_local_connection(pvar, request_num,
 					                        listening_socket_num);
-#else
-					accept_local_connection(pvar, request_num);
-#endif							/* NO_INET6 */
 					break;
 				}
 			}
@@ -879,27 +779,18 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 				found_to_host_addr(pvar, request_num);
 			}
 			pvar->fwd_state.requests[request_num].to_host_lookup_handle = 0;
-#ifdef NO_INET6
-			free(pvar->fwd_state.requests[request_num].
-			     to_host_hostent_buf);
-			pvar->fwd_state.requests[request_num].to_host_hostent_buf =
-				NULL;
-#endif							/* NO_INET6 */
 			return TRUE;
 		}
 
 	case WM_SOCK_IO:{
 			int channel_num = find_channel_num(pvar, (SOCKET) wParam);
-#ifndef NO_INET6
 			FWDChannel FAR *channel =
 				pvar->fwd_state.channels + channel_num;
-#endif							/* NO_INET6 */
 
 			if (channel_num < 0)
 				return TRUE;
 
 			if (HIWORD(lParam) != 0) {
-#ifndef NO_INET6
 				if (LOWORD(lParam) == FD_CONNECT) {
 					if (channel->to_host_addrs->ai_next == NULL) {
 						/* all protocols were failed */
@@ -951,15 +842,6 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 					              HIWORD(lParam));
 					return TRUE;
 				}
-#else
-				if (LOWORD(lParam) == FD_CONNECT) {
-					channel_opening_error(pvar, channel_num,
-					                      HIWORD(lParam));
-				} else {
-					channel_error(pvar, "accessing", channel_num,
-					              HIWORD(lParam));
-				}
-#endif							/* NO_INET6 */
 			} else {
 				switch (LOWORD(lParam)) {
 				case FD_CONNECT:
@@ -1074,25 +956,15 @@ void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
    It returns the listening socket for the request, if there is one.
    The caller must close this socket if it is not INVALID_SOCKET.
 */
-#ifndef NO_INET6
 static SOCKET FAR *delete_request(PTInstVar pvar, int request_num,
                                   int *p_num_listening_sockets)
 {
-#else
-static SOCKET delete_request(PTInstVar pvar, int request_num)
-{
-#endif							/* NO_INET6 */
 	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
-#ifndef NO_INET6
 	SOCKET FAR *lp_listening_sockets;
-#else
-	SOCKET result = INVALID_SOCKET;
-#endif							/* NO_INET6 */
 
 /* safe to shut down the listening socket here. Any pending connections
    that haven't yet been turned into channels will be broken, but that's
    just tough luck. */
-#ifndef NO_INET6
 	*p_num_listening_sockets = request->num_listening_sockets;
 	lp_listening_sockets = request->listening_sockets;
 	if (request->listening_sockets != NULL) {
@@ -1107,20 +979,6 @@ static SOCKET delete_request(PTInstVar pvar, int request_num)
 	}
 
 	return lp_listening_sockets;
-#else
-	if (request->listening_socket != INVALID_SOCKET) {
-		result = request->listening_socket;
-		request->listening_socket = INVALID_SOCKET;
-	}
-
-	request->status |= FWD_DELETED;
-
-	if (request->num_channels == 0) {
-		really_delete_request(pvar, request_num);
-	}
-
-	return result;
-#endif							/* NO_INET6 */
 }
 
 static BOOL are_specs_identical(FWDRequestSpec FAR * spec1,
@@ -1139,7 +997,6 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
 
 	if (request->spec.type == FWD_LOCAL_TO_REMOTE) {
-#ifndef NO_INET6
 		struct addrinfo hints;
 		struct addrinfo FAR *res;
 		struct addrinfo FAR *res0;
@@ -1211,50 +1068,16 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 	}
 
 	return TRUE;
-#else
-		SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
-		struct sockaddr_in addr;
-
-		addr.sin_family = AF_INET;
-		addr.sin_port = htons((unsigned short) request->spec.from_port);
-		addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-		request->listening_socket = s;
-		if (s == INVALID_SOCKET
-			|| WSAAsyncSelect(s, make_accept_wnd(pvar), WM_SOCK_ACCEPT,
-							  FD_ACCEPT | FD_READ | FD_CLOSE | FD_WRITE) ==
-			SOCKET_ERROR
-			|| bind(s, (struct sockaddr FAR *) &addr,
-					sizeof(addr)) == SOCKET_ERROR
-			|| listen(s, SOMAXCONN) == SOCKET_ERROR) {
-			if (report_error) {
-				notify_nonfatal_error(pvar,
-									  "Some socket(s) required for port forwarding could not be initialized.\n"
-									  "Some port forwarding services may not be available.");
-			}
-			return FALSE;
-		}
-	}
-
-	return TRUE;
-#endif							/* NO_INET6 */
 }
 
 /* This function will only be called on a request when all its channels are
    closed. */
-#ifndef NO_INET6
 static BOOL init_request(PTInstVar pvar, int request_num,
                          BOOL report_error, SOCKET FAR * listening_sockets,
                          int num_listening_sockets)
 {
-#else
-static BOOL init_request(PTInstVar pvar, int request_num,
-						 BOOL report_error, SOCKET listening_socket)
-{
-#endif							/* NO_INET6 */
 	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
 
-#ifndef NO_INET6
 	request->num_listening_sockets = 0;
 	request->listening_sockets = NULL;
 	request->to_host_addrs = NULL;
@@ -1274,26 +1097,6 @@ static BOOL init_request(PTInstVar pvar, int request_num,
 		assert(listening_sockets == NULL);
 		return TRUE;
 	}
-#else
-	request->listening_socket = INVALID_SOCKET;
-	request->to_host_addr = 0;
-	request->to_host_hostent_buf = NULL;
-	request->to_host_lookup_handle = 0;
-	request->status = 0;
-
-	if (pvar->fwd_state.in_interactive_mode) {
-		if (listening_socket != INVALID_SOCKET) {
-			request->listening_socket = listening_socket;
-			return TRUE;
-		} else {
-			return interactive_init_request(pvar, request_num,
-											report_error);
-		}
-	} else {
-		assert(listening_socket == INVALID_SOCKET);
-		return TRUE;
-	}
-#endif							/* NO_INET6 */
 }
 
 void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
@@ -1302,15 +1105,11 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 	FWDRequestSpec FAR *new_specs =
 		(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) * num_specs);
 	char FAR *specs_accounted_for;
-#ifndef NO_INET6
 	typedef struct _saved_sockets {
 		SOCKET FAR *listening_sockets;
 		int num_listening_sockets;
 	} saved_sockets_t;
 	saved_sockets_t FAR *ptr_to_saved_sockets;
-#else
-	SOCKET FAR *saved_sockets;
-#endif							/* NO_INET6 */
 	int i;
 	int num_new_requests = num_specs;
 	int num_free_requests = 0;
@@ -1331,22 +1130,14 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 	}
 
 	specs_accounted_for = (char FAR *) malloc(sizeof(char) * num_specs);
-#ifndef NO_INET6
 	ptr_to_saved_sockets =
 		(saved_sockets_t FAR *) malloc(sizeof(saved_sockets_t) *
 		                               num_specs);
-#else
-	saved_sockets = (SOCKET FAR *) malloc(sizeof(SOCKET) * num_specs);
-#endif							/* NO_INET6 */
 
 	memset(specs_accounted_for, 0, num_specs);
 	for (i = 0; i < num_specs; i++) {
-#ifndef NO_INET6
 		ptr_to_saved_sockets[i].listening_sockets = NULL;
 		ptr_to_saved_sockets[i].num_listening_sockets = 0;
-#else
-		saved_sockets[i] = INVALID_SOCKET;
-#endif							/* NO_INET6 */
 	}
 
 	for (i = pvar->fwd_state.num_requests - 1; i >= 0; i--) {
@@ -1362,16 +1153,11 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 				specs_accounted_for[new_spec - new_specs] = 1;
 				num_new_requests--;
 			} else {
-#ifndef NO_INET6
 				int num_listening_sockets;
 				SOCKET FAR *listening_sockets;
 				listening_sockets =
 					delete_request(pvar, i, &num_listening_sockets);
-#else
-				SOCKET listening_socket = delete_request(pvar, i);
-#endif							/* NO_INET6 */
 
-#ifndef NO_INET6
 				if (new_spec != NULL) {
 					ptr_to_saved_sockets[new_spec -  new_specs].
 						listening_sockets = listening_sockets;
@@ -1383,13 +1169,6 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 					for (i = 0; i < num_listening_sockets; ++i)
 						safe_closesocket(pvar, listening_sockets[i]);
 				}
-#else
-				if (new_spec != NULL) {
-					saved_sockets[new_spec - new_specs] = listening_socket;
-				} else if (listening_socket != INVALID_SOCKET) {
-					safe_closesocket(pvar, listening_socket);
-				}
-#endif							/* NO_INET6 */
 
 				if (pvar->fwd_state.requests[i].num_channels == 0) {
 					num_free_requests++;
@@ -1427,14 +1206,9 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 			assert(free_request < pvar->fwd_state.num_requests);
 
 			pvar->fwd_state.requests[free_request].spec = new_specs[i];
-#ifndef NO_INET6
 			if (!init_request(pvar, free_request, report_err,
 			                  ptr_to_saved_sockets[i].listening_sockets,
 			                  ptr_to_saved_sockets[i].num_listening_sockets)) {
-#else
-			if (!init_request
-				(pvar, free_request, report_err, saved_sockets[i])) {
-#endif							/* NO_INET6 */
 				report_err = FALSE;
 			}
 
@@ -1442,11 +1216,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 		}
 	}
 
-#ifndef NO_INET6
 	free(ptr_to_saved_sockets);
-#else
-	free(saved_sockets);
-#endif							/* NO_INET6 */
 	free(specs_accounted_for);
 	free(new_specs);
 }
@@ -1541,28 +1311,13 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 	int channel_num;
 	FWDChannel FAR *channel;
 	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
-#ifndef NO_INET6
 	struct addrinfo hints;
 	char pname[NI_MAXSERV];
-#endif							/* NO_INET6 */
 
-#ifndef NO_INET6
 	if (request->to_host_addrs == NULL
 	 && request->to_host_lookup_handle == 0) {
 		HANDLE task_handle;
-#else
-	if (request->to_host_addr == 0 && request->to_host_lookup_handle == 0) {
-		HANDLE task_handle;
-#endif							/* NO_INET6 */
 
-#ifdef NO_INET6
-		if (request->to_host_hostent_buf == NULL) {
-			request->to_host_hostent_buf =
-				(char FAR *) malloc(MAXGETHOSTSTRUCT);
-		}
-#endif							/* NO_INET6 */
-
-#ifndef NO_INET6
 		_snprintf_s(pname, sizeof(pname), _TRUNCATE, "%d", request->spec.to_port);
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_UNSPEC;
@@ -1571,13 +1326,6 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 			WSAAsyncGetAddrInfo(make_accept_wnd(pvar), WM_SOCK_GOTNAME,
 			                    request->spec.to_host, pname, &hints,
 			                    &request->to_host_addrs);
-#else
-		task_handle =
-			WSAAsyncGetHostByName(make_accept_wnd(pvar), WM_SOCK_GOTNAME,
-								  request->spec.to_host,
-								  request->to_host_hostent_buf,
-								  MAXGETHOSTSTRUCT);
-#endif							/* NO_INET6 */
 
 		if (task_handle == 0) {
 			SSH_fail_channel_open(pvar, remote_channel_num);
@@ -1589,13 +1337,7 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 			            pvar->ts->UIMsg,
 			            request->spec.to_host, request->spec.to_port_name);
 			notify_nonfatal_error(pvar, buf);
-#ifndef NO_INET6
-	  /*****/
 			freeaddrinfo(request->to_host_addrs);
-#else
-			free(request->to_host_hostent_buf);
-			request->to_host_hostent_buf = NULL;
-#endif							/* NO_INET6 */
 			return;
 		} else {
 			request->to_host_lookup_handle = task_handle;
@@ -1617,15 +1359,9 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 		*chan_num = channel_num;
 	}
 
-#ifndef NO_INET6
 	if (request->to_host_addrs != NULL) {
 		make_local_connection(pvar, channel_num);
 	}
-#else
-	if (request->to_host_addr != 0) {
-		make_local_connection(pvar, channel_num);
-	}
-#endif							/* NO_INET6 */
 }
 
 void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
@@ -1889,7 +1625,7 @@ void FWD_end(PTInstVar pvar)
 		}
 		free(pvar->fwd_state.channels);
 	}
-#ifndef NO_INET6
+
 	if (pvar->fwd_state.requests != NULL) {
 		for (i = 0; i < pvar->fwd_state.num_requests; i++) {
 			int j;
@@ -1906,18 +1642,6 @@ void FWD_end(PTInstVar pvar)
 		}
 		free(pvar->fwd_state.requests);
 	}
-#else
-	if (pvar->fwd_state.requests != NULL) {
-		for (i = 0; i < pvar->fwd_state.num_requests; i++) {
-			SOCKET s = delete_request(pvar, i);
-
-			if (s != INVALID_SOCKET) {
-				closesocket(s);
-			}
-		}
-		free(pvar->fwd_state.requests);
-	}
-#endif							/* NO_INET6 */
 
 	free(pvar->fwd_state.local_host_IP_numbers);
 	free(pvar->fwd_state.server_listening_specs);

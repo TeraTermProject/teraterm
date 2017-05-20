@@ -29,12 +29,8 @@
 #include "ttlib.h"
 #include "helpid.h"
 #include "teraprn.h"
-#ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#else
-#include <winsock.h>
-#endif /* NO_INET6 */
 #include "ttplug.h"  /* TTPLUG */
 
 #include <stdio.h>
@@ -3643,16 +3639,13 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 	AutoDisconnectedPort = -1;
 
 	CommStart(&cv,lParam,&ts);
-#ifndef NO_INET6
 	if (ts.PortType == IdTCPIP && cv.RetryWithOtherProtocol == TRUE) {
 		Connecting = TRUE;
 	}
 	else {
 		Connecting = FALSE;
 	}
-#else
-	Connecting = FALSE;
-#endif /* NO_INET6 */
+
 	ChangeTitle();
 	if (! cv.Ready) {
 		return 0;
@@ -3853,9 +3846,7 @@ void CVTWindow::OnFileNewConnection()
 	GetHNRec.Telnet = ts.Telnet;
 	GetHNRec.TelPort = ts.TelPort;
 	GetHNRec.TCPPort = ts.TCPPort;
-#ifndef NO_INET6
 	GetHNRec.ProtocolFamily = ts.ProtocolFamily;
-#endif /* NO_INET6 */
 	GetHNRec.ComPort = ts.ComPort;
 	GetHNRec.MaxComPort = ts.MaxComPort;
 
@@ -3881,9 +3872,7 @@ void CVTWindow::OnFileNewConnection()
 			ts.PortType = GetHNRec.PortType;
 			ts.Telnet = GetHNRec.Telnet;
 			ts.TCPPort = GetHNRec.TCPPort;
-#ifndef NO_INET6
 			ts.ProtocolFamily = GetHNRec.ProtocolFamily;
-#endif /* NO_INET6 */
 			ts.ComPort = GetHNRec.ComPort;
 
 			if ((GetHNRec.PortType==IdTCPIP) &&
@@ -3924,7 +3913,6 @@ void CVTWindow::OnFileNewConnection()
 					_snprintf_s(tcpport, sizeof(tcpport), _TRUNCATE, "%d", GetHNRec.TCPPort);
 					strncat_s(Command,sizeof(Command),tcpport,_TRUNCATE);
 				}
-#ifndef NO_INET6
 				/********************************/
 				/* Ç±Ç±Ç…ÉvÉçÉgÉRÉãèàóùÇì¸ÇÍÇÈ */
 				/********************************/
@@ -3933,7 +3921,6 @@ void CVTWindow::OnFileNewConnection()
 				} else if (GetHNRec.ProtocolFamily == AF_INET6) {
 					strncat_s(Command,sizeof(Command)," /6",_TRUNCATE);
 				}
-#endif /* NO_INET6 */
 				strncat_s(Command,sizeof(Command)," ",_TRUNCATE);
 				strncat_s(Command,sizeof(Command),Command2,_TRUNCATE);
 			}

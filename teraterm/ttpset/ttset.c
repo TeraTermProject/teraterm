@@ -4,10 +4,8 @@
 /* IPv6 modification is Copyright(C) 2000 Jun-ya kato <kato@win6.jp> */
 
 /* TTSET.DLL, setup file routines*/
-#ifndef NO_INET6
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#endif							/* NO_INET6 */
 #include "teraterm.h"
 #include "tttypes.h"
 #include <stdio.h>
@@ -3615,7 +3613,6 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 	return (strlen(Temp) > 0);
 }
 #endif
-#ifndef NO_INET6
 static void ParseHostName(char *HostStr, WORD * port)
 {
 	/*
@@ -3700,16 +3697,12 @@ static void ParseHostName(char *HostStr, WORD * port)
 		*port = 23;
 	}
 }
-#endif							/* NO_INET6 */
 
 
 void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 {
 	int i, pos, c;
 	//int param_top;
-#ifdef NO_INET6
-	BYTE b;
-#endif							/* NO_INET6 */
 	char Temp[MaxStrLen]; // ttpmacroから呼ばれることを想定しMaxStrLenサイズとする
 	char Temp2[MaxStrLen];
 	char TempDir[MAXPATHLEN];
@@ -3728,11 +3721,6 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 
 	/* Set AutoConnect true as default (2008.2.16 by steven)*/
 	ts->ComAutoConnect = TRUE;
-
-#ifndef NO_INET6
-	/* user specifies the protocol connecting to the host */
-	/* ts->ProtocolFamily = AF_UNSPEC; */
-#endif							/* NO_INET6 */
 
 	/* Get command line parameters */
 	if (DDETopic != NULL)
@@ -3947,12 +3935,10 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 					ts->VTPos.x = 0;
 			}
 		}
-#ifndef NO_INET6
 		else if (_stricmp(Temp, "/4") == 0)	/* Protocol Tera Term speaking */
 			ts->ProtocolFamily = AF_INET;
 		else if (_stricmp(Temp, "/6") == 0)
 			ts->ProtocolFamily = AF_INET6;
-#endif
 		else if (_stricmp(Temp, "/DUPLICATE") == 0) {	// duplicate session (2004.12.7. yutaka)
 			ts->DuplicateSession = 1;
 
@@ -3995,28 +3981,7 @@ void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		ts->MacroFN[0] = 0;
 
 	if ((ts->HostName[0] != 0) && (ParamPort == IdTCPIP)) {
-#ifndef NO_INET6
 		ParseHostName(ts->HostName, &ParamTCP);
-#else							/* NO_INET6 */
-		if ((_strnicmp(ts->HostName, "telnet://", 9) == 0) ||
-		    (_strnicmp(ts->HostName, "tn3270://", 9) == 0)) {
-			memmove(ts->HostName, &(ts->HostName[9]),
-			        strlen(ts->HostName) - 8);
-			i = strlen(ts->HostName);
-			if ((i > 0) && (ts->HostName[i - 1] == '/'))
-				ts->HostName[i - 1] = 0;
-		}
-		i = 0;
-		do {
-			b = ts->HostName[i];
-			i++;
-		} while ((b != 0) && (b != ':'));
-		if (b == ':') {
-			ts->HostName[i - 1] = 0;
-			if (sscanf(&(ts->HostName[i]), "%d", &ParamTCP) != 1)
-				ParamTCP = 0;
-		}
-#endif							/* NO_INET6 */
 	}
 
 	switch (ParamPort) {

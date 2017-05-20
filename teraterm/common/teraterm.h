@@ -5,11 +5,9 @@
 
 #pragma once
 
-#ifndef NO_INET6
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_ /* Prevent inclusion of winsock.h in windows.h */
 #endif /* _WINSOCKAPI_ */
-#endif /* NO_INET6 */
 #include <windows.h>
 
 /* _MSC_VER ‚Ì’l
