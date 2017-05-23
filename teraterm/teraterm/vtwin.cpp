@@ -2478,10 +2478,7 @@ BOOL CVTWindow::OnMouseWheel(
 
 void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
 {
-	int fontheight, gap;
-
 	CWnd::OnNcCalcSize(valid, sizeinfo);
-
 	return;
 }
 
