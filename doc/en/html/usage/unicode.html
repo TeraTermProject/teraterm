@@ -41,56 +41,42 @@ UTF-8 &lt;-----&gt; Unicode(UTF-16LE) &lt;-----&gt; MBCS
 
 (2): A user must specify the locale to convert the characters between
      Unicode and MBCS.
-<!--
-     The codepage is the enhanced character set by Microsoft,
-     the number differs from one country to another.
--->
-
 </p>
 
 <p>
 To enable Unicode character sets with the localized language, you have to
-set properly the locale and codepage parameters in the 'teraterm.ini' file.
+set properly the locale parameters in the 'teraterm.ini' file.
 See example of these values below.
 </p>
 
 <pre>
 ; Locale for Unicode
 Locale = japanese
-
-; CodePage for Unicode
-CodePage = 932
 </pre>
 
 <p>
-To change this value, you can use [Locale] and/or [CodePage] in "Terminal setup" dialog-box.
+To change this value, you can use [Locale] in "Terminal setup" dialog-box.
 </p>
 
 <p>
-Check the following web-sites to learn more about setting of locale and
-codepage in Tera Term:
+Check the following web-sites to learn more about setting of locale in Tera Term:
 </p>
 <ul>
   <li><a href="http://msdn.microsoft.com/en-us/library/39cwe7zf.aspx">Language Strings</a></li>
-  <li><a href="http://msdn.microsoft.com/en-us/library/dd317756.aspx">Code Page Identifiers (Windows)</a></li>
 </ul>
 
 <h4>Example of WindowsXP Simplified Chinese</h4>
 
 <ul>
- <li>On Setup -&gt; Terminal dialog, select locale=chs and CodePage=65001.</li>
+ <li>On Setup -&gt; Terminal dialog, select locale=chs.</li>
  <li>On Setup -&gt; Font dialog, select FontName=NSimSun, CharacterSet=CHINESE_GB2312 and Size=9.</li>
 </ul>
-
 
 
 <h4>Example of WindowsXP USA</h4>
 <pre>
 ; Locale for Unicode
 Locale = american
-
-; CodePage for Unicode
-CodePage = 65001
 </pre>
 
 <p>
@@ -371,167 +357,6 @@ parameter '/KR'.
     </tr>
   </tbody>
 </table>
-
-<h3>[NOTE] Code-Page Identifiers</h3>
-<table>
-<thead>
-  <tr><th>Identifier</th>	<th>Name</th></tr>
-</thead>
-<tbody>
-  <tr><td>037</td>	<td>IBM EBCDIC US-Canada</td></tr>
-  <tr><td>437</td>	<td>OEM United States</td></tr>
-  <tr><td>500</td>	<td>IBM EBCDIC International</td></tr>
-  <tr><td>708</td>	<td>Arabic (ASMO 708)</td></tr>
-  <tr><td>709</td>	<td>Arabic (ASMO-449+, BCON V4)</td></tr>
-  <tr><td>710</td>	<td>Arabic - Transparent Arabic</td></tr>
-  <tr><td>720</td>	<td>Arabic (Transparent ASMO); Arabic (DOS)</td></tr>
-  <tr><td>737</td>	<td>OEM Greek (formerly 437G); Greek (DOS)</td></tr>
-  <tr><td>775</td>	<td>OEM Baltic; Baltic (DOS)</td></tr>
-  <tr><td>850</td>	<td>OEM Multilingual Latin 1; Western European (DOS)</td></tr>
-  <tr><td>852</td>	<td>OEM Latin 2; Central European (DOS)</td></tr>
-  <tr><td>855</td>	<td>OEM Cyrillic (primarily Russian)</td></tr>
-  <tr><td>857</td>	<td>OEM Turkish; Turkish (DOS)</td></tr>
-  <tr><td>858</td>	<td>OEM Multilingual Latin 1 + Euro symbol</td></tr>
-  <tr><td>860</td>	<td>OEM Portuguese; Portuguese (DOS)</td></tr>
-  <tr><td>861</td>	<td>OEM Icelandic; Icelandic (DOS)</td></tr>
-  <tr><td>862</td>	<td>OEM Hebrew; Hebrew (DOS)</td></tr>
-  <tr><td>863</td>	<td>OEM French Canadian; French Canadian (DOS)</td></tr>
-  <tr><td>864</td>	<td>OEM Arabic; Arabic (864)</td></tr>
-  <tr><td>865</td>	<td>OEM Nordic; Nordic (DOS)</td></tr>
-  <tr><td>866</td>	<td>OEM Russian; Cyrillic (DOS)</td></tr>
-  <tr><td>869</td>	<td>OEM Modern Greek; Greek, Modern (DOS)</td></tr>
-  <tr><td>870</td>	<td>IBM EBCDIC Multilingual/ROECE (Latin 2); IBM EBCDIC Multilingual Latin 2</td></tr>
-  <tr><td>874</td>	<td>ANSI/OEM Thai (same as 28605, ISO 8859-15); Thai (Windows)</td></tr>
-  <tr><td>875</td>	<td>IBM EBCDIC Greek Modern</td></tr>
-  <tr><td>932</td>	<td>ANSI/OEM Japanese; Japanese (Shift-JIS)</td></tr>
-  <tr><td>936</td>	<td>ANSI/OEM Simplified Chinese (PRC, Singapore); Chinese Simplified (GB2312)</td></tr>
-  <tr><td>949</td>	<td>ANSI/OEM Korean (Unified Hangul Code)</td></tr>
-  <tr><td>950</td>	<td>ANSI/OEM Traditional Chinese (Taiwan; Hong Kong SAR, PRC); Chinese Traditional (Big5)</td></tr>
-  <tr><td>1026</td>	<td>IBM EBCDIC Turkish (Latin 5)</td></tr>
-  <tr><td>1047</td>	<td>IBM EBCDIC Latin 1/Open System</td></tr>
-  <tr><td>1140</td>	<td>IBM EBCDIC US-Canada (037 + Euro symbol); IBM EBCDIC (US-Canada-Euro)</td></tr>
-  <tr><td>1141</td>	<td>IBM EBCDIC Germany (20273 + Euro symbol); IBM EBCDIC (Germany-Euro)</td></tr>
-  <tr><td>1142</td>	<td>IBM EBCDIC Denmark-Norway (20277 + Euro symbol); IBM EBCDIC (Denmark-Norway-Euro)</td></tr>
-  <tr><td>1143</td>	<td>IBM EBCDIC Finland-Sweden (20278 + Euro symbol); IBM EBCDIC (Finland-Sweden-Euro)</td></tr>
-  <tr><td>1144</td>	<td>IBM EBCDIC Italy (20280 + Euro symbol); IBM EBCDIC (Italy-Euro)</td></tr>
-  <tr><td>1145</td>	<td>IBM EBCDIC Latin America-Spain (20284 + Euro symbol); IBM EBCDIC (Spain-Euro)</td></tr>
-  <tr><td>1146</td>	<td>IBM EBCDIC United Kingdom (20285 + Euro symbol); IBM EBCDIC (UK-Euro)</td></tr>
-  <tr><td>1147</td>	<td>IBM EBCDIC France (20297 + Euro symbol); IBM EBCDIC (France-Euro)</td></tr>
-  <tr><td>1148</td>	<td>IBM EBCDIC International (500 + Euro symbol); IBM EBCDIC (International-Euro)</td></tr>
-  <tr><td>1149</td>	<td>IBM EBCDIC Icelandic (20871 + Euro symbol); IBM EBCDIC (Icelandic-Euro)</td></tr>
-  <tr><td>1200</td>	<td>Unicode UTF-16, little endian byte order (BMP of ISO 10646); available only to managed applications</td></tr>
-  <tr><td>1201</td>	<td>Unicode UTF-16, big endian byte order; available only to managed applications</td></tr>
-  <tr><td>1250</td>	<td>ANSI Central European; Central European (Windows)</td></tr>
-  <tr><td>1251</td>	<td>ANSI Cyrillic; Cyrillic (Windows)</td></tr>
-  <tr><td>1252</td>	<td>ANSI Latin 1; Western European (Windows)</td></tr>
-  <tr><td>1253</td>	<td>ANSI Greek; Greek (Windows)</td></tr>
-  <tr><td>1254</td>	<td>ANSI Turkish; Turkish (Windows)</td></tr>
-  <tr><td>1255</td>	<td>ANSI Hebrew; Hebrew (Windows)</td></tr>
-  <tr><td>1256</td>	<td>ANSI Arabic; Arabic (Windows)</td></tr>
-  <tr><td>1257</td>	<td>ANSI Baltic; Baltic (Windows)</td></tr>
-  <tr><td>1258</td>	<td>ANSI/OEM Vietnamese; Vietnamese (Windows)</td></tr>
-  <tr><td>1361</td>	<td>Korean (Johab)</td></tr>
-  <tr><td>10000</td>	<td>MAC Roman; Western European (Mac)</td></tr>
-  <tr><td>10001</td>	<td>Japanese (Mac)</td></tr>
-  <tr><td>10002</td>	<td>MAC Traditional Chinese (Big5); Chinese Traditional (Mac)</td></tr>
-  <tr><td>10003</td>	<td>Korean (Mac)</td></tr>
-  <tr><td>10004</td>	<td>Arabic (Mac)</td></tr>
-  <tr><td>10005</td>	<td>Hebrew (Mac)</td></tr>
-  <tr><td>10006</td>	<td>Greek (Mac)</td></tr>
-  <tr><td>10007</td>	<td>Cyrillic (Mac)</td></tr>
-  <tr><td>10008</td>	<td>MAC Simplified Chinese (GB 2312); Chinese Simplified (Mac)</td></tr>
-  <tr><td>10010</td>	<td>Romanian (Mac)</td></tr>
-  <tr><td>10017</td>	<td>Ukrainian (Mac)</td></tr>
-  <tr><td>10021</td>	<td>Thai (Mac)</td></tr>
-  <tr><td>10029</td>	<td>MAC Latin 2; Central European (Mac)</td></tr>
-  <tr><td>10079</td>	<td>Icelandic (Mac)</td></tr>
-  <tr><td>10081</td>	<td>Turkish (Mac)</td></tr>
-  <tr><td>10082</td>	<td>Croatian (Mac)</td></tr>
-  <tr><td>12000</td>	<td>Unicode UTF-32, little endian byte order; available only to managed applications</td></tr>
-  <tr><td>12001</td>	<td>Unicode UTF-32, big endian byte order; available only to managed applications</td></tr>
-  <tr><td>20000</td>	<td>CNS Taiwan; Chinese Traditional (CNS)</td></tr>
-  <tr><td>20001</td>	<td>TCA Taiwan</td></tr>
-  <tr><td>20002</td>	<td>Eten Taiwan; Chinese Traditional (Eten)</td></tr>
-  <tr><td>20003</td>	<td>IBM5550 Taiwan</td></tr>
-  <tr><td>20004</td>	<td>TeleText Taiwan</td></tr>
-  <tr><td>20005</td>	<td>Wang Taiwan</td></tr>
-  <tr><td>20105</td>	<td>IA5 (IRV International Alphabet No. 5, 7-bit); Western European (IA5)</td></tr>
-  <tr><td>20106</td>	<td>IA5 German (7-bit)</td></tr>
-  <tr><td>20107</td>	<td>IA5 Swedish (7-bit)</td></tr>
-  <tr><td>20108</td>	<td>IA5 Norwegian (7-bit)</td></tr>
-  <tr><td>20127</td>	<td>US-ASCII (7-bit)</td></tr>
-  <tr><td>20261</td>	<td>T.61</td></tr>
-  <tr><td>20269</td>	<td>ISO 6937 Non-Spacing Accent</td></tr>
-  <tr><td>20273</td>	<td>IBM EBCDIC Germany</td></tr>
-  <tr><td>20277</td>	<td>IBM EBCDIC Denmark-Norway</td></tr>
-  <tr><td>20278</td>	<td>IBM EBCDIC Finland-Sweden</td></tr>
-  <tr><td>20280</td>	<td>IBM EBCDIC Italy</td></tr>
-  <tr><td>20284</td>	<td>IBM EBCDIC Latin America-Spain</td></tr>
-  <tr><td>20285</td>	<td>IBM EBCDIC United Kingdom</td></tr>
-  <tr><td>20290</td>	<td>IBM EBCDIC Japanese Katakana Extended</td></tr>
-  <tr><td>20297</td>	<td>IBM EBCDIC France</td></tr>
-  <tr><td>20420</td>	<td>IBM EBCDIC Arabic</td></tr>
-  <tr><td>20423</td>	<td>IBM EBCDIC Greek</td></tr>
-  <tr><td>20424</td>	<td>IBM EBCDIC Hebrew</td></tr>
-  <tr><td>20833</td>	<td>IBM EBCDIC Korean Extended</td></tr>
-  <tr><td>20838</td>	<td>IBM EBCDIC Thai</td></tr>
-  <tr><td>20866</td>	<td>Russian (KOI8-R); Cyrillic (KOI8-R)</td></tr>
-  <tr><td>20871</td>	<td>IBM EBCDIC Icelandic</td></tr>
-  <tr><td>20880</td>	<td>IBM EBCDIC Cyrillic Russian</td></tr>
-  <tr><td>20905</td>	<td>IBM EBCDIC Turkish</td></tr>
-  <tr><td>20924</td>	<td>IBM EBCDIC Latin 1/Open System (1047 + Euro symbol)</td></tr>
-  <tr><td>20932</td>	<td>Japanese (JIS 0208-1990 and 0121-1990)</td></tr>
-  <tr><td>20936</td>	<td>Simplified Chinese (GB2312); Chinese Simplified (GB2312-80)</td></tr>
-  <tr><td>20949</td>	<td>Korean Wansung</td></tr>
-  <tr><td>21025</td>	<td>IBM EBCDIC Cyrillic Serbian-Bulgarian</td></tr>
-  <tr><td>21027</td>	<td>(deprecated)</td></tr>
-  <tr><td>21866</td>	<td>Ukrainian (KOI8-U); Cyrillic (KOI8-U)</td></tr>
-  <tr><td>28591</td>	<td>ISO 8859-1 Latin 1; Western European (ISO)</td></tr>
-  <tr><td>28592</td>	<td>ISO 8859-2 Central European; Central European (ISO)</td></tr>
-  <tr><td>28593</td>	<td>ISO 8859-3 Latin 3</td></tr>
-  <tr><td>28594</td>	<td>ISO 8859-4 Baltic</td></tr>
-  <tr><td>28595</td>	<td>ISO 8859-5 Cyrillic</td></tr>
-  <tr><td>28596</td>	<td>ISO 8859-6 Arabic</td></tr>
-  <tr><td>28597</td>	<td>ISO 8859-7 Greek</td></tr>
-  <tr><td>28598</td>	<td>ISO 8859-8 Hebrew; Hebrew (ISO-Visual)</td></tr>
-  <tr><td>28599</td>	<td>ISO 8859-9 Turkish</td></tr>
-  <tr><td>28603</td>	<td>ISO 8859-13 Estonian</td></tr>
-  <tr><td>28605</td>	<td>ISO 8859-15 Latin 9</td></tr>
-  <tr><td>29001</td>	<td>Europa 3</td></tr>
-  <tr><td>38598</td>	<td>ISO 8859-8 Hebrew; Hebrew (ISO-Logical)</td></tr>
-  <tr><td>50220</td>	<td>ISO 2022 Japanese with no halfwidth Katakana; Japanese (JIS)</td></tr>
-  <tr><td>50221</td>	<td>ISO 2022 Japanese with halfwidth Katakana; Japanese (JIS-Allow 1 byte Kana)</td></tr>
-  <tr><td>50222</td>	<td>ISO 2022 Japanese JIS X 0201-1989; Japanese (JIS-Allow 1 byte Kana - SO/SI)</td></tr>
-  <tr><td>50225</td>	<td>ISO 2022 Korean</td></tr>
-  <tr><td>50227</td>	<td>ISO 2022 Simplified Chinese; Chinese Simplified (ISO 2022)</td></tr>
-  <tr><td>50229</td>	<td>ISO 2022 Traditional Chinese</td></tr>
-  <tr><td>50930</td>	<td>EBCDIC Japanese (Katakana) Extended</td></tr>
-  <tr><td>50931</td>	<td>EBCDIC US-Canada and Japanese</td></tr>
-  <tr><td>50933</td>	<td>EBCDIC Korean Extended and Korean</td></tr>
-  <tr><td>50935</td>	<td>EBCDIC Simplified Chinese Extended and Simplified Chinese</td></tr>
-  <tr><td>50936</td>	<td>EBCDIC Simplified Chinese</td></tr>
-  <tr><td>50937</td>	<td>EBCDIC US-Canada and Traditional Chinese</td></tr>
-  <tr><td>50939</td>	<td>EBCDIC Japanese (Latin) Extended and Japanese</td></tr>
-  <tr><td>51932</td>	<td>EUC Japanese</td></tr>
-  <tr><td>51936</td>	<td>EUC Simplified Chinese; Chinese Simplified (EUC)</td></tr>
-  <tr><td>51949</td>	<td>EUC Korean</td></tr>
-  <tr><td>51950</td>	<td>EUC Traditional Chinese</td></tr>
-  <tr><td>52936</td>	<td>HZ-GB2312 Simplified Chinese; Chinese Simplified (HZ)</td></tr>
-  <tr><td>54936</td>	<td>Windows XP and later: GB18030 Simplified Chinese (4 byte); Chinese Simplified (GB18030)</td></tr>
-  <tr><td>57002</td>	<td>ISCII Devanagari</td></tr>
-  <tr><td>57003</td>	<td>ISCII Bengali</td></tr>
-  <tr><td>57004</td>	<td>ISCII Tamil</td></tr>
-  <tr><td>57005</td>	<td>ISCII Telugu</td></tr>
-  <tr><td>57006</td>	<td>ISCII Assamese</td></tr>
-  <tr><td>57007</td>	<td>ISCII Oriya</td></tr>
-  <tr><td>57008</td>	<td>ISCII Kannada</td></tr>
-  <tr><td>57009</td>	<td>ISCII Malayalam</td></tr>
-  <tr><td>57010</td>	<td>ISCII Gujarati</td></tr>
-  <tr><td>57011</td>	<td>ISCII Punjabi</td></tr>
-  <tr><td>65000</td>	<td>Unicode (UTF-7)</td></tr>
-  <tr><td>65001</td>	<td>Unicode (UTF-8)</td></tr>
-  </tbody>
-  </table>
 
 </BODY>
 </HTML>
