@@ -823,6 +823,37 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 	return v;
 }
 
+void GetDownloadFolder(char *dest, int destlen)
+{
+	HMODULE hDll;
+	typedef GUID KNOWNFOLDERID;
+	typedef HRESULT(WINAPI *SHGETKNOWNFOLDERPATH)(KNOWNFOLDERID*, DWORD, HANDLE, PWSTR*);
+	// {374DE290-123F-4565-9164-39C4925E467B}
+	KNOWNFOLDERID FOLDERID_Downloads = { 0x374de290, 0x123f, 0x4565, 0x91, 0x64, 0x39, 0xc4, 0x92, 0x5e, 0x46, 0x7b };
+	char download[MAX_PATH];
+
+	memset(download, 0, sizeof(download));
+	if (hDll = LoadLibrary("shell32.dll")) {
+		SHGETKNOWNFOLDERPATH pSHGetKnownFolderPath = (SHGETKNOWNFOLDERPATH)GetProcAddress(hDll, "SHGetKnownFolderPath");
+		if (pSHGetKnownFolderPath) {
+			PWSTR pBuffer = NULL;
+			pSHGetKnownFolderPath(&FOLDERID_Downloads, 0, NULL, &pBuffer);
+			WideCharToMultiByte(CP_ACP, 0, pBuffer, -1, download, sizeof(download), NULL, NULL);
+		}
+		FreeLibrary(hDll);
+	}
+	if (strlen(download) == 0) {
+		LPITEMIDLIST pidl;
+		if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == NOERROR) {
+			SHGetPathFromIDList(pidl, download);
+			CoTaskMemFree(pidl);
+		}
+	}
+	if (strlen(download) > 0) {
+		strncpy_s(dest, destlen, download, _TRUNCATE);
+	}
+}
+
 void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen)
 {
 	// My Documents ‚É file ‚ª‚ ‚éê‡A

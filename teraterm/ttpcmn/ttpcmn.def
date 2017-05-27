@@ -83,3 +83,4 @@ EXPORTS
   HasGetAdaptersAddresses @72
   HasDnsQuery @73
   HasBalloonTipSupport @87
+  GetDownloadFolder @88

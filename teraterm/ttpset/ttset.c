@@ -1102,11 +1102,11 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	GetPrivateProfileString(Section, "FileDir", "",
 	                        ts->FileDir, sizeof(ts->FileDir), FName);
 	if (strlen(ts->FileDir) == 0)
-		strncpy_s(ts->FileDir, sizeof(ts->FileDir), ts->HomeDir, _TRUNCATE);
+		GetDownloadFolder(ts->FileDir, sizeof(ts->FileDir));
 	else {
 		_getcwd(Temp, sizeof(Temp));
 		if (_chdir(ts->FileDir) != 0)
-			strncpy_s(ts->FileDir, sizeof(ts->FileDir), ts->HomeDir, _TRUNCATE);
+			GetDownloadFolder(ts->FileDir, sizeof(ts->FileDir));
 		_chdir(Temp);
 	}
 
