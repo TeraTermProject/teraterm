@@ -3064,9 +3064,11 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 		if (len > 0 && len < sizeof(buf)) {	/* should always be true */
 			buf[0] = 0;
 			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
-			for (j = 0;
-				 j <= SSH_CIPHER_MAX
-				 && strcmp(buf, get_cipher_name(j)) != 0; j++) {
+			for (j = 0; j <= SSH_CIPHER_MAX; j++) {
+				char *cipher_name = get_cipher_name(j);
+				if (cipher_name != NULL && strcmp(buf, cipher_name) == 0) {
+					break;
+				}
 			}
 			if (j <= SSH_CIPHER_MAX) {
 				buf2[buf2index] = '0' + j;
