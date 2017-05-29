@@ -35,27 +35,27 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added the notification feature regarding clipboard accessing from remote host. (Windows Me or 2000 or later)</li>
+      <li>added the notification feature regarding clipboard accessing from the remote host. (Windows Me or 2000 or later)</li>
       <li>renamed command line from /NAMEDPIPE to <a href="../commandline/teraterm.html#pipe">/PIPE</a> option.</li>
-      <li>When <a href="../commandline/teraterm.html#pipe">/PIPE</a> option is used as command line, the host name is ccomplemented by these rules:
+      <li>When <a href="../commandline/teraterm.html#pipe">/PIPE</a> option is used as command line, the host name is complemented by these rules:
         <ul>
-          <li>If the host name begins with a \, the name is not changed.</li>
-          <li>If the host name does not include a \, the \\.\pipe\ is added at the beginning.</li>
-          <li>If the host name includes a \ anywhere but first, before that is treated as server name and after that is treated as pipe name. </li>
+          <li>If the host name begins with a '\', the name is not changed.</li>
+          <li>If the host name does not include a '\', the '\\.\pipe\' is added at the beginning.</li>
+          <li>If the host name includes a '\' anywhere but first, before that is treated as server name and after that is treated as pipe name. </li>
         </ul></li>
       <li>added new feature regarding <a href="../setup/teraterm-win.html#maximize">How to scroll the screen when the window size is maximized</a>.
         <ul>
-          <li>changed default action to new method. If the action behaves in the same manner as Tera Term 4.94, please set MaximizedBugTweak to 1.</li>
-          <li>changed MaximizedBugTweak value from on/off to 0/1/2 combination. The off is treated as 0, and the on is trested as 2.</li>
+          <li>changed default action to the new method. If the action behaves in the same manner as Tera Term 4.94, please set MaximizedBugTweak to 1.</li>
+          <li>changed MaximizedBugTweak value from on/off to 0/1/2 combination. The "off" is treated as 0, and the "on" is treated as 2.</li>
         </ul></li>
-      <li>changed default directory path for receiving a file(Vista or later:Downloads, XP or earlier:My Documents).</li>
+      <li>changed default directory path for receiving a file (Vista or later:Downloads, XP or earlier:My Documents).</li>
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <li>The port number can not specify 65535 at the command line option.</li>
-      <li>When the <a href="../menu/file-new.html">New connection</a> selects Serial menu, a part of TCP/IP menu is not be disabled.</li>
+      <li>The port number cannot specify 65535 by the command line option.</li>
+      <li>When the <a href="../menu/file-new.html">New connection</a> selects Serial menu, a part of TCP/IP menu is not disabled.</li>
     </ul>
   </li>
 
@@ -63,7 +63,7 @@
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.81">2.81</a></li>
       <li>upgraded Oniguruma to 6.2.0.</li>
-      <li>NOTICE: The installer can not support Windows 95, 98, Me and NT 4.0. Please use the zip archive version on these Windows.</li>
+      <li>NOTICE: The installer does not support Windows 95, 98, Me and NT 4.0. Please use the zip archive version on these Windows.</li>
     </ul>
   </li>
 </ul>
@@ -2884,7 +2884,7 @@ SYNOPSIS:
     <ul>
       <li>added the notification feature when remote host uses forwarded agent. (Windows Me or 2000 or later)</li>
       <li>added support for changing the user password when using the password authentication.</li>
-      <li>added subsystem launching instead of shell on connection.
+      <li>added support for executing the specified subsystem instead of the shell on connection.
         <ul>
           <li>added the <a href="../commandline/ttssh.html#ssh-subsystem">/ssh-subsystem</a> option at the command line.</li>
         </ul></li>
@@ -2893,7 +2893,7 @@ SYNOPSIS:
 
   <li>Bug fixes
     <ul>
-      <li>When agent transfer is enabled, an application fault is occurred after the remote host sends big packet request.</li>
+      <li>When agent forwarding is enabled, an application fault is occurred after the remote host sends big packet request.</li>
     </ul>
   </li>
 
