@@ -35,7 +35,13 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li><a href="../setup/teraterm-win.html#maximize">画面最大化時のスクロール方式</a> として新しい方式を追加した。
+        <ul>
+          <li>デフォルト設定での動作を新方式に変更した。Tera Term 4.94 までと同じ動作にする場合は MaximizedBugTweak を 1 に変更する。</li>
+          <li>設定ファイルの MaximizedBugTweak 設定で指定する値を、on/off から 0/1/2 に変更した。off は 0、on は 2 として扱われる。</li>
+        </ul></li>
       <li>リモートからのクリップボードへのアクセスを通知する機能を追加した。(Windows Me, 2000 以上)</li>
+      <li>ファイル受信ディレクトリの初期値を変更した(Vista以降はDownloads、XP以前はMy Documents)</li>
       <li>コマンドラインオプション /NAMEDPIPE を <a href="../commandline/teraterm.html#pipe">/PIPE</a> へ変更した。</li>
       <li>コマンドラインオプション <a href="../commandline/teraterm.html#pipe">/PIPE</a> を使用した時に、以下のルールでホスト名を補うようにした。
         <ul>
@@ -43,12 +49,6 @@
           <li>ホスト名に \ が含まれない場合は先頭に \\.\pipe\ が付加される。</li>
           <li>ホスト名の先頭以外に \ が有る場合は、それより前をサーバ名、後ろをパイプ名として扱う。</li>
         </ul></li>
-      <li><a href="../setup/teraterm-win.html#maximize">画面最大化時のスクロール方式</a> として新しい方式を追加した。
-        <ul>
-          <li>デフォルト設定での動作を新方式に変更した。Tera Term 4.94 までと同じ動作にする場合は MaximizedBugTweak を 1 に変更する。</li>
-          <li>設定ファイルの MaximizedBugTweak 設定で指定する値を、on/off から 0/1/2 に変更した。off は 0、on は 2 として扱われる。</li>
-        </ul></li>
-      <li>ファイル受信ディレクトリの初期値を変更した(Vista以降はDownloads、XP以前はMy Documents)</li>
     </ul>
   </li>
 
@@ -2888,12 +2888,12 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>リモートホストが転送したエージェントを使用した時に通知する機能を追加した。(Windows Me, 2000 以上)</li>
       <li>パスワード認証時のパスワード変更に対応した。</li>
       <li>接続時にシェルではなくサブシステムを起動する機能を追加した。
         <ul>
           <li>コマンドラインオプションに <a href="../commandline/ttssh.html#ssh-subsystem">/ssh-subsystem</a> オプションを追加した。</li>
         </ul></li>
+      <li>リモートホストが転送したエージェントを使用した時に通知する機能を追加した。(Windows Me, 2000 以上)</li>
     </ul>
   </li>
 

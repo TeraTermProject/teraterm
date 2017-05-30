@@ -35,7 +35,13 @@
 <ul class="history">
   <li>Changes
     <ul>
+      <li>added new feature regarding <a href="../setup/teraterm-win.html#maximize">How to scroll the screen when the window size is maximized</a>.
+        <ul>
+          <li>changed default action to the new method. If the action behaves in the same manner as Tera Term 4.94, please set MaximizedBugTweak to 1.</li>
+          <li>changed MaximizedBugTweak value from on/off to 0/1/2 combination. The "off" is treated as 0, and the "on" is treated as 2.</li>
+        </ul></li>
       <li>added the notification feature regarding clipboard accessing from the remote host. (Windows Me or 2000 or later)</li>
+      <li>changed default directory path for receiving a file (Vista or later:Downloads, XP or earlier:My Documents).</li>
       <li>renamed command line from /NAMEDPIPE to <a href="../commandline/teraterm.html#pipe">/PIPE</a> option.</li>
       <li>When <a href="../commandline/teraterm.html#pipe">/PIPE</a> option is used as command line, the host name is complemented by these rules:
         <ul>
@@ -43,12 +49,6 @@
           <li>If the host name does not include a '\', the '\\.\pipe\' is added at the beginning.</li>
           <li>If the host name includes a '\' anywhere but first, before that is treated as server name and after that is treated as pipe name. </li>
         </ul></li>
-      <li>added new feature regarding <a href="../setup/teraterm-win.html#maximize">How to scroll the screen when the window size is maximized</a>.
-        <ul>
-          <li>changed default action to the new method. If the action behaves in the same manner as Tera Term 4.94, please set MaximizedBugTweak to 1.</li>
-          <li>changed MaximizedBugTweak value from on/off to 0/1/2 combination. The "off" is treated as 0, and the "on" is treated as 2.</li>
-        </ul></li>
-      <li>changed default directory path for receiving a file (Vista or later:Downloads, XP or earlier:My Documents).</li>
     </ul>
   </li>
 
@@ -2882,12 +2882,12 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>added the notification feature when remote host uses forwarded agent. (Windows Me or 2000 or later)</li>
       <li>added support for changing the user password when using the password authentication.</li>
       <li>added support for executing the specified subsystem instead of the shell on connection.
         <ul>
           <li>added the <a href="../commandline/ttssh.html#ssh-subsystem">/ssh-subsystem</a> option at the command line.</li>
         </ul></li>
+      <li>added the notification feature when remote host uses forwarded agent. (Windows Me or 2000 or later)</li>
     </ul>
   </li>
 
