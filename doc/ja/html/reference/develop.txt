@@ -34,9 +34,9 @@
        PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
        VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
 - インストーラ
-  Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 以上で作成したインストーラは Windows NT 4.0, 9x をサポートしないので不可)
-  Inno Setup Preprocessor (ispack-5.4.3 より)
-  InnoIDE 1.0.0 (ispack-5.4.3 より)
+  Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor
+  Inno Script Studio 2.2.2.32
 - その他
   Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
   ActivePerl 5.8 以上

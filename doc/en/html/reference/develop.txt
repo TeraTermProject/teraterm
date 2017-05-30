@@ -32,9 +32,9 @@
        PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
        VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
 - Installer
-  Inno Setup 5.4.3 ANSI (http://www.jrsoftware.org/isinfo.php) (5.5.0 or higher doesn't support Windows NT 4.0 and 9x)
-  Inno Setup Preprocessor (from ispack-5.4.3)
-  InnoIDE 1.0.0 (from ispack-5.4.3)
+  Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup Preprocessor
+  Inno Script Studio 2.2.2.32
 - others
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
   ActivePerl 5.8 later version
