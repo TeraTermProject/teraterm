@@ -285,7 +285,7 @@ Example: adding a TTSSH menu under File menu
 
   4. Evaluate executable program file.
      - Make installer package
-       Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
+       Open "teraterm\installer\teraterm.iss" with Inno Script Studio and call [Project]-[Compile] with InnoSetup.
      - Test Tera Term installation and evaluate it.
 
   5. Create SVN tag.
@@ -295,7 +295,7 @@ Example: adding a TTSSH menu under File menu
   6. Re-checkout from svn tag.
 
   7. Make installer package
-     Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
+     Open "teraterm\installer\teraterm.iss" with Inno Script Studio and call [Project]-[Compile] with InnoSetup.
 
   8. Update OSDN project site.
      - Add new release.

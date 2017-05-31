@@ -298,7 +298,7 @@
 
   4. 動作確認をする
      - インストーラを作成する。
-       ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される。
+       Inno Script Studio で teraterm\installer\teraterm.iss を開き、[Project]-[Compile]で作成される。
      - インストールおよび実行をテストする。
 
   5. SVN のタグを作成する。
@@ -308,7 +308,7 @@
   6. リリース用のタグでチェックアウトし直す。
 
   7. インストーラを作成する。
-     ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
+     Inno Script Studio で teraterm\installer\teraterm.iss を開き、[Project]-[Compile]で作成される
 
   8. OSDN を更新する。
      - [ダウンロード]-[管理]-[新規作成]
