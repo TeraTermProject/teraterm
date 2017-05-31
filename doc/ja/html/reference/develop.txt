@@ -36,7 +36,7 @@
 - インストーラ
   Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor
-  Inno Script Studio 2.2.2.32
+  ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - その他
   Cygwin 1.5.x (1.7.x は Windows 9x をサポートしていないので不可)
   ActivePerl 5.8 以上
@@ -298,7 +298,7 @@
 
   4. 動作確認をする
      - インストーラを作成する。
-       Inno Script Studio で teraterm\installer\teraterm.iss を開き、[Project]-[Compile]で作成される。
+       ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される。
      - インストールおよび実行をテストする。
 
   5. SVN のタグを作成する。
@@ -308,7 +308,7 @@
   6. リリース用のタグでチェックアウトし直す。
 
   7. インストーラを作成する。
-     Inno Script Studio で teraterm\installer\teraterm.iss を開き、[Project]-[Compile]で作成される
+     ISTool で teraterm\installer\teraterm.iss を開き、[Project]-[Compile Setup]で作成される
 
   8. OSDN を更新する。
      - [ダウンロード]-[管理]-[新規作成]

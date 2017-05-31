@@ -34,7 +34,7 @@
 - Installer
   Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor
-  Inno Script Studio 2.2.2.32
+  ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - others
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
   ActivePerl 5.8 later version
@@ -285,7 +285,7 @@ Example: adding a TTSSH menu under File menu
 
   4. Evaluate executable program file.
      - Make installer package
-       Open "teraterm\installer\teraterm.iss" with Inno Script Studio and call [Project]-[Compile] with InnoSetup.
+       Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
      - Test Tera Term installation and evaluate it.
 
   5. Create SVN tag.
@@ -295,7 +295,7 @@ Example: adding a TTSSH menu under File menu
   6. Re-checkout from svn tag.
 
   7. Make installer package
-     Open "teraterm\installer\teraterm.iss" with Inno Script Studio and call [Project]-[Compile] with InnoSetup.
+     Open "teraterm\installer\teraterm.iss" with ISTool and call [Project]-[Compile Setup] with InnoSetup.
 
   8. Update OSDN project site.
      - Add new release.
