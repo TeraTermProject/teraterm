@@ -87,19 +87,29 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 <hr>
 
 <h2><a name="library">Third Party Libraries</a></h2>
-    It is inefficient to build advanced software from scratch, that's why Tera Term actively uses open source libraries. This, however, requires from developers to be careful and avoid license violations, especially GPL. <br>
-    
-    Several Tera Term modules are linked to open source libraries as shown on the drawing below. The macro program is linked to regular expression library "Oniguruma", which allows to handle regular expressions in "waitregex" and "sprintf" macro commands. Tera Term also calls this library to display Oniguruma version information in "About Tera Term" dialog box. <br>    
 <p>
-    "TTSSH" module uses OpenSSL library to perform cryptography related operations. One may think that OpenSSL library contains only Secure Socket Layer (SSL) protocol related functions used for secure web access, however that is wrong assumption. OpenSSL library also supports basic cipher algorithms, which are utilized by "TTSSH" module. Since Secure Layer related functions of the library are not used, it is very unlikely that "TTSSH" module will be compromised if a security hole is found in OpenSSL library. <br>
-    
-    Zlib library is used to compress SSH packets. Packet compression is effective on low speed networks like for example with dial-up connections, however in high speed networks it may slow down communication. That's why packet compression function is disabled by default. <br>
-
-    "PuTTY" is another free terminal emulator that became a de-facto standard worldwide. PuTTY package contains SSH authentication agent called "Pageant". TTSSH uses part of PuTTY source code to support Pageant based authentication method.    
+  It is inefficient to build advanced software from scratch, that's why Tera Term actively uses open source libraries. This, however, requires from developers to be careful and avoid license violations, especially GPL.<br>
+  Several Tera Term modules are linked to open source libraries as shown on the drawing below.
 </p>
-    
+<p>
+  The macro program is linked to regular expression library "Oniguruma", which allows to handle regular expressions in "waitregex", "strmatch" and "strreplace" macro commands.<br>
+  Tera Term also calls this library to display Oniguruma version information in "About Tera Term" dialog box.
+</p>
+<p>
+  The macro program is linked to pseudorandom number generator "SFMT", which allows to generate random number in "random" macro command.
+</p>
+<p>
+  "TTSSH" module is linkd to "OpenSSL" library to perform cryptography related operations. One may think that OpenSSL library contains only Secure Socket Layer (SSL) protocol related functions used for secure web access, however that is wrong assumption. OpenSSL library also supports basic cipher algorithms, which are utilized by "TTSSH" module. Since Secure Layer related functions of the library are not used, it is very unlikely that "TTSSH" module will be compromised if a SSL related security hole is found in OpenSSL library.
+</p>
+<p>
+  "TTSSH" module is linkd to compression Library "zlib" to compress SSH packets. Packet compression is effective on low speed networks like for example with dial-up connections, however in high speed networks it may slow down communication. That's why packet compression function is disabled by default. <br>
+</p>
+<p>
+  "TTSSH" module is linkd to terminal emulator "PuTTY." PuTTY package contains SSH authentication agent called "Pageant". TTSSH uses part of PuTTY source code to support Pageant based authentication method. SSH communication part of PuTTY source code is not used.
+</p>
+<p>
 Note that these libraries are called statically (not via dynamic link). When compiling the source code with these libraries use "/MT" option. Tera Term doesn't use dynamic calls to the libraries because not all user environments can support such calls, which may cause Tera Term to crash.
-  
+</p> 
 
 <div align="center">
 <img src="image/library_relation.png" width=720 height=540>
