@@ -957,7 +957,7 @@ void LogToFile()
 			{
 				tmp[0] = 0;
 				if ( ts.LogTimestamp && eLineEnd ) {
-					char *strtime = mctimelocal();
+					char *strtime = mctimelocal(ts.LogTimestampFormat);
 					/* 2007.05.24 Gentaro */
 					if( eLineEnd == Line_FileHead ){
 						strncat_s(tmp, sizeof(tmp), "\r\n", _TRUNCATE);
@@ -1012,7 +1012,7 @@ void LogToFile()
 							LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
 							LocalTime.wMilliseconds);
 	#else
-					char *strtime = mctimelocal();
+					char *strtime = mctimelocal(ts.LogTimestampFormat);
 	#endif
 	#else
 						time_t tick = time(NULL);

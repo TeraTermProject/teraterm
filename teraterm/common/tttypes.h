@@ -619,6 +619,7 @@ struct tttset {
 	int ZmodemTimeOutFin;
 	WORD WaitCom;
 	WORD Dummy5;	// ãåTrimTrailingNLonPaste. PasteFlagÇ…ìùçáÇµÇΩà◊îpé~ÅBëºÇ÷ì]óp
+	char LogTimestampFormat[48];
 };
 
 typedef struct tttset TTTSet, *PTTSet;
@@ -1081,6 +1082,9 @@ typedef TMap far *PMap;
  * Increment the number of this macro value
  * when you change TMap or member of TMap.
  *
+ * - At version 4.96, ttset_memfilemap was replaced with ttset_memfilemap_32.
+ *   added tttset.LogTimestampFormat
+ *
  * - At version 4.95, ttset_memfilemap was replaced with ttset_memfilemap_31.
  *   added tttset.NotifyClipboardAccess
  *
@@ -1262,4 +1266,4 @@ typedef TMap far *PMap;
  *   added tttset.VTCompatTab.
  */
 
-#define TT_FILEMAPNAME "ttset_memfilemap_31"
+#define TT_FILEMAPNAME "ttset_memfilemap_32"

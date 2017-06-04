@@ -1052,6 +1052,11 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogIncludeScreenBuffer", FName, FALSE);
 
+	/* Timestamp format of Log each line */
+	GetPrivateProfileString(Section, "LogTimestampFormat", "%a %b %e %H:%M:%S.%N %Y",
+	                        ts->LogTimestampFormat, sizeof(ts->LogTimestampFormat),
+	                        FName);
+
 	/* File Transfer dialog visibility */
 	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
 
@@ -2530,6 +2535,10 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteOnOff(Section, "LogHideDialog", FName, ts->LogHideDialog);
 
 	WriteOnOff(Section, "LogIncludeScreenBuffer", FName, ts->LogAllBuffIncludedInFirst);
+
+	/* Timestamp format of Log each line */
+	WritePrivateProfileString(Section, "LogTimestampFormat",
+	                          ts->LogTimestampFormat, FName);
 
 	/* Default Log file name (2006.8.28 maya) */
 	WritePrivateProfileString(Section, "LogDefaultName",

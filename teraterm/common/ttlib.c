@@ -1460,25 +1460,92 @@ int KanjiCodeTranslate(int lang, int kcode)
 	return Table[lang][kcode];
 }
 
-char *mctimelocal()
+char *mctimelocal(char *format)
 {
-	SYSTEMTIME LocalTime;
+	SYSTEMTIME systime;
 	static char strtime[29];
 	char week[][4] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 	char month[][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	char tmp[5];
+	unsigned int i = strlen(format);
 
-	GetLocalTime(&LocalTime);
-	_snprintf_s(strtime, sizeof(strtime), _TRUNCATE,
-	            "%s %s %02d %02d:%02d:%02d.%03d %04d",
-	            week[LocalTime.wDayOfWeek],
-	            month[LocalTime.wMonth-1],
-	            LocalTime.wDay,
-	            LocalTime.wHour,
-	            LocalTime.wMinute,
-	            LocalTime.wSecond,
-	            LocalTime.wMilliseconds,
-	            LocalTime.wYear);
+	GetLocalTime(&systime);
+	memset(strtime, 0, sizeof(strtime));
+	for (i=0; i<strlen(format); i++) {
+		if (format[i] == '%') {
+			char c = format[i + 1];
+			switch (c) {
+				case 'a':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s", week[systime.wDayOfWeek]);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'b':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%s", month[systime.wMonth - 1]);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'd':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02d", systime.wDay);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'e':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%2d", systime.wDay);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'H':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02d", systime.wHour);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'N':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%03d", systime.wMilliseconds);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'm':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02d", systime.wMonth);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'M':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02d", systime.wMinute);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'S':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%02d", systime.wSecond);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'w':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%d", systime.wDayOfWeek);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case 'Y':
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%04d", systime.wYear);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					i++;
+					break;
+				case '%':
+					strncat_s(strtime, sizeof(strtime), "%", _TRUNCATE);
+					i++;
+					break;
+				default:
+					_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%c", format[i]);
+					strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+					break;
+			}
+		}
+		else {
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, "%c", format[i]);
+			strncat_s(strtime, sizeof(strtime), tmp, _TRUNCATE);
+		}
+	}
 
 	return strtime;
 }
