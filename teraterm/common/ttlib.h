@@ -63,7 +63,7 @@ BOOL HasBalloonTipSupport();
 int KanjiCode2List(int lang, int kcode);
 int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
-char *mctimelocal(char *format);
+char *mctimelocal(char *format, BOOL utc_flag);
 
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 int b64decode(PCHAR dst, int dsize, PCHAR src);

@@ -1460,7 +1460,7 @@ int KanjiCodeTranslate(int lang, int kcode)
 	return Table[lang][kcode];
 }
 
-char *mctimelocal(char *format)
+char *mctimelocal(char *format, BOOL utc_flag)
 {
 	SYSTEMTIME systime;
 	static char strtime[29];
@@ -1470,7 +1470,12 @@ char *mctimelocal(char *format)
 	char tmp[5];
 	unsigned int i = strlen(format);
 
-	GetLocalTime(&systime);
+	if (utc_flag) {
+		GetSystemTime(&systime);
+	}
+	else {
+		GetLocalTime(&systime);
+	}
 	memset(strtime, 0, sizeof(strtime));
 	for (i=0; i<strlen(format); i++) {
 		if (format[i] == '%') {

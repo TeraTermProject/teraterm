@@ -540,7 +540,7 @@ struct tttset {
 	WORD MaximizedBugTweak;
 	WORD NotifyClipboardAccess;
 	WORD SaveVTWinPos;
-	WORD Dummy3;		// ãåDisablePasteMouseMButton. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
+	WORD LogTimestampUTC;
 	int MouseWheelScrollLine;
 	WORD CRSend_ini;
 	WORD LocalEcho_ini;
@@ -1084,6 +1084,7 @@ typedef TMap far *PMap;
  *
  * - At version 4.96, ttset_memfilemap was replaced with ttset_memfilemap_32.
  *   added tttset.LogTimestampFormat
+ *   added tttset.LogTimestampUTC
  *
  * - At version 4.95, ttset_memfilemap was replaced with ttset_memfilemap_31.
  *   added tttset.NotifyClipboardAccess

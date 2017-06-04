@@ -1057,6 +1057,9 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        ts->LogTimestampFormat, sizeof(ts->LogTimestampFormat),
 	                        FName);
 
+	/* Use UTC/GMT time for Log each line timestamp */
+	ts->LogTimestampUTC = GetOnOff(Section, "LogTimestampUTC", FName, FALSE);
+
 	/* File Transfer dialog visibility */
 	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
 
@@ -2539,6 +2542,9 @@ void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	/* Timestamp format of Log each line */
 	WritePrivateProfileString(Section, "LogTimestampFormat",
 	                          ts->LogTimestampFormat, FName);
+
+	/* Use UTC/GMT time for Log each line timestamp */
+	WriteOnOff(Section, "LogTimestampUTC", FName, ts->LogTimestampUTC);
 
 	/* Default Log file name (2006.8.28 maya) */
 	WritePrivateProfileString(Section, "LogDefaultName",
