@@ -7317,11 +7317,11 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	ret = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
 
 	if (ret == -1) {
-		logprintf(pvar, LOG_LEVEL_WARNING, __FUNCTION__ "%s: DialogBoxParam failed.");
+		logprintf(pvar, LOG_LEVEL_WARNING, __FUNCTION__ ": DialogBoxParam failed.");
 		return FALSE;
 	}
 	else if (ret == 0) {
-		logprintf(pvar, LOG_LEVEL_NOTICE, __FUNCTION__ "%s: dialog cancelled.");
+		logprintf(pvar, LOG_LEVEL_NOTICE, __FUNCTION__ ": dialog cancelled.");
 		return FALSE;
 	}
 
