@@ -2113,24 +2113,6 @@ void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len,
 {
 	unsigned char message = prep_packet(pvar, data, len, padding);
 
-	
-#ifdef SSH2_DEBUG
-	// for SSH2(yutaka)
-	if (SSHv2(pvar)) {
-		if (pvar->key_done) {
-			message = message;
-		}
-
-		if (pvar->userauth_success) {
-			message = message;
-		}
-
-		if (pvar->rekeying) {
-			message = message;
-		}
-	}
-#endif
-
 	// SSHのメッセージタイプをチェック
 	if (message != SSH_MSG_NONE) {
 		// メッセージタイプに応じたハンドラを起動

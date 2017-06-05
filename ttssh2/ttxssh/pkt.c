@@ -205,17 +205,10 @@ int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen)
 
 			//debug_print(10, data, pvar->pkt_state.datalen);
 
-			// SSH2なら暗号化パケットの一部を復号化する。
+			// 暗号化パケットの一部を復号化する。
 			if (!pvar->pkt_state.predecrypted_packet) {
-				//DEBUG_PRINT_TO_FILE(0, data, pvar->pkt_state.datalen);
 				SSH_predecrpyt_packet(pvar, data);
-
-				if (SSHv1(pvar)) {
-					pvar->pkt_state.predecrypted_packet = TRUE;
-				} else { // for SSH2(yutaka)
-					// do nothing
-					pvar->pkt_state.predecrypted_packet = TRUE;
-				}
+				pvar->pkt_state.predecrypted_packet = TRUE;
 			}
 
 			if (SSHv1(pvar)) {
