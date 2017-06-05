@@ -983,33 +983,8 @@ void LogToFile()
 		{
 			if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
 			{
-				// 時刻を書き出す(2006.7.23 maya)
-				// 日付フォーマットを日本ではなく世界標準に変更した (2006.7.23 yutaka)
-				/* 2007.05.24 Gentaro */
-				// ミリ秒も表示するように変更 (2009.5.23 maya)
 				if ( ts.LogTimestamp && eLineEnd ) {
-	#if 1
-	#if 0
-					SYSTEMTIME	LocalTime;
-					GetLocalTime(&LocalTime);
-					char strtime[27];
-
-					// format time
-					sprintf(strtime, "[%04d/%02d/%02d %02d:%02d:%02d.%03d] ",
-							LocalTime.wYear, LocalTime.wMonth,LocalTime.wDay,
-							LocalTime.wHour, LocalTime.wMinute, LocalTime.wSecond,
-							LocalTime.wMilliseconds);
-	#else
 					char *strtime = mctimelocal(ts.LogTimestampFormat, ts.LogTimestampUTC);
-	#endif
-	#else
-						time_t tick = time(NULL);
-						char *strtime = ctime(&tick);
-	#endif
-					/* 2007.05.24 Gentaro */
-					if( eLineEnd == Line_FileHead ){
-						WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &wrote, NULL);
-					}
 					WriteFile((HANDLE)LogVar->FileHandle, "[", 1, &wrote, NULL);
 					WriteFile((HANDLE)LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
 					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);
