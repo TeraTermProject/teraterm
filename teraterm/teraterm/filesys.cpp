@@ -416,11 +416,7 @@ static void CloseFileSync(PFileVar ptr)
 		CloseHandle(ptr->LogThread);
 		ptr->LogThread = (HANDLE)-1;
 	}
-#ifdef FileVarWin16
-	_lclose(ptr->FileHandle);
-#else
 	CloseHandle((HANDLE)ptr->FileHandle);
-#endif
 }
 
 // 遅延書き込み用スレッド
@@ -444,11 +440,7 @@ static unsigned _stdcall DeferredLogWriteThread(void *arg)
 			case WM_DPC_LOGTHREAD_SEND:
 				buf = (PCHAR)msg.wParam;
 				buflen = (DWORD)msg.lParam;
-#ifdef FileVarWin16
-				_lwrite(fv->FileHandle, buf, buflen );
-#else
 				WriteFile((HANDLE)LogVar->FileHandle, buf, buflen, &wrote, NULL);
-#endif
 				free(buf);   // ここでメモリ解放
 				break;
 
@@ -617,11 +609,7 @@ BOOL LogStart()
 		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
 		                                     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (LogVar->FileHandle>0){
-#ifdef FileVarWin16
-			_llseek(LogVar->FileHandle,0,2);
-#else
 			SetFilePointer((HANDLE)LogVar->FileHandle, 0, NULL, FILE_END);
-#endif
 			/* 2007.05.24 Gentaro
 				If log file already exists,
 				a newline is inserted before the first timestamp.
@@ -1020,21 +1008,11 @@ void LogToFile()
 	#endif
 					/* 2007.05.24 Gentaro */
 					if( eLineEnd == Line_FileHead ){
-#ifdef FileVarWin16
-						_lwrite(LogVar->FileHandle,"\r\n",2);
-#else
 						WriteFile((HANDLE)LogVar->FileHandle, "\r\n", 2, &wrote, NULL);
-#endif
 					}
-#ifdef FileVarWin16
-					_lwrite(LogVar->FileHandle,"[",1);
-					_lwrite(LogVar->FileHandle, strtime, strlen(strtime));
-					_lwrite(LogVar->FileHandle,"] ",2);
-#else
 					WriteFile((HANDLE)LogVar->FileHandle, "[", 1, &wrote, NULL);
 					WriteFile((HANDLE)LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
 					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);
-#endif
 				}
 
 				/* 2007.05.24 Gentaro */
@@ -1045,11 +1023,7 @@ void LogToFile()
 					eLineEnd = Line_Other; /* clear endmark*/
 				}
 
-#ifdef FileVarWin16
-				_lwrite(LogVar->FileHandle,(PCHAR)&b,1);
-#else
 				WriteFile((HANDLE)LogVar->FileHandle, (PCHAR)&b, 1, &wrote, NULL);
-#endif
 				(LogVar->ByteCount)++;
 			}
 		}
@@ -1171,12 +1145,8 @@ void FileSendStart()
 	else
 		(*SetFileVar)(SendVar);
 
-#ifdef FileVarWin16
-	SendVar->FileHandle = _lopen(SendVar->FullName,OF_READ);
-#else
 	SendVar->FileHandle = (int)CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
 	                                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-#endif
 	SendVar->FileOpen = (SendVar->FileHandle>0);
 	if (! SendVar->FileOpen)
 	{
@@ -1295,12 +1265,8 @@ void FileSendBinayBoost()
 
 	do {
 		if (FileSendHandler.pos == FileSendHandler.end) {
-#ifdef FileVarWin16
-			fc = _lread(SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf));
-#else
 			ReadFile((HANDLE)SendVar->FileHandle, &(FileSendHandler.buf[0]), sizeof(FileSendHandler.buf), &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
-#endif
 			FileSendHandler.pos = 0;
 			FileSendHandler.end = fc;
 		} else {
@@ -1380,21 +1346,13 @@ void FileSend()
 			}
 		}
 		else if (! FileReadEOF) {
-#ifdef FileVarWin16
-			fc = _lread(SendVar->FileHandle,&FileByte,1);
-#else
 			ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 			fc = LOWORD(read_bytes);
-#endif
 			SendVar->ByteCount = SendVar->ByteCount + fc;
 
 			if (FileCRSend && (fc==1) && (FileByte==0x0A)) {
-#ifdef FileVarWin16
-				fc = _lread(SendVar->FileHandle,&FileByte,1);
-#else
 				ReadFile((HANDLE)SendVar->FileHandle, &FileByte, 1, &read_bytes, NULL);
 				fc = LOWORD(read_bytes);
-#endif
 				SendVar->ByteCount = SendVar->ByteCount + fc;
 			}
 		}

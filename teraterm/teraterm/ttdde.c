@@ -601,12 +601,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		if (LogVar != NULL)
 		{
 			DWORD wrote;
-#ifdef FileVarWin16
-			_lwrite(LogVar->FileHandle,
-				ParamFileName,strlen(ParamFileName));
-#else
 			WriteFile((HANDLE)LogVar->FileHandle, ParamFileName, strlen(ParamFileName), &wrote, NULL);
-#endif
 			LogVar->ByteCount =
 				LogVar->ByteCount + strlen(ParamFileName);
 			FLogRefreshNum();
