@@ -3,26 +3,25 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <title>Terminal ([Setup] menu; Russian mode)</title>
+    <title>Terminal ([Setup] menu; Japanese mode)</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
 
   <body>
-    <h1>Terminal ([Setup] menu; Russian mode)</h1>
+    <h1>Terminal ([Setup] menu; Japanese mode)</h1>
 
     <p>
-      This page is described when the <a href="setup-general.html#Language">Language</a> is selected to Russian on the <a href="setup-general.html">Setup - General</a> dialog.
+      This page is described when the <a href="setup-general.html#Language">Language</a> is selected to Japanese on the <a href="setup-general.html">Setup - General</a> dialog.
       Please refer to below page if another language mode is used.
     </p>
 
     <ul>
-      <li><a href="setup-terminaljp.html">Japanese mode</a></li>
       <li><a href="setup-terminal.html">English mode</a></li>
-      <li><a href="setup-terminalk.html">Korean mode</a></li>
-      <li><a href="setup-terminalutf8.html">UTF-8 mode</a></li>
+      <li><a href="setup-terminal_ko.html">Korean mode</a></li>
+      <li><a href="setup-terminal_ru.html">Russian mode</a></li>
+      <li><a href="setup-terminal_utf8.html">UTF-8 mode</a></li>
     </ul>
-
 
     <h2>"Terminal setup" dialog box</h2>
     <dl>
@@ -51,11 +50,11 @@
           <dd>Tera Term doesn't convert it.</dd>
 
           <dt>CR+LF</dt>
-          <dd>Received CR ($0D) characters are converted to CR+LF ($0D $0A) pairs.<br>
+          <dd>Received CR ($0D) character is converted to CR+LF ($0D $0A) pairs.<br>
               e.g.) If "CR LF" is received, it is converted to "CR LF LF."</dd>
 
           <dt>LF</dt>
-          <dd>Received LF ($0A) characters are converted to CR+LF ($0D $0A) pairs.<br>
+          <dd>Received LF ($0A) character is converted to CR+LF ($0D $0A) pairs.<br>
               e.g.) If "CR LF" is received, it is converted to "CR CR LF."</dd>
 
           <dt>AUTO</dt>
@@ -73,7 +72,10 @@
           <dd>Tera Term doesn't convert it.</dd>
 
           <dt>CR+LF</dt>
-          <dd>CR ($0D) characters to be sent are converted to CR+LF ($0D $0A) pairs before they are actually sent.</dd>
+          <dd>CR ($0D) character to be sent is converted to CR+LF ($0D $0A) pairs before it is actually sent.</dd>
+
+          <dt>LF</dt>
+          <dd>CR ($0D) character to be sent is converted to LF ($0A) before it is actually sent.</dd>
         </dl>
       </dd>
 
@@ -107,28 +109,60 @@
 	Enables auto switching between VT and TEK emulations.
       </dd>
 
-      <dt id="RussCharSet">Character set</dt>
+      <dt id="KanjiReceive">Kanji (receive)</dt>
       <dd>
-	<dl>
-	  <dt id="RussHost">Host</dt>
-	  <dd>
-	    Russian character set used in the host computer.
-	    Windows (CP 1251), KOI8-R, CP 866 or ISO 8859-5.
-	  </dd>
-
-	  <dt id="RussClient">Client</dt>
-	  <dd>
-	    Russian character set used in your PC. Windows (CP 1251),
-	    KOI8-R, CP 866 or ISO 8859-5. If you are using Russian version
-	    of Windows, you should select Windows.
-	  </dd>
-
-      <dt id="RussFont">Font</dt>
-      <dd>
-	Character code set of the specified font, Windows (CP 1251),
-	KOI8-R, CP 866 or ISO 8859-5.
+	Kanji character that is received from host(SJIS, EUC, JIS, UTF-8 and UTF-8m).
       </dd>
-	</dl>
+
+      <dt id="KatakanaReceive">7bit katakana (receive)</dt>
+      <dd>
+	When "HANKAKU" katakana code from host is described for 7bit
+	(Shift control with SO/SI is using), please select this entry.
+	This is only enabled when Kanji (receive) is JIS.
+      </dd>
+
+      <dt id="KanjiSend">Kanji (transmit)</dt>
+      <dd>
+	Kanji character that is sent from client(SJIS, EUC, JIS and UTF-8).
+      </dd>
+
+      <dt id="KatakanaSend">7bit katakana (transmit)</dt>
+      <dd>
+	When "HANKAKU" katakana code from host is described for 7bit
+	(Shift control with SO/SI is using), please select this entry.
+	This is only enabled when Kanji (transmit) is JIS.
+      </dd>
+
+      <dt id="KanjiIn">Kanji-in (transmit)</dt>
+      <dd>
+	The escape sequence is used when Kanji (transmit) is JIS.
+	(Sequence regarding Kanji character is specified to G0.
+	^[$@ or ^[$B).
+	The escape sequence from host can use any sequence.
+      </dd>
+
+      <dt id="KanjiOut">Kanji-out (transmit)</dt>
+      <dd>
+	The escape sequence is used when Kanji (transmit) is JIS.
+	(Sequence regarding ASCII and JIS Roman code is specified to G0.
+	^[(B or ^[(J ).
+	The escape sequence from host can use any sequence.
+	<p>
+	  NOTICE: ^[(H can not be selected on initial setting. <br>
+	  <!--a href="../usage/tips/incorrect-kanjiout.html">¨ ^[(H ‚ð‘I‘ð‰Â”\‚É‚·‚éB</a-->
+	</p>
+      </dd>
+
+      <dt id="locale">locale</dt>
+      <dd>
+	Locale setting.
+	Refer to <a href="../usage/unicode.html">Unicode</a> for details.
+      </dd>
+
+      <dt id="CodePage">CodePage</dt>
+      <dd>
+	Codepage setting.
+	Refer to <a href="../usage/unicode.html">Unicode</a> for details.
       </dd>
     </dl>
   </body>

@@ -3,24 +3,24 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-    <title>Terminal ([Setup] メニュー; 韓国語モード)</title>
+    <title>Terminal ([Setup] メニュー; ロシア語モード)</title>
     <META http-equiv="Content-Style-Type" content="text/css">
     <link rel="stylesheet" href="../style.css" type="text/css">
   </head>
 
   <body>
-    <h1>Terminal ([Setup] メニュー; 韓国語モード)</h1>
+    <h1>Terminal ([Setup] メニュー; ロシア語モード)</h1>
 
     <p>
-      このページは <a href="setup-general.html">Setup - General</a> で <a href="setup-general.html#Language">Language</a> に Korean を選択した時の説明です。
+      このページは <a href="setup-general.html">Setup - General</a> で <a href="setup-general.html#Language">Language</a> に Russian を選択した時の説明です。
       他の言語モード使用時は以下のページを参照してください。
     </p>
 
     <ul>
-      <li><a href="setup-terminalen.html">英語モードのヘルプ</a></li>
-      <li><a href="setup-terminalr.html">ロシア語モードのヘルプ</a></li>
       <li><a href="setup-terminal.html">日本語モードのヘルプ</a></li>
-      <li><a href="setup-terminalutf8.html">UTF-8モードのヘルプ</a></li>
+      <li><a href="setup-terminal_en.html">英語モードのヘルプ</a></li>
+      <li><a href="setup-terminal_ko.html">韓国語モードのヘルプ</a></li>
+      <li><a href="setup-terminal_utf8.html">UTF-8モードのヘルプ</a></li>
     </ul>
 
     <h2>"Terminal setup" ダイアログボックス</h2>
@@ -110,26 +110,29 @@
 	TEK window へ制御を移します(逆も同様)。
       </dd>
 
-      <dt id="KanjiReceive">Coding (receive)</dt>
+      <dt id="RussCharSet">Character set</dt>
       <dd>
-	ホストから送られてくる文字コード (KS5601, UTF-8, UTF-8m の3種類)。
-      </dd>
+	<dl>
+	  <dt id="RussHost">Host</dt>
+	  <dd>
+	    ホストコンピュータで使用されているロシア語文字セット。
+	    Windows (CP 1251), KOI8-R, CP 866 or ISO 8859-5 から選択します。
+	  </dd>
 
-      <dt id="KanjiSend">Coding (transmit)</dt>
-      <dd>
-	送出する文字コード (KS5601, UTF-8 の2種類)。
-      </dd>
+	  <dt id="RussClient">Client</dt>
+	  <dd>
+	    あなたの PC で使用されているロシア語文字セット。
+	    Windows (CP 1251), KOI8-R, CP 866, ISO 8859-5 から選択します。
+	    もしあなたがロシア語 Windows を使用しているなら、Windows
+	    を選択すべきです。
+	  </dd>
 
-      <dt id="locale">locale</dt>
-      <dd>
-	ロケール。
-	詳細は<a href="../usage/unicode.html">Unicode設定</a>を参照。
-      </dd>
-
-      <dt id="CodePage">CodePage</dt>
-      <dd>
-	コードページ。
-	詳細は<a href="../usage/unicode.html">Unicode設定</a>を参照。
+	  <dt id="RussFont">Font</dt>
+	  <dd>
+	    指定されたフォントの文字コードを、Windows (CP 1251), KOI8-R,
+	    CP 866, ISO 8859-5 の中から選択します。
+	  </dd>
+	</dl>
       </dd>
     </dl>
   </body>
