@@ -19,6 +19,11 @@
 #define HlpFilePrint            12
 #define HlpSetupTerminal        13
 #define HlpSetupTerminalRuss    14
+#define HlpSetupTerminalEn      41
+#define HlpSetupTerminalJa      42
+#define HlpSetupTerminalKo      43
+#define HlpSetupTerminalRu      44
+#define HlpSetupTerminalUtf8    45
 #define HlpSetupWindow          15
 #define HlpSetupFont            16
 #define HlpSetupKeyboard        18
