@@ -931,7 +931,7 @@ void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level)
 		             _S_IREAD | _S_IWRITE);
 
 		if (file >= 0) {
-			char *strtime = mctimelocal("%Y-%m-%dT%H:%M:%S,%NZ", TRUE);
+			char *strtime = mctimelocal("%Y-%m-%d %H:%M:%S.%NZ", TRUE);
 			DWORD processid;
 			char tmp[26];
 
