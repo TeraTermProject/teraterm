@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-05-12)
+; Updated by TeraTerm Project (2017-06-06)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -858,6 +858,8 @@ MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
 MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
 MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
 MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
+MSG_SSH_AGENTERROR_TITLE=Bad agent request
+MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Unrecognized command-line option: %s

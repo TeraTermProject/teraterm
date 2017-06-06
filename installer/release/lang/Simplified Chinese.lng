@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-05-12)
+; Updated by TeraTerm Project (2017-06-06)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -859,6 +859,8 @@ MSG_SSH_GEX_SIZE_OUTOFRANGE=接收到的组大小超出范围：%d
 MSG_SSH_GEX_SIZE_SMALLER=接收到的组大小小于请求的最小值。\n请求：%d，收到：%d\n确定要接受收到的组吗？
 MSG_SSH_GEX_SIZE_LARGER=接收到的组大小大于请求的最大值。\n请求：%d，收到：%d\n确定要接受收到的组吗？
 MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
+MSG_SSH_AGENTERROR_TITLE=Bad agent request
+MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=无效的命令行选项：%s

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "resource.h"
 #include "libputty.h"
 #include "key.h"
+#include "ttcommon.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -9147,6 +9148,18 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	if (agent_msg->len == 0) {
 		req_len = get_uint32_MSBfirst(data);
 		if (req_len > AGENT_MAX_MSGLEN - 4) {
+			logprintf(pvar, LOG_LEVEL_NOTICE,
+				__FUNCTION__ ": Agent Forwarding Error: server request is too large. "
+				"size=%u, allowd max=%u.", req_len, AGENT_MAX_MSGLEN-4);
+			if (pvar->session_settings.ForwardAgentNotify) {
+				char title[MAX_UIMSG];
+				UTIL_get_lang_msg("MSG_SSH_AGENTERROR_TITLE", pvar, "Bad agent request");
+				strncpy_s(title, sizeof(title), pvar->ts->UIMsg, _TRUNCATE);
+				UTIL_get_lang_msg("MSG_SSH_AGENTERROR_TOOLARGE", pvar,
+					"Agent request size is too large, ignore it.");
+				NotifyInfoMessage(pvar->cv, pvar->ts->UIMsg, title);
+			}
+
 			goto error;
 		}
 
@@ -9167,6 +9180,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 
 	agent_query(data, *agent_request_len, &response, &resplen, NULL, NULL);
 	if (response == NULL || resplen < 5) {
+		logprintf(pvar, LOG_LEVEL_NOTICE, __FUNCTION__ "Agent Forwarding Error: agent_query is failed.");
 		goto error;
 	}
 
