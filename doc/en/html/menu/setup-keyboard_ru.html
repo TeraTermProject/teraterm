@@ -16,7 +16,7 @@
       <dt>Transmit DEL by:</dt>
       <dd>
 	<dl>
-	  <dt>Backspace key</dt>
+	  <dt id="BSKey">Backspace key</dt>
 	  <dd>
 	    If this option is checked, pressing the backspace key sends
 	    the DEL character (ASCII 0x7F). If not checked, the BS character
@@ -25,7 +25,7 @@
 	    Ctrl+backspace key.
 	  </dd>
 
-	  <dt>Delete key</dt>
+	  <dt id="DeleteKey">Delete key</dt>
 	  <dd>
 	    If this option is checked, pressing the Delete key sends the
 	    DEL character. If not checked, the function assigned for the
@@ -43,17 +43,18 @@
 	generates KOI8-R code, select KOI8-R.
       </dd>
 
-      <dt>Meta key</dt>
+      <dt id="MetaKey">Meta key</dt>
       <dd>
 	Enables the meta-key mode. The Alt key is used as the meta key.
 	For example, the sequence ESC A is sent by pressing the Alt+A key.
-	Shortcut keys which use the Alt key (such as Alt+C) are disabled.
+	Shortcut keys which use the Alt key (such as Alt+C) are disabled.<br>
+	Please set the "left" value to input the character with AltGr key and the Meta key is enabled. However, this value can be enabled with Windows NT 4.0 later.
       </dd>
 
       <dt>Disabled mode:</dt>
       <dd>
 	<dl>
-	  <dt>Application Keypad</dt>
+	  <dt id="DisableAppKeypad">Application Keypad</dt>
 	  <dd>
 	    This option disables Application Keypad mode.<br>
 	    If this option is selected, you can prevent a problem of a
@@ -63,7 +64,7 @@
 	    may encounter other problems when this option is selected.
 	  </dd>
 
-	  <dt>Application Cursor</dt>
+	  <dt id="DisableAppCursor">Application Cursor</dt>
 	  <dd>
 	    This option disables Application Cursor mode.
 	  </dd>

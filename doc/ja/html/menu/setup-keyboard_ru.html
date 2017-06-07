@@ -16,7 +16,7 @@
       <dt>Transmit DEL by:</dt>
       <dd>
 	<dl>
-	  <dt>Backspace key</dt>
+	  <dt id="BSKey">Backspace key</dt>
 	  <dd>
 	    このオプションが選択されると backspace キーを押した時に DEL 文字
 	    (ASCII $7F) が送出されます。
@@ -25,7 +25,7 @@
 	    Ctrl+Backspace で BS (DEL) 文字を送出できます。
 	  </dd>
 
-	  <dt>Delete key</dt>
+	  <dt id="DeleteKey">Delete key</dt>
 	  <dd>
 	    このオプションが選択されると Delete (Del) キーを押した時に
 	    DEL 文字が送出されます。
@@ -46,17 +46,18 @@
 	を選択してください。
       </dd>
 
-      <dt>Meta key</dt>
+      <dt id="MetaKey">Meta key</dt>
       <dd>
 	Alt キーをメタ・キー (meta key) として使います。
 	例えば、Alt+A を押すと、ESC A を送出します。
-	メタ・キーモードでは、ショートカット・キーは一部を除いて使用できなくなります。
+	メタ・キーモードでは、ショートカット・キーは一部を除いて使用できなくなります。<br >
+	メタ・キーを有効にしつつ AltGr キーとの組み合わせで文字を入力をしたい場合は、設定値を left にします。※NT 4.0 以降のみ対応
       </dd>
 
       <dt>Disabled mode:</dt>
       <dd>
 	<dl>
-	  <dt>Application Keypad</dt>
+	  <dt id="DisableAppKeypad">Application Keypad</dt>
 	  <dd>
 	    アプリケーションキーパッドモードを無効にします。<br>
 	    アプリケーションキーパッドモードを無効にすると、
@@ -66,7 +67,7 @@
 	    アプリケーションでは不具合が起きるかもしれません。
 	  </dd>
 
-	  <dt>Application Cursor</dt>
+	  <dt id="DisableAppCursor">Application Cursor</dt>
 	  <dd>
 	    アプリケーションカーソルモードを無効にします。
 	  </dd>
