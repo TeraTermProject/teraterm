@@ -54,6 +54,9 @@
 #define HlpAboutContacts        20008
 #define HlpAboutJargons         20009
 #define HlpAboutWriter          20010
+#define HlpAboutCtrlseq         20011
+#define HlpAboutDifference      20012
+#define HlpAboutForeword        20013
 
 #define HlpUsageKeyboard                30100
 #define HlpUsageMouse                   30200
@@ -80,20 +83,37 @@
 #define HlpUsageTipsDoubleclick         30815
 #define HlpUsageTipsNotc1char           30816
 #define HlpUsageTipsIncorrectkout       30817
+#define HlpUsageTipsAppkeypad           30818
+#define HlpUsageTipsIme                 30819
+#define HlpUsageTipsNamedpipe           30820
+#define HlpUsageTipsTelnetprotocol      30821
+#define HlpUsageTipsVim                 30822
+#define HlpUsageTipsVirtualstore        30823
 #define HlpUsageUnicode                 30900
 #define HlpUsageTransparent             31000
+#define HlpUsageTtmenuTtmenu            31100
+#define HlpUsageKcodechange             31200
+#define HlpUsageRecurringcommand        31300
+#define HlpUsageResizemenu              31400
+#define HlpUsageTtyrec                  31500
 
 #define HlpMenuFile                         41000
 #define HlpMenuFileNew                      41100
 #define HlpMenuFileLog                      41200
 #define HlpMenuFileSendfile                 41300
 #define HlpMenuFileTransfer                 41400
+#define HlpMenuFileTransferKermit           41410
 #define HlpMenuFileTransferKermitGet        41411
 #define HlpMenuFileTransferKermitSend       41412
+#define HlpMenuFileTransferXmodem           41420
 #define HlpMenuFileTransferXmodemReceive    41421
 #define HlpMenuFileTransferXmodemSend       41422
+#define HlpMenuFileTransferYmodem           41460
+#define HlpMenuFileTransferZmodem           41430
 #define HlpMenuFileTransferZmodemSend       41431
+#define HlpMenuFileTransferBplus            41440
 #define HlpMenuFileTransferBplusSend        41441
+#define HlpMenuFileTransferQuickvan         41450
 #define HlpMenuFileTransferQuickvanSend     41451
 #define HlpMenuFileChdir                    41500
 #define HlpMenuFilePrint                    41600
@@ -116,9 +136,11 @@
 #define HlpMenuSetupDir                     43016
 #define HlpMenuSetupKeymap                  43015
 #define HlpMenuControl                      44000
+#define HlpMenuControlBroadcast             44001
 #define HlpMenuWindow                       45000
 #define HlpMenuWindowWindow                 45001
 #define HlpMenuHelp                         46000
+#define HlpMenuResize                       47000
 
 #define HlpMenutekFile          50000
 #define HlpMenutekFilePrint     50001
@@ -136,6 +158,7 @@
 #define HlpCmdlineTtssh     60003
 #define HlpCmdlineCygterm   60004
 #define HlpCmdlineTtproxy   60005
+#define HlpCmdlineTtyplay   60006
 
 #define HlpSetupTeraterm        71000
 #define HlpSetupTeratermTerm    71001
@@ -144,9 +167,11 @@
 #define HlpSetupTeratermTrans   71004
 #define HlpSetupTeratermPrint   71005
 #define HlpSetupTeratermMisc    71006
+#define HlpSetupTeratermIni     71007
 #define HlpSetupKbd             71000
 #define HlpSetupSshknownhosts   72000
 #define HlpSetupCygterm         73000
+#define HlpSetupLang            74000
 
 #define HlpRefKeycode   80001
 #define HlpRefRe        80002
@@ -363,11 +388,12 @@
 #define HlpMacroCommandZmodemrecv       92108
 #define HlpMacroCommandZmodemsend       92109
 
-#define HlpMacroAppendixes          93000
-#define HlpMacroAppendixesError     93001
-#define HlpMacroAppendixesNewline   93002
-#define HlpMacroAppendixesNegative  93003
-#define HlpMacroAppendixesAscii     93004
-#define HlpMacroAppendixesRegex     93005
+#define HlpMacroAppendixes              93000
+#define HlpMacroAppendixesError         93001
+#define HlpMacroAppendixesNewline       93002
+#define HlpMacroAppendixesNegative      93003
+#define HlpMacroAppendixesAscii         93004
+#define HlpMacroAppendixesRegex         93005
+#define HlpMacroAppendixesDisconnect    93006
 
 #define HlpUninstall    100000
