@@ -575,10 +575,14 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        Temp, sizeof(Temp), FName);
 	GetNthNum(Temp, 1, &ts->TerminalWidth);
 	GetNthNum(Temp, 2, &ts->TerminalHeight);
-	if (ts->TerminalWidth < 0)
-		ts->TerminalWidth = 1;
-	if (ts->TerminalHeight < 0)
-		ts->TerminalHeight = 1;
+	if (ts->TerminalWidth <= 0)
+		ts->TerminalWidth = 80;
+	else if (ts->TerminalWidth > TermWidthMax)
+		ts->TerminalWidth = TermWidthMax;
+	if (ts->TerminalHeight <= 0)
+		ts->TerminalHeight = 24;
+	else if (ts->TerminalHeight > TermHeightMax)
+		ts->TerminalHeight = TermHeightMax;
 
 	/* Terminal size = Window size */
 	ts->TermIsWin = GetOnOff(Section, "TermIsWin", FName, FALSE);
