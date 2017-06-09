@@ -235,6 +235,10 @@
 				RelativePath="ttmdlg.cpp"
 				>
 			</File>
+			<File
+				RelativePath="ttmmain.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -378,10 +382,6 @@
 			</File>
 			<File
 				RelativePath="ttmlib.c"
-				>
-			</File>
-			<File
-				RelativePath="ttmmain.cpp"
 				>
 			</File>
 			<File

@@ -132,6 +132,7 @@
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="ttmacro.cpp" />
     <ClCompile Include="ttmdlg.cpp" />
+    <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="ttl.c" />
     <ClCompile Include="..\common\ttlib.c" />
@@ -139,7 +140,6 @@
     <ClCompile Include="ttmdde.c" />
     <ClCompile Include="ttmenc.c" />
     <ClCompile Include="ttmlib.c" />
-    <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmparse.c" />
     <ClCompile Include="wait4all.c" />
   </ItemGroup>

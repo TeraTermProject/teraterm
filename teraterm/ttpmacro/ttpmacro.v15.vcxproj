@@ -137,12 +137,12 @@
     <ClCompile Include="statdlg.cpp" />
     <ClCompile Include="ttl.c" />
     <ClCompile Include="ttmacro.cpp" />
+    <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmbuff.c" />
     <ClCompile Include="ttmdde.c" />
     <ClCompile Include="ttmdlg.cpp" />
     <ClCompile Include="ttmenc.c" />
     <ClCompile Include="ttmlib.c" />
-    <ClCompile Include="ttmmain.cpp" />
     <ClCompile Include="ttmparse.c" />
     <ClCompile Include="wait4all.c" />
   </ItemGroup>

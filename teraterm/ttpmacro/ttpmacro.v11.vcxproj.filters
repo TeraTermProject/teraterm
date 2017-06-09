@@ -43,6 +43,9 @@
     <ClCompile Include="ttmdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ttmmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\common\i18n.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -62,9 +65,6 @@
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
     <ClCompile Include="ttmlib.c">
-      <Filter>Source Files %28C%29</Filter>
-    </ClCompile>
-    <ClCompile Include="ttmmain.cpp">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
     <ClCompile Include="ttmparse.c">
