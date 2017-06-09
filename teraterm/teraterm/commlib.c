@@ -122,6 +122,9 @@ void CommInit(PComVar cv)
 /* message flag */
 	cv->NoMsg = 0;
 
+	cv->isSSH = 0;
+	cv->TitleRemote[0] = '\0';
+
 	cv->NotifyIcon = NULL;
 }
 

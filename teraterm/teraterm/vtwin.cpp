@@ -737,10 +737,6 @@ CVTWindow::CVTWindow()
 	InitKeyboard();
 	SetKeyMap();
 
-	// コマンドラインでも設定ファイルでも変更しないのでここで初期化 (2008.1.25 maya)
-	cv.isSSH = 0;
-	cv.TitleRemote[0] = '\0';
-
 	/* window status */
 	AdjustSize = TRUE;
 	Minimized = FALSE;
