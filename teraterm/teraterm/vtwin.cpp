@@ -231,10 +231,6 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
-// CVTWindow constructor
-
-
 static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
 	typedef BOOL (WINAPI *func)(HWND,COLORREF,BYTE,DWORD);
@@ -633,6 +629,9 @@ BOOL GetVirtualStoreEnvironment(void)
 error:
 	return (ret);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// CVTWindow constructor
 
 CVTWindow::CVTWindow()
 {
