@@ -119,7 +119,7 @@ BOOL LoadTTFILE()
 	else
 		TTFILECount = 0;
 
-	HTTFILE = LoadLibrary("TTPFILE.DLL");
+	HTTFILE = LoadHomeDLL("TTPFILE.DLL");
 	if (HTTFILE == NULL)
 		return FALSE;
 

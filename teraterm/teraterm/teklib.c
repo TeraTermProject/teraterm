@@ -7,6 +7,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tektypes.h"
+#include "ttwinman.h"
 
 #include "teklib.h"
 
@@ -58,7 +59,7 @@ BOOL LoadTTTEK()
   BOOL Err;
 
   if (HTTTEK != NULL) return TRUE;
-  HTTTEK = LoadLibrary("TTPTEK.DLL");
+  HTTTEK = LoadHomeDLL("TTPTEK.DLL");
   if (HTTTEK == NULL) return FALSE;
 
   Err = FALSE;

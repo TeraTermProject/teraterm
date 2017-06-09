@@ -9,6 +9,8 @@
 #include "ttsetup.h"
 #include "ttplug.h" /* TTPLUG */
 
+#include "ttwinman.h"
+
 PReadIniFile ReadIniFile;
 PWriteIniFile WriteIniFile;
 PReadKeyboardCnf ReadKeyboardCnf;
@@ -34,7 +36,7 @@ BOOL LoadTTSET()
   BOOL Err;
 
   if (HTTSET != NULL) return TRUE;
-  HTTSET = LoadLibrary("TTPSET.DLL");
+  HTTSET = LoadHomeDLL("TTPSET.DLL");
   if (HTTSET == NULL) return FALSE;
 
   Err = FALSE;

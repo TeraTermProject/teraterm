@@ -44,7 +44,7 @@ BOOL LoadTTDLG()
 	if (HTTDLG == NULL) {
 		TTDLGUseCount = 0;
 
-		HTTDLG = LoadLibrary("TTPDLG.DLL");
+		HTTDLG = LoadHomeDLL("TTPDLG.DLL");
 		if (HTTDLG==NULL) return FALSE;
 
 		TTDLGSetUILanguageFile(ts.UILanguageFile);

@@ -13,6 +13,7 @@ void ConvertToCP932(char *str, int len);
 void ChangeTitle();
 void SwitchMenu();
 void SwitchTitleBar();
+HMODULE LoadHomeDLL(const char *DLLname);
 
 extern HWND HVTWin;
 extern HWND HTEKWin;

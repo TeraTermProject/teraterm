@@ -275,3 +275,10 @@ void SwitchTitleBar()
   if (H2!=0)
     PostMessage(H2,WM_USER_CHANGETBAR,0,0);
 }
+
+HMODULE LoadHomeDLL(const char *DLLname)
+{
+	char DLLpath[MAX_PATH];
+	_snprintf_s(DLLpath, sizeof(DLLpath), _TRUNCATE, "%s\\%s", ts.HomeDir, DLLname);
+	return LoadLibrary(DLLpath);
+}
