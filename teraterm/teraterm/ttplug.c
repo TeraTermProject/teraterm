@@ -83,27 +83,17 @@ void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   //if (getenv("TERATERM_EXTENSIONS") != NULL) {
   if (1) {
     char buf[1024];
-    int index;
     struct _finddata_t searchData;
     long searchHandle;
 
-    if (GetModuleFileName(hInst, buf, sizeof(buf)) == 0) {
-      return;
-    }
-    for (index = strlen(buf) - 1;
-    index >= 0 && buf[index] != '\\' && buf[index] != ':' && buf[index] != '/';
-      index--) {
-    }
-    index++;
-    strncpy_s(buf + index, sizeof(buf) - index, "TTX*.DLL", _TRUNCATE);
+    _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts->HomeDir);
 
-    searchHandle = _findfirst(buf,&searchData);
+    searchHandle = _findfirst(buf, &searchData);
     if (searchHandle != -1L) {
-      loadExtension(&extensionList, searchData.name);
-
-      while (_findnext(searchHandle, &searchData)==0) {
-	loadExtension(&extensionList, searchData.name);
-      }
+      do {
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\%s", ts->HomeDir, searchData.name);
+	loadExtension(&extensionList, buf);
+      } while (_findnext(searchHandle, &searchData)==0);
       _findclose(searchHandle);
     }
 
