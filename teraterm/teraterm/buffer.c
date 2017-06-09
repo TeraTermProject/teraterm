@@ -275,6 +275,16 @@ void InitBuffer()
 	NumOfColumns = ts.TerminalWidth;
 	NumOfLines = ts.TerminalHeight;
 
+	if (NumOfColumns <= 0)
+		NumOfColumns = 80;
+	else if (NumOfColumns > TermWidthMax)
+		NumOfColumns = TermWidthMax;
+
+	if (NumOfLines <= 0)
+		NumOfLines = 24;
+	else if (NumOfLines > TermHeightMax)
+		NumOfLines = TermHeightMax;
+
 	/* setup window */
 	if (ts.EnableScrollBuff>0) {
 		if (ts.ScrollBuffSize < NumOfLines) {
