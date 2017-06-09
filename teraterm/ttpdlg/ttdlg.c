@@ -355,20 +355,28 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					ts = (PTTSet)GetWindowLong(Dialog,DWL_USER);
 
 					if ( ts!=NULL ) {
-						ts->TerminalWidth = GetDlgItemInt(Dialog,IDC_TERMWIDTH,NULL,FALSE);
-						if ( ts->TerminalWidth<1 ) {
-							ts->TerminalWidth = 1;
-						}
-						else if ( ts->TerminalWidth>TermWidthMax ) {
+						int width, height;
+
+						width = GetDlgItemInt(Dialog, IDC_TERMWIDTH, NULL, FALSE);
+						if (width > TermWidthMax) {
 							ts->TerminalWidth = TermWidthMax;
 						}
-
-						ts->TerminalHeight = GetDlgItemInt(Dialog,IDC_TERMHEIGHT,NULL,FALSE);
-						if ( ts->TerminalHeight<1 ) {
-							ts->TerminalHeight = 1;
+						else if (width > 0) {
+							ts->TerminalWidth = width;
 						}
-						else if ( ts->TerminalHeight>TermHeightMax ) {
+						else { // 0 ˆÈ‰º‚Ìê‡‚Í•ÏX‚µ‚È‚¢
+							;
+						}
+
+						height = GetDlgItemInt(Dialog, IDC_TERMHEIGHT, NULL, FALSE);
+						if (height > TermHeightMax) {
 							ts->TerminalHeight = TermHeightMax;
+						}
+						else if (height > 0) {
+							ts->TerminalHeight = height;
+						}
+						else { // 0 ˆÈ‰º‚Ìê‡‚Í•ÏX‚µ‚È‚¢
+							;
 						}
 
 						GetRB(Dialog,&ts->TermIsWin,IDC_TERMISWIN,IDC_TERMISWIN);
