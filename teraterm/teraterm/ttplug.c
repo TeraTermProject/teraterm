@@ -67,6 +67,8 @@ static void loadExtension(ExtensionList * * extensions, char const * fileName) {
   }
 
   err = GetLastError();
+  // 言語ファイルによるメッセージの国際化を行っているが、この時点では設定が
+  // まだ読み込まれていない為、メッセージが英語のままとなる。要検討。
   get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts.UILanguageFile);
   get_lang_msg("MSG_LOAD_EXT_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Cannot load extension %s (%d)", ts.UILanguageFile);
   _snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, fileName, err);
