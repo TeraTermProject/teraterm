@@ -35,6 +35,24 @@ END_MESSAGE_MAP()
 
 CCtrlApp::CCtrlApp()
 {
+	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
+	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
+
+	HMODULE module;
+	pSetDllDir setDllDir;
+	pSetDefDllDir setDefDllDir;
+
+	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
+		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
+			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
+			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
+		}
+		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
+			// SetDefaultDllDirectories() が使えなくても、SetDllDirectory() が使える場合は
+			// カレントディレクトリだけでも検索パスからはずしておく。
+			(*setDllDir)("");
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
