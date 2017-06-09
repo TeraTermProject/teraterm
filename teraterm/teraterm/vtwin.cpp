@@ -648,6 +648,7 @@ CVTWindow::CVTWindow()
 	PKeyMap tempkm;
 #endif
 	int fuLoad = LR_DEFAULTCOLOR;
+	BOOL isFirstInstance;
 
 #ifdef _DEBUG
   ::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -656,13 +657,14 @@ CVTWindow::CVTWindow()
 	// 例外ハンドラのフック (2007.9.30 yutaka)
 	SetUnhandledExceptionFilter(ApplicationFaultHandler);
 
-	TTXInit(&ts, &cv); /* TTPLUG */
-
 	CommInit(&cv);
+	isFirstInstance = StartTeraTerm(&ts);
+
+	TTXInit(&ts, &cv); /* TTPLUG */
 
 	MsgDlgHelp = RegisterWindowMessage(HELPMSGSTRING);
 
-	if (StartTeraTerm(&ts)) {
+	if (isFirstInstance) {
 		/* first instance */
 		if (LoadTTSET()) {
 			/* read setup info from "teraterm.ini" */
