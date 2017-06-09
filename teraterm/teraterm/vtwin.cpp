@@ -688,6 +688,9 @@ CVTWindow::CVTWindow()
 			if (tempkm!=NULL) free(tempkm);
 #endif
 		}
+		else {
+			abort();
+		}
 
 	} else {
 		// 2つめ以降のプロセスにおいても、ディスクから TERATERM.INI を読む。(2004.11.4 yutaka)
@@ -712,7 +715,9 @@ CVTWindow::CVTWindow()
 			}
 #endif
 		}
-
+		else {
+			abort();
+		}
 	}
 
 	/* Parse command line parameters*/
