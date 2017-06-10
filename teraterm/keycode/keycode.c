@@ -41,12 +41,12 @@ int PASCAL WinMain(HINSTANCE hInstance,
 
 	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
-			// SetDefaultDllDirectories() ãŒä½¿ãˆã‚‹å ´åˆã¯ã€æ¤œç´¢ãƒ‘ã‚¹ã‚’ %WINDOWS%\system32 ã®ã¿ã«è¨­å®šã™ã‚‹
+			// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍAŒŸõƒpƒX‚ğ %WINDOWS%\system32 ‚Ì‚İ‚Éİ’è‚·‚é
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
 		}
 		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() ãŒä½¿ãˆãªãã¦ã‚‚ã€SetDllDirectory() ãŒä½¿ãˆã‚‹å ´åˆã¯
-			// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã ã‘ã§ã‚‚æ¤œç´¢ãƒ‘ã‚¹ã‹ã‚‰ã¯ãšã—ã¦ãŠãã€‚
+			// SetDefaultDllDirectories() ‚ªg‚¦‚È‚­‚Ä‚àASetDllDirectory() ‚ªg‚¦‚éê‡‚Í
+			// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚¾‚¯‚Å‚àŒŸõƒpƒX‚©‚ç‚Í‚¸‚µ‚Ä‚¨‚­B
 			(*setDllDir)("");
 		}
 	}
