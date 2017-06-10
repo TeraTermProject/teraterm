@@ -397,14 +397,14 @@ Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができま
 
 <pre>
 例:
-; 2017/06/04 21:12:40.123
-LogTimestampFormat=%Y/%m/%d %H:%M:%S.%N
+; Sun Jun  4 21:12:40.123 2017
+LogTimestampFormat=%a %b %e %H:%M:%S.%N %Y
 </pre>
 
 <pre>
 省略時:
-; Sun Jun  4 21:12:40.123 JST 2017
-LogTimestampFormat=%a %b %e %H:%M:%S.%N %Y
+; 2017-06-04 21:12:40.123
+LogTimestampFormat=%Y-%m-%d %H:%M:%S.%N
 </pre>
 
 
