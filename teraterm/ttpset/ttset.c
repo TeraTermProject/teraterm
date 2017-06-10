@@ -1057,7 +1057,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->LogAllBuffIncludedInFirst = GetOnOff(Section, "LogIncludeScreenBuffer", FName, FALSE);
 
 	/* Timestamp format of Log each line */
-	GetPrivateProfileString(Section, "LogTimestampFormat", "%a %b %e %H:%M:%S.%N %Y",
+	GetPrivateProfileString(Section, "LogTimestampFormat", "%Y-%m-%d %H:%M:%S.%N",
 	                        ts->LogTimestampFormat, sizeof(ts->LogTimestampFormat),
 	                        FName);
 
