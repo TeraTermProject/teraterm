@@ -127,7 +127,7 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c);
 static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_num, unsigned char *data, unsigned int buflen);
 static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned int *buflen);
 static void ssh2_scp_free_packetlist(Channel_t *c);
-
+static void get_window_pixel_size(PTInstVar pvar, int *x, int *y);
 
 //
 // Global request confirm
@@ -2197,13 +2197,16 @@ static void prep_pty(PTInstVar pvar)
 	static const int msgs[] = { SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
 	static const SSHPacketHandler handlers[]
 	= { handle_pty_success, handle_pty_failure };
+	int x, y;
+
+	get_window_pixel_size(pvar, &x, &y);
 
 	set_uint32(outmsg, len);
 	memcpy(outmsg + 4, pvar->ts->TermType, len);
 	set_uint32(outmsg + 4 + len, pvar->ssh_state.win_rows);
 	set_uint32(outmsg + 4 + len + 4, pvar->ssh_state.win_cols);
-	set_uint32(outmsg + 4 + len + 8, 0);
-	set_uint32(outmsg + 4 + len + 12, 0);
+	set_uint32(outmsg + 4 + len + 8, x);
+	set_uint32(outmsg + 4 + len + 12, y);
 	memcpy(outmsg + 4 + len + 16, ssh_ttymodes, sizeof(ssh_ttymodes));
 	finish_send_packet(pvar);
 
@@ -2815,7 +2818,7 @@ void SSH_notify_host_OK(PTInstVar pvar)
 	}
 }
 
-void get_window_pixel_size(PTInstVar pvar, int *x, int *y)
+static void get_window_pixel_size(PTInstVar pvar, int *x, int *y)
 {
 	RECT r;
 
@@ -2838,6 +2841,8 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 	pvar->ssh_state.win_cols = cols;
 	pvar->ssh_state.win_rows = rows;
 
+	get_window_pixel_size(pvar, &x, &y);
+
 	if (SSHv1(pvar)) {
 		if (get_handler(pvar, SSH_SMSG_STDOUT_DATA) == handle_data) {
 			unsigned char FAR *outmsg =
@@ -2845,8 +2850,8 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 
 			set_uint32(outmsg, rows);
 			set_uint32(outmsg + 4, cols);
-			set_uint32(outmsg + 8, 0);
-			set_uint32(outmsg + 12, 0);
+			set_uint32(outmsg + 8, x);
+			set_uint32(outmsg + 12, y);
 			finish_send_packet(pvar);
 		}
 
@@ -2873,7 +2878,6 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		buffer_put_char(msg, 0);  // wantconfirm
 		buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
 		buffer_put_int(msg, pvar->ssh_state.win_rows);  // lines
-		get_window_pixel_size(pvar, &x, &y);
 		buffer_put_int(msg, x);  // window width (pixel):
 		buffer_put_int(msg, y);  // window height (pixel):
 		len = buffer_len(msg);
