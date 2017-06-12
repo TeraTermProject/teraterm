@@ -37,7 +37,8 @@
     <ul>
       <li>ログの行頭に追加するタイムスタンプのフォーマットを指定できるようにした。
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> エントリを追加した。デフォルトは"%a %b %e %H:%M:%S.%N %Y"。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> エントリを追加した。デフォルトは"%Y-%m-%d %H:%M:%S.%N"。</li>
+          <li>デフォルトのフォーマットは RFC 3339 形式に変更された。以前のフォーマットに戻すには LogTimestampFormat に "%a %b %e %H:%M:%S.%N %Y" を設定する。</li>
         </ul></li>
       <li>ログの行頭に追加するタイムスタンプの時刻にUTCを使用できるようにした。
         <ul>
