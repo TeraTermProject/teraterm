@@ -7372,6 +7372,47 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	return TRUE;
 }
 
+/*
+ * SSH_MSG_CHANNEL_REQUEST 送信関数
+ * type-specific data が string で 0 ～ 2 の物に対応。
+ * 使用しないメッセージは NULL にする。
+ * type-specific data が他の形式には対応していないので、自前で送る事。
+ */
+static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char *req, int want_reply, unsigned char *msg1, unsigned char *msg2)
+{
+	buffer_t *msg;
+	unsigned char *outmsg;
+	int len;
+
+	msg = buffer_init();
+	if (msg == NULL) {
+		return FALSE;
+	}
+
+	buffer_put_int(msg, c->remote_id);
+	buffer_put_string(msg, req, strlen(req));
+
+	buffer_put_char(msg, want_reply);
+
+	if (msg1) {
+		buffer_put_string(msg, msg1, strlen(msg1));
+	}
+	if (msg2) {
+		buffer_put_string(msg, msg1, strlen(msg1));
+	}
+
+	len = buffer_len(msg);
+	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
+	memcpy(outmsg, buffer_ptr(msg), len);
+	finish_send_packet(pvar);
+	buffer_free(msg);
+
+	logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+	          "local: %d, remote: %d, request-type: %s, msg1=%s, msg2=%s",
+	          c->self_id, c->remote_id, req, msg1 ? msg1 : "none", msg2 ? msg2 : "none");
+	return TRUE;
+}
+
 BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg, *ttymsg;
@@ -7459,18 +7500,17 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 }
 
 static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
-{	
-	buffer_t *msg;
-	char *s;
-	unsigned char *outmsg;
+{
 	int len;
 	char *data;
 	int id, remote_id;
 	Channel_t *c;
+	char buff[MAX_PATH + 30];
+
 #ifdef DONT_WANTCONFIRM
-	int wantconfirm = 0; // false
+	int want_reply = 0; // false
 #else
-	int wantconfirm = 1; // true
+	int want_reply = 1; // true
 #endif
 
 	notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_OPEN_CONFIRMATION was received.", LOG_LEVEL_VERBOSE);
@@ -7505,97 +7545,42 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	c->remote_maxpacket = get_uint32_MSBfirst(data);
 	data += 4;
 
-	if (c->type == TYPE_PORTFWD) {
+	switch (c->type) {
+	case TYPE_PORTFWD:
 		// port-forwadingの"direct-tcpip"が成功。
 		FWD_confirmed_open(pvar, c->local_num, -1);
-		return TRUE;
-	}
+		break;
 
-	if (c->type == TYPE_SHELL) {
+	case TYPE_SHELL:
 		// ポートフォワーディングの準備 (2005.2.26, 2005.6.21 yutaka)
 		// シェルオープンしたあとに X11 の要求を出さなくてはならない。(2005.7.3 yutaka)
 		FWD_prep_forwarding(pvar);
 		FWD_enter_interactive_mode(pvar);
-	}
 
-	//debug_print(100, data, len);
-
-	if (c->type == TYPE_SHELL) {
 		// エージェント転送 (2008.11.25 maya)
 		if (pvar->session_settings.ForwardAgent) {
 			// pty-req より前にリクエストしないとエラーになる模様
-
-			msg = buffer_init();
-			if (msg == NULL) {
-				// TODO: error check
-				return FALSE;
-			}
-			buffer_put_int(msg, c->remote_id);
-			s = "auth-agent-req@openssh.com";
-			buffer_put_string(msg, s, strlen(s));
-			buffer_put_char(msg, 1); // want reply
-			len = buffer_len(msg);
-			outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
-			memcpy(outmsg, buffer_ptr(msg), len);
-			finish_send_packet(pvar);
-			buffer_free(msg);
-
-			notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at handle_SSH2_channel_success().", LOG_LEVEL_VERBOSE);
-			return TRUE;
+			return send_channel_request_gen(pvar, c, "auth-agent-req@openssh.com", 1, NULL, NULL);
 		}
 		else {
 			return send_pty_request(pvar, c);
 		}
-	}
+		break;
 
-	msg = buffer_init();
-	if (msg == NULL) {
-		// TODO: error check
-		return FALSE;
-	}
-
-	buffer_put_int(msg, remote_id);
-	if (c->type == TYPE_SCP) {
-		s = "exec";
-	} else if (c->type == TYPE_SFTP || c->type == TYPE_SUBSYSTEM_GEN) {
-		s = "subsystem";
-	} else {
-		s = "";  // NOT REACHED
-	}
-	buffer_put_string(msg, s, strlen(s));
-	buffer_put_char(msg, wantconfirm);  // wantconfirm (disableに変更 2005/3/28 yutaka)
-
-	if (c->type == TYPE_SCP) {
-		char sbuf[MAX_PATH + 30];
+	case TYPE_SCP:
 		if (c->scp.dir == TOREMOTE) {
-			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -t %s", c->scp.remotefile);
+			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "scp -t %s", c->scp.remotefile);
 
 		} else {
 			// ファイル名に空白を含まれていてもよいように、ファイル名を二重引用符で囲む。
 			// (2014.7.13 yutaka)
-			_snprintf_s(sbuf, sizeof(sbuf), _TRUNCATE, "scp -p -f \"%s\"", c->scp.remotefile);
-
+			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "scp -p -f \"%s\"", c->scp.remotefile);
 		}
-		buffer_put_string(msg, sbuf, strlen(sbuf));
-	}
-	else if (c->type == TYPE_SFTP) {
-		char *sbuf = "sftp";
-		buffer_put_string(msg, sbuf, strlen(sbuf));
-	}
-	else if (c->type == TYPE_SUBSYSTEM_GEN) {
-		buffer_put_string(msg, pvar->subsystem_name, strlen(pvar->subsystem_name));
-		pvar->session_nego_status = 0;
-	}
 
-	len = buffer_len(msg);
-	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
-	memcpy(outmsg, buffer_ptr(msg), len);
-	finish_send_packet(pvar);
-	buffer_free(msg);
+		if (!send_channel_request_gen(pvar, c, "exec", want_reply, buff, NULL)) {
+			return FALSE;;
+		}
 
-	notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at handle_SSH2_open_confirm().", LOG_LEVEL_VERBOSE);
-
-	if (c->type == TYPE_SCP) {
 		// SCPで remote-to-local の場合は、サーバからのファイル送信要求を出す。
 		// この時点では remote window size が"0"なので、すぐには送られないが、遅延送信処理で送られる。
 		// (2007.12.27 yutaka)
@@ -7603,17 +7588,31 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 			char ch = '\0';
 			SSH2_send_channel_data(pvar, c, &ch, 1, 0);
 		}
+		break;
 
-	} else if (c->type == TYPE_SFTP) {
+	case TYPE_SFTP:
+		if (!send_channel_request_gen(pvar, c, "subsystem", want_reply, "sftp", NULL)) {
+			return FALSE;;
+		}
+
 		// SFTPセッションを開始するためのネゴシエーションを行う。
 		// (2012.5.3 yutaka)
 		sftp_do_init(pvar, c);
+		break;
 
+	case TYPE_SUBSYSTEM_GEN:
+		if (!send_channel_request_gen(pvar, c, "subsystem", want_reply, pvar->subsystem_name, NULL)) {
+			return FALSE;;
+		}
+		pvar->session_nego_status = 0;
+		break;
+
+	default: // NOT REACHED
+		logprintf(pvar, LOG_LEVEL_ERROR, __FUNCTION__ ": Invalid channel-type. (%d)", c->type);
+		return FALSE;
 	}
-
 	return TRUE;
 }
-
 
 // SSH2 port-forwarding においてセッションがオープンできない場合のサーバからのリプライ（失敗）
 static BOOL handle_SSH2_open_failure(PTInstVar pvar)
@@ -7678,7 +7677,6 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	return TRUE;
 }
-
 
 // SSH2_MSG_GLOBAL_REQUEST for OpenSSH 6.8
 static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
@@ -7764,15 +7762,11 @@ static BOOL handle_SSH2_request_failure(PTInstVar pvar)
 
 static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 {	
-	buffer_t *msg;
-	char *s;
-	unsigned char *outmsg;
-	int len;
 	Channel_t *c;
 #ifdef DONT_WANTCONFIRM
-	int wantconfirm = 0; // false
+	int want_reply = 0; // false
 #else
-	int wantconfirm = 1; // true
+	int want_reply = 1; // true
 #endif
 	char buf[128];
 
@@ -7793,33 +7787,19 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 
 	} else if (pvar->session_nego_status == 2) {
 		pvar->session_nego_status = 3;
-		msg = buffer_init();
-		if (msg == NULL) {
-			// TODO: error check
-			return FALSE;
-		}
+
 		// find channel by shell id(2005.2.27 yutaka)
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
 			// TODO: error check
 			return FALSE;
 		}
-		buffer_put_int(msg, c->remote_id);
-//		buffer_put_int(msg, pvar->remote_id);
 
-		s = "shell";
-		buffer_put_string(msg, s, strlen(s));  // ctype
-		buffer_put_char(msg, wantconfirm);   // wantconfirm (disableに変更 2005/3/28 yutaka)
+		if (!send_channel_request_gen(pvar, c, "shell", want_reply, NULL, NULL)) {
+			return FALSE;;
+		}
 
-		len = buffer_len(msg);
-		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
-		memcpy(outmsg, buffer_ptr(msg), len);
-		finish_send_packet(pvar);
-		buffer_free(msg);
-
-		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at handle_SSH2_channel_success().", LOG_LEVEL_VERBOSE);
-
-		if (wantconfirm == 0) {
+		if (want_reply == 0) {
 			handle_SSH2_channel_success(pvar);
 		}
 
@@ -7838,7 +7818,6 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 	Channel_t *c;
 	char *data;
 	int channel_id;
-	char buf[128];
 
 	data = pvar->ssh_state.payload;
 	channel_id = get_uint32_MSBfirst(data);
@@ -7864,11 +7843,9 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 			if (pvar->session_nego_status == 1) {
 				// リモートで auth-agent-req@openssh.com がサポートされてないので
 				// エラーは気にせず次へ進む
-
-				strncpy_s(buf, sizeof(buf),
-					  "auth-agent-req@openssh.com is not supported by remote host.",
-					  _TRUNCATE);
-				notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+				notify_verbose_message(pvar,
+					"auth-agent-req@openssh.com is not supported by remote host.",
+					LOG_LEVEL_VERBOSE);
 
 				return send_pty_request(pvar, c);
 			}
