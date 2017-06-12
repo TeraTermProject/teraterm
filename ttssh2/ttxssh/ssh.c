@@ -2848,17 +2848,20 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			unsigned char FAR *outmsg =
 				begin_send_packet(pvar, SSH_CMSG_WINDOW_SIZE, 16);
 
-			set_uint32(outmsg, rows);
-			set_uint32(outmsg + 4, cols);
-			set_uint32(outmsg + 8, x);
-			set_uint32(outmsg + 12, y);
+			set_uint32(outmsg, rows);     // window height (characters)
+			set_uint32(outmsg + 4, cols); // window width  (characters)
+			set_uint32(outmsg + 8, x);    // window width  (pixels)
+			set_uint32(outmsg + 12, y);   // window height (pixels)
 			finish_send_packet(pvar);
+			logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH_CMSG_WINDOW_SIZE. "
+			          "cols: %d, rows: %d, x: %d, y: %d", cols, rows, x, y);
 		}
 
-	} else if (SSHv2(pvar)) { // ターミナルサイズ変更通知の追加 (2005.1.4 yutaka)
-		                      // SSH2かどうかのチェックも行う。(2005.1.5 yutaka)
+	} else if (SSHv2(pvar)) {
+		// ターミナルサイズ変更通知の追加 (2005.1.4 yutaka)
+		// SSH2かどうかのチェックも行う。(2005.1.5 yutaka)
 		buffer_t *msg;
-		char *s;
+		char *req_type = "window-change";
 		unsigned char *outmsg;
 		int len;
 		Channel_t *c;
@@ -2873,41 +2876,37 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			return;
 		}
 		buffer_put_int(msg, c->remote_id);
-		s = "window-change";
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_char(msg, 0);  // wantconfirm
-		buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
-		buffer_put_int(msg, pvar->ssh_state.win_rows);  // lines
-		buffer_put_int(msg, x);  // window width (pixel):
-		buffer_put_int(msg, y);  // window height (pixel):
+		buffer_put_string(msg, req_type, strlen(req_type));
+		buffer_put_char(msg, 0);    // want_reply
+		buffer_put_int(msg, cols);  // columns
+		buffer_put_int(msg, rows);  // lines
+		buffer_put_int(msg, x);     // window width (pixel):
+		buffer_put_int(msg, y);     // window height (pixel):
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at SSH_notify_win_size().", LOG_LEVEL_VERBOSE);
+		logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+		          "local: %d, remote: %d, request-type: %s, cols: %d, rows: %d, x: %d, y: %d",
+		          c->self_id, c->remote_id, req_type, cols, rows, x, y);
 
 	} else {
 		// SSHでない場合は何もしない。
-
 	}
-
 }
 
-// ブレーク信号を送る。
-// OpenSSH の"~B"に相当する。ただし、SSH2のみ。
+// ブレーク信号を送る -- RFC 4335
+// OpenSSH の"~B"に相当する。
 // (2010.9.27 yutaka)
 int SSH_notify_break_signal(PTInstVar pvar)
 {
 	int ret = 0;
 
-	if (SSHv1(pvar)) {
-		// 何もしない。
-
-	} else if (SSHv2(pvar)) { 
+	if (SSHv2(pvar)) { // SSH2 のみ対応
 		buffer_t *msg;
-		char *s;
+		char *req_type = "break";
 		unsigned char *outmsg;
 		int len;
 		Channel_t *c;
@@ -2921,23 +2920,20 @@ int SSH_notify_break_signal(PTInstVar pvar)
 			goto error;
 		}
 		buffer_put_int(msg, c->remote_id);
-		s = "break";
-		buffer_put_string(msg, s, strlen(s));
-		buffer_put_char(msg, 0);  // wantconfirm
-		buffer_put_int(msg, 1000);  
+		buffer_put_string(msg, req_type, strlen(req_type));
+		buffer_put_char(msg, 0);  // want_reply
+		buffer_put_int(msg, 1000);  // break-length (msec)
 		len = buffer_len(msg);
 		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_REQUEST, len);
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at SSH_notify_break_signal().", LOG_LEVEL_VERBOSE);
+		logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+		          "local: %d, remote: %d, request-type: %s, break-length: %d",
+		          c->self_id, c->remote_id, req_type, 1000);
 
 		ret = 1;
-
-	} else {
-		// SSHでない場合は何もしない。
-
 	}
 
 error:
@@ -3680,7 +3676,7 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 	} else {
 		// SSH2: X11 port-forwarding (2005.7.2 yutaka)
 		buffer_t *msg;
-		char *s;
+		char *req_type = "x11-req";
 		unsigned char *outmsg;
 		int len;
 		Channel_t *c;
@@ -3709,15 +3705,12 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		newdata[newlen - 1] = '\0';
 
 		buffer_put_int(msg, c->remote_id);
-		s = "x11-req";
-		buffer_put_string(msg, s, strlen(s)); // service name
-		buffer_put_char(msg, 0);  // want confirm (false)
-		buffer_put_char(msg, 0);  // XXX bool single connection
+		buffer_put_string(msg, req_type, strlen(req_type)); // service name
+		buffer_put_char(msg, 0);  // want_reply (false)
+		buffer_put_char(msg, 0);  // single connection
 
-		s = auth_protocol; // MIT-MAGIC-COOKIE-1
-		buffer_put_string(msg, s, strlen(s));
-		s = newdata;
-		buffer_put_string(msg, s, strlen(s));
+		buffer_put_string(msg, auth_protocol, strlen(auth_protocol)); // protocol ("MIT-MAGIC-COOKIE-1")
+		buffer_put_string(msg, newdata, strlen(newdata)); // cookie
 
 		buffer_put_int(msg, screen_num);
 
@@ -3727,7 +3720,9 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at SSH_request_X11_forwarding().", LOG_LEVEL_VERBOSE);
+		logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+		          "local: %d, remote: %d, request-type: %s, proto: %s, cookie: %s, screen: %d",
+		          c->self_id, c->remote_id, req_type, auth_protocol, newdata, screen_num);
 
 		free(newdata);
 	}
@@ -7420,13 +7415,13 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 {
 	buffer_t *msg, *ttymsg;
-	char *s = "pty-req";  // pseudo terminalのリクエスト
+	char *req_type = "pty-req";  // pseudo terminalのリクエスト
 	unsigned char *outmsg;
 	int len, x, y;
 #ifdef DONT_WANTCONFIRM
-	int wantconfirm = 0; // false
+	int want_reply = 0; // false
 #else
-	int wantconfirm = 1; // true
+	int want_reply = 1; // true
 #endif
 
 	// pty open
@@ -7443,11 +7438,10 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	}
 
 	buffer_put_int(msg, c->remote_id);
-	buffer_put_string(msg, s, strlen(s));
-	buffer_put_char(msg, wantconfirm);  // wantconfirm (disableに変更 2005/3/28 yutaka)
+	buffer_put_string(msg, req_type, strlen(req_type));
+	buffer_put_char(msg, want_reply);  // want_reply (disableに変更 2005/3/28 yutaka)
 
-	s = pvar->ts->TermType; // TERM
-	buffer_put_string(msg, s, strlen(s));
+	buffer_put_string(msg, pvar->ts->TermType, strlen(pvar->ts->TermType));
 	buffer_put_int(msg, pvar->ssh_state.win_cols);  // columns
 	buffer_put_int(msg, pvar->ssh_state.win_rows);  // lines
 	get_window_pixel_size(pvar, &x, &y);
@@ -7494,9 +7488,17 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_free(ttymsg);
 
 	notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at send_pty_request().", LOG_LEVEL_VERBOSE);
+	logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+	          "local: %d, remote: %d, request-type: %s, "
+	          "term: %s, cols: %d, rows: %d, x: %d, y: %d, "
+	          "out-speed: %d, in-speed: %d, verase: %s, onlcr: %s",
+	          c->self_id, c->remote_id, req_type, pvar->ts->TermType,
+	          pvar->ssh_state.win_cols, pvar->ssh_state.win_rows, x, y,
+	          9600, 9600, (pvar->ts->BSKey==IdBS)?"^h":"^?", (pvar->ts->CRReceive==IdBS)?"on":"off");
+
 	pvar->session_nego_status = 2;
 
-	if (wantconfirm == 0) {
+	if (want_reply == 0) {
 		handle_SSH2_channel_success(pvar);
 	}
 
