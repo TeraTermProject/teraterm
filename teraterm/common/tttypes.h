@@ -567,7 +567,7 @@ struct tttset {
 	WORD DisableMenuDuplicateSession;
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
-	WORD Dummy4;		// ãåConfirmChangePasteCR. PasteFlagÇ…ìùçáÇµÇΩÇΩÇﬂîpé~ÅBëºÇ÷ì]óp
+	WORD EnableSOSI;
 	WORD JumpList;
 	WORD TabStopFlag;
 	DWORD CtrlFlag;

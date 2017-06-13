@@ -802,7 +802,7 @@ void PrnParseControl(BYTE b) // printer mode
 	case NUL:
 		return;
 	case SO:
-		if (! DirectPrn) {
+		if (ts.EnableSOSI && ! DirectPrn) {
 			if ((ts.Language==IdJapanese) &&
 			    (ts.KanjiCode==IdJIS) &&
 			    (ts.JIS7Katakana==1) &&
@@ -815,7 +815,7 @@ void PrnParseControl(BYTE b) // printer mode
 		}
 		break;
 	case SI:
-		if (! DirectPrn) {
+		if (ts.EnableSOSI && ! DirectPrn) {
 			Glr[0] = 0; /* LS0 */
 			return;
 		}
@@ -942,16 +942,22 @@ void ParseControl(BYTE b)
 		}
 		break;
 	case SO: /* LS1 */
-		if ((ts.Language==IdJapanese) &&
-		    (ts.KanjiCode==IdJIS) &&
-		    (ts.JIS7Katakana==1) &&
-		    ((ts.TermFlag & TF_FIXEDJIS)!=0))
-			Gn[1] = IdKatakana;
+		if (ts.EnableSOSI) {
+			if ((ts.Language==IdJapanese) &&
+			    (ts.KanjiCode==IdJIS) &&
+			    (ts.JIS7Katakana==1) &&
+			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
+			{
+				Gn[1] = IdKatakana;
+			}
 
-		Glr[0] = 1;
+			Glr[0] = 1;
+		}
 		break;
 	case SI: /* LS0 */
-		Glr[0] = 0;
+		if (ts.EnableSOSI) {
+			Glr[0] = 0;
+		}
 		break;
 	case DLE:
 		if ((ts.FTFlag & FT_BPAUTO)!=0)

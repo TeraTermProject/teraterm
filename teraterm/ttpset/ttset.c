@@ -1940,6 +1940,8 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	if (GetOnOff(Section, "NormalizeLineBreakOnPaste", FName, FALSE))
 		ts->PasteFlag |= CPF_NORMALIZE_LINEBREAK;
 
+	// Disable SO/SI.
+	ts->EnableSOSI = GetOnOff(Section, "EnableSOSI", FName, TRUE);
 
 	// Fallback to CP932 (Experimental)
 	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
@@ -3211,6 +3213,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// Normalize line break when pasting
 	WriteOnOff(Section, "NormalizeLineBreakOnPaste", FName,
 		(WORD) (ts->PasteFlag & CPF_NORMALIZE_LINEBREAK));
+
+	// Disable SO/SI.
+	WriteOnOff(Section, "EnableSOSI", FName, ts->EnableSOSI);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
