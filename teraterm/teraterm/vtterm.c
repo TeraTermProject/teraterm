@@ -80,11 +80,11 @@ BOOL AcceptWheelToCursor;
 
 // save/restore cursor
 typedef struct {
-  int CursorX, CursorY;
-  TCharAttr Attr;
-  int Glr[2], Gn[4]; // G0-G3, GL & GR
-  BOOL AutoWrapMode;
-  BOOL RelativeOrgMode;
+	int CursorX, CursorY;
+	TCharAttr Attr;
+	int Glr[2], Gn[4]; // G0-G3, GL & GR
+	BOOL AutoWrapMode;
+	BOOL RelativeOrgMode;
 } TStatusBuff;
 typedef TStatusBuff *PStatusBuff;
 
@@ -112,8 +112,8 @@ static int ParseMode;
 static int ChangeEmu;
 
 typedef struct tstack {
-    char *title;
-    struct tstack *next;
+	char *title;
+	struct tstack *next;
 } TStack;
 typedef TStack *PTStack;
 PTStack TitleStack = NULL;
@@ -144,7 +144,7 @@ static BOOL MainWrap;
 static BOOL MainCursor=TRUE;
 
 /* status for printer escape sequences */
-static BOOL PrintEX = TRUE;  // printing extent
+static BOOL PrintEX = TRUE; // printing extent
 			    // (TRUE: screen, FALSE: scroll region)
 static BOOL AutoPrintMode = FALSE;
 static BOOL PrinterMode = FALSE;
@@ -174,241 +174,239 @@ static _locale_t CLocale = NULL;
 
 void ClearParams()
 {
-    ICount = 0;
-    NParam = 1;
-    NSParam[1] = 0;
-    Param[1] = 0;
-    Prv = 0;
+	ICount = 0;
+	NParam = 1;
+	NSParam[1] = 0;
+	Param[1] = 0;
+	Prv = 0;
 }
 
 void ResetSBuffer(PStatusBuff sbuff)
 {
-  sbuff->CursorX = 0;
-  sbuff->CursorY = 0;
-  sbuff->Attr = DefCharAttr;
-  if (ts.Language==IdJapanese)
-  {
-    sbuff->Gn[0] = IdASCII;
-    sbuff->Gn[1] = IdKatakana;
-    sbuff->Gn[2] = IdKatakana;
-    sbuff->Gn[3] = IdKanji;
-    sbuff->Glr[0] = 0;
-    if ((ts.KanjiCode==IdJIS) &&
-	(ts.JIS7Katakana==0))
-      sbuff->Glr[1] = 2;  // 8-bit katakana
-    else
-      sbuff->Glr[1] = 3;
-  }
-  else {
-    sbuff->Gn[0] = IdASCII;
-    sbuff->Gn[1] = IdSpecial;
-    sbuff->Gn[2] = IdASCII;
-    sbuff->Gn[3] = IdASCII;
-    sbuff->Glr[0] = 0;
-    sbuff->Glr[1] = 0;
-  }
-  sbuff->AutoWrapMode = TRUE;
-  sbuff->RelativeOrgMode = FALSE;
+	sbuff->CursorX = 0;
+	sbuff->CursorY = 0;
+	sbuff->Attr = DefCharAttr;
+	if (ts.Language==IdJapanese) {
+		sbuff->Gn[0] = IdASCII;
+		sbuff->Gn[1] = IdKatakana;
+		sbuff->Gn[2] = IdKatakana;
+		sbuff->Gn[3] = IdKanji;
+		sbuff->Glr[0] = 0;
+		if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
+			sbuff->Glr[1] = 2;	// 8-bit katakana
+		else
+			sbuff->Glr[1] = 3;
+	}
+	else {
+		sbuff->Gn[0] = IdASCII;
+		sbuff->Gn[1] = IdSpecial;
+		sbuff->Gn[2] = IdASCII;
+		sbuff->Gn[3] = IdASCII;
+		sbuff->Glr[0] = 0;
+		sbuff->Glr[1] = 0;
+	}
+	sbuff->AutoWrapMode = TRUE;
+	sbuff->RelativeOrgMode = FALSE;
 }
 
 void ResetAllSBuffers()
 {
-  ResetSBuffer(&SBuff1);
-  // copy SBuff1 to SBuff2
-  SBuff2 = SBuff1;
-  SBuff3 = SBuff1;
+	ResetSBuffer(&SBuff1);
+	// copy SBuff1 to SBuff2
+	SBuff2 = SBuff1;
+	SBuff3 = SBuff1;
 }
 
 void ResetCurSBuffer()
 {
-    PStatusBuff Buff;
+	PStatusBuff Buff;
 
-    if (AltScr) {
-	Buff = &SBuff3; // Alternate screen buffer
-    }
-    else {
-	Buff = &SBuff1; // Normal screen buffer
-    }
-    ResetSBuffer(Buff);
-    SBuff2 = *Buff;
+	if (AltScr) {
+		Buff = &SBuff3; // Alternate screen buffer
+	}
+	else {
+		Buff = &SBuff1; // Normal screen buffer
+	}
+	ResetSBuffer(Buff);
+	SBuff2 = *Buff;
 }
 
 void ResetTerminal() /*reset variables but don't update screen */
 {
-  DispReset();
-  BuffReset();
+	DispReset();
+	BuffReset();
 
-  /* Attribute */
-  CharAttr = DefCharAttr;
-  Special = FALSE;
-  BuffSetCurCharAttr(CharAttr);
+	/* Attribute */
+	CharAttr = DefCharAttr;
+	Special = FALSE;
+	BuffSetCurCharAttr(CharAttr);
 
-  /* Various modes */
-  InsertMode = FALSE;
-  LFMode = (ts.CRSend == IdCRLF);
-  AutoWrapMode = TRUE;
-  AppliKeyMode = FALSE;
-  AppliCursorMode = FALSE;
-  AppliEscapeMode = FALSE;
-  AcceptWheelToCursor = ts.TranslateWheelToCursor;
-  RelativeOrgMode = FALSE;
-  ts.ColorFlag &= ~CF_REVERSEVIDEO;
-  AutoRepeatMode = TRUE;
-  FocusReportMode = FALSE;
-  MouseReportMode = IdMouseTrackNone;
-  MouseReportExtMode = IdMouseTrackExtNone;
-  DecLocatorFlag = 0;
-  ClearThenHome = FALSE;
+	/* Various modes */
+	InsertMode = FALSE;
+	LFMode = (ts.CRSend == IdCRLF);
+	AutoWrapMode = TRUE;
+	AppliKeyMode = FALSE;
+	AppliCursorMode = FALSE;
+	AppliEscapeMode = FALSE;
+	AcceptWheelToCursor = ts.TranslateWheelToCursor;
+	RelativeOrgMode = FALSE;
+	ts.ColorFlag &= ~CF_REVERSEVIDEO;
+	AutoRepeatMode = TRUE;
+	FocusReportMode = FALSE;
+	MouseReportMode = IdMouseTrackNone;
+	MouseReportExtMode = IdMouseTrackExtNone;
+	DecLocatorFlag = 0;
+	ClearThenHome = FALSE;
 
-  ChangeTerminalID();
+	ChangeTerminalID();
 
-  LastX = 0;
-  LastY = 0;
-  ButtonStat = 0;
+	LastX = 0;
+	LastY = 0;
+	ButtonStat = 0;
 
-  if (CLocale == NULL) {
-    CLocale = _create_locale(LC_ALL, "C");
-  }
+	if (CLocale == NULL) {
+		CLocale = _create_locale(LC_ALL, "C");
+	}
 
-  /* Character sets */
-  ResetCharSet();
+	/* Character sets */
+	ResetCharSet();
 
-  /* ESC flag for device control sequence */
-  ESCFlag = FALSE;
-  /* for TEK sequence */
-  JustAfterESC = FALSE;
+	/* ESC flag for device control sequence */
+	ESCFlag = FALSE;
+	/* for TEK sequence */
+	JustAfterESC = FALSE;
 
-  /* Parse mode */
-  ParseMode = ModeFirst;
+	/* Parse mode */
+	ParseMode = ModeFirst;
 
-  /* Clear printer mode */
-  PrinterMode = FALSE;
+	/* Clear printer mode */
+	PrinterMode = FALSE;
 
-  // status buffers
-  ResetAllSBuffers();
+	// status buffers
+	ResetAllSBuffers();
 
-  // Alternate Screen Buffer
-  AltScr = FALSE;
+	// Alternate Screen Buffer
+	AltScr = FALSE;
 
-  // Left/Right Margin Mode
-  LRMarginMode = FALSE;
+	// Left/Right Margin Mode
+	LRMarginMode = FALSE;
 
-  // Bracketed Paste Mode
-  BracketedPaste = FALSE;
+	// Bracketed Paste Mode
+	BracketedPaste = FALSE;
 
-  // Saved IME Status
-  IMEstat = FALSE;
+	// Saved IME Status
+	IMEstat = FALSE;
 
-  // previous received character
-  PrevCharacter = -1;	// none
-  PrevCRorLFGeneratedCRLF = FALSE;
+	// previous received character
+	PrevCharacter = -1;	// none
+	PrevCRorLFGeneratedCRLF = FALSE;
 
-  // Beep over-used
-  BeepStartTime = GetTickCount();
-  BeepSuppressTime = BeepStartTime - ts.BeepSuppressTime * 1000;
-  BeepStartTime -= (ts.BeepOverUsedTime * 1000);
-  BeepOverUsedCount = ts.BeepOverUsedCount;
+	// Beep over-used
+	BeepStartTime = GetTickCount();
+	BeepSuppressTime = BeepStartTime - ts.BeepSuppressTime * 1000;
+	BeepStartTime -= (ts.BeepOverUsedTime * 1000);
+	BeepOverUsedCount = ts.BeepOverUsedCount;
 }
 
 void ResetCharSet()
 {
-  if (ts.Language==IdJapanese)
-  {
-    Gn[0] = IdASCII;
-    Gn[1] = IdKatakana;
-    Gn[2] = IdKatakana;
-    Gn[3] = IdKanji;
-    Glr[0] = 0;
-    if ((ts.KanjiCode==IdJIS) &&
-	(ts.JIS7Katakana==0))
-      Glr[1] = 2;  // 8-bit katakana
-    else
-      Glr[1] = 3;
-  }
-  else {
-    Gn[0] = IdASCII;
-    Gn[1] = IdSpecial;
-    Gn[2] = IdASCII;
-    Gn[3] = IdASCII;
-    Glr[0] = 0;
-    Glr[1] = 0;
-    cv.SendCode = IdASCII;
-    cv.SendKanjiFlag = FALSE;
-    cv.EchoCode = IdASCII;
-    cv.EchoKanjiFlag = FALSE;
-  }
-  /* Kanji flag */
-  KanjiIn = FALSE;
-  EUCkanaIn = FALSE;
-  EUCsupIn = FALSE;
-  SSflag = FALSE;
-  ConvJIS = FALSE;
-  Fallbacked = FALSE;
+	if (ts.Language==IdJapanese) {
+		Gn[0] = IdASCII;
+		Gn[1] = IdKatakana;
+		Gn[2] = IdKatakana;
+		Gn[3] = IdKanji;
+		Glr[0] = 0;
+		if ((ts.KanjiCode==IdJIS) && (ts.JIS7Katakana==0))
+			Glr[1] = 2;	// 8-bit katakana
+		else
+			Glr[1] = 3;
+	}
+	else {
+		Gn[0] = IdASCII;
+		Gn[1] = IdSpecial;
+		Gn[2] = IdASCII;
+		Gn[3] = IdASCII;
+		Glr[0] = 0;
+		Glr[1] = 0;
+		cv.SendCode = IdASCII;
+		cv.SendKanjiFlag = FALSE;
+		cv.EchoCode = IdASCII;
+		cv.EchoKanjiFlag = FALSE;
+	}
+	/* Kanji flag */
+	KanjiIn = FALSE;
+	EUCkanaIn = FALSE;
+	EUCsupIn = FALSE;
+	SSflag = FALSE;
+	ConvJIS = FALSE;
+	Fallbacked = FALSE;
 
-  cv.Language = ts.Language;
-  cv.CRSend = ts.CRSend;
-  cv.KanjiCodeEcho = ts.KanjiCode;
-  cv.JIS7KatakanaEcho = ts.JIS7Katakana;
-  cv.KanjiCodeSend = ts.KanjiCodeSend;
-  cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
-  cv.KanjiIn = ts.KanjiIn;
-  cv.KanjiOut = ts.KanjiOut;
+	cv.Language = ts.Language;
+	cv.CRSend = ts.CRSend;
+	cv.KanjiCodeEcho = ts.KanjiCode;
+	cv.JIS7KatakanaEcho = ts.JIS7Katakana;
+	cv.KanjiCodeSend = ts.KanjiCodeSend;
+	cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
+	cv.KanjiIn = ts.KanjiIn;
+	cv.KanjiOut = ts.KanjiOut;
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
 {
-  if (!DisabledModeOnly || ts.DisableAppKeypad) AppliKeyMode = FALSE;
-  if (!DisabledModeOnly || ts.DisableAppCursor) AppliCursorMode = FALSE;
+	if (!DisabledModeOnly || ts.DisableAppKeypad)
+		AppliKeyMode = FALSE;
+	if (!DisabledModeOnly || ts.DisableAppCursor)
+		AppliCursorMode = FALSE;
 }
 
 void MoveToMainScreen()
 {
-  StatusX = CursorX;
-  StatusWrap = Wrap;
-  StatusCursor = IsCaretEnabled();
+	StatusX = CursorX;
+	StatusWrap = Wrap;
+	StatusCursor = IsCaretEnabled();
 
-  CursorTop = MainTop;
-  CursorBottom = MainBottom;
-  Wrap = MainWrap;
-  DispEnableCaret(MainCursor);
-  MoveCursor(MainX,MainY); // move to main screen
+	CursorTop = MainTop;
+	CursorBottom = MainBottom;
+	Wrap = MainWrap;
+	DispEnableCaret(MainCursor);
+	MoveCursor(MainX, MainY); // move to main screen
 }
 
 void MoveToStatusLine()
 {
-  MainX = CursorX;
-  MainY = CursorY;
-  MainTop = CursorTop;
-  MainBottom = CursorBottom;
-  MainWrap = Wrap;
-  MainCursor = IsCaretEnabled();
+	MainX = CursorX;
+	MainY = CursorY;
+	MainTop = CursorTop;
+	MainBottom = CursorBottom;
+	MainWrap = Wrap;
+	MainCursor = IsCaretEnabled();
 
-  DispEnableCaret(StatusCursor);
-  MoveCursor(StatusX,NumOfLines-1); // move to status line
-  CursorTop = NumOfLines-1;
-  CursorBottom = CursorTop;
-  Wrap = StatusWrap;
+	DispEnableCaret(StatusCursor);
+	MoveCursor(StatusX, NumOfLines-1); // move to status line
+	CursorTop = NumOfLines-1;
+	CursorBottom = CursorTop;
+	Wrap = StatusWrap;
 }
 
 void HideStatusLine()
 {
-  if (isCursorOnStatusLine)
-    MoveToMainScreen();
-  StatusX = 0;
-  StatusWrap = FALSE;
-  StatusCursor = TRUE;
-  ShowStatusLine(0); //hide
+	if (isCursorOnStatusLine)
+		MoveToMainScreen();
+	StatusX = 0;
+	StatusWrap = FALSE;
+	StatusCursor = TRUE;
+	ShowStatusLine(0); //hide
 }
 
 void ChangeTerminalSize(int Nx, int Ny)
 {
-  BuffChangeTerminalSize(Nx,Ny);
-  StatusX = 0;
-  MainX = 0;
-  MainY = 0;
-  MainTop = 0;
-  MainBottom = NumOfColumns-1;
-  LRMarginMode = FALSE;
+	BuffChangeTerminalSize(Nx, Ny);
+	StatusX = 0;
+	MainX = 0;
+	MainY = 0;
+	MainTop = 0;
+	MainBottom = NumOfColumns-1;
+	LRMarginMode = FALSE;
 }
 
 void SendCSIstr(char *str, int len) {
@@ -508,7 +506,7 @@ void CarriageReturn(BOOL logFlag)
 #ifndef NO_COPYLINE_FIX
 	if (!ts.EnableContinuedLineCopy || logFlag)
 #endif /* NO_COPYLINE_FIX */
-        if (cv.HLogBuf!=0) Log1Byte(CR);
+	if (cv.HLogBuf!=0) Log1Byte(CR);
 
 	if (RelativeOrgMode || CursorX > CursorLeftM)
 		MoveCursor(CursorLeftM, CursorY);
@@ -547,230 +545,219 @@ void LineFeed(BYTE b, BOOL logFlag)
 
 void Tab()
 {
-  if (Wrap && !ts.VTCompatTab) {
-      CarriageReturn(FALSE);
-      LineFeed(LF,FALSE);
+	if (Wrap && !ts.VTCompatTab) {
+		CarriageReturn(FALSE);
+		LineFeed(LF,FALSE);
 #ifndef NO_COPYLINE_FIX
-      if (ts.EnableContinuedLineCopy) {
-	SetLineContinued();
-      }
+		if (ts.EnableContinuedLineCopy) {
+			SetLineContinued();
+		}
 #endif /* NO_COPYLINE_FIX */
-      Wrap = FALSE;
-  }
-  CursorForwardTab(1, AutoWrapMode);
-  if (cv.HLogBuf!=0) Log1Byte(HT);
+		Wrap = FALSE;
+	}
+	CursorForwardTab(1, AutoWrapMode);
+	if (cv.HLogBuf!=0) Log1Byte(HT);
 }
 
 void PutChar(BYTE b)
 {
-  BOOL SpecialNew;
-  TCharAttr CharAttrTmp;
+	BOOL SpecialNew;
+	TCharAttr CharAttrTmp;
 
-  CharAttrTmp = CharAttr;
+	CharAttrTmp = CharAttr;
 
-  if (PrinterMode) { // printer mode
-    WriteToPrnFile(b,TRUE);
-    return;
-  }
+	if (PrinterMode) { // printer mode
+		WriteToPrnFile(b,TRUE);
+		return;
+	}
 
-  if (Wrap)
-  {
-    CarriageReturn(FALSE);
-    LineFeed(LF,FALSE);
+	if (Wrap) {
+		CarriageReturn(FALSE);
+		LineFeed(LF,FALSE);
 #ifndef NO_COPYLINE_FIX
-    CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
+		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
 #endif /* NO_COPYLINE_FIX */
-  }
+	}
 
-//  if (cv.HLogBuf!=0) Log1Byte(b);
+//	if (cv.HLogBuf!=0) Log1Byte(b);
 // (2005.2.20 yutaka)
-  if (ts.LogTypePlainText) {
-	  if (__isascii(b) && !isprint(b)) {
-		  // ASCII文字で、非表示な文字はログ採取しない。
-	  } else {
+	if (ts.LogTypePlainText) {
+		if (__isascii(b) && !isprint(b)) {
+			// ASCII文字で、非表示な文字はログ採取しない。
+		} else {
+			if (cv.HLogBuf!=0) Log1Byte(b);
+		}
+	} else {
 		if (cv.HLogBuf!=0) Log1Byte(b);
-	  }
-  } else {
-	  if (cv.HLogBuf!=0) Log1Byte(b);
-  }
+	}
 
-  Wrap = FALSE;
+	Wrap = FALSE;
 
-  SpecialNew = FALSE;
-  if ((b>0x5F) && (b<0x80))
-  {
-    if (SSflag)
-      SpecialNew = (Gn[GLtmp]==IdSpecial);
-    else
-      SpecialNew = (Gn[Glr[0]]==IdSpecial);
-  }
-  else if (b>0xDF)
-  {
-    if (SSflag)
-      SpecialNew = (Gn[GLtmp]==IdSpecial);
-    else
-      SpecialNew = (Gn[Glr[1]]==IdSpecial);
-  }
+	SpecialNew = FALSE;
+	if ((b>0x5F) && (b<0x80)) {
+		if (SSflag)
+			SpecialNew = (Gn[GLtmp]==IdSpecial);
+		else
+			SpecialNew = (Gn[Glr[0]]==IdSpecial);
+	}
+	else if (b>0xDF) {
+		if (SSflag)
+			SpecialNew = (Gn[GLtmp]==IdSpecial);
+		else
+			SpecialNew = (Gn[Glr[1]]==IdSpecial);
+	}
 
-  if (SpecialNew != Special)
-  {
-    UpdateStr();
-    Special = SpecialNew;
-  }
+	if (SpecialNew != Special) {
+		UpdateStr();
+		Special = SpecialNew;
+	}
 
-  if (Special)
-  {
-    b = b & 0x7F;
-    CharAttrTmp.Attr |= AttrSpecial;
-  }
-  else
-    CharAttrTmp.Attr |= CharAttr.Attr;
+	if (Special) {
+		b = b & 0x7F;
+		CharAttrTmp.Attr |= AttrSpecial;
+	}
+	else
+		CharAttrTmp.Attr |= CharAttr.Attr;
 
-  BuffPutChar(b, CharAttrTmp, InsertMode);
+	BuffPutChar(b, CharAttrTmp, InsertMode);
 
-  if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
-    UpdateStr();
-    Wrap = AutoWrapMode;
-  }
-  else {
-    MoveRight();
-  }
+	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
+		UpdateStr();
+		Wrap = AutoWrapMode;
+	}
+	else {
+		MoveRight();
+	}
 }
 
 void PutDecSp(BYTE b)
 {
-  TCharAttr CharAttrTmp;
+	TCharAttr CharAttrTmp;
 
-  CharAttrTmp = CharAttr;
+	CharAttrTmp = CharAttr;
 
-  if (PrinterMode) { // printer mode
-    WriteToPrnFile(b, TRUE);
-    return;
-  }
+	if (PrinterMode) { // printer mode
+		WriteToPrnFile(b, TRUE);
+		return;
+	}
 
-  if (Wrap) {
-    CarriageReturn(FALSE);
-    LineFeed(LF, FALSE);
+	if (Wrap) {
+		CarriageReturn(FALSE);
+		LineFeed(LF, FALSE);
 #ifndef NO_COPYLINE_FIX
-    CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
+		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
 #endif /* NO_COPYLINE_FIX */
-  }
+	}
 
-  if (cv.HLogBuf!=0) Log1Byte(b);
+	if (cv.HLogBuf!=0) Log1Byte(b);
 /*
-  if (ts.LogTypePlainText && __isascii(b) && !isprint(b)) {
-    // ASCII文字で、非表示な文字はログ採取しない。
-  } else {
-    if (cv.HLogBuf!=0) Log1Byte(b);
-  }
+	if (ts.LogTypePlainText && __isascii(b) && !isprint(b)) {
+		// ASCII文字で、非表示な文字はログ採取しない。
+	} else {
+		if (cv.HLogBuf!=0) Log1Byte(b);
+	}
  */
 
-  Wrap = FALSE;
+	Wrap = FALSE;
 
-  if (!Special) {
-    UpdateStr();
-    Special = TRUE;
-  }
+	if (!Special) {
+		UpdateStr();
+		Special = TRUE;
+	}
 
-  CharAttrTmp.Attr |= AttrSpecial;
-  BuffPutChar(b, CharAttrTmp, InsertMode);
+	CharAttrTmp.Attr |= AttrSpecial;
+	BuffPutChar(b, CharAttrTmp, InsertMode);
 
-  if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
-    UpdateStr();
-    Wrap = AutoWrapMode;
-  }
-  else {
-    MoveRight();
-  }
+	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
+		UpdateStr();
+		Wrap = AutoWrapMode;
+	}
+	else {
+		MoveRight();
+	}
 }
 
 void PutKanji(BYTE b)
 {
-  int LineEnd;
+	int LineEnd;
 #ifndef NO_COPYLINE_FIX
-  TCharAttr CharAttrTmp;
+	TCharAttr CharAttrTmp;
 
-  CharAttrTmp = CharAttr;
+	CharAttrTmp = CharAttr;
 #endif /* NO_COPYLINE_FIX */
-  Kanji = Kanji + b;
+	Kanji = Kanji + b;
 
-  if (PrinterMode && DirectPrn)
-  {
-    WriteToPrnFile(HIBYTE(Kanji),FALSE);
-    WriteToPrnFile(LOBYTE(Kanji),TRUE);
-    return;
-  }
+	if (PrinterMode && DirectPrn) {
+		WriteToPrnFile(HIBYTE(Kanji),FALSE);
+		WriteToPrnFile(LOBYTE(Kanji),TRUE);
+		return;
+	}
 
-  if (ConvJIS)
-    Kanji = JIS2SJIS((WORD)(Kanji & 0x7f7f));
+	if (ConvJIS)
+		Kanji = JIS2SJIS((WORD)(Kanji & 0x7f7f));
 
-  if (PrinterMode) { // printer mode
-    WriteToPrnFile(HIBYTE(Kanji),FALSE);
-    WriteToPrnFile(LOBYTE(Kanji),TRUE);
-    return;
-  }
+	if (PrinterMode) { // printer mode
+		WriteToPrnFile(HIBYTE(Kanji),FALSE);
+		WriteToPrnFile(LOBYTE(Kanji),TRUE);
+		return;
+	}
 
-  if (CursorX > CursorRightM)
-    LineEnd = NumOfColumns - 1;
-  else
-    LineEnd = CursorRightM;
+	if (CursorX > CursorRightM)
+		LineEnd = NumOfColumns - 1;
+	else
+		LineEnd = CursorRightM;
 
-  if (Wrap)
-  {
-    CarriageReturn(FALSE);
-    LineFeed(LF,FALSE);
+	if (Wrap) {
+		CarriageReturn(FALSE);
+		LineFeed(LF,FALSE);
 #ifndef NO_COPYLINE_FIX
-    if (ts.EnableContinuedLineCopy)
-      CharAttrTmp.Attr |= AttrLineContinued;
+		if (ts.EnableContinuedLineCopy)
+			CharAttrTmp.Attr |= AttrLineContinued;
 #endif /* NO_COPYLINE_FIX */
-  }
-  else if (CursorX > LineEnd - 1) {
-    if (AutoWrapMode)
-    {
+	}
+	else if (CursorX > LineEnd - 1) {
+		if (AutoWrapMode) {
 #ifndef NO_COPYLINE_FIX
-      if (ts.EnableContinuedLineCopy)
-      {
-      CharAttrTmp.Attr |= AttrLineContinued;
-      if (CursorX == LineEnd)
-	BuffPutChar(0x20, CharAttr, FALSE);
-      }
+			if (ts.EnableContinuedLineCopy) {
+				CharAttrTmp.Attr |= AttrLineContinued;
+				if (CursorX == LineEnd)
+					BuffPutChar(0x20, CharAttr, FALSE);
+			}
 #endif /* NO_COPYLINE_FIX */
-      CarriageReturn(FALSE);
-      LineFeed(LF,FALSE);
-    }
-    else {
-      return;
-    }
-  }
+			CarriageReturn(FALSE);
+			LineFeed(LF,FALSE);
+		}
+		else {
+			return;
+		}
+	}
 
-  Wrap = FALSE;
+	Wrap = FALSE;
 
-  if (cv.HLogBuf!=0)
-  {
-    Log1Byte(HIBYTE(Kanji));
-    Log1Byte(LOBYTE(Kanji));
-  }
+	if (cv.HLogBuf!=0) {
+		Log1Byte(HIBYTE(Kanji));
+		Log1Byte(LOBYTE(Kanji));
+	}
 
-  if (Special)
-  {
-    UpdateStr();
-    Special = FALSE;
-  }
+	if (Special) {
+		UpdateStr();
+		Special = FALSE;
+	}
 
 #ifndef NO_COPYLINE_FIX
-  BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
+	BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
 #else
-  BuffPutKanji(Kanji, CharAttr, InsertMode);
+	BuffPutKanji(Kanji, CharAttr, InsertMode);
 #endif /* NO_COPYLINE_FIX */
 
-  if (CursorX < LineEnd - 1) {
-    MoveRight();
-    MoveRight();
-  }
-  else {
-    UpdateStr();
-    Wrap = AutoWrapMode;
-  }
+	if (CursorX < LineEnd - 1) {
+		MoveRight();
+		MoveRight();
+	}
+	else {
+		UpdateStr();
+		Wrap = AutoWrapMode;
+	}
 }
 
 void PutDebugChar(BYTE b)
@@ -833,90 +820,93 @@ void PutDebugChar(BYTE b)
 
 void PrnParseControl(BYTE b) // printer mode
 {
-  switch (b) {
-    case NUL: return;
-    case SO:
-      if (! DirectPrn)
-      {
-	if ((ts.Language==IdJapanese) &&
-	    (ts.KanjiCode==IdJIS) &&
-	    (ts.JIS7Katakana==1) &&
-	    ((ts.TermFlag & TF_FIXEDJIS)!=0))
-	  Gn[1] = IdKatakana;
-	Glr[0] = 1; /* LS1 */
-	return;
-      }
-      break;
-    case SI:
-      if (! DirectPrn)
-      {
-	Glr[0] = 0; /* LS0 */
-	return;
-      }
-      break;
-    case DC1:
-    case DC3: return;
-    case ESC:
-      ICount = 0;
-      JustAfterESC = TRUE;
-      ParseMode = ModeESC;
-      WriteToPrnFile(0,TRUE); // flush prn buff
-      return;
-    case CSI:
-      if (! Accept8BitCtrl) {
-	PutChar(b); /* Disp C1 char in VT100 mode */
-	return;
-      }
-      ClearParams();
-      FirstPrm = TRUE;
-      ParseMode = ModeCSI;
-      WriteToPrnFile(0,TRUE); // flush prn buff
-      WriteToPrnFile(b,FALSE);
-      return;
-  }
-  /* send the uninterpreted character to printer */
-  WriteToPrnFile(b,TRUE);
+	switch (b) {
+	case NUL:
+		return;
+	case SO:
+		if (! DirectPrn) {
+			if ((ts.Language==IdJapanese) &&
+			    (ts.KanjiCode==IdJIS) &&
+			    (ts.JIS7Katakana==1) &&
+			    ((ts.TermFlag & TF_FIXEDJIS)!=0))
+			{
+				Gn[1] = IdKatakana;
+			}
+			Glr[0] = 1; /* LS1 */
+			return;
+		}
+		break;
+	case SI:
+		if (! DirectPrn) {
+			Glr[0] = 0; /* LS0 */
+			return;
+		}
+		break;
+	case DC1:
+	case DC3:
+		return;
+	case ESC:
+		ICount = 0;
+		JustAfterESC = TRUE;
+		ParseMode = ModeESC;
+		WriteToPrnFile(0, TRUE); // flush prn buff
+		return;
+	case CSI:
+		if (! Accept8BitCtrl) {
+			PutChar(b); /* Disp C1 char in VT100 mode */
+			return;
+		}
+		ClearParams();
+		FirstPrm = TRUE;
+		ParseMode = ModeCSI;
+		WriteToPrnFile(0, TRUE); // flush prn buff
+		WriteToPrnFile(b, FALSE);
+		return;
+	}
+	/* send the uninterpreted character to printer */
+	WriteToPrnFile(b, TRUE);
 }
 
 void ParseControl(BYTE b)
 {
-  if (PrinterMode) { // printer mode
-    PrnParseControl(b);
-    return;
-  }
+	if (PrinterMode) { // printer mode
+		PrnParseControl(b);
+		return;
+	}
 
-  if (b>=0x80) /* C1 char */
-  {
-    /* English mode */
-    if (ts.Language==IdEnglish)
-    {
-      if (!Accept8BitCtrl) {
-	PutChar(b); /* Disp C1 char in VT100 mode */
-	return;
-      }
-    }
-    else { /* Japanese mode */
-      if ((ts.TermFlag & TF_ACCEPT8BITCTRL)==0)
-	return; /* ignore C1 char */
-      /* C1 chars are interpreted as C0 chars in VT100 mode */
-      if (VTlevel < 2)
-	b = b & 0x7F;
-    }
-  }
-  switch (b) {
-    /* C0 group */
-    case ENQ:
-      CommBinaryOut(&cv,&(ts.Answerback[0]),ts.AnswerbackLen);
-      break;
-    case BEL:
-      if (ts.Beep != IdBeepOff) {
-	RingBell(ts.Beep);
-      }
-      break;
-    case BS: BackSpace(); break;
-    case HT: Tab(); break;
-
-    case LF:
+	if (b>=0x80) { /* C1 char */
+		if (ts.Language==IdEnglish) { /* English mode */
+			if (!Accept8BitCtrl) {
+				PutChar(b); /* Disp C1 char in VT100 mode */
+				return;
+			}
+		}
+		else { /* Japanese mode */
+			if ((ts.TermFlag & TF_ACCEPT8BITCTRL)==0) {
+				return; /* ignore C1 char */
+			}
+			/* C1 chars are interpreted as C0 chars in VT100 mode */
+			if (VTlevel < 2) {
+				b = b & 0x7F;
+			}
+		}
+	}
+	switch (b) {
+	/* C0 group */
+	case ENQ:
+		CommBinaryOut(&cv, &(ts.Answerback[0]), ts.AnswerbackLen);
+		break;
+	case BEL:
+		if (ts.Beep != IdBeepOff)
+			RingBell(ts.Beep);
+		break;
+	case BS:
+		BackSpace();
+		break;
+	case HT:
+		Tab();
+		break;
+	case LF:
 		if (ts.CRReceive == IdLF) {
 			// 受信時の改行コードが LF の場合は、サーバから LF のみが送られてくると仮定し、
 			// CR+LFとして扱うようにする。
@@ -940,506 +930,515 @@ void ParseControl(BYTE b)
 			break;
 		}
 
-    case VT: LineFeed(b,TRUE); break;
+	case VT:
+		LineFeed(b, TRUE);
+		break;
 
-    case FF:
-      if ((ts.AutoWinSwitch>0) && JustAfterESC)
-      {
-	CommInsert1Byte(&cv,b);
-	CommInsert1Byte(&cv,ESC);
-	ChangeEmu = IdTEK;  /* Enter TEK Mode */
-      }
-      else
-	LineFeed(b,TRUE);
-      break;
-    case CR:
-      if (ts.CRReceive == IdAUTO) {
-	// 9th Apr 2012: AUTO CR/LF mode (tentner)
-	// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
-	if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
-	  CarriageReturn(TRUE);
-	  LineFeed(b, TRUE);
-	  PrevCRorLFGeneratedCRLF = TRUE;
-	}
-	else {
-	  PrevCRorLFGeneratedCRLF = FALSE;
-	}
-      }
-      else {
-	CarriageReturn(TRUE);
-	if (ts.CRReceive==IdCRLF) {
-	  CommInsert1Byte(&cv,LF);
-	}
-      }
-      break;
-    case SO:
-      if ((ts.Language==IdJapanese) &&
-	  (ts.KanjiCode==IdJIS) &&
-	  (ts.JIS7Katakana==1) &&
-	  ((ts.TermFlag & TF_FIXEDJIS)!=0))
-	Gn[1] = IdKatakana;
+	case FF:
+		if ((ts.AutoWinSwitch>0) && JustAfterESC) {
+			CommInsert1Byte(&cv, b);
+			CommInsert1Byte(&cv, ESC);
+			ChangeEmu = IdTEK;	/* Enter TEK Mode */
+		}
+		else
+			LineFeed(b, TRUE);
+		break;
+	case CR:
+		if (ts.CRReceive == IdAUTO) {
+			// 9th Apr 2012: AUTO CR/LF mode (tentner)
+			// a CR or LF will generated a CR+LF, if the next character is the opposite, it will be ignored
+			if(PrevCharacter != LF || !PrevCRorLFGeneratedCRLF) {
+				CarriageReturn(TRUE);
+				LineFeed(b, TRUE);
+				PrevCRorLFGeneratedCRLF = TRUE;
+			}
+			else {
+				PrevCRorLFGeneratedCRLF = FALSE;
+			}
+		}
+		else {
+			CarriageReturn(TRUE);
+			if (ts.CRReceive==IdCRLF) {
+				CommInsert1Byte(&cv, LF);
+			}
+		}
+		break;
+	case SO: /* LS1 */
+		if ((ts.Language==IdJapanese) &&
+		    (ts.KanjiCode==IdJIS) &&
+		    (ts.JIS7Katakana==1) &&
+		    ((ts.TermFlag & TF_FIXEDJIS)!=0))
+			Gn[1] = IdKatakana;
 
-      Glr[0] = 1; /* LS1 */
-      break;
-    case SI: Glr[0] = 0; break; /* LS0 */
-    case DLE:
-      if ((ts.FTFlag & FT_BPAUTO)!=0)
-	ParseMode = ModeDLE; /* Auto B-Plus activation */
-      break;
-    case CAN:
-      if ((ts.FTFlag & FT_ZAUTO)!=0)
-	ParseMode = ModeCAN; /* Auto ZMODEM activation */
-//	else if (ts.AutoWinSwitch>0)
-//		ChangeEmu = IdTEK;  /* Enter TEK Mode */
-      else
-	ParseMode = ModeFirst;
-      break;
-    case SUB: ParseMode = ModeFirst; break;
-    case ESC:
-      ICount = 0;
-      JustAfterESC = TRUE;
-      ParseMode = ModeESC;
-      break;
-    case FS:
-    case GS:
-    case RS:
-    case US:
-      if (ts.AutoWinSwitch>0)
-      {
-	CommInsert1Byte(&cv,b);
-	ChangeEmu = IdTEK;  /* Enter TEK Mode */
-      }
-      break;
+		Glr[0] = 1;
+		break;
+	case SI: /* LS0 */
+		Glr[0] = 0;
+		break;
+	case DLE:
+		if ((ts.FTFlag & FT_BPAUTO)!=0)
+			ParseMode = ModeDLE; /* Auto B-Plus activation */
+		break;
+	case CAN:
+		if ((ts.FTFlag & FT_ZAUTO)!=0)
+			ParseMode = ModeCAN; /* Auto ZMODEM activation */
+//		else if (ts.AutoWinSwitch>0)
+//			ChangeEmu = IdTEK;	/* Enter TEK Mode */
+		else
+			ParseMode = ModeFirst;
+		break;
+	case SUB:
+		ParseMode = ModeFirst;
+		break;
+	case ESC:
+		ICount = 0;
+		JustAfterESC = TRUE;
+		ParseMode = ModeESC;
+		break;
+	case FS:
+	case GS:
+	case RS:
+	case US:
+		if (ts.AutoWinSwitch>0) {
+			CommInsert1Byte(&cv, b);
+			ChangeEmu = IdTEK;	/* Enter TEK Mode */
+		}
+		break;
 
-    /* C1 char */
-    case IND: LineFeed(0,TRUE); break;
-    case NEL:
-      LineFeed(0,TRUE);
-      CarriageReturn(TRUE);
-      break;
-    case HTS: if (ts.TabStopFlag & TABF_HTS8) SetTabStop(); break;
-    case RI: CursorUpWithScroll(); break;
-    case SS2:
-      GLtmp = 2;
-      SSflag = TRUE;
-      break;
-    case SS3:
-      GLtmp = 3;
-      SSflag = TRUE;
-      break;
-    case DCS:
-      ClearParams();
-      ESCFlag = FALSE;
-      ParseMode = ModeDCS;
-      break;
-    case SOS:
-      ESCFlag = FALSE;
-      ParseMode = ModeIgnore;
-      break;
-    case CSI:
-      ClearParams();
-      FirstPrm = TRUE;
-      ParseMode = ModeCSI;
-      break;
-    case OSC:
-      ClearParams();
-      ParseMode = ModeXS;
-      break;
-    case PM:
-    case APC:
-      ESCFlag = FALSE;
-      ParseMode = ModeIgnore;
-      break;
-  }
+	/* C1 char */
+	case IND:
+		LineFeed(0, TRUE);
+		break;
+	case NEL:
+		LineFeed(0, TRUE);
+		CarriageReturn(TRUE);
+		break;
+	case HTS:
+		if (ts.TabStopFlag & TABF_HTS8)
+			SetTabStop();
+		break;
+	case RI:
+		CursorUpWithScroll();
+		break;
+	case SS2:
+		GLtmp = 2;
+		SSflag = TRUE;
+		break;
+	case SS3:
+		GLtmp = 3;
+		SSflag = TRUE;
+		break;
+	case DCS:
+		ClearParams();
+		ESCFlag = FALSE;
+		ParseMode = ModeDCS;
+		break;
+	case SOS:
+		ESCFlag = FALSE;
+		ParseMode = ModeIgnore;
+		break;
+	case CSI:
+		ClearParams();
+		FirstPrm = TRUE;
+		ParseMode = ModeCSI;
+		break;
+	case OSC:
+		ClearParams();
+		ParseMode = ModeXS;
+		break;
+	case PM:
+	case APC:
+		ESCFlag = FALSE;
+		ParseMode = ModeIgnore;
+		break;
+	}
 }
 
 void SaveCursor()
 {
-  int i;
-  PStatusBuff Buff;
+	int i;
+	PStatusBuff Buff;
 
-  if (isCursorOnStatusLine)
-    Buff = &SBuff2; // for status line
-  else if (AltScr)
-    Buff = &SBuff3; // for alternate screen
-  else
-    Buff = &SBuff1; // for main screen
+	if (isCursorOnStatusLine)
+		Buff = &SBuff2; // for status line
+	else if (AltScr)
+		Buff = &SBuff3; // for alternate screen
+	else
+		Buff = &SBuff1; // for main screen
 
-  Buff->CursorX = CursorX;
-  Buff->CursorY = CursorY;
-  Buff->Attr = CharAttr;
-  Buff->Glr[0] = Glr[0];
-  Buff->Glr[1] = Glr[1];
-  for (i=0 ; i<=3; i++)
-    Buff->Gn[i] = Gn[i];
-  Buff->AutoWrapMode = AutoWrapMode;
-  Buff->RelativeOrgMode = RelativeOrgMode;
+	Buff->CursorX = CursorX;
+	Buff->CursorY = CursorY;
+	Buff->Attr = CharAttr;
+
+	Buff->Glr[0] = Glr[0];
+	Buff->Glr[1] = Glr[1];
+	for (i=0 ; i<=3; i++)
+		Buff->Gn[i] = Gn[i];
+
+	Buff->AutoWrapMode = AutoWrapMode;
+	Buff->RelativeOrgMode = RelativeOrgMode;
 }
 
-void  RestoreCursor()
+void RestoreCursor()
 {
-  int i;
-  PStatusBuff Buff;
-  UpdateStr();
+	int i;
+	PStatusBuff Buff;
 
-  if (isCursorOnStatusLine)
-    Buff = &SBuff2; // for status line
-  else if (AltScr)
-    Buff = &SBuff3; // for alternate screen
-  else
-    Buff = &SBuff1; // for main screen
+	UpdateStr();
 
-  if (Buff->CursorX > NumOfColumns-1)
-    Buff->CursorX = NumOfColumns-1;
-  if (Buff->CursorY > NumOfLines-1-StatusLine)
-    Buff->CursorY = NumOfLines-1-StatusLine;
-  MoveCursor(Buff->CursorX,Buff->CursorY);
-  CharAttr = Buff->Attr;
-  BuffSetCurCharAttr(CharAttr);
-  Glr[0] = Buff->Glr[0];
-  Glr[1] = Buff->Glr[1];
-  for (i=0 ; i<=3; i++)
-    Gn[i] = Buff->Gn[i];
-  AutoWrapMode = Buff->AutoWrapMode;
-  RelativeOrgMode = Buff->RelativeOrgMode;
+	if (isCursorOnStatusLine)
+		Buff = &SBuff2; // for status line
+	else if (AltScr)
+		Buff = &SBuff3; // for alternate screen
+	else
+		Buff = &SBuff1; // for main screen
+
+	if (Buff->CursorX > NumOfColumns-1)
+		Buff->CursorX = NumOfColumns-1;
+	if (Buff->CursorY > NumOfLines-1-StatusLine)
+		Buff->CursorY = NumOfLines-1-StatusLine;
+	MoveCursor(Buff->CursorX, Buff->CursorY);
+
+	CharAttr = Buff->Attr;
+	BuffSetCurCharAttr(CharAttr);
+
+	Glr[0] = Buff->Glr[0];
+	Glr[1] = Buff->Glr[1];
+	for (i=0 ; i<=3; i++)
+		Gn[i] = Buff->Gn[i];
+
+	AutoWrapMode = Buff->AutoWrapMode;
+	RelativeOrgMode = Buff->RelativeOrgMode;
 }
 
 void AnswerTerminalType()
 {
-  char Tmp[50];
+	char Tmp[50];
 
-  if (ts.TerminalID<IdVT320 || !Send8BitMode)
-    strncpy_s(Tmp, sizeof(Tmp),"\033[?", _TRUNCATE);
-  else
-    strncpy_s(Tmp, sizeof(Tmp),"\233?", _TRUNCATE);
+	if (ts.TerminalID<IdVT320 || !Send8BitMode)
+		strncpy_s(Tmp, sizeof(Tmp),"\033[?", _TRUNCATE);
+	else
+		strncpy_s(Tmp, sizeof(Tmp),"\233?", _TRUNCATE);
 
-  switch (ts.TerminalID) {
-    case IdVT100:
-      strncat_s(Tmp,sizeof(Tmp),"1;2",_TRUNCATE);
-      break;
-    case IdVT100J:
-      strncat_s(Tmp,sizeof(Tmp),"5;2",_TRUNCATE);
-      break;
-    case IdVT101:
-      strncat_s(Tmp,sizeof(Tmp),"1;0",_TRUNCATE);
-      break;
-    case IdVT102:
-      strncat_s(Tmp,sizeof(Tmp),"6",_TRUNCATE);
-      break;
-    case IdVT102J:
-      strncat_s(Tmp,sizeof(Tmp),"15",_TRUNCATE);
-      break;
-    case IdVT220J:
-      strncat_s(Tmp,sizeof(Tmp),"62;1;2;5;6;7;8",_TRUNCATE);
-      break;
-    case IdVT282:
-      strncat_s(Tmp,sizeof(Tmp),"62;1;2;4;5;6;7;8;10;11",_TRUNCATE);
-      break;
-    case IdVT320:
-      strncat_s(Tmp,sizeof(Tmp),"63;1;2;6;7;8",_TRUNCATE);
-      break;
-    case IdVT382:
-      strncat_s(Tmp,sizeof(Tmp),"63;1;2;4;5;6;7;8;10;15",_TRUNCATE);
-      break;
-    case IdVT420:
-      strncat_s(Tmp,sizeof(Tmp),"64;1;2;7;8;9;15;18;21",_TRUNCATE);
-      break;
-    case IdVT520:
-      strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;8;9;12;18;19;21;23;24;42;44;45;46",_TRUNCATE);
-      break;
-    case IdVT525:
-      strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;9;12;18;19;21;22;23;24;42;44;45;46",_TRUNCATE);
-      break;
-  }
-  strncat_s(Tmp,sizeof(Tmp),"c",_TRUNCATE);
+	switch (ts.TerminalID) {
+	case IdVT100:
+		strncat_s(Tmp,sizeof(Tmp),"1;2",_TRUNCATE);
+		break;
+	case IdVT100J:
+		strncat_s(Tmp,sizeof(Tmp),"5;2",_TRUNCATE);
+		break;
+	case IdVT101:
+		strncat_s(Tmp,sizeof(Tmp),"1;0",_TRUNCATE);
+		break;
+	case IdVT102:
+		strncat_s(Tmp,sizeof(Tmp),"6",_TRUNCATE);
+		break;
+	case IdVT102J:
+		strncat_s(Tmp,sizeof(Tmp),"15",_TRUNCATE);
+		break;
+	case IdVT220J:
+		strncat_s(Tmp,sizeof(Tmp),"62;1;2;5;6;7;8",_TRUNCATE);
+		break;
+	case IdVT282:
+		strncat_s(Tmp,sizeof(Tmp),"62;1;2;4;5;6;7;8;10;11",_TRUNCATE);
+		break;
+	case IdVT320:
+		strncat_s(Tmp,sizeof(Tmp),"63;1;2;6;7;8",_TRUNCATE);
+		break;
+	case IdVT382:
+		strncat_s(Tmp,sizeof(Tmp),"63;1;2;4;5;6;7;8;10;15",_TRUNCATE);
+		break;
+	case IdVT420:
+		strncat_s(Tmp,sizeof(Tmp),"64;1;2;7;8;9;15;18;21",_TRUNCATE);
+		break;
+	case IdVT520:
+		strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;8;9;12;18;19;21;23;24;42;44;45;46",_TRUNCATE);
+		break;
+	case IdVT525:
+		strncat_s(Tmp,sizeof(Tmp),"65;1;2;7;9;12;18;19;21;22;23;24;42;44;45;46",_TRUNCATE);
+		break;
+	}
+	strncat_s(Tmp,sizeof(Tmp),"c",_TRUNCATE);
 
-  CommBinaryOut(&cv,Tmp,strlen(Tmp)); /* Report terminal ID */
+	CommBinaryOut(&cv,Tmp,strlen(Tmp)); /* Report terminal ID */
 }
 
 void ESCSpace(BYTE b)
 {
-  switch (b) {
-    case 'F':	// S7C1T
-      Send8BitMode = FALSE;
-      break;
-    case 'G':	// S8C1T
-      if (VTlevel >= 2) {
-	Send8BitMode = TRUE;
-      }
-      break;
-  }
+	switch (b) {
+	case 'F':  // S7C1T
+		Send8BitMode = FALSE;
+		break;
+	case 'G':  // S8C1T
+		if (VTlevel >= 2) {
+			Send8BitMode = TRUE;
+		}
+		break;
+	}
 }
 
 void ESCSharp(BYTE b)
 {
-  switch (b) {
-    case '8':  /* Fill screen with "E" (DECALN) */
-      BuffUpdateScroll();
-      BuffFillWithE();
-      CursorTop = 0;
-      CursorBottom = NumOfLines-1-StatusLine;
-      CursorLeftM = 0;
-      CursorRightM = NumOfColumns - 1;
-      MoveCursor(0,0);
-      ParseMode = ModeFirst;
-      break;
-  }
+	switch (b) {
+	case '8':  /* Fill screen with "E" (DECALN) */
+		BuffUpdateScroll();
+		BuffFillWithE();
+		CursorTop = 0;
+		CursorBottom = NumOfLines-1-StatusLine;
+		CursorLeftM = 0;
+		CursorRightM = NumOfColumns - 1;
+		MoveCursor(0, 0);
+		ParseMode = ModeFirst;
+		break;
+	}
 }
 
 /* select double byte code set */
 void ESCDBCSSelect(BYTE b)
 {
-  int Dist;
+	int Dist;
 
-  if (ts.Language!=IdJapanese) return;
+	if (ts.Language!=IdJapanese) return;
 
-  switch (ICount) {
-    case 1:
-      if ((b=='@') || (b=='B'))
-      {
-	Gn[0] = IdKanji; /* Kanji -> G0 */
-	if ((ts.TermFlag & TF_AUTOINVOKE)!=0)
-	  Glr[0] = 0; /* G0->GL */
-      }
-      break;
-    case 2:
-      /* Second intermediate char must be
-	 '(' or ')' or '*' or '+'. */
-      Dist = (IntChar[2]-'(') & 3; /* G0 - G3 */
-      if ((b=='1') || (b=='3') ||
-	  (b=='@') || (b=='B'))
-      {
-	Gn[Dist] = IdKanji; /* Kanji -> G0-3 */
-	if (((ts.TermFlag & TF_AUTOINVOKE)!=0) &&
-	    (Dist==0))
-	  Glr[0] = 0; /* G0->GL */
-      }
-      break;
-  }
+	switch (ICount) {
+		case 1:
+			if ((b=='@') || (b=='B'))
+			{
+				Gn[0] = IdKanji; /* Kanji -> G0 */
+				if ((ts.TermFlag & TF_AUTOINVOKE)!=0)
+					Glr[0] = 0; /* G0->GL */
+			}
+			break;
+		case 2:
+			/* Second intermediate char must be
+				 '(' or ')' or '*' or '+'. */
+			Dist = (IntChar[2]-'(') & 3; /* G0 - G3 */
+			if ((b=='1') || (b=='3') ||
+					(b=='@') || (b=='B'))
+			{
+				Gn[Dist] = IdKanji; /* Kanji -> G0-3 */
+				if (((ts.TermFlag & TF_AUTOINVOKE)!=0) &&
+						(Dist==0))
+					Glr[0] = 0; /* G0->GL */
+			}
+			break;
+	}
 }
 
 void ESCSelectCode(BYTE b)
 {
-  switch (b) {
-    case '0':
-      if (ts.AutoWinSwitch>0)
-	ChangeEmu = IdTEK; /* enter TEK mode */
-      break;
-  }
+	switch (b) {
+		case '0':
+			if (ts.AutoWinSwitch>0)
+				ChangeEmu = IdTEK; /* enter TEK mode */
+			break;
+	}
 }
 
-  /* select single byte code set */
+	/* select single byte code set */
 void ESCSBCSSelect(BYTE b)
 {
-  int Dist;
+	int Dist;
 
-  /* Intermediate char must be
-     '(' or ')' or '*' or '+'.	*/
-  Dist = (IntChar[1]-'(') & 3; /* G0 - G3 */
+	/* Intermediate char must be '(' or ')' or '*' or '+'. */
+	Dist = (IntChar[1]-'(') & 3; /* G0 - G3 */
 
-  switch (b) {
-    case '0': Gn[Dist] = IdSpecial; break;
-    case '<': Gn[Dist] = IdASCII; break;
-    case '>': Gn[Dist] = IdASCII; break;
-    case 'A': Gn[Dist] = IdASCII; break;
-    case 'B': Gn[Dist] = IdASCII; break;
-    case 'H': Gn[Dist] = IdASCII; break;
-    case 'I':
-      if (ts.Language==IdJapanese)
-	Gn[Dist] = IdKatakana;
-      break;
-    case 'J': Gn[Dist] = IdASCII; break;
-  }
+	switch (b) {
+	case '0': Gn[Dist] = IdSpecial; break;
+	case '<': Gn[Dist] = IdASCII; break;
+	case '>': Gn[Dist] = IdASCII; break;
+	case 'A': Gn[Dist] = IdASCII; break;
+	case 'B': Gn[Dist] = IdASCII; break;
+	case 'H': Gn[Dist] = IdASCII; break;
+	case 'I':
+		if (ts.Language==IdJapanese)
+			Gn[Dist] = IdKatakana;
+		break;
+	case 'J': Gn[Dist] = IdASCII; break;
+	}
 
-  if (((ts.TermFlag & TF_AUTOINVOKE)!=0) &&
-      (Dist==0))
-    Glr[0] = 0;  /* G0->GL */
+	if (((ts.TermFlag & TF_AUTOINVOKE)!=0) && (Dist==0))
+		Glr[0] = 0;  /* G0->GL */
 }
 
 void PrnParseEscape(BYTE b) // printer mode
 {
-  int i;
+	int i;
 
-  ParseMode = ModeFirst;
-  switch (ICount) {
-    /* no intermediate char */
-    case 0:
-      switch (b) {
-	case '[': /* CSI */
-	  ClearParams();
-	  FirstPrm = TRUE;
-	  WriteToPrnFile(ESC,FALSE);
-	  WriteToPrnFile('[',FALSE);
-	  ParseMode = ModeCSI;
-	  return;
-      } /* end of case Icount=0 */
-      break;
-    /* one intermediate char */
-    case 1:
-      switch (IntChar[1]) {
-	case '$':
-	  if (! DirectPrn)
-	  {
-	    ESCDBCSSelect(b);
-	    return;
-	  }
-	  break;
-	case '(':
-	case ')':
-	case '*':
-	case '+':
-	  if (! DirectPrn)
-	  {
-	    ESCSBCSSelect(b);
-	    return;
-	  }
-	  break;
-      }
-      break;
-    /* two intermediate char */
-    case 2:
-      if ((! DirectPrn) &&
-	  (IntChar[1]=='$') &&
-	  ('('<=IntChar[2]) &&
-	  (IntChar[2]<='+'))
-      {
-	ESCDBCSSelect(b);
-	return;
-      }
-      break;
-  }
-  // send the uninterpreted sequence to printer
-  WriteToPrnFile(ESC,FALSE);
-  for (i=1; i<=ICount; i++)
-    WriteToPrnFile(IntChar[i],FALSE);
-  WriteToPrnFile(b,TRUE);
+	ParseMode = ModeFirst;
+	switch (ICount) {
+	/* no intermediate char */
+	case 0:
+		switch (b) {
+		case '[': /* CSI */
+			ClearParams();
+			FirstPrm = TRUE;
+			WriteToPrnFile(ESC,FALSE);
+			WriteToPrnFile('[',FALSE);
+			ParseMode = ModeCSI;
+			return;
+		} /* end of case Icount=0 */
+		break;
+	/* one intermediate char */
+	case 1:
+		switch (IntChar[1]) {
+		case '$':
+			if (! DirectPrn) {
+				ESCDBCSSelect(b);
+				return;
+			}
+			break;
+		case '(':
+		case ')':
+		case '*':
+		case '+':
+			if (! DirectPrn) {
+				ESCSBCSSelect(b);
+				return;
+			}
+			break;
+		}
+		break;
+	/* two intermediate char */
+	case 2:
+		if ((! DirectPrn) &&
+		    (IntChar[1]=='$') &&
+		    ('('<=IntChar[2]) &&
+		    (IntChar[2]<='+'))
+		{
+			ESCDBCSSelect(b);
+			return;
+		}
+		break;
+	}
+	// send the uninterpreted sequence to printer
+	WriteToPrnFile(ESC,FALSE);
+	for (i=1; i<=ICount; i++)
+		WriteToPrnFile(IntChar[i],FALSE);
+	WriteToPrnFile(b,TRUE);
 }
 
 void ParseEscape(BYTE b) /* b is the final char */
 {
-  if (PrinterMode) { // printer mode
-    PrnParseEscape(b);
-    return;
-  }
+	if (PrinterMode) { // printer mode
+		PrnParseEscape(b);
+		return;
+	}
 
-  switch (ICount) {
-    /* no intermediate char */
-    case 0:
-      switch (b) {
-        case '6': // DECBI
-	  if (CursorY >= CursorTop && CursorY <= CursorBottom
-	    && CursorX >= CursorLeftM && CursorX <= CursorRightM)
-	  {
-	    if (CursorX == CursorLeftM)
-	      BuffScrollRight(1);
-	    else
-	      MoveCursor(CursorX-1, CursorY);
-	  }
-	  break;
-	case '7': SaveCursor(); break;
-	case '8': RestoreCursor(); break;
-	case '9': // DECFI
-	  if (CursorY >= CursorTop && CursorY <= CursorBottom
-	    && CursorX >= CursorLeftM && CursorX <= CursorRightM)
-	  {
-	    if (CursorX == CursorRightM)
-	      BuffScrollLeft(1);
-	    else
-	      MoveCursor(CursorX+1, CursorY);
-	  }
-	  break;
-	case '=': AppliKeyMode = TRUE; break;
-	case '>': AppliKeyMode = FALSE; break;
-	case 'D': /* IND */
-	  LineFeed(0,TRUE);
-	  break;
-	case 'E': /* NEL */
-	  MoveCursor(0,CursorY);
-	  LineFeed(0,TRUE);
-	  break;
-	case 'H': /* HTS */
-	  if (ts.TabStopFlag & TABF_HTS7) SetTabStop();
-	  break;
-	case 'M': /* RI */
-	  CursorUpWithScroll();
-	  break;
-	case 'N': /* SS2 */
-	  GLtmp = 2;
-	  SSflag = TRUE;
-	  break;
-	case 'O': /* SS3 */
-	  GLtmp = 3;
-	  SSflag = TRUE;
-	  break;
-	case 'P': /* DCS */
-	  ClearParams();
-	  ESCFlag = FALSE;
-	  ParseMode = ModeDCS;
-	  return;
-	case 'X': /* SOS */
-	case '^': /* APC */
-	case '_': /* PM  */
-	  ESCFlag = FALSE;
-	  ParseMode = ModeIgnore;
-	  return;
-	case 'Z': /* DECID */
-	  AnswerTerminalType();
-	  break;
-	case '[': /* CSI */
-	  ClearParams();
-	  FirstPrm = TRUE;
-	  ParseMode = ModeCSI;
-	  return;
-	case '\\': break; /* ST */
-	case ']': /* XTERM sequence (OSC) */
-	  ClearParams();
-	  ParseMode = ModeXS;
-	  return;
-	case 'c': /* Hardware reset */
-	  HideStatusLine();
-	  ResetTerminal();
-	  ClearUserKey();
-	  ClearBuffer();
-	  if (ts.PortType==IdSerial) // reset serial port
-	    CommResetSerial(&ts, &cv, TRUE);
-	  break;
-	case 'g': /* Visual Bell (screen original?) */
-	  RingBell(IdBeepVisual);
-	  break;
-	case 'n': Glr[0] = 2; break; /* LS2 */
-	case 'o': Glr[0] = 3; break; /* LS3 */
-	case '|': Glr[1] = 3; break; /* LS3R */
-	case '}': Glr[1] = 2; break; /* LS2R */
-	case '~': Glr[1] = 1; break; /* LS1R */
-      } /* end of case Icount=0 */
-      break;
-    /* one intermediate char */
-    case 1:
-      switch (IntChar[1]) {
-	case ' ': ESCSpace(b); break;
-	case '#': ESCSharp(b); break;
-	case '$': ESCDBCSSelect(b); break;
-	case '%': break;
-	case '(':
-	case ')':
-	case '*':
-	case '+':
-	  ESCSBCSSelect(b);
-	  break;
-      }
-      break;
-    /* two intermediate char */
-    case 2:
-      if ((IntChar[1]=='$') &&
-	  ('('<=IntChar[2]) &&
-	  (IntChar[2]<='+'))
-	ESCDBCSSelect(b);
-      else if ((IntChar[1]=='%') &&
-	       (IntChar[2]=='!'))
-	ESCSelectCode(b);
-      break;
-  }
-  ParseMode = ModeFirst;
+	switch (ICount) {
+	case 0: /* no intermediate char */
+		switch (b) {
+		case '6': // DECBI
+			if (CursorY >= CursorTop && CursorY <= CursorBottom &&
+			    CursorX >= CursorLeftM && CursorX <= CursorRightM) {
+				if (CursorX == CursorLeftM)
+					BuffScrollRight(1);
+				else
+					MoveCursor(CursorX-1, CursorY);
+			}
+		break;
+		case '7': SaveCursor(); break;
+		case '8': RestoreCursor(); break;
+		case '9': // DECFI
+			if (CursorY >= CursorTop && CursorY <= CursorBottom &&
+			    CursorX >= CursorLeftM && CursorX <= CursorRightM) {
+				if (CursorX == CursorRightM)
+					BuffScrollLeft(1);
+				else
+					MoveCursor(CursorX+1, CursorY);
+			}
+			break;
+		case '=': AppliKeyMode = TRUE; break;
+		case '>': AppliKeyMode = FALSE; break;
+		case 'D': /* IND */
+			LineFeed(0,TRUE);
+			break;
+		case 'E': /* NEL */
+			MoveCursor(0,CursorY);
+			LineFeed(0,TRUE);
+			break;
+		case 'H': /* HTS */
+			if (ts.TabStopFlag & TABF_HTS7)
+				SetTabStop();
+			break;
+		case 'M': /* RI */
+			CursorUpWithScroll();
+			break;
+		case 'N': /* SS2 */
+			GLtmp = 2;
+			SSflag = TRUE;
+			break;
+		case 'O': /* SS3 */
+			GLtmp = 3;
+			SSflag = TRUE;
+			break;
+		case 'P': /* DCS */
+			ClearParams();
+			ESCFlag = FALSE;
+			ParseMode = ModeDCS;
+			return;
+		case 'X': /* SOS */
+		case '^': /* APC */
+		case '_': /* PM  */
+			ESCFlag = FALSE;
+			ParseMode = ModeIgnore;
+			return;
+		case 'Z': /* DECID */
+			AnswerTerminalType();
+			break;
+		case '[': /* CSI */
+			ClearParams();
+			FirstPrm = TRUE;
+			ParseMode = ModeCSI;
+			return;
+		case '\\': break; /* ST */
+		case ']': /* XTERM sequence (OSC) */
+			ClearParams();
+			ParseMode = ModeXS;
+			return;
+		case 'c': /* Hardware reset */
+			HideStatusLine();
+			ResetTerminal();
+			ClearUserKey();
+			ClearBuffer();
+			if (ts.PortType==IdSerial) // reset serial port
+				CommResetSerial(&ts, &cv, TRUE);
+			break;
+		case 'g': /* Visual Bell (screen original?) */
+			RingBell(IdBeepVisual);
+			break;
+		case 'n': Glr[0] = 2; break; /* LS2 */
+		case 'o': Glr[0] = 3; break; /* LS3 */
+		case '|': Glr[1] = 3; break; /* LS3R */
+		case '}': Glr[1] = 2; break; /* LS2R */
+		case '~': Glr[1] = 1; break; /* LS1R */
+		}
+		break;
+		/* end of case Icount=0 */
+
+	case 1: /* one intermediate char */
+		switch (IntChar[1]) {
+		case ' ': ESCSpace(b); break;
+		case '#': ESCSharp(b); break;
+		case '$': ESCDBCSSelect(b); break;
+		case '%': break;
+		case '(':
+		case ')':
+		case '*':
+		case '+':
+			ESCSBCSSelect(b);
+			break;
+		}
+		break;
+
+	case 2: /* two intermediate char */
+		if ((IntChar[1]=='$') && ('('<=IntChar[2]) && (IntChar[2]<='+'))
+			ESCDBCSSelect(b);
+		else if ((IntChar[1]=='%') && (IntChar[2]=='!'))
+			ESCSelectCode(b);
+		break;
+	}
+	ParseMode = ModeFirst;
 }
 
 void EscapeSequence(BYTE b)
@@ -3784,11 +3783,11 @@ void ParseCS(BYTE b) /* b is the final char */
 			// Private Sequence
 			  case 'r': CSSetScrollRegion(); break;   // DECSTBM
 			  case 's':
-			    if (LRMarginMode)
-			      CSSetLRScrollRegion();              // DECSLRM
-			    else
-			      SaveCursor();                       // SCP (Save cursor (ANSI.SYS/SCO?))
-			    break;
+				if (LRMarginMode)
+					CSSetLRScrollRegion();    // DECSLRM
+				else
+					SaveCursor();             // SCP (Save cursor (ANSI.SYS/SCO?))
+				break;
 			  case 't': CSSunSequence(); break;       // DECSLPP / Window manipulation(dtterm?)
 			  case 'u': RestoreCursor(); break;       // RCP (Restore cursor (ANSI.SYS/SCO))
 			}
@@ -4911,10 +4910,10 @@ void XSequence(BYTE b)
 
 void DLESeen(BYTE b)
 {
-  ParseMode = ModeFirst;
-  if (((ts.FTFlag & FT_BPAUTO)!=0) && (b=='B'))
-    BPStart(IdBPAuto); /* Auto B-Plus activation */
-  ChangeEmu = -1;
+	ParseMode = ModeFirst;
+	if (((ts.FTFlag & FT_BPAUTO)!=0) && (b=='B'))
+		BPStart(IdBPAuto); /* Auto B-Plus activation */
+	ChangeEmu = -1;
 }
 
 void CANSeen(BYTE b)
@@ -5303,12 +5302,6 @@ static void UnicodeToCP932(unsigned int code)
 	unsigned char wchar[32];
 	unsigned short cset = 0;
 
-#if 0
-	Kanji = code & 0xff00;
-	PutKanji(code & 0x00ff);
-	return;
-#else
-
 	wchar[0] = code & 0xff;
 	wchar[1] = (code >> 8) & 0xff;
 
@@ -5348,7 +5341,6 @@ static void UnicodeToCP932(unsigned int code)
 			break;
 		}
 	}
-#endif
 }
 
 // UTF-8で受信データを処理する
@@ -5494,13 +5486,12 @@ skip:
 BOOL ParseFirstRus(BYTE b)
 // returns if b is processed
 {
-  if (b>=128)
-  {
-    b = RussConv(ts.RussHost,ts.RussClient,b);
-    PutChar(b);
-    return TRUE;
-  }
-  return FALSE;
+	if (b>=128) {
+		b = RussConv(ts.RussHost,ts.RussClient,b);
+		PutChar(b);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void ParseFirst(BYTE b)
@@ -5574,348 +5565,369 @@ void ParseFirst(BYTE b)
 
 int VTParse()
 {
-  BYTE b;
-  int c;
+	BYTE b;
+	int c;
 
-  c = CommRead1Byte(&cv,&b);
+	c = CommRead1Byte(&cv,&b);
 
-  if (c==0) return 0;
+	if (c==0) return 0;
 
-  CaretOff();
-  UpdateCaretPosition(FALSE);  // 非アクティブの場合のみ再描画する
+	CaretOff();
+	UpdateCaretPosition(FALSE);	// 非アクティブの場合のみ再描画する
 
-  ChangeEmu = 0;
+	ChangeEmu = 0;
 
-  /* Get Device Context */
-  DispInitDC();
+	/* Get Device Context */
+	DispInitDC();
 
-  LockBuffer();
+	LockBuffer();
 
-  while ((c>0) && (ChangeEmu==0))
-  {
-    if (DebugFlag!=DEBUG_FLAG_NONE)
-      PutDebugChar(b);
-    else {
-      switch (ParseMode) {
-	case ModeFirst: ParseFirst(b); break;
-	case ModeESC: EscapeSequence(b); break;
-	case ModeDCS: DeviceControl(b); break;
-	case ModeDCUserKey: DCUserKey(b); break;
-	case ModeSOS: IgnoreString(b); break;
-	case ModeCSI: ControlSequence(b); break;
-	case ModeXS:  XSequence(b); break;
-	case ModeDLE: DLESeen(b); break;
-	case ModeCAN: CANSeen(b); break;
-	case ModeIgnore: IgnoreString(b); break;
-	default:
-	  ParseMode = ModeFirst;
-	  ParseFirst(b);
-      }
-    }
+	while ((c>0) && (ChangeEmu==0)) {
+		if (DebugFlag!=DEBUG_FLAG_NONE)
+			PutDebugChar(b);
+		else {
+			switch (ParseMode) {
+			case ModeFirst:
+				ParseFirst(b);
+				break;
+			case ModeESC:
+				EscapeSequence(b);
+				break;
+			case ModeDCS:
+				DeviceControl(b);
+				break;
+			case ModeDCUserKey:
+				DCUserKey(b);
+				break;
+			case ModeSOS:
+				IgnoreString(b);
+				break;
+			case ModeCSI:
+				ControlSequence(b);
+				break;
+			case ModeXS:
+				XSequence(b);
+				break;
+			case ModeDLE:
+				DLESeen(b);
+				break;
+			case ModeCAN:
+				CANSeen(b);
+				break;
+			case ModeIgnore:
+				IgnoreString(b);
+				break;
+			default:
+				ParseMode = ModeFirst;
+				ParseFirst(b);
+			}
+		}
 
-    PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
+		PrevCharacter = b;		// memorize previous character for AUTO CR/LF-receive mode
 
-    if (ChangeEmu==0)
-      c = CommRead1Byte(&cv,&b);
-  }
+		if (ChangeEmu==0)
+			c = CommRead1Byte(&cv,&b);
+	}
 
-  BuffUpdateScroll();
+	BuffUpdateScroll();
 
-  BuffSetCaretWidth();
-  UnlockBuffer();
+	BuffSetCaretWidth();
+	UnlockBuffer();
 
-  /* release device context */
-  DispReleaseDC();
+	/* release device context */
+	DispReleaseDC();
 
-  CaretOn();
+	CaretOn();
 
-  if (ChangeEmu > 0) ParseMode = ModeFirst;
-  return ChangeEmu;
+	if (ChangeEmu > 0)
+		ParseMode = ModeFirst;
+
+	return ChangeEmu;
 }
 
 int MakeLocatorReportStr(char *buff, size_t buffsize, int event, int x, int y) {
-  if (x < 0) {
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d&w", CLocale, event, ButtonStat);
-  }
-  else {
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, event, ButtonStat, y, x);
-  }
+	if (x < 0) {
+		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d&w", CLocale, event, ButtonStat);
+	}
+	else {
+		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d;%d;%d;0&w", CLocale, event, ButtonStat, y, x);
+	}
 }
 
 BOOL DecLocatorReport(int Event, int Button) {
-  int x, y, MaxX, MaxY, len = 0;
-  char buff[24];
+	int x, y, MaxX, MaxY, len = 0;
+	char buff[24];
 
-  if (DecLocatorFlag & DecLocatorPixel) {
-    x = LastX + 1;
-    y = LastY + 1;
-    DispConvScreenToWin(NumOfColumns+1, NumOfLines+1, &MaxX, &MaxY);
-    if (x < 1 || x > MaxX || y < 1 || y > MaxY) {
-      x = -1;
-    }
-  }
-  else {
-    DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
-    x++; y++;
-    if (x < 1 || x > NumOfColumns || y < 1 || y > NumOfLines) {
-      x = -1;
-    }
-  }
+	if (DecLocatorFlag & DecLocatorPixel) {
+		x = LastX + 1;
+		y = LastY + 1;
+		DispConvScreenToWin(NumOfColumns+1, NumOfLines+1, &MaxX, &MaxY);
+		if (x < 1 || x > MaxX || y < 1 || y > MaxY) {
+			x = -1;
+		}
+	}
+	else {
+		DispConvWinToScreen(LastX, LastY, &x, &y, NULL);
+		x++; y++;
+		if (x < 1 || x > NumOfColumns || y < 1 || y > NumOfLines) {
+			x = -1;
+		}
+	}
 
-  switch (Event) {
-  case IdMouseEventCurStat:
-    if (MouseReportMode == IdMouseTrackDECELR) {
-      len = MakeLocatorReportStr(buff, sizeof(buff), 1, x, y);
-    }
-    else {
-      len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "0&w", CLocale);
-    }
-    break;
+	switch (Event) {
+	case IdMouseEventCurStat:
+		if (MouseReportMode == IdMouseTrackDECELR) {
+			len = MakeLocatorReportStr(buff, sizeof(buff), 1, x, y);
+		}
+		else {
+			len = _snprintf_s_l(buff, sizeof(buff), _TRUNCATE, "0&w", CLocale);
+		}
+		break;
 
-  case IdMouseEventBtnDown:
-    if (DecLocatorFlag & DecLocatorButtonDown) {
-      len = MakeLocatorReportStr(buff, sizeof(buff), Button*2+2, x, y);
-    }
-    break;
+	case IdMouseEventBtnDown:
+		if (DecLocatorFlag & DecLocatorButtonDown) {
+			len = MakeLocatorReportStr(buff, sizeof(buff), Button*2+2, x, y);
+		}
+		break;
 
-  case IdMouseEventBtnUp:
-    if (DecLocatorFlag & DecLocatorButtonUp) {
-      len = MakeLocatorReportStr(buff, sizeof(buff), Button*2+3, x, y);
-    }
-    break;
+	case IdMouseEventBtnUp:
+		if (DecLocatorFlag & DecLocatorButtonUp) {
+			len = MakeLocatorReportStr(buff, sizeof(buff), Button*2+3, x, y);
+		}
+		break;
 
-  case IdMouseEventMove:
-    if (DecLocatorFlag & DecLocatorFiltered) {
-      if (y < FilterTop || y > FilterBottom || x < FilterLeft || x > FilterRight) {
-	len = MakeLocatorReportStr(buff, sizeof(buff), 10, x, y);
-	DecLocatorFlag &= ~DecLocatorFiltered;
-      }
-    }
-    break;
-  }
+	case IdMouseEventMove:
+		if (DecLocatorFlag & DecLocatorFiltered) {
+			if (y < FilterTop || y > FilterBottom || x < FilterLeft || x > FilterRight) {
+				len = MakeLocatorReportStr(buff, sizeof(buff), 10, x, y);
+				DecLocatorFlag &= ~DecLocatorFiltered;
+			}
+		}
+		break;
+	}
 
-  if (len == 0) {
-    return FALSE;
-  }
+	if (len == 0) {
+		return FALSE;
+	}
 
-  SendCSIstr(buff, len);
+	SendCSIstr(buff, len);
 
-  if (DecLocatorFlag & DecLocatorOneShot) {
-    MouseReportMode = IdMouseTrackNone;
-  }
-  return TRUE;
+	if (DecLocatorFlag & DecLocatorOneShot) {
+		MouseReportMode = IdMouseTrackNone;
+	}
+	return TRUE;
 }
 
 #define MOUSE_POS_LIMIT (255 - 32)
 #define MOUSE_POS_EXT_LIMIT (2047 - 32)
 
 int MakeMouseReportStr(char *buff, size_t buffsize, int mb, int x, int y) {
-  char tmpx[3], tmpy[3];
+	char tmpx[3], tmpy[3];
 
-  switch (MouseReportExtMode) {
-  case IdMouseTrackExtNone:
-    if (x >= MOUSE_POS_LIMIT) x = MOUSE_POS_LIMIT;
-    if (y >= MOUSE_POS_LIMIT) y = MOUSE_POS_LIMIT;
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
-    break;
+	switch (MouseReportExtMode) {
+	case IdMouseTrackExtNone:
+		if (x >= MOUSE_POS_LIMIT) x = MOUSE_POS_LIMIT;
+		if (y >= MOUSE_POS_LIMIT) y = MOUSE_POS_LIMIT;
+		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%c%c", CLocale, mb+32, x+32, y+32);
+		break;
 
-  case IdMouseTrackExtUTF8:
-    if (x >= MOUSE_POS_EXT_LIMIT) x = MOUSE_POS_EXT_LIMIT;
-    if (y >= MOUSE_POS_EXT_LIMIT) y = MOUSE_POS_EXT_LIMIT;
-    x += 32;
-    y += 32;
-    if (x < 128) {
-      tmpx[0] = x;
-      tmpx[1] = 0;
-    }
-    else {
-      tmpx[0] = (x >> 6) & 0x1f | 0xc0;
-      tmpx[1] = x & 0x3f | 0x80;
-      tmpx[2] = 0;
-    }
-    if (y < 128) {
-      tmpy[0] = y;
-      tmpy[1] = 0;
-    }
-    else {
-      tmpy[0] = (x >> 6) & 0x1f | 0xc0;
-      tmpy[1] = y & 0x3f | 0x80;
-      tmpy[2] = 0;
-    }
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%s%s", CLocale, mb+32, tmpx, tmpy);
-    break;
+	case IdMouseTrackExtUTF8:
+		if (x >= MOUSE_POS_EXT_LIMIT) x = MOUSE_POS_EXT_LIMIT;
+		if (y >= MOUSE_POS_EXT_LIMIT) y = MOUSE_POS_EXT_LIMIT;
+		x += 32;
+		y += 32;
+		if (x < 128) {
+			tmpx[0] = x;
+			tmpx[1] = 0;
+		}
+		else {
+			tmpx[0] = (x >> 6) & 0x1f | 0xc0;
+			tmpx[1] = x & 0x3f | 0x80;
+			tmpx[2] = 0;
+		}
+		if (y < 128) {
+			tmpy[0] = y;
+			tmpy[1] = 0;
+		}
+		else {
+			tmpy[0] = (x >> 6) & 0x1f | 0xc0;
+			tmpy[1] = y & 0x3f | 0x80;
+			tmpy[2] = 0;
+		}
+		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "M%c%s%s", CLocale, mb+32, tmpx, tmpy);
+		break;
 
-  case IdMouseTrackExtSGR:
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "<%d;%d;%d%c", CLocale, mb&0x7f, x, y, (mb&0x80)?'m':'M');
-    break;
+	case IdMouseTrackExtSGR:
+		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "<%d;%d;%d%c", CLocale, mb&0x7f, x, y, (mb&0x80)?'m':'M');
+		break;
 
-  case IdMouseTrackExtURXVT:
-    return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d;%dM", CLocale, mb+32, x, y);
-    break;
-  }
-  buff[0] = 0;
-  return 0;
+	case IdMouseTrackExtURXVT:
+		return _snprintf_s_l(buff, buffsize, _TRUNCATE, "%d;%d;%dM", CLocale, mb+32, x, y);
+		break;
+	}
+	buff[0] = 0;
+	return 0;
 }
 
 BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
-  char Report[32];
-  int x, y, len, modifier;
-  static int LastSendX = -1, LastSendY = -1, LastButton = IdButtonRelease;
+	char Report[32];
+	int x, y, len, modifier;
+	static int LastSendX = -1, LastSendY = -1, LastButton = IdButtonRelease;
 
-  len = 0;
+	len = 0;
 
-  switch (Event) {
-  case IdMouseEventBtnDown:
-    ButtonStat |= (8>>(Button+1));
-    break;
-  case IdMouseEventBtnUp:
-    ButtonStat &= ~(8>>(Button+1));
-    break;
-  }
-  LastX = Xpos;
-  LastY = Ypos;
+	switch (Event) {
+	case IdMouseEventBtnDown:
+		ButtonStat |= (8>>(Button+1));
+		break;
+	case IdMouseEventBtnUp:
+		ButtonStat &= ~(8>>(Button+1));
+		break;
+	}
+	LastX = Xpos;
+	LastY = Ypos;
 
-  if (MouseReportMode == IdMouseTrackNone)
-    return FALSE;
+	if (MouseReportMode == IdMouseTrackNone)
+		return FALSE;
 
-  if (ts.DisableMouseTrackingByCtrl && ControlKey())
-    return FALSE;
+	if (ts.DisableMouseTrackingByCtrl && ControlKey())
+		return FALSE;
 
-  if (MouseReportMode == IdMouseTrackDECELR)
-    return DecLocatorReport(Event, Button);
+	if (MouseReportMode == IdMouseTrackDECELR)
+		return DecLocatorReport(Event, Button);
 
-  DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
-  x++; y++;
+	DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
+	x++; y++;
 
-  if (x < 1) x = 1;
-  if (y < 1) y = 1;
+	if (x < 1) x = 1;
+	if (y < 1) y = 1;
 
-  if (ShiftKey())
-    modifier = 4;
-  else
-    modifier = 0;
+	if (ShiftKey())
+		modifier = 4;
+	else
+		modifier = 0;
 
-  if (ControlKey())
-    modifier |= 8;
+	if (ControlKey())
+		modifier |= 8;
 
-  if (AltKey())
-    modifier |= 16;
+	if (AltKey())
+		modifier |= 16;
 
-  modifier = (ShiftKey()?4:0) | (AltKey()?8:0) | (ControlKey()?16:0);
+	modifier = (ShiftKey()?4:0) | (AltKey()?8:0) | (ControlKey()?16:0);
 
-  switch (Event) {
-    case IdMouseEventBtnDown:
-      switch (MouseReportMode) {
-	case IdMouseTrackX10:
-	  len = MakeMouseReportStr(Report, sizeof Report, Button, x, y);
-	  break;
+	switch (Event) {
+	case IdMouseEventBtnDown:
+		switch (MouseReportMode) {
+		case IdMouseTrackX10:
+			len = MakeMouseReportStr(Report, sizeof Report, Button, x, y);
+			break;
 
-	case IdMouseTrackVT200:
-	case IdMouseTrackBtnEvent:
-	case IdMouseTrackAllEvent:
-	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
-	  LastSendX = x;
-	  LastSendY = y;
-	  LastButton = Button;
-	  break;
+		case IdMouseTrackVT200:
+		case IdMouseTrackBtnEvent:
+		case IdMouseTrackAllEvent:
+			len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
+			LastSendX = x;
+			LastSendY = y;
+			LastButton = Button;
+			break;
 
-	case IdMouseTrackNetTerm:
-	  len = _snprintf_s_l(Report, sizeof Report, _TRUNCATE, "\033}%d,%d\r", CLocale, y, x);
-	  CommBinaryOut(&cv, Report, len);
-	  return TRUE;
+		case IdMouseTrackNetTerm:
+			len = _snprintf_s_l(Report, sizeof Report, _TRUNCATE, "\033}%d,%d\r", CLocale, y, x);
+			CommBinaryOut(&cv, Report, len);
+			return TRUE;
 
-	case IdMouseTrackVT200Hl: /* not supported yet */
-	default:
-	  return FALSE;
-      }
-      break;
+		case IdMouseTrackVT200Hl: /* not supported yet */
+		default:
+			return FALSE;
+		}
+		break;
 
-    case IdMouseEventBtnUp:
-      switch (MouseReportMode) {
-	case IdMouseTrackVT200:
-	case IdMouseTrackBtnEvent:
-	case IdMouseTrackAllEvent:
-	  if (MouseReportExtMode == IdMouseTrackExtSGR) {
-	    modifier |= 128;
-	  }
-	  else {
-	    Button = IdButtonRelease;
-	  }
-	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
-	  LastSendX = x;
-	  LastSendY = y;
-	  LastButton = IdButtonRelease;
-	  break;
+	case IdMouseEventBtnUp:
+		switch (MouseReportMode) {
+		case IdMouseTrackVT200:
+		case IdMouseTrackBtnEvent:
+		case IdMouseTrackAllEvent:
+			if (MouseReportExtMode == IdMouseTrackExtSGR) {
+				modifier |= 128;
+			}
+			else {
+				Button = IdButtonRelease;
+			}
+			len = MakeMouseReportStr(Report, sizeof Report, Button | modifier, x, y);
+			LastSendX = x;
+			LastSendY = y;
+			LastButton = IdButtonRelease;
+			break;
 
-	case IdMouseTrackX10: /* nothing to do */
-	case IdMouseTrackNetTerm: /* nothing to do */
-	  return TRUE;
+		case IdMouseTrackX10:     /* nothing to do */
+		case IdMouseTrackNetTerm: /* nothing to do */
+			return TRUE;
 
-	case IdMouseTrackVT200Hl: /* not supported yet */
-	default:
-	  return FALSE;
-      }
-      break;
+		case IdMouseTrackVT200Hl: /* not supported yet */
+		default:
+			return FALSE;
+		}
+		break;
 
-    case IdMouseEventMove:
-      switch (MouseReportMode) {
-	case IdMouseTrackBtnEvent:
-	  if (LastButton == 3) {
-	    return FALSE;
-	  }
-	  /* FALLTHROUGH */
-	case IdMouseTrackAllEvent:
-	  if (x == LastSendX && y == LastSendY) {
-	    return FALSE;
-	  }
-	  len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | 32, x, y);
-	  LastSendX = x;
-	  LastSendY = y;
-	  break;
+	case IdMouseEventMove:
+		switch (MouseReportMode) {
+		case IdMouseTrackBtnEvent:
+			if (LastButton == 3) {
+				return FALSE;
+			}
+			/* FALLTHROUGH */
+		case IdMouseTrackAllEvent:
+			if (x == LastSendX && y == LastSendY) {
+				return FALSE;
+			}
+			len = MakeMouseReportStr(Report, sizeof Report, LastButton | modifier | 32, x, y);
+			LastSendX = x;
+			LastSendY = y;
+		break;
 
-	case IdMouseTrackVT200Hl: /* not supported yet */
-	case IdMouseTrackX10: /* nothing to do */
-	case IdMouseTrackVT200: /* nothing to do */
-	case IdMouseTrackNetTerm: /* nothing to do */
-	default:
-	  return FALSE;
-      }
-      break;
+		case IdMouseTrackVT200Hl: /* not supported yet */
+		case IdMouseTrackX10:     /* nothing to do */
+		case IdMouseTrackVT200:   /* nothing to do */
+		case IdMouseTrackNetTerm: /* nothing to do */
+		default:
+			return FALSE;
+		}
+		break;
 
-    case IdMouseEventWheel:
-      switch (MouseReportMode) {
-	case IdMouseTrackVT200:
-	case IdMouseTrackBtnEvent:
-	case IdMouseTrackAllEvent:
-	  len = MakeMouseReportStr(Report, sizeof Report, Button | modifier | 64, x, y);
-	  break;
+	case IdMouseEventWheel:
+		switch (MouseReportMode) {
+		case IdMouseTrackVT200:
+		case IdMouseTrackBtnEvent:
+		case IdMouseTrackAllEvent:
+			len = MakeMouseReportStr(Report, sizeof Report, Button | modifier | 64, x, y);
+			break;
 
-	case IdMouseTrackX10: /* nothing to do */
-	case IdMouseTrackVT200Hl: /* not supported yet */
-	case IdMouseTrackNetTerm: /* nothing to do */
-	  return FALSE;
-      }
-      break;
-  }
+		case IdMouseTrackX10:     /* nothing to do */
+		case IdMouseTrackVT200Hl: /* not supported yet */
+		case IdMouseTrackNetTerm: /* nothing to do */
+			return FALSE;
+		}
+		break;
+	}
 
-  if (len == 0)
-    return FALSE;
+	if (len == 0)
+		return FALSE;
 
-  SendCSIstr(Report, len);
-  return TRUE;
+	SendCSIstr(Report, len);
+	return TRUE;
 }
 
 void FocusReport(BOOL focus) {
-  if (!FocusReportMode)
-    return;
+	if (!FocusReportMode)
+		return;
 
-  if (focus) {
-    // Focus In
-    SendCSIstr("I", 0);
-  } else {
-    // Focus Out
-    SendCSIstr("O", 0);
-  }
+	if (focus) {
+		// Focus In
+		SendCSIstr("I", 0);
+	} else {
+		// Focus Out
+		SendCSIstr("O", 0);
+	}
 }
 
 void VisualBell() {
@@ -5975,30 +5987,30 @@ BOOL WheelToCursorMode() {
 }
 
 void ChangeTerminalID() {
-  switch (ts.TerminalID) {
-  case IdVT220J:
-  case IdVT282:
-    VTlevel = 2;
-    break;
-  case IdVT320:
-  case IdVT382:
-    VTlevel = 3;
-    break;
-  case IdVT420:
-    VTlevel = 4;
-    break;
-  case IdVT520:
-  case IdVT525:
-    VTlevel = 5;
-    break;
-  default:
-    VTlevel = 1;
-  }
+	switch (ts.TerminalID) {
+	case IdVT220J:
+	case IdVT282:
+		VTlevel = 2;
+		break;
+	case IdVT320:
+	case IdVT382:
+		VTlevel = 3;
+		break;
+	case IdVT420:
+		VTlevel = 4;
+		break;
+	case IdVT520:
+	case IdVT525:
+		VTlevel = 5;
+		break;
+	default:
+		VTlevel = 1;
+	}
 
-  if (VTlevel == 1) {
-    Send8BitMode = FALSE;
-  }
-  else {
-    Send8BitMode = ts.Send8BitCtrl;
-  }
+	if (VTlevel == 1) {
+		Send8BitMode = FALSE;
+	}
+	else {
+		Send8BitMode = ts.Send8BitCtrl;
+	}
 }
