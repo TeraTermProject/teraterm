@@ -1471,11 +1471,9 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	GetPrivateProfileString(Section, "ZModemRcvCommand", "rz",
 	                        ts->ZModemRcvCommand, sizeof(ts->ZModemRcvCommand), FName);
 
-#ifndef NO_COPYLINE_FIX
 	/* Enable continued-line copy  -- special option */
 	ts->EnableContinuedLineCopy =
 		GetOnOff(Section, "EnableContinuedLineCopy", FName, FALSE);
-#endif							/* NO_COPYLINE_FIX */
 
 	if (GetOnOff(Section, "DisablePasteMouseRButton", FName, FALSE))
 		ts->PasteFlag |= CPF_DISABLE_RBUTTON;

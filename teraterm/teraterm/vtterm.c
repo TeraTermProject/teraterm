@@ -503,10 +503,8 @@ void BackSpace()
 
 void CarriageReturn(BOOL logFlag)
 {
-#ifndef NO_COPYLINE_FIX
 	if (!ts.EnableContinuedLineCopy || logFlag)
-#endif /* NO_COPYLINE_FIX */
-	if (cv.HLogBuf!=0) Log1Byte(CR);
+		if (cv.HLogBuf!=0) Log1Byte(CR);
 
 	if (RelativeOrgMode || CursorX > CursorLeftM)
 		MoveCursor(CursorLeftM, CursorY);
@@ -523,10 +521,8 @@ void LineFeed(BYTE b, BOOL logFlag)
 		(b>=LF) && (b<=FF))
 		BuffDumpCurrentLine(b);
 
-#ifndef NO_COPYLINE_FIX
 	if (!ts.EnableContinuedLineCopy || logFlag)
-#endif /* NO_COPYLINE_FIX */
-	if (cv.HLogBuf!=0) Log1Byte(LF);
+		if (cv.HLogBuf!=0) Log1Byte(LF);
 
 	if (CursorY < CursorBottom)
 		MoveCursor(CursorX,CursorY+1);
@@ -534,9 +530,7 @@ void LineFeed(BYTE b, BOOL logFlag)
 	else if (CursorY < NumOfLines-StatusLine-1)
 		MoveCursor(CursorX,CursorY+1);
 
-#ifndef NO_COPYLINE_FIX
 	ClearLineContinued();
-#endif /* NO_COPYLINE_FIX */
 
 	if (LFMode) CarriageReturn(logFlag);
 
@@ -548,11 +542,9 @@ void Tab()
 	if (Wrap && !ts.VTCompatTab) {
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
-#ifndef NO_COPYLINE_FIX
 		if (ts.EnableContinuedLineCopy) {
 			SetLineContinued();
 		}
-#endif /* NO_COPYLINE_FIX */
 		Wrap = FALSE;
 	}
 	CursorForwardTab(1, AutoWrapMode);
@@ -574,9 +566,7 @@ void PutChar(BYTE b)
 	if (Wrap) {
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
-#ifndef NO_COPYLINE_FIX
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
-#endif /* NO_COPYLINE_FIX */
 	}
 
 //	if (cv.HLogBuf!=0) Log1Byte(b);
@@ -644,9 +634,7 @@ void PutDecSp(BYTE b)
 	if (Wrap) {
 		CarriageReturn(FALSE);
 		LineFeed(LF, FALSE);
-#ifndef NO_COPYLINE_FIX
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
-#endif /* NO_COPYLINE_FIX */
 	}
 
 	if (cv.HLogBuf!=0) Log1Byte(b);
@@ -680,11 +668,9 @@ void PutDecSp(BYTE b)
 void PutKanji(BYTE b)
 {
 	int LineEnd;
-#ifndef NO_COPYLINE_FIX
 	TCharAttr CharAttrTmp;
-
 	CharAttrTmp = CharAttr;
-#endif /* NO_COPYLINE_FIX */
+
 	Kanji = Kanji + b;
 
 	if (PrinterMode && DirectPrn) {
@@ -710,20 +696,16 @@ void PutKanji(BYTE b)
 	if (Wrap) {
 		CarriageReturn(FALSE);
 		LineFeed(LF,FALSE);
-#ifndef NO_COPYLINE_FIX
 		if (ts.EnableContinuedLineCopy)
 			CharAttrTmp.Attr |= AttrLineContinued;
-#endif /* NO_COPYLINE_FIX */
 	}
 	else if (CursorX > LineEnd - 1) {
 		if (AutoWrapMode) {
-#ifndef NO_COPYLINE_FIX
 			if (ts.EnableContinuedLineCopy) {
 				CharAttrTmp.Attr |= AttrLineContinued;
 				if (CursorX == LineEnd)
 					BuffPutChar(0x20, CharAttr, FALSE);
 			}
-#endif /* NO_COPYLINE_FIX */
 			CarriageReturn(FALSE);
 			LineFeed(LF,FALSE);
 		}
@@ -744,11 +726,7 @@ void PutKanji(BYTE b)
 		Special = FALSE;
 	}
 
-#ifndef NO_COPYLINE_FIX
 	BuffPutKanji(Kanji, CharAttrTmp, InsertMode);
-#else
-	BuffPutKanji(Kanji, CharAttr, InsertMode);
-#endif /* NO_COPYLINE_FIX */
 
 	if (CursorX < LineEnd - 1) {
 		MoveRight();

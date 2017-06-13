@@ -757,13 +757,11 @@ void BuffEraseCharsInLine(int XStart, int Count)
 //  XStart: start position of erasing
 //  Count: number of characters to be erased
 {
-#ifndef NO_COPYLINE_FIX
 	BOOL LineContinued=FALSE;
 
 	if (ts.EnableContinuedLineCopy && XStart == 0 && (AttrLine[0] & AttrLineContinued)) {
 		LineContinued = TRUE;
 	}
-#endif /* NO_COPYLINE_FIX */
 
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
@@ -776,7 +774,6 @@ void BuffEraseCharsInLine(int XStart, int Count)
 	memset(&(AttrLineFG[XStart]),CurCharAttr.Fore,Count);
 	memset(&(AttrLineBG[XStart]),CurCharAttr.Back,Count);
 
-#ifndef NO_COPYLINE_FIX
 	if (ts.EnableContinuedLineCopy) {
 		if (LineContinued) {
 			BuffLineContinued(TRUE);
@@ -786,7 +783,6 @@ void BuffEraseCharsInLine(int XStart, int Count)
 			AttrBuff[NextLinePtr(LinePtr)] &= ~AttrLineContinued;
 		}
 	}
-#endif /* NO_COPYLINE_FIX */
 
 	DispEraseCharsInLine(XStart, Count);
 }
@@ -1288,10 +1284,9 @@ void BuffCBCopy(BOOL Table)
 	int i, j, k, IStart, IEnd;
 	BOOL Sp, FirstChar;
 	BYTE b;
-#ifndef NO_COPYLINE_FIX
 	BOOL LineContinued, PrevLineContinued;
+
 	LineContinued = FALSE;
-#endif /* NO_COPYLINE_FIX */
 
 	if (TalkStatus==IdTalkCB) {
 		return;
@@ -1348,7 +1343,6 @@ void BuffCBCopy(BOOL Table)
 
 		// exclude right-side space characters
 		IEnd = LeftHalfOfDBCS(TmpPtr,IEnd);
-#ifndef NO_COPYLINE_FIX
 		PrevLineContinued = LineContinued;
 		LineContinued = FALSE;
 		if (ts.EnableContinuedLineCopy && j!=SelectEnd.y && !BoxSelect) {
@@ -1362,7 +1356,6 @@ void BuffCBCopy(BOOL Table)
 			}
 		}
 		if (!LineContinued)
-#endif /* NO_COPYLINE_FIX */
 			while ((IEnd>0) && (CodeBuff[TmpPtr+IEnd]==0x20)) {
 				MoveCharPtr(TmpPtr,&IEnd,-1);
 			}
@@ -1384,11 +1377,7 @@ void BuffCBCopy(BOOL Table)
 					Sp = TRUE;
 					b = 0x09;
 				}
-#ifndef NO_COPYLINE_FIX
 				if ((b!=0x09) || (! FirstChar) || PrevLineContinued) {
-#else
-				if ((b!=0x09) || (! FirstChar)) {
-#endif
 					FirstChar = FALSE;
 					CBPtr[k] = b;
 					k++;
@@ -1404,9 +1393,7 @@ void BuffCBCopy(BOOL Table)
 			}
 		}
 
-#ifndef NO_COPYLINE_FIX
 		if (!LineContinued)
-#endif /* NO_COPYLINE_FIX */
 			if (j < SelectEnd.y) {
 				CBPtr[k] = 0x0d;
 				k++;
@@ -1417,7 +1404,6 @@ void BuffCBCopy(BOOL Table)
 		TmpPtr = NextLinePtr(TmpPtr);
 	}
 	CBPtr[k] = 0;
-#ifndef NO_COPYLINE_FIX
 	LineContinued = FALSE;
 	if (ts.EnableContinuedLineCopy && j!=SelectEnd.y && !BoxSelect && j<BuffEnd-1) {
 		LONG NextTmpPtr = NextLinePtr(TmpPtr);
@@ -1430,7 +1416,6 @@ void BuffCBCopy(BOOL Table)
 		}
 	}
 	if (!LineContinued)
-#endif /* NO_COPYLINE_FIX */
 		UnlockBuffer();
 
 // --- send CB memory to clipboard
@@ -1672,11 +1657,9 @@ void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 	int XStart, LineEnd, MoveLen;
 	int extr = 0;
 
-#ifndef NO_COPYLINE_FIX
 	if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] & AttrLineContinued)) {
 		Attr.Attr |= AttrLineContinued;
 	}
-#endif /* NO_COPYLINE_FIX */
 
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
@@ -1761,11 +1744,9 @@ void BuffPutKanji(WORD w, TCharAttr Attr, BOOL Insert)
 	int XStart, LineEnd, MoveLen;
 	int extr = 0;
 
-#ifndef NO_COPYLINE_FIX
 	if (ts.EnableContinuedLineCopy && CursorX == 0 && (AttrLine[0] & AttrLineContinued)) {
 		Attr.Attr |= AttrLineContinued;
 	}
-#endif /* NO_COPYLINE_FIX */
 
 	EraseKanji(1); /* if cursor is on right half of a kanji, erase the kanji */
 
@@ -3529,7 +3510,6 @@ void ShowStatusLine(int Show)
 	MoveCursor(CursorX,CursorY);
 }
 
-#ifndef NO_COPYLINE_FIX
 void BuffLineContinued(BOOL mode)
 {
 	if (ts.EnableContinuedLineCopy) {
@@ -3540,7 +3520,6 @@ void BuffLineContinued(BOOL mode)
 		}
 	}
 }
-#endif /* NO_COPYLINE_FIX */
 
 void BuffSetCurCharAttr(TCharAttr Attr) {
 	CurCharAttr = Attr;
@@ -3765,13 +3744,11 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 //  Count: number of characters to be erased
 {
 	int i;
-#ifndef NO_COPYLINE_FIX
 	BOOL LineContinued=FALSE;
 
 	if (ts.EnableContinuedLineCopy && XStart == 0 && (AttrLine[0] & AttrLineContinued)) {
 		LineContinued = TRUE;
 	}
-#endif /* NO_COPYLINE_FIX */
 
 	if (ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) {
 		if (!(AttrLine2[CursorX] & Attr2Protect)) {
@@ -3787,7 +3764,6 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 		}
 	}
 
-#ifndef NO_COPYLINE_FIX
 	if (ts.EnableContinuedLineCopy) {
 		if (LineContinued) {
 			BuffLineContinued(TRUE);
@@ -3797,7 +3773,6 @@ void BuffSelectedEraseCharsInLine(int XStart, int Count)
 			AttrBuff[NextLinePtr(LinePtr)] &= ~AttrLineContinued;
 		}
 	}
-#endif /* NO_COPYLINE_FIX */
 
 	BuffUpdateRect(XStart, CursorY, XStart+Count, CursorY);
 }

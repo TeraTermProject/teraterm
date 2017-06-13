@@ -44,9 +44,7 @@
 #define AttrFontMask      0x07
 #define AttrBlink         0x08
 #define AttrReverse       0x10
-#ifndef NO_COPYLINE_FIX
 #define AttrLineContinued 0x20 /* valid only at the beggining or end of a line */
-#endif /* NO_COPYLINE_FIX */
 /* begin - ishizaki */
 #define AttrURL           0x40
 /* end - ishizaki */
@@ -482,9 +480,7 @@ struct tttset {
 	WORD DelayPerLine;
 	WORD MaxComPort;
 	WORD ComAutoConnect;
-#ifndef NO_COPYLINE_FIX
 	WORD EnableContinuedLineCopy;
-#endif /* NO_COPYLINE_FIX */
 	COLORREF ANSIColor[16];
 	/* protocol used in connect() */
 	int ProtocolFamily;

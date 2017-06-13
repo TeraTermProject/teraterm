@@ -63,11 +63,9 @@ void CursorForwardTab(int count, BOOL AutoWrapMode);
 void CursorBackwardTab(int count);
 void ClearTabStop(int Ps);
 void ShowStatusLine(int Show);
-#ifndef NO_COPYLINE_FIX
 void BuffLineContinued(BOOL mode);
 #define SetLineContinued() BuffLineContinued(TRUE)
 #define ClearLineContinued() BuffLineContinued(FALSE)
-#endif /* NO_COPYLINE_FIX */
 void BuffRegionScrollUpNLines(int n);
 void BuffRegionScrollDownNLines(int n);
 void BuffSetCurCharAttr(TCharAttr Attr);
