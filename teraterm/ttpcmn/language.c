@@ -37,7 +37,7 @@ unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
 	return (result);
 }
 
-unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
+unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 {
 	wchar_t wchar;
 	int ret;
@@ -97,7 +97,7 @@ unsigned int FAR PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 
 
 // Japanese SJIS -> JIS
-WORD FAR PASCAL SJIS2JIS(WORD KCode)
+WORD PASCAL SJIS2JIS(WORD KCode)
 {
 	WORD x0,x1,x2,y0;
 	BYTE b = LOBYTE(KCode);
@@ -124,13 +124,13 @@ WORD FAR PASCAL SJIS2JIS(WORD KCode)
 }
 
 // Japanese SJIS -> EUC
-WORD FAR PASCAL SJIS2EUC(WORD KCode)
+WORD PASCAL SJIS2EUC(WORD KCode)
 {
 	return (SJIS2JIS(KCode) | 0x8080);
 }
 
 // Japanese JIS -> SJIS
-WORD FAR PASCAL JIS2SJIS(WORD KCode)
+WORD PASCAL JIS2SJIS(WORD KCode)
 {
 	WORD n1, n2, SJIS;
 
@@ -564,7 +564,7 @@ static BYTE cpconv[4][4][128] =
 };
 
 // Russian character set conversion
-BYTE FAR PASCAL RussConv(int cin, int cout, BYTE b)
+BYTE PASCAL RussConv(int cin, int cout, BYTE b)
 // cin: input character set (IdWindows/IdKOI8/Id866/IdISO)
 // cin: output character set (IdWindows/IdKOI8/Id866/IdISO)
 {
@@ -575,7 +575,7 @@ BYTE FAR PASCAL RussConv(int cin, int cout, BYTE b)
 }
 
 // Russian character set conversion for a character string
-void FAR PASCAL RussConvStr(int cin, int cout, PCHAR Str, int count)
+void PASCAL RussConvStr(int cin, int cout, PCHAR Str, int count)
 // cin: input character set (IdWindows/IdKOI8/Id866/IdISO)
 // cin: output character set (IdWindows/IdKOI8/Id866/IdISO)
 {

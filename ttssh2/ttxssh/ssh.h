@@ -587,27 +587,27 @@ typedef struct _SSHPacketHandlerItem SSHPacketHandlerItem;
 struct _SSHPacketHandlerItem {
 	SSHPacketHandler handler;
 	/* Circular list of handlers for given message */
-	SSHPacketHandlerItem FAR * next_for_message;
-	SSHPacketHandlerItem FAR * last_for_message;
+	SSHPacketHandlerItem *next_for_message;
+	SSHPacketHandlerItem *last_for_message;
 	/* Circular list of handlers in set */
-	SSHPacketHandlerItem FAR * next_in_set;
+	SSHPacketHandlerItem *next_in_set;
 	int active_for_message;
 };
 
 typedef struct {
-	char FAR * hostname;
+	char *hostname;
 
 	int server_protocol_flags;
-	char FAR * server_ID;
+	char *server_ID;
 
 	/* This buffer is used to hold the outgoing data, and encrypted in-place
 	   here if necessary. */
-	unsigned char FAR * outbuf;
+	unsigned char *outbuf;
 	long outbuflen;
 	/* This buffer is used by the SSH protocol processing to store uncompressed
 	   packet data for compression. User data is never streamed through here;
 	   it is compressed directly from the user's buffer. */
-	unsigned char FAR * precompress_outbuf;
+	unsigned char *precompress_outbuf;
 	long precompress_outbuflen;
 	/* this is the length of the packet data, including the type header */
 	long outgoing_packet_len;
@@ -615,10 +615,10 @@ typedef struct {
 	/* This buffer is used by the SSH protocol processing to store decompressed
 	   packet data. User data is never streamed through here; it is decompressed
 	   directly to the user's buffer. */
-	unsigned char FAR * postdecompress_inbuf;
+	unsigned char *postdecompress_inbuf;
 	long postdecompress_inbuflen;
 
-	unsigned char FAR * payload;
+	unsigned char *payload;
 	long payload_grabbed;
 	long payloadlen;
 	long payload_datastart;
@@ -633,7 +633,7 @@ typedef struct {
 	BOOL decompressing;
 	int compression_level;
 
-	SSHPacketHandlerItem FAR * packet_handlers[256];
+	SSHPacketHandlerItem *packet_handlers[256];
 	int status_flags;
 
 	int win_cols;
@@ -651,47 +651,47 @@ typedef struct {
 
 void SSH_init(PTInstVar pvar);
 void SSH_open(PTInstVar pvar);
-void SSH_notify_disconnecting(PTInstVar pvar, char FAR * reason);
+void SSH_notify_disconnecting(PTInstVar pvar, char *reason);
 /* SSH_handle_server_ID returns TRUE iff a valid ID string has been
    received. If it returns FALSE, we need to keep looking for another
    ID string. */
-BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len);
+BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len);
 /* SSH_handle_packet requires NO PAYLOAD on entry.
    'len' is the size of the packet: payload + padding (+ CRC for SSHv1)
    'padding' is the size of the padding.
    'data' points to the start of the packet data (the length field)
 */
-void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len, int padding);
+void SSH_handle_packet(PTInstVar pvar, char *data, int len, int padding);
 void SSH_notify_win_size(PTInstVar pvar, int cols, int rows);
 void SSH_notify_user_name(PTInstVar pvar);
 void SSH_notify_cred(PTInstVar pvar);
 void SSH_notify_host_OK(PTInstVar pvar);
-void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen);
+void SSH_send(PTInstVar pvar, unsigned char const *buf, unsigned int buflen);
 /* SSH_extract_payload returns number of bytes extracted */
-int SSH_extract_payload(PTInstVar pvar, unsigned char FAR * dest, int len);
+int SSH_extract_payload(PTInstVar pvar, unsigned char *dest, int len);
 void SSH_end(PTInstVar pvar);
 
-void SSH_get_server_ID_info(PTInstVar pvar, char FAR * dest, int len);
-void SSH_get_protocol_version_info(PTInstVar pvar, char FAR * dest, int len);
-void SSH_get_compression_info(PTInstVar pvar, char FAR * dest, int len);
-void SSH_get_mac_info(PTInstVar pvar, char FAR * dest, int len);
+void SSH_get_server_ID_info(PTInstVar pvar, char *dest, int len);
+void SSH_get_protocol_version_info(PTInstVar pvar, char *dest, int len);
+void SSH_get_compression_info(PTInstVar pvar, char *dest, int len);
+void SSH_get_mac_info(PTInstVar pvar, char *dest, int len);
 
 /* len must be <= SSH_MAX_SEND_PACKET_SIZE */
 void SSH_channel_send(PTInstVar pvar, int channel_num,
                       uint32 remote_channel_num,
-                      unsigned char FAR * buf, int len, int retry);
+                      unsigned char *buf, int len, int retry);
 void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num);
 void SSH_confirm_channel_open(PTInstVar pvar, uint32 remote_channel_num, uint32 local_channel_num);
 void SSH_channel_output_eof(PTInstVar pvar, uint32 remote_channel_num);
 void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 local_channel_num);
-void SSH_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port,
-                            char FAR * to_local_host, int to_local_port);
-void SSH_cancel_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port, int reply);
+void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_port,
+                            char *to_local_host, int to_local_port);
+void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_port, int reply);
 void SSH_request_X11_forwarding(PTInstVar pvar,
-  char FAR * auth_protocol, unsigned char FAR * auth_data, int auth_data_len, int screen_num);
+  char *auth_protocol, unsigned char *auth_data, int auth_data_len, int screen_num);
 void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
-                      char FAR * to_remote_host, int to_remote_port,
-                      char FAR * originator, unsigned short originator_port);
+                      char *to_remote_host, int to_remote_port,
+                      char *originator, unsigned short originator_port);
 
 int SSH_start_scp(PTInstVar pvar, char *sendfile, char *dstfile);
 int SSH_start_scp_receive(PTInstVar pvar, char *filename);
@@ -702,7 +702,7 @@ int SSH_sftp_transaction(PTInstVar pvar);
 int SSH_get_min_packet_size(PTInstVar pvar);
 /* data is guaranteed to be at least SSH_get_min_packet_size bytes long
    at least 5 bytes must be decrypted */
-void SSH_predecrpyt_packet(PTInstVar pvar, char FAR * data);
+void SSH_predecrpyt_packet(PTInstVar pvar, char *data);
 int SSH_get_clear_MAC_size(PTInstVar pvar);
 
 #define SSH_is_any_payload(pvar) ((pvar)->ssh_state.payload_datalen > 0)
@@ -822,9 +822,9 @@ typedef struct channel {
 	unsigned int state;
 } Channel_t;
 
-unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len);
+unsigned char *begin_send_packet(PTInstVar pvar, int type, int len);
 void finish_send_packet_special(PTInstVar pvar, int skip_compress);
-void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen, int retry);
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry);
 
 #define finish_send_packet(pvar) finish_send_packet_special((pvar), 0)
 #define get_payload_uint32(pvar, offset) get_uint32_MSBfirst((pvar)->ssh_state.payload + (offset))

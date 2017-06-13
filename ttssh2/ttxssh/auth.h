@@ -38,15 +38,15 @@ See LICENSE.TXT for the license.
 
 typedef struct {
   SSHAuthMethod method;
-  char FAR * password;
-  char FAR * rhosts_client_user;
-  struct Key FAR * key_pair;
+  char *password;
+  char *rhosts_client_user;
+  struct Key *key_pair;
 } AUTHCred;
 
 typedef enum { GENERIC_AUTH_MODE, TIS_AUTH_MODE } AuthMode;
 
 typedef struct {
-  char FAR * user;
+  char *user;
   AUTHCred cur_cred;
   SSHAuthMethod failed_method;
   int flags;
@@ -54,23 +54,23 @@ typedef struct {
   HWND auth_dialog;
 
   AuthMode mode;
-  char FAR * TIS_prompt;
+  char *TIS_prompt;
 } AUTHState;
 
 void AUTH_init(PTInstVar pvar);
-char FAR * AUTH_get_user_name(PTInstVar pvar);
+char *AUTH_get_user_name(PTInstVar pvar);
 int AUTH_set_supported_auth_types(PTInstVar pvar, int types);
 void AUTH_set_generic_mode(PTInstVar pvar);
-void AUTH_set_TIS_mode(PTInstVar pvar, char FAR * prompt, int len);
+void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len);
 void AUTH_advance_to_next_cred(PTInstVar pvar);
 void AUTH_do_cred_dialog(PTInstVar pvar);
 void AUTH_do_default_cred_dialog(PTInstVar pvar);
 void AUTH_destroy_cur_cred(PTInstVar pvar);
-void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len);
+void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len);
 void AUTH_notify_disconnecting(PTInstVar pvar);
 void AUTH_notify_end_error(PTInstVar pvar);
 void AUTH_end(PTInstVar pvar);
-void destroy_malloced_string(char FAR * FAR * str);
+void destroy_malloced_string(char **str);
 LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
                                    WPARAM wParam, LPARAM lParam);
 

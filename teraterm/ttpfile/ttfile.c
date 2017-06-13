@@ -37,7 +37,7 @@ static HFONT DlgGetfnFont;
 char UILanguageFile[MAX_PATH];
 char FileSendFilter[128];
 
-BOOL FAR PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
+BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 {
 	int i, j;
 	OPENFILENAME ofn;
@@ -319,7 +319,7 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL FAR PASCAL GetTransFname
+BOOL PASCAL GetTransFname
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];
@@ -520,7 +520,7 @@ BOOL CALLBACK TFn2Hook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL FAR PASCAL GetMultiFname
+BOOL PASCAL GetMultiFname
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 {
 	int i, len;
@@ -760,14 +760,14 @@ BOOL CALLBACK GetFnDlg
 	return FALSE;
 }
 
-BOOL FAR PASCAL GetGetFname(HWND HWin, PFileVar fv)
+BOOL PASCAL GetGetFname(HWND HWin, PFileVar fv)
 {
 	return (BOOL)DialogBoxParam(hInst,
 	                            MAKEINTRESOURCE(IDD_GETFNDLG),
 	                            HWin, GetFnDlg, (LONG)fv);
 }
 
-void FAR PASCAL SetFileVar(PFileVar fv)
+void PASCAL SetFileVar(PFileVar fv)
 {
 	int i;
 	char uimsg[MAX_UIMSG];
@@ -980,7 +980,7 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL FAR PASCAL GetXFname
+BOOL PASCAL GetXFname
   (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
 {
 	char uimsg[MAX_UIMSG];
@@ -1079,7 +1079,7 @@ BOOL FAR PASCAL GetXFname
 	return Ok;
 }
 
-void FAR PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
+void PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
 		case PROTO_KMT:
@@ -1103,7 +1103,7 @@ void FAR PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet t
 	}
 }
 
-BOOL FAR PASCAL ProtoParse
+BOOL PASCAL ProtoParse
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	BOOL Ok;
@@ -1153,7 +1153,7 @@ BOOL FAR PASCAL ProtoParse
 	return Ok;
 }
 
-void FAR PASCAL ProtoTimeOutProc
+void PASCAL ProtoTimeOutProc
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
@@ -1178,7 +1178,7 @@ void FAR PASCAL ProtoTimeOutProc
 	}
 }
 
-BOOL FAR PASCAL ProtoCancel
+BOOL PASCAL ProtoCancel
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
@@ -1208,12 +1208,12 @@ BOOL FAR PASCAL ProtoCancel
 	return TRUE;
 }
 
-void FAR PASCAL TTFILESetUILanguageFile(char *file)
+void PASCAL TTFILESetUILanguageFile(char *file)
 {
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 }
 
-void FAR PASCAL TTFILESetFileSendFilter(char *file)
+void PASCAL TTFILESetFileSendFilter(char *file)
 {
 	strncpy_s(FileSendFilter, sizeof(FileSendFilter), file, _TRUNCATE);
 }

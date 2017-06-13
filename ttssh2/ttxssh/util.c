@@ -33,7 +33,7 @@ See LICENSE.TXT for the license.
 
 #include "ttxssh.h"
 
-void UTIL_init_sock_write_buf(UTILSockWriteBuf FAR * buf)
+void UTIL_init_sock_write_buf(UTILSockWriteBuf *buf)
 {
 	buf_create(&buf->bufdata, &buf->buflen);
 	buf->datastart = 0;
@@ -41,7 +41,7 @@ void UTIL_init_sock_write_buf(UTILSockWriteBuf FAR * buf)
 }
 
 static int send_until_block(PTInstVar pvar, SOCKET s,
-                            const char FAR * data, int len)
+                            const char *data, int len)
 {
 	int total_sent = 0;
 
@@ -91,9 +91,9 @@ static int send_until_block(PTInstVar pvar, SOCKET s,
  * return TRUE: 送信成功
  *        FALSE: 送信エラー
  */
-BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
+BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
                               UTILBlockingWriteCallback blocking_write,
-                              SOCKET socket, const char FAR * data,
+                              SOCKET socket, const char *data,
                               int len)
 {
 	int curlen;
@@ -269,7 +269,7 @@ BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 	}
 }
 
-BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
+BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf *buf,
 						  SOCKET socket)
 {
 	int first_amount = min(buf->buflen - buf->datastart, buf->datalen);
@@ -302,13 +302,13 @@ BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
 	return TRUE;
 }
 
-void UTIL_destroy_sock_write_buf(UTILSockWriteBuf FAR * buf)
+void UTIL_destroy_sock_write_buf(UTILSockWriteBuf *buf)
 {
 	SecureZeroMemory(buf->bufdata, buf->buflen);
 	buf_destroy(&buf->bufdata, &buf->buflen);
 }
 
-BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf FAR * buf)
+BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf)
 {
 	return buf->buflen / 2 < buf->datalen;
 }

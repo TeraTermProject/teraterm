@@ -64,7 +64,7 @@ See LICENSE.TXT for the license.
 #include "i18n.h"
 #include "ttlib.h"
 
-typedef struct _TInstVar FAR * PTInstVar;
+typedef struct _TInstVar *PTInstVar;
 
 #include "util.h"
 #include "pkt.h"
@@ -198,11 +198,11 @@ typedef struct _TInstVar {
 
 	/* shared memory for settings across instances. Basically it's
 	   a cache for the INI file.*/
-	TS_SSH FAR * ts_SSH;
+	TS_SSH *ts_SSH;
 
 	int fatal_error;
 	int showing_err;
-	char FAR * err_msg;
+	char *err_msg;
 
 	Tconnect Pconnect;
 	Trecv Precv;
@@ -339,16 +339,16 @@ typedef struct _TInstVar {
 #define SSHv2(pvar) ((pvar)->protocol_major == 2)
 
 void notify_established_secure_connection(PTInstVar pvar);
-void notify_closed_connection(PTInstVar pvar, char FAR * send_msg);
-void notify_nonfatal_error(PTInstVar pvar, char FAR * msg);
-void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect);
-void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level);
+void notify_closed_connection(PTInstVar pvar, char *send_msg);
+void notify_nonfatal_error(PTInstVar pvar, char *msg);
+void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect);
+void notify_verbose_message(PTInstVar pvar, char *msg, int level);
 void logprintf(PTInstVar pvar, int level, char *fmt, ...);
 void logprintf_hexdump(PTInstVar pvar, int level, char *data, int len, char *fmt, ...);
 
 
-void get_teraterm_dir_relative_name(char FAR * buf, int bufsize, char FAR * basename);
-int copy_teraterm_dir_relative_path(char FAR * dest, int destsize, char FAR * basename);
+void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
+int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);
 void get_file_version(char *exefile, int *major, int *minor, int *release, int *build);
 int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);
 

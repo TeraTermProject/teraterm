@@ -31,7 +31,7 @@ typedef struct {
   char password[50];
 } TInstVar;
 
-typedef TInstVar FAR * PTInstVar;
+typedef TInstVar *PTInstVar;
 PTInstVar pvar;
 static TInstVar InstVar;
 
@@ -70,7 +70,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->origWriteIniFile = NULL;
 }
 
-static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags) {
+static int PASCAL FAR TTXsend(SOCKET s, const char *buf, int len, int flags) {
   if (pvar->enable) {
     return len;
   }
@@ -89,23 +89,23 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
   }
 }
 
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPsend = *hooks->Psend;
   *hooks->Psend = TTXsend;
 }
 
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPsend) {
     *hooks->Psend = pvar->origPsend;
   }
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
   pvar->origPWriteFile = *hooks->PWriteFile;
   *hooks->PWriteFile = TTXWriteFile;
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPWriteFile) {
     *hooks->PWriteFile = pvar->origPWriteFile;
   }
@@ -123,7 +123,7 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
   return;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
+static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origReadIniFile = *hooks->ReadIniFile;
   *hooks->ReadIniFile = TTXReadIniFile;
   pvar->origWriteIniFile = *hooks->WriteIniFile;
@@ -281,7 +281,7 @@ static TTXExports Exports = {
   TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
   /* do version checking if necessary */
   /* if (Version!=TTVERSION) return FALSE; */
@@ -289,8 +289,8 @@ BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exp
   if (size > exports->size) {
     size = exports->size;
   }
-  memcpy((char FAR *)exports + sizeof(exports->size),
-    (char FAR *)&Exports + sizeof(exports->size),
+  memcpy((char *)exports + sizeof(exports->size),
+    (char *)&Exports + sizeof(exports->size),
     size);
   return TRUE;
 }

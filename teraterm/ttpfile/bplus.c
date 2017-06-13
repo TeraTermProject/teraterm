@@ -15,7 +15,7 @@
 #include "ttlib.h"
 
 /* proto type */
-BOOL FAR PASCAL GetTransFname
+BOOL PASCAL GetTransFname
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option);
 
 #define BPTimeOut 10

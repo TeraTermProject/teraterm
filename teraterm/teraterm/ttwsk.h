@@ -11,46 +11,46 @@
 extern "C" {
 #endif
 
-typedef int (PASCAL FAR *Tclosesocket) (SOCKET s);
-typedef int (PASCAL FAR *Tconnect)
-  (SOCKET s, const struct sockaddr FAR *name, int namelen);
-typedef u_long (PASCAL FAR *Thtonl)
+typedef int (PASCAL *Tclosesocket) (SOCKET s);
+typedef int (PASCAL *Tconnect)
+  (SOCKET s, const struct sockaddr *name, int namelen);
+typedef u_long (PASCAL *Thtonl)
   (u_long hostlong);
-typedef u_short (PASCAL FAR *Thtons)
+typedef u_short (PASCAL *Thtons)
   (u_short hostshort);
-typedef unsigned long (PASCAL FAR *Tinet_addr)
-  (const char FAR * cp);
-typedef int (PASCAL FAR *Tioctlsocket)
-  (SOCKET s, long cmd, u_long FAR *argp);
-typedef int (PASCAL FAR *Trecv)
-  (SOCKET s, char FAR * buf, int len, int flags);
-typedef int (PASCAL FAR *Tselect)
-  (int nfds, fd_set FAR *readfds, fd_set FAR *writefds,
-   fd_set FAR *exceptfds, const struct timeval FAR *timeout);
-typedef int (PASCAL FAR *Tsend)
-  (SOCKET s, const char FAR * buf, int len, int flags);
-typedef int (PASCAL FAR *Tsetsockopt)
+typedef unsigned long (PASCAL *Tinet_addr)
+  (const char * cp);
+typedef int (PASCAL *Tioctlsocket)
+  (SOCKET s, long cmd, u_long *argp);
+typedef int (PASCAL *Trecv)
+  (SOCKET s, char * buf, int len, int flags);
+typedef int (PASCAL *Tselect)
+  (int nfds, fd_set *readfds, fd_set *writefds,
+   fd_set *exceptfds, const struct timeval *timeout);
+typedef int (PASCAL *Tsend)
+  (SOCKET s, const char * buf, int len, int flags);
+typedef int (PASCAL *Tsetsockopt)
   (SOCKET s, int level, int optname,
-   const char FAR * optval, int optlen);
-typedef SOCKET (PASCAL FAR *Tsocket)
+   const char * optval, int optlen);
+typedef SOCKET (PASCAL *Tsocket)
   (int af, int type, int protocol);
-//typedef struct hostent FAR * (PASCAL FAR *Tgethostbyname)
-//  (const char FAR * name);
-typedef int (PASCAL FAR *TWSAStartup)
+//typedef struct hostent * (PASCAL *Tgethostbyname)
+//  (const char * name);
+typedef int (PASCAL *TWSAStartup)
   (WORD wVersionRequired, LPWSADATA lpWSAData);
-typedef int (PASCAL FAR *TWSACleanup)(void);
-typedef int (PASCAL FAR *TWSAAsyncSelect)
+typedef int (PASCAL *TWSACleanup)(void);
+typedef int (PASCAL *TWSAAsyncSelect)
   (SOCKET s, HWND hWnd, u_int wMsg,long lEvent);
-typedef HANDLE (PASCAL FAR *TWSAAsyncGetHostByName)
-  (HWND hWnd, u_int wMsg, const char FAR * name, char FAR * buf, int buflen);
-typedef int (PASCAL FAR *TWSACancelAsyncRequest)(HANDLE hAsyncTaskHandle);
-typedef int (PASCAL FAR *TWSAGetLastError)(void);
-typedef HANDLE (PASCAL FAR *TWSAAsyncGetAddrInfo)
-  (HWND hWnd, unsigned int wMsg, const char FAR * hostname,
-   const char FAR * portname, struct addrinfo FAR * hints,
-   struct addrinfo FAR * FAR * res);
-// typedef int (PASCAL FAR *Tgetaddrinfo)(const char *name, const char *port, const struct addrinfo *hints, struct addrinfo **res);
-typedef void (PASCAL FAR *Tfreeaddrinfo)(struct addrinfo *ai);
+typedef HANDLE (PASCAL *TWSAAsyncGetHostByName)
+  (HWND hWnd, u_int wMsg, const char * name, char * buf, int buflen);
+typedef int (PASCAL *TWSACancelAsyncRequest)(HANDLE hAsyncTaskHandle);
+typedef int (PASCAL *TWSAGetLastError)(void);
+typedef HANDLE (PASCAL *TWSAAsyncGetAddrInfo)
+  (HWND hWnd, unsigned int wMsg, const char * hostname,
+   const char * portname, struct addrinfo * hints,
+   struct addrinfo * * res);
+// typedef int (PASCAL *Tgetaddrinfo)(const char *name, const char *port, const struct addrinfo *hints, struct addrinfo **res);
+typedef void (PASCAL *Tfreeaddrinfo)(struct addrinfo *ai);
 
 BOOL LoadWinsock();
 void FreeWinsock();

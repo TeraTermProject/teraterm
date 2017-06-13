@@ -7,16 +7,16 @@
 extern "C" {
 #endif
 
-typedef BOOL (PASCAL FAR *TReadFile)
+typedef BOOL (PASCAL *TReadFile)
   (HANDLE FHandle, LPVOID Buff, DWORD ReadSize, LPDWORD ReadBytes,
    LPOVERLAPPED ReadOverLap);
-typedef BOOL (PASCAL FAR *TWriteFile)
+typedef BOOL (PASCAL *TWriteFile)
   (HANDLE FHandle, LPCVOID Buff, DWORD WriteSize, LPDWORD WriteBytes,
    LPOVERLAPPED WriteOverLap);
-typedef HANDLE (PASCAL FAR *TCreateFile)
+typedef HANDLE (PASCAL *TCreateFile)
   (LPCTSTR FName, DWORD AcMode, DWORD ShMode, LPSECURITY_ATTRIBUTES SecAttr,
    DWORD CreateDisposition, DWORD FileAttr, HANDLE Template);
-typedef BOOL (PASCAL FAR *TCloseFile)
+typedef BOOL (PASCAL *TCloseFile)
   (HANDLE FHandle);
 
 extern TReadFile PReadFile;

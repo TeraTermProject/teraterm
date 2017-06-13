@@ -56,7 +56,7 @@ void PASCAL CopyTTSetToShmem(PTTSet ts)
 }
 
 
-BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
+BOOL PASCAL StartTeraTerm(PTTSet ts)
 {
 	char Temp[MAX_PATH];
 
@@ -99,7 +99,7 @@ BOOL PASCAL FAR StartTeraTerm(PTTSet ts)
 
 // 設定ファイルをディスクに保存し、Tera Term本体を再起動する。
 // (2012.4.30 yutaka)
-void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts)
+void PASCAL RestartTeraTerm(HWND hwnd, PTTSet ts)
 {
 	char path[1024];
 	STARTUPINFO si;
@@ -132,7 +132,7 @@ void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts)
 	}
 }
 
-void PASCAL FAR ChangeDefaultSet(PTTSet ts, PKeyMap km)
+void PASCAL ChangeDefaultSet(PTTSet ts, PKeyMap km)
 {
 	if ((ts!=NULL) &&
 		(_stricmp(ts->SetupFName, pm->ts.SetupFName) == 0)) {
@@ -143,14 +143,14 @@ void PASCAL FAR ChangeDefaultSet(PTTSet ts, PKeyMap km)
 	}
 }
 
-void PASCAL FAR GetDefaultSet(PTTSet ts)
+void PASCAL GetDefaultSet(PTTSet ts)
 {
 	memcpy(ts,&(pm->ts),sizeof(TTTSet));
 }
 
 
 /* Key scan code -> Tera Term key code */
-WORD PASCAL FAR GetKeyCode(PKeyMap KeyMap, WORD Scan)
+WORD PASCAL GetKeyCode(PKeyMap KeyMap, WORD Scan)
 {
 	WORD Key;
 
@@ -164,7 +164,7 @@ WORD PASCAL FAR GetKeyCode(PKeyMap KeyMap, WORD Scan)
 	return Key;
 }
 
-void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
+void PASCAL GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
                           BOOL AppliKeyMode, BOOL AppliCursorMode,
                           BOOL Send8BitMode, PCHAR KeyStr, int destlen,
                           LPINT Len, LPWORD Type)
@@ -818,22 +818,22 @@ void PASCAL FAR GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
 	PeekMessage(&Msg,HWin, WM_CHAR, WM_CHAR,PM_REMOVE);
 }
 
-void FAR PASCAL SetCOMFlag(int Com)
+void PASCAL SetCOMFlag(int Com)
 {
 	pm->ComFlag[(Com-1)/CHAR_BIT] |= 1 << ((Com-1)%CHAR_BIT);
 }
 
-void FAR PASCAL ClearCOMFlag(int Com)
+void PASCAL ClearCOMFlag(int Com)
 {
 	pm->ComFlag[(Com-1)/CHAR_BIT] &= ~(1 << ((Com-1)%CHAR_BIT));
 }
 
-int FAR PASCAL CheckCOMFlag(int Com)
+int PASCAL CheckCOMFlag(int Com)
 {
 	return ((pm->ComFlag[(Com-1)/CHAR_BIT] & 1 << (Com-1)%CHAR_BIT) > 0);
 }
 
-int FAR PASCAL RegWin(HWND HWinVT, HWND HWinTEK)
+int PASCAL RegWin(HWND HWinVT, HWND HWinTEK)
 {
 	int i, j;
 
@@ -864,7 +864,7 @@ int FAR PASCAL RegWin(HWND HWinVT, HWND HWinTEK)
 	}
 }
 
-void FAR PASCAL UnregWin(HWND HWin)
+void PASCAL UnregWin(HWND HWin)
 {
 	int i, j;
 
@@ -902,7 +902,7 @@ char GetWindowTypeChar(HWND Hw, HWND HWin)
 		return '+';
 }
 
-void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
+void PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
 {
 	int i;
 	char Temp[MAXPATHLEN];
@@ -974,7 +974,7 @@ void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, in
 	}
 }
 
-void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList)
+void PASCAL SetWinList(HWND HWin, HWND HDlg, int IList)
 {
 	int i;
 	char Temp[MAXPATHLEN];
@@ -1000,7 +1000,7 @@ void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList)
 	}
 }
 
-void FAR PASCAL SelectWin(int WinId)
+void PASCAL SelectWin(int WinId)
 {
 	if ((WinId>=0) && (WinId<pm->NWin)) {
 		/* ウィンドウが最大化および最小化されていた場合、その状態を維持できるように、
@@ -1019,7 +1019,7 @@ void FAR PASCAL SelectWin(int WinId)
 	}
 }
 
-void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
+void PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 {
 	int i;
 
@@ -1048,7 +1048,7 @@ void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic)
 	SelectWin(i);
 }
 
-void FAR PASCAL ShowAllWin(int stat) {
+void PASCAL ShowAllWin(int stat) {
 	int i;
 
 	for (i=0; i < pm->NWin; i++) {
@@ -1056,7 +1056,7 @@ void FAR PASCAL ShowAllWin(int stat) {
 	}
 }
 
-void FAR PASCAL UndoAllWin(void) {
+void PASCAL UndoAllWin(void) {
 	int i;
 	WINDOWPLACEMENT rc0;
 	RECT rc;
@@ -1123,7 +1123,7 @@ void FAR PASCAL UndoAllWin(void) {
 	}
 }
 
-void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
+void PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 {
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
@@ -1152,7 +1152,7 @@ void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	}
 }
 
-HWND FAR PASCAL GetNthWin(int n)
+HWND PASCAL GetNthWin(int n)
 {
 	if (n<pm->NWin) {
 		return pm->WinList[n];
@@ -1202,7 +1202,7 @@ static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *nu
 }
 
 // ウィンドウを左右に並べて表示する(Show Windows Side by Side)
-void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
+void PASCAL ShowAllWinSidebySide(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
@@ -1212,7 +1212,7 @@ void FAR PASCAL ShowAllWinSidebySide(HWND myhwnd)
 }
 
 // ウィンドウを上下に並べて表示する(Show Windows Stacked)
-void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
+void PASCAL ShowAllWinStacked(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
@@ -1222,7 +1222,7 @@ void FAR PASCAL ShowAllWinStacked(HWND myhwnd)
 }
 
 // ウィンドウを重ねて表示する(Cascade)
-void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
+void PASCAL ShowAllWinCascade(HWND myhwnd)
 {
 	int n;
 	HWND hwnd[MAXNWIN];
@@ -1232,7 +1232,7 @@ void FAR PASCAL ShowAllWinCascade(HWND myhwnd)
 }
 
 // 全Tera Termに終了指示を出す。
-void FAR PASCAL BroadcastClosingMessage(HWND myhwnd)
+void PASCAL BroadcastClosingMessage(HWND myhwnd)
 {
 	int i, max;
 	HWND hwnd[MAXNWIN];
@@ -1255,7 +1255,7 @@ void FAR PASCAL BroadcastClosingMessage(HWND myhwnd)
 }
 
 
-int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
+int PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 {
 	if ( ! cv->Ready ) {
 		return 0;
@@ -1276,7 +1276,7 @@ int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b)
 	}
 }
 
-void PASCAL FAR CommInsert1Byte(PComVar cv, BYTE b)
+void PASCAL CommInsert1Byte(PComVar cv, BYTE b)
 {
 	if ( ! cv->Ready ) {
 		return;
@@ -1319,7 +1319,7 @@ void Log1Bin(PComVar cv, BYTE b)
 	}
 }
 
-int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b)
+int PASCAL CommRead1Byte(PComVar cv, LPBYTE b)
 {
 	int c;
 
@@ -1389,7 +1389,7 @@ int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b)
 	return c;
 }
 
-int FAR PASCAL CommRawOut(PComVar cv, PCHAR B, int C)
+int PASCAL CommRawOut(PComVar cv, PCHAR B, int C)
 {
 	int a;
 
@@ -1412,7 +1412,7 @@ int FAR PASCAL CommRawOut(PComVar cv, PCHAR B, int C)
 	return a;
 }
 
-int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
+int PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
 {
 	int a, i, Len;
 	char d[3];
@@ -1449,7 +1449,7 @@ int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
+int PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 {
 	int a, i, Len, OutLen;
 	char d[3];
@@ -1751,7 +1751,7 @@ int TextOutMBCS(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
+int PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen, OutLen;
 	char TempStr[12];
@@ -1854,7 +1854,7 @@ int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C)
+int PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C)
 {
 	int a, i, Len;
 	char d[3];
@@ -1898,7 +1898,7 @@ int FAR PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
+int PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;
@@ -2073,7 +2073,7 @@ int FAR PASCAL TextEchoMBCS(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
+int PASCAL CommTextEcho(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	char TempStr[11];
@@ -2386,17 +2386,17 @@ static NOTIFYICONDATA notify_icon = {0};
 static int NotifyIconShowCount = 0;
 static HICON CustomIcon = NULL;
 
-void FAR PASCAL SetCustomNotifyIcon(HICON icon)
+void PASCAL SetCustomNotifyIcon(HICON icon)
 {
 	CustomIcon = icon;
 }
 
-HICON FAR PASCAL GetCustomNotifyIcon()
+HICON PASCAL GetCustomNotifyIcon()
 {
 	return CustomIcon;
 }
 
-void FAR PASCAL CreateNotifyIcon(PComVar cv)
+void PASCAL CreateNotifyIcon(PComVar cv)
 {
 	if (cv->NotifyIcon == NULL) {
 		notify_icon.cbSize = sizeof(notify_icon);
@@ -2428,7 +2428,7 @@ void FAR PASCAL CreateNotifyIcon(PComVar cv)
 	return;
 }
 
-void FAR PASCAL DeleteNotifyIcon(PComVar cv)
+void PASCAL DeleteNotifyIcon(PComVar cv)
 {
 	if (cv->NotifyIcon) {
 		Shell_NotifyIcon(NIM_DELETE, cv->NotifyIcon);
@@ -2439,7 +2439,7 @@ void FAR PASCAL DeleteNotifyIcon(PComVar cv)
 	return;
 }
 
-void FAR PASCAL ShowNotifyIcon(PComVar cv)
+void PASCAL ShowNotifyIcon(PComVar cv)
 {
 	if (cv->NotifyIcon == NULL) {
 		CreateNotifyIcon(cv);
@@ -2454,7 +2454,7 @@ void FAR PASCAL ShowNotifyIcon(PComVar cv)
 	return;
 }
 
-void FAR PASCAL HideNotifyIcon(PComVar cv)
+void PASCAL HideNotifyIcon(PComVar cv)
 {
 	if (NotifyIconShowCount > 1) {
 		NotifyIconShowCount -= 1;
@@ -2472,7 +2472,7 @@ void FAR PASCAL HideNotifyIcon(PComVar cv)
 	return;
 }
 
-void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver)
+void PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver)
 {
 	if (cv->NotifyIcon) {
 		cv->NotifyIcon->uVersion = ver;
@@ -2481,7 +2481,7 @@ void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver)
 	return;
 }
 
-void FAR PASCAL NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
+void PASCAL NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
 {
 	if (msg == NULL) {
 		return;

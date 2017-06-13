@@ -51,8 +51,8 @@ See LICENSE.TXT for the license.
 
 /* a length == 0 means that we're killing the channel and the filter
    should deallocate */
-typedef int (* FWDFilter)(void FAR * closure, int direction,
-  int FAR * length, unsigned char FAR * FAR * buf);
+typedef int (* FWDFilter)(void *closure, int direction,
+  int *length, unsigned char **buf);
 
 typedef struct {
   int status;
@@ -61,9 +61,9 @@ typedef struct {
   int request_num;
   UTILSockWriteBuf writebuf;
 
-  void FAR * filter_closure;
+  void *filter_closure;
   FWDFilter filter;
-  struct addrinfo FAR * to_host_addrs;
+  struct addrinfo *to_host_addrs;
 
   // for agent forwarding
   buffer_t *agent_msg;
@@ -99,8 +99,8 @@ typedef struct {
 #define MAX_LISTENING_SOCKETS 4096
 typedef struct {
   int num_listening_sockets;
-  SOCKET FAR * listening_sockets;
-  struct addrinfo FAR * to_host_addrs;
+  SOCKET *listening_sockets;
+  struct addrinfo *to_host_addrs;
   HANDLE to_host_lookup_handle;
 
   int num_channels;
@@ -114,13 +114,13 @@ typedef struct {
   WNDPROC old_accept_wnd_proc;
   int num_server_listening_specs;
   /* stored in sorted order */
-  FWDRequestSpec FAR * server_listening_specs;
+  FWDRequestSpec *server_listening_specs;
   int num_requests;
-  FWDRequest FAR * requests;
+  FWDRequest *requests;
   int num_channels;
-  FWDChannel FAR * channels;
-  struct sockaddr_storage FAR * local_host_IP_numbers;
-  struct _X11AuthData FAR * X11_auth_data;
+  FWDChannel *channels;
+  struct sockaddr_storage *local_host_IP_numbers;
+  struct _X11AuthData *X11_auth_data;
   BOOL in_interactive_mode;
 } FWDState;
 
@@ -129,25 +129,25 @@ void FWD_init(PTInstVar pvar);
    given request. Before the SSH session's prep phase, this returns true for
    all requests. After the SSH session's prep phase, this returns true only
    for requests that the server actually was told about during the prep phase. */
-BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec FAR * spec);
+BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec);
 int FWD_get_num_request_specs(PTInstVar pvar);
-void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs, int num_specs);
-void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs, int num_specs);
-int FWD_compare_specs(void const FAR * void_spec1, void const FAR * void_spec2);
+void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs);
+void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs);
+int FWD_compare_specs(void const *void_spec1, void const *void_spec2);
 void FWD_prep_forwarding(PTInstVar pvar);
 void FWD_enter_interactive_mode(PTInstVar pvar);
 void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
-              char FAR * local_hostname, int local_port,
-              char FAR * originator, int originator_len,
+              char *local_hostname, int local_port,
+              char *originator, int originator_len,
               int *chan_num);
 void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
-                  char FAR * originator, int originator_len,
+                  char *originator, int originator_len,
                   int *chan_num);
 void FWD_confirmed_open(PTInstVar pvar, uint32 local_channel_num,
   uint32 remote_channel_num);
 void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num);
 void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
-  unsigned char FAR * data, int length);
+  unsigned char *data, int length);
 void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num);
 void FWD_channel_output_eof(PTInstVar pvar, uint32 local_channel_num);
 void FWD_end(PTInstVar pvar);

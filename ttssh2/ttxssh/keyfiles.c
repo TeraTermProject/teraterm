@@ -51,7 +51,7 @@ See LICENSE.TXT for the license.
 
 static char ID_string[] = "SSH PRIVATE KEY FILE FORMAT 1.1\n";
 
-static BIGNUM FAR *get_bignum(unsigned char FAR * bytes)
+static BIGNUM *get_bignum(unsigned char *bytes)
 {
 	int bits = get_ushort16_MSBfirst(bytes);
 
@@ -63,7 +63,7 @@ static BIGNUM FAR *get_bignum(unsigned char FAR * bytes)
    It's needed to work around "issues" with LIBEAY/RSAREF.
    If this function returns 0, then something went wrong and the
    key must be discarded. */
-static BOOL normalize_key(RSA FAR * key)
+static BOOL normalize_key(RSA *key)
 {
 	BOOL OK = FALSE;
 	BIGNUM *r = BN_new();
@@ -107,7 +107,7 @@ static RSA *read_RSA_private_key(PTInstVar pvar,
 	unsigned char *keyfile_data;
 	unsigned int index;
 	int cipher;
-	RSA FAR *key;
+	RSA *key;
 	unsigned int E_index, N_index, D_index, U_index, P_index, Q_index = 0;
 
 	*invalid_passphrase = FALSE;

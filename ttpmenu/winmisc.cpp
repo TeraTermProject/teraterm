@@ -452,7 +452,7 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			char chars[] = { (char) wParam, 0 };
 
 			SendMessage(control, EM_REPLACESEL, (WPARAM) TRUE,
-			            (LPARAM) (char FAR *) chars);
+			            (LPARAM) (char *) chars);
 			return 0;
 		}
 	}

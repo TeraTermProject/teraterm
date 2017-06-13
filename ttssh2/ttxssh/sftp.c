@@ -832,7 +832,7 @@ static LRESULT CALLBACK EditProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			if (buf[0] != '\0') {
 				SendDlgItemMessage(GetParent(hwnd), IDC_SFTP_CONSOLE, EM_REPLACESEL, 0, (LPARAM) buf);
 				SendDlgItemMessage(GetParent(hwnd), IDC_SFTP_CONSOLE, EM_REPLACESEL, 0,
-								   (LPARAM) (char FAR *) "\r\n");
+								   (LPARAM) (char *) "\r\n");
 				goto cmd_parsed;
 			}
 		}
@@ -1117,7 +1117,7 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 		case WM_USER_CONSOLE:
 			SendDlgItemMessage(hDlgWnd, IDC_SFTP_CONSOLE, EM_REPLACESEL, 0, (LPARAM) lp);
 			SendDlgItemMessage(hDlgWnd, IDC_SFTP_CONSOLE, EM_REPLACESEL, 0,
-							   (LPARAM) (char FAR *) "\r\n");
+							   (LPARAM) (char *) "\r\n");
 			return TRUE;
 
 #if 0

@@ -45,7 +45,7 @@ typedef struct {
 	unsigned char orgCommand[OutBuffSize];
 } TInstVar;
 
-typedef TInstVar FAR * PTInstVar;
+typedef TInstVar *PTInstVar;
 PTInstVar pvar;
 static TInstVar InstVar;
 
@@ -272,7 +272,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 //  TTXSend, TTXWriteFile -- キー入力処理
 //	キー入力があったら、タイマを延長する
 //
-static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags) {
+static int PASCAL FAR TTXsend(SOCKET s, const char *buf, int len, int flags) {
 	if (pvar->enable && len > 0) {
 		SetTimer(pvar->cv->HWin, IdRecurringTimer, pvar->interval * 1000, RecurringTimerProc);
 	}
@@ -290,7 +290,7 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 // TTXOpenTCP, TTXOpenFile -- セッション開始処理
 //	Psend, WriteFileをフックし、有効ならばタイマをセットする。
 //
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
 	pvar->origPsend = *hooks->Psend;
 	*hooks->Psend = TTXsend;
 
@@ -299,7 +299,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks) {
 	}
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
 	pvar->origPWriteFile = *hooks->PWriteFile;
 	*hooks->PWriteFile = TTXWriteFile;
 
@@ -312,14 +312,14 @@ static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
 // TTXCloseTCP, TTXCloseFile -- セッション終了時処理
 //	Psend, WriteFileのフックを解除し、タイマを止める。
 //
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
 	if (pvar->origPsend) {
 		*hooks->Psend = pvar->origPsend;
 	}
 	KillTimer(pvar->cv->HWin, IdRecurringTimer);
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
 	if (pvar->origPWriteFile) {
 		*hooks->PWriteFile = pvar->origPWriteFile;
 	}
@@ -411,7 +411,7 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	return;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
+static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	pvar->origReadIniFile = *hooks->ReadIniFile;
 	*hooks->ReadIniFile = TTXReadIniFile;
 
@@ -632,7 +632,7 @@ static TTXExports Exports = {
 	TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 	/* do version checking if necessary */
 	/* if (Version!=TTVERSION) return FALSE; */
@@ -640,8 +640,8 @@ BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exp
 	if (size > exports->size) {
 		size = exports->size;
 	}
-	memcpy((char FAR *)exports + sizeof(exports->size),
-	       (char FAR *)&Exports + sizeof(exports->size), size);
+	memcpy((char *)exports + sizeof(exports->size),
+	       (char *)&Exports + sizeof(exports->size), size);
 	return TRUE;
 }
 

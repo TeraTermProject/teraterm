@@ -1,1 +1,1 @@
-void FAR PASCAL TTDLGSetUILanguageFile(char *file);
+void PASCAL TTDLGSetUILanguageFile(char *file);

@@ -53,7 +53,7 @@ static void loadExtension(ExtensionList * * extensions, char const * fileName) {
       newExtension->exports = (TTXExports *)malloc(sizeof(TTXExports));
       memset(newExtension->exports, 0, sizeof(TTXExports));
       newExtension->exports->size = sizeof(TTXExports);
-      if (bind(TTVERSION,(TTXExports FAR *)newExtension->exports)) {
+      if (bind(TTVERSION,(TTXExports *)newExtension->exports)) {
         newExtension->next = *extensions;
         *extensions = newExtension;
         NumExtensions++;
@@ -75,7 +75,7 @@ static void loadExtension(ExtensionList * * extensions, char const * fileName) {
   MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONEXCLAMATION);
 }
 
-void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   ExtensionList * extensionList = NULL;
   int i;
 
@@ -119,7 +119,7 @@ void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   }
 }
 
-void PASCAL FAR TTXInternalOpenTCP(TTXSockHooks FAR * hooks) {
+void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -129,7 +129,7 @@ void PASCAL FAR TTXInternalOpenTCP(TTXSockHooks FAR * hooks) {
   }
 }
 
-void PASCAL FAR TTXInternalCloseTCP(TTXSockHooks FAR * hooks) {
+void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -139,7 +139,7 @@ void PASCAL FAR TTXInternalCloseTCP(TTXSockHooks FAR * hooks) {
   }
 }
 
-void PASCAL FAR TTXInternalOpenFile(TTXFileHooks FAR * hooks) {
+void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -149,7 +149,7 @@ void PASCAL FAR TTXInternalOpenFile(TTXFileHooks FAR * hooks) {
   }
 }
 
-void PASCAL FAR TTXInternalCloseFile(TTXFileHooks FAR * hooks) {
+void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -159,7 +159,7 @@ void PASCAL FAR TTXInternalCloseFile(TTXFileHooks FAR * hooks) {
   }
 }
 
-void PASCAL FAR TTXInternalGetUIHooks(TTXUIHooks FAR * hooks) {
+void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -169,7 +169,7 @@ void PASCAL FAR TTXInternalGetUIHooks(TTXUIHooks FAR * hooks) {
   }
 }
 
-void PASCAL FAR TTXInternalGetSetupHooks(TTXSetupHooks FAR * hooks) {
+void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -179,7 +179,7 @@ void PASCAL FAR TTXInternalGetSetupHooks(TTXSetupHooks FAR * hooks) {
   }
 }
 
-void PASCAL FAR TTXSetWinSize(int rows, int cols) {
+void PASCAL TTXSetWinSize(int rows, int cols) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -189,7 +189,7 @@ void PASCAL FAR TTXSetWinSize(int rows, int cols) {
   }
 }
 
-void PASCAL FAR TTXModifyMenu(HMENU menu) {
+void PASCAL TTXModifyMenu(HMENU menu) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -199,7 +199,7 @@ void PASCAL FAR TTXModifyMenu(HMENU menu) {
   }
 }
 
-void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+void PASCAL TTXModifyPopupMenu(HMENU menu) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -209,7 +209,7 @@ void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
   }
 }
 
-BOOL PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -223,7 +223,7 @@ BOOL PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
   return FALSE;
 }
 
-void PASCAL FAR TTXEnd(void) {
+void PASCAL TTXEnd(void) {
   int i;
 
   if (NumExtensions==0) return;
@@ -245,7 +245,7 @@ void PASCAL FAR TTXEnd(void) {
   NumExtensions = 0;
 }
 
-void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
+void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {

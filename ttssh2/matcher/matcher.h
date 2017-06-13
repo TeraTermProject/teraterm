@@ -48,6 +48,6 @@ and that it does not contain any pattern metacharacters.
 This function is optimized for matching many patterns against one string,
 such as occurs when searching an ssh_known_hosts file for a host key.
 */
-BOOL match_pattern(char const FAR * pattern, char const FAR * str);
+BOOL match_pattern(char const *pattern, char const *str);
 
 #endif

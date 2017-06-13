@@ -42,7 +42,7 @@ static void AsyncConnect(PComVar cv)
 	BBuf = TRUE;
 	/* set synchronous mode */
 	PWSAAsyncSelect(cv->s,cv->HWin,0,0);
-	Psetsockopt(cv->s,(int)SOL_SOCKET,SO_OOBINLINE,(char FAR *)&BBuf,sizeof(BBuf));
+	Psetsockopt(cv->s,(int)SOL_SOCKET,SO_OOBINLINE,(char *)&BBuf,sizeof(BBuf));
 	/* set asynchronous mode */
 	PWSAAsyncSelect(cv->s,cv->HWin,WM_USER_COMMOPEN, FD_CONNECT);
 

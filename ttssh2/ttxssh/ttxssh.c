@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <commctrl.h>
 #include <commdlg.h>
 #include <winsock2.h>
-static char FAR *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
+static char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #include <Lmcons.h>
 
@@ -99,7 +99,7 @@ static HFONT DlgAboutTextFont;
 static HFONT DlgSetupFont;
 static HFONT DlgKeygenFont;
 
-static TInstVar FAR *pvar;
+static TInstVar *pvar;
 
 typedef struct {
 	int cnt;
@@ -171,7 +171,7 @@ static void uninit_TTSSH(PTInstVar pvar)
 	ssh_heartbeat_lock_finalize();
 }
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv)
+static void PASCAL TTXInit(PTTSet ts, PComVar cv)
 {
 	pvar->settings = *pvar->ts_SSH;
 	pvar->ts = ts;
@@ -274,7 +274,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
  * Remove unsupported cipher or duplicated cipher.
  * Add unspecified ciphers at the end of list.
  */
-static void normalize_cipher_order(char FAR * buf)
+static void normalize_cipher_order(char *buf)
 {
 	/* SSH_CIPHER_NONE means that all ciphers below that one are disabled.
 	   We *never* allow no encryption. */
@@ -310,7 +310,7 @@ static void normalize_cipher_order(char FAR * buf)
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
 
-static void normalize_kex_order(char FAR * buf)
+static void normalize_kex_order(char *buf)
 {
 	static char default_strings[] = {
 		KEX_ECDH_SHA2_256,
@@ -329,7 +329,7 @@ static void normalize_kex_order(char FAR * buf)
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
 
-static void normalize_host_key_order(char FAR * buf)
+static void normalize_host_key_order(char *buf)
 {
 	static char default_strings[] = {
 		KEY_ECDSA256,
@@ -344,7 +344,7 @@ static void normalize_host_key_order(char FAR * buf)
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
 
-static void normalize_mac_order(char FAR * buf)
+static void normalize_mac_order(char *buf)
 {
 	static char default_strings[] = {
 		HMAC_SHA2_512,
@@ -362,7 +362,7 @@ static void normalize_mac_order(char FAR * buf)
 	normalize_generic_order(buf, default_strings, NUM_ELEM(default_strings));
 }
 
-static void normalize_comp_order(char FAR * buf)
+static void normalize_comp_order(char *buf)
 {
 	static char default_strings[] = {
 		COMP_DELAYED,
@@ -381,7 +381,7 @@ static void clear_local_settings(PTInstVar pvar)
 	pvar->ts_SSH->TryDefaultAuth = FALSE;
 }
 
-static BOOL read_BOOL_option(PCHAR fileName, char FAR * keyName, BOOL def)
+static BOOL read_BOOL_option(PCHAR fileName, char *keyName, BOOL def)
 {
 	char buf[1024];
 
@@ -397,8 +397,8 @@ static BOOL read_BOOL_option(PCHAR fileName, char FAR * keyName, BOOL def)
 	}
 }
 
-static void read_string_option(PCHAR fileName, char FAR * keyName,
-                               char FAR * def, char FAR * buf, int bufSize)
+static void read_string_option(PCHAR fileName, char *keyName,
+                               char *def, char *buf, int bufSize)
 {
 
 	buf[0] = 0;
@@ -408,7 +408,7 @@ static void read_string_option(PCHAR fileName, char FAR * keyName,
 static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 {
 	char buf[1024];
-	TS_SSH FAR *settings = pvar->ts_SSH;
+	TS_SSH *settings = pvar->ts_SSH;
 
 #define READ_STD_STRING_OPTION(name) \
 	read_string_option(fileName, #name, "", settings->name, sizeof(settings->name))
@@ -536,7 +536,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 }
 
 static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
-                              TS_SSH FAR * settings, BOOL copy_forward)
+                              TS_SSH *settings, BOOL copy_forward)
 {
 	char buf[1024];
 
@@ -664,8 +664,8 @@ static unsigned short find_local_port(PTInstVar pvar)
 	int tries;
 	SOCKET connecter;
 	struct addrinfo hints;
-	struct addrinfo FAR *res;
-	struct addrinfo FAR *res0;
+	struct addrinfo *res;
+	struct addrinfo *res0;
 	unsigned short port;
 	char pname[NI_MAXHOST];
 
@@ -722,8 +722,8 @@ static unsigned short find_local_port(PTInstVar pvar)
 	return 0;
 }
 
-static int PASCAL FAR TTXconnect(SOCKET s,
-                                 const struct sockaddr FAR * name,
+static int PASCAL TTXconnect(SOCKET s,
+                                 const struct sockaddr *name,
                                  int namelen)
 {
 	if (pvar->socket == INVALID_SOCKET || pvar->socket != s) {
@@ -736,17 +736,17 @@ static int PASCAL FAR TTXconnect(SOCKET s,
 		switch (pvar->ts->ProtocolFamily) {
 		case AF_INET:
 			len = sizeof(struct sockaddr_in);
-			((struct sockaddr_in FAR *) &ss)->sin_family = AF_INET;
-			((struct sockaddr_in FAR *) &ss)->sin_addr.s_addr = INADDR_ANY;
-			((struct sockaddr_in FAR *) &ss)->sin_port =
+			((struct sockaddr_in *) &ss)->sin_family = AF_INET;
+			((struct sockaddr_in *) &ss)->sin_addr.s_addr = INADDR_ANY;
+			((struct sockaddr_in *) &ss)->sin_port =
 				htons(find_local_port(pvar));
 			break;
 		case AF_INET6:
 			len = sizeof(struct sockaddr_in6);
-			((struct sockaddr_in6 FAR *) &ss)->sin6_family = AF_INET6;
-			memset(&((struct sockaddr_in6 FAR *) &ss)->sin6_addr, 0,
+			((struct sockaddr_in6 *) &ss)->sin6_family = AF_INET6;
+			memset(&((struct sockaddr_in6 *) &ss)->sin6_addr, 0,
 			       sizeof(struct in_addr6));
-			((struct sockaddr_in6 FAR *) &ss)->sin6_port =
+			((struct sockaddr_in6 *) &ss)->sin6_port =
 				htons(find_local_port(pvar));
 			break;
 		default:
@@ -754,13 +754,13 @@ static int PASCAL FAR TTXconnect(SOCKET s,
 			break;
 		}
 
-		bind(s, (struct sockaddr FAR *) &ss, len);
+		bind(s, (struct sockaddr *) &ss, len);
 	}
 
 	return (pvar->Pconnect) (s, name, namelen);
 }
 
-static int PASCAL FAR TTXWSAAsyncSelect(SOCKET s, HWND hWnd, u_int wMsg,
+static int PASCAL TTXWSAAsyncSelect(SOCKET s, HWND hWnd, u_int wMsg,
                                         long lEvent)
 {
 	if (s == pvar->socket) {
@@ -776,7 +776,7 @@ static int PASCAL FAR TTXWSAAsyncSelect(SOCKET s, HWND hWnd, u_int wMsg,
 	return (pvar->PWSAAsyncSelect) (s, hWnd, wMsg, lEvent);
 }
 
-static int PASCAL FAR TTXrecv(SOCKET s, char FAR * buf, int len, int flags)
+static int PASCAL TTXrecv(SOCKET s, char *buf, int len, int flags)
 {
 	if (s == pvar->socket) {
 		int ret;
@@ -791,7 +791,7 @@ static int PASCAL FAR TTXrecv(SOCKET s, char FAR * buf, int len, int flags)
 	}
 }
 
-static int PASCAL FAR TTXsend(SOCKET s, char const FAR * buf, int len,
+static int PASCAL TTXsend(SOCKET s, char const *buf, int len,
                               int flags)
 {
 	if (s == pvar->socket) {
@@ -850,7 +850,7 @@ void notify_established_secure_connection(PTInstVar pvar)
 	                       LOG_LEVEL_VERBOSE);
 }
 
-void notify_closed_connection(PTInstVar pvar, char FAR * send_msg)
+void notify_closed_connection(PTInstVar pvar, char *send_msg)
 {
 	SSH_notify_disconnecting(pvar, send_msg);
 	AUTH_notify_disconnecting(pvar);
@@ -860,11 +860,11 @@ void notify_closed_connection(PTInstVar pvar, char FAR * send_msg)
 	            pvar->socket, MAKELPARAM(FD_CLOSE, 0));
 }
 
-static void add_err_msg(PTInstVar pvar, char FAR * msg)
+static void add_err_msg(PTInstVar pvar, char *msg)
 {
 	if (pvar->err_msg != NULL) {
 		int buf_len = strlen(pvar->err_msg) + 3 + strlen(msg);
-		char FAR *buf = (char FAR *) malloc(buf_len);
+		char *buf = (char *) malloc(buf_len);
 
 		strncpy_s(buf, buf_len, pvar->err_msg, _TRUNCATE);
 		strncat_s(buf, buf_len, "\n\n", _TRUNCATE);
@@ -876,7 +876,7 @@ static void add_err_msg(PTInstVar pvar, char FAR * msg)
 	}
 }
 
-void notify_nonfatal_error(PTInstVar pvar, char FAR * msg)
+void notify_nonfatal_error(PTInstVar pvar, char *msg)
 {
 	if (!pvar->showing_err) {
 		// 未接続の状態では通知先ウィンドウがないので、デスクトップをオーナーとして
@@ -898,7 +898,7 @@ void notify_nonfatal_error(PTInstVar pvar, char FAR * msg)
 	}
 }
 
-void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect)
+void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 {
 	if (msg[0] != 0) {
 		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
@@ -920,7 +920,7 @@ void notify_fatal_error(PTInstVar pvar, char FAR * msg, BOOL send_disconnect)
 	}
 }
 
-void notify_verbose_message(PTInstVar pvar, char FAR * msg, int level)
+void notify_verbose_message(PTInstVar pvar, char *msg, int level)
 {
 	if (level <= pvar->session_settings.LogLevel) {
 		char buf[1024];
@@ -1045,7 +1045,7 @@ void logprintf_hexdump(PTInstVar pvar, int level, char *data, int len, char *fmt
 	}
 }
 
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks)
+static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 {
 	if (pvar->settings.Enabled) {
 		// TCPLocalEcho/TCPCRSend を無効にする (maya 2007.4.25)
@@ -1090,7 +1090,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks)
 	}
 }
 
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks FAR * hooks)
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 {
 	if (pvar->session_settings.Enabled) {
 		pvar->socket = INVALID_SOCKET;
@@ -1644,18 +1644,18 @@ hostssh_enabled:
 	return FALSE;
 }
 
-static BOOL FAR PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
+static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 {
 	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
 	                             parent, TTXHostDlg, (LONG) rec);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks)
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks)
 {
 	*hooks->GetHostName = TTXGetHostName;
 }
 
-static void FAR PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts)
+static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts)
 {
 	(pvar->ReadIniFile) (fileName, ts);
 	read_ssh_options(pvar, fileName);
@@ -1664,7 +1664,7 @@ static void FAR PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts)
 	FWDUI_load_settings(pvar);
 }
 
-static void FAR PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts)
+static void PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts)
 {
 	(pvar->WriteIniFile) (fileName, ts);
 	*pvar->ts_SSH = pvar->settings;
@@ -1674,7 +1674,7 @@ static void FAR PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts)
 }
 
 static void read_ssh_options_from_user_file(PTInstVar pvar,
-                                            char FAR * user_file_name)
+                                            char *user_file_name)
 {
 	if (user_file_name[0] == '.') {
 		read_ssh_options(pvar, user_file_name);
@@ -1727,7 +1727,7 @@ void add_forward_param(PTInstVar pvar, char *param)
 	}
 }
 
-static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
+static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	int param_len=strlen(param);
 	int opt_len = param_len+1;
 	char *option = (char *)calloc(opt_len, sizeof(char));
@@ -2098,7 +2098,7 @@ static void FAR PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	(pvar->ParseParam) (param, ts, DDETopic);
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks)
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks)
 {
 	pvar->ReadIniFile = *hooks->ReadIniFile;
 	pvar->WriteIniFile = *hooks->WriteIniFile;
@@ -2109,13 +2109,13 @@ static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks)
 	*hooks->ParseParam = TTXParseParam;
 }
 
-static void PASCAL FAR TTXSetWinSize(int rows, int cols)
+static void PASCAL TTXSetWinSize(int rows, int cols)
 {
 	SSH_notify_win_size(pvar, cols, rows);
 }
 
 static void insertMenuBeforeItem(HMENU menu, WORD beforeItemID, WORD flags,
-                                 WORD newItemID, char FAR * text)
+                                 WORD newItemID, char *text)
 {
 	int i, j;
 
@@ -2157,7 +2157,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu)
+static void PASCAL TTXModifyMenu(HMENU menu)
 {
 	pvar->FileMenu = GetFileMenu(menu);
 
@@ -2182,7 +2182,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu)
 	insertMenuBeforeItem(menu, 50170, MF_GRAYED, ID_SSHSCPMENU, pvar->ts->UIMsg);
 }
 
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	if (menu == pvar->FileMenu) {
 		if (pvar->cv->Ready && pvar->settings.Enabled)
 			EnableMenuItem(menu, ID_SSHSCPMENU, MF_BYCOMMAND | MF_ENABLED);
@@ -2405,7 +2405,7 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 		strncat_s(buf2, sizeof(buf2), fp, _TRUNCATE);
 		free(fp);
 
-		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETTEXT, 0, (LPARAM)(char FAR *)buf2);
+		SendDlgItemMessage(dlg, IDC_ABOUTTEXT, WM_SETTEXT, 0, (LPARAM)(char *)buf2);
 	}
 }
 
@@ -2605,7 +2605,7 @@ static BOOL CALLBACK TTXAboutDlg(HWND dlg, UINT msg, WPARAM wParam,
 	return FALSE;
 }
 
-static char FAR *get_cipher_name(int cipher)
+static char *get_cipher_name(int cipher)
 {
 	switch (cipher) {
 	case SSH_CIPHER_NONE:
@@ -2823,7 +2823,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 	for (i = 0; pvar->settings.CipherOrder[i] != 0; i++) {
 		int cipher = pvar->settings.CipherOrder[i] - '0';
-		char FAR *name = get_cipher_name(cipher);
+		char *name = get_cipher_name(cipher);
 
 		if (name != NULL) {
 			SendMessage(cipherControl, LB_ADDSTRING, 0, (LPARAM) name);
@@ -2837,7 +2837,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_kex_order(pvar->settings.KexOrder);
 	for (i = 0; pvar->settings.KexOrder[i] != 0; i++) {
 		int index = pvar->settings.KexOrder[i] - '0';
-		char FAR *name = NULL;
+		char *name = NULL;
 
 		if (index == 0)	{
 			UTIL_get_lang_msg("DLG_SSHSETUP_KEX_BORDER", pvar,
@@ -2858,7 +2858,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_host_key_order(pvar->settings.HostKeyOrder);
 	for (i = 0; pvar->settings.HostKeyOrder[i] != 0; i++) {
 		int index = pvar->settings.HostKeyOrder[i] - '0';
-		char FAR *name = NULL;
+		char *name = NULL;
 
 		if (index == 0)	{
 			UTIL_get_lang_msg("DLG_SSHSETUP_HOST_KEY_BORDER", pvar,
@@ -2879,7 +2879,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_mac_order(pvar->settings.MacOrder);
 	for (i = 0; pvar->settings.MacOrder[i] != 0; i++) {
 		int index = pvar->settings.MacOrder[i] - '0';
-		char FAR *name = NULL;
+		char *name = NULL;
 
 		if (index == 0)	{
 			UTIL_get_lang_msg("DLG_SSHSETUP_MAC_BORDER", pvar,
@@ -2900,7 +2900,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	normalize_comp_order(pvar->settings.CompOrder);
 	for (i = 0; pvar->settings.CompOrder[i] != 0; i++) {
 		int index = pvar->settings.CompOrder[i] - '0';
-		char FAR *name = NULL;
+		char *name = NULL;
 
 		if (index == 0)	{
 			UTIL_get_lang_msg("DLG_SSHSETUP_COMP_BORDER", pvar,
@@ -2977,8 +2977,8 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 }
 
-void get_teraterm_dir_relative_name(char FAR * buf, int bufsize,
-                                    char FAR * basename)
+void get_teraterm_dir_relative_name(char *buf, int bufsize,
+                                    char *basename)
 {
 	int filename_start = 0;
 	int i;
@@ -3002,8 +3002,8 @@ void get_teraterm_dir_relative_name(char FAR * buf, int bufsize,
 	}
 }
 
-int copy_teraterm_dir_relative_path(char FAR * dest, int destsize,
-                                    char FAR * basename)
+int copy_teraterm_dir_relative_path(char *dest, int destsize,
+                                    char *basename)
 {
 	char buf[1024];
 	int filename_start = 0;
@@ -3254,13 +3254,13 @@ static void move_cur_sel_delta(HWND listbox, int delta)
 			SendMessage(listbox, LB_GETTEXT, curPos, (LPARAM) buf);
 			SendMessage(listbox, LB_DELETESTRING, curPos, 0);
 			SendMessage(listbox, LB_INSERTSTRING, newPos,
-			            (LPARAM) (char FAR *) buf);
+			            (LPARAM) (char *) buf);
 			SendMessage(listbox, LB_SETCURSEL, newPos, 0);
 		}
 	}
 }
 
-static int get_keys_file_name(HWND parent, char FAR * buf, int bufsize,
+static int get_keys_file_name(HWND parent, char *buf, int bufsize,
                               int readonly)
 {
 	OPENFILENAME params;
@@ -5149,7 +5149,7 @@ error:;
 }
 
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd)
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 {
 	char uimsg[MAX_UIMSG];
 
@@ -5223,7 +5223,7 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd)
 		return 1;
 	case ID_SSHASYNCMESSAGEBOX:
 		if (pvar->err_msg != NULL) {
-			char FAR *msg = pvar->err_msg;
+			char *msg = pvar->err_msg;
 
 			/* Could there be a buffer overrun bug anywhere in Win32
 			   MessageBox? Who knows? I'm paranoid. */
@@ -5323,7 +5323,7 @@ static void dquote_string(char *str, char *dst, int dst_len)
 	strncpy_s(dst, dst_len, str, _TRUNCATE);
 }
 
-static void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen,
+static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen,
                                          PGetHNRec rec)
 {
 	char tmpFile[MAX_PATH];
@@ -5442,7 +5442,7 @@ static void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen,
    This function is called for each extension, in reverse load order (see
    below).
 */
-static void PASCAL FAR TTXEnd(void)
+static void PASCAL TTXEnd(void)
 {
 	uninit_TTSSH(pvar);
 
@@ -5487,7 +5487,7 @@ static TTXExports Exports = {
 };
 
 BOOL __declspec(dllexport)
-PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports)
+PASCAL TTXBind(WORD Version, TTXExports *exports)
 {
 	int size = sizeof(Exports) - sizeof(exports->size);
 	/* do version checking if necessary */
@@ -5496,8 +5496,8 @@ PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports)
 	if (size > exports->size) {
 		size = exports->size;
 	}
-	memcpy((char FAR *) exports + sizeof(exports->size),
-		   (char FAR *) &Exports + sizeof(exports->size), size);
+	memcpy((char *) exports + sizeof(exports->size),
+		   (char *) &Exports + sizeof(exports->size), size);
 	return TRUE;
 }
 

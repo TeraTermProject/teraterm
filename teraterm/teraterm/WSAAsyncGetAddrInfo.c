@@ -9,23 +9,23 @@
 #include "WSAASyncGetAddrInfo.h"
 #include "ttwsk.h"
 
-static unsigned __stdcall getaddrinfo_thread(void FAR * p);
+static unsigned __stdcall getaddrinfo_thread(void * p);
 
-HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
-                           const char FAR * hostname,
-                           const char FAR * portname,
-                           struct addrinfo FAR * hints,
-                           struct addrinfo FAR * FAR * res)
+HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
+                           const char *hostname,
+                           const char *portname,
+                           struct addrinfo *hints,
+                           struct addrinfo **res)
 {
 	HANDLE thread;
 	unsigned tid;
-	struct getaddrinfo_args FAR * ga;
+	struct getaddrinfo_args * ga;
 
 	/*
 	* allocate structure to pass args to sub-thread dynamically
 	* WSAAsyncGetAddrInfo() is reentrant
 	*/
-	if ((ga = (struct getaddrinfo_args FAR *)malloc(sizeof(struct getaddrinfo_args))) == NULL)
+	if ((ga = (struct getaddrinfo_args *)malloc(sizeof(struct getaddrinfo_args))) == NULL)
 		return NULL;
 
 	/* packing arguments struct addrinfo_args */
@@ -36,7 +36,7 @@ HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 	ga->hints = *hints; // ポインタだけ渡すと、スレッド先で不定となる。(2016.3.11 yutaka)
 	ga->res = res;
 
-	ga->lpHandle = (HANDLE FAR *)malloc(sizeof(HANDLE));
+	ga->lpHandle = (HANDLE *)malloc(sizeof(HANDLE));
 	if (ga->lpHandle == NULL) {
 		free(ga->hostname);
 		free(ga->portname);
@@ -59,19 +59,19 @@ HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
 		return (HANDLE)thread;
 }
 
-static unsigned __stdcall getaddrinfo_thread(void FAR * p)
+static unsigned __stdcall getaddrinfo_thread(void * p)
 {
 	int gai;
 	HWND hWnd;
 	unsigned int wMsg;
-	const char FAR * hostname;
-	const char FAR * portname;
-	struct addrinfo FAR * hints;
-	struct addrinfo FAR * FAR * res;
-	struct getaddrinfo_args FAR * ga;
+	const char *hostname;
+	const char *portname;
+	struct addrinfo *hints;
+	struct addrinfo **res;
+	struct getaddrinfo_args *ga;
 
 	/* unpacking arguments */
-	ga = (struct getaddrinfo_args FAR *)p;
+	ga = (struct getaddrinfo_args *)p;
 	hWnd = ga->hWnd;
 	wMsg = ga->wMsg;
 	hostname = ga->hostname;

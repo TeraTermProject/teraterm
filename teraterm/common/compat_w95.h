@@ -35,7 +35,7 @@ extern "C" {
 void __stdcall DoCover_IsDebuggerPresent()
 {
     DWORD dw;
-    DWORD_PTR FAR* lpdw;
+    DWORD_PTR *lpdw;
     OSVERSIONINFO osvi;
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     // Windows95 でなければここでおわり
@@ -47,7 +47,7 @@ void __stdcall DoCover_IsDebuggerPresent()
         return;
     }
     // 横取り関数を設定するアドレスを取得
-    lpdw = (DWORD_PTR FAR*) &_imp__IsDebuggerPresent;
+    lpdw = (DWORD_PTR *) &_imp__IsDebuggerPresent;
     // このアドレスを書き込めるように設定
     // (同じプログラム内なので障害なく行える)
     VirtualProtect(lpdw, sizeof(DWORD_PTR), PAGE_READWRITE, &dw);

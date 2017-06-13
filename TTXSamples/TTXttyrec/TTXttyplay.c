@@ -53,7 +53,7 @@ typedef struct {
 	char origOLDTitle[TitleBuffSize];
 } TInstVar;
 
-static TInstVar FAR * pvar;
+static TInstVar *pvar;
 static TInstVar InstVar;
 
 #define GetFileMenu(menu)	GetSubMenuByChildID(menu, ID_FILE_NEWCONNECTION)
@@ -293,7 +293,7 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 	return TRUE;
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
 	if (pvar->cv->PortType == IdFile && pvar->enable) {
 		pvar->origPReadFile = *hooks->PReadFile;
 		pvar->origPWriteFile = *hooks->PWriteFile;
@@ -304,7 +304,7 @@ static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
 	}
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
 	if (pvar->origPReadFile) {
 		*hooks->PReadFile = pvar->origPReadFile;
 	}
@@ -370,7 +370,7 @@ static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
 	pvar->speed = GetPrivateProfileInt(INISECTION, "Speed", 0, fn);
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
+static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	pvar->origParseParam = *hooks->ParseParam;
 	*hooks->ParseParam = TTXParseParam;
 	pvar->origReadIniFile = *hooks->ReadIniFile;
@@ -424,7 +424,7 @@ static BOOL FAR PASCAL TTXGetHostName(HWND parent, PGetHNRec GetHNRec) {
 	return (TRUE);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
+static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
 	if (pvar->ChangeTitle) {
 		pvar->ChangeTitle = FALSE;
 		*hooks->SetupWin = TTXSetupWin;
@@ -455,14 +455,14 @@ static TTXExports Exports = {
 	TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 
 	if (size > exports->size) {
 		size = exports->size;
 	}
-	memcpy((char FAR *)exports + sizeof(exports->size),
-		(char FAR *)&Exports + sizeof(exports->size),
+	memcpy((char *)exports + sizeof(exports->size),
+		(char *)&Exports + sizeof(exports->size),
 		size);
 	return TRUE;
 }

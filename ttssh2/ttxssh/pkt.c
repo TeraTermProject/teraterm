@@ -144,7 +144,7 @@ static int recv_line_data(PTInstVar pvar)
    -- reads data from the sshd and feeds the SSH protocol packets to ssh.c
    -- copies any available decrypted session data into the application buffer
 */
-int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen)
+int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 {
 	int amount_in_buf = 0;
 	BOOL connection_closed = FALSE;
@@ -197,7 +197,7 @@ int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen)
 		} else if (pvar->pkt_state.seen_server_ID
 		           && pvar->pkt_state.datalen >=
 		           (unsigned int) SSH_get_min_packet_size(pvar)) {
-			char FAR *data =
+			char *data =
 				pvar->pkt_state.buf + pvar->pkt_state.datastart;
 			uint32 padding;
 			uint32 pktsize;

@@ -1010,8 +1010,8 @@ typedef struct {
 	WORD NoMsg;
 	/* if TRUE, teraterm trys to connect other protocol family */
 	BOOL RetryWithOtherProtocol;
-	struct addrinfo FAR * res0;
-	struct addrinfo FAR * res;
+	struct addrinfo * res0;
+	struct addrinfo * res;
 	char *Locale;
 	int *CodePage;
 	int *ConnetingTimeout;

@@ -13,64 +13,64 @@ int PASCAL DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 int PASCAL CheckComPort(WORD ComPort);
 void PASCAL CopyShmemToTTSet(PTTSet ts);
 void PASCAL CopyTTSetToShmem(PTTSet ts);
-BOOL FAR PASCAL StartTeraTerm(PTTSet ts);
-void PASCAL FAR RestartTeraTerm(HWND hwnd, PTTSet ts);
-void FAR PASCAL ChangeDefaultSet(PTTSet ts, PKeyMap km);
-void FAR PASCAL GetDefaultSet(PTTSet ts);
-// void FAR PASCAL LoadDefaultSet(PCHAR SetupFName);
-WORD FAR PASCAL GetKeyCode(PKeyMap KeyMap, WORD Scan);
-void FAR PASCAL GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
+BOOL PASCAL StartTeraTerm(PTTSet ts);
+void PASCAL RestartTeraTerm(HWND hwnd, PTTSet ts);
+void PASCAL ChangeDefaultSet(PTTSet ts, PKeyMap km);
+void PASCAL GetDefaultSet(PTTSet ts);
+// void PASCAL LoadDefaultSet(PCHAR SetupFName);
+WORD PASCAL GetKeyCode(PKeyMap KeyMap, WORD Scan);
+void PASCAL GetKeyStr(HWND HWin, PKeyMap KeyMap, WORD KeyCode,
                           BOOL AppliKeyMode, BOOL AppliCursorMode,
                           BOOL Send8BitMode, PCHAR KeyStr,
                           int destlen, LPINT Len, LPWORD Type);
 
-void FAR PASCAL SetCOMFlag(int com);
-void FAR PASCAL ClearCOMFlag(int com);
-int FAR PASCAL CheckCOMFlag(int com);
+void PASCAL SetCOMFlag(int com);
+void PASCAL ClearCOMFlag(int com);
+int PASCAL CheckCOMFlag(int com);
 
-int FAR PASCAL RegWin(HWND HWinVT, HWND HWinTEK);
-void FAR PASCAL UnregWin(HWND HWin);
-void FAR PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag);
-void FAR PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
-void FAR PASCAL SelectWin(int WinId);
-void FAR PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
-HWND FAR PASCAL GetNthWin(int n);
-void FAR PASCAL ShowAllWin(int stat);
-void FAR PASCAL ShowAllWinSidebySide(HWND);
-void FAR PASCAL ShowAllWinStacked(HWND);
-void FAR PASCAL ShowAllWinCascade(HWND);
-void FAR PASCAL BroadcastClosingMessage(HWND myhwnd);
-void FAR PASCAL UndoAllWin();
-void FAR PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
+int PASCAL RegWin(HWND HWinVT, HWND HWinTEK);
+void PASCAL UnregWin(HWND HWin);
+void PASCAL SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag);
+void PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
+void PASCAL SelectWin(int WinId);
+void PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
+HWND PASCAL GetNthWin(int n);
+void PASCAL ShowAllWin(int stat);
+void PASCAL ShowAllWinSidebySide(HWND);
+void PASCAL ShowAllWinStacked(HWND);
+void PASCAL ShowAllWinCascade(HWND);
+void PASCAL BroadcastClosingMessage(HWND myhwnd);
+void PASCAL UndoAllWin();
+void PASCAL OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
 
-int FAR PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
-int FAR PASCAL CommRead1Byte(PComVar cv, LPBYTE b);
-void FAR PASCAL CommInsert1Byte(PComVar cv, BYTE b);
-int FAR PASCAL CommRawOut(PComVar cv, PCHAR B, int C);
-int FAR PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C);
-int FAR PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
-int FAR PASCAL CommTextOut(PComVar cv, PCHAR B, int C);
-int FAR PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
-int FAR PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);
+int PASCAL CommReadRawByte(PComVar cv, LPBYTE b);
+int PASCAL CommRead1Byte(PComVar cv, LPBYTE b);
+void PASCAL CommInsert1Byte(PComVar cv, BYTE b);
+int PASCAL CommRawOut(PComVar cv, PCHAR B, int C);
+int PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C);
+int PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
+int PASCAL CommTextOut(PComVar cv, PCHAR B, int C);
+int PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
+int PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);
 
-void FAR PASCAL CreateNotifyIcon(PComVar cv);
-void FAR PASCAL DeleteNotifyIcon(PComVar cv);
-void FAR PASCAL NotifyMessage(PComVar cv, PCHAR message, PCHAR title, DWORD flag);
-void FAR PASCAL ShowNotifyIcon(PComVar cv);
-void FAR PASCAL HideNotifyIcon(PComVar cv);
-void FAR PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
-void FAR PASCAL SetCustomNotifyIcon(HICON icon);
-HICON FAR PASCAL GetCustomNotifyIcon();
+void PASCAL CreateNotifyIcon(PComVar cv);
+void PASCAL DeleteNotifyIcon(PComVar cv);
+void PASCAL NotifyMessage(PComVar cv, PCHAR message, PCHAR title, DWORD flag);
+void PASCAL ShowNotifyIcon(PComVar cv);
+void PASCAL HideNotifyIcon(PComVar cv);
+void PASCAL SetVerNotifyIcon(PComVar cv, unsigned int ver);
+void PASCAL SetCustomNotifyIcon(HICON icon);
+HICON PASCAL GetCustomNotifyIcon();
 
 #define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
 #define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)
 #define NotifyErrorMessage(cv, msg, title) NotifyMessage(cv, msg, title, 3)
 
-WORD FAR PASCAL SJIS2JIS(WORD KCode);
-WORD FAR PASCAL SJIS2EUC(WORD KCode);
-WORD FAR PASCAL JIS2SJIS(WORD KCode);
-BYTE FAR PASCAL RussConv(int cin, int cout, BYTE b);
-void FAR PASCAL RussConvStr
+WORD PASCAL SJIS2JIS(WORD KCode);
+WORD PASCAL SJIS2EUC(WORD KCode);
+WORD PASCAL JIS2SJIS(WORD KCode);
+BYTE PASCAL RussConv(int cin, int cout, BYTE b);
+void PASCAL RussConvStr
   (int cin, int cout, PCHAR Str, int count);
 
 #ifdef __cplusplus

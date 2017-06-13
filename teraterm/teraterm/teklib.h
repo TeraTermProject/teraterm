@@ -8,43 +8,43 @@
 extern "C" {
 #endif
 
-typedef void (FAR PASCAL *PTEKInit)
+typedef void (PASCAL *PTEKInit)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKResizeWindow)
+typedef void (PASCAL *PTEKResizeWindow)
   (PTEKVar tk, PTTSet ts, int W, int H);
-typedef void (FAR PASCAL *PTEKChangeCaret)
+typedef void (PASCAL *PTEKChangeCaret)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKDestroyCaret)
+typedef void (PASCAL *PTEKDestroyCaret)
   (PTEKVar tk, PTTSet ts);
-typedef int (FAR PASCAL *PTEKParse)
+typedef int (PASCAL *PTEKParse)
   (PTEKVar tk, PTTSet ts, PComVar cv);
-typedef void (FAR PASCAL *PTEKReportGIN)
+typedef void (PASCAL *PTEKReportGIN)
   (PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode);
-typedef void (FAR PASCAL *PTEKPaint)
+typedef void (PASCAL *PTEKPaint)
   (PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo);
-typedef void (FAR PASCAL *PTEKWMLButtonDown)
+typedef void (PASCAL *PTEKWMLButtonDown)
   (PTEKVar tk, PTTSet ts, PComVar cv, POINT pos);
-typedef void (FAR PASCAL *PTEKWMLButtonUp)
+typedef void (PASCAL *PTEKWMLButtonUp)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKWMMouseMove)
+typedef void (PASCAL *PTEKWMMouseMove)
   (PTEKVar tk, PTTSet ts, POINT p);
-typedef void (FAR PASCAL *PTEKWMSize)
+typedef void (PASCAL *PTEKWMSize)
   (PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy);
-typedef void (FAR PASCAL *PTEKCMCopy)
+typedef void (PASCAL *PTEKCMCopy)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKCMCopyScreen)
+typedef void (PASCAL *PTEKCMCopyScreen)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKPrint)
+typedef void (PASCAL *PTEKPrint)
   (PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag);
-typedef void (FAR PASCAL *PTEKClearScreen)
+typedef void (PASCAL *PTEKClearScreen)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKSetupFont)
+typedef void (PASCAL *PTEKSetupFont)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKResetWin)
+typedef void (PASCAL *PTEKResetWin)
   (PTEKVar tk, PTTSet ts, WORD EmuOld);
-typedef void (FAR PASCAL *PTEKRestoreSetup)
+typedef void (PASCAL *PTEKRestoreSetup)
   (PTEKVar tk, PTTSet ts);
-typedef void (FAR PASCAL *PTEKEnd)
+typedef void (PASCAL *PTEKEnd)
   (PTEKVar tk);
 
 extern PTEKInit TEKInit;

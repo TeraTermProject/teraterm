@@ -28,7 +28,7 @@ typedef struct {
   BOOL ontop;
 } TInstVar;
 
-static TInstVar FAR * pvar;
+static TInstVar *pvar;
 static TInstVar InstVar;
 
 #define GetFileMenu(menu)	GetSubMenuByChildID(menu, ID_FILE_NEWCONNECTION)
@@ -130,14 +130,14 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {
     size = exports->size;
   }
-  memcpy((char FAR *)exports + sizeof(exports->size),
-    (char FAR *)&Exports + sizeof(exports->size),
+  memcpy((char *)exports + sizeof(exports->size),
+    (char *)&Exports + sizeof(exports->size),
     size);
   return TRUE;
 }

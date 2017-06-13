@@ -72,23 +72,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CMP(a,b) memcmp(a, b, SSH_BLOCKSIZE)
 
 
-static char FAR *get_cipher_name(int cipher);
+static char *get_cipher_name(int cipher);
 
-static void crc_update(uint32 FAR * a, uint32 b)
+static void crc_update(uint32 *a, uint32 b)
 {
 	b ^= *a;
-	*a = do_crc((unsigned char FAR *) &b, sizeof(b));
+	*a = do_crc((unsigned char *) &b, sizeof(b));
 }
 
 /* check_crc
    detects if a block is used in a particular pattern
 */
 
-static int check_crc(unsigned char FAR * S, unsigned char FAR * buf,
-                     uint32 len, unsigned char FAR * IV)
+static int check_crc(unsigned char *S, unsigned char *buf,
+                     uint32 len, unsigned char *IV)
 {
 	uint32 crc;
-	unsigned char FAR *c;
+	unsigned char *c;
 
 	crc = 0;
 	if (IV && !CMP(S, IV)) {
@@ -113,27 +113,27 @@ static int check_crc(unsigned char FAR * S, unsigned char FAR * buf,
 detect_attack
 Detects a crc32 compensation attack on a packet
 */
-static int detect_attack(CRYPTDetectAttack FAR * statics,
-                         unsigned char FAR * buf, uint32 len,
-                         unsigned char *FAR IV)
+static int detect_attack(CRYPTDetectAttack *statics,
+                         unsigned char *buf, uint32 len,
+                         unsigned char *IV)
 {
-	uint32 FAR *h = statics->h;
+	uint32 *h = statics->h;
 	uint32 n = statics->n;
 	uint32 i, j;
 	uint32 l;
-	unsigned char FAR *c;
-	unsigned char FAR *d;
+	unsigned char *c;
+	unsigned char *d;
 
 	for (l = n; l < HASH_FACTOR(len / SSH_BLOCKSIZE); l = l << 2) {
 	}
 
 	if (h == NULL) {
 		n = l;
-		h = (uint32 FAR *) malloc(n * HASH_ENTRYSIZE);
+		h = (uint32 *) malloc(n * HASH_ENTRYSIZE);
 	} else {
 		if (l > n) {
 			n = l;
-			h = (uint32 FAR *) realloc(h, n * HASH_ENTRYSIZE);
+			h = (uint32 *) realloc(h, n * HASH_ENTRYSIZE);
 		}
 	}
 
@@ -188,7 +188,7 @@ static int detect_attack(CRYPTDetectAttack FAR * statics,
 	return DEATTACK_OK;
 }
 
-BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char FAR * buf,
+BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf,
                          int bytes)
 {
 	if (SSHv1(pvar)) {
@@ -204,11 +204,11 @@ BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char FAR * buf,
 	}
 }
 
-static void no_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void no_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
 }
 
-static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
 	unsigned char *newbuf;
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
@@ -242,7 +242,7 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char FAR * buf, int byte
 	free(newbuf);
 }
 
-static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
 	unsigned char *newbuf;
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
@@ -276,9 +276,9 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char FAR * buf, int byte
 	free(newbuf);
 }
 
-static void c3DES_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void c3DES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	Cipher3DESState FAR *encryptstate = &pvar->crypt_state.enc.c3DES;
+	Cipher3DESState *encryptstate = &pvar->crypt_state.enc.c3DES;
 
 	DES_ncbc_encrypt(buf, buf, bytes,
 	                 &encryptstate->k1, &encryptstate->ivec1, DES_ENCRYPT);
@@ -288,9 +288,9 @@ static void c3DES_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
 	                 &encryptstate->k3, &encryptstate->ivec3, DES_ENCRYPT);
 }
 
-static void c3DES_decrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void c3DES_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	Cipher3DESState FAR *decryptstate = &pvar->crypt_state.dec.c3DES;
+	Cipher3DESState *decryptstate = &pvar->crypt_state.dec.c3DES;
 
 	DES_ncbc_encrypt(buf, buf, bytes,
 	                 &decryptstate->k3, &decryptstate->ivec3, DES_DECRYPT);
@@ -300,25 +300,25 @@ static void c3DES_decrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
 	                 &decryptstate->k1, &decryptstate->ivec1, DES_DECRYPT);
 }
 
-static void cDES_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void cDES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	CipherDESState FAR *encryptstate = &pvar->crypt_state.enc.cDES;
+	CipherDESState *encryptstate = &pvar->crypt_state.enc.cDES;
 
 	DES_ncbc_encrypt(buf, buf, bytes,
 	                 &encryptstate->k, &encryptstate->ivec, DES_ENCRYPT);
 }
 
-static void cDES_decrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void cDES_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	CipherDESState FAR *decryptstate = &pvar->crypt_state.dec.cDES;
+	CipherDESState *decryptstate = &pvar->crypt_state.dec.cDES;
 
 	DES_ncbc_encrypt(buf, buf, bytes,
 	                 &decryptstate->k, &decryptstate->ivec, DES_DECRYPT);
 }
 
-static void flip_endianness(unsigned char FAR * cbuf, int bytes)
+static void flip_endianness(unsigned char *cbuf, int bytes)
 {
-	uint32 FAR *buf = (uint32 FAR *) cbuf;
+	uint32 *buf = (uint32 *) cbuf;
 	int count = bytes / 4;
 
 	while (count > 0) {
@@ -331,9 +331,9 @@ static void flip_endianness(unsigned char FAR * cbuf, int bytes)
 	}
 }
 
-static void cBlowfish_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void cBlowfish_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	CipherBlowfishState FAR *encryptstate =
+	CipherBlowfishState *encryptstate =
 		&pvar->crypt_state.enc.cBlowfish;
 
 	flip_endianness(buf, bytes);
@@ -342,9 +342,9 @@ static void cBlowfish_encrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes
 	flip_endianness(buf, bytes);
 }
 
-static void cBlowfish_decrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+static void cBlowfish_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	CipherBlowfishState FAR *decryptstate =
+	CipherBlowfishState *decryptstate =
 		&pvar->crypt_state.dec.cBlowfish;
 
 	flip_endianness(buf, bytes);
@@ -353,7 +353,7 @@ static void cBlowfish_decrypt(PTInstVar pvar, unsigned char FAR * buf, int bytes
 	flip_endianness(buf, bytes);
 }
 
-void CRYPT_set_random_data(PTInstVar pvar, unsigned char FAR * buf, int bytes)
+void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, int bytes)
 {
 	RAND_bytes(buf, bytes);
 }
@@ -365,7 +365,7 @@ void CRYPT_initialize_random_numbers(PTInstVar pvar)
 	//RAND_screen();
 }
 
-static BIGNUM FAR *get_bignum(unsigned char FAR * bytes)
+static BIGNUM *get_bignum(unsigned char *bytes)
 {
 	int bits = get_ushort16_MSBfirst(bytes);
 
@@ -373,11 +373,11 @@ static BIGNUM FAR *get_bignum(unsigned char FAR * bytes)
 }
 
 // make_key()を fingerprint 生成でも利用するので、staticを削除。(2006.3.27 yutaka)
-RSA FAR *make_key(PTInstVar pvar,
-                  int bits, unsigned char FAR * exp,
-                  unsigned char FAR * mod)
+RSA *make_key(PTInstVar pvar,
+                  int bits, unsigned char *exp,
+                  unsigned char *mod)
 {
-	RSA FAR *key = RSA_new();
+	RSA *key = RSA_new();
 
 	if (key != NULL) {
 		key->e = get_bignum(exp);
@@ -405,7 +405,7 @@ RSA FAR *make_key(PTInstVar pvar,
 	}
 }
 
-void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char FAR * cookie)
+void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char *cookie)
 {
 	if (SSHv1(pvar)) {
 		memcpy(pvar->crypt_state.server_cookie, cookie, SSH_COOKIE_LENGTH);
@@ -415,7 +415,7 @@ void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char FAR * cookie)
 	}
 }
 
-void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char FAR * cookie)
+void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char *cookie)
 {
 	if (SSHv2(pvar)) {
 		memcpy(pvar->crypt_state.client_cookie, cookie,
@@ -424,8 +424,8 @@ void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char FAR * cookie)
 }
 
 BOOL CRYPT_set_server_RSA_key(PTInstVar pvar,
-                              int bits, unsigned char FAR * exp,
-                              unsigned char FAR * mod)
+                              int bits, unsigned char *exp,
+                              unsigned char *mod)
 {
 	pvar->crypt_state.server_key.RSA_key = make_key(pvar, bits, exp, mod);
 
@@ -433,8 +433,8 @@ BOOL CRYPT_set_server_RSA_key(PTInstVar pvar,
 }
 
 BOOL CRYPT_set_host_RSA_key(PTInstVar pvar,
-                            int bits, unsigned char FAR * exp,
-                            unsigned char FAR * mod)
+                            int bits, unsigned char *exp,
+                            unsigned char *mod)
 {
 	pvar->crypt_state.host_key.RSA_key = make_key(pvar, bits, exp, mod);
 
@@ -544,7 +544,7 @@ int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 // ※本関数は SSH2 でのみ使用される。
 // (2004.12.17 yutaka)
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
-	char FAR * data, int len, char FAR * MAC)
+	char *data, int len, char *MAC)
 {
 	HMAC_CTX c;
 	unsigned char m[EVP_MAX_MD_SIZE];
@@ -605,7 +605,7 @@ int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 
 // for SSH2
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
-                            char FAR * data, int len, char FAR * MAC)
+                            char *data, int len, char *MAC)
 {
 	HMAC_CTX c;
 	static u_char m[EVP_MAX_MD_SIZE];
@@ -697,7 +697,7 @@ int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 }
 
 int CRYPT_choose_session_key(PTInstVar pvar,
-                             unsigned char FAR * encrypted_key_buf)
+                             unsigned char *encrypted_key_buf)
 {
 	int server_key_bits =
 		BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
@@ -724,7 +724,7 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 		/* following Goldberg's code, I'm using MD5(servkey->n || hostkey->n || cookie)
 		   for the session ID, rather than the one specified in the RFC */
 		int session_buf_len = server_key_bytes + host_key_bytes + 8;
-		char FAR *session_buf = (char FAR *) malloc(session_buf_len);
+		char *session_buf = (char *) malloc(session_buf_len);
 		char session_id[16];
 		int i;
 
@@ -795,9 +795,9 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 }
 
 int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
-                                          unsigned char FAR * challenge,
+                                          unsigned char *challenge,
                                           int challenge_len,
-                                          unsigned char FAR * response)
+                                          unsigned char *response)
 {
 	int server_key_bits =
 		BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);
@@ -805,7 +805,7 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 	int server_key_bytes = (server_key_bits + 7) / 8;
 	int host_key_bytes = (host_key_bits + 7) / 8;
 	int session_buf_len = server_key_bytes + host_key_bytes + 8;
-	char FAR *session_buf = (char FAR *) malloc(session_buf_len);
+	char *session_buf = (char *) malloc(session_buf_len);
 	char decrypted_challenge[48];
 	int decrypted_challenge_len;
 
@@ -843,24 +843,24 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 	return 1;
 }
 
-static void c3DES_init(char FAR * session_key, Cipher3DESState FAR * state)
+static void c3DES_init(char *session_key, Cipher3DESState *state)
 {
-	DES_set_key((const_DES_cblock FAR *) session_key, &state->k1);
-	DES_set_key((const_DES_cblock FAR *) (session_key + 8), &state->k2);
-	DES_set_key((const_DES_cblock FAR *) (session_key + 16), &state->k3);
+	DES_set_key((const_DES_cblock *) session_key, &state->k1);
+	DES_set_key((const_DES_cblock *) (session_key + 8), &state->k2);
+	DES_set_key((const_DES_cblock *) (session_key + 16), &state->k3);
 	memset(state->ivec1, 0, 8);
 	memset(state->ivec2, 0, 8);
 	memset(state->ivec3, 0, 8);
 }
 
-static void cDES_init(char FAR * session_key, CipherDESState FAR * state)
+static void cDES_init(char *session_key, CipherDESState *state)
 {
-	DES_set_key((const_DES_cblock FAR *) session_key, &state->k);
+	DES_set_key((const_DES_cblock *) session_key, &state->k);
 	memset(state->ivec, 0, 8);
 }
 
-static void cBlowfish_init(char FAR * session_key,
-                           CipherBlowfishState FAR * state)
+static void cBlowfish_init(char *session_key,
+                           CipherBlowfishState *state)
 {
 	BF_set_key(&state->k, 32, session_key);
 	memset(state->ivec, 0, 8);
@@ -940,8 +940,8 @@ void cipher_cleanup_SSH2(EVP_CIPHER_CTX *evp)
 BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 {
 	struct Enc *enc;
-	char FAR *encryption_key = pvar->crypt_state.sender_cipher_key;
-	char FAR *decryption_key = pvar->crypt_state.receiver_cipher_key;
+	char *encryption_key = pvar->crypt_state.sender_cipher_key;
+	char *decryption_key = pvar->crypt_state.receiver_cipher_key;
 	int cipher;
 	BOOL isOK = TRUE;
 
@@ -1061,7 +1061,7 @@ void CRYPT_init(PTInstVar pvar)
 		HASH_MINSIZE / HASH_ENTRYSIZE;
 }
 
-static char FAR *get_cipher_name(int cipher)
+static char *get_cipher_name(int cipher)
 {
 	switch (cipher) {
 	case SSH_CIPHER_NONE:
@@ -1122,7 +1122,7 @@ static char FAR *get_cipher_name(int cipher)
 	}
 }
 
-void CRYPT_get_cipher_info(PTInstVar pvar, char FAR * dest, int len)
+void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)
 {
 	UTIL_get_lang_msg("DLG_ABOUT_CIPHER_INFO", pvar,
 	                  "%s to server, %s from server");
@@ -1131,7 +1131,7 @@ void CRYPT_get_cipher_info(PTInstVar pvar, char FAR * dest, int len)
 	          get_cipher_name(pvar->crypt_state.receiver_cipher));
 }
 
-void CRYPT_get_server_key_info(PTInstVar pvar, char FAR * dest, int len)
+void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 {
 	if (SSHv1(pvar)) {
 		if (pvar->crypt_state.server_key.RSA_key == NULL
@@ -1191,8 +1191,8 @@ void CRYPT_end(PTInstVar pvar)
 	SecureZeroMemory(&pvar->crypt_state.dec, sizeof(pvar->crypt_state.dec));
 }
 
-int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase,
-                             char FAR * buf, int bytes)
+int CRYPT_passphrase_decrypt(int cipher, char *passphrase,
+                             char *buf, int bytes)
 {
 	unsigned char passphrase_key[16];
 
@@ -1202,11 +1202,11 @@ int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase,
 	case SSH_CIPHER_3DES:{
 			Cipher3DESState state;
 
-			DES_set_key((const_DES_cblock FAR *) passphrase_key,
+			DES_set_key((const_DES_cblock *) passphrase_key,
 			            &state.k1);
-			DES_set_key((const_DES_cblock FAR *) (passphrase_key + 8),
+			DES_set_key((const_DES_cblock *) (passphrase_key + 8),
 			            &state.k2);
-			DES_set_key((const_DES_cblock FAR *) passphrase_key,
+			DES_set_key((const_DES_cblock *) passphrase_key,
 			            &state.k3);
 			memset(state.ivec1, 0, 8);
 			memset(state.ivec2, 0, 8);

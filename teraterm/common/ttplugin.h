@@ -14,72 +14,72 @@
 #include "ttfileio.h"
 
 typedef struct {
-  Tclosesocket FAR * Pclosesocket;
-  Tconnect FAR * Pconnect;
-  Thtonl FAR * Phtonl;
-  Thtons FAR * Phtons;
-  Tinet_addr FAR * Pinet_addr;
-  Tioctlsocket FAR * Pioctlsocket;
-  Trecv FAR * Precv;
-  Tselect FAR * Pselect;
-  Tsend FAR * Psend;
-  Tsetsockopt FAR * Psetsockopt;
-  Tsocket FAR * Psocket;
-  TWSAAsyncSelect FAR * PWSAAsyncSelect;
-  TWSAAsyncGetHostByName FAR * PWSAAsyncGetHostByName;
-  TWSACancelAsyncRequest FAR * PWSACancelAsyncRequest;
-  TWSAGetLastError FAR * PWSAGetLastError;
-//  Tgetaddrinfo FAR * Pgetaddrinfo;
-  Tfreeaddrinfo FAR * Pfreeaddrinfo;
-  TWSAAsyncGetAddrInfo FAR * PWSAAsyncGetAddrInfo;
+  Tclosesocket * Pclosesocket;
+  Tconnect * Pconnect;
+  Thtonl * Phtonl;
+  Thtons * Phtons;
+  Tinet_addr * Pinet_addr;
+  Tioctlsocket * Pioctlsocket;
+  Trecv * Precv;
+  Tselect * Pselect;
+  Tsend * Psend;
+  Tsetsockopt * Psetsockopt;
+  Tsocket * Psocket;
+  TWSAAsyncSelect * PWSAAsyncSelect;
+  TWSAAsyncGetHostByName * PWSAAsyncGetHostByName;
+  TWSACancelAsyncRequest * PWSACancelAsyncRequest;
+  TWSAGetLastError * PWSAGetLastError;
+//  Tgetaddrinfo * Pgetaddrinfo;
+  Tfreeaddrinfo * Pfreeaddrinfo;
+  TWSAAsyncGetAddrInfo * PWSAAsyncGetAddrInfo;
 } TTXSockHooks;
 
 typedef struct {
-  TCreateFile FAR * PCreateFile;
-  TCloseFile FAR * PCloseFile;
-  TReadFile FAR * PReadFile;
-  TWriteFile FAR * PWriteFile;
+  TCreateFile * PCreateFile;
+  TCloseFile * PCloseFile;
+  TReadFile * PReadFile;
+  TWriteFile * PWriteFile;
 } TTXFileHooks;
 
 typedef struct {
-  PReadIniFile FAR * ReadIniFile;
-  PWriteIniFile FAR * WriteIniFile;
-  PReadKeyboardCnf FAR * ReadKeyboardCnf;
-  PCopyHostList FAR * CopyHostList;
-  PAddHostToList FAR * AddHostToList;
-  PParseParam FAR * ParseParam;
+  PReadIniFile * ReadIniFile;
+  PWriteIniFile * WriteIniFile;
+  PReadKeyboardCnf * ReadKeyboardCnf;
+  PCopyHostList * CopyHostList;
+  PAddHostToList * AddHostToList;
+  PParseParam * ParseParam;
 } TTXSetupHooks;
 
 typedef struct {
-  PSetupTerminal FAR * SetupTerminal;
-  PSetupWin FAR * SetupWin;
-  PSetupKeyboard FAR * SetupKeyboard;
-  PSetupSerialPort FAR * SetupSerialPort;
-  PSetupTCPIP FAR * SetupTCPIP;
-  PGetHostName FAR * GetHostName;
-  PChangeDirectory FAR * ChangeDirectory;
-  PAboutDialog FAR * AboutDialog;
-  PChooseFontDlg FAR * ChooseFontDlg;
-  PSetupGeneral FAR * SetupGeneral;
-  PWindowWindow FAR * WindowWindow;
+  PSetupTerminal * SetupTerminal;
+  PSetupWin * SetupWin;
+  PSetupKeyboard * SetupKeyboard;
+  PSetupSerialPort * SetupSerialPort;
+  PSetupTCPIP * SetupTCPIP;
+  PGetHostName * GetHostName;
+  PChangeDirectory * ChangeDirectory;
+  PAboutDialog * AboutDialog;
+  PChooseFontDlg * ChooseFontDlg;
+  PSetupGeneral * SetupGeneral;
+  PWindowWindow * WindowWindow;
 } TTXUIHooks;
 
 typedef struct {
   int size;
   int loadOrder; /* smaller numbers get loaded first */
-  void (PASCAL FAR * TTXInit)(PTTSet ts, PComVar cv); /* called first to last */
-  void (PASCAL FAR * TTXGetUIHooks)(TTXUIHooks FAR * UIHooks); /* called first to last */
-  void (PASCAL FAR * TTXGetSetupHooks)(TTXSetupHooks FAR * setupHooks); /* called first to last */
-  void (PASCAL FAR * TTXOpenTCP)(TTXSockHooks FAR * hooks); /* called first to last */
-  void (PASCAL FAR * TTXCloseTCP)(TTXSockHooks FAR * hooks); /* called last to first */
-  void (PASCAL FAR * TTXSetWinSize)(int rows, int cols); /* called first to last */
-  void (PASCAL FAR * TTXModifyMenu)(HMENU menu); /* called first to last */
-  void (PASCAL FAR * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
-  int (PASCAL FAR * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
-  void (PASCAL FAR * TTXEnd)(void); /* called last to first */
-  void (PASCAL FAR * TTXSetCommandLine)(PCHAR cmd, int cmdlen, PGetHNRec rec); /* called first to last */
-  void (PASCAL FAR * TTXOpenFile)(TTXFileHooks FAR * hooks); /* called first to last */
-  void (PASCAL FAR * TTXCloseFile)(TTXFileHooks FAR * hooks); /* called last to first */
+  void (PASCAL * TTXInit)(PTTSet ts, PComVar cv); /* called first to last */
+  void (PASCAL * TTXGetUIHooks)(TTXUIHooks * UIHooks); /* called first to last */
+  void (PASCAL * TTXGetSetupHooks)(TTXSetupHooks * setupHooks); /* called first to last */
+  void (PASCAL * TTXOpenTCP)(TTXSockHooks * hooks); /* called first to last */
+  void (PASCAL * TTXCloseTCP)(TTXSockHooks * hooks); /* called last to first */
+  void (PASCAL * TTXSetWinSize)(int rows, int cols); /* called first to last */
+  void (PASCAL * TTXModifyMenu)(HMENU menu); /* called first to last */
+  void (PASCAL * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
+  int (PASCAL * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
+  void (PASCAL * TTXEnd)(void); /* called last to first */
+  void (PASCAL * TTXSetCommandLine)(PCHAR cmd, int cmdlen, PGetHNRec rec); /* called first to last */
+  void (PASCAL * TTXOpenFile)(TTXFileHooks * hooks); /* called first to last */
+  void (PASCAL * TTXCloseFile)(TTXFileHooks * hooks); /* called last to first */
 } TTXExports;
 
 /* On entry, 'size' is set to the size of the structure and the rest of
@@ -88,6 +88,6 @@ typedef struct {
    default behaviour, i.e. do nothing.
    This is all for binary compatibility across releases; if the record gets bigger,
    then the extra functions will be NULL for DLLs that don't understand them. */
-typedef BOOL (PASCAL FAR * TTXBindProc)(WORD Version, TTXExports FAR * exports);
+typedef BOOL (PASCAL * TTXBindProc)(WORD Version, TTXExports * exports);
 
 #endif

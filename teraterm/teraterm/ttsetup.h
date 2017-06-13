@@ -7,21 +7,21 @@
 extern "C" {
 #endif
 
-typedef void (PASCAL FAR *PReadIniFile)
+typedef void (PASCAL *PReadIniFile)
   (PCHAR FName, PTTSet ts);
-typedef void (PASCAL FAR *PWriteIniFile)
+typedef void (PASCAL *PWriteIniFile)
   (PCHAR FName, PTTSet ts);
-typedef void (PASCAL FAR *PReadKeyboardCnf)
+typedef void (PASCAL *PReadKeyboardCnf)
   (PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
-typedef void (PASCAL FAR *PCopyHostList)
+typedef void (PASCAL *PCopyHostList)
   (PCHAR IniSrc, PCHAR IniDest);
-typedef void (PASCAL FAR *PAddHostToList)
+typedef void (PASCAL *PAddHostToList)
   (PCHAR FName, PCHAR Host);
-typedef void (PASCAL FAR *PParseParam)
+typedef void (PASCAL *PParseParam)
   (PCHAR Param, PTTSet ts, PCHAR DDETopic);
-typedef void (PASCAL FAR *PCopySerialList)
+typedef void (PASCAL *PCopySerialList)
   (PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
-typedef void (PASCAL FAR *PAddValueToList)
+typedef void (PASCAL *PAddValueToList)
   (PCHAR FName, PCHAR Host, PCHAR section, PCHAR key, int MaxList);
 
 extern PReadIniFile ReadIniFile;

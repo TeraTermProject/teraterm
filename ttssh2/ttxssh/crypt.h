@@ -66,7 +66,7 @@ typedef struct {
 } CipherBlowfishState;
 
 typedef struct {
-  uint32 FAR * h;
+  uint32 *h;
   uint32 n;
 } CRYPTDetectAttack;
 
@@ -80,7 +80,7 @@ typedef union {
   CipherBlowfishState cBlowfish;
 } CRYPTCipherState;
 
-typedef void (* CRYPTCryptFun)(PTInstVar pvar, unsigned char FAR * buf, int bytes);
+typedef void (* CRYPTCryptFun)(PTInstVar pvar, unsigned char *buf, int bytes);
 
 typedef struct {
   CRYPTDetectAttack detect_attack_statics;
@@ -108,35 +108,35 @@ void CRYPT_init(PTInstVar pvar);
    from the server. Therefore we have some time available to do some
    moderately expensive computations. */
 void CRYPT_initialize_random_numbers(PTInstVar pvar);
-void CRYPT_set_random_data(PTInstVar pvar, unsigned char FAR * buf, int bytes);
+void CRYPT_set_random_data(PTInstVar pvar, unsigned char *buf, int bytes);
 void CRYPT_end(PTInstVar pvar);
 
-void CRYPT_get_cipher_info(PTInstVar pvar, char FAR * dest, int len);
-void CRYPT_get_server_key_info(PTInstVar pvar, char FAR * dest, int len);
+void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len);
+void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len);
 
-void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char FAR * cookie);
-void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char FAR * cookie);
+void CRYPT_set_server_cookie(PTInstVar pvar, unsigned char *cookie);
+void CRYPT_set_client_cookie(PTInstVar pvar, unsigned char *cookie);
 #define CRYPT_get_server_cookie(pvar) ((pvar)->crypt_state.server_cookie)
 
-void CRYPT_free_public_key(CRYPTPublicKey FAR * key);
+void CRYPT_free_public_key(CRYPTPublicKey *key);
 
 BOOL CRYPT_set_server_RSA_key(PTInstVar pvar,
-  int bits, unsigned char FAR * exp, unsigned char FAR * mod);
+  int bits, unsigned char *exp, unsigned char *mod);
 BOOL CRYPT_set_host_RSA_key(PTInstVar pvar,
-  int bits, unsigned char FAR * exp, unsigned char FAR * mod);
+  int bits, unsigned char *exp, unsigned char *mod);
 int CRYPT_get_encrypted_session_key_len(PTInstVar pvar);
-int CRYPT_choose_session_key(PTInstVar pvar, unsigned char FAR * encrypted_key_buf);
+int CRYPT_choose_session_key(PTInstVar pvar, unsigned char *encrypted_key_buf);
 BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag);
-int CRYPT_generate_RSA_challenge_response(PTInstVar pvar, unsigned char FAR * challenge,
-                                           int challenge_len, unsigned char FAR * response);
+int CRYPT_generate_RSA_challenge_response(PTInstVar pvar, unsigned char *challenge,
+                                           int challenge_len, unsigned char *response);
 
 int CRYPT_get_receiver_MAC_size(PTInstVar pvar);
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
-  char FAR * data, int len, char FAR * MAC);
+  char *data, int len, char *MAC);
 int CRYPT_get_sender_MAC_size(PTInstVar pvar);
 
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
-  char FAR * data, int len, char FAR * MAC);
+  char *data, int len, char *MAC);
 
 BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers, int receiver_ciphers);
 BOOL CRYPT_choose_ciphers(PTInstVar pvar);
@@ -149,10 +149,10 @@ int CRYPT_get_encryption_block_size(PTInstVar pvar);
 #define CRYPT_decrypt(pvar, buf, bytes) \
     ((pvar)->crypt_state.decrypt((pvar), (buf), (bytes)))
 
-BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char FAR * buf, int bytes);
-int CRYPT_passphrase_decrypt(int cipher, char FAR * passphrase, char FAR * buf, int len);
-RSA FAR *make_key(PTInstVar pvar,
-                  int bits, unsigned char FAR * exp,
-                  unsigned char FAR * mod);
+BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf, int bytes);
+int CRYPT_passphrase_decrypt(int cipher, char *passphrase, char *buf, int len);
+RSA *make_key(PTInstVar pvar,
+                  int bits, unsigned char *exp,
+                  unsigned char *mod);
 
 #endif

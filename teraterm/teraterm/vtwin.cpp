@@ -2200,7 +2200,7 @@ send_success:
 	DragFinish(hDropInfo);
 }
 
-void CVTWindow::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
+void CVTWindow::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
 {
 #ifndef WINDOW_MAXMIMUM_ENABLED
 	lpMMI->ptMaxSize.x = 10000;

@@ -34,15 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct {
 	PTInstVar pvar;
-	X11AuthData FAR *auth_data;
+	X11AuthData *auth_data;
 
-	unsigned char FAR *init_buf;
+	unsigned char *init_buf;
 	int init_buf_len;
 	int init_data_len;
 } X11UnspoofingFilterClosure;
 
-void parse_DISPLAY_str(char FAR * name_buf, int name_buf_len,
-                          int FAR * port, int FAR * screen, char *DISPLAY)
+void parse_DISPLAY_str(char *name_buf, int name_buf_len,
+                          int *port, int *screen, char *DISPLAY)
 {
 	strncpy_s(name_buf, name_buf_len, "localhost", _TRUNCATE);
 	*port = 6000;
@@ -73,10 +73,10 @@ void parse_DISPLAY_str(char FAR * name_buf, int name_buf_len,
 	}
 }
 
-void X11_get_DISPLAY_info(PTInstVar pvar, char FAR * name_buf, int name_buf_len,
-                          int FAR * port, int FAR * screen)
+void X11_get_DISPLAY_info(PTInstVar pvar, char *name_buf, int name_buf_len,
+                          int *port, int *screen)
 {
-	char FAR *DISPLAY = getenv("DISPLAY");
+	char *DISPLAY = getenv("DISPLAY");
 
 	if (pvar->settings.X11Display[0] != 0) {
 		parse_DISPLAY_str(name_buf, name_buf_len, port, screen, pvar->settings.X11Display);
@@ -87,11 +87,11 @@ void X11_get_DISPLAY_info(PTInstVar pvar, char FAR * name_buf, int name_buf_len,
 }
 
 
-X11AuthData FAR *X11_load_local_auth_data(int screen_num)
+X11AuthData *X11_load_local_auth_data(int screen_num)
 {
-	X11AuthData FAR *auth_data =
-		(X11AuthData FAR *) malloc(sizeof(X11AuthData));
-	char FAR *local_auth_data_str;
+	X11AuthData *auth_data =
+		(X11AuthData *) malloc(sizeof(X11AuthData));
+	char *local_auth_data_str;
 
 	auth_data->local_protocol = getenv("TTSSH_XAUTH_PROTOCOL_NAME");
 
@@ -133,7 +133,7 @@ X11AuthData FAR *X11_load_local_auth_data(int screen_num)
 	return auth_data;
 }
 
-void X11_dispose_auth_data(X11AuthData FAR * auth_data)
+void X11_dispose_auth_data(X11AuthData *auth_data)
 {
 	SecureZeroMemory(auth_data->local_data, auth_data->local_data_len);
 	free(auth_data->local_data);
@@ -144,9 +144,9 @@ void X11_dispose_auth_data(X11AuthData FAR * auth_data)
 }
 
 void *X11_init_unspoofing_filter(PTInstVar pvar,
-                                 X11AuthData FAR * auth_data)
+                                 X11AuthData *auth_data)
 {
-	X11UnspoofingFilterClosure FAR *closure =
+	X11UnspoofingFilterClosure *closure =
 		malloc(sizeof(X11UnspoofingFilterClosure));
 
 	closure->pvar = pvar;
@@ -162,9 +162,9 @@ void *X11_init_unspoofing_filter(PTInstVar pvar,
 #define MERGE_GOT_GOOD_DATA 1
 #define MERGE_GOT_BAD_DATA  2
 
-static int merge_into_X11_init_packet(X11UnspoofingFilterClosure FAR *
+static int merge_into_X11_init_packet(X11UnspoofingFilterClosure *
                                       closure, int length,
-                                      unsigned char FAR * buf)
+                                      unsigned char *buf)
 {
 	buf_ensure_size_growing(&closure->init_buf, &closure->init_buf_len,
 	                        closure->init_data_len + length);
@@ -214,9 +214,9 @@ static int merge_into_X11_init_packet(X11UnspoofingFilterClosure FAR *
 	}
 }
 
-static void insert_real_X11_auth_data(X11UnspoofingFilterClosure FAR *
-                                      closure, int FAR * length,
-                                      unsigned char FAR * FAR * buf)
+static void insert_real_X11_auth_data(X11UnspoofingFilterClosure *
+                                      closure, int *length,
+                                      unsigned char **buf)
 {
 	int name_len = closure->auth_data->local_protocol == NULL
 		? 0 : strlen(closure->auth_data->local_protocol);
@@ -248,11 +248,11 @@ static void insert_real_X11_auth_data(X11UnspoofingFilterClosure FAR *
 	       data_len);
 }
 
-int X11_unspoofing_filter(void FAR * void_closure, int direction,
-                          int FAR * length, unsigned char FAR * FAR * buf)
+int X11_unspoofing_filter(void *void_closure, int direction,
+                          int *length, unsigned char **buf)
 {
-	X11UnspoofingFilterClosure FAR *closure =
-		(X11UnspoofingFilterClosure FAR *) void_closure;
+	X11UnspoofingFilterClosure *closure =
+		(X11UnspoofingFilterClosure *) void_closure;
 
 	if (length == NULL) {
 		buf_destroy(&closure->init_buf, &closure->init_buf_len);

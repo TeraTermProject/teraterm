@@ -35,22 +35,22 @@ See LICENSE.TXT for the license.
 #define __HOSTS_H
 
 typedef struct {
-  char FAR * prefetched_hostname;
+  char *prefetched_hostname;
 
 #if 0
   int key_bits;
   /* The key exponent and modulus, in SSH mp_int format */
-  unsigned char FAR * key_exp;
-  unsigned char FAR * key_mod;
+  unsigned char *key_exp;
+  unsigned char *key_mod;
 #else
   // ホストキー(SSH1,SSH2)は Key 構造体に集約する
   Key hostkey;
 #endif
 
   int file_num;
-  char FAR * FAR * file_names;
+  char **file_names;
   int file_data_index;
-  char FAR * file_data;  // known_hostsファイルの内容がすべて格納される
+  char *file_data;  // known_hostsファイルの内容がすべて格納される
 
   HWND hosts_dialog;
 } HOSTSState;
@@ -59,12 +59,12 @@ typedef int hostkeys_foreach_fn(Key *key, void *ctx);
 
 void HOSTS_init(PTInstVar pvar);
 void HOSTS_open(PTInstVar pvar);
-void HOSTS_prefetch_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport);
+void HOSTS_prefetch_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport);
 #if 0
-BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname,
-                         int bits, unsigned char FAR * exp, unsigned char FAR * mod);
+BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname,
+                         int bits, unsigned char *exp, unsigned char *mod);
 #else
-BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key);
+BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport, Key *key);
 #endif
 void HOSTS_do_unknown_host_dialog(HWND wnd, PTInstVar pvar);
 void HOSTS_do_different_key_dialog(HWND wnd, PTInstVar pvar);

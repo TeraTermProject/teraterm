@@ -51,7 +51,7 @@ int is_numeric_hostname(const char *hostname)
 	return 0;
 }
 
-int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key)
+int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 {
 	DNS_STATUS status;
 	PDNS_RECORD rec, p;

@@ -7,27 +7,27 @@
 extern "C" {
 #endif
 
-typedef BOOL (FAR PASCAL *PSetupTerminal)
+typedef BOOL (PASCAL *PSetupTerminal)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (FAR PASCAL *PSetupWin)
+typedef BOOL (PASCAL *PSetupWin)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (FAR PASCAL *PSetupKeyboard)
+typedef BOOL (PASCAL *PSetupKeyboard)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (FAR PASCAL *PSetupSerialPort)
+typedef BOOL (PASCAL *PSetupSerialPort)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (FAR PASCAL *PSetupTCPIP)
+typedef BOOL (PASCAL *PSetupTCPIP)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (FAR PASCAL *PGetHostName)
+typedef BOOL (PASCAL *PGetHostName)
   (HWND WndParent, PGetHNRec GetHNRec);
-typedef BOOL (FAR PASCAL *PChangeDirectory)
+typedef BOOL (PASCAL *PChangeDirectory)
   (HWND WndParent, PCHAR CurDir);
-typedef BOOL (FAR PASCAL *PAboutDialog)
+typedef BOOL (PASCAL *PAboutDialog)
   (HWND WndParent);
-typedef BOOL (FAR PASCAL *PChooseFontDlg)
+typedef BOOL (PASCAL *PChooseFontDlg)
   (HWND WndParent, LPLOGFONT LogFont, PTTSet ts);
-typedef BOOL (FAR PASCAL *PSetupGeneral)
+typedef BOOL (PASCAL *PSetupGeneral)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (FAR PASCAL *PWindowWindow)
+typedef BOOL (PASCAL *PWindowWindow)
   (HWND WndParent, PBOOL Close);
 
 extern PSetupTerminal SetupTerminal;
@@ -42,7 +42,7 @@ extern PChooseFontDlg ChooseFontDlg;
 extern PSetupGeneral SetupGeneral;
 extern PWindowWindow WindowWindow;
 
-extern void FAR PASCAL TTDLGSetUILanguageFile(char *file);
+extern void PASCAL TTDLGSetUILanguageFile(char *file);
 
 /* proto types */
 BOOL LoadTTDLG();

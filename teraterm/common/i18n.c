@@ -4,13 +4,13 @@
 
 #include "i18n.h"
 
-void FAR PASCAL GetI18nStr(PCHAR section, PCHAR key, PCHAR buf, int buf_len, PCHAR def, PCHAR iniFile)
+void PASCAL GetI18nStr(PCHAR section, PCHAR key, PCHAR buf, int buf_len, PCHAR def, PCHAR iniFile)
 {
 	GetPrivateProfileString(section, key, def, buf, buf_len, iniFile);
 	RestoreNewLine(buf);
 }
 
-int FAR PASCAL GetI18nLogfont(PCHAR section, PCHAR key, PLOGFONT logfont, int ppi, PCHAR iniFile)
+int PASCAL GetI18nLogfont(PCHAR section, PCHAR key, PLOGFONT logfont, int ppi, PCHAR iniFile)
 {
 	static char tmp[MAX_UIMSG];
 	static char font[LF_FACESIZE];

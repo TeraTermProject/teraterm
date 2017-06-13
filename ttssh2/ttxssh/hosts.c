@@ -59,12 +59,12 @@ static HFONT DlgHostsReplaceFont;
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
-static char FAR *FAR * parse_multi_path(char FAR * buf)
+static char **parse_multi_path(char *buf)
 {
 	int i;
 	int ch;
 	int num_paths = 1;
-	char FAR *FAR * result;
+	char ** result;
 	int last_path_index;
 
 	for (i = 0; (ch = buf[i]) != 0; i++) {
@@ -74,7 +74,7 @@ static char FAR *FAR * parse_multi_path(char FAR * buf)
 	}
 
 	result =
-		(char FAR * FAR *) malloc(sizeof(char FAR *) * (num_paths + 1));
+		(char **) malloc(sizeof(char *) * (num_paths + 1));
 
 	last_path_index = 0;
 	num_paths = 0;
@@ -112,7 +112,7 @@ void HOSTS_open(PTInstVar pvar)
 //
 // known_hostsファイルの内容をすべて pvar->hosts_state.file_data へ読み込む
 //
-static int begin_read_file(PTInstVar pvar, char FAR * name,
+static int begin_read_file(PTInstVar pvar, char *name,
                            int suppress_errors)
 {
 	int fd;
@@ -196,7 +196,7 @@ static int begin_read_host_files(PTInstVar pvar, int suppress_errors)
 }
 
 // MIME64の文字列をスキップする
-static int eat_base64(char FAR * data)
+static int eat_base64(char *data)
 {
 	int index = 0;
 	int ch;
@@ -214,7 +214,7 @@ static int eat_base64(char FAR * data)
 	return index;
 }
 
-static int eat_spaces(char FAR * data)
+static int eat_spaces(char *data)
 {
 	int index = 0;
 	int ch;
@@ -225,7 +225,7 @@ static int eat_spaces(char FAR * data)
 	return index;
 }
 
-static int eat_digits(char FAR * data)
+static int eat_digits(char *data)
 {
 	int index = 0;
 	int ch;
@@ -236,7 +236,7 @@ static int eat_digits(char FAR * data)
 	return index;
 }
 
-static int eat_to_end_of_line(char FAR * data)
+static int eat_to_end_of_line(char *data)
 {
 	int index = 0;
 	int ch;
@@ -252,7 +252,7 @@ static int eat_to_end_of_line(char FAR * data)
 	return index;
 }
 
-static int eat_to_end_of_pattern(char FAR * data)
+static int eat_to_end_of_pattern(char *data)
 {
 	int index = 0;
 	int ch;
@@ -301,14 +301,14 @@ error:
 }
 
 
-static char FAR *parse_bignum(char FAR * data)
+static char *parse_bignum(char *data)
 {
 	uint32 digits = 0;
 	BIGNUM *num = BN_new();
 	BIGNUM *billion = BN_new();
 	BIGNUM *digits_num = BN_new();
 	BN_CTX *ctx = BN_CTX_new();
-	char FAR *result;
+	char *result;
 	int ch;
 	int leftover_digits = 1;
 
@@ -335,7 +335,7 @@ static char FAR *parse_bignum(char FAR * data)
 	BN_mul(num, num, billion, ctx);
 	BN_add(num, num, digits_num);
 
-	result = (char FAR *) malloc(2 + BN_num_bytes(num));
+	result = (char *) malloc(2 + BN_num_bytes(num));
 	set_ushort16_MSBfirst(result, BN_num_bits(num));
 	BN_bn2bin(num, result + 2);
 
@@ -350,8 +350,8 @@ static char FAR *parse_bignum(char FAR * data)
 //
 // known_hostsファイルの内容を解析し、指定したホストの公開鍵を探す。
 //
-static int check_host_key(PTInstVar pvar, char FAR * hostname,
-                          unsigned short tcpport, char FAR * data,
+static int check_host_key(PTInstVar pvar, char *hostname,
+                          unsigned short tcpport, char *data,
                           Key *key)
 {
 	int index = eat_spaces(data);
@@ -504,7 +504,7 @@ static int check_host_key(PTInstVar pvar, char FAR * hostname,
 //     1: 1行だけ探して戻る
 //
 static int read_host_key(PTInstVar pvar,
-                         char FAR * hostname, unsigned short tcpport,
+                         char *hostname, unsigned short tcpport,
                          int suppress_errors, int return_always,
                          Key *key)
 {
@@ -541,7 +541,7 @@ static int read_host_key(PTInstVar pvar,
 	do {
 		if (pvar->hosts_state.file_data == NULL
 		 || pvar->hosts_state.file_data[pvar->hosts_state.file_data_index] == 0) {
-			char FAR *filename;
+			char *filename;
 			int keep_going = 1;
 
 			if (pvar->hosts_state.file_data != NULL) {
@@ -593,7 +593,7 @@ static void finish_read_host_files(PTInstVar pvar, int suppress_errors)
 }
 
 // サーバへ接続する前に、known_hostsファイルからホスト公開鍵を先読みしておく。
-void HOSTS_prefetch_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport)
+void HOSTS_prefetch_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport)
 {
 	Key key; // known_hostsに登録されている鍵
 
@@ -621,8 +621,8 @@ void HOSTS_prefetch_host_key(PTInstVar pvar, char FAR * hostname, unsigned short
 // return:
 //   *keyptr != NULL  取得成功
 //
-static int parse_hostkey_file(PTInstVar pvar, char FAR * hostname,
-	unsigned short tcpport, char FAR * data, Key **keyptr)
+static int parse_hostkey_file(PTInstVar pvar, char *hostname,
+	unsigned short tcpport, char *data, Key **keyptr)
 {
 	int index = eat_spaces(data);
 	int matched = 0;
@@ -778,7 +778,7 @@ int HOSTS_hostkey_foreach(PTInstVar pvar, hostkeys_foreach_fn *callback, void *c
 	int success = 0;
 	int suppress_errors = 1;
 	unsigned short tcpport;
-	char FAR *filename;
+	char *filename;
 	char *hostname;
 	Key *key;
 
@@ -831,8 +831,8 @@ error:
 }
 
 
-static BOOL equal_mp_ints(unsigned char FAR * num1,
-                          unsigned char FAR * num2)
+static BOOL equal_mp_ints(unsigned char *num1,
+                          unsigned char *num2)
 {
 	if (num1 == NULL || num2 == NULL) {
 		return FALSE;
@@ -857,8 +857,8 @@ static BOOL equal_mp_ints(unsigned char FAR * num1,
 int HOSTS_compare_public_key(Key *src, Key *key)
 {
 	int bits;
-	unsigned char FAR * exp;
-	unsigned char FAR * mod;
+	unsigned char *exp;
+	unsigned char *mod;
 	const EC_GROUP *group;
 	const EC_POINT *pa, *pb;
 	Key *a, *b;
@@ -984,7 +984,7 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 	hosts_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 }
 
-static int print_mp_int(char FAR * buf, unsigned char FAR * mp)
+static int print_mp_int(char *buf, unsigned char *mp)
 {
 	int i = 0, j, k;
 	BIGNUM *num = BN_new();
@@ -1011,7 +1011,7 @@ static int print_mp_int(char FAR * buf, unsigned char FAR * mp)
 //
 // known_hosts ファイルへ保存するエントリを作成する。
 //
-static char FAR *format_host_key(PTInstVar pvar)
+static char *format_host_key(PTInstVar pvar)
 {
 	int host_len = strlen(pvar->hosts_state.prefetched_hostname);
 	char *result = NULL;
@@ -1024,7 +1024,7 @@ static char FAR *format_host_key(PTInstVar pvar)
 		int result_len = host_len + 50 + 8 +
 		                 get_ushort16_MSBfirst(pvar->hosts_state.hostkey.exp) / 3 +
 		                 get_ushort16_MSBfirst(pvar->hosts_state.hostkey.mod) / 3;
-		result = (char FAR *) malloc(result_len);
+		result = (char *) malloc(result_len);
 
 		if (pvar->ssh_state.tcpport == 22) {
 			strncpy_s(result, result_len, pvar->hosts_state.prefetched_hostname, _TRUNCATE);
@@ -1107,7 +1107,7 @@ error:
 	return result;
 }
 
-static char FAR *format_specified_host_key(Key *key, char *hostname, unsigned short tcpport)
+static char *format_specified_host_key(Key *key, char *hostname, unsigned short tcpport)
 {
 	int host_len = strlen(hostname);
 	char *result = NULL;
@@ -1120,7 +1120,7 @@ static char FAR *format_specified_host_key(Key *key, char *hostname, unsigned sh
 		int result_len = host_len + 50 + 8 +
 			get_ushort16_MSBfirst(key->exp) / 3 +
 			get_ushort16_MSBfirst(key->mod) / 3;
-		result = (char FAR *) malloc(result_len);
+		result = (char *) malloc(result_len);
 
 		if (tcpport == 22) {
 			strncpy_s(result, result_len, hostname, _TRUNCATE);
@@ -1206,7 +1206,7 @@ static char FAR *format_specified_host_key(Key *key, char *hostname, unsigned sh
 
 static void add_host_key(PTInstVar pvar)
 {
-	char FAR *name = NULL;
+	char *name = NULL;
 
 	if ( pvar->hosts_state.file_names != NULL)
 		name = pvar->hosts_state.file_names[0];
@@ -1217,7 +1217,7 @@ static void add_host_key(PTInstVar pvar)
 		                  "Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 	} else {
-		char FAR *keydata = format_host_key(pvar);
+		char *keydata = format_host_key(pvar);
 		int length = strlen(keydata);
 		int fd;
 		int amount_written;
@@ -1259,7 +1259,7 @@ static void add_host_key(PTInstVar pvar)
 // 指定したキーを known_hosts に追加する。
 void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 {
-	char FAR *name = NULL;
+	char *name = NULL;
 	char *hostname;
 	unsigned short tcpport;
 
@@ -1276,7 +1276,7 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 	}
 	else {
-		char FAR *keydata = format_specified_host_key(key, hostname, tcpport);
+		char *keydata = format_specified_host_key(key, hostname, tcpport);
 		int length = strlen(keydata);
 		int fd;
 		int amount_written;
@@ -1322,7 +1322,7 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 //
 static void delete_different_key(PTInstVar pvar)
 {
-	char FAR *name = pvar->hosts_state.file_names[0];
+	char *name = pvar->hosts_state.file_names[0];
 
 	if (name == NULL || name[0] == 0) {
 		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
@@ -1371,7 +1371,7 @@ static void delete_different_key(PTInstVar pvar)
 			int host_index = 0;
 			int matched = 0;
 			int keybits = 0;
-			char FAR *data;
+			char *data;
 			int do_write = 0;
 			length = amount_written = 0;
 
@@ -1506,7 +1506,7 @@ error2:
 
 void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 {
-	char FAR *name = pvar->hosts_state.file_names[0];
+	char *name = pvar->hosts_state.file_names[0];
 	char *hostname;
 	unsigned short tcpport;
 
@@ -1561,7 +1561,7 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 			int host_index = 0;
 			int matched = 0;
 			int keybits = 0;
-			char FAR *data;
+			char *data;
 			int do_write = 0;
 			length = amount_written = 0;
 
@@ -2229,7 +2229,7 @@ void HOSTS_do_different_type_key_dialog(HWND wnd, PTInstVar pvar)
 //
 // SSH2対応を追加 (2006.3.24 yutaka)
 //
-BOOL HOSTS_check_host_key(PTInstVar pvar, char FAR * hostname, unsigned short tcpport, Key *key)
+BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport, Key *key)
 {
 	int found_different_key = 0, found_different_type_key = 0;
 	Key key2; // known_hostsに登録されている鍵

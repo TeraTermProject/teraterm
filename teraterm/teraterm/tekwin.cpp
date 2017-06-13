@@ -349,7 +349,7 @@ void CTEKWindow::OnDestroy()
 	ActiveWin = IdVT;
 }
 
-void CTEKWindow::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
+void CTEKWindow::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
 {
 	lpMMI->ptMaxSize.x = 10000;
 	lpMMI->ptMaxSize.y = 10000;

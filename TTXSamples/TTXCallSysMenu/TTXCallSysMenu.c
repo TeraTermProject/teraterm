@@ -17,7 +17,7 @@ typedef struct {
   PComVar cv;
 } TInstVar;
 
-static TInstVar FAR * pvar;
+static TInstVar *pvar;
 static TInstVar InstVar;
 
 static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
@@ -48,7 +48,7 @@ static TTXExports Exports = {
   NULL, // TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
   /* do version checking if necessary */
   /* if (Version!=TTVERSION) return FALSE; */
@@ -56,8 +56,8 @@ BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exp
   if (size > exports->size) {
     size = exports->size;
   }
-  memcpy((char FAR *)exports + sizeof(exports->size),
-    (char FAR *)&Exports + sizeof(exports->size),
+  memcpy((char *)exports + sizeof(exports->size),
+    (char *)&Exports + sizeof(exports->size),
     size);
   return TRUE;
 }

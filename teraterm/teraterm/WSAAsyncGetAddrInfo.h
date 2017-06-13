@@ -12,18 +12,18 @@
 struct getaddrinfo_args {
   HWND hWnd;
   unsigned int wMsg;
-  char FAR * hostname;
-  char FAR * portname;
+  char *hostname;
+  char *portname;
   struct addrinfo hints;
-  struct addrinfo FAR * FAR * res;
-  HANDLE FAR * lpHandle;
+  struct addrinfo **res;
+  HANDLE *lpHandle;
 };
 
-HANDLE FAR PASCAL WSAAsyncGetAddrInfo(HWND hWnd,
+HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd,
 			   unsigned int wMsg,
-			   const char FAR * hostname,
-			   const char FAR * portname,
-			   struct addrinfo FAR * hints,
-			   struct addrinfo FAR * FAR * res);
+			   const char *hostname,
+			   const char *portname,
+			   struct addrinfo *hints,
+			   struct addrinfo **res);
 
 #endif /* __WSAASYNCGETADDRINFO__ */

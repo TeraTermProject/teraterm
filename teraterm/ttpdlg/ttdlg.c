@@ -25,7 +25,7 @@
 #undef ONIG_EXTERN
 
 #include <winsock2.h>
-static char FAR * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
+static char * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
@@ -3421,7 +3421,7 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL FAR PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
+BOOL PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	int i;
 
@@ -3446,7 +3446,7 @@ BOOL FAR PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 		                     WndParent, TermDlg, (LPARAM)ts);
 }
 
-BOOL FAR PASCAL SetupWin(HWND WndParent, PTTSet ts)
+BOOL PASCAL SetupWin(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3454,7 +3454,7 @@ BOOL FAR PASCAL SetupWin(HWND WndParent, PTTSet ts)
 		                     WndParent, WinDlg, (LPARAM)ts);
 }
 
-BOOL FAR PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
+BOOL PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3462,7 +3462,7 @@ BOOL FAR PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
 		                     WndParent, KeybDlg, (LPARAM)ts);
 }
 
-BOOL FAR PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
+BOOL PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3470,7 +3470,7 @@ BOOL FAR PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
 		                     WndParent, SerialDlg, (LPARAM)ts);
 }
 
-BOOL FAR PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
+BOOL PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3478,7 +3478,7 @@ BOOL FAR PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
 		                     WndParent, TCPIPDlg, (LPARAM)ts);
 }
 
-BOOL FAR PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
+BOOL PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3486,7 +3486,7 @@ BOOL FAR PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 		                     WndParent, HostDlg, (LPARAM)GetHNRec);
 }
 
-BOOL FAR PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
+BOOL PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3494,7 +3494,7 @@ BOOL FAR PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
 		                     WndParent, DirDlg, (LPARAM)CurDir);
 }
 
-BOOL FAR PASCAL AboutDialog(HWND WndParent)
+BOOL PASCAL AboutDialog(HWND WndParent)
 {
 	return
 		(BOOL)DialogBox(hInst,
@@ -3544,7 +3544,7 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL FAR PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
+BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 {
 	CHOOSEFONT cf;
 	BOOL Ok;
@@ -3564,7 +3564,7 @@ BOOL FAR PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 	return Ok;
 }
 
-BOOL FAR PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
+BOOL PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3572,7 +3572,7 @@ BOOL FAR PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
 		                     WndParent, (DLGPROC)&GenDlg, (LPARAM)ts);
 }
 
-BOOL FAR PASCAL WindowWindow(HWND WndParent, PBOOL Close)
+BOOL PASCAL WindowWindow(HWND WndParent, PBOOL Close)
 {
 	*Close = FALSE;
 	return
@@ -3582,7 +3582,7 @@ BOOL FAR PASCAL WindowWindow(HWND WndParent, PBOOL Close)
 		                     (DLGPROC)&WinListDlg, (LPARAM)Close);
 }
 
-void FAR PASCAL TTDLGSetUILanguageFile(char *file)
+void PASCAL TTDLGSetUILanguageFile(char *file)
 {
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 }

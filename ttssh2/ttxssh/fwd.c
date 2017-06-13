@@ -109,7 +109,7 @@ static int find_request_num_from_async_request(PTInstVar pvar,
 static int find_listening_socket_num(PTInstVar pvar, int request_num,
                                      SOCKET s)
 {
-	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
+	FWDRequest *request = pvar->fwd_state.requests + request_num;
 	int i;
 
 	for (i = 0; i < request->num_listening_sockets; ++i)
@@ -123,7 +123,7 @@ static int find_listening_socket_num(PTInstVar pvar, int request_num,
 static void drain_matching_messages(HWND wnd, UINT msg, WPARAM wParam)
 {
 	MSG m;
-	MSG FAR *buf;
+	MSG *buf;
 	int buf_len;
 	int buf_size;
 	int i;
@@ -136,12 +136,12 @@ static void drain_matching_messages(HWND wnd, UINT msg, WPARAM wParam)
 	/* suck out all the messages */
 	buf_size = 1;
 	buf_len = 0;
-	buf = (MSG FAR *) malloc(sizeof(MSG) * buf_size);
+	buf = (MSG *) malloc(sizeof(MSG) * buf_size);
 
 	while (PeekMessage(&m, wnd, msg, msg, PM_REMOVE)) {
 		if (buf_len == buf_size) {
 			buf_size *= 2;
-			buf = (MSG FAR *) realloc(buf, sizeof(MSG) * buf_size);
+			buf = (MSG *) realloc(buf, sizeof(MSG) * buf_size);
 		}
 
 		buf[buf_len] = m;
@@ -207,7 +207,7 @@ int FWD_check_local_channel_num(PTInstVar pvar, int local_num)
 
 static void request_error(PTInstVar pvar, int request_num, int err)
 {
-	SOCKET FAR *s =
+	SOCKET *s =
 		pvar->fwd_state.requests[request_num].listening_sockets;
 	int i;
 
@@ -229,7 +229,7 @@ static void request_error(PTInstVar pvar, int request_num, int err)
 
 static void send_local_connection_closure(PTInstVar pvar, int channel_num)
 {
-	FWDChannel FAR *channel = pvar->fwd_state.channels + channel_num;
+	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
 	if ((channel->status & (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED))
 	 == (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)) {
@@ -241,7 +241,7 @@ static void send_local_connection_closure(PTInstVar pvar, int channel_num)
 
 static void closed_local_connection(PTInstVar pvar, int channel_num)
 {
-	FWDChannel FAR *channel = pvar->fwd_state.channels + channel_num;
+	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
 	if (channel->local_socket != INVALID_SOCKET) {
 		safe_closesocket(pvar, channel->local_socket);
@@ -255,7 +255,7 @@ static void closed_local_connection(PTInstVar pvar, int channel_num)
    active channels. */
 static void really_delete_request(PTInstVar pvar, int request_num)
 {
-	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
+	FWDRequest *request = pvar->fwd_state.requests + request_num;
 
 	if (request->to_host_lookup_handle != 0) {
 		safe_WSACancelAsyncRequest(pvar, request->to_host_lookup_handle);
@@ -268,7 +268,7 @@ static void really_delete_request(PTInstVar pvar, int request_num)
 
 void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
 {
-	FWDChannel FAR *channel = &pvar->fwd_state.channels[local_channel_num];
+	FWDChannel *channel = &pvar->fwd_state.channels[local_channel_num];
 
 	if (channel->type == TYPE_AGENT) { // TYPE_AGENT でここに来るのは SSH1 のみ
 		buffer_free(channel->agent_msg);
@@ -291,7 +291,7 @@ void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
 	}
 
 	if (channel->request_num >= 0) {
-		FWDRequest FAR *request =
+		FWDRequest *request =
 			&pvar->fwd_state.requests[channel->request_num];
 
 		request->num_channels--;
@@ -305,7 +305,7 @@ void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
 
 void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num)
 {
-	FWDChannel FAR *channel;
+	FWDChannel *channel;
 
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
 		return;
@@ -324,7 +324,7 @@ void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num)
 
 void FWD_channel_output_eof(PTInstVar pvar, uint32 local_channel_num)
 {
-	FWDChannel FAR *channel;
+	FWDChannel *channel;
 
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
 		return;
@@ -341,7 +341,7 @@ void FWD_channel_output_eof(PTInstVar pvar, uint32 local_channel_num)
 	}
 }
 
-static char FAR *describe_socket_error(PTInstVar pvar, int code)
+static char *describe_socket_error(PTInstVar pvar, int code)
 {
 	switch (code) {
 	case WSAECONNREFUSED:
@@ -373,10 +373,10 @@ static char FAR *describe_socket_error(PTInstVar pvar, int code)
 	}
 }
 
-static void channel_error(PTInstVar pvar, char FAR * action,
+static void channel_error(PTInstVar pvar, char *action,
                           int channel_num, int err)
 {
-	char FAR *err_msg;
+	char *err_msg;
 	char uimsg[MAX_UIMSG];
 
 	closed_local_connection(pvar, channel_num);
@@ -410,8 +410,8 @@ static void channel_error(PTInstVar pvar, char FAR * action,
 static void channel_opening_error(PTInstVar pvar, int channel_num, int err)
 {
 	char buf[1024];
-	FWDChannel FAR *channel = &pvar->fwd_state.channels[channel_num];
-	FWDRequest FAR *request =
+	FWDChannel *channel = &pvar->fwd_state.channels[channel_num];
+	FWDRequest *request =
 		&pvar->fwd_state.requests[channel->request_num];
 	char uimsg[MAX_UIMSG];
 
@@ -446,7 +446,7 @@ static int alloc_channel(PTInstVar pvar, int new_status,
 	int i;
 	int new_num_channels;
 	int new_channel = -1;
-	FWDChannel FAR *channel;
+	FWDChannel *channel;
 
 	for (i = 0; i < pvar->fwd_state.num_channels && new_channel < 0; i++) {
 		if (pvar->fwd_state.channels[i].status == 0) {
@@ -457,7 +457,7 @@ static int alloc_channel(PTInstVar pvar, int new_status,
 	if (new_channel < 0) {
 		new_num_channels = pvar->fwd_state.num_channels + 1;
 		pvar->fwd_state.channels =
-			(FWDChannel FAR *) realloc(pvar->fwd_state.channels,
+			(FWDChannel *) realloc(pvar->fwd_state.channels,
 			                           sizeof(FWDChannel) *
 			                           new_num_channels);
 
@@ -491,7 +491,7 @@ static int alloc_agent_channel(PTInstVar pvar, int remote_channel_num)
 	int i;
 	int new_num_channels;
 	int new_channel = -1;
-	FWDChannel FAR *channel;
+	FWDChannel *channel;
 
 	for (i = 0; i < pvar->fwd_state.num_channels && new_channel < 0; i++) {
 		if (pvar->fwd_state.channels[i].status == 0) {
@@ -502,7 +502,7 @@ static int alloc_agent_channel(PTInstVar pvar, int remote_channel_num)
 	if (new_channel < 0) {
 		new_num_channels = pvar->fwd_state.num_channels + 1;
 		pvar->fwd_state.channels =
-			(FWDChannel FAR *) realloc(pvar->fwd_state.channels,
+			(FWDChannel *) realloc(pvar->fwd_state.channels,
 			                           sizeof(FWDChannel) *
 			                           new_num_channels);
 
@@ -552,8 +552,8 @@ static void connected_local_connection(PTInstVar pvar, int channel_num)
 
 static void make_local_connection(PTInstVar pvar, int channel_num)
 {
-	FWDChannel FAR *channel = pvar->fwd_state.channels + channel_num;
-	FWDRequest FAR *request =
+	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
+	FWDRequest *request =
 		pvar->fwd_state.requests + channel->request_num;
 
 	for (channel->to_host_addrs = request->to_host_addrs;
@@ -600,21 +600,21 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 	char strport[NI_MAXSERV]; // ws2tcpip.h
 	int addrlen = sizeof(addr);
 	char buf[1024];
-	BYTE FAR *IP;
-	FWDChannel FAR *channel;
-	FWDRequest FAR *request = &pvar->fwd_state.requests[request_num];
+	BYTE *IP;
+	FWDChannel *channel;
+	FWDRequest *request = &pvar->fwd_state.requests[request_num];
 	BOOL is_localhost = FALSE;
 
 	s = accept(request->listening_sockets[listening_socket_num],
-	           (struct sockaddr FAR *) &addr, &addrlen);
+	           (struct sockaddr *) &addr, &addrlen);
 	if (s == INVALID_SOCKET)
 		return;
 
-	IP = (BYTE FAR *) & ((struct sockaddr_in *) (&addr))->sin_addr.s_addr;
+	IP = (BYTE *) & ((struct sockaddr_in *) (&addr))->sin_addr.s_addr;
 
 	// SSH2 port-forwardingに接続元のリモートポートが必要。(2005.2.27 yutaka)
 	if (getnameinfo
-	    ((struct sockaddr FAR *) &addr, addrlen, hname, sizeof(hname),
+	    ((struct sockaddr *) &addr, addrlen, hname, sizeof(hname),
 	     strport, sizeof(strport), NI_NUMERICHOST | NI_NUMERICSERV)) {
 		/* NOT REACHED */
 	}
@@ -640,7 +640,7 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 
 static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
 {
-	FWDChannel FAR *channel = pvar->fwd_state.channels + channel_num;
+	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
 	if ((channel->status & (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED))
 	 == (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)) {
@@ -653,7 +653,7 @@ static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
 
 static void read_local_connection(PTInstVar pvar, int channel_num)
 {
-	FWDChannel FAR *channel = pvar->fwd_state.channels + channel_num;
+	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
 	if ((channel->status & (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED))
 	 != (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)) {
@@ -670,7 +670,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 		//OutputDebugPrintf("%s: recv %d\n", __FUNCTION__, amount);
 
 		if (amount > 0) {
-			char FAR *new_buf = buf;
+			char *new_buf = buf;
 			int action = FWD_FILTER_RETAIN;
 
 			if (channel->filter != NULL) {
@@ -784,7 +784,7 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 
 	case WM_SOCK_IO:{
 			int channel_num = find_channel_num(pvar, (SOCKET) wParam);
-			FWDChannel FAR *channel =
+			FWDChannel *channel =
 				pvar->fwd_state.channels + channel_num;
 
 			if (channel_num < 0)
@@ -867,11 +867,11 @@ static LRESULT CALLBACK accept_wnd_proc(HWND wnd, UINT msg, WPARAM wParam,
 	                      wParam, lParam);
 }
 
-int FWD_compare_specs(void const FAR * void_spec1,
-                      void const FAR * void_spec2)
+int FWD_compare_specs(void const *void_spec1,
+                      void const *void_spec2)
 {
-	FWDRequestSpec FAR *spec1 = (FWDRequestSpec FAR *) void_spec1;
-	FWDRequestSpec FAR *spec2 = (FWDRequestSpec FAR *) void_spec2;
+	FWDRequestSpec *spec1 = (FWDRequestSpec *) void_spec1;
+	FWDRequestSpec *spec2 = (FWDRequestSpec *) void_spec2;
 	int delta = spec1->from_port - spec2->from_port;
 
 	if (delta == 0) {
@@ -890,8 +890,8 @@ int FWD_compare_specs(void const FAR * void_spec1,
    so that we never lie to the server about where its forwarded connection is
    ending up. Maybe some SSH implementation depends on this information being
    reliable, for security? */
-static BOOL can_server_listen_using(FWDRequestSpec FAR * listener,
-                                    FWDRequestSpec FAR * spec)
+static BOOL can_server_listen_using(FWDRequestSpec *listener,
+                                    FWDRequestSpec *spec)
 {
 	return listener->type == spec->type
 	    && listener->from_port == spec->from_port
@@ -902,7 +902,7 @@ static BOOL can_server_listen_using(FWDRequestSpec FAR * listener,
 	     || strcmp(listener->bind_address, spec->bind_address) == 0);
 }
 
-BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec FAR * spec)
+BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec)
 {
 	int num_server_listening_requests =
 		pvar->fwd_state.num_server_listening_specs;
@@ -910,7 +910,7 @@ BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec FAR * spec)
 	if (num_server_listening_requests < 0) {
 		return TRUE;
 	} else {
-		FWDRequestSpec FAR *listener =
+		FWDRequestSpec *listener =
 			bsearch(spec, pvar->fwd_state.server_listening_specs,
 			        num_server_listening_requests,
 			        sizeof(FWDRequestSpec), FWD_compare_specs);
@@ -937,7 +937,7 @@ int FWD_get_num_request_specs(PTInstVar pvar)
 	return num_request_specs;
 }
 
-void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
+void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec *specs,
                            int num_specs)
 {
 	int i;
@@ -956,11 +956,11 @@ void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
    It returns the listening socket for the request, if there is one.
    The caller must close this socket if it is not INVALID_SOCKET.
 */
-static SOCKET FAR *delete_request(PTInstVar pvar, int request_num,
+static SOCKET *delete_request(PTInstVar pvar, int request_num,
                                   int *p_num_listening_sockets)
 {
-	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
-	SOCKET FAR *lp_listening_sockets;
+	FWDRequest *request = pvar->fwd_state.requests + request_num;
+	SOCKET *lp_listening_sockets;
 
 /* safe to shut down the listening socket here. Any pending connections
    that haven't yet been turned into channels will be broken, but that's
@@ -981,8 +981,8 @@ static SOCKET FAR *delete_request(PTInstVar pvar, int request_num,
 	return lp_listening_sockets;
 }
 
-static BOOL are_specs_identical(FWDRequestSpec FAR * spec1,
-                                FWDRequestSpec FAR * spec2)
+static BOOL are_specs_identical(FWDRequestSpec *spec1,
+                                FWDRequestSpec *spec2)
 {
 	return spec1->type == spec2->type
 	    && spec1->from_port == spec2->from_port
@@ -994,12 +994,12 @@ static BOOL are_specs_identical(FWDRequestSpec FAR * spec1,
 static BOOL interactive_init_request(PTInstVar pvar, int request_num,
                                      BOOL report_error)
 {
-	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
+	FWDRequest *request = pvar->fwd_state.requests + request_num;
 
 	if (request->spec.type == FWD_LOCAL_TO_REMOTE) {
 		struct addrinfo hints;
-		struct addrinfo FAR *res;
-		struct addrinfo FAR *res0;
+		struct addrinfo *res;
+		struct addrinfo *res0;
 		SOCKET s;
 		char pname[NI_MAXSERV];
 		char bname[NI_MAXHOST];
@@ -1020,7 +1020,7 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 		     res = res->ai_next)
 			request->num_listening_sockets++;
 		request->listening_sockets =
-			(SOCKET FAR *) malloc(sizeof(SOCKET) *
+			(SOCKET *) malloc(sizeof(SOCKET) *
 			                      request->num_listening_sockets);
 		if (request->listening_sockets == NULL) {
 			freeaddrinfo(res0);
@@ -1073,10 +1073,10 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 /* This function will only be called on a request when all its channels are
    closed. */
 static BOOL init_request(PTInstVar pvar, int request_num,
-                         BOOL report_error, SOCKET FAR * listening_sockets,
+                         BOOL report_error, SOCKET *listening_sockets,
                          int num_listening_sockets)
 {
-	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
+	FWDRequest *request = pvar->fwd_state.requests + request_num;
 
 	request->num_listening_sockets = 0;
 	request->listening_sockets = NULL;
@@ -1099,17 +1099,17 @@ static BOOL init_request(PTInstVar pvar, int request_num,
 	}
 }
 
-void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
+void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs,
                            int num_specs)
 {
-	FWDRequestSpec FAR *new_specs =
-		(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) * num_specs);
-	char FAR *specs_accounted_for;
+	FWDRequestSpec *new_specs =
+		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
+	char *specs_accounted_for;
 	typedef struct _saved_sockets {
-		SOCKET FAR *listening_sockets;
+		SOCKET *listening_sockets;
 		int num_listening_sockets;
 	} saved_sockets_t;
-	saved_sockets_t FAR *ptr_to_saved_sockets;
+	saved_sockets_t *ptr_to_saved_sockets;
 	int i;
 	int num_new_requests = num_specs;
 	int num_free_requests = 0;
@@ -1129,9 +1129,9 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 		}
 	}
 
-	specs_accounted_for = (char FAR *) malloc(sizeof(char) * num_specs);
+	specs_accounted_for = (char *) malloc(sizeof(char) * num_specs);
 	ptr_to_saved_sockets =
-		(saved_sockets_t FAR *) malloc(sizeof(saved_sockets_t) *
+		(saved_sockets_t *) malloc(sizeof(saved_sockets_t) *
 		                               num_specs);
 
 	memset(specs_accounted_for, 0, num_specs);
@@ -1142,9 +1142,9 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 
 	for (i = pvar->fwd_state.num_requests - 1; i >= 0; i--) {
 		if ((pvar->fwd_state.requests[i].status & FWD_DELETED) == 0) {
-			FWDRequestSpec FAR *cur_spec =
+			FWDRequestSpec *cur_spec =
 				&pvar->fwd_state.requests[i].spec;
-			FWDRequestSpec FAR *new_spec =
+			FWDRequestSpec *new_spec =
 				bsearch(cur_spec, new_specs, num_specs,
 				        sizeof(FWDRequestSpec), FWD_compare_specs);
 
@@ -1154,7 +1154,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 				num_new_requests--;
 			} else {
 				int num_listening_sockets;
-				SOCKET FAR *listening_sockets;
+				SOCKET *listening_sockets;
 				listening_sockets =
 					delete_request(pvar, i, &num_listening_sockets);
 
@@ -1186,7 +1186,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec FAR * specs,
 			pvar->fwd_state.num_requests + num_new_requests - num_free_requests;
 
 		pvar->fwd_state.requests =
-			(FWDRequest FAR *) realloc(pvar->fwd_state.requests,
+			(FWDRequest *) realloc(pvar->fwd_state.requests,
 			                           sizeof(FWDRequest) *
 			                           total_requests);
 		for (i = pvar->fwd_state.num_requests; i < total_requests; i++) {
@@ -1227,7 +1227,7 @@ void FWD_prep_forwarding(PTInstVar pvar)
 	int num_server_listening_requests = 0;
 
 	for (i = 0; i < pvar->fwd_state.num_requests; i++) {
-		FWDRequest FAR *request = pvar->fwd_state.requests + i;
+		FWDRequest *request = pvar->fwd_state.requests + i;
 
 		if ((request->status & FWD_DELETED) == 0) {
 			switch (request->spec.type) {
@@ -1263,8 +1263,8 @@ void FWD_prep_forwarding(PTInstVar pvar)
 		num_server_listening_requests;
 
 	if (num_server_listening_requests > 0) {
-		FWDRequestSpec FAR *server_listening_requests =
-			(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) *
+		FWDRequestSpec *server_listening_requests =
+			(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) *
 			                              num_server_listening_requests);
 
 		pvar->fwd_state.server_listening_specs = server_listening_requests;
@@ -1309,8 +1309,8 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 {
 	char buf[1024];
 	int channel_num;
-	FWDChannel FAR *channel;
-	FWDRequest FAR *request = pvar->fwd_state.requests + request_num;
+	FWDChannel *channel;
+	FWDRequest *request = pvar->fwd_state.requests + request_num;
 	struct addrinfo hints;
 	char pname[NI_MAXSERV];
 
@@ -1365,15 +1365,15 @@ static void create_local_channel(PTInstVar pvar, uint32 remote_channel_num,
 }
 
 void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
-              char FAR * local_hostname, int local_port,
-              char FAR * originator, int originator_len,
+              char *local_hostname, int local_port,
+              char *originator, int originator_len,
               int *chan_num)
 {
 	int i;
 	char buf[1024];
 
 	for (i = 0; i < pvar->fwd_state.num_requests; i++) {
-		FWDRequest FAR *request = pvar->fwd_state.requests + i;
+		FWDRequest *request = pvar->fwd_state.requests + i;
 
 		if (SSHv1(pvar)) {
 			if ((request->status & FWD_DELETED) == 0
@@ -1401,7 +1401,7 @@ void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
 	/* now, before we panic, maybe we TOLD the server we could forward this port
 	   and then the user changed the settings. */
 	for (i = 0; i < pvar->fwd_state.num_server_listening_specs; i++) {
-		FWDRequestSpec FAR *spec =
+		FWDRequestSpec *spec =
 			pvar->fwd_state.server_listening_specs + i;
 
 		if (spec->type == FWD_REMOTE_TO_LOCAL
@@ -1423,13 +1423,13 @@ void FWD_open(PTInstVar pvar, uint32 remote_channel_num,
 }
 
 void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
-                  char FAR * originator, int originator_len,
+                  char *originator, int originator_len,
                   int *chan_num)
 {
 	int i;
 
 	for (i = 0; i < pvar->fwd_state.num_requests; i++) {
-		FWDRequest FAR *request = pvar->fwd_state.requests + i;
+		FWDRequest *request = pvar->fwd_state.requests + i;
 
 		if ((request->status & FWD_DELETED) == 0
 		 && request->spec.type == FWD_REMOTE_X11_TO_LOCAL) {
@@ -1448,7 +1448,7 @@ void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
 	/* now, before we panic, maybe we TOLD the server we could forward this port
 	   and then the user changed the settings. */
 	for (i = 0; i < pvar->fwd_state.num_server_listening_specs; i++) {
-		FWDRequestSpec FAR *spec =
+		FWDRequestSpec *spec =
 			pvar->fwd_state.server_listening_specs + i;
 
 		if (spec->type == FWD_REMOTE_X11_TO_LOCAL) {
@@ -1479,7 +1479,7 @@ void FWD_confirmed_open(PTInstVar pvar, uint32 local_channel_num,
                         uint32 remote_channel_num)
 {
 	SOCKET s;
-	FWDChannel FAR *channel;
+	FWDChannel *channel;
 
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
 		return;
@@ -1510,7 +1510,7 @@ void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num)
 	FWD_free_channel(pvar, local_channel_num);
 }
 
-static BOOL blocking_write(PTInstVar pvar, SOCKET s, const char FAR * data,
+static BOOL blocking_write(PTInstVar pvar, SOCKET s, const char *data,
                            int length)
 {
 	u_long do_block = 0;
@@ -1550,10 +1550,10 @@ error:
 }
 
 void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
-                       unsigned char FAR * data, int length)
+                       unsigned char *data, int length)
 {
 	SOCKET s;
-	FWDChannel FAR *channel;
+	FWDChannel *channel;
 	int action = FWD_FILTER_RETAIN;
 
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
@@ -1630,7 +1630,7 @@ void FWD_end(PTInstVar pvar)
 		for (i = 0; i < pvar->fwd_state.num_requests; i++) {
 			int j;
 			int num_listening_sockets;
-			SOCKET FAR *s =
+			SOCKET *s =
 				delete_request(pvar, i, &num_listening_sockets);
 
 			for (j = 0; j < num_listening_sockets; ++j) {

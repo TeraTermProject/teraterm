@@ -67,21 +67,21 @@ typedef unsigned short uint16;
    (buf)[3] = (unsigned char)(uint32)(v))
 
 typedef struct _UTILSockWriteBuf {
-  char FAR * bufdata;
+  char *bufdata;
   int buflen;
   int datastart;
   int datalen;
 } UTILSockWriteBuf;
 
 typedef BOOL (* UTILBlockingWriteCallback)(PTInstVar pvar,
-  SOCKET socket, const char FAR * data, int len);
+  SOCKET socket, const char *data, int len);
 
-void UTIL_init_sock_write_buf(UTILSockWriteBuf FAR * buf);
-BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf FAR * buf,
-  UTILBlockingWriteCallback blocking_write, SOCKET socket, const char FAR * data, int len);
-BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf FAR * buf, SOCKET socket);
-void UTIL_destroy_sock_write_buf(UTILSockWriteBuf FAR * buf);
-BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf FAR * buf);
+void UTIL_init_sock_write_buf(UTILSockWriteBuf *buf);
+BOOL UTIL_sock_buffered_write(PTInstVar pvar, UTILSockWriteBuf *buf,
+  UTILBlockingWriteCallback blocking_write, SOCKET socket, const char *data, int len);
+BOOL UTIL_sock_write_more(PTInstVar pvar, UTILSockWriteBuf *buf, SOCKET socket);
+void UTIL_destroy_sock_write_buf(UTILSockWriteBuf *buf);
+BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf);
 
 void UTIL_get_lang_msg(PCHAR key, PTInstVar pvar, PCHAR def);
 int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PTInstVar pvar);

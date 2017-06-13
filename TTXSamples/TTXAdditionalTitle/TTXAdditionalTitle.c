@@ -43,7 +43,7 @@ typedef struct {
   char orig_title[TitleBuffSize];
 } TInstVar;
 
-static TInstVar FAR * pvar;
+static TInstVar *pvar;
 static TInstVar InstVar;
 
 static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
@@ -174,7 +174,7 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
   }
 }
 
-int PASCAL FAR TTXrecv(SOCKET s, char FAR *buff, int len, int flags) {
+int PASCAL FAR TTXrecv(SOCKET s, char *buff, int len, int flags) {
   int rlen;
 
   if ((rlen = pvar->origPrecv(s, buff, len, flags)) > 0) {
@@ -191,23 +191,23 @@ BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, L
   return result;
 }
 
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPrecv = *hooks->Precv;
   *hooks->Precv = TTXrecv;
 }
 
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPrecv) {
     *hooks->Precv = pvar->origPrecv;
   }
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
   pvar->origPReadFile = *hooks->PReadFile;
   *hooks->PReadFile = TTXReadFile;
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPReadFile) {
     *hooks->PReadFile = pvar->origPReadFile;
   }
@@ -230,7 +230,7 @@ static BOOL FAR PASCAL TTXDummySetupWin(HWND parent, PTTSet ts) {
   return (TRUE);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
+static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
   if (pvar->ChangeTitle) {
     pvar->ChangeTitle = FALSE;
     *hooks->SetupWin = TTXDummySetupWin;
@@ -303,7 +303,7 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
   }
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
+static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origReadIniFile = *hooks->ReadIniFile;
   *hooks->ReadIniFile = TTXReadIniFile;
   pvar->origWriteIniFile = *hooks->WriteIniFile;
@@ -340,14 +340,14 @@ static TTXExports Exports = {
   TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {
     size = exports->size;
   }
-  memcpy((char FAR *)exports + sizeof(exports->size),
-    (char FAR *)&Exports + sizeof(exports->size),
+  memcpy((char *)exports + sizeof(exports->size),
+    (char *)&Exports + sizeof(exports->size),
     size);
   return TRUE;
 }

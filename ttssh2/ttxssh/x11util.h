@@ -37,11 +37,11 @@ See LICENSE.TXT for the license.
 #include "ttxssh.h"
 
 typedef struct _X11AuthData {
-  char FAR * local_protocol;
-  unsigned char FAR * local_data;
+  char *local_protocol;
+  unsigned char *local_data;
   int local_data_len;
-  char FAR * spoofed_protocol;
-  unsigned char FAR * spoofed_data;
+  char *spoofed_protocol;
+  unsigned char *spoofed_data;
   int spoofed_data_len;
 } X11AuthData;
 
@@ -49,12 +49,12 @@ typedef struct _X11AuthData {
 #define X11_get_spoofed_protocol_data(d) ((d)->spoofed_data)
 #define X11_get_spoofed_protocol_data_len(d) ((d)->spoofed_data_len)
 
-void X11_get_DISPLAY_info(PTInstVar pvar, char FAR * name_buf, int name_buf_len, int FAR * port, int FAR * screen);
-X11AuthData FAR * X11_load_local_auth_data(int screen_num);
-void FAR * X11_init_unspoofing_filter(struct _TInstVar FAR * pvar,
-  X11AuthData FAR * auth_data);
-int X11_unspoofing_filter(void FAR * closure, int direction,
-  int FAR * length, unsigned char FAR * FAR * buf);
-void X11_dispose_auth_data(X11AuthData FAR * auth_data);
+void X11_get_DISPLAY_info(PTInstVar pvar, char *name_buf, int name_buf_len, int *port, int *screen);
+X11AuthData *X11_load_local_auth_data(int screen_num);
+void *X11_init_unspoofing_filter(struct _TInstVar *pvar,
+  X11AuthData *auth_data);
+int X11_unspoofing_filter(void *closure, int direction,
+  int *length, unsigned char **buf);
+void X11_dispose_auth_data(X11AuthData *auth_data);
 
 #endif

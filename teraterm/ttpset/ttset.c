@@ -493,7 +493,7 @@ static void WriteCygtermConfFile(PTTSet ts)
 
 }
 
-void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
+void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
 	HDC TmpDC;
@@ -1950,7 +1950,7 @@ void FAR PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ReadCygtermConfFile(ts);
 }
 
-void FAR PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
+void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 {
 	int i;
 	char Temp[MAX_PATH];
@@ -3240,7 +3240,7 @@ void GetInt(PKeyMap KeyMap, int KeyId, PCHAR Sect, PCHAR Key, PCHAR FName)
 	KeyMap->Map[KeyId - 1] = Num;
 }
 
-void FAR PASCAL ReadKeyboardCnf
+void PASCAL ReadKeyboardCnf
 	(PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning) {
 	int i, j, Ptr;
 	char EntName[7];
@@ -3493,7 +3493,7 @@ void FAR PASCAL ReadKeyboardCnf
 				}
 }
 
-void FAR PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
+void PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
                                PCHAR key, int MaxList)
 {
 	int i, j;
@@ -3526,7 +3526,7 @@ void FAR PASCAL CopySerialList(PCHAR IniSrc, PCHAR IniDest, PCHAR section,
 	WritePrivateProfileString(NULL, NULL, NULL, IniDest);
 }
 
-void FAR PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
+void PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
                                PCHAR key, int MaxList)
 {
 	HANDLE MemH;
@@ -3587,12 +3587,12 @@ void FAR PASCAL AddValueToList(PCHAR FName, PCHAR Host, PCHAR section,
 }
 
  /* copy hostlist from source IniFile to dest IniFile */
-void FAR PASCAL CopyHostList(PCHAR IniSrc, PCHAR IniDest)
+void PASCAL CopyHostList(PCHAR IniSrc, PCHAR IniDest)
 {
 	CopySerialList(IniSrc, IniDest, "Hosts", "Host", MAXHOSTLIST);
 }
 
-void FAR PASCAL AddHostToList(PCHAR FName, PCHAR Host)
+void PASCAL AddHostToList(PCHAR FName, PCHAR Host)
 {
 	AddValueToList(FName, Host, "Hosts", "Host", MAXHOSTLIST);
 }
@@ -3718,7 +3718,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 }
 
 
-void FAR PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
+void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 {
 	int i, pos, c;
 	//int param_top;

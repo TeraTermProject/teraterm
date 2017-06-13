@@ -174,8 +174,8 @@ typedef struct _BGBLENDFUNCTION
     BYTE     AlphaFormat;
 }BGBLENDFUNCTION;
 
-BOOL (FAR WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
-BOOL (FAR WINAPI *BGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
+BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
+BOOL (WINAPI *BGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 
 static HBITMAP GetBitmapHandle(char *File);
 
@@ -414,9 +414,9 @@ BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long
 {
   HINSTANCE hSPI;
   char spiVersion[8];
-  int (FAR PASCAL *SPI_IsSupported)(LPSTR,DWORD);
-  int (FAR PASCAL *SPI_GetPicture)(LPSTR,long,unsigned int,HANDLE *,HANDLE *,FARPROC,long);
-  int (FAR PASCAL *SPI_GetPluginInfo)(int,LPSTR,int);
+  int (PASCAL *SPI_IsSupported)(LPSTR,DWORD);
+  int (PASCAL *SPI_GetPicture)(LPSTR,long,unsigned int,HANDLE *,HANDLE *,FARPROC,long);
+  int (PASCAL *SPI_GetPluginInfo)(int,LPSTR,int);
   int ret;
 
   ret  = FALSE;
@@ -504,7 +504,7 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
   return TRUE;
 }
 
-BOOL FAR WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BGBLENDFUNCTION bf)
+BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BGBLENDFUNCTION bf)
 {
   HDC hdcDestWork,hdcSrcWork;
   int i,invAlpha,alpha;

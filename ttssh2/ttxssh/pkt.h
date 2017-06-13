@@ -39,7 +39,7 @@ See LICENSE.TXT for the license.
 #define PACKET_MAX_SIZE (4 * 1024 * 1024)
 
 typedef struct {
-  char FAR * buf;
+  char *buf;
   unsigned long buflen;
   unsigned long datastart;
   unsigned long datalen;
@@ -49,7 +49,7 @@ typedef struct {
 } PKTState;
 
 void PKT_init(PTInstVar pvar);
-int PKT_recv(PTInstVar pvar, char FAR * buf, int buflen);
+int PKT_recv(PTInstVar pvar, char *buf, int buflen);
 void PKT_end(PTInstVar pvar);
 
 #endif

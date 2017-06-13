@@ -42,11 +42,11 @@ static HFONT DlgFwdFont;
 
 typedef struct {
 	int port;
-	char FAR *name;
+	char *name;
 } TCP_service_name;
 
 typedef struct {
-	FWDRequestSpec FAR *spec;
+	FWDRequestSpec *spec;
 	PTInstVar pvar;
 } FWDEditClosure;
 
@@ -370,15 +370,15 @@ static TCP_service_name service_DB[] = {
 	{210, "z3950"}
 };
 
-static int compare_services(void const FAR * elem1, void const FAR * elem2)
+static int compare_services(void const *elem1, void const *elem2)
 {
-	TCP_service_name FAR *s1 = (TCP_service_name FAR *) elem1;
-	TCP_service_name FAR *s2 = (TCP_service_name FAR *) elem2;
+	TCP_service_name *s1 = (TCP_service_name *) elem1;
+	TCP_service_name *s2 = (TCP_service_name *) elem2;
 
 	return strcmp(s1->name, s2->name);
 }
 
-static void make_X_forwarding_spec(FWDRequestSpec FAR * spec, PTInstVar pvar)
+static void make_X_forwarding_spec(FWDRequestSpec *spec, PTInstVar pvar)
 {
 	spec->type = FWD_REMOTE_X11_TO_LOCAL;
 	spec->from_port = -1;
@@ -412,7 +412,7 @@ static int parse_port_from_buf(char * buf)
 		}
 	} else {
 		char lower_buf[32];
-		TCP_service_name FAR *result;
+		TCP_service_name *result;
 		TCP_service_name key;
 
 		for (i = 0; buf[i] != 0 && i < sizeof(lower_buf) - 1; i++) {
@@ -421,7 +421,7 @@ static int parse_port_from_buf(char * buf)
 		lower_buf[i] = 0;
 
 		key.name = lower_buf;
-		result = (TCP_service_name FAR *)
+		result = (TCP_service_name *)
 			bsearch(&key, service_DB, NUM_ELEM(service_DB),
 			        sizeof(service_DB[0]), compare_services);
 
@@ -561,10 +561,10 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 static void FWDUI_save_settings(PTInstVar pvar)
 {
 	int num_specs = FWD_get_num_request_specs(pvar);
-	FWDRequestSpec FAR *requests =
-		(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) * num_specs);
+	FWDRequestSpec *requests =
+		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
 	int i;
-	char FAR *str = pvar->settings.DefaultForwarding;
+	char *str = pvar->settings.DefaultForwarding;
 	int str_remaining = sizeof(pvar->settings.DefaultForwarding) - 1;
 	char format[20];
 
@@ -582,7 +582,7 @@ static void FWDUI_save_settings(PTInstVar pvar)
 		}
 
 		if (str_remaining > 0) {
-			FWDRequestSpec FAR *spec = requests + i;
+			FWDRequestSpec *spec = requests + i;
 			int chars;
 
 			// IPv6 アドレスなら "[", "]" を付加して文字列化
@@ -671,11 +671,11 @@ static void FWDUI_save_settings(PTInstVar pvar)
 
 void FWDUI_load_settings(PTInstVar pvar)
 {
-	char FAR *str = pvar->settings.DefaultForwarding;
+	char *str = pvar->settings.DefaultForwarding;
 
 	if (str[0] != 0) {
 		int i, ch, j;
-		FWDRequestSpec FAR *requests;
+		FWDRequestSpec *requests;
 
 		j = 1;
 		for (i = 0; (ch = str[i]) != 0; i++) {
@@ -685,7 +685,7 @@ void FWDUI_load_settings(PTInstVar pvar)
 		}
 
 		requests =
-			(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) * j);
+			(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * j);
 
 		j = 0;
 		if (parse_request(requests, str, pvar)) {
@@ -729,8 +729,8 @@ void FWDUI_open(PTInstVar pvar)
 {
 }
 
-static void set_verbose_port(char FAR * buf, int bufsize, int port,
-                             char FAR * name)
+static void set_verbose_port(char *buf, int bufsize, int port,
+                             char *name)
 {
 	if (*name >= '0' && *name <= '9') {
 		strncpy_s(buf, bufsize, name, _TRUNCATE);
@@ -741,7 +741,7 @@ static void set_verbose_port(char FAR * buf, int bufsize, int port,
 	buf[bufsize - 1] = 0;
 }
 
-static void get_spec_string(FWDRequestSpec FAR * spec, char FAR * buf,
+static void get_spec_string(FWDRequestSpec *spec, char *buf,
                             int bufsize, PTInstVar pvar)
 {
 	char verbose_from_port[64];
@@ -790,7 +790,7 @@ static void init_listbox_selection(HWND dlg)
 	update_listbox_selection(dlg);
 }
 
-static int add_spec_to_listbox(HWND dlg, FWDRequestSpec FAR * spec, PTInstVar pvar)
+static int add_spec_to_listbox(HWND dlg, FWDRequestSpec *spec, PTInstVar pvar)
 {
 	char buf[1024];
 	HWND listbox = GetDlgItem(dlg, IDC_SSHFWDLIST);
@@ -801,7 +801,7 @@ static int add_spec_to_listbox(HWND dlg, FWDRequestSpec FAR * spec, PTInstVar pv
 	index = SendMessage(listbox, LB_ADDSTRING, 0, (LPARAM) buf);
 
 	if (index >= 0) {
-		FWDRequestSpec FAR *listbox_spec = malloc(sizeof(FWDRequestSpec));
+		FWDRequestSpec *listbox_spec = malloc(sizeof(FWDRequestSpec));
 
 		*listbox_spec = *spec;
 		if (SendMessage
@@ -817,8 +817,8 @@ static int add_spec_to_listbox(HWND dlg, FWDRequestSpec FAR * spec, PTInstVar pv
 static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 {
 	int num_specs = FWD_get_num_request_specs(pvar);
-	FWDRequestSpec FAR *requests =
-		(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) * num_specs);
+	FWDRequestSpec *requests =
+		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
 	int i;
 	char uimsg[MAX_UIMSG];
 
@@ -867,7 +867,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 
 static void free_listbox_spec(HWND listbox, int selection)
 {
-	FWDRequestSpec FAR *spec = (FWDRequestSpec FAR *)
+	FWDRequestSpec *spec = (FWDRequestSpec *)
 		SendMessage(listbox, LB_GETITEMDATA, selection, 0);
 
 	if (spec != NULL) {
@@ -892,14 +892,14 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 	int num_items = SendMessage(listbox, LB_GETCOUNT, 0, 0);
 	BOOL X_enabled = IsDlgButtonChecked(dlg, IDC_SSHFWDX11);
 	int num_specs = X_enabled ? 1 : 0;
-	FWDRequestSpec FAR *specs =
-		(FWDRequestSpec FAR *) malloc(sizeof(FWDRequestSpec) *
+	FWDRequestSpec *specs =
+		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) *
 		                              (num_specs + num_items));
 	int i;
 	int num_unspecified_forwardings = 0;
 
 	for (i = 0; i < num_items; i++) {
-		FWDRequestSpec FAR *spec = (FWDRequestSpec FAR *)
+		FWDRequestSpec *spec = (FWDRequestSpec *)
 			SendMessage(listbox, LB_GETITEMDATA, i, 0);
 
 		if (spec != NULL) {
@@ -1027,7 +1027,7 @@ static void set_dir_options_status(HWND dlg)
 	shift_over_input(dlg, type, IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT);
 }
 
-static void setup_edit_controls(HWND dlg, FWDRequestSpec FAR * spec,
+static void setup_edit_controls(HWND dlg, FWDRequestSpec *spec,
                                 WORD radio_item,
                                 WORD from_port_item, WORD listen_address_item,
                                 WORD to_host_item, WORD to_port_item)
@@ -1046,7 +1046,7 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec FAR * spec,
 	set_dir_options_status(dlg);
 }
 
-static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec, HWND dlg)
+static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 {
 	char uimsg[MAX_UIMSG];
 
@@ -1107,14 +1107,14 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec, HWND dl
 }
 
 static void grab_control_text(HWND dlg, int type, WORD rtl_item,
-                              WORD ltr_item, char FAR * buf, int bufsize)
+                              WORD ltr_item, char *buf, int bufsize)
 {
 	GetDlgItemText(dlg, type == FWD_REMOTE_TO_LOCAL ? rtl_item : ltr_item,
 	               buf, bufsize);
 	buf[bufsize - 1] = 0;
 }
 
-static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
+static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec,
                              HWND dlg)
 {
 	FWDRequestSpec new_spec;
@@ -1192,7 +1192,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec FAR * spec,
 static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                        LPARAM lParam)
 {
-	FWDEditClosure FAR *closure;
+	FWDEditClosure *closure;
 	PTInstVar pvar;
 	LOGFONT logfont;
 	HFONT font;
@@ -1200,7 +1200,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 	switch (msg) {
 	case WM_INITDIALOG:
-		closure = (FWDEditClosure FAR *) lParam;
+		closure = (FWDEditClosure *) lParam;
 		SetWindowLong(dlg, DWL_USER, lParam);
 
 		pvar = closure->pvar;
@@ -1233,7 +1233,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
-		closure = (FWDEditClosure FAR *) GetWindowLong(dlg, DWL_USER);
+		closure = (FWDEditClosure *) GetWindowLong(dlg, DWL_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -1307,7 +1307,7 @@ static void edit_forwarding_entry(PTInstVar pvar, HWND dlg)
 	int cursel = SendMessage(listbox, LB_GETCURSEL, 0, 0);
 
 	if (cursel >= 0) {
-		FWDRequestSpec FAR *spec = (FWDRequestSpec FAR *)
+		FWDRequestSpec *spec = (FWDRequestSpec *)
 			SendMessage(listbox, LB_GETITEMDATA, cursel, 0);
 
 		if (spec != NULL) {

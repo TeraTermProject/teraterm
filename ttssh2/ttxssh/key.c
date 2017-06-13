@@ -478,10 +478,10 @@ int key_verify(Key *key,
 	return (ret);   // success
 }
 
-static char FAR *copy_mp_int(char FAR * num)
+static char *copy_mp_int(char *num)
 {
 	int len = (get_ushort16_MSBfirst(num) + 7) / 8 + 2;
-	char FAR *result = (char FAR *) malloc(len);
+	char *result = (char *) malloc(len);
 
 	if (result != NULL) {
 		memcpy(result, num, len);
@@ -2081,14 +2081,14 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
 		}
-		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)buf);
+		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
 		free(buf);
 	}
 
 	if (ctx->nold > 0) {
 		buf_len = 100 * ctx->nold;
 		buf = calloc(100, ctx->nold);
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)"");
+		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)"");
 		for (i = 0; i < ctx->nold; i++) {
 			switch (dgst_alg) {
 			case SSH_DIGEST_MD5:
@@ -2109,7 +2109,7 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
 		}
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char FAR *)buf);
+		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
 		free(buf);
 	}
 }

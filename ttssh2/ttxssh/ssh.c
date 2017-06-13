@@ -739,7 +739,7 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
    'len' is the length of the
    payload + padding (+ length of CRC for SSHv1). 'padding' is the length
    of the padding alone. */
-static int prep_packet(PTInstVar pvar, char FAR * data, int len,
+static int prep_packet(PTInstVar pvar, char *data, int len,
 					   int padding)
 {
 	pvar->ssh_state.payload = data + 4;
@@ -857,9 +857,9 @@ static int prep_packet(PTInstVar pvar, char FAR * data, int len,
    or for the packet type byte).
    Returns a pointer to the payload data area, a region of length 'len',
    to be filled by the caller. */
-unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len)
+unsigned char *begin_send_packet(PTInstVar pvar, int type, int len)
 {
-	unsigned char FAR *buf;
+	unsigned char *buf;
 
 	pvar->ssh_state.outgoing_packet_len = len + 1;
 
@@ -890,7 +890,7 @@ unsigned char FAR *begin_send_packet(PTInstVar pvar, int type, int len)
 // ことがあるので、その場合はエラーとしない。
 // これにより、TCPコネクション切断の誤検出を防ぐ。
 // (2006.12.9 yutaka)
-static int retry_send_packet(PTInstVar pvar, char FAR * data, int len)
+static int retry_send_packet(PTInstVar pvar, char *data, int len)
 {
 	int n;
 	int err;
@@ -917,7 +917,7 @@ static int retry_send_packet(PTInstVar pvar, char FAR * data, int len)
 	return 0; // success
 }
 
-static BOOL send_packet_blocking(PTInstVar pvar, char FAR * data, int len)
+static BOOL send_packet_blocking(PTInstVar pvar, char *data, int len)
 {
 	// パケット送信後にバッファを使いまわすため、ブロッキングで送信してしまう必要がある。
 	// ノンブロッキングで送信してWSAEWOULDBLOCKが返ってきた場合、そのバッファは送信完了する
@@ -986,7 +986,7 @@ error:
 void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 {
 	unsigned int len = pvar->ssh_state.outgoing_packet_len;
-	unsigned char FAR *data;
+	unsigned char *data;
 	unsigned int data_length;
 	buffer_t *msg = NULL; // for SSH2 packet compression
 
@@ -1151,18 +1151,18 @@ static void destroy_packet_buf(PTInstVar pvar)
    handlers fires, if it returns FALSE, then all handlers in the set are
    removed from their queues. */
 static void enque_handlers(PTInstVar pvar, int num_msgs,
-                           const int FAR * messages,
-                           const SSHPacketHandler FAR * handlers)
+                           const int *messages,
+                           const SSHPacketHandler *handlers)
 {
-	SSHPacketHandlerItem FAR *first_item;
-	SSHPacketHandlerItem FAR *last_item = NULL;
+	SSHPacketHandlerItem *first_item;
+	SSHPacketHandlerItem *last_item = NULL;
 	int i;
 
 	for (i = 0; i < num_msgs; i++) {
-		SSHPacketHandlerItem FAR *item =
-			(SSHPacketHandlerItem FAR *)
+		SSHPacketHandlerItem *item =
+			(SSHPacketHandlerItem *)
 			malloc(sizeof(SSHPacketHandlerItem));
-		SSHPacketHandlerItem FAR *cur_item =
+		SSHPacketHandlerItem *cur_item =
 			pvar->ssh_state.packet_handlers[messages[i]];
 
 		item->handler = handlers[i];
@@ -1195,7 +1195,7 @@ static void enque_handlers(PTInstVar pvar, int num_msgs,
 
 static SSHPacketHandler get_handler(PTInstVar pvar, int message)
 {
-	SSHPacketHandlerItem FAR *cur_item =
+	SSHPacketHandlerItem *cur_item =
 		pvar->ssh_state.packet_handlers[message];
 
 	if (cur_item == NULL) {
@@ -1208,18 +1208,18 @@ static SSHPacketHandler get_handler(PTInstVar pvar, int message)
 /* Called only by SSH_handle_packet */
 static void deque_handlers(PTInstVar pvar, int message)
 {
-	SSHPacketHandlerItem FAR *cur_item =
+	SSHPacketHandlerItem *cur_item =
 		pvar->ssh_state.packet_handlers[message];
-	SSHPacketHandlerItem FAR *first_item_in_set = cur_item;
+	SSHPacketHandlerItem *first_item_in_set = cur_item;
 
 	if (cur_item == NULL)
 		return;
 
 	do {
-		SSHPacketHandlerItem FAR *next_in_set = cur_item->next_in_set;
+		SSHPacketHandlerItem *next_in_set = cur_item->next_in_set;
 
 		if (cur_item->active_for_message >= 0) {
-			SSHPacketHandlerItem FAR *replacement =
+			SSHPacketHandlerItem *replacement =
 				cur_item->next_for_message;
 
 			if (replacement == cur_item) {
@@ -1247,7 +1247,7 @@ static void enque_handler(PTInstVar pvar, int message,
 	enque_handlers(pvar, 1, &message, &handler);
 }
 
-static void chop_newlines(char FAR * buf)
+static void chop_newlines(char *buf)
 {
 	int len = strlen(buf);
 
@@ -1365,7 +1365,7 @@ static BOOL handle_ignore(PTInstVar pvar)
 static BOOL handle_debug(PTInstVar pvar)
 {
 	BOOL always_display;
-	char FAR *description;
+	char *description;
 	int description_len;
 	char buf[2048];
 
@@ -1411,10 +1411,10 @@ static BOOL handle_debug(PTInstVar pvar)
 static BOOL handle_disconnect(PTInstVar pvar)
 {
 	int reason_code;
-	char FAR *description;
+	char *description;
 	int description_len;
 	char buf[2048];
-	char FAR *explanation = "";
+	char *explanation = "";
 	char uimsg[MAX_UIMSG];
 
 	if (SSHv1(pvar)) {
@@ -1527,7 +1527,7 @@ static BOOL handle_server_public_key(PTInstVar pvar)
 	int host_key_public_modulus_len;
 	int protocol_flags_pos;
 	int supported_ciphers;
-	char FAR *inmsg;
+	char *inmsg;
 	Key hostkey;
 	int supported_types;
 
@@ -1609,9 +1609,9 @@ static BOOL handle_server_public_key(PTInstVar pvar)
 The ID must have already been found to start with "SSH-". It must
 be null-terminated.
 */
-static BOOL parse_protocol_ID(PTInstVar pvar, char FAR * ID)
+static BOOL parse_protocol_ID(PTInstVar pvar, char *ID)
 {
-	char FAR *str;
+	char *str;
 
 	for (str = ID + 4; *str >= '0' && *str <= '9'; str++) {
 	}
@@ -1743,7 +1743,7 @@ void server_version_check(PTInstVar pvar)
 	}
 }
 
-BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
+BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 {
 	static char prefix[64];
 	int negotiate;
@@ -1757,11 +1757,11 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 		return FALSE;
 	} else {
 		int buf_len;
-		char FAR *buf;
+		char *buf;
 
 		strncpy_s(prefix, sizeof(prefix), "Received server identification string: ", _TRUNCATE);
 		buf_len = strlen(prefix) + ID_len + 1;
-		buf = (char FAR *) malloc(buf_len);
+		buf = (char *) malloc(buf_len);
 		strncpy_s(buf, buf_len, prefix, _TRUNCATE);
 		strncat_s(buf, buf_len, ID, _TRUNCATE);
 		chop_newlines(buf);
@@ -1845,7 +1845,7 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char FAR * ID, int ID_len)
 
 					strncpy_s(prefix, sizeof(prefix), "Sent client identification string: ", _TRUNCATE);
 					buf_len = strlen(prefix) + strlen(pvar->client_version_string) + 1;
-					buf = (char FAR *) malloc(buf_len);
+					buf = (char *) malloc(buf_len);
 					strncpy_s(buf, buf_len, prefix, _TRUNCATE);
 					strncat_s(buf, buf_len, pvar->client_version_string, _TRUNCATE);
 					notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
@@ -2109,7 +2109,7 @@ void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end)
 }
 
 
-void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len,
+void SSH_handle_packet(PTInstVar pvar, char *data, int len,
 					   int padding)
 {
 	unsigned char message = prep_packet(pvar, data, len, padding);
@@ -2144,7 +2144,7 @@ void SSH_handle_packet(PTInstVar pvar, char FAR * data, int len,
 					pvar->ts->UIMsg, message, handle_message_stage);
 				notify_fatal_error(pvar, buf, TRUE);
 			} else {
-				unsigned char FAR *outmsg =
+				unsigned char *outmsg =
 					begin_send_packet(pvar, SSH2_MSG_UNIMPLEMENTED, 4);
 
 				set_uint32(outmsg,
@@ -2191,7 +2191,7 @@ static BOOL handle_pty_failure(PTInstVar pvar)
 static void prep_pty(PTInstVar pvar)
 {
 	int len = strlen(pvar->ts->TermType);
-	unsigned char FAR *outmsg =
+	unsigned char *outmsg =
 		begin_send_packet(pvar, SSH_CMSG_REQUEST_PTY,
 		                  4 + len + 16 + sizeof(ssh_ttymodes));
 	static const int msgs[] = { SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
@@ -2354,7 +2354,7 @@ static void prep_compression(PTInstVar pvar)
 			static const SSHPacketHandler handlers[]
 			= { handle_enable_compression, handle_disable_compression };
 
-			unsigned char FAR *outmsg =
+			unsigned char *outmsg =
 				begin_send_packet(pvar, SSH_CMSG_REQUEST_COMPRESSION, 4);
 
 			set_uint32(outmsg, pvar->session_settings.CompressionLevel);
@@ -2394,7 +2394,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 	challenge_bytes = get_mpint_len(pvar, 0);
 
 	if (grab_payload(pvar, challenge_bytes)) {
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_CMSG_AUTH_RSA_RESPONSE, 16);
 
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
@@ -2423,7 +2423,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 			int server_key_bytes = (server_key_bits + 7) / 8;
 			int host_key_bytes = (host_key_bits + 7) / 8;
 			int session_buf_len = server_key_bytes + host_key_bytes + 8;
-			char FAR *session_buf = (char FAR *) malloc(session_buf_len);
+			char *session_buf = (char *) malloc(session_buf_len);
 			unsigned char session_id[16];
 
 			unsigned char *hash;
@@ -2464,7 +2464,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 static void try_send_credentials(PTInstVar pvar)
 {
 	if ((pvar->ssh_state.status_flags & STATUS_DONT_SEND_CREDENTIALS) == 0) {
-		AUTHCred FAR *cred = AUTH_get_cur_cred(pvar);
+		AUTHCred *cred = AUTH_get_cur_cred(pvar);
 		static const int RSA_msgs[] =
 			{ SSH_SMSG_AUTH_RSA_CHALLENGE, SSH_SMSG_FAILURE };
 		static const SSHPacketHandler RSA_handlers[]
@@ -2483,7 +2483,7 @@ static void try_send_credentials(PTInstVar pvar)
 			return;
 		case SSH_AUTH_PASSWORD:{
 				int len = strlen(cred->password);
-				unsigned char FAR *outmsg =
+				unsigned char *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_PASSWORD,
 					                  4 + len);
 
@@ -2505,7 +2505,7 @@ static void try_send_credentials(PTInstVar pvar)
 			}
 		case SSH_AUTH_RHOSTS:{
 				int len = strlen(cred->rhosts_client_user);
-				unsigned char FAR *outmsg =
+				unsigned char *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RHOSTS, 4 + len);
 
 				notify_verbose_message(pvar,
@@ -2520,7 +2520,7 @@ static void try_send_credentials(PTInstVar pvar)
 			}
 		case SSH_AUTH_RSA:{
 				int len = BN_num_bytes(cred->key_pair->rsa->n);
-				unsigned char FAR *outmsg =
+				unsigned char *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RSA, 2 + len);
 
 				notify_verbose_message(pvar,
@@ -2538,7 +2538,7 @@ static void try_send_credentials(PTInstVar pvar)
 				int name_len = strlen(cred->rhosts_client_user);
 				int exp_len = BN_num_bytes(cred->key_pair->rsa->e);
 				int index;
-				unsigned char FAR *outmsg =
+				unsigned char *outmsg =
 					begin_send_packet(pvar, SSH_CMSG_AUTH_RHOSTS_RSA,
 					                  12 + mod_len + name_len + exp_len);
 
@@ -2562,7 +2562,7 @@ static void try_send_credentials(PTInstVar pvar)
 				break;
 			}
 		case SSH_AUTH_PAGEANT:{
-				unsigned char FAR *outmsg;
+				unsigned char *outmsg;
 				unsigned char *pubkey;
 				int len, bn_bytes;
 
@@ -2604,7 +2604,7 @@ static void try_send_credentials(PTInstVar pvar)
 			}
 		case SSH_AUTH_TIS:{
 				if (cred->password == NULL) {
-					unsigned char FAR *outmsg =
+					unsigned char *outmsg =
 						begin_send_packet(pvar, SSH_CMSG_AUTH_TIS, 0);
 
 					notify_verbose_message(pvar,
@@ -2613,7 +2613,7 @@ static void try_send_credentials(PTInstVar pvar)
 					enque_handlers(pvar, 2, TIS_msgs, TIS_handlers);
 				} else {
 					int len = strlen(cred->password);
-					unsigned char FAR *outmsg =
+					unsigned char *outmsg =
 						begin_send_packet(pvar, SSH_CMSG_AUTH_TIS_RESPONSE,
 						                  4 + len);
 
@@ -2648,11 +2648,11 @@ skip_ssh2:;
 static void try_send_user_name(PTInstVar pvar)
 {
 	if ((pvar->ssh_state.status_flags & STATUS_DONT_SEND_USER_NAME) == 0) {
-		char FAR *username = AUTH_get_user_name(pvar);
+		char *username = AUTH_get_user_name(pvar);
 
 		if (username != NULL) {
 			int len = strlen(username);
-			unsigned char FAR *outmsg =
+			unsigned char *outmsg =
 				begin_send_packet(pvar, SSH_CMSG_USER, 4 + len);
 			char buf[1024] = "Sending user name: ";
 			static const int msgs[] =
@@ -2677,7 +2677,7 @@ static void try_send_user_name(PTInstVar pvar)
 static void send_session_key(PTInstVar pvar)
 {
 	int encrypted_session_key_len;
-	unsigned char FAR *outmsg;
+	unsigned char *outmsg;
 
 	if (SSHv1(pvar)) {
 		encrypted_session_key_len =
@@ -2770,11 +2770,11 @@ void SSH_open(PTInstVar pvar)
 	pvar->ssh_state.win_rows = pvar->ts->TerminalHeight;
 }
 
-void SSH_notify_disconnecting(PTInstVar pvar, char FAR * reason)
+void SSH_notify_disconnecting(PTInstVar pvar, char *reason)
 {
 	if (SSHv1(pvar)) {
 		int len = reason == NULL ? 0 : strlen(reason);
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_DISCONNECT, len + 4);
 
 		set_uint32(outmsg, len);
@@ -2845,7 +2845,7 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 
 	if (SSHv1(pvar)) {
 		if (get_handler(pvar, SSH_SMSG_STDOUT_DATA) == handle_data) {
-			unsigned char FAR *outmsg =
+			unsigned char *outmsg =
 				begin_send_packet(pvar, SSH_CMSG_WINDOW_SIZE, 16);
 
 			set_uint32(outmsg, rows);     // window height (characters)
@@ -2953,7 +2953,7 @@ int SSH_get_min_packet_size(PTInstVar pvar)
 
 /* data is guaranteed to be at least SSH_get_min_packet_size bytes long
    at least 5 bytes must be decrypted */
-void SSH_predecrpyt_packet(PTInstVar pvar, char FAR * data)
+void SSH_predecrpyt_packet(PTInstVar pvar, char *data)
 {
 	if (SSHv2(pvar)) {
 		CRYPT_decrypt(pvar, data, get_predecryption_amount(pvar));
@@ -2979,7 +2979,7 @@ void SSH_notify_cred(PTInstVar pvar)
 	try_send_credentials(pvar);
 }
 
-void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen)
+void SSH_send(PTInstVar pvar, unsigned char const *buf, unsigned int buflen)
 {
 	// RAWパケットダンプを追加 (2008.8.15 yutaka)
 	if (LOG_LEVEL_SSHDUMP <= pvar->session_settings.LogLevel) {
@@ -2996,7 +2996,7 @@ void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen
 			int len =
 				buflen >
 				SSH_MAX_SEND_PACKET_SIZE ? SSH_MAX_SEND_PACKET_SIZE : buflen;
-			unsigned char FAR *outmsg =
+			unsigned char *outmsg =
 				begin_send_packet(pvar, SSH_CMSG_STDIN_DATA, 4 + len);
 
 			set_uint32(outmsg, len);
@@ -3021,7 +3021,7 @@ void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen
 				}
 
 				pvar->ssh_state.compress_stream.next_in =
-					(unsigned char FAR *) buf;
+					(unsigned char *) buf;
 				pvar->ssh_state.compress_stream.avail_in = len;
 
 				if (deflate(&pvar->ssh_state.compress_stream, Z_SYNC_FLUSH) != Z_OK) {
@@ -3047,7 +3047,7 @@ void SSH_send(PTInstVar pvar, unsigned char const FAR * buf, unsigned int buflen
 
 }
 
-int SSH_extract_payload(PTInstVar pvar, unsigned char FAR * dest, int len)
+int SSH_extract_payload(PTInstVar pvar, unsigned char *dest, int len)
 {
 	int num_bytes = pvar->ssh_state.payload_datalen;
 
@@ -3077,7 +3077,7 @@ int SSH_extract_payload(PTInstVar pvar, unsigned char FAR * dest, int len)
 	return num_bytes;
 }
 
-void SSH_get_compression_info(PTInstVar pvar, char FAR * dest, int len)
+void SSH_get_compression_info(PTInstVar pvar, char *dest, int len)
 {
 	char buf[1024];
 	char buf2[1024];
@@ -3139,7 +3139,7 @@ void SSH_get_compression_info(PTInstVar pvar, char FAR * dest, int len)
 	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg, buf, buf2);
 }
 
-void SSH_get_server_ID_info(PTInstVar pvar, char FAR * dest, int len)
+void SSH_get_server_ID_info(PTInstVar pvar, char *dest, int len)
 {
 	strncpy_s(dest, len,
 	          pvar->ssh_state.server_ID == NULL ? "Unknown"
@@ -3147,7 +3147,7 @@ void SSH_get_server_ID_info(PTInstVar pvar, char FAR * dest, int len)
 	          _TRUNCATE);
 }
 
-void SSH_get_protocol_version_info(PTInstVar pvar, char FAR * dest,
+void SSH_get_protocol_version_info(PTInstVar pvar, char *dest,
                                    int len)
 {
 	if (pvar->protocol_major == 0) {
@@ -3158,7 +3158,7 @@ void SSH_get_protocol_version_info(PTInstVar pvar, char FAR * dest,
 	}
 }
 
-void SSH_get_mac_info(PTInstVar pvar, char FAR * dest, int len)
+void SSH_get_mac_info(PTInstVar pvar, char *dest, int len)
 {
 	UTIL_get_lang_msg("DLG_ABOUT_MAC_INFO", pvar,
 	                  "%s to server, %s from server");
@@ -3173,14 +3173,14 @@ void SSH_end(PTInstVar pvar)
 	int mode;
 
 	for (i = 0; i < 256; i++) {
-		SSHPacketHandlerItem FAR *first_item =
+		SSHPacketHandlerItem *first_item =
 			pvar->ssh_state.packet_handlers[i];
 
 		if (first_item != NULL) {
-			SSHPacketHandlerItem FAR *item = first_item;
+			SSHPacketHandlerItem *item = first_item;
 
 			do {
-				SSHPacketHandlerItem FAR *cur_item = item;
+				SSHPacketHandlerItem *cur_item = item;
 
 				item = item->next_for_message;
 				free(cur_item);
@@ -3287,7 +3287,7 @@ void SSH_end(PTInstVar pvar)
 
 }
 
-void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * buf, unsigned int buflen, int retry)
+void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry)
 {
 	buffer_t *msg;
 	unsigned char *outmsg;
@@ -3355,10 +3355,10 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char FAR * bu
 /* support for port forwarding */
 void SSH_channel_send(PTInstVar pvar, int channel_num,
                       uint32 remote_channel_num,
-                      unsigned char FAR * buf, int len, int retry)
+                      unsigned char *buf, int len, int retry)
 {
 	if (SSHv1(pvar)) {
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_CHANNEL_DATA, 8 + len);
 
 		set_uint32(outmsg, remote_channel_num);
@@ -3383,7 +3383,7 @@ void SSH_channel_send(PTInstVar pvar, int channel_num,
 			}
 
 			pvar->ssh_state.compress_stream.next_in =
-				(unsigned char FAR *) buf;
+				(unsigned char *) buf;
 			pvar->ssh_state.compress_stream.avail_in = len;
 
 			if (deflate(&pvar->ssh_state.compress_stream, Z_SYNC_FLUSH) !=
@@ -3410,7 +3410,7 @@ void SSH_channel_send(PTInstVar pvar, int channel_num,
 void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num)
 {
 	if (SSHv1(pvar)) {
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_CHANNEL_OPEN_FAILURE, 4);
 
 		set_uint32(outmsg, remote_channel_num);
@@ -3476,7 +3476,7 @@ void SSH_confirm_channel_open(PTInstVar pvar, uint32 remote_channel_num,
 							  uint32 local_channel_num)
 {
 	if (SSHv1(pvar)) {
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_CHANNEL_OPEN_CONFIRMATION, 8);
 
 		set_uint32(outmsg, remote_channel_num);
@@ -3499,7 +3499,7 @@ void SSH_confirm_channel_open(PTInstVar pvar, uint32 remote_channel_num,
 void SSH_channel_output_eof(PTInstVar pvar, uint32 remote_channel_num)
 {
 	if (SSHv1(pvar)){
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_CHANNEL_OUTPUT_CLOSED, 4);
 
 		set_uint32(outmsg, remote_channel_num);
@@ -3550,7 +3550,7 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 local_channel_num)
 {
 	if (SSHv1(pvar)){
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_CHANNEL_INPUT_EOF, 4);
 
 		set_uint32(outmsg, remote_channel_num);
@@ -3568,12 +3568,12 @@ void SSH_channel_input_eof(PTInstVar pvar, uint32 remote_channel_num, uint32 loc
 	}
 }
 
-void SSH_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port,
-                            char FAR * to_local_host, int to_local_port)
+void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_port,
+                            char *to_local_host, int to_local_port)
 {
 	if (SSHv1(pvar)) {
 		int host_len = strlen(to_local_host);
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_CMSG_PORT_FORWARD_REQUEST,
 			                  12 + host_len);
 
@@ -3614,7 +3614,7 @@ void SSH_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_se
 	}
 }
 
-void SSH_cancel_request_forwarding(PTInstVar pvar, char FAR * bind_address, int from_server_port, int reply)
+void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_port, int reply)
 {
 	if (SSHv2(pvar)) {
 		buffer_t *msg;
@@ -3645,18 +3645,18 @@ void SSH_cancel_request_forwarding(PTInstVar pvar, char FAR * bind_address, int 
 }
 
 void SSH_request_X11_forwarding(PTInstVar pvar,
-                                char FAR * auth_protocol,
-                                unsigned char FAR * auth_data,
+                                char *auth_protocol,
+                                unsigned char *auth_data,
                                 int auth_data_len, int screen_num)
 {
 	if (SSHv1(pvar)) {
 		int protocol_len = strlen(auth_protocol);
 		int data_len = auth_data_len * 2;
 		int outmsg_len = 12 + protocol_len + data_len;
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_CMSG_X11_REQUEST_FORWARDING, outmsg_len);
 		int i;
-		char FAR *auth_data_ptr;
+		char *auth_data_ptr;
 
 		set_uint32(outmsg, protocol_len);
 		memcpy(outmsg + 4, auth_protocol, protocol_len);
@@ -3730,8 +3730,8 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 }
 
 void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
-                      char FAR * to_remote_host, int to_remote_port,
-                      char FAR * originator, unsigned short originator_port)
+                      char *to_remote_host, int to_remote_port,
+                      char *originator, unsigned short originator_port)
 {
 	static const int msgs[]
 	= { SSH_MSG_CHANNEL_OPEN_CONFIRMATION, SSH_MSG_CHANNEL_OPEN_FAILURE };
@@ -3743,7 +3743,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 	if ((pvar->ssh_state.
 		 server_protocol_flags & SSH_PROTOFLAG_HOST_IN_FWD_OPEN) != 0) {
 		int originator_len = strlen(originator);
-		unsigned char FAR *outmsg =
+		unsigned char *outmsg =
 			begin_send_packet(pvar, SSH_MSG_PORT_OPEN,
 			                  16 + host_len + originator_len);
 
@@ -3756,7 +3756,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 	} else {
 
 		if (SSHv1(pvar)) {
-			unsigned char FAR *outmsg =
+			unsigned char *outmsg =
 				begin_send_packet(pvar, SSH_MSG_PORT_OPEN,
 				                  12 + host_len);
 
@@ -6693,7 +6693,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 }
 
 
-static unsigned __stdcall ssh_heartbeat_thread(void FAR * p)
+static unsigned __stdcall ssh_heartbeat_thread(void *p)
 {
 	static int instance = 0;
 	PTInstVar pvar = (PTInstVar)p;
@@ -8047,7 +8047,7 @@ void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 	return;
 }
 
-static unsigned __stdcall ssh_scp_thread(void FAR * p)
+static unsigned __stdcall ssh_scp_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;
@@ -8229,7 +8229,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 
 #define WM_RECEIVING_FILE (WM_USER + 2)
 
-static unsigned __stdcall ssh_scp_receive_thread(void FAR * p)
+static unsigned __stdcall ssh_scp_receive_thread(void *p)
 {
 	Channel_t *c = (Channel_t *)p;
 	PTInstVar pvar = c->scp.pvar;

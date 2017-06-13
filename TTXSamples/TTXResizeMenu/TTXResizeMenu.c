@@ -27,7 +27,7 @@ typedef struct {
   int ResizeList[MAX_MENU_ITEMS][2];
 } TInstVar;
 
-static TInstVar FAR * pvar;
+static TInstVar *pvar;
 
 /* WIN32 allows multiple instances of a DLL */
 static TInstVar InstVar;
@@ -172,7 +172,7 @@ static BOOL FAR PASCAL TTXSetupTerminal(HWND parent, PTTSet ts) {
   return (TRUE);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
+static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
   if (pvar->ReplaceTermDlg) {
     *hooks->SetupTerminal = TTXSetupTerminal;
   }
@@ -221,7 +221,7 @@ static void PASCAL FAR ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
   pvar->MenuItems = i;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR * hooks) {
+static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origReadIniFile = *hooks->ReadIniFile;
   *hooks->ReadIniFile = ResizeMenuReadIniFile;
 }
@@ -290,14 +290,14 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {
     size = exports->size;
   }
-  memcpy((char FAR *)exports + sizeof(exports->size),
-         (char FAR *)&Exports + sizeof(exports->size),
+  memcpy((char *)exports + sizeof(exports->size),
+         (char *)&Exports + sizeof(exports->size),
          size);
   return TRUE;
 }

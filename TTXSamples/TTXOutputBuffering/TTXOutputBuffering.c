@@ -20,7 +20,7 @@ typedef struct {
 	char buff[BUFF_SIZE];
 } TInstVar;
 
-typedef TInstVar FAR * PTInstVar;
+typedef TInstVar *PTInstVar;
 PTInstVar pvar;
 static TInstVar InstVar;
 
@@ -63,7 +63,7 @@ int flush_buffer(SOCKET s, int flags) {
 //
 //  TTXSend -- キー入力処理
 //
-static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags) {
+static int PASCAL FAR TTXsend(SOCKET s, const char *buf, int len, int flags) {
 	int i, wlen, left_len;
 
 	if (len > 0 && pvar->enable) {
@@ -121,7 +121,7 @@ static int PASCAL FAR TTXsend(SOCKET s, const char FAR *buf, int len, int flags)
 // TTXOpen -- セッション開始処理
 //	Psend をフックする。
 //
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
 	pvar->origPsend = *hooks->Psend;
 	*hooks->Psend = TTXsend;
 	pvar->buff_used = 0;
@@ -131,7 +131,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks FAR * hooks) {
 // TTXCloseTCP -- セッション終了時処理
 //	Psend のフックを解除する。
 //
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks FAR * hooks) {
+static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
 	if (pvar->origPsend) {
 		*hooks->Psend = pvar->origPsend;
 	}
@@ -156,7 +156,7 @@ static TTXExports Exports = {
 	NULL, // TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 	/* do version checking if necessary */
 	/* if (Version!=TTVERSION) return FALSE; */
@@ -164,8 +164,8 @@ BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exp
 	if (size > exports->size) {
 		size = exports->size;
 	}
-	memcpy((char FAR *)exports + sizeof(exports->size),
-	       (char FAR *)&Exports + sizeof(exports->size), size);
+	memcpy((char *)exports + sizeof(exports->size),
+	       (char *)&Exports + sizeof(exports->size), size);
 	return TRUE;
 }
 

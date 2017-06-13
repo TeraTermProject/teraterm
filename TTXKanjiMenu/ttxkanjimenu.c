@@ -53,7 +53,7 @@ typedef struct {
 	BOOL NeedResetCharSet;
 } TInstVar;
 
-static TInstVar FAR * pvar;
+static TInstVar *pvar;
 
 /* WIN32 allows multiple instances of a DLL */
 static TInstVar InstVar;
@@ -61,7 +61,7 @@ static TInstVar InstVar;
 /*
  * This function is called when Tera Term starts up.
  */
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
 	pvar->origReadIniFile = NULL;
@@ -70,7 +70,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 	pvar->NeedResetCharSet = FALSE;
 }
 
-static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
+static BOOL PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	WORD orgRecvCode, orgSendCode;
 	BOOL ret;
 
@@ -101,12 +101,12 @@ static BOOL FAR PASCAL TTXKanjiMenuSetupTerminal(HWND parent, PTTSet ts) {
 	return ret;
 }
 
-static BOOL FAR PASCAL ResetCharSet(HWND parent, PTTSet ts) {
+static BOOL PASCAL ResetCharSet(HWND parent, PTTSet ts) {
 	pvar->NeedResetCharSet = FALSE;
 	return TRUE;
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
 	if (pvar->NeedResetCharSet) {
 		*hooks->SetupTerminal = ResetCharSet;
 	}
@@ -116,7 +116,7 @@ static void PASCAL FAR TTXGetUIHooks(TTXUIHooks FAR * hooks) {
 	}
 }
 
-static void PASCAL FAR TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
 	char buff[20];
 
 	/* Call original ReadIniFile */
@@ -143,7 +143,7 @@ static void PASCAL FAR TTXKanjiMenuReadIniFile(PCHAR fn, PTTSet ts) {
 	return;
 }
 
-static void PASCAL FAR TTXKanjiMenuWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXKanjiMenuWriteIniFile(PCHAR fn, PTTSet ts) {
 	/* Call original WriteIniFile */
 	pvar->origWriteIniFile(fn, ts);
 
@@ -152,7 +152,7 @@ static void PASCAL FAR TTXKanjiMenuWriteIniFile(PCHAR fn, PTTSet ts) {
 	return;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	pvar->origReadIniFile = *hooks->ReadIniFile;
 	*hooks->ReadIniFile = TTXKanjiMenuReadIniFile;
 	pvar->origWriteIniFile = *hooks->WriteIniFile;
@@ -164,7 +164,7 @@ static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks FAR *hooks) {
 #define ID_MI_KANJISEND 54109
 #define ID_MI_USEONESETTING 54200
 
-static void PASCAL FAR InsertSendKcodeMenu(HMENU menu) {
+static void PASCAL InsertSendKcodeMenu(HMENU menu) {
 	UINT flag = MF_BYPOSITION | MF_STRING | MF_CHECKED;
 
 	if (pvar->ts->Language == IdJapanese) {
@@ -196,7 +196,7 @@ static void PASCAL FAR InsertSendKcodeMenu(HMENU menu) {
 	}
 }
 
-static void PASCAL FAR DeleteSendKcodeMenu(HMENU menu) {
+static void PASCAL DeleteSendKcodeMenu(HMENU menu) {
 	if (pvar->ts->Language == IdJapanese) {
 		DeleteMenu(menu, 5, MF_BYPOSITION);
 		DeleteMenu(menu, 5, MF_BYPOSITION);
@@ -211,7 +211,7 @@ static void PASCAL FAR DeleteSendKcodeMenu(HMENU menu) {
 	}
 }
 
-static void PASCAL FAR UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
+static void PASCAL UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
 	if (UseOneSetting) {
 		if (pvar->ts->Language == IdJapanese) {
 			GetI18nStr(IniSection, "MENU_SJIS", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
@@ -285,7 +285,7 @@ static void PASCAL FAR UpdateRecvMenuCaption(HMENU menu, BOOL UseOneSetting) {
 /*
  * This function is called when Tera Term creates a new menu.
  */
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
 	UINT flag = MF_ENABLED;
 
 	// 言語が日本語のときのみメニューに追加されるようにした。 (2007.7.14 maya)
@@ -373,7 +373,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 /*
  * This function is called when Tera Term pops up a submenu menu.
  */
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	// メニューが呼び出されたら、最新の設定に更新する。(2007.5.25 yutaka)
 	UpdateRecvMenu(pvar->ts->KanjiCode);
 	if (!pvar->UseOneSetting) {
@@ -386,7 +386,7 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
 /*
  * This function is called when Tera Term receives a command message.
  */
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	WORD val;
 
 	if ((cmd > ID_MI_KANJIRECV) && (cmd <= ID_MI_KANJIRECV+IdUTF8m)) {
@@ -476,7 +476,7 @@ static TTXExports Exports = {
 	NULL  // TTXSetCommandLine
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 	/* do version checking if necessary */
 	/* if (Version!=TTVERSION) return FALSE; */
@@ -484,8 +484,8 @@ BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports FAR * exp
 	if (size > exports->size) {
 		size = exports->size;
 	}
-	memcpy((char FAR *)exports + sizeof(exports->size),
-	       (char FAR *)&Exports + sizeof(exports->size),
+	memcpy((char *)exports + sizeof(exports->size),
+	       (char *)&Exports + sizeof(exports->size),
 	       size);
 	return TRUE;
 }

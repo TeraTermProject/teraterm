@@ -40,8 +40,8 @@ See LICENSE.TXT for the license.
    in the length of the string (as opposed to exponential).
    Since it's also best-case quadratic, it should only be used for unusual
    cases (2 or more *'s in the pattern). */
-static BOOL wildcard_match_pattern(char const FAR * pattern, int patternLen,
-                                   char const FAR * str, int strLen) {
+static BOOL wildcard_match_pattern(char const *pattern, int patternLen,
+                                   char const *str, int strLen) {
 	char * canBeAt = (char *)malloc(sizeof(char)*(strLen + 1));
 	int i, result;
 
@@ -79,7 +79,7 @@ static BOOL wildcard_match_pattern(char const FAR * pattern, int patternLen,
 Before entry, ensure that str does not contain any invalid characters
 (at least including '*', '?', ',', ' ' and '\n').
 */
-BOOL match_pattern(char const FAR * pattern, char const FAR * str) {
+BOOL match_pattern(char const *pattern, char const *str) {
 	char patternCh = *pattern;
 	char strCh = *str;
 

@@ -1555,7 +1555,7 @@ char *mctimelocal(char *format, BOOL utc_flag)
 	return strtime;
 }
 
-PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
+PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 {
 	int i = 0;
 	BOOL quoted = FALSE;
@@ -1593,7 +1593,7 @@ PCHAR FAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 	return (param);
 }
 
-void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
+void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 {
 	BOOL quoted = FALSE;
 	PCHAR dest_end = dest + dest_len - 1;
@@ -1616,7 +1616,7 @@ void FAR PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 	*dest = '\0';
 }
 
-void FAR PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src)
+void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src)
 {
 	BOOL quoted = FALSE;
 	PCHAR dest_end = dest + dest_size - 1;

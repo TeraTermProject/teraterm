@@ -63,6 +63,6 @@ typedef struct {
 } DNS_SSHFP_DATA, *PDNS_SSHFP_DATA;
 
 int is_numeric_hostname(const char *hostname);
-int verify_hostkey_dns(PTInstVar pvar, char FAR *hostname, Key *key);
+int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key);
 
 #endif //  __TTSSH_DNS_H

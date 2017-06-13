@@ -17,7 +17,7 @@
 
 static HANDLE hInst;
 
-void FAR PASCAL TEKInit(PTEKVar tk, PTTSet ts)
+void PASCAL TEKInit(PTEKVar tk, PTTSet ts)
 {
   int i;
 
@@ -151,7 +151,7 @@ void SwitchRubberBand(PTEKVar tk, PTTSet ts, BOOL OnFlag)
   tk->RubberBand = OnFlag;
 }
 
-void FAR PASCAL TEKChangeCaret(PTEKVar tk, PTTSet ts)
+void PASCAL TEKChangeCaret(PTEKVar tk, PTTSet ts)
 {
   UINT T;
 
@@ -175,14 +175,14 @@ void FAR PASCAL TEKChangeCaret(PTEKVar tk, PTTSet ts)
   }
 }
 
-void FAR PASCAL TEKDestroyCaret(PTEKVar tk, PTTSet ts)
+void PASCAL TEKDestroyCaret(PTEKVar tk, PTTSet ts)
 {
   DestroyCaret();
   if (ts->NonblinkingCursor!=0)
 	KillTimer(tk->HWin,IdCaretTimer);
 }
 
-void FAR PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
+void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
 {
   int i, Height, Width;
   TEXTMETRIC Metrics;
@@ -377,7 +377,7 @@ void FAR PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   tk->ScaleFont = FALSE;
 }
 
-int FAR PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
+int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
 {
   BOOL f;
   int c;
@@ -443,7 +443,7 @@ int FAR PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
   return (tk->ChangeEmu);
 }
 
-void FAR PASCAL TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode)
+void PASCAL TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode)
 {
   BYTE Code[11];
   int X, Y;
@@ -465,7 +465,7 @@ void FAR PASCAL TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode)
   tk->IgnoreCount = 6;
 }
 
-void FAR PASCAL TEKPaint
+void PASCAL TEKPaint
   (PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo)
 {
   int X,Y,W,H;
@@ -486,7 +486,7 @@ void FAR PASCAL TEKPaint
   if (tk->GIN) ToggleCrossHair(tk,ts,TRUE);
 }
 
-void FAR PASCAL TEKWMLButtonDown
+void PASCAL TEKWMLButtonDown
   (PTEKVar tk, PTTSet ts, PComVar cv, POINT pos)
 {
   BYTE b;
@@ -517,7 +517,7 @@ void FAR PASCAL TEKWMLButtonDown
   }
 }
 
-void FAR PASCAL TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
+void PASCAL TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
 {
   int X;
 
@@ -546,7 +546,7 @@ void FAR PASCAL TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
   }
 }
 
-void FAR PASCAL TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p)
+void PASCAL TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p)
 {
   int X, Y;
 
@@ -578,7 +578,7 @@ void FAR PASCAL TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p)
   if (tk->GIN) SetCapture(tk->HWin);
 }
 
-void FAR PASCAL TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy)
+void PASCAL TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy)
 {
   int Width, Height;
 
@@ -636,7 +636,7 @@ void CopyToClipboard
   SwitchRubberBand(tk,ts,tk->Select);
 }
 
-void FAR PASCAL TEKCMCopy(PTEKVar tk, PTTSet ts)
+void PASCAL TEKCMCopy(PTEKVar tk, PTTSet ts)
 {
   int x, y;
 
@@ -654,13 +654,13 @@ void FAR PASCAL TEKCMCopy(PTEKVar tk, PTTSet ts)
     abs(tk->SelectEnd.y - tk->SelectStart.y));                          
 }
 
-void FAR PASCAL TEKCMCopyScreen(PTEKVar tk, PTTSet ts)
+void PASCAL TEKCMCopyScreen(PTEKVar tk, PTTSet ts)
 {
   /* copy fullscreen to clipboard */
   CopyToClipboard(tk, ts, 0, 0, tk->ScreenWidth, tk->ScreenHeight);
 }
 
-void FAR PASCAL TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
+void PASCAL TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
 {
   POINT PPI;
   RECT Margin;
@@ -739,7 +739,7 @@ void FAR PASCAL TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
   SwitchRubberBand(tk,ts,tk->Select);
 }
 
-void FAR PASCAL TEKClearScreen(PTEKVar tk, PTTSet ts)
+void PASCAL TEKClearScreen(PTEKVar tk, PTTSet ts)
 {
   RECT R;
 
@@ -753,7 +753,7 @@ void FAR PASCAL TEKClearScreen(PTEKVar tk, PTTSet ts)
   TEKCaretOn(tk,ts);
 }
 
-void FAR PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
+void PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
 {
   int W, H;
 //  BOOL Ok;
@@ -776,7 +776,7 @@ void FAR PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
   TEKResizeWindow(tk,ts,W,H);
 }
 
-void FAR PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
+void PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
 {
   HDC TmpDC;
   RECT R;
@@ -844,7 +844,7 @@ void FAR PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
   InvalidateRect(tk->HWin,NULL,TRUE);
 }
 
-/* BOOL FAR PASCAL TEKSetupWinDlg(PTEKVar tk, PTTSet ts)
+/* BOOL PASCAL TEKSetupWinDlg(PTEKVar tk, PTTSet ts)
 {
   BOOL Ok;
   WORD OldEmu;
@@ -861,7 +861,7 @@ void FAR PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
   return Ok;
 } */
 
-void FAR PASCAL TEKRestoreSetup(PTEKVar tk, PTTSet ts)
+void PASCAL TEKRestoreSetup(PTEKVar tk, PTTSet ts)
 {
   int W, H;
   RECT R;
@@ -879,7 +879,7 @@ void FAR PASCAL TEKRestoreSetup(PTEKVar tk, PTTSet ts)
   TEKResizeWindow(tk,ts,W,H);
 }
 
-void FAR PASCAL TEKEnd(PTEKVar tk)
+void PASCAL TEKEnd(PTEKVar tk)
 {
   int i;
 

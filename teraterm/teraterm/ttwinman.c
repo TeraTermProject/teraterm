@@ -53,7 +53,7 @@ void ConvertToCP932(char *str, int destlen)
 {
 #define IS_SJIS(n) (ts.KanjiCode == IdSJIS && IsDBCSLeadByte(n))
 #define IS_EUC(n) (ts.KanjiCode == IdEUC && (n & 0x80))
-	extern WORD FAR PASCAL JIS2SJIS(WORD KCode);
+	extern WORD PASCAL JIS2SJIS(WORD KCode);
 	int len = strlen(str);
 	char *cc = _alloca(len + 1);
 	char *c = cc;

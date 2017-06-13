@@ -48,7 +48,7 @@ static HFONT DlgAuthFont;
 static HFONT DlgTisFont;
 static HFONT DlgAuthSetupFont;
 
-void destroy_malloced_string(char FAR * FAR * str)
+void destroy_malloced_string(char **str)
 {
 	if (*str != NULL) {
 		SecureZeroMemory(*str, strlen(*str));
@@ -72,7 +72,7 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 			char chars[] = { (char) wParam, 0 };
 
 			SendMessage(control, EM_REPLACESEL, (WPARAM) TRUE,
-			            (LPARAM) (char FAR *) chars);
+			            (LPARAM) (char *) chars);
 			return 0;
 		}
 	}
@@ -352,10 +352,10 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 }
 
-static char FAR *alloc_control_text(HWND ctl)
+static char *alloc_control_text(HWND ctl)
 {
 	int len = GetWindowTextLength(ctl);
-	char FAR *result = malloc(len + 1);
+	char *result = malloc(len + 1);
 
 	if (result != NULL) {
 		GetWindowText(ctl, result, len + 1);
@@ -365,7 +365,7 @@ static char FAR *alloc_control_text(HWND ctl)
 	return result;
 }
 
-static int get_key_file_name(HWND parent, char FAR * buf, int bufsize, PTInstVar pvar)
+static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar)
 {
 	OPENFILENAME params;
 	char fullname_buf[2048] = "identity";
@@ -423,7 +423,7 @@ static void choose_host_RSA_key_file(HWND dlg, PTInstVar pvar)
 static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 {
 	int method = SSH_AUTH_PASSWORD;
-	char FAR *password =
+	char *password =
 		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
 	Key *key_pair = NULL;
 
@@ -936,7 +936,7 @@ canceled:
 	}
 }
 
-char FAR *AUTH_get_user_name(PTInstVar pvar)
+char *AUTH_get_user_name(PTInstVar pvar)
 {
 	return pvar->auth_state.user;
 }
@@ -1121,7 +1121,7 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 
 static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	char FAR *password =
+	char *password =
 		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
 
 	pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
@@ -1462,7 +1462,7 @@ void AUTH_set_generic_mode(PTInstVar pvar)
 	destroy_malloced_string(&pvar->auth_state.TIS_prompt);
 }
 
-void AUTH_set_TIS_mode(PTInstVar pvar, char FAR * prompt, int len)
+void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len)
 {
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 		pvar->auth_state.mode = TIS_AUTH_MODE;
@@ -1520,7 +1520,7 @@ static const char *get_auth_method_name(SSHAuthMethod auth)
 	}
 }
 
-void AUTH_get_auth_info(PTInstVar pvar, char FAR * dest, int len)
+void AUTH_get_auth_info(PTInstVar pvar, char *dest, int len)
 {
 	const char *method = "unknown";
 	char buf[256];
