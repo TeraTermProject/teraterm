@@ -1,7 +1,7 @@
 // VS2005でビルドされたバイナリが Windows95 でも起動できるようにするために、
 // IsDebuggerPresent()のシンボル定義を追加する。
 //
-// cf.http://jet2.u-abel.net/program/tips/forceimp.htm
+// cf. https://pf-j.sakura.ne.jp/program/tips/forceimp.htm
 
 
 #if _MSC_VER == 1400
