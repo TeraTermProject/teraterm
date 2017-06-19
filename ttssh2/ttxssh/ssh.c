@@ -8895,12 +8895,9 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	int len;
 	char *data;
 	int id;
-	int buflen;
-	char *str;
-	int reply;
+	char *request;
+	int want_reply;
 	int success = 0;
-	char *emsg = "exit-status";
-	int estat = 0;
 	Channel_t *c;
 
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
@@ -8908,9 +8905,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	//debug_print(98, data, len);
-
-	// ID(4) + string(any) + reply(1) + exit status(4)
+	// ID(4) + string(any) + want_reply(1) + exit status(4)
 	id = get_uint32_MSBfirst(data);
 	data += 4;
 	c = ssh2_channel_lookup(id);
@@ -8919,23 +8914,33 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 		return FALSE;
 	}
 
-	buflen = get_uint32_MSBfirst(data);
-	data += 4;
-	str = data;
-	data += buflen;
+	request = buffer_get_string(&data, NULL);
 
-	reply = data[0];
+	want_reply = data[0];
 	data += 1;
 
-	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received. local:%d remote:%d %s reply:%d", c->self_id, c->remote_id, str, reply);
+	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received. "
+		"local:%d remote:%d request:%s want_reply:%d",
+		c->self_id, c->remote_id, request?request:"(null)", want_reply);
 
-	// 終了コードが含まれているならば
-	if (memcmp(str, emsg, strlen(emsg)) == 0) {
-		success = 1;
-		estat = get_uint32_MSBfirst(data);
+	if (request) {
+		if (strcmp(request, "exit-status") == 0) {
+			// 終了コードが含まれているならば
+			int estat = get_uint32_MSBfirst(data);
+			success = 1;
+			logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": exit-status=%d", estat);
+		}
+		else if (strcmp(request, "keepalive@openssh.com") == 0) {
+			// OpenSSH client では success = 1 にしていないけれど、
+			// server 側は SUCCESS/FAILURE どちらでも OK なので
+			// とりあえず SUCCESS を返す。
+			success = 1;
+		}
+
+		free(request);
 	}
 
-	if (reply) {
+	if (want_reply) {
 		buffer_t *msg;
 		unsigned char *outmsg;
 		int len;
@@ -8961,9 +8966,9 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 		buffer_free(msg);
 
 		if (success) {
-			logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_SUCCESS was sent at handle_SSH2_channel_request().");
+			logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": SSH2_MSG_CHANNEL_SUCCESS was sent.");
 		} else {
-			logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_FAILURE was sent at handle_SSH2_channel_request().");
+			logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": SSH2_MSG_CHANNEL_FAILURE was sent.");
 		}
 	}
 
