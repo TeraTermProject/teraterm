@@ -943,13 +943,7 @@ char *AUTH_get_user_name(PTInstVar pvar)
 
 int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 {
-	char buf[1024];
-
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	          "Server reports supported authentication method mask = %d",
-	          types);
-	buf[sizeof(buf) - 1] = 0;
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
+	logprintf(LOG_LEVEL_VERBOSE, "Server reports supported authentication method mask = %d", types);
 
 	if (SSHv1(pvar)) {
 		types &= (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA)
@@ -973,8 +967,7 @@ int AUTH_set_supported_auth_types(PTInstVar pvar, int types)
 		return 0;
 	} else {
 		if (pvar->auth_state.auth_dialog != NULL) {
-			update_server_supported_types(pvar,
-			                              pvar->auth_state.auth_dialog);
+			update_server_supported_types(pvar, pvar->auth_state.auth_dialog);
 		}
 
 		return 1;

@@ -2232,15 +2232,13 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 {
 	size_t i;
 	int dlgresult;
-	char msg[1024];
 	char *host;
 
 	host = pvar->ssh_state.hostname;
 
 	// "/nosecuritywarning"が指定されている場合、更新は一切行わない。
 	if (pvar->nocheck_known_hosts) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because `/nosecuritywarning' option was specified.");
-		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		logputs(LOG_LEVEL_VERBOSE, "Hostkey was not updated because `/nosecuritywarning' option was specified.");
 		goto error;
 	}
 
@@ -2253,8 +2251,7 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 			cur_active != NULL ? cur_active : pvar->NotificationWindow,
 			hosts_updatekey_dlg_proc, (LPARAM)pvar);
 		if (dlgresult != 1) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because a user cancelled.");
-			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+			logputs(LOG_LEVEL_VERBOSE, "Hostkey was not updated because a user cancelled.");
 			goto error;
 		}
 	}
@@ -2266,8 +2263,7 @@ static void update_known_hosts(PTInstVar pvar, struct hostkeys_update_ctx *ctx)
 	for (i = 0; i < ctx->nkeys; i++) {
 		HOSTS_add_host_key(pvar, ctx->keys[i]);
 	}
-	_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was successfully updated to known_hosts file.");
-	notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+	logputs(LOG_LEVEL_VERBOSE, "Hostkey was successfully updated to known_hosts file.");
 
 error:
 	return;
@@ -2276,7 +2272,6 @@ error:
 static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_int32_t seq, void *_ctx)
 {
 	struct hostkeys_update_ctx *ctx = (struct hostkeys_update_ctx *)_ctx;
-	char msg[128];
 	char *data;
 	int len;
 	unsigned char *blob = NULL;
@@ -2307,18 +2302,19 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 	memcpy(cp, data, len);
 
 	if (ctx->nnew == 0) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey can not be updated because ctx->nnew %d(program bug).", ctx->nnew);
-		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		logprintf(LOG_LEVEL_FATAL,
+			"Hostkey can not be updated because ctx->nnew %d(program bug).", ctx->nnew);
 		goto error;
 	}
 	if (type != SSH2_MSG_REQUEST_SUCCESS) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Server failed to confirm ownership of private host keys(type %d)", type);
-		notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
+		logprintf(LOG_LEVEL_ERROR,
+			"Server failed to confirm ownership of private host keys(type %d)", type);
 		goto error;
 	}
 	if (pvar->session_id_len == 0) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey can not be updated because pvar->session_id_len %d(program bug).", pvar->session_id_len);
-		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		logprintf(LOG_LEVEL_FATAL,
+			"Hostkey can not be updated because pvar->session_id_len %d(program bug).",
+			pvar->session_id_len);
 		goto error;
 	}
 
@@ -2345,18 +2341,18 @@ static void client_global_hostkeys_private_confirm(PTInstVar pvar, int type, u_i
 		free(sig);
 		sig = NULL;
 		if (ret != 1) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "server gave bad signature for %s key %u", 
+			logprintf(LOG_LEVEL_ERROR,
+				"server gave bad signature for %s key %u",
 				get_sshname_from_key(ctx->keys[i]), i);
-			notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
 			goto error;
 		}
 		ndone++;
 	}
 
 	if (ndone != ctx->nnew) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey can not be updated because ndone != ctx->nnew (%u / %u)(program bug).",
+		logprintf(LOG_LEVEL_FATAL,
+			"Hostkey can not be updated because ndone != ctx->nnew (%u / %u)(program bug).",
 			ndone, ctx->nnew);
-		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
 		goto error;
 	}
 
@@ -2381,7 +2377,6 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	int len;
 	size_t i;
 	char *cp, *fp;
-	char msg[128];
 	unsigned char *blob = NULL;
 	buffer_t *b = NULL;
 	struct hostkeys_update_ctx *ctx = NULL;
@@ -2390,8 +2385,7 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 
 	// Tera Termの設定で、当該機能のオンオフを制御できるようにする。
 	if (pvar->settings.UpdateHostkeys == SSH_UPDATE_HOSTKEYS_NO) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Hostkey was not updated because ts.UpdateHostkeys is disabled.");
-		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		logputs(LOG_LEVEL_VERBOSE, "Hostkey was not updated because ts.UpdateHostkeys is disabled.");
 		return 1;
 	}
 
@@ -2413,24 +2407,20 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		blob = buffer_get_string_msg(b, &len);
 		key = key_from_blob(blob, len);
 		if (key == NULL) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not found host key into blob %p (%d)", blob, len);
-			notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
+			logprintf(LOG_LEVEL_ERROR, "Not found host key into blob %p (%d)", blob, len);
 			goto error;
 		}
 		free(blob);
 		blob = NULL;
 
 		fp = key_fingerprint(key, SSH_FP_HEX, SSH_DIGEST_MD5);
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Received %s host key %s", 
-			get_sshname_from_key(key), fp);
-		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		logprintf(LOG_LEVEL_VERBOSE, "Received %s host key %s", get_sshname_from_key(key), fp);
 		free(fp);
 
 		// 許可されたホストキーアルゴリズムかをチェックする。
 		if (check_hostkey_algorithm(pvar, key) == 0) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "%s host key is not permitted by ts.HostKeyOrder",
+			logprintf(LOG_LEVEL_VERBOSE, "%s host key is not permitted by ts.HostKeyOrder",
 				get_sshname_from_key(key));
-			notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
 			continue;
 		}
 
@@ -2439,9 +2429,8 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		// 重複したキーを受信したらエラーとする。
 		for (i = 0; i < ctx->nkeys; i++) {
 			if (HOSTS_compare_public_key(key, ctx->keys[i]) == 1) {
-				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Received duplicated %s host key",
+				logprintf(LOG_LEVEL_ERROR, "Received duplicated %s host key",
 					get_sshname_from_key(key));
-				notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
 				goto error;
 			}
 		}
@@ -2449,9 +2438,8 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		// キーを登録する。
 		tmp = realloc(ctx->keys, (ctx->nkeys + 1)*sizeof(*ctx->keys));
 		if (tmp == NULL) {
-			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not memory: realloc ctx->keys %d",
+			logprintf(LOG_LEVEL_FATAL, "Not memory: realloc ctx->keys %d",
 				ctx->nkeys);
-			notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
 			goto error;
 		}
 		ctx->keys = tmp;
@@ -2460,15 +2448,13 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 	}
 
 	if (ctx->nkeys == 0) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "No host rotation key");
-		notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
+		logputs(LOG_LEVEL_VERBOSE, "No host rotation key");
 		goto error;
 	}
 
 	if ((ctx->keys_seen = calloc(ctx->nkeys, sizeof(*ctx->keys_seen))) == NULL) {
-		_snprintf_s(msg, sizeof(msg), _TRUNCATE, "Not memory: calloc ctx->keys %d",
+		logprintf(LOG_LEVEL_FATAL, "Not memory: calloc ctx->keys %d",
 			ctx->nkeys);
-		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
 		goto error;
 	}
 
@@ -2480,9 +2466,8 @@ int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen)
 		if (!ctx->keys_seen[i])
 			ctx->nnew++;
 	}
-	_snprintf_s(msg, sizeof(msg), _TRUNCATE, "%u keys from server: %u new, %u retained. %u to remove",
+	logprintf(LOG_LEVEL_VERBOSE, "%u keys from server: %u new, %u retained. %u to remove",
 		ctx->nkeys, ctx->nnew, ctx->nkeys - ctx->nnew, ctx->nold);
-	notify_verbose_message(pvar, msg, LOG_LEVEL_VERBOSE);
 
 	// 新規追加する鍵はゼロだが、deprecatedな鍵が存在する。
 	if (ctx->nnew == 0 && ctx->nold != 0) {

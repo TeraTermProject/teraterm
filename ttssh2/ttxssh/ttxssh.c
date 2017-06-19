@@ -846,8 +846,7 @@ void notify_established_secure_connection(PTInstVar pvar)
 		SetCustomNotifyIcon(SecureNotifyIcon);
 	}
 
-	notify_verbose_message(pvar, "Entering secure mode",
-	                       LOG_LEVEL_VERBOSE);
+	logputs(LOG_LEVEL_VERBOSE, "Entering secure mode");
 }
 
 void notify_closed_connection(PTInstVar pvar, char *send_msg)
@@ -893,7 +892,7 @@ void notify_nonfatal_error(PTInstVar pvar, char *msg)
 		}
 	}
 	if (msg[0] != 0) {
-		notify_verbose_message(pvar, msg, LOG_LEVEL_ERROR);
+		logputs(LOG_LEVEL_ERROR, msg);
 		add_err_msg(pvar, msg);
 	}
 }
@@ -901,7 +900,7 @@ void notify_nonfatal_error(PTInstVar pvar, char *msg)
 void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 {
 	if (msg[0] != 0) {
-		notify_verbose_message(pvar, msg, LOG_LEVEL_FATAL);
+		logputs(LOG_LEVEL_FATAL, msg);
 		add_err_msg(pvar, msg);
 	}
 
@@ -920,7 +919,7 @@ void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 	}
 }
 
-void notify_verbose_message(PTInstVar pvar, char *msg, int level)
+void logputs(int level, char *msg)
 {
 	if (level <= pvar->session_settings.LogLevel) {
 		char buf[1024];
@@ -956,7 +955,7 @@ void logprintf(int level, char *fmt, ...)
 		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
 		va_end(params);
 
-		notify_verbose_message(pvar, buff, level);
+		logputs(level, buff);
 	}
 }
 
@@ -1014,7 +1013,7 @@ void logprintf_hexdump(int level, char *data, int len, char *fmt, ...)
 		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
 		va_end(params);
 
-		notify_verbose_message(pvar, buff, level);
+		logputs(level, buff);
 
 		addr = 0;
 		byte_cnt = 0;
@@ -1026,7 +1025,7 @@ void logprintf_hexdump(int level, char *data, int len, char *fmt, ...)
 
 			if (byte_cnt == 16) {
 				format_line_hexdump(buff, sizeof(buff), addr, bytes, byte_cnt);
-				notify_verbose_message(pvar, buff, level);
+				logputs(level, buff);
 
 				addr += 16;
 				byte_cnt = 0;
@@ -1036,7 +1035,7 @@ void logprintf_hexdump(int level, char *data, int len, char *fmt, ...)
 
 		if (byte_cnt > 0) {
 			format_line_hexdump(buff, sizeof(buff), addr, bytes, byte_cnt);
-			notify_verbose_message(pvar, buff, level);
+			logputs(level, buff);
 		}
 	}
 }
@@ -1050,8 +1049,8 @@ static void PASCAL TTXOpenTCP(TTXSockHooks *hooks)
 
 		pvar->session_settings = pvar->settings;
 
-		notify_verbose_message(pvar, "---------------------------------------------------------------------", LOG_LEVEL_VERBOSE);
-		notify_verbose_message(pvar, "Initiating SSH session", LOG_LEVEL_VERBOSE);
+		logputs(LOG_LEVEL_VERBOSE, "---------------------------------------------------------------------");
+		logputs(LOG_LEVEL_VERBOSE, "Initiating SSH session");
 
 		FWDUI_load_settings(pvar);
 
@@ -1091,8 +1090,7 @@ static void PASCAL TTXCloseTCP(TTXSockHooks *hooks)
 	if (pvar->session_settings.Enabled) {
 		pvar->socket = INVALID_SOCKET;
 
-		notify_verbose_message(pvar, "Terminating SSH session...",
-		                       LOG_LEVEL_VERBOSE);
+		logputs(LOG_LEVEL_VERBOSE, "Terminating SSH session...");
 
 		*hooks->Precv = pvar->Precv;
 		*hooks->Psend = pvar->Psend;
@@ -1656,7 +1654,7 @@ static void PASCAL TTXReadINIFile(PCHAR fileName, PTTSet ts)
 	(pvar->ReadIniFile) (fileName, ts);
 	read_ssh_options(pvar, fileName);
 	pvar->settings = *pvar->ts_SSH;
-	notify_verbose_message(pvar, "Reading INI file", LOG_LEVEL_VERBOSE);
+	logputs(LOG_LEVEL_VERBOSE, "Reading INI file");
 	FWDUI_load_settings(pvar);
 }
 
@@ -1665,7 +1663,7 @@ static void PASCAL TTXWriteINIFile(PCHAR fileName, PTTSet ts)
 	(pvar->WriteIniFile) (fileName, ts);
 	*pvar->ts_SSH = pvar->settings;
 	clear_local_settings(pvar);
-	notify_verbose_message(pvar, "Writing INI file", LOG_LEVEL_VERBOSE);
+	logputs(LOG_LEVEL_VERBOSE, "Writing INI file");
 	write_ssh_options(pvar, fileName, pvar->ts_SSH, TRUE);
 }
 

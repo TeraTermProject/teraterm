@@ -618,11 +618,10 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 	     strport, sizeof(strport), NI_NUMERICHOST | NI_NUMERICSERV)) {
 		/* NOT REACHED */
 	}
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+	logprintf(LOG_LEVEL_VERBOSE,
 	          "Host %s connecting to port %d; forwarding to %s:%d",
 	          hname, request->spec.from_port, request->spec.to_host,
 	          request->spec.to_port);
-	notify_verbose_message(pvar, buf, LOG_LEVEL_VERBOSE);
 
 	strncpy_s(buf, sizeof(buf), hname, _TRUNCATE);
 
@@ -1056,9 +1055,7 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 				                  "Some socket(s) required for port forwarding could not be initialized.\n"
 				                  "Some port forwarding services may not be available.\n"
 				                  "(errno %d)");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-				            pvar->ts->UIMsg, WSAGetLastError());
-				notify_verbose_message(pvar,buf,LOG_LEVEL_WARNING);
+				logprintf(LOG_LEVEL_WARNING, buf, pvar->ts->UIMsg, WSAGetLastError());
 			}
 			freeaddrinfo(res0);
 			/* free(request->listening_sockets); /* DO NOT FREE HERE, listening_sockets'll be freed in FWD_end */

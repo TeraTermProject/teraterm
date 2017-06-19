@@ -147,32 +147,11 @@ static void sftp_console_message(PTInstVar pvar, Channel_t *c, char *fmt, ...)
 	va_end(arg);
 
 	SendMessage(c->sftp.console_window, WM_USER_CONSOLE, 0, (LPARAM)tmp);
-	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
+	logputs(LOG_LEVEL_VERBOSE, tmp);
 }
 
-static void sftp_do_syslog(PTInstVar pvar, int level, char *fmt, ...)
-{
-	char tmp[1024];
-	va_list arg;
-
-	va_start(arg, fmt);
-	_vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
-	va_end(arg);
-
-	notify_verbose_message(pvar, tmp, level);
-}
-
-static void sftp_syslog(PTInstVar pvar, char *fmt, ...)
-{
-	char tmp[1024];
-	va_list arg;
-
-	va_start(arg, fmt);
-	_vsnprintf_s(tmp, sizeof(tmp), _TRUNCATE, fmt, arg);
-	va_end(arg);
-
-	notify_verbose_message(pvar, tmp, LOG_LEVEL_VERBOSE);
-}
+#define sftp_do_syslog(pvar, level, ...) logprintf(level, __VA_ARGS__)
+#define sftp_syslog(pvar, ...) logprintf(LOG_LEVEL_VERBOSE, __VA_ARGS__)
 
 // SFTP専用バッファを確保する。SCPとは異なり、先頭に後続のデータサイズを埋め込む。
 //

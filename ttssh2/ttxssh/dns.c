@@ -96,7 +96,8 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 				          "verify_hostkey_dns: SSHFP RR: Algorithm = %d, Digest type = %d",
 				          t->Algorithm, t->DigestType);
 				if (t->Algorithm == SSHFP_KEY_RESERVED) {
-					notify_verbose_message(pvar, "verify_hostkey_dns: Invalid key algorithm (SSHFP_KEY_RESERVED)", LOG_LEVEL_WARNING);
+					logputs(LOG_LEVEL_WARNING,
+					        "verify_hostkey_dns: Invalid key algorithm (SSHFP_KEY_RESERVED)");
 					continue; // skip invalid record
 				}
 				if (t->Algorithm == hostkey_alg) {
@@ -108,8 +109,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 								logprintf(LOG_LEVEL_VERBOSE,
 								          "verify_hostkey_dns: not allowed digest type. "
 								          "Algorithm = %d, Digest type = %d",
-								          t->Algorithm,
-									  t->DigestType);
+								          t->Algorithm, t->DigestType);
 								dgst_alg = -1;
 							}
 							else {
@@ -134,10 +134,10 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 					}
 					if (hostkey_dlen == p->wDataLength-2 && memcmp(hostkey_digest, t->Digest, hostkey_dlen) == 0) {
 						found = DNS_VERIFY_MATCH;
-						notify_verbose_message(pvar, "verify_hostkey_dns: key matched", LOG_LEVEL_INFO);
+						logputs(LOG_LEVEL_INFO, "verify_hostkey_dns: key matched");
 					}
 					else {
-						notify_verbose_message(pvar, "verify_hostkey_dns: key mismatched", LOG_LEVEL_WARNING);
+						logputs(LOG_LEVEL_WARNING, "verify_hostkey_dns: key mismatched");
 						found = DNS_VERIFY_MISMATCH;
 						break;
 					}
@@ -154,7 +154,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 		DnsRecordListFree(rec, DnsFreeRecordList);
 	}
 	else {
-		notify_verbose_message(pvar, "verify_hostkey_dns: DnsQuery failed.", LOG_LEVEL_VERBOSE);
+		logputs(LOG_LEVEL_VERBOSE, "verify_hostkey_dns: DnsQuery failed.");
 	}
 
 	free(hostkey_digest);

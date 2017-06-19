@@ -342,7 +342,7 @@ void notify_established_secure_connection(PTInstVar pvar);
 void notify_closed_connection(PTInstVar pvar, char *send_msg);
 void notify_nonfatal_error(PTInstVar pvar, char *msg);
 void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect);
-void notify_verbose_message(PTInstVar pvar, char *msg, int level);
+void logputs(int level, char *msg);
 void logprintf(int level, char *fmt, ...);
 void logprintf_hexdump(int level, char *data, int len, char *fmt, ...);
 
