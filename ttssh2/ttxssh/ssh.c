@@ -2853,7 +2853,7 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 			set_uint32(outmsg + 8, x);    // window width  (pixels)
 			set_uint32(outmsg + 12, y);   // window height (pixels)
 			finish_send_packet(pvar);
-			logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH_CMSG_WINDOW_SIZE. "
+			logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH_CMSG_WINDOW_SIZE. "
 			          "cols: %d, rows: %d, x: %d, y: %d", cols, rows, x, y);
 		}
 
@@ -2888,7 +2888,7 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
 		          "local: %d, remote: %d, request-type: %s, cols: %d, rows: %d, x: %d, y: %d",
 		          c->self_id, c->remote_id, req_type, cols, rows, x, y);
 
@@ -2929,7 +2929,7 @@ int SSH_notify_break_signal(PTInstVar pvar)
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
 		          "local: %d, remote: %d, request-type: %s, break-length: %d",
 		          c->self_id, c->remote_id, req_type, 1000);
 
@@ -3720,7 +3720,7 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
 		          "local: %d, remote: %d, request-type: %s, proto: %s, cookie: %s, screen: %d",
 		          c->self_id, c->remote_id, req_type, auth_protocol, newdata, screen_num);
 
@@ -7317,11 +7317,11 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	ret = DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SSHPASSWD_INPUT), pvar->cv->HWin, passwd_change_dialog, (LPARAM)&cp);
 
 	if (ret == -1) {
-		logprintf(pvar, LOG_LEVEL_WARNING, __FUNCTION__ ": DialogBoxParam failed.");
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": DialogBoxParam failed.");
 		return FALSE;
 	}
 	else if (ret == 0) {
-		logprintf(pvar, LOG_LEVEL_NOTICE, __FUNCTION__ ": dialog cancelled.");
+		logprintf(LOG_LEVEL_NOTICE, __FUNCTION__ ": dialog cancelled.");
 		return FALSE;
 	}
 
@@ -7406,7 +7406,7 @@ static BOOL send_channel_request_gen(PTInstVar pvar, Channel_t *c, unsigned char
 	finish_send_packet(pvar);
 	buffer_free(msg);
 
-	logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
 	          "local: %d, remote: %d, request-type: %s, msg1=%s, msg2=%s",
 	          c->self_id, c->remote_id, req, msg1 ? msg1 : "none", msg2 ? msg2 : "none");
 	return TRUE;
@@ -7488,7 +7488,7 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_free(ttymsg);
 
 	notify_verbose_message(pvar, "SSH2_MSG_CHANNEL_REQUEST was sent at send_pty_request().", LOG_LEVEL_VERBOSE);
-	logprintf(pvar, LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
 	          "local: %d, remote: %d, request-type: %s, "
 	          "term: %s, cols: %d, rows: %d, x: %d, y: %d, "
 	          "out-speed: %d, in-speed: %d, verase: %s, onlcr: %s",
@@ -7614,7 +7614,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 		break;
 
 	default: // NOT REACHED
-		logprintf(pvar, LOG_LEVEL_ERROR, __FUNCTION__ ": Invalid channel-type. (%d)", c->type);
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": Invalid channel-type. (%d)", c->type);
 		return FALSE;
 	}
 	return TRUE;
@@ -9131,7 +9131,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 	if (agent_msg->len == 0) {
 		req_len = get_uint32_MSBfirst(data);
 		if (req_len > AGENT_MAX_MSGLEN - 4) {
-			logprintf(pvar, LOG_LEVEL_NOTICE,
+			logprintf(LOG_LEVEL_NOTICE,
 				__FUNCTION__ ": Agent Forwarding Error: server request is too large. "
 				"size=%u, allowd max=%u.", req_len, AGENT_MAX_MSGLEN-4);
 			if (pvar->session_settings.ForwardAgentNotify) {
@@ -9163,7 +9163,7 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 
 	agent_query(data, *agent_request_len, &response, &resplen, NULL, NULL);
 	if (response == NULL || resplen < 5) {
-		logprintf(pvar, LOG_LEVEL_NOTICE, __FUNCTION__ "Agent Forwarding Error: agent_query is failed.");
+		logprintf(LOG_LEVEL_NOTICE, __FUNCTION__ "Agent Forwarding Error: agent_query is failed.");
 		goto error;
 	}
 

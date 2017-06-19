@@ -946,21 +946,17 @@ void notify_verbose_message(PTInstVar pvar, char *msg, int level)
 	}
 }
 
-void logprintf(PTInstVar pv, int level, char *fmt, ...)
+void logprintf(int level, char *fmt, ...)
 {
 	char buff[4096];
 	va_list params;
 
-	if (pv == NULL) {
-		pv = pvar;
-	}
-
-	if (level <= pv->session_settings.LogLevel) {
+	if (level <= pvar->session_settings.LogLevel) {
 		va_start(params, fmt);
 		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
 		va_end(params);
 
-		notify_verbose_message(pv, buff, level);
+		notify_verbose_message(pvar, buff, level);
 	}
 }
 
@@ -1004,7 +1000,7 @@ static void format_line_hexdump(char *buf, int buflen, int addr, int *bytes, int
 	//strncat_s(buf, buflen, "\n", _TRUNCATE);
 }
 
-void logprintf_hexdump(PTInstVar pvar, int level, char *data, int len, char *fmt, ...)
+void logprintf_hexdump(int level, char *data, int len, char *fmt, ...)
 {
 	char buff[4096];
 	va_list params;

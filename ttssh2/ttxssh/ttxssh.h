@@ -343,9 +343,8 @@ void notify_closed_connection(PTInstVar pvar, char *send_msg);
 void notify_nonfatal_error(PTInstVar pvar, char *msg);
 void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect);
 void notify_verbose_message(PTInstVar pvar, char *msg, int level);
-void logprintf(PTInstVar pvar, int level, char *fmt, ...);
-void logprintf_hexdump(PTInstVar pvar, int level, char *data, int len, char *fmt, ...);
-
+void logprintf(int level, char *fmt, ...);
+void logprintf_hexdump(int level, char *data, int len, char *fmt, ...);
 
 void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
 int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);

@@ -558,12 +558,12 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 		return TRUE;
 
 	if (mac->key == NULL) {
-		logprintf(pvar, LOG_LEVEL_VERBOSE, "HMAC key is NULL(seq %lu len %d)", sequence_number, len);
+		logprintf(LOG_LEVEL_VERBOSE, "HMAC key is NULL(seq %lu len %d)", sequence_number, len);
 		goto error;
 	}
 
 	if ((u_int)mac->mac_len > sizeof(m)) {
-		logprintf(pvar, LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
+		logprintf(LOG_LEVEL_VERBOSE, "HMAC len(%d) is larger than %d bytes(seq %lu len %d)", 
 			mac->mac_len, sizeof(m), sequence_number, len);
 		goto error;
 	}
@@ -576,9 +576,9 @@ BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
 	HMAC_cleanup(&c);
 
 	if (memcmp(m, MAC, mac->mac_len)) {
-		logprintf(pvar, LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
-		logprintf_hexdump(pvar, LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:");
-		logprintf_hexdump(pvar, LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:");
+		logprintf(LOG_LEVEL_VERBOSE, "HMAC key is not matched(seq %lu len %d)", sequence_number, len);
+		logprintf_hexdump(LOG_LEVEL_VERBOSE, m, mac->mac_len, "m:");
+		logprintf_hexdump(LOG_LEVEL_VERBOSE, MAC, mac->mac_len, "MAC:");
 		goto error;
 	}
 

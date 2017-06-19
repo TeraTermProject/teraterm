@@ -187,7 +187,7 @@ unsigned int buffer_get_int(buffer_t *msg)
 
 	if (buffer_get_int_ret(&ret, msg) == -1) {
 		// TODO: ƒGƒ‰[ˆ—
-		logprintf(NULL, LOG_LEVEL_ERROR, "buffer_get_int: buffer error");
+		logprintf(LOG_LEVEL_ERROR, "buffer_get_int: buffer error");
 	}
 	return (ret);
 }

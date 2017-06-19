@@ -84,7 +84,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 	default: // Un-supported algorithm
 		hostkey_alg = SSHFP_KEY_RESERVED;
 	}
-	logprintf(pvar, LOG_LEVEL_VERBOSE, "verify_hostkey_dns: key type = %d, SSHFP type = %d", key->type, hostkey_alg);
+	logprintf(LOG_LEVEL_VERBOSE, "verify_hostkey_dns: key type = %d, SSHFP type = %d", key->type, hostkey_alg);
 
 	status = DnsQuery(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
 
@@ -92,7 +92,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 		for (p=rec; p!=NULL; p=p->pNext) {
 			if (p->wType == DNS_TYPE_SSHFP) {
 				t = (PDNS_SSHFP_DATA)&(p->Data.Null);
-				logprintf(pvar, LOG_LEVEL_VERBOSE,
+				logprintf(LOG_LEVEL_VERBOSE,
 				          "verify_hostkey_dns: SSHFP RR: Algorithm = %d, Digest type = %d",
 				          t->Algorithm, t->DigestType);
 				if (t->Algorithm == SSHFP_KEY_RESERVED) {
@@ -105,7 +105,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 						case SSHFP_HASH_SHA1:
 							if (hostkey_alg != SSHFP_KEY_RSA && hostkey_alg != SSHFP_KEY_DSA) {
 								// SHA1 does not allowed to use with ECDSA and ED25519 key
-								logprintf(pvar, LOG_LEVEL_VERBOSE,
+								logprintf(LOG_LEVEL_VERBOSE,
 								          "verify_hostkey_dns: not allowed digest type. "
 								          "Algorithm = %d, Digest type = %d",
 								          t->Algorithm,
@@ -148,7 +148,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 				}
 			}
 			else {
-				logprintf(pvar, LOG_LEVEL_VERBOSE, "verify_hostkey_dns: not SSHFP RR (%d)", p->wType);
+				logprintf(LOG_LEVEL_VERBOSE, "verify_hostkey_dns: not SSHFP RR (%d)", p->wType);
 			}
 		}
 		DnsRecordListFree(rec, DnsFreeRecordList);
