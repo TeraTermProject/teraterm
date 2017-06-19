@@ -78,6 +78,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // channel data structure
 #define CHANNEL_MAX 100
 
+//
+// msg が NULL では無い事の保証。NULL の場合は "(null)" を返す。
+//
+#define NonNull(msg) ((msg)?(msg):"(null)")
 
 static struct global_confirm global_confirms;
 
@@ -6333,13 +6337,16 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 
 static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 {
-	char *data, *s;
+	char *data, *svc;
 
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
 
-	s = buffer_get_string(&data, NULL);
-	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_ACCEPT was received. service name=%s", s);
+	if ((svc = buffer_get_string(&data, NULL)) == NULL) {
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL.");
+	}
+	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_ACCEPT was received. service-name=%s", NonNull(svc));
+	free(svc);
 
 	SSH2_dispatch_init(5);
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
@@ -6937,14 +6944,24 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	inst = buffer_get_string(&data, NULL);
 	lang = buffer_get_string(&data, NULL);
 	lprompt[0] = 0;
-	if (strlen(inst) > 0) {
+	if (inst == NULL) {
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL. (inst)");
+	}
+	else if (strlen(inst) > 0) {
 		strncat_s(lprompt, sizeof(lprompt), inst, _TRUNCATE);
 		strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
 	}
-	if (strlen(lang) > 0) {
+	if (lang == NULL) {
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL. (lang)");
+	}
+	else if (strlen(lang) > 0) {
 		strncat_s(lprompt, sizeof(lprompt), lang, _TRUNCATE);
 		strncat_s(lprompt, sizeof(lprompt), "\r\n", _TRUNCATE);
 	}
+
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": user=%s, inst=%s, lang=%s",
+		NonNull(name), NonNull(inst), NonNull(lang));
+
 	free(name);
 	free(inst);
 	free(lang);
@@ -7256,7 +7273,14 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 
 	info = buffer_get_string(&data, NULL);
 	lang = buffer_get_string(&data, NULL);
-	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": info %s lang %s\n", info, lang);
+	if (info == NULL || lang == NULL) {
+		logprintf(LOG_LEVEL_ERROR,
+			__FUNCTION__ ": buffer_get_string returns NULL. info=%s, lang=%s",
+			NonNull(info), NonNull(lang));
+	}
+	else {
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": info=%s, lang=%s\n", info, lang);
+	}
 	free(info);
 	free(lang);
 
@@ -7587,10 +7611,13 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	cstring = buffer_get_string(&data, NULL);
 
+	if (cstring == NULL) {
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL");
+	}
 	UTIL_get_lang_msg("MSG_SSH_CHANNEL_OPEN_ERROR", pvar,
 	                  "SSH2_MSG_CHANNEL_OPEN_FAILURE was received.\r\nchannel [%d]: reason: %s(%d) message: %s");
 	_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, pvar->ts->UIMsg,
-	            id, rmsg, reason, cstring);
+	            id, rmsg, reason, NonNull(cstring));
 	notify_nonfatal_error(pvar, tmpbuf);
 
 	free(cstring);
@@ -7641,8 +7668,12 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 	data++;
 	len--;
 
-	// OpenSSH 6.8では、サーバのホスト鍵が更新されると、下記の通知が来る。
-	if (strcmp(rtype, "hostkeys-00@openssh.com") == 0) {
+	if (rtype == NULL) {
+		// rtype が NULL で無い事の保証
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL.");
+	}
+	else if (strcmp(rtype, "hostkeys-00@openssh.com") == 0) {
+		// OpenSSH 6.8では、サーバのホスト鍵が更新されると、この通知が来る。
 		// OpenSSH 6.8の実装では、常に成功で返すようになっているため、
 		// それに合わせて Tera Term でも成功と返すことにする。
 		success = update_client_input_hostkeys(pvar, data, len);
@@ -8701,7 +8732,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 	buffer_t *msg;
 	unsigned char *outmsg;
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was received.");
+	logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": SSH2_MSG_CHANNEL_OPEN was received.");
 
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
@@ -8719,8 +8750,16 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 	remote_maxpacket = get_uint32_MSBfirst(data);
 	data += 4;
 
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
+		": type=%s, channel=%d, init_winsize=%d, max_packetsize:%d",
+		NonNull(ctype), remote_id, remote_window, remote_maxpacket);
+
 	// check Channel Type(string)
-	if (strcmp(ctype, "forwarded-tcpip") == 0) { // port-forwarding(remote to local)
+	if (ctype == NULL) {
+		// ctype が NULL で無い事の保証の為、先にチェックする
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL. (ctype)");
+	}
+	else if (strcmp(ctype, "forwarded-tcpip") == 0) { // port-forwarding(remote to local)
 		char *listen_addr, *orig_addr;
 		int listen_port, orig_port;
 
@@ -8732,28 +8771,36 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		orig_port = get_uint32_MSBfirst(data);  // 32776
 		data += 4;
 
-		// searching request entry by listen_port & create_local_channel
-		FWD_open(pvar, remote_id, listen_addr, listen_port, orig_addr, orig_port,
-			&chan_num);
+		if (listen_addr && orig_addr) {
+			logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
+				": %s: listen_addr=%s, listen_port=%d, orig_addr=%s, orig_port=%d",
+				ctype, listen_addr, listen_port, orig_addr, orig_port);
+			// searching request entry by listen_port & create_local_channel
+			FWD_open(pvar, remote_id, listen_addr, listen_port, orig_addr, orig_port, &chan_num);
 
+			// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
+			// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
+			// changed window size from 32KB to 128KB. (2007.10.29 maya)
+			c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
+			if (c == NULL) {
+				// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
+				FWD_free_channel(pvar, chan_num);
+				UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
+				                  "Could not open new channel. TTSSH is already opening too many channels.");
+				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				return FALSE;
+			}
+			c->remote_id = remote_id;
+			c->remote_window = remote_window;
+			c->remote_maxpacket = remote_maxpacket;
+		}
+		else {
+			logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": %s: buffer_get_string returns NULL. "
+				"linsten_addr=%s, orig_addr=%s",
+				ctype, NonNull(listen_addr), NonNull(orig_addr));
+		}
 		free(listen_addr);
 		free(orig_addr);
-
-		// channelをアロケートし、必要な情報（remote window size）をここで取っておく。
-		// changed window size from 128KB to 32KB. (2006.3.6 yutaka)
-		// changed window size from 32KB to 128KB. (2007.10.29 maya)
-		c = ssh2_channel_new(CHAN_TCP_WINDOW_DEFAULT, CHAN_TCP_PACKET_DEFAULT, TYPE_PORTFWD, chan_num);
-		if (c == NULL) {
-			// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
-			FWD_free_channel(pvar, chan_num);
-			UTIL_get_lang_msg("MSG_SSH_NO_FREE_CHANNEL", pvar,
-			                  "Could not open new channel. TTSSH is already opening too many channels.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
-			return FALSE;
-		}
-		c->remote_id = remote_id;
-		c->remote_window = remote_window;
-		c->remote_maxpacket = remote_maxpacket;
 
 	} else if (strcmp(ctype, "x11") == 0) { // port-forwarding(X11)
 		// X applicationをターミナル上で実行すると、SSH2_MSG_CHANNEL_OPEN が送られてくる。
@@ -8763,6 +8810,10 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 		orig_str = buffer_get_string(&data, NULL);  // "127.0.0.1"
 		orig_port = get_uint32_MSBfirst(data);
 		data += 4;
+
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": %s: orig_addr=%s, orig_port=%d",
+			ctype, orig_str, orig_port);
+
 		free(orig_str);
 
 		// X server(port 6000)へ接続する。接続に失敗するとTera Term自身が切断される。
@@ -8817,12 +8868,11 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			finish_send_packet(pvar);
 			buffer_free(msg);
 
-			logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN_FAILURE was sent at handle_SSH2_channel_open().");
+			logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": SSH2_MSG_CHANNEL_OPEN_FAILURE was sent.");
 		}
 
 	} else {
 		// unknown type(unsupported)
-
 	}
 
 	free(ctype);
@@ -8900,6 +8950,8 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	int success = 0;
 	Channel_t *c;
 
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received.");
+
 	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
 	data = pvar->ssh_state.payload;
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
@@ -8919,26 +8971,28 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	want_reply = data[0];
 	data += 1;
 
-	logprintf(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was received. "
-		"local:%d remote:%d request:%s want_reply:%d",
-		c->self_id, c->remote_id, request?request:"(null)", want_reply);
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
+		": local=%d, remote=%d, request=%s, want_reply=%d",
+		c->self_id, c->remote_id, NonNull(request), want_reply);
 
-	if (request) {
-		if (strcmp(request, "exit-status") == 0) {
-			// 終了コードが含まれているならば
-			int estat = get_uint32_MSBfirst(data);
-			success = 1;
-			logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": exit-status=%d", estat);
-		}
-		else if (strcmp(request, "keepalive@openssh.com") == 0) {
-			// OpenSSH client では success = 1 にしていないけれど、
-			// server 側は SUCCESS/FAILURE どちらでも OK なので
-			// とりあえず SUCCESS を返す。
-			success = 1;
-		}
-
-		free(request);
+	if (request == NULL) {
+		// request が NULL で無い事の保証
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_get_string returns NULL. (request)");
 	}
+	else if (strcmp(request, "exit-status") == 0) {
+		// 終了コードが含まれているならば
+		int estat = get_uint32_MSBfirst(data);
+		success = 1;
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": exit-status=%d", estat);
+	}
+	else if (strcmp(request, "keepalive@openssh.com") == 0) {
+		// OpenSSH client では success = 1 にしていないけれど、
+		// server 側は SUCCESS/FAILURE どちらでも OK なので
+		// とりあえず SUCCESS を返す。
+		success = 1;
+	}
+
+	free(request);
 
 	if (want_reply) {
 		buffer_t *msg;
