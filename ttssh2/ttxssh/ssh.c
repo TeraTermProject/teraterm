@@ -7410,7 +7410,6 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	buffer_free(msg);
 	buffer_free(ttymsg);
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_REQUEST was sent at send_pty_request().");
 	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_REQUEST. "
 	          "local: %d, remote: %d, request-type: %s, "
 	          "term: %s, cols: %d, rows: %d, x: %d, y: %d, "
