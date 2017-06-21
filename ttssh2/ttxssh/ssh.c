@@ -3501,6 +3501,7 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL");
 		return;
 	}
 	buffer_put_int(msg, c->remote_id);  // remote ID
@@ -3541,8 +3542,11 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 	if (SSHv1(pvar)) {
 		int host_len = strlen(to_local_host);
 		unsigned char *outmsg =
-			begin_send_packet(pvar, SSH_CMSG_PORT_FORWARD_REQUEST,
-			                  12 + host_len);
+			begin_send_packet(pvar, SSH_CMSG_PORT_FORWARD_REQUEST, 12 + host_len);
+
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": Forwarding request (SSH1 RtoL): "
+			"remote_port=%d, to_host=%s, to_port=%d",
+			from_server_port, to_local_host, to_local_port);
 
 		set_uint32(outmsg, from_server_port);
 		set_uint32(outmsg + 4, host_len);
@@ -3552,20 +3556,29 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 
 		enque_forwarding_request_handlers(pvar);
 
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH_CMSG_PORT_FORWARD_REQUEST."
+			"remote_port=%d, to_host=%s, to_port=%d",
+			from_server_port, to_local_host, to_local_port);
+
 	} else {
 		// SSH2 port-forwading remote to local (2005.6.21 yutaka)
 		buffer_t *msg;
-		char *s;
+		char *req;
 		unsigned char *outmsg;
 		int len;
+
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": Forwarding request (SSH2 RtoL): "
+			"bind_addr=%s, remote_port=%d, to_host=%s, to_port=%d",
+			bind_address, from_server_port, to_local_host, to_local_port);
 
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL");
 			return;
 		}
-		s = "tcpip-forward";
-		buffer_put_string(msg, s, strlen(s)); // ctype
+		req = "tcpip-forward";
+		buffer_put_string(msg, req, strlen(req)); // ctype
 		buffer_put_char(msg, 1);  // want reply
 		buffer_put_string(msg, bind_address, strlen(bind_address));
 
@@ -3577,7 +3590,9 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_GLOBAL_REQUEST was sent at SSH_request_forwarding().");
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_GLOBAL_REQUEST. "
+			"request=%s, want_reply=%d, bind_address=%s, remote_port=%d",
+			req, 1, bind_address, from_server_port);
 	}
 }
 
