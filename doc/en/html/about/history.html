@@ -35,15 +35,15 @@
 <ul class="history">
   <li>Changes
     <ul>
-      <!--li>ログの行頭に追加するタイムスタンプのフォーマットを指定できるようにした。
+      <li>added configuration of timestamp format at the start of log file.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> エントリを追加した。デフォルトは"%a %b %e %H:%M:%S.%N %Y"。</li>
-          <li>デフォルトのフォーマットは RFC 3339 形式に変更された。以前のフォーマットに戻すには LogTimestampFormat に "%a %b %e %H:%M:%S.%N %Y" を設定する。</li>
+          <li>added the <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> entry in the teraterm.ini file. The default is "%a %b %e %H:%M:%S.%N %Y".</li>
+          <li>The default format is changed to RFC 3339 style. Specify the "%a %b %e %H:%M:%S.%N %Y" at the LogTimestampFormat entry to restore before format.</li>
         </ul></li>
-      <li>ログの行頭に追加するタイムスタンプの時刻にUTCを使用できるようにした。
+      <li>UTC can be used at timestamp format at the start of log file.
         <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> エントリを追加した。デフォルトはoff。</li>
-        </ul></li-->
+          <li>added the <a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> entry in the teraterm.ini file. The default is off.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -2915,13 +2915,13 @@ SYNOPSIS:
     </ul>
   </li-->
 
-  <!--li>Bug fixes
+  <li>Bug fixes
     <ul>
-      <li>パスワード認証時のパスワード変更ダイアログでキャンセルした時に、デバッグログにゴミが出力される問題を修正した。</li>
-      <li>SSHv1 接続時のウィンドウサイズ変更通知で、正しいウィンドウサイズ(ピクセル数)を通知するように修正した。</li>
+      <li>When the password chaning dialog is canceled on password authentication, corrupted character will output at the debug lof.</li>
+      <li>When the chaging window size is notified on SSHv1 connection, right window size(pixel count) is notified.</li>
       <li>When the window size change is notified, the right window size(pixel) can be reported.</li>
     </ul>
-  </li-->
+  </li>
 
   <li>Misc
     <ul>

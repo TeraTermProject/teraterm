@@ -353,11 +353,11 @@ DeferredLogWriteMode=on
 </pre>
 
 
-<h1><a name="LogTimestampFormat"><!--ログの行頭に追加するタイムスタンプのフォーマットを指定する--></a></h1>
+<h1><a name="LogTimestampFormat">Specify timestamp format at the start of log file</a></h1>
 
-<!--p>
-Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができますが、タイムスタンプのフォーマットを指定することができます。
-</p-->
+<p>
+When the log file is written, the timestamp can be added at the start of line and the timestamp format can be specified.
+</p>
 
 <pre>
 SYNOPSIS:
@@ -388,14 +388,14 @@ LogTimestampFormat=%Y-%m-%d %H:%M:%S.%N
 </pre>
 
 
-<h1><a name="LogTimestampUTC"><!--ログの行頭に追加するタイムスタンプの時刻にUTCを使用する--></a></h1>
+<h1><a name="LogTimestampUTC">UTC is used as timestamp at the start of log file</a></h1>
 
-<!--p>
-Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができますが、通常はローカル日時を使用します。<br>
-夏時間に対応したローカル日時を使用していると、夏時間の切り替えタイミングに時刻が進む（または戻る）ために意図しない時刻が記録されることがあります。<br>
-UTC の日時には夏時間がないため、この問題を回避することができます。<br>
-ローカル日時のかわりに UTC の日時を使用する場合は、設定ファイルの [Tera Term] セクションの LogTimestampUTC 行を以下のように変更してください。
-</p-->
+<p>
+When the log file is written, the timestamp can be added at the start of log file. Basically, local time is used. <br>
+When local time is used for summer time, the clock will go or back at summer time switching. So, unexpected clock will be recorded. <br>
+Fortunately, this problem can be avoided because UTC timestamp does not support summer time. <br>
+If UTC timestamp is used instead of local time, change the LogTimestampUTC entry of [Tera Term] section in the following:
+</p>
 
 <pre>
 LogTimestampUTC=on
