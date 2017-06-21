@@ -2955,7 +2955,7 @@ void SSH_notify_cred(PTInstVar pvar)
 void SSH_send(PTInstVar pvar, unsigned char const *buf, unsigned int buflen)
 {
 	// RAWパケットダンプを追加 (2008.8.15 yutaka)
-	if (LOG_LEVEL_SSHDUMP <= pvar->session_settings.LogLevel) {
+	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
 		init_memdump();
 		push_memdump("SSH sending packet", "SSH_send", (char *)buf, buflen);
 	}
@@ -6246,7 +6246,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was received(DH key generation is completed).");
 
 	// ログ採取の終了 (2005.3.7 yutaka)
-	if (LOG_LEVEL_SSHDUMP <= pvar->session_settings.LogLevel) {
+	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
 		save_memdump(LOGDUMP);
 	}
 	finish_memdump();
@@ -8552,7 +8552,7 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	data += 4;
 
 	// RAWパケットダンプを追加 (2008.8.15 yutaka)
-	if (LOG_LEVEL_SSHDUMP <= pvar->session_settings.LogLevel) {
+	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
 		init_memdump();
 		push_memdump("SSH receiving packet", "PKT_recv", (char *)data, str_len);
 	}
