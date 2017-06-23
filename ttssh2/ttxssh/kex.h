@@ -78,6 +78,5 @@ unsigned char *kex_ecdh_hash(const EVP_MD *evp_md,
                                unsigned int *hashlen);
 
 int dh_pub_is_valid(DH *dh, BIGNUM *dh_pub);
-int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public);
 void kex_derive_keys(PTInstVar pvar, int need, u_char *hash, BIGNUM *shared_secret,
                      char *session_id, int session_id_len);

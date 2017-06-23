@@ -50,6 +50,7 @@ const char *ssh_key_type(ssh_keytype type);
 char *get_sshname_from_key(Key *key);
 enum hostkey_type get_keytype_from_name(char *name);
 char *curve_keytype_to_name(ssh_keytype type);
+ssh_keytype key_curve_name_to_keytype(char *name);
 
 Key *key_new_private(int type);
 Key *key_new(int type);
@@ -67,6 +68,9 @@ ssh_keytype nid_to_keytype(int nid);
 
 void key_private_serialize(Key *key, buffer_t *b);
 Key *key_private_deserialize(buffer_t *blob);
+
+int key_ec_validate_private(EC_KEY *key);
+int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public);
 
 int update_client_input_hostkeys(PTInstVar pvar, char *dataptr, int datalen);
 

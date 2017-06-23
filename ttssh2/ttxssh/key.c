@@ -26,7 +26,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "key.h"
-#include "kex.h"
 #include "resource.h"
 
 #include <openssl/rsa.h>
@@ -1803,42 +1802,6 @@ error:
 		BN_CTX_free(ctx);
 }
 
-static int key_ec_validate_private(EC_KEY *key)
-{
-	BN_CTX *bnctx = NULL;
-	BIGNUM *order, *tmp;
-	int ret = -1;
-
-	if ((bnctx = BN_CTX_new()) == NULL)
-		goto out;
-	BN_CTX_start(bnctx);
-
-	if ((order = BN_CTX_get(bnctx)) == NULL ||
-	    (tmp = BN_CTX_get(bnctx)) == NULL)
-		goto out;
-
-	/* log2(private) > log2(order)/2 */
-	if (EC_GROUP_get_order(EC_KEY_get0_group(key), order, bnctx) != 1)
-		goto out;
-	if (BN_num_bits(EC_KEY_get0_private_key(key)) <=
-	    BN_num_bits(order) / 2) {
-		goto out;
-	}
-
-	/* private < order - 1 */
-	if (!BN_sub(tmp, order, BN_value_one()))
-		goto out;
-	if (BN_cmp(EC_KEY_get0_private_key(key), tmp) >= 0) {
-		goto out;
-	}
-	ret = 0;
-
-out:
-	if (bnctx)
-		BN_CTX_free(bnctx);
-	return ret;
-}
-
 Key *key_private_deserialize(buffer_t *blob)
 {
 	int success = 0;
@@ -1892,25 +1855,21 @@ Key *key_private_deserialize(buffer_t *blob)
 			if (nid != keytype_to_cipher_nid(skt))
 				goto ecdsa_error;
 
-			k->ecdsa = EC_KEY_new_by_curve_name(nid);
-			if (k->ecdsa == NULL)
+			if ((k->ecdsa = EC_KEY_new_by_curve_name(nid)) == NULL)
 				goto ecdsa_error;
-
-			q = EC_POINT_new(EC_KEY_get0_group(k->ecdsa));
-			if (q == NULL)
+			if ((q = EC_POINT_new(EC_KEY_get0_group(k->ecdsa))) == NULL)
 				goto ecdsa_error;
-
 			if ((exponent = BN_new()) == NULL)
 				goto ecdsa_error;
-			buffer_get_ecpoint_msg(blob,
-				EC_KEY_get0_group(k->ecdsa), q);
+
+			buffer_get_ecpoint_msg(blob, EC_KEY_get0_group(k->ecdsa), q);
 			buffer_get_bignum2_msg(blob, exponent);
 			if (EC_KEY_set_public_key(k->ecdsa, q) != 1)
 				goto ecdsa_error;
 			if (EC_KEY_set_private_key(k->ecdsa, exponent) != 1)
 				goto ecdsa_error;
 			if (key_ec_validate_public(EC_KEY_get0_group(k->ecdsa),
-				EC_KEY_get0_public_key(k->ecdsa)) != 0)
+			                           EC_KEY_get0_public_key(k->ecdsa)) != 0)
 				goto ecdsa_error;
 			if (key_ec_validate_private(k->ecdsa) != 0)
 				goto ecdsa_error;
@@ -1964,6 +1923,119 @@ error:
 	return (k);
 }
 
+
+int key_ec_validate_private(EC_KEY *key)
+{
+	BN_CTX *bnctx = NULL;
+	BIGNUM *order, *tmp;
+	int ret = -1;
+
+	if ((bnctx = BN_CTX_new()) == NULL)
+		goto out;
+	BN_CTX_start(bnctx);
+
+	if ((order = BN_CTX_get(bnctx)) == NULL ||
+	    (tmp = BN_CTX_get(bnctx)) == NULL)
+		goto out;
+
+	/* log2(private) > log2(order)/2 */
+	if (EC_GROUP_get_order(EC_KEY_get0_group(key), order, bnctx) != 1)
+		goto out;
+	if (BN_num_bits(EC_KEY_get0_private_key(key)) <=
+	    BN_num_bits(order) / 2) {
+		goto out;
+	}
+
+	/* private < order - 1 */
+	if (!BN_sub(tmp, order, BN_value_one()))
+		goto out;
+	if (BN_cmp(EC_KEY_get0_private_key(key), tmp) >= 0) {
+		goto out;
+	}
+	ret = 0;
+
+out:
+	if (bnctx)
+		BN_CTX_free(bnctx);
+	return ret;
+}
+
+// from openssh 5.8p1 key.c
+int key_ec_validate_public(const EC_GROUP *group, const EC_POINT *public)
+{
+	BN_CTX *bnctx;
+	EC_POINT *nq = NULL;
+	BIGNUM *order, *x, *y, *tmp;
+	int ret = -1;
+
+	if ((bnctx = BN_CTX_new()) == NULL) {
+		return ret;
+	}
+	BN_CTX_start(bnctx);
+
+	/*
+	* We shouldn't ever hit this case because bignum_get_ecpoint()
+	* refuses to load GF2m points.
+	*/
+	if (EC_METHOD_get_field_type(EC_GROUP_method_of(group)) !=
+		NID_X9_62_prime_field) {
+		goto out;
+	}
+
+	/* Q != infinity */
+	if (EC_POINT_is_at_infinity(group, public)) {
+		goto out;
+	}
+
+	if ((x = BN_CTX_get(bnctx)) == NULL ||
+		(y = BN_CTX_get(bnctx)) == NULL ||
+		(order = BN_CTX_get(bnctx)) == NULL ||
+		(tmp = BN_CTX_get(bnctx)) == NULL) {
+		goto out;
+	}
+
+	/* log2(x) > log2(order)/2, log2(y) > log2(order)/2 */
+	if (EC_GROUP_get_order(group, order, bnctx) != 1) {
+		goto out;
+	}
+	if (EC_POINT_get_affine_coordinates_GFp(group, public,
+		x, y, bnctx) != 1) {
+		goto out;
+	}
+	if (BN_num_bits(x) <= BN_num_bits(order) / 2) {
+		goto out;
+	}
+	if (BN_num_bits(y) <= BN_num_bits(order) / 2) {
+		goto out;
+	}
+
+	/* nQ == infinity (n == order of subgroup) */
+	if ((nq = EC_POINT_new(group)) == NULL) {
+		goto out;
+	}
+	if (EC_POINT_mul(group, nq, NULL, public, order, bnctx) != 1) {
+		goto out;
+	}
+	if (EC_POINT_is_at_infinity(group, nq) != 1) {
+		goto out;
+	}
+
+	/* x < order - 1, y < order - 1 */
+	if (!BN_sub(tmp, order, BN_value_one())) {
+		goto out;
+	}
+	if (BN_cmp(x, tmp) >= 0) {
+		goto out;
+	}
+	if (BN_cmp(y, tmp) >= 0) {
+		goto out;
+	}
+	ret = 0;
+out:
+	BN_CTX_free(bnctx);
+	EC_POINT_free(nq);
+	return ret;
+}
 
 static void hostkeys_update_ctx_free(struct hostkeys_update_ctx *ctx)
 {
