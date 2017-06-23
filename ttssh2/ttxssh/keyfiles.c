@@ -794,6 +794,18 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ssh-rsa", strlen("ssh-rsa")) == 0) {
 				result->type = KEY_RSA;
 			}
+			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ecdsa-sha2-nistp256", strlen("ecdsa-sha2-nistp256")) == 0) {
+				result->type = KEY_ECDSA256;
+			}
+			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ecdsa-sha2-nistp384", strlen("ecdsa-sha2-nistp384")) == 0) {
+				result->type = KEY_ECDSA384;
+			}
+			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ecdsa-sha2-nistp521", strlen("ecdsa-sha2-nistp521")) == 0) {
+				result->type = KEY_ECDSA521;
+			}
+			else if (strncmp(line + strlen("PuTTY-User-Key-File-2: "), "ssh-ed25519", strlen("ssh-ed25519")) == 0) {
+				result->type = KEY_ED25519;
+			}
 			else {
 				strncpy_s(errmsg, errmsg_len, "not a PuTTY SSH-2 private key", _TRUNCATE);
 				goto error;
@@ -1083,6 +1095,98 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		buffer_get_bignum2(&pub, result->dsa->pub_key);
 
 		buffer_get_bignum2(&pri, result->dsa->priv_key);
+
+		break;
+	}
+	case KEY_ECDSA256:
+	case KEY_ECDSA384:
+	case KEY_ECDSA521:
+	{
+		char *pubkey_type, *pub, *pri;
+		int success = 0;
+		unsigned int nid;
+		char *curve = NULL;
+		ssh_keytype skt;
+		BIGNUM *exponent = NULL;
+		EC_POINT *q = NULL;
+
+		pub = pubkey->buf;
+		pri = prikey->buf;
+		pubkey_type = buffer_get_string(&pub, NULL);
+		if ((result->type == KEY_ECDSA256 && strcmp(pubkey_type, "ecdsa-sha2-nistp256") != 0) ||
+		    (result->type == KEY_ECDSA384 && strcmp(pubkey_type, "ecdsa-sha2-nistp384") != 0) ||
+		    (result->type == KEY_ECDSA521 && strcmp(pubkey_type, "ecdsa-sha2-nistp521") != 0)) {
+			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
+			free(pubkey_type);
+			goto error;
+		}
+		free(pubkey_type);
+
+		nid = keytype_to_cipher_nid(result->type);
+		curve = buffer_get_string(&pub, NULL);
+		skt = key_curve_name_to_keytype(curve);
+		if (nid != keytype_to_cipher_nid(skt))
+			goto ecdsa_error;
+
+		if ((result->ecdsa = EC_KEY_new_by_curve_name(nid)) == NULL)
+			goto ecdsa_error;
+		if ((q = EC_POINT_new(EC_KEY_get0_group(result->ecdsa))) == NULL)
+			goto ecdsa_error;
+		if ((exponent = BN_new()) == NULL)
+			goto ecdsa_error;
+
+		buffer_get_ecpoint(&pub, EC_KEY_get0_group(result->ecdsa), q);
+		buffer_get_bignum2(&pri, exponent);
+		if (EC_KEY_set_public_key(result->ecdsa, q) != 1)
+			goto ecdsa_error;
+		if (EC_KEY_set_private_key(result->ecdsa, exponent) != 1)
+			goto ecdsa_error;
+		if (key_ec_validate_public(EC_KEY_get0_group(result->ecdsa),
+		                           EC_KEY_get0_public_key(result->ecdsa)) != 0)
+			goto ecdsa_error;
+		if (key_ec_validate_private(result->ecdsa) != 0)
+			goto ecdsa_error;
+
+		success = 1;
+
+ecdsa_error:
+		free(curve);
+		if (exponent)
+			BN_clear_free(exponent);
+		if (q)
+			EC_POINT_free(q);
+		if (success == 0)
+			goto error;
+
+		break;
+	}
+	case KEY_ED25519:
+	{
+		char *pubkey_type, *pub, *pri;
+		unsigned int pklen, sklen;
+		char *sk;
+		pub = pubkey->buf;
+		pri = prikey->buf;
+		pubkey_type = buffer_get_string(&pub, NULL);
+		if (strcmp(pubkey_type, "ssh-ed25519") != 0) {
+			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
+			free(pubkey_type);
+			goto error;
+		}
+		free(pubkey_type);
+
+		result->ed25519_pk = buffer_get_string(&pub, &pklen);
+		sk = buffer_get_string(&pri, &sklen);
+		result->ed25519_sk = malloc(pklen + sklen + 1);
+		memcpy(result->ed25519_sk, sk, sklen);
+		memcpy(result->ed25519_sk + sklen, result->ed25519_pk, pklen);
+		result->ed25519_sk[sklen + pklen] = '\0';
+		free(sk);
+
+		if (pklen != ED25519_PK_SZ)
+			goto error;
+		if (sklen + pklen != ED25519_SK_SZ)
+			goto error;
 
 		break;
 	}
