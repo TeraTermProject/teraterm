@@ -353,7 +353,7 @@ DeferredLogWriteMode=on
 </pre>
 
 
-<h1><a name="LogTimestampFormat">Specify timestamp format at the start of log file</a></h1>
+<h1><a name="LogTimestampFormat">Specify timestamp format at the start of log file's line</a></h1>
 
 <p>
 When the log file is written, the timestamp can be added at the start of line and the timestamp format can be specified.
@@ -388,10 +388,10 @@ LogTimestampFormat=%Y-%m-%d %H:%M:%S.%N
 </pre>
 
 
-<h1><a name="LogTimestampUTC">UTC is used as timestamp at the start of log file</a></h1>
+<h1><a name="LogTimestampUTC">UTC is used as timestamp at the start of log file's line</a></h1>
 
 <p>
-When the log file is written, the timestamp can be added at the start of log file. Basically, local time is used. <br>
+When the log file is written, the timestamp can be added at the start of log file's line. Basically, local time is used. <br>
 When local time is used for summer time, the clock will go or back at summer time switching. So, unexpected clock will be recorded. <br>
 Fortunately, this problem can be avoided because UTC timestamp does not support summer time. <br>
 If UTC timestamp is used instead of local time, change the LogTimestampUTC entry of [Tera Term] section in the following:
