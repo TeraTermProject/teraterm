@@ -989,7 +989,7 @@ static void fill_service_names(HWND dlg, WORD item)
 	}
 }
 
-static void shift_over_input(HWND dlg, int type, WORD rtl_item,
+static void shift_over_input(HWND dlg, FWDType type, WORD rtl_item,
 							 WORD ltr_item)
 {
 	HWND shift_from;
@@ -1018,7 +1018,7 @@ static void shift_over_input(HWND dlg, int type, WORD rtl_item,
 
 static void set_dir_options_status(HWND dlg)
 {
-	int type = IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)
+	FWDType type = IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)
 		? FWD_REMOTE_TO_LOCAL : FWD_LOCAL_TO_REMOTE;
 
 	shift_over_input(dlg, type, IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT);
@@ -1106,7 +1106,7 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 	fill_service_names(dlg, IDC_SSHLTRTOPORT);
 }
 
-static void grab_control_text(HWND dlg, int type, WORD rtl_item,
+static void grab_control_text(HWND dlg, FWDType type, WORD rtl_item,
                               WORD ltr_item, char *buf, int bufsize)
 {
 	GetDlgItemText(dlg, type == FWD_REMOTE_TO_LOCAL ? rtl_item : ltr_item,
@@ -1118,7 +1118,7 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec,
                              HWND dlg)
 {
 	FWDRequestSpec new_spec;
-	int type = IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)
+	FWDType type = IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)
 		? FWD_REMOTE_TO_LOCAL : FWD_LOCAL_TO_REMOTE;
 	char buf[1024];
 

@@ -72,9 +72,9 @@ typedef struct {
 } FWDChannel;
 
 /* Request types */
-#define FWD_LOCAL_TO_REMOTE              1
-#define FWD_REMOTE_TO_LOCAL              2
-#define FWD_REMOTE_X11_TO_LOCAL          3
+typedef enum {
+	FWD_NONE, FWD_LOCAL_TO_REMOTE, FWD_REMOTE_TO_LOCAL, FWD_REMOTE_X11_TO_LOCAL
+} FWDType;
 
 /* If 'type' is FWD_REMOTE_X11_TO_LOCAL, then from_port must be
    -1, to_port must be 6000 + display number, and to_host must
@@ -84,7 +84,7 @@ typedef struct {
    at one time.
 */
 typedef struct {
-  int type;
+  FWDType type;
   int from_port;
   char from_port_name[32];
   int to_port;
