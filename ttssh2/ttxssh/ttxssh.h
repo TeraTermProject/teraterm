@@ -338,7 +338,7 @@ typedef struct _TInstVar {
 #define SSHv1(pvar) ((pvar)->protocol_major == 1)
 #define SSHv2(pvar) ((pvar)->protocol_major == 2)
 
-#define LogLevel(pvar, level) ((pvar)->session_settings.LogLevel >= (level))
+#define LogLevel(pvar, level) ((pvar)->settings.LogLevel >= (level))
 
 void notify_established_secure_connection(PTInstVar pvar);
 void notify_closed_connection(PTInstVar pvar, char *send_msg);

@@ -921,7 +921,7 @@ void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 
 void logputs(int level, char *msg)
 {
-	if (level <= pvar->session_settings.LogLevel) {
+	if (level <= pvar->settings.LogLevel) {
 		char buf[1024];
 		int file;
 
@@ -950,7 +950,7 @@ void logprintf(int level, char *fmt, ...)
 	char buff[4096];
 	va_list params;
 
-	if (level <= pvar->session_settings.LogLevel) {
+	if (level <= pvar->settings.LogLevel) {
 		va_start(params, fmt);
 		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
 		va_end(params);
@@ -1008,7 +1008,7 @@ void logprintf_hexdump(int level, char *data, int len, char *fmt, ...)
 	int byte_cnt;
 	int i;
 
-	if (level <= pvar->session_settings.LogLevel) {
+	if (level <= pvar->settings.LogLevel) {
 		va_start(params, fmt);
 		vsnprintf_s(buff, sizeof(buff), _TRUNCATE, fmt, params);
 		va_end(params);
