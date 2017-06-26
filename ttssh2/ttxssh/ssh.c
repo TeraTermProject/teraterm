@@ -4506,7 +4506,7 @@ void SSH2_update_host_key_myproposal(PTInstVar pvar)
 	myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = buf; 
 }
 
-// H-MACアルゴリズム優先順位に応じて、myproposal[]を書き換える。
+// HMACアルゴリズム優先順位に応じて、myproposal[]を書き換える。
 // (2011.2.28 yutaka)
 void SSH2_update_hmac_myproposal(PTInstVar pvar)
 {

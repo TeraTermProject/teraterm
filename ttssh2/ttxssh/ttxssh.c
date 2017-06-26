@@ -438,7 +438,7 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 	// Host Key algorithm order
 	READ_STD_STRING_OPTION(HostKeyOrder);
 	normalize_host_key_order(settings->HostKeyOrder);
-	// H-MAC order
+	// HMAC order
 	READ_STD_STRING_OPTION(MacOrder);
 	normalize_mac_order(settings->MacOrder);
 	// Compression algorithm order
