@@ -349,10 +349,12 @@ static Channel_t *ssh2_channel_lookup(int id)
 	Channel_t *c;
 
 	if (id < 0 || id >= CHANNEL_MAX) {
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": invalid channel id. (%d)", id);
 		return (NULL);
 	}
 	c = &channels[id];
 	if (c->used == 0) { // already freed
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": channel was already freed. id:%d", id);
 		return (NULL);
 	}
 	return (c);
@@ -1068,6 +1070,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			msg = buffer_init();
 			if (msg == NULL) {
 				// TODO: error check
+				logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 				return;
 			}
 
@@ -2075,6 +2078,8 @@ void SSH2_dispatch_add_message(unsigned char message)
 
 	if (handle_message_count >= HANDLE_MESSAGE_MAX) {
 		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": too many handlers. handlers:%d, max:%d",
+			handle_message_count, HANDLE_MESSAGE_MAX);
 		return;
 	}
 
@@ -2766,6 +2771,7 @@ void SSH_notify_disconnecting(PTInstVar pvar, char *reason)
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		buffer_put_int(msg, SSH2_DISCONNECT_BY_APPLICATION);
@@ -2840,12 +2846,16 @@ void SSH_notify_win_size(PTInstVar pvar, int cols, int rows)
 		Channel_t *c;
 
 		c = ssh2_channel_lookup(pvar->shell_id);
-		if (c == NULL)
+		if (c == NULL) {
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": shell channel not found.");
 			return;
+		}
+
 
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		buffer_put_int(msg, c->remote_id);
@@ -2885,11 +2895,14 @@ int SSH_notify_break_signal(PTInstVar pvar)
 		Channel_t *c;
 
 		c = ssh2_channel_lookup(pvar->shell_id);
-		if (c == NULL)
+		if (c == NULL) {
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": shell channel not found.");
 			goto error;
+		}
 
 		msg = buffer_init();
 		if (msg == NULL) {
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			goto error;
 		}
 		buffer_put_int(msg, c->remote_id);
@@ -3015,7 +3028,12 @@ void SSH_send(PTInstVar pvar, unsigned char const *buf, unsigned int buflen)
 
 	} else { // for SSH2(yutaka)
 		Channel_t *c = ssh2_channel_lookup(pvar->shell_id);
-		SSH2_send_channel_data(pvar, c, (unsigned char *)buf, buflen, 0);
+		if (c == NULL) {
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": shell channel not found.");
+		}
+		else {
+			SSH2_send_channel_data(pvar, c, (unsigned char *)buf, buflen, 0);
+		}
 	}
 
 }
@@ -3270,6 +3288,8 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 	if (pvar->rekeying) {
 		// TODO: 理想としてはパケット破棄ではなく、パケット読み取り遅延にしたいところだが、
 		// 将来直すことにする。
+		logputs(LOG_LEVEL_INFO, __FUNCTION__ ": now rekeying. data is not sent.");
+
 		c = NULL;
 
 		return;
@@ -3298,6 +3318,7 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		buffer_put_int(msg, c->remote_id);
@@ -3309,9 +3330,9 @@ void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, un
 		memcpy(outmsg, buffer_ptr(msg), len);
 		finish_send_packet(pvar);
 		buffer_free(msg);
-		//debug_print(1, pvar->ssh_state.outbuf, 7 + 4 + 1 + 1 + len);
 
-		logprintf(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_DATA was sent at SSH2_send_channel_data(). local:%d remote:%d", c->self_id, c->remote_id);
+		logprintf(LOG_LEVEL_SSHDUMP, __FUNCTION__ ": sending SSH2_MSG_CHANNEL_DATA. "
+			"local:%d remote:%d len:%d", c->self_id, c->remote_id, buflen);
 
 		// remote window sizeの調整
 		if (buflen <= c->remote_window) {
@@ -3396,6 +3417,7 @@ void SSH_fail_channel_open(PTInstVar pvar, uint32 remote_channel_num)
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		buffer_put_int(msg, remote_channel_num);
@@ -3425,6 +3447,7 @@ void SSH2_confirm_channel_open(PTInstVar pvar, Channel_t *c)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return;
 	}
 	buffer_put_int(msg, c->remote_id);
@@ -3493,6 +3516,8 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 	if (pvar->rekeying) {
 		// TODO: 理想としてはパケット破棄ではなく、パケット読み取り遅延にしたいところだが、
 		// 将来直すことにする。
+		logputs(LOG_LEVEL_INFO, __FUNCTION__ ": now rekeying. data is not sent.");
+
 		c = NULL;
 
 		return;
@@ -3501,7 +3526,7 @@ void SSH2_channel_input_eof(PTInstVar pvar, Channel_t *c)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
-		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL");
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return;
 	}
 	buffer_put_int(msg, c->remote_id);  // remote ID
@@ -3574,7 +3599,7 @@ void SSH_request_forwarding(PTInstVar pvar, char *bind_address, int from_server_
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
-			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL");
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		req = "tcpip-forward";
@@ -3607,6 +3632,7 @@ void SSH_cancel_request_forwarding(PTInstVar pvar, char *bind_address, int from_
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		s = "cancel-tcpip-forward";
@@ -3669,12 +3695,15 @@ void SSH_request_X11_forwarding(PTInstVar pvar,
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 
 		c = ssh2_channel_lookup(pvar->shell_id);
-		if (c == NULL)
+		if (c == NULL) {
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": shell channel not found.");
 			return;
+		}
 
 		// making the fake data	
 		newlen = 2 * auth_data_len + 1;
@@ -3759,6 +3788,8 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 			if (pvar->rekeying) {
 				// TODO: 理想としてはパケット破棄ではなく、パケット読み取り遅延にしたいところだが、
 				// 将来直すことにする。
+				logputs(LOG_LEVEL_INFO, __FUNCTION__ ": now rekeying. channel open request is not sent.");
+
 				c = NULL;
 
 				return;
@@ -3779,6 +3810,7 @@ void SSH_open_channel(PTInstVar pvar, uint32 local_channel_num,
 			msg = buffer_init();
 			if (msg == NULL) {
 				// TODO: error check
+				logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 				return;
 			}
 			s = "direct-tcpip";
@@ -4545,6 +4577,7 @@ void SSH2_send_kexinit(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return;
 	}
 	if (pvar->my_kex != NULL)
@@ -5140,6 +5173,7 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return;
 	}
 
@@ -5425,6 +5459,7 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return;
 	}
 
@@ -6328,6 +6363,7 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return FALSE;
 	}
 	s = "ssh-userauth";
@@ -6396,6 +6432,7 @@ BOOL do_SSH2_authrequest(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return FALSE;
 	}
 
@@ -6588,6 +6625,7 @@ static LRESULT CALLBACK ssh_heartbeat_dlg_proc(HWND hWnd, UINT msg, WPARAM wp, L
 			msg = buffer_init();
 			if (msg == NULL) {
 				// TODO: error check
+				logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 				return FALSE;
 			}
 			s = "ssh-heartbeat";
@@ -6753,6 +6791,7 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return FALSE;
 	}
 	s = "session";
@@ -6985,11 +7024,14 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	num = get_uint32_MSBfirst(data);
 	data += 4;
 
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": prompts=%d", num);
+
 	///////// step2
 	// サーバへパスフレーズを送る
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return FALSE;
 	}
 	buffer_put_int(msg, num);
@@ -7010,6 +7052,12 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 
 		// get boolean
 		echo = data[0];
+		data[0] = '\0'; // ログ出力の為、一時的に NUL Terminate する
+
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ":   prompt[%d]=\"%s\", echo=%d, pass-state=%d",
+			i, prompt, slen, pvar->keyboard_interactive_password_input);
+
+		data[0] = echo; // ログ出力を行ったので、元の値に書き戻す
 		data += 1;
 
 		// keyboard-interactive method (2005.3.12 yutaka)
@@ -7037,7 +7085,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	finish_send_packet(pvar);
 	buffer_free(msg);
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_INFO_RESPONSE was sent at handle_SSH2_userauth_inforeq().");
+	logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_USERAUTH_INFO_RESPONSE.");
 	return TRUE;
 }
 
@@ -7302,6 +7350,7 @@ BOOL handle_SSH2_userauth_passwd_changereq(PTInstVar pvar)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 		return FALSE;
 	}
 
@@ -7390,11 +7439,13 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	msg = buffer_init();
 	if (msg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL. (msg)");
 		return FALSE;
 	}
 	ttymsg = buffer_init();
 	if (ttymsg == NULL) {
 		// TODO: error check
+		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL. (ttymsg)");
 		buffer_free(msg);
 		return FALSE;
 	}
@@ -7493,6 +7544,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO:
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
 
@@ -7606,6 +7658,7 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO: SSH2_MSG_DISCONNECTを送る
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
 
@@ -7752,6 +7805,7 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": shell channel not found.");
 			return FALSE;
 		}
 		pvar->agentfwd_enable = TRUE;
@@ -7764,6 +7818,7 @@ static BOOL handle_SSH2_channel_success(PTInstVar pvar)
 		c = ssh2_channel_lookup(pvar->shell_id);
 		if (c == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": shell channel not found.");
 			return FALSE;
 		}
 
@@ -7799,6 +7854,7 @@ static BOOL handle_SSH2_channel_failure(PTInstVar pvar)
 	c = ssh2_channel_lookup(channel_id);
 	if (c == NULL) {
 		// TODO: error check
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", channel_id);
 		return FALSE;
 	}
 
@@ -7847,6 +7903,7 @@ static void do_SSH2_adjust_window_size(PTInstVar pvar, Channel_t *c)
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		buffer_put_int(msg, c->remote_id);
@@ -7882,6 +7939,7 @@ void ssh2_channel_send_close(PTInstVar pvar, Channel_t *c)
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return;
 		}
 		buffer_put_int(msg, c->remote_id);
@@ -8548,8 +8606,6 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
 	len = pvar->ssh_state.payloadlen;
 
-	//debug_print(80, data, len);
-
 	// channel number
 	id = get_uint32_MSBfirst(data);
 	data += 4;
@@ -8557,28 +8613,30 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO:
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
-
-	logprintf(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_DATA was received. local:%d remote:%d", c->self_id, c->remote_id);
 
 	// string length
 	str_len = get_uint32_MSBfirst(data);
 	data += 4;
 
-	// RAWパケットダンプを追加 (2008.8.15 yutaka)
 	if (LogLevel(pvar, LOG_LEVEL_SSHDUMP)) {
+		logprintf(LOG_LEVEL_SSHDUMP, "SSH2_MSG_CHANNEL_DATA was received. local:%d remote:%d len:%d", c->self_id, c->remote_id, str_len);
 		init_memdump();
 		push_memdump("SSH receiving packet", "PKT_recv", (char *)data, str_len);
 	}
 
 	// バッファサイズのチェック
 	if (str_len > c->local_maxpacket) {
-		// TODO: logging
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": Data length is larger than local_maxpacket. "
+			"len:%d local_maxpacket:%d", str_len, c->local_maxpacket);
 	}
 	if (str_len > c->local_window) {
 		// TODO: logging
 		// local window sizeより大きなパケットは捨てる
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": Data length is larger than local_window. "
+			"len:%d local_window:%d", str_len, c->local_window);
 		return FALSE;
 	}
 
@@ -8602,8 +8660,6 @@ static BOOL handle_SSH2_channel_data(PTInstVar pvar)
 			return FALSE;
 		}
 	}
-
-	//debug_print(200, data, strlen);
 
 	// ウィンドウサイズの調整
 	c->local_window -= str_len;
@@ -8642,6 +8698,7 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO:
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
 
@@ -8656,10 +8713,14 @@ static BOOL handle_SSH2_channel_extended_data(PTInstVar pvar)
 	// バッファサイズのチェック
 	if (strlen > c->local_maxpacket) {
 		// TODO: logging
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": Data length is larger than local_maxpacket. "
+			"len:%d local_maxpacket:%d", strlen, c->local_maxpacket);
 	}
 	if (strlen > c->local_window) {
 		// TODO: logging
 		// local window sizeより大きなパケットは捨てる
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": Data length is larger than local_window. "
+			"len:%d local_window:%d", strlen, c->local_window);
 		return FALSE;
 	}
 
@@ -8715,6 +8776,7 @@ static BOOL handle_SSH2_channel_eof(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO:
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
 
@@ -8870,6 +8932,7 @@ static BOOL handle_SSH2_channel_open(PTInstVar pvar)
 			msg = buffer_init();
 			if (msg == NULL) {
 				// TODO: error check
+				logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 				return FALSE;
 			}
 			buffer_put_int(msg, remote_id);
@@ -8919,6 +8982,7 @@ static BOOL handle_SSH2_channel_close(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO:
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
 
@@ -8978,6 +9042,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 	c = ssh2_channel_lookup(id);
 	if (c == NULL) {
 		// TODO:
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": channel not found. (%d)", id);
 		return FALSE;
 	}
 
@@ -9024,6 +9089,7 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 		msg = buffer_init();
 		if (msg == NULL) {
 			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
 			return FALSE;
 		}
 		buffer_put_int(msg, c->remote_id);
@@ -9070,6 +9136,7 @@ static BOOL handle_SSH2_window_adjust(PTInstVar pvar)
 	if (c == NULL) {
 		// channel close後にadjust messageが遅れてやってくるケースもあるため、
 		// FALSEでは返さないようにする。(2007.12.26 yutaka)
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": channel not found. (%d)", id);
 		return TRUE;
 	}
 
