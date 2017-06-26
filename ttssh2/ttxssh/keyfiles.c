@@ -1383,6 +1383,9 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 	else if (strncmp(blob->buf + blob->offset, "dl-modp{sign{dsa", strlen("dl-modp{sign{dsa") - 1) == 0) {
 		result->type = KEY_DSA;
 	}
+	else if (strncmp(blob->buf + blob->offset, "ec-modp", strlen("ec-modp") - 1) == 0) {
+		result->type = KEY_ECDSA256;
+	}
 	else {
 		strncpy_s(errmsg, errmsg_len, "unknown key type", _TRUNCATE);
 		goto error;
@@ -1519,6 +1522,73 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		buffer_get_bignum_SECSH(blob2, result->dsa->q);
 		buffer_get_bignum_SECSH(blob2, result->dsa->pub_key);
 		buffer_get_bignum_SECSH(blob2, result->dsa->priv_key);
+
+		break;
+	}
+	case KEY_ECDSA256:
+	{
+		unsigned int dummy, nid;
+		int success = 0;
+		char *curve = NULL;
+		BIGNUM *exponent = NULL;
+		EC_POINT *q = NULL;
+		BN_CTX *ctx = NULL;
+
+		dummy = buffer_get_int(blob2);
+		curve = buffer_get_string_msg(blob2, NULL);
+
+		if (strncmp(curve, "nistp256", strlen("nistp256")) == 0) {
+			result->type = KEY_ECDSA256;
+		}
+		else if (strncmp(curve, "nistp384", strlen("nistp384")) == 0) {
+			result->type = KEY_ECDSA384;
+		}
+		else if (strncmp(curve, "nistp521", strlen("nistp521")) == 0) {
+			result->type = KEY_ECDSA521;
+		}
+		else {
+			strncpy_s(errmsg, errmsg_len, "key type error", _TRUNCATE);
+			goto error;
+		}
+
+		nid = keytype_to_cipher_nid(result->type);
+		if ((result->ecdsa = EC_KEY_new_by_curve_name(nid)) == NULL)
+			goto ecdsa_error;
+		if ((q = EC_POINT_new(EC_KEY_get0_group(result->ecdsa))) == NULL)
+			goto ecdsa_error;
+		if ((exponent = BN_new()) == NULL)
+			goto ecdsa_error;
+
+		buffer_get_bignum_SECSH(blob2, exponent);
+		if (EC_KEY_set_private_key(result->ecdsa, exponent) != 1)
+			goto ecdsa_error;
+		if (key_ec_validate_private(result->ecdsa) != 0)
+			goto ecdsa_error;
+
+		// ƒtƒ@ƒCƒ‹‚É‚Í”é–§Œ®‚µ‚©Ši”[‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅŒöŠJŒ®‚ðŒvŽZ‚Å‹‚ß‚é
+		if ((ctx = BN_CTX_new()) == NULL)
+			goto ecdsa_error;
+		if (!EC_POINT_mul(EC_KEY_get0_group(result->ecdsa), q, exponent, NULL, NULL, ctx)) {
+			goto ecdsa_error;
+		}
+		if (EC_KEY_set_public_key(result->ecdsa, q) != 1)
+			goto ecdsa_error;
+		if (key_ec_validate_public(EC_KEY_get0_group(result->ecdsa),
+		                           EC_KEY_get0_public_key(result->ecdsa)) != 0)
+			goto ecdsa_error;
+
+		success = 1;
+
+ecdsa_error:
+		free(curve);
+		if (exponent)
+			BN_clear_free(exponent);
+		if (q)
+			EC_POINT_free(q);
+		if (ctx)
+			BN_CTX_free(ctx);
+		if (success == 0)
+			goto error;
 
 		break;
 	}
