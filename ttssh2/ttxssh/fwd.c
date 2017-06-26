@@ -1050,12 +1050,11 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 		}
 		if (s == INVALID_SOCKET) {
 			if (report_error) {
-				char buf[256];
 				UTIL_get_lang_msg("MSG_FWD_SOCKET_ERROR", pvar,
 				                  "Some socket(s) required for port forwarding could not be initialized.\n"
 				                  "Some port forwarding services may not be available.\n"
 				                  "(errno %d)");
-				logprintf(LOG_LEVEL_WARNING, buf, pvar->ts->UIMsg, WSAGetLastError());
+				logprintf(LOG_LEVEL_WARNING, pvar->ts->UIMsg, WSAGetLastError());
 			}
 			freeaddrinfo(res0);
 			/* free(request->listening_sockets); /* DO NOT FREE HERE, listening_sockets'll be freed in FWD_end */
