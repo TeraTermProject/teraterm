@@ -749,6 +749,33 @@ error:
  *
  *    mpint  x                  (the private key parameter)
  *
+ * for "ecdsa-sha2-nistp256" or
+ *     "ecdsa-sha2-nistp384" or
+ *     "ecdsa-sha2-nistp521", it will be composed of
+ *
+ * "Public-Lines: " plus a number N.
+ *
+ *    string  "ecdsa-sha2-[identifier]" ("ecdsa-sha2-nistp256" or
+ *                                       "ecdsa-sha2-nistp384" or
+ *                                       "ecdsa-sha2-nistp521")
+ *    string  [identifier] ("nistp256" or "nistp384" or "nistp521")
+ *    string  Q            (EC_POINT)
+ *
+ * "Private-Lines: " plus a number N,
+ *
+ *    mpint  n
+ *
+ * for "ssh-ed25519", it will be composed of
+ *
+ * "Public-Lines: " plus a number N.
+ *
+ *    string "ssh-ed25519"
+ *    string key
+ *
+ * "Private-Lines: " plus a number N,
+ *
+ *    string key
+ *
  * "Private-MAC: " plus a hex, HMAC-SHA-1 of:
  *
  *    string name of algorithm ("ssh-dss", "ssh-rsa")
@@ -1261,6 +1288,7 @@ error:
  * 
  *   `if-modn{sign{rsa-pkcs1-sha1},encrypt{rsa-pkcs1v2-oaep}}'
  *   `dl-modp{sign{dsa-nist-sha1},dh{plain}}'
+ *   `ec-modp'
  *
  * The encryption. The cipher-type string appears to be either
  *
@@ -1282,6 +1310,11 @@ error:
  *  - mpint q
  *  - mpint y
  *  - mpint x
+ *
+ * For a ECDSA key, the payload blob contains:
+ *  - uint32 1
+ *  - string [identifier] ("nistp256" or "nistp384" or "nistp521")
+ *  - mpint  n
  */
 Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
                                  FILE * fp,
