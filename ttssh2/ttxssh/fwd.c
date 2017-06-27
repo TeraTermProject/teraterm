@@ -231,8 +231,7 @@ static void send_local_connection_closure(PTInstVar pvar, int channel_num)
 {
 	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
-	if ((channel->status & (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED))
-	 == (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)) {
+	if ((channel->status & FWD_BOTH_CONNECTED) == FWD_BOTH_CONNECTED) {
 		SSH_channel_input_eof(pvar, channel->remote_num, channel_num);
 		SSH_channel_output_eof(pvar, channel->remote_num);
 		channel->status |= FWD_CLOSED_LOCAL_IN | FWD_CLOSED_LOCAL_OUT;
@@ -599,8 +598,7 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 	char hname[NI_MAXHOST];
 	char strport[NI_MAXSERV]; // ws2tcpip.h
 	int addrlen = sizeof(addr);
-	char buf[1024];
-	BYTE *IP;
+	int port;
 	FWDChannel *channel;
 	FWDRequest *request = &pvar->fwd_state.requests[request_num];
 	BOOL is_localhost = FALSE;
@@ -610,20 +608,18 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 	if (s == INVALID_SOCKET)
 		return;
 
-	IP = (BYTE *) & ((struct sockaddr_in *) (&addr))->sin_addr.s_addr;
-
 	// SSH2 port-forwardingに接続元のリモートポートが必要。(2005.2.27 yutaka)
 	if (getnameinfo
 	    ((struct sockaddr *) &addr, addrlen, hname, sizeof(hname),
 	     strport, sizeof(strport), NI_NUMERICHOST | NI_NUMERICSERV)) {
 		/* NOT REACHED */
 	}
-	logprintf(LOG_LEVEL_VERBOSE,
-	          "Host %s connecting to port %d; forwarding to %s:%d",
-	          hname, request->spec.from_port, request->spec.to_host,
-	          request->spec.to_port);
+	port = atoi(strport);
 
-	strncpy_s(buf, sizeof(buf), hname, _TRUNCATE);
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
+	          ": Host %s(%d) connecting to port %d; forwarding to %s:%d",
+	          hname, port, request->spec.from_port, request->spec.to_host,
+	          request->spec.to_port);
 
 	channel_num = alloc_channel(pvar, FWD_LOCAL_CONNECTED, request_num);
 	channel = pvar->fwd_state.channels + channel_num;
@@ -634,15 +630,14 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 
 	// add originator-port (2005.2.27 yutaka)
 	SSH_open_channel(pvar, channel_num, request->spec.to_host,
-	                 request->spec.to_port, buf, atoi(strport));
+	                 request->spec.to_port, hname, port);
 }
 
 static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
 {
 	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
-	if ((channel->status & (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED))
-	 == (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)) {
+	if ((channel->status & FWD_BOTH_CONNECTED) == FWD_BOTH_CONNECTED) {
 		if (!UTIL_sock_write_more
 			(pvar, &channel->writebuf, channel->local_socket)) {
 			channel_error(pvar, "writing", channel_num, WSAGetLastError());
@@ -654,8 +649,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 {
 	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
 
-	if ((channel->status & (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED))
-	 != (FWD_REMOTE_CONNECTED | FWD_LOCAL_CONNECTED)) {
+	if ((channel->status & FWD_BOTH_CONNECTED) != FWD_BOTH_CONNECTED) {
 		return;
 	}
 
