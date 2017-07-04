@@ -33,11 +33,9 @@ See LICENSE.TXT for the license.
 */
 
 #include "ttxssh.h"
-
 #include "x11util.h"
-
 #include "fwd.h"
-
+#include "fwd-socks.h"
 #include "ttcommon.h"
 
 #include <assert.h>
@@ -590,8 +588,19 @@ static void make_local_connection(PTInstVar pvar, int channel_num)
 	channel_opening_error(pvar, channel_num, WSAGetLastError());
 }
 
-static void accept_local_connection(PTInstVar pvar, int request_num,
-                                    int listening_socket_num)
+static char *dump_fwdchannel(FWDChannel *c)
+{
+	static char buff[1024];
+
+	_snprintf_s(buff, sizeof(buff), _TRUNCATE,
+		"status=%d, channel: local=%d, remote=%d, socket: %s, filter: %s",
+		c->status, c->request_num, c->remote_num, (c->local_socket != INVALID_SOCKET) ? "ok" : "invalid",
+		(c->filter != NULL) ? "on" : "off");
+
+	return buff;
+}
+
+static void accept_local_connection(PTInstVar pvar, int request_num, int listening_socket_num)
 {
 	int channel_num;
 	SOCKET s;
@@ -604,34 +613,46 @@ static void accept_local_connection(PTInstVar pvar, int request_num,
 	FWDRequest *request = &pvar->fwd_state.requests[request_num];
 	BOOL is_localhost = FALSE;
 
-	s = accept(request->listening_sockets[listening_socket_num],
-	           (struct sockaddr *) &addr, &addrlen);
+	s = accept(request->listening_sockets[listening_socket_num], (struct sockaddr *) &addr, &addrlen);
 	if (s == INVALID_SOCKET)
 		return;
 
 	// SSH2 port-forwardingに接続元のリモートポートが必要。(2005.2.27 yutaka)
-	if (getnameinfo
-	    ((struct sockaddr *) &addr, addrlen, hname, sizeof(hname),
-	     strport, sizeof(strport), NI_NUMERICHOST | NI_NUMERICSERV)) {
+	if (getnameinfo((struct sockaddr *) &addr, addrlen, hname, sizeof(hname),
+	                strport, sizeof(strport), NI_NUMERICHOST | NI_NUMERICSERV)) {
 		/* NOT REACHED */
 	}
 	port = atoi(strport);
-
-	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
-	          ": Host %s(%d) connecting to port %d; forwarding to %s:%d",
-	          hname, port, request->spec.from_port, request->spec.to_host,
-	          request->spec.to_port);
 
 	channel_num = alloc_channel(pvar, FWD_LOCAL_CONNECTED, request_num);
 	channel = pvar->fwd_state.channels + channel_num;
 
 	channel->local_socket = s;
-	channel->filter_closure = NULL;
-	channel->filter = NULL;
 
-	// add originator-port (2005.2.27 yutaka)
-	SSH_open_channel(pvar, channel_num, request->spec.to_host,
-	                 request->spec.to_port, hname, port);
+	if (request->spec.type == FWD_LOCAL_TO_REMOTE) {
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
+		          ": Host %s(%d) connecting to port %d; forwarding to %s:%d; type=LtoR",
+		          hname, port, request->spec.from_port, request->spec.to_host, request->spec.to_port);
+
+		channel->filter_closure = NULL;
+		channel->filter = NULL;
+		SSH_open_channel(pvar, channel_num, request->spec.to_host,
+		                 request->spec.to_port, hname, port);
+	}
+	else { // FWD_LOCAL_DYNAMIC
+		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__
+		          ": Host %s(%d) connecting to port %d; type=dynamic",
+		          hname, port, request->spec.from_port);
+
+		// SOCKS のリクエストを処理する為の filter を登録
+		channel->filter_closure = SOCKS_init_filter(pvar, channel_num, hname, port);
+		channel->filter = SOCKS_filter;
+
+		// リモート側はまだ繋がっていないが、read_local_connection() 等で処理が行われるようにフラグを立てる。
+		channel->status |= FWD_BOTH_CONNECTED;
+
+	}
+	logprintf(150, __FUNCTION__ ": channel info: %s", dump_fwdchannel(channel));
 }
 
 static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
@@ -649,6 +670,8 @@ static void write_local_connection_buffer(PTInstVar pvar, int channel_num)
 static void read_local_connection(PTInstVar pvar, int channel_num)
 {
 	FWDChannel *channel = pvar->fwd_state.channels + channel_num;
+
+	logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": channel=%d", channel_num);
 
 	if ((channel->status & FWD_BOTH_CONNECTED) != FWD_BOTH_CONNECTED) {
 		return;
@@ -909,6 +932,7 @@ BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec)
 
 	switch (spec->type) {
 	case FWD_LOCAL_TO_REMOTE:
+	case FWD_LOCAL_DYNAMIC:
 		return TRUE;
 	default:
 		listener =
@@ -997,7 +1021,7 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 {
 	FWDRequest *request = pvar->fwd_state.requests + request_num;
 
-	if (request->spec.type == FWD_LOCAL_TO_REMOTE) {
+	if (request->spec.type == FWD_LOCAL_TO_REMOTE || request->spec.type == FWD_LOCAL_DYNAMIC) {
 		struct addrinfo hints;
 		struct addrinfo *res;
 		struct addrinfo *res0;
@@ -1107,6 +1131,7 @@ static char *dump_fwdspec(FWDRequestSpec *spec, int stat)
 	  case FWD_LOCAL_TO_REMOTE: ftype = "LtoR"; break;
 	  case FWD_REMOTE_TO_LOCAL: ftype = "RtoL"; break;
 	  case FWD_REMOTE_X11_TO_LOCAL: ftype = "X11"; bind_addr = ftype; break;
+	  case FWD_LOCAL_DYNAMIC: ftype="dynamic"; break;
 	  default: ftype = "Unknown"; break;
 	}
 

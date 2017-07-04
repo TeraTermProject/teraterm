@@ -272,6 +272,10 @@
 				>
 			</File>
 			<File
+				RelativePath="fwd-socks.h"
+				>
+			</File>
+			<File
 				RelativePath="fwdui.h"
 				>
 			</File>
@@ -389,6 +393,10 @@
 			</File>
 			<File
 				RelativePath="fwd.c"
+				>
+			</File>
+			<File
+				RelativePath="fwd-socks.c"
 				>
 			</File>
 			<File

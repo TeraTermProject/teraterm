@@ -469,6 +469,8 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 		request->type = FWD_LOCAL_TO_REMOTE;
 	} else if (*tmp == 'R' || *tmp == 'r') {
 		request->type = FWD_REMOTE_TO_LOCAL;
+	} else if (*tmp == 'D' || *tmp == 'd') {
+		request->type = FWD_LOCAL_DYNAMIC;
 	} else if (*tmp == 'X' || *tmp == 'x') {
 		make_X_forwarding_spec(request, pvar);
 		return TRUE;
@@ -496,14 +498,12 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 		}
 	}
 
-	strncpy_s(request->bind_address, sizeof(request->bind_address),
-	          "localhost", _TRUNCATE);
+	strncpy_s(request->bind_address, sizeof(request->bind_address), "localhost", _TRUNCATE);
 	i=0;
 	switch (argc) {
 		case 4:
 			if (*argv[i] == '\0' || strcmp(argv[i], "*") == 0) {
-				strncpy_s(request->bind_address, sizeof(request->bind_address),
-				          "0.0.0.0", _TRUNCATE);
+				strncpy_s(request->bind_address, sizeof(request->bind_address), "0.0.0.0", _TRUNCATE);
 			}
 			else {
 				// IPv6 アドレスの "[", "]" があれば削除
@@ -550,6 +550,46 @@ static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
 				return FALSE;
 			}
 
+			break;
+
+		case 2:
+			if (request->type != FWD_LOCAL_DYNAMIC) {
+				return FALSE;
+			}
+			if (*argv[i] == '\0' || strcmp(argv[i], "*") == 0) {
+				strncpy_s(request->bind_address, sizeof(request->bind_address),
+				          "0.0.0.0", _TRUNCATE);
+			}
+			else {
+				// IPv6 アドレスの "[", "]" があれば削除
+				start = 0;
+				strncpy_s(hostname, sizeof(hostname), argv[i], _TRUNCATE);
+				if (strlen(hostname) > 0 &&
+				    hostname[strlen(hostname)-1] == ']') {
+					hostname[strlen(hostname)-1] = '\0';
+				}
+				if (hostname[0] == '[') {
+					start = 1;
+				}
+				strncpy_s(request->bind_address, sizeof(request->bind_address),
+				          hostname + start, _TRUNCATE);
+			}
+			i++;
+			// FALLTHROUGH
+		case 1:
+			if (request->type != FWD_LOCAL_DYNAMIC) {
+				return FALSE;
+			}
+			request->from_port = parse_port(argv[i], request->from_port_name,
+			                                sizeof(request->from_port_name));
+			if (request->from_port < 0) {
+				return FALSE;
+			}
+			i++;
+
+			request->to_host[0] = '\0';
+			request->to_port = parse_port("0", request->to_port_name,
+			                              sizeof(request->to_port_name));
 			break;
 
 		default:
@@ -659,6 +699,8 @@ static void FWDUI_save_settings(PTInstVar pvar)
 			case FWD_REMOTE_X11_TO_LOCAL:
 				_snprintf_s(str, str_remaining, _TRUNCATE, "X");
 				break;
+			case FWD_LOCAL_DYNAMIC:
+				_snprintf_s(str, str_remaining, _TRUNCATE, "D%s", spec->from_port_name);
 			}
 
 			chars = strlen(str);
@@ -773,6 +815,9 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 		                  "Remote X applications to local X server");
 		strncpy_s(buf, bufsize, pvar->ts->UIMsg, _TRUNCATE);
 		return;
+	case FWD_LOCAL_DYNAMIC:
+		UTIL_get_lang_msg("MSG_FWD_DYNAMIC", pvar, "Local port %s to remote dynamic");
+		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg, verbose_from_port);
 	}
 }
 
@@ -894,8 +939,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 	BOOL X_enabled = IsDlgButtonChecked(dlg, IDC_SSHFWDX11);
 	int num_specs = X_enabled ? 1 : 0;
 	FWDRequestSpec *specs =
-		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) *
-		                              (num_specs + num_items));
+		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * (num_specs + num_items));
 	int i;
 	int num_unspecified_forwardings = 0;
 
@@ -917,8 +961,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 
 	buf[0] = '\0';
 	for (i = 0; i < num_specs; i++) {
-		if (i < num_specs - 1
-			&& FWD_compare_specs(specs + i, specs + i + 1) == 0) {
+		if (i < num_specs - 1 && FWD_compare_specs(specs + i, specs + i + 1) == 0) {
 			switch (specs[i].type) {
 			case FWD_REMOTE_TO_LOCAL:
 				UTIL_get_lang_msg("MSG_SAME_SERVERPORT_ERROR", pvar,
@@ -927,6 +970,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 				            pvar->ts->UIMsg, specs[i].from_port);
 				break;
 			case FWD_LOCAL_TO_REMOTE:
+			case FWD_LOCAL_DYNAMIC:
 				UTIL_get_lang_msg("MSG_SAME_LOCALPORT_ERROR", pvar,
 				                  "You cannot have two forwarding from the same local port (%d).");
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE,

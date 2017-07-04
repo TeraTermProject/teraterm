@@ -1788,7 +1788,8 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 				if (option[4] == 0) {
 					pvar->settings.Enabled = 1;
 				} else if (MATCH_STR(option + 4, "-L") == 0 ||
-				           MATCH_STR(option + 4, "-R") == 0) {
+				           MATCH_STR(option + 4, "-R") == 0 ||
+				           MATCH_STR(option + 4, "-D") == 0) {
 					char *p = option + 5;
 					option2[0] = *p;
 					i = 1;

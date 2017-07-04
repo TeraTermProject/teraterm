@@ -78,7 +78,7 @@ typedef struct {
 
 /* Request types */
 typedef enum {
-	FWD_NONE, FWD_LOCAL_TO_REMOTE, FWD_REMOTE_TO_LOCAL, FWD_REMOTE_X11_TO_LOCAL
+	FWD_NONE, FWD_LOCAL_TO_REMOTE, FWD_REMOTE_TO_LOCAL, FWD_REMOTE_X11_TO_LOCAL, FWD_LOCAL_DYNAMIC
 } FWDType;
 
 /* If 'type' is FWD_REMOTE_X11_TO_LOCAL, then from_port must be
