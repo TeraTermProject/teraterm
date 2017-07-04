@@ -46,7 +46,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;&#x0D;&#x0A;"
+				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(SolutionDir)common"
@@ -212,7 +212,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ListDlg.cpp"
+				RelativePath="ListDlg.cpp"
 				>
 			</File>
 			<File
@@ -253,7 +253,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ListDlg.h"
+				RelativePath="ListDlg.h"
 				>
 			</File>
 			<File
@@ -265,7 +265,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
+				RelativePath="stdafx.h"
 				>
 			</File>
 			<File
@@ -322,15 +322,15 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath=".\ttm-version.rc"
+				RelativePath="ttm-version.rc"
 				>
 			</File>
 			<File
-				RelativePath="Ttmacro.ico"
+				RelativePath="ttmacro.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\ttmacro_3d.ico"
+				RelativePath="ttmacro_3d.ico"
 				>
 			</File>
 			<File
@@ -393,7 +393,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\wait4all.c"
+				RelativePath="wait4all.c"
 				>
 			</File>
 		</Filter>

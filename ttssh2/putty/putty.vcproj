@@ -173,11 +173,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\libputty.c"
+			RelativePath="libputty.c"
 			>
 		</File>
 		<File
-			RelativePath=".\libputty.h"
+			RelativePath="libputty.h"
 			>
 		</File>
 	</Files>

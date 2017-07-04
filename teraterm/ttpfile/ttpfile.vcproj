@@ -237,7 +237,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ymodem.c"
+				RelativePath="ymodem.c"
 				>
 			</File>
 			<File
@@ -291,7 +291,7 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="Ttpfile.rc"
+				RelativePath="ttpfile.rc"
 				>
 				<FileConfiguration
 					Name="Release|Win32"

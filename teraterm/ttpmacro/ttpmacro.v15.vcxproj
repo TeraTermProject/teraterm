@@ -167,7 +167,7 @@
     <ClInclude Include="ttm_res.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Ttmacro.ico" />
+    <Image Include="ttmacro.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttm-version.rc" />

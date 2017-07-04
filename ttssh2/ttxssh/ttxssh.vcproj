@@ -46,7 +46,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;&#x0D;&#x0A;"
+				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\inc32;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRTDBG_MAP_ALLOC"
@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot; &#x0D;&#x0A;"
+				AdditionalOptions="/D&quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="$(SolutionDir)..\teraterm\common;$(SolutionDir)..\libs\openssl\inc32;$(SolutionDir)..\teraterm\teraterm;$(SolutionDir)..\libs\zlib;$(SolutionDir)matcher;$(SolutionDir)putty"
@@ -451,7 +451,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ttsecure_green.ico"
+				RelativePath="ttsecure_green.ico"
 				>
 			</File>
 			<File

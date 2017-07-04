@@ -86,7 +86,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles=".\teraterm.manifest"
+				AdditionalManifestFiles="teraterm.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -179,7 +179,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles=".\teraterm.manifest"
+				AdditionalManifestFiles="teraterm.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -209,7 +209,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\addsetting.cpp"
+				RelativePath="addsetting.cpp"
 				>
 			</File>
 			<File
@@ -370,7 +370,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\winjump.c"
+				RelativePath="winjump.c"
 				>
 			</File>
 			<File
@@ -383,7 +383,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\addsetting.h"
+				RelativePath="addsetting.h"
 				>
 			</File>
 			<File

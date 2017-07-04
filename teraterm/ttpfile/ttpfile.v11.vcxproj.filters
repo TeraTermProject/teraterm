@@ -80,7 +80,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Ttpfile.rc">
+    <ResourceCompile Include="ttpfile.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

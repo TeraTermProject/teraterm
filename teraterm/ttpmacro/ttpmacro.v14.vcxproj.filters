@@ -131,7 +131,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Ttmacro.ico">
+    <Image Include="ttmacro.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
