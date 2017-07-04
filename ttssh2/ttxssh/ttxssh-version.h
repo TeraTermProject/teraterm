@@ -28,9 +28,9 @@
 
 #pragma once
 
+#include "tt-version.h"
+
 #define TTSSH_VERSION_MAJOR             2
 #define TTSSH_VERSION_MINOR             81
-#define TTSSH_TOSTR(x)                  TTSSH_TOSTR2(x)
-#define TTSSH_TOSTR2(x)                 #x
-#define TTSSH_VERSION_STR(sep)          TTSSH_TOSTR(TTSSH_VERSION_MAJOR) sep TTSSH_TOSTR(TTSSH_VERSION_MINOR)
+#define TTSSH_VERSION_STR(sep)          TT_TOSTR(TTSSH_VERSION_MAJOR) sep TT_TOSTR(TTSSH_VERSION_MINOR)
 #define TTSSH_RES_VERSION_STR           TTSSH_VERSION_STR(", ") ", 0, 0"
