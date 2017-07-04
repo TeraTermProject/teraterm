@@ -147,7 +147,7 @@ typedef struct _TS_SSH {
 	char DefaultRhostsHostPrivateKeyFile[1024];
 	char DefaultRSAPrivateKeyFile[1024];
 
-	char DefaultForwarding[2048];
+	char DefaultForwarding[4096];
 	BOOL TryDefaultAuth;
 
 	int LogLevel;      /* 0 = NONE, 100 = Verbose */
