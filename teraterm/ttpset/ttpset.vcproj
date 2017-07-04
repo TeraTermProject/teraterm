@@ -223,6 +223,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\tt-version.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\ttlib.h"
 				>
 			</File>

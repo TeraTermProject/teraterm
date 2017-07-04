@@ -30,6 +30,9 @@
     <ClInclude Include="..\common\teraterm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\tt-version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\common\ttlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>

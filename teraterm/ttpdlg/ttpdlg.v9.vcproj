@@ -73,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib onig_s.lib ttpcmn.lib"
+				AdditionalDependencies="onig_s.lib ttpcmn.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"
@@ -163,7 +163,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Version.lib onig_sd.lib ttpcmn.lib"
+				AdditionalDependencies="onig_sd.lib ttpcmn.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(OutDir)"

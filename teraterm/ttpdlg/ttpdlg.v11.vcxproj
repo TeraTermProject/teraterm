@@ -80,7 +80,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Version.lib;onig_s.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onig_s.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
@@ -119,7 +119,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>Version.lib;onig_sd.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>onig_sd.lib;ttpcmn.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\oniguruma\src;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>

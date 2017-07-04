@@ -130,6 +130,9 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="tt-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="ttermpro.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

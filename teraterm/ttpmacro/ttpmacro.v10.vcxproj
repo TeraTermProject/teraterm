@@ -167,6 +167,7 @@
     <None Include="Ttmacro.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttm-version.rc" />
     <ResourceCompile Include="ttpmacro.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>

@@ -322,6 +322,10 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath=".\ttm-version.rc"
+				>
+			</File>
+			<File
 				RelativePath="Ttmacro.ico"
 				>
 			</File>

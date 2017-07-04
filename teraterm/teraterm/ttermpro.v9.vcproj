@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath="tt-version.rc"
+				>
+			</File>
+			<File
 				RelativePath="ttermpro.rc"
 				>
 			</File>

@@ -167,6 +167,7 @@
     <Image Include="Ttmacro.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttm-version.rc" />
     <ResourceCompile Include="ttpmacro.rc">
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">0x0411</Culture>

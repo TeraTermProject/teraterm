@@ -2439,65 +2439,6 @@ BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-// 実行ファイルからバージョン情報を得る (2005.2.28 yutaka)
-static void get_file_version(char *exefile, int *major, int *minor, int *release, int *build)
-{
-	typedef struct {
-		WORD wLanguage;
-		WORD wCodePage;
-	} LANGANDCODEPAGE, *LPLANGANDCODEPAGE;
-	LPLANGANDCODEPAGE lplgcode;
-	UINT unLen;
-	DWORD size;
-	char *buf = NULL;
-	BOOL ret;
-	int i;
-	char fmt[80];
-	char *pbuf;
-
-	size = GetFileVersionInfoSize(exefile, NULL);
-	if (size == 0) {
-		goto error;
-	}
-	buf = malloc(size);
-	ZeroMemory(buf, size);
-
-	if (GetFileVersionInfo(exefile, 0, size, buf) == FALSE) {
-		goto error;
-	}
-
-	ret = VerQueryValue(buf, "\\VarFileInfo\\Translation",
-	                    (LPVOID *)&lplgcode, &unLen);
-	if (ret == FALSE) {
-		goto error;
-	}
-
-	for (i = 0 ; i < (int)(unLen / sizeof(LANGANDCODEPAGE)) ; i++) {
-		_snprintf_s(fmt, sizeof(fmt), _TRUNCATE, "\\StringFileInfo\\%04x%04x\\FileVersion",
-		            lplgcode[i].wLanguage, lplgcode[i].wCodePage);
-		VerQueryValue(buf, fmt, &pbuf, &unLen);
-		if (unLen > 0) { // get success
-			int n, a, b, c, d;
-
-			n = sscanf(pbuf, "%d, %d, %d, %d", &a, &b, &c, &d);
-			if (n == 4) { // convert success
-				*major = a;
-				*minor = b;
-				*release = c;
-				*build = d;
-				break;
-			}
-		}
-	}
-
-	free(buf);
-	return;
-
-error:
-	free(buf);
-	*major = *minor = *release = *build = 0;
-}
-
 
 //
 // static textに書かれたURLをダブルクリックすると、ブラウザが起動するようにする。
@@ -2705,7 +2646,6 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 
 BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
-	int a, b, c, d;
 	char buf[128], tmpbuf[128];
 	HDC hdc;
 	HWND hwnd;
@@ -2793,10 +2733,8 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 			SetWindowText(Dialog, uimsg);
 
-			// Tera Termのバージョンを設定する (2005.2.28 yutaka)
-			// __argv[0]では WinExec() したプロセスから参照できないようなので削除。(2005.3.14 yutaka)
-			get_file_version("ttermpro.exe", &a, &b, &c, &d);
-			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", a, b);
+			// Tera Term 本体のバージョン
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
 #ifdef SVNVERSION
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
 			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);

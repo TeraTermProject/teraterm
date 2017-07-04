@@ -170,6 +170,7 @@
     <Image Include="..\common\vt_classic.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="tt-version.rc" />
     <ResourceCompile Include="ttermpro.rc" />
   </ItemGroup>
   <ItemGroup>

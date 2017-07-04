@@ -136,6 +136,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttm-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="ttpmacro.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

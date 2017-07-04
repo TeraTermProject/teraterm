@@ -438,7 +438,7 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "#include ""tt-version.rc""\r\n"
     "\0"
 END
 
@@ -460,45 +460,6 @@ IDI_VT_CLASSIC          ICON                    "..\\common\\vt_classic.ico"
 IDI_TTERM_3D            ICON                    "..\\common\\teraterm_3d.ico"
 IDI_VT_3D               ICON                    "..\\common\\vt_3d.ico"
 IDI_CYGTERM             ICON                    "..\\..\\cygterm\\cygterm.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 4,95,0,0
- PRODUCTVERSION 4,95,0,0
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "CompanyName", "T. Teranishi, TeraTerm Project"
-            VALUE "FileDescription", "Tera Term"
-            VALUE "FileVersion", "4, 95, 0, 0"
-            VALUE "InternalName", "TTERMPRO"
-            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2017 TeraTerm Project"
-            VALUE "OriginalFilename", "TTERMPRO.EXE"
-            VALUE "ProductName", "Tera Term"
-            VALUE "ProductVersion", "4, 95, 0, 0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -687,7 +648,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+#include "tt-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
