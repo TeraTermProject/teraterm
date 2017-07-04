@@ -34,7 +34,7 @@ BEGIN
     LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
     ICON            "",IDC_TTSSH_ICON,248,7,20,20
     LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
-    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2016 TeraTerm Project",IDC_INCLUDES,6,36,262,34
+    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2017 TeraTerm Project",IDC_INCLUDES,6,36,262,34
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
     LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,175,8
     LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,175,8
@@ -599,7 +599,7 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "#include ""ttxssh-version.rc""\r\n"
     "\0"
 END
 
@@ -616,44 +616,6 @@ END
 IDI_SECURETT            ICON                    "ttsecure.ico"
 IDI_SECURETT_GREEN      ICON                    "ttsecure_green.ico"
 IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,81,0,0
- PRODUCTVERSION 2,81,0,0
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x2L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "FileDescription", "TTXSSH"
-            VALUE "FileVersion", "2, 81, 0, 0"
-            VALUE "InternalName", "TTXSSH"
-            VALUE "LegalCopyright", "(C)1998-2001 Robert O'Callahan, (C) 2000-2003 Jun-ya KATO, (C) 2004-2017 TeraTerm Project"
-            VALUE "OriginalFilename", "TTXSSH.dll"
-            VALUE "ProductName", "TTSSH"
-            VALUE "ProductVersion", "2, 81, 0, 0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -664,7 +626,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+#include "ttxssh-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

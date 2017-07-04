@@ -308,6 +308,10 @@
 				>
 			</File>
 			<File
+				RelativePath="ttxssh-version.h"
+				>
+			</File>
+			<File
 				RelativePath="ttxssh.h"
 				>
 			</File>
@@ -454,6 +458,10 @@
 			</File>
 			<File
 				RelativePath="ttsecure_yellow.ico"
+				>
+			</File>
+			<File
+				RelativePath="ttxssh-version.rc"
 				>
 			</File>
 			<File

@@ -194,6 +194,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="sftp.h" />
     <ClInclude Include="ssh.h" />
+    <ClInclude Include="ttxssh-version.h" />
     <ClInclude Include="ttxssh.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="x11util.h" />
@@ -203,6 +204,7 @@
     <None Include="ttsecure_yellow.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttxssh-version.rc" />
     <ResourceCompile Include="ttxssh.rc" />
   </ItemGroup>
   <ItemGroup>

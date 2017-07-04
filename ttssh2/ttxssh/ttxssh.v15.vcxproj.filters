@@ -102,6 +102,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ttxssh-version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ttxssh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -194,6 +197,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttxssh-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="ttxssh.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
