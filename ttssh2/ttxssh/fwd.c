@@ -1517,11 +1517,27 @@ void FWD_confirmed_open(PTInstVar pvar, uint32 local_channel_num,
 {
 	SOCKET s;
 	FWDChannel *channel;
+	FwdFilterResult action = FWD_FILTER_RETAIN;
 
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
 		return;
 
 	channel = pvar->fwd_state.channels + local_channel_num;
+
+	if (channel->filter != NULL) {
+		action = channel->filter(channel->filter_closure, FWD_FILTER_OPENCONFIRM, NULL, NULL);
+		switch (action) {
+		case FWD_FILTER_REMOVE:
+			channel->filter(channel->filter_closure, FWD_FILTER_CLEANUP, NULL, NULL);
+			channel->filter = NULL;
+			channel->filter_closure = NULL;
+			break;
+		case FWD_FILTER_CLOSECHANNEL:
+			closed_local_connection(pvar, local_channel_num);
+			break;
+		}
+	}
+
 	s = channel->local_socket;
 	if (s != INVALID_SOCKET) {
 		channel->remote_num = remote_channel_num;
@@ -1535,15 +1551,28 @@ void FWD_confirmed_open(PTInstVar pvar, uint32 local_channel_num,
 	}
 }
 
-void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num)
+void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num, int reason)
 {
+	FWDChannel *channel;
+	int r = reason;
+
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
 		return;
 
-	UTIL_get_lang_msg("MSG_FWD_DENIED_BY_SERVER_ERROR", pvar,
-	                  "A program on the local machine attempted to connect to a forwarded port.\n"
-	                  "The forwarding request was denied by the server. The connection has been closed.");
-	notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+	channel = pvar->fwd_state.channels + local_channel_num;
+
+	// SSH2 では呼び出し元で既にポップアップを出しているので、
+	// ここでは SSH1 の時のみポップアップを出す
+	if (SSHv1(pvar)) {
+		UTIL_get_lang_msg("MSG_FWD_DENIED_BY_SERVER_ERROR", pvar,
+		                  "A program on the local machine attempted to connect to a forwarded port.\n"
+		                  "The forwarding request was denied by the server. The connection has been closed.");
+		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+	}
+
+	if (channel->filter != NULL) {
+		channel->filter(channel->filter_closure, FWD_FILTER_OPENFAILURE, &r, NULL);
+	}
 	FWD_free_channel(pvar, local_channel_num);
 }
 

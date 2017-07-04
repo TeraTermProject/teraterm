@@ -1946,7 +1946,7 @@ static BOOL handle_channel_open_confirmation(PTInstVar pvar)
 static BOOL handle_channel_open_failure(PTInstVar pvar)
 {
 	if (grab_payload(pvar, 4)) {
-		FWD_failed_open(pvar, get_payload_uint32(pvar, 0));
+		FWD_failed_open(pvar, get_payload_uint32(pvar, 0), -1);
 	}
 	return FALSE;
 }
@@ -7688,9 +7688,8 @@ static BOOL handle_SSH2_open_failure(PTInstVar pvar)
 
 	free(cstring);
 
-	// 転送チャネル内にあるソケットの解放漏れを修正 (2007.7.26 maya)
 	if (c->type == TYPE_PORTFWD) {
-		FWD_free_channel(pvar, c->local_num);
+		FWD_failed_open(pvar, c->local_num, reason);
 	}
 
 	// チャネルの解放漏れを修正 (2007.5.1 maya)

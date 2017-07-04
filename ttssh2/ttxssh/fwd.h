@@ -50,6 +50,8 @@ typedef enum {
 
 typedef enum {
 	FWD_FILTER_CLEANUP,
+	FWD_FILTER_OPENCONFIRM,
+	FWD_FILTER_OPENFAILURE,
 	FWD_FILTER_FROM_CLIENT,
 	FWD_FILTER_FROM_SERVER
 } FwdFilterEvent;
@@ -143,7 +145,7 @@ void FWD_X11_open(PTInstVar pvar, uint32 remote_channel_num,
                   int *chan_num);
 void FWD_confirmed_open(PTInstVar pvar, uint32 local_channel_num,
   uint32 remote_channel_num);
-void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num);
+void FWD_failed_open(PTInstVar pvar, uint32 local_channel_num, int reason);
 void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
   unsigned char *data, int length);
 void FWD_channel_input_eof(PTInstVar pvar, uint32 local_channel_num);
