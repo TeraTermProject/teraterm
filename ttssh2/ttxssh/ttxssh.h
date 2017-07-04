@@ -327,6 +327,10 @@ typedef struct _TInstVar {
 	char subsystem_name[256];
 } TInstVar;
 
+// 異なるバージョンの同時起動で問題を起こさないように、
+// TS_SSH および TInstVar のメンバを変更した場合は以下の名前を変更する事
+#define TTSSH_FILEMAPNAME "TTSSH_2-81_TS_data"
+
 #define LOG_LEVEL_FATAL      5
 #define LOG_LEVEL_ERROR      10
 #define LOG_LEVEL_WARNING    30

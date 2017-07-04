@@ -5521,7 +5521,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		pvar = &InstVar;
 		__mem_mapping =
 			CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE, 0,
-			                  sizeof(TS_SSH), "TTSSH_1-4_TS_data");
+			                  sizeof(TS_SSH), TTSSH_FILEMAPNAME);
 		if (__mem_mapping == NULL) {
 			/* fake it. The settings won't be shared, but what the heck. */
 			pvar->ts_SSH = NULL;
