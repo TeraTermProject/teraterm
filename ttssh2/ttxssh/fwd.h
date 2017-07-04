@@ -120,7 +120,6 @@ typedef struct {
   FWDRequest *requests;
   int num_channels;
   FWDChannel *channels;
-  struct sockaddr_storage *local_host_IP_numbers;
   struct _X11AuthData *X11_auth_data;
   BOOL in_interactive_mode;
 } FWDState;

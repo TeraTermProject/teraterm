@@ -1638,7 +1638,6 @@ void FWD_init(PTInstVar pvar)
 	pvar->fwd_state.server_listening_specs = NULL;
 	pvar->fwd_state.num_channels = 0;
 	pvar->fwd_state.channels = NULL;
-	pvar->fwd_state.local_host_IP_numbers = NULL;
 	pvar->fwd_state.X11_auth_data = NULL;
 	pvar->fwd_state.accept_wnd = NULL;
 	pvar->fwd_state.in_interactive_mode = FALSE;
@@ -1672,7 +1671,6 @@ void FWD_end(PTInstVar pvar)
 		free(pvar->fwd_state.requests);
 	}
 
-	free(pvar->fwd_state.local_host_IP_numbers);
 	free(pvar->fwd_state.server_listening_specs);
 
 	if (pvar->fwd_state.X11_auth_data != NULL) {
