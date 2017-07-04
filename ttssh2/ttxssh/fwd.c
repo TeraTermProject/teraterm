@@ -279,7 +279,7 @@ void FWD_free_channel(PTInstVar pvar, uint32 local_channel_num)
 	else { // TYPE_PORTFWD
 		UTIL_destroy_sock_write_buf(&channel->writebuf);
 		if (channel->filter != NULL) {
-			channel->filter(channel->filter_closure, 0, NULL, NULL);
+			channel->filter(channel->filter_closure, FWD_FILTER_CLEANUP, NULL, NULL);
 			channel->filter = NULL;
 			channel->filter_closure = NULL;
 		}
@@ -665,25 +665,20 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 
 		if (amount > 0) {
 			char *new_buf = buf;
-			int action = FWD_FILTER_RETAIN;
+			FwdFilterResult action = FWD_FILTER_RETAIN;
 
 			if (channel->filter != NULL) {
-				action =
-					channel->filter(channel->filter_closure,
-					                FWD_FILTER_FROM_CLIENT, &amount,
-					                &new_buf);
+				action = channel->filter(channel->filter_closure, FWD_FILTER_FROM_CLIENT, &amount, &new_buf);
 			}
 
-			if (amount > 0
-			 && (channel->status & FWD_CLOSED_REMOTE_OUT) == 0) {
+			if (amount > 0 && (channel->status & FWD_CLOSED_REMOTE_OUT) == 0) {
 				// ポートフォワーディングにおいてクライアントからの送信要求を、SSH通信に乗せてサーバまで送り届ける。
-				SSH_channel_send(pvar, channel_num, channel->remote_num, new_buf,
-				                 amount, 0);
+				SSH_channel_send(pvar, channel_num, channel->remote_num, new_buf, amount, 0);
 			}
 
 			switch (action) {
 			case FWD_FILTER_REMOVE:
-				channel->filter(channel->filter_closure, 0, NULL, NULL);
+				channel->filter(channel->filter_closure, FWD_FILTER_CLEANUP, NULL, NULL);
 				channel->filter = NULL;
 				channel->filter_closure = NULL;
 				break;
@@ -691,8 +686,7 @@ static void read_local_connection(PTInstVar pvar, int channel_num)
 				closed_local_connection(pvar, channel_num);
 				break;
 			}
-		} else if (amount == 0
-		        || (err = WSAGetLastError()) == WSAEWOULDBLOCK) {
+		} else if (amount == 0 || (err = WSAGetLastError()) == WSAEWOULDBLOCK) {
 			return;
 		} else {
 			channel_error(pvar, "reading", channel_num, err);
@@ -1584,7 +1578,7 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 {
 	SOCKET s;
 	FWDChannel *channel;
-	int action = FWD_FILTER_RETAIN;
+	FwdFilterResult action = FWD_FILTER_RETAIN;
 
 	if (!FWD_check_local_channel_num(pvar, local_channel_num))
 		return;
@@ -1592,9 +1586,7 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 	channel = pvar->fwd_state.channels + local_channel_num;
 
 	if (channel->filter != NULL) {
-		action =
-			channel->filter(channel->filter_closure,
-			                FWD_FILTER_FROM_SERVER, &length, &data);
+		action = channel->filter(channel->filter_closure, FWD_FILTER_FROM_SERVER, &length, &data);
 	}
 
 	s = channel->local_socket;
@@ -1604,16 +1596,15 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 		// 送信する。
 		// Xサーバに送信時に発生する FD_WRITE は、処理する必要がないため無視する。
 		//OutputDebugPrintf("%s: send %d\n", __FUNCTION__, length);
-		if (!UTIL_sock_buffered_write
-			(pvar, &channel->writebuf, blocking_write, s, data, length)) {
+		if (!UTIL_sock_buffered_write(pvar, &channel->writebuf, blocking_write, s, data, length)) {
 			closed_local_connection(pvar, local_channel_num);
 
 			// ポップアップ抑止指定あれば、関数を呼び出さない。
 			// (2014.6.26 yutaka)
 			if ((pvar->settings.DisablePopupMessage & POPUP_MSG_FWD_received_data) == 0) {
 				UTIL_get_lang_msg("MSG_FWD_COMM_ERROR", pvar,
-								  "A communications error occurred while sending forwarded data to a local port.\n"
-								  "The forwarded connection will be closed.");
+				                  "A communications error occurred while sending forwarded data to a local port.\n"
+				                  "The forwarded connection will be closed.");
 				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 			}
 		}
@@ -1621,7 +1612,7 @@ void FWD_received_data(PTInstVar pvar, uint32 local_channel_num,
 
 	switch (action) {
 	case FWD_FILTER_REMOVE:
-		channel->filter(channel->filter_closure, 0, NULL, NULL);
+		channel->filter(channel->filter_closure, FWD_FILTER_CLEANUP, NULL, NULL);
 		channel->filter = NULL;
 		channel->filter_closure = NULL;
 		break;

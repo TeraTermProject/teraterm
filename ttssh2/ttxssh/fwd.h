@@ -44,17 +44,18 @@ See LICENSE.TXT for the license.
 #define FWD_CLOSED_LOCAL_OUT  0x20
 #define FWD_AGENT_DUMMY       0x40
 
-#define FWD_FILTER_REMOVE       0
-#define FWD_FILTER_RETAIN       1
-#define FWD_FILTER_CLOSECHANNEL 2
+typedef enum {
+	FWD_FILTER_REMOVE, FWD_FILTER_RETAIN, FWD_FILTER_CLOSECHANNEL
+} FwdFilterResult;
 
-#define FWD_FILTER_FROM_CLIENT 0
-#define FWD_FILTER_FROM_SERVER 1
+typedef enum {
+	FWD_FILTER_CLEANUP,
+	FWD_FILTER_FROM_CLIENT,
+	FWD_FILTER_FROM_SERVER
+} FwdFilterEvent;
 
-/* a length == 0 means that we're killing the channel and the filter
-   should deallocate */
-typedef int (* FWDFilter)(void *closure, int direction,
-  int *length, unsigned char **buf);
+/* a length == 0 means that we're killing the channel and the filter should deallocate */
+typedef FwdFilterResult (* FWDFilter)(void *closure, FwdFilterEvent event, int *length, unsigned char **buf);
 
 typedef struct {
   int status;

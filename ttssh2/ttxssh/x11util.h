@@ -52,10 +52,8 @@ typedef struct _X11AuthData {
 
 void X11_get_DISPLAY_info(PTInstVar pvar, char *name_buf, int name_buf_len, int *port, int *screen);
 X11AuthData *X11_load_local_auth_data(int screen_num);
-void *X11_init_unspoofing_filter(struct _TInstVar *pvar,
-  X11AuthData *auth_data);
-int X11_unspoofing_filter(void *closure, int direction,
-  int *length, unsigned char **buf);
+void *X11_init_unspoofing_filter(struct _TInstVar *pvar, X11AuthData *auth_data);
+FwdFilterResult X11_unspoofing_filter(void *closure, FwdFilterEvent event, int *length, unsigned char **buf);
 void X11_dispose_auth_data(X11AuthData *auth_data);
 
 #endif

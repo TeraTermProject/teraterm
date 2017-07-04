@@ -249,17 +249,18 @@ static void insert_real_X11_auth_data(X11UnspoofingFilterClosure *
 	       data_len);
 }
 
-int X11_unspoofing_filter(void *void_closure, int direction,
-                          int *length, unsigned char **buf)
+FwdFilterResult X11_unspoofing_filter(void *void_closure, FwdFilterEvent event, int *length, unsigned char **buf)
 {
 	X11UnspoofingFilterClosure *closure =
 		(X11UnspoofingFilterClosure *) void_closure;
 
-	if (length == NULL) {
+	switch (event) {
+	case FWD_FILTER_CLEANUP:
 		buf_destroy(&closure->init_buf, &closure->init_buf_len);
 		free(closure);
 		return FWD_FILTER_REMOVE;
-	} else if (direction == FWD_FILTER_FROM_SERVER) {
+
+	case FWD_FILTER_FROM_SERVER:
 		switch (merge_into_X11_init_packet(closure, *length, *buf)) {
 		case MERGE_NEED_MORE:
 			*length = 0;
@@ -276,7 +277,8 @@ int X11_unspoofing_filter(void *void_closure, int direction,
 			*length = 0;
 			return FWD_FILTER_CLOSECHANNEL;
 		}
-	} else {
-		return FWD_FILTER_RETAIN;
+		break;
 	}
+
+	return FWD_FILTER_RETAIN;
 }
