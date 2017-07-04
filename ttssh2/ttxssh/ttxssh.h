@@ -354,7 +354,6 @@ void logprintf_hexdump(int level, char *data, int len, char *fmt, ...);
 
 void get_teraterm_dir_relative_name(char *buf, int bufsize, char *basename);
 int copy_teraterm_dir_relative_path(char *dest, int destsize, char *basename);
-void get_file_version(char *exefile, int *major, int *minor, int *release, int *build);
 int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize);
 
 #endif

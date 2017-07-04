@@ -1806,18 +1806,16 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 			else {
 				char TTSSH_ID[1024];
 				int TTSSH_ID_len;
-				int a, b, c, d;
 
 				// SSH バージョンを teraterm 側にセットする
 				// SCP コマンドのため (2008.2.3 maya)
 				pvar->cv->isSSH = pvar->protocol_major;
 
 				// 自分自身のバージョンを取得する (2005.3.3 yutaka)
-				get_file_version("ttxssh.dll", &a, &b, &c, &d);
-
 				_snprintf_s(TTSSH_ID, sizeof(TTSSH_ID), _TRUNCATE,
 				            "SSH-%d.%d-TTSSH/%d.%d Win32\r\n",
-				            pvar->protocol_major, pvar->protocol_minor, a, b);
+				            pvar->protocol_major, pvar->protocol_minor,
+				            TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
 				TTSSH_ID_len = strlen(TTSSH_ID);
 
 				// for SSH2(yutaka)

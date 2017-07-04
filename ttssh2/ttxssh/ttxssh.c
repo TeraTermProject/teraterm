@@ -2185,66 +2185,6 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	}
 }
 
-// 実行ファイルからバージョン情報を得る (2005.2.28 yutaka)
-void get_file_version(char *exefile, int *major, int *minor, int *release, int *build)
-{
-	typedef struct {
-		WORD wLanguage;
-		WORD wCodePage;
-	} LANGANDCODEPAGE, *LPLANGANDCODEPAGE;
-	LPLANGANDCODEPAGE lplgcode;
-	UINT unLen;
-	DWORD size;
-	char *buf = NULL;
-	BOOL ret;
-	int i;
-	char fmt[80];
-	char *pbuf;
-
-	size = GetFileVersionInfoSize(exefile, NULL);
-	if (size == 0) {
-		goto error;
-	}
-	buf = malloc(size);
-	ZeroMemory(buf, size);
-
-	if (GetFileVersionInfo(exefile, 0, size, buf) == FALSE) {
-		goto error;
-	}
-
-	ret = VerQueryValue(buf,
-			"\\VarFileInfo\\Translation",
-			(LPVOID *)&lplgcode, &unLen);
-	if (ret == FALSE)
-		goto error;
-
-	for (i = 0 ; i < (int)(unLen / sizeof(LANGANDCODEPAGE)) ; i++) {
-		_snprintf_s(fmt, sizeof(fmt), _TRUNCATE,
-		            "\\StringFileInfo\\%04x%04x\\FileVersion",
-		            lplgcode[i].wLanguage, lplgcode[i].wCodePage);
-		VerQueryValue(buf, fmt, &pbuf, &unLen);
-		if (unLen > 0) { // get success
-			int n, a, b, c, d;
-
-			n = sscanf(pbuf, "%d, %d, %d, %d", &a, &b, &c, &d);
-			if (n == 4) { // convert success
-				*major = a;
-				*minor = b;
-				*release = c;
-				*build = d;
-				break;
-			}
-		}
-	}
-
-	free(buf);
-	return;
-
-error:
-	free(buf);
-	*major = *minor = *release = *build = 0;
-}
-
 static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm dgst_alg)
 {
 	char buf[1024], buf2[2048];
@@ -2406,7 +2346,6 @@ static void about_dlg_set_abouttext(PTInstVar pvar, HWND dlg, digest_algorithm d
 static void init_about_dlg(PTInstVar pvar, HWND dlg)
 {
 	char buf[1024];
-	int a, b, c, d;
 	char uimsg[MAX_UIMSG];
 
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
@@ -2420,9 +2359,8 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
 
 	// TTSSHのバージョンを設定する (2005.2.28 yutaka)
-	get_file_version("ttxssh.dll", &a, &b, &c, &d);
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", a, b);
+	            "TTSSH\r\nTera Term Secure Shell extension, %d.%d", TTSSH_VERSION_MAJOR, TTSSH_VERSION_MINOR);
 	SendMessage(GetDlgItem(dlg, IDC_TTSSH_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
 
 	// OpenSSLのバージョンを設定する (2005.1.24 yutaka)

@@ -72,7 +72,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="Version.lib &#x0D;&#x0A;&#x0D;&#x0A;"
 				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib libeay32.lib zlibd.lib ttpcmn.lib dnsapi.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -169,7 +168,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="Version.lib &#x0D;&#x0A;"
 				AdditionalDependencies="odbc32.lib odbccp32.lib ws2_32.lib libeay32.lib zlib.lib ttpcmn.lib dnsapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
