@@ -1097,8 +1097,28 @@ static BOOL init_request(PTInstVar pvar, int request_num,
 	}
 }
 
-void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs,
-                           int num_specs)
+static char *dump_fwdspec(FWDRequestSpec *spec, int stat)
+{
+	static char buff[1024];
+	char *ftype;
+	char *bind_addr = spec->bind_address;
+
+	switch (spec->type) {
+	  case FWD_LOCAL_TO_REMOTE: ftype = "LtoR"; break;
+	  case FWD_REMOTE_TO_LOCAL: ftype = "RtoL"; break;
+	  case FWD_REMOTE_X11_TO_LOCAL: ftype = "X11"; bind_addr = ftype; break;
+	  default: ftype = "Unknown"; break;
+	}
+
+	_snprintf_s(buff, sizeof(buff), _TRUNCATE,
+		"type=%s, bind_address=%s, from_port=%d, to_host=%s, to_port=%d%s",
+		ftype, bind_addr, spec->from_port, spec->to_host, spec->to_port,
+		(stat) ? ", deleted" : "");
+
+	return buff;
+}
+
+void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 {
 	FWDRequestSpec *new_specs =
 		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
@@ -1146,34 +1166,19 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs,
 	if (LogLevel(pvar, 150)) {
 		logprintf(150, __FUNCTION__ ": old specs: %d", pvar->fwd_state.num_requests);
 		for (i=0; i < pvar->fwd_state.num_requests; i++) {
-			FWDRequestSpec *spec = &pvar->fwd_state.requests[i].spec;
-			char *ftype, *bind_addr = spec->bind_address;
-			switch (spec->type) {
-			  case FWD_LOCAL_TO_REMOTE: ftype = "LtoR"; break;
-			  case FWD_REMOTE_TO_LOCAL: ftype = "RtoL"; break;
-			  case FWD_REMOTE_X11_TO_LOCAL: ftype = "X11"; bind_addr = ftype; break;
-			  default: ftype = "Unknown"; break;
-			}
-			logprintf(150, "  request %d: type=%s, bind_address=%s, "
-				"from_port=%d, to_host=%s, to_port=%d, %s",
-				i, ftype, bind_addr, spec->from_port,
-				spec->to_host, spec->to_port,
-				(pvar->fwd_state.requests[i].status&FWD_DELETED)?"deleted, ":"");
+			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+				dump_fwdspec(&pvar->fwd_state.requests[i].spec, pvar->fwd_state.requests[i].status));
 		}
+
+		logprintf(150, __FUNCTION__ ": new specs: %d", num_specs);
+		for (i=0; i < num_specs; i++) {
+			logprintf(150, __FUNCTION__ ":   #%d: %s", i, dump_fwdspec(new_specs+i, 0));
+		}
+
 		logprintf(150, __FUNCTION__ ": listening specs: %d", pvar->fwd_state.num_server_listening_specs);
 		for (i=0; i < pvar->fwd_state.num_server_listening_specs; i++) {
-			FWDRequestSpec *listener = &pvar->fwd_state.server_listening_specs[i];
-			char *ftype, *bind_addr = listener->bind_address;
-			switch (listener->type) {
-			  case FWD_LOCAL_TO_REMOTE: ftype = "LtoR"; break;
-			  case FWD_REMOTE_TO_LOCAL: ftype = "RtoL"; break;
-			  case FWD_REMOTE_X11_TO_LOCAL: ftype = "X11";  bind_addr = ftype; break;
-			  default: ftype = "Unknown"; break;
-			}
-			logprintf(150, "  listen %d: type=%s, bind_address=%s, "
-				"from_port=%d, to_host=%s, to_port=%d, %s",
-				i, ftype, bind_addr, listener->from_port,
-				listener->to_host, listener->to_port, "");
+			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+				dump_fwdspec(&pvar->fwd_state.server_listening_specs[i], 0));
 		}
 	}
 
@@ -1252,6 +1257,15 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs,
 			free_request++;
 		}
 	}
+
+	if (LogLevel(pvar, 150)) {
+		logprintf(150, __FUNCTION__ ": updated specs: %d", pvar->fwd_state.num_requests);
+		for (i=0; i < pvar->fwd_state.num_requests; i++) {
+			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+				dump_fwdspec(&pvar->fwd_state.requests[i].spec, pvar->fwd_state.requests[i].status));
+		}
+	}
+
 
 	free(ptr_to_saved_sockets);
 	free(specs_accounted_for);
