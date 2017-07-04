@@ -890,15 +890,28 @@ static BOOL can_server_listen_using(FWDRequestSpec *listener,
 	     || strcmp(listener->bind_address, spec->bind_address) == 0);
 }
 
+/*
+ * ポート転送を有効に出来るかの判定関数。
+ * shell / subsystem 開始前はすべて有効にできる (TRUEを返す)。
+ * 開始後は以下の転送タイプは追加不可 (開始済みのみTRUEを返す)
+ * - RtoL転送
+ * - X11転送
+ */
 BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec)
 {
+	FWDRequestSpec *listener;
 	int num_server_listening_requests =
 		pvar->fwd_state.num_server_listening_specs;
 
 	if (num_server_listening_requests < 0) {
 		return TRUE;
-	} else {
-		FWDRequestSpec *listener =
+	}
+
+	switch (spec->type) {
+	case FWD_LOCAL_TO_REMOTE:
+		return TRUE;
+	default:
+		listener =
 			bsearch(spec, pvar->fwd_state.server_listening_specs,
 			        num_server_listening_requests,
 			        sizeof(FWDRequestSpec), FWD_compare_specs);

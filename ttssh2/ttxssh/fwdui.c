@@ -939,8 +939,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 			return FALSE;
 		}
 
-		if (specs[i].type != FWD_LOCAL_TO_REMOTE
-			&& !FWD_can_server_listen_for(pvar, specs + i)) {
+		if (!FWD_can_server_listen_for(pvar, specs + i)) {
 			num_unspecified_forwardings++;
 		}
 	}
@@ -951,8 +950,7 @@ static BOOL end_fwd_dlg(PTInstVar pvar, HWND dlg)
 		strncat_s(buf, sizeof(buf), pvar->ts->UIMsg, _TRUNCATE);
 
 		for (i = 0; i < num_specs; i++) {
-			if (specs[i].type != FWD_LOCAL_TO_REMOTE &&
-			    !FWD_can_server_listen_for(pvar, specs + i)) {
+			if (!FWD_can_server_listen_for(pvar, specs + i)) {
 				char buf2[1024];
 
 				get_spec_string(specs + i, buf2, sizeof(buf2), pvar);

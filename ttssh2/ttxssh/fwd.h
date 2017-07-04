@@ -127,10 +127,6 @@ typedef struct {
 } FWDState;
 
 void FWD_init(PTInstVar pvar);
-/* This function checks to see whether the server is (or can) listen for a
-   given request. Before the SSH session's prep phase, this returns true for
-   all requests. After the SSH session's prep phase, this returns true only
-   for requests that the server actually was told about during the prep phase. */
 BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec);
 int FWD_get_num_request_specs(PTInstVar pvar);
 void FWD_get_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs);
