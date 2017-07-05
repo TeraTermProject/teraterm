@@ -53,8 +53,8 @@ typedef enum {
 #define SOCKS5_COMMAND_UDP       0x03
 
 #define SOCKS5_AUTH_NONE         0x00
-#define SOCKS5_AUTH_GSSAPI       0x00
-#define SOCKS5_AUTH_USERPASS     0x00
+#define SOCKS5_AUTH_GSSAPI       0x01
+#define SOCKS5_AUTH_USERPASS     0x02
 #define SOCKS5_AUTH_NOACCEPTABLE 0xff
 
 #define SOCKS5_ADDRTYPE_IPV4     0x01
@@ -134,7 +134,7 @@ send_socks4_reply(FWDDynamicFilterClosure *closure, int code) {
 		0, 0, 0, 0 // field 4
 	};
 
-	if (code >= SOCKS4_RESULT_OK) {
+	if (code == SOCKS4_RESULT_OK) {
 		buff[1] = SOCKS4_RESULT_OK;
 	}
 
