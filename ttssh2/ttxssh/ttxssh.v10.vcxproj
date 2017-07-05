@@ -152,6 +152,7 @@
     <ClCompile Include="ed25519_hash.c" />
     <ClCompile Include="ed25519_sc25519.c" />
     <ClCompile Include="ed25519_verify.c" />
+    <ClCompile Include="fwd-socks.c" />
     <ClCompile Include="fwd.c" />
     <ClCompile Include="fwdui.c" />
     <ClCompile Include="hosts.c" />
@@ -179,6 +180,7 @@
     <ClInclude Include="ed25519_fe25519.h" />
     <ClInclude Include="ed25519_ge25519.h" />
     <ClInclude Include="ed25519_sc25519.h" />
+    <ClInclude Include="fwd-socks.h" />
     <ClInclude Include="fwd.h" />
     <ClInclude Include="fwdui.h" />
     <ClInclude Include="hosts.h" />

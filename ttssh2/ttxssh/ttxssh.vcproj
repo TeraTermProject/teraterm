@@ -268,11 +268,11 @@
 				>
 			</File>
 			<File
-				RelativePath="fwd.h"
+				RelativePath="fwd-socks.h"
 				>
 			</File>
 			<File
-				RelativePath="fwd-socks.h"
+				RelativePath="fwd.h"
 				>
 			</File>
 			<File
@@ -392,11 +392,11 @@
 				>
 			</File>
 			<File
-				RelativePath="fwd.c"
+				RelativePath="fwd-socks.c"
 				>
 			</File>
 			<File
-				RelativePath="fwd-socks.c"
+				RelativePath="fwd.c"
 				>
 			</File>
 			<File

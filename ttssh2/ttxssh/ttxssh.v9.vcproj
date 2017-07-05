@@ -275,6 +275,10 @@
 				>
 			</File>
 			<File
+				RelativePath="fwd-socks.h"
+				>
+			</File>
+			<File
 				RelativePath="fwd.h"
 				>
 			</File>
@@ -384,6 +388,10 @@
 			</File>
 			<File
 				RelativePath="ed25519_verify.c"
+				>
+			</File>
+			<File
+				RelativePath="fwd-socks.c"
 				>
 			</File>
 			<File

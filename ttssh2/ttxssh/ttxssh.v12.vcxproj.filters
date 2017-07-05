@@ -46,6 +46,9 @@
     <ClCompile Include="ed25519_verify.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fwd-socks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="fwd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -136,6 +139,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ed25519_sc25519.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fwd-socks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fwd.h">
