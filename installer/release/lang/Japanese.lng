@@ -630,7 +630,7 @@ DLG_FWDSETUP_EDIT=編集(&E)...
 DLG_FWDSETUP_REMOVE=削除(&R)
 DLG_FWDSETUP_CHECKIDENTITY=ローカルのポートは他のホストからの接続を受け入れる(&C)
 DLG_FWDSETUP_X=Xクライアントアプリケーションの転送
-DLG_FWDSETUP_XAPP=リモートの(&X)アプリケーションをローカルのXサーバに表示する
+DLG_FWDSETUP_XAPP=リモートの&XアプリケーションをローカルのXサーバに表示する
 
 MSG_FWD_REMOTE_XSERVER=リモートX サーバ
 MSG_FWD_REMOTE_XSCREEN=X サーバ (ディスプレイ %d:%d)
