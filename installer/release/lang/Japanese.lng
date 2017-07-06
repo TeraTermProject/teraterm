@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-06-06)
+; Updated by TeraTerm Project (2017-07-07)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -613,6 +613,8 @@ DLG_FWD_REMOTE_PORT=リモートサーバのポート(&R)
 DLG_FWD_REMOTE_LISTEN=リッスン(&S)
 DLG_FWD_REMOTE_LOCAL=ローカル側ホスト(&A)
 DLG_FWD_REMOTE_LOCAL_PORT=ポート(&O)
+DLG_FWD_DYNAMIC_PORT=ダイナミックポート(&D)
+DLG_FWD_DYNAMIC_LISTEN=リッスン(&T)
 
 MSG_SAME_SERVERPORT_ERROR=同一リモートポートに 2つ以上の転送は設定できません (%d).
 MSG_SAME_LOCALPORT_ERROR=同一ローカルポートに 2つ以上の転送は設定できません (%d).
@@ -635,6 +637,7 @@ MSG_FWD_REMOTE_XSCREEN=X サーバ (ディスプレイ %d:%d)
 MSG_FWD_REMOTE=リモートの "%s" のポート %s からローカル側ホスト "%s" のポート %s
 MSG_FWD_LOCAL=ローカルの "%s" のポート %s から リモート側ホスト "%s" のポート %s
 MSG_FWD_X=リモートのXアプリケーションからローカルのXサーバ
+MSG_FWD_DYNAMIC=ローカルの "%s" のポート %s からリモート側ダイナミック
 
 ; dlg host
 DLG_HOST_TITLE=Tera Term: 新しい接続

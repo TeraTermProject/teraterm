@@ -613,6 +613,8 @@ DLG_FWD_REMOTE_PORT=Forward &remote server port
 DLG_FWD_REMOTE_LISTEN=li&sten
 DLG_FWD_REMOTE_LOCAL=to local m&achine
 DLG_FWD_REMOTE_LOCAL_PORT=p&ort
+DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
+DLG_FWD_DYNAMIC_LISTEN=lis&ten
 
 MSG_SAME_SERVERPORT_ERROR=You cannot have two forwarding from the same server port (%d).
 MSG_SAME_LOCALPORT_ERROR=You cannot have two forwarding from the same local port (%d).
@@ -635,6 +637,7 @@ MSG_FWD_REMOTE_XSCREEN=X server (display %d:%d)
 MSG_FWD_REMOTE=Remote "%s" port %s to local "%s" port %s
 MSG_FWD_LOCAL=Local "%s" port %s to remote "%s" port %s
 MSG_FWD_X=Remote X applications to local X server
+MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 
 ; dlg host
 DLG_HOST_TITLE=Tera Term: New connection

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-06-06)
+; Updated by TeraTerm Project (2017-07-07)
 ; Last translated (Russian language) by Ryumik Sergey (2015-03-14)
 
 [Tera Term]
@@ -614,6 +614,8 @@ DLG_FWD_REMOTE_PORT=&Через удаленный порт
 DLG_FWD_REMOTE_LISTEN=&Слушать
 DLG_FWD_REMOTE_LOCAL=&Локальный компьютер
 DLG_FWD_REMOTE_LOCAL_PORT=&Порт
+DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
+DLG_FWD_DYNAMIC_LISTEN=lis&ten
 
 MSG_SAME_SERVERPORT_ERROR=Вы не можете иметь два перенаправления из одного и того же порта сервера (%d).
 MSG_SAME_LOCALPORT_ERROR=Вы не можете иметь два перенаправление из одного и того же порта (%d).
@@ -636,6 +638,7 @@ MSG_FWD_REMOTE_XSCREEN=X-сервер (экран %d:%d)
 MSG_FWD_REMOTE=Удаленный "%s" порт %s в локальный "%s" порт %s
 MSG_FWD_LOCAL=Локальный "%s" порт %s в удаленный "%s" порт %s
 MSG_FWD_X=удаленные приложения X на локальный X-сервер
+MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 
 ; dlg host
 DLG_HOST_TITLE=Tera Term: Новое соединение

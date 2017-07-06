@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-06-06)
+; Updated by TeraTerm Project (2017-07-07)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -614,6 +614,8 @@ DLG_FWD_REMOTE_PORT=轉向遠端伺服器端口(&R)
 DLG_FWD_REMOTE_LISTEN=偵聽(&S)
 DLG_FWD_REMOTE_LOCAL=到本地設備(&A)
 DLG_FWD_REMOTE_LOCAL_PORT=端口(&O)
+DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
+DLG_FWD_DYNAMIC_LISTEN=lis&ten
 
 MSG_SAME_SERVERPORT_ERROR=不能在同一遠端端口設定兩個或更多的連線 (%d).
 MSG_SAME_LOCALPORT_ERROR=不能在同一本地端口設定兩個或更多的連線 (%d).
@@ -636,6 +638,7 @@ MSG_FWD_REMOTE_XSCREEN=X伺服器(顯示 %d:%d)
 MSG_FWD_REMOTE=遠端「%s」端口%s到本地「%s」端口%s
 MSG_FWD_LOCAL=本地「%s」端口%s到遠端「%s」端口%s
 MSG_FWD_X=遠端X應用程式到本地X伺服器
+MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
 
 ; dlg host
 DLG_HOST_TITLE=Tera Term：建立新連線

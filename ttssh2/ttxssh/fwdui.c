@@ -700,7 +700,8 @@ static void FWDUI_save_settings(PTInstVar pvar)
 				_snprintf_s(str, str_remaining, _TRUNCATE, "X");
 				break;
 			case FWD_LOCAL_DYNAMIC:
-				_snprintf_s(str, str_remaining, _TRUNCATE, "D%s", spec->from_port_name);
+				_snprintf_s(str, str_remaining, _TRUNCATE, "D%s:%s",
+				            spec->bind_address, spec->from_port_name);
 			}
 
 			chars = strlen(str);
@@ -808,16 +809,18 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 		                  "Local \"%s\" port %s to remote \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
 		            spec->bind_address, verbose_from_port,
-		            spec->to_host,verbose_to_port);
+		            spec->to_host, verbose_to_port);
 		break;
 	case FWD_REMOTE_X11_TO_LOCAL:
 		UTIL_get_lang_msg("MSG_FWD_X", pvar,
 		                  "Remote X applications to local X server");
 		strncpy_s(buf, bufsize, pvar->ts->UIMsg, _TRUNCATE);
-		return;
+		break;
 	case FWD_LOCAL_DYNAMIC:
-		UTIL_get_lang_msg("MSG_FWD_DYNAMIC", pvar, "Local port %s to remote dynamic");
-		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg, verbose_from_port);
+		UTIL_get_lang_msg("MSG_FWD_DYNAMIC", pvar, "Local \"%s\" port %s to remote dynamic");
+		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
+		            spec->bind_address, verbose_from_port);
+		break;
 	}
 }
 
@@ -1032,24 +1035,72 @@ static void fill_service_names(HWND dlg, WORD item)
 	}
 }
 
-static void shift_over_input(HWND dlg, FWDType type, WORD rtl_item,
-							 WORD ltr_item)
+static void init_input(HWND dlg, FWDType type_to)
 {
-	HWND shift_from;
-	HWND shift_to;
+	HWND dlg_item;
 
-	if (type == FWD_REMOTE_TO_LOCAL) {
+	if (type_to == FWD_REMOTE_TO_LOCAL || type_to == FWD_LOCAL_DYNAMIC) {
+		dlg_item = GetDlgItem(dlg, IDC_SSHLTRFROMPORT);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHLTRLISTENADDR);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHLTRTOHOST);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHLTRTOPORT);
+		EnableWindow(dlg_item, FALSE);
+	}
+	if (type_to == FWD_LOCAL_TO_REMOTE || type_to == FWD_LOCAL_DYNAMIC) {
+		dlg_item = GetDlgItem(dlg, IDC_SSHRTLFROMPORT);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHRTLLISTENADDR);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHRTLTOHOST);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHRTLTOPORT);
+		EnableWindow(dlg_item, FALSE);
+	}
+	if (type_to == FWD_REMOTE_TO_LOCAL || type_to == FWD_LOCAL_TO_REMOTE) {
+		dlg_item = GetDlgItem(dlg, IDC_SSHDYNFROMPORT);
+		EnableWindow(dlg_item, FALSE);
+		dlg_item = GetDlgItem(dlg, IDC_SSHDYNLISTENADDR);
+		EnableWindow(dlg_item, FALSE);
+	}
+}
+
+static void shift_over_input(HWND dlg, FWDType type_from, FWDType type_to,
+                             WORD rtl_item, WORD ltr_item, WORD dyn_item)
+{
+	HWND shift_from = NULL;
+	HWND shift_to = NULL;
+
+	if (type_from == FWD_LOCAL_TO_REMOTE ) {
 		shift_from = GetDlgItem(dlg, ltr_item);
-		shift_to = GetDlgItem(dlg, rtl_item);
-	} else {
+	}
+	else if (type_from == FWD_REMOTE_TO_LOCAL) {
 		shift_from = GetDlgItem(dlg, rtl_item);
-		shift_to = GetDlgItem(dlg, ltr_item);
+	}
+	else if (type_from == FWD_LOCAL_DYNAMIC && dyn_item != 0) {
+		shift_from = GetDlgItem(dlg, dyn_item);
 	}
 
-	EnableWindow(shift_from, FALSE);
-	EnableWindow(shift_to, TRUE);
+	if (type_to == FWD_LOCAL_TO_REMOTE ) {
+		shift_to = GetDlgItem(dlg, ltr_item);
+	}
+	else if (type_to == FWD_REMOTE_TO_LOCAL) {
+		shift_to = GetDlgItem(dlg, rtl_item);
+	}
+	else if (type_to == FWD_LOCAL_DYNAMIC && dyn_item != 0) {
+		shift_to = GetDlgItem(dlg, dyn_item);
+	}
 
-	if (GetWindowTextLength(shift_to) == 0) {
+	if (shift_from != 0) {
+		EnableWindow(shift_from, FALSE);
+	}
+	if (shift_to != 0) {
+		EnableWindow(shift_to, TRUE);
+	}
+
+	if (shift_from != 0 && shift_to != 0 && GetWindowTextLength(shift_to) == 0) {
 		char buf[128];
 
 		GetWindowText(shift_from, buf, sizeof(buf));
@@ -1061,13 +1112,40 @@ static void shift_over_input(HWND dlg, FWDType type, WORD rtl_item,
 
 static void set_dir_options_status(HWND dlg)
 {
-	FWDType type = IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)
-		? FWD_REMOTE_TO_LOCAL : FWD_LOCAL_TO_REMOTE;
+	FWDType type_to, type_from;
+	BOOL enable_LTR, enable_RTL, enable_DYN;
+	
+	type_to = FWD_REMOTE_TO_LOCAL;
+	if (IsDlgButtonChecked(dlg, IDC_SSHFWDLOCALTOREMOTE)) {
+		type_to = FWD_LOCAL_TO_REMOTE;
+	}
+	if (IsDlgButtonChecked(dlg, IDC_SSHFWDLOCALDYNAMIC)) {
+		type_to = FWD_LOCAL_DYNAMIC;
+	}
 
-	shift_over_input(dlg, type, IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT);
-	shift_over_input(dlg, type, IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR);
-	shift_over_input(dlg, type, IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST);
-	shift_over_input(dlg, type, IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT);
+	enable_LTR = IsWindowEnabled(GetDlgItem(dlg, IDC_SSHLTRFROMPORT));
+	enable_RTL = IsWindowEnabled(GetDlgItem(dlg, IDC_SSHRTLFROMPORT));
+	enable_DYN = IsWindowEnabled(GetDlgItem(dlg, IDC_SSHDYNFROMPORT));
+	type_from = FWD_NONE; // ダイアログ表示時にはすべてEnable状態
+	if (enable_LTR && !enable_RTL && !enable_DYN) {
+		type_from = FWD_LOCAL_TO_REMOTE;
+	}
+	else if (!enable_LTR && enable_RTL && !enable_DYN) {
+		type_from = FWD_REMOTE_TO_LOCAL;
+	}
+	else if (!enable_LTR && !enable_RTL && enable_DYN) {
+		type_from = FWD_LOCAL_DYNAMIC;
+	}
+
+	if (type_from == FWD_NONE) {
+		init_input(dlg, type_to);
+	}
+	else {
+		shift_over_input(dlg, type_from, type_to, IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT, IDC_SSHDYNFROMPORT);
+		shift_over_input(dlg, type_from, type_to, IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR, IDC_SSHDYNLISTENADDR);
+		shift_over_input(dlg, type_from, type_to, IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST, 0);
+		shift_over_input(dlg, type_from, type_to, IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT, 0);
+	}
 }
 
 static void setup_edit_controls(HWND dlg, FWDRequestSpec *spec,
@@ -1078,8 +1156,10 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec *spec,
 	CheckDlgButton(dlg, radio_item, TRUE);
 	SetFocus(GetDlgItem(dlg, radio_item));
 	SetDlgItemText(dlg, from_port_item, spec->from_port_name);
-	SetDlgItemText(dlg, to_port_item, spec->to_port_name);
-	if (strcmp(spec->to_host, "localhost") != 0) {
+	if (to_port_item != 0) {
+		SetDlgItemText(dlg, to_port_item, spec->to_port_name);
+	}
+	if (to_host_item != 0 && strcmp(spec->to_host, "localhost") != 0) {
 		SetDlgItemText(dlg, to_host_item, spec->to_host);
 	}
 	if (strcmp(spec->bind_address, "localhost") != 0) {
@@ -1123,6 +1203,12 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 	GetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_REMOTE_LOCAL_PORT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_FWD_DYNAMIC_PORT", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC, pvar->ts->UIMsg);
+	GetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC_LISTEN, uimsg, sizeof(uimsg));
+	UTIL_get_lang_msg("DLG_FWD_DYNAMIC_LISTEN", pvar, uimsg);
+	SetDlgItemText(dlg, IDC_SSHFWDLOCALDYNAMIC_LISTEN, pvar->ts->UIMsg);
 	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
 	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
@@ -1141,35 +1227,57 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 		                    IDC_SSHLTRFROMPORT, IDC_SSHLTRLISTENADDR,
 		                    IDC_SSHLTRTOHOST, IDC_SSHLTRTOPORT);
 		break;
+	case FWD_LOCAL_DYNAMIC:
+		setup_edit_controls(dlg, spec, IDC_SSHFWDLOCALDYNAMIC,
+		                    IDC_SSHDYNFROMPORT, IDC_SSHDYNLISTENADDR,
+		                    0, 0);
+		break;
 	}
 
 	fill_service_names(dlg, IDC_SSHRTLFROMPORT);
 	fill_service_names(dlg, IDC_SSHLTRFROMPORT);
 	fill_service_names(dlg, IDC_SSHRTLTOPORT);
 	fill_service_names(dlg, IDC_SSHLTRTOPORT);
+	fill_service_names(dlg, IDC_SSHDYNFROMPORT);
 }
 
-static void grab_control_text(HWND dlg, FWDType type, WORD rtl_item,
-                              WORD ltr_item, char *buf, int bufsize)
+static void grab_control_text(HWND dlg, FWDType type,
+                              WORD rtl_item, WORD ltr_item, WORD dyn_item,
+                              char *buf, int bufsize)
 {
-	GetDlgItemText(dlg, type == FWD_REMOTE_TO_LOCAL ? rtl_item : ltr_item,
-	               buf, bufsize);
+	WORD dlg_item = ltr_item;
+	if (type == FWD_REMOTE_TO_LOCAL) {
+		dlg_item = rtl_item;
+	}
+	else if (type == FWD_LOCAL_DYNAMIC) {
+		dlg_item = dyn_item;
+	}
+
+	GetDlgItemText(dlg, dlg_item, buf, bufsize);
 	buf[bufsize - 1] = 0;
 }
 
-static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec,
-                             HWND dlg)
+static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 {
 	FWDRequestSpec new_spec;
-	FWDType type = IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)
-		? FWD_REMOTE_TO_LOCAL : FWD_LOCAL_TO_REMOTE;
+	FWDType type;
 	char buf[1024];
 
+	type = FWD_LOCAL_TO_REMOTE;
+	if (IsDlgButtonChecked(dlg, IDC_SSHFWDREMOTETOLOCAL)) {
+		type = FWD_REMOTE_TO_LOCAL;
+	}
+	else if (IsDlgButtonChecked(dlg, IDC_SSHFWDLOCALDYNAMIC)) {
+		type = FWD_LOCAL_DYNAMIC;
+	}
 	new_spec.type = type;
-	grab_control_text(dlg, type, IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT,
-	                  new_spec.from_port_name,
-	                  sizeof(new_spec.from_port_name));
-	grab_control_text(dlg, type, IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR,
+
+	grab_control_text(dlg, type,
+	                  IDC_SSHRTLFROMPORT, IDC_SSHLTRFROMPORT, IDC_SSHDYNFROMPORT,
+	                  new_spec.from_port_name, sizeof(new_spec.from_port_name));
+
+	grab_control_text(dlg, type,
+	                  IDC_SSHRTLLISTENADDR, IDC_SSHLTRLISTENADDR, IDC_SSHDYNLISTENADDR,
 	                  new_spec.bind_address, sizeof(new_spec.bind_address));
 	if (new_spec.bind_address[0] == 0) {
 		strncpy_s(new_spec.bind_address, sizeof(new_spec.bind_address), "localhost", _TRUNCATE);
@@ -1186,23 +1294,28 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec,
 			memmove(new_spec.bind_address, new_spec.bind_address + 1, strlen(new_spec.bind_address)+1);
 		}
 	}
-	grab_control_text(dlg, type, IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST,
-	                  new_spec.to_host, sizeof(new_spec.to_host));
-	if (new_spec.to_host[0] == 0) {
-		strncpy_s(new_spec.to_host, sizeof(new_spec.to_host), "localhost", _TRUNCATE);
-	}
-	else {
-		// IPv6 アドレスの "[", "]" があれば削除
-		if (new_spec.to_host[strlen(new_spec.to_host)-1] == ']') {
-			new_spec.to_host[strlen(new_spec.to_host)-1] = '\0';
+
+	if (type == FWD_LOCAL_TO_REMOTE || type == FWD_REMOTE_TO_LOCAL) {
+		grab_control_text(dlg, type,
+		                  IDC_SSHRTLTOHOST, IDC_SSHLTRTOHOST, 0,
+		                  new_spec.to_host, sizeof(new_spec.to_host));
+		if (new_spec.to_host[0] == 0) {
+			strncpy_s(new_spec.to_host, sizeof(new_spec.to_host), "localhost", _TRUNCATE);
 		}
-		if (new_spec.to_host[0] == '[') {
-			memmove(new_spec.to_host, new_spec.to_host + 1, strlen(new_spec.to_host)+1);
+		else {
+			// IPv6 アドレスの "[", "]" があれば削除
+			if (new_spec.to_host[strlen(new_spec.to_host)-1] == ']') {
+				new_spec.to_host[strlen(new_spec.to_host)-1] = '\0';
+			}
+			if (new_spec.to_host[0] == '[') {
+				memmove(new_spec.to_host, new_spec.to_host + 1, strlen(new_spec.to_host)+1);
+			}
 		}
+
+		grab_control_text(dlg, type,
+		                  IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT, 0,
+		                  new_spec.to_port_name, sizeof(new_spec.to_port_name));
 	}
-	grab_control_text(dlg, type, IDC_SSHRTLTOPORT, IDC_SSHLTRTOPORT,
-	                  new_spec.to_port_name,
-	                  sizeof(new_spec.to_port_name));
 
 	new_spec.from_port = parse_port_from_buf(new_spec.from_port_name);
 	if (new_spec.from_port < 0) {
@@ -1215,15 +1328,17 @@ static BOOL end_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec,
 		return FALSE;
 	}
 
-	new_spec.to_port = parse_port_from_buf(new_spec.to_port_name);
-	if (new_spec.to_port < 0) {
-		UTIL_get_lang_msg("MSG_INVALID_PORT_ERROR", pvar,
-		                  "Port \"%s\" is not a valid port number.\n"
-		                  "Either choose a port name from the list, or enter a number between 1 and 65535.");
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-		            pvar->ts->UIMsg, new_spec.to_port_name);
-		notify_nonfatal_error(pvar, buf);
-		return FALSE;
+	if (type == FWD_LOCAL_TO_REMOTE || type == FWD_REMOTE_TO_LOCAL) {
+		new_spec.to_port = parse_port_from_buf(new_spec.to_port_name);
+		if (new_spec.to_port < 0) {
+			UTIL_get_lang_msg("MSG_INVALID_PORT_ERROR", pvar,
+			                  "Port \"%s\" is not a valid port number.\n"
+			                  "Either choose a port name from the list, or enter a number between 1 and 65535.");
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE,
+			            pvar->ts->UIMsg, new_spec.to_port_name);
+			notify_nonfatal_error(pvar, buf);
+			return FALSE;
+		}
 	}
 
 	*spec = new_spec;
@@ -1254,19 +1369,25 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgFwdEditFont, pvar)) {
 			SendDlgItemMessage(dlg, IDD_SSHFWDBANNER, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRFROMPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_LISTEN, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRLISTENADDR, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_HOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRTOHOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALTOREMOTE_PORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHLTRTOPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLFROMPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_LISTEN, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLLISTENADDR, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_HOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLTOHOST, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDREMOTETOLOCAL_PORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDC_SSHRTLTOPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALDYNAMIC, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHDYNFROMPORT, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHFWDLOCALDYNAMIC_LISTEN, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(dlg, IDC_SSHDYNLISTENADDR, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDOK, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(dlg, IDCANCEL, WM_SETFONT, (WPARAM)DlgFwdEditFont, MAKELPARAM(TRUE,0));
 		}
@@ -1302,6 +1423,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		case IDC_SSHFWDLOCALTOREMOTE:
 		case IDC_SSHFWDREMOTETOLOCAL:
+		case IDC_SSHFWDLOCALDYNAMIC:
 			set_dir_options_status(dlg);
 			return TRUE;
 

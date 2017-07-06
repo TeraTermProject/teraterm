@@ -223,6 +223,10 @@
 #define IDC_NEW_PASSWD_LABEL            1224
 #define IDC_CONFIRM_PASSWD_LABEL        1225
 #define IDC_PASSWD_CHANGEREQ_MSG        1226
+#define IDC_SSHFWDLOCALDYNAMIC          1227
+#define IDC_SSHDYNFROMPORT              1228
+#define IDC_SSHFWDLOCALDYNAMIC_LISTEN   1229
+#define IDC_SSHDYNLISTENADDR            1230
 
 // Next default values for new objects
 // 
@@ -230,7 +234,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        114
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1227
+#define _APS_NEXT_CONTROL_VALUE         1231
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
