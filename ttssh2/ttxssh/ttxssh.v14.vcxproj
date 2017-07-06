@@ -203,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="ttsecure.ico" />
+    <Image Include="ttsecure_green.ico" />
     <Image Include="ttsecure_yellow.ico" />
   </ItemGroup>
   <ItemGroup>

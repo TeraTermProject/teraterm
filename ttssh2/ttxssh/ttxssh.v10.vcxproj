@@ -198,6 +198,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ttsecure.ico" />
+    <None Include="ttsecure_green.ico" />
     <None Include="ttsecure_yellow.ico" />
   </ItemGroup>
   <ItemGroup>

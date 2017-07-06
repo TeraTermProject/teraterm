@@ -182,6 +182,9 @@
     <Image Include="ttsecure.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="ttsecure_green.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
     <Image Include="ttsecure_yellow.ico">
       <Filter>Resource Files</Filter>
     </Image>
