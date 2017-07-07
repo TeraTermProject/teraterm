@@ -79,8 +79,9 @@
     <Link>
       <AdditionalDependencies>setupapi.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)htmlhelp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>
-      <DelayLoadDLLs>setupapi.dll; user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>setupapi.dll;user32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
@@ -132,12 +133,17 @@
     <ClCompile Include="ttcmn.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cmn_res.h" />
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="language.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpcmn.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttpcmn-version.rc" />
+    <ResourceCompile Include="ttpcmn.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

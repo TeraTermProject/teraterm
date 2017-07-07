@@ -130,6 +130,7 @@
     <ClCompile Include="ttset.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="set_res.h" />
     <ClInclude Include="..\common\teraterm.h" />
     <ClInclude Include="..\common\tt-version.h" />
     <ClInclude Include="..\common\ttlib.h" />
@@ -137,6 +138,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpset.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttpset-version.rc" />
+    <ResourceCompile Include="ttpset.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ttpcmn\ttpcmn.v11.vcxproj">

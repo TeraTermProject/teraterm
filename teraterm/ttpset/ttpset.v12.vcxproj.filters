@@ -27,6 +27,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="set_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\common\teraterm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -44,5 +47,13 @@
     <None Include="ttpset.def">
       <Filter>Def File</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ttpset-version.rc">
+      <Filter>Resource File</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttpset.rc">
+      <Filter>Resource File</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -245,7 +245,11 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="..\common\Teraterm.ico"
+				RelativePath="..\common\teraterm.ico"
+				>
+			</File>
+			<File
+				RelativePath="ttpdlg-version.rc"
 				>
 			</File>
 			<File

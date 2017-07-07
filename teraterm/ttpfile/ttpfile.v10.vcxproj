@@ -143,6 +143,7 @@
     <ClInclude Include="zmodem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttpfile-version.rc" />
     <ResourceCompile Include="ttpfile.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>

@@ -43,7 +43,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\common\Teraterm.ico">
+    <None Include="..\common\teraterm.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ttpdlg.def">
@@ -51,6 +51,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttpdlg-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="ttpdlg.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

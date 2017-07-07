@@ -80,6 +80,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttpfile-version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="ttpfile.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

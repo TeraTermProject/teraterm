@@ -218,6 +218,10 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="set_res.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\teraterm.h"
 				>
 			</File>
@@ -247,6 +251,14 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath="ttpset-version.rc"
+				>
+			</File>
+			<File
+				RelativePath="ttpset.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

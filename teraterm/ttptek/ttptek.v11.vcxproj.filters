@@ -30,6 +30,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="tek_res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="tekesc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -38,5 +41,13 @@
     <None Include="ttptek.def">
       <Filter>Def File</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResouceCompile Include="ttptek-version.rc">
+      <Filter>Resource File</Filter>
+    </ResouceCompile>
+    <ResouceCompile Include="ttptek.rc">
+      <Filter>Resource File</Filter>
+    </ResouceCompile>
   </ItemGroup>
 </Project>

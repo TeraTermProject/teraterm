@@ -61,6 +61,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -145,6 +146,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
+				AdditionalIncludeDirectories="$(SolutionDir)common"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -219,6 +221,10 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath="keycode-version.rc"
+				>
+			</File>
+			<File
 				RelativePath="keycode.ico"
 				>
 			</File>
@@ -249,6 +255,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
+			<File
+				RelativePath="kc_res.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

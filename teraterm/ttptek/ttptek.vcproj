@@ -222,6 +222,10 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="tek_res.h"
+				>
+			</File>
+			<File
 				RelativePath="tekesc.h"
 				>
 			</File>
@@ -239,6 +243,14 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath="ttptek-version.rc"
+				>
+			</File>
+			<File
+				RelativePath="ttptek.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -137,10 +137,11 @@
     <ClInclude Include="..\common\ttlib.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\common\Teraterm.ico" />
+    <None Include="..\common\teraterm.ico" />
     <None Include="ttpdlg.def" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="ttpdlg-version.rc" />
     <ResourceCompile Include="ttpdlg.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>

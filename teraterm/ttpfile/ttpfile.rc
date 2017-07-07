@@ -15,6 +15,20 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// ì˙ñ{åÍ resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+
+#endif    // ì˙ñ{åÍ resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -39,12 +53,12 @@ BEGIN
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "#include ""windows.h""\r\n"
     "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    """\0"
+    "\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "#include ""ttpfile-version.rc""\r\n"
     "\0"
 END
 
@@ -102,7 +116,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+#include "ttpfile-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

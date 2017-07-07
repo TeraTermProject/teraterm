@@ -74,8 +74,9 @@
 				AdditionalDependencies="setupapi.lib htmlhelp.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="$(SolutionDir)htmlhelp"
 				ModuleDefinitionFile="$(ProjectName).def"
-				DelayLoadDLLs="setupapi.dll; user32.dll"
+				DelayLoadDLLs="setupapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
@@ -227,6 +228,10 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="cmn_res.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\i18n.h"
 				>
 			</File>
@@ -252,6 +257,14 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath="ttpcmn-version.rc"
+				>
+			</File>
+			<File
+				RelativePath="ttpcmn.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

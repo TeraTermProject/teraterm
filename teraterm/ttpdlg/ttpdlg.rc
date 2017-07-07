@@ -42,7 +42,7 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "#include ""ttpdlg-version.rc""\r\n"
     "\0"
 END
 
@@ -461,7 +461,7 @@ IDI_TTERM               ICON                    "..\\common\\teraterm.ico"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+#include "ttpdlg-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

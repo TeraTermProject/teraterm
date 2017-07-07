@@ -290,6 +290,10 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath="ttpfile-version.rc"
+				>
+			</File>
+			<File
 				RelativePath="ttpfile.rc"
 				>
 				<FileConfiguration
