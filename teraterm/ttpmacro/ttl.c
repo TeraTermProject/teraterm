@@ -36,6 +36,7 @@
 #include <mbstring.h>
 #include <time.h>
 #include <errno.h>
+#include "tt-version.h"
 #include "ttmdlg.h"
 #include "ttmbuff.h"
 #include "ttmparse.h"
@@ -2798,87 +2799,29 @@ WORD TTLGetModemStatus()
 	return Err;
 }
 
-// 実行ファイルからバージョン情報を得る (2005.2.28 yutaka)
-static void get_file_version(char *exefile, int *major, int *minor, int *release, int *build)
-{
-	typedef struct {
-		WORD wLanguage;
-		WORD wCodePage;
-	} LANGANDCODEPAGE, *LPLANGANDCODEPAGE;
-	LPLANGANDCODEPAGE lplgcode;
-	UINT unLen;
-	DWORD size;
-	char *buf = NULL;
-	BOOL ret;
-	int i;
-	char fmt[80];
-	char *pbuf;
-
-	size = GetFileVersionInfoSize(exefile, NULL);
-	if (size == 0) {
-		goto error;
-	}
-	buf = malloc(size);
-	ZeroMemory(buf, size);
-
-	if (GetFileVersionInfo(exefile, 0, size, buf) == FALSE) {
-		goto error;
-	}
-
-	ret = VerQueryValue(buf,
-			"\\VarFileInfo\\Translation", 
-			(LPVOID *)&lplgcode, &unLen);
-	if (ret == FALSE)
-		goto error;
-
-	for (i = 0 ; i < (int)(unLen / sizeof(LANGANDCODEPAGE)) ; i++) {
-		_snprintf_s(fmt, sizeof(fmt), _TRUNCATE, "\\StringFileInfo\\%04x%04x\\FileVersion", 
-			lplgcode[i].wLanguage, lplgcode[i].wCodePage);
-		VerQueryValue(buf, fmt, &pbuf, &unLen);
-		if (unLen > 0) { // get success
-			int n, a, b, c, d;
-
-			n = sscanf(pbuf, "%d, %d, %d, %d", &a, &b, &c, &d);
-			if (n == 4) { // convert success
-				*major = a;
-				*minor = b;
-				*release = c;
-				*build = d;
-				break;
-			}
-		}
-	}
-
-	free(buf);
-	return;
-
-error:
-	free(buf);
-	*major = *minor = *release = *build = 0;
-}
-
 //
-// Tera Termのversionを取得する
-//
-// (2008.2.4 yutaka)
+// Tera Term のバージョン取得 & 比較
+// バージョン番号はコンパイル時に決定する。
+// (現在は実行ファイルのバージョン情報は参照しない)
 //
 WORD TTLGetVer()
 {
 	TVarId VarId;
 	WORD Err;
 	TStrVal Str1, Str2;
-	int a, b, c, d;
+	int cur_major = TT_VERSION_MAJOR;
+	int cur_minor = TT_VERSION_MINOR;
 	int compare = 0;
-	int major, minor, ret;
-	int curver, ver;
+	int comp_major, comp_minor, ret;
+	int cur_ver, comp_ver;
 
 	Err = 0;
-	GetStrVar(&VarId,&Err);
+	GetStrVar(&VarId, &Err);
 
 	if (CheckParameterGiven()) {
 		GetStrVal(Str1, &Err);
 
-		ret = sscanf_s(Str1, "%d.%d", &major, &minor);
+		ret = sscanf_s(Str1, "%d.%d", &comp_major, &comp_minor);
 		if (ret != 2) {
 			SetResult(-2);
 			return 0;
@@ -2895,17 +2838,16 @@ WORD TTLGetVer()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	get_file_version("ttermpro.exe", &a, &b, &c, &d);
-	_snprintf_s(Str2, sizeof(Str2), _TRUNCATE, "%d.%d", a, b);
-	SetStrVal(VarId,Str2);
+	_snprintf_s(Str2, sizeof(Str2), _TRUNCATE, "%d.%d", cur_major, cur_minor);
+	SetStrVal(VarId, Str2);
 
 	if (compare == 1) {
-		curver = a * 100 + b;
-		ver = major * 100 + minor;
+		cur_ver = cur_major * 100 + cur_minor;
+		comp_ver = comp_major * 100 + comp_minor;
 
-		if (curver < ver) {
+		if (cur_ver < comp_ver) {
 			SetResult(-1);
-		} else if (curver == ver) {
+		} else if (cur_ver == comp_ver) {
 			SetResult(0);
 		} else {
 			SetResult(1);
