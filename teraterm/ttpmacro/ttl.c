@@ -2842,8 +2842,8 @@ WORD TTLGetVer()
 	SetStrVal(VarId, Str2);
 
 	if (compare == 1) {
-		cur_ver = cur_major * 100 + cur_minor;
-		comp_ver = comp_major * 100 + comp_minor;
+		cur_ver = cur_major * 10000 + cur_minor;
+		comp_ver = comp_major * 10000 + comp_minor;
 
 		if (cur_ver < comp_ver) {
 			SetResult(-1);
