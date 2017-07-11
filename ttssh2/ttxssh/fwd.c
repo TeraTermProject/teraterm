@@ -916,7 +916,7 @@ static BOOL can_server_listen_using(FWDRequestSpec *listener,
 /*
  * ポート転送を有効に出来るかの判定関数。
  * shell / subsystem 開始前はすべて有効にできる (TRUEを返す)。
- * 開始後は以下の転送タイプは追加不可 (開始済みのみTRUEを返す)
+ * 開始後は以下の転送タイプは追加不可 (すでに開始されている転送設定のみTRUEを返す)
  * - RtoL転送
  * - X11転送
  */
