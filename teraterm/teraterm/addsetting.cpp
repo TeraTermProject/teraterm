@@ -119,6 +119,7 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CLEAR_ON_RESIZE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CURSOR_CHANGE_IME, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_LIST_HIDDEN_FONTS, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgGeneralFont = NULL;
@@ -145,6 +146,9 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_CURSOR_CHANGE_IME, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_GENERAL_CURSOR_CHANGE_IME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_CURSOR_CHANGE_IME, ts.UIMsg);
+	GetDlgItemText(IDC_LIST_HIDDEN_FONTS, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_LIST_HIDDEN_FONTS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_LIST_HIDDEN_FONTS, ts.UIMsg);
 
 	// (1)DisableAcceleratorSendBreak
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_SENDBREAK);
@@ -173,6 +177,10 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	// (7)IDC_CURSOR_CHANGE_IME
 	btn = (CButton *)GetDlgItem(IDC_CURSOR_CHANGE_IME);
 	btn->SetCheck((ts.WindowFlag & WF_IMECURSORCHANGE) != 0);
+
+	// (8)IDC_LIST_HIDDEN_FONTS
+	btn = (CButton *)GetDlgItem(IDC_LIST_HIDDEN_FONTS);
+	btn->SetCheck(ts.ListHiddenFonts);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -219,6 +227,10 @@ void CGeneralPropPageDlg::OnOK()
 	if (((ts.WindowFlag & WF_IMECURSORCHANGE) != 0) != btn->GetCheck()) {
 		ts.WindowFlag ^= WF_IMECURSORCHANGE;
 	}
+
+	// (8)IDC_LIST_HIDDEN_FONTS
+	btn = (CButton *)GetDlgItem(IDC_LIST_HIDDEN_FONTS);
+	ts.ListHiddenFonts = btn->GetCheck();
 }
 
 

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-07-07)
+; Updated by TeraTerm Project (2017-07-11)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -184,6 +184,7 @@ DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=Mouse &wheel scroll line
 DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=&Automatischer Bildlauf nur in unterster Zeile
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&Clear display when window resized
 DLG_TAB_GENERAL_CURSOR_CHANGE_IME=Change cursor shape with &IME state
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accept &mouse event tracking request
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Disable mouse event tracking when Control is pressed

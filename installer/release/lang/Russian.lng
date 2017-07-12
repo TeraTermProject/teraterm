@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-07-07)
+; Updated by TeraTerm Project (2017-07-11)
 ; Last translated (Russian language) by Ryumik Sergey (2015-03-14)
 
 [Tera Term]
@@ -184,6 +184,7 @@ DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=&Прокручивание строк колесом мыши
 DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=&Автоперевод строки только на нижнюю линию
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&Очистить экран при изменении размера окна
 DLG_TAB_GENERAL_CURSOR_CHANGE_IME=&Изменить вид курсора в соответствии с режимом IME
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Принять запрос на отслеживание событий мыши
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Отключить отслеживание событий мыши

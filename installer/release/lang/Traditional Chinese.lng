@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-07-07)
+; Updated by TeraTerm Project (2017-07-11)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -184,6 +184,7 @@ DLG_TAB_GENERAL_MOUSEWHEEL_SCROLL_LINE=滑鼠滾輪滾動行數(&W)
 DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=底部捲軸自動調整長度(&U)
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=改變視窗大小時清空螢幕(&C)
 DLG_TAB_GENERAL_CURSOR_CHANGE_IME=根據輸入法狀態改變游標形狀(&I)
+DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=接受滑鼠事件跟蹤請求(&M)
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=按下 Ctrl 鍵時，禁用滑鼠事件跟蹤(&D)
