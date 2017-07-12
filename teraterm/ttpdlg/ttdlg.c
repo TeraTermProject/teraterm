@@ -3507,6 +3507,9 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+#ifndef CF_INACTIVEFONTS
+#define CF_INACTIVEFONTS 0x02000000L
+#endif
 BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 {
 	CHOOSEFONT cf;
@@ -3519,6 +3522,9 @@ BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
 	           CF_FIXEDPITCHONLY | CF_SHOWHELP | CF_NOVERTFONTS |
 	           CF_ENABLEHOOK;
+	if (ts->ListHiddenFonts) {
+		cf.Flags |= CF_INACTIVEFONTS;
+	}
 	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;

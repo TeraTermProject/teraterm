@@ -640,7 +640,7 @@ struct tttset {
 	int ZmodemTimeOutInit;
 	int ZmodemTimeOutFin;
 	WORD WaitCom;
-	WORD Dummy5;	// ‹ŒTrimTrailingNLonPaste. PasteFlag‚É“‡‚µ‚½ˆ×”p~B‘¼‚Ö“]—p
+	WORD ListHiddenFonts;
 	char LogTimestampFormat[48];
 };
 

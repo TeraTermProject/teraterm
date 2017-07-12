@@ -1968,6 +1968,9 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// Disable SO/SI.
 	ts->EnableSOSI = GetOnOff(Section, "EnableSOSI", FName, TRUE);
 
+	// List Inactive Font
+	ts->ListHiddenFonts = GetOnOff(Section, "ListHiddenFonts", FName, FALSE);
+
 	// Fallback to CP932 (Experimental)
 	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
 
@@ -3241,6 +3244,9 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 
 	// Disable SO/SI.
 	WriteOnOff(Section, "EnableSOSI", FName, ts->EnableSOSI);
+
+	// List Inactive Font
+	WriteOnOff(Section, "ListHiddenFonts", FName, ts->ListHiddenFonts);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
