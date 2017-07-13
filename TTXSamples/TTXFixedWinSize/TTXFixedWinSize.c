@@ -26,7 +26,7 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
     pvar->ts = ts;
     pvar->cv = cv;
 
@@ -35,7 +35,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
     pvar->origReadIniFile = NULL;
 }
 
-static BOOL FAR PASCAL FixedSizeSetupTerminalDlg(HWND parent, PTTSet ts) {
+static BOOL PASCAL FixedSizeSetupTerminalDlg(HWND parent, PTTSet ts) {
     BOOL ret;
     if (pvar->sizeModify) {
 	pvar->ts->TerminalWidth = WIDTH;
@@ -54,23 +54,23 @@ static BOOL FAR PASCAL FixedSizeSetupTerminalDlg(HWND parent, PTTSet ts) {
     return ret;
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
     pvar->origSetupTerminalDlg = *hooks->SetupTerminal;
     *hooks->SetupTerminal = FixedSizeSetupTerminalDlg;
 }
 
-static void PASCAL FAR FixedSizeReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL FixedSizeReadIniFile(PCHAR fn, PTTSet ts) {
     (pvar->origReadIniFile)(fn, ts);
     ts->TerminalWidth = WIDTH;
     ts->TerminalHeight = HEIGHT;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
     pvar->origReadIniFile = *hooks->ReadIniFile;
     *hooks->ReadIniFile = FixedSizeReadIniFile;
 }
 
-static void PASCAL FAR TTXSetWinSize(int rows, int cols) {
+static void PASCAL TTXSetWinSize(int rows, int cols) {
     if (rows != HEIGHT || cols != WIDTH) {
 	pvar->sizeModify = TRUE;
 	// Call Setup-Terminal dialog
@@ -94,7 +94,7 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

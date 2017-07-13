@@ -258,7 +258,7 @@ void CALLBACK RecurringTimerProc(HWND hwnd, UINT msg, UINT_PTR ev, DWORD now) {
 //
 //  TTXInit -- 起動時処理
 //
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
 	pvar->origPsend = NULL;
@@ -272,14 +272,14 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
 //  TTXSend, TTXWriteFile -- キー入力処理
 //	キー入力があったら、タイマを延長する
 //
-static int PASCAL FAR TTXsend(SOCKET s, const char *buf, int len, int flags) {
+static int PASCAL TTXsend(SOCKET s, const char *buf, int len, int flags) {
 	if (pvar->enable && len > 0) {
 		SetTimer(pvar->cv->HWin, IdRecurringTimer, pvar->interval * 1000, RecurringTimerProc);
 	}
 	return pvar->origPsend(s, buf, len, flags);
 }
 
-static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbytes, LPOVERLAPPED wol) {
+static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbytes, LPOVERLAPPED wol) {
 	if (pvar->enable && len > 0) {
 		SetTimer(pvar->cv->HWin, IdRecurringTimer, pvar->interval * 1000, RecurringTimerProc);
 	}
@@ -290,7 +290,7 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 // TTXOpenTCP, TTXOpenFile -- セッション開始処理
 //	Psend, WriteFileをフックし、有効ならばタイマをセットする。
 //
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
 	pvar->origPsend = *hooks->Psend;
 	*hooks->Psend = TTXsend;
 
@@ -299,7 +299,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
 	}
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
+static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
 	pvar->origPWriteFile = *hooks->PWriteFile;
 	*hooks->PWriteFile = TTXWriteFile;
 
@@ -312,14 +312,14 @@ static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
 // TTXCloseTCP, TTXCloseFile -- セッション終了時処理
 //	Psend, WriteFileのフックを解除し、タイマを止める。
 //
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
 	if (pvar->origPsend) {
 		*hooks->Psend = pvar->origPsend;
 	}
 	KillTimer(pvar->cv->HWin, IdRecurringTimer);
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
+static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 	if (pvar->origPWriteFile) {
 		*hooks->PWriteFile = pvar->origPWriteFile;
 	}
@@ -365,14 +365,14 @@ void ReadINI(PCHAR fn, PTTSet ts) {
 	pvar->enable = GetOnOff(SECTION, "Enable", sect, FALSE);
 }
 
-static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
 	pvar->origReadIniFile(fn, ts);
 	ReadINI(fn, ts);
 
 	return;
 }
 
-static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 	char buff[20];
 
 	pvar->origWriteIniFile(fn, ts);
@@ -395,7 +395,7 @@ static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 //	/F= による設定ファイルの切り替えのみ対応。
 //
 
-static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
+static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	char buff[1024];
 	PCHAR next;
 	pvar->origParseParam(Param, ts, DDETopic);
@@ -411,7 +411,7 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	return;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	pvar->origReadIniFile = *hooks->ReadIniFile;
 	*hooks->ReadIniFile = TTXReadIniFile;
 
@@ -428,7 +428,7 @@ static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
 // メニュー処理
 //	コントロールメニューにRecurringCommandを追加。
 //
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
 	UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 	pvar->SetupMenu = GetSetupMenu(menu);
@@ -449,7 +449,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
 
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	if (menu==pvar->ControlMenu) {
 		if (pvar->enable) {
 			CheckMenuItem(pvar->ControlMenu, ID_MENU_CONTROL, MF_BYCOMMAND | MF_CHECKED);
@@ -568,7 +568,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 //
 // メニューコマンド処理
 //
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	switch (cmd) {
 	  case ID_MENU_SETUP:
 		switch (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
@@ -632,7 +632,7 @@ static TTXExports Exports = {
 	TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 	/* do version checking if necessary */
 	/* if (Version!=TTVERSION) return FALSE; */

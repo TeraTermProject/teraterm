@@ -61,7 +61,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->origPsend = NULL;
@@ -70,7 +70,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->origWriteIniFile = NULL;
 }
 
-static int PASCAL FAR TTXsend(SOCKET s, const char *buf, int len, int flags) {
+static int PASCAL TTXsend(SOCKET s, const char *buf, int len, int flags) {
   if (pvar->enable) {
     return len;
   }
@@ -79,7 +79,7 @@ static int PASCAL FAR TTXsend(SOCKET s, const char *buf, int len, int flags) {
   }
 }
 
-static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbytes, LPOVERLAPPED wol) {
+static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbytes, LPOVERLAPPED wol) {
   if (pvar->enable) {
     *wbytes = len;
     return TRUE;
@@ -89,48 +89,48 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
   }
 }
 
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPsend = *hooks->Psend;
   *hooks->Psend = TTXsend;
 }
 
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPsend) {
     *hooks->Psend = pvar->origPsend;
   }
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
+static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
   pvar->origPWriteFile = *hooks->PWriteFile;
   *hooks->PWriteFile = TTXWriteFile;
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
+static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPWriteFile) {
     *hooks->PWriteFile = pvar->origPWriteFile;
   }
 }
 
-static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
   pvar->origReadIniFile(fn, ts);
   GetPrivateProfileString(SECTION, "Password", "", pvar->password, sizeof(pvar->password), fn);
   return;
 }
 
-static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
   pvar->origWriteIniFile(fn, ts);
 //  WritePrivateProfileString(SECTION, "Password", pvar->password, fn);
   return;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origReadIniFile = *hooks->ReadIniFile;
   *hooks->ReadIniFile = TTXReadIniFile;
   pvar->origWriteIniFile = *hooks->WriteIniFile;
   *hooks->WriteIniFile = TTXWriteIniFile;
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
   UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
   pvar->SetupMenu = GetSetupMenu(menu);
@@ -142,7 +142,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR,  0, NULL);
 }
 
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   if (menu == pvar->ControlMenu) {
     if (pvar->cv->Ready)
       EnableMenuItem(pvar->ControlMenu, ID_MENU_VIEWMODE, MF_BYCOMMAND | MF_ENABLED);
@@ -217,7 +217,7 @@ static LRESULT CALLBACK ViewModeSetPass(HWND dlg, UINT msg, WPARAM wParam, LPARA
   return FALSE;
 }
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   switch (cmd) {
     case ID_MENU_VIEWMODE:
       if (pvar->enable) {
@@ -281,7 +281,7 @@ static TTXExports Exports = {
   TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
   /* do version checking if necessary */
   /* if (Version!=TTVERSION) return FALSE; */

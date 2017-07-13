@@ -21,17 +21,17 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
 	strcpy_s(pvar->origIniFileName, sizeof(pvar->origIniFileName), fn);
 	(pvar->origReadIniFile)(fn, ts);
 }
 
-static void PASCAL FAR TTXWriteIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXWriteIniFile(PCHAR fn, PTTSet ts) {
 	CopyFile(pvar->origIniFileName, fn, TRUE);
 	(pvar->origWriteIniFile)(fn, ts);
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	if (pvar->origIniFileName[0] == 0) {
 		pvar->origReadIniFile = *hooks->ReadIniFile;
 		*hooks->ReadIniFile = TTXReadIniFile;
@@ -61,7 +61,7 @@ static TTXExports Exports = {
 	NULL	// TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 
 	if (size > exports->size) {

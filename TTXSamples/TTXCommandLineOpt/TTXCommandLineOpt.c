@@ -20,7 +20,7 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
 }
@@ -54,7 +54,7 @@ BOOL ColorStr2ColorRef(COLORREF *color, PCHAR Str) {
   return TRUE;
 }
 
-static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
+static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
   char buff[1024];
   PCHAR start, cur, next;
   int x, y;
@@ -85,7 +85,7 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
   pvar->origParseParam(Param, ts, DDETopic);
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origParseParam = *hooks->ParseParam;
   *hooks->ParseParam = TTXParseParam;
 }
@@ -106,7 +106,7 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

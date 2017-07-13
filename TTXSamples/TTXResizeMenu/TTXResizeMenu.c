@@ -152,7 +152,7 @@ void UpdateMenu() {
   }
 }
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->ReplaceTermDlg = FALSE;
@@ -167,19 +167,19 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   }
 }
 
-static BOOL FAR PASCAL TTXSetupTerminal(HWND parent, PTTSet ts) {
+static BOOL PASCAL TTXSetupTerminal(HWND parent, PTTSet ts) {
   pvar->ReplaceTermDlg = FALSE;
   return (TRUE);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
   if (pvar->ReplaceTermDlg) {
     *hooks->SetupTerminal = TTXSetupTerminal;
   }
   return;
 }
 
-static void PASCAL FAR ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
   int i, x, y;
   char Key[20], Buff[100];
 
@@ -221,12 +221,12 @@ static void PASCAL FAR ResizeMenuReadIniFile(PCHAR fn, PTTSet ts) {
   pvar->MenuItems = i;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origReadIniFile = *hooks->ReadIniFile;
   *hooks->ReadIniFile = ResizeMenuReadIniFile;
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
   MENUITEMINFO mi;
 
   if (pvar->MenuItems > 0) {
@@ -242,13 +242,13 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
   }
 }
 
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   if (menu == pvar->ResizeMenu) {
     UpdateMenu();
   }
 }
 
-static int PASCAL FAR TTXProcessCommand(HWND HWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND HWin, WORD cmd) {
   int num, full_h, full_w;
   if (cmd >= ID_MENUID_BASE && cmd < ID_MENUID_BASE + pvar->MenuItems) {
     GetMonitorSizeByChar(&full_w, &full_h);
@@ -290,7 +290,7 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

@@ -89,7 +89,7 @@ BOOL GetOnOff(PCHAR sect, PCHAR key, PCHAR fn, BOOL def) {
   }
 }
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->origPrecv = NULL;
@@ -99,7 +99,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
   pvar->record = FALSE;
 }
 
-static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
   (pvar->origReadIniFile)(fn, ts);
   pvar->rec_stsize = GetOnOff(INISECTION, "RecordStartSize", fn, TRUE);
 }
@@ -118,12 +118,12 @@ void WriteData(HANDLE fh, char *buff, int len) {
   return;
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origReadIniFile = *hooks->ReadIniFile;
   *hooks->ReadIniFile = TTXReadIniFile;
 }
 
-int PASCAL FAR TTXrecv(SOCKET s, char *buff, int len, int flags) {
+int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
   int rlen;
 
   rlen = pvar->origPrecv(s, buff, len, flags);
@@ -133,7 +133,7 @@ int PASCAL FAR TTXrecv(SOCKET s, char *buff, int len, int flags) {
   return rlen;
 }
 
-BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVERLAPPED rol) {
+BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVERLAPPED rol) {
   if (!pvar->origPReadFile(fh, buff, len, rbytes, rol))
     return FALSE;
 
@@ -143,31 +143,31 @@ BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, L
   return TRUE;
 }
 
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPrecv = *hooks->Precv;
   *hooks->Precv = TTXrecv;
 }
 
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPrecv) {
     *hooks->Precv = pvar->origPrecv;
   }
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
+static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
   if (pvar->cv->PortType == IdSerial) {
     pvar->origPReadFile = *hooks->PReadFile;
     *hooks->PReadFile = TTXReadFile;
   }
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
+static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPReadFile) {
     *hooks->PReadFile = pvar->origPReadFile;
   }
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
   UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
   pvar->FileMenu = GetFileMenu(menu);
@@ -180,7 +180,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 //		MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
 
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   if (menu==pvar->FileMenu) {
     if (pvar->cv->Ready)
       EnableMenuItem(pvar->FileMenu, ID_MENUITEM, MF_BYCOMMAND | MF_ENABLED);
@@ -189,7 +189,7 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
   }
 }
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   OPENFILENAME ofn;
   char fname[MAX_PATH];
   char buff[20];
@@ -237,7 +237,7 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
   return 0;
 }
 
-static void PASCAL FAR TTXEnd(void) {
+static void PASCAL TTXEnd(void) {
   if (pvar->fh != INVALID_HANDLE_VALUE) {
     CloseHandle(pvar->fh);
     pvar->fh = INVALID_HANDLE_VALUE;
@@ -263,7 +263,7 @@ static TTXExports Exports = {
   TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

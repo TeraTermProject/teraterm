@@ -97,7 +97,7 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 	pvar->ts = ts;
 	pvar->cv = cv;
 	pvar->origPReadFile = NULL;
@@ -129,7 +129,7 @@ void ChangeTitle(char *title) {
 	SendMessage(pvar->cv->HWin, WM_COMMAND, MAKELONG(ID_SETUP_WINDOW, 0), 0);
 }
 
-static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rbytes, LPOVERLAPPED rol) {
+static BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD rbytes, LPOVERLAPPED rol) {
 	static struct recheader prh = { 0, 0, 0 };
 	static unsigned int lbytes;
 	static char ibuff[BUFFSIZE];
@@ -236,7 +236,7 @@ static BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID obuff, DWORD oblen, LPDWORD
 	return FALSE;
 }
 
-static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbytes, LPOVERLAPPED wol) {
+static BOOL PASCAL TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD wbytes, LPOVERLAPPED wol) {
 	char tmpbuff[2048];
 	unsigned int spos, dpos;
 	char *ptr;
@@ -293,7 +293,7 @@ static BOOL PASCAL FAR TTXWriteFile(HANDLE fh, LPCVOID buff, DWORD len, LPDWORD 
 	return TRUE;
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
+static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
 	if (pvar->cv->PortType == IdFile && pvar->enable) {
 		pvar->origPReadFile = *hooks->PReadFile;
 		pvar->origPWriteFile = *hooks->PWriteFile;
@@ -304,7 +304,7 @@ static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
 	}
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
+static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
 	if (pvar->origPReadFile) {
 		*hooks->PReadFile = pvar->origPReadFile;
 	}
@@ -318,7 +318,7 @@ static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
 	}
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
 	UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 	pvar->FileMenu = GetFileMenu(menu);
@@ -336,7 +336,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 //	InsertMenu(menu, ID_HELPMENU, MF_ENABLED, ID_MENU_REPLAY, "&t");
 }
 
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	if (menu==pvar->FileMenu) {
 		if (pvar->enable) {
 			EnableMenuItem(pvar->FileMenu, ID_MENU_REPLAY, MF_BYCOMMAND | MF_GRAYED);
@@ -347,7 +347,7 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
 	}
 }
 
-static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
+static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	char buff[1024];
 	PCHAR next;
 	pvar->origParseParam(Param, ts, DDETopic);
@@ -363,21 +363,21 @@ static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
 	}
 }
 
-static void PASCAL FAR TTXReadIniFile(PCHAR fn, PTTSet ts) {
+static void PASCAL TTXReadIniFile(PCHAR fn, PTTSet ts) {
 	(pvar->origReadIniFile)(fn, ts);
 //	ts->TitleFormat = 0;
 	pvar->maxwait = GetPrivateProfileInt(INISECTION, "MaxWait", 0, fn);
 	pvar->speed = GetPrivateProfileInt(INISECTION, "Speed", 0, fn);
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 	pvar->origParseParam = *hooks->ParseParam;
 	*hooks->ParseParam = TTXParseParam;
 	pvar->origReadIniFile = *hooks->ReadIniFile;
 	*hooks->ReadIniFile = TTXReadIniFile;
 }
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	OPENFILENAME ofn;
 
 	switch (cmd) {
@@ -414,17 +414,17 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
 	return 0;
 }
 
-static BOOL FAR PASCAL TTXSetupWin(HWND parent, PTTSet ts) {
+static BOOL PASCAL TTXSetupWin(HWND parent, PTTSet ts) {
 	return (TRUE);
 }
 
-static BOOL FAR PASCAL TTXGetHostName(HWND parent, PGetHNRec GetHNRec) {
+static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec GetHNRec) {
 	GetHNRec->PortType = IdTCPIP;
 	_snprintf_s(GetHNRec->HostName, MAXPATHLEN, _TRUNCATE, "/R=\"%s\" /TP", pvar->openfn);
 	return (TRUE);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
 	if (pvar->ChangeTitle) {
 		pvar->ChangeTitle = FALSE;
 		*hooks->SetupWin = TTXSetupWin;
@@ -455,7 +455,7 @@ static TTXExports Exports = {
 	TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
 	int size = sizeof(Exports) - sizeof(exports->size);
 
 	if (size > exports->size) {

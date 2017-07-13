@@ -41,7 +41,7 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->config[0] = NULL;
@@ -322,7 +322,7 @@ void ParseInputStr(unsigned char *rstr, int rcount) {
   }
 }
 
-int PASCAL FAR TTXrecv(SOCKET s, char *buff, int len, int flags) {
+int PASCAL TTXrecv(SOCKET s, char *buff, int len, int flags) {
   int rlen;
 
   if ((rlen = pvar->origPrecv(s, buff, len, flags)) > 0) {
@@ -331,7 +331,7 @@ int PASCAL FAR TTXrecv(SOCKET s, char *buff, int len, int flags) {
   return rlen;
 }
 
-BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVERLAPPED rol) {
+BOOL PASCAL TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, LPOVERLAPPED rol) {
   BOOL result;
 
   if ((result = pvar->origPReadFile(fh, buff, len, rbytes, rol)) != FALSE)
@@ -339,23 +339,23 @@ BOOL PASCAL FAR TTXReadFile(HANDLE fh, LPVOID buff, DWORD len, LPDWORD rbytes, L
   return result;
 }
 
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
   pvar->origPrecv = *hooks->Precv;
   *hooks->Precv = TTXrecv;
 }
 
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
   if (pvar->origPrecv) {
     *hooks->Precv = pvar->origPrecv;
   }
 }
 
-static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
+static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
   pvar->origPReadFile = *hooks->PReadFile;
   *hooks->PReadFile = TTXReadFile;
 }
 
-static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
+static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   if (pvar->origPReadFile) {
     *hooks->PReadFile = pvar->origPReadFile;
   }
@@ -380,7 +380,7 @@ static TTXExports Exports = {
   TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

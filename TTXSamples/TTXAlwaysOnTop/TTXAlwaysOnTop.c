@@ -57,12 +57,12 @@ HMENU GetSubMenuByChildID(HMENU menu, UINT id) {
   return NULL;
 }
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->ontop = FALSE;
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
   UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
   pvar->ControlMenu = GetControlMenu(menu);
@@ -78,7 +78,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 		MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   switch (cmd) {
     case ID_MENU_BASE:
       if (pvar->ontop) {
@@ -130,7 +130,7 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

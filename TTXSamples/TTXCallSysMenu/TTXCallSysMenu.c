@@ -20,7 +20,7 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   if (cmd==MENU_ID) {
     PostMessage(hWin, WM_SYSCOMMAND, SC_KEYMENU, MAKELPARAM(0x20, 0));
     return 1;
@@ -48,7 +48,7 @@ static TTXExports Exports = {
   NULL, // TTXCloseFile
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
   /* do version checking if necessary */
   /* if (Version!=TTVERSION) return FALSE; */

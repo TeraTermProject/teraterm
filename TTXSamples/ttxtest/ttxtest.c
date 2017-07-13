@@ -94,7 +94,7 @@ static TInstVar InstVar;
    or you will slow down the startup process even if your extension is not
    going to be used.
 */
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
 }
@@ -125,7 +125,7 @@ static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
    This function is called for each extension, in load order (see below).
    Thus, the extension with highest load order puts its hooks in last.
 */
-static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXOpenTCP(TTXSockHooks *hooks) {
   printf("TTXOpenTCP %d\n", ORDER);
 }
 
@@ -139,7 +139,7 @@ static void PASCAL FAR TTXOpenTCP(TTXSockHooks *hooks) {
    This function is called for each extension, in reverse load order (see
    below).
 */
-static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
+static void PASCAL TTXCloseTCP(TTXSockHooks *hooks) {
   printf("TTXCloseTCP %d\n", ORDER);
 }
 
@@ -175,7 +175,7 @@ static void PASCAL FAR TTXCloseTCP(TTXSockHooks *hooks) {
    This function is called for each extension, in load order (see below).
    Thus, the extension with highest load order puts its hooks in last.
 */
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
   printf("TTXSetUIHooks %d\n", ORDER);
 }
 
@@ -197,7 +197,7 @@ static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
    This function is called for each extension, in load order (see below).
    Thus, the extension with highest load order puts its hooks in last.
 */
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   printf("TTXSetSetupHooks %d\n", ORDER);
 }
 
@@ -205,7 +205,7 @@ static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
 
    This function is called for each extension, in load order (see below).
 */
-static void PASCAL FAR TTXSetWinSize(int rows, int cols) {
+static void PASCAL TTXSetWinSize(int rows, int cols) {
   printf("TTXSetWinSize %d\n", ORDER);
 }
 
@@ -221,7 +221,7 @@ static void PASCAL FAR TTXSetWinSize(int rows, int cols) {
    Thus, the extension with highest load order number puts its items in last.
 */
 #define ID_MENUITEM 6000
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
   UINT flag = MF_ENABLED;
 
   printf("TTXModifyMenu %d\n", ORDER);
@@ -241,7 +241,7 @@ static void PASCAL FAR TTXModifyMenu(HMENU menu) {
 
    This function is called for each extension, in load order (see below).
 */
-static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
+static void PASCAL TTXModifyPopupMenu(HMENU menu) {
   printf("TTXModifyPopupMenu %d\n", ORDER);
 
   if (menu==pvar->SetupMenu)
@@ -264,7 +264,7 @@ static void PASCAL FAR TTXModifyPopupMenu(HMENU menu) {
    below). Thus, the extension that has highest load order number gets to
    process the command first.
 */
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   printf("TTXProcessCommand %d\n", ORDER);
 
   if (cmd==ID_MENUITEM)
@@ -289,13 +289,13 @@ static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
    This function is called for each extension, in reverse load order (see
    below).
 */
-static void PASCAL FAR TTXEnd(void) {
+static void PASCAL TTXEnd(void) {
   printf("TTXEnd %d\n", ORDER);
 }
 
 /*
 */
-static void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
+static void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
   printf("TTXSetCommandLine %d\n", ORDER);
 }
 
@@ -325,7 +325,7 @@ static void PASCAL FAR TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
    This function is called for each extension, in load order (see below).
    Thus, the extension with highest load order puts its hooks in last.
 */
-static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
+static void PASCAL TTXOpenFile(TTXFileHooks *hooks) {
   printf("TTXOpenFile %d\n", ORDER);
 }
 
@@ -339,7 +339,7 @@ static void PASCAL FAR TTXOpenFile(TTXFileHooks *hooks) {
    This function is called for each extension, in reverse load order (see
    below).
 */
-static void PASCAL FAR TTXCloseFile(TTXFileHooks *hooks) {
+static void PASCAL TTXCloseFile(TTXFileHooks *hooks) {
   printf("TTXCloseFile %d\n", ORDER);
 }
 
@@ -414,7 +414,7 @@ static TTXExports Exports = {
    extra functions that have been added since this extension was compiled
    will automatically be NULL and thus get default behaviour.)
 */
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
   /* do version checking if necessary */
   /* if (Version!=TTVERSION) return FALSE; */

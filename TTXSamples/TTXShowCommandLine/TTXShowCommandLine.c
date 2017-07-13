@@ -18,12 +18,12 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL FAR TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
+static void PASCAL TTXParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic) {
   MessageBox(NULL, Param, "TTXShowCommandLine", MB_OK|MB_ICONEXCLAMATION);
   pvar->origParseParam(Param, ts, DDETopic);
 }
 
-static void PASCAL FAR TTXGetSetupHooks(TTXSetupHooks *hooks) {
+static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
   pvar->origParseParam = *hooks->ParseParam;
   *hooks->ParseParam = TTXParseParam;
 }
@@ -44,7 +44,7 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {

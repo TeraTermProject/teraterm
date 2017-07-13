@@ -27,30 +27,30 @@ typedef struct {
 static TInstVar *pvar;
 static TInstVar InstVar;
 
-static void PASCAL FAR TTXInit(PTTSet ts, PComVar cv) {
+static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   pvar->ts = ts;
   pvar->cv = cv;
   pvar->ReplaceTermDlg = FALSE;
 }
 
-static BOOL FAR PASCAL TTXSetupTerminal(HWND parent, PTTSet ts) {
+static BOOL PASCAL TTXSetupTerminal(HWND parent, PTTSet ts) {
   pvar->ReplaceTermDlg = FALSE;
   return (TRUE);
 }
 
-static void PASCAL FAR TTXGetUIHooks(TTXUIHooks *hooks) {
+static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks) {
   if (pvar->ReplaceTermDlg) {
     *hooks->SetupTerminal = TTXSetupTerminal;
   }
   return;
 }
 
-static void PASCAL FAR TTXModifyMenu(HMENU menu) {
+static void PASCAL TTXModifyMenu(HMENU menu) {
   pvar->SetupMenu = menu;
   InsertMenu(pvar->SetupMenu, ID_HELPMENU, MF_ENABLED, ID_MENUITEM, MENU_STR);
 }
 
-static int PASCAL FAR TTXProcessCommand(HWND hWin, WORD cmd) {
+static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   if (cmd == ID_MENUITEM) {
     pvar->ts->TerminalWidth = TERM_WIDTH;
     pvar->ts->TerminalHeight = TERM_HEIGHT;
@@ -79,7 +79,7 @@ static TTXExports Exports = {
   NULL, // TTXEnd
 };
 
-BOOL __declspec(dllexport) PASCAL FAR TTXBind(WORD Version, TTXExports *exports) {
+BOOL __declspec(dllexport) PASCAL TTXBind(WORD Version, TTXExports *exports) {
   int size = sizeof(Exports) - sizeof(exports->size);
 
   if (size > exports->size) {
