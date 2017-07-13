@@ -886,7 +886,7 @@ int FWD_compare_specs(void const *void_spec1,
 	int delta = spec1->from_port - spec2->from_port;
 
 	if (delta == 0) {
-		delta = spec1->type - spec2->type;
+		delta = FwdListeningType(spec1->type) - FwdListeningType(spec2->type);
 	}
 
 	if (delta == 0) {

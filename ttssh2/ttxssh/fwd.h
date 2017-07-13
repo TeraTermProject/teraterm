@@ -78,8 +78,17 @@ typedef struct {
 
 /* Request types */
 typedef enum {
-	FWD_NONE, FWD_LOCAL_TO_REMOTE, FWD_REMOTE_TO_LOCAL, FWD_REMOTE_X11_TO_LOCAL, FWD_LOCAL_DYNAMIC
+	FWD_NONE,
+	FWD_LOCAL_TO_REMOTE,
+	FWD_LOCAL_DYNAMIC,
+	FWD_LISTENING_LOCAL, // 比較用のダミー。ローカルで listen するのはこれより上にする
+	FWD_REMOTE_TO_LOCAL,
+	FWD_REMOTE_X11_TO_LOCAL
 } FWDType;
+
+#define FwdTypeIsLocal(type)	((type) > FWD_NONE && (type) < FWD_LISTENING_LOCAL)
+#define FwdTypeIsRemote(type)	((type) > FWD_LISTENING_LOCAL)
+#define FwdListeningType(type)	(FwdTypeIsLocal(type)?FWD_LOCAL_TO_REMOTE:(type))
 
 /* If 'type' is FWD_REMOTE_X11_TO_LOCAL, then from_port must be
    -1, to_port must be 6000 + display number, and to_host must
