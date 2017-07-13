@@ -113,6 +113,11 @@ You can use the following command line parameters on TTSSH.
       if &lt;listen_addr&gt; is omitted, it listens at localhost.<br>
       &lt;listen_addr&gt; is not used with SSH1 protocol.</dd>
 
+  <dt id="ssh-d">/ssh-D[&lt;listen_addr&gt;:]&lt;port&gt;[,[&lt;listen_addr&gt;:]&lt;port&gt;[,...]]</dt>
+  <dd>dynamic port-forwarding from local listen-address(&lt;listen_addr&gt;) port(&lt;port&gt;) to remote side host<br>
+      Tera Term (ttssh) acts as a SOCKS proxy server.<br>
+      if &lt;listen_addr&gt; is omitted, it listens at localhost.</dd>
+
   <dt id="ssh-x">/ssh-X[[&lt;hostname&gt;]:&lt;displaynumber&gt;[.&lt;screennumber&gt;]]</dt>
   <dd>enable X11 forwarding<br>
     When the destination display is specified, the X11 connection is transferred to the display.<br>
@@ -177,6 +182,7 @@ If the value includes the `"' character, the user should write the `"' character
 
 <pre>
 ttermpro.exe server1:22 /ssh /ssh-L30025:smtpsrv1:25 /ssh-L30110:pop3srv1:110
+ttermpro.exe server1:22 /ssh /ssh-D1080
 ttermpro.exe server2:22 /ssh /ssh-X
 ttermpro.exe server2:22 /ssh /ssh-Xlocalhost:3.0
 ttermpro.exe server3:22 /ssh /2 /auth=password /user=guest /passwd=guest
