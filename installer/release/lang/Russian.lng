@@ -1,5 +1,5 @@
-; Updated by TeraTerm Project (2017-07-11)
-; Last translated (Russian language) by Ryumik Sergey (2015-03-14)
+; Updated by TeraTerm Project (2017-07-19)
+; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -60,7 +60,7 @@ MENU_SETUP_GENERAL=&Общие...
 MENU_SETUP_ADDITION=&Дополнительные настройки...
 MENU_SETUP_SAVE=&Сохранить настройки...
 MENU_SETUP_RESTORE=&Восстановить настройки...
-MENU_SETUP_OPENSETUP=&Папка настроек...
+MENU_SETUP_OPENSETUP=&Каталог настроек...
 MENU_SETUP_LOADKEYMAP=&Загрузить настройки клавиш...
 
 MENU_CONTROL=&Управление
@@ -121,7 +121,7 @@ TEKMENU_SHOW_MENUBAR=&Показать меню
 
 ; ttermpro
 ; filesys.cpp
-MSG_COMMENT_LOG_OPEN_ERROR=Лог-файл еще не открыт.
+MSG_COMMENT_LOG_OPEN_ERROR=Лог-файл еще не открыт
 
 ; ttime.c
 MSG_USE_IME_ERROR=Ошибка в IME
@@ -134,12 +134,12 @@ DLG_MAIN_TITLE_CONNECTING=[соединяется...]
 DLG_MAIN_TITLE_DISCONNECTED=[разъединено]
 
 ; vtterm.c
-MSG_CBACCESS_TITLE=Clipboard Access
-MSG_CBACCESS_REJECT_TITLE=Rejected Clipboard Access
-MSG_CBACCESS_READ=Remote host reads clipboard contents.
-MSG_CBACCESS_WRITE=Remote host writes clipboard.
-MSG_CBACCESS_READ_REJECT=Reject clipboard read access from remote.
-MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
+MSG_CBACCESS_TITLE=Доступ к буферу
+MSG_CBACCESS_REJECT_TITLE=Отклонить доступ к буферу
+MSG_CBACCESS_READ=Удаленный хост читает из буфера
+MSG_CBACCESS_WRITE=Удаленный хост пишет в буфер
+MSG_CBACCESS_READ_REJECT=Отклонить удаленное чтение из буфера
+MSG_CBACCESS_WRITE_REJECT=Отклонить удаленную запись в буфер
 
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Остановить все Tera Term(ы)?
@@ -147,12 +147,12 @@ MSG_DISCONNECT_CONF=Разъединить?
 MSG_DANDD_CONF=Вы уверены, что хотите отправить файл?
 MSG_DANDD_CONF_TITLE=Tera Term: Файл "Drag and Drop"
 MSG_EXEC_TT_ERROR=Не удается запустить Tera Term. (%d)
-MSG_FIND_CYGTERM_DIR_ERROR=Не найдена папка Cygwin.
-MSG_CYGTERM_ENV_ALLOC_ERROR=Не удается выделить память для переменной среды.
-MSG_EXEC_CYGTERM_ERROR=Не удается запустить Cygterm.
-MSG_EXEC_TTMENU_ERROR=Не удается запустить меню Tera Term. (%d)
-MSG_EXEC_LOGMETT_ERROR=Не удается запустить LogMeTT. (%d)
-MSG_VIEW_LOGFILE_ERROR=Не удается посмотреть лог-файл. (%d)
+MSG_FIND_CYGTERM_DIR_ERROR=Не найдена папка Cygwin
+MSG_CYGTERM_ENV_ALLOC_ERROR=Не удается выделить память для переменной среды
+MSG_EXEC_CYGTERM_ERROR=Не удается запустить Cygterm
+MSG_EXEC_TTMENU_ERROR=Не удается запустить меню Tera Term (%d).
+MSG_EXEC_LOGMETT_ERROR=Не удается запустить LogMeTT (%d).
+MSG_VIEW_LOGFILE_ERROR=Не удается посмотреть лог-файл (%d).
 FILEDLG_OPEN_LOGFILE_TITLE=Посмотреть лог-файл в бинарном режиме 
 FILEDLG_OPEN_LOGFILE_FILTER=all(*.*)\0*.*\0\0
 DIRDLG_CYGTERM_DIR_TITLE=Указать папку Cygwin
@@ -205,25 +205,25 @@ DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF=выкл.
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON=чт./запись
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ=чтение
 DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE=запись
-DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Notify clipboard access from remote
+DLG_TAB_SEQUENCE_CLIPBOARD_NOTIFY=&Уведомлять об удаленном доступе к буферу
 
 DLG_TAB_COPYPASTE_CONTINUE=&Возможность продолжения копирования строки
 DLG_TAB_COPYPASTE_MOUSEPASTE=&Отключить вставку правой кнопкой мыши
 DLG_TAB_COPYPASTE_CONFIRMPASTE=&Разрешить вставку правой кнопкой мыши
 DLG_TAB_COPYPASTE_MOUSEPASTEM=&Отключить вставку средней кнопкой мыши
 DLG_TAB_COPYPASTE_SELECTLBUTTON=&Использовать только левую кнопку мыши
-DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Trim trailing new line character when pasting
-DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Normalize line break when pasting
+DLG_TAB_COPYPASTE_TRIM_TRAILING_NL=&Удалить символ новой строки при вставке
+DLG_TAB_COPYPASTE_NORMALIZE_LINEBREAK=&Разрешить возврат строки при вставке
 DLG_TAB_COPYPASTE_CONFIRM_CHANGE_PASTE=&Разрешить вставку изменения
 DLG_TAB_COPYPASTE_STRINGFILE=&Текстовый файл
 DLG_TAB_COPYPASTE_DELIMITER=&Разделитель символов
-DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку перед строкой
+DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку
 DLG_TAB_COPYPASTE_PASTEDELAY2=мс
 
 DLG_TAB_VISUAL_ALPHA=&Прозрачный
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
 DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
-DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
+DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=&Яркость изображения
 DLG_TAB_VISUAL_MOUSE=&Курсор мыши
 DLG_TAB_VISUAL_FONT_QUALITY=&Качество шрифта
 DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT=По умолчанию
@@ -278,13 +278,13 @@ DLG_FILETRANS_START=&Старт
 DLG_FILETRANS_PAUSE=&Пауза
 DLG_FILETRANS_CLOSE=Закрыть
 
-DLG_SETUPDIR_TITLE=Tera Term: Setup directory
-DLG_SETUPDIR_INIFILE=Tera Term Configuration File
-DLG_SETUPDIR_KEYBOARDFILE=Keyboard Configuration File
-DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
-DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
-DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
-DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+DLG_SETUPDIR_TITLE=Tera Term: Каталог настроек
+DLG_SETUPDIR_INIFILE=Файл конфигурации Tera Term
+DLG_SETUPDIR_KEYBOARDFILE=Файл конфигурации клавиатуры
+DLG_SETUPDIR_CYGTERMFILE=Файл конфигурации CygTerm
+DLG_SETUPDIR_KNOWNHOSTSFILE=Файл известных хостов SSH
+DLG_SETUPDIR_NOFILE_ERROR=Файл не существует.(%d)
+DLG_SETUPDIR_OPENFILE_ERROR=Нельзя открыть файл.(%d)
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Не удается использовать winsock
@@ -519,7 +519,7 @@ MENU_SSH_KEYGEN=&Генератор ключа SSH...
 
 ; dlg информация
 DLG_ABOUT_TITLE=Информация о TTSSH
-DLG_ABOUT_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_ABOUT_FP_HASH_ALGORITHM=Алгоритм хэширования:
 DLG_ABOUT_SERVERID=Сервер ID:
 DLG_ABOUT_PROTOCOL=Протокол:
 DLG_ABOUT_ENCRYPTION=Шифрование:
@@ -528,9 +528,9 @@ DLG_ABOUT_KEXKEY=Ключ смены ключа:
 DLG_ABOUT_AUTH=Аутентификация:
 DLG_ABOUT_COMP=Сжатие:
 DLG_ABOUT_CLIENTID=Клиент ID:
-DLG_ABOUT_KEX=Key exchange algorithm:
+DLG_ABOUT_KEX=Алгоритм обмена ключами:
 DLG_ABOUT_HOSTKEY=Ключ хоста:
-DLG_ABOUT_MAC=MAC algorithm:
+DLG_ABOUT_MAC=MAC-алгоритм:
 DLG_ABOUT_MAC_INFO=%s к серверу, %s от сервера
 DLG_ABOUT_COMPDELAY=Задержка сжатия:
 DLG_ABOUT_CIPHER_INFO=%s к серверу, %s от сервера
@@ -540,7 +540,7 @@ DLG_ABOUT_KEY_NONE=Нет
 DLG_ABOUT_COMP_INFO=уровень %d; отношение %.1f (%ld:%ld)
 DLG_ABOUT_COMP_INFO2=уровень %d
 DLG_ABOUT_COMP_NONE=нет
-DLG_ABOUT_COMP_UPDOWN=Upstream %s; Downstream %s
+DLG_ABOUT_COMP_UPDOWN=Направление вверх %s; вниз %s
 DLG_ABOUT_AUTH_INFO=Пользователь '%s', использовано %s
 DLG_ABOUT_FINGERPRINT=Отпечаток ключа хоста:
 
@@ -592,7 +592,7 @@ DLG_DIFFERENTKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_DIFFERENTKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ КЛЮЧ, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_DIFFERENTKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_DIFFERENTKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
-DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_DIFFERENTKEY_FP_HASH_ALGORITHM=Алгоритм хэширования:
 DLG_DIFFERENTKEY_REPLACE=&Заменить существующий ключ новым ключом
 
 ; dlg diff type key
@@ -600,7 +600,7 @@ DLG_DIFFERENTTYPEKEY_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_DIFFERENTTYPEKEY_WARNING=Ваш список известных хостов неизвестен для сервера "####################################", но вам дали ДРУГОЙ ТИП КЛЮЧА, чтобы попасть в список известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_DIFFERENTTYPEKEY_WARNING2=Если вы добавите новый ключ в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_DIFFERENTTYPEKEY_FINGERPRINT=Отпечаток ключа сервера хоста:
-DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM=Алгоритм хэширования:
 DLG_DIFFERENTTYPEKEY_ADD=&Добавить этот компьютер и его ключ в список известных хостов
 
 ; dlg fwd edit
@@ -615,8 +615,8 @@ DLG_FWD_REMOTE_PORT=&Через удаленный порт
 DLG_FWD_REMOTE_LISTEN=&Слушать
 DLG_FWD_REMOTE_LOCAL=&Локальный компьютер
 DLG_FWD_REMOTE_LOCAL_PORT=&Порт
-DLG_FWD_DYNAMIC_PORT=Forward &dynamic port
-DLG_FWD_DYNAMIC_LISTEN=lis&ten
+DLG_FWD_DYNAMIC_PORT=&Динамичный порт
+DLG_FWD_DYNAMIC_LISTEN=&Прослушивание
 
 MSG_SAME_SERVERPORT_ERROR=Вы не можете иметь два перенаправления из одного и того же порта сервера (%d).
 MSG_SAME_LOCALPORT_ERROR=Вы не можете иметь два перенаправление из одного и того же порта (%d).
@@ -639,7 +639,7 @@ MSG_FWD_REMOTE_XSCREEN=X-сервер (экран %d:%d)
 MSG_FWD_REMOTE=Удаленный "%s" порт %s в локальный "%s" порт %s
 MSG_FWD_LOCAL=Локальный "%s" порт %s в удаленный "%s" порт %s
 MSG_FWD_X=удаленные приложения X на локальный X-сервер
-MSG_FWD_DYNAMIC=Local "%s" port %s to remote dynamic
+MSG_FWD_DYNAMIC=Локальный "%s" порт %s управляется удаленно
 
 ; dlg host
 DLG_HOST_TITLE=Tera Term: Новое соединение
@@ -729,10 +729,10 @@ DLG_SSHSETUP_FORWARDAGENTCONFIRM=&Подтвердить агента пересылки
 DLG_SSHSETUP_FORWARDAGENTNOTIFY=No&tify access to the forwarded agent
 DLG_SSHSETUP_VERIFYHOSTKEYDNS=&Проверить ключ хоста в DNS
 DLG_SSHSETUP_NOTICE=Все параметры вступят в силу в следующей сессии.
-DLG_SSHSETUP_HOSTKEY_ROTATION=Hostkey rotatio&n
-DLG_SSHSETUP_HOSTKEY_ROTATION_NO=No
-DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Yes
-DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Ask
+DLG_SSHSETUP_HOSTKEY_ROTATION=&Смена ключа
+DLG_SSHSETUP_HOSTKEY_ROTATION_NO=Нет
+DLG_SSHSETUP_HOSTKEY_ROTATION_YES=Да
+DLG_SSHSETUP_HOSTKEY_ROTATION_ASK=Запрос
 
 FILEDLG_OPEN_KNOWNHOSTS_RW_TITLE=Выберите файл чтения/записи известных хостов
 FILEDLG_OPEN_KNOWNHOSTS_RO_TITLE=Выберите файл чтения известных хостов, чтобы добавить
@@ -742,19 +742,19 @@ DLG_TIS_TITLE=SSH вызов аутентификации
 DLG_TIS_BANNER=Вести лог в %s
 
 ; dlg passwd change
-DLG_PASSCHG_TITLE=TTSSH: Change Password
-DLG_PASSCHG_MESSAGE=Server requests to change password
-DLG_PASSCHG_OLDPASSWD=&Old Password
-DLG_PASSCHG_NEWPASSWD=&New Password
-DLG_PASSCHG_CONFIRMPASSWD=&Confirm Password
-MSG_PASSCHG_MISMATCH=Mismatch; try again.
+DLG_PASSCHG_TITLE=TTSSH: изменить пароль
+DLG_PASSCHG_MESSAGE=Сервер просит сменить пароль
+DLG_PASSCHG_OLDPASSWD=&Старый пароль
+DLG_PASSCHG_NEWPASSWD=&Новый пароль
+DLG_PASSCHG_CONFIRMPASSWD=&Подтвердите пароль
+MSG_PASSCHG_MISMATCH=Ошибка, попробуйте еще раз
 
 ; dlg unknown host
 DLG_UNKNOWNHOST_TITLE=ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ
 DLG_UNKNOWNHOST_WARNING=Нет записи для сервера "####################################" в списке известных хостов. Враждебный компьютер может притворяться сервером!
 DLG_UNKNOWNHOST_WARNING2=Если вы добавите этот компьютер в список известных хостов и продолжите, то не будете получать это предупреждение.
 DLG_UNKNOWNHOST_FINGERPRINT=Ключ сервера хоста:
-DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
+DLG_UNKNOWNHOST_FP_HASH_ALGORITHM=Алгоритм хэширования:
 DLG_UNKNOWNHOST_ADD=&Добавьте этот компьютер и его ключ в список известных хостов
 
 DLG_HOSTKEY_SSHFP_NOTFOUND=Не найден ключ хоста в DNS.
@@ -764,11 +764,11 @@ DLG_HOSTKEY_SSHFP_DIFFTYPE=Несоответствие типа ключа хоста в DNS.
 DLG_HOSTKEY_DNSSEC_NG=Найден ненадежный пароль в DNS.
 DLG_HOSTKEY_DNSSEC_OK=Найден надежный пароль в DNS.
 
-DLG_HOSTKEY_ROTATION_TITLE=Hostkey rotation
-DLG_HOSTKEY_ROTATION_WARNING=You received the list of host keys from remote server `%s'.\nYou can choose to add %u new key(s) and remove %u obsolete key(s) from this machine to the known hosts list.\nAre you sure that you want to update known hosts file?
-DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Fingerprint hash algorithm:
-DLG_HOSTKEY_ROTATION_ADD=%u new key(s):
-DLG_HOSTKEY_ROTATION_REMOVE=%u obsolete key(s):
+DLG_HOSTKEY_ROTATION_TITLE=Смена ключа
+DLG_HOSTKEY_ROTATION_WARNING=Вы получили список ключей хоста от удаленного сервера `%s'.\nВы можете добавить %u новый ключ(и) и удалить %u старый ключ(и) от этого компьютера в список известных ключей хостов.\nВы уверены, что хотите обновить список известных хостов?
+DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM=Алгоритм хэширования:
+DLG_HOSTKEY_ROTATION_ADD=%u новый ключ(и):
+DLG_HOSTKEY_ROTATION_REMOVE=%u старый ключ(и):
 
 ; crypt.c
 MSG_ENCRYPT_ERROR1=%s ошибка шифрования(1): байты %d (%d)
@@ -802,9 +802,9 @@ MSG_FWD_DENIED_ERROR=Сервер попытался перенаправить соединение через этот компью
 MSG_FWD_DENIED_X_ERROR=Сервер попытался перенаправить соединение через этот компьютер.\nЭто требуется для соединения к локальному X-серверу.\nВы не указали эту переадресацию заранее на TTSSH, поэтому просьба была отклонена.
 MSG_FWD_DENIED_BY_SERVER_ERROR=Программа на локальном компьютере пыталась подключиться к порту.\nПросьба была отклонена сервером. Соединение будет закрыто.
 MSG_FWD_COMM_ERROR=Ошибка связи при отправке данных в локальный порт.\nСоединение будет закрыто.
-MSG_FWD_AGENT_FORWARDING_CONFIRM=Вы уверены, что хотите принять просьбу агента пересылки?
-MSG_FWD_AGENT_NOTIFY=Remote host access to agent.
-MSG_FWD_AGENT_NOTIFY_TITLE=Agent Forwarding
+MSG_FWD_AGENT_FORWARDING_CONFIRM=Вы уверены, что хотите принять запрос агента?
+MSG_FWD_AGENT_NOTIFY=Доступ к удаленному хосту для агента.
+MSG_FWD_AGENT_NOTIFY_TITLE=Активация агента
 
 ; hosts.c
 MSG_HOSTS_READ_ENOENT_ERROR=Произошла ошибка при попытке чтения файла известных хостов.\nУказанный файл не существует.
@@ -857,14 +857,14 @@ MSG_SSH_SERVER_NO_AUTH_METHOD_ERROR=Сервер не имеет надежного метода аутентифика
 MSG_SSH_SERVER_UNSUPPORT_AUTH_METHOD_ERROR=\nМетод проверки аутентификации не поддерживается сервером.
 MSG_SSH_CHANNEL_OPEN_ERROR=Было принято сообщение SSH2_MSG_CHANNEL_OPEN_FAILURE.\nКанал [%d]: причина: %s(%d) сообщение: %s
 MSG_SSH_NO_FREE_CHANNEL=Не удалось открыть новый канал. В TTSSH уже открыто очень много каналов.
-MSG_SSH_GEX_SIZE_TITLE=TTSSH: Confirm GEX group size
-MSG_SSH_GEX_SIZE_CANCEL=New connection is cancelled.
-MSG_SSH_GEX_SIZE_OUTOFRANGE=Received group size is out of range: %d
-MSG_SSH_GEX_SIZE_SMALLER=Received group size is smaller than the requested minimal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
-MSG_SSH_GEX_SIZE_LARGER=Received group size is larger than the requested maximal size.\nrequested: %d, received: %d\nAre you sure that you want to accept received group?
-MSG_SSH_SUBSYSTEM_REQUEST_ERROR=subsystem request failed. (%s)
-MSG_SSH_AGENTERROR_TITLE=Bad agent request
-MSG_SSH_AGENTERROR_TOOLARGE=Agent request size is too large, ignore it.
+MSG_SSH_GEX_SIZE_TITLE=TTSSH: Подтвердить размер GEX-группы
+MSG_SSH_GEX_SIZE_CANCEL=Новое соединенние отменено.
+MSG_SSH_GEX_SIZE_OUTOFRANGE=Полученный размер группы выходит за допустимые пределы: %d
+MSG_SSH_GEX_SIZE_SMALLER=Размер группы меньше запрашиваемого минимального размера.\nзапрошено: %d, принято: %d\nВы уверены, что хотите принять полученную группу?
+MSG_SSH_GEX_SIZE_LARGER=Размер группы больше запрашиваемого максимального размера.\nзапрошено: %d, принято: %d\nВы уверены, что хотите принять полученную группу?
+MSG_SSH_SUBSYSTEM_REQUEST_ERROR=Запрос подсистемы завершился неудачно. (%s)
+MSG_SSH_AGENTERROR_TITLE=Неверный запрос агента
+MSG_SSH_AGENTERROR_TOOLARGE=Запрос агента слишком велик, игнорируйте его.
 
 ; ttxssh.c
 MSG_UNKNOWN_OPTION_ERROR=Неверный параметр в командной строке: %s
@@ -991,7 +991,7 @@ MENU_HOTKEY=Показать список "горячих" клавиш (Ctl+Alt+M)
 MENU_VERSION=Версия
 MENU_EXEC=Выполнить
 MENU_CLOSE=Выход
-MENU_NOTRAY=(none)
+MENU_NOTRAY=(нет)
 
 DLG_ABOUT_TITLE=Информация о версии
 DLG_ABOUT_APPNAME=запустить инструмент
@@ -1092,4 +1092,4 @@ DLG_TITLE=повторение команды
 DLG_ENABLE=&Разрешено
 DLG_INTERVAL=&Интервал(сек)
 DLG_COMMAND=&Команда
-DLG_ADD_NEWLINE=&Add new line
+DLG_ADD_NEWLINE=&Добавить новую строку
