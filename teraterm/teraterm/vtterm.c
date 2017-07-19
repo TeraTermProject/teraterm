@@ -3078,7 +3078,7 @@ void CSDouble(BYTE b)
 	}
 }
 
-void CSDolRequestMode()
+void CSDolRequestMode() // DECRQM
 {
 	char buff[256];
 	char *pp;
@@ -3226,6 +3226,12 @@ void CSDolRequestMode()
 			break;
 		  case 67:	// DECBKM
 			if (ts.BSKey==IdBS)
+				resp = 1;
+			else
+				resp = 2;
+			break;
+		  case 69:	// DECRQM
+			if (LRMarginMode)
 				resp = 1;
 			else
 				resp = 2;
