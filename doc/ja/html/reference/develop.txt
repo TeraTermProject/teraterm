@@ -282,9 +282,8 @@
      リリース作業時に、バージョンを一つインクリメントする。
      リリースされる前にバージョン番号が上がったファイルが出回るのを避けるため。
      バグレポートなどで混乱の元になりそうなので、リリースまではバージョン番号を上げないこと。
-     - ttermpro.rc
-     - ttxssh.rc
-     - ttmacro.rc // 変更時のみ
+     - tt-version.h
+     - ttxssh-version.h
      - ttpmenu.rc // 変更時のみ
      - TTProxy.rc // 変更時のみ
      - ttxkanjimenu.rc // 変更時のみ

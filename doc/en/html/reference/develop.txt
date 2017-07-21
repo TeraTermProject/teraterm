@@ -269,9 +269,8 @@ Example: adding a TTSSH menu under File menu
 
   3. Increase the software version and modify date.
      Increment the version of VS_VERSION_INFO while release process.
-     - ttermpro.rc
-     - ttxssh.rc
-     - ttmacro.rc // only modifying
+     - tt-version.h
+     - ttxssh-version.h
      - ttpmenu.rc // only modifying
      - TTProxy.rc // only modifying
      - ttxkanjimenu.rc // only modifying
