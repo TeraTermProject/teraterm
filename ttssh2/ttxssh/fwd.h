@@ -81,7 +81,7 @@ typedef enum {
 	FWD_NONE,
 	FWD_LOCAL_TO_REMOTE,
 	FWD_LOCAL_DYNAMIC,
-	FWD_LISTENING_LOCAL, // 豈碑ｼ�逕ｨ縺ｮ繝繝溘�ｼ縲ゅΟ繝ｼ繧ｫ繝ｫ縺ｧ listen 縺吶ｋ縺ｮ縺ｯ縺薙ｌ繧医ｊ荳翫↓縺吶ｋ
+	FWD_LISTENING_LOCAL, // 比較用のダミー。ローカルで listen するのはこれより上にする
 	FWD_REMOTE_TO_LOCAL,
 	FWD_REMOTE_X11_TO_LOCAL
 } FWDType;
