@@ -90,7 +90,7 @@ void *SOCKS_init_filter(PTInstVar pvar, int channel_num, char *peer_name, int po
 
 	closure->pvar = pvar;
 	closure->channel_num = channel_num;
-	closure->peer_name = strdup(peer_name);
+	closure->peer_name = _strdup(peer_name);
 	closure->peer_port = port;
 
 	closure->status = SOCKS_STATE_INIT;
