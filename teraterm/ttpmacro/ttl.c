@@ -3983,6 +3983,38 @@ WORD TTLSend()
 }
 
 /*
+ * src に含まれる 0x01 を 0x01 0x02 に置き換えて dst にコピーする。
+ * TStrVal には 0x00 が含まれる事が無い(終端と区別できない)ので 0x00 は考慮する必要なし。
+ */
+static void AddBroadcastString(char *dst, int dstlen, char *src)
+{
+	int i;
+	char *p, *p2;
+
+	i = strlen(dst);
+	dst += i;
+	dstlen -= i;
+
+	while (*src != 0 && dstlen > 1) {
+		if (*src == 0x01) {
+			// 0x01 を格納するには 0x01 0x02 の2バイト + NUL 終端用の1バイトが必要
+			if (dstlen < 3) {
+				break;
+			}
+			*dst++ = *src++;
+			*dst++ = 0x02;
+			dstlen -= 2;
+		}
+		else {
+			*dst++ = *src++;
+			dstlen--;
+		}
+	}
+
+	*dst = 0;
+}
+
+/*
  * TTLSendBroadcast / TTLSendMulticast の下請け
  *
  * 各パラメータを連結した文字列を buff に格納して返す。
@@ -4005,7 +4037,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 	while (1) {
 		if (GetString(Str, &Err)) {
 			if (Err!=0) return Err;
-			strncat_s(buff, bufflen, Str, _TRUNCATE);
+			AddBroadcastString(buff, bufflen, Str);
 		}
 		else if (GetExpression(&ValType, &Val, &Err)) {
 			if (Err!=0) return Err;
@@ -4024,7 +4056,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 					strncat_s(buff, bufflen, tmp, _TRUNCATE);
 					break;
 				case TypString: 
-					strncat_s(buff, bufflen, StrVarPtr((TVarId)Val), _TRUNCATE);
+					AddBroadcastString(buff, bufflen, StrVarPtr((TVarId)Val));
 					break;
 				default:
 					return ErrTypeMismatch;

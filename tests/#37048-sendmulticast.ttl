@@ -13,6 +13,15 @@ pause 1
 
 sendmulticast mcast "0: " 0 ", 1:" 1 ","#13#10
 
+;pause 1
+
+sendmulticast mcast "1:"#1","#13#10
+
+pause 1
+
+str = "1:"#1","#13#10
+sendmulticast mcast str
+
 pause 1
 
 sendmulticast mcast 4
