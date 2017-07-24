@@ -4061,7 +4061,7 @@ static WORD TTLSendBroadcast(BOOL crlf)
 		return Err;
 
 	SetFile(buf);
-	return SendCmnd(CmdSendBroadcast,IdTTLWaitCmndEnd);
+	return SendCmnd(CmdSendBroadcast, 0);
 }
 
 // "setmulticastname"コマンド (2009.3.5 yutaka)
@@ -4075,7 +4075,7 @@ WORD TTLSetMulticastName()
 	if (Err!=0) return Err;
 
 	SetFile(Str);
-	return SendCmnd(CmdSetMulticastName,IdTTLWaitCmndEnd);
+	return SendCmnd(CmdSetMulticastName, 0);
 }
 
 // "sendmulticast"コマンド (2009.3.5 yutaka)
@@ -4097,7 +4097,7 @@ WORD TTLSendMulticast()
 		return Err;
 
 	SetSecondFile(buf);
-	return SendCmnd(CmdSendMulticast,IdTTLWaitCmndEnd);
+	return SendCmnd(CmdSendMulticast, 0);
 }
 
 WORD TTLSendFile()
@@ -5782,7 +5782,7 @@ WORD TTLScpSend()
 
 	SetFile(Str);
 	SetSecondFile(Str2);
-	return SendCmnd(CmdScpSend,IdTTLWaitCmndEnd);
+	return SendCmnd(CmdScpSend, 0);
 }
 
 // SYNOPSIS: 
@@ -5814,7 +5814,7 @@ WORD TTLScpRecv()
 
 	SetFile(Str);
 	SetSecondFile(Str2);
-	return SendCmnd(CmdScpRcv,IdTTLWaitCmndEnd);
+	return SendCmnd(CmdScpRcv, 0);
 }
 
 int ExecCmnd()

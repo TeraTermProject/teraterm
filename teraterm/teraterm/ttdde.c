@@ -862,8 +862,6 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		static HMODULE h = NULL;
 		char msg[128];
 
-		//MessageBox(NULL, "hoge", "foo", MB_OK);
-
 		if (func == NULL) {
 			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
 				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
@@ -877,11 +875,8 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 
 		if (func != NULL) {
-			//MessageBox(NULL, ParamFileName, "foo2", MB_OK);
-			//MessageBox(NULL, ParamSecondFileName, "foo3", MB_OK);
-			DdeCmnd = TRUE;
+			// DdeCmnd = TRUE;
 			func(ParamFileName, ParamSecondFileName);
-			EndDdeCmnd(1);     // マクロ実行を終了させる。本来なら、SCP転送が完了してから呼び出したほうが望ましい。
 			break;
 		}
 
@@ -898,8 +893,6 @@ scp_send_error:
 		static HMODULE h = NULL;
 		char msg[128];
 
-		//MessageBox(NULL, "hoge", "foo", MB_OK);
-
 		if (func == NULL) {
 			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
 				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
@@ -913,11 +906,8 @@ scp_send_error:
 		}
 
 		if (func != NULL) {
-			//MessageBox(NULL, ParamFileName, "foo2", MB_OK);
-			//MessageBox(NULL, ParamSecondFileName, "foo3", MB_OK);
-			DdeCmnd = TRUE;
+			// DdeCmnd = TRUE;
 			func(ParamFileName, ParamSecondFileName);
-			EndDdeCmnd(1);     // マクロ実行を終了させる。本来なら、SCP転送が完了してから呼び出したほうが望ましい。
 			break;
 		}
 
@@ -1035,20 +1025,14 @@ scp_rcv_error:
 
 	case CmdSendBroadcast: // 'sendbroadcast'
 		SendAllBroadcastMessage(HVTWin, HVTWin, 0, ParamFileName, strlen(ParamFileName));
-		DdeCmnd = TRUE;
-		EndDdeCmnd(0);     // マクロ実行を終了させる。
 		break;
 
 	case CmdSendMulticast: // 'sendmulticast'
 		SendMulticastMessage(HVTWin, HVTWin, ParamFileName, ParamSecondFileName, strlen(ParamSecondFileName));
-		DdeCmnd = TRUE;
-		EndDdeCmnd(0);     // マクロ実行を終了させる。
 		break;
 
 	case CmdSetMulticastName: // 'setmulticastname'
 		SetMulticastName(ParamFileName);
-		DdeCmnd = TRUE;
-		EndDdeCmnd(0);     // マクロ実行を終了させる。
 		break;
 
 	case CmdDispStr:
