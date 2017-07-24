@@ -1,0 +1,25 @@
+mcast = "multicast-test"
+
+for i 1 3
+	call opentt
+	unlink
+next
+
+call opentt
+
+sendmulticast mcast "hexdump -C"#10
+
+pause 1
+
+sendmulticast mcast "0: " 0 ", 1:" 1 ","#13#10
+
+pause 1
+
+sendmulticast mcast 4
+end
+
+:opentt
+	cygconnect
+	wait "%" "$" "#"
+	setmulticastname mcast
+	return
