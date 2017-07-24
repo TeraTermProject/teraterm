@@ -5456,7 +5456,7 @@ void CVTWindow::OnControlResetPort()
 	CommResetSerial(&ts, &cv, TRUE);
 }
 
-void ApplyBoradCastCommandHisotry(HWND Dialog, char *historyfile)
+void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
 {
 	char EntName[13];
 	char Command[HostNameMaxLength+1];
@@ -5773,7 +5773,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 				SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 			}
 			GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
-			ApplyBoradCastCommandHisotry(hWnd, historyfile);
+			ApplyBroadCastCommandHisotry(hWnd, historyfile);
 
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hWnd, IDC_COMMAND_EDIT));
@@ -5947,7 +5947,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 												  ts.MaxBroadcatHistory);
 								FreeTTSET();
 							}
-							ApplyBoradCastCommandHisotry(hWnd, historyfile);
+							ApplyBroadCastCommandHisotry(hWnd, historyfile);
 							ts.BroadcastCommandHistory = TRUE;
 						}
 						else {
@@ -5995,7 +5995,7 @@ skip:;
 				case IDC_COMMAND_EDIT:
 					if (HIWORD(wp) == CBN_DROPDOWN) {
 						GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
-						ApplyBoradCastCommandHisotry(hWnd, historyfile);
+						ApplyBroadCastCommandHisotry(hWnd, historyfile);
 					}
 					return FALSE;
 
