@@ -3982,67 +3982,86 @@ WORD TTLSend()
 	return 0;
 }
 
-static WORD DoSendBroadcast(BOOL crlf)
+/*
+ * TTLSendBroadcast / TTLSendMulticast の下請け
+ *
+ * 各パラメータを連結した文字列を buff に格納して返す。
+ * crlf が TRUE の時は各パラメータの間に "\n" を挟む。(要検討)
+ *
+ * パラメータが String の場合はそのまま、Integer の場合は ASCII コードとみなしてその文字を送る。
+ * Tera Term 側では send 等と共通のルーチンが使われる為、DDE 通信の為のエンコードを行う必要有り。
+ *   0x00 -> 0x01 0x01
+ *   0x01 -> 0x01 0x02
+ */
+static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 {
-	TStrVal buf;    // 一行バッファ
-	char asc[10];
 	TStrVal Str;
 	WORD Err, ValType;
 	int Val;
-	BOOL EndOfLine;
+	char tmp[3];
 
-	if (! Linked)
-		return ErrLinkFirst;
+	buff[0] = '\0';
 
-	buf[0] = '\0';
-	EndOfLine = FALSE;
-
-	do {
-		if (GetString(Str,&Err))
-		{
+	while (1) {
+		if (GetString(Str, &Err)) {
 			if (Err!=0) return Err;
-			strncat_s(buf, MaxStrLen, Str, _TRUNCATE);
-			if (crlf) 
-				strncat_s(buf, MaxStrLen, "\n", _TRUNCATE);
+			strncat_s(buff, bufflen, Str, _TRUNCATE);
 		}
-		else if (GetExpression(&ValType,&Val,&Err))
-		{
+		else if (GetExpression(&ValType, &Val, &Err)) {
 			if (Err!=0) return Err;
 			switch (ValType) {
-				case TypInteger:  // intはASCIIコードとみなす。
-					asc[0] = LOBYTE(Val);
-					asc[1] = '\0';
-					strncat_s(buf, MaxStrLen, asc, _TRUNCATE);
-					if (crlf) 
-						strncat_s(buf, MaxStrLen, "\n", _TRUNCATE);
+				case TypInteger:
+					Val = LOBYTE(Val);
+					if (Val == 0 || Val == 1) {
+						tmp[0] = 1;
+						tmp[1] = Val + 1;
+						tmp[2] = 0;
+					}
+					else {
+						tmp[0] = Val;
+						tmp[1] = 0;
+					}
+					strncat_s(buff, bufflen, tmp, _TRUNCATE);
 					break;
 				case TypString: 
-					strncat_s(buf, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
-					if (crlf) 
-						strncat_s(buf, MaxStrLen, "\n", _TRUNCATE);
+					strncat_s(buff, bufflen, StrVarPtr((TVarId)Val), _TRUNCATE);
 					break;
 				default:
 					return ErrTypeMismatch;
 			}
 		}
-		else
-			EndOfLine = TRUE;
-	} while (! EndOfLine);
+		else {
+			break;
+		}
+		if (crlf) {
+			/*
+			 * 検討事項:
+			 *
+			 * 1. crlf が TRUE 時に送るのが "\n" なのは妥当?
+			 *    sendln では 0x0A 0x0D ("\r\n") を送っている
+			 *
+			 * 2. パラメータ一つ毎に改行しているのは妥当?
+			 *    sendln ではすべてのパラメータを送った後に改行している
+			 */
+			strncat_s(buff, bufflen, "\n", _TRUNCATE);
+		}
+	}
+	return 0;
+}
+
+static WORD TTLSendBroadcast(BOOL crlf)
+{
+	TStrVal buf;
+	WORD Err;
+
+	if (! Linked)
+		return ErrLinkFirst;
+
+	if ((Err = GetBroadcastString(buf, MaxStrLen, crlf)) != 0)
+		return Err;
 
 	SetFile(buf);
 	return SendCmnd(CmdSendBroadcast,IdTTLWaitCmndEnd);
-}
-
-// "sendbroadcast"コマンド (2009.3.3 yutaka)
-WORD TTLSendBroadcast()
-{
-	return DoSendBroadcast(FALSE);
-}
-
-// "sendlnbroadcast"コマンド (2009.3.6 yutaka)
-WORD TTLSendlnBroadcast()
-{
-	return DoSendBroadcast(TRUE);
 }
 
 // "setmulticastname"コマンド (2009.3.5 yutaka)
@@ -4062,12 +4081,8 @@ WORD TTLSetMulticastName()
 // "sendmulticast"コマンド (2009.3.5 yutaka)
 WORD TTLSendMulticast()
 {
-	TStrVal buf;    // 一行バッファ
-	char asc[10];
-	TStrVal Str;
-	WORD Err, ValType;
-	int Val;
-	BOOL EndOfLine;
+	TStrVal buf, Str;
+	WORD Err;
 
 	if (! Linked)
 		return ErrLinkFirst;
@@ -4078,40 +4093,12 @@ WORD TTLSendMulticast()
 	if (Err!=0) return Err;
 	SetFile(Str);
 
-	buf[0] = '\0';
-	EndOfLine = FALSE;
-
-	do {
-		if (GetString(Str,&Err))
-		{
-			if (Err!=0) return Err;
-			strncat_s(buf, MaxStrLen, Str, _TRUNCATE);
-		}
-		else if (GetExpression(&ValType,&Val,&Err))
-		{
-			if (Err!=0) return Err;
-			switch (ValType) {
-				case TypInteger:  // intはASCIIコードとみなす。
-					asc[0] = LOBYTE(Val);
-					asc[1] = '\0';
-					strncat_s(buf, MaxStrLen, asc, _TRUNCATE);
-					break;
-				case TypString: 
-					strncat_s(buf, MaxStrLen, StrVarPtr((TVarId)Val), _TRUNCATE);
-					break;
-				default:
-					return ErrTypeMismatch;
-			}
-		}
-		else
-			EndOfLine = TRUE;
-	} while (! EndOfLine);
+	if ((Err = GetBroadcastString(buf, MaxStrLen, FALSE)) != 0)
+		return Err;
 
 	SetSecondFile(buf);
 	return SendCmnd(CmdSendMulticast,IdTTLWaitCmndEnd);
 }
-
-
 
 WORD TTLSendFile()
 {
@@ -6188,9 +6175,9 @@ int ExecCmnd()
 		case RsvSendBreak:
 			Err = TTLCommCmd(CmdSendBreak,0); break;
 		case RsvSendBroadcast:
-			Err = TTLSendBroadcast(); break;
+			Err = TTLSendBroadcast(FALSE); break;
 		case RsvSendlnBroadcast:
-			Err = TTLSendlnBroadcast(); break;
+			Err = TTLSendBroadcast(TRUE); break;
 		case RsvSendMulticast:
 			Err = TTLSendMulticast(); break;
 		case RsvSetMulticastName:
