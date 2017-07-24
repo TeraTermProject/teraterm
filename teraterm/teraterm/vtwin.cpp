@@ -5589,7 +5589,7 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 {
 	int i;
 	HWND hd;
-    TCHAR szWindowText[256];
+	TCHAR szWindowText[256];
 
 	SendMessage(hWnd, LB_RESETCONTENT, 0, 0);
 
