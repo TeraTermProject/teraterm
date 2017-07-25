@@ -93,6 +93,9 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\ttddecmnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ttl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

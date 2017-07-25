@@ -146,6 +146,7 @@
     <ClCompile Include="wait4all.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="errdlg.h" />
     <ClInclude Include="inpdlg.h" />

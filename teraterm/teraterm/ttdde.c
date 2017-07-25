@@ -43,6 +43,7 @@
 #include "keyboard.h"
 
 #include "ttdde.h"
+#include "ttddecmnd.h"
 #include "commlib.h"
 
 #include "vtwin.h"
@@ -334,67 +335,6 @@ WORD HexStr2Word(PCHAR Str)
 	}
 	return w;
 }
-
-#define CmdSetHWnd      ' '
-#define CmdSetFile      '!'
-#define CmdSetBinary    '"'
-#define CmdSetAppend    '#'
-#define CmdSetXmodemOpt '$'
-#define CmdSetSync      '%'
-
-#define CmdBPlusRecv    '&'
-#define CmdBPlusSend    '\''
-#define CmdChangeDir    '('
-#define CmdClearScreen  ')'
-#define CmdCloseWin     '*'
-#define CmdConnect      '+'
-#define CmdDisconnect   ','
-#define CmdEnableKeyb   '-'
-#define CmdGetTitle     '.'
-#define CmdInit         '/'
-#define CmdKmtFinish    '0'
-#define CmdKmtGet       '1'
-#define CmdKmtRecv      '2'
-#define CmdKmtSend      '3'
-#define CmdLoadKeyMap   '4'
-#define CmdLogClose     '5'
-#define CmdLogOpen      '6'
-#define CmdLogPause     '7'
-#define CmdLogStart     '8'
-#define CmdLogWrite     '9'
-#define CmdQVRecv       ':'
-#define CmdQVSend       ';'
-#define CmdRestoreSetup '<'
-#define CmdSendBreak    '='
-#define CmdSendFile     '>'
-#define CmdSendKCode    '?'
-#define CmdSetEcho      '@'
-#define CmdSetTitle     'A'
-#define CmdShowTT       'B'
-#define CmdXmodemSend   'C'
-#define CmdXmodemRecv   'D'
-#define CmdZmodemSend   'E'
-#define CmdZmodemRecv   'F'
-#define CmdCallMenu     'G'
-#define CmdScpSend      'H'
-#define CmdScpRcv       'I'
-#define CmdSetSecondFile 'J'
-#define CmdSetBaud      'K'
-#define CmdSetRts       'L'
-#define CmdSetDtr       'M'
-#define CmdGetHostname  'N'
-#define CmdSendBroadcast  'O'
-#define CmdSendMulticast  'P'
-#define CmdSetMulticastName  'Q'
-#define CmdSetDebug     'R'
-#define CmdYmodemSend   'S'
-#define CmdYmodemRecv   'T'
-#define CmdDispStr      'U'
-#define CmdLogInfo      'V'
-#define CmdLogRotate    'W'
-#define CmdLogAutoClose 'X'
-#define CmdGetModemStatus 'Y'
-#define CmdSetFlowCtrl  'Z'
 
 HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {

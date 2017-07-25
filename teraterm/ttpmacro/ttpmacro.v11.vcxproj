@@ -150,6 +150,7 @@
     <ClInclude Include="msgdlg.h" />
     <ClInclude Include="statdlg.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="ttl.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="ttm_res.h" />
