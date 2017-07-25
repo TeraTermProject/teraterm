@@ -1238,7 +1238,6 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 	fill_service_names(dlg, IDC_SSHLTRFROMPORT);
 	fill_service_names(dlg, IDC_SSHRTLTOPORT);
 	fill_service_names(dlg, IDC_SSHLTRTOPORT);
-	fill_service_names(dlg, IDC_SSHDYNFROMPORT);
 }
 
 static void grab_control_text(HWND dlg, FWDType type,
