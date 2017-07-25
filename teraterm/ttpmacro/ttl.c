@@ -3989,7 +3989,6 @@ WORD TTLSend()
 static void AddBroadcastString(char *dst, int dstlen, char *src)
 {
 	int i;
-	char *p, *p2;
 
 	i = strlen(dst);
 	dst += i;
