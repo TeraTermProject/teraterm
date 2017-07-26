@@ -964,7 +964,7 @@ scp_rcv_error:
 		break;
 
 	case CmdSendBroadcast: // 'sendbroadcast'
-		SendAllBroadcastMessage(HVTWin, HVTWin, 0, ParamFileName, strlen(ParamFileName));
+		SendBroadcastMessage(HVTWin, HVTWin, ParamFileName, strlen(ParamFileName));
 		break;
 
 	case CmdSendMulticast: // 'sendmulticast'

@@ -224,7 +224,7 @@ protected:
 extern "C" {
 #endif
 
-void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf, int buflen);
+void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen);
 void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buflen);
 void SetMulticastName(char *name);
 

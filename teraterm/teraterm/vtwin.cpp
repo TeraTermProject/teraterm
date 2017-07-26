@@ -5580,11 +5580,10 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 }
 
 /*
- * 全 Tera Term へメッセージを送信するブロードキャストモード。
- * "sendbroadcast"マクロコマンドからも利用される。
+ * ダイアログで選択されたウィンドウのみ、もしくは親ウィンドウのみに送るブロードキャストモード。
+ * リアルタイムモードが off の時に利用される。
  */
-extern "C"
-void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf, int buflen)
+void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_only, char *buf, int buflen)
 {
 	int i;
 	int count;
@@ -5596,27 +5595,51 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 	cds.cbData = buflen;
 	cds.lpData = buf;
 
-	// すべてのTera Termにメッセージとデータを送る
-	count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
-	for (i = 0 ; i < count ; i++) {
-		hd = NULL;
-		if (parent_only) {
-			hd = GetParent(hWnd);
-			i = MAXNWIN;		// 337: 強引かつ直値 :P
-		} else {
+	if (parent_only) {
+		// 親ウィンドウのみに WM_COPYDATA メッセージを送る
+		SendMessage(GetParent(hWnd), WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
+	}
+	else {
+		// ダイアログで選択されたウィンドウにメッセージを送る
+		count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
+		for (i = 0 ; i < count ; i++) {
 			// リストボックスで選択されているか
 			if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
-				hd = GetNthWin(i);
+				if ((hd = GetNthWin(i)) != NULL) {
+					// WM_COPYDATAを使って、プロセス間通信を行う。
+					SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
+				}
 			}
 		}
-		if (hd == NULL) {
-			continue;
-		}
+	}
+}
 
+/*
+ * 全 Tera Term へメッセージを送信するブロードキャストモード。
+ * "sendbroadcast"マクロコマンドからのみ利用される。
+ */
+extern "C"
+void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
+{
+	int i;
+	HWND hd;
+	COPYDATASTRUCT cds;
+
+	ZeroMemory(&cds, sizeof(cds));
+	cds.dwData = IPC_BROADCAST_COMMAND;
+	cds.cbData = buflen;
+	cds.lpData = buf;
+
+	// 全 Tera Term へメッセージを送る。
+	for (i = 0 ; i < MAXNWIN ; i++) {
+		if ((hd = GetNthWin(i)) == NULL) {
+			break;
+		}
 		// WM_COPYDATAを使って、プロセス間通信を行う。
 		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
 	}
 }
+
 
 /*
  * 任意の Tera Term 群へメッセージを送信するマルチキャストモード。厳密には、
@@ -5644,12 +5667,11 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 	 */
 	nlen = strlen(name) + 1;
 	msglen = nlen + buflen;
-	msg = (char *)malloc(msglen);
-	if (msg == NULL) {
-		goto error;
+	if ((msg = (char *)malloc(msglen)) == NULL) {
+		return;
 	}
 	strcpy_s(msg, msglen, name);
-	memcpy(msg + nlen, buf, buflen);
+	memcpy_s(msg + nlen, msglen - nlen, buf, buflen);
 
 	ZeroMemory(&cds, sizeof(cds));
 	cds.dwData = IPC_MULTICAST_COMMAND;
@@ -5658,8 +5680,7 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 
 	// すべてのTera Termにメッセージとデータを送る
 	for (i = 0 ; i < MAXNWIN ; i++) {
-		hd = GetNthWin(i);
-		if (hd == NULL) {
+		if ((hd = GetNthWin(i)) == NULL) {
 			break;
 		}
 
@@ -5667,7 +5688,6 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
 	}
 
-error:
 	free(msg);
 }
 
@@ -5930,7 +5950,7 @@ skip:;
 						// 337: 2007/03/20 チェックされていたら親ウィンドウにのみ送信
 						checked = SendMessage(GetDlgItem(hWnd, IDC_PARENT_ONLY), BM_GETCHECK, 0, 0);
 
-						SendAllBroadcastMessage(HVTWin, hWnd, checked, buf, strlen(buf));
+						SendBroadcastMessageToSelected(HVTWin, hWnd, checked, buf, strlen(buf));
 					}
 
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
