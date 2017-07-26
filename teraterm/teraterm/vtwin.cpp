@@ -5591,6 +5591,11 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 	HWND hd;
 	COPYDATASTRUCT cds;
 
+	ZeroMemory(&cds, sizeof(cds));
+	cds.dwData = IPC_BROADCAST_COMMAND;
+	cds.cbData = buflen;
+	cds.lpData = buf;
+
 	// すべてのTera Termにメッセージとデータを送る
 	count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 	for (i = 0 ; i < count ; i++) {
@@ -5607,11 +5612,6 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 		if (hd == NULL) {
 			continue;
 		}
-
-		ZeroMemory(&cds, sizeof(cds));
-		cds.dwData = IPC_BROADCAST_COMMAND;
-		cds.cbData = buflen;
-		cds.lpData = buf;
 
 		// WM_COPYDATAを使って、プロセス間通信を行う。
 		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
@@ -5651,17 +5651,17 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 	strcpy_s(msg, msglen, name);
 	memcpy(msg + nlen, buf, buflen);
 
+	ZeroMemory(&cds, sizeof(cds));
+	cds.dwData = IPC_MULTICAST_COMMAND;
+	cds.cbData = msglen;
+	cds.lpData = msg;
+
 	// すべてのTera Termにメッセージとデータを送る
 	for (i = 0 ; i < MAXNWIN ; i++) {
 		hd = GetNthWin(i);
 		if (hd == NULL) {
 			break;
 		}
-
-		ZeroMemory(&cds, sizeof(cds));
-		cds.dwData = IPC_MULTICAST_COMMAND;
-		cds.cbData = msglen;
-		cds.lpData = msg;
 
 		// WM_COPYDATAを使って、プロセス間通信を行う。
 		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
