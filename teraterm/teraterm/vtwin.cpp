@@ -5580,7 +5580,7 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 }
 
 /*
- * 全TeraTermへメッセージを送信するブロードキャストモード。
+ * 全 Tera Term へメッセージを送信するブロードキャストモード。
  * "sendbroadcast"マクロコマンドからも利用される。
  */
 extern "C"
@@ -5624,7 +5624,7 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 }
 
 /*
- * 任意のTeraTerm群へメッセージを送信するマルチキャストモード。厳密には、
+ * 任意の Tera Term 群へメッセージを送信するマルチキャストモード。厳密には、
  * ブロードキャスト送信を行い、受信側でメッセージを取捨選択する。
  * "sendmulticast"マクロコマンドからのみ利用される。
  */
