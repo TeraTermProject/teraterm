@@ -60,6 +60,7 @@ void PASCAL SetWinList(HWND HWin, HWND HDlg, int IList);
 void PASCAL SelectWin(int WinId);
 void PASCAL SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
 HWND PASCAL GetNthWin(int n);
+int PASCAL GetRegisteredWindowCount();
 void PASCAL ShowAllWin(int stat);
 void PASCAL ShowAllWinSidebySide(HWND);
 void PASCAL ShowAllWinStacked(HWND);

@@ -5545,30 +5545,16 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 	return FALSE;
 }
 
-
-static int GetApplicationInstanceCount(void)
-{
-	int i;
-	HWND hd;
-
-	for (i = 0 ; i < MAXNWIN ; i++) {
-		hd = GetNthWin(i);
-		if (hd == NULL) {
-			break;
-		}
-	}
-	return (i);
-}
-
 static void UpdateBroadcastWindowList(HWND hWnd)
 {
-	int i;
+	int i, count;
 	HWND hd;
 	TCHAR szWindowText[256];
 
 	SendMessage(hWnd, LB_RESETCONTENT, 0, 0);
 
-	for (i = 0 ; i < MAXNWIN ; i++) {
+	count = GetRegisteredWindowCount();
+	for (i = 0 ; i < count ; i++) {
 		hd = GetNthWin(i);
 		if (hd == NULL) {
 			break;
@@ -5621,7 +5607,7 @@ void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_only, cha
 extern "C"
 void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
 {
-	int i;
+	int i, count;
 	HWND hd;
 	COPYDATASTRUCT cds;
 
@@ -5630,8 +5616,10 @@ void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
 	cds.cbData = buflen;
 	cds.lpData = buf;
 
+	count = GetRegisteredWindowCount();
+
 	// 全 Tera Term へメッセージを送る。
-	for (i = 0 ; i < MAXNWIN ; i++) {
+	for (i = 0 ; i < count ; i++) {
 		if ((hd = GetNthWin(i)) == NULL) {
 			break;
 		}
@@ -5649,7 +5637,7 @@ void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
 extern "C"
 void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buflen)
 {
-	int i;
+	int i, count;
 	HWND hd;
 	COPYDATASTRUCT cds;
 	char *msg = NULL;
@@ -5678,8 +5666,10 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 	cds.cbData = msglen;
 	cds.lpData = msg;
 
+	count = GetRegisteredWindowCount();
+
 	// すべてのTera Termにメッセージとデータを送る
-	for (i = 0 ; i < MAXNWIN ; i++) {
+	for (i = 0 ; i < count ; i++) {
 		if ((hd = GetNthWin(i)) == NULL) {
 			break;
 		}
@@ -6084,7 +6074,7 @@ skip:;
 				if (wp != list_timer_id)
 					break;
 
-				n = GetApplicationInstanceCount();
+				n = GetRegisteredWindowCount();
 				if (n != prev_instances) {
 					prev_instances = n;
 					UpdateBroadcastWindowList(BroadcastWindowList);
@@ -6099,7 +6089,7 @@ skip:;
 					int i, n;
 
 					//OutputDebugPrintf("msg %x wp %x lp %x\n", msg, wp, lp);
-					n = GetApplicationInstanceCount();
+					n = GetRegisteredWindowCount();
 					for (i = 0 ; i < n ; i++) {
 						ListBox_SetSel(BroadcastWindowList, TRUE, i);
 					}

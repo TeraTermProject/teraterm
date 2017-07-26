@@ -1187,6 +1187,10 @@ HWND PASCAL GetNthWin(int n)
 	}
 }
 
+int PASCAL GetRegisteredWindowCount()
+{
+	return (pm->NWin);
+}
 
 // 有効なウィンドウを探し、現在位置を記憶させておく。
 static void get_valid_window_and_memorize_rect(HWND myhwnd, HWND hwnd[], int *num, int style)
