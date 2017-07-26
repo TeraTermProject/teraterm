@@ -5364,7 +5364,6 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	return TRUE;
 }
 
-
 //
 // 現在読み込まれている teraterm.ini ファイルが格納されている
 // フォルダをエクスプローラで開く。
@@ -5379,7 +5378,6 @@ void CVTWindow::OnOpenSetupDirectory()
 		HVTWin, (DLGPROC)OnSetupDirectoryDlgProc);
 
 }
-
 
 void CVTWindow::OnSetupLoadKeyMap()
 {
@@ -5480,9 +5478,6 @@ void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_SETCURSEL,0,0);
 }
 
-
-
-
 // ドロップダウンの中のエディットコントロールを
 // サブクラス化するためのウインドウプロシージャ
 static WNDPROC OrigBroadcastEditProc; // Original window procedure
@@ -5526,16 +5521,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 					SetWindowText(dlg, "");
 					SendMessage(dlg, EM_SETSEL, 0, 0);
 				}
-#if 0
-				for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
-					hd = GetNthWin(i);
-					if (hd == NULL)
-						break;
 
-					PostMessage(hd, msg, wParam, lParam);
-					//PostMessage(hd, WM_SETFOCUS, NULL, 0);
-				}
-#else
 				count = SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0);
 				for (i = 0 ; i < count ; i++) {
 					if (SendMessage(BroadcastWindowList, LB_GETSEL, i, 0)) {
@@ -5545,21 +5531,11 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 						}
 					}
 				}
-#endif
 			}
 			break;
 
 		case WM_CHAR:
-#if 0
-			switch (wParam) {
-				case VK_RETURN:
-				case VK_ESCAPE:
-					// 警告音が出ないようにする
-					return FALSE;
-			}
-			// not break;
-#endif
-			// 入力した文字ががIDC_COMMAND_EDITに残らないように捨てる
+			// 入力した文字がIDC_COMMAND_EDITに残らないように捨てる
 			return FALSE;
 
 		default:
@@ -5575,7 +5551,7 @@ static int GetApplicationInstanceCount(void)
 	int i;
 	HWND hd;
 
-	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
+	for (i = 0 ; i < MAXNWIN ; i++) {
 		hd = GetNthWin(i);
 		if (hd == NULL) {
 			break;
@@ -5583,7 +5559,6 @@ static int GetApplicationInstanceCount(void)
 	}
 	return (i);
 }
-
 
 static void UpdateBroadcastWindowList(HWND hWnd)
 {
@@ -5593,7 +5568,7 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 
 	SendMessage(hWnd, LB_RESETCONTENT, 0, 0);
 
-	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
+	for (i = 0 ; i < MAXNWIN ; i++) {
 		hd = GetNthWin(i);
 		if (hd == NULL) {
 			break;
@@ -5602,12 +5577,6 @@ static void UpdateBroadcastWindowList(HWND hWnd)
 		GetWindowText(hd, szWindowText, 256);
 		SendMessage(hWnd, LB_INSERTSTRING, -1, (LPARAM)szWindowText);
 	}
-
-#if 0
-	for (i = 0 ; i < SendMessage(BroadcastWindowList, LB_GETCOUNT, 0, 0) ; i++) {
-		SendMessage(hWnd, LB_SETSEL, TRUE, i);
-	}
-#endif
 }
 
 /*
@@ -5652,9 +5621,7 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 		// (2006.2.7 yutaka)
 		PostMessage(hd, WM_SETFOCUS, NULL, 0);
 	}
-
 }
-
 
 /*
  * 任意のTeraTerm群へメッセージを送信するマルチキャストモード。厳密には、
@@ -5690,7 +5657,7 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 	memcpy(msg + nlen, buf, buflen);
 
 	// すべてのTera Termにメッセージとデータを送る
-	for (i = 0 ; i < MAXNWIN ; i++) { // 50 = MAXNWIN(@ ttcmn.c)
+	for (i = 0 ; i < MAXNWIN ; i++) {
 		hd = GetNthWin(i);
 		if (hd == NULL) {
 			break;
@@ -5713,7 +5680,6 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 error:
 	free(msg);
 }
-
 
 extern "C"
 void SetMulticastName(char *name)
@@ -5841,15 +5807,15 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			init_height = rc_dlg.bottom - rc_dlg.top;
 
 			// 現在サイズから必要な値を計算
-			GetClientRect(hWnd,                                 &rc_dlg);
+			GetClientRect(hWnd, &rc_dlg);
 			p.x = rc_dlg.right;
 			p.y = rc_dlg.bottom;
 			ClientToScreen(hWnd, &p);
 
-			GetWindowRect(GetDlgItem(hWnd, IDOK),               &rc_ok);
+			GetWindowRect(GetDlgItem(hWnd, IDOK), &rc_ok);
 			ok2right = p.x - rc_ok.left;
 
-			GetWindowRect(GetDlgItem(hWnd, IDCANCEL),               &rc);
+			GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
 			cancel2right = p.x - rc.left;
 
 			GetWindowRect(GetDlgItem(hWnd, IDC_COMMAND_EDIT), &rc);
@@ -5944,7 +5910,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							GetDefaultFName(ts.HomeDir, BROADCAST_LOGFILE, historyfile, sizeof(historyfile));
 							if (LoadTTSET()) {
 								(*AddValueToList)(historyfile, buf, "BroadcastCommands", "Command",
-												  ts.MaxBroadcatHistory);
+								                  ts.MaxBroadcatHistory);
 								FreeTTSET();
 							}
 							ApplyBroadCastCommandHisotry(hWnd, historyfile);
@@ -6046,7 +6012,7 @@ skip:;
 				POINT p;
 
 				// 新しいダイアログのサイズを得る
-				GetClientRect(hWnd,                                 &rc_dlg);
+				GetClientRect(hWnd, &rc_dlg);
 				dlg_w = rc_dlg.right;
 				dlg_h = rc_dlg.bottom;
 
@@ -6056,8 +6022,8 @@ skip:;
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDOK), 0,
-							 dlg_w - ok2right, p.y, 0, 0,
-							 SWP_NOSIZE | SWP_NOZORDER);
+				             dlg_w - ok2right, p.y, 0, 0,
+				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Cancel button
 				GetWindowRect(GetDlgItem(hWnd, IDCANCEL), &rc);
@@ -6065,8 +6031,8 @@ skip:;
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDCANCEL), 0,
-							 dlg_w - cancel2right, p.y, 0, 0,
-							 SWP_NOSIZE | SWP_NOZORDER);
+				             dlg_w - cancel2right, p.y, 0, 0,
+				             SWP_NOSIZE | SWP_NOZORDER);
 
 				// Command Edit box
 				GetWindowRect(GetDlgItem(hWnd, IDC_COMMAND_EDIT), &rc);
@@ -6074,8 +6040,8 @@ skip:;
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDC_COMMAND_EDIT), 0,
-							 0, 0, dlg_w - p.x - ok2right - cmdlist2ok, p.y,
-							 SWP_NOMOVE | SWP_NOZORDER);
+				             0, 0, dlg_w - p.x - ok2right - cmdlist2ok, p.y,
+				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// List Edit box
 				GetWindowRect(GetDlgItem(hWnd, IDC_LIST), &rc);
@@ -6083,8 +6049,8 @@ skip:;
 				p.y = rc.top;
 				ScreenToClient(hWnd, &p);
 				SetWindowPos(GetDlgItem(hWnd, IDC_LIST), 0,
-							 0, 0, dlg_w - p.x - list2right , dlg_h - p.y - list2bottom,
-							 SWP_NOMOVE | SWP_NOZORDER);
+				             0, 0, dlg_w - p.x - list2right , dlg_h - p.y - list2bottom,
+				             SWP_NOMOVE | SWP_NOZORDER);
 
 				// status bar
 				SendMessage(hStatus , msg , wp , lp);
@@ -6229,8 +6195,6 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 
 	return 1; // 送信できた場合は1を返す
 }
-
-
 
 void CVTWindow::OnControlOpenTEK()
 {
