@@ -5615,11 +5615,6 @@ void SendAllBroadcastMessage(HWND HVTWin, HWND hWnd, int parent_only, char *buf,
 
 		// WM_COPYDATAを使って、プロセス間通信を行う。
 		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
-
-		// 送信先Tera Termウィンドウに適当なメッセージを送る。
-		// これをしないと、送り込んだデータが反映されない模様。
-		// (2006.2.7 yutaka)
-		PostMessage(hd, WM_SETFOCUS, NULL, 0);
 	}
 }
 
@@ -5670,11 +5665,6 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 
 		// WM_COPYDATAを使って、プロセス間通信を行う。
 		SendMessage(hd, WM_COPYDATA, (WPARAM)HVTWin, (LPARAM)&cds);
-
-		// 送信先Tera Termウィンドウに適当なメッセージを送る。
-		// これをしないと、送り込んだデータが反映されない模様。
-		// (2006.2.7 yutaka)
-		PostMessage(hd, WM_SETFOCUS, NULL, 0);
 	}
 
 error:
@@ -6192,6 +6182,13 @@ LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
 			CBSend();
 		}
 	}
+
+	// CBStartSend(), CBSend() では送信用バッファにデータを書き込むだけで、
+	// 実際の送信は teraterm.cpp:OnIdle() で CommSend() が呼ばれる事に
+	// よって行われる。
+	// しかし非アクティブなウィンドウでは OnIdle() が呼ばれないので、
+	// 空のメッセージを送って OnIdle() が呼ばれるようにする。
+	PostMessage(WM_NULL, 0, 0);
 
 	return 1; // 送信できた場合は1を返す
 }
