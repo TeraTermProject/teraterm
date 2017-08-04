@@ -4080,6 +4080,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 	return 0;
 }
 
+// sendbroadcast / sendlnbroadcast の二つから利用 (crlfの値で動作を変える)
 static WORD TTLSendBroadcast(BOOL crlf)
 {
 	TStrVal buf;
@@ -4095,7 +4096,6 @@ static WORD TTLSendBroadcast(BOOL crlf)
 	return SendCmnd(CmdSendBroadcast, 0);
 }
 
-// "setmulticastname"コマンド (2009.3.5 yutaka)
 WORD TTLSetMulticastName()
 {
 	TStrVal Str;
@@ -4109,8 +4109,8 @@ WORD TTLSetMulticastName()
 	return SendCmnd(CmdSetMulticastName, 0);
 }
 
-// "sendmulticast"コマンド (2009.3.5 yutaka)
-WORD TTLSendMulticast()
+// sendmulticast / sendlnmulticast の二つから利用 (crlfの値で動作を変える)
+WORD TTLSendMulticast(BOOL crlf)
 {
 	TStrVal buf, Str;
 	WORD Err;
@@ -4124,7 +4124,7 @@ WORD TTLSendMulticast()
 	if (Err!=0) return Err;
 	SetFile(Str);
 
-	if ((Err = GetBroadcastString(buf, MaxStrLen, FALSE)) != 0)
+	if ((Err = GetBroadcastString(buf, MaxStrLen, crlf)) != 0)
 		return Err;
 
 	SetSecondFile(buf);
@@ -6209,8 +6209,10 @@ int ExecCmnd()
 			Err = TTLSendBroadcast(FALSE); break;
 		case RsvSendlnBroadcast:
 			Err = TTLSendBroadcast(TRUE); break;
+		case RsvSendlnMulticast:
+			Err = TTLSendMulticast(TRUE); break;
 		case RsvSendMulticast:
-			Err = TTLSendMulticast(); break;
+			Err = TTLSendMulticast(FALSE); break;
 		case RsvSetMulticastName:
 			Err = TTLSetMulticastName(); break;
 		case RsvSendFile:

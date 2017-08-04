@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>sendlnmulticast</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendlnmulticast</h1>
+
+<p>
+Multicast the data with new-line.
+</p>
+
+<pre class="macro-syntax">
+sendlnmulticast &lt;multicastname&gt; &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>Remarks</h2>
+
+<p>
+Causes Tera Term to multicast characters followed by a new-line character to selected terminals, and then the data is sent to the host.<br>
+Format of &lt;data&gt; is the same as the "<a href="sendmulticast.html">sendmulticast</a>" command.
+</p>
+
+<h2>Example</h2>
+
+<pre class="macro-example">
+mcastname = "multicast-test"
+
+connect "server-a"
+setmulticastname mcastname
+
+unlink
+
+connect "server-b"
+setmulticastname mcastname
+
+sendlnmulticast mcastname "ls -l"
+</pre>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="sendmulticast.html">sendmulticast</a></li>
+  <li><a href="setmulticastname.html">setmulticastname</a></li>
+</ul>
+
+
+</body>
+</html>

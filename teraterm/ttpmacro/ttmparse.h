@@ -232,6 +232,7 @@
 #define RsvFileUnLock   154
 #define RsvContinue     155
 #define RsvRegexOption  156
+#define RsvSendlnMulticast 157
 
 #define RsvSetDebug     175
 #define RsvYmodemRecv   176

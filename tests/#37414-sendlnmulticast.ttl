@@ -1,0 +1,27 @@
+mcast = "multicast-test"
+
+for i 1 3
+	call opentt
+	unlink
+next
+
+call opentt
+
+callmenu 50814
+
+sendlnmulticast mcast "date"
+
+pause 1
+
+sendlnmulticast mcast "echo 1" "echo 2" "echo 3"
+
+pause 5
+
+sendlnmulticast mcast "exit"
+end
+
+:opentt
+	cygconnect
+	wait "%" "$" "#"
+	setmulticastname mcast
+	return

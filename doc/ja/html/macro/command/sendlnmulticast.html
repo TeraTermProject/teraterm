@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+  <title>sendlnmulticast</title>
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <link rel="stylesheet" href="../../style.css" type="text/css">
+</head>
+
+<body>
+
+
+<h1>sendlnmulticast</h1>
+
+<p>
+データと改行をマルチキャスト送信する。
+</p>
+
+<pre class="macro-syntax">
+sendlnmulticast &lt;multicastname&gt; &lt;data1&gt; &lt;data2&gt;....
+</pre>
+
+<h2>解説</h2>
+
+<p>
+文字列とそれに続く改行文字を、指定した端末にマルチキャスト送信する。<br>
+&lt;data&gt; の形式は、<a href="sendmulticast.html">"sendmulticast"</a>コマンドと同じ。
+</p>
+
+<h2>例</h2>
+
+<pre class="macro-example">
+mcastname = "multicast-test"
+
+connect "server-a"
+setmulticastname mcastname
+
+unlink
+
+connect "server-b"
+setmulticastname mcastname
+
+sendlnmulticast mcastname "ls -l"
+</pre>
+
+<h2>参照</h2>
+<ul>
+  <li><a href="sendmulticast.html">sendmulticast</a></li>
+  <li><a href="setmulticastname.html">setmulticastname</a></li>
+</ul>
+
+</body>
+</html>
