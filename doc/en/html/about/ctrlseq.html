@@ -213,7 +213,7 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
 <i>Ps</i> = 5      Requests the terminal's operation status report. Always returns "CSI 0 n" (Terminal ready).
             Response: CSI <i>s</i> n
             <i>s</i> = 0    Terminal ready.
-   = 6      Requests cursor position report.
+   = 6      Requests cursor position report. (CPR)
             Response: CSI <i>r</i> ; <i>c</i> R
               <i>r</i>    Line number.
               <i>c</i>    Column number.
