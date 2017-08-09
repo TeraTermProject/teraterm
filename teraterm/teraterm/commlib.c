@@ -537,15 +537,15 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				switch (err) {
 				case ERROR_FILE_NOT_FOUND:
 					get_lang_msg("MSG_CANTOPEN_ERROR_NOTFOUND", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Not found.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
 					break;
 				case ERROR_ACCESS_DENIED:
 					get_lang_msg("MSG_CANTOPEN_ERROR_DENIED", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Access denied.", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
 					break;
 				default:
 					get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. (0x%08x)", ts->UILanguageFile);
-					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4], err);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P, err);
 					break;
 				}
 
