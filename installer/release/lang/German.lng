@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-07-11)
+; Updated by TeraTerm Project (2017-08-09)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -289,7 +289,9 @@ DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
 ; commonlib.c
 MSG_WINSOCK_ERROR=Kann Winsock nicht verwenden
 MSG_INVALID_HOST_ERROR=Falscher Hostname
-MSG_CANTOPEN_ERROR=Kann %s nicht öffnen
+MSG_CANTOPEN_ERROR=Kann %s nicht öffnen (0x%08x)
+MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
+MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied
 MSG_CANTOPEN_FILE_ERROR=Kann Datei nicht öffnen
 MSG_COMM_REFUSE_ERROR=Verbindung ist abgebrochen worden
 MSG_COMM_REACH_ERROR=Netzwerk ist nicht erreichbar

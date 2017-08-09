@@ -447,13 +447,25 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			strncpy_s(ErrMsg, sizeof(ErrMsg),P, _TRUNCATE);
 			strncpy_s(P, sizeof(P),"\\\\.\\", _TRUNCATE);
 			strncat_s(P, sizeof(P),ErrMsg, _TRUNCATE);
-			cv->ComID =
-			PCreateFile(P,GENERIC_READ | GENERIC_WRITE,
-			            0,NULL,OPEN_EXISTING,
-			            FILE_FLAG_OVERLAPPED,NULL);
+			cv->ComID = PCreateFile(P, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+			                        OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
-				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+				DWORD err = GetLastError();
+
+				switch (err) {
+				case ERROR_FILE_NOT_FOUND:
+					get_lang_msg("MSG_CANTOPEN_ERROR_NOTFOUND", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Not found.", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+					break;
+				case ERROR_ACCESS_DENIED:
+					get_lang_msg("MSG_CANTOPEN_ERROR_DENIED", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Access denied.", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+					break;
+				default:
+					get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. (0x%08x)", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4], err);
+					break;
+				}
 
 				if (cv->NoMsg==0) {
 					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
@@ -480,8 +492,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 		case IdFile:
 			InitFileIO(IdFile);  /* TTPLUG */
 			TTXOpenFile(); /* TTPLUG */
-			cv->ComID = PCreateFile(ts->HostName,GENERIC_READ,0,NULL,
-			                        OPEN_EXISTING,0,NULL);
+			cv->ComID = PCreateFile(ts->HostName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 			InvalidHost = (cv->ComID == INVALID_HANDLE_VALUE);
 			if (InvalidHost) {
 				if (cv->NoMsg==0) {
@@ -517,14 +528,26 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 				break;
 			}
 
-			cv->ComID =
-			PCreateFile(P,GENERIC_READ | GENERIC_WRITE,
-			            0,NULL,OPEN_EXISTING,
-			            0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
-						NULL);
+			cv->ComID = PCreateFile(P, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+			                        0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
+			                        NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
-				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+				DWORD err = GetLastError();
+
+				switch (err) {
+				case ERROR_FILE_NOT_FOUND:
+					get_lang_msg("MSG_CANTOPEN_ERROR_NOTFOUND", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Not found.", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+					break;
+				case ERROR_ACCESS_DENIED:
+					get_lang_msg("MSG_CANTOPEN_ERROR_DENIED", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Access denied.", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
+					break;
+				default:
+					get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. (0x%08x)", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4], err);
+					break;
+				}
 
 				if (cv->NoMsg==0) {
 					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);

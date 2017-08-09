@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-07-11)
+; Updated by TeraTerm Project (2017-08-09)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -289,7 +289,9 @@ DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
 ; commonlib.c
 MSG_WINSOCK_ERROR=윈속을 사용할 수 없습니다
 MSG_INVALID_HOST_ERROR=잘못된 호스트
-MSG_CANTOPEN_ERROR=%s를 열 수 없습니다
+MSG_CANTOPEN_ERROR=%s를 열 수 없습니다 (0x%08x)
+MSG_CANTOPEN_ERROR_NOTFOUND=Cannot open %s. Not found.
+MSG_CANTOPEN_ERROR_DENIED=Cannot open %s. Access denied
 MSG_CANTOPEN_FILE_ERROR=파일을 열 수 없습니다
 MSG_COMM_REFUSE_ERROR=연결이 거부됐습니다
 MSG_COMM_REACH_ERROR=네트웍크에 연결할 수 없습니다

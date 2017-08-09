@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-07-11)
+; Updated by TeraTerm Project (2017-08-09)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -288,7 +288,9 @@ DLG_SETUPDIR_OPENFILE_ERROR=ファイルが開けません(%d)
 ; commonlib.c
 MSG_WINSOCK_ERROR=Winsock が使えません
 MSG_INVALID_HOST_ERROR=無効なホスト
-MSG_CANTOPEN_ERROR=%sが開けません
+MSG_CANTOPEN_ERROR=%sが開けません (0x%08x)
+MSG_CANTOPEN_ERROR_NOTFOUND=%sが見つかりません。
+MSG_CANTOPEN_ERROR_DENIED=%sへのアクセスが拒否されました。
 MSG_CANTOPEN_FILE_ERROR=ファイルが開けません
 MSG_COMM_REFUSE_ERROR=接続が拒否されました
 MSG_COMM_REACH_ERROR=ネットワークに到達できません
