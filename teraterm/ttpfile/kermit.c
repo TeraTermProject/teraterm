@@ -1010,7 +1010,7 @@ BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
 		if (! fv->NoMsg)
 		{
 			get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
-			get_lang_msg("MSG_CANTOEPN_FILE_ERROR", uimsg, sizeof(uimsg), "Cannot open file", UILanguageFile);
+			get_lang_msg("MSG_CANTOPEN_FILE_ERROR", uimsg, sizeof(uimsg), "Cannot open file", UILanguageFile);
 			MessageBox(fv->HWin,uimsg,uimsg,MB_ICONEXCLAMATION);
 		}
 		return FALSE;

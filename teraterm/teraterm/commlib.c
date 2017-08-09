@@ -452,7 +452,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			            0,NULL,OPEN_EXISTING,
 			            FILE_FLAG_OVERLAPPED,NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				get_lang_msg("MSG_CANTOEPN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
+				get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
 				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
 
 				if (cv->NoMsg==0) {
@@ -486,7 +486,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			if (InvalidHost) {
 				if (cv->NoMsg==0) {
 					get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts->UILanguageFile);
-					get_lang_msg("MSG_CANTOEPN_FILE_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open file", ts->UILanguageFile);
+					get_lang_msg("MSG_CANTOPEN_FILE_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open file", ts->UILanguageFile);
 					MessageBox(cv->HWin,ts->UIMsg,uimsg,MB_TASKMODAL | MB_ICONEXCLAMATION);
 				}
 			}
@@ -523,7 +523,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 			            0,  // ブロッキングモードにする(FILE_FLAG_OVERLAPPED は指定しない)
 						NULL);
 			if (cv->ComID == INVALID_HANDLE_VALUE ) {
-				get_lang_msg("MSG_CANTOEPN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
+				get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s", ts->UILanguageFile);
 				_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, &P[4]);
 
 				if (cv->NoMsg==0) {

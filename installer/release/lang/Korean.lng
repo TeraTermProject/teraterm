@@ -289,8 +289,8 @@ DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
 ; commonlib.c
 MSG_WINSOCK_ERROR=윈속을 사용할 수 없습니다
 MSG_INVALID_HOST_ERROR=잘못된 호스트
-MSG_CANTOEPN_ERROR=%s를 열 수 없습니다
-MSG_CANTOEPN_FILE_ERROR=파일을 열 수 없습니다
+MSG_CANTOPEN_ERROR=%s를 열 수 없습니다
+MSG_CANTOPEN_FILE_ERROR=파일을 열 수 없습니다
 MSG_COMM_REFUSE_ERROR=연결이 거부됐습니다
 MSG_COMM_REACH_ERROR=네트웍크에 연결할 수 없습니다
 MSG_COMM_TIMEOUT_ERROR=연결시간 초과

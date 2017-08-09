@@ -289,8 +289,8 @@ DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
 ; commonlib.c
 MSG_WINSOCK_ERROR=Kann Winsock nicht verwenden
 MSG_INVALID_HOST_ERROR=Falscher Hostname
-MSG_CANTOEPN_ERROR=Kann %s nicht öffnen
-MSG_CANTOEPN_FILE_ERROR=Kann Datei nicht öffnen
+MSG_CANTOPEN_ERROR=Kann %s nicht öffnen
+MSG_CANTOPEN_FILE_ERROR=Kann Datei nicht öffnen
 MSG_COMM_REFUSE_ERROR=Verbindung ist abgebrochen worden
 MSG_COMM_REACH_ERROR=Netzwerk ist nicht erreichbar
 MSG_COMM_TIMEOUT_ERROR=Timeout der Verbindung
