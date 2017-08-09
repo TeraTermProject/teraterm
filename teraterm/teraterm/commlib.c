@@ -543,6 +543,10 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 					get_lang_msg("MSG_CANTOPEN_ERROR_DENIED", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Access denied.", ts->UILanguageFile);
 					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
 					break;
+				case ERROR_PIPE_BUSY:
+					get_lang_msg("MSG_CANTOPEN_ERROR_PIPEBUSY", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. Pipe is busy.", ts->UILanguageFile);
+					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P);
+					break;
 				default:
 					get_lang_msg("MSG_CANTOPEN_ERROR", ts->UIMsg, sizeof(ts->UIMsg), "Cannot open %s. (0x%08x)", ts->UILanguageFile);
 					_snprintf_s(ErrMsg, sizeof(ErrMsg), _TRUNCATE, ts->UIMsg, P, err);
