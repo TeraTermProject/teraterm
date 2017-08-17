@@ -4064,18 +4064,9 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 		else {
 			break;
 		}
-		if (crlf) {
-			/*
-			 * 検討事項:
-			 *
-			 * 1. crlf が TRUE 時に送るのが "\n" なのは妥当?
-			 *    sendln では 0x0A 0x0D ("\r\n") を送っている
-			 *
-			 * 2. パラメータ一つ毎に改行しているのは妥当?
-			 *    sendln ではすべてのパラメータを送った後に改行している
-			 */
-			strncat_s(buff, bufflen, "\n", _TRUNCATE);
-		}
+	}
+	if (crlf) {
+		strncat_s(buff, bufflen, "\r\n", _TRUNCATE);
 	}
 	return 0;
 }
