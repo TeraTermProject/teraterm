@@ -1987,7 +1987,7 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], msg[MAX_UIMSG];
 
 	/* version */
-	ret = WritePrivateProfileString(Section, "Version", "2.3", FName);
+	ret = WritePrivateProfileString(Section, "Version", TT_VERSION_STR("."), FName);
 	if (ret == 0) {
 		// iniファイルの書き込みに失敗したら、エラーメッセージを表示する。(2012.10.18 yutaka)
 		ret = GetLastError();
