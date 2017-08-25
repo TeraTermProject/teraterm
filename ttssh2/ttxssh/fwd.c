@@ -1163,7 +1163,9 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 {
 	FWDRequestSpec *new_specs =
 		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
+	FWDRequestSpec *server_listening_specs = pvar->fwd_state.server_listening_specs;
 	char *specs_accounted_for;
+	char *listening_specs_remain_for = NULL;
 	typedef struct _saved_sockets {
 		SOCKET *listening_sockets;
 		int num_listening_sockets;
@@ -1173,6 +1175,9 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	int num_new_requests = num_specs;
 	int num_free_requests = 0;
 	int free_request = 0;
+	int num_new_listening = 0;
+	int num_cur_listening = pvar->fwd_state.num_server_listening_specs;
+	int x11_listening = -1;
 	BOOL report_err = TRUE;
 
 	memcpy(new_specs, specs, sizeof(FWDRequestSpec) * num_specs);
@@ -1216,10 +1221,10 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 			logprintf(150, __FUNCTION__ ":   #%d: %s", i, dump_fwdspec(new_specs+i, 0));
 		}
 
-		logprintf(150, __FUNCTION__ ": listening specs: %d", pvar->fwd_state.num_server_listening_specs);
-		for (i=0; i < pvar->fwd_state.num_server_listening_specs; i++) {
+		logprintf(150, __FUNCTION__ ": listening specs: %d", num_cur_listening);
+		for (i=0; i < num_cur_listening; i++) {
 			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
-				dump_fwdspec(&pvar->fwd_state.server_listening_specs[i], 0));
+				dump_fwdspec(&server_listening_specs[i], 0));
 		}
 	}
 
@@ -1278,6 +1283,11 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 		pvar->fwd_state.num_requests = total_requests;
 	}
 
+	if (num_cur_listening > 0) {
+		listening_specs_remain_for = (char *) malloc(sizeof(char) * num_cur_listening);
+		memset(listening_specs_remain_for, 0, num_cur_listening);
+	}
+
 	for (i = 0; i < num_specs; i++) {
 		if (!specs_accounted_for[i]) {
 			while ((pvar->fwd_state.requests[free_request].status & FWD_DELETED) == 0
@@ -1296,6 +1306,62 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 
 			free_request++;
 		}
+
+		// 更新後もサーバ側で listen し続けるかのマーク付け
+		if (new_specs[i].type == FWD_REMOTE_TO_LOCAL) {
+			if (num_cur_listening > 0) {
+				FWDRequestSpec *listening_spec =
+					bsearch(&new_specs[i], server_listening_specs, num_specs, sizeof(FWDRequestSpec), FWD_compare_specs);
+				if (listening_spec != NULL) {
+					listening_specs_remain_for[listening_spec - server_listening_specs] = 1;
+				}
+			}
+			num_new_listening++;
+		}
+	}
+
+	for (i = 0; i < num_cur_listening; i++) {
+		FWDRequestSpec *lspec = &server_listening_specs[i];
+		if (lspec->type == FWD_REMOTE_X11_TO_LOCAL) {
+			// X11 転送はキャンセルできないので、そのまま引き継ぐ
+			// 引き継ぐ為に場所を覚えておく
+			x11_listening = i;
+			num_new_listening++;
+		}
+		else if (!listening_specs_remain_for[i]) {
+			SSH_cancel_request_forwarding(pvar, lspec->bind_address, lspec->from_port, 0);
+		}
+	}
+
+	if (x11_listening > 0) {
+		// X11 転送が有った場合は先頭に移動する (reallocで消されないようにする為)
+		server_listening_specs[0] = server_listening_specs[x11_listening];
+	}
+
+	if (num_new_listening > 0) {
+		if (num_cur_listening >= 0)  {
+			server_listening_specs = realloc(server_listening_specs, sizeof(FWDRequestSpec) * num_new_listening);
+			if (server_listening_specs) {
+				FWDRequestSpec *dst = server_listening_specs;
+				if (x11_listening >= 0) {
+					dst++;
+				}
+				for (i=0; i < num_specs; i++) {
+					if (new_specs[i].type == FWD_REMOTE_TO_LOCAL) {
+						*dst = new_specs[i];
+						dst++;
+					}
+				}
+				qsort(server_listening_specs, num_new_listening, sizeof(FWDRequestSpec), FWD_compare_specs);
+				pvar->fwd_state.server_listening_specs = server_listening_specs;
+				pvar->fwd_state.num_server_listening_specs = num_new_listening;
+			}
+		}
+	}
+	else if (num_cur_listening > 0) {
+		free(server_listening_specs);
+		pvar->fwd_state.server_listening_specs = NULL;
+		pvar->fwd_state.num_server_listening_specs = 0;
 	}
 
 	if (LogLevel(pvar, 150)) {
@@ -1304,10 +1370,15 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
 				dump_fwdspec(&pvar->fwd_state.requests[i].spec, pvar->fwd_state.requests[i].status));
 		}
+		logprintf(150, __FUNCTION__ ": new listening specs: %d", pvar->fwd_state.num_server_listening_specs);
+		for (i=0; i < pvar->fwd_state.num_server_listening_specs; i++) {
+			logprintf(150, __FUNCTION__ ":   #%d: %s", i,
+				dump_fwdspec(&pvar->fwd_state.server_listening_specs[i], 0));
+		}
 	}
 
-
 	free(ptr_to_saved_sockets);
+	free(listening_specs_remain_for);
 	free(specs_accounted_for);
 	free(new_specs);
 }
