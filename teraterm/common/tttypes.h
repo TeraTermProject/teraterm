@@ -362,10 +362,6 @@ typedef struct {
 } eterm_lookfeel_t;
 
 /* TTTSet */
-//
-// NOTE: ‰º‹L‚ÌƒGƒ‰[‚ª‚Å‚é‚±‚Æ‚ª‚ ‚é
-//   fatal error C1001: INTERNAL COMPILER ERROR (compiler file 'msc1.cpp', line 2701)
-// 
 struct tttset {
 /*------ VTSet --------*/
 	/* Tera Term home directory */
