@@ -1973,13 +1973,29 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->ISO2022Flag = ISO2022_SHIFT_NONE;
 	for (i=1; GetNthString(Temp, i, sizeof(Temp2), Temp2); i++) {
 		BOOL add=TRUE;
-		char *p = Temp2;
+		char *p = Temp2, *p2;
 		int mask = 0;
+
+		while (*p == ' ' || *p == '\t') {
+			p++;
+		}
+		p2 = p + strlen(p);
+		while (p2 > p) {
+			p2--;
+			if (*p2 != ' ' && *p2 != '\t') {
+				break;
+			}
+		}
+		*++p2 = 0;
 
 		if (*p == '-') {
 			p++;
 			add=FALSE;
 		}
+		else if (*p == '+') {
+			p++;
+		}
+
 		if (_stricmp(p, "on") == 0 || _stricmp(p, "all") == 0)
 			ts->ISO2022Flag = ISO2022_SHIFT_ALL;
 		else if (_stricmp(p, "off") == 0 || _stricmp(p, "none") == 0)
