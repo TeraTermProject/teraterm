@@ -1968,8 +1968,8 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	// List Inactive Font
 	ts->ListHiddenFonts = GetOnOff(Section, "ListHiddenFonts", FName, FALSE);
 
-	// ISO2022ShiftCharacter
-	GetPrivateProfileString(Section, "ISO2022ShiftCharacter", "on", Temp, sizeof(Temp), FName);
+	// ISO2022ShiftFunction
+	GetPrivateProfileString(Section, "ISO2022ShiftFunction", "on", Temp, sizeof(Temp), FName);
 	ts->ISO2022Flag = ISO2022_SHIFT_NONE;
 	for (i=1; GetNthString(Temp, i, sizeof(Temp2), Temp2); i++) {
 		BOOL add=TRUE;
@@ -3287,7 +3287,7 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	// List Inactive Font
 	WriteOnOff(Section, "ListHiddenFonts", FName, ts->ListHiddenFonts);
 
-	// ISO2022ShiftCharacter
+	// ISO2022ShiftFunction
 	if (ts->ISO2022Flag == ISO2022_SHIFT_ALL) {
 		strncpy_s(Temp, sizeof(Temp), "on", _TRUNCATE);
 	}
@@ -3329,7 +3329,7 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 			Temp[i-1] = 0;
 		}
 	}
-	WritePrivateProfileString(Section, "ISO2022ShiftCharacter", Temp, FName);
+	WritePrivateProfileString(Section, "ISO2022ShiftFunction", Temp, FName);
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);
