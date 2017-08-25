@@ -1093,6 +1093,21 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 		}
 		freeaddrinfo(res0);
 	}
+	else if (request->spec.type == FWD_REMOTE_TO_LOCAL) {
+		if (SSHv2(pvar)) {
+			FWDRequestSpec *listener =
+				bsearch(&request->spec, pvar->fwd_state.server_listening_specs,
+					pvar->fwd_state.num_server_listening_specs,
+				        sizeof(FWDRequestSpec), FWD_compare_specs);
+			if (listener == NULL) {
+				SSH_request_forwarding(pvar,
+				                       request->spec.bind_address,
+				                       request->spec.from_port,
+				                       request->spec.to_host,
+				                       request->spec.to_port);
+			}
+		}
+	}
 
 	return TRUE;
 }
