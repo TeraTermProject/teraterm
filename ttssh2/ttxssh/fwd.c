@@ -917,7 +917,7 @@ static BOOL can_server_listen_using(FWDRequestSpec *listener,
  * ポート転送を有効に出来るかの判定関数。
  * shell / subsystem 開始前はすべて有効にできる (TRUEを返す)。
  * 開始後は以下の転送タイプは追加不可 (すでに開始されている転送設定のみTRUEを返す)
- * - RtoL転送
+ * - SSH1接続時のRtoL転送 (SSH2は追加可能)
  * - X11転送
  */
 BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec)
@@ -934,6 +934,11 @@ BOOL FWD_can_server_listen_for(PTInstVar pvar, FWDRequestSpec *spec)
 	case FWD_LOCAL_TO_REMOTE:
 	case FWD_LOCAL_DYNAMIC:
 		return TRUE;
+	case FWD_REMOTE_TO_LOCAL:
+		if (SSHv2(pvar)) {
+			return TRUE;
+		}
+		// FALLTHROUGH
 	default:
 		listener =
 			bsearch(spec, pvar->fwd_state.server_listening_specs,
