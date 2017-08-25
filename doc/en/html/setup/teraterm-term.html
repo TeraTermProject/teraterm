@@ -489,5 +489,63 @@ Default:
 MaxOSCBufferSize=4096
 </pre>
 
+<h1><a name="ISO2022ShiftFunction">Disabling ISO/IEC 2022 shift function</a></h1>
+
+<!--
+<p>
+ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
+</p>
+
+<pre>
+ISO2022ShiftFunction=off
+</pre>
+
+<p>
+また、ISO/IEC 2022のシフト機能の内、特定のもののみを禁止する事も出来ます。以下のシフト機能の内、<strong>許可する</strong>機能の略号の組み合わせを指定します。
+</p>
+
+<table>
+<tr><th>Mnemonic</th> <th>Code</th><th>Description</th></tr>
+<tr><td>SI</td>   <td>0x0F</td>  <td>Maps G1 character set into GR.</td></tr>
+<tr><td>SO</td>   <td>0x0E</td>  <td>Maps G1 character set into GL.</td></tr>
+<tr><td>LS2</td>  <td>ESC n</td> <td>Maps G2 character set into GL.</td></tr>
+<tr><td>LS3</td>  <td>ESC o</td> <td>Maps G3 character set into GL.</td></tr>
+<tr><td>LS1R</td> <td>ESC ~</td> <td>Maps G1 character set into GR.</td></tr>
+<tr><td>LS2R</td> <td>ESC }</td> <td>Maps G2 character set into GR.</td></tr>
+<tr><td>LS3R</td> <td>ESC |</td> <td>Maps G3 character set into GR.</td></tr>
+<tr><td>SS2</td>  <td>0x8E / ESC N</td> <td>Temporarily maps the G2 character set into GL or GR, for the next graphic character.</td></tr>
+<tr><td>SS3</td>  <td>0x8F / ESC O</td> <td>Temporarily maps the G3 character set into GL or GR, for the next graphic character.</td></tr>
+<tr><td>ALL</td>  <td> - </td> <td>All of the above</td>
+<tr><td>NONE</td>  <td> - </td> <td>Nothing</td>
+</table>
+
+<p>
+例えば、Shift-In(SI), Shift-Out(SO) のみを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
+</p>
+
+<pre>
+ISO2022ShiftFunction=LS2,LS3,LS1R,LS2R,LS3R,SS2,SS3
+</pre>
+
+<p>
+また、略号の前に - を付ける事によって指定したシフト機能を無効にする事ができます。前述の Shift-In(SI), Shift-Out(SO) のみ
+を禁止する設定は、以下のようにも指定できます。
+</p>
+
+<pre>
+ISO2022ShiftFunction=ALL,-SI,-SO
+</pre>
+
+<p>
+注: この形式で指定した場合、設定の保存を行うと使用する機能のみのリストに置き換えられます。
+</p>
+-->
+
+<pre>
+Default:
+ISO2022ShiftFunction=on
+</pre>
+
+
 </BODY>
 </HTML>

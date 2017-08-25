@@ -556,5 +556,61 @@ MaxOSCBufferSize=16000
 MaxOSCBufferSize=4096
 </pre>
 
+
+<h1><a name="ISO2022ShiftFunction">ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止する</a></h1>
+
+<p>
+ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
+</p>
+
+<pre>
+ISO2022ShiftFunction=off
+</pre>
+
+<p>
+また、ISO/IEC 2022のシフト機能の内、特定のもののみを禁止する事も出来ます。以下のシフト機能の内、<strong>許可する</strong>機能の略号の組み合わせを指定します。
+</p>
+
+<table>
+<tr><th>略号</th> <th>コード</th><th>説明</th></tr>
+<tr><td>SI</td>   <td>0x0F</td>  <td>GL へ G0 を呼び出す</td></tr>
+<tr><td>SO</td>   <td>0x0E</td>  <td>GL へ G1 を呼び出す</td></tr>
+<tr><td>LS2</td>  <td>ESC n</td> <td>GL へ G2 を呼び出す</td></tr>
+<tr><td>LS3</td>  <td>ESC o</td> <td>GL へ G3 を呼び出す</td></tr>
+<tr><td>LS1R</td> <td>ESC ~</td> <td>GR へ G1 を呼び出す</td></tr>
+<tr><td>LS2R</td> <td>ESC }</td> <td>GR へ G2 を呼び出す</td></tr>
+<tr><td>LS3R</td> <td>ESC |</td> <td>GR へ G3 を呼び出す</td></tr>
+<tr><td>SS2</td>  <td>0x8E / ESC N</td> <td>GL または GR へ G2 を次の一文字に限り呼び出す</td></tr>
+<tr><td>SS3</td>  <td>0x8F / ESC O</td> <td>GL または GR へ G3 を次の一文字に限り呼び出す</td></tr>
+<tr><td>ALL</td>  <td> - </td> <td>上記すべて</td>
+<tr><td>NONE</td>  <td> - </td> <td>なし</td>
+</table>
+
+<p>
+例えば、Shift-In(SI), Shift-Out(SO) のみを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
+</p>
+
+<pre>
+ISO2022ShiftFunction=LS2,LS3,LS1R,LS2R,LS3R,SS2,SS3
+</pre>
+
+<p>
+また、略号の前に - を付ける事によって指定したシフト機能を無効にする事ができます。前述の Shift-In(SI), Shift-Out(SO) のみを禁止する設定は、以下のようにも指定できます。
+</p>
+
+<pre>
+ISO2022ShiftFunction=ALL,-SI,-SO
+</pre>
+
+<p>
+注: この形式で指定した場合、設定の保存を行うと使用する機能のみのリストに置き換えられます。
+</p>
+
+<pre>
+省略時:
+ISO2022ShiftFunction=on
+</pre>
+
+
 </BODY>
 </HTML>
