@@ -1034,10 +1034,8 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 		char pname[NI_MAXSERV];
 		char bname[NI_MAXHOST];
 
-		_snprintf_s(pname, sizeof(pname), _TRUNCATE,
-		            "%d", request->spec.from_port);
-		_snprintf_s(bname, sizeof(bname), _TRUNCATE,
-		            "%s", request->spec.bind_address);
+		_snprintf_s(pname, sizeof(pname), _TRUNCATE, "%d", request->spec.from_port);
+		_snprintf_s(bname, sizeof(bname), _TRUNCATE, "%s", request->spec.bind_address);
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_UNSPEC;	/* a user will be able to specify protocol in future version */
 		hints.ai_flags = AI_PASSIVE;
@@ -1067,10 +1065,9 @@ static BOOL interactive_init_request(PTInstVar pvar, int request_num,
 				s = INVALID_SOCKET;
 				continue;
 			}
-			if (WSAAsyncSelect
-				(s, make_accept_wnd(pvar), WM_SOCK_ACCEPT,
-				 FD_ACCEPT | FD_READ | FD_CLOSE | FD_WRITE
-				) == SOCKET_ERROR) {
+			if (WSAAsyncSelect(s, make_accept_wnd(pvar), WM_SOCK_ACCEPT,
+			                   FD_ACCEPT | FD_READ | FD_CLOSE | FD_WRITE) == SOCKET_ERROR)
+			{
 				s = INVALID_SOCKET;
 				continue;
 			}
@@ -1132,8 +1129,7 @@ static BOOL init_request(PTInstVar pvar, int request_num,
 			request->listening_sockets = listening_sockets;
 			return TRUE;
 		} else {
-			return interactive_init_request(pvar, request_num,
-											report_error);
+			return interactive_init_request(pvar, request_num, report_error);
 		}
 	} else {
 		assert(listening_sockets == NULL);
@@ -1185,7 +1181,8 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 	for (i = 0; i < num_specs - 1; i++) {
 		if (FWD_compare_specs(new_specs + i, new_specs + i + 1) == 0) {
 			UTIL_get_lang_msg("MSG_FWD_DUPLICATE_ERROR", pvar,
-			                  "TTSSH INTERNAL ERROR: Could not set port forwards because duplicate type/port requests were found");
+			                  "TTSSH INTERNAL ERROR: Could not set port forwards "
+			                  "because duplicate type/port requests were found");
 			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 			free(new_specs);
 			return;
@@ -1194,8 +1191,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 
 	specs_accounted_for = (char *) malloc(sizeof(char) * num_specs);
 	ptr_to_saved_sockets =
-		(saved_sockets_t *) malloc(sizeof(saved_sockets_t) *
-		                               num_specs);
+		(saved_sockets_t *) malloc(sizeof(saved_sockets_t) * num_specs);
 
 	memset(specs_accounted_for, 0, num_specs);
 	for (i = 0; i < num_specs; i++) {
@@ -1274,8 +1270,7 @@ void FWD_set_request_specs(PTInstVar pvar, FWDRequestSpec *specs, int num_specs)
 
 		pvar->fwd_state.requests =
 			(FWDRequest *) realloc(pvar->fwd_state.requests,
-			                           sizeof(FWDRequest) *
-			                           total_requests);
+			                       sizeof(FWDRequest) * total_requests);
 		for (i = pvar->fwd_state.num_requests; i < total_requests; i++) {
 			pvar->fwd_state.requests[i].status = FWD_DELETED;
 			pvar->fwd_state.requests[i].num_channels = 0;
@@ -1340,14 +1335,12 @@ void FWD_prep_forwarding(PTInstVar pvar)
 
 					pvar->fwd_state.X11_auth_data =
 						X11_load_local_auth_data(screen_num);
-					SSH_request_X11_forwarding(pvar,
-					                           X11_get_spoofed_protocol_name
-					                           (pvar->fwd_state.X11_auth_data),
-					                           X11_get_spoofed_protocol_data
-					                           (pvar->fwd_state.X11_auth_data),
-					                           X11_get_spoofed_protocol_data_len
-					                           (pvar->fwd_state.X11_auth_data),
-					                           screen_num);
+					SSH_request_X11_forwarding(
+						pvar,
+						X11_get_spoofed_protocol_name(pvar->fwd_state.X11_auth_data),
+						X11_get_spoofed_protocol_data(pvar->fwd_state.X11_auth_data),
+						X11_get_spoofed_protocol_data_len(pvar->fwd_state.X11_auth_data),
+						screen_num);
 					num_server_listening_requests++;
 					break;
 				}
@@ -1360,8 +1353,7 @@ void FWD_prep_forwarding(PTInstVar pvar)
 
 	if (num_server_listening_requests > 0) {
 		FWDRequestSpec *server_listening_requests =
-			(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) *
-			                              num_server_listening_requests);
+			(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_server_listening_requests);
 
 		pvar->fwd_state.server_listening_specs = server_listening_requests;
 
@@ -1370,8 +1362,7 @@ void FWD_prep_forwarding(PTInstVar pvar)
 				switch (pvar->fwd_state.requests[i].spec.type) {
 				case FWD_REMOTE_X11_TO_LOCAL:
 				case FWD_REMOTE_TO_LOCAL:
-					*server_listening_requests =
-						pvar->fwd_state.requests[i].spec;
+					*server_listening_requests = pvar->fwd_state.requests[i].spec;
 					server_listening_requests++;
 					break;
 				}
