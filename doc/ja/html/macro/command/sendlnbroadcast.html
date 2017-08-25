@@ -29,13 +29,17 @@ sendlnbroadcast &lt;data1&gt; &lt;data2&gt;....
 </p>
 
 <p>
-※<a href="../../menu/setup-additional.html">AcceptBroadcast</a>が無効の端末では、送信データが破棄されます。
+<a href="../../menu/setup-additional.html">AcceptBroadcast</a>が無効の端末では、送信データが破棄される。
 </p>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-sendlnbroadcast 'timpani' 'flute' 'piccolo'
+; "ABCdefGHI" と改行文字が送られる
+sendlnbroadcast "ABC" "def" "GHI"
+
+; 改行文字のみが送られる
+sendlnbroadcast
 </pre>
 
 </body>

@@ -41,7 +41,11 @@ unlink
 connect "server-b"
 setmulticastname mcastname
 
-sendlnmulticast mcastname "ls -l"
+; "ABCdefGHI" ‚Æ‰üs•¶š‚ª‘—‚ç‚ê‚é
+sendlnmulticast mcastname "ABC" "def" "GHI"
+
+; ‰üs•¶š‚Ì‚İ‚ª‘—‚ç‚ê‚é
+sendlnmulticast mcastname
 </pre>
 
 <h2>QÆ</h2>

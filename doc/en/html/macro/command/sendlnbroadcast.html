@@ -29,13 +29,17 @@ Format of &lt;data&gt; is the same as the "<a href="sendbroadcast.html">sendbroa
 </p>
 
 <p>
-NOTICE: Sent data is ignored on the terminal the <a href="../../menu/setup-additional.html">AcceptBroadcast</a> is disabled.
+Sent data is ignored on the terminal the <a href="../../menu/setup-additional.html">AcceptBroadcast</a> is disabled.
 </p>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-sendlnbroadcast 'timpani' 'flute' 'piccolo'
+; Sends "ABCdefGHI" with a new-line character.
+sendlnbroadcast "ABC" "def" "GHI"
+
+; Only a new-line character is sent.
+sendlnbroadcast
 </pre>
 
 </body>

@@ -41,7 +41,11 @@ unlink
 connect "server-b"
 setmulticastname mcastname
 
-sendlnmulticast mcastname "ls -l"
+; Sends "ABCdefGHI" with a new-line character.
+sendlnmulticast mcastname "ABC" "def" "GHI"
+
+; Only a new-line character is sent.
+sendlnmulticast mcastname
 </pre>
 
 <h2>See also</h2>
