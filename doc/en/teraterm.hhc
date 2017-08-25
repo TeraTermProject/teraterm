@@ -867,6 +867,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="sendlnmulticast">
+					<param name="Local" value="html\macro\command\sendlnmulticast.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="sendmulticast">
 					<param name="Local" value="html\macro\command\sendmulticast.html">
 					<param name="ImageNumber" value="11">

@@ -317,6 +317,7 @@ HlpMacroCommandSendfile=html\macro\command\sendfile.html
 HlpMacroCommandSendkcode=html\macro\command\sendkcode.html
 HlpMacroCommandSendln=html\macro\command\sendln.html
 HlpMacroCommandSendlnbroadcast=html\macro\command\sendlnbroadcast.html
+HlpMacroCommandSendlnmulticast=html\macro\command\sendlnmulticast.html
 HlpMacroCommandSendmulticast=html\macro\command\sendmulticast.html
 HlpMacroCommandSetdate=html\macro\command\setdate.html
 HlpMacroCommandSetdir=html\macro\command\setdir.html
