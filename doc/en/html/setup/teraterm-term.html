@@ -491,9 +491,8 @@ MaxOSCBufferSize=4096
 
 <h1><a name="ISO2022ShiftFunction">Disabling ISO/IEC 2022 shift function</a></h1>
 
-<!--
 <p>
-ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
+When character set switching by ISO/IEC 2022 shift is forbidden, please configure below setting on ISO2022ShiftFunction entry of [Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -501,7 +500,7 @@ ISO2022ShiftFunction=off
 </pre>
 
 <p>
-また、ISO/IEC 2022のシフト機能の内、特定のもののみを禁止する事も出来ます。以下のシフト機能の内、<strong>許可する</strong>機能の略号の組み合わせを指定します。
+Also, specific entry can be disabled into ISO/IEC 2022 shift function. Please specify <strong>accepted</strong> function name's combination into below shift function.
 </p>
 
 <table>
@@ -520,7 +519,7 @@ ISO2022ShiftFunction=off
 </table>
 
 <p>
-例えば、Shift-In(SI), Shift-Out(SO) のみを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
+For example, when Shift-In(SI) and Shift-Out(SO) is disabled, please configure below setting on the ISO2022ShiftFunction entry of [Tera Term] section in the teraterm.ini file.
 </p>
 
 <pre>
@@ -528,8 +527,7 @@ ISO2022ShiftFunction=LS2,LS3,LS1R,LS2R,LS3R,SS2,SS3
 </pre>
 
 <p>
-また、略号の前に - を付ける事によって指定したシフト機能を無効にする事ができます。前述の Shift-In(SI), Shift-Out(SO) のみ
-を禁止する設定は、以下のようにも指定できます。
+Also, when '-' is added in the front of name, specified shift function can be disabled. The above Shift-In(SI) and Shift-Out(SO) is disabled to configure below setting.
 </p>
 
 <pre>
@@ -537,9 +535,8 @@ ISO2022ShiftFunction=ALL,-SI,-SO
 </pre>
 
 <p>
-注: この形式で指定した場合、設定の保存を行うと使用する機能のみのリストに置き換えられます。
+NOTE: When this format is specified, using function is replaced after configure saving.
 </p>
--->
 
 <pre>
 Default:
