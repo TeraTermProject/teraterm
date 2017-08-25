@@ -302,6 +302,22 @@ typedef TCharAttr *PCharAttr;
 #define TABF_TBC        (TABF_TBC0 | TABF_TBC3)
 #define TABF_ALL        (TABF_HTS | TABF_TBC)
 
+// ISO 2022 Shift flags (used in ts.ISO2022Flag)
+#define ISO2022_SHIFT_NONE   0x0000
+#define ISO2022_SI           0x0001
+#define ISO2022_SO           0x0002
+#define ISO2022_LS2          0x0004
+#define ISO2022_LS3          0x0008
+#define ISO2022_LS1R         0x0010
+#define ISO2022_LS2R         0x0020
+#define ISO2022_LS3R         0x0040
+#define ISO2022_SS2          0x0100
+#define ISO2022_SS3          0x0200
+#define ISO2022_LS           (ISO2022_SI | ISO2022_SO | ISO2022_LS2 | ISO2022_LS3)
+#define ISO2022_LSR          (ISO2022_LS1R | ISO2022_LS2R | ISO2022_LS3R)
+#define ISO2022_SS           (ISO2022_SS2 | ISO2022_SS3)
+#define ISO2022_SHIFT_ALL    (ISO2022_LS | ISO2022_LSR | ISO2022_SS)
+
 // Control Sequence flags (used in ts.CtrlFlag)
 #define CSF_CBWRITE     1
 #define CSF_CBREAD      2
@@ -589,7 +605,7 @@ struct tttset {
 	WORD DisableMenuDuplicateSession;
 	WORD DisableMenuNewConnection;
 	char TerminalUID[9];
-	WORD EnableSOSI;
+	WORD ISO2022Flag;
 	WORD JumpList;
 	WORD TabStopFlag;
 	DWORD CtrlFlag;

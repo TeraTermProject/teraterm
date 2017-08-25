@@ -827,7 +827,7 @@ void PrnParseControl(BYTE b) // printer mode
 	case NUL:
 		return;
 	case SO:
-		if (ts.EnableSOSI && ! DirectPrn) {
+		if ((ts.ISO2022Flag & ISO2022_SO) && ! DirectPrn) {
 			if ((ts.Language==IdJapanese) &&
 			    (ts.KanjiCode==IdJIS) &&
 			    (ts.JIS7Katakana==1) &&
@@ -840,7 +840,7 @@ void PrnParseControl(BYTE b) // printer mode
 		}
 		break;
 	case SI:
-		if (ts.EnableSOSI && ! DirectPrn) {
+		if ((ts.ISO2022Flag & ISO2022_SI) && ! DirectPrn) {
 			Glr[0] = 0; /* LS0 */
 			return;
 		}
@@ -967,7 +967,7 @@ void ParseControl(BYTE b)
 		}
 		break;
 	case SO: /* LS1 */
-		if (ts.EnableSOSI) {
+		if (ts.ISO2022Flag & ISO2022_SO) {
 			if ((ts.Language==IdJapanese) &&
 			    (ts.KanjiCode==IdJIS) &&
 			    (ts.JIS7Katakana==1) &&
@@ -980,7 +980,7 @@ void ParseControl(BYTE b)
 		}
 		break;
 	case SI: /* LS0 */
-		if (ts.EnableSOSI) {
+		if (ts.ISO2022Flag & ISO2022_SI) {
 			Glr[0] = 0;
 		}
 		break;
@@ -1030,12 +1030,16 @@ void ParseControl(BYTE b)
 		CursorUpWithScroll();
 		break;
 	case SS2:
-		GLtmp = 2;
-		SSflag = TRUE;
+		if (ts.ISO2022Flag & ISO2022_SS2) {
+			GLtmp = 2;
+			SSflag = TRUE;
+		}
 		break;
 	case SS3:
-		GLtmp = 3;
-		SSflag = TRUE;
+		if (ts.ISO2022Flag & ISO2022_SS3) {
+			GLtmp = 3;
+			SSflag = TRUE;
+		}
 		break;
 	case DCS:
 		ClearParams();
@@ -1374,12 +1378,16 @@ void ParseEscape(BYTE b) /* b is the final char */
 			CursorUpWithScroll();
 			break;
 		case 'N': /* SS2 */
-			GLtmp = 2;
-			SSflag = TRUE;
+			if (ts.ISO2022Flag & ISO2022_SS2) {
+				GLtmp = 2;
+				SSflag = TRUE;
+			}
 			break;
 		case 'O': /* SS3 */
-			GLtmp = 3;
-			SSflag = TRUE;
+			if (ts.ISO2022Flag & ISO2022_SS3) {
+				GLtmp = 3;
+				SSflag = TRUE;
+			}
 			break;
 		case 'P': /* DCS */
 			ClearParams();
@@ -1416,11 +1424,31 @@ void ParseEscape(BYTE b) /* b is the final char */
 		case 'g': /* Visual Bell (screen original?) */
 			RingBell(IdBeepVisual);
 			break;
-		case 'n': Glr[0] = 2; break; /* LS2 */
-		case 'o': Glr[0] = 3; break; /* LS3 */
-		case '|': Glr[1] = 3; break; /* LS3R */
-		case '}': Glr[1] = 2; break; /* LS2R */
-		case '~': Glr[1] = 1; break; /* LS1R */
+		case 'n': /* LS2 */
+			if (ts.ISO2022Flag & ISO2022_LS2) {
+				Glr[0] = 2;
+			}
+			break;
+		case 'o': /* LS3 */
+			if (ts.ISO2022Flag & ISO2022_LS3) {
+				Glr[0] = 3;
+			}
+			break;
+		case '|': /* LS3R */
+			if (ts.ISO2022Flag & ISO2022_LS3R) {
+				Glr[1] = 3;
+			}
+			break;
+		case '}': /* LS2R */
+			if (ts.ISO2022Flag & ISO2022_LS2R) {
+				Glr[1] = 2;
+			}
+			break;
+		case '~': /* LS1R */
+			if (ts.ISO2022Flag & ISO2022_LS1R) {
+				Glr[1] = 1;
+			}
+			break;
 		}
 		break;
 		/* end of case Icount=0 */
@@ -5096,7 +5124,9 @@ BOOL ParseFirstJP(BYTE b)
 	else if (b==0x8E) { // SS2
 		switch (ts.KanjiCode) {
 		case IdEUC:
-			EUCkanaIn = TRUE;
+			if (ts.ISO2022Flag & ISO2022_SS2) {
+				EUCkanaIn = TRUE;
+			}
 			break;
 		case IdUTF8:
 		case IdUTF8m:
@@ -5109,8 +5139,10 @@ BOOL ParseFirstJP(BYTE b)
 	else if (b==0x8F) { // SS3
 		switch (ts.KanjiCode) {
 		case IdEUC:
-			EUCcount = 2;
-			EUCsupIn = TRUE;
+			if (ts.ISO2022Flag & ISO2022_SS3) {
+				EUCcount = 2;
+				EUCsupIn = TRUE;
+			}
 			break;
 		case IdUTF8:
 		case IdUTF8m:
