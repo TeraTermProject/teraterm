@@ -1970,31 +1970,46 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 
 	// ISO2022ShiftCharacter
 	GetPrivateProfileString(Section, "ISO2022ShiftCharacter", "on", Temp, sizeof(Temp), FName);
-	if (_stricmp(Temp, "on") == 0 || _stricmp(Temp, "all") == 0)
-		ts->ISO2022Flag = ISO2022_SHIFT_ALL;
-	else if (_stricmp(Temp, "off") == 0 || _stricmp(Temp, "none") == 0)
-		ts->ISO2022Flag = ISO2022_SHIFT_NONE;
-	else {
-		ts->ISO2022Flag = ISO2022_SHIFT_NONE;
-		for (i=1; GetNthString(Temp, i, sizeof(Temp2), Temp2); i++) {
-			if (_stricmp(Temp2, "SI") == 0 || _stricmp(Temp2, "LS0") == 0)
-				ts->ISO2022Flag |= ISO2022_SI;
-			else if (_stricmp(Temp2, "SO") == 0 || _stricmp(Temp2, "LS1") == 0)
-				ts->ISO2022Flag |= ISO2022_SO;
-			else if (_stricmp(Temp2, "LS2") == 0)
-				ts->ISO2022Flag |= ISO2022_LS2;
-			else if (_stricmp(Temp2, "LS3") == 0)
-				ts->ISO2022Flag |= ISO2022_LS3;
-			else if (_stricmp(Temp2, "LS1R") == 0)
-				ts->ISO2022Flag |= ISO2022_LS1R;
-			else if (_stricmp(Temp2, "LS2R") == 0)
-				ts->ISO2022Flag |= ISO2022_LS2R;
-			else if (_stricmp(Temp2, "LS3R") == 0)
-				ts->ISO2022Flag |= ISO2022_LS3R;
-			else if (_stricmp(Temp2, "SS2") == 0)
-				ts->ISO2022Flag |= ISO2022_SS2;
-			else if (_stricmp(Temp2, "SS3") == 0)
-				ts->ISO2022Flag |= ISO2022_SS3;
+	ts->ISO2022Flag = ISO2022_SHIFT_NONE;
+	for (i=1; GetNthString(Temp, i, sizeof(Temp2), Temp2); i++) {
+		BOOL add=TRUE;
+		char *p = Temp2;
+		int mask = 0;
+
+		if (*p == '-') {
+			p++;
+			add=FALSE;
+		}
+		if (_stricmp(p, "on") == 0 || _stricmp(p, "all") == 0)
+			ts->ISO2022Flag = ISO2022_SHIFT_ALL;
+		else if (_stricmp(p, "off") == 0 || _stricmp(p, "none") == 0)
+			ts->ISO2022Flag = ISO2022_SHIFT_NONE;
+		else if (_stricmp(p, "SI") == 0 || _stricmp(p, "LS0") == 0)
+			mask = ISO2022_SI;
+		else if (_stricmp(p, "SO") == 0 || _stricmp(p, "LS1") == 0)
+			mask = ISO2022_SO;
+		else if (_stricmp(p, "LS2") == 0)
+			mask = ISO2022_LS2;
+		else if (_stricmp(p, "LS3") == 0)
+			mask = ISO2022_LS3;
+		else if (_stricmp(p, "LS1R") == 0)
+			mask = ISO2022_LS1R;
+		else if (_stricmp(p, "LS2R") == 0)
+			mask = ISO2022_LS2R;
+		else if (_stricmp(p, "LS3R") == 0)
+			mask = ISO2022_LS3R;
+		else if (_stricmp(p, "SS2") == 0)
+			mask = ISO2022_SS2;
+		else if (_stricmp(p, "SS3") == 0)
+			mask = ISO2022_SS3;
+
+		if (mask) {
+			if (add) {
+				ts->ISO2022Flag |= mask;
+			}
+			else {
+				ts->ISO2022Flag &= ~mask;
+			}
 		}
 	}
 
@@ -3273,16 +3288,13 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteOnOff(Section, "ListHiddenFonts", FName, ts->ListHiddenFonts);
 
 	// ISO2022ShiftCharacter
-	switch (ts->TabStopFlag) {
-	case ISO2022_SHIFT_ALL:
+	if (ts->ISO2022Flag == ISO2022_SHIFT_ALL) {
 		strncpy_s(Temp, sizeof(Temp), "on", _TRUNCATE);
-		break;
-	case ISO2022_SHIFT_NONE:
-		strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
-		break;
-	default:
+	}
+	else {
+		Temp[0]=0;
 		if (ts->ISO2022Flag & ISO2022_SI) {
-			strncpy_s(Temp, sizeof(Temp), "SI,", _TRUNCATE);
+			strncat_s(Temp, sizeof(Temp), "SI,", _TRUNCATE);
 		}
 		if (ts->ISO2022Flag & ISO2022_SO) {
 			strncat_s(Temp, sizeof(Temp), "SO,", _TRUNCATE);
@@ -3310,13 +3322,12 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		}
 
 		i = strlen(Temp);
-		if (i == 0) { // –³‚¢‚Í‚¸‚¾‚¯‚ê‚Ç”O‚Ì‚½‚ß
+		if (i == 0) {
 			strncpy_s(Temp, sizeof(Temp), "off", _TRUNCATE);
 		}
 		else if (Temp[i-1] == ',') {
 			Temp[i-1] = 0;
 		}
-		break;
 	}
 	WritePrivateProfileString(Section, "ISO2022ShiftCharacter", Temp, FName);
 
