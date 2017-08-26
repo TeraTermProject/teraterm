@@ -35,6 +35,10 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>許可する ISO/IEC 2022 のシフト機能を設定できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-term.html#ISO2022ShiftFunction">ISO2022ShiftFunction</a> エントリを追加した。デフォルトは on。</li>
+        </ul></li>
       <li>ログの行頭に追加するタイムスタンプのフォーマットを指定できるようにした。
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> エントリを追加した。デフォルトは"%Y-%m-%d %H:%M:%S.%N"。</li>
@@ -44,15 +48,11 @@
         <ul>
           <li>teraterm.ini に <a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> エントリを追加した。デフォルトはoff。</li>
         </ul></li>
-      <li>シリアルポートおよび名前付きパイプが開けなかった時、エラーメッセージで理由やエラーコードを表示するようにした。</li>
       <li>OSで非表示に設定されているフォントをフォント設定ダイアログで選択できるようにする設定を追加した。
         <ul>
           <li><a href="../menu/setup-additional.html#ListHiddenFonts">Additional settingsダイアログ</a>の General タブで設定を有効化できるようにした。</li>
         </ul></li>
-      <li>許可する ISO/IEC 2022 のシフト機能を設定できるようにした。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-term.html#ISO2022ShiftFunction">ISO2022ShiftFunction</a> エントリを追加した。デフォルトは on。</li>
-        </ul></li>
+      <li>シリアルポートおよび名前付きパイプが開けなかった時、エラーメッセージで理由やエラーコードを表示するようにした。</li>
       <li><a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> マクロコマンドで、改行を送信するのを最後のパラメータの後の一回だけに変更した。</li>
       <li><a href="../macro/command/sendlnmulticast.html">sendlnmulticast</a> マクロコマンドを追加した。</li>
     </ul>
@@ -63,7 +63,7 @@
       <li>DECRQM 制御シーケンスで DECLRMM の状態を正しく返さない問題を修正した。</li>
       <li><a href="../setup/teraterm-prn.html#formfeed">PrnConvFF</a> が TERATERM.INI から読み込まれない問題を修正した。</li>
       <li><a href="../macro/command/sendbroadcast.html">sendbroadcast</a> / <a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> マクロコマンドが正しく働かない問題を修正した。</li>
-      <li><a href="../macro/command/sendbroadcast.html">sendbroadcast</a> / <a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> / <a href="../macro/command/sendmulticast.html">sendmulticast</a> マクロコマンドで、0x00, 0x01 が正しく送れない問題を修正した。</li>
+      <li><a href="../macro/command/sendbroadcast.html">sendbroadcast</a> / <a href="../macro/command/sendlnbroadcast.html">sendlnbroadcast</a> マクロコマンドで、0x00, 0x01 が正しく送れない問題を修正した。</li>
     </ul>
   </li>
 
@@ -2941,9 +2941,9 @@
 
   <li>バグ修正
     <ul>
-      <li>パスワード認証時のパスワード変更ダイアログでキャンセルした時に、デバッグログにゴミが出力される問題を修正した。</li>
-      <li>SSHv1 接続時の端末サイズ変更通知で、正しい端末サイズ(ピクセル数)を通知するように修正した。</li>
       <li>SSHv2 接続時、リモートからローカルへのポート転送をサーバ接続後に追加しても有効にならない問題を修正した。</li>
+      <li>SSHv1 接続時の端末サイズ変更通知で、正しい端末サイズ(ピクセル数)を通知するように修正した。</li>
+      <li>パスワード認証時のパスワード変更ダイアログでキャンセルした時に、デバッグログにゴミが出力される問題を修正した。</li>
     </ul>
   </li>
 
