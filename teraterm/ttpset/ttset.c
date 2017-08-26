@@ -1342,6 +1342,11 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	for (i = 0; i <= 3; i++)
 		GetNthNum(Temp, 1 + i, &ts->PrnMargin[i]);
 
+	/* Disable (convert to NL) Form Feed when printing */
+	/*   --- special option */
+	ts->PrnConvFF =
+		GetOnOff(Section, "PrnConvFF", FName, FALSE);
+
 	/* Quick-VAN log  -- special option */
 	if (GetOnOff(Section, "QVLog", FName, FALSE))
 		ts->LogFlag |= LOG_QV;
@@ -2833,6 +2838,10 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WriteInt4(Section, "PrnMargin", FName,
 	          ts->PrnMargin[0], ts->PrnMargin[1],
 	          ts->PrnMargin[2], ts->PrnMargin[3]);
+
+	/* Disable (convert to NL) Form Feed when printing */
+	/*   --- special option */
+	WriteOnOff(Section, "PrnConvFF", FName, ts->PrnConvFF);
 
 	/* Quick-VAN log  -- special option */
 	WriteOnOff(Section, "QVLog", FName, (WORD) (ts->LogFlag & LOG_QV));
