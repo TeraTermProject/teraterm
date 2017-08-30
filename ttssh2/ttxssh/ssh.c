@@ -6254,6 +6254,7 @@ static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar)
 
 	SSH2_dispatch_init(6);
 	SSH2_dispatch_add_range_message(SSH2_MSG_GLOBAL_REQUEST, SSH2_MSG_CHANNEL_FAILURE);
+	SSH2_dispatch_add_message(SSH2_MSG_UNIMPLEMENTED);
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX
 	// OpenSSH 3.9ではデータ通信中のDH鍵交換要求が、サーバから送られてくることがある。
 	SSH2_dispatch_add_message(SSH2_MSG_KEXINIT);
