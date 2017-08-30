@@ -9064,10 +9064,9 @@ static BOOL handle_SSH2_channel_request(PTInstVar pvar)
 		logprintf(LOG_LEVEL_VERBOSE, __FUNCTION__ ": exit-status=%d", estat);
 	}
 	else if (strcmp(request, "keepalive@openssh.com") == 0) {
-		// OpenSSH client ‚Å‚Í success = 1 ‚É‚µ‚Ä‚¢‚È‚¢‚¯‚ê‚ÇA
-		// server ‘¤‚Í SUCCESS/FAILURE ‚Ç‚¿‚ç‚Å‚à OK ‚È‚Ì‚Å
-		// ‚Æ‚è‚ ‚¦‚¸ SUCCESS ‚ğ•Ô‚·B
-		success = 1;
+		// ŒÃ‚¢ OpenSSH ‚Å‚Í SUCCESS ‚ğ•Ô‚µ‚Ä‚à keepalive ‚É
+		// ‰“š‚µ‚½‚ÆŠÅ˜ô‚³‚ê‚È‚¢‚Ì‚Å FAILURE ‚ğ•Ô‚·B[teraterm:1278]
+		success = 0;
 	}
 
 	free(request);
