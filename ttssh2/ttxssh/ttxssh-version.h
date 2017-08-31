@@ -31,6 +31,6 @@
 #include "tt-version.h"
 
 #define TTSSH_VERSION_MAJOR             2
-#define TTSSH_VERSION_MINOR             81
+#define TTSSH_VERSION_MINOR             82
 #define TTSSH_VERSION_STR(sep)          TT_TOSTR(TTSSH_VERSION_MAJOR) sep TT_TOSTR(TTSSH_VERSION_MINOR)
 #define TTSSH_RES_VERSION_STR           TTSSH_VERSION_STR(", ") ", 0, 0"
