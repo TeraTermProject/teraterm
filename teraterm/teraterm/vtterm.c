@@ -2596,7 +2596,7 @@ void CSGT(BYTE b)
 	switch (b) {
 	  case 'c': /* second terminal report (Secondary DA) */
 		if (Param[1] == 0) {
-			SendCSIstr(">32;278;0c", 0); /* VT382(>32) + xterm rev 278 */
+			SendCSIstr(">32;331;0c", 0); /* VT382(>32) + xterm rev 331 */
 		}
 		break;
 
