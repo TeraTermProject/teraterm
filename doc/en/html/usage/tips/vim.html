@@ -51,11 +51,12 @@ Tera Term can support below control sequence changing the cursor shape.
 
 <p>
 The vim cursor can be changed in the insert mode to output above control sequences when a user enters(t_SI) and leaves(t_EI). <br>
-For example, when below contents is added in the .vimrc file, the cursor style is underline and blinking in the insert mode. Next, the cursor style is block and blinking outside the insert mode.
+For example, when below contents is added in the .vimrc file, the cursor style is vertical line and blinking in the insert mode, the cursor style is underline and blinking in the replace mode, and the cursor style is block and blinking in the normal mode.
 </p>
 
 <pre class="macro-example">
-let &amp;t_SI .= "\e[3 q"
+let &amp;t_SI .= "\e[5 q"
+let &amp;t_SR .= "\e[3 q"
 let &amp;t_EI .= "\e[1 q"
 </pre>
 
