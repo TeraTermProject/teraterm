@@ -3996,33 +3996,33 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			if (ts.NonblinkingCursor) {
 				tmp++;
 			}
-			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d q", CLocale, tmp);
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r%d q", CLocale, tmp);
 		}
 		break;
 	  case '"':
 		switch (StrBuff[1]) {
 		  case 'p': // DECSCL
 			if (VTlevel > 1 && Send8BitMode) {
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r6%d;0\"p", CLocale, VTlevel);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r6%d;0\"p", CLocale, VTlevel);
 			}
 			else {
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r6%d;1\"p", CLocale, VTlevel);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r6%d;1\"p", CLocale, VTlevel);
 			}
 			break;
 
 		  case 'q': // DECSCA
 			if (CharAttr.Attr2 & Attr2Protect) {
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r1\"q", CLocale);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r1\"q", CLocale);
 			}
 			else {
-				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r0\"q", CLocale);
+				len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r0\"q", CLocale);
 			}
 			break;
 		}
 		break;
 	  case 'm':	// SGR
 		if (StrBuff[1] == 0) {
-			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r0", CLocale);
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r0", CLocale);
 			if (CharAttr.Attr & AttrBold) {
 				len += _snprintf_s_l(&RepStr[len], sizeof(RepStr) - len, _TRUNCATE, ";1", CLocale);
 			}
@@ -4088,17 +4088,17 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 		break;
 	  case 'r':	// DECSTBM
 		if (StrBuff[1] == 0) {
-			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%dr", CLocale, CursorTop+1, CursorBottom+1);
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r%d;%dr", CLocale, CursorTop+1, CursorBottom+1);
 		}
 		break;
 	  case 's':	// DECSLRM
 		if (StrBuff[1] == 0) {
-			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "0$r%d;%ds", CLocale, CursorLeftM+1, CursorRightM+1);
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r%d;%ds", CLocale, CursorLeftM+1, CursorRightM+1);
 		}
 		break;
 	}
 	if (len == 0) {
-		if (strncpy_s(RepStr, sizeof(RepStr), "1$r", _TRUNCATE)) {
+		if (strncpy_s(RepStr, sizeof(RepStr), "0$r", _TRUNCATE)) {
 			return;
 		}
 		len = 3;
