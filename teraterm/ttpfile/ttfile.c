@@ -170,7 +170,7 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 }
 
 /* Hook function for file name dialog box */
-BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD Lo, Hi;
@@ -226,44 +226,41 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		Lo = LOWORD(*pl) & 1;
 		Hi = HIWORD(*pl);
 		SetRB(Dialog,Lo,IDC_FOPTBIN,IDC_FOPTBIN);
-		if (Hi!=0xFFFF)
-		{
-			ShowDlgItem(Dialog,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
-			SetRB(Dialog,Hi & 1,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
+		ShowDlgItem(Dialog,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
+		SetRB(Dialog,Hi & 1,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
 
-			// plain textチェックボックスはデフォルトでON (2005.2.20 yutaka)
-			ShowDlgItem(Dialog,IDC_PLAINTEXT,IDC_PLAINTEXT);
-			if (Lo) {
-				// Binaryフラグが有効なときはチェックできない
-				DisableDlgItem(Dialog,IDC_PLAINTEXT,IDC_PLAINTEXT);
-			}
-			else if (Hi & 0x1000) {
-				SetRB(Dialog,1,IDC_PLAINTEXT,IDC_PLAINTEXT);
-			}
-
-			// timestampチェックボックス (2006.7.23 maya)
-			ShowDlgItem(Dialog,IDC_TIMESTAMP,IDC_TIMESTAMP);
-			if (Lo) {
-				// Binaryフラグが有効なときはチェックできない
-				DisableDlgItem(Dialog,IDC_TIMESTAMP,IDC_TIMESTAMP);
-			}
-			else if (Hi & 0x2000) {
-				SetRB(Dialog,1,IDC_TIMESTAMP,IDC_TIMESTAMP);
-			}
-
-			// Hide dialogチェックボックス (2008.1.30 maya)
-			ShowDlgItem(Dialog,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
-			if (Hi & 0x4000) {
-				SetRB(Dialog,1,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
-			}
-
-			// Include screen bufferチェックボックス (2013.9.29 yutaka)
-			ShowDlgItem(Dialog,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
-			if (Hi & 0x8000) {
-				SetRB(Dialog,1,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
-			}
-
+		// plain textチェックボックスはデフォルトでON (2005.2.20 yutaka)
+		ShowDlgItem(Dialog,IDC_PLAINTEXT,IDC_PLAINTEXT);
+		if (Lo) {
+			// Binaryフラグが有効なときはチェックできない
+			DisableDlgItem(Dialog,IDC_PLAINTEXT,IDC_PLAINTEXT);
 		}
+		else if (Hi & 0x1000) {
+			SetRB(Dialog,1,IDC_PLAINTEXT,IDC_PLAINTEXT);
+		}
+
+		// timestampチェックボックス (2006.7.23 maya)
+		ShowDlgItem(Dialog,IDC_TIMESTAMP,IDC_TIMESTAMP);
+		if (Lo) {
+			// Binaryフラグが有効なときはチェックできない
+			DisableDlgItem(Dialog,IDC_TIMESTAMP,IDC_TIMESTAMP);
+		}
+		else if (Hi & 0x2000) {
+			SetRB(Dialog,1,IDC_TIMESTAMP,IDC_TIMESTAMP);
+		}
+
+		// Hide dialogチェックボックス (2008.1.30 maya)
+		ShowDlgItem(Dialog,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
+		if (Hi & 0x4000) {
+			SetRB(Dialog,1,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
+		}
+
+		// Include screen bufferチェックボックス (2013.9.29 yutaka)
+		ShowDlgItem(Dialog,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
+		if (Hi & 0x8000) {
+			SetRB(Dialog,1,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
+		}
+
 		return TRUE;
 
 	case WM_COMMAND: // for old style dialog
@@ -274,8 +271,7 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			{
 				GetRB(Dialog,&Lo,IDC_FOPTBIN,IDC_FOPTBIN);
 				Hi = HIWORD(*pl);
-				if (Hi!=0xFFFF)
-					GetRB(Dialog,&Hi,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
+				GetRB(Dialog,&Hi,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
 				*pl = MAKELONG(Lo,Hi);
 			}
 			break;
@@ -303,8 +299,7 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				GetRB(Dialog,&Lo,IDC_FOPTBIN,IDC_FOPTBIN);
 				Hi = HIWORD(*pl);
-				if (Hi!=0xFFFF)
-					GetRB(Dialog,&Hi,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
+				GetRB(Dialog,&Hi,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
 
 				if (!Lo) {
 					// plain text check-box
@@ -344,13 +339,16 @@ BOOL CALLBACK TFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
+BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
+
 BOOL PASCAL GetTransFname
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*3], *pf;
 	OPENFILENAME ofn;
-	LONG opt;
+	LONG optl;
+	WORD optw;
 	char TempDir[MAXPATHLEN];
 	BOOL Ok;
 	char FileName[MAX_PATH];
@@ -405,6 +403,7 @@ BOOL PASCAL GetTransFname
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFile = fv->FullName;
 	ofn.nMaxFile = sizeof(fv->FullName);
+
 	if (FuncId == GTF_LOG) {
 		DWORD logdir = GetFileAttributes(fv->LogDefaultPath);
 		// ログ保存の場合は初期フォルダを決め打ちしないようにする。(2007.8.24 yutaka)
@@ -418,19 +417,33 @@ BOOL PASCAL GetTransFname
 	} else {
 		ofn.lpstrInitialDir = CurDir;
 	}
+
 	ofn.Flags = OFN_SHOWHELP | OFN_HIDEREADONLY;
-	if (FuncId!=GTF_BP)
-	{
-		ofn.Flags = ofn.Flags | OFN_ENABLETEMPLATE | OFN_ENABLEHOOK;
-		ofn.Flags = ofn.Flags | OFN_EXPLORER;
+
+	switch (FuncId) {
+	case GTF_LOG:
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
-		ofn.lpfnHook = (LPOFNHOOKPROC)(&TFnHook);
+
+		ofn.lpfnHook = (LPOFNHOOKPROC)(&LogFnHook);
+		optl = *Option;
+		ofn.lCustData = (DWORD)&optl;
+		break;
+	case GTF_SEND:
+		ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_EXPLORER;
+		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
+
+		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
+		optw = (WORD)*Option;
+		ofn.lCustData = (DWORD)&optw;
+		break;
+	case GTF_BP:
+		// nothing to do
+		break;
 	}
-	opt = *Option;
-	if (FuncId!=GTF_LOG)
-	{
-		ofn.Flags = ofn.Flags | OFN_FILEMUSTEXIST;
-		opt = MAKELONG(LOWORD(*Option),0xFFFF);
+
+	if (FuncId != GTF_LOG) {
+		ofn.Flags |= OFN_FILEMUSTEXIST;
 
 		// フィルタがワイルドカードではなく、そのファイルが存在する場合
 		// あらかじめデフォルトのファイル名を入れておく (2008.5.18 maya)
@@ -445,27 +458,22 @@ BOOL PASCAL GetTransFname
 			}
 		}
 	}
-	ofn.lCustData = (DWORD)&opt;
 	ofn.lpstrTitle = fv->DlgCaption;
 
 	ofn.hInstance = hInst;
 
 	// loggingの場合、オープンダイアログをセーブダイアログへ変更 (2005.1.6 yutaka)
 	if (FuncId == GTF_LOG) {
-		// ログのデフォルト値(log_YYYYMMDD_HHMMSS.txt)を設定する (2005.1.21 yutaka)
-		// デフォルトファイル名を teraterm.log へ変更 (2005.2.22 yutaka)
-		// デフォルトファイル名の設定場所を呼び出し元へ移動 (2006.8.28 maya)
 		Ok = GetSaveFileName(&ofn);
 	} else {
 		Ok = GetOpenFileName(&ofn);
 	}
 
-	if (Ok)
-	{
+	if (Ok) {
 		if (FuncId==GTF_LOG)
-			*Option = opt;
+			*Option = optl;
 		else
-			*Option = MAKELONG(LOWORD(opt),HIWORD(*Option));
+			*Option = (long)optw;
 
 		fv->DirLen = ofn.nFileOffset;
 
@@ -480,7 +488,7 @@ BOOL PASCAL GetTransFname
 	return Ok;
 }
 
-BOOL CALLBACK TFn2Hook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	LPWORD pw;
@@ -632,7 +640,7 @@ BOOL PASCAL GetMultiFname
 	{
 		ofn.Flags = ofn.Flags | OFN_ENABLETEMPLATE | OFN_ENABLEHOOK;
 		ofn.lCustData = (DWORD)Option;
-		ofn.lpfnHook = (LPOFNHOOKPROC)(&TFn2Hook);
+		ofn.lpfnHook = (LPOFNHOOKPROC)(&TransFnHook);
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FOPT);
 	} else if (FuncId==GMF_Y) {
 		// TODO: YMODEM
