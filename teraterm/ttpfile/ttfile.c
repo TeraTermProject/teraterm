@@ -609,8 +609,14 @@ BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPara
 			pw = (LPWORD)GetWindowLong(Dialog,DWL_USER);
 			if (pw!=NULL)
 				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
+			}
 			break;
 		case IDCANCEL:
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
+			}
 			break;
 		}
 		break;
@@ -962,15 +968,15 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgFoptFont, UILanguageFile)) {
-			SendDlgItemMessage(Dialog, IDC_XOPT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_XOPTCHECK, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_XOPTCRC, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_XOPT1K, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_XOPTBIN, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+		if (get_lang_font("DLG_TAHOMA_FONT", Dialog, &logfont, &DlgXoptFont, UILanguageFile)) {
+			SendDlgItemMessage(Dialog, IDC_XOPT, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPTCHECK, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPTCRC, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPT1K, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_XOPTBIN, WM_SETFONT, (WPARAM)DlgXoptFont, MAKELPARAM(TRUE,0));
 		}
 		else {
-			DlgFoptFont = NULL;
+			DlgXoptFont = NULL;
 		}
 
 		GetDlgItemText(Dialog, IDC_XOPT, uimsg2, sizeof(uimsg2));
@@ -1035,8 +1041,14 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				}
 				*pl = MAKELONG(Lo,Hi);
 			}
+			if (DlgXoptFont != NULL) {
+				DeleteObject(DlgXoptFont);
+			}
 			break;
 		case IDCANCEL:
+			if (DlgXoptFont != NULL) {
+				DeleteObject(DlgXoptFont);
+			}
 			break;
 		}
 		break;
