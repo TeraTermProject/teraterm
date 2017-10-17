@@ -224,6 +224,22 @@ typedef TCharAttr *PCharAttr;
 #define LOGDLG_TIMESTAMP       (1 << 3)
 #define LOGDLG_HIDEDIALOG      (1 << 4)
 #define LOGDLG_INCSCRBUFF      (1 << 5)
+#define LOGDLG_UTC             (1 << 6)
+#define LOGDLG_ELAPSED         (1 << 7)
+/*
+ * ELAPSED TIME の時は LOGDLG_UTC を経過時間の基準を表すフラグとする
+ * LOGDLG_ELAPSEDCON == 0 => ログ開始から
+ * LOGDLG_ELAPSEDCON == 1 => 接続開始から
+ */
+#define LOGDLG_ELAPSEDCON      LOGDLG_UTC
+
+// Log Timestamp Type
+enum LogTimestampType {
+    TIMESTAMP_LOCAL,
+    TIMESTAMP_UTC,
+    TIMESTAMP_ELAPSED_LOGSTART,
+    TIMESTAMP_ELAPSED_CONNECTED
+};
 
 // log flags (used in ts.LogFlag) 
 #define LOG_TEL 1
@@ -582,7 +598,7 @@ struct tttset {
 	WORD MaximizedBugTweak;
 	WORD NotifyClipboardAccess;
 	WORD SaveVTWinPos;
-	WORD LogTimestampUTC;
+	WORD LogTimestampType;
 	int MouseWheelScrollLine;
 	WORD CRSend_ini;
 	WORD LocalEcho_ini;
@@ -1071,6 +1087,8 @@ typedef struct {
 	BOOL VirtualStoreEnabled;
 
 	NOTIFYICONDATA *NotifyIcon;
+
+	DWORD ConnectedTime;
 } TComVar;
 typedef TComVar far *PComVar;
 

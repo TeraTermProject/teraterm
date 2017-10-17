@@ -1086,8 +1086,19 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        ts->LogTimestampFormat, sizeof(ts->LogTimestampFormat),
 	                        FName);
 
-	/* Use UTC/GMT time for Log each line timestamp */
-	ts->LogTimestampUTC = GetOnOff(Section, "LogTimestampUTC", FName, FALSE);
+	/* Timestamp type */
+	GetPrivateProfileString(Section, "LogTimestampType", "", Temp, sizeof(Temp), FName);
+	if (_stricmp(Temp, "UTC") == 0)
+		ts->LogTimestampType = TIMESTAMP_UTC;
+	else if (_stricmp(Temp, "LoggingElapsed") == 0)
+		ts->LogTimestampType = TIMESTAMP_ELAPSED_LOGSTART;
+	else if (_stricmp(Temp, "ConnectionElapsed") == 0)
+		ts->LogTimestampType = TIMESTAMP_ELAPSED_CONNECTED;
+	else if (_stricmp(Temp, "") == 0 && GetOnOff(Section, "LogTimestampUTC", FName, FALSE))
+		// LogTimestampType ‚ª–¢Ý’è‚Ìê‡‚Í LogTimestampUTC ‚Ì’l‚ðŽQÆ‚·‚é
+		ts->LogTimestampType = TIMESTAMP_UTC;
+	else
+		ts->LogTimestampType = TIMESTAMP_LOCAL;
 
 	/* File Transfer dialog visibility */
 	ts->FTHideDialog = GetOnOff(Section, "FTHideDialog", FName, FALSE);
@@ -2638,8 +2649,21 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "LogTimestampFormat",
 	                          ts->LogTimestampFormat, FName);
 
-	/* Use UTC/GMT time for Log each line timestamp */
-	WriteOnOff(Section, "LogTimestampUTC", FName, ts->LogTimestampUTC);
+	/* Timestamp type */
+	switch (ts->LogTimestampType) {
+	case TIMESTAMP_LOCAL:
+		WritePrivateProfileString(Section, "LogTimestampType", "Local", FName);
+		break;
+	case TIMESTAMP_UTC:
+		WritePrivateProfileString(Section, "LogTimestampType", "UTC", FName);
+		break;
+	case TIMESTAMP_ELAPSED_LOGSTART:
+		WritePrivateProfileString(Section, "LogTimestampType", "LoggingElapsed", FName);
+		break;
+	case TIMESTAMP_ELAPSED_CONNECTED:
+		WritePrivateProfileString(Section, "LogTimestampType", "ConnectionElapsed", FName);
+		break;
+	}
 
 	/* Default Log file name (2006.8.28 maya) */
 	WritePrivateProfileString(Section, "LogDefaultName",

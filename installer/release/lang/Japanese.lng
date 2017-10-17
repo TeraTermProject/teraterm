@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-08-25)
+; Updated by TeraTerm Project (2017-10-17)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -428,6 +428,10 @@ DLG_FOPT_PLAIN=プレーンテキスト(&P)
 DLG_FOPT_TIMESTAMP=タイムスタンプ(&T)
 DLG_FOPT_HIDEDIALOG=ダイアログを非表示(&D)
 DLG_FOPT_ALLBUFFINFIRST=現在バッファを含む(&C)
+DLG_FOPT_TIMESTAMP_LOCAL=地方時
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
 
 DLG_XOPT=オプション
 DLG_XOPT_CHECKSUM=チェックサム(&S)

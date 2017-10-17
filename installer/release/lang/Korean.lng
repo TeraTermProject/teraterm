@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-08-09)
+; Updated by TeraTerm Project (2017-10-17)
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
@@ -429,6 +429,10 @@ DLG_FOPT_PLAIN=일반 텍스트(&P)
 DLG_FOPT_TIMESTAMP=타임스탬프(&T)
 DLG_FOPT_HIDEDIALOG=다이얼로그 숨기기(&D)
 DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer
+DLG_FOPT_TIMESTAMP_LOCAL=Local Time
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
 
 DLG_XOPT=선택사항
 DLG_XOPT_CHECKSUM=체크섬(&S)

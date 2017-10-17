@@ -209,6 +209,24 @@ void SetLogFlags(HWND Dialog)
 			opt |= LOGDLG_INCSCRBUFF;
 		}
 
+		switch (GetCurSel(Dialog, IDC_TIMESTAMPTYPE) - 1) {
+		case TIMESTAMP_LOCAL:
+			// nothing to do
+			break;
+		case TIMESTAMP_UTC:
+			opt |= LOGDLG_UTC;
+			break;
+		case TIMESTAMP_ELAPSED_LOGSTART:
+			opt |= LOGDLG_ELAPSED;
+			break;
+		case TIMESTAMP_ELAPSED_CONNECTED:
+			opt |= LOGDLG_ELAPSED | LOGDLG_ELAPSEDCON;
+			break;
+		default:
+			// not reached
+			break;
+		}
+
 		*pl = opt;
 	}
 }
@@ -217,13 +235,14 @@ void SetLogFlags(HWND Dialog)
 BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
-	WORD BinFlag;
+	WORD BinFlag, TsFlag;
 	LPLONG pl;
 	long opt;
 	LPOFNOTIFY notify;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
 	HFONT font;
+	int tstype;
 
 	switch (Message) {
 	case WM_INITDIALOG:
@@ -239,9 +258,10 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SendDlgItemMessage(Dialog, IDC_FOPTBIN, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_FOPTAPPEND, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_PLAINTEXT, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(Dialog, IDC_TIMESTAMP, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_HIDEDIALOG, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 			SendDlgItemMessage(Dialog, IDC_ALLBUFF_INFIRST, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_TIMESTAMP, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
+			SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, WM_SETFONT, (WPARAM)DlgFoptFont, MAKELPARAM(TRUE,0));
 		}
 		else {
 			DlgFoptFont = NULL;
@@ -259,15 +279,24 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		GetDlgItemText(Dialog, IDC_PLAINTEXT, uimsg2, sizeof(uimsg2));
 		get_lang_msg("DLG_FOPT_PLAIN", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 		SetDlgItemText(Dialog, IDC_PLAINTEXT, uimsg);
-		GetDlgItemText(Dialog, IDC_TIMESTAMP, uimsg2, sizeof(uimsg2));
-		get_lang_msg("DLG_FOPT_TIMESTAMP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-		SetDlgItemText(Dialog, IDC_TIMESTAMP, uimsg);
 		GetDlgItemText(Dialog, IDC_HIDEDIALOG, uimsg2, sizeof(uimsg2));
 		get_lang_msg("DLG_FOPT_HIDEDIALOG", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 		SetDlgItemText(Dialog, IDC_HIDEDIALOG, uimsg);
 		GetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg2, sizeof(uimsg2));
 		get_lang_msg("DLG_FOPT_ALLBUFFINFIRST", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 		SetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg);
+		GetDlgItemText(Dialog, IDC_TIMESTAMP, uimsg2, sizeof(uimsg2));
+		get_lang_msg("DLG_FOPT_TIMESTAMP", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
+		SetDlgItemText(Dialog, IDC_TIMESTAMP, uimsg);
+
+		get_lang_msg("DLG_FOPT_TIMESTAMP_LOCAL", uimsg, sizeof(uimsg), "Local Time", UILanguageFile);
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
+		get_lang_msg("DLG_FOPT_TIMESTAMP_UTC", uimsg, sizeof(uimsg), "UTC", UILanguageFile);
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
+		get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", uimsg, sizeof(uimsg), "Elapsed Time (Logging)", UILanguageFile);
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
+		get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", uimsg, sizeof(uimsg), "Elapsed Time (Connection)", UILanguageFile);
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
 		// Binary チェックボックス
 		BinFlag = CheckFlag(opt, LOGDLG_BINARY);
@@ -289,16 +318,6 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		}
 
-		// timestampチェックボックス (2006.7.23 maya)
-		ShowDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		if (BinFlag) {
-			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-		else if (opt & LOGDLG_TIMESTAMP) {
-			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
-		}
-
 		// Hide dialogチェックボックス (2008.1.30 maya)
 		ShowDlgItem(Dialog, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
 		if (opt & LOGDLG_HIDEDIALOG) {
@@ -309,6 +328,42 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		ShowDlgItem(Dialog, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 		if (opt & LOGDLG_INCSCRBUFF) {
 			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
+		}
+
+		// timestampチェックボックス (2006.7.23 maya)
+		ShowDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		if (BinFlag) {
+			// Binaryフラグが有効なときはチェックできない
+			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		}
+		else if (opt & LOGDLG_TIMESTAMP) {
+			TsFlag = TRUE;
+			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		}
+
+		// timestamp 種別
+		ShowDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+		if (opt & LOGDLG_ELAPSED) {
+			// 経過時間
+			if (opt & LOGDLG_ELAPSEDCON) {
+				tstype = TIMESTAMP_ELAPSED_CONNECTED;
+			}
+			else {
+				tstype = TIMESTAMP_ELAPSED_LOGSTART;
+			}
+		}
+		else {
+			// 日時形式
+			if (opt & LOGDLG_UTC) {
+				tstype = TIMESTAMP_UTC;
+			}
+			else {
+				tstype = TIMESTAMP_LOCAL;
+			}
+		}
+		SendDlgItemMessage(Dialog, IDC_TIMESTAMPTYPE, CB_SETCURSEL, tstype, 0);
+		if (BinFlag || !TsFlag) {
+			DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 		}
 
 		return TRUE;
@@ -331,9 +386,20 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
 			if (BinFlag) {
 				DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
+				DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+				break; // BinFlag が on の時は Fall Through しない
 			}
 			else {
 				EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
+			}
+			// FALLTHROUGH -- BinFlag が off の時は Timestamp 種別の有効/無効を設定する
+		case IDC_TIMESTAMP:
+			GetRB(Dialog, &TsFlag, IDC_TIMESTAMP, IDC_TIMESTAMP);
+			if (TsFlag) {
+				EnableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
+			}
+			else {
+				DisableDlgItem(Dialog, IDC_TIMESTAMPTYPE, IDC_TIMESTAMPTYPE);
 			}
 			break;
 		}

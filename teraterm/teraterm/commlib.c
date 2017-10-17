@@ -151,6 +151,8 @@ void CommInit(PComVar cv)
 	cv->TitleRemote[0] = '\0';
 
 	cv->NotifyIcon = NULL;
+
+	cv->ConnectedTime = 0;
 }
 
 /* reset a serial port which is already open */
@@ -351,6 +353,7 @@ void CommOpen(HWND HW, PTTSet ts, PComVar cv)
 	cv->Flush = FALSE;
 	cv->FlushLen = 0;
 	cv->TelLineMode = FALSE;
+	cv->ConnectedTime = 0;
 
 	if ((ts->PortType!=IdSerial) && (strlen(ts->HostName)==0))
 	{
@@ -769,6 +772,7 @@ void CommStart(PComVar cv, LONG lParam, PTTSet ts)
 			break;
 	}
 	cv->Ready = TRUE;
+	cv->ConnectedTime = GetTickCount();
 }
 
 BOOL CommCanClose(PComVar cv)

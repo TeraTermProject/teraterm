@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-08-09)
+; Updated by TeraTerm Project (2017-10-17)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -429,6 +429,10 @@ DLG_FOPT_PLAIN=纯文本(&P)
 DLG_FOPT_TIMESTAMP=时间戳(&T)
 DLG_FOPT_HIDEDIALOG=隐藏对话框(&D)
 DLG_FOPT_ALLBUFFINFIRST=包括屏幕缓冲区(&C)
+DLG_FOPT_TIMESTAMP_LOCAL=Local Time
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
 
 DLG_XOPT=选项
 DLG_XOPT_CHECKSUM=校验(&S)

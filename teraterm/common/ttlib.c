@@ -1580,6 +1580,31 @@ char *mctimelocal(char *format, BOOL utc_flag)
 	return strtime;
 }
 
+char *strelapsed(DWORD start_time)
+{
+	static char strtime[20];
+	int days, hours, minutes, seconds, msecs;
+	DWORD delta = GetTickCount() - start_time;
+
+	msecs = delta % 1000;
+	delta /= 1000;
+
+	seconds = delta % 60;
+	delta /= 60;
+
+	minutes = delta % 60;
+	delta /= 60;
+
+	hours = delta % 24;
+	days = delta / 24;
+
+	_snprintf_s(strtime, sizeof(strtime), _TRUNCATE,
+		"%d %02d:%02d:%02d.%04d",
+		days, hours, minutes, seconds, msecs);
+
+	return strtime;
+}
+
 PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 {
 	int i = 0;

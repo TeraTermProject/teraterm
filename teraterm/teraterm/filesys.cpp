@@ -286,8 +286,8 @@ BOOL OpenFTDlg(PFileVar fv)
 	get_lang_msg("BTN_HELP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(HFTDlg, IDC_TRANSHELP, ts.UIMsg);
 
+	fv->StartTime = GetTickCount();
 	if (fv->OpId == OpSendFile) {
-		fv->StartTime = GetTickCount();
 		InitDlgProgress(HFTDlg, IDC_TRANSPROGRESS, &fv->ProgStat);
 		ShowWindow(GetDlgItem(HFTDlg, IDC_TRANS_ELAPSED), SW_SHOW);
 	}
@@ -533,6 +533,24 @@ BOOL LogStart()
 			Option |= LOGDLG_INCSCRBUFF;
 		}
 
+		switch (ts.LogTimestampType) {
+		case TIMESTAMP_LOCAL:
+			// nothing to do
+			break;
+		case TIMESTAMP_UTC:
+			Option |= LOGDLG_UTC;
+			break;
+		case TIMESTAMP_ELAPSED_LOGSTART:
+			Option |= LOGDLG_ELAPSED;
+			break;
+		case TIMESTAMP_ELAPSED_CONNECTED:
+			Option |= LOGDLG_ELAPSED | LOGDLG_ELAPSEDCON;
+			break;
+		default:
+			// not reached
+			break;
+		}
+
 		// ログのデフォルトファイル名を設定 (2006.8.28 maya)
 		strncat_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogDefaultName, _TRUNCATE);
 		ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
@@ -557,6 +575,25 @@ BOOL LogStart()
 			CheckFlag(Option, LOGDLG_HIDEDIALOG);
 		ts.LogAllBuffIncludedInFirst =
 			CheckFlag(Option, LOGDLG_INCSCRBUFF);
+
+		if (Option & LOGDLG_ELAPSED) {
+			// 経過時間
+			if (Option & LOGDLG_ELAPSEDCON) {
+				ts.LogTimestampType = TIMESTAMP_ELAPSED_CONNECTED;
+			}
+			else {
+				ts.LogTimestampType = TIMESTAMP_ELAPSED_LOGSTART;
+			}
+		}
+		else {
+			// 日時形式
+			if (Option & LOGDLG_UTC) {
+				ts.LogTimestampType = TIMESTAMP_UTC;
+			}
+			else {
+				ts.LogTimestampType = TIMESTAMP_LOCAL;
+			}
+		}
 	}
 	else {
 		// LogVar->DirLen = 0 だとここに来る
@@ -948,7 +985,23 @@ void LogToFile()
 			{
 				tmp[0] = 0;
 				if ( ts.LogTimestamp && eLineEnd ) {
-					char *strtime = mctimelocal(ts.LogTimestampFormat, ts.LogTimestampUTC);
+					char *strtime = NULL;
+
+					switch (ts.LogTimestampType) {
+					case TIMESTAMP_LOCAL:
+						strtime = mctimelocal(ts.LogTimestampFormat, FALSE);
+						break;
+					case TIMESTAMP_UTC:
+						strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
+						break;
+					case TIMESTAMP_ELAPSED_LOGSTART:
+						strtime = strelapsed(LogVar->StartTime);
+						break;
+					case TIMESTAMP_ELAPSED_CONNECTED:
+						strtime = strelapsed(cv.ConnectedTime);
+						break;
+					}
+
 					/* 2007.05.24 Gentaro */
 					if( eLineEnd == Line_FileHead ){
 						strncat_s(tmp, sizeof(tmp), "\r\n", _TRUNCATE);
@@ -987,7 +1040,22 @@ void LogToFile()
 			if (((cv.FilePause & OpLog)==0) && (! cv.ProtoFlag))
 			{
 				if ( ts.LogTimestamp && eLineEnd ) {
-					char *strtime = mctimelocal(ts.LogTimestampFormat, ts.LogTimestampUTC);
+					char *strtime = NULL;
+
+					switch (ts.LogTimestampType) {
+					case TIMESTAMP_LOCAL:
+						strtime = mctimelocal(ts.LogTimestampFormat, FALSE);
+						break;
+					case TIMESTAMP_UTC:
+						strtime = mctimelocal(ts.LogTimestampFormat, TRUE);
+						break;
+					case TIMESTAMP_ELAPSED_LOGSTART:
+						strtime = strelapsed(LogVar->StartTime);
+						break;
+					case TIMESTAMP_ELAPSED_CONNECTED:
+						strtime = strelapsed(cv.ConnectedTime);
+						break;
+					}
 					WriteFile((HANDLE)LogVar->FileHandle, "[", 1, &wrote, NULL);
 					WriteFile((HANDLE)LogVar->FileHandle, strtime, strlen(strtime), &wrote, NULL);
 					WriteFile((HANDLE)LogVar->FileHandle, "] ", 2, &wrote, NULL);

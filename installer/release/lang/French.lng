@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-08-09)
+; Updated by TeraTerm Project (2017-10-17)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -429,6 +429,10 @@ DLG_FOPT_PLAIN=texte brut
 DLG_FOPT_TIMESTAMP=&Timestamp
 DLG_FOPT_HIDEDIALOG=Cacher
 DLG_FOPT_ALLBUFFINFIRST=In&clude screen buffer
+DLG_FOPT_TIMESTAMP_LOCAL=Local Time
+DLG_FOPT_TIMESTAMP_UTC=UTC
+DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING=Elapsed Time (Logging)
+DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION=Elapsed Time (Connection)
 
 DLG_XOPT=Option
 DLG_XOPT_CHECKSUM=Check&sum
