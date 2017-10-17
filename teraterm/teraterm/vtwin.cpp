@@ -4298,7 +4298,7 @@ void CVTWindow::OnViewLog()
 	GetStartupInfo(&si);
 	memset(&pi, 0, sizeof(pi));
 
-	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s \"%s\"", ts.ViewlogEditor, file);
+	_snprintf_s(command, sizeof(command), _TRUNCATE, "\"%s\" \"%s\"", ts.ViewlogEditor, file);
 
 	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
