@@ -169,12 +169,57 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 	return Ok;
 }
 
+void SetLogFlags(HWND Dialog)
+{
+	LPLONG pl;
+	WORD BinFlag, val;
+	long opt = 0;
+
+	pl = (LPLONG)GetWindowLong(Dialog, DWL_USER);
+	if (pl) {
+		GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
+		if (BinFlag) {
+			opt |= LOGDLG_BINARY;
+		}
+
+		GetRB(Dialog, &val, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
+		if (val) {
+			opt |= LOGDLG_APPEND;
+		}
+
+		if (!BinFlag) {
+			GetRB(Dialog, &val, IDC_PLAINTEXT, IDC_PLAINTEXT);
+			if (val) {
+				opt |= LOGDLG_PLAINTEXT;
+			}
+
+			GetRB(Dialog, &val, IDC_TIMESTAMP, IDC_TIMESTAMP);
+			if (val) {
+				opt |= LOGDLG_TIMESTAMP;
+			}
+		}
+
+		GetRB(Dialog, &val, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
+		if (val) {
+			opt |= LOGDLG_HIDEDIALOG;
+		}
+
+		GetRB(Dialog, &val, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
+		if (val) {
+			opt |= LOGDLG_INCSCRBUFF;
+		}
+
+		*pl = opt;
+	}
+}
+
 /* Hook function for file name dialog box */
 BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
-	WORD Lo, Hi;
+	WORD BinFlag;
 	LPLONG pl;
+	long opt;
 	LPOFNOTIFY notify;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
 	LOGFONT logfont;
@@ -184,6 +229,7 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:
 		ofn = (LPOPENFILENAME)lParam;
 		pl = (LPLONG)(ofn->lCustData);
+		opt = *pl;
 		SetWindowLong(Dialog, DWL_USER, (LONG)pl);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
@@ -223,42 +269,46 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		get_lang_msg("DLG_FOPT_ALLBUFFINFIRST", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 		SetDlgItemText(Dialog, IDC_ALLBUFF_INFIRST, uimsg);
 
-		Lo = LOWORD(*pl) & 1;
-		Hi = HIWORD(*pl);
-		SetRB(Dialog,Lo,IDC_FOPTBIN,IDC_FOPTBIN);
-		ShowDlgItem(Dialog,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
-		SetRB(Dialog,Hi & 1,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
+		// Binary チェックボックス
+		BinFlag = CheckFlag(opt, LOGDLG_BINARY);
+		SetRB(Dialog, BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
 
-		// plain textチェックボックスはデフォルトでON (2005.2.20 yutaka)
-		ShowDlgItem(Dialog,IDC_PLAINTEXT,IDC_PLAINTEXT);
-		if (Lo) {
-			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog,IDC_PLAINTEXT,IDC_PLAINTEXT);
+		// Append チェックボックス
+		ShowDlgItem(Dialog, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
+		if (opt & LOGDLG_APPEND) {
+			SetRB(Dialog, 1, IDC_FOPTAPPEND, IDC_FOPTAPPEND);
 		}
-		else if (Hi & 0x1000) {
-			SetRB(Dialog,1,IDC_PLAINTEXT,IDC_PLAINTEXT);
+
+		// Plain Text チェックボックス
+		ShowDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		if (BinFlag) {
+			// Binaryフラグが有効なときはチェックできない
+			DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_PLAINTEXT);
+		}
+		else if (opt & LOGDLG_PLAINTEXT) {
+			SetRB(Dialog, 1, IDC_PLAINTEXT, IDC_PLAINTEXT);
 		}
 
 		// timestampチェックボックス (2006.7.23 maya)
-		ShowDlgItem(Dialog,IDC_TIMESTAMP,IDC_TIMESTAMP);
-		if (Lo) {
+		ShowDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
+		if (BinFlag) {
 			// Binaryフラグが有効なときはチェックできない
-			DisableDlgItem(Dialog,IDC_TIMESTAMP,IDC_TIMESTAMP);
+			DisableDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		}
-		else if (Hi & 0x2000) {
-			SetRB(Dialog,1,IDC_TIMESTAMP,IDC_TIMESTAMP);
+		else if (opt & LOGDLG_TIMESTAMP) {
+			SetRB(Dialog, 1, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		}
 
 		// Hide dialogチェックボックス (2008.1.30 maya)
-		ShowDlgItem(Dialog,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
-		if (Hi & 0x4000) {
-			SetRB(Dialog,1,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
+		ShowDlgItem(Dialog, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
+		if (opt & LOGDLG_HIDEDIALOG) {
+			SetRB(Dialog, 1, IDC_HIDEDIALOG, IDC_HIDEDIALOG);
 		}
 
 		// Include screen bufferチェックボックス (2013.9.29 yutaka)
-		ShowDlgItem(Dialog,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
-		if (Hi & 0x8000) {
-			SetRB(Dialog,1,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
+		ShowDlgItem(Dialog, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
+		if (opt & LOGDLG_INCSCRBUFF) {
+			SetRB(Dialog, 1, IDC_ALLBUFF_INFIRST, IDC_ALLBUFF_INFIRST);
 		}
 
 		return TRUE;
@@ -266,24 +316,24 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
-			if (pl!=NULL)
-			{
-				GetRB(Dialog,&Lo,IDC_FOPTBIN,IDC_FOPTBIN);
-				Hi = HIWORD(*pl);
-				GetRB(Dialog,&Hi,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
-				*pl = MAKELONG(Lo,Hi);
+			SetLogFlags(Dialog);
+
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
 			}
 			break;
 		case IDCANCEL:
+			if (DlgFoptFont != NULL) {
+				DeleteObject(DlgFoptFont);
+			}
 			break;
 		case IDC_FOPTBIN:
-			GetRB(Dialog,&Lo,IDC_FOPTBIN,IDC_FOPTBIN);
-			if (Lo) {
-				DisableDlgItem(Dialog,IDC_PLAINTEXT,IDC_TIMESTAMP);
+			GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
+			if (BinFlag) {
+				DisableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
 			}
 			else {
-				EnableDlgItem(Dialog,IDC_PLAINTEXT,IDC_TIMESTAMP);
+				EnableDlgItem(Dialog, IDC_PLAINTEXT, IDC_TIMESTAMP);
 			}
 			break;
 		}
@@ -292,43 +342,8 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		notify = (LPOFNOTIFY)lParam;
 		switch (notify->hdr.code) {
 		case CDN_FILEOK:
-			pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
-			if (pl!=NULL)
-			{
-				WORD val = 0;
+			SetLogFlags(Dialog);
 
-				GetRB(Dialog,&Lo,IDC_FOPTBIN,IDC_FOPTBIN);
-				Hi = HIWORD(*pl);
-				GetRB(Dialog,&Hi,IDC_FOPTAPPEND,IDC_FOPTAPPEND);
-
-				if (!Lo) {
-					// plain text check-box
-					GetRB(Dialog,&val,IDC_PLAINTEXT,IDC_PLAINTEXT);
-					if (val > 0) { // checked
-						Hi |= 0x1000;
-					}
-
-					// timestampチェックボックス (2006.7.23 maya)
-					GetRB(Dialog,&val,IDC_TIMESTAMP,IDC_TIMESTAMP);
-					if (val > 0) {
-						Hi |= 0x2000;
-					}
-				}
-
-				// Hide dialogチェックボックス (2008.1.30 maya)
-				GetRB(Dialog,&val,IDC_HIDEDIALOG,IDC_HIDEDIALOG);
-				if (val > 0) {
-					Hi |= 0x4000;
-				}
-
-				// Include screen bufferチェックボックス (2013.9.29 yutaka)
-				GetRB(Dialog,&val,IDC_ALLBUFF_INFIRST,IDC_ALLBUFF_INFIRST);
-				if (val > 0) {
-					Hi |= 0x8000;
-				}
-
-				*pl = MAKELONG(Lo,Hi);
-			}
 			if (DlgFoptFont != NULL) {
 				DeleteObject(DlgFoptFont);
 			}
@@ -477,8 +492,7 @@ BOOL PASCAL GetTransFname
 
 		fv->DirLen = ofn.nFileOffset;
 
-		if (CurDir!=NULL)
-		{
+		if (CurDir!=NULL) {
 			memcpy(CurDir,fv->FullName,fv->DirLen-1);
 			CurDir[fv->DirLen-1] = 0;
 		}

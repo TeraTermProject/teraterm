@@ -99,6 +99,8 @@ void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
 
+#define CheckFlag(var, flag)	(((var) & (flag)) != 0)
+
 #ifdef __cplusplus
 }
 #endif

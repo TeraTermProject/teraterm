@@ -217,6 +217,14 @@ typedef TCharAttr *PCharAttr;
 #define IdUtf8     5
 #define IdLangMax IdUtf8
 
+// LogDialog Option
+#define LOGDLG_BINARY          1
+#define LOGDLG_APPEND          (1 << 1)
+#define LOGDLG_PLAINTEXT       (1 << 2)
+#define LOGDLG_TIMESTAMP       (1 << 3)
+#define LOGDLG_HIDEDIALOG      (1 << 4)
+#define LOGDLG_INCSCRBUFF      (1 << 5)
+
 // log flags (used in ts.LogFlag) 
 #define LOG_TEL 1
 #define LOG_KMT 2

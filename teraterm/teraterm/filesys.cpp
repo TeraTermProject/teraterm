@@ -512,72 +512,51 @@ BOOL LogStart()
 		logdir = ts.HomeDir;
 	}
 
-	if (strlen(&(LogVar->FullName[LogVar->DirLen]))==0)
-	{
-		// LOWORD
-		// 0x0001 = Binary
-		// HIWORD
-		// 0x0001 = Append
-		// 0x1000 = plain text (2005.2.20 yutaka)
-		// 0x2000 = timestamp (2006.7.23 maya)
-		// 0x4000 = hide file transfer dialog (2008.1.30 maya)
-		// 0x8000 = Include screen buffer (2013.9.29 yutaka)
-		// teraterm.iniの設定を見てからデフォルトオプションを決める。(2005.5.7 yutaka)
-		Option = MAKELONG(ts.LogBinary,
-		                  ts.Append |
-		                  (0x1000 * ts.LogTypePlainText) |
-		                  (0x2000 * ts.LogTimestamp) |
-		                  (0x4000 * ts.LogHideDialog) |
-		                  (0x8000 * ts.LogAllBuffIncludedInFirst)
-		         );
+	if (strlen(&(LogVar->FullName[LogVar->DirLen]))==0) {
+		Option = 0;
+		if (ts.LogBinary) {
+			Option |= LOGDLG_BINARY;
+		}
+		if (ts.Append) {
+			Option |= LOGDLG_APPEND;
+		}
+		if (ts.LogTypePlainText) {
+			Option |= LOGDLG_PLAINTEXT;
+		}
+		if (ts.LogTimestamp) {
+			Option |= LOGDLG_TIMESTAMP;
+		}
+		if (ts.LogHideDialog) {
+			Option |= LOGDLG_HIDEDIALOG;
+		}
+		if (ts.LogAllBuffIncludedInFirst) {
+			Option |= LOGDLG_INCSCRBUFF;
+		}
 
 		// ログのデフォルトファイル名を設定 (2006.8.28 maya)
 		strncat_s(LogVar->FullName, sizeof(LogVar->FullName), ts.LogDefaultName, _TRUNCATE);
-
 		ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-
-		// &h をホスト名に置換 (2007.5.14)
 		ConvertLogname(LogVar->FullName, sizeof(LogVar->FullName));
 
 		strncpy_s(LogVar->LogDefaultPath, sizeof(LogVar->LogDefaultPath), ts.LogDefaultPath, _TRUNCATE);
-		if (! (*GetTransFname)(LogVar, logdir, GTF_LOG, &Option))
-		{
+		if (! (*GetTransFname)(LogVar, logdir, GTF_LOG, &Option)) {
 			FreeFileVar(&LogVar);
 			FreeTTFILE();
 			return FALSE;
 		}
-		ts.LogBinary = LOWORD(Option);
-		ts.Append = HIWORD(Option);
 
-		if (ts.Append & 0x1000) {
-			ts.LogTypePlainText = 1;
-		} else {
-			ts.LogTypePlainText = 0;
-		}
-
-		if (ts.Append & 0x2000) {
-			ts.LogTimestamp = 1;
-		}
-		else {
-			ts.LogTimestamp = 0;
-		}
-
-		if (ts.Append & 0x4000) {
-			ts.LogHideDialog = 1;
-		}
-		else {
-			ts.LogHideDialog = 0;
-		}
-
-		if (ts.Append & 0x8000) {
-			ts.LogAllBuffIncludedInFirst = 1;
-		}
-		else {
-			ts.LogAllBuffIncludedInFirst = 0;
-		}
-
-		ts.Append &= 0x1; // 1bitにマスクする
-
+		ts.LogBinary = CheckFlag(Option, LOGDLG_BINARY);
+			CheckFlag(Option, LOGDLG_BINARY);
+		ts.Append =
+			CheckFlag(Option, LOGDLG_APPEND);
+		ts.LogTypePlainText =
+			CheckFlag(Option, LOGDLG_PLAINTEXT);
+		ts.LogTimestamp =
+			CheckFlag(Option, LOGDLG_TIMESTAMP);
+		ts.LogHideDialog =
+			CheckFlag(Option, LOGDLG_HIDEDIALOG);
+		ts.LogAllBuffIncludedInFirst =
+			CheckFlag(Option, LOGDLG_INCSCRBUFF);
 	}
 	else {
 		// LogVar->DirLen = 0 だとここに来る
@@ -586,12 +565,11 @@ BOOL LogStart()
 
 		// フルパス化
 		strncpy_s(FileName, sizeof(FileName), LogVar->FullName, _TRUNCATE);
-		ConvFName(logdir,FileName,sizeof(FileName),"",LogVar->FullName,sizeof(LogVar->FullName));
+		ConvFName(logdir, FileName, sizeof(FileName), "", LogVar->FullName, sizeof(LogVar->FullName));
 
 		ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-
-		// &h をホスト名に置換 (2007.5.14)
 		ConvertLogname(LogVar->FullName, sizeof(LogVar->FullName));
+
 		(*SetFileVar)(LogVar);
 
 		FixLogOption();
@@ -1111,7 +1089,7 @@ void FreeBinBuf()
 extern "C" {
 void FileSendStart()
 {
-	LONG Option;
+	LONG Option = 0;
 
 	if (! cv.Ready || FSend) return;
 	if (cv.ProtoFlag)
@@ -1131,16 +1109,15 @@ void FileSendStart()
 
 	FSend = TRUE;
 
-	if (strlen(&(SendVar->FullName[SendVar->DirLen]))==0)
-	{
-		Option = MAKELONG(ts.TransBin,0);
+	if (strlen(&(SendVar->FullName[SendVar->DirLen]))==0) {
+		if (ts.TransBin)
+			Option |= LOGDLG_BINARY;
 		SendVar->FullName[0] = 0;
-		if (! (*GetTransFname)(SendVar, ts.FileDir, GTF_SEND, &Option))
-		{
+		if (! (*GetTransFname)(SendVar, ts.FileDir, GTF_SEND, &Option)) {
 			FileTransEnd(OpSendFile);
 			return;
 		}
-		ts.TransBin = LOWORD(Option);
+		ts.TransBin = CheckFlag(Option, LOGDLG_BINARY);
 	}
 	else
 		(*SetFileVar)(SendVar);
@@ -1850,7 +1827,7 @@ void ZMODEMStart(int mode)
 extern "C" {
 void BPStart(int mode)
 {
-	LONG Option;
+	LONG Option = 0;
 
 	if (! ProtoStart())
 		return;
