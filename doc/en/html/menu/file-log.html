@@ -14,40 +14,40 @@
       Logs received characters to a file.
     </p>
 
-    <h2>"Log" dialog box (to input the log file name)</h2>
+    <h2 id="LogStart">"Log" dialog box (to input the log file name)</h2>
     <dl>
-      <dt>File Name</dt>
+      <dt id="FileName">File Name</dt>
       <dd>
 	Enter or select the log file name.
       </dd>
 
-      <dt>Binary</dt>
+      <dt id="Binary">Binary</dt>
       <dd>
 	If you select this option, received characters are written without
 	any modifications. Otherwise, new-line codes are converted and
 	escape sequences are stripped out.
       </dd>
 
-      <dt>Append</dt>
+      <dt id="Append">Append</dt>
       <dd>
 	If you select this option and the specified log file already exists,
 	received characters are appended to the file. Otherwise, the file is
 	overwritten.
       </dd>
 
-      <dt>Plain text</dt>
+      <dt id="PlainText">Plain text</dt>
       <dd>
 	If you select this option, ASCII non-printable characters are not written.<br>
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
       </dd>
 
-      <dt>Timestamp</dt>
+      <dt id="Timestamp">Timestamp</dt>
       <dd>
 	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
       </dd>
 
-      <dt>Hide dialog</dt>
+      <dt id="HideDialog">Hide dialog</dt>
       <dd>
 	If you select this option, "Log" dialog box is not displayed.
       </dd>
@@ -59,14 +59,14 @@
 
     </dl>
 
-    <h2>"Log" dialog box (displayed while logging)</h2>
+    <h2 id="Logging">"Log" dialog box (displayed while logging)</h2>
     <dl>
-      <dt>Close</dt>
+      <dt id="Close">Close</dt>
       <dd>
 	The Close button quits logging and closes the log file.
       </dd>
 
-      <dt>Pause/Start</dt>
+      <dt id="Pause">Pause/Start</dt>
       <dd>
 	The Pause button pauses logging. The Start button restarts logging.
 	These buttons function as toggles.

@@ -14,39 +14,39 @@
       ホストから受信した文字をファイルに書き込みます。
     </p>
 
-    <h2>"Log" ダイアログボックス(ファイル名指定)</h2>
+    <h2 id="LogStart">"Log" ダイアログボックス(ファイル名指定)</h2>
     <dl>
-      <dt>File Name</dt>
+      <dt id="FileName">File Name</dt>
       <dd>
 	書き込むファイルのファイル名を入力または選択してください。
       </dd>
 
-      <dt>Binary</dt>
+      <dt id="Binary">Binary</dt>
       <dd>
 	ホストから受信した文字をそのままファイルに書き込みたい場合は選択してください。
 	選択しない場合は、漢字コード、改行文字は変換され、
 	エスケープシーケンスは取り除かれてから書き込まれます。
       </dd>
 
-      <dt>Append</dt>
+      <dt id="Append">Append</dt>
       <dd>
 	すでに存在するファイルに追加して書き込みたい場合は選択してください。
 	選択しない場合は上書きされます。
       </dd>
 
-      <dt>Plain text</dt>
+      <dt id="PlainText">Plain text</dt>
       <dd>
 	ASCII 非表示文字を書き込みたくない場合は選択してください。<br>
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
       </dd>
 
-      <dt>Timestamp</dt>
+      <dt id="Timestamp">Timestamp</dt>
       <dd>
 	ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
       </dd>
 
-      <dt>Hide dialog</dt>
+      <dt id="HideDialog">Hide dialog</dt>
       <dd>
 	ログ転送のダイアログを表示したくない場合は選択してください。
       </dd>
@@ -58,14 +58,14 @@
 
     </dl>
 
-    <h2>"Log" ダイアログボックス(ファイルへ書き込み中)</h2>
+    <h2 id="Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</h2>
     <dl>
-      <dt>Close</dt>
+      <dt id="Close">Close</dt>
       <dd>
 	Close ボタンを押すとファイルへの書き込みを終了します。
       </dd>
 
-      <dt>Pause/Start</dt>
+      <dt id="Pause">Pause/Start</dt>
       <dd>
 	Pause ボタンを押すとファイルへの書き込みを一時中断します。
 	このとき Pause ボタンは Start ボタンに変化します。
