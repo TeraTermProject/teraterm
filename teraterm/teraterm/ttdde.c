@@ -77,7 +77,6 @@ static LONG SyncFreeSpace;
 
 static char ParamFileName[MaxStrLen];
 static WORD ParamBinaryFlag;
-static WORD ParamAppendFlag;
 static WORD ParamXmodemOpt;
 static char ParamSecondFileName[MaxStrLen];
 
@@ -361,12 +360,14 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 	case CmdSetBinary:
 		ParamBinaryFlag = Command[1] & 1;
 		break;
-	case CmdSetAppend:
-		ParamAppendFlag     = Command[1] & 1;
-		ts.LogTypePlainText = Command[13] & 1;
-		ts.LogTimestamp     = Command[14] & 1;
-		ts.LogHideDialog    = Command[15] & 1;
-		ts.LogAllBuffIncludedInFirst    = Command[16] & 1;
+	case CmdSetLogOpt:
+		ts.LogBinary        = Command[LogOptBinary] - 0x30;
+		ts.Append           = Command[LogOptAppend] - 0x30;
+		ts.LogTypePlainText = Command[LogOptPlainText] - 0x30;
+		ts.LogTimestamp     = Command[LogOptTimestamp] - 0x30;
+		ts.LogHideDialog    = Command[LogOptHideDialog] - 0x30;
+		ts.LogAllBuffIncludedInFirst = Command[LogOptIncScrBuff] - 0x30;
+		ts.LogTimestampType = Command[LogOptTimestampType] - 0x30;
 		break;
 	case CmdSetXmodemOpt:
 		ParamXmodemOpt = Command[1] & 3;
@@ -543,8 +544,6 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 			LogVar->NoMsg = TRUE;
 			strncpy_s(LogVar->FullName, sizeof(LogVar->FullName),ParamFileName, _TRUNCATE);
 			ParseStrftimeFileName(LogVar->FullName, sizeof(LogVar->FullName));
-			ts.LogBinary = ParamBinaryFlag;
-			ts.Append = ParamAppendFlag;
 			ret = LogStart();
 			if (ret) {
 				strncpy_s(ParamFileName, sizeof(ParamFileName),"1", _TRUNCATE);

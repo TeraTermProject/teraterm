@@ -920,29 +920,20 @@ void SetDebug(int DebugFlag)
   DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
 }
 
-void SetAppend(int AppendFlag)
+void SetLogOption(int *LogFlags)
 {
-	char Cmd[18];
+	char Cmd[LogOptMax+2];
 
-	Cmd[0]  = CmdSetAppend;
-	Cmd[1]  = 0x30 + (AppendFlag & 1);
-	Cmd[2]  = 0x30;
-	Cmd[3]  = 0x30;
-	Cmd[4]  = 0x30;
-	Cmd[5]  = 0x30;
-	Cmd[6]  = 0x30;
-	Cmd[7]  = 0x30;
-	Cmd[8]  = 0x30;
-	Cmd[9]  = 0x30;
-	Cmd[10] = 0x30;
-	Cmd[11] = 0x30;
-	Cmd[12] = 0x30;
-	Cmd[13] = 0x30 + ((AppendFlag & 0x1000) != 0);
-	Cmd[14] = 0x30 + ((AppendFlag & 0x2000) != 0);
-	Cmd[15] = 0x30 + ((AppendFlag & 0x4000) != 0);
-	Cmd[16] = 0x30 + ((AppendFlag & 0x8000) != 0);
-	Cmd[17] = 0;
-	DdeClientTransaction(Cmd,strlen(Cmd)+1,ConvH,0,CF_OEMTEXT,XTYP_EXECUTE,1000,NULL);
+	Cmd[0]                   = CmdSetLogOpt;
+	Cmd[LogOptBinary]        = 0x30 + (LogFlags[LogOptBinary] != 0);
+	Cmd[LogOptAppend]        = 0x30 + (LogFlags[LogOptAppend] != 0);
+	Cmd[LogOptPlainText]     = 0x30 + (LogFlags[LogOptPlainText] != 0);
+	Cmd[LogOptTimestamp]     = 0x30 + (LogFlags[LogOptTimestamp] != 0);
+	Cmd[LogOptHideDialog]    = 0x30 + (LogFlags[LogOptHideDialog] != 0);
+	Cmd[LogOptIncScrBuff]    = 0x30 + (LogFlags[LogOptIncScrBuff] != 0);
+	Cmd[LogOptTimestampType] = 0x30 + LogFlags[LogOptTimestampType];
+	Cmd[LogOptMax+1]         = 0;
+	DdeClientTransaction(Cmd, sizeof(Cmd), ConvH, 0, CF_OEMTEXT, XTYP_EXECUTE, 1000, NULL);
 }
 
 void SetXOption(int XOption)

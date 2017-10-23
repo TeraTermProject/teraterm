@@ -57,7 +57,7 @@ void SetFile(PCHAR FN);
 void SetSecondFile(PCHAR FN);
 void SetBinary(int BinFlag);
 void SetDebug(int DebugFlag);
-void SetAppend(int AppendFlag);
+void SetLogOption(int *LogFlags);
 void SetXOption(int XOption);
 void SendSync();
 void SetSync(BOOL OnFlag);

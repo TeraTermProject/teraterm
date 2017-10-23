@@ -3131,53 +3131,49 @@ WORD TTLLogOpen()
 {
 	TStrVal Str;
 	WORD Err;
-	int BinFlag, AppendFlag;
-	int TmpFlag, TmpOpt;
+	int LogFlags[LogOptMax+1] = { 0 };
+	int TmpFlag;
 	char ret[2];
 
 	Err = 0;
-	GetStrVal(Str,&Err);
-	GetIntVal(&BinFlag,&Err);
-	GetIntVal(&AppendFlag,&Err);
+	GetStrVal(Str, &Err);
+	GetIntVal(&LogFlags[LogOptBinary], &Err);
+	GetIntVal(&LogFlags[LogOptAppend], &Err);
 
-	if (CheckParameterGiven()) { // plain text
-		GetIntVal(&TmpFlag, &Err);
-		if (Err!=0) return Err;
-		TmpOpt = (TmpFlag == 0) ? 0 : 1;
-		AppendFlag |= TmpOpt * 0x1000;
-
-		if (CheckParameterGiven()) { // timestamp
-			GetIntVal(&TmpFlag, &Err);
-			if (Err!=0) return Err;
-			TmpOpt = (TmpFlag == 0) ? 0 : 1;
-			AppendFlag |= TmpOpt * 0x2000;
-
-			if (CheckParameterGiven()) { // hide file transfer dialog
-				GetIntVal(&TmpFlag, &Err);
-				if (Err!=0) return Err;
-				TmpOpt = (TmpFlag == 0) ? 0 : 1;
-				AppendFlag |= TmpOpt * 0x4000;
-
-				if (CheckParameterGiven()) { // Include screen buffer
-					GetIntVal(&TmpFlag, &Err);
-					if (Err!=0) return Err;
-					TmpOpt = (TmpFlag == 0) ? 0 : 1;
-					AppendFlag |= TmpOpt * 0x8000;
-				}
-
-			}
-		}
-	}
-
-	if ((Err==0) &&
-	    ((strlen(Str)==0) || (GetFirstChar()!=0)))
-		Err = ErrSyntax;
-
+	// plain text
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetIntVal(&LogFlags[LogOptPlainText], &Err);
 	if (Err!=0) return Err;
 
+	// timestamp
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetIntVal(&LogFlags[LogOptTimestamp], &Err);
+	if (Err!=0) return Err;
+
+	// hide file transfer dialog
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetIntVal(&LogFlags[LogOptHideDialog], &Err);
+	if (Err!=0) return Err;
+
+	// Include screen buffer
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetIntVal(&LogFlags[LogOptIncScrBuff], &Err);
+	if (Err!=0) return Err;
+
+	// Timestamp Type
+	if (!CheckParameterGiven()) goto EndLogOptions;
+	GetIntVal(&TmpFlag, &Err);
+	if (Err!=0) return Err;
+	if (TmpFlag < 0 || TmpFlag > 3)
+		return ErrSyntax;
+	LogFlags[LogOptTimestampType] = TmpFlag;
+
+EndLogOptions:
+	if (strlen(Str) == 0 || GetFirstChar() != 0)
+		return ErrSyntax;
+
 	SetFile(Str);
-	SetBinary(BinFlag);
-	SetAppend(AppendFlag);
+	SetLogOption(LogFlags);
 
 	memset(ret, 0, sizeof(ret));
 	Err = GetTTParam(CmdLogOpen,ret,sizeof(ret));

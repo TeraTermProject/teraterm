@@ -18,7 +18,7 @@ Tera Term のログを開始する。
 </p>
 
 <pre class="macro-syntax">
-logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;Include screen buffer flag&gt;]]]]
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;include screen buffer flag&gt; [&lt;timestamp type&gt;]]]]]
 </pre>
 
 <h2>解説</h2>
@@ -49,8 +49,39 @@ logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text
 </p>
 
 <p>
-&lt;Include screen buffer flag&gt; が 0 以外の場合、現在の端末バッファすべてを先にファイルに書き込む。 <em>(バージョン 4.80以降)</em>
+&lt;include screen buffer flag&gt; が 0 以外の場合、現在の端末バッファすべてを先にファイルに書き込む。 <em>(バージョン 4.80以降)</em>
 </p>
+
+<p>
+&lt;timestamp type&gt; は timestamp の形式を指定する。以下の値が指定出来る。<em>(バージョン 4.97以降)</em>
+</p>
+
+<table>
+  <tr>
+    <th>値</th>
+    <th>意味</ht>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>地方時</td>
+  </tr>
+
+  <tr>
+    <td>1</td>
+    <td>UTC</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>Elapsed Time (Logging)</td>
+  </tr>
+
+  <tr>
+    <td>3</td>
+    <td>Elapsed Time (Connection)</td>
+  </tr>
+</table>
 
 <p>
 ログファイルを開けた場合、result に 0 が格納される。開けなかった場合は 1 が格納される。<em>(バージョン 4.62 以降)</em>

@@ -18,7 +18,7 @@ Causes Tera Term to start logging.
 </p>
 
 <pre class="macro-syntax">
-logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;Include screen buffer flag&gt;]]]]
+logopen &lt;filename&gt; &lt;binary flag&gt; &lt;append flag&gt; [&lt;plain text flag&gt; [&lt;timestamp flag&gt; [&lt;hide dialog flag&gt; [&lt;include screen buffer flag&gt; [&lt;timestamp type]]]]]
 </pre>
 
 <h2>Remarks</h2>
@@ -49,9 +49,39 @@ If &lt;hide dialog flag&gt; is not 0, "Log" dialog box is not displayed.
 </p>
 
 <p>
-If &lt;Include screen buffer flag&gt; is not 0, all current screen buffer is written into a log file in first.  <em>(version 4.80 or later)</em>
+If &lt;include screen buffer flag&gt; is not 0, all current screen buffer is written into a log file in first.  <em>(version 4.80 or later)</em>
 </p>
 
+<p>
+&lt;timestamp type&gt; specifies timestamp type, and can be one of the following: <em>(version 4.97 or later)</em>
+</p>
+
+<table>
+  <tr>
+    <th>value</th>
+    <th>Meaning</ht>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>Local Time</td>
+  </tr>
+
+  <tr>
+    <td>1</td>
+    <td>UTC</td>
+  </tr>
+
+  <tr>
+    <td>2</td>
+    <td>Elapsed Time (Logging)</td>
+  </tr>
+
+  <tr>
+    <td>3</td>
+    <td>Elapsed Time (Connection)</td>
+  </tr>
+</table>
 
 <p>
 If a log file is successfully opened, the system variable "result" is set to 0. Otherwise, the "result" is set to 1. <em>(version 4.62 or later)</em>
