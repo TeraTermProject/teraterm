@@ -41,12 +41,6 @@
 	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
       </dd>
 
-      <dt id="Timestamp">Timestamp</dt>
-      <dd>
-	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
-	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
-      </dd>
-
       <dt id="HideDialog">Hide dialog</dt>
       <dd>
 	If you select this option, "Log" dialog box is not displayed.
@@ -57,6 +51,35 @@
 	If you select this option, the logging starts after current all buffer is written into a log file.
       </dd>
 
+      <dt id="Timestamp">Timestamp</dt>
+      <dd>
+	If you select this option, a timestamp is added on top of each log line. The timestamp is added when the first character of the line appears.<br>
+	The timestamp type can be selected from following.
+	<dl id="Timestamptype">
+	  <dt>Local Time</dt>
+	  <dd>
+	    Record the time in local time.
+	  </dd>
+
+	  <dt>UTC</dt>
+	  <dd>
+	    Record the time in UTC.
+	  </dd>
+
+	  <dt>Elapsed Time (Logging)</dt>
+	  <dd>
+	    Record the elapsed time from the start of logging.
+	  </dd>
+
+	  <dt>Elapsed Time (Connection)</dt>
+	  <dd>
+	    Record the elapsed time from the start of connection.
+	  </dd>
+	</dl>
+	The timestamp format is specified with <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> when the timestamp type is "Local Time" and "UTC".<br>
+	The LogTimestampFormat is ignored when the timestamp type is "Elapsed Time (Logging)" or "Elapsed Time (Connection)".<br>
+	NOTE: When the Binary option is enabled, this option can not be checked and the value will be disabled.
+      </dd>
     </dl>
 
     <h2 id="Logging">"Log" dialog box (displayed while logging)</h2>

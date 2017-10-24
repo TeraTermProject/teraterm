@@ -40,12 +40,6 @@
 	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
       </dd>
 
-      <dt id="Timestamp">Timestamp</dt>
-      <dd>
-	ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
-	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
-      </dd>
-
       <dt id="HideDialog">Hide dialog</dt>
       <dd>
 	ログ転送のダイアログを表示したくない場合は選択してください。
@@ -56,6 +50,35 @@
 	現在の端末バッファをすべてログファイルに書き出してから、ログ採取を開始します。
       </dd>
 
+      <dt id="Timestamp">Timestamp</dt>
+      <dd>
+	ログの行頭に時刻を追加したい場合は選択してください。行の最初の文字が出力された時刻が追加されます。<br>
+	タイムスタンプの種別として以下が選択できます。
+	<dl id="TimestampType">
+	  <dt>Local Time</dt>
+	  <dd>
+	    ローカルタイムでの日時を記録します。
+	  </dd>
+
+	  <dt>UTC</dt>
+	  <dd>
+	    UTC での日時を記録します。
+	  </dd>
+
+	  <dt>Elapsed Time (Logging)</dt>
+	  <dd>
+	    ログ取得開始からの経過時間を記録します。
+	  </dd>
+
+	  <dt>Elapsed Time (Connection)</dt>
+	  <dd>
+	    接続開始からの経過時間を記録します。
+	  </dd>
+	</dl>
+	Local Time, UTC での日時のフォーマットは <a href="../setup/teraterm-misc.html#LogTimestampFormat">LogTimestampFormat</a> の設定に従います。<br>
+	Elapsed Time (Logging), Elapsed Time (Connection) では LogTimestampFormat の設定は無視されます。<br>
+	※Binary オプションが有効の場合は選択不可であり、設定は無効化されます。
+      </dd>
     </dl>
 
     <h2 id="Logging">"Log" ダイアログボックス(ファイルへ書き込み中)</h2>
