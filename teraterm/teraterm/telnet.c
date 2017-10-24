@@ -249,89 +249,82 @@ void ParseTelIAC(BYTE b)
 
 void ParseTelSB(BYTE b)
 {
-  BYTE TmpStr[51];
-  int i;
+	BYTE TmpStr[51];
+	int i;
 
-  if (tr.SubOptIAC)
-  {
-    tr.SubOptIAC = FALSE;
-    switch (b) {
-      case SE:
-	if ((tr.MyOpt[TERMTYPE].Status == Yes) &&
-	    (tr.SubOptCount >= 2) &&
-	    (tr.SubOptBuff[0] == TERMTYPE) &&
-	    (tr.SubOptBuff[1] == 1))
-	{
+	if (tr.SubOptIAC) {
+		tr.SubOptIAC = FALSE;
+		switch (b) {
+		case SE:
+			if ((tr.MyOpt[TERMTYPE].Status == Yes) &&
+			    (tr.SubOptCount >= 2) &&
+			    (tr.SubOptBuff[0] == TERMTYPE) &&
+			    (tr.SubOptBuff[1] == 1))
+			{
 #if 1
-	  _snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c", IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
-	  // 4 バイト目に 0 が入るので、ずらして長さをとる
-	  i = strlen(TmpStr + 4) + 4;
+				_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c",
+				            IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
+				// 4 バイト目に 0 が入るので、ずらして長さをとる
+				i = strlen(TmpStr + 4) + 4;
 #else
-	  TmpStr[0] = IAC;
-	  TmpStr[1] = SB;
-	  TmpStr[2] = TERMTYPE;
-	  TmpStr[3] = 0;
-	  strcpy(&TmpStr[4],ts.TermType);
-	  i = 4 + strlen(ts.TermType);
-	  TmpStr[i] = IAC;
-	  i++;
-	  TmpStr[i] = SE;
-	  i++;
+				TmpStr[0] = IAC;
+				TmpStr[1] = SB;
+				TmpStr[2] = TERMTYPE;
+				TmpStr[3] = 0;
+				strcpy(&TmpStr[4],ts.TermType);
+				i = 4 + strlen(ts.TermType);
+				TmpStr[i] = IAC;
+				i++;
+				TmpStr[i] = SE;
+				i++;
 #endif
-	  CommRawOut(&cv,TmpStr,i);
+				CommRawOut(&cv,TmpStr,i);
 
-	  if (tr.LogFile!=0)
-	    TelWriteLog(TmpStr,i);
+				if (tr.LogFile!=0)
+					TelWriteLog(TmpStr,i);
+			}
+			else if ( /* (tr.HisOpt[NAWS].Status == Yes) && */
+			        (tr.SubOptCount >= 5) &&
+			        (tr.SubOptBuff[0] == NAWS))
+			{
+				tr.WinSize.x = tr.SubOptBuff[1]*256+ tr.SubOptBuff[2];
+				tr.WinSize.y = tr.SubOptBuff[3]*256+ tr.SubOptBuff[4];
+				tr.ChangeWinSize = TRUE;
+			}
+			tr.SubOptCount = 0;
+			TelStatus = TelIdle;
+			return ;
+		/* case IAC: braek; */
+		default:
+			if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1) {
+				tr.SubOptCount = 0;
+				TelStatus = TelIdle;
+				return;
+			}
+			else {
+				tr.SubOptBuff[tr.SubOptCount] = IAC;
+				tr.SubOptCount++;
+				if (b==IAC) {
+					tr.SubOptIAC = TRUE;
+					return;
+				}
+			}
+		}
 	}
-	else if ( /* (tr.HisOpt[NAWS].Status == Yes) && */
-		 (tr.SubOptCount >= 5) &&
-		 (tr.SubOptBuff[0] == NAWS))
-	{
-	  tr.WinSize.x = tr.SubOptBuff[1]*256+
-			 tr.SubOptBuff[2];
-	  tr.WinSize.y = tr.SubOptBuff[3]*256+
-			 tr.SubOptBuff[4];
-	  tr.ChangeWinSize = TRUE;
+	else if (b==IAC) {
+		tr.SubOptIAC = TRUE;
+		return;
 	}
-	tr.SubOptCount = 0;
-	TelStatus = TelIdle;
-	return ;
-      /* case IAC: braek; */
-      default:
-	if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1)
-	{
-	  tr.SubOptCount = 0;
-	  TelStatus = TelIdle;
-	  return;
+
+	if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1) {
+		tr.SubOptCount = 0;
+		tr.SubOptIAC = FALSE;
+		TelStatus = TelIdle;
 	}
 	else {
-	  tr.SubOptBuff[tr.SubOptCount] = IAC;
-	  tr.SubOptCount++;
-	  if (b==IAC)
-	  {
-	    tr.SubOptIAC = TRUE;
-	    return;
-	  }
+		tr.SubOptBuff[tr.SubOptCount] = b;
+		tr.SubOptCount++;
 	}
-    }
-  }
-  else
-    if (b==IAC)
-    {
-      tr.SubOptIAC = TRUE;
-      return;
-    }
-
-  if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1)
-  {
-    tr.SubOptCount = 0;
-    tr.SubOptIAC = FALSE;
-    TelStatus = TelIdle;
-  }
-  else {
-    tr.SubOptBuff[tr.SubOptCount] = b;
-    tr.SubOptCount++;
-  }
 }
 
 void ParseTelWill(BYTE b)
