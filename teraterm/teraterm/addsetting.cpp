@@ -1617,81 +1617,13 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_OPT_BINARY | (BN_CLICKED << 16):
 			{
 				CButton *btn;
-				// バイナリオプションが有効の場合、FixLogOption() で無効化している
-				// オプションを、ここでも無効にしなければならない。
 				btn = (CButton *)GetDlgItem(IDC_OPT_BINARY);
 				if (btn->GetCheck()) {
-					ts.LogBinary = 1;
-
-					ts.LogTypePlainText = 0;
-					ts.LogTimestamp = 0;
 					GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(FALSE);
 					GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(FALSE);
 				} else {
-					ts.LogBinary = 0;
-
 					GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(TRUE);
 					GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(TRUE);
-				}
-			}
-			return TRUE;
-
-		case IDC_OPT_APPEND | (BN_CLICKED << 16):
-			{
-				CButton *btn;
-				btn = (CButton *)GetDlgItem(IDC_OPT_APPEND);
-				if (btn->GetCheck()) {
-					ts.Append = 1;
-				} else {
-					ts.Append = 0;
-				}
-			}
-			return TRUE;
-
-		case IDC_OPT_PLAINTEXT | (BN_CLICKED << 16):
-			{
-				CButton *btn;
-				btn = (CButton *)GetDlgItem(IDC_OPT_PLAINTEXT);
-				if (btn->GetCheck()) {
-					ts.LogTypePlainText = 1;
-				} else {
-					ts.LogTypePlainText = 0;
-				}
-			}
-			return TRUE;
-
-		case IDC_OPT_TIMESTAMP | (BN_CLICKED << 16):
-			{
-				CButton *btn;
-				btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
-				if (btn->GetCheck()) {
-					ts.LogTimestamp = 1;
-				} else {
-					ts.LogTimestamp = 0;
-				}
-			}
-			return TRUE;
-
-		case IDC_OPT_HIDEDLG | (BN_CLICKED << 16):
-			{
-				CButton *btn;
-				btn = (CButton *)GetDlgItem(IDC_OPT_HIDEDLG);
-				if (btn->GetCheck()) {
-					ts.LogHideDialog = 1;
-				} else {
-					ts.LogHideDialog = 0;
-				}
-			}
-			return TRUE;
-
-		case IDC_OPT_INCBUF | (BN_CLICKED << 16):
-			{
-				CButton *btn;
-				btn = (CButton *)GetDlgItem(IDC_OPT_INCBUF);
-				if (btn->GetCheck()) {
-					ts.LogAllBuffIncludedInFirst = 1;
-				} else {
-					ts.LogAllBuffIncludedInFirst = 0;
 				}
 			}
 			return TRUE;
@@ -1774,8 +1706,55 @@ void CLogPropPageDlg::OnOK()
 		/* 残りのメンバーは意図的に設定を残す。*/
 	}
 
-}
+	// Log Options
+	btn = (CButton *)GetDlgItem(IDC_OPT_BINARY);
+	if (btn->GetCheck()) {
+		ts.LogBinary = 1;
+	}
+	else {
+		ts.LogBinary = 0;
+	}
 
+	btn = (CButton *)GetDlgItem(IDC_OPT_APPEND);
+	if (btn->GetCheck()) {
+		ts.Append = 1;
+	}
+	else {
+		ts.Append = 0;
+	}
+
+	btn = (CButton *)GetDlgItem(IDC_OPT_PLAINTEXT);
+	if (btn->GetCheck()) {
+		ts.LogTypePlainText = 1;
+	}
+	else {
+		ts.LogTypePlainText = 0;
+	}
+
+	btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+	if (btn->GetCheck()) {
+		ts.LogTimestamp = 1;
+	}
+	else {
+		ts.LogTimestamp = 0;
+	}
+
+	btn = (CButton *)GetDlgItem(IDC_OPT_HIDEDLG);
+	if (btn->GetCheck()) {
+		ts.LogHideDialog = 1;
+	}
+	else {
+		ts.LogHideDialog = 0;
+	}
+
+	btn = (CButton *)GetDlgItem(IDC_OPT_INCBUF);
+	if (btn->GetCheck()) {
+		ts.LogAllBuffIncludedInFirst = 1;
+	}
+	else {
+		ts.LogAllBuffIncludedInFirst = 0;
+	}
+}
 
 
 // CCygwinPropPageDlg ダイアログ
