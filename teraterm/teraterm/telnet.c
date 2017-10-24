@@ -102,6 +102,7 @@ void InitTelnet()
   tr.HisOpt[SGA].Accept = TRUE;
   tr.HisOpt[ECHO].Accept = TRUE;
   tr.MyOpt[TERMTYPE].Accept = TRUE;
+  tr.MyOpt[TERMSPEED].Accept = TRUE;
   tr.MyOpt[NAWS].Accept = TRUE;
   tr.HisOpt[NAWS].Accept = TRUE;
   tr.WinSize.x = ts.TerminalWidth;
@@ -261,23 +262,10 @@ void ParseTelSB(BYTE b)
 			    (tr.SubOptBuff[0] == TERMTYPE) &&
 			    (tr.SubOptBuff[1] == 1))
 			{
-#if 1
 				_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c",
 				            IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
 				// 4 バイト目に 0 が入るので、ずらして長さをとる
 				i = strlen(TmpStr + 4) + 4;
-#else
-				TmpStr[0] = IAC;
-				TmpStr[1] = SB;
-				TmpStr[2] = TERMTYPE;
-				TmpStr[3] = 0;
-				strcpy(&TmpStr[4],ts.TermType);
-				i = 4 + strlen(ts.TermType);
-				TmpStr[i] = IAC;
-				i++;
-				TmpStr[i] = SE;
-				i++;
-#endif
 				CommRawOut(&cv,TmpStr,i);
 
 				if (tr.LogFile!=0)
@@ -290,6 +278,24 @@ void ParseTelSB(BYTE b)
 				tr.WinSize.x = tr.SubOptBuff[1]*256+ tr.SubOptBuff[2];
 				tr.WinSize.y = tr.SubOptBuff[3]*256+ tr.SubOptBuff[4];
 				tr.ChangeWinSize = TRUE;
+			}
+			else if ((tr.MyOpt[TERMSPEED].Status == Yes) &&
+			         (tr.SubOptCount >= 2) &&
+			         (tr.SubOptBuff[0] == TERMSPEED) &&
+			         (tr.SubOptBuff[1] == 1))
+			{
+				_snprintf_s(TmpStr, sizeof(TmpStr),
+					_TRUNCATE,"%c%c%c%c%d,%d%c%c",
+					IAC, SB, TERMSPEED, 0,
+					ts.TerminalInputSpeed,
+					ts.TerminalOutputSpeed,
+					IAC,SE);
+				// 4 バイト目に 0 が入るので、ずらして長さをとる
+				i = strlen(TmpStr + 4) + 4;
+				CommRawOut(&cv, TmpStr, i);
+
+				if (tr.LogFile)
+					TelWriteLog(TmpStr, i);
 			}
 			tr.SubOptCount = 0;
 			TelStatus = TelIdle;

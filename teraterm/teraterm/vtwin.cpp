@@ -3714,6 +3714,8 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 				TelEnableHisOpt(BINARY);
 			}
 
+			TelEnableMyOpt(TERMSPEED);
+
 			TelStartKeepAliveThread();
 		}
 		else if (!ts.DisableTCPEchoCR) {
