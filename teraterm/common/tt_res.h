@@ -190,6 +190,7 @@
 #define IDC_CHECK7                      2540
 #define IDC_OPT_INCBUF                  2540
 #define IDC_INI_SETUPDIR_STATIC         2541
+#define IDC_OPT_TIMESTAMP_TYPE          2541
 #define IDC_KEYCNF_SETUPDIR_STATIC      2542
 #define IDC_CYGTERM_SETUPDIR_STATIC     2543
 #define IDC_SSH_SETUPDIR_STATIC         2547

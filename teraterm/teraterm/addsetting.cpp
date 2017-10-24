@@ -1473,15 +1473,24 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_OPT_PLAINTEXT, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_FOPT_PLAIN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_OPT_PLAINTEXT, ts.UIMsg);
-	GetDlgItemText(IDC_OPT_TIMESTAMP, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FOPT_TIMESTAMP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(IDC_OPT_TIMESTAMP, ts.UIMsg);
 	GetDlgItemText(IDC_OPT_HIDEDLG, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_FOPT_HIDEDIALOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_OPT_HIDEDLG, ts.UIMsg);
 	GetDlgItemText(IDC_OPT_INCBUF, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_FOPT_ALLBUFFINFIRST", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_OPT_INCBUF, ts.UIMsg);
+	GetDlgItemText(IDC_OPT_TIMESTAMP, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_FOPT_TIMESTAMP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_OPT_TIMESTAMP, ts.UIMsg);
+
+	get_lang_msg("DLG_FOPT_TIMESTAMP_LOCAL", ts.UIMsg, sizeof(ts.UIMsg), "Local Time", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_FOPT_TIMESTAMP_UTC", ts.UIMsg, sizeof(ts.UIMsg), "UTC", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", ts.UIMsg, sizeof(ts.UIMsg), "Elapsed Time (Logging)", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", ts.UIMsg, sizeof(ts.UIMsg), "Elapsed Time (Connection)", ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
 
 	// Viewlog Editor path (2005.1.29 yutaka)
@@ -1540,13 +1549,37 @@ BOOL CLogPropPageDlg::OnInitDialog()
 	btn->SetCheck(ts.Append != 0);
 	btn = (CButton *)GetDlgItem(IDC_OPT_PLAINTEXT);
 	btn->SetCheck(ts.LogTypePlainText != 0);
-	btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
-	btn->SetCheck(ts.LogTimestamp != 0);
 	btn = (CButton *)GetDlgItem(IDC_OPT_HIDEDLG);
 	btn->SetCheck(ts.LogHideDialog != 0);
 	btn = (CButton *)GetDlgItem(IDC_OPT_INCBUF);
 	btn->SetCheck(ts.LogAllBuffIncludedInFirst != 0);
+	btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+	btn->SetCheck(ts.LogTimestamp != 0);
 
+	combo = (CComboBox *)GetDlgItem(IDC_OPT_TIMESTAMP_TYPE);
+	combo->SetCurSel(ts.LogTimestampType);
+	if (ts.LogBinary || !ts.LogTimestamp) {
+		GetDlgItem(IDC_OPT_TIMESTAMP_TYPE)->EnableWindow(FALSE);
+	}
+	else {
+		GetDlgItem(IDC_OPT_TIMESTAMP_TYPE)->EnableWindow(TRUE);
+	}
+/*
+	switch (ts.LogTimestampType) {
+		case CSF_CBRW:
+			cmb->SetCurSel(3);
+			break;
+		case CSF_CBREAD:
+			cmb->SetCurSel(2);
+			break;
+		case CSF_CBWRITE:
+			cmb->SetCurSel(1);
+			break;
+		default: // off
+			cmb->SetCurSel(0);
+			break;
+	}
+*/
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_VIEWLOG_EDITOR));
@@ -1621,9 +1654,27 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				if (btn->GetCheck()) {
 					GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(FALSE);
 					GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(FALSE);
+					GetDlgItem(IDC_OPT_TIMESTAMP_TYPE)->EnableWindow(FALSE);
 				} else {
 					GetDlgItem(IDC_OPT_PLAINTEXT)->EnableWindow(TRUE);
 					GetDlgItem(IDC_OPT_TIMESTAMP)->EnableWindow(TRUE);
+
+					btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+					if (btn->GetCheck()) {
+						GetDlgItem(IDC_OPT_TIMESTAMP_TYPE)->EnableWindow(TRUE);
+					}
+				}
+			}
+			return TRUE;
+
+		case IDC_OPT_TIMESTAMP | (BN_CLICKED << 16):
+			{
+				CButton *btn;
+				btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+				if (btn->GetCheck()) {
+					GetDlgItem(IDC_OPT_TIMESTAMP_TYPE)->EnableWindow(TRUE);
+				} else {
+					GetDlgItem(IDC_OPT_TIMESTAMP_TYPE)->EnableWindow(FALSE);
 				}
 			}
 			return TRUE;
@@ -1640,6 +1691,7 @@ void CLogPropPageDlg::OnOK()
 	char uimsg[MAX_UIMSG];
 	CButton *btn;
 	CString str;
+	CComboBox *cmb;
 	int i;
 
 	// Viewlog Editor path (2005.1.29 yutaka)
@@ -1731,14 +1783,6 @@ void CLogPropPageDlg::OnOK()
 		ts.LogTypePlainText = 0;
 	}
 
-	btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
-	if (btn->GetCheck()) {
-		ts.LogTimestamp = 1;
-	}
-	else {
-		ts.LogTimestamp = 0;
-	}
-
 	btn = (CButton *)GetDlgItem(IDC_OPT_HIDEDLG);
 	if (btn->GetCheck()) {
 		ts.LogHideDialog = 1;
@@ -1754,6 +1798,17 @@ void CLogPropPageDlg::OnOK()
 	else {
 		ts.LogAllBuffIncludedInFirst = 0;
 	}
+
+	btn = (CButton *)GetDlgItem(IDC_OPT_TIMESTAMP);
+	if (btn->GetCheck()) {
+		ts.LogTimestamp = 1;
+	}
+	else {
+		ts.LogTimestamp = 0;
+	}
+
+	cmb = (CComboBox *)GetDlgItem(IDC_OPT_TIMESTAMP_TYPE);
+	ts.LogTimestampType = cmb->GetCurSel();
 }
 
 
