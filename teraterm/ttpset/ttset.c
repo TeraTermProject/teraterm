@@ -2045,6 +2045,19 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 		}
 	}
 
+	// Terminal Speed (Used by telnet and ssh)
+	GetPrivateProfileString(Section, "TerminalSpeed", "38400", Temp, sizeof(Temp), FName);
+	GetNthNum(Temp,  1, &i);
+	if (i > 0)
+		ts->TerminalInputSpeed = i;
+	else
+		ts->TerminalInputSpeed = 38400;
+	GetNthNum(Temp,  2, &i);
+	if (i > 0)
+		ts->TerminalOutputSpeed = i;
+	else
+		ts->TerminalOutputSpeed = ts->TerminalInputSpeed;
+
 	// Fallback to CP932 (Experimental)
 	ts->FallbackToCP932 = GetOnOff(Section, "FallbackToCP932", FName, FALSE);
 
@@ -3379,6 +3392,15 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 		}
 	}
 	WritePrivateProfileString(Section, "ISO2022ShiftFunction", Temp, FName);
+
+	// Terminal Speed
+	if (ts->TerminalInputSpeed == ts->TerminalOutputSpeed) {
+		WriteInt(Section, "TerminalSpeed", FName, ts->TerminalInputSpeed);
+	}
+	else {
+		WriteInt2(Section, "TerminalSpeed", FName,
+			ts->TerminalInputSpeed, ts->TerminalOutputSpeed);
+	}
 
 	// CygTerm Configuration File
 	WriteCygtermConfFile(ts);

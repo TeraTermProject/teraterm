@@ -7462,9 +7462,9 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 
 	// TTY mode‚Í‚±‚±‚Å“n‚· (2005.7.17 yutaka)
 	buffer_put_char(ttymsg, SSH2_TTY_OP_OSPEED);
-	buffer_put_int(ttymsg, 9600);  // baud rate
+	buffer_put_int(ttymsg, pvar->ts->TerminalOutputSpeed);  // baud rate
 	buffer_put_char(ttymsg, SSH2_TTY_OP_ISPEED);
-	buffer_put_int(ttymsg, 9600);  // baud rate
+	buffer_put_int(ttymsg, pvar->ts->TerminalInputSpeed);  // baud rate
 
 	// VERASE
 	buffer_put_char(ttymsg, SSH2_TTY_KEY_VERASE);
@@ -7505,7 +7505,8 @@ BOOL send_pty_request(PTInstVar pvar, Channel_t *c)
 	          "out-speed: %d, in-speed: %d, verase: %s, onlcr: %s",
 	          c->self_id, c->remote_id, req_type, pvar->ts->TermType,
 	          pvar->ssh_state.win_cols, pvar->ssh_state.win_rows, x, y,
-	          9600, 9600, (pvar->ts->BSKey==IdBS)?"^h":"^?", (pvar->ts->CRReceive==IdBS)?"on":"off");
+	          pvar->ts->TerminalOutputSpeed, pvar->ts->TerminalInputSpeed,
+	          (pvar->ts->BSKey==IdBS)?"^h":"^?", (pvar->ts->CRReceive==IdBS)?"on":"off");
 
 	pvar->session_nego_status = 2;
 

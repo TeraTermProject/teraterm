@@ -678,6 +678,8 @@ struct tttset {
 	WORD WaitCom;
 	WORD ListHiddenFonts;
 	char LogTimestampFormat[48];
+	int TerminalInputSpeed;
+	int TerminalOutputSpeed;
 };
 
 typedef struct tttset TTTSet, *PTTSet;
