@@ -176,16 +176,27 @@ void SendWinSize()
 	TmpBuff[i++] = IAC;
 	TmpBuff[i++] = SB;
 	TmpBuff[i++] = NAWS;
+
+	if (HIBYTE(tr.WinSize.x) == IAC) {
+		TmpBuff[i++] = IAC;
+	}
 	TmpBuff[i++] = HIBYTE(tr.WinSize.x);
-//	if (LOBYTE(tr.WinSize.x) == IAC) {
-//		tr.SendBackBuff[i++] = IAC;
-//	}
+
+	if (LOBYTE(tr.WinSize.x) == IAC) {
+		TmpBuff[i++] = IAC;
+	}
 	TmpBuff[i++] = LOBYTE(tr.WinSize.x);
+
+	if (HIBYTE(tr.WinSize.y) == IAC) {
+		TmpBuff[i++] = IAC;
+	}
 	TmpBuff[i++] = HIBYTE(tr.WinSize.y);
-//	if (LOBYTE(tr.WinSize.y) == IAC) {
-//		tr.SendBackBuff[i++] = IAC;
-//	}
+
+	if (LOBYTE(tr.WinSize.y) == IAC) {
+		TmpBuff[i++] = IAC;
+	}
 	TmpBuff[i++] = LOBYTE(tr.WinSize.y);
+
 	TmpBuff[i++] = IAC;
 	TmpBuff[i++] = SE;
 
