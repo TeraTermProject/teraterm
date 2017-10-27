@@ -325,5 +325,41 @@ WaitCom=off
 </pre>
 
 
+<h1><a name="TerminalSpeed">サーバに通知する端末速度を変更する</a></h1>
+
+<p>
+Telnet や SSH での接続開始時、端末の速度をサーバへ通知します。
+</p>
+
+<p>
+このサーバに通知する端末速度を変更したい場合は、設定ファイルの [Tera Term] セクションの TerminalSpeed 行を、
+</p>
+
+<pre>
+TerminalSpeed=&lt;送信速度&gt;,&lt;受信速度&gt;
+</pre>
+
+<p>
+のように変更してください。例えば、送信速度を 38400bps に、受信速度を 9600bps にする場合は以下のようにします。
+</p>
+
+<pre>
+TerminalSpeed=38400,9600
+</pre>
+
+<p>
+また、以下のように速度を一つだけ指定した場合は、送信速度と受信速度の両方をその値で通知します。
+</p>
+
+<pre>
+TerminalSpeed=&lt;送受信速度&gt;
+</pre>
+
+<pre>
+省略時:
+TerminalSpeed=38400
+</pre>
+
+
 </BODY>
 </HTML>

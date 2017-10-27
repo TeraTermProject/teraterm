@@ -42,6 +42,11 @@
           <li>The timestamp type can be changed on <a href="../menu/file-log.html#Timestamp">Log dialog</a> and <a href="../menu/setup-additional.html#LogTimestamp">Additional settings dialog</a>.</li>
           <li>The <a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> setting is obsolete, use the timestamp type setting instead.</li>
         </ul></li>
+      <li>On telnet connection, the terminal speed is notified to the server.
+        <ul>
+          <li>added support for the Telnet Terminal Speed Option.</li>
+          <li>added the <a href="../setup/teraterm-com.html#TerminalSpeed">TerminalSpeed</a> entry in the teraterm.ini file. The default is 38400.</li>
+        </ul></li>
     </ul>
   </li>
 
@@ -54,6 +59,14 @@
           <li>PlainText and Timestamp setting is not applied.</li>
           <li>Changes to the log option settings are applied when the dialog is cancelled.</li>
         </ul></li>
+      <li>On telnet connection, the terminal size is not notified correctly if terminal width or height is 255.</li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded TTSSH to <a href="#ttssh_2.83">2.83</a>.</li>
+      <li>upgraded Oniguruma to 6.6.1.</li>
     </ul>
   </li>
 </ul>
@@ -2944,6 +2957,18 @@ SYNOPSIS:
 
 <h2><a name="ttssh">TTSSH</a></h2>
 
+<h3><a name="ttssh_2.83">2017.11.30 (Ver 2.83)</a></h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>The terminal speed notifies to the server can be changed by setting.
+        <ul>
+          <li>added the <a href="../setup/teraterm-com.html#TerminalSpeed">TerminalSpeed</a> entry in the teraterm.ini file. The default is 38400.</li>
+          <li>The default value of the terminal speed notifies to the server is changed to 38400 bps.</li>
+        </ul></li>
+    </ul>
+  </li>
+</ul>
 
 <h3><a name="ttssh_2.82">2017.08.31 (Ver 2.82)</a></h3>
 <ul class="history">

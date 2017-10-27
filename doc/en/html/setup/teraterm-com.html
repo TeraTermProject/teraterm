@@ -297,5 +297,43 @@ WaitCom=off
 </pre>
 
 
+<h1><a name="TerminalSpeed">Change the terminal speed notifies to server</a></h1>
+
+<p>
+When Telnet or SSH connection is started, Tera Term notifies the terminal speed to the server.
+</p>
+
+You can specify the maximum serial port number (maximum value of n for COMn) to be listed in the [File] New connection and [Setup] Serial port dialog boxes. To specify the maximum number, edit the MaxComPort line in the [Tera Term] section of the setup file like the following:
+
+<p>
+To change the terminal speed notifies to the server, edit the TerminalSpeed line in the [Tera Term] section of the setup file like the following:
+</p>
+
+<pre>
+TerminalSpeed=&lt;Transmit Speed&gt;,&lt;Receive Speed&gt;
+</pre>
+
+<p>
+For example, notifies the transmit speed as 38400bps and receive speed as 9600bps, configure the TerminalSpeed entry as follows:
+</p>
+
+<pre>
+TerminalSpeed=38400,9600
+</pre>
+
+<p>
+When only one value is specified as below, this value is used as both of the transmit speed and received speed.
+</p>
+
+<pre>
+TerminalSpeed=&lt;Speed&gt;
+</pre>
+
+<pre>
+Default:
+TerminalSpeed=38400
+</pre>
+
+
 </BODY>
 </HTML>
