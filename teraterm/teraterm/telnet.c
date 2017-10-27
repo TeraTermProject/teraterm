@@ -242,49 +242,54 @@ void ParseTelSB(BYTE b)
 		tr.SubOptIAC = FALSE;
 		switch (b) {
 		case SE:
-			if ((tr.MyOpt[TERMTYPE].Status == Yes) &&
-			    (tr.SubOptCount >= 2) &&
-			    (tr.SubOptBuff[0] == TERMTYPE) &&
-			    (tr.SubOptBuff[1] == 1))
-			{
-				_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c",
-				            IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
-				// 4 バイト目に 0 が入るので、ずらして長さをとる
-				i = strlen(TmpStr + 4) + 4;
-				CommRawOut(&cv, TmpStr, i);
+			if (tr.SubOptCount <= 1) {
+				// パラメータなしの Sub Option は無いと思われるのでここではじく
+				tr.SubOptCount = 0;
+				TelStatus = TelIdle;
+				return ;
+			}
 
-				if (tr.LogFile)
-					TelWriteLog(TmpStr, i);
-			}
-			else if ( /* (tr.HisOpt[NAWS].Status == Yes) && */
-			        (tr.SubOptCount >= 5) &&
-			        (tr.SubOptBuff[0] == NAWS))
-			{
-				tr.WinSize.x = tr.SubOptBuff[1]*256+ tr.SubOptBuff[2];
-				tr.WinSize.y = tr.SubOptBuff[3]*256+ tr.SubOptBuff[4];
-				tr.ChangeWinSize = TRUE;
-			}
-			else if ((tr.MyOpt[TERMSPEED].Status == Yes) &&
-			         (tr.SubOptCount >= 2) &&
-			         (tr.SubOptBuff[0] == TERMSPEED) &&
-			         (tr.SubOptBuff[1] == 1))
-			{
-				_snprintf_s(TmpStr, sizeof(TmpStr),
-					_TRUNCATE, "%c%c%c%c%d,%d%c%c",
-					IAC, SB, TERMSPEED, 0,
-					ts.TerminalInputSpeed,
-					ts.TerminalOutputSpeed,
-					IAC, SE);
-				// 4 バイト目に 0 が入るので、ずらして長さをとる
-				i = strlen(TmpStr + 4) + 4;
-				CommRawOut(&cv, TmpStr, i);
+			switch (tr.SubOptBuff[0]) {
+			case TERMTYPE:
+				if ((tr.MyOpt[TERMTYPE].Status == Yes) && (tr.SubOptBuff[1] == 1)) {
+					_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE, "%c%c%c%c%s%c%c",
+						IAC, SB, TERMTYPE, 0, ts.TermType, IAC, SE);
+					// 4 バイト目に 0 が入るので、ずらして長さをとる
+					i = strlen(TmpStr + 4) + 4;
+					CommRawOut(&cv, TmpStr, i);
 
-				if (tr.LogFile)
-					TelWriteLog(TmpStr, i);
+					if (tr.LogFile)
+						TelWriteLog(TmpStr, i);
+				}
+				break;
+
+			case NAWS:
+				if ( /* (tr.HisOpt[NAWS].Status == Yes) && */ (tr.SubOptCount >= 5)) {
+					tr.WinSize.x = tr.SubOptBuff[1]*256 + tr.SubOptBuff[2];
+					tr.WinSize.y = tr.SubOptBuff[3]*256 + tr.SubOptBuff[4];
+					tr.ChangeWinSize = TRUE;
+				}
+				break;
+
+			case TERMSPEED:
+				if ((tr.MyOpt[TERMSPEED].Status == Yes) && (tr.SubOptBuff[1] == 1)) {
+					_snprintf_s(TmpStr, sizeof(TmpStr), _TRUNCATE,
+						"%c%c%c%c%d,%d%c%c", IAC, SB, TERMSPEED, 0,
+						ts.TerminalInputSpeed, ts.TerminalOutputSpeed, IAC, SE);
+					// 4 バイト目に 0 が入るので、ずらして長さをとる
+					i = strlen(TmpStr + 4) + 4;
+					CommRawOut(&cv, TmpStr, i);
+
+					if (tr.LogFile)
+						TelWriteLog(TmpStr, i);
+				}
+				break;
 			}
+
 			tr.SubOptCount = 0;
 			TelStatus = TelIdle;
 			return ;
+
 		/* case IAC: braek; */
 		default:
 			if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1) {
