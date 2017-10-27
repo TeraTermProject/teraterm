@@ -301,8 +301,19 @@ void ParseTelSB(BYTE b)
 			TelStatus = TelIdle;
 			return ;
 
-		/* case IAC: braek; */
+		case IAC:
+			/*
+			 * 連続した IAC は値が 255 のデータとして扱う
+			 * 関数の最後の部分で SubOptBuff にデータが追加されるので、
+			 * ここでは何も行わない
+			 */
+			break;
+
 		default:
+			/*
+			 * サブオプション中に他の TELNET コマンドが来た場合の扱いは
+			 * 決まっていない。とりあえずデータとして追加しておく。
+			 */
 			if (tr.SubOptCount >= sizeof(tr.SubOptBuff)-1) {
 				tr.SubOptCount = 0;
 				TelStatus = TelIdle;
@@ -311,10 +322,6 @@ void ParseTelSB(BYTE b)
 			else {
 				tr.SubOptBuff[tr.SubOptCount] = IAC;
 				tr.SubOptCount++;
-				if (b==IAC) {
-					tr.SubOptIAC = TRUE;
-					return;
-				}
 			}
 		}
 	}
