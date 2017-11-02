@@ -36,11 +36,6 @@ See LICENSE.TXT for the license.
 #include "util.h"
 #include "pkt.h"
 
-//#define READAMOUNT 60000
-// 60000 -> 65536 へ拡張。SSH2ではwindow制御を行うため、SSH2のwindow sizeと
-// 合わせておく必要がある。(2004.10.17 yutaka)
-//#define READAMOUNT 65536
-// 65536 -> 131072 へ拡張。(2007.10.29 maya)
 #define READAMOUNT CHAN_SES_WINDOW_DEFAULT
 
 void PKT_init(PTInstVar pvar)
@@ -67,31 +62,26 @@ static int recv_data(PTInstVar pvar, unsigned long up_to_amount)
 		pvar->pkt_state.datastart = 0;
 	}
 
-	buf_ensure_size(&pvar->pkt_state.buf, &pvar->pkt_state.buflen,
-	                up_to_amount);
+	buf_ensure_size(&pvar->pkt_state.buf, &pvar->pkt_state.buflen, up_to_amount);
 
 	_ASSERT(pvar->pkt_state.buf != NULL);
 
 	amount_read = (pvar->Precv) (pvar->socket,
-	                             pvar->pkt_state.buf +
-	                             pvar->pkt_state.datalen,
+	                             pvar->pkt_state.buf + pvar->pkt_state.datalen,
 	                             up_to_amount - pvar->pkt_state.datalen,
 	                             0);
 
 	if (amount_read > 0) {
 		/* Update seen_newline if necessary */
-		if (!pvar->pkt_state.seen_server_ID
-		 && !pvar->pkt_state.seen_newline) {
+		if (!pvar->pkt_state.seen_server_ID && !pvar->pkt_state.seen_newline) {
 			int i;
 
 			for (i = 0; i < amount_read; i++) {
-				if (pvar->pkt_state.buf[pvar->pkt_state.datalen + i] ==
-				    '\n') {
+				if (pvar->pkt_state.buf[pvar->pkt_state.datalen + i] == '\n') {
 					pvar->pkt_state.seen_newline = 1;
 				}
 			}
 		}
-
 		pvar->pkt_state.datalen += amount_read;
 	}
 
@@ -115,12 +105,10 @@ static int recv_line_data(PTInstVar pvar)
 		pvar->pkt_state.datastart = 0;
 	}
 
-	buf_ensure_size(&pvar->pkt_state.buf, &pvar->pkt_state.buflen,
-	                up_to_amount);
+	buf_ensure_size(&pvar->pkt_state.buf, &pvar->pkt_state.buflen, up_to_amount);
 
 	for (i = 0 ; i < (int)up_to_amount ; i++) {
-		amount_read = (pvar->Precv) (pvar->socket,
-		                             &buf[i], 1, 0);
+		amount_read = (pvar->Precv) (pvar->socket, &buf[i], 1, 0);
 		if (amount_read != 1) {
 			return 0; // error
 		} 
@@ -160,16 +148,13 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			buflen -= grabbed;
 
 		} else if (!pvar->pkt_state.seen_server_ID &&
-		           (pvar->pkt_state.seen_newline
-		            || pvar->pkt_state.datalen >= 255)) {
+		           (pvar->pkt_state.seen_newline || pvar->pkt_state.datalen >= 255)) {
 			/* We're looking for the initial ID string and either we've seen the
 			   terminating newline, or we've exceeded the limit at which we should see
 			   a newline. */
 			unsigned int i;
 
-			for (i = 0;
-			     pvar->pkt_state.buf[i] != '\n'
-			     && i < pvar->pkt_state.datalen; i++) {
+			for (i = 0; pvar->pkt_state.buf[i] != '\n' && i < pvar->pkt_state.datalen; i++) {
 			}
 			if (pvar->pkt_state.buf[i] == '\n') {
 				i++;
@@ -179,32 +164,24 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			if (SSH_handle_server_ID(pvar, pvar->pkt_state.buf, i)) {
 				pvar->pkt_state.seen_server_ID = 1;
 
-				if (SSHv1(pvar)) {
-
-				} else { // for SSH2(yutaka)
+				if (SSHv2(pvar)) {
 					// send Key Exchange Init
 					SSH2_send_kexinit(pvar);
 				}
-
 			} else {
 				// reset flag to re-read server ID (2008.1.24 yutaka)
 				pvar->pkt_state.seen_newline = 0;
-
 			}
 
 			pvar->pkt_state.datastart += i;
 			pvar->pkt_state.datalen -= i;
 
-		} else if (pvar->pkt_state.seen_server_ID
-		           && pvar->pkt_state.datalen >=
-		           (unsigned int) SSH_get_min_packet_size(pvar)) {
-			char *data =
-				pvar->pkt_state.buf + pvar->pkt_state.datastart;
+		} else if (pvar->pkt_state.seen_server_ID &&
+		           pvar->pkt_state.datalen >= (unsigned int) SSH_get_min_packet_size(pvar)) {
+			char *data = pvar->pkt_state.buf + pvar->pkt_state.datastart;
 			uint32 padding;
 			uint32 pktsize;
 			uint32 total_packet_size;
-
-			//debug_print(10, data, pvar->pkt_state.datalen);
 
 			// 暗号化パケットの一部を復号化する。
 			if (!pvar->pkt_state.predecrypted_packet) {
@@ -242,8 +219,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				                  "Oversized packet received from server; connection will close.");
 				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			} else {
-				int amount_read =
-					recv_data(pvar, max(total_packet_size, READAMOUNT));
+				int amount_read = recv_data(pvar, max(total_packet_size, READAMOUNT));
 
 				if (amount_read == SOCKET_ERROR) {
 					if (amount_in_buf == 0) {
@@ -257,20 +233,11 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 					}
 				}
 			}
-
-
 		} else {
-			// パケットの受信（最大60KB）
+			// パケットの受信
 			int amount_read;
 
-			if (pvar->pkt_state.seen_server_ID == 0) {
-				//amount_read = recv_line_data(pvar);
-				amount_read = recv_data(pvar, READAMOUNT);
-
-			} else {
-				amount_read = recv_data(pvar, READAMOUNT);
-
-			}
+			amount_read = recv_data(pvar, READAMOUNT);
 
 			if (amount_read == SOCKET_ERROR) {
 				if (amount_in_buf == 0) {
@@ -289,8 +256,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 	}
 
 	if (SSH_is_any_payload(pvar)) {
-		PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY,
-		            pvar->socket, MAKELPARAM(FD_READ, 0));
+		PostMessage(pvar->NotificationWindow, WM_USER_COMMNOTIFY, pvar->socket, MAKELPARAM(FD_READ, 0));
 	}
 
 	return amount_in_buf;
