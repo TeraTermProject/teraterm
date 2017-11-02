@@ -726,101 +726,103 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
  * 'len' is the length of the * payload + padding (+ length of CRC for SSHv1).
  * 'padding' is the length of the padding alone.
  */
-static int prep_packet(PTInstVar pvar, char *data, int len, int padding)
+static int prep_packet_ssh1(PTInstVar pvar, char *data, int len, int padding)
 {
 	pvar->ssh_state.payload = data + 4;
 	pvar->ssh_state.payloadlen = len;
 
-	if (SSHv1(pvar)) {
-		if (CRYPT_detect_attack(pvar, pvar->ssh_state.payload, len)) {
-			UTIL_get_lang_msg("MSG_SSH_COREINS_ERROR", pvar, "'CORE insertion attack' detected.  Aborting connection.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
-		}
-
-		CRYPT_decrypt(pvar, pvar->ssh_state.payload, len);
-		/* PKT guarantees that the data is always 4-byte aligned */
-		if (do_crc(pvar->ssh_state.payload, len - 4) != get_uint32_MSBfirst(pvar->ssh_state.payload + len - 4)) {
-			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
-			return SSH_MSG_NONE;
-		}
-
-		pvar->ssh_state.payload += padding;
-		pvar->ssh_state.payloadlen -= padding + 4;
-	} else {
-		int already_decrypted = get_predecryption_amount(pvar);
-
-		CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
-
-		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
-			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar,
-			                  "Detected corrupted data; connection terminating.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
-			return SSH_MSG_NONE;
-		}
-
-		pvar->ssh_state.payload++;
-		pvar->ssh_state.payloadlen -= padding + 1;
+	if (CRYPT_detect_attack(pvar, pvar->ssh_state.payload, len)) {
+		UTIL_get_lang_msg("MSG_SSH_COREINS_ERROR", pvar, "'CORE insertion attack' detected.  Aborting connection.");
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 	}
+
+	CRYPT_decrypt(pvar, pvar->ssh_state.payload, len);
+	/* PKT guarantees that the data is always 4-byte aligned */
+	if (do_crc(pvar->ssh_state.payload, len - 4) != get_uint32_MSBfirst(pvar->ssh_state.payload + len - 4)) {
+		UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		return SSH_MSG_NONE;
+	}
+
+	pvar->ssh_state.payload += padding;
+	pvar->ssh_state.payloadlen -= padding + 4;
 
 	pvar->ssh_state.payload_grabbed = 0;
 
-	if (SSHv1(pvar)) {
-		if (pvar->ssh_state.decompressing) {
-			if (pvar->ssh_state.decompress_stream.avail_in != 0) {
-				UTIL_get_lang_msg("MSG_SSH_DECOMPRESS_ERROR", pvar,
-				                  "Internal error: a packet was not fully decompressed.\n"
-				                  "This is a bug, please report it.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
-			}
-
-			pvar->ssh_state.decompress_stream.next_in = pvar->ssh_state.payload;
-			pvar->ssh_state.decompress_stream.avail_in = pvar->ssh_state.payloadlen;
-			pvar->ssh_state.decompress_stream.next_out = pvar->ssh_state.postdecompress_inbuf;
-			pvar->ssh_state.payloadlen = -1;
-		} else {
-			pvar->ssh_state.payload++;
+	if (pvar->ssh_state.decompressing) {
+		if (pvar->ssh_state.decompress_stream.avail_in != 0) {
+			UTIL_get_lang_msg("MSG_SSH_DECOMPRESS_ERROR", pvar,
+			                  "Internal error: a packet was not fully decompressed.\n"
+			                  "This is a bug, please report it.");
+			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 		}
 
-		if (!grab_payload_limited(pvar, 1)) {
-			return SSH_MSG_NONE;
-		}
-
+		pvar->ssh_state.decompress_stream.next_in = pvar->ssh_state.payload;
+		pvar->ssh_state.decompress_stream.avail_in = pvar->ssh_state.payloadlen;
+		pvar->ssh_state.decompress_stream.next_out = pvar->ssh_state.postdecompress_inbuf;
+		pvar->ssh_state.payloadlen = -1;
 	} else {
-		// support of SSH2 packet compression (2005.7.9 yutaka)
-		// support of "Compression delayed" (2006.6.23 maya)
-		if ((pvar->stoc_compression == COMP_ZLIB ||
-		     pvar->stoc_compression == COMP_DELAYED && pvar->userauth_success) &&
-		    pvar->ssh2_keys[MODE_IN].comp.enabled) { // compression enabled
-			int ret;
+		pvar->ssh_state.payload++;
+	}
 
-			if (pvar->decomp_buffer == NULL) {
-				pvar->decomp_buffer = buffer_init();
-				if (pvar->decomp_buffer == NULL)
-					return SSH_MSG_NONE;
-			}
-			// 一度確保したバッファは使い回すので初期化を忘れずに。
-			buffer_clear(pvar->decomp_buffer);
+	if (!grab_payload_limited(pvar, 1)) {
+		return SSH_MSG_NONE;
+	}
 
-			// packet sizeとpaddingを取り除いたペイロード部分のみを展開する。
-			ret = buffer_decompress(&pvar->ssh_state.decompress_stream,
-			                        pvar->ssh_state.payload,
-			                        pvar->ssh_state.payloadlen,
-			                        pvar->decomp_buffer);
+	pvar->ssh_state.receiver_sequence_number++;
 
-			// ポインタの更新。
-			pvar->ssh_state.payload = buffer_ptr(pvar->decomp_buffer);
-			pvar->ssh_state.payload++;
-			pvar->ssh_state.payloadlen = buffer_len(pvar->decomp_buffer);
+	return pvar->ssh_state.payload[-1];
+}
 
-		} else {
-			pvar->ssh_state.payload++;
+static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding)
+{
+	int already_decrypted = get_predecryption_amount(pvar);
+
+	pvar->ssh_state.payload = data + 4;
+	pvar->ssh_state.payloadlen = len;
+
+	CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
+
+	if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
+		UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
+		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		return SSH_MSG_NONE;
+	}
+
+	pvar->ssh_state.payload++;
+	pvar->ssh_state.payloadlen -= padding + 1;
+
+	pvar->ssh_state.payload_grabbed = 0;
+
+	// data compression
+	if (pvar->ssh2_keys[MODE_IN].comp.enabled &&
+	   (pvar->stoc_compression == COMP_ZLIB ||
+	    pvar->stoc_compression == COMP_DELAYED && pvar->userauth_success)) {
+
+		if (pvar->decomp_buffer == NULL) {
+			pvar->decomp_buffer = buffer_init();
+			if (pvar->decomp_buffer == NULL)
+				return SSH_MSG_NONE;
 		}
+		// 一度確保したバッファは使い回すので初期化を忘れずに。
+		buffer_clear(pvar->decomp_buffer);
 
-		if (!grab_payload_limited(pvar, 1)) {
-			return SSH_MSG_NONE;
-		}
+		// packet sizeとpaddingを取り除いたペイロード部分のみを展開する。
+		buffer_decompress(&pvar->ssh_state.decompress_stream,
+		                  pvar->ssh_state.payload,
+		                  pvar->ssh_state.payloadlen,
+		                  pvar->decomp_buffer);
 
+		// ポインタの更新。
+		pvar->ssh_state.payload = buffer_ptr(pvar->decomp_buffer);
+		pvar->ssh_state.payload++;
+		pvar->ssh_state.payloadlen = buffer_len(pvar->decomp_buffer);
+	} else {
+		pvar->ssh_state.payload++;
+	}
+
+	if (!grab_payload_limited(pvar, 1)) {
+		return SSH_MSG_NONE;
 	}
 
 	pvar->ssh_state.receiver_sequence_number++;
@@ -2034,44 +2036,56 @@ void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end)
 }
 
 
-void SSH_handle_packet(PTInstVar pvar, char *data, int len, int padding)
+void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding)
 {
-	unsigned char message = prep_packet(pvar, data, len, padding);
+	unsigned char message = prep_packet_ssh1(pvar, data, len, padding);
 
 	// SSHのメッセージタイプをチェック
 	if (message != SSH_MSG_NONE) {
 		// メッセージタイプに応じたハンドラを起動
 		SSHPacketHandler handler = get_handler(pvar, message);
 
-		// for SSH2(yutaka)
-		if (SSHv2(pvar)) {
-			// 想定外のメッセージタイプが到着したらアボートさせる。
-			if (!SSH2_dispatch_enabled_check(message) || handler == NULL) {
-				char buf[1024];
+		if (handler == NULL) {
+			char buf[1024];
 
-				UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG2_ERROR", pvar, "Unexpected SSH2 message(%d) on current stage(%d)");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, message, handle_message_stage);
-				notify_fatal_error(pvar, buf, TRUE);
-				return;
+			UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG_ERROR", pvar, "Unexpected packet type received: %d");
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, message, handle_message_stage);
+			notify_fatal_error(pvar, buf, TRUE);
+		} else {
+			if (!handler(pvar)) {
+				deque_handlers(pvar, message);
 			}
+		}
+	}
+}
+
+void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding)
+{
+	unsigned char message = prep_packet_ssh2(pvar, data, len, padding);
+
+	// SSHのメッセージタイプをチェック
+	if (message != SSH_MSG_NONE) {
+		// メッセージタイプに応じたハンドラを起動
+		SSHPacketHandler handler = get_handler(pvar, message);
+
+		// 想定外のメッセージタイプが到着したらアボートさせる。
+		if (!SSH2_dispatch_enabled_check(message) || handler == NULL) {
+			char buf[1024];
+
+			UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG2_ERROR", pvar, "Unexpected SSH2 message(%d) on current stage(%d)");
+			_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, message, handle_message_stage);
+			notify_fatal_error(pvar, buf, TRUE);
+			return;
 		}
 
 		if (handler == NULL) {
-			if (SSHv1(pvar)) {
-				char buf[1024];
+			unsigned char *outmsg = begin_send_packet(pvar, SSH2_MSG_UNIMPLEMENTED, 4);
 
-				UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG_ERROR", pvar, "Unexpected packet type received: %d");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, message, handle_message_stage);
-				notify_fatal_error(pvar, buf, TRUE);
-			} else {
-				unsigned char *outmsg = begin_send_packet(pvar, SSH2_MSG_UNIMPLEMENTED, 4);
+			set_uint32(outmsg, pvar->ssh_state.receiver_sequence_number - 1);
+			finish_send_packet(pvar);
 
-				set_uint32(outmsg, pvar->ssh_state.receiver_sequence_number - 1);
-				finish_send_packet(pvar);
-
-				logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_UNIMPLEMENTED was sent at SSH_handle_packet().");
-				/* XXX need to decompress incoming packet, but how? */
-			}
+			logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": SSH2_MSG_UNIMPLEMENTED was sent.");
+			/* XXX need to decompress incoming packet, but how? */
 		} else {
 			if (!handler(pvar)) {
 				deque_handlers(pvar, message);

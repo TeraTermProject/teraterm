@@ -146,12 +146,12 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			amount_in_buf += grabbed;
 			buf += grabbed;
 			buflen -= grabbed;
-
-		} else if (!pvar->pkt_state.seen_server_ID &&
-		           (pvar->pkt_state.seen_newline || pvar->pkt_state.datalen >= 255)) {
-			/* We're looking for the initial ID string and either we've seen the
-			   terminating newline, or we've exceeded the limit at which we should see
-			   a newline. */
+		}
+		else if (!pvar->pkt_state.seen_server_ID && (pvar->pkt_state.seen_newline || pvar->pkt_state.datalen >= 255)) {
+			/*
+			 * We're looking for the initial ID string and either we've seen the
+			 * terminating newline, or we've exceeded the limit at which we should see a newline.
+			 */
 			unsigned int i;
 
 			for (i = 0; pvar->pkt_state.buf[i] != '\n' && i < pvar->pkt_state.datalen; i++) {
@@ -175,9 +175,8 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 
 			pvar->pkt_state.datastart += i;
 			pvar->pkt_state.datalen -= i;
-
-		} else if (pvar->pkt_state.seen_server_ID &&
-		           pvar->pkt_state.datalen >= (unsigned int) SSH_get_min_packet_size(pvar)) {
+		}
+		else if (pvar->pkt_state.seen_server_ID && pvar->pkt_state.datalen >= (unsigned int) SSH_get_min_packet_size(pvar)) {
 			char *data = pvar->pkt_state.buf + pvar->pkt_state.datastart;
 			uint32 padding;
 			uint32 pktsize;
@@ -206,7 +205,12 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 
 			if (total_packet_size <= pvar->pkt_state.datalen) {
 				/* the data must be 4 byte aligned. */
-				SSH_handle_packet(pvar, data, pktsize, padding);
+				if (SSHv1(pvar)) {
+					SSH_handle_packet1(pvar, data, pktsize, padding);
+				}
+				else {
+					SSH_handle_packet2(pvar, data, pktsize, padding);
+				}
 				pvar->pkt_state.predecrypted_packet = FALSE;
 
 				pvar->pkt_state.datastart += total_packet_size;
