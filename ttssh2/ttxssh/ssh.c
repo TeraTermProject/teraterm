@@ -245,7 +245,6 @@ static void ssh2_channel_add_bufchain(Channel_t *c, unsigned char *buf, unsigned
 	}
 }
 
-
 static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 {
 	bufchain_t *ch;
@@ -270,8 +269,6 @@ static void ssh2_channel_retry_send_bufchain(PTInstVar pvar, Channel_t *c)
 		free(ch);
 	}
 }
-
-
 
 // channel close時にチャネル構造体をリストへ返却する
 // (2007.4.26 yutaka)
@@ -330,7 +327,6 @@ static void ssh2_channel_delete(Channel_t *c)
 	c->used = 0;
 }
 
-
 // connection close時に呼ばれる
 void ssh2_channel_free(void)
 {
@@ -341,7 +337,6 @@ void ssh2_channel_free(void)
 		c = &channels[i];
 		ssh2_channel_delete(c);
 	}
-
 }
 
 static Channel_t *ssh2_channel_lookup(int id)
@@ -376,7 +371,6 @@ static Channel_t *ssh2_local_channel_lookup(int local_num)
 	return (NULL);
 }
 
-
 //
 // SSH heartbeat mutex
 //
@@ -405,7 +399,6 @@ void ssh_heartbeat_unlock(void)
 {
 	//LeaveCriticalSection(&g_ssh_heartbeat_lock);
 }
-
 
 //
 // SSH memory dump (for debug)
@@ -603,12 +596,6 @@ void push_bignum_memdump(char *name, char *desc, BIGNUM *bignum)
 	free(buf); // free
 }
 
-
-//
-//
-//
-
-
 static int get_predecryption_amount(PTInstVar pvar)
 {
 	static int small_block_decryption_sizes[] = { 5, 5, 6, 6, 8 };
@@ -637,14 +624,12 @@ static int buffer_packet_data(PTInstVar pvar, int limit)
 		return pvar->ssh_state.payloadlen;
 	} else {
 		int cur_decompressed_bytes =
-			pvar->ssh_state.decompress_stream.next_out -
-			pvar->ssh_state.postdecompress_inbuf;
+			pvar->ssh_state.decompress_stream.next_out - pvar->ssh_state.postdecompress_inbuf;
 
 		while (limit > cur_decompressed_bytes) {
 			int result;
 
-			pvar->ssh_state.payload =
-				pvar->ssh_state.postdecompress_inbuf + 1;
+			pvar->ssh_state.payload = pvar->ssh_state.postdecompress_inbuf + 1;
 			if (pvar->ssh_state.postdecompress_inbuflen == cur_decompressed_bytes) {
 				buf_ensure_size(&pvar->ssh_state.postdecompress_inbuf,
 				                &pvar->ssh_state.postdecompress_inbuflen,
@@ -652,17 +637,13 @@ static int buffer_packet_data(PTInstVar pvar, int limit)
 			}
 
 			pvar->ssh_state.decompress_stream.next_out =
-				pvar->ssh_state.postdecompress_inbuf +
-				cur_decompressed_bytes;
+				pvar->ssh_state.postdecompress_inbuf + cur_decompressed_bytes;
 			pvar->ssh_state.decompress_stream.avail_out =
-				min(limit, pvar->ssh_state.postdecompress_inbuflen)
-				- cur_decompressed_bytes;
+				min(limit, pvar->ssh_state.postdecompress_inbuflen) - cur_decompressed_bytes;
 
-			result =
-				inflate(&pvar->ssh_state.decompress_stream, Z_SYNC_FLUSH);
+			result = inflate(&pvar->ssh_state.decompress_stream, Z_SYNC_FLUSH);
 			cur_decompressed_bytes =
-				pvar->ssh_state.decompress_stream.next_out -
-				pvar->ssh_state.postdecompress_inbuf;
+				pvar->ssh_state.decompress_stream.next_out - pvar->ssh_state.postdecompress_inbuf;
 
 			switch (result) {
 			case Z_OK:
@@ -739,31 +720,27 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
 
 #define do_crc(buf, len) (~(uint32)crc32(0xFFFFFFFF, (buf), (len)))
 
-/* Decrypt the payload, checksum it, eat the padding, get the packet type
-   and return it.
-   'data' points to the start of the packet --- its length field.
-   'len' is the length of the
-   payload + padding (+ length of CRC for SSHv1). 'padding' is the length
-   of the padding alone. */
-static int prep_packet(PTInstVar pvar, char *data, int len,
-					   int padding)
+/*
+ * Decrypt the payload, checksum it, eat the padding, get the packet type and return it.
+ * 'data' points to the start of the packet --- its length field.
+ * 'len' is the length of the * payload + padding (+ length of CRC for SSHv1).
+ * 'padding' is the length of the padding alone.
+ */
+static int prep_packet(PTInstVar pvar, char *data, int len, int padding)
 {
 	pvar->ssh_state.payload = data + 4;
 	pvar->ssh_state.payloadlen = len;
 
 	if (SSHv1(pvar)) {
 		if (CRYPT_detect_attack(pvar, pvar->ssh_state.payload, len)) {
-			UTIL_get_lang_msg("MSG_SSH_COREINS_ERROR", pvar,
-			                  "'CORE insertion attack' detected.  Aborting connection.");
+			UTIL_get_lang_msg("MSG_SSH_COREINS_ERROR", pvar, "'CORE insertion attack' detected.  Aborting connection.");
 			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		}
 
 		CRYPT_decrypt(pvar, pvar->ssh_state.payload, len);
 		/* PKT guarantees that the data is always 4-byte aligned */
-		if (do_crc(pvar->ssh_state.payload, len - 4) !=
-			get_uint32_MSBfirst(pvar->ssh_state.payload + len - 4)) {
-			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar,
-			                  "Detected corrupted data; connection terminating.");
+		if (do_crc(pvar->ssh_state.payload, len - 4) != get_uint32_MSBfirst(pvar->ssh_state.payload + len - 4)) {
+			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
 			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			return SSH_MSG_NONE;
 		}
@@ -773,12 +750,9 @@ static int prep_packet(PTInstVar pvar, char *data, int len,
 	} else {
 		int already_decrypted = get_predecryption_amount(pvar);
 
-		CRYPT_decrypt(pvar, data + already_decrypted,
-		              (4 + len) - already_decrypted);
+		CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
 
-		if (!CRYPT_verify_receiver_MAC
-			(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4,
-			 data + len + 4)) {
+		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar,
 			                  "Detected corrupted data; connection terminating.");
 			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
@@ -800,12 +774,9 @@ static int prep_packet(PTInstVar pvar, char *data, int len,
 				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
 			}
 
-			pvar->ssh_state.decompress_stream.next_in =
-				pvar->ssh_state.payload;
-			pvar->ssh_state.decompress_stream.avail_in =
-				pvar->ssh_state.payloadlen;
-			pvar->ssh_state.decompress_stream.next_out =
-				pvar->ssh_state.postdecompress_inbuf;
+			pvar->ssh_state.decompress_stream.next_in = pvar->ssh_state.payload;
+			pvar->ssh_state.decompress_stream.avail_in = pvar->ssh_state.payloadlen;
+			pvar->ssh_state.decompress_stream.next_out = pvar->ssh_state.postdecompress_inbuf;
 			pvar->ssh_state.payloadlen = -1;
 		} else {
 			pvar->ssh_state.payload++;
@@ -932,47 +903,27 @@ static BOOL send_packet_blocking(PTInstVar pvar, char *data, int len)
 	int code = 0;
 	char *kind = NULL, buf[256];
 
-#if 0
-	if ((pvar->PWSAAsyncSelect) (pvar->socket, pvar->NotificationWindow,
-	                             0, 0) == SOCKET_ERROR
-	 || ioctlsocket(pvar->socket, FIONBIO, &do_block) == SOCKET_ERROR
-	 || retry_send_packet(pvar, data, len)
-	 || (pvar->PWSAAsyncSelect) (pvar->socket, pvar->NotificationWindow,
-	                             pvar->notification_msg,
-	                             pvar->notification_events) ==
-		SOCKET_ERROR) {
-		UTIL_get_lang_msg("MSG_SSH_SEND_PKT_ERROR", pvar,
-		                  "A communications error occurred while sending an SSH packet.\n"
-		                  "The connection will close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
-		return FALSE;
-	} else {
-		return TRUE;
-	}
-#else
-	if ((pvar->PWSAAsyncSelect) (pvar->socket, pvar->NotificationWindow,
-	                             0, 0) == SOCKET_ERROR) {
-			code = WSAGetLastError();
-			kind = "WSAAsyncSelect1";
-			goto error;
+	if ((pvar->PWSAAsyncSelect) (pvar->socket, pvar->NotificationWindow, 0, 0) == SOCKET_ERROR) {
+		code = WSAGetLastError();
+		kind = "WSAAsyncSelect1";
+		goto error;
 	}
 	if (ioctlsocket(pvar->socket, FIONBIO, &do_block) == SOCKET_ERROR) {
-			code = WSAGetLastError();
-			kind = "ioctlsocket";
-			goto error;
+		code = WSAGetLastError();
+		kind = "ioctlsocket";
+		goto error;
 	}
 	if (retry_send_packet(pvar, data, len) != 0) {
-			code = WSAGetLastError();
-			kind = "retry_send_packet";
-			goto error;
+		code = WSAGetLastError();
+		kind = "retry_send_packet";
+		goto error;
 	}
 	if ((pvar->PWSAAsyncSelect) (pvar->socket, pvar->NotificationWindow,
 	                             pvar->notification_msg,
-	                             pvar->notification_events) ==
-		SOCKET_ERROR) {
-			code = WSAGetLastError();
-			kind = "WSAAsyncSelect2";
-			goto error;
+	                             pvar->notification_events) == SOCKET_ERROR) {
+		code = WSAGetLastError();
+		kind = "WSAAsyncSelect2";
+		goto error;
 	}
 	return TRUE;
 
@@ -984,7 +935,6 @@ error:
 	            kind, code);
 	notify_fatal_error(pvar, buf, TRUE);
 	return FALSE;
-#endif
 }
 
 /* if skip_compress is true, then the data has already been compressed
@@ -1000,15 +950,11 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		if (!skip_compress) {
 			buf_ensure_size(&pvar->ssh_state.outbuf,
 			                &pvar->ssh_state.outbuflen,
-			                (int)(len + (len >> 6) + 50 +
-			                      CRYPT_get_sender_MAC_size(pvar)));
-			pvar->ssh_state.compress_stream.next_in =
-				pvar->ssh_state.precompress_outbuf;
+			                (int)(len + (len >> 6) + 50 + CRYPT_get_sender_MAC_size(pvar)));
+			pvar->ssh_state.compress_stream.next_in = pvar->ssh_state.precompress_outbuf;
 			pvar->ssh_state.compress_stream.avail_in = len;
-			pvar->ssh_state.compress_stream.next_out =
-				pvar->ssh_state.outbuf + 12;
-			pvar->ssh_state.compress_stream.avail_out =
-				pvar->ssh_state.outbuflen - 12;
+			pvar->ssh_state.compress_stream.next_out = pvar->ssh_state.outbuf + 12;
+			pvar->ssh_state.compress_stream.avail_out = pvar->ssh_state.outbuflen - 12;
 
 			if (deflate(&pvar->ssh_state.compress_stream, Z_SYNC_FLUSH) != Z_OK) {
 				UTIL_get_lang_msg("MSG_SSH_COMP_ERROR", pvar,
@@ -1019,9 +965,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			}
 		}
 
-		len =
-			pvar->ssh_state.outbuflen - 12 -
-			pvar->ssh_state.compress_stream.avail_out;
+		len = pvar->ssh_state.outbuflen - 12 - pvar->ssh_state.compress_stream.avail_out;
 	}
 
 	if (SSHv1(pvar)) {
@@ -1036,8 +980,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		} else {
 			memset(data + 4, 0, padding);
 		}
-		set_uint32(data + data_length - 4,
-		           do_crc(data + 4, data_length - 8));
+		set_uint32(data + data_length - 4, do_crc(data + 4, data_length - 8));
 		CRYPT_encrypt(pvar, data + 4, data_length - 4);
 	} else { //for SSH2(yutaka)
 		int block_size = CRYPT_get_encryption_block_size(pvar);
@@ -1050,12 +993,12 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		 pvar->ssh_state.outbuf:
 		 offset: 0 1 2 3 4 5 6 7 8 9 10 11 12 ...         EOD
 		         <--ignore---> ^^^^^^^^    <---- payload --->
-				               packet length
+		                       packet length
 
-							            ^^padding
+		                                ^^padding
 
-							   <---------------------------->
-							      SSH2 sending data on TCP
+		                       <---------------------------->
+		                          SSH2 sending data on TCP
 		
 		 NOTE:
 		   payload = type(1) + raw-data
@@ -1089,23 +1032,13 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		} else {
 			// 無圧縮
 			data = pvar->ssh_state.outbuf + 7;
-
 		}
 
 		// 送信パケット構築(input parameter: data, len)
 		if (block_size < 8) {
 			block_size = 8;
 		}
-#if 0
-		encryption_size = ((len + 8) / block_size + 1) * block_size;
-		data_length = encryption_size + CRYPT_get_sender_MAC_size(pvar);
 
-		set_uint32(data, encryption_size - 4);
-		padding = encryption_size - len - 5;
-		data[4] = (unsigned char) padding;
-#else
-		// でかいパケットを送ろうとすると、サーバ側で"Bad packet length"になってしまう問題への対処。
-		// (2007.10.29 yutaka)
 		encryption_size = 4 + 1 + len;
 		padding = block_size - (encryption_size % block_size);
 		if (padding < 4)
@@ -1120,7 +1053,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			// realloc()されると、ポインタが変わる可能性があるので、再度取り直す。
 			data = buffer_ptr(msg);
 		}
-#endif
+
 		//if (pvar->ssh_state.outbuflen <= 7 + data_length) *(int *)0 = 0;
 		CRYPT_set_random_data(pvar, data + 5 + len, padding);
 		ret = CRYPT_build_sender_MAC(pvar,
@@ -2101,8 +2034,7 @@ void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end)
 }
 
 
-void SSH_handle_packet(PTInstVar pvar, char *data, int len,
-					   int padding)
+void SSH_handle_packet(PTInstVar pvar, char *data, int len, int padding)
 {
 	unsigned char message = prep_packet(pvar, data, len, padding);
 
@@ -2117,10 +2049,8 @@ void SSH_handle_packet(PTInstVar pvar, char *data, int len,
 			if (!SSH2_dispatch_enabled_check(message) || handler == NULL) {
 				char buf[1024];
 
-				UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG2_ERROR", pvar,
-								  "Unexpected SSH2 message(%d) on current stage(%d)");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-					pvar->ts->UIMsg, message, handle_message_stage);
+				UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG2_ERROR", pvar, "Unexpected SSH2 message(%d) on current stage(%d)");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, message, handle_message_stage);
 				notify_fatal_error(pvar, buf, TRUE);
 				return;
 			}
@@ -2130,17 +2060,13 @@ void SSH_handle_packet(PTInstVar pvar, char *data, int len,
 			if (SSHv1(pvar)) {
 				char buf[1024];
 
-				UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG_ERROR", pvar,
-				                  "Unexpected packet type received: %d");
-				_snprintf_s(buf, sizeof(buf), _TRUNCATE,
-					pvar->ts->UIMsg, message, handle_message_stage);
+				UTIL_get_lang_msg("MSG_SSH_UNEXP_MSG_ERROR", pvar, "Unexpected packet type received: %d");
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, message, handle_message_stage);
 				notify_fatal_error(pvar, buf, TRUE);
 			} else {
-				unsigned char *outmsg =
-					begin_send_packet(pvar, SSH2_MSG_UNIMPLEMENTED, 4);
+				unsigned char *outmsg = begin_send_packet(pvar, SSH2_MSG_UNIMPLEMENTED, 4);
 
-				set_uint32(outmsg,
-				           pvar->ssh_state.receiver_sequence_number - 1);
+				set_uint32(outmsg, pvar->ssh_state.receiver_sequence_number - 1);
 				finish_send_packet(pvar);
 
 				logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_UNIMPLEMENTED was sent at SSH_handle_packet().");
@@ -2161,10 +2087,8 @@ static BOOL handle_pty_success(PTInstVar pvar)
 	enque_handler(pvar, SSH_SMSG_STDOUT_DATA, handle_data);
 	enque_handler(pvar, SSH_SMSG_STDERR_DATA, handle_data);
 	enque_handler(pvar, SSH_MSG_CHANNEL_DATA, handle_channel_data);
-	enque_handler(pvar, SSH_MSG_CHANNEL_INPUT_EOF,
-	              handle_channel_input_eof);
-	enque_handler(pvar, SSH_MSG_CHANNEL_OUTPUT_CLOSED,
-	              handle_channel_output_eof);
+	enque_handler(pvar, SSH_MSG_CHANNEL_INPUT_EOF, handle_channel_input_eof);
+	enque_handler(pvar, SSH_MSG_CHANNEL_OUTPUT_CLOSED, handle_channel_output_eof);
 	enque_handler(pvar, SSH_MSG_PORT_OPEN, handle_channel_open);
 	enque_handler(pvar, SSH_SMSG_X11_OPEN, handle_X11_channel_open);
 	enque_handler(pvar, SSH_SMSG_AGENT_OPEN, handle_agent_open);
@@ -2183,9 +2107,7 @@ static BOOL handle_pty_failure(PTInstVar pvar)
 static void prep_pty(PTInstVar pvar)
 {
 	int len = strlen(pvar->ts->TermType);
-	unsigned char *outmsg =
-		begin_send_packet(pvar, SSH_CMSG_REQUEST_PTY,
-		                  4 + len + 16 + sizeof(ssh_ttymodes));
+	unsigned char *outmsg = begin_send_packet(pvar, SSH_CMSG_REQUEST_PTY, 4 + len + 16 + sizeof(ssh_ttymodes));
 	static const int msgs[] = { SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
 	static const SSHPacketHandler handlers[]
 	= { handle_pty_success, handle_pty_failure };
@@ -2224,8 +2146,7 @@ static BOOL handle_agent_request_failure(PTInstVar pvar)
 static void prep_agent_request(PTInstVar pvar)
 {
 	static const int msgs[] = { SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
-	static const SSHPacketHandler handlers[]
-	= { handle_agent_request_success, handle_agent_request_failure };
+	static const SSHPacketHandler handlers[] = { handle_agent_request_success, handle_agent_request_failure };
 
 	enque_handlers(pvar, 2, msgs, handlers);
 
@@ -2245,7 +2166,6 @@ static void prep_forwarding(PTInstVar pvar)
 	}
 }
 
-
 //
 //
 // (2005.7.10 yutaka)
@@ -2261,9 +2181,7 @@ static void enable_send_compression(PTInstVar pvar)
 	pvar->ssh_state.compress_stream.zalloc = NULL;
 	pvar->ssh_state.compress_stream.zfree = NULL;
 	pvar->ssh_state.compress_stream.opaque = NULL;
-	if (deflateInit
-	    (&pvar->ssh_state.compress_stream,
-	     pvar->ssh_state.compression_level) != Z_OK) {
+	if (deflateInit(&pvar->ssh_state.compress_stream, pvar->ssh_state.compression_level) != Z_OK) {
 		UTIL_get_lang_msg("MSG_SSH_SETUP_COMP_ERROR", pvar,
 		                  "An error occurred while setting up compression.\n"
 		                  "The connection will close.");
@@ -2306,8 +2224,7 @@ static void enable_recv_compression(PTInstVar pvar)
 			pvar->ssh_state.decompressing = TRUE;
 		}
 
-		buf_ensure_size(&pvar->ssh_state.postdecompress_inbuf,
-		                &pvar->ssh_state.postdecompress_inbuflen, 1000);
+		buf_ensure_size(&pvar->ssh_state.postdecompress_inbuf, &pvar->ssh_state.postdecompress_inbuflen, 1000);
 	}
 }
 
@@ -2321,7 +2238,6 @@ static void enable_compression(PTInstVar pvar)
 		pvar->ssh_state.compressing = FALSE;
 		pvar->ssh_state.decompressing = FALSE;
 	}
-
 }
 
 static BOOL handle_enable_compression(PTInstVar pvar)
@@ -2343,11 +2259,9 @@ static void prep_compression(PTInstVar pvar)
 		// added if statement (2005.7.10 yutaka)
 		if (SSHv1(pvar)) {
 			static const int msgs[] = { SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
-			static const SSHPacketHandler handlers[]
-			= { handle_enable_compression, handle_disable_compression };
+			static const SSHPacketHandler handlers[] = { handle_enable_compression, handle_disable_compression };
 
-			unsigned char *outmsg =
-				begin_send_packet(pvar, SSH_CMSG_REQUEST_COMPRESSION, 4);
+			unsigned char *outmsg = begin_send_packet(pvar, SSH_CMSG_REQUEST_COMPRESSION, 4);
 
 			set_uint32(outmsg, pvar->session_settings.CompressionLevel);
 			finish_send_packet(pvar);
@@ -2355,8 +2269,7 @@ static void prep_compression(PTInstVar pvar)
 			enque_handlers(pvar, 2, msgs, handlers);
 		}
 
-		pvar->ssh_state.compression_level =
-			pvar->session_settings.CompressionLevel;
+		pvar->ssh_state.compression_level = pvar->session_settings.CompressionLevel;
 
 	} else {
 		// added if statement (2005.7.10 yutaka)
@@ -2369,8 +2282,7 @@ static void prep_compression(PTInstVar pvar)
 static void enque_simple_auth_handlers(PTInstVar pvar)
 {
 	static const int msgs[] = { SSH_SMSG_SUCCESS, SSH_SMSG_FAILURE };
-	static const SSHPacketHandler handlers[]
-	= { handle_auth_success, handle_auth_failure };
+	static const SSHPacketHandler handlers[] = { handle_auth_success, handle_auth_failure };
 
 	enque_handlers(pvar, 2, msgs, handlers);
 }
@@ -2386,8 +2298,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 	challenge_bytes = get_mpint_len(pvar, 0);
 
 	if (grab_payload(pvar, challenge_bytes)) {
-		unsigned char *outmsg =
-			begin_send_packet(pvar, SSH_CMSG_AUTH_RSA_RESPONSE, 16);
+		unsigned char *outmsg = begin_send_packet(pvar, SSH_CMSG_AUTH_RSA_RESPONSE, 16);
 
 		if (pvar->auth_state.cur_cred.method == SSH_AUTH_RSA) {
 			if (CRYPT_generate_RSA_challenge_response
@@ -2395,9 +2306,7 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 
 				// セッション複製時にパスワードを使い回したいので、ここでのリソース解放はやめる。
 				// socket close時にもこの関数は呼ばれているので、たぶん問題ない。(2005.4.8 yutaka)
-#if 0
 				//AUTH_destroy_cur_cred(pvar);
-#endif
 
 				finish_send_packet(pvar);
 
@@ -2423,14 +2332,11 @@ static BOOL handle_rsa_challenge(PTInstVar pvar)
 
 			/* Pageant にハッシュを計算してもらう */
 			// 公開鍵の長さ
-			pubkeylen = putty_get_ssh1_keylen(pvar->pageant_curkey,
-			                                  pvar->pageant_keylistlen);
+			pubkeylen = putty_get_ssh1_keylen(pvar->pageant_curkey, pvar->pageant_keylistlen);
 			// セッションIDを作成
 			BN_bn2bin(pvar->crypt_state.host_key.RSA_key->n, session_buf);
-			BN_bn2bin(pvar->crypt_state.server_key.RSA_key->n,
-			          session_buf + host_key_bytes);
-			memcpy(session_buf + server_key_bytes + host_key_bytes,
-			       pvar->crypt_state.server_cookie, 8);
+			BN_bn2bin(pvar->crypt_state.server_key.RSA_key->n, session_buf + host_key_bytes);
+			memcpy(session_buf + server_key_bytes + host_key_bytes, pvar->crypt_state.server_cookie, 8);
 			MD5(session_buf, session_buf_len, session_id);
 			// ハッシュを受け取る
 			hash = putty_hash_ssh1_challenge(pvar->pageant_curkey,
@@ -2486,9 +2392,7 @@ static void try_send_credentials(PTInstVar pvar)
 				
 				// セッション複製時にパスワードを使い回したいので、ここでのリソース解放はやめる。
 				// socket close時にもこの関数は呼ばれているので、たぶん問題ない。(2005.4.8 yutaka)
-#if 0
 				//AUTH_destroy_cur_cred(pvar);
-#endif
 				
 				enque_simple_auth_handlers(pvar);
 				break;
@@ -3204,7 +3108,6 @@ void SSH_end(PTInstVar pvar)
 		pvar->ssh_state.decompressing = FALSE;
 	}
 
-#if 1
 	// SSH2のデータを解放する (2004.12.27 yutaka)
 	if (SSHv2(pvar)) {
 		if (pvar->kexdh) {
@@ -3272,8 +3175,6 @@ void SSH_end(PTInstVar pvar)
 			}
 		}
 	}
-#endif
-
 }
 
 void SSH2_send_channel_data(PTInstVar pvar, Channel_t *c, unsigned char *buf, unsigned int buflen, int retry)
@@ -4880,11 +4781,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-#if 0
-	for (i = 0; i < SSH2_COOKIE_LENGTH; i++) {
-		cookie[i] = data[i];
-	}
-#endif
 	// get rid of Cookie length
 	offset += SSH2_COOKIE_LENGTH;
 
@@ -5342,13 +5238,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	// (3) 要求の最小値は満たすが、要求値よりは小さい。確認ダイアログは出さない。
 		logprintf(LOG_LEVEL_NOTICE,
 			"DH-GEX: grp_bits(%d) < kexgex_bits(%d)", grp_bits, pvar->kexgex_bits);
-#if 1
 		tmpbuf[0] = 0; // no message
-#else
-		_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE,
-			"Received group size is smaller than requested.\nrequested: %d, received: %d\nAccept this?",
-			pvar->kexgex_bits, grp_bits);
-#endif
 	}
 	else if (grp_bits <= pvar->kexgex_max) {
 	// (4) 要求値以上、かつ要求の最大値以下。問題なし。
@@ -5495,7 +5385,6 @@ error:;
 
 static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 {
-#if 1
 	// free already allocated buffer
 	if (pvar->ssh2_keys[mode].enc.iv != NULL) {
 		free(pvar->ssh2_keys[mode].enc.iv);
@@ -5506,7 +5395,6 @@ static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 	if (pvar->ssh2_keys[mode].mac.key != NULL) {
 		free(pvar->ssh2_keys[mode].mac.key);
 	}
-#endif
 
 	pvar->ssh2_keys[mode] = current_keys[mode];
 }
