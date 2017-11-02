@@ -465,6 +465,13 @@ typedef enum {
 	HMAC_SHA2_256_96,
 	HMAC_SHA2_512,
 	HMAC_SHA2_512_96,
+	HMAC_SHA1_EtM,
+	HMAC_MD5_EtM,
+	HMAC_SHA1_96_EtM,
+	HMAC_MD5_96_EtM,
+	HMAC_RIPEMD160_EtM,
+	HMAC_SHA2_256_EtM,
+	HMAC_SHA2_512_EtM,
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
 } hmac_type;
@@ -474,19 +481,25 @@ typedef struct ssh2_mac {
 	char *name;
 	const EVP_MD *(*evp_md)(void);
 	int truncatebits;
+	int etm;
 } ssh2_mac_t;
 
 static ssh2_mac_t ssh2_macs[] = {
-	{HMAC_SHA1,        "hmac-sha1",                  EVP_sha1,      0},  // RFC4253
-	{HMAC_MD5,         "hmac-md5",                   EVP_md5,       0},  // RFC4253
-	{HMAC_SHA1_96,     "hmac-sha1-96",               EVP_sha1,      96}, // RFC4253
-	{HMAC_MD5_96,      "hmac-md5-96",                EVP_md5,       96}, // RFC4253
-	{HMAC_RIPEMD160,   "hmac-ripemd160@openssh.com", EVP_ripemd160, 0},
-	{HMAC_SHA2_256,    "hmac-sha2-256",              EVP_sha256,    0},  // RFC6668
-//	{HMAC_SHA2_256_96, "hmac-sha2-256-96",           EVP_sha256,    96}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
-	{HMAC_SHA2_512,    "hmac-sha2-512",              EVP_sha512,    0},  // RFC6668
-//	{HMAC_SHA2_512_96, "hmac-sha2-512-96",           EVP_sha512,    96}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
-	{HMAC_NONE,        NULL,                         NULL,          0},
+	{HMAC_SHA1,         "hmac-sha1",                     EVP_sha1,      0,  0}, // RFC4253
+	{HMAC_MD5,          "hmac-md5",                      EVP_md5,       0,  0}, // RFC4253
+	{HMAC_SHA1_96,      "hmac-sha1-96",                  EVP_sha1,      96, 0}, // RFC4253
+	{HMAC_MD5_96,       "hmac-md5-96",                   EVP_md5,       96, 0}, // RFC4253
+	{HMAC_RIPEMD160,    "hmac-ripemd160@openssh.com",    EVP_ripemd160, 0,  0},
+	{HMAC_SHA2_256,     "hmac-sha2-256",                 EVP_sha256,    0,  0}, // RFC6668
+//	{HMAC_SHA2_256_96,  "hmac-sha2-256-96",              EVP_sha256,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
+	{HMAC_SHA2_512,     "hmac-sha2-512",                 EVP_sha512,    0,  0}, // RFC6668
+//	{HMAC_SHA2_512_96,  "hmac-sha2-512-96",              EVP_sha512,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
+	{HMAC_SHA1_EtM,     "hmac-sha1-etm@openssh.com",     EVP_sha1,      0,  1},
+	{HMAC_MD5_EtM,      "hmac-md5-etm@openssh.com",      EVP_md5,       0,  1},
+	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",EVP_ripemd160, 0,  1},
+	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", EVP_sha256,    0,  1},
+	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", EVP_sha512,    0,  1},
+	{HMAC_NONE,         NULL,                            NULL,          0,  0},
 };
 
 
@@ -526,6 +539,7 @@ struct Mac {
 	int             mac_len; 
 	u_char          *key;
 	int             key_len;
+	int		etm;
 };
 
 struct Comp {
@@ -697,7 +711,7 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len);
    'data' points to the start of the packet data (the length field)
 */
 void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding);
-void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding);
+void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding, int etm);
 void SSH_notify_win_size(PTInstVar pvar, int cols, int rows);
 void SSH_notify_user_name(PTInstVar pvar);
 void SSH_notify_cred(PTInstVar pvar);

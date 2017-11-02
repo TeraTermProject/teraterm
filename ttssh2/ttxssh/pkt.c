@@ -181,9 +181,13 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			uint32 padding;
 			uint32 pktsize;
 			uint32 total_packet_size;
+			struct Mac *mac = &pvar->ssh2_keys[MODE_IN].mac;
+			int etm;
+
+			etm = mac && mac->enabled && mac->etm;
 
 			// 暗号化パケットの一部を復号化する。
-			if (!pvar->pkt_state.predecrypted_packet) {
+			if (!pvar->pkt_state.predecrypted_packet && !etm) {
 				SSH_predecrpyt_packet(pvar, data);
 				pvar->pkt_state.predecrypted_packet = TRUE;
 			}
@@ -196,7 +200,12 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			} else {
 				// SSH2のパケットは先頭に packet-size(4)+padding(1)+type(1) が続く。
 				pktsize = get_uint32_MSBfirst(data);
-				padding = (unsigned char) data[4];
+				if (etm) {
+					padding = 0;
+				}
+				else {
+					padding = (unsigned char) data[4];
+				}
 			}
 
 			// パケット(TCPペイロード)の全体のサイズは、SSHペイロード＋4（＋MAC）となる。
@@ -209,7 +218,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 					SSH_handle_packet1(pvar, data, pktsize, padding);
 				}
 				else {
-					SSH_handle_packet2(pvar, data, pktsize, padding);
+					SSH_handle_packet2(pvar, data, pktsize, padding, etm);
 				}
 				pvar->pkt_state.predecrypted_packet = FALSE;
 

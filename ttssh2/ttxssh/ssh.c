@@ -774,19 +774,31 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, int len, int padding)
 	return pvar->ssh_state.payload[-1];
 }
 
-static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding)
+static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding, int etm)
 {
-	int already_decrypted = get_predecryption_amount(pvar);
-
 	pvar->ssh_state.payload = data + 4;
 	pvar->ssh_state.payloadlen = len;
 
-	CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
+	if (etm) {
+		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
+			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+			return SSH_MSG_NONE;
+		}
 
-	if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
-		UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
-		return SSH_MSG_NONE;
+		CRYPT_decrypt(pvar, data + 4, len);
+		padding = (unsigned int) data[4];
+	}
+	else {
+		int already_decrypted = get_predecryption_amount(pvar);
+
+		CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
+
+		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
+			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+			return SSH_MSG_NONE;
+		}
 	}
 
 	pvar->ssh_state.payload++;
@@ -989,6 +1001,8 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		unsigned int encryption_size;
 		unsigned int padding;
 		BOOL ret;
+		struct Mac *mac = &pvar->ssh2_keys[MODE_OUT].mac;
+		int aadlen = 0;
 
 		/*
 		 データ構造
@@ -1041,14 +1055,18 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			block_size = 8;
 		}
 
-		encryption_size = 4 + 1 + len;
+		if (mac && mac->etm) {
+			aadlen = 4;
+		}
+
+		encryption_size = 4 - aadlen + 1 + len;
 		padding = block_size - (encryption_size % block_size);
 		if (padding < 4)
 			padding += block_size;
 		encryption_size += padding;
-		set_uint32(data, encryption_size - 4);
+		set_uint32(data, encryption_size - 4 + aadlen);
 		data[4] = (unsigned char) padding;
-		data_length = encryption_size + CRYPT_get_sender_MAC_size(pvar);
+		data_length = encryption_size;
 		if (msg) {
 			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
 			buffer_append_space(msg, padding + EVP_MAX_MD_SIZE);
@@ -1058,16 +1076,33 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 
 		//if (pvar->ssh_state.outbuflen <= 7 + data_length) *(int *)0 = 0;
 		CRYPT_set_random_data(pvar, data + 5 + len, padding);
-		ret = CRYPT_build_sender_MAC(pvar,
-		                             pvar->ssh_state.sender_sequence_number,
-		                             data, encryption_size,
-		                             data + encryption_size);
-		if (ret == FALSE) { // MACがまだ設定されていない場合
-			data_length = encryption_size;
+
+		if (aadlen == 0) {
+			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
+			                             data, encryption_size, data + encryption_size);
+			if (ret) {
+				data_length += CRYPT_get_sender_MAC_size(pvar);
+//				data[encryption_size + 5] = 0;
+			}
 		}
 
 		// パケットを暗号化する。MAC以降は暗号化対象外。
-		CRYPT_encrypt(pvar, data, encryption_size);
+		CRYPT_encrypt(pvar, data + aadlen, encryption_size);
+
+		if (aadlen) {
+			int maclen;
+			encryption_size += aadlen;
+			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
+			                             data, encryption_size, data + encryption_size);
+			if (ret) {
+				maclen = CRYPT_get_sender_MAC_size(pvar);
+				data_length = encryption_size + maclen;
+			}
+			logprintf(LOG_LEVEL_ERROR, __FUNCTION__
+				": EtM test. aadlen:%d, enclen:%d, pad:%d, datalen:%d, maclen:%d",
+				aadlen, encryption_size, padding, data_length, maclen);
+		}
+
 	}
 
 	send_packet_blocking(pvar, data, data_length);
@@ -2035,7 +2070,6 @@ void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end)
 	}
 }
 
-
 void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding)
 {
 	unsigned char message = prep_packet_ssh1(pvar, data, len, padding);
@@ -2059,9 +2093,9 @@ void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding)
 	}
 }
 
-void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding)
+void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding, int etm)
 {
-	unsigned char message = prep_packet_ssh2(pvar, data, len, padding);
+	unsigned char message = prep_packet_ssh2(pvar, data, len, padding, etm);
 
 	// SSHのメッセージタイプをチェック
 	if (message != SSH_MSG_NONE) {
@@ -4168,6 +4202,21 @@ int get_ssh2_mac_truncatebits(hmac_type type)
 	return bits;
 }
 
+int get_ssh2_mac_etm(hmac_type type)
+{
+	ssh2_mac_t *ptr = ssh2_macs;
+	int etm;
+
+	while (ptr->name != NULL) {
+		if (type == ptr->type) {
+			etm = ptr->etm;
+			break;
+		}
+		ptr++;
+	}
+	return etm;
+}
+
 char* get_ssh2_comp_name(compression_type type)
 {
 	ssh2_comp_t *ptr = ssh2_comps;
@@ -4701,6 +4750,7 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 		if (get_ssh2_mac_truncatebits(val) != 0) {
 			current_keys[mode].mac.mac_len = get_ssh2_mac_truncatebits(val) / 8;
 		}
+		current_keys[mode].mac.etm = get_ssh2_mac_etm(val);
 
 		// キーサイズとブロックサイズもここで設定しておく (2004.11.7 yutaka)
 		if (ctos == 1) {

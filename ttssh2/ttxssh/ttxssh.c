@@ -348,12 +348,19 @@ static void normalize_host_key_order(char *buf)
 static void normalize_mac_order(char *buf)
 {
 	static char default_strings[] = {
+		HMAC_SHA2_512_EtM,
+		HMAC_SHA2_256_EtM,
+		HMAC_SHA1_EtM,
 		HMAC_SHA2_512,
 		HMAC_SHA2_256,
 		HMAC_SHA1,
+		HMAC_RIPEMD160_EtM,
 		HMAC_RIPEMD160,
+		HMAC_MD5_EtM,
 		HMAC_MD5,
 		HMAC_NONE,
+		HMAC_SHA1_96_EtM,
+		HMAC_MD5_96_EtM,
 		HMAC_SHA1_96,
 		HMAC_MD5_96,
 		0, // Dummy for HMAC_SHA2_512_96,
