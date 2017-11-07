@@ -774,26 +774,45 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, int len, int padding)
 	return pvar->ssh_state.payload[-1];
 }
 
+/*
+ * パケット処理の為の以下の準備を行う。(SSHv2用)
+ * ・データ復号
+ * ・MAC の検証
+ * ・padding を取り除く
+ * ・メッセージタイプを判別して返す
+ *
+ * 引数:
+ *   data - ssh パケットの先頭を指すポインタ
+ *   len - パケット長 (先頭のパケット長領域(4バイト)を除いた値)
+ *   padding - パディング長 (EtMの場合は0となっているので、復号後に取得する必要あり)
+ *   etm - MAC 方式が EtM かどうかのフラグ
+ */
+
 static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding, int etm)
 {
-	pvar->ssh_state.payload = data + 4;
-	pvar->ssh_state.payloadlen = len;
-
 	if (etm) {
+		// EtM の場合は先に MAC の検証を行う
 		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
 			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 			return SSH_MSG_NONE;
 		}
 
+		// パケット長部分(先頭4バイト)は暗号化されていないので、そこをスキップして復号する。
 		CRYPT_decrypt(pvar, data + 4, len);
+
+		// EtM の場合は 呼び出し元では padding 部分が読めない為、ここで値を取得する。
 		padding = (unsigned int) data[4];
 	}
 	else {
+		// E&M では先頭部分が事前復号されている。
+		// 事前復号された長さを取得する。
 		int already_decrypted = get_predecryption_amount(pvar);
 
+		// 事前復号された部分をスキップして、残りの部分を復号する。
 		CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
 
+		// E&M では復号後に MAC の検証を行う。
 		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
 			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
@@ -801,8 +820,11 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding, in
 		}
 	}
 
-	pvar->ssh_state.payload++;
-	pvar->ssh_state.payloadlen -= padding + 1;
+	// パケット長(4バイト) 部分とパディング長(1バイト)部分をスキップした SSH ペイロードの先頭
+	pvar->ssh_state.payload = data + 4 + 1;
+
+	// パディング長部分(1バイト)とパディングを除いた実際のペイロード長
+	pvar->ssh_state.payloadlen = len - 1 - padding;
 
 	pvar->ssh_state.payload_grabbed = 0;
 
@@ -1002,7 +1024,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		unsigned int padding;
 		BOOL ret;
 		struct Mac *mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		int aadlen = 0;
+		int aadlen = 0, maclen = 0;
 
 		/*
 		 データ構造
@@ -1056,6 +1078,7 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		}
 
 		if (mac && mac->etm) {
+			// 暗号化対象では無いが、MAC の対象となる部分の長さ
 			aadlen = 4;
 		}
 
@@ -1066,7 +1089,6 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		encryption_size += padding;
 		set_uint32(data, encryption_size - 4 + aadlen);
 		data[4] = (unsigned char) padding;
-		data_length = encryption_size;
 		if (msg) {
 			// パケット圧縮の場合、バッファを拡張する。(2011.6.10 yutaka)
 			buffer_append_space(msg, padding + EVP_MAX_MD_SIZE);
@@ -1074,15 +1096,14 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			data = buffer_ptr(msg);
 		}
 
-		//if (pvar->ssh_state.outbuflen <= 7 + data_length) *(int *)0 = 0;
 		CRYPT_set_random_data(pvar, data + 5 + len, padding);
 
 		if (aadlen == 0) {
+			// E&M では先に MAC を計算する
 			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
 			                             data, encryption_size, data + encryption_size);
 			if (ret) {
-				data_length += CRYPT_get_sender_MAC_size(pvar);
-//				data[encryption_size + 5] = 0;
+				maclen = CRYPT_get_sender_MAC_size(pvar);
 			}
 		}
 
@@ -1090,19 +1111,19 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		CRYPT_encrypt(pvar, data + aadlen, encryption_size);
 
 		if (aadlen) {
-			int maclen;
-			encryption_size += aadlen;
+			// EtM では暗号化後に MAC を計算する
 			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
-			                             data, encryption_size, data + encryption_size);
+			                             data, aadlen + encryption_size, data + aadlen + encryption_size);
 			if (ret) {
 				maclen = CRYPT_get_sender_MAC_size(pvar);
-				data_length = encryption_size + maclen;
 			}
-			logprintf(LOG_LEVEL_ERROR, __FUNCTION__
-				": EtM test. aadlen:%d, enclen:%d, pad:%d, datalen:%d, maclen:%d",
-				aadlen, encryption_size, padding, data_length, maclen);
 		}
 
+		data_length = encryption_size + aadlen + maclen;
+
+		logprintf(150, __FUNCTION__
+			": built packet info: aadlen:%d, enclen:%d, padlen:%d, datalen:%d, maclen:%d, mode:%s",
+			aadlen, encryption_size, padding, data_length, maclen, aadlen ? "EtM" : "E&M");
 	}
 
 	send_packet_blocking(pvar, data, data_length);
