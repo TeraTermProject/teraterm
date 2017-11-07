@@ -496,6 +496,8 @@ static ssh2_mac_t ssh2_macs[] = {
 //	{HMAC_SHA2_512_96,  "hmac-sha2-512-96",              EVP_sha512,    96, 0}, // draft-dbider-sha2-mac-for-ssh-05, deleted at 06
 	{HMAC_SHA1_EtM,     "hmac-sha1-etm@openssh.com",     EVP_sha1,      0,  1},
 	{HMAC_MD5_EtM,      "hmac-md5-etm@openssh.com",      EVP_md5,       0,  1},
+	{HMAC_SHA1_96_EtM,  "hmac-sha1-96-etm@openssh.com",  EVP_sha1,      96, 1},
+	{HMAC_MD5_96_EtM,   "hmac-md5-96-etm@openssh.com",   EVP_md5,       96, 1},
 	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",EVP_ripemd160, 0,  1},
 	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", EVP_sha256,    0,  1},
 	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", EVP_sha512,    0,  1},
