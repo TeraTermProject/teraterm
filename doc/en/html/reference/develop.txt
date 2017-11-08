@@ -46,7 +46,7 @@
 
 * Libraries
 - Oniguruma 6.6.0 (https://github.com/kkos/oniguruma)
-- OpenSSL 1.0.2l (http://www.openssl.org/)
+- OpenSSL 1.0.2m (http://www.openssl.org/)
 - zlib 1.2.11 (http://www.zlib.net/)
 - PuTTY 0.70 (http://www.chiark.greenend.org.uk/~sgtatham/putty/)
 - SFMT 1.5.1 (http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.html)
