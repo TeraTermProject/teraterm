@@ -16,7 +16,7 @@ static char *Registry_id =
 
 BOOL bUseINI = FALSE;					// 保存先(TRUE=INI, FALSE=レジストリ)
 TCHAR szSectionName[MAX_PATH];			// INIのセクション名
-TCHAR szSectionNames[MAX_PATH*10]={0};	// INIのセクション名一覧
+TCHAR szSectionNames[1024*10]={0};	// INIのセクション名一覧
 TCHAR szApplicationName[MAX_PATH]={0};	// INIファイルのフルパス
 
 BOOL getSection(LPCTSTR str)
