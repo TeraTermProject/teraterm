@@ -105,10 +105,10 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
   "TTSSH" module is linkd to compression Library "zlib" to compress SSH packets. Packet compression is effective on low speed networks like for example with dial-up connections, however in high speed networks it may slow down communication. That's why packet compression function is disabled by default. <br>
 </p>
 <p>
-  "TTSSH" module is linkd to terminal emulator "PuTTY." PuTTY package contains SSH authentication agent called "Pageant". TTSSH uses part of PuTTY source code to support Pageant based authentication method. SSH communication part of PuTTY source code is not used.
+  "TTSSH" module is linkd to terminal emulator "PuTTY." PuTTY package contains SSH authentication agent called "Pageant". TTSSH uses part of PuTTY source code to support Pageant based authentication method. Communication part and terminal emulation part of PuTTY source code is not used.
 </p>
 <p>
-Note that these libraries are called statically (not via dynamic link). When compiling the source code with these libraries use "/MT" option. Tera Term doesn't use dynamic calls to the libraries because not all user environments can support such calls, which may cause Tera Term to crash.
+  Note that these libraries are called statically (not via dynamic link). When compiling the source code with these libraries use "/MT" option. Tera Term doesn't use dynamic calls to the libraries because not all user environments can support such calls, which may cause Tera Term to crash.
 </p> 
 
 <div align="center">
