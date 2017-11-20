@@ -36,16 +36,16 @@
   <li>変更
     <ul>
       <li>DA2 要求への応答内容を変更した。</li>
+      <li>Telnet 接続時、端末速度をサーバへ伝えるようにした。
+        <ul>
+          <li>Tlnet Terminal Speed Option に対応した。</li>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#TerminalSpeed">TerminalSpeed</a> エントリを追加した。デフォルトは38400。</li>
+        </ul></li>
       <li>ログの行頭に追加するタイムスタンプの種類を設定できるようにした。
         <ul>
           <li>タイムスタンプの種類ととして "Elapsed Time (Logging)" と "Elapsed Time (Connection)" を追加した。</li>
           <li><a href="../menu/file-log.html#Timestamp">Log ダイアログ</a>、および <a href="../menu/setup-additional.html#LogTimestamp">Additional settings ダイアログ</a>の Log タブで、タイムスタンプの種類を設定できるようにした。</li>
           <li><a href="../setup/teraterm-misc.html#LogTimestampUTC">LogTimestampUTC</a> 設定は非推奨となりました。代わりにタイムスタンプの種類に UTC を設定してください。</li>
-        </ul></li>
-      <li>Telnet 接続時、端末速度をサーバへ伝えるようにした。
-        <ul>
-          <li>Tlnet Terminal Speed Option に対応した。</li>
-          <li>teraterm.ini に <a href="../setup/teraterm-com.html#TerminalSpeed">TerminalSpeed</a> エントリを追加した。デフォルトは38400。</li>
         </ul></li>
     </ul>
   </li>
@@ -53,13 +53,13 @@
   <li>バグ修正
     <ul>
       <li>DECRQSS 制御シーケンスへの応答が間違っている問題を修正した。</li>
+      <li>Telnet 接続時、端末の幅または高さが 255 の時にサーバへ端末のサイズが正しく伝わらない問題を修正した。</li>
       <li><a href="../menu/file.html">[File]</a> メニューの [View Log] でエディタが起動しない問題を修正した。</li>
       <li><a href="../menu/setup-additional.html#LogOption">Additional settings ダイアログ</a>の Log タブで、Log Option 設定に関する問題を修正した。
         <ul>
           <li>PlainText, Timestamp 設定が正しく反映されない事がある問題を修正した。</li>
           <li>ダイアログをキャンセルした時に、Log Option 設定の変更が反映される問題を修正した。</li>
         </ul></li>
-      <li>Telnet 接続時、端末の幅または高さが 255 の時にサーバへ端末のサイズが正しく伝わらない問題を修正した。</li>
     </ul>
   </li>
 
@@ -2968,11 +2968,6 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>サーバに通知する端末速度を設定で変更できるようにした。
-        <ul>
-          <li>teraterm.ini に <a href="../setup/teraterm-com.html#TerminalSpeed">TerminalSpeed</a> エントリを追加した。デフォルトは38400。</li>
-          <li>サーバに通知する端末速度のデフォルトを 38400bps に変更した。</li>
-        </ul></li>
       <li>SSH2 の MAC アルゴリズムとして以下をサポートした。
         <ul>
           <li>hmac-sha1-etm@openssh.com</li>
@@ -2982,6 +2977,11 @@
           <li>hmac-md5-etm@openssh.com</li>
           <li>hmac-sha1-96-etm@openssh.com</li>
           <li>hmac-md5-96-etm@openssh.com</li>
+        </ul></li>
+      <li>サーバに通知する端末速度を設定で変更できるようにした。
+        <ul>
+          <li>teraterm.ini に <a href="../setup/teraterm-com.html#TerminalSpeed">TerminalSpeed</a> エントリを追加した。デフォルトは38400。</li>
+          <li>サーバに通知する端末速度のデフォルトを 38400bps に変更した。</li>
         </ul></li>
     </ul>
   </li>
