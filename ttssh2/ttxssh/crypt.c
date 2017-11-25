@@ -189,17 +189,10 @@ static int detect_attack(CRYPTDetectAttack *statics,
 	return DEATTACK_OK;
 }
 
-BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf,
-                         int bytes)
+BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	if (SSHv1(pvar)) {
-		if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE) {
-			return FALSE;
-		}
-		else {
-			return detect_attack(&pvar->crypt_state.detect_attack_statics,
-			                     buf, bytes, NULL) == DEATTACK_DETECTED;
-		}
+	if (SSHv1(pvar) && pvar->crypt_state.sender_cipher != SSH_CIPHER_NONE) {
+		return detect_attack(&pvar->crypt_state.detect_attack_statics, buf, bytes, NULL) == DEATTACK_DETECTED;
 	} else {
 		return FALSE;
 	}
