@@ -4053,234 +4053,231 @@ Newkeys current_keys[MODE_MAX];
 int get_cipher_block_size(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	int val = 8;
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {
-			val = ptr->block_size;
-			break;
+			return ptr->block_size;
 		}
 		ptr++;
 	}
-	return (val);
+
+	// not found.
+	return 8;
 }
 
 int get_cipher_key_len(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	int val = 0;
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {
-			val = ptr->key_len;
-			break;
+			return ptr->key_len;
 		}
 		ptr++;
 	}
-	return (val);
+
+	// not found.
+	return 0;
 }
 
 int get_cipher_discard_len(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	int val = 0;
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {
-			val = ptr->discard_len;
-			break;
+			return ptr->discard_len;
 		}
 		ptr++;
 	}
-	return (val);
+
+	// not found.
+	return 0;
 }
 
 // 暗号アルゴリズム名から検索する。
 SSHCipher get_cipher_by_name(char *name)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	SSHCipher ret = SSH_CIPHER_NONE;
 
 	if (name == NULL)
 		goto error;
 
 	while (ptr->name != NULL) {
 		if (strcmp(ptr->name, name) == 0) {
-			ret = ptr->cipher;
-			break;
+			return ptr->cipher;
 		}
 		ptr++;
 	}
+
+	// not found.
 error:
-	return (ret);
+	return SSH_CIPHER_NONE;
 }
 
 static char * get_cipher_string(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {
-			p = ptr->name;
-			break;
+			return ptr->name;
 		}
 		ptr++;
 	}
-	return p;
+
+	// not found.
+	return "unknown";
 }
 
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
-	const EVP_CIPHER *type;
-
-	type = EVP_enc_null();
 
 	while (ptr->name != NULL) {
 		if (cipher == ptr->cipher) {
-			type = ptr->func();
-			break;
+			return ptr->func();
 		}
 		ptr++;
 	}
-	return type;
+
+	// not found.
+	return EVP_enc_null();
 }
 
 char* get_kex_algorithm_name(kex_algorithm kextype)
 {
 	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
-	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (kextype == ptr->kextype) {
-			p = ptr->name;
-			break;
+			return ptr->name;
 		}
 		ptr++;
 	}
-	return p;
+
+	// not found.
+	return "unknown";
 }
 
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
 {
 	ssh2_kex_algorithm_t *ptr = ssh2_kex_algorithms;
-	const EVP_MD *evp_md;
 
 	while (ptr->name != NULL) {
 		if (kextype == ptr->kextype) {
-			evp_md = ptr->evp_md();
-			break;
+			return ptr->evp_md();
 		}
 		ptr++;
 	}
-	return evp_md;
+
+	// not found.
+	return EVP_md_null();
 }
 
 char* get_ssh2_mac_name(hmac_type type)
 {
 	ssh2_mac_t *ptr = ssh2_macs;
-	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			p = ptr->name;
-			break;
+			return ptr->name;
 		}
 		ptr++;
 	}
-	return p;
+
+	// not found.
+	return "unknown";
 }
 
 const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type)
 {
 	ssh2_mac_t *ptr = ssh2_macs;
-	const EVP_MD *evp_md;
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			evp_md = ptr->evp_md();
-			break;
+			return ptr->evp_md();
 		}
 		ptr++;
 	}
-	return evp_md;
+
+	// not found.
+	return EVP_md_null();
 }
 
 int get_ssh2_mac_truncatebits(hmac_type type)
 {
 	ssh2_mac_t *ptr = ssh2_macs;
-	int bits;
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			bits = ptr->truncatebits;
-			break;
+			return ptr->truncatebits;
 		}
 		ptr++;
 	}
-	return bits;
+
+	// not found.
+	return 0;
 }
 
 int get_ssh2_mac_etm(hmac_type type)
 {
 	ssh2_mac_t *ptr = ssh2_macs;
-	int etm;
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			etm = ptr->etm;
-			break;
+			return ptr->etm;
 		}
 		ptr++;
 	}
-	return etm;
+
+	// not found
+	return 0;
 }
 
 char* get_ssh2_comp_name(compression_type type)
 {
 	ssh2_comp_t *ptr = ssh2_comps;
-	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			p = ptr->name;
-			break;
+			return ptr->name;
 		}
 		ptr++;
 	}
-	return p;
+
+	// not found.
+	return "unknown";
 }
 
 char* get_ssh_keytype_name(ssh_keytype type)
 {
 	ssh2_host_key_t *ptr = ssh2_host_key;
-	char *p = "ssh-unknown";
 
 	while (ptr->name != NULL) {
 		if (type == ptr->type) {
-			// ssh2_host_key[]はグローバル変数なので、そのまま返り値にできる。
-			p = ptr->name;
-			break;
+			return ptr->name;
 		}
 		ptr++;
 	}
-	return p;
+
+	// not found.
+	return "ssh-unknown";
 }
 
 char* get_digest_algorithm_name(digest_algorithm id)
 {
 	ssh_digest_t *ptr = ssh_digests;
-	char *p = "unknown";
 
 	while (ptr->name != NULL) {
 		if (id == ptr->id) {
-			p = ptr->name;
-			break;
+			return ptr->name;
 		}
 		ptr++;
 	}
-	return p;
+
+	// not found.
+	return "unknown";
 }
 
 static void do_write_buffer_file(void *buf, int len, char *file, int lineno)
@@ -4299,7 +4296,6 @@ static void do_write_buffer_file(void *buf, int len, char *file, int lineno)
 	fclose(fp);
 }
 
-
 void SSH2_packet_start(buffer_t *msg, unsigned char type)
 {
 	unsigned char buf[9];
@@ -4310,7 +4306,6 @@ void SSH2_packet_start(buffer_t *msg, unsigned char type)
 	buffer_clear(msg);
 	buffer_append(msg, buf, len);
 }
-
 
 // the caller is normalize_cipher_order()
 void SSH2_update_cipher_myproposal(PTInstVar pvar)
@@ -4748,38 +4743,35 @@ static compression_type choose_SSH2_compression_algorithm(char *server_proposal,
 // 暗号アルゴリズムのキーサイズ、ブロックサイズ、MACサイズのうち最大値(we_need)を決定する。
 static void choose_SSH2_key_maxlength(PTInstVar pvar)
 {
-	int mode, need, val, ctos;
+	int mode, val;
+	unsigned int need = 0;
 	const EVP_MD *md;
+	SSHCipher cipher;
+	hmac_type mac;
 
 	for (mode = 0; mode < MODE_MAX; mode++) {
-		if (mode == MODE_OUT)
-			ctos = 1;
-		else
-			ctos = 0;
-
-		if (ctos == 1) {
-			val = pvar->ctos_hmac;
-		} else {
-			val = pvar->stoc_hmac;
+		if (mode == MODE_OUT) {
+			mac = pvar->ctos_hmac;
+			cipher = pvar->ctos_cipher;
+		}
+		else {
+			mac = pvar->stoc_hmac;
+			cipher = pvar->stoc_cipher;
 		}
 
 		// current_keys[]に設定しておいて、あとで pvar->ssh2_keys[] へコピーする。
-		md = get_ssh2_mac_EVP_MD(val);
+		md = get_ssh2_mac_EVP_MD(mac);
 		current_keys[mode].mac.md = md;
 		current_keys[mode].mac.key_len = current_keys[mode].mac.mac_len = EVP_MD_size(md);
-		if (get_ssh2_mac_truncatebits(val) != 0) {
-			current_keys[mode].mac.mac_len = get_ssh2_mac_truncatebits(val) / 8;
+		val = get_ssh2_mac_truncatebits(mac);
+		if (val != 0) {
+			current_keys[mode].mac.mac_len = val / 8;
 		}
-		current_keys[mode].mac.etm = get_ssh2_mac_etm(val);
+		current_keys[mode].mac.etm = get_ssh2_mac_etm(mac);
 
 		// キーサイズとブロックサイズもここで設定しておく (2004.11.7 yutaka)
-		if (ctos == 1) {
-			current_keys[mode].enc.key_len = get_cipher_key_len(pvar->ctos_cipher);
-			current_keys[mode].enc.block_size = get_cipher_block_size(pvar->ctos_cipher);
-		} else {
-			current_keys[mode].enc.key_len = get_cipher_key_len(pvar->stoc_cipher);
-			current_keys[mode].enc.block_size = get_cipher_block_size(pvar->stoc_cipher);
-		}
+		current_keys[mode].enc.key_len = get_cipher_key_len(cipher);
+		current_keys[mode].enc.block_size = get_cipher_block_size(cipher);
 		current_keys[mode].mac.enabled = 0;
 		current_keys[mode].comp.enabled = 0; // (2005.7.9 yutaka)
 
@@ -4787,27 +4779,13 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 		pvar->ssh2_keys[mode].mac.enabled = 0;
 		pvar->ssh2_keys[mode].comp.enabled = 0; // (2005.7.9 yutaka)
 	}
-	need = 0;
+
 	for (mode = 0; mode < MODE_MAX; mode++) {
-		if (mode == MODE_OUT)
-			ctos = 1;
-		else
-			ctos = 0;
-
-		val = current_keys[mode].enc.key_len;
-		if (need < val)
-			need = val;
-
-		val = current_keys[mode].enc.block_size;
-		if (need < val)
-			need = val;
-
-		val = current_keys[mode].mac.key_len;
-		if (need < val)
-			need = val;
+		need = max(need, current_keys[mode].enc.key_len);
+		need = max(need, current_keys[mode].enc.block_size);
+		need = max(need, current_keys[mode].mac.key_len);
 	}
 	pvar->we_need = need;
-
 }
 
 

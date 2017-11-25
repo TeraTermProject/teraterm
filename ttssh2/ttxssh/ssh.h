@@ -535,13 +535,13 @@ struct Enc {
 };
 
 struct Mac {
-	char            *name; 
-	int             enabled; 
+	char            *name;
+	int             enabled;
 	const EVP_MD    *md;
-	int             mac_len; 
+	unsigned int    mac_len;
 	u_char          *key;
-	int             key_len;
-	int		etm;
+	unsigned int    key_len;
+	int             etm;
 };
 
 struct Comp {
