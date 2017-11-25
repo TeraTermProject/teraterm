@@ -150,6 +150,9 @@ unsigned int CRYPT_get_encryption_block_size(PTInstVar pvar);
 #define CRYPT_decrypt(pvar, buf, bytes) \
     ((pvar)->crypt_state.decrypt((pvar), (buf), (bytes)))
 
+BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int len, unsigned int aadlen, unsigned int authlen);
+BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int len, unsigned int aadlen, unsigned int authlen);
+
 BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf, int bytes);
 int CRYPT_passphrase_decrypt(int cipher, char *passphrase, char *buf, int len);
 RSA *make_key(PTInstVar pvar,

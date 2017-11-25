@@ -542,7 +542,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// •œ†‰»
 	cp = buffer_append_space(b, len);
 	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
-		get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
+		get_cipher_EVP_CIPHER(ciphernameval), 0, 0, pvar);
 	if (EVP_Cipher(&cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
 		cipher_cleanup_SSH2(&cipher_ctx);
 		goto error;
@@ -931,7 +931,7 @@ Key *read_SSH2_PuTTY_private_key(PTInstVar pvar,
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(&cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, pvar);
+		cipher_init_SSH2(&cipher_ctx, key, 32, iv, 16, CIPHER_DECRYPT, EVP_aes_256_cbc(), 0, 0, pvar);
 		len = buffer_len(prikey);
 		decrypted = (char *)malloc(len);
 		if (EVP_Cipher(&cipher_ctx, decrypted, prikey->buf, len) == 0) {
@@ -1466,7 +1466,7 @@ Key *read_SSH2_SECSH_private_key(PTInstVar pvar,
 		memset(iv, 0, sizeof(iv));
 
 		// decrypt
-		cipher_init_SSH2(&cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, pvar);
+		cipher_init_SSH2(&cipher_ctx, key, 24, iv, 8, CIPHER_DECRYPT, EVP_des_ede3_cbc(), 0, 0, pvar);
 		decrypted = (char *)malloc(len);
 		if (EVP_Cipher(&cipher_ctx, decrypted, blob->buf + blob->offset, len) == 0) {
 			strncpy_s(errmsg, errmsg_len, "Key decrypt error", _TRUNCATE);

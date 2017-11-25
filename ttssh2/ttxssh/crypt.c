@@ -198,6 +198,113 @@ BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf, int bytes)
 	}
 }
 
+BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes, unsigned int aadlen, unsigned int authlen)
+{
+	unsigned char *newbuf = NULL;
+	unsigned int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
+	unsigned char lastiv[1];
+	char tmp[80];
+	EVP_CIPHER_CTX *evp = &pvar->evpcip[MODE_OUT];
+
+	if (bytes == 0)
+		return TRUE;
+
+	if (bytes % block_size) {
+		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar, "%s encrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            get_cipher_name(pvar->crypt_state.sender_cipher),
+		            bytes, block_size);
+		notify_fatal_error(pvar, tmp, TRUE);
+		return FALSE;
+	}
+
+	if ((newbuf = malloc(bytes)) == NULL)
+		goto err;
+
+	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
+		goto err;
+
+	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
+		goto err;
+
+	if (EVP_Cipher(evp, newbuf, data+aadlen, bytes) < 0)
+		goto err;
+
+	memcpy(data+aadlen, newbuf, bytes);
+
+	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
+		goto err;
+
+	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_GET_TAG, authlen, data+aadlen+bytes))
+		goto err;
+
+	free(newbuf);
+
+	return TRUE;
+
+err:
+	free(newbuf);
+
+	UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+	            get_cipher_name(pvar->crypt_state.sender_cipher));
+	notify_fatal_error(pvar, tmp, TRUE);
+	return FALSE;
+}
+
+BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes, unsigned int aadlen, unsigned int authlen)
+{
+	unsigned char *newbuf = NULL;
+	unsigned int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
+	unsigned char lastiv[1];
+	char tmp[80];
+	EVP_CIPHER_CTX *evp = &pvar->evpcip[MODE_IN];
+
+	if (bytes == 0)
+		return TRUE;
+
+	if (bytes % block_size) {
+		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar, "%s decrypt error(1): bytes %d (%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		            get_cipher_name(pvar->crypt_state.receiver_cipher),
+		            bytes, block_size);
+		notify_fatal_error(pvar, tmp, TRUE);
+		return FALSE;
+	}
+
+	if ((newbuf = malloc(bytes)) == NULL)
+		goto err;
+
+	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
+		goto err;
+
+	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_TAG, authlen, data+aadlen+bytes))
+		goto err;
+
+	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
+		goto err;
+
+	if (EVP_Cipher(evp, newbuf, data+aadlen, bytes) < 0)
+		goto err;
+
+	memcpy(data+aadlen, newbuf, bytes);
+	free(newbuf);
+
+	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
+		return FALSE;
+	else
+		return TRUE;
+
+err:
+	free(newbuf);
+
+	UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+	            get_cipher_name(pvar->crypt_state.receiver_cipher));
+	notify_fatal_error(pvar, tmp, TRUE);
+	return FALSE;
+}
+
 static void no_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
 }
@@ -468,6 +575,8 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 		            | (1 << SSH2_CIPHER_CAMELLIA128_CTR)
 		            | (1 << SSH2_CIPHER_CAMELLIA192_CTR)
 		            | (1 << SSH2_CIPHER_CAMELLIA256_CTR)
+		            | (1 << SSH2_CIPHER_AES128_GCM)
+		            | (1 << SSH2_CIPHER_AES256_GCM)
 		);
 	}
 
@@ -870,6 +979,7 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
                       int encrypt,
                       const EVP_CIPHER *type,
                       int discard_len,
+                      unsigned int authlen,
                       PTInstVar pvar)
 {
 	int klen;
@@ -877,10 +987,28 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 	unsigned char *junk = NULL, *discard = NULL;
 
 	EVP_CIPHER_CTX_init(evp);
-	if (EVP_CipherInit(evp, type, NULL, (u_char *)iv, (encrypt == CIPHER_ENCRYPT)) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
-		                  "Cipher initialize error(%d)");
+	if (EVP_CipherInit(evp, type, NULL, NULL, (encrypt == CIPHER_ENCRYPT)) == 0) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
+		notify_fatal_error(pvar, tmp, TRUE);
+		return;
+	}
+
+	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IVLEN, ivlen, NULL)) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
+		notify_fatal_error(pvar, tmp, TRUE);
+		return;
+	}
+	if (EVP_CipherInit(evp, NULL, NULL, (u_char *)iv, -1) == 0) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
+		notify_fatal_error(pvar, tmp, TRUE);
+		return;
+	}
+	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
@@ -888,17 +1016,15 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 	klen = EVP_CIPHER_CTX_key_length(evp);
 	if (klen > 0 && keylen != klen) {
 		if (EVP_CIPHER_CTX_set_key_length(evp, keylen) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
-			                  "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
+			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
 			notify_fatal_error(pvar, tmp, TRUE);
 			return;
 		}
 	}
 	if (EVP_CipherInit(evp, NULL, (u_char *)key, NULL, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
-		                  "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
+		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
@@ -908,10 +1034,8 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 		discard = malloc(discard_len);
 		if (junk == NULL || discard == NULL ||
 		    EVP_Cipher(evp, discard, junk, discard_len) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar,
-			                  "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE,
-			            pvar->ts->UIMsg, 3);
+			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {
@@ -969,10 +1093,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
 				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(cipher),
-				                 enc->iv, get_cipher_block_size(cipher),
+				                 enc->iv, get_cipher_iv_len(cipher),
 				                 CIPHER_ENCRYPT,
 				                 get_cipher_EVP_CIPHER(cipher),
 				                 get_cipher_discard_len(cipher),
+				                 get_cipher_auth_len(cipher),
 				                 pvar);
 
 				pvar->crypt_state.encrypt = crypt_SSH2_encrypt;
@@ -1014,10 +1139,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
 				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(cipher),
-				                 enc->iv, get_cipher_block_size(cipher),
+				                 enc->iv, get_cipher_iv_len(cipher),
 				                 CIPHER_DECRYPT,
 				                 get_cipher_EVP_CIPHER(cipher),
 				                 get_cipher_discard_len(cipher),
+				                 get_cipher_auth_len(cipher),
 				                 pvar);
 
 				pvar->crypt_state.decrypt = crypt_SSH2_decrypt;
@@ -1110,6 +1236,10 @@ static char *get_cipher_name(int cipher)
 		return "Camellia192-CTR";
 	case SSH2_CIPHER_CAMELLIA256_CTR:
 		return "Camellia256-CTR";
+	case SSH2_CIPHER_AES128_GCM:
+		return "AES128-GCM@openssh.com";
+	case SSH2_CIPHER_AES256_GCM:
+		return "AES256-GCM@openssh.com";
 
 	default:
 		return "Unknown";

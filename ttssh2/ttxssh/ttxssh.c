@@ -280,6 +280,7 @@ static void normalize_cipher_order(char *buf)
 	/* SSH_CIPHER_NONE means that all ciphers below that one are disabled.
 	   We *never* allow no encryption. */
 	static char default_strings[] = {
+		SSH2_CIPHER_AES256_GCM,
 		SSH2_CIPHER_CAMELLIA256_CTR,
 		SSH2_CIPHER_AES256_CTR,
 		SSH2_CIPHER_CAMELLIA256_CBC,
@@ -288,6 +289,7 @@ static void normalize_cipher_order(char *buf)
 		SSH2_CIPHER_AES192_CTR,
 		SSH2_CIPHER_CAMELLIA192_CBC,
 		SSH2_CIPHER_AES192_CBC,
+		SSH2_CIPHER_AES128_GCM,
 		SSH2_CIPHER_CAMELLIA128_CTR,
 		SSH2_CIPHER_AES128_CTR,
 		SSH2_CIPHER_CAMELLIA128_CBC,
@@ -2603,6 +2605,10 @@ static char *get_cipher_name(int cipher)
 		return "Camellia192-CTR(SSH2)";
 	case SSH2_CIPHER_CAMELLIA256_CTR:
 		return "Camellia256-CTR(SSH2)";
+	case SSH2_CIPHER_AES128_GCM:
+		return "AES128-GCM@openssh.com(SSH2)";
+	case SSH2_CIPHER_AES256_GCM:
+		return "AES256-GCM@openssh.com(SSH2)";
 
 	default:
 		return NULL;
@@ -4170,7 +4176,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
 	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
-		get_cipher_EVP_CIPHER(ciphernameval), 0, pvar);
+		get_cipher_EVP_CIPHER(ciphernameval), 0, 0, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 
@@ -4983,9 +4989,9 @@ public_error:
 				MD5_Update(&md, (const unsigned char *)passphrase, strlen(passphrase));
 				MD5_Final(digest, &md);
 				if (cipher_num == SSH_CIPHER_NONE) {
-					cipher_init_SSH2(&cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, pvar);
+					cipher_init_SSH2(&cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, EVP_enc_null(), 0, 0, pvar);
 				} else {
-					cipher_init_SSH2(&cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, evp_ssh1_3des(), 0, pvar);
+					cipher_init_SSH2(&cipher_ctx, digest, 16, NULL, 0, CIPHER_ENCRYPT, evp_ssh1_3des(), 0, 0, pvar);
 				}
 				len = buffer_len(b);
 				if (len % 8) { // fatal error

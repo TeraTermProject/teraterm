@@ -784,14 +784,22 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsign
  * 引数:
  *   data - ssh パケットの先頭を指すポインタ
  *   len - パケット長 (先頭のパケット長領域(4バイト)を除いた値)
- *   etm - MAC 方式が EtM かどうかのフラグ
+ *   aadlen - 暗号化されていないが認証の対象となっているデータの長さ
+ *   authlen - 認証データ(AEAD tag)長
  */
 
-static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, int etm)
+static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsigned int aadlen, unsigned int authlen)
 {
 	unsigned int padding;
 
-	if (etm) {
+	if (authlen > 0) {
+		if (!CRYPT_decrypt_aead(pvar, data, len, aadlen, authlen)) {
+			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
+			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+			return SSH_MSG_NONE;
+		}
+	}
+	else if (aadlen > 0) {
 		// EtM の場合は先に MAC の検証を行う
 		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
 			UTIL_get_lang_msg("MSG_SSH_CORRUPTDATA_ERROR", pvar, "Detected corrupted data; connection terminating.");
@@ -1025,7 +1033,8 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		unsigned int padding;
 		BOOL ret;
 		struct Mac *mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		unsigned int aadlen = 0, maclen = 0;
+		struct Enc *enc = &pvar->ssh2_keys[MODE_OUT].enc;
+		unsigned int aadlen = 0, maclen = 0, authlen = 0;
 
 		/*
 		 データ構造
@@ -1078,7 +1087,11 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 			block_size = 8;
 		}
 
-		if (mac && mac->etm) {
+		if (enc) {
+			authlen = enc->auth_len;
+		}
+
+		if (mac && mac->etm || authlen > 0) {
 			// 暗号化対象では無いが、MAC の対象となる部分の長さ
 			aadlen = 4;
 		}
@@ -1099,25 +1112,31 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 
 		CRYPT_set_random_data(pvar, data + 5 + len, padding);
 
-		if (aadlen == 0) {
-			// E&M では先に MAC を計算する
-			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
-			                             data, encryption_size, data + encryption_size);
-			if (ret) {
-				maclen = CRYPT_get_sender_MAC_size(pvar);
-			}
+		if (authlen > 0) {
+			CRYPT_encrypt_aead(pvar, data, encryption_size, aadlen, authlen);
+			maclen = authlen;
 		}
+		else if (aadlen) {
+			// パケット暗号化
+			CRYPT_encrypt(pvar, data + aadlen, encryption_size);
 
-		// パケットを暗号化する。MAC以降は暗号化対象外。
-		CRYPT_encrypt(pvar, data + aadlen, encryption_size);
-
-		if (aadlen) {
 			// EtM では暗号化後に MAC を計算する
 			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
 			                             data, aadlen + encryption_size, data + aadlen + encryption_size);
 			if (ret) {
 				maclen = CRYPT_get_sender_MAC_size(pvar);
 			}
+		}
+		else {
+			// E&M では先に MAC を計算する
+			ret = CRYPT_build_sender_MAC(pvar, pvar->ssh_state.sender_sequence_number,
+			                             data, encryption_size, data + encryption_size);
+			if (ret) {
+				maclen = CRYPT_get_sender_MAC_size(pvar);
+			}
+
+			// パケット暗号化
+			CRYPT_encrypt(pvar, data, encryption_size);
 		}
 
 		data_length = encryption_size + aadlen + maclen;
@@ -2115,9 +2134,9 @@ void SSH1_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned i
 	}
 }
 
-void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, int etm)
+void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int aadlen, unsigned int authlen)
 {
-	unsigned char message = prep_packet_ssh2(pvar, data, len, etm);
+	unsigned char message = prep_packet_ssh2(pvar, data, len, aadlen, authlen);
 
 	// SSHのメッセージタイプをチェック
 	if (message != SSH_MSG_NONE) {
@@ -2922,6 +2941,28 @@ unsigned int SSH_get_clear_MAC_size(PTInstVar pvar)
 		return 0;
 	} else {
 		return CRYPT_get_receiver_MAC_size(pvar);
+	}
+}
+
+unsigned int SSH_get_authdata_size(PTInstVar pvar, int direction)
+{
+	if (SSHv1(pvar)) {
+		return 0;
+	}
+	else {
+		struct Mac *mac = &pvar->ssh2_keys[direction].mac;
+		struct Enc *enc = &pvar->ssh2_keys[direction].enc;
+
+		if (enc && enc->auth_len > 0) {
+			// AEAD
+			return enc->auth_len;
+		}
+		else if (mac && mac->enabled) {
+			return mac->mac_len;
+		}
+		else {
+			return 0;
+		}
 	}
 }
 
@@ -4095,6 +4136,41 @@ int get_cipher_discard_len(SSHCipher cipher)
 	return 0;
 }
 
+int get_cipher_iv_len(SSHCipher cipher)
+{
+	ssh2_cipher_t *ptr = ssh2_ciphers;
+
+	while (ptr->name != NULL) {
+		if (cipher == ptr->cipher) {
+			if (ptr->iv_len != 0) {
+				return ptr->iv_len;
+			}
+			else {
+				return ptr->block_size;
+			}
+		}
+		ptr++;
+	}
+
+	// not found.
+	return 8; // block_size
+}
+
+int get_cipher_auth_len(SSHCipher cipher)
+{
+	ssh2_cipher_t *ptr = ssh2_ciphers;
+
+	while (ptr->name != NULL) {
+		if (cipher == ptr->cipher) {
+			return ptr->auth_len;
+		}
+		ptr++;
+	}
+
+	// not found.
+	return 0;
+}
+
 // 暗号アルゴリズム名から検索する。
 SSHCipher get_cipher_by_name(char *name)
 {
@@ -4409,6 +4485,12 @@ void SSH2_update_cipher_myproposal(PTInstVar pvar)
 				break;
 			case SSH2_CIPHER_CAMELLIA256_CTR:
 				c_str = "camellia256-ctr,";
+				break;
+			case SSH2_CIPHER_AES128_GCM:
+				c_str = "aes128-gcm@openssh.com,";
+				break;
+			case SSH2_CIPHER_AES256_GCM:
+				c_str = "aes256-gcm@openssh.com,";
 				break;
 			default:
 				continue;
@@ -4772,6 +4854,9 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 		// キーサイズとブロックサイズもここで設定しておく (2004.11.7 yutaka)
 		current_keys[mode].enc.key_len = get_cipher_key_len(cipher);
 		current_keys[mode].enc.block_size = get_cipher_block_size(cipher);
+		current_keys[mode].enc.iv_len = get_cipher_iv_len(cipher);
+		current_keys[mode].enc.auth_len = get_cipher_auth_len(cipher);
+
 		current_keys[mode].mac.enabled = 0;
 		current_keys[mode].comp.enabled = 0; // (2005.7.9 yutaka)
 
@@ -4783,6 +4868,7 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 	for (mode = 0; mode < MODE_MAX; mode++) {
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
+		need = max(need, current_keys[mode].enc.iv_len);
 		need = max(need, current_keys[mode].mac.key_len);
 	}
 	pvar->we_need = need;
@@ -5645,7 +5731,6 @@ cont:
 	} else {
 		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
 		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
-		ssh2_set_newkeys(pvar, MODE_IN);
 		ssh2_set_newkeys(pvar, MODE_OUT);
 
 		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
@@ -5880,7 +5965,6 @@ cont:
 	} else {
 		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
 		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
-		ssh2_set_newkeys(pvar, MODE_IN);
 		ssh2_set_newkeys(pvar, MODE_OUT);
 
 		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
@@ -6112,7 +6196,6 @@ cont:
 	} else {
 		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
 		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
-		ssh2_set_newkeys(pvar, MODE_IN);
 		ssh2_set_newkeys(pvar, MODE_OUT);
 
 		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
@@ -6238,6 +6321,8 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 	                       | 1 << SSH2_CIPHER_CAMELLIA128_CTR
 	                       | 1 << SSH2_CIPHER_CAMELLIA192_CTR
 	                       | 1 << SSH2_CIPHER_CAMELLIA256_CTR
+	                       | 1 << SSH2_CIPHER_AES128_GCM
+	                       | 1 << SSH2_CIPHER_AES256_GCM
 	);
 	int type = (1 << SSH_AUTH_PASSWORD) | (1 << SSH_AUTH_RSA) |
 	           (1 << SSH_AUTH_TIS) | (1 << SSH_AUTH_PAGEANT);
@@ -6268,6 +6353,7 @@ static BOOL handle_SSH2_newkeys(PTInstVar pvar)
 
 	} else {
 		// SSH2_MSG_NEWKEYSを受け取った時点で、MACを有効にする。(2006.10.30 yutaka)
+		ssh2_set_newkeys(pvar, MODE_IN);
 		pvar->ssh2_keys[MODE_IN].mac.enabled = 1;
 		pvar->ssh2_keys[MODE_IN].comp.enabled = 1;
 

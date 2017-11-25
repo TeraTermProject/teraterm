@@ -95,7 +95,8 @@ typedef enum {
 	SSH2_CIPHER_3DES_CTR, SSH2_CIPHER_BLOWFISH_CTR, SSH2_CIPHER_CAST128_CTR,
 	SSH2_CIPHER_CAMELLIA128_CBC, SSH2_CIPHER_CAMELLIA192_CBC, SSH2_CIPHER_CAMELLIA256_CBC,
 	SSH2_CIPHER_CAMELLIA128_CTR, SSH2_CIPHER_CAMELLIA192_CTR, SSH2_CIPHER_CAMELLIA256_CTR,
-	SSH_CIPHER_MAX = SSH2_CIPHER_CAMELLIA256_CTR,
+	SSH2_CIPHER_AES128_GCM, SSH2_CIPHER_AES256_GCM,
+	SSH_CIPHER_MAX = SSH2_CIPHER_AES256_GCM,
 } SSHCipher;
 
 typedef enum {
@@ -380,40 +381,44 @@ typedef struct ssh2_cipher {
 	int block_size;
 	int key_len;
 	int discard_len;
+	int iv_len;
+	int auth_len;
 	const EVP_CIPHER *(*func)(void);
 } ssh2_cipher_t;
 
 static ssh2_cipher_t ssh2_ciphers[] = {
-	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, EVP_des_ede3_cbc},     // RFC4253
-	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, EVP_aes_128_cbc},      // RFC4253
-	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, EVP_aes_192_cbc},      // RFC4253
-	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, EVP_aes_256_cbc},      // RFC4253
-	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, EVP_bf_cbc},           // RFC4253
-	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, evp_aes_128_ctr},      // RFC4344
-	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, EVP_rc4},              // RFC4253
-	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, EVP_rc4},              // RFC4345
-	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, EVP_rc4},              // RFC4345
-	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, EVP_cast5_cbc},        // RFC4253
-	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, evp_des3_ctr},         // RFC4344
-	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 32,    0, evp_bf_ctr},           // RFC4344
-	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, evp_cast5_ctr},        // RFC4344
-	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
-	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, 0, 0, EVP_des_ede3_cbc},     // RFC4253
+	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, 0, 0, EVP_aes_128_cbc},      // RFC4253
+	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, 0, 0, EVP_aes_192_cbc},      // RFC4253
+	{SSH2_CIPHER_AES256_CBC,      "aes256-cbc",      16, 32,    0, 0, 0, EVP_aes_256_cbc},      // RFC4253
+	{SSH2_CIPHER_BLOWFISH_CBC,    "blowfish-cbc",     8, 16,    0, 0, 0, EVP_bf_cbc},           // RFC4253
+	{SSH2_CIPHER_AES128_CTR,      "aes128-ctr",      16, 16,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_AES192_CTR,      "aes192-ctr",      16, 24,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_AES256_CTR,      "aes256-ctr",      16, 32,    0, 0, 0, evp_aes_128_ctr},      // RFC4344
+	{SSH2_CIPHER_ARCFOUR,         "arcfour",          8, 16,    0, 0, 0, EVP_rc4},              // RFC4253
+	{SSH2_CIPHER_ARCFOUR128,      "arcfour128",       8, 16, 1536, 0, 0, EVP_rc4},              // RFC4345
+	{SSH2_CIPHER_ARCFOUR256,      "arcfour256",       8, 32, 1536, 0, 0, EVP_rc4},              // RFC4345
+	{SSH2_CIPHER_CAST128_CBC,     "cast128-cbc",      8, 16,    0, 0, 0, EVP_cast5_cbc},        // RFC4253
+	{SSH2_CIPHER_3DES_CTR,        "3des-ctr",         8, 24,    0, 0, 0, evp_des3_ctr},         // RFC4344
+	{SSH2_CIPHER_BLOWFISH_CTR,    "blowfish-ctr",     8, 32,    0, 0, 0, evp_bf_ctr},           // RFC4344
+	{SSH2_CIPHER_CAST128_CTR,     "cast128-ctr",      8, 16,    0, 0, 0, evp_cast5_ctr},        // RFC4344
+	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc", 16, 16,    0, 0, 0, EVP_camellia_128_cbc}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc", 16, 24,    0, 0, 0, EVP_camellia_192_cbc}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc", 16, 32,    0, 0, 0, EVP_camellia_256_cbc}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr", 16, 16,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr", 16, 24,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr", 16, 32,    0, 0, 0, evp_camellia_128_ctr}, // draft-kanno-secsh-camellia-02
 #ifdef WITH_CAMELLIA_PRIVATE
-	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0, EVP_camellia_128_cbc},
-	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0, EVP_camellia_192_cbc},
-	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc@openssh.org", 16, 32, 0, EVP_camellia_256_cbc},
-	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr@openssh.org", 16, 16, 0, evp_camellia_128_ctr},
-	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr@openssh.org", 16, 24, 0, evp_camellia_128_ctr},
-	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr@openssh.org", 16, 32, 0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA128_CBC, "camellia128-cbc@openssh.org", 16, 16, 0,  0,  0, EVP_camellia_128_cbc},
+	{SSH2_CIPHER_CAMELLIA192_CBC, "camellia192-cbc@openssh.org", 16, 24, 0,  0,  0, EVP_camellia_192_cbc},
+	{SSH2_CIPHER_CAMELLIA256_CBC, "camellia256-cbc@openssh.org", 16, 32, 0,  0,  0, EVP_camellia_256_cbc},
+	{SSH2_CIPHER_CAMELLIA128_CTR, "camellia128-ctr@openssh.org", 16, 16, 0,  0,  0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr@openssh.org", 16, 24, 0,  0,  0, evp_camellia_128_ctr},
+	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr@openssh.org", 16, 32, 0,  0,  0, evp_camellia_128_ctr},
 #endif // WITH_CAMELLIA_PRIVATE
-	{SSH_CIPHER_NONE,          NULL,            0,  0, 0,    NULL},
+	{SSH2_CIPHER_AES128_GCM,      "aes128-gcm@openssh.com",      16, 16, 0, 12, 16, EVP_aes_128_gcm},
+	{SSH2_CIPHER_AES256_GCM,      "aes256-gcm@openssh.com",      16, 32, 0, 12, 16, EVP_aes_256_gcm},
+	{SSH_CIPHER_NONE,             NULL,               0,  0,    0, 0, 0, NULL},
 };
 
 
@@ -532,6 +537,8 @@ struct Enc {
 	u_char          *iv;
 	unsigned int    key_len;
 	unsigned int    block_size;
+	unsigned int    iv_len;
+	unsigned int    auth_len;
 };
 
 struct Mac {
@@ -713,7 +720,7 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len);
    'data' points to the start of the packet data (the length field)
 */
 void SSH1_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int padding);
-void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, int etm);
+void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int aadlen, unsigned int authlen);
 void SSH_notify_win_size(PTInstVar pvar, int cols, int rows);
 void SSH_notify_user_name(PTInstVar pvar);
 void SSH_notify_cred(PTInstVar pvar);
@@ -756,6 +763,7 @@ unsigned int SSH_get_min_packet_size(PTInstVar pvar);
    at least 5 bytes must be decrypted */
 void SSH_predecrpyt_packet(PTInstVar pvar, char *data);
 unsigned int SSH_get_clear_MAC_size(PTInstVar pvar);
+unsigned int SSH_get_authdata_size(PTInstVar pvar, int direction);
 
 #define SSH_is_any_payload(pvar) ((pvar)->ssh_state.payload_datalen > 0)
 #define SSH_get_host_name(pvar) ((pvar)->ssh_state.hostname)
@@ -767,6 +775,8 @@ BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
 int get_cipher_block_size(SSHCipher cipher);
 int get_cipher_key_len(SSHCipher cipher);
+int get_cipher_iv_len(SSHCipher cipher);
+int get_cipher_auth_len(SSHCipher cipher);
 SSHCipher get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher);
