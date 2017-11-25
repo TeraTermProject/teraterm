@@ -784,12 +784,13 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsign
  * 引数:
  *   data - ssh パケットの先頭を指すポインタ
  *   len - パケット長 (先頭のパケット長領域(4バイト)を除いた値)
- *   padding - パディング長 (EtMの場合は0となっているので、復号後に取得する必要あり)
  *   etm - MAC 方式が EtM かどうかのフラグ
  */
 
-static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsigned int padding, int etm)
+static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, int etm)
 {
+	unsigned int padding;
+
 	if (etm) {
 		// EtM の場合は先に MAC の検証を行う
 		if (!CRYPT_verify_receiver_MAC(pvar, pvar->ssh_state.receiver_sequence_number, data, len + 4, data + len + 4)) {
@@ -800,9 +801,6 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 
 		// パケット長部分(先頭4バイト)は暗号化されていないので、そこをスキップして復号する。
 		CRYPT_decrypt(pvar, data + 4, len);
-
-		// EtM の場合は 呼び出し元では padding 部分が読めない為、ここで値を取得する。
-		padding = (unsigned int) data[4];
 	}
 	else {
 		// E&M では先頭部分が事前復号されている。
@@ -819,6 +817,9 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsign
 			return SSH_MSG_NONE;
 		}
 	}
+
+	// パディング長の取得
+	padding = (unsigned int) data[4];
 
 	// パケット長(4バイト) 部分とパディング長(1バイト)部分をスキップした SSH ペイロードの先頭
 	pvar->ssh_state.payload = data + 4 + 1;
@@ -2114,9 +2115,9 @@ void SSH1_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned i
 	}
 }
 
-void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int padding, int etm)
+void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, int etm)
 {
-	unsigned char message = prep_packet_ssh2(pvar, data, len, padding, etm);
+	unsigned char message = prep_packet_ssh2(pvar, data, len, etm);
 
 	// SSHのメッセージタイプをチェック
 	if (message != SSH_MSG_NONE) {

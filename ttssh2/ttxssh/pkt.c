@@ -186,34 +186,24 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 
 			/*
 			 * 通常の MAC 方式 (E&M: Encrypt & MAC) ではパケット長部分も暗号化されているため、
-			 * 先頭の 1 ブロックを復号する。MAC 方式が EtM (Encrypt then MAC) の時は
+			 * 先頭の 1 ブロックを復号する。MAC 方式が EtM (Encrypt then MAC) の時、および SSH1 では
 			 * パケット長部分は暗号化されていないので復号は必要無い。
 			 */
-			if (!pvar->pkt_state.predecrypted_packet && !etm) {
+			if (SSHv2(pvar) && !pvar->pkt_state.predecrypted_packet && !etm) {
 				SSH_predecrpyt_packet(pvar, data);
 				pvar->pkt_state.predecrypted_packet = TRUE;
 			}
 
+			// パケットの先頭に uint32 (4バイト) のパケット長が来る
+			pktsize = get_uint32_MSBfirst(data);
+
 			if (SSHv1(pvar)) {
-				uint32 realpktsize = get_uint32_MSBfirst(data);
+				// SSH1 ではパケット長の値には padding の長さが含まれていない。
+				// また padding の長さの情報もパケット上には無いので、パケット長の値から計算する。
+				padding = 8 - (pktsize % 8);
 
-				padding = 8 - (realpktsize % 8);
-				pktsize = realpktsize + padding;
-			} else {
-				// SSH2 ではパケットの先頭に uint32 (4バイト) のパケット長が来る
-				pktsize = get_uint32_MSBfirst(data);
-
-				// 続く 1 バイトは padding の長さ
-				if (etm) {
-					// EtM では padding length 以降は暗号化されている。
-					// この時点ではまだ復号していないので padding length が分からない。
-					// 仮に 0 を入れて置く。
-					padding = 0;
-				}
-				else {
-					// E&M では復号済み
-					padding = (unsigned char) data[4];
-				}
+				// 以降の処理は pktsize に padding の値が含まれている事が前提となっている。
+				pktsize += padding;
 			}
 
 			// パケット(TCPペイロード)の全体のサイズは、SSHペイロード+4（+MAC）となる。
@@ -223,24 +213,28 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			if (total_packet_size <= pvar->pkt_state.datalen) {
 				// 受信済みデータが十分有る場合はパケットの実処理を行う
 				if (SSHv1(pvar)) {
-					// SSH1 は EtM 非対応
+					// SSH1 は EtM 非対応 (そもそも MAC ではなく CRC を使う)
 					SSH1_handle_packet(pvar, data, pktsize, padding);
 				}
 				else {
-					SSH2_handle_packet(pvar, data, pktsize, padding, etm);
+					// SSH2 ではこの時点では padding 長部分が復号されていない場合があるので、
+					// padding 長は渡さずに、必要になった時に内部で取得する。
+					SSH2_handle_packet(pvar, data, pktsize, etm);
 				}
 
 				pvar->pkt_state.predecrypted_packet = FALSE;
 				pvar->pkt_state.datastart += total_packet_size;
 				pvar->pkt_state.datalen -= total_packet_size;
 
-			} else if (total_packet_size > PACKET_MAX_SIZE) {
+			}
+			else if (total_packet_size > PACKET_MAX_SIZE) {
 				// パケット長が大きすぎる場合は異常終了する。
 				// 実際には何らかの要因で復号失敗⇒パケット長部分が壊れている事が多い。
 				UTIL_get_lang_msg("MSG_PKT_OVERSIZED_ERROR", pvar,
 				                  "Oversized packet received from server; connection will close.");
 				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
-			} else {
+			}
+			else {
 				int amount_read = recv_data(pvar, max(total_packet_size, READAMOUNT));
 
 				if (amount_read == SOCKET_ERROR) {
