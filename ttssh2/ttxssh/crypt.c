@@ -495,7 +495,7 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 	}
 }
 
-int CRYPT_get_decryption_block_size(PTInstVar pvar)
+unsigned int CRYPT_get_decryption_block_size(PTInstVar pvar)
 {
 	if (SSHv1(pvar)) {
 		return 8;
@@ -506,7 +506,7 @@ int CRYPT_get_decryption_block_size(PTInstVar pvar)
 	}
 }
 
-int CRYPT_get_encryption_block_size(PTInstVar pvar)
+unsigned int CRYPT_get_encryption_block_size(PTInstVar pvar)
 {
 	if (SSHv1(pvar)) {
 		return 8;
@@ -517,7 +517,7 @@ int CRYPT_get_encryption_block_size(PTInstVar pvar)
 	}
 }
 
-int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
+unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar)
 {
 	struct Mac *mac;
 
@@ -582,7 +582,7 @@ error:
 	return FALSE;
 }
 
-int CRYPT_get_sender_MAC_size(PTInstVar pvar)
+unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar)
 {
 	struct Mac *mac;
 
@@ -675,7 +675,7 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 	}
 }
 
-int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
+unsigned int CRYPT_get_encrypted_session_key_len(PTInstVar pvar)
 {
 	int server_key_bits =
 		BN_num_bits(pvar->crypt_state.server_key.RSA_key->n);

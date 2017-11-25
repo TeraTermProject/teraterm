@@ -596,14 +596,14 @@ void push_bignum_memdump(char *name, char *desc, BIGNUM *bignum)
 	free(buf); // free
 }
 
-static int get_predecryption_amount(PTInstVar pvar)
+static unsigned int get_predecryption_amount(PTInstVar pvar)
 {
 	static int small_block_decryption_sizes[] = { 5, 5, 6, 6, 8 };
 
 	if (SSHv1(pvar)) {
 		return 0;
 	} else {
-		int block_size = CRYPT_get_decryption_block_size(pvar);
+		unsigned int block_size = CRYPT_get_decryption_block_size(pvar);
 
 		if (block_size < 5) {
 			return small_block_decryption_sizes[block_size];
@@ -726,7 +726,7 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
  * 'len' is the length of the * payload + padding (+ length of CRC for SSHv1).
  * 'padding' is the length of the padding alone.
  */
-static int prep_packet_ssh1(PTInstVar pvar, char *data, int len, int padding)
+static int prep_packet_ssh1(PTInstVar pvar, char *data, unsigned int len, unsigned int padding)
 {
 	pvar->ssh_state.payload = data + 4;
 	pvar->ssh_state.payloadlen = len;
@@ -788,7 +788,7 @@ static int prep_packet_ssh1(PTInstVar pvar, char *data, int len, int padding)
  *   etm - MAC 方式が EtM かどうかのフラグ
  */
 
-static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding, int etm)
+static int prep_packet_ssh2(PTInstVar pvar, char *data, unsigned int len, unsigned int padding, int etm)
 {
 	if (etm) {
 		// EtM の場合は先に MAC の検証を行う
@@ -807,7 +807,7 @@ static int prep_packet_ssh2(PTInstVar pvar, char *data, int len, int padding, in
 	else {
 		// E&M では先頭部分が事前復号されている。
 		// 事前復号された長さを取得する。
-		int already_decrypted = get_predecryption_amount(pvar);
+		unsigned int already_decrypted = get_predecryption_amount(pvar);
 
 		// 事前復号された部分をスキップして、残りの部分を復号する。
 		CRYPT_decrypt(pvar, data + already_decrypted, (4 + len) - already_decrypted);
@@ -887,8 +887,8 @@ unsigned char *begin_send_packet(PTInstVar pvar, int type, int len)
 		   We only need a reasonable upper bound for the buffer size */
 		buf_ensure_size(&pvar->ssh_state.outbuf,
 		                &pvar->ssh_state.outbuflen,
-		                len + 30 + CRYPT_get_sender_MAC_size(pvar) +
-		                CRYPT_get_encryption_block_size(pvar));
+		                (int)(len + 30 + CRYPT_get_sender_MAC_size(pvar) +
+		                CRYPT_get_encryption_block_size(pvar)));
 		buf = pvar->ssh_state.outbuf + 12;
 	}
 
@@ -1019,12 +1019,12 @@ void finish_send_packet_special(PTInstVar pvar, int skip_compress)
 		set_uint32(data + data_length - 4, do_crc(data + 4, data_length - 8));
 		CRYPT_encrypt(pvar, data + 4, data_length - 4);
 	} else { //for SSH2(yutaka)
-		int block_size = CRYPT_get_encryption_block_size(pvar);
+		unsigned int block_size = CRYPT_get_encryption_block_size(pvar);
 		unsigned int encryption_size;
 		unsigned int padding;
 		BOOL ret;
 		struct Mac *mac = &pvar->ssh2_keys[MODE_OUT].mac;
-		int aadlen = 0, maclen = 0;
+		unsigned int aadlen = 0, maclen = 0;
 
 		/*
 		 データ構造
@@ -2091,7 +2091,7 @@ void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end)
 	}
 }
 
-void SSH1_handle_packet(PTInstVar pvar, char *data, int len, int padding)
+void SSH1_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int padding)
 {
 	unsigned char message = prep_packet_ssh1(pvar, data, len, padding);
 
@@ -2114,7 +2114,7 @@ void SSH1_handle_packet(PTInstVar pvar, char *data, int len, int padding)
 	}
 }
 
-void SSH2_handle_packet(PTInstVar pvar, char *data, int len, int padding, int etm)
+void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int padding, int etm)
 {
 	unsigned char message = prep_packet_ssh2(pvar, data, len, padding, etm);
 
@@ -2897,14 +2897,12 @@ error:
 	return (ret);
 }
 
-int SSH_get_min_packet_size(PTInstVar pvar)
+unsigned int SSH_get_min_packet_size(PTInstVar pvar)
 {
 	if (SSHv1(pvar)) {
 		return 12;
 	} else {
-		int block_size = CRYPT_get_decryption_block_size(pvar);
-
-		return max(16, block_size);
+		return max(16, CRYPT_get_decryption_block_size(pvar));
 	}
 }
 
@@ -2917,7 +2915,7 @@ void SSH_predecrpyt_packet(PTInstVar pvar, char *data)
 	}
 }
 
-int SSH_get_clear_MAC_size(PTInstVar pvar)
+unsigned int SSH_get_clear_MAC_size(PTInstVar pvar)
 {
 	if (SSHv1(pvar)) {
 		return 0;

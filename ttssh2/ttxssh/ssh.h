@@ -712,8 +712,8 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len);
    'padding' is the size of the padding.
    'data' points to the start of the packet data (the length field)
 */
-void SSH1_handle_packet(PTInstVar pvar, char *data, int len, int padding);
-void SSH2_handle_packet(PTInstVar pvar, char *data, int len, int padding, int etm);
+void SSH1_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int padding);
+void SSH2_handle_packet(PTInstVar pvar, char *data, unsigned int len, unsigned int padding, int etm);
 void SSH_notify_win_size(PTInstVar pvar, int cols, int rows);
 void SSH_notify_user_name(PTInstVar pvar);
 void SSH_notify_cred(PTInstVar pvar);
@@ -751,11 +751,11 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 int SSH_sftp_transaction(PTInstVar pvar);
 
 /* auxiliary SSH2 interfaces for pkt.c */
-int SSH_get_min_packet_size(PTInstVar pvar);
+unsigned int SSH_get_min_packet_size(PTInstVar pvar);
 /* data is guaranteed to be at least SSH_get_min_packet_size bytes long
    at least 5 bytes must be decrypted */
 void SSH_predecrpyt_packet(PTInstVar pvar, char *data);
-int SSH_get_clear_MAC_size(PTInstVar pvar);
+unsigned int SSH_get_clear_MAC_size(PTInstVar pvar);
 
 #define SSH_is_any_payload(pvar) ((pvar)->ssh_state.payload_datalen > 0)
 #define SSH_get_host_name(pvar) ((pvar)->ssh_state.hostname)

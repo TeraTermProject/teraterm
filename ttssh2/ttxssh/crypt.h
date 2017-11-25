@@ -125,16 +125,16 @@ BOOL CRYPT_set_server_RSA_key(PTInstVar pvar,
   int bits, unsigned char *exp, unsigned char *mod);
 BOOL CRYPT_set_host_RSA_key(PTInstVar pvar,
   int bits, unsigned char *exp, unsigned char *mod);
-int CRYPT_get_encrypted_session_key_len(PTInstVar pvar);
+unsigned int CRYPT_get_encrypted_session_key_len(PTInstVar pvar);
 int CRYPT_choose_session_key(PTInstVar pvar, unsigned char *encrypted_key_buf);
 BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag);
 int CRYPT_generate_RSA_challenge_response(PTInstVar pvar, unsigned char *challenge,
                                            int challenge_len, unsigned char *response);
 
-int CRYPT_get_receiver_MAC_size(PTInstVar pvar);
+unsigned int CRYPT_get_receiver_MAC_size(PTInstVar pvar);
 BOOL CRYPT_verify_receiver_MAC(PTInstVar pvar, uint32 sequence_number,
   char *data, int len, char *MAC);
-int CRYPT_get_sender_MAC_size(PTInstVar pvar);
+unsigned int CRYPT_get_sender_MAC_size(PTInstVar pvar);
 
 BOOL CRYPT_build_sender_MAC(PTInstVar pvar, uint32 sequence_number,
   char *data, int len, char *MAC);
@@ -143,8 +143,8 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers, int receive
 BOOL CRYPT_choose_ciphers(PTInstVar pvar);
 #define CRYPT_get_sender_cipher(pvar) ((pvar)->crypt_state.sender_cipher)
 #define CRYPT_get_receiver_cipher(pvar) ((pvar)->crypt_state.receiver_cipher)
-int CRYPT_get_decryption_block_size(PTInstVar pvar);
-int CRYPT_get_encryption_block_size(PTInstVar pvar);
+unsigned int CRYPT_get_decryption_block_size(PTInstVar pvar);
+unsigned int CRYPT_get_encryption_block_size(PTInstVar pvar);
 #define CRYPT_encrypt(pvar, buf, bytes) \
     ((pvar)->crypt_state.encrypt((pvar), (buf), (bytes)))
 #define CRYPT_decrypt(pvar, buf, bytes) \
