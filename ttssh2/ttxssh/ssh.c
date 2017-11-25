@@ -2091,7 +2091,7 @@ void SSH2_dispatch_add_range_message(unsigned char begin, unsigned char end)
 	}
 }
 
-void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding)
+void SSH1_handle_packet(PTInstVar pvar, char *data, int len, int padding)
 {
 	unsigned char message = prep_packet_ssh1(pvar, data, len, padding);
 
@@ -2114,7 +2114,7 @@ void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding)
 	}
 }
 
-void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding, int etm)
+void SSH2_handle_packet(PTInstVar pvar, char *data, int len, int padding, int etm)
 {
 	unsigned char message = prep_packet_ssh2(pvar, data, len, padding, etm);
 

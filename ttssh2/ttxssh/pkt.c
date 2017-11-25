@@ -224,10 +224,10 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 				// 受信済みデータが十分有る場合はパケットの実処理を行う
 				if (SSHv1(pvar)) {
 					// SSH1 は EtM 非対応
-					SSH_handle_packet1(pvar, data, pktsize, padding);
+					SSH1_handle_packet(pvar, data, pktsize, padding);
 				}
 				else {
-					SSH_handle_packet2(pvar, data, pktsize, padding, etm);
+					SSH2_handle_packet(pvar, data, pktsize, padding, etm);
 				}
 
 				pvar->pkt_state.predecrypted_packet = FALSE;

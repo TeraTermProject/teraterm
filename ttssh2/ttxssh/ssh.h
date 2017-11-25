@@ -712,8 +712,8 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len);
    'padding' is the size of the padding.
    'data' points to the start of the packet data (the length field)
 */
-void SSH_handle_packet1(PTInstVar pvar, char *data, int len, int padding);
-void SSH_handle_packet2(PTInstVar pvar, char *data, int len, int padding, int etm);
+void SSH1_handle_packet(PTInstVar pvar, char *data, int len, int padding);
+void SSH2_handle_packet(PTInstVar pvar, char *data, int len, int padding, int etm);
 void SSH_notify_win_size(PTInstVar pvar, int cols, int rows);
 void SSH_notify_user_name(PTInstVar pvar);
 void SSH_notify_cred(PTInstVar pvar);
