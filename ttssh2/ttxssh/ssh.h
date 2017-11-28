@@ -416,8 +416,8 @@ static ssh2_cipher_t ssh2_ciphers[] = {
 	{SSH2_CIPHER_CAMELLIA192_CTR, "camellia192-ctr@openssh.org", 16, 24, 0,  0,  0, evp_camellia_128_ctr},
 	{SSH2_CIPHER_CAMELLIA256_CTR, "camellia256-ctr@openssh.org", 16, 32, 0,  0,  0, evp_camellia_128_ctr},
 #endif // WITH_CAMELLIA_PRIVATE
-	{SSH2_CIPHER_AES128_GCM,      "aes128-gcm@openssh.com",      16, 16, 0, 12, 16, EVP_aes_128_gcm},
-	{SSH2_CIPHER_AES256_GCM,      "aes256-gcm@openssh.com",      16, 32, 0, 12, 16, EVP_aes_256_gcm},
+	{SSH2_CIPHER_AES128_GCM,      "aes128-gcm@openssh.com",      16, 16, 0, 12, 16, EVP_aes_128_gcm}, // not RFC5647, PROTOCOL of OpenSSH
+	{SSH2_CIPHER_AES256_GCM,      "aes256-gcm@openssh.com",      16, 32, 0, 12, 16, EVP_aes_256_gcm}, // not RFC5647, PROTOCOL of OpenSSH
 	{SSH_CIPHER_NONE,             NULL,               0,  0,    0, 0, 0, NULL},
 };
 
