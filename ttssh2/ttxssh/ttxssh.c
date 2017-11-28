@@ -2564,51 +2564,51 @@ static char *get_cipher_name(int cipher)
 
 	// for SSH2(yutaka)
 	case SSH2_CIPHER_AES128_CBC:
-		return "AES128-CBC(SSH2)";
+		return "aes128-cbc(SSH2)";
 	case SSH2_CIPHER_AES192_CBC:
-		return "AES192-CBC(SSH2)";
+		return "aes192-cbc(SSH2)";
 	case SSH2_CIPHER_AES256_CBC:
-		return "AES256-CBC(SSH2)";
+		return "aes256-cbc(SSH2)";
 	case SSH2_CIPHER_3DES_CBC:
-		return "3DES-CBC(SSH2)";
+		return "3des-cbc(SSH2)";
 	case SSH2_CIPHER_BLOWFISH_CBC:
-		return "Blowfish-CBC(SSH2)";
+		return "blowfish-cbc(SSH2)";
 	case SSH2_CIPHER_AES128_CTR:
-		return "AES128-CTR(SSH2)";
+		return "aes128-ctr(SSH2)";
 	case SSH2_CIPHER_AES192_CTR:
-		return "AES192-CTR(SSH2)";
+		return "aes192-ctr(SSH2)";
 	case SSH2_CIPHER_AES256_CTR:
-		return "AES256-CTR(SSH2)";
+		return "aes256-ctr(SSH2)";
 	case SSH2_CIPHER_ARCFOUR:
-		return "Arcfour(SSH2)";
+		return "arcfour(SSH2)";
 	case SSH2_CIPHER_ARCFOUR128:
-		return "Arcfour128(SSH2)";
+		return "arcfour128(SSH2)";
 	case SSH2_CIPHER_ARCFOUR256:
-		return "Arcfour256(SSH2)";
+		return "arcfour256(SSH2)";
 	case SSH2_CIPHER_CAST128_CBC:
-		return "CAST128-CBC(SSH2)";
+		return "cast128-cbc(SSH2)";
 	case SSH2_CIPHER_3DES_CTR:
-		return "3DES-CTR(SSH2)";
+		return "3des-ctr(SSH2)";
 	case SSH2_CIPHER_BLOWFISH_CTR:
-		return "Blowfish-CTR(SSH2)";
+		return "blowfish-ctr(SSH2)";
 	case SSH2_CIPHER_CAST128_CTR:
-		return "CAST128-CTR(SSH2)";
+		return "cast128-ctr(SSH2)";
 	case SSH2_CIPHER_CAMELLIA128_CBC:
-		return "Camellia128-CBC(SSH2)";
+		return "camellia128-cbc(SSH2)";
 	case SSH2_CIPHER_CAMELLIA192_CBC:
-		return "Camellia192-CBC(SSH2)";
+		return "camellia192-cbc(SSH2)";
 	case SSH2_CIPHER_CAMELLIA256_CBC:
-		return "Camellia256-CBC(SSH2)";
+		return "camellia256-cbc(SSH2)";
 	case SSH2_CIPHER_CAMELLIA128_CTR:
-		return "Camellia128-CTR(SSH2)";
+		return "camellia128-ctr(SSH2)";
 	case SSH2_CIPHER_CAMELLIA192_CTR:
-		return "Camellia192-CTR(SSH2)";
+		return "camellia192-ctr(SSH2)";
 	case SSH2_CIPHER_CAMELLIA256_CTR:
-		return "Camellia256-CTR(SSH2)";
+		return "camellia256-ctr(SSH2)";
 	case SSH2_CIPHER_AES128_GCM:
-		return "AES128-GCM@openssh.com(SSH2)";
+		return "aes128-gcm@openssh.com(SSH2)";
 	case SSH2_CIPHER_AES256_GCM:
-		return "AES256-GCM@openssh.com(SSH2)";
+		return "aes256-gcm@openssh.com(SSH2)";
 
 	default:
 		return NULL;

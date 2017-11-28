@@ -1195,51 +1195,51 @@ static char *get_cipher_name(int cipher)
 
 	// SSH2 
 	case SSH2_CIPHER_3DES_CBC:
-		return "3DES-CBC";
+		return "3des-cbc";
 	case SSH2_CIPHER_AES128_CBC:
-		return "AES128-CBC";
+		return "aes128-cbc";
 	case SSH2_CIPHER_AES192_CBC:
-		return "AES192-CBC";
+		return "aes192-cbc";
 	case SSH2_CIPHER_AES256_CBC:
-		return "AES256-CBC";
+		return "aes256-cbc";
 	case SSH2_CIPHER_BLOWFISH_CBC:
-		return "Blowfish-CBC";
+		return "blowfish-cbc";
 	case SSH2_CIPHER_AES128_CTR:
-		return "AES128-CTR";
+		return "aes128-ctr";
 	case SSH2_CIPHER_AES192_CTR:
-		return "AES192-CTR";
+		return "aes192-ctr";
 	case SSH2_CIPHER_AES256_CTR:
-		return "AES256-CTR";
+		return "aes256-ctr";
 	case SSH2_CIPHER_ARCFOUR:
-		return "Arcfour";
+		return "arcfour";
 	case SSH2_CIPHER_ARCFOUR128:
-		return "Arcfour128";
+		return "arcfour128";
 	case SSH2_CIPHER_ARCFOUR256:
-		return "Arcfour256";
+		return "arcfour256";
 	case SSH2_CIPHER_CAST128_CBC:
-		return "CAST-128-CBC";
+		return "cast-128-cbc";
 	case SSH2_CIPHER_3DES_CTR:
-		return "3DES-CTR";
+		return "3des-ctr";
 	case SSH2_CIPHER_BLOWFISH_CTR:
-		return "Blowfish-CTR";
+		return "blowfish-ctr";
 	case SSH2_CIPHER_CAST128_CTR:
-		return "CAST-128-CTR";
+		return "cast-128-ctr";
 	case SSH2_CIPHER_CAMELLIA128_CBC:
-		return "Camellia128-CBC";
+		return "camellia128-cbc";
 	case SSH2_CIPHER_CAMELLIA192_CBC:
-		return "Camellia192-CBC";
+		return "camellia192-cbc";
 	case SSH2_CIPHER_CAMELLIA256_CBC:
-		return "Camellia256-CBC";
+		return "camellia256-cbc";
 	case SSH2_CIPHER_CAMELLIA128_CTR:
-		return "Camellia128-CTR";
+		return "camellia128-ctr";
 	case SSH2_CIPHER_CAMELLIA192_CTR:
-		return "Camellia192-CTR";
+		return "camellia192-ctr";
 	case SSH2_CIPHER_CAMELLIA256_CTR:
-		return "Camellia256-CTR";
+		return "camellia256-ctr";
 	case SSH2_CIPHER_AES128_GCM:
-		return "AES128-GCM@openssh.com";
+		return "aes128-gcm@openssh.com";
 	case SSH2_CIPHER_AES256_GCM:
-		return "AES256-GCM@openssh.com";
+		return "aes256-gcm@openssh.com";
 
 	default:
 		return "Unknown";
