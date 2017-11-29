@@ -203,8 +203,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,14,0,0
- PRODUCTVERSION 1,14,0,0
+ FILEVERSION 1,15,0,0
+ PRODUCTVERSION 1,15,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -222,12 +222,12 @@ BEGIN
             VALUE "Comments", "Tera Term launch tool"
             VALUE "CompanyName", "S.Hayakawa, TeraTerm Project"
             VALUE "FileDescription", "TeraTerm Menu"
-            VALUE "FileVersion", "1, 14, 0, 0"
+            VALUE "FileVersion", "1, 15, 0, 0"
             VALUE "InternalName", "ttpmenu"
             VALUE "LegalCopyright", "Copyright(C) 1997-2003 S.Hayakawa, (C) 2004-2016 TeraTerm Project"
             VALUE "OriginalFilename", "ttpmenu.exe"
             VALUE "ProductName", "TeraTerm Menu"
-            VALUE "ProductVersion", "1, 14, 0, 0"
+            VALUE "ProductVersion", "1, 15, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
