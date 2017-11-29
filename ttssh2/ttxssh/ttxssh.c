@@ -2189,7 +2189,7 @@ static void PASCAL TTXModifyMenu(HMENU menu)
 
 static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 	if (menu == pvar->FileMenu) {
-		if (pvar->cv->Ready && pvar->settings.Enabled)
+		if (pvar->cv->Ready && pvar->socket != INVALID_SOCKET)
 			EnableMenuItem(menu, ID_SSHSCPMENU, MF_BYCOMMAND | MF_ENABLED);
 		else
 			EnableMenuItem(menu, ID_SSHSCPMENU, MF_BYCOMMAND | MF_GRAYED);
