@@ -2269,6 +2269,10 @@ BOOL HOSTS_check_host_key(PTInstVar pvar, char *hostname, unsigned short tcpport
 					} else {
 						// SSH2ではあとで SSH_notify_host_OK() を呼ぶ。
 					}
+
+					// About TTSSH ダイアログでの表示のために、ここで保存しておく。
+					key_copy(&pvar->hosts_state.hostkey, key);
+
 					return TRUE;
 				}
 				else if (match == 0) {
