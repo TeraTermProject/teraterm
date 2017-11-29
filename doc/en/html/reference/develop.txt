@@ -244,6 +244,9 @@ Example: adding a TTSSH menu under File menu
 * How to release Tera Term installation package
   To release Tera Term installation package is shown in the following step:
 
+  0. Increment the version while RC release process.
+     - tt-version.h
+
   1. Check latest libraries and tools.
      Visual Studio
        http://www.microsoft.com/japan/msdn/vstudio/downloads/default.aspx
@@ -268,8 +271,6 @@ Example: adding a TTSSH menu under File menu
   2. Check the document files.
 
   3. Increase the software version and modify date.
-     Increment the version of VS_VERSION_INFO while release process.
-     - tt-version.h
      - ttxssh-version.h
      - ttpmenu.rc // only modifying
      - TTProxy.rc // only modifying
