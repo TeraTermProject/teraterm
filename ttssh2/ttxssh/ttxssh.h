@@ -257,7 +257,7 @@ typedef struct _TInstVar {
 	buffer_t *peer_kex;
 	kex_algorithm kex_type; // KEX algorithm
 	ssh_keytype hostkey_type;
-	ssh2_cipher_t *ciphers[MODE_MAX];
+	SSH2Cipher *ciphers[MODE_MAX];
 	hmac_type ctos_hmac;
 	hmac_type stoc_hmac;
 	compression_type ctos_compression;

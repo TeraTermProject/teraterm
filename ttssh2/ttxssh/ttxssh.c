@@ -4128,7 +4128,7 @@ static void init_password_control(HWND dlg, int item)
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
 static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
-	ssh2_cipher_t *cipher = NULL;
+	SSH2Cipher *cipher = NULL;
 	char *ciphername = DEFAULT_CIPHERNAME;
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;

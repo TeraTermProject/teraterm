@@ -97,7 +97,7 @@ typedef enum {
 	SSH2_CIPHER_CAMELLIA128_CTR, SSH2_CIPHER_CAMELLIA192_CTR, SSH2_CIPHER_CAMELLIA256_CTR,
 	SSH2_CIPHER_AES128_GCM, SSH2_CIPHER_AES256_GCM,
 	SSH_CIPHER_MAX = SSH2_CIPHER_AES256_GCM,
-} SSHCipher;
+} SSHCipherId;
 
 typedef enum {
 	SSH_AUTH_NONE, SSH_AUTH_RHOSTS, SSH_AUTH_RSA, SSH_AUTH_PASSWORD,
@@ -376,7 +376,7 @@ static ssh2_host_key_t ssh2_host_key[] = {
 
 
 typedef struct ssh2_cipher {
-	SSHCipher id;
+	SSHCipherId id;
 	char *name;
 	int block_size;
 	int key_len;
@@ -384,9 +384,9 @@ typedef struct ssh2_cipher {
 	int iv_len;
 	int auth_len;
 	const EVP_CIPHER *(*func)(void);
-} ssh2_cipher_t;
+} SSH2Cipher;
 
-static ssh2_cipher_t ssh2_ciphers[] = {
+static SSH2Cipher ssh2_ciphers[] = {
 	{SSH2_CIPHER_3DES_CBC,        "3des-cbc",         8, 24,    0, 0, 0, EVP_des_ede3_cbc},     // RFC4253
 	{SSH2_CIPHER_AES128_CBC,      "aes128-cbc",      16, 16,    0, 0, 0, EVP_aes_128_cbc},      // RFC4253
 	{SSH2_CIPHER_AES192_CBC,      "aes192-cbc",      16, 24,    0, 0, 0, EVP_aes_192_cbc},      // RFC4253
@@ -773,13 +773,13 @@ void SSH2_send_kexinit(PTInstVar pvar);
 BOOL do_SSH2_userauth(PTInstVar pvar);
 BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
-int get_cipher_block_size(ssh2_cipher_t *cipher);
-int get_cipher_key_len(ssh2_cipher_t *cipher);
-int get_cipher_iv_len(ssh2_cipher_t *cipher);
-int get_cipher_auth_len(ssh2_cipher_t *cipher);
-ssh2_cipher_t *get_cipher_by_name(char *name);
+int get_cipher_block_size(SSH2Cipher *cipher);
+int get_cipher_key_len(SSH2Cipher *cipher);
+int get_cipher_iv_len(SSH2Cipher *cipher);
+int get_cipher_auth_len(SSH2Cipher *cipher);
+SSH2Cipher *get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
-const EVP_CIPHER* get_cipher_EVP_CIPHER(ssh2_cipher_t *cipher);
+const EVP_CIPHER* get_cipher_EVP_CIPHER(SSH2Cipher *cipher);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
 char* get_ssh2_mac_name(hmac_type type);
 const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type);
@@ -787,7 +787,7 @@ int get_ssh2_mac_truncatebits(hmac_type type);
 char* get_ssh2_comp_name(compression_type type);
 char* get_ssh_keytype_name(ssh_keytype type);
 char* get_digest_algorithm_name(digest_algorithm id);
-int get_cipher_discard_len(ssh2_cipher_t *cipher);
+int get_cipher_discard_len(SSH2Cipher *cipher);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);

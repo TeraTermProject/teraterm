@@ -371,7 +371,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
 	unsigned int check1, check2, m1len, m2len; 
 	int dlen, i;
-	ssh2_cipher_t *cipher;
+	SSH2Cipher *cipher;
 	size_t authlen;
 	EVP_CIPHER_CTX cipher_ctx;
 

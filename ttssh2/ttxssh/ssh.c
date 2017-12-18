@@ -4091,7 +4091,7 @@ SSHKeys current_keys[MODE_MAX];
 // general
 //
 
-int get_cipher_block_size(ssh2_cipher_t *cipher)
+int get_cipher_block_size(SSH2Cipher *cipher)
 {
 	int blocksize = 0;
 	
@@ -4102,7 +4102,7 @@ int get_cipher_block_size(ssh2_cipher_t *cipher)
 	return max(blocksize, 8);
 }
 
-int get_cipher_key_len(ssh2_cipher_t *cipher)
+int get_cipher_key_len(SSH2Cipher *cipher)
 {
 	if (cipher) {
 		return cipher->key_len;
@@ -4112,7 +4112,7 @@ int get_cipher_key_len(ssh2_cipher_t *cipher)
 	}
 }
 
-int get_cipher_discard_len(ssh2_cipher_t *cipher)
+int get_cipher_discard_len(SSH2Cipher *cipher)
 {
 	if (cipher) {
 		return cipher->discard_len;
@@ -4122,7 +4122,7 @@ int get_cipher_discard_len(ssh2_cipher_t *cipher)
 	}
 }
 
-int get_cipher_iv_len(ssh2_cipher_t *cipher)
+int get_cipher_iv_len(SSH2Cipher *cipher)
 {
 	if (cipher) {
 		if (cipher->iv_len != 0) {
@@ -4137,7 +4137,7 @@ int get_cipher_iv_len(ssh2_cipher_t *cipher)
 	}
 }
 
-int get_cipher_auth_len(ssh2_cipher_t *cipher)
+int get_cipher_auth_len(SSH2Cipher *cipher)
 {
 	if (cipher) {
 		return cipher->auth_len;
@@ -4148,9 +4148,9 @@ int get_cipher_auth_len(ssh2_cipher_t *cipher)
 }
 
 // ˆÃ†ƒAƒ‹ƒSƒŠƒYƒ€–¼‚©‚çŒŸõ‚·‚éB
-ssh2_cipher_t *get_cipher_by_name(char *name)
+SSH2Cipher *get_cipher_by_name(char *name)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
+	SSH2Cipher *ptr = ssh2_ciphers;
 
 	while (ptr->name != NULL) {
 		if (name != NULL && strcmp(ptr->name, name) == 0) {
@@ -4163,7 +4163,7 @@ ssh2_cipher_t *get_cipher_by_name(char *name)
 	return ptr;
 }
 
-static char * get_cipher_string(ssh2_cipher_t *cipher)
+static char * get_cipher_string(SSH2Cipher *cipher)
 {
 	if (cipher) {
 		return cipher->name;
@@ -4173,7 +4173,7 @@ static char * get_cipher_string(ssh2_cipher_t *cipher)
 	}
 }
 
-const EVP_CIPHER* get_cipher_EVP_CIPHER(ssh2_cipher_t *cipher)
+const EVP_CIPHER* get_cipher_EVP_CIPHER(SSH2Cipher *cipher)
 {
 	if (cipher) {
 		return cipher->func();
@@ -4717,10 +4717,10 @@ static kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_p
 	return (type);
 }
 
-static ssh2_cipher_t *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
+static SSH2Cipher *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
 {
 	char str_cipher[32];
-	ssh2_cipher_t *ptr = ssh2_ciphers;
+	SSH2Cipher *ptr = ssh2_ciphers;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_cipher, sizeof(str_cipher));
 	return get_cipher_by_name(str_cipher);
@@ -4779,7 +4779,7 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 	int mode, val;
 	unsigned int need = 0;
 	const EVP_MD *md;
-	ssh2_cipher_t *cipher;
+	SSH2Cipher *cipher;
 	hmac_type mac;
 
 	for (mode = 0; mode < MODE_MAX; mode++) {

@@ -1069,7 +1069,7 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 	struct Enc *enc;
 	char *encryption_key = pvar->crypt_state.sender_cipher_key;
 	char *decryption_key = pvar->crypt_state.receiver_cipher_key;
-	ssh2_cipher_t *cipher;
+	SSH2Cipher *cipher;
 	BOOL isOK = TRUE;
 
 	if (sender_flag) {
