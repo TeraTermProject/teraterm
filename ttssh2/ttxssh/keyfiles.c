@@ -453,7 +453,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// ˆÃ†‰»ƒAƒ‹ƒSƒŠƒYƒ€‚Ì–¼‘O
 	ciphername = buffer_get_string_msg(copy_consumed, NULL);
 	cipher = get_cipher_by_name(ciphername);
-	if (cipher->id == SSH_CIPHER_NONE && strcmp(ciphername, "none") != 0) {
+	if (cipher == NULL && strcmp(ciphername, "none") != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
 		goto error;
 	}

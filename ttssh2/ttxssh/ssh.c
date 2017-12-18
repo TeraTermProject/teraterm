@@ -4152,15 +4152,18 @@ SSH2Cipher *get_cipher_by_name(char *name)
 {
 	SSH2Cipher *ptr = ssh2_ciphers;
 
+	if (name == NULL || name[0] == '\0')
+		return NULL;
+
 	while (ptr->name != NULL) {
-		if (name != NULL && strcmp(ptr->name, name) == 0) {
+		if (strcmp(ptr->name, name) == 0) {
 			return ptr;
 		}
 		ptr++;
 	}
 
 	// not found.
-	return ptr;
+	return NULL;
 }
 
 static char * get_cipher_string(SSH2Cipher *cipher)
