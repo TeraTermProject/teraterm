@@ -934,7 +934,7 @@ int CRYPT_generate_RSA_challenge_response(PTInstVar pvar,
 		       challenge + decrypted_challenge_len -
 		       SSH_RSA_CHALLENGE_LENGTH, SSH_RSA_CHALLENGE_LENGTH);
 	} else {
-		memset(decrypted_challenge, 0,
+		SecureZeroMemory(decrypted_challenge,
 		       SSH_RSA_CHALLENGE_LENGTH - decrypted_challenge_len);
 		memcpy(decrypted_challenge + SSH_RSA_CHALLENGE_LENGTH -
 		       decrypted_challenge_len, challenge,
@@ -960,22 +960,22 @@ static void c3DES_init(char *session_key, Cipher3DESState *state)
 	DES_set_key((const_DES_cblock *) session_key, &state->k1);
 	DES_set_key((const_DES_cblock *) (session_key + 8), &state->k2);
 	DES_set_key((const_DES_cblock *) (session_key + 16), &state->k3);
-	memset(state->ivec1, 0, 8);
-	memset(state->ivec2, 0, 8);
-	memset(state->ivec3, 0, 8);
+	SecureZeroMemory(state->ivec1, 8);
+	SecureZeroMemory(state->ivec2, 8);
+	SecureZeroMemory(state->ivec3, 8);
 }
 
 static void cDES_init(char *session_key, CipherDESState *state)
 {
 	DES_set_key((const_DES_cblock *) session_key, &state->k);
-	memset(state->ivec, 0, 8);
+	SecureZeroMemory(state->ivec, 8);
 }
 
 static void cBlowfish_init(char *session_key,
                            CipherBlowfishState *state)
 {
 	BF_set_key(&state->k, 32, session_key);
-	memset(state->ivec, 0, 8);
+	SecureZeroMemory(state->ivec, 8);
 }
 
 
@@ -1174,8 +1174,8 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
 		return FALSE;
 	} else {
-		memset(encryption_key, 0, CRYPT_KEY_LENGTH);
-		memset(decryption_key, 0, CRYPT_KEY_LENGTH);
+		SecureZeroMemory(encryption_key, CRYPT_KEY_LENGTH);
+		SecureZeroMemory(decryption_key, CRYPT_KEY_LENGTH);
 		return TRUE;
 	}
 }
@@ -1345,9 +1345,9 @@ int CRYPT_passphrase_decrypt(int cipher, char *passphrase,
 			            &state.k2);
 			DES_set_key((const_DES_cblock *) passphrase_key,
 			            &state.k3);
-			memset(state.ivec1, 0, 8);
-			memset(state.ivec2, 0, 8);
-			memset(state.ivec3, 0, 8);
+			SecureZeroMemory(state.ivec1, 8);
+			SecureZeroMemory(state.ivec2, 8);
+			SecureZeroMemory(state.ivec3, 8);
 			DES_ncbc_encrypt(buf, buf, bytes,
 			                 &state.k3, &state.ivec3, DES_DECRYPT);
 			DES_ncbc_encrypt(buf, buf, bytes,
@@ -1370,7 +1370,7 @@ int CRYPT_passphrase_decrypt(int cipher, char *passphrase,
 			CipherBlowfishState state;
 
 			BF_set_key(&state.k, 16, passphrase_key);
-			memset(state.ivec, 0, 8);
+			SecureZeroMemory(state.ivec, 8);
 			flip_endianness(buf, bytes);
 			BF_cbc_encrypt(buf, buf, bytes, &state.k, state.ivec,
 						   BF_DECRYPT);
