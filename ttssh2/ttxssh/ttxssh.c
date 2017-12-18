@@ -2833,7 +2833,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 							  "<MACs below this line are disabled>");
 			name = pvar->ts->UIMsg;
 		} else {
-			name = get_ssh2_mac_name(index);
+			name = get_ssh2_mac_name_by_id(index);
 		}
 
 		if (name != NULL) {
@@ -3093,7 +3093,7 @@ static void complete_setup_dlg(PTInstVar pvar, HWND dlg)
 			SendMessage(cipherControl, LB_GETTEXT, i, (LPARAM) buf);
 			for (j = 0;
 				j <= HMAC_MAX
-				&& strcmp(buf, get_ssh2_mac_name(j)) != 0; j++) {
+				&& strcmp(buf, get_ssh2_mac_name_by_id(j)) != 0; j++) {
 			}
 			if (j <= HMAC_MAX) {
 				buf2[buf2index] = '0' + j;

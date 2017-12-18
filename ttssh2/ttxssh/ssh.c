@@ -3165,8 +3165,8 @@ void SSH_get_mac_info(PTInstVar pvar, char *dest, int len)
 	UTIL_get_lang_msg("DLG_ABOUT_MAC_INFO", pvar,
 	                  "%s to server, %s from server");
 	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
-	            get_ssh2_mac_name(pvar->ctos_hmac),
-	            get_ssh2_mac_name(pvar->stoc_hmac));
+	            get_ssh2_mac_name(pvar->macs[MODE_OUT]),
+	            get_ssh2_mac_name(pvar->macs[MODE_IN]));
 }
 
 void SSH_end(PTInstVar pvar)
@@ -4216,64 +4216,63 @@ const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype)
 	return EVP_md_null();
 }
 
-char* get_ssh2_mac_name(hmac_type type)
+SSH2Mac *get_ssh2_mac(SSH2MacId id)
 {
-	ssh2_mac_t *ptr = ssh2_macs;
+	SSH2Mac *ptr = ssh2_macs;
 
 	while (ptr->name != NULL) {
-		if (type == ptr->type) {
-			return ptr->name;
+		if (ptr->id == id) {
+			return ptr;
 		}
 		ptr++;
 	}
 
-	// not found.
-	return "unknown";
+	return NULL;
 }
 
-const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type)
+char* get_ssh2_mac_name(SSH2Mac *mac)
 {
-	ssh2_mac_t *ptr = ssh2_macs;
-
-	while (ptr->name != NULL) {
-		if (type == ptr->type) {
-			return ptr->evp_md();
-		}
-		ptr++;
+	if (mac) {
+		return mac->name;
 	}
-
-	// not found.
-	return EVP_md_null();
+	else {
+		return "unknown";
+	}
 }
 
-int get_ssh2_mac_truncatebits(hmac_type type)
+char* get_ssh2_mac_name_by_id(SSH2MacId id)
 {
-	ssh2_mac_t *ptr = ssh2_macs;
-
-	while (ptr->name != NULL) {
-		if (type == ptr->type) {
-			return ptr->truncatebits;
-		}
-		ptr++;
-	}
-
-	// not found.
-	return 0;
+	return get_ssh2_mac_name(get_ssh2_mac(id));
 }
 
-int get_ssh2_mac_etm(hmac_type type)
+const EVP_MD* get_ssh2_mac_EVP_MD(SSH2Mac *mac)
 {
-	ssh2_mac_t *ptr = ssh2_macs;
-
-	while (ptr->name != NULL) {
-		if (type == ptr->type) {
-			return ptr->etm;
-		}
-		ptr++;
+	if (mac) {
+		return mac->evp_md();
 	}
+	else {
+		return EVP_md_null();
+	}
+}
 
-	// not found
-	return 0;
+int get_ssh2_mac_truncatebits(SSH2Mac *mac)
+{
+	if (mac) {
+		return mac->truncatebits;
+	}
+	else {
+		return 0;
+	}
+}
+
+int get_ssh2_mac_etm(SSH2Mac *mac)
+{
+	if (mac) {
+		return mac->etm;
+	}
+	else {
+		return 0;
+	}
 }
 
 char* get_ssh2_comp_name(compression_type type)
@@ -4580,7 +4579,7 @@ void SSH2_update_hmac_myproposal(PTInstVar pvar)
 		index = pvar->settings.MacOrder[i] - '0';
 		if (index == HMAC_NONE) // disabled line
 			break;
-		strncat_s(buf, sizeof(buf), get_ssh2_mac_name(index), _TRUNCATE);
+		strncat_s(buf, sizeof(buf), get_ssh2_mac_name_by_id(index), _TRUNCATE);
 		strncat_s(buf, sizeof(buf), ",", _TRUNCATE);
 	}
 	len = strlen(buf);
@@ -4730,23 +4729,21 @@ static SSH2Cipher *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_
 }
 
 
-static hmac_type choose_SSH2_hmac_algorithm(char *server_proposal, char *my_proposal)
+static SSH2Mac *choose_SSH2_mac_algorithm(char *server_proposal, char *my_proposal)
 {
-	hmac_type type = HMAC_UNKNOWN;
 	char str_hmac[64];
-	ssh2_mac_t *ptr = ssh2_macs;
+	SSH2Mac *ptr = ssh2_macs;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_hmac, sizeof(str_hmac));
 
 	while (ptr->name != NULL) {
 		if (strcmp(ptr->name, str_hmac) == 0) {
-			type = ptr->type;
-			break;
+			return ptr;
 		}
 		ptr++;
 	}
 
-	return (type);
+	return (NULL);
 }
 
 
@@ -4783,17 +4780,11 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 	unsigned int need = 0;
 	const EVP_MD *md;
 	SSH2Cipher *cipher;
-	hmac_type mac;
+	SSH2Mac *mac;
 
 	for (mode = 0; mode < MODE_MAX; mode++) {
-		if (mode == MODE_OUT) {
-			mac = pvar->ctos_hmac;
-		}
-		else {
-			mac = pvar->stoc_hmac;
-		}
-
 		cipher = pvar->ciphers[mode];
+		mac = pvar->macs[mode];
 
 		// current_keys[]に設定しておいて、あとで pvar->ssh2_keys[] へコピーする。
 		md = get_ssh2_mac_EVP_MD(mac);
@@ -4817,9 +4808,7 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 		// 現時点ではMACはdisable
 		pvar->ssh2_keys[mode].mac.enabled = 0;
 		pvar->ssh2_keys[mode].comp.enabled = 0; // (2005.7.9 yutaka)
-	}
 
-	for (mode = 0; mode < MODE_MAX; mode++) {
 		need = max(need, current_keys[mode].enc.key_len);
 		need = max(need, current_keys[mode].enc.block_size);
 		need = max(need, current_keys[mode].enc.iv_len);
@@ -4991,8 +4980,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
 
-	pvar->ctos_hmac = choose_SSH2_hmac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
-	if (pvar->ctos_hmac == HMAC_UNKNOWN) { // not match
+	pvar->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
+	if (pvar->macs[MODE_OUT] == NULL) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
@@ -5010,8 +4999,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
 
-	pvar->stoc_hmac = choose_SSH2_hmac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
-	if (pvar->stoc_hmac == HMAC_UNKNOWN) { // not match
+	pvar->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
+	if (pvar->macs[MODE_IN] == NULL) { // not match
 		strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
@@ -5078,11 +5067,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"MAC algorithm client to server: %s",
-		get_ssh2_mac_name(pvar->ctos_hmac));
+		get_ssh2_mac_name(pvar->macs[MODE_OUT]));
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"MAC algorithm server to client: %s",
-		get_ssh2_mac_name(pvar->stoc_hmac));
+		get_ssh2_mac_name(pvar->macs[MODE_IN]));
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"compression algorithm client to server: %s",

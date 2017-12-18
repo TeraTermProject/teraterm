@@ -479,17 +479,17 @@ typedef enum {
 	HMAC_SHA2_512_EtM,
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
-} hmac_type;
+} SSH2MacId;
 
 typedef struct ssh2_mac {
-	hmac_type type;
+	SSH2MacId id;
 	char *name;
 	const EVP_MD *(*evp_md)(void);
 	int truncatebits;
 	int etm;
-} ssh2_mac_t;
+} SSH2Mac;
 
-static ssh2_mac_t ssh2_macs[] = {
+static SSH2Mac ssh2_macs[] = {
 	{HMAC_SHA1,         "hmac-sha1",                     EVP_sha1,      0,  0}, // RFC4253
 	{HMAC_MD5,          "hmac-md5",                      EVP_md5,       0,  0}, // RFC4253
 	{HMAC_SHA1_96,      "hmac-sha1-96",                  EVP_sha1,      96, 0}, // RFC4253
@@ -781,9 +781,11 @@ SSH2Cipher *get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
 const EVP_CIPHER* get_cipher_EVP_CIPHER(SSH2Cipher *cipher);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
-char* get_ssh2_mac_name(hmac_type type);
-const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type);
-int get_ssh2_mac_truncatebits(hmac_type type);
+SSH2Mac *get_ssh2_mac(SSH2MacId id);
+char* get_ssh2_mac_name(SSH2Mac *mac);
+char* get_ssh2_mac_name_by_id(SSH2MacId id);
+const EVP_MD* get_ssh2_mac_EVP_MD(SSH2Mac *mac);
+int get_ssh2_mac_truncatebits(SSH2Mac *mac);
 char* get_ssh2_comp_name(compression_type type);
 char* get_ssh_keytype_name(ssh_keytype type);
 char* get_digest_algorithm_name(digest_algorithm id);
