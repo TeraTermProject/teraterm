@@ -29,7 +29,7 @@
 #include "ttxssh.h"
 #include "kex.h"
 
-extern Newkeys current_keys[MODE_MAX];
+extern SSHKeys current_keys[MODE_MAX];
 
 static DH *dh_new_group_asc(const char *gen, const char *modulus)
 {

@@ -4081,7 +4081,7 @@ void debug_print(int no, char *msg, int len)
 #endif
 }
 
-Newkeys current_keys[MODE_MAX];
+SSHKeys current_keys[MODE_MAX];
 
 
 #define write_buffer_file(buf,len) do_write_buffer_file(buf,len,__FILE__,__LINE__)

@@ -561,7 +561,7 @@ typedef struct {
 	struct Enc  enc;
 	struct Mac  mac;
 	struct Comp comp;
-} Newkeys;
+} SSHKeys;
 
 #define roundup(x, y)   ((((x)+((y)-1))/(y))*(y))
 
