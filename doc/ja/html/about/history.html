@@ -33,6 +33,11 @@
 
 <h3><a name="teraterm_4.98">2018.02.28 (Ver 4.98) not released</a></h3>
 <ul class="history">
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_2.84">TTSSH(2.84)</a>へ差し替えた。</li>
+    </ul>
+  </li>
 </ul>
 
 
@@ -2974,7 +2979,9 @@
   <li>バグ修正
     <ul>
       <li>バージョン情報ダイアログのサーバホスト鍵の指紋に、同一サーバで接続に使用されていない方式の鍵が表示されることがある問題を修正した。</li>
-      <li>シリアルポート接続時に <li><a href="../menu/file.html">[File]</a> メニューの [SSH SCP] が無効にならない問題を修正した。</li>
+      <li>シリアルポート接続時に <a href="../menu/file.html">[File]</a> メニューの [SSH SCP] が無効にならない問題を修正した。</li>
+      <li>暗号方式で aes128-gcm@openss.com または aes256-gcm@openssh.com を使用時、MAC 方式のネゴシエーションが行えなかった時に接続を切る問題を修正した。</li>
+      <li>暗号方式で aes128-gcm@openss.com または aes256-gcm@openssh.com を使用時、"About TTSSH" ダイアログで使用していない MAC 方式を表示する問題を修正した。</li>
     </ul>
   </li>
 </ul>

@@ -4980,14 +4980,19 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
 
-	pvar->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
-	if (pvar->macs[MODE_OUT] == NULL) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
+	if (pvar->ciphers[MODE_OUT]->auth_len > 0) {
+		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (c2s)");
+		pvar->macs[MODE_OUT] = get_ssh2_mac(HMAC_IMPLICIT);
 	}
-
+	else {
+		pvar->macs[MODE_OUT] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_CTOS]);
+		if (pvar->macs[MODE_OUT] == NULL) { // not match
+			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+			msg = tmp;
+			goto error;
+		}
+	}
 
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
@@ -4999,14 +5004,19 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
 
-	pvar->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
-	if (pvar->macs[MODE_IN] == NULL) { // not match
-		strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
-		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
-		msg = tmp;
-		goto error;
+	if (pvar->ciphers[MODE_IN]->auth_len > 0) {
+		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (s2c)");
+		pvar->macs[MODE_IN] = get_ssh2_mac(HMAC_IMPLICIT);
 	}
-
+	else {
+		pvar->macs[MODE_IN] = choose_SSH2_mac_algorithm(buf, myproposal[PROPOSAL_MAC_ALGS_STOC]);
+		if (pvar->macs[MODE_IN] == NULL) { // not match
+			strncpy_s(tmp, sizeof(tmp), "unknown MAC algorithm: ", _TRUNCATE);
+			strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
+			msg = tmp;
+			goto error;
+		}
+	}
 
 	// 圧縮アルゴリズムの決定
 	// pvar->ssh_state.compressing = FALSE; として下記メンバを使用する。
