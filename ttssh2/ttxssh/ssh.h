@@ -477,6 +477,7 @@ typedef enum {
 	HMAC_RIPEMD160_EtM,
 	HMAC_SHA2_256_EtM,
 	HMAC_SHA2_512_EtM,
+	HMAC_IMPLICIT,
 	HMAC_UNKNOWN,
 	HMAC_MAX = HMAC_UNKNOWN,
 } SSH2MacId;
@@ -506,6 +507,7 @@ static SSH2Mac ssh2_macs[] = {
 	{HMAC_RIPEMD160_EtM,"hmac-ripemd160-etm@openssh.com",EVP_ripemd160, 0,  1},
 	{HMAC_SHA2_256_EtM, "hmac-sha2-256-etm@openssh.com", EVP_sha256,    0,  1},
 	{HMAC_SHA2_512_EtM, "hmac-sha2-512-etm@openssh.com", EVP_sha512,    0,  1},
+	{HMAC_IMPLICIT,     "<implicit>",                    EVP_md_null,   0,  0}, // for AEAD cipher
 	{HMAC_NONE,         NULL,                            NULL,          0,  0},
 };
 
