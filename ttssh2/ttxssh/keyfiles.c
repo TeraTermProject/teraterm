@@ -371,7 +371,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	unsigned int len, klen, nkeys, blocksize, keylen, ivlen, slen, rounds;
 	unsigned int check1, check2, m1len, m2len; 
 	int dlen, i;
-	SSHCipher ciphernameval;
+	ssh2_cipher_t *cipher;
 	size_t authlen;
 	EVP_CIPHER_CTX cipher_ctx;
 
@@ -452,8 +452,8 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	 */
 	// ˆÃ†‰»ƒAƒ‹ƒSƒŠƒYƒ€‚Ì–¼‘O
 	ciphername = buffer_get_string_msg(copy_consumed, NULL);
-	ciphernameval = get_cipher_by_name(ciphername);
-	if (ciphernameval == SSH_CIPHER_NONE && strcmp(ciphername, "none") != 0) {
+	cipher = get_cipher_by_name(ciphername);
+	if (cipher->id == SSH_CIPHER_NONE && strcmp(ciphername, "none") != 0) {
 		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
 		goto error;
 	}
@@ -509,7 +509,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 
 	/* size of encrypted key blob */
 	len = buffer_get_int(copy_consumed);
-	blocksize = get_cipher_block_size(ciphernameval);
+	blocksize = get_cipher_block_size(cipher);
 	authlen = 0;  // TODO: ‚Æ‚è‚ ‚¦‚¸ŒÅ’è‰»
 	if (len < blocksize) {
 		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": encrypted data too small");
@@ -521,7 +521,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	}
 
 	/* setup key */
-	keylen = get_cipher_key_len(ciphernameval);
+	keylen = get_cipher_key_len(cipher);
 	ivlen = blocksize;
 	key = calloc(1, keylen + ivlen);
 	if (!strcmp(kdfname, KDFNAME)) {
@@ -542,7 +542,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	// •œ†‰»
 	cp = buffer_append_space(b, len);
 	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_DECRYPT, 
-		get_cipher_EVP_CIPHER(ciphernameval), 0, 0, pvar);
+		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	if (EVP_Cipher(&cipher_ctx, cp, buffer_tail_ptr(copy_consumed), len) == 0) {
 		cipher_cleanup_SSH2(&cipher_ctx);
 		goto error;

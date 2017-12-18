@@ -4128,7 +4128,7 @@ static void init_password_control(HWND dlg, int item)
 // based on OpenSSH 6.5:key_save_private(), key_private_to_blob2()
 static void save_bcrypt_private_key(char *passphrase, char *filename, char *comment, HWND dlg, PTInstVar pvar, int rounds)
 {
-	SSHCipher ciphernameval = SSH_CIPHER_NONE;
+	ssh2_cipher_t *cipher = NULL;
 	char *ciphername = DEFAULT_CIPHERNAME;
 	buffer_t *b = NULL;
 	buffer_t *kdf = NULL;
@@ -4156,9 +4156,9 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 		kdfname = "none";
 	}
 
-	ciphernameval = get_cipher_by_name(ciphername);
-	blocksize = get_cipher_block_size(ciphernameval);
-	keylen = get_cipher_key_len(ciphernameval);
+	cipher = get_cipher_by_name(ciphername);
+	blocksize = get_cipher_block_size(cipher);
+	keylen = get_cipher_key_len(cipher);
 	ivlen = blocksize;
 	authlen = 0;  // TODO: とりあえず固定化
 	key = calloc(1, keylen + ivlen);
@@ -4176,7 +4176,7 @@ static void save_bcrypt_private_key(char *passphrase, char *filename, char *comm
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
 	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
-		get_cipher_EVP_CIPHER(ciphernameval), 0, 0, pvar);
+		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
 

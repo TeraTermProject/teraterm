@@ -4091,134 +4091,96 @@ SSHKeys current_keys[MODE_MAX];
 // general
 //
 
-int get_cipher_block_size(SSHCipher cipher)
+int get_cipher_block_size(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			return ptr->block_size;
-		}
-		ptr++;
+	int blocksize = 0;
+	
+	if (cipher) {
+		blocksize = cipher->block_size;
 	}
 
-	// not found.
-	return 8;
+	return max(blocksize, 8);
 }
 
-int get_cipher_key_len(SSHCipher cipher)
+int get_cipher_key_len(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			return ptr->key_len;
-		}
-		ptr++;
+	if (cipher) {
+		return cipher->key_len;
 	}
-
-	// not found.
-	return 0;
+	else {
+		return 0;
+	}
 }
 
-int get_cipher_discard_len(SSHCipher cipher)
+int get_cipher_discard_len(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			return ptr->discard_len;
-		}
-		ptr++;
+	if (cipher) {
+		return cipher->discard_len;
 	}
-
-	// not found.
-	return 0;
+	else {
+		return 0;
+	}
 }
 
-int get_cipher_iv_len(SSHCipher cipher)
+int get_cipher_iv_len(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			if (ptr->iv_len != 0) {
-				return ptr->iv_len;
-			}
-			else {
-				return ptr->block_size;
-			}
+	if (cipher) {
+		if (cipher->iv_len != 0) {
+			return cipher->iv_len;
 		}
-		ptr++;
+		else {
+			return cipher->block_size;
+		}
 	}
-
-	// not found.
-	return 8; // block_size
+	else {
+		return 8; // block_size
+	}
 }
 
-int get_cipher_auth_len(SSHCipher cipher)
+int get_cipher_auth_len(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			return ptr->auth_len;
-		}
-		ptr++;
+	if (cipher) {
+		return cipher->auth_len;
 	}
-
-	// not found.
-	return 0;
+	else {
+		return 0;
+	}
 }
 
 // 暗号アルゴリズム名から検索する。
-SSHCipher get_cipher_by_name(char *name)
+ssh2_cipher_t *get_cipher_by_name(char *name)
 {
 	ssh2_cipher_t *ptr = ssh2_ciphers;
 
-	if (name == NULL)
-		goto error;
-
 	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, name) == 0) {
-			return ptr->cipher;
+		if (name != NULL && strcmp(ptr->name, name) == 0) {
+			return ptr;
 		}
 		ptr++;
 	}
 
 	// not found.
-error:
-	return SSH_CIPHER_NONE;
+	return ptr;
 }
 
-static char * get_cipher_string(SSHCipher cipher)
+static char * get_cipher_string(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			return ptr->name;
-		}
-		ptr++;
+	if (cipher) {
+		return cipher->name;
 	}
-
-	// not found.
-	return "unknown";
+	else {
+		return "unknown";
+	}
 }
 
-const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher)
+const EVP_CIPHER* get_cipher_EVP_CIPHER(ssh2_cipher_t *cipher)
 {
-	ssh2_cipher_t *ptr = ssh2_ciphers;
-
-	while (ptr->name != NULL) {
-		if (cipher == ptr->cipher) {
-			return ptr->func();
-		}
-		ptr++;
+	if (cipher) {
+		return cipher->func();
 	}
-
-	// not found.
-	return EVP_enc_null();
+	else {
+		return EVP_enc_null();
+	}
 }
 
 char* get_kex_algorithm_name(kex_algorithm kextype)
@@ -4711,7 +4673,6 @@ static void choose_SSH2_proposal(char *server_proposal,
 {
 	char tmp_cli[1024], *ptr_cli, *ctc_cli;
 	char tmp_svr[1024], *ptr_svr, *ctc_svr;
-	SSHCipher cipher = SSH_CIPHER_NONE;
 
 	strncpy_s(tmp_cli, sizeof(tmp_cli), my_proposal, _TRUNCATE);
 	ptr_cli = strtok_s(tmp_cli, ",", &ctc_cli);
@@ -4756,23 +4717,13 @@ static kex_algorithm choose_SSH2_kex_algorithm(char *server_proposal, char *my_p
 	return (type);
 }
 
-static SSHCipher choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
+static ssh2_cipher_t *choose_SSH2_cipher_algorithm(char *server_proposal, char *my_proposal)
 {
-	SSHCipher cipher = SSH_CIPHER_NONE;
 	char str_cipher[32];
 	ssh2_cipher_t *ptr = ssh2_ciphers;
 
 	choose_SSH2_proposal(server_proposal, my_proposal, str_cipher, sizeof(str_cipher));
-
-	while (ptr->name != NULL) {
-		if (strcmp(ptr->name, str_cipher) == 0) {
-			cipher = ptr->cipher;
-			break;
-		}
-		ptr++;
-	}
-
-	return (cipher);
+	return get_cipher_by_name(str_cipher);
 }
 
 
@@ -4828,18 +4779,18 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 	int mode, val;
 	unsigned int need = 0;
 	const EVP_MD *md;
-	SSHCipher cipher;
+	ssh2_cipher_t *cipher;
 	hmac_type mac;
 
 	for (mode = 0; mode < MODE_MAX; mode++) {
 		if (mode == MODE_OUT) {
 			mac = pvar->ctos_hmac;
-			cipher = pvar->ctos_cipher;
 		}
 		else {
 			mac = pvar->stoc_hmac;
-			cipher = pvar->stoc_cipher;
 		}
+
+		cipher = pvar->ciphers[mode];
 
 		// current_keys[]に設定しておいて、あとで pvar->ssh2_keys[] へコピーする。
 		md = get_ssh2_mac_EVP_MD(mac);
@@ -4997,8 +4948,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
 
-	pvar->ctos_cipher = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
-	if (pvar->ctos_cipher == SSH_CIPHER_NONE) {
+	pvar->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
+	if (pvar->ciphers[MODE_OUT]->id == SSH_CIPHER_NONE) {
 		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(ctos): ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
@@ -5017,8 +4968,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
 
-	pvar->stoc_cipher = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
-	if (pvar->stoc_cipher == SSH_CIPHER_NONE) {
+	pvar->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
+	if (pvar->ciphers[MODE_IN]->id == SSH_CIPHER_NONE) {
 		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(stoc): ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
@@ -5116,11 +5067,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"encryption algorithm client to server: %s",
-		get_cipher_string(pvar->ctos_cipher));
+		get_cipher_string(pvar->ciphers[MODE_OUT]));
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"encryption algorithm server to client: %s",
-		get_cipher_string(pvar->stoc_cipher));
+		get_cipher_string(pvar->ciphers[MODE_IN]));
 
 	logprintf(LOG_LEVEL_VERBOSE,
 		"MAC algorithm client to server: %s",

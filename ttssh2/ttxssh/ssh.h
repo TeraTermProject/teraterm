@@ -376,7 +376,7 @@ static ssh2_host_key_t ssh2_host_key[] = {
 
 
 typedef struct ssh2_cipher {
-	SSHCipher cipher;
+	SSHCipher id;
 	char *name;
 	int block_size;
 	int key_len;
@@ -773,13 +773,13 @@ void SSH2_send_kexinit(PTInstVar pvar);
 BOOL do_SSH2_userauth(PTInstVar pvar);
 BOOL do_SSH2_authrequest(PTInstVar pvar);
 void debug_print(int no, char *msg, int len);
-int get_cipher_block_size(SSHCipher cipher);
-int get_cipher_key_len(SSHCipher cipher);
-int get_cipher_iv_len(SSHCipher cipher);
-int get_cipher_auth_len(SSHCipher cipher);
-SSHCipher get_cipher_by_name(char *name);
+int get_cipher_block_size(ssh2_cipher_t *cipher);
+int get_cipher_key_len(ssh2_cipher_t *cipher);
+int get_cipher_iv_len(ssh2_cipher_t *cipher);
+int get_cipher_auth_len(ssh2_cipher_t *cipher);
+ssh2_cipher_t *get_cipher_by_name(char *name);
 char* get_kex_algorithm_name(kex_algorithm kextype);
-const EVP_CIPHER* get_cipher_EVP_CIPHER(SSHCipher cipher);
+const EVP_CIPHER* get_cipher_EVP_CIPHER(ssh2_cipher_t *cipher);
 const EVP_MD* get_kex_algorithm_EVP_MD(kex_algorithm kextype);
 char* get_ssh2_mac_name(hmac_type type);
 const EVP_MD* get_ssh2_mac_EVP_MD(hmac_type type);
@@ -787,7 +787,7 @@ int get_ssh2_mac_truncatebits(hmac_type type);
 char* get_ssh2_comp_name(compression_type type);
 char* get_ssh_keytype_name(ssh_keytype type);
 char* get_digest_algorithm_name(digest_algorithm id);
-int get_cipher_discard_len(SSHCipher cipher);
+int get_cipher_discard_len(ssh2_cipher_t *cipher);
 void ssh_heartbeat_lock_initialize(void);
 void ssh_heartbeat_lock_finalize(void);
 void ssh_heartbeat_lock(void);

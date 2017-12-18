@@ -765,9 +765,18 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 			choose_cipher(pvar, pvar->crypt_state.supported_receiver_ciphers);
 
 	} else { // SSH2(yutaka)
-		pvar->crypt_state.sender_cipher = pvar->ctos_cipher;
-		pvar->crypt_state.receiver_cipher =pvar->stoc_cipher;
-
+		if (pvar->ciphers[MODE_OUT] == NULL) {
+			pvar->crypt_state.sender_cipher = SSH_CIPHER_NONE;
+		}
+		else {
+			pvar->crypt_state.sender_cipher = pvar->ciphers[MODE_OUT]->id;
+		}
+		if (pvar->ciphers[MODE_IN] == NULL) {
+			pvar->crypt_state.receiver_cipher = SSH_CIPHER_NONE;
+		}
+		else {
+			pvar->crypt_state.receiver_cipher = pvar->ciphers[MODE_IN]->id;
+		}
 	}
 
 	if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE
@@ -1060,36 +1069,39 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 	struct Enc *enc;
 	char *encryption_key = pvar->crypt_state.sender_cipher_key;
 	char *decryption_key = pvar->crypt_state.receiver_cipher_key;
-	int cipher;
+	ssh2_cipher_t *cipher;
 	BOOL isOK = TRUE;
 
 	if (sender_flag) {
-		cipher = pvar->crypt_state.sender_cipher;
-		switch (cipher) {
-		case SSH_CIPHER_3DES:
-			c3DES_init(encryption_key, &pvar->crypt_state.enc.c3DES);
-			pvar->crypt_state.encrypt = c3DES_encrypt;
-			break;
+		if (SSHv1(pvar)) {
+			switch (pvar->crypt_state.sender_cipher) {
+			case SSH_CIPHER_3DES:
+				c3DES_init(encryption_key, &pvar->crypt_state.enc.c3DES);
+				pvar->crypt_state.encrypt = c3DES_encrypt;
+				break;
 
-		case SSH_CIPHER_DES:
-			cDES_init(encryption_key, &pvar->crypt_state.enc.cDES);
-			pvar->crypt_state.encrypt = cDES_encrypt;
-			break;
+			case SSH_CIPHER_DES:
+				cDES_init(encryption_key, &pvar->crypt_state.enc.cDES);
+				pvar->crypt_state.encrypt = cDES_encrypt;
+				break;
 
-		case SSH_CIPHER_BLOWFISH:
-			cBlowfish_init(encryption_key, &pvar->crypt_state.enc.cBlowfish);
-			pvar->crypt_state.encrypt = cBlowfish_encrypt;
-			break;
+			case SSH_CIPHER_BLOWFISH:
+				cBlowfish_init(encryption_key, &pvar->crypt_state.enc.cBlowfish);
+				pvar->crypt_state.encrypt = cBlowfish_encrypt;
+				break;
 
-		case SSH_CIPHER_NONE:
-		case SSH_CIPHER_IDEA:
-		case SSH_CIPHER_TSS:
-		case SSH_CIPHER_RC4:
-			isOK = FALSE;
-			break;
-
-		default: // SSH2
-			if (cipher <= SSH_CIPHER_MAX) {
+			case SSH_CIPHER_NONE:
+			case SSH_CIPHER_IDEA:
+			case SSH_CIPHER_TSS:
+			case SSH_CIPHER_RC4:
+				isOK = FALSE;
+				break;
+			}
+		}
+		else {
+			// SSH2
+			cipher = pvar->ciphers[MODE_OUT];
+			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_OUT].enc;
 				cipher_init_SSH2(&pvar->evpcip[MODE_OUT],
 				                 enc->key, get_cipher_key_len(cipher),
@@ -1105,37 +1117,39 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			else {
 				isOK = FALSE;
 			}
-			break;
 		}
 	}
 
 	if (receiver_flag) {
-		cipher = pvar->crypt_state.receiver_cipher;
-		switch (cipher) {
-		case SSH_CIPHER_3DES:
-			c3DES_init(decryption_key, &pvar->crypt_state.dec.c3DES);
-			pvar->crypt_state.decrypt = c3DES_decrypt;
-			break;
+		if (SSHv1(pvar)) {
+			switch (pvar->crypt_state.receiver_cipher) {
+			case SSH_CIPHER_3DES:
+				c3DES_init(decryption_key, &pvar->crypt_state.dec.c3DES);
+				pvar->crypt_state.decrypt = c3DES_decrypt;
+				break;
 
-		case SSH_CIPHER_DES:
-			cDES_init(decryption_key, &pvar->crypt_state.dec.cDES);
-			pvar->crypt_state.decrypt = cDES_decrypt;
-			break;
+			case SSH_CIPHER_DES:
+				cDES_init(decryption_key, &pvar->crypt_state.dec.cDES);
+				pvar->crypt_state.decrypt = cDES_decrypt;
+				break;
 
-		case SSH_CIPHER_BLOWFISH:
-			cBlowfish_init(decryption_key, &pvar->crypt_state.dec.cBlowfish);
-			pvar->crypt_state.decrypt = cBlowfish_decrypt;
-			break;
+			case SSH_CIPHER_BLOWFISH:
+				cBlowfish_init(decryption_key, &pvar->crypt_state.dec.cBlowfish);
+				pvar->crypt_state.decrypt = cBlowfish_decrypt;
+				break;
 
-		case SSH_CIPHER_NONE:
-		case SSH_CIPHER_IDEA:
-		case SSH_CIPHER_TSS:
-		case SSH_CIPHER_RC4:
-			isOK = FALSE;
-			break;
-
-		default: // SSH2
-			if (cipher <= SSH_CIPHER_MAX) {
+			case SSH_CIPHER_NONE:
+			case SSH_CIPHER_IDEA:
+			case SSH_CIPHER_TSS:
+			case SSH_CIPHER_RC4:
+				isOK = FALSE;
+				break;
+			}
+		}
+		else {
+			// SSH2
+			cipher = pvar->ciphers[MODE_IN];
+			if (cipher) {
 				enc = &pvar->ssh2_keys[MODE_IN].enc;
 				cipher_init_SSH2(&pvar->evpcip[MODE_IN],
 				                 enc->key, get_cipher_key_len(cipher),
@@ -1151,7 +1165,6 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 			else {
 				isOK = FALSE;
 			}
-			break;
 		}
 	}
 
