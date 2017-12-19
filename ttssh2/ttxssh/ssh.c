@@ -5520,6 +5520,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	char *emsg, emsg_tmp[1024];  // error message
 	int ret, hashlen;
 	Key *hostkey;  // hostkey
+	BOOL result = FALSE;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
 
@@ -5705,22 +5706,19 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
-	BN_free(dh_server_pub);
-	DH_free(pvar->kexdh); pvar->kexdh = NULL;
-	key_free(hostkey);
-	if (dh_buf != NULL) free(dh_buf);
-	return TRUE;
+	result = TRUE;
 
 error:
 	BN_free(dh_server_pub);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	key_free(hostkey);
-	if (dh_buf != NULL) free(dh_buf);
+	free(dh_buf);
 	BN_free(share_key);
 
-	notify_fatal_error(pvar, emsg, TRUE);
+	if (result == FALSE)
+		notify_fatal_error(pvar, emsg, TRUE);
 
-	return FALSE;
+	return result;
 }
 
 
@@ -5745,6 +5743,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	char *emsg, emsg_tmp[1024];  // error message
 	int ret, hashlen;
 	Key *hostkey = NULL;  // hostkey
+	BOOL result = FALSE;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_REPLY was received.");
 
@@ -5939,22 +5938,19 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
-	BN_free(dh_server_pub);
-	DH_free(pvar->kexdh); pvar->kexdh = NULL;
-	key_free(hostkey);
-	if (dh_buf != NULL) free(dh_buf);
-	return TRUE;
+	result = TRUE;
 
 error:
 	BN_free(dh_server_pub);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	key_free(hostkey);
-	if (dh_buf != NULL) free(dh_buf);
+	free(dh_buf);
 	BN_free(share_key);
 
-	notify_fatal_error(pvar, emsg, TRUE);
+	if (result == FALSE)
+		notify_fatal_error(pvar, emsg, TRUE);
 
-	return FALSE;
+	return result;
 }
 
 
@@ -5978,6 +5974,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	char *emsg, emsg_tmp[1024];  // error message
 	int ret, hashlen;
 	Key *hostkey = NULL;  // hostkey
+	BOOL result = FALSE;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_ECDH_REPLY was received.");
 
@@ -6185,22 +6182,19 @@ cont:
 	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
-	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
-	EC_POINT_clear_free(server_public);
-	key_free(hostkey);
-	if (ecdh_buf != NULL) free(ecdh_buf);
-	return TRUE;
+	result = TRUE;
 
 error:
-	EC_POINT_clear_free(server_public);
 	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
+	EC_POINT_clear_free(server_public);
 	key_free(hostkey);
-	if (ecdh_buf != NULL) free(ecdh_buf);
+	free(ecdh_buf);
 	BN_free(share_key);
 
-	notify_fatal_error(pvar, emsg, TRUE);
+	if (result == FALSE)
+		notify_fatal_error(pvar, emsg, TRUE);
 
-	return FALSE;
+	return result;
 }
 
 
