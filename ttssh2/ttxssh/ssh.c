@@ -5500,6 +5500,93 @@ static void ssh2_set_newkeys(PTInstVar pvar, int mode)
 	pvar->ssh2_keys[mode] = current_keys[mode];
 }
 
+static BOOL ssh2_kex_finish(PTInstVar pvar, char *hash, int hashlen, BIGNUM *share_key, Key *hostkey, char *signature, int siglen)
+{
+	int ret;
+	char emsg[1024];  // error message
+
+	//debug_print(30, hash, hashlen);
+	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
+	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
+	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
+	//debug_print(34, buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
+	//debug_print(35, server_host_key_blob, bloblen);
+
+	// session idの保存（初回接続時のみ）
+	if (pvar->session_id == NULL) {
+		pvar->session_id_len = hashlen;
+		pvar->session_id = malloc(pvar->session_id_len);
+		if (pvar->session_id != NULL) {
+			memcpy(pvar->session_id, hash, pvar->session_id_len);
+		} else {
+			// TODO:
+		}
+	}
+
+	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
+		if (ret == -3 && hostkey->type == KEY_RSA) {
+			if (!pvar->settings.EnableRsaShortKeyServer) {
+				_snprintf_s(emsg, sizeof(emsg), _TRUNCATE, __FUNCTION__
+					": key verify error. remote rsa key length is too short (%d-bit)",
+					BN_num_bits(hostkey->rsa->n));
+			}
+			else {
+				goto cont;
+			}
+		}
+		else {
+			_snprintf_s(emsg, sizeof(emsg), _TRUNCATE, __FUNCTION__ ": key verify error (%d)\r\n%s", ret, SENDTOME);
+		}
+
+		save_memdump(LOGDUMP);
+		notify_fatal_error(pvar, emsg, TRUE);
+		return FALSE;
+	}
+
+cont:
+	kex_derive_keys(pvar, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
+
+	// KEX finish
+	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
+	finish_send_packet(pvar);
+
+	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was sent at handle_SSH2_dh_kex_reply().");
+
+	// SSH2_MSG_NEWKEYSを送り終わったあとにキーの設定および再設定を行う
+	// 送信用の暗号鍵は SSH2_MSG_NEWKEYS の送信後に、受信用のは SSH2_MSG_NEWKEYS の
+	// 受信後に再設定を行う。
+	if (pvar->rekeying == 1) { // キーの再設定
+		// まず、送信用だけ設定する。
+		ssh2_set_newkeys(pvar, MODE_OUT);
+		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
+		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
+		enable_send_compression(pvar);
+		if (!CRYPT_start_encryption(pvar, 1, 0)) {
+			// TODO: error
+		}
+
+	} else {
+		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
+		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
+		ssh2_set_newkeys(pvar, MODE_OUT);
+
+		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
+		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
+		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
+
+		// パケット圧縮が有効なら初期化する。(2005.7.9 yutaka)
+		// SSH2_MSG_NEWKEYSの受信より前なのでここだけでよい。(2006.10.30 maya)
+		prep_compression(pvar);
+		enable_compression(pvar);
+	}
+
+	SSH2_dispatch_init(3);
+	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
+	SSH2_dispatch_add_message(SSH2_MSG_IGNORE);
+	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
+
+	return TRUE;
+}
 
 //
 // Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEXDH_REPLY:31)
@@ -5517,8 +5604,8 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	char *dh_buf = NULL;
 	BIGNUM *share_key = NULL;
 	char *hash;
-	char *emsg, emsg_tmp[1024];  // error message
-	int ret, hashlen;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
 	Key *hostkey;  // hostkey
 	BOOL result = FALSE;
 
@@ -5622,91 +5709,11 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
 	}
 
-	//debug_print(30, hash, hashlen);
-	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
-	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
-	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
-	//debug_print(34, buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
-	//debug_print(35, server_host_key_blob, bloblen);
-
-	// session idの保存（初回接続時のみ）
-	if (pvar->session_id == NULL) {
-		pvar->session_id_len = hashlen;
-		pvar->session_id = malloc(pvar->session_id_len);
-		if (pvar->session_id != NULL) {
-			memcpy(pvar->session_id, hash, pvar->session_id_len);
-		} else {
-			// TODO:
-		}
-	}
-
-	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
-		if (ret == -3 && hostkey->type == KEY_RSA) {
-			if (!pvar->settings.EnableRsaShortKeyServer) {
-				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_dh_kex_reply()", BN_num_bits(hostkey->rsa->n));
-			}
-			else {
-				goto cont;
-			}
-		}
-		else {
-			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-			            "key verify error(%d) @ handle_SSH2_dh_kex_reply()\r\n%s", ret, SENDTOME);
-		}
-		emsg = emsg_tmp;
-		save_memdump(LOGDUMP);
-		goto error;
-	}
-
-cont:
-	kex_derive_keys(pvar, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
-
-	// KEX finish
-	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
-	finish_send_packet(pvar);
-
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was sent at handle_SSH2_dh_kex_reply().");
-
-	// SSH2_MSG_NEWKEYSを送り終わったあとにキーの設定および再設定を行う
-	// 送信用の暗号鍵は SSH2_MSG_NEWKEYS の送信後に、受信用のは SSH2_MSG_NEWKEYS の
-	// 受信後に再設定を行う。
-	if (pvar->rekeying == 1) { // キーの再設定
-		// まず、送信用だけ設定する。
-		ssh2_set_newkeys(pvar, MODE_OUT);
-		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
-		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
-		enable_send_compression(pvar);
-		if (!CRYPT_start_encryption(pvar, 1, 0)) {
-			// TODO: error
-		}
-
-	} else {
-		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
-		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
-		ssh2_set_newkeys(pvar, MODE_OUT);
-
-		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
-		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
-		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
-
-		// パケット圧縮が有効なら初期化する。(2005.7.9 yutaka)
-		// SSH2_MSG_NEWKEYSの受信より前なのでここだけでよい。(2006.10.30 maya)
-		prep_compression(pvar);
-		enable_compression(pvar);
-	}
-
 	// TTSSHバージョン情報に表示するキービット数を求めておく (2004.10.30 yutaka)
 	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
 	pvar->server_key_bits = BN_num_bits(dh_server_pub);
 
-	SSH2_dispatch_init(3);
-	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
-
-	result = TRUE;
+	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
 
 error:
 	BN_free(dh_server_pub);
@@ -5715,7 +5722,7 @@ error:
 	free(dh_buf);
 	BN_free(share_key);
 
-	if (result == FALSE)
+	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
 
 	return result;
@@ -5740,8 +5747,8 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	char *dh_buf = NULL;
 	BIGNUM *share_key = NULL;
 	char *hash;
-	char *emsg, emsg_tmp[1024];  // error message
-	int ret, hashlen;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
 
@@ -5854,91 +5861,11 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "hash", hash, hashlen);
 	}
 
-	//debug_print(30, hash, hashlen);
-	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
-	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
-	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
-	//debug_print(34, buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
-	//debug_print(35, server_host_key_blob, bloblen);
-
-	// session idの保存（初回接続時のみ）
-	if (pvar->session_id == NULL) {
-		pvar->session_id_len = hashlen;
-		pvar->session_id = malloc(pvar->session_id_len);
-		if (pvar->session_id != NULL) {
-			memcpy(pvar->session_id, hash, pvar->session_id_len);
-		} else {
-			// TODO:
-		}
-	}
-
-	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
-		if (ret == -3 && hostkey->type == KEY_RSA) {
-			if (!pvar->settings.EnableRsaShortKeyServer) {
-				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_dh_gex_reply()", BN_num_bits(hostkey->rsa->n));
-			}
-			else {
-				goto cont;
-			}
-		}
-		else {
-			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-			            "key verify error(%d) @ handle_SSH2_dh_gex_reply()\r\n%s", ret, SENDTOME);
-		}
-		emsg = emsg_tmp;
-		save_memdump(LOGDUMP);
-		goto error;
-	}
-
-cont:
-	kex_derive_keys(pvar, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
-
-	// KEX finish
-	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
-	finish_send_packet(pvar);
-
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was sent at handle_SSH2_dh_gex_reply().");
-
-	// SSH2_MSG_NEWKEYSを送り終わったあとにキーの設定および再設定を行う
-	// 送信用の暗号鍵は SSH2_MSG_NEWKEYS の送信後に、受信用のは SSH2_MSG_NEWKEYS の
-	// 受信後に再設定を行う。
-	if (pvar->rekeying == 1) { // キーの再設定
-		// まず、送信用だけ設定する。
-		ssh2_set_newkeys(pvar, MODE_OUT);
-		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
-		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
-		enable_send_compression(pvar);
-		if (!CRYPT_start_encryption(pvar, 1, 0)) {
-			// TODO: error
-		}
-
-	} else {
-		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
-		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
-		ssh2_set_newkeys(pvar, MODE_OUT);
-
-		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
-		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
-		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
-
-		// パケット圧縮が有効なら初期化する。(2005.7.9 yutaka)
-		// SSH2_MSG_NEWKEYSの受信より前なのでここだけでよい。(2006.10.30 maya)
-		prep_compression(pvar);
-		enable_compression(pvar);
-	}
-
 	// TTSSHバージョン情報に表示するキービット数を求めておく (2004.10.30 yutaka)
 	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
 	pvar->server_key_bits = BN_num_bits(dh_server_pub);
 
-	SSH2_dispatch_init(3);
-	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
-
-	result = TRUE;
+	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
 
 error:
 	BN_free(dh_server_pub);
@@ -5947,7 +5874,7 @@ error:
 	free(dh_buf);
 	BN_free(share_key);
 
-	if (result == FALSE)
+	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
 
 	return result;
@@ -5955,7 +5882,7 @@ error:
 
 
 //
-// Elliptic Curv Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_ECDH_REPLY:31)
+// Elliptic Curve Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_ECDH_REPLY:31)
 //
 static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 {
@@ -5971,8 +5898,8 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	char *ecdh_buf = NULL;
 	BIGNUM *share_key = NULL;
 	char *hash;
-	char *emsg, emsg_tmp[1024];  // error message
-	int ret, hashlen;
+	char *emsg = NULL, emsg_tmp[1024];  // error message
+	int hashlen;
 	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
 
@@ -6083,81 +6010,6 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "hash", hash, hashlen);
 	}
 
-	//debug_print(30, hash, hashlen);
-	//debug_print(31, pvar->client_version_string, strlen(pvar->client_version_string));
-	//debug_print(32, pvar->server_version_string, strlen(pvar->server_version_string));
-	//debug_print(33, buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
-	//debug_print(34, buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
-	//debug_print(35, server_host_key_blob, bloblen);
-
-	// session idの保存（初回接続時のみ）
-	if (pvar->session_id == NULL) {
-		pvar->session_id_len = hashlen;
-		pvar->session_id = malloc(pvar->session_id_len);
-		if (pvar->session_id != NULL) {
-			memcpy(pvar->session_id, hash, pvar->session_id_len);
-		} else {
-			// TODO:
-		}
-	}
-
-	if ((ret = key_verify(hostkey, signature, siglen, hash, hashlen)) != 1) {
-		if (ret == -3 && hostkey->type == KEY_RSA) {
-			if (!pvar->settings.EnableRsaShortKeyServer) {
-				_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-				            "key verify error(remote rsa key length is too short %d-bit) "
-				            "@ handle_SSH2_ecdh_kex_reply()", BN_num_bits(hostkey->rsa->n));
-			}
-			else {
-				goto cont;
-			}
-		}
-		else {
-			_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-			            "key verify error(%d) @ handle_SSH2_ecdh_kex_reply()\r\n%s", ret, SENDTOME);
-		}
-		emsg = emsg_tmp;
-		save_memdump(LOGDUMP);
-		goto error;
-	}
-
-cont:
-	kex_derive_keys(pvar, pvar->we_need, hash, share_key, pvar->session_id, pvar->session_id_len);
-
-	// KEX finish
-	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
-	finish_send_packet(pvar);
-
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was sent at handle_SSH2_ecdh_kex_reply().");
-
-	// SSH2_MSG_NEWKEYSを送り終わったあとにキーの設定および再設定を行う
-	// 送信用の暗号鍵は SSH2_MSG_NEWKEYS の送信後に、受信用のは SSH2_MSG_NEWKEYS の
-	// 受信後に再設定を行う。
-	if (pvar->rekeying == 1) { // キーの再設定
-		// まず、送信用だけ設定する。
-		ssh2_set_newkeys(pvar, MODE_OUT);
-		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
-		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
-		enable_send_compression(pvar);
-		if (!CRYPT_start_encryption(pvar, 1, 0)) {
-			// TODO: error
-		}
-
-	} else {
-		// 初回接続の場合は実際に暗号ルーチンが設定されるのは、あとになってから
-		// なので（CRYPT_start_encryption関数）、ここで鍵の設定をしてしまってもよい。
-		ssh2_set_newkeys(pvar, MODE_OUT);
-
-		// SSH2_MSG_NEWKEYSを送信した時点で、MACを有効にする。(2006.10.30 yutaka)
-		pvar->ssh2_keys[MODE_OUT].mac.enabled = 1;
-		pvar->ssh2_keys[MODE_OUT].comp.enabled = 1;
-
-		// パケット圧縮が有効なら初期化する。(2005.7.9 yutaka)
-		// SSH2_MSG_NEWKEYSの受信より前なのでここだけでよい。(2006.10.30 maya)
-		prep_compression(pvar);
-		enable_compression(pvar);
-	}
-
 	// TTSSHバージョン情報に表示するキービット数を求めておく
 	switch (pvar->kex_type) {
 		case KEX_ECDH_SHA2_256:
@@ -6177,21 +6029,16 @@ cont:
 			break;
 	}
 
-	SSH2_dispatch_init(3);
-	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
-
-	result = TRUE;
+	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
 
 error:
-	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
 	EC_POINT_clear_free(server_public);
+	EC_KEY_free(pvar->ecdh_client_key); pvar->ecdh_client_key = NULL;
 	key_free(hostkey);
 	free(ecdh_buf);
 	BN_free(share_key);
 
-	if (result == FALSE)
+	if (emsg)
 		notify_fatal_error(pvar, emsg, TRUE);
 
 	return result;
