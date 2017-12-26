@@ -1860,8 +1860,6 @@ BOOL SSH_handle_server_ID(PTInstVar pvar, char *ID, int ID_len)
 
 					SSH2_dispatch_init(1);
 					SSH2_dispatch_add_message(SSH2_MSG_KEXINIT);
-					SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.3 yutaka)
-					SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 				}
 			}
 
@@ -2068,6 +2066,11 @@ void SSH2_dispatch_init(int stage)
 {
 	handle_message_count = 0;
 	handle_message_stage = stage;
+
+	SSH2_dispatch_add_message(SSH2_MSG_IGNORE);
+	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
+	SSH2_dispatch_add_message(SSH2_MSG_DISCONNECT);
+	SSH2_dispatch_add_message(SSH2_MSG_UNIMPLEMENTED);
 }
 
 int SSH2_dispatch_enabled_check(unsigned char message)
@@ -5186,8 +5189,6 @@ static void SSH2_dh_kex_init(PTInstVar pvar)
 
 	SSH2_dispatch_init(2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEXDH_REPLY);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
 	buffer_free(msg);
 
@@ -5269,8 +5270,6 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 
 	SSH2_dispatch_init(2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_DH_GEX_GROUP);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
 	buffer_free(msg);
 
@@ -5403,8 +5402,6 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	SSH2_dispatch_init(2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_DH_GEX_REPLY);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
 	buffer_free(msg);
 
@@ -5467,8 +5464,6 @@ static void SSH2_ecdh_kex_init(PTInstVar pvar)
 
 	SSH2_dispatch_init(2);
 	SSH2_dispatch_add_message(SSH2_MSG_KEX_ECDH_REPLY);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
 	buffer_free(msg);
 
@@ -5582,8 +5577,6 @@ cont:
 
 	SSH2_dispatch_init(3);
 	SSH2_dispatch_add_message(SSH2_MSG_NEWKEYS);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE);
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
 	return TRUE;
 }
@@ -6081,14 +6074,7 @@ static void do_SSH2_dispatch_setup_for_transfer(PTInstVar pvar)
 
 	SSH2_dispatch_init(6);
 	SSH2_dispatch_add_range_message(SSH2_MSG_GLOBAL_REQUEST, SSH2_MSG_CHANNEL_FAILURE);
-	SSH2_dispatch_add_message(SSH2_MSG_UNIMPLEMENTED);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX
-	// OpenSSH 3.9ではデータ通信中のDH鍵交換要求が、サーバから送られてくることがある。
 	SSH2_dispatch_add_message(SSH2_MSG_KEXINIT);
-	// HP-UXでX11 forwardingが失敗した場合、下記のメッセージが送られてくる。(2006.4.7 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
-	// OpenSSH はデータ通信中に致命的なエラーがあると SSH2_MSG_DISCONNECT を送ってくる (2007.10.25 maya)
-	SSH2_dispatch_add_message(SSH2_MSG_DISCONNECT);
 }
 
 
@@ -6206,8 +6192,6 @@ BOOL do_SSH2_userauth(PTInstVar pvar)
 
 	SSH2_dispatch_init(4);
 	SSH2_dispatch_add_message(SSH2_MSG_SERVICE_ACCEPT);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_SERVICE_REQUEST was sent at do_SSH2_userauth().");
 
@@ -6229,7 +6213,6 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 	free(svc);
 
 	SSH2_dispatch_init(5);
-	SSH2_dispatch_add_message(SSH2_MSG_IGNORE); // XXX: Tru64 UNIX workaround   (2005.3.5 yutaka)
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 		// keyboard-interactive method
 		SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_INFO_REQUEST);
@@ -6244,7 +6227,6 @@ static BOOL handle_SSH2_service_accept(PTInstVar pvar)
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_SUCCESS);
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_FAILURE);
 	SSH2_dispatch_add_message(SSH2_MSG_USERAUTH_BANNER);
-	SSH2_dispatch_add_message(SSH2_MSG_DEBUG);  // support for authorized_keys command (2006.2.23 yutaka)
 
 	return do_SSH2_authrequest(pvar);
 }
