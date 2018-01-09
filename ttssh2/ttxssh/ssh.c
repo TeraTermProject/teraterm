@@ -4845,20 +4845,22 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		SSH2_send_kexinit(pvar);
 	}
 
-	if (pvar->peer_kex != NULL) { // already allocated
-		buffer_free(pvar->peer_kex);
-	}
-	pvar->peer_kex = buffer_init();
-	if (pvar->peer_kex == NULL) {
-		msg = "Out of memory @ handle_SSH2_kexinit()";
-		goto error;
-	}
-	// [-2]:padding size
-//	len = pvar->ssh_state.payloadlen + pvar->ssh_state.payload[-2] + 1;
+	data = pvar->ssh_state.payload;
 	len = pvar->ssh_state.payloadlen - 1;
-//	buffer_append(pvar->peer_kex, &pvar->ssh_state.payload[-6], len);
-	buffer_append(pvar->peer_kex, pvar->ssh_state.payload, len);
-	//write_buffer_file(&pvar->ssh_state.payload[-6], len);
+
+	// KEX ‚ÌÅŒã‚Å hash (session-id) ‚ðŒvŽZ‚·‚é‚Ì‚ÉŽg‚¤‚Ì‚Å•Û‘¶‚µ‚Ä‚¨‚­
+	if (pvar->peer_kex != NULL) {
+		// already allocated
+		buffer_clear(pvar->peer_kex);
+	}
+	else {
+		pvar->peer_kex = buffer_init();
+		if (pvar->peer_kex == NULL) {
+			msg = __FUNCTION__ ": Out of memory";
+			goto error;
+		}
+	}
+	buffer_append(pvar->peer_kex, data, len);
 
 	// TODO: buffer overrun check
 
