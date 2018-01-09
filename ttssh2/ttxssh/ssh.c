@@ -5545,7 +5545,7 @@ cont:
 	begin_send_packet(pvar, SSH2_MSG_NEWKEYS, 0);
 	finish_send_packet(pvar);
 
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_NEWKEYS was sent at handle_SSH2_dh_kex_reply().");
+	logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": SSH2_MSG_NEWKEYS was sent.");
 
 	// SSH2_MSG_NEWKEYSを送り終わったあとにキーの設定および再設定を行う
 	// 送信用の暗号鍵は SSH2_MSG_NEWKEYS の送信後に、受信用のは SSH2_MSG_NEWKEYS の
@@ -5591,7 +5591,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	int offset = 0;
 	char *server_host_key_blob;
 	int bloblen, siglen;
-	BIGNUM *dh_server_pub = NULL;
+	BIGNUM *server_public = NULL;
 	char *signature;
 	int dh_len, share_len;
 	char *dh_buf = NULL;
@@ -5599,7 +5599,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	char *hash;
 	char *emsg = NULL, emsg_tmp[1024];  // error message
 	int hashlen;
-	Key *hostkey;  // hostkey
+	Key *hostkey = NULL;  // hostkey
 	BOOL result = FALSE;
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEXDH_REPLY was received.");
@@ -5624,7 +5624,7 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	hostkey = key_from_blob(data, bloblen);
 	if (hostkey == NULL) {
-		emsg = "key_from_blob error @ handle_SSH2_dh_kex_reply()";
+		emsg = __FUNCTION__ ": key_from_blob error";
 		goto error;
 	}
 	data += bloblen;
@@ -5632,47 +5632,48 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 	// known_hosts対応 (2006.3.20 yutaka)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "type mismatch for decoded server_host_key_blob (kex:%s blob:%s) @ %s",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type), __FUNCTION__);
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", __FUNCTION__,
+		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
 	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (pvar->socket == INVALID_SOCKET) {
-		emsg = "Server disconnected @ handle_SSH2_dh_kex_reply()";
+		emsg = __FUNCTION__ ": Server disconnected";
 		goto error;
 	}
 
-	dh_server_pub = BN_new();
-	if (dh_server_pub == NULL) {
-		emsg = "Out of memory1 @ handle_SSH2_dh_kex_reply()";
+	server_public = BN_new();
+	if (server_public == NULL) {
+		emsg = __FUNCTION__ ": Out of memory (1)";
 		goto error;
 	}
 
-	buffer_get_bignum2(&data, dh_server_pub);
+	buffer_get_bignum2(&data, server_public);
 
 	siglen = get_uint32_MSBfirst(data);
 	data += 4;
 	signature = data;
 	data += siglen;
 
+	push_memdump("KEXDH_REPLY", "signature", signature, siglen);
 
-	// check DH public value
-	if (!dh_pub_is_valid(pvar->kexdh, dh_server_pub)) {
-		emsg = "DH public value invalid @ handle_SSH2_dh_kex_reply()";
+	// check public key
+	if (!dh_pub_is_valid(pvar->kexdh, server_public)) {
+		emsg = __FUNCTION__ ": invalid server public key";
 		goto error;
 	}
 	// 共通鍵の生成
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
-		emsg = "Out of memory2 @ handle_SSH2_dh_kex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (2)";
 		goto error;
 	}
-	share_len = DH_compute_key(dh_buf, dh_server_pub, pvar->kexdh);
+	share_len = DH_compute_key(dh_buf, server_public, pvar->kexdh);
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory3 @ handle_SSH2_dh_kex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (3)";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
@@ -5681,35 +5682,36 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
-	hash = kex_dh_hash(get_kex_algorithm_EVP_MD(pvar->kex_type),
-	                   pvar->client_version_string,
-	                   pvar->server_version_string,
-	                   buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
-	                   buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
-	                   server_host_key_blob, bloblen,
-	                   pvar->kexdh->pub_key,
-	                   dh_server_pub,
-	                   share_key,
-	                   &hashlen);
+	hash = kex_dh_hash(
+		get_kex_algorithm_EVP_MD(pvar->kex_type),
+		pvar->client_version_string,
+		pvar->server_version_string,
+		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
+		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
+		server_host_key_blob, bloblen,
+		pvar->kexdh->pub_key,
+		server_public,
+		share_key,
+		&hashlen);
 
 	{
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
 
-		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "dh_server_pub", dh_server_pub);
+		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "server_public", server_public);
 		push_bignum_memdump("KEXDH_REPLY kex_dh_kex_hash", "share_key", share_key);
 
 		push_memdump("KEXDH_REPLY kex_dh_kex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHバージョン情報に表示するキービット数を求めておく (2004.10.30 yutaka)
+	// TTSSHバージョン情報に表示するキービット数を求めておく
 	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
-	pvar->server_key_bits = BN_num_bits(dh_server_pub);
+	pvar->server_key_bits = BN_num_bits(server_public);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
 
 error:
-	BN_free(dh_server_pub);
+	BN_free(server_public);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	key_free(hostkey);
 	free(dh_buf);
@@ -5722,11 +5724,9 @@ error:
 }
 
 
-// Diffie-Hellman Key Exchange Reply(SSH2_MSG_KEX_DH_GEX_REPLY:33)
 //
-// C then computes K = f^x mod p, H = hash(V_C ||
-//          V_S || I_C || I_S || K_S || min || n || max || p || g || e ||
-//          f || K), and verifies the signature s on H.
+// Diffie-Hellman Group and Key Exchange Reply(SSH2_MSG_KEX_DH_GEX_REPLY:33)
+//
 static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 {
 	char *data;
@@ -5734,7 +5734,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	int offset = 0;
 	char *server_host_key_blob;
 	int bloblen, siglen;
-	BIGNUM *dh_server_pub = NULL;
+	BIGNUM *server_public = NULL;
 	char *signature;
 	int dh_len, share_len;
 	char *dh_buf = NULL;
@@ -5767,7 +5767,7 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	hostkey = key_from_blob(data, bloblen);
 	if (hostkey == NULL) {
-		emsg = "key_from_blob error @ handle_SSH2_dh_gex_reply()";
+		emsg = __FUNCTION__ ": key_from_blob error";
 		goto error;
 	}
 	data += bloblen;
@@ -5775,24 +5775,24 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 	// known_hosts対応 (2006.3.20 yutaka)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "type mismatch for decoded server_host_key_blob (kex:%s blob:%s) @ %s",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type), __FUNCTION__);
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", __FUNCTION__,
+		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
 	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (pvar->socket == INVALID_SOCKET) {
-		emsg = "Server disconnected @ handle_SSH2_dh_gex_reply()";
+		emsg = __FUNCTION__ ": Server disconnected";
 		goto error;
 	}
 
-	dh_server_pub = BN_new();
-	if (dh_server_pub == NULL) {
-		emsg = "Out of memory1 @ handle_SSH2_dh_gex_reply()";
+	server_public = BN_new();
+	if (server_public == NULL) {
+		emsg = __FUNCTION__ ": Out of memory (1)";
 		goto error;
 	}
 
-	buffer_get_bignum2(&data, dh_server_pub);
+	buffer_get_bignum2(&data, server_public);
 
 	siglen = get_uint32_MSBfirst(data);
 	data += 4;
@@ -5801,22 +5801,22 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	push_memdump("DH_GEX_REPLY", "signature", signature, siglen);
 
-	// check DH public value
-	if (!dh_pub_is_valid(pvar->kexdh, dh_server_pub)) {
-		emsg = "DH public value invalid @ handle_SSH2_dh_gex_reply()";
+	// check public key
+	if (!dh_pub_is_valid(pvar->kexdh, server_public)) {
+		emsg = __FUNCTION__ ": invalid server public key";
 		goto error;
 	}
 	// 共通鍵の生成
 	dh_len = DH_size(pvar->kexdh);
 	dh_buf = malloc(dh_len);
 	if (dh_buf == NULL) {
-		emsg = "Out of memory2 @ handle_SSH2_dh_gex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (2)";
 		goto error;
 	}
-	share_len = DH_compute_key(dh_buf, dh_server_pub, pvar->kexdh);
+	share_len = DH_compute_key(dh_buf, server_public, pvar->kexdh);
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory3 @ handle_SSH2_dh_gex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (3)";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
@@ -5829,18 +5829,16 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		get_kex_algorithm_EVP_MD(pvar->kex_type),
 		pvar->client_version_string,
 		pvar->server_version_string,
-		buffer_ptr(pvar->my_kex),  buffer_len(pvar->my_kex),
-		buffer_ptr(pvar->peer_kex),  buffer_len(pvar->peer_kex),
+		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
+		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
 		server_host_key_blob, bloblen,
-		/////// KEXGEX
 		pvar->kexgex_min,
 		pvar->kexgex_bits,
 		pvar->kexgex_max,
 		pvar->kexdh->p,
 		pvar->kexdh->g,
 		pvar->kexdh->pub_key,
-		/////// KEXGEX
-		dh_server_pub,
+		server_public,
 		share_key,
 		&hashlen);
 
@@ -5848,20 +5846,20 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "peer_kex", buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex));
 
-		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "dh_server_pub", dh_server_pub);
+		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "server_public", server_public);
 		push_bignum_memdump("DH_GEX_REPLY kex_dh_gex_hash", "share_key", share_key);
 
 		push_memdump("DH_GEX_REPLY kex_dh_gex_hash", "hash", hash, hashlen);
 	}
 
-	// TTSSHバージョン情報に表示するキービット数を求めておく (2004.10.30 yutaka)
+	// TTSSHバージョン情報に表示するキービット数を求めておく
 	pvar->client_key_bits = BN_num_bits(pvar->kexdh->pub_key);
-	pvar->server_key_bits = BN_num_bits(dh_server_pub);
+	pvar->server_key_bits = BN_num_bits(server_public);
 
 	result = ssh2_kex_finish(pvar, hash, hashlen, share_key, hostkey, signature, siglen);
 
 error:
-	BN_free(dh_server_pub);
+	BN_free(server_public);
 	DH_free(pvar->kexdh); pvar->kexdh = NULL;
 	key_free(hostkey);
 	free(dh_buf);
@@ -5918,7 +5916,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	hostkey = key_from_blob(data, bloblen);
 	if (hostkey == NULL) {
-		emsg = "key_from_blob error @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": key_from_blob error";
 		goto error;
 	}
 	data += bloblen;
@@ -5926,14 +5924,14 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	// known_hosts対応 (2006.3.20 yutaka)
 	if (hostkey->type != pvar->hostkey_type) {  // ホストキーの種別比較
 		_snprintf_s(emsg_tmp, sizeof(emsg_tmp), _TRUNCATE,
-		            "type mismatch for decoded server_host_key_blob (kex:%s blob:%s) @ %s",
-		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type), __FUNCTION__);
+		            "%s: type mismatch for decoded server_host_key_blob (kex:%s blob:%s)", __FUNCTION__,
+		            get_ssh_keytype_name(pvar->hostkey_type), get_ssh_keytype_name(hostkey->type));
 		emsg = emsg_tmp;
 		goto error;
 	}
 	HOSTS_check_host_key(pvar, pvar->ssh_state.hostname, pvar->ssh_state.tcpport, hostkey);
 	if (pvar->socket == INVALID_SOCKET) {
-		emsg = "Server disconnected @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": Server disconnected";
 		goto error;
 	}
 
@@ -5941,7 +5939,7 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 	group = EC_KEY_get0_group(pvar->ecdh_client_key);
 	server_public = EC_POINT_new(group);
 	if (server_public == NULL) {
-		emsg = "Out of memory1 @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (1)";
 		goto error;
 	}
 
@@ -5956,24 +5954,24 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	// check public key
 	if (key_ec_validate_public(group, server_public) != 0) {
-		emsg = "ECDH invalid server public key @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": invalid server public key";
 		goto error;
 	}
 	// 共通鍵の生成
 	ecdh_len = (EC_GROUP_get_degree(group) + 7) / 8;
 	ecdh_buf = malloc(ecdh_len);
 	if (ecdh_buf == NULL) {
-		emsg = "Out of memory2 @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (2)";
 		goto error;
 	}
 	if (ECDH_compute_key(ecdh_buf, ecdh_len, server_public,
 	                     pvar->ecdh_client_key, NULL) != (int)ecdh_len) {
-		emsg = "Out of memory3 @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (3)";
 		goto error;
 	}
 	share_key = BN_new();
 	if (share_key == NULL) {
-		emsg = "Out of memory4 @ handle_SSH2_ecdh_kex_reply()";
+		emsg = __FUNCTION__ ": Out of memory (4)";
 		goto error;
 	}
 	// 'share_key'がサーバとクライアントで共有する鍵（G^A×B mod P）となる。
@@ -5982,17 +5980,18 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	// ハッシュの計算
 	/* calc and verify H */
-	hash = kex_ecdh_hash(get_kex_algorithm_EVP_MD(pvar->kex_type),
-	                     group,
-	                     pvar->client_version_string,
-	                     pvar->server_version_string,
-	                     buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
-	                     buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
-	                     server_host_key_blob, bloblen,
-	                     EC_KEY_get0_public_key(pvar->ecdh_client_key),
-	                     server_public,
-	                     share_key,
-	                     &hashlen);
+	hash = kex_ecdh_hash(
+		get_kex_algorithm_EVP_MD(pvar->kex_type),
+		group,
+		pvar->client_version_string,
+		pvar->server_version_string,
+		buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex),
+		buffer_ptr(pvar->peer_kex), buffer_len(pvar->peer_kex),
+		server_host_key_blob, bloblen,
+		EC_KEY_get0_public_key(pvar->ecdh_client_key),
+		server_public,
+		share_key,
+		&hashlen);
 
 	{
 		push_memdump("KEX_ECDH_REPLY ecdh_kex_reply", "my_kex", buffer_ptr(pvar->my_kex), buffer_len(pvar->my_kex));
