@@ -115,10 +115,7 @@ void *buffer_append_space(buffer_t * buf, size_t size)
 	return (p);
 
 panic:
-	{
-		char *p = NULL;
-		*p = 0; // application fault
-	}
+	abort();
 	return (NULL);
 }
 
@@ -153,11 +150,7 @@ int buffer_append(buffer_t * buf, char *ptr, int size)
 	return (ret);
 
 panic:
-	{
-	char *p = NULL;
-	*p = 0; // application fault
-	}
-
+	abort();
 	return (ret);
 }
 
