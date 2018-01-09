@@ -4864,12 +4864,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	// TODO: buffer overrun check
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
-	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディング+1)；真のパケットサイズ
-	len = pvar->ssh_state.payloadlen;
-
-	//write_buffer_file(data, len);
 	push_memdump("KEXINIT", "exchange algorithm list: receiving", data, len);
 
 	if (offset + 20 >= len) {
@@ -5610,10 +5604,10 @@ static BOOL handle_SSH2_dh_kex_reply(PTInstVar pvar)
 
 	// TODO: buffer overrun check
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
-	len = pvar->ssh_state.payloadlen;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
 
 	// for debug
 	push_memdump("KEXDH_REPLY", "key exchange: receiving", data, len);
@@ -5753,10 +5747,10 @@ static BOOL handle_SSH2_dh_gex_reply(PTInstVar pvar)
 
 	// TODO: buffer overrun check
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
-	len = pvar->ssh_state.payloadlen;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
 
 	// for debug
 	push_memdump("DH_GEX_REPLY", "key exchange: receiving", data, len);
@@ -5902,10 +5896,10 @@ static BOOL handle_SSH2_ecdh_kex_reply(PTInstVar pvar)
 
 	// TODO: buffer overrun check
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
+	// メッセージタイプの後に続くペイロードの先頭
 	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
-	len = pvar->ssh_state.payloadlen;
+	// ペイロードの長さ; メッセージタイプ分の 1 バイトを減らす
+	len = pvar->ssh_state.payloadlen - 1;
 
 	// for debug
 	push_memdump("KEX_ECDH_REPLY", "key exchange: receiving", data, len);
@@ -7528,15 +7522,15 @@ static BOOL handle_SSH2_client_global_request(PTInstVar pvar)
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_GLOBAL_REQUEST was received.");
 
 	// SSH2 packet format:
-	// [size(4) + padding size(1) + type(1)] + [payload(N) + padding(X)]
-	//  header                                     body
-	//                                         ^data
-	//            <-----------------size------------------------------->
-	//                              <---------len-------->
+	// size(4) + padding size(1) + type(1) + payload(N) + padding(X)
+	//                                       ^data
+	//           <-----------------size---------------------------->
+	//                             <--------len------->
 	//
-	// data = payload(N) + padding(X): パディングも含めたボディすべてを指す。
+	// data: メッセージタイプに続くペイロードの先頭を指すポインタ
 	data = pvar->ssh_state.payload;
-	// len = size - (padding size + 1): パディングを除くボディ。typeが先頭に含まれる。
+	// len = size - (padding size + sizeof(padding size)) = sizeof(type) + sizeof(payload):
+	// ペイロード部分の長さ。type 分も含む
 	len = pvar->ssh_state.payloadlen;
 
 	len--;   // type 分を除く
