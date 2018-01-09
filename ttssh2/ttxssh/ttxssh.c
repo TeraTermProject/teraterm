@@ -932,7 +932,7 @@ void notify_fatal_error(PTInstVar pvar, char *msg, BOOL send_disconnect)
 void logputs(int level, char *msg)
 {
 	if (level <= pvar->settings.LogLevel) {
-		char buf[1024];
+		char buf[4096];
 		int file;
 
 		get_teraterm_dir_relative_name(buf, NUM_ELEM(buf), "TTSSH.LOG");
