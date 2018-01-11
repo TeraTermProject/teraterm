@@ -133,6 +133,11 @@ static void ssh2_scp_get_packetlist(Channel_t *c, unsigned char **buf, unsigned 
 static void ssh2_scp_free_packetlist(Channel_t *c);
 static void get_window_pixel_size(PTInstVar pvar, int *x, int *y);
 
+// マクロ
+#define remained_payload(pvar) ((pvar)->ssh_state.payload + payload_current_offset(pvar))
+#define remained_payloadlen(pvar) ((pvar)->ssh_state.payloadlen - (pvar)->ssh_state.payload_grabbed)
+#define payload_current_offset(pvar) ((pvar)->ssh_state.payload_grabbed - 1)
+
 //
 // Global request confirm
 //
@@ -4845,8 +4850,8 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		SSH2_send_kexinit(pvar);
 	}
 
-	data = pvar->ssh_state.payload;
-	len = pvar->ssh_state.payloadlen - 1;
+	data = remained_payload(pvar);
+	len = remained_payloadlen(pvar);
 
 	// KEX の最後で hash (session-id) を計算するのに使うので保存しておく
 	if (pvar->peer_kex != NULL) {
