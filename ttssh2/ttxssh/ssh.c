@@ -4827,7 +4827,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 {
 	char buf[1024];
 	char *data;
-	int len, i, size;
+	int len, size;
 	int offset = 0;
 	char *msg = NULL;
 	char tmp[1024+512];
@@ -4883,10 +4883,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// キー交換アルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed kex algorithms is too long.");
 	}
-	buf[i] = '\0'; // null-terminate
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: KEX algorithm: %s", buf);
@@ -4903,10 +4904,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// ホストキーアルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed hostkey algorithms is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
@@ -4931,10 +4933,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// クライアント -> サーバ暗号アルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed encryption algorithms (client to server) is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
@@ -4951,10 +4954,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// サーバ -> クライアント暗号アルゴリズムチェック
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed encryption algorithms (server to client) is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
@@ -4971,10 +4975,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// MAC(Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed MAC algorithms (client to server) is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
@@ -4995,10 +5000,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed MAC algorithms (server to client) is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
@@ -5022,10 +5028,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	// (2005.7.9 yutaka)
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed compression algorithms (client to server) is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm client to server: %s", buf);
@@ -5041,10 +5048,11 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	size = get_payload_uint32(pvar, offset);
 	offset += 4;
-	for (i = 0; i < size; i++) {
-		buf[i] = data[offset + i];
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed compression algorithms (server to client) is too long.");
 	}
-	buf[i] = 0;
+	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
 	offset += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm server to client: %s", buf);
