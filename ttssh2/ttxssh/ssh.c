@@ -4940,7 +4940,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
 
 	pvar->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
-	if (pvar->ciphers[MODE_OUT]->id == SSH_CIPHER_NONE) {
+	if (pvar->ciphers[MODE_OUT] == NULL) {
 		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(ctos): ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
@@ -4960,7 +4960,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
 
 	pvar->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
-	if (pvar->ciphers[MODE_IN]->id == SSH_CIPHER_NONE) {
+	if (pvar->ciphers[MODE_IN] == NULL) {
 		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(stoc): ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
