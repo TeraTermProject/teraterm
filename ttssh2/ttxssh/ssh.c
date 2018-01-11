@@ -4833,7 +4833,6 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	char buf[1024];
 	char *data;
 	int len, size;
-	int offset = 0;
 	char *msg = NULL;
 	char tmp[1024+512];
 	char str_keytype[20];
@@ -4853,7 +4852,7 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	data = remained_payload(pvar);
 	len = remained_payloadlen(pvar);
 
-	// KEX の最後で hash (session-id) を計算するのに使うので保存しておく
+	// KEX の最後で exchange-hash (session-id) を計算するのに使うので保存しておく
 	if (pvar->peer_kex != NULL) {
 		// already allocated
 		buffer_clear(pvar->peer_kex);
@@ -4867,33 +4866,35 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 	buffer_append(pvar->peer_kex, data, len);
 
-	// TODO: buffer overrun check
-
 	push_memdump("KEXINIT", "exchange algorithm list: receiving", data, len);
 
-	if (offset + 20 >= len) {
-		msg = "payload size too small @ handle_SSH2_kexinit()";
+	// cookie; ここでは使わないので読み飛ばす
+	if (! grab_payload(pvar, SSH2_COOKIE_LENGTH)) {
+		msg = __FUNCTION__ ": truncated packet (cookie)";
 		goto error;
 	}
 
 	// get rid of Cookie length
-	offset += SSH2_COOKIE_LENGTH;
+	data += SSH2_COOKIE_LENGTH;
 
+	// 各要素(鍵交換,暗号化等)で使用するアルゴリズムの決定。
+	// サーバからはカンマ区切りでのリストが送られて来る。
+	// クライアントとサーバ両方がサポートしている物のうち、
+	// クライアント側で最も前に指定した物が使われる。
 
-	// KEXの決定。判定順をmyproposal[PROPOSAL_KEX_ALGS]の並びと合わせること。
-	// サーバは、クライアントから送られてきた myproposal[PROPOSAL_KEX_ALGS] のカンマ文字列のうち、
-	// 先頭から自分の myproposal[] と比較を行い、最初にマッチしたものがKEXアルゴリズムとして
-	// 選択される。(2004.10.30 yutaka)
-
-	// キー交換アルゴリズムチェック
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// 鍵交換アルゴリズム
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (kex algorithms)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed kex algorithms is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: KEX algorithm: %s", buf);
 
@@ -4905,16 +4906,19 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-
-	// ホストキーアルゴリズムチェック
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// ホスト鍵アルゴリズム
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (hostkey algorithms)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed hostkey algorithms is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
 
@@ -4934,63 +4938,72 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-
-	// クライアント -> サーバ暗号アルゴリズムチェック
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// 暗号アルゴリズム(クライアント -> サーバ)
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (encryption algorithms client to server)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed encryption algorithms (client to server) is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
 
 	pvar->ciphers[MODE_OUT] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_CTOS]);
-	if (pvar->ciphers[MODE_OUT] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(ctos): ", _TRUNCATE);
+	if (pvar->ciphers[MODE_OUT]->id == SSH_CIPHER_NONE) {
+		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(client to server): ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
 	}
 
-
-	// サーバ -> クライアント暗号アルゴリズムチェック
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// 暗号アルゴリズム(サーバ -> クライアント)
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (encryption algorithms server to client)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed encryption algorithms (server to client) is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
 
 	pvar->ciphers[MODE_IN] = choose_SSH2_cipher_algorithm(buf, myproposal[PROPOSAL_ENC_ALGS_STOC]);
-	if (pvar->ciphers[MODE_IN] == NULL) {
-		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(stoc): ", _TRUNCATE);
+	if (pvar->ciphers[MODE_IN]->id == SSH_CIPHER_NONE) {
+		strncpy_s(tmp, sizeof(tmp), "unknown Encrypt algorithm(server to client): ", _TRUNCATE);
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
 	}
 
-
-	// MAC(Message Authentication Code)アルゴリズムの決定 (2004.12.17 yutaka)
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// MACアルゴリズム(クライアント -> サーバ)
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (MAC algorithms client to server)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed MAC algorithms (client to server) is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
 
 	if (pvar->ciphers[MODE_OUT]->auth_len > 0) {
-		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (c2s)");
+		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (client to server)");
 		pvar->macs[MODE_OUT] = get_ssh2_mac(HMAC_IMPLICIT);
 	}
 	else {
@@ -5003,19 +5016,24 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		}
 	}
 
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// MACアルゴリズム(サーバ -> クライアント)
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (MAC algorithms server to client)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed MAC algorithms (server to client) is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
 
 	if (pvar->ciphers[MODE_IN]->auth_len > 0) {
-		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (s2c)");
+		logputs(LOG_LEVEL_VERBOSE, "AEAD cipher is selected, ignoring MAC algorithms. (server to client)");
 		pvar->macs[MODE_IN] = get_ssh2_mac(HMAC_IMPLICIT);
 	}
 	else {
@@ -5028,17 +5046,19 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		}
 	}
 
-	// 圧縮アルゴリズムの決定
-	// pvar->ssh_state.compressing = FALSE; として下記メンバを使用する。
-	// (2005.7.9 yutaka)
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// 圧縮アルゴリズム(クライアント -> サーバ)
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (compression algorithms client to server)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed compression algorithms (client to server) is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm client to server: %s", buf);
 
@@ -5050,15 +5070,19 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-
-	size = get_payload_uint32(pvar, offset);
-	offset += 4;
+	// 圧縮アルゴリズム(サーバ -> クライアント)
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		msg = __FUNCTION__ ": truncated packet (compression algorithms server to client)";
+		goto error;
+	}
+	data += 4;
 
 	if (size >= sizeof(buf)) {
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed compression algorithms (server to client) is too long.");
 	}
-	strncpy_s(buf, sizeof(buf), data+offset, _TRUNCATE);
-	offset += size;
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm server to client: %s", buf);
 
@@ -5070,39 +5094,31 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-
-	// 決定
+skip:
+	// 決定した方式をログに出力
 	logprintf(LOG_LEVEL_VERBOSE, "KEX algorithm: %s",
 		get_kex_algorithm_name(pvar->kex_type));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"server host key algorithm: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "server host key algorithm: %s",
 		get_ssh_keytype_name(pvar->hostkey_type));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"encryption algorithm client to server: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm client to server: %s",
 		get_cipher_string(pvar->ciphers[MODE_OUT]));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"encryption algorithm server to client: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "encryption algorithm server to client: %s",
 		get_cipher_string(pvar->ciphers[MODE_IN]));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"MAC algorithm client to server: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "MAC algorithm client to server: %s",
 		get_ssh2_mac_name(pvar->macs[MODE_OUT]));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"MAC algorithm server to client: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "MAC algorithm server to client: %s",
 		get_ssh2_mac_name(pvar->macs[MODE_IN]));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"compression algorithm client to server: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm client to server: %s",
 		get_ssh2_comp_name(pvar->ctos_compression));
 
-	logprintf(LOG_LEVEL_VERBOSE,
-		"compression algorithm server to client: %s",
+	logprintf(LOG_LEVEL_VERBOSE, "compression algorithm server to client: %s",
 		get_ssh2_comp_name(pvar->stoc_compression));
-
 
 	// we_needの決定 (2004.11.6 yutaka)
 	// キー再作成の場合はスキップする。
