@@ -4826,8 +4826,26 @@ static void choose_SSH2_key_maxlength(PTInstVar pvar)
 }
 
 
-// キー交換開始前のチェック (SSH2_MSG_KEXINIT)
-// ※当該関数はデータ通信中にも呼ばれてくる可能性あり
+/*
+ * キー交換開始前のチェック (SSH2_MSG_KEXINIT)
+ * ※当該関数はデータ通信中にも呼ばれてくる可能性あり
+ *
+ * SSH2_MSG_KEXINIT:
+ *   byte         SSH_MSG_KEXINIT
+ *   byte[16]     cookie (random bytes)
+ *   name-list    kex_algorithms
+ *   name-list    server_host_key_algorithms
+ *   name-list    encryption_algorithms (c2s)
+ *   name-list    encryption_algorithms (s2c)
+ *   name-list    mac_algorithms (c2s)
+ *   name-list    mac_algorithms (s2c)
+ *   name-list    compression_algorithms (c2s)
+ *   name-list    compression_algorithms (s2c)
+ *   name-list    languages (c2s)
+ *   name-list    languages (s2c)
+ *   boolean      first_kex_packet_follows
+ *   uint32       0 (reserved for future extension)
+ */
 static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 {
 	char buf[1024];
@@ -5092,6 +5110,68 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		strncat_s(tmp, sizeof(tmp), buf, _TRUNCATE);
 		msg = tmp;
 		goto error;
+	}
+
+	// 言語(クライアント -> サーバ)
+	// 現状では未使用。ログに記録するだけ。
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		// 言語の name-list が取れないという事は KEXINIT パケットのフォーマット自体が想定外であり
+		// 異常な状態であるが、通信に必要なアルゴリズムはすでにネゴ済みで通信自体は行える。
+		// 今まではこの部分のチェックを行っていなかったので、警告を記録するのみで処理を続行する。
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (language client to server)");
+		goto skip;
+	}
+	data += 4;
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed language (client to server) is too long.");
+	}
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language client to server: %s", buf);
+
+	// 言語(サーバ -> クライアント)
+	// 現状では未使用。ログに記録するだけ。
+	if (!grab_payload(pvar, 4)
+	 || !grab_payload(pvar, size = get_uint32(data))) {
+		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (language server to client)");
+		goto skip;
+	}
+	data += 4;
+
+	if (size >= sizeof(buf)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed language (server to client) is too long.");
+	}
+	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
+	data += size;
+
+	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language server to client: %s", buf);
+
+	// first_kex_packet_follows:
+	// KEXINIT パケットの後に、アルゴリズムのネゴ結果を推測して鍵交換パケットを送っているか。
+	// SSH_MSG_KEXINIT の後の鍵交換はクライアント側から送るのでサーバ側が 1 にする事はないはず。
+	if (!grab_payload(pvar, 1)) {
+		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (first_kex_packet_follows)");
+		goto skip;
+	}
+	if (data[0] != 0) {
+		// 前述のようにサーバ側は 0 以外にする事はないはずなので、警告を記録する。
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": first_kex_packet_follows is not 0. (%d)", data[0]);
+	}
+	data++;
+
+	// reserved: 現状は常に 0 となる。
+	if (!grab_payload(pvar, 4)) {
+		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (reserved)");
+		goto skip;
+	}
+	if ((size = get_uint32(data)) != 0) {
+		logprintf(LOG_LEVEL_INFO, __FUNCTION__ ": reserved data is not 0. (%d)", size);
 	}
 
 skip:
