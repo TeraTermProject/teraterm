@@ -5453,11 +5453,14 @@ error:;
 	notify_fatal_error(pvar, "error occurred @ SSH2_dh_gex_kex_init()", TRUE);
 }
 
-
-// SSH2_MSG_KEX_DH_GEX_GROUP
+/*
+ * SSH2_MSG_KEX_DH_GEX_GROUP:
+ *   byte    SSH_MSG_KEX_DH_GEX_GROUP
+ *   mpint   p, safe prime
+ *   mpint   g, generator for subgroup in GF(p)
+ */
 static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 {
-	char *data;
 	int len, grp_bits;
 	BIGNUM *p = NULL, *g = NULL;
 	DH *dh = NULL;
@@ -5467,18 +5470,15 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 
 	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_KEX_DH_GEX_GROUP was received.");
 
-	// 6byte（サイズ＋パディング＋タイプ）を取り除いた以降のペイロード
-	data = pvar->ssh_state.payload;
-	// パケットサイズ - (パディングサイズ+1)；真のパケットサイズ
-	len = pvar->ssh_state.payloadlen;
-
 	p = BN_new();
 	g = BN_new();
 	if (p == NULL || g == NULL)
 		goto error;
 
-	buffer_get_bignum2(&data, p); // 素数の取得
-	buffer_get_bignum2(&data, g); // 生成元の取得
+	if (!get_mpint_from_payload(pvar, p) || !get_mpint_from_payload(pvar, g)) {
+		notify_fatal_error(pvar, __FUNCTION__ ":truncated packet (mpint)", FALSE);
+		return FALSE;
+	}
 
 	grp_bits = BN_num_bits(p);
 	logprintf(LOG_LEVEL_VERBOSE, "DH-GEX: Request: %d / %d / %d, Received: %d",
