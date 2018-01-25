@@ -5392,16 +5392,16 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 	}
 
 	// サーバが保証すべき最低限のビット数を求める（we_needはバイト）。
-	if (pvar->settings.GexMinimalGroupSize < GEX_GRP_MINSIZE) {
-		min = GEX_GRP_MINSIZE;
+	if (pvar->settings.GexMinimalGroupSize < GEX_GRP_LIMIT_MIN) {
+		min = GEX_GRP_LIMIT_MIN;
 	}
-	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_MAXSIZE) {
-		min = GEX_GRP_MAXSIZE;
+	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_LIMIT_MAX) {
+		min = GEX_GRP_LIMIT_MAX;
 	}
 	else {
 		min = pvar->settings.GexMinimalGroupSize;
 	}
-	max = GEX_GRP_MAXSIZE;
+	max = GEX_GRP_LIMIT_MAX;
 	bits = dh_estimate(pvar->we_need * 8);
 	if (bits < min) {
 		bits = min;
@@ -5485,9 +5485,9 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	            pvar->kexgex_min, pvar->kexgex_bits, pvar->kexgex_max, BN_num_bits(p));
 
 	//
-	// (1) < GEX_GRP_MINSIZE <= (2) < kexgex_min <= (3) < kexgex_bits <= (4) <= kexgex_max < (5) <= GEX_GRP_MAXSIZE < (6)
+	// (1) < GEX_GRP_LIMIT_MIN <= (2) < kexgex_min <= (3) < kexgex_bits <= (4) <= kexgex_max < (5) <= GEX_GRP_LIMIT_MAX < (6)
 	//
-	if (grp_bits < GEX_GRP_MINSIZE || grp_bits > GEX_GRP_MAXSIZE) {
+	if (grp_bits < GEX_GRP_LIMIT_MIN || grp_bits > GEX_GRP_LIMIT_MAX) {
 	// (1), (6) プロトコルで認められている範囲(1024 <= grp_bits <= 8192)の外。強制切断。
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_OUTOFRANGE", pvar,
 		                  "Received group size is out of range: %d");
@@ -5516,7 +5516,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 	}
 	else {
 	// (5) こちらの設定した最大値より大きい。確認ダイアログを出す。
-	//     ただし現状では kexgex_max == GEX_GRP_MAXSIZE(8192) である為この状況になる事は無い。
+	//     ただし現状では kexgex_max == GEX_GRP_LIMIT_MAX(8192) である為この状況になる事は無い。
 		logprintf(LOG_LEVEL_WARNING,
 			"DH-GEX: grp_bits(%d) > kexgex_max(%d)", grp_bits, pvar->kexgex_max);
 		UTIL_get_lang_msg("MSG_SSH_GEX_SIZE_LARGER", pvar,

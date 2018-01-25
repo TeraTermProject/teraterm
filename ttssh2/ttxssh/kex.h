@@ -28,8 +28,9 @@
 
 #include "ttxssh.h"
 
-#define GEX_GRP_MINSIZE 1024
-#define GEX_GRP_MAXSIZE 8192
+// SSH_MSG_KEY_DH_GEX_REQUEST ‚Å‚Ì min, n, max ‚ª‚Æ‚è“¾‚é”ÍˆÍ‚ÌãŒÀ/‰ºŒÀ (RFC 4419)
+#define GEX_GRP_LIMIT_MIN   1024
+#define GEX_GRP_LIMIT_MAX   8192
 
 DH *dh_new_group1(void);
 DH *dh_new_group14(void);
