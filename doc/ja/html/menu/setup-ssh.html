@@ -117,7 +117,7 @@
 	</table>
       </dd>
 
-      <dt id="KnownHosts">SSH Known Hosts</dt>
+      <dt id="KnownHostsFiles">SSH Known Hosts</dt>
       <dd>
 	SSH で接続したホスト (とホスト公開鍵) が格納されるファイルを指定します。
       </dd>
@@ -135,7 +135,7 @@
 	</dl>
       </dd>
 
-      <dt id="KeepAlive">HeartBeat (keep-alive)</dt>
+      <dt id="HeartBeat">HeartBeat (keep-alive)</dt>
       <dd>
 	一定時間ごとにパケットをホストに送信し、接続を維持します。
 	(特に NAT 環境下で有効。) 0を指定すると当該機能を無効化します。
@@ -146,19 +146,19 @@
 	認証に成功したパスワードをメモリ上に保存します。保存されたパスワードは "Duplicate session" をしたときに使用されます。Tera Termのセッションが切断される際に、メモリは消去されます。
       </dd>
 
-      <dt id="AgentForwarding">Enable agent forwarding</dt>
+      <dt id="ForwardAgent">Enable agent forwarding</dt>
       <dd>
 	Pageant を利用した SSH エージェント転送を有効にします。
       </dd>
 
-      <dt id="AgentForwardingConfirm">Confirm agent forwarding</dt>
+      <dt id="ForwardAgentConfirm">Confirm agent forwarding</dt>
       <dd>
 	リモートから SSH エージェント転送が要求されたとき、要求に応えて Pageant に問い合わせるかどうかユーザに確認します。
       </dd>
 
-      <dt id="SSHFP">Verify host key fingerprint by DNS</dt>
+      <dt id="VerifyHostKeyDNS">Verify host key fingerprint by DNS</dt>
       <dd>
-	<a href="../usage/ssh.html#SSHFP">SSHFP リソースレコード</a>を利用して SSH サーバホスト鍵を検証するか指定します。<br />
+	<a href="../usage/ssh.html#VerifyHostKeyDNS">SSHFP リソースレコード</a>を利用して SSH サーバホスト鍵を検証するか指定します。<br />
 	この検証結果は参考程度の位置づけです。
       </dd>
 
@@ -278,7 +278,7 @@
 	</table>
       </dd>
 
-      <dt id="CompressionOrder">Compression order (SSH2 only)</dt>
+      <dt id="CompOrder">Compression order (SSH2 only)</dt>
       <dd>
 	SSH2 接続で使用する圧縮方式を順序を付けて指定します。<br>
 	&lt;Compressions below this line are disabled&gt;以下の暗号は使用されません。
@@ -298,7 +298,7 @@
 	</table>
       </dd>
 
-      <dt id="CompressionLevel">Compression level</dt>
+      <dt id="Compression">Compression level</dt>
       <dd>
 	通信路の圧縮レベルを指定します。
 	右にスライドさせるほど圧縮が強くかかります。

@@ -13,7 +13,7 @@
 
     <h2>"TTSSH: Authentication Setup" ダイアログボックス</h2>
     <dl>
-      <dt>User name</dt>
+      <dt id="DefaultUserName">User name</dt>
       <dd>
         SSH 接続で用いるユーザ名を指定します。
       </dd>
@@ -25,13 +25,34 @@
 
       <dt>Use RSA/DSA/ECDSA/ED25519 key to login</dt>
       <dd>
-        あらかじめ作成した RSA/DSA/ECDSA/ED25519 鍵を用いた認証方法を選択します。<br />
-        OpenSSH 形式のほか、TTSSH 2.63(Tera Term 4.76) 以降では PuTTY 形式・SECSH(ssh.com) 形式の SSH2 秘密鍵に対応しています。
+        あらかじめ作成した RSA/DSA/ECDSA/ED25519 鍵を用いた認証方法を選択します。
+
+        <dl>
+          <dt id="DefaultRSAPrivateKeyFile">Private key file<dt>
+          <dd>
+            OpenSSH 形式の秘密鍵ファイルを指定します。<br />
+            TTSSH 2.63(Tera Term 4.76) 以降では PuTTY 形式・SECSH(ssh.com) 形式の SSH2 秘密鍵にも対応しています。
+          </dd>
+        </dl>
       </dd>
 
       <dt>Use rhost to login (SSH1)</dt>
       <dd>
         ホストの設定で rhost が利用できる場合に選択します。
+
+        <dl>
+          <dt id="DefaultRhostsLocalUserName">Local user name<dt>
+          <dd>
+            ユーザ名を指定します。
+          </dd>
+        </dl>
+
+        <dl>
+          <dt id="DefaultRhostsHostPrivateKeyFile">Host private key file<dt>
+          <dd>
+            OpenSSH 形式の秘密鍵ファイルを指定します。
+          </dd>
+        </dl>
       </dd>
 
       <dt>
@@ -50,7 +71,7 @@
         TTSSH は秘密鍵ファイルを扱いません。
       </dd>
 
-      <dt>
+      <dt id="CheckAuthListFirst">
         Check the supported authentication methods before login (SSH2)
       </dt>
       <dd>

@@ -117,7 +117,7 @@
 	</table>
       </dd>
 
-      <dt id="KnownHosts">SSH Known Hosts</dt>
+      <dt id="KnownHostsFiles">SSH Known Hosts</dt>
       <dd>
 	Specify the file which includes a name of Host connected via SSH
 	(and Public key for Host).
@@ -136,7 +136,7 @@
 	</dl>
       </dd>
 
-      <dt id="KeepAlive">HeartBeat (keep-alive)</dt>
+      <dt id="HeartBeat">HeartBeat (keep-alive)</dt>
       <dd>
 	A Keep-alive packet is sent on a regular basis to maintain the
 	connection (particularly useful under NAT). If 0 is specified,
@@ -148,19 +148,19 @@
 	The user password is preserved in the memory. The password in the memory is used by "Duplicate session" function. The password is deleted in the memory when Tera Term session disconnects.
       </dd>
 
-      <dt id="AgentForwarding">Enable agent forwarding</dt>
+      <dt id="ForwardAgent">Enable agent forwarding</dt>
       <dd>
       The SSH agent forwarding is enabled using by the Pageant application.
       </dd>
 
-      <dt id="AgentForwardingConfirm">Confirm agent forwarding</dt>
+      <dt id="ForwardAgentConfirm">Confirm agent forwarding</dt>
       <dd>
 	When the SSH agent-forwarding is requested, a user will confirm contacting the Pageant.
       </dd>
 
-      <dt id="SSHFP">Verify host key fingerprint by DNS</dt>
+      <dt id="VerifyHostKeyDNS">Verify host key fingerprint by DNS</dt>
       <dd>
-	The host key of the SSH server is verified by using the <a href="../usage/ssh.html#SSHFP">SSHFP Resource Record</a>.<br />
+	The host key of the SSH server is verified by using the <a href="../usage/ssh.html#VerifyHostKeyDNS">SSHFP Resource Record</a>.<br />
 	The result of this verification should be used only as a guide.
       </dd>
 
@@ -280,7 +280,7 @@
 	</table>
       </dd>
 
-      <dt id="CompressionOrder">Compression order (SSH2 only)</dt>
+      <dt id="CompOrder">Compression order (SSH2 only)</dt>
       <dd>
 	Specify the type of compression key for SSH2 with the order.<br>
 	&lt;Compressions below this line are disabled&gt;
@@ -300,7 +300,7 @@
 	</table>
       </dd>
 
-      <dt id="CompressionLevel">Compression level</dt>
+      <dt id="Compression">Compression level</dt>
       <dd>
 	Specify the level of compression for transmission. The more right,
 	the more compression is done (note: it may degrade the throughout

@@ -13,7 +13,7 @@
 
     <h2>"TTSSH: Authentication Setup" Dialog box</h2>
     <dl>
-      <dt>User name</dt>
+      <dt id="DefaultUserName">User name</dt>
       <dd>
         Specify user name to be used for SSH connection.
       </dd>
@@ -26,12 +26,32 @@
       <dt>Use RSA/DSA/ECDSA/ED25519 key to login</dt>
       <dd>
         Choose an authentication method using RSA/DSA/ECDSA/ED25519 key which are previously generated.<br />
-        TTSSH 2.63(Tera Term 4.76) later can support the PuTTY format and SECSH(ssh.com) format of the SSH2 private key.
+        <dl>
+          <dt id="DefaultRSAPrivateKeyFile">Private key file<dt>
+          <dd>
+            Specify OpenSSH format private key file.<br />
+            TTSSH 2.63(Tera Term 4.76) later can support the PuTTY format and SECSH(ssh.com) format of the SSH2 private key.
+          </dd>
+        </dl>
       </dd>
 
       <dt>Use rhost to login (SSH1)</dt>
       <dd>
         Specify if rhost connection is allowed by Host.
+
+        <dl>
+          <dt id="DefaultRhostsLocalUserName">Local user name<dt>
+          <dd>
+            ユーザ名を指定します。
+          </dd>
+        </dl>
+
+        <dl>
+          <dt id="DefaultRhostsHostPrivateKeyFile">Host private key file<dt>
+          <dd>
+            Specify OpenSSH format private key file.
+          </dd>
+        </dl>
       </dd>
 
       <dt>
@@ -50,7 +70,7 @@
         TTSSH does not handle a private key file.
       </dd>
 
-      <dt>
+      <dt id="CheckAuthListFirst">
         Check the supported authentication methods before login (SSH2)
       </dt>
       <dd>
