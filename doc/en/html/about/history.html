@@ -2970,6 +2970,15 @@ SYNOPSIS:
 
 <h3><a name="ttssh_2.84">2018.02.28 (Ver 2.84) not released</a></h3>
 <ul class="history">
+  <li>Changes
+    <ul>
+      <li>The minimum group size of the Diffie-Hellman group exchange key exchange method is increased to 2048. (RFC 8270)
+        <ul>
+          <li>To change to the previous behavior, set the GexMinimalGroupSize entry in teraterm.ini file to 1024.</li></li>
+        </ul></li>
+    </ul>
+  </li>
+
   <li>Bug fixes
     <ul>
       <!--li>バージョン情報ダイアログのサーバホスト鍵の指紋に、同一サーバで接続に使用されていない方式の鍵が表示されることがある問題を修正した。</li-->

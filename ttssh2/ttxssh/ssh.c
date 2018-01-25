@@ -5375,9 +5375,15 @@ error:;
 
 
 
-//
-// DH-GEX (RFC 4419)
-//
+/*
+ * DH-GEX (RFC 4419)
+ *
+ * SSH_MSG_KEY_DH_GEX_REQUEST:
+ *   byte    SSH_MSG_KEY_DH_GEX_REQUEST (34)
+ *   uint32  min, minimal size in bits of an acceptable group
+ *   uint32  n, preferred size in bits of the group the server will send
+ *   uint32  max, maximal size in bits of an acceptable group
+ */
 
 static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 {
@@ -5391,17 +5397,31 @@ static void SSH2_dh_gex_kex_init(PTInstVar pvar)
 		goto error;
 	}
 
-	// サーバが保証すべき最低限のビット数を求める（we_needはバイト）。
-	if (pvar->settings.GexMinimalGroupSize < GEX_GRP_LIMIT_MIN) {
+	// サーバに要求する group size の min, n(preferred), max を決定する。
+	if (pvar->settings.GexMinimalGroupSize == 0) {
+		// 0 (未設定) だった時は最新の推奨値を使う
+		min = GEX_GRP_DEFAULT_MIN;
+	}
+	else if (pvar->settings.GexMinimalGroupSize < GEX_GRP_LIMIT_MIN) {
 		min = GEX_GRP_LIMIT_MIN;
+		logprintf(LOG_LEVEL_NOTICE,
+			__FUNCTION__ ": small GexMinimalGroupSize is too small (%d), use minimum limit (%sd)",
+			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MIN);
 	}
 	else if (pvar->settings.GexMinimalGroupSize > GEX_GRP_LIMIT_MAX) {
 		min = GEX_GRP_LIMIT_MAX;
+		logprintf(LOG_LEVEL_NOTICE,
+			__FUNCTION__ ": small GexMinimalGroupSize is too larse (%d), use maximum limit (%sd)",
+			pvar->settings.GexMinimalGroupSize, GEX_GRP_LIMIT_MAX);
 	}
 	else {
 		min = pvar->settings.GexMinimalGroupSize;
 	}
+
+	// max は常に上限いっぱい
 	max = GEX_GRP_LIMIT_MAX;
+
+	// preferred は使用する各暗号要素の鍵長/ブロック長のうち、最大のものを使う
 	bits = dh_estimate(pvar->we_need * 8);
 	if (bits < min) {
 		bits = min;
