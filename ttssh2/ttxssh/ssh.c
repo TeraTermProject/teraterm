@@ -83,6 +83,12 @@
 //
 #define NonNull(msg) ((msg)?(msg):"(null)")
 
+typedef enum {
+	GetPayloadError = 0,
+	GetPayloadOK = 1,
+	GetPayloadTruncate = 2
+} PayloadStat;
+
 static struct global_confirm global_confirms;
 
 static Channel_t channels[CHANNEL_MAX];
@@ -721,6 +727,109 @@ static BOOL grab_payload_limited(PTInstVar pvar, int num_bytes)
 			return TRUE;
 		}
 	}
+}
+
+static PayloadStat get_byte_from_payload(PTInstVar pvar, unsigned char *val)
+{
+	unsigned char *data;
+
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, 1)) {
+		return GetPayloadError;
+	}
+
+	*val = *data;
+	return GetPayloadOK;
+}
+#define get_boolean_from_payload(pvar, val) get_byte_from_payload(pvar, val)
+
+static PayloadStat get_bytearray_from_payload(PTInstVar pvar, unsigned char *buff, unsigned int len)
+{
+	unsigned char *data;
+
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, len)) {
+		return GetPayloadError;
+	}
+
+	memcpy_s(buff, len, data, len);
+	return GetPayloadOK;
+}
+
+static PayloadStat get_uint32_from_payload(PTInstVar pvar, unsigned int *val)
+{
+	unsigned char *data;
+
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, 4)) {
+		return  GetPayloadError;
+	}
+
+	*val = get_uint32(data);
+	return GetPayloadOK;
+}
+
+static PayloadStat get_string_from_payload(
+	PTInstVar pvar, unsigned char *buff, unsigned int bufflen, unsigned int *len, BOOL null_terminate)
+{
+	unsigned int size;
+	unsigned char *data;
+
+	if (!get_uint32_from_payload(pvar, &size)) {
+		return GetPayloadError;
+	}
+
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, size)) {
+		return GetPayloadError;
+	}
+
+	*len = size;
+
+	if (size < bufflen) {
+		memcpy_s(buff, bufflen, data, size);
+		if (null_terminate) {
+			buff[size] = 0;
+		}
+		return GetPayloadOK;
+	}
+	else if (size == bufflen) {
+		memcpy_s(buff, bufflen, data, bufflen);
+		if (null_terminate) {
+			buff[bufflen-1] = 0;
+			return GetPayloadTruncate;
+		}
+		else {
+			return GetPayloadOK;
+		}
+	}
+	else {
+		memcpy_s(buff, bufflen, data, bufflen);
+		if (null_terminate) {
+			buff[bufflen-1] = 0;
+		}
+		return GetPayloadTruncate;
+	}
+}
+#define get_namelist_from_payload(pvar, buff, bufflen, size) get_string_from_payload(pvar, buff, bufflen, size, TRUE)
+
+static PayloadStat get_mpint_from_payload(PTInstVar pvar, BIGNUM *bn)
+{
+	unsigned int len;
+	unsigned char *data;
+
+	if (!get_uint32_from_payload(pvar, &len)) {
+		return GetPayloadError;
+	}
+
+	data = remained_payload(pvar);
+	if (!grab_payload(pvar, len)) {
+		return GetPayloadError;
+	}
+
+	BN_bin2bn(data, len, bn);
+
+	return GetPayloadOK;
 }
 
 #define do_crc(buf, len) (~(uint32)crc32(0xFFFFFFFF, (buf), (len)))
@@ -4892,27 +5001,20 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 		goto error;
 	}
 
-	// get rid of Cookie length
-	data += SSH2_COOKIE_LENGTH;
-
 	// 各要素(鍵交換,暗号化等)で使用するアルゴリズムの決定。
 	// サーバからはカンマ区切りでのリストが送られて来る。
 	// クライアントとサーバ両方がサポートしている物のうち、
 	// クライアント側で最も前に指定した物が使われる。
 
 	// 鍵交換アルゴリズム
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (kex algorithms)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed kex algorithms is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: KEX algorithm: %s", buf);
 
@@ -4925,18 +5027,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// ホスト鍵アルゴリズム
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (hostkey algorithms)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed hostkey algorithms is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: server host key algorithm: %s", buf);
 
@@ -4957,18 +5055,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// 暗号アルゴリズム(クライアント -> サーバ)
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (encryption algorithms client to server)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed encryption algorithms (client to server) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm client to server: %s", buf);
 
@@ -4981,18 +5075,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// 暗号アルゴリズム(サーバ -> クライアント)
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (encryption algorithms server to client)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed encryption algorithms (server to client) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: encryption algorithm server to client: %s", buf);
 
@@ -5005,18 +5095,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// MACアルゴリズム(クライアント -> サーバ)
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (MAC algorithms client to server)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed MAC algorithms (client to server) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm client to server: %s", buf);
 
@@ -5035,18 +5121,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// MACアルゴリズム(サーバ -> クライアント)
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (MAC algorithms server to client)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed MAC algorithms (server to client) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: MAC algorithm server to client: %s", buf);
 
@@ -5065,18 +5147,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// 圧縮アルゴリズム(クライアント -> サーバ)
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (compression algorithms client to server)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed compression algorithms (client to server) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm client to server: %s", buf);
 
@@ -5089,18 +5167,14 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 	}
 
 	// 圧縮アルゴリズム(サーバ -> クライアント)
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		msg = __FUNCTION__ ": truncated packet (compression algorithms server to client)";
 		goto error;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed compression algorithms (server to client) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: compression algorithm server to client: %s", buf);
 
@@ -5114,63 +5188,54 @@ static BOOL handle_SSH2_kexinit(PTInstVar pvar)
 
 	// 言語(クライアント -> サーバ)
 	// 現状では未使用。ログに記録するだけ。
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		// 言語の name-list が取れないという事は KEXINIT パケットのフォーマット自体が想定外であり
 		// 異常な状態であるが、通信に必要なアルゴリズムはすでにネゴ済みで通信自体は行える。
 		// 今まではこの部分のチェックを行っていなかったので、警告を記録するのみで処理を続行する。
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (language client to server)");
 		goto skip;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed language (client to server) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language client to server: %s", buf);
 
 	// 言語(サーバ -> クライアント)
 	// 現状では未使用。ログに記録するだけ。
-	if (!grab_payload(pvar, 4)
-	 || !grab_payload(pvar, size = get_uint32(data))) {
+	switch (get_namelist_from_payload(pvar, buf, sizeof(buf), &size)) {
+	case GetPayloadError:
 		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (language server to client)");
-		goto skip;
-	}
-	data += 4;
-
-	if (size >= sizeof(buf)) {
+		goto error;
+	case GetPayloadTruncate:
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": server proposed language (server to client) is too long.");
+		break;
 	}
-	strncpy_s(buf, sizeof(buf), data, _TRUNCATE);
-	data += size;
 
 	logprintf(LOG_LEVEL_VERBOSE, "server proposal: language server to client: %s", buf);
 
 	// first_kex_packet_follows:
 	// KEXINIT パケットの後に、アルゴリズムのネゴ結果を推測して鍵交換パケットを送っているか。
 	// SSH_MSG_KEXINIT の後の鍵交換はクライアント側から送るのでサーバ側が 1 にする事はないはず。
-	if (!grab_payload(pvar, 1)) {
+	if (!get_boolean_from_payload(pvar, buf)) {
 		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (first_kex_packet_follows)");
 		goto skip;
 	}
-	if (data[0] != 0) {
+	if (buf[0] != 0) {
 		// 前述のようにサーバ側は 0 以外にする事はないはずなので、警告を記録する。
-		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": first_kex_packet_follows is not 0. (%d)", data[0]);
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": first_kex_packet_follows is not 0. (%d)", buf[0]);
 	}
-	data++;
 
 	// reserved: 現状は常に 0 となる。
-	if (!grab_payload(pvar, 4)) {
+	if (!get_uint32_from_payload(pvar, &size)) {
 		// 言語(クライアント -> サーバ) と同様に、問題があっても警告のみとする。
 		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": truncated packet (reserved)");
 		goto skip;
 	}
-	if ((size = get_uint32(data)) != 0) {
+	if (size != 0) {
 		logprintf(LOG_LEVEL_INFO, __FUNCTION__ ": reserved data is not 0. (%d)", size);
 	}
 
