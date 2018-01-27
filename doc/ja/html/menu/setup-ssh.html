@@ -19,75 +19,83 @@
 	&lt;ciphers below this line are disabled&gt;à»â∫ÇÃà√çÜÇÕégópÇ≥ÇÍÇ‹ÇπÇÒÅB
 	<table border="1">
 	  <tr>
-	    <td>Camellia256-CTR</td>
+	    <td>aes256-gcm@openssh.com</td>
+	    <td>not RFC5647, PROTOCOL of OpenSSH</td>
+	  </tr>
+	  <tr>
+	    <td>aes128-gcm@openssh.com</td>
+	    <td>not RFC5647, PROTOCOL of OpenSSH</td>
+	  </tr>
+	  <tr>
+	    <td>camellia256-ctr</td>
 	    <td>draft-kanno-secsh-camellia-02</td>
 	  </tr>
 	  <tr>
-	    <td>AES256-CTR</td>
+	    <td>aes256-ctr</td>
 	    <td>RFC4344</td>
 	  </tr>
 	  <tr>
-	    <td>Camellia256-CBC</td>
+	    <td>camellia256-cbc</td>
 	    <td>draft-kanno-secsh-camellia-02</td>
 	  </tr>
 	  <tr>
-	    <td>AES256-CBC</td>
+	    <td>aes256-cbc</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
-	    <td>Camellia192-CTR</td>
+	    <td>camellia192-ctr</td>
 	    <td>draft-kanno-secsh-camellia-02</td>
 	  </tr>
 	  <tr>
-	    <td>AES192-CTR</td>
+	    <td>aes192-ctr</td>
 	    <td>RFC4344</td>
 	  </tr>
 	  <tr>
-	    <td>Camellia192-CBC</td>
+	    <td>camellia192-cbc</td>
 	    <td>draft-kanno-secsh-camellia-02</td>
 	  </tr>
 	  <tr>
-	    <td>AES192-CBC</td>
+	    <td>aes192-cbc</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
-	    <td>Camellia128-CTR</td>
+	    <td>camellia128-ctr</td>
 	    <td>draft-kanno-secsh-camellia-02</td>
 	  </tr>
 	  <tr>
-	    <td>AES128-CTR</td>
+	    <td>aes128-ctr</td>
 	    <td>RFC4344</td>
 	  </tr>
 	  <tr>
-	    <td>Camellia128-CBC</td>
+	    <td>camellia128-cbc</td>
 	    <td>draft-kanno-secsh-camellia-02</td>
 	  </tr>
 	  <tr>
-	    <td>AES128-CBC</td>
+	    <td>aes128-cbc</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
-	    <td>3DES-CTR</td>
+	    <td>3des-ctr</td>
 	    <td>RFC4344</td>
 	  </tr>
 	  <tr>
-	    <td>3DES-CBC</td>
+	    <td>3des-cbc</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
-	    <td>Blowfish-CTR</td>
+	    <td>blowfish-ctr</td>
 	    <td>RFC4344</td>
 	  </tr>
 	  <tr>
-	    <td>Blowfish-CBC</td>
+	    <td>blowfish-cbc</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
-	    <td>CAST128-CTR</td>
+	    <td>cast128-ctr</td>
 	    <td>RFC4344</td>
 	  </tr>
 	  <tr>
-	    <td>CAST128-CBC</td>
+	    <td>cast128-cbc</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
@@ -95,15 +103,15 @@
 	    <td></td>
 	  </tr>
 	  <tr>
-	    <td>Arcfour256</td>
+	    <td>arcfour256</td>
 	    <td>RFC4345</td>
 	  </tr>
 	  <tr>
-	    <td>Arcfour128</td>
+	    <td>arcfour128</td>
 	    <td>RFC4345</td>
 	  </tr>
 	  <tr>
-	    <td>Arcfour</td>
+	    <td>arcfour</td>
 	    <td>RFC4253</td>
 	  </tr>
 	  <tr>
@@ -181,15 +189,15 @@
 	  </tr>
 	  <tr>
 	    <td>diffie-hellman-group18-sha512</td>
-	    <td>draft-ietf-curdle-ssh-kex-sha2-03</td>
+	    <td>RFC8268</td>
 	  </tr>
 	  <tr>
 	    <td>diffie-hellman-group16-sha512</td>
-	    <td>draft-ietf-curdle-ssh-kex-sha2-03</td>
+	    <td>RFC8268</td>
 	  </tr>
 	  <tr>
 	    <td>diffie-hellman-group14-sha256</td>
-	    <td>draft-ietf-curdle-ssh-kex-sha2-03</td>
+	    <td>RFC8268</td>
 	  </tr>
 	  <tr>
 	    <td>diffie-hellman-group-exchange-sha256</td>
@@ -265,7 +273,7 @@
 	  </tr>
 	  <tr>
 	    <td>ssh-ed25519</td>
-	    <td>draft-ietf-curdle-ssh-ed25519-00</td>
+	    <td>draft-ietf-curdle-ssh-ed25519-02</td>
 	  </tr>
 	  <tr>
 	    <td>ssh-rsa</td>
