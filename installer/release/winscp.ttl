@@ -1,0 +1,16 @@
+;
+; ttpmacro.exe winscp.ttl "!@" "!U" "!P" "!/"
+;
+; !! -> !
+; !/ -> Remote Path
+; !@ -> Remote Host
+; !U -> Remote User
+; !P -> Remote Passwd
+
+sprintf2 conncmd "%s@%s" params[3] params[2]
+
+connect conncmd
+
+waitregex "."
+
+send "cd " params[5] #13
