@@ -26,7 +26,7 @@ BEGIN
             VALUE "FileDescription", "Tera Term Tek Emulation Routines"
             VALUE "FileVersion", TT_RES_VERSION_STR
             VALUE "InternalName", "TTPTEK"
-            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2017 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2018 TeraTerm Project"
             VALUE "OriginalFilename", "ttptek.dll"
             VALUE "ProductName", "Tera Term"
             VALUE "ProductVersion", TT_RES_VERSION_STR
