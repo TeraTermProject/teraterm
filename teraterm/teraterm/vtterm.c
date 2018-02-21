@@ -430,7 +430,7 @@ void ChangeTerminalSize(int Nx, int Ny)
 	MainX = 0;
 	MainY = 0;
 	MainTop = 0;
-	MainBottom = NumOfLines-1;
+	MainBottom = NumOfLines-StatusLine-1;
 	LRMarginMode = FALSE;
 }
 
