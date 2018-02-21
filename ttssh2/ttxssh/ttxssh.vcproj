@@ -228,7 +228,7 @@
 				>
 			</File>
 			<File
-				RelativePath="chacha_private.h"
+				RelativePath="chacha.h"
 				>
 			</File>
 			<File
@@ -341,6 +341,10 @@
 			</File>
 			<File
 				RelativePath="buffer.c"
+				>
+			</File>
+			<File
+				RelativePath="chacha.c"
 				>
 			</File>
 			<File

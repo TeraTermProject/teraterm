@@ -145,6 +145,7 @@
     <ClCompile Include="arc4random.c" />
     <ClCompile Include="auth.c" />
     <ClCompile Include="buffer.c" />
+    <ClCompile Include="chacha.c" />
     <ClCompile Include="cipher-ctr.c" />
     <ClCompile Include="crypt.c" />
     <ClCompile Include="dns.c" />
@@ -175,7 +176,7 @@
     <ClInclude Include="arc4random.h" />
     <ClInclude Include="auth.h" />
     <ClInclude Include="buffer.h" />
-    <ClInclude Include="chacha_private.h" />
+    <ClInclude Include="chacha.h" />
     <ClInclude Include="cipher.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="crypt.h" />

@@ -33,7 +33,7 @@
 #define KEYSTREAM_ONLY
 #include "ttxssh.h"
 #include "arc4random.h"
-#include "chacha_private.h"
+#include "chacha.h"
 
 #include <openssl/rand.h>
 #include <openssl/err.h>
@@ -48,7 +48,7 @@
 #define RSBUFSZ	(16*BLOCKSZ)
 static int rs_initialized;
 static int rs_stir_pid;
-static chacha_ctx rs;		/* chacha context for random keystream */
+static struct chacha_ctx rs;	/* chacha context for random keystream */
 static u_char rs_buf[RSBUFSZ];	/* keystream blocks */
 static size_t rs_have;		/* valid bytes at end of rs_buf */
 static size_t rs_count;		/* bytes till reseed */
@@ -60,8 +60,8 @@ _rs_init(u_char *buf, size_t n)
 {
 	if (n < KEYSZ + IVSZ)
 		return;
-	chacha_keysetup(&rs, buf, KEYSZ * 8, 0);
-	chacha_ivsetup(&rs, buf + KEYSZ);
+	chacha_keysetup(&rs, buf, KEYSZ * 8);
+	chacha_ivsetup(&rs, buf + KEYSZ, NULL);
 }
 
 static void

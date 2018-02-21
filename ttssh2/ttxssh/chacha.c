@@ -1,18 +1,21 @@
+/* Imported via OpenSSH-7.6p1, TeraTerm Project doda */
+
 /*
 chacha-merged.c version 20080118
 D. J. Bernstein
 Public domain.
 */
 
-/* $OpenBSD: chacha_private.h,v 1.2 2013/10/04 07:02:27 djm Exp $ */
+// #include "includes.h"
+
+#include "chacha.h"
+
+/* $OpenBSD: chacha.c,v 1.1 2013/11/21 00:45:44 djm Exp $ */
 
 typedef unsigned char u8;
 typedef unsigned int u32;
 
-typedef struct
-{
-  u32 input[16]; /* could be compressed */
-} chacha_ctx;
+typedef struct chacha_ctx chacha_ctx;
 
 #define U8C(v) (v##U)
 #define U32C(v) (v##U)
@@ -51,8 +54,8 @@ typedef struct
 static const char sigma[16] = "expand 32-byte k";
 static const char tau[16] = "expand 16-byte k";
 
-static void
-chacha_keysetup(chacha_ctx *x,const u8 *k,u32 kbits,u32 ivbits)
+void
+chacha_keysetup(chacha_ctx *x, const u8 *k, u32 kbits)
 {
   const char *constants;
 
@@ -76,17 +79,17 @@ chacha_keysetup(chacha_ctx *x,const u8 *k,u32 kbits,u32 ivbits)
   x->input[3] = U8TO32_LITTLE(constants + 12);
 }
 
-static void
-chacha_ivsetup(chacha_ctx *x,const u8 *iv)
+void
+chacha_ivsetup(chacha_ctx *x, const u8 *iv, const u8 *counter)
 {
-  x->input[12] = 0;
-  x->input[13] = 0;
+  x->input[12] = counter == NULL ? 0 : U8TO32_LITTLE(counter + 0);
+  x->input[13] = counter == NULL ? 0 : U8TO32_LITTLE(counter + 4);
   x->input[14] = U8TO32_LITTLE(iv + 0);
   x->input[15] = U8TO32_LITTLE(iv + 4);
 }
 
-static void
-chacha_encrypt_bytes(chacha_ctx *x,const u8 *m,u8 *c,u32 bytes)
+void
+chacha_encrypt_bytes(chacha_ctx *x, const u8 *m, u8 *c, u32 bytes)
 {
   u32 x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15;
   u32 j0, j1, j2, j3, j4, j5, j6, j7, j8, j9, j10, j11, j12, j13, j14, j15;
@@ -163,7 +166,6 @@ chacha_encrypt_bytes(chacha_ctx *x,const u8 *m,u8 *c,u32 bytes)
     x14 = PLUS(x14,j14);
     x15 = PLUS(x15,j15);
 
-#ifndef KEYSTREAM_ONLY
     x0 = XOR(x0,U8TO32_LITTLE(m + 0));
     x1 = XOR(x1,U8TO32_LITTLE(m + 4));
     x2 = XOR(x2,U8TO32_LITTLE(m + 8));
@@ -180,7 +182,6 @@ chacha_encrypt_bytes(chacha_ctx *x,const u8 *m,u8 *c,u32 bytes)
     x13 = XOR(x13,U8TO32_LITTLE(m + 52));
     x14 = XOR(x14,U8TO32_LITTLE(m + 56));
     x15 = XOR(x15,U8TO32_LITTLE(m + 60));
-#endif
 
     j12 = PLUSONE(j12);
     if (!j12) {
@@ -215,8 +216,6 @@ chacha_encrypt_bytes(chacha_ctx *x,const u8 *m,u8 *c,u32 bytes)
     }
     bytes -= 64;
     c += 64;
-#ifndef KEYSTREAM_ONLY
     m += 64;
-#endif
   }
 }

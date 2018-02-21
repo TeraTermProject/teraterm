@@ -10,6 +10,9 @@
     <ClCompile Include="buffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="chacha.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cipher-ctr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,7 +99,7 @@
     <ClInclude Include="arc4random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="chacha_private.h">
+    <ClInclude Include="chacha.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dns.h">
