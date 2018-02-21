@@ -298,6 +298,7 @@ typedef struct _TInstVar {
 	int keyboard_interactive_password_input;
 	int userauth_retry_count;
 	buffer_t *decomp_buffer;
+	buffer_t *authbanner_buffer;
 	char *ssh2_authlist;
 	BOOL tryed_ssh2_authlist;
 	HWND ssh_hearbeat_dialog;

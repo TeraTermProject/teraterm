@@ -2842,6 +2842,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->ask4passwd = 0; // disabled(default) (2006.9.18 maya)
 	pvar->userauth_retry_count = 0;
 	pvar->decomp_buffer = NULL;
+	pvar->authbanner_buffer = NULL;
 	pvar->ssh2_authlist = NULL; // (2007.4.27 yutaka)
 	pvar->tryed_ssh2_authlist = FALSE;
 	pvar->agentfwd_enable = FALSE;
@@ -3376,6 +3377,11 @@ void SSH_end(PTInstVar pvar)
 		if (pvar->decomp_buffer != NULL) {
 			buffer_free(pvar->decomp_buffer);
 			pvar->decomp_buffer = NULL;
+		}
+
+		if (pvar->authbanner_buffer != NULL) {
+			buffer_free(pvar->authbanner_buffer);
+			pvar->authbanner_buffer = NULL;
 		}
 
 		if (pvar->ssh2_authlist != NULL) { // (2007.4.27 yutaka)
@@ -6932,6 +6938,47 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	return TRUE;
 }
 
+void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
+{
+	unsigned char *start = src;
+	int cplen = 0;
+	unsigned int i;
+
+	if (srclen == 0)
+		return;
+
+	for (i=0; i<srclen; i++) {
+		if (src[i] < 0x20) {
+			if (cplen > 0) {
+				buffer_append(buff, start, cplen);
+			}
+
+			if (src[i] == '\r') {
+				buffer_append(buff, "\r\n", 2);
+
+				if (i < srclen - 1 && src[i+1] == '\n') {
+					i++;
+				}
+			}
+			else if (src[i] == '\n') {
+				buffer_append(buff, "\r\n", 2);
+			}
+
+			start = src + i + 1;
+			cplen = 0;
+		}
+		else {
+			cplen++;
+		}
+	}
+
+	if (cplen > 0) {
+		buffer_append(buff, start, cplen);
+	}
+
+	buffer_append(buff, "\0", 1);
+}
+
 /*
  * SSH_MSG_USERAUTH_BANNER:
  *    byte      SSH_MSG_USERAUTH_BANNER
@@ -6942,6 +6989,7 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 {
 	int msglen, ltaglen;
 	char buff[2048];
+	char *new_payload_buffer = NULL;
 
 	logputs(LOG_LEVEL_INFO, "SSH2_MSG_USERAUTH_BANNER was received.");
 
@@ -6951,21 +6999,48 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 	}
 
 	if (msglen > 0) {
+		unsigned char *msg;
+
+		if (pvar->authbanner_buffer == NULL) {
+			pvar->authbanner_buffer = buffer_init();
+		}
+		else {
+			buffer_clear(pvar->authbanner_buffer);
+		}
+
+		if (pvar->authbanner_buffer != NULL) {
+			sanitize_str(pvar->authbanner_buffer, buff, MIN(msglen, sizeof(buff)));
+			msg = buffer_ptr(pvar->authbanner_buffer);
+			msglen = buffer_len(pvar->authbanner_buffer) - 1; // NUL Terminate 分は数えない
+		}
+		else {
+			// メモリ確保失敗時は変換前の文字列を表示する。
+			// ただ、C0 制御文字をそのまま表示しようとするので望ましくないかも。
+			msg = buff;
+		}
+
 		switch (pvar->settings.AuthBanner) {
 		case 0:
 			break;
 		case 1:
-			pvar->ssh_state.payload_datastart = 4;
-			pvar->ssh_state.payload_datalen = msglen;
+			if (pvar->authbanner_buffer != NULL) {
+				new_payload_buffer = msg;
+				pvar->ssh_state.payload_datastart = 0;
+				pvar->ssh_state.payload_datalen = msglen;
+			}
+			else {
+				pvar->ssh_state.payload_datastart = 4;
+				pvar->ssh_state.payload_datalen = msglen;
+			}
 			break;
 		case 2:
-			MessageBox(pvar->cv->HWin, buff, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
+			MessageBox(pvar->cv->HWin, msg, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
 			break;
 		case 3:
-			NotifyInfoMessage(pvar->cv, buff, "Authentication Banner");
+			NotifyInfoMessage(pvar->cv, msg, "Authentication Banner");
 			break;
 		}
-		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, buff);
+		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, msg);
 	}
 	else {
 		logprintf(LOG_LEVEL_VERBOSE, "Empty banner");
@@ -6981,6 +7056,10 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 	}
 	else {
 		logprintf(LOG_LEVEL_VERBOSE, "Empty Language Tag");
+	}
+
+	if (new_payload_buffer) {
+		pvar->ssh_state.payload = new_payload_buffer;
 	}
 
 	return TRUE;
