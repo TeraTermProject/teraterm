@@ -5846,8 +5846,14 @@ BOOL MouseReport(int Event, int Button, int Xpos, int Ypos) {
 	DispConvWinToScreen(Xpos, Ypos, &x, &y, NULL);
 	x++; y++;
 
-	if (x < 1) x = 1;
-	if (y < 1) y = 1;
+	if (x < 1)
+		x = 1;
+	else if (x > NumOfColumns)
+		x = NumOfColumns;
+	if (y < 1)
+		y = 1;
+	else if (y > NumOfLines)
+		y = NumOfLines;
 
 	if (ShiftKey())
 		modifier = 4;
