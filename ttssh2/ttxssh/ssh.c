@@ -6932,51 +6932,44 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 	return TRUE;
 }
 
+/*
+ * SSH_MSG_USERAUTH_BANNER:
+ *    byte      SSH_MSG_USERAUTH_BANNER
+ *    string    message in ISO-10646 UTF-8 encoding
+ *    string    language tag
+ */
 static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 {
-	int leftlen, msglen, ltaglen;
-	char *data, *msg, *ltag;
+	int msglen, ltaglen;
+	char buff[2048];
 
 	logputs(LOG_LEVEL_INFO, "SSH2_MSG_USERAUTH_BANNER was received.");
 
-	data = pvar->ssh_state.payload;
-	leftlen = pvar->ssh_state.payloadlen - 1;
-
-	if (leftlen < 4) {
-		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": banner payload corrupted. leftlen=%d", leftlen);
+	if (!get_string_from_payload(pvar, buff, sizeof(buff), &msglen, TRUE)) {
+		logputs(LOG_LEVEL_WARNING, __FUNCTION__ ": banner payload corrupted.");
 		return TRUE;
 	}
-
-	msg = buffer_get_string(&data, &msglen);
-	leftlen -= msglen + 4;
 
 	if (msglen > 0) {
 		pvar->ssh_state.payload_datastart = 4;
 		pvar->ssh_state.payload_datalen = msglen;
-		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, msg);
+		NotifyInfoMessage(pvar->cv, buff, "Authentication Banner");
+		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, buff);
 	}
 	else {
 		logprintf(LOG_LEVEL_VERBOSE, "Empty banner");
 	}
 
-	if (leftlen < 4) {
-		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": langtag payload corrupted. leftlen=%d", leftlen);
+	if (!get_string_from_payload(pvar, buff, sizeof(buff), &ltaglen, TRUE)) {
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": langtag payload corrupted.");
 		return TRUE;
 	}
 
-	ltag = buffer_get_string(&data, &ltaglen);
-	leftlen -= ltaglen + 4;
-
 	if (ltaglen > 0) {
-		logprintf(LOG_LEVEL_NOTICE, "Banner ltag len: %d, Banner Language Tag: %s", ltaglen, ltag);
+		logprintf(LOG_LEVEL_NOTICE, "Banner ltag len: %d, Banner Language Tag: %s", ltaglen, buff);
 	}
 	else {
 		logprintf(LOG_LEVEL_VERBOSE, "Empty Language Tag");
-	}
-
-
-	if (leftlen > 0) {
-		logprintf(LOG_LEVEL_NOTICE, __FUNCTION__ ": extra payload found. leftlen=%d, leftdata[0]=%02x", leftlen, data[0]);
 	}
 
 	return TRUE;
