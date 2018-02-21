@@ -6951,9 +6951,20 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 	}
 
 	if (msglen > 0) {
-		pvar->ssh_state.payload_datastart = 4;
-		pvar->ssh_state.payload_datalen = msglen;
-		NotifyInfoMessage(pvar->cv, buff, "Authentication Banner");
+		switch (pvar->settings.AuthBanner) {
+		case 0:
+			break;
+		case 1:
+			pvar->ssh_state.payload_datastart = 4;
+			pvar->ssh_state.payload_datalen = msglen;
+			break;
+		case 2:
+			MessageBox(pvar->cv->HWin, buff, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
+			break;
+		case 3:
+			NotifyInfoMessage(pvar->cv, buff, "Authentication Banner");
+			break;
+		}
 		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, buff);
 	}
 	else {

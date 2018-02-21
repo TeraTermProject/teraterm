@@ -542,6 +542,8 @@ static void read_ssh_options(PTInstVar pvar, PCHAR fileName)
 
 	settings->GexMinimalGroupSize = GetPrivateProfileInt("TTSSH", "GexMinimalGroupSize", 0, fileName);
 
+	settings->AuthBanner = GetPrivateProfileInt("TTSSH", "AuthBanner", 1, fileName);
+
 	clear_local_settings(pvar);
 }
 
@@ -665,6 +667,9 @@ static void write_ssh_options(PTInstVar pvar, PCHAR fileName,
 
 	_itoa_s(settings->GexMinimalGroupSize, buf, sizeof(buf), 10);
 	WritePrivateProfileString("TTSSH", "GexMinimalGroupSize", buf, fileName);
+
+	_itoa_s(settings->AuthBanner, buf, sizeof(buf), 10);
+	WritePrivateProfileString("TTSSH", "AuthBanner", buf, fileName);
 }
 
 

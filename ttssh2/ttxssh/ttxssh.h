@@ -192,6 +192,8 @@ typedef struct _TS_SSH {
 	int UpdateHostkeys;
 
 	int GexMinimalGroupSize;
+
+	int AuthBanner;
 } TS_SSH;
 
 typedef struct _TInstVar {
