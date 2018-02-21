@@ -6934,8 +6934,50 @@ static BOOL handle_SSH2_userauth_failure(PTInstVar pvar)
 
 static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 {
-	//
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_BANNER was received.");
+	int leftlen, msglen, ltaglen;
+	char *data, *msg, *ltag;
+
+	logputs(LOG_LEVEL_INFO, "SSH2_MSG_USERAUTH_BANNER was received.");
+
+	data = pvar->ssh_state.payload;
+	leftlen = pvar->ssh_state.payloadlen - 1;
+
+	if (leftlen < 4) {
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": banner payload corrupted. leftlen=%d", leftlen);
+		return TRUE;
+	}
+
+	msg = buffer_get_string(&data, &msglen);
+	leftlen -= msglen + 4;
+
+	if (msglen > 0) {
+		pvar->ssh_state.payload_datastart = 4;
+		pvar->ssh_state.payload_datalen = msglen;
+		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, msg);
+	}
+	else {
+		logprintf(LOG_LEVEL_VERBOSE, "Empty banner");
+	}
+
+	if (leftlen < 4) {
+		logprintf(LOG_LEVEL_WARNING, __FUNCTION__ ": langtag payload corrupted. leftlen=%d", leftlen);
+		return TRUE;
+	}
+
+	ltag = buffer_get_string(&data, &ltaglen);
+	leftlen -= ltaglen + 4;
+
+	if (ltaglen > 0) {
+		logprintf(LOG_LEVEL_NOTICE, "Banner ltag len: %d, Banner Language Tag: %s", ltaglen, ltag);
+	}
+	else {
+		logprintf(LOG_LEVEL_VERBOSE, "Empty Language Tag");
+	}
+
+
+	if (leftlen > 0) {
+		logprintf(LOG_LEVEL_NOTICE, __FUNCTION__ ": extra payload found. leftlen=%d, leftdata[0]=%02x", leftlen, data[0]);
+	}
 
 	return TRUE;
 }
