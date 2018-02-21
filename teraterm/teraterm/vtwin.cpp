@@ -1028,6 +1028,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	}
 
 	if (mousereport = MouseReport(IdMouseEventBtnDown, LMR, p.x, p.y)) {
+		SetCapture();
 		return;
 	}
 
