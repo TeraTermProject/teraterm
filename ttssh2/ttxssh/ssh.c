@@ -6948,7 +6948,7 @@ void sanitize_str(buffer_t *buff, unsigned char *src, size_t srclen)
 		return;
 
 	for (i=0; i<srclen; i++) {
-		if (src[i] < 0x20) {
+		if (src[i] < 0x20 && src[i] != '\t') {
 			if (cplen > 0) {
 				buffer_append(buff, start, cplen);
 			}
