@@ -33,6 +33,12 @@
 
 <h3><a name="teraterm_4.98">2018.02.28 (Ver 4.98) not released</a></h3>
 <ul class="history">
+  <li>バグ修正
+    <ul>
+      <li>マウストラッキング有効時の画面端での操作性を改善した。</li>
+    </ul>
+  </li>
+
   <li>その他
     <ul>
       <li><a href="#ttssh_2.84">TTSSH(2.84)</a>へ差し替えた。</li>
@@ -2982,6 +2988,10 @@
       <li>Diffie-Hellman group exchane 鍵交換方式での最小グループサイズを 2048 に変更した。(RFC 8270)
         <ul>
           <li>以前の動作に戻すには、teraterm.ini の GexMinimalGroupSize エントリを 1024 にする。</li>
+        </ul></li>
+      <li>SSH_MSG_USERAUTH_BANNER ssh メッセージに対応した。
+        <ul>
+          <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
         </ul></li>
     </ul>
   </li>

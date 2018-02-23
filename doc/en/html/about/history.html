@@ -33,6 +33,12 @@
 
 <h3><a name="teraterm_4.98">2018.02.28 (Ver 4.98) not released</a></h3>
 <ul class="history">
+  <li>Bug fixes
+    <ul>
+      <!-- li>マウストラッキング有効時の画面端での操作性を改善した。</li -->
+    </ul>
+  </li>
+
   <li>Misc
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.84">2.84</a>.</li>
@@ -61,7 +67,7 @@
     </ul>
   </li>
 
-  <li>Buf fixes
+  <li>Bug fixes
     <ul>
       <li>The response of DECRQSS control sequence was invalid.</li>
       <li>On telnet connection, the terminal size is not notified correctly if terminal width or height is 255.</li>
@@ -2977,6 +2983,10 @@ SYNOPSIS:
         <ul>
           <li>To change to the previous behavior, set the GexMinimalGroupSize entry in teraterm.ini file to 1024.</li></li>
         </ul></li>
+      <!-- li>SSH_MSG_USERAUTH_BANNER ssh メッセージに対応した。
+        <ul>
+          <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
+        </ul></li -->
     </ul>
   </li>
 
