@@ -179,23 +179,25 @@ TEKPPI=0,0
 </pre>
 
 
-<h1><a name="russfont">印刷フォントのロシア語コードセット (Russian mode only)</a></h1>
+<h1><a name="russfont">印刷フォントのロシア語コードセット (ロシア語モードのみ)</a></h1>
 
 <p>
-<a href="#font">プリンタフォントの指定</a>もしくは<a href="#direct">エスケープシーケンスによる印刷でポートに直接出力</a>を選択した場合、キャラクタセットも指定しなければなりません。さもなくば、ロシア語の文字は正しく印刷されません。キャラクタセットを指定するには、設定ファイルの [Tera Term] セクションの RussPrint 行を以下のように変更してください。
+ロシア語モードでは、<a href="#font">プリンタフォントの指定</a>もしくは<a href="#direct">エスケープシーケンスによる印刷でポートに直接出力</a>を選択した場合、キャラクタセットも指定しなければなりません。さもなくば、ロシア語の文字は正しく印刷されません。キャラクタセットを指定するには、設定ファイルの [Tera Term] セクションの RussPrint 行を以下のように変更してください。
 </p>
 
 <pre>
 RussFont=&lt;char set&gt;
 </pre>
 
-<pre>
-&lt;char set&gt;には以下のいずれかを指定可能。
-  Windows
-  KOI8-R
-  CP-866
-  ISO-8859-5
-</pre>
+<p>
+&lt;char set&gt;には以下が指定可能です。
+</p>
+<ul>
+  <li>Windows</li>
+  <li>KOI8-R</li>
+  <li>CP-866</li>
+  <li>ISO-8859-5</li>
+</ul>
 
 <pre>
 省略時:
