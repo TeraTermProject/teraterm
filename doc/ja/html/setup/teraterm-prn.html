@@ -59,25 +59,18 @@ PassThruPort=
 </p>
 
 
-<h1><a name="ignoremc">印刷用制御コードを無視する</a></h1>
+<h1><a name="ignoremc">エスケープシーケンスによる印刷を行わない</a></h1>
 
 <p>
-設定ファイルの [Tera Term] セクションの PrinterCtrlSequence 行を以下のように変更することによって、印刷用制御コード(MC: Media Copy)を無視するかどうかを設定できます。PassThruPort 行は指定しても無効となります。
+設定ファイルの [Tera Term] セクションの PrinterCtrlSequence 行を以下のように変更することによって、エスケープシーケンスによる印刷を行わないように出来ます。
 </p>
 
 <pre>
-PrinterCtrlSequence=on|off
-</pre>
-
-<p><!-- TODO: 内容修正 --></p>
-
-<pre>
-例(印刷用制御コードを無視する):
 PrinterCtrlSequence=off
 </pre>
 
 <pre>
-省略時(印刷用制御コードを解釈する):
+省略時:
 PrinterCtrlSequence=on
 </pre>
 
