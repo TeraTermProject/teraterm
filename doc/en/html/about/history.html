@@ -2979,24 +2979,24 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
+      <li>added support for SSH_MSG_USERAUTH_BANNER SSH message.
+        <ul>
+          <li>added the AuthBanner entry in the teraterm.ini file. The default is 1(display to VT window).</li>
+        </ul></li>
       <li>The minimum group size of the Diffie-Hellman group exchange key exchange method is increased to 2048. (RFC 8270)
         <ul>
           <li>To change to the previous behavior, set the GexMinimalGroupSize entry in teraterm.ini file to 1024.</li></li>
         </ul></li>
-      <!-- li>SSH_MSG_USERAUTH_BANNER ssh メッセージに対応した。
-        <ul>
-          <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
-        </ul></li -->
     </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <!--li>バージョン情報ダイアログのサーバホスト鍵の指紋に、同一サーバで接続に使用されていない方式の鍵が表示されることがある問題を修正した。</li-->
-      <!--li>シリアルポート接続時に <a href="../menu/file.html">[File]</a> メニューの [SSH SCP] が無効にならない問題を修正した。</li-->
-      <li>When using aes128-gcm@openssh.com or aes256-gcm@openssh.com as symmetric cipher algorithm, connection is terminated if MAC algorithm cannot negotiate.</li>
-      <li>When using aes128-gcm@openssh.com or aes256-gcm@openssh.com as symmetric cipher algorithm, un-used MAC algorithm is displayed on "About TTSSH" dialog.</li>
       <li>Application fault is occurred if server proposes a very long string in the algorithm negotiation.</li>
+      <li>When using aes128-gcm@openssh.com or aes256-gcm@openssh.com as symmetric cipher algorithm, connection is terminated if MAC algorithm cannot negotiate.</li>
+      <!--li>シリアルポート接続時に <a href="../menu/file.html">[File]</a> メニューの [SSH SCP] が無効にならない問題を修正した。</li-->
+      <li>When using aes128-gcm@openssh.com or aes256-gcm@openssh.com as symmetric cipher algorithm, un-used MAC algorithm is displayed on "About TTSSH" dialog.</li>
+      <!--li>"About TTSSH" ダイアログのサーバホスト鍵の指紋に、同一サーバで接続に使用されていない方式の鍵が表示されることがある問題を修正した。</li-->
     </ul>
   </li>
 

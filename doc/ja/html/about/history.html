@@ -2985,24 +2985,24 @@
 <ul class="history">
   <li>変更
     <ul>
+      <li>SSH_MSG_USERAUTH_BANNER SSH メッセージに対応した。
+        <ul>
+          <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
+        </ul></li>
       <li>Diffie-Hellman group exchane 鍵交換方式での最小グループサイズを 2048 に変更した。(RFC 8270)
         <ul>
           <li>以前の動作に戻すには、teraterm.ini の GexMinimalGroupSize エントリを 1024 にする。</li>
-        </ul></li>
-      <li>SSH_MSG_USERAUTH_BANNER ssh メッセージに対応した。
-        <ul>
-          <li>teraterm.ini に AuthBanner エントリを追加した。デフォルトは 1。(VTウィンドウで表示)</li>
         </ul></li>
     </ul>
   </li>
 
   <li>バグ修正
     <ul>
-      <li>バージョン情報ダイアログのサーバホスト鍵の指紋に、同一サーバで接続に使用されていない方式の鍵が表示されることがある問題を修正した。</li>
-      <li>シリアルポート接続時に <a href="../menu/file.html">[File]</a> メニューの [SSH SCP] が無効にならない問題を修正した。</li>
-      <li>暗号方式で aes128-gcm@openss.com または aes256-gcm@openssh.com を使用時、MAC 方式のネゴシエーションが行えなかった時に接続を切る問題を修正した。</li>
-      <li>暗号方式で aes128-gcm@openss.com または aes256-gcm@openssh.com を使用時、"About TTSSH" ダイアログで使用していない MAC 方式を表示する問題を修正した。</li>
       <li>暗号方式等のネゴシエーション時、サーバの提案が長すぎる時に落ちる問題を修正した。</li>
+      <li>暗号方式で aes128-gcm@openss.com または aes256-gcm@openssh.com を使用時、MAC 方式のネゴシエーションが行えなかった時に接続を切る問題を修正した。</li>
+      <li>シリアルポート接続時に <a href="../menu/file.html">[File]</a> メニューの [SSH SCP] が無効にならない問題を修正した。</li>
+      <li>暗号方式で aes128-gcm@openss.com または aes256-gcm@openssh.com を使用時、"About TTSSH" ダイアログで使用していない MAC 方式を表示する問題を修正した。</li>
+      <li>"About TTSSH" ダイアログのサーバホスト鍵の指紋に、同一サーバで接続に使用されていない方式の鍵が表示されることがある問題を修正した。</li>
     </ul>
   </li>
 
