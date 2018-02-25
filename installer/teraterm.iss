@@ -27,7 +27,7 @@ Name: build.bat
 ;Name: makearchive.bat; Parameters: release
 
 [Setup]
-AppCopyright=(C) 2004-2017 TeraTerm Project
+AppCopyright=(C) 2004-2018 TeraTerm Project
 AppName={#AppName}
 #ifndef snapshot
 AppVerName={#AppName} {#AppVer}
