@@ -136,11 +136,11 @@
 	<p>
 	Configure the host key rotation feature(OpenSSH 6.8 or later).
 	</p>
-	<!--p>
-	  SSH サーバはホスト鍵を持っていますが、何らかの理由でこのホスト鍵を変更することがあります。<br />
-	  この場合 SSH サーバによっては新しいホスト鍵の一覧をクライアントに送信し、クライアントにホスト鍵一覧の更新を促します。<br />
-	  TTSSH はこの機能に対応しており、新しいホスト鍵の一覧を受信したときにクライアント側の known hosts リストを更新することができます。
-	</p-->
+	<p>
+	  SSH server has the host key, however the host key may be changed for any reason. <br />
+	  In this case, SSH server sends a list of new host keys to client. Next, the server urges updating of host key lists to client. <br />
+	  TTSSH can support this feature. When a list of new host key is received, the known hosts list of client is updated.
+	</p>
 	<dl>
 	  <dt>No</dt>
 	  <dd>Do not update the known hosts file.</dd>
