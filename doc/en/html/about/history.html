@@ -3190,7 +3190,7 @@ SYNOPSIS:
 <ul class="history">
   <li>Changes
     <ul>
-      <li>When the fingerprint of the host key is shown on the known_hosts and the version dialog, the hash algorithm can be not only MD5, but SHA256.</li>
+      <li>When the fingerprint of the host key is shown on the known_hosts and the "About TTSSH" dialog, the hash algorithm can be not only MD5, but SHA256.</li>
       <li>Added support for the ED25519 key by using the host key verifying(SSHFP) of DNS.</li>
       <li>The key exchange, host key, cipher, MAC and compression method which are not shown in the teraterm.ini file
           is changed for inserting position in the following:
@@ -3235,7 +3235,7 @@ SYNOPSIS:
   <li>Bug fixes
     <ul>
       <li>added a workaround because the Tera Term 4.87(TTSSH 2.73) can not connect to a part of Cisco devices.</li>
-      <li>When the known_hosts file is updated by the host key rotation, an application fault will be occurred after the fingerprint display of the version dialog.</li>
+      <li>When the known_hosts file is updated by the host key rotation, an application fault will be occurred after the fingerprint display of the "About TTSSH" dialog.</li>
     </ul>
   </li>
 
@@ -3359,7 +3359,7 @@ SYNOPSIS:
           <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a> supports the bcrypt KDF format of the RSA/DSA/ECDSA private key.</li>
           <li>added the ED25519 into the Host Key algorithm, and then changed the HostKeyOrder entry in the teraterm.ini file.</li>
         </ul></li>
-      <li>added the host key's fingerprint and the random art into the version dialog.</li>
+      <li>added the host key's fingerprint and the random art into the "About TTSSH" dialog.</li>
       <li>TTY option ONLCR can be sent to the remote server.</li>
     </ul>
   </li>
@@ -3560,7 +3560,7 @@ SYNOPSIS:
     <ul>
       <li>added Camellia128-CBC, Camellia128-CTR, Camellia192-CBC, Camellia192-CTR, Camellia256-CBC, Camellia256-CTR symmetric key cipher algorithm for SSH2 protocol.</li>
       <li>added support for SSH2 MAC algorithms: hmac-sha2-256, hmac-sha2-256-96, hmac-sha2-512, hmac-sha2-512-96</li>
-      <li>added the PuTTY version on the version dialog.</li>
+      <li>added the PuTTY version on the "About TTSSH" dialog.</li>
       <li>removed the random initialization because it takes a long time to connect.</li>
       <li>The time-stamp of the log file is recorded on the millisecond time scale.</li>
     </ul>
@@ -4078,7 +4078,7 @@ SYNOPSIS:
 <h3><a name="ttssh_2.14">2005.5.28 (Ver 2.14)</a></h3>
 <ul class="history">
       <li>added three file filter on private key saving dialog.</li>
-      <li>added zlib version information on TTSSH version dialog.</li>
+      <li>added zlib version information on "About TTSSH" dialog.</li>
 </ul>
 
 <h3><a name="ttssh_2.13">2005.4.24 (Ver 2.13)</a></h3>
@@ -4125,7 +4125,7 @@ SYNOPSIS:
 <h3><a name="ttssh_1.08">2005.1.30 (Ver 1.08)</a></h3>
 <ul class="history">
       <li>added support of keyboard-interactive authentication. You can configure the its authentication enabling flag by "KeyboardInteractive" entry of TTSSH section in the 'teraterm.ini' file.</li>
-      <li>added show of Project Homepage URL and OpenSSL version at version dialog.</li>
+      <li>added show of Project Homepage URL and OpenSSL version at "About TTSSH" dialog.</li>
       <li>fixed the application fault of pushing enter key before be grayed at rhosts and TIS in SSH2 authentication dialog.</li>
       <li>added support of public-key authentication auto-login. And also added /auth=publickey and /keyfile command line option.</li>
 </ul>
@@ -4187,7 +4187,7 @@ SYNOPSIS:
       <li>added support of KEX algorithm diffie-hellman-group14-sha(OpenSSH 3.9 later version)</li>
       <li>added support of KEX algorithm diffie-hellman-group-exchange-sha1</li>
       <li>added support of server host key algorithm ssh-dss</li>
-      <li>added show of SSH2 information in version dialog</li>
+      <li>added show of SSH2 information in "About TTSSH" dialog</li>
       <li>upgraded OpenSSL to 0.9.7e</li>
       <li>rewrote README(English). Special thanks to Boris Maisuradze for his cooperation.</li>
 </ul>

@@ -3196,7 +3196,7 @@
 <ul class="history">
   <li>変更
     <ul>
-      <li>known_hostsダイアログおよびバージョン情報ダイアログにおいて、サーバホスト鍵の指紋を表示するときに使うハッシュアルゴリズムを、MD5 だけでなく SHA256 も選択できるようにした。</li>
+      <li>known_hostsダイアログおよび"About TTSSH" ダイアログにおいて、サーバホスト鍵の指紋を表示するときに使うハッシュアルゴリズムを、MD5 だけでなく SHA256 も選択できるようにした。</li>
       <li>DNS によるホスト鍵の確認(SSHFP)で ED25519 鍵に対応した。</li>
       <li>TERATERM.INI の設定値で指定されていない鍵交換・ホスト鍵・暗号化・MAC・圧縮方式の、プログラムでの挿入位置を変更した。
         <ul>
@@ -3240,7 +3240,7 @@
   <li>バグ修正
     <ul>
       <li>Tera Term 4.87(TTSSH 2.73) で一部の Cisco の機器へ接続できない問題への処置を追加した。</li>
-      <li>ホスト公開鍵の自動更新によるknown_hosts更新後、バージョン情報のfingerprint表示で落ちる問題を修正した。</li>
+      <li>ホスト公開鍵の自動更新によるknown_hosts更新後、"About TTSSH" ダイアログのfingerprint表示で落ちる問題を修正した。</li>
     </ul>
   </li>
 
@@ -3364,7 +3364,7 @@
           <li><a href="../menu/setup-sshkeygenerator.html">Key Generator</a>で RSA/DSA/ECDSA 秘密鍵ファイルに bcrypt KDF 形式を選択可能とした。</li>
           <li>Host Key algorithmに ED25519 を追加した。teraterm.ini の HostKeyOrder エントリを変更した。</li>
         </ul></li>
-      <li>バージョン情報にホスト公開鍵の指紋およびランダムアートを表示するようにした。</li>
+      <li>"About TTSSH" ダイアログにホスト公開鍵の指紋およびランダムアートを表示するようにした。</li>
       <li>端末オプションのONLCR設定をサーバに通知するようにした。</li>
     </ul>
   </li>
@@ -3565,7 +3565,7 @@
     <ul>
       <li>SSH2 の共通鍵暗号方式に Camellia128-CBC, Camellia128-CTR, Camellia192-CBC, Camellia192-CTR, Camellia256-CBC, Camellia256-CTR を追加した。</li>
       <li>SSH2 の MAC アルゴリズムとして hmac-sha2-256, hmac-sha2-256-96, hmac-sha2-512, hmac-sha2-512-96 をサポートした。</li>
-      <li>バージョンダイアログに、PuTTYのバージョンを表記するようにした。</li>
+      <li>"About TTSSH" ダイアログに、PuTTYのバージョンを表記するようにした。</li>
       <li>接続時に時間がかかるため、省略できる乱数の初期化を削除した。</li>
       <li>ログファイルのタイムスタンプをミリ秒まで記録するようにした。</li>
     </ul>
@@ -4083,7 +4083,7 @@
 <h3><a name="ttssh_2.14">2005.5.28 (Ver 2.14)</a></h3>
 <ul class="history">
       <li>秘密鍵ファイルダイアログに3ファイルフィルタを追加した。</li>
-      <li>zlibのバージョンをバージョン情報に追加した。</li>
+      <li>zlibのバージョン情報を"About TTSSH" ダイアログに追加した。</li>
 </ul>
 
 <h3><a name="ttssh_2.13">2005.4.24 (Ver 2.13)</a></h3>
@@ -4130,7 +4130,7 @@
 <h3><a name="ttssh_1.08">2005.1.30 (Ver 1.08)</a></h3>
 <ul class="history">
       <li>keyboard-interactive認証をサポートした。それにともない、teraterm.ini ファイルのTTSSHセクションの"KeyboardInteractive"エントリを追加した。</li>
-      <li>バージョンダイアログにホームページのURL・OpenSSLバージョンを追加した。</li>
+      <li>"About TTSSH" ダイアログにホームページのURL・OpenSSLバージョンを追加した。</li>
       <li>SSH2認証ダイアログで、rhostsおよびTISがグレーになる前に、Enterキーを押下すると、アプリケーションエラーとなる現象に対処した。</li>
       <li>公開鍵認証自動ログインをサポート。/auth=publickey, /keyfileコマンドラインオプションを追加。</li>
 </ul>
@@ -4192,7 +4192,7 @@
       <li>KEXアルゴリズム diffie-hellman-group14-sha1 (OpenSSH 3.9以降)をサポートした</li>
       <li>KEXアルゴリズム diffie-hellman-group-exchange-sha1 をサポートした</li>
       <li>ホストキーアルゴリズム ssh-dss をサポートした</li>
-      <li>バージョン情報ダイアログにSSH2情報を出力するようにした</li>
+      <li>"About TTSSH" ダイアログにSSH2情報を出力するようにした</li>
       <li>OpenSSL 0.9.7eへ差し替えた</li>
       <li>READMEをBoris Maisuradze氏に英文化していただきました。感謝します。</li>
 </ul>
