@@ -245,7 +245,15 @@ Example: adding a TTSSH menu under File menu
   To release Tera Term installation package is shown in the following step:
 
   0. Increment the version while RC release process.
-     - tt-version.h
+     - teraterm\common\tt-version.h
+     - ttssh2\ttxssh\ttxssh-version.h
+     - ttpmenu.rc // only modifying
+     - TTProxy.rc // only modifying
+     - ttxkanjimenu.rc // only modifying
+     - teraterm.iss
+       version up AppVer and add "RC"
+       comment out snapshot
+       change called batch files
 
   1. Check latest libraries and tools.
      Visual Studio
@@ -271,12 +279,8 @@ Example: adding a TTSSH menu under File menu
   2. Check the document files.
 
   3. Increase the software version and modify date.
-     - ttxssh-version.h
-     - ttpmenu.rc // only modifying
-     - TTProxy.rc // only modifying
-     - ttxkanjimenu.rc // only modifying
      - teraterm.iss
-       version up AppVer, comment out snapshot, change called batch files
+       remove "RC" from AppVer
      - html/about/hisotry.html
 
      Note: Don't update the version number until the release, because the installer does not overwrite file when versions are same.
@@ -316,3 +320,5 @@ Example: adding a TTSSH menu under File menu
   13. Announce release to Twitter.
       https://twitter.com/Tera_Term
       Post release announcement and pin.
+
+  14. Update Chocolatey

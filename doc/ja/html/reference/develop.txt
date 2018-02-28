@@ -253,7 +253,15 @@
 
   0. RC 作成時にバージョンを一つインクリメントする。
      一般にテストを呼びかけ、旧バージョンとの同時実行が考えられるため(cf. TT_FILEMAPNAME 定義)。
-     - tt-version.h
+     - teraterm\common\tt-version.h
+     - ttssh2\ttxssh\ttxssh-version.h
+     - ttpmenu.rc // 変更時のみ
+     - TTProxy.rc // 変更時のみ
+     - ttxkanjimenu.rc // 変更時のみ
+     - teraterm.iss
+       AppVer を上げ、"RC" を追加
+       snapshot を コメントアウト
+       バッチファイルの呼び出しを修正
 
   1. 依存ライブラリ、ツール、インポート元の最新版をチェックする。
      Visual Studio
@@ -283,12 +291,8 @@
      - ドキュメント差分が翻訳されていることを確認する。
 
   3. バージョンを上げ、日付を変更する。
-     - ttxssh-version.h
-     - ttpmenu.rc // 変更時のみ
-     - TTProxy.rc // 変更時のみ
-     - ttxkanjimenu.rc // 変更時のみ
      - teraterm.iss
-       AppVer を上げる、snapshot を コメントアウト、バッチファイルの呼び出しを修正。
+       AppVer から RC を削除
      - html/about/hisotry.html
 
      CygTerm+ は例外で、リリースとは関係なくバージョンが上がる。
@@ -330,3 +334,5 @@
   13. Twitter に告知する。
       https://twitter.com/Tera_Term
       リリース告知をツイートして固定する。
+
+  14. Chocolatey の登録を更新
