@@ -193,6 +193,7 @@
 #define HlpSetupTeratermPrint   71005
 #define HlpSetupTeratermMisc    71006
 #define HlpSetupTeratermIni     71007
+#define HlpSetupTeratermSSH     71008
 #define HlpSetupKbd             71000
 #define HlpSetupSshknownhosts   72000
 #define HlpSetupCygterm         73000

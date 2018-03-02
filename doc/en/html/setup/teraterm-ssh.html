@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>TTSSH (Tera Term setup file)</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1><a name="AuthBanner">”FØƒoƒi[‚Ì•\Ž¦•û–@</a></h1>
+
+<p>
+SSH ”FØŽžAƒT[ƒo‚©‚ç SSH_MSG_USERAUTH_BANNER ƒƒbƒZ[ƒW‚ª‘—‚ç‚ê‚Ä—ˆ‚éŽ–‚ª‚ ‚è‚Ü‚·B<br />
+•W€‚Å‚Í‚±‚ÌƒƒbƒZ[ƒW‚Ì“à—e‚ð VT ƒEƒBƒ“ƒhƒE‚Å•\Ž¦‚µ‚Ü‚·B•\Ž¦•û–@‚ð•ÏX‚·‚éê‡‚ÍÝ’èƒtƒ@ƒCƒ‹‚Ì [TTSSH] ƒZƒNƒVƒ‡ƒ“‚Ì AuthBanner s‚ðAˆÈ‰º‚Ì‚æ‚¤‚É•ÏX‚µ‚Ä‰º‚³‚¢B
+</p>
+
+<pre>
+AuthBanner=&lt;•\Ž¦•û–@&gt;
+</pre>
+
+<p>
+•\Ž¦•û–@‚É‚Í 0 ` 3 ‚ªŽw’è‚Å‚«‚Ü‚·B‚»‚ê‚¼‚ê‚Ì’l‚ÌˆÓ–¡‚ÍˆÈ‰º‚Ì‚Æ‚¨‚è‚Å‚·B
+</p>
+
+<table>
+<thead>
+  <tr> <th>’l</th> <th>“®ì</th> </tr>
+</thead>
+<tbody>
+  <tr> <td>0</td>  <td>•\Ž¦‚µ‚È‚¢</td> </tr>
+  <tr> <td>1</td>  <td>VT ƒEƒBƒ“ƒhƒE“à‚É•\Ž¦‚·‚é</td> </tr>
+  <tr> <td>2</td>  <td>ƒ|ƒbƒvƒAƒbƒv‚Å•\Ž¦‚·‚é</td> </tr>
+  <tr> <td>3</td>  <td>ƒoƒ‹[ƒ“ƒ`ƒbƒv‚Å•\Ž¦‚·‚é</td> </tr>
+</tbody>
+</table>
+
+<pre>
+Default:
+AuthBanner=1
+</pre>
+
+
+<h1><a name="DisablePopupMessage">ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Ì—}Ž~</a></h1>
+
+<p>
+ƒ}ƒNƒ‚â”ñƒƒOƒIƒ“ó‘Ô‚Å‚ÌŽ©“®ŽÀsŽž‚ÉƒGƒ‰[‚âŒx‚Æ‚È‚éó‘Ô‚ª”­¶‚µ‚½ê‡AƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ª•\Ž¦‚³‚êƒ†[ƒU‚Ì‘€ì‘Ò‚¿‚É‚È‚é‚ÆŽŸ‚ÌŽè‡‚Éi‚Ü‚È‚­‚È‚è‚Ü‚·B<br />
+‚±‚Ì‚æ‚¤‚Èê‡‚Ì‚½‚ßAƒGƒ‰[‚âŒx‚ª‚ ‚Á‚½ê‡‚ÉƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ð•\Ž¦‚³‚¹‚È‚¢‚æ‚¤‚É‚Å‚«‚Ü‚·B
+</p>
+
+<pre>
+DisablePopupMessage=&lt;•\Ž¦•û–@&gt;
+</pre>
+
+<p>
+•\Ž¦•û–@‚É‚Í 0 ‚© 1 ‚ªŽw’è‚Å‚«‚Ü‚·B‚»‚ê‚¼‚ê‚Ì’l‚ÌˆÓ–¡‚ÍˆÈ‰º‚Ì‚Æ‚¨‚è‚Å‚·B
+</p>
+
+<table>
+<thead>
+  <tr> <th>’l</th> <th>“®ì</th> </tr>
+</thead>
+<tbody>
+  <tr> <td>0</td>  <td>ƒ|ƒbƒvƒAƒbƒv‚ð—}Ž~‚µ‚È‚¢</td> </tr>
+  <tr> <td>1</td>  <td>ƒ|ƒbƒvƒAƒbƒv‚ð—}Ž~‚·‚é</td> </tr>
+</tbody>
+</table>
+
+<pre>
+Default:
+DisablePopupMessage=0
+</pre>
+
+
+<!--h1><a name="EnableRsaShortKeyServer">768bit –¢–ž‚Ì RSA ƒT[ƒoƒzƒXƒgŒ®‚ðŽ‚ÂƒT[ƒo‚Ö‚ÌÚ‘±‚ð‹–‚·</a></h1>
+
+<p>
+SSH ƒT[ƒoƒzƒXƒgŒ®‚Í RSA ‚Ìê‡‚ÉÅ’á 768bit ‚Ì’·‚³‚ð•K—v‚Æ‚·‚é‚ªA768bit –¢–ž‚ÌƒT[ƒoƒzƒXƒgŒ®‚ðŽ‚Â‹@Ší‚à‘¶Ý‚·‚éB<br />
+’Êí TTSSH Œ®’·‚ª’Z‚·‚¬‚éê‡‚ÉÚ‘±‚ðØ‚é‚ªA‚±‚ÌÝ’è‚ð‚·‚é‚±‚Æ‚Å—áŠO“I‚ÉÚ‘±‚ð‹–‚·‚±‚Æ‚ª‚Å‚«‚éB
+</p>
+
+<pre>
+EnableRsaShortKeyServer=&lt;Ý’è’l&gt;
+</pre>
+
+<p>
+Ý’è’l‚É‚Í 0 ‚© 1 ‚ªŽw’è‚Å‚«‚Ü‚·B‚»‚ê‚¼‚ê‚Ì’l‚ÌˆÓ–¡‚ÍˆÈ‰º‚Ì‚Æ‚¨‚è‚Å‚·B
+</p>
+
+<table>
+<thead>
+  <tr> <th>’l</th> <th>“®ì</th> </tr>
+</thead>
+<tbody>
+  <tr> <td>0</td>  <td>Ú‘±‚ð‹–‚³‚È‚¢</td> </tr>
+  <tr> <td>1</td>  <td>Ú‘±‚ð‹–‚·</td> </tr>
+</tbody>
+</table>
+
+<pre>
+Default:
+EnableRsaShortKeyServer=0
+</pre-->
+
+
+<h1><a name="GexMinimalGroupSize">Diffie-Hellman ŒQŒðŠ·•ûŽ®Œ®ŒðŠ·‚Å‚ÌŒQ‚ÌÅ¬ƒTƒCƒY</a></h1>
+
+<p>
+SSH ‚ÌŒ®ŒðŠ·•ûŽ®‚Æ‚µ‚Ä "Diffie-Hellman ŒQŒðŠ·" (diffie-hellman-group-exchange-sha*) ‚ðŽg—p‚·‚éê‡ASSH ƒNƒ‰ƒCƒAƒ“ƒg‚ÍŒ®ŒðŠ·‚ÉŽg—p‚·‚éŒQ‚ÌuÅ¬ƒTƒCƒYvu’ñˆÄƒTƒCƒYvuÅ‘åƒTƒCƒYv‚Ì—v‹‚ðƒT[ƒo‚É‘—M‚µ‚Ü‚·B<br />
+Œãq‚Ì‚æ‚¤‚ÉŒ»Ý‚Ì TTSSH ‚Í•W€‚Å 2048 ‚ðÅ¬ƒTƒCƒY‚Æ‚µ‚Ä‘—‚è‚Ü‚·BƒT[ƒo‚©‚ç‘—‚ç‚ê‚Ä—ˆ‚½ŒQ‚ÌƒTƒCƒY‚ª‚±‚ÌÅ¬’l‚æ‚è¬‚³‚¢ê‡ATTSSH ‚ÍÚ‘±‚ð‘±s‚µ‚Ä‚¢‚¢‚©Šm”F‚·‚éƒ_ƒCƒAƒƒO‚ð•\Ž¦‚µ‚Ü‚·B
+</p>
+
+<p>
+Ý’èƒtƒ@ƒCƒ‹‚Ì [TTSSH] ƒZƒNƒVƒ‡ƒ“‚Ì GexMinimalGroupSize s‚ðˆÈ‰º‚Ì‚æ‚¤‚É•ÏX‚·‚é‚±‚Æ‚É‚æ‚Á‚ÄAƒT[ƒo‚É—v‹‚·‚éŒQ‚ÌÅ¬ƒTƒCƒY‚ð•ÏX‚Å‚«‚Ü‚·B
+</p>
+
+<pre>
+GexMinimalGroupSize=&lt;ŒQ‚ÌÅ¬ƒTƒCƒY&gt;
+</pre>
+
+<p>
+ŒQ‚ÌÅ¬ƒTƒCƒY‚É‚Í 0 ‚¨‚æ‚Ñ 1024 ` 8192 ‚ªŽw’è‚Å‚«‚Ü‚·B<br />
+0 ‚ðŽw’è‚µ‚½Žž‚Í TTSSH ‚ªÅ“K‚Æ”»’f‚µ‚½’l‚ðŽg‚¢‚Ü‚·BŒ»Ý‚Ìƒo[ƒWƒ‡ƒ“‚Ì TTSSH ‚Å‚Í <a href="https://tools.ietf.org/html/rfc8270">RFC 8270</a> ‚É]‚¢ 2048 ‚ª‘—‚ç‚ê‚Ü‚·B«—ˆ‚Ìƒo[ƒWƒ‡ƒ“‚Å‚Í‚±‚Ì’l‚ª•ÏX‚³‚ê‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B<br />
+1024 ` 8192 ‚ÌŠÔ‚Ì’l‚ðŽw’è‚µ‚½ê‡‚Í‚»‚Ì’l‚ªŽg‚í‚ê‚Ü‚·B
+</p>
+
+<pre>
+Default:
+GexMinimalGroupSize=0
+</pre>
+
+
+<h1><a name="LogLevel">ƒƒOƒŒƒxƒ‹</a></h1>
+
+<p>
+TTSSH ‚ª TTSSH.LOG ‚É‹L˜^‚·‚éƒƒO‚ÌƒŒƒxƒ‹‚ðÝ’è‚µ‚Ü‚·B
+</p>
+
+<pre>
+LogLevel=&lt;Ý’è’l&gt;
+</pre>
+
+<table>
+<thead>
+  <tr> <th>’l</th> <th>“®ì</th> </tr>
+</thead>
+<tbody>
+  <tr> <td>0</td>  <td>–³Œø</td> </tr>
+  <tr> <td>5</td>  <td>FATAL</td> </tr>
+  <tr> <td>10</td> <td>ERROR</td> </tr>
+  <tr> <td>30</td> <td>WARNING</td> </tr>
+  <tr> <td>50</td> <td>NOTICE</td> </tr>
+  <tr> <td>80</td> <td>INFO</td> </tr>
+  <tr> <td>100</td><td>VERBOSE</td> </tr>
+  <tr> <td>200</td><td>SSHDUMP</td> </tr>
+</tbody>
+</table>
+
+<pre>
+Default:
+LogLevel=0
+</pre>
+
+
+<h1><a name="X11Display">X11“]‘—‚Å‚Ì“]‘—æƒfƒBƒXƒvƒŒƒCŽw’è</a></h1>
+
+<p>
+X11 “]‘—‚Å‚Ì“]‘—æƒfƒBƒXƒvƒŒƒC‚ðŽw’è‚·‚é‚É‚ÍAÝ’èƒtƒ@ƒCƒ‹‚Ì [TTSSH] ƒZƒNƒVƒ‡ƒ“‚Ì X11Display s‚ðˆÈ‰º‚Ì‚æ‚¤‚É•ÏX‚µ‚Ä‰º‚³‚¢B
+</p>
+
+<pre>
+X11Display=&lt;ƒfƒBƒXƒvƒŒƒCŽw’è&gt;
+</pre>
+
+<p>
+ƒfƒBƒXƒvƒŒƒCŽw’è‚É‚Í X11 ‚Ì’Êí‚ÌƒfƒBƒXƒvƒŒƒCŽw’èŒ`Ž®([&lt;ƒzƒXƒg&gt;]:[&lt;ƒfƒBƒXƒvƒŒƒC”Ô†&gt;[.&lt;ƒXƒNƒŠ[ƒ“”Ô†&gt;]) ‚ªŽg‚¦‚Ü‚·BX11Display ‚É‚È‚É‚àŽw’è‚µ‚È‚©‚Á‚½(‹ó•¶Žš—ñ‚ðŽw’è‚µ‚½)ê‡AŠÂ‹«•Ï” DISPLAY ‚ªÝ’è‚³‚ê‚Ä‚¢‚ê‚Î‚»‚Ì’l‚ªAÝ’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½ê‡‚Í localhost:0.0 ‚ªŽg‚í‚ê‚Ü‚·B
+</p>
+
+<p>
+‚±‚ÌÝ’è‚Í <a href="../commandline/ttssh.html#ssh-x">/ssh-X ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒIƒvƒVƒ‡ƒ“</a> ‚Åã‘‚«‚³‚ê‚Ü‚·BÝ’è‚Ì—Dæ‡ˆÊ‚ÍˆÈ‰º‚Ì‡”Ô‚Æ‚È‚Á‚Ä‚¢‚Ü‚·B
+</p>
+
+<ol>
+  <li><a href="../commandline/ttssh.html#ssh-x">/ssh-X ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ƒIƒvƒVƒ‡ƒ“</a></li>
+  <li>Ý’èƒtƒ@ƒCƒ‹‚Ì [TTSSH] ƒZƒNƒVƒ‡ƒ“‚Ì X11Display Ý’è</li>
+  <li>ŠÂ‹«•Ï” DISPLAY ‚Ì’l</li>
+  <li>localhost:0.0</li>
+</ol>
+
+<pre>
+Default:
+X11Display=
+</pre>
+
+
+
+</BODY>
+</HTML>
