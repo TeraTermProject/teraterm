@@ -9,30 +9,31 @@
 </HEAD>
 <BODY>
 
-<h1><a name="AuthBanner">認証バナーの表示方法</a></h1>
+<h1><a name="AuthBanner">How to display authentication banner</a></h1>
 
 <p>
-SSH 認証時、サーバから SSH_MSG_USERAUTH_BANNER メッセージが送られて来る事があります。<br />
-標準ではこのメッセージの内容を VT ウィンドウで表示します。表示方法を変更する場合は設定ファイルの [TTSSH] セクションの AuthBanner 行を、以下のように変更して下さい。
+When SSH authentication is used, the SSH_MSG_USERAUTH_BANNER message may be sent from server.<br />
+Basically, this message is shown on VT window. If display method is changed, please change AuthBanner entry of [TTSSH] section in the following:
 </p>
 
 <pre>
-AuthBanner=&lt;表示方法&gt;
+AuthBanner=&lt;Display Method&gt;
 </pre>
 
 <p>
-表示方法には 0 ～ 3 が指定できます。それぞれの値の意味は以下のとおりです。
+The display method can be specified from 0 to 3. 
+Meaning of each value in the following:
 </p>
 
 <table>
 <thead>
-  <tr> <th>値</th> <th>動作</th> </tr>
+  <tr> <th>Value</th> <th>Action</th> </tr>
 </thead>
 <tbody>
-  <tr> <td>0</td>  <td>表示しない</td> </tr>
-  <tr> <td>1</td>  <td>VT ウィンドウ内に表示する</td> </tr>
-  <tr> <td>2</td>  <td>ポップアップで表示する</td> </tr>
-  <tr> <td>3</td>  <td>バルーンチップで表示する</td> </tr>
+  <tr> <td>0</td>  <td>No display</td> </tr>
+  <tr> <td>1</td>  <td>Display in VT window</td> </tr>
+  <tr> <td>2</td>  <td>Display by pop-up</td> </tr>
+  <tr> <td>3</td>  <td>Display by balloon tip</td> </tr>
 </tbody>
 </table>
 
@@ -42,28 +43,30 @@ AuthBanner=1
 </pre>
 
 
-<h1><a name="DisablePopupMessage">メッセージボックスの抑止</a></h1>
+<h1><a name="DisablePopupMessage">Suppressing message box</a></h1>
 
 <p>
-マクロや非ログオン状態での自動実行時にエラーや警告となる状態が発生した場合、メッセージボックスが表示されユーザの操作待ちになると次の手順に進まなくなります。<br />
-このような場合のため、エラーや警告があった場合にメッセージボックスを表示させないようにできます。
+When Tera Term is automated by using macro or non-logon and the error and warning is occurred, 
+the message box will be shown. Next, Tera Term waits user operation and the procedure can not be continued.<br />
+To prevent this problem, the message box can be suppressed.
 </p>
 
 <pre>
-DisablePopupMessage=&lt;表示方法&gt;
+DisablePopupMessage=&lt;Display Method&gt;
 </pre>
 
 <p>
-表示方法には 0 か 1 が指定できます。それぞれの値の意味は以下のとおりです。
+The display method can be specified with 0 or 1.
+Meaning of each value is as follows.
 </p>
 
 <table>
 <thead>
-  <tr> <th>値</th> <th>動作</th> </tr>
+  <tr> <th>Value</th> <th>Action</th> </tr>
 </thead>
 <tbody>
-  <tr> <td>0</td>  <td>ポップアップを抑止しない</td> </tr>
-  <tr> <td>1</td>  <td>ポップアップを抑止する</td> </tr>
+  <tr> <td>0</td>  <td>Not suppress pop-up window</td> </tr>
+  <tr> <td>1</td>  <td>Suppress pop-up window</td> </tr>
 </tbody>
 </table>
 
@@ -73,28 +76,30 @@ DisablePopupMessage=0
 </pre>
 
 
-<!--h1><a name="EnableRsaShortKeyServer">768bit 未満の RSA サーバホスト鍵を持つサーバへの接続を許す</a></h1>
+<!--h1><a name="EnableRsaShortKeyServer">Enabling connection to server with RSA host key less than 768bit</a></h1>
 
 <p>
-SSH サーバホスト鍵は RSA の場合に最低 768bit の長さを必要とするが、768bit 未満のサーバホスト鍵を持つ機器も存在する。<br />
-通常 TTSSH 鍵長が短すぎる場合に接続を切るが、この設定をすることで例外的に接続を許すことができる。
+The RSA host key of SSH server needs 768bit length at least, however some server having the host key less than 768bit exist.<br />
+Basically, when the host key of SSH server length is too small, Tera Term disconnects current session. 
+However, this configuration enables to permit exceptionally.
 </p>
 
 <pre>
-EnableRsaShortKeyServer=&lt;設定値&gt;
+EnableRsaShortKeyServer=&lt;Value&gt;
 </pre>
 
 <p>
-設定値には 0 か 1 が指定できます。それぞれの値の意味は以下のとおりです。
+The value can be specified with 0 or 1.
+Meaning of each value is as follows.
 </p>
 
 <table>
 <thead>
-  <tr> <th>値</th> <th>動作</th> </tr>
+  <tr> <th>Value</th> <th>Action</th> </tr>
 </thead>
 <tbody>
-  <tr> <td>0</td>  <td>接続を許さない</td> </tr>
-  <tr> <td>1</td>  <td>接続を許す</td> </tr>
+  <tr> <td>0</td>  <td>Disable connection</td> </tr>
+  <tr> <td>1</td>  <td>Allow connection</td> </tr>
 </tbody>
 </table>
 
@@ -104,25 +109,30 @@ EnableRsaShortKeyServer=0
 </pre-->
 
 
-<h1><a name="GexMinimalGroupSize">Diffie-Hellman 群交換方式鍵交換での群の最小サイズ</a></h1>
+<h1><a name="GexMinimalGroupSize">Minimum group size for Diffie-Hellman Group Exchange</a></h1>
 
 <p>
-SSH の鍵交換方式として "Diffie-Hellman 群交換" (diffie-hellman-group-exchange-sha*) を使用する場合、SSH クライアントは鍵交換に使用する群の「最小サイズ」「提案サイズ」「最大サイズ」の要求をサーバに送信します。<br />
-後述のように現在の TTSSH は標準で 2048 を最小サイズとして送ります。サーバから送られて来た群のサイズがこの最小値より小さい場合、TTSSH は接続を続行していいか確認するダイアログを表示します。
+When Diffie-Hellman Group Exchange(diffie-hellman-group-exchange-sha*) is used for key exchanging method, 
+SSH client some requests of 'Minimum size', 'Proposed size' and 'Maximum size' regarding group to server.<br />
+As described below, current TTSSH sends 2048 as minimum size to server. When the group size sent from server 
+is smaller than the minimu size, TTSSH shows the confirmation dialog whether the connection continues.
 </p>
 
 <p>
-設定ファイルの [TTSSH] セクションの GexMinimalGroupSize 行を以下のように変更することによって、サーバに要求する群の最小サイズを変更できます。
+When the GexMinimalGroupSize entry of [TTSSH] section is changed below, the minimum size of
+group requesting to server.
 </p>
 
 <pre>
-GexMinimalGroupSize=&lt;群の最小サイズ&gt;
+GexMinimalGroupSize=&lt;Minimum size of group&gt;
 </pre>
 
 <p>
-群の最小サイズには 0 および 1024 ～ 8192 が指定できます。<br />
-0 を指定した時は TTSSH が最適と判断した値を使います。現在のバージョンの TTSSH では <a href="https://tools.ietf.org/html/rfc8270">RFC 8270</a> に従い 2048 が送られます。将来のバージョンではこの値が変更される可能性があります。<br />
-1024 ～ 8192 の間の値を指定した場合はその値が使われます。
+The minimum size of group can be specified with 0 and 1024 to 8192.<br />
+When the value is 0, TTSSH uses the optimal value. Current TTSSH sends 2048 
+in accordance with <a href="https://tools.ietf.org/html/rfc8270">RFC 8270</a>.
+The value will be changed in the future.<br />
+When the value is specified from 1024 to 8192, the value is used necessarily.
 </p>
 
 <pre>
@@ -131,22 +141,22 @@ GexMinimalGroupSize=0
 </pre>
 
 
-<h1><a name="LogLevel">ログレベル</a></h1>
+<h1><a name="LogLevel">Log Level</a></h1>
 
 <p>
-TTSSH が TTSSH.LOG に記録するログのレベルを設定します。
+The log level can be specified that TTSSH records to TTSSH.LOG file.
 </p>
 
 <pre>
-LogLevel=&lt;設定値&gt;
+LogLevel=&lt;Value&gt;
 </pre>
 
 <table>
 <thead>
-  <tr> <th>値</th> <th>動作</th> </tr>
+  <tr> <th>Value</th> <th>Action</th> </tr>
 </thead>
 <tbody>
-  <tr> <td>0</td>  <td>無効</td> </tr>
+  <tr> <td>0</td>  <td>Invalid</td> </tr>
   <tr> <td>5</td>  <td>FATAL</td> </tr>
   <tr> <td>10</td> <td>ERROR</td> </tr>
   <tr> <td>30</td> <td>WARNING</td> </tr>
@@ -163,28 +173,32 @@ LogLevel=0
 </pre>
 
 
-<h1><a name="X11Display">X11転送での転送先ディスプレイ指定</a></h1>
+<h1><a name="X11Display">Destination display for X11 transfer</a></h1>
 
 <p>
-X11 転送での転送先ディスプレイを指定するには、設定ファイルの [TTSSH] セクションの X11Display 行を以下のように変更して下さい。
+When destination display for X11 transfer is specified, please change the X11Display entry
+of [TTSSH] section in the following.
 </p>
 
 <pre>
-X11Display=&lt;ディスプレイ指定&gt;
+X11Display=&lt;Display specification&gt;
 </pre>
 
 <p>
-ディスプレイ指定には X11 の通常のディスプレイ指定形式([&lt;ホスト&gt;]:[&lt;ディスプレイ番号&gt;[.&lt;スクリーン番号&gt;]) が使えます。X11Display になにも指定しなかった(空文字列を指定した)場合、環境変数 DISPLAY が設定されていればその値が、設定されていなかった場合は localhost:0.0 が使われます。
+The display specification can be used as X11 normal format([&lt;host&gt;]:[&lt;display number&gt;[.&lt;screen number&gt;]).
+When the X11Display is not any specified _empty string_, the DISPLAY environment variable is enabled and the value is used.
+The environment variable is disable and the  localhost:0.0 is used.
 </p>
 
 <p>
-この設定は <a href="../commandline/ttssh.html#ssh-x">/ssh-X コマンドラインオプション</a> で上書きされます。設定の優先順位は以下の順番となっています。
+This configuration is overwitten with <a href="../commandline/ttssh.html#ssh-x">/ssh-X command line option</a>.
+The configuration priority is as follows.
 </p>
 
 <ol>
-  <li><a href="../commandline/ttssh.html#ssh-x">/ssh-X コマンドラインオプション</a></li>
-  <li>設定ファイルの [TTSSH] セクションの X11Display 設定</li>
-  <li>環境変数 DISPLAY の値</li>
+  <li><a href="../commandline/ttssh.html#ssh-x">/ssh-X command line option</a></li>
+  <li>X11Display entry of [TTSSH] section</li>
+  <li>DISPLAY environment variable</li>
   <li>localhost:0.0</li>
 </ol>
 
