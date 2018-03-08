@@ -2368,8 +2368,9 @@ void CVTWindow::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
-	else
-		MouseReport(IdMouseEventBtnUp, IdLeftButton, point.x, point.y);
+	else if (MouseReport(IdMouseEventBtnUp, IdLeftButton, point.x, point.y)) {
+		ReleaseCapture();
+	}
 
 	if (! LButton) {
 		return;
@@ -2389,19 +2390,18 @@ void CVTWindow::OnMButtonDown(UINT nFlags, CPoint point)
 
 void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 {
-	BOOL mousereport;
-
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
-	else
-		mousereport = MouseReport(IdMouseEventBtnUp, IdMiddleButton, point.x, point.y);
+	else if (MouseReport(IdMouseEventBtnUp, IdMiddleButton, point.x, point.y)) {
+		ReleaseCapture();
+	}
 
 	if (! MButton) {
 		return;
 	}
 
 	// added DisablePasteMouseMButton (2008.3.2 maya)
-	if ((ts.PasteFlag & CPF_DISABLE_MBUTTON) || mousereport) {
+	if (ts.PasteFlag & CPF_DISABLE_MBUTTON) {
 		ButtonUp(FALSE);
 	}
 	else {
@@ -2574,12 +2574,11 @@ void CVTWindow::OnRButtonDown(UINT nFlags, CPoint point)
 
 void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	BOOL mousereport;
-
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
-	else
-		mousereport = MouseReport(IdMouseEventBtnUp, IdRightButton, point.x, point.y);
+	else if (MouseReport(IdMouseEventBtnUp, IdRightButton, point.x, point.y)) {
+		ReleaseCapture();
+	}
 
 	if (! RButton) {
 		return;
@@ -2590,9 +2589,8 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 	 *  ・ts.PasteFlag & CPF_DISABLE_RBUTTON -> 右ボタンによるペースト無効
 	 *  ・ts.PasteFlag & CPF_CONFIRM_RBUTTON -> 表示されたメニューからペーストを行うので、
 	 *                                          右ボタンアップによるペーストは行わない
-	 *  ・mousereport                        -> マウストラッキング中はペーストを行わない
 	 */
-	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON) || mousereport) {
+	if ((ts.PasteFlag & CPF_DISABLE_RBUTTON) || (ts.PasteFlag & CPF_CONFIRM_RBUTTON)) {
 		ButtonUp(FALSE);
 	} else {
 		ButtonUp(TRUE);
