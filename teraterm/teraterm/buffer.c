@@ -1207,14 +1207,12 @@ void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr att
 				AttrBuff[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
 				AttrBuffFG[j] = attr->Fore;
 				AttrBuffBG[j] = attr->Back;
-				j++;
 			}
-			while (j < Ptr+XStart+C) {
+			while (++j < Ptr+XStart+C) {
 				AttrBuff[j] = AttrBuff[j] & ~mask->Attr | attr->Attr;
 				AttrBuff2[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
 				AttrBuffFG[j] = attr->Fore;
 				AttrBuffBG[j] = attr->Back;
-				j++;
 			}
 			if (XStart+C<NumOfColumns && (AttrBuff[j-1] & AttrKanji)) {
 				AttrBuff[j] = AttrBuff[j] & ~mask->Attr | attr->Attr;
@@ -1229,10 +1227,10 @@ void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr att
 		for (i=YStart; i<=YEnd; i++) {
 			j = Ptr+XStart-1;
 			if (XStart>0 && (AttrBuff[j] & AttrKanji)) {
-				AttrBuff[j++] ^= attr->Attr;
+				AttrBuff[j] ^= attr->Attr;
 			}
-			while (j < Ptr+XStart+C) {
-				AttrBuff[j++] ^= attr->Attr;
+			while (++j < Ptr+XStart+C) {
+				AttrBuff[j] ^= attr->Attr;
 			}
 			if (XStart+C<NumOfColumns && (AttrBuff[j-1] & AttrKanji)) {
 				AttrBuff[j] ^= attr->Attr;
