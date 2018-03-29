@@ -1241,6 +1241,151 @@ void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr att
 	BuffUpdateRect(XStart, YStart, XEnd, YEnd);
 }
 
+void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr attr, PCharAttr mask)
+{
+	int i, j, endp;
+	LONG Ptr;
+
+	if (XEnd>NumOfColumns-1) {
+		XEnd = NumOfColumns-1;
+	}
+	if (YEnd>NumOfLines-1-StatusLine) {
+		YEnd = NumOfLines-1-StatusLine;
+	}
+	if (XStart>XEnd || YStart>YEnd) {
+		return;
+	}
+
+	Ptr = GetLinePtr(PageStart+YStart);
+
+	if (mask) { // DECCARA
+		if (YStart == YEnd) {
+			i = Ptr + XStart - 1;
+			endp = Ptr + XEnd + 1;
+
+			if (XStart > 0 && (AttrBuff[i] & AttrKanji)) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+			}
+			while (++i < endp) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+			}
+			if (XEnd < NumOfColumns-1 && (AttrBuff[i-1] & AttrKanji)) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+			}
+		}
+		else {
+			i = Ptr + XStart - 1;
+			endp = Ptr + NumOfColumns;
+
+			if (XStart > 0 && (AttrBuff[i] & AttrKanji)) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+			}
+			while (++i < endp) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+			}
+
+			for (j=0; j < YEnd-YStart-1; j++) {
+				Ptr = NextLinePtr(Ptr);
+				i = Ptr;
+				endp = Ptr + NumOfColumns;
+
+				while (i < endp) {
+					AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+					AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+					AttrBuffFG[i] = attr->Fore;
+					AttrBuffBG[i] = attr->Back;
+					i++;
+				}
+			}
+
+			Ptr = NextLinePtr(Ptr);
+			i = Ptr;
+			endp = Ptr + XEnd + 1;
+
+			while (i < endp) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+				i++;
+			}
+			if (XEnd < NumOfColumns-1 && (AttrBuff[i-1] & AttrKanji)) {
+				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
+				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
+				AttrBuffFG[i] = attr->Fore;
+				AttrBuffBG[i] = attr->Back;
+			}
+		}
+	}
+	else { // DECRARA
+		if (YStart == YEnd) {
+			i = Ptr + XStart - 1;
+			endp = Ptr + XEnd + 1;
+
+			if (XStart > 0 && (AttrBuff[i] & AttrKanji)) {
+				AttrBuff[i] ^= attr->Attr;
+			}
+			while (++i < endp) {
+				AttrBuff[i] ^= attr->Attr;
+			}
+			if (XEnd < NumOfColumns-1 && (AttrBuff[i-1] & AttrKanji)) {
+				AttrBuff[i] ^= attr->Attr;
+			}
+		}
+		else {
+			i = Ptr + XStart - 1;
+			endp = Ptr + NumOfColumns;
+
+			if (XStart > 0 && (AttrBuff[i] & AttrKanji)) {
+				AttrBuff[i] ^= attr->Attr;
+			}
+			while (++i < endp) {
+				AttrBuff[i] ^= attr->Attr;
+			}
+
+			for (j=0; j < YEnd-YStart-1; j++) {
+				Ptr = NextLinePtr(Ptr);
+				i = Ptr;
+				endp = Ptr + NumOfColumns;
+
+				while (i < endp) {
+					AttrBuff[i] ^= attr->Attr;
+					i++;
+				}
+			}
+
+			Ptr = NextLinePtr(Ptr);
+			i = Ptr;
+			endp = Ptr + XEnd + 1;
+
+			while (i < endp) {
+				AttrBuff[i] ^= attr->Attr;
+				i++;
+			}
+			if (XEnd < NumOfColumns-1 && (AttrBuff[i-1] & AttrKanji)) {
+				AttrBuff[i] ^= attr->Attr;
+			}
+			Ptr = NextLinePtr(Ptr);
+		}
+	}
+	BuffUpdateRect(0, YStart, NumOfColumns-1, YEnd);
+}
+
 int LeftHalfOfDBCS(LONG Line, int CharPtr)
 // If CharPtr is on the right half of a DBCS character,
 // return pointer to the left half

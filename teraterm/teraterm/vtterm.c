@@ -97,6 +97,7 @@ static BOOL AutoWrapMode;
 static BOOL FocusReportMode;
 static BOOL AltScr;
 static BOOL LRMarginMode;
+static BOOL RectangleMode;
 BOOL BracketedPaste;
 
 static int VTlevel;
@@ -282,6 +283,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 	MouseReportExtMode = IdMouseTrackExtNone;
 	DecLocatorFlag = 0;
 	ClearThenHome = FALSE;
+	RectangleMode = FALSE;
 
 	ChangeTerminalID();
 
@@ -3446,11 +3448,21 @@ void CSDol(BYTE b)
 			mask.Attr &= AttrSgrMask;
 			attr.Attr2 &= Attr2ColorMask;
 			mask.Attr2 &= Attr2ColorMask;
-			BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
+			if (RectangleMode) {
+				BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
+			}
+			else {
+				BuffChangeAttrStream(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, &mask);
+			}
 		}
 		else { // DECRARA
 			attr.Attr &= AttrSgrMask;
-			BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
+			if (RectangleMode) {
+			    BuffChangeAttrBox(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
+			}
+			else {
+			    BuffChangeAttrStream(Param[2]-1, Param[1]-1, Param[4]-1, Param[3]-1, &attr, NULL);
+			}
 		}
 		break;
 
@@ -3731,6 +3743,23 @@ void CSSpace(BYTE b) {
 	}
 }
 
+void CSAster(BYTE b)
+{
+	switch (b) {
+	  case 'x': // DECSACE
+		switch (Param[1]) {
+		  case 0:
+		  case 1:
+			RectangleMode = FALSE;
+			break;
+		  case 2:
+			RectangleMode = TRUE;
+			break;
+		}
+		break;
+	}
+}
+
 void PrnParseCS(BYTE b) // printer mode
 {
 	ParseMode = ModeFirst;
@@ -3849,6 +3878,7 @@ void ParseCS(BYTE b) /* b is the final char */
 			  case '!': CSExc(b); break;    /* intermediate char = '!' */
 			  case '"': CSDouble(b); break; /* intermediate char = '"' */
 			  case '$': CSDol(b); break;    /* intermediate char = '$' */
+			  case '*': CSAster(b); break;  /* intermediate char = '*' */
 			  case '\'': CSQuote(b); break; /* intermediate char = '\'' */
 			}
 			break; /* end of case Prv=0 */
