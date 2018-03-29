@@ -1204,7 +1204,7 @@ void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr att
 			j = Ptr+XStart-1;
 			if (XStart>0 && (AttrBuff[j] & AttrKanji)) {
 				AttrBuff[j] = AttrBuff[j] & ~mask->Attr | attr->Attr;
-				AttrBuff[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
+				AttrBuff2[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
 				AttrBuffFG[j] = attr->Fore;
 				AttrBuffBG[j] = attr->Back;
 			}
