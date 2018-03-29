@@ -2936,6 +2936,13 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 		if (h > ts.TerminalHeight)
 			h = ts.TerminalHeight;
 	}
+
+	// 最低でも 1x1 の端末サイズを保障する。
+	if (w <= 0)
+		w = 1;
+	if (h <= 0)
+		h = 1;
+
 	UpdateSizeTip(HVTWin, w, h);
 
 	fixed_width = w * FontWidth + margin_width;
