@@ -2927,6 +2927,15 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 
 	w = nWidth / FontWidth;
 	h = nHeight / FontHeight;
+
+	if (!ts.TermIsWin) {
+		// TermIsWin=off の時はリサイズでは端末サイズが変わらないので
+		// 現在の端末サイズを上限とする。
+		if (w > ts.TerminalWidth)
+			w = ts.TerminalWidth;
+		if (h > ts.TerminalHeight)
+			h = ts.TerminalHeight;
+	}
 	UpdateSizeTip(HVTWin, w, h);
 
 	fixed_width = w * FontWidth + margin_width;
