@@ -2905,29 +2905,60 @@ void CVTWindow::OnSize(UINT nType, int cx, int cy)
 #endif
 }
 
-// 「ドラッグ中にウィンドウの内容を表示する」にチェックが入っている場合、
-// リサイズ中は常に"WM_SIZING"が飛んでくるため、リサイズツールチップを
-// 再描画する。
-// (2008.8.1 yutaka)
+// リサイズ中の処理として、以下の二つを行う。
+// ・ツールチップで新しい端末サイズを表示する
+// ・フォントサイズと端末サイズに合わせて、ウィンドウ位置・サイズを調整する
 void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 {
 	int nWidth;
 	int nHeight;
 	RECT cr, wr;
-	int extra_width, extra_height;
+	int margin_width, margin_height;
 	int w, h;
+	int fixed_width, fixed_height;
 
 	::GetWindowRect(HVTWin, &wr);
 	::GetClientRect(HVTWin, &cr);
 
-	extra_width = wr.right - wr.left - cr.right + cr.left;
-	extra_height = wr.bottom - wr.top - cr.bottom + cr.top;
-	nWidth = (pRect->right) - (pRect->left) - extra_width;
-	nHeight = (pRect->bottom) - (pRect->top) - extra_height;
+	margin_width = wr.right - wr.left - cr.right + cr.left;
+	margin_height = wr.bottom - wr.top - cr.bottom + cr.top;
+	nWidth = (pRect->right) - (pRect->left) - margin_width;
+	nHeight = (pRect->bottom) - (pRect->top) - margin_height;
 
 	w = nWidth / FontWidth;
 	h = nHeight / FontHeight;
 	UpdateSizeTip(HVTWin, w, h);
+
+	fixed_width = w * FontWidth + margin_width;
+	fixed_height = h * FontHeight + margin_height;
+
+	switch (fwSide) { // 幅調整
+	case 1: // 左
+	case 4: // 左上
+	case 7: // 左下
+		pRect->left = pRect->right - fixed_width;
+		break;
+	case 2: // 右
+	case 5: // 右上
+	case 8: // 右下
+		pRect->right = pRect->left + fixed_width;
+		break;
+	}
+
+	switch (fwSide) { // 高さ調整
+	case 3: // 上
+	case 4: // 左上
+	case 5: // 右上
+		pRect->top = pRect->bottom - fixed_height;
+		break;
+	case 6: // 下
+	case 7: // 左下
+	case 8: // 右下
+		pRect->bottom = pRect->top + fixed_height;
+		break;
+	}
+
+	CFrameWnd::OnSizing(fwSide, pRect);
 }
 
 void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
