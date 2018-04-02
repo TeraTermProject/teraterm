@@ -144,6 +144,7 @@
     <ClCompile Include="filesys.cpp" />
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="keyboard.c" />
+    <ClCompile Include="sizetip.c" />
     <ClCompile Include="prnabort.cpp" />
     <ClCompile Include="protodlg.cpp" />
     <ClCompile Include="teklib.c" />
@@ -180,6 +181,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\tt_res.h" />
     <ClInclude Include="addsetting.h" />
+    <ClInclude Include="sizetip.h" />
     <ClInclude Include="ttfileio.h" />
   </ItemGroup>
   <ItemGroup>

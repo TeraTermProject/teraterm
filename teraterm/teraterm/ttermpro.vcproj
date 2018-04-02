@@ -318,6 +318,10 @@
 				>
 			</File>
 			<File
+				RelativePath="sizetip.c"
+				>
+			</File>
+			<File
 				RelativePath="teklib.c"
 				>
 			</File>
@@ -384,6 +388,10 @@
 			>
 			<File
 				RelativePath="addsetting.h"
+				>
+			</File>
+			<File
+				RelativePath="sizetip.h"
 				>
 			</File>
 			<File

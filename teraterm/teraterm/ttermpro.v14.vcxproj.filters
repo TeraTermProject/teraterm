@@ -63,6 +63,9 @@
     <ClCompile Include="keyboard.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
+    <ClCompile Include="sizetip.c">
+      <Filter>Source Files %28C%29</Filter>
+    </ClCompile>
     <ClCompile Include="teklib.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
@@ -139,6 +142,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="addsetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sizetip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\tt_res.h">

@@ -145,6 +145,7 @@
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="commlib.c" />
     <ClCompile Include="keyboard.c" />
+    <ClCompile Include="sizetip.c" />
     <ClCompile Include="teklib.c" />
     <ClCompile Include="telnet.c" />
     <ClCompile Include="ttdde.c" />
@@ -175,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="addsetting.h" />
+    <ClInclude Include="sizetip.h" />
     <ClInclude Include="..\common\tt_res.h" />
     <ClInclude Include="ttfileio.h" />
   </ItemGroup>
