@@ -4050,6 +4050,13 @@ void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
 			break;
 		}
 		break;
+	  case '*':
+		switch (StrBuff[1]) {
+		  case 'x': // DECSACE
+			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r%d*x", CLocale, RectangleMode?2:0);
+			break;
+		}
+		break;
 	  case 'm':	// SGR
 		if (StrBuff[1] == 0) {
 			len = _snprintf_s_l(RepStr, sizeof(RepStr), _TRUNCATE, "1$r0", CLocale);
