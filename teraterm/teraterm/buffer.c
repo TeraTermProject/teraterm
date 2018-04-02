@@ -1205,20 +1205,20 @@ void BuffChangeAttrBox(int XStart, int YStart, int XEnd, int YEnd, PCharAttr att
 			if (XStart>0 && (AttrBuff[j] & AttrKanji)) {
 				AttrBuff[j] = AttrBuff[j] & ~mask->Attr | attr->Attr;
 				AttrBuff2[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[j] = attr->Fore;
-				AttrBuffBG[j] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[j] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[j] = attr->Back; }
 			}
 			while (++j < Ptr+XStart+C) {
 				AttrBuff[j] = AttrBuff[j] & ~mask->Attr | attr->Attr;
 				AttrBuff2[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[j] = attr->Fore;
-				AttrBuffBG[j] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[j] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[j] = attr->Back; }
 			}
 			if (XStart+C<NumOfColumns && (AttrBuff[j-1] & AttrKanji)) {
 				AttrBuff[j] = AttrBuff[j] & ~mask->Attr | attr->Attr;
 				AttrBuff2[j] = AttrBuff2[j] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[j] = attr->Fore;
-				AttrBuffBG[j] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[j] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[j] = attr->Back; }
 			}
 			Ptr = NextLinePtr(Ptr);
 		}
@@ -1266,20 +1266,20 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 			if (XStart > 0 && (AttrBuff[i] & AttrKanji)) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 			}
 			while (++i < endp) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 			}
 			if (XEnd < NumOfColumns-1 && (AttrBuff[i-1] & AttrKanji)) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 			}
 		}
 		else {
@@ -1289,14 +1289,14 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 			if (XStart > 0 && (AttrBuff[i] & AttrKanji)) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 			}
 			while (++i < endp) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 			}
 
 			for (j=0; j < YEnd-YStart-1; j++) {
@@ -1307,8 +1307,8 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 				while (i < endp) {
 					AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 					AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-					AttrBuffFG[i] = attr->Fore;
-					AttrBuffBG[i] = attr->Back;
+					if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+					if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 					i++;
 				}
 			}
@@ -1320,15 +1320,15 @@ void BuffChangeAttrStream(int XStart, int YStart, int XEnd, int YEnd, PCharAttr 
 			while (i < endp) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 				i++;
 			}
 			if (XEnd < NumOfColumns-1 && (AttrBuff[i-1] & AttrKanji)) {
 				AttrBuff[i] = AttrBuff[i] & ~mask->Attr | attr->Attr;
 				AttrBuff2[i] = AttrBuff2[i] & ~mask->Attr2 | attr->Attr2;
-				AttrBuffFG[i] = attr->Fore;
-				AttrBuffBG[i] = attr->Back;
+				if (mask->Attr2 & Attr2Fore) { AttrBuffFG[i] = attr->Fore; }
+				if (mask->Attr2 & Attr2Back) { AttrBuffBG[i] = attr->Back; }
 			}
 		}
 	}
