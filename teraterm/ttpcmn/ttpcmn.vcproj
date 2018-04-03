@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\servicenames.c"
+				>
+			</File>
+			<File
 				RelativePath="ttcmn.c"
 				>
 			</File>
@@ -237,6 +241,10 @@
 			</File>
 			<File
 				RelativePath="language.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\servicenames.h"
 				>
 			</File>
 			<File

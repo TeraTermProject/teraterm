@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="language.c" />
+    <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="ttcmn.c" />
     <ClCompile Include="..\common\ttlib.c" />
   </ItemGroup>
@@ -131,6 +132,7 @@
     <ClInclude Include="cmn_res.h" />
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="language.h" />
+    <ClInclude Include="..\common\servicenames.h" />
     <ClInclude Include="..\common\ttlib.h" />
   </ItemGroup>
   <ItemGroup>

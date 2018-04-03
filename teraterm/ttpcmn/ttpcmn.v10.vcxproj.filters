@@ -25,6 +25,9 @@
     <ClCompile Include="language.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\servicenames.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ttcmn.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,6 +43,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="language.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\servicenames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\ttlib.h">

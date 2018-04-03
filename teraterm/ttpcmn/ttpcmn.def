@@ -85,3 +85,7 @@ EXPORTS
   HasDnsQuery @73
   HasBalloonTipSupport @87
   GetDownloadFolder @88
+
+  parse_port @90
+  parse_port_from_buf @91
+  service_name @92

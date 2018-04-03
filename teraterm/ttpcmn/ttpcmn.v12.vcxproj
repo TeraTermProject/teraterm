@@ -131,6 +131,7 @@
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="language.c" />
+    <ClCompile Include="..\common\servicenames.c" />
     <ClCompile Include="ttcmn.c" />
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +139,7 @@
     <ClInclude Include="..\common\i18n.h" />
     <ClInclude Include="..\common\ttlib.h" />
     <ClInclude Include="language.h" />
+    <ClInclude Include="..\common\servicenames.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ttpcmn.def" />
