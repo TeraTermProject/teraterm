@@ -40,6 +40,7 @@
 #include <errno.h>
 #include "ttlib.h"
 #include "tt_res.h"
+#include "servicenames.h"
 
 #include "compat_w95.h"
 
@@ -3820,17 +3821,32 @@ BOOL NextParam(PCHAR Param, int *i, PCHAR Temp, int Size)
 	return (strlen(Temp) > 0);
 }
 #endif
+
+static int ParsePortName(char *buff)
+{
+	int port = parse_port_from_buf(buff);
+
+	if (port > 0 || sscanf(buff, "%d", &port) == 1)
+		return port;
+	else
+		return 0;
+}
+
 static void ParseHostName(char *HostStr, WORD * port)
 {
 	/*
-	 * hostname.domain.com
-	 * hostname.domain.com:23
-	 * [3ffe:1234:1234::1]     IPv6 raw address
-	 * [3ffe:1234:1234::1]:23  IPv6 raw address and port#
-	 * telnet://hostname.domain.com/
-	 * telnet://hostname.domain.com:23/
+	 * hostname.example.jp
+	 * hostname.example.jp:23
+	 * hostname.example.jp:telnet
+	 * [3ffe:1234:1234::1]         IPv6 raw address
+	 * [3ffe:1234:1234::1]:23      IPv6 raw address and port#
+	 * [3ffe:1234:1234::1]:telnet  IPv6 raw address and service name
+	 * telnet://hostname.example.jp/
+	 * telnet://hostname.example.jp:23/
+	 * telnet://hostname.example.jp:telnet/
 	 * telnet://[3ffe:1234:1234::1]/
 	 * telnet://[3ffe:1234:1234::1]:23/
+	 * telnet://[3ffe:1234:1234::1]:telnet/
 	 * tn3270:// .... /
 	 */
 
@@ -3885,7 +3901,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 	 *                    |
 	 *                    s
 	 *
-	 *   hostname.domain.com
+	 *   hostname.example.jp
 	 *   |
 	 *   s
 	 */
@@ -3896,8 +3912,7 @@ static void ParseHostName(char *HostStr, WORD * port)
 	} while (b != '\0' && b != ':');
 	if (b == ':') {
 		s[i - 1] = '\0';
-		if (sscanf(&(s[i]), "%hd", port) != 1)
-			*port = 65535;
+		*port = ParsePortName(&(s[i]));
 		is_port = 1;
 	}
 	if (is_telnet_handler == 1 && is_port == 0) {
@@ -4097,8 +4112,7 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 		}
 		else if (_strnicmp(Temp, "/P=", 3) == 0) {	/* TCP port num */
 			ParamPort = IdTCPIP;
-			if (sscanf(&Temp[3], "%hd", &ParamTCP) != 1)
-				ParamTCP = 0;
+			ParamTCP = ParsePortName(&Temp[3]);
 		}
 		else if (_stricmp(Temp, "/PIPE") == 0 ||
 		         _stricmp(Temp, "/NAMEDPIPE") == 0) {	/* 名前付きパイプ */
@@ -4161,7 +4175,7 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 
 		}
 		else if ((Temp[0] != '/') && (strlen(Temp) > 0)) {
-			if (JustAfterHost && (sscanf(Temp, "%d", &c) == 1))
+			if (JustAfterHost && ((c=ParsePortName(Temp)) > 0))
 				ParamTCP = c;
 			else {
 				strncpy_s(ts->HostName, sizeof(ts->HostName), Temp, _TRUNCATE);	/* host name */
