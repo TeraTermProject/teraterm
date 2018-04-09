@@ -389,15 +389,17 @@ void FWDUI_open(PTInstVar pvar)
 
 static void set_verbose_port(char *buf, int bufsize, int port, char *name)
 {
-	if (isdigit(*name)) {
-		int tmpnum = atoi(name);
-		if (tmpnum == port) {
-			strncpy_s(buf, bufsize, name, _TRUNCATE);
-			return;
-		}
-	}
+	char *p = name;
 
-	_snprintf_s(buf, bufsize, _TRUNCATE, "%d (%s)", port, name);
+	while (*p && isdigit(*p)) {
+		p++;
+	}
+	if (*p == 0) {
+		strncpy_s(buf, bufsize, name, _TRUNCATE);
+	}
+	else {
+		_snprintf_s(buf, bufsize, _TRUNCATE, "%d (%s)", port, name);
+	}
 }
 
 static void get_spec_string(FWDRequestSpec *spec, char *buf,
