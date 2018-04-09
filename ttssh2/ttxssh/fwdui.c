@@ -387,16 +387,17 @@ void FWDUI_open(PTInstVar pvar)
 {
 }
 
-static void set_verbose_port(char *buf, int bufsize, int port,
-                             char *name)
+static void set_verbose_port(char *buf, int bufsize, int port, char *name)
 {
-	if (*name >= '0' && *name <= '9') {
-		strncpy_s(buf, bufsize, name, _TRUNCATE);
-	} else {
-		_snprintf_s(buf, bufsize, _TRUNCATE, "%d (%s)", port, name);
+	if (isdigit(*name)) {
+		int tmpnum = atoi(name);
+		if (tmpnum == port) {
+			strncpy_s(buf, bufsize, name, _TRUNCATE);
+			return;
+		}
 	}
 
-	buf[bufsize - 1] = 0;
+	_snprintf_s(buf, bufsize, _TRUNCATE, "%d (%s)", port, name);
 }
 
 static void get_spec_string(FWDRequestSpec *spec, char *buf,

@@ -382,36 +382,31 @@ static BOOL is_service_name_char(char ch)
 int PASCAL parse_port_from_buf(char * buf)
 {
 	int i;
+	char lower_buf[32];
+	TCP_service_name *found;
+	TCP_service_name key;
 
-	if (buf[0] >= '0' && buf[0] <= '9') {
+	for (i = 0; buf[i] != 0 && i < sizeof(lower_buf) - 1; i++) {
+		lower_buf[i] = tolower(buf[i]);
+	}
+	lower_buf[i] = 0;
+
+	key.name = lower_buf;
+	found = (TCP_service_name *)
+		bsearch(&key, service_DB, NUM_ELEM(service_DB),
+				sizeof(service_DB[0]), compare_services);
+
+	if (found) {
+		return found->port;
+	}
+	else if (isdigit(buf[0])) {
 		int result = atoi(buf);
-
-		if (result < 1 || result > 65535) {
-			return -1;
-		} else {
+		if (result > 0 && result < 65536) {
 			return result;
 		}
-	} else {
-		char lower_buf[32];
-		TCP_service_name *result;
-		TCP_service_name key;
-
-		for (i = 0; buf[i] != 0 && i < sizeof(lower_buf) - 1; i++) {
-			lower_buf[i] = tolower(buf[i]);
-		}
-		lower_buf[i] = 0;
-
-		key.name = lower_buf;
-		result = (TCP_service_name *)
-			bsearch(&key, service_DB, NUM_ELEM(service_DB),
-			        sizeof(service_DB[0]), compare_services);
-
-		if (result == NULL) {
-			return -1;
-		} else {
-			return result->port;
-		}
 	}
+
+	return -1;
 }
 
 int PASCAL parse_port(char *str, char *buf, int bufsize)
