@@ -19,7 +19,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
          [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
          [/L=&lt;log file&gt;] [/LA=&lt;language&gt;] [/M=&lt;macro file&gt;] [/NOLOG]
-         [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/T=&lt;telnet flag&gt;]
+         [/P=&lt;TCP port#&gt;] [/R=&lt;replay file&gt;] [/SPEED=&lt;speed&gt;] [/T=&lt;telnet flag&gt;]
          [/TEKICON=&lt;icon name&gt;] [/TIMEOUT=&lt;connecting timeout value&gt;]
          [/V] [/VTICON=&lt;icon name&gt;] [/W="&lt;window title&gt;"] [/WAITCOM]
          [/X=&lt;window pos (x)] [/Y=&lt;window pos (y)] [/PIPE]
@@ -60,7 +60,7 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
 
   <dt id="baud">/BAUD=&lt;speed&gt;</dt>
   <dd>
-    speed of serial port.
+    speed of serial port. Same as the <a href="#speed">/SPEED=</a> option.
     Actually, the serial port driver may not reflect your speed.
   </dd>
 
@@ -164,6 +164,12 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="r">/R=&lt;replay file&gt;</dt>
   <dd>Replay file</dd>
 
+  <dt id="speed">/SPEED=&lt;speed&gt;</dt>
+  <dd>
+    speed of serial port. Same as the <a href="#baud">/BAUD=</a> option.
+    Actually, the serial port driver may not reflect your speed.
+  </dd>
+
   <dt id="t">/T=&lt;telnet flag&gt;</dt>
   <dd><ul>
         <li><span class="syntax">/T=1</span> Enable telnet</li>
@@ -228,7 +234,7 @@ TTERMPRO \\.\pipe\vmware-serial-port
 TTERMPRO /C=1
 TTERMPRO /F=TELNET.INI
 TTERMPRO foohost.example.org /F=FOOHOST.INI
-TTERMPRO /C=2 /BAUD=9600 /F=MYSETUP.INI
+TTERMPRO /C=2 /SPEED=9600 /F=MYSETUP.INI
 TTERMPRO /K=MYKEY.CNF /W="My host"
 TTERMPRO /R=README.TXT ; replay a file
 TTERMPRO myhost /B /X=100 /Y=50

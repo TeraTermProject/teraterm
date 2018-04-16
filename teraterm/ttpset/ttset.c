@@ -3988,7 +3988,11 @@ void PASCAL ParseParam(PCHAR Param, PTTSet ts, PCHAR DDETopic)
 			else
 				ts->AutoWinClose = 0;
 		}
-		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* Serial port baud rate */
+		else if (_strnicmp(Temp, "/SPEED=", 7) == 0) {	/* Serial port speed */
+			ParamPort = IdSerial;
+			ParamBaud = atoi(&Temp[7]);
+		}
+		else if (_strnicmp(Temp, "/BAUD=", 6) == 0) {	/* for backward compatibility */
 			ParamPort = IdSerial;
 			ParamBaud = atoi(&Temp[6]);
 		}
