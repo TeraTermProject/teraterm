@@ -344,6 +344,7 @@ HlpMacroCommandSetflowctrl=html\macro\command\setflowctrl.html
 HlpMacroCommandSetMulticastName=html\macro\command\setmulticastname.html
 HlpMacroCommandSetPassword=html\macro\command\setpassword.html
 HlpMacroCommandSetrts=html\macro\command\setrts.html
+HlpMacroCommandSetspeed=html\macro\command\setspeed.html
 HlpMacroCommandSetsync=html\macro\command\setsync.html
 HlpMacroCommandSettime=html\macro\command\settime.html
 HlpMacroCommandSettitle=html\macro\command\settitle.html

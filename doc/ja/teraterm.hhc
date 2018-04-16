@@ -921,6 +921,11 @@
 					<param name="ImageNumber" value="11">
 					</OBJECT>
 				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="setspeed">
+					<param name="Local" value="html\macro\command\setspeed.html">
+					<param name="ImageNumber" value="11">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
 					<param name="Name" value="setsync">
 					<param name="Local" value="html\macro\command\setsync.html">
 					<param name="ImageNumber" value="11">

@@ -368,6 +368,7 @@
 #define HlpMacroCommandSetMulticastName 92146
 #define HlpMacroCommandSetPassword      92196
 #define HlpMacroCommandSetrts           92136
+#define HlpMacroCommandSetspeed         92217
 #define HlpMacroCommandSetsync          92084
 #define HlpMacroCommandSettime          92085
 #define HlpMacroCommandSettitle         92086
