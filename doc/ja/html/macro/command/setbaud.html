@@ -14,7 +14,7 @@
 <h1>setbaud</h1>
 
 <p>
-シリアルポートのボーレートを変更する。
+シリアルポートのスピードを変更する。
 </p>
 
 <pre class="macro-syntax">
@@ -25,9 +25,9 @@ setbaud &lt;value&gt;
 
 <dl>
 	<dt class="macro">整数 &lt;value&gt; (バージョン 4.66 未満)</dt>
-	<dd>ボーレートに対応するIDを指定する。
+	<dd>スピードに対応するIDを指定する。
 <pre>
-ID       baud rate
+ID       speed (bps)
 1        110 
 2        300 
 3        600 
@@ -47,13 +47,13 @@ ID       baud rate
 	</dd>
 	
 	<dt class="macro">整数 &lt;value&gt; (バージョン 4.66 以降)</dt>
-	<dd>ボーレートを指定する。</dd>
+	<dd>スピードを指定する。</dd>
 </dl>
 
 <h2>例</h2>
 
 <pre class="macro-example">
-; change baud rate to 115200
+; change speed to 115200bps
 
 ; less than version 4.66
 setbaud 12

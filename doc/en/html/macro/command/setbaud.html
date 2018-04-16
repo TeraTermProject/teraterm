@@ -14,7 +14,7 @@
 <h1>setbaud</h1>
 
 <p>
-Causes Tera Term to change baud rate. 
+Causes Tera Term to change speed of serial port. 
 </p>
 
 <pre class="macro-syntax">
@@ -25,9 +25,9 @@ setbaud &lt;value&gt;
 
 <dl>
 	<dt class="macro">integer &lt;value&gt; (less than version 4.66)</dt>
-	<dd>The corresponding ID of baud rate.
+	<dd>The corresponding ID of speed.
 <pre>
-value    baud rate
+value    speed (bps)
 1        110 
 2        300 
 3        600 
@@ -47,13 +47,13 @@ value    baud rate
 	</dd>
 	
 	<dt class="macro">integer &lt;value&gt; (version 4.66 or later)</dt>
-	<dd>The immediate baud rate.</dd>
+	<dd>The immediate speed.</dd>
 </dl>
 
 <h2>Example</h2>
 
 <pre class="macro-example">
-; change baud rate to 115200
+; change speed to 115200
 
 ; less than version 4.66
 setbaud 12

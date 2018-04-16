@@ -18,7 +18,7 @@ Tera Term Pro を起動するときのコマンドライン(ショートカットのリンク先)の形式
 
 <pre class="syntax">
 TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP port#&gt;][/] | \\&lt;server&gt;\pipe\&lt;pipe name&gt;]
-         [/B] [/BAUD=&lt;baud rate&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E] [/ES]
+         [/B] [/BAUD=&lt;speed&gt;] [/C=&lt;serial port#&gt;] [/DS] [/E] [/ES]
          [/F=&lt;setup file&gt;] [/FD=&lt;file transfer directory&gt;]
          [/H] [/I] [/K=&lt;keyboard setup file&gt;]
          [/KR=&lt;kanji code (receive)&gt;] [/KT=&lt;kanji code (transmit)&gt;]
@@ -62,9 +62,9 @@ TTERMPRO [ &lt;host&gt;[[:]&lt;TCP port#&gt;] | telnet://&lt;host&gt;[:&lt;TCP p
   <dt id="b">/B</dt>
   <dd>Telnet バイナリオプション</dd>
 
-  <dt id="baud">/BAUD=&lt;baud rate&gt;</dt>
+  <dt id="baud">/BAUD=&lt;speed&gt;</dt>
   <dd>
-    シリアルポートのボーレートを指定します。
+    シリアルポートのスピードを指定します。
     指定した値が実際に反映されるかは、シリアルポートのチップ・ドライバの仕様によります。
   </dd>
 
@@ -246,7 +246,7 @@ TTERMPRO /PIPE pipename ; \\.\pipe\pipename への接続
 <pre>
 &lt;TCP port#&gt;
 /B
-&lt;baud rate&gt;
+&lt;speed&gt;
 &lt;serial port#&gt;
 &lt;file transfer directory&gt;
 /H
