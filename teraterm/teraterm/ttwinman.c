@@ -147,7 +147,7 @@ void ConvertToCP932(char *str, int destlen)
  *    | | | +--------- displays VT/TEK
  *    | | +----------- displays TCP host/serial port first
  *    | +------------- displays TCP port number
- *    +--------------- displays baud rate of serial port
+ *    +--------------- displays speed of serial port
  */
 void ChangeTitle()
 {
@@ -191,9 +191,9 @@ void ChangeTitle()
 		else if (cv.PortType==IdSerial)
 		{
 			// COM5 over‚É‘Î‰ž
-			char str[24]; // COMxxxx:xxxxxxxxxxbaud
+			char str[24]; // COMxxxx:xxxxxxxxxxbps
 			if (ts.TitleFormat & 32) {
-				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d:%ubaud", ts.ComPort, ts.Baud);
+				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d:%ubps", ts.ComPort, ts.Baud);
 			}
 			else {
 				_snprintf_s(str, sizeof(str), _TRUNCATE, "COM%d", ts.ComPort);
