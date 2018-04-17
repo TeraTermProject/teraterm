@@ -70,8 +70,24 @@
             <dl>
               <dt>Use challenge/response to log in (SSH1:TIS, SSH2:keyboard-interactive)</dt>
               <dd>
-                Choose if Challenge/Response authentication is available.<br>
-                keyboard-interactive is used for SSH2 connection and if used, Password itself won't be sent over the communication path (If using a usual password authentication, Password itself will be sent in encrypted form).
+                <dl>
+                  <dt>SSH1</dt>
+                  <dd>
+                    Choose if Challenge/Response authentication is available.
+                    <!-- サーバによっては S/Key 認証になる場合があります。-->
+                  </dd>
+                  <dt>SSH2</dt>
+                  <dd>
+                    Choose if keyboard-interactive authentication is available.
+		    <!--
+                    FreeBSD 等のパスワード認証を無効に設定したサーバへ、パスワードを使ってログインする場合は、
+                    この認証方式を使います。<br>
+                    この認証方式では、入力した内容が暗号化された状態でサーバへ送られます。
+                    認証の為にパスワードを入力した場合は、パスワード認証と同じように、
+                    暗号化されたパスワードが通信路を流れます。
+		    -->
+                  </dd>
+                </dl>
               </dd>
             </dl>
           </li>
