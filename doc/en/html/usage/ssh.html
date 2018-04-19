@@ -32,7 +32,8 @@
           </ul>
         </li>
         <li>rhosts authentication for SSH1</li>
-        <li>challenge/response (SSH1), keyboard-interactive (SSH2) authentication</li>
+        <li>challenge/response(TIS) authentication for SSH1</li>
+	<li>keyboard-interactive authentication for SSH2</li>
       </ul>
       In this document, we will describe Password authentication and Key-pair authentication which would be most widely used.
     </p>
@@ -60,7 +61,7 @@
           NOTE: The password can not be sent as plain text like TELNET protocol because the SSH packet including the password data is encrypted.</li>
       <li>When using public key authentication, check [RSA/DSA/ECDSA/ED25519 key to log in] (second from the top line) and click [Private key file:] to specify Private key file. Then type in username and Private key pass phrase.<br>
           Note: TTSSH 2.63(Tera Term 4.76) later can support the PuTTY format and SECSH(ssh.com) format of the SSH2 private key.</li>
-      <li>When the keyboard-interactive authentication is used, check the [Use challenge/response to log in(keyboard-interactive)] and input your user name.<br>
+      <li>When the keyboard-interactive authentication is used, check the [Use keyboard-interactive to log in] and input your user name.<br>
           Next, the dialog with the server prompt and string is shown and input your password.</li>
       <li>When the Pageant is used, check the [Use Pageant] and input your user name.</li>
     </ul>

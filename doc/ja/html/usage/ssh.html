@@ -31,7 +31,8 @@
           </ul>
         </li>
         <li>SSH1 における rhosts 認証</li>
-        <li>challenge/response (SSH1), keyboard-interactive (SSH2) 認証</li>
+        <li>SSH1 における challenge/response(TIS) 認証</li>
+	<li>SHS2 における keyboard-interactive 認証</li>
       </ul>
       があります。ここでは需要が多いと思われる認証方法について触れたいと思います。
     </p>
@@ -59,7 +60,7 @@
           ※パスワード送信時の SSH パケットは暗号化されているので、TELNET のようにパスワードが平文で送信されることはありません。</li>
       <li>公開鍵認証を用いる場合は、上から2番目の「Use RSA/DSA/ECDSA/ED25519 key to log in」にチェックをつけ、「Private key file:」ボタンを押して秘密キーのファイルを指定します。その後ユーザ名と秘密キーのパスフレーズを入力してログインします。<br>
           ※OpenSSH 形式のほか、TTSSH 2.63(Tera Term 4.76) 以降では PuTTY 形式・SECSH(ssh.com) 形式の SSH2 秘密鍵に対応しています。</li>
-      <li>keyboard-interactive認証を使用する場合は「Use challange/response to log in(keyboard-interactive)」にチェックをつけ、ユーザ名を入力します。<br>
+      <li>keyboard-interactive認証を使用する場合は「Use keyboard-interactive to log in」にチェックをつけ、ユーザ名を入力します。<br>
           サーバからのプロンプトと文字列を入力するダイアログが表示されるので、パスワードを入力します。</li>
       <li>Pageant を用いて認証する場合は「Use Pageant」にチェックをつけ、ユーザ名を入力します。</li>
     </ul>

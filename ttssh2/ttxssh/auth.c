@@ -255,11 +255,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	// SSH バージョンによって TIS のラベルを書き換え
 	if (pvar->settings.ssh_protocol_version == 1) {
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
-		                  "Use challenge/response to log in(&TIS)");
+		                  "Use challenge/response(&TIS) to log in");
 		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
 	} else {
 		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
-		                  "Use &challenge/response to log in(keyboard-interactive)");
+		                  "Use keyboard-&interactive to log in");
 		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
 	}
 

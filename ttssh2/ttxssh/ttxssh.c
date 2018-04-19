@@ -1946,7 +1946,10 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_PASSWORD;
 					pvar->ssh2_authmethod = SSH_AUTH_PASSWORD;
 
-				// /auth=challenge ‚ð’Ç‰Á (2007.10.5 maya)
+				} else if (_stricmp(option + 6, "keyboard-interactive") == 0) { // keyboard-interactive”FØ
+					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
+					pvar->ssh2_authmethod = SSH_AUTH_TIS;
+
 				} else if (_stricmp(option + 6, "challenge") == 0) { // keyboard-interactive”FØ
 					//pvar->auth_state.cur_cred.method = SSH_AUTH_TIS;
 					pvar->ssh2_authmethod = SSH_AUTH_TIS;
