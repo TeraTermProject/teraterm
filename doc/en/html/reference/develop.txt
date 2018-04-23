@@ -41,7 +41,7 @@
     converts character-code and return-code of documents for building OpenSSL.
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     Use the compatible version for check-outed svn version.
-    Copy the "svn.exe" to the libs\svn\bin directory.
+    Extract into libs\svn. ("svnversion.exe" is located in libs\svn\bin directory.)
 
 
 * Libraries
