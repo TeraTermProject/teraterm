@@ -2770,7 +2770,13 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 			else {
 				// 1900 = VS2015(VC++14)
 				// 1910 = VS2017(VC++15)
-				if (msc_low_ver == 10) {
+				// 1911 = VS2017 update3-4(VC++15)
+				// 1912 = VS2017 update5(VC++15)
+				// 1913 = VS2017 update6(VC++15)
+				// 1914 = VS2017 15.7(VC++15)
+				// VS2017 Update3から製品バージョンが3桁表記(15.x.x)になり、
+				// _MSC_FULL_VERから算出できなくなったため、一律で15.0とする。
+				if (msc_low_ver >= 10) {
 					vs_ver = msc_ver - 4;
 					msc_low_ver = 0;
 				} 
