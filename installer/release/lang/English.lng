@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-10-17)
+; Updated by TeraTerm Project (2018-05-17)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -369,7 +369,7 @@ DLG_TERM_AUTOSWITCH=A&uto switch (VT<->TEK)
 DLG_TERM_KANJI=&Kanji (receive)
 DLG_TERM_KANA=Hal&f-width kana
 DLG_TERM_KANJISEND=Kan&ji (transmit)
-DLG_TERM_KANASEND=Half-&width kana
+DLG_TERM_KANASEND=Half-wi&dth kana
 DLG_TERM_KIN=Kanji-i&n:
 DLG_TERM_KOUT=Kanji-&out:
 DLG_TERM_LOCALE=lo&cale:

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-10-17)
+; Updated by TeraTerm Project (2018-05-17)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -370,7 +370,7 @@ DLG_TERM_AUTOSWITCH=Commut. auto (VT<->TEK)
 DLG_TERM_KANJI=&Kanji (réception)
 DLG_TERM_KANA=Hal&f-width kana
 DLG_TERM_KANJISEND=Kan&ji (émission)
-DLG_TERM_KANASEND=Half-&width kana
+DLG_TERM_KANASEND=Half-wi&dth kana
 DLG_TERM_KIN=Kanji-i&n:
 DLG_TERM_KOUT=Kanji-&out:
 DLG_TERM_LOCALE=lo&cal:

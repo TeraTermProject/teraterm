@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2017-10-17)
+; Updated by TeraTerm Project (2018-05-17)
 ; Last translated (Simplified Chinese language) by LiShaohui (2017-04-11)
 
 [Tera Term]
@@ -370,7 +370,7 @@ DLG_TERM_AUTOSWITCH=自动切换(VT<->TEK)(&U)：
 DLG_TERM_KANJI=汉字 - 接收(&K)
 DLG_TERM_KANA=Hal&f-width 假名
 DLG_TERM_KANJISEND=汉字 - 发送(&J)
-DLG_TERM_KANASEND=Half-&width 假名
+DLG_TERM_KANASEND=Half-wi&dth 假名
 DLG_TERM_KIN=汉字输入(&N)：
 DLG_TERM_KOUT=汉字输出(&O)：
 DLG_TERM_LOCALE=地区(&C)：
