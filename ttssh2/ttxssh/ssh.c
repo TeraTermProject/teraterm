@@ -2834,6 +2834,7 @@ void SSH_init(PTInstVar pvar)
 	// for SSH2(yutaka)
 	memset(pvar->ssh2_keys, 0, sizeof(pvar->ssh2_keys));
 	pvar->userauth_success = 0;
+	pvar->shell_id = SSH_CHANNEL_INVALID;
 	pvar->session_nego_status = 0;
 	pvar->settings.ssh_protocol_version = 2;  // SSH2(default)
 	pvar->rekeying = 0;
@@ -3369,7 +3370,7 @@ void SSH_end(PTInstVar pvar)
 
 		pvar->userauth_success = 0;
 		//pvar->remote_id = 0;
-		pvar->shell_id = 0;
+		pvar->shell_id = SSH_CHANNEL_INVALID;
 		pvar->session_nego_status = 0;
 
 		pvar->ssh_heartbeat_tick = 0;

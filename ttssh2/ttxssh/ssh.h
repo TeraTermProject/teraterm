@@ -134,6 +134,7 @@ enum channel_type {
 
 
 /* SSH2 constants */
+#define SSH_CHANNEL_INVALID -1
 
 /* SSH2 messages */
 typedef enum {
