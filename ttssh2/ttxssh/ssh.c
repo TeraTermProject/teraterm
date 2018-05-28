@@ -3048,7 +3048,7 @@ unsigned int SSH_get_min_packet_size(PTInstVar pvar)
 
 /* data is guaranteed to be at least SSH_get_min_packet_size bytes long
    at least 5 bytes must be decrypted */
-void SSH_predecrpyt_packet(PTInstVar pvar, char *data)
+void SSH_predecrypt_packet(PTInstVar pvar, char *data)
 {
 	if (SSHv2(pvar)) {
 		CRYPT_decrypt(pvar, data, get_predecryption_amount(pvar));

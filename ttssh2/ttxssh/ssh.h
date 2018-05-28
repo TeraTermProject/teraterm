@@ -764,7 +764,7 @@ int SSH_sftp_transaction(PTInstVar pvar);
 unsigned int SSH_get_min_packet_size(PTInstVar pvar);
 /* data is guaranteed to be at least SSH_get_min_packet_size bytes long
    at least 5 bytes must be decrypted */
-void SSH_predecrpyt_packet(PTInstVar pvar, char *data);
+void SSH_predecrypt_packet(PTInstVar pvar, char *data);
 unsigned int SSH_get_clear_MAC_size(PTInstVar pvar);
 unsigned int SSH_get_authdata_size(PTInstVar pvar, int direction);
 

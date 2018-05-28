@@ -204,7 +204,7 @@ int PKT_recv(PTInstVar pvar, char *buf, int buflen)
 			 * 後段の処理を行う為にパケット長を知る必要が有る為、先頭の 1 ブロックを復号する。
 			 */
 			if (SSHv2(pvar) && !pvar->pkt_state.predecrypted_packet && aadlen == 0) {
-				SSH_predecrpyt_packet(pvar, data);
+				SSH_predecrypt_packet(pvar, data);
 				pvar->pkt_state.predecrypted_packet = TRUE;
 			}
 
