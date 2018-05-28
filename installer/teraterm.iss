@@ -61,11 +61,11 @@ Name: {app}\lang; Components: TeraTerm
 
 [Files]
 Source: ..\teraterm\release\ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: ..\teraterm\release\ttpcmn.dll; DestDir: {app}; Components: TeraTerm
-Source: ..\teraterm\release\ttpdlg.dll; DestDir: {app}; Components: TeraTerm
-Source: ..\teraterm\release\ttpfile.dll; DestDir: {app}; Components: TeraTerm
-Source: ..\teraterm\release\ttpset.dll; DestDir: {app}; Components: TeraTerm
-Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm
+Source: ..\teraterm\release\ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: ..\teraterm\release\ttpdlg.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: ..\teraterm\release\ttpfile.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: ..\teraterm\release\ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
+Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: release\TERATERM.INI; DestDir: {app}; Components: TeraTerm; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: authusers-modify
 Source: release\TSPECIAL1.TTF; DestDir: {fonts}; Components: TeraTerm; Attribs: readonly; Flags: overwritereadonly uninsneveruninstall; FontInstall: Tera Special; Check: isAbleToInstallFont
 Source: ..\doc\en\teraterm.chm; DestDir: {app}; Components: TeraTerm
@@ -77,7 +77,7 @@ Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm; Flags: onlyifd
 Source: release\EDITOR.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\NT98KEYB.CNF; DestDir: {app}; Components: TeraTerm
 Source: release\PC98KEYB.CNF; DestDir: {app}; Components: TeraTerm
-Source: ..\teraterm\release\keycode.exe; DestDir: {app}; Components: TeraTerm
+Source: ..\teraterm\release\keycode.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpmacro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: release\delpassw.ttl; DestDir: {app}; Components: TeraTerm
 Source: release\dialup.ttl; DestDir: {app}; Components: TeraTerm
