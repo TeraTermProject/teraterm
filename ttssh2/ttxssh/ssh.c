@@ -2847,6 +2847,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->ssh2_authlist = NULL; // (2007.4.27 yutaka)
 	pvar->tryed_ssh2_authlist = FALSE;
 	pvar->agentfwd_enable = FALSE;
+	pvar->use_subsystem = FALSE;
 
 }
 
@@ -3320,6 +3321,7 @@ void SSH_end(PTInstVar pvar)
 	buf_destroy(&pvar->ssh_state.postdecompress_inbuf,
 	            &pvar->ssh_state.postdecompress_inbuflen);
 	pvar->agentfwd_enable = FALSE;
+	pvar->use_subsystem = FALSE;
 
 	// support of "Compression delayed" (2006.6.23 maya)
 	if (pvar->ssh_state.compressing ||
