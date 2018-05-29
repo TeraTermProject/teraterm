@@ -74,18 +74,17 @@
                   <dt>SSH1</dt>
                   <dd>
                     Choose if Challenge/Response authentication is available.
-                    <!-- サーバによっては S/Key 認証になる場合があります。-->
+                    It may be S/Key authentication depending on the server.
                   </dd>
                   <dt>SSH2</dt>
                   <dd>
                     Choose if keyboard-interactive authentication is available.
-		    <!--
-                    FreeBSD 等のパスワード認証を無効に設定したサーバへ、パスワードを使ってログインする場合は、
-                    この認証方式を使います。<br>
-                    この認証方式では、入力した内容が暗号化された状態でサーバへ送られます。
-                    認証の為にパスワードを入力した場合は、パスワード認証と同じように、
-                    暗号化されたパスワードが通信路を流れます。
-		    -->
+                    This authentication method is used to log in to the server by using your password 
+                    that has disabled password authentication such as FreeBSD. <br>
+                    Encrypted input data are sent to the server with the method.
+                    When a password is input for authentication, same as password authentication,
+                    encrypted password passes through.
+                    
                   </dd>
                 </dl>
               </dd>
