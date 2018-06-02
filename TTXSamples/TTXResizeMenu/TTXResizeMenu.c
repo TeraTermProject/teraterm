@@ -232,8 +232,14 @@ static void PASCAL TTXModifyMenu(HMENU menu) {
   if (pvar->MenuItems > 0) {
     InitMenu();
 
-    memset(&mi, 0, sizeof(mi));
-    mi.cbSize = sizeof(mi);
+    if (IsWindows2000OrLater()) {
+      memset(&mi, 0, sizeof(MENUITEMINFO));
+      mi.cbSize = sizeof(MENUITEMINFO);
+    }
+    else {
+      memset(&mi, 0, sizeof(MENUITEMINFO)-sizeof(HBITMAP));
+      mi.cbSize = sizeof(MENUITEMINFO)-sizeof(HBITMAP);
+    }
     mi.fMask  = MIIM_TYPE | MIIM_SUBMENU;
     mi.fType  = MFT_STRING;
     mi.hSubMenu = pvar->ResizeMenu;
