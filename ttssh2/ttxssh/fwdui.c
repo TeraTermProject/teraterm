@@ -377,6 +377,7 @@ void FWDUI_load_settings(PTInstVar pvar)
 
 void FWDUI_init(PTInstVar pvar)
 {
+	FWDUI_load_settings(pvar);
 }
 
 void FWDUI_end(PTInstVar pvar)
