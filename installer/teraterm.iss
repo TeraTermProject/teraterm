@@ -28,10 +28,15 @@ Name: build.bat
 
 [Setup]
 AppCopyright=(C) 2004-2018 TeraTerm Project
+AppPublisher=TeraTerm Project
+AppPublisherURL=https://ttssh2.osdn.jp/
+AppSupportURL=https://ttssh2.osdn.jp/
 AppName={#AppName}
 #ifndef snapshot
+AppVersion={#AppVer}
 AppVerName={#AppName} {#AppVer}
 #else
+AppVersion={#AppVer}+ snapshot-{#snapshot}
 AppVerName={#AppName} {#AppVer}+ snapshot-{#snapshot}
 #endif
 LicenseFile=release\license.txt
