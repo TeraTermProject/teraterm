@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -254,6 +254,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_WINDOW_UNDO, OnWindowUndo)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
+	ON_MESSAGE(WM_USER_DROPNOTIFY, OnDropNotify)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -918,6 +919,9 @@ CVTWindow::CVTWindow()
 	// Tera Termの起動時、Virtual Storeが働くかどうかを覚えておく。
 	// (2015.11.14 yutaka)
 	cv.VirtualStoreEnabled = GetVirtualStoreEnvironment();
+
+	DropLists = NULL;
+	DropListCount = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1986,6 +1990,7 @@ void CVTWindow::OnDestroy()
 
 	/* Disable drag-drop */
 	::DragAcceptFiles(HVTWin,FALSE);
+	DropListFree();
 
 	EndDDE();
 
@@ -2019,57 +2024,135 @@ void CVTWindow::OnDestroy()
 	DeleteNotifyIcon(&cv);
 }
 
+static void SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount, HFONT hFont)
+{
+	for (int i = 0 ; i < nIDDlgItemCount ; i++) {
+		const int nIDDlgItem = nIDDlgItems[i];
+		SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE,0));
+	}
+}
+
+enum drop_type {
+	DROP_TYPE_CANCEL,
+	DROP_TYPE_SCP,
+	DROP_TYPE_SEND_FILE,		// past contents of file
+	DROP_TYPE_SEND_FILE_BINARY,
+	DROP_TYPE_PASTE_FILENAME,
+	DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE,
+};
+
+struct DrapDropDlgParam {
+	const char *TargetFilename;
+	enum drop_type DropType;
+	bool ScpEnable;
+	char *ScpSendDirPtr;
+	int ScpSendDirSize;
+	bool SendfileEnable;
+	int RemaingFileCount;
+	bool AdaptSameProcess;
+	bool DefaultProcess;
+};
+
+struct DrapDropDlgData {
+	HFONT DlgDragDropFont;
+	struct DrapDropDlgParam *Param;
+};
+
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	static HFONT DlgDragDropFont = NULL;
-	char uimsg[MAX_UIMSG];
-	LOGFONT logfont;
-	HFONT font;
+	struct DrapDropDlgData *DlgData = (struct DrapDropDlgData *)GetWindowLongPtr(hDlgWnd, GWLP_USERDATA);
 
 	switch (msg) {
 		case WM_INITDIALOG:
+		{
+			char uimsg[MAX_UIMSG];
+			LOGFONT logfont;
+			HFONT font;
+			HFONT DlgDragDropFont = NULL;
+			DlgData = (struct DrapDropDlgData *)malloc(sizeof(struct DrapDropDlgData));
+			SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)DlgData);
+			struct DrapDropDlgParam *Param = (struct DrapDropDlgParam *)lp;
+			DlgData->Param = Param;
 			font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
 			GetObject(font, sizeof(LOGFONT), &logfont);
 			if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgDragDropFont, ts.UILanguageFile)) {
-				SendDlgItemMessage(hDlgWnd, IDC_SCP_PATH, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hDlgWnd, IDOK, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hDlgWnd, IDCANCEL, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hDlgWnd, IDC_DAD_STATIC, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hDlgWnd, IDC_DAD_SENDFILE, WM_SETFONT, (WPARAM)DlgDragDropFont, MAKELPARAM(TRUE,0));
+				const static int IDs[] = {
+					IDC_FILENAME_EDIT,
+					IDC_DAD_STATIC,
+					IDC_SCP_RADIO, IDC_SENDFILE_RADIO, IDC_PASTE_RADIO,
+					IDC_SCP_PATH_LABEL, IDC_SCP_PATH, IDC_SCP_PATH_NOTE,
+					IDC_BINARY_CHECK, IDC_ESCAPE_CHECK,
+					IDC_ADAPT_SAME_CHECK, IDC_DEFAULT_CHECK,
+					IDOK, IDCANCEL,
+				};
+				SetDlgFonts(hDlgWnd, IDs, _countof(IDs), DlgDragDropFont);
 			} else {
 				DlgDragDropFont = NULL;
 			}
+			DlgData->DlgDragDropFont = DlgDragDropFont;
 
 			GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
 			get_lang_msg("MSG_DANDD_CONF_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 			SetWindowText(hDlgWnd, ts.UIMsg);
 
+			SetDlgItemText(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
+
 			get_lang_msg("MSG_DANDD_CONF", ts.UIMsg, sizeof(ts.UIMsg),
 			             "Are you sure that you want to send the file content?", ts.UILanguageFile);
 			SetDlgItemText(hDlgWnd, IDC_DAD_STATIC, ts.UIMsg);
+			
+			// checkbox
+			CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO,
+							 (Param->DropType == DROP_TYPE_SEND_FILE ||
+							  Param->DropType == DROP_TYPE_SEND_FILE_BINARY) ? IDC_SENDFILE_RADIO :
+							 (Param->DropType == DROP_TYPE_PASTE_FILENAME ||
+							  Param->DropType == DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE) ? IDC_PASTE_RADIO :
+							 IDC_SCP_RADIO);
 
-			get_lang_msg("FILEDLG_TRANS_TITLE_SENDFILE", ts.UIMsg, sizeof(ts.UIMsg),
-						 "Send file", ts.UILanguageFile);
-			SetDlgItemText(hDlgWnd, IDOK, ts.UIMsg);
-
-			SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)ts.ScpSendDir);
-
-			// SSH2 接続ではない場合には "SCP" を無効化する。
-			if (cv.isSSH != 2) {
-				EnableWindow(GetDlgItem(hDlgWnd, IDC_DAD_SENDFILE), FALSE);
+			// SCP
+			SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)Param->ScpSendDirPtr);
+			if (!Param->ScpEnable) {
+				// 無効化
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_RADIO), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH_LABEL), FALSE);
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
-				EnableWindow(GetDlgItem(hDlgWnd, IDC_STATIC), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH_NOTE), FALSE);
+			}
 
-				// フォーカスの初期状態を Cancel にする為、この時点では Send File (IDOK)に
+			// Send File
+			if (Param->DropType == DROP_TYPE_SEND_FILE_BINARY) {
+				SendMessage(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
+			}
+			if (!Param->SendfileEnable) {
+				// 無効化
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_RADIO), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), FALSE);
+			}
+
+			// Paste Filename
+			if (Param->DropType != DROP_TYPE_PASTE_FILENAME) {
+				SendMessage(GetDlgItem(hDlgWnd, IDC_ESCAPE_CHECK), BM_SETCHECK, BST_CHECKED, 0);
+			}
+
+			// Adapt same process
+			GetDlgItemText(hDlgWnd, IDC_ADAPT_SAME_CHECK, uimsg, sizeof(uimsg));
+			char b[MAX_UIMSG];
+			_snprintf_s(b, sizeof(b), _TRUNCATE, uimsg, Param->RemaingFileCount);
+			SetDlgItemText(hDlgWnd, IDC_ADAPT_SAME_CHECK, b);
+			if (Param->RemaingFileCount < 2) {
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_ADAPT_SAME_CHECK), FALSE);
+			}
+
+			// focus to "SCP dest textbox" or "Cancel"
+			if (Param->ScpEnable) {
+				// "SCP" 有効時は Cancel にフォーカスを当て、最終的に SCP PATH にフォーカスが
+				// 当たるようにする。
+				SetFocus(GetDlgItem(hDlgWnd, IDC_SCP_RADIO));
+			} else {
+				// フォーカスの初期状態を Cancel にする為、この時点では IDOK に
 				// フォーカスを当てる。後で WM_NEXTDLGCTL でフォーカスが次のボタンになる。
 				SetFocus(GetDlgItem(hDlgWnd, IDOK));
 			}
-			else {
-				// SSH2 接続時は Cancel にフォーカスを当て、最終的に SCP PATH にフォーカスが
-				// 当たるようにする。
-				SetFocus(GetDlgItem(hDlgWnd, IDCANCEL));
-			}
-
 			// フォーカスを次のボタンに移す
 			// SetFocus() で直接フォーカスを当てるとタブキーの動作等に問題が出るため、
 			// このメッセージを併用する
@@ -2077,34 +2160,55 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 			// TRUEにするとボタンにフォーカスが当たらない。
 			return FALSE;
+		}
 
 		case WM_COMMAND:
-			switch (LOWORD(wp)) {
-				case IDC_DAD_SENDFILE:
-					SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_GETTEXT, sizeof(ts.ScpSendDir), (LPARAM)ts.ScpSendDir);
-					if (DlgDragDropFont != NULL) {
-						DeleteObject(DlgDragDropFont);
-					}
-					EndDialog(hDlgWnd, IDC_DAD_SENDFILE);
-					break;
-
-				case IDOK:
-					if (DlgDragDropFont != NULL) {
-						DeleteObject(DlgDragDropFont);
-					}
-					EndDialog(hDlgWnd, IDOK);
-					break;
-
-				case IDCANCEL:
-					if (DlgDragDropFont != NULL) {
-						DeleteObject(DlgDragDropFont);
-					}
-					EndDialog(hDlgWnd, IDCANCEL);
-					break;
-
-				default:
-					return FALSE;
+		{
+			WORD wID = GET_WM_COMMAND_ID(wp, lp);
+			const WORD wCMD = GET_WM_COMMAND_CMD(wp, lp);
+			if (wCMD == BN_DBLCLK &&
+				(wID == IDC_SCP_RADIO || wID == IDC_SENDFILE_RADIO || wID == IDC_PASTE_RADIO))
+			{	// radio buttons double click
+				wID = IDOK;
 			}
+			if (wID == IDOK) {
+				if (IsDlgButtonChecked(hDlgWnd, IDC_SCP_RADIO) == BST_CHECKED) {
+					// SCP
+					DlgData->Param->DropType = DROP_TYPE_SCP;
+					SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_GETTEXT,
+								(WPARAM)DlgData->Param->ScpSendDirSize,
+								(LPARAM)DlgData->Param->ScpSendDirPtr);
+				} else if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_RADIO) == BST_CHECKED) {
+					// Send File
+					DlgData->Param->DropType =
+						(IsDlgButtonChecked(hDlgWnd, IDC_BINARY_CHECK) == BST_CHECKED) ?
+						DROP_TYPE_SEND_FILE_BINARY : DROP_TYPE_SEND_FILE;
+				} else /* if (IsDlgButtonChecked(hDlgWnd, IDC_PASTE_RADIO) == BST_CHECKED) */ {
+					// Paste Filename
+					DlgData->Param->DropType =
+						(IsDlgButtonChecked(hDlgWnd, IDC_ESCAPE_CHECK) == BST_CHECKED) ?
+						DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE : DROP_TYPE_PASTE_FILENAME;
+				}
+				DlgData->Param->AdaptSameProcess = 
+					(IsDlgButtonChecked(hDlgWnd, IDC_ADAPT_SAME_CHECK) == BST_CHECKED) ?
+					true : false;
+				DlgData->Param->DefaultProcess = 
+					(IsDlgButtonChecked(hDlgWnd, IDC_DEFAULT_CHECK) == BST_CHECKED) ?
+					true : false;
+			}
+			if (wID == IDCANCEL) {
+				DlgData->Param->DropType = DROP_TYPE_CANCEL;
+			}
+			if (wID == IDOK || wID == IDCANCEL) {
+				if (DlgData->DlgDragDropFont != NULL) {
+					DeleteObject(DlgData->DlgDragDropFont);
+				}
+				EndDialog(hDlgWnd, wID);
+				free(DlgData);
+				break;
+			}
+			return FALSE;
+		}
 
 		default:
 			return FALSE;
@@ -2112,117 +2216,311 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 	return TRUE;
 }
 
+static enum drop_type ShowDropDialogBox(
+	HINSTANCE hInstance, HWND hWndParent,
+	const char *TargetFilename,
+	enum drop_type DefaultDropType,
+	int RemaingFileCount,
+	bool EnableSCP,
+	bool EnableSendFile,
+	bool *AdaptSameProcess,
+	bool *DefaultProcess)
+{
+	struct DrapDropDlgParam Param;
+	Param.TargetFilename = TargetFilename;
+	Param.DropType = DefaultDropType;
+	Param.ScpEnable = EnableSCP;
+	Param.ScpSendDirPtr = ts.ScpSendDir;
+	Param.ScpSendDirSize = sizeof(ts.ScpSendDir);
+	Param.SendfileEnable = EnableSendFile;
+	Param.RemaingFileCount = RemaingFileCount;
+	int ret = DialogBoxParam(
+		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
+		hWndParent, (DLGPROC)OnDragDropDlgProc,
+		(LPARAM)&Param);
+	if (ret != IDOK) {
+		return DROP_TYPE_CANCEL;
+	}
+	*AdaptSameProcess = Param.AdaptSameProcess;
+	*DefaultProcess = Param.DefaultProcess;
+	return Param.DropType;
+}
+
+static void EscapeFilename(const char *src, char *dest)
+{
+#define ESCAPE_CHARS	" ;&()$!`'[]{}#^~"
+	setlocale(LC_ALL, ts.Locale);
+	const char *s = src;
+	char *d = dest;
+	while (*s) {
+		if (isleadbyte(*s)) { // multi-byte
+			*d++ = *s++;
+			*d++ = *s++;
+			continue;
+		}
+		char c = *s++;
+		if (c == '\\') {
+			// パスの区切りを \ -> / へ
+			*d = '/';
+		} else if (strchr(ESCAPE_CHARS, c) != NULL) {
+			// エスケープが必要な文字
+			*d++ = '\\';
+			*d = c;
+		} else {
+			*d = c;
+		}
+		d++;
+	}
+	*d = '\0'; // null-terminate
+}
+
+static void PasteString(PComVar cv, const char *str, bool escape)
+{
+	PCHAR ptr = (PCHAR)str;
+	char *tmpbuf = NULL;
+	if (escape) {
+		size_t len = strlen(str) * 2;
+		tmpbuf = (char *)malloc(len);
+		EscapeFilename(str, tmpbuf);
+		ptr = tmpbuf;
+	}
+
+	// consoleへ送信
+	while (*ptr) {
+		CommTextOut(cv, ptr, 1);
+		if (ts.LocalEcho > 0) {
+			CommTextEcho(cv, ptr, 1);
+		}
+		ptr++;
+	}
+
+	if (tmpbuf != NULL) free(tmpbuf);
+}
+
+/* 入力はファイルのみ(フォルダは含まれない) */
+static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
+{
+	typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
+	static PSSH_start_scp func = NULL;
+	static HMODULE h = NULL;
+	char msg[128];
+
+	if (h == NULL) {
+		if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
+		scp_send_error:
+			::MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
+			return false;
+		}
+	}
+	if (func == NULL) {
+		func = (PSSH_start_scp)GetProcAddress(h, "TTXScpSendfile");
+		if (func == NULL) {
+			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetProcAddress(\"TTXScpSendfile\")) %d", GetLastError());
+			goto scp_send_error;
+		}
+	}
+
+	for (int i = 0; i < FileCount; i++) {
+		const char *FileName = Filenames[i];
+		func((char *)FileName, ts.ScpSendDir);
+	}
+	return true;
+}
+
+void CVTWindow::DropListFree()
+{
+	if (DropListCount > 0) {
+		for (int i = 0; i < DropListCount; i++) {
+			free(DropLists[i]);
+			DropLists[i] = NULL;
+		}
+		free(DropLists);
+		DropLists = NULL;
+		DropListCount = 0;
+	}
+}
+
+LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
+{
+	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
+
+	(void)lParam;
+	int FileCount = 0;
+	int DirectoryCount = 0;
+	for (int i = 0; i < DropListCount; i++) {
+		const char *FileName = DropLists[i];
+		const DWORD attr = GetFileAttributes(FileName);
+		if (attr == -1 ) {
+			goto finish;
+		}
+		if (attr & FILE_ATTRIBUTE_DIRECTORY) {
+			DirectoryCount++;
+		} else {
+			FileCount++;
+		}
+	}
+
+	bool AdapatSameProcess = false;
+	const bool isSSH = (cv.isSSH == 2);
+	enum drop_type DropType;
+	if (DefaultDropType == DROP_TYPE_CANCEL) {
+		// default is not set
+		if (!ShowDialog) {
+			if (FileCount == 1 && DirectoryCount == 0) {
+				if (ts.ConfirmFileDragAndDrop) {
+					if (isSSH) {
+						DropType = DROP_TYPE_SCP;
+					} else {
+						DropType = DROP_TYPE_SEND_FILE;
+					}
+					AdapatSameProcess = false;
+				} else {
+					DropType = DROP_TYPE_SEND_FILE;
+					AdapatSameProcess = true;
+				}
+			} else if (FileCount == 0 && DirectoryCount == 1) {
+				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+				AdapatSameProcess = true;
+			} else if (FileCount > 0 && DirectoryCount > 0) {
+				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+				AdapatSameProcess = false;
+			} else if (FileCount > 0 && DirectoryCount == 0) {
+				// filename only
+				if (isSSH) {
+					DropType = DROP_TYPE_SCP;
+				} else {
+					DropType = DROP_TYPE_SEND_FILE;
+				}
+				AdapatSameProcess = false;
+			} else {
+				// directory only
+				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+				AdapatSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
+			}
+		} else {
+			// show dialog
+			if (DirectoryCount > 0) {
+				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+			} else {
+				if (isSSH) {
+					DropType = DROP_TYPE_SCP;
+				} else {
+					DropType = DROP_TYPE_SEND_FILE;
+				}
+			}
+			AdapatSameProcess = false;
+		}
+	} else {
+		if (DirectoryCount > 0 &&
+			(DefaultDropType == DROP_TYPE_SEND_FILE ||
+			 DefaultDropType == DROP_TYPE_SEND_FILE_BINARY ||
+			 DefaultDropType == DROP_TYPE_SCP))
+		{	// デフォルトのままでは処理できない組み合わせ
+			DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+			AdapatSameProcess = false;
+		} else {
+			DropType = DefaultDropType;
+			AdapatSameProcess = ShowDialog ? false : true;
+		}
+	}
+
+	for (int i = 0; i < DropListCount; i++) {
+		const char *FileName = DropLists[i];
+
+		if (!AdapatSameProcess) {
+			bool DefaultProcess;
+			DropType =
+				ShowDropDialogBox(hInst, HVTWin,
+								  FileName, DropType,
+								  DropListCount - i,
+								  (DirectoryCount == 0 && isSSH) ? true : false,
+								  DirectoryCount == 0 ? true : false,
+								  &AdapatSameProcess, &DefaultProcess);
+			if (DropType == DROP_TYPE_CANCEL) {
+				goto finish;
+			}
+			if (DefaultProcess) {
+				DefaultDropType = DropType;
+			}
+		}
+			 
+		switch (DropType) {
+		case DROP_TYPE_CANCEL:
+		default:
+			// cancel
+			break;
+		case DROP_TYPE_SEND_FILE:
+		case DROP_TYPE_SEND_FILE_BINARY:
+			if (SendVar==NULL && NewFileVar(&SendVar)) {
+				HelpId = HlpFileSend;
+				strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileName,  _TRUNCATE);
+				SendVar->DirLen = 0;
+				ts.TransBin = DropType == DROP_TYPE_SEND_FILE ? 0 : 1;
+				FileSendStart();
+#if 0
+				goto finish;	// send fileは連続してできない
+#else
+				{
+					LONG lCount = 0;
+					CWinApp *app = AfxGetApp();
+					while(1) {
+						if (SendVar == NULL) {
+							break;
+						}
+						app->OnIdle(lCount++);
+					}
+				}
+#endif
+			}
+			break;
+		case DROP_TYPE_PASTE_FILENAME:
+		case DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE:
+		{
+			const bool escape = DropType == DROP_TYPE_PASTE_FILENAME ? false : true;
+			PasteString(&cv, FileName, escape);
+			if (DropListCount > 1) {
+				PasteString(&cv, "\n", false);
+			}
+			break;
+		}
+		case DROP_TYPE_SCP:
+		{
+			// send by scp
+			char **FileNames = &DropLists[i];
+			int FileCount = AdapatSameProcess ? DropListCount - i : 1;
+			if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
+				goto finish;
+			}
+			i += FileCount - 1;
+			break;
+		}
+		}
+	}
+
+finish:
+	DropListFree();
+	return 0;
+}
+
 void CVTWindow::OnDropFiles(HDROP hDropInfo)
 {
 	::SetForegroundWindow(HVTWin);
-	if (cv.Ready && (SendVar==NULL) && NewFileVar(&SendVar))
+	if (cv.Ready && SendVar==NULL)
 	{
-		if (DragQueryFile(hDropInfo,0,SendVar->FullName,
-			sizeof(SendVar->FullName))>0)
-		{
-			DWORD attr;
-			char *ptr, *q;
-			char tmpbuf[_MAX_PATH * 2];
+		const UINT ShowDialog =
+			((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) ? 1 : 0;
+		DropListCount = DragQueryFile(hDropInfo, -1, NULL, 0);
+		DropLists = (char **)malloc(sizeof(char *) * DropListCount);
 
-			// ディレクトリの場合はフルパス名を貼り付ける (2004.11.3 yutaka)
-			attr = GetFileAttributes(SendVar->FullName);
-			if (attr != -1 && (attr & FILE_ATTRIBUTE_DIRECTORY)) {
-				ptr = SendVar->FullName;
-				// パスの区切りを \ -> / へ
-				setlocale(LC_ALL, ts.Locale);
-				while (*ptr) {
-					if (isleadbyte(*ptr)) { // multi-byte
-						ptr += 2;
-						continue;
-					}
-					if (*ptr == '\\')
-						*ptr = '/';
-					ptr++;
-				}
-
-				// パスに空白があればエスケープする
-				q = tmpbuf;
-				ptr = SendVar->FullName;
-				while (*ptr) {
-					if (*ptr == ' ')
-						*q++ = '\\';
-					*q++ = *ptr;
-					ptr++;
-				}
-				*q = '\0'; // null-terminate
-
-				ptr = tmpbuf;
-
-				// consoleへ送信
-				while (*ptr) {
-					CommTextOut(&cv, ptr, 1);
-					if (ts.LocalEcho > 0) {
-						CommTextEcho(&cv, ptr, 1);
-					}
-					ptr++;
-				}
-				FreeFileVar(&SendVar); // 解放を忘れずに
-
-			} else {
-				// Confirm send a file when drag and drop (2007.12.28 maya)
-				if (ts.ConfirmFileDragAndDrop) {
-					// いきなりファイルの内容を送り込む前に、ユーザに問い合わせを行う。(2006.1.21 yutaka)
-					// MessageBoxでSCPも選択できるようにする。(2008.1.25 yutaka)
-					// SCPパスを指定できるようにダイアログに変更した。(2012.4.11 yutaka)
-					int ret;
-
-					ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_DAD_DIALOG),
-									HVTWin, (DLGPROC)OnDragDropDlgProc);
-
-					if (ret == IDOK) {   // sendfile
-						HelpId = HlpFileSend;
-						SendVar->DirLen = 0;
-						ts.TransBin = 0;
-						FileSendStart();
-
-					} else if (ret == IDC_DAD_SENDFILE) {   // SCP
-						typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
-						static PSSH_start_scp func = NULL;
-						static HMODULE h = NULL;
-						char msg[128];
-
-						if (func == NULL) {
-							if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
-								_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
-								goto scp_send_error;
-							}
-							func = (PSSH_start_scp)GetProcAddress(h, "TTXScpSendfile");
-							if (func == NULL) {
-								_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetProcAddress(\"TTXScpSendfile\")) %d", GetLastError());
-								goto scp_send_error;
-							}
-						}
-
-						if (func != NULL) {
-							func(SendVar->FullName, ts.ScpSendDir);
-							goto send_success;
-						}
-
-scp_send_error:
-						::MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
-send_success:
-						FreeFileVar(&SendVar);  // 解放を忘れずに
-
-					} else {
-						FreeFileVar(&SendVar);
-
-					}
-				}
-				else {
-					SendVar->DirLen = 0;
-					ts.TransBin = 0;
-					FileSendStart();
-
-				}
-			}
+		for (int i = 0; i < DropListCount; i++) {
+			const UINT cch = DragQueryFile(hDropInfo, i, NULL, 0) + 1;
+			char *FileName = (char *)malloc(cch);
+			DropLists[i] = FileName;
+			DragQueryFile(hDropInfo,i,FileName,cch);
 		}
-		else
-			FreeFileVar(&SendVar);
+
+		::PostMessage(HVTWin, WM_USER_DROPNOTIFY, ShowDialog, 0);
 	}
 	DragFinish(hDropInfo);
 }

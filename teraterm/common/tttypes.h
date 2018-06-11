@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -173,6 +173,7 @@ typedef TCharAttr *PCharAttr;
 #define WM_USER_GETSERIALNO  WM_USER+13
 #define WM_USER_CHANGETITLE  WM_USER+14
 #define WM_USER_NOTIFYICON   WM_USER+15
+#define WM_USER_DROPNOTIFY   WM_USER+16
 
 #define WM_USER_DDEREADY     WM_USER+21
 #define WM_USER_DDECMNDEND   WM_USER+22

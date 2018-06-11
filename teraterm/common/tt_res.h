@@ -164,7 +164,6 @@
 #define IDC_PROT_ELAPSED                2525
 #define IDC_DAD_STATIC                  2525
 #define IDC_PROTOELAPSEDTIME            2526
-#define IDC_DAD_SENDFILE                2526
 #define IDC_TRANS_ELAPSED               2527
 #define IDC_BGIMG_LABEL                 2527
 #define IDC_TRANS_ETIME                 2528
@@ -218,7 +217,16 @@
 #define IDC_NORMALIZE_LINEBREAK         2565
 #define IDC_CLIPBOARD_NOTIFY            2566
 #define IDC_LIST_HIDDEN_FONTS           2567
-
+#define IDC_BINARY_CHECK                2568
+#define IDC_ADAPT_SAME_CHECK            2569
+#define IDC_FILENAME_EDIT               2570
+#define IDC_SCP_RADIO                   2571
+#define IDC_SENDFILE_RADIO              2572
+#define IDC_PASTE_RADIO                 2573
+#define IDC_ESCAPE_CHECK                2574
+#define IDC_DEFAULT_CHECK               2575
+#define IDC_SCP_PATH_LABEL              2576
+#define IDC_SCP_PATH_NOTE               2577
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -316,7 +324,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2568
+#define _APS_NEXT_CONTROL_VALUE         2578
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
