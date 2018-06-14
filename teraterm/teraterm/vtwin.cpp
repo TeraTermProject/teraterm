@@ -2513,7 +2513,7 @@ void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
 
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 {
-	if (! Minimized && (nHitTest == HTCAPTION)) {
+	if (! Minimized && !ts.TermIsWin && (nHitTest == HTCAPTION)) {
 		DispRestoreWinSize();
 	}
 	else {
