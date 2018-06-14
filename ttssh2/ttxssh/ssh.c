@@ -7653,6 +7653,7 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 	int id, remote_id;
 	Channel_t *c;
 	char buff[MAX_PATH + 30];
+	char *host_p, *path_p;
 
 #ifdef DONT_WANTCONFIRM
 	int want_reply = 0; // false
@@ -7717,8 +7718,17 @@ static BOOL handle_SSH2_open_confirm(PTInstVar pvar)
 
 	case TYPE_SCP:
 		if (c->scp.dir == TOREMOTE) {
-			_snprintf_s(buff, sizeof(buff), _TRUNCATE, "scp -t %s", c->scp.remotefile);
-
+			if ((path_p = strchr(c->scp.remotefile, ':')) != NULL) {
+				host_p = c->scp.remotefile;
+				*path_p++ = 0;
+				if (*path_p == 0) {
+					path_p = ".";
+				}
+				_snprintf_s(buff, sizeof(buff), _TRUNCATE, "ssh %s scp -t %s", host_p, path_p);
+			}
+			else {
+				_snprintf_s(buff, sizeof(buff), _TRUNCATE, "scp -t %s", c->scp.remotefile);
+			}
 		} else {
 			// ファイル名に空白を含まれていてもよいように、ファイル名を二重引用符で囲む。
 			// (2014.7.13 yutaka)
