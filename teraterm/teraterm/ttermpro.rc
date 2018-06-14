@@ -66,6 +66,19 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,100,220,10
     CONTROL         "List &hidden fonts in font dialog",IDC_LIST_HIDDEN_FONTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,115,220,10
+    GROUPBOX        "Title format",IDC_TITLEFMT_GROUP,5,130,250,55
+    CONTROL         "&Display host/port name",IDC_TITLEFMT_DISPHOSTNAME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,110,10
+    CONTROL         "Display session &number",IDC_TITLEFMT_DISPSESSION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,155,110,10
+    CONTROL         "Display &VT/TEK",IDC_TITLEFMT_DISPVTTEK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,170,110,10
+    CONTROL         "Swap hostname and &title position",IDC_TITLEFMT_SWAPHOSTTITLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,140,130,10
+    CONTROL         "Display tcp &port number",IDC_TITLEFMT_DISPTCPPORT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,155,130,10
+    CONTROL         "Display se&rial port speed",IDC_TITLEFMT_DISPSERIALSPEED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,170,130,10
 END
 
 IDD_TABSHEET_SEQUENCE DIALOGEX 0, 0, 258, 188

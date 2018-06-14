@@ -120,6 +120,13 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 		SendDlgItemMessage(IDC_CLEAR_ON_RESIZE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_CURSOR_CHANGE_IME, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_LIST_HIDDEN_FONTS, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_GROUP, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_DISPHOSTNAME, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_DISPSESSION, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_DISPVTTEK, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_SWAPHOSTTITLE, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_DISPTCPPORT, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_TITLEFMT_DISPSERIALSPEED, WM_SETFONT, (WPARAM)DlgGeneralFont, MAKELPARAM(TRUE,0));
 	}
 	else {
 		DlgGeneralFont = NULL;
@@ -149,6 +156,28 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_LIST_HIDDEN_FONTS, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_GENERAL_LIST_HIDDEN_FONTS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_LIST_HIDDEN_FONTS, ts.UIMsg);
+
+	GetDlgItemText(IDC_TITLEFMT_GROUP, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_GROUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_GROUP, ts.UIMsg);
+	GetDlgItemText(IDC_TITLEFMT_DISPHOSTNAME, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_DISPHOSTNAME, ts.UIMsg);
+	GetDlgItemText(IDC_TITLEFMT_DISPSESSION, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_DISPSESSION", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_DISPSESSION, ts.UIMsg);
+	GetDlgItemText(IDC_TITLEFMT_DISPVTTEK, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_DISPVTTEK, ts.UIMsg);
+	GetDlgItemText(IDC_TITLEFMT_SWAPHOSTTITLE, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_SWAPHOSTTITLE, ts.UIMsg);
+	GetDlgItemText(IDC_TITLEFMT_DISPTCPPORT, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_DISPTCPPORT, ts.UIMsg);
+	GetDlgItemText(IDC_TITLEFMT_DISPSERIALSPEED, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_TITLEFMT_DISPSERIALSPEED, ts.UIMsg);
 
 	// (1)DisableAcceleratorSendBreak
 	btn = (CButton *)GetDlgItem(IDC_DISABLE_SENDBREAK);
@@ -181,6 +210,25 @@ BOOL CGeneralPropPageDlg::OnInitDialog()
 	// (8)IDC_LIST_HIDDEN_FONTS
 	btn = (CButton *)GetDlgItem(IDC_LIST_HIDDEN_FONTS);
 	btn->SetCheck(ts.ListHiddenFonts);
+
+	// (9) Title Format
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPHOSTNAME);
+	btn->SetCheck((ts.TitleFormat & 1) != 0);
+
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPSESSION);
+	btn->SetCheck((ts.TitleFormat & (1<<1)) != 0);
+
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPVTTEK);
+	btn->SetCheck((ts.TitleFormat & (1<<2)) != 0);
+
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_SWAPHOSTTITLE);
+	btn->SetCheck((ts.TitleFormat & (1<<3)) != 0);
+
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPTCPPORT);
+	btn->SetCheck((ts.TitleFormat & (1<<4)) != 0);
+
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPSERIALSPEED);
+	btn->SetCheck((ts.TitleFormat & (1<<5)) != 0);
 
 	// ダイアログにフォーカスを当てる (2004.12.7 yutaka)
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CLICKABLE_URL));
@@ -231,6 +279,20 @@ void CGeneralPropPageDlg::OnOK()
 	// (8)IDC_LIST_HIDDEN_FONTS
 	btn = (CButton *)GetDlgItem(IDC_LIST_HIDDEN_FONTS);
 	ts.ListHiddenFonts = btn->GetCheck();
+
+	// (9) Title Format
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPHOSTNAME);
+	ts.TitleFormat = (btn->GetCheck() == BST_CHECKED);
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPSESSION);
+	ts.TitleFormat |= ((btn->GetCheck() == BST_CHECKED) << 1);
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPVTTEK);
+	ts.TitleFormat |= ((btn->GetCheck() == BST_CHECKED) << 2);
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_SWAPHOSTTITLE);
+	ts.TitleFormat |= ((btn->GetCheck() == BST_CHECKED) << 3);
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPTCPPORT);
+	ts.TitleFormat |= ((btn->GetCheck() == BST_CHECKED) << 4);
+	btn = (CButton *)GetDlgItem(IDC_TITLEFMT_DISPSERIALSPEED);
+	ts.TitleFormat |= ((btn->GetCheck() == BST_CHECKED) << 5);
 }
 
 

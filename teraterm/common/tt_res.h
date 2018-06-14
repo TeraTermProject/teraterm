@@ -218,6 +218,13 @@
 #define IDC_NORMALIZE_LINEBREAK         2565
 #define IDC_CLIPBOARD_NOTIFY            2566
 #define IDC_LIST_HIDDEN_FONTS           2567
+#define IDC_TITLEFMT_GROUP              2568
+#define IDC_TITLEFMT_DISPHOSTNAME       2569
+#define IDC_TITLEFMT_DISPSESSION        2570
+#define IDC_TITLEFMT_DISPVTTEK          2571
+#define IDC_TITLEFMT_SWAPHOSTTITLE      2572
+#define IDC_TITLEFMT_DISPTCPPORT        2573
+#define IDC_TITLEFMT_DISPSERIALSPEED    2574
 
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
@@ -316,7 +323,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2568
+#define _APS_NEXT_CONTROL_VALUE         2575
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
