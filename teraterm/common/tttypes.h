@@ -1142,4 +1142,4 @@ typedef TMap far *PMap;
 // TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
 // TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが
 // 連番からバージョン番号を使うように変更した為、通常は手動で変更する必要は無い
-#define TT_FILEMAPNAME "ttset_memfilemap_" TT_VERSION_STR("_") "_S"
+#define TT_FILEMAPNAME "ttset_memfilemap_" TT_VERSION_STR("_")
