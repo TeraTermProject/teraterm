@@ -26,7 +26,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_DAD_DIALOG DIALOGEX 0, 0, 187, 207
+IDD_DAD_DIALOG DIALOGEX 0, 0, 187, 267
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Tera Term: File Drag and Drop"
 FONT 8, "Tahoma", 400, 0, 0x0
@@ -42,12 +42,17 @@ BEGIN
     LTEXT           "dest is home directory if empty",IDC_SCP_PATH_NOTE,50,64,120,8
     CONTROL         "Bina&ry",IDC_BINARY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,92,151,10
     CONTROL         "Es&cape",IDC_ESCAPE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,125,151,10
+    CONTROL         "Separat&or is Space",IDC_SPACE_RADIO,"Button",BS_AUTORADIOBUTTON,19,139,160,10
+    CONTROL         "Separator is &NewLine",IDC_NEWLINE_RADIO,"Button",BS_AUTORADIOBUTTON,19,154,160,10
     CONTROL         "&Adapt same process to remaing %d files",IDC_ADAPT_SAME_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,144,172,10
-    CONTROL         "&Default process from next drop\n(Drop with CTRL, this dialog is dispalyed)",IDC_DEFAULT_CHECK,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,160,172,18
-    DEFPUSHBUTTON   "OK",IDOK,69,185,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,130,185,50,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,173,172,10
+    CONTROL         "Do sa&me process, next drop",IDC_SAME_PROCESS_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,188,172,10
+    CONTROL         "&Do not display this dialog, next drop",IDC_DONTSHOW_CHECK,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,203,172,11
+    DEFPUSHBUTTON   "OK",IDOK,69,245,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,130,245,50,14
+    LTEXT           "Drop with CTRL, this dialog is dispalyed",IDC_DAD_NOTE,7,221,172,8
 END
 
 IDD_COMMENT_DIALOG DIALOGEX 0, 0, 239, 19

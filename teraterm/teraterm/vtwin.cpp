@@ -2038,19 +2038,25 @@ enum drop_type {
 	DROP_TYPE_SEND_FILE,		// past contents of file
 	DROP_TYPE_SEND_FILE_BINARY,
 	DROP_TYPE_PASTE_FILENAME,
-	DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE,
 };
+
+#define DROP_TYPE_PASTE_ESCAPE	0x01
+#define	DROP_TYPE_PASTE_NEWLINE	0x02
 
 struct DrapDropDlgParam {
 	const char *TargetFilename;
 	enum drop_type DropType;
+	unsigned char DropTypePaste;
 	bool ScpEnable;
 	char *ScpSendDirPtr;
 	int ScpSendDirSize;
 	bool SendfileEnable;
+	bool PasteNewlineEnable;
 	int RemaingFileCount;
 	bool AdaptSameProcess;
-	bool DefaultProcess;
+	bool DoSameProcess;
+	bool DoNotShowDialogEnable;
+	bool DoNotShowDialog;
 };
 
 struct DrapDropDlgData {
@@ -2081,8 +2087,10 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 					IDC_DAD_STATIC,
 					IDC_SCP_RADIO, IDC_SENDFILE_RADIO, IDC_PASTE_RADIO,
 					IDC_SCP_PATH_LABEL, IDC_SCP_PATH, IDC_SCP_PATH_NOTE,
-					IDC_BINARY_CHECK, IDC_ESCAPE_CHECK,
-					IDC_ADAPT_SAME_CHECK, IDC_DEFAULT_CHECK,
+					IDC_BINARY_CHECK,
+					IDC_ESCAPE_CHECK, IDC_NEWLINE_RADIO, IDC_SPACE_RADIO,
+					IDC_ADAPT_SAME_CHECK, IDC_DONTSHOW_CHECK,
+					IDC_DAD_NOTE,
 					IDOK, IDCANCEL,
 				};
 				SetDlgFonts(hDlgWnd, IDs, _countof(IDs), DlgDragDropFont);
@@ -2105,8 +2113,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO,
 							 (Param->DropType == DROP_TYPE_SEND_FILE ||
 							  Param->DropType == DROP_TYPE_SEND_FILE_BINARY) ? IDC_SENDFILE_RADIO :
-							 (Param->DropType == DROP_TYPE_PASTE_FILENAME ||
-							  Param->DropType == DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE) ? IDC_PASTE_RADIO :
+							 Param->DropType == DROP_TYPE_PASTE_FILENAME  ? IDC_PASTE_RADIO :
 							 IDC_SCP_RADIO);
 
 			// SCP
@@ -2130,8 +2137,15 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			}
 
 			// Paste Filename
-			if (Param->DropType != DROP_TYPE_PASTE_FILENAME) {
+			if (Param->DropTypePaste & DROP_TYPE_PASTE_ESCAPE) {
 				SendMessage(GetDlgItem(hDlgWnd, IDC_ESCAPE_CHECK), BM_SETCHECK, BST_CHECKED, 0);
+			}
+			CheckRadioButton(hDlgWnd, IDC_SPACE_RADIO, IDC_NEWLINE_RADIO, 
+							 Param->DropTypePaste & DROP_TYPE_PASTE_NEWLINE?
+							 IDC_NEWLINE_RADIO : IDC_SPACE_RADIO);
+			if (Param->RemaingFileCount < 2) {
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SPACE_RADIO), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_NEWLINE_RADIO), FALSE);
 			}
 
 			// Adapt same process
@@ -2141,6 +2155,15 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			SetDlgItemText(hDlgWnd, IDC_ADAPT_SAME_CHECK, b);
 			if (Param->RemaingFileCount < 2) {
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_ADAPT_SAME_CHECK), FALSE);
+			}
+
+			// Dont Show Dialog
+			if (Param->DoNotShowDialog) {
+				SendMessage(GetDlgItem(hDlgWnd, IDC_DONTSHOW_CHECK), BM_SETCHECK, BST_CHECKED, 0);
+			}
+			if (!Param->DoNotShowDialogEnable) {
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_DONTSHOW_CHECK), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_DAD_NOTE), FALSE);
 			}
 
 			// focus to "SCP dest textbox" or "Cancel"
@@ -2185,15 +2208,23 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 						DROP_TYPE_SEND_FILE_BINARY : DROP_TYPE_SEND_FILE;
 				} else /* if (IsDlgButtonChecked(hDlgWnd, IDC_PASTE_RADIO) == BST_CHECKED) */ {
 					// Paste Filename
-					DlgData->Param->DropType =
+					DlgData->Param->DropType = DROP_TYPE_PASTE_FILENAME;
+					DlgData->Param->DropTypePaste = 0;
+					DlgData->Param->DropTypePaste |=
 						(IsDlgButtonChecked(hDlgWnd, IDC_ESCAPE_CHECK) == BST_CHECKED) ?
-						DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE : DROP_TYPE_PASTE_FILENAME;
+						DROP_TYPE_PASTE_ESCAPE : 0;
+					DlgData->Param->DropTypePaste |=
+						(IsDlgButtonChecked(hDlgWnd, IDC_NEWLINE_RADIO) == BST_CHECKED) ?
+						DROP_TYPE_PASTE_NEWLINE : 0;
 				}
 				DlgData->Param->AdaptSameProcess = 
 					(IsDlgButtonChecked(hDlgWnd, IDC_ADAPT_SAME_CHECK) == BST_CHECKED) ?
 					true : false;
-				DlgData->Param->DefaultProcess = 
-					(IsDlgButtonChecked(hDlgWnd, IDC_DEFAULT_CHECK) == BST_CHECKED) ?
+				DlgData->Param->DoSameProcess =
+					(IsDlgButtonChecked(hDlgWnd, IDC_SAME_PROCESS_CHECK) == BST_CHECKED) ?
+					true : false;
+				DlgData->Param->DoNotShowDialog = 
+					(IsDlgButtonChecked(hDlgWnd, IDC_DONTSHOW_CHECK) == BST_CHECKED) ?
 					true : false;
 			}
 			if (wID == IDCANCEL) {
@@ -2223,17 +2254,24 @@ static enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
+	bool EnableDoNotShowDialog,
+	unsigned char *DropTypePaste,
 	bool *AdaptSameProcess,
-	bool *DefaultProcess)
+	bool *DoSameProcess,
+	bool *DoNotShowDialog)
 {
 	struct DrapDropDlgParam Param;
 	Param.TargetFilename = TargetFilename;
 	Param.DropType = DefaultDropType;
+	Param.DropTypePaste = *DropTypePaste;
 	Param.ScpEnable = EnableSCP;
 	Param.ScpSendDirPtr = ts.ScpSendDir;
 	Param.ScpSendDirSize = sizeof(ts.ScpSendDir);
 	Param.SendfileEnable = EnableSendFile;
+	Param.PasteNewlineEnable = true;
 	Param.RemaingFileCount = RemaingFileCount;
+	Param.DoNotShowDialog = *DoNotShowDialog;
+	Param.DoNotShowDialogEnable = EnableDoNotShowDialog;
 	int ret = DialogBoxParam(
 		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
 		hWndParent, (DLGPROC)OnDragDropDlgProc,
@@ -2241,8 +2279,10 @@ static enum drop_type ShowDropDialogBox(
 	if (ret != IDOK) {
 		return DROP_TYPE_CANCEL;
 	}
+	*DropTypePaste = Param.DropTypePaste;
 	*AdaptSameProcess = Param.AdaptSameProcess;
-	*DefaultProcess = Param.DefaultProcess;
+	*DoSameProcess = Param.DoSameProcess;
+	*DoNotShowDialog = Param.DoNotShowDialog;
 	return Param.DropType;
 }
 
@@ -2343,7 +2383,10 @@ void CVTWindow::DropListFree()
 
 LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 {
+	// iniに保存されない、今実行しているTera Termでのみ有効な設定
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
+	static unsigned char DefaultDropTypePaste = DROP_TYPE_PASTE_ESCAPE;
+	static bool DefaultShowDialog = ts.ConfirmFileDragAndDrop ? true : false;
 
 	(void)lParam;
 	int FileCount = 0;
@@ -2364,6 +2407,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 	bool AdapatSameProcess = false;
 	const bool isSSH = (cv.isSSH == 2);
 	enum drop_type DropType;
+	unsigned char DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
 	if (DefaultDropType == DROP_TYPE_CANCEL) {
 		// default is not set
 		if (!ShowDialog) {
@@ -2377,13 +2421,13 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 					AdapatSameProcess = false;
 				} else {
 					DropType = DROP_TYPE_SEND_FILE;
-					AdapatSameProcess = true;
+					AdapatSameProcess = DefaultShowDialog ? false : true;
 				}
 			} else if (FileCount == 0 && DirectoryCount == 1) {
-				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
-				AdapatSameProcess = true;
+				DropType = DROP_TYPE_PASTE_FILENAME;
+				AdapatSameProcess = DefaultShowDialog ? false : true;
 			} else if (FileCount > 0 && DirectoryCount > 0) {
-				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+				DropType = DROP_TYPE_PASTE_FILENAME;
 				AdapatSameProcess = false;
 			} else if (FileCount > 0 && DirectoryCount == 0) {
 				// filename only
@@ -2395,13 +2439,13 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 				AdapatSameProcess = false;
 			} else {
 				// directory only
-				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+				DropType = DROP_TYPE_PASTE_FILENAME;
 				AdapatSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
 			}
 		} else {
 			// show dialog
 			if (DirectoryCount > 0) {
-				DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+				DropType = DROP_TYPE_PASTE_FILENAME;
 			} else {
 				if (isSSH) {
 					DropType = DROP_TYPE_SCP;
@@ -2417,11 +2461,13 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 			 DefaultDropType == DROP_TYPE_SEND_FILE_BINARY ||
 			 DefaultDropType == DROP_TYPE_SCP))
 		{	// デフォルトのままでは処理できない組み合わせ
-			DropType = DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE;
+			DropType = DROP_TYPE_PASTE_FILENAME;
+			DropTypePaste = DefaultDropTypePaste;
 			AdapatSameProcess = false;
 		} else {
 			DropType = DefaultDropType;
-			AdapatSameProcess = ShowDialog ? false : true;
+			DropTypePaste = DefaultDropTypePaste;
+			AdapatSameProcess = (ShowDialog || DefaultShowDialog) ? false : true;
 		}
 	}
 
@@ -2429,19 +2475,28 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		const char *FileName = DropLists[i];
 
 		if (!AdapatSameProcess) {
-			bool DefaultProcess;
+			bool DoSameProcess;
+			bool DoNotShowDialog = !DefaultShowDialog;
 			DropType =
 				ShowDropDialogBox(hInst, HVTWin,
 								  FileName, DropType,
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
 								  DirectoryCount == 0 ? true : false,
-								  &AdapatSameProcess, &DefaultProcess);
+								  ts.ConfirmFileDragAndDrop ? false : true,
+								  &DropTypePaste,
+								  &AdapatSameProcess,
+								  &DoSameProcess,
+								  &DoNotShowDialog);
 			if (DropType == DROP_TYPE_CANCEL) {
 				goto finish;
 			}
-			if (DefaultProcess) {
+			if (DoSameProcess) {
 				DefaultDropType = DropType;
+				DefaultDropTypePaste = DropTypePaste;
+			}
+			if (!ts.ConfirmFileDragAndDrop) {
+				DefaultShowDialog = !DoNotShowDialog;
 			}
 		}
 			 
@@ -2475,12 +2530,12 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 			}
 			break;
 		case DROP_TYPE_PASTE_FILENAME:
-		case DROP_TYPE_PASTE_FILENAME_WITH_ESCAPE:
 		{
-			const bool escape = DropType == DROP_TYPE_PASTE_FILENAME ? false : true;
+			const bool escape = (DropTypePaste & DROP_TYPE_PASTE_ESCAPE) ? true : false;
 			PasteString(&cv, FileName, escape);
-			if (DropListCount > 1) {
-				PasteString(&cv, "\n", false);
+			if (DropListCount > 1 && i < DropListCount - 1) {
+				const char *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? "\n" : " ";
+				PasteString(&cv, separator, false);
 			}
 			break;
 		}

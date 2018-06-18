@@ -64,7 +64,6 @@
 #define IDC_SHELL                       1038
 #define IDC_TERM_EDIT                   1039
 #define IDC_ENV1                        1040
-#define IDC_EDIT7                       1041
 #define IDC_ENV2                        1041
 #define IDC_MOUSE                       1042
 #define IDC_DELIMITER                   1043
@@ -129,7 +128,6 @@
 #define IDC_REALTIME_CHECK              2508
 #define IDC_LIST1                       2509
 #define IDC_LIST                        2509
-#define IDC_EDIT1                       2510
 #define IDC_EDIT                        2510
 #define IDC_SCROLL_LINE                 2510
 #define IDC_PASTEDELAY_EDIT             2510
@@ -138,7 +136,6 @@
 #define IDC_ROTATE_SIZE                 2510
 #define IDC_INI_SETUPDIR_EDIT           2510
 #define IDC_KEYCNF_SETUPDIR_EDIT        2511
-#define IDC_CHECK1                      2512
 #define IDC_CONFIRM_CHANGE_PASTE        2512
 #define IDC_CURSOR_CTRL_SEQ             2512
 #define IDC_LOG_ROTATE                  2512
@@ -199,7 +196,6 @@
 #define IDC_CYGTERM_SETUPDIR_BUTTON_FILE2 2551
 #define IDC_SSH_SETUPDIR_BUTTON_FILE    2551
 #define IDC_BGIMG_BRIGHTNESS            2551
-#define IDC_EDIT2                       2552
 #define IDC_EDIT_BGIMG_BRIGHTNESS       2552
 #define IDC_INI_SETUPDIR_EDIT_VSTORE    2552
 #define IDC_INI_SETUPDIR_STATIC_VSTORE  2553
@@ -224,9 +220,13 @@
 #define IDC_SENDFILE_RADIO              2572
 #define IDC_PASTE_RADIO                 2573
 #define IDC_ESCAPE_CHECK                2574
-#define IDC_DEFAULT_CHECK               2575
-#define IDC_SCP_PATH_LABEL              2576
-#define IDC_SCP_PATH_NOTE               2577
+#define IDC_SCP_PATH_LABEL              2575
+#define IDC_SCP_PATH_NOTE               2576
+#define IDC_SPACE_RADIO                 2577
+#define IDC_NEWLINE_RADIO               2578
+#define IDC_DAD_NOTE                    2579
+#define IDC_SAME_PROCESS_CHECK          2580
+#define IDC_DONTSHOW_CHECK              2581
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002
 #define ID_ACC_NEWCONNECTION            50003
@@ -324,7 +324,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         52031
-#define _APS_NEXT_CONTROL_VALUE         2578
+#define _APS_NEXT_CONTROL_VALUE         2582
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
