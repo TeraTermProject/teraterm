@@ -31,6 +31,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "vtdisp.h"
+#include "vtterm.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -372,12 +373,8 @@ BOOL CheckClipboardContent(HWND HWin, BOOL AddCR, BOOL Bracketed)
 	}
 }
 
-#define BracketStartLen	(sizeof(BracketStart)-1)
-#define BracketEndLen	(sizeof(BracketEnd)-1)
 void CBStartPaste(HWND HWin, BOOL AddCR, BOOL Bracketed)
 {
-	static char BracketStart[] = "\033[200~";
-	static char BracketEnd[] = "\033[201~";
 	UINT Cf;
 	PCHAR TmpPtr;
 	LPWSTR TmpPtrW;
