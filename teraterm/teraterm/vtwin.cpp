@@ -2032,6 +2032,28 @@ static void SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
 	}
 }
 
+typedef struct {
+	int nIDDlgItem;
+	char *key;
+} DlgTextInfo;
+
+static void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, char *UILanguageFile)
+{
+	for (int i = 0 ; i < infoCount; i++) {
+		char *key = infos[i].key;
+		char uimsg[MAX_UIMSG];
+		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
+		if (uimsg[0] != '\0') {
+			const int nIDDlgItem = infos[i].nIDDlgItem;
+			if (nIDDlgItem == 0) {
+				SetWindowText(hDlgWnd, uimsg);
+			} else {
+				SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+			}
+		}
+	}
+}
+
 enum drop_type {
 	DROP_TYPE_CANCEL,
 	DROP_TYPE_SCP,
@@ -2053,8 +2075,8 @@ struct DrapDropDlgParam {
 	bool SendfileEnable;
 	bool PasteNewlineEnable;
 	int RemaingFileCount;
-	bool AdaptSameProcess;
 	bool DoSameProcess;
+	bool DoSameProcessNextDrop;
 	bool DoNotShowDialogEnable;
 	bool DoNotShowDialog;
 };
@@ -2071,7 +2093,6 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 	switch (msg) {
 		case WM_INITDIALOG:
 		{
-			char uimsg[MAX_UIMSG];
 			LOGFONT logfont;
 			HFONT font;
 			HFONT DlgDragDropFont = NULL;
@@ -2082,14 +2103,14 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
 			GetObject(font, sizeof(LOGFONT), &logfont);
 			if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgDragDropFont, ts.UILanguageFile)) {
-				const static int IDs[] = {
+				static const int IDs[] = {
 					IDC_FILENAME_EDIT,
 					IDC_DAD_STATIC,
 					IDC_SCP_RADIO, IDC_SENDFILE_RADIO, IDC_PASTE_RADIO,
 					IDC_SCP_PATH_LABEL, IDC_SCP_PATH, IDC_SCP_PATH_NOTE,
 					IDC_BINARY_CHECK,
 					IDC_ESCAPE_CHECK, IDC_NEWLINE_RADIO, IDC_SPACE_RADIO,
-					IDC_ADAPT_SAME_CHECK, IDC_DONTSHOW_CHECK,
+					IDC_SAME_PROCESS_CHECK, IDC_SAME_PROCESS_NEXTDROP_CHECK, IDC_DONTSHOW_CHECK,
 					IDC_DAD_NOTE,
 					IDOK, IDCANCEL,
 				};
@@ -2099,15 +2120,15 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			}
 			DlgData->DlgDragDropFont = DlgDragDropFont;
 
-			GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
-			get_lang_msg("MSG_DANDD_CONF_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetWindowText(hDlgWnd, ts.UIMsg);
+			static const DlgTextInfo textInfos[] = {
+				{ 0, "MSG_DANDD_CONF_TITLE" },
+				{ IDC_DAD_STATIC, "MSG_DANDD_CONF" },
+				{ IDC_SAME_PROCESS_CHECK, "MSG_DANDD_CONF_CONFLICTS" },
+			};
+			SetDlgTexts(hDlgWnd, textInfos, _countof(textInfos), ts.UILanguageFile);
 
+			// target file
 			SetDlgItemText(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
-
-			get_lang_msg("MSG_DANDD_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Are you sure that you want to send the file content?", ts.UILanguageFile);
-			SetDlgItemText(hDlgWnd, IDC_DAD_STATIC, ts.UIMsg);
 			
 			// checkbox
 			CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO,
@@ -2148,13 +2169,14 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 				EnableWindow(GetDlgItem(hDlgWnd, IDC_NEWLINE_RADIO), FALSE);
 			}
 
-			// Adapt same process
-			GetDlgItemText(hDlgWnd, IDC_ADAPT_SAME_CHECK, uimsg, sizeof(uimsg));
-			char b[MAX_UIMSG];
-			_snprintf_s(b, sizeof(b), _TRUNCATE, uimsg, Param->RemaingFileCount);
-			SetDlgItemText(hDlgWnd, IDC_ADAPT_SAME_CHECK, b);
+			// Do this for the next %d conflicts
+			char orgmsg[MAX_UIMSG];
+			GetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
+			char uimsg[MAX_UIMSG];
+			_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, orgmsg, Param->RemaingFileCount - 1);
+			SetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, uimsg);
 			if (Param->RemaingFileCount < 2) {
-				EnableWindow(GetDlgItem(hDlgWnd, IDC_ADAPT_SAME_CHECK), FALSE);
+				EnableWindow(GetDlgItem(hDlgWnd, IDC_SAME_PROCESS_CHECK), FALSE);
 			}
 
 			// Dont Show Dialog
@@ -2194,6 +2216,17 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			{	// radio buttons double click
 				wID = IDOK;
 			}
+			if (wCMD == EN_SETFOCUS && wID == IDC_SCP_PATH) {
+				CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO, IDC_SCP_RADIO);
+			}
+			if (wID == IDC_BINARY_CHECK) {
+				CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO, IDC_SENDFILE_RADIO);
+			}
+			if (wID == IDC_ESCAPE_CHECK ||
+				wID == IDC_SPACE_RADIO || wID == IDC_NEWLINE_RADIO)
+			{
+				CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO, IDC_PASTE_RADIO);
+			}
 			if (wID == IDOK) {
 				if (IsDlgButtonChecked(hDlgWnd, IDC_SCP_RADIO) == BST_CHECKED) {
 					// SCP
@@ -2217,11 +2250,11 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 						(IsDlgButtonChecked(hDlgWnd, IDC_NEWLINE_RADIO) == BST_CHECKED) ?
 						DROP_TYPE_PASTE_NEWLINE : 0;
 				}
-				DlgData->Param->AdaptSameProcess = 
-					(IsDlgButtonChecked(hDlgWnd, IDC_ADAPT_SAME_CHECK) == BST_CHECKED) ?
-					true : false;
-				DlgData->Param->DoSameProcess =
+				DlgData->Param->DoSameProcess = 
 					(IsDlgButtonChecked(hDlgWnd, IDC_SAME_PROCESS_CHECK) == BST_CHECKED) ?
+					true : false;
+				DlgData->Param->DoSameProcessNextDrop =
+					(IsDlgButtonChecked(hDlgWnd, IDC_SAME_PROCESS_NEXTDROP_CHECK) == BST_CHECKED) ?
 					true : false;
 				DlgData->Param->DoNotShowDialog = 
 					(IsDlgButtonChecked(hDlgWnd, IDC_DONTSHOW_CHECK) == BST_CHECKED) ?
@@ -2256,8 +2289,8 @@ static enum drop_type ShowDropDialogBox(
 	bool EnableSendFile,
 	bool EnableDoNotShowDialog,
 	unsigned char *DropTypePaste,
-	bool *AdaptSameProcess,
 	bool *DoSameProcess,
+	bool *DoSameProcessNextDrop,
 	bool *DoNotShowDialog)
 {
 	struct DrapDropDlgParam Param;
@@ -2280,8 +2313,8 @@ static enum drop_type ShowDropDialogBox(
 		return DROP_TYPE_CANCEL;
 	}
 	*DropTypePaste = Param.DropTypePaste;
-	*AdaptSameProcess = Param.AdaptSameProcess;
 	*DoSameProcess = Param.DoSameProcess;
+	*DoSameProcessNextDrop = Param.DoSameProcessNextDrop;
 	*DoNotShowDialog = Param.DoNotShowDialog;
 	return Param.DropType;
 }
@@ -2404,7 +2437,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		}
 	}
 
-	bool AdapatSameProcess = false;
+	bool DoSameProcess = false;
 	const bool isSSH = (cv.isSSH == 2);
 	enum drop_type DropType;
 	unsigned char DropTypePaste = DROP_TYPE_PASTE_ESCAPE;
@@ -2418,17 +2451,17 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 					} else {
 						DropType = DROP_TYPE_SEND_FILE;
 					}
-					AdapatSameProcess = false;
+					DoSameProcess = false;
 				} else {
 					DropType = DROP_TYPE_SEND_FILE;
-					AdapatSameProcess = DefaultShowDialog ? false : true;
+					DoSameProcess = DefaultShowDialog ? false : true;
 				}
 			} else if (FileCount == 0 && DirectoryCount == 1) {
 				DropType = DROP_TYPE_PASTE_FILENAME;
-				AdapatSameProcess = DefaultShowDialog ? false : true;
+				DoSameProcess = DefaultShowDialog ? false : true;
 			} else if (FileCount > 0 && DirectoryCount > 0) {
 				DropType = DROP_TYPE_PASTE_FILENAME;
-				AdapatSameProcess = false;
+				DoSameProcess = false;
 			} else if (FileCount > 0 && DirectoryCount == 0) {
 				// filename only
 				if (isSSH) {
@@ -2436,11 +2469,11 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 				} else {
 					DropType = DROP_TYPE_SEND_FILE;
 				}
-				AdapatSameProcess = false;
+				DoSameProcess = false;
 			} else {
 				// directory only
 				DropType = DROP_TYPE_PASTE_FILENAME;
-				AdapatSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
+				DoSameProcess = ts.ConfirmFileDragAndDrop ? false : true;
 			}
 		} else {
 			// show dialog
@@ -2453,7 +2486,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 					DropType = DROP_TYPE_SEND_FILE;
 				}
 			}
-			AdapatSameProcess = false;
+			DoSameProcess = false;
 		}
 	} else {
 		if (DirectoryCount > 0 &&
@@ -2463,19 +2496,19 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		{	// デフォルトのままでは処理できない組み合わせ
 			DropType = DROP_TYPE_PASTE_FILENAME;
 			DropTypePaste = DefaultDropTypePaste;
-			AdapatSameProcess = false;
+			DoSameProcess = false;
 		} else {
 			DropType = DefaultDropType;
 			DropTypePaste = DefaultDropTypePaste;
-			AdapatSameProcess = (ShowDialog || DefaultShowDialog) ? false : true;
+			DoSameProcess = (ShowDialog || DefaultShowDialog) ? false : true;
 		}
 	}
 
 	for (int i = 0; i < DropListCount; i++) {
 		const char *FileName = DropLists[i];
 
-		if (!AdapatSameProcess) {
-			bool DoSameProcess;
+		if (!DoSameProcess) {
+			bool DoSameProcessNextDrop;
 			bool DoNotShowDialog = !DefaultShowDialog;
 			DropType =
 				ShowDropDialogBox(hInst, HVTWin,
@@ -2485,13 +2518,13 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 								  DirectoryCount == 0 ? true : false,
 								  ts.ConfirmFileDragAndDrop ? false : true,
 								  &DropTypePaste,
-								  &AdapatSameProcess,
 								  &DoSameProcess,
+								  &DoSameProcessNextDrop,
 								  &DoNotShowDialog);
 			if (DropType == DROP_TYPE_CANCEL) {
 				goto finish;
 			}
-			if (DoSameProcess) {
+			if (DoSameProcessNextDrop) {
 				DefaultDropType = DropType;
 				DefaultDropTypePaste = DropTypePaste;
 			}
@@ -2543,7 +2576,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		{
 			// send by scp
 			char **FileNames = &DropLists[i];
-			int FileCount = AdapatSameProcess ? DropListCount - i : 1;
+			int FileCount = DoSameProcess ? DropListCount - i : 1;
 			if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
 				goto finish;
 			}

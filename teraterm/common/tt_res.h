@@ -214,7 +214,7 @@
 #define IDC_CLIPBOARD_NOTIFY            2566
 #define IDC_LIST_HIDDEN_FONTS           2567
 #define IDC_BINARY_CHECK                2568
-#define IDC_ADAPT_SAME_CHECK            2569
+#define IDC_SAME_PROCESS_CHECK          2569
 #define IDC_FILENAME_EDIT               2570
 #define IDC_SCP_RADIO                   2571
 #define IDC_SENDFILE_RADIO              2572
@@ -225,7 +225,7 @@
 #define IDC_SPACE_RADIO                 2577
 #define IDC_NEWLINE_RADIO               2578
 #define IDC_DAD_NOTE                    2579
-#define IDC_SAME_PROCESS_CHECK          2580
+#define IDC_SAME_PROCESS_NEXTDROP_CHECK 2580
 #define IDC_DONTSHOW_CHECK              2581
 #define ID_ACC_SENDBREAK                50001
 #define ID_ACC_COPY                     50002

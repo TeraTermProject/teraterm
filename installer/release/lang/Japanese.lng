@@ -143,8 +143,6 @@ MSG_CBACCESS_WRITE_REJECT=リモートホストからのクリップボード書き込みを拒否しまし
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=全Tera Termを強制終了しますか？
 MSG_DISCONNECT_CONF=切断しますか？
-MSG_DANDD_CONF=ファイル転送を行いますか？
-MSG_DANDD_CONF_TITLE=Tera Term: ファイル ドラッグ&ドロップ
 MSG_EXEC_TT_ERROR=Tera Term を実行できません (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Cygwin ディレクトリが見つかりません
 MSG_CYGTERM_ENV_ALLOC_ERROR=環境変数用のメモリが確保できません
@@ -167,6 +165,10 @@ FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER=txt(*.txt)\0*.txt\0すべてのファイル(*.*
 MSG_LOGFILE_INVALID_CHAR_ERROR=ログファイル名に無効な文字が含まれています
 MSG_LOGFILE_TOOLONG_ERROR=ログファイル名が長すぎます
 MSG_SAVESETUP_PERMISSION_ERROR=TERATERM.INI に書き込み権限がありません
+
+MSG_DANDD_CONF_TITLE=Tera Term: ファイル ドラッグ&ドロップ
+MSG_DANDD_CONF=ファイル転送を行いますか？
+MSG_DANDD_CONF_CONFLICTS=同じ処理を次の %d 個の競合に適用
 
 DLG_TABSHEET_TITLE=Tera Term: その他の設定
 DLG_TABSHEET_TITLE_GENERAL=全般
