@@ -14,7 +14,7 @@
     <ProjectGuid>{311F2B21-AEC4-4384-8209-BB83B54749B4}</ProjectGuid>
     <RootNamespace>ttpfile</RootNamespace>
     <ProjectName>ttpfile</ProjectName>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

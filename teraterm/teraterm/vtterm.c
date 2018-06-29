@@ -98,7 +98,12 @@ static BOOL FocusReportMode;
 static BOOL AltScr;
 static BOOL LRMarginMode;
 static BOOL RectangleMode;
-BOOL BracketedPaste;
+static BOOL BracketedPaste;
+
+char BracketStart[] = "\033[200~";
+char BracketEnd[] = "\033[201~";
+int BracketStartLen = (sizeof(BracketStart)-1);
+int BracketEndLen = (sizeof(BracketEnd)-1);
 
 static int VTlevel;
 
@@ -6103,4 +6108,34 @@ void ChangeTerminalID() {
 	else {
 		Send8BitMode = ts.Send8BitCtrl;
 	}
+}
+
+void TermPasteString(char *str, int len)
+{
+	TermSendStartBracket();
+	CommTextOut(&cv, str, len);
+	if (ts.LocalEcho) {
+		CommTextEcho(&cv, str, len);
+	}
+	TermSendEndBracket();
+
+	return;
+}
+
+void TermSendStartBracket()
+{
+	if (BracketedPaste) {
+		CommBinaryOut(&cv, BracketStart, BracketStartLen);
+	}
+
+	return;
+}
+
+void TermSendEndBracket()
+{
+	if (BracketedPaste) {
+		CommBinaryOut(&cv, BracketEnd, BracketEndLen);
+	}
+
+	return;
 }

@@ -72,6 +72,8 @@
 
 #define CMP(a,b) memcmp(a, b, SSH_BLOCKSIZE)
 
+static unsigned char *encbuff = NULL;
+static unsigned int encbufflen = 0;
 
 static char *get_cipher_name(int cipher);
 
@@ -200,7 +202,7 @@ BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf, int bytes)
 
 BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes, unsigned int aadlen, unsigned int authlen)
 {
-	unsigned char *newbuf = NULL;
+	unsigned char *newbuff = NULL;
 	unsigned int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
@@ -218,8 +220,12 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return FALSE;
 	}
 
-	if ((newbuf = malloc(bytes)) == NULL)
-		goto err;
+	if (bytes > encbufflen) {
+		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+			goto err;
+		encbuff = newbuff;
+		encbufflen = bytes;
+	}
 
 	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
 		goto err;
@@ -227,10 +233,10 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	if (EVP_Cipher(evp, newbuf, data+aadlen, bytes) < 0)
+	if (EVP_Cipher(evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
-	memcpy(data+aadlen, newbuf, bytes);
+	memcpy(data+aadlen, encbuff, bytes);
 
 	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
 		goto err;
@@ -238,13 +244,9 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_GET_TAG, authlen, data+aadlen+bytes))
 		goto err;
 
-	free(newbuf);
-
 	return TRUE;
 
 err:
-	free(newbuf);
-
 	UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 	            get_cipher_name(pvar->crypt_state.sender_cipher));
@@ -254,7 +256,7 @@ err:
 
 BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes, unsigned int aadlen, unsigned int authlen)
 {
-	unsigned char *newbuf = NULL;
+	unsigned char *newbuff = NULL;
 	unsigned int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	unsigned char lastiv[1];
 	char tmp[80];
@@ -272,8 +274,12 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return FALSE;
 	}
 
-	if ((newbuf = malloc(bytes)) == NULL)
-		goto err;
+	if (bytes > encbufflen) {
+		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+			goto err;
+		encbuff = newbuff;
+		encbufflen = bytes;
+	}
 
 	if (!EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_IV_GEN, 1, lastiv))
 		goto err;
@@ -284,11 +290,10 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	if (aadlen && !EVP_Cipher(evp, NULL, data, aadlen) < 0)
 		goto err;
 
-	if (EVP_Cipher(evp, newbuf, data+aadlen, bytes) < 0)
+	if (EVP_Cipher(evp, encbuff, data+aadlen, bytes) < 0)
 		goto err;
 
-	memcpy(data+aadlen, newbuf, bytes);
-	free(newbuf);
+	memcpy(data+aadlen, encbuff, bytes);
 
 	if (EVP_Cipher(evp, NULL, NULL, 0) < 0)
 		return FALSE;
@@ -296,8 +301,6 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return TRUE;
 
 err:
-	free(newbuf);
-
 	UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 	            get_cipher_name(pvar->crypt_state.receiver_cipher));
@@ -311,7 +314,7 @@ static void no_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 
 static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	unsigned char *newbuf;
+	unsigned char *newbuff;
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	char tmp[80];
 
@@ -328,24 +331,26 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 		return;
 	}
 
-	if ((newbuf = malloc(bytes)) == NULL)
-		return;
+	if (bytes > encbufflen) {
+		if ((newbuff = realloc(encbuff, bytes)) == NULL)
+			return;
+		encbuff = newbuff;
+		encbufflen = bytes;
+	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher));
 		notify_fatal_error(pvar, tmp, TRUE);
 	} else {
-		memcpy(buf, newbuf, bytes);
+		memcpy(buf, encbuff, bytes);
 	}
-
-	free(newbuf);
 }
 
 static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 {
-	unsigned char *newbuf;
+	unsigned char *newbuff;
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	char tmp[80];
 
@@ -362,19 +367,21 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 		return;
 	}
 
-	if ((newbuf = malloc(bytes)) == NULL)
-		return;
+	if (bytes > encbufflen) {
+		if ((newbuff = malloc(bytes)) == NULL)
+			return;
+		encbuff = newbuff;
+		encbufflen = bytes;
+	}
 
-	if (EVP_Cipher(&pvar->evpcip[MODE_IN], newbuf, buf, bytes) == 0) {
+	if (EVP_Cipher(&pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
 		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher));
 		notify_fatal_error(pvar, tmp, TRUE);
 	} else {
-		memcpy(buf, newbuf, bytes);
+		memcpy(buf, encbuff, bytes);
 	}
-
-	free(newbuf);
 }
 
 static void c3DES_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
@@ -1307,6 +1314,10 @@ void CRYPT_free_public_key(CRYPTPublicKey * key)
 
 void CRYPT_end(PTInstVar pvar)
 {
+	free(encbuff);
+	encbuff = NULL;
+	encbufflen = 0;
+
 	destroy_public_key(&pvar->crypt_state.host_key);
 	destroy_public_key(&pvar->crypt_state.server_key);
 

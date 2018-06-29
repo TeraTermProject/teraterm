@@ -43,11 +43,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResouceCompile Include="ttptek-version.rc">
-      <Filter>Resource File</Filter>
-    </ResouceCompile>
-    <ResouceCompile Include="ttptek.rc">
-      <Filter>Resource File</Filter>
-    </ResouceCompile>
+    <ResourceCompile Include="ttptek-version.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="ttptek.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

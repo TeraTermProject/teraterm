@@ -50,10 +50,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpset-version.rc">
-      <Filter>Resource File</Filter>
+      <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="ttpset.rc">
-      <Filter>Resource File</Filter>
+      <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

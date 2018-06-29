@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-05-17)
+; Updated by TeraTerm Project (2018-06-14)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -185,6 +185,13 @@ DLG_TAB_GENERAL_AUTOSCROLL_ONLY_IN_BOTTOM_LINE=&Automatischer Bildlauf nur in un
 DLG_TAB_GENERAL_CLEAR_ON_RESIZE=&Clear display when window resized
 DLG_TAB_GENERAL_CURSOR_CHANGE_IME=Change cursor shape with &IME state
 DLG_TAB_GENERAL_LIST_HIDDEN_FONTS=List &hidden fonts in font dialog
+DLG_TAB_GENERAL_TITLEFMT_GROUP=Title format
+DLG_TAB_GENERAL_TITLEFMT_DISPHOSTNAME=&Display host/port name
+DLG_TAB_GENERAL_TITLEFMT_DISPSESSION=Display session &number
+DLG_TAB_GENERAL_TITLEFMT_DISPVTTEK=Display &VT/TEK
+DLG_TAB_GENERAL_TITLEFMT_SWAPHOSTTITLE=Swap hostname and &title position
+DLG_TAB_GENERAL_TITLEFMT_DISPTCPPORT=Display tcp &port number
+DLG_TAB_GENERAL_TITLEFMT_DISPSERIALSPEED=Display se&rial port speed
 
 DLG_TAB_SEQUENCE_ACCEPT_MOUSE_EVENT_TRACKING=Accept &mouse event tracking request
 DLG_TAB_SEQUENCE_DISABLE_MOUSE_TRACKING_CTRL=&Disable mouse event tracking when Control is pressed

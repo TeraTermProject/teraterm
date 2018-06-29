@@ -40,7 +40,15 @@ VT window
     It is effective when <a href="../menu/setup-additional.html">DisableMouseRButtonPaste</a> is disabled.</dd>
 
 <dt>Double clicking the left button on the title bar</dt>
-<dd>If the window size (real screen size) is not equal to the terminal size (logical size of the terminal), resizes the window to the terminal size. A further double clicking restores the original window size.</dd>
+<dd>
+  <dl>The behaviour is changed according to the <a href="../menu/setup-terminal.html#TermIsWin">"Term size = win size"</a> setting.
+    <dt>On</dt>
+    <dd>Maximize window. If the window is already maximized, restore to the original size.</dd>
+
+    <dt>Off</dt>
+    <dd>If the window size (real screen size) is not equal to the terminal size (logical size of the terminal), resizes the window to the terminal size. A further double clicking restores the original window size.</dd>
+  </dl>
+</dd>
 
 <dt>Clicking the left button while pressing the Ctrl key</dt>
 <dd>If the menu bar is hidden, the pop-up menu appears. To hide the menu bar, check the Hide menu bar option in the [Setup] Window dialog box.</dd>
