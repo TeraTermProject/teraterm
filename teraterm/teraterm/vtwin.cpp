@@ -2565,6 +2565,9 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		case DROP_TYPE_PASTE_FILENAME:
 		{
 			const bool escape = (DropTypePaste & DROP_TYPE_PASTE_ESCAPE) ? true : false;
+			if (!BracketedPasteMode()) {
+				TermSendStartBracket();
+			}
 			PasteString(&cv, FileName, escape);
 			if (DropListCount > 1 && i < DropListCount - 1) {
 				const char *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? "\n" : " ";
@@ -2587,6 +2590,9 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 	}
 
 finish:
+	if (BracketedPasteMode()) {
+		TermSendEndBracket();
+	}
 	DropListFree();
 	return 0;
 }
