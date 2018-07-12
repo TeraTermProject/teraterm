@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2017 TeraTerm Project
+ * Copyright (C) 2009-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,10 @@ int get_svn_revision(char *svnversion, char *path) {
 
 	// _popen はスペースが含まれる場合にダブルクォートで囲んでも
 	// うまく動かないため 8.3 形式に変換
-	GetShortPathName(svnversion, arg1, sizeof(arg1));
+	DWORD r = GetShortPathName(svnversion, arg1, sizeof(arg1));
+	if (r == 0) {
+		return -1;	// svn did not exist
+	}
 	GetShortPathName(path, arg2, sizeof(arg2));
 
 	_snprintf_s(command, sizeof(command), _TRUNCATE, "%s -n %s", arg1, arg2);
