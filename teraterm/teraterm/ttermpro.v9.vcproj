@@ -212,6 +212,10 @@
 				>
 			</File>
 			<File
+				RelativePath="dnddlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\dlglib.c"
 				>
 			</File>
@@ -379,6 +383,10 @@
 			>
 			<File
 				RelativePath="addsetting.h"
+				>
+			</File>
+			<File
+				RelativePath="dnddlg.h"
 				>
 			</File>
 			<File

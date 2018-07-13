@@ -111,6 +111,9 @@
     <ClCompile Include="WSAAsyncGetAddrInfo.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
+    <ClCompile Include="dnddlg.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\cygterm\cygterm.ico">
@@ -152,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="ttfileio.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dnddlg.h">
+      <Filter>dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

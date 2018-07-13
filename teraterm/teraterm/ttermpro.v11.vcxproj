@@ -144,6 +144,7 @@
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="commlib.c" />
+    <ClCompile Include="dnddlg.cpp" />
     <ClCompile Include="keyboard.c" />
     <ClCompile Include="sizetip.c" />
     <ClCompile Include="teklib.c" />
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="addsetting.h" />
+    <ClInclude Include="dnddlg.h" />
     <ClInclude Include="sizetip.h" />
     <ClInclude Include="..\common\tt_res.h" />
     <ClInclude Include="ttfileio.h" />
