@@ -293,11 +293,11 @@ DLG_SETUPDIR_OPENFILE_ERROR=Нельзя открыть файл.(%d)
 
 DLG_DANDD_TITLE=Tera Term: Файл "Drag and Drop"
 DLG_DANDD_TEXT=Вы уверены, что хотите отправить файл?
-DLG_DANDD_DEST_NOTE=
-DLG_DANDD_CONFLICTS=
-DLG_DANDD_SAME_NEEXTDROP=
-DLG_DANDD_DONTSHOW_NEEXTDROP=
-DLG_DANDD_NOTE=
+DLG_DANDD_DEST_NOTE=dest is home directory if empty
+DLG_DANDD_CONFLICTS=&Do this for the next %d conflicts
+DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
+DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
+DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Не удается использовать winsock
