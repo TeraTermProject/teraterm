@@ -144,8 +144,6 @@ MSG_CBACCESS_WRITE_REJECT=Отклонить удаленную запись в буфер
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Остановить все Tera Term(ы)?
 MSG_DISCONNECT_CONF=Разъединить?
-MSG_DANDD_CONF=Вы уверены, что хотите отправить файл?
-MSG_DANDD_CONF_TITLE=Tera Term: Файл "Drag and Drop"
 MSG_EXEC_TT_ERROR=Не удается запустить Tera Term. (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Не найдена папка Cygwin
 MSG_CYGTERM_ENV_ALLOC_ERROR=Не удается выделить память для переменной среды
@@ -292,6 +290,14 @@ DLG_SETUPDIR_CYGTERMFILE=Файл конфигурации CygTerm
 DLG_SETUPDIR_KNOWNHOSTSFILE=Файл известных хостов SSH
 DLG_SETUPDIR_NOFILE_ERROR=Файл не существует.(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=Нельзя открыть файл.(%d)
+
+DLG_DANDD_TITLE=Tera Term: Файл "Drag and Drop"
+DLG_DANDD_TEXT=Вы уверены, что хотите отправить файл?
+DLG_DANDD_DEST_NOTE=
+DLG_DANDD_CONFLICTS=
+DLG_DANDD_SAME_NEEXTDROP=
+DLG_DANDD_DONTSHOW_NEEXTDROP=
+DLG_DANDD_NOTE=
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Не удается использовать winsock
