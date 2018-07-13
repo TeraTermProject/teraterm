@@ -144,7 +144,7 @@
     <ResourceCompile Include="ttpset.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ttpcmn\ttpcmn.v12.vcxproj">
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v14.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

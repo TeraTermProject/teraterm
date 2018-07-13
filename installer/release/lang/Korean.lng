@@ -144,8 +144,6 @@ MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=연결을 끊을까요?
-MSG_DANDD_CONF=파일 내용을 보낼까요?
-MSG_DANDD_CONF_TITLE=Tera Term: 파일 Drag and Drop
 MSG_EXEC_TT_ERROR=Tera Term을 실행할 수 없습니다. (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Cygwin 디렉토리를 찾을 수 없습니다.
 MSG_CYGTERM_ENV_ALLOC_ERROR=환경변소를 위한 메모리를 할당할 수 없습니다.
@@ -292,6 +290,14 @@ DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
 DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
 DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+
+DLG_DANDD_TITLE=Tera Term: 파일 Drag and Drop
+DLG_DANDD_TEXT=파일 내용을 보낼까요?
+DLG_DADDD_DEST_NOTE=
+DLG_DANDD_CONFLICTS=
+DLG_DANDD_SAME_NEEXTDROP=
+DLG_DANDD_DONTSHOW_NEEXTDROP=
+DLG_DANDD_NOTE=
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=윈속을 사용할 수 없습니다

@@ -143,8 +143,6 @@ MSG_CBACCESS_WRITE_REJECT=リモートホストからのクリップボード書き込みを拒否しまし
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=全Tera Termを強制終了しますか？
 MSG_DISCONNECT_CONF=切断しますか？
-MSG_DANDD_CONF=ファイル転送を行いますか？
-MSG_DANDD_CONF_TITLE=Tera Term: ファイル ドラッグ&ドロップ
 MSG_EXEC_TT_ERROR=Tera Term を実行できません (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Cygwin ディレクトリが見つかりません
 MSG_CYGTERM_ENV_ALLOC_ERROR=環境変数用のメモリが確保できません
@@ -291,6 +289,14 @@ DLG_SETUPDIR_CYGTERMFILE=CygTerm設定ファイル
 DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hostsファイル
 DLG_SETUPDIR_NOFILE_ERROR=ファイルが存在しません(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=ファイルが開けません(%d)
+
+DLG_DANDD_TITLE=Tera Term: ファイル ドラッグ&ドロップ
+DLG_DANDD_TEXT=ファイル転送を行いますか？
+DLG_DADDD_DEST_NOTE=空のときホームディレクトリ
+DLG_DANDD_CONFLICTS=同じ処理を次の %d 個の競合に適用
+DLG_DANDD_SAME_NEEXTDROP=次のドロップ時、同じ処理を行う
+DLG_DANDD_DONTSHOW_NEEXTDROP=次のドロップ時、ダイアログを表示しない
+DLG_DANDD_NOTE=CTRLを押しながらドロップすると、ダイアログが表示されます
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Winsock が使えません

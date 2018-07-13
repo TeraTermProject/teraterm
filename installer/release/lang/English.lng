@@ -143,8 +143,6 @@ MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=Terminate ALL Tera Term(s)?
 MSG_DISCONNECT_CONF=Disconnect?
-MSG_DANDD_CONF=Are you sure that you want to send the file content?
-MSG_DANDD_CONF_TITLE=Tera Term: File Drag and Drop
 MSG_EXEC_TT_ERROR=Can't execute Tera Term. (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=Can't find Cygwin directory.
 MSG_CYGTERM_ENV_ALLOC_ERROR=Can't allocate memory for environment variable.
@@ -291,6 +289,14 @@ DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
 DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
 DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+
+DLG_DANDD_TITLE=Tera Term: File Drag and Drop
+DLG_DANDD_TEXT=Are you sure that you want to send the file content?
+DLG_DADDD_DEST_NOTE=
+DLG_DANDD_CONFLICTS=
+DLG_DANDD_SAME_NEEXTDROP=
+DLG_DANDD_DONTSHOW_NEEXTDROP=
+DLG_DANDD_NOTE=
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Cannot use winsock

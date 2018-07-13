@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -173,6 +173,7 @@ typedef TCharAttr *PCharAttr;
 #define WM_USER_GETSERIALNO  WM_USER+13
 #define WM_USER_CHANGETITLE  WM_USER+14
 #define WM_USER_NOTIFYICON   WM_USER+15
+#define WM_USER_DROPNOTIFY   WM_USER+16
 
 #define WM_USER_DDEREADY     WM_USER+21
 #define WM_USER_DDECMNDEND   WM_USER+22
@@ -683,7 +684,6 @@ struct tttset {
 };
 
 typedef struct tttset TTTSet, *PTTSet;
-//typedef TTTSet far *PTTSet;
 
   /* New Line modes */
 #define IdCR   1
@@ -781,11 +781,6 @@ typedef struct tttset TTTSet, *PTTSet;
   /* Baud rate ID */
 #define BaudNone    0
 
-static PCHAR far BaudList[] =
-	{"110","300","600","1200","2400","4800","9600",
-	 "14400","19200","38400","57600","115200",
-	 "230400", "460800", "921600", NULL};
-
   /* Parity ID */
 #define IdParityNone  1
 #define IdParityOdd   2
@@ -816,7 +811,7 @@ typedef struct {
 	WORD ComPort; // serial port #
 	WORD MaxComPort; // max serial port #
 } TGetHNRec;
-typedef TGetHNRec far *PGetHNRec;
+typedef TGetHNRec *PGetHNRec;
 
 /* Tera Term internal key codes */
 #define IdUp               1
@@ -934,7 +929,7 @@ typedef struct {
 	/* user key type */
 	BYTE UserKeyType[NumOfUserKey];
 } TKeyMap;
-typedef TKeyMap far *PKeyMap;
+typedef TKeyMap *PKeyMap;
 
 /* Control Characters */
 
@@ -1092,7 +1087,7 @@ typedef struct {
 
 	DWORD ConnectedTime;
 } TComVar;
-typedef TComVar far *PComVar;
+typedef TComVar *PComVar;
 
 #define ID_FILE          0
 #define ID_EDIT          1
@@ -1137,7 +1132,7 @@ typedef struct {
 	BOOL WinUndoFlag;
 	int WinUndoStyle;
 } TMap;
-typedef TMap far *PMap;
+typedef TMap *PMap;
 
 // TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
 // TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが

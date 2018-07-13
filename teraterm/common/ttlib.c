@@ -970,12 +970,12 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	strncpy_s(buf, buflen, Temp, _TRUNCATE);
 }
 
-void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, PCHAR iniFile)
+void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile)
 {
 	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
 }
 
-int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PCHAR iniFile)
+int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
 {
 	if (GetI18nLogfont("Tera Term", key, logfont,
 	                   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),

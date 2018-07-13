@@ -14,6 +14,7 @@
     <ProjectGuid>{98CA1284-8F6C-4791-BF57-7E5FAD33744E}</ProjectGuid>
     <RootNamespace>putty</RootNamespace>
     <ProjectName>putty</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

@@ -14,7 +14,7 @@
     <ProjectGuid>{47CB840D-85C8-460F-9101-BEB54BEF9D56}</ProjectGuid>
     <RootNamespace>ttpdlg</RootNamespace>
     <ProjectName>ttpdlg</ProjectName>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,6 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -113,6 +114,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -155,13 +157,11 @@
     <None Include="ttpdlg.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\svnrev\svnrev.v12.vcxproj">
+    <ProjectReference Include="..\svnrev\svnrev.v15.vcxproj">
       <Project>{80f1c3f0-a213-4d48-85c8-a265990d19a7}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpcmn\ttpcmn.v12.vcxproj">
+    <ProjectReference Include="..\ttpcmn\ttpcmn.v15.vcxproj">
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

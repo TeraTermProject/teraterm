@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,13 @@ private:
 
   HMENU MainMenu, FileMenu, TransMenu, EditMenu,
     SetupMenu, ControlMenu, WinMenu, HelpMenu;
+
+  // drag and drop handle
+  char **DropLists;
+  int DropListCount;
+  void DropListFree();
+  bool DropWithLeftbutton;
+  bool DropWithRightbutton;
 
 protected:
 
@@ -214,6 +221,7 @@ protected:
 	afx_msg void OnHelpIndex();
 	afx_msg void OnHelpUsing();
 	afx_msg void OnHelpAbout();
+	afx_msg LONG OnDropNotify(UINT ShowMenu, LONG lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP();
 	void Disconnect(BOOL confirm);

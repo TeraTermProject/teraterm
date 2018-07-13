@@ -144,8 +144,6 @@ MSG_CBACCESS_WRITE_REJECT=Reject clipboard write access from remote.
 ; vtwin.cpp
 MSG_ALL_TERMINATE_CONF=關閉全部 Tera Term 連線？
 MSG_DISCONNECT_CONF=中斷連線？
-MSG_DANDD_CONF=確定要傳送文件內容？
-MSG_DANDD_CONF_TITLE=Tera Term：文件拖放
 MSG_EXEC_TT_ERROR=Tera Term 無法繼續運行 (%d)
 MSG_FIND_CYGTERM_DIR_ERROR=未能找到 Cygwin 目錄
 MSG_CYGTERM_ENV_ALLOC_ERROR=無法為環境變量分配記憶體
@@ -292,6 +290,14 @@ DLG_SETUPDIR_CYGTERMFILE=CygTerm Configuration File
 DLG_SETUPDIR_KNOWNHOSTSFILE=SSH known_hosts File
 DLG_SETUPDIR_NOFILE_ERROR=File does not exist.(%d)
 DLG_SETUPDIR_OPENFILE_ERROR=Cannot open file.(%d)
+
+DLG_DANDD_TITLE=Tera Term：文件拖放
+DLG_DANDD_TEXT=確定要傳送文件內容？
+DLG_DADDD_DEST_NOTE=
+DLG_DANDD_CONFLICTS=
+DLG_DANDD_SAME_NEEXTDROP=
+DLG_DANDD_DONTSHOW_NEEXTDROP=
+DLG_DANDD_NOTE=
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=無法使用 Winsock
