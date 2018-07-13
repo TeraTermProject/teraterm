@@ -1,7 +1,7 @@
 ■ 開発環境
 - OS
   Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro / Windows 10 Pro
-- コンパイラ
+- Tera Term Project でリリースに使用しているコンパイラ
 -- Visual Studio 2005 SP1 (Standard Edition 以上)
    Microsoft Visual Studio 2005 Service Pack 1 MFC セキュリティ更新プログラム
    Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
@@ -9,6 +9,7 @@
        SDK でインストールされたディレクトリが最優先になるよう、INCLUDE および LIB 環境変数を設定します。
        例: INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
            LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
+- サポートされているコンパイラ
 -- Visual Studio 2008 SP1 (Standard Edition 以上)
    注: コンパイルされた実行ファイルは Windows NT 4.0, 95, 98, Me で動きません。
 -- Visual Studio 2010 SP1 (Professional Edition 以上)
@@ -26,13 +27,13 @@
 -- Visual Studio Community 2017 
    注: コンパイルされた実行ファイルは Windows Vista, XP, 2000, NT 4.0, 95, 98, Me で動きません。
        Windows Vista, XP をサポートするには v141_xp を指定してください。
--- バッチファイルからビルドするために
-   Visual Studio のコマンドプロンプトからバッチファイルを実行するか、以下のように環境変数を設定してください。
-   使用したいバージョンの Visual Studio の "(x86) Native Tools Command Prompt" を実行し、コンパイラのパスに関係する PATH と VSINSTALLDIR 変数を環境変数に登録してください。
-   例: INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
-       LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
-       PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
-       VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
+- バッチファイルからビルドするために
+  Visual Studio のコマンドプロンプトからバッチファイルを実行するか、以下のように環境変数を設定してください。
+  使用したいバージョンの Visual Studio の "(x86) Native Tools Command Prompt" を実行し、コンパイラのパスに関係する PATH と VSINSTALLDIR 変数を環境変数に登録してください。
+  例: INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
+      LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
+      PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
+      VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
 - インストーラ
   Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor

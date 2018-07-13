@@ -1,7 +1,7 @@
 * Development Environment
 - OS
   Windows XP Professional / Windows 8 Pro / Windows 8.1 Pro / Windows 10 Pro
-- Compiler
+- Compiler used for release in Tera Term Project
 -- Visual Studio 2005 SP1 Standard Edition (or higher edition)
    Microsoft Visual Studio 2005 Service Pack 1 MFC Security Update
    Windows Server 2003 R2 Platform SDK(Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1)
@@ -9,6 +9,7 @@
          Configure the INCLUDE and LIB environment variables to be given priority for the SDK installation directory.
          e.g. INCLUDE "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include"
               LIB     "C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib"
+- Supported Compiler
 -- Visual Studio 2008 SP1 Standard Edition (or higher edition)
    Note: The executable program which was compiled by this version does not work on Windows NT 4.0, 95, 98 and Me.
 -- Visual Studio 2010 SP1 Professional Edition (or higher edition)
@@ -22,22 +23,20 @@
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
 -- Visual Studio Community 2017 
    Note: The executable program which was compiled by this version does not work on Windows Vista, XP, 2000, NT 4.0, 95, 98 and Me.
--- How to build with batch file
-   Please execute the batch file on command prompt of Visual Studio. Otherwise, please configure 
-   below environment variables.
-   Please call "(x86) Native Tools Command Prompt" of your Visual Studio to register new PATH 
-   regarding the compiler path and VSINSTALLDIR variable.
-   Example: INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
-       LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
-       PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
-       VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
+- How to build with batch file
+  Please execute the batch file on command prompt of Visual Studio. Otherwise, please configure below environment variables.
+  Please call "(x86) Native Tools Command Prompt" of your Visual Studio to register new PATH regarding the compiler path and VSINSTALLDIR variable.
+  Example: INCLUDE       C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;
+           LIB           C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\LIB;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\LIB;C:\Program Files (x86)\Windows Kits\8.1\lib\winv6.3\um\x86;
+           PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
+           VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
 - Installer
   Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - others
   Cygwin 1.5.x (1.7.x doesn't support Windows 9x)
-  ActivePerl 5.8 later version
+  ActivePerl 5.8 or later version
     converts character-code and return-code of documents for building OpenSSL.
   Subversion for Windows (http://sourceforge.net/projects/win32svn/)
     Use the compatible version for check-outed svn version.
