@@ -292,7 +292,7 @@ DLG_SETUPDIR_OPENFILE_ERROR=ファイルが開けません(%d)
 
 DLG_DANDD_TITLE=Tera Term: ファイル ドラッグ&ドロップ
 DLG_DANDD_TEXT=ファイル転送を行いますか？
-DLG_DADDD_DEST_NOTE=空のときホームディレクトリ
+DLG_DANDD_DEST_NOTE=空のときホームディレクトリ
 DLG_DANDD_CONFLICTS=同じ処理を次の %d 個の競合に適用
 DLG_DANDD_SAME_NEEXTDROP=次のドロップ時、同じ処理を行う
 DLG_DANDD_DONTSHOW_NEEXTDROP=次のドロップ時、ダイアログを表示しない
