@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-07-14)
+; Updated by TeraTerm Project (2018-07-16)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -293,7 +293,15 @@ DLG_SETUPDIR_OPENFILE_ERROR=Нельзя открыть файл.(%d)
 
 DLG_DANDD_TITLE=Tera Term: Файл "Drag and Drop"
 DLG_DANDD_TEXT=Вы уверены, что хотите отправить файл?
-DLG_DANDD_DEST_NOTE=dest is home directory if empty
+DLG_DANDD_SCP_RADIO=&SCP
+DLG_DANDD_SENDFILE_RADIO=S&end File (Paste content of file)
+DLG_DANDD_PASTE_RADIO=&Paste Filename
+DLG_DANDD_SCP_DEST_LABEL=des&t:
+DLG_DANDD_SCP_DEST_NOTE=dest is home directory if empty
+DLG_DANDD_SEND_BINARY_CHECK=Bina&ry
+DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
+DLG_DANDD_PASTE_SPACE_RADIO=Separat&or is Space
+DLG_DANDD_PASTE_NEWLINE_RADIO=Separator is &NewLine
 DLG_DANDD_CONFLICTS=&Do this for the next %d conflicts
 DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
