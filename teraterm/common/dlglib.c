@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2008-2017 TeraTerm Project
+ * (C) 2008-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -174,7 +174,7 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 	SetDlgItemText(HDlg, id_Item, buff);
 }
 
-void SetDropDownList(HWND HDlg, int Id_Item, PCHAR far *List, int nsel)
+void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR **List, int nsel)
 {
 	int i;
 
@@ -200,4 +200,153 @@ LONG GetCurSel(HWND HDlg, int Id_Item)
 	}
 
 	return n;
+}
+
+typedef struct {
+	WNDPROC OrigProc;	// Original window procedure
+	LONG_PTR OrigUser;	// DWLP_USER
+	BOOL ComboBox;
+} EditSubclassData;
+
+// C-n/C-p のためにサブクラス化 (2007.9.4 maya)
+// C-p/C-n/C-b/C-f/C-a/C-e をサポート (2007.9.5 maya)
+// C-d/C-k をサポート (2007.10.3 yutaka)
+// ドロップダウンの中のエディットコントロールを
+// サブクラス化するためのウインドウプロシージャ
+static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
+                                         WPARAM wParam, LPARAM lParam)
+{
+	EditSubclassData *data = (EditSubclassData *)GetWindowLong(dlg, GWLP_USERDATA);
+	int  max, select, len;
+	char *str, *orgstr;
+
+	switch (msg) {
+		// キーが押されたのを検知する
+		case WM_KEYDOWN:
+			if (GetKeyState(VK_CONTROL) < 0) {
+				switch (wParam) {
+					case 0x50: // Ctrl+p ... up
+						if (data->ComboBox) {
+							HWND parent = GetParent(dlg);
+							select = SendMessage(parent, CB_GETCURSEL, 0, 0);
+							if (select > 0) {
+								PostMessage(parent, CB_SETCURSEL, select - 1, 0);
+							}
+							return 0;
+						}
+						break;
+					case 0x4e: // Ctrl+n ... down
+						if (data->ComboBox) {
+							HWND parent = GetParent(dlg);
+							max = SendMessage(parent, CB_GETCOUNT, 0, 0);
+							select = SendMessage(parent, CB_GETCURSEL, 0, 0);
+							if (select < max - 1) {
+								PostMessage(parent, CB_SETCURSEL, select + 1, 0);
+							}
+							return 0;
+						}
+						break;
+					case 0x42: // Ctrl+b ... left
+						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
+						PostMessage(dlg, EM_SETSEL, select-1, select-1);
+						return 0;
+					case 0x46: // Ctrl+f ... right
+						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
+						max = GetWindowTextLength(dlg) ;
+						PostMessage(dlg, EM_SETSEL, select+1, select+1);
+						return 0;
+					case 0x41: // Ctrl+a ... home
+						PostMessage(dlg, EM_SETSEL, 0, 0);
+						return 0;
+					case 0x45: // Ctrl+e ... end
+						max = GetWindowTextLength(dlg) ;
+						PostMessage(dlg, EM_SETSEL, max, max);
+						return 0;
+
+					case 0x44: // Ctrl+d
+					case 0x4b: // Ctrl+k
+					case 0x55: // Ctrl+u
+						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
+						max = GetWindowTextLength(dlg);
+						max++; // '\0'
+						orgstr = str = malloc(max);
+						if (str != NULL) {
+							len = GetWindowText(dlg, str, max);
+							if (select >= 0 && select < len) {
+								if (wParam == 0x44) { // カーソル配下の文字のみを削除する
+									memmove(&str[select], &str[select + 1], len - select - 1);
+									str[len - 1] = '\0';
+
+								} else if (wParam == 0x4b) { // カーソルから行末まで削除する
+									str[select] = '\0';
+
+								}
+							}
+
+							if (wParam == 0x55) { // カーソルより左側をすべて消す
+								if (select >= len) {
+									str[0] = '\0';
+								} else {
+									str = &str[select];
+								}
+								select = 0;
+							}
+
+							SetWindowText(dlg, str);
+							SendMessage(dlg, EM_SETSEL, select, select);
+							free(orgstr);
+							return 0;
+						}
+						break;
+				}
+			}
+			break;
+
+		// 上のキーを押した結果送られる文字で音が鳴るので捨てる
+		case WM_CHAR:
+			switch (wParam) {
+				case 0x01:
+				case 0x02:
+				case 0x04:
+				case 0x05:
+				case 0x06:
+				case 0x0b:
+				case 0x0e:
+				case 0x10:
+				case 0x15:
+					return 0;
+			}
+			break;
+	}
+
+	SetWindowLong(dlg, GWL_WNDPROC, (LONG_PTR)data->OrigProc);
+	SetWindowLong(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
+	LRESULT Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
+	SetWindowLong(dlg, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLong(dlg, GWLP_USERDATA, (LONG_PTR)data);
+
+	switch (msg) {
+		case WM_DESTROY:
+			SetWindowLong(dlg, GWL_WNDPROC, (LONG_PTR)data->OrigProc);
+			SetWindowLong(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
+			free(data);
+			break;
+	}
+
+	return Result;
+}
+
+// C-n/C-p のためにサブクラス化
+void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
+{
+	HWND hWndEdit = GetDlgItem(hDlg, nID);
+	if (ComboBox) {
+		hWndEdit = GetWindow(hWndEdit, GW_CHILD);
+	}
+	EditSubclassData *data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
+	data->OrigProc = (WNDPROC)GetWindowLong(hWndEdit, GWL_WNDPROC);
+	data->OrigUser = (LONG_PTR)GetWindowLong(hWndEdit, GWLP_USERDATA);
+	data->ComboBox = ComboBox;
+	SetWindowLong(hWndEdit, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLong(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
 }

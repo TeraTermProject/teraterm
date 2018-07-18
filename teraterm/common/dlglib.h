@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,10 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId);
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num);
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *prog);
 void SetDlgTime(HWND HDlg, int id_Item, DWORD elapsed, int bytes);
-void SetDropDownList(HWND HDlg, int Id_Item, PCHAR far *List, int nsel);
+void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR **List, int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
+void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
 
 #ifdef __cplusplus
 }

@@ -163,6 +163,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH_NOTE), FALSE);
 		}
+		SetEditboxSubclass(hDlgWnd, IDC_SCP_PATH, FALSE);
 
 		// Send File
 		if (Param->DropType == DROP_TYPE_SEND_FILE_BINARY) {
