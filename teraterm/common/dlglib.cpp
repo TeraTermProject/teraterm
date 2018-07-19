@@ -28,7 +28,8 @@
  */
 
 /* Routines for dialog boxes */
-#include "teraterm.h"
+#include <windows.h>
+#include "dlglib.h"
 #include <stdio.h>
 #include <commctrl.h>
 
@@ -269,7 +270,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						SendMessage(dlg, EM_GETSEL, 0, (LPARAM)&select);
 						max = GetWindowTextLength(dlg);
 						max++; // '\0'
-						orgstr = str = malloc(max);
+						orgstr = str = (char *)malloc(max);
 						if (str != NULL) {
 							len = GetWindowText(dlg, str, max);
 							if (select >= 0 && select < len) {
@@ -319,16 +320,16 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 			break;
 	}
 
-	SetWindowLong(dlg, GWL_WNDPROC, (LONG_PTR)data->OrigProc);
-	SetWindowLong(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
-	LRESULT Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
-	SetWindowLong(dlg, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
-	SetWindowLong(dlg, GWLP_USERDATA, (LONG_PTR)data);
+	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
+	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
+	const LRESULT Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
+	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data);
 
 	switch (msg) {
 		case WM_DESTROY:
-			SetWindowLong(dlg, GWL_WNDPROC, (LONG_PTR)data->OrigProc);
-			SetWindowLong(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
+			SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
+			SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
 			free(data);
 			break;
 	}
@@ -344,9 +345,9 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 		hWndEdit = GetWindow(hWndEdit, GW_CHILD);
 	}
 	EditSubclassData *data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
-	data->OrigProc = (WNDPROC)GetWindowLong(hWndEdit, GWL_WNDPROC);
+	data->OrigProc = (WNDPROC)GetWindowLong(hWndEdit, GWLP_WNDPROC);
 	data->OrigUser = (LONG_PTR)GetWindowLong(hWndEdit, GWLP_USERDATA);
 	data->ComboBox = ComboBox;
-	SetWindowLong(hWndEdit, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
-	SetWindowLong(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
+	SetWindowLongPtr(hWndEdit, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
 }

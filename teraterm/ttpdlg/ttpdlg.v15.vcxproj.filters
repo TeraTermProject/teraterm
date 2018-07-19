@@ -18,13 +18,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\dlglib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ttdlg.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\common\ttlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

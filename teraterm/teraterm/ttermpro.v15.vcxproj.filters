@@ -96,9 +96,6 @@
     <ClCompile Include="WSAAsyncGetAddrInfo.c">
       <Filter>Source Files %28C%29</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\dlglib.c">
-      <Filter>dialog</Filter>
-    </ClCompile>
     <ClCompile Include="dnddlg.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
@@ -115,6 +112,9 @@
       <Filter>dialog</Filter>
     </ClCompile>
     <ClCompile Include="addsetting.cpp">
+      <Filter>dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.cpp">
       <Filter>dialog</Filter>
     </ClCompile>
   </ItemGroup>

@@ -22,9 +22,6 @@
     <ClCompile Include="bplus.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\dlglib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ftlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,6 +44,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zmodem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\dlglib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
