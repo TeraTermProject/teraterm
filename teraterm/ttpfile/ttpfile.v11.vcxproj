@@ -125,7 +125,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bplus.c" />
-    <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib.cpp" />
     <ClCompile Include="ftlib.c" />
     <ClCompile Include="kermit.c" />
     <ClCompile Include="quickvan.c" />

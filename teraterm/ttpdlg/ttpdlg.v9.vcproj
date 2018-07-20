@@ -206,7 +206,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 			>
 			<File
-				RelativePath="..\common\dlglib.c"
+				RelativePath="..\common\dlglib.cpp"
 				>
 			</File>
 			<File

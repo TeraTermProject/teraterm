@@ -134,7 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="addsetting.cpp" />
-    <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib.cpp" />
     <ClCompile Include="filesys.cpp" />
     <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="prnabort.cpp" />

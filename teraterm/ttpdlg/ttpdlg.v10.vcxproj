@@ -126,7 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib.cpp" />
     <ClCompile Include="ttdlg.c" />
     <ClCompile Include="..\common\ttlib.c" />
   </ItemGroup>
