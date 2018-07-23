@@ -1,0 +1,34 @@
+
+project(ttpcmn)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+
+set(SRC
+  ../common/i18n.c
+  ../common/i18n.h
+  ../common/ttlib.c
+  ../common/servicenames.c
+  ../common/servicenames.h
+  ttpcmn.def
+  cmn_res.h
+  language.c
+  language.h
+  ttcmn.c
+  ttpcmn-version.rc
+  ttpcmn.rc
+  )
+
+
+include_directories(
+  ../common
+  ../ttpfile
+  .
+  )
+add_library(
+  ttpcmn SHARED
+  ${SRC}
+  )
+target_link_libraries(
+  ttpcmn
+  setupapi.lib
+  htmlhelp.lib)
