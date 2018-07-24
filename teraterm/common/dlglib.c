@@ -218,6 +218,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
 {
 	EditSubclassData *data = (EditSubclassData *)GetWindowLong(dlg, GWLP_USERDATA);
+	LRESULT Result;
 	int  max, select, len;
 	char *str, *orgstr;
 
@@ -322,7 +323,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 
 	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
-	const LRESULT Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
+	Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
 	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data);
 
@@ -340,11 +341,12 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 // C-n/C-p のためにサブクラス化
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 {
+	EditSubclassData *data;
 	HWND hWndEdit = GetDlgItem(hDlg, nID);
 	if (ComboBox) {
 		hWndEdit = GetWindow(hWndEdit, GW_CHILD);
 	}
-	EditSubclassData *data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
+	data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
 	data->OrigProc = (WNDPROC)GetWindowLong(hWndEdit, GWLP_WNDPROC);
 	data->OrigUser = (LONG_PTR)GetWindowLong(hWndEdit, GWLP_USERDATA);
 	data->ComboBox = ComboBox;
