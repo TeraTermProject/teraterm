@@ -209,7 +209,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\dlglib.cpp"
+				RelativePath="..\common\dlglib.c"
 				>
 			</File>
 			<File

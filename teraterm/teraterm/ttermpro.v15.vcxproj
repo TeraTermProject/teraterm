@@ -137,7 +137,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\dlglib.cpp" />
+    <ClCompile Include="..\common\dlglib.c" />
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="addsetting.cpp" />
