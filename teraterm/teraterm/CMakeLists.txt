@@ -14,7 +14,7 @@ set(SRC
   #
   ../common/ttlib.c
   ../common/ttlib.h
-  ../common/dlglib.cpp
+  ../common/dlglib.c
   ../common/dlglib.h
   #
   addsetting.cpp

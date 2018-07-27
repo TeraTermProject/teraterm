@@ -4,7 +4,7 @@ project(ttpfile)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(SRC
-  ../common/dlglib.cpp
+  ../common/dlglib.c
   ../common/dlglib.h
   ../common/ttlib.c
   ../common/ttlib.h
