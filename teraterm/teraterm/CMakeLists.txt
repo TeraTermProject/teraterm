@@ -1,5 +1,16 @@
 project(teraterm)
 
+if (MSVC)
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE          ${CMAKE_C_FLAGS_RELEASE})
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_C_FLAGS_RELWITHDEBINFO})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS_MINSIZEREL})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+endif ()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(SRC
@@ -79,36 +90,51 @@ set(SRC
   WSAAsyncGetAddrInfo.h
   )
 
-
 include_directories(
   ../common
   ../ttpfile
   .
   )
+
 link_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
   ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
   )
+
 set(CMAKE_MFC_FLAG 1)
-set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\"nafxcwd.lib,LIBCMTD.lib\")
+
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
+set(CMAKE_EXE_LINKER_FLAGS "/DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+
 add_executable(
   teraterm WIN32
   ${SRC}
   )
+
 target_link_libraries(
   teraterm
-  debug nafxcwd.lib
-  debug LIBCMTD.lib
   ttpcmn
   ttpdlg
   ttpfile
-  ttpmacro
   ttpset
   ttptek
-  onig_s.lib
+  optimized nafxcw.lib
+  debug nafxcwd.lib
+  optimized LIBCMT.lib
+  debug LIBCMTD.lib
+  optimized onig_s.lib
+  debug onig_sd.lib
   ws2_32.lib
   imm32.lib
   imagehlp.lib
   )
 
-
+add_dependencies(
+  teraterm
+  ttpcmn
+  ttpdlg
+  ttpfile
+  ttpset
+  ttptek
+  )

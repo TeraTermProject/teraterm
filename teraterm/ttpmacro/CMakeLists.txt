@@ -1,5 +1,15 @@
-
 project(ttpmacro)
+
+if (MSVC)
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE          ${CMAKE_C_FLAGS_RELEASE})
+    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_C_FLAGS_RELWITHDEBINFO})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS_MINSIZEREL})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
@@ -49,12 +59,12 @@ set(SRC
   ttm-version.rc
   )
 
-
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
   ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   )
+
 link_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
   ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
@@ -62,10 +72,12 @@ link_directories(
 
 set(CMAKE_MFC_FLAG 1)
 
-set(CMAKE_SHARED_LINKER_FLAGS /NODEFAULTLIB:\"LIBCMT.lib,LIBCMTD.lib\")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
+set(CMAKE_EXE_LINKER_FLAGS "/DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll")
 
-add_library(
-  ttpmacro SHARED
+add_executable(
+  ttpmacro WIN32
   ${SRC}
   )
 
@@ -74,9 +86,16 @@ target_link_libraries(
   ttpcmn
   optimized nafxcw.lib
   debug nafxcwd.lib
-  optimized libcmt.lib
-  debug libcmtd.lib
-  onig_s.lib
-  SFMT.lib
+  optimized LIBCMT.lib
+  debug LIBCMTD.lib
+  optimized onig_s.lib
+  debug onig_sd.lib
+  optimized SFMT.lib
+  debug SFMTd.lib
   iphlpapi.lib
+  )
+
+add_dependencies(
+  ttpmacro
+  ttpcmn
   )

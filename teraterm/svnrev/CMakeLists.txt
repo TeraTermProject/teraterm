@@ -7,18 +7,17 @@ set(SRC
   svnrev.h
   )
 
-
 include_directories(
   ../common
   ../ttpfile
   .
   )
+
 add_executable(
   svnrev
   ${SRC}
   )
+
 target_link_libraries(
   svnrev
   )
-
-
