@@ -20,3 +20,6 @@ execute_process(
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DGENERATOR=${GENERATOR} -P openssl.cmake
   )
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -DGENERATOR=${GENERATOR} -P SFMT.cmake
+  )
