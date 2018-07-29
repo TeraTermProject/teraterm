@@ -1,4 +1,5 @@
-﻿
+﻿# cmake -P putty.cmake
+
 set(SRC_DIR_BASE "putty-0.70")
 set(SRC_ARC "putty-0.70.tar.gz")
 set(SRC_URL "https://the.earth.li/~sgtatham/putty/0.70/putty-0.70.tar.gz")

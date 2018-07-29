@@ -1,6 +1,9 @@
-﻿
-set(GENERATOR "Visual Studio 15 2017")
-#set(GENERATOR "Visual Studio 14 2015")
+﻿# cmake -DGENERATOR="Vsual Studio 15 2017" -P buildall.cmake 
+
+if("${GENERATOR}" STREQUAL "")
+  #set(GENERATOR "Visual Studio 15 2017")
+  message(FATAL_ERROR "set GENERATOR!")
+endif()
 
 # utf-8
 execute_process(

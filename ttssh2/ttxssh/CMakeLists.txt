@@ -2,6 +2,9 @@ project(ttxssh)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
+
 set(SRC
   ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
   ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
@@ -72,15 +75,14 @@ set(SRC
 include_directories(
   ../../teraterm/teraterm
   ../../teraterm/common
-  ../../libs/openssl/inc32
-  ../../libs/zlib
   ../matcher
   ../putty
+  ${OPENSSL_INCLUDE_DIRS}
+  ${ZLIB_INCLUDE_DIRS}
   )
 
 link_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/openssl/out32
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/zlib
+  ${ZLIB_LIBRARY_DIRS}
   )
 
 add_library(
@@ -92,8 +94,9 @@ target_link_libraries(
   ttxssh
   libputty
   ttpcmn
-  libeay32.lib
-  zlib.lib
+  debug zlibstaticd.lib
+  optimized zlibstatic.lib
+  ${OPENSSL_LIB}
   ws2_32.lib
   dnsapi.lib
   )

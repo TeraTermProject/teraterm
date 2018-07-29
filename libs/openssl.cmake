@@ -1,5 +1,5 @@
-﻿
-#set(GENERATOR "Visual Studio 15 2017")
+﻿# cmake -DGENERATOR="Visual Studio 15 2017" -P openssl.cmake
+
 string(REPLACE " " "_" GENERATOR_ ${GENERATOR})
 
 set(SRC_DIR_BASE "openssl-1.0.2o")

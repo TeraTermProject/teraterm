@@ -1,5 +1,8 @@
 project(teraterm)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
+
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
@@ -93,12 +96,13 @@ set(SRC
 include_directories(
   ../common
   ../ttpfile
+  ${SFMT_INCLUDE_DIRS}
   .
   )
 
 link_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
+  ${ONIGURUMA_LIBRARY_DIRS}
+  ${SFMT_LIBRARY_DIRS}
   )
 
 set(CMAKE_MFC_FLAG 1)
@@ -123,8 +127,8 @@ target_link_libraries(
   debug nafxcwd.lib
   optimized LIBCMT.lib
   debug LIBCMTD.lib
-  optimized onig_s.lib
-  debug onig_sd.lib
+  optimized onig.lib
+  debug onigd.lib
   ws2_32.lib
   imm32.lib
   imagehlp.lib

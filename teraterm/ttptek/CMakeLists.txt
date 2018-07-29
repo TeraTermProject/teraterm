@@ -1,5 +1,8 @@
 project(ttptek)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
+
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
@@ -29,14 +32,13 @@ set(SRC
   )
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
+  ${ONIGURUMA_INCLUDE}
+  ${SFMT_INCLUDE_DIR}
   )
 
 link_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
+  ${SFMT_LIBRARY_DIRS}
   )
 
 add_library(
@@ -47,10 +49,10 @@ add_library(
 target_link_libraries(
   ttptek
   ttpcmn
-  optimized onig_s.lib
-  debug onig_sd.lib
-  optimized SFMT.lib
-  debug SFMTd.lib
+#  optimized onig.lib
+#  debug onigd.lib
+  debug sfmtd.lib
+  optimized sfmt.lib
   iphlpapi.lib
   )
 

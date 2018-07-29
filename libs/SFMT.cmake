@@ -1,5 +1,5 @@
-﻿
-#set(GENERATOR "Visual Studio 15 2017")
+﻿# cmake -DGENERATOR="Visual Studio 15 2017" -P SFMT.cmake
+
 string(REPLACE " " "_" GENERATOR_ ${GENERATOR})
 
 set(SRC_DIR_BASE "SFMT-src-1.5.1")
@@ -37,6 +37,10 @@ file(WRITE "${SRC_DIR}/CMakeLists.txt"
   "cmake_minimum_required(VERSION 2.4.4)\n"
   "project(SFMT C)\n"
   "\n"
+  "if(MSVC)\n"
+  "  set(CMAKE_DEBUG_POSTFIX \"d\")\n"
+  "endif()\n"
+  "\n"
   "add_library(\n"
   "  sfmt STATIC\n"
   "  SFMT.c\n"
@@ -47,7 +51,7 @@ file(WRITE "${SRC_DIR}/CMakeLists.txt"
   "  ARCHIVE DESTINATION \${CMAKE_INSTALL_PREFIX}/lib\n"
   "  )\n"
   "install(\n"
-  "  FILES SFMT.h SFMT-params.h\n"
+  "  FILES SFMT.h SFMT-params.h SFMT-params19937.h\n"
   "  DESTINATION \${CMAKE_INSTALL_PREFIX}/include\n"
   "  )\n"
   )
@@ -66,6 +70,8 @@ execute_process(
 if(NOT rv STREQUAL "0")
   message(FATAL_ERROR "cmake generate fail ${rv}")
 endif()
+
+########################################
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build . --config release
@@ -86,22 +92,6 @@ if(NOT rv STREQUAL "0")
 endif()
 
 ########################################
-
-set(BUILD_DIR "${BUILD_DIR}_debug")
-set(INSTALL_DIR "${INSTALL_DIR}_debug")
-
-file(MAKE_DIRECTORY "${BUILD_DIR}")
-
-execute_process(
-  COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${GENERATOR}
-  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-  WORKING_DIRECTORY ${BUILD_DIR}
-  RESULT_VARIABLE rv
-  )
-if(NOT rv STREQUAL "0")
-  message(FATAL_ERROR "cmake generate fail ${rv}")
-endif()
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build . --config debug

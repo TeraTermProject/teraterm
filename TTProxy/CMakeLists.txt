@@ -2,6 +2,8 @@ project(ttproxy)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
+
 set(SRC
   ../teraterm/common/ttlib.c
   ../teraterm/common/ttlib.h
@@ -26,7 +28,7 @@ include_directories(
   ../teraterm/teraterm
   ../teraterm/common
   YCL/include
-  ../libs/openssl/inc32
+  ${OPENSSL_INCLUDE_DIRS}
   .
   )
 

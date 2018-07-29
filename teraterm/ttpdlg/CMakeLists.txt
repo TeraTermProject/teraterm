@@ -1,5 +1,7 @@
 project(ttpdlg)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
+
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
@@ -31,13 +33,13 @@ set(SRC
   )
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${ONIGURUMA_INCLUDE_DIRS}
   )
 
 link_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
+  ${ONIGURUMA_LIBRARY_DIRS}
   )
 
 add_library(
@@ -48,8 +50,8 @@ add_library(
 target_link_libraries(
   ttpdlg
   ttpcmn
-  optimized onig_s.lib
-  debug onig_sd.lib
+  optimized onig.lib
+  debug onigd.lib
   )
 
 add_dependencies(
@@ -58,8 +60,9 @@ add_dependencies(
   )
 
 ## svnversion.h
-INCLUDE(FindSubversion)
-
+if(EXISTS ${CMAKE_SOURCE_DIR}/.svn)
+  INCLUDE(FindSubversion)
+endif()
 if(Subversion_FOUND)
   Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TT)
   FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "#define SVNVERSION ${TT_WC_REVISION}\n")

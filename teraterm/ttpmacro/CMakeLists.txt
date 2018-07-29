@@ -1,5 +1,8 @@
 project(ttpmacro)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
+
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
@@ -60,14 +63,14 @@ set(SRC
   )
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
+  ${ONIGURUMA_INCLUDE_DIRS}
+  ${SFMT_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   )
 
 link_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/oniguruma/src
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/SFMT
+  ${ONIGURUMA_LIBRARY_DIRS}
+  ${SFMT_LIBRARY_DIRS}
   )
 
 set(CMAKE_MFC_FLAG 1)
@@ -88,10 +91,10 @@ target_link_libraries(
   debug nafxcwd.lib
   optimized LIBCMT.lib
   debug LIBCMTD.lib
-  optimized onig_s.lib
-  debug onig_sd.lib
-  optimized SFMT.lib
-  debug SFMTd.lib
+  optimized onig.lib
+  debug onigd.lib
+  optimized sfmt.lib
+  debug sfmtd.lib
   iphlpapi.lib
   )
 

@@ -1,5 +1,5 @@
-﻿
-#set(GENERATOR "Visual Studio 15 2017")
+﻿# cmake -DGENERATOR="Visual Studio 15 2017" -P oniguruma.cmake
+
 string(REPLACE " " "_" GENERATOR_ ${GENERATOR})
 
 set(SRC_DIR_BASE "onig-6.8.2")
@@ -40,6 +40,7 @@ execute_process(
   COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${GENERATOR}
   -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
   -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+  -DCMAKE_DEBUG_POSTFIX=d
   -DBUILD_SHARED_LIBS=OFF
   WORKING_DIRECTORY ${BUILD_DIR}
   RESULT_VARIABLE rv
@@ -47,6 +48,8 @@ execute_process(
 if(NOT rv STREQUAL "0")
   message(FATAL_ERROR "cmake generate fail ${rv}")
 endif()
+
+########################################
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build . --config release
@@ -68,23 +71,9 @@ endif()
 
 ########################################
 
-file(MAKE_DIRECTORY "${BUILD_DIR}_debug")
-
-execute_process(
-  COMMAND ${CMAKE_COMMAND} ${SRC_DIR} -G ${GENERATOR}
-  -DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/VSToolchain.cmake
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}_debug
-  -DBUILD_SHARED_LIBS=OFF
-  WORKING_DIRECTORY ${BUILD_DIR}_debug
-  RESULT_VARIABLE rv
-  )
-if(NOT rv STREQUAL "0")
-  message(FATAL_ERROR "cmake generate fail ${rv}")
-endif()
-
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build . --config debug
-  WORKING_DIRECTORY ${BUILD_DIR}_debug
+  WORKING_DIRECTORY ${BUILD_DIR}
   RESULT_VARIABLE rv
   )
 if(NOT rv STREQUAL "0")
@@ -93,7 +82,7 @@ endif()
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} --build . --config debug --target install
-  WORKING_DIRECTORY ${BUILD_DIR}_debug
+  WORKING_DIRECTORY ${BUILD_DIR}
   RESULT_VARIABLE rv
   )
 if(NOT rv STREQUAL "0")
