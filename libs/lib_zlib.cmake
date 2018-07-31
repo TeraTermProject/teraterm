@@ -1,11 +1,5 @@
 ﻿
-string(REPLACE " " "_" GENERATOR_ ${CMAKE_GENERATOR})
+include(${CMAKE_CURRENT_LIST_DIR}/script_support.cmake)
 
-list(
-  APPEND
-  CMAKE_PREFIX_PATH
-  "${CMAKE_CURRENT_LIST_DIR}/zlib_${GENERATOR_}"
-  )
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(ZLIB REQUIRED zlib)
-
+set(ZLIB_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/zlib_${TOOLSET}/include)
+set(ZLIB_LIBRARY_DIRS ${CMAKE_CURRENT_LIST_DIR}/zlib_${TOOLSET}/lib)

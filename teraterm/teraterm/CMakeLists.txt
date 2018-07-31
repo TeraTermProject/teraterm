@@ -107,9 +107,9 @@ link_directories(
 
 set(CMAKE_MFC_FLAG 1)
 
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
-set(CMAKE_EXE_LINKER_FLAGS "/DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
 
 add_executable(
   teraterm WIN32
@@ -132,6 +132,7 @@ target_link_libraries(
   ws2_32.lib
   imm32.lib
   imagehlp.lib
+  delayimp.lib
   )
 
 add_dependencies(

@@ -1,11 +1,5 @@
 ﻿
-string(REPLACE " " "_" GENERATOR_ ${CMAKE_GENERATOR})
+include(${CMAKE_CURRENT_LIST_DIR}/script_support.cmake)
 
-list(
-  APPEND
-  CMAKE_PREFIX_PATH
-  "${CMAKE_CURRENT_LIST_DIR}/oniguruma_${GENERATOR_}/"
-  )
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(ONIGURUMA REQUIRED oniguruma)
-
+set(ONIGURUMA_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/oniguruma_${TOOLSET}/include)
+set(ONIGURUMA_LIBRARY_DIRS ${CMAKE_CURRENT_LIST_DIR}/oniguruma_${TOOLSET}/lib)
