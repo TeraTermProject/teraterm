@@ -56,25 +56,9 @@ struct DrapDropDlgParam {
 };
 
 struct DrapDropDlgData {
-	HFONT hPrevFont;
+	HFONT hNewFont;
 	DrapDropDlgParam *Param;
 };
-
-static HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount, const char *UILanguageFile, PCHAR key)
-{
-	if (key == NULL) key = "DLG_TAHOMA_FONT";
-	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
-	LOGFONT logfont;
-	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
-	HFONT hNewFont;
-	if (get_lang_font("DLG_TAHOMA_FONT", hDlg, &logfont, &hNewFont, UILanguageFile)) {
-		for (int i = 0 ; i < nIDDlgItemCount ; i++) {
-			const int nIDDlgItem = nIDDlgItems[i];
-			SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE,0));
-		}
-	}
-	return hNewFont;
-}
 
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -117,7 +101,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)DlgData);
 		DrapDropDlgParam *Param = (DrapDropDlgParam *)lp;
 		DlgData->Param = Param;
-		DlgData->hPrevFont = SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs), Param->UILanguageFile, NULL);
+		DlgData->hNewFont = SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs), Param->UILanguageFile, NULL);
 		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
 
 		// target file
@@ -258,15 +242,18 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			DlgData->Param->DropType = DROP_TYPE_CANCEL;
 		}
 		if (wID == IDOK || wID == IDCANCEL) {
-			if (DlgData->hPrevFont != NULL) {
-				DeleteObject(DlgData->hPrevFont);
-			}
 			EndDialog(hDlgWnd, wID);
-			free(DlgData);
 			break;
 		}
 		return FALSE;
 	}
+	case WM_NCDESTROY:
+		if (DlgData->hNewFont != NULL) {
+			DeleteObject(DlgData->hNewFont);
+			DlgData->hNewFont = NULL;
+		}
+		free(DlgData);
+		break;
 
 	default:
 		return FALSE;

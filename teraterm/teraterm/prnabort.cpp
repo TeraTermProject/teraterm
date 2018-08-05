@@ -1,6 +1,6 @@
-/*
+﻿/*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,82 +28,102 @@
  */
 
 /* TERATERM.EXE, print-abort dialog box */
-#include "stdafx.h"
+#include <windows.h>
+#include <windowsx.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
+#include "dlglib.h"
 #include "tt_res.h"
 #include "prnabort.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-// CPrnAbortDlg dialog
-BEGIN_MESSAGE_MAP(CPrnAbortDlg, CDialog)
-	//{{AFX_MSG_MAP(CPrnAbortDlg)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-// CPrnAbortDlg message handler
-BOOL CPrnAbortDlg::Create(CWnd* p_Parent, PBOOL AbortFlag, PTTSet pts)
+LRESULT CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	BOOL Ok;
-	HWND HParent;
-	LOGFONT logfont;
-	HFONT font;
+	static const DlgTextInfo TextInfos[] = {
+		{ IDC_PRNABORT_PRINTING, "DLG_PRNABORT_PRINTING" }, 
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	static const int FontIDs[] = {
+		IDC_PRNABORT_PRINTING, IDCANCEL
+	};
 
-	m_pParent = p_Parent;
-	if (p_Parent!=NULL) {
-		HParent = p_Parent->GetSafeHwnd();
-	}
-	else {
-		HParent = NULL;
-	}
-	Abort = AbortFlag;
-	Ok = (CDialog::Create(CPrnAbortDlg::IDD, m_pParent));
-	if (Ok) {
-		::EnableWindow(HParent,FALSE);
-		::EnableWindow(GetSafeHwnd(),TRUE);
-	}
+	CPrnAbortDlg *self = (CPrnAbortDlg *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", GetSafeHwnd(), &logfont, &DlgFont, pts->UILanguageFile)) {
-		SendDlgItemMessage(IDC_PRNABORT_PRINTING, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDCANCEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
+	switch (msg) {
+	case WM_INITDIALOG:
+	{
+		CPrnAbortDlg *self = (CPrnAbortDlg *)lp;
+		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)self);
+		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), self->m_ts->UILanguageFile);
+		self->m_hNewFont =
+			SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs),
+						self->m_ts->UILanguageFile, "DLG_SYSTEM_FONT");
+		return TRUE;
 	}
 
-	return Ok;
+	case WM_COMMAND:
+	{
+		WORD wID = GET_WM_COMMAND_ID(wp, lp);
+		const WORD wCMD = GET_WM_COMMAND_CMD(wp, lp);
+		if (wID == IDOK) {
+			self->DestroyWindow();
+		}
+		if (wID == IDCANCEL) {
+			self->OnCancel();
+		}
+		return FALSE;
+	}
+	case WM_NCDESTROY:
+		self->PostNcDestroy();
+		return TRUE;
+
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts)
+{
+	m_pAbort = AbortFlag;
+	m_hParentWnd = hParent;
+	m_ts = pts;
+
+	HRSRC hResource = ::FindResource(hInstance, MAKEINTRESOURCE(IDD_PRNABORTDLG), RT_DIALOG);
+	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);
+	DLGTEMPLATE *lpTemplate = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
+	HWND hWnd = ::CreateDialogIndirectParam(	
+		hInstance, lpTemplate, hParent,
+		(DLGPROC)OnDlgProc, (LPARAM)this);
+	if (hWnd == NULL)
+	{
+		return FALSE;
+	}
+
+	m_hWnd = hWnd;
+	::EnableWindow(hParent,FALSE);
+	::ShowWindow(hWnd, SW_SHOW);
+	::EnableWindow(m_hWnd,TRUE);
+	return TRUE;
 }
 
 void CPrnAbortDlg::OnCancel()
 {
-	*Abort = TRUE;
+	*m_pAbort = TRUE;
 	DestroyWindow();
-}
-
-BOOL CPrnAbortDlg::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	*Abort = TRUE;
-	DestroyWindow();
-
-	return CDialog::OnCommand(wParam, lParam);
 }
 
 void CPrnAbortDlg::PostNcDestroy()
 {
+	::DeleteObject(m_hNewFont);
 	delete this;
 }
 
 BOOL CPrnAbortDlg::DestroyWindow()
 {
-	HWND HParent;
-
-	HParent = m_pParent->GetSafeHwnd();
-	::EnableWindow(HParent,TRUE);
-	::SetFocus(HParent);
-	return CDialog::DestroyWindow();
+	::EnableWindow(m_hParentWnd,TRUE);
+	::SetFocus(m_hParentWnd);
+	::DestroyWindow(m_hWnd);
+	return TRUE;
 }
+

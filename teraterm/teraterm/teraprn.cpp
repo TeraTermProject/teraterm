@@ -129,7 +129,6 @@ BOOL PrnStart(LPSTR DocumentName)
 	DOCINFO Doc;
 	char DocName[50];
 	CWnd* pParent;
-	char uimsg[MAX_UIMSG];
 
 	Printing = FALSE;
 	PrintAbortFlag = FALSE;
@@ -144,15 +143,8 @@ BOOL PrnStart(LPSTR DocumentName)
 	else {
 		pParent = (CWnd*)pTEKWin;
 	}
-	PrnAbortDlg->Create(pParent,&PrintAbortFlag,&ts);
+	PrnAbortDlg->Create(hInst, pParent->GetSafeHwnd(),&PrintAbortFlag,&ts);
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
-
-	GetDlgItemText(HPrnAbortDlg, IDC_PRNABORT_PRINTING, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PRNABORT_PRINTING", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HPrnAbortDlg, IDC_PRNABORT_PRINTING, ts.UIMsg);
-	GetDlgItemText(HPrnAbortDlg, IDCANCEL, uimsg, sizeof(uimsg));
-	get_lang_msg("BTN_CANCEL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HPrnAbortDlg, IDCANCEL, ts.UIMsg);
 
 	SetAbortProc(PrintDC,PrnAbortProc);
 
@@ -595,7 +587,7 @@ void PrintFileDirect()
 	else {
 		pParent = (CWnd*)pTEKWin;
 	}
-	PrnAbortDlg->Create(pParent,&PrintAbortFlag,&ts);
+	PrnAbortDlg->Create(hInst, pParent->GetSafeHwnd(),&PrintAbortFlag,&ts);
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
 	HPrnFile = _lopen(PrnFName,OF_READ);
