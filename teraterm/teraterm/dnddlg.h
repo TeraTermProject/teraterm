@@ -27,6 +27,7 @@
  */
 
 #include <windows.h>
+#include "tttypes.h"	// for TTTSet
 
 enum drop_type {
 	DROP_TYPE_CANCEL,
@@ -46,7 +47,7 @@ enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
-	bool EnableDoNotShowDialog,
+	TTTSet *pts,
 	unsigned char *DropTypePaste,
 	bool *DoSameProcess,
 	bool *DoSameProcessNextDrop,

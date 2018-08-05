@@ -30,6 +30,7 @@
 /* Routines for dialog boxes */
 #include <windows.h>
 #include "dlglib.h"
+#include "i18n.h"		// for MAX_UIMSG
 #include <stdio.h>
 #include <commctrl.h>
 
@@ -324,11 +325,13 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
 	Result = CallWindowProc(data->OrigProc, dlg, msg, wParam, lParam);
+	data->OrigProc = (WNDPROC)GetWindowLongPtr(dlg, GWLP_WNDPROC);
+	data->OrigUser = GetWindowLongPtr(dlg, GWLP_USERDATA);
 	SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data);
 
 	switch (msg) {
-		case WM_DESTROY:
+		case WM_NCDESTROY:
 			SetWindowLongPtr(dlg, GWLP_WNDPROC, (LONG_PTR)data->OrigProc);
 			SetWindowLongPtr(dlg, GWLP_USERDATA, (LONG_PTR)data->OrigUser);
 			free(data);
@@ -352,4 +355,21 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 	data->ComboBox = ComboBox;
 	SetWindowLongPtr(hWndEdit, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
+}
+
+void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+{
+	for (int i = 0 ; i < infoCount; i++) {
+		char *key = infos[i].key;
+		char uimsg[MAX_UIMSG];
+		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
+		if (uimsg[0] != '\0') {
+			const int nIDDlgItem = infos[i].nIDDlgItem;
+			if (nIDDlgItem == 0) {
+				SetWindowText(hDlgWnd, uimsg);
+			} else {
+				SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+			}
+		}
+	}
 }

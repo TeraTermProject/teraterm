@@ -28,6 +28,7 @@
  */
 
 /* Constants, types for file transfer */
+#pragma once
 
 /* GetSetupFname function id */
 #define GSF_SAVE	0 // Save setup
