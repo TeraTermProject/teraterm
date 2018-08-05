@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,40 +28,25 @@
  */
 
 /* TERATERM.EXE, print-abort dialog box */
+#pragma once
+
+#include "tttypes.h"	// for TTSet
 
 // CPrnAbortDlg dialog
-class CPrnAbortDlg : public CDialog
+class CPrnAbortDlg
 {
-#ifndef NO_I18N
-private:
-	HFONT DlgFont;
-#endif
-
 public:
-#ifndef NO_I18N
-	BOOL Create(CWnd* p_Parent, PBOOL AbortFlag, PTTSet pts);
-#else
-	BOOL Create(CWnd* p_Parent, PBOOL AbortFlag);
-#endif
+	HWND m_hWnd;
+	HWND GetSafeHwnd() const {return m_hWnd;}
+	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
+	BOOL DestroyWindow();
+	HFONT m_hNewFont;
 
-	//{{AFX_DATA(CPrnAbortDlg)
-	enum { IDD = IDD_PRNABORTDLG };
-	//}}AFX_DATA
-
-	//{{AFX_VIRTUAL(CPrnAbortDlg)
-	public:
-	virtual BOOL DestroyWindow();
-	protected:
-	virtual void OnCancel( );
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	virtual void PostNcDestroy();
-	//}}AFX_VIRTUAL
-
-	protected:
-	CWnd* m_pParent;
-	BOOL *Abort;
-
-	//{{AFX_MSG(CPrnAbortDlg)
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+private:
+	void OnCancel();
+	void PostNcDestroy();
+	HWND m_hParentWnd;
+	BOOL *m_pAbort;
+	TTTSet *m_ts;
+	static LRESULT CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 };

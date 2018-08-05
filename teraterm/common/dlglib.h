@@ -49,6 +49,8 @@ typedef struct {
 	char *key;
 } DlgTextInfo;
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
+				  const char *UILanguageFile, PCHAR key);
 
 #ifdef __cplusplus
 }
