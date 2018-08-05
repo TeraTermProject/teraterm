@@ -28,6 +28,8 @@
  */
 
 /* Constants and types for Tera Term */
+#pragma once
+
 #include <locale.h>
 #include "teraterm.h"
 #include "tt-version.h"

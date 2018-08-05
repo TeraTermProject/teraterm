@@ -2222,7 +2222,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 								  DropListCount - i,
 								  (DirectoryCount == 0 && isSSH) ? true : false,
 								  DirectoryCount == 0 ? true : false,
-								  ts.ConfirmFileDragAndDrop ? false : true,
+								  &ts,
 								  &DropTypePaste,
 								  &DoSameProcess,
 								  &DoSameProcessNextDrop,

@@ -37,13 +37,6 @@
 #include "i18n.h"
 #include "ttlib.h"
 #include "dlglib.h"
-#include "tttypes.h"	// for ttwinman.h
-#include "ttwinman.h"	// for ts
-
-struct DlgTextInfo {
-	int nIDDlgItem;
-	char *key;
-};
 
 struct DrapDropDlgParam {
 	const char *TargetFilename;
@@ -83,23 +76,6 @@ static HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount
 	return hNewFont;
 }
 
-static void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
-{
-	for (int i = 0 ; i < infoCount; i++) {
-		char *key = infos[i].key;
-		char uimsg[MAX_UIMSG];
-		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
-		if (uimsg[0] != '\0') {
-			const int nIDDlgItem = infos[i].nIDDlgItem;
-			if (nIDDlgItem == 0) {
-				SetWindowText(hDlgWnd, uimsg);
-			} else {
-				SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
-			}
-		}
-	}
-}
-
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	static const int FontIDs[] = {
@@ -132,13 +108,13 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	DrapDropDlgData *DlgData = (DrapDropDlgData *)GetWindowLongPtr(hDlgWnd, GWLP_USERDATA);
+	DrapDropDlgData *DlgData = (DrapDropDlgData *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 
 	switch (msg) {
 	case WM_INITDIALOG:
 	{
 		DlgData = (DrapDropDlgData *)malloc(sizeof(DrapDropDlgData));
-		SetWindowLongPtr(hDlgWnd, GWLP_USERDATA, (LONG_PTR)DlgData);
+		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)DlgData);
 		DrapDropDlgParam *Param = (DrapDropDlgParam *)lp;
 		DlgData->Param = Param;
 		DlgData->hPrevFont = SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs), Param->UILanguageFile, NULL);
@@ -305,7 +281,7 @@ enum drop_type ShowDropDialogBox(
 	int RemaingFileCount,
 	bool EnableSCP,
 	bool EnableSendFile,
-	bool EnableDoNotShowDialog,
+	TTTSet *pts,
 	unsigned char *DropTypePaste,
 	bool *DoSameProcess,
 	bool *DoSameProcessNextDrop,
@@ -316,14 +292,15 @@ enum drop_type ShowDropDialogBox(
 	Param.DropType = DefaultDropType;
 	Param.DropTypePaste = *DropTypePaste;
 	Param.ScpEnable = EnableSCP;
-	Param.ScpSendDirPtr = ts.ScpSendDir;
-	Param.ScpSendDirSize = sizeof(ts.ScpSendDir);
 	Param.SendfileEnable = EnableSendFile;
 	Param.PasteNewlineEnable = true;
 	Param.RemaingFileCount = RemaingFileCount;
 	Param.DoNotShowDialog = *DoNotShowDialog;
-	Param.DoNotShowDialogEnable = EnableDoNotShowDialog;
-	Param.UILanguageFile = ts.UILanguageFile;
+	Param.DoNotShowDialogEnable = pts->ConfirmFileDragAndDrop ? false : true,
+	Param.ScpSendDirPtr = pts->ScpSendDir;
+	Param.ScpSendDirSize = _countof(pts->ScpSendDir);
+	Param.UILanguageFile = pts->UILanguageFile;
+
 	int ret = DialogBoxParam(
 		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
 		hWndParent, (DLGPROC)OnDragDropDlgProc,
