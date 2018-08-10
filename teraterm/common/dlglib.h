@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
@@ -27,7 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Routines for dialog boxes */
+#pragma once
+
+#include <windows.h>
+
+ /* Routines for dialog boxes */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,6 +55,25 @@ typedef struct {
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
 				  const char *UILanguageFile, PCHAR key);
+
+////////////////////////////////////////
+DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCSTR lpTemplateName);
+DLGTEMPLATE *TTGetNewDlgTemplate(
+	HINSTANCE hInst, const DLGTEMPLATE *src,
+	size_t *PrevTemplSize, size_t *NewTemplSize);
+BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult);
+HWND TTCreateDialogIndirectParam(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc,
+	LPARAM lParamInit);
+int TTDialogBoxParam(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc,
+	LPARAM lParamInit);
 
 #ifdef __cplusplus
 }

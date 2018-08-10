@@ -31,22 +31,21 @@
 #pragma once
 
 #include "tttypes.h"	// for TTSet
+#include "tmfc.h"
 
 // CPrnAbortDlg dialog
-class CPrnAbortDlg
+class CPrnAbortDlg : public TTCDialog
 {
 public:
-	HWND m_hWnd;
-	HWND GetSafeHwnd() const {return m_hWnd;}
+	CPrnAbortDlg();
+	~CPrnAbortDlg();
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
-	BOOL DestroyWindow();
-	HFONT m_hNewFont;
+	void OnCancel();
+	void OnInitDialog();
+	void PostNcDestroy();
 
 private:
-	void OnCancel();
-	void PostNcDestroy();
-	HWND m_hParentWnd;
 	BOOL *m_pAbort;
 	TTTSet *m_ts;
-	static LRESULT CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+	HFONT m_hNewFont;
 };

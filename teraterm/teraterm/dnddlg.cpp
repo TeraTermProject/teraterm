@@ -56,12 +56,15 @@ struct DrapDropDlgParam {
 };
 
 struct DrapDropDlgData {
+#if 0
 	HFONT hNewFont;
+#endif
 	DrapDropDlgParam *Param;
 };
 
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+#if 0
 	static const int FontIDs[] = {
 		IDC_FILENAME_EDIT,
 		IDC_DAD_STATIC,
@@ -73,6 +76,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		IDC_DAD_NOTE,
 		IDOK, IDCANCEL,
 	};
+#endif
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_DANDD_TITLE" },
 		{ IDC_DAD_STATIC, "DLG_DANDD_TEXT" },
@@ -101,7 +105,9 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)DlgData);
 		DrapDropDlgParam *Param = (DrapDropDlgParam *)lp;
 		DlgData->Param = Param;
+#if 0
 		DlgData->hNewFont = SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs), Param->UILanguageFile, NULL);
+#endif
 		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
 
 		// target file
@@ -242,16 +248,22 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			DlgData->Param->DropType = DROP_TYPE_CANCEL;
 		}
 		if (wID == IDOK || wID == IDCANCEL) {
+#if 0
 			EndDialog(hDlgWnd, wID);
+#else
+			TTEndDialog(hDlgWnd, wID);
+#endif
 			break;
 		}
 		return FALSE;
 	}
 	case WM_NCDESTROY:
+#if 0
 		if (DlgData->hNewFont != NULL) {
 			DeleteObject(DlgData->hNewFont);
 			DlgData->hNewFont = NULL;
 		}
+#endif
 		free(DlgData);
 		break;
 
@@ -288,10 +300,17 @@ enum drop_type ShowDropDialogBox(
 	Param.ScpSendDirSize = _countof(pts->ScpSendDir);
 	Param.UILanguageFile = pts->UILanguageFile;
 
+#if 0
 	int ret = DialogBoxParam(
 		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
 		hWndParent, (DLGPROC)OnDragDropDlgProc,
 		(LPARAM)&Param);
+#else
+	int ret = TTDialogBoxParam(
+		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
+		hWndParent, (DLGPROC)OnDragDropDlgProc,
+		(LPARAM)&Param);
+#endif
 	if (ret != IDOK) {
 		return DROP_TYPE_CANCEL;
 	}

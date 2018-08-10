@@ -15,7 +15,11 @@ endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /i ${CMAKE_CURRENT_SOURCE_DIR}/../common")
+if(${MINGW})
+  set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -I ${CMAKE_CURRENT_SOURCE_DIR}/../common")
+else()
+  set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /i ${CMAKE_CURRENT_SOURCE_DIR}/../common")
+endif()
 
 set(SRC
   ../common/dlglib.c
@@ -38,9 +42,16 @@ include_directories(
   ${ONIGURUMA_INCLUDE_DIRS}
   )
 
-link_directories(
-  ${ONIGURUMA_LIBRARY_DIRS}
-  )
+if(${MINGW})
+  link_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
+	${ONIGURUMA_LIBRARY_DIRS}
+	)
+else()
+  link_directories(
+	${ONIGURUMA_LIBRARY_DIRS}
+	)
+endif()
 
 add_library(
   ttpdlg SHARED

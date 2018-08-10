@@ -25,6 +25,12 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   )
 
+if(${MINGW})
+  link_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
+	)
+endif()
+
 add_library(
   ttpset SHARED
   ${SRC}

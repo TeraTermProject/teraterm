@@ -67,7 +67,7 @@ void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen);
 void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
-void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile);
+void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
 void OutputDebugPrintf(char *fmt, ...);

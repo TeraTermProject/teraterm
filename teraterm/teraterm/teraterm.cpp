@@ -45,6 +45,7 @@
 #include "tekwin.h"
 #include "ttdde.h"
 #include "keyboard.h"
+#include "compat_win.h"
 
 #include "teraapp.h"
 
@@ -80,6 +81,11 @@ CTeraApp::CTeraApp()
 			// カレントディレクトリだけでも検索パスからはずしておく。
 			(*setDllDir)("");
 		}
+	}
+
+	WinCompatInit();
+	if (PSetThreadDpiAwarenessContext) {
+		PSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 }
 

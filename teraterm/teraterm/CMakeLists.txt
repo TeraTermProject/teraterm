@@ -29,10 +29,16 @@ set(SRC
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/dlglib.c
+  ../common/dlglib_cpp.cpp
   ../common/dlglib.h
+  ../common/dlglib_tmpl.cpp
+  ../common/compat_win.cpp
+  ../common/compat_win.h
   #
   addsetting.cpp
   addsetting.h
+  tmfc.cpp
+  tmfc.h
   buffer.c
   buffer.h
   clipboar.c
@@ -109,7 +115,9 @@ set(CMAKE_MFC_FLAG 1)
 
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+if (${MSVC})
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+endif()
 
 add_executable(
   teraterm WIN32

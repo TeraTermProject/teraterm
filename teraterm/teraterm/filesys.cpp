@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -250,7 +250,7 @@ BOOL OpenFTDlg(PFileVar fv)
 
 	if (FTDlg!=NULL)
 	{
-		FTDlg->Create(fv, &cv, &ts);
+		FTDlg->Create(hInst, HVTWin, fv, &cv, &ts);
 		FTDlg->RefreshNum();
 		if (fv->OpId == OpLog) {
 			HWndLog = FTDlg->m_hWnd; // steven add
@@ -1469,8 +1469,6 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 {
 	int vsize;
 	PProtoDlg pd;
-	HWND Hpd;
-	char uimsg[MAX_UIMSG];
 
 	ProtoId = IdProto;
 
@@ -1530,28 +1528,7 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 		ProtoVar = NULL;
 		return FALSE;
 	}
-	pd->Create(fv,&ts);
-
-	Hpd=pd->GetSafeHwnd();
-
-	GetDlgItemText(Hpd, IDC_PROT_FILENAME, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PROT_FILENAME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(Hpd, IDC_PROT_FILENAME, ts.UIMsg);
-	GetDlgItemText(Hpd, IDC_PROT_PROT, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PROT_PROTO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(Hpd, IDC_PROT_PROT, ts.UIMsg);
-	GetDlgItemText(Hpd, IDC_PROT_PACKET, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PROT_PACKET", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(Hpd, IDC_PROT_PACKET, ts.UIMsg);
-	GetDlgItemText(Hpd, IDC_PROT_TRANS, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PROT_TRANS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(Hpd, IDC_PROT_TRANS, ts.UIMsg);
-	GetDlgItemText(Hpd, IDC_PROT_ELAPSED, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_PROT_ELAPSED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(Hpd, IDC_PROT_ELAPSED, ts.UIMsg);
-	GetDlgItemText(Hpd, IDCANCEL, uimsg, sizeof(uimsg));
-	get_lang_msg("BTN_CANCEL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(Hpd, IDCANCEL, ts.UIMsg);
+	pd->Create(hInst, HVTWin, fv, &ts);
 
 	(*ProtoInit)(ProtoId,FileVar,ProtoVar,&cv,&ts);
 

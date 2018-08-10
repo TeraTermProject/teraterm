@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,23 @@
  */
 
 /* TERATERM.EXE, file transfer dialog box */
-#include "stdafx.h"
+#include <stdio.h>
+#include <windows.h>
+#include <Commctrl.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
 #include "ttlib.h"
+#include "dlglib.h"
 #include "tt_res.h"
 #include "ftdlg.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
-BEGIN_MESSAGE_MAP(CFileTransDlg, CDialog)
-	//{{AFX_MSG_MAP(CFileTransDlg)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
+BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts)
 {
 	BOOL Ok;
-	WNDCLASS wc;
 	int fuLoad = LR_DEFAULTCOLOR;
 	HWND hwnd;
 
@@ -61,28 +52,14 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	cv = pcv;
 	cv->FilePause &= ~fv->OpId;
 	ts = pts;
-	LOGFONT logfont;
-	HFONT font;
-
-	wc.style = CS_PARENTDC;
-	wc.lpfnWndProc = AfxWndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = DLGWINDOWEXTRA;
-	wc.hInstance = AfxGetInstanceHandle();
-	wc.hIcon = NULL;
-	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "FTDlg32";
-	RegisterClass(&wc);
-
 	Pause = FALSE;
-	hwnd = GetForegroundWindow()->GetSafeHwnd();
+
+	hwnd = GetForegroundWindow();
 	if (fv->OpId == OpLog) { // parent window is desktop
-		Ok = CDialog::Create(CFileTransDlg::IDD, GetDesktopWindow());
+		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), CFileTransDlg::IDD);
 	}
 	else { // parent window is VT window
-		Ok = CDialog::Create(CFileTransDlg::IDD, NULL);
+		Ok = TTCDialog::Create(hInstance, NULL, CFileTransDlg::IDD);
 	}
 
 	if (!fv->HideDialog) {
@@ -99,22 +76,6 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	}
 
 	fv->HWin = GetSafeHwnd();
-
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", fv->HWin, &logfont, &DlgFont, ts->UILanguageFile)) {
-		SendDlgItemMessage(IDC_TRANS_FILENAME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSFNAME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_FULLPATH_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_EDIT_FULLPATH, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANS_TRANS, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSBYTES, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANS_ELAPSED, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANS_ETIME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSPAUSESTART, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDCANCEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSHELP, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-	}
 
 	return Ok;
 }
@@ -183,7 +144,7 @@ void CFileTransDlg::RefreshNum()
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg message handler
 
-BOOL CFileTransDlg::OnInitDialog()
+void CFileTransDlg::OnInitDialog()
 {
 	int fuLoad = LR_DEFAULTCOLOR;
 
@@ -205,19 +166,17 @@ BOOL CFileTransDlg::OnInitDialog()
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
-	SmallIcon = LoadImage(AfxGetInstanceHandle(),
+	SmallIcon = LoadImage(m_hInst,
 		MAKEINTRESOURCE(IDI_TTERM),
 		IMAGE_ICON, 16, 16, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_SMALL,
 		(LPARAM)SmallIcon);
 
-	BigIcon = LoadImage(AfxGetInstanceHandle(),
+	BigIcon = LoadImage(m_hInst,
 			MAKEINTRESOURCE(IDI_TTERM),
 			IMAGE_ICON, 0, 0, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
 		(LPARAM)BigIcon);
-
-	return 1;
 }
 
 void CFileTransDlg::OnCancel( )
@@ -238,21 +197,15 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			::PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
 			return TRUE;
 		default:
-			return (CDialog::OnCommand(wParam,lParam));
+			return (TTCDialog::OnCommand(wParam,lParam));
 	}
 }
 
 void CFileTransDlg::PostNcDestroy()
 {
 	// logopenとlogcloseを繰り返すと、GDIリソースリークとなる問題を修正した。
-	//   - CreateFontIndirect()で作成した論理フォントを削除する。
 	//   - LoadImage()によるアイコンリソースを解放する。
 	// (2016.10.5 yutaka)
-	if (DlgFont) {
-		DeleteObject(DlgFont);
-		DlgFont = NULL;
-	}
-
 	if (SmallIcon) {
 		DestroyIcon((HICON)SmallIcon);
 		SmallIcon = NULL;
@@ -264,9 +217,4 @@ void CFileTransDlg::PostNcDestroy()
 	}
 
 	delete this;
-}
-
-LRESULT CFileTransDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	return DefDlgProc(GetSafeHwnd(),message,wParam,lParam);
 }

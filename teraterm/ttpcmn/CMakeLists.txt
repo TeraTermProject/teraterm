@@ -34,6 +34,12 @@ include_directories(
   .
   )
 
+if(${MINGW})
+  link_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
+	)
+endif()
+
 add_library(
   ttpcmn SHARED
   ${SRC}

@@ -4525,8 +4525,8 @@ void CVTWindow::OnExternalSetup()
 {
 	DWORD ret;
 
-	CAddSettingPropSheetDlg CAddSetting("", CWnd::FromHandle(HVTWin));
-	CAddSetting.EnableStackedTabs(FALSE);
+	CAddSettingPropSheetDlg CAddSetting(hInst, "", HVTWin);
+//	CAddSetting.EnableStackedTabs(FALSE);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
 		case -1:
@@ -6214,4 +6214,11 @@ void CVTWindow::OnHelpAbout()
 	}
 	(*AboutDialog)(HVTWin);
 	FreeTTDLG();
+}
+
+
+BOOL CallOnIdle(LONG lCount)
+{
+	CWinApp *app = AfxGetApp();
+	return app->OnIdle(lCount);
 }

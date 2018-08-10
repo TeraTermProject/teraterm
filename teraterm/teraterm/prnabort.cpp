@@ -28,59 +28,20 @@
  */
 
 /* TERATERM.EXE, print-abort dialog box */
-#include <windows.h>
-#include <windowsx.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
 #include "tt_res.h"
+#include "tmfc.h"
 #include "prnabort.h"
 
-LRESULT CALLBACK CPrnAbortDlg::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
+CPrnAbortDlg::CPrnAbortDlg()
 {
-	static const DlgTextInfo TextInfos[] = {
-		{ IDC_PRNABORT_PRINTING, "DLG_PRNABORT_PRINTING" }, 
-		{ IDCANCEL, "BTN_CANCEL" },
-	};
-	static const int FontIDs[] = {
-		IDC_PRNABORT_PRINTING, IDCANCEL
-	};
+}
 
-	CPrnAbortDlg *self = (CPrnAbortDlg *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
-
-	switch (msg) {
-	case WM_INITDIALOG:
-	{
-		CPrnAbortDlg *self = (CPrnAbortDlg *)lp;
-		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)self);
-		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), self->m_ts->UILanguageFile);
-		self->m_hNewFont =
-			SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs),
-						self->m_ts->UILanguageFile, "DLG_SYSTEM_FONT");
-		return TRUE;
-	}
-
-	case WM_COMMAND:
-	{
-		WORD wID = GET_WM_COMMAND_ID(wp, lp);
-		const WORD wCMD = GET_WM_COMMAND_CMD(wp, lp);
-		if (wID == IDOK) {
-			self->DestroyWindow();
-		}
-		if (wID == IDCANCEL) {
-			self->OnCancel();
-		}
-		return FALSE;
-	}
-	case WM_NCDESTROY:
-		self->PostNcDestroy();
-		return TRUE;
-
-	default:
-		return FALSE;
-	}
-	return TRUE;
+CPrnAbortDlg::~CPrnAbortDlg()
+{
 }
 
 BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts)
@@ -89,41 +50,36 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 	m_hParentWnd = hParent;
 	m_ts = pts;
 
-	HRSRC hResource = ::FindResource(hInstance, MAKEINTRESOURCE(IDD_PRNABORTDLG), RT_DIALOG);
-	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);
-	DLGTEMPLATE *lpTemplate = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
-	HWND hWnd = ::CreateDialogIndirectParam(	
-		hInstance, lpTemplate, hParent,
-		(DLGPROC)OnDlgProc, (LPARAM)this);
-	if (hWnd == NULL)
-	{
-		return FALSE;
-	}
+	TTCDialog::Create(hInstance, hParent, IDD_PRNABORTDLG);
 
-	m_hWnd = hWnd;
-	::EnableWindow(hParent,FALSE);
-	::ShowWindow(hWnd, SW_SHOW);
-	::EnableWindow(m_hWnd,TRUE);
 	return TRUE;
+}
+
+void CPrnAbortDlg::OnInitDialog()
+{
+	TTCDialog::OnInitDialog();
+
+	static const DlgTextInfo TextInfos[] = {
+		{ IDC_PRNABORT_PRINTING, "DLG_PRNABORT_PRINTING" }, 
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	static const int FontIDs[] = {
+		IDC_PRNABORT_PRINTING, IDCANCEL
+	};
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), m_ts->UILanguageFile);
+	m_hNewFont =
+		SetDlgFonts(m_hWnd, FontIDs, _countof(FontIDs),
+					m_ts->UILanguageFile, "DLG_SYSTEM_FONT");
 }
 
 void CPrnAbortDlg::OnCancel()
 {
 	*m_pAbort = TRUE;
-	DestroyWindow();
+	TTCDialog::OnCancel();
 }
 
 void CPrnAbortDlg::PostNcDestroy()
 {
 	::DeleteObject(m_hNewFont);
-	delete this;
+	TTCDialog::DestroyWindow();
 }
-
-BOOL CPrnAbortDlg::DestroyWindow()
-{
-	::EnableWindow(m_hParentWnd,TRUE);
-	::SetFocus(m_hParentWnd);
-	::DestroyWindow(m_hWnd);
-	return TRUE;
-}
-

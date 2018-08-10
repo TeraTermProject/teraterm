@@ -643,7 +643,8 @@ struct tttset {
 	WORD FontQuality;
 	char ScpSendDir[MAXPATHLEN];
 	char BGImageFilePath[MAX_PATH];
-	enum rotate_mode LogRotate;
+//	enum rotate_mode LogRotate;
+	int LogRotate;
 	DWORD LogRotateSize;
 	WORD LogRotateSizeType;
 	WORD LogRotateStep;
