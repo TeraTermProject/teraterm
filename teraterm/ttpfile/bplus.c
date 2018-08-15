@@ -40,7 +40,7 @@
 #include "ttlib.h"
 
 /* proto type */
-BOOL PASCAL GetTransFname
+BOOL WINAPI GetTransFname
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option);
 
 #define BPTimeOut 10

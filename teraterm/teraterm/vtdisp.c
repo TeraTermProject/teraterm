@@ -181,9 +181,9 @@ BOOL   BGNoCopyBits;
 BOOL   BGInSizeMove;
 HBRUSH BGBrushInSizeMove;
 
-HDC hdcBGWork;
-HDC hdcBGBuffer;
-HDC hdcBG;
+static HDC hdcBGWork;
+static HDC hdcBGBuffer;
+static HDC hdcBG;
 
 typedef struct tagWallpaperInfo
 {
@@ -199,8 +199,11 @@ typedef struct _BGBLENDFUNCTION
     BYTE     AlphaFormat;
 }BGBLENDFUNCTION;
 
-BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
-BOOL (WINAPI *BGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
+typedef BOOL (WINAPI *TBGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
+typedef BOOL (WINAPI *TBGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
+
+static TBGAlphaBlend BGAlphaBlend;
+static TBGEnumDisplayMonitors BGEnumDisplayMonitors;
 
 static HBITMAP GetBitmapHandle(char *File);
 
@@ -435,13 +438,18 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
   strncat_s(filename,destlen,fd.cFileName,_TRUNCATE);
 }
 
+// Susie Plug-in
 BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long sizeFile,HLOCAL *hbuf,HLOCAL *hbmi)
 {
   HINSTANCE hSPI;
   char spiVersion[8];
-  int (PASCAL *SPI_IsSupported)(LPSTR,DWORD);
-  int (PASCAL *SPI_GetPicture)(LPSTR,long,unsigned int,HANDLE *,HANDLE *,FARPROC,long);
-  int (PASCAL *SPI_GetPluginInfo)(int,LPSTR,int);
+  typedef int (WINAPI *SPI_GetPluginInfo_t)(int infono, LPSTR buf, int buflen); 
+  typedef int (WINAPI *SPI_IsSupported_t)(LPSTR filename, DWORD dw);
+  typedef int (WINAPI *SPI_GetPicture_t)(LPSTR buf, long len, unsigned int flag, HANDLE *pHBInfo, HANDLE *pHBm, FARPROC lpPrgressCallback, long lData);
+
+  SPI_GetPluginInfo_t SPI_GetPluginInfo;
+  SPI_IsSupported_t SPI_IsSupported;
+  SPI_GetPicture_t SPI_GetPicture;
   int ret;
 
   ret  = FALSE;
@@ -453,9 +461,9 @@ BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long
   if(!hSPI)
     goto error;
 
-  (FARPROC)SPI_GetPluginInfo = GetProcAddress(hSPI,"GetPluginInfo");
-  (FARPROC)SPI_IsSupported   = GetProcAddress(hSPI,"IsSupported");
-  (FARPROC)SPI_GetPicture    = GetProcAddress(hSPI,"GetPicture");
+  SPI_GetPluginInfo = (SPI_GetPluginInfo_t)GetProcAddress(hSPI,"GetPluginInfo");
+  SPI_IsSupported   = (SPI_IsSupported_t)GetProcAddress(hSPI,"IsSupported");
+  SPI_GetPicture    = (SPI_GetPicture_t)GetProcAddress(hSPI,"GetPicture");
 
   if(!SPI_GetPluginInfo || !SPI_IsSupported || !SPI_GetPicture)
     goto error;
@@ -1620,7 +1628,7 @@ void BGInitialize(void)
   if(BGUseAlphaBlendAPI) {
     GetSystemDirectory(msimg32_dll, sizeof(msimg32_dll));
     strncat_s(msimg32_dll, sizeof(msimg32_dll), "\\msimg32.dll", _TRUNCATE);
-    (FARPROC)BGAlphaBlend = GetProcAddressWithDllName(msimg32_dll,"AlphaBlend");
+    BGAlphaBlend = (TBGAlphaBlend)GetProcAddressWithDllName(msimg32_dll,"AlphaBlend");
   }
   else {
     BGAlphaBlend = NULL;
@@ -1632,7 +1640,7 @@ void BGInitialize(void)
   //EnumDisplayMonitors ‚ð’T‚·
   GetSystemDirectory(user32_dll, sizeof(user32_dll));
   strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
-  (FARPROC)BGEnumDisplayMonitors = GetProcAddressWithDllName(user32_dll,"EnumDisplayMonitors");
+  BGEnumDisplayMonitors = (TBGEnumDisplayMonitors)GetProcAddressWithDllName(user32_dll,"EnumDisplayMonitors");
 }
 
 void BGExchangeColor() {

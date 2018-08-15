@@ -29,7 +29,7 @@
 /* IPv6 modification is Copyright(C) 2000 Jun-ya Kato <kato@win6.jp> */
 
 /* TTDLG.DLL, dialog boxes */
-#include "teraterm.h"
+#include <winsock2.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -37,6 +37,7 @@
 #include <direct.h>
 #include <commdlg.h>
 #include <Dlgs.h>
+#include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -49,7 +50,6 @@
 #include "oniguruma.h"
 #undef ONIG_EXTERN
 
-#include <winsock2.h>
 static char * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #undef EFFECT_ENABLED	// エフェクトの有効可否
@@ -72,38 +72,38 @@ static HFONT DlgWinlistFont;
 
 char UILanguageFile[MAX_PATH];
 
-static PCHAR NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
-static PCHAR NLList[] = {"CR","CR+LF", "LF", NULL};
-static PCHAR TermList[] =
+static const TCHAR *NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
+static const TCHAR *NLList[] = {"CR","CR+LF", "LF", NULL};
+static const TCHAR *TermList[] =
 	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",
 	 "VT420", "VT520", "VT525", NULL};
 static WORD Term_TermJ[] =
 	{IdVT100, IdVT101, IdVT102, IdVT282, IdVT320, IdVT382,
 	 IdVT420, IdVT520, IdVT525};
 static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
-static PCHAR TermListJ[] =
+static const TCHAR *TermListJ[] =
 	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
-static PCHAR KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", "UTF-8m", NULL};
-static PCHAR KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
-static PCHAR KanjiInList[] = {"^[$@","^[$B",NULL};
-static PCHAR KanjiOutList[] = {"^[(B","^[(J",NULL};
-static PCHAR KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
-static PCHAR RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
-static PCHAR RussList2[] = {"Windows","KOI8-R",NULL};
-static PCHAR LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
-static PCHAR MetaList[] = {"off", "on", "left", "right", NULL};
-static PCHAR MetaList2[] = {"off", "on", NULL};
+static const TCHAR *KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", "UTF-8m", NULL};
+static const TCHAR *KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
+static const TCHAR *KanjiInList[] = {"^[$@","^[$B",NULL};
+static const TCHAR *KanjiOutList[] = {"^[(B","^[(J",NULL};
+static const TCHAR *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
+static const TCHAR *RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
+static const TCHAR *RussList2[] = {"Windows","KOI8-R",NULL};
+static const TCHAR *LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
+static const TCHAR *MetaList[] = {"off", "on", "left", "right", NULL};
+static const TCHAR *MetaList2[] = {"off", "on", NULL};
 
 // HKS
-static PCHAR KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
-static PCHAR KoreanListSend[] = {"KS5601", "UTF-8", NULL};
+static const TCHAR *KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
+static const TCHAR *KoreanListSend[] = {"KS5601", "UTF-8", NULL};
 
 // UTF-8
-static PCHAR Utf8List[] = {"UTF-8", "UTF-8m", NULL};
-static PCHAR Utf8ListSend[] = {"UTF-8", NULL};
+static const TCHAR *Utf8List[] = {"UTF-8", "UTF-8m", NULL};
+static const TCHAR *Utf8ListSend[] = {"UTF-8", NULL};
 
-static PCHAR BaudList[] =
+static const TCHAR *BaudList[] =
 	{"110","300","600","1200","2400","4800","9600",
 	 "14400","19200","38400","57600","115200",
 	 "230400", "460800", "921600", NULL};
@@ -1364,10 +1364,10 @@ BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-static PCHAR DataList[] = {"7 bit","8 bit",NULL};
-static PCHAR ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
-static PCHAR StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
-static PCHAR FlowList[] = {"Xon/Xoff","hardware","none",NULL};
+static const TCHAR *DataList[] = {"7 bit","8 bit",NULL};
+static const TCHAR *ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
+static const TCHAR *StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
+static const TCHAR *FlowList[] = {"Xon/Xoff","hardware","none",NULL};
 
 BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -2926,8 +2926,8 @@ BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-static PCHAR LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
-static char **LangUIList = NULL;
+static const TCHAR *LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
+static TCHAR **LangUIList = NULL;
 #define LANG_PATH "lang"
 #define LANG_EXT ".lng"
 

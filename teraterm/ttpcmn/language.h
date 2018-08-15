@@ -29,17 +29,19 @@
 
 /* TTCMN.DLL, character code conversion */
 
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* proto types */
-unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale);
-WORD PASCAL SJIS2JIS(WORD KCode);
-WORD PASCAL SJIS2EUC(WORD KCode);
-WORD PASCAL JIS2SJIS(WORD KCode);
-BYTE PASCAL RussConv(int cin, int cout, BYTE b);
-void PASCAL RussConvStr
+unsigned int WINAPI SJIS2UTF8(WORD KCode, int *byte, char *locale);
+WORD WINAPI SJIS2JIS(WORD KCode);
+WORD WINAPI SJIS2EUC(WORD KCode);
+WORD WINAPI JIS2SJIS(WORD KCode);
+BYTE WINAPI RussConv(int cin, int cout, BYTE b);
+void WINAPI RussConvStr
   (int cin, int cout, PCHAR Str, int count);
 
 #ifdef __cplusplus

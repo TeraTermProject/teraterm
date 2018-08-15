@@ -28,7 +28,10 @@
  */
 
 /* TERATERM.EXE, file transfer routines */
-#include "stdafx.h"
+#include <stdio.h>
+#include <io.h>
+#include <process.h>
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
@@ -48,9 +51,6 @@
 #include "ftlib.h"
 
 #include "buffer.h"
-
-#include <io.h>
-#include <process.h>
 
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1

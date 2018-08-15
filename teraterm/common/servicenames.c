@@ -43,10 +43,10 @@ See LICENSE.TXT for the license.
 
 typedef struct {
 	int port;
-	char *name;
+	const char *name;
 } TCP_service_name;
 
-static TCP_service_name service_DB[] = {
+static const TCP_service_name service_DB[] = {
 	{384, "arns"},
 	{204, "at-echo"},
 	{202, "at-nbp"},
@@ -379,7 +379,7 @@ static BOOL is_service_name_char(char ch)
 	return (isalnum(ch) || ch == '_' || ch == '-');
 }
 
-int PASCAL parse_port_from_buf(char * buf)
+int WINAPI parse_port_from_buf(char * buf)
 {
 	int i;
 	char lower_buf[32];
@@ -409,7 +409,7 @@ int PASCAL parse_port_from_buf(char * buf)
 	return -1;
 }
 
-int PASCAL parse_port(char *str, char *buf, int bufsize)
+int WINAPI parse_port(char *str, char *buf, int bufsize)
 {
 	int i = 0;
 
@@ -423,7 +423,7 @@ int PASCAL parse_port(char *str, char *buf, int bufsize)
 	return parse_port_from_buf(buf);
 }
 
-char * PASCAL service_name(int num) {
+const char * WINAPI service_name(int num) {
 	if (num < 0 || num >= NUM_ELEM(service_DB))
 		return NULL;
 	return (service_DB[num].name);

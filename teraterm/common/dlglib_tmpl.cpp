@@ -1,7 +1,39 @@
-﻿
+﻿/*
+ * (C) 2005-2018 TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* Routines for dialog boxes */
+
 #include "dlglib.h"
+#include "tttypes.h"		// for TTSet
+#include "ttwinman.h"		// for ts
 
 #include <wchar.h>
+#include <assert.h>
 
 //#define	_countof(ary)	(sizeof(ary)/sizeof(ary[0]))
 
@@ -337,7 +369,7 @@ static size_t CopyDlgTemplateEx(
 	return size * sizeof(WORD);
 }
 
-DLGTEMPLATE *GetNewDlgTemplate(
+static DLGTEMPLATE *GetDlgTemplate(
 	HINSTANCE hInst, const DLGTEMPLATE *src,
 	const WCHAR *FontFaceName, LONG FontHeight, BYTE FontCharSet,
 	size_t *PrevTemplSize, size_t *NewTemplSize)
@@ -346,22 +378,26 @@ DLGTEMPLATE *GetNewDlgTemplate(
 	const size_t prev_size = CopyDlgTemplateEx(src, NULL, &logfont);
 	DLGTEMPLATE *dest;
 	size_t new_size = 0;
-	if (FontFaceName == NULL) {
+	if (FontFaceName == NULL || FontFaceName[0] == '\0') {
 		// simple copy
 		dest = (DLGTEMPLATE *)malloc(prev_size);
 		CopyDlgTemplateEx(src, dest, NULL);
 		new_size = prev_size;
 	} else {
 		// copy with replacing font
-		const size_t new_size_forcast = prev_size +
-			((wcslen(FontFaceName) - wcslen(logfont.lfFaceName)) *
-			 sizeof(WCHAR)) + 4;
+		size_t size_namediff =
+			wcslen(FontFaceName) - wcslen(logfont.lfFaceName);
+		size_namediff *= sizeof(WCHAR);
+		size_namediff += 3;		// テキスト、フォント名長でalignが変化する
+		size_t new_size_forcast = prev_size + size_namediff;
+		new_size_forcast = (new_size_forcast + 3) & ~3;
 		dest = (DLGTEMPLATE *)malloc(new_size_forcast);
 		logfont.lfCharSet = FontCharSet;
 		logfont.lfHeight = FontHeight;
 		wcscpy_s(logfont.lfFaceName, _countof(logfont.lfFaceName),
 				 FontFaceName);
 		new_size = CopyDlgTemplateEx(src, dest, &logfont);
+		assert(new_size <= new_size_forcast);
 	}
 
 	if (PrevTemplSize != NULL) {
@@ -373,50 +409,86 @@ DLGTEMPLATE *GetNewDlgTemplate(
 	return dest;
 }
 
-DLGTEMPLATE *GetDlgTemplate(
+static DLGTEMPLATE *GetDlgTemplate(
 	HINSTANCE hInst, LPCSTR lpTemplateName,
-	const WCHAR *FontFaceName, LONG FontHeight, BYTE FontCharSet)
+	const WCHAR *FontFaceName, LONG FontHeight, BYTE FontCharSet,
+	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
 	HRSRC hResource = ::FindResource(hInst, lpTemplateName, RT_DIALOG);
 	HANDLE hDlgTemplate = ::LoadResource(hInst, hResource);
 	const DLGTEMPLATE *src = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
 
-	DLGTEMPLATE *dest = GetNewDlgTemplate(
+	DLGTEMPLATE *dest = GetDlgTemplate(
 		hInst, src,
 		FontFaceName, FontHeight, FontCharSet,
-		NULL, NULL);
+		PrevTemplSize, NewTemplSize);
 
 	::FreeResource(hDlgTemplate);
 
 	return dest;
 }
 
+static wchar_t FontFaceName[LF_FACESIZE];
+static LONG FontHeight;
+static BYTE FontCharSet;
+
+void TTSetDlgFont(const wchar_t *face, int height, int charset)
+{
+	if (face != NULL) {
+		wcscpy_s(FontFaceName, face);
+	} else {
+		FontFaceName[0] = L'\0';
+	}
+	FontHeight = height;
+	FontCharSet = charset;
+}
+
+void TTSetDlgFont(const char *face, int height, int charset)
+{
+	if (face != NULL) {
+		mbstowcs(FontFaceName, face, LF_FACESIZE);
+	} else {
+		FontFaceName[0] = L'\0';
+	}
+	FontHeight = height;
+	FontCharSet = charset;
+}
+
+static void initFont()
+{
+	LOGFONT logfont;
+	BOOL result;
+	result = GetI18nLogfont("Tera Term", "DLG_TAHOMA_FONT", &logfont, 72, ts.UILanguageFile);
+	if (!result) {
+		result = GetI18nLogfont("Tera Term", "DLG_SYSTEM_FONT", &logfont, 72, ts.UILanguageFile);
+	}
+
+	if (result) {
+		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	} else {
+		TTSetDlgFont((wchar_t *)NULL, 0, 0);
+	}
+}
+
 DLGTEMPLATE *TTGetNewDlgTemplate(
 	HINSTANCE hInst, const DLGTEMPLATE *src,
 	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
-	const WCHAR *FontFaceName = L"Meiryo UI";
-//	const WCHAR *FontFaceName = L"Tahoma";
-	LONG FontHeight = 20;
-	BYTE FontCharSet = 128;
-
+	initFont();
 	DLGTEMPLATE *DlgTemplate =
-		GetNewDlgTemplate(hInst, src,
-						  FontFaceName, FontHeight, FontCharSet,
-						  PrevTemplSize, NewTemplSize);
+		GetDlgTemplate(hInst, src,
+					   FontFaceName, FontHeight, FontCharSet,
+					   PrevTemplSize, NewTemplSize);
 
 	return DlgTemplate;
 }
 
 DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCSTR lpTemplateName)
 {
-	const WCHAR *FontFaceName = L"Meiryo UI";
-	LONG FontHeight = 20;
-	BYTE FontCharSet = 128;
-
+	initFont();
 	DLGTEMPLATE *DlgTemplate =
 		GetDlgTemplate(hInst, lpTemplateName,
-					   FontFaceName, FontHeight, FontCharSet);
-
+					   FontFaceName, FontHeight, FontCharSet,
+					   NULL, NULL);
 	return DlgTemplate;
 }

@@ -64,16 +64,26 @@ DLGTEMPLATE *TTGetNewDlgTemplate(
 BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult);
 HWND TTCreateDialogIndirectParam(
 	HINSTANCE hInstance,
-	LPCTSTR lpTemplateName,
+	LPCDLGTEMPLATE lpTemplate,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit);
+HWND TTCreateDialog(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc);
 int TTDialogBoxParam(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit);
+int TTDialogBox(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc);
 
 #ifdef __cplusplus
 }

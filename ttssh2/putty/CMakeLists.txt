@@ -2,14 +2,18 @@ project(libputty)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
+if(${MINGW})
+  add_definitions("-D_WINDOWS")
+endif()
+
 set(SRC
-  ../../libs/putty/CONF.C
-  ../../libs/putty/MISC.C
-  ../../libs/putty/TREE234.C
-  ../../libs/putty/VERSION.C
-  ../../libs/putty/WINDOWS/WINMISC.C
-  ../../libs/putty/WINDOWS/WINPGNTC.C
-  ../../libs/putty/WINDOWS/WINSECUR.C
+  ../../libs/putty/conf.c
+  ../../libs/putty/misc.c
+  ../../libs/putty/tree234.c
+  ../../libs/putty/version.c
+  ../../libs/putty/windows/winmisc.c
+  ../../libs/putty/windows/winpgntc.c
+  ../../libs/putty/windows/winsecur.c
   libputty.c
   libputty.h
   )

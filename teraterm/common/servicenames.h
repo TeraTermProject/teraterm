@@ -28,14 +28,16 @@
 
 /* TTCMN.DLL, service name conversion */
 
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* proto types */
-int PASCAL parse_port(char *str, char *buf, int bufsize);
-int PASCAL parse_port_from_buf(char *buf);
-char * PASCAL service_name(int num);
+int WINAPI parse_port(char *str, char *buf, int bufsize);
+int WINAPI parse_port_from_buf(char *buf);
+const char * WINAPI service_name(int num);
 
 #ifdef __cplusplus
 }

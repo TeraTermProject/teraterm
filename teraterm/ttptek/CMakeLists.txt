@@ -41,6 +41,12 @@ link_directories(
   ${SFMT_LIBRARY_DIRS}
   )
 
+if(${MINGW})
+  link_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
+	)
+endif()
+
 add_library(
   ttptek SHARED
   ${SRC}
@@ -49,11 +55,10 @@ add_library(
 target_link_libraries(
   ttptek
   ttpcmn
-#  optimized onig.lib
-#  debug onigd.lib
   debug sfmtd.lib
   optimized sfmt.lib
   iphlpapi.lib
+  htmlhelp.lib
   )
 
 add_dependencies(

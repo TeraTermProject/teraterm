@@ -1,6 +1,38 @@
-﻿
+﻿/*
+ * (C) 2005-2018 TeraTerm Project
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* Routines for dialog boxes */
+
 #include <windows.h>
 #include "dlglib.h"
+
+// ダイアログモーダル状態の時、OnIdle()を実行する
+//#define ENABLE_CALL_IDLE_MODAL	1
 
 extern BOOL CallOnIdle(LONG lCount);
 
@@ -9,10 +41,12 @@ typedef struct {
 	LONG_PTR OrigUser;	// DWLP_USER
 	LPARAM ParamInit;
 	int DlgResult;
+	bool EndDialogFlag;
 } TTDialogData;
 
 static TTDialogData *TTDialogTmpData;
 
+#if ENABLE_CALL_IDLE_MODAL
 static int TTDoModal(HWND hDlgWnd)
 {
 	LONG lIdleCount = 0;
@@ -31,10 +65,9 @@ static int TTDoModal(HWND hDlgWnd)
 			::ShowWindow(hDlgWnd, SW_SHOWNORMAL);
 		}
 #endif
-		int DlgRet = data->DlgResult;
-		if (DlgRet != 0) {
+		if (data->EndDialogFlag) {
 			// TTEndDialog()が呼ばれた
-			return DlgRet;
+			return data->DlgResult;
 		}
 
 		if(!::PeekMessage(&Msg, NULL, NULL, NULL, PM_NOREMOVE))
@@ -71,6 +104,7 @@ static int TTDoModal(HWND hDlgWnd)
 	// ここには来ない
 	return IDOK;
 }
+#endif
 
 static INT_PTR CALLBACK TTDialogProc(
 	HWND hDlgWnd, UINT msg,
@@ -115,9 +149,14 @@ static INT_PTR CALLBACK TTDialogProc(
  */
 BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult)
 {
+#if ENABLE_CALL_IDLE_MODAL
 	TTDialogData *data = TTDialogTmpData;
 	data->DlgResult = nResult;
+	data->EndDialogFlag = true;
 	return TRUE;
+#else
+	return EndDialog(hDlgWnd, nResult);
+#endif
 }
 
 /**
@@ -134,24 +173,30 @@ HWND TTCreateDialogIndirectParam(
 	data->OrigProc = lpDialogFunc;
 	data->OrigUser = 0;
 	data->ParamInit = lParamInit;
+	data->EndDialogFlag = false;
 	data->DlgResult = 0;
-#if 0
-	HRSRC hResource = ::FindResource(hInstance, lpTemplateName, RT_DIALOG);
-	HANDLE hDlgTemplate = ::LoadResource(hInstance, hResource);
-	DLGTEMPLATE *lpTemplate = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
-#else
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
-#endif
 	TTDialogTmpData = data;
 	HWND hDlgWnd = CreateDialogIndirectParam(
 		hInstance, lpTemplate, hWndParent, TTDialogProc, (LPARAM)data);
 	TTDialogTmpData = NULL;
 	ShowWindow(hDlgWnd, SW_SHOW);
     UpdateWindow(hDlgWnd);
-#if 1
 	free(lpTemplate);
-#endif
 	return hDlgWnd;
+}
+
+/**
+ *	CreateDialog() 互換関数
+ */
+HWND TTCreateDialog(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc)
+{
+	return TTCreateDialogIndirectParam(hInstance, lpTemplateName,
+									   hWndParent, lpDialogFunc, NULL);
 }
 
 /**
@@ -165,6 +210,7 @@ int TTDialogBoxParam(
 	DLGPROC lpDialogFunc,		// ダイアログボックスプロシージャへのポインタ
 	LPARAM lParamInit)			// 初期化値
 {
+#if ENABLE_CALL_IDLE_MODAL
 	HWND hDlgWnd = TTCreateDialogIndirectParam(
 		hInstance, lpTemplateName,
 		hWndParent, lpDialogFunc, lParamInit);
@@ -173,5 +219,27 @@ int TTDialogBoxParam(
 	::DestroyWindow(hDlgWnd);
 	EnableWindow(hWndParent, TRUE);
 	return DlgResult;
+#else
+	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
+	int DlgResult = DialogBoxIndirectParam(
+		hInstance, lpTemplate, hWndParent,
+		lpDialogFunc, lParamInit);
+	free(lpTemplate);
+	return DlgResult;
+#endif
 }
 
+/**
+ *	DialogBoxParam() 互換関数
+ *		EndDialog()ではなく、TTEndDialog()を使用すること
+ */
+int TTDialogBox(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc)
+{
+	return TTDialogBoxParam(
+		hInstance, lpTemplateName,
+		hWndParent, lpDialogFunc, (LPARAM)NULL);
+}

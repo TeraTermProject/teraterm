@@ -31,6 +31,8 @@
 /* TERATERM.EXE, VT window */
 
 #include "stdafx.h"
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include "teraterm.h"
 #include "tttypes.h"
 
@@ -52,10 +54,9 @@
 #include "tekwin.h"
 #include "ttdde.h"
 #include "ttlib.h"
+#include "dlglib.h"
 #include "helpid.h"
 #include "teraprn.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include "ttplug.h"  /* TTPLUG */
 
 #include <stdio.h>
@@ -4525,8 +4526,7 @@ void CVTWindow::OnExternalSetup()
 {
 	DWORD ret;
 
-	CAddSettingPropSheetDlg CAddSetting(hInst, "", HVTWin);
-//	CAddSetting.EnableStackedTabs(FALSE);
+	CAddSettingPropSheetDlg CAddSetting(hInst, "Tera Term: Additional settings", HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
 		case -1:
@@ -4988,44 +4988,11 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	BOOL open_dir, ret;
 	int button_pressed;
 	HWND hWnd;
-	LOGFONT logfont;
-	HFONT font;
 	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
 		// I18N
-		font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
-		GetObject(font, sizeof(LOGFONT), &logfont);
-		if (get_lang_font("DLG_TAHOMA_FONT", hDlgWnd, &logfont, &DlgSetupdirFont, ts.UILanguageFile)) {
-			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_INI_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_KEYCNF_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_CYGTERM_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_EDIT, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_BUTTON_FILE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_STATIC_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-			SendDlgItemMessage(hDlgWnd, IDC_SSH_SETUPDIR_EDIT_VSTORE, WM_SETFONT, (WPARAM)DlgSetupdirFont, MAKELPARAM(TRUE,0));
-		} else {
-			DlgSetupdirFont = NULL;
-		}
-
 		GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
 		get_lang_msg("DLG_SETUPDIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 		SetWindowText(hDlgWnd, ts.UIMsg);
@@ -5263,7 +5230,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			if (DlgSetupdirFont != NULL) {
 				DeleteObject(DlgSetupdirFont);
 			}
-			EndDialog(hDlgWnd, IDCANCEL);
+			TTEndDialog(hDlgWnd, IDCANCEL);
 			break;
 
 		default:
@@ -5283,7 +5250,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		}
 
 	case WM_CLOSE:
-		EndDialog(hDlgWnd, 0);
+		TTEndDialog(hDlgWnd, 0);
 		return TRUE;
 
 	default:
@@ -5300,11 +5267,8 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 //
 void CVTWindow::OnOpenSetupDirectory()
 {
-	int ret;
-
-	ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
-		HVTWin, (DLGPROC)OnSetupDirectoryDlgProc);
-
+	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_SETUP_DIR_DIALOG),
+	            HVTWin, (DLGPROC)OnSetupDirectoryDlgProc);
 }
 
 void CVTWindow::OnSetupLoadKeyMap()
@@ -6044,8 +6008,9 @@ void CVTWindow::OnControlBroadcastCommand(void)
 		goto activate;
 	}
 
-	hDlgWnd = CreateDialog(hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
-	                       HVTWin, (DLGPROC)BroadcastCommandDlgProc);
+	hDlgWnd = TTCreateDialog(
+		hInst, MAKEINTRESOURCE(IDD_BROADCAST_DIALOG),
+		HVTWin, (DLGPROC)BroadcastCommandDlgProc);
 
 	if (hDlgWnd == NULL) {
 		return;

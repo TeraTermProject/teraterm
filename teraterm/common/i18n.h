@@ -38,8 +38,8 @@
 extern "C" {
 #endif
 
-void GetI18nStr(PCHAR section, PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile);
-int GetI18nLogfont(PCHAR section, PCHAR key, PLOGFONT logfont, int ppi, const char *iniFile);
+void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile);
 
 #ifdef __cplusplus
 }

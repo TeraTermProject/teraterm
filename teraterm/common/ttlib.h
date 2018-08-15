@@ -29,6 +29,8 @@
 
 /* useful routines */
 
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,9 +96,9 @@ char *strelapsed(DWORD start_time);
 void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
 int b64decode(PCHAR dst, int dsize, PCHAR src);
 
-PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param);
-void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
-void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
+PCHAR WINAPI GetParam(PCHAR buff, int size, PCHAR param);
+void WINAPI DequoteParam(PCHAR dest, int dest_len, PCHAR src);
+void WINAPI DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
 

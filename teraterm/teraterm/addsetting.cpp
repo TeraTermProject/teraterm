@@ -39,7 +39,7 @@
 #include "addsetting.h"
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttwinman.h"
+#include "ttwinman.h"	// for ts
 #include "ttcommon.h"
 #include "ttftypes.h"
 #include "dlglib.h"
@@ -1476,7 +1476,8 @@ void CCygwinPropPageDlg::OnOK()
 }
 
 // CAddSettingPropSheetDlg
-CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd) :
+CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
+	HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd) :
 	TTCPropertySheet(hInstance, pszCaption, hParentWnd)
 {
 	m_GeneralPage = new CGeneralPropPageDlg(hInstance, this);
@@ -1496,7 +1497,7 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(HINSTANCE hInstance, LPCTSTR ps
 	m_psh.phpage = hPsp;
 
 	get_lang_msg("DLG_TABSHEET_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Tera Term: Additional settings", ts.UILanguageFile);
+				 pszCaption, ts.UILanguageFile);
 	m_psh.pszCaption = _tcsdup(ts.UIMsg);
 }
 
@@ -1511,6 +1512,3 @@ CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()
 	delete m_CygwinPage;
 }
 
-void CAddSettingPropSheetDlg::OnInitDialog()
-{
-}

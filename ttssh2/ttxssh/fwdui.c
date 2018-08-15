@@ -647,7 +647,7 @@ static void fill_service_names(HWND dlg, WORD item)
 {
 	HWND cbox = GetDlgItem(dlg, item);
 	int i;
-	char *svc;
+	const char *svc;
 
 	for (i=0; (svc = service_name(i)) != NULL; i++) {
 		SendMessage(cbox, CB_ADDSTRING, 0, (LPARAM) svc);

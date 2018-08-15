@@ -120,11 +120,9 @@ private:
 class CAddSettingPropSheetDlg : public TTCPropertySheet
 {
 public:
-	CAddSettingPropSheetDlg(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd = NULL);
+	CAddSettingPropSheetDlg(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd);
 	virtual ~CAddSettingPropSheetDlg();
 private:
-	void OnInitDialog();
-
 	HPROPSHEETPAGE hPsp[6];
 	
 	CGeneralPropPageDlg   *m_GeneralPage;

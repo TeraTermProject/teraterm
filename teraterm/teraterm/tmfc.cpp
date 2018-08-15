@@ -325,7 +325,11 @@ TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND
 	m_hInst = hInstance;
 	memset(&m_psh, 0, sizeof(m_psh));
 	m_psh.dwSize = sizeof(m_psh);
-	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS 
+	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS
+	if (pszCaption != NULL) {
+		m_psh.pszCaption = pszCaption;
+		//m_psh.dwFlags |= PSH_PROPTITLE;		// 「のプロパティー」が追加される?
+	}
 	m_psh.hwndParent = hParentWnd;
 	m_psh.pfnCallback = PropSheetProc;
 }
