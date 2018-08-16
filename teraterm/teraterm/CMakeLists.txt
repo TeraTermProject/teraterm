@@ -102,6 +102,7 @@ set(SRC
 include_directories(
   ../common
   ../ttpfile
+  ../ttpdlg
   ${SFMT_INCLUDE_DIRS}
   .
   )
@@ -115,8 +116,14 @@ set(CMAKE_MFC_FLAG 1)
 
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
-if (${MSVC})
+if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
+endif()
+
+if(MINGW)
+  link_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
+	)
 endif()
 
 add_executable(
@@ -137,6 +144,7 @@ target_link_libraries(
   debug LIBCMTD.lib
   optimized onig.lib
   debug onigd.lib
+  Comctl32.lib
   ws2_32.lib
   imm32.lib
   imagehlp.lib

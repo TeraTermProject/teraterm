@@ -33,9 +33,11 @@
 #include "teraterm.h"
 
 typedef struct {
-	char *name;
+	const char *name;
 	LPCTSTR id;
 } mouse_cursor_t;
+
+extern const mouse_cursor_t MouseCursor[];
 
 // General Page
 class CGeneralPropPageDlg : public TTCPropertyPage

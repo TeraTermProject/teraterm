@@ -102,10 +102,6 @@ static char THIS_FILE[] = __FILE__;
 
 #define BROADCAST_LOGFILE "broadcast.log"
 
-static HFONT DlgBroadcastFont;
-static HFONT DlgCommentFont;
-static HFONT DlgSetupdirFont;
-
 static BOOL TCPLocalEchoUsed = FALSE;
 static BOOL TCPCRSendUsed = FALSE;
 
@@ -114,9 +110,6 @@ static BOOL IgnoreRelease = FALSE;
 static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
-
-// 本体は addsetting.cpp
-extern mouse_cursor_t MouseCursor[];
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -386,7 +379,7 @@ void SetAutoConnectPort(int port)
 // (2007.9.30 yutaka)
 //
 // 例外コードを文字列へ変換する
-static char *GetExceptionString(int exception)
+static const char *GetExceptionString(int exception)
 {
 #define EXCEPTION(x) case EXCEPTION_##x: return (#x);
 	static char buf[16];
@@ -1972,7 +1965,7 @@ void CVTWindow::OnAllClose()
 }
 
 // 終了問い合わせなしにTera Termを終了する。OnAllClose()受信用。
-LONG CVTWindow::OnNonConfirmClose(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnNonConfirmClose(WPARAM wParam, LPARAM lParam)
 {
 	// ここで ts の内容を意図的に書き換えても、終了時に自動セーブされるわけではないので、特に問題なし。
 	ts.PortFlag &= ~PF_CONFIRMDISCONN;
@@ -2121,7 +2114,7 @@ void CVTWindow::DropListFree()
 	}
 }
 
-LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
+LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 {
 	// iniに保存されない、今実行しているTera Termでのみ有効な設定
 	static enum drop_type DefaultDropType = DROP_TYPE_CANCEL;
@@ -2286,11 +2279,11 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 		{
 			// send by scp
 			char **FileNames = &DropLists[i];
-			int FileCount = DoSameProcess ? DropListCount - i : 1;
-			if (!SendScp(FileNames, FileCount, ts.ScpSendDir)) {
+			int FileCountScp = DoSameProcess ? DropListCount - i : 1;
+			if (!SendScp(FileNames, FileCountScp, ts.ScpSendDir)) {
 				goto finish;
 			}
-			i += FileCount - 1;
+			i += FileCountScp - 1;
 			break;
 		}
 		}
@@ -2952,7 +2945,7 @@ void CVTWindow::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
-void CVTWindow::OnTimer(UINT nIDEvent)
+void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	POINT Point;
 	WORD PortType;
@@ -3154,7 +3147,7 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 }
 
 //<!--by AKASI
-LONG CVTWindow::OnWindowPosChanging(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnWindowPosChanging(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ALPHABLEND_TYPE2
 	if(BGEnable && BGNoCopyBits) {
@@ -3165,7 +3158,7 @@ LONG CVTWindow::OnWindowPosChanging(UINT wParam, LONG lParam)
 	return CFrameWnd::DefWindowProc(WM_WINDOWPOSCHANGING,wParam,lParam);
 }
 
-LONG CVTWindow::OnSettingChange(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnSettingChange(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ALPHABLEND_TYPE2
 	BGOnSettingChange();
@@ -3173,7 +3166,7 @@ LONG CVTWindow::OnSettingChange(UINT wParam, LONG lParam)
 	return CFrameWnd::DefWindowProc(WM_SETTINGCHANGE,wParam,lParam);
 }
 
-LONG CVTWindow::OnEnterSizeMove(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnEnterSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	EnableSizeTip(1);
 
@@ -3183,7 +3176,7 @@ LONG CVTWindow::OnEnterSizeMove(UINT wParam, LONG lParam)
 	return CFrameWnd::DefWindowProc(WM_ENTERSIZEMOVE,wParam,lParam);
 }
 
-LONG CVTWindow::OnExitSizeMove(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 #ifdef ALPHABLEND_TYPE2
 	BGOnExitSizeMove();
@@ -3195,7 +3188,7 @@ LONG CVTWindow::OnExitSizeMove(UINT wParam, LONG lParam)
 }
 //-->
 
-LONG CVTWindow::OnIMEComposition(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 {
 	HGLOBAL hstr;
 	//LPSTR lpstr;
@@ -3253,14 +3246,14 @@ skip:
 	return CFrameWnd::DefWindowProc(WM_IME_COMPOSITION,wParam,lParam);
 }
 
-LONG CVTWindow::OnIMEInputChange(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMEInputChange(WPARAM wParam, LPARAM lParam)
 {
 	ChangeCaret();
 
 	return CFrameWnd::DefWindowProc(WM_INPUTLANGCHANGE,wParam,lParam);
 }
 
-LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == IMN_SETOPENSTATUS) {
 		ChangeCaret();
@@ -3276,7 +3269,7 @@ LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 //     http://27213143.at.webry.info/201202/article_2.html
 //     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
 // (2012.5.9 yutaka)
-LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 {
 	static int complen, newsize;
 	static char comp[512];
@@ -3338,7 +3331,7 @@ LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
 	return CFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
 }
 
-LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnAccelCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IdHold:
@@ -3431,7 +3424,7 @@ LONG CVTWindow::OnAccelCommand(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 {
 	HMENU SysMenu;
 	BOOL Show, B1, B2;
@@ -3493,7 +3486,7 @@ LONG CVTWindow::OnChangeMenu(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnChangeTBar(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 {
 	BOOL TBar;
 	DWORD Style,ExStyle;
@@ -3555,7 +3548,7 @@ LONG CVTWindow::OnChangeTBar(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(lParam)) {
 		case FD_READ:  // TCP/IP
@@ -3585,7 +3578,7 @@ LONG CVTWindow::OnCommNotify(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnCommOpen(WPARAM wParam, LPARAM lParam)
 {
 	AutoDisconnectedPort = -1;
 
@@ -3680,7 +3673,7 @@ LONG CVTWindow::OnCommOpen(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnCommStart(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnCommStart(WPARAM wParam, LPARAM lParam)
 {
 	// 自動接続が無効のときも接続ダイアログを出すようにした (2006.9.15 maya)
 	if (((ts.PortType!=IdSerial) && (ts.HostName[0]==0)) ||
@@ -3706,7 +3699,7 @@ LONG CVTWindow::OnCommStart(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnDdeEnd(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 {
 	EndDDE();
 	if (CloseTT) {
@@ -3715,42 +3708,42 @@ LONG CVTWindow::OnDdeEnd(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CVTWindow::OnDlgHelp(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	OpenHelp(HH_HELP_CONTEXT, HelpId, ts.UILanguageFile);
 	return 0;
 }
 
-LONG CVTWindow::OnFileTransEnd(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnFileTransEnd(WPARAM wParam, LPARAM lParam)
 {
 	FileTransEnd(wParam);
 	return 0;
 }
 
-LONG CVTWindow::OnGetSerialNo(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnGetSerialNo(WPARAM wParam, LPARAM lParam)
 {
 	return (LONG)SerialNo;
 }
 
-LONG CVTWindow::OnKeyCode(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnKeyCode(WPARAM wParam, LPARAM lParam)
 {
 	KeyCodeSend(wParam,(WORD)lParam);
 	return 0;
 }
 
-LONG CVTWindow::OnProtoEnd(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnProtoEnd(WPARAM wParam, LPARAM lParam)
 {
 	ProtoDlgCancel();
 	return 0;
 }
 
-LONG CVTWindow::OnChangeTitle(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnChangeTitle(WPARAM wParam, LPARAM lParam)
 {
 	ChangeTitle();
 	return 0;
 }
 
-LONG CVTWindow::OnNotifyIcon(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == 1) {
 		switch (lParam) {
@@ -3994,7 +3987,7 @@ void CVTWindow::OnCygwinConnection()
 	char file[MAX_PATH], *filename;
 	char c, *envptr, *envbuff=NULL;
 	int envbufflen;
-	char *exename = "cygterm.exe";
+	const char *exename = "cygterm.exe";
 	char cygterm[MAX_PATH];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -4078,7 +4071,7 @@ found_path:;
 //
 void CVTWindow::OnTTMenuLaunch()
 {
-	char *exename = "ttpmenu.exe";
+	const char *exename = "ttpmenu.exe";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
@@ -4086,7 +4079,7 @@ void CVTWindow::OnTTMenuLaunch()
 	GetStartupInfo(&si);
 	memset(&pi, 0, sizeof(pi));
 
-	if (CreateProcess(NULL, exename, NULL, NULL, FALSE, 0,
+	if (CreateProcess(NULL, (LPSTR)exename, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
 		char buf[80];
 		char uimsg[MAX_UIMSG];
@@ -4137,35 +4130,18 @@ void CVTWindow::OnFileLog()
 
 static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_COMMENT_TITLE" },
+		{ IDOK, "BTN_OK" }
+	};
 	char buf[256];
 	UINT ret;
-	LOGFONT logfont;
-	HFONT font;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 		case WM_INITDIALOG:
-			//SetDlgItemText(hDlgWnd, IDC_EDIT_COMMENT, "サンプル");
 			// エディットコントロールにフォーカスをあてる
 			SetFocus(GetDlgItem(hDlgWnd, IDC_EDIT_COMMENT));
-
-			font = (HFONT)SendMessage(hDlgWnd, WM_GETFONT, 0, 0);
-			GetObject(font, sizeof(LOGFONT), &logfont);
-			if (get_lang_font("DLG_SYSTEM_FONT", hDlgWnd, &logfont, &DlgCommentFont, ts.UILanguageFile)) {
-				SendDlgItemMessage(hDlgWnd, IDC_EDIT_COMMENT, WM_SETFONT, (WPARAM)DlgCommentFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hDlgWnd, IDOK, WM_SETFONT, (WPARAM)DlgCommentFont, MAKELPARAM(TRUE,0));
-			}
-			else {
-				DlgCommentFont = NULL;
-			}
-
-			GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_COMMENT_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetWindowText(hDlgWnd, ts.UIMsg);
-			GetDlgItemText(hDlgWnd, IDOK, uimsg, sizeof(uimsg));
-			get_lang_msg("BTN_OK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hDlgWnd, IDOK, ts.UIMsg);
-
+			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 			return FALSE;
 
 		case WM_COMMAND:
@@ -4177,16 +4153,13 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 						//buf[sizeof(buf) - 1] = '\0';  // null-terminate
 						CommentLogToFile(buf, ret);
 					}
-					if (DlgCommentFont != NULL) {
-						DeleteObject(DlgCommentFont);
-					}
-					EndDialog(hDlgWnd, IDOK);
+					TTEndDialog(hDlgWnd, IDOK);
 					break;
 				default:
 					return FALSE;
 			}
 		case WM_CLOSE:
-			EndDialog(hDlgWnd, 0);
+			TTEndDialog(hDlgWnd, 0);
 			return TRUE;
 
 		default:
@@ -4197,17 +4170,10 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 
 void CVTWindow::OnCommentToLog()
 {
-	DWORD ret;
-
 	// ログファイルへコメントを追加する (2004.8.6 yutaka)
-	ret = DialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
-	                HVTWin, (DLGPROC)OnCommentDlgProc);
-	if (ret == 0 || ret == -1) {
-		ret = GetLastError();
-	}
-
+	TTDialogBox(hInst, MAKEINTRESOURCE(IDD_COMMENT_DIALOG),
+				HVTWin, (DLGPROC)OnCommentDlgProc);
 }
-
 
 // ログの閲覧 (2005.1.29 yutaka)
 void CVTWindow::OnViewLog()
@@ -4255,7 +4221,7 @@ void CVTWindow::OnReplayLog()
 	OPENFILENAME ofn;
 	char szFile[MAX_PATH];
 	char Command[MAX_PATH] = "notepad.exe";
-	char *exec = "ttermpro";
+	const char *exec = "ttermpro";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	char uimsg[MAX_UIMSG];
@@ -4973,11 +4939,18 @@ error:
 
 static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_SETUPDIR_TITLE" },
+		{ IDC_INI_SETUPDIR_GROUP, "DLG_SETUPDIR_INIFILE" },
+		{ IDC_KEYCNF_SETUPDIR_GROUP, "DLG_SETUPDIR_KEYBOARDFILE" },
+		{ IDC_CYGTERM_SETUPDIR_GROUP, "DLG_SETUPDIR_CYGTERMFILE" },
+		{ IDC_SSH_SETUPDIR_GROUP, "DLG_SETUPDIR_KNOWNHOSTSFILE" },
+	};
 	static char teratermexepath[MAX_PATH];
 	static char inipath[MAX_PATH], inifilename[MAX_PATH], inipath_vstore[1024];
 	static char keycnfpath[MAX_PATH], keycnffilename[MAX_PATH], keycnfpath_vstore[1024];
 	static char cygtermpath[MAX_PATH], cygtermfilename[MAX_PATH], cygtermpath_vstore[1024];
-	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH], eterm1path_vstore[1024];
+//	static char eterm1path[MAX_PATH], eterm1filename[MAX_PATH], eterm1path_vstore[1024];
 	char temp[MAX_PATH];
 	char tmpbuf[1024];
 	typedef int (CALLBACK *PSSH_read_known_hosts_file)(char *, int);
@@ -4988,30 +4961,11 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 	BOOL open_dir, ret;
 	int button_pressed;
 	HWND hWnd;
-	char uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
 		// I18N
-		GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
-		get_lang_msg("DLG_SETUPDIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		SetWindowText(hDlgWnd, ts.UIMsg);
-
-		GetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
-		get_lang_msg("DLG_SETUPDIR_INIFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_INI_SETUPDIR_GROUP, ts.UIMsg);
-
-		GetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
-		get_lang_msg("DLG_SETUPDIR_KEYBOARDFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_KEYCNF_SETUPDIR_GROUP, ts.UIMsg);
-
-		GetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
-		get_lang_msg("DLG_SETUPDIR_CYGTERMFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_CYGTERM_SETUPDIR_GROUP, ts.UIMsg);
-
-		GetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, uimsg, sizeof(uimsg));
-		get_lang_msg("DLG_SETUPDIR_KNOWNHOSTSFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		SetDlgItemText(hDlgWnd, IDC_SSH_SETUPDIR_GROUP, ts.UIMsg);
+		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
 		if (GetModuleFileName(NULL, temp, sizeof(temp)) != 0) {
 			ExtractDirName(temp, teratermexepath);
@@ -5227,9 +5181,6 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 			break;
 
 		case IDCANCEL:
-			if (DlgSetupdirFont != NULL) {
-				DeleteObject(DlgSetupdirFont);
-			}
 			TTEndDialog(hDlgWnd, IDCANCEL);
 			break;
 
@@ -5590,13 +5541,19 @@ static int CompareMulticastName(char *name)
 //
 static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_BROADCAST_TITLE" },
+		{ IDC_HISTORY_CHECK, "DLG_BROADCAST_HISTORY" },
+		{ IDC_ENTERKEY_CHECK, "DLG_BROADCAST_ENTER" },
+		{ IDC_PARENT_ONLY, "DLG_BROADCAST_PARENTONLY" },
+		{ IDC_REALTIME_CHECK, "DLG_BROADCAST_REALTIME" },
+		{ IDOK, "DLG_BROADCAST_SUBMIT" },
+		{ IDCANCEL, "BTN_CLOSE" },
+	};
 	char buf[256 + 3];
 	UINT ret;
 	LRESULT checked;
 	LRESULT history;
-	LOGFONT logfont;
-	HFONT font;
-	char uimsg[MAX_UIMSG];
 	char historyfile[MAX_PATH];
 	static HWND hwndBroadcast     = NULL; // Broadcast dropdown
 	static HWND hwndBroadcastEdit = NULL; // Edit control on Broadcast dropdown
@@ -5654,44 +5611,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			BroadcastWindowList = GetDlgItem(hWnd, IDC_LIST);
 			UpdateBroadcastWindowList(BroadcastWindowList);
 
-			font = (HFONT)SendMessage(hWnd, WM_GETFONT, 0, 0);
-			GetObject(font, sizeof(LOGFONT), &logfont);
-			if (get_lang_font("DLG_SYSTEM_FONT", hWnd, &logfont, &DlgBroadcastFont, ts.UILanguageFile)) {
-				SendDlgItemMessage(hWnd, IDC_COMMAND_EDIT, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDC_HISTORY_CHECK, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDC_RADIO_CRLF, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDC_RADIO_CR, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDC_RADIO_LF, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDC_ENTERKEY_CHECK, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDC_PARENT_ONLY, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));	// 337: 2007/03/20
-				SendDlgItemMessage(hWnd, IDC_REALTIME_CHECK, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDOK, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-				SendDlgItemMessage(hWnd, IDCANCEL, WM_SETFONT, (WPARAM)DlgBroadcastFont, MAKELPARAM(TRUE,0));
-			}
-			else {
-				DlgBroadcastFont = NULL;
-			}
-			GetWindowText(hWnd, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_BROADCAST_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetWindowText(hWnd, ts.UIMsg);
-			GetDlgItemText(hWnd, IDC_HISTORY_CHECK, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_BROADCAST_HISTORY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hWnd, IDC_HISTORY_CHECK, ts.UIMsg);
-			GetDlgItemText(hWnd, IDC_ENTERKEY_CHECK, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_BROADCAST_ENTER", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hWnd, IDC_ENTERKEY_CHECK, ts.UIMsg);
-			GetDlgItemText(hWnd, IDC_PARENT_ONLY, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_BROADCAST_PARENTONLY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hWnd, IDC_PARENT_ONLY, ts.UIMsg);
-			GetDlgItemText(hWnd, IDC_REALTIME_CHECK, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_BROADCAST_REALTIME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hWnd, IDC_REALTIME_CHECK, ts.UIMsg);
-			GetDlgItemText(hWnd, IDOK, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_BROADCAST_SUBMIT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hWnd, IDOK, ts.UIMsg);
-			GetDlgItemText(hWnd, IDCANCEL, uimsg, sizeof(uimsg));
-			get_lang_msg("BTN_CLOSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hWnd, IDCANCEL, ts.UIMsg);
+			// I18N
+			SetDlgTexts(hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
 			// ダイアログの初期サイズを保存
 			GetWindowRect(hWnd, &rc_dlg);
@@ -5890,9 +5811,6 @@ skip:;
 		case WM_CLOSE:
 			//DestroyWindow(hWnd);
 			EndDialog(hWnd, 0);
-			if (DlgBroadcastFont != NULL) {
-				DeleteObject(DlgBroadcastFont);
-			}
 			return TRUE;
 
 		case WM_SIZE:
@@ -6031,7 +5949,7 @@ activate:;
 }
 
 // WM_COPYDATAの受信
-LONG CVTWindow::OnReceiveIpcMessage(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 {
 	COPYDATASTRUCT *cds;
 	char *buf, *msg, *name;

@@ -571,7 +571,7 @@ void CTEKWindow::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 }
 
-void CTEKWindow::OnTimer(UINT nIDEvent)
+void CTEKWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	UINT T;
 
@@ -590,7 +590,7 @@ void CTEKWindow::OnTimer(UINT nIDEvent)
 	}
 }
 
-LONG CTEKWindow::OnAccelCommand(UINT wParam, LONG lParam)
+LRESULT CTEKWindow::OnAccelCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 		case IdPrint:
@@ -632,7 +632,7 @@ LONG CTEKWindow::OnAccelCommand(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CTEKWindow::OnChangeMenu(UINT wParam, LONG lParam)
+LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 {
 	HMENU SysMenu;
 	BOOL Show, B1, B2;
@@ -685,7 +685,7 @@ LONG CTEKWindow::OnChangeMenu(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CTEKWindow::OnChangeTBar(UINT wParam, LONG lParam)
+LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 {
 	BOOL TBar;
 	DWORD Style;
@@ -719,13 +719,13 @@ LONG CTEKWindow::OnChangeTBar(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CTEKWindow::OnDlgHelp(UINT wParam, LONG lParam)
+LRESULT CTEKWindow::OnDlgHelp(WPARAM wParam, LPARAM lParam)
 {
 	OpenHelp(HH_HELP_CONTEXT, HelpId, ts.UILanguageFile);
 	return 0;
 }
 
-LONG CTEKWindow::OnGetSerialNo(UINT wParam, LONG lParam)
+LRESULT CTEKWindow::OnGetSerialNo(WPARAM wParam, LPARAM lParam)
 {
 	return (LONG)SerialNo;
 }

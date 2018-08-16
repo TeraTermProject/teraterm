@@ -47,5 +47,4 @@ public:
 private:
 	BOOL *m_pAbort;
 	TTTSet *m_ts;
-	HFONT m_hNewFont;
 };

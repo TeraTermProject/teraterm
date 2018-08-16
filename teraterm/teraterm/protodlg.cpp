@@ -61,8 +61,6 @@ BOOL CProtoDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet p
 
 void CProtoDlg::OnInitDialog()
 {
-	TTTSet *ts = m_pts;
-
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_PROT_FILENAME, "DLG_PROT_FILENAME" },
 		{ IDC_PROT_PROT, "DLG_PROT_PROTO" },

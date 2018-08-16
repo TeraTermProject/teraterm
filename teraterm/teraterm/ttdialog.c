@@ -31,7 +31,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplug.h" /* TTPLUG */
-
+#include "ttdlg.h"
 #include "ttdialog.h"
 #include "ttwinman.h"
 

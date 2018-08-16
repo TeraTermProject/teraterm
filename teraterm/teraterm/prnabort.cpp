@@ -63,13 +63,7 @@ void CPrnAbortDlg::OnInitDialog()
 		{ IDC_PRNABORT_PRINTING, "DLG_PRNABORT_PRINTING" }, 
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	static const int FontIDs[] = {
-		IDC_PRNABORT_PRINTING, IDCANCEL
-	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), m_ts->UILanguageFile);
-	m_hNewFont =
-		SetDlgFonts(m_hWnd, FontIDs, _countof(FontIDs),
-					m_ts->UILanguageFile, "DLG_SYSTEM_FONT");
 }
 
 void CPrnAbortDlg::OnCancel()
@@ -80,6 +74,5 @@ void CPrnAbortDlg::OnCancel()
 
 void CPrnAbortDlg::PostNcDestroy()
 {
-	::DeleteObject(m_hNewFont);
 	TTCDialog::DestroyWindow();
 }

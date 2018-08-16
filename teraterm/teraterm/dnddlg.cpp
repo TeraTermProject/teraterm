@@ -56,27 +56,11 @@ struct DrapDropDlgParam {
 };
 
 struct DrapDropDlgData {
-#if 0
-	HFONT hNewFont;
-#endif
 	DrapDropDlgParam *Param;
 };
 
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-#if 0
-	static const int FontIDs[] = {
-		IDC_FILENAME_EDIT,
-		IDC_DAD_STATIC,
-		IDC_SCP_RADIO, IDC_SENDFILE_RADIO, IDC_PASTE_RADIO,
-		IDC_SCP_PATH_LABEL, IDC_SCP_PATH, IDC_SCP_PATH_NOTE,
-		IDC_BINARY_CHECK,
-		IDC_ESCAPE_CHECK, IDC_NEWLINE_RADIO, IDC_SPACE_RADIO,
-		IDC_SAME_PROCESS_CHECK, IDC_SAME_PROCESS_NEXTDROP_CHECK, IDC_DONTSHOW_CHECK,
-		IDC_DAD_NOTE,
-		IDOK, IDCANCEL,
-	};
-#endif
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_DANDD_TITLE" },
 		{ IDC_DAD_STATIC, "DLG_DANDD_TEXT" },
@@ -105,9 +89,6 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)DlgData);
 		DrapDropDlgParam *Param = (DrapDropDlgParam *)lp;
 		DlgData->Param = Param;
-#if 0
-		DlgData->hNewFont = SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs), Param->UILanguageFile, NULL);
-#endif
 		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
 
 		// target file
@@ -258,12 +239,6 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		return FALSE;
 	}
 	case WM_NCDESTROY:
-#if 0
-		if (DlgData->hNewFont != NULL) {
-			DeleteObject(DlgData->hNewFont);
-			DlgData->hNewFont = NULL;
-		}
-#endif
 		free(DlgData);
 		break;
 

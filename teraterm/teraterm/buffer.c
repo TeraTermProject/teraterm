@@ -33,6 +33,7 @@
 #include "tttypes.h"
 #include <string.h>
 #include <stdio.h>
+#include <windows.h>
 
 #include "ttwinman.h"
 #include "teraprn.h"

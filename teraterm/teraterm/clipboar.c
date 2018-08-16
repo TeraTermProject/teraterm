@@ -813,7 +813,7 @@ BOOL CBSetClipboard(HWND owner, HGLOBAL hMem)
 	char *buf;
 	int wide_len;
 	HGLOBAL wide_hMem;
-	LPWSTR wide_buf;
+	LPWSTR wide_buf = 0;
 
 	if (OpenClipboard(owner) == 0)
 		return FALSE;
@@ -860,7 +860,11 @@ HGLOBAL CBAllocClipboardMem(char *text)
 
 static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	char uimsg[MAX_UIMSG];
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_CLIPBOARD_TITLE" },
+		{ IDCANCEL, "BTN_CANCEL" },
+		{ IDOK, "BTN_OK" },
+	};
 	POINT p;
 	RECT rc_dsk, rc_dlg;
 	int dlg_height, dlg_width;
@@ -868,19 +872,11 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 	RECT rc_edit, rc_ok, rc_cancel;
 	// for status bar
 	static HWND hStatus = NULL;
-	static init_width, init_height;
+	static int init_width, init_height;
 
 	switch (msg) {
 		case WM_INITDIALOG:
-			GetWindowText(hDlgWnd, uimsg, sizeof(uimsg));
-			get_lang_msg("DLG_CLIPBOARD_TITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetWindowText(hDlgWnd, ts.UIMsg);
-			GetDlgItemText(hDlgWnd, IDCANCEL, uimsg, sizeof(uimsg));
-			get_lang_msg("BTN_CANCEL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hDlgWnd, IDCANCEL, ts.UIMsg);
-			GetDlgItemText(hDlgWnd, IDOK, uimsg, sizeof(uimsg));
-			get_lang_msg("BTN_OK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-			SetDlgItemText(hDlgWnd, IDOK, ts.UIMsg);
+			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
 			SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_SETTEXT, 0, (LPARAM)CBMemPtr);
 

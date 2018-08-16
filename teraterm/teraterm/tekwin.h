@@ -82,12 +82,12 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg LONG OnAccelCommand(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeMenu(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeTBar(UINT wParam, LONG lParam);
-	afx_msg LONG OnDlgHelp(UINT wParam, LONG lParam);
-	afx_msg LONG OnGetSerialNo(UINT wParam, LONG lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDlgHelp(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGetSerialNo(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnFilePrint();
 	afx_msg void OnFileExit();
 	afx_msg void OnEditCopy();

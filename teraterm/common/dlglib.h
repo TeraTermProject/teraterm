@@ -50,7 +50,7 @@ void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
 typedef struct {
 	int nIDDlgItem;
-	char *key;
+	const char *key;
 } DlgTextInfo;
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,

@@ -329,6 +329,7 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		}
 
 		// timestampチェックボックス (2006.7.23 maya)
+		TsFlag = FALSE;
 		ShowDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		if (BinFlag) {
 			// Binaryフラグが有効なときはチェックできない

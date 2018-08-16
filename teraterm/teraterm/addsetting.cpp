@@ -52,7 +52,7 @@
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
-mouse_cursor_t MouseCursor[] = {
+const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
 	{"IBEAM", IDC_IBEAM},
 	{"CROSS", IDC_CROSS},
