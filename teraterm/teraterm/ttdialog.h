@@ -54,6 +54,8 @@ typedef BOOL (PASCAL *PSetupGeneral)
   (HWND WndParent, PTTSet ts);
 typedef BOOL (PASCAL *PWindowWindow)
   (HWND WndParent, PBOOL Close);
+typedef BOOL (PASCAL *PTTDLGSetUILanguageFile)
+  (char *file);
 
 extern PSetupTerminal SetupTerminal;
 extern PSetupWin SetupWin;
@@ -66,8 +68,7 @@ extern PAboutDialog AboutDialog;
 extern PChooseFontDlg ChooseFontDlg;
 extern PSetupGeneral SetupGeneral;
 extern PWindowWindow WindowWindow;
-
-extern void PASCAL TTDLGSetUILanguageFile(char *file);
+extern PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
 
 /* proto types */
 BOOL LoadTTDLG();

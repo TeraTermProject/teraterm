@@ -49,6 +49,7 @@ PAboutDialog AboutDialog;
 PChooseFontDlg ChooseFontDlg;
 PSetupGeneral SetupGeneral;
 PWindowWindow WindowWindow;
+PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
 
 #define IdSetupTerminal   1
 #define IdSetupWin        2
@@ -60,7 +61,8 @@ PWindowWindow WindowWindow;
 #define IdAboutDialog     8
 #define IdChooseFontDlg   9
 #define IdSetupGeneral    10
-#define IdWindowWindow	  11
+#define IdWindowWindow    11
+#define IdTTDLGSetUILanguageFile  12
 
 BOOL LoadTTDLG()
 {
@@ -72,9 +74,8 @@ BOOL LoadTTDLG()
 		HTTDLG = LoadHomeDLL("TTPDLG.DLL");
 		if (HTTDLG==NULL) return FALSE;
 
-		TTDLGSetUILanguageFile(ts.UILanguageFile);
-
 		Err = FALSE;
+
 		SetupTerminal = (PSetupTerminal)GetProcAddress(HTTDLG,
 		  MAKEINTRESOURCE(IdSetupTerminal));
 		if (SetupTerminal==NULL) {
@@ -139,6 +140,15 @@ BOOL LoadTTDLG()
 		  MAKEINTRESOURCE(IdWindowWindow));
 		if (WindowWindow==NULL) {
 			Err = TRUE;
+		}
+
+		TTDLGSetUILanguageFile = (PTTDLGSetUILanguageFile)GetProcAddress(HTTDLG,
+		  MAKEINTRESOURCE(IdTTDLGSetUILanguageFile));
+		if (TTDLGSetUILanguageFile==NULL) {
+			Err = TRUE;
+		}
+		else {
+			TTDLGSetUILanguageFile(ts.UILanguageFile);
 		}
 
 		if (Err) {

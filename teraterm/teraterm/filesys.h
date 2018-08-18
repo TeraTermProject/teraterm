@@ -50,6 +50,10 @@ typedef void (PASCAL *PProtoTimeOutProc)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
 typedef BOOL (PASCAL *PProtoCancel)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
+typedef BOOL (PASCAL *PTTFILESetUILanguageFile)
+  (char *file);
+typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
+  (char *file);
 
 extern PGetSetupFname GetSetupFname;
 extern PGetTransFname GetTransFname;
@@ -61,6 +65,8 @@ extern PProtoInit ProtoInit;
 extern PProtoParse ProtoParse;
 extern PProtoTimeOutProc ProtoTimeOutProc;
 extern PProtoCancel ProtoCancel;
+extern PTTFILESetUILanguageFile TTFILESetUILanguageFile;
+extern PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 
 BOOL LoadTTFILE();
 BOOL FreeTTFILE();

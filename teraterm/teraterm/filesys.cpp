@@ -100,6 +100,8 @@ PProtoInit ProtoInit;
 PProtoParse ProtoParse;
 PProtoTimeOutProc ProtoTimeOutProc;
 PProtoCancel ProtoCancel;
+PTTFILESetUILanguageFile TTFILESetUILanguageFile;
+PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 
 #define IdGetSetupFname  1
 #define IdGetTransFname  2
@@ -112,6 +114,9 @@ PProtoCancel ProtoCancel;
 #define IdProtoParse	 8
 #define IdProtoTimeOutProc 9
 #define IdProtoCancel	 10
+
+#define IdTTFILESetUILanguageFile 11
+#define IdTTFILESetFileSendFilter 12
 
 /*
    Line Head flag for timestamping
@@ -148,10 +153,8 @@ BOOL LoadTTFILE()
 	if (HTTFILE == NULL)
 		return FALSE;
 
-	TTFILESetUILanguageFile(ts.UILanguageFile);
-	TTFILESetFileSendFilter(ts.FileSendFilter);
-
 	Err = FALSE;
+
 	GetSetupFname = (PGetSetupFname)GetProcAddress(HTTFILE,
 	                                               MAKEINTRESOURCE(IdGetSetupFname));
 	if (GetSetupFname==NULL)
@@ -201,6 +204,24 @@ BOOL LoadTTFILE()
 	                                           MAKEINTRESOURCE(IdProtoCancel));
 	if (ProtoCancel==NULL)
 		Err = TRUE;
+
+	TTFILESetUILanguageFile = (PTTFILESetUILanguageFile)GetProcAddress(HTTFILE,
+	                                                                   MAKEINTRESOURCE(IdTTFILESetUILanguageFile));
+	if (TTFILESetUILanguageFile==NULL) {
+		Err = TRUE;
+	}
+	else {
+		TTFILESetUILanguageFile(ts.UILanguageFile);
+	}
+
+	TTFILESetFileSendFilter = (PTTFILESetFileSendFilter)GetProcAddress(HTTFILE,
+	                                                                   MAKEINTRESOURCE(IdTTFILESetFileSendFilter));
+	if (TTFILESetFileSendFilter==NULL) {
+		Err = TRUE;
+	}
+	else {
+		TTFILESetFileSendFilter(ts.FileSendFilter);
+	}
 
 	if (Err)
 	{
