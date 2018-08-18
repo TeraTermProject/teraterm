@@ -361,7 +361,7 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 {
 	int i;
 	for (i = 0 ; i < infoCount; i++) {
-		char *key = infos[i].key;
+		const char *key = infos[i].key;
 		char uimsg[MAX_UIMSG];
 		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
 		if (uimsg[0] != '\0') {
@@ -378,14 +378,13 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
                   const char *UILanguageFile, PCHAR key)
 {
-	HFONT hPrevFont;
+	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
 	LOGFONT logfont;
 	HFONT hNewFont;
-	int i;
 	if (key == NULL) key = "DLG_TAHOMA_FONT";
-	hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
 	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
 	if (get_lang_font(key, hDlg, &logfont, &hNewFont, UILanguageFile)) {
+		int i;
 		for (i = 0 ; i < nIDDlgItemCount ; i++) {
 			const int nIDDlgItem = nIDDlgItems[i];
 			SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE,0));
