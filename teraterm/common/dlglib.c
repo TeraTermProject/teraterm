@@ -359,7 +359,8 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
 {
-	for (int i = 0 ; i < infoCount; i++) {
+	int i;
+	for (i = 0 ; i < infoCount; i++) {
 		char *key = infos[i].key;
 		char uimsg[MAX_UIMSG];
 		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
@@ -375,15 +376,17 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 }
 
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-				  const char *UILanguageFile, PCHAR key)
+                  const char *UILanguageFile, PCHAR key)
 {
-	if (key == NULL) key = "DLG_TAHOMA_FONT";
-	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
+	HFONT hPrevFont;
 	LOGFONT logfont;
-	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
 	HFONT hNewFont;
+	int i;
+	if (key == NULL) key = "DLG_TAHOMA_FONT";
+	hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
+	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
 	if (get_lang_font(key, hDlg, &logfont, &hNewFont, UILanguageFile)) {
-		for (int i = 0 ; i < nIDDlgItemCount ; i++) {
+		for (i = 0 ; i < nIDDlgItemCount ; i++) {
 			const int nIDDlgItem = nIDDlgItems[i];
 			SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE,0));
 		}
