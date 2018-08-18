@@ -361,7 +361,7 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 {
 	int i;
 	for (i = 0 ; i < infoCount; i++) {
-		const char *key = infos[i].key;
+		char *key = infos[i].key;
 		char uimsg[MAX_UIMSG];
 		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
 		if (uimsg[0] != '\0') {
