@@ -376,7 +376,7 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 }
 
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-				  const char *UILanguageFile, PCHAR key)
+                  const char *UILanguageFile, PCHAR key)
 {
 	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
 	LOGFONT logfont;
