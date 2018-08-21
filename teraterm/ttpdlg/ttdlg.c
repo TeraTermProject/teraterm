@@ -91,7 +91,7 @@ static const TCHAR *KanjiOutList[] = {"^[(B","^[(J",NULL};
 static const TCHAR *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
 static const TCHAR *RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
 static const TCHAR *RussList2[] = {"Windows","KOI8-R",NULL};
-static const TCHAR *LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
+//static const TCHAR *LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
 static const TCHAR *MetaList[] = {"off", "on", "left", "right", NULL};
 static const TCHAR *MetaList2[] = {"off", "on", NULL};
 

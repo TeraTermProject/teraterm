@@ -120,7 +120,7 @@ BOOL CMsgDlg::OnInitDialog()
 	return TRUE;
 }
 
-LONG CMsgDlg::OnExitSizeMove(UINT wParam, LONG lParam)
+LRESULT CMsgDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
 

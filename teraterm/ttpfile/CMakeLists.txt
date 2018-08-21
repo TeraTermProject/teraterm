@@ -43,7 +43,7 @@ include_directories(
   ../common
   )
 
-if(${MINGW})
+if(MINGW)
   link_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
 	)
@@ -53,6 +53,14 @@ add_library(
   ttpfile SHARED
   ${SRC}
   )
+
+if(MINGW)
+  set_target_properties(
+	ttpfile
+	PROPERTIES PREFIX ""
+	SUFFIX ".dll"
+	)
+endif()
 
 target_link_libraries(
   ttpfile

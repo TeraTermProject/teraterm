@@ -220,27 +220,13 @@ static BOOL IsLoadImageOnlyEnabled(void)
 	return !IsWindowsVistaOrLater();
 }
 
-
-void dprintf(char *format, ...)
-{
-  va_list args;
-  char    buffer[1024];
-
-  va_start(args,format);
-
-  _vsnprintf_s(buffer,sizeof(buffer),_TRUNCATE,format,args);
-  strncat_s(buffer,sizeof(buffer),"\n",_TRUNCATE);
-
-  OutputDebugString(buffer);
-}
-
 HBITMAP CreateScreenCompatibleBitmap(int width,int height)
 {
   HDC     hdc;
   HBITMAP hbm;
 
   #ifdef _DEBUG
-    dprintf("CreateScreenCompatibleBitmap : width = %d height = %d",width,height);
+    OutputDebugPrintf("CreateScreenCompatibleBitmap : width = %d height = %d\n",width,height);
   #endif
 
   hdc = GetDC(NULL);
@@ -251,7 +237,7 @@ HBITMAP CreateScreenCompatibleBitmap(int width,int height)
 
   #ifdef _DEBUG
     if(!hbm)
-      dprintf("CreateScreenCompatibleBitmap : fail in CreateCompatibleBitmap");
+      OutputDebugPrintf("CreateScreenCompatibleBitmap : fail in CreateCompatibleBitmap\n");
   #endif
 
   return hbm;
@@ -264,7 +250,7 @@ HBITMAP CreateDIB24BPP(int width,int height,unsigned char **buf,int *lenBuf)
   BITMAPINFO bmi;
 
   #ifdef _DEBUG
-    dprintf("CreateDIB24BPP : width = %d height = %d",width,height);
+    OutputDebugPrintf("CreateDIB24BPP : width = %d height = %d\n",width,height);
   #endif
 
   if(!width || !height)
@@ -296,7 +282,7 @@ HDC  CreateBitmapDC(HBITMAP hbm)
   HDC hdc;
 
   #ifdef _DEBUG
-    dprintf("CreateBitmapDC : hbm = %x",hbm);
+    OutputDebugPrintf("CreateBitmapDC : hbm = %x\n",hbm);
   #endif
 
   hdc = CreateCompatibleDC(NULL);
@@ -312,7 +298,7 @@ void DeleteBitmapDC(HDC *hdc)
   HBITMAP hbm;
 
   #ifdef _DEBUG
-    dprintf("DeleteBitmapDC : *hdc = %x",hdc);
+    OutputDebugPrintf("DeleteBitmapDC : *hdc = %x\n",hdc);
   #endif
 
   if(!hdc)
@@ -338,7 +324,7 @@ void FillBitmapDC(HDC hdc,COLORREF color)
   HBRUSH  hBrush;
 
   #ifdef _DEBUG
-    dprintf("FillBitmapDC : hdc = %x color = %x",hdc,color);
+    OutputDebugPrintf("FillBitmapDC : hdc = %x color = %x\n",hdc,color);
   #endif
 
   if(!hdc)
@@ -588,7 +574,7 @@ void BGPreloadPicture(BGSrc *src)
   WIN32_FIND_DATA fd;
 
   #ifdef _DEBUG
-    dprintf("Preload Picture : %s",src->file);
+    OutputDebugPrintf("Preload Picture : %s\n",src->file);
   #endif
 
   //ファイルを読み込む
@@ -1265,7 +1251,7 @@ void BGSetupPrimary(BOOL forceSetup)
   CopyRect(&BGPrevRect,&rect);
 
   #ifdef _DEBUG
-    dprintf("BGSetupPrimary : BGInSizeMove = %d",BGInSizeMove);
+    OutputDebugPrintf("BGSetupPrimary : BGInSizeMove = %d\n",BGInSizeMove);
   #endif
 
   //作業用 DC 作成

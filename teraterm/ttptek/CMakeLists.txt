@@ -41,7 +41,7 @@ link_directories(
   ${SFMT_LIBRARY_DIRS}
   )
 
-if(${MINGW})
+if(MINGW)
   link_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
 	)
@@ -51,6 +51,14 @@ add_library(
   ttptek SHARED
   ${SRC}
   )
+
+if(MINGW)
+  set_target_properties(
+	ttptek
+	PROPERTIES PREFIX ""
+	SUFFIX ".dll"
+	)
+endif()
 
 target_link_libraries(
   ttptek

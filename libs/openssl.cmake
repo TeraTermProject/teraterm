@@ -1,5 +1,5 @@
 ﻿# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P openssl.cmake
-# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=Release -P openssl.cmake
+# cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -DCMAKE_CONFIGURATION_TYPE=Release -P openssl.cmake
 
 ####
 if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL ""))
@@ -53,7 +53,7 @@ set(SRC_ARC "openssl-1.0.2o.tar.xz")
 set(SRC_URL "https://www.openssl.org/source/openssl-1.0.2o.tar.gz")
 set(SRC_ARC_HASH_SHA256 ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d)
 
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/donwload/openssl")
+set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/openssl")
 
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/openssl/src_${TOOLSET}")
 set(SRC_DIR "${EXTRACT_DIR}/${SRC_DIR_BASE}")
@@ -78,6 +78,8 @@ file(DOWNLOAD
 
 find_program(
   PERL perl.exe
+  HINTS c:/Perl64/bin
+  HINTS c:/Perl/bin
   HINTS c:/cygwin/usr/bin
   HINTS c:/cygwin64/usr/bin
   )
@@ -141,7 +143,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
 	find_program(
 	  VCVARS32 vcvars32.bat
-	  HINTS "C:/Program Files (x86)/Microsoft Visual Studio 8.0/VC/bin"
+	  HINTS "C:/Program Files (x86)/Microsoft Visual Studio 8/VC/bin"
 	  )
   else()
 	message(FATAL_ERROR "CMAKE_GENERATOR ${CMAKE_GENERATOR} not supported")
@@ -167,13 +169,24 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   endif()
   file(TO_NATIVE_PATH ${PERL} PERL_N)
   file(TO_NATIVE_PATH ${INSTALL_DIR} INSTALL_DIR_N)
+  string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
   file(APPEND "${SRC_DIR}/build_cmake.bat"
 	"del crypto\\buildinf.h\n"
-	"${PERL_N} Configure no-asm ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N}\n"
-	"rem call ms\\do_ms.bat\n"
-	"${PERL_N} util/mkfiles.pl > MINFO\n"
-	"${PERL_N} util/mk1mf.pl no-asm VC-WIN32 > ms\\nt.mak\n"
-	"nmake -f ms\\nt.mak install\n"
+	"set PATH=${PERL_N_PATH};%PATH%\n"
+	)
+  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
+	## Visual Studio 2005 特別処理
+	# includeパスの設定
+	file(APPEND "${SRC_DIR}/build_cmake.bat"
+	  "set SDK=C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\n"
+	  "set INCLUDE=%SDK%\\Include;%INCLUDE%\n"
+	  "set LIB=%SDK%\\lib;%LIB%\n"
+	  )
+  endif()
+  file(APPEND "${SRC_DIR}/build_cmake.bat"
+	"perl Configure no-asm ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N}\n"
+	"call ms\\do_ms.bat\n"
+	"nmake -f ms\\nt.mak install ${NMAKE_OPTION}\n"
 	)
 
   set(BUILD_CMAKE_BAT "${SRC_DIR}/build_cmake.bat")

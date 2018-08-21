@@ -73,12 +73,12 @@ protected:
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg void OnSysColorChange();
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg LONG OnDdeCmndEnd(UINT wParam, LONG lParam);
-	afx_msg LONG OnDdeComReady(UINT wParam, LONG lParam);
-	afx_msg LONG OnDdeReady(UINT wParam, LONG lParam);
-	afx_msg LONG OnDdeEnd(UINT wParam, LONG lParam);
-	afx_msg LONG OnMacroBringup(UINT wParam, LONG lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg LRESULT OnDdeCmndEnd(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDdeComReady(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDdeReady(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDdeEnd(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnMacroBringup(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

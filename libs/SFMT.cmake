@@ -53,7 +53,7 @@ set(SRC_ARC "SFMT-1.5.1.zip")
 set(SRC_URL "http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/SFMT-src-1.5.1.zip")
 set(SRC_ARC_HASH_SHA256 630d1dfa6b690c30472f75fa97ca90ba62f9c13c5add6c264fdac2c1d3a878f4)
 
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/donwload/SFMT")
+set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/SFMT")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/src")
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/src/${SRC_DIR_BASE}")
 set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/build_${TOOLSET}")

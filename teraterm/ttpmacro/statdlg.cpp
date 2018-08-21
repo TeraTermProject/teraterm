@@ -158,7 +158,7 @@ void CStatDlg::PostNcDestroy()
 	delete this;
 }
 
-LONG CStatDlg::OnExitSizeMove(UINT wParam, LONG lParam)
+LRESULT CStatDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
 
@@ -178,7 +178,7 @@ LONG CStatDlg::OnExitSizeMove(UINT wParam, LONG lParam)
 	return CDialog::DefWindowProc(WM_EXITSIZEMOVE,wParam,lParam);
 }
 
-LONG CStatDlg::OnSetForceForegroundWindow(UINT wParam, LONG lParam)
+LRESULT CStatDlg::OnSetForceForegroundWindow(WPARAM wParam, LPARAM lParam)
 {
 	DWORD pid;
 	DWORD targetid;

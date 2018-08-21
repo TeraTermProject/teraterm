@@ -502,7 +502,7 @@ void CCtrlWindow::OnSysColorChange()
 	CDialog::OnSysColorChange();
 }
 
-void CCtrlWindow::OnTimer(UINT nIDEvent)
+void CCtrlWindow::OnTimer(UINT_PTR nIDEvent)
 {
 	BOOL TimeOut;
 
@@ -593,7 +593,7 @@ BOOL CCtrlWindow::PreTranslateMessage(MSG* pMsg)
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
-LONG CCtrlWindow::OnDdeCmndEnd(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeCmndEnd(WPARAM wParam, LPARAM lParam)
 {
 	if (TTLStatus == IdTTLWaitCmndResult) {
 		LockVar();
@@ -608,7 +608,7 @@ LONG CCtrlWindow::OnDdeCmndEnd(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnDdeComReady(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeComReady(WPARAM wParam, LPARAM lParam)
 {
 	ComReady = wParam;
 	if ((TTLStatus == IdTTLWait) ||
@@ -644,7 +644,7 @@ LONG CCtrlWindow::OnDdeComReady(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnDdeReady(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeReady(WPARAM wParam, LPARAM lParam)
 {
 	if (TTLStatus != IdTTLInitDDE) {
 		return 0;
@@ -662,7 +662,7 @@ LONG CCtrlWindow::OnDdeReady(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnDdeEnd(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnDdeEnd(WPARAM wParam, LPARAM lParam)
 {
 	EndDDE();
 	if ((TTLStatus == IdTTLWaitCmndEnd) ||
@@ -691,7 +691,7 @@ LONG CCtrlWindow::OnDdeEnd(UINT wParam, LONG lParam)
 	return 0;
 }
 
-LONG CCtrlWindow::OnMacroBringup(UINT wParam, LONG lParam)
+LRESULT CCtrlWindow::OnMacroBringup(WPARAM wParam, LPARAM lParam)
 {
 	DWORD pid;
 	DWORD thisThreadId;

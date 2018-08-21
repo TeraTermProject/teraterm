@@ -56,8 +56,8 @@ protected:
 
 	//{{AFX_MSG(CStatDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg LONG OnExitSizeMove(UINT wParam, LONG lParam);
-	afx_msg LONG OnSetForceForegroundWindow(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnSetForceForegroundWindow(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	void Relocation(BOOL is_init, int WW);
 	DECLARE_MESSAGE_MAP()

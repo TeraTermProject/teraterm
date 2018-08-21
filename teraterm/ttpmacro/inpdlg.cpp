@@ -135,7 +135,7 @@ void CInpDlg::OnOK()
 	EndDialog(IDOK);
 }
 
-LONG CInpDlg::OnExitSizeMove(UINT wParam, LONG lParam)
+LRESULT CInpDlg::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 {
 	RECT R;
 

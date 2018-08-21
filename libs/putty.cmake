@@ -5,7 +5,7 @@ set(SRC_ARC "putty-0.70.tar.gz")
 set(SRC_URL "https://the.earth.li/~sgtatham/putty/0.70/putty-0.70.tar.gz")
 set(SRC_ARC_HASH_SHA256 bb8aa49d6e96c5a8e18a057f3150a1695ed99a24eef699e783651d1f24e7b0be)
 
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/donwload/putty")
+set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/putty")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/putty/src")
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/putty/src/${SRC_DIR_BASE}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/putty")

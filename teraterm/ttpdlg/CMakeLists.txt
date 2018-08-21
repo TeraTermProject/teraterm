@@ -15,12 +15,18 @@ endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-if(${MINGW})
+if(MINGW)
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -I ${CMAKE_CURRENT_SOURCE_DIR}/../common")
 else()
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /i ${CMAKE_CURRENT_SOURCE_DIR}/../common")
 endif()
 
+if(MSVC)
+  set(SRC_DEF ttpdlg.def)
+else()
+  set(SRC_DEF ttpdlg_mingw.def)
+endif()
+  
 set(SRC
   ../common/dlglib.c
   ../common/dlglib.h
@@ -33,6 +39,7 @@ set(SRC
   ttpdlg.rc
   ttpdlg-version.rc
   ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
+  ${SRC_DEF}
   )
 
 include_directories(
@@ -41,7 +48,7 @@ include_directories(
   ${ONIGURUMA_INCLUDE_DIRS}
   )
 
-if(${MINGW})
+if(MINGW)
   link_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
 	${ONIGURUMA_LIBRARY_DIRS}
@@ -56,6 +63,14 @@ add_library(
   ttpdlg SHARED
   ${SRC}
   )
+
+if(MINGW)
+  set_target_properties(
+	ttpdlg
+	PROPERTIES PREFIX ""
+	SUFFIX ".dll"
+	)
+endif()
 
 target_link_libraries(
   ttpdlg

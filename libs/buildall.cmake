@@ -5,11 +5,6 @@ if("${CMAKE_GENERATOR}" STREQUAL "")
   message(FATAL_ERROR "set CMAKE_GENERATOR!")
 endif()
 
-# utf-8
-execute_process(
-  COMMAND cmd.exe /c chcp 65001
-  )
-
 # build
 execute_process(
   COMMAND ${CMAKE_COMMAND} -DCMAKE_GENERATOR=${CMAKE_GENERATOR} -P oniguruma.cmake

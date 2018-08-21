@@ -53,7 +53,7 @@ set(SRC_ARC "onig-6.8.2.tar.gz")
 set(SRC_URL "https://github.com/kkos/oniguruma/releases/download/v6.8.2/onig-6.8.2.tar.gz")
 set(SRC_ARC_HASH_SHA1 4bd58a64fcff233118dcdf6d1ad9607c67bdb878)
 
-set(DOWN_DIR "${CMAKE_SOURCE_DIR}/donwload/oniguruma")
+set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/oniguruma")
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src")
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/src/${SRC_DIR_BASE}")
 set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/oniguruma/build_${TOOLSET}")

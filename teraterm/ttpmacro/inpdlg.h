@@ -53,7 +53,7 @@ protected:
 	//{{AFX_MSG(CInpDlg)
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
-	afx_msg LONG OnExitSizeMove(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	void Relocation(BOOL is_init, int WW);
 	DECLARE_MESSAGE_MAP()

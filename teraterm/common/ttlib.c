@@ -1045,7 +1045,7 @@ BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
 	return ret;
 }
 
-void OutputDebugPrintf(char *fmt, ...) {
+void OutputDebugPrintf(const char *fmt, ...) {
 	char tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
@@ -1715,3 +1715,18 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body)
 
 	*body = p1;
 }
+
+#if 0
+void dprintf(char *format, ...)
+{
+	va_list args;
+	char    buffer[1024];
+
+	va_start(args,format);
+
+	_vsnprintf_s(buffer,sizeof(buffer),_TRUNCATE,format,args);
+	strncat_s(buffer,sizeof(buffer),"\n",_TRUNCATE);
+
+	OutputDebugString(buffer);
+}
+#endif

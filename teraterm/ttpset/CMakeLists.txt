@@ -25,7 +25,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   )
 
-if(${MINGW})
+if(MINGW)
   link_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
 	)
@@ -35,6 +35,14 @@ add_library(
   ttpset SHARED
   ${SRC}
   )
+
+if(MINGW)
+  set_target_properties(
+	ttpset
+	PROPERTIES PREFIX ""
+	SUFFIX ".dll"
+	)
+endif()
 
 target_link_libraries(
   ttpset
