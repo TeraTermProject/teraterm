@@ -29,7 +29,6 @@ set(SRC
   ../common/teraterm.ico
   dlg_res.h
   ttdlg.c
-  ttdlg.h
   ttpdlg.def
   ttpdlg.rc
   ttpdlg-version.rc
