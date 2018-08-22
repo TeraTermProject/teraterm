@@ -48,10 +48,10 @@ endif()
 
 include(script_support.cmake)
 
-set(SRC_DIR_BASE "openssl-1.0.2o")
-set(SRC_ARC "openssl-1.0.2o.tar.xz")
-set(SRC_URL "https://www.openssl.org/source/openssl-1.0.2o.tar.gz")
-set(SRC_ARC_HASH_SHA256 ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d)
+set(SRC_DIR_BASE "openssl-1.0.2p")
+set(SRC_ARC "openssl-1.0.2p.tar.gz")
+set(SRC_URL "https://www.openssl.org/source/openssl-1.0.2p.tar.gz")
+set(SRC_ARC_HASH_SHA256 50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00)
 
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/openssl")
 
@@ -161,22 +161,22 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   file(WRITE "${SRC_DIR}/build_cmake.bat"
 	"cd %~dp0\n"
 	)
+  file(TO_NATIVE_PATH ${PERL} PERL_N)
+  file(TO_NATIVE_PATH ${INSTALL_DIR} INSTALL_DIR_N)
+  string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
+  file(APPEND "${SRC_DIR}/build_cmake.bat"
+	"del crypto\\buildinf.h\n"
+	"set PATH=${PERL_N_PATH}\n"
+	)
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
 	file(TO_NATIVE_PATH ${VCVARS32} VCVARS32_N)
 	file(APPEND "${SRC_DIR}/build_cmake.bat"
 	  "call \"${VCVARS32_N}\"\n"
 	  )
   endif()
-  file(TO_NATIVE_PATH ${PERL} PERL_N)
-  file(TO_NATIVE_PATH ${INSTALL_DIR} INSTALL_DIR_N)
-  string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
-  file(APPEND "${SRC_DIR}/build_cmake.bat"
-	"del crypto\\buildinf.h\n"
-	"set PATH=${PERL_N_PATH};%PATH%\n"
-	)
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
 	## Visual Studio 2005 特別処理
-	# includeパスの設定
+	# include,libパスの設定
 	file(APPEND "${SRC_DIR}/build_cmake.bat"
 	  "set SDK=C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\n"
 	  "set INCLUDE=%SDK%\\Include;%INCLUDE%\n"

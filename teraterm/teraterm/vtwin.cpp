@@ -3887,7 +3887,7 @@ void CVTWindow::OnFileNewConnection()
 void CVTWindow::OnDuplicateSession()
 {
 	char Command[1024];
-	char *exec = "ttermpro";
+	const char *exec = "ttermpro";
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	char cygterm_cfg[MAX_PATH];

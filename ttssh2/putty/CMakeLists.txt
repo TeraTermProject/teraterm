@@ -2,7 +2,7 @@ project(libputty)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-if(${MINGW})
+if(MINGW)
   add_definitions("-D_WINDOWS")
 endif()
 
