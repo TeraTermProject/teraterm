@@ -44,7 +44,7 @@ BEGIN
     CONTROL         "Es&cape",IDC_ESCAPE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,125,188,10
     CONTROL         "Separat&or is Space",IDC_SPACE_RADIO,"Button",BS_AUTORADIOBUTTON,21,139,188,10
     CONTROL         "Separator is &NewLine",IDC_NEWLINE_RADIO,"Button",BS_AUTORADIOBUTTON,21,154,188,10
-    CONTROL         "&Do this for the next %d conflicts",IDC_SAME_PROCESS_CHECK,
+    CONTROL         "&Do this for the next %d files",IDC_SAME_PROCESS_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,173,236,10
     CONTROL         "Do sa&me process, next drop",IDC_SAME_PROCESS_NEXTDROP_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,188,236,10

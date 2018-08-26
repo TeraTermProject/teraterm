@@ -85,7 +85,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		{ IDC_ESCAPE_CHECK, "DLG_DANDD_PASTE_ESCAPE_CHECK" },
 		{ IDC_SPACE_RADIO, "DLG_DANDD_PASTE_SPACE_RADIO" },
 		{ IDC_NEWLINE_RADIO, "DLG_DANDD_PASTE_NEWLINE_RADIO" },
-		{ IDC_SAME_PROCESS_CHECK, "DLG_DANDD_CONFLICTS" },
+		{ IDC_SAME_PROCESS_CHECK, "DLG_DANDD_NEXTFILES" },
 		{ IDC_SAME_PROCESS_NEXTDROP_CHECK, "DLG_DANDD_SAME_NEEXTDROP" },
 		{ IDC_DONTSHOW_CHECK, "DLG_DANDD_DONTSHOW_NEEXTDROP" },
 		{ IDC_DAD_NOTE, "DLG_DANDD_NOTE" },
@@ -147,7 +147,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_NEWLINE_RADIO), FALSE);
 		}
 
-		// Do this for the next %d conflicts
+		// Do this for the next %d files
 		char orgmsg[MAX_UIMSG];
 		GetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
 		char uimsg[MAX_UIMSG];

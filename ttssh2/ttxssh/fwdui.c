@@ -409,13 +409,12 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 	char verbose_from_port[64];
 	char verbose_to_port[64];
 
-	set_verbose_port(verbose_from_port, sizeof(verbose_from_port),
-	                 spec->from_port, spec->from_port_name);
-	set_verbose_port(verbose_to_port, sizeof(verbose_to_port),
-	                 spec->to_port, spec->to_port_name);
-
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:
+		set_verbose_port(verbose_from_port, sizeof(verbose_from_port),
+		                 spec->from_port, spec->from_port_name);
+		set_verbose_port(verbose_to_port, sizeof(verbose_to_port),
+		                 spec->to_port, spec->to_port_name);
 		UTIL_get_lang_msg("MSG_FWD_REMOTE", pvar,
 		                  "Remote \"%s\" port %s to local \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
@@ -423,6 +422,10 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 		            spec->to_host, verbose_to_port);
 		break;
 	case FWD_LOCAL_TO_REMOTE:
+		set_verbose_port(verbose_from_port, sizeof(verbose_from_port),
+		                 spec->from_port, spec->from_port_name);
+		set_verbose_port(verbose_to_port, sizeof(verbose_to_port),
+		                 spec->to_port, spec->to_port_name);
 		UTIL_get_lang_msg("MSG_FWD_LOCAL", pvar,
 		                  "Local \"%s\" port %s to remote \"%s\" port %s");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
@@ -435,6 +438,8 @@ static void get_spec_string(FWDRequestSpec *spec, char *buf,
 		strncpy_s(buf, bufsize, pvar->ts->UIMsg, _TRUNCATE);
 		break;
 	case FWD_LOCAL_DYNAMIC:
+		set_verbose_port(verbose_from_port, sizeof(verbose_from_port),
+		                 spec->from_port, spec->from_port_name);
 		UTIL_get_lang_msg("MSG_FWD_DYNAMIC", pvar, "Local \"%s\" port %s to remote dynamic");
 		_snprintf_s(buf, bufsize, _TRUNCATE, pvar->ts->UIMsg,
 		            spec->bind_address, verbose_from_port);
