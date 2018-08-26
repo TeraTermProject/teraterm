@@ -33,8 +33,12 @@
 
 #include "ttsetup.h"
 #include "ttplug.h" /* TTPLUG */
+#include "ttutil.h"
 
 #include "ttwinman.h"
+
+static HANDLE HTTSET = NULL;
+static int UseCount = 0;
 
 PReadIniFile ReadIniFile;
 PWriteIniFile WriteIniFile;
@@ -45,73 +49,53 @@ PParseParam ParseParam;
 PCopySerialList CopySerialList;
 PAddValueToList AddValueToList;
 
-static HANDLE HTTSET = NULL;
+static const GetProcAddressList ProcList[] = {
+	{ &ReadIniFile, "ReadIniFile", 8 },
+	{ &WriteIniFile, "WriteIniFile", 8 },
+	{ &ReadKeyboardCnf, "ReadKeyboardCnf", 12 },
+	{ &CopyHostList, "CopyHostList", 8 },
+	{ &AddHostToList, "AddHostToList", 8 },
+	{ &ParseParam, "ParseParam", 12 },
+	{ &CopySerialList, "CopySerialList", 20 },
+	{ &AddValueToList, "AddValueToList", 20 },
+};
 
-#define IdReadIniFile     1
-#define IdWriteIniFile    2
-#define IdReadKeyboardCnf 3
-#define IdCopyHostList    4
-#define IdAddHostToList   5
-#define IdParseParam      6
-#define IdCopySerialList  7
-#define IdAddValueToList  8
+static void FreeTTSetCommon()
+{
+	FreeLibrary(HTTSET);
+	HTTSET = NULL;
+
+	ClearProcAddressses(ProcList, _countof(ProcList));
+}
 
 BOOL LoadTTSET()
 {
-  BOOL Err;
+	if (UseCount == 0) {
+		BOOL ret;
 
-  if (HTTSET != NULL) return TRUE;
-  HTTSET = LoadHomeDLL("TTPSET.DLL");
-  if (HTTSET == NULL) return FALSE;
+		HTTSET = LoadHomeDLL("TTPSET.DLL");
+		if (HTTSET == NULL) return FALSE;
 
-  Err = FALSE;
-  ReadIniFile =
-	(PReadIniFile)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdReadIniFile));
-  if (ReadIniFile==NULL) Err = TRUE;
+		ret = GetProcAddressses(HTTSET, ProcList, _countof(ProcList));
+		if (!ret) {
+			FreeTTSetCommon();
+			return FALSE;
+		}
 
-  WriteIniFile =
-	(PWriteIniFile)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdWriteIniFile));
-  if (WriteIniFile==NULL) Err = TRUE;
-
-  ReadKeyboardCnf =
-	(PReadKeyboardCnf)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdReadKeyboardCnf));
-  if (ReadKeyboardCnf==NULL) Err = TRUE;
-
-  CopyHostList =
-	(PCopyHostList)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdCopyHostList));
-  if (CopyHostList==NULL) Err = TRUE;
-
-  AddHostToList =
-	(PAddHostToList)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdAddHostToList));
-  if (AddHostToList==NULL) Err = TRUE;
-
-  ParseParam =
-	(PParseParam)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdParseParam));
-  if (ParseParam==NULL) Err = TRUE;
-
-  CopySerialList =
-	(PCopySerialList)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdCopySerialList));
-  if (CopySerialList==NULL) Err = TRUE;
-
-  AddValueToList =
-	(PAddValueToList)GetProcAddress(HTTSET, MAKEINTRESOURCE(IdAddValueToList));
-  if (AddValueToList==NULL) Err = TRUE;
-
-  if (Err)
-  {
-    FreeLibrary(HTTSET);
-    HTTSET = NULL;
-    return FALSE;
-  }
-  TTXGetSetupHooks(); /* TTPLUG */
-  return TRUE;
+		TTXGetSetupHooks(); /* TTPLUG */
+	}
+	UseCount++;
+	return TRUE;
 }
 
-void FreeTTSET()
+BOOL FreeTTSET()
 {
-  if (HTTSET != NULL)
-  {
-    FreeLibrary(HTTSET);
-    HTTSET = NULL;
-  }
+	if (UseCount == 0) {
+		return FALSE;
+	}
+	UseCount--;
+	if (UseCount == 0) {
+		FreeTTSetCommon();
+	}
+	return TRUE;
 }

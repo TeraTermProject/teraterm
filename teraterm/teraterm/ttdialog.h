@@ -32,29 +32,29 @@
 extern "C" {
 #endif
 
-typedef BOOL (PASCAL *PSetupTerminal)
+typedef BOOL (WINAPI *PSetupTerminal)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (PASCAL *PSetupWin)
+typedef BOOL (WINAPI *PSetupWin)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (PASCAL *PSetupKeyboard)
+typedef BOOL (WINAPI *PSetupKeyboard)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (PASCAL *PSetupSerialPort)
+typedef BOOL (WINAPI *PSetupSerialPort)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (PASCAL *PSetupTCPIP)
+typedef BOOL (WINAPI *PSetupTCPIP)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (PASCAL *PGetHostName)
+typedef BOOL (WINAPI *PGetHostName)
   (HWND WndParent, PGetHNRec GetHNRec);
-typedef BOOL (PASCAL *PChangeDirectory)
+typedef BOOL (WINAPI *PChangeDirectory)
   (HWND WndParent, PCHAR CurDir);
-typedef BOOL (PASCAL *PAboutDialog)
+typedef BOOL (WINAPI *PAboutDialog)
   (HWND WndParent);
-typedef BOOL (PASCAL *PChooseFontDlg)
+typedef BOOL (WINAPI *PChooseFontDlg)
   (HWND WndParent, LPLOGFONT LogFont, PTTSet ts);
-typedef BOOL (PASCAL *PSetupGeneral)
+typedef BOOL (WINAPI *PSetupGeneral)
   (HWND WndParent, PTTSet ts);
-typedef BOOL (PASCAL *PWindowWindow)
+typedef BOOL (WINAPI *PWindowWindow)
   (HWND WndParent, PBOOL Close);
-typedef BOOL (PASCAL *PTTDLGSetUILanguageFile)
+typedef BOOL (WINAPI *PTTDLGSetUILanguageFile)
   (char *file);
 
 extern PSetupTerminal SetupTerminal;

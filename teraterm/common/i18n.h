@@ -38,8 +38,21 @@
 extern "C" {
 #endif
 
-void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile);
+#if defined(TTPCMN_DLL)
+#if !defined(DllExport)
+#define DllExport __declspec(dllexport)
+#endif
+#elif defined(TTPCMN_IMPORT)
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
+#else
+#undef DllExport
+#define DllExport	// direct link
+#endif
+
+DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile);
 
 #ifdef __cplusplus
 }

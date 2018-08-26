@@ -38,12 +38,12 @@ extern "C" {
 
 /* This function initializes the extensions and is called at the beginning
    of the program. */
-void PASCAL TTXInit(PTTSet ts, PComVar cv);
+void WINAPI TTXInit(PTTSet ts, PComVar cv);
 
 /* This function is called when a TCP connection is about to be opened.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks);
+void WINAPI TTXInternalOpenTCP(TTXSockHooks * hooks);
 #define TTXOpenTCP()                                             \
   do {                                                           \
     static TTXSockHooks SockHooks = {                            \
@@ -59,7 +59,7 @@ void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks);
 /* This function is called when a TCP connection has been closed.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks);
+void WINAPI TTXInternalCloseTCP(TTXSockHooks * hooks);
 #define TTXCloseTCP()                                            \
   do {                                                           \
     static TTXSockHooks SockHooks = {                            \
@@ -72,7 +72,7 @@ void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks);
     TTXInternalCloseTCP(&SockHooks);                             \
   } while (0)
 
-void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks);
+void WINAPI TTXInternalOpenFile(TTXFileHooks * hooks);
 #define TTXOpenFile()                                            \
   do {                                                           \
     static TTXFileHooks FileHooks = {                            \
@@ -81,7 +81,7 @@ void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks);
     TTXInternalOpenFile(&FileHooks);                             \
   } while (0)
 
-void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks);
+void WINAPI TTXInternalCloseFile(TTXFileHooks * hooks);
 #define TTXCloseFile()                                           \
   do {                                                           \
     static TTXFileHooks FileHooks = {                            \
@@ -93,7 +93,7 @@ void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks);
 /* This function is called after the TTDLG DLL has been loaded.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks);
+void WINAPI TTXInternalGetUIHooks(TTXUIHooks * hooks);
 #define TTXGetUIHooks()                                            \
   do {                                                             \
     static TTXUIHooks UIHooks = {                                  \
@@ -107,7 +107,7 @@ void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks);
 /* This function is called after the TTSET DLL has been loaded.
    This macro stuff is to make sure that the functions in the caller's
    EXE or DLL are hooked. */
-void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks);
+void WINAPI TTXInternalGetSetupHooks(TTXSetupHooks * hooks);
 #define TTXGetSetupHooks()                                            \
   do {                                                                \
     static TTXSetupHooks SetupHooks = {                               \
@@ -118,27 +118,27 @@ void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks);
   } while (0)
 
 /* This function is called when the window size has changed. */
-void PASCAL TTXSetWinSize(int rows, int cols);
+void WINAPI TTXSetWinSize(int rows, int cols);
 
 /* This function adds the extensions' entries to the menu, which is the
    handle for the program's menubar. */
-void PASCAL TTXModifyMenu(HMENU menu);
+void WINAPI TTXModifyMenu(HMENU menu);
 
 /* This function is called when a popup menu is about to be displayed.
    The status of the entries is set appropriately. */
-void PASCAL TTXModifyPopupMenu(HMENU menu);
+void WINAPI TTXModifyPopupMenu(HMENU menu);
 
 /* This function calls on the extensions to handle a command. It returns
    TRUE if they handle it, otherwise FALSE. */
-BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd);
+BOOL WINAPI TTXProcessCommand(HWND hWin, WORD cmd);
 
 /* This function is called to see whether Telnet mode can be turned on when
    Tera Term thinks it has detected a telnetd */
-void PASCAL TTXEnd(void);
+void WINAPI TTXEnd(void);
 
 /* This function is called when a new Tera Term is being started with certain
    settings and the extension may wish to add some options to the command line */
-void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec);
+void WINAPI TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec);
 #ifdef __cplusplus
 }
 #endif

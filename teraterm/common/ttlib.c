@@ -34,12 +34,12 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
-#include "tttypes.h"
 #include <shlobj.h>
 #include <ctype.h>
+#include <mbctype.h>	// for _ismbblead
 
-// for _ismbblead
-#include <mbctype.h>
+#include "tttypes.h"
+#include "ttlib.h"
 
 /* OS version with GetVersionEx(*1)
 
@@ -210,7 +210,7 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 	return len;
 }
 
-BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos)
+BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos)
 {
 	BYTE b;
 	LPTSTR Ptr, DirPtr, FNPtr, PtrOld;
@@ -825,7 +825,7 @@ BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
 	return (i>=Nth);
 }
 
-void GetNthNum(PCHAR Source, int Nth, int far *Num)
+void GetNthNum(PCHAR Source, int Nth, int *Num)
 {
 	char T[15];
 
@@ -1605,7 +1605,7 @@ char *strelapsed(DWORD start_time)
 	return strtime;
 }
 
-PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
+PCHAR WINAPI GetParam(PCHAR buff, int size, PCHAR param)
 {
 	int i = 0;
 	BOOL quoted = FALSE;
@@ -1643,7 +1643,7 @@ PCHAR PASCAL GetParam(PCHAR buff, int size, PCHAR param)
 	return (param);
 }
 
-void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
+void WINAPI DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 {
 	BOOL quoted = FALSE;
 	PCHAR dest_end = dest + dest_len - 1;
@@ -1666,7 +1666,7 @@ void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src)
 	*dest = '\0';
 }
 
-void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src)
+void WINAPI DeleteComment(PCHAR dest, int dest_size, PCHAR src)
 {
 	BOOL quoted = FALSE;
 	PCHAR dest_end = dest + dest_size - 1;
@@ -1730,3 +1730,4 @@ void dprintf(char *format, ...)
 	OutputDebugString(buffer);
 }
 #endif
+

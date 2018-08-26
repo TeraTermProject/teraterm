@@ -47,10 +47,10 @@ static BOOL KeyDown = FALSE;
 static BOOL Short;
 static WORD Scan;
 
-int PASCAL WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrevInstance,
-                   LPSTR lpszCmdLine,
-                   int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance,
+				   HINSTANCE hPrevInstance,
+				   LPSTR lpszCmdLine,
+				   int nCmdShow)
 {
 	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
 	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);

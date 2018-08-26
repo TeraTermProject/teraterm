@@ -1,12 +1,52 @@
 ﻿
 add_subdirectory(ttpcmn)
+set_target_properties(
+  ttpcmn
+  PROPERTIES FOLDER teraterm)
+
 add_subdirectory(ttpdlg)
+set_target_properties(
+  ttpdlg
+  PROPERTIES FOLDER teraterm)
+
 add_subdirectory(ttpfile)
+set_target_properties(
+  ttpfile
+  PROPERTIES FOLDER teraterm)
+
 add_subdirectory(ttpset)
-add_subdirectory(ttpmacro)
+set_target_properties(
+  ttpset
+  PROPERTIES FOLDER teraterm)
+
+if((${CMAKE_MAKE_PROGRAM} MATCHES "VCExpress.exe") OR MINGW)
+  message("pass ttpmacro compile")
+else()
+  # need MFC (VS2005Express does not include MFC)
+  add_subdirectory(ttpmacro)
+  set_target_properties(
+	ttpmacro
+	PROPERTIES FOLDER teraterm)
+endif()
+
 add_subdirectory(ttptek)
-add_subdirectory(teraterm)
+set_target_properties(
+  ttptek
+  PROPERTIES FOLDER teraterm)
+
+if((${CMAKE_MAKE_PROGRAM} MATCHES "VCExpress.exe") OR MINGW)
+  message("pass teraterm compile")
+else()
+  add_subdirectory(teraterm)
+  set_target_properties(
+	teraterm
+	PROPERTIES FOLDER teraterm)
+endif()
+
 add_subdirectory(keycode)
+set_target_properties(
+  keycode
+  PROPERTIES FOLDER teraterm)
 
 # ttpdlg内でconfig時 svnversion.h を生成
 #add_subdirectory(svnrev)

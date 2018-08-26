@@ -38,7 +38,7 @@ TWriteFile PWriteFile;
 TCreateFile PCreateFile;
 TCloseFile PCloseFile;
 
-static BOOL PASCAL DummyWriteFile(HANDLE fh, LPCVOID buff,
+static BOOL WINAPI DummyWriteFile(HANDLE fh, LPCVOID buff,
   DWORD len, LPDWORD wbytes, LPOVERLAPPED wol)
 {
 	*wbytes = len;

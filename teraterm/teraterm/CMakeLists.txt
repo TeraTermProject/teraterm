@@ -16,7 +16,7 @@ endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(SRC
+set(COMMON_SRC
   ../common/tt_res.h
   ../common/ttcommon.h
   ../common/ttddecmnd.h
@@ -25,7 +25,6 @@ set(SRC
   ../common/ttplugin.h
   ../common/tt-version.h
   ../common/teraterm.h
-  #
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/dlglib.c
@@ -34,7 +33,15 @@ set(SRC
   ../common/dlglib_tmpl.cpp
   ../common/compat_win.cpp
   ../common/compat_win.h
-  #
+  )
+
+source_group(
+  "common"
+  FILES
+  ${COMMON_SRC}
+  )
+
+set(SRC
   addsetting.cpp
   addsetting.h
   tmfc.cpp
@@ -97,6 +104,9 @@ set(SRC
   winjump.h
   WSAAsyncGetAddrInfo.c
   WSAAsyncGetAddrInfo.h
+  ttutil.c
+  ttutil.h
+  ${COMMON_SRC}
   )
 
 include_directories(

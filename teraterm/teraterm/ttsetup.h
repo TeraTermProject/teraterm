@@ -32,21 +32,21 @@
 extern "C" {
 #endif
 
-typedef void (PASCAL *PReadIniFile)
+typedef void (WINAPI *PReadIniFile)
   (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PWriteIniFile)
+typedef void (WINAPI *PWriteIniFile)
   (PCHAR FName, PTTSet ts);
-typedef void (PASCAL *PReadKeyboardCnf)
+typedef void (WINAPI *PReadKeyboardCnf)
   (PCHAR FName, PKeyMap KeyMap, BOOL ShowWarning);
-typedef void (PASCAL *PCopyHostList)
+typedef void (WINAPI *PCopyHostList)
   (PCHAR IniSrc, PCHAR IniDest);
-typedef void (PASCAL *PAddHostToList)
+typedef void (WINAPI *PAddHostToList)
   (PCHAR FName, PCHAR Host);
-typedef void (PASCAL *PParseParam)
+typedef void (WINAPI *PParseParam)
   (PCHAR Param, PTTSet ts, PCHAR DDETopic);
-typedef void (PASCAL *PCopySerialList)
+typedef void (WINAPI *PCopySerialList)
   (PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
-typedef void (PASCAL *PAddValueToList)
+typedef void (WINAPI *PAddValueToList)
   (PCHAR FName, PCHAR Host, PCHAR section, PCHAR key, int MaxList);
 
 extern PReadIniFile ReadIniFile;
@@ -60,7 +60,7 @@ extern PAddValueToList AddValueToList;
 
 /* proto types */
 BOOL LoadTTSET();
-void FreeTTSET();
+BOOL FreeTTSET();
 
 #ifdef __cplusplus
 }

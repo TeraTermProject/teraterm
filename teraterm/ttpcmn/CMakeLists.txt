@@ -13,19 +13,35 @@ endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(SRC
+set(COMMON_SRC
+  ../common/teraterm.h
+  ../common/tttypes.h
   ../common/i18n.c
   ../common/i18n.h
   ../common/ttlib.c
+  ../common/ttlib.h
   ../common/servicenames.c
   ../common/servicenames.h
-  ttpcmn.def
+  ../common/tt-version.h
+  ../common/ttftypes.h
+  ../common/ttcommon.h
+  ../common/tt_res.h
+  )
+
+source_group(
+  "common"
+  FILES
+  ${COMMON_SRC}
+  )
+
+set(SRC
   cmn_res.h
   language.c
   language.h
   ttcmn.c
   ttpcmn-version.rc
   ttpcmn.rc
+  ${COMMON_SRC}
   )
 
 include_directories(
@@ -41,10 +57,15 @@ if(MINGW)
 endif()
 
 add_library(
-  ttpcmn SHARED
+  ttpcmn
+  SHARED
   ${SRC}
   )
 
+target_compile_definitions(
+  ttpcmn
+  PRIVATE -DTTPCMN_DLL
+  )
 if(MINGW)
   set_target_properties(
 	ttpcmn

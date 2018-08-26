@@ -28,13 +28,13 @@
 
 #include "i18n.h"
 
-void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetPrivateProfileString(section, key, def, buf, buf_len, iniFile);
 	RestoreNewLine(buf);
 }
 
-int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile)
+DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile)
 {
 	static char tmp[MAX_UIMSG];
 	static char font[LF_FACESIZE];

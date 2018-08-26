@@ -21,25 +21,27 @@ else()
   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /i ${CMAKE_CURRENT_SOURCE_DIR}/../common")
 endif()
 
-if(MSVC)
-  set(SRC_DEF ttpdlg.def)
-else()
-  set(SRC_DEF ttpdlg_mingw.def)
-endif()
-  
-set(SRC
+set(COMMON_SRC
   ../common/dlglib.c
   ../common/dlglib.h
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/teraterm.ico
+  )
+
+source_group(
+  "common"
+  FILES
+  ${COMMON_SRC}
+  )
+
+set(SRC
   dlg_res.h
   ttdlg.c
-  ttpdlg.def
   ttpdlg.rc
   ttpdlg-version.rc
   ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
-  ${SRC_DEF}
+  ${COMMON_SRC}
   )
 
 include_directories(

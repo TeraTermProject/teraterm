@@ -34,10 +34,23 @@
 extern "C" {
 #endif
 
+#if defined(TTPCMN_DLL)
+#if !defined(DllExport)
+#define DllExport __declspec(dllexport)
+#endif
+#elif defined(TTPCMN_IMPORT)
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
+#else
+#undef DllExport
+#define DllExport	// direct link
+#endif
+
 /* proto types */
-int WINAPI parse_port(char *str, char *buf, int bufsize);
-int WINAPI parse_port_from_buf(char *buf);
-const char * WINAPI service_name(int num);
+DllExport int WINAPI parse_port(char *str, char *buf, int bufsize);
+DllExport int WINAPI parse_port_from_buf(char *buf);
+DllExport const char * WINAPI service_name(int num);
 
 #ifdef __cplusplus
 }

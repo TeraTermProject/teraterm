@@ -33,6 +33,7 @@
 #include "tttypes.h"
 #include "tektypes.h"
 #include "ttwinman.h"
+#include "ttutil.h"
 
 #include "teklib.h"
 
@@ -49,7 +50,6 @@ PTEKWMMouseMove TEKWMMouseMove;
 PTEKWMSize TEKWMSize;
 PTEKCMCopy TEKCMCopy;
 PTEKCMCopyScreen TEKCMCopyScreen;
-
 PTEKPrint TEKPrint;
 PTEKClearScreen TEKClearScreen;
 PTEKSetupFont TEKSetupFont;
@@ -58,125 +58,64 @@ PTEKRestoreSetup TEKRestoreSetup;
 PTEKEnd TEKEnd;
 
 static HMODULE HTTTEK = NULL;
+static UseCount = 0;
 
-#define IdTEKInit	   1
-#define IdTEKResizeWindow  2
-#define IdTEKChangeCaret   3
-#define IdTEKDestroyCaret  4
-#define IdTEKParse	   5
-#define IdTEKReportGIN	   6
-#define IdTEKPaint	   7
-#define IdTEKWMLButtonDown 8
-#define IdTEKWMLButtonUp   9
-#define IdTEKWMMouseMove   10
-#define IdTEKWMSize	   11
-#define IdTEKCMCopy	   12
-#define IdTEKCMCopyScreen  13
-#define IdTEKPrint	   14
-#define IdTEKClearScreen   15
-#define IdTEKSetupFont	   16
-#define IdTEKResetWin	   17
-#define IdTEKRestoreSetup  18
-#define IdTEKEnd	   19
+static const GetProcAddressList ProcList[] = {
+	{ &TEKInit, "TEKInit" },
+	{ &TEKResizeWindow, "TEKResizeWindow" },
+	{ &TEKChangeCaret, "TEKChangeCaret" },
+	{ &TEKDestroyCaret, "TEKDestroyCaret" },
+	{ &TEKParse, "TEKParse" },
+	{ &TEKReportGIN, "TEKReportGIN" },
+	{ &TEKPaint, "TEKPaint" },
+	{ &TEKWMLButtonDown, "TEKWMLButtonDown" },
+	{ &TEKWMLButtonUp, "TEKWMLButtonUp" },
+	{ &TEKWMMouseMove, "TEKWMMouseMove" },
+	{ &TEKWMSize, "TEKWMSize" },
+	{ &TEKCMCopy, "TEKCMCopy" },
+	{ &TEKCMCopyScreen, "TEKCMCopyScreen" },
+	{ &TEKPrint, "TEKPrint" },
+	{ &TEKClearScreen, "TEKClearScreen" },
+	{ &TEKSetupFont, "TEKSetupFont" },
+	{ &TEKResetWin, "TEKResetWin" },
+	{ &TEKRestoreSetup, "TEKRestoreSetup" },
+	{ &TEKEnd, "TEKEnd" },
+};
+
+static void FreeTTTEKCommon()
+{
+    FreeLibrary(HTTTEK);
+    HTTTEK = NULL;
+
+	ClearProcAddressses(ProcList, _countof(ProcList));
+}
 
 BOOL LoadTTTEK()
 {
-  BOOL Err;
+	if (UseCount == 0) {
+		BOOL ret;
 
-  if (HTTTEK != NULL) return TRUE;
-  HTTTEK = LoadHomeDLL("TTPTEK.DLL");
-  if (HTTTEK == NULL) return FALSE;
+		HTTTEK = LoadHomeDLL("TTPTEK.DLL");
+		if (HTTTEK == NULL) return FALSE;
 
-  Err = FALSE;
-  TEKInit = (PTEKInit)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKInit));
-  if (TEKInit==NULL) Err = TRUE;
-
-  TEKResizeWindow = (PTEKResizeWindow)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKResizeWindow));
-  if (TEKResizeWindow==NULL) Err = TRUE;
-
-  TEKChangeCaret = (PTEKChangeCaret)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKChangeCaret));
-  if (TEKChangeCaret==NULL) Err = TRUE;
-
-  TEKDestroyCaret = (PTEKDestroyCaret)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKDestroyCaret));
-  if (TEKDestroyCaret==NULL) Err = TRUE;
-
-  TEKParse = (PTEKParse)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKParse));
-  if (TEKParse==NULL) Err = TRUE;
-
-  TEKReportGIN = (PTEKReportGIN)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKReportGIN));
-  if (TEKReportGIN==NULL) Err = TRUE;
-
-  TEKPaint = (PTEKPaint)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKPaint));
-  if (TEKPaint==NULL) Err = TRUE;
-
-  TEKWMLButtonDown = (PTEKWMLButtonDown)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKWMLButtonDown));
-  if (TEKWMLButtonDown==NULL) Err = TRUE;
-
-  TEKWMLButtonUp = (PTEKWMLButtonUp)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKWMLButtonUp));
-  if (TEKWMLButtonUp==NULL) Err = TRUE;
-
-  TEKWMMouseMove = (PTEKWMMouseMove)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKWMMouseMove));
-  if (TEKWMMouseMove==NULL) Err = TRUE;
-
-  TEKWMSize = (PTEKWMSize)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKWMSize));
-  if (TEKWMSize==NULL) Err = TRUE;
-
-  TEKCMCopy = (PTEKCMCopy)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKCMCopy));
-  if (TEKCMCopy==NULL) Err = TRUE;
-
-  TEKCMCopyScreen = (PTEKCMCopyScreen)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKCMCopyScreen));
-  if (TEKCMCopyScreen==NULL) Err = TRUE;
-
-  TEKPrint = (PTEKPrint)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKPrint));
-  if (TEKPrint==NULL) Err = TRUE;
-
-  TEKClearScreen = (PTEKClearScreen)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKClearScreen));
-  if (TEKClearScreen==NULL) Err = TRUE;
-
-  TEKSetupFont = (PTEKSetupFont)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKSetupFont));
-  if (TEKSetupFont==NULL) Err = TRUE;
-
-  TEKResetWin = (PTEKResetWin)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKResetWin));
-  if (TEKResetWin==NULL) Err = TRUE;
-
-  TEKRestoreSetup = (PTEKRestoreSetup)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKRestoreSetup));
-  if (TEKRestoreSetup==NULL) Err = TRUE;
-
-  TEKEnd = (PTEKEnd)GetProcAddress(HTTTEK,
-    MAKEINTRESOURCE(IdTEKEnd));
-  if (TEKEnd==NULL) Err = TRUE;
-
-  if (Err)
-  {
-    FreeLibrary(HTTTEK);
-    HTTTEK = NULL;
-  }
-  return (! Err);
+		ret = GetProcAddressses(HTTTEK, ProcList, _countof(ProcList));
+		if (!ret)
+		{
+			FreeTTTEKCommon();
+		}
+	}
+	UseCount++;
+	return TRUE;
 }
 
-void FreeTTTEK()
+BOOL FreeTTTEK()
 {
-  if (HTTTEK!=NULL)
-  {
-    FreeLibrary(HTTTEK);
-    HTTTEK = NULL;
-  }
+	if (UseCount == 0) {
+		return FALSE;
+	}
+	UseCount--;
+	if (UseCount == 0) {
+		FreeTTTEKCommon();
+	}
+	return TRUE;
 }

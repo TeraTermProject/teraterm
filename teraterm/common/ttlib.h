@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,9 +35,22 @@
 extern "C" {
 #endif
 
-BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos);
-BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
-BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
+#if defined(TTPCMN_DLL)
+#if !defined(DllExport)
+#define DllExport __declspec(dllexport)
+#endif
+#elif defined(TTPCMN_IMPORT)
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
+#else
+#undef DllExport
+#define DllExport	// direct link
+#endif
+
+BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos);
+DllExport BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
+DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
 void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void DeleteSlash(PCHAR Path);
@@ -55,49 +68,49 @@ void QuoteFName(PCHAR FName);
 #endif
 int isInvalidFileNameChar(PCHAR FName);
 #define deleteInvalidFileNameChar(name) replaceInvalidFileNameChar(name, 0)
-void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
+DllExport void replaceInvalidFileNameChar(PCHAR FName, unsigned char c);
 int isInvalidStrftimeChar(PCHAR FName);
 void deleteInvalidStrftimeChar(PCHAR FName);
 void ParseStrftimeFileName(PCHAR FName, int destlen);
 void ConvFName(PCHAR HomeDir, PCHAR Temp, int templen, PCHAR DefExt, PCHAR FName, int destlen);
 void RestoreNewLine(PCHAR Text);
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
-void GetNthNum(PCHAR Source, int Nth, int far *Num);
+void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
-void GetDownloadFolder(char *dest, int destlen);
+DllExport void GetDownloadFolder(char *dest, int destlen);
 void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen);
 void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
-BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
-void OutputDebugPrintf(const char *fmt, ...);
-BOOL is_NT4();
+DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
+DllExport void OutputDebugPrintf(const char *fmt, ...);
+DllExport BOOL is_NT4();
 int get_OPENFILENAME_SIZE();
-BOOL IsWindows95();
-BOOL IsWindowsMe();
-BOOL IsWindowsNT4();
-BOOL IsWindowsNTKernel();
-BOOL IsWindows2000();
-BOOL IsWindows2000OrLater();
-BOOL IsWindowsVistaOrLater();
-BOOL IsWindows7OrLater();
-BOOL HasMultiMonitorSupport();
-BOOL HasGetAdaptersAddresses();
-BOOL HasDnsQuery();
-BOOL HasBalloonTipSupport();
+DllExport BOOL IsWindows95();
+DllExport BOOL IsWindowsMe();
+DllExport BOOL IsWindowsNT4();
+DllExport BOOL IsWindowsNTKernel();
+DllExport BOOL IsWindows2000();
+DllExport BOOL IsWindows2000OrLater();
+DllExport BOOL IsWindowsVistaOrLater();
+DllExport BOOL IsWindows7OrLater();
+DllExport BOOL HasMultiMonitorSupport();
+DllExport BOOL HasGetAdaptersAddresses();
+DllExport BOOL HasDnsQuery();
+DllExport BOOL HasBalloonTipSupport();
 int KanjiCode2List(int lang, int kcode);
 int List2KanjiCode(int lang, int kcode);
 int KanjiCodeTranslate(int lang, int kcode);
-char *mctimelocal(char *format, BOOL utc_flag);
+DllExport char *mctimelocal(char *format, BOOL utc_flag);
 char *strelapsed(DWORD start_time);
 
-void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
-int b64decode(PCHAR dst, int dsize, PCHAR src);
+DllExport void b64encode(PCHAR dst, int dsize, PCHAR src, int len);
+DllExport int b64decode(PCHAR dst, int dsize, PCHAR src);
 
-PCHAR WINAPI GetParam(PCHAR buff, int size, PCHAR param);
-void WINAPI DequoteParam(PCHAR dest, int dest_len, PCHAR src);
+DllExport PCHAR WINAPI GetParam(PCHAR buff, int size, PCHAR param);
+DllExport void WINAPI DequoteParam(PCHAR dest, int dest_len, PCHAR src);
 void WINAPI DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);

@@ -13,12 +13,22 @@ endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(SRC
+set(COMMON_SRC
+  ../common/tttypes.h
   ../common/ttlib.c
   ../common/ttlib.h
+  )
+
+source_group(
+  "common"
+  FILES
+  ${COMMON_SRC}
+  )
+
+set(SRC
   ttset.c
   ttpset-version.rc
-  ttpset.def
+  ${COMMON_SRC}
   )
 
 include_directories(

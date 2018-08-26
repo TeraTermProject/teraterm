@@ -31,7 +31,7 @@
  * cf. ftp://ftp.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/SHIFTJIS.TXT
  *
  */
-static codemap_t mapUnicodeToSJIS[] = {
+static const codemap_t mapUnicodeToSJIS[] = {
 	{ 0x0020, 0x0020 },
 	{ 0x0021, 0x0021 },
 	{ 0x0022, 0x0022 },

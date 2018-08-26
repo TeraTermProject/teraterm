@@ -305,12 +305,12 @@
 typedef DWORD BINT;
 
 typedef char TName[MaxNameLen];
-typedef TName far *PName;
+typedef TName *PName;
 typedef char TStrVal [MaxStrLen];
-typedef TStrVal far *PStrVal;
+typedef TStrVal *PStrVal;
 
 typedef DWORD TVarId;
-typedef TVarId far *PVarId;
+typedef TVarId *PVarId;
 
 #ifdef __cplusplus
 extern "C" {
@@ -336,9 +336,9 @@ BOOL NewLabVar(PCHAR Name, BINT InitVal, WORD ILevel);
 int NewIntAryVar(PCHAR Name, int size);
 int NewStrAryVar(PCHAR Name, int size);
 void DelLabVar(WORD ILevel);
-void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level);
-BOOL GetExpression(LPWORD ValType, int far *Val, LPWORD Err);
-void GetIntVal(int far *Val, LPWORD Err);
+void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level);
+BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err);
+void GetIntVal(int *Val, LPWORD Err);
 void SetIntVal(TVarId VarId, int Val);
 int CopyIntVal(TVarId VarId);
 void GetIntVar(PVarId VarId, LPWORD Err);
@@ -347,7 +347,7 @@ void GetStrVal2(PCHAR Str, LPWORD Err, BOOL AutoConversion);
 void GetStrVar(PVarId VarId, LPWORD Err);
 void SetStrVal(TVarId VarId, PCHAR Str);
 PCHAR StrVarPtr(TVarId VarId);
-void GetVarType(LPWORD ValType, int far *Val, LPWORD Err);
+void GetVarType(LPWORD ValType, int *Val, LPWORD Err);
 TVarId GetIntVarFromArray(TVarId VarId, int Index, LPWORD Err);
 TVarId GetStrVarFromArray(TVarId VarId, int Index, LPWORD Err);
 BOOL GetIndex(int *Index, LPWORD Err);

@@ -31,16 +31,16 @@
 extern "C" {
 #endif
 
-typedef BOOL (PASCAL *TReadFile)
+typedef BOOL (WINAPI *TReadFile)
   (HANDLE FHandle, LPVOID Buff, DWORD ReadSize, LPDWORD ReadBytes,
    LPOVERLAPPED ReadOverLap);
-typedef BOOL (PASCAL *TWriteFile)
+typedef BOOL (WINAPI *TWriteFile)
   (HANDLE FHandle, LPCVOID Buff, DWORD WriteSize, LPDWORD WriteBytes,
    LPOVERLAPPED WriteOverLap);
-typedef HANDLE (PASCAL *TCreateFile)
+typedef HANDLE (WINAPI *TCreateFile)
   (LPCTSTR FName, DWORD AcMode, DWORD ShMode, LPSECURITY_ATTRIBUTES SecAttr,
    DWORD CreateDisposition, DWORD FileAttr, HANDLE Template);
-typedef BOOL (PASCAL *TCloseFile)
+typedef BOOL (WINAPI *TCloseFile)
   (HANDLE FHandle);
 
 extern TReadFile PReadFile;

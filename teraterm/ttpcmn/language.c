@@ -29,6 +29,9 @@
 
 // TTCMN.DLL character code conversion
 
+#define DllExport __declspec(dllexport) 
+#include "language.h"
+#undef DllExport
 #include "teraterm.h"
 #include "tttypes.h"
 #include <mbstring.h>
@@ -36,7 +39,15 @@
 
 #include "sjis2uni.map"
 
-unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
+#if !defined(DllExport)
+#if defined(TTPCMN)
+#define DllExport __declspec(dllexport) 
+#else
+#define DllExport __declspec(dllexport) 
+#endif
+#endif
+
+DllExport unsigned short WINAPI ConvertUnicode(unsigned short code, const codemap_t *table, int tmax)
 {
 	int low, mid, high;
 	unsigned short result;
@@ -62,7 +73,7 @@ unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
 	return (result);
 }
 
-unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
+DllExport unsigned int WINAPI SJIS2UTF8(WORD KCode, int *byte, char *locale)
 {
 	wchar_t wchar;
 	int ret;
@@ -122,7 +133,7 @@ unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 
 
 // Japanese SJIS -> JIS
-WORD PASCAL SJIS2JIS(WORD KCode)
+DllExport WORD WINAPI SJIS2JIS(WORD KCode)
 {
 	WORD x0,x1,x2,y0;
 	BYTE b = LOBYTE(KCode);
@@ -149,13 +160,13 @@ WORD PASCAL SJIS2JIS(WORD KCode)
 }
 
 // Japanese SJIS -> EUC
-WORD PASCAL SJIS2EUC(WORD KCode)
+DllExport WORD WINAPI SJIS2EUC(WORD KCode)
 {
 	return (SJIS2JIS(KCode) | 0x8080);
 }
 
 // Japanese JIS -> SJIS
-WORD PASCAL JIS2SJIS(WORD KCode)
+DllExport WORD WINAPI JIS2SJIS(WORD KCode)
 {
 	WORD n1, n2, SJIS;
 
@@ -182,7 +193,7 @@ WORD PASCAL JIS2SJIS(WORD KCode)
 
 /* Russian charset conversion table by Andrey Nikiforov 19971114 */
 /* Updated by NAGATA Shinya 20111228 */
-static BYTE cpconv[4][4][128] =
+static const BYTE cpconv[4][4][128] =
 {
 #if 0
 // 1251 -> 1251 = dummy
@@ -589,7 +600,7 @@ static BYTE cpconv[4][4][128] =
 };
 
 // Russian character set conversion
-BYTE PASCAL RussConv(int cin, int cout, BYTE b)
+DllExport BYTE WINAPI RussConv(int cin, int cout, BYTE b)
 // cin: input character set (IdWindows/IdKOI8/Id866/IdISO)
 // cin: output character set (IdWindows/IdKOI8/Id866/IdISO)
 {
@@ -600,7 +611,7 @@ BYTE PASCAL RussConv(int cin, int cout, BYTE b)
 }
 
 // Russian character set conversion for a character string
-void PASCAL RussConvStr(int cin, int cout, PCHAR Str, int count)
+DllExport void WINAPI RussConvStr(int cin, int cout, PCHAR Str, int count)
 // cin: input character set (IdWindows/IdKOI8/Id866/IdISO)
 // cin: output character set (IdWindows/IdKOI8/Id866/IdISO)
 {

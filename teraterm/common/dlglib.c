@@ -176,7 +176,7 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 	SetDlgItemText(HDlg, id_Item, buff);
 }
 
-void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR **List, int nsel)
+void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR *List[], int nsel)
 {
 	int i;
 
@@ -376,7 +376,7 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 }
 
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-                  const char *UILanguageFile, PCHAR key)
+				  const char *UILanguageFile, PCHAR key)
 {
 	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
 	LOGFONT logfont;

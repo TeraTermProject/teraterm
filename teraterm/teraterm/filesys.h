@@ -31,28 +31,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef BOOL (PASCAL *PGetSetupFname)
+typedef BOOL (WINAPI *PGetSetupFname)
   (HWND HWin, WORD FuncId, PTTSet ts);
-typedef BOOL (PASCAL *PGetTransFname)
+typedef BOOL (WINAPI *PGetTransFname)
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option);
-typedef BOOL (PASCAL *PGetMultiFname)
+typedef BOOL (WINAPI *PGetMultiFname)
   (PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option);
-typedef BOOL (PASCAL *PGetGetFname)
+typedef BOOL (WINAPI *PGetGetFname)
   (HWND HWin, PFileVar fv);
-typedef void (PASCAL *PSetFileVar) (PFileVar fv);
-typedef BOOL (PASCAL *PGetXFname)
+typedef void (WINAPI *PSetFileVar) (PFileVar fv);
+typedef BOOL (WINAPI *PGetXFname)
   (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir);
-typedef void (PASCAL *PProtoInit)
+typedef void (WINAPI *PProtoInit)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts);
-typedef BOOL (PASCAL *PProtoParse)
+typedef BOOL (WINAPI *PProtoParse)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
-typedef void (PASCAL *PProtoTimeOutProc)
+typedef void (WINAPI *PProtoTimeOutProc)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
-typedef BOOL (PASCAL *PProtoCancel)
+typedef BOOL (WINAPI *PProtoCancel)
   (int Proto, PFileVar fv, PCHAR pv, PComVar cv);
-typedef BOOL (PASCAL *PTTFILESetUILanguageFile)
+typedef BOOL (WINAPI *PTTFILESetUILanguageFile)
   (char *file);
-typedef BOOL (PASCAL *PTTFILESetFileSendFilter)
+typedef BOOL (WINAPI *PTTFILESetFileSendFilter)
   (char *file);
 
 extern PGetSetupFname GetSetupFname;

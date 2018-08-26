@@ -87,19 +87,19 @@ typedef struct {
 typedef struct {
   int size;
   int loadOrder; /* smaller numbers get loaded first */
-  void (PASCAL * TTXInit)(PTTSet ts, PComVar cv); /* called first to last */
-  void (PASCAL * TTXGetUIHooks)(TTXUIHooks * UIHooks); /* called first to last */
-  void (PASCAL * TTXGetSetupHooks)(TTXSetupHooks * setupHooks); /* called first to last */
-  void (PASCAL * TTXOpenTCP)(TTXSockHooks * hooks); /* called first to last */
-  void (PASCAL * TTXCloseTCP)(TTXSockHooks * hooks); /* called last to first */
-  void (PASCAL * TTXSetWinSize)(int rows, int cols); /* called first to last */
-  void (PASCAL * TTXModifyMenu)(HMENU menu); /* called first to last */
-  void (PASCAL * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
-  int (PASCAL * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
-  void (PASCAL * TTXEnd)(void); /* called last to first */
-  void (PASCAL * TTXSetCommandLine)(PCHAR cmd, int cmdlen, PGetHNRec rec); /* called first to last */
-  void (PASCAL * TTXOpenFile)(TTXFileHooks * hooks); /* called first to last */
-  void (PASCAL * TTXCloseFile)(TTXFileHooks * hooks); /* called last to first */
+  void (WINAPI * TTXInit)(PTTSet ts, PComVar cv); /* called first to last */
+  void (WINAPI * TTXGetUIHooks)(TTXUIHooks * UIHooks); /* called first to last */
+  void (WINAPI * TTXGetSetupHooks)(TTXSetupHooks * setupHooks); /* called first to last */
+  void (WINAPI * TTXOpenTCP)(TTXSockHooks * hooks); /* called first to last */
+  void (WINAPI * TTXCloseTCP)(TTXSockHooks * hooks); /* called last to first */
+  void (WINAPI * TTXSetWinSize)(int rows, int cols); /* called first to last */
+  void (WINAPI * TTXModifyMenu)(HMENU menu); /* called first to last */
+  void (WINAPI * TTXModifyPopupMenu)(HMENU menu); /* called first to last */
+  int (WINAPI * TTXProcessCommand)(HWND hWin, WORD cmd); /* returns TRUE if handled, called last to first */
+  void (WINAPI * TTXEnd)(void); /* called last to first */
+  void (WINAPI * TTXSetCommandLine)(PCHAR cmd, int cmdlen, PGetHNRec rec); /* called first to last */
+  void (WINAPI * TTXOpenFile)(TTXFileHooks * hooks); /* called first to last */
+  void (WINAPI * TTXCloseFile)(TTXFileHooks * hooks); /* called last to first */
 } TTXExports;
 
 /* On entry, 'size' is set to the size of the structure and the rest of
@@ -108,6 +108,6 @@ typedef struct {
    default behaviour, i.e. do nothing.
    This is all for binary compatibility across releases; if the record gets bigger,
    then the extra functions will be NULL for DLLs that don't understand them. */
-typedef BOOL (PASCAL * TTXBindProc)(WORD Version, TTXExports * exports);
+typedef BOOL (WINAPI * TTXBindProc)(WORD Version, TTXExports * exports);
 
 #endif

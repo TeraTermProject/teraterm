@@ -38,7 +38,7 @@
 
 static unsigned __stdcall getaddrinfo_thread(void * p);
 
-HANDLE PASCAL WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
+HANDLE WINAPI WSAAsyncGetAddrInfo(HWND hWnd, unsigned int wMsg,
                            const char *hostname,
                            const char *portname,
                            struct addrinfo *hints,

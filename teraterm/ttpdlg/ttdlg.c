@@ -50,6 +50,9 @@
 #include "oniguruma.h"
 #undef ONIG_EXTERN
 
+#undef DllExport
+#define DllExport __declspec(dllexport) 
+
 static char * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
 #undef EFFECT_ENABLED	// エフェクトの有効可否
@@ -70,7 +73,7 @@ static HFONT DlgTermFont;
 static HFONT DlgWinFont;
 static HFONT DlgWinlistFont;
 
-char UILanguageFile[MAX_PATH];
+static char UILanguageFile[MAX_PATH];
 
 static const TCHAR *NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
 static const TCHAR *NLList[] = {"CR","CR+LF", "LF", NULL};
@@ -109,7 +112,7 @@ static const TCHAR *BaudList[] =
 	 "230400", "460800", "921600", NULL};
 
 
-BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
 	WORD w;
@@ -540,7 +543,7 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void DispSample(HWND Dialog, PTTSet ts, int IAttr)
+static void DispSample(HWND Dialog, PTTSet ts, int IAttr)
 {
 	int i,x,y;
 	COLORREF Text, Back;
@@ -583,7 +586,7 @@ void DispSample(HWND Dialog, PTTSet ts, int IAttr)
 	ReleaseDC(Dialog,DC);
 }
 
-void ChangeColor(HWND Dialog, PTTSet ts, int IAttr, int IOffset)
+static void ChangeColor(HWND Dialog, PTTSet ts, int IAttr, int IOffset)
 {
 	SetDlgItemInt(Dialog,IDC_WINRED,ts->TmpColor[IAttr][IOffset],FALSE);
 	SetDlgItemInt(Dialog,IDC_WINGREEN,ts->TmpColor[IAttr][IOffset+1],FALSE);
@@ -592,7 +595,7 @@ void ChangeColor(HWND Dialog, PTTSet ts, int IAttr, int IOffset)
 	DispSample(Dialog,ts,IAttr);
 }
 
-void ChangeSB (HWND Dialog, PTTSet ts, int IAttr, int IOffset)
+static void ChangeSB (HWND Dialog, PTTSet ts, int IAttr, int IOffset)
 {
 	HWND HRed, HGreen, HBlue;
 
@@ -606,7 +609,7 @@ void ChangeSB (HWND Dialog, PTTSet ts, int IAttr, int IOffset)
 	ChangeColor(Dialog,ts,IAttr,IOffset);
 }
 
-void RestoreVar(HWND Dialog, PTTSet ts, int *IAttr, int *IOffset)
+static void RestoreVar(HWND Dialog, PTTSet ts, int *IAttr, int *IOffset)
 {
 	WORD w;
 
@@ -626,7 +629,7 @@ void RestoreVar(HWND Dialog, PTTSet ts, int *IAttr, int *IOffset)
 	}
 }
 
-BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
 	HWND Wnd, HRed, HGreen, HBlue;
@@ -1234,7 +1237,7 @@ BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
 	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
@@ -1369,7 +1372,7 @@ static const TCHAR *ParityList[] = {"none", "odd", "even", "mark", "space", NULL
 static const TCHAR *StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
 static const TCHAR *FlowList[] = {"Xon/Xoff","hardware","none",NULL};
 
-BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
 	int i, w, sel;
@@ -1577,7 +1580,7 @@ BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PTTSet ts;
 	char EntName[10];
@@ -1879,7 +1882,7 @@ BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PGetHNRec GetHNRec;
 	char EntName[128];
@@ -2153,7 +2156,7 @@ BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PCHAR CurDir;
 	char HomeDir[MAXPATHLEN];
@@ -2536,7 +2539,7 @@ static void do_subclass_window(HWND hWnd, url_subclass_t *parent)
 }
 
 
-BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	char buf[128], tmpbuf[128];
 	HDC hdc;
@@ -3002,7 +3005,7 @@ static int get_sel_lang_ui(char **list, char *selstr)
 	return (n + 1);  // 1origin
 }
 
-BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static int langui_sel = 1, uilist_count = 0;
 	PTTSet ts;
@@ -3164,7 +3167,7 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PBOOL Close;
 	int n;
@@ -3280,7 +3283,7 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
+DllExport BOOL WINAPI SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	int i;
 
@@ -3305,7 +3308,7 @@ BOOL PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 		                     WndParent, TermDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupWin(HWND WndParent, PTTSet ts)
+DllExport BOOL WINAPI SetupWin(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3313,7 +3316,7 @@ BOOL PASCAL SetupWin(HWND WndParent, PTTSet ts)
 		                     WndParent, WinDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
+DllExport BOOL WINAPI SetupKeyboard(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3321,7 +3324,7 @@ BOOL PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
 		                     WndParent, KeybDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
+DllExport BOOL WINAPI SetupSerialPort(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3329,7 +3332,7 @@ BOOL PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
 		                     WndParent, SerialDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
+DllExport BOOL WINAPI SetupTCPIP(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3337,7 +3340,7 @@ BOOL PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
 		                     WndParent, TCPIPDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
+DllExport BOOL WINAPI GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3345,7 +3348,7 @@ BOOL PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 		                     WndParent, HostDlg, (LPARAM)GetHNRec);
 }
 
-BOOL PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
+DllExport BOOL WINAPI ChangeDirectory(HWND WndParent, PCHAR CurDir)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3353,7 +3356,7 @@ BOOL PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
 		                     WndParent, DirDlg, (LPARAM)CurDir);
 }
 
-BOOL PASCAL AboutDialog(HWND WndParent)
+DllExport BOOL WINAPI AboutDialog(HWND WndParent)
 {
 	return
 		(BOOL)DialogBox(hInst,
@@ -3406,7 +3409,7 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 #ifndef CF_INACTIVEFONTS
 #define CF_INACTIVEFONTS 0x02000000L
 #endif
-BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
+DllExport BOOL WINAPI ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 {
 	CHOOSEFONT cf;
 	BOOL Ok;
@@ -3429,7 +3432,7 @@ BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 	return Ok;
 }
 
-BOOL PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
+DllExport BOOL WINAPI SetupGeneral(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3437,7 +3440,7 @@ BOOL PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
 		                     WndParent, (DLGPROC)&GenDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL WindowWindow(HWND WndParent, PBOOL Close)
+DllExport BOOL WINAPI WindowWindow(HWND WndParent, PBOOL Close)
 {
 	*Close = FALSE;
 	return
@@ -3447,7 +3450,7 @@ BOOL PASCAL WindowWindow(HWND WndParent, PBOOL Close)
 		                     (DLGPROC)&WinListDlg, (LPARAM)Close);
 }
 
-void PASCAL TTDLGSetUILanguageFile(char *file)
+DllExport void WINAPI TTDLGSetUILanguageFile(char *file)
 {
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 }

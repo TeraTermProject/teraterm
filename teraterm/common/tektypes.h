@@ -147,4 +147,4 @@ typedef struct {
 
   BYTE HiY, Extra, LoY, HiX, LoX;   
 } TTEKVar;
-typedef TTEKVar far *PTEKVar;
+typedef TTEKVar *PTEKVar;

@@ -1,9 +1,0 @@
-EXPORTS
-  ReadIniFile @1
-  WriteIniFile @2
-  ReadKeyboardCnf @3
-  CopyHostList @4
-  AddHostToList @5
-  ParseParam @6
-  CopySerialList @7
-  AddValueToList @8

@@ -36,13 +36,18 @@
 #include <string.h>
 
 #include "ttcommon.h"
-#include "tekesc.h"
 
 #include "compat_w95.h"
 
+#undef DllExport
+#define DllExport __declspec(dllexport) 
+
+#include "tekesc.h"
+#include "tttek.h"
+
 static HANDLE hInst;
 
-void PASCAL TEKInit(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKInit(PTEKVar tk, PTTSet ts)
 {
   int i;
 
@@ -176,7 +181,7 @@ void SwitchRubberBand(PTEKVar tk, PTTSet ts, BOOL OnFlag)
   tk->RubberBand = OnFlag;
 }
 
-void PASCAL TEKChangeCaret(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKChangeCaret(PTEKVar tk, PTTSet ts)
 {
   UINT T;
 
@@ -200,14 +205,14 @@ void PASCAL TEKChangeCaret(PTEKVar tk, PTTSet ts)
   }
 }
 
-void PASCAL TEKDestroyCaret(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKDestroyCaret(PTEKVar tk, PTTSet ts)
 {
   DestroyCaret();
   if (ts->NonblinkingCursor!=0)
 	KillTimer(tk->HWin,IdCaretTimer);
 }
 
-void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
+DllExport void WINAPI TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
 {
   int i, Height, Width;
   TEXTMETRIC Metrics;
@@ -402,7 +407,7 @@ void PASCAL TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H)
   tk->ScaleFont = FALSE;
 }
 
-int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
+DllExport int WINAPI TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
 {
   BOOL f;
   int c;
@@ -468,7 +473,7 @@ int PASCAL TEKParse(PTEKVar tk, PTTSet ts, PComVar cv)
   return (tk->ChangeEmu);
 }
 
-void PASCAL TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode)
+DllExport void WINAPI TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode)
 {
   BYTE Code[11];
   int X, Y;
@@ -490,8 +495,7 @@ void PASCAL TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode)
   tk->IgnoreCount = 6;
 }
 
-void PASCAL TEKPaint
-  (PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo)
+DllExport void WINAPI TEKPaint(PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo)
 {
   int X,Y,W,H;
 
@@ -511,8 +515,7 @@ void PASCAL TEKPaint
   if (tk->GIN) ToggleCrossHair(tk,ts,TRUE);
 }
 
-void PASCAL TEKWMLButtonDown
-  (PTEKVar tk, PTTSet ts, PComVar cv, POINT pos)
+DllExport void WINAPI TEKWMLButtonDown(PTEKVar tk, PTTSet ts, PComVar cv, POINT pos)
 {
   BYTE b;
 
@@ -542,7 +545,7 @@ void PASCAL TEKWMLButtonDown
   }
 }
 
-void PASCAL TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
 {
   int X;
 
@@ -571,7 +574,7 @@ void PASCAL TEKWMLButtonUp(PTEKVar tk, PTTSet ts)
   }
 }
 
-void PASCAL TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p)
+DllExport void WINAPI TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p)
 {
   int X, Y;
 
@@ -603,7 +606,7 @@ void PASCAL TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p)
   if (tk->GIN) SetCapture(tk->HWin);
 }
 
-void PASCAL TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy)
+DllExport void WINAPI TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy)
 {
   int Width, Height;
 
@@ -661,7 +664,7 @@ void CopyToClipboard
   SwitchRubberBand(tk,ts,tk->Select);
 }
 
-void PASCAL TEKCMCopy(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKCMCopy(PTEKVar tk, PTTSet ts)
 {
   int x, y;
 
@@ -679,13 +682,13 @@ void PASCAL TEKCMCopy(PTEKVar tk, PTTSet ts)
     abs(tk->SelectEnd.y - tk->SelectStart.y));                          
 }
 
-void PASCAL TEKCMCopyScreen(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKCMCopyScreen(PTEKVar tk, PTTSet ts)
 {
   /* copy fullscreen to clipboard */
   CopyToClipboard(tk, ts, 0, 0, tk->ScreenWidth, tk->ScreenHeight);
 }
 
-void PASCAL TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
+DllExport void WINAPI TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
 {
   POINT PPI;
   RECT Margin;
@@ -764,7 +767,7 @@ void PASCAL TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag)
   SwitchRubberBand(tk,ts,tk->Select);
 }
 
-void PASCAL TEKClearScreen(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKClearScreen(PTEKVar tk, PTTSet ts)
 {
   RECT R;
 
@@ -778,7 +781,7 @@ void PASCAL TEKClearScreen(PTEKVar tk, PTTSet ts)
   TEKCaretOn(tk,ts);
 }
 
-void PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKSetupFont(PTEKVar tk, PTTSet ts)
 {
   int W, H;
 //  BOOL Ok;
@@ -801,7 +804,7 @@ void PASCAL TEKSetupFont(PTEKVar tk, PTTSet ts)
   TEKResizeWindow(tk,ts,W,H);
 }
 
-void PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
+DllExport void WINAPI TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
 {
   HDC TmpDC;
   RECT R;
@@ -869,7 +872,7 @@ void PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
   InvalidateRect(tk->HWin,NULL,TRUE);
 }
 
-/* BOOL PASCAL TEKSetupWinDlg(PTEKVar tk, PTTSet ts)
+/* DllExport BOOL WINAPI TEKSetupWinDlg(PTEKVar tk, PTTSet ts)
 {
   BOOL Ok;
   WORD OldEmu;
@@ -886,7 +889,7 @@ void PASCAL TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld)
   return Ok;
 } */
 
-void PASCAL TEKRestoreSetup(PTEKVar tk, PTTSet ts)
+DllExport void WINAPI TEKRestoreSetup(PTEKVar tk, PTTSet ts)
 {
   int W, H;
   RECT R;
@@ -904,7 +907,7 @@ void PASCAL TEKRestoreSetup(PTEKVar tk, PTTSet ts)
   TEKResizeWindow(tk,ts,W,H);
 }
 
-void PASCAL TEKEnd(PTEKVar tk)
+DllExport void WINAPI TEKEnd(PTEKVar tk)
 {
   int i;
 

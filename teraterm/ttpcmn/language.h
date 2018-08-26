@@ -31,18 +31,25 @@
 
 #pragma once
 
+#include <windows.h>	// for WINAPI
+#include "codemap.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if !defined(DllExport)
+#define DllExport __declspec(dllimport)
+#endif
+
 /* proto types */
-unsigned int WINAPI SJIS2UTF8(WORD KCode, int *byte, char *locale);
-WORD WINAPI SJIS2JIS(WORD KCode);
-WORD WINAPI SJIS2EUC(WORD KCode);
-WORD WINAPI JIS2SJIS(WORD KCode);
-BYTE WINAPI RussConv(int cin, int cout, BYTE b);
-void WINAPI RussConvStr
-  (int cin, int cout, PCHAR Str, int count);
+DllExport unsigned int WINAPI SJIS2UTF8(WORD KCode, int *byte, char *locale);
+DllExport WORD WINAPI SJIS2JIS(WORD KCode);
+DllExport WORD WINAPI SJIS2EUC(WORD KCode);
+DllExport WORD WINAPI JIS2SJIS(WORD KCode);
+DllExport BYTE WINAPI RussConv(int cin, int cout, BYTE b);
+DllExport void WINAPI RussConvStr(int cin, int cout, PCHAR Str, int count);
+DllExport unsigned short WINAPI ConvertUnicode(unsigned short code, const codemap_t *table, int tmax);
 
 #ifdef __cplusplus
 }

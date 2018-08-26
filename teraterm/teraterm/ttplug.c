@@ -104,7 +104,7 @@ static void loadExtension(ExtensionList * * extensions, char const * fileName) {
   MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONEXCLAMATION);
 }
 
-void PASCAL TTXInit(PTTSet ts, PComVar cv) {
+void WINAPI TTXInit(PTTSet ts, PComVar cv) {
   ExtensionList * extensionList = NULL;
   int i;
 
@@ -148,7 +148,7 @@ void PASCAL TTXInit(PTTSet ts, PComVar cv) {
   }
 }
 
-void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
+void WINAPI TTXInternalOpenTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -158,7 +158,7 @@ void PASCAL TTXInternalOpenTCP(TTXSockHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
+void WINAPI TTXInternalCloseTCP(TTXSockHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -168,7 +168,7 @@ void PASCAL TTXInternalCloseTCP(TTXSockHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
+void WINAPI TTXInternalOpenFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -178,7 +178,7 @@ void PASCAL TTXInternalOpenFile(TTXFileHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
+void WINAPI TTXInternalCloseFile(TTXFileHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -188,7 +188,7 @@ void PASCAL TTXInternalCloseFile(TTXFileHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
+void WINAPI TTXInternalGetUIHooks(TTXUIHooks * hooks) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -198,7 +198,7 @@ void PASCAL TTXInternalGetUIHooks(TTXUIHooks * hooks) {
   }
 }
 
-void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
+void WINAPI TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -208,7 +208,7 @@ void PASCAL TTXInternalGetSetupHooks(TTXSetupHooks * hooks) {
   }
 }
 
-void PASCAL TTXSetWinSize(int rows, int cols) {
+void WINAPI TTXSetWinSize(int rows, int cols) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -218,7 +218,7 @@ void PASCAL TTXSetWinSize(int rows, int cols) {
   }
 }
 
-void PASCAL TTXModifyMenu(HMENU menu) {
+void WINAPI TTXModifyMenu(HMENU menu) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -228,7 +228,7 @@ void PASCAL TTXModifyMenu(HMENU menu) {
   }
 }
 
-void PASCAL TTXModifyPopupMenu(HMENU menu) {
+void WINAPI TTXModifyPopupMenu(HMENU menu) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {
@@ -238,7 +238,7 @@ void PASCAL TTXModifyPopupMenu(HMENU menu) {
   }
 }
 
-BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
+BOOL WINAPI TTXProcessCommand(HWND hWin, WORD cmd) {
   int i;
 
   for (i = NumExtensions - 1; i >= 0; i--) {
@@ -252,7 +252,7 @@ BOOL PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
   return FALSE;
 }
 
-void PASCAL TTXEnd(void) {
+void WINAPI TTXEnd(void) {
   int i;
 
   if (NumExtensions==0) return;
@@ -274,7 +274,7 @@ void PASCAL TTXEnd(void) {
   NumExtensions = 0;
 }
 
-void PASCAL TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
+void WINAPI TTXSetCommandLine(PCHAR cmd, int cmdlen, PGetHNRec rec) {
   int i;
 
   for (i = 0; i < NumExtensions; i++) {

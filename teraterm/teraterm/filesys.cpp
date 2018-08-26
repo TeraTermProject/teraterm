@@ -46,6 +46,7 @@
 #include "helpid.h"
 #include "dlglib.h"
 #include "vtterm.h"
+#include "ttutil.h"
 
 #include "filesys.h"
 #include "ftlib.h"
@@ -103,21 +104,6 @@ PProtoCancel ProtoCancel;
 PTTFILESetUILanguageFile TTFILESetUILanguageFile;
 PTTFILESetFileSendFilter TTFILESetFileSendFilter;
 
-#define IdGetSetupFname  1
-#define IdGetTransFname  2
-#define IdGetMultiFname  3
-#define IdGetGetFname	 4
-#define IdSetFileVar	 5
-#define IdGetXFname	 6
-
-#define IdProtoInit	 7
-#define IdProtoParse	 8
-#define IdProtoTimeOutProc 9
-#define IdProtoCancel	 10
-
-#define IdTTFILESetUILanguageFile 11
-#define IdTTFILESetFileSendFilter 12
-
 /*
    Line Head flag for timestamping
    2007.05.24 Gentaro
@@ -134,105 +120,54 @@ enum enumLineEnd eLineEnd = Line_LineHead;
 // 遅延書き込み用スレッドのメッセージ
 #define WM_DPC_LOGTHREAD_SEND (WM_APP + 1)
 
+static const GetProcAddressList ProcList[] = {
+	{ &GetSetupFname, "GetSetupFname", 12 },
+	{ &GetTransFname, "GetTransFname", 16 },
+	{ &GetMultiFname, "GetMultiFname", 16 },
+	{ &GetGetFname, "GetGetFname", 8 },
+	{ &SetFileVar, "SetFileVar", 4 },
+	{ &GetXFname, "GetXFname", 20 },
+	{ &ProtoInit, "ProtoInit", 20 },
+	{ &ProtoParse, "ProtoParse", 16 },
+	{ &ProtoTimeOutProc, "ProtoTimeOutProc", 16 },
+	{ &ProtoCancel, "ProtoCancel", 16 },
+	{ &TTFILESetUILanguageFile, "TTFILESetUILanguageFile", 4 },
+	{ &TTFILESetFileSendFilter, "TTFILESetFileSendFilter", 4 },
+};
+
 static void CloseFileSync(PFileVar ptr);
 
+static void FreeTTFILECommon()
+{
+	FreeLibrary(HTTFILE);
+	HTTFILE = NULL;
+
+	ClearProcAddressses(ProcList, _countof(ProcList));
+}
 
 BOOL LoadTTFILE()
 {
-	BOOL Err;
 
-	if (HTTFILE != NULL)
+	if (HTTFILE == NULL)
 	{
-		TTFILECount++;
-		return TRUE;
-	}
-	else
+		BOOL ret;
+
 		TTFILECount = 0;
 
-	HTTFILE = LoadHomeDLL("TTPFILE.DLL");
-	if (HTTFILE == NULL)
-		return FALSE;
+		HTTFILE = LoadHomeDLL("TTPFILE.DLL");
+		if (HTTFILE == NULL)
+			return FALSE;
 
-	Err = FALSE;
-
-	GetSetupFname = (PGetSetupFname)GetProcAddress(HTTFILE,
-	                                               MAKEINTRESOURCE(IdGetSetupFname));
-	if (GetSetupFname==NULL)
-		Err = TRUE;
-
-	GetTransFname = (PGetTransFname)GetProcAddress(HTTFILE,
-	                                               MAKEINTRESOURCE(IdGetTransFname));
-	if (GetTransFname==NULL)
-		Err = TRUE;
-
-	GetMultiFname = (PGetMultiFname)GetProcAddress(HTTFILE,
-	                                               MAKEINTRESOURCE(IdGetMultiFname));
-	if (GetMultiFname==NULL)
-		Err = TRUE;
-
-	GetGetFname = (PGetGetFname)GetProcAddress(HTTFILE,
-	                                           MAKEINTRESOURCE(IdGetGetFname));
-	if (GetGetFname==NULL)
-		Err = TRUE;
-
-	SetFileVar = (PSetFileVar)GetProcAddress(HTTFILE,
-	                                         MAKEINTRESOURCE(IdSetFileVar));
-	if (SetFileVar==NULL)
-		Err = TRUE;
-
-	GetXFname = (PGetXFname)GetProcAddress(HTTFILE,
-	                                       MAKEINTRESOURCE(IdGetXFname));
-	if (GetXFname==NULL)
-		Err = TRUE;
-
-	ProtoInit = (PProtoInit)GetProcAddress(HTTFILE,
-	                                       MAKEINTRESOURCE(IdProtoInit));
-	if (ProtoInit==NULL)
-		Err = TRUE;
-
-	ProtoParse = (PProtoParse)GetProcAddress(HTTFILE,
-	                                         MAKEINTRESOURCE(IdProtoParse));
-	if (ProtoParse==NULL)
-		Err = TRUE;
-
-	ProtoTimeOutProc = (PProtoTimeOutProc)GetProcAddress(HTTFILE,
-	                                                     MAKEINTRESOURCE(IdProtoTimeOutProc));
-	if (ProtoTimeOutProc==NULL)
-		Err = TRUE;
-
-	ProtoCancel = (PProtoCancel)GetProcAddress(HTTFILE,
-	                                           MAKEINTRESOURCE(IdProtoCancel));
-	if (ProtoCancel==NULL)
-		Err = TRUE;
-
-	TTFILESetUILanguageFile = (PTTFILESetUILanguageFile)GetProcAddress(HTTFILE,
-	                                                                   MAKEINTRESOURCE(IdTTFILESetUILanguageFile));
-	if (TTFILESetUILanguageFile==NULL) {
-		Err = TRUE;
-	}
-	else {
+		ret = GetProcAddressses(HTTFILE, ProcList, _countof(ProcList));
+		if (!ret) {
+			FreeTTFILECommon();
+			return FALSE;
+		}
 		TTFILESetUILanguageFile(ts.UILanguageFile);
-	}
-
-	TTFILESetFileSendFilter = (PTTFILESetFileSendFilter)GetProcAddress(HTTFILE,
-	                                                                   MAKEINTRESOURCE(IdTTFILESetFileSendFilter));
-	if (TTFILESetFileSendFilter==NULL) {
-		Err = TRUE;
-	}
-	else {
 		TTFILESetFileSendFilter(ts.FileSendFilter);
 	}
-
-	if (Err)
-	{
-		FreeLibrary(HTTFILE);
-		HTTFILE = NULL;
-		return FALSE;
-	}
-	else {
-		TTFILECount = 1;
-		return TRUE;
-	}
+	TTFILECount++;
+	return TRUE;
 }
 
 BOOL FreeTTFILE()
@@ -244,8 +179,7 @@ BOOL FreeTTFILE()
 		return TRUE;
 	if (HTTFILE!=NULL)
 	{
-		FreeLibrary(HTTFILE);
-		HTTFILE = NULL;
+		FreeTTFILECommon();
 	}
 	return TRUE;
 }

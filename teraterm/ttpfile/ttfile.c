@@ -53,6 +53,9 @@
 
 #include "compat_w95.h"
 
+#undef DllExport
+#define DllExport __declspec(dllexport) 
+
 static HANDLE hInst;
 
 static HFONT DlgFoptFont;
@@ -62,7 +65,7 @@ static HFONT DlgGetfnFont;
 char UILanguageFile[MAX_PATH];
 char FileSendFilter[128];
 
-BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
+DllExport BOOL WINAPI GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 {
 	int i, j;
 	OPENFILENAME ofn;
@@ -421,8 +424,7 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 
 BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
 
-BOOL PASCAL GetTransFname
-  (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
+DllExport BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*3], *pf;
@@ -638,8 +640,7 @@ BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-BOOL PASCAL GetMultiFname
-  (PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
+DllExport BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 {
 	int i, len;
 	char uimsg[MAX_UIMSG];
@@ -867,14 +868,14 @@ BOOL CALLBACK GetFnDlg
 	return FALSE;
 }
 
-BOOL PASCAL GetGetFname(HWND HWin, PFileVar fv)
+DllExport BOOL WINAPI GetGetFname(HWND HWin, PFileVar fv)
 {
 	return (BOOL)DialogBoxParam(hInst,
 	                            MAKEINTRESOURCE(IDD_GETFNDLG),
 	                            HWin, GetFnDlg, (LONG)fv);
 }
 
-void PASCAL SetFileVar(PFileVar fv)
+DllExport void WINAPI SetFileVar(PFileVar fv)
 {
 	int i;
 	char uimsg[MAX_UIMSG];
@@ -1086,8 +1087,7 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL PASCAL GetXFname
-  (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
+DllExport BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
 {
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*2+128], *pf;
@@ -1182,7 +1182,7 @@ BOOL PASCAL GetXFname
 	return Ok;
 }
 
-void PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
+DllExport void WINAPI ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -1206,8 +1206,7 @@ void PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
 	}
 }
 
-BOOL PASCAL ProtoParse
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+DllExport BOOL WINAPI ProtoParse(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	BOOL Ok;
 
@@ -1256,8 +1255,7 @@ BOOL PASCAL ProtoParse
 	return Ok;
 }
 
-void PASCAL ProtoTimeOutProc
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+DllExport void WINAPI ProtoTimeOutProc(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -1281,8 +1279,7 @@ void PASCAL ProtoTimeOutProc
 	}
 }
 
-BOOL PASCAL ProtoCancel
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+DllExport BOOL WINAPI ProtoCancel(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -1310,12 +1307,12 @@ BOOL PASCAL ProtoCancel
 	return TRUE;
 }
 
-void PASCAL TTFILESetUILanguageFile(char *file)
+DllExport void WINAPI TTFILESetUILanguageFile(char *file)
 {
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 }
 
-void PASCAL TTFILESetFileSendFilter(char *file)
+DllExport void WINAPI TTFILESetFileSendFilter(char *file)
 {
 	strncpy_s(FileSendFilter, sizeof(FileSendFilter), file, _TRUNCATE);
 }

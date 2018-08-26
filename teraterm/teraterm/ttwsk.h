@@ -36,46 +36,46 @@
 extern "C" {
 #endif
 
-typedef int (PASCAL *Tclosesocket) (SOCKET s);
-typedef int (PASCAL *Tconnect)
+typedef int (WINAPI *Tclosesocket) (SOCKET s);
+typedef int (WINAPI *Tconnect)
   (SOCKET s, const struct sockaddr *name, int namelen);
-typedef u_long (PASCAL *Thtonl)
+typedef u_long (WINAPI *Thtonl)
   (u_long hostlong);
-typedef u_short (PASCAL *Thtons)
+typedef u_short (WINAPI *Thtons)
   (u_short hostshort);
-typedef unsigned long (PASCAL *Tinet_addr)
+typedef unsigned long (WINAPI *Tinet_addr)
   (const char * cp);
-typedef int (PASCAL *Tioctlsocket)
+typedef int (WINAPI *Tioctlsocket)
   (SOCKET s, long cmd, u_long *argp);
-typedef int (PASCAL *Trecv)
+typedef int (WINAPI *Trecv)
   (SOCKET s, char * buf, int len, int flags);
-typedef int (PASCAL *Tselect)
+typedef int (WINAPI *Tselect)
   (int nfds, fd_set *readfds, fd_set *writefds,
    fd_set *exceptfds, const struct timeval *timeout);
-typedef int (PASCAL *Tsend)
+typedef int (WINAPI *Tsend)
   (SOCKET s, const char * buf, int len, int flags);
-typedef int (PASCAL *Tsetsockopt)
+typedef int (WINAPI *Tsetsockopt)
   (SOCKET s, int level, int optname,
    const char * optval, int optlen);
-typedef SOCKET (PASCAL *Tsocket)
+typedef SOCKET (WINAPI *Tsocket)
   (int af, int type, int protocol);
-//typedef struct hostent * (PASCAL *Tgethostbyname)
+//typedef struct hostent * (WINAPI *Tgethostbyname)
 //  (const char * name);
-typedef int (PASCAL *TWSAStartup)
+typedef int (WINAPI *TWSAStartup)
   (WORD wVersionRequired, LPWSADATA lpWSAData);
-typedef int (PASCAL *TWSACleanup)(void);
-typedef int (PASCAL *TWSAAsyncSelect)
+typedef int (WINAPI *TWSACleanup)(void);
+typedef int (WINAPI *TWSAAsyncSelect)
   (SOCKET s, HWND hWnd, u_int wMsg,long lEvent);
-typedef HANDLE (PASCAL *TWSAAsyncGetHostByName)
+typedef HANDLE (WINAPI *TWSAAsyncGetHostByName)
   (HWND hWnd, u_int wMsg, const char * name, char * buf, int buflen);
-typedef int (PASCAL *TWSACancelAsyncRequest)(HANDLE hAsyncTaskHandle);
-typedef int (PASCAL *TWSAGetLastError)(void);
-typedef HANDLE (PASCAL *TWSAAsyncGetAddrInfo)
+typedef int (WINAPI *TWSACancelAsyncRequest)(HANDLE hAsyncTaskHandle);
+typedef int (WINAPI *TWSAGetLastError)(void);
+typedef HANDLE (WINAPI *TWSAAsyncGetAddrInfo)
   (HWND hWnd, unsigned int wMsg, const char * hostname,
    const char * portname, struct addrinfo * hints,
    struct addrinfo * * res);
-// typedef int (PASCAL *Tgetaddrinfo)(const char *name, const char *port, const struct addrinfo *hints, struct addrinfo **res);
-typedef void (PASCAL *Tfreeaddrinfo)(struct addrinfo *ai);
+// typedef int (WINAPI *Tgetaddrinfo)(const char *name, const char *port, const struct addrinfo *hints, struct addrinfo **res);
+typedef void (WINAPI *Tfreeaddrinfo)(struct addrinfo *ai);
 
 BOOL LoadWinsock();
 void FreeWinsock();

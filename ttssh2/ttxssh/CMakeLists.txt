@@ -5,9 +5,21 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
 
+set(COMMON_SRC
+  ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
+  ../../teraterm/common/ttcommon.h
+  ../../teraterm/common/i18n.h
+  ../../teraterm/common/ttlib.h
+  )
+
+source_group(
+  "common"
+  FILES
+  ${COMMON_SRC}
+  )
+
 set(SRC
   ${CMAKE_CURRENT_BINARY_DIR}/puttyversion.h
-  ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
   ../matcher/matcher.c
   arc4random.c
   arc4random.h
@@ -69,6 +81,7 @@ set(SRC
   util.h
   x11util.c
   x11util.h
+  ${COMMON_SRC}
   )
 
 
@@ -88,6 +101,11 @@ link_directories(
 add_library(
   ttxssh SHARED
   ${SRC}
+  )
+
+target_compile_definitions(
+  ttxssh
+  PRIVATE -DTTPCMN_IMPORT
   )
 
 target_link_libraries(

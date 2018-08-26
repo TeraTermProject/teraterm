@@ -812,7 +812,7 @@ BOOL GetString(PCHAR Str, LPWORD Err)
 	return TRUE;
 }
 
-BOOL GetNumber(int far *Num)
+BOOL GetNumber(int *Num)
 {
 	BYTE b;
 
@@ -981,7 +981,7 @@ void DelLabVar(WORD ILevel)
 		LabVarCount--;
 }
 
-void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level)
+void CopyLabel(WORD ILabel, BINT *Ptr, LPWORD Level)
 {
 	*Ptr = LabVal[ILabel];
 	*Level = (WORD)LabLevel[ILabel];
@@ -995,7 +995,7 @@ void CopyLabel(WORD ILabel, BINT far *Ptr, LPWORD Level)
  *   Evaluate following operator.
  *     not, ~, !, +(unary), -(unary)
  */
-BOOL GetFactor(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL GetFactor(LPWORD ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD P, WId;
@@ -1094,7 +1094,7 @@ BOOL GetFactor(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     *, /, %
  */
-BOOL EvalMultiplication(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalMultiplication(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1155,7 +1155,7 @@ BOOL EvalMultiplication(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     +, -
  */
-BOOL EvalAddition(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalAddition(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1209,7 +1209,7 @@ BOOL EvalAddition(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     >>, <<, >>>
  */
-BOOL EvalBitShift(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalBitShift(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1283,7 +1283,7 @@ BOOL EvalBitShift(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &
  */
-BOOL EvalBitAnd(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalBitAnd(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1330,7 +1330,7 @@ BOOL EvalBitAnd(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ^
  */
-BOOL EvalBitXor(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalBitXor(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1377,7 +1377,7 @@ BOOL EvalBitXor(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     |
  */
-BOOL EvalBitOr(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalBitOr(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1424,7 +1424,7 @@ BOOL EvalBitOr(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     <, >, <=, >=
  */
-BOOL EvalGreater(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalGreater(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1482,7 +1482,7 @@ BOOL EvalGreater(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     =, ==, <>, !=
  */
-BOOL EvalEqual(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalEqual(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1536,7 +1536,7 @@ BOOL EvalEqual(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     &&
  */
-BOOL EvalLogicalAnd(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL EvalLogicalAnd(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P, Type, Er;
 	int Val1, Val2;
@@ -1583,7 +1583,7 @@ BOOL EvalLogicalAnd(LPWORD ValType, int far *Val, LPWORD Err)
  *   Evaluate following operator.
  *     ||
  */
-BOOL GetExpression(LPWORD ValType, int far *Val, LPWORD Err)
+BOOL GetExpression(LPWORD ValType, int *Val, LPWORD Err)
 {
 	WORD P1, P2, Type, Er;
 	int Val1, Val2;
@@ -1638,7 +1638,7 @@ BOOL GetExpression(LPWORD ValType, int far *Val, LPWORD Err)
 	}
 }
 
-void GetIntVal(int far *Val, LPWORD Err)
+void GetIntVal(int *Val, LPWORD Err)
 {
 	WORD ValType;
 
@@ -1801,7 +1801,7 @@ PCHAR StrVarPtr(TVarId VarId)
 }
 
 // for ifdefined (2006.9.23 maya)
-void GetVarType(LPWORD ValType, int far *Val, LPWORD Err)
+void GetVarType(LPWORD ValType, int *Val, LPWORD Err)
 {
 	TName Name;
 	WORD WId;

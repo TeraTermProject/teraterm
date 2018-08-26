@@ -16,12 +16,20 @@ endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
-set(SRC
+set(COMMON_SRC
   ../common/i18n.c
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h
-  #
+  )
+
+source_group(
+  "common"
+  FILES
+  ${COMMON_SRC}
+  )
+
+set(SRC
   errdlg.cpp
   errdlg.h
   inpdlg.cpp
@@ -57,9 +65,9 @@ set(SRC
   ttmparse.h
   wait4all.c
   wait4all.h
-
   ttpmacro.rc
   ttm-version.rc
+  ${COMMON_SRC}
   )
 
 include_directories(

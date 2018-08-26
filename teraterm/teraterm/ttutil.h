@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2010-2017 TeraTerm Project
+﻿/*
+ * (C) 2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,32 +25,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*
- * WSAAsyncGetAddrInfo.h -- declarations for WSAAsyncGetAddrInfo()
- * Copyright(C) 2000-2003 Jun-ya Kato <kato@win6.jp>
- */
-#ifndef __WSAASYNCGETADDRINFO__
-#define __WSAASYNCGETADDRINFO__
 
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+/* useful routines */
 
-struct getaddrinfo_args {
-  HWND hWnd;
-  unsigned int wMsg;
-  char *hostname;
-  char *portname;
-  struct addrinfo hints;
-  struct addrinfo **res;
-  HANDLE *lpHandle;
-};
+#pragma once
 
-HANDLE WINAPI WSAAsyncGetAddrInfo(HWND hWnd,
-			   unsigned int wMsg,
-			   const char *hostname,
-			   const char *portname,
-			   struct addrinfo *hints,
-			   struct addrinfo **res);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* __WSAASYNCGETADDRINFO__ */
+typedef struct {
+	void *func;
+	const char *name;
+	int arg_bytes;
+} GetProcAddressList;
+
+BOOL GetProcAddressses(HMODULE hModule, const GetProcAddressList list[], int count);
+void ClearProcAddressses(const GetProcAddressList list[], int count);
+
+#ifdef __cplusplus
+}
+#endif

@@ -144,7 +144,7 @@ typedef struct {
   DWORD FileMtime;
   HANDLE LogThreadEvent;
 } TFileVar;
-typedef TFileVar far *PFileVar;
+typedef TFileVar *PFileVar;
 
 typedef struct {
 	int MAXL;
@@ -176,7 +176,7 @@ typedef struct {
   int FileMode;
   LONGLONG FileSize;
 } TKmtVar;
-typedef TKmtVar far *PKmtVar;
+typedef TKmtVar *PKmtVar;
 
   /* Kermit states */
 #define WaitMark  0
@@ -218,7 +218,7 @@ typedef struct {
   int TOutVLong;
   int CANCount;
 } TXVar;
-typedef TXVar far *PXVar;
+typedef TXVar *PXVar;
 
   /* XMODEM states */
 #define XpktSOH 1
@@ -254,7 +254,7 @@ typedef struct {
   BYTE LastMessage;
   BOOL RecvFilesize;
 } TYVar;
-typedef TYVar far *PYVar;
+typedef TYVar *PYVar;
 
   /* YMODEM states */
 #define YpktSOH 0x01
@@ -287,7 +287,7 @@ typedef struct {
   int TOutInit;
   int TOutFin;
 } TZVar;
-typedef TZVar far *PZVar;
+typedef TZVar *PZVar;
 
 #define Z_RecvInit 1
 #define Z_RecvInit2 2
@@ -346,7 +346,7 @@ typedef struct {
   BOOL CtlEsc;
   BYTE Q[8];
 } TBPVar;
-typedef TBPVar far *PBPVar;
+typedef TBPVar *PBPVar;
 
   /* B Plus states */
 #define BP_Init      1
@@ -383,7 +383,7 @@ typedef struct {
   BOOL EnqFlag;
   BYTE CheckSum;
 } TQVVar;
-typedef TQVVar far *PQVVar;
+typedef TQVVar *PQVVar;
 
   /* Quick-VAN states */
 #define QV_RecvInit1 1

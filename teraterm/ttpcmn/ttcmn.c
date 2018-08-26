@@ -41,11 +41,14 @@
 #include <locale.h>
 #include <htmlhelp.h>
 
+#define DllExport __declspec(dllexport) 
+#include "language.h"
+#undef DllExport
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
 #include "ttlib.h"
-#include "language.h"
 #include "compat_w95.h"
 #include "tt_res.h"
 #include "ttcommon.h"

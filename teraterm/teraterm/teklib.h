@@ -33,43 +33,43 @@
 extern "C" {
 #endif
 
-typedef void (PASCAL *PTEKInit)
+typedef void (WINAPI *PTEKInit)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKResizeWindow)
+typedef void (WINAPI *PTEKResizeWindow)
   (PTEKVar tk, PTTSet ts, int W, int H);
-typedef void (PASCAL *PTEKChangeCaret)
+typedef void (WINAPI *PTEKChangeCaret)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKDestroyCaret)
+typedef void (WINAPI *PTEKDestroyCaret)
   (PTEKVar tk, PTTSet ts);
-typedef int (PASCAL *PTEKParse)
+typedef int (WINAPI *PTEKParse)
   (PTEKVar tk, PTTSet ts, PComVar cv);
-typedef void (PASCAL *PTEKReportGIN)
+typedef void (WINAPI *PTEKReportGIN)
   (PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode);
-typedef void (PASCAL *PTEKPaint)
+typedef void (WINAPI *PTEKPaint)
   (PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo);
-typedef void (PASCAL *PTEKWMLButtonDown)
+typedef void (WINAPI *PTEKWMLButtonDown)
   (PTEKVar tk, PTTSet ts, PComVar cv, POINT pos);
-typedef void (PASCAL *PTEKWMLButtonUp)
+typedef void (WINAPI *PTEKWMLButtonUp)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKWMMouseMove)
+typedef void (WINAPI *PTEKWMMouseMove)
   (PTEKVar tk, PTTSet ts, POINT p);
-typedef void (PASCAL *PTEKWMSize)
+typedef void (WINAPI *PTEKWMSize)
   (PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy);
-typedef void (PASCAL *PTEKCMCopy)
+typedef void (WINAPI *PTEKCMCopy)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKCMCopyScreen)
+typedef void (WINAPI *PTEKCMCopyScreen)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKPrint)
+typedef void (WINAPI *PTEKPrint)
   (PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag);
-typedef void (PASCAL *PTEKClearScreen)
+typedef void (WINAPI *PTEKClearScreen)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKSetupFont)
+typedef void (WINAPI *PTEKSetupFont)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKResetWin)
+typedef void (WINAPI *PTEKResetWin)
   (PTEKVar tk, PTTSet ts, WORD EmuOld);
-typedef void (PASCAL *PTEKRestoreSetup)
+typedef void (WINAPI *PTEKRestoreSetup)
   (PTEKVar tk, PTTSet ts);
-typedef void (PASCAL *PTEKEnd)
+typedef void (WINAPI *PTEKEnd)
   (PTEKVar tk);
 
 extern PTEKInit TEKInit;
@@ -94,7 +94,7 @@ extern PTEKEnd TEKEnd;
 
 /* proto types */
 BOOL LoadTTTEK();
-void FreeTTTEK();
+BOOL FreeTTTEK();
 
 #ifdef __cplusplus
 }

@@ -5327,7 +5327,6 @@ static void ParseASCII(BYTE b)
 //
 #include "uni2sjis.map"
 #include "unisym2decsp.map"
-extern unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax);
 
 
 //
@@ -5335,8 +5334,8 @@ extern unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int 
 //
 #include "uni_combining.map"
 
-unsigned short GetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code,
-								 combining_map_t *table, int tmax)
+static unsigned short GetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code,
+										 const combining_map_t table[], int tmax)
 {
 	unsigned short result = 0;
 	int i;
@@ -5355,7 +5354,7 @@ unsigned short GetPrecomposedChar(int start_index, unsigned short first_code, un
 	return (result);
 }
 
-int GetIndexOfCombiningFirstCode(unsigned short code, combining_map_t *table, int tmax)
+static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map_t table[], int tmax)
 {
 	int low, mid, high;
 	int index = -1;
