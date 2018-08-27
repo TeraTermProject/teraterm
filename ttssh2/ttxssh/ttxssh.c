@@ -759,13 +759,14 @@ static int PASCAL TTXconnect(SOCKET s,
 		case AF_INET6:
 			len = sizeof(struct sockaddr_in6);
 			((struct sockaddr_in6 *) &ss)->sin6_family = AF_INET6;
-			memset(&((struct sockaddr_in6 *) &ss)->sin6_addr, 0,
-			       sizeof(struct in_addr6));
+			((struct sockaddr_in6 *) &ss)->sin6_addr = in6addr_any;
 			((struct sockaddr_in6 *) &ss)->sin6_port =
 				htons(find_local_port(pvar));
 			break;
 		default:
 			/* UNSPEC */
+			len = sizeof(ss);
+			ss.ss_family = AF_UNSPEC;
 			break;
 		}
 
