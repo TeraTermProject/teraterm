@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-08-27)
+; Updated by TeraTerm Project (2018-08-28)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -293,18 +293,18 @@ DLG_SETUPDIR_OPENFILE_ERROR=ファイルが開けません(%d)
 DLG_DANDD_TITLE=Tera Term: ファイル ドラッグ&ドロップ
 DLG_DANDD_TEXT=ファイル転送を行いますか？
 DLG_DANDD_SCP_RADIO=&SCP
-DLG_DANDD_SENDFILE_RADIO=S&end File (Paste content of file)
-DLG_DANDD_PASTE_RADIO=&Paste Filename
-DLG_DANDD_SCP_DEST_LABEL=des&t:
-DLG_DANDD_SCP_DEST_NOTE=空のときホームディレクトリ
-DLG_DANDD_SEND_BINARY_CHECK=Bina&ry
-DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
-DLG_DANDD_PASTE_SPACE_RADIO=Separat&or is Space
-DLG_DANDD_PASTE_NEWLINE_RADIO=Separator is &NewLine
+DLG_DANDD_SENDFILE_RADIO=ファイル送信（ファイルの内容を貼り付け）(&E)
+DLG_DANDD_PASTE_RADIO=ファイル名を貼り付け(&P)
+DLG_DANDD_SCP_DEST_LABEL=送信先(&T):
+DLG_DANDD_SCP_DEST_NOTE=空のときはホームディレクトリに送信されます
+DLG_DANDD_SEND_BINARY_CHECK=バイナリ(&R)
+DLG_DANDD_PASTE_ESCAPE_CHECK=エスケープ(&C)
+DLG_DANDD_PASTE_SPACE_RADIO=スペースで区切る(&O)
+DLG_DANDD_PASTE_NEWLINE_RADIO=改行で区切る(&N)
 DLG_DANDD_NEXTFILES=同じ処理を次の %d 個のファイルに適用(&D)
 DLG_DANDD_SAME_NEEXTDROP=次のドロップ時、同じ処理を行う(&M)
 DLG_DANDD_DONTSHOW_NEEXTDROP=次のドロップ時、ダイアログを表示しない(&I)
-DLG_DANDD_NOTE=CTRLを押しながらドロップすると、ダイアログが表示されます
+DLG_DANDD_NOTE=このダイアログは、CTRLを押しながらドロップすると必ず表示されます
 
 ; commonlib.c
 MSG_WINSOCK_ERROR=Winsock が使えません

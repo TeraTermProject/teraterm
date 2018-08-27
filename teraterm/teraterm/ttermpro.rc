@@ -37,9 +37,9 @@ BEGIN
     CONTROL         "S&end File (Paste content of file)",IDC_SENDFILE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | BS_NOTIFY,7,77,236,10
     CONTROL         "&Paste Filename",IDC_PASTE_RADIO,"Button",BS_AUTORADIOBUTTON | BS_NOTIFY,7,109,236,10
-    LTEXT           "des&t:",IDC_SCP_PATH_LABEL,19,50,22,8
-    EDITTEXT        IDC_SCP_PATH,44,47,199,14,ES_AUTOHSCROLL
-    LTEXT           "dest is home directory if empty",IDC_SCP_PATH_NOTE,44,64,199,8
+    LTEXT           "des&t:",IDC_SCP_PATH_LABEL,19,50,40,8
+    EDITTEXT        IDC_SCP_PATH,62,47,181,14,ES_AUTOHSCROLL
+    LTEXT           "dest is home directory if empty",IDC_SCP_PATH_NOTE,62,64,199,8
     CONTROL         "Bina&ry",IDC_BINARY_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,92,188,10
     CONTROL         "Es&cape",IDC_ESCAPE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,125,188,10
     CONTROL         "Separat&or is Space",IDC_SPACE_RADIO,"Button",BS_AUTORADIOBUTTON,21,139,188,10
