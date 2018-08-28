@@ -238,10 +238,9 @@ When a user configures below settings in the .vimrc file, the vsplit scroll will
 
 <pre class="macro-example">
 if &amp;term =~ "xterm"
-    let &amp;t_ti .= "\e[?6h\e[?69h"
-    let &amp;t_te .= "\e7\e[?69l\e[?6l\e8"
+    let &amp;t_ti .= "\e[?69h"
+    let &amp;t_te .= "\e[?69l"
     let &amp;t_CV = "\e[%i%p1%d;%p2%ds"
-    let &amp;t_CS = "y"
 endif
 </pre>
 
