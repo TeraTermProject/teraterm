@@ -192,6 +192,11 @@ inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 
 
 <h2><a name="TitleStack">ウィンドウタイトルを保存/復元する</a></h2>
+
+<p class="notice">
+注: Vim 8.1.0253 より、Vim がタイトルの保存/復元機能に対応したため、下記の設定は必要ありません。
+</p>
+
 <p>
 Tera Term では xterm のウィンドウタイトル変更制御シーケンスに対応しています。
 例えば vim の場合、set title を実行するとウィンドウタイトルに現在開いているファイル名等の情報が表示されるようになります。<br>
@@ -205,8 +210,10 @@ Tera Term では xterm のウィンドウタイトル変更制御シーケンスに対応しています。
 </p>
 
 <pre class="macro-example">
-let &amp;t_ti .= "\e[22;0t"
-let &amp;t_te .= "\e[23;0t"
+if !has("patch-8.1.0253")
+    let &amp;t_ti .= "\e[22;0t"
+    let &amp;t_te .= "\e[23;0t"
+endif
 </pre>
 
 

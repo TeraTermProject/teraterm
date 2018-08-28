@@ -191,6 +191,10 @@ inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 
 
 <h2><a name="TitleStack">Save and Restore Window Title</a></h2>
+<p class="notice">
+NOTE: Since Vim 8.1.0253, Vim supports save and restore window title feature, and following setting isn't necessary.
+</p>
+
 <p>
 Tera Term can support the xterm control sequence changing the window title.
 For example, in case of vim, when the "set title" is executed, the window title will be displayed 
@@ -206,8 +210,10 @@ the vim, and then restore the window title on existing the vim.
 </p>
 
 <pre class="macro-example">
-let &amp;t_ti .= "\e[22;0t"
-let &amp;t_te .= "\e[23;0t"
+if !has("patch-8.1.0253")
+    let &amp;t_ti .= "\e[22;0t"
+    let &amp;t_te .= "\e[23;0t"
+endif
 </pre>
 
 
