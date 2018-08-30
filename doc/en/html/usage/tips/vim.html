@@ -15,7 +15,7 @@ When a user uses the control sequence, the remote host can control the Tera Term
 The Vim procedure for using the control sequence is described below.
 </p>
 
-<h2><a name="CursorStyle">Changing cursor shape on entering and leaving into insert mode</a></h2>
+<h2 id="CursorStyle">Changing cursor shape on entering and leaving into insert mode</h2>
 <p>
 Tera Term can support below control sequence changing the cursor shape.
 </p>
@@ -63,7 +63,7 @@ let &amp;t_EI .= "\e[1 q"
 <p>NOTICE: If a user uses the control sequence except the DECTCEM, turn on the Cursor control sequence of the Additional Settings dialog(The default value is off).</p>
 
 
-<h2><a name="Bracketed">Auto indent can be disabled on pasting from clipboard</a></h2>
+<h2 id="Bracketed">Auto indent can be disabled on pasting from clipboard</h2>
 <p class="notice">
 NOTE: When text is pasted by using Vim 8.0.0238 or later , auto indent and completion are disabled not below configuration becasue the vim editor supports Bracketed Paste Mode. <br>
 However, when tmux is used, below configuration is needed because Bracketed Paste Mode is not enabled.
@@ -144,7 +144,7 @@ The program will receive: ESC [ 200 ~, followed by the pasted text, followed by 
 </p>
 
 
-<h2><a name="IMEcontrol">Controlling IME</a></h2>
+<h2 id="IMEcontrol">Controlling IME</h2>
 <p>
 Tera Term can support the original sequence to control the IME behavior.
 For example, A user can switch the IME status of enabling and disabling to use this control sequence.
@@ -169,7 +169,7 @@ As an alternative, please use the <a href="#AppESC">Delete wait time after ESC k
 </p>
 
 
-<h2><a name="AppESC">Delete wait time after ESC key is pushed in insert mode</a></h2>
+<h2 id="AppESC">Delete wait time after ESC key is pushed in insert mode</h2>
 <p>
 When the ESC key is pressed, Tera Term, xterm and other terminal emulator send the ESC(0x1b) key code. Also, when the cursor key and the function key is pushed, Tera Term sends the ESC key code.
 Therefore, the host application can not recognize whether the ESC key is pressed. <br>
@@ -190,7 +190,7 @@ inoremap &lt;special&gt; &lt;Esc&gt;O[ &lt;Esc&gt;
 </pre>
 
 
-<h2><a name="TitleStack">Save and Restore Window Title</a></h2>
+<h2 id="TitleStack">Save and Restore Window Title</h2>
 <p class="notice">
 NOTE: Since Vim 8.1.0253, Vim supports save and restore window title feature, and following setting isn't necessary.
 </p>
@@ -217,7 +217,7 @@ endif
 </pre>
 
 
-<h2><a name="VerticalSplit">Speed up vsplit scrolling</a></h2>
+<h2 id="VerticalSplit">Speed up vsplit scrolling</h2>
 <p>
 The vim will slow down by using the vsplit function for a reason of the VT100 and VT200 series specification based on 
 many terminal emulators.
@@ -251,7 +251,7 @@ emulator can support this function, but other terminal emulators can not support
 </p>
 
 
-<h2><a name="withScreen">GNU Screen Notice</a></h2>
+<h2 id="withScreen">GNU Screen Notice</h2>
 <p>
 When the GNU Screen is used, an application on the screen sends the control sequence and the sequence will be abandoned because the screen can not support the sequence.
 </p>
@@ -276,7 +276,7 @@ However, the screen can not work to switch the window because the sequence can n
 
 <h1>Vim Configuration</h1>
 
-<h2><a name="background">Background color</a></h2>
+<h2 id="background">Background color</h2>
 <p>
 The vim editor can automatically recognize the terminal color number, namely the 256 color
 supporting because the Tera Term 4.83 or later supports the Termcap String Query of xterm. 

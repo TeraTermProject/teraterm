@@ -37,12 +37,12 @@
  This article was written by TeraTerm Project in February 2008. The original is in Japanese language and is available from <a class="lnk" onclick="window.open(this.href); return false;" href="http://ttssh2.osdn.jp/manual/ja/reference/sourcecode.html">ttssh2.osdn.jp</a>. Yutaka Hirata and Boris Maisuradze translated the article to English in December 2015.</p> 
     
     
-<h2><a name="foreword">Foreword</a></h2>
+<h2 id="foreword">Foreword</h2>
     This article describes the source code of Tera Term version 4.58 released in February 2008. The general architecture of Tera Term did not change since then, so this description can be considered as up-to-date.     
 <hr>
 
 
-<h2><a name="skillset">Required Skill Sets</a></h2>
+<h2 id="skillset">Required Skill Sets</h2>
     Most programs included in Tera Term package are written in programming language C. Part of the code is written in C++ and uses Microsoft Foundation Classes (MFC). Knowledge of Win32 API is also required because the source code contains lots of calls to Windows platform specific functions from Win32 API. <br>
     
     Microsoft Visual Studio 2005 Standard Edition or later is required to build the source code. Unfortunately, Express Edition cannot be used as it does not support MFC. Other compilers like C++ Builder, Turbo C++ Explorer and gcc cannot be used either. <br>
@@ -63,7 +63,7 @@
 <hr>
 
 
-<h2><a name="module">Tera Term Package Content</a></h2>
+<h2 id="module">Tera Term Package Content</h2>
     Tera Term installation package contains several binary files (.exe and .dll) and their relationship is shown on the drawing below. Executable files have extension ".exe". Dynamically linked libraries (DLL) that are called only when needed, have extension ".dll". All binary files are 32-bit programs (x86) and Tera Term developers currently do not test them in 64-bit OS environments like x86-64, or IA-64.
      
 <div align="center">
@@ -86,7 +86,7 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 
 <hr>
 
-<h2><a name="library">Third Party Libraries</a></h2>
+<h2 id="library">Third Party Libraries</h2>
 <p>
   It is inefficient to build advanced software from scratch, that's why Tera Term actively uses open source libraries. This, however, requires from developers to be careful and avoid license violations, especially GPL.<br>
   Several Tera Term modules are linked to open source libraries as shown on the drawing below.
@@ -118,7 +118,7 @@ Launching a macro script starts "ttpmacro.exe" program. Macro scripts can be exe
 <hr>
     
 
-<h2><a name="plugin">Plug-in Support</a></h2>
+<h2 id="plugin">Plug-in Support</h2>
     Tera Term supports external plug-in functionality. Plug-ins should be written and compiled as dynamically linked libraries (DLL files). This allows developers to add new features to Tera Term without modifying its source code. Presence of a plug-in (.dll file) in Tera Term installation directory is enough for it to work. <br>
     
     TTSSH is typical example of Tera Term plug-in module. TTXSamples\ttxtest\ttxtest.c file contains a sample plug-in code. It is recommended to develop plug-ins based on this sample. "TTX KanjiMenu" source code (TTXKanjiMenu\ directory) is another example of practical and simple plug-in module.<br><br>
@@ -272,7 +272,7 @@ static TTXExports Exports = {
 
 
 
-<h2><a name="configuration">Reading and Writing Configuration File</a></h2>
+<h2 id="configuration">Reading and Writing Configuration File</h2>
 Modern Windows applications use system Registry to store their settings. Tera Term, however, stores its configuration in .ini file because that was the common practice back in the days when Tera Term was created. <br>
 
 LogMeTT and TTLEdit programs included in Tera Term package store their configurations in system Registry. <br>
@@ -301,7 +301,7 @@ To read or write string entries use GetPrivateProfileString() and WritePrivatePr
 
 
 
-<h2><a name="secure">Secure Programming</a></h2>
+<h2 id="secure">Secure Programming</h2>
 
 <h3>String Operation</h3>
 Prior to Windows Vista default user account in Microsoft Windows had Administrator privileges. When an application run by administrator contains a bug causing buffer overflow error, a third-party can illegally obtain Administrator level privileges. <br>
@@ -376,7 +376,7 @@ _snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
 
 
 
-<h2><a name="compatibility">Compatibility with Obsolete Windows Versions</a></h2>
+<h2 id="compatibility">Compatibility with Obsolete Windows Versions</h2>
 
 <h3>Dynamic Loading</h3>
 The same Microsoft Windows application executable file can work fine under different Windows versions if certain programming techniques are applied. For example, if we call API function SetLayeredWindowAttributes() that was introduced in Windows 2000, our application will fail under older Windows versions such as Windows NT4.0, or Windows 98. To be able to use newer API-s we need to dynamically load them with LoadLibrary() function. <br>
@@ -421,7 +421,7 @@ Visual Studio 2005 and later versions no longer support Microsoft Windows 95. Bi
 <hr>
 
 
-<h2><a name="debug">Debugging Methods</a></h2>
+<h2 id="debug">Debugging Methods</h2>
 <h3>Debug printf</h3>
 In general, Windows applications cannot use printf() function for debugging, because in these applications standard output is not defined. However, application can use printf() together with AllocConsole() and freopen(). <br>
 
@@ -453,7 +453,7 @@ It should be noted that Windows allocates separate virtual memory region for eac
 <hr>
 
 
-<h2><a name="thread">Multithreading</a></h2>
+<h2 id="thread">Multithreading</h2>
 Vast majority of modern Windows application use multithreading, however back in the days of Windows 3.1 and Windows 95 when Tera Term was born, this technique was considered a gimmick. Generally speaking Tera Term is singlethreaded application. As it can be seen from the source code, Tera Term uses lots of global variables and most of the procedures are not thread-safe. <br>
 
 However, there are few procedures that utilize _beginthreadex() API function to implement multithreading. The cases where multithreading is used are listed in the tables below.
@@ -582,7 +582,7 @@ void TelStartKeepAliveThread() {
 <hr>
 
 
-<h2><a name="dde">DDE Communication</a></h2>
+<h2 id="dde">DDE Communication</h2>
   <h3>Overview</h3>
 Dynamic Data Exchange (DDE) mechanism was introduced in 1987 in Windows 2.0. While DDE allows to establish communication between processes, it is currently considered as legacy technique and is rarely used. Modern methods of inter-process communication are mailslot, named pipes and OLE. <br>
 
@@ -779,7 +779,7 @@ As it has been mentioned earlier DDE communication buffer and log buffer in Tera
 
         
 
-<h2><a name="ttssh">SSH Design and Implementation in TTSSH</a></h2>
+<h2 id="ttssh">SSH Design and Implementation in TTSSH</h2>
   <h3>Overview</h3>
 Original TTSSH plugin for Tera Term was developed by <a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a> (currently works as <a href="http://robert.ocallahan.org/">Former Mozilla hacker</a>). It was supporting SSH1, packet compression and port forwarding. However, it did not support SSH2, SCP or SFTP. Development of the original Tera Term stopped in 1998 and its maintenance ended in 2001. <br>
 
@@ -1069,7 +1069,7 @@ When user performs an operation in X11 screen, X server needs to send data via T
 <hr>
 
 
-<h2><a name="macro">Macro Language Design and Implementation</a></h2>
+<h2 id="macro">Macro Language Design and Implementation</h2>
   <h3>Overview</h3>
 Tera Term macro script is BASIC-style language. It does not use Bison or Flex like lexical analyzer and is written entirely from the scratch using recursive descent parsing method. Therefore, from this point of view Tera Term macro can not be called a full-fledged scripting language.<br>
   
@@ -1181,7 +1181,7 @@ CheckVar() function can tell whether the variable exists and if it has numeric o
 
 
 
-<h2><a name="caret">Caret Control</a></h2>
+<h2 id="caret">Caret Control</h2>
   <h3>Overview</h3>
 Usually user moves the cursor by pressing corresponding keys on the keyboard, but if server needs to move the cursor, it sends out escape sequences (sets of characters that start with ESC code). Furthermore, terminal window may be in inactive mode, for example while running in broadcast mode, but it still should be able to move the cursor to simultaneously update multiple terminal windows.
 <br>
@@ -1286,7 +1286,7 @@ Since inactive window cursor may be in different states, we need to properly han
 <hr>
 
 
-<h2><a name="serial">Serial Port</a></h2>
+<h2 id="serial">Serial Port</h2>
   <h3>Overview</h3>
 Tera Term supports UART (16550A) compatible serial ports. Serial ports are also known as Communication Ports, or COM ports. When operating system detects COM port, it assigns it sequential number starting 1 and uses this number in port name like "COM1", "COM2", etc. Microsoft Windows XP supports up-to 256 COM ports (COM1 - COM256). <br>
 
@@ -1395,7 +1395,7 @@ cleanup:
 <hr>
 
 
-<h2><a name="xyzmodem">Binary Transfer Protocols</a></h2>
+<h2 id="xyzmodem">Binary Transfer Protocols</h2>
   <h3>Overview</h3>
   Creation of personal computers triggered development of communication protocols that would allow to send binary files from one computer to another. Many different protocols were born at that time and most of them have become legacy by now. One of the areas where such protocols are still in demand is communication with embedded devices for uploading or retrieving firmware. Tera Term supports 3 such protocols XMODEM, YMODEM and ZMODEM, which are described in this section. <br>
  

@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<h1><a name="autocopy">自動的な文字列コピーをしない</a></h1>
+<h1 id="autocopy">自動的な文字列コピーをしない</h1>
 
 <p>
 マウスで文字列を選択すると、同時にそれがクリップボードにコピーされます。この自動的な文字列コピーをしないようにするには、設定ファイルの [Tera Term] セクションの AutoTextCopy 行を以下のように変更してください。
@@ -25,7 +25,7 @@ AutoTextCopy=on
 </pre>
 
 
-<h1><a name="delimiter">ダブルクリックによる単語選択の区切り文字</a></h1>
+<h1 id="delimiter">ダブルクリックによる単語選択の区切り文字</h1>
 
 <p>
 左マウスボタンで単語をダブルクリックすると、その単語を選択することができます。設定ファイルの [Tera Term] セクションの DelimList 行を以下のように変更することによって単語の区切り文字を指定することができます。
@@ -84,7 +84,7 @@ DelimDBCS=off
 </p>
 
 
-<h1><a name="popup">ポップアップメニューを使用不可にする</a></h1>
+<h1 id="popup">ポップアップメニューを使用不可にする</h1>
 
 <p>
 メニューバーが表示されていないとき、Ctrl キーを押しながらマウス左ボタンを押すと、ポップアップメニューが現れます。ポップアップメニューが現れないようにするには、設定ファイルの [Tera Term] セクションの EnablePopupMenu 行を以下のように変更してください。
@@ -100,7 +100,7 @@ EnablePopupMenu=on
 </pre>
 
 
-<h1><a name="menubar">"Show menu bar" コマンドを隠す</a></h1>
+<h1 id="menubar">"Show menu bar" コマンドを隠す</h1>
 
 <p>
 メニューバーが表示されていないとき、システムメニューに "Show menu bar" コマンドが現れます。この "Show menu bar" コマンドが現れないようにするには、設定ファイルの [Tera Term] セクションの EnableShowMenu 行を以下のように変更してください。
@@ -116,7 +116,7 @@ EnableShowMenu=on
 </pre>
 
 
-<h1><a name="lang">言語モードの選択を不可にする</a></h1>
+<h1 id="lang">言語モードの選択を不可にする</h1>
 
 <p>
 [Setup] General ダイアログボックスで言語モード (Language) の選択ができないようにするには、設定ファイルの [Tera Term] セクションの LanguageSelection 行を、
@@ -136,7 +136,7 @@ LanguageSelection=on
 </pre>
 
 
-<h1><a name="scrollbuf">スクロールバッファーの最大行数</a></h1>
+<h1 id="scrollbuf">スクロールバッファーの最大行数</h1>
 
 <p>
 [Setup] Window ダイアログボックスで指定可能なスクロールバッファーの最大行数を変更するには、設定ファイルの [Tera Term] セクションの MaxBuffSize 行を、
@@ -161,7 +161,7 @@ MaxBuffSize=10000
 </pre>
 
 
-<h1><a name="blink">点滅しないカーソル</a></h1>
+<h1 id="blink">点滅しないカーソル</h1>
 
 <p>
 カーソルを点滅させないようにするには、設定ファイルの [Tera Term] セクションにの NonblinkingCursor 行を、
@@ -181,7 +181,7 @@ NonblinkingCursor=off
 </pre>
 
 
-<h1><a name="scrollline">一度にスクロールする最大の行数を設定する</a></h1>
+<h1 id="scrollline">一度にスクロールする最大の行数を設定する</h1>
 
 <p>
 VT window では画面のスクロールを速くするために、一度に複数行スクロールすることがあります。一度にスクロールする最大の行数を設定するには、設定ファイルの [Tera Term] セクションの ScrollThreshold 行を、
@@ -201,7 +201,7 @@ ScrollThreshold=12
 </pre>
 
 
-<h1><a name="textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</a></h1>
+<h1 id="textselect">マウスでウィンドウを選択したときの文字の選択を禁止する</h1>
 
 <p>
 非選択状態のウィンドウの文字領域をマウスでクリックすることによってウィンドウ選択することができます。初期設定では、このマウスクリックによって同時に文字の選択も開始されます。マウスでウィンドウを選択した時の文字の選択を禁止するには、設定ファイルの [Tera Term] セクションの SelectOnActivate 行を、
@@ -221,7 +221,7 @@ SelectOnActivate=on
 </pre>
 
 
-<h1><a name="title">タイトルの形式</a></h1>
+<h1 id="title">タイトルの形式</h1>
 
 <p>
 タイトルの形式を変えるには設定ファイルの [Tera Term] セクションの TitleFormat 行を以下のように変更してください。
@@ -288,7 +288,7 @@ TitleFormat=5
 </pre>
 
 
-<h1><a name="color">白色および黒色属性の文字の実際の色</a></h1>
+<h1 id="color">白色および黒色属性の文字の実際の色</h1>
 
 <p>
 エスケープシーケンス "&lt;ESC&gt;[37m" と"&lt;ESC&gt;[30m" は文字色をそれぞれ白と黒にします。同様にエスケープシーケンス "&lt;ESC&gt;[47m" と"&lt;ESC&gt;[40m" は背景色をそれぞれ白と黒にします。
@@ -312,7 +312,7 @@ UseTextColor=off
 </pre>
 
 
-<h1><a name="space">文字(行)間にすきまをあける</a></h1>
+<h1 id="space">文字(行)間にすきまをあける</h1>
 
 <p>
 文字(行)間にすきまをあけるには、設定ファイルの [Tera Term] セクションの VTFontSpace 行を以下のように変更してください。
@@ -343,7 +343,7 @@ VTFontSpace=0,0,0,0
 </pre>
 
 
-<h1><a name="window">[Window] メニューを隠す</a></h1>
+<h1 id="window">[Window] メニューを隠す</h1>
 
 <p>
 [Window] メニューを隠すには、設定ファイルの [Tera Term] セクションの WindowMenu 行を以下のように変更してください。
@@ -359,7 +359,7 @@ WindowMenu=on
 </pre>
 
 
-<h1><a name="eterm">Eterm風半透明ウィンドウ</a></h1>
+<h1 id="eterm">Eterm風半透明ウィンドウ</h1>
 
 <p>
 Eterm風半透明ウィンドウの詳細設定をします。
@@ -512,7 +512,7 @@ BGSrc2Alpha     = 64
 </pre>
 
 
-<h1><a name="maximize">ウィンドウ最大化時の画面スクロール方法</a></h1>
+<h1 id="maximize">ウィンドウ最大化時の画面スクロール方法</h1>
 <p>
 ウィンドウ最大化時の画面スクロール方法を指定します。<br>
 </p>
@@ -542,7 +542,7 @@ MaximizedBugTweak=2
 </pre>
 
 
-<h1><a name="killfocus">フォーカスが外れた時にもカーソルを表示する</a></h1>
+<h1 id="killfocus">フォーカスが外れた時にもカーソルを表示する</h1>
 <p>
 Tera Term は、ウィンドウのフォーカスが外れた時にもカーソルを表示します。<br>
 この機能を無効にするには、設定ファイルの [Tera Term] セクションの KillFocusCursor 行を以下のように変更してください。
@@ -558,7 +558,7 @@ KillFocusCursor=on
 </pre>
 
 
-<h1><a name="vttekpos">ウィンドウの初期位置を固定する</a></h1>
+<h1 id="vttekpos">ウィンドウの初期位置を固定する</h1>
 <p>
 ウィンドウの初期位置を変更するには、設定ファイルの [Tera Term] セクションの VTPos 行(VTウィンドウ) および TEKPos 行(TEKウィンドウ) を変更して下さい。<br>
 例えば、VTウィンドウの初期位置を画面の左端から 200 ピクセル、上端から 100 ピクセルの位置にする場合は、以下のようにして下さい。
@@ -588,7 +588,7 @@ TEKPos=-2147483648,-2147483648
 </pre>
 
 
-<h1><a name="savevtwinpos">ウィンドウ位置を保存する</a></h1>
+<h1 id="savevtwinpos">ウィンドウ位置を保存する</h1>
 <p>
 Tera Term は、"Save setup" を実行したときにはウィンドウの位置を保存しません。<br>
 この設定が on になっていると、設定ファイルの保存時にウィンドウの位置を保存します。
@@ -608,7 +608,7 @@ SaveVTWinPos=off
 </pre>
 
 
-<h1><a name="WindowIcon">ウィンドウアイコンを変更する</a></h1>
+<h1 id="WindowIcon">ウィンドウアイコンを変更する</h1>
 <p>
 Tera Termの実行ファイルには、VTウィンドウやTEKウィンドウのウィンドウアイコン等で使われている他にも、いくつかアイコンが含まれています。
 設定ファイルの[Tera Term]セクションのVTIcon, TEKIcon行を変更する事によって、VTウィンドウおよびTEKウィンドウのウィンドウアイコンにこれらのアイコンを使用する事が出来ます。

@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="rename">Auto renaming of a received file to avoid overwriting</a></h1>
+<h1 id="rename">Auto renaming of a received file to avoid overwriting</h1>
 
 <p>
 When a file is received by using the Kermit, Zmodem, BPlus or Quick-VAN protocol, the file name is given by the remote host. If the same file name already exists in the local disk, the existing file is overwritten by the received file. To avoid this overwriting, edit the AutoFileRename line in the [Tera Term] section of the setup file like the following:
@@ -29,7 +29,7 @@ AutoFileRename=on
 </pre>
 
 
-<h1><a name="bpauto">Auto activation of B-Plus Receive</a></h1>
+<h1 id="bpauto">Auto activation of B-Plus Receive</h1>
 
 <p>
 To enable the auto activation of the B-Plus Receive command, edit the BPAuto line in the [Tera Term] section of the setup file like the following:
@@ -49,7 +49,7 @@ BPAuto=off
 </pre>
 
 
-<h1><a name="bpesc">Escaping all control characters in the B-Plus protocol</a></h1>
+<h1 id="bpesc">Escaping all control characters in the B-Plus protocol</h1>
 
 <p>
 To escape all control characters in the B-Plus file transfer, edit the BPEscCtl line in the [Tera Term] section of the setup file like the following.
@@ -65,7 +65,7 @@ BPEscCtl=off
 </pre>
 
 
-<h1><a name="bplog">B-Plus log</a></h1>
+<h1 id="bplog">B-Plus log</h1>
 
 <p>
 To log data packets of B-Plus to the file BPLUS.LOG, edit the BPLog line in the [Tera Term] section of the setup file like the following:
@@ -81,7 +81,7 @@ BPLog=off
 </pre>
 
 
-<h1><a name="kmlog">Kermit log</a></h1>
+<h1 id="kmlog">Kermit log</h1>
 
 <p>
 To log data packets of Kermit to the file KERMIT.LOG, edit the KmtLog line in the [Tera Term] section of the setup file like the following:
@@ -97,7 +97,7 @@ KmtLog=off
 </pre>
 
 
-<h1><a name="kmlongpkt">Kermit Long Packet</a></h1>
+<h1 id="kmlongpkt">Kermit Long Packet</h1>
 
 <p>
 To transmit and receive extended-length packets of Kermit, edit the KmtLongPacket line in the [Tera Term] section of the setup file like the following:
@@ -117,7 +117,7 @@ KmtLongPacket=off
 </pre>
 
 
-<h1><a name="kmfileattr">Kermit File Attributes</a></h1>
+<h1 id="kmfileattr">Kermit File Attributes</h1>
 
 <p>
 To accept file attributes(size, type and timestamp, etc) of Kermit, edit the KmtFileAttr line in the [Tera Term] section of the setup file like the following:
@@ -137,7 +137,7 @@ KmtFileAttr=off
 </pre>
 
 
-<h1><a name="xmlog">XMODEM log</a></h1>
+<h1 id="xmlog">XMODEM log</h1>
 
 <p>
 To log data packets of XMODEM to the file XMODEM.LOG, edit the XmodemLog line in the [Tera Term] section of the setup file like the following:
@@ -153,7 +153,7 @@ XmodemLog=off
 </pre>
 
 
-<h1><a name="xmodemrecv">Receive command for XMODEM</a></h1>
+<h1 id="xmodemrecv">Receive command for XMODEM</h1>
 
 <p>
 You can automatically start the receipt of file by sending "a command for XMODEM receipt" to host immediately before transmitting a file. Specify a command for XMODEM receipt to be sent from Tera Term.
@@ -173,7 +173,7 @@ XmodemRcvCommand=
 </pre>
 
 
-<h1><a name="XmodemTimeouts">Timeout settings for XMODEM</a></h1>
+<h1 id="XmodemTimeouts">Timeout settings for XMODEM</h1>
 
 <p>
 XMODEM timeout value can be specified in seconds.
@@ -193,7 +193,7 @@ XmodemTimeouts=10,3,10,20,60
 </pre>
 
 
-<h1><a name="YmodemTimeouts">Timeout settings for YMODEM</a></h1>
+<h1 id="YmodemTimeouts">Timeout settings for YMODEM</h1>
 
 <p>
 YMODEM timeout value can be specified in seconds.
@@ -213,7 +213,7 @@ YmodemTimeouts=10,3,10,20,60
 </pre>
 
 
-<h1><a name="zmauto">Auto activation of ZMODEM Receive / Send</a></h1>
+<h1 id="zmauto">Auto activation of ZMODEM Receive / Send</h1>
 
 <p>
 To enable the auto activation of the ZMODEM Receive / Send command, edit the ZmodemAuto line in the [Tera Term] section of the setup file like the following:
@@ -234,7 +234,7 @@ ZmodemAuto=off
 </pre>
 
 
-<h1><a name="zmparam">Parameters for ZMODEM sending</a></h1>
+<h1 id="zmparam">Parameters for ZMODEM sending</h1>
 
 <p>
 You can change the ZMODEM parameters for sending by editing the ZmodemDataLen and ZmodemWinSize lines in the [Tera Term] section of the setup file like the following:
@@ -273,7 +273,7 @@ Please specify the ZmodemDataLen=128 at the Allied Telesis router.
 </p>
 
 
-<h1><a name="zmesc">Escaping all control characters in the ZMODEM protocol</a></h1>
+<h1 id="zmesc">Escaping all control characters in the ZMODEM protocol</h1>
 
 <p>
 To escape all control characters in the ZMODEM file transfer, edit the ZmodemEscCtl line in the [Tera Term] section of the setup file like the following:
@@ -289,7 +289,7 @@ ZmodemEscCtl=off
 </pre>
 
 
-<h1><a name="zmlog">ZMODEM log</a></h1>
+<h1 id="zmlog">ZMODEM log</h1>
 
 <p>
 To log data packets of ZMODEM to the file ZMODEM.LOG, edit the following line in the [Tera Term] section of the setup file like the following:
@@ -305,7 +305,7 @@ ZmodemLog=off
 </pre>
 
 
-<h1><a name="zmodemrecv">Receive command for ZMODEM</a></h1>
+<h1 id="zmodemrecv">Receive command for ZMODEM</h1>
 
 <p>
 You can automatically start the receipt of file by sending "a command for ZMODEM receipt" to host immediately before transmitting a file. Specify a command for ZMODEM receipt to be sent from Tera Term.
@@ -325,7 +325,7 @@ ZmodemRcvCommand=rz
 </pre>
 
 
-<h1><a name="ZmodemTimeouts">Timeout settings for ZMODEM</a></h1>
+<h1 id="ZmodemTimeouts">Timeout settings for ZMODEM</h1>
 
 <p>
 ZMODEM timeout value can be specified in seconds.
@@ -342,7 +342,7 @@ ZMODEM timeout value can be specified in seconds.
 default:
 ZmodemTimeouts=10,0,10,3
 </pre>
-<h1><a name="filter">File name filter for send file dialog</a></h1>
+<h1 id="filter">File name filter for send file dialog</h1>
 
 <p>
 To apply user define filter for "types of file" on send file dialog, edit the following line in the [Tera Term] section of the setup file like the following: 
@@ -358,7 +358,7 @@ FileSendFilter=
 </pre>
 
 
-<h1><a name="draganddrop">Confirmation of File Transfer by Drag &amp; Drop</a></h1>
+<h1 id="draganddrop">Confirmation of File Transfer by Drag &amp; Drop</h1>
 
 <p>
 Tera Term displays a message box to confirm the file transfer operation when a file is dragged and dropped in a window as a default.  If ConfirmFileDragAndDrop line in "Tera Term" section of setup file is modified as follows, a file transfer will be started without a confirmation.
@@ -374,7 +374,7 @@ ConfirmFileDragAndDrop=on
 </pre>
 
 
-<h1><a name="hidetransdialog">File Transfer Dialog is hidden</a></h1>
+<h1 id="hidetransdialog">File Transfer Dialog is hidden</h1>
 
 <p>
 Basically, the transferring progress dialog is shown when a file is sent.
@@ -391,7 +391,7 @@ FTHideDialog=off
 </pre>
 
 
-<h1><a name="FileSendHighSpeedMode">High Speed File Transfer on Serial Connection</a></h1>
+<h1 id="FileSendHighSpeedMode">High Speed File Transfer on Serial Connection</h1>
 
 <p>
 Basically, the file content is sent as one byte at a time. <br>

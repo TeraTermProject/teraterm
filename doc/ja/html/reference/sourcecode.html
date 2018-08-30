@@ -34,12 +34,12 @@
 
 <hr width=80% align=center>
 
-<h2><a name="foreword">はじめに</a></h2>
+<h2 id="foreword">はじめに</h2>
 　本文書では、Tera Termのソースコードについて解説をします。解説対象とするソースコードはバージョン"4.58"（2008年2月現在）のものをベースとしています。
 <hr>
 
 
-<h2><a name="skillset">必要スキル</a></h2>
+<h2 id="skillset">必要スキル</h2>
 　Tera Termのパッケージに含まれるほとんどのプログラムは、C言語で記述されています。一部のコードはC++言語で、MFC(Microsoft Foundation Class)が利用されています。Windows特有の処理を行うために、Win32 APIが多用されているため、APIの知識が必要となってきます。<br>
 　ソースコードをビルドするためには、Microsoft Visual Studio 2005 Standard Edition以上が必要です。Express EditionではMFCが利用できないため、ビルドができません。また、C++BuilderやTurbo C++ Explorer、gccなどのコンパイラにおいても、ビルドすることはできません。<br>
 　Windowsプログラミングに関する情報の源は、Microsoftが提供する「MSDNライブラリ」にあります。開発を行う際は、MSDNライブラリを頻繁に参照することになります。<br>
@@ -58,7 +58,7 @@
 <hr>
 
 
-<h2><a name="module">モジュール構成</a></h2>
+<h2 id="module">モジュール構成</h2>
 　Tera Termパッケージに含まれる実行モジュール（.exeと.dll）の関連図を以下に示します。実行ファイルの拡張子は".exe"になっており、必要に応じてDLLが動的リンクされます。いずれも32ビットプログラム(x86)であるために、x86-64やIA-64といった64ビット環境ではそのまま動作するかどうかは評価されていません。
 　
 <div align="center">
@@ -82,7 +82,7 @@
 <hr>
 
 
-<h2><a name="library">ライブラリ構成</a></h2>
+<h2 id="library">ライブラリ構成</h2>
 <p>
   高度な機能を実現するために、フルスクラッチで実装することは効率がいいとは言えません。Tera Termでは開発効率化を図るために、オープンソースのライブラリを積極的に利用しています。ただし、オープンソース製品のライセンスによる競合には注意を払う必要があります（特にGPL）。<br>
   下図に、オープンソースのライブラリをリンクしているモジュールと、そのリンク状況を示します。
@@ -114,7 +114,7 @@
 <hr>
 
 
-<h2><a name="plugin">プラグインサポート</a></h2>
+<h2 id="plugin">プラグインサポート</h2>
 　Tera Termでは、DLLという形式でプラグインのしくみをサポートしています。プラグイン形式のDLLファイルを、Tera Termがインストールされているディレクトリへ設置するだけで、Tera Termのソースコードを修正することなく、機能追加を行うことができます。代表的なプラグインとして、TTSSHがあります。<br>
 　プラグインを作成するためのサンプルコードとして、TTXSamples\ttxtest\ttxtest.c というソースファイルが用意されています。プラグインを開発するときは、このソースファイルをひな形とするとよいでしょう。実践的なプラグインとして、"TTX KanjiMenu"のソースコード（TTXKanjiMenu\配下）がシンプルで分かりやすいです。<br><br>
 
@@ -276,7 +276,7 @@ static TTXExports Exports = {
 
 
 
-<h2><a name="configuration">設定ファイルの読み書き</a></h2>
+<h2 id="configuration">設定ファイルの読み書き</h2>
 　Windowsではアプリケーションのデータ保存のために、レジストリが伝統的に利用されていますが、Tera Termではその誕生がWindows 3.1までに遡るために、.iniファイルによるローカルディレクトリへの保存方法が標準となっています。<br>
 　パッケージに同梱されるCollectorやCygTermに関してもローカルディレクトリへデータが保存されます。<br>
 　LogMeTTとTTLEditはレジストリへ保存されます。<br>
@@ -303,7 +303,7 @@ static TTXExports Exports = {
 
 
 
-<h2><a name="secure">セキュアプログラミング</a></h2>
+<h2 id="secure">セキュアプログラミング</h2>
 
 <h3>文字列操作</h3>
 　WindowsのデフォルトアカウントはAdministrator権限を保持するために（ただし、Windows Vistaには当てはまらない）、アプリケーションにバッファオーバーフローの不具合があると、管理者権限を第三者に奪取されてしまう危険性があります。<br>
@@ -375,7 +375,7 @@ _snprintf_s(buf, sizeof(buf), _TRUNCATE, "abcdef");
 
 
 
-<h2><a name="compatibility">古いバージョンのWindowsとの互換性維持</a></h2>
+<h2 id="compatibility">古いバージョンのWindowsとの互換性維持</h2>
 
 <h3>ダイナミックローディング</h3>
 
@@ -424,7 +424,7 @@ Visual Studio 2005になってから、Windows 95のサポートが打ち切られました。よって、
 <hr>
 
 
-<h2><a name="debug">デバッグ手法</a></h2>
+<h2 id="debug">デバッグ手法</h2>
 <h3>debug printf</h3>
 　Windowsアプリケーションでは printf() が使えません。標準出力がどこにも割り当てられていないからです。AllocConsole()とfreopen()を使えば、Windowsアプリケーションにおいても printf() を利用することができます。<br>
 　OutputDebugString()というAPIがあります。これは Visual Studio のデバッグコンソールにメッセージ出力することができる関数です。当該APIは、"Debug build"および"Release build"に関係なく、デバッガが存在すれば、メッセージを送信します。ゆえに、 Visual Studioがなくとも、<a href="http://www.vector.co.jp/soft/win95/prog/se046776.html">DBCon</a>のようなツールを使えば、アプリケーションの単体起動においても、OutputDebugString()によるメッセージを拾うことができます。<br>
@@ -454,7 +454,7 @@ void OutputDebugPrintf(char *fmt, ...) {
 <hr>
 
 
-<h2><a name="thread">マルチスレッド</a></h2>
+<h2 id="thread">マルチスレッド</h2>
 　Windowsのアプリケーションはマルチスレッドで設計されることがほとんどですが、Windows 3.1から95の時代ではあまり一般的ではありませんでした。そのため、元々Tera Termはマルチスレッド化されていません。ソースコードを見ると分かるように、グローバル変数が多用されているため、ほとんどの処理がスレッドセーフではありません。<br>
 　ただし、一部の処理においては _beginthreadex() API を使ってスレッドが生成されています。以下にスレッド生成箇所を示します。
 
@@ -582,7 +582,7 @@ void TelStartKeepAliveThread() {
 <hr>
 
 
-<h2><a name="dde">DDEによるプロセス間通信</a></h2>
+<h2 id="dde">DDEによるプロセス間通信</h2>
   <h3>概要</h3>
 　DDE(Dynamic Data Exchange)の誕生は、1987年のWindows 2.0までに遡ります。DDEはプロセス間通信を行うためのしくみですが、現在ではレガシーな方式であり、ほとんどのアプリケーションでは利用されていません。Windowsにおけるプロセス間通信といえば、メールスロットや名前付きパイプ、OLEなどが定番です。<br>
 　かつては、DDEによるプロセス間の通信データをキャプチャすることができる「DDEスパイ」(DDESPY.EXE)というツールがVisual Studioに付属していましたが、現在のVisual Studioにはもはや含まれていません。<br>
@@ -766,7 +766,7 @@ void TelStartKeepAliveThread() {
 <hr>
 
 
-<h2><a name="ttssh">TTSSHによるSSHの設計と実装</a></h2>
+<h2 id="ttssh">TTSSHによるSSHの設計と実装</h2>
   <h3>概要</h3>
 　オリジナルのTTSSHは<a href="http://www.cs.cmu.edu/People/roc/">Robert O'Callahan</a>氏（現在は<a href="http://robert.ocallahan.org/">元Mozilla hacker</a>として活躍）により開発されたプラグインです。SSH1へ対応しており、ポートフォワーディングやzlibによるパケット圧縮もサポートしていました。TTSSHは、Tera Termをセキュア通信に対応させるためのプラグインであったために、SCPやSFTP等には未対応でした。オリジナルTera Termが1998年に開発凍結後も、2001年ごろまでメンテナンスが続けられていました。<br>
 　TTSSHのSSH2対応を実現するために、TeraTerm Projectにより2004年から設計と実装が始められました。3年の歳月をかけて、ほぼSSH2プロトコルのフルサポートを実現しました。現在ではSCPへも対応しています。将来的にはSFTPへも対応されるかもしれません。<br>
@@ -1035,7 +1035,7 @@ DISPLAY=localhost:10.0
 <hr>
 
 
-<h2><a name="macro">マクロ言語の設計と実装</a></h2>
+<h2 id="macro">マクロ言語の設計と実装</h2>
   <h3>概要</h3>
 　Tera Termのマクロスクリプトは、BASIC風の言語仕様となっています。BisonやFlexといったしくみは利用しておらず、力業的な独自の構文解析（再帰的下降法）により実装されています。そのため、本格的なスクリプト言語としての記述はできない側面があります。<br>
 　
@@ -1147,7 +1147,7 @@ WORD LineLen;       /* バッファサイズ */
 
 
 
-<h2><a name="caret">キャレット制御</a></h2>
+<h2 id="caret">キャレット制御</h2>
   <h3>概要</h3>
 　ユーザが端末上でキーボード入力を行うと、カーソルが移動しますが、サーバからのエスケープシーケンスにより、キーボード入力なしにカーソルを移動させる必要があります。また、ウィンドウが非アクティブ状態の場合においても、カーソルを表示させることにより、ブロードキャストモードにおいて、複数端末の同時操作性を向上させています。
 <br>
@@ -1252,7 +1252,7 @@ void CaretKillFocus(BOOL show)
 <hr>
 
 
-<h2><a name="serial">シリアルポート</a></h2>
+<h2 id="serial">シリアルポート</h2>
   <h3>概要</h3>
 　Tera TermはUART(16550A)互換のシリアルポートに対応しているため、シリアルコンソールが使用できます。シリアルポートのことを、COM(Communication Port)ポートと呼ぶこともあります。OSが検出したCOMポートは、順に"COM1"、"COM2"といった名前が付けられ、アプリケーションから利用することができます。Microsoft Windows XPでは、最大256個のCOMポート（COM1～COM256）までが利用可能です。<br>
 　パソコンに搭載されるCOMポートは、せいぜい1つ、多くても2つであり、最近ではまったくCOMポートがないパソコンも存在します。そのため、USB接続によるシリアルポートを実現する「USBシリアル変換ケーブル」が発売されています。こういった製品の特徴として、OSに認識させるCOMポートの番号を、ユーザが自由に設定できるようになっています。すなわち、Tera Term見えには、2つのCOMポートがあった場合、それぞれ"COM1"、"COM2"として認識できるとは限らず、"COM1"、"COM7"といったふうに認識できるようになる必要があります。<br>
@@ -1361,7 +1361,7 @@ cleanup:
 <hr>
 
 
-<h2><a name="xyzmodem">バイナリ転送プロトコル</a></h2>
+<h2 id="xyzmodem">バイナリ転送プロトコル</h2>
   <h3>概要</h3>
 パソコン通信時代に、バイナリファイルを転送するためのプロトコルが多数開発され、Tera Termではいくつかの転送方式をサポートしています。これらのプロトコルは、今となってはレガシー仕様であり、ほとんど利用されることはありません。現在では、ルータなどの組み込み機器において、ファームウェアのアップロードに使われるぐらいです。
 本節では、XMODEM/YMODEM/ZMODEMに関して説明します。<br>

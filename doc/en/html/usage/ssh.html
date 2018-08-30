@@ -16,7 +16,7 @@
       When the TTSSH module is installed, Tera Term supports the SSH connection.
     </p>
 
-    <h2><a name="prerequisite">Prerequisite</a></h2>
+    <h2 id="prerequisite">Prerequisite</h2>
 
     <p>
       SSH is composed of two protocols, namely SSH1 and SSH2. Be careful that SSH2 is NOT upward compatible of SSH1. These protocols should be chosen carefully according to the host to be connected. TTSSH supports both protocols.
@@ -38,7 +38,7 @@
       In this document, we will describe Password authentication and Key-pair authentication which would be most widely used.
     </p>
 
-    <h2><a name="connproc">Procedure of connection</a></h2>
+    <h2 id="connproc">Procedure of connection</h2>
 
     <p>
       When Tera Term is activated, the following dialog will let you choose login procedure.
@@ -66,7 +66,7 @@
       <li>When the Pageant is used, check the [Use Pageant] and input your user name.</li>
     </ul>
 
-    <h3><a name="passwd_input">Inputing Password and Passphrase</a></h3>
+    <h3 id="passwd_input">Inputing Password and Passphrase</h3>
     <p>
       The password and passphrase input box differs from normal dialog box.
     </p>
@@ -75,9 +75,9 @@
       <li>Control + V can not be used because the key equals SYN (0x16). Please use Shift + Insert combination for pasting.</li>
     </ul>
 
-    <h2><a name="securitywarning">Security Warning</a></h2>
+    <h2 id="securitywarning">Security Warning</h2>
 
-    <h3><a name="known_hosts">ssh_known_hosts file</a></h3>
+    <h3 id="known_hosts">ssh_known_hosts file</h3>
 
     <p>On SSH connection, Tera Term searches the server host key into the ssh_known_hosts file. If the host key can not be found, the security warning is shown.<br />
        The result is described below.</p>
@@ -96,7 +96,7 @@
 
     <pre>ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub</pre>
 
-    <h3><a name="VerifyHostKeyDNS">SSHFP RR</a></h3>
+    <h3 id="VerifyHostKeyDNS">SSHFP RR</h3>
 
     <p>When a user is using SSH to connect to a server, the user can use SSHFP RR (Secure SHell FingerPrint Resource Record) defined in RFC 4255. However, this feature is experimentally implemented because the current Tera Term can not do the DNSSEC verification.</p>
 
@@ -107,7 +107,7 @@
        <i>A public key verified using this method MUST NOT be trusted if the SSHFP resource record (RR) used for verification was not authenticated by a trusted SIG RR.</i><br />
       The DNSSEC verification always fails because the Windows resolver used by Tera Term can not verify the DNSSEC signature. </p>
 
-    <h2><a name="generate">Generating Key</a></h2>
+    <h2 id="generate">Generating Key</h2>
 
     <p>
      Here, we will describe how to generate Public/Private key pair.  To generate key, select [Setup]

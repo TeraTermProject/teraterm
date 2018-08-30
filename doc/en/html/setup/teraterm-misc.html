@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="beep">Beep sound on connection</a></h1>
+<h1 id="beep">Beep sound on connection</h1>
 
 <p>
 To enable a beep sound which is made when a TCP/IP connection is established and when the connection is terminated, edit the BeepOnConnect line in the [Tera Term] section of the setup file like the following:
@@ -25,7 +25,7 @@ BeepOnConnect=off
 </pre>
 
 
-<h1><a name="macro">Executing a macro on startup</a></h1>
+<h1 id="macro">Executing a macro on startup</h1>
 
 <p>
 A macro can be executed automatically when Tera Term is started. You can specify the macro filename by using the command line option "
@@ -42,7 +42,7 @@ StartupMacro=
 </pre>
 
 
-<h1><a name="UILang">User interface language file</a></h1>
+<h1 id="UILang">User interface language file</h1>
 
 <p>
 To switch the display language, specify user interface language file that includes the message.
@@ -58,7 +58,7 @@ UILanguageFile=
 </pre>
 
 
-<h1><a name="broadcast">Number for the history of broadcast command</a></h1>
+<h1 id="broadcast">Number for the history of broadcast command</h1>
 
 <p>
 If you configure the number for the history of broadcast command, you need to set up MaxBroadcatHistory entry in the 'teraterm.ini' file. See example of this value below.
@@ -74,7 +74,7 @@ MaxBroadcatHistory=99
 </pre>
 
 
-<h1><a name="mousewheel">Mouse wheel action in application cursor mode</a></h1>
+<h1 id="mousewheel">Mouse wheel action in application cursor mode</h1>
 
 <p>
 Basically, Tera Term window scrolls up and scrolls down when a user rotates the mouse wheel. However, Tera Term would send key sequences of up and down cursor when the application cursor mode is enabled by starting vi or less command.
@@ -103,7 +103,7 @@ DisableWheelToCursorByCtrl=on
 </pre>
 
 
-<h1><a name="hostdlg">Showing "New Connection" dialog on startup</a></h1>
+<h1 id="hostdlg">Showing "New Connection" dialog on startup</h1>
 
 <p>
 Tera Term shows "New Connection" dialog on startup when the port type is TCP/IP. (The dialog is not shown when the port type is Serial). <br>
@@ -120,7 +120,7 @@ HostDialogOnStartup=on
 </pre>
 
 
-<h1><a name="DisablePasteMouseMButton">Enable paste by clicking the middle button of mouse</a></h1>
+<h1 id="DisablePasteMouseMButton">Enable paste by clicking the middle button of mouse</h1>
 
 <p>
 In order to enable paste by clicking the middle button of mouse, change the DisablePasteMouseMButton line at [Tera Term] section of the setup file like the following:
@@ -136,7 +136,7 @@ DisablePasteMouseMButton=on
 </pre>
 
 
-<h1><a name="DisableMenuNewConnection">Disable "New connection" menu</a></h1>
+<h1 id="DisableMenuNewConnection">Disable "New connection" menu</h1>
 
 <p>
 In order to disable "New connection" menu, change the DisableMenuNewConnection line at [Tera Term] section of the setup file like the following:
@@ -152,7 +152,7 @@ DisableMenuNewConnection=off
 </pre>
 
 
-<h1><a name="DisableMenuDuplicateSession">Disable "Duplicate session" menu</a></h1>
+<h1 id="DisableMenuDuplicateSession">Disable "Duplicate session" menu</h1>
 
 <p>
 In order to disable "Duplicate session" menu, change the DisableMenuDuplicateSession line at [Tera Term] section of the setup file like the following:
@@ -168,7 +168,7 @@ DisableMenuDuplicateSession=off
 </pre>
 
 
-<h1><a name="DisableMenuSendBreak">Disable "Send break" menu</a></h1>
+<h1 id="DisableMenuSendBreak">Disable "Send break" menu</h1>
 
 <p>
 In order to disable "Send break" menu, change the DisableMenuSendBreak line at [Tera Term] section of the setup file like the following:
@@ -184,7 +184,7 @@ DisableMenuSendBreak=off
 </pre>
 
 
-<h1><a name="ClearScreenOnCloseConnection">Clear the screen when disconnected</a></h1>
+<h1 id="ClearScreenOnCloseConnection">Clear the screen when disconnected</h1>
 
 <p>
 In order to clear the screen, change the ClearScreenOnCloseConnection line at [Tera Term] section of the setup file like the following:
@@ -200,7 +200,7 @@ ClearScreenOnCloseConnection=off
 </pre>
 
 
-<h1><a name="AcceleratorNewConnection">Disable accelerator key of New Connection</a></h1>
+<h1 id="AcceleratorNewConnection">Disable accelerator key of New Connection</h1>
 
 <p>
 In order to disable accelerator key of "New Connection", change the AcceleratorNewConnection line at [Tera Term] section of the setup file like the following:
@@ -216,7 +216,7 @@ AcceleratorNewConnection=on
 </pre>
 
 
-<h1><a name="DisableAcceleratorDuplicateSession">Disable accelerator key of Duplicate session</a></h1>
+<h1 id="DisableAcceleratorDuplicateSession">Disable accelerator key of Duplicate session</h1>
 
 <p>
 In order to disable accelerator key of "Duplicate session", change the DisableAcceleratorDuplicateSession line at [Tera Term] section of the setup file like the following:
@@ -232,7 +232,7 @@ DisableAcceleratorDuplicateSession=off
 </pre>
 
 
-<h1><a name="AcceleratorCygwinConnection">Disable accelerator key of Cygwin connection</a></h1>
+<h1 id="AcceleratorCygwinConnection">Disable accelerator key of Cygwin connection</h1>
 
 <p>
 In order to disable accelerator key of "Cygwin connection", change the AcceleratorCygwinConnection line at [Tera Term] section of the setup file like the following:
@@ -248,7 +248,7 @@ AcceleratorCygwinConnection=on
 </pre>
 
 
-<h1><a name="ClickableUrlBrowser">A browser by using Clickable URL</a></h1>
+<h1 id="ClickableUrlBrowser">A browser by using Clickable URL</h1>
 
 <p>
 When the clickable URL is enabled, the default browser will be launched.<br>
@@ -276,7 +276,7 @@ ClickableUrlBrowserArg=
 </pre>
 
 
-<h1><a name="JoinSplitURL">URL string concatenated of split line</a></h1>
+<h1 id="JoinSplitURL">URL string concatenated of split line</h1>
 
 <p>
 When the end of URL string continues to the next line, basically the whole string is recognized as a URL string.
@@ -319,7 +319,7 @@ JoinSplitURLIgnoreEOLChar=\
 </pre>
 
 
-<h1><a name="LogLockExclusive">Exclusive-lock log file</a></h1>
+<h1 id="LogLockExclusive">Exclusive-lock log file</h1>
 
 <p>
 When a log file is opened in written mode, the file will be locked exclusively. So, the log file can not be opened by multiple processes.<br>
@@ -336,7 +336,7 @@ LogLockExclusive=on
 </pre>
 
 
-<h1><a name="DeferredLogWriteMode">Deferred log write mode</a></h1>
+<h1 id="DeferredLogWriteMode">Deferred log write mode</h1>
 
 <p>
 The log file is written on the thread procedure to avoid Tera Term slows down 
@@ -353,7 +353,7 @@ DeferredLogWriteMode=on
 </pre>
 
 
-<h1><a name="LogTimestampFormat">Specify timestamp format at the start of log file's line</a></h1>
+<h1 id="LogTimestampFormat">Specify timestamp format at the start of log file's line</h1>
 
 <p>
 When the log file is written, the timestamp can be added at the start of line and the timestamp format can be specified.
@@ -388,7 +388,7 @@ LogTimestampFormat=%Y-%m-%d %H:%M:%S.%N
 </pre>
 
 
-<h1><a name="LogTimestampUTC">UTC is used as timestamp at the start of log file's line</a></h1>
+<h1 id="LogTimestampUTC">UTC is used as timestamp at the start of log file's line</h1>
 
 <p>
 When the log file is written, the timestamp can be added at the start of log file's line. Basically, local time is used. <br>

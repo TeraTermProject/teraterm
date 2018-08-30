@@ -15,7 +15,7 @@
       Tera Term の特徴とも言える SSH 接続について解説します。Tera Term は TTSSH プラグインを導入すると SSH 接続に対応します。
     </p>
 
-    <h2><a name="prerequisite">前提知識</a></h2>
+    <h2 id="prerequisite">前提知識</h2>
 
     <p>
       SSH には SSH1、SSH2 の2種類のプロトコルがあります。SSH2 は SSH1 の上位互換ではないので注意が必要です。接続するホストに応じて適切に選択する必要があります。TTSSH は両方のバージョンに対応しています。
@@ -37,7 +37,7 @@
       があります。ここでは需要が多いと思われる認証方法について触れたいと思います。
     </p>
 
-    <h2><a name="connproc">接続の手順</a></h2>
+    <h2 id="connproc">接続の手順</h2>
 
     <p>
       Tera Term を起動すると、下図のようなダイアログによりログイン方法を選ぶことができます。
@@ -65,7 +65,7 @@
       <li>Pageant を用いて認証する場合は「Use Pageant」にチェックをつけ、ユーザ名を入力します。</li>
     </ul>
 
-    <h3><a name="passwd_input">パスワード / パスフレーズ入力</a></h3>
+    <h3 id="passwd_input">パスワード / パスフレーズ入力</h3>
     <p>
       パスワード / パスフレーズの入力欄は、通常のダイアログと違い以下のような動作となります。
     </p>
@@ -74,9 +74,9 @@
       <li>Control + V は SYN (0x16) の入力となりますので、貼り付けには利用できません。貼り付けを行うには Shift + Insert を使用してください。</li>
     </ul>
 
-    <h2><a name="securitywarning">セキュリティ警告</a></h2>
+    <h2 id="securitywarning">セキュリティ警告</h2>
 
-    <h3><a name="known_hosts">ssh_known_hosts ファイル</a></h3>
+    <h3 id="known_hosts">ssh_known_hosts ファイル</h3>
 
     <p>SSH 接続時には SSH サーバのホスト鍵をチェックし、一致する鍵が ssh_known_hosts にない場合には警告を表示します。<br />
        チェックの結果は以下のように分類されます。</p>
@@ -95,7 +95,7 @@
 
     <pre>ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub</pre>
 
-    <h3><a name="VerifyHostKeyDNS">SSHFP RR</a></h3>
+    <h3 id="VerifyHostKeyDNS">SSHFP RR</h3>
 
     <p>SSH 接続時に、RFC 4255 に規定されている SSHFP RR (Secure SHell FingerPrint Resource Record) による検証が可能ですが、現在のTera Termでは DNSSEC 検証ができないので参考程度の位置づけとなります。</p>
 
@@ -105,7 +105,7 @@
     <p>SSHFP に関して規定している RFC 4255 には「DNSSEC 認証されていない SSHFP RR を信頼してはならない」とあります。<br />
        Tera Term が利用している Windows リゾルバは DNSSEC の署名が検証ができないため、常に DNSSEC 検証に失敗します。</p>
 
-    <h2><a name="generate">キーの生成</a></h2>
+    <h2 id="generate">キーの生成</h2>
 
     <p>
       ここで、公開鍵認証に用いる公開鍵・秘密鍵ペアの生成方法を説明します。鍵ファイルを生成するには [Setup] メニューから「SSH KeyGenerator...」を選択します。

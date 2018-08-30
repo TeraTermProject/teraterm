@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="delay">Delay of path-through printing</a></h1>
+<h1 id="delay">Delay of path-through printing</h1>
 
 <p>
 You can set the delay of pass-through printing. A pass-through sequence is initiated by ESC[5i and terminated by ESC[4i. The received data between ESC[5i and ESC[4i are printed when the delay time has passed since Tera Term received ESC[4i. If the second ESC[5i is received before the delay of the first pass-through sequence has passed, the first and second printing data are combined and printed at once after the delay of the second sequence has passed. Namely, multiple consecutive sequences with intervals less than the delay are treated as one printing sequence. To change the delay of pass-through printing, edit the PassThruDelay line in the [Tera Term] section of the setup file like the following:
@@ -25,7 +25,7 @@ PassThruDelay=3
 </pre>
 
 
-<h1><a name="direct">Path-through printing directly to a port</a></h1>
+<h1 id="direct">Path-through printing directly to a port</h1>
 
 <p>
 You can send the data of pass-through printing to a port by editing the PassThruPort line in the [Tera Term] section of the setup file like the following:
@@ -55,7 +55,7 @@ For Russian mode, you should see also <a href="#russfont">Russian code set of th
 </p>
 
 
-<h1><a name="ignoremc">Disabling the printing by the control sequence</a></h1>
+<h1 id="ignoremc">Disabling the printing by the control sequence</h1>
 
 <p>
 You can disable the which invoked by the control sequence. To do this, edit the PrinterCtrlSequence line in the [Tera Term] section of the setup file like the following:
@@ -71,7 +71,7 @@ PrinterCtrlSequence=on
 </pre>
 
 
-<h1><a name="formfeed">Disabling the form-feed in the path-through printing</a></h1>
+<h1 id="formfeed">Disabling the form-feed in the path-through printing</h1>
 
 <p>
 You can disable the form-feed (moving to the next paper) which is caused by an FF character in the pass-through printing. To do this, edit the PrnConvFF line in the [Tera Term] section of the setup file like the following:
@@ -95,7 +95,7 @@ PrnConvFF=off
 </pre>
 
 
-<h1><a name="font">Printer font</a></h1>
+<h1 id="font">Printer font</h1>
 
 <p>
 In the default setup, the font used for printing is the same as one for displaying text on the screen. You can specify a font for printing, by doing the following procedure:
@@ -123,7 +123,7 @@ For Russian mode, you should see also <a href="#russfont">Russian code set of th
 </p>
 
 
-<h1><a name="margin">Page margins</a></h1>
+<h1 id="margin">Page margins</h1>
 
 <p>
 You can specify the left, right, top and bottom margins of a page for printing by editing the PrnMargin line in the [Tera Term] section of the setup file like the following:
@@ -143,7 +143,7 @@ PrnMargin=50,50,50,50
 </pre>
 
 
-<h1><a name="scale">Scaling factors for printing</a></h1>
+<h1 id="scale">Scaling factors for printing</h1>
 
 <p>
 When a printed image is too small or too large, usually you can enlarge or shrink the image by changing the scaling factor in the "Printer" section of Control Panel. If the printer driver does not support scaling, you can specify scaling factors for horizontal and vertical directions. To specify scaling factors, edit the VTPPI and TEKPPI lines in the [Tera Term] section of the setup file:
@@ -171,7 +171,7 @@ TEKPPI=0,0
 </pre>
 
 
-<h1><a name="russfont">Russian code set of the printer font (Russian mode only)</a></h1>
+<h1 id="russfont">Russian code set of the printer font (Russian mode only)</h1>
 
 <p>
 When you specify a <a href="#font">printer font</a> or a <a href="#direct">printer device</a>, you should specify also the character set for the printer font or device. Otherwise, Russian characters may not be printed correctly. To specify the character set, edit the RussPrint line in the [Tera Term] section of the setup file like the following:

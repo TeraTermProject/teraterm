@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="backwrap">バック・ラップ (back wrap)</a></h1>
+<h1 id="backwrap">バック・ラップ (back wrap)</h1>
 
 <p>
 バック・ラップ (back wrap) 機能を有効にすると、BS 文字を受信した時に行の始めにあるカーソルが前の行の最後に移動します。バック・ラップを有効にするには、設定ファイルの [Tera Term] セクションの BackWrap 行を以下のように変更してください。
@@ -25,7 +25,7 @@ BackWrap=off
 </pre>
 
 
-<h1><a name="beep">BEL 文字受信時の動作</a></h1>
+<h1 id="beep">BEL 文字受信時の動作</h1>
 
 <p>
 BEL 文字 (ASCII $07) が受信された時に Tera Term はビープ音を鳴らします。
@@ -53,7 +53,7 @@ Beep=on
 </pre>
 
 
-<h1><a name="C1">C1 制御文字 ($80-$9F) を使用しない</a></h1>
+<h1 id="C1">C1 制御文字 ($80-$9F) を使用しない</h1>
 
 <p>
 Tera Term の漢字モード(受信)を EUC か JIS にして、 Teraminal ID を VT2XX または、 VT3XX にしている場合、Shift-JIS の漢字を受信すると、ハングアップすることがあります。
@@ -89,7 +89,7 @@ Accept8BitCtrl=on
 </pre>
 </li></ol>
 
-<h1><a name="C1send">C1 制御文字 ($80-$9F) を送信に使用する</a></h1>
+<h1 id="C1send">C1 制御文字 ($80-$9F) を送信に使用する</h1>
 <p>
 Tera TermではC1制御文字を送信する時、同等の意味を持つ7ビット文字の組み合わせを使います。
 </p>
@@ -115,7 +115,7 @@ Send8BitCtrl=on
 Send8BitCtrl=off
 </pre>
 
-<h1><a name="kout">正しくない "kanji-out" を使用可能にする</a></h1>
+<h1 id="kout">正しくない "kanji-out" を使用可能にする</h1>
 
 <p>
 一部のシステムで用いられている "kanji-out" シーケンス ^[(H は、JIS/ISO の規格に従っていません。本当に必要のある場合以外は使用しないでください。初期設定では間違いを防ぐため [Setup] terminal ダイアログボックスで ^[(H が選択できないようになっています。
@@ -139,7 +139,7 @@ AllowWrongSequence=off
 </pre>
 
 
-<h1><a name="kctrl">2バイト文字(漢字)の1バイト目と2バイト目の間に制御文字等が入った場合、1バイト目を無効にする</a></h1>
+<h1 id="kctrl">2バイト文字(漢字)の1バイト目と2バイト目の間に制御文字等が入った場合、1バイト目を無効にする</h1>
 
 <p>
 ホストから送られてくる2バイト文字(漢字等)の1バイト目と2バイト目の間に制御文字(例えば改行文字)等が入っても、Tera Term の初期設定では2バイト文字も制御文字も正しく取り扱われます。
@@ -163,7 +163,7 @@ CtrlInKanji=on
 </pre>
 
 
-<h1><a name="displayall">受信した文字をすべて表示</a></h1>
+<h1 id="displayall">受信した文字をすべて表示</h1>
 
 <p>
 <!-- TODO: 内容修正 -->
@@ -215,7 +215,7 @@ Debug=off
 </pre>
 
 
-<h1><a name="statusline">ステータスラインを使用不可にする</a></h1>
+<h1 id="statusline">ステータスラインを使用不可にする</h1>
 
 <p>
 VT 端末のステータスラインの機能を使用不可にするには、設定ファイルの [Tera Term] セクションの EnableStatusLine 
@@ -236,7 +236,7 @@ EnableStatusLine=on
 </pre>
 
 
-<h1><a name="tekgin">TEK GIN report のマウスコード</a></h1>
+<h1 id="tekgin">TEK GIN report のマウスコード</h1>
 
 <p>
 ホスト側のアプリケーションによって、TEK window が GIN モード(クロスヘアーカーソルが現れ、座標入力が可能な状態)になったとき、あるキーを押すと TEK window はクロスヘアーカーソルの座標とキーの ASCII コードをホストへ報告します。
@@ -261,7 +261,7 @@ TEKGINMouseCode=32
 </pre>
 
 
-<h1><a name="vttab">行末のタブ表示を VT 端末互換にする</a></h1>
+<h1 id="vttab">行末のタブ表示を VT 端末互換にする</h1>
 
 <p>
 on の場合には、行末のタブの動作は VT/PuTTY/xterm 等と同じになります。タブによる自動改行は発生しません。<br>
@@ -278,7 +278,7 @@ VTCompatTab=off
 </pre>
 
 
-<h1><a name="ScrollWindowClearScreen">画面クリア時にカレントバッファをスクロールアウトさせるかどうか設定する</a></h1>
+<h1 id="ScrollWindowClearScreen">画面クリア時にカレントバッファをスクロールアウトさせるかどうか設定する</h1>
 
 <p>
 カーソルが左上(0, 0)にある場合の &lt;ESC&gt;[J (Erase Below) は、&lt;ESC&gt;[2J (Erase All) と同じことになる。<br>
@@ -296,7 +296,7 @@ ScrollWindowClearScreen=on
 </pre>
 
 
-<h1><a name="UnknownUnicodeCharacterAsWide">対応していないUnicodeの文字をワイド文字として扱うか設定する</a></h1>
+<h1 id="UnknownUnicodeCharacterAsWide">対応していないUnicodeの文字をワイド文字として扱うか設定する</h1>
 
 <p>
 受信漢字コードがUTF-8またはUTF-8mの設定の時に、Tera Termが対応していないUnicodeの文字の取り扱いを設定します。<br>
@@ -310,7 +310,7 @@ UnknownUnicodeCharacterAsWide=off
 </pre>
 
 
-<h1><a name="UnicodeDecSpMapping">UnicodeからDEC特殊文字へのマッピングを設定する</a></h1>
+<h1 id="UnicodeDecSpMapping">UnicodeからDEC特殊文字へのマッピングを設定する</h1>
 
 <p>
 日本語環境ではTera Termは罫線や一部の記号を2カラム幅で表示します。しかし、ホスト側のアプリケーションによってはUTF-8エンコーディング時にはこれらの文字が1カラム幅で表示されると期待した出力を行う物があり、その結果画面出力が崩れる場合があります。<br>
@@ -360,7 +360,7 @@ UnicodeToDecSpMapping=3
 </pre>
 
 
-<h1><a name="StrictKeyMapping">ファンクションキー等のデフォルトの動作</a></h1>
+<h1 id="StrictKeyMapping">ファンクションキー等のデフォルトの動作</h1>
 
 <p>
 Tera Term 4.62 より、ファンクションキーやエディタキーパッドのキーのデフォルトの動作が変更になりました。
@@ -381,7 +381,7 @@ StrictKeyMapping=off
 </pre>
 
 
-<h1><a name="Meta8Bit">AltキーでMSBをセットした文字を送信する</a></h1>
+<h1 id="Meta8Bit">AltキーでMSBをセットした文字を送信する</h1>
 
 <p>
 AltキーでMSB(Most Significant Bit 最上位ビット)をセットした文字を送信するには、設定ファイルの [Tera Term] セクションの Meta8Bit 行を以下のようにしてください。
@@ -409,7 +409,7 @@ Meta8Bit=off
 </pre>
 
 
-<h1><a name="AltScr">代替画面バッファを無効にする</a></h1>
+<h1 id="AltScr">代替画面バッファを無効にする</h1>
 
 <p>
 Tera Term 4.65より代替画面バッファに対応しました。この為、代替画面バッファに対応したアプリケーション(Vimやlessなど)では終了時に起動前の画面が復元されます。
@@ -429,7 +429,7 @@ AlternateScreenBuffer=on
 </pre>
 
 
-<h1><a name="TerminalUID">端末固有IDを設定する</a></h1>
+<h1 id="TerminalUID">端末固有IDを設定する</h1>
 
 <p>
 Tera Term は DA3 制御シーケンスを受信すると、端末固有の ID 応答します。端末固有 ID は 8 桁の 16 進数値で、最初の 2 桁が製造場所を、残りの 6 桁が製造場所内で端末毎に割り振られた固有の番号です。
@@ -449,7 +449,7 @@ TerminalUID=FFFFFFFF
 </pre>
 
 
-<h1><a name="LockTUID">端末固有IDを変更可能にする</a></h1>
+<h1 id="LockTUID">端末固有IDを変更可能にする</h1>
 
 <p>
 端末固有 ID はホスト側から DECSTUI 制御シーケンスを送る事によって変更する事が出来ますが、標準ではこの機能は無効にされています。
@@ -469,7 +469,7 @@ LockTUID=on
 </pre>
 
 
-<h1><a name="TabStopModify">タブストップ位置の変更を禁止する</a></h1>
+<h1 id="TabStopModify">タブストップ位置の変更を禁止する</h1>
 
 <p>
 制御シーケンスによるタブストップの位置の変更を禁止したい場合は、設定ファイルの [Tera Term] セクションの TabStopModifySequence 行を以下のようにしてください。
@@ -507,7 +507,7 @@ TabStopModifySequence=on
 </pre>
 
 
-<h1><a name="BellLimitting">ベル過使用時の一時無効化</a></h1>
+<h1 id="BellLimitting">ベル過使用時の一時無効化</h1>
 <p>
 ホスト側から BEL 文字 (ASCII $07) が送られて来た時、Tera Term ではビープ音を鳴らしたり、画面を点滅させたりします。
 </p>
@@ -534,7 +534,7 @@ BeepSuppressTime=5
 </pre>
 
 
-<h1><a name="MaxOSCBufferSize">OSC文字列用バッファサイズ</a></h1>
+<h1 id="MaxOSCBufferSize">OSC文字列用バッファサイズ</h1>
 <p>
 Tera Term では OSC 文字列の処理時に処理用のバッファが足りなくなると自動的にバッファを拡張するようになっています。
 しかし、バグ等でホスト側が壊れた OSC 文字列送ってきた時などに際限なくメモリを消費するのを防ぐため、
@@ -557,7 +557,7 @@ MaxOSCBufferSize=4096
 </pre>
 
 
-<h1><a name="ISO2022ShiftFunction">ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止する</a></h1>
+<h1 id="ISO2022ShiftFunction">ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止する</h1>
 
 <p>
 ISO/IEC 2022のシフト機能による文字セットの切り替えを禁止したい場合は、設定ファイルの [Tera Term] セクションの ISO2022ShiftFunction 行を以下のようにしてください。
