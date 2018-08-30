@@ -60,89 +60,83 @@ VT window
 <dd>Minimizes the window, if the title bar is hidden.</dd>
 
 <dt><a name="dragdropwindow">Dragging a text file and dropping it into the window</a></dt>
-<!--
   <dl>
-    <dt>確認ダイアログの表示</dt>
+    <dt>Displaying Confirmation Dialog</dt>
     <dd>
       <dl>
-        <dt><a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> が on のとき</dt>
-        <dd>ドロップするとダイアログが表示されます。<br>
-            ただし、ダイアログで "次のドロップ時、ダイアログを表示しない" をチェックして OK を押すと表示されなくなります。その後は CTRL キーを押しながらドロップすればダイアログが表示されます。</dd>
-        <dt>ConfirmFileDragAndDrop が off のとき</dt>
+        <dt>When <a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> is on</dt>
+        <dd>Dialog is shown after dropping<br>
+            However, when "Do not display this dialog, next drop" is checked on the dialog, the dialog is not shown. Next, the dialog can be shown by using CTRL key pressing. </dd>
+        <dt>When ConfirmFileDragAndDrop is off</dt>
         <dd>
-          1つのファイルをドロップすると、ダイアログを表示せずに処理します。デフォルトの処理はSend File (Past content of file)です。<br>
-          1つまたは複数のフォルダをドロップすると、ダイアログを表示せずに処理します。デフォルトの処理はPast Filenameです。<br>
-          これ以外(複数のファイル/ファイルとフォルダ)の場合はダイアログが表示されます。また、上記の場合でも、CTRL キーを押しながらドロップするとダイアログが表示されます。
+          When one file is dropped, the action is done without dialog dislaying. The default action is Send File (Past content of file).<br>
+          When one or multiple folders are dropped, the action is done without dialog dislaying. The default action is Past Filename.<br>
+          The dialog is shown other than these(multiple files/a file and folder). In this case, the dialog can be shown by using CTRL key pressing.
         </dd>
       </dl>
     </dd>
-    <dt>ダイアログ</dt>
+    <dt>Dialog</dt>
     <dd>
-      ファイル/フォルダをドロップしたときの動作を指定します。
+      When the file and folder is dropped, the action can be determined.
       <dl>
         <dt>SCP</dt>
         <dd>
-          SCP でファイルを送信します。<br>
-          SSH2 接続の場合で、ドロップ内容がファイルだけのとき選択できます。<br>
+          The file is sent with SCP method.<br>
+          On SSH2 connection, this menu can be selected with the file. <br>
           <dl>
             <dt>dest</dt>
             <dd>
-              送信先を指定します。<br>
-              空白の場合はホームディレクトリです。<br>
-              "~" は送信先の OS やシェルによって使えないことがあります。
+              Specity the destination path. <br>
+              The path is treated as home directory when dest is empty. <br>
+              NOTICE: The "~" may not be used in some cases of remote OS and shell.
             </dd>
           </dl>
         </dd>
         <dt>Send File (Paste content of file)</dt>
         <dd>
-          ファイルの内容を送信(ペースト)します。<br>
-          ドロップ内容がファイルだけのとき選択できます。<br>
+          The file content is sent(pasted) into the terminal.<br>
+          When the file is dropped, this menu can be selected with the file. <br>
           <dl>
             <dt>Binary</dt>
             <dd>
-              チェックが入っているときは、ファイルの内容がそのまま送信されます。<br>
-              チェックが入ってないときは、漢字コード、改行コードは変換されます。
+              When this option is checked, the file content is transmitted as it is. <br>
+              When this option is not checked, KANJI and new line code are converted.
             </dd>
           </dl>
         </dd>
         <dt>Paste Filename</dt>
         <dd>
-          ファイル名/フォルダ名をペーストします。
+          A file name and folder name is pasted.
           <dl>
             <dt>Escape</dt>
             <dd>
-              チェックが入っていると次の処理が行われます。
+              When this option is checked, below processing is done.
               <ul>
-                <li>パス区切りを "\" から "/" へ変換します。</li>
-                <li>" ;&()$!`'[]{}#^~"の文字を"\"でエスケープします。</li>
+                <li>The path delimiter is changed from "\" to "/". </li>
+                <li>" ;&()$!`'[]{}#^~" characters are escaped with "\". </li>
               </ul>
             </dd>
             <dt>Separator is Space</dt>
-            <dd>複数ドロップされたとき、ファイル名の区切りはスペースとなります。</dd>
+            <dd>When multiple files are dropped, the file delimiter is space. </dd>
             <dt>Separator is NewLine</dt>
-            <dd>複数ドロップされたとき、ファイル名の区切りは改行となります。</dd>
+            <dd>When multiple files are dropped, the file delimiter is new line. </dd>
           </dl>
         </dd>
         <dt>Do this for the next N files</dt>
-        <dd>チェックが入っていると、同時にドロップされた残りのファイル/フォルダも同様に処理します。</dd>
+        <dd>When this option is checked, remaining files and folders are processed the same way. </dd>
         <dt>Do same process, next drop</dt>
-        <dd>ダイアログの設定内容を記憶し、次にドロップされたときに利用（ダイアログが表示される場合には
-            ダイアログの設定に反映、そうでなければユーザへ確認せずに同じ処理を）します。</dd>
+        <dd>The dialog setting is recorded into memory, and then the setting is reused by using next action.(When the dialog is shown, the dialog setting is update. Otherwise same action is done without confirmation.) </dd>
         <dt>Do not display this dialog, next drop</dt>
         <dd>
-          チェックが入っていると、次回のファイルドロップ時にダイアログが表示されなくなり、
-          ユーザへ確認せずにファイル/フォルダを処理します。<br>
-          このチェックボックスは ConfirmFileDragAndDrop が off のときのみチェックすることができます。<br>
-          この設定は ConfirmFileDragAndDrop とは別の設定であり、
-          <a href="../menu/setup-save.html">[Setup] Save Setup</a> で設定を保存しても保存されません。<br>
-          たとえば「次のドロップ時、同じ処理を行う」で SCP を選んだあとにフォルダをドロップするなど、
-          処理できない（確認が必要な）場合や、CTRL キーを押しながらドロップした場合は、ダイアログが表示されます。
+          When this option is checked, the dialog is not shown on next file dropping and the action is done without confirmation. <br>
+          This option can be used when ConfirmFileDragAndDrop is off. <br>
+          This option is a different setting from ConfirmFileDragAndDrop, and then the option can not be saved by using <a href="../menu/setup-save.html">[Setup] Save Setup</a>. <br>
+          For example, when "Do same process, next drop" and SCP are selected, a folder is dropped. Next, when the action can not be done(needing confirmation) or dropping by using CTRL key pressing, the dialog is shown.
         </dd>
       </dl>
     </dd>
   </dl>
 </dd>
--->
 
 <dt>Dragging with the middle button, Clicking the middle button</dt>
 <dd>These actions are no longer supported.</dd>
