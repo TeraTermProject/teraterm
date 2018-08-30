@@ -67,7 +67,8 @@ VT window
     <dd>
       <dl>
         <dt><a href="../setup/teraterm-trans.html#draganddrop">ConfirmFileDragAndDrop</a> が on のとき</dt>
-        <dd>ドロップすると必ずダイアログが表示されます。</dd>
+        <dd>ドロップするとダイアログが表示されます。<br>
+            ただし、ダイアログで "次のドロップ時、ダイアログを表示しない" をチェックして OK を押すと表示されなくなります。その後は CTRL キーを押しながらドロップすればダイアログが表示されます。</dd>
         <dt>ConfirmFileDragAndDrop が off のとき</dt>
         <dd>
           1つのファイルをドロップすると、ダイアログを表示せずに処理します。デフォルトの処理はSend File (Past content of file)です。<br>
@@ -119,11 +120,11 @@ VT window
             </dd>
             <dt>Separator is Space</dt>
             <dd>複数ドロップされたとき、ファイル名の区切りはスペースとなります。</dd>
-            <dt>Separator is NewLine ボタン</dt>
+            <dt>Separator is NewLine</dt>
             <dd>複数ドロップされたとき、ファイル名の区切りは改行となります。</dd>
           </dl>
         </dd>
-        <dt>同じ処理を次の N 個の競合に適用</dt>
+        <dt>同じ処理を次の N 個のファイルに適用</dt>
         <dd>チェックが入っていると、同時にドロップされた残りのファイル/フォルダも同様に処理します。</dd>
         <dt>次のドロップ時、同じ処理を行う</dt>
         <dd>ダイアログの設定内容を記憶し、次にドロップされたときに利用（ダイアログが表示される場合には
