@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 
 /* TERATERM.EXE, main */
 
-//#include "stdafx.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -46,7 +45,6 @@
 #include "ttdde.h"
 #include "keyboard.h"
 #include "compat_win.h"
-
 #include "compat_w95.h"
 
 static void init()
@@ -212,18 +210,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
 	LONG lCount = 0;
-
+	DWORD SleepTick = 1;
 	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow();
-	pVTWin = m_pMainWnd->m_hWnd;
+	pVTWin = m_pMainWnd;
 	ShowWindow(m_pMainWnd->m_hWnd, nCmdShow);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
+
 		if (MetaKey(ts.MetaKey)) {
 			continue;
 		}
+
 		if (m_pMainWnd->m_hAccel != NULL &&
 			!TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg))
 		{
@@ -231,22 +231,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			DispatchMessage(&msg);
 		}
 
-		if (!OnIdle(lCount++)) {
-			lCount = 0;
+		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
+			// メッセージがない
+			if (!OnIdle(lCount)) {
+				// idle不要
+				if (SleepTick < 500) {	// 最大 501ms未満
+					SleepTick += 2;
+				}
+				lCount = 0;
+				Sleep(SleepTick);
+			} else {
+				// 要idle
+				SleepTick = 0;
+				lCount++;
+			}
 		}
-    }
+	}
     return (msg.wParam);
 }
-
-#if 0
-
-#define COMPILE_NEWAPIS_STUBS 
-//#define WANT_GETDISKFREESPACEEX_WRAPPER // wrap for GetDiskFreeSpaceEx
-//#define WANT_GETLONGPATHNAME_WRAPPER // wrap for GetLongPathName
-//#define WANT_GETFILEATTRIBUTESEX_WRAPPER // wrap for GetFileAttributesEx
-#define WANT_ISDEBUGGERPRESENT_WRAPPER // wrap for wrap for IsDebuggerPresent
-#include <NewAPIs.h>
-
-// https://bearwindows.zcm.com.au/msvc.htm
-
-#endif
