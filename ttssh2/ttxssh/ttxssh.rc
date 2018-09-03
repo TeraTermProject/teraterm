@@ -8,6 +8,9 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
+#ifndef IDC_STATIC
+#define IDC_STATIC -1
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -631,7 +634,7 @@ IDI_SECURETT_YELLOW     ICON                    "ttsecure_yellow.ico"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "ttxssh-version.rc"
+//#include "ttxssh-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

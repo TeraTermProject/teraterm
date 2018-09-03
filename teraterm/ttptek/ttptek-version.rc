@@ -3,6 +3,8 @@
 // Version
 //
 
+//#include "afxres.h"
+
 #include "tt-version.h"
 
 VS_VERSION_INFO VERSIONINFO
