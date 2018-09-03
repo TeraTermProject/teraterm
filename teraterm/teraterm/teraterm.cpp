@@ -29,7 +29,7 @@
 
 /* TERATERM.EXE, main */
 
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -47,22 +47,7 @@
 #include "keyboard.h"
 #include "compat_win.h"
 
-#include "teraapp.h"
-
 #include "compat_w95.h"
-
-#if 0
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-BEGIN_MESSAGE_MAP(CTeraApp, CWinApp)
-	//{{AFX_MSG_MAP(CTeraApp)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-#endif
 
 static void init()
 {
@@ -90,29 +75,6 @@ static void init()
 		PSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 }
-
-#if 0
-// CTeraApp instance
-CTeraApp theApp;
-
-
-
-
-
-// CTeraApp initialization
-BOOL CTeraApp::InitInstance()
-{
-	hInst = m_hInstance;
-	m_pMainWnd = new CVTWindow();
-	pVTWin = m_pMainWnd;
-	return TRUE;
-}
-
-int CTeraApp::ExitInstance()
-{
-	return CWinApp::ExitInstance();
-}
-#endif
 
 // Tera Term main engine
 static BOOL OnIdle(LONG lCount)
@@ -241,20 +203,15 @@ static BOOL OnIdle(LONG lCount)
 	return (Busy>0);
 }
 
-BOOL CTeraApp::PreTranslateMessage(MSG* pMsg)
+BOOL CallOnIdle(LONG lCount)
 {
-	if (MetaKey(ts.MetaKey)) {
-		return FALSE; /* ignore accelerator keys */
-	}
-	else {
-		return CWinApp::PreTranslateMessage(pMsg);
-	}
+	return OnIdle(lCount);
 }
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
+	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd->m_hWnd;
@@ -262,15 +219,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
+		if (MetaKey(ts.MetaKey)) {
+			continue;
+		}
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
     return (msg.wParam);
 }
 
+#define COMPILE_NEWAPIS_STUBS 
+//#define WANT_GETDISKFREESPACEEX_WRAPPER // wrap for GetDiskFreeSpaceEx
+//#define WANT_GETLONGPATHNAME_WRAPPER // wrap for GetLongPathName
+//#define WANT_GETFILEATTRIBUTESEX_WRAPPER // wrap for GetFileAttributesEx
+#define WANT_ISDEBUGGERPRESENT_WRAPPER // wrap for wrap for IsDebuggerPresent
+#include <NewAPIs.h>
 
-BOOL CallOnIdle(LONG lCount)
-{
-	CWinApp *app = AfxGetApp();
-	return app->OnIdle(lCount);
-}
+// https://bearwindows.zcm.com.au/msvc.htm
