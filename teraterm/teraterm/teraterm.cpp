@@ -228,6 +228,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
     return (msg.wParam);
 }
 
+#if 0
+
 #define COMPILE_NEWAPIS_STUBS 
 //#define WANT_GETDISKFREESPACEEX_WRAPPER // wrap for GetDiskFreeSpaceEx
 //#define WANT_GETLONGPATHNAME_WRAPPER // wrap for GetLongPathName
@@ -236,3 +238,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #include <NewAPIs.h>
 
 // https://bearwindows.zcm.com.au/msvc.htm
+
+#endif
