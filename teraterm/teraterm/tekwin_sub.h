@@ -40,16 +40,17 @@ public:
 	static const RECT rectDefault;
 	///
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-//	static LRESULT AfxWndProc(UINT message, WPARAM wParam, LPARAM lParam);
 	///
+#if 1
 	void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	void OnKillFocus(TTCWnd* pNewWnd);
 	void OnDestroy();
 	void OnSetFocus(TTCWnd* pOldWnd);
 	void OnSysCommand(UINT nID, LPARAM lParam);
+	void OnClose();
+#endif
 	void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	void OnClose();
 };
 
 class TTCPoint {

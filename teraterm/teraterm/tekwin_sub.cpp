@@ -91,10 +91,14 @@ void TTCFrameWnd::OnSysCommand(UINT nID, LPARAM lParam)
 {}
 
 void TTCFrameWnd::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-{}
+{
+	TTCFrameWnd::Proc(WM_SYSKEYDOWN, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
+}
 
 void TTCFrameWnd::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
-{}
+{
+	TTCFrameWnd::Proc(WM_SYSKEYUP, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
+}
 
 void TTCFrameWnd::OnClose()
 {}
