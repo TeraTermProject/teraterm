@@ -72,7 +72,9 @@ void CPrnAbortDlg::OnCancel()
 	TTCDialog::OnCancel();
 }
 
+#if 0
 void CPrnAbortDlg::PostNcDestroy()
 {
 	TTCDialog::DestroyWindow();
 }
+#endif

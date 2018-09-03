@@ -42,7 +42,7 @@ public:
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
 	void OnCancel();
 	void OnInitDialog();
-	void PostNcDestroy();
+//	void PostNcDestroy();
 
 private:
 	BOOL *m_pAbort;

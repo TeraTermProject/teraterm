@@ -17,6 +17,7 @@ set(COMMON_SRC
   ../common/tttypes.h
   ../common/ttlib.c
   ../common/ttlib.h
+  ../common/servicenames.h
   )
 
 source_group(

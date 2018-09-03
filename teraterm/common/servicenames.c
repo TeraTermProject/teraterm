@@ -379,7 +379,7 @@ static BOOL is_service_name_char(char ch)
 	return (isalnum(ch) || ch == '_' || ch == '-');
 }
 
-int WINAPI parse_port_from_buf(char * buf)
+DllExport int WINAPI parse_port_from_buf(char * buf)
 {
 	int i;
 	char lower_buf[32];

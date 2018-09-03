@@ -10,6 +10,7 @@ set(COMMON_SRC
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
   ../../teraterm/common/ttlib.h
+  ../../teraterm/common/servicenames.h
   )
 
 source_group(
