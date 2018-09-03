@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="maxport">シリアルポート番号の最大値</a></h1>
+<h1 id="maxport">シリアルポート番号の最大値</h1>
 
 <p>
 [File] New connection および [Setup] Serial port ダイアログボックスで表示されるシリアルポート番号の最大値 (COMn の最大値 n) を指定するには、設定ファイルの [Tera Term] セクションの MaxComPort 行を、
@@ -29,7 +29,7 @@ MaxComPort=256
 </pre>
 
 
-<h1><a name="clearcom">シリアルポートのバッファをクリアしない</a></h1>
+<h1 id="clearcom">シリアルポートのバッファをクリアしない</h1>
 
 <p>
 Tera Termの初期設定ではシリアルポートを開く時にシリアルポートのバッファの内容を消去します。
@@ -53,7 +53,7 @@ ClearComBuffOnOpen=on
 </pre>
 
 
-<h1><a name="confirm">TCP/IP 回線切断の確認をしない</a></h1>
+<h1 id="confirm">TCP/IP 回線切断の確認をしない</h1>
 
 <p>
 Unix 等のホストに telnet でログインしている状態で、回線を強制的に切断すると、プロセスが残ったままになることがあります。やむを得ない場合を除き、正しい方法でログアウトするようにしてください。
@@ -81,7 +81,7 @@ ConfirmDisconnect=on
 </pre>
 
 
-<h1><a name="telbin">Telnet のバイナリオプション</a></h1>
+<h1 id="telbin">Telnet のバイナリオプション</h1>
 
 <p>
 ホストに telnet 接続し、ファイル転送 (XMODEM 等)で CR 文字を送出する場合、Tera Term の初期設定では CR+NUL ($0D $00) に変換してから送出します。バイナリオプションで telnet 接続すると、このような変換はおこないません。
@@ -109,7 +109,7 @@ TelBin=off
 </pre>
 
 
-<h1><a name="telecho">Telnet のエコーオプション</a></h1>
+<h1 id="telecho">Telnet のエコーオプション</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの TelEcho 行を、
@@ -129,7 +129,7 @@ TelEcho=off
 </pre>
 
 
-<h1><a name="tellog">Telnet のログ</a></h1>
+<h1 id="tellog">Telnet のログ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの TelLog 行を、
@@ -149,9 +149,9 @@ TelLog=off
 </pre>
 
 
-<h1><a name="port/nontelnet">Telnet 用ポート番号 / 非 telnet TCP/IP 接続用の端末設定</a></h1>
+<h1 id="port/nontelnet">Telnet 用ポート番号 / 非 telnet TCP/IP 接続用の端末設定</h1>
 
-<h2><a name="port">Telnet 用ポート番号</a></h2>
+<h2 id="port">Telnet 用ポート番号</h2>
 
 <p>
 <a href="../commandline/teraterm.html">コマンドライン</a>、または <a href="../menu/file-new.html">[File] New connection</a> ダイアログボックスでは、TCP/IP 接続に使用される TCP ポート番号 (&lt;TCP port#&gt;) と telnet フラグ (&lt;telnet flag&gt;) を指定することができます。コマンドラインでこれらのパラメーターが省略された場合は、Tera Term 設定ファイルに書かれている設定値が使用されます。
@@ -178,7 +178,7 @@ TelPort=23
 &lt;telnet flag&gt; と &lt;TCP port#&gt; が何であれ Tera Term はホストから送られてきた telnet コマンドに応答することができます。(但し、<a href="#detecttelnet">TelAutoDetect</a>がoffの時は除きます。)
 </p>
 
-<h2><a name="nontelnet">非 telnet TCP/IP 接続用の端末設定</a></h2>
+<h2 id="nontelnet">非 telnet TCP/IP 接続用の端末設定</h2>
 
 <p>
 Telnet プロトコルに対応していないホスト(通常 23 以外のポート番号を使用)に TCP/IP 接続する場合、ローカルエコーを on に、送信する改行コードを CR+LF にする必要がある場合があります。設定ファイルの [Tera Term] セクションの TCPLocalEcho と TCPCRSend 行を、
@@ -204,7 +204,7 @@ TCPCRSend=
 </pre>
 
 
-<h1><a name="detecttelnet">Telnet コマンド自動検出の無効化</a></h1>
+<h1 id="detecttelnet">Telnet コマンド自動検出の無効化</h1>
 
 <p>
 非 Telnet 接続時でも、Tera Term はホストから送られてきた telnet コマンドに応答し、以降の通信を Telnet 接続として扱うようになります。<br>
@@ -229,7 +229,7 @@ TelAutoDetect=on
 </pre>
 
 
-<h1><a name="linemode">行単位送信モードの無効化</a></h1>
+<h1 id="linemode">行単位送信モードの無効化</h1>
 
 <p>
 Tera Term 4.63 より行単位送信(Line at a time)モードに対応しました。<br>
@@ -258,7 +258,7 @@ EnableLineMode=on
 </pre>
 
 
-<h1><a name="SendBreakTime">シリアルポートでブレーク信号を送出する時間の長さ</a></h1>
+<h1 id="SendBreakTime">シリアルポートでブレーク信号を送出する時間の長さ</h1>
 
 <p>
 シリアルポートでブレーク信号を送信する場合、デフォルトの送出時間は 1000 ミリ秒です。<br>
@@ -275,7 +275,7 @@ SendBreakTime=1000
 </pre>
 
 
-<h1><a name="AutoComPortReconnect">シリアルポートの切断・再接続を検出する</a></h1>
+<h1 id="AutoComPortReconnect">シリアルポートの切断・再接続を検出する</h1>
 
 <p>
 接続中の USB シリアルケーブルが抜かれたことを検出した場合に Tera Term のシリアル接続を切断し、
@@ -300,7 +300,7 @@ AutoComPortReconnect=on
 </pre>
 
 
-<h1><a name="WaitCom">シリアルポートの接続を待つ</a></h1>
+<h1 id="WaitCom">シリアルポートの接続を待つ</h1>
 
 <p>
 接続しようとしたシリアルポートが未接続の場合、接続されるまで待ちます。
@@ -325,7 +325,7 @@ WaitCom=off
 </pre>
 
 
-<h1><a name="TerminalSpeed">サーバに通知する端末速度を変更する</a></h1>
+<h1 id="TerminalSpeed">サーバに通知する端末速度を変更する</h1>
 
 <p>
 Telnet や SSH での接続開始時、端末の速度をサーバへ通知します。

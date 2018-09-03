@@ -11,7 +11,7 @@
 
 <h1>Supported Control Functions</h1>
 
-<h2><a name="C0">C0 Control Character</a></h2>
+<h2 id="C0">C0 Control Character</h2>
 <table border="1">
 <tr><th>Hexadecimal</th>	<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>0x00</td>	<td> NUL </td>	<td> </td></tr>
@@ -48,7 +48,7 @@
 <tr><td>0x1f</td>	<td> US  </td>	<td> </td></tr>
 </table>
 
-<h2><a name="C1">C1 Control Character</a></h2>
+<h2 id="C1">C1 Control Character</h2>
 <table border="1">
 <tr><th>Hexadecimal</th>	<th>Equivalent 7-bit control</th>	<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>0x80</td>	<td> </td>	<td> PAD </td>	<td></td></tr>
@@ -85,7 +85,7 @@
 <tr><td>0x9f</td>	<td> ESC _ </td>	<td> APC </td>	<td> Application Program Command. Introduces a <a href="#APC">APC Sequence</a> .</td></tr>
 </table>
 
-<h2><a name="ESC">Escape Sequence</a></h2>
+<h2 id="ESC">Escape Sequence</h2>
 <table border="1">
 <tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>ESC 6</td>	<td>DECBI</td>	<td> Moves the cursor backward one column. If the cursor is at the left margin, then all screen data within the margins moves one column to the right. The column shifted past the right margin is lost. </td></tr>
@@ -133,7 +133,7 @@
 <tr><td>ESC +</td></tr>
 </table>
 
-<h2><a name="CSI">CSI Sequence</a></h2>
+<h2 id="CSI">CSI Sequence</h2>
 <table border="1">
 <tr><th>Sequence</th>		<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>CSI <i>Ps</i> @</td>	<td>ICH</td>	<td> Insert <i>Ps</i> space (SP) characters starting at the cursor position. The default value of <i>Ps</i> is 1. </td></tr>
@@ -506,7 +506,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 </td></tr>
 </table>
 
-<h3><a name="mode">Modes (Standard)</a></h3>
+<h3 id="mode">Modes (Standard)</h3>
 <table border="1">
     <tr>
 	<th>Mode No.</th>
@@ -556,7 +556,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
     </tr>
 </table>
 
-<h3><a name="decmode">Modes (DEC/xterm specific)</a></h3>
+<h3 id="decmode">Modes (DEC/xterm specific)</h3>
 <table border="1">
     <tr>
 	<th> Mode No. </th>
@@ -758,7 +758,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
     </tr>
 </table>
 
-<h3><a name="charattr">Character Attributes. (SGR)</a></h3>
+<h3 id="charattr">Character Attributes. (SGR)</h3>
 <table border="1">
 <tr><th>No.</th>	<th>Attribute</th></tr>
 <tr><td> 0</td>		<td>Normal</td></tr>
@@ -828,7 +828,7 @@ Response: CSI <i>Pe</i> ; <i>Pb</i> ; <i>Pr</i> ; <i>Pc</i> ; <i>Pp</i> &amp; w
 <tr><td>107</td>	<td>Set background color to Bright White. (Color No. 15)</td></tr>
 </table>
 
-<h2><a name="DCS">DCS Sequence</a></h2>
+<h2 id="DCS">DCS Sequence</h2>
 <table border="1">
 <tr><th>Sequence</th>	<th>Mnemonic</th>	<th>Description</th></tr>
 <tr><td>DCS <i>Ps1</i> ; <i>Ps2</i> | <i>Pt</i> ST</td>	<td>DECUDK</td>	<td>Define user function key.
@@ -874,7 +874,7 @@ Response: DCS <i>Ps</i> + r <i>Pt</i> ST
 </td></tr>
 </table>
 
-<h2><a name="OSC">OSC Sequence</a></h2>
+<h2 id="OSC">OSC Sequence</h2>
 <p>Format</p>
 <pre>
 OSC <i>Ps</i> ; <i>Pt</i> ST
@@ -956,22 +956,22 @@ When the <i>Pd</i> is the "?", the request does. The clipboard content responses
 <!-- tr><td> 119 </td>		<td>Reset hightlight text color. </td></tr -->
 </table>
 
-<h2><a name="SOS">SOS Sequence</a></h2>
+<h2 id="SOS">SOS Sequence</h2>
 <p>Format</p>
 <pre>SOS <i>Pt</i> ST</pre>
 <p>Tera Term implements no SOS functions; <i>Pt</i> is ignored.</p>
 
-<h2><a name="PM">PM Sequence</a></h2>
+<h2 id="PM">PM Sequence</h2>
 <p>Format</p>
 <pre>PM <i>Pt</i> ST</pre>
 <p>Tera Term implements no PM functions; <i>Pt</i> is ignored.</p>
 
-<h2><a name="APC">APC Sequence</a></h2>
+<h2 id="APC">APC Sequence</h2>
 <p>Format</p>
 <pre>APC <i>Pt</i> ST</pre>
 <p>Tera Term implements no APC functions; <i>Pt</i> is ignored.</p>
 
-<h2><a name="ref">References</a></h2>
+<h2 id="ref">References</h2>
 <ul>
   <li><a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48</a></li>
   <li><a href="http://vt100.net/">VT100.net</a></li>

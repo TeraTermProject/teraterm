@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="beep">接続時のビープ音</a></h1>
+<h1 id="beep">接続時のビープ音</h1>
 
 <p>
 TCP/IP 接続が確立した時とその接続が切れた時にビープ音を鳴らすには、設定ファイルの [Tera Term] セクションの BeepOnConnect 行を以下のように変更してください。
@@ -25,7 +25,7 @@ BeepOnConnect=off
 </pre>
 
 
-<h1><a name="IME">IME (日本語入力システム)に関する設定</a></h1>
+<h1 id="IME">IME (日本語入力システム)に関する設定</h1>
 
 <p>
 IME のインライン入力をしないようにするには、設定ファイルの [Tera Term] セクションの IMEInline 行を以下のように変更してください。
@@ -53,7 +53,7 @@ IME=on
 </pre>
 
 
-<h1><a name="macro">起動時にマクロを実行</a></h1>
+<h1 id="macro">起動時にマクロを実行</h1>
 
 <p>
 Tera Term 起動時にマクロを自動的に実行することができます。マクロファイル名はコマンドラインオプション "/M=&lt;マクロファイル名&gt;" を使うか、設定ファイルの [Tera Term] セクションの StartupMacro 行を以下のように変更することによって指定できます。
@@ -69,7 +69,7 @@ StartupMacro=
 </pre>
 
 
-<h1><a name="UILang">ユーザインタフェースの言語ファイル</a></h1>
+<h1 id="UILang">ユーザインタフェースの言語ファイル</h1>
 
 <p>
 ユーザインタフェースのメッセージが含まれたファイルを指定すると、表示される言語を切り換えることができます。
@@ -85,7 +85,7 @@ UILanguageFile=
 </pre>
 
 
-<h1><a name="broadcast">ブロードキャストコマンドの履歴の保存数</a></h1>
+<h1 id="broadcast">ブロードキャストコマンドの履歴の保存数</h1>
 
 <p>
 ブロードキャストコマンドの履歴の保存数を設定をしたい場合、MaxBroadcatHistory エントリを設定します。以下に例を示します。
@@ -101,7 +101,7 @@ MaxBroadcatHistory=99
 </pre>
 
 
-<h1><a name="mousewheel">アプリケーションカーソルモード時のマウスホイールの動作</a></h1>
+<h1 id="mousewheel">アプリケーションカーソルモード時のマウスホイールの動作</h1>
 
 <p>
 マウスのホイールを回転させた時は通常はスクロールバーが上下しますが、アプリケーションカーソルモード(viやless等を起動すると通常はこのモードになります)時にはスクロールバーは動かさず、かわりに上または下カーソルキーのシーケンスを送信します。
@@ -130,7 +130,7 @@ DisableWheelToCursorByCtrl=on
 </pre>
 
 
-<h1><a name="hostdlg">起動時の "New Connection" ダイアログの表示</a></h1>
+<h1 id="hostdlg">起動時の "New Connection" ダイアログの表示</h1>
 
 <p>
 Tera Term はポートの種類が TCP/IP の場合、起動時に "New Connection" ダイアログを表示します。(Serialの場合には表示しません)<br>
@@ -147,7 +147,7 @@ HostDialogOnStartup=on
 </pre>
 
 
-<h1><a name="DisablePasteMouseMButton">マウスの中ボタンによる貼り付けを有効にする</a></h1>
+<h1 id="DisablePasteMouseMButton">マウスの中ボタンによる貼り付けを有効にする</h1>
 
 <p>
 中ボタンをクリックしたときに貼り付けを有効にするには、設定ファイルの [Tera Term] セクションの DisablePasteMouseMButton 行を以下のように変更してください。
@@ -163,7 +163,7 @@ DisablePasteMouseMButton=on
 </pre>
 
 
-<h1><a name="DisableMenuNewConnection">メニューの New connection を無効にする</a></h1>
+<h1 id="DisableMenuNewConnection">メニューの New connection を無効にする</h1>
 
 <p>
 メニューの "New connection" を無効にするには、設定ファイルの [Tera Term] セクションの DisableMenuNewConnection 行を以下のように変更してください。
@@ -179,7 +179,7 @@ DisableMenuNewConnection=off
 </pre>
 
 
-<h1><a name="DisableMenuDuplicateSession">メニューの Duplicate session を無効にする</a></h1>
+<h1 id="DisableMenuDuplicateSession">メニューの Duplicate session を無効にする</h1>
 
 <p>
 メニューの "Duplicate session" を無効にするには、設定ファイルの [Tera Term] セクションの DisableMenuDuplicateSession 行を以下のように変更してください。
@@ -195,7 +195,7 @@ DisableMenuDuplicateSession=off
 </pre>
 
 
-<h1><a name="DisableMenuSendBreak">メニューの Send break を無効にする</a></h1>
+<h1 id="DisableMenuSendBreak">メニューの Send break を無効にする</h1>
 
 <p>
 メニューの "Send break" を無効にするには、設定ファイルの [Tera Term] セクションの DisableMenuSendBreak 行を以下のように変更してください。
@@ -211,7 +211,7 @@ DisableMenuSendBreak=off
 </pre>
 
 
-<h1><a name="ClearScreenOnCloseConnection">切断時に画面をクリアする</a></h1>
+<h1 id="ClearScreenOnCloseConnection">切断時に画面をクリアする</h1>
 
 <p>
 切断時に画面をクリアするには、設定ファイルの [Tera Term] セクションの ClearScreenOnCloseConnection 行を以下のように変更してください。
@@ -227,7 +227,7 @@ ClearScreenOnCloseConnection=off
 </pre>
 
 
-<h1><a name="AcceleratorNewConnection">New Connection のアクセラレータキーを無効にする</a></h1>
+<h1 id="AcceleratorNewConnection">New Connection のアクセラレータキーを無効にする</h1>
 
 <p>
 New Connection のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの AcceleratorNewConnection 行を以下のように変更してください。
@@ -243,7 +243,7 @@ AcceleratorNewConnection=on
 </pre>
 
 
-<h1><a name="DisableAcceleratorDuplicateSession">Duplicate session のアクセラレータキーを無効にする</a></h1>
+<h1 id="DisableAcceleratorDuplicateSession">Duplicate session のアクセラレータキーを無効にする</h1>
 
 <p>
 Duplicate session のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの DisableAcceleratorDuplicateSession 行を以下のように変更してください。
@@ -259,7 +259,7 @@ DisableAcceleratorDuplicateSession=off
 </pre>
 
 
-<h1><a name="AcceleratorCygwinConnection">Cygwin connection のアクセラレータキーを無効にする</a></h1>
+<h1 id="AcceleratorCygwinConnection">Cygwin connection のアクセラレータキーを無効にする</h1>
 
 <p>
 Cygwin connection のアクセラレータキーを無効にするには、設定ファイルの [Tera Term] セクションの AcceleratorCygwinConnection 行を以下のように変更してください。
@@ -275,7 +275,7 @@ AcceleratorCygwinConnection=on
 </pre>
 
 
-<h1><a name="ClickableUrlBrowser">クリッカブル URL で起動するブラウザ</a></h1>
+<h1 id="ClickableUrlBrowser">クリッカブル URL で起動するブラウザ</h1>
 
 <p>
 URL クリックが有効な場合、通常は URL のスキームに OS で関連付けられたプログラムが起動します。<br>
@@ -303,7 +303,7 @@ ClickableUrlBrowserArg=
 </pre>
 
 
-<h1><a name="JoinSplitURL">改行している URL を継続したものとして扱う</a></h1>
+<h1 id="JoinSplitURL">改行している URL を継続したものとして扱う</h1>
 
 <p>
 端末の右端から次の行に URL が続いている場合、通常は継続した URL として扱われる。しかし、特定の環境では端末の右端で改行を送信するので、URL が次の行に継続したものとして扱われない。<br>
@@ -339,7 +339,7 @@ JoinSplitURLIgnoreEOLChar=\
 </pre>
 
 
-<h1><a name="LogLockExclusive">ログファイルを排他ロックする</a></h1>
+<h1 id="LogLockExclusive">ログファイルを排他ロックする</h1>
 
 <p>
 Tera Term はログファイルを書き込むために開くとき排他ロックをかけます。これは複数のプロセスから同じログファイルに書き込みをしないためで、同時に同じファイルを開こうとすると失敗します。<br>
@@ -356,7 +356,7 @@ LogLockExclusive=on
 </pre>
 
 
-<h1><a name="DeferredLogWriteMode">ログファイルを遅延書き込みする</a></h1>
+<h1 id="DeferredLogWriteMode">ログファイルを遅延書き込みする</h1>
 
 <p>
 ログファイルの書き込みを別スレッドで行うことで、ネットワークドライブ上にログファイルを採取しても、
@@ -373,7 +373,7 @@ DeferredLogWriteMode=on
 </pre>
 
 
-<h1><a name="LogTimestampFormat">ログの行頭に追加するタイムスタンプのフォーマットを指定する</a></h1>
+<h1 id="LogTimestampFormat">ログの行頭に追加するタイムスタンプのフォーマットを指定する</h1>
 
 <p>
 Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができますが、タイムスタンプのフォーマットを指定することができます。
@@ -408,7 +408,7 @@ LogTimestampFormat=%Y-%m-%d %H:%M:%S.%N
 </pre>
 
 
-<h1><a name="LogTimestampUTC">ログの行頭に追加するタイムスタンプの時刻にUTCを使用する</a></h1>
+<h1 id="LogTimestampUTC">ログの行頭に追加するタイムスタンプの時刻にUTCを使用する</h1>
 
 <p>
 Tera Term はログファイルの書き込み時に行頭にタイムスタンプを書き込むことができますが、通常はローカル日時を使用します。<br>

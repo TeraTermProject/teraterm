@@ -35,7 +35,7 @@
       PATH          C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Windows Kits\8.1\bin\x86
       VSINSTALLDIR  C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
 - インストーラ
-  Inno Setup 5.5.9 ANSI (http://www.jrsoftware.org/isinfo.php)
+  Inno Setup 5.6.1 ANSI (http://www.jrsoftware.org/isinfo.php)
   Inno Setup Preprocessor
   ISTool 5.3.0.1 (https://sourceforge.net/projects/istool/)
 - その他

@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="maxport">Maximum serial port number</a></h1>
+<h1 id="maxport">Maximum serial port number</h1>
 
 <p>
 You can specify the maximum serial port number (maximum value of n for COMn) to be listed in the [File] New connection and [Setup] Serial port dialog boxes. To specify the maximum number, edit the MaxComPort line in the [Tera Term] section of the setup file like the following:
@@ -29,7 +29,7 @@ MaxComPort=256
 </pre>
 
 
-<h1><a name="clearcom">Don't clear COM buffer when serial port opening.</a></h1>
+<h1 id="clearcom">Don't clear COM buffer when serial port opening.</h1>
 
 <p>
 In the default setup, Tera Term cleaning COM buffer when serial port opening.
@@ -49,7 +49,7 @@ ClearComBuffOnOpen=on
 </pre>
 
 
-<h1><a name="confirm">Disabling the warning on TCP/IP disconnection</a></h1>
+<h1 id="confirm">Disabling the warning on TCP/IP disconnection</h1>
 
 <p>
 In the default setup, Tera Term displays the warning message "Disconnect ?" when you try to close the TCP/IP connection by using the "Close" command in  the system menu (or by double clicking the icon at upper left corner of the window).
@@ -69,7 +69,7 @@ ConfirmDisconnect=on
 </pre>
 
 
-<h1><a name="telbin">Telnet binary option</a></h1>
+<h1 id="telbin">Telnet binary option</h1>
 
 <p>
 To enable the telnet binary option, edit the TelBin line in the [Tera Term] section of the setup file like the following:
@@ -89,7 +89,7 @@ TelBin=off
 </pre>
 
 
-<h1><a name="telecho">Telnet echo option</a></h1>
+<h1 id="telecho">Telnet echo option</h1>
 
 <p>
 If you edit the TelEcho line in the [Tera Term] section of the setup file like the following:
@@ -109,7 +109,7 @@ TelEcho=off
 </pre>
 
 
-<h1><a name="tellog">Telnet log</a></h1>
+<h1 id="tellog">Telnet log</h1>
 
 <p>
 To log option-negotiation data of a telnet session to the file TELNET.LOG, edit the TelLog line in the [Tera Term] section of the setup file like the following:
@@ -125,9 +125,9 @@ TelLog=off
 </pre>
 
 
-<h1><a name="port/nontelnet">Telnet port number / Terminal setup for non-telnet connection</a></h1>
+<h1 id="port/nontelnet">Telnet port number / Terminal setup for non-telnet connection</h1>
 
-<h2><a name="port">Telnet port number</a></h2>
+<h2 id="port">Telnet port number</h2>
 
 <p>
 On the <a href="../commandline/teraterm.html">command line</a>, or on the <a href="../menu/file-new.html">[File] New connection</a> dialog box, you can specify the TCP port number (&lt;TCP port#&gt;) and telnet flag (&lt;telnet flag&gt;) for a TCP/IP connection. If these parameters are omitted in the command line, the default values are taken from the Tera Term setup file.
@@ -154,7 +154,7 @@ TelPort=23
 Whatever &lt;TCP port#&gt; is and whatever &lt;telnet flag&gt; is, Tera Term can respond to telnet commands sent by the host. (except <a href="#detecttelnet">TelAutoDetect</a> setting is off.)
 </p>
 
-<h2><a name="nontelnet">Terminal setup for non-telnet TCP/IP connection</a></h2>
+<h2 id="nontelnet">Terminal setup for non-telnet TCP/IP connection</h2>
 
 <p>
 For a non-telnet TCP/IP connection (usually with a port other than 23), you may need to set the "local echo" option on, and the "new-line (transmit)" option to CR+LF. If you edit the TCPLocalEcho and TCPCRSend lines in the [Tera Term] section of the setup file like the following:
@@ -180,7 +180,7 @@ TCPCRSend=
 </pre>
 
 
-<h1><a name="detecttelnet">Disable Auto-Detect mode of Telnet command</a></h1>
+<h1 id="detecttelnet">Disable Auto-Detect mode of Telnet command</h1>
 
 <p>
 Tera Term will detect a command of Telnet sent from host even a connection is in non-Telnet mode.Once it detects a command, a connection is treated as if in Telnet mode.<br>
@@ -201,7 +201,7 @@ TelAutoDetect=on
 </pre>
 
 
-<h1><a name="linemode">Disabling "Line at a time" mode</a></h1>
+<h1 id="linemode">Disabling "Line at a time" mode</h1>
 
 <p>
 Tera Term now supports for "Line at a time" mode from version 4.63.<br>
@@ -230,7 +230,7 @@ EnableLineMode=on
 </pre>
 
 
-<h1><a name="SendBreakTime">Pause time while the break signal is sending to the serial port</a></h1>
+<h1 id="SendBreakTime">Pause time while the break signal is sending to the serial port</h1>
 
 <p>
 When the break signal is sent to the serial port, the default pause time is 1000 msec.<br>
@@ -247,7 +247,7 @@ SendBreakTime=1000
 </pre>
 
 
-<h1><a name="AutoComPortReconnect">Automatic COM port Reconnection</a></h1>
+<h1 id="AutoComPortReconnect">Automatic COM port Reconnection</h1>
 
 <p>
 The serial console is disconnected when the USB serial cable is extracted.
@@ -272,7 +272,7 @@ AutoComPortReconnect=on
 </pre>
 
 
-<h1><a name="WaitCom">Wait for COM port connection</a></h1>
+<h1 id="WaitCom">Wait for COM port connection</h1>
 
 <p>
 Tera Term waits for port connection when the serial port does not exist.
@@ -297,7 +297,7 @@ WaitCom=off
 </pre>
 
 
-<h1><a name="TerminalSpeed">Change the terminal speed notifies to server</a></h1>
+<h1 id="TerminalSpeed">Change the terminal speed notifies to server</h1>
 
 <p>
 When Telnet or SSH connection is started, Tera Term notifies the terminal speed to the server.

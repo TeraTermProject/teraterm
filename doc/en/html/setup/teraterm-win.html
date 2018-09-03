@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<h1><a name="autocopy">Disabling auto text copying</a></h1>
+<h1 id="autocopy">Disabling auto text copying</h1>
 
 <p>
 If you select text by mouse, it is copied to the clipboard at the same time. To disable the auto text copying, edit the AutoTextCopy line in the [Tera Term] section of the setup file like the following:
@@ -25,7 +25,7 @@ AutoTextCopy=on
 </pre>
 
 
-<h1><a name="delimiter">Delimiters of a word selected by double clicking</a></h1>
+<h1 id="delimiter">Delimiters of a word selected by double clicking</h1>
 
 <p>
 You can select a word by double clicking it with the left mouse button. You can specify delimiter characters for the word selection by editing the DelimList line in the [Tera Term] section of the setup file like the following:
@@ -80,7 +80,7 @@ DelimDBCS=off
 </pre>
 
 
-<h1><a name="popup">Disabling the pop-up menu</a></h1>
+<h1 id="popup">Disabling the pop-up menu</h1>
 
 <p>
 When the menu bar is hidden, clicking the left mouse button while pressing the Ctrl key causes the pop-up menu to appear. To disable the pop-up menu, edit the EnablePopupMenu line in the [Tera Term] section of the setup file like the following:
@@ -96,7 +96,7 @@ EnablePopupMenu=on
 </pre>
 
 
-<h1><a name="menubar">Hiding the "Show menu bar" command</a></h1>
+<h1 id="menubar">Hiding the "Show menu bar" command</h1>
 
 <p>
 When the menu bar is hidden, the "Show menu bar" command appears in the system menu. To hide the "Show menu bar" command, edit the EnableShowMenu line in the [Tera Term] section of the setup file like the following:
@@ -112,7 +112,7 @@ EnableShowMenu=on
 </pre>
 
 
-<h1><a name="lang">Disabling the language mode selection</a></h1>
+<h1 id="lang">Disabling the language mode selection</h1>
 
 <p>
 To disable the language mode selection in the [Setup] General dialog box, edit the LanguageSelection line in the [Tera Term] section of the setup file like the following:
@@ -128,7 +128,7 @@ LanguageSelection=on
 </pre>
 
 
-<h1><a name="scrollbuf">Maximum scroll buffer size</a></h1>
+<h1 id="scrollbuf">Maximum scroll buffer size</h1>
 
 <p>
 You can change the maximum scroll buffer size, which can be specified in the [Setup] Window dialog box, by editing the MaxBuffSize line in the [Tera Term] section of the setup file like the following:
@@ -149,7 +149,7 @@ MaxBuffSize=10000
 </pre>
 
 
-<h1><a name="blink">Nonblinking cursor</a></h1>
+<h1 id="blink">Nonblinking cursor</h1>
 
 <p>
 You can make the cursor nonblinking by editing the NonblinkingCursor line in the [Tera Term] section of the setup file like the following:
@@ -165,7 +165,7 @@ NonblinkingCursor=off
 </pre>
 
 
-<h1><a name="scrollline">Maximum number of lines to move in a jump scrolling</a></h1>
+<h1 id="scrollline">Maximum number of lines to move in a jump scrolling</h1>
 
 <p>
 To change the maximum number of lines to move in a jump scrolling, edit the ScrollThreshold line in the [Tera Term] section of the setup file like the following:
@@ -181,7 +181,7 @@ ScrollThreshold=12
 </pre>
 
 
-<h1><a name="textselect">Disabling text selection when the window is activated by mouse</a></h1>
+<h1 id="textselect">Disabling text selection when the window is activated by mouse</h1>
 
 <p>
 When the window is inactive, you can activate the window by clicking the text area of window. In the default setup, the text selection is started by this mouse clicking at the same time. To disable the text selection when the window is activated by mouse, edit the SelectOnActive line in the [Tera Term] section of the setup file like the following:
@@ -197,7 +197,7 @@ SelectOnActivate=on
 </pre>
 
 
-<h1><a name="title">Title format</a></h1>
+<h1 id="title">Title format</h1>
 
 <p>
 To change the title format, edit the TitleFormat line in the [Tera Term] section of the setup file like the following:
@@ -268,7 +268,7 @@ TitleFormat=5
 </pre>
 
 
-<h1><a name="color">Actual colors of "white" and "black" colored text</a></h1>
+<h1 id="color">Actual colors of "white" and "black" colored text</h1>
 
 <p>
 The escape sequences "&lt;ESC&gt;[37m" and "&lt;ESC&gt;[30m" make the text color white and black, respectively. Similarly, the escape sequences "&lt;ESC&gt;[47m" and "&lt;ESC&gt;[40m" make the background color white and black, respectively.
@@ -296,7 +296,7 @@ UseTextColor=off
 </pre>
 
 
-<h1><a name="space">Space between characters (lines)</a></h1>
+<h1 id="space">Space between characters (lines)</h1>
 
 <p>
 To change space between characters (lines), edit the VTFontSpace line in the [Tera Term] section of the setup file like the following:
@@ -326,7 +326,7 @@ VTFontSpace=0,0,0,0
 </pre>
 
 
-<h1><a name="window">Hiding the [Window] menu</a></h1>
+<h1 id="window">Hiding the [Window] menu</h1>
 
 <p>
 To hide the [Window] menu, edit the WindowMenu line in the [Tera Term] section of the setup file like the following:
@@ -342,7 +342,7 @@ WindowMenu=on
 </pre>
 
 
-<h1><a name="eterm">Eterm lookfeel window</a></h1>
+<h1 id="eterm">Eterm lookfeel window</h1>
 
 <p>
 To specify the detailed settings for Eterm lookfeel window, edit the [BG] section of the setup file like the following:
@@ -496,7 +496,7 @@ BGSrc2Alpha     = 64
 </pre>
 
 
-<h1><a name="maximize">How to scroll the screen when the window size is maximized</a></h1>
+<h1 id="maximize">How to scroll the screen when the window size is maximized</h1>
 <p>
 The screen scrolling method can be specified when the window size is maximized.
 </p>
@@ -527,7 +527,7 @@ MaximizedBugTweak=2
 </pre>
 
 
-<h1><a name="killfocus">Display the cursor even if the window comes out of focus</a></h1>
+<h1 id="killfocus">Display the cursor even if the window comes out of focus</h1>
 <p>
 Tera Term will display the cursor even if the window comes out of focus.<br>
 If you want to disable this option, modify a line of KillFocusCursor in [Tera Term] section of setup file as follows.
@@ -543,7 +543,7 @@ KillFocusCursor=on
 </pre>
 
 
-<h1><a name="vttekpos">Fix the initial window position</a></h1>
+<h1 id="vttekpos">Fix the initial window position</h1>
 <p>
 In order to change the default window position, change values of VTPos line(VT Window) and TEKPos line(TEK Window) at [Tera Term] section inside the setup file.<br>
 For example, if you want to set the default VT window position to 200 pixels from the left side of the screen and 100px from the top of the screen, change the setup file as follows.
@@ -573,7 +573,7 @@ TEKPos=-2147483648,-2147483648
 </pre>
 
 
-<h1><a name="savevtwinpos">Save the window position</a></h1>
+<h1 id="savevtwinpos">Save the window position</h1>
 <p>
 Tera Term does not save the window position when "Save setup" was called.<br>
 If you enable this position, current window position is saved to a specified setup file.
@@ -593,7 +593,7 @@ SaveVTWinPos=off
 </pre>
 
 
-<h1><a name="WindowIcon">Change the window icon</a></h1>
+<h1 id="WindowIcon">Change the window icon</h1>
 <p>
 Tera Term executable program includes "VT window" icon, "TEK window" icon, and some other icons.
 If you change the value of VTIcon or TEKIcon, the displaying icon of VT window or TEK window is changed.

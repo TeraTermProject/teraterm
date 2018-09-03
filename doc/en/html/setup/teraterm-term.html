@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="backwrap">Back wrap</a></h1>
+<h1 id="backwrap">Back wrap</h1>
 
 <p>
 If you enables the back wrap, the cursor at the beginning of a line moves back to the end of previous line when a BS character is received. To enable the back wrap, edit the BackWrap line in the [Tera Term] section of the setup file like the following:
@@ -25,7 +25,7 @@ BackWrap=off
 </pre>
 
 
-<h1><a name="beep">The motion receiving BEL character</a></h1>
+<h1 id="beep">The motion receiving BEL character</h1>
 
 <p>
 Tera Term will sound the beep when the BEL character(ASCII $07) receives.
@@ -53,7 +53,7 @@ Beep=on
 </pre>
 
 
-<h1><a name="C1">Disabling the C1 (ASCII $80-$9F) control characters</a></h1>
+<h1 id="C1">Disabling the C1 (ASCII $80-$9F) control characters</h1>
 
 <p>
 If you choose the Terminal ID to be "VT2XX" or "VT3XX" in the [Setup] Terminal dialog box, characters in range of ASCII $80-$9F are interpreted as the C1 control characters.
@@ -72,7 +72,7 @@ Default:
 Accept8BitCtrl=on
 </pre>
 
-<h1><a name="C1send">Send C1 (ASCII $80-$9F) control characters</a></h1>
+<h1 id="C1send">Send C1 (ASCII $80-$9F) control characters</h1>
 
 <p>
 When sending C1 control characters, Tera Term uses equivalent 7-bit sequences.
@@ -96,7 +96,7 @@ Send8BitCtrl=off
 </pre>
 
 
-<h1><a name="displayall">Displaying all received characters</a></h1>
+<h1 id="displayall">Displaying all received characters</h1>
 
 <p>
 To display all received characters (including control characters) on the screen, edit the Debug line in the [Tera Term] section of the setup file like the following:
@@ -152,7 +152,7 @@ Debug=off
 </pre>
 
 
-<h1><a name="statusline">Disabling the status line</a></h1>
+<h1 id="statusline">Disabling the status line</h1>
 
 <p>
 To disable the status line functions of VT terminal, edit the EnableStatusLine line in the [Tera Term] section of the setup file like the following:
@@ -172,7 +172,7 @@ EnableStatusLine=on
 </pre>
 
 
-<h1><a name="tekgin">Mouse code in TEK GIN report</a></h1>
+<h1 id="tekgin">Mouse code in TEK GIN report</h1>
 
 <p>
 In TEK GIN mode, the cross hair cursor appears in the TEK window. When you press a key or click the left mouse button, the key code (ASCII code) is sent with the coordinate of the cursor.
@@ -193,7 +193,7 @@ TEKGINMouseCode=32
 </pre>
 
 
-<h1><a name="vttab">Displaying tab at end of line like VT terminal</a></h1>
+<h1 id="vttab">Displaying tab at end of line like VT terminal</h1>
 
 <p>
 If you set 'on', the behavior of tab at end-of-line is the same as VT/PuTTY/xterm. The tab doesn't cause automatic linefeed.<br>
@@ -210,7 +210,7 @@ VTCompatTab=off
 </pre>
 
 
-<h1><a name="ScrollWindowClearScreen">Scroll down the current buffer when the screen is clear</a></h1>
+<h1 id="ScrollWindowClearScreen">Scroll down the current buffer when the screen is clear</h1>
 
 <p>
 &lt;ESC&gt;[J (Erase Below) escape sequence equals &lt;ESC&gt;[2J (Erase All) when the current cursor is top left (0, 0).<br>
@@ -228,7 +228,7 @@ ScrollWindowClearScreen=on
 </pre>
 
 
-<h1><a name="UnknownUnicodeCharacterAsWide">Display unsupported Unicode character as wide character</a></h1>
+<h1 id="UnknownUnicodeCharacterAsWide">Display unsupported Unicode character as wide character</h1>
 
 <p>
 When the received KANJI code is UTF-8 or UTF-8m, a user can configure the behavior of the Unicode characters which Tera Term does not support as the pure Unicode.<br>
@@ -243,7 +243,7 @@ UnknownUnicodeCharacterAsWide=off
 </pre>
 
 
-<h1><a name="UnicodeDecSpMapping">Mapping of Unicode to DEC special character</a></h1>
+<h1 id="UnicodeDecSpMapping">Mapping of Unicode to DEC special character</h1>
 
 <p>
 Tera Term in Japanese mode will display a ruled line and some symbols as 2-columns wide. However, some host applications may assume these characters will be displayed as 1-column wide character which results in incorrect display image.<br> 
@@ -297,7 +297,7 @@ UnicodeToDecSpMapping=3
 </pre>
 
 
-<h1><a name="StrictKeyMapping">Mapping of the function key</a></h1>
+<h1 id="StrictKeyMapping">Mapping of the function key</h1>
 
 <p>
 A use can change the default action of the function key and the editor keypad from Tera Term 4.62. When a user can use this feature, the key sequence like as the VT terminal sends to the server without the keyboard configuration file.
@@ -317,7 +317,7 @@ StrictKeyMapping=off
 </pre>
 
 
-<h1><a name="Meta8Bit">MSB set character sending with Alt key</a></h1>
+<h1 id="Meta8Bit">MSB set character sending with Alt key</h1>
 
 <p>
 To send MSB(Most Significant Bit) set character by using the Alt key, a user should modify Meta8Bit line of [Tera Term] section in a configuration file as follows
@@ -345,7 +345,7 @@ Meta8Bit=off
 </pre>
 
 
-<h1><a name="AltScr">Disabling the alternate screen buffer</a></h1>
+<h1 id="AltScr">Disabling the alternate screen buffer</h1>
 
 <p>
 Tera Term 4.65 later version supports for the alternate screen buffer. An old screen is restored when the application such as Vim and less exits.
@@ -365,7 +365,7 @@ AlternateScreenBuffer=on
 </pre>
 
 
-<h1><a name="TerminalUID">Configure Terminal Unique ID</a></h1>
+<h1 id="TerminalUID">Configure Terminal Unique ID</h1>
 
 <p>
 When the Tera Term receives the DA3 control sequence, the Tera Term replies the terminal unique ID. The ID is 8-digit hex value, the first 2-digit is the manufacture place and the remaining 6-digit is the unique number in the place.
@@ -385,7 +385,7 @@ TerminalUID=FFFFFFFF
 </pre>
 
 
-<h1><a name="LockTUID">Changing Terminal Unique ID</a></h1>
+<h1 id="LockTUID">Changing Terminal Unique ID</h1>
 
 <p>
 Basically, the terminal unique ID can be changed by receiving the DECSTUI control sequence. However, this feature is disabled.
@@ -405,7 +405,7 @@ LockTUID=on
 </pre>
 
 
-<h1><a name="TabStopModify">Disabling tabstop modification</a></h1>
+<h1 id="TabStopModify">Disabling tabstop modification</h1>
 
 <p>
 When the tabstop position can not be able to modify by the control sequence, configure below TabStopModifySequence entry in the [Tera Term] section of the teraterm.ini file.
@@ -443,7 +443,7 @@ TabStopModifySequence=on
 </pre>
 
 
-<h1><a name="BellLimitting">Limited BELL Over</a></h1>
+<h1 id="BellLimitting">Limited BELL Over</h1>
 <p>
 When the BEL character(ASCII $07) is sent from the host server, Tera Term will generate a beep sound and blink a screen.
 </p>
@@ -467,7 +467,7 @@ BeepSuppressTime=5
 </pre>
 
 
-<h1><a name="MaxOSCBufferSize">OSC string buffer size</a></h1>
+<h1 id="MaxOSCBufferSize">OSC string buffer size</h1>
 <p>
 Tera Term will expand the buffer size of the OSC string when the buffer size is lack. 
 However, when the remote host sends invalid OSC string by using the host bug, 
@@ -489,7 +489,7 @@ Default:
 MaxOSCBufferSize=4096
 </pre>
 
-<h1><a name="ISO2022ShiftFunction">Disabling ISO/IEC 2022 shift function</a></h1>
+<h1 id="ISO2022ShiftFunction">Disabling ISO/IEC 2022 shift function</h1>
 
 <p>
 When character set switching by ISO/IEC 2022 shift is forbidden, please configure below setting on ISO2022ShiftFunction entry of [Tera Term] section in the teraterm.ini file.

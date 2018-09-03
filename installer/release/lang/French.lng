@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-07-16)
+; Updated by TeraTerm Project (2018-08-27)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -302,7 +302,7 @@ DLG_DANDD_SEND_BINARY_CHECK=Bina&ry
 DLG_DANDD_PASTE_ESCAPE_CHECK=Es&cape
 DLG_DANDD_PASTE_SPACE_RADIO=Separat&or is Space
 DLG_DANDD_PASTE_NEWLINE_RADIO=Separator is &NewLine
-DLG_DANDD_CONFLICTS=&Do this for the next %d conflicts
+DLG_DANDD_NEXTFILES=&Do this for the next %d files
 DLG_DANDD_SAME_NEEXTDROP=Do sa&me process, next drop
 DLG_DANDD_DONTSHOW_NEEXTDROP=Do not d&isplay this dialog, next drop
 DLG_DANDD_NOTE=Drop with CTRL, this dialog is displayed

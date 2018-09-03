@@ -9,7 +9,7 @@
 </HEAD>
 <BODY>
 
-<h1><a name="rename">受信したファイルの名前を自動的に変更して上書きを避ける</a></h1>
+<h1 id="rename">受信したファイルの名前を自動的に変更して上書きを避ける</h1>
 
 <p>
 Kermit, Zmodem, BPlus, Quick-VAN プロトコルを使用してファイルを受信する場合、ファイル名はホスト(送信側)により与えられます。もし、同じファイル名がすでにローカルディスクに存在する場合、そのファイルは受信されたファイルにより上書きされます。この上書きを避けるには、設定ファイルの [Tera Term] セクションの AutoFileRename 行を以下のように変更してください。
@@ -29,7 +29,7 @@ AutoFileRename=on
 </pre>
 
 
-<h1><a name="bpauto">B-Plus 受信の自動起動</a></h1>
+<h1 id="bpauto">B-Plus 受信の自動起動</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの BPAuto 行を、
@@ -49,7 +49,7 @@ BPAuto=off
 </pre>
 
 
-<h1><a name="bpesc">B-Plus ですべての制御文字をエスケープする</a></h1>
+<h1 id="bpesc">B-Plus ですべての制御文字をエスケープする</h1>
 
 <p>
 B-Plus では、通信回線が一部の制御文字を通さないことを想定して、それらをエスケープする(他の文字の組み合わせに置き換える)ようになっています。しかし、想定外の制御文字も通さない回線の場合は転送がうまくいきません。そのような場合は、設定ファイルの [Tera Term] セクションの BPEscCtl 行を、
@@ -69,7 +69,7 @@ BPEscCtl=off
 </pre>
 
 
-<h1><a name="bplog">B-Plus のログ</a></h1>
+<h1 id="bplog">B-Plus のログ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの BPLog 行を、
@@ -89,7 +89,7 @@ BPLog=off
 </pre>
 
 
-<h1><a name="kmlog">Kermit のログ</a></h1>
+<h1 id="kmlog">Kermit のログ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの KmtLog 行を、
@@ -109,7 +109,7 @@ KmtLog=off
 </pre>
 
 
-<h1><a name="kmlongpkt">Kermit のロングパケット</a></h1>
+<h1 id="kmlongpkt">Kermit のロングパケット</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの KmtLongPacket 行を、
@@ -129,7 +129,7 @@ KmtLongPacket=off
 </pre>
 
 
-<h1><a name="kmfileattr">Kermit のファイル属性</a></h1>
+<h1 id="kmfileattr">Kermit のファイル属性</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの KmtFileAttr 行を、
@@ -150,7 +150,7 @@ KmtFileAttr=off
 
 
 
-<h1><a name="qvlog">Quick-VAN のログ</a></h1>
+<h1 id="qvlog">Quick-VAN のログ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの QVLog 行を、
@@ -170,7 +170,7 @@ QVLog=off
 </pre>
 
 
-<h1><a name="qvwinsize">Quick-VAN のウィンドウサイズ</a></h1>
+<h1 id="qvwinsize">Quick-VAN のウィンドウサイズ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの QVWinSize 行を、
@@ -198,7 +198,7 @@ QVWinSize=8
 </pre>
 
 
-<h1><a name="xmlog">XMODEM のログ</a></h1>
+<h1 id="xmlog">XMODEM のログ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの XmodemLog 行を、
@@ -218,7 +218,7 @@ XmodemLog=off
 </pre>
 
 
-<h1><a name="xmodemrecv">XMODEM の受信コマンド</a></h1>
+<h1 id="xmodemrecv">XMODEM の受信コマンド</h1>
 
 <p>
 XMODEM でファイル送信を開始する直前に、ホストに 「XMODEM を受信するコマンド」を送信し、自動的に受信を開始させることができます。このときに Tera Term から送信する「XMODEM を受信するコマンド」を指定します。
@@ -238,7 +238,7 @@ XmodemRcvCommand=
 </pre>
 
 
-<h1><a name="XmodemTimeouts">XMODEM のタイムアウト</a></h1>
+<h1 id="XmodemTimeouts">XMODEM のタイムアウト</h1>
 
 <p>
 XMODEM のタイムアウト値（単位は秒）を設定できます。
@@ -258,7 +258,7 @@ XmodemTimeouts=10,3,10,20,60
 </pre>
 
 
-<h1><a name="YmodemTimeouts">YMODEM のタイムアウト</a></h1>
+<h1 id="YmodemTimeouts">YMODEM のタイムアウト</h1>
 
 <p>
 YMODEM のタイムアウト値（単位は秒）を設定できます。
@@ -278,7 +278,7 @@ YmodemTimeouts=10,3,10,20,60
 </pre>
 
 
-<h1><a name="zmauto">ZMODEM 受信/送信の自動起動</a></h1>
+<h1 id="zmauto">ZMODEM 受信/送信の自動起動</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの ZmodemAuto 行を、
@@ -299,7 +299,7 @@ ZmodemAuto=off
 </pre>
 
 
-<h1><a name="zmparam">ZMODEM 送信の設定</a></h1>
+<h1 id="zmparam">ZMODEM 送信の設定</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの ZmodemDataLen と ZmodemWinSize 行を以下のように変更すると、ZMODEM 送信に関する設定をすることができます。これらの設定は ZMODEM 受信には影響を与えません。
@@ -334,7 +334,7 @@ ZmodemWinSize=32767
 </p>
 
 
-<h1><a name="zmesc">ZMODEM ですべての制御文字をエスケープする</a></h1>
+<h1 id="zmesc">ZMODEM ですべての制御文字をエスケープする</h1>
 
 <p>
 ZMODEM では、通信回線が一部の制御文字を通さないことを想定して、それらをエスケープする(他の文字の組み合わせに置き換える)ようになっています。しかし、想定外の制御文字も通さない回線の場合は転送がうまくいきません。そのような場合は、設定ファイルの [Tera Term] セクションの ZmodemEscCtl 行を、
@@ -354,7 +354,7 @@ ZmodemEscCtl=off
 </pre>
 
 
-<h1><a name="zmlog">ZMODEM のログ</a></h1>
+<h1 id="zmlog">ZMODEM のログ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの ZmodemLog 行を、
@@ -374,7 +374,7 @@ ZmodemLog=off
 </pre>
 
 
-<h1><a name="zmodemrecv">ZMODEM の受信コマンド</a></h1>
+<h1 id="zmodemrecv">ZMODEM の受信コマンド</h1>
 
 <p>
 ZMODEM でファイル送信を開始する直前に、ホストに「ZMODEM を受信するコマンド」を送信し、自動的に受信を開始させることができます。このときに Tera Term から送信する「ZMODEM を受信するコマンド」を指定します。
@@ -394,7 +394,7 @@ ZmodemRcvCommand=rz
 </pre>
 
 
-<h1><a name="ZmodemTimeouts">ZMODEM のタイムアウト</a></h1>
+<h1 id="ZmodemTimeouts">ZMODEM のタイムアウト</h1>
 
 <p>
 ZMODEM のタイムアウト値（単位は秒）を設定できます。
@@ -413,7 +413,7 @@ ZmodemTimeouts=10,0,10,3
 </pre>
 
 
-<h1><a name="filter">送信ダイアログのファイル名フィルタ</a></h1>
+<h1 id="filter">送信ダイアログのファイル名フィルタ</h1>
 
 <p>
 設定ファイルの [Tera Term] セクションの FileSendFilter 行を、
@@ -433,7 +433,7 @@ FileSendFilter=
 </pre>
 
 
-<h1><a name="draganddrop">ドラッグ&amp;ドロップによるファイル送信の確認</a></h1>
+<h1 id="draganddrop">ドラッグ&amp;ドロップによるファイル送信の確認</h1>
 
 <p>
 Tera Term は、デフォルトではファイルをウインドウにドラッグ&amp;ドロップしたときに、ファイルを転送するかどうか確認のメッセージボックスを表示します。設定ファイルの [Tera Term] セクションの ConfirmFileDragAndDrop 行を下記のように変更すると、確認をせずにファイルの転送を開始します。
@@ -449,7 +449,7 @@ ConfirmFileDragAndDrop=on
 </pre>
 
 
-<h1><a name="hidetransdialog">ファイル送信時の転送状況ダイアログを表示しない</a></h1>
+<h1 id="hidetransdialog">ファイル送信時の転送状況ダイアログを表示しない</h1>
 
 <p>
 Tera Term は、ファイル送信時に送信済み容量等の転送状況を表示するダイアログを出します。
@@ -466,7 +466,7 @@ FTHideDialog=off
 </pre>
 
 
-<h1><a name="FileSendHighSpeedMode">シリアル接続における高速なファイル転送</a></h1>
+<h1 id="FileSendHighSpeedMode">シリアル接続における高速なファイル転送</h1>
 
 <p>
 Tera Term は、ファイル送信時に内容を1バイトずつ送ります。<br>
