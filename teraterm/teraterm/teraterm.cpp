@@ -211,6 +211,8 @@ BOOL CallOnIdle(LONG lCount)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
+	LONG lCount = 0;
+
 	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow();
@@ -227,6 +229,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+		}
+
+		if (!OnIdle(lCount++)) {
+			lCount = 0;
 		}
     }
     return (msg.wParam);

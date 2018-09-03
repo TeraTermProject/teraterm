@@ -90,8 +90,6 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 
 #define CWnd	TTCWnd
 #define CFrameWnd	TTCFrameWnd
-#define CMenu TTCMenu
-#define CPoint	TTCPoint
 
 #define VTClassName "VTWin32"
 
