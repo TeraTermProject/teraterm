@@ -7,7 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+//#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -17,8 +17,8 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 #ifdef _WIN32
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
+//LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+//#pragma code_page(932)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -58,7 +58,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "ttpcmn-version.rc"
+//#include "ttpcmn-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
