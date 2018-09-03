@@ -34,7 +34,7 @@ set(SRC
   tek_res.h
   tekesc.c
   tekesc.h
-  ttptek.rc
+#  ttptek.rc
   ttptek-version.rc
   tttek.h
   tttek.c

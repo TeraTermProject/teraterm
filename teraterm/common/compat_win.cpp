@@ -2,6 +2,7 @@
 #include "compat_win.h"
 
 TSetThreadDpiAwarenessContext PSetThreadDpiAwarenessContext;
+TGetDpiForWindow PGetDpiForWindow;
 
 void WinCompatInit()
 {
@@ -17,4 +18,7 @@ void WinCompatInit()
 	PSetThreadDpiAwarenessContext =
 		(TSetThreadDpiAwarenessContext)
 		GetProcAddress(dll_handle, "SetThreadDpiAwarenessContext");
+	PGetDpiForWindow =
+		(TGetDpiForWindow)
+		GetProcAddress(dll_handle, "GetDpiForWindow");
 }

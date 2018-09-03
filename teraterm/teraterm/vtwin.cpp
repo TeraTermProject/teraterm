@@ -82,6 +82,7 @@
 #include "dnddlg.h"
 #include "tekwin.h"
 #include "htmlhelp.h"
+#include "compat_win.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -256,6 +257,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_COMMAND(ID_HELP_INDEX2, OnHelpIndex)
 	ON_COMMAND(ID_HELP_ABOUT, OnHelpAbout)
 	ON_MESSAGE(WM_USER_DROPNOTIFY, OnDropNotify)
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 #endif
@@ -6118,6 +6120,19 @@ void CVTWindow::OnHelpAbout()
 	FreeTTDLG();
 }
 
+LRESULT CVTWindow::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	static DWORD preTime = 0;
+	DWORD currentTime = GetTickCount();
+	if (currentTime - preTime < 1000) {
+		return 0;
+	}
+	preTime = currentTime;
+		
+	DpiChanged();
+	return TRUE;
+}
+
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
@@ -6316,6 +6331,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_USER_DROPNOTIFY:
 		OnDropNotify(wp, lp);
+		break;
+	case WM_DPICHANGED:
+		OnDpiChanged(wp, lp);
 		break;
 	case WM_COMMAND:
 	{

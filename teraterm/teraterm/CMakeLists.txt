@@ -42,10 +42,12 @@ source_group(
   )
 
 set(SRC
+  tmfc.h
+  tmfc.cpp
+  tmfc_frame.cpp
+  #
   addsetting.cpp
   addsetting.h
-  tmfc.cpp
-  tmfc.h
   buffer.c
   buffer.h
   clipboar.c
@@ -70,8 +72,6 @@ set(SRC
   teklib.h
   tekwin.cpp
   tekwin.h
-  tekwin_sub.cpp
-  tekwin_sub.h
   telnet.c
   telnet.h
   teraapp.h

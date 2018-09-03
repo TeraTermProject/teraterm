@@ -31,17 +31,13 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
-#include "tekwin_sub.h"
+#include "tmfc.h"
 class CTEKWindow : public TTCFrameWnd
 {
 private:
   TTEKVar tk;
-#ifndef NO_I18N
   HMENU MainMenu, EditMenu, WinMenu,
     FileMenu, SetupMenu, HelpMenu;
-#else
-  HMENU MainMenu, EditMenu, WinMenu;
-#endif
 
 public:
 	CTEKWindow();

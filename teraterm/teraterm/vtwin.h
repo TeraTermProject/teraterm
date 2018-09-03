@@ -31,7 +31,7 @@
 
 #ifdef __cplusplus
 
-#include "tekwin_sub.h"
+#include "tmfc.h"
 //class CVTWindow : public CFrameWnd
 class CVTWindow : public TTCFrameWnd
 {
@@ -225,6 +225,7 @@ protected:
 //	afx_msg void OnHelpUsing();		// 実体なし不要
 	afx_msg void OnHelpAbout();
 	afx_msg LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 //	DECLARE_MESSAGE_MAP();
 #undef afx_msg

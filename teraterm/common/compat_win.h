@@ -1,7 +1,9 @@
 ﻿
 #include <windows.h>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 #if !defined(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)
 #define DPI_AWARENESS_CONTEXT_SYSTEM_AWARE          ((DPI_AWARENESS_CONTEXT)-2)
@@ -18,7 +20,11 @@ typedef DPI_AWARENESS_CONTEXT (WINAPI *TSetThreadDpiAwarenessContext)
 	(DPI_AWARENESS_CONTEXT dpiContext);
 extern TSetThreadDpiAwarenessContext PSetThreadDpiAwarenessContext;
 
+typedef UINT (WINAPI *TGetDpiForWindow)(HWND hwnd);
+extern TGetDpiForWindow PGetDpiForWindow;
+
 void WinCompatInit();
 
-
+#ifdef __cplusplus
 }
+#endif

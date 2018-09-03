@@ -36,6 +36,7 @@
 #include "ttime.h"
 #include "ttdialog.h"
 #include "ttcommon.h"
+#include "compat_win.h"
 
 #include "vtdisp.h"
 
@@ -100,7 +101,6 @@ int NumOfLines, NumOfColumns;
 int PageStart, BuffEnd;
 
 static BOOL CursorOnDBCS = FALSE;
-static LOGFONT VTlf;
 static BOOL SaveWinSize = FALSE;
 static int WinWidthOld, WinHeightOld;
 static HBRUSH Background;
@@ -1951,28 +1951,28 @@ void DispConvScreenToWin
        *Yw = (Ys - WinOrgY) * FontHeight;
 }
 
-void SetLogFont()
+static void SetLogFont(LOGFONT *VTlf)
 {
-  memset(&VTlf, 0, sizeof(LOGFONT));
-  VTlf.lfWeight = FW_NORMAL;
-  VTlf.lfItalic = 0;
-  VTlf.lfUnderline = 0;
-  VTlf.lfStrikeOut = 0;
-  VTlf.lfWidth = ts.VTFontSize.x;
-  VTlf.lfHeight = ts.VTFontSize.y;
-  VTlf.lfCharSet = ts.VTFontCharSet;
-  VTlf.lfOutPrecision  = OUT_CHARACTER_PRECIS;
-  VTlf.lfClipPrecision = CLIP_CHARACTER_PRECIS;
-  VTlf.lfQuality       = (BYTE)ts.FontQuality;
-  VTlf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
-  strncpy_s(VTlf.lfFaceName, sizeof(VTlf.lfFaceName),ts.VTFont, _TRUNCATE);
+  memset(VTlf, 0, sizeof(LOGFONT));
+  VTlf->lfWeight = FW_NORMAL;
+  VTlf->lfItalic = 0;
+  VTlf->lfUnderline = 0;
+  VTlf->lfStrikeOut = 0;
+  VTlf->lfWidth = ts.VTFontSize.x;
+  VTlf->lfHeight = ts.VTFontSize.y;
+  VTlf->lfCharSet = ts.VTFontCharSet;
+  VTlf->lfOutPrecision  = OUT_CHARACTER_PRECIS;
+  VTlf->lfClipPrecision = CLIP_CHARACTER_PRECIS;
+  VTlf->lfQuality       = (BYTE)ts.FontQuality;
+  VTlf->lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
+  strncpy_s(VTlf->lfFaceName, sizeof(VTlf->lfFaceName),ts.VTFont, _TRUNCATE);
 }
 
 void ChangeFont()
 {
   int i, j;
   TEXTMETRIC Metrics;
-  HDC TmpDC;
+  LOGFONT VTlf;
 
   /* Delete Old Fonts */
   for (i = 0 ; i <= AttrFontMask ; i++)
@@ -1984,14 +1984,23 @@ void ChangeFont()
       DeleteObject(VTFont[i]);
   }
 
+  {
+  HDC TmpDC = GetDC(HVTWin);
+  UINT uDpi;
+
   /* Normal Font */
-  SetLogFont();
+  SetLogFont(&VTlf);
+  if (PGetDpiForWindow == NULL) {
+	  uDpi = GetDeviceCaps(TmpDC,LOGPIXELSY);	// ‚¢‚Â‚à96‚ð•Ô‚·?
+  } else {
+	  uDpi = PGetDpiForWindow(HVTWin);
+  }
+  VTlf.lfWidth = -MulDiv(VTlf.lfWidth, uDpi, 72);
+  VTlf.lfHeight = -MulDiv(VTlf.lfHeight, uDpi, 72);
   VTFont[0] = CreateFontIndirect(&VTlf);
 
   /* set IME font */
   SetConversionLogFont(&VTlf);
-
-  TmpDC = GetDC(HVTWin);
 
   SelectObject(TmpDC, VTFont[0]);
   GetTextMetrics(TmpDC, &Metrics);
@@ -1999,6 +2008,7 @@ void ChangeFont()
   FontHeight = Metrics.tmHeight + ts.FontDH;
 
   ReleaseDC(HVTWin,TmpDC);
+  }
 
   /* Underline */
   VTlf.lfUnderline = 1;
@@ -2049,8 +2059,6 @@ void ChangeFont()
     VTFont[AttrSpecial | AttrBold | AttrUnder] = VTFont[AttrSpecial | AttrUnder];
   }
 
-  SetLogFont();
-
   for (i = 0 ; i < TermWidthMax; i++)
     Dx[i] = FontWidth;
 }
@@ -2070,8 +2078,11 @@ void ResetIME()
 
 		if (ts.UseIME>0)
 		{
-			if (ts.IMEInline>0)
+			if (ts.IMEInline>0) {
+				LOGFONT VTlf;
+				SetLogFont(&VTlf);
 				SetConversionLogFont(&VTlf);
+			}
 			else
 				SetConversionWindow(HVTWin,-1,0);
 		}
@@ -3358,10 +3369,11 @@ void DispSetupFontDlg()
 //  reset window
 {
   BOOL Ok;
+  LOGFONT VTlf;
 
   ts.VTFlag = 1;
   if (! LoadTTDLG()) return;
-  SetLogFont();
+  SetLogFont(&VTlf);
   Ok = ChooseFontDlg(HVTWin,&VTlf,&ts);
   FreeTTDLG();
   if (! Ok) return;
@@ -3860,4 +3872,11 @@ int DispFindClosestColor(int red, int green, int blue)
 		color ^= 8;
 	}
 	return color;
+}
+
+void DpiChanged(void)
+{
+  ChangeFont();
+  DispChangeWinSize(WinWidth,WinHeight);
+  ChangeCaret();
 }
