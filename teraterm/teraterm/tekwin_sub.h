@@ -4,16 +4,6 @@
 #include <windows.h>
 #include "tmfc.h"
 
-#if 0
-class TTCDC
-{
-public:
-	HDC m_hDC;
-	BOOL operator=(const CDC& obj);
-	HDC GetSafeHdc() const;
-};
-#endif
-
 class TTCMenu
 {
 public:
@@ -43,9 +33,9 @@ public:
 	///
 #if 1
 	void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
-	void OnKillFocus(TTCWnd* pNewWnd);
+	void OnKillFocus(HWND hNewWnd);
 	void OnDestroy();
-	void OnSetFocus(TTCWnd* pOldWnd);
+	void OnSetFocus(HWND hOldWnd);
 	void OnSysCommand(UINT nID, LPARAM lParam);
 	void OnClose();
 #endif

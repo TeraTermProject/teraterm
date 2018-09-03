@@ -37,6 +37,7 @@ class TTCWnd
 public:
 	HWND m_hWnd;
 	HINSTANCE m_hInst;
+	HACCEL m_hAccel;
 
 	TTCWnd();
 	void DestroyWindow();

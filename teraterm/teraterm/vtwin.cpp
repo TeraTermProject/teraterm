@@ -827,9 +827,8 @@ CVTWindow::CVTWindow()
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = VTClassName;
 
-	ATOM a = RegisterClass(&wc);
-	//LoadAccelTable(MAKEINTRESOURCE(IDR_ACC));
-	::LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACC));
+	RegisterClass(&wc);
+	m_hAccel = ::LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACC));
 
 	if (ts.VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
@@ -1885,7 +1884,7 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void CVTWindow::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 {
 	DispSetActive(nState!=WA_INACTIVE);
 }
@@ -2426,11 +2425,11 @@ void CVTWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	KeyUp(nChar);
 }
 
-void CVTWindow::OnKillFocus(CWnd* pNewWnd)
+void CVTWindow::OnKillFocus(HWND hNewWnd)
 {
 	DispDestroyCaret();
 	FocusReport(FALSE);
-	CFrameWnd::OnKillFocus(pNewWnd);
+	CFrameWnd::OnKillFocus(hNewWnd);
 
 	if (IsCaretOn()) {
 		CaretKillFocus(TRUE);
@@ -2655,7 +2654,6 @@ void CVTWindow::OnNcRButtonDown(UINT nHitTest, CPoint point)
 void CVTWindow::OnPaint()
 {
 	PAINTSTRUCT ps;
-//	CDC *cdc;
 	HDC PaintDC;
 	int Xs, Ys, Xe, Ye;
 
@@ -2666,7 +2664,6 @@ void CVTWindow::OnPaint()
 #endif
 
 	PaintDC = BeginPaint(&ps);
-//	PaintDC = cdc->GetSafeHdc();
 
 	PaintWindow(PaintDC,ps.rcPaint,ps.fErase, &Xs,&Ys,&Xe,&Ye);
 	LockBuffer();
@@ -2720,11 +2717,11 @@ void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
 	}
 }
 
-void CVTWindow::OnSetFocus(CWnd* pOldWnd)
+void CVTWindow::OnSetFocus(HWND hOldWnd)
 {
 	ChangeCaret();
 	FocusReport(TRUE);
-	CFrameWnd::OnSetFocus(pOldWnd);
+	CFrameWnd::OnSetFocus(hOldWnd);
 }
 
 void CVTWindow::OnSize(UINT nType, int cx, int cy)
@@ -6129,4 +6126,244 @@ void CVTWindow::OnHelpAbout()
 	}
 	(*AboutDialog)(HVTWin);
 	FreeTTDLG();
+}
+
+LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	LRESULT retval = 0;
+	switch(msg)
+	{
+	case WM_ACTIVATE:
+		OnActivate(wp & 0xFFFF, (HWND)wp, (wp >> 16) & 0xFFFF);
+		break;
+	case WM_CHAR:
+		OnChar(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_CLOSE:
+		OnClose();
+		break;
+	case WM_DESTROY:
+		OnDestroy();
+		//PostQuitMessage(0);
+		break;
+	case WM_DROPFILES:
+		OnDropFiles((HDROP)wp);
+		break;
+	case WM_GETMINMAXINFO:
+		OnGetMinMaxInfo((MINMAXINFO *)lp);
+		break;
+	case WM_HSCROLL:
+		OnHScroll((UINT)wp, 0, (HWND)lp);
+		break;
+	case WM_INITMENUPOPUP:
+		InitMenuPopup((HMENU)wp);
+		break;
+	case WM_KEYDOWN:
+		OnKeyDown(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_KEYUP:
+		OnKeyUp(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_KILLFOCUS:
+		OnKillFocus((HWND)wp);
+		break;
+	case WM_LBUTTONDBLCLK:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnLButtonDblClk(wp, pt);
+		break;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnLButtonDown(wp, pt);
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnLButtonUp(wp, pt);
+		break;
+	}
+	case WM_MBUTTONDOWN:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnMButtonDown(wp, pt);
+		break;
+	}
+	case WM_MBUTTONUP:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnMButtonUp(wp, pt);
+		break;
+	}
+	case WM_MOUSEACTIVATE:
+		break;
+	case WM_MOUSEMOVE:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnMouseMove(wp, pt);
+		break;
+	}
+	case WM_MOUSEWHEEL:
+		break;
+	case WM_MOVE:
+		OnMove(LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_NCLBUTTONDBLCLK:
+		break;
+	case WM_NCRBUTTONDOWN:
+		break;
+#if 0
+	case WM_NCCALCSIZE:
+		break;
+#endif
+	case WM_PAINT:
+		OnPaint();
+		break;
+	case WM_RBUTTONDOWN:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnRButtonDown(wp, pt);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		CPoint pt;
+		pt.x = LOWORD(lp);
+		pt.y = HIWORD(lp);
+		OnRButtonUp(wp, pt);
+		break;
+	}
+	case WM_SETFOCUS:
+		OnSetFocus((HWND)wp);
+		break;
+	case WM_SIZE:
+		OnSize(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_SIZING:
+		break;
+	case WM_SYSCHAR:
+		OnSysChar(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_SYSCOLORCHANGE:
+		break;
+	case WM_SYSCOMMAND:
+		OnSysCommand((wp & 0xFFF0), lp);
+		break;
+	case WM_SYSKEYDOWN:
+		OnSysKeyDown(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_SYSKEYUP:
+		OnSysKeyUp(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_TIMER:
+		OnTimer(wp);
+		break;
+	case WM_VSCROLL:
+		OnVScroll((UINT)wp, 0, (HWND)lp);
+		break;
+	case WM_DEVICECHANGE:
+		break;
+	////
+	case WM_COMMAND:
+	{
+		WORD wID = GET_WM_COMMAND_ID(wp, lp);
+		const WORD wCMD = GET_WM_COMMAND_CMD(wp, lp);
+		switch (wID) {
+		case ID_FILE_NEWCONNECTION: OnFileNewConnection(); break;
+		case ID_FILE_DUPLICATESESSION: OnDuplicateSession(); break;
+		case ID_FILE_CYGWINCONNECTION: OnCygwinConnection(); break;
+		case ID_FILE_TERATERMMENU: OnTTMenuLaunch(); break;
+		case ID_FILE_LOGMEIN: OnLogMeInLaunch(); break;
+		case ID_FILE_LOG: OnFileLog(); break;
+		case ID_FILE_COMMENTTOLOG: OnCommentToLog(); break;
+		case ID_FILE_VIEWLOG: OnViewLog(); break;
+		case ID_FILE_SHOWLOGDIALOG: OnShowLogDialog(); break;
+		case ID_FILE_REPLAYLOG: OnReplayLog(); break;
+		case ID_FILE_SENDFILE: OnFileSend(); break;
+		case ID_FILE_KERMITRCV: OnFileKermitRcv(); break;
+		case ID_FILE_KERMITGET: OnFileKermitGet(); break;
+		case ID_FILE_KERMITSEND: OnFileKermitSend(); break;
+		case ID_FILE_KERMITFINISH: OnFileKermitFinish(); break;
+		case ID_FILE_XRCV: OnFileXRcv(); break;
+		case ID_FILE_XSEND: OnFileXSend(); break;
+		case ID_FILE_YRCV: OnFileYRcv(); break;
+		case ID_FILE_YSEND: OnFileYSend(); break;
+		case ID_FILE_ZRCV: OnFileZRcv(); break;
+		case ID_FILE_ZSEND: OnFileZSend(); break;
+		case ID_FILE_BPRCV: OnFileBPRcv(); break;
+		case ID_FILE_BPSEND: OnFileBPSend(); break;
+		case ID_FILE_QVRCV: OnFileQVRcv(); break;
+		case ID_FILE_QVSEND: OnFileQVSend(); break;
+		case ID_FILE_CHANGEDIR: OnFileChangeDir(); break;
+		case ID_FILE_PRINT2: OnFilePrint(); break;
+		case ID_FILE_DISCONNECT: OnFileDisconnect(); break;
+		case ID_FILE_EXIT: OnFileExit(); break;
+		case ID_FILE_EXITALL: OnAllClose(); break;
+		case ID_EDIT_COPY2: OnEditCopy(); break;
+		case ID_EDIT_COPYTABLE: OnEditCopyTable(); break;
+		case ID_EDIT_PASTE2: OnEditPaste(); break;
+		case ID_EDIT_PASTECR: OnEditPasteCR(); break;
+		case ID_EDIT_CLEARSCREEN: OnEditClearScreen(); break;
+		case ID_EDIT_CLEARBUFFER: OnEditClearBuffer(); break;
+		case ID_EDIT_CANCELSELECT: OnEditCancelSelection(); break;
+		case ID_EDIT_SELECTALL: OnEditSelectAllBuffer(); break;
+		case ID_EDIT_SELECTSCREEN: OnEditSelectScreenBuffer(); break;
+		case ID_SETUP_ADDITIONALSETTINGS: OnExternalSetup(); break;
+		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
+		case ID_SETUP_WINDOW: OnSetupWindow(); break;
+		case ID_SETUP_FONT: OnSetupFont(); break;
+		case ID_SETUP_KEYBOARD: OnSetupKeyboard(); break;
+		case ID_SETUP_SERIALPORT: OnSetupSerialPort(); break;
+		case ID_SETUP_TCPIP: OnSetupTCPIP(); break;
+		case ID_SETUP_GENERAL: OnSetupGeneral(); break;
+		case ID_SETUP_SAVE: OnSetupSave(); break;
+		case ID_SETUP_RESTORE: OnSetupRestore(); break;
+		case ID_OPEN_SETUP: OnOpenSetupDirectory(); break;
+		case ID_SETUP_LOADKEYMAP: OnSetupLoadKeyMap(); break;
+		case ID_CONTROL_RESETTERMINAL: OnControlResetTerminal(); break;
+		case ID_CONTROL_RESETREMOTETITLE: OnControlResetRemoteTitle(); break;
+		case ID_CONTROL_AREYOUTHERE: OnControlAreYouThere(); break;
+		case ID_CONTROL_SENDBREAK: OnControlSendBreak(); break;
+		case ID_CONTROL_RESETPORT: OnControlResetPort(); break;
+		case ID_CONTROL_BROADCASTCOMMAND: OnControlBroadcastCommand(); break;
+		case ID_CONTROL_OPENTEK: OnControlOpenTEK(); break;
+		case ID_CONTROL_CLOSETEK: OnControlCloseTEK(); break;
+		case ID_CONTROL_MACRO: OnControlMacro(); break;
+		case ID_CONTROL_SHOW_MACRO: OnShowMacroWindow(); break;
+		case ID_WINDOW_WINDOW: OnWindowWindow(); break;
+		case ID_WINDOW_MINIMIZEALL: OnWindowMinimizeAll(); break;
+		case ID_WINDOW_CASCADEALL: OnWindowCascade(); break;
+		case ID_WINDOW_STACKED: OnWindowStacked(); break;
+		case ID_WINDOW_SIDEBYSIDE: OnWindowSidebySide(); break;
+		case ID_WINDOW_RESTOREALL: OnWindowRestoreAll(); break;
+		case ID_WINDOW_UNDO: OnWindowUndo(); break;
+		case ID_HELP_INDEX2: OnHelpIndex(); break;
+		case ID_HELP_ABOUT: OnHelpAbout(); break;
+		default:
+			OnCommand(wp, lp);
+			break;
+		}
+		break;
+	}
+	default:
+		retval = TTCFrameWnd::Proc(msg, wp, lp);
+		break;
+	}
+	return retval;
 }

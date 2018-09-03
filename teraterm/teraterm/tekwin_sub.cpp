@@ -78,13 +78,13 @@ BOOL TTCFrameWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 void TTCFrameWnd::OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 {}
 
-void TTCFrameWnd::OnKillFocus(TTCWnd* pNewWnd)
+void TTCFrameWnd::OnKillFocus(HWND hNewWnd)
 {}
 
 void TTCFrameWnd::OnDestroy()
 {}
 
-void TTCFrameWnd::OnSetFocus(TTCWnd* pOldWnd)
+void TTCFrameWnd::OnSetFocus(HWND hOldWnd)
 {}
 
 void TTCFrameWnd::OnSysCommand(UINT nID, LPARAM lParam)

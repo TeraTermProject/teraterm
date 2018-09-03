@@ -90,7 +90,7 @@ public:
 protected:
 	//{{AFX_MSG(CVTWindow)
 #define afx_msg
-	afx_msg void OnActivate(UINT nState, TTCWnd* pWndOther, BOOL bMinimized);
+	afx_msg void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnClose();
 	afx_msg void OnAllClose();
@@ -102,7 +102,7 @@ protected:
 	afx_msg void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKillFocus(TTCWnd* pNewWnd);
+	afx_msg void OnKillFocus(HWND hNewWnd);
 	afx_msg void OnLButtonDblClk(UINT nFlags, TTCPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, TTCPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, TTCPoint point);
@@ -119,7 +119,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg void OnRButtonDown(UINT nFlags, TTCPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, TTCPoint point);
-	afx_msg void OnSetFocus(TTCWnd* pOldWnd);
+	afx_msg void OnSetFocus(HWND hOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -232,6 +232,8 @@ protected:
 //	DECLARE_MESSAGE_MAP();
 #undef afx_msg
 	void Disconnect(BOOL confirm);
+	///
+	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };
 #endif
 

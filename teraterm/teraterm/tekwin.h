@@ -69,7 +69,7 @@ protected:
 	afx_msg void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKillFocus(TTCWnd* pNewWnd);
+	afx_msg void OnKillFocus(HWND hNewWnd);
 	afx_msg void OnLButtonDown(UINT nFlags, TTCPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, TTCPoint point);
 	afx_msg void OnMButtonUp(UINT nFlags, TTCPoint point);
@@ -78,7 +78,7 @@ protected:
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnPaint();
 	afx_msg void OnRButtonUp(UINT nFlags, TTCPoint point);
-	afx_msg void OnSetFocus(TTCWnd* pOldWnd);
+	afx_msg void OnSetFocus(HWND hOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);

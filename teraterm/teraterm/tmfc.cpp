@@ -38,6 +38,7 @@ TTCWnd::TTCWnd()
 {
 	m_hWnd = NULL;
 	m_hInst = NULL;
+	m_hAccel = NULL;
 }
 
 LRESULT TTCWnd::SendMessage(UINT msg, WPARAM wp, LPARAM lp)

@@ -222,8 +222,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		if (MetaKey(ts.MetaKey)) {
 			continue;
 		}
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+		if (m_pMainWnd->m_hAccel != NULL &&
+			!TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
     }
     return (msg.wParam);
 }

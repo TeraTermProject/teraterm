@@ -411,10 +411,10 @@ void CTEKWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	KeyUp(nChar);
 }
 
-void CTEKWindow::OnKillFocus(CWnd* pNewWnd)
+void CTEKWindow::OnKillFocus(HWND hNewWnd)
 {
 	TEKDestroyCaret(&tk,&ts);
-	CFrameWnd::OnKillFocus(pNewWnd);
+	CFrameWnd::OnKillFocus(hNewWnd);
 }
 
 void CTEKWindow::OnLButtonDown(UINT nFlags, CPoint point)
@@ -526,10 +526,10 @@ void CTEKWindow::OnRButtonUp(UINT nFlags, CPoint point)
 	CBStartPaste(tk.HWin, FALSE, FALSE);
 }
 
-void CTEKWindow::OnSetFocus(CWnd* pOldWnd)
+void CTEKWindow::OnSetFocus(HWND hOldWnd)
 {
 	TEKChangeCaret(&tk,&ts);
-	CFrameWnd::OnSetFocus(pOldWnd);
+	CFrameWnd::OnSetFocus(hOldWnd);
 }
 
 void CTEKWindow::OnSize(UINT nType, int cx, int cy)
