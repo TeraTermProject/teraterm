@@ -6144,7 +6144,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DESTROY:
 		OnDestroy();
-		//PostQuitMessage(0);
+		PostQuitMessage(0);
 		break;
 	case WM_DROPFILES:
 		OnDropFiles((HDROP)wp);
@@ -6155,9 +6155,11 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_HSCROLL:
 		OnHScroll((UINT)wp, 0, (HWND)lp);
 		break;
+#if 0
 	case WM_INITMENUPOPUP:
 		InitMenuPopup((HMENU)wp);
 		break;
+#endif
 	case WM_KEYDOWN:
 		OnKeyDown(wp, LOWORD(lp), HIWORD(lp));
 		break;
@@ -6207,8 +6209,10 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnMButtonUp(wp, pt);
 		break;
 	}
+#if 0
 	case WM_MOUSEACTIVATE:
 		break;
+#endif
 	case WM_MOUSEMOVE:
 	{
 		CPoint pt;
@@ -6217,6 +6221,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnMouseMove(wp, pt);
 		break;
 	}
+#if 0
 	case WM_MOUSEWHEEL:
 		break;
 	case WM_MOVE:
@@ -6226,7 +6231,6 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_NCRBUTTONDOWN:
 		break;
-#if 0
 	case WM_NCCALCSIZE:
 		break;
 #endif
@@ -6256,7 +6260,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnSize(wp, LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_SIZING:
+		OnSizing(wp, (LPRECT)lp);
 		break;
+#if 0
 	case WM_SYSCHAR:
 		OnSysChar(wp, LOWORD(lp), HIWORD(lp));
 		break;
@@ -6279,7 +6285,82 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DEVICECHANGE:
 		break;
-	////
+#endif
+	case WM_IME_COMPOSITION:
+		OnIMEComposition(wp, lp);
+		break;
+	case WM_INPUTLANGCHANGE:
+		OnIMEInputChange(wp, lp);
+		break;
+	case WM_IME_NOTIFY:
+		OnIMENotify(wp, lp);
+		break;
+	case WM_IME_REQUEST:
+		OnIMERequest(wp, lp);
+		break;
+	case WM_WINDOWPOSCHANGING:
+		OnWindowPosChanging(wp, lp);
+		break;
+	case WM_SETTINGCHANGE:
+		OnSettingChange(wp, lp);
+		break;
+	case WM_ENTERSIZEMOVE:
+		OnEnterSizeMove(wp, lp);
+		break;
+	case WM_EXITSIZEMOVE :
+		OnExitSizeMove(wp, lp);
+		break;
+	case WM_USER_ACCELCOMMAND:
+		OnAccelCommand(wp, lp);
+		break;
+	case WM_USER_CHANGEMENU:
+		OnChangeMenu(wp, lp);
+		break;
+	case WM_USER_CHANGETBAR:
+		OnChangeTBar(wp, lp);
+		break;
+	case WM_USER_COMMNOTIFY:
+		OnCommNotify(wp, lp);
+		break;
+	case WM_USER_COMMOPEN:
+		OnCommOpen(wp, lp);
+		break;
+	case WM_USER_COMMSTART:
+		OnCommStart(wp, lp);
+		break;
+	case WM_USER_DDEEND:
+		OnDdeEnd(wp, lp);
+		break;
+	case WM_USER_DLGHELP2:
+		OnDlgHelp(wp, lp);
+		break;
+	case WM_USER_FTCANCEL:
+		OnFileTransEnd(wp, lp);
+		break;
+	case WM_USER_GETSERIALNO:
+		OnGetSerialNo(wp, lp);
+		break;
+	case WM_USER_KEYCODE:
+		OnKeyCode(wp, lp);
+		break;
+	case WM_USER_PROTOCANCEL:
+		OnProtoEnd(wp, lp);
+		break;
+	case WM_USER_CHANGETITLE:
+		OnChangeTitle(wp, lp);
+		break;
+	case WM_COPYDATA:
+		OnReceiveIpcMessage(wp, lp);
+		break;
+	case WM_USER_NONCONFIRM_CLOSE:
+		OnNonConfirmClose(wp, lp);
+		break;
+	case WM_USER_NOTIFYICON:
+		OnNotifyIcon(wp, lp);
+		break;
+	case WM_USER_DROPNOTIFY:
+		OnDropNotify(wp, lp);
+		break;
 	case WM_COMMAND:
 	{
 		WORD wID = GET_WM_COMMAND_ID(wp, lp);
