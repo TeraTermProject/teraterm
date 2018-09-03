@@ -34,14 +34,10 @@ set_target_properties(
   ttptek
   PROPERTIES FOLDER teraterm)
 
-#if((${CMAKE_MAKE_PROGRAM} MATCHES "VCExpress.exe") OR MINGW)
-#  message("pass teraterm compile")
-#else()
-  add_subdirectory(teraterm)
-  set_target_properties(
-	teraterm
-	PROPERTIES FOLDER teraterm)
-#endif()
+add_subdirectory(teraterm)
+set_target_properties(
+  teraterm
+  PROPERTIES FOLDER teraterm)
 
 add_subdirectory(keycode)
 set_target_properties(
