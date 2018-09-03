@@ -28,7 +28,7 @@
  */
 
 /* TERATERM.EXE, TEK window */
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tektypes.h"
@@ -43,6 +43,12 @@
 #include "tt_res.h"
 #include "tekwin.h"
 #include "ttlib.h"
+#include "htmlhelp.h"
+
+#define CWnd	TTCWnd
+#define CFrameWnd	TTCFrameWnd
+#define CMenu TTCMenu
+#define CPoint	TTCPoint
 
 #define TEKClassName "TEKWin32"
 
@@ -51,6 +57,11 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+static HINSTANCE AfxGetInstanceHandle()
+{
+	return hInst;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
@@ -76,7 +87,8 @@ CTEKWindow::CTEKWindow()
 	}
 
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = AfxWndProc;
+//	wc.lpfnWndProc = (WNDPROC)AfxWndProc;
+	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = AfxGetInstanceHandle();
@@ -97,7 +109,7 @@ CTEKWindow::CTEKWindow()
 		rect.right = rect.left + 640; //temporary width
 		rect.bottom = rect.top + 400; //temporary height
 	}
-	Create(TEKClassName, "Tera Term", Style, rect, GetDesktopWindow(), NULL);
+	Create(hInst, TEKClassName, "Tera Term", Style, rect, ::GetDesktopWindow(), NULL);
 //--------------------------------------------------------
 	HTEKWin = GetSafeHwnd();
 	if (HTEKWin == NULL) {
@@ -246,6 +258,7 @@ void CTEKWindow::InitMenuPopup(HMENU SubMenu)
 	}
 }
 
+#if 0
 BEGIN_MESSAGE_MAP(CTEKWindow, CFrameWnd)
 	//{{AFX_MSG_MAP(CTEKWindow)
 	ON_WM_ACTIVATE()
@@ -291,6 +304,7 @@ BEGIN_MESSAGE_MAP(CTEKWindow, CFrameWnd)
 	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow message handler
@@ -497,11 +511,10 @@ void CTEKWindow::OnMove(int x, int y)
 void CTEKWindow::OnPaint()
 {
 	PAINTSTRUCT ps;
-	CDC *cdc;
+//	CDC *cdc;
 	HDC PaintDC;
 
-	cdc = BeginPaint(&ps);
-	PaintDC = cdc->GetSafeHdc();
+	PaintDC = BeginPaint(&ps);
 
 	TEKPaint(&tk,&ts,PaintDC,&ps);
 

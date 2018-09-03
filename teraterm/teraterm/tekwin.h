@@ -31,8 +31,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
-
-class CTEKWindow : public CFrameWnd
+#include "tekwin_sub.h"
+class CTEKWindow : public TTCFrameWnd
 {
 private:
   TTEKVar tk;
@@ -61,23 +61,24 @@ public:
 
 protected:
 	//{{AFX_MSG(CTEKWindow)
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+#define afx_msg
+	afx_msg void OnActivate(UINT nState, TTCWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnDestroy();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
-	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
+	afx_msg void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMButtonUp(UINT nFlags, CPoint point);
-	afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnKillFocus(TTCWnd* pNewWnd);
+	afx_msg void OnLButtonDown(UINT nFlags, TTCPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, TTCPoint point);
+	afx_msg void OnMButtonUp(UINT nFlags, TTCPoint point);
+	afx_msg int OnMouseActivate(TTCWnd* pDesktopWnd, UINT nHitTest, UINT message);
+	afx_msg void OnMouseMove(UINT nFlags, TTCPoint point);
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnPaint();
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	afx_msg void OnRButtonUp(UINT nFlags, TTCPoint point);
+	afx_msg void OnSetFocus(TTCWnd* pOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -103,5 +104,6 @@ protected:
 	afx_msg void OnHelpUsing();
 	afx_msg void OnHelpAbout();
 	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+//	DECLARE_MESSAGE_MAP()
+#undef afx_msg
 };

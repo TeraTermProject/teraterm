@@ -38,8 +38,13 @@ public:
 	HWND m_hWnd;
 	HINSTANCE m_hInst;
 
+	TTCWnd();
+	void DestroyWindow();
 	HWND GetSafeHwnd() const {return m_hWnd;}
 	HWND GetSafeHwnd() { return m_hWnd; }
+	HDC BeginPaint(LPPAINTSTRUCT lpPaint);
+	BOOL EndPaint(LPPAINTSTRUCT lpPaint);
+	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT SendMessage(UINT msg, WPARAM wp, LPARAM lp);
 	LRESULT SendDlgItemMessage(int id, UINT msg, WPARAM wp, LPARAM lp);
 	void GetDlgItemText(int id, TCHAR *buf, size_t size);
@@ -64,10 +69,10 @@ public:
 	TTCDialog();
 	virtual ~TTCDialog();
 	BOOL Create(HINSTANCE hInstance, HWND hParent, int idd);
+	void DestroyWindow();
 	virtual void OnInitDialog();
 	virtual	void OnOK();
 	virtual void OnCancel();
-	virtual void DestroyWindow();
 	virtual void PostNcDestroy();
 	virtual BOOL OnCommand(WPARAM wp, LPARAM lp);
 	HWND m_hParentWnd;

@@ -30,7 +30,7 @@
 
 /* TERATERM.EXE, VT window */
 
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "teraterm.h"
@@ -51,7 +51,6 @@
 #include "filesys.h"
 #include "telnet.h"
 #include "tektypes.h"
-#include "tekwin.h"
 #include "ttdde.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -63,11 +62,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <tchar.h>
 
 #include <shlobj.h>
 #include <io.h>
 #include <errno.h>
 #include <imagehlp.h>
+#include <crtdbg.h>
 
 #include <windowsx.h>
 #include <imm.h>
@@ -79,15 +80,22 @@
 #include "winjump.h"
 #include "sizetip.h"
 #include "dnddlg.h"
+#include "tekwin.h"
+#include "htmlhelp.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, \
              0xC0, 0x4F, 0xB9, 0x51, 0xED);
 
+#define CWnd	TTCWnd
+#define CFrameWnd	TTCFrameWnd
+#define CMenu TTCMenu
+#define CPoint	TTCPoint
+
 #define VTClassName "VTWin32"
 
-#ifdef _DEBUG
+#if 0 //def _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -114,6 +122,7 @@ static int AutoDisconnectedPort = -1;
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
+#if 0
 BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	//{{AFX_MSG_MAP(CVTWindow)
 	ON_WM_ACTIVATE()
@@ -252,6 +261,12 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_MESSAGE(WM_USER_DROPNOTIFY, OnDropNotify)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
+#endif
+
+static HINSTANCE AfxGetInstanceHandle()
+{
+	return hInst;
+}
 
 static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
@@ -673,7 +688,7 @@ CVTWindow::CVTWindow()
 	BOOL isFirstInstance;
 
 #ifdef _DEBUG
-  ::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 	// 例外ハンドラのフック (2007.9.30 yutaka)
@@ -800,7 +815,8 @@ CVTWindow::CVTWindow()
 #endif
 
 	wc.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = AfxWndProc;
+//	wc.lpfnWndProc = AfxWndProc;
+	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = AfxGetInstanceHandle();
@@ -811,8 +827,9 @@ CVTWindow::CVTWindow()
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = VTClassName;
 
-	RegisterClass(&wc);
-	LoadAccelTable(MAKEINTRESOURCE(IDR_ACC));
+	ATOM a = RegisterClass(&wc);
+	//LoadAccelTable(MAKEINTRESOURCE(IDR_ACC));
+	::LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACC));
 
 	if (ts.VTPos.x==CW_USEDEFAULT) {
 		rect = rectDefault;
@@ -823,7 +840,7 @@ CVTWindow::CVTWindow()
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
-	Create(VTClassName, "Tera Term", Style, rect, NULL, NULL);
+	Create(hInst, VTClassName, "Tera Term", Style, rect, NULL, NULL);
 
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
@@ -921,7 +938,7 @@ CVTWindow::CVTWindow()
 
 /////////////////////////////////////////////////////////////////////////////
 
-#ifdef _DEBUG
+#if 0 //def _DEBUG
 void CVTWindow::AssertValid() const
 {
 	CFrameWnd::AssertValid();
@@ -1028,7 +1045,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	}
 
 	if (mousereport = MouseReport(IdMouseEventBtnDown, LMR, p.x, p.y)) {
-		SetCapture();
+		::SetCapture(m_hWnd);
 		return;
 	}
 
@@ -2247,6 +2264,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 				ts.TransBin = DropType == DROP_TYPE_SEND_FILE ? 0 : 1;
 				FileSendStart();
 #if 0
+#if 0
 				goto finish;	// send fileは連続してできない
 #else
 				{
@@ -2259,6 +2277,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 						app->OnIdle(lCount++);
 					}
 				}
+#endif
 #endif
 			}
 			break;
@@ -2329,7 +2348,7 @@ void CVTWindow::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
 #endif
 }
 
-void CVTWindow::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CVTWindow::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 {
 	int Func;
 
@@ -2556,12 +2575,22 @@ void CVTWindow::OnMove(int x, int y)
 }
 
 // マウスホイールの回転
+LRESULT CVTWindow::OnMouseWheel(WPARAM wParam, LPARAM lParam)
+#if 0
 BOOL CVTWindow::OnMouseWheel(
 	UINT nFlags,   // 仮想キー
 	short zDelta,  // 回転距離
 	CPoint pt      // カーソル位置
 )
+#endif
 {
+	UINT nFlags = GET_KEYSTATE_WPARAM(wParam);		// 仮想キー
+	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転距離
+	POINTS pts = MAKEPOINTS(lParam);				// カーソル位置
+	POINT pt;
+	pt.x = pts.x;
+	pt.y = pts.y;
+
 	int line, i;
 
 	::ScreenToClient(HVTWin, &pt);
@@ -2597,11 +2626,13 @@ BOOL CVTWindow::OnMouseWheel(
 	return (TRUE);
 }
 
+#if 0
 void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
 {
 	CWnd::OnNcCalcSize(valid, sizeinfo);
 	return;
 }
+#endif
 
 void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 {
@@ -2609,7 +2640,7 @@ void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
 		DispRestoreWinSize();
 	}
 	else {
-		CFrameWnd::OnNcLButtonDblClk(nHitTest,point);
+//TODO		CFrameWnd::OnNcLButtonDblClk(nHitTest,point);
 	}
 }
 
@@ -2625,7 +2656,7 @@ void CVTWindow::OnNcRButtonDown(UINT nHitTest, CPoint point)
 void CVTWindow::OnPaint()
 {
 	PAINTSTRUCT ps;
-	CDC *cdc;
+//	CDC *cdc;
 	HDC PaintDC;
 	int Xs, Ys, Xe, Ye;
 
@@ -2635,8 +2666,8 @@ void CVTWindow::OnPaint()
 //-->
 #endif
 
-	cdc = BeginPaint(&ps);
-	PaintDC = cdc->GetSafeHdc();
+	PaintDC = BeginPaint(&ps);
+//	PaintDC = cdc->GetSafeHdc();
 
 	PaintWindow(PaintDC,ps.rcPaint,ps.fErase, &Xs,&Ys,&Xe,&Ye);
 	LockBuffer();
@@ -2848,7 +2879,7 @@ void CVTWindow::OnSizing(UINT fwSide, LPRECT pRect)
 		break;
 	}
 
-	CFrameWnd::OnSizing(fwSide, pRect);
+//TODO	CFrameWnd::OnSizing(fwSide, pRect);
 }
 
 void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -2861,7 +2892,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	// ALT + xを押下すると WM_SYSCHAR が飛んでくる。
 	// ALT + Enterでウィンドウの最大化 (2005.4.24 yutaka)
 	if ((nFlags&0x2000) != 0 && nChar == CR) {
-		if (IsZoomed()) { // window is maximum
+		if (::IsZoomed(m_hWnd)) { // window is maximum
 			ShowWindow(SW_RESTORE);
 		} else {
 			ShowWindow(SW_MAXIMIZE);
@@ -2900,13 +2931,15 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-	CFrameWnd::OnSysChar(nChar, nRepCnt, nFlags);
+//	CFrameWnd::OnSysChar(nChar, nRepCnt, nFlags);
 }
 
+#if 0
 void CVTWindow::OnSysColorChange()
 {
 	CFrameWnd::OnSysColorChange();
 }
+#endif
 
 void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -2995,7 +3028,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 		case IdComEndTimer:
 			if (! CommCanClose(&cv)) {
 				// wait if received data remains
-				SetTimer(IdComEndTimer,1,NULL);
+				::SetTimer(m_hWnd, IdComEndTimer,1,NULL);
 				break;
 			}
 			cv.Ready = FALSE;
@@ -3031,7 +3064,7 @@ void CVTWindow::OnTimer(UINT_PTR nIDEvent)
 	}
 }
 
-void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CVTWindow::OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 {
 	int Func;
 	SCROLLINFO si;
@@ -3142,8 +3175,8 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		}
 		break;
 	}
-
-	return CFrameWnd::OnDeviceChange(nEventType, dwData);
+	return TRUE;
+//TODO	return CFrameWnd::OnDeviceChange(nEventType, dwData);
 }
 
 //<!--by AKASI
@@ -3572,7 +3605,7 @@ LRESULT CVTWindow::OnCommNotify(WPARAM wParam, LPARAM lParam)
 			cv.OutBuffCount = 0;
 			cv.LineModeBuffCount = 0;
 			cv.FlushLen = 0;
-			SetTimer(IdComEndTimer,1,NULL);
+			::SetTimer(m_hWnd, IdComEndTimer,1,NULL);
 			break;
 	}
 	return 0;
@@ -4701,7 +4734,7 @@ void CVTWindow::OnSetupSave()
 		int w, h;
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
-		if (IsZoomed()) {
+		if (::IsZoomed(m_hWnd)) {
 			w = ts.TerminalWidth;
 			h = ts.TerminalHeight;
 			ts.TerminalWidth = ts.TerminalOldWidth;
@@ -4717,7 +4750,7 @@ void CVTWindow::OnSetupSave()
 		FreeTTSET();
 
 #ifdef WINDOW_MAXMIMUM_ENABLED
-		if (IsZoomed()) {
+		if (::IsZoomed(m_hWnd)) {
 			ts.TerminalWidth = w;
 			ts.TerminalHeight = h;
 		}
@@ -5935,7 +5968,7 @@ void CVTWindow::OnControlBroadcastCommand(void)
 	}
 
 	// ダイアログをウィンドウの真上に配置する (2008.1.25 yutaka)
-	GetWindowRect(&prc);
+	::GetWindowRect(m_hWnd, &prc);
 	::GetWindowRect(hDlgWnd, &rc);
 	x = prc.left;
 	y = prc.top - (rc.bottom - rc.top);
@@ -6009,7 +6042,7 @@ LRESULT CVTWindow::OnReceiveIpcMessage(WPARAM wParam, LPARAM lParam)
 	// よって行われる。
 	// しかし非アクティブなウィンドウでは OnIdle() が呼ばれないので、
 	// 空のメッセージを送って OnIdle() が呼ばれるようにする。
-	PostMessage(WM_NULL, 0, 0);
+	::PostMessage(m_hWnd, WM_NULL, 0, 0);
 
 	return 1; // 送信できた場合は1を返す
 }
@@ -6097,11 +6130,4 @@ void CVTWindow::OnHelpAbout()
 	}
 	(*AboutDialog)(HVTWin);
 	FreeTTDLG();
-}
-
-
-BOOL CallOnIdle(LONG lCount)
-{
-	CWinApp *app = AfxGetApp();
-	return app->OnIdle(lCount);
 }

@@ -34,6 +34,12 @@
 #include <windowsx.h>
 #include "dlglib.h"
 
+TTCWnd::TTCWnd()
+{
+	m_hWnd = NULL;
+	m_hInst = NULL;
+}
+
 LRESULT TTCWnd::SendMessage(UINT msg, WPARAM wp, LPARAM lp)
 {
 	return ::SendMessage(m_hWnd, msg, wp, lp);

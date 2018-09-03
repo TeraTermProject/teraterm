@@ -28,7 +28,7 @@
  */
 
 /* TERATERM.EXE, Printing routines */
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include <commdlg.h>
@@ -44,11 +44,13 @@
 
 #include "teraprn.h"
 
-#ifdef _DEBUG
+#if 0 //def _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+#define CWnd TTCWnd
 
 static PRINTDLG PrnDlg;
 

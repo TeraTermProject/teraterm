@@ -70,6 +70,8 @@ set(SRC
   teklib.h
   tekwin.cpp
   tekwin.h
+  tekwin_sub.cpp
+  tekwin_sub.h
   telnet.c
   telnet.h
   teraapp.h

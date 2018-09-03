@@ -51,6 +51,7 @@
 
 #include "compat_w95.h"
 
+#if 0
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -61,8 +62,9 @@ BEGIN_MESSAGE_MAP(CTeraApp, CWinApp)
 	//{{AFX_MSG_MAP(CTeraApp)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
+#endif
 
-CTeraApp::CTeraApp()
+static void init()
 {
 	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
 	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
@@ -89,6 +91,7 @@ CTeraApp::CTeraApp()
 	}
 }
 
+#if 0
 // CTeraApp instance
 CTeraApp theApp;
 
@@ -109,9 +112,10 @@ int CTeraApp::ExitInstance()
 {
 	return CWinApp::ExitInstance();
 }
+#endif
 
 // Tera Term main engine
-BOOL CTeraApp::OnIdle(LONG lCount)
+static BOOL OnIdle(LONG lCount)
 {
 	static int Busy = 2;
 	int Change, nx, ny;
@@ -245,4 +249,28 @@ BOOL CTeraApp::PreTranslateMessage(MSG* pMsg)
 	else {
 		return CWinApp::PreTranslateMessage(pMsg);
 	}
+}
+
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
+                   LPSTR lpszCmdLine, int nCmdShow)
+{
+	hInst = hInstance;
+	CVTWindow *m_pMainWnd = new CVTWindow();
+	pVTWin = m_pMainWnd->m_hWnd;
+	ShowWindow(m_pMainWnd->m_hWnd, nCmdShow);
+
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return (msg.wParam);
+}
+
+
+BOOL CallOnIdle(LONG lCount)
+{
+	CWinApp *app = AfxGetApp();
+	return app->OnIdle(lCount);
 }
