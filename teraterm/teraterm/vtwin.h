@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
@@ -98,37 +98,34 @@ protected:
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
-//	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
+	afx_msg void OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKillFocus(HWND hNewWnd);
-	afx_msg void OnLButtonDblClk(UINT nFlags, TTCPoint point);
-	afx_msg void OnLButtonDown(UINT nFlags, TTCPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, TTCPoint point);
-	afx_msg void OnMButtonDown(UINT nFlags, TTCPoint point);
-	afx_msg void OnMButtonUp(UINT nFlags, TTCPoint point);
-	afx_msg int OnMouseActivate(TTCWnd* pDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnMouseMove(UINT nFlags, TTCPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, POINTS point);
+	afx_msg void OnLButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnLButtonUp(UINT nFlags, POINTS point);
+	afx_msg void OnMButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnMButtonUp(UINT nFlags, POINTS point);
+	afx_msg int OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message);
+	afx_msg void OnMouseMove(UINT nFlags, POINTS point);
 	afx_msg void OnMove(int x, int y);
-//	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, TTCPoint pt);
-	afx_msg LRESULT OnMouseWheel(WPARAM wParam, LPARAM lParam);
-//	afx_msg void OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *calcsize);
-	afx_msg void OnNcLButtonDblClk(UINT nHitTest, TTCPoint point);
-	afx_msg void OnNcRButtonDown(UINT nHitTest, TTCPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, POINTS pt);
+//	afx_msg void OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *calcsize); // 何もしていない、不要
+	afx_msg void OnNcLButtonDblClk(UINT nHitTest, POINTS point);
+	afx_msg void OnNcRButtonDown(UINT nHitTest, POINTS point);
 	afx_msg void OnPaint();
-	afx_msg void OnRButtonDown(UINT nFlags, TTCPoint point);
-	afx_msg void OnRButtonUp(UINT nFlags, TTCPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnRButtonUp(UINT nFlags, POINTS point);
 	afx_msg void OnSetFocus(HWND hOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnSysColorChange();
+//	afx_msg void OnSysColorChange();		// 何もしていない、不要
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-//	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, HWND pScrollBar);
 	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData);
 //<!--by AKASI
@@ -225,7 +222,7 @@ protected:
 	afx_msg void OnWindowRestoreAll();
 	afx_msg void OnWindowUndo();
 	afx_msg void OnHelpIndex();
-	afx_msg void OnHelpUsing();
+//	afx_msg void OnHelpUsing();		// 実体なし不要
 	afx_msg void OnHelpAbout();
 	afx_msg LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
 	//}}AFX_MSG

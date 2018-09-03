@@ -2029,7 +2029,7 @@ void CVTWindow::OnDestroy()
 
 	FreeBuffer();
 
-	CFrameWnd::OnDestroy();
+//	CFrameWnd::OnDestroy();		// TODO
 	TTXEnd(); /* TTPLUG */
 
 	DeleteNotifyIcon(&cv);
@@ -2381,9 +2381,9 @@ void CVTWindow::OnHScroll(UINT nSBCode, UINT nPos, HWND pScrollBar)
 	DispHScroll(Func,nPos);
 }
 
-void CVTWindow::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
+void CVTWindow::OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu)
 {
-	InitMenuPopup(pPopupMenu->m_hMenu);
+	InitMenuPopup(hPopupMenu);
 }
 
 void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -2429,14 +2429,14 @@ void CVTWindow::OnKillFocus(HWND hNewWnd)
 {
 	DispDestroyCaret();
 	FocusReport(FALSE);
-	CFrameWnd::OnKillFocus(hNewWnd);
+//	CFrameWnd::OnKillFocus(hNewWnd);		// TODO
 
 	if (IsCaretOn()) {
 		CaretKillFocus(TRUE);
 	}
 }
 
-void CVTWindow::OnLButtonDblClk(UINT nFlags, CPoint point)
+void CVTWindow::OnLButtonDblClk(UINT nFlags, POINTS point)
 {
 	if (LButton || MButton || RButton) {
 		return;
@@ -2465,7 +2465,7 @@ void CVTWindow::OnLButtonDblClk(UINT nFlags, CPoint point)
 	::SetTimer(HVTWin, IdScrollTimer, 100, NULL);
 }
 
-void CVTWindow::OnLButtonDown(UINT nFlags, CPoint point)
+void CVTWindow::OnLButtonDown(UINT nFlags, POINTS point)
 {
 	POINT p;
 
@@ -2474,7 +2474,7 @@ void CVTWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	ButtonDown(p,IdLeftButton);
 }
 
-void CVTWindow::OnLButtonUp(UINT nFlags, CPoint point)
+void CVTWindow::OnLButtonUp(UINT nFlags, POINTS point)
 {
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
@@ -2489,7 +2489,7 @@ void CVTWindow::OnLButtonUp(UINT nFlags, CPoint point)
 	ButtonUp(FALSE);
 }
 
-void CVTWindow::OnMButtonDown(UINT nFlags, CPoint point)
+void CVTWindow::OnMButtonDown(UINT nFlags, POINTS point)
 {
 	POINT p;
 
@@ -2498,7 +2498,7 @@ void CVTWindow::OnMButtonDown(UINT nFlags, CPoint point)
 	ButtonDown(p,IdMiddleButton);
 }
 
-void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
+void CVTWindow::OnMButtonUp(UINT nFlags, POINTS point)
 {
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
@@ -2519,7 +2519,7 @@ void CVTWindow::OnMButtonUp(UINT nFlags, CPoint point)
 	}
 }
 
-int CVTWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
+int CVTWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 {
 	if ((ts.SelOnActive==0) && (nHitTest==HTCLIENT)) { //disable mouse event for text selection
 		IgnoreRelease = TRUE;
@@ -2530,7 +2530,7 @@ int CVTWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 	}
 }
 
-void CVTWindow::OnMouseMove(UINT nFlags, CPoint point)
+void CVTWindow::OnMouseMove(UINT nFlags, POINTS point)
 {
 	int i;
 	BOOL mousereport;
@@ -2573,18 +2573,12 @@ void CVTWindow::OnMove(int x, int y)
 }
 
 // マウスホイールの回転
-LRESULT CVTWindow::OnMouseWheel(WPARAM wParam, LPARAM lParam)
-#if 0
 BOOL CVTWindow::OnMouseWheel(
 	UINT nFlags,   // 仮想キー
 	short zDelta,  // 回転距離
-	CPoint pt      // カーソル位置
+	POINTS pts    // カーソル位置
 )
-#endif
 {
-	UINT nFlags = GET_KEYSTATE_WPARAM(wParam);		// 仮想キー
-	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);	// 回転距離
-	POINTS pts = MAKEPOINTS(lParam);				// カーソル位置
 	POINT pt;
 	pt.x = pts.x;
 	pt.y = pts.y;
@@ -2625,6 +2619,7 @@ BOOL CVTWindow::OnMouseWheel(
 }
 
 #if 0
+// 何もしていない
 void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
 {
 	CWnd::OnNcCalcSize(valid, sizeinfo);
@@ -2632,17 +2627,14 @@ void CVTWindow::OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *sizeinfo)
 }
 #endif
 
-void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, CPoint point)
+void CVTWindow::OnNcLButtonDblClk(UINT nHitTest, POINTS point)
 {
 	if (! Minimized && !ts.TermIsWin && (nHitTest == HTCAPTION)) {
 		DispRestoreWinSize();
 	}
-	else {
-//TODO		CFrameWnd::OnNcLButtonDblClk(nHitTest,point);
-	}
 }
 
-void CVTWindow::OnNcRButtonDown(UINT nHitTest, CPoint point)
+void CVTWindow::OnNcRButtonDown(UINT nHitTest, POINTS point)
 {
 	if ((nHitTest==HTCAPTION) &&
 	    (ts.HideTitle>0) &&
@@ -2683,7 +2675,7 @@ void CVTWindow::OnPaint()
 	}
 }
 
-void CVTWindow::OnRButtonDown(UINT nFlags, CPoint point)
+void CVTWindow::OnRButtonDown(UINT nFlags, POINTS point)
 {
 	POINT p;
 
@@ -2692,7 +2684,7 @@ void CVTWindow::OnRButtonDown(UINT nFlags, CPoint point)
 	ButtonDown(p,IdRightButton);
 }
 
-void CVTWindow::OnRButtonUp(UINT nFlags, CPoint point)
+void CVTWindow::OnRButtonUp(UINT nFlags, POINTS point)
 {
 	if (IgnoreRelease)
 		IgnoreRelease = FALSE;
@@ -2721,7 +2713,6 @@ void CVTWindow::OnSetFocus(HWND hOldWnd)
 {
 	ChangeCaret();
 	FocusReport(TRUE);
-	CFrameWnd::OnSetFocus(hOldWnd);
 }
 
 void CVTWindow::OnSize(UINT nType, int cx, int cy)
@@ -2930,6 +2921,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 //	CFrameWnd::OnSysChar(nChar, nRepCnt, nFlags);
 }
 
+// 何もしていない、不要
 #if 0
 void CVTWindow::OnSysColorChange()
 {
@@ -2948,9 +2940,11 @@ void CVTWindow::OnSysCommand(UINT nID, LPARAM lParam)
 		// now getting host address (see CommOpen() in commlib.c)
 		::PostMessage(HVTWin,WM_SYSCOMMAND,nID,lParam);
 	}
+#if 0
 	else {
 		CFrameWnd::OnSysCommand(nID,lParam);
 	}
+#endif
 }
 
 void CVTWindow::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -3172,7 +3166,6 @@ BOOL CVTWindow::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		break;
 	}
 	return TRUE;
-//TODO	return CFrameWnd::OnDeviceChange(nEventType, dwData);
 }
 
 //<!--by AKASI
@@ -6155,11 +6148,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_HSCROLL:
 		OnHScroll((UINT)wp, 0, (HWND)lp);
 		break;
-#if 0
 	case WM_INITMENUPOPUP:
-		InitMenuPopup((HMENU)wp);
+		OnInitMenuPopup((HMENU)wp, LOWORD(lp), HIWORD(lp));
 		break;
-#endif
 	case WM_KEYDOWN:
 		OnKeyDown(wp, LOWORD(lp), HIWORD(lp));
 		break;
@@ -6170,67 +6161,41 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnKillFocus((HWND)wp);
 		break;
 	case WM_LBUTTONDBLCLK:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnLButtonDblClk(wp, pt);
+		OnLButtonDblClk(wp, MAKEPOINTS(lp));
 		break;
-	}
 	case WM_LBUTTONDOWN:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnLButtonDown(wp, pt);
+		OnLButtonDown(wp, MAKEPOINTS(lp));
 		break;
-	}
 	case WM_LBUTTONUP:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnLButtonUp(wp, pt);
+		OnLButtonUp(wp, MAKEPOINTS(lp));
 		break;
-	}
 	case WM_MBUTTONDOWN:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnMButtonDown(wp, pt);
+		OnMButtonDown(wp, MAKEPOINTS(lp));
 		break;
-	}
 	case WM_MBUTTONUP:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnMButtonUp(wp, pt);
+		OnMButtonUp(wp, MAKEPOINTS(lp));
 		break;
-	}
-#if 0
 	case WM_MOUSEACTIVATE:
+		OnMouseActivate((HWND)wp, LOWORD(lp), HIWORD(lp));
 		break;
-#endif
 	case WM_MOUSEMOVE:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnMouseMove(wp, pt);
+		OnMouseMove(wp, MAKEPOINTS(lp));
 		break;
-	}
-#if 0
 	case WM_MOUSEWHEEL:
+		OnMouseWheel(GET_KEYSTATE_WPARAM(wp), GET_WHEEL_DELTA_WPARAM(wp), MAKEPOINTS(lp));
 		break;
 	case WM_MOVE:
 		OnMove(LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_NCLBUTTONDBLCLK:
+		OnNcLButtonDblClk((UINT)wp, MAKEPOINTS(lp));
+		TTCFrameWnd::Proc(msg, wp, lp);
 		break;
 	case WM_NCRBUTTONDOWN:
+		OnNcRButtonDown((UINT)wp, MAKEPOINTS(lp));
 		break;
+#if 0
+		// 何もしていない
 	case WM_NCCALCSIZE:
 		break;
 #endif
@@ -6238,23 +6203,14 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnPaint();
 		break;
 	case WM_RBUTTONDOWN:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnRButtonDown(wp, pt);
+		OnRButtonDown((UINT)wp, MAKEPOINTS(lp));
 		break;
-	}
 	case WM_RBUTTONUP:
-	{
-		CPoint pt;
-		pt.x = LOWORD(lp);
-		pt.y = HIWORD(lp);
-		OnRButtonUp(wp, pt);
+		OnRButtonUp((UINT)wp, MAKEPOINTS(lp));
 		break;
-	}
 	case WM_SETFOCUS:
 		OnSetFocus((HWND)wp);
+		TTCFrameWnd::Proc(msg, wp, lp);
 		break;
 	case WM_SIZE:
 		OnSize(wp, LOWORD(lp), HIWORD(lp));
@@ -6262,14 +6218,16 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_SIZING:
 		OnSizing(wp, (LPRECT)lp);
 		break;
-#if 0
 	case WM_SYSCHAR:
 		OnSysChar(wp, LOWORD(lp), HIWORD(lp));
 		break;
+#if 0	// 何もしていない、不要
 	case WM_SYSCOLORCHANGE:
 		break;
+#endif
 	case WM_SYSCOMMAND:
 		OnSysCommand((wp & 0xFFF0), lp);
+		TTCFrameWnd::Proc(msg, wp, lp);
 		break;
 	case WM_SYSKEYDOWN:
 		OnSysKeyDown(wp, LOWORD(lp), HIWORD(lp));
@@ -6284,8 +6242,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnVScroll((UINT)wp, 0, (HWND)lp);
 		break;
 	case WM_DEVICECHANGE:
+		OnDeviceChange((UINT)wp, (DWORD_PTR)lp);
+		TTCFrameWnd::Proc(msg, wp, lp);
 		break;
-#endif
 	case WM_IME_COMPOSITION:
 		OnIMEComposition(wp, lp);
 		break;
