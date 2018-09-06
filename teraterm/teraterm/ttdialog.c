@@ -32,6 +32,7 @@
 #include "tttypes.h"
 #include "ttplug.h" /* TTPLUG */
 #include "ttutil.h"
+#include "ttdlg.h"
 
 #include "ttdialog.h"
 #include "ttwinman.h"
@@ -39,6 +40,20 @@
 static HMODULE HTTDLG = NULL;
 static int TTDLGUseCount = 0;
 
+PSetupTerminal SetupTerminal = _SetupTerminal;
+PSetupWin SetupWin = _SetupWin;
+PSetupKeyboard SetupKeyboard = _SetupKeyboard;
+PSetupSerialPort SetupSerialPort = _SetupSerialPort;
+PSetupTCPIP SetupTCPIP = _SetupTCPIP;
+PGetHostName GetHostName = _GetHostName;
+PChangeDirectory ChangeDirectory = _ChangeDirectory;
+PAboutDialog AboutDialog = _AboutDialog;
+PChooseFontDlg ChooseFontDlg = _ChooseFontDlg;
+PSetupGeneral SetupGeneral = _SetupGeneral;
+PWindowWindow WindowWindow = _WindowWindow;
+PTTDLGSetUILanguageFile TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
+
+#if 0
 PSetupTerminal SetupTerminal;
 PSetupWin SetupWin;
 PSetupKeyboard SetupKeyboard;
@@ -51,6 +66,7 @@ PChooseFontDlg ChooseFontDlg;
 PSetupGeneral SetupGeneral;
 PWindowWindow WindowWindow;
 PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
+#endif
 
 static const GetProcAddressList ProcList[] = {
 	{ &SetupTerminal, "SetupTerminal", 8 },
@@ -75,6 +91,17 @@ static void FreeTTDLGCommon()
 	ClearProcAddressses(ProcList, _countof(ProcList));
 }
 
+BOOL LoadTTDLG()
+{
+	return TRUE;
+}
+
+BOOL FreeTTDLG()
+{
+	return TRUE;
+}
+
+#if 0
 BOOL LoadTTDLG()
 {
 	if (TTDLGUseCount == 0) {
@@ -107,4 +134,5 @@ BOOL FreeTTDLG()
 	}
 	return TRUE;
 }
+#endif
 

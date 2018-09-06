@@ -29,8 +29,8 @@
 /* Routines for dialog boxes */
 
 #include "dlglib.h"
-#include "tttypes.h"		// for TTSet
-#include "ttwinman.h"		// for ts
+//#include "tttypes.h"		// for TTSet
+//#include "ttwinman.h"		// for ts
 
 #include <wchar.h>
 #include <assert.h>
@@ -415,6 +415,7 @@ static DLGTEMPLATE *GetDlgTemplate(
 	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
 	HRSRC hResource = ::FindResource(hInst, lpTemplateName, RT_DIALOG);
+	assert(hResource != NULL);
 	HANDLE hDlgTemplate = ::LoadResource(hInst, hResource);
 	const DLGTEMPLATE *src = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
 
@@ -446,7 +447,7 @@ void TTSetDlgFont(const wchar_t *face, int height, int charset)
 void TTSetDlgFont(const char *face, int height, int charset)
 {
 	if (face != NULL) {
-		mbstowcs(FontFaceName, face, LF_FACESIZE);
+		mbstowcs(FontFaceName, face, LF_FACESIZE);		// TODO MultiByteToWideChar()を使う
 	} else {
 		FontFaceName[0] = L'\0';
 	}
@@ -454,6 +455,7 @@ void TTSetDlgFont(const char *face, int height, int charset)
 	FontCharSet = charset;
 }
 
+#if 0
 static void initFont()
 {
 	LOGFONT logfont;
@@ -468,6 +470,11 @@ static void initFont()
 	} else {
 		TTSetDlgFont((wchar_t *)NULL, 0, 0);
 	}
+}
+#endif
+static void initFont()
+{
+	TTSetDlgFont(L"ＭＳ Ｐゴシック",12,128);
 }
 
 DLGTEMPLATE *TTGetNewDlgTemplate(

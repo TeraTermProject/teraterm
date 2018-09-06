@@ -362,6 +362,7 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 	int i;
 	for (i = 0 ; i < infoCount; i++) {
 		const char *key = infos[i].key;
+#if 1
 		char uimsg[MAX_UIMSG];
 		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
 		if (uimsg[0] != '\0') {
@@ -372,24 +373,20 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 				SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
 			}
 		}
-	}
-}
-
-HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-				  const char *UILanguageFile, PCHAR key)
-{
-	HFONT hPrevFont = (HFONT)SendMessage(hDlg, WM_GETFONT, 0, 0);
-	LOGFONT logfont;
-	HFONT hNewFont;
-	if (key == NULL) key = "DLG_TAHOMA_FONT";
-	GetObject(hPrevFont, sizeof(LOGFONT), &logfont);
-	if (get_lang_font(key, hDlg, &logfont, &hNewFont, UILanguageFile)) {
-		int i;
-		for (i = 0 ; i < nIDDlgItemCount ; i++) {
-			const int nIDDlgItem = nIDDlgItems[i];
-			SendDlgItemMessage(hDlg, nIDDlgItem, WM_SETFONT, (WPARAM)hNewFont, MAKELPARAM(TRUE,0));
+#else
+		char uimsg_ini[MAX_UIMSG];
+		get_lang_msg(key, uimsg_ini, sizeof(uimsg_ini), "", UILanguageFile);
+		if (uimsg_ini[0] != '\0') {
+			wchar_t uimsg[MAX_UIMSG];
+			MultiByteToWideChar(932, 0, uimsg_ini, -1, uimsg, _countof(uimsg));
+			const int nIDDlgItem = infos[i].nIDDlgItem;
+			if (nIDDlgItem == 0) {
+				SetWindowTextW(hDlgWnd, uimsg);
+			} else {
+				SetDlgItemTextW(hDlgWnd, nIDDlgItem, uimsg);
+			}
 		}
+#endif
 	}
-	return hNewFont;
 }
 

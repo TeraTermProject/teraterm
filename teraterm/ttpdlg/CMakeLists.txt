@@ -24,6 +24,8 @@ endif()
 set(COMMON_SRC
   ../common/dlglib.c
   ../common/dlglib.h
+  ../common/dlglib_cpp.cpp
+  ../common/dlglib_tmpl.cpp
   ../common/ttlib.c
   ../common/ttlib.h
   ../common/teraterm.ico

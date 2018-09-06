@@ -28,7 +28,6 @@ BOOL TTCFrameWnd::Create(
 	DWORD dwExStyle)
 {
 	pseudoPtr = this;
-	DWORD s = WS_OVERLAPPEDWINDOW;
 	HWND hWnd = ::CreateWindowExA(
 		0,
 		lpszClassName,

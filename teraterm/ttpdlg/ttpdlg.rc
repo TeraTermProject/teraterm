@@ -450,7 +450,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_TTERM               ICON                    "..\\common\\teraterm.ico"
+//IDI_TTERM               ICON                    "..\\common\\teraterm.ico"
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -461,7 +461,7 @@ IDI_TTERM               ICON                    "..\\common\\teraterm.ico"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "ttpdlg-version.rc"
+//#include "ttpdlg-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

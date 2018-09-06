@@ -108,6 +108,12 @@ set(SRC
   WSAAsyncGetAddrInfo.h
   ttutil.c
   ttutil.h
+  #
+  ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
+  #
+  ../ttpdlg/ttdlg.c
+  ../ttpdlg/ttpdlg.rc
+  #
   ${COMMON_SRC}
   )
 
@@ -116,7 +122,9 @@ include_directories(
   ../ttpfile
   ../ttpdlg
   ${SFMT_INCLUDE_DIRS}
+  ${ONIGURUMA_INCLUDE_DIRS}
   .
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 link_directories(
@@ -124,10 +132,6 @@ link_directories(
   ${SFMT_LIBRARY_DIRS}
   )
 
-set(CMAKE_MFC_FLAG 1)
-
-#set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
-#set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
 if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
 endif()
@@ -143,17 +147,19 @@ add_executable(
   ${SRC}
   )
 
+set_target_properties(
+  teraterm
+  PROPERTIES
+  OUTPUT_NAME "ttermpro"
+  )
+
 target_link_libraries(
   teraterm
   ttpcmn
-  ttpdlg
   ttpfile
   ttpset
   ttptek
-#  optimized nafxcw.lib
-#  debug nafxcwd.lib
-#  optimized LIBCMT.lib
-#  debug LIBCMTD.lib
+#  ttpdlg
   optimized onig.lib
   debug onigd.lib
   Comctl32.lib
@@ -166,8 +172,20 @@ target_link_libraries(
 add_dependencies(
   teraterm
   ttpcmn
-  ttpdlg
+#  ttpdlg
   ttpfile
   ttpset
   ttptek
   )
+
+## svnversion.h
+if(EXISTS ${CMAKE_SOURCE_DIR}/.svn)
+  INCLUDE(FindSubversion)
+endif()
+if(Subversion_FOUND)
+  Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TT)
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "#define SVNVERSION ${TT_WC_REVISION}\n")
+  message("rev.${TT_WC_REVISION}")
+else()
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "#undef SVNVERSION\n")
+endif()
