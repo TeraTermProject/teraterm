@@ -48,7 +48,7 @@ private:
 
 	static void add_error_message(const char* message) {
 		if (getInstance().error_message != NULL) {
-			StringBuffer buffer = getInstance().error_message;
+			StringBuffer buffer = (const char *)getInstance().error_message;
 			buffer.append("\n\n");
 			buffer.append(message);
 			getInstance().error_message = buffer.toString();

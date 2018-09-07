@@ -20,12 +20,12 @@ using namespace yebisuya;
 
 extern char UILanguageFile[MAX_PATH];
 
-void UTIL_get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def)
+void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
 {
     GetI18nStr("TTProxy", key, buf, buf_len, def, UILanguageFile);
 }
 
-int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font)
+int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font)
 {
     if (GetI18nLogfont("TTProxy", key, logfont,
                        GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
@@ -44,7 +44,7 @@ class ProxyWSockHook {
 public:
     class MessageShower {
     public:
-        virtual void showMessage(const char* message)const = NULL;
+        virtual void showMessage(const char* message)const = 0;
     };
 private:
     struct DUMMYHOSTENT {

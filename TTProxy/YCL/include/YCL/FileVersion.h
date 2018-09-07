@@ -11,7 +11,9 @@
 
 #include <YCL/common.h>
 
+#if defined(_MSC_VER)
 #pragma comment(lib, "version.lib")
+#endif
 
 namespace yebisuya {
 
