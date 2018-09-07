@@ -13,14 +13,25 @@ include_directories(
   ../../teraterm/common
   )
 
+if(MINGW)
+  link_directories(
+	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
+	)
+endif()
+
 add_library(
   TTXAdditionalTitle SHARED
   ${SRC}
+  )
+
+set_target_properties(
+  TTXAdditionalTitle
+  PROPERTIES
+  PREFIX ""
   )
 
 target_link_libraries(
   TTXAdditionalTitle
   ttpcmn
   )
-
 

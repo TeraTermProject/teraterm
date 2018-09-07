@@ -13,9 +13,21 @@ include_directories(
   ../../teraterm/common
   )
 
+if(MINGW)
+  link_directories(
+	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
+	)
+endif()
+
 add_library(
   TTXAlwaysOnTop SHARED
   ${SRC}
+  )
+
+set_target_properties(
+  TTXAlwaysOnTop
+  PROPERTIES
+  PREFIX ""
   )
 
 target_link_libraries(

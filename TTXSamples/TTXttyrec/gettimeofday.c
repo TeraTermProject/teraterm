@@ -1,9 +1,17 @@
 #include "gettimeofday.h"
 
+// unix time epoch from windows file time 
+#if defined(_MSC_VER)
+#define FTEPOCHDIFF 116444736000000000i64
+#else
+#define FTEPOCHDIFF 116444736000000000LL
+#endif
+
 int gettimeofday(struct timeval *tv, struct timezone *tz) {
 	FILETIME ft;
 	__int64 t;
-	int tzsec, dst;
+	long tzsec;
+	int dst;
 
 	if (tv) {
 		GetSystemTimeAsFileTime(&ft);

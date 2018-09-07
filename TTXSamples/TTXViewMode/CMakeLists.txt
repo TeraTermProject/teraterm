@@ -20,3 +20,9 @@ add_library(
   TTXViewMode SHARED
   ${SRC}
   )
+
+set_target_properties(
+  TTXViewMode
+  PROPERTIES
+  PREFIX ""
+  )

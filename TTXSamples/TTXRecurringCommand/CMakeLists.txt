@@ -14,9 +14,21 @@ include_directories(
   ../../teraterm/common
   )
 
+if(MINGW)
+  link_directories(
+	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
+	)
+endif()
+
 add_library(
   TTXRecurringCommand SHARED
   ${SRC}
+  )
+
+set_target_properties(
+  TTXRecurringCommand
+  PROPERTIES
+  PREFIX ""
   )
 
 target_link_libraries(

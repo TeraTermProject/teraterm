@@ -30,4 +30,8 @@ add_library(
   ReadMe-ja.txt
   )
 
-
+set_target_properties(
+  TTXttyrec TTXttyplay
+  PROPERTIES
+  PREFIX ""
+  )

@@ -11,3 +11,9 @@ add_library(
   TTXtest SHARED
   TTXtest.c
   )
+
+set_target_properties(
+  TTXtest
+  PROPERTIES
+  PREFIX ""
+  )

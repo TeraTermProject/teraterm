@@ -10,7 +10,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#if defined(_MSC_VER)
 #include "gettimeofday.h"
+#endif
 
 #include "compat_w95.h"
 
