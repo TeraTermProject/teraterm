@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
  */
 
 /* TERATERM.EXE, TEK window */
-//#include "stdafx.h"
+#include <windowsx.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tektypes.h"
@@ -47,8 +47,6 @@
 
 #define CWnd	TTCWnd
 #define CFrameWnd	TTCFrameWnd
-#define CMenu TTCMenu
-#define CPoint	TTCPoint
 
 #define TEKClassName "TEKWin32"
 
@@ -340,7 +338,7 @@ BOOL CTEKWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void CTEKWindow::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+void CTEKWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 {
 	if (nState!=WA_INACTIVE) {
 		tk.Active = TRUE;
@@ -396,9 +394,9 @@ void CTEKWindow::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
 	lpMMI->ptMaxTrackSize.y = 10000;
 }
 
-void CTEKWindow::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
+void CTEKWindow::OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu)
 {
-	InitMenuPopup(pPopupMenu->m_hMenu);
+	InitMenuPopup(hPopupMenu);
 }
 
 void CTEKWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -417,7 +415,7 @@ void CTEKWindow::OnKillFocus(HWND hNewWnd)
 	CFrameWnd::OnKillFocus(hNewWnd);
 }
 
-void CTEKWindow::OnLButtonDown(UINT nFlags, CPoint point)
+void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
 {
 	POINT p;
 	HMENU PopupMenu, PopupBase;
@@ -469,17 +467,17 @@ void CTEKWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	TEKWMLButtonDown(&tk,&ts,&cv,p);
 }
 
-void CTEKWindow::OnLButtonUp(UINT nFlags, CPoint point)
+void CTEKWindow::OnLButtonUp(UINT nFlags, POINTS point)
 {
 	TEKWMLButtonUp(&tk,&ts);
 }
 
-void CTEKWindow::OnMButtonUp(UINT nFlags, CPoint point)
+void CTEKWindow::OnMButtonUp(UINT nFlags, POINTS point)
 {
 	//OnRButtonUp(nFlags,point);
 }
 
-int CTEKWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
+int CTEKWindow::OnMouseActivate(HWND pDesktopWnd, UINT nHitTest, UINT message)
 {
 	if ((ts.SelOnActive==0) &&
 	    (nHitTest==HTCLIENT)) { //disable mouse event for text selection
@@ -490,7 +488,7 @@ int CTEKWindow::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 	}
 }
 
-void CTEKWindow::OnMouseMove(UINT nFlags, CPoint point)
+void CTEKWindow::OnMouseMove(UINT nFlags, POINTS point)
 {
 	POINT p;
 
@@ -521,7 +519,7 @@ void CTEKWindow::OnPaint()
 	EndPaint(&ps);
 }
 
-void CTEKWindow::OnRButtonUp(UINT nFlags, CPoint point)
+void CTEKWindow::OnRButtonUp(UINT nFlags, POINTS point)
 {
 	CBStartPaste(tk.HWin, FALSE, FALSE);
 }
@@ -867,4 +865,124 @@ void CTEKWindow::OnHelpAbout()
 	}
 	(*AboutDialog)(tk.HWin);
 	FreeTTDLG();
+}
+
+LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
+{
+	LRESULT retval = 0;
+	switch(msg)
+	{
+	case WM_ACTIVATE:
+		OnActivate(wp & 0xFFFF, (HWND)wp, (wp >> 16) & 0xFFFF);
+		break;
+	case WM_CHAR:
+		OnChar(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_DESTROY:
+		OnDestroy();
+		PostQuitMessage(0);
+		break;
+	case WM_GETMINMAXINFO:
+		OnGetMinMaxInfo((MINMAXINFO *)lp);
+		break;
+	case WM_INITMENUPOPUP:
+		OnInitMenuPopup((HMENU)wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_KEYDOWN:
+		OnKeyDown(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_KEYUP:
+		OnKeyUp(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_KILLFOCUS:
+		OnKillFocus((HWND)wp);
+		break;
+	case WM_LBUTTONDOWN:
+		OnLButtonDown(wp, MAKEPOINTS(lp));
+		break;
+	case WM_LBUTTONUP:
+		OnLButtonUp(wp, MAKEPOINTS(lp));
+		break;
+	case WM_MBUTTONUP:
+		OnMButtonUp(wp, MAKEPOINTS(lp));
+		break;
+	case WM_MOUSEACTIVATE:
+		OnMouseActivate((HWND)wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_MOUSEMOVE:
+		OnMouseMove(wp, MAKEPOINTS(lp));
+		break;
+	case WM_MOVE:
+		OnMove(LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_PAINT:
+		OnPaint();
+		break;
+	case WM_RBUTTONUP:
+		OnRButtonUp((UINT)wp, MAKEPOINTS(lp));
+		break;
+	case WM_SETFOCUS:
+		OnSetFocus((HWND)wp);
+		TTCFrameWnd::Proc(msg, wp, lp);
+		break;
+	case WM_SIZE:
+		OnSize(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_SYSCOMMAND:
+		OnSysCommand((wp & 0xFFF0), lp);
+		TTCFrameWnd::Proc(msg, wp, lp);
+		break;
+	case WM_SYSKEYDOWN:
+		OnSysKeyDown(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_SYSKEYUP:
+		OnSysKeyUp(wp, LOWORD(lp), HIWORD(lp));
+		break;
+	case WM_TIMER:
+		OnTimer(wp);
+		break;
+	case WM_USER_ACCELCOMMAND:
+		OnAccelCommand(wp, lp);
+		break;
+	case WM_USER_CHANGEMENU:
+		OnChangeMenu(wp, lp);
+		break;
+	case WM_USER_CHANGETBAR:
+		OnChangeTBar(wp, lp);
+		break;
+	case WM_USER_DLGHELP2:
+		OnDlgHelp(wp, lp);
+		break;
+	case WM_USER_GETSERIALNO:
+		OnGetSerialNo(wp, lp);
+		break;
+	case WM_COMMAND:
+	{
+		const WORD wID = GET_WM_COMMAND_ID(wp, lp);
+		switch (wID) {
+		case ID_TEKFILE_PRINT: OnFilePrint(); break;
+		case ID_TEKFILE_EXIT: OnFileExit(); break;
+		case ID_TEKEDIT_COPY: OnEditCopy(); break;
+		case ID_TEKEDIT_COPYSCREEN: OnEditCopyScreen(); break;
+		case ID_TEKEDIT_PASTE: OnEditPaste(); break;
+		case ID_TEKEDIT_PASTECR: OnEditPasteCR(); break;
+		case ID_TEKEDIT_CLEARSCREEN: OnEditClearScreen(); break;
+		case ID_TEKSETUP_WINDOW: OnSetupWindow(); break;
+		case ID_TEKSETUP_FONT: OnSetupFont(); break;
+		case ID_TEKVTWIN: OnVTWin(); break;
+		case ID_TEKWINDOW_WINDOW: OnWindowWindow(); break;
+		case ID_TEKHELP_INDEX: OnHelpIndex(); break;
+		case ID_TEKHELP_ABOUT: OnHelpAbout(); break;
+		default:
+			OnCommand(wp, lp);
+			break;
+		}
+		break;
+	}
+	default:
+		retval = TTCFrameWnd::Proc(msg, wp, lp);
+		break;
+	}
+				
+	return retval;
 }

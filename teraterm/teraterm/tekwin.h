@@ -58,22 +58,22 @@ public:
 protected:
 	//{{AFX_MSG(CTEKWindow)
 #define afx_msg
-	afx_msg void OnActivate(UINT nState, TTCWnd* pWndOther, BOOL bMinimized);
+	afx_msg void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnDestroy();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
-	afx_msg void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
+	afx_msg void OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKillFocus(HWND hNewWnd);
-	afx_msg void OnLButtonDown(UINT nFlags, TTCPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, TTCPoint point);
-	afx_msg void OnMButtonUp(UINT nFlags, TTCPoint point);
-	afx_msg int OnMouseActivate(TTCWnd* pDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnMouseMove(UINT nFlags, TTCPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnLButtonUp(UINT nFlags, POINTS point);
+	afx_msg void OnMButtonUp(UINT nFlags, POINTS point);
+	afx_msg int OnMouseActivate(HWND hDesktopWnd, UINT nHitTest, UINT message);
+	afx_msg void OnMouseMove(UINT nFlags, POINTS point);
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnPaint();
-	afx_msg void OnRButtonUp(UINT nFlags, TTCPoint point);
+	afx_msg void OnRButtonUp(UINT nFlags, POINTS point);
 	afx_msg void OnSetFocus(HWND hOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -102,4 +102,5 @@ protected:
 	//}}AFX_MSG
 //	DECLARE_MESSAGE_MAP()
 #undef afx_msg
+	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };

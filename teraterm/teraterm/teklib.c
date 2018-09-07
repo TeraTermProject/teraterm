@@ -61,25 +61,25 @@ static HMODULE HTTTEK = NULL;
 static UseCount = 0;
 
 static const GetProcAddressList ProcList[] = {
-	{ &TEKInit, "TEKInit" },
-	{ &TEKResizeWindow, "TEKResizeWindow" },
-	{ &TEKChangeCaret, "TEKChangeCaret" },
-	{ &TEKDestroyCaret, "TEKDestroyCaret" },
-	{ &TEKParse, "TEKParse" },
-	{ &TEKReportGIN, "TEKReportGIN" },
-	{ &TEKPaint, "TEKPaint" },
-	{ &TEKWMLButtonDown, "TEKWMLButtonDown" },
-	{ &TEKWMLButtonUp, "TEKWMLButtonUp" },
-	{ &TEKWMMouseMove, "TEKWMMouseMove" },
-	{ &TEKWMSize, "TEKWMSize" },
-	{ &TEKCMCopy, "TEKCMCopy" },
-	{ &TEKCMCopyScreen, "TEKCMCopyScreen" },
-	{ &TEKPrint, "TEKPrint" },
-	{ &TEKClearScreen, "TEKClearScreen" },
-	{ &TEKSetupFont, "TEKSetupFont" },
-	{ &TEKResetWin, "TEKResetWin" },
-	{ &TEKRestoreSetup, "TEKRestoreSetup" },
-	{ &TEKEnd, "TEKEnd" },
+	{ &TEKInit, "TEKInit", 8 },
+	{ &TEKResizeWindow, "TEKResizeWindow", 16 },
+	{ &TEKChangeCaret, "TEKChangeCaret", 8 },
+	{ &TEKDestroyCaret, "TEKDestroyCaret", 8 },
+	{ &TEKParse, "TEKParse", 12 },
+	{ &TEKReportGIN, "TEKReportGIN", 16  },
+	{ &TEKPaint, "TEKPaint", 16 },
+	{ &TEKWMLButtonDown, "TEKWMLButtonDown", 20 },
+	{ &TEKWMLButtonUp, "TEKWMLButtonUp", 8 },
+	{ &TEKWMMouseMove, "TEKWMMouseMove", 16 },
+	{ &TEKWMSize, "TEKWMSize", 24 },
+	{ &TEKCMCopy, "TEKCMCopy", 8 },
+	{ &TEKCMCopyScreen, "TEKCMCopyScreen", 8 },
+	{ &TEKPrint, "TEKPrint", 16 },
+	{ &TEKClearScreen, "TEKClearScreen", 8 },
+	{ &TEKSetupFont, "TEKSetupFont", 8 },
+	{ &TEKResetWin, "TEKResetWin", 12 },
+	{ &TEKRestoreSetup, "TEKRestoreSetup", 8 },
+	{ &TEKEnd, "TEKEnd", 4 },
 };
 
 static void FreeTTTEKCommon()
@@ -102,6 +102,7 @@ BOOL LoadTTTEK()
 		if (!ret)
 		{
 			FreeTTTEKCommon();
+			return FALSE;
 		}
 	}
 	UseCount++;
