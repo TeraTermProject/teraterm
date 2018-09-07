@@ -58,7 +58,7 @@ PTEKRestoreSetup TEKRestoreSetup;
 PTEKEnd TEKEnd;
 
 static HMODULE HTTTEK = NULL;
-static UseCount = 0;
+static int UseCount = 0;
 
 static const GetProcAddressList ProcList[] = {
 	{ &TEKInit, "TEKInit", 8 },

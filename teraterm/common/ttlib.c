@@ -274,7 +274,7 @@ BOOL ExtractDirName(PCHAR PathName, PCHAR DirName)
 
 /* fit a filename to the windows-filename format */
 /* FileName must contain filename part only. */
-void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt)
+void FitFileName(PCHAR FileName, int destlen, const char *DefExt)
 {
 	int i, j, NumOfDots;
 	char Temp[MAX_PATH];
@@ -879,7 +879,7 @@ void GetDownloadFolder(char *dest, int destlen)
 	}
 }
 
-void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen)
+void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int destlen)
 {
 	// My Documents Ç… file Ç™Ç†ÇÈèÍçáÅA
 	// ÇªÇÍÇì«Ç›çûÇﬁÇÊÇ§Ç…ÇµÇΩÅB(2007.2.18 maya)

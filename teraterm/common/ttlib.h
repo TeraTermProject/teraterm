@@ -51,7 +51,7 @@ extern "C" {
 BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos);
 DllExport BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
 DllExport BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
-void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt);
+void FitFileName(PCHAR FileName, int destlen, const char *DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void DeleteSlash(PCHAR Path);
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP);
@@ -78,7 +78,7 @@ BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
 DllExport void GetDownloadFolder(char *dest, int destlen);
-void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen);
+void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int destlen);
 void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);

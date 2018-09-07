@@ -1922,7 +1922,7 @@ void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 }
 
 /* copy from ttset.c*/
-static void WriteInt2(PCHAR Sect, PCHAR Key, PCHAR FName, int i1, int i2)
+static void WriteInt2(const char *Sect, const char *Key, const char *FName, int i1, int i2)
 {
 	char Temp[32];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d", i1, i2);
@@ -4897,8 +4897,9 @@ static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, i
 {
 	BOOL ret = FALSE;
 	int flag = 0;
-	char *s, **p;
-	char *virstore_env[] = {
+	char *s;
+	const char **p;
+	static const char *virstore_env[] = {
 		"ProgramFiles",
 		"ProgramData",
 		"SystemRoot",
