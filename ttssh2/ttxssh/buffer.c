@@ -38,6 +38,10 @@
 #include <openssl/ec.h>
 #include <zlib.h>
 
+#if defined(__MINGW32__)
+#define __FUNCTION__
+#endif
+
 // バッファのオフセットを初期化し、まだ読んでいない状態にする。
 // Tera Term(TTSSH)オリジナル関数。
 void buffer_rewind(buffer_t *buf)

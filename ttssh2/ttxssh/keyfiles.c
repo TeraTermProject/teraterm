@@ -50,6 +50,10 @@ See LICENSE.TXT for the license.
 
 #include "cipher.h"
 
+#if defined(__MINGW32__)
+#define __FUNCTION__
+#endif
+
 static char ID_string[] = "SSH PRIVATE KEY FILE FORMAT 1.1\n";
 
 static BIGNUM *get_bignum(unsigned char *bytes)
@@ -454,7 +458,7 @@ static Key *read_SSH2_private2_key(PTInstVar pvar,
 	ciphername = buffer_get_string_msg(copy_consumed, NULL);
 	cipher = get_cipher_by_name(ciphername);
 	if (cipher == NULL && strcmp(ciphername, "none") != 0) {
-		logprintf(LOG_LEVEL_ERROR, "%s: unknown cipher name", __FUNCTION__);
+		logprintf(LOG_LEVEL_ERROR, __FUNCTION__ ": unknown cipher name");
 		goto error;
 	}
 	// パスフレーズのチェック。暗号化が none でない場合は空のパスワードを認めない。

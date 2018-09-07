@@ -43,12 +43,12 @@ DSA *duplicate_DSA(DSA *src);
 unsigned char *duplicate_ED25519_PK(unsigned char *src);
 BOOL key_copy(Key *dest, Key *src);
 
-char *key_fingerprint_raw(Key *k, enum digest_algorithm dgst_alg, int *dgst_raw_length);
-char *key_fingerprint(Key *key, enum fp_rep dgst_rep, enum fp_type dgst_type);
+char *key_fingerprint_raw(Key *k, digest_algorithm dgst_alg, int *dgst_raw_length);
+char *key_fingerprint(Key *key, enum fp_rep dgst_rep, digest_algorithm dgst_alg);
 
 const char *ssh_key_type(ssh_keytype type);
 char *get_sshname_from_key(Key *key);
-enum hostkey_type get_keytype_from_name(char *name);
+ssh_keytype get_keytype_from_name(char *name);
 char *curve_keytype_to_name(ssh_keytype type);
 ssh_keytype key_curve_name_to_keytype(char *name);
 

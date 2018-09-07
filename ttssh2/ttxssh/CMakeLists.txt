@@ -99,6 +99,12 @@ link_directories(
   ${ZLIB_LIBRARY_DIRS}
   )
 
+if(MINGW)
+  link_directories(
+	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
+	)
+endif()
+
 add_library(
   ttxssh SHARED
   ${SRC}
@@ -107,6 +113,12 @@ add_library(
 target_compile_definitions(
   ttxssh
   PRIVATE -DTTPCMN_IMPORT
+  )
+
+set_target_properties(
+  ttxssh
+  PROPERTIES
+  PREFIX ""
   )
 
 target_link_libraries(

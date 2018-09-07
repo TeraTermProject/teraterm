@@ -7,7 +7,7 @@ if(MINGW)
 	)
 
   set(OPENSSL_LIB
-	${CMAKE_CURRENT_LIST_DIR}/openssl_${TOOLSET}/lib/libeay32.lib
+	${CMAKE_CURRENT_LIST_DIR}/openssl_${TOOLSET}/lib/libcrypto.a
   )
 
 else()

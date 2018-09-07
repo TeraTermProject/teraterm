@@ -65,6 +65,10 @@ typedef enum {
 #define SOCKS5_ERROR_COMMAND     129
 #define SOCKS5_ERROR_ADDRTYPE    130
 
+#if defined(__MINGW32__)
+#define __FUNCTION__
+#endif
+
 typedef struct {
 	PTInstVar pvar;
 
