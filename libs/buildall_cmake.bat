@@ -7,7 +7,8 @@ set opt=
 :retry_cmake
 set CMAKE=%~dp0cmake-3.11.4-win32-x86\bin\cmake.exe
 echo 1. 自分のcmake.exeを使用する(PATHを通してある)
-echo 2. cmakeをダウンロードする(このフォルダにインストールする)
+echo 2. VS2005でも使用できるcmake使用する
+echo    (必要なら自動でダウンロードして、このフォルダにインストールします)
 if exist %CMAKE% echo    インストール済み(%CMAKE%)
 
 set /p no="select no "

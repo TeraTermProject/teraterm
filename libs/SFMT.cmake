@@ -58,6 +58,10 @@ set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/src")
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/src/${SRC_DIR_BASE}")
 set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/SFMT/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/SFMT_${TOOLSET}")
+if("${CMAKE_GENERATOR}" MATCHES "Win64")
+  set(BUILD_DIR "${BUILD_DIR}_x64")
+  set(INSTALL_DIR "${INSTALL_DIR}_x64")
+endif()
 
 ########################################
 

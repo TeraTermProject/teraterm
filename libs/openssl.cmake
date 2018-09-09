@@ -56,14 +56,16 @@ set(SRC_ARC_HASH_SHA256 50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a284
 set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/openssl")
 
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/openssl/src_${TOOLSET}")
-set(SRC_DIR "${EXTRACT_DIR}/${SRC_DIR_BASE}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/openssl_${TOOLSET}")
-
+if(${CMAKE_GENERATOR} MATCHES "Win64")
+  set(EXTRACT_DIR "${EXTRACT_DIR}_x64")
+  set(INSTALL_DIR "${INSTALL_DIR}_x64")
+endif()
 if((${CMAKE_GENERATOR} MATCHES "Visual Studio") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL "Debug"))
   set(EXTRACT_DIR "${EXTRACT_DIR}_debug")
-  set(SRC_DIR "${EXTRACT_DIR}/${SRC_DIR_BASE}")
   set(INSTALL_DIR "${INSTALL_DIR}_debug")
 endif()
+set(SRC_DIR "${EXTRACT_DIR}/${SRC_DIR_BASE}")
 
 ########################################
 
@@ -110,7 +112,7 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   if(${CMAKE_GENERATOR} MATCHES "NMake Makefiles")
   elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
 	find_program(
-	  VCVARS32 vcvars32.bat
+	  VCVARS32 vcvarsall.bat
 	  HINTS "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build"
 	  HINTS "C:/Program Files (x86)/Microsoft Visual Studio/2017/Professional/VC/Auxiliary/Build"
 	  HINTS "C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Auxiliary/Build"
@@ -152,28 +154,34 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
 	message(FATAL_ERROR "vcvars32.bat not found")
   endif()
 
-  if(("${CMAKE_BUILD_TYPE}" STREQUAL "Release") OR ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL "Release"))
-	set(CONFIG_TARGET "VC-WIN32")
+  if(${CMAKE_GENERATOR} MATCHES "Win64")
+	set(CONFIG_TARGET "VC-WIN64A")
+	set(DO_MS "ms\\do_win64a.bat")
   else()
-	set(CONFIG_TARGET "debug-VC-WIN32")
+	set(CONFIG_TARGET "VC-WIN32")
+	set(DO_MS "ms\\do_ms.bat")
+  endif()
+  if(("${CMAKE_BUILD_TYPE}" STREQUAL "Release") OR ("${CMAKE_CONFIGURATION_TYPE}" STREQUAL "Release"))
+  else()
+	set(CONFIG_TARGET "debug-${CONFIG_TARGET}")
   endif()
 
   file(WRITE "${SRC_DIR}/build_cmake.bat"
 	"cd %~dp0\n"
+	"setlocal\n"
 	)
   file(TO_NATIVE_PATH ${PERL} PERL_N)
   file(TO_NATIVE_PATH ${INSTALL_DIR} INSTALL_DIR_N)
+  file(TO_NATIVE_PATH ${VCVARS32} VCVARS32_N)
   string(REGEX REPLACE [[^(.*)\\.*$]] [[\1]] PERL_N_PATH ${PERL_N})
   file(APPEND "${SRC_DIR}/build_cmake.bat"
 	"del crypto\\buildinf.h\n"
+	"setlocal\n"
 	"set PATH=${PERL_N_PATH}\n"
+	"perl Configure no-asm ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N}\n"
+	"call ${DO_MS}\n"
+	"endlocal\n"
 	)
-  if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
-	file(TO_NATIVE_PATH ${VCVARS32} VCVARS32_N)
-	file(APPEND "${SRC_DIR}/build_cmake.bat"
-	  "call \"${VCVARS32_N}\"\n"
-	  )
-  endif()
   if(${CMAKE_GENERATOR} MATCHES "Visual Studio 8 2005")
 	## Visual Studio 2005 特別処理
 	# include,libパスの設定
@@ -183,9 +191,20 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
 	  "set LIB=%SDK%\\lib;%LIB%\n"
 	  )
   endif()
+  if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017 Win64")
+	file(APPEND "${SRC_DIR}/build_cmake.bat"
+	  "call \"${VCVARS32_N}\" x86_amd64 10.0.17134.0\n"
+	  )
+  elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
+	file(APPEND "${SRC_DIR}/build_cmake.bat"
+	  "call \"${VCVARS32_N}\" x86 10.0.17134.0\n"
+	  )
+  elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio")
+	file(APPEND "${SRC_DIR}/build_cmake.bat"
+	  "call \"${VCVARS32_N}\"\n"
+	  )
+  endif()
   file(APPEND "${SRC_DIR}/build_cmake.bat"
-	"perl Configure no-asm ${CONFIG_TARGET} --prefix=${INSTALL_DIR_N}\n"
-	"call ms\\do_ms.bat\n"
 	"nmake -f ms\\nt.mak install ${NMAKE_OPTION}\n"
 	)
 
