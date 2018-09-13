@@ -30,7 +30,6 @@
 
 /* TERATERM.EXE, VT window */
 
-//#include "stdafx.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "teraterm.h"
@@ -677,7 +676,6 @@ CVTWindow::CVTWindow()
 #ifdef ALPHABLEND_TYPE2
 	DWORD ExStyle;
 #endif
-	char *Param;
 	int CmdShow;
 #ifdef SHARED_KEYMAP
 	char Temp[MAX_PATH];
@@ -761,8 +759,8 @@ CVTWindow::CVTWindow()
 	/* Parse command line parameters*/
 	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
 	// 落ちるバグを修正。(2007.6.12 maya)
-	Param = GetCommandLine();
 	if (LoadTTSET()) {
+		LPTSTR Param = GetCommandLine();
 		(*ParseParam)(Param, &ts, &(TopicName[0]));
 	}
 	FreeTTSET();
@@ -6241,7 +6239,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 #endif
 	case WM_SYSCOMMAND:
-		OnSysCommand((wp & 0xFFF0), lp);
+		OnSysCommand(wp, lp);
 		TTCFrameWnd::Proc(msg, wp, lp);
 		break;
 	case WM_SYSKEYDOWN:

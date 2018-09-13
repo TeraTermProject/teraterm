@@ -929,7 +929,7 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnSize(wp, LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_SYSCOMMAND:
-		OnSysCommand((wp & 0xFFF0), lp);
+		OnSysCommand(wp, lp);
 		TTCFrameWnd::Proc(msg, wp, lp);
 		break;
 	case WM_SYSKEYDOWN:

@@ -219,14 +219,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
+		bool message_processed = false;
 
-		if (MetaKey(ts.MetaKey)) {
-			continue;
+		if (m_pMainWnd->m_hAccel != NULL) {
+			if (!MetaKey(ts.MetaKey)) {
+				// matakeyが押されていない
+				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
+					// アクセラレーターキーを処理した
+					message_processed = true;
+				}
+			}
 		}
 
-		if (m_pMainWnd->m_hAccel != NULL &&
-			!TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg))
-		{
+		if (!message_processed) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
