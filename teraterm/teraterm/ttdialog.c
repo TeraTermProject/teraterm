@@ -31,14 +31,9 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplug.h" /* TTPLUG */
-#include "ttutil.h"
 #include "ttdlg.h"
 
 #include "ttdialog.h"
-#include "ttwinman.h"
-
-static HMODULE HTTDLG = NULL;
-static int TTDLGUseCount = 0;
 
 PSetupTerminal SetupTerminal = _SetupTerminal;
 PSetupWin SetupWin = _SetupWin;
@@ -53,46 +48,9 @@ PSetupGeneral SetupGeneral = _SetupGeneral;
 PWindowWindow WindowWindow = _WindowWindow;
 PTTDLGSetUILanguageFile TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
 
-#if 0
-PSetupTerminal SetupTerminal;
-PSetupWin SetupWin;
-PSetupKeyboard SetupKeyboard;
-PSetupSerialPort SetupSerialPort;
-PSetupTCPIP SetupTCPIP;
-PGetHostName GetHostName;
-PChangeDirectory ChangeDirectory;
-PAboutDialog AboutDialog;
-PChooseFontDlg ChooseFontDlg;
-PSetupGeneral SetupGeneral;
-PWindowWindow WindowWindow;
-PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
-#endif
-
-static const GetProcAddressList ProcList[] = {
-	{ &SetupTerminal, "SetupTerminal", 8 },
-	{ &SetupWin, "SetupWin", 8 },
-	{ &SetupKeyboard, "SetupKeyboard", 8 },
-	{ &SetupSerialPort, "SetupSerialPort", 8 },
-	{ &SetupTCPIP, "SetupTCPIP", 8 },
-	{ &GetHostName, "GetHostName", 8 },
-	{ &ChangeDirectory, "ChangeDirectory", 8 },
-	{ &AboutDialog, "AboutDialog", 4 },
-	{ &ChooseFontDlg, "ChooseFontDlg", 12 },
-	{ &SetupGeneral, "SetupGeneral", 8 },
-	{ &WindowWindow, "WindowWindow", 8 },
-	{ &TTDLGSetUILanguageFile, "TTDLGSetUILanguageFile", 4 },
-};
-
-static void FreeTTDLGCommon()
-{
-	FreeLibrary(HTTDLG);
-	HTTDLG = NULL;
-
-	ClearProcAddressses(ProcList, _countof(ProcList));
-}
-
 BOOL LoadTTDLG()
 {
+	TTXGetUIHooks(); /* TTPLUG */
 	return TRUE;
 }
 
@@ -100,39 +58,3 @@ BOOL FreeTTDLG()
 {
 	return TRUE;
 }
-
-#if 0
-BOOL LoadTTDLG()
-{
-	if (TTDLGUseCount == 0) {
-		BOOL ret;
-
-		HTTDLG = LoadHomeDLL("TTPDLG.DLL");
-		if (HTTDLG==NULL) return FALSE;
-
-		ret = GetProcAddressses(HTTDLG, ProcList, _countof(ProcList));
-		if (!ret) {
-			FreeTTDLGCommon();
-			return FALSE;
-		}
-
-		TTDLGSetUILanguageFile(ts.UILanguageFile);
-		TTXGetUIHooks(); /* TTPLUG */
-	}
-	TTDLGUseCount++;
-	return TRUE;
-}
-
-BOOL FreeTTDLG()
-{
-	if (TTDLGUseCount == 0) {
-		return FALSE;
-	}
-	TTDLGUseCount--;
-	if (TTDLGUseCount == 0) {
-		FreeTTDLGCommon();
-	}
-	return TRUE;
-}
-#endif
-
