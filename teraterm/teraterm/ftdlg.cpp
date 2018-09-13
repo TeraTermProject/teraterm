@@ -45,6 +45,7 @@
 BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts)
 {
 	BOOL Ok;
+	WNDCLASS wc;
 	int fuLoad = LR_DEFAULTCOLOR;
 	HWND hwnd;
 
@@ -52,6 +53,19 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	cv = pcv;
 	cv->FilePause &= ~fv->OpId;
 	ts = pts;
+
+	wc.style = CS_PARENTDC;
+	wc.lpfnWndProc = TTCDialog::ProcStub;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = DLGWINDOWEXTRA;
+	wc.hInstance = hInstance;
+	wc.hIcon = NULL;
+	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = "FTDlg32";
+	RegisterClass(&wc);
+
 	Pause = FALSE;
 
 	hwnd = GetForegroundWindow();
@@ -146,6 +160,16 @@ void CFileTransDlg::RefreshNum()
 
 void CFileTransDlg::OnInitDialog()
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ IDC_TRANS_FILENAME, "DLG_FILETRANS_FILENAME" },
+		{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
+		{ IDC_TRANS_TRANS, "DLG_FILETRANS_TRNAS" },
+		{ IDC_TRANS_ELAPSED, "DLG_FILETRANS_ELAPSED" },
+		{ IDCANCEL, "DLG_FILETRANS_CLOSE" },
+		{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_PAUSE" },
+		{ IDC_TRANSHELP, "BTN_HELP" },
+	};
+
 	int fuLoad = LR_DEFAULTCOLOR;
 
 	if (fv->HideDialog) {
@@ -163,20 +187,22 @@ void CFileTransDlg::OnInitDialog()
 	// ログファイルはフルパス表示にする(2004.8.6 yutaka)
 	SetDlgItemText(IDC_EDIT_FULLPATH, &(fv->FullName[0]));
 
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts->UILanguageFile);
+
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
 	SmallIcon = LoadImage(m_hInst,
-		MAKEINTRESOURCE(IDI_TTERM),
-		IMAGE_ICON, 16, 16, fuLoad);
+						  MAKEINTRESOURCE(IDI_TTERM),
+						  IMAGE_ICON, 16, 16, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_SMALL,
-		(LPARAM)SmallIcon);
+				  (LPARAM)SmallIcon);
 
 	BigIcon = LoadImage(m_hInst,
-			MAKEINTRESOURCE(IDI_TTERM),
-			IMAGE_ICON, 0, 0, fuLoad);
+						MAKEINTRESOURCE(IDI_TTERM),
+						IMAGE_ICON, 0, 0, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
-		(LPARAM)BigIcon);
+				  (LPARAM)BigIcon);
 }
 
 void CFileTransDlg::OnCancel( )

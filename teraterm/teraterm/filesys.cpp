@@ -188,11 +188,9 @@ static PFileTransDlg FLogDlg = NULL;
 static PFileTransDlg SendDlg = NULL;
 static PProtoDlg PtDlg = NULL;
 
-BOOL OpenFTDlg(PFileVar fv)
+static BOOL OpenFTDlg(PFileVar fv)
 {
 	PFileTransDlg FTDlg;
-	HWND HFTDlg;
-	char uimsg[MAX_UIMSG];
 
 	FTDlg = new CFileTransDlg();
 
@@ -217,32 +215,9 @@ BOOL OpenFTDlg(PFileVar fv)
 	else
 		SendDlg = FTDlg; /* File send */
 
-	HFTDlg=FTDlg->GetSafeHwnd();
-
-	GetDlgItemText(HFTDlg, IDC_TRANS_FILENAME, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FILETRANS_FILENAME", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDC_TRANS_FILENAME, ts.UIMsg);
-	GetDlgItemText(HFTDlg, IDC_FULLPATH_LABEL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FILETRANS_FULLPATH", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDC_FULLPATH_LABEL, ts.UIMsg);
-	GetDlgItemText(HFTDlg, IDC_TRANS_TRANS, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FILETRANS_TRNAS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDC_TRANS_TRANS, ts.UIMsg);
-	GetDlgItemText(HFTDlg, IDC_TRANS_ELAPSED, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FILETRANS_ELAPSED", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDC_TRANS_ELAPSED, ts.UIMsg);
-	GetDlgItemText(HFTDlg, IDCANCEL, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FILETRANS_CLOSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDCANCEL, ts.UIMsg);
-	GetDlgItemText(HFTDlg, IDC_TRANSPAUSESTART, uimsg, sizeof(uimsg));
-	get_lang_msg("DLG_FILETRANS_PAUSE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDC_TRANSPAUSESTART, ts.UIMsg);
-	GetDlgItemText(HFTDlg, IDC_TRANSHELP, uimsg, sizeof(uimsg));
-	get_lang_msg("BTN_HELP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	SetDlgItemText(HFTDlg, IDC_TRANSHELP, ts.UIMsg);
-
 	fv->StartTime = GetTickCount();
 	if (fv->OpId == OpSendFile) {
+		HWND HFTDlg = FTDlg->GetSafeHwnd();
 		InitDlgProgress(HFTDlg, IDC_TRANSPROGRESS, &fv->ProgStat);
 		ShowWindow(GetDlgItem(HFTDlg, IDC_TRANS_ELAPSED), SW_SHOW);
 	}

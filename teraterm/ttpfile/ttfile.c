@@ -46,12 +46,23 @@
 #include "quickvan.h"
 // resource IDs
 #include "file_res.h"
+#include "dlglib.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
 
 #include "compat_w95.h"
+
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef DialogBox
+#define DialogBox(p1,p2,p3,p4) \
+	TTDialogBox(p1,p2,p3,p4)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
 
 #undef DllExport
 #define DllExport __declspec(dllexport) 
@@ -170,13 +181,13 @@ DllExport BOOL WINAPI GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 	return Ok;
 }
 
-void SetLogFlags(HWND Dialog)
+static void SetLogFlags(HWND Dialog)
 {
 	LPLONG pl;
 	WORD BinFlag, val;
 	long opt = 0;
 
-	pl = (LPLONG)GetWindowLong(Dialog, DWL_USER);
+	pl = (LPLONG)GetWindowLongPtr(Dialog, DWLP_USER);
 	if (pl) {
 		GetRB(Dialog, &BinFlag, IDC_FOPTBIN, IDC_FOPTBIN);
 		if (BinFlag) {
@@ -233,7 +244,7 @@ void SetLogFlags(HWND Dialog)
 }
 
 /* Hook function for file name dialog box */
-BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD BinFlag, TsFlag;
@@ -250,7 +261,7 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		ofn = (LPOPENFILENAME)lParam;
 		pl = (LPLONG)(ofn->lCustData);
 		opt = *pl;
-		SetWindowLong(Dialog, DWL_USER, (LONG)pl);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG)pl);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -422,7 +433,7 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
+static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
 
 DllExport BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
@@ -569,7 +580,7 @@ DllExport BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLO
 	return Ok;
 }
 
-BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	LPWORD pw;
@@ -790,8 +801,7 @@ DllExport BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWO
 	return Ok;
 }
 
-BOOL CALLBACK GetFnDlg
-  (HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PFileVar fv;
 	char TempFull[MAX_PATH];
@@ -952,7 +962,7 @@ DllExport void WINAPI SetFileVar(PFileVar fv)
 }
 
 /* Hook function for XMODEM file name dialog box */
-BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD Hi, Lo;

@@ -74,9 +74,6 @@ BOOL TTCFrameWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void TTCFrameWnd::OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
-{}
-
 void TTCFrameWnd::OnKillFocus(HWND hNewWnd)
 {}
 

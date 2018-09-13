@@ -50,7 +50,11 @@ PTTDLGSetUILanguageFile TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
 
 BOOL LoadTTDLG()
 {
-	TTXGetUIHooks(); /* TTPLUG */
+	static BOOL initialized;
+	if (!initialized) {
+		TTXGetUIHooks(); /* TTPLUG */
+		initialized = TRUE;
+	}
 	return TRUE;
 }
 

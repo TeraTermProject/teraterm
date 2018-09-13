@@ -32,18 +32,6 @@
 #pragma once
 #include <windows.h>
 
-class TTCMenu
-{
-public:
-	HMENU m_hMenu;
-};
-
-class TTCPoint {
-public:
-	int x;
-	int y;
-};
-
 class TTCWnd
 {
 public:
@@ -70,7 +58,7 @@ public:
 	void SetDlgItemInt(int id, UINT val, BOOL bSigned = TRUE);
 	UINT GetDlgItemInt(int id, BOOL* lpTrans = NULL, BOOL bSigned = TRUE) const;
 	void ShowWindow(int nCmdShow);
-	void SetWindowText(TCHAR *str);
+	void SetWindowText(const TCHAR *str);
 	void ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 	void ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 	int MessageBox(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
@@ -82,7 +70,7 @@ public:
 	TTCFrameWnd();
 	virtual ~TTCFrameWnd();
 	static TTCFrameWnd *pseudoPtr;
-	static LRESULT ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static LRESULT CALLBACK ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	virtual BOOL Create(HINSTANCE hInstance,
 						LPCTSTR lpszClassName,
 						LPCTSTR lpszWindowName,
@@ -98,7 +86,6 @@ public:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	///
 #if 1
-	void OnInitMenuPopup(TTCMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	void OnKillFocus(HWND hNewWnd);
 	void OnDestroy();
 	void OnSetFocus(HWND hOldWnd);
@@ -114,6 +101,8 @@ class TTCDialog : public TTCWnd
 public:
 	TTCDialog();
 	virtual ~TTCDialog();
+	static TTCDialog *pseudoPtr;
+	static LRESULT CALLBACK ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	BOOL Create(HINSTANCE hInstance, HWND hParent, int idd);
 	void DestroyWindow();
 	virtual void OnInitDialog();

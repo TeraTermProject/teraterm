@@ -32,6 +32,7 @@
 #include "tmfc.h"
 
 #include <windowsx.h>
+#include <assert.h>
 #include "dlglib.h"
 
 TTCWnd::TTCWnd()
@@ -103,7 +104,7 @@ void TTCWnd::ShowWindow(int nCmdShow)
 	::ShowWindow(m_hWnd, nCmdShow);
 }
 
-void TTCWnd::SetWindowText(TCHAR *str)
+void TTCWnd::SetWindowText(const TCHAR *str)
 {
 	::SetWindowText(m_hWnd, str);
 }
@@ -162,11 +163,17 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 #else
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, MAKEINTRESOURCE(idd));
 #endif
+	pseudoPtr = this;
 	HWND hWnd = ::CreateDialogIndirectParam(	
 		hInstance, lpTemplate, hParent,
 		(DLGPROC)OnDlgProc, (LPARAM)this);
+	pseudoPtr = NULL;
 	if (hWnd == NULL)
 	{
+#if defined(_DEBUG)
+		DWORD e = GetLastError();
+#endif
+		assert(false);
 		return FALSE;
 	}
 
@@ -239,6 +246,25 @@ LRESULT CALLBACK TTCDialog::OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM 
 		return FALSE;
 	}
 	return TRUE;
+}
+
+TTCDialog *TTCDialog::pseudoPtr;
+
+LRESULT CALLBACK TTCDialog::ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+	TTCDialog *self;
+	if (pseudoPtr != NULL) {
+		self = pseudoPtr;
+		self->m_hWnd = hWnd;
+	} else {
+		self = (TTCDialog *)GetWindowLongPtr(hWnd, DWLP_USER);
+	}
+
+	LRESULT result = self->OnDlgProc(hWnd, msg, wp, lp);
+	if (result == FALSE) {
+		result = ::DefWindowProc(hWnd, msg, wp, lp);
+	}
+	return result;
 }
 
 ////////////////////////////////////////
