@@ -68,6 +68,12 @@ include_directories(
   .
   )
 
+if(MINGW)
+  link_directories(
+	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
+	)
+endif()
+
 add_library(
   ttproxy SHARED
   ${SRC}

@@ -63,9 +63,11 @@ public:
 			distination[i] = array[i];
 		}
 	}
+#if 0
 	void copyTo(Array* distination)const {
 		copyTo(distination->array[i]);
 	}
+#endif
 };
 
 }

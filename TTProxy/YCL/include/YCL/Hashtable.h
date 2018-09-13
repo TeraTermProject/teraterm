@@ -122,7 +122,7 @@ private:
 	//	全てのエントリが設定済みでkeyと等しいものがなければ-1を返す。
 	int find(const TYPE_KEY& key)const {
 		int found = -1;
-		int h = HASHCODE(key);
+		int h = HASHCODE(&key);
 		for (int i = 0; i < backetSize; i++) {
 			int index = ((unsigned) h + i) % backetSize;
 			const TYPE_KEY& bkey = backet[index].key;
