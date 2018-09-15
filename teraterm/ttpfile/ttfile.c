@@ -50,6 +50,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
+#include <assert.h>
 
 #include "compat_w95.h"
 
@@ -160,6 +161,14 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 			strncpy_s(ts->KeyCnfFN, sizeof(ts->KeyCnfFN),Name, _TRUNCATE);
 		break;
 	}
+
+#if defined(_DEBUG)
+	if (!Ok) {
+		DWORD Err = GetLastError();
+		DWORD DlgErr = CommDlgExtendedError();
+		assert(Err == 0 && DlgErr == 0);
+	}
+#endif
 
 	/* restore dir */
 	_chdir(TempDir);
