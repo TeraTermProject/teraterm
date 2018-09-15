@@ -279,16 +279,16 @@ public:
 		return SetWindowLong(GWL_EXSTYLE, exStyle);
 	}
 	WNDPROC getWndProc()const {
-		return (WNDPROC) GetWindowLong(GWL_WNDPROC);
+		return (WNDPROC) GetWindowLong(GWLP_WNDPROC);
 	}
 	WNDPROC setWndProc(WNDPROC proc) {
-		return (WNDPROC) SetWindowLong(GWL_WNDPROC, (long) proc);
+		return (WNDPROC) SetWindowLong(GWLP_WNDPROC, (long) proc);
 	}
 	HWND getOwner()const {
-		return (HWND) GetWindowLong(GWL_HWNDPARENT);
+		return (HWND) GetWindowLong(GWLP_HWNDPARENT);
 	}
 	HWND setOwner(HWND owner) {
-		return (HWND) SetWindowLong(GWL_HWNDPARENT, (long) owner);
+		return (HWND) SetWindowLong(GWLP_HWNDPARENT, (long) owner);
 	}
 	HWND getChildWindow()const {
 		return GetWindow(GW_CHILD);
@@ -331,28 +331,28 @@ public:
 		return GetClassLong(GCL_CBWNDEXTRA);
 	}
 	HBRUSH getBackgroundBrush()const {
-		return (HBRUSH) GetClassLong(GCL_HBRBACKGROUND);
+		return (HBRUSH) GetClassLong(GCLP_HBRBACKGROUND);
 	}
 	HCURSOR getClassCursor()const {
-		return (HCURSOR) GetClassLong(GCL_HCURSOR);
+		return (HCURSOR) GetClassLong(GCLP_HCURSOR);
 	}
 	HICON getClassIcon()const {
-		return (HICON) GetClassLong(GCL_HICON);
+		return (HICON) GetClassLong(GCLP_HICON);
 	}
 	HICON getClassSmallIcon()const {
-		return (HICON) GetClassLong(GCL_HICONSM);
+		return (HICON) GetClassLong(GCLP_HICONSM);
 	}
 	HINSTANCE getClassInstance()const {
-		return (HINSTANCE) GetClassLong(GCL_HMODULE);
+		return (HINSTANCE) GetClassLong(GCLP_HMODULE);
 	}
 	int getMenuResourceId()const {
-		return GetClassLong(GCL_MENUNAME);
+		return GetClassLong(GCLP_MENUNAME);
 	}
 	int getClassStyle()const {
 		return GetClassLong(GCL_STYLE);
 	}
 	WNDPROC getClassWindowProc()const {
-		return (WNDPROC) GetClassLong(GCL_WNDPROC);
+		return (WNDPROC) GetClassLong(GCLP_WNDPROC);
 	}
 };
 

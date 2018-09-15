@@ -72,8 +72,8 @@ inline bool YclAssert(bool condition, const char* message) {
 	return false;
 }
 
-#define YCLASSERT(condition, message) if (YclAssert(condition, message)) {__asm { int 3 }}
-#define YCLVERIFY(condition, message) if (YclAssert(condition, message)) {__asm { int 3 }}
+#define YCLASSERT(condition, message) if (YclAssert(condition, message)) {__debugbreak();}
+#define YCLVERIFY(condition, message) if (YclAssert(condition, message)) {__debugbreak();}
 
 #ifdef __cplusplus
 extern "C" {

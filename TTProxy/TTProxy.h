@@ -6,7 +6,7 @@ using namespace yebisuya;
 
 #include "ProxyWSockHook.h"
 
-extern BOOL PASCAL TTXBind(WORD Version, TTXExports* exports);
+__declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
 
 char UILanguageFile[MAX_PATH];
 

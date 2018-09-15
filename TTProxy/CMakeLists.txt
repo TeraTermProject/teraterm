@@ -57,7 +57,6 @@ set(SRC
   TTProxy.cpp
   TTProxy.h
   TTProxy.rc
-  TTX.def
   )
 
 include_directories(
@@ -81,10 +80,17 @@ add_library(
   ${YCL_SRC}
   )
 
+set_target_properties(
+  ttproxy
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   ttproxy
   ttpcmn
   ws2_32.lib
+  version.lib
   )
 
 

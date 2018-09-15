@@ -27,6 +27,12 @@ add_library(
   ${SRC}
   )
 
+set_target_properties(
+  ttxkanjimenu
+  PROPERTIES
+  PREFIX ""
+  )
+
 target_link_libraries(
   ttxkanjimenu
   ttpcmn

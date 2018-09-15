@@ -51,7 +51,7 @@ protected:
 				|| message == WM_CTLCOLORLISTBOX
 				|| message == WM_CTLCOLORSCROLLBAR
 				|| message == WM_CTLCOLORSTATIC)) {
-			result = (BOOL) ::GetWindowLong(dialog, DWL_MSGRESULT);
+			result = (BOOL) ::GetWindowLong(dialog, DWLP_MSGRESULT);
 		}
 		return result;
 	}
@@ -85,7 +85,7 @@ public:
 	}
 
 	void setResult(LRESULT result) {
-		SetWindowLong(DWL_MSGRESULT, result);
+		SetWindowLong(DWLP_MSGRESULT, result);
 	}
 	int getDefID()const {
 		return LOWORD(SendMessage(DM_GETDEFID));
@@ -109,7 +109,7 @@ public:
 	}
 	int open(HINSTANCE instance, int resourceId, HWND owner = NULL) {
 		YCLVERIFY(prepareOpen(this) == NULL, "Another dialog has been opening yet.");
-		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, DialogProc, NULL);
+		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, (DLGPROC)DialogProc, NULL);
 	}
 protected:
 	virtual bool dispatch(int message, int wparam, long lparam) {
