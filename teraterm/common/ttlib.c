@@ -224,7 +224,7 @@ BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos)
 		Ptr = &PathName[2];
 	else
 		Ptr = PathName;
-	if (Ptr[0]=='\\')
+	if (Ptr[0]=='\\' || Ptr[0]=='/')
 		Ptr = CharNext(Ptr);
 
 	DirPtr = Ptr;
@@ -236,6 +236,7 @@ BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos)
 		switch (b) {
 			case ':':
 				return FALSE;
+			case '/':	/* FALLTHROUGH */
 			case '\\':
 				DirPtr = PtrOld;
 				FNPtr = Ptr;
