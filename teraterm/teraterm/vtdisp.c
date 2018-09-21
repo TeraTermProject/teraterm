@@ -327,18 +327,6 @@ void FillBitmapDC(HDC hdc,COLORREF color)
   DeleteObject(hBrush);
 }
 
-FARPROC GetProcAddressWithDllName(char *dllName,char *procName)
-{
-  HINSTANCE hDll;
-
-  hDll = LoadLibrary(dllName);
-
-  if(hDll)
-    return GetProcAddress(hDll,procName);
-  else
-    return 0;
-}
-
 static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
 {
   int    i;
