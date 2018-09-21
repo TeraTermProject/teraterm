@@ -9,6 +9,13 @@ set(COMMON_SRC
   ../teraterm/common/ttlib.h
   ../teraterm/common/i18n.c
   ../teraterm/common/i18n.h
+  ../teraterm/teraterm/ttdialog.h
+  ../teraterm/teraterm/ttfileio.h
+  ../teraterm/common/ttplugin.h
+  ../teraterm/teraterm/ttsetup.h
+  ../teraterm/common/tttypes.h
+  ../teraterm/common/tt-version.h
+  ../teraterm/teraterm/ttwsk.h
   )
 source_group(
   "common"

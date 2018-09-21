@@ -56,8 +56,6 @@ private:
   char **DropLists;
   int DropListCount;
   void DropListFree();
-  bool DropWithLeftbutton;
-  bool DropWithRightbutton;
 
 protected:
 

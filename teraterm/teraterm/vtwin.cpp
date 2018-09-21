@@ -392,7 +392,7 @@ void SetAutoConnectPort(int port)
 // (2007.9.30 yutaka)
 //
 // 例外コードを文字列へ変換する
-static const char *GetExceptionString(int exception)
+static const char *GetExceptionString(DWORD exception)
 {
 #define EXCEPTION(x) case EXCEPTION_##x: return (#x);
 	static char buf[16];
@@ -4516,7 +4516,7 @@ void CVTWindow::OnExternalSetup()
 	CAddSettingPropSheetDlg CAddSetting(hInst, "Tera Term: Additional settings", HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
-		case -1:
+		case (DWORD)-1:
 		case IDABORT:
 			ret = GetLastError();
 			break;
@@ -6338,8 +6338,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_COMMAND:
 	{
-		WORD wID = GET_WM_COMMAND_ID(wp, lp);
-		const WORD wCMD = GET_WM_COMMAND_CMD(wp, lp);
+		const WORD wID = GET_WM_COMMAND_ID(wp, lp);
 		switch (wID) {
 		case ID_FILE_NEWCONNECTION: OnFileNewConnection(); break;
 		case ID_FILE_DUPLICATESESSION: OnDuplicateSession(); break;

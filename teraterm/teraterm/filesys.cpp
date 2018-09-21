@@ -270,7 +270,7 @@ void FreeFileVar(PFileVar *fv)
 	{
 		CloseFileSync(*fv);
 		//if ((*fv)->FileOpen) _lclose((*fv)->FileHandle);
-		if ((*fv)->FnStrMemHandle>0)
+		if ((*fv)->FnStrMemHandle != 0)
 		{
 			GlobalUnlock((*fv)->FnStrMemHandle);
 			GlobalFree((*fv)->FnStrMemHandle);
