@@ -85,7 +85,7 @@ find_program(
   HINTS c:/cygwin/usr/bin
   HINTS c:/cygwin64/usr/bin
   )
-if(PERL-NOTFOUND)
+if(${PERL} STREQUAL "PERL-NOTFOUND")
   message(FATAL_ERROR "perl not found")
 endif()
 

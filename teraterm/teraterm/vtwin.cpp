@@ -6175,7 +6175,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnGetMinMaxInfo((MINMAXINFO *)lp);
 		break;
 	case WM_HSCROLL:
-		OnHScroll((UINT)wp, 0, (HWND)lp);
+		OnHScroll(LOWORD(wp), HIWORD(wp), (HWND)lp);
 		break;
 	case WM_INITMENUPOPUP:
 		OnInitMenuPopup((HMENU)wp, LOWORD(lp), HIWORD(lp));
@@ -6268,7 +6268,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		OnTimer(wp);
 		break;
 	case WM_VSCROLL:
-		OnVScroll((UINT)wp, 0, (HWND)lp);
+		OnVScroll(LOWORD(wp), HIWORD(wp), (HWND)lp);
 		break;
 	case WM_DEVICECHANGE:
 		OnDeviceChange((UINT)wp, (DWORD_PTR)lp);
