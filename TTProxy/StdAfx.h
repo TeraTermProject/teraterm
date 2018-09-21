@@ -10,7 +10,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#define _WINSOCKAPI_
+//#define _WINSOCKAPI_
 
 /* VS2015(VC14.0)だと、WSASocketA(), inet_ntoa() などのAPIがdeprecatedであると
 * 警告するために、警告を抑止する。代替関数に置換すると、VS2005(VC8.0)でビルド
@@ -24,6 +24,7 @@
 
 // この位置にヘッダーを挿入してください
 #include <winsock2.h>
+#include <windows.h>
 
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
@@ -32,9 +33,9 @@
 #include <openssl/err.h>
 #include <openssl/x509v3.h>
 
-#include <teraterm.h>
-#include <tttypes.h>
-#include <ttplugin.h>
+#include "teraterm.h"
+#include "tttypes.h"
+#include "ttplugin.h"
 
 // TODO: プログラムで必要なヘッダー参照を追加してください。
 

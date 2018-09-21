@@ -5,9 +5,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
 
 set(COMMON_SRC
-  ../teraterm/common/ttlib.c
   ../teraterm/common/ttlib.h
-  ../teraterm/common/i18n.c
   ../teraterm/common/i18n.h
   ../teraterm/teraterm/ttdialog.h
   ../teraterm/teraterm/ttfileio.h
@@ -80,6 +78,8 @@ if(MINGW)
 	)
 endif()
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-uTTXBind@8")
+
 add_library(
   ttproxy SHARED
   ${SRC}
@@ -91,6 +91,7 @@ set_target_properties(
   ttproxy
   PROPERTIES
   PREFIX ""
+  OUTPUT_NAME "TTXProxy"
   )
 
 target_link_libraries(

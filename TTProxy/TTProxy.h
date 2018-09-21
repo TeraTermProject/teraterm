@@ -6,7 +6,7 @@ using namespace yebisuya;
 
 #include "ProxyWSockHook.h"
 
-__declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
+extern "C" __declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
 
 char UILanguageFile[MAX_PATH];
 
@@ -97,7 +97,7 @@ private:
 	}
 
 	static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
-		int param_len=strlen(param);
+		//int param_len=strlen(param);
 		char option[1024];
 		int opt_len = sizeof(option);
 		int action;
@@ -289,7 +289,7 @@ private:
 		}
 	}
 
-	friend BOOL PASCAL TTXBind(WORD Version, TTXExports* exports) {
+	friend __declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports) {
 		static const TTXExports EXPORTS = {
 			/* This must contain the size of the structure. See below for its usage. */
 			sizeof EXPORTS,
