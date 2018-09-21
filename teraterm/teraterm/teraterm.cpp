@@ -69,8 +69,8 @@ static void init()
 	}
 
 	WinCompatInit();
-	if (PSetThreadDpiAwarenessContext) {
-		PSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	if (pSetThreadDpiAwarenessContext) {
+		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}
 }
 

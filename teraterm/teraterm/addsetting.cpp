@@ -45,13 +45,6 @@
 #include "dlglib.h"
 #include "compat_win.h"
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
-#endif
-
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
 	{"IBEAM", IDC_IBEAM},
@@ -60,10 +53,6 @@ const mouse_cursor_t MouseCursor[] = {
 	{NULL, NULL},
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
-
-// 本体は vtwin.cpp
-extern void SetWindowStyle(TTTSet *ts);
-
 
 static void SetupRGBbox(HWND hDlgWnd, int index)
 {
@@ -597,7 +586,9 @@ void CCopypastePropPageDlg::OnOK()
 	// (10)
 	GetDlgItemText(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
 	val = atoi(buf);
-	ts.PasteDelayPerLine = min(max(0, val), 5000);
+	ts.PasteDelayPerLine =
+		(val < 0) ? 0 :
+		(val > 5000) ? 5000 : val;
 }
 
 
@@ -627,6 +618,8 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_ALPHABLEND, "DLG_TAB_VISUAL_ALPHA" },
+		{ IDC_ALPHA_BLEND_ACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_ACTIVE_LABEL" },
+		{ IDC_ALPHA_BLEND_INACTIVE_LABEL, "DLG_TAB_VISUAL_ALPHA_INACTIVE_LABEL" },
 		{ IDC_ETERM_LOOKFEEL, "DLG_TAB_VISUAL_ETERM" },
 		{ IDC_BGIMG_CHECK, "DLG_TAB_VISUAL_BGIMG" },
 		{ IDC_BGIMG_BRIGHTNESS, "DLG_TAB_VISUAL_BGIMG_BRIGHTNESS" },
@@ -656,8 +649,10 @@ void CVisualPropPageDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
 	// (1)AlphaBlend
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlend);
-	SetDlgItemText(IDC_ALPHA_BLEND, buf);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendActive);
+	SetDlgItemText(IDC_ALPHA_BLEND_ACTIVE, buf);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendInactive);
+	SetDlgItemText(IDC_ALPHA_BLEND_INACTIVE, buf);
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
@@ -750,7 +745,7 @@ void CVisualPropPageDlg::OnInitDialog()
 	SetCheck(IDC_URL_UNDERLINE, (ts.FontFlag&FF_URLUNDERLINE) != 0);
 
 	// ダイアログにフォーカスを当てる
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND));
+	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND_ACTIVE));
 }
 
 BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -905,18 +900,24 @@ HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 void CVisualPropPageDlg::OnOK()
 {
 	int sel;
-	int beforeAlphaBlend;
 	char buf[MAXPATHLEN];
 	COLORREF TmpColor;
 	int flag_changed = 0;
 
 	// (1)
-	beforeAlphaBlend = ts.AlphaBlend;
-	GetDlgItemText(IDC_ALPHA_BLEND, buf, sizeof(buf));
+	GetDlgItemText(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		ts.AlphaBlend = atoi(buf);
-		ts.AlphaBlend = max(0, ts.AlphaBlend);
-		ts.AlphaBlend = min(255, ts.AlphaBlend);
+		int i = atoi(buf);
+		ts.AlphaBlendActive =
+			(i < 0) ? 0 :
+			(i > 255) ? 255 : i;
+	}
+	GetDlgItemText(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
+	if (isdigit(buf[0])) {
+		int i = atoi(buf);
+		ts.AlphaBlendInactive = 
+			(i < 0) ? 0 :
+			(i > 255) ? 255 : i;
 	}
 
 	// (2)
@@ -934,9 +935,10 @@ void CVisualPropPageDlg::OnOK()
 
 	GetDlgItemText(IDC_EDIT_BGIMG_BRIGHTNESS, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		ts.BGImgBrightness = atoi(buf);
-		ts.BGImgBrightness = max(0, ts.BGImgBrightness);
-		ts.BGImgBrightness = min(255, ts.BGImgBrightness);
+		int i = atoi(buf);
+		ts.BGImgBrightness = 
+			(i < 0) ? 0 :
+			(i > 255) ? 255 : i;
 	}
 
 	// (3)
@@ -1011,17 +1013,6 @@ void CVisualPropPageDlg::OnOK()
 	// (11) URL Underline
 	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != GetCheck(IDC_URL_UNDERLINE)) {
 		ts.FontFlag ^= FF_URLUNDERLINE;
-	}
-
-	// 2006/03/11 by 337 : Alpha値も即時変更
-	// Layered窓になっていない場合は効果が無い
-	if (ts.EtermLookfeel.BGUseAlphaBlendAPI) {
-		// 起動時に半透明レイヤにしていない場合でも、即座に半透明となるようにする。(2006.4.1 yutaka)
-		//MySetLayeredWindowAttributes(HVTWin, 0, (ts.AlphaBlend > 255) ? 255: ts.AlphaBlend, LWA_ALPHA);
-		// 値が変更されたときのみ設定を反映する。(2007.10.19 maya)
-		if (ts.AlphaBlend != beforeAlphaBlend) {
-			SetWindowStyle(&ts);
-		}
 	}
 
 	if (flag_changed) {

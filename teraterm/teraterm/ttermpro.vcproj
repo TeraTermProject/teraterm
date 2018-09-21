@@ -213,11 +213,15 @@
 				>
 			</File>
 			<File
-				RelativePath="dnddlg.cpp"
+				RelativePath="..\common\compat_win.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\common\dlglib.c"
+				>
+			</File>
+			<File
+				RelativePath="dnddlg.cpp"
 				>
 			</File>
 			<File

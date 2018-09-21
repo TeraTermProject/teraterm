@@ -154,17 +154,17 @@ typedef struct _BGSrc
   char       fileTmp[MAX_PATH];
 }BGSrc;
 
-BGSrc BGDest;
-BGSrc BGSrc1;
-BGSrc BGSrc2;
+static BGSrc BGDest;
+static BGSrc BGSrc1;
+static BGSrc BGSrc2;
 
 int  BGEnable;
-int  BGReverseTextAlpha;
-int  BGUseAlphaBlendAPI;
+static int  BGReverseTextAlpha;
+static int  BGUseAlphaBlendAPI;
 BOOL BGNoFrame;
-BOOL BGFastSizeMove;
+static BOOL BGFastSizeMove;
 
-char BGSPIPath[MAX_PATH];
+static char BGSPIPath[MAX_PATH];
 
 COLORREF BGVTColor[2];
 COLORREF BGVTBoldColor[2];
@@ -191,19 +191,7 @@ typedef struct tagWallpaperInfo
   int  pattern;
 }WallpaperInfo;
 
-typedef struct _BGBLENDFUNCTION
-{
-    BYTE     BlendOp;
-    BYTE     BlendFlags;
-    BYTE     SourceConstantAlpha;
-    BYTE     AlphaFormat;
-}BGBLENDFUNCTION;
-
-typedef BOOL (WINAPI *TBGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
-typedef BOOL (WINAPI *TBGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
-
-static TBGAlphaBlend BGAlphaBlend;
-static TBGEnumDisplayMonitors BGEnumDisplayMonitors;
+static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
 static HBITMAP GetBitmapHandle(char *File);
 
@@ -351,7 +339,7 @@ FARPROC GetProcAddressWithDllName(char *dllName,char *procName)
     return 0;
 }
 
-void RandomFile(char *filespec_src,char *filename, int destlen)
+static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
 {
   int    i;
   int    file_num;
@@ -361,6 +349,7 @@ void RandomFile(char *filespec_src,char *filename, int destlen)
   HANDLE hFind;
   WIN32_FIND_DATA fd;
 
+  filename[0] = 0;
   ExpandEnvironmentStrings(filespec_src, filespec, sizeof(filespec));
 
   //絶対パスに変換
@@ -523,7 +512,7 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
   return TRUE;
 }
 
-BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BGBLENDFUNCTION bf)
+static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BLENDFUNCTION bf)
 {
   HDC hdcDestWork,hdcSrcWork;
   int i,invAlpha,alpha;
@@ -565,7 +554,7 @@ void BGPreloadPicture(BGSrc *src)
   char  filespec[MAX_PATH];
   char *filePart;
   int   fileSize;
-  int   readByte;
+  DWORD readByte;
   unsigned char *fileBuf;
 
   HBITMAP hbm;
@@ -671,7 +660,7 @@ void BGPreloadPicture(BGSrc *src)
 
 void BGGetWallpaperInfo(WallpaperInfo *wi)
 {
-  int  length;
+  DWORD length;
   int style;
   int  tile;
   char str[256];
@@ -891,10 +880,6 @@ void BGPreloadWallpaper(BGSrc *src)
 
 	BGGetWallpaperInfo(&wi);
 
-#ifdef DEBUG_XP
-	strcpy(wi.filename, "c:\\usr\\ttssh2\\1011_01.jpg");
-#endif
-
 	if (IsLoadImageOnlyEnabled()) {
 		//壁紙を読み込み
 		//LR_CREATEDIBSECTION を指定するのがコツ
@@ -913,12 +898,6 @@ void BGPreloadWallpaper(BGSrc *src)
 		if (hbm == NULL) {
 			goto createdc;
 		}
-
-#ifdef DEBUG_XP
-		//wi.pattern = BG_STRETCH;
-		//wi.pattern = BG_FIT_WIDTH;
-		//wi.pattern = BG_FIT_HEIGHT;
-#endif
 
 		GetObject(hbm,sizeof(bm),&bm);
 		// 壁紙の設定に合わせて、画像のストレッチサイズを決める。
@@ -1197,9 +1176,9 @@ void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   lws.src        = src;
   lws.hdcDest    = hdcDest;
 
-  if(BGEnumDisplayMonitors)
+  if(pEnumDisplayMonitors != NULL)
   {
-    (*BGEnumDisplayMonitors)(NULL,NULL,BGLoadWallpaperEnumFunc,(LPARAM)&lws);
+    (*pEnumDisplayMonitors)(NULL,NULL,BGLoadWallpaperEnumFunc,(LPARAM)&lws);
   }else{
     RECT rectMonitor;
 
@@ -1266,7 +1245,7 @@ void BGSetupPrimary(BOOL forceSetup)
 
   if(!BGInSizeMove)
   {
-    BGBLENDFUNCTION bf;
+    BLENDFUNCTION bf;
     HDC hdcSrc = NULL;
 
     //背景 HDC
@@ -1298,7 +1277,7 @@ void BGSetupPrimary(BOOL forceSetup)
   }
 }
 
-COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
+COLORREF BGGetColor(const char *name,COLORREF defcolor,char *file)
 {
   unsigned int r,g,b;
   char colorstr[256],defstr[256];
@@ -1314,7 +1293,7 @@ COLORREF BGGetColor(char *name,COLORREF defcolor,char *file)
   return RGB(r,g,b);
 }
 
-BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,char **strList,int nList)
+BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,const char *strList[],int nList)
 {
   char defstr[64],str[64];
   int  i;
@@ -1333,21 +1312,21 @@ BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,char **strList,int
 
 BOOL BGGetOnOff(char *name,BOOL def,char *file)
 {
-  char *strList[2] = {"Off","On"};
+  const static char *strList[2] = {"Off","On"};
 
   return BGGetStrIndex(name,def,file,strList,2);
 }
 
 BG_PATTERN BGGetPattern(char *name,BG_PATTERN def,char *file)
 {
-  char *strList[6]={"stretch","tile","center","fitwidth","fitheight","autofit"};
+  const static char *strList[6]={"stretch","tile","center","fitwidth","fitheight","autofit"};
 
   return BGGetStrIndex(name,def,file,strList,6);
 }
 
 BG_PATTERN BGGetType(char *name,BG_TYPE def,char *file)
 {
-  char *strList[3]={"color","picture","wallpaper"};
+  const static char *strList[3]={"color","picture","wallpaper"};
 
   return BGGetStrIndex(name,def,file,strList,3);
 }
@@ -1466,7 +1445,6 @@ void BGDestruct(void)
 void BGInitialize(void)
 {
   char path[MAX_PATH],config_file[MAX_PATH],tempPath[MAX_PATH];
-  char msimg32_dll[MAX_PATH],user32_dll[MAX_PATH];
 
   // VTColor を読み込み
   BGVTColor[0] = ts.VTColor[0];
@@ -1544,11 +1522,6 @@ void BGInitialize(void)
   BGFastSizeMove = ts.EtermLookfeel.BGFastSizeMove;
   BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
 
-#if 0
-  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
-  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
-#endif
-
   //テンポラリーファイル名を生成
   GetTempPath(MAX_PATH,tempPath);
   GetTempFileName(tempPath,"ttAK",0,BGDest.fileTmp);
@@ -1612,9 +1585,7 @@ void BGInitialize(void)
 
   // AlphaBlend のアドレスを読み込み
   if(BGUseAlphaBlendAPI) {
-    GetSystemDirectory(msimg32_dll, sizeof(msimg32_dll));
-    strncat_s(msimg32_dll, sizeof(msimg32_dll), "\\msimg32.dll", _TRUNCATE);
-    BGAlphaBlend = (TBGAlphaBlend)GetProcAddressWithDllName(msimg32_dll,"AlphaBlend");
+	BGAlphaBlend = pAlphaBlend;
   }
   else {
     BGAlphaBlend = NULL;
@@ -1622,11 +1593,6 @@ void BGInitialize(void)
 
   if(!BGAlphaBlend)
     BGAlphaBlend = AlphaBlendWithoutAPI;
-
-  //EnumDisplayMonitors を探す
-  GetSystemDirectory(user32_dll, sizeof(user32_dll));
-  strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
-  BGEnumDisplayMonitors = (TBGEnumDisplayMonitors)GetProcAddressWithDllName(user32_dll,"EnumDisplayMonitors");
 }
 
 void BGExchangeColor() {
@@ -1990,10 +1956,10 @@ void ChangeFont()
 
   /* Normal Font */
   SetLogFont(&VTlf);
-  if (PGetDpiForWindow == NULL) {
+  if (pGetDpiForWindow == NULL) {
 	  uDpi = GetDeviceCaps(TmpDC,LOGPIXELSY);	// いつも96を返す?
   } else {
-	  uDpi = PGetDpiForWindow(HVTWin);
+	  uDpi = pGetDpiForWindow(HVTWin);
   }
   VTlf.lfWidth = -MulDiv(VTlf.lfWidth, uDpi, 72);
   VTlf.lfHeight = -MulDiv(VTlf.lfHeight, uDpi, 72);
@@ -2522,8 +2488,8 @@ void DispChangeWin()
     ANSIColor[IdBack ]   = ts.VTColor[1];
 
 #ifdef ALPHABLEND_TYPE2
-      ANSIColor[IdFore ]   = BGVTColor[0];
-     ANSIColor[IdBack ]   = BGVTColor[1];
+	ANSIColor[IdFore ]   = BGVTColor[0];
+	ANSIColor[IdBack ]   = BGVTColor[1];
 #endif  // ALPHABLEND_TYPE2
 
   }
@@ -2823,7 +2789,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
     {
       if(BGReverseTextAlpha < 255)
       {
-        BGBLENDFUNCTION bf;
+        BLENDFUNCTION bf;
         HBRUSH hbr;
 
         hbr = CreateSolidBrush(GetBkColor(hdcBGBuffer));

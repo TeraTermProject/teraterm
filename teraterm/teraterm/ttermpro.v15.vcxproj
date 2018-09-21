@@ -137,6 +137,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\compat_win.cpp" />
     <ClCompile Include="..\common\dlglib.c" />
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
@@ -186,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\compat_w95.h" />
+    <ClInclude Include="..\common\compat_win.h" />
     <ClInclude Include="..\common\dlglib.h" />
     <ClInclude Include="..\common\tektypes.h" />
     <ClInclude Include="..\common\teraterm.h" />

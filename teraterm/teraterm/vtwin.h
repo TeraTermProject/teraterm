@@ -1,4 +1,4 @@
-Ôªø/*
+/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
@@ -57,6 +57,10 @@ private:
   int DropListCount;
   void DropListFree();
 
+  // window attribute
+  BYTE Alpha;
+  void SetWindowAlpha(BYTE alpha);
+
 protected:
 
 public:
@@ -109,7 +113,7 @@ protected:
 	afx_msg void OnMouseMove(UINT nFlags, POINTS point);
 	afx_msg void OnMove(int x, int y);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, POINTS pt);
-//	afx_msg void OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *calcsize); // ‰Ωï„ÇÇ„Åó„Å¶„ÅÑ„Å™„ÅÑ„ÄÅ‰∏çË¶Å
+//	afx_msg void OnNcCalcSize(BOOL valid, NCCALCSIZE_PARAMS *calcsize); // âΩÇ‡ÇµÇƒÇ¢Ç»Ç¢ÅAïsóv
 	afx_msg void OnNcLButtonDblClk(UINT nHitTest, POINTS point);
 	afx_msg void OnNcRButtonDown(UINT nHitTest, POINTS point);
 	afx_msg void OnPaint();
@@ -119,7 +123,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-//	afx_msg void OnSysColorChange();		// ‰Ωï„ÇÇ„Åó„Å¶„ÅÑ„Å™„ÅÑ„ÄÅ‰∏çË¶Å
+//	afx_msg void OnSysColorChange();		// âΩÇ‡ÇµÇƒÇ¢Ç»Ç¢ÅAïsóv
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -220,7 +224,7 @@ protected:
 	afx_msg void OnWindowRestoreAll();
 	afx_msg void OnWindowUndo();
 	afx_msg void OnHelpIndex();
-//	afx_msg void OnHelpUsing();		// ÂÆü‰Ωì„Å™„Åó‰∏çË¶Å
+//	afx_msg void OnHelpUsing();		// é¿ëÃÇ»Çµïsóv
 	afx_msg void OnHelpAbout();
 	afx_msg LRESULT OnDropNotify(WPARAM ShowMenu, LPARAM lParam);
 	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);

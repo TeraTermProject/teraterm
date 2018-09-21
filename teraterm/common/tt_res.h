@@ -31,7 +31,10 @@
 #define IDC_FULLPATH_LABEL              1002
 #define IDC_LINECOPY                    1003
 #define IDC_MOUSE_CURSOR                1004
-#define IDC_ALPHA_BLEND                 1008
+#define IDC_ALPHA_BLEND_ACTIVE          1005
+#define IDC_ALPHA_BLEND_INACTIVE        1006
+#define IDC_ALPHA_BLEND_ACTIVE_LABEL    1007
+#define IDC_ALPHA_BLEND_INACTIVE_LABEL  1008
 #define IDC_CYGWIN_PATH                 1009
 #define IDC_SELECT_FILE                 1010
 #define IDC_DELIM_LIST                  1011

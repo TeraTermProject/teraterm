@@ -1717,18 +1717,67 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body)
 	*body = p1;
 }
 
-#if 0
-void dprintf(char *format, ...)
+/**
+ *	ウィンドウ上の位置を取得する
+ *	@Param[in]		hWnd
+ *	@Param[in]		point		位置(x,y)
+ *	@Param[in,out]	InWindow	ウィンドウ上
+ *	@Param[in,out]	InClient	クライアント領域上
+ *	@Param[in,out]	InTitleBar	タイトルバー上
+ *	@retval			FALSE		無効なhWnd
+ */
+BOOL GetPositionOnWindow(
+	HWND hWnd, const POINT *point,
+	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar)
 {
-	va_list args;
-	char    buffer[1024];
+	const int x = point->x;
+	const int y = point->y;
+	RECT winRect;
+	RECT clientRect;
 
-	va_start(args,format);
+	if (InWindow != NULL) *InWindow = FALSE;
+	if (InClient != NULL) *InClient = FALSE;
+	if (InTitleBar != NULL) *InTitleBar = FALSE;
 
-	_vsnprintf_s(buffer,sizeof(buffer),_TRUNCATE,format,args);
-	strncat_s(buffer,sizeof(buffer),"\n",_TRUNCATE);
+	if (!GetWindowRect(hWnd, &winRect)) {
+		return FALSE;
+	}
 
-	OutputDebugString(buffer);
+	if ((x < winRect.left) || (winRect.right < x) ||
+		(y < winRect.top) || (winRect.bottom < y))
+	{
+		return TRUE;
+	}
+	if (InWindow != NULL) *InWindow = TRUE;
+
+	{
+		POINT pos;
+		GetClientRect(hWnd, &clientRect);
+		pos.x = clientRect.left;
+		pos.y = clientRect.top;
+		ClientToScreen(hWnd, &pos);
+		clientRect.left = pos.x;
+		clientRect.top = pos.y;
+
+		pos.x = clientRect.right;
+		pos.y = clientRect.bottom;
+		ClientToScreen(hWnd, &pos);
+		clientRect.right = pos.x;
+		clientRect.bottom = pos.y;
+	}
+
+	if ((clientRect.left <= x) && (x < clientRect.right) &&
+		(clientRect.top <= y) && (y < clientRect.bottom))
+	{
+		if (InClient != NULL) *InClient = TRUE;
+		if (InTitleBar != NULL) *InTitleBar = FALSE;
+		return TRUE;
+	}
+	if (InClient != NULL) *InClient = FALSE;
+
+	if (InTitleBar != NULL) {
+		*InTitleBar = (y < clientRect.top) ? TRUE : FALSE;
+	}
+
+	return TRUE;
 }
-#endif
-

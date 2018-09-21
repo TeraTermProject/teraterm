@@ -295,7 +295,7 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 
 
 // Tera Term起動時とURL文字列mouse over時に呼ばれる (2005.4.2 yutaka)
-void SetMouseCursor(char *cursor)
+static void SetMouseCursor(const char *cursor)
 {
 	HCURSOR hc;
 	LPCTSTR name = NULL;
@@ -319,32 +319,36 @@ void SetMouseCursor(char *cursor)
 	}
 }
 
-
-void SetWindowStyle(TTTSet *ts)
+/**
+ * @param[in]	alpha	0-255
+ */
+void CVTWindow::SetWindowAlpha(BYTE alpha)
 {
-	LONG_PTR lp;
-
-	SetMouseCursor(ts->MouseCursorName);
+	if (pSetLayeredWindowAttributes == NULL) {
+		return;	// レイヤードウインドウのサポートなし
+	}
+	if (Alpha == alpha) {
+		return;	// 変化なしなら何もしない
+	}
+	LONG_PTR lp = GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
+	if (lp == 0) {
+		return;
+	}
 
 	// 2006/03/16 by 337: BGUseAlphaBlendAPIがOnならばLayered属性とする
 	//if (ts->EtermLookfeel.BGUseAlphaBlendAPI) {
 	// アルファ値が255の場合、画面のちらつきを抑えるため何もしないこととする。(2006.4.1 yutaka)
 	// 呼び出し元で、値が変更されたときのみ設定を反映する。(2007.10.19 maya)
-	if (ts->AlphaBlend < 255) {
-		lp = GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
-		if (lp != 0) {
-			SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
-			MySetLayeredWindowAttributes(HVTWin, 0, ts->AlphaBlend, LWA_ALPHA);
-		}
+	if (alpha < 255) {
+		SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
+		pSetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
 	}
-	// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
 	else {
-		lp = GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
-		if (lp != 0) {
-			SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
-			RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
-		}
+		// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
+		SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
+		::RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
 	}
+	Alpha = alpha;
 }
 
 void RegDeviceNotify(HWND hWnd)
@@ -689,7 +693,9 @@ CVTWindow::CVTWindow()
 #endif
 
 	// 例外ハンドラのフック (2007.9.30 yutaka)
+#if !defined(_M_X64)
 	SetUnhandledExceptionFilter(ApplicationFaultHandler);
+#endif
 
 	CommInit(&cv);
 	isFirstInstance = StartTeraTerm(&ts);
@@ -785,6 +791,7 @@ CVTWindow::CVTWindow()
 	Hold = FALSE;
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
+	Alpha = 255;
 
 	/* Initialize scroll buffer */
 	InitBuffer();
@@ -845,7 +852,8 @@ CVTWindow::CVTWindow()
 	SerialNo = RegWin(HVTWin,NULL);
 
 	logfile_lock_initialize();
-	SetWindowStyle(&ts);
+	SetMouseCursor(ts.MouseCursorName);
+	SetWindowAlpha(ts.AlphaBlendActive);
 	// ロケールの設定
 	// wctomb のため
 	setlocale(LC_ALL, ts.Locale);
@@ -1040,7 +1048,8 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		return;
 	}
 
-	if (mousereport = MouseReport(IdMouseEventBtnDown, LMR, p.x, p.y)) {
+	mousereport = MouseReport(IdMouseEventBtnDown, LMR, p.x, p.y);
+	if (mousereport) {
 		::SetCapture(m_hWnd);
 		return;
 	}
@@ -1651,7 +1660,7 @@ void CVTWindow::ResetSetup()
 	//
 	// AlphaBlend を即時反映できるようにする。
 	// (2016.12.24 yutaka)
-	SetWindowStyle(&ts);
+	SetWindowAlpha(ts.AlphaBlendActive);
 #else
 	DispApplyANSIColor();
 #endif
@@ -1780,7 +1789,7 @@ LRESULT CVTWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	else if ((ts.HideTitle>0) &&
 	         (message == WM_NCHITTEST)) {
 		Result = CFrameWnd::DefWindowProc(message,wParam,lParam);
-		if ((Result==HTCLIENT) && AltKey())
+		if ((Result==HTCLIENT) && AltKey()) {
 #ifdef ALPHABLEND_TYPE2
 			if(ShiftKey())
 				Result = HTBOTTOMRIGHT;
@@ -1789,6 +1798,7 @@ LRESULT CVTWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 #else
 			Result = HTCAPTION;
 #endif
+		}
 		return Result;
 	}
 
@@ -1884,6 +1894,11 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 void CVTWindow::OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized)
 {
 	DispSetActive(nState!=WA_INACTIVE);
+	if (nState == WA_INACTIVE) {
+		SetWindowAlpha(ts.AlphaBlendInactive);
+	} else {
+		SetWindowAlpha(ts.AlphaBlendActive);
+	}
 }
 
 void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -2094,7 +2109,8 @@ static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
 	char msg[128];
 
 	if (h == NULL) {
-		if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
+		h = GetModuleHandle("ttxssh.dll");
+		if (h == NULL) {
 			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 		scp_send_error:
 			::MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
@@ -2142,7 +2158,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	for (int i = 0; i < DropListCount; i++) {
 		const char *FileName = DropLists[i];
 		const DWORD attr = GetFileAttributes(FileName);
-		if (attr == -1 ) {
+		if (attr == (DWORD)-1 ) {
 			FileCount++;
 		} else if (attr & FILE_ATTRIBUTE_DIRECTORY) {
 			DirectoryCount++;
@@ -5618,8 +5634,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// サブクラス化させてリアルタイムモードにする (2008.1.21 yutaka)
 			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-			OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWL_WNDPROC);
-			SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)BroadcastEditProc);
+			OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC);
+			SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
@@ -5694,8 +5710,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					// new handler
 					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-					OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWL_WNDPROC);
-					SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)BroadcastEditProc);
+					OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC);
+					SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -5706,7 +5722,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
 					// restore old handler
-					SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)OrigBroadcastEditProc);
+					SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
@@ -5781,7 +5797,7 @@ skip:;
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
 					// 破棄されないので、以下の「ウィンドウプロシージャ戻し」は不要と思われる。(yutaka)
 #if 0
-					SetWindowLong(hwndBroadcastEdit, GWL_WNDPROC, (LONG)OrigBroadcastEditProc);
+					SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
 #endif
 
 					//EndDialog(hDlgWnd, IDOK);

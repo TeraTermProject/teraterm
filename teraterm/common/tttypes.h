@@ -549,8 +549,9 @@ struct tttset {
 	COLORREF ANSIColor[16];
 	/* protocol used in connect() */
 	int ProtocolFamily;
-  char MouseCursorName[16];
-	int AlphaBlend;
+	char MouseCursorName[16];
+	int AlphaBlendActive;
+	int AlphaBlendInactive;
 	char CygwinDirectory[MAX_PATH];
 #define DEFAULT_LOCALE "japanese"
 	char Locale[80];

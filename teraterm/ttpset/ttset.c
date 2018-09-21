@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1564,13 +1564,17 @@ DllExport void WINAPI ReadIniFile(PCHAR FName, PTTSet ts)
 	          _TRUNCATE);
 
 	// Translucent window
-	ts->AlphaBlend =
-		GetPrivateProfileInt(Section, "AlphaBlend ", 255, FName);
-	ts->AlphaBlend = max(0, ts->AlphaBlend);
-	ts->AlphaBlend = min(255, ts->AlphaBlend);
+	ts->AlphaBlendInactive =
+		GetPrivateProfileInt(Section, "AlphaBlend", 255, FName);
+	ts->AlphaBlendInactive = max(0, ts->AlphaBlendInactive);
+	ts->AlphaBlendInactive = min(255, ts->AlphaBlendInactive);
+	ts->AlphaBlendActive =
+		GetPrivateProfileInt(Section, "AlphaBlendActive", 255, FName);
+	ts->AlphaBlendActive = max(0, ts->AlphaBlendActive);
+	ts->AlphaBlendActive = min(255, ts->AlphaBlendActive);
 
 	// Cygwin install path
-	GetPrivateProfileString(Section, "CygwinDirectory ", "c:\\cygwin",
+	GetPrivateProfileString(Section, "CygwinDirectory", "c:\\cygwin",
 	                        Temp, sizeof(Temp), FName);
 	strncpy_s(ts->CygwinDirectory, sizeof(ts->CygwinDirectory), Temp,
 	          _TRUNCATE);
@@ -1582,17 +1586,17 @@ DllExport void WINAPI ReadIniFile(PCHAR FName, PTTSet ts)
 	else {
 		Temp[0] = '\0';
 	}
-	GetPrivateProfileString(Section, "ViewlogEditor ", Temp,
+	GetPrivateProfileString(Section, "ViewlogEditor", Temp,
 	                        ts->ViewlogEditor, sizeof(ts->ViewlogEditor), FName);
 
 	// Locale for UTF-8
-	GetPrivateProfileString(Section, "Locale ", DEFAULT_LOCALE,
+	GetPrivateProfileString(Section, "Locale", DEFAULT_LOCALE,
 	                        Temp, sizeof(Temp), FName);
 	strncpy_s(ts->Locale, sizeof(ts->Locale), Temp, _TRUNCATE);
 
 	// CodePage
 	ts->CodePage =
-		GetPrivateProfileInt(Section, "CodePage ", DEFAULT_CODEPAGE,
+		GetPrivateProfileInt(Section, "CodePage", DEFAULT_CODEPAGE,
 		                     FName);
 
 	// UI language message file
@@ -2292,8 +2296,10 @@ DllExport void WINAPI WriteIniFile(PCHAR FName, PTTSet ts)
 	           ts->EnableContinuedLineCopy);
 	WritePrivateProfileString(Section, "MouseCursor", ts->MouseCursorName,
 	                          FName);
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->AlphaBlend);
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->AlphaBlendInactive);
 	WritePrivateProfileString(Section, "AlphaBlend", Temp, FName);
+	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->AlphaBlendActive);
+	WritePrivateProfileString(Section, "AlphaBlendActive", Temp, FName);
 	WritePrivateProfileString(Section, "CygwinDirectory",
 	                          ts->CygwinDirectory, FName);
 	WritePrivateProfileString(Section, "ViewlogEditor", ts->ViewlogEditor,
