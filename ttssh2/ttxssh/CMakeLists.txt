@@ -99,6 +99,10 @@ link_directories(
   ${ZLIB_LIBRARY_DIRS}
   )
 
+if (MSVC)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:dnsapi.dll")
+endif()
+
 if(MINGW)
   link_directories(
 	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
@@ -125,11 +129,15 @@ target_link_libraries(
   ttxssh
   libputty
   ttpcmn
-  debug zlibstaticd.lib
-  optimized zlibstatic.lib
+  debug zlibstaticd
+  optimized zlibstatic
   ${OPENSSL_LIB}
-  ws2_32.lib
-  dnsapi.lib
+  #
+  ws2_32
+  dnsapi
+  gdi32
+  comdlg32
+  delayimp
   )
 
 ### create puttyversion.h

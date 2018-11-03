@@ -55,7 +55,7 @@ BOOL CPrnAbortDlg::Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PT
 	return TRUE;
 }
 
-void CPrnAbortDlg::OnInitDialog()
+BOOL CPrnAbortDlg::OnInitDialog()
 {
 	TTCDialog::OnInitDialog();
 
@@ -64,17 +64,17 @@ void CPrnAbortDlg::OnInitDialog()
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), m_ts->UILanguageFile);
+	return TRUE;
 }
 
-void CPrnAbortDlg::OnCancel()
+BOOL CPrnAbortDlg::OnCancel()
 {
 	*m_pAbort = TRUE;
-	TTCDialog::OnCancel();
+	return TTCDialog::OnCancel();
 }
 
-#if 0
-void CPrnAbortDlg::PostNcDestroy()
+BOOL CPrnAbortDlg::PostNcDestroy()
 {
-	TTCDialog::DestroyWindow();
+	delete this;
+	return TRUE;
 }
-#endif

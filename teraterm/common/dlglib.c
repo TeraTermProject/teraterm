@@ -28,9 +28,11 @@
  */
 
 /* Routines for dialog boxes */
-#include <windows.h>
 #include "dlglib.h"
+
 #include "i18n.h"		// for MAX_UIMSG
+#include <windows.h>
+#include <assert.h>
 #include <stdio.h>
 #include <commctrl.h>
 
@@ -360,6 +362,8 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
 {
 	int i;
+	assert(hDlgWnd != NULL);
+	assert(infoCount > 0);
 	for (i = 0 ; i < infoCount; i++) {
 		const char *key = infos[i].key;
 #if 1
@@ -370,7 +374,9 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 			if (nIDDlgItem == 0) {
 				SetWindowText(hDlgWnd, uimsg);
 			} else {
-				SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+				BOOL r;
+				r = SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+				assert(r != 0); (void)r;
 			}
 		}
 #else

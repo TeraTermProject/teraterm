@@ -45,8 +45,22 @@ public:
 	HWND GetSafeHwnd() { return m_hWnd; }
 	HDC BeginPaint(LPPAINTSTRUCT lpPaint);
 	BOOL EndPaint(LPPAINTSTRUCT lpPaint);
-	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT SendMessage(UINT msg, WPARAM wp, LPARAM lp);
+	void ShowWindow(int nCmdShow);
+	void SetWindowText(const TCHAR *str);
+	LONG_PTR SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong);
+	LONG_PTR GetWindowLongPtr(int nIndex);
+	void ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
+	void ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
+	int MessageBox(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
+	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	BOOL GetWindowRect(RECT *R);
+	BOOL SetWindowPos(HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
+	BOOL GetClientRect(RECT *R);
+	BOOL InvalidateRect(RECT *R, BOOL bErase = TRUE);
+	BOOL EndDialog(int nResult);
+	// for controls
+	HWND GetDlgItem(int id);
 	LRESULT SendDlgItemMessage(int id, UINT msg, WPARAM wp, LPARAM lp);
 	void GetDlgItemText(int id, TCHAR *buf, size_t size);
 	void SetDlgItemText(int id, const TCHAR *str);
@@ -54,14 +68,11 @@ public:
 	UINT GetCheck(int id);
 	void SetCurSel(int id, int no);
 	int GetCurSel(int id);
-	void EnableDlgItem(int id, BOOL enable);
 	void SetDlgItemInt(int id, UINT val, BOOL bSigned = TRUE);
 	UINT GetDlgItemInt(int id, BOOL* lpTrans = NULL, BOOL bSigned = TRUE) const;
-	void ShowWindow(int nCmdShow);
-	void SetWindowText(const TCHAR *str);
-	void ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
-	void ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
-	int MessageBox(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
+	void EnableDlgItem(int id, BOOL enable);
+private:
+	void ModifyStyleCom(int nStyleOffset, DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 };
 
 class TTCFrameWnd : public TTCWnd
@@ -101,21 +112,25 @@ class TTCDialog : public TTCWnd
 public:
 	TTCDialog();
 	virtual ~TTCDialog();
-	static TTCDialog *pseudoPtr;
-	static LRESULT CALLBACK ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	BOOL Create(HINSTANCE hInstance, HWND hParent, int idd);
+	INT_PTR DoModal(HINSTANCE hInstance, HWND hParent, int idd);
 	void DestroyWindow();
-	virtual void OnInitDialog();
-	virtual	void OnOK();
-	virtual void OnCancel();
-	virtual void PostNcDestroy();
+	virtual BOOL OnInitDialog();
+	virtual	BOOL OnOK();
+	virtual BOOL OnCancel();
 	virtual BOOL OnCommand(WPARAM wp, LPARAM lp);
+	virtual BOOL OnClose();
+	virtual BOOL PostNcDestroy();
+	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
 	HWND m_hParentWnd;
 
+	static LRESULT CALLBACK DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static LRESULT CALLBACK WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 private:
-	int DoModal();
 
-	static LRESULT CALLBACK OnDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+	LRESULT DlgProcBase(UINT msg, WPARAM wp, LPARAM lp);
+	LRESULT WndProcBase(UINT msg, WPARAM wp, LPARAM lp);
+	static TTCDialog *pseudoPtr;
 };
 
 class TTCPropertySheet
@@ -124,7 +139,7 @@ public:
 	TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND hParentWnd);
 	virtual ~TTCPropertySheet();
 	virtual void OnInitDialog();
-	int DoModal();
+	INT_PTR DoModal();
 	PROPSHEETHEADER m_psh;
 	HWND m_hWnd;
 	static int CALLBACK PropSheetProc(HWND hWnd, UINT msg, LPARAM lParam);
@@ -142,7 +157,7 @@ public:
 	virtual HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
 
 	PROPSHEETPAGE m_psp;
-	static BOOL CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
+	static INT_PTR CALLBACK Proc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static UINT CALLBACK PropSheetPageProc(HWND hwnd, UINT uMsg, LPPROPSHEETPAGE ppsp);
 	TTCPropertySheet *m_pSheet;
 };

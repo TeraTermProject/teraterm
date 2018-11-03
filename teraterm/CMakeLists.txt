@@ -21,15 +21,10 @@ set_target_properties(
   ttpset
   PROPERTIES FOLDER teraterm)
 
-if((${CMAKE_MAKE_PROGRAM} MATCHES "VCExpress.exe") OR MINGW)
-  message("pass ttpmacro compile")
-else()
-  # need MFC (VS2005Express does not include MFC)
-  add_subdirectory(ttpmacro)
-  set_target_properties(
-	ttpmacro
-	PROPERTIES FOLDER teraterm)
-endif()
+add_subdirectory(ttpmacro)
+set_target_properties(
+  ttpmacro
+  PROPERTIES FOLDER teraterm)
 
 add_subdirectory(ttptek)
 set_target_properties(

@@ -23,3 +23,5 @@ GPATH
 GRTAGS
 GTAGS
 **/build*/*
+*.vcproj.*.user
+teraterm/ttpdlg/svnversion.h

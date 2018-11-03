@@ -40,9 +40,9 @@ public:
 	CPrnAbortDlg();
 	~CPrnAbortDlg();
 	BOOL Create(HINSTANCE hInstance, HWND hParent, PBOOL AbortFlag, PTTSet pts);
-	void OnCancel();
-	void OnInitDialog();
-//	void PostNcDestroy();
+	BOOL OnCancel();
+	BOOL OnInitDialog();
+	BOOL PostNcDestroy();
 
 private:
 	BOOL *m_pAbort;

@@ -34,8 +34,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <sys\utime.h>
-#include <sys\stat.h>
+#include <sys/utime.h>
+#include <sys/stat.h>
 
 #include "tt_res.h"
 #include "dlglib.h"

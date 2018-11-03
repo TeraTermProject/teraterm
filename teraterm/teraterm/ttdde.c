@@ -68,7 +68,7 @@ static HSZ Item = 0;
 static HSZ Item2 = 0;
 static HWND HWndDdeCli = NULL;
 
-static StartupFlag = FALSE;
+static BOOL StartupFlag = FALSE;
 
 // for sync mode
 static BOOL SyncMode = FALSE;
@@ -335,7 +335,76 @@ WORD HexStr2Word(PCHAR Str)
 	return w;
 }
 
-HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
+#if defined(_MSC_VER) && (_MSC_VER == 1400)
+#define inline
+#endif
+inline static void Debug(char c)
+{
+	OutputDebugPrintf("%s\n",
+		c == CmdSetHWnd ? "CmdSetHWnd" :
+		c == CmdSetFile ? "CmdSetFile" :
+		c == CmdSetBinary ? "CmdSetBinary" :
+		c == CmdSetLogOpt ? "CmdSetLogOpt" :
+		c == CmdSetXmodemOpt ? "CmdSetXmodemOpt" :
+		c == CmdSetSync ? "CmdSetSync" :
+		c == CmdBPlusRecv ? "CmdBPlusRecv" :
+		c == CmdBPlusSend ? "CmdBPlusSend" :
+		c == CmdChangeDir ? "CmdChangeDir" :
+		c == CmdClearScreen ? "CmdClearScreen" :
+		c == CmdCloseWin ? "CmdCloseWin" :
+		c == CmdConnect ? "CmdConnect" :
+		c == CmdDisconnect ? "CmdDisconnect" :
+		c == CmdEnableKeyb ? "CmdEnableKeyb" :
+		c == CmdGetTitle ? "CmdGetTitle" :
+		c == CmdInit ? "CmdInit" :
+		c == CmdKmtFinish ? "CmdKmtFinish" :
+		c == CmdKmtGet ? "CmdKmtGet" :
+		c == CmdKmtRecv ? "CmdKmtRecv" :
+		c == CmdKmtSend ? "CmdKmtSend" :
+		c == CmdLoadKeyMap ? "CmdLoadKeyMap" :
+		c == CmdLogClose ? "CmdLogClose" :
+		c == CmdLogOpen ? "CmdLogOpen" :
+		c == CmdLogPause ? "CmdLogPause" :
+		c == CmdLogStart ? "CmdLogStart" :
+		c == CmdLogWrite ? "CmdLogWrite" :
+		c == CmdQVRecv ? "CmdQVRecv" :
+		c == CmdQVSend ? "CmdQVSend" :
+		c == CmdRestoreSetup ? "CmdRestoreSetup" :
+		c == CmdSendBreak ? "CmdSendBreak" :
+		c == CmdSendFile ? "CmdSendFile" :
+		c == CmdSendKCode ? "CmdSendKCode" :
+		c == CmdSetEcho ? "CmdSetEcho" :
+		c == CmdSetTitle ? "CmdSetTitle" :
+		c == CmdShowTT ? "CmdShowTT" :
+		c == CmdXmodemSend ? "CmdXmodemSend" :
+		c == CmdXmodemRecv ? "CmdXmodemRecv" :
+		c == CmdZmodemSend ? "CmdZmodemSend" :
+		c == CmdZmodemRecv ? "CmdZmodemRecv" :
+		c == CmdCallMenu ? "CmdCallMenu" :
+		c == CmdScpSend ? "CmdScpSend" :
+		c == CmdScpRcv ? "CmdScpRcv" :
+		c == CmdSetSecondFile ? "CmdSetSecondFile" :
+		c == CmdSetBaud ? "CmdSetBaud" :
+		c == CmdSetRts ? "CmdSetRts" :
+		c == CmdSetDtr ? "CmdSetDtr" :
+		c == CmdGetHostname ? "CmdGetHostname" :
+		c == CmdSendBroadcast ? "CmdSendBroadcast" :
+		c == CmdSendMulticast ? "CmdSendMulticast" :
+		c == CmdSetMulticastName ? "CmdSetMulticastName" :
+		c == CmdSetDebug ? "CmdSetDebug" :
+		c == CmdYmodemSend ? "CmdYmodemSend" :
+		c == CmdYmodemRecv ? "CmdYmodemRecv" :
+		c == CmdDispStr ? "CmdDispStr" :
+		c == CmdLogInfo ? "CmdLogInfo" :
+		c == CmdLogRotate ? "CmdLogRotate" :
+		c == CmdLogAutoClose ? "CmdLogAutoClose" :
+		c == CmdGetModemStatus ? "CmdGetModemStatus" :
+		c == CmdSetFlowCtrl ? "CmdSetFlowCtrl" :
+		"unknown"
+		);
+}
+
+static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 {
 	char Command[MaxStrLen + 1];
 	int i;
@@ -348,6 +417,7 @@ HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		(DdeGetData(Data,Command,sizeof(Command),0) == 0))
 		return DDE_FNOTPROCESSED;
 
+	Debug(Command[0]);
 	switch (Command[0]) {
 	case CmdSetHWnd:
 		GetClientHWnd(&Command[1]);
@@ -1000,9 +1070,10 @@ scp_rcv_error:
 	return (HDDEDATA)DDE_FACK;
 }
 
-HDDEDATA CALLBACK DdeCallbackProc(UINT CallType, UINT Fmt, HCONV Conv,
-                                  HSZ HSz1, HSZ HSz2, HDDEDATA Data,
-                                  DWORD Data1, DWORD Data2)
+static HDDEDATA CALLBACK DdeCallbackProc(
+	UINT CallType, UINT Fmt, HCONV Conv,
+	HSZ HSz1, HSZ HSz2, HDDEDATA Data,
+	DWORD Data1, DWORD Data2)
 {
 	HDDEDATA Result;
 

@@ -54,7 +54,7 @@ if(MINGW)
 	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
 	)
 endif()
-
+  
 add_library(
   ttpcmn
   SHARED
@@ -75,6 +75,7 @@ endif()
 
 target_link_libraries(
   ttpcmn
-  setupapi.lib
-  htmlhelp.lib
+  ole32
+  setupapi
+  htmlhelp
   )

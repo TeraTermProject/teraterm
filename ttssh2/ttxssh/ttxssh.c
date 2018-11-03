@@ -57,7 +57,7 @@
 #include <winsock2.h>
 static char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 
-#include <Lmcons.h>
+#include <lmcons.h>
 
 // include OpenSSL header file
 #include <openssl/evp.h>

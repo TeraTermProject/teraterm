@@ -33,6 +33,9 @@ set(COMMON_SRC
   ../common/dlglib_tmpl.cpp
   ../common/compat_win.cpp
   ../common/compat_win.h
+  ../common/tmfc.cpp
+  ../common/tmfc.h
+  ../common/tmfc_frame.cpp
   )
 
 source_group(
@@ -42,10 +45,6 @@ source_group(
   )
 
 set(SRC
-  tmfc.h
-  tmfc.cpp
-  tmfc_frame.cpp
-  #
   addsetting.cpp
   addsetting.h
   buffer.c
@@ -160,13 +159,17 @@ target_link_libraries(
   ttpset
   ttptek
 #  ttpdlg
-  optimized onig.lib
-  debug onigd.lib
-  Comctl32.lib
-  ws2_32.lib
-  imm32.lib
-  imagehlp.lib
-  delayimp.lib
+  optimized onig
+  debug onigd
+  #
+  gdi32
+  comctl32
+  ws2_32
+  imm32
+  imagehlp
+  delayimp
+  oleaut32
+  uuid
   )
 
 add_dependencies(

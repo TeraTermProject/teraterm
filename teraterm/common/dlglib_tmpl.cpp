@@ -29,11 +29,15 @@
 /* Routines for dialog boxes */
 
 #include "dlglib.h"
-//#include "tttypes.h"		// for TTSet
-//#include "ttwinman.h"		// for ts
 
 #include <wchar.h>
 #include <assert.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define malloc(l) _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)   _free_dbg((p), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 //#define	_countof(ary)	(sizeof(ary)/sizeof(ary[0]))
 
@@ -111,17 +115,20 @@ static size_t CopySzOrOrd(const WORD *src, WORD *dest)
 {
 	size_t size;
 	if (*src == 0x0000) {
+		// 0x0000 のとき、なにもない
 		if (dest != NULL) {
 			*dest = *src;
 		}
 		size = 1;
 	} else if (*src == 0xffff) {
+		// 0xffff のとき、1WORDのデータ
 		if (dest != NULL) {
 			*dest++ = *src++;
 			*dest++ = *src++;
 		}
 		size = 2;
 	} else {
+		// 以外はwchar_tの文字列
 		return CopySz(src, dest);
 	}
 	return size;
@@ -370,7 +377,7 @@ static size_t CopyDlgTemplateEx(
 }
 
 static DLGTEMPLATE *GetDlgTemplate(
-	HINSTANCE hInst, const DLGTEMPLATE *src,
+	const DLGTEMPLATE *src,
 	const WCHAR *FontFaceName, LONG FontHeight, BYTE FontCharSet,
 	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
@@ -420,7 +427,7 @@ static DLGTEMPLATE *GetDlgTemplate(
 	const DLGTEMPLATE *src = (DLGTEMPLATE *)::LockResource(hDlgTemplate);
 
 	DLGTEMPLATE *dest = GetDlgTemplate(
-		hInst, src,
+		src,
 		FontFaceName, FontHeight, FontCharSet,
 		PrevTemplSize, NewTemplSize);
 
@@ -441,7 +448,7 @@ void TTSetDlgFont(const wchar_t *face, int height, int charset)
 		FontFaceName[0] = L'\0';
 	}
 	FontHeight = height;
-	FontCharSet = charset;
+	FontCharSet = (BYTE)charset;
 }
 
 void TTSetDlgFont(const char *face, int height, int charset)
@@ -452,38 +459,16 @@ void TTSetDlgFont(const char *face, int height, int charset)
 		FontFaceName[0] = L'\0';
 	}
 	FontHeight = height;
-	FontCharSet = charset;
-}
-
-#if 0
-static void initFont()
-{
-	LOGFONT logfont;
-	BOOL result;
-	result = GetI18nLogfont("Tera Term", "DLG_TAHOMA_FONT", &logfont, 72, ts.UILanguageFile);
-	if (!result) {
-		result = GetI18nLogfont("Tera Term", "DLG_SYSTEM_FONT", &logfont, 72, ts.UILanguageFile);
-	}
-
-	if (result) {
-		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-	} else {
-		TTSetDlgFont((wchar_t *)NULL, 0, 0);
-	}
-}
-#endif
-static void initFont()
-{
-	TTSetDlgFont(L"ＭＳ Ｐゴシック",12,128);
+	FontCharSet = (BYTE)charset;
 }
 
 DLGTEMPLATE *TTGetNewDlgTemplate(
 	HINSTANCE hInst, const DLGTEMPLATE *src,
 	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
-	initFont();
+	(void)hInst;
 	DLGTEMPLATE *DlgTemplate =
-		GetDlgTemplate(hInst, src,
+		GetDlgTemplate(src,
 					   FontFaceName, FontHeight, FontCharSet,
 					   PrevTemplSize, NewTemplSize);
 
@@ -492,10 +477,34 @@ DLGTEMPLATE *TTGetNewDlgTemplate(
 
 DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCSTR lpTemplateName)
 {
-	initFont();
 	DLGTEMPLATE *DlgTemplate =
 		GetDlgTemplate(hInst, lpTemplateName,
 					   FontFaceName, FontHeight, FontCharSet,
 					   NULL, NULL);
 	return DlgTemplate;
+}
+
+/*
+ *	ダイアログテンプレートのクラス名取得
+ *	@retval		クラス文字列
+ *	@retval		NULL クラスなし
+ */
+const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl)
+{
+	const WORD *src = (const WORD *)DlgTempl;
+	if (*src != 1) {
+		// DLGTEMPLATE
+		src += sizeof(DLGTEMPLATE) / sizeof(WORD);
+	} else {
+		// DLGTEMPLATEEX
+		src += sizeof(DLGTEMPLATEEX) / sizeof(WORD);
+	}
+	size_t t = CopySzOrOrd(src, NULL);	// menu
+	src += t;
+
+	if (*src == L'\0') {
+		// no class name
+		return NULL;
+	}
+	return (wchar_t *)src;
 }

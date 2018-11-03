@@ -36,7 +36,8 @@ set_target_properties(
 target_link_libraries(
   ttxkanjimenu
   ttpcmn
-  ws2_32.lib
+  #
+  ws2_32
   )
 
 

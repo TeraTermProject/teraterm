@@ -51,10 +51,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <shlobj.h>
+#include <crtdbg.h>
 
 #include "winjump.h"
 #include "teraterm.h"
 #include "tttypes.h"
+
+#ifdef _DEBUG
+#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
+#define _strdup(s)	_strdup_dbg(s, _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 #define MAX_JUMPLIST_ITEMS 30 /* PuTTY will never show more items in
                                * the jumplist than this, regardless of
@@ -385,9 +392,11 @@ static const IID IID_IShellLink = {
     0x000214ee, 0x0000, 0x0000, {0xc0,0x00,0x00,0x00,0x00,0x00,0x00,0x46}
 };
 #endif
+#if __MINGW64_VERSION_MAJOR < 7
 static const IID IID_ICustomDestinationList = {
     0x6332debf, 0x87b5, 0x4670, {0x90,0xc0,0x5e,0x57,0xb4,0x08,0xa4,0x9e}
 };
+#endif
 #if !defined(__MINGW32__)
 static const IID IID_IObjectArray = {
     0x92ca9dcd, 0x5622, 0x4bba, {0xa8,0x05,0x5e,0x9f,0x54,0x1b,0xd8,0xc9}

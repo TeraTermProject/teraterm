@@ -31,10 +31,21 @@
  */
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <wspiapi.h>
 #include <windows.h>
 #include <process.h>
-#include "WSAASyncGetAddrInfo.h"
+#include "WSAAsyncGetAddrInfo.h"
 #include "ttwsk.h"
+
+struct getaddrinfo_args {
+	HWND hWnd;
+	unsigned int wMsg;
+	char *hostname;
+	char *portname;
+	struct addrinfo hints;
+	struct addrinfo **res;
+	HANDLE *lpHandle;
+};
 
 static unsigned __stdcall getaddrinfo_thread(void * p);
 

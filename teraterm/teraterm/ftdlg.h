@@ -49,10 +49,10 @@ public:
 	enum { IDD = IDD_FILETRANSDLG };
 
 protected:
-	virtual void OnCancel();
+	virtual BOOL OnCancel();
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	virtual void PostNcDestroy();
-	virtual void OnInitDialog();
+	virtual BOOL PostNcDestroy();
+	virtual BOOL OnInitDialog();
 
 private:
 	PFileVar fv;

@@ -36,6 +36,7 @@
 #include <mbstring.h>
 #include <locale.h>
 #include <ctype.h>
+#include <crtdbg.h>
 
 #include "buffer.h"
 #include "ttwinman.h"
@@ -52,6 +53,14 @@
 #include "clipboar.h"
 
 #include "vtterm.h"
+
+#ifdef _DEBUG
+#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 void ParseFirst(BYTE b);
 

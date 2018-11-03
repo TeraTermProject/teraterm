@@ -702,7 +702,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style;
 	HMENU SysMenu;
 
-	Style = GetWindowLong (HTEKWin, GWL_STYLE);
+	Style = GetWindowLongPtr (GWL_STYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	if (TBar == (ts.HideTitle==0)) {
 		return 0;
@@ -715,7 +715,7 @@ LRESULT CTEKWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 		Style = Style & ~WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX;
 	}
 	tk.AdjustSize = TRUE;
-	SetWindowLong (HTEKWin, GWL_STYLE, Style);
+	SetWindowLongPtr (GWL_STYLE, Style);
 	::SetWindowPos (HTEKWin, NULL, 0, 0, 0, 0,
 	                SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	::ShowWindow (HTEKWin, SW_SHOW);

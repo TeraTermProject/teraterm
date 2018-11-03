@@ -25,6 +25,8 @@ add_library(
 target_link_libraries(
   TTXttyplay
   ttpcmn
+  #
+  comdlg32
   )
 
 add_library(
@@ -34,6 +36,12 @@ add_library(
   gettimeofday.h
   ReadMe.txt
   ReadMe-ja.txt
+  )
+
+target_link_libraries(
+  TTXttyrec
+  ttpcmn
+  comdlg32
   )
 
 set_target_properties(

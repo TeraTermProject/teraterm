@@ -36,7 +36,7 @@
 #include <io.h>
 #include <direct.h>
 #include <commdlg.h>
-#include <Dlgs.h>
+#include <dlgs.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"

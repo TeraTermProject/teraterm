@@ -73,10 +73,12 @@ endif()
 target_link_libraries(
   ttptek
   ttpcmn
-  debug sfmtd.lib
-  optimized sfmt.lib
-  iphlpapi.lib
-  htmlhelp.lib
+  debug sfmtd
+  optimized sfmt
+  #
+  iphlpapi
+  htmlhelp
+  gdi32
   )
 
 add_dependencies(

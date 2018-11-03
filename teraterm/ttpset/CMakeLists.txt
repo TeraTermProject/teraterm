@@ -58,6 +58,8 @@ endif()
 target_link_libraries(
   ttpset
   ttpcmn
+  #
+  gdi32
   )
 
 add_dependencies(

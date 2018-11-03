@@ -97,8 +97,11 @@ set_target_properties(
 target_link_libraries(
   ttproxy
   ttpcmn
-  ws2_32.lib
-  version.lib
+  #
+  ws2_32
+  version
+  gdi32
+  comdlg32
   )
 
 

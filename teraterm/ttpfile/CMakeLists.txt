@@ -76,6 +76,9 @@ endif()
 target_link_libraries(
   ttpfile
   ttpcmn
+  #
+  gdi32
+  comdlg32
   )
 
 add_dependencies(

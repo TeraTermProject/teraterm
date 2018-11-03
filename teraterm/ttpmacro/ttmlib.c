@@ -33,7 +33,7 @@
 #include "ttlib.h"
 #include <string.h>
 #include <direct.h>
-#include <Shlobj.h>
+#include <shlobj.h>
 
 static char CurrentDir[MAXPATHLEN];
 
@@ -215,4 +215,30 @@ void BringupWindow(HWND hWnd)
 		BringWindowToTop(hWnd);
 		AttachThreadInput(thisThreadId, fgThreadId, FALSE);
 	}
+}
+
+/**
+ * •¶Žš‚ð•`‰æ‚µ‚½Žž‚Ç‚ñ‚È”ÍˆÍ‚É‚È‚é‚©ŒvŽZ‚·‚é
+ */
+void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize)
+{
+	HDC TmpDC = GetDC(hWnd);
+	HFONT prevFont = NULL;
+	if (Font) {
+		prevFont = (HFONT)SelectObject(TmpDC, Font);
+	}
+	CalcTextExtent(TmpDC, (PCHAR)Text, textSize);
+	if (Font && prevFont != NULL) {
+		SelectObject(TmpDC, prevFont);
+	}
+	ReleaseDC(hWnd, TmpDC);
+}
+
+int MessageBoxHaltScript(HWND hWnd, const char *UILanguageFile)
+{
+	char uimsg[MAX_UIMSG];
+	char uimsg2[MAX_UIMSG];
+	get_lang_msg("MSG_MACRO_CONF", uimsg, sizeof(uimsg), "MACRO: confirmation", UILanguageFile);
+	get_lang_msg("MSG_MACRO_HALT_SCRIPT", uimsg2, sizeof(uimsg2), "Are you sure that you want to halt this macro script?", UILanguageFile);
+	return MessageBox(hWnd, uimsg2, uimsg, MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
 }

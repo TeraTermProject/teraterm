@@ -71,7 +71,7 @@
 
 #include <windowsx.h>
 #include <imm.h>
-#include <Dbt.h>
+#include <dbt.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -266,34 +266,6 @@ static HINSTANCE AfxGetInstanceHandle()
 	return hInst;
 }
 
-static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
-{
-	typedef BOOL (WINAPI *func)(HWND,COLORREF,BYTE,DWORD);
-	static HMODULE g_hmodUser32 = NULL;
-	static func g_pSetLayeredWindowAttributes = NULL;
-	char user32_dll[MAX_PATH];
-
-	GetSystemDirectory(user32_dll, sizeof(user32_dll));
-	strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
-	if (g_hmodUser32 == NULL) {
-		g_hmodUser32 = LoadLibrary(user32_dll);
-		if (g_hmodUser32 == NULL) {
-			return FALSE;
-		}
-
-		g_pSetLayeredWindowAttributes =
-			(func)GetProcAddress(g_hmodUser32, "SetLayeredWindowAttributes");
-	}
-
-	if (g_pSetLayeredWindowAttributes == NULL) {
-		return FALSE;
-	}
-
-	return g_pSetLayeredWindowAttributes(hwnd, crKey,
-	                                     bAlpha, dwFlags);
-}
-
-
 // Tera Term起動時とURL文字列mouse over時に呼ばれる (2005.4.2 yutaka)
 static void SetMouseCursor(const char *cursor)
 {
@@ -330,7 +302,7 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	if (Alpha == alpha) {
 		return;	// 変化なしなら何もしない
 	}
-	LONG_PTR lp = GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
+	LONG_PTR lp = GetWindowLongPtr(GWL_EXSTYLE);
 	if (lp == 0) {
 		return;
 	}
@@ -340,12 +312,12 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	// アルファ値が255の場合、画面のちらつきを抑えるため何もしないこととする。(2006.4.1 yutaka)
 	// 呼び出し元で、値が変更されたときのみ設定を反映する。(2007.10.19 maya)
 	if (alpha < 255) {
-		SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
+		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
 		pSetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
 	}
 	else {
 		// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
-		SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
+		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
 		::RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
 	}
 	Alpha = alpha;
@@ -434,6 +406,7 @@ static const char *GetExceptionString(DWORD exception)
 #undef EXCEPTION
 }
 
+#if !defined(_M_X64)
 /* 例外発生時に関数の呼び出し履歴を表示する、例外フィルタ関数 */
 static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 {
@@ -585,6 +558,7 @@ error:
 //	return (EXCEPTION_EXECUTE_HANDLER);  /* そのままプロセスを終了させる */
 	return (EXCEPTION_CONTINUE_SEARCH);  /* 引き続き［アプリケーションエラー］ポップアップメッセージボックスを呼び出す */
 }
+#endif // !defined(_M_X64 )
 
 
 // Virtual Storeが有効であるかどうかを判別する。
@@ -687,10 +661,6 @@ CVTWindow::CVTWindow()
 #endif
 	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
-
-#ifdef _DEBUG
-	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
 
 	// 例外ハンドラのフック (2007.9.30 yutaka)
 #if !defined(_M_X64)
@@ -861,9 +831,9 @@ CVTWindow::CVTWindow()
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI
 	if(BGNoFrame && ts.HideTitle > 0) {
-		ExStyle  = GetWindowLong(HVTWin,GWL_EXSTYLE);
+		ExStyle  = ::GetWindowLong(HVTWin,GWL_EXSTYLE);
 		ExStyle &= ~WS_EX_CLIENTEDGE;
-		SetWindowLong(HVTWin,GWL_EXSTYLE,ExStyle);
+		::SetWindowLong(HVTWin,GWL_EXSTYLE,ExStyle);
 	}
 //-->
 #endif
@@ -3529,8 +3499,8 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 	DWORD Style,ExStyle;
 	HMENU SysMenu;
 
-	Style = GetWindowLong (HVTWin, GWL_STYLE);
-	ExStyle = GetWindowLong (HVTWin, GWL_EXSTYLE);
+	Style = ::GetWindowLongPtr (HVTWin, GWL_STYLE);
+	ExStyle = ::GetWindowLongPtr (HVTWin, GWL_EXSTYLE);
 	TBar = ((Style & WS_SYSMENU)!=0);
 	if (TBar == (ts.HideTitle==0)) {
 		return 0;
@@ -3566,9 +3536,9 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 #endif
 
 	AdjustSize = TRUE;
-	SetWindowLong(HVTWin, GWL_STYLE, Style);
+	::SetWindowLong(HVTWin, GWL_STYLE, Style);
 #ifdef ALPHABLEND_TYPE2
-	SetWindowLong(HVTWin, GWL_EXSTYLE, ExStyle);
+	::SetWindowLong(HVTWin, GWL_EXSTYLE, ExStyle);
 #endif
 	::SetWindowPos(HVTWin, NULL, 0, 0, 0, 0,
 	               SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);

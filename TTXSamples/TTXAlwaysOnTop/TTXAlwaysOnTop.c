@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <Windows.h>
+#include <windows.h>
 
 #include "compat_w95.h"
 

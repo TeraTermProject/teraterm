@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <Windows.h>
+#include <windows.h>
 #include <commctrl.h>
 #include <time.h>
 
@@ -694,12 +694,12 @@ void CVisualPropPageDlg::OnInitDialog()
 	int sel = 0;
 	for (int i = 0 ; MouseCursor[i].name ; i++) {
 		const TCHAR *name = MouseCursor[i].name;
-		SendDlgItemMessage(IDC_MOUSE_CURSOR, LB_INSERTSTRING, i, (LPARAM)name);
+		SendDlgItemMessage(IDC_MOUSE_CURSOR, CB_ADDSTRING, i, (LPARAM)name);
 		if (_tcscmp(name, ts.MouseCursorName) == 0) {
 			sel = i;
 		}
 	}
-	SendDlgItemMessage(IDC_MOUSE_CURSOR, LB_SETCURSEL, sel, 0);
+	SetCurSel(IDC_MOUSE_CURSOR, sel);
 
 	// (4)Font quality
 	switch (ts.FontQuality) {
@@ -724,7 +724,7 @@ void CVisualPropPageDlg::OnInitDialog()
 	}
 	SetupRGBbox(GetSafeHwnd(), 0);
 	SendDlgItemMessage(IDC_ANSI_COLOR, LB_SETCURSEL, 0, 0);
-	InvalidateRect(GetDlgItem(m_hWnd, IDC_SAMPLE_COLOR), NULL, TRUE);
+	::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 
 	// (6)Bold Attr Color
 	SetCheck(IDC_ENABLE_ATTR_COLOR_BOLD, (ts.ColorFlag&CF_BOLDCOLOR) != 0);
@@ -745,7 +745,7 @@ void CVisualPropPageDlg::OnInitDialog()
 	SetCheck(IDC_URL_UNDERLINE, (ts.FontFlag&FF_URLUNDERLINE) != 0);
 
 	// ダイアログにフォーカスを当てる
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND_ACTIVE));
+	::SetFocus(GetDlgItem(IDC_ALPHA_BLEND_ACTIVE));
 }
 
 BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -835,7 +835,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			sel = SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
 				SetupRGBbox(GetSafeHwnd(), sel);
-				InvalidateRect(GetDlgItem(m_hWnd, IDC_SAMPLE_COLOR), NULL, TRUE);
+				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
 			return TRUE;
 
@@ -865,7 +865,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 255を超えたRGB値は補正されるので、それをEditに表示する (2007.2.18 maya)
 				SetupRGBbox(GetSafeHwnd(), sel);
 
-				InvalidateRect(GetDlgItem(m_hWnd, IDC_SAMPLE_COLOR), NULL, TRUE);
+				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
 
 			return TRUE;
@@ -876,7 +876,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 {
-	if ( hWnd == GetDlgItem(m_hWnd, IDC_SAMPLE_COLOR) ) {
+	if ( hWnd == GetDlgItem(IDC_SAMPLE_COLOR) ) {
 		BYTE r, g, b;
 		char buf[8];
 
@@ -942,7 +942,7 @@ void CVisualPropPageDlg::OnOK()
 	}
 
 	// (3)
-	sel = SendDlgItemMessage(IDC_MOUSE_CURSOR, LB_GETCURSEL, 0, 0);
+	sel = GetCurSel(IDC_MOUSE_CURSOR);
 	if (sel >= 0 && sel < MOUSE_CURSOR_MAX) {
 		strncpy_s(ts.MouseCursorName, sizeof(ts.MouseCursorName), MouseCursor[sel].name, _TRUNCATE);
 	}

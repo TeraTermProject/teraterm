@@ -49,6 +49,7 @@ See LICENSE.TXT for the license.
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <wspiapi.h>
 /* actual body of in6addr_any and in6addr_loopback is disappeared?? */
 #undef IN6_IS_ADDR_LOOPBACK
 #define IN6_IS_ADDR_LOOPBACK(a)         \

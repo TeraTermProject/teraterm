@@ -34,4 +34,6 @@ set_target_properties(
 target_link_libraries(
   TTXRecurringCommand
   ttpcmn
+  #
+  gdi32
   )

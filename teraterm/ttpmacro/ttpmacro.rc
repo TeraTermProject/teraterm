@@ -1,13 +1,15 @@
 // Microsoft Visual C++ generated resource script.
 //
+#include <windows.h>
 #include "ttm_res.h"
+#define IDC_STATIC 0
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+//#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -85,13 +87,13 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,54,36,34,14
 END
 
-IDD_MSGDLG DIALOGEX 0, 0, 80, 43
-STYLE DS_SETFONT | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+IDD_MSGDLG DIALOGEX 0, 0, 81, 43
+STYLE DS_SETFONT | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 FONT 14, "System", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,0,31,35,12
     LTEXT           "",IDC_MSGTEXT,0,8,65,9,SS_NOPREFIX
-    PUSHBUTTON      "No",IDCLOSE,45,31,35,12,NOT WS_VISIBLE
+    PUSHBUTTON      "No",IDCANCEL,45,31,35,12,NOT WS_VISIBLE
 END
 
 IDD_STATDLG DIALOGEX 0, 0, 52, 25
@@ -108,8 +110,8 @@ FONT 14, "System", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
-    LISTBOX         IDC_LISTBOX,7,7,104,49,LBS_SORT | LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
-    LTEXT           "Static",IDC_STATIC,7,63,172,15
+    LISTBOX         IDC_LISTBOX,7,7,104,49,LBS_USETABSTOPS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    LTEXT           "Static",IDC_LISTTEXT,7,63,172,15
 END
 
 
@@ -119,7 +121,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_CTRLWIN, DIALOG
     BEGIN
@@ -129,6 +131,15 @@ BEGIN
     IDD_ERRDLG, DIALOG
     BEGIN
         RIGHTMARGIN, 260
+    END
+
+    IDD_INPDLG, DIALOG
+    BEGIN
+    END
+
+    IDD_MSGDLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 80
     END
 
     IDD_LISTDLG, DIALOG
@@ -150,7 +161,25 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_TTMACRO             ICON                    "ttmacro.ico"
+
 IDI_TTMACRO_3D          ICON                    "ttmacro_3d.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_INPDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_MSGDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -59,7 +59,7 @@ BOOL CProtoDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet p
 /////////////////////////////////////////////////////////////////////////////
 // CProtoDlg message handler
 
-void CProtoDlg::OnInitDialog()
+BOOL CProtoDlg::OnInitDialog()
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_PROT_FILENAME, "DLG_PROT_FILENAME" },
@@ -70,12 +70,14 @@ void CProtoDlg::OnInitDialog()
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), m_pts->UILanguageFile);
+	return TRUE;
 }
 
 
-void CProtoDlg::OnCancel()
+BOOL CProtoDlg::OnCancel()
 {
 	::PostMessage(fv->HMainWin,WM_USER_PROTOCANCEL,0,0);
+	return TRUE;
 }
 
 BOOL CProtoDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -89,7 +91,8 @@ BOOL CProtoDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void CProtoDlg::PostNcDestroy()
+BOOL CProtoDlg::PostNcDestroy()
 {
 	delete this;
+	return TRUE;
 }

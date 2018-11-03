@@ -57,6 +57,9 @@ HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
 				  const char *UILanguageFile, PCHAR key);
 
 ////////////////////////////////////////
+void TTSetDlgFont(const char *face, int height, int charset);
+//void TTSetDlgFont(const wchar_t *face, int height, int charset);
+const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
 DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCSTR lpTemplateName);
 DLGTEMPLATE *TTGetNewDlgTemplate(
 	HINSTANCE hInst, const DLGTEMPLATE *src,

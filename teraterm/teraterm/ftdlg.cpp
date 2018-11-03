@@ -30,7 +30,7 @@
 /* TERATERM.EXE, file transfer dialog box */
 #include <stdio.h>
 #include <windows.h>
-#include <Commctrl.h>
+#include <commctrl.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
@@ -55,7 +55,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	ts = pts;
 
 	wc.style = CS_PARENTDC;
-	wc.lpfnWndProc = TTCDialog::ProcStub;
+	wc.lpfnWndProc = TTCDialog::WndProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = DLGWINDOWEXTRA;
 	wc.hInstance = hInstance;
@@ -158,7 +158,7 @@ void CFileTransDlg::RefreshNum()
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg message handler
 
-void CFileTransDlg::OnInitDialog()
+BOOL CFileTransDlg::OnInitDialog()
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ IDC_TRANS_FILENAME, "DLG_FILETRANS_FILENAME" },
@@ -203,11 +203,13 @@ void CFileTransDlg::OnInitDialog()
 						IMAGE_ICON, 0, 0, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
 				  (LPARAM)BigIcon);
+	return TRUE;
 }
 
-void CFileTransDlg::OnCancel( )
+BOOL CFileTransDlg::OnCancel( )
 {
 	::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
+	return TRUE;
 }
 
 BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -227,7 +229,7 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void CFileTransDlg::PostNcDestroy()
+BOOL CFileTransDlg::PostNcDestroy()
 {
 	// logopenとlogcloseを繰り返すと、GDIリソースリークとなる問題を修正した。
 	//   - LoadImage()によるアイコンリソースを解放する。
@@ -243,4 +245,5 @@ void CFileTransDlg::PostNcDestroy()
 	}
 
 	delete this;
+	return TRUE;
 }

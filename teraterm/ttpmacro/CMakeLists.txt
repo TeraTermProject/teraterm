@@ -21,6 +21,16 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h
+  ../common/tmfc.cpp
+  ../common/tmfc.h
+  ../common/tmfc_frame.cpp
+  ../common/dlglib.h
+  ../common/dlglib.c
+  ../common/dlglib_tmpl.cpp
+  ../common/dlglib_cpp.cpp
+  ../common/compat_w95.h
+  ../common/compat_win.h
+  ../common/compat_win.cpp
   )
 
 source_group(
@@ -30,6 +40,8 @@ source_group(
   )
 
 set(SRC
+  #
+  ttm_res.h
   errdlg.cpp
   errdlg.h
   inpdlg.cpp
@@ -40,7 +52,6 @@ set(SRC
   msgdlg.h
   statdlg.cpp
   statdlg.h
-  stdafx.h
   ttl.c
   ttl.h
   ttm_res.h
@@ -83,10 +94,14 @@ link_directories(
 
 set(CMAKE_MFC_FLAG 1)
 
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:nafxcw.lib /NODEFAULTLIB:LIBCMT.lib")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:nafxcwd.lib /NODEFAULTLIB:LIBCMTD.lib")
-if (${MSVC})
+if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll")
+endif()
+
+if(MINGW)
+  link_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
+	)
 endif()
 
 add_executable(
@@ -97,16 +112,17 @@ add_executable(
 target_link_libraries(
   ttpmacro
   ttpcmn
-  optimized nafxcw.lib
-  debug nafxcwd.lib
-  optimized LIBCMT.lib
-  debug LIBCMTD.lib
-  optimized onig.lib
-  debug onigd.lib
-  optimized sfmt.lib
-  debug sfmtd.lib
-  iphlpapi.lib
-  delayimp.lib
+  optimized onig
+  debug onigd
+  optimized sfmt
+  debug sfmtd
+  #
+  iphlpapi
+  delayimp
+  ws2_32
+  comctl32
+  gdi32
+  comdlg32
   )
 
 add_dependencies(

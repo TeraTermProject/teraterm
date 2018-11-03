@@ -40,10 +40,10 @@ public:
 
 	enum { IDD = IDD_PROTDLG };
 protected:
-	virtual void OnCancel( );
+	virtual BOOL OnCancel();
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	virtual void OnInitDialog();
-	virtual void PostNcDestroy();
+	virtual BOOL OnInitDialog();
+	virtual BOOL PostNcDestroy();
 private:
 	PFileVar fv;
 	TTTSet *m_pts;

@@ -29,6 +29,7 @@
 
 /* TERATERM.EXE, main */
 
+#include <crtdbg.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "commlib.h"
@@ -46,6 +47,7 @@
 #include "keyboard.h"
 #include "compat_win.h"
 #include "compat_w95.h"
+#include "dlglib.h"
 
 static void init()
 {
@@ -206,16 +208,70 @@ BOOL CallOnIdle(LONG lCount)
 	return OnIdle(lCount);
 }
 
+HINSTANCE GetInstance()
+{
+	return hInst;
+}
+
+static HWND main_window;
+HWND GetHWND()
+{
+	return main_window;
+}
+
+static void SetDialogFont()
+{
+	LOGFONT logfont;
+	BOOL result;
+	result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, ts.UILanguageFile);
+	if (result == FALSE) {
+		NONCLIENTMETRICSA ncm = {sizeof ncm};
+		result = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0);
+		if (result == TRUE) {
+			logfont = ncm.lfMessageFont;
+		}
+	}
+	if (result == FALSE) {
+		result = GetI18nLogfont("Tera Term", "DLG_TAHOMA_FONT", &logfont, 72, ts.UILanguageFile);
+		if (result == FALSE) {
+			result = GetI18nLogfont("Tera Term", "DLG_SYSTEM_FONT", &logfont, 72, ts.UILanguageFile);
+		}
+	}
+
+#if 0
+	TTSetDlgFont(L"MS Shell Dlg2", 8, 128);
+	TTSetDlgFont(L"MS Shell Dlg", 8, 128);
+	TTSetDlgFont(L"Yu Gothic UI",12,128);	// windows 10
+	TTSetDlgFont(L"Meiryo UI",12,128);		// Windows 7,8
+	TTSetDlgFont(L"ƒƒCƒŠƒI",10,128);
+	TTSetDlgFont(L"MS UI Gothic",10,128);
+	TTSetDlgFont(L"‚l‚r ‚oƒSƒVƒbƒN",12,128);
+	TTSetDlgFont(L"Segoe UI",10,128);
+#endif
+
+	if (result) {
+		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	} else {
+		TTSetDlgFont(NULL, 0, 0);
+	}
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
+#ifdef _DEBUG
+	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 	LONG lCount = 0;
 	DWORD SleepTick = 1;
 	init();
 	hInst = hInstance;
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
+	main_window = m_pMainWnd->m_hWnd;
 	ShowWindow(m_pMainWnd->m_hWnd, nCmdShow);
+	SetDialogFont();
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
@@ -252,5 +308,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			}
 		}
 	}
-    return (msg.wParam);
+	delete m_pMainWnd;
+	m_pMainWnd = NULL;
+
+    return msg.wParam;
 }
