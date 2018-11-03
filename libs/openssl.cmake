@@ -20,6 +20,12 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -P openssl.cmake
 	  )
 	return()
+  elseif("$ENV{MSYSTEM}" MATCHES "MINGW32")
+	# mingw on msys2
+	# single-configuration
+	if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+	  set(CMAKE_BUILD_TYPE Release)
+	endif()
   elseif("${CMAKE_GENERATOR}" MATCHES "Unix Makefiles")
 	# mingw
 	# single-configuration
@@ -78,13 +84,21 @@ file(DOWNLOAD
 
 ########################################
 
-find_program(
-  PERL perl.exe
-  HINTS c:/Perl64/bin
-  HINTS c:/Perl/bin
-  HINTS c:/cygwin/usr/bin
-  HINTS c:/cygwin64/usr/bin
-  )
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+  find_program(
+	PERL perl
+	)
+else()
+  # CYGWIN 
+  find_program(
+	PERL perl.exe
+	HINTS c:/Perl64/bin
+	HINTS c:/Perl/bin
+	HINTS c:/cygwin/usr/bin
+	HINTS c:/cygwin64/usr/bin
+	)
+endif()
+
 if(${PERL} STREQUAL "PERL-NOTFOUND")
   message(FATAL_ERROR "perl not found")
 endif()
@@ -220,19 +234,32 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   endif()
 else()
   ######################################## MinGW
-  find_program(
-	MAKE make.exe
-	HINTS c:/cygwin/usr/bin
-	HINTS c:/cygwin64/usr/bin
-	)
-  include(${CMAKE_SOURCE_DIR}/../mingw.toolchain.cmake)
-  set(ENV{PREFIX} i686-w64-mingw32)
-  set(ENV{CC} ${CMAKE_C_COMPILER})
-  set(ENV{CXX} ${CMAKE_CXX_COMPILER})
-  set(ENV{AR} "i686-w64-mingw32-ar")
-  set(ENV{RANLIB} "i686-w64-mingw32-ranlib")
+  if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+	find_program(
+	  MAKE make
+	  )
+  else()
+	find_program(
+	  MAKE make.exe
+	  HINTS c:/cygwin/usr/bin
+	  HINTS c:/cygwin64/usr/bin
+	  )
+  endif()
+  set(ENV{PATH} "/usr/bin;/bin")
+  if("$ENV{MSYSTEM}" MATCHES "MINGW32")
+	set(CMAKE_C_COMPILER "cc")
+	set(PATH "/mingw32/bin:/usr/local/bin:/usr/bin:/bin")
+	message("compiler ${CMAKE_C_COMPILER} ${CMAKE_CXX_COMPILER}")
+  else()
+	include(${CMAKE_SOURCE_DIR}/../mingw.toolchain.cmake)
+	set(ENV{PREFIX} i686-w64-mingw32)
+	set(ENV{CC} ${CMAKE_C_COMPILER})
+	set(ENV{AR} "i686-w64-mingw32-ar")
+	set(ENV{RANLIB} "i686-w64-mingw32-ranlib")
+	set(PATH "/usr/bin:/bin")
+  endif()
   execute_process(
-	COMMAND ${PERL} ./Configure mingw --prefix=${INSTALL_DIR}
+	COMMAND ${CMAKE_COMMAND} -E env "PATH=/usr/bin:/bin" ${PERL} ./Configure mingw --prefix=${INSTALL_DIR}
 	WORKING_DIRECTORY ${SRC_DIR}
 	RESULT_VARIABLE rv
 	)
@@ -240,7 +267,7 @@ else()
 	message(FATAL_ERROR "cmake configure fail ${rv}")
   endif()
   execute_process(
-	COMMAND ${MAKE}
+	COMMAND ${CMAKE_COMMAND} -E env "PATH=${PATH}" ${MAKE} CC=${CMAKE_C_COMPILER}
 	WORKING_DIRECTORY ${SRC_DIR}
 	RESULT_VARIABLE rv
 	)
@@ -248,7 +275,7 @@ else()
 	message(FATAL_ERROR "cmake build fail ${rv}")
   endif()
   execute_process(
-	COMMAND ${MAKE} install
+	COMMAND ${CMAKE_COMMAND} -E env "PATH=${PATH}" ${MAKE} install
 	WORKING_DIRECTORY ${SRC_DIR}
 	RESULT_VARIABLE rv
 	)

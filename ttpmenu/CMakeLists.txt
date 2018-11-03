@@ -31,8 +31,11 @@ add_executable(
 
 target_link_libraries(
   ttpmenu
-  version.lib
-  comctl32.lib
+  version
+  comctl32
+  user32
+  gdi32
+  comdlg32
   )
 
 

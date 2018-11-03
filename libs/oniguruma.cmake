@@ -20,6 +20,11 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -P oniguruma.cmake
 	  )
 	return()
+  elseif("$ENV{MSYSTEM}" MATCHES "MINGW32")
+	# mingw on msys2
+	if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+	  set(CMAKE_BUILD_TYPE Release)
+	endif()
   elseif("${CMAKE_GENERATOR}" MATCHES "Unix Makefiles")
 	# mingw
 	# single-configuration

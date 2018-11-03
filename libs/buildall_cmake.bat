@@ -42,7 +42,7 @@ if "%no%" == "5" set GENERATOR="Visual Studio 10 2010" & goto build_all
 if "%no%" == "6" set GENERATOR="Visual Studio 9 2008" & goto build_all
 if "%no%" == "7" set GENERATOR="Visual Studio 8 2005" & goto build_all
 if "%no%" == "9" set GENERATOR="NMake Makefiles" & set OPT=-DCMAKE_BUILD_TYPE=Release & goto build_all
-if "%no%" == "z" set GENERATOR="Unix Makefiles" & goto build_all
+if "%no%" == "z" set GENERATOR="Unix Makefiles" & set OPT=-DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake & goto build_all
 echo ? retry
 goto retry_vs
 

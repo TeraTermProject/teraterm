@@ -32,7 +32,8 @@
 #include "tmfc.h"
 #include "ttlib.h"
 
-#if defined(_MSC_VER) && (_MSC_VER <= 1500)
+#if (defined(_MSC_VER) && (_MSC_VER <= 1500)) || \
+	(__cplusplus <= 199711L)
 #define nullptr NULL	// C++11,nullptr / > VS2010
 #endif
 
