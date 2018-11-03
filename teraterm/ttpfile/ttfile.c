@@ -270,7 +270,7 @@ static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		ofn = (LPOPENFILENAME)lParam;
 		pl = (LPLONG)(ofn->lCustData);
 		opt = *pl;
-		SetWindowLongPtr(Dialog, DWLP_USER, (LONG)pl);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pl);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -602,7 +602,7 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	case WM_INITDIALOG:
 		ofn = (LPOPENFILENAME)lParam;
 		pw = (LPWORD)ofn->lCustData;
-		SetWindowLong(Dialog, DWL_USER, (LONG)pw);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG_PTR)pw);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -629,7 +629,7 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			pw = (LPWORD)GetWindowLong(Dialog,DWL_USER);
+			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pw!=NULL)
 				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
 			if (DlgFoptFont != NULL) {
@@ -647,7 +647,7 @@ static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARA
 		notify = (LPOFNOTIFY)lParam;
 		switch (notify->hdr.code) {
 		case CDN_FILEOK:
-			pw = (LPWORD)GetWindowLong(Dialog,DWL_USER);
+			pw = (LPWORD)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pw!=NULL)
 				GetRB(Dialog,pw,IDC_FOPTBIN,IDC_FOPTBIN);
 			if (DlgFoptFont != NULL) {
@@ -822,7 +822,7 @@ static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 	switch (Message) {
 	case WM_INITDIALOG:
 		fv = (PFileVar)lParam;
-		SetWindowLong(Dialog, DWL_USER, lParam);
+		SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 		SendDlgItemMessage(Dialog, IDC_GETFN, EM_LIMITTEXT, sizeof(TempFull)-1,0);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
@@ -857,7 +857,7 @@ static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 		return TRUE;
 
 	case WM_COMMAND:
-		fv = (PFileVar)GetWindowLong(Dialog,DWL_USER);
+		fv = (PFileVar)GetWindowLongPtr(Dialog,DWLP_USER);
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			if (fv!=NULL) {
@@ -985,7 +985,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	case WM_INITDIALOG:
 		ofn = (LPOPENFILENAME)lParam;
 		pl = (LPLONG)ofn->lCustData;
-		SetWindowLong(Dialog, DWL_USER, (LONG)pl);
+		SetWindowLongPtr(Dialog, DWLP_USER, (LONG)pl);
 
 		font = (HFONT)SendMessage(Dialog, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
@@ -1042,7 +1042,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	case WM_COMMAND: // for old style dialog
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
+			pl = (LPLONG)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pl!=NULL)
 			{
 				if (LOWORD(*pl)==0xFFFF) { // Send
@@ -1077,7 +1077,7 @@ static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 		notify = (LPOFNOTIFY)lParam;
 		switch (notify->hdr.code) {
 		case CDN_FILEOK:
-			pl = (LPLONG)GetWindowLong(Dialog,DWL_USER);
+			pl = (LPLONG)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (pl!=NULL) {
 				if (LOWORD(*pl) == 0xFFFF) { // Send
 					Lo = 0xFFFF;

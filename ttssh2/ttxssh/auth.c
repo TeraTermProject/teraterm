@@ -78,7 +78,7 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 		}
 	}
 
-	return CallWindowProc((WNDPROC) GetWindowLong(control, GWL_USERDATA),
+	return CallWindowProc((WNDPROC) GetWindowLongPtr(control, GWLP_USERDATA),
 	                      control, msg, wParam, lParam);
 }
 
@@ -86,9 +86,9 @@ static void init_password_control(HWND dlg)
 {
 	HWND passwordControl = GetDlgItem(dlg, IDC_SSHPASSWORD);
 
-	SetWindowLong(passwordControl, GWL_USERDATA,
-	              SetWindowLong(passwordControl, GWL_WNDPROC,
-	                            (LONG) password_wnd_proc));
+	SetWindowLongPtr(passwordControl, GWLP_USERDATA,
+	              SetWindowLongPtr(passwordControl, GWLP_WNDPROC,
+	                            (LONG_PTR) password_wnd_proc));
 
 	SetFocus(passwordControl);
 }
@@ -691,7 +691,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->auth_state.auth_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_auth_dlg(pvar, dlg);
 
@@ -748,7 +748,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;			/* because we set the focus */
 
 	case WM_TIMER:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLong(dlg, DWLP_USER);
 		// 認証準備ができてから、認証データを送信する。早すぎると、落ちる。(2004.12.16 yutaka)
 		if (wParam == IDC_TIMER1) {
 			// 自動ログインのため
@@ -839,7 +839,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLong(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -1145,7 +1145,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
 		pvar->auth_state.auth_dialog = dlg;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_TIS_dlg(pvar, dlg);
 
@@ -1171,7 +1171,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLong(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -1366,7 +1366,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 	switch (msg) {
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_default_auth_dlg(pvar, dlg);
 
@@ -1398,7 +1398,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLong(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:

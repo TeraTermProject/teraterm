@@ -655,8 +655,8 @@ void init_password_control(HWND dlg, int item)
 {
 	HWND passwordControl = GetDlgItem(dlg, item);
 
-	SetWindowLong(passwordControl, GWL_USERDATA,
-	              SetWindowLong(passwordControl, GWL_WNDPROC,
+	SetWindowLong(passwordControl, GWLP_USERDATA,
+	              SetWindowLong(passwordControl, GWLP_WNDPROC,
 	                            (LONG) password_wnd_proc));
 }
 
@@ -2076,7 +2076,7 @@ BOOL ManageWMCommand_Config(HWND hWnd, WPARAM wParam)
 	case BUTTON_ETC:
 		::GetDlgItemText(hWnd, EDIT_ENTRY, g_JobInfo.szName, MAX_PATH);
 		g_JobInfo.bTtssh	= ::IsDlgButtonChecked(hWnd, CHECK_TTSSH);
-		if (::DialogBox(g_hI, (LPCTSTR) DIALOG_ETC, hWnd, DlgCallBack_Etc) == TRUE) {
+		if (::DialogBox(g_hI, (LPCTSTR) DIALOG_ETC, hWnd, (DLGPROC)DlgCallBack_Etc) == TRUE) {
 			::CheckDlgButton(hWnd, CHECK_TTSSH, 0);
 			if ((pt = lstrstri(g_JobInfo.szTeraTerm, TTSSH)) != NULL)
 				if (::lstrcmpi(pt, TTSSH) == 0)
@@ -2279,13 +2279,13 @@ BOOL ManageWMCommand_Menu(HWND hWnd, WPARAM wParam)
 
 	switch(LOWORD(wParam)) {
 	case ID_TMENU_ADD:
-		::DialogBox(g_hI, (LPCTSTR) DIALOG_CONFIG, 0, DlgCallBack_Config);
+		::DialogBox(g_hI, (LPCTSTR) DIALOG_CONFIG, 0, (DLGPROC)DlgCallBack_Config);
 		return TRUE;
 	case ID_TMENU_CLOSE:
 		::DestroyWindow(hWnd);
 		return	TRUE;
 	case ID_VERSION:
-		::DialogBox(g_hI, (LPCTSTR) DIALOG_VERSION, hWnd, DlgCallBack_Version);
+		::DialogBox(g_hI, (LPCTSTR) DIALOG_VERSION, hWnd, (DLGPROC)DlgCallBack_Version);
 		return TRUE;
 	case ID_ICON:
 		if (GetMenuState(g_hConfigMenu, ID_ICON, MF_BYCOMMAND & MF_CHECKED) != 0) {

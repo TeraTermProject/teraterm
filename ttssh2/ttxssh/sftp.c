@@ -1073,8 +1073,8 @@ static LRESULT CALLBACK OnSftpConsoleDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, 
 			SetFocus(hEdit);
 
 			// エディットコントロールのサブクラス化
-			hEditProc = (WNDPROC)GetWindowLong(hEdit, GWL_WNDPROC);
-			SetWindowLong(hEdit, GWL_WNDPROC, (LONG)EditProc);
+			hEditProc = (WNDPROC)GetWindowLong(hEdit, GWLP_WNDPROC);
+			SetWindowLong(hEdit, GWLP_WNDPROC, (LONG)EditProc);
 
 			return TRUE;
 

@@ -982,7 +982,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		closure = (FWDEditClosure *) lParam;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		pvar = closure->pvar;
 		init_fwd_edit_dlg(pvar, closure->spec, dlg);
@@ -1020,7 +1020,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
-		closure = (FWDEditClosure *) GetWindowLong(dlg, DWL_USER);
+		closure = (FWDEditClosure *) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
@@ -1147,7 +1147,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		pvar = (PTInstVar) lParam;
-		SetWindowLong(dlg, DWL_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_fwd_dlg(pvar, dlg);
 
@@ -1171,7 +1171,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar) GetWindowLong(dlg, DWL_USER);
+		pvar = (PTInstVar) GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
