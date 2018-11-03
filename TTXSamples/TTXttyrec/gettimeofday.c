@@ -7,11 +7,9 @@
 #define FTEPOCHDIFF 116444736000000000LL
 #endif
 
-int gettimeofday(struct timeval *tv, struct timezone *tz) {
+int gettimeofday(struct timeval *tv /*, struct timezone *tz*/ ) {
 	FILETIME ft;
 	__int64 t;
-	long tzsec;
-	int dst;
 
 	if (tv) {
 		GetSystemTimeAsFileTime(&ft);
@@ -20,7 +18,10 @@ int gettimeofday(struct timeval *tv, struct timezone *tz) {
 		tv->tv_usec = (long)(t % 1000000);
 	}
 
+#if 0
 	if (tz) {
+		long tzsec;
+		int dst;
 		if (_get_timezone(&tzsec) == 0 && _get_daylight(&dst) == 0) {
 			tz->tz_minuteswest = tzsec / 60;
 			tz->tz_dsttime = dst;
@@ -29,6 +30,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz) {
 			return -1;
 		}
 	}
+#endif
 
 	return 0;
 }
