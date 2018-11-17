@@ -196,9 +196,8 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			if (IsDlgButtonChecked(hDlgWnd, IDC_SCP_RADIO) == BST_CHECKED) {
 				// SCP
 				DlgData->Param->DropType = DROP_TYPE_SCP;
-				SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_GETTEXT,
-							(WPARAM)DlgData->Param->ScpSendDirSize,
-							(LPARAM)DlgData->Param->ScpSendDirPtr);
+				GetDlgItemTextA(hDlgWnd, IDC_SCP_PATH,
+								DlgData->Param->ScpSendDirPtr, DlgData->Param->ScpSendDirSize);
 			} else if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_RADIO) == BST_CHECKED) {
 				// Send File
 				DlgData->Param->DropType =

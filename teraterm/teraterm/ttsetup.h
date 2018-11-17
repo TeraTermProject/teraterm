@@ -47,7 +47,7 @@ typedef void (WINAPI *PParseParam)
 typedef void (WINAPI *PCopySerialList)
   (PCHAR IniSrc, PCHAR IniDest, PCHAR section, PCHAR key, int MaxList);
 typedef void (WINAPI *PAddValueToList)
-  (PCHAR FName, PCHAR Host, PCHAR section, PCHAR key, int MaxList);
+  (const PCHAR FName, const PCHAR Host, const PCHAR section, const PCHAR key, int MaxList);
 
 extern PReadIniFile ReadIniFile;
 extern PWriteIniFile WriteIniFile;

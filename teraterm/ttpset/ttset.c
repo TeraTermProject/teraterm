@@ -3726,8 +3726,8 @@ DllExport void WINAPI CopySerialList(
 }
 
 DllExport void WINAPI AddValueToList(
-	PCHAR FName, PCHAR Host, PCHAR section,
-	PCHAR key, int MaxList)
+	const PCHAR FName, const PCHAR Host, const PCHAR section,
+	const PCHAR key, int MaxList)
 {
 	HANDLE MemH;
 	PCHAR MemP;
