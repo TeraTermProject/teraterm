@@ -1,5 +1,8 @@
 project(teraterm)
 
+option(USE_UNICODE_API "unicode" ON)
+option(LINK_UNICOWS "unicode APIs for 9x" ON)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
@@ -10,11 +13,15 @@ if (MSVC)
   string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
 endif ()
 
-option(USE_UNICODE_API "unicode" ON)
 
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
+if(LINK_UNICOWS)
+#  set(UNICOWS_LIB "${CMAKE_SOURCE_DIR}/libs/unicows_mingw/liblibunicows.a")
+  set(UNICOWS_LIB "${CMAKE_SOURCE_DIR}/libs/libunicows-1.1.2-msvc6/unicows.lib")
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
@@ -140,7 +147,6 @@ include_directories(
   )
 
 link_directories(
-#  ${PROJECT_SOURCE_DIR}/libs/unicows_mingw/liblibunicows.a
   ${ONIGURUMA_LIBRARY_DIRS}
   ${SFMT_LIBRARY_DIRS}
   )
@@ -168,6 +174,7 @@ set_target_properties(
 
 target_link_libraries(
   teraterm
+  ${UNICOWS_LIB}
   ttpcmn
   ttpfile
   ttpset
