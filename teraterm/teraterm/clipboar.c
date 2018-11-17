@@ -1015,7 +1015,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 						if (CBMemPtr == NULL) {
 							CBMemPtr = GlobalLock(CBMemHandle);
 						}
-						GetDlgItemTextA(hDlgWnd, IDC_EDIT, GlobalSize(CBMemHandle), (LPARAM)CBMemPtr);
+						GetDlgItemTextA(hDlgWnd, IDC_EDIT, CBMemPtr, GlobalSize(CBMemHandle));
 						result = IDOK;
 					}
 

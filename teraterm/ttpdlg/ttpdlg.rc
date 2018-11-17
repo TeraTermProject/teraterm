@@ -42,7 +42,6 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "#include ""ttpdlg-version.rc""\r\n"
     "\0"
 END
 
@@ -454,7 +453,6 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "ttpdlg-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

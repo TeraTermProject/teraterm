@@ -106,7 +106,6 @@ set(SRC
   ttplug.h
   ttsetup.c
   ttsetup.h
-  tt-version.rc
   ttwinman.c
   ttwinman.h
   ttwsk.c
