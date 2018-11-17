@@ -51,6 +51,7 @@ set(SRC
   commlib.h
   dnddlg.cpp
   dnddlg.h
+  dnddlg.rc
   filesys.cpp
   filesys.h
   ftdlg.cpp
