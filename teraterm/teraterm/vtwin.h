@@ -32,7 +32,7 @@
 #ifdef __cplusplus
 
 #include "tmfc.h"
-//class CVTWindow : public CFrameWnd
+
 class CVTWindow : public TTCFrameWnd
 {
 private:
@@ -53,7 +53,7 @@ private:
     SetupMenu, ControlMenu, WinMenu, HelpMenu;
 
   // drag and drop handle
-  char **DropLists;
+  TCHAR **DropLists;
   int DropListCount;
   void DropListFree();
 

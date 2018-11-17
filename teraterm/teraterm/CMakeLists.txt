@@ -10,6 +10,11 @@ if (MSVC)
   string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
 endif ()
 
+option(USE_UNICODE_API "unicode" ON)
+
+if(USE_UNICODE_API)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
@@ -32,12 +37,26 @@ set(COMMON_SRC
   ../common/tmfc.cpp
   ../common/tmfc.h
   ../common/tmfc_frame.cpp
+  ../common/i18n.c
+  ../common/i18n.h
   )
 
 source_group(
   "common"
   FILES
   ${COMMON_SRC}
+  )
+
+set(TTDLG_SRC
+  ../ttpdlg/dlg_res.h
+  ../ttpdlg/ttdlg.c
+  ../ttpdlg/ttpdlg.rc
+  )
+
+source_group(
+  "ttdlg"
+  FILES
+  ${TTDLG_SRC}
   )
 
 set(SRC
@@ -107,10 +126,8 @@ set(SRC
   #
   ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
   #
-  ../ttpdlg/ttdlg.c
-  ../ttpdlg/ttpdlg.rc
-  #
   ${COMMON_SRC}
+  ${TTDLG_SRC}
   )
 
 include_directories(
@@ -124,6 +141,7 @@ include_directories(
   )
 
 link_directories(
+#  ${PROJECT_SOURCE_DIR}/libs/unicows_mingw/liblibunicows.a
   ${ONIGURUMA_LIBRARY_DIRS}
   ${SFMT_LIBRARY_DIRS}
   )

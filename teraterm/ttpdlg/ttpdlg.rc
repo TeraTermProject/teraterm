@@ -239,7 +239,7 @@ BEGIN
     CONTROL         "(C) 2004-2018 TeraTerm Project",IDC_PROJECT_LABEL,
                     "Static",SS_LEFTNOWORDWRAP | WS_GROUP,39,67,122,9
     LTEXT           "Includes:",IDC_INLUCDE_LABEL,39,26,31,8
-    LTEXT           "Version",IDC_TT_VERSION,39,12,101,8
+    LTEXT           "Version",IDC_TT_VERSION,39,12,127,8
     RTEXT           "Author:",IDC_AUTHOR_LABEL,5,106,28,8
     LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,106,128,8,SS_NOTIFY | WS_TABSTOP
     RTEXT           "Forum:",IDC_FORUM_LABEL,5,115,25,8
@@ -454,7 +454,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-//#include "ttpdlg-version.rc"
+#include "ttpdlg-version.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

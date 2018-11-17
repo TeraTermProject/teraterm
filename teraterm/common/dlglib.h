@@ -44,7 +44,7 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId);
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num);
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *prog);
 void SetDlgTime(HWND HDlg, int id_Item, DWORD elapsed, int bytes);
-void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR *List[], int nsel);
+void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
@@ -55,12 +55,13 @@ typedef struct {
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
 				  const char *UILanguageFile, PCHAR key);
+void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 
 ////////////////////////////////////////
 void TTSetDlgFont(const char *face, int height, int charset);
 //void TTSetDlgFont(const wchar_t *face, int height, int charset);
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
-DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCSTR lpTemplateName);
+DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName);
 DLGTEMPLATE *TTGetNewDlgTemplate(
 	HINSTANCE hInst, const DLGTEMPLATE *src,
 	size_t *PrevTemplSize, size_t *NewTemplSize);

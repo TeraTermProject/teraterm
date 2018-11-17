@@ -35,6 +35,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <time.h>
+#include <tchar.h>
 
 #include "addsetting.h"
 #include "teraterm.h"
@@ -45,6 +46,15 @@
 #include "dlglib.h"
 #include "compat_win.h"
 
+#undef GetDlgItemText
+#define GetDlgItemText GetDlgItemTextA
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef MessageBox
+#define MessageBox MessageBoxA
+#undef SendDlgItemMessage
+#define SendDlgItemMessage SendDlgItemMessageA
+
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
 	{"IBEAM", IDC_IBEAM},
@@ -54,26 +64,18 @@ const mouse_cursor_t MouseCursor[] = {
 };
 #define MOUSE_CURSOR_MAX (sizeof(MouseCursor)/sizeof(MouseCursor[0]) - 1)
 
-static void SetupRGBbox(HWND hDlgWnd, int index)
+void CVisualPropPageDlg::SetupRGBbox(int index)
 {
-	HWND hWnd;
 	BYTE c;
-	char buf[10];
 
-	hWnd = GetDlgItem(hDlgWnd, IDC_COLOR_RED);
 	c = GetRValue(ts.ANSIColor[index]);
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", c);
-	SendMessage(hWnd, WM_SETTEXT , 0, (LPARAM)buf);
+	SetDlgItemNum(IDC_COLOR_RED, c);
 
-	hWnd = GetDlgItem(hDlgWnd, IDC_COLOR_GREEN);
 	c = GetGValue(ts.ANSIColor[index]);
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", c);
-	SendMessage(hWnd, WM_SETTEXT , 0, (LPARAM)buf);
+	SetDlgItemNum(IDC_COLOR_GREEN, c);
 
-	hWnd = GetDlgItem(hDlgWnd, IDC_COLOR_BLUE);
 	c = GetBValue(ts.ANSIColor[index]);
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", c);
-	SendMessage(hWnd, WM_SETTEXT , 0, (LPARAM)buf);
+	SetDlgItemNum(IDC_COLOR_BLUE, c);
 }
 
 // CGeneralPropPageDlg ダイアログ
@@ -81,9 +83,10 @@ static void SetupRGBbox(HWND hDlgWnd, int index)
 CGeneralPropPageDlg::CGeneralPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CGeneralPropPageDlg::IDD, sheet)
 {
-	get_lang_msg("DLG_TABSHEET_TITLE_GENERAL", ts.UIMsg, sizeof(ts.UIMsg),
-	             "General", ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE_GENERAL", UIMsg, _countof(UIMsg),
+	             _T("General"), ts.UILanguageFile);
+	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
@@ -127,9 +130,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 	SetCheck(IDC_ACCEPT_BROADCAST, ts.AcceptBroadcast);
 
 	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	char buf[64];
-	_snprintf_s(buf, sizeof(buf), "%d", ts.MouseWheelScrollLine);
-	SetDlgItemText(IDC_SCROLL_LINE, buf);
+	SetDlgItemNum(IDC_SCROLL_LINE, ts.MouseWheelScrollLine);
 
 	// (5)IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE
 	SetCheck(IDC_AUTOSCROLL_ONLY_IN_BOTTOM_LINE, ts.AutoScrollOnlyInBottomLine);
@@ -157,7 +158,7 @@ void CGeneralPropPageDlg::OnInitDialog()
 
 void CGeneralPropPageDlg::OnOK()
 {
-	char buf[64];
+	TCHAR buf[64];
 	int val;
 
 	// (1)
@@ -170,8 +171,8 @@ void CGeneralPropPageDlg::OnOK()
 	ts.AcceptBroadcast = GetCheck(IDC_ACCEPT_BROADCAST);
 
 	// (4)IDC_MOUSEWHEEL_SCROLL_LINE
-	GetDlgItemText(IDC_SCROLL_LINE, buf, sizeof(buf));
-	val = atoi(buf);
+	GetDlgItemTextT(IDC_SCROLL_LINE, buf, _countof(buf));
+	val = _tstoi(buf);
 	if (val > 0)
 		ts.MouseWheelScrollLine = val;
 
@@ -205,9 +206,10 @@ void CGeneralPropPageDlg::OnOK()
 CSequencePropPageDlg::CSequencePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CSequencePropPageDlg::IDD, sheet)
 {
-	get_lang_msg("DLG_TABSHEET_TITLE_SEQUENCE", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Control Sequence", ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE_SEQUENCE", UIMsg, _countof(UIMsg),
+	             _T("Control Sequence"), ts.UILanguageFile);
+	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
@@ -389,9 +391,10 @@ void CSequencePropPageDlg::OnOK()
 CCopypastePropPageDlg::CCopypastePropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CCopypastePropPageDlg::IDD, sheet)
 {
-	get_lang_msg("DLG_TABSHEET_TITLE_COPYPASTE", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Copy and Paste", ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE_COPYPASTE", UIMsg, _countof(UIMsg),
+				  _T("Copy and Paste"), ts.UILanguageFile);
+	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
@@ -453,7 +456,7 @@ void CCopypastePropPageDlg::OnInitDialog()
 	SetCheck(IDC_CONFIRM_CHANGE_PASTE, (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE)?BST_CHECKED:BST_UNCHECKED);
 
 	// ファイルパス
-	SetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
+	SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
 	if (ts.PasteFlag & CPF_CONFIRM_CHANGEPASTE) {
 		EnableDlgItem(IDC_CONFIRM_STRING_FILE, TRUE);
 		EnableDlgItem(IDC_CONFIRM_STRING_FILE_PATH, TRUE);
@@ -463,12 +466,12 @@ void CCopypastePropPageDlg::OnInitDialog()
 	}
 
 	// (9)delimiter characters
-	SetDlgItemText(IDC_DELIM_LIST, ts.DelimList);
+	SetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList);
 
 	// (10)PasteDelayPerLine
 	char buf[64];
 	_snprintf_s(buf, sizeof(buf), "%d", ts.PasteDelayPerLine);
-	SetDlgItemText(IDC_PASTEDELAY_EDIT, buf);
+	SetDlgItemNum(IDC_PASTEDELAY_EDIT, ts.PasteDelayPerLine);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_LINECOPY));
@@ -496,7 +499,7 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 		case IDC_CONFIRM_STRING_FILE_PATH | (BN_CLICKED << 16):
 			{
-				OPENFILENAME ofn;
+				OPENFILENAMEA ofn;
 
 				memset(&ofn, 0, sizeof(ofn));
 				ofn.lStructSize = get_OPENFILENAME_SIZE();
@@ -510,8 +513,8 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				             "Choose a file including strings for ConfirmChangePaste", ts.UILanguageFile);
 				ofn.lpstrTitle = uimsg;
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_FORCESHOWHIDDEN | OFN_HIDEREADONLY;
-				if (GetOpenFileName(&ofn) != 0) {
-					SetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
+				if (GetOpenFileNameA(&ofn) != 0) {
+					SetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile);
 				}
 			}
 			return TRUE;
@@ -578,13 +581,13 @@ void CCopypastePropPageDlg::OnOK()
 	else {
 		ts.PasteFlag &= ~CPF_CONFIRM_CHANGEPASTE;
 	}
-	GetDlgItemText(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
+	GetDlgItemTextA(IDC_CONFIRM_STRING_FILE, ts.ConfirmChangePasteStringFile, sizeof(ts.ConfirmChangePasteStringFile));
 
 	// (9)
-	GetDlgItemText(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
+	GetDlgItemTextA(IDC_DELIM_LIST, ts.DelimList, sizeof(ts.DelimList));
 
 	// (10)
-	GetDlgItemText(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
+	GetDlgItemTextA(IDC_PASTEDELAY_EDIT, buf, sizeof(buf));
 	val = atoi(buf);
 	ts.PasteDelayPerLine =
 		(val < 0) ? 0 :
@@ -597,9 +600,10 @@ void CCopypastePropPageDlg::OnOK()
 CVisualPropPageDlg::CVisualPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CVisualPropPageDlg::IDD, sheet)
 {
-	get_lang_msg("DLG_TABSHEET_TITLE_VISUAL", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Visual", ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE_VISUAL", UIMsg, _countof(UIMsg),
+	             _T("Visual"), ts.UILanguageFile);
+	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
@@ -650,18 +654,18 @@ void CVisualPropPageDlg::OnInitDialog()
 
 	// (1)AlphaBlend
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendActive);
-	SetDlgItemText(IDC_ALPHA_BLEND_ACTIVE, buf);
+	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendInactive);
-	SetDlgItemText(IDC_ALPHA_BLEND_INACTIVE, buf);
+	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, ts.AlphaBlendInactive);
 
 	// (2)[BG] BGEnable
 	SetCheck(IDC_ETERM_LOOKFEEL, ts.EtermLookfeel.BGEnable);
 
 	// Eterm look-feelの背景画像指定。
-	SetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath);
+	SetDlgItemTextA(IDC_BGIMG_EDIT, ts.BGImageFilePath);
 
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.BGImgBrightness);
-	SetDlgItemText(IDC_EDIT_BGIMG_BRIGHTNESS, buf);
+	SetDlgItemNum(IDC_EDIT_BGIMG_BRIGHTNESS, ts.BGImgBrightness);
 
 	if (ts.EtermLookfeel.BGEnable) {
 		EnableDlgItem(IDC_BGIMG_CHECK, TRUE);
@@ -693,9 +697,9 @@ void CVisualPropPageDlg::OnInitDialog()
 	// (3)Mouse cursor type
 	int sel = 0;
 	for (int i = 0 ; MouseCursor[i].name ; i++) {
-		const TCHAR *name = MouseCursor[i].name;
-		SendDlgItemMessage(IDC_MOUSE_CURSOR, CB_ADDSTRING, i, (LPARAM)name);
-		if (_tcscmp(name, ts.MouseCursorName) == 0) {
+		const char *name = MouseCursor[i].name;
+		SendDlgItemMessageA(IDC_MOUSE_CURSOR, CB_ADDSTRING, i, (LPARAM)name);
+		if (strcmp(name, ts.MouseCursorName) == 0) {
 			sel = i;
 		}
 	}
@@ -720,9 +724,9 @@ void CVisualPropPageDlg::OnInitDialog()
 	// (5)ANSI color
 	for (int i = 0 ; i < 16 ; i++) {
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", i);
-		SendDlgItemMessage(IDC_ANSI_COLOR, LB_INSERTSTRING, i, (LPARAM)buf);
+		SendDlgItemMessageA(IDC_ANSI_COLOR, LB_INSERTSTRING, i, (LPARAM)buf);
 	}
-	SetupRGBbox(GetSafeHwnd(), 0);
+	SetupRGBbox(0);
 	SendDlgItemMessage(IDC_ANSI_COLOR, LB_SETCURSEL, 0, 0);
 	::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 
@@ -781,7 +785,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 無効化されたら、BGThemeFile を元に戻す。
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// 背景画像も無効化する。
-				SetDlgItemText(IDC_BGIMG_EDIT, "");
+				SetDlgItemTextT(IDC_BGIMG_EDIT, _T(""));
 				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
 			}
 			return TRUE;
@@ -805,7 +809,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				// 無効化されたら、BGThemeFile を元に戻す。
 				strncpy_s(ts.EtermLookfeel.BGThemeFile, BG_THEME_IMAGEFILE_DEFAULT, sizeof(ts.EtermLookfeel.BGThemeFile));
 				// 背景画像も無効化する。
-				SetDlgItemText(IDC_BGIMG_EDIT, "");
+				SetDlgItemTextT(IDC_BGIMG_EDIT, _T(""));
 				SetDlgItemInt(IDC_EDIT_BGIMG_BRIGHTNESS, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT);
 			}
 			return TRUE;
@@ -813,7 +817,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_BGIMG_BUTTON | (BN_CLICKED << 16):
 			// 背景画像をダイアログで指定する。
 			{
-				OPENFILENAME ofn;
+				OPENFILENAMEA ofn;
 				char szFile[MAX_PATH];
 
 				memset(&ofn, 0, sizeof(ofn));
@@ -825,8 +829,8 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				ofn.nMaxFile = _countof(szFile);
 				ofn.lpstrTitle = "select image file";
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-				if (GetOpenFileName(&ofn) != 0) {
-					SetDlgItemText(IDC_BGIMG_EDIT, szFile);
+				if (GetOpenFileNameA(&ofn) != 0) {
+					SetDlgItemTextA(IDC_BGIMG_EDIT, szFile);
 				}
 			}
 			return TRUE;
@@ -834,7 +838,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDC_ANSI_COLOR | (LBN_SELCHANGE << 16):
 			sel = SendDlgItemMessage(IDC_ANSI_COLOR, LB_GETCURSEL, 0, 0);
 			if (sel != -1) {
-				SetupRGBbox(GetSafeHwnd(), sel);
+				SetupRGBbox(sel);
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
 			return TRUE;
@@ -851,19 +855,19 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 					return TRUE;
 				}
 
-				GetDlgItemText(IDC_COLOR_RED, buf, sizeof(buf));
+				GetDlgItemTextA(IDC_COLOR_RED, buf, sizeof(buf));
 				r = atoi(buf);
 
-				GetDlgItemText(IDC_COLOR_GREEN, buf, sizeof(buf));
+				GetDlgItemTextA(IDC_COLOR_GREEN, buf, sizeof(buf));
 				g = atoi(buf);
 
-				GetDlgItemText(IDC_COLOR_BLUE, buf, sizeof(buf));
+				GetDlgItemTextA(IDC_COLOR_BLUE, buf, sizeof(buf));
 				b = atoi(buf);
 
 				ts.ANSIColor[sel] = RGB(r, g, b);
 
 				// 255を超えたRGB値は補正されるので、それをEditに表示する (2007.2.18 maya)
-				SetupRGBbox(GetSafeHwnd(), sel);
+				SetupRGBbox(sel);
 
 				::InvalidateRect(GetDlgItem(IDC_SAMPLE_COLOR), NULL, TRUE);
 			}
@@ -880,13 +884,13 @@ HBRUSH CVisualPropPageDlg::OnCtlColor(HDC hDC, HWND hWnd)
 		BYTE r, g, b;
 		char buf[8];
 
-		GetDlgItemText(IDC_COLOR_RED, buf, sizeof(buf));
+		GetDlgItemTextA(IDC_COLOR_RED, buf, sizeof(buf));
 		r = atoi(buf);
 
-		GetDlgItemText(IDC_COLOR_GREEN, buf, sizeof(buf));
+		GetDlgItemTextA(IDC_COLOR_GREEN, buf, sizeof(buf));
 		g = atoi(buf);
 
-		GetDlgItemText(IDC_COLOR_BLUE, buf, sizeof(buf));
+		GetDlgItemTextA(IDC_COLOR_BLUE, buf, sizeof(buf));
 		b = atoi(buf);
 
 		SetBkMode(hDC, TRANSPARENT);
@@ -905,14 +909,14 @@ void CVisualPropPageDlg::OnOK()
 	int flag_changed = 0;
 
 	// (1)
-	GetDlgItemText(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
+	GetDlgItemTextA(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
 		int i = atoi(buf);
 		ts.AlphaBlendActive =
 			(i < 0) ? 0 :
 			(i > 255) ? 255 : i;
 	}
-	GetDlgItemText(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
+	GetDlgItemTextA(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
 		int i = atoi(buf);
 		ts.AlphaBlendInactive = 
@@ -928,12 +932,12 @@ void CVisualPropPageDlg::OnOK()
 		ts.EtermLookfeel.BGEnable = GetCheck(IDC_ETERM_LOOKFEEL);
 	}
 	if (ts.EtermLookfeel.BGEnable) {
-		GetDlgItemText(IDC_BGIMG_EDIT, ts.BGImageFilePath, sizeof(ts.BGImageFilePath));
+		GetDlgItemTextA(IDC_BGIMG_EDIT, ts.BGImageFilePath, sizeof(ts.BGImageFilePath));
 	} else {
 		strncpy_s(ts.BGImageFilePath, sizeof(ts.BGImageFilePath), "%SystemRoot%\\Web\\Wallpaper\\*.bmp", _TRUNCATE);
 	}
 
-	GetDlgItemText(IDC_EDIT_BGIMG_BRIGHTNESS, buf, sizeof(buf));
+	GetDlgItemTextA(IDC_EDIT_BGIMG_BRIGHTNESS, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
 		int i = atoi(buf);
 		ts.BGImgBrightness = 
@@ -1028,9 +1032,10 @@ void CVisualPropPageDlg::OnOK()
 CLogPropPageDlg::CLogPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CLogPropPageDlg::IDD, sheet)
 {
-	get_lang_msg("DLG_TABSHEET_TITLE_Log", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Log", ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE_Log", UIMsg, _countof(UIMsg),
+	             _T("Log"), ts.UILanguageFile);
+	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
@@ -1090,13 +1095,13 @@ void CLogPropPageDlg::OnInitDialog()
 
 
 	// Viewlog Editor path (2005.1.29 yutaka)
-	SetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
+	SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 
 	// Log Default File Name (2006.8.28 maya)
-	SetDlgItemText(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultName);
+	SetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, ts.LogDefaultName);
 
 	// Log Default File Path (2007.5.30 maya)
-	SetDlgItemText(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath);
+	SetDlgItemTextA(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath);
 
 	/* Auto start logging (2007.5.31 maya) */
 	SetCheck(IDC_AUTOSTART, ts.LogAutoStart);
@@ -1173,12 +1178,13 @@ void CLogPropPageDlg::OnInitDialog()
 BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	char uimsg[MAX_UIMSG];
-	char buf[MAX_PATH], buf2[MAX_PATH];
+	char buf[MAX_PATH];
+	char buf2[MAX_PATH];
 
 	switch (wParam) {
 		case IDC_VIEWLOG_PATH | (BN_CLICKED << 16):
 			{
-				OPENFILENAME ofn;
+				OPENFILENAMEA ofn;
 
 				ZeroMemory(&ofn, sizeof(ofn));
 				ofn.lStructSize = get_OPENFILENAME_SIZE();
@@ -1192,8 +1198,8 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				             "Choose a executing file with launching logging file", ts.UILanguageFile);
 				ofn.lpstrTitle = uimsg;
 				ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_FORCESHOWHIDDEN | OFN_HIDEREADONLY;
-				if (GetOpenFileName(&ofn) != 0) {
-					SetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
+				if (GetOpenFileNameA(&ofn) != 0) {
+					SetDlgItemTextA(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor);
 				}
 			}
 			return TRUE;
@@ -1267,15 +1273,15 @@ void CLogPropPageDlg::OnOK()
 	char uimsg[MAX_UIMSG];
 
 	// Viewlog Editor path (2005.1.29 yutaka)
-	GetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, sizeof(ts.ViewlogEditor));
+	GetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
 
 	// Log Default File Name (2006.8.28 maya)
-	GetDlgItemText(IDC_DEFAULTNAME_EDITOR, buf, sizeof(buf));
+	GetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, buf, sizeof(buf));
 	if (isInvalidStrftimeChar(buf)) {
 		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
 		get_lang_msg("MSG_LOGFILE_INVALID_CHAR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
 		             "Invalid character is included in log file name.", ts.UILanguageFile);
-		MessageBox(ts.UIMsg, uimsg, MB_ICONEXCLAMATION);
+		MessageBoxA(ts.UIMsg, uimsg, MB_ICONEXCLAMATION);
 		return;
 	}
 
@@ -1300,7 +1306,7 @@ void CLogPropPageDlg::OnOK()
 	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);
 
 	// Log Default File Path (2007.5.30 maya)
-	GetDlgItemText(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath, sizeof(ts.LogDefaultPath));
+	GetDlgItemText(IDC_DEFAULTPATH_EDITOR, ts.LogDefaultPath, _countof(ts.LogDefaultPath));
 
 	/* Auto start logging (2007.5.31 maya) */
 	ts.LogAutoStart = GetCheck(IDC_AUTOSTART);
@@ -1380,9 +1386,10 @@ void CLogPropPageDlg::OnOK()
 CCygwinPropPageDlg::CCygwinPropPageDlg(HINSTANCE inst, TTCPropertySheet *sheet)
 	: TTCPropertyPage(inst, CCygwinPropPageDlg::IDD, sheet)
 {
-	get_lang_msg("DLG_TABSHEET_TITLE_CYGWIN", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Cygwin", ts.UILanguageFile);
-	m_psp.pszTitle = _tcsdup(ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE_CYGWIN", UIMsg, _countof(UIMsg),
+	             _T("Cygwin"), ts.UILanguageFile);
+	m_psp.pszTitle = _tcsdup(UIMsg);
 	m_psp.dwFlags |= PSP_USETITLE;
 }
 
@@ -1404,20 +1411,20 @@ void CCygwinPropPageDlg::OnInitDialog()
 
 	memcpy(&settings, &ts.CygtermSettings, sizeof(cygterm_t));
 
-	SetDlgItemText(IDC_TERM_EDIT, settings.term);
-	SetDlgItemText(IDC_TERM_TYPE, settings.term_type);
-	SetDlgItemText(IDC_PORT_START, settings.port_start);
-	SetDlgItemText(IDC_PORT_RANGE, settings.port_range);
-	SetDlgItemText(IDC_SHELL, settings.shell);
-	SetDlgItemText(IDC_ENV1, settings.env1);
-	SetDlgItemText(IDC_ENV2, settings.env2);
+	SetDlgItemTextA(IDC_TERM_EDIT, settings.term);
+	SetDlgItemTextA(IDC_TERM_TYPE, settings.term_type);
+	SetDlgItemTextA(IDC_PORT_START, settings.port_start);
+	SetDlgItemTextA(IDC_PORT_RANGE, settings.port_range);
+	SetDlgItemTextA(IDC_SHELL, settings.shell);
+	SetDlgItemTextA(IDC_ENV1, settings.env1);
+	SetDlgItemTextA(IDC_ENV2, settings.env2);
 
 	SetCheck(IDC_LOGIN_SHELL, settings.login_shell);
 	SetCheck(IDC_HOME_CHDIR, settings.home_chdir);
 	SetCheck(IDC_AGENT_PROXY, settings.agent_proxy);
 
 	// Cygwin install path
-	SetDlgItemText(IDC_CYGWIN_PATH, ts.CygwinDirectory);
+	SetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory);
 
 	// ダイアログにフォーカスを当てる
 	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_CYGWIN_PATH));
@@ -1432,9 +1439,9 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			// Cygwin install ディレクトリの選択ダイアログ
 			get_lang_msg("DIRDLG_CYGTERM_DIR_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
 			             "Select Cygwin directory", ts.UILanguageFile);
-			GetDlgItemText(IDC_CYGWIN_PATH, buf, sizeof(buf));
+			GetDlgItemTextA(IDC_CYGWIN_PATH, buf, sizeof(buf));
 			if (doSelectFolder(GetSafeHwnd(), buf2, sizeof(buf2), buf, ts.UIMsg)) {
-				SetDlgItemText(IDC_CYGWIN_PATH, buf2);
+				SetDlgItemTextA(IDC_CYGWIN_PATH, buf2);
 			}
 			return TRUE;
 	}
@@ -1445,13 +1452,13 @@ BOOL CCygwinPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 void CCygwinPropPageDlg::OnOK()
 {
 	// writing to CygTerm config file
-	GetDlgItemText(IDC_TERM_EDIT, settings.term, sizeof(settings.term));
-	GetDlgItemText(IDC_TERM_TYPE, settings.term_type, sizeof(settings.term_type));
-	GetDlgItemText(IDC_PORT_START, settings.port_start, sizeof(settings.port_start));
-	GetDlgItemText(IDC_PORT_RANGE, settings.port_range, sizeof(settings.port_range));
-	GetDlgItemText(IDC_SHELL, settings.shell, sizeof(settings.shell));
-	GetDlgItemText(IDC_ENV1, settings.env1, sizeof(settings.env1));
-	GetDlgItemText(IDC_ENV2, settings.env2, sizeof(settings.env2));
+	GetDlgItemTextA(IDC_TERM_EDIT, settings.term, sizeof(settings.term));
+	GetDlgItemTextA(IDC_TERM_TYPE, settings.term_type, sizeof(settings.term_type));
+	GetDlgItemTextA(IDC_PORT_START, settings.port_start, sizeof(settings.port_start));
+	GetDlgItemTextA(IDC_PORT_RANGE, settings.port_range, sizeof(settings.port_range));
+	GetDlgItemTextA(IDC_SHELL, settings.shell, sizeof(settings.shell));
+	GetDlgItemTextA(IDC_ENV1, settings.env1, sizeof(settings.env1));
+	GetDlgItemTextA(IDC_ENV2, settings.env2, sizeof(settings.env2));
 
 	settings.login_shell = GetCheck(IDC_LOGIN_SHELL);
 	settings.home_chdir = GetCheck(IDC_HOME_CHDIR);
@@ -1463,7 +1470,7 @@ void CCygwinPropPageDlg::OnOK()
 	ts.CygtermSettings.update_flag = TRUE;
 
 	// Cygwin install path
-	GetDlgItemText(IDC_CYGWIN_PATH, ts.CygwinDirectory, sizeof(ts.CygwinDirectory));
+	GetDlgItemTextA(IDC_CYGWIN_PATH, ts.CygwinDirectory, sizeof(ts.CygwinDirectory));
 }
 
 // CAddSettingPropSheetDlg
@@ -1487,9 +1494,10 @@ CAddSettingPropSheetDlg::CAddSettingPropSheetDlg(
 	m_psh.nPages = 6;
 	m_psh.phpage = hPsp;
 
-	get_lang_msg("DLG_TABSHEET_TITLE", ts.UIMsg, sizeof(ts.UIMsg),
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TABSHEET_TITLE", UIMsg, _countof(UIMsg),
 				 pszCaption, ts.UILanguageFile);
-	m_psh.pszCaption = _tcsdup(ts.UIMsg);
+	m_psh.pszCaption = _tcsdup(UIMsg);
 }
 
 CAddSettingPropSheetDlg::~CAddSettingPropSheetDlg()

@@ -62,19 +62,54 @@ HWND TTCWnd::GetDlgItem(int id)
 	return ::GetDlgItem(m_hWnd, id);
 }
 
-LRESULT TTCWnd::SendDlgItemMessage(int id, UINT msg, WPARAM wp, LPARAM lp)
+LRESULT TTCWnd::SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
 	return ::SendDlgItemMessage(m_hWnd, id, msg, wp, lp);
 }
 
-void TTCWnd::GetDlgItemText(int id, TCHAR *buf, size_t size)
+LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
+{
+	return ::SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
+}
+
+LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
+{
+	return ::SendDlgItemMessageA(m_hWnd, id, msg, wp, lp);
+}
+
+void TTCWnd::GetDlgItemTextT(int id, TCHAR *buf, size_t size)
 {
 	::GetDlgItemText(m_hWnd, id, buf, (int)size);
 }
 
-void TTCWnd::SetDlgItemText(int id, const TCHAR *str)
+void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
+{
+	::GetDlgItemTextW(m_hWnd, id, buf, (int)size);
+}
+
+void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
+{
+	::GetDlgItemTextA(m_hWnd, id, buf, (int)size);
+}
+
+void TTCWnd::SetDlgItemTextT(int id, const TCHAR *str)
 {
 	::SetDlgItemText(m_hWnd, id, str);
+}
+
+void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
+{
+	::SetDlgItemTextW(m_hWnd, id, str);
+}
+
+void TTCWnd::SetDlgItemTextA(int id, const char *str)
+{
+	::SetDlgItemTextA(m_hWnd, id, str);
+}
+
+void TTCWnd::SetDlgItemNum(int id, LONG Num)
+{
+	SetDlgNum(m_hWnd, id, Num);
 }
 
 // nCheck	BST_UNCHECKED / BST_CHECKED / BST_INDETERMINATE 
@@ -137,9 +172,14 @@ void TTCWnd::ShowWindow(int nCmdShow)
 	::ShowWindow(m_hWnd, nCmdShow);
 }
 
-void TTCWnd::SetWindowText(const TCHAR *str)
+void TTCWnd::SetWindowTextT(const TCHAR *str)
 {
 	::SetWindowText(m_hWnd, str);
+}
+
+void TTCWnd::SetWindowTextA(const char *str)
+{
+	::SetWindowTextA(m_hWnd, str);
 }
 
 LONG_PTR TTCWnd::SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong)
@@ -179,9 +219,14 @@ void TTCWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags)
 	ModifyStyleCom(GWL_EXSTYLE, dwRemove, dwAdd, nFlags);
 }
 
-int TTCWnd::MessageBox(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
+int TTCWnd::MessageBoxT(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
 	return ::MessageBox(m_hWnd, lpText, lpCaption, uType);
+}
+
+int TTCWnd::MessageBoxA(const char *lpText, const char *lpCaption, UINT uType)
+{
+	return ::MessageBoxA(m_hWnd, lpText, lpCaption, uType);
 }
 
 BOOL TTCWnd::GetWindowRect(RECT *R)
@@ -480,7 +525,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 		dlgproc = nullptr;
 	}
 	pseudoPtr = this;
-	HWND hWnd = ::CreateDialogIndirectParam(
+	HWND hWnd = ::CreateDialogIndirectParamW(
 		hInstance, lpTemplate, hParent,
 		dlgproc, (LPARAM)this);
 	pseudoPtr = nullptr;

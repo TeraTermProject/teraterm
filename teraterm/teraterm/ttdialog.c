@@ -34,6 +34,7 @@
 #include "ttdlg.h"
 
 #include "ttdialog.h"
+#include "ttwinman.h"
 
 PSetupTerminal SetupTerminal = _SetupTerminal;
 PSetupWin SetupWin = _SetupWin;
@@ -52,6 +53,7 @@ BOOL LoadTTDLG()
 {
 	static BOOL initialized;
 	if (!initialized) {
+		TTDLGSetUILanguageFile(ts.UILanguageFile);
 		TTXGetUIHooks(); /* TTPLUG */
 		initialized = TRUE;
 	}

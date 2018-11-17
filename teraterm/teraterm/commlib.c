@@ -29,6 +29,10 @@
 /* IPv6 modification is Copyright (C) 2000, 2001 Jun-ya KATO <kato@win6.jp> */
 
 /* TERATERM.EXE, Communication routines */
+
+#undef UNICODE
+#undef _UNICODE
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include "tt_res.h"

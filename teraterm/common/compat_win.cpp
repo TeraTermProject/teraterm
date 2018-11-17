@@ -1,4 +1,4 @@
-﻿/*
+/*
  * (C) 2018 TeraTerm Project
  * All rights reserved.
  *
@@ -76,11 +76,11 @@ void WinCompatInit()
 		const DllInfo *pDllInfo = &DllInfos[i];
 
 		char dllName[MAX_PATH];
-		GetSystemDirectory(dllName, sizeof(dllName));
+		GetSystemDirectoryA(dllName, sizeof(dllName));
 		strcat_s(dllName, sizeof(dllName), "/");
 		strcat_s(dllName, sizeof(dllName), pDllInfo->DllName);
 
-		HINSTANCE hDll = LoadLibrary(dllName);
+		HINSTANCE hDll = LoadLibraryA(dllName);
 		*pDllInfo->hDll = hDll;
 
 		if (hDll != NULL) {

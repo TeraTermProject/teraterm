@@ -46,6 +46,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#undef UNICODE
+#undef _UNICODE
+
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>

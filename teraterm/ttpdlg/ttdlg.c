@@ -29,6 +29,7 @@
 /* IPv6 modification is Copyright(C) 2000 Jun-ya Kato <kato@win6.jp> */
 
 /* TTDLG.DLL, dialog boxes */
+
 #include <winsock2.h>
 #include <stdio.h>
 #include <string.h>
@@ -37,6 +38,7 @@
 #include <direct.h>
 #include <commdlg.h>
 #include <dlgs.h>
+#include <tchar.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttlib.h"
@@ -77,38 +79,38 @@ extern HANDLE hInst;
 
 static char UILanguageFile[MAX_PATH];
 
-static const TCHAR *NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
-static const TCHAR *NLList[] = {"CR","CR+LF", "LF", NULL};
-static const TCHAR *TermList[] =
+static const char *NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
+static const char *NLList[] = {"CR","CR+LF", "LF", NULL};
+static const char *TermList[] =
 	{"VT100", "VT101", "VT102", "VT282", "VT320", "VT382",
 	 "VT420", "VT520", "VT525", NULL};
 static WORD Term_TermJ[] =
 	{IdVT100, IdVT101, IdVT102, IdVT282, IdVT320, IdVT382,
 	 IdVT420, IdVT520, IdVT525};
 static WORD TermJ_Term[] = {1, 1, 2, 3, 3, 4, 4, 5, 6, 7, 8, 9};
-static const TCHAR *TermListJ[] =
+static const char *TermListJ[] =
 	{"VT100", "VT100J", "VT101", "VT102", "VT102J", "VT220J", "VT282",
 	 "VT320", "VT382", "VT420", "VT520", "VT525", NULL};
-static const TCHAR *KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", "UTF-8m", NULL};
-static const TCHAR *KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
-static const TCHAR *KanjiInList[] = {"^[$@","^[$B",NULL};
-static const TCHAR *KanjiOutList[] = {"^[(B","^[(J",NULL};
-static const TCHAR *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
-static const TCHAR *RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
-static const TCHAR *RussList2[] = {"Windows","KOI8-R",NULL};
+static const char *KanjiList[] = {"SJIS","EUC","JIS", "UTF-8", "UTF-8m", NULL};
+static const char *KanjiListSend[] = {"SJIS","EUC","JIS", "UTF-8", NULL};
+static const char *KanjiInList[] = {"^[$@","^[$B",NULL};
+static const char *KanjiOutList[] = {"^[(B","^[(J",NULL};
+static const char *KanjiOutList2[] = {"^[(B","^[(J","^[(H",NULL};
+static const char *RussList[] = {"Windows","KOI8-R","CP 866","ISO 8859-5",NULL};
+static const char *RussList2[] = {"Windows","KOI8-R",NULL};
 //static const TCHAR *LocaleList[] = {"japanese","chinese", "chinese-simplified", "chinese-traditional", NULL};
-static const TCHAR *MetaList[] = {"off", "on", "left", "right", NULL};
-static const TCHAR *MetaList2[] = {"off", "on", NULL};
+static const char *MetaList[] = {"off", "on", "left", "right", NULL};
+static const char *MetaList2[] = {"off", "on", NULL};
 
 // HKS
-static const TCHAR *KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
-static const TCHAR *KoreanListSend[] = {"KS5601", "UTF-8", NULL};
+static const char *KoreanList[] = {"KS5601", "UTF-8", "UTF-8m", NULL};
+static const char *KoreanListSend[] = {"KS5601", "UTF-8", NULL};
 
 // UTF-8
-static const TCHAR *Utf8List[] = {"UTF-8", "UTF-8m", NULL};
-static const TCHAR *Utf8ListSend[] = {"UTF-8", NULL};
+static const char *Utf8List[] = {"UTF-8", "UTF-8m", NULL};
+static const char *Utf8ListSend[] = {"UTF-8", NULL};
 
-static const TCHAR *BaudList[] =
+static const char *BaudList[] =
 	{"110","300","600","1200","2400","4800","9600",
 	 "14400","19200","38400","57600","115200",
 	 "230400", "460800", "921600", NULL};
@@ -211,7 +213,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			else {
 				Str2Hex(ts->Answerback,Temp,ts->AnswerbackLen,
 					sizeof(Temp)-1,FALSE);
-				SetDlgItemText(Dialog, IDC_TERMANSBACK, Temp);
+				SetDlgItemTextA(Dialog, IDC_TERMANSBACK, Temp);
 				SendDlgItemMessage(Dialog, IDC_TERMANSBACK, EM_LIMITTEXT,
 					sizeof(Temp) - 1, 0);
 			}
@@ -238,7 +240,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 				}
 
 				// ロケール用テキストボックス
-				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
+				SetDlgItemTextA(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
 				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
@@ -253,7 +255,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 				SetDropDownList(Dialog, IDC_TERMKANJISEND, KoreanListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
 
 				// ロケール用テキストボックス
-				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
+				SetDlgItemTextA(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
 				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
@@ -263,7 +265,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 				SetDropDownList(Dialog, IDC_TERMKANJISEND, Utf8ListSend, KanjiCode2List(ts->Language,ts->KanjiCodeSend));
 
 				// ロケール用テキストボックス
-				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
+				SetDlgItemTextA(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
 
 				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
@@ -321,7 +323,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 						GetRB(Dialog,&ts->LocalEcho,IDC_TERMLOCALECHO,IDC_TERMLOCALECHO);
 
 						if ((ts->FTFlag & FT_BPAUTO)==0) {
-							GetDlgItemText(Dialog, IDC_TERMANSBACK,Temp,sizeof(Temp));
+							GetDlgItemTextA(Dialog, IDC_TERMANSBACK,Temp,sizeof(Temp));
 							ts->AnswerbackLen = Hex2Str(Temp,ts->Answerback,sizeof(ts->Answerback));
 						}
 
@@ -345,7 +347,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 								ts->KanjiOut = w;
 							}
 
-							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
+							GetDlgItemTextA(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
 							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
 						}
 						else if (ts->Language==IdRussian) {
@@ -375,7 +377,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 							ts->KanjiIn = 0;
 							ts->KanjiOut = 0;
 
-							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
+							GetDlgItemTextA(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
 							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
 						}
 
@@ -463,7 +465,7 @@ static void DispSample(HWND Dialog, PTTSet ts, int IAttr)
 #endif
 	x = (int)((TestRect.left+TestRect.right) / 2 - FW * 1.5);
 	y = (TestRect.top+TestRect.bottom-FH) / 2;
-	ExtTextOut(DC, x,y, ETO_CLIPPED | ETO_OPAQUE,
+	ExtTextOutA(DC, x,y, ETO_CLIPPED | ETO_OPAQUE,
 	           &TestRect, "ABC", 3, &(DX[0]));
 	ReleaseDC(Dialog,DC);
 }
@@ -540,13 +542,14 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 		{ IDC_WINHELP, "BTN_HELP" },
+		{ IDC_WINCOLOREMU, "DLG_WIN_PCBOLD16" },		// get_lang_msg
 	};
 	PTTSet ts;
 	HWND Wnd, HRed, HGreen, HBlue;
 	int IAttr, IOffset;
 	WORD i, pos, ScrollCode, NewPos;
 	HDC DC;
-	char uimsg[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -554,7 +557,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			SetWindowLong(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
-			SetDlgItemText(Dialog, IDC_WINTITLE, ts->Title);
+			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
 			SendDlgItemMessage(Dialog, IDC_WINTITLE, EM_LIMITTEXT,
 			                   sizeof(ts->Title)-1, 0);
 
@@ -564,8 +567,6 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 				DisableDlgItem(Dialog,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
 
 			if (ts->VTFlag>0) {
-				get_lang_msg("DLG_WIN_PCBOLD16", uimsg, sizeof(uimsg), "&16 Colors (PC style)", UILanguageFile);
-				SetDlgItemText(Dialog, IDC_WINCOLOREMU,uimsg);
 				SetRB(Dialog, (ts->ColorFlag&CF_PCBOLD16)!=0, IDC_WINCOLOREMU, IDC_WINCOLOREMU);
 				SetRB(Dialog, (ts->ColorFlag&CF_AIXTERM16)!=0, IDC_WINAIXTERM16, IDC_WINAIXTERM16);
 				SetRB(Dialog, (ts->ColorFlag&CF_XTERM256)!=0,IDC_WINXTERM256,IDC_WINXTERM256);
@@ -641,16 +642,16 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 					}
 				}
 				ShowDlgItem(Dialog,IDC_WINATTRTEXT,IDC_WINATTR);
-				get_lang_msg("DLG_WIN_NORMAL", uimsg, sizeof(uimsg), "Normal", UILanguageFile);
+				get_lang_msgT("DLG_WIN_NORMAL", uimsg, sizeof(uimsg), _T("Normal"), UILanguageFile);
 				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msg("DLG_WIN_BOLD", uimsg, sizeof(uimsg), "Bold", UILanguageFile);
+				get_lang_msgT("DLG_WIN_BOLD", uimsg, sizeof(uimsg), _T("Bold"), UILanguageFile);
 				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msg("DLG_WIN_BLINK", uimsg, sizeof(uimsg), "Blink", UILanguageFile);
+				get_lang_msgT("DLG_WIN_BLINK", uimsg, sizeof(uimsg), _T("Blink"), UILanguageFile);
 				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
-				get_lang_msg("DLG_WIN_REVERSEATTR", uimsg, sizeof(uimsg), "Reverse", UILanguageFile);
+				get_lang_msgT("DLG_WIN_REVERSEATTR", uimsg, sizeof(uimsg), _T("Reverse"), UILanguageFile);
 				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)uimsg);
 				/* begin - ishizaki */
-				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)"URL");
+				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_ADDSTRING, 0, (LPARAM)_T("URL"));
 				/* end - ishizaki */
 				SendDlgItemMessage(Dialog, IDC_WINATTR, CB_SETCURSEL, 0,0);
 #ifdef USE_NORMAL_BGCOLOR
@@ -694,7 +695,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			switch (LOWORD(wParam)) {
 				case IDOK:
 					if ( ts!=NULL ) {
-						GetDlgItemText(Dialog,IDC_WINTITLE,ts->Title,sizeof(ts->Title));
+						GetDlgItemTextA(Dialog,IDC_WINTITLE,ts->Title,sizeof(ts->Title));
 						GetRB(Dialog,&ts->HideTitle,IDC_WINHIDETITLE,IDC_WINHIDETITLE);
 						GetRB(Dialog,&ts->PopupMenu,IDC_WINHIDEMENU,IDC_WINHIDEMENU);
 						DC = GetDC(Dialog);
@@ -1101,10 +1102,10 @@ static BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	return FALSE;
 }
 
-static const TCHAR *DataList[] = {"7 bit","8 bit",NULL};
-static const TCHAR *ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
-static const TCHAR *StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
-static const TCHAR *FlowList[] = {"Xon/Xoff","hardware","none",NULL};
+static const char *DataList[] = {"7 bit","8 bit",NULL};
+static const char *ParityList[] = {"none", "odd", "even", "mark", "space", NULL};
+static const char *StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
+static const char *FlowList[] = {"Xon/Xoff","hardware","none",NULL};
 
 static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
@@ -1152,7 +1153,7 @@ static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					strncat_s(Temp, sizeof(Temp), ": ", _TRUNCATE);
 					strncat_s(Temp, sizeof(Temp), ComPortDesc[i], _TRUNCATE);
 #endif
-					SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
+					SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
 					                   0, (LPARAM)Temp);
 					if (ComPortTable[i] == ts->ComPort) {
 						w = i;
@@ -1164,7 +1165,7 @@ static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 			} else {
 				for (i=1; i<=ts->MaxComPort; i++) {
 					_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", i);
-					SendDlgItemMessage(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
+					SendDlgItemMessageA(Dialog, IDC_SERIALPORT, CB_ADDSTRING,
 					                   0, (LPARAM)Temp);
 				}
 				if (ts->ComPort<=ts->MaxComPort) {
@@ -1207,12 +1208,12 @@ static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						memset(Temp, 0, sizeof(Temp));
-						GetDlgItemText(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
+						GetDlgItemTextA(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
 						if (strncmp(Temp, "COM", 3) == 0 && Temp[3] != '\0') {
 							ts->ComPort = (WORD)atoi(&Temp[3]);
 						}
 
-						GetDlgItemText(Dialog, IDC_SERIALBAUD, Temp, sizeof(Temp)-1);
+						GetDlgItemTextA(Dialog, IDC_SERIALBAUD, Temp, sizeof(Temp)-1);
 						if (atoi(Temp) != 0) {
 							ts->Baud = (DWORD)atoi(Temp);
 						}
@@ -1294,10 +1295,10 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 			i = 1;
 			do {
 				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-				GetPrivateProfileString("Hosts",EntName,"",
+				GetPrivateProfileStringA("Hosts",EntName,"",
 				                        TempHost,sizeof(TempHost),ts->SetupFName);
 				if (strlen(TempHost) > 0) {
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING,
+					SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_ADDSTRING,
 					                   0, (LPARAM)TempHost);
 				}
 				i++;
@@ -1305,13 +1306,13 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 
 			/* append a blank item to the bottom */
 			TempHost[0] = 0;
-			SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, (LPARAM)TempHost);
+			SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_ADDSTRING, 0, (LPARAM)TempHost);
 			SetRB(Dialog,ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
 			SetRB(Dialog,ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
 			SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TCPPort,FALSE);
 			SetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,ts->TelKeepAliveInterval,FALSE);
 			SetRB(Dialog,ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-			SetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType);
+			SetDlgItemTextA(Dialog, IDC_TCPIPTERMTYPE, ts->TermType);
 			SendDlgItemMessage(Dialog, IDC_TCPIPTERMTYPE, EM_LIMITTEXT, sizeof(ts->TermType)-1, 0);
 
 			// SSH接続のときにも TERM を送るので、telnetが無効でも disabled にしない。(2005.11.3 yutaka)
@@ -1324,7 +1325,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 				case IDOK:
 					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
 					if (ts!=NULL) {
-						WritePrivateProfileString("Hosts",NULL,NULL,ts->SetupFName);
+						WritePrivateProfileStringA("Hosts",NULL,NULL,ts->SetupFName);
 
 						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCOUNT,0,0);
 						if (Index==(UINT)LB_ERR) {
@@ -1337,10 +1338,10 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 							Index = MAXHOSTLIST;
 						}
 						for (i = 1 ; i <= Index ; i++) {
-							SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
+							SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
 							                   i-1, (LPARAM)TempHost);
 							_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%i", i);
-							WritePrivateProfileString("Hosts",EntName,TempHost,ts->SetupFName);
+							WritePrivateProfileStringA("Hosts",EntName,TempHost,ts->SetupFName);
 						}
 						GetRB(Dialog,&ts->HistoryList,IDC_TCPIPHISTORY,IDC_TCPIPHISTORY);
 						GetRB(Dialog,&ts->AutoWinClose,IDC_TCPIPAUTOCLOSE,IDC_TCPIPAUTOCLOSE);
@@ -1350,7 +1351,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 						}
 						ts->TelKeepAliveInterval = GetDlgItemInt(Dialog,IDC_TCPIPTELNETKEEPALIVE,&Ok,FALSE);
 						GetRB(Dialog,&ts->Telnet,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
-						GetDlgItemText(Dialog, IDC_TCPIPTERMTYPE, ts->TermType,
+						GetDlgItemTextA(Dialog, IDC_TCPIPTERMTYPE, ts->TermType,
 						               sizeof(ts->TermType));
 					}
 					EndDialog(Dialog, 1);
@@ -1362,7 +1363,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 
 				case IDC_TCPIPHOST:
 					if (HIWORD(wParam)==EN_CHANGE) {
-						GetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
+						GetDlgItemTextA(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
 						if (strlen(TempHost)==0) {
 							DisableDlgItem(Dialog,IDC_TCPIPADD,IDC_TCPIPADD);
 						}
@@ -1373,14 +1374,14 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 					break;
 
 				case IDC_TCPIPADD:
-					GetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
+					GetDlgItemTextA(Dialog, IDC_TCPIPHOST, TempHost, sizeof(TempHost));
 					if (strlen(TempHost)>0) {
 						Index = SendDlgItemMessage(Dialog,IDC_TCPIPLIST,LB_GETCURSEL,0,0);
 						if (Index==(UINT)LB_ERR) {
 							Index = 0;
 						}
 
-						SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
+						SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
 						                   Index, (LPARAM)TempHost);
 
 						SetDlgItemText(Dialog, IDC_TCPIPHOST, 0);
@@ -1426,11 +1427,11 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 					if ((Index==0) || (Index>=i-1)) {
 						return TRUE;
 					}
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
+					SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
 					                   Index, (LPARAM)TempHost);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
 					                   Index, 0);
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
+					SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_INSERTSTRING,
 					                   Index-1, (LPARAM)TempHost);
 					if (LOWORD(wParam)==IDC_TCPIPUP) {
 						Index--;
@@ -1462,7 +1463,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 					                   Index, (LPARAM)TempHost);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
 					                   Index, 0);
-					SetDlgItemText(Dialog, IDC_TCPIPHOST, TempHost);
+					SetDlgItemTextA(Dialog, IDC_TCPIPHOST, TempHost);
 					DisableDlgItem(Dialog,IDC_TCPIPUP,IDC_TCPIPDOWN);
 					SetFocus(GetDlgItem(Dialog, IDC_TCPIPHOST));
 					break;
@@ -1529,10 +1530,10 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			i = 1;
 			do {
 				_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Host%d", i);
-				GetPrivateProfileString("Hosts",EntName,"",
+				GetPrivateProfileStringA("Hosts",EntName,"",
 				                        TempHost,sizeof(TempHost),GetHNRec->SetupFN);
 				if ( strlen(TempHost) > 0 ) {
-					SendDlgItemMessage(Dialog, IDC_HOSTNAME, CB_ADDSTRING,
+					SendDlgItemMessageA(Dialog, IDC_HOSTNAME, CB_ADDSTRING,
 					                   0, (LPARAM)TempHost);
 				}
 				i++;
@@ -1549,7 +1550,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPORT, EM_LIMITTEXT,5,0);
 			SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TCPPort,FALSE);
 			for (i=0; ProtocolFamilyList[i]; ++i) {
-				SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, CB_ADDSTRING,
+				SendDlgItemMessageA(Dialog, IDC_HOSTTCPPROTOCOL, CB_ADDSTRING,
 				                   0, (LPARAM)ProtocolFamilyList[i]);
 			}
 			SendDlgItemMessage(Dialog, IDC_HOSTTCPPROTOCOL, EM_LIMITTEXT,
@@ -1575,7 +1576,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 						strncat_s(EntName, sizeof(EntName), ": ", _TRUNCATE);
 						strncat_s(EntName, sizeof(EntName), ComPortDesc[i], _TRUNCATE);
 					}
-					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
+					SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
 					                   0, (LPARAM)EntName);
 					j++;
 					if (GetHNRec->ComPort==ComPortTable[i]) {
@@ -1589,7 +1590,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 						continue;
 					}
 					_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "COM%d", i);
-					SendDlgItemMessage(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
+					SendDlgItemMessageA(Dialog, IDC_HOSTCOM, CB_ADDSTRING,
 					                   0, (LPARAM)EntName);
 					j++;
 					if (GetHNRec->ComPort==i) {
@@ -1625,7 +1626,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 						char afstr[BUFSIZ];
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
 						if ( GetHNRec->PortType==IdTCPIP ) {
-							GetDlgItemText(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
+							GetDlgItemTextA(Dialog, IDC_HOSTNAME, GetHNRec->HostName, HostNameMaxLength);
 						}
 						else {
 							GetHNRec->HostName[0] = 0;
@@ -1639,10 +1640,10 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	((strcmp((str), "IPv6") == 0) ? AF_INET6 : \
 	((strcmp((str), "IPv4") == 0) ? AF_INET : AF_UNSPEC))
 						memset(afstr, 0, sizeof(afstr));
-						GetDlgItemText(Dialog, IDC_HOSTTCPPROTOCOL, afstr, sizeof(afstr));
+						GetDlgItemTextA(Dialog, IDC_HOSTTCPPROTOCOL, afstr, sizeof(afstr));
 						GetHNRec->ProtocolFamily = getaf(afstr);
 						memset(EntName,0,sizeof(EntName));
-						GetDlgItemText(Dialog, IDC_HOSTCOM, EntName, sizeof(EntName)-1);
+						GetDlgItemTextA(Dialog, IDC_HOSTCOM, EntName, sizeof(EntName)-1);
 						if (strncmp(EntName, "COM", 3) == 0 && EntName[3] != '\0') {
 #if 0
 							GetHNRec->ComPort = (BYTE)(EntName[3])-0x30;
@@ -1700,7 +1701,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 							len = SendMessage(hostcom, CB_GETLBTEXTLEN, i, 0);
 							lbl = (char *)calloc(len+1, sizeof(char));
 							SendMessage(hostcom, CB_GETLBTEXT, i, (LPARAM)lbl);
-							GetTextExtentPoint32(TmpDC, lbl, len, &s);
+							GetTextExtentPoint32A(TmpDC, lbl, len, &s);
 							if (s.cx > max_len) {
 								max_len = s.cx;
 							}
@@ -1748,7 +1749,7 @@ static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			CurDir = (PCHAR)(lParam);
 			SetWindowLong(Dialog, DWLP_USER, lParam);
 
-			SetDlgItemText(Dialog, IDC_DIRCURRENT, CurDir);
+			SetDlgItemTextA(Dialog, IDC_DIRCURRENT, CurDir);
 			SendDlgItemMessage(Dialog, IDC_DIRNEW, EM_LIMITTEXT,
 			                   MAXPATHLEN-1, 0);
 
@@ -1761,7 +1762,7 @@ static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			ScreenToClient(Dialog,&D);
 			DH = R.bottom-R.top;
 			TmpDC = GetDC(Dialog);
-			GetTextExtentPoint32(TmpDC,CurDir,strlen(CurDir),&s);
+			GetTextExtentPoint32A(TmpDC,CurDir,strlen(CurDir),&s);
 			ReleaseDC(Dialog,TmpDC);
 			DW = s.cx + s.cx/10;
 
@@ -1829,12 +1830,12 @@ static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 					if ( CurDir!=NULL ) {
 						_getcwd(HomeDir,sizeof(HomeDir));
 						_chdir(CurDir);
-						GetDlgItemText(Dialog, IDC_DIRNEW, TmpDir, sizeof(TmpDir));
+						GetDlgItemTextA(Dialog, IDC_DIRNEW, TmpDir, sizeof(TmpDir));
 						if ( strlen(TmpDir)>0 ) {
 							if (_chdir(TmpDir) != 0) {
 								get_lang_msg("MSG_TT_ERROR", uimsg2, sizeof(uimsg2), "Tera Term: Error", UILanguageFile);
 								get_lang_msg("MSG_FIND_DIR_ERROR", uimsg, sizeof(uimsg), "Cannot find directory", UILanguageFile);
-								MessageBox(Dialog,uimsg,uimsg2,MB_ICONEXCLAMATION);
+								MessageBoxA(Dialog,uimsg,uimsg2,MB_ICONEXCLAMATION);
 								_chdir(HomeDir);
 								return TRUE;
 							}
@@ -1852,9 +1853,9 @@ static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 				case IDC_SELECT_DIR:
 					get_lang_msg("DLG_SELECT_DIR_TITLE", uimsg, sizeof(uimsg),
 					             "Select new directory", UILanguageFile);
-					GetDlgItemText(Dialog, IDC_DIRNEW, buf, sizeof(buf));
+					GetDlgItemTextA(Dialog, IDC_DIRNEW, buf, sizeof(buf));
 					if (doSelectFolder(Dialog, buf2, sizeof(buf2), buf, uimsg)) {
-						SetDlgItemText(Dialog, IDC_DIRNEW, buf2);
+						SetDlgItemTextA(Dialog, IDC_DIRNEW, buf2);
 					}
 					return TRUE;
 
@@ -1919,7 +1920,7 @@ static LRESULT CALLBACK UrlWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 			// get URL
 			SendMessage(hWnd, WM_GETTEXT , sizeof(url), (LPARAM)url);
 			// kick WWW browser
-			ShellExecute(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
+			ShellExecuteA(NULL, NULL, url, NULL, NULL,SW_SHOWNORMAL);
 		}
 		break;
 
@@ -2122,12 +2123,15 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 #elif defined(__MINGW32__)
 static void GetCompilerInfo(char *buf, size_t buf_size)
 {
+#if defined(__GNUC__) || defined(__clang__) 
+	_snprintf_s(buf, buf_size, _TRUNCATE,
+				"mingw " __MINGW64_VERSION_STR " "
 #if defined(__clang__)
-	strncpy_s(buf, buf_size, "mingw clang " __clang_version__, _TRUNCATE);
+				"clang " __clang_version__
 #elif defined(__GNUC__)
-	_snprintf_s(buf, buf_size, _TRUNCATE, "mingw gcc %s(%d.%d.%d)",
-				__VERSION__,
-				__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+				"gcc " __VERSION__
+#endif
+		);
 #else
 	strncat_s(buf, buf_size, "mingw", _TRUNCATE);
 #endif
@@ -2142,6 +2146,9 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 
 static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_ABOUT_TITLE" },
+	};
 	char buf[128], tmpbuf[128];
 	HDC hdc;
 	HWND hwnd;
@@ -2149,7 +2156,7 @@ static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 	DWORD dwExt;
 	WORD w, h;
 	POINT point;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+	char uimsg[MAX_UIMSG];
 
 #if defined(EFFECT_ENABLED) || defined(TEXTURE_ENABLED)
 	// for animation
@@ -2197,20 +2204,20 @@ static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 #endif
 			}
 
-			GetWindowText(Dialog, uimsg2, sizeof(uimsg2));
-			get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-			SetWindowText(Dialog, uimsg);
+			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 
 			// Tera Term 本体のバージョン
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Version %d.%d", TT_VERSION_MAJOR, TT_VERSION_MINOR);
 #ifdef SVNVERSION
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# %d)", SVNVERSION);
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #else
 			_snprintf_s(tmpbuf, sizeof(tmpbuf), _TRUNCATE, " (SVN# UNK)");
-			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
 #endif
-			SendMessage(GetDlgItem(Dialog, IDC_TT_VERSION), WM_SETTEXT, 0, (LPARAM)buf);
+			strncat_s(buf, sizeof(buf), tmpbuf, _TRUNCATE);
+#if defined(UNICODE)
+			strncat_s(buf, sizeof(buf), " unicode", _TRUNCATE);
+#endif
+			SetDlgItemTextA(Dialog, IDC_TT_VERSION, buf);
 
 			// Onigurumaのバージョンを設定する
 			// バージョンの取得は onig_version() を呼び出すのが適切だが、そのためだけにライブラリを
@@ -2220,22 +2227,22 @@ static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 			// ライブラリをリンクし、正規の手順でバージョンを得ることにした。
 			// (2006.7.24 yutaka)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Oniguruma %s", onig_version());
-			SendMessage(GetDlgItem(Dialog, IDC_ONIGURUMA_LABEL), WM_SETTEXT, 0, (LPARAM)buf);
+			SetDlgItemTextA(Dialog, IDC_ONIGURUMA_LABEL, buf);
 
 			// ビルドしたときに使われたVisual C++のバージョンを設定する。(2009.3.3 yutaka)
 			GetCompilerInfo(tmpbuf, sizeof(tmpbuf));
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Built using %s", tmpbuf);
-			SendMessage(GetDlgItem(Dialog, IDC_BUILDTOOL), WM_SETTEXT, 0, (LPARAM)buf);
+			SetDlgItemTextA(Dialog, IDC_BUILDTOOL, buf);
 
 			// ビルドタイムを設定する。(2009.3.4 yutaka)
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "Build time: %s %s", __DATE__, __TIME__);
-			SendMessage(GetDlgItem(Dialog, IDC_BUILDTIME), WM_SETTEXT, 0, (LPARAM)buf);
+			SetDlgItemTextA(Dialog, IDC_BUILDTIME, buf);
 
 			// static text のサイズを変更 (2007.4.16 maya)
 			hwnd = GetDlgItem(Dialog, IDC_AUTHOR_URL);
 			hdc = GetDC(hwnd);
-			GetDlgItemText(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
-			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
+			GetDlgItemTextA(Dialog, IDC_AUTHOR_URL, uimsg, sizeof(uimsg));
+			dwExt = GetTabbedTextExtentA(hdc,uimsg,strlen(uimsg),0,NULL);
 			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
 			h = HIWORD(dwExt);
 			GetWindowRect(hwnd, &r);
@@ -2246,8 +2253,8 @@ static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 
 			hwnd = GetDlgItem(Dialog, IDC_FORUM_URL);
 			hdc = GetDC(hwnd);
-			GetDlgItemText(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
-			dwExt = GetTabbedTextExtent(hdc,uimsg,strlen(uimsg),0,NULL);
+			GetDlgItemTextA(Dialog, IDC_FORUM_URL, uimsg, sizeof(uimsg));
+			dwExt = GetTabbedTextExtentA(hdc,uimsg,strlen(uimsg),0,NULL);
 			w = LOWORD(dwExt) + 5; // 幅が若干足りないので補正
 			h = HIWORD(dwExt);
 			GetWindowRect(hwnd, &r);
@@ -2456,8 +2463,8 @@ static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 	return FALSE;
 }
 
-static const TCHAR *LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
-static TCHAR **LangUIList = NULL;
+static const char *LangList[] = {"English","Japanese","Russian","Korean","UTF-8",NULL};
+static char **LangUIList = NULL;
 #define LANG_PATH "lang"
 #define LANG_EXT ".lng"
 
@@ -2467,7 +2474,7 @@ static int make_sel_lang_ui(char *HomeDir)
 	int    file_num;
 	char   fullpath[1024];
 	HANDLE hFind;
-	WIN32_FIND_DATA fd;
+	WIN32_FIND_DATAA fd;
 	char **p;
 
 	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, LANG_PATH, LANG_EXT);
@@ -2484,13 +2491,13 @@ static int make_sel_lang_ui(char *HomeDir)
 	}
 
 	file_num = 0;
-	hFind = FindFirstFile(fullpath,&fd);
+	hFind = FindFirstFileA(fullpath,&fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				file_num++;
 			}
-		} while(FindNextFile(hFind,&fd));
+		} while(FindNextFileA(hFind,&fd));
 		FindClose(hFind);
 	}
 
@@ -2498,13 +2505,13 @@ static int make_sel_lang_ui(char *HomeDir)
 	LangUIList = calloc(file_num, sizeof(char *));
 
 	i = 0;
-	hFind = FindFirstFile(fullpath,&fd);
+	hFind = FindFirstFileA(fullpath,&fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				LangUIList[i++] = _strdup(fd.cFileName);
 			}
-		} while(FindNextFile(hFind,&fd) && i < file_num);
+		} while(FindNextFileA(hFind,&fd) && i < file_num);
 		FindClose(hFind);
 	}
 	LangUIList[i] = NULL;
@@ -2555,11 +2562,11 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 		
-			SendDlgItemMessage(Dialog, IDC_GENPORT, CB_ADDSTRING,
+			SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
 			                   0, (LPARAM)"TCP/IP");
 			for (w=1;w<=ts->MaxComPort;w++) {
 				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
-				SendDlgItemMessage(Dialog, IDC_GENPORT, CB_ADDSTRING,
+				SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
 				                   0, (LPARAM)Temp);
 			}
 			if (ts->PortType==IdSerial) {
@@ -2583,7 +2590,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			// 最初に指定されている言語ファイルの番号を覚えておく。
 			uilist_count = make_sel_lang_ui(ts->HomeDir);
 			langui_sel = get_sel_lang_ui(LangUIList, ts->UILanguageFile_ini);
-			SetDropDownList(Dialog, IDC_GENLANG_UI, ((const TCHAR **)LangUIList), langui_sel);
+			SetDropDownList(Dialog, IDC_GENLANG_UI, ((const char **)LangUIList), langui_sel);
 			if (LangUIList[0] == NULL) {
 				EnableWindow(GetDlgItem(Dialog, IDC_GENLANG_UI), FALSE);
 			}
@@ -2628,10 +2635,10 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 							_snprintf_s(ts->UILanguageFile_ini, sizeof(ts->UILanguageFile_ini), _TRUNCATE,
 								"%s\\%s", LANG_PATH, LangUIList[w - 1]);
 
-							GetCurrentDirectory(sizeof(CurDir), CurDir);
-							SetCurrentDirectory(ts->HomeDir);
+							GetCurrentDirectoryA(sizeof(CurDir), CurDir);
+							SetCurrentDirectoryA(ts->HomeDir);
 							_fullpath(ts->UILanguageFile, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile));
-							SetCurrentDirectory(CurDir);
+							SetCurrentDirectoryA(CurDir);
 
 							// タイトルの更新を行う。(2014.2.23 yutaka)
 							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
@@ -2823,13 +2830,13 @@ static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		{
 			static LPCHOOSEFONT cf;
 			PTTSet ts;
-			char uimsg[MAX_UIMSG];
+			TCHAR uimsg[MAX_UIMSG];
 
 			//EnableWindow(GetDlgItem(Dialog, cmb2), FALSE);
 			cf = (LPCHOOSEFONT)lParam;
 			ts = (PTTSet)cf->lCustData;
-			get_lang_msg("DLG_CHOOSEFONT_STC6", uimsg, sizeof(uimsg),
-			             "\"Font style\" selection here won't affect actual font appearance.", ts->UILanguageFile);
+			get_lang_msgT("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
+			             _T("\"Font style\" selection here won't affect actual font appearance."), ts->UILanguageFile);
 			SetDlgItemText(Dialog, stc6, uimsg);
 
 			SetFocus(GetDlgItem(Dialog,cmb1));
@@ -2861,9 +2868,9 @@ static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 #ifndef CF_INACTIVEFONTS
 #define CF_INACTIVEFONTS 0x02000000L
 #endif
-DllExport BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
+DllExport BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts)
 {
-	CHOOSEFONT cf;
+	CHOOSEFONTA cf;
 	BOOL Ok;
 
 	memset(&cf, 0, sizeof(CHOOSEFONT));
@@ -2880,7 +2887,7 @@ DllExport BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet t
 	cf.nFontType = REGULAR_FONTTYPE;
 	cf.hInstance = hInst;
 	cf.lCustData = (LPARAM)ts;
-	Ok = ChooseFont(&cf);
+	Ok = ChooseFontA(&cf);
 	return Ok;
 }
 

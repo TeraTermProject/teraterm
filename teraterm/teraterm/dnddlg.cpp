@@ -39,7 +39,7 @@
 #include "dlglib.h"
 
 struct DrapDropDlgParam {
-	const char *TargetFilename;
+	const TCHAR *TargetFilename;
 	enum drop_type DropType;
 	unsigned char DropTypePaste;
 	bool ScpEnable;
@@ -136,10 +136,10 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 		// Do this for the next %d files
 		char orgmsg[MAX_UIMSG];
-		GetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
+		GetDlgItemTextA(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
 		char uimsg[MAX_UIMSG];
 		_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, orgmsg, Param->RemaingFileCount - 1);
-		SetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, uimsg);
+		SetDlgItemTextA(hDlgWnd, IDC_SAME_PROCESS_CHECK, uimsg);
 		if (Param->RemaingFileCount < 2) {
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SAME_PROCESS_CHECK), FALSE);
 		}
@@ -250,7 +250,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 enum drop_type ShowDropDialogBox(
 	HINSTANCE hInstance, HWND hWndParent,
-	const char *TargetFilename,
+	const TCHAR *TargetFilename,
 	enum drop_type DefaultDropType,
 	int RemaingFileCount,
 	bool EnableSCP,

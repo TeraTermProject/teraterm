@@ -74,7 +74,7 @@ static TImmSetOpenStatus PImmSetOpenStatus;
 
 
 static HANDLE HIMEDLL = NULL;
-static LOGFONT lfIME;
+static LOGFONTA lfIME;
 
 
 BOOL LoadIME()
@@ -87,15 +87,15 @@ BOOL LoadIME()
   char imm32_dll[MAX_PATH];
 
   if (HIMEDLL != NULL) return TRUE;
-  GetSystemDirectory(imm32_dll, sizeof(imm32_dll));
+  GetSystemDirectoryA(imm32_dll, sizeof(imm32_dll));
   strncat_s(imm32_dll, sizeof(imm32_dll), "\\imm32.dll", _TRUNCATE);
-  HIMEDLL = LoadLibrary(imm32_dll);
+  HIMEDLL = LoadLibraryA(imm32_dll);
   if (HIMEDLL == NULL)
   {
     get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
     get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
-    MessageBox(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
-    WritePrivateProfileString("Tera Term","IME","off",ts.SetupFName);
+    MessageBoxA(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
+    WritePrivateProfileStringA("Tera Term","IME","off",ts.SetupFName);
     ts.UseIME = 0;
 #if 0
     tempts = (PTTSet)malloc(sizeof(TTTSet));
@@ -192,9 +192,9 @@ void SetConversionWindow(HWND HWin, int X, int Y)
   (*PImmReleaseContext)(HVTWin,hIMC);
 }
 
-void SetConversionLogFont(PLOGFONT lf)
+void SetConversionLogFont(PLOGFONTA lf)
 {
-  memcpy(&lfIME,lf,sizeof(LOGFONT));
+  memcpy(&lfIME,lf,sizeof(*lf));
 }
 
 HGLOBAL GetConvString(UINT wParam, LPARAM lParam)

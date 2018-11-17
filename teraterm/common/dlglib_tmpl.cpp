@@ -417,7 +417,7 @@ static DLGTEMPLATE *GetDlgTemplate(
 }
 
 static DLGTEMPLATE *GetDlgTemplate(
-	HINSTANCE hInst, LPCSTR lpTemplateName,
+	HINSTANCE hInst, LPCTSTR lpTemplateName,
 	const WCHAR *FontFaceName, LONG FontHeight, BYTE FontCharSet,
 	size_t *PrevTemplSize, size_t *NewTemplSize)
 {
@@ -475,7 +475,7 @@ DLGTEMPLATE *TTGetNewDlgTemplate(
 	return DlgTemplate;
 }
 
-DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCSTR lpTemplateName)
+DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName)
 {
 	DLGTEMPLATE *DlgTemplate =
 		GetDlgTemplate(hInst, lpTemplateName,

@@ -28,6 +28,8 @@
  */
 
 /* TERATERM.EXE, file transfer routines */
+//#undef UNICODE
+//#undef _UNICODE
 #include <stdio.h>
 #include <io.h>
 #include <process.h>
@@ -52,6 +54,13 @@
 #include "ftlib.h"
 
 #include "buffer.h"
+
+#undef GetUserName
+#define GetUserName GetUserNameA
+#undef CreateFile
+#define CreateFile CreateFileA
+#undef MessageBox
+#define MessageBox MessageBoxA
 
 #define FS_BRACKET_NONE  0
 #define FS_BRACKET_START 1
@@ -411,7 +420,6 @@ end:
 }
 
 
-extern "C" {
 BOOL LogStart()
 {
 	LONG Option;
@@ -676,7 +684,6 @@ BOOL LogStart()
 	}
 
 	return TRUE;
-}
 }
 
 void LogPut1(BYTE b)
@@ -1084,7 +1091,6 @@ void FreeBinBuf()
 	cv.BCount = 0;
 }
 
-extern "C" {
 void FileSendStart()
 {
 	LONG Option = 0;
@@ -1152,7 +1158,6 @@ void FileSendStart()
 
 	if (! OpenFTDlg(SendVar))
 		FileTransEnd(OpSendFile);
-	}
 }
 
 void FileTransEnd(WORD OpId)
@@ -1210,7 +1215,6 @@ int FSEcho1(BYTE b)
 		return CommTextEcho(&cv,(PCHAR)&b,1);
 }
 
-extern "C" {
 // ˆÈ‰º‚ÌŽž‚Í‚±‚¿‚ç‚ÌŠÖ”‚ðŽg‚¤
 // - BinaryMode == true
 // - FileBracketMode == false
@@ -1271,9 +1275,7 @@ void FileSendBinayBoost()
 
 	FileTransEnd(OpSendFile);
 }
-}
 
-extern "C" {
 void FileSend()
 {
 	WORD c, fc;
@@ -1377,22 +1379,17 @@ void FileSend()
 
 	FileTransEnd(OpSendFile);
 }
-}
 
-extern "C" {
 void FLogChangeButton(BOOL Pause)
 {
 	if (FLogDlg!=NULL)
 		FLogDlg->ChangeButton(Pause);
 }
-}
 
-extern "C" {
 void FLogRefreshNum()
 {
 	if (FLogDlg!=NULL)
 		FLogDlg->RefreshNum();
-}
 }
 
 BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
@@ -1466,7 +1463,6 @@ BOOL OpenProtoDlg(PFileVar fv, int IdProto, int Mode, WORD Opt1, WORD Opt2)
 	return TRUE;
 }
 
-extern "C" {
 void CloseProtoDlg()
 {
 	if (PtDlg!=NULL)
@@ -1487,7 +1483,6 @@ void CloseProtoDlg()
 			ProtoVar = NULL;
 		}
 	}
-}
 }
 
 BOOL ProtoStart()
@@ -1534,7 +1529,6 @@ void ProtoEnd()
 	FreeFileVar(&FileVar);
 }
 
-extern "C" {
 int ProtoDlgParse()
 {
 	int P;
@@ -1551,26 +1545,20 @@ int ProtoDlgParse()
 	}
 	return P;
 }
-}
 
-extern "C" {
 void ProtoDlgTimeOut()
 {
 	if (PtDlg!=NULL)
 		(*ProtoTimeOutProc)(ProtoId,FileVar,ProtoVar,&cv);
 }
-}
 
-extern "C" {
 void ProtoDlgCancel()
 {
 	if ((PtDlg!=NULL) &&
 	    (*ProtoCancel)(ProtoId,FileVar,ProtoVar,&cv))
 		ProtoEnd();
 }
-}
 
-extern "C" {
 void KermitStart(int mode)
 {
 	WORD w;
@@ -1625,9 +1613,7 @@ void KermitStart(int mode)
 	if (! OpenProtoDlg(FileVar,PROTO_KMT,mode,0,0))
 		ProtoEnd();
 }
-}
 
-extern "C" {
 void XMODEMStart(int mode)
 {
 	LONG Option;
@@ -1712,9 +1698,7 @@ void XMODEMStart(int mode)
 	                   ts.XmodemOpt,ts.XmodemBin))
 		ProtoEnd();
 }
-}
 
-extern "C" {
 void YMODEMStart(int mode)
 {
 	WORD Opt;
@@ -1756,9 +1740,7 @@ void YMODEMStart(int mode)
 	if (! OpenProtoDlg(FileVar,PROTO_YM,mode,Opt,0))
 		ProtoEnd();
 }
-}
 
-extern "C" {
 void ZMODEMStart(int mode)
 {
 	WORD Opt;
@@ -1797,9 +1779,7 @@ void ZMODEMStart(int mode)
 	if (! OpenProtoDlg(FileVar,PROTO_ZM,mode,Opt,0))
 		ProtoEnd();
 }
-}
 
-extern "C" {
 void BPStart(int mode)
 {
 	LONG Option = 0;
@@ -1832,9 +1812,7 @@ void BPStart(int mode)
 	if (! OpenProtoDlg(FileVar,PROTO_BP,mode,0,0))
 		ProtoEnd();
 }
-}
 
-extern "C" {
 void QVStart(int mode)
 {
 	WORD W;
@@ -1867,5 +1845,4 @@ void QVStart(int mode)
 
 	if (! OpenProtoDlg(FileVar,PROTO_QV,mode,0,0))
 		ProtoEnd();
-}
 }

@@ -43,6 +43,9 @@
 #include <locale.h>
 #include <olectl.h>
 
+#undef CreateFontIndirect
+#define CreateFontIndirect CreateFontIndirectA
+
 #define CurWidth 2
 
 static const BYTE DefaultColorTable[256][3] = {
@@ -327,7 +330,7 @@ void FillBitmapDC(HDC hdc,COLORREF color)
   DeleteObject(hBrush);
 }
 
-static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
+static void RandomFile(const char *filespec_src, char *filename, int destlen)
 {
   int    i;
   int    file_num;
@@ -335,17 +338,17 @@ static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
   char   *filePart;
   char filespec[1024];
   HANDLE hFind;
-  WIN32_FIND_DATA fd;
+  WIN32_FIND_DATAA fd;
 
   filename[0] = 0;
-  ExpandEnvironmentStrings(filespec_src, filespec, sizeof(filespec));
+  ExpandEnvironmentStringsA(filespec_src, filespec, sizeof(filespec));
 
   //絶対パスに変換
-  if(!GetFullPathName(filespec,MAX_PATH,fullpath,&filePart))
+  if(!GetFullPathNameA(filespec,MAX_PATH,fullpath,&filePart))
     return;
 
   //ファイルを数える
-  hFind = FindFirstFile(fullpath,&fd);
+  hFind = FindFirstFileA(fullpath,&fd);
 
   file_num = 0;
 
@@ -357,7 +360,7 @@ static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
       if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
         file_num ++;
 
-    }while(FindNextFile(hFind,&fd));
+    }while(FindNextFileA(hFind,&fd));
 
   }
 
@@ -369,7 +372,7 @@ static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
   //何番目のファイルにするか決める。
   file_num = rand()%file_num + 1;
 
-  hFind = FindFirstFile(fullpath,&fd);
+  hFind = FindFirstFileA(fullpath,&fd);
 
   if(hFind != INVALID_HANDLE_VALUE)
   {
@@ -380,7 +383,7 @@ static void RandomFile(const TCHAR *filespec_src, TCHAR *filename, int destlen)
       if(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
         i ++;
 
-    }while(i < file_num && FindNextFile(hFind,&fd));
+    }while(i < file_num && FindNextFileA(hFind,&fd));
 
   }else{
     return;
@@ -419,7 +422,7 @@ BOOL LoadPictureWithSPI(char *nameSPI,char *nameFile,unsigned char *bufFile,long
   hSPI = NULL;
 
   //SPI をロード
-  hSPI = LoadLibrary(nameSPI);
+  hSPI = LoadLibraryA(nameSPI);
 
   if(!hSPI)
     goto error;
@@ -460,7 +463,7 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
   HANDLE hFile;
   BITMAPFILEHEADER bfh;
 
-  hFile = CreateFile(nameFile,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+  hFile = CreateFileA(nameFile,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 
   if(hFile == INVALID_HANDLE_VALUE)
     return FALSE;
@@ -548,14 +551,14 @@ void BGPreloadPicture(BGSrc *src)
   HBITMAP hbm;
   HANDLE  hPictureFile;
   HANDLE  hFind;
-  WIN32_FIND_DATA fd;
+  WIN32_FIND_DATAA fd;
 
   #ifdef _DEBUG
     OutputDebugPrintf("Preload Picture : %s\n",src->file);
   #endif
 
   //ファイルを読み込む
-  hPictureFile = CreateFile(src->file,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  hPictureFile = CreateFileA(src->file,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 
   if(hPictureFile == INVALID_HANDLE_VALUE)
     return;
@@ -573,11 +576,11 @@ void BGPreloadPicture(BGSrc *src)
   CloseHandle(hPictureFile);
 
   // SPIPath を絶対パスに変換
-  if(!GetFullPathName(BGSPIPath,MAX_PATH,filespec,&filePart))
+  if(!GetFullPathNameA(BGSPIPath,MAX_PATH,filespec,&filePart))
     return;
 
   //プラグインを当たっていく
-  hFind = FindFirstFile(filespec,&fd);
+  hFind = FindFirstFileA(filespec,&fd);
 
   if(hFind != INVALID_HANDLE_VALUE && filePart)
   {
@@ -614,7 +617,7 @@ void BGPreloadPicture(BGSrc *src)
 
         break;
       }
-    }while(FindNextFile(hFind,&fd));
+    }while(FindNextFileA(hFind,&fd));
 
     FindClose(hFind);
   }
@@ -623,7 +626,7 @@ void BGPreloadPicture(BGSrc *src)
 
   if (IsLoadImageOnlyEnabled()) {
     //画像をビットマップとして読み込み
-    hbm = LoadImage(0,src->file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+    hbm = LoadImageA(0,src->file,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 
   } else {
 	  // Susie pluginで読み込めないJPEGファイルが存在した場合、
@@ -658,21 +661,21 @@ void BGGetWallpaperInfo(WallpaperInfo *wi)
   strncpy_s(wi->filename, sizeof(wi->filename),"", _TRUNCATE);
 
   //レジストリキーのオープン
-  if(RegOpenKeyEx(HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+  if(RegOpenKeyExA(HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
     return;
 
   //壁紙名ゲット
   length = MAX_PATH;
-  RegQueryValueEx(hKey,"Wallpaper"     ,NULL,NULL,(BYTE*)(wi->filename),&length);
+  RegQueryValueExA(hKey,"Wallpaper"     ,NULL,NULL,(BYTE*)(wi->filename),&length);
 
   //壁紙スタイルゲット
   length = 256;
-  RegQueryValueEx(hKey,"WallpaperStyle",NULL,NULL,(BYTE*)str,&length);
+  RegQueryValueExA(hKey,"WallpaperStyle",NULL,NULL,(BYTE*)str,&length);
   style = atoi(str);
 
   //壁紙スタイルゲット
   length = 256;
-  RegQueryValueEx(hKey,"TileWallpaper" ,NULL,NULL,(BYTE*)str,&length);
+  RegQueryValueExA(hKey,"TileWallpaper" ,NULL,NULL,(BYTE*)str,&length);
   tile = atoi(str);
 
   //これでいいの？
@@ -718,7 +721,7 @@ static HBITMAP GetBitmapHandle(char *File)
 	short type;
 	HBITMAP hBitmap = NULL;
 
-	hFile=CreateFile(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
+	hFile=CreateFileA(File,GENERIC_READ,0,NULL,OPEN_EXISTING,0,NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return (hBitmap);
 	}
@@ -872,10 +875,10 @@ void BGPreloadWallpaper(BGSrc *src)
 		//壁紙を読み込み
 		//LR_CREATEDIBSECTION を指定するのがコツ
 		if (wi.pattern == BG_STRETCH) {
-			hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			hbm = LoadImageA(0,wi.filename,IMAGE_BITMAP,CRTWidth,CRTHeight,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		}
 		else {
-			hbm = LoadImage(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
+			hbm = LoadImageA(0,wi.filename,IMAGE_BITMAP,        0,       0,LR_LOADFROMFILE);
 		}
 	}
 	else {
@@ -985,7 +988,7 @@ void BGStretchPicture(HDC hdcDest,BGSrc *src,int x,int y,int width,int height,BO
 			HBITMAP hbm;
 
 			if (IsLoadImageOnlyEnabled()) {
-				hbm = LoadImage(0,src->file,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
+				hbm = LoadImageA(0,src->file,IMAGE_BITMAP,width,height,LR_LOADFROMFILE);
 			} else {
 				HBITMAP newhbm;
 				hbm = GetBitmapHandle(src->file);
@@ -1272,7 +1275,7 @@ COLORREF BGGetColor(const char *name,COLORREF defcolor,char *file)
 
   _snprintf_s(defstr,sizeof(defstr),_TRUNCATE,"%d,%d,%d",GetRValue(defcolor),GetGValue(defcolor),GetBValue(defcolor));
 
-  GetPrivateProfileString(BG_SECTION,name,defstr,colorstr,255,file);
+  GetPrivateProfileStringA(BG_SECTION,name,defstr,colorstr,255,file);
 
   r = g = b = 0;
 
@@ -1289,7 +1292,7 @@ BG_PATTERN BGGetStrIndex(char *name,BG_PATTERN def,char *file,const char *strLis
   def %= nList;
 
   strncpy_s(defstr, sizeof(defstr),strList[def], _TRUNCATE);
-  GetPrivateProfileString(BG_SECTION,name,defstr,str,64,file);
+  GetPrivateProfileStringA(BG_SECTION,name,defstr,str,64,file);
 
   for(i = 0;i < nList;i++)
     if(!_stricmp(str,strList[i]))
@@ -1365,37 +1368,37 @@ void BGReadIniFile(char *file)
   BGDest.pattern = BGGetPattern("BGPicturePattern",BGSrc1.pattern,file);
   BGDest.color   = BGGetColor("BGPictureBaseColor",BGSrc1.color,file);
 
-  GetPrivateProfileString(BG_SECTION,"BGPictureFile",BGSrc1.file,path,MAX_PATH,file);
+  GetPrivateProfileStringA(BG_SECTION,"BGPictureFile",BGSrc1.file,path,MAX_PATH,file);
   RandomFile(path,BGDest.file,sizeof(BGDest.file));
 
-  BGSrc1.alpha   = 255 - GetPrivateProfileInt(BG_SECTION,"BGPictureTone",255 - BGSrc1.alpha,file);
+  BGSrc1.alpha   = 255 - GetPrivateProfileIntA(BG_SECTION,"BGPictureTone",255 - BGSrc1.alpha,file);
 
   if(!strcmp(BGDest.file,""))
     BGSrc1.alpha = 255;
 
-  BGSrc2.alpha   = 255 - GetPrivateProfileInt(BG_SECTION,"BGFadeTone",255 - BGSrc2.alpha,file);
+  BGSrc2.alpha   = 255 - GetPrivateProfileIntA(BG_SECTION,"BGFadeTone",255 - BGSrc2.alpha,file);
   BGSrc2.color   = BGGetColor("BGFadeColor",BGSrc2.color,file);
 
-  BGReverseTextAlpha = GetPrivateProfileInt(BG_SECTION,"BGReverseTextTone",BGReverseTextAlpha,file);
+  BGReverseTextAlpha = GetPrivateProfileIntA(BG_SECTION,"BGReverseTextTone",BGReverseTextAlpha,file);
 
   //Src1 の読み出し
   BGSrc1.type      = BGGetType("BGSrc1Type",BGSrc1.type,file);
   BGSrc1.pattern   = BGGetPattern("BGSrc1Pattern",BGSrc1.pattern,file);
   BGSrc1.antiAlias = BGGetOnOff("BGSrc1AntiAlias",BGSrc1.antiAlias,file);
-  BGSrc1.alpha     = GetPrivateProfileInt(BG_SECTION,"BGSrc1Alpha"  ,BGSrc1.alpha  ,file);
+  BGSrc1.alpha     = GetPrivateProfileIntA(BG_SECTION,"BGSrc1Alpha"  ,BGSrc1.alpha  ,file);
   BGSrc1.color     = BGGetColor("BGSrc1Color",BGSrc1.color,file);
 
-  GetPrivateProfileString(BG_SECTION,"BGSrc1File",BGSrc1.file,path,MAX_PATH,file);
+  GetPrivateProfileStringA(BG_SECTION,"BGSrc1File",BGSrc1.file,path,MAX_PATH,file);
   RandomFile(path,BGSrc1.file,sizeof(BGSrc1.file));
 
   //Src2 の読み出し
   BGSrc2.type      = BGGetType("BGSrc2Type",BGSrc2.type,file);
   BGSrc2.pattern   = BGGetPattern("BGSrc2Pattern",BGSrc2.pattern,file);
   BGSrc2.antiAlias = BGGetOnOff("BGSrc2AntiAlias",BGSrc2.antiAlias,file);
-  BGSrc2.alpha     = GetPrivateProfileInt(BG_SECTION,"BGSrc2Alpha"  ,BGSrc2.alpha  ,file);
+  BGSrc2.alpha     = GetPrivateProfileIntA(BG_SECTION,"BGSrc2Alpha"  ,BGSrc2.alpha  ,file);
   BGSrc2.color     = BGGetColor("BGSrc2Color",BGSrc2.color,file);
 
-  GetPrivateProfileString(BG_SECTION,"BGSrc2File",BGSrc2.file,path,MAX_PATH,file);
+  GetPrivateProfileStringA(BG_SECTION,"BGSrc2File",BGSrc2.file,path,MAX_PATH,file);
   RandomFile(path,BGSrc2.file,sizeof(BGSrc2.file));
 
   //Dest の読み出し
@@ -1404,11 +1407,11 @@ void BGReadIniFile(char *file)
   BGDest.antiAlias = BGGetOnOff("BGDestAntiAlias",BGDest.antiAlias,file);
   BGDest.color     = BGGetColor("BGDestColor",BGDest.color,file);
 
-  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, BGDest.file,path,MAX_PATH,file);
+  GetPrivateProfileStringA(BG_SECTION, BG_DESTFILE, BGDest.file,path,MAX_PATH,file);
   RandomFile(path,BGDest.file,sizeof(BGDest.file));
 
   //その他読み出し
-  BGReverseTextAlpha = GetPrivateProfileInt(BG_SECTION,"BGReverseTextAlpha",BGReverseTextAlpha,file);
+  BGReverseTextAlpha = GetPrivateProfileIntA(BG_SECTION,"BGReverseTextAlpha",BGReverseTextAlpha,file);
   BGReadTextColorConfig(file);
 }
 
@@ -1425,9 +1428,9 @@ void BGDestruct(void)
   DeleteBitmapDC(&(BGSrc2.hdc));
 
   //テンポラリーファイル削除
-  DeleteFile(BGDest.fileTmp);
-  DeleteFile(BGSrc1.fileTmp);
-  DeleteFile(BGSrc2.fileTmp);
+  DeleteFileA(BGDest.fileTmp);
+  DeleteFileA(BGSrc1.fileTmp);
+  DeleteFileA(BGSrc2.fileTmp);
 }
 
 void BGInitialize(void)
@@ -1480,21 +1483,21 @@ void BGInitialize(void)
 	  ts.EtermLookfeel.BGFastSizeMove = BGGetOnOff("BGFastSizeMove"    ,TRUE ,ts.SetupFName);
 	  ts.EtermLookfeel.BGNoCopyBits = BGGetOnOff("BGFlickerlessMove" ,TRUE ,ts.SetupFName);
 
-	  GetPrivateProfileString(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
+	  GetPrivateProfileStringA(BG_SECTION,"BGSPIPath","plugin",BGSPIPath,MAX_PATH,ts.SetupFName);
 	  strncpy_s(ts.EtermLookfeel.BGSPIPath, sizeof(ts.EtermLookfeel.BGSPIPath), BGSPIPath, _TRUNCATE);
 
   if (ts.EtermLookfeel.BGThemeFile[0] == '\0') {
 	  //コンフィグファイルの決定
-	  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
+	  GetPrivateProfileStringA(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
 	  strncpy_s(ts.EtermLookfeel.BGThemeFile, sizeof(ts.EtermLookfeel.BGThemeFile), path, _TRUNCATE);
 
 	  // 背景画像の読み込み
 	  _snprintf_s(path, sizeof(path), _TRUNCATE, "%s\\%s", ts.HomeDir, BG_THEME_IMAGEFILE);
-	  GetPrivateProfileString(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
+	  GetPrivateProfileStringA(BG_SECTION, BG_DESTFILE, "", ts.BGImageFilePath, sizeof(ts.BGImageFilePath), path);
 
 	  // 背景画像の明るさの読み込み。
 	  // BGSrc1Alpha と BGSrc2Alphaは同値として扱う。
-	  ts.BGImgBrightness = GetPrivateProfileInt(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
+	  ts.BGImgBrightness = GetPrivateProfileIntA(BG_SECTION, BG_THEME_IMAGE_BRIGHTNESS1, BG_THEME_IMAGE_BRIGHTNESS_DEFAULT, path);
   }
 
   if(!BGEnable)
@@ -1511,10 +1514,10 @@ void BGInitialize(void)
   BGNoCopyBits = ts.EtermLookfeel.BGNoCopyBits;
 
   //テンポラリーファイル名を生成
-  GetTempPath(MAX_PATH,tempPath);
-  GetTempFileName(tempPath,"ttAK",0,BGDest.fileTmp);
-  GetTempFileName(tempPath,"ttAK",0,BGSrc1.fileTmp);
-  GetTempFileName(tempPath,"ttAK",0,BGSrc2.fileTmp);
+  GetTempPathA(MAX_PATH,tempPath);
+  GetTempFileNameA(tempPath,"ttAK",0,BGDest.fileTmp);
+  GetTempFileNameA(tempPath,"ttAK",0,BGSrc1.fileTmp);
+  GetTempFileNameA(tempPath,"ttAK",0,BGSrc2.fileTmp);
 
   //デフォルト値
   BGDest.type      = BG_PICTURE;
@@ -1543,7 +1546,7 @@ void BGInitialize(void)
   BGReadIniFile(ts.SetupFName);
 
   //コンフィグファイルの決定
-  GetPrivateProfileString(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
+  GetPrivateProfileStringA(BG_SECTION,"BGThemeFile","",path,MAX_PATH,ts.SetupFName);
   RandomFile(path,config_file,sizeof(config_file));
 
   //設定のオーバーライド
@@ -1552,14 +1555,14 @@ void BGInitialize(void)
     char dir[MAX_PATH],prevDir[MAX_PATH];
 
     //INIファイルのあるディレクトリに一時的に移動
-    GetCurrentDirectory(MAX_PATH,prevDir);
+    GetCurrentDirectoryA(MAX_PATH,prevDir);
 
     ExtractDirName(config_file,dir);
-    SetCurrentDirectory(dir);
+    SetCurrentDirectoryA(dir);
 
     BGReadIniFile(config_file);
 
-    SetCurrentDirectory(prevDir);
+    SetCurrentDirectoryA(prevDir);
   }
 
   //SPI のパスを整形
@@ -1905,9 +1908,9 @@ void DispConvScreenToWin
        *Yw = (Ys - WinOrgY) * FontHeight;
 }
 
-static void SetLogFont(LOGFONT *VTlf)
+static void SetLogFont(LOGFONTA *VTlf)
 {
-  memset(VTlf, 0, sizeof(LOGFONT));
+  memset(VTlf, 0, sizeof(*VTlf));
   VTlf->lfWeight = FW_NORMAL;
   VTlf->lfItalic = 0;
   VTlf->lfUnderline = 0;
@@ -1926,7 +1929,7 @@ void ChangeFont()
 {
   int i, j;
   TEXTMETRIC Metrics;
-  LOGFONT VTlf;
+  LOGFONTA VTlf;
 
   /* Delete Old Fonts */
   for (i = 0 ; i <= AttrFontMask ; i++)
@@ -2033,7 +2036,7 @@ void ResetIME()
 		if (ts.UseIME>0)
 		{
 			if (ts.IMEInline>0) {
-				LOGFONT VTlf;
+				LOGFONTA VTlf;
 				SetLogFont(&VTlf);
 				SetConversionLogFont(&VTlf);
 			}
@@ -2747,7 +2750,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 //<!--by AKASI
   if(!BGEnable)
   {
-    ExtTextOut(VTDC,*X+ts.FontDX,Y+ts.FontDY,
+    ExtTextOutA(VTDC,*X+ts.FontDX,Y+ts.FontDY,
                ETO_CLIPPED | ETO_OPAQUE,
                &RText,Buff,Count,&Dx[0]);
   }else{
@@ -2794,7 +2797,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
       }
     }
 
-    ExtTextOut(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect,Buff,Count,&Dx[0]);
+    ExtTextOutA(hdcBGBuffer,ts.FontDX,ts.FontDY,eto_options,&rect,Buff,Count,&Dx[0]);
     BitBlt(VTDC,*X,Y,width,height,hdcBGBuffer,0,0,SRCCOPY);
 
     SelectObject(hdcBGBuffer,hPrevFont);
@@ -3323,7 +3326,7 @@ void DispSetupFontDlg()
 //  reset window
 {
   BOOL Ok;
-  LOGFONT VTlf;
+  LOGFONTA VTlf;
 
   ts.VTFlag = 1;
   if (! LoadTTDLG()) return;
@@ -3780,7 +3783,7 @@ void DispGetRootWinSize(int *x, int *y)
 	GetWindowRect(HVTWin, &win);
 	GetClientRect(HVTWin, &client);
 
-	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	if (((mod = GetModuleHandleA("user32.dll")) != NULL) &&
 	    (GetProcAddress(mod,"MonitorFromWindow") != NULL)) {
 		// マルチモニタがサポートされている場合
 		monitor = MonitorFromWindow(HVTWin, MONITOR_DEFAULTTONEAREST);

@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <commctrl.h>
+#include <tchar.h>
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
 {
@@ -101,10 +102,10 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
 
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num)
 {
-	char Temp[16];
+	TCHAR Temp[16];
 
 	/* In Win16, SetDlgItemInt can not be used to display long integer. */
-	_snprintf_s(Temp,sizeof(Temp),_TRUNCATE,"%d",Num);
+	_sntprintf_s(Temp, _countof(Temp), _TRUNCATE, _T("%d"), Num);
 	SetDlgItemText(HDlg,id_Item,Temp);
 }
 
@@ -128,7 +129,7 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	// 落ちる問題への対処。(2005.3.18 yutaka)
 	// cf. http://sourceforge.jp/tracker/index.php?func=detail&aid=5713&group_id=1412&atid=5333
 	double Num; 
-	char NumStr[10]; 
+	TCHAR NumStr[10]; 
 
 	if (b==0) {
 		Num = 100.0; 
@@ -136,7 +137,7 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	else {
 		Num = 100.0 * (double)a / (double)b; 
 	}
-	_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%3.1f%%",Num); 
+	_sntprintf_s(NumStr, _countof(NumStr),_TRUNCATE,_T("%3.1f%%"),Num); 
 	SetDlgItemText(HDlg, id_Item, NumStr); 
 
 	if (id_Progress != 0 && p != NULL && *p >= 0 && (double)*p < Num) {
@@ -149,13 +150,13 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 {
 	static int prev_elapsed;
 	int elapsed, rate;
-	char buff[64];
+	TCHAR buff[64];
 
 	elapsed = (GetTickCount() - stime) / 1000;
 
 	if (elapsed == 0) {
 		prev_elapsed = 0;
-		SetDlgItemText(HDlg, id_Item, "0:00");
+		SetDlgItemText(HDlg, id_Item, _T("0:00"));
 		return;
 	}
 
@@ -166,25 +167,25 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 
 	rate = bytes / elapsed;
 	if (rate < 1200) {
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%dBytes/s)"), elapsed / 60, elapsed % 60, rate); 
 	}
 	else if (rate < 1200000) {
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dKB/s)"), elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
 	}
 	else {
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dMB/s)"), elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100);
 	}
 
 	SetDlgItemText(HDlg, id_Item, buff);
 }
 
-void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR *List[], int nsel)
+void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel)
 {
 	int i;
 
 	i = 0;
 	while (List[i] != NULL) {
-		SendDlgItemMessage(HDlg, Id_Item, CB_ADDSTRING,
+		SendDlgItemMessageA(HDlg, Id_Item, CB_ADDSTRING,
 		                   0, (LPARAM)List[i]);
 		i++;
 	}
@@ -276,7 +277,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						max++; // '\0'
 						orgstr = str = (char *)malloc(max);
 						if (str != NULL) {
-							len = GetWindowText(dlg, str, max);
+							len = GetWindowTextA(dlg, str, max);
 							if (select >= 0 && select < len) {
 								if (wParam == 0x44) { // カーソル配下の文字のみを削除する
 									memmove(&str[select], &str[select + 1], len - select - 1);
@@ -297,7 +298,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 								select = 0;
 							}
 
-							SetWindowText(dlg, str);
+							SetWindowTextA(dlg, str);
 							SendMessage(dlg, EM_SETSEL, select, select);
 							free(orgstr);
 							return 0;
@@ -366,10 +367,9 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 	assert(infoCount > 0);
 	for (i = 0 ; i < infoCount; i++) {
 		const char *key = infos[i].key;
-#if 1
-		char uimsg[MAX_UIMSG];
-		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
-		if (uimsg[0] != '\0') {
+		TCHAR uimsg[MAX_UIMSG];
+		get_lang_msgT(key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		if (uimsg[0] != _T('\0')) {
 			const int nIDDlgItem = infos[i].nIDDlgItem;
 			if (nIDDlgItem == 0) {
 				SetWindowText(hDlgWnd, uimsg);
@@ -379,20 +379,23 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 				assert(r != 0); (void)r;
 			}
 		}
-#else
-		char uimsg_ini[MAX_UIMSG];
-		get_lang_msg(key, uimsg_ini, sizeof(uimsg_ini), "", UILanguageFile);
-		if (uimsg_ini[0] != '\0') {
-			wchar_t uimsg[MAX_UIMSG];
-			MultiByteToWideChar(932, 0, uimsg_ini, -1, uimsg, _countof(uimsg));
-			const int nIDDlgItem = infos[i].nIDDlgItem;
-			if (nIDDlgItem == 0) {
-				SetWindowTextW(hDlgWnd, uimsg);
-			} else {
-				SetDlgItemTextW(hDlgWnd, nIDDlgItem, uimsg);
-			}
-		}
-#endif
 	}
 }
 
+void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+{
+	int i;
+	for (i = 0; i < infoCount; i++) {
+		const int nIDDlgItem = infos[i].nIDDlgItem;
+		const char *key = infos[i].key;
+		TCHAR uimsg[MAX_UIMSG];
+ 		get_lang_msgT(key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		if (uimsg[0] != '\0') {
+			if (nIDDlgItem < 1000) {
+				ModifyMenu(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
+			} else {
+				ModifyMenu(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+			}
+		}
+	}
+}

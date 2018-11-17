@@ -63,7 +63,7 @@ BOOL TTCFrameWnd::Create(
 	DWORD dwExStyle)
 {
 	pseudoPtr = this;
-	HWND hWnd = ::CreateWindowExA(
+	HWND hWnd = ::CreateWindowEx(
 		0,
 		lpszClassName,
 		lpszWindowName,

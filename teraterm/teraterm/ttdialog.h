@@ -49,7 +49,7 @@ typedef BOOL (WINAPI *PChangeDirectory)
 typedef BOOL (WINAPI *PAboutDialog)
   (HWND WndParent);
 typedef BOOL (WINAPI *PChooseFontDlg)
-  (HWND WndParent, LPLOGFONT LogFont, PTTSet ts);
+  (HWND WndParent, LPLOGFONTA LogFont, PTTSet ts);
 typedef BOOL (WINAPI *PSetupGeneral)
   (HWND WndParent, PTTSet ts);
 typedef BOOL (WINAPI *PWindowWindow)

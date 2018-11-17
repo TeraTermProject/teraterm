@@ -89,6 +89,7 @@ private:
 	HBRUSH OnCtlColor(HDC hDC, HWND hWnd);
 	enum { IDD = IDD_TABSHEET_VISUAL };
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	void SetupRGBbox(int index);
 };
 
 // Log Page

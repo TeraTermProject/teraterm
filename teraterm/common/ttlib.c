@@ -213,7 +213,8 @@ int b64decode(PCHAR dst, int dsize, PCHAR src)
 BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos)
 {
 	BYTE b;
-	LPTSTR Ptr, DirPtr, FNPtr, PtrOld;
+//	LPTSTR Ptr, DirPtr, FNPtr, PtrOld;
+	LPSTR Ptr, DirPtr, FNPtr, PtrOld;
 
 	*DirLen = 0;
 	*FNPos = 0;
@@ -225,14 +226,14 @@ BOOL GetFileNamePos(PCHAR PathName, int *DirLen, int *FNPos)
 	else
 		Ptr = PathName;
 	if (Ptr[0]=='\\' || Ptr[0]=='/')
-		Ptr = CharNext(Ptr);
+		Ptr = CharNextA(Ptr);
 
 	DirPtr = Ptr;
 	FNPtr = Ptr;
 	while (Ptr[0]!=0) {
 		b = Ptr[0];
 		PtrOld = Ptr;
-		Ptr = CharNext(Ptr);
+		Ptr = CharNextA(Ptr);
 		switch (b) {
 			case ':':
 				return FALSE;
@@ -315,8 +316,8 @@ void FitFileName(PCHAR FileName, int destlen, const char *DefExt)
 // Append a slash to the end of a path name
 void AppendSlash(PCHAR Path, int destlen)
 {
-	if (strcmp(CharPrev((LPCTSTR)Path,
-	           (LPCTSTR)(&Path[strlen(Path)])),
+	if (strcmp(CharPrevA((LPCSTR)Path,
+	           (LPCSTR)(&Path[strlen(Path)])),
 	           "\\") != 0) {
 		strncat_s(Path,destlen,"\\",_TRUNCATE);
 	}
@@ -802,6 +803,46 @@ void RestoreNewLine(PCHAR Text)
 	memcpy(Text, buf, size);
 }
 
+void RestoreNewLineW(wchar_t *Text)
+{
+	int i, j=0;
+	int size= wcslen(Text);
+	wchar_t *buf = (wchar_t *)_alloca((size+1) * sizeof(wchar_t));
+
+	memset(buf, 0, (size+1) * sizeof(wchar_t));
+	for (i=0; i<size; i++) {
+		if (Text[i] == L'\\' && i<size ) {
+			switch (Text[i+1]) {
+				case L'\\':
+					buf[j] = L'\\';
+					i++;
+					break;
+				case L'n':
+					buf[j] = L'\n';
+					i++;
+					break;
+				case L't':
+					buf[j] = L'\t';
+					i++;
+					break;
+				case L'0':
+					buf[j] = L'\0';
+					i++;
+					break;
+				default:
+					buf[j] = L'\\';
+			}
+			j++;
+		}
+		else {
+			buf[j] = Text[i];
+			j++;
+		}
+	}
+	/* use memcpy to copy with '\0' */
+	memcpy(Text, buf, size * sizeof(wchar_t));
+}
+
 BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest)
 {
 	int i, j, k;
@@ -859,7 +900,7 @@ void GetDownloadFolder(char *dest, int destlen)
 	char download[MAX_PATH];
 
 	memset(download, 0, sizeof(download));
-	if (hDll = LoadLibrary("shell32.dll")) {
+	if (hDll = LoadLibraryA("shell32.dll")) {
 		SHGETKNOWNFOLDERPATH pSHGetKnownFolderPath = (SHGETKNOWNFOLDERPATH)GetProcAddress(hDll, "SHGetKnownFolderPath");
 		if (pSHGetKnownFolderPath) {
 			PWSTR pBuffer = NULL;
@@ -871,7 +912,7 @@ void GetDownloadFolder(char *dest, int destlen)
 	if (strlen(download) == 0) {
 		LPITEMIDLIST pidl;
 		if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == NOERROR) {
-			SHGetPathFromIDList(pidl, download);
+			SHGetPathFromIDListA(pidl, download);
 			CoTaskMemFree(pidl);
 		}
 	}
@@ -891,7 +932,7 @@ void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int 
 	IMalloc *pmalloc;
 	SHGetMalloc(&pmalloc);
 	if (SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl) == S_OK) {
-		SHGetPathFromIDList(pidl, MyDoc);
+		SHGetPathFromIDListA(pidl, MyDoc);
 		pmalloc->lpVtbl->Free(pmalloc, pidl);
 		pmalloc->lpVtbl->Release(pmalloc);
 	}
@@ -902,7 +943,7 @@ void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int 
 	strncpy_s(MyDocSetupFName, sizeof(MyDocSetupFName), MyDoc, _TRUNCATE);
 	AppendSlash(MyDocSetupFName,sizeof(MyDocSetupFName));
 	strncat_s(MyDocSetupFName, sizeof(MyDocSetupFName), file, _TRUNCATE);
-	if (GetFileAttributes(MyDocSetupFName) != -1) {
+	if (GetFileAttributesA(MyDocSetupFName) != -1) {
 		strncpy_s(dest, destlen, MyDocSetupFName, _TRUNCATE);
 		return;
 	}
@@ -928,7 +969,7 @@ void GetUILanguageFile(char *buf, int buflen)
 	char CurDir[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(NULL,Temp,sizeof(Temp)) == 0) {
 		memset(buf, 0, buflen);
 		return;
 	}
@@ -938,13 +979,13 @@ void GetUILanguageFile(char *buf, int buflen)
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
 	
 	/* Get LanguageFile name */
-	GetPrivateProfileString("Tera Term", "UILanguageFile", "",
+	GetPrivateProfileStringA("Tera Term", "UILanguageFile", "",
 	                        Temp, sizeof(Temp), SetupFName);
 
-	GetCurrentDirectory(sizeof(CurDir), CurDir);
-	SetCurrentDirectory(HomeDir);
+	GetCurrentDirectoryA(sizeof(CurDir), CurDir);
+	SetCurrentDirectoryA(HomeDir);
 	_fullpath(buf, Temp, buflen);
-	SetCurrentDirectory(CurDir);
+	SetCurrentDirectoryA(CurDir);
 }
 
 // 指定したエントリを teraterm.ini から読み取る (2009.3.23 yutaka)
@@ -955,7 +996,7 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	char SetupFName[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(NULL,Temp,sizeof(Temp)) == 0) {
 		strncpy_s(buf, buflen, "off", _TRUNCATE);
 		return;
 	}
@@ -965,10 +1006,19 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
 	
 	/* Get LanguageFile name */
-	GetPrivateProfileString("Tera Term", entry, "off",
+	GetPrivateProfileStringA("Tera Term", entry, "off",
 	                        Temp, sizeof(Temp), SetupFName);
 
 	strncpy_s(buf, buflen, Temp, _TRUNCATE);
+}
+
+void get_lang_msgT(const char *key, TCHAR *buf, int buf_len, const TCHAR *def, const char *iniFile)
+{
+#if defined(UNICODE)
+	GetI18nStrW("Tera Term", key, buf, buf_len, def, iniFile);
+#else	
+	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
+#endif
 }
 
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
@@ -976,7 +1026,7 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
 }
 
-int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile)
+int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
 	if (GetI18nLogfont("Tera Term", key, logfont,
 	                   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
@@ -984,7 +1034,7 @@ int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char
 		return FALSE;
 	}
 
-	if ((*font = CreateFontIndirect(logfont)) == NULL) {
+	if ((*font = CreateFontIndirectA(logfont)) == NULL) {
 		return FALSE;
 	}
 
@@ -1004,7 +1054,7 @@ int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData
 
 BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
 {
-	BROWSEINFO      bi;
+	BROWSEINFOA     bi;
 	LPITEMIDLIST    pidlRoot;      // ブラウズのルートPIDL
 	LPITEMIDLIST    pidlBrowse;    // ユーザーが選択したPIDL
 	char buf[MAX_PATH];
@@ -1029,10 +1079,10 @@ BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
 	bi.lpfn = setDefaultFolder;
 	bi.lParam = (LPARAM)def;
 	// フォルダ選択ダイアログの表示 
-	pidlBrowse = SHBrowseForFolder(&bi);
+	pidlBrowse = SHBrowseForFolderA(&bi);
 	if (pidlBrowse != NULL) {  
 		// PIDL形式の戻り値のファイルシステムのパスに変換
-		if (SHGetPathFromIDList(pidlBrowse, buf)) {
+		if (SHGetPathFromIDListA(pidlBrowse, buf)) {
 			// 取得成功
 			strncpy_s(path, pathlen, buf, _TRUNCATE);
 			ret = TRUE;
@@ -1051,7 +1101,7 @@ void OutputDebugPrintf(const char *fmt, ...) {
 	va_list arg;
 	va_start(arg, fmt);
 	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
-	OutputDebugString(tmp);
+	OutputDebugStringA(tmp);
 }
 
 #if (_MSC_VER < 1800)
@@ -1244,10 +1294,10 @@ ULONGLONG myVerSetConditionMask(ULONGLONG dwlConditionMask, DWORD dwTypeBitMask,
 	static func pVerSetConditionMask = NULL;
 	char kernel32_dll[MAX_PATH];
 
-	GetSystemDirectory(kernel32_dll, sizeof(kernel32_dll));
+	GetSystemDirectoryA(kernel32_dll, sizeof(kernel32_dll));
 	strncat_s(kernel32_dll, sizeof(kernel32_dll), "\\kernel32.dll", _TRUNCATE);
 	if (hmodKernel32 == NULL) {
-		hmodKernel32 = LoadLibrary(kernel32_dll);
+		hmodKernel32 = LoadLibraryA(kernel32_dll);
 		if (hmodKernel32 != NULL) {
 			pVerSetConditionMask = (func)GetProcAddress(hmodKernel32, "VerSetConditionMask");
 		}
@@ -1384,7 +1434,7 @@ BOOL HasMultiMonitorSupport()
 {
 	HMODULE mod;
 
-	if (((mod = GetModuleHandle("user32.dll")) != NULL) &&
+	if (((mod = GetModuleHandleA("user32.dll")) != NULL) &&
 	    (GetProcAddress(mod, "MonitorFromPoint") != NULL)) {
 		return TRUE;
 	}
@@ -1398,7 +1448,7 @@ BOOL HasGetAdaptersAddresses()
 {
 	HMODULE mod;
 
-	if (((mod = GetModuleHandle("iphlpapi.dll")) != NULL) &&
+	if (((mod = GetModuleHandleA("iphlpapi.dll")) != NULL) &&
 		(GetProcAddress(mod, "GetAdaptersAddresses") != NULL)) {
 		return TRUE;
 	}
@@ -1411,7 +1461,7 @@ BOOL HasDnsQuery()
 {
 	HMODULE mod;
 
-	if (((mod = GetModuleHandle("Dnsapi.dll")) != NULL) &&
+	if (((mod = GetModuleHandleA("Dnsapi.dll")) != NULL) &&
 		(GetProcAddress(mod, "DnsQuery") != NULL)) {
 		return TRUE;
 	}
@@ -1425,6 +1475,7 @@ BOOL HasBalloonTipSupport()
 	return IsWindows2000OrLater() || IsWindowsMe();
 }
 
+// TODO check unicode
 int get_OPENFILENAME_SIZE()
 {
 	if (IsWindows2000OrLater()) {

@@ -61,6 +61,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <tchar.h>
 
 //
 // リサイズツールチップ (based on PuTTY sizetip.c)
@@ -134,7 +135,7 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 				HDC hdc = CreateCompatibleDC(NULL);
 
 				SelectObject(hdc, tip_font);
-				GetTextExtentPoint32(hdc, str, strlen(str), &sz);
+				GetTextExtentPoint32(hdc, str, _tcslen(str), &sz);
 
 				SetWindowPos(hWnd, NULL, 0, 0, sz.cx + 6, sz.cy + 6,
 				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
@@ -171,7 +172,7 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 			wc.hCursor = NULL;
 			wc.hbrBackground = NULL;
 			wc.lpszMenuName = NULL;
-			wc.lpszClassName = "SizeTipClass";
+			wc.lpszClassName = _T("SizeTipClass");
 
 			tip_class = RegisterClass(&wc);
 		}
@@ -197,7 +198,7 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 
 	/* Generate the tip text */
 
-	sprintf_s(str, sizeof(str), "%dx%d", cx, cy);
+	_stprintf_s(str, _countof(str), _T("%dx%d"), cx, cy);
 
 	if (!tip_wnd) {
 		HDC hdc;
@@ -209,7 +210,7 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 		/* calculate the tip's size */
 
 		hdc = CreateCompatibleDC(NULL);
-		GetTextExtentPoint32(hdc, str, strlen(str), &sz);
+		GetTextExtentPoint32(hdc, str, _tcslen(str), &sz);
 		DeleteDC(hdc);
 
 		GetWindowRect(src, &wr);

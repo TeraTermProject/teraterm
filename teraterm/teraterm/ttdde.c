@@ -28,6 +28,8 @@
  */
 
 /* TERATERM.EXE, DDE routines */
+#undef UNICODE
+#undef _UNICODE
 #include "teraterm.h"
 #include "tttypes.h"
 #include <stdio.h>

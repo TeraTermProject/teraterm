@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <commctrl.h>
+#include <tchar.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
@@ -38,6 +39,11 @@
 #include "dlglib.h"
 #include "tt_res.h"
 #include "ftdlg.h"
+
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef SetWindowText
+#define SetWindowText SetWindowTextA
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
@@ -63,7 +69,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "FTDlg32";
+	wc.lpszClassName = _T("FTDlg32");
 	RegisterClass(&wc);
 
 	Pause = FALSE;

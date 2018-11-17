@@ -58,7 +58,7 @@ static void init()
 	pSetDllDir setDllDir;
 	pSetDefDllDir setDefDllDir;
 
-	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
+	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
 			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
@@ -221,7 +221,7 @@ HWND GetHWND()
 
 static void SetDialogFont()
 {
-	LOGFONT logfont;
+	LOGFONTA logfont;
 	BOOL result;
 
 	// 明示的に指定されている場合はそれに従う

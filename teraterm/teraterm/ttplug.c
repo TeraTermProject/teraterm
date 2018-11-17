@@ -70,7 +70,7 @@ static void loadExtension(ExtensionList * * extensions, char const * fileName) {
   char uimsg[MAX_UIMSG];
 
   if (NumExtensions>=MAXNUMEXTENSIONS) return;
-  LibHandle[NumExtensions] = LoadLibrary(fileName);
+  LibHandle[NumExtensions] = LoadLibraryA(fileName);
   if (LibHandle[NumExtensions] != NULL) {
 #if defined(_MSC_VER)
     const char *TTXBIND = "_TTXBind@8";
@@ -106,7 +106,7 @@ static void loadExtension(ExtensionList * * extensions, char const * fileName) {
   get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: Error", ts.UILanguageFile);
   get_lang_msg("MSG_LOAD_EXT_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Cannot load extension %s (%d)", ts.UILanguageFile);
   _snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, fileName, err);
-  MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONEXCLAMATION);
+  MessageBoxA(NULL, buf, uimsg, MB_OK | MB_ICONEXCLAMATION);
 }
 
 void WINAPI TTXInit(PTTSet ts, PComVar cv) {

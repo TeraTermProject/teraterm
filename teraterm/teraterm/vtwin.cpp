@@ -90,12 +90,30 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 
 #define CFrameWnd	TTCFrameWnd
 
-#define VTClassName "VTWin32"
+#define VTClassName _T("VTWin32")
 
-#if 0 //def _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef CreateProcess
+#define CreateProcess CreateProcessA
+#undef STARTUPINFO
+#define STARTUPINFO STARTUPINFOA
+#undef GetStartupInfo
+#define GetStartupInfo GetStartupInfoA
+
+#if defined(UNICODE)
+#define CreateProcessT CreateProcessW
+#define GetStartupInfoT GetStartupInfoW
+#define STARTUPINFOT STARTUPINFOW
+#else
+#define CreateProcessT CreateProcessA
+#define GetStartupInfoT GetStartupInfoA
+#define STARTUPINFOT STARTUPINFOA
+#endif
+
+#ifdef _DEBUG
+#define malloc(l)   _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define new  		::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 // ウィンドウ最大化ボタンを有効にする (2005.1.15 yutaka)
@@ -330,7 +348,7 @@ void RegDeviceNotify(HWND hWnd)
 	PRegisterDeviceNotification pRegisterDeviceNotification;
 	DEV_BROADCAST_DEVICEINTERFACE filter;
 
-	if (((h = GetModuleHandle("user32.dll")) == NULL) ||
+	if (((h = GetModuleHandleA("user32.dll")) == NULL) ||
 			((pRegisterDeviceNotification = (PRegisterDeviceNotification)GetProcAddress(h, "RegisterDeviceNotificationA")) == NULL)) {
 		return;
 	}
@@ -348,7 +366,7 @@ void UnRegDeviceNotify(HWND hWnd)
 	HMODULE h;
 	PUnregisterDeviceNotification pUnregisterDeviceNotification;
 
-	if (((h = GetModuleHandle("user32.dll")) == NULL) ||
+	if (((h = GetModuleHandleA("user32.dll")) == NULL) ||
 			((pUnregisterDeviceNotification = (PUnregisterDeviceNotification)GetProcAddress(h, "UnregisterDeviceNotification")) == NULL)) {
 		return;
 	}
@@ -425,10 +443,10 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	char imagehlp_dll[MAX_PATH];
 
 	// Windows98/Me/NT4では動かないためスキップする。(2007.10.9 yutaka)
-	GetSystemDirectory(imagehlp_dll, sizeof(imagehlp_dll));
+	GetSystemDirectoryA(imagehlp_dll, sizeof(imagehlp_dll));
 	strncat_s(imagehlp_dll, sizeof(imagehlp_dll), "\\imagehlp.dll", _TRUNCATE);
-	h2 = LoadLibrary(imagehlp_dll);
-	if (((h = GetModuleHandle(imagehlp_dll)) == NULL) ||
+	h2 = LoadLibraryA(imagehlp_dll);
+	if (((h = GetModuleHandleA(imagehlp_dll)) == NULL) ||
 		(GetProcAddress(h, "SymGetLineFromAddr") == NULL)) {
 			FreeLibrary(h2);
 			goto error;
@@ -552,7 +570,7 @@ static LONG CALLBACK ApplicationFaultHandler(EXCEPTION_POINTERS *ExInfo)
 	GlobalUnlock(pSym);
 	GlobalFree(pSym);
 
-	MessageBox(NULL, msg, "Tera Term: Application fault", MB_OK | MB_ICONEXCLAMATION);
+	MessageBoxA(NULL, msg, "Tera Term: Application fault", MB_OK | MB_ICONEXCLAMATION);
 
 error:
 //	return (EXCEPTION_EXECUTE_HANDLER);  /* そのままプロセスを終了させる */
@@ -736,7 +754,7 @@ CVTWindow::CVTWindow()
 	// 256バイト以上のコマンドラインパラメータ指定があると、BOF(Buffer Over Flow)で
 	// 落ちるバグを修正。(2007.6.12 maya)
 	if (LoadTTSET()) {
-		LPTSTR Param = GetCommandLine();
+		LPSTR Param = GetCommandLineA();
 		(*ParseParam)(Param, &ts, &(TopicName[0]));
 	}
 	FreeTTSET();
@@ -813,7 +831,7 @@ CVTWindow::CVTWindow()
 		rect.right = rect.left + 100;
 		rect.bottom = rect.top + 100;
 	}
-	Create(hInst, VTClassName, "Tera Term", Style, rect, NULL, NULL);
+	Create(hInst, VTClassName, _T("Tera Term"), Style, rect, NULL, NULL);
 
 	/*--------- Init2 -----------------*/
 	HVTWin = GetSafeHwnd();
@@ -979,7 +997,6 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 	if ((LMR==IdLeftButton) && ControlKey() && (MainMenu==NULL) &&
 	    ((ts.MenuFlag & MF_NOPOPUP)==0)) {
 		int i, numItems;
-		char itemText[256];
 
 		InitMenu(&PopupMenu);
 
@@ -987,13 +1004,14 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		numItems = GetMenuItemCount(PopupMenu);
 
 		for (i = 0; i < numItems; i++) {
+			TCHAR itemText[256];
 			HMENU submenu = GetSubMenu(PopupMenu, i);
 
 			if (submenu != NULL) {
 				InitMenuPopup(submenu);
 			}
 
-			if (GetMenuString(PopupMenu, i, itemText, sizeof(itemText), MF_BYPOSITION) != 0) {
+			if (GetMenuString(PopupMenu, i, itemText, _countof(itemText), MF_BYPOSITION) != 0) {
 				int state = GetMenuState(PopupMenu, i, MF_BYPOSITION) &
 				            (MF_CHECKED | MF_DISABLED | MF_GRAYED | MF_HILITE |
 				             MF_MENUBARBREAK | MF_MENUBREAK | MF_SEPARATOR);
@@ -1036,14 +1054,14 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 		 IsClipboardFormatAvailable(CF_OEMTEXT))) {
 
 		int i, numItems;
-		char itemText[256];
 
 		InitPasteMenu(&PopupMenu);
 		PopupBase = CreatePopupMenu();
 		numItems = GetMenuItemCount(PopupMenu);
 
 		for (i = 0; i < numItems; i++) {
-			if (GetMenuString(PopupMenu, i, itemText, sizeof(itemText), MF_BYPOSITION) != 0) {
+			TCHAR itemText[256];
+			if (GetMenuString(PopupMenu, i, itemText, _countof(itemText), MF_BYPOSITION) != 0) {
 				int state = GetMenuState(PopupMenu, i, MF_BYPOSITION) &
 				            (MF_CHECKED | MF_DISABLED | MF_GRAYED | MF_HILITE |
 				             MF_MENUBARBREAK | MF_MENUBREAK | MF_SEPARATOR);
@@ -1121,7 +1139,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 }
 
 // LogMeIn.exe -> LogMeTT.exe へリネーム (2005.2.21 yutaka)
-static char LogMeTTMenuString[] = "Log&MeTT";
+static TCHAR LogMeTTMenuString[] = _T("Log&MeTT");
 static char LogMeTT[MAX_PATH];
 
 static BOOL isLogMeTTExist()
@@ -1136,14 +1154,14 @@ static BOOL isLogMeTTExist()
 	char *path;
 
 	/* LogMeTT 2.9.6からはレジストリにインストールパスが含まれる。*/
-	result = RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\LogMeTT", 0, NULL,
+	result = RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\LogMeTT", 0, NULL,
 				REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &key, &dwDisposition);
 	if (result == ERROR_SUCCESS) {
-		result = RegQueryValueEx(key, "InstallPath", NULL, &dwType, NULL, &dwSize);
+		result = RegQueryValueExA(key, "InstallPath", NULL, &dwType, NULL, &dwSize);
 		if (result == ERROR_SUCCESS) {
 			path = (char *)malloc(dwSize);
 			if (path != NULL) {
-				result = RegQueryValueEx(key, "InstallPath", NULL, &dwType, (LPBYTE)path, &dwSize);
+				result = RegQueryValueExA(key, "InstallPath", NULL, &dwType, (LPBYTE)path, &dwSize);
 				if (result == ERROR_SUCCESS) {
 					inregist = 1;
 					strncpy_s(LogMeTT, sizeof(LogMeTT), path, _TRUNCATE);
@@ -1168,17 +1186,108 @@ static BOOL isLogMeTTExist()
 
 void CVTWindow::InitMenu(HMENU *Menu)
 {
-	*Menu = LoadMenu(AfxGetInstanceHandle(),
-	                 MAKEINTRESOURCE(IDR_MENU));
-	char uimsg[MAX_UIMSG];
-	int ret;
+	static const DlgTextInfo MenuTextInfo[] = {
+		ID_FILE, "MENU_FILE",
+		ID_EDIT, "MENU_EDIT",
+		ID_SETUP, "MENU_SETUP",
+		ID_CONTROL, "MENU_CONTROL",
+		ID_HELPMENU, "MENU_HELP",
+	};
+	static const DlgTextInfo FileMenuTextInfo[] = {
+		ID_FILE_NEWCONNECTION, "MENU_FILE_NEW",
+		ID_FILE_DUPLICATESESSION, "MENU_FILE_DUPLICATE",
+		ID_FILE_CYGWINCONNECTION, "MENU_FILE_GYGWIN",
+		ID_FILE_LOG, "MENU_FILE_LOG",
+		ID_FILE_COMMENTTOLOG, "MENU_FILE_COMMENTLOG",
+		ID_FILE_VIEWLOG, "MENU_FILE_VIEWLOG",
+		ID_FILE_SHOWLOGDIALOG, "MENU_FILE_SHOWLOGDIALOG",
+		ID_FILE_SENDFILE, "MENU_FILE_SENDFILE",
+		ID_FILE_REPLAYLOG, "MENU_FILE_REPLAYLOG",
+		ID_FILE_CHANGEDIR, "MENU_FILE_CHANGEDIR",
+		ID_FILE_LOGMEIN, "MENU_FILE_LOGMETT",
+		ID_FILE_PRINT2, "MENU_FILE_PRINT",
+		ID_FILE_DISCONNECT, "MENU_FILE_DISCONNECT",
+		ID_FILE_EXIT, "MENU_FILE_EXIT",
+		ID_FILE_EXITALL, "MENU_FILE_EXITALL",
+		9, "MENU_TRANS",
+		ID_FILE_KERMITRCV, "MENU_TRANS_KERMIT_RCV",
+		ID_FILE_KERMITGET, "MENU_TRANS_KERMIT_GET",
+		ID_FILE_KERMITSEND, "MENU_TRANS_KERMIT_SEND",
+		ID_FILE_KERMITFINISH, "MENU_TRANS_KERMIT_FINISH",
+		ID_FILE_XRCV, "MENU_TRANS_X_RCV",
+		ID_FILE_XSEND, "MENU_TRANS_X_SEND",
+		ID_FILE_YRCV, "MENU_TRANS_Y_RCV",
+		ID_FILE_YSEND, "MENU_TRANS_Y_SEND",
+		ID_FILE_ZRCV, "MENU_TRANS_Z_RCV",
+		ID_FILE_ZSEND, "MENU_TRANS_Z_SEND",
+		ID_FILE_BPRCV, "MENU_TRANS_BP_RCV",
+		ID_FILE_BPSEND, "MENU_TRANS_BP_SEND",
+		ID_FILE_QVRCV, "MENU_TRANS_QV_RCV",
+		ID_FILE_QVSEND, "MENU_TRANS_QV_SEND",
+	};
+	static const DlgTextInfo EditMenuTextInfo[] = {
+		ID_EDIT_COPY2, "MENU_EDIT_COPY",
+		ID_EDIT_COPYTABLE, "MENU_EDIT_COPYTABLE",
+		ID_EDIT_PASTE2, "MENU_EDIT_PASTE",
+		ID_EDIT_PASTECR, "MENU_EDIT_PASTECR",
+		ID_EDIT_CLEARSCREEN, "MENU_EDIT_CLSCREEN",
+		ID_EDIT_CLEARBUFFER, "MENU_EDIT_CLBUFFER",
+		ID_EDIT_CANCELSELECT, "MENU_EDIT_CANCELSELECT",
+		ID_EDIT_SELECTSCREEN, "MENU_EDIT_SELECTSCREEN",
+		ID_EDIT_SELECTALL, "MENU_EDIT_SELECTALL",
+	};
+	static const DlgTextInfo SetupMenuTextInfo1[] = {
+		ID_SETUP_TERMINAL, "MENU_SETUP_TERMINAL",
+		ID_SETUP_WINDOW, "MENU_SETUP_WINDOW",
+		ID_SETUP_FONT, "MENU_SETUP_FONT",
+		ID_SETUP_KEYBOARD, "MENU_SETUP_KEYBOARD",
+		ID_SETUP_SERIALPORT, "MENU_SETUP_SERIALPORT",
+		ID_SETUP_TCPIP, "MENU_SETUP_TCPIP",
+		ID_SETUP_GENERAL, "MENU_SETUP_GENERAL",
+		ID_SETUP_ADDITIONALSETTINGS, "MENU_SETUP_ADDITION",
+		ID_SETUP_SAVE, "MENU_SETUP_SAVE",
+		ID_SETUP_RESTORE, "MENU_SETUP_RESTORE",
+		ID_OPEN_SETUP, "MENU_SETUP_OPENSETUP",
+		ID_SETUP_LOADKEYMAP, "MENU_SETUP_LOADKEYMAP",
+	};
+	static const DlgTextInfo ControlMenuTextInfo1[] = {
+		ID_CONTROL_RESETTERMINAL, "MENU_CONTROL_RESET",
+		ID_CONTROL_RESETREMOTETITLE, "MENU_CONTROL_RESETTITLE",
+		ID_CONTROL_AREYOUTHERE, "MENU_CONTROL_AREYOUTHERE",
+		ID_CONTROL_SENDBREAK, "MENU_CONTROL_SENDBREAK",
+		ID_CONTROL_RESETPORT, "MENU_CONTROL_RESETPORT",
+		ID_CONTROL_BROADCASTCOMMAND, "MENU_CONTROL_BROADCAST",
+		ID_CONTROL_OPENTEK, "MENU_CONTROL_OPENTEK",
+		ID_CONTROL_CLOSETEK, "MENU_CONTROL_CLOSETEK",
+		ID_CONTROL_MACRO, "MENU_CONTROL_MACRO",
+		ID_CONTROL_SHOW_MACRO, "MENU_CONTROL_SHOW_MACRO",
+	};
+	static const DlgTextInfo HelpMenuTextInfo[] = {
+		ID_HELP_INDEX2, "MENU_HELP_INDEX",
+		ID_HELP_ABOUT, "MENU_HELP_ABOUT",
+	};
 
-	FileMenu = GetSubMenu(*Menu,ID_FILE);
+	HMENU hMenu = LoadMenu(AfxGetInstanceHandle(),
+						   MAKEINTRESOURCE(IDR_MENU));
+	*Menu = hMenu;
+
+	FileMenu = GetSubMenu(hMenu,ID_FILE);
 	TransMenu = GetSubMenu(FileMenu,ID_TRANSFER);
-	EditMenu = GetSubMenu(*Menu,ID_EDIT);
-	SetupMenu = GetSubMenu(*Menu,ID_SETUP);
-	ControlMenu = GetSubMenu(*Menu,ID_CONTROL);
-	HelpMenu = GetSubMenu(*Menu,ID_HELPMENU);
+	EditMenu = GetSubMenu(hMenu,ID_EDIT);
+	SetupMenu = GetSubMenu(hMenu,ID_SETUP);
+	ControlMenu = GetSubMenu(hMenu,ID_CONTROL);
+	HelpMenu = GetSubMenu(hMenu,ID_HELPMENU);
+	SetDlgMenuTexts(hMenu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
+
+	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
+		TCHAR uimsg[MAX_UIMSG];
+		WinMenu = CreatePopupMenu();
+		get_lang_msgT("MENU_WINDOW", uimsg, _countof(uimsg),
+					  _T("&Window"), ts.UILanguageFile);
+		::InsertMenu(*Menu, ID_HELPMENU,
+			MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+			(int)WinMenu, uimsg);
+	}
 
 	/* LogMeTT の存在を確認してメニューを追加する */
 	if (isLogMeTTExist()) {
@@ -1187,233 +1296,11 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		::InsertMenu(FileMenu, ID_FILE_PRINT2, MF_SEPARATOR, NULL, NULL);
 	}
 
-	GetMenuString(*Menu, ID_FILE, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_FILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_FILE, MF_BYPOSITION, ID_FILE, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_NEWCONNECTION, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_NEW", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_NEWCONNECTION, MF_BYCOMMAND, ID_FILE_NEWCONNECTION, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_DUPLICATESESSION, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_DUPLICATE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_DUPLICATESESSION, MF_BYCOMMAND, ID_FILE_DUPLICATESESSION, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_CYGWINCONNECTION, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_GYGWIN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_CYGWINCONNECTION, MF_BYCOMMAND, ID_FILE_CYGWINCONNECTION, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_LOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_LOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_LOG, MF_BYCOMMAND, ID_FILE_LOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_COMMENTTOLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_COMMENTLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_COMMENTTOLOG, MF_BYCOMMAND, ID_FILE_COMMENTTOLOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_VIEWLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_VIEWLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND, ID_FILE_VIEWLOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_SHOWLOGDIALOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_SHOWLOGDIALOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_SHOWLOGDIALOG, MF_BYCOMMAND, ID_FILE_SHOWLOGDIALOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_SENDFILE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_SENDFILE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_SENDFILE, MF_BYCOMMAND, ID_FILE_SENDFILE, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_REPLAYLOG, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_REPLAYLOG", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_REPLAYLOG, MF_BYCOMMAND, ID_FILE_REPLAYLOG, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_CHANGEDIR, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_CHANGEDIR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_CHANGEDIR, MF_BYCOMMAND, ID_FILE_CHANGEDIR, ts.UIMsg);
-	ret = GetMenuString(FileMenu, ID_FILE_LOGMEIN, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	if (ret != 0) {
-		get_lang_msg("MENU_FILE_LOGMETT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-		ModifyMenu(FileMenu, ID_FILE_LOGMEIN, MF_BYCOMMAND, ID_FILE_LOGMEIN, ts.UIMsg);
-	}
-	GetMenuString(FileMenu, ID_FILE_PRINT2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_PRINT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_PRINT2, MF_BYCOMMAND, ID_FILE_PRINT2, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_DISCONNECT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_DISCONNECT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_DISCONNECT, MF_BYCOMMAND, ID_FILE_DISCONNECT, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_EXIT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_EXIT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_EXIT, MF_BYCOMMAND, ID_FILE_EXIT, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_EXITALL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_FILE_EXITALL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_EXITALL, MF_BYCOMMAND, ID_FILE_EXITALL, ts.UIMsg);
-
-	GetMenuString(FileMenu, 9, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_TRANS", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, 9, MF_BYPOSITION, 9, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_KERMITRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITRCV, MF_BYCOMMAND, ID_FILE_KERMITRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_KERMITGET, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_GET", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITGET, MF_BYCOMMAND, ID_FILE_KERMITGET, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_KERMITSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITSEND, MF_BYCOMMAND, ID_FILE_KERMITSEND, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_KERMITFINISH, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_KERMIT_FINISH", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_KERMITFINISH, MF_BYCOMMAND, ID_FILE_KERMITFINISH, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_XRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_X_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_XRCV, MF_BYCOMMAND, ID_FILE_XRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_XSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_X_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_XSEND, MF_BYCOMMAND, ID_FILE_XSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_YRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Y_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_YRCV, MF_BYCOMMAND, ID_FILE_YRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_YSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Y_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_YSEND, MF_BYCOMMAND, ID_FILE_YSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_ZRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Z_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_ZRCV, MF_BYCOMMAND, ID_FILE_ZRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_ZSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_Z_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_ZSEND, MF_BYCOMMAND, ID_FILE_ZSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_BPRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_BP_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_BPRCV, MF_BYCOMMAND, ID_FILE_BPRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_BPSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_BP_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_BPSEND, MF_BYCOMMAND, ID_FILE_BPSEND, ts.UIMsg);
-
-	GetMenuString(FileMenu, ID_FILE_QVRCV, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_QV_RCV", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_QVRCV, MF_BYCOMMAND, ID_FILE_QVRCV, ts.UIMsg);
-	GetMenuString(FileMenu, ID_FILE_QVSEND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_TRANS_QV_SEND", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(FileMenu, ID_FILE_QVSEND, MF_BYCOMMAND, ID_FILE_QVSEND, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_EDIT, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_EDIT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_EDIT, MF_BYPOSITION, ID_EDIT, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_COPY2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_COPY", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_COPY2, MF_BYCOMMAND, ID_EDIT_COPY2, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_COPYTABLE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_COPYTABLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_COPYTABLE, MF_BYCOMMAND, ID_EDIT_COPYTABLE, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_PASTE2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_PASTE2, MF_BYCOMMAND, ID_EDIT_PASTE2, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_PASTECR, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTECR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_PASTECR, MF_BYCOMMAND, ID_EDIT_PASTECR, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_CLEARSCREEN, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_CLSCREEN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_CLEARSCREEN, MF_BYCOMMAND, ID_EDIT_CLEARSCREEN, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_CLEARBUFFER, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_CLBUFFER", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_CLEARBUFFER, MF_BYCOMMAND, ID_EDIT_CLEARBUFFER, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_CANCELSELECT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_CANCELSELECT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_CANCELSELECT, MF_BYCOMMAND, ID_EDIT_CANCELSELECT, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_SELECTSCREEN, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_SELECTSCREEN", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_SELECTSCREEN, MF_BYCOMMAND, ID_EDIT_SELECTSCREEN, ts.UIMsg);
-	GetMenuString(EditMenu, ID_EDIT_SELECTALL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_SELECTALL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(EditMenu, ID_EDIT_SELECTALL, MF_BYCOMMAND, ID_EDIT_SELECTALL, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_SETUP, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_SETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_SETUP, MF_BYPOSITION, ID_SETUP, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_TERMINAL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_TERMINAL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_TERMINAL, MF_BYCOMMAND, ID_SETUP_TERMINAL, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_WINDOW, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_WINDOW", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_WINDOW, MF_BYCOMMAND, ID_SETUP_WINDOW, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_FONT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_FONT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_FONT, MF_BYCOMMAND, ID_SETUP_FONT, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_KEYBOARD, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_KEYBOARD", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_KEYBOARD, MF_BYCOMMAND, ID_SETUP_KEYBOARD, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_SERIALPORT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_SERIALPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_SERIALPORT, MF_BYCOMMAND, ID_SETUP_SERIALPORT, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_TCPIP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_TCPIP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_TCPIP, MF_BYCOMMAND, ID_SETUP_TCPIP, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_GENERAL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_GENERAL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_GENERAL, MF_BYCOMMAND, ID_SETUP_GENERAL, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_ADDITIONALSETTINGS, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_ADDITION", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_ADDITIONALSETTINGS, MF_BYCOMMAND, ID_SETUP_ADDITIONALSETTINGS, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_SAVE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_SAVE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_SAVE, MF_BYCOMMAND, ID_SETUP_SAVE, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_RESTORE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_RESTORE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_RESTORE, MF_BYCOMMAND, ID_SETUP_RESTORE, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_OPEN_SETUP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_OPENSETUP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_OPEN_SETUP, MF_BYCOMMAND, ID_OPEN_SETUP, ts.UIMsg);
-	GetMenuString(SetupMenu, ID_SETUP_LOADKEYMAP, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_SETUP_LOADKEYMAP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(SetupMenu, ID_SETUP_LOADKEYMAP, MF_BYCOMMAND, ID_SETUP_LOADKEYMAP, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_CONTROL, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_CONTROL", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_CONTROL, MF_BYPOSITION, ID_CONTROL, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_RESETTERMINAL, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_RESET", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_RESETTERMINAL, MF_BYCOMMAND, ID_CONTROL_RESETTERMINAL, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_RESETREMOTETITLE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_RESETTITLE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_RESETREMOTETITLE, MF_BYCOMMAND, ID_CONTROL_RESETREMOTETITLE, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_AREYOUTHERE, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_AREYOUTHERE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_AREYOUTHERE, MF_BYCOMMAND, ID_CONTROL_AREYOUTHERE, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_SENDBREAK, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_SENDBREAK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_SENDBREAK, MF_BYCOMMAND, ID_CONTROL_SENDBREAK, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_RESETPORT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_RESETPORT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_RESETPORT, MF_BYCOMMAND, ID_CONTROL_RESETPORT, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_BROADCASTCOMMAND, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_BROADCAST", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_BROADCASTCOMMAND, MF_BYCOMMAND, ID_CONTROL_BROADCASTCOMMAND, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_OPENTEK, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_OPENTEK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_OPENTEK, MF_BYCOMMAND, ID_CONTROL_OPENTEK, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_CLOSETEK, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_CLOSETEK", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_CLOSETEK, MF_BYCOMMAND, ID_CONTROL_CLOSETEK, ts.UIMsg);
-
-	GetMenuString(ControlMenu, ID_CONTROL_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_MACRO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND, ID_CONTROL_MACRO, ts.UIMsg);
-	GetMenuString(ControlMenu, ID_CONTROL_SHOW_MACRO, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_CONTROL_SHOW_MACRO", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(ControlMenu, ID_CONTROL_SHOW_MACRO, MF_BYCOMMAND, ID_CONTROL_SHOW_MACRO, ts.UIMsg);
-
-	GetMenuString(*Menu, ID_HELPMENU, uimsg, sizeof(uimsg), MF_BYPOSITION);
-	get_lang_msg("MENU_HELP", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_HELPMENU, MF_BYPOSITION, ID_HELPMENU, ts.UIMsg);
-	GetMenuString(HelpMenu, ID_HELP_INDEX2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_HELP_INDEX", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(HelpMenu, ID_HELP_INDEX2, MF_BYCOMMAND, ID_HELP_INDEX2, ts.UIMsg);
-	GetMenuString(HelpMenu, ID_HELP_ABOUT, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_HELP_ABOUT", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(HelpMenu, ID_HELP_ABOUT, MF_BYCOMMAND, ID_HELP_ABOUT, ts.UIMsg);
-
-	if ((ts.MenuFlag & MF_SHOWWINMENU) !=0) {
-		WinMenu = CreatePopupMenu();
-		get_lang_msg("MENU_WINDOW", ts.UIMsg, sizeof(ts.UIMsg),
-		             "&Window", ts.UILanguageFile);
-		::InsertMenu(*Menu,ID_HELPMENU,
-		             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-		             (int)WinMenu, ts.UIMsg);
-	}
+	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, SetupMenuTextInfo1, _countof(SetupMenuTextInfo1), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, ControlMenuTextInfo1, _countof(ControlMenuTextInfo1), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	TTXModifyMenu(*Menu); /* TTPLUG */
 }
@@ -1590,17 +1477,13 @@ void CVTWindow::InitMenuPopup(HMENU SubMenu)
 // added ConfirmPasteMouseRButton (2007.3.17 maya)
 void CVTWindow::InitPasteMenu(HMENU *Menu)
 {
-	char uimsg[MAX_UIMSG];
-
+	static const DlgTextInfo MenuTextInfo[] = {
+		ID_EDIT_PASTE2, "MENU_EDIT_PASTE",
+		ID_EDIT_PASTECR, "MENU_EDIT_PASTECR",
+	};
 	*Menu = LoadMenu(AfxGetInstanceHandle(),
 	                 MAKEINTRESOURCE(IDR_PASTEMENU));
-
-	GetMenuString(*Menu, ID_EDIT_PASTE2, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_EDIT_PASTE2, MF_BYCOMMAND, ID_EDIT_PASTE2, ts.UIMsg);
-	GetMenuString(*Menu, ID_EDIT_PASTECR, uimsg, sizeof(uimsg), MF_BYCOMMAND);
-	get_lang_msg("MENU_EDIT_PASTECR", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
-	ModifyMenu(*Menu, ID_EDIT_PASTECR, MF_BYCOMMAND, ID_EDIT_PASTECR, ts.UIMsg);
+	SetDlgMenuTexts(*Menu, MenuTextInfo, _countof(MenuTextInfo), ts.UILanguageFile);
 }
 
 void CVTWindow::ResetSetup()
@@ -1909,7 +1792,7 @@ static void WriteInt2(const char *Sect, const char *Key, const char *FName, int 
 {
 	char Temp[32];
 	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d,%d", i1, i2);
-	WritePrivateProfileString(Sect, Key, Temp, FName);
+	WritePrivateProfileStringA(Sect, Key, Temp, FName);
 }
 
 static void SaveVTPos()
@@ -1931,12 +1814,13 @@ void CVTWindow::OnClose()
 		MessageBeep(0);
 		return;
 	}
-	get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Disconnect?", ts.UILanguageFile);
+	TCHAR uimsg[MAX_UIMSG];
+	get_lang_msgT("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
+				  _T("Disconnect?"), ts.UILanguageFile);
 	if (cv.Ready && (cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    ! CloseTT &&
-	    (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
+	    (::MessageBox(HVTWin, uimsg, _T("Tera Term"),
 	     MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL)) {
 		return;
 	}
@@ -1953,9 +1837,10 @@ void CVTWindow::OnAllClose()
 {
 	// 突然終了させると危険なので、かならずユーザに問い合わせを出すようにする。
 	// (2013.8.17 yutaka)
-	get_lang_msg("MSG_ALL_TERMINATE_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Terminate ALL Tera Term(s)?", ts.UILanguageFile);
-	if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
+	TCHAR uimsg[MAX_UIMSG];
+	get_lang_msgT("MSG_ALL_TERMINATE_CONF", uimsg, _countof(uimsg),
+	             _T("Terminate ALL Tera Term(s)?"), ts.UILanguageFile);
+	if (::MessageBox(HVTWin, uimsg, _T("Tera Term"),
 	     MB_OKCANCEL | MB_ICONERROR | MB_DEFBUTTON2)==IDCANCEL)
 		return;
 
@@ -2047,14 +1932,21 @@ static void EscapeFilename(const char *src, char *dest)
 	*d = '\0'; // null-terminate
 }
 
-static void PasteString(PComVar cv, const char *str, bool escape)
+static void PasteString(PComVar cv, const TCHAR *str, bool escape)
 {
-	PCHAR ptr = (PCHAR)str;
+#if defined(UNICODE)
+	char fileName[MAX_PATH];
+	WideCharToMultiByte(CP_ACP, 0, str, -1, fileName, sizeof(fileName), NULL, NULL);
+	const char *strA = fileName;
+#else
+	const char *strA = str;
+#endif
+	PCHAR ptr = (PCHAR)strA;
 	char *tmpbuf = NULL;
 	if (escape) {
-		size_t len = strlen(str) * 2;
+		size_t len = strlen(strA) * 2;
 		tmpbuf = (char *)malloc(len);
-		EscapeFilename(str, tmpbuf);
+		EscapeFilename(strA, tmpbuf);
 		ptr = tmpbuf;
 	}
 
@@ -2071,7 +1963,7 @@ static void PasteString(PComVar cv, const char *str, bool escape)
 }
 
 /* 入力はファイルのみ(フォルダは含まれない) */
-static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
+static bool SendScp(TCHAR *Filenames[], int FileCount, const char *SendDir)
 {
 	typedef int (CALLBACK *PSSH_start_scp)(char *, char *);
 	static PSSH_start_scp func = NULL;
@@ -2079,11 +1971,11 @@ static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
 	char msg[128];
 
 	if (h == NULL) {
-		h = GetModuleHandle("ttxssh.dll");
+		h = GetModuleHandleA("ttxssh.dll");
 		if (h == NULL) {
 			_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 		scp_send_error:
-			::MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
+			::MessageBoxA(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
 			return false;
 		}
 	}
@@ -2096,7 +1988,12 @@ static bool SendScp(char *Filenames[], int FileCount, const char *SendDir)
 	}
 
 	for (int i = 0; i < FileCount; i++) {
+#if defined(UNICODE)
+		char FileName[MAX_PATH];
+		WideCharToMultiByte(CP_ACP, 0, Filenames[i], -1, FileName, sizeof(FileName), NULL, NULL);
+#else
 		const char *FileName = Filenames[i];
+#endif
 		func((char *)FileName, ts.ScpSendDir);
 	}
 	return true;
@@ -2126,7 +2023,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	int FileCount = 0;
 	int DirectoryCount = 0;
 	for (int i = 0; i < DropListCount; i++) {
-		const char *FileName = DropLists[i];
+		const TCHAR *FileName = DropLists[i];
 		const DWORD attr = GetFileAttributes(FileName);
 		if (attr == (DWORD)-1 ) {
 			FileCount++;
@@ -2205,7 +2102,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 	}
 
 	for (int i = 0; i < DropListCount; i++) {
-		const char *FileName = DropLists[i];
+		const TCHAR *FileName = DropLists[i];
 
 		if (!DoSameProcess) {
 			bool DoSameProcessNextDrop;
@@ -2242,7 +2139,11 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		case DROP_TYPE_SEND_FILE_BINARY:
 			if (SendVar==NULL && NewFileVar(&SendVar)) {
 				HelpId = HlpFileSend;
+#if defined(UNICODE)
+				WideCharToMultiByte(CP_ACP, 0, FileName, -1, SendVar->FullName, sizeof(SendVar->FullName), NULL, NULL);
+#else
 				strncpy_s(SendVar->FullName, sizeof(SendVar->FullName), FileName,  _TRUNCATE);
+#endif
 				SendVar->DirLen = 0;
 				ts.TransBin = DropType == DROP_TYPE_SEND_FILE ? 0 : 1;
 				FileSendStart();
@@ -2272,7 +2173,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 
 			PasteString(&cv, FileName, escape);
 			if (DropListCount > 1 && i < DropListCount - 1) {
-				const char *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? "\n" : " ";
+				const TCHAR *separator = (DropTypePaste & DROP_TYPE_PASTE_NEWLINE) ? _T("\n") : _T(" ");
 				PasteString(&cv, separator, false);
 			}
 
@@ -2283,7 +2184,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 		case DROP_TYPE_SCP:
 		{
 			// send by scp
-			char **FileNames = &DropLists[i];
+			TCHAR **FileNames = &DropLists[i];
 			int FileCountScp = DoSameProcess ? DropListCount - i : 1;
 			if (!SendScp(FileNames, FileCountScp, ts.ScpSendDir)) {
 				goto finish;
@@ -2307,11 +2208,11 @@ void CVTWindow::OnDropFiles(HDROP hDropInfo)
 		const UINT ShowDialog =
 			((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0) ? 1 : 0;
 		DropListCount = DragQueryFile(hDropInfo, -1, NULL, 0);
-		DropLists = (char **)malloc(sizeof(char *) * DropListCount);
+		DropLists = (TCHAR **)malloc(sizeof(TCHAR *) * DropListCount);
 
 		for (int i = 0; i < DropListCount; i++) {
 			const UINT cch = DragQueryFile(hDropInfo, i, NULL, 0) + 1;
-			char *FileName = (char *)malloc(cch);
+			TCHAR *FileName = (TCHAR *)malloc(cch*sizeof(TCHAR));
 			DropLists[i] = FileName;
 			DragQueryFile(hDropInfo,i,FileName,cch);
 		}
@@ -2391,6 +2292,7 @@ void CVTWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	if (MetaKey(ts.MetaKey) && (nFlags & 0x2000) != 0)
 	{
+
 		PeekMessage((LPMSG)&M,HVTWin,WM_CHAR,WM_CHAR,PM_REMOVE);
 		/* for Ctrl+Alt+Key combination */
 		GetKeyboardState((PBYTE)KeyState);
@@ -3467,12 +3369,13 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 	if ((MainMenu!=NULL) &&
 	    (B1 != B2)) {
 		if (WinMenu==NULL) {
+			TCHAR uimsg[MAX_UIMSG];
 			WinMenu = CreatePopupMenu();
-			get_lang_msg("MENU_WINDOW", ts.UIMsg, sizeof(ts.UIMsg),
-			             "&Window", ts.UILanguageFile);
-			::InsertMenu(MainMenu,ID_HELPMENU,
-			             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			             (int)WinMenu, ts.UIMsg);
+			get_lang_msgT("MENU_WINDOW", uimsg, _countof(uimsg),
+						  _T("&Window"), ts.UILanguageFile);
+			::InsertMenu(MainMenu, ID_HELPMENU,
+						 MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
+						 (int)WinMenu, uimsg);
 		}
 		else {
 			RemoveMenu(MainMenu,ID_HELPMENU,MF_BYPOSITION);
@@ -3484,11 +3387,12 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 
 	::GetSystemMenu(HVTWin,TRUE);
 	if ((! Show) && ((ts.MenuFlag & MF_NOSHOWMENU)==0)) {
+		TCHAR uimsg[MAX_UIMSG];
 		SysMenu = ::GetSystemMenu(HVTWin,FALSE);
 		AppendMenu(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msg("MENU_SHOW_MENUBAR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Show menu &bar", ts.UILanguageFile);
-		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, ts.UIMsg);
+		get_lang_msgT("MENU_SHOW_MENUBAR", uimsg, _countof(uimsg),
+		             _T("Show menu &bar"), ts.UILanguageFile);
+		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 	}
 	return 0;
 }
@@ -3546,11 +3450,12 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 
 	if ((ts.HideTitle==0) && (MainMenu==NULL) &&
 	    ((ts.MenuFlag & MF_NOSHOWMENU) == 0)) {
+		TCHAR uimsg[MAX_UIMSG];
 		SysMenu = ::GetSystemMenu(HVTWin,FALSE);
 		AppendMenu(SysMenu, MF_SEPARATOR, 0, NULL);
-		get_lang_msg("MENU_SHOW_MENUBAR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Show menu &bar", ts.UILanguageFile);
-		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, ts.UIMsg);
+		get_lang_msgT("MENU_SHOW_MENUBAR", uimsg, _countof(uimsg),
+					  _T("Show menu &bar"), ts.UILanguageFile);
+		AppendMenu(SysMenu, MF_STRING, ID_SHOWMENUBAR, uimsg);
 	}
 	return 0;
 }
@@ -3975,12 +3880,13 @@ void CVTWindow::OnDuplicateSession()
 
 	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_TT_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute Tera Term. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
+		TCHAR buf[80];
+		TCHAR uimsg[MAX_UIMSG];
+		TCHAR uimsg2[80];
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_EXEC_TT_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Can't execute Tera Term. (%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	}
 }
@@ -3998,30 +3904,31 @@ void CVTWindow::OnCygwinConnection()
 	char cygterm[MAX_PATH];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-	char uimsg[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
+	TCHAR uimsg2[MAX_UIMSG];
 
 	if (strlen(ts.CygwinDirectory) > 0) {
-		if (SearchPath(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+		if (SearchPathA(ts.CygwinDirectory, "bin\\cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
 
-	if (SearchPath(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+	if (SearchPathA(NULL, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 		goto found_path;
 	}
 
 	for (c = 'C' ; c <= 'Z' ; c++) {
 		char tmp[MAX_PATH];
 		sprintf(tmp, "%c:\\cygwin\\bin;%c:\\cygwin64\\bin", c, c);
-		if (SearchPath(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
+		if (SearchPathA(tmp, "cygwin1", ".dll", sizeof(file), file, &filename) > 0) {
 			goto found_dll;
 		}
 	}
 
-	get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-	get_lang_msg("MSG_FIND_CYGTERM_DIR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-	             "Can't find Cygwin directory.", ts.UILanguageFile);
-	::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+	get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+	get_lang_msgT("MSG_FIND_CYGTERM_DIR_ERROR", uimsg2, _countof(uimsg2),
+				  _T("Can't find Cygwin directory."), ts.UILanguageFile);
+	::MessageBox(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 	return;
 
 found_dll:;
@@ -4030,20 +3937,20 @@ found_dll:;
 	if (envptr != NULL) {
 		envbufflen = strlen(file) + strlen(envptr) + 7; // "PATH="(5) + ";"(1) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_ENV_ALLOC_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Can't allocate memory for environment variable.", ts.UILanguageFile);
-			::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+			get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+			get_lang_msgT("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
+			             _T("Can't allocate memory for environment variable."), ts.UILanguageFile);
+			::MessageBox(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s;%s", file, envptr);
 	} else {
 		envbufflen = strlen(file) + 6; // "PATH="(5) + NUL(1)
 		if ((envbuff = (char *)malloc(envbufflen)) == NULL) {
-			get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_CYGTERM_ENV_ALLOC_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "Can't allocate memory for environment variable.", ts.UILanguageFile);
-			::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+			get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+			get_lang_msgT("MSG_CYGTERM_ENV_ALLOC_ERROR", uimsg2, _countof(uimsg2),
+			             _T("Can't allocate memory for environment variable."), ts.UILanguageFile);
+			::MessageBox(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 			return;
 		}
 		_snprintf_s(envbuff, envbufflen, _TRUNCATE, "PATH=%s", file);
@@ -4065,10 +3972,10 @@ found_path:;
 
 	if (CreateProcess(NULL, cygterm, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_CYGTERM_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute Cygterm.", ts.UILanguageFile);
-		::MessageBox(NULL, ts.UIMsg, uimsg, MB_OK | MB_ICONWARNING);
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_EXEC_CYGTERM_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Can't execute Cygterm."), ts.UILanguageFile);
+		::MessageBox(NULL, uimsg2, uimsg, MB_OK | MB_ICONWARNING);
 	}
 }
 
@@ -4088,12 +3995,13 @@ void CVTWindow::OnTTMenuLaunch()
 
 	if (CreateProcess(NULL, (LPSTR)exename, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_TTMENU_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute TeraTerm Menu. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
+		TCHAR buf[80];
+		TCHAR uimsg[MAX_UIMSG];
+		TCHAR uimsg2[80];
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_EXEC_TTMENU_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Can't execute TeraTerm Menu. (%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	}
 }
@@ -4117,12 +4025,13 @@ void CVTWindow::OnLogMeInLaunch()
 
 	if (CreateProcess(NULL, LogMeTT, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_LOGMETT_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute LogMeTT. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
+		TCHAR buf[80];
+		TCHAR uimsg[MAX_UIMSG];
+		TCHAR uimsg2[80];
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_EXEC_LOGMETT_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Can't execute LogMeTT. (%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	}
 }
@@ -4155,7 +4064,7 @@ static LRESULT CALLBACK OnCommentDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPAR
 			switch (LOWORD(wp)) {
 				case IDOK:
 					memset(buf, 0, sizeof(buf));
-					ret = GetDlgItemText(hDlgWnd, IDC_EDIT_COMMENT, buf, sizeof(buf) - 1);
+					ret = GetDlgItemTextA(hDlgWnd, IDC_EDIT_COMMENT, buf, sizeof(buf) - 1);
 					if (ret > 0) { // テキスト取得成功
 						//buf[sizeof(buf) - 1] = '\0';  // null-terminate
 						CommentLogToFile(buf, ret);
@@ -4204,12 +4113,13 @@ void CVTWindow::OnViewLog()
 
 	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
 	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		char uimsg[MAX_UIMSG];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_VIEW_LOGFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't view logging file. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
+		TCHAR buf[80];
+		TCHAR uimsg[MAX_UIMSG];
+		TCHAR uimsg2[MAX_UIMSG];
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_VIEW_LOGFILE_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Can't view logging file. (%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	}
 }
@@ -4226,47 +4136,48 @@ void CVTWindow::OnShowLogDialog()
 void CVTWindow::OnReplayLog()
 {
 	OPENFILENAME ofn;
-	char szFile[MAX_PATH];
-	char Command[MAX_PATH] = "notepad.exe";
-	const char *exec = "ttermpro";
-	STARTUPINFO si;
+	TCHAR szFile[MAX_PATH];
+	TCHAR Command[MAX_PATH] = _T("notepad.exe");
+	const TCHAR *exec = _T("ttermpro");
+	STARTUPINFOT si;
 	PROCESS_INFORMATION pi;
-	char uimsg[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
+	TCHAR uimsg2[MAX_UIMSG];
 
 	// バイナリモードで採取したログファイルを選択する
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	memset(szFile, 0, sizeof(szFile));
 	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner = HVTWin;
-	get_lang_msg("FILEDLG_OPEN_LOGFILE_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
-	             "all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
-	ofn.lpstrFilter = ts.UIMsg;
+	get_lang_msgT("FILEDLG_OPEN_LOGFILE_FILTER", uimsg, _countof(uimsg),
+				  _T("all(*.*)\\0*.*\\0\\0"), ts.UILanguageFile);
+	ofn.lpstrFilter = uimsg;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	ofn.lpstrDefExt = "log";
-	get_lang_msg("FILEDLG_OPEN_LOGFILE_TITLE", uimsg, sizeof(uimsg),
-	             "Select replay log file with binary mode", ts.UILanguageFile);
-	ofn.lpstrTitle = uimsg;
+	ofn.lpstrDefExt = _T("log");
+	get_lang_msgT("FILEDLG_OPEN_LOGFILE_TITLE", uimsg2, _countof(uimsg2),
+	             _T("Select replay log file with binary mode"), ts.UILanguageFile);
+	ofn.lpstrTitle = uimsg2;
 	if(GetOpenFileName(&ofn) == 0)
 		return;
 
 
 	// "/R"オプション付きでTera Termを起動する（ログが再生される）
-	_snprintf_s(Command, sizeof(Command), _TRUNCATE,
-	            "%s /R=\"%s\"", exec, szFile);
+	_sntprintf_s(Command, _countof(Command), _TRUNCATE,
+	            _T("%s /R=\"%s\""), exec, szFile);
 
 	memset(&si, 0, sizeof(si));
-	GetStartupInfo(&si);
+	GetStartupInfoT(&si);
 	memset(&pi, 0, sizeof(pi));
 
-	if (CreateProcess(NULL, Command, NULL, NULL, FALSE, 0,
-	                  NULL, NULL, &si, &pi) == 0) {
-		char buf[80];
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_EXEC_TT_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Can't execute Tera Term. (%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, GetLastError());
+	if (CreateProcessT(NULL, Command, NULL, NULL, FALSE, 0,
+					   NULL, NULL, &si, &pi) == 0) {
+		TCHAR buf[80];
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_EXEC_TT_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Can't execute Tera Term. (%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, GetLastError());
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 	}
 }
@@ -4382,9 +4293,10 @@ void CVTWindow::Disconnect(BOOL confirm)
 	if ((cv.PortType==IdTCPIP) &&
 	    ((ts.PortFlag & PF_CONFIRMDISCONN) != 0) &&
 	    (confirm)) {
-		get_lang_msg("MSG_DISCONNECT_CONF", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Disconnect?", ts.UILanguageFile);
-		if (::MessageBox(HVTWin, ts.UIMsg, "Tera Term",
+		TCHAR uimsg[MAX_UIMSG];
+		get_lang_msgT("MSG_DISCONNECT_CONF", uimsg, _countof(uimsg),
+					  _T("Disconnect?"), ts.UILanguageFile);
+		if (::MessageBox(HVTWin, uimsg, _T("Tera Term"),
 		                 MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2)==IDCANCEL) {
 			return;
 		}
@@ -4499,7 +4411,7 @@ void CVTWindow::OnExternalSetup()
 {
 	DWORD ret;
 
-	CAddSettingPropSheetDlg CAddSetting(hInst, "Tera Term: Additional settings", HVTWin);
+	CAddSettingPropSheetDlg CAddSetting(hInst, _T("Tera Term: Additional settings"), HVTWin);
 	ret = CAddSetting.DoModal();
 	switch (ret) {
 		case (DWORD)-1:
@@ -4694,11 +4606,12 @@ void CVTWindow::OnSetupSave()
 	// 書き込みできるかの判別を追加 (2005.11.3 yutaka)
 	if ((ret = _access(ts.SetupFName, 0x02)) != 0) {
 		if (errno != ENOENT) {  // ファイルがすでに存在する場合のみエラーとする (2005.12.13 yutaka)
-			char uimsg[MAX_UIMSG];
-			get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg), "Tera Term: ERROR", ts.UILanguageFile);
-			get_lang_msg("MSG_SAVESETUP_PERMISSION_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			             "TERATERM.INI file doesn't have the writable permission.", ts.UILanguageFile);
-			MessageBox(ts.UIMsg, uimsg, MB_OK|MB_ICONEXCLAMATION);
+			TCHAR uimsg[MAX_UIMSG];
+			TCHAR uimsg2[MAX_UIMSG];
+			get_lang_msgT("MSG_TT_ERROR", uimsg, _countof(uimsg), _T("Tera Term: ERROR"), ts.UILanguageFile);
+			get_lang_msgT("MSG_SAVESETUP_PERMISSION_ERROR", uimsg2, _countof(uimsg2),
+						  _T("TERATERM.INI file doesn't have the writable permission."), ts.UILanguageFile);
+			MessageBoxT(uimsg2, uimsg, MB_OK|MB_ICONEXCLAMATION);
 			return;
 		}
 	}
@@ -4716,7 +4629,7 @@ void CVTWindow::OnSetupSave()
 		}
 #endif
 
-		CopyFile(TmpSetupFN, ts.SetupFName, TRUE);
+		CopyFileA(TmpSetupFN, ts.SetupFName, TRUE);
 		/* write current setup values to file */
 		(*WriteIniFile)(ts.SetupFName,&ts);
 		/* copy host list */
@@ -4765,18 +4678,19 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	BOOL ret = FALSE;
-	char buf[80];
-	char uimsg[MAX_UIMSG];
+	TCHAR buf[80];
+	TCHAR uimsg[MAX_UIMSG];
+	TCHAR uimsg2[80];
 
 	SetLastError(NO_ERROR);
 
 	_snprintf_s(fullpath, sizeof(fullpath), "%s\\%s", pathname, filename);
 	if (_access(fullpath, 0) != 0) { // ファイルが存在しない
 		DWORD no = GetLastError();
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("DLG_SETUPDIR_NOFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			"File does not exist.(%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("DLG_SETUPDIR_NOFILE_ERROR", uimsg2, _countof(uimsg2),
+					  _T("File does not exist.(%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
 	}
@@ -4790,10 +4704,10 @@ static BOOL openFileWithApplication(char *pathname, char *filename, char *editor
 	if (CreateProcess(NULL, command, NULL, NULL, FALSE, 0,
 		NULL, NULL, &si, &pi) == 0) { // 起動失敗
 		DWORD no = GetLastError();
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("DLG_SETUPDIR_OPENFILE_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-			"Cannot open file.(%d)", ts.UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, ts.UIMsg, no);
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("DLG_SETUPDIR_OPENFILE_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Cannot open file.(%d)"), ts.UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg2, no);
 		::MessageBox(NULL, buf, uimsg, MB_OK | MB_ICONWARNING);
 		goto error;
 	}
@@ -4915,7 +4829,7 @@ static BOOL convertVirtualStore(char *path, char *filename, char *vstore_path, i
 	if (SHGetSpecialFolderLocation(NULL, CSIDL, &pidl) != S_OK) {
 		goto error;
 	}
-	SHGetPathFromIDList(pidl, shPath);
+	SHGetPathFromIDListA(pidl, shPath);
 	CoTaskMemFree(pidl);
 
 	// Virtual Storeパスを作る。
@@ -4975,7 +4889,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 		// I18N
 		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-		if (GetModuleFileName(NULL, temp, sizeof(temp)) != 0) {
+		if (GetModuleFileNameA(NULL, temp, sizeof(temp)) != 0) {
 			ExtractDirName(temp, teratermexepath);
 		}
 
@@ -5058,7 +4972,7 @@ static LRESULT CALLBACK OnSetupDirectoryDlgProc(HWND hDlgWnd, UINT msg, WPARAM w
 
 		// ssh_known_hosts
 		if (func == NULL) {
-			if (((h = GetModuleHandle("ttxssh.dll")) != NULL)) {
+			if (((h = GetModuleHandleA("ttxssh.dll")) != NULL)) {
 				func = (PSSH_read_known_hosts_file)GetProcAddress(h, "TTXReadKnownHostsFile");
 				if (func) {
 					int ret = func(temp, sizeof(temp));
@@ -5314,7 +5228,7 @@ void ApplyBroadCastCommandHisotry(HWND Dialog, char *historyfile)
 	SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_RESETCONTENT, 0, 0);
 	do {
 		_snprintf_s(EntName, sizeof(EntName), _TRUNCATE, "Command%d", i);
-		GetPrivateProfileString("BroadcastCommands",EntName,"",
+		GetPrivateProfileStringA("BroadcastCommands",EntName,"",
 		                        Command,sizeof(Command), historyfile);
 		if (strlen(Command) > 0) {
 			SendDlgItemMessage(Dialog, IDC_COMMAND_EDIT, CB_ADDSTRING,
@@ -5348,7 +5262,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 
 		case WM_LBUTTONUP:
 			// すでにテキストが入力されている場合は、カーソルを末尾へ移動させる。
-			len = GetWindowText(dlg, buf, sizeof(buf));
+			len = GetWindowTextA(dlg, buf, sizeof(buf));
 			SendMessage(dlg, EM_SETSEL, len, len);
 			SetFocus(dlg);
 			break;
@@ -5369,7 +5283,7 @@ static LRESULT CALLBACK BroadcastEditProc(HWND dlg, UINT msg,
 				int count;
 
 				if (wParam == 0x0d) {  // Enter key
-					SetWindowText(dlg, "");
+					SetWindowText(dlg, _T(""));
 					SendMessage(dlg, EM_SETSEL, 0, 0);
 				}
 
@@ -5720,7 +5634,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 							goto skip;
 						}
 
-						ret = GetDlgItemText(hWnd, IDC_COMMAND_EDIT, buf, 256 - 1);
+						ret = GetDlgItemTextA(hWnd, IDC_COMMAND_EDIT, buf, sizeof(buf) - 1);
 						if (ret == 0) { // error
 							memset(buf, 0, sizeof(buf));
 						}

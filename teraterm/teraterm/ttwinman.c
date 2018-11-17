@@ -249,7 +249,7 @@ void ChangeTitle()
 	if ((ts.TitleFormat & 4)!=0) // VT
 		strncat_s(TempTitle,sizeof(TempTitle)," VT",_TRUNCATE);
 
-	SetWindowText(HVTWin,TempTitle);
+	SetWindowTextA(HVTWin,TempTitle);
 
 	if (HTEKWin!=0)
 	{
@@ -257,7 +257,7 @@ void ChangeTitle()
 		{
 			strncat_s(TempTitle,sizeof(TempTitle)," TEK",_TRUNCATE);
 		}
-		SetWindowText(HTEKWin,TempTitle);
+		SetWindowTextA(HTEKWin,TempTitle);
 	}
 }
 
@@ -305,5 +305,5 @@ HMODULE LoadHomeDLL(const char *DLLname)
 {
 	char DLLpath[MAX_PATH];
 	_snprintf_s(DLLpath, sizeof(DLLpath), _TRUNCATE, "%s\\%s", ts.HomeDir, DLLname);
-	return LoadLibrary(DLLpath);
+	return LoadLibraryA(DLLpath);
 }

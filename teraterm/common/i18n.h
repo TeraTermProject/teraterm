@@ -51,8 +51,10 @@ extern "C" {
 #define DllExport	// direct link
 #endif
 
+DllExport void GetI18nStrT(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile);
+DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
 
 #ifdef __cplusplus
 }

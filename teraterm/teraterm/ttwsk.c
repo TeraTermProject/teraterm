@@ -28,7 +28,8 @@
  */
 
 /* TERATERM.EXE, Winsock interface */
-
+#undef UNICODE
+#undef _UNICODE
 #include "teraterm.h"
 #include "ttwsk.h"
 #include "WSAAsyncGetAddrInfo.h"

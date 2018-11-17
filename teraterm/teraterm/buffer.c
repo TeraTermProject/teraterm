@@ -28,6 +28,8 @@
  */
 
 /* TERATERM.EXE, scroll buffer routines */
+#undef UNICODE
+#undef _UNICODE
 
 #include "teraterm.h"
 #include "tttypes.h"

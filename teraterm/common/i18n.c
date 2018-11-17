@@ -28,18 +28,37 @@
 
 #include "i18n.h"
 
+#include <assert.h>
+
+DllExport void GetI18nStrT(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+{
+	assert(FALSE);
+}
+
+DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
+{
+	wchar_t sectionW[64];
+	wchar_t keyW[128];
+	wchar_t iniFileW[MAX_PATH];
+	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
+	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
+	MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
+	GetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+	RestoreNewLineW(buf);
+}
+
 DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
-	GetPrivateProfileString(section, key, def, buf, buf_len, iniFile);
+	GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
 	RestoreNewLine(buf);
 }
 
-DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONT logfont, int ppi, const char *iniFile)
+DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
 {
 	static char tmp[MAX_UIMSG];
 	static char font[LF_FACESIZE];
 	int hight, charset;
-	GetPrivateProfileString(section, key, "-", tmp, MAX_UIMSG, iniFile);
+	GetPrivateProfileStringA(section, key, "-", tmp, MAX_UIMSG, iniFile);
 	if (strcmp(tmp, "-") == 0) {
 		return FALSE;
 	}

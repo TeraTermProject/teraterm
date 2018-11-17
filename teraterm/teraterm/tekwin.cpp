@@ -44,11 +44,21 @@
 #include "tekwin.h"
 #include "ttlib.h"
 #include "htmlhelp.h"
+#include <tchar.h>
 
 #define CWnd	TTCWnd
 #define CFrameWnd	TTCFrameWnd
 
-#define TEKClassName "TEKWin32"
+#undef GetMenuString
+#define GetMenuString GetMenuStringA
+#undef ModifyMenu
+#define ModifyMenu ModifyMenuA
+#undef InsertMenu
+#define InsertMenu InsertMenuA
+#undef AppendMenu
+#define AppendMenu AppendMenuA
+
+#define TEKClassName _T("TEKWin32")
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -107,7 +117,7 @@ CTEKWindow::CTEKWindow()
 		rect.right = rect.left + 640; //temporary width
 		rect.bottom = rect.top + 400; //temporary height
 	}
-	Create(hInst, TEKClassName, "Tera Term", Style, rect, ::GetDesktopWindow(), NULL);
+	Create(hInst, TEKClassName, _T("Tera Term"), Style, rect, ::GetDesktopWindow(), NULL);
 //--------------------------------------------------------
 	HTEKWin = GetSafeHwnd();
 	if (HTEKWin == NULL) {
