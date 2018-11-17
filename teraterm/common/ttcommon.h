@@ -74,13 +74,13 @@ DllExport void WINAPI SetWinList(HWND HWin, HWND HDlg, int IList);
 DllExport void WINAPI SelectWin(int WinId);
 DllExport void WINAPI SelectNextWin(HWND HWin, int Next, BOOL SkipIconic);
 DllExport HWND WINAPI GetNthWin(int n);
-DllExport int WINAPI GetRegisteredWindowCount();
+DllExport int WINAPI GetRegisteredWindowCount(void);
 DllExport void WINAPI ShowAllWin(int stat);
 DllExport void WINAPI ShowAllWinSidebySide(HWND);
 DllExport void WINAPI ShowAllWinStacked(HWND);
 DllExport void WINAPI ShowAllWinCascade(HWND);
 DllExport void WINAPI BroadcastClosingMessage(HWND myhwnd);
-DllExport void WINAPI UndoAllWin();
+DllExport void WINAPI UndoAllWin(void);
 DllExport void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile);
 
 DllExport int WINAPI CommReadRawByte(PComVar cv, LPBYTE b);
@@ -100,7 +100,7 @@ DllExport void WINAPI ShowNotifyIcon(PComVar cv);
 DllExport void WINAPI HideNotifyIcon(PComVar cv);
 DllExport void WINAPI SetVerNotifyIcon(PComVar cv, unsigned int ver);
 DllExport void WINAPI SetCustomNotifyIcon(HICON icon);
-DllExport HICON WINAPI GetCustomNotifyIcon();
+DllExport HICON WINAPI GetCustomNotifyIcon(void);
 
 #define NotifyInfoMessage(cv, msg, title) NotifyMessage(cv, msg, title, 1)
 #define NotifyWarnMessage(cv, msg, title) NotifyMessage(cv, msg, title, 2)

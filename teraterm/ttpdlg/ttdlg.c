@@ -1459,7 +1459,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 						(Index==i-1)) {
 						return TRUE;
 					}
-					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
+					SendDlgItemMessageA(Dialog, IDC_TCPIPLIST, LB_GETTEXT,
 					                   Index, (LPARAM)TempHost);
 					SendDlgItemMessage(Dialog, IDC_TCPIPLIST, LB_DELETESTRING,
 					                   Index, 0);
@@ -2553,7 +2553,6 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 	static int langui_sel = 1, uilist_count = 0;
 	PTTSet ts;
 	WORD w;
-	char Temp[8];
 
 	switch (Message) {
 		case WM_INITDIALOG:
@@ -2565,6 +2564,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
 			                   0, (LPARAM)"TCP/IP");
 			for (w=1;w<=ts->MaxComPort;w++) {
+				char Temp[8];
 				_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "COM%d", w);
 				SendDlgItemMessageA(Dialog, IDC_GENPORT, CB_ADDSTRING,
 				                   0, (LPARAM)Temp);
@@ -2639,6 +2639,8 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 							SetCurrentDirectoryA(ts->HomeDir);
 							_fullpath(ts->UILanguageFile, ts->UILanguageFile_ini, sizeof(ts->UILanguageFile));
 							SetCurrentDirectoryA(CurDir);
+
+							strncpy_s(UILanguageFile, sizeof(UILanguageFile), ts->UILanguageFile, _TRUNCATE);
 
 							// タイトルの更新を行う。(2014.2.23 yutaka)
 							PostMessage(GetParent(Dialog),WM_USER_CHANGETITLE,0,0);
