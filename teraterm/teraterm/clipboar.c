@@ -878,7 +878,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 		case WM_INITDIALOG:
 			SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-			SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_SETTEXT, 0, (LPARAM)CBMemPtr);
+			SetDlgItemTextA(hDlgWnd, IDC_EDIT, CBMemPtr);
 
 			if (ActiveWin == IdVT) { // VT Window
 				/*
@@ -977,7 +977,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 			switch (LOWORD(wp)) {
 				case IDOK:
 				{
-					unsigned len = SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXTLENGTH, 0, 0);
+					unsigned len = SendMessageA(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXTLENGTH, 0, 0);
 					HGLOBAL hMem;
 					INT_PTR result = IDCANCEL;
 
@@ -1015,7 +1015,7 @@ static LRESULT CALLBACK OnClipboardDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LP
 						if (CBMemPtr == NULL) {
 							CBMemPtr = GlobalLock(CBMemHandle);
 						}
-						SendMessage(GetDlgItem(hDlgWnd, IDC_EDIT), WM_GETTEXT, GlobalSize(CBMemHandle), (LPARAM)CBMemPtr);
+						GetDlgItemTextA(hDlgWnd, IDC_EDIT, GlobalSize(CBMemHandle), (LPARAM)CBMemPtr);
 						result = IDOK;
 					}
 

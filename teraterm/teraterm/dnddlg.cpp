@@ -102,7 +102,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 						 IDC_SCP_RADIO);
 
 		// SCP
-		SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)Param->ScpSendDirPtr);
+		SetDlgItemTextA(hDlgWnd, IDC_SCP_PATH, Param->ScpSendDirPtr);
 		if (!Param->ScpEnable) {
 			// 無効化
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_RADIO), FALSE);
