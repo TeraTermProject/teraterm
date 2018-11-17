@@ -1,15 +1,14 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include <windows.h>
-#include "../common/tt_res.h"
-#define IDC_STATIC 0
+#include "tt_res.h"
+
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-//#include "afxres.h"
-
+#include <winresrc.h>
+#define IDC_STATIC -1
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -17,10 +16,8 @@
 // âpåÍ (ïƒçë) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -32,8 +29,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Tera Term: File Drag and Drop"
 FONT 8, "Tahoma", 0, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_FILENAME_EDIT,7,6,236,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "Are you sure that you want to send the file content?",IDC_DAD_STATIC,7,25,173,8
+    EDITTEXT        IDC_FILENAME_EDIT,7,18,236,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "Are you sure that you want to send the file content?",IDC_DAD_STATIC,7,6,173,8
     CONTROL         "&SCP",IDC_SCP_RADIO,"Button",BS_AUTORADIOBUTTON | BS_NOTIFY,7,36,236,10
     CONTROL         "S&end File (Paste content of file)",IDC_SENDFILE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | BS_NOTIFY,7,77,236,10
@@ -88,8 +85,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,108,10
     CONTROL         "Display session &number",IDC_TITLEFMT_DISPSESSION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,155,108,10
-    CONTROL         "Display &VT/TEK",IDC_TITLEFMT_DISPVTTEK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,170,108,10
+    CONTROL         "Display &VT/TEK",IDC_TITLEFMT_DISPVTTEK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,170,108,10
     CONTROL         "Swap hostname and &title position",IDC_TITLEFMT_SWAPHOSTTITLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,140,130,10
     CONTROL         "Display tcp &port number",IDC_TITLEFMT_DISPTCPPORT,
@@ -307,7 +303,7 @@ BEGIN
     LTEXT           "Elapsed time:",IDC_PROT_ELAPSED,12,48,46,8
     RTEXT           "",IDC_PROTOELAPSEDTIME,60,48,70,8
     RTEXT           "",IDC_PROTOPERCENT,104,61,26,8,0,WS_EX_TRANSPARENT
-    CONTROL         "",IDC_PROTOPROGRESS,"msctls_progress32",NOT WS_VISIBLE | WS_BORDER | 0x1,12,58,92,14,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_PROTOPROGRESS,"msctls_progress32",PBS_SMOOTH | NOT WS_VISIBLE | WS_BORDER,12,58,92,14,WS_EX_TRANSPARENT
     DEFPUSHBUTTON   "Cancel",IDCANCEL,51,77,40,14
 END
 
@@ -359,7 +355,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DAD_DIALOG, DIALOG
     BEGIN
@@ -463,18 +459,17 @@ END
 
 1 TEXTINCLUDE 
 BEGIN
-    "..\\common\\tt_res.h\0"
+    "tt_res.h\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
+    "#include <winresrc.h>\r\n"
+    "#define IDC_STATIC -1\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "#include ""tt-version.rc""\r\n"
     "\0"
 END
 
@@ -489,20 +484,28 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_TTERM               ICON                    "../common/teraterm.ico"
+
 IDI_VT                  ICON                    "../common/vt.ico"
+
 IDI_TEK                 ICON                    "../common/tek.ico"
+
 IDI_TTERM_CLASSIC       ICON                    "../common/teraterm_classic.ico"
+
 IDI_VT_CLASSIC          ICON                    "../common/vt_classic.ico"
+
 IDI_TTERM_3D            ICON                    "../common/teraterm_3d.ico"
+
 IDI_VT_3D               ICON                    "../common/vt_3d.ico"
+
 IDI_CYGTERM             ICON                    "../../cygterm/cygterm.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_MENU MENU 
+IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -616,7 +619,7 @@ BEGIN
     END
 END
 
-IDR_TEKMENU MENU 
+IDR_TEKMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -647,7 +650,7 @@ BEGIN
     END
 END
 
-IDR_PASTEMENU MENU 
+IDR_PASTEMENU MENU
 BEGIN
     MENUITEM "&Paste",                      ID_EDIT_PASTE2
     MENUITEM "Paste<C&R>",                  ID_EDIT_PASTECR
@@ -659,7 +662,7 @@ END
 // Accelerator
 //
 
-IDR_ACC ACCELERATORS 
+IDR_ACC ACCELERATORS
 BEGIN
     "T",            ID_ACC_AREYOUTHERE,     VIRTKEY, ALT, NOINVERT
     "C",            ID_ACC_COPY,            VIRTKEY, ALT, NOINVERT
@@ -677,15 +680,4 @@ END
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-#include "tt-version.rc"
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
 
