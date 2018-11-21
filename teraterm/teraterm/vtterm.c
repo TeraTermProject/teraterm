@@ -2769,6 +2769,12 @@ void CSQExchangeColor()		// DECSCNM / Visual Bell
 void CSQChangeColumnMode(int width)		// DECCOLM
 {
 	ChangeTerminalSize(width, NumOfLines-StatusLine);
+	LRMarginMode = FALSE;
+
+	// DECCOLM では画面がクリアされるのが仕様
+	// ClearOnResize が off の時はここでクリアする。
+	// ClearOnResize が on の時は ChangeTerminalSize() を呼ぶとクリアされるので、
+	// 余計なスクロールを避ける為にここではクリアしない。
 	if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
 		MoveCursor(0, 0);
 		BuffClearScreen();
