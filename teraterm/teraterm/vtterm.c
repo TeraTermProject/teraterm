@@ -2463,6 +2463,13 @@ void CSSunSequence() /* Sun terminal private sequences */
 		}
 		break;
 
+	  case 16: // Report character cell size (pixel)
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "6;%d;%dt", CLocale, FontHeight, FontWidth);
+			SendCSIstr(Report, len);
+		}
+		break;
+
 	  case 18: /* get terminal size */
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%ut", CLocale,
