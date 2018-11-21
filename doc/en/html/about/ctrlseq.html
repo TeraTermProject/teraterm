@@ -250,20 +250,41 @@ Response: Depends the <a href="../menu/setup-terminal.html#TerminalID">Terminal 
             <i>Ps2</i> = 0    Restore maximized window.
                 = 1    Maximize window.
 
+    = 10    Change full-screen state of window. Currently use the window maximizing instead.
+            <i>Ps2</i> = 0    Undo full-screen mode.
+                = 1    Change to full-screen.
+                = 2    Toggle full-screen.
+
     = 11    Reports window state.
             Response: CSI <i>s</i> t
               <i>s</i> = 1    Normal. (non-iconified)
                 = 2    Iconified.
 
     = 13    Reports window position.
+            <i>Ps2</i> = Omitted, 0, 1
+                       Reports whole window position.
+                = 2    Reprots text area position.
             Response: CSI 3 ; <i>x</i> ; <i>y</i> t
               <i>x</i>    X position of window.
               <i>y</i>    Y position of window.
 
     = 14    Reports window size in pixels.
+            <i>Ps2</i> = Omitted, 0, 1
+                       Reports text area size.
+                = 2    Reprots whole window size.
             Response: CSI 4 ; <i>y</i> ; <i>x</i> t
               <i>y</i>    Window height in pixels.
               <i>x</i>    Window width in pixels.
+
+    = 15    Reports root window size in pixels.
+            Response: CSI 5 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    Root window height in pixels.
+              <i>x</i>    Root window width in pixels.
+
+    = 16    Reports character size in pixels.
+            Response: CSI 6 ; <i>y</i> ; <i>x</i> t
+              <i>y</i>    character height in pixels.
+              <i>x</i>    character width in pixels.
 
     = 18    Reports terminal size in characters.
             Response: CSI 8 ; <i>y</i> ; <i>x</i> t

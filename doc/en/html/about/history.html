@@ -33,11 +33,22 @@
 
 <h3 id="teraterm_4.101">2018.11.xx (Ver 4.101)</h3>
 <ul class="history">
-  <!-- li>Changes
+  <li>Changes
     <ul>
-      <li></li>
+      <li>added support for following dtterm window manipulation sequences.
+        <ul>
+          <li>10: Full-screen mode</li>
+          <li>13;2: Report window position. (text area)</li>
+          <li>14;2: Report window size. (whole window)</li>
+          <li>15: Report root window size in pixel.</li>
+          <li>16: Report character size in pixel.</li>
+        </ul></li>
+      <li>The behavior of following dtterm window manipulation sequence was changed.
+        <ul>
+          <li>14: Report window size sequence: report text area size instead of whole window size.</li>
+        </ul></li>
     </ul>
-  </li -->
+  </li>
 
   <li>Misc
     <ul>
