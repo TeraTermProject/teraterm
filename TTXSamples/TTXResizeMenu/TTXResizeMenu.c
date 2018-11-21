@@ -13,6 +13,10 @@
 
 #define ID_MENUID_BASE 55101
 #define MAX_MENU_ITEMS 20
+#define ID_MENUID_INC_WIDTH  (ID_MENUID_BASE + 50)
+#define ID_MENUID_DEC_WIDTH  (ID_MENUID_BASE + 51)
+#define ID_MENUID_INC_HEIGHT (ID_MENUID_BASE + 52)
+#define ID_MENUID_DEC_HEIGHT (ID_MENUID_BASE + 53)
 
 static HANDLE hInst; /* Instance handle of TTX*.DLL */
 
@@ -277,7 +281,35 @@ static int PASCAL TTXProcessCommand(HWND HWin, WORD cmd) {
     SendMessage(HWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
     return 1;
   }
-  return 0;
+  switch (cmd) {
+    case ID_MENUID_INC_WIDTH:
+      pvar->ts->TerminalWidth += 1;
+      pvar->ReplaceTermDlg = TRUE;
+      break;
+    case ID_MENUID_DEC_WIDTH:
+      if (pvar->ts->TerminalWidth > 1) {
+	pvar->ts->TerminalWidth -= 1;
+	pvar->ReplaceTermDlg = TRUE;
+      }
+      break;
+    case ID_MENUID_INC_HEIGHT:
+      pvar->ts->TerminalHeight += 1;
+      pvar->ReplaceTermDlg = TRUE;
+      break;
+    case ID_MENUID_DEC_HEIGHT:
+      if (pvar->ts->TerminalHeight > 1) {
+	pvar->ts->TerminalHeight -= 1;
+	pvar->ReplaceTermDlg = TRUE;
+      }
+      break;
+    default:
+      return 0;
+  }
+
+  if (pvar->ReplaceTermDlg) {
+    SendMessage(HWin, WM_COMMAND, MAKELONG(ID_SETUP_TERMINAL, 0), 0);
+  }
+  return 1;
 }
 
 static TTXExports Exports = {
