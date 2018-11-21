@@ -3781,20 +3781,29 @@ BOOL DispWindowIconified() {
 	return IsIconic(HVTWin);
 }
 
-void DispGetWindowPos(int *x, int *y) {
+void DispGetWindowPos(int *x, int *y, BOOL client) {
 	WINDOWPLACEMENT wndpl;
+	POINT point;
 
-	wndpl.length = sizeof(WINDOWPLACEMENT);
-	GetWindowPlacement(HVTWin, &wndpl);
+	if (client) {
+		point.x = point.y = 0;
+		ClientToScreen(HVTWin, &point);
+		*x = point.x;
+		*y = point.y;
+	}
+	else {
+		wndpl.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(HVTWin, &wndpl);
 
-	switch (wndpl.showCmd) {
-	  case SW_SHOWMAXIMIZED:
-		*x = wndpl.ptMaxPosition.x;
-		*y = wndpl.ptMaxPosition.y;
-		break;
-	  default:
-		*x = wndpl.rcNormalPosition.left;
-		*y = wndpl.rcNormalPosition.top;
+		switch (wndpl.showCmd) {
+		  case SW_SHOWMAXIMIZED:
+			*x = wndpl.ptMaxPosition.x;
+			*y = wndpl.ptMaxPosition.y;
+			break;
+		  default:
+			*x = wndpl.rcNormalPosition.left;
+			*y = wndpl.rcNormalPosition.top;
+		}
 	}
 
 	return;

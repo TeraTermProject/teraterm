@@ -2418,7 +2418,18 @@ void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 13: // Report window position
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetWindowPos(&x, &y);
+			RequiredParams(2);
+			switch (Param[2]) {
+			  case 0:
+			  case 1:
+				DispGetWindowPos(&x, &y, FALSE);
+				break;
+			  case 2:
+				DispGetWindowPos(&x, &y, TRUE);
+				break;
+			  default:
+				return;
+			}
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%u;%ut", CLocale, (unsigned int)x, (unsigned int)y);
 			SendCSIstr(Report, len);
 		}
