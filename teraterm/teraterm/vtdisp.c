@@ -3824,7 +3824,7 @@ void DispGetWindowSize(int *width, int *height, BOOL client) {
 	return;
 }
 
-void DispGetRootWinSize(int *x, int *y)
+void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 {
 	HMODULE mod;
 	HMONITOR monitor;
@@ -3847,8 +3847,14 @@ void DispGetRootWinSize(int *x, int *y)
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop, 0);
 	}
 
-	*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
-	*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
+	if (inPixels) {
+		*x = desktop.right - desktop.left;
+		*y = desktop.bottom - desktop.top;
+	}
+	else {
+		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
+		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
+	}
 
 	return;
 }

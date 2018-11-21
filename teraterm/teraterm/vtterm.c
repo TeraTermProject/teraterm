@@ -2455,6 +2455,14 @@ void CSSunSequence() /* Sun terminal private sequences */
 		}
 		break;
 
+	  case 15: // Report display size (pixel)
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			DispGetRootWinSize(&x, &y, TRUE);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "5;%d;%dt", CLocale, y, x);
+			SendCSIstr(Report, len);
+		}
+		break;
+
 	  case 18: /* get terminal size */
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "8;%u;%ut", CLocale,
@@ -2465,7 +2473,7 @@ void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 19: // Report display size (character)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetRootWinSize(&x, &y);
+			DispGetRootWinSize(&x, &y, FALSE);
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
 			SendCSIstr(Report, len);
 		}

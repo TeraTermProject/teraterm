@@ -113,7 +113,7 @@ void DispResizeWin(int w, int h);
 BOOL DispWindowIconified();
 void DispGetWindowPos(int *x, int *y, BOOL client);
 void DispGetWindowSize(int *width, int *height, BOOL client);
-void DispGetRootWinSize(int *x, int *y);
+void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
 int DispFindClosestColor(int red, int green, int blue);
 void UpdateBGBrush(void);
 
