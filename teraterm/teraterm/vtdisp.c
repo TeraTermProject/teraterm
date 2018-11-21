@@ -3800,10 +3800,15 @@ void DispGetWindowPos(int *x, int *y) {
 	return;
 }
 
-void DispGetWindowSize(int *width, int *height) {
+void DispGetWindowSize(int *width, int *height, BOOL client) {
 	RECT r;
 
-	GetWindowRect(HVTWin, &r);
+	if (client) {
+		GetClientRect(HVTWin, &r);
+	}
+	else {
+		GetWindowRect(HVTWin, &r);
+	}
 	*width = r.right - r.left;
 	*height = r.bottom - r.top;
 

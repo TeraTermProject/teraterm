@@ -2426,7 +2426,19 @@ void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 14: /* get window size */
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetWindowSize(&x, &y);
+			RequiredParams(2);
+			switch (Param[2]) {
+			  case 0:
+			  case 1:
+				DispGetWindowSize(&x, &y, TRUE);
+				break;
+			  case 2:
+				DispGetWindowSize(&x, &y, FALSE);
+				break;
+			  default:
+				return;
+			}
+
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "4;%d;%dt", CLocale, y, x);
 			SendCSIstr(Report, len);
 		}
