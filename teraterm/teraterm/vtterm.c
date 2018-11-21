@@ -2409,6 +2409,27 @@ void CSSunSequence() /* Sun terminal private sequences */
 		}
 		break;
 
+	  case 10: // Full-screen
+		/*
+		 * 本来ならば PuTTY のようなフルスクリーンモードを実装するべきだが、
+		 * とりあえずは手抜きで最大化を利用する
+		 */
+		if (ts.WindowFlag & WF_WINDOWCHANGE) {
+			RequiredParams(2);
+			switch (Param[2]) {
+			  case 0:
+			    DispShowWindow(WINDOW_RESTORE);
+			    break;
+			  case 1:
+			    DispShowWindow(WINDOW_MAXIMIZE);
+			    break;
+			  case 2:
+			    DispShowWindow(WINDOW_TOGGLE_MAXIMIZE);
+			    break;
+			}
+		}
+		break;
+
 	  case 11: // Report window state
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);

@@ -141,6 +141,7 @@ extern TCharAttr DefCharAttr;
 #define WINDOW_RAISE    4
 #define WINDOW_LOWER    5
 #define WINDOW_REFRESH  6
+#define WINDOW_TOGGLE_MAXIMIZE 7
 
 #ifdef __cplusplus
 }

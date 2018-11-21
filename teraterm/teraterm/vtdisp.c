@@ -3758,6 +3758,14 @@ void DispShowWindow(int mode) {
 	  case WINDOW_REFRESH:
 		InvalidateRect(HVTWin, NULL, FALSE);
 		break;
+	  case WINDOW_TOGGLE_MAXIMIZE:
+		if (IsZoomed(HVTWin)) {
+			ShowWindow(HVTWin, SW_RESTORE);
+		}
+		else {
+			ShowWindow(HVTWin, SW_MAXIMIZE);
+		}
+		break;
 	}
 }
 
