@@ -222,7 +222,7 @@ BEGIN
     PUSHBUTTON      "&Help",IDC_DIRHELP,115,34,36,14
 END
 
-IDD_ABOUTDLG DIALOGEX 20, 20, 187, 128
+IDD_ABOUTDLG DIALOGEX 20, 20, 187, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About Tera Term"
 FONT 14, "System", 0, 0, 0x0
@@ -242,8 +242,8 @@ BEGIN
     LTEXT           "Version",IDC_TT_VERSION,38,10,101,8
     RTEXT           "Author:",IDC_AUTHOR_LABEL,5,106,28,8
     LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,106,128,8,SS_NOTIFY | WS_TABSTOP
-    RTEXT           "Forum:",IDC_FORUM_LABEL,8,115,25,8
-    LTEXT           "http://logmett.com/support-forums",IDC_FORUM_URL,36,115,136,8,SS_NOTIFY | WS_TABSTOP
+//    RTEXT           "Forum:",IDC_FORUM_LABEL,8,115,25,8
+//    LTEXT           "http://logmett.com/support-forums",IDC_FORUM_URL,36,115,136,8,SS_NOTIFY | WS_TABSTOP
     LTEXT           "Oniguruma: ",IDC_ONIGURUMA_LABEL,38,35,114,8
     LTEXT           "Built using Microsoft Visual C++",IDC_BUILDTOOL,7,87,172,10
     LTEXT           "Build time: ",IDC_BUILDTIME,7,97,165,8
