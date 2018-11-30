@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include "ttmparse.h"
 #include "ttlib.h"
+#include "win16api.h"
 
 #include "ttmbuff.h"
 
@@ -136,7 +137,7 @@ static void TrimUnicodeBOM(CHAR *pbuf, BINT *plen)
 
 BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 {
-	int F;
+	HANDLE F;
 	int dummy_read = 0;
 	char basename[MAX_PATH];
 	unsigned int i, n;
@@ -176,7 +177,7 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 	}
 
 	F = _lopen(FileName,OF_READ);
-	if (F<=0) {
+	if (F == INVALID_HANDLE_VALUE) {
 		return FALSE;
 	}
 	BuffHandle[IBuff] = GlobalAlloc(GMEM_MOVEABLE, BuffLen[IBuff]);

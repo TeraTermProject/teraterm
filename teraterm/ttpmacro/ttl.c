@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2017 TeraTerm Project
+ * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,6 +67,7 @@
 #include <ws2tcpip.h>
 #include <iptypes.h>
 #include <iphlpapi.h>
+#include "win16api.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -89,10 +90,10 @@ int ExitCode = 0;
 
 // for "FindXXXX" commands
 #define NumDirHandle 8
-static long DirHandle[NumDirHandle] = {-1,-1, -1, -1, -1, -1, -1, -1};
+static intptr_t DirHandle[NumDirHandle] = {-1,-1, -1, -1, -1, -1, -1, -1};
 /* for "FileMarkPtr" and "FileSeekBack" commands */
 #define NumFHandle 16
-static int FHandle[NumFHandle];
+static HANDLE FHandle[NumFHandle];
 static long FPointer[NumFHandle];
 
 // forward declaration
@@ -178,7 +179,7 @@ BOOL InitTTL(HWND HWin)
 	for (i=0; i<NumDirHandle; i++)
 		DirHandle[i] = -1L;
 	for (i=0; i<NumFHandle; i++)
-		FHandle[i] = -1;
+		FHandle[i] = INVALID_HANDLE_VALUE;
 
 	if (! InitBuff(FileName))
 	{
@@ -1274,7 +1275,8 @@ WORD TTLExpandEnv()
 WORD TTLFileClose()
 {
 	WORD Err;
-	int FH, i;
+	HANDLE FH;
+	int i;
 
 	Err = 0;
 	GetIntVal(&FH,&Err);
@@ -1284,14 +1286,15 @@ WORD TTLFileClose()
 	_lclose(FH);
 	i = 0;
 	while ((i<NumFHandle) && (FH!=FHandle[i])) i++;
-	if (i<NumFHandle) FHandle[i] = -1;
+	if (i<NumFHandle) FHandle[i] = INVALID_HANDLE_VALUE;
 	return Err;
 }
 
 WORD TTLFileConcat()
 {
 	WORD Err;
-	int FH1, FH2, c;
+	HANDLE FH1, FH2;
+	int c;
 	TStrVal FName1, FName2;
 	BYTE buf[1024];
 
@@ -1322,16 +1325,16 @@ WORD TTLFileConcat()
 	}
 
 	FH1 = _lopen(FName1,OF_WRITE);
-	if (FH1<0)
+	if (FH1 == INVALID_HANDLE_VALUE)
 		FH1 = _lcreat(FName1,0);
-	if (FH1<0) {
+	if (FH1 == INVALID_HANDLE_VALUE) {
 		SetResult(3);
 		return Err;
 	}
 	_llseek(FH1,0,2);
 
 	FH2 = _lopen(FName2,OF_READ);
-	if (FH2!=-1)
+	if (FH2 != INVALID_HANDLE_VALUE)
 	{
 		do {
 			c = _lread(FH2,&(buf[0]),sizeof(buf));
@@ -1383,7 +1386,7 @@ WORD TTLFileCreate()
 {
 	WORD Err;
 	TVarId VarId;
-	int FH;
+	HANDLE FH;
 	TStrVal FName;
 
 	Err = 0;
@@ -1403,11 +1406,10 @@ WORD TTLFileCreate()
 		return Err;
 	}
 	FH = _lcreat(FName,0);
-	if (FH<0) {
-		FH = -1;
+	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
-	  }
-	  else {
+	}
+	else {
 		SetResult(0);
 	}
 	SetIntVal(VarId, FH);
@@ -1447,7 +1449,8 @@ WORD TTLFileDelete()
 WORD TTLFileMarkPtr()
 {
 	WORD Err;
-	int FH, i;
+	HANDLE FH;
+	int i;
 
 	Err = 0;
 	GetIntVal(&FH,&Err);
@@ -1459,7 +1462,7 @@ WORD TTLFileMarkPtr()
 	if (i>=NumFHandle)
 	{
 		i = 0;
-		while ((i<NumFHandle) && (FHandle[i]!=-1)) i++;
+		while ((i<NumFHandle) && (FHandle[i]!=INVALID_HANDLE_VALUE)) i++;
 		if (i<NumFHandle) FHandle[i] = FH;
 	}
 	if (i<NumFHandle)
@@ -1534,7 +1537,8 @@ WORD TTLFileOpen()
 {
 	WORD Err;
 	TVarId VarId;
-	int Append, FH, ReadonlyFlag=0;
+	HANDLE FH;
+	int Append, ReadonlyFlag=0;
 	TStrVal FName;
 
 	Err = 0;
@@ -1561,11 +1565,11 @@ WORD TTLFileOpen()
 	else {
 		FH = _lopen(FName,OF_READWRITE);
 	}
-	if (FH<0)
+	if (FH == INVALID_HANDLE_VALUE)
 		FH = _lcreat(FName,0);
-	if (FH<0) FH = -1;
+	if (FH == INVALID_HANDLE_VALUE) FH = INVALID_HANDLE_VALUE;
 	SetIntVal(VarId, FH);
-	if (FH<0) return Err;
+	if (FH == INVALID_HANDLE_VALUE) return Err;
 	if (Append!=0) _llseek(FH, 0, 2);  
 	return Err;
 }
@@ -1634,7 +1638,8 @@ WORD TTLFileReadln()
 {
 	WORD Err;
 	TVarId VarId;
-	int FH, i, c;
+	HANDLE FH;
+	int i, c;
 	TStrVal Str;
 	BOOL EndFile, EndLine;
 	BYTE b;
@@ -1690,7 +1695,8 @@ WORD TTLFileRead()
 {
 	WORD Err;
 	TVarId VarId;
-	int FH, i, c;
+	HANDLE FH;
+	int i, c;
 	int ReadByte;   // “Ç‚Ýž‚ÞƒoƒCƒg”
 	TStrVal Str;
 	BOOL EndFile, EndLine;
@@ -1794,7 +1800,8 @@ WORD TTLFileSearch()
 WORD TTLFileSeek()
 {
 	WORD Err;
-	int FH, i, j;
+	HANDLE FH;
+	int i, j;
 
 	Err = 0;
 	GetIntVal(&FH,&Err);
@@ -1810,7 +1817,8 @@ WORD TTLFileSeek()
 WORD TTLFileSeekBack()
 {
 	WORD Err;
-	int FH, i;
+	HANDLE FH;
+	int i;
 
 	Err = 0;
 	GetIntVal(&FH,&Err);
@@ -1883,7 +1891,8 @@ end:
 WORD TTLFileStrSeek()
 {
 	WORD Err;
-	int FH, Len, i, c;
+	HANDLE FH;
+	int Len, i, c;
 	TStrVal Str;
 	BYTE b;
 	long int pos;
@@ -1925,7 +1934,8 @@ WORD TTLFileStrSeek()
 WORD TTLFileStrSeek2()
 {
 	WORD Err;
-	int FH, Len, i, c;
+	HANDLE FH;
+	int Len, i, c;
 	TStrVal Str;
 	BYTE b;
 	long int pos, pos2;
@@ -2027,7 +2037,8 @@ end:
 WORD TTLFileWrite(BOOL addCRLF)
 {
 	WORD Err, P;
-	int FH, Val;
+	HANDLE FH;
+	int Val;
 	TStrVal Str;
 
 	Err = 0;

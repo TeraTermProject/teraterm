@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2007-2017 TeraTerm Project
  * All rights reserved.
@@ -110,12 +110,12 @@ typedef struct {
   int FnPtr;
 
   BOOL FileOpen;
-  int FileHandle;
+  HANDLE FileHandle;
   LONG FileSize, ByteCount;
   BOOL OverWrite;
 
   BOOL LogFlag;
-  int LogFile;
+  HANDLE LogFile;
   WORD LogState;
   WORD LogCount;
 

@@ -38,6 +38,7 @@
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "win16api.h"
 
 /* proto type */
 BOOL PASCAL GetTransFname
@@ -52,7 +53,7 @@ BOOL BPOpenFileToBeSent(PFileVar fv)
   if (strlen(&(fv->FullName[fv->DirLen]))==0) return FALSE;
 
   fv->FileHandle = _lopen(fv->FullName,OF_READ);
-  fv->FileOpen = fv->FileHandle>0;
+  fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
   if (fv->FileOpen)
   {
     SetDlgItemText(fv->HWin, IDC_PROTOFNAME, &(fv->FullName[fv->DirLen]));

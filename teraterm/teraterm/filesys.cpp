@@ -43,6 +43,7 @@
 #include "helpid.h"
 #include "dlglib.h"
 #include "vtterm.h"
+#include "win16api.h"
 
 #include "filesys.h"
 #include "ftlib.h"
@@ -667,10 +668,10 @@ BOOL LogStart()
 		if (!ts.LogLockExclusive) {
 			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 		}
-		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-		                                     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (LogVar->FileHandle>0){
-			SetFilePointer((HANDLE)LogVar->FileHandle, 0, NULL, FILE_END);
+		LogVar->FileHandle = CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+		                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (LogVar->FileHandle != INVALID_HANDLE_VALUE){
+			SetFilePointer(LogVar->FileHandle, 0, NULL, FILE_END);
 			/* 2007.05.24 Gentaro
 				If log file already exists,
 				a newline is inserted before the first timestamp.
@@ -683,10 +684,10 @@ BOOL LogStart()
 		if (!ts.LogLockExclusive) {
 			dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 		}
-		LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-		                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		LogVar->FileHandle = CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+		                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
-	LogVar->FileOpen = (LogVar->FileHandle>0);
+	LogVar->FileOpen = (LogVar->FileHandle != INVALID_HANDLE_VALUE);
 	if (! LogVar->FileOpen)
 	{
 		char msg[128];
@@ -941,8 +942,8 @@ static void LogRotate(void)
 	if (!ts.LogLockExclusive) {
 		dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	}
-	LogVar->FileHandle = (int)CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
-	                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	LogVar->FileHandle = CreateFile(LogVar->FullName, GENERIC_WRITE, dwShareMode, NULL,
+	                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	// 遅延書き込み用スレッドを起こす。
 	// (2013.4.19 yutaka)
@@ -1211,9 +1212,9 @@ void FileSendStart()
 	else
 		(*SetFileVar)(SendVar);
 
-	SendVar->FileHandle = (int)CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
-	                                      OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-	SendVar->FileOpen = (SendVar->FileHandle>0);
+	SendVar->FileHandle = CreateFile(SendVar->FullName, GENERIC_READ, FILE_SHARE_READ, NULL,
+	                                 OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	SendVar->FileOpen = (SendVar->FileHandle != INVALID_HANDLE_VALUE);
 	if (! SendVar->FileOpen)
 	{
 		FileTransEnd(OpSendFile);
@@ -1593,7 +1594,7 @@ void CloseProtoDlg()
 		    (((PQVVar)ProtoVar)->QVMode==IdQVSend))
 			CommTextOut(&cv,"\015",1);
 		if (FileVar->LogFlag)
-			_lclose(FileVar->LogFile);
+			CloseHandle(FileVar->LogFile);
 		FileVar->LogFile = 0;
 		if (ProtoVar!=NULL)
 		{
@@ -1811,7 +1812,7 @@ void XMODEMStart(int mode)
 	else
 		FileVar->FileHandle = _lopen(FileVar->FullName,OF_READ);
 
-	FileVar->FileOpen = FileVar->FileHandle>0;
+	FileVar->FileOpen = FileVar->FileHandle != INVALID_HANDLE_VALUE;
 	if (! FileVar->FileOpen)
 	{
 		ProtoEnd();

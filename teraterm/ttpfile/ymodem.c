@@ -36,6 +36,7 @@
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
+#include "win16api.h"
 
 #include "tt_res.h"
 #include "ttcommon.h"
@@ -260,12 +261,12 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 		fv->FileHandle = _lopen(fv->FullName,OF_READ);
 		fv->FileSize = GetFSize(fv->FullName);
 	} else {
-		fv->FileHandle = -1;
+		fv->FileHandle = INVALID_HANDLE_VALUE;
 		fv->FileSize = 0;
 		fv->FileMtime = 0;
 		yv->RecvFilesize = FALSE;
 	}
-	fv->FileOpen = fv->FileHandle>0;
+	fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
 
 	if (yv->YMode == IdYSend) {
 		InitDlgProgress(fv->HWin, IDC_PROTOPROGRESS, &fv->ProgStat);
@@ -287,8 +288,7 @@ static void initialize_file_info(PFileVar fv, PYVar yv)
 	yv->LastMessage = 0;
 }
 
-void YInit
-(PFileVar fv, PYVar yv, PComVar cv, PTTSet ts)
+void YInit(PFileVar fv, PYVar yv, PComVar cv, PTTSet ts)
 {
 	char inistr[MAX_PATH + 10];
 
@@ -441,7 +441,7 @@ BOOL YReadPacket(PFileVar fv, PYVar yv, PComVar cv)
 				if (fv->FileOpen) {
 					fv->FileOpen = 0;
 					_lclose(fv->FileHandle);
-					fv->FileHandle = -1;
+					fv->FileHandle = INVALID_HANDLE_VALUE;
 
 					if (fv->FileMtime > 0) {
 						SetFMtime(fv->FullName, fv->FileMtime);

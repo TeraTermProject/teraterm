@@ -38,6 +38,7 @@
 #include "ttlib.h"
 #include "ftlib.h"
 #include "dlglib.h"
+#include "win16api.h"
 
 #include "xmodem.h"
 
