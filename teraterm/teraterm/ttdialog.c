@@ -36,27 +36,37 @@
 #include "ttdialog.h"
 #include "ttwinman.h"
 
-PSetupTerminal SetupTerminal = _SetupTerminal;
-PSetupWin SetupWin = _SetupWin;
-PSetupKeyboard SetupKeyboard = _SetupKeyboard;
-PSetupSerialPort SetupSerialPort = _SetupSerialPort;
-PSetupTCPIP SetupTCPIP = _SetupTCPIP;
-PGetHostName GetHostName = _GetHostName;
-PChangeDirectory ChangeDirectory = _ChangeDirectory;
-PAboutDialog AboutDialog = _AboutDialog;
-PChooseFontDlg ChooseFontDlg = _ChooseFontDlg;
-PSetupGeneral SetupGeneral = _SetupGeneral;
-PWindowWindow WindowWindow = _WindowWindow;
-PTTDLGSetUILanguageFile TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
+PSetupTerminal SetupTerminal;
+PSetupWin SetupWin;
+PSetupKeyboard SetupKeyboard;
+PSetupSerialPort SetupSerialPort;
+PSetupTCPIP SetupTCPIP;
+PGetHostName GetHostName;
+PChangeDirectory ChangeDirectory;
+PAboutDialog AboutDialog;
+PChooseFontDlg ChooseFontDlg;
+PSetupGeneral SetupGeneral;
+PWindowWindow WindowWindow;
+PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
 
 BOOL LoadTTDLG()
 {
-	static BOOL initialized;
-	if (!initialized) {
-		TTDLGSetUILanguageFile(ts.UILanguageFile);
-		TTXGetUIHooks(); /* TTPLUG */
-		initialized = TRUE;
-	}
+	SetupTerminal = _SetupTerminal;
+	SetupWin = _SetupWin;
+	SetupKeyboard = _SetupKeyboard;
+	SetupSerialPort = _SetupSerialPort;
+	SetupTCPIP = _SetupTCPIP;
+	GetHostName = _GetHostName;
+	ChangeDirectory = _ChangeDirectory;
+	AboutDialog = _AboutDialog;
+	ChooseFontDlg = _ChooseFontDlg;
+	SetupGeneral = _SetupGeneral;
+	WindowWindow = _WindowWindow;
+	TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
+
+	TTDLGSetUILanguageFile(ts.UILanguageFile);
+	TTXGetUIHooks(); /* TTPLUG */
+
 	return TRUE;
 }
 
