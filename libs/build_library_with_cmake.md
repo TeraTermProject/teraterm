@@ -9,9 +9,19 @@
 
 ## Visual Studioの場合
 
+### batファイルを使用する場合
+
 - buildall_cmake.bat を実行
 - cmakeを選択
-- コンパイルする Visual Studioを選ぶ
+- コンパイルに使用する Visual Studioを選ぶ
+
+### cmakeを使用する場合
+
+- cmakeを使える状態にしてcmakeを実行
+	- `cmake -DCMAKE_GENERATOR="Visual Studio 15 2017" -P buildall.cmake`
+	- `cmake -DCMAKE_GENERATOR="Visual Studio 15 2017 Win64" -P buildall.cmake`
+- Visual Studio 2005の場合は、cmakeのバージョン3.11.4以前を使用する
+	- `cmake -DCMAKE_GENERATOR="Visual Studio 8 2005" -P buildall.cmake`
 
 ## MinGW 共通
 
