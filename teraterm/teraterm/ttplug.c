@@ -118,7 +118,7 @@ void WINAPI TTXInit(PTTSet ts, PComVar cv) {
   if (1) {
     char buf[1024];
     struct _finddata_t searchData;
-    long searchHandle;
+	intptr_t searchHandle;
 
     _snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s\\TTX*.DLL", ts->HomeDir);
 

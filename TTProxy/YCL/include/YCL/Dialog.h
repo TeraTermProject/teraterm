@@ -51,7 +51,7 @@ protected:
 				|| message == WM_CTLCOLORLISTBOX
 				|| message == WM_CTLCOLORSCROLLBAR
 				|| message == WM_CTLCOLORSTATIC)) {
-			result = (BOOL) ::GetWindowLong(dialog, DWLP_MSGRESULT);
+			result = (BOOL) ::GetWindowLongPtr(dialog, DWLP_MSGRESULT);
 		}
 		return result;
 	}
@@ -85,7 +85,7 @@ public:
 	}
 
 	void setResult(LRESULT result) {
-		SetWindowLong(DWLP_MSGRESULT, result);
+		SetWindowLongPtr(DWLP_MSGRESULT, result);
 	}
 	int getDefID()const {
 		return LOWORD(SendMessage(DM_GETDEFID));

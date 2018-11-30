@@ -200,7 +200,7 @@ HWND TTCreateDialog(
  *	DialogBoxParam() 互換関数
  *		EndDialog()ではなく、TTEndDialog()を使用すること
  */
-int TTDialogBoxParam(
+INT_PTR TTDialogBoxParam(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,			// オーナーウィンドウのハンドル
@@ -218,7 +218,7 @@ int TTDialogBoxParam(
 	return DlgResult;
 #else
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, lpTemplateName);
-	int DlgResult = DialogBoxIndirectParam(
+	INT_PTR DlgResult = DialogBoxIndirectParam(
 		hInstance, lpTemplate, hWndParent,
 		lpDialogFunc, lParamInit);
 	free(lpTemplate);
@@ -230,7 +230,7 @@ int TTDialogBoxParam(
  *	DialogBoxParam() 互換関数
  *		EndDialog()ではなく、TTEndDialog()を使用すること
  */
-int TTDialogBox(
+INT_PTR TTDialogBox(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,

@@ -53,8 +53,6 @@ typedef struct {
 	const char *key;
 } DlgTextInfo;
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
-HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
-				  const char *UILanguageFile, PCHAR key);
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 
 ////////////////////////////////////////
@@ -77,13 +75,13 @@ HWND TTCreateDialog(
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
-int TTDialogBoxParam(
+INT_PTR TTDialogBoxParam(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc,
 	LPARAM lParamInit);
-int TTDialogBox(
+INT_PTR TTDialogBox(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,

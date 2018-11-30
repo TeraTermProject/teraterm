@@ -2200,7 +2200,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		pvar = (PTInstVar)lParam;
-		SetWindowLong(dlg, DWLP_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_TITLE", pvar, uimsg);
@@ -2261,7 +2261,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
-		pvar = (PTInstVar)GetWindowLong(dlg, DWLP_USER);
+		pvar = (PTInstVar)GetWindowLongPtr(dlg, DWLP_USER);
 
 		switch (LOWORD(wParam)) {
 		case IDOK:

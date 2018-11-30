@@ -194,7 +194,7 @@ void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel)
 
 LONG GetCurSel(HWND HDlg, int Id_Item)
 {
-	LONG n;
+	LRESULT n;
 
 	n = SendDlgItemMessage(HDlg, Id_Item, CB_GETCURSEL, 0, 0);
 	if (n==CB_ERR) {
@@ -204,7 +204,7 @@ LONG GetCurSel(HWND HDlg, int Id_Item)
 		n++;
 	}
 
-	return n;
+	return (LONG)n;
 }
 
 typedef struct {
@@ -221,9 +221,11 @@ typedef struct {
 static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
 {
-	EditSubclassData *data = (EditSubclassData *)GetWindowLong(dlg, GWLP_USERDATA);
+	EditSubclassData *data = (EditSubclassData *)GetWindowLongPtr(dlg, GWLP_USERDATA);
 	LRESULT Result;
-	int  max, select, len;
+	LRESULT select;
+	LRESULT max;
+	int len;
 	char *str, *orgstr;
 
 	switch (msg) {
@@ -277,7 +279,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						max++; // '\0'
 						orgstr = str = (char *)malloc(max);
 						if (str != NULL) {
-							len = GetWindowTextA(dlg, str, max);
+							len = GetWindowTextA(dlg, str, (int)max);
 							if (select >= 0 && select < len) {
 								if (wParam == 0x44) { // カーソル配下の文字のみを削除する
 									memmove(&str[select], &str[select + 1], len - select - 1);
@@ -353,8 +355,8 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 		hWndEdit = GetWindow(hWndEdit, GW_CHILD);
 	}
 	data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
-	data->OrigProc = (WNDPROC)GetWindowLong(hWndEdit, GWLP_WNDPROC);
-	data->OrigUser = (LONG_PTR)GetWindowLong(hWndEdit, GWLP_USERDATA);
+	data->OrigProc = (WNDPROC)GetWindowLongPtr(hWndEdit, GWLP_WNDPROC);
+	data->OrigUser = (LONG_PTR)GetWindowLongPtr(hWndEdit, GWLP_USERDATA);
 	data->ComboBox = ComboBox;
 	SetWindowLongPtr(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);

@@ -2565,7 +2565,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process initialization */
 			DoCover_IsDebuggerPresent();
 			hInst = hInstance;
-			HMap = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE,
+			HMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
 			                         0, sizeof(TMap), TT_FILEMAPNAME);
 			if (HMap == NULL) {
 				return FALSE;

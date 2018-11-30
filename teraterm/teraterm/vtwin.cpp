@@ -849,9 +849,9 @@ CVTWindow::CVTWindow()
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI
 	if(BGNoFrame && ts.HideTitle > 0) {
-		ExStyle  = ::GetWindowLong(HVTWin,GWL_EXSTYLE);
+		ExStyle  = ::GetWindowLongPtr(HVTWin,GWL_EXSTYLE);
 		ExStyle &= ~WS_EX_CLIENTEDGE;
-		::SetWindowLong(HVTWin,GWL_EXSTYLE,ExStyle);
+		::SetWindowLongPtr(HVTWin,GWL_EXSTYLE,ExStyle);
 	}
 //-->
 #endif
@@ -1018,7 +1018,7 @@ void CVTWindow::ButtonDown(POINT p, int LMR)
 
 				AppendMenu(PopupBase,
 				           submenu != NULL ? LOBYTE(state) | MF_POPUP : state,
-				           submenu != NULL ? (UINT)submenu : GetMenuItemID(PopupMenu, i),
+				           submenu != NULL ? (UINT_PTR)submenu : GetMenuItemID(PopupMenu, i),
 				           itemText);
 			}
 		}
@@ -1286,7 +1286,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 					  _T("&Window"), ts.UILanguageFile);
 		::InsertMenu(hMenu, ID_HELPMENU,
 			MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			(int)WinMenu, uimsg);
+			(UINT_PTR)WinMenu, uimsg);
 	}
 
 	/* LogMeTT の存在を確認してメニューを追加する */
@@ -3375,7 +3375,7 @@ LRESULT CVTWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 						  _T("&Window"), ts.UILanguageFile);
 			::InsertMenu(MainMenu, ID_HELPMENU,
 						 MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-						 (int)WinMenu, uimsg);
+						 (UINT_PTR)WinMenu, uimsg);
 		}
 		else {
 			RemoveMenu(MainMenu,ID_HELPMENU,MF_BYPOSITION);
@@ -3440,9 +3440,9 @@ LRESULT CVTWindow::OnChangeTBar(WPARAM wParam, LPARAM lParam)
 #endif
 
 	AdjustSize = TRUE;
-	::SetWindowLong(HVTWin, GWL_STYLE, Style);
+	::SetWindowLongPtr(HVTWin, GWL_STYLE, Style);
 #ifdef ALPHABLEND_TYPE2
-	::SetWindowLong(HVTWin, GWL_EXSTYLE, ExStyle);
+	::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, ExStyle);
 #endif
 	::SetWindowPos(HVTWin, NULL, 0, 0, 0, 0,
 	               SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
@@ -5515,8 +5515,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			// サブクラス化させてリアルタイムモードにする (2008.1.21 yutaka)
 			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-			OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC);
-			SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
+			OrigBroadcastEditProc = (WNDPROC)GetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC);
+			SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
@@ -5591,8 +5591,8 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					// new handler
 					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
-					OrigBroadcastEditProc = (WNDPROC)GetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC);
-					SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
+					OrigBroadcastEditProc = (WNDPROC)GetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC);
+					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -5603,7 +5603,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
 					// restore old handler
-					SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
+					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
@@ -5678,7 +5678,7 @@ skip:;
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
 					// 破棄されないので、以下の「ウィンドウプロシージャ戻し」は不要と思われる。(yutaka)
 #if 0
-					SetWindowLong(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
+					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
 #endif
 
 					//EndDialog(hDlgWnd, IDOK);

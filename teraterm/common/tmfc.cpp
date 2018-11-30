@@ -389,7 +389,7 @@ LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 		case IDOK:
 			Processed = OnOK();
 			//self->DestroyWindow();
-			//SetWindowLong(hwndDlg, DWL_MSGRESULT, lResult)
+			//SetWindowLongPtr(hwndDlg, DWL_MSGRESULT, lResult)
 			// return TRUE
 			break;
 		case IDCANCEL:
@@ -442,7 +442,7 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
 		case IDOK:
 			Processed = OnOK();
 			//self->DestroyWindow();
-			//SetWindowLong(hwndDlg, DWL_MSGRESULT, lResult)
+			//SetWindowLongPtr(hwndDlg, DWL_MSGRESULT, lResult)
 			// return TRUE
 			break;
 		case IDCANCEL:

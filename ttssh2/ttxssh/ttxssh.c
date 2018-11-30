@@ -1255,7 +1255,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	switch (msg) {
 	case WM_INITDIALOG:
 		GetHNRec = (PGetHNRec) lParam;
-		SetWindowLong(dlg, DWLP_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOST_TITLE", pvar, uimsg);
@@ -1332,8 +1332,8 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		// C-n/C-p のためにサブクラス化 (2007.9.4 maya)
 		hwndHostname = GetDlgItem(dlg, IDC_HOSTNAME);
 		hwndHostnameEdit = GetWindow(hwndHostname, GW_CHILD);
-		OrigHostnameEditProc = (WNDPROC)GetWindowLong(hwndHostnameEdit, GWLP_WNDPROC);
-		SetWindowLong(hwndHostnameEdit, GWLP_WNDPROC, (LONG)HostnameEditProc);
+		OrigHostnameEditProc = (WNDPROC)GetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC);
+		SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 
 		CheckRadioButton(dlg, IDC_HOSTTELNET, IDC_HOSTOTHER,
 		                 pvar->settings.Enabled ? IDC_HOSTSSH : GetHNRec->
@@ -1488,7 +1488,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			GetHNRec = (PGetHNRec) GetWindowLong(dlg, DWLP_USER);
+			GetHNRec = (PGetHNRec) GetWindowLongPtr(dlg, DWLP_USER);
 			if (GetHNRec != NULL) {
 				if (IsDlgButtonChecked(dlg, IDC_HOSTTCPIP)) {
 					char afstr[BUFSIZ];
@@ -1554,7 +1554,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 					}
 				}
 			}
-			SetWindowLong(hwndHostnameEdit, GWLP_WNDPROC, (LONG)OrigHostnameEditProc);
+			SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)OrigHostnameEditProc);
 			EndDialog(dlg, 1);
 
 			if (DlgHostFont != NULL) {
@@ -1564,7 +1564,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			return TRUE;
 
 		case IDCANCEL:
-			SetWindowLong(hwndHostnameEdit, GWLP_WNDPROC, (LONG)OrigHostnameEditProc);
+			SetWindowLongPtr(hwndHostnameEdit, GWLP_WNDPROC, (LONG_PTR)OrigHostnameEditProc);
 			EndDialog(dlg, 0);
 
 			if (DlgHostFont != NULL) {
@@ -1614,7 +1614,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			enable_dlg_items(dlg, IDC_SSH_VERSION, IDC_SSH_VERSION, FALSE); // disabled
 hostssh_enabled:
 
-			GetHNRec = (PGetHNRec) GetWindowLong(dlg, DWLP_USER);
+			GetHNRec = (PGetHNRec) GetWindowLongPtr(dlg, DWLP_USER);
 
 			if (IsDlgButtonChecked(dlg, IDC_HOSTTELNET)) {
 				if (GetHNRec != NULL)
@@ -1657,7 +1657,7 @@ hostssh_enabled:
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)
 {
 	return (BOOL) DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_HOSTDLG),
-	                             parent, TTXHostDlg, (LONG) rec);
+	                             parent, TTXHostDlg, (LPARAM)rec);
 }
 
 static void PASCAL TTXGetUIHooks(TTXUIHooks *hooks)
@@ -3297,7 +3297,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 
 	switch (msg) {
 	case WM_INITDIALOG:
-		SetWindowLong(dlg, DWLP_USER, lParam);
+		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 		init_setup_dlg((PTInstVar) lParam, dlg);
 
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
@@ -3361,7 +3361,7 @@ static BOOL CALLBACK TTXSetupDlg(HWND dlg, UINT msg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			complete_setup_dlg((PTInstVar) GetWindowLong(dlg, DWLP_USER), dlg);
+			complete_setup_dlg((PTInstVar) GetWindowLongPtr(dlg, DWLP_USER), dlg);
 			EndDialog(dlg, 1);
 			if (DlgSetupFont != NULL) {
 				DeleteObject(DlgSetupFont);
@@ -4128,9 +4128,9 @@ static void init_password_control(HWND dlg, int item)
 {
 	HWND passwordControl = GetDlgItem(dlg, item);
 
-	SetWindowLong(passwordControl, GWLP_USERDATA,
-	              SetWindowLong(passwordControl, GWLP_WNDPROC,
-	                            (LONG) password_wnd_proc));
+	SetWindowLongPtr(passwordControl, GWLP_USERDATA,
+	              SetWindowLongPtr(passwordControl, GWLP_WNDPROC,
+	                            (LONG_PTR) password_wnd_proc));
 }
 
 // bcrypt KDF形式で秘密鍵を保存する
@@ -5482,7 +5482,7 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		hInst = hInstance;
 		pvar = &InstVar;
 		__mem_mapping =
-			CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE, 0,
+			CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
 			                  sizeof(TS_SSH), TTSSH_FILEMAPNAME);
 		if (__mem_mapping == NULL) {
 			/* fake it. The settings won't be shared, but what the heck. */

@@ -655,9 +655,9 @@ void init_password_control(HWND dlg, int item)
 {
 	HWND passwordControl = GetDlgItem(dlg, item);
 
-	SetWindowLong(passwordControl, GWLP_USERDATA,
-	              SetWindowLong(passwordControl, GWLP_WNDPROC,
-	                            (LONG) password_wnd_proc));
+	SetWindowLongPtr(passwordControl, GWLP_USERDATA,
+					 SetWindowLongPtr(passwordControl, GWLP_WNDPROC,
+									  (LONG_PTR) password_wnd_proc));
 }
 
 /* ==========================================================================

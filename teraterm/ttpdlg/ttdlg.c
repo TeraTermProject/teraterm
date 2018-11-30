@@ -142,7 +142,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfosCom, _countof(TextInfosCom), UILanguageFile);
 			if ( ts->Language==IdJapanese ) {
@@ -275,7 +275,7 @@ static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 
 					if ( ts!=NULL ) {
 						int width, height;
@@ -554,7 +554,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 			SetDlgItemTextA(Dialog, IDC_WINTITLE, ts->Title);
@@ -690,7 +690,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			return TRUE;
 
 		case WM_COMMAND:
-			ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			RestoreVar(Dialog,ts,&IAttr,&IOffset);
 			switch (LOWORD(wParam)) {
 				case IDOK:
@@ -942,7 +942,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			break;
 
 		case WM_PAINT:
-			ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			if ( ts==NULL ) {
 				return TRUE;
 			}
@@ -951,7 +951,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			break;
 
 		case WM_HSCROLL:
-			ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+			ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 			if (ts==NULL) {
 				return TRUE;
 			}
@@ -1044,7 +1044,7 @@ static BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -1070,7 +1070,7 @@ static BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						WORD w;
 
@@ -1134,7 +1134,7 @@ static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 
@@ -1205,7 +1205,7 @@ static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( ts!=NULL ) {
 						memset(Temp, 0, sizeof(Temp));
 						GetDlgItemTextA(Dialog, IDC_SERIALPORT, Temp, sizeof(Temp)-1);
@@ -1285,7 +1285,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 				
@@ -1323,7 +1323,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
 						WritePrivateProfileStringA("Hosts",NULL,NULL,ts->SetupFName);
 
@@ -1472,7 +1472,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 					GetRB(Dialog,&w,IDC_TCPIPTELNET,IDC_TCPIPTELNET);
 					if (w==1) {
 						EnableDlgItem(Dialog,IDC_TCPIPTERMTYPELABEL,IDC_TCPIPTERMTYPE);
-						ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+						ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 						if (ts!=NULL) {
 							SetDlgItemInt(Dialog,IDC_TCPIPPORT,ts->TelPort,FALSE);
 						}
@@ -1516,7 +1516,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	switch (Message) {
 		case WM_INITDIALOG:
 			GetHNRec = (PGetHNRec)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 		
@@ -1621,7 +1621,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWLP_USER);
+					GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( GetHNRec!=NULL ) {
 						char afstr[BUFSIZ];
 						GetRB(Dialog,&GetHNRec->PortType,IDC_HOSTTCPIP,IDC_HOSTSERIAL);
@@ -1682,7 +1682,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 				case IDC_HOSTTELNET:
 					GetRB(Dialog,&i,IDC_HOSTTELNET,IDC_HOSTTELNET);
 					if ( i==1 ) {
-						GetHNRec = (PGetHNRec)GetWindowLong(Dialog,DWLP_USER);
+						GetHNRec = (PGetHNRec)GetWindowLongPtr(Dialog,DWLP_USER);
 						if ( GetHNRec!=NULL ) {
 							SetDlgItemInt(Dialog,IDC_HOSTTCPPORT,GetHNRec->TelPort,FALSE);
 						}
@@ -1747,7 +1747,7 @@ static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 				
 			CurDir = (PCHAR)(lParam);
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgItemTextA(Dialog, IDC_DIRCURRENT, CurDir);
 			SendDlgItemMessage(Dialog, IDC_DIRNEW, EM_LIMITTEXT,
@@ -1826,7 +1826,7 @@ static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					CurDir = (PCHAR)GetWindowLong(Dialog,DWLP_USER);
+					CurDir = (PCHAR)GetWindowLongPtr(Dialog,DWLP_USER);
 					if ( CurDir!=NULL ) {
 						_getcwd(HomeDir,sizeof(HomeDir));
 						_chdir(CurDir);
@@ -2557,7 +2557,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 	switch (Message) {
 		case WM_INITDIALOG:
 			ts = (PTTSet)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 		
@@ -2600,7 +2600,7 @@ static BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 		case WM_COMMAND:
 			switch (LOWORD(wParam)) {
 				case IDOK:
-					ts = (PTTSet)GetWindowLong(Dialog,DWLP_USER);
+					ts = (PTTSet)GetWindowLongPtr(Dialog,DWLP_USER);
 					if (ts!=NULL) {
 						w = (WORD)GetCurSel(Dialog, IDC_GENPORT);
 						if (w>1) {
@@ -2683,7 +2683,7 @@ static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 	switch (Message) {
 		case WM_INITDIALOG:
 			Close = (PBOOL)lParam;
-			SetWindowLong(Dialog, DWLP_USER, lParam);
+			SetWindowLongPtr(Dialog, DWLP_USER, lParam);
 
 			SetDlgTexts(Dialog, TextInfos, _countof(TextInfos), UILanguageFile);
 		
@@ -2728,7 +2728,7 @@ static BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM
 						PostMessage(Hw,WM_SYSCOMMAND,SC_CLOSE,0);
 					}
 					else {
-						Close = (PBOOL)GetWindowLong(Dialog,DWLP_USER);
+						Close = (PBOOL)GetWindowLongPtr(Dialog,DWLP_USER);
 						if (Close!=NULL) {
 							*Close = TRUE;
 						}

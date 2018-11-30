@@ -30,11 +30,11 @@ public:
 		return window;
 	}
 
-	long GetWindowLong(int index)const {
-		return ::GetWindowLong(window, index);
+	long GetWindowLongPtr(int index)const {
+		return ::GetWindowLongPtr(window, index);
 	}
-	long SetWindowLong(int index, long data) {
-		return ::SetWindowLong(window, index, data);
+	long SetWindowLongPtr(int index, long data) {
+		return ::SetWindowLongPtr(window, index, data);
 	}
 	int GetWindowTextLength()const {
 		return ::GetWindowTextLength(window);
@@ -267,28 +267,28 @@ public:
 		return (HICON) SendMessage(WM_SETICON, large, (LPARAM) icon);
 	}
 	long getStyle()const {
-		return GetWindowLong(GWL_STYLE);
+		return GetWindowLongPtr(GWL_STYLE);
 	}
 	long getExStyle()const {
-		return GetWindowLong(GWL_EXSTYLE);
+		return GetWindowLongPtr(GWL_EXSTYLE);
 	}
 	long setStyle(long style) {
-		return SetWindowLong(GWL_STYLE, style);
+		return SetWindowLongPtr(GWL_STYLE, style);
 	}
 	long setExStyle(long exStyle) {
-		return SetWindowLong(GWL_EXSTYLE, exStyle);
+		return SetWindowLongPtr(GWL_EXSTYLE, exStyle);
 	}
 	WNDPROC getWndProc()const {
-		return (WNDPROC) GetWindowLong(GWLP_WNDPROC);
+		return (WNDPROC) GetWindowLongPtr(GWLP_WNDPROC);
 	}
 	WNDPROC setWndProc(WNDPROC proc) {
-		return (WNDPROC) SetWindowLong(GWLP_WNDPROC, (long) proc);
+		return (WNDPROC) SetWindowLongPtr(GWLP_WNDPROC, (LONG_PTR) proc);
 	}
 	HWND getOwner()const {
-		return (HWND) GetWindowLong(GWLP_HWNDPARENT);
+		return (HWND) GetWindowLongPtr(GWLP_HWNDPARENT);
 	}
 	HWND setOwner(HWND owner) {
-		return (HWND) SetWindowLong(GWLP_HWNDPARENT, (long) owner);
+		return (HWND) SetWindowLongPtr(GWLP_HWNDPARENT, (LONG_PTR) owner);
 	}
 	HWND getChildWindow()const {
 		return GetWindow(GW_CHILD);
