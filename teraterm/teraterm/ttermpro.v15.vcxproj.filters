@@ -117,6 +117,9 @@
     <ClCompile Include="..\common\dlglib.c">
       <Filter>dialog</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\win16api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -269,6 +272,9 @@
     </ClInclude>
     <ClInclude Include="addsetting.h">
       <Filter>dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\win16api.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

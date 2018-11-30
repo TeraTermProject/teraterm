@@ -244,6 +244,10 @@
 				RelativePath="zmodem.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16_api.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

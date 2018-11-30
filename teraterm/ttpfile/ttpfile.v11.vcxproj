@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="bplus.c" />
     <ClCompile Include="..\common\dlglib.c" />
     <ClCompile Include="ftlib.c" />

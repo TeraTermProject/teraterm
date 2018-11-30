@@ -395,6 +395,10 @@
 				RelativePath="wait4all.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16api.c"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

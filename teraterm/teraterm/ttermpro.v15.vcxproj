@@ -140,6 +140,7 @@
     <ClCompile Include="..\common\dlglib.c" />
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
@@ -197,6 +198,7 @@
     <ClInclude Include="..\common\ttplugin.h" />
     <ClInclude Include="..\common\tttypes.h" />
     <ClInclude Include="..\common\tt_res.h" />
+    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="addsetting.h" />
     <ClInclude Include="buffer.h" />
     <ClInclude Include="clipboar.h" />

@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="addsetting.cpp" />
+    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="..\common\dlglib.c" />
     <ClCompile Include="filesys.cpp" />
     <ClCompile Include="ftdlg.cpp" />
