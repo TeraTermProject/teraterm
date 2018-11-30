@@ -99,11 +99,6 @@ LRESULT TTCFrameWnd::ProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	return self->Proc(msg, wp, lp);
 }
 
-LRESULT TTCFrameWnd::Proc(UINT msg, WPARAM wp, LPARAM lp)
-{
-	return DefWindowProc(msg, wp, lp);
-}
-
 BOOL TTCFrameWnd::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	return FALSE;
@@ -123,12 +118,12 @@ void TTCFrameWnd::OnSysCommand(UINT nID, LPARAM lParam)
 
 void TTCFrameWnd::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	TTCFrameWnd::Proc(WM_SYSKEYDOWN, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
+	DefWindowProc(WM_SYSKEYDOWN, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
 }
 
 void TTCFrameWnd::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	TTCFrameWnd::Proc(WM_SYSKEYUP, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
+	DefWindowProc(WM_SYSKEYUP, (WPARAM)nChar, MAKELONG(nRepCnt, nFlags));
 }
 
 void TTCFrameWnd::OnClose()

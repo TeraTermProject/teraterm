@@ -933,14 +933,14 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_SETFOCUS:
 		OnSetFocus((HWND)wp);
-		TTCFrameWnd::Proc(msg, wp, lp);
+		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_SIZE:
 		OnSize(wp, LOWORD(lp), HIWORD(lp));
 		break;
 	case WM_SYSCOMMAND:
 		OnSysCommand(wp, lp);
-		TTCFrameWnd::Proc(msg, wp, lp);
+		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_SYSKEYDOWN:
 		OnSysKeyDown(wp, LOWORD(lp), HIWORD(lp));
@@ -990,7 +990,7 @@ LRESULT CTEKWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	}
 	default:
-		retval = TTCFrameWnd::Proc(msg, wp, lp);
+		retval = DefWindowProc(msg, wp, lp);
 		break;
 	}
 				

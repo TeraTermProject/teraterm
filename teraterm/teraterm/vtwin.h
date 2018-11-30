@@ -79,7 +79,6 @@ public:
 
 	//{{AFX_VIRTUAL(CVTWindow)
 	protected:
-	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 

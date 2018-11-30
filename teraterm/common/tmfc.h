@@ -55,7 +55,8 @@ public:
 	void ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 	int MessageBoxT(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 	int MessageBoxA(const char * lpText, const char *lpCaption, UINT uType);
-	virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	//virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	BOOL GetWindowRect(RECT *R);
 	BOOL SetWindowPos(HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
 	BOOL GetClientRect(RECT *R);
@@ -100,7 +101,7 @@ public:
 						LPCTSTR lpszMenuName = NULL,
 						DWORD dwExStyle = 0);//,
 						//CCreateContext* pContext = NULL);
-	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
+	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp) = 0;
 	static const RECT rectDefault;
 	///
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);

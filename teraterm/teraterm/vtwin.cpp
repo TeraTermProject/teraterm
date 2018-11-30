@@ -1631,33 +1631,6 @@ void CVTWindow::OpenTEK()
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow message handler
 
-LRESULT CVTWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT Result;
-
-	if (message == MsgDlgHelp) {
-		OnDlgHelp(wParam,lParam);
-		return 0;
-	}
-	else if ((ts.HideTitle>0) &&
-	         (message == WM_NCHITTEST)) {
-		Result = CFrameWnd::DefWindowProc(message,wParam,lParam);
-		if ((Result==HTCLIENT) && AltKey()) {
-#ifdef ALPHABLEND_TYPE2
-			if(ShiftKey())
-				Result = HTBOTTOMRIGHT;
-			else
-				Result = HTCAPTION;
-#else
-			Result = HTCAPTION;
-#endif
-		}
-		return Result;
-	}
-
-	return (CFrameWnd::DefWindowProc(message,wParam,lParam));
-}
-
 BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	WORD wID = LOWORD(wParam);
@@ -2129,7 +2102,7 @@ LRESULT CVTWindow::OnDropNotify(WPARAM ShowDialog, LPARAM lParam)
 				DefaultShowDialog = !DoNotShowDialog;
 			}
 		}
-			 
+
 		switch (DropType) {
 		case DROP_TYPE_CANCEL:
 		default:
@@ -2805,7 +2778,7 @@ void CVTWindow::OnSysChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	}
 
-//	CFrameWnd::OnSysChar(nChar, nRepCnt, nFlags);
+	CFrameWnd::DefWindowProc(WM_SYSCHAR, nChar, MAKELONG(nRepCnt, nFlags));
 }
 
 // 何もしていない、不要
@@ -6026,7 +5999,7 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 	preTime = currentTime;
-		
+
 	DpiChanged();
 	return TRUE;
 }
@@ -6034,6 +6007,10 @@ LRESULT CVTWindow::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 {
 	LRESULT retval = 0;
+	if (msg == MsgDlgHelp) {
+		OnDlgHelp(wp,lp);
+		return 0;
+	}
 	switch(msg)
 	{
 	case WM_ACTIVATE:
@@ -6099,7 +6076,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_NCLBUTTONDBLCLK:
 		OnNcLButtonDblClk((UINT)wp, MAKEPOINTS(lp));
-		TTCFrameWnd::Proc(msg, wp, lp);
+		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_NCRBUTTONDOWN:
 		OnNcRButtonDown((UINT)wp, MAKEPOINTS(lp));
@@ -6120,7 +6097,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_SETFOCUS:
 		OnSetFocus((HWND)wp);
-		TTCFrameWnd::Proc(msg, wp, lp);
+		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_SIZE:
 		OnSize(wp, LOWORD(lp), HIWORD(lp));
@@ -6128,16 +6105,18 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_SIZING:
 		OnSizing(wp, (LPRECT)lp);
 		break;
+#if 1
 	case WM_SYSCHAR:
 		OnSysChar(wp, LOWORD(lp), HIWORD(lp));
 		break;
+#endif
 #if 0	// 何もしていない、不要
 	case WM_SYSCOLORCHANGE:
 		break;
 #endif
 	case WM_SYSCOMMAND:
 		OnSysCommand(wp, lp);
-		TTCFrameWnd::Proc(msg, wp, lp);
+		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_SYSKEYDOWN:
 		OnSysKeyDown(wp, LOWORD(lp), HIWORD(lp));
@@ -6153,7 +6132,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_DEVICECHANGE:
 		OnDeviceChange((UINT)wp, (DWORD_PTR)lp);
-		TTCFrameWnd::Proc(msg, wp, lp);
+		DefWindowProc(msg, wp, lp);
 		break;
 	case WM_IME_COMPOSITION:
 		OnIMEComposition(wp, lp);
@@ -6313,8 +6292,24 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		}
 		break;
 	}
+	case WM_NCHITTEST: {
+		retval = CFrameWnd::DefWindowProc(msg, wp ,lp);
+		if (ts.HideTitle>0) {
+			if ((retval == HTCLIENT) && AltKey()) {
+#ifdef ALPHABLEND_TYPE2
+			if(ShiftKey())
+				retval = HTBOTTOMRIGHT;
+			else
+				retval = HTCAPTION;
+#else
+			retval = HTCAPTION;
+#endif
+			}
+		}
+	}
+		break;
 	default:
-		retval = TTCFrameWnd::Proc(msg, wp, lp);
+		retval = DefWindowProc(msg, wp, lp);
 		break;
 	}
 	return retval;
