@@ -389,6 +389,10 @@
 				RelativePath="WSAAsyncGetAddrInfo.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16_api.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -412,6 +416,10 @@
 			</File>
 			<File
 				RelativePath="ttfileio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\win16_api.h"
 				>
 			</File>
 		</Filter>

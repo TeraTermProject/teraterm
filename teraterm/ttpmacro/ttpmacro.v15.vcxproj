@@ -132,6 +132,7 @@
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="errdlg.cpp" />
     <ClCompile Include="inpdlg.cpp" />
     <ClCompile Include="ListDlg.cpp" />
@@ -151,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\ttddecmnd.h" />
     <ClInclude Include="..\common\ttlib.h" />
+    <ClInclude Include="..\common\win16api.h" />
     <ClInclude Include="errdlg.h" />
     <ClInclude Include="inpdlg.h" />
     <ClInclude Include="ListDlg.h" />

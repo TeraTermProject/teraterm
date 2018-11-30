@@ -42,6 +42,7 @@
 #include "ftlib.h"
 #include "ttlib.h"
 #include "ttcommon.h"
+#include "win16api.h"
 
 #define TimeOutCAN 1
 #define TimeOutCANSend 2
@@ -805,7 +806,7 @@ void QVSendVFILE(PFileVar fv, PQVVar qv, PComVar cv)
 
   /* file open */
   fv->FileHandle = _lopen(fv->FullName,OF_READ);
-  fv->FileOpen = fv->FileHandle>0;
+  fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
   if (! fv->FileOpen)
   {
     QVCancel(fv,qv,cv);

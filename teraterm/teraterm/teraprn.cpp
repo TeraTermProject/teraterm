@@ -38,6 +38,7 @@
 #include "commlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "win16api.h"
 
 #include "tt_res.h"
 #include "prnabort.h"
@@ -69,7 +70,7 @@ static BOOL PrintAbortFlag = FALSE;
 
 /* pass-thru printing */
 static char PrnFName[MAX_PATH];
-static int HPrnFile = 0;
+static HANDLE HPrnFile = INVALID_HANDLE_VALUE;
 static char PrnBuff[TermWidthMax];
 static int PrnBuffCount = 0;
 
@@ -180,7 +181,6 @@ void PrnStop()
 	}
 }
 
-extern "C" {
 int VTPrintInit(int PrnFlag)
 // Initialize printing of VT window
 //   PrnFlag: specifies object to be printed
@@ -345,8 +345,7 @@ int VTPrintInit(int PrnFlag)
 		return (IdPrnScreen);
 	}
 }
-}
-extern "C" {
+
 void PrnSetAttr(TCharAttr Attr)
 //  Set text attribute of printing
 //
@@ -363,9 +362,7 @@ void PrnSetAttr(TCharAttr Attr)
 		SetBkColor(  PrintDC,White);
 	}
 }
-}
 
-extern "C" {
 void PrnOutText(PCHAR Buff, int Count)
 //  Print out text
 //    Buff: points text buffer
@@ -440,18 +437,14 @@ void PrnOutText(PCHAR Buff, int Count)
 	} while (Count>0);
 
 }
-}
 
-extern "C" {
 void PrnNewLine()
 //  Moves to the next line in printing
 {
 	PrnX = Margin.left;
 	PrnY = PrnY + PrnFH;
 }
-}
 
-extern "C" {
 void VTPrintEnd()
 {
 	int i, j;
@@ -472,16 +465,14 @@ void VTPrintEnd()
 	PrnStop();
 	return;
 }
-}
 
 /* printer emulation routines */
-extern "C" {
 void OpenPrnFile()
 {
 	char Temp[MAX_PATH];
 
 	KillTimer(HVTWin,IdPrnStartTimer);
-	if (HPrnFile > 0) {
+	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		return;
 	}
 	if (PrnFName[0] == 0) {
@@ -493,14 +484,13 @@ void OpenPrnFile()
 	}
 	else {
 		HPrnFile = _lopen(PrnFName,OF_WRITE);
-		if (HPrnFile <= 0) {
+		if (HPrnFile == INVALID_HANDLE_VALUE) {
 			HPrnFile = _lcreat(PrnFName,0);
 		}
 	}
-	if (HPrnFile > 0) {
+	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		_llseek(HPrnFile,0,2);
 	}
-}
 }
 
 void PrintFile()
@@ -512,7 +502,7 @@ void PrintFile()
 
 	if (VTPrintInit(IdPrnFile)==IdPrnFile) {
 		HPrnFile = _lopen(PrnFName,OF_READ);
-		if (HPrnFile>0) {
+		if (HPrnFile != INVALID_HANDLE_VALUE) {
 			do {
 				i = 0;
 				do {
@@ -587,7 +577,7 @@ void PrintFileDirect()
 	HPrnAbortDlg = PrnAbortDlg->GetSafeHwnd();
 
 	HPrnFile = _lopen(PrnFName,OF_READ);
-	PrintAbortFlag = (HPrnFile<=HFILE_ERROR) || ! PrnOpen(ts.PrnDev);
+	PrintAbortFlag = (HPrnFile == INVALID_HANDLE_VALUE) || ! PrnOpen(ts.PrnDev);
 	PrnBuffCount = 0;
 	SetTimer(HVTWin,IdPrnProcTimer,0,NULL);
 }
@@ -596,7 +586,7 @@ void PrnFileDirectProc()
 {
 	int c;
 
-	if (HPrnFile==0) {
+	if (HPrnFile==INVALID_HANDLE_VALUE) {
 		return;
 	}
 	if (PrintAbortFlag) {
@@ -604,7 +594,7 @@ void PrnFileDirectProc()
 		PrnAbortDlg = NULL;
 		PrnCancel();
 	}
-	if (!PrintAbortFlag && (HPrnFile>0)) {
+	if (!PrintAbortFlag && (HPrnFile != INVALID_HANDLE_VALUE)) {
 		do {
 			if (PrnBuffCount==0) {
 				PrnBuffCount = _lread(HPrnFile,PrnBuff,1);
@@ -626,10 +616,10 @@ void PrnFileDirectProc()
 			}
 		} while (c>0);
 	}
-	if (HPrnFile > 0) {
+	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		_lclose(HPrnFile);
 	}
-	HPrnFile = 0;
+	HPrnFile = INVALID_HANDLE_VALUE;
 	PrnClose();
 	remove(PrnFName);
 	PrnFName[0] = 0;
@@ -642,7 +632,7 @@ void PrnFileDirectProc()
 
 void PrnFileStart()
 {
-	if (HPrnFile>0) {
+	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		return;
 	}
 	if (PrnFName[0]==0) {
@@ -656,19 +646,16 @@ void PrnFileStart()
 	}
 }
 
-extern "C" {
 void ClosePrnFile()
 {
 	PrnBuffCount = 0;
-	if (HPrnFile > 0) {
+	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		_lclose(HPrnFile);
 	}
-	HPrnFile = 0;
+	HPrnFile = INVALID_HANDLE_VALUE;
 	SetTimer(HVTWin,IdPrnStartTimer,ts.PassThruDelay*1000,NULL);
 }
-}
 
-extern "C" {
 void WriteToPrnFile(BYTE b, BOOL Write)
 //  (b,Write) =
 //    (0,FALSE): clear buffer
@@ -688,5 +675,4 @@ void WriteToPrnFile(BYTE b, BOOL Write)
 	if ((b==0) && ! Write) {
 		PrnBuffCount = 0;
 	}
-}
 }

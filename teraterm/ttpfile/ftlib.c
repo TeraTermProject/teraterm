@@ -35,6 +35,7 @@
 #include "ttlib.h"
 #include <stdio.h>
 #include <string.h>
+#include "win16api.h"
 
 #include "tt_res.h"
 

@@ -5369,7 +5369,6 @@ void SendBroadcastMessageToSelected(HWND HVTWin, HWND hWnd, int parent_only, cha
  * 全 Tera Term へメッセージを送信するブロードキャストモード。
  * "sendbroadcast"マクロコマンドからのみ利用される。
  */
-extern "C"
 void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
 {
 	int i, count;
@@ -5399,7 +5398,6 @@ void SendBroadcastMessage(HWND HVTWin, HWND hWnd, char *buf, int buflen)
  * ブロードキャスト送信を行い、受信側でメッセージを取捨選択する。
  * "sendmulticast"マクロコマンドからのみ利用される。
  */
-extern "C"
 void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buflen)
 {
 	int i, count;
@@ -5446,7 +5444,6 @@ void SendMulticastMessage(HWND HVTWin, HWND hWnd, char *name, char *buf, int buf
 	free(msg);
 }
 
-extern "C"
 void SetMulticastName(char *name)
 {
 	strncpy_s(ts.MulticastName, sizeof(ts.MulticastName), name, _TRUNCATE);

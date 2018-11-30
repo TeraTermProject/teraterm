@@ -58,6 +58,7 @@
 #include "ftlib.h"
 #include "ttcommon.h"
 #include "ttlib.h"
+#include "win16api.h"
 
 #define ZPAD   '*'
 #define ZDLE   0x18
@@ -835,7 +836,7 @@ void ZParseRInit(PFileVar fv, PZVar zv)
 
 	/* file open */
 	fv->FileHandle = _lopen(fv->FullName, OF_READ);
-	fv->FileOpen = fv->FileHandle > 0;
+	fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
 
 	if (zv->CtlEsc) {
 		if ((zv->RxHdr[ZF0] & ESCCTL) == 0) {

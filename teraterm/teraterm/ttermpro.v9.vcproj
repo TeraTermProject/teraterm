@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\teraterm_3d.ico"
+				>
+			</File>
+			<File
 				RelativePath="..\common\teraterm_classic.ico"
 				>
 			</File>
@@ -286,6 +290,10 @@
 			</File>
 			<File
 				RelativePath="..\common\vt.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\common\vt_3d.ico"
 				>
 			</File>
 			<File
@@ -376,6 +384,10 @@
 				RelativePath="WSAAsyncGetAddrInfo.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16_api.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -399,6 +411,10 @@
 			</File>
 			<File
 				RelativePath="ttfileio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\win16_api.h"
 				>
 			</File>
 		</Filter>

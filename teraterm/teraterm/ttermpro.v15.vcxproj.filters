@@ -120,6 +120,9 @@
     <ClCompile Include="..\common\compat_win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\win16api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\cygterm\cygterm.ico">
@@ -274,6 +277,9 @@
       <Filter>dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\common\compat_win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\win16api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -42,6 +42,7 @@
 #include "ttlib.h"
 #include "dlglib.h"
 #include "ftlib.h"
+#include "win16api.h"
 
 #define KERMIT_CAPAS
 
@@ -1004,7 +1005,7 @@ BOOL KmtSendNextFile(PFileVar fv, PKmtVar kv, PComVar cv)
 
 	/* file open */
 	fv->FileHandle = _lopen(fv->FullName,OF_READ);
-	fv->FileOpen = fv->FileHandle>0;
+	fv->FileOpen = fv->FileHandle != INVALID_HANDLE_VALUE;
 	if (! fv->FileOpen)
 	{
 		if (! fv->NoMsg)
