@@ -96,7 +96,6 @@ BOOL CALLBACK PrnAbortProc(HDC PDC, int Code)
 	}
 }
 
-extern "C" {
 HDC PrnBox(HWND HWin, PBOOL Sel)
 {
 	/* initialize PrnDlg record */
@@ -122,9 +121,7 @@ HDC PrnBox(HWND HWin, PBOOL Sel)
 	*Sel = (PrnDlg.Flags & PD_SELECTION) != 0;
 	return PrintDC;
 }
-}
 
-extern "C" {
 BOOL PrnStart(LPSTR DocumentName)
 {
 	DOCINFO Doc;
@@ -167,9 +164,7 @@ BOOL PrnStart(LPSTR DocumentName)
 	}
 	return Printing;
 }
-}
 
-extern "C" {
 void PrnStop()
 {
 	if (Printing) {
@@ -183,9 +178,7 @@ void PrnStop()
 		HPrnAbortDlg = NULL;
 	}
 }
-}
 
-extern "C" {
 int VTPrintInit(int PrnFlag)
 // Initialize printing of VT window
 //   PrnFlag: specifies object to be printed
@@ -350,8 +343,7 @@ int VTPrintInit(int PrnFlag)
 		return (IdPrnScreen);
 	}
 }
-}
-extern "C" {
+
 void PrnSetAttr(TCharAttr Attr)
 //  Set text attribute of printing
 //
@@ -368,9 +360,7 @@ void PrnSetAttr(TCharAttr Attr)
 		SetBkColor(  PrintDC,White);
 	}
 }
-}
 
-extern "C" {
 void PrnOutText(PCHAR Buff, int Count)
 //  Print out text
 //    Buff: points text buffer
@@ -445,18 +435,14 @@ void PrnOutText(PCHAR Buff, int Count)
 	} while (Count>0);
 
 }
-}
 
-extern "C" {
 void PrnNewLine()
 //  Moves to the next line in printing
 {
 	PrnX = Margin.left;
 	PrnY = PrnY + PrnFH;
 }
-}
 
-extern "C" {
 void VTPrintEnd()
 {
 	int i, j;
@@ -477,10 +463,8 @@ void VTPrintEnd()
 	PrnStop();
 	return;
 }
-}
 
 /* printer emulation routines */
-extern "C" {
 void OpenPrnFile()
 {
 	char Temp[MAX_PATH];
@@ -505,7 +489,6 @@ void OpenPrnFile()
 	if (HPrnFile != INVALID_HANDLE_VALUE) {
 		_llseek(HPrnFile,0,2);
 	}
-}
 }
 
 void PrintFile()
@@ -661,7 +644,6 @@ void PrnFileStart()
 	}
 }
 
-extern "C" {
 void ClosePrnFile()
 {
 	PrnBuffCount = 0;
@@ -671,9 +653,7 @@ void ClosePrnFile()
 	HPrnFile = INVALID_HANDLE_VALUE;
 	SetTimer(HVTWin,IdPrnStartTimer,ts.PassThruDelay*1000,NULL);
 }
-}
 
-extern "C" {
 void WriteToPrnFile(BYTE b, BOOL Write)
 //  (b,Write) =
 //    (0,FALSE): clear buffer
@@ -693,5 +673,4 @@ void WriteToPrnFile(BYTE b, BOOL Write)
 	if ((b==0) && ! Write) {
 		PrnBuffCount = 0;
 	}
-}
 }
