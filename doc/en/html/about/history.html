@@ -31,6 +31,42 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
+<h3 id="teraterm_4.101">2018.11.30 (Ver 4.101)</h3>
+<ul class="history">
+  <li>Changes
+    <ul>
+      <li>added support for following dtterm window manipulation sequences.
+        <ul>
+          <li>10: Full-screen mode</li>
+          <li>13;2: Report window position. (text area)</li>
+          <li>14;2: Report window size. (whole window)</li>
+          <li>15: Report root window size in pixels.</li>
+          <li>16: Report character size in pixels.</li>
+        </ul></li>
+      <li>The behavior of following dtterm window manipulation sequence was changed.
+        <ul>
+          <li>14: Report window size sequence: report text area size instead of whole window size.</li>
+        </ul></li>
+      <li>The left and right margin mode does not be reset when window size is changed.</li>
+      <li>The `/' character can be treated as path separator by using the command line option receiving a file name.</li>
+    </ul>
+  </li>
+
+  <li>Bug fixes
+    <ul>
+      <li>The plugin compiled before 4.100 can not called because the DLL's calling convention is changed in Tera Term 4.100. </li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded TTSSH to <a href="#ttssh_2.87">2.87</a>.</li>
+      <li>upgraded TTXResizeMenu Plug-in to <a href="#resizemenu_1.05">1.05</a></li>
+      <li>upgraded Oniguruma to 6.9.0.</li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="teraterm_4.100">2018.08.31 (Ver 4.100)</h3>
 <ul class="history">
   <li>Changes
@@ -3027,6 +3063,15 @@ SYNOPSIS:
 
 <h2 id="ttssh">TTSSH</h2>
 
+<h3 id="ttssh_2.87">2018.11.30 (Ver 2.87)</h3>
+<ul class="history">
+  <li>Misc
+    <ul>
+      <li>upgraded OpenSSL to 1.0.2q.</li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttssh_2.86">2018.08.31 (Ver 2.86)</h3>
 <ul class="history">
   <li>Bug fixes
@@ -4828,6 +4873,11 @@ SYNOPSIS:
 </ul>
 
 <h2 id="resizemenu">TTXResizeMenu</h2>
+<h3 id="resizemenu_1.05">2018.11.30 (Ver 1.05)</h3>
+<ul class="history">
+  <li>added menu id to increase/decrease window size. (for shortcut keys)</li>
+</ul>
+
 <h3 id="resizemenu_1.04">2018.08.31 (Ver 1.04)</h3>
 <ul class="history">
   <li>Fixed an issue where TTXResizeMenu can not be loaded on Windows 95/NT4.0.</li>

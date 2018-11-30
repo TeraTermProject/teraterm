@@ -111,9 +111,9 @@ void DispMoveWindow(int x, int y);
 void DispShowWindow(int mode);
 void DispResizeWin(int w, int h);
 BOOL DispWindowIconified();
-void DispGetWindowPos(int *x, int *y);
-void DispGetWindowSize(int *width, int *height);
-void DispGetRootWinSize(int *x, int *y);
+void DispGetWindowPos(int *x, int *y, BOOL client);
+void DispGetWindowSize(int *width, int *height, BOOL client);
+void DispGetRootWinSize(int *x, int *y, BOOL inPixels);
 int DispFindClosestColor(int red, int green, int blue);
 void UpdateBGBrush(void);
 void DpiChanged(void);
@@ -142,6 +142,7 @@ extern TCharAttr DefCharAttr;
 #define WINDOW_RAISE    4
 #define WINDOW_LOWER    5
 #define WINDOW_REFRESH  6
+#define WINDOW_TOGGLE_MAXIMIZE 7
 
 #ifdef __cplusplus
 }

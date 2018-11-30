@@ -31,6 +31,42 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
+<h3 id="teraterm_4.101">2018.11.30 (Ver 4.101)</h3>
+<ul class="history">
+  <li>変更
+    <ul>
+      <li>以下の dtterm のウィンドウ操作シーケンスに対応した。
+        <ul>
+          <li>10: フルスクリーンモード</li>
+          <li>13;2: ウィンドウ位置方向(テキスト領域)</li>
+          <li>14;2: ウインドウサイズ報告(ウィンドウ全体)</li>
+          <li>15: ルートウィンドウサイズ報告(ピクセル)</li>
+	  <li>16: 文字サイズ報告(ピクセル)</li>
+        </ul></li>
+      <li>以下の dtterm のウィンドウ操作シーケンスの動作を変更した。
+        <ul>
+          <li>14: ウインドウサイズ報告: 報告する領域をウィンドウ全体からテキスト領域に変更した。</li>
+        </ul></li>
+      <li>ウィンドウサイズ変更時に左右マージンモードをリセットしないようにした。</li>
+      <li>ファイル名を受け取るコマンドラインオプションで、`/' もパス区切り記号として扱うようにした。</li>
+    </ul>
+  </li>
+
+  <li>バグ修正
+    <ul>
+      <li>Ver 4.100 で DLL の呼び出し規約を変えたことで、それ以前にコンパイルされたプラグインが呼び出せなくなっていた問題を修正した。</li>
+    </ul>
+  </li>
+
+  <li>その他
+    <ul>
+      <li><a href="#ttssh_2.87">TTSSH(2.87)</a>へ差し替えた。</li>
+      <li><a href="#resizemenu_1.05">TTXResizeMenu Plugin(1.05)</a>へ差し替えた。</li>
+      <li>Oniguruma 6.9.0へ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="teraterm_4.100">2018.08.31 (Ver 4.100)</h3>
 <ul class="history">
   <li>変更
@@ -3033,6 +3069,15 @@
 
 <h2 id="ttssh">TTSSH</h2>
 
+<h3 id="ttssh_2.87">2018.11.30 (Ver 2.87)</h3>
+<ul class="history">
+  <li>その他
+    <ul>
+      <li>OpenSSL 1.0.2qへ差し替えた。</li>
+    </ul>
+  </li>
+</ul>
+
 <h3 id="ttssh_2.86">2018.08.31 (Ver 2.86)</h3>
 <ul class="history">
   <li>バグ修正
@@ -4835,6 +4880,11 @@
 </ul>
 
 <h2 id="resizemenu">TTXResizeMenu</h2>
+<h3 id="resizemenu_1.05">2018.11.30 (Ver 1.05)</h3>
+<ul class="history">
+  <li>ウインドウサイズを増減させる為のメニューIDを追加した。(ショートカットキー定義用)</li>
+</ul>
+
 <h3 id="resizemenu_1.04">2018.08.31 (Ver 1.04)</h3>
 <ul class="history">
   <li>Windows 95/NT4.0 で TTXResizeMenu が読み込まれない問題を修正した。</li>

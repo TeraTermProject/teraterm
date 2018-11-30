@@ -488,6 +488,10 @@ TTXAlwaysOnTop メニューコマンド     ID
 TTXResizeMenu メニューコマンド      ID
 -----------------------------------------
 [Resize] Menu(1) - Menu(20)         55101 - 55120
+-- Increase window width            55151 (メニュー割り当てなし)
+-- Decrease window width            55152 (メニュー割り当てなし)
+-- Increase window height           55153 (メニュー割り当てなし)
+-- Decrease window height           55154 (メニュー割り当てなし)
 
 TTXViewMode メニューコマンド        ID
 -----------------------------------------

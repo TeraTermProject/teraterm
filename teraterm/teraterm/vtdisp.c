@@ -3721,6 +3721,14 @@ void DispShowWindow(int mode) {
 	  case WINDOW_REFRESH:
 		InvalidateRect(HVTWin, NULL, FALSE);
 		break;
+	  case WINDOW_TOGGLE_MAXIMIZE:
+		if (IsZoomed(HVTWin)) {
+			ShowWindow(HVTWin, SW_RESTORE);
+		}
+		else {
+			ShowWindow(HVTWin, SW_MAXIMIZE);
+		}
+		break;
 	}
 }
 
@@ -3744,36 +3752,50 @@ BOOL DispWindowIconified() {
 	return IsIconic(HVTWin);
 }
 
-void DispGetWindowPos(int *x, int *y) {
+void DispGetWindowPos(int *x, int *y, BOOL client) {
 	WINDOWPLACEMENT wndpl;
+	POINT point;
 
-	wndpl.length = sizeof(WINDOWPLACEMENT);
-	GetWindowPlacement(HVTWin, &wndpl);
+	if (client) {
+		point.x = point.y = 0;
+		ClientToScreen(HVTWin, &point);
+		*x = point.x;
+		*y = point.y;
+	}
+	else {
+		wndpl.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(HVTWin, &wndpl);
 
-	switch (wndpl.showCmd) {
-	  case SW_SHOWMAXIMIZED:
-		*x = wndpl.ptMaxPosition.x;
-		*y = wndpl.ptMaxPosition.y;
-		break;
-	  default:
-		*x = wndpl.rcNormalPosition.left;
-		*y = wndpl.rcNormalPosition.top;
+		switch (wndpl.showCmd) {
+		  case SW_SHOWMAXIMIZED:
+			*x = wndpl.ptMaxPosition.x;
+			*y = wndpl.ptMaxPosition.y;
+			break;
+		  default:
+			*x = wndpl.rcNormalPosition.left;
+			*y = wndpl.rcNormalPosition.top;
+		}
 	}
 
 	return;
 }
 
-void DispGetWindowSize(int *width, int *height) {
+void DispGetWindowSize(int *width, int *height, BOOL client) {
 	RECT r;
 
-	GetWindowRect(HVTWin, &r);
+	if (client) {
+		GetClientRect(HVTWin, &r);
+	}
+	else {
+		GetWindowRect(HVTWin, &r);
+	}
 	*width = r.right - r.left;
 	*height = r.bottom - r.top;
 
 	return;
 }
 
-void DispGetRootWinSize(int *x, int *y)
+void DispGetRootWinSize(int *x, int *y, BOOL inPixels)
 {
 	HMODULE mod;
 	HMONITOR monitor;
@@ -3796,8 +3818,14 @@ void DispGetRootWinSize(int *x, int *y)
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop, 0);
 	}
 
-	*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
-	*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
+	if (inPixels) {
+		*x = desktop.right - desktop.left;
+		*y = desktop.bottom - desktop.top;
+	}
+	else {
+		*x = (desktop.right - desktop.left - (win.right - win.left - client.right)) / FontWidth;
+		*y = (desktop.bottom - desktop.top - (win.bottom - win.top - client.bottom)) / FontHeight;
+	}
 
 	return;
 }

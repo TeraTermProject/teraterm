@@ -447,7 +447,6 @@ void ChangeTerminalSize(int Nx, int Ny)
 	MainY = 0;
 	MainTop = 0;
 	MainBottom = NumOfLines-StatusLine-1;
-	LRMarginMode = FALSE;
 }
 
 void SendCSIstr(char *str, int len) {
@@ -2418,6 +2417,27 @@ void CSSunSequence() /* Sun terminal private sequences */
 		}
 		break;
 
+	  case 10: // Full-screen
+		/*
+		 * 本来ならば PuTTY のようなフルスクリーンモードを実装するべきだが、
+		 * とりあえずは手抜きで最大化を利用する
+		 */
+		if (ts.WindowFlag & WF_WINDOWCHANGE) {
+			RequiredParams(2);
+			switch (Param[2]) {
+			  case 0:
+			    DispShowWindow(WINDOW_RESTORE);
+			    break;
+			  case 1:
+			    DispShowWindow(WINDOW_MAXIMIZE);
+			    break;
+			  case 2:
+			    DispShowWindow(WINDOW_TOGGLE_MAXIMIZE);
+			    break;
+			}
+		}
+		break;
+
 	  case 11: // Report window state
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "%dt", CLocale, DispWindowIconified()?2:1);
@@ -2427,7 +2447,18 @@ void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 13: // Report window position
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetWindowPos(&x, &y);
+			RequiredParams(2);
+			switch (Param[2]) {
+			  case 0:
+			  case 1:
+				DispGetWindowPos(&x, &y, FALSE);
+				break;
+			  case 2:
+				DispGetWindowPos(&x, &y, TRUE);
+				break;
+			  default:
+				return;
+			}
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "3;%u;%ut", CLocale, (unsigned int)x, (unsigned int)y);
 			SendCSIstr(Report, len);
 		}
@@ -2435,8 +2466,35 @@ void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 14: /* get window size */
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetWindowSize(&x, &y);
+			RequiredParams(2);
+			switch (Param[2]) {
+			  case 0:
+			  case 1:
+				DispGetWindowSize(&x, &y, TRUE);
+				break;
+			  case 2:
+				DispGetWindowSize(&x, &y, FALSE);
+				break;
+			  default:
+				return;
+			}
+
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "4;%d;%dt", CLocale, y, x);
+			SendCSIstr(Report, len);
+		}
+		break;
+
+	  case 15: // Report display size (pixel)
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			DispGetRootWinSize(&x, &y, TRUE);
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "5;%d;%dt", CLocale, y, x);
+			SendCSIstr(Report, len);
+		}
+		break;
+
+	  case 16: // Report character cell size (pixel)
+		if (ts.WindowFlag & WF_WINDOWREPORT) {
+			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "6;%d;%dt", CLocale, FontHeight, FontWidth);
 			SendCSIstr(Report, len);
 		}
 		break;
@@ -2451,7 +2509,7 @@ void CSSunSequence() /* Sun terminal private sequences */
 
 	  case 19: // Report display size (character)
 		if (ts.WindowFlag & WF_WINDOWREPORT) {
-			DispGetRootWinSize(&x, &y);
+			DispGetRootWinSize(&x, &y, FALSE);
 			len = _snprintf_s_l(Report, sizeof(Report), _TRUNCATE, "9;%d;%dt", CLocale, y, x);
 			SendCSIstr(Report, len);
 		}
@@ -2720,6 +2778,12 @@ void CSQExchangeColor()		// DECSCNM / Visual Bell
 void CSQChangeColumnMode(int width)		// DECCOLM
 {
 	ChangeTerminalSize(width, NumOfLines-StatusLine);
+	LRMarginMode = FALSE;
+
+	// DECCOLM では画面がクリアされるのが仕様
+	// ClearOnResize が off の時はここでクリアする。
+	// ClearOnResize が on の時は ChangeTerminalSize() を呼ぶとクリアされるので、
+	// 余計なスクロールを避ける為にここではクリアしない。
 	if ((ts.TermFlag & TF_CLEARONRESIZE) == 0) {
 		MoveCursor(0, 0);
 		BuffClearScreen();

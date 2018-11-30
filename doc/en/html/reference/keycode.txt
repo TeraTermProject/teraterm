@@ -478,6 +478,10 @@ TTXAlwaysOnTop Menu command         ID
 TTXResizeMenu Menu command          ID
 -----------------------------------------
 [Resize] Menu(1) - Menu(20)         55101 - 55120
+-- Increase window width            55151 (not in menu)
+-- Decrease window width            55152 (not in menu)
+-- Increase window height           55153 (not in menu)
+-- Decrease window height           55154 (not in menu)
 
 TTXViewMode Menu command            ID
 -----------------------------------------
