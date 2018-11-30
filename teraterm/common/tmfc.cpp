@@ -50,6 +50,7 @@ TTCWnd::TTCWnd()
 	m_hWnd = nullptr;
 	m_hInst = nullptr;
 	m_hAccel = nullptr;
+	m_hParentWnd = nullptr;
 }
 
 LRESULT TTCWnd::SendMessage(UINT msg, WPARAM wp, LPARAM lp)
@@ -112,7 +113,7 @@ void TTCWnd::SetDlgItemNum(int id, LONG Num)
 	SetDlgNum(m_hWnd, id, Num);
 }
 
-// nCheck	BST_UNCHECKED / BST_CHECKED / BST_INDETERMINATE 
+// nCheck	BST_UNCHECKED / BST_CHECKED / BST_INDETERMINATE
 void TTCWnd::SetCheck(int id, int nCheck)
 {
 	::SendMessage(GetDlgItem(id), BM_SETCHECK, nCheck, 0);
@@ -130,7 +131,7 @@ void TTCWnd::SetCurSel(int id, int no)
 	TCHAR ClassName[32];
 	int r = GetClassName(hWnd, ClassName, _countof(ClassName));
 	assert(r != 0); (void)r;
-	UINT msg = 
+	UINT msg =
 		(_tcscmp(ClassName, _T("ListBox")) == 0) ? LB_SETCURSEL :
 		(_tcscmp(ClassName, _T("ComboBox")) == 0) ? CB_SETCURSEL : 0;
 	assert(msg != 0);
@@ -144,7 +145,7 @@ int TTCWnd::GetCurSel(int id)
 	TCHAR ClassName[32];
 	int r = GetClassName(hWnd, ClassName, _countof(ClassName));
 	assert(r != 0); (void)r;
-	UINT msg = 
+	UINT msg =
 		(_tcscmp(ClassName, _T("ListBox")) == 0) ? LB_GETCURSEL :
 		(_tcscmp(ClassName, _T("ComboBox")) == 0) ? CB_GETCURSEL : 0;
 	assert(msg != 0);
@@ -489,18 +490,18 @@ INT_PTR TTCDialog::DoModal(HINSTANCE hInstance, HWND hParent, int idd)
 {
 	pseudoPtr = this;
 #if defined(REWRITE_TEMPLATE)
-	INT_PTR result = 
+	INT_PTR result =
 		TTDialogBoxParam(hInstance,
 						 MAKEINTRESOURCE(idd),
 						 hParent,
 						 (DLGPROC)&DlgProcStub, (LPARAM)this);
 #else
-	INT_PTR result = 
+	INT_PTR result =
 		DialogBoxParam(hInstance,
 					   MAKEINTRESOURCE(idd),
 					   hParent,
 					   (DLGPROC)&DlgProcStub, (LPARAM)this);
-#endif	
+#endif
 	pseudoPtr = nullptr;
 	return result;
 }
@@ -510,6 +511,8 @@ INT_PTR TTCDialog::DoModal(HINSTANCE hInstance, HWND hParent, int idd)
  */
 BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 {
+	m_hInst = hInstance;
+	m_hParentWnd = hParent;
 #if defined(REWRITE_TEMPLATE)
 	DLGTEMPLATE *lpTemplate = TTGetDlgTemplate(hInstance, MAKEINTRESOURCE(idd));
 #else
@@ -700,7 +703,7 @@ TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND
 	m_psh.hwndParent = hParentWnd;
 	m_psh.pfnCallback = PropSheetProc;
 }
-	
+
 TTCPropertySheet::~TTCPropertySheet()
 {
 }
@@ -716,7 +719,7 @@ INT_PTR TTCPropertySheet::DoModal()
 	// モードレスダイアログボックスの場合はウィンドウのハンドル
 	m_hWnd = (HWND)::PropertySheet(&m_psh);
 //	ShowWindow(m_hWnd, SW_SHOW);
-	
+
 //	::ModifyStyle(m_hWnd, TCS_MULTILINE, TCS_SINGLELINE, 0);
 
 	ModalResult = 0;

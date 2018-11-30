@@ -62,6 +62,8 @@ BOOL TTCFrameWnd::Create(
 	LPCTSTR lpszMenuName,
 	DWORD dwExStyle)
 {
+	m_hInst = hInstance;
+	m_hParentWnd = hParentWnd;
 	pseudoPtr = this;
 	HWND hWnd = ::CreateWindowEx(
 		0,

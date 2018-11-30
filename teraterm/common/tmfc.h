@@ -38,6 +38,7 @@ public:
 	HWND m_hWnd;
 	HINSTANCE m_hInst;
 	HACCEL m_hAccel;
+	HWND m_hParentWnd;
 
 	TTCWnd();
 	void DestroyWindow();
@@ -132,7 +133,6 @@ public:
 	virtual BOOL OnClose();
 	virtual BOOL PostNcDestroy();
 	virtual LRESULT DlgProc(UINT msg, WPARAM wp, LPARAM lp);
-	HWND m_hParentWnd;
 
 	static LRESULT CALLBACK DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	static LRESULT CALLBACK WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);

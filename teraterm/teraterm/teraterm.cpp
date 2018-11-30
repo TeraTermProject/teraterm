@@ -48,6 +48,7 @@
 #include "compat_win.h"
 #include "compat_w95.h"
 #include "dlglib.h"
+#include "teraterml.h"
 
 static void init()
 {
@@ -264,6 +265,18 @@ static void SetDialogFont()
 	}
 }
 
+static HWND hModalWnd;
+
+void AddModalHandle(HWND hWnd)
+{
+	hModalWnd = hWnd;
+}
+
+void RemoveModalHandle(HWND hWnd)
+{
+	hModalWnd = 0;
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -283,6 +296,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
+		if (hModalWnd != 0) {
+			if (IsDialogMessage(hModalWnd, &msg)) {
+				continue;
+			}
+		}
+
 		bool message_processed = false;
 
 		if (m_pMainWnd->m_hAccel != NULL) {

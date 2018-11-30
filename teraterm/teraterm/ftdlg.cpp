@@ -39,6 +39,7 @@
 #include "dlglib.h"
 #include "tt_res.h"
 #include "ftdlg.h"
+#include "teraterml.h"
 
 #undef SetDlgItemText
 #define SetDlgItemText SetDlgItemTextA
@@ -51,7 +52,6 @@
 BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts)
 {
 	BOOL Ok;
-	WNDCLASS wc;
 	int fuLoad = LR_DEFAULTCOLOR;
 	HWND hwnd;
 
@@ -60,6 +60,8 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	cv->FilePause &= ~fv->OpId;
 	ts = pts;
 
+#if 0
+	WNDCLASS wc;
 	wc.style = CS_PARENTDC;
 	wc.lpfnWndProc = TTCDialog::WndProcStub;
 	wc.cbClsExtra = 0;
@@ -71,6 +73,7 @@ BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PCom
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = _T("FTDlg32");
 	RegisterClass(&wc);
+#endif
 
 	Pause = FALSE;
 
@@ -209,6 +212,9 @@ BOOL CFileTransDlg::OnInitDialog()
 						IMAGE_ICON, 0, 0, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
 				  (LPARAM)BigIcon);
+
+	AddModalHandle(m_hWnd);
+
 	return TRUE;
 }
 
@@ -249,6 +255,8 @@ BOOL CFileTransDlg::PostNcDestroy()
 		DestroyIcon((HICON)BigIcon);
 		BigIcon = NULL;
 	}
+
+	RemoveModalHandle(m_hWnd);
 
 	delete this;
 	return TRUE;
