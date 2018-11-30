@@ -43,7 +43,7 @@ HANDLE win16_lopen(const char *FileName, int iReadWrite)
 		// read/write (teratermではttpmacro/ttl.c内の1箇所のみで使用されている
 		handle = CreateFileA(FileName,
 							 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
-							 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		break;
 	default:
 		assert(FALSE);
@@ -89,8 +89,13 @@ UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
 }
 
 /*
+ *	@param[in]	iOrigin
+ *				@arg 0(FILE_BEGIN)
+ *				@arg 1(FILE_CURRENT)
+ *				@arg 2(FILE_END)
  *	@retval ファイル位置
  *	@retval HFILE_ERROR((HFILE)-1)	エラー
+ *	@retval INVALID_SET_FILE_POINTER((DWORD)-1) エラー
  */
 LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
 {
