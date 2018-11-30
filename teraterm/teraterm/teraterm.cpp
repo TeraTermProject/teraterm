@@ -291,7 +291,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
-	ShowWindow(m_pMainWnd->m_hWnd, nCmdShow);
 	SetDialogFont();
 
 	MSG msg;
