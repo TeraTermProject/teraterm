@@ -46,6 +46,8 @@ set(COMMON_SRC
   ../common/tmfc_frame.cpp
   ../common/i18n.c
   ../common/i18n.h
+  ../common/win16api.h
+  ../common/win16api.c
   )
 
 source_group(

@@ -31,6 +31,8 @@ set(COMMON_SRC
   ../common/compat_w95.h
   ../common/compat_win.h
   ../common/compat_win.cpp
+  ../common/win16api.h
+  ../common/win16api.c
   )
 
 source_group(

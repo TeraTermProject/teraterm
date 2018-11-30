@@ -20,6 +20,8 @@ set(COMMON_SRC
   ../common/dlglib_tmpl.cpp
   ../common/ttlib.c
   ../common/ttlib.h
+  ../common/win16api.h
+  ../common/win16api.c
   )
 
 source_group(
