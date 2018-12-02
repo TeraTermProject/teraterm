@@ -176,7 +176,7 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 	return Ok;
 }
 
-void SetLogFlags(HWND Dialog)
+static void SetLogFlags(HWND Dialog)
 {
 	LPLONG pl;
 	WORD BinFlag, val;
@@ -239,7 +239,7 @@ void SetLogFlags(HWND Dialog)
 }
 
 /* Hook function for file name dialog box */
-BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD BinFlag, TsFlag;
@@ -338,6 +338,7 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 		}
 
 		// timestampチェックボックス (2006.7.23 maya)
+		TsFlag = FALSE;
 		ShowDlgItem(Dialog, IDC_TIMESTAMP, IDC_TIMESTAMP);
 		if (BinFlag) {
 			// Binaryフラグが有効なときはチェックできない
@@ -427,10 +428,9 @@ BOOL CALLBACK LogFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
+static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam);
 
-BOOL PASCAL GetTransFname
-  (PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
+BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 {
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*3], *pf;
@@ -575,7 +575,7 @@ BOOL PASCAL GetTransFname
 	return Ok;
 }
 
-BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	LPWORD pw;
@@ -646,8 +646,7 @@ BOOL CALLBACK TransFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-BOOL PASCAL GetMultiFname
-  (PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
+BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 {
 	int i, len;
 	char uimsg[MAX_UIMSG];
@@ -797,8 +796,7 @@ BOOL PASCAL GetMultiFname
 	return Ok;
 }
 
-BOOL CALLBACK GetFnDlg
-  (HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK GetFnDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	PFileVar fv;
 	char TempFull[MAX_PATH];
@@ -875,14 +873,14 @@ BOOL CALLBACK GetFnDlg
 	return FALSE;
 }
 
-BOOL PASCAL GetGetFname(HWND HWin, PFileVar fv)
+BOOL WINAPI GetGetFname(HWND HWin, PFileVar fv)
 {
 	return (BOOL)DialogBoxParam(hInst,
 	                            MAKEINTRESOURCE(IDD_GETFNDLG),
 	                            HWin, GetFnDlg, (LONG)fv);
 }
 
-void PASCAL SetFileVar(PFileVar fv)
+void WINAPI SetFileVar(PFileVar fv)
 {
 	int i;
 	char uimsg[MAX_UIMSG];
@@ -959,7 +957,7 @@ void PASCAL SetFileVar(PFileVar fv)
 }
 
 /* Hook function for XMODEM file name dialog box */
-BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	LPOPENFILENAME ofn;
 	WORD Hi, Lo;
@@ -1094,8 +1092,7 @@ BOOL CALLBACK XFnHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-BOOL PASCAL GetXFname
-  (HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
+BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR CurDir)
 {
 	char uimsg[MAX_UIMSG];
 	char FNFilter[sizeof(FileSendFilter)*2+128], *pf;
@@ -1190,7 +1187,7 @@ BOOL PASCAL GetXFname
 	return Ok;
 }
 
-void PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
+void WINAPI ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -1214,8 +1211,7 @@ void PASCAL ProtoInit(int Proto, PFileVar fv, PCHAR pv, PComVar cv, PTTSet ts)
 	}
 }
 
-BOOL PASCAL ProtoParse
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+BOOL WINAPI ProtoParse(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	BOOL Ok;
 
@@ -1264,8 +1260,7 @@ BOOL PASCAL ProtoParse
 	return Ok;
 }
 
-void PASCAL ProtoTimeOutProc
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+void WINAPI ProtoTimeOutProc(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -1289,8 +1284,7 @@ void PASCAL ProtoTimeOutProc
 	}
 }
 
-BOOL PASCAL ProtoCancel
-  (int Proto, PFileVar fv, PCHAR pv, PComVar cv)
+BOOL WINAPI ProtoCancel(int Proto, PFileVar fv, PCHAR pv, PComVar cv)
 {
 	switch (Proto) {
 	case PROTO_KMT:
@@ -1318,12 +1312,12 @@ BOOL PASCAL ProtoCancel
 	return TRUE;
 }
 
-void PASCAL TTFILESetUILanguageFile(char *file)
+void WINAPI TTFILESetUILanguageFile(char *file)
 {
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 }
 
-void PASCAL TTFILESetFileSendFilter(char *file)
+void WINAPI TTFILESetFileSendFilter(char *file)
 {
 	strncpy_s(FileSendFilter, sizeof(FileSendFilter), file, _TRUNCATE);
 }

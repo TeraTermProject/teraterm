@@ -3280,7 +3280,7 @@ BOOL CALLBACK WinListDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-BOOL PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
+BOOL WINAPI SetupTerminal(HWND WndParent, PTTSet ts)
 {
 	int i;
 
@@ -3305,7 +3305,7 @@ BOOL PASCAL SetupTerminal(HWND WndParent, PTTSet ts)
 		                     WndParent, TermDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupWin(HWND WndParent, PTTSet ts)
+BOOL WINAPI SetupWin(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3313,7 +3313,7 @@ BOOL PASCAL SetupWin(HWND WndParent, PTTSet ts)
 		                     WndParent, WinDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
+BOOL WINAPI SetupKeyboard(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3321,7 +3321,7 @@ BOOL PASCAL SetupKeyboard(HWND WndParent, PTTSet ts)
 		                     WndParent, KeybDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
+BOOL WINAPI SetupSerialPort(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3329,7 +3329,7 @@ BOOL PASCAL SetupSerialPort(HWND WndParent, PTTSet ts)
 		                     WndParent, SerialDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
+BOOL WINAPI SetupTCPIP(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3337,7 +3337,7 @@ BOOL PASCAL SetupTCPIP(HWND WndParent, PTTSet ts)
 		                     WndParent, TCPIPDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
+BOOL WINAPI GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3345,7 +3345,7 @@ BOOL PASCAL GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 		                     WndParent, HostDlg, (LPARAM)GetHNRec);
 }
 
-BOOL PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
+BOOL WINAPI ChangeDirectory(HWND WndParent, PCHAR CurDir)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3353,7 +3353,7 @@ BOOL PASCAL ChangeDirectory(HWND WndParent, PCHAR CurDir)
 		                     WndParent, DirDlg, (LPARAM)CurDir);
 }
 
-BOOL PASCAL AboutDialog(HWND WndParent)
+BOOL WINAPI AboutDialog(HWND WndParent)
 {
 	return
 		(BOOL)DialogBox(hInst,
@@ -3406,7 +3406,7 @@ BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 #ifndef CF_INACTIVEFONTS
 #define CF_INACTIVEFONTS 0x02000000L
 #endif
-BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
+BOOL WINAPI ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 {
 	CHOOSEFONT cf;
 	BOOL Ok;
@@ -3429,7 +3429,7 @@ BOOL PASCAL ChooseFontDlg(HWND WndParent, LPLOGFONT LogFont, PTTSet ts)
 	return Ok;
 }
 
-BOOL PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
+BOOL WINAPI SetupGeneral(HWND WndParent, PTTSet ts)
 {
 	return
 		(BOOL)DialogBoxParam(hInst,
@@ -3437,7 +3437,7 @@ BOOL PASCAL SetupGeneral(HWND WndParent, PTTSet ts)
 		                     WndParent, (DLGPROC)&GenDlg, (LPARAM)ts);
 }
 
-BOOL PASCAL WindowWindow(HWND WndParent, PBOOL Close)
+BOOL WINAPI WindowWindow(HWND WndParent, PBOOL Close)
 {
 	*Close = FALSE;
 	return
@@ -3447,7 +3447,7 @@ BOOL PASCAL WindowWindow(HWND WndParent, PBOOL Close)
 		                     (DLGPROC)&WinListDlg, (LPARAM)Close);
 }
 
-void PASCAL TTDLGSetUILanguageFile(char *file)
+void WINAPI TTDLGSetUILanguageFile(char *file)
 {
 	strncpy_s(UILanguageFile, sizeof(UILanguageFile), file, _TRUNCATE);
 }
