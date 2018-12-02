@@ -1332,9 +1332,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
                     ULONG ul_reason_for_call,
                     LPVOID lpReserved)
 {
-//	PMap pm;
-//	HANDLE HMap = NULL;
-
 	hInst = hInstance;
 	switch( ul_reason_for_call ) {
 	case DLL_THREAD_ATTACH:
@@ -1345,15 +1342,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 		break;
 	case DLL_PROCESS_ATTACH:
 		/* do process initialization */
-//		HMap = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READONLY,
-//		                         0, sizeof(TMap), TT_FILEMAPNAME);
-//		if (HMap != NULL) {
-//			pm = (PMap)MapViewOfFile(HMap,FILE_MAP_READ,0,0,0);
-//			if (pm != NULL) {
-//				strncpy_s(UILanguageFile, sizeof(UILanguageFile), pm->ts.UILanguageFile, _TRUNCATE);
-//				strncpy_s(FileSendFilter, sizeof(FileSendFilter), pm->ts.FileSendFilter, _TRUNCATE);
-//			}
-//		}
 		DoCover_IsDebuggerPresent();
 		break;
 	case DLL_PROCESS_DETACH:

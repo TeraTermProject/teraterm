@@ -1116,6 +1116,8 @@ typedef TComVar *PComVar;
 
 /* shared memory */
 typedef struct {
+	size_t size_tmap;		/* sizeof TMap */
+	size_t size_tttset;		/* sizeof TTTSet */
 	/* Setup information from "teraterm.ini" */
 	TTTSet ts;
 	/* Key code map from "keyboard.def" */
@@ -1136,7 +1138,3 @@ typedef struct {
 } TMap;
 typedef TMap *PMap;
 
-// TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
-// TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが
-// 連番からバージョン番号を使うように変更した為、通常は手動で変更する必要は無い
-#define TT_FILEMAPNAME "ttset_memfilemap_" TT_VERSION_STR("_")

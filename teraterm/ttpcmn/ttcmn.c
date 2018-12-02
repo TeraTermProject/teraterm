@@ -49,6 +49,11 @@
 #include "compat_w95.h"
 #include "tt_res.h"
 
+// TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
+// TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが
+// 連番からバージョン番号を使うように変更した為、通常は手動で変更する必要は無い
+#define TT_FILEMAPNAME "ttset_memfilemap_" TT_VERSION_STR("_")
+
 /* first instance flag */
 static BOOL FirstInstance = TRUE;
 
@@ -2546,6 +2551,52 @@ void PASCAL NotifyMessage(PComVar cv, char *msg, char *title, DWORD flag)
 	return;
 }
 
+/*
+ *	@return		エラーが有る場合 FALSE
+ *	@param[in]	BOOL first_instance
+ */
+static BOOL OpenSharedMemory(BOOL *first_instance_)
+{
+	int i;
+	HMap = NULL;
+	pm = NULL;
+	for (i = 0; i < 100; i++) {
+		char tmp[32];
+		HANDLE hMap;
+		BOOL first_instance;
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, i == 0 ? "%s" : "%s_%d", TT_FILEMAPNAME, i);
+		hMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
+								 0, sizeof(TMap), tmp);
+		if (hMap == NULL) {
+			return FALSE;
+		}
+
+		first_instance = (GetLastError() != ERROR_ALREADY_EXISTS);
+
+		TMap *map = (TMap *)MapViewOfFile(hMap,FILE_MAP_WRITE,0,0,0);
+		if (map == NULL) {
+			return FALSE;
+		}
+
+		if (first_instance ||
+			(map->size_tmap == sizeof(TMap) &&
+			 map->size_tttset == sizeof(TTTSet)))
+		{
+			map->size_tmap = sizeof(TMap);
+			map->size_tttset = sizeof(TTTSet);
+			HMap = hMap;
+			pm = map;
+			*first_instance_ = first_instance;
+			return TRUE;
+		}
+
+		// next try
+		UnmapViewOfFile(map);
+		CloseHandle(hMap);
+	}
+	return FALSE;
+}
+
 BOOL WINAPI DllMain(HANDLE hInstance,
                     ULONG ul_reason_for_call,
                     LPVOID lpReserved)
@@ -2561,15 +2612,8 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 			/* do process initialization */
 			DoCover_IsDebuggerPresent();
 			hInst = hInstance;
-			HMap = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE,
-			                         0, sizeof(TMap), TT_FILEMAPNAME);
-			if (HMap == NULL) {
-				return FALSE;
-			}
-			FirstInstance = (GetLastError() != ERROR_ALREADY_EXISTS);
-
-			pm = (PMap)MapViewOfFile(HMap,FILE_MAP_WRITE,0,0,0);
-			if (pm == NULL) {
+			if (OpenSharedMemory(&FirstInstance) == FALSE) {
+				// dllロード失敗、teratermが起動しない
 				return FALSE;
 			}
 			break;
