@@ -2564,6 +2564,7 @@ static BOOL OpenSharedMemory(BOOL *first_instance_)
 		char tmp[32];
 		HANDLE hMap;
 		BOOL first_instance;
+		TMap *map;
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, i == 0 ? "%s" : "%s_%d", TT_FILEMAPNAME, i);
 		hMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
 								 0, sizeof(TMap), tmp);
@@ -2573,7 +2574,7 @@ static BOOL OpenSharedMemory(BOOL *first_instance_)
 
 		first_instance = (GetLastError() != ERROR_ALREADY_EXISTS);
 
-		TMap *map = (TMap *)MapViewOfFile(hMap,FILE_MAP_WRITE,0,0,0);
+		map = (TMap *)MapViewOfFile(hMap,FILE_MAP_WRITE,0,0,0);
 		if (map == NULL) {
 			return FALSE;
 		}
