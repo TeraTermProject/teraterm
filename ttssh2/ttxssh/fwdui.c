@@ -69,16 +69,21 @@ typedef struct {
 
 static void make_X_forwarding_spec(FWDRequestSpec *spec, PTInstVar pvar)
 {
+	char uimsg[MAX_UIMSG];
 	spec->type = FWD_REMOTE_X11_TO_LOCAL;
 	spec->from_port = -1;
 	X11_get_DISPLAY_info(pvar, spec->to_host, sizeof(spec->to_host),
 	                     &spec->to_port, &spec->x11_screen);
-	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSERVER", pvar, "remote X server");
-	strncpy_s(spec->from_port_name, sizeof(spec->from_port_name),
-	          pvar->ts->UIMsg, _TRUNCATE);
-	UTIL_get_lang_msg("MSG_FWD_REMOTE_XSCREEN", pvar, "X server (display %d:%d)");
+	UTIL_get_lang_msgU8("MSG_FWD_REMOTE_XSERVER",
+						spec->from_port_name, sizeof(spec->from_port_name),
+						"remote X server",
+						pvar->ts->UILanguageFile);
+	UTIL_get_lang_msgU8("MSG_FWD_REMOTE_XSCREEN",
+						uimsg, _countof(uimsg),
+						"X server (display %d:%d)",
+						pvar->ts->UILanguageFile);
 	_snprintf_s(spec->to_port_name, sizeof(spec->to_port_name), _TRUNCATE,
-	            pvar->ts->UIMsg, spec->to_port - 6000, spec->x11_screen);
+	            uimsg, spec->to_port - 6000, spec->x11_screen);
 }
 
 static BOOL parse_request(FWDRequestSpec *request, char *str, PTInstVar pvar)
@@ -685,7 +690,7 @@ static void fill_service_names(HWND dlg, WORD item)
 	const char *svc;
 
 	for (i=0; (svc = service_name(i)) != NULL; i++) {
-		SendMessage(cbox, CB_ADDSTRING, 0, (LPARAM) svc);
+		SendMessageA(cbox, CB_ADDSTRING, 0, (LPARAM) svc);
 	}
 }
 
@@ -825,8 +830,25 @@ static void setup_edit_controls(HWND dlg, FWDRequestSpec *spec,
 
 static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 {
-	char uimsg[MAX_UIMSG];
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_FWD_TITLE" },
+		{ IDD_SSHFWDBANNER, "DLG_FWD_BANNER" },
+		{ IDC_SSHFWDLOCALTOREMOTE, "DLG_FWD_LOCAL_PORT" },
+		{ IDC_SSHFWDLOCALTOREMOTE_LISTEN, "DLG_FWD_LOCAL_LISTEN" },
+		{ IDC_SSHFWDLOCALTOREMOTE_HOST, "DLG_FWD_LOCAL_REMOTE" },
+		{ IDC_SSHFWDLOCALTOREMOTE_PORT, "DLG_FWD_LOCAL_REMOTE_PORT" },
+		{ IDC_SSHFWDREMOTETOLOCAL, "DLG_FWD_REMOTE_PORT" },
+		{ IDC_SSHFWDREMOTETOLOCAL_LISTEN, "DLG_FWD_REMOTE_LISTEN" },
+		{ IDC_SSHFWDREMOTETOLOCAL_HOST, "DLG_FWD_REMOTE_LOCAL" },
+		{ IDC_SSHFWDREMOTETOLOCAL_PORT, "DLG_FWD_REMOTE_LOCAL_PORT" },
+		{ IDC_SSHFWDLOCALDYNAMIC, "DLG_FWD_DYNAMIC_PORT" },
+		{ IDC_SSHFWDLOCALDYNAMIC_LISTEN, "DLG_FWD_DYNAMIC_LISTEN" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
+#if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_TITLE", pvar, uimsg);
 	SetWindowText(dlg, pvar->ts->UIMsg);
@@ -869,7 +891,8 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+#endif
+		
 	switch (spec->type) {
 	case FWD_REMOTE_TO_LOCAL:
 		setup_edit_controls(dlg, spec, IDC_SSHFWDREMOTETOLOCAL,

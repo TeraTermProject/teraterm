@@ -88,6 +88,7 @@ BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf);
 void UTIL_get_lang_msgW(const char *key, wchar_t *buf, size_t buf_len, const wchar_t *def, const char *iniFile);
 #endif
 void UTIL_get_lang_msgA(const char *key, char *buf, size_t buf_len, const char *def, const char *iniFile);
+void UTIL_get_lang_msgU8(const char *key, char *buf, size_t buf_len, const char *def, const char *iniFile);
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, PTInstVar pvar);
 
 void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def);

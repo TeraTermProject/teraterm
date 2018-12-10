@@ -202,6 +202,7 @@ BOOL CRYPT_detect_attack(PTInstVar pvar, unsigned char *buf, int bytes)
 
 BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes, unsigned int aadlen, unsigned int authlen)
 {
+	char uimsg[MAX_UIMSG];
 	unsigned char *newbuff = NULL;
 	unsigned int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	unsigned char lastiv[1];
@@ -212,8 +213,11 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return TRUE;
 
 	if (bytes % block_size) {
-		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar, "%s encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		char uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgU8("MSG_ENCRYPT_ERROR1", uimsg, _countof(uimsg),
+							"%s encrypt error(1): bytes %d (%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -247,8 +251,10 @@ BOOL CRYPT_encrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	return TRUE;
 
 err:
-	UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+	UTIL_get_lang_msgU8("MSG_ENCRYPT_ERROR2", uimsg, _countof(uimsg),
+						"%s encrypt error(2)",
+						pvar->ts->UILanguageFile);
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 	            get_cipher_name(pvar->crypt_state.sender_cipher));
 	notify_fatal_error(pvar, tmp, TRUE);
 	return FALSE;
@@ -261,13 +267,16 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 	unsigned char lastiv[1];
 	char tmp[80];
 	EVP_CIPHER_CTX *evp = &pvar->evpcip[MODE_IN];
+	char uimsg[MAX_UIMSG];
 
 	if (bytes == 0)
 		return TRUE;
 
 	if (bytes % block_size) {
-		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar, "%s decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		UTIL_get_lang_msgU8("MSG_DECRYPT_ERROR1", uimsg, _countof(uimsg),
+							"%s decrypt error(1): bytes %d (%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -301,8 +310,10 @@ BOOL CRYPT_decrypt_aead(PTInstVar pvar, unsigned char *data, unsigned int bytes,
 		return TRUE;
 
 err:
-	UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
-	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+	UTIL_get_lang_msgU8("MSG_DECRYPT_ERROR2", uimsg, _countof(uimsg),
+						"%s decrypt error(2)",
+						pvar->ts->UILanguageFile);
+	_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 	            get_cipher_name(pvar->crypt_state.receiver_cipher));
 	notify_fatal_error(pvar, tmp, TRUE);
 	return FALSE;
@@ -317,14 +328,16 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	unsigned char *newbuff;
 	int block_size = pvar->ssh2_keys[MODE_OUT].enc.block_size;
 	char tmp[80];
+	char uimsg[MAX_UIMSG];
 
 	if (bytes == 0)
 		return;
 
 	if (bytes % block_size) {
-		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR1", pvar,
-		                  "%s encrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		UTIL_get_lang_msgU8("MSG_ENCRYPT_ERROR1", uimsg, _countof(uimsg),
+							"%s encrypt error(1): bytes %d (%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -339,8 +352,10 @@ static void crypt_SSH2_encrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_OUT], encbuff, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_ENCRYPT_ERROR2", pvar, "%s encrypt error(2)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		UTIL_get_lang_msgU8("MSG_ENCRYPT_ERROR2", uimsg, _countof(uimsg),
+							"%s encrypt error(2)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 		            get_cipher_name(pvar->crypt_state.sender_cipher));
 		notify_fatal_error(pvar, tmp, TRUE);
 	} else {
@@ -353,14 +368,16 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	unsigned char *newbuff;
 	int block_size = pvar->ssh2_keys[MODE_IN].enc.block_size;
 	char tmp[80];
+	char uimsg[MAX_UIMSG];
 
 	if (bytes == 0)
 		return;
 
 	if (bytes % block_size) {
-		UTIL_get_lang_msg("MSG_DECRYPT_ERROR1", pvar,
-		                  "%s decrypt error(1): bytes %d (%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		UTIL_get_lang_msgU8("MSG_DECRYPT_ERROR1", uimsg, _countof(uimsg),
+							"%s decrypt error(1): bytes %d (%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher),
 		            bytes, block_size);
 		notify_fatal_error(pvar, tmp, TRUE);
@@ -375,8 +392,10 @@ static void crypt_SSH2_decrypt(PTInstVar pvar, unsigned char *buf, int bytes)
 	}
 
 	if (EVP_Cipher(&pvar->evpcip[MODE_IN], encbuff, buf, bytes) == 0) {
-		UTIL_get_lang_msg("MSG_DECRYPT_ERROR2", pvar, "%s decrypt error(2)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg,
+		UTIL_get_lang_msgU8("MSG_DECRYPT_ERROR2", uimsg, _countof(uimsg),
+							"%s decrypt error(2)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg,
 		            get_cipher_name(pvar->crypt_state.receiver_cipher));
 		notify_fatal_error(pvar, tmp, TRUE);
 	} else {
@@ -493,9 +512,11 @@ RSA *make_key(PTInstVar pvar,
 	}
 
 	if (key == NULL || key->e == NULL || key->n == NULL) {
-		UTIL_get_lang_msg("MSG_RSAKEY_SETUP_ERROR", pvar,
-		                  "Error setting up RSA keys");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		char uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgU8("MSG_RSAKEY_SETUP_ERROR", uimsg, _countof(uimsg),
+							"Error setting up RSA keys",
+							pvar->ts->UILanguageFile);
+		notify_fatal_error(pvar, uimsg, TRUE);
 
 		if (key != NULL) {
 			if (key->e != NULL) {
@@ -553,6 +574,7 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
                                  int receiver_ciphers)
 {
 	int cipher_mask;
+	char uimsg[MAX_UIMSG];
 
 	if (SSHv1(pvar)) {
 		cipher_mask = (1 << SSH_CIPHER_DES)
@@ -593,18 +615,20 @@ BOOL CRYPT_set_supported_ciphers(PTInstVar pvar, int sender_ciphers,
 	pvar->crypt_state.supported_receiver_ciphers = receiver_ciphers;
 
 	if (sender_ciphers == 0) {
-		UTIL_get_lang_msg("MSG_UNAVAILABLE_CIPHERS_ERROR", pvar,
-		                  "The server does not support any of the TTSSH encryption algorithms.\n"
-		                  "A secure connection cannot be made in the TTSSH-to-server direction.\n"
-		                  "The connection will be closed.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		UTIL_get_lang_msgU8("MSG_UNAVAILABLE_CIPHERS_ERROR", uimsg, _countof(uimsg),
+							"The server does not support any of the TTSSH encryption algorithms.\n"
+							"A secure connection cannot be made in the TTSSH-to-server direction.\n"
+							"The connection will be closed.",
+							pvar->ts->UILanguageFile);
+		notify_fatal_error(pvar, uimsg, TRUE);
 		return FALSE;
 	} else if (receiver_ciphers == 0) {
-		UTIL_get_lang_msg("MSG_UNAVAILABLE_CIPHERS_ERROR", pvar,
-		                  "The server does not support any of the TTSSH encryption algorithms.\n"
-		                  "A secure connection cannot be made in the TTSSH-to-server direction.\n"
-		                  "The connection will be closed.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		UTIL_get_lang_msgU8("MSG_UNAVAILABLE_CIPHERS_ERROR", uimsg, _countof(uimsg),
+							"The server does not support any of the TTSSH encryption algorithms.\n"
+							"A secure connection cannot be made in the TTSSH-to-server direction.\n"
+							"The connection will be closed.",
+							pvar->ts->UILanguageFile);
+		notify_fatal_error(pvar, uimsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -788,12 +812,14 @@ BOOL CRYPT_choose_ciphers(PTInstVar pvar)
 
 	if (pvar->crypt_state.sender_cipher == SSH_CIPHER_NONE
 		|| pvar->crypt_state.receiver_cipher == SSH_CIPHER_NONE) {
-		UTIL_get_lang_msg("MSG_CIPHER_NONE_ERROR", pvar,
-		                  "All the encryption algorithms that this program and the server both understand have been disabled.\n"
-		                  "To communicate with this server, you will have to enable some more ciphers\n"
-		                  "in the TTSSH Setup dialog box when you run Tera Term again.\n"
-		                  "This connection will now close.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		char uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgU8("MSG_CIPHER_NONE_ERROR", uimsg, _countof(uimsg),
+							"All the encryption algorithms that this program and the server both understand have been disabled.\n"
+							"To communicate with this server, you will have to enable some more ciphers\n"
+							"in the TTSSH Setup dialog box when you run Tera Term again.\n"
+							"This connection will now close.",
+							pvar->ts->UILanguageFile);
+		notify_fatal_error(pvar, uimsg, TRUE);
 		return FALSE;
 	} else {
 		return TRUE;
@@ -835,9 +861,11 @@ int CRYPT_choose_session_key(PTInstVar pvar,
 	}
 
 	if (bit_delta < 128 || server_key_bits < 512 || host_key_bits < 512) {
-		UTIL_get_lang_msg("MSG_RSAKEY_TOOWEAK_ERROR", pvar,
-		                  "Server RSA keys are too weak. A secure connection cannot be established.");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		char uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgU8("MSG_RSAKEY_TOOWEAK_ERROR", uimsg, _countof(uimsg),
+							"Server RSA keys are too weak. A secure connection cannot be established.",
+							pvar->ts->UILanguageFile);
+		notify_fatal_error(pvar, uimsg, TRUE);
 		return 0;
 	} else {
 		/* following Goldberg's code, I'm using MD5(servkey->n || hostkey->n || cookie)
@@ -1001,30 +1029,39 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 	int klen;
 	char tmp[80];
 	unsigned char *junk = NULL, *discard = NULL;
+	char uimsg[MAX_UIMSG];
 
 	EVP_CIPHER_CTX_init(evp);
 	if (EVP_CipherInit(evp, type, NULL, NULL, (encrypt == CIPHER_ENCRYPT)) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 1);
+		UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+							"Cipher initialize error(%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 1);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
 
 	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IVLEN, ivlen, NULL)) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 2);
+		UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+							"Cipher initialize error(%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 2);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
 	if (EVP_CipherInit(evp, NULL, NULL, (u_char *)iv, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 3);
+		UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+							"Cipher initialize error(%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 3);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
 	if (authlen > 0 && !EVP_CIPHER_CTX_ctrl(evp, EVP_CTRL_GCM_SET_IV_FIXED, -1, (u_char *)iv)) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 4);
+		UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+							"Cipher initialize error(%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 4);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
@@ -1032,15 +1069,19 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 	klen = EVP_CIPHER_CTX_key_length(evp);
 	if (klen > 0 && keylen != klen) {
 		if (EVP_CIPHER_CTX_set_key_length(evp, keylen) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 5);
+			UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+								"Cipher initialize error(%d)",
+								pvar->ts->UILanguageFile);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 5);
 			notify_fatal_error(pvar, tmp, TRUE);
 			return;
 		}
 	}
 	if (EVP_CipherInit(evp, NULL, (u_char *)key, NULL, -1) == 0) {
-		UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 6);
+		UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+							"Cipher initialize error(%d)",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 6);
 		notify_fatal_error(pvar, tmp, TRUE);
 		return;
 	}
@@ -1050,8 +1091,10 @@ void cipher_init_SSH2(EVP_CIPHER_CTX *evp,
 		discard = malloc(discard_len);
 		if (junk == NULL || discard == NULL ||
 		    EVP_Cipher(evp, discard, junk, discard_len) == 0) {
-			UTIL_get_lang_msg("MSG_CIPHER_INIT_ERROR", pvar, "Cipher initialize error(%d)");
-			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, pvar->ts->UIMsg, 7);
+			UTIL_get_lang_msgU8("MSG_CIPHER_INIT_ERROR", uimsg, _countof(uimsg),
+								"Cipher initialize error(%d)",
+								pvar->ts->UILanguageFile);
+			_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, uimsg, 7);
 			notify_fatal_error(pvar, tmp, TRUE);
 		}
 		else {
@@ -1176,9 +1219,11 @@ BOOL CRYPT_start_encryption(PTInstVar pvar, int sender_flag, int receiver_flag)
 	}
 
 	if (!isOK) {
-		UTIL_get_lang_msg("MSG_CIPHER_NOTSELECTED_ERROR", pvar,
-		                  "No cipher selected!");
-		notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+		char uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgU8("MSG_CIPHER_NOTSELECTED_ERROR", uimsg, _countof(uimsg),
+							"No cipher selected!",
+							pvar->ts->UILanguageFile);
+		notify_fatal_error(pvar, uimsg, TRUE);
 		return FALSE;
 	} else {
 		SecureZeroMemory(encryption_key, CRYPT_KEY_LENGTH);
@@ -1268,33 +1313,40 @@ static char *get_cipher_name(int cipher)
 
 void CRYPT_get_cipher_info(PTInstVar pvar, char *dest, int len)
 {
-	UTIL_get_lang_msg("DLG_ABOUT_CIPHER_INFO", pvar,
-	                  "%s to server, %s from server");
-	_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
-	          get_cipher_name(pvar->crypt_state.sender_cipher),
-	          get_cipher_name(pvar->crypt_state.receiver_cipher));
+	char uimsg[MAX_UIMSG];
+	UTIL_get_lang_msgU8("DLG_ABOUT_CIPHER_INFO", uimsg, _countof(uimsg),
+						"%s to server, %s from server",
+						pvar->ts->UILanguageFile);
+	_snprintf_s(dest, len, _TRUNCATE, uimsg,
+				get_cipher_name(pvar->crypt_state.sender_cipher),
+				get_cipher_name(pvar->crypt_state.receiver_cipher));
 }
 
 void CRYPT_get_server_key_info(PTInstVar pvar, char *dest, int len)
 {
+	char uimsg[MAX_UIMSG];
 	if (SSHv1(pvar)) {
 		if (pvar->crypt_state.server_key.RSA_key == NULL
 		 || pvar->crypt_state.host_key.RSA_key == NULL) {
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_NONE", pvar, "None");
-			strncpy_s(dest, len, pvar->ts->UIMsg, _TRUNCATE);
+			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_NONE", uimsg, _countof(uimsg),
+								"None",
+								pvar->ts->UILanguageFile);
+			strncpy_s(dest, len, uimsg, _TRUNCATE);
 		} else {
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO", pvar,
-			                  "%d-bit server key, %d-bit host key");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
+			UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO", uimsg, _countof(uimsg),
+								"%d-bit server key, %d-bit host key",
+								pvar->ts->UILanguageFile);
+			_snprintf_s(dest, len, _TRUNCATE, uimsg,
 			            BN_num_bits(pvar->crypt_state.server_key.RSA_key->n),
 			            BN_num_bits(pvar->crypt_state.host_key.RSA_key->n));
 		}
 	} else { // SSH2
-			UTIL_get_lang_msg("DLG_ABOUT_KEY_INFO2", pvar,
-			                  "%d-bit client key, %d-bit server key");
-			_snprintf_s(dest, len, _TRUNCATE, pvar->ts->UIMsg,
-			            pvar->client_key_bits,
-			            pvar->server_key_bits);
+		UTIL_get_lang_msgU8("DLG_ABOUT_KEY_INFO2", uimsg, _countof(uimsg),
+							"%d-bit client key, %d-bit server key",
+							pvar->ts->UILanguageFile);
+		_snprintf_s(dest, len, _TRUNCATE, uimsg,
+					pvar->client_key_bits,
+					pvar->server_key_bits);
 	}
 }
 

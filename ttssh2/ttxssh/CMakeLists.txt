@@ -19,6 +19,8 @@ set(COMMON_SRC
   ../../teraterm/common/dlglib_cpp.cpp
   ../../teraterm/common/dlglib_tmpl.cpp
   ../../teraterm/common/servicenames.h
+  ../../teraterm/common/codeconv.cpp
+  ../../teraterm/common/codeconv.h
   )
 
 source_group(

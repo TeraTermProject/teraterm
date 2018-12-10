@@ -40,6 +40,7 @@ See LICENSE.TXT for the license.
 #include "hosts.h"
 #include "dns.h"
 #include "dlglib.h"
+#include "codeconv.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -52,8 +53,9 @@ See LICENSE.TXT for the license.
 #include <sys/stat.h>
 #include <direct.h>
 #include <memory.h>
+#include <tchar.h>
 
-#if defined(UNICODE)
+#if 0 //defined(UNICODE)
 #undef SetDlgItemText
 #define SetDlgItemText SetDlgItemTextA
 #undef GetDlgItemText
@@ -134,20 +136,23 @@ static int begin_read_file(PTInstVar pvar, char *name,
 	int length;
 	int amount_read;
 	char buf[2048];
+	char uimsg[MAX_UIMSG];
 
 	get_teraterm_dir_relative_name(buf, sizeof(buf), name);
 	fd = _open(buf, _O_RDONLY | _O_SEQUENTIAL | _O_BINARY);
 	if (fd == -1) {
 		if (!suppress_errors) {
 			if (errno == ENOENT) {
-				UTIL_get_lang_msg("MSG_HOSTS_READ_ENOENT_ERROR", pvar,
-				                  "An error occurred while trying to read a known_hosts file.\n"
-				                  "The specified filename does not exist.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_READ_ENOENT_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to read a known_hosts file.\n"
+									"The specified filename does not exist.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			} else {
-				UTIL_get_lang_msg("MSG_HOSTS_READ_ERROR", pvar,
-				                  "An error occurred while trying to read a known_hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_READ_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to read a known_hosts file.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 		}
 		return 0;
@@ -160,18 +165,20 @@ static int begin_read_file(PTInstVar pvar, char *name,
 		pvar->hosts_state.file_data = malloc(length + 1);
 		if (pvar->hosts_state.file_data == NULL) {
 			if (!suppress_errors) {
-				UTIL_get_lang_msg("MSG_HOSTS_ALLOC_ERROR", pvar,
-				                  "Memory ran out while trying to allocate space to read a known_hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_ALLOC_ERROR", uimsg, _countof(uimsg),
+									"Memory ran out while trying to allocate space to read a known_hosts file.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			_close(fd);
 			return 0;
 		}
 	} else {
 		if (!suppress_errors) {
-			UTIL_get_lang_msg("MSG_HOSTS_READ_ERROR", pvar,
-			                  "An error occurred while trying to read a known_hosts file.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_HOSTS_READ_ERROR", uimsg, _countof(uimsg),
+								"An error occurred while trying to read a known_hosts file.",
+								pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 		}
 		_close(fd);
 		return 0;
@@ -184,9 +191,10 @@ static int begin_read_file(PTInstVar pvar, char *name,
 
 	if (amount_read != length) {
 		if (!suppress_errors) {
-			UTIL_get_lang_msg("MSG_HOSTS_READ_ERROR", pvar,
-			                  "An error occurred while trying to read a known_hosts file.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_HOSTS_READ_ERROR", uimsg, _countof(uimsg),
+								"An error occurred while trying to read a known_hosts file.",
+								pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 		}
 		free(pvar->hosts_state.file_data);
 		pvar->hosts_state.file_data = NULL;
@@ -525,16 +533,18 @@ static int read_host_key(PTInstVar pvar,
 {
 	int i;
 	int while_flg;
+	char uimsg[MAX_UIMSG];
 
 	for (i = 0; hostname[i] != 0; i++) {
 		int ch = hostname[i];
 
 		if (!is_pattern_char(ch) || ch == '*' || ch == '?') {
 			if (!suppress_errors) {
-				UTIL_get_lang_msg("MSG_HOSTS_HOSTNAME_INVALID_ERROR", pvar,
-				                  "The host name contains an invalid character.\n"
-				                  "This session will be terminated.");
-				notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+				UTIL_get_lang_msgU8("MSG_HOSTS_HOSTNAME_INVALID_ERROR", uimsg, _countof(uimsg),
+									"The host name contains an invalid character.\n"
+									"This session will be terminated.",
+									pvar->ts->UILanguageFile);
+				notify_fatal_error(pvar, uimsg, TRUE);
 			}
 			return 0;
 		}
@@ -542,10 +552,11 @@ static int read_host_key(PTInstVar pvar,
 
 	if (i == 0) {
 		if (!suppress_errors) {
-			UTIL_get_lang_msg("MSG_HOSTS_HOSTNAME_EMPTY_ERROR", pvar,
-			                  "The host name should not be empty.\n"
-			                  "This session will be terminated.");
-			notify_fatal_error(pvar, pvar->ts->UIMsg, TRUE);
+			UTIL_get_lang_msgU8("MSG_HOSTS_HOSTNAME_EMPTY_ERROR", uimsg, _countof(uimsg),
+								"The host name should not be empty.\n"
+								"This session will be terminated.",
+								pvar->ts->UILanguageFile);
+			notify_fatal_error(pvar, uimsg, TRUE);
 		}
 		return 0;
 	}
@@ -974,22 +985,26 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 
 static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 {
-	char buf[1024];
-	char buf2[2048];
+	TCHAR buf[1024];
+	TCHAR buf2[2048];
 	int i, j;
 	int ch;
 
 	// static text‚Ì # •”•ª‚ðƒzƒXƒg–¼‚É’uŠ·‚·‚é
-	GetDlgItemText(dlg, IDC_HOSTWARNING, buf, sizeof(buf));
+	GetDlgItemText(dlg, IDC_HOSTWARNING, buf, _countof(buf));
 	for (i = 0; (ch = buf[i]) != 0 && ch != '#'; i++) {
 		buf2[i] = ch;
 	}
-	strncpy_s(buf2 + i, sizeof(buf2) - i,
-	          pvar->hosts_state.prefetched_hostname, _TRUNCATE);
-	j = i + strlen(buf2 + i);
+	{
+		const TCHAR *hostname = ToTcharU8(pvar->hosts_state.prefetched_hostname);
+		_tcsncpy_s(buf2 + i, sizeof(buf2) - i,
+				   hostname, _TRUNCATE);
+		free((void *)hostname);
+	}
+	j = i + _tcslen(buf2 + i);
 	for (; buf[i] == '#'; i++) {
 	}
-	strncpy_s(buf2 + j, sizeof(buf2) - j, buf + i, _TRUNCATE);
+	_tcsncpy_s(buf2 + j, sizeof(buf2) - j, buf + i, _TRUNCATE);
 
 	SetDlgItemText(dlg, IDC_HOSTWARNING, buf2);
 
@@ -1222,15 +1237,17 @@ static char *format_specified_host_key(Key *key, char *hostname, unsigned short 
 static void add_host_key(PTInstVar pvar)
 {
 	char *name = NULL;
+	char uimsg[MAX_UIMSG];
 
 	if ( pvar->hosts_state.file_names != NULL)
 		name = pvar->hosts_state.file_names[0];
 
 	if (name == NULL || name[0] == 0) {
-		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
-		                  "The host and its key cannot be added, because no known-hosts file has been specified.\n"
-		                  "Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msgU8("MSG_HOSTS_FILE_UNSPECIFY_ERROR", uimsg, _countof(uimsg),
+							"The host and its key cannot be added, because no known-hosts file has been specified.\n"
+							"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.",
+							pvar->ts->UILanguageFile);
+		notify_nonfatal_error(pvar, uimsg);
 	} else {
 		char *keydata = format_host_key(pvar);
 		int length = strlen(keydata);
@@ -1245,15 +1262,17 @@ static void add_host_key(PTInstVar pvar)
 		          _S_IREAD | _S_IWRITE);
 		if (fd == -1) {
 			if (errno == EACCES) {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
-				                  "An error occurred while trying to write the host key.\n"
-				                  "You do not have permission to write to the known-hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_EACCES_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"You do not have permission to write to the known-hosts file.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			} else {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-				                  "An error occurred while trying to write the host key.\n"
-				                  "The host key could not be written.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"The host key could not be written.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			return;
 		}
@@ -1263,10 +1282,11 @@ static void add_host_key(PTInstVar pvar)
 		close_result = _close(fd);
 
 		if (amount_written != length || close_result == -1) {
-			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-			                  "An error occurred while trying to write the host key.\n"
-			                  "The host key could not be written.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+								"An error occurred while trying to write the host key.\n"
+								"The host key could not be written.",
+								pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 		}
 	}
 }
@@ -1277,6 +1297,7 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 	char *name = NULL;
 	char *hostname;
 	unsigned short tcpport;
+	char uimsg[MAX_UIMSG];
 
 	hostname = pvar->ssh_state.hostname;
 	tcpport = pvar->ssh_state.tcpport;
@@ -1285,10 +1306,11 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 		name = pvar->hosts_state.file_names[0];
 
 	if (name == NULL || name[0] == 0) {
-		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
-			"The host and its key cannot be added, because no known-hosts file has been specified.\n"
-			"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msgU8("MSG_HOSTS_FILE_UNSPECIFY_ERROR", uimsg, _countof(uimsg),
+							"The host and its key cannot be added, because no known-hosts file has been specified.\n"
+							"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.",
+							pvar->ts->UILanguageFile);
+		notify_nonfatal_error(pvar, uimsg);
 	}
 	else {
 		char *keydata = format_specified_host_key(key, hostname, tcpport);
@@ -1304,16 +1326,18 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 			_S_IREAD | _S_IWRITE);
 		if (fd == -1) {
 			if (errno == EACCES) {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
-					"An error occurred while trying to write the host key.\n"
-					"You do not have permission to write to the known-hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_EACCES_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"You do not have permission to write to the known-hosts file.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			else {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-					"An error occurred while trying to write the host key.\n"
-					"The host key could not be written.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"The host key could not be written.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			return;
 		}
@@ -1323,10 +1347,11 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 		close_result = _close(fd);
 
 		if (amount_written != length || close_result == -1) {
-			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-				"An error occurred while trying to write the host key.\n"
-				"The host key could not be written.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+								"An error occurred while trying to write the host key.\n"
+								"The host key could not be written.",
+								pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 		}
 	}
 }
@@ -1338,12 +1363,14 @@ void HOSTS_add_host_key(PTInstVar pvar, Key *key)
 static void delete_different_key(PTInstVar pvar)
 {
 	char *name = pvar->hosts_state.file_names[0];
+	char uimsg[MAX_UIMSG];
 
 	if (name == NULL || name[0] == 0) {
-		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
-		                  "The host and its key cannot be added, because no known-hosts file has been specified.\n"
-		                  "Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msgU8("MSG_HOSTS_FILE_UNSPECIFY_ERROR", uimsg, _countof(uimsg),
+							"The host and its key cannot be added, because no known-hosts file has been specified.\n"
+							"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.",
+							pvar->ts->UILanguageFile);
+		notify_nonfatal_error(pvar, uimsg);
 	}
 	else {
 		Key key; // known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
@@ -1366,15 +1393,18 @@ static void delete_different_key(PTInstVar pvar)
 
 		if (fd == -1) {
 			if (errno == EACCES) {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
-				                  "An error occurred while trying to write the host key.\n"
-				                  "You do not have permission to write to the known-hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_EACCES_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"You do not have permission to write to the known-hosts file.",
+									pvar->ts->UILanguageFile);
+
+				notify_nonfatal_error(pvar, uimsg);
 			} else {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-				                  "An error occurred while trying to write the host key.\n"
-				                  "The host key could not be written.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"The host key could not be written.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			return;
 		}
@@ -1496,10 +1526,11 @@ static void delete_different_key(PTInstVar pvar)
 error1:
 		close_result = _close(fd);
 		if (amount_written != length || close_result == -1) {
-			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-			                  "An error occurred while trying to write the host key.\n"
-			                  "The host key could not be written.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+								"An error occurred while trying to write the host key.\n"
+								"The host key could not be written.",
+								pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 			goto error2;
 		}
 
@@ -1524,15 +1555,17 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 	char *name = pvar->hosts_state.file_names[0];
 	char *hostname;
 	unsigned short tcpport;
+	char uimsg[MAX_UIMSG];
 
 	hostname = pvar->ssh_state.hostname;
 	tcpport = pvar->ssh_state.tcpport;
 
 	if (name == NULL || name[0] == 0) {
-		UTIL_get_lang_msg("MSG_HOSTS_FILE_UNSPECIFY_ERROR", pvar,
-			"The host and its key cannot be added, because no known-hosts file has been specified.\n"
-			"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.");
-		notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+		UTIL_get_lang_msgU8("MSG_HOSTS_FILE_UNSPECIFY_ERROR", uimsg, _countof(uimsg),
+							"The host and its key cannot be added, because no known-hosts file has been specified.\n"
+							"Restart Tera Term and specify a read/write known-hosts file in the TTSSH Setup dialog box.",
+							pvar->ts->UILanguageFile);
+		notify_nonfatal_error(pvar, uimsg);
 	}
 	else {
 		Key key; // known_hosts‚É“o˜^‚³‚ê‚Ä‚¢‚éŒ®
@@ -1555,16 +1588,18 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 
 		if (fd == -1) {
 			if (errno == EACCES) {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_EACCES_ERROR", pvar,
-					"An error occurred while trying to write the host key.\n"
-					"You do not have permission to write to the known-hosts file.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_EACCES_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"You do not have permission to write to the known-hosts file.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			else {
-				UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-					"An error occurred while trying to write the host key.\n"
-					"The host key could not be written.");
-				notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+				UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+									"An error occurred while trying to write the host key.\n"
+									"The host key could not be written.",
+									pvar->ts->UILanguageFile);
+				notify_nonfatal_error(pvar, uimsg);
 			}
 			return;
 		}
@@ -1683,10 +1718,11 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 	error1:
 		close_result = _close(fd);
 		if (amount_written != length || close_result == -1) {
-			UTIL_get_lang_msg("MSG_HOSTS_WRITE_ERROR", pvar,
-				"An error occurred while trying to write the host key.\n"
-				"The host key could not be written.");
-			notify_nonfatal_error(pvar, pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_HOSTS_WRITE_ERROR", uimsg, _countof(uimsg),
+								"An error occurred while trying to write the host key.\n"
+								"The host key could not be written.",
+								pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 			goto error2;
 		}
 
@@ -1728,6 +1764,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	PTInstVar pvar;
 //	LOGFONT logfont;
 //	HFONT font;
+	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1740,13 +1777,13 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
+		SetWindowText(dlg, uimsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDC_HOSTWARNING, uimsg);
 		GetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_WARNING2", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_HOSTWARNING2, pvar->ts->UIMsg);
+		SetDlgItemText(dlg, IDC_HOSTWARNING2, uimsg);
 		GetDlgItemText(dlg, IDC_HOSTFINGERPRINT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_FINGERPRINT", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_HOSTFINGERPRINT, pvar->ts->UIMsg);
@@ -1765,23 +1802,31 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 #endif
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_NOTFOUND", uimsg, _countof(uimsg),
+							   _T("No host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_AUTH_MATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "Matching host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_MATCH", uimsg, _countof(uimsg),
+							   _T("Matching host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "Mismatching host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_MISMATCH", uimsg, _countof(uimsg),
+							   _T("Mismatching host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_DIFFERENTTYPE:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "Mismatching host key type found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_DIFFTYPE", uimsg, _countof(uimsg),
+							   _T("Mismatching host key type found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		}
 
@@ -1789,14 +1834,18 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "Found insecure fingerprint in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_DNSSEC_NG", uimsg, _countof(uimsg),
+							   _T("Found insecure fingerprint in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, uimsg);
 			break;
 		case DNS_VERIFY_AUTH_MATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "Found secure fingerprint in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_DNSSEC_OK", uimsg, _countof(uimsg),
+							   _T("Found secure fingerprint in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, uimsg);
 			break;
 		}
 
@@ -1905,6 +1954,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	PTInstVar pvar;
 //	LOGFONT logfont;
 //	HFONT font;
+	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1942,23 +1992,31 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 #endif
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_NOTFOUND", uimsg, _countof(uimsg),
+							   _T("No host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_AUTH_MATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "Matching host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_MATCH", uimsg, _countof(uimsg),
+							   _T("Matching host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "Mismatching host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_MISMATCH", uimsg, _countof(uimsg),
+							   _T("Mismatching host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_DIFFERENTTYPE:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "Mismatching host key type found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_DIFFTYPE", uimsg, _countof(uimsg),
+							   _T("Mismatching host key type found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		}
 
@@ -1966,14 +2024,18 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "Found insecure fingerprint in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_DNSSEC_NG", uimsg, _countof(uimsg),
+							   _T( "Found insecure fingerprint in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, uimsg);
 			break;
 		case DNS_VERIFY_AUTH_MATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "Found secure fingerprint in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_DNSSEC_OK", uimsg, _countof(uimsg),
+							   _T("Found secure fingerprint in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, uimsg);
 			break;
 		}
 
@@ -2080,6 +2142,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	PTInstVar pvar;
 //	LOGFONT logfont;
 //	HFONT font;
+	TCHAR uimsg[MAX_UIMSG];
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -2117,23 +2180,31 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 #endif
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_NOTFOUND", uimsg, _countof(uimsg),
+							   _T("No host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_AUTH_MATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MATCH", pvar, "Matching host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_MATCH", uimsg, _countof(uimsg),
+							   _T("Matching host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_MISMATCH", pvar, "Mismatching host key fingerprint found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_MISMATCH", uimsg, _countof(uimsg),
+							   _T("Mismatching host key fingerprint found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		case DNS_VERIFY_DIFFERENTTYPE:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_DIFFTYPE", pvar, "Mismatching host key type found in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_SSHFP_DIFFTYPE", uimsg, _countof(uimsg),
+							   _T("Mismatching host key type found in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPCHECK, uimsg);
 			break;
 		}
 
@@ -2141,14 +2212,18 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case DNS_VERIFY_MATCH:
 		case DNS_VERIFY_MISMATCH:
 		case DNS_VERIFY_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_NG", pvar, "Found insecure fingerprint in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_DNSSEC_NG", uimsg, _countof(uimsg),
+							   _T("Found insecure fingerprint in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, uimsg);
 			break;
 		case DNS_VERIFY_AUTH_MATCH:
 		case DNS_VERIFY_AUTH_MISMATCH:
 		case DNS_VERIFY_AUTH_DIFFERENTTYPE:
-			UTIL_get_lang_msg("DLG_HOSTKEY_DNSSEC_OK", pvar, "Found secure fingerprint in DNS.");
-			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, pvar->ts->UIMsg);
+			UTIL_get_lang_msgT("DLG_HOSTKEY_DNSSEC_OK", uimsg, _countof(uimsg),
+							   _T("Found secure fingerprint in DNS."),
+							   pvar->ts->UILanguageFile);
+			SetDlgItemText(dlg, IDC_HOSTSSHFPDNSSEC, uimsg);
 			break;
 		}
 

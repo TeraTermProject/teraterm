@@ -32,6 +32,7 @@
 #include <openssl/rand.h>
 #include "util.h"
 #include <stdlib.h>
+#include <tchar.h>
 
 typedef struct {
 	PTInstVar pvar;
@@ -251,6 +252,7 @@ static void insert_real_X11_auth_data(X11UnspoofingFilterClosure *
 
 FwdFilterResult X11_unspoofing_filter(void *void_closure, FwdFilterEvent event, int *length, unsigned char **buf)
 {
+	char uimsg[MAX_UIMSG];
 	X11UnspoofingFilterClosure *closure =
 		(X11UnspoofingFilterClosure *) void_closure;
 
@@ -270,10 +272,11 @@ FwdFilterResult X11_unspoofing_filter(void *void_closure, FwdFilterEvent event, 
 			return FWD_FILTER_REMOVE;
 		default:
 		case MERGE_GOT_BAD_DATA:
-			UTIL_get_lang_msg("MSG_X_AUTH_ERROR", closure->pvar,
-			                  "Remote X application sent incorrect authentication data.\n"
-			                  "Its X session is being cancelled.");
-			notify_nonfatal_error(closure->pvar, closure->pvar->ts->UIMsg);
+			UTIL_get_lang_msgU8("MSG_X_AUTH_ERROR", uimsg, _countof(uimsg),
+								"Remote X application sent incorrect authentication data.\n"
+								"Its X session is being cancelled.",
+								closure->pvar->ts->UILanguageFile);
+			notify_nonfatal_error(closure->pvar, uimsg);
 			*length = 0;
 			return FWD_FILTER_CLOSECHANNEL;
 		}
