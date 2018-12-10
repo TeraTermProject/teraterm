@@ -83,8 +83,11 @@ void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int 
 void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
-void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-void get_lang_msgT(const char *key, TCHAR *buf, int buf_len, const TCHAR *def, const char *iniFile);
+DllExport void set_lang_section(const char *section);
+DllExport void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+#if defined(UNICODE)
+DllExport void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
+#endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
 DllExport void OutputDebugPrintf(const char *fmt, ...);
@@ -121,6 +124,12 @@ BOOL GetPositionOnWindow(
 	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
+
+#if defined(_UNICODE)
+#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
+#else
+#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
+#endif
 
 #ifdef __cplusplus
 }

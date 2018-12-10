@@ -28,13 +28,7 @@
 
 #include "i18n.h"
 
-#include <assert.h>
-
-DllExport void GetI18nStrT(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
-{
-	assert(FALSE);
-}
-
+#if defined(UNICODE)
 DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
 {
 	wchar_t sectionW[64];
@@ -46,6 +40,7 @@ DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, i
 	GetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
 	RestoreNewLineW(buf);
 }
+#endif
 
 DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {

@@ -1,8 +1,5 @@
 project(teraterm)
 
-option(USE_UNICODE_API "unicode" ON)
-option(LINK_UNICOWS "unicode APIs for 9x" OFF)
-
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 

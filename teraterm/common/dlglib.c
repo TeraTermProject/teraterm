@@ -391,7 +391,7 @@ void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const
 		const int nIDDlgItem = infos[i].nIDDlgItem;
 		const char *key = infos[i].key;
 		TCHAR uimsg[MAX_UIMSG];
- 		get_lang_msgT(key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		get_lang_msgT(key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
 		if (uimsg[0] != '\0') {
 			if (nIDDlgItem < 1000) {
 				ModifyMenu(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);

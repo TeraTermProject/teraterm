@@ -45,7 +45,7 @@
 
                 dwMajorVersion   dwMinorVersion    dwPlatformId
 Windows95       4                0                 VER_PLATFORM_WIN32_WINDOWS
-Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS 
+Windows98       4                10                VER_PLATFORM_WIN32_WINDOWS
 WindowsMe       4                90                VER_PLATFORM_WIN32_WINDOWS
 WindowsNT4.0    4                0                 VER_PLATFORM_WIN32_NT
 Windows2000     5                0                 VER_PLATFORM_WIN32_NT
@@ -75,7 +75,7 @@ static char *invalidFileNameStrings[] = {
 	"AUX", "CLOCK$", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
 	"CON", "CONFIG$", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
 	"NUL", "PRN",
-	".", "..", 
+	".", "..",
 	NULL
 };
 
@@ -100,6 +100,8 @@ static char b64dec_table[] = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
+
+static const char *lang_section = "Tera Term";
 
 void b64encode(PCHAR d, int dsize, PCHAR s, int len)
 {
@@ -886,7 +888,7 @@ int GetNthNum2(PCHAR Source, int Nth, int defval)
 	if (sscanf(T, "%d", &v) != 1) {
 		v = defval;
 	}
-	
+
 	return v;
 }
 
@@ -977,7 +979,7 @@ void GetUILanguageFile(char *buf, int buflen)
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
-	
+
 	/* Get LanguageFile name */
 	GetPrivateProfileStringA("Tera Term", "UILanguageFile", "",
 	                        Temp, sizeof(Temp), SetupFName);
@@ -1004,7 +1006,7 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 
 	/* Get SetupFName */
 	GetDefaultSetupFName(HomeDir, SetupFName, sizeof(SetupFName));
-	
+
 	/* Get LanguageFile name */
 	GetPrivateProfileStringA("Tera Term", entry, "off",
 	                        Temp, sizeof(Temp), SetupFName);
@@ -1012,23 +1014,26 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	strncpy_s(buf, buflen, Temp, _TRUNCATE);
 }
 
-void get_lang_msgT(const char *key, TCHAR *buf, int buf_len, const TCHAR *def, const char *iniFile)
+void set_lang_section(const char *section)
 {
-#if defined(UNICODE)
-	GetI18nStrW("Tera Term", key, buf, buf_len, def, iniFile);
-#else	
-	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
-#endif
+	lang_section = section;
 }
+
+#if defined(UNICODE)
+void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
+{
+	GetI18nStrW(lang_section, key, buf, buf_len, def, iniFile);
+}
+#endif
 
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
-	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
+	GetI18nStr(lang_section, key, buf, buf_len, def, iniFile);
 }
 
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
-	if (GetI18nLogfont("Tera Term", key, logfont,
+	if (GetI18nLogfont(lang_section, key, logfont,
 	                   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
 	                   iniFile) == FALSE) {
 		return FALSE;
@@ -1078,9 +1083,9 @@ BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
 	bi.ulFlags = 0;
 	bi.lpfn = setDefaultFolder;
 	bi.lParam = (LPARAM)def;
-	// フォルダ選択ダイアログの表示 
+	// フォルダ選択ダイアログの表示
 	pidlBrowse = SHBrowseForFolderA(&bi);
-	if (pidlBrowse != NULL) {  
+	if (pidlBrowse != NULL) {
 		// PIDL形式の戻り値のファイルシステムのパスに変換
 		if (SHGetPathFromIDListA(pidlBrowse, buf)) {
 			// 取得成功
