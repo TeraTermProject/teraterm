@@ -30,6 +30,8 @@ set(COMMON_SRC
   ../common/ttftypes.h
   ../common/ttcommon.h
   ../common/tt_res.h
+  ../common/codeconv.h
+  ../common/codeconv.cpp
   )
 
 source_group(
@@ -43,6 +45,7 @@ set(SRC
   language.c
   language.h
   ttcmn.c
+  ttcmn_notify.c
   ttpcmn-version.rc
   ${COMMON_SRC}
   )

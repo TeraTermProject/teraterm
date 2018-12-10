@@ -95,7 +95,7 @@ DllExport int WINAPI CommTextEcho(PComVar cv, PCHAR B, int C);
 
 DllExport void WINAPI CreateNotifyIcon(PComVar cv);
 DllExport void WINAPI DeleteNotifyIcon(PComVar cv);
-DllExport void WINAPI NotifyMessage(PComVar cv, PCHAR message, PCHAR title, DWORD flag);
+DllExport void WINAPI NotifyMessage(PComVar cv, const TCHAR *message, const TCHAR *title, DWORD flag);
 DllExport void WINAPI ShowNotifyIcon(PComVar cv);
 DllExport void WINAPI HideNotifyIcon(PComVar cv);
 DllExport void WINAPI SetVerNotifyIcon(PComVar cv, unsigned int ver);

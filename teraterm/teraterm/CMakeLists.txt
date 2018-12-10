@@ -45,6 +45,8 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/win16api.h
   ../common/win16api.c
+  ../common/codeconv.h
+  ../common/codeconv.cpp
   )
 
 source_group(

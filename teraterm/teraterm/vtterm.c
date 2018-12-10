@@ -37,6 +37,7 @@
 #include <locale.h>
 #include <ctype.h>
 #include <crtdbg.h>
+#include <tchar.h>
 
 #include "buffer.h"
 #include "ttwinman.h"
@@ -51,6 +52,7 @@
 #include "telnet.h"
 #include "ttime.h"
 #include "clipboar.h"
+#include "codeconv.h"
 
 #include "vtterm.h"
 
@@ -4736,7 +4738,8 @@ void XsProcColor(int mode, unsigned int ColorNumber, char *ColorSpec, BYTE TermC
 void XsProcClipboard(PCHAR buff)
 {
 	int len, blen;
-	char *p, *cbbuff, hdr[20], notify_buff[256], notify_title[MAX_UIMSG];
+	char *p, *cbbuff, hdr[20];
+	TCHAR notify_buff[256], notify_title[MAX_UIMSG];
 	HGLOBAL cbmem;
 	int wide_len;
 	HGLOBAL wide_cbmem;
@@ -4751,10 +4754,10 @@ void XsProcClipboard(PCHAR buff)
 		if (*p == '?' && *(p+1) == 0) { // Read access
 			if (ts.CtrlFlag & CSF_CBREAD) {
 				if (ts.NotifyClipboardAccess) {
-					get_lang_msg("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
-					             "Clipboard Access", ts.UILanguageFile);
-					get_lang_msg("MSG_CBACCESS_READ", notify_buff, sizeof(notify_buff),
-					             "Remote host reads clipboard contents.", ts.UILanguageFile);
+					get_lang_msgT("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
+								  _T("Clipboard Access"), ts.UILanguageFile);
+					get_lang_msgT("MSG_CBACCESS_READ", notify_buff, sizeof(notify_buff),
+								  _T("Remote host reads clipboard contents."), ts.UILanguageFile);
 					NotifyInfoMessage(&cv, notify_buff, notify_title);
 				}
 				strncpy_s(hdr, sizeof(hdr), "\033]52;", _TRUNCATE);
@@ -4763,10 +4766,10 @@ void XsProcClipboard(PCHAR buff)
 				}
 			}
 			else if (ts.NotifyClipboardAccess) {
-				get_lang_msg("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
-				             "Rejected Clipboard Access", ts.UILanguageFile);
-				get_lang_msg("MSG_CBACCESS_READ_REJECT", notify_buff, sizeof(notify_buff),
-				             "Reject clipboard read access from remote.", ts.UILanguageFile);
+				get_lang_msgT("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
+							  _T("Rejected Clipboard Access"), ts.UILanguageFile);
+				get_lang_msgT("MSG_CBACCESS_READ_REJECT", notify_buff, sizeof(notify_buff),
+							  _T("Reject clipboard read access from remote."), ts.UILanguageFile);
 				NotifyWarnMessage(&cv, notify_buff, notify_title);
 			}
 		}
@@ -4794,11 +4797,15 @@ void XsProcClipboard(PCHAR buff)
 			GlobalUnlock(cbmem);
 
 			if (ts.NotifyClipboardAccess) {
-				get_lang_msg("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
-				             "Clipboard Access", ts.UILanguageFile);
-				get_lang_msg("MSG_CBACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg),
-				             "Remote host wirtes clipboard.", ts.UILanguageFile);
-				_snprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, "%s\n--\n%s", ts.UIMsg, cbbuff);
+				TCHAR buff[256];
+				const TCHAR *cbbuffT;
+				get_lang_msgT("MSG_CBACCESS_TITLE", notify_title, sizeof(notify_title),
+							  _T("Clipboard Access"), ts.UILanguageFile);
+				get_lang_msgT("MSG_CBACCESS_WRITE", buff, sizeof(buff),
+							  _T("Remote host wirtes clipboard."), ts.UILanguageFile);
+				cbbuffT = ToTcharA(cbbuff);
+				_sntprintf_s(notify_buff, sizeof(notify_buff), _TRUNCATE, _T("%s\n--\n%s"), buff, cbbuffT);
+				free((void *)cbbuffT);
 				NotifyInfoMessage(&cv, notify_buff, notify_title);
 			}
 
@@ -4820,10 +4827,10 @@ void XsProcClipboard(PCHAR buff)
 			}
 		}
 		else if (ts.NotifyClipboardAccess) {
-			get_lang_msg("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
-			             "Rejected Clipboard Access", ts.UILanguageFile);
-			get_lang_msg("MSG_CBACCESS_WRITE_REJECT", notify_buff, sizeof(notify_buff),
-			             "Reject clipboard write access from remote.", ts.UILanguageFile);
+			get_lang_msgT("MSG_CBACCESS_REJECT_TITLE", notify_title, sizeof(notify_title),
+						  _T("Rejected Clipboard Access"), ts.UILanguageFile);
+			get_lang_msgT("MSG_CBACCESS_WRITE_REJECT", notify_buff, sizeof(notify_buff),
+						  _T("Reject clipboard write access from remote."), ts.UILanguageFile);
 			NotifyWarnMessage(&cv, notify_buff, notify_title);
 		}
 	}

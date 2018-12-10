@@ -154,7 +154,7 @@ void CommInit(PComVar cv)
 	cv->isSSH = 0;
 	cv->TitleRemote[0] = '\0';
 
-	cv->NotifyIcon = NULL;
+	cv->CmnNotifyData = NULL;
 
 	cv->ConnectedTime = 0;
 }

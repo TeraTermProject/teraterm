@@ -1087,7 +1087,7 @@ typedef struct {
 	_locale_t locale;
 	BOOL VirtualStoreEnabled;
 
-	NOTIFYICONDATA *NotifyIcon;
+	void *CmnNotifyData;
 
 	DWORD ConnectedTime;
 } TComVar;
