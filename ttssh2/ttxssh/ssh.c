@@ -73,10 +73,6 @@
 #define GetPrivateProfileInt GetPrivateProfileIntA
 #undef WritePrivateProfileString
 #define WritePrivateProfileString WritePrivateProfileStringA
-#if 0
-#undef MessageBox
-#define MessageBox MessageBoxA
-#endif
 #undef GetDlgItemText
 #define GetDlgItemText GetDlgItemTextA
 #undef SetDlgItemText
@@ -4103,8 +4099,14 @@ static int MessageBoxU8(HWND hWnd, const char *textU8, const char *captionU8, UI
 	return r;
 }
 
-#undef MessageBox
-#define MessageBox(p1,p2,p3,p4) MessageBoxU8(p1,p2,p3,p4)
+static void NotifyInfoMessageU8(PComVar cv, const char *message, const char *title)
+{
+	const TCHAR *messageT = ToTcharU8(message);
+	const TCHAR *titleT = ToTcharU8(title);
+	NotifyMessage(cv, messageT, titleT, 1);
+	free((void *)messageT);
+	free((void *)titleT);
+}
 
 int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_dir direction)
 {
@@ -4139,7 +4141,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		if (fp == NULL) {
 			char buf[80];
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "fopen: %d", GetLastError());
-			MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
+			MessageBoxU8(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
 			goto error;
 		}
 
@@ -4183,11 +4185,11 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 			int dlgresult;
 			if (_access(c->scp.localfilefull, 0x02) == -1) { // 0x02 == writable
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file is read only.", c->scp.localfilefull);
-				MessageBox(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
+				MessageBoxU8(NULL, buf, "TTSSH: file open error", MB_OK | MB_ICONERROR);
 				goto error;
 			}
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "`%s' file exists. (%d)\noverwrite it?", c->scp.localfilefull, GetLastError());
-			dlgresult = MessageBox(NULL, buf, "TTSSH: confirm", MB_YESNO | MB_ICONERROR);
+			dlgresult = MessageBoxU8(NULL, buf, "TTSSH: confirm", MB_YESNO | MB_ICONERROR);
 			if (dlgresult == IDNO) {
 				goto error;
 			}
@@ -4197,7 +4199,7 @@ int SSH_scp_transaction(PTInstVar pvar, char *sendfile, char *dstfile, enum scp_
 		if (fp == NULL) {
 			char buf[512];
 			_snprintf_s(buf, sizeof(buf), _TRUNCATE, "fopen: %d", GetLastError());
-			MessageBox(NULL, buf, "TTSSH: file open write error", MB_OK | MB_ICONERROR);
+			MessageBoxU8(NULL, buf, "TTSSH: file open write error", MB_OK | MB_ICONERROR);
 			goto error;
 		}
 
@@ -5683,7 +5685,7 @@ static BOOL handle_SSH2_dh_gex_group(PTInstVar pvar)
 		UTIL_get_lang_msgU8("MSG_SSH_GEX_SIZE_TITLE", uimsg, _countof(uimsg),
 							"TTSSH: Confirm GEX group size",
 							pvar->ts->UILanguageFile);
-		if (MessageBox(NULL, tmpbuf, uimsg, MB_YESNO | MB_ICONERROR) == IDNO) {
+		if (MessageBoxU8(NULL, tmpbuf, uimsg, MB_YESNO | MB_ICONERROR) == IDNO) {
 			UTIL_get_lang_msgU8("MSG_SSH_GEX_SIZE_CANCEL", uimsg, _countof(uimsg),
 								"New connection is cancelled.",
 								pvar->ts->UILanguageFile);
@@ -7167,10 +7169,10 @@ static BOOL handle_SSH2_userauth_banner(PTInstVar pvar)
 			}
 			break;
 		case 2:
-			MessageBox(pvar->cv->HWin, msg, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
+			MessageBoxU8(pvar->cv->HWin, msg, "Authentication Banner", MB_OK | MB_ICONINFORMATION);
 			break;
 		case 3:
-			NotifyInfoMessage(pvar->cv, msg, "Authentication Banner");
+			NotifyInfoMessageU8(pvar->cv, msg, "Authentication Banner");
 			break;
 		}
 		logprintf(LOG_LEVEL_NOTICE, "Banner len: %d, Banner message: %s.", msglen, msg);
@@ -7297,7 +7299,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 	// パスワード変更の場合、メッセージがあれば、表示する。(2010.11.11 yutaka)
 	if (num == 0) {
 		if (strlen(lprompt) > 0) 
-			MessageBox(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
+			MessageBoxU8(pvar->cv->HWin, lprompt, "USERAUTH INFO_REQUEST", MB_OK | MB_ICONINFORMATION);
 	}
 
 	// プロンプトの数だけ prompt & echo が繰り返される。
@@ -7534,7 +7536,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 				UTIL_get_lang_msgU8("MSG_PASSCHG_MISMATCH", uimsg, _countof(uimsg),
 									"Mismatch; try again.",
 									pvar->ts->UILanguageFile);
-				MessageBox(NULL, uimsg, "ERROR", MB_OK | MB_ICONEXCLAMATION);
+				MessageBoxU8(NULL, uimsg, "ERROR", MB_OK | MB_ICONEXCLAMATION);
 				return FALSE;
 			}
 
@@ -8518,7 +8520,7 @@ static void SSH2_scp_toremote(PTInstVar pvar, Channel_t *c, unsigned char *data,
 		ssh2_channel_send_close(pvar, c);
 		//ssh2_channel_delete(c);  // free channel
 
-		//MessageBox(NULL, "SCP sending done.", "TTSSH", MB_OK);
+		//MessageBoxU8(NULL, "SCP sending done.", "TTSSH", MB_OK);
 	}
 }
 
@@ -8782,7 +8784,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			copylen = min(buflen, sizeof(msg));
 			memcpy(msg, data, copylen);
 			msg[copylen - 1] = 0;
-			MessageBox(NULL, msg, "TTSSH: SCP error(SCP_INIT)", MB_OK | MB_ICONEXCLAMATION);
+			MessageBoxU8(NULL, msg, "TTSSH: SCP error(SCP_INIT)", MB_OK | MB_ICONEXCLAMATION);
 
 		}
 
@@ -8864,7 +8866,7 @@ error:
 			//ssh2_channel_send_close(pvar, c);
 		}
 
-		MessageBox(NULL, msg, "TTSSH: SCP error", MB_OK | MB_ICONEXCLAMATION);
+		MessageBoxU8(NULL, msg, "TTSSH: SCP error", MB_OK | MB_ICONEXCLAMATION);
 	}
 }
 
@@ -9464,14 +9466,14 @@ static BOOL SSH_agent_response(PTInstVar pvar, Channel_t *c, int local_channel_n
 				__FUNCTION__ ": Agent Forwarding Error: server request is too large. "
 				"size=%u, allowd max=%u.", req_len, AGENT_MAX_MSGLEN-4);
 			if (pvar->session_settings.ForwardAgentNotify) {
-				char title[MAX_UIMSG];
-				char uimsg[MAX_UIMSG];
-				UTIL_get_lang_msgU8("MSG_SSH_AGENTERROR_TITLE", title, _countof(title),
-									"Bad agent request",
-									pvar->ts->UILanguageFile);
-				UTIL_get_lang_msgU8("MSG_SSH_AGENTERROR_TOOLARGE", uimsg, _countof(uimsg),
-									"Agent request size is too large, ignore it.",
-									pvar->ts->UILanguageFile);
+				TCHAR title[MAX_UIMSG];
+				TCHAR uimsg[MAX_UIMSG];
+				UTIL_get_lang_msgT("MSG_SSH_AGENTERROR_TITLE", title, _countof(title),
+								   _T("Bad agent request"),
+								   pvar->ts->UILanguageFile);
+				UTIL_get_lang_msgT("MSG_SSH_AGENTERROR_TOOLARGE", uimsg, _countof(uimsg),
+								   _T("Agent request size is too large, ignore it."),
+								   pvar->ts->UILanguageFile);
 				NotifyInfoMessage(pvar->cv, uimsg, title);
 			}
 

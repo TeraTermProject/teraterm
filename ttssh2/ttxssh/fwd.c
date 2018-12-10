@@ -1879,13 +1879,13 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 	HWND cur_active = GetActiveWindow();
 
 	if (pvar->session_settings.ForwardAgentNotify) {
-		char title[MAX_UIMSG];
-		char uimsg[MAX_UIMSG];
-		UTIL_get_lang_msgU8("MSG_FWD_AGENT_NOTIFY_TITLE", title, _countof(title),
-							"Agent Forwarding",
-							pvar->ts->UILanguageFile);
-		UTIL_get_lang_msgU8("MSG_FWD_AGENT_NOTIFY", uimsg, _countof(uimsg),
-							"Remote host access to agent",
+		TCHAR title[MAX_UIMSG];
+		TCHAR uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgT("MSG_FWD_AGENT_NOTIFY_TITLE", title, _countof(title),
+						   _T("Agent Forwarding"),
+						   pvar->ts->UILanguageFile);
+		UTIL_get_lang_msgT("MSG_FWD_AGENT_NOTIFY", uimsg, _countof(uimsg),
+						   _T("Remote host access to agent"),
 							pvar->ts->UILanguageFile);
 		NotifyInfoMessage(pvar->cv, uimsg, title);
 	}
