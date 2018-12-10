@@ -390,7 +390,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\win16_api.c"
+				RelativePath="..\common\win16api.c"
 				>
 			</File>
 		</Filter>
@@ -419,7 +419,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\win16_api.h"
+				RelativePath="..\common\win16api.h"
 				>
 			</File>
 		</Filter>
