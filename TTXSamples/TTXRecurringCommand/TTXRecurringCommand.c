@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <tchar.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttplugin.h"
@@ -8,8 +9,25 @@
 #include "tt_res.h"
 #include "resource.h"
 #include "i18n.h"
+#include "dlglib.h"
 
 #include "compat_w95.h"
+
+#if defined(UNICODE)
+#undef GetPrivateProfileString
+#define GetPrivateProfileString GetPrivateProfileStringA
+#undef GetPrivateProfileInt
+#define GetPrivateProfileInt GetPrivateProfileIntA
+#undef WritePrivateProfileString
+#define WritePrivateProfileString WritePrivateProfileStringA
+#undef GetModuleFileName
+#define GetModuleFileName GetModuleFileNameA
+#endif
+
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) TTEndDialog(p1, p2)
 
 #define ORDER 4000
 
@@ -429,23 +447,24 @@ static void PASCAL TTXGetSetupHooks(TTXSetupHooks *hooks) {
 //	コントロールメニューにRecurringCommandを追加。
 //
 static void PASCAL TTXModifyMenu(HMENU menu) {
+	TCHAR uimsg[MAX_UIMSG];
 	UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 	pvar->SetupMenu = GetSetupMenu(menu);
 	pvar->ControlMenu = GetControlMenu(menu);
 
-	GetI18nStr(SECTION, "MENU_SETUP_RECURRING", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-		"Rec&urring command", pvar->ts->UILanguageFile);
-	InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETUP, pvar->ts->UIMsg);
+	GetI18nStrT(SECTION, "MENU_SETUP_RECURRING", uimsg, _countof(uimsg),
+			   _T("Rec&urring command"), pvar->ts->UILanguageFile);
+	InsertMenu(pvar->SetupMenu, ID_SETUP_ADDITIONALSETTINGS, flag, ID_MENU_SETUP, uimsg);
 
 	if (pvar->enable) {
 		flag |= MF_CHECKED;
 	}
 
 
-	GetI18nStr(SECTION, "MENU_CONTROL_RECURRING", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-		"Rec&urring command", pvar->ts->UILanguageFile);
-	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, pvar->ts->UIMsg);
+	GetI18nStrT(SECTION, "MENU_CONTROL_RECURRING", uimsg, _countof(uimsg),
+			   _T("Rec&urring command"), pvar->ts->UILanguageFile);
+	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, flag, ID_MENU_CONTROL, uimsg);
 	InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
 
@@ -464,13 +483,21 @@ static void PASCAL TTXModifyPopupMenu(HMENU menu) {
 // RecurringCommand設定ダイアログのコールバック関数。
 //
 static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam) {
-	char uimsg[MAX_UIMSG];
-	static HFONT DlgFont;
-	LOGFONT logfont;
-	HFONT font;
+	static const DlgTextInfo TextInfos[] = {
+		{ 0, "DLG_TITLE" },
+		{ IDC_ENABLE, "DLG_ENABLE" },
+		{ IDC_INTERVAL_LABEL, "DLG_INTERVAL" },
+		{ IDC_COMMAND_LABEL, "DLG_COMMAND" },
+		{ IDC_ADD_NL, "DLG_ADD_NEWLINE" },
+	};
+//	char uimsg[MAX_UIMSG];
+//	static HFONT DlgFont;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	  case WM_INITDIALOG:
+#if 0
 	  	font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 
@@ -487,7 +514,9 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		else {
 			DlgFont = NULL;
 		}
-
+#endif
+		SetDlgTexts(dlg, TextInfos, _countof(TextInfos), pvar->ts->UILanguageFile);
+#if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		GetI18nStr(SECTION, "DLG_TITLE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
 		SetWindowText(dlg, pvar->ts->UIMsg);
@@ -507,11 +536,11 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 		GetDlgItemText(dlg, IDC_ADD_NL, uimsg, sizeof(uimsg));
 		GetI18nStr(SECTION, "DLG_ADD_NEWLINE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);
 		SetDlgItemText(dlg, IDC_ADD_NL, pvar->ts->UIMsg);
-
+#endif
 		SendMessage(GetDlgItem(dlg, IDC_ENABLE), BM_SETCHECK,
 		            pvar->enable?BST_CHECKED:BST_UNCHECKED, 0);
 		SetDlgItemInt(dlg, IDC_INTERVAL, pvar->interval, FALSE);
-		SetDlgItemText(dlg, IDC_COMMAND, pvar->orgCommand);
+		SetDlgItemTextA(dlg, IDC_COMMAND, pvar->orgCommand);
 		SendMessage(GetDlgItem(dlg, IDC_ADD_NL), BM_SETCHECK,
 		            pvar->add_nl?BST_CHECKED:BST_UNCHECKED, 0);
 
@@ -526,7 +555,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 				pvar->interval = MINIMUM_INTERVAL;
 			}
 
-			GetDlgItemText(dlg, IDC_COMMAND, pvar->orgCommand, sizeof(pvar->orgCommand));
+			GetDlgItemTextA(dlg, IDC_COMMAND, pvar->orgCommand, sizeof(pvar->orgCommand));
 			strncpy_s(pvar->command, sizeof(pvar->command), pvar->orgCommand, _TRUNCATE);
 			UnEscapeStr(pvar->command);
 			pvar->cmdLen = (int)strlen(pvar->command);
@@ -548,16 +577,20 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 			}
 
 			EndDialog(dlg, IDOK);
+#if 0
 			if (DlgFont != NULL) {
 				DeleteObject(DlgFont);
 			}
+#endif
 			return TRUE;
 
 		  case IDCANCEL:
 			EndDialog(dlg, IDCANCEL);
+#if 0
 			if (DlgFont != NULL) {
 				DeleteObject(DlgFont);
 			}
+#endif
 			return TRUE;
 		}
 		break;
@@ -578,7 +611,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 		  case IDCANCEL:
 			break;
 		  case -1:
-			MessageBox(hWin, "TTXRecurringCommand: Error", "Can't display dialog box.",
+			MessageBoxA(hWin, "TTXRecurringCommand: Error", "Can't display dialog box.",
 			           MB_OK | MB_ICONEXCLAMATION);
 			break;
 		}
