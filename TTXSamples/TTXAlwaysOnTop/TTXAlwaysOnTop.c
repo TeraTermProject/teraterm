@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <tchar.h>
 
 #include "compat_w95.h"
 
@@ -64,16 +65,17 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv) {
 
 static void PASCAL TTXModifyMenu(HMENU menu) {
   UINT flag = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+  TCHAR uimsg[MAX_UIMSG];
 
   pvar->ControlMenu = GetControlMenu(menu);
   if (pvar->ontop) {
     flag |= MF_CHECKED;
   }
 
-  GetI18nStr(IniSection, "MENU_ALWAYSONTOP", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-             "&Always on top", pvar->ts->UILanguageFile);
+  GetI18nStrT(IniSection, "MENU_ALWAYSONTOP", uimsg, _countof(uimsg),
+			  _T("&Always on top"), pvar->ts->UILanguageFile);
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO,
-		flag, ID_MENU_BASE, pvar->ts->UIMsg);
+			 flag, ID_MENU_BASE, uimsg);
   InsertMenu(pvar->ControlMenu, ID_CONTROL_MACRO,
 		MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 }
