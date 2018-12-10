@@ -31,6 +31,9 @@
 #define _WIN32_IE 0x501
 #endif
 
+#undef UNICODE
+#undef _UNICODE
+
 /* TTCMN.DLL, main */
 #include <direct.h>
 #include <string.h>
