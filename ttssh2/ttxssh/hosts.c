@@ -39,6 +39,7 @@ See LICENSE.TXT for the license.
 #include "key.h"
 #include "hosts.h"
 #include "dns.h"
+#include "dlglib.h"
 
 #include <openssl/bn.h>
 #include <openssl/evp.h>
@@ -52,9 +53,22 @@ See LICENSE.TXT for the license.
 #include <direct.h>
 #include <memory.h>
 
+#if defined(UNICODE)
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef GetDlgItemText
+#define GetDlgItemText GetDlgItemTextA
+#endif
 
-static HFONT DlgHostsAddFont;
-static HFONT DlgHostsReplaceFont;
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
+
+//static HFONT DlgHostsAddFont;
+//static HFONT DlgHostsReplaceFont;
 
 // BASE64構成文字列（ここでは'='は含まれていない）
 static char base64[] ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -936,7 +950,7 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 	case SSH_DIGEST_MD5:
 		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_HEX, dgst_alg);
 		if (fp != NULL) {
-			SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
+			SetDlgItemTextA(dlg, IDC_FINGER_PRINT, fp);
 			free(fp);
 		}
 		break;
@@ -944,7 +958,7 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 	default:
 		fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_BASE64, SSH_DIGEST_SHA256);
 		if (fp != NULL) {
-			SendMessage(GetDlgItem(dlg, IDC_FINGER_PRINT), WM_SETTEXT, 0, (LPARAM)fp);
+			SetDlgItemTextA(dlg, IDC_FINGER_PRINT, fp);
 			free(fp);
 		}
 		break;
@@ -953,7 +967,7 @@ static void hosts_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest_algorithm
 	// ビジュアル化fingerprintを表示する
 	fp = key_fingerprint(&pvar->hosts_state.hostkey, SSH_FP_RANDOMART, dgst_alg);
 	if (fp != NULL) {
-		SendMessage(GetDlgItem(dlg, IDC_FP_RANDOMART), WM_SETTEXT, 0, (LPARAM)fp);
+		SetDlgItemTextA(dlg, IDC_FP_RANDOMART, fp);
 		free(fp);
 	}
 }
@@ -1701,10 +1715,19 @@ void HOSTS_delete_all_hostkeys(PTInstVar pvar)
 static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                         LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_UNKNOWNHOST_TITLE" },
+		{ IDC_HOSTWARNING, "DLG_UNKNOWNHOST_WARNING" },
+		{ IDC_HOSTWARNING2, "DLG_UNKNOWNHOST_WARNING2" },
+		{ IDC_HOSTFINGERPRINT, "DLG_UNKNOWNHOST_FINGERPRINT" },
+		{ IDC_FP_HASH_ALG, "DLG_UNKNOWNHOST_FP_HASH_ALGORITHM" },
+		{ IDC_ADDTOKNOWNHOSTS, "DLG_UNKNOWNHOST_ADD" },
+		{ IDC_CONTINUE, "BTN_CONTINUE" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
-	char uimsg[MAX_UIMSG];
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1713,6 +1736,8 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
+		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
@@ -1737,7 +1762,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+#endif
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
 			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
@@ -1776,7 +1801,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
@@ -1796,7 +1821,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgHostsAddFont = NULL;
 		}
-
+#endif
 		// add host check boxにチェックをデフォルトで入れておく 
 		SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
@@ -1825,11 +1850,11 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			pvar->hosts_state.hosts_dialog = NULL;
 
 			EndDialog(dlg, 1);
-
+#if 0
 			if (DlgHostsAddFont != NULL) {
 				DeleteObject(DlgHostsAddFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
@@ -1837,11 +1862,11 @@ canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgHostsAddFont != NULL) {
 				DeleteObject(DlgHostsAddFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -1867,10 +1892,19 @@ canceled:
 static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                             LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_UNKNOWNHOST_TITLE" },
+		{ IDC_HOSTWARNING, "DLG_DIFFERENTKEY_WARNING" },
+		{ IDC_HOSTWARNING2, "DLG_DIFFERENTKEY_WARNING2" },
+		{ IDC_HOSTFINGERPRINT, "DLG_DIFFERENTKEY_FINGERPRINT" },
+		{ IDC_FP_HASH_ALG, "DLG_DIFFERENTKEY_FP_HASH_ALGORITHM" },
+		{ IDC_ADDTOKNOWNHOSTS, "DLG_DIFFERENTKEY_REPLACE" },
+		{ IDC_CONTINUE, "BTN_CONTINUE" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
-	char uimsg[MAX_UIMSG];
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1879,6 +1913,8 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
+		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTKEY_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
@@ -1903,7 +1939,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+#endif
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
 			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
@@ -1942,7 +1978,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsReplaceFont, pvar)) {
@@ -1961,7 +1997,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgHostsReplaceFont = NULL;
 		}
-
+#endif
 		// デフォルトでチェックは入れない
 		return TRUE;			/* because we do not set the focus */
 
@@ -1989,11 +2025,11 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			pvar->hosts_state.hosts_dialog = NULL;
 
 			EndDialog(dlg, 1);
-
+#if 0
 			if (DlgHostsReplaceFont != NULL) {
 				DeleteObject(DlgHostsReplaceFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
@@ -2001,11 +2037,11 @@ canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgHostsReplaceFont != NULL) {
 				DeleteObject(DlgHostsReplaceFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:
@@ -2031,10 +2067,19 @@ canceled:
 static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                          LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_DIFFERENTTYPEKEY_TITLE" },
+		{ IDC_HOSTWARNING, "DLG_DIFFERENTTYPEKEY_WARNING" },
+		{ IDC_HOSTWARNING2, "DLG_DIFFERENTTYPEKEY_WARNING2" },
+		{ IDC_HOSTFINGERPRINT, "DLG_DIFFERENTTYPEKEY_FINGERPRINT" },
+		{ IDC_FP_HASH_ALG, "DLG_DIFFERENTTYPEKEY_FP_HASH_ALGORITHM" },
+		{ IDC_ADDTOKNOWNHOSTS, "DLG_DIFFERENTTYPEKEY_ADD" },
+		{ IDC_CONTINUE, "BTN_CONTINUE" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
-	char uimsg[MAX_UIMSG];
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -2043,6 +2088,8 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
+		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
@@ -2067,7 +2114,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+#endif
 		switch (pvar->dns_key_check) {
 		case DNS_VERIFY_NOTFOUND:
 			UTIL_get_lang_msg("DLG_HOSTKEY_SSHFP_NOTFOUND", pvar, "No host key fingerprint found in DNS.");
@@ -2106,7 +2153,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		}
 
 		init_hosts_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
@@ -2126,7 +2173,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgHostsAddFont = NULL;
 		}
-
+#endif
 		// add host check box のデフォルトは off にする
 		// SendMessage(GetDlgItem(dlg, IDC_ADDTOKNOWNHOSTS), BM_SETCHECK, BST_CHECKED, 0);
 
@@ -2155,11 +2202,11 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			pvar->hosts_state.hosts_dialog = NULL;
 
 			EndDialog(dlg, 1);
-
+#if 0
 			if (DlgHostsAddFont != NULL) {
 				DeleteObject(DlgHostsAddFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
@@ -2167,11 +2214,11 @@ canceled:
 			pvar->hosts_state.hosts_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgHostsAddFont != NULL) {
 				DeleteObject(DlgHostsAddFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:

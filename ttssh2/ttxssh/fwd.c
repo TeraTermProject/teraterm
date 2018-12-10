@@ -528,7 +528,7 @@ static HWND make_accept_wnd(PTInstVar pvar)
 	if (pvar->fwd_state.accept_wnd == NULL) {
 		UTIL_get_lang_msg("DLG_FWDMON_TITLE", pvar, "TTSSH Port Forwarding Monitor");
 		pvar->fwd_state.accept_wnd =
-			CreateWindow("STATIC", pvar->ts->UIMsg,
+			CreateWindowA("STATIC", pvar->ts->UIMsg,
 			             WS_DISABLED | WS_POPUP, 0, 0, 1, 1, NULL, NULL,
 			             hInst, NULL);
 		if (pvar->fwd_state.accept_wnd != NULL) {
@@ -1856,7 +1856,7 @@ BOOL FWD_agent_forward_confirm(PTInstVar pvar)
 	if (pvar->session_settings.ForwardAgentConfirm) {
 		UTIL_get_lang_msg("MSG_FWD_AGENT_FORWARDING_CONFIRM", pvar,
 		                  "Are you sure you want to accept agent-forwarding request?");
-		if (MessageBox(cur_active != NULL ? cur_active : pvar->NotificationWindow,
+		if (MessageBoxA(cur_active != NULL ? cur_active : pvar->NotificationWindow,
 		               pvar->ts->UIMsg, "TTSSH",
 		               MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES) {
 			return TRUE;

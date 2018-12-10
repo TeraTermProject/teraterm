@@ -37,11 +37,30 @@ See LICENSE.TXT for the license.
 #include "resource.h"
 #include "x11util.h"
 #include "util.h"
+#include "dlglib.h"
 
 #include "servicenames.h"
 
-static HFONT DlgFwdEditFont;
-static HFONT DlgFwdFont;
+#if defined(UNICODE)
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef GetDlgItemText
+#define GetDlgItemText GetDlgItemTextA
+#undef GetWindowText
+#define GetWindowText GetWindowTextA
+#undef SetWindowText
+#define SetWindowText SetWindowTextA
+#endif
+
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
+
+//static HFONT DlgFwdEditFont;
+//static HFONT DlgFwdFont;
 
 typedef struct {
 	FWDRequestSpec *spec;
@@ -492,8 +511,19 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	FWDRequestSpec *requests =
 		(FWDRequestSpec *) malloc(sizeof(FWDRequestSpec) * num_specs);
 	int i;
-	char uimsg[MAX_UIMSG];
-
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_FWD_TITLE" },
+		{ IDC_PORTFORWARD, "DLG_FWDSETUP_LIST" },
+		{ IDC_ADD, "DLG_FWDSETUP_ADD" },
+		{ IDC_EDIT, "DLG_FWDSETUP_EDIT" },
+		{ IDC_REMOVE, "DLG_FWDSETUP_REMOVE" },
+		{ IDC_XFORWARD, "DLG_FWDSETUP_X" },
+		{ IDC_SSHFWDX11, "DLG_FWDSETUP_XAPP" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_TITLE", pvar, uimsg);
 	SetWindowText(dlg, pvar->ts->UIMsg);
@@ -521,7 +551,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+#endif
 	FWD_get_request_specs(pvar, requests, num_specs);
 
 	for (i = 0; i < num_specs; i++) {
@@ -975,8 +1005,8 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 {
 	FWDEditClosure *closure;
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 	BOOL result;
 
 	switch (msg) {
@@ -986,7 +1016,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		pvar = closure->pvar;
 		init_fwd_edit_dlg(pvar, closure->spec, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgFwdEditFont, pvar)) {
@@ -1017,6 +1047,7 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgFwdEditFont = NULL;
 		}
+#endif
 		return FALSE;			/* because we set the focus */
 
 	case WM_COMMAND:
@@ -1028,20 +1059,22 @@ static BOOL CALLBACK fwd_edit_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 			result = end_fwd_edit_dlg(closure->pvar, closure->spec, dlg);
 
 			if (result) {
+#if 0
 				if (DlgFwdEditFont != NULL) {
 					DeleteObject(DlgFwdEditFont);
 				}
+#endif
 			}
 
 			return result;
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgFwdEditFont != NULL) {
 				DeleteObject(DlgFwdEditFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_SSHFWDLOCALTOREMOTE:
@@ -1140,8 +1173,8 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                   LPARAM lParam)
 {
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 	BOOL ret;
 
 	switch (msg) {
@@ -1150,7 +1183,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_fwd_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgFwdFont, pvar)) {
@@ -1167,7 +1200,7 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgFwdFont = NULL;
 		}
-
+#endif
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -1177,21 +1210,21 @@ static BOOL CALLBACK fwd_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDOK:
 
 			ret = end_fwd_dlg(pvar, dlg);
-
+#if 0
 			if (ret == TRUE && DlgFwdFont != NULL) {
 				DeleteObject(DlgFwdFont);
 			}
-
+#endif
 			return ret;
 
 		case IDCANCEL:
 			free_all_listbox_specs(dlg);
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgFwdFont != NULL) {
 				DeleteObject(DlgFwdFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_ADD:

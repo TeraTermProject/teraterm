@@ -31,11 +31,13 @@
 #include "util.h"
 #include "ssh.h"
 #include "key.h"
+#include "dlglib.h"
 
 #include <io.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <tchar.h>
 
 #include "resource.h"
 #include "keyfiles.h"
@@ -45,9 +47,32 @@
 
 #define MAX_AUTH_CONTROL IDC_SSHUSEPAGEANT
 
-static HFONT DlgAuthFont;
-static HFONT DlgTisFont;
-static HFONT DlgAuthSetupFont;
+#if defined(UNICODE)
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef GetDlgItemText
+#define GetDlgItemText GetDlgItemTextA
+#endif
+#if defined(UNICODE)
+#define SetWindowTextT SetWindowTextW
+#define GetDlgItemTextT GetDlgItemTextW
+#define SetDlgItemTextT SetDlgItemTextW
+#else
+#define SetWindowTextT SetWindowTextA
+#define GetDlgItemTextT GetDlgItemTextA
+#define SetDlgItemTextT SetDlgItemTextA
+#endif
+
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
+
+//static HFONT DlgAuthFont;
+//static HFONT DlgTisFont;
+//static HFONT DlgAuthSetupFont;
 
 void destroy_malloced_string(char **str)
 {
@@ -117,11 +142,20 @@ static void set_auth_options_status(HWND dlg, int controlID)
 
 static void init_auth_machine_banner(PTInstVar pvar, HWND dlg)
 {
-	char buf[1024], buf2[1024];
+	TCHAR buf[1024], buf2[1024];
+	const char *hostname = SSH_get_host_name(pvar);
 
-	GetDlgItemText(dlg, IDC_SSHAUTHBANNER, buf2, sizeof(buf2));
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, buf2, SSH_get_host_name(pvar));
-	SetDlgItemText(dlg, IDC_SSHAUTHBANNER, buf);
+	GetDlgItemTextT(dlg, IDC_SSHAUTHBANNER, buf2, _countof(buf2));
+#if defined(UNICODE)
+	{
+		wchar_t hostnameW[128];
+		MultiByteToWideChar(CP_UTF8, 0, hostname, -1, hostnameW, _countof(hostnameW));
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, buf2, hostnameW);
+	}
+#else
+	_sntprintf_s(buf, _countof(buf), _TRUNCATE, buf2, hostname);
+#endif
+	SetDlgItemTextT(dlg, IDC_SSHAUTHBANNER, buf);
 }
 
 static void update_server_supported_types(PTInstVar pvar, HWND dlg)
@@ -177,57 +211,78 @@ static void update_server_supported_types(PTInstVar pvar, HWND dlg)
 
 static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_AUTH_TITLE" },
+		{ IDC_SSHAUTHBANNER, "DLG_AUTH_BANNER" },
+		{ IDC_SSHAUTHBANNER2, "DLG_AUTH_BANNER2" },
+		{ IDC_SSHUSERNAMELABEL, "DLG_AUTH_USERNAME" },
+		{ IDC_SSHPASSWORDCAPTION, "DLG_AUTH_PASSWORD" },
+		{ IDC_REMEMBER_PASSWORD, "DLG_AUTH_REMEMBER_PASSWORD" },
+		{ IDC_FORWARD_AGENT, "DLG_AUTH_FWDAGENT" },
+		{ IDC_SSHUSEPASSWORD, "DLG_AUTH_METHOD_PASSWORD" },
+		{ IDC_SSHUSERSA, "DLG_AUTH_METHOD_RSA" },
+		{ IDC_SSHUSERHOSTS, "DLG_AUTH_METHOD_RHOST" },
+		{ IDC_SSHUSEPAGEANT, "DLG_AUTH_METHOD_PAGEANT" },
+		{ IDC_CHOOSERSAFILE, "DLG_AUTH_PRIVATEKEY" },
+		{ IDC_LOCALUSERNAMELABEL, "DLG_AUTH_LOCALUSER" },
+		{ IDC_CHOOSEHOSTRSAFILE, "DLG_AUTH_HOST_PRIVATEKEY" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
+	TCHAR uimsg[MAX_UIMSG];
 	int default_method = pvar->session_settings.DefaultAuthMethod;
-	char uimsg[MAX_UIMSG];
 
-	GetWindowText(dlg, uimsg, sizeof(uimsg));
-	UTIL_get_lang_msg("DLG_AUTH_TITLE", pvar, uimsg);
+	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
+	GetWindowText(dlg, uimsg, _countof(uimsg));
+	UTIL_get_lang_msgT("DLG_AUTH_TITLE", pvar, uimsg);
 	SetWindowText(dlg, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHAUTHBANNER, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHAUTHBANNER, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_BANNER", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHAUTHBANNER, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHAUTHBANNER2, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHAUTHBANNER2, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_BANNER2", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHAUTHBANNER2, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHUSERNAMELABEL, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHUSERNAMELABEL, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_USERNAME", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHUSERNAMELABEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHPASSWORDCAPTION, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHPASSWORDCAPTION, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_PASSWORD", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHPASSWORDCAPTION, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_REMEMBER_PASSWORD, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_REMEMBER_PASSWORD, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_REMEMBER_PASSWORD", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_REMEMBER_PASSWORD, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_FORWARD_AGENT, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_FORWARD_AGENT, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_FWDAGENT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_FORWARD_AGENT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHUSEPASSWORD, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHUSEPASSWORD, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_METHOD_PASSWORD", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHUSEPASSWORD, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHUSERSA, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHUSERSA, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_METHOD_RSA", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHUSERSA, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHUSERHOSTS, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHUSERHOSTS, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_METHOD_RHOST", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHUSERHOSTS, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_SSHUSEPAGEANT, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_SSHUSEPAGEANT, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_METHOD_PAGEANT", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_SSHUSEPAGEANT, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_CHOOSERSAFILE, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_CHOOSERSAFILE, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_PRIVATEKEY", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_CHOOSERSAFILE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_LOCALUSERNAMELABEL, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_LOCALUSERNAMELABEL, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_LOCALUSER", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_LOCALUSERNAMELABEL, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDC_CHOOSEHOSTRSAFILE, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDC_CHOOSEHOSTRSAFILE, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTH_HOST_PRIVATEKEY", pvar, uimsg);
 	SetDlgItemText(dlg, IDC_CHOOSEHOSTRSAFILE, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDOK, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("BTN_OK", pvar, uimsg);
 	SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
+	GetDlgItemText(dlg, IDCANCEL, uimsg, _countof(uimsg));
 	UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+#endif
 
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(dlg);
@@ -235,10 +290,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	// 認証失敗後はラベルを書き換え
 	if (pvar->auth_state.failed_method != SSH_AUTH_NONE) {
 		/* must be retrying a failed attempt */
-		UTIL_get_lang_msg("DLG_AUTH_BANNER2_FAILED", pvar, "Authentication failed. Please retry.");
-		SetDlgItemText(dlg, IDC_SSHAUTHBANNER2, pvar->ts->UIMsg);
-		UTIL_get_lang_msg("DLG_AUTH_TITLE_FAILED", pvar, "Retrying SSH Authentication");
-		SetWindowText(dlg, pvar->ts->UIMsg);
+		TCHAR uimsg[MAX_UIMSG];
+		UTIL_get_lang_msgT("DLG_AUTH_BANNER2_FAILED", uimsg, _countof(uimsg), _T("Authentication failed. Please retry."), pvar->ts->UILanguageFile);
+		SetDlgItemTextT(dlg, IDC_SSHAUTHBANNER2, uimsg);
+		UTIL_get_lang_msgT("DLG_AUTH_TITLE_FAILED", uimsg, _countof(uimsg), _T("Retrying SSH Authentication"), pvar->ts->UILanguageFile);
+		SetWindowTextT(dlg, uimsg);
 		default_method = pvar->auth_state.failed_method;
 	}
 
@@ -254,45 +310,45 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 
 	// SSH バージョンによって TIS のラベルを書き換え
 	if (pvar->settings.ssh_protocol_version == 1) {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE1", pvar,
-		                  "Use challenge/response(&TIS) to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
+		UTIL_get_lang_msgT("DLG_AUTH_METHOD_CHALLENGE1", uimsg, _countof(uimsg),
+						   _T("Use challenge/response(&TIS) to log in"), pvar->ts->UILanguageFile);
+		SetDlgItemTextT(dlg, IDC_SSHUSETIS, uimsg);
 	} else {
-		UTIL_get_lang_msg("DLG_AUTH_METHOD_CHALLENGE2", pvar,
-		                  "Use keyboard-&interactive to log in");
-		SetDlgItemText(dlg, IDC_SSHUSETIS, pvar->ts->UIMsg);
+		UTIL_get_lang_msgT("DLG_AUTH_METHOD_CHALLENGE2",  uimsg, _countof(uimsg),
+						   _T("Use keyboard-&interactive to log in"), pvar->ts->UILanguageFile);
+		SetDlgItemTextT(dlg, IDC_SSHUSETIS, uimsg);
 	}
 
 	if (pvar->auth_state.user != NULL) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
+		SetDlgItemTextA(dlg, IDC_SSHUSERNAME, pvar->auth_state.user);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
 	}
 	else if (strlen(pvar->ssh2_username) > 0) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME, pvar->ssh2_username);
+		SetDlgItemTextA(dlg, IDC_SSHUSERNAME, pvar->ssh2_username);
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAME), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHUSERNAMELABEL), FALSE);
 		}
 	}
 	else if (pvar->session_settings.DefaultUserName[0] != 0) {
-		SetDlgItemText(dlg, IDC_SSHUSERNAME,
+		SetDlgItemTextA(dlg, IDC_SSHUSERNAME,
 		               pvar->session_settings.DefaultUserName);
 	}
 
 	if (strlen(pvar->ssh2_password) > 0) {
-		SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
+		SetDlgItemTextA(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
 		}
 	}
 
-	SetDlgItemText(dlg, IDC_RSAFILENAME,
+	SetDlgItemTextA(dlg, IDC_RSAFILENAME,
 	               pvar->session_settings.DefaultRSAPrivateKeyFile);
-	SetDlgItemText(dlg, IDC_HOSTRSAFILENAME,
+	SetDlgItemTextA(dlg, IDC_HOSTRSAFILENAME,
 	               pvar->session_settings.DefaultRhostsHostPrivateKeyFile);
-	SetDlgItemText(dlg, IDC_LOCALUSERNAME,
+	SetDlgItemTextA(dlg, IDC_LOCALUSERNAME,
 	               pvar->session_settings.DefaultRhostsLocalUserName);
 
 	if (pvar->ssh2_authmethod == SSH_AUTH_PASSWORD) {
@@ -301,7 +357,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_RSA) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSERSA);
 
-		SetDlgItemText(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
+		SetDlgItemTextA(dlg, IDC_RSAFILENAME, pvar->ssh2_keyfile);
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_CHOOSERSAFILE), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_RSAFILENAME), FALSE);
@@ -355,11 +411,11 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 
 static char *alloc_control_text(HWND ctl)
 {
-	int len = GetWindowTextLength(ctl);
+	int len = GetWindowTextLengthA(ctl);
 	char *result = malloc(len + 1);
 
 	if (result != NULL) {
-		GetWindowText(ctl, result, len + 1);
+		GetWindowTextA(ctl, result, len + 1);
 		result[len] = 0;
 	}
 
@@ -368,7 +424,7 @@ static char *alloc_control_text(HWND ctl)
 
 static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar)
 {
-	OPENFILENAME params;
+	OPENFILENAMEA params;
 	char fullname_buf[2048] = "identity";
 	char filter[MAX_UIMSG];
 
@@ -395,7 +451,7 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 		OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
 	params.lpstrDefExt = NULL;
 
-	if (GetOpenFileName(&params) != 0) {
+	if (GetOpenFileNameA(&params) != 0) {
 		copy_teraterm_dir_relative_path(buf, bufsize, fullname_buf);
 		return 1;
 	} else {
@@ -668,10 +724,11 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 
 	EndDialog(dlg, 1);
+#if 0
 	if (DlgAuthFont != NULL) {
 		DeleteObject(DlgAuthFont);
 	}
-
+#endif
 	return TRUE;
 }
 
@@ -684,8 +741,8 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 	const int IDC_TIMER3 = 302; // challenge で ask4passwd でCheckAuthListFirst が FALSE のとき
 	const int autologin_timeout = 10; // ミリ秒
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -694,7 +751,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_auth_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgAuthFont, pvar)) {
@@ -723,7 +780,7 @@ static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgAuthFont = NULL;
 		}
-
+#endif
 		// SSH2 autologinが有効の場合は、タイマを仕掛ける。 (2004.12.1 yutaka)
 		if (pvar->ssh2_autologin == 1) {
 			autologin_sent_none = FALSE;
@@ -869,11 +926,11 @@ canceled:
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgAuthFont != NULL) {
 				DeleteObject(DlgAuthFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_SSHUSERNAME:
@@ -1085,8 +1142,14 @@ void AUTH_advance_to_next_cred(PTInstVar pvar)
 
 static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 {
-	char uimsg[MAX_UIMSG];
-
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_TIS_TITLE" },
+		{ IDC_SSHAUTHBANNER, "DLG_TIS_BANNER" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_DISCONNECT" },
+	};
+	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_TIS_TITLE", pvar, uimsg);
 	SetWindowText(dlg, pvar->ts->UIMsg);
@@ -1099,7 +1162,7 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_DISCONNECT", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+#endif
 	init_auth_machine_banner(pvar, dlg);
 	init_password_control(dlg);
 
@@ -1138,8 +1201,8 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                   LPARAM lParam)
 {
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1148,7 +1211,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_TIS_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgTisFont, pvar)) {
@@ -1161,7 +1224,7 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgTisFont = NULL;
 		}
-
+#endif
 		// /auth=challenge を追加 (2007.10.5 maya)
 		if (pvar->ssh2_autologin == 1) {
 			SetDlgItemText(dlg, IDC_SSHPASSWORD, pvar->ssh2_password);
@@ -1175,21 +1238,22 @@ static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
+#if 0
 			if (DlgTisFont != NULL) {
 				DeleteObject(DlgTisFont);
 			}
-
+#endif
 			return end_TIS_dlg(pvar, dlg);
 
 		case IDCANCEL:			/* kill the connection */
 			pvar->auth_state.auth_dialog = NULL;
 			notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgTisFont != NULL) {
 				DeleteObject(DlgTisFont);
 			}
-
+#endif
 			return TRUE;
 
 		default:
@@ -1233,8 +1297,24 @@ void AUTH_do_cred_dialog(PTInstVar pvar)
 
 static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 {
-	char uimsg[MAX_UIMSG];
-
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_AUTHSETUP_TITLE" },
+		{ IDC_SSHAUTHBANNER, "DLG_AUTHSETUP_BANNER" },
+		{ IDC_SSHUSERNAMELABEL, "DLG_AUTHSETUP_USERNAME" },
+		{ IDC_SSHUSEPASSWORD, "DLG_AUTHSETUP_METHOD_PASSWORD" },
+		{ IDC_SSHUSERSA, "DLG_AUTHSETUP_METHOD_RSA" },
+		{ IDC_SSHUSERHOSTS, "DLG_AUTHSETUP_METHOD_RHOST" },
+		{ IDC_SSHUSETIS, "DLG_AUTHSETUP_METHOD_CHALLENGE" },
+		{ IDC_SSHUSEPAGEANT, "DLG_AUTHSETUP_METHOD_PAGEANT" },
+		{ IDC_CHOOSERSAFILE, "DLG_AUTH_PRIVATEKEY" },
+		{ IDC_LOCALUSERNAMELABEL, "DLG_AUTH_LOCALUSER" },
+		{ IDC_CHOOSEHOSTRSAFILE, "DLG_AUTH_HOST_PRIVATEKEY" },
+		{ IDC_CHECKAUTH, "DLG_AUTHSETUP_CHECKAUTH" },
+		{ IDOK, "BTN_OK" },
+		{ IDCANCEL, "BTN_CANCEL" },
+	};
+	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTHSETUP_TITLE", pvar, uimsg);
 	SetWindowText(dlg, pvar->ts->UIMsg);
@@ -1277,6 +1357,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("BTN_CANCEL", pvar, uimsg);
 	SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
+#endif
 
 	switch (pvar->settings.DefaultAuthMethod) {
 	case SSH_AUTH_RSA:
@@ -1360,8 +1441,8 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 										   WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 
 	switch (msg) {
 	case WM_INITDIALOG:
@@ -1369,7 +1450,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		init_default_auth_dlg(pvar, dlg);
-
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgAuthSetupFont, pvar)) {
@@ -1394,7 +1475,7 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 		else {
 			DlgAuthSetupFont = NULL;
 		}
-
+#endif
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -1402,20 +1483,20 @@ static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
 
 		switch (LOWORD(wParam)) {
 		case IDOK:
-
+#if 0
 			if (DlgAuthSetupFont != NULL) {
 				DeleteObject(DlgAuthSetupFont);
 			}
-
+#endif
 			return end_default_auth_dlg(pvar, dlg);
 
 		case IDCANCEL:
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgAuthSetupFont != NULL) {
 				DeleteObject(DlgAuthSetupFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_CHOOSERSAFILE:

@@ -5,11 +5,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_zlib.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_openssl.cmake)
 
+if(USE_UNICODE_API)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
 set(COMMON_SRC
   ../../teraterm/teraterm/WSAAsyncGetAddrInfo.c
   ../../teraterm/common/ttcommon.h
   ../../teraterm/common/i18n.h
   ../../teraterm/common/ttlib.h
+  ../../teraterm/common/dlglib.h
+  ../../teraterm/common/dlglib.c
+  ../../teraterm/common/dlglib_cpp.cpp
+  ../../teraterm/common/dlglib_tmpl.cpp
   ../../teraterm/common/servicenames.h
   )
 

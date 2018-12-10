@@ -314,13 +314,26 @@ BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf)
 	return buf->buflen / 2 < buf->datalen;
 }
 
-void UTIL_get_lang_msg(PCHAR key, PTInstVar pvar, PCHAR def)
+void UTIL_get_lang_msgA(const char *key, char *buf, size_t buf_len, const char *def, const char *iniFile)
 {
-	GetI18nStr("TTSSH", key, pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg),
-		def, pvar->ts->UILanguageFile);
+	get_lang_msg(key, buf, buf_len, def, iniFile);
 }
 
-int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PTInstVar pvar)
+#if defined(_UNICODE)
+void UTIL_get_lang_msgW(const char *key, wchar_t *buf, size_t buf_len, const wchar_t *def, const char *iniFile)
+{
+	get_lang_msgW(key, buf, buf_len, def, iniFile);
+}
+#endif
+
+void UTIL_get_lang_msg(const char *key, PTInstVar pvar, const char *def)
+{
+	UTIL_get_lang_msgA(key,
+					   pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), def,
+					   pvar->ts->UILanguageFile);
+}
+
+int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font, PTInstVar pvar)
 {
 	if (GetI18nLogfont("TTSSH", key, logfont,
 					   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
@@ -328,7 +341,7 @@ int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PTIns
 		return FALSE;
 	}
 
-	if ((*font = CreateFontIndirect(logfont)) == NULL) {
+	if ((*font = CreateFontIndirectA(logfont)) == NULL) {
 		return FALSE;
 	}
 

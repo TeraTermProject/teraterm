@@ -54,6 +54,7 @@
 #include "fwd.h"
 #include "sftp.h"
 #include "kex.h"
+#include "dlglib.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -62,6 +63,25 @@
 
 #include <direct.h>
 #include <io.h>
+
+#if defined(UNICODE)
+#undef GetPrivateProfileString
+#define GetPrivateProfileString GetPrivateProfileStringA
+#undef GetPrivateProfileInt
+#define GetPrivateProfileInt GetPrivateProfileIntA
+#undef WritePrivateProfileString
+#define WritePrivateProfileString WritePrivateProfileStringA
+#undef MessageBox
+#define MessageBox MessageBoxA
+#undef GetDlgItemText
+#define GetDlgItemText GetDlgItemTextA
+#undef SetDlgItemText
+#define SetDlgItemText SetDlgItemTextA
+#undef GetWindowText
+#define GetWindowText GetWindowTextA
+#undef SetWindowText
+#define SetWindowText SetWindowTextA
+#endif
 
 // SSH2 macro
 #ifdef _DEBUG
@@ -7337,14 +7357,21 @@ struct change_password {
 
 static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	const static DlgTextInfo text_info[] = {
+		{ 0, "DLG_PASSCHG_TITLE" },
+		{ IDC_PASSWD_CHANGEREQ_MSG, "DLG_PASSCHG_MESSAGE" },
+		{ IDC_OLD_PASSWD_LABEL, "DLG_PASSCHG_OLDPASSWD" },
+		{ IDC_NEW_PASSWD_LABEL, "DLG_PASSCHG_NEWPASSWD" },
+		{ IDC_CONFIRM_PASSWD_LABEL, "DLG_PASSCHG_CONFIRMPASSWD" },
+	};
 	char old_passwd[PASSWD_MAXLEN];
 	char new_passwd[PASSWD_MAXLEN];
 	char retype_passwd[PASSWD_MAXLEN];
 	static struct change_password *cp;
-	LOGFONT logfont;
-	HFONT font;
-	static HFONT DlgChgPassFont;
-	char uimsg[MAX_UIMSG];
+//	LOGFONT logfont;
+//	HFONT font;
+//	static HFONT DlgChgPassFont;
+//	char uimsg[MAX_UIMSG];
 	static PTInstVar pvar;
 
 
@@ -7353,6 +7380,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 		cp = (struct change_password *)lParam;
 		pvar = cp->pvar;
 
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 
@@ -7362,7 +7390,9 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 		else {
 			DlgChgPassFont = NULL;
 		}
-
+#endif
+		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+#if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_PASSCHG_TITLE", pvar, uimsg);
 		SetWindowText(dlg, pvar->ts->UIMsg);
@@ -7382,7 +7412,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 		GetDlgItemText(dlg, IDC_CONFIRM_PASSWD_LABEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_PASSCHG_CONFIRMPASSWD", pvar, uimsg);
 		SetDlgItemText(dlg, IDC_CONFIRM_PASSWD_LABEL, pvar->ts->UIMsg);
-
+#endif
 		SetFocus(GetDlgItem(dlg, IDC_OLD_PASSWD));
 
 		return FALSE;
@@ -7390,9 +7420,9 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			SendMessage(GetDlgItem(dlg, IDC_OLD_PASSWD), WM_GETTEXT , sizeof(old_passwd), (LPARAM)old_passwd);
-			SendMessage(GetDlgItem(dlg, IDC_NEW_PASSWD), WM_GETTEXT , sizeof(new_passwd), (LPARAM)new_passwd);
-			SendMessage(GetDlgItem(dlg, IDC_CONFIRM_PASSWD), WM_GETTEXT , sizeof(retype_passwd), (LPARAM)retype_passwd);
+			GetDlgItemTextA(dlg, IDC_OLD_PASSWD, old_passwd, sizeof(old_passwd));
+			GetDlgItemTextA(dlg, IDC_NEW_PASSWD, new_passwd, sizeof(new_passwd));
+			GetDlgItemTextA(dlg, IDC_CONFIRM_PASSWD, retype_passwd, sizeof(retype_passwd));
 
 			if (strcmp(new_passwd, retype_passwd) == 1) {
 				UTIL_get_lang_msg("MSG_PASSCHG_MISMATCH", pvar, "Mismatch; try again.");
@@ -7410,24 +7440,24 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 			strncpy_s(cp->new_passwd, sizeof(cp->new_passwd), new_passwd, _TRUNCATE);
 
 			EndDialog(dlg, 1); // dialog close
-
+#if 0
 			if (DlgChgPassFont != NULL) {
 				DeleteObject(DlgChgPassFont);
 				DlgChgPassFont = NULL;
 			}
-
+#endif
 			return TRUE;
 
 		case IDCANCEL:
 			// Ú‘±‚ðØ‚é
                         notify_closed_connection(pvar, "authentication cancelled");
 			EndDialog(dlg, 0); // dialog close
-
+#if 0
 			if (DlgChgPassFont != NULL) {
 				DeleteObject(DlgChgPassFont);
 				DlgChgPassFont = NULL;
 			}
-
+#endif
 			return TRUE;
 		}
 	}
@@ -8186,6 +8216,7 @@ static int is_canceled_window(HWND hd)
 		return 0;
 }
 
+#if 0
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 	HWND HProg;
 	HProg = GetDlgItem(HDlg, id_Progress);
@@ -8198,6 +8229,7 @@ void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 
 	return;
 }
+#endif
 
 static unsigned __stdcall ssh_scp_thread(void *p)
 {
@@ -8218,7 +8250,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 	buf = malloc(buflen);
 
 	//SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfile);
-	SendMessage(GetDlgItem(hWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
+	SetDlgItemTextA(hWnd, IDC_FILENAME, c->scp.localfilefull);
 
 	InitDlgProgress(hWnd, IDC_PROGBAR, &ProgStat);
 
@@ -8267,7 +8299,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 
 		rate = (int)(100 * total_size / c->scp.filestat.st_size);
 		_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", total_size, c->scp.filestat.st_size, rate);
-		SendMessage(GetDlgItem(hWnd, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+		SetDlgItemTextA(hWnd, IDC_PROGRESS, s);
 		if (ProgStat != rate) {
 			ProgStat = rate;
 			SendDlgItemMessage(hWnd, IDC_PROGBAR, PBM_SETPOS, (WPARAM)ProgStat, 0);
@@ -8290,7 +8322,7 @@ static unsigned __stdcall ssh_scp_thread(void *p)
 			else {
 				_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
 			}
-			SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+			SetDlgItemTextA(hWnd, IDC_PROGTIME, s);
 			prev_elapsed = elapsed;
 		}
 
@@ -8437,7 +8469,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 
 				rate =(int)(100 * c->scp.filercvsize / c->scp.filetotalsize);
 				_snprintf_s(s, sizeof(s), _TRUNCATE, "%lld / %lld (%d%%)", c->scp.filercvsize, c->scp.filetotalsize, rate);
-				SendMessage(GetDlgItem(c->scp.progress_window, IDC_PROGRESS), WM_SETTEXT, 0, (LPARAM)s);
+				SetDlgItemTextA(c->scp.progress_window, IDC_PROGRESS, s);
 
 				if (ProgStat != rate) {
 					ProgStat = rate;
@@ -8461,7 +8493,7 @@ static unsigned __stdcall ssh_scp_receive_thread(void *p)
 					else {
 						_snprintf_s(s, sizeof(s), _TRUNCATE, "%d:%02d", elapsed / 60, elapsed % 60);
 					}
-					SendDlgItemMessage(hWnd, IDC_PROGTIME, WM_SETTEXT, 0, (LPARAM)s);
+					SetDlgItemTextA(hWnd, IDC_PROGTIME, s);
 					prev_elapsed = elapsed;
 				}
 
@@ -8618,7 +8650,7 @@ static BOOL SSH2_scp_fromremote(PTInstVar pvar, Channel_t *c, unsigned char *dat
 			if (hDlgWnd != NULL) {
 				c->scp.progress_window = hDlgWnd;
 				SetWindowText(hDlgWnd, "TTSSH: SCP receiving file");
-				SendMessage(GetDlgItem(hDlgWnd, IDC_FILENAME), WM_SETTEXT, 0, (LPARAM)c->scp.localfilefull);
+				SetDlgItemTextA(hDlgWnd, IDC_FILENAME, c->scp.localfilefull);
 				ShowWindow(hDlgWnd, SW_SHOW);
 			}
 

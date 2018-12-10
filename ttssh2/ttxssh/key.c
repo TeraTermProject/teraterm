@@ -27,11 +27,19 @@
  */
 #include "key.h"
 #include "resource.h"
+#include "dlglib.h"
 
 #include <openssl/rsa.h>
 #include <openssl/dsa.h>
 #include <openssl/ecdsa.h>
 #include <openssl/buffer.h>
+
+#undef DialogBoxParam
+#define DialogBoxParam(p1,p2,p3,p4,p5) \
+	TTDialogBoxParam(p1,p2,p3,p4,p5)
+#undef EndDialog
+#define EndDialog(p1,p2) \
+	TTEndDialog(p1, p2)
 
 #define INTBLOB_LEN 20
 #define SIGBLOB_LEN (2*INTBLOB_LEN)
@@ -2153,14 +2161,14 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
 		}
-		SendDlgItemMessage(dlg, IDC_ADDKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
+		SetDlgItemTextA(dlg, IDC_ADDKEY_EDIT, buf);
 		free(buf);
 	}
 
 	if (ctx->nold > 0) {
 		buf_len = 100 * ctx->nold;
 		buf = calloc(100, ctx->nold);
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)"");
+		SetDlgItemTextA(dlg, IDC_REMOVEKEY_EDIT, "");
 		for (i = 0; i < ctx->nold; i++) {
 			switch (dgst_alg) {
 			case SSH_DIGEST_MD5:
@@ -2181,17 +2189,17 @@ static void hosts_updatekey_dlg_set_fingerprint(PTInstVar pvar, HWND dlg, digest
 				strncat_s(buf, buf_len, "\r\n", _TRUNCATE);
 			}
 		}
-		SendDlgItemMessage(dlg, IDC_REMOVEKEY_EDIT, WM_SETTEXT, 0, (LPARAM)(char *)buf);
+		SetDlgItemTextA(dlg, IDC_REMOVEKEY_EDIT, buf);
 		free(buf);
 	}
 }
 
 static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static HFONT DlgHostsAddFont;
+//	static HFONT DlgHostsAddFont;
 	PTInstVar pvar;
-	LOGFONT logfont;
-	HFONT font;
+//	LOGFONT logfont;
+//	HFONT font;
 	char buf[1024];
 	char *host;
 	struct hostkeys_update_ctx *ctx;
@@ -2202,44 +2210,44 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		pvar = (PTInstVar)lParam;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		GetWindowText(dlg, uimsg, sizeof(uimsg));
+		GetWindowTextA(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_TITLE", pvar, uimsg);
-		SetWindowText(dlg, pvar->ts->UIMsg);
+		SetWindowTextA(dlg, pvar->ts->UIMsg);
 
 		host = pvar->ssh_state.hostname;
 		ctx = pvar->hostkey_ctx;
 		
-		GetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, uimsg, sizeof(uimsg));
+		GetDlgItemTextA(dlg, IDC_HOSTKEY_MESSAGE, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_WARNING", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE,
 			pvar->ts->UIMsg, host, ctx->nnew, ctx->nold
 			);
-		SetDlgItemText(dlg, IDC_HOSTKEY_MESSAGE, buf);
+		SetDlgItemTextA(dlg, IDC_HOSTKEY_MESSAGE, buf);
 
-		GetDlgItemText(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
+		GetDlgItemTextA(dlg, IDC_FP_HASH_ALG, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_FP_HASH_ALGORITHM", pvar, uimsg);
-		SetDlgItemText(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
+		SetDlgItemTextA(dlg, IDC_FP_HASH_ALG, pvar->ts->UIMsg);
 
-		GetDlgItemText(dlg, IDC_ADDKEY_TEXT, uimsg, sizeof(uimsg));
+		GetDlgItemTextA(dlg, IDC_ADDKEY_TEXT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_ADD", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nnew);
-		SetDlgItemText(dlg, IDC_ADDKEY_TEXT, buf);
+		SetDlgItemTextA(dlg, IDC_ADDKEY_TEXT, buf);
 
-		GetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, uimsg, sizeof(uimsg));
+		GetDlgItemTextA(dlg, IDC_REMOVEKEY_TEXT, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_HOSTKEY_ROTATION_REMOVE", pvar, uimsg);
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, pvar->ts->UIMsg, ctx->nold);
-		SetDlgItemText(dlg, IDC_REMOVEKEY_TEXT, buf);
+		SetDlgItemTextA(dlg, IDC_REMOVEKEY_TEXT, buf);
 
 		CheckDlgButton(dlg, IDC_FP_HASH_ALG_SHA256, TRUE);
 		hosts_updatekey_dlg_set_fingerprint(pvar, dlg, SSH_DIGEST_SHA256);
 
-		GetDlgItemText(dlg, IDOK, uimsg, sizeof(uimsg));
+		GetDlgItemTextA(dlg, IDOK, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_YES", pvar, uimsg);
-		SetDlgItemText(dlg, IDOK, pvar->ts->UIMsg);
-		GetDlgItemText(dlg, IDCANCEL, uimsg, sizeof(uimsg));
+		SetDlgItemTextA(dlg, IDOK, pvar->ts->UIMsg);
+		GetDlgItemTextA(dlg, IDCANCEL, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("BTN_NO", pvar, uimsg);
-		SetDlgItemText(dlg, IDCANCEL, pvar->ts->UIMsg);
-
+		SetDlgItemTextA(dlg, IDCANCEL, pvar->ts->UIMsg);
+#if 0
 		font = (HFONT)SendMessage(dlg, WM_GETFONT, 0, 0);
 		GetObject(font, sizeof(LOGFONT), &logfont);
 		if (UTIL_get_lang_font("DLG_TAHOMA_FONT", dlg, &logfont, &DlgHostsAddFont, pvar)) {
@@ -2257,7 +2265,7 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		else {
 			DlgHostsAddFont = NULL;
 		}
-
+#endif
 		return TRUE;			/* because we do not set the focus */
 
 	case WM_COMMAND:
@@ -2267,20 +2275,20 @@ static BOOL CALLBACK hosts_updatekey_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		case IDOK:
 
 			EndDialog(dlg, 1);
-
+#if 0
 			if (DlgHostsAddFont != NULL) {
 				DeleteObject(DlgHostsAddFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDCANCEL:			/* kill the connection */
 			EndDialog(dlg, 0);
-
+#if 0
 			if (DlgHostsAddFont != NULL) {
 				DeleteObject(DlgHostsAddFont);
 			}
-
+#endif
 			return TRUE;
 
 		case IDC_FP_HASH_ALG_MD5:

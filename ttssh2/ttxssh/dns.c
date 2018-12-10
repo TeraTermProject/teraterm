@@ -88,7 +88,7 @@ int verify_hostkey_dns(PTInstVar pvar, char *hostname, Key *key)
 	}
 	logprintf(LOG_LEVEL_VERBOSE, "verify_hostkey_dns: key type = %d, SSHFP type = %d", key->type, hostkey_alg);
 
-	status = DnsQuery(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
+	status = DnsQuery_A(hostname, DNS_TYPE_SSHFP, DNS_QUERY_STANDARD, NULL, &rec, NULL);
 
 	if (status == 0) {
 		for (p=rec; p!=NULL; p=p->pNext) {

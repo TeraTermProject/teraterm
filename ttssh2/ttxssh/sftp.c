@@ -808,8 +808,8 @@ static LRESULT CALLBACK EditProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	switch (uMsg) {
 		case WM_KEYDOWN:
 		if ((int)wParam == VK_RETURN) {
-			GetWindowText(hwnd, buf, sizeof(buf));
-			SetWindowText(hwnd, "");
+			GetWindowTextA(hwnd, buf, sizeof(buf));
+			SetWindowTextA(hwnd, "");
 			if (buf[0] != '\0') {
 				SendDlgItemMessage(GetParent(hwnd), IDC_SFTP_CONSOLE, EM_REPLACESEL, 0, (LPARAM) buf);
 				SendDlgItemMessage(GetParent(hwnd), IDC_SFTP_CONSOLE, EM_REPLACESEL, 0,
