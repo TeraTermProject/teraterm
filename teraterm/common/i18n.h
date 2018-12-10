@@ -55,6 +55,7 @@ extern "C" {
 DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 #endif
 DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile);
 DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
 
 #if defined(_UNICODE)

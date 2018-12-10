@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2006-2018 TeraTerm Project
  * All rights reserved.
  *
@@ -48,6 +48,31 @@ DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int b
 	RestoreNewLine(buf);
 }
 
+DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
+{
+#if defined(UNICODE)
+	wchar_t tmp[MAX_UIMSG];
+	wchar_t defW[MAX_UIMSG];
+	MultiByteToWideChar(CP_UTF8, 0, def, -1, defW, _countof(defW));
+	GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
+	WideCharToMultiByte(CP_UTF8, 0,
+						tmp, _countof(tmp),
+						buf, buf_len,
+						NULL, NULL);
+#else
+	// ANSI -> Wide -> utf8
+	char strA[MAX_UIMSG];
+	wchar_t strW[MAX_UIMSG];
+	GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
+	MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
+	WideCharToMultiByte(CP_UTF8, 0,
+						strW, -1,
+						buf, buf_len,
+						NULL, NULL);
+#endif
+}
+
+
 DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
 {
 	static char tmp[MAX_UIMSG];
@@ -63,7 +88,7 @@ DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA log
 	GetNthNum(tmp, 3, &charset);
 
 	strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
-	logfont->lfCharSet = charset;
+	logfont->lfCharSet = (BYTE)charset;
 	logfont->lfHeight = MulDiv(hight, -ppi, 72);
 	logfont->lfWidth = 0;
 

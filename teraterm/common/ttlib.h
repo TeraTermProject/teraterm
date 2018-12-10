@@ -85,6 +85,7 @@ void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 DllExport void set_lang_section(const char *section);
 DllExport void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
+DllExport void get_lang_msgU8(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 #if defined(UNICODE)
 DllExport void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 #endif

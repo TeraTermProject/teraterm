@@ -1031,6 +1031,11 @@ void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, cons
 	GetI18nStr(lang_section, key, buf, buf_len, def, iniFile);
 }
 
+void get_lang_msgU8(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+{
+	GetI18nStrU8(lang_section, key, buf, buf_len, def, iniFile);
+}
+
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
 	if (GetI18nLogfont(lang_section, key, logfont,
