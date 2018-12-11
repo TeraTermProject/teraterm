@@ -841,7 +841,6 @@ CVTWindow::CVTWindow()
 
 	logfile_lock_initialize();
 	SetMouseCursor(ts.MouseCursorName);
-	SetWindowAlpha(ts.AlphaBlendActive);
 	// ロケールの設定
 	// wctomb のため
 	setlocale(LC_ALL, ts.Locale);
@@ -917,6 +916,7 @@ CVTWindow::CVTWindow()
 	if (ts.Minimize>0) {
 		CmdShow = SW_SHOWMINIMIZED;
 	}
+	SetWindowAlpha(ts.AlphaBlendActive);
 	ShowWindow(CmdShow);
 	ChangeCaret();
 
@@ -2508,6 +2508,11 @@ void CVTWindow::OnPaint()
 	PAINTSTRUCT ps;
 	HDC PaintDC;
 	int Xs, Ys, Xe, Ye;
+
+	// 表示されていなくてもWM_PAINTが発生するケース対策
+	if (IsWindowVisible() == 0) {
+		return;
+	}
 
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI
