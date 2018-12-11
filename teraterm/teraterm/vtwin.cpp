@@ -838,7 +838,6 @@ CVTWindow::CVTWindow()
 	SerialNo = RegWin(HVTWin,NULL);
 
 	logfile_lock_initialize();
-	SetWindowStyle(&ts);
 	// ロケールの設定
 	// wctomb のため
 	setlocale(LC_ALL, ts.Locale);
@@ -914,6 +913,7 @@ CVTWindow::CVTWindow()
 	if (ts.Minimize>0) {
 		CmdShow = SW_SHOWMINIMIZED;
 	}
+	SetWindowStyle(&ts);
 	ShowWindow(CmdShow);
 	ChangeCaret();
 
@@ -2238,7 +2238,7 @@ LONG CVTWindow::OnDropNotify(UINT ShowDialog, LONG lParam)
 				DefaultShowDialog = !DoNotShowDialog;
 			}
 		}
-			 
+
 		switch (DropType) {
 		case DROP_TYPE_CANCEL:
 		default:
@@ -2634,6 +2634,11 @@ void CVTWindow::OnPaint()
 	CDC *cdc;
 	HDC PaintDC;
 	int Xs, Ys, Xe, Ye;
+
+	// 表示されていなくてもWM_PAINTが発生するケース対策
+	if (IsWindowVisible() == 0) {
+		return;
+	}
 
 #ifdef ALPHABLEND_TYPE2
 //<!--by AKASI
