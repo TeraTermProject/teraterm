@@ -35,7 +35,7 @@ public:
 			negative = true;
 			value = -value; 
 		}
-		return toString(value, 10, negative);
+		return toString(value, base, negative);
 	}
 	static String toString(unsigned long value) {
 		return toString(value, 10);
