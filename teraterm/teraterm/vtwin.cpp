@@ -2510,7 +2510,7 @@ void CVTWindow::OnPaint()
 	int Xs, Ys, Xe, Ye;
 
 	// 表示されていなくてもWM_PAINTが発生するケース対策
-	if (IsWindowVisible() == 0) {
+	if (::IsWindowVisible(m_hWnd) == 0) {
 		return;
 	}
 

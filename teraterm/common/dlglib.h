@@ -45,6 +45,7 @@ void SetDlgNum(HWND HDlg, int id_Item, LONG Num);
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *prog);
 void SetDlgTime(HWND HDlg, int id_Item, DWORD elapsed, int bytes);
 void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel);
+void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
@@ -54,6 +55,12 @@ typedef struct {
 } DlgTextInfo;
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+
+#if defined(_UNICODE)
+#define SetDropDownListT(p1, p2, p3, p4)	SetDropDownListW(p1, p2, p3, p4)
+#else
+#define SetDropDownListT(p1, p2, p3, p4)	SetDropDownList(p1, p2, p3, p4)
+#endif
 
 ////////////////////////////////////////
 void TTSetDlgFont(const char *face, int height, int charset);

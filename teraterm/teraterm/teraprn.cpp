@@ -28,7 +28,6 @@
  */
 
 /* TERATERM.EXE, Printing routines */
-//#include "stdafx.h"
 #include "teraterm.h"
 #include "tttypes.h"
 #include <commdlg.h>

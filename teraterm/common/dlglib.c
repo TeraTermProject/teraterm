@@ -186,7 +186,20 @@ void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel)
 	i = 0;
 	while (List[i] != NULL) {
 		SendDlgItemMessageA(HDlg, Id_Item, CB_ADDSTRING,
-		                   0, (LPARAM)List[i]);
+							0, (LPARAM)List[i]);
+		i++;
+	}
+	SendDlgItemMessage(HDlg, Id_Item, CB_SETCURSEL,nsel-1,0);
+}
+
+void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel)
+{
+	int i;
+
+	i = 0;
+	while (List[i] != NULL) {
+		SendDlgItemMessageW(HDlg, Id_Item, CB_ADDSTRING,
+							0, (LPARAM)List[i]);
 		i++;
 	}
 	SendDlgItemMessage(HDlg, Id_Item, CB_SETCURSEL,nsel-1,0);

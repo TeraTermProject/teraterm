@@ -112,7 +112,7 @@ static INT_PTR CALLBACK TTDialogProc(
 {
 	TTDialogData *data = (TTDialogData *)GetWindowLongPtr(hDlgWnd, DWLP_USER);
 	if (msg == WM_INITDIALOG) {
-		TTDialogData *data = (TTDialogData *)lParam;
+		data = (TTDialogData *)lParam;
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)lParam);
 		lParam = data->ParamInit;
 	}
