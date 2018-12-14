@@ -82,7 +82,7 @@ public:
 		return loadIcon(instance, MAKEINTRESOURCE(id), cx, cy, flags);
 	}
 	static HICON loadIcon(HINSTANCE instance, const char* id, int cx, int cy, int flags) {
-		return (HICON) ::LoadImage(instance, id, IMAGE_ICON, cx, cx, flags);
+		return (HICON) ::LoadImage(instance, id, IMAGE_ICON, cx, cy, flags);
 	}
 
 	static HCURSOR loadCursor(int id) {
@@ -120,7 +120,7 @@ public:
 		return loadCursor(instance, MAKEINTRESOURCE(id), cx, cy, flags);
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, const char* id, int cx, int cy, int flags) {
-		return (HCURSOR) ::LoadImage(instance, id, IMAGE_CURSOR, cx, cx, flags);
+		return (HCURSOR) ::LoadImage(instance, id, IMAGE_CURSOR, cx, cy, flags);
 	}
 
 	static HMENU loadMenu(int id) {
