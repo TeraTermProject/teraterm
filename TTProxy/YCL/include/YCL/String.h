@@ -12,6 +12,7 @@
 #include <YCL/common.h>
 
 #include <string.h>
+#include <tchar.h>
 
 namespace yebisuya {
 
@@ -21,7 +22,7 @@ private:
 	// 文字列を格納するバッファ。
 	// 文字列の前には参照カウンタを持ち、
 	// 代入や破棄の際にはそこを変更する。
-	const char* string;
+	const TCHAR* string;
 
 	// utilities
 	// 文字列を格納するバッファを作成する。
@@ -31,18 +32,18 @@ private:
 	//	length 文字列の長さ。
 	// 返値:
 	//	作成したバッファの文字列部のアドレス。
-	static char* createBuffer(size_t length) {
-		size_t* count = (size_t*) new unsigned char[sizeof (size_t) + sizeof (char) * (length + 1)];
+	static TCHAR* createBuffer(size_t length) {
+		size_t* count = (size_t*) new TCHAR[sizeof (size_t) + sizeof (TCHAR) * (length + 1)];
 		*count = 0;
-		return (char*) (count + 1);
+		return (TCHAR*) (count + 1);
 	}
 	// 文字列を格納したバッファを作成する。
 	// 引数:
 	//	source 格納する文字列。
 	// 返値:
 	//	作成したバッファの文字列部のアドレス。
-	static const char* create(const char* source) {
-		return source != NULL ? create(source, strlen(source)) : NULL;
+	static const TCHAR* create(const TCHAR* source) {
+		return source != NULL ? create(source, _tcslen(source)) : NULL;
 	}
 	// 文字列を格納したバッファを作成する。
 	// 引数:
@@ -50,10 +51,10 @@ private:
 	//	length 文字列の長さ。
 	// 返値:
 	//	作成したバッファの文字列部のアドレス。
-	static const char* create(const char* source, size_t length) {
+	static const TCHAR* create(const TCHAR* source, size_t length) {
 		if (source != NULL) {
-			char* buffer = createBuffer(length);
-			memcpy(buffer, source, length);
+			TCHAR* buffer = createBuffer(length);
+			memcpy(buffer, source, sizeof(TCHAR) * length);
 			buffer[length] = '\0';
 			return buffer;
 		}
@@ -65,12 +66,12 @@ private:
 	//	str2 連結する文字列(後)。
 	// 返値:
 	//	作成したバッファの文字列部のアドレス。
-	static const char* concat(const char* str1, const char* str2) {
-		size_t len1 = strlen(str1);
-		size_t len2 = strlen(str2);
-		char* buffer = createBuffer(len1 + len2);
-		memcpy(buffer, str1, len1);
-		memcpy(buffer + len1, str2, len2);
+	static const TCHAR* concat(const TCHAR* str1, const TCHAR* str2) {
+		size_t len1 = _tcslen(str1);
+		size_t len2 = _tcslen(str2);
+		TCHAR* buffer = createBuffer(len1 + len2);
+		memcpy(buffer, str1, sizeof(TCHAR) * len1);
+		memcpy(buffer + len1, str2, sizeof(TCHAR) * len2);
 		buffer[len1 + len2] = '\0';
 		return buffer;
 	}
@@ -80,7 +81,7 @@ private:
 		if (string != NULL) {
 			size_t* count = (size_t*) string - 1;
 			if (--*count == 0)
-				delete[] (unsigned char*) count;
+				delete[] (TCHAR*) count;
 		}
 	}
 	// 参照カウンタを増やす。
@@ -95,7 +96,7 @@ private:
 	// 新しいバッファの参照カウンタを増やす。
 	// 引数:
 	//	source 置き換える新しいバッファ。
-	void set(const char* source) {
+	void set(const TCHAR* source) {
 		if (string != source) {
 			release();
 			string = source;
@@ -111,14 +112,14 @@ public:
 	// 元の文字列を指定するコンストラクタ。
 	// 引数:
 	//	source 元の文字列。
-	String(const char* source):string(NULL) {
+	String(const TCHAR* source):string(NULL) {
 		set(create(source));
 	}
 	// 元の文字列を長さ付きで指定するコンストラクタ。
 	// 引数:
 	//	source 元の文字列。
 	//	length 文字列の長さ。
-	String(const char* source, size_t length):string(NULL) {
+	String(const TCHAR* source, size_t length):string(NULL) {
 		set(create(source, length));
 	}
 	// コピーコンストラクタ。
@@ -131,14 +132,14 @@ public:
 	// 引数:
 	//	str1 前になる文字列。
 	//	str2 後になる文字列。
-	String(const char* str1, const char* str2):string(NULL) {
+	String(const TCHAR* str1, const TCHAR* str2):string(NULL) {
 		set(concat(str1, str2));
 	}
 	// 二つの文字列を連結するコンストラクタ。
 	// 引数:
 	//	str1 前になる文字列。
 	//	str2 後になる文字列。
-	String(const String& str1, const char* str2):string(NULL) {
+	String(const String& str1, const TCHAR* str2):string(NULL) {
 		set(*str2 != '\0' ? concat(str1.string, str2) : str1.string);
 	}
 	// destructor
@@ -153,7 +154,7 @@ public:
 	//	source 連結する文字列。
 	// 返値:
 	//	連結された文字列。
-	String concat(const char* source)const {
+	String concat(const TCHAR* source)const {
 		return String(*this, source);
 	}
 	// 文字列との比較を行う。
@@ -162,12 +163,12 @@ public:
 	//	str 比較する文字列。
 	// 返値:
 	//	等しければ0、strの方が大きければ負、小さければ正。
-	int compareTo(const char* str)const {
+	int compareTo(const TCHAR* str)const {
 		if (str == NULL)
 			return string == NULL ? 0 : 1;
 		else if (string == NULL)
 			return -1;
-		return strcmp(string, str);
+		return _tcscmp(string, str);
 	}
 	// 文字列との比較を大文字小文字の区別なしで行う。
 	// NULLとも比較できる。
@@ -175,12 +176,12 @@ public:
 	//	str 比較する文字列。
 	// 返値:
 	//	等しければ0、strの方が大きければ負、小さければ正。
-	int compareToIgnoreCase(const char* str)const {
+	int compareToIgnoreCase(const TCHAR* str)const {
 		if (str == NULL)
 			return string == NULL ? 0 : 1;
 		else if (string == NULL)
 			return -1;
-		return _stricmp(string, str);
+		return _tcsicmp(string, str);
 	}
 	// 文字列との比較を行う。
 	// NULLとも比較できる。
@@ -188,7 +189,7 @@ public:
 	//	str 比較する文字列。
 	// 返値:
 	//	等しければ真。
-	bool equals(const char* str)const {
+	bool equals(const TCHAR* str)const {
 		return compareTo(str) == 0;
 	}
 	// 文字列との比較を大文字小文字の区別なしで行う。
@@ -197,7 +198,7 @@ public:
 	//	str 比較する文字列。
 	// 返値:
 	//	等しければ真。
-	bool equalsIgnoreCase(const char* str)const {
+	bool equalsIgnoreCase(const TCHAR* str)const {
 		return compareToIgnoreCase(str) == 0;
 	}
 	// 指定された文字列で始まっているかどうかを判定する。
@@ -205,7 +206,7 @@ public:
 	//	str 比較する文字列。
 	// 返値:
 	//	指定された文字列で始まっていれば真。
-	bool startsWith(const char* str)const {
+	bool startsWith(const TCHAR* str)const {
 		return startsWith(str, 0);
 	}
 	// 指定の位置から指定された文字列で始まっているかどうかを判定する。
@@ -213,28 +214,28 @@ public:
 	//	str 比較する文字列。
 	// 返値:
 	//	指定された文字列で始まっていれば真。
-	bool startsWith(const char* str, int offset)const {
-		return strncmp(string, str, strlen(str)) == 0;
+	bool startsWith(const TCHAR* str, int offset)const {
+		return _tcsncmp(string, str, _tcslen(str)) == 0;
 	}
 	// 指定された文字列で終わっているかどうかを判定する。
 	// 引数:
 	//	str 比較する文字列。
 	// 返値:
 	//	指定された文字列で終わっていれば真。
-	// 
-	bool endsWith(const char* str)const {
-		size_t str_length = strlen(str);
+	//
+	bool endsWith(const TCHAR* str)const {
+		size_t str_length = _tcslen(str);
 		size_t string_length = length();
 		if (string_length < str_length)
 			return false;
-		return strcmp(string + string_length - str_length, str) == 0;
+		return _tcscmp(string + string_length - str_length, str) == 0;
 	}
 	// 指定の文字がどの位置にあるかを探す。
 	// 引数:
 	//	chr 探す文字。
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
-	int indexOf(char chr)const {
+	int indexOf(TCHAR chr)const {
 		return indexOf(chr, 0);
 	}
 	// 指定の文字がどの位置にあるかを指定の位置から探す。
@@ -243,12 +244,10 @@ public:
 	//	from 探し始める位置。
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
-	int indexOf(char chr, size_t from)const {
-		if (from < 0)
-			from = 0;
-		else if (from >= length())
+	int indexOf(TCHAR chr, size_t from)const {
+		if (from >= length())
 			return -1;
-		const char* found = strchr(string + from, chr);
+		const TCHAR* found = _tcschr(string + from, chr);
 		if (found == NULL)
 			return -1;
 		return found - string;
@@ -258,7 +257,7 @@ public:
 	//	str 探す文字列。
 	// 返値:
 	//	文字列の見つかったインデックス。見つからなければ-1。
-	int indexOf(const char* str)const {
+	int indexOf(const TCHAR* str)const {
 		return indexOf(str, 0);
 	}
 	// 指定の文字列がどの位置にあるかを指定の位置から探す。
@@ -267,27 +266,25 @@ public:
 	//	from 探し始める位置。
 	// 返値:
 	//	文字列の見つかったインデックス。見つからなければ-1。
-	// 
-	int indexOf(const char* str, size_t from)const {
-		if (from < 0)
-			from = 0;
-		else if (from >= length())
+	//
+	int indexOf(const TCHAR* str, size_t from)const {
+		if (from >= length())
 			return -1;
-		const char* found = strstr(string + from, str);
+		const TCHAR* found = _tcsstr(string + from, str);
 		if (found == NULL)
 			return -1;
 		return found - string;
 	}
 	// 文字列の長さを返す。
 	size_t length()const {
-		return strlen(string);
+		return _tcslen(string);
 	}
 	// 指定の文字が最後に見つかる位置を取得する。
 	// 引数:
 	//	chr 探す文字。
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
-	int lastIndexOf(char chr)const {
+	int lastIndexOf(TCHAR chr)const {
 		return lastIndexOf(chr, (size_t) -1);
 	}
 	// 指定の文字が指定の位置よりも前で最後に見つかる位置を取得する。
@@ -296,18 +293,20 @@ public:
 	//	from 探し始める位置。
 	// 返値:
 	//	文字の見つかったインデックス。見つからなければ-1。
-	int lastIndexOf(char chr, size_t from)const {
+	int lastIndexOf(TCHAR chr, size_t from)const {
 		size_t len = length();
 		if (from > len - 1)
 			from = len - 1;
-		const char* s = string;
-		const char* end = string + from;
-		const char* found = NULL;
+		const TCHAR* s = string;
+		const TCHAR* end = string + from;
+		const TCHAR* found = NULL;
 		while (*s != '0' && s <= end) {
 			if (*s == chr)
 				found = s;
+#if !defined(UNICODE)
 			if (isLeadByte(*s))
 				s++;
+#endif
 			s++;
 		}
 		return found != NULL ? found - string : -1;
@@ -317,7 +316,7 @@ public:
 	//	str 探す文字列。
 	// 返値:
 	//	文字列の見つかったインデックス。見つからなければ-1。
-	int lastIndexOf(const char* str)const {
+	int lastIndexOf(const TCHAR* str)const {
 		return lastIndexOf(str, (size_t) -1);
 	}
 	// 指定の文字列が指定の位置よりも前で最後に見つかる位置を取得する。
@@ -326,14 +325,14 @@ public:
 	//	from 探し始める位置。
 	// 返値:
 	//	文字列の見つかったインデックス。見つからなければ-1。
-	int lastIndexOf(const char* str, size_t from)const {
+	int lastIndexOf(const TCHAR* str, size_t from)const {
 		size_t len = length();
-		size_t str_len = strlen(str);
+		size_t str_len = _tcslen(str);
 		if (from > len - str_len)
 			from = len - str_len;
-		const char* s = string + from;
+		const TCHAR* s = string + from;
 		while (s >= string) {
-			if (strncmp(s, str, str_len) == 0)
+			if (_tcsncmp(s, str, str_len) == 0)
 				return s - string;
 			s--;
 		}
@@ -361,8 +360,8 @@ public:
 	//	index 取り出す文字の位置。
 	// 返値:
 	//	指定の位置にある文字。
-	char charAt(size_t index)const {
-		return index >= 0 && index < length() ? string[index] : '\0';
+	TCHAR TCHARAt(size_t index)const {
+		return index < length() ? string[index] : '\0';
 	}
 	// 指定の文字を指定の文字に置き換えます。
 	// 引数:
@@ -370,13 +369,16 @@ public:
 	//	newChr 置き換える文字。
 	// 返値:
 	//	置換後の文字列。
-	String replace(char oldChr, char newChr)const {
+	String replace(TCHAR oldChr, TCHAR newChr)const {
 		String result(string);
-		char* s = (char*) result.string;
+		TCHAR* s = (TCHAR*) result.string;
 		while (*s != '\0'){
+#if !defined(UNICODE)
 			if (String::isLeadByte(*s))
 				s++;
-			else if (*s == oldChr)
+			else
+#endif
+			if (*s == oldChr)
 				*s = newChr;
 			s++;
 		}
@@ -387,11 +389,14 @@ public:
 	//	変換後の文字列。
 	String toLowerCase()const {
 		String result(string);
-		char* s = (char*) result.string;
+		TCHAR* s = (TCHAR*) result.string;
 		while (*s != '\0'){
+#if !defined(UNICODE)
 			if (String::isLeadByte(*s))
 				s++;
-			else if ('A' <= *s && *s <= 'Z')
+			else 
+#endif
+			if ('A' <= *s && *s <= 'Z')
 				*s += 'a' - 'A';
 			s++;
 		}
@@ -402,12 +407,15 @@ public:
 	//	変換後の文字列。
 	String toUpperCase()const {
 		String result(string);
-		char* s = (char*) result.string;
+		TCHAR* s = (TCHAR*) result.string;
 		while (*s != '\0'){
+#if !defined(UNICODE)
 			if (String::isLeadByte(*s))
 				s++;
-			else if ('a' <= *s && *s <= 'z')
-				*s += 'A' - 'a';
+			else
+#endif
+			if (_T('a') <= *s && *s <= _T('z'))
+				*s += _T('A') - _T('a');
 			s++;
 		}
 		return result;
@@ -416,38 +424,38 @@ public:
 	// 返値:
 	//	削除後の文字列。
 	String trim()const {
-		const char* s = string;
-		while (*s != '\0' && (unsigned char) *s <= ' ')
+		const TCHAR* s = string;
+		while (*s != '\0' && (TCHAR) *s <= _T(' '))
 			s++;
-		const char* start = s;
+		const TCHAR* start = s;
 		s = string + length();
-		while (s > start && (*s != '\0' && (unsigned char) *s <= ' '))
+		while (s > start && (*s != '\0' && (TCHAR) *s <= _T(' ')))
 			s--;
 		return String(start, s - start);
 	}
 
 	// operators
 
-	// const char*へのキャスト演算子
+	// const TCHAR*へのキャスト演算子
 	// 返値:
 	//	文字列へのアドレス。
-	operator const char*()const {
+	operator const TCHAR*()const {
 		return string;
 	}
-	// char配列のように扱うための[]演算子。
+	// TCHAR配列のように扱うための[]演算子。
 	// 引数:
 	//	index 取得する文字のインデックス。
 	// 返値:
 	//	指定のインデックスにある文字。
-	char operator[](size_t index)const {
-		return charAt(index);
+	TCHAR operator[](size_t index)const {
+		return TCHARAt(index);
 	}
 	// 文字列を連結するための+演算子。
 	// 引数:
 	//	source 連結する文字列。
 	// 返値:
 	//	連結した文字列。
-	String operator+(const char* source)const {
+	String operator+(const TCHAR* source)const {
 		return String(string, source);
 	}
 	// 文字列を連結するための+演算子。
@@ -464,7 +472,7 @@ public:
 	//	str2 連結する文字列(後)。
 	// 返値:
 	//	連結した文字列。
-	friend String operator+(const char* str1, const String& str2) {
+	friend String operator+(const TCHAR* str1, const String& str2) {
 		return *str1 != '\0' ? String(str1, str2.string) : str2;
 	}
 	// 代入演算子。
@@ -472,7 +480,7 @@ public:
 	//	source 代入する文字列。
 	// 返値:
 	//	代入結果。
-	String& operator=(const char* source) {
+	String& operator=(const TCHAR* source) {
 		set(create(source));
 		return *this;
 	}
@@ -490,7 +498,7 @@ public:
 	//	source 連結する文字列。
 	// 返値:
 	//	連結結果。
-	String& operator+=(const char* source) {
+	String& operator+=(const TCHAR* source) {
 		if (*source != '\0')
 			set(concat(string, source));
 		return *this;
@@ -508,7 +516,7 @@ public:
 	//	str 比較対象の文字列。
 	// 返値:
 	//	strの方が等しければ真。
-	bool operator==(const char* str)const {
+	bool operator==(const TCHAR* str)const {
 		return compareTo(str) == 0;
 	}
 	// 比較演算子。
@@ -517,7 +525,7 @@ public:
 	//	str2 比較する文字列。
 	// 返値:
 	//	str1よりstr2の方が等しければ真。
-	friend bool operator==(const char* str1, const String& str2) {
+	friend bool operator==(const TCHAR* str1, const String& str2) {
 		return str2.compareTo(str1) == 0;
 	}
 	// 比較演算子。
@@ -533,7 +541,7 @@ public:
 	//	str 比較対象の文字列。
 	// 返値:
 	//	strの方が等しくなければ真。
-	bool operator!=(const char* str)const {
+	bool operator!=(const TCHAR* str)const {
 		return compareTo(str) != 0;
 	}
 	// 比較演算子。
@@ -542,7 +550,7 @@ public:
 	//	str2 比較する文字列。
 	// 返値:
 	//	str1よりstr2の方が等しくなければ真。
-	friend bool operator!=(const char* str1, const String& str2) {
+	friend bool operator!=(const TCHAR* str1, const String& str2) {
 		return str2.compareTo(str1) != 0;
 	}
 	// 比較演算子。
@@ -558,7 +566,7 @@ public:
 	//	str 比較対象の文字列。
 	// 返値:
 	//	strの方が大きければ真。
-	bool operator<(const char* str)const {
+	bool operator<(const TCHAR* str)const {
 		return compareTo(str) < 0;
 	}
 	// 比較演算子。
@@ -567,7 +575,7 @@ public:
 	//	str2 比較する文字列。
 	// 返値:
 	//	str1よりstr2の方が大きければ真。
-	friend bool operator<(const char* str1, const String& str2) {
+	friend bool operator<(const TCHAR* str1, const String& str2) {
 		return str2.compareTo(str1) > 0;
 	}
 	// 比較演算子。
@@ -583,7 +591,7 @@ public:
 	//	str 比較対象の文字列。
 	// 返値:
 	//	strの方が大きいか等しければ真。
-	bool operator<=(const char* str)const {
+	bool operator<=(const TCHAR* str)const {
 		return compareTo(str) <= 0;
 	}
 	// 比較演算子。
@@ -592,7 +600,7 @@ public:
 	//	str2 比較する文字列。
 	// 返値:
 	//	str1よりstr2の方が大きいか等しければ真。
-	friend bool operator<=(const char* str1, const String& str2) {
+	friend bool operator<=(const TCHAR* str1, const String& str2) {
 		return str2.compareTo(str1) >= 0;
 	}
 	// 比較演算子。
@@ -608,7 +616,7 @@ public:
 	//	str 比較対象の文字列。
 	// 返値:
 	//	strの方が小さければ真。
-	bool operator>(const char* str)const {
+	bool operator>(const TCHAR* str)const {
 		return compareTo(str) > 0;
 	}
 	// 比較演算子。
@@ -617,7 +625,7 @@ public:
 	//	str2 比較する文字列。
 	// 返値:
 	//	str1よりstr2の方が小さければ真。
-	friend bool operator>(const char* str1, const String& str2) {
+	friend bool operator>(const TCHAR* str1, const String& str2) {
 		return str2.compareTo(str1) < 0;
 	}
 	// 比較演算子。
@@ -633,7 +641,7 @@ public:
 	//	str 比較対象の文字列。
 	// 返値:
 	//	strの方が小さいか等しければ真。
-	bool operator>=(const char* str)const {
+	bool operator>=(const TCHAR* str)const {
 		return compareTo(str) >= 0;
 	}
 	// 比較演算子。
@@ -642,7 +650,7 @@ public:
 	//	str2 比較する文字列。
 	// 返値:
 	//	str1よりstr2の方が小さいか等しければ真。
-	friend bool operator>=(const char* str1, const String& str2) {
+	friend bool operator>=(const TCHAR* str1, const String& str2) {
 		return str2.compareTo(str1) <= 0;
 	}
 
@@ -653,13 +661,15 @@ public:
 	//	判定するバイト。
 	// 返値:
 	//	2バイト文字の最初の1バイトであれば真。
-	static bool isLeadByte(char ch) {
+#if !defined(UNICODE)
+	static bool isLeadByte(TCHAR ch) {
 	#ifdef _INC_WINDOWS
 		return ::IsDBCSLeadByte(ch) != 0;
 	#else
 		return (ch & 0x80) != 0;
 	#endif
 	}
+#endif
 };
 
 }

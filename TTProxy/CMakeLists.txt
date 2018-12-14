@@ -1,18 +1,33 @@
 project(ttproxy)
 
+if(USE_UNICODE_API)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
+
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4")
+endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
 
 set(COMMON_SRC
   ../teraterm/common/ttlib.h
   ../teraterm/common/i18n.h
-  ../teraterm/teraterm/ttdialog.h
-  ../teraterm/teraterm/ttfileio.h
   ../teraterm/common/ttplugin.h
-  ../teraterm/teraterm/ttsetup.h
   ../teraterm/common/tttypes.h
   ../teraterm/common/tt-version.h
+  ../teraterm/common/codeconv.h
+  ../teraterm/common/codeconv.cpp
+  ../teraterm/common/dlglib.h
+  ../teraterm/common/dlglib.c
+  ../teraterm/common/dlglib_cpp.cpp
+  ../teraterm/common/dlglib_tmpl.cpp
+  ../teraterm/teraterm/ttdialog.h
+  ../teraterm/teraterm/ttfileio.h
+  ../teraterm/teraterm/ttsetup.h
   ../teraterm/teraterm/ttwsk.h
   )
 source_group(

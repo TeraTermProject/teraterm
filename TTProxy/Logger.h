@@ -70,7 +70,7 @@ private:
 			WriteFile(logfile, label, strlen(label), &written, NULL);
 			WriteFile(logfile, ": [", 3, &written, NULL);
 			while (size-- > 0) {
-				len = wsprintf(buf, " %02x", *data++);
+				len = wsprintfA(buf, " %02x", *data++);
 				WriteFile(logfile, buf, 3, &written, NULL);
 			}
 			WriteFile(logfile, " ]\r\n", 4, &written, NULL);

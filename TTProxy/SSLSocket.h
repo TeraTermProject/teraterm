@@ -84,8 +84,8 @@ private:
     }
 public:
     static bool init() {
-        LIBEAY32() = ::LoadLibrary("LIBEAY32");
-        SSLEAY32() = ::LoadLibrary("SSLEAY32");
+        LIBEAY32() = ::LoadLibraryA("LIBEAY32");
+        SSLEAY32() = ::LoadLibraryA("SSLEAY32");
         if (LIBEAY32() == NULL || SSLEAY32() == NULL) {
             if (LIBEAY32() != NULL) {
                 ::FreeLibrary(LIBEAY32());
@@ -140,12 +140,15 @@ private:
                 if (*s2 != '.')
                     return false;
             }else{
+#if !defined(UNICODE)
                 if (::IsDBCSLeadByte(*s1)) {
                     if (*s1 != *s2 || s1 + 1 >= s1_end || s2 + 1 >= s2_end || *(s1 + 1) != *(s2 + 1))
                         return false;
                     s1++;
                     s2++;
-                }else{
+                } else
+#endif
+                {
                     if (toLowerCase(*s1) != toLowerCase(*s2))
                         return false;
                 }
@@ -156,13 +159,15 @@ private:
         return true;
     }
 
+#if 0
     static int print_debugw32(const char *str, size_t len, void *u) {
         char* buf = (char*) alloca(len + 1);
         memcpy(buf, str, len);
         buf[len] = '\0';
-        OutputDebugString(buf);
+        OutputDebugStringA(buf);
         return len;
     }
+#endif
 private:
     SSL* ssl;
     long verify_result;

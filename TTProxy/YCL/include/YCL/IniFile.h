@@ -24,17 +24,17 @@ namespace yebisuya {
 class IniFile {
 private:
 	static String YES() {
-		static const char YES[] = "yes";
+		static const TCHAR YES[] = _T("yes");
 		static String string = YES;
 		return string;
 	}
 	static String NO() {
-		static const char NO[] = "no";
+		static const TCHAR NO[] = _T("no");
 		static String string = NO;
 		return string;
 	}
-	static const char* INVALID() {
-		static const char string[] = "\n:";
+	static const TCHAR* INVALID() {
+		static const TCHAR string[] = _T("\n:");
 		return string;
 	}
 
@@ -43,24 +43,26 @@ private:
 		Vector<String> list;
 		mutable int index;
 	public:
-		EnumKeyNames(const char* filename, const char* section):index(0) {
+		EnumKeyNames(const TCHAR* filename, const TCHAR* section):index(0) {
 			Hashtable<String, int> table;
-			int section_len = strlen(section);
-			char* buffer;
+			int section_len = _tcslen(section);
+			TCHAR* buffer;
 			size_t size = 256;
 			while ((buffer = getSectionNames(filename, size)) == NULL)
 				size += 256;
-			const char* name = buffer;
+			const TCHAR* name = buffer;
 			while (*name != '\0') {
-				if (strncmp(name, section, section_len) == 0) {
+				if (_tcsncmp(name, section, section_len) == 0) {
 					if (name[section_len] == '\\') {
 						int i;
 						name += section_len + 1;
 						for (i = 0; name[i] != '\0'; i++) {
 							if (name[i] == '\\')
 								break;
+#if !defined(UNICODE)
 							if (String::isLeadByte(name[i]))
 								i++;
+#endif
 						}
 						table.put(String(name, i), 1);
 					}
@@ -84,10 +86,10 @@ private:
 	friend class EnumKeyNames;
 	class EnumValueNames : public Enumeration<String> {
 	private:
-		char* buffer;
-		mutable char* p;
+		TCHAR* buffer;
+		mutable TCHAR* p;
 	public:
-		EnumValueNames(const char* filename, const char* section) {
+		EnumValueNames(const TCHAR* filename, const TCHAR* section) {
 			size_t size = 256;
 			while ((buffer = getValueNames(filename, section, size)) == NULL)
 				size += 256;
@@ -140,23 +142,23 @@ private:
             return ((IniFile*) ini)->deleteValue(name);
         }
     };
-	static char* getSectionNames(const char* filename, size_t size) {
-		char* buffer = new char[size];
+	static TCHAR* getSectionNames(const TCHAR* filename, size_t size) {
+		TCHAR* buffer = new TCHAR[size];
 		if (::GetPrivateProfileSectionNames(buffer, size, filename) < size - 2)
 			return buffer;
 		delete[] buffer;
 		return NULL;
 	}
-	static char* getValueNames(const char* filename, const char* section, size_t size) {
-		static const char null = '\0';
-		char* buffer = new char[size];
+	static TCHAR* getValueNames(const TCHAR* filename, const TCHAR* section, size_t size) {
+		static const TCHAR null = '\0';
+		TCHAR* buffer = new TCHAR[size];
 		if (::GetPrivateProfileString(section, NULL, &null, buffer, size, filename) < size - 2)
 			return buffer;
 		delete[] buffer;
 		return NULL;
 	}
-	static String getString(const char* filename, const char* section, const char* name, bool& exists, size_t size) {
-		char* buffer = (char*) alloca(size);
+	static String getString(const TCHAR* filename, const TCHAR* section, const TCHAR* name, bool& exists, size_t size) {
+		TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * size);
 		size_t len = ::GetPrivateProfileString(section, name, INVALID(), buffer, size, filename);
 		if (len < size - 2) {
 			// 改行を含んだ文字列はiniファイルからは取得できないので取得失敗したことが分かる
@@ -170,24 +172,24 @@ private:
 		exists = true;
 		return NULL;
 	}
-	static String generateSectionName(const char* parentSection, const char* subkeyName) {
+	static String generateSectionName(const TCHAR* parentSection, const TCHAR* subkeyName) {
 		StringBuffer buffer = parentSection;
 		buffer.append('\\');
 		buffer.append(subkeyName);
 		return buffer.toString();
 	}
-	static bool deleteAllSubsection(const char* filename, const char* section, const char* subkey) {
+	static bool deleteAllSubsection(const TCHAR* filename, const TCHAR* section, const TCHAR* subkey) {
 		String keyname = generateSectionName(section, subkey);
 		int keyname_len = keyname.length();
 
-		char* buffer;
+		TCHAR* buffer;
 		size_t size = 256;
 		while ((buffer = getSectionNames(filename, size)) == NULL)
 			size += 256;
-		const char* name = buffer;
+		const TCHAR* name = buffer;
 		bool succeeded = true;
 		while (*name != '\0') {
-			if (strncmp(name, keyname, keyname_len) == 0) {
+			if (_tcsncmp(name, keyname, keyname_len) == 0) {
 				if (name[keyname_len] == '\0' || name[keyname_len] == '\\') {
 					if (!::WritePrivateProfileString(name, NULL, NULL, filename)) {
 						succeeded = false;
@@ -209,19 +211,19 @@ public:
 	}
 	IniFile(String filename, String section):filename(filename), section(section) {
 	}
-	IniFile(const IniFile& parent, const char* subkeyName):filename(parent.filename), section(generateSectionName(parent.section, subkeyName)) {
+	IniFile(const IniFile& parent, const TCHAR* subkeyName):filename(parent.filename), section(generateSectionName(parent.section, subkeyName)) {
 	}
 
 	bool isOpened()const {
 		return filename != NULL && section != NULL;
 	}
-	long getInteger(const char* name, long defaultValue = 0)const {
+	long getInteger(const TCHAR* name, long defaultValue = 0)const {
 		return filename != NULL && section != NULL ? ::GetPrivateProfileInt(section, name, defaultValue, filename) : defaultValue;
 	}
-	String getString(const char* name)const {
+	String getString(const TCHAR* name)const {
 		return getString(name, NULL);
 	}
-	String getString(const char* name, String defaultValue)const {
+	String getString(const TCHAR* name, String defaultValue)const {
 		if (filename != NULL && section != NULL && name != NULL) {
 			size_t size = 256;
 			String string;
@@ -233,7 +235,7 @@ public:
 		}
 		return defaultValue;
 	}
-	bool getBoolean(const char* name, bool defaultValue = false)const {
+	bool getBoolean(const TCHAR* name, bool defaultValue = false)const {
 		String string = getString(name);
 		if (string != NULL) {
 			if (string == YES())
@@ -244,10 +246,10 @@ public:
 		return defaultValue;
 	}
 
-	bool setInteger(const char* name, long value) {
+	bool setInteger(const TCHAR* name, long value) {
 		return setString(name, Integer::toString(value));
 	}
-	bool setString(const char* name, String value) {
+	bool setString(const TCHAR* name, String value) {
 		if (filename != NULL && section != NULL && name != NULL) {
 			// NULLでなければエスケープしてから""で括る
 			if (value != NULL) {
@@ -262,30 +264,30 @@ public:
 		}
 		return false;
 	}
-	bool setBoolean(const char* name, bool value) {
+	bool setBoolean(const TCHAR* name, bool value) {
 		return setString(name, value ? YES() : NO());
 	}
 
-	bool existsValue(const char* name) {
-		char buffer[3];
+	bool existsValue(const TCHAR* name) {
+		TCHAR buffer[3];
 		::GetPrivateProfileString(section, name, INVALID(), buffer, countof(buffer), filename);
 		return buffer[0] != '\n';
 	}
-	bool deleteKey(const char* name) {
+	bool deleteKey(const TCHAR* name) {
 		return filename != NULL && section != NULL && name != NULL && deleteAllSubsection(filename, section, name);
 	}
-	bool deleteValue(const char* name) {
+	bool deleteValue(const TCHAR* name) {
 		return filename != NULL && section != NULL && name != NULL
 			&& ::WritePrivateProfileString(section, name, NULL, filename) != FALSE;
 	}
 
-	bool open(String filename, String section) {
+	bool open(String _filename, String _section) {
 		close();
-		this->filename = filename;
-		this->section = section;
+		filename = _filename;
+		section = _section;
 		return isOpened();
 	}
-	bool open(const IniFile& parent, const char* subkeyName) {
+	bool open(const IniFile& parent, const TCHAR* subkeyName) {
 		close();
 		filename = parent.filename;
 		section = generateSectionName(parent.section, subkeyName);

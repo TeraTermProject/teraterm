@@ -10,8 +10,8 @@
 #endif // _MSC_VER >= 1000
 
 #include <YCL/common.h>
-
 #include <YCL/String.h>
+//#include "codeconv.h"
 
 namespace yebisuya {
 
@@ -39,16 +39,16 @@ public:
 	int GetWindowTextLength()const {
 		return ::GetWindowTextLength(window);
 	}
-	int GetWindowText(char* buffer, int size)const {
+	int GetWindowText(TCHAR* buffer, int size)const {
 		return ::GetWindowText(window, buffer, size);
 	}
 	String GetWindowText()const {
 		int length = GetWindowTextLength();
-		char* buffer = (char*) alloca(length + 1);
+		TCHAR* buffer = (TCHAR*) alloca((length + 1) * sizeof(TCHAR));
 		GetWindowText(buffer, length + 1);
-		return buffer;
+		return String(buffer);
 	}
-	bool SetWindowText(const char* text) {
+	bool SetWindowText(const TCHAR* text) {
 		return ::SetWindowText(window, text) != FALSE;
 	}
 	long SendMessage(int message, int wparam = 0, long lparam = 0)const {
@@ -208,7 +208,7 @@ public:
 		static const char USER32[] = "user32.dll";
 		static const char APINAME[] = "SetLayeredWindowAttributes";
 		static DWORD (WINAPI* api)(HWND, DWORD, BYTE, DWORD)
-			= (DWORD (WINAPI*)(HWND, DWORD, BYTE, DWORD)) ::GetProcAddress(::GetModuleHandle(USER32), APINAME);
+			= (DWORD (WINAPI*)(HWND, DWORD, BYTE, DWORD)) ::GetProcAddress(::GetModuleHandleA(USER32), APINAME);
 		return api != NULL ? (*api)(window, reserved, parameters, attribute) : 0;
 	}
 	long SetLayeredWindowAttributes(int parameters, long attribute) {
@@ -226,10 +226,10 @@ public:
 	bool UnregisterHotKey(int id) {
 		return ::UnregisterHotKey(window, id) != FALSE;
 	}
-	int MessageBox(const char* message, const char* caption, int type) {
+	int MessageBox(const TCHAR* message, const TCHAR* caption, int type) {
 		return ::MessageBox(window, message, caption, type);
 	}
-	int MessageBox(const char* message, int type) {
+	int MessageBox(const TCHAR* message, int type) {
 		Window top(window);
 		while ((top.getStyle() & WS_CHILD) != 0) {
 			top <<= top.GetParent();
@@ -247,7 +247,7 @@ public:
 		return create(exStyle, classname, title, style, rect, parent, menu, GetInstanceHandle(), param);
 	}
 	bool create(long exStyle, const char* classname, const char* title, long style, const RECT& rect, HWND parent, HMENU menu, HINSTANCE instance, void* param = NULL) {
-		return (window = ::CreateWindowEx(exStyle, classname, title,
+		return (window = ::CreateWindowExA(exStyle, classname, title,
 			style, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
 			parent, menu, instance, param)) != NULL;
 	}

@@ -30,7 +30,7 @@ public:
 	int resetContent() {
 		return SendMessage(CB_RESETCONTENT);
 	}
-	int addString(const char* string) {
+	int addString(const TCHAR* string) {
 		return SendMessage(CB_ADDSTRING, 0, (LPARAM) string);
 	}
 	int addItemData(long data) {
@@ -48,12 +48,12 @@ public:
 	int getTextLen(int index)const {
 		return SendMessage(CB_GETLBTEXTLEN, index);
 	}
-	int getText(int index, char* buffer)const {
+	int getText(int index, TCHAR* buffer)const {
 		return SendMessage(CB_GETLBTEXT, index, (LPARAM) buffer);
 	}
 	String getText(int index) {
 		int length = getTextLen(index);
-		char* buffer = (char*) alloca(length + 1);
+		TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * (length + 1));
 		getText(index, buffer);
 		return buffer;
 	}

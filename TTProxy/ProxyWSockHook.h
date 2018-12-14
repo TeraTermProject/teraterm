@@ -17,15 +17,22 @@ using namespace yebisuya;
 
 #include "ttlib.h"
 #include "i18n.h"
+#include "codeconv.h"
+#include "dlglib.h"
 
 extern char UILanguageFile[MAX_PATH];
 
-void UTIL_get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def)
+void UTIL_get_lang_msg(const char *key, TCHAR *buf, int buf_len, const TCHAR *def)
 {
-    GetI18nStr("TTProxy", key, buf, buf_len, def, UILanguageFile);
+    GetI18nStrT("TTProxy", key, buf, buf_len, def, UILanguageFile);
 }
 
-int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font)
+void UTIL_get_lang_msgU8(const char *key, char *buf, int buf_len, const char *def)
+{
+    GetI18nStrU8("TTProxy", key, buf, buf_len, def, UILanguageFile);
+}
+
+int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font)
 {
     if (GetI18nLogfont("TTProxy", key, logfont,
                        GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
@@ -33,7 +40,7 @@ int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONT logfont, HFONT *font)
         return FALSE;
     }
 
-    if ((*font = CreateFontIndirect(logfont)) == NULL) {
+    if ((*font = CreateFontIndirectA(logfont)) == NULL) {
         return FALSE;
     }
 
@@ -44,7 +51,7 @@ class ProxyWSockHook {
 public:
     class MessageShower {
     public:
-        virtual void showMessage(const char* message)const = 0;
+        virtual void showMessage(const TCHAR* message)const = 0;
     };
 private:
     struct DUMMYHOSTENT {
@@ -136,57 +143,57 @@ private:
     private:
         struct PROXY_TYPE_TABLE {
             Type type;
-            const char* name;
+            const TCHAR* name;
         };
         static const PROXY_TYPE_TABLE* proxy_type_table() {
             static PROXY_TYPE_TABLE table[] = {
-                {TYPE_HTTP,   "http"},
-                {TYPE_SOCKS5, "socks"},
-                {TYPE_SOCKS4, "socks4"},
-                {TYPE_TELNET, "telnet"},
-                {TYPE_SOCKS5, "socks5"},
-                {TYPE_NONE_FORCE, "none"},
-                {TYPE_HTTP_SSL,   "http+ssl"},
-                {TYPE_SOCKS5_SSL, "socks+ssl"},
-                {TYPE_SOCKS4_SSL, "socks4+ssl"},
-                {TYPE_TELNET_SSL, "telnet+ssl"},
-                {TYPE_SOCKS5_SSL, "socks5+ssl"},
-                {TYPE_SSL, "ssl"},
-                {TYPE_SSL, "none+ssl"},
+                {TYPE_HTTP,   _T("http")},
+                {TYPE_SOCKS5, _T("socks")},
+                {TYPE_SOCKS4, _T("socks4")},
+                {TYPE_TELNET, _T("telnet")},
+                {TYPE_SOCKS5, _T("socks5")},
+                {TYPE_NONE_FORCE, _T("none")},
+                {TYPE_HTTP_SSL,   _T("http+ssl")},
+                {TYPE_SOCKS5_SSL, _T("socks+ssl")},
+                {TYPE_SOCKS4_SSL, _T("socks4+ssl")},
+                {TYPE_TELNET_SSL, _T("telnet+ssl")},
+                {TYPE_SOCKS5_SSL, _T("socks5+ssl")},
+                {TYPE_SSL, _T("ssl")},
+                {TYPE_SSL, _T("none+ssl")},
                 {TYPE_NONE, NULL},
             };
             return table;
         }
     public:
-        static Type parseType(const char* string) {
-            return parseType(string, string + strlen(string));
+        static Type parseType(const TCHAR* string) {
+            return parseType(string, string + _tcslen(string));
         }
-        static Type parseType(const char* string, const char* end) {
+        static Type parseType(const TCHAR* string, const TCHAR* end) {
             int length = end - string;
-            char* buffer = (char*) alloca(length + 1);
-            char* dst = buffer;
+            TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * (length + 1));
+            TCHAR* dst = buffer;
             while (length-- > 0 && *string != '\0') {
-                int ch = *string++;
-                if ('A' <= ch && ch <= 'Z') {
-                    ch += 'a' - 'A';
+                TCHAR ch = *string++;
+                if (_T('A') <= ch && ch <= _T('Z')) {
+                    ch += _T('a') - _T('A');
                 }
                 *dst++ = ch;
             }
-            *dst = '\0';
+            *dst = _T('\0');
             const PROXY_TYPE_TABLE* table = proxy_type_table();
             bool ssl_enabled = SSLSocket::isEnabled();
             while (table->name != NULL) {
-                if (!ssl_enabled && strstr(table->name, "ssl") != NULL) {
+                if (!ssl_enabled && _tcsstr(table->name, _T("ssl")) != NULL) {
                     table++;
                     continue;
                 }
-                if (strcmp(buffer, table->name) == 0)
+                if (_tcscmp(buffer, table->name) == 0)
                     return table->type;
                 table++;
             }
             return TYPE_NONE;
         }
-        static const char* getTypeName(Type type) {
+        static const TCHAR* getTypeName(Type type) {
             if (type != TYPE_NONE && type != TYPE_NONE_FORCE) {
                 const PROXY_TYPE_TABLE* table = proxy_type_table();
                 while (table->name != NULL) {
@@ -198,10 +205,10 @@ private:
             return NULL;
         }
 
-        static int parsePort(const char* string) {
-            return parsePort(string, string + strlen(string));
+        static int parsePort(const TCHAR* string) {
+            return parsePort(string, string + _tcslen(string));
         }
-        static int parsePort(const char* string, const char* end) {
+        static int parsePort(const TCHAR* string, const TCHAR* end) {
             if (string > end || *string < '1' || '9' < *string)
                 return -1;
             int digit = 0;
@@ -276,8 +283,8 @@ private:
             return url;
         }
 #else
-        static String parse(const char* url, ProxyInfo& proxy) {
-            char* p = strstr((char*) url, "://");
+        static String parse(const TCHAR* url, ProxyInfo& proxy) {
+            TCHAR* p = _tcsstr((TCHAR*) url, _T("://"));
             if (p == NULL) {
                 proxy.type = TYPE_NONE;
                 return NULL;
@@ -286,7 +293,7 @@ private:
             if (proxy.type == TYPE_NONE)
                 return NULL;
             p += 3;
-            const char* start = p;
+            const TCHAR* start = p;
 
             // user:pass ‚ª‚ ‚ê‚ÎŠi”[‚·‚é
             String tmp = String(start);
@@ -352,7 +359,7 @@ private:
                 return NULL;
             StringBuffer buffer;
             buffer.append(getTypeName(type));
-            buffer.append("://");
+            buffer.append(_T("://"));
             if (type != TYPE_SSL) {
                 if (user != NULL) {
                     urlencode(user, buffer);
@@ -366,9 +373,9 @@ private:
                     buffer.append(host);
                 }
                 else {
-                    buffer.append("[");
+                    buffer.append(_T("["));
                     buffer.append(host);
-                    buffer.append("]");
+                    buffer.append(_T("]"));
                 }
                 if (port != 0) {
                     buffer.append(':');
@@ -398,34 +405,38 @@ private:
             }
         }
 
-        static String urldecode(const char* start, const char* end) {
-            char* buffer = (char*) alloca((end - start) * 3 + 1);
-            char* dst = buffer;
+        static String urldecode(const TCHAR* start, const TCHAR* end) {
+            TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * ((end - start) * 3 + 1));
+            TCHAR* dst = buffer;
             int c1, c2;
             while (start < end) {
                 if (*start == '%' && start + 2 < end && (c1 = hexdigit(start[1])) != -1 && (c2 = hexdigit(start[2])) != -1) {
                     *dst++ = (char) (c1 << 4 | c2);
                     start += 3;
                 }else{
-                    if (IsDBCSLeadByte(*start)) {
+#if !defined(UNICODE)
+                    if (::IsDBCSLeadByte(*start)) {
                         *dst++ = *start++;
                     }
+#endif
                     *dst++ = *start++;
                 }
             }
             *dst = '\0';
             return buffer;
         }
-        static String urlencode(const char* string, StringBuffer& buffer) {
-            static const char table[] = "0123456789ABCDEF";
-            const char* start = string;
+        static String urlencode(const TCHAR* string, StringBuffer& buffer) {
+            static const TCHAR table[] = _T("0123456789ABCDEF");
+            const TCHAR* start = string;
             while (*string != '\0') {
                 if ('0' <= *string && *string <= '9'
                     || 'A' <= *string && *string <= 'Z'
                     || 'a' <= *string && *string <= 'z'
                     || *string == '-' || *string == '.' || *string == '_') {
+#if !defined(UNICODE)
                 }else if (::IsDBCSLeadByte(*string)) {
                     string++;
+#endif
                 }else{
                     if (start < string) {
                         buffer.append(start, string - start);
@@ -485,26 +496,26 @@ private:
         ~ConnectionInfo() {
             delete[] buffer;
         }
-        void fillBuffer(char* buffer, int bufferLength) {
-          fillBuffer(buffer, bufferLength, "ssh");
+        void fillBuffer(char* _buffer, int bufferLength) {
+          fillBuffer(_buffer, bufferLength, "ssh");
         }
-        void fillBuffer(char* buffer, int bufferLength, const char *portname) {
-          fillBuffer(buffer, bufferLength, "ssh", AF_UNSPEC);
+        void fillBuffer(char* _buffer, int bufferLength, const char *portname) {
+          fillBuffer(_buffer, bufferLength, "ssh", AF_UNSPEC);
         }
-        void fillBuffer(char* buffer, int bufferLength, const char *portname, int addr_family) {
-            struct servent* sv;
+        void fillBuffer(char* _buffer, int bufferLength, const char *portname, int addr_family) {
+            struct servent* sv = getservbyname(portname, "tcp");
             struct addrinfo* res;
             struct addrinfo* res0;
             struct addrinfo hints;
             int portnum = 0;
-            if (sv = getservbyname(portname, "tcp")) {
+            if (sv) {
               portnum = sv->s_port;
             }
             else {
               portnum = atoi(portname);
             }
-            memset(buffer, 0, bufferLength);
-            DUMMYHOSTENT* dst = (DUMMYHOSTENT*) buffer;
+            memset(_buffer, 0, bufferLength);
+            DUMMYHOSTENT* dst = (DUMMYHOSTENT*) _buffer;
             dst->addr = addr;
             dst->addr6 = addr6;
             dst->addrlist[0] = (char*) &dst->addr;
@@ -554,7 +565,7 @@ private:
                 case AF_UNSPEC:
                 default:
                     memset(&hints, 0, sizeof hints);
-                    getaddrinfo(proxy.host, NULL, &hints, &res0);
+                    getaddrinfo((u8)proxy.host, NULL, &hints, &res0);
                     if (res0) {
                         int flag = 0;
                         for (res = res0; res; res = res->ai_next) {
@@ -591,7 +602,7 @@ private:
                     break;
             }
 
-            strcpy_s(dst->hostname, bufferLength - sizeof (DUMMYHOSTENT), realhost);
+            strcpy_s(dst->hostname, bufferLength - sizeof (DUMMYHOSTENT), (u8)realhost);
         }
     };
     class ConnectionInfoHolder {
@@ -665,7 +676,7 @@ private:
             ::LeaveCriticalSection(&section);
             return info;
         }
-        ConnectionInfo* find(const char* url) {
+        ConnectionInfo* find(const TCHAR* url) {
             ::EnterCriticalSection(&section);
             ConnectionInfo* info = table.get(url);
             ::LeaveCriticalSection(&section);
@@ -734,20 +745,18 @@ private:
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND && wParam == MAKEWPARAM(IDC_REFER, BN_CLICKED)) {
-                char buffer[1024];
-                char uimsg[MAX_UIMSG];
-                OPENFILENAME ofn = {
-                    sizeof ofn,
-                    *this,
-                };
+                TCHAR buffer[1024];
+                TCHAR uimsg[MAX_UIMSG];
+                OPENFILENAME ofn;
+                ofn.lStructSize = sizeof(ofn);
                 ofn.lpstrFile = buffer;
                 ofn.nMaxFile = countof(buffer);
                 ofn.Flags = OFN_LONGNAMES | OFN_NONETWORKBUTTON | OFN_PATHMUSTEXIST | OFN_NOREADONLYRETURN | OFN_HIDEREADONLY;
-                UTIL_get_lang_msg("MSG_LOGFILE_SELECT", uimsg, sizeof(uimsg),
-                                  "Select Logfile");
+                UTIL_get_lang_msg("MSG_LOGFILE_SELECT", uimsg, _countof(uimsg),
+                                  _T("Select Logfile"));
                 ofn.lpstrTitle = uimsg;
                 if (logfile != NULL) {
-                    strcpy_s(buffer, sizeof buffer, logfile);
+                    _tcscpy_s(buffer, _countof(buffer), (tc)logfile);
                 }else{
                     buffer[0] = '\0';
                 }
@@ -764,14 +773,33 @@ private:
             return Dialog::dispatch(message, wParam, lParam);
         }
         virtual bool onInitDialog() {
-            char uimsg[MAX_UIMSG], uitmp[MAX_UIMSG];
-            LOGFONT logfont;
+            const static DlgTextInfo text_info[] = {
+                { 0, "DLG_OTHER_TITLE" },
+                { IDC_GRP_COMMON, "DLG_OTHER_COMMON" },
+                { IDC_TIMEOUT_LABEL, "DLG_OTHER_TIMEOUT" },
+                { IDC_TIMEOUT_SECONDS, "DLG_OTHER_SECOND" },
+                { IDC_LOGFILE_LABEL, "DLG_OTHER_LOG" },
+                { IDC_REFER, "DLG_OTHER_REFER" },
+                { IDC_GRP_SOCKS, "DLG_OTHER_SOCKS" },
+                { IDC_RESOLVE_LABEL, "DLG_OTHER_RESOLV" },
+                { IDC_GRP_TELNET, "DLG_OTHER_TELNET" },
+                { IDC_HOSTNAME_LABEL, "DLG_OTHER_HOST" },
+                { IDC_USERNAME_LABEL, "DLG_OTHER_USER" },
+                { IDC_PASSWORD_LABEL, "DLG_OTHER_PASS" },
+                { IDC_CONNECTED_LABEL, "DLG_OTHER_CONNECT" },
+                { IDC_ERROR_LABEL, "DLG_OTHER_ERROR" },
+//              { IDOK, "BTN_OK" },
+//              { IDCANCEL, "BTN_CANCEL" },
+            };
+            TCHAR uimsg[MAX_UIMSG];
+//			TCHAR uitmp[MAX_UIMSG];
+            LOGFONTA logfont;
             HFONT font;
 
             Dialog::onInitDialog();
 
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-            GetObject(font, sizeof(LOGFONT), &logfont);
+            GetObject(font, sizeof(logfont), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
                 SendDlgItemMessage(IDC_GRP_COMMON, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
                 SendDlgItemMessage(IDC_TIMEOUT_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
@@ -801,6 +829,9 @@ private:
                 DlgFont = NULL;
             }
 
+            HWND hWnd = (HWND)this;
+            SetDlgTexts(hWnd, text_info, _countof(text_info), UILanguageFile);
+#if 0
             GetWindowText(uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("DLG_OTHER_TITLE", uimsg, sizeof(uimsg), uitmp);
             SetWindowText(uimsg);
@@ -849,6 +880,7 @@ private:
             GetDlgItemText(IDCANCEL, uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uitmp);
             SetDlgItemText(IDCANCEL, uimsg);
+#endif
 
             host = GetDlgItem(IDC_HOSTNAME);
             user = GetDlgItem(IDC_USERNAME);
@@ -860,22 +892,22 @@ private:
             SetDlgItemInt(IDC_TIMEOUT, timeout, false);
 
             resolveCombo <<= GetDlgItem(IDC_RESOLVE);
-            UTIL_get_lang_msg("DLG_OTHER_RESOLV_AUTO", uimsg, sizeof(uimsg), "auto resolve");
+            UTIL_get_lang_msg("DLG_OTHER_RESOLV_AUTO", uimsg, _countof(uimsg), _T("auto resolve"));
             resolveCombo.addString(uimsg);
-            UTIL_get_lang_msg("DLG_OTHER_RESOLV_REMOTE", uimsg, sizeof(uimsg), "resolve remote");
+            UTIL_get_lang_msg("DLG_OTHER_RESOLV_REMOTE", uimsg, _countof(uimsg), _T("resolve remote"));
             resolveCombo.addString(uimsg);
-            UTIL_get_lang_msg("DLG_OTHER_RESOLV_LOCAL", uimsg, sizeof(uimsg), "resolve local");
+            UTIL_get_lang_msg("DLG_OTHER_RESOLV_LOCAL", uimsg, _countof(uimsg), _T("resolve local"));
             resolveCombo.addString(uimsg);
             resolveCombo.setCurSel(resolve);
 
-            host.SetWindowText(HostnamePrompt);
-            user.SetWindowText(UsernamePrompt);
-            pass.SetWindowText(PasswordPrompt);
-            conn.SetWindowText(ConnectedMessage);
-            erro.SetWindowText(ErrorMessage);
+            host.SetWindowText((tc)HostnamePrompt);
+            user.SetWindowText((tc)UsernamePrompt);
+            pass.SetWindowText((tc)PasswordPrompt);
+            conn.SetWindowText((tc)ConnectedMessage);
+            erro.SetWindowText((tc)ErrorMessage);
 
             if (logfile != NULL)
-                log.SetWindowText(logfile);
+                log.SetWindowText((tc)logfile);
 
             return true;
         }
@@ -885,9 +917,9 @@ private:
                 || pass.GetWindowTextLength() == 0
                 || conn.GetWindowTextLength() == 0
                 || erro.GetWindowTextLength() == 0) {
-                char uimsg[MAX_UIMSG];
-                UTIL_get_lang_msg("MSG_EMPTY_PARAMETER", uimsg, sizeof(uimsg),
-                                  "Some parameters are empty!");
+                TCHAR uimsg[MAX_UIMSG];
+                UTIL_get_lang_msg("MSG_EMPTY_PARAMETER", uimsg, _countof(uimsg),
+                                  _T("Some parameters are empty!"));
                 MessageBox(uimsg, FileVersion::getOwnVersion().getProductName(), MB_OK | MB_ICONERROR);
                 return;
             }
@@ -962,14 +994,15 @@ private:
             return Dialog::dispatch(message, wParam, lParam);
         }
         virtual bool onInitDialog() {
-            char uimsg[MAX_UIMSG], uitmp[MAX_UIMSG];
-            LOGFONT logfont;
+            TCHAR uimsg[MAX_UIMSG];
+//			TCHAR uitmp[MAX_UIMSG];
+            LOGFONTA logfont;
             HFONT font;
 
             Dialog::onInitDialog();
 
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-            GetObject(font, sizeof(LOGFONT), &logfont);
+            GetObject(font, sizeof(logfont), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
                 SendDlgItemMessage(IDC_URL_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
                 SendDlgItemMessage(IDC_URL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
@@ -991,8 +1024,23 @@ private:
                 DlgFont = NULL;
             }
 
+            const static DlgTextInfo text_info[] = {
+                { 0, "DLG_SETUP_TITLE" },
+                { IDC_URL_LABEL, "DLG_SETUP_URL" },
+                { IDC_TYPE_LEBEL, "DLG_SETUP_TYPE" },
+                { IDC_HOSTNAME_LABEL, "DLG_SETUP_HOST" },
+                { IDC_PORT_LABEL, "DLG_SETUP_PORT" },
+                { IDC_USERNAME_LABEL, "DLG_SETUP_USER" },
+                { IDC_PASSWORD_LABEL, "DLG_SETUP_PASS" },
+                { IDC_OPTIONS, "DLG_SETUP_OTHER" },
+//              { IDOK, "BTN_OK" },
+//              { IDCANCEL, "BTN_CANCEL" },
+            };
+            HWND hWnd = (HWND)this;
+            SetDlgTexts(hWnd, text_info, _countof(text_info), UILanguageFile);
+#if 0
             GetWindowText(uitmp, sizeof(uitmp));
-            UTIL_get_lang_msg("DLG_SETUP_TITLE", uimsg, sizeof(uimsg), uitmp);
+            UTIL_get_lang_msgT("DLG_SETUP_TITLE", uimsg, sizeof(uimsg), uitmp);
             SetWindowText(uimsg);
             GetDlgItemText(IDC_URL_LABEL, uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("DLG_SETUP_URL", uimsg, sizeof(uimsg), uitmp);
@@ -1021,7 +1069,7 @@ private:
             GetDlgItemText(IDCANCEL, uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("BTN_CANCEL", uimsg, sizeof(uimsg), uitmp);
             SetDlgItemText(IDCANCEL, uimsg);
-
+#endif
             url  <<= GetDlgItem(IDC_URL);
             type <<= GetDlgItem(IDC_TYPE);
             host <<= GetDlgItem(IDC_HOSTNAME);
@@ -1030,18 +1078,18 @@ private:
             pass <<= GetDlgItem(IDC_PASSWORD);
 
             lock = true;
-            UTIL_get_lang_msg("MSG_TYPE_NONE", uimsg, sizeof(uimsg), "Without Proxy");
+            UTIL_get_lang_msg("MSG_TYPE_NONE", uimsg, _countof(uimsg), __T("Without Proxy"));
             type.addString(uimsg);
-            type.addString("HTTP");
-            type.addString("TELNET");
-            type.addString("SOCKS4");
-            type.addString("SOCKS5");
+            type.addString(_T("HTTP"));
+            type.addString(_T("TELNET"));
+            type.addString(_T("SOCKS4"));
+            type.addString(_T("SOCKS5"));
             if (SSLSocket::isEnabled()) {
-                type.addString("SSL");
-                type.addString("HTTP+SSL");
-                type.addString("TELNET+SSL");
-                type.addString("SOCKS4+SSL");
-                type.addString("SOCKS5+SSL");
+                type.addString(_T("SSL"));
+                type.addString(_T("HTTP+SSL"));
+                type.addString(_T("TELNET+SSL"));
+                type.addString(_T("SOCKS4+SSL"));
+                type.addString(_T("SOCKS5+SSL"));
             }
             type.setCurSel(proxy.type);
 
@@ -1049,8 +1097,8 @@ private:
                 if (proxy.host != NULL) {
                     host.SetWindowText(proxy.host);
                     if (proxy.port != 0) {
-                        char buffer[16];
-                        _itoa_s(proxy.port, buffer, sizeof buffer, 10);
+                        TCHAR buffer[16];
+                        _itot_s(proxy.port, buffer, _countof(buffer), 10);
                         port.SetWindowText(buffer);
                     }
                     if (proxy.user != NULL) {
@@ -1066,17 +1114,17 @@ private:
             return true;
         }
         virtual void onOK() {
-            char uimsg[MAX_UIMSG];
+            TCHAR uimsg[MAX_UIMSG];
             if (proxy.type != ProxyInfo::TYPE_NONE && proxy.type != ProxyInfo::TYPE_SSL) {
                 if (proxy.host == NULL) {
-                    UTIL_get_lang_msg("MSG_EMPTY_HOSTNAME", uimsg, sizeof(uimsg),
-                                      "Hostname is empty!");
+                    UTIL_get_lang_msg("MSG_EMPTY_HOSTNAME", uimsg, _countof(uimsg),
+                                      _T("Hostname is empty!"));
                     MessageBox(uimsg, FileVersion::getOwnVersion().getProductName(), MB_OK | MB_ICONERROR);
                     return;
                 }
                 if (port.GetWindowTextLength() != 0 && proxy.port <= 0) {
-                    UTIL_get_lang_msg("MSG_ILLEGAL_PORT", uimsg, sizeof(uimsg),
-                                      "Illegal port number!");
+                    UTIL_get_lang_msg("MSG_ILLEGAL_PORT", uimsg, _countof(uimsg),
+                                      _T("Illegal port number!"));
                     MessageBox(uimsg, FileVersion::getOwnVersion().getProductName(), MB_OK | MB_ICONERROR);
                     return;
                 }
@@ -1177,9 +1225,9 @@ private:
             }
             String urlS = proxy.generateURL();
             if (urlS == NULL) {
-                urlS = "none:///";
+                urlS = _T("none:///");
             }
-            url.SetWindowText(urlS);
+            url.SetWindowText((tc)urlS);
         }
     public:
         ProxyInfo proxy;
@@ -1197,15 +1245,15 @@ private:
         HFONT DlgFont;
         virtual bool onInitDialog() {
             String buf;
-            char *buf2;
-            const char *ver;
+            TCHAR *buf2;
+            const TCHAR *ver;
             int n, a, b, c, d, len;
-            char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], uimsg3[MAX_UIMSG];
-            LOGFONT logfont;
+            TCHAR uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], uimsg3[MAX_UIMSG];
+            LOGFONTA logfont;
             HFONT font;
 
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-            GetObject(font, sizeof(LOGFONT), &logfont);
+            GetObject(font, sizeof(logfont), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
                 SendDlgItemMessage(IDC_VERSION, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
                 SendDlgItemMessage(IDOK, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
@@ -1214,31 +1262,31 @@ private:
                 DlgFont = NULL;
             }
 
-            GetWindowText(uimsg2, sizeof(uimsg2));
-            UTIL_get_lang_msg("DLG_ABOUT_TITLE", uimsg, sizeof(uimsg), uimsg2);
+            GetWindowText(uimsg2, _countof(uimsg2));
+            UTIL_get_lang_msg("DLG_ABOUT_TITLE", uimsg, _countof(uimsg), uimsg2);
             SetWindowText(uimsg);
 
-            UTIL_get_lang_msg("DLG_ABOUT_EXTENSION", uimsg, sizeof(uimsg),
-                              "Tera Term proxy extension");
-            UTIL_get_lang_msg("DLG_ABOUT_YEBISUYA", uimsg2, sizeof(uimsg2),
-                              "YebisuyaHompo");
-            UTIL_get_lang_msg("DLG_ABOUT_HOMEPAGE", uimsg3, sizeof(uimsg3),
-                              "TTProxy home page");
+            UTIL_get_lang_msg("DLG_ABOUT_EXTENSION", uimsg, _countof(uimsg),
+                              _T("Tera Term proxy extension"));
+            UTIL_get_lang_msg("DLG_ABOUT_YEBISUYA", uimsg2, _countof(uimsg2),
+                              _T("YebisuyaHompo"));
+            UTIL_get_lang_msg("DLG_ABOUT_HOMEPAGE", uimsg3, _countof(uimsg3),
+                              _T("TTProxy home page"));
             buf = GetDlgItemText(IDC_VERSION);
             len = buf.length() + 50;
-            buf2 = (char *)_alloca(len);
+            buf2 = (TCHAR *)_alloca(sizeof(TCHAR) * len);
             if (buf2 == NULL) {
                 return true;
             }
             ver = FileVersion::getOwnVersion().getFileVersion();
-            n = sscanf_s(ver, "%d, %d, %d, %d", &a, &b, &c, &d);
+            n = _stscanf_s(ver, _T("%d, %d, %d, %d"), &a, &b, &c, &d);
             if (n == 4) {
-                sprintf_s(buf2, len, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
+                _stprintf_s(buf2, len, buf, uimsg, a, b, c, d, uimsg2, uimsg3);
             }
             SetDlgItemText(IDC_VERSION, (n == 4) ? buf2 : buf);
 
-            GetDlgItemText(IDOK, uimsg, sizeof(uimsg));
-            UTIL_get_lang_msg("BTN_OK", uimsg, sizeof(uimsg),"OK");
+            GetDlgItemText(IDOK, uimsg, _countof(uimsg));
+            UTIL_get_lang_msg("BTN_OK", uimsg, _countof(uimsg), _T("OK"));
             SetDlgItemText(IDOK, uimsg);
 
             return true;
@@ -1277,7 +1325,6 @@ private:
     }
 
     int sendToSocket(SOCKET s, const unsigned char* buffer, int size) {
-        int i = 0;
         Logger::log("send", buffer, size);
         return _sendToSocket(s, buffer, size);
     }
@@ -1287,20 +1334,20 @@ private:
         int len;
         va_list arglist;
         va_start(arglist, format);
-        len = wvsprintf(buf, format, arglist);
+        len = wvsprintfA(buf, format, arglist);
         va_end(arglist);
         Logger::log("send", buf);
         return _sendToSocket(s, (const unsigned char*) buf, len);
     }
 
-    int recieveFromSocketTimeout(SOCKET s, unsigned char* buffer, int size, int timeout) {
+    int recieveFromSocketTimeout(SOCKET s, unsigned char* buffer, int size, int _timeout) {
         int ready = 0;
         while (!ready) {
-            struct timeval tv = {timeout, 0};
+            struct timeval tv = {_timeout, 0};
             fd_set fd;
             FD_ZERO(&fd);
             FD_SET(s, &fd);
-            switch (select((int) (s + 1), &fd, NULL, NULL, timeout > 0 ? &tv : NULL)) {
+            switch (select((int) (s + 1), &fd, NULL, NULL, _timeout > 0 ? &tv : NULL)) {
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
             case 0:
@@ -1348,13 +1395,13 @@ private:
         return 0;
     }
 
-    int wait_for_prompt(SOCKET s, String prompts[], int count, int timeout /* sec */) {
+    int wait_for_prompt(SOCKET s, String prompts[], int count, int _timeout /* sec */) {
         char buf[1024];
         while (1) {
             char *dst = buf;
             char *end = buf + sizeof buf - 1;
             while (dst < end) {
-                switch (recieveFromSocketTimeout(s, (unsigned char*) dst, 1, timeout)) {    /* recv one-by-one */
+                switch (recieveFromSocketTimeout(s, (unsigned char*) dst, 1, _timeout)) {    /* recv one-by-one */
                 case SOCKET_ERROR:
                     if (WSAGetLastError() != WSAEWOULDBLOCK) {
                         return SOCKET_ERROR;
@@ -1376,7 +1423,8 @@ private:
                 *dst = '\0';
                 Logger::log("recv", buf);
                 for (i = 0; i < count; i++) {
-                    char* found = strstr(buf, prompts[i]);
+                    u8 promptU8 = (const TCHAR *)prompts[i];
+                    char* found = strstr(buf, promptU8);
                     if (found != NULL) {
                         return i;
                     }
@@ -1389,13 +1437,16 @@ private:
         static const char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         char buf[1024];
         int status_code;
-        if (sendToSocketFormat(s, strchr(realhost,':')?"CONNECT [%s]:%d HTTP/1.1\r\n":"CONNECT %s:%d HTTP/1.1\r\n", (const char *)realhost, realport) == SOCKET_ERROR)
+        u8 realhostU8 = (const TCHAR *)realhost;
+        if (sendToSocketFormat(s, strchr((const char *)realhostU8,':')?"CONNECT [%s]:%d HTTP/1.1\r\n":"CONNECT %s:%d HTTP/1.1\r\n", (const char *)realhostU8, realport) == SOCKET_ERROR)
             return SOCKET_ERROR;
-        if (sendToSocketFormat(s, strchr(realhost,':')?"Host: [%s]:%d\r\n":"Host: %s:%d\r\n", (const char *)realhost, realport) == SOCKET_ERROR)
+        if (sendToSocketFormat(s, strchr((const char *)realhostU8,':')?"Host: [%s]:%d\r\n":"Host: %s:%d\r\n", (const char *)realhostU8, realport) == SOCKET_ERROR)
             return SOCKET_ERROR;
         if (proxy.user != NULL) {
-            int userlen = strlen(proxy.user);
-            int passlen = strlen(proxy.pass);
+            u8 proxy_user = (const TCHAR *)proxy.user;
+            u8 proxy_pass = (const TCHAR *)proxy.pass;
+            int userlen = strlen(proxy_user);
+            int passlen = strlen(proxy_pass);
             int authlen = userlen + 1 + passlen;
             int encodedlen = (authlen + 2) / 3 * 4;
             char* auth = (char*) alloca(authlen + 1);
@@ -1404,10 +1455,10 @@ private:
             char *dst = encoded;
             int bits = 0;
             int data = 0;
-            strcpy_s(auth, authlen + 1, proxy.user);
+            strcpy_s(auth, authlen + 1, proxy_user);
             auth[userlen] = ':';
-            strcpy_s(auth + userlen + 1, passlen + 1, proxy.pass);
-        
+            strcpy_s(auth + userlen + 1, passlen + 1, proxy_pass);
+
             /* make base64 string */
             while (*src != '\0') {
                 data = (data << 8) | *src++;
@@ -1422,7 +1473,7 @@ private:
                 *dst++ = base64_table[0x3F & (data << (6 - bits))];
                 encodedlen--;
             }
-            while (encodedlen-- > 0) { 
+            while (encodedlen-- > 0) {
                 *dst++ = '=';
             }
             *dst = '\0';
@@ -1441,19 +1492,19 @@ private:
             }
         } while (strcmp(buf,"\r\n") != 0);
         if (status_code != 200) {
-            char uimsg[MAX_UIMSG];
+            TCHAR uimsg[MAX_UIMSG];
             switch (status_code) {
             case 401:
             case 407:
                 UTIL_get_lang_msg("MSG_PROXY_UNAUTHORIZED", uimsg, sizeof(uimsg),
-                                  "Proxy authorization failed!");
+                                  _T("Proxy authorization failed!"));
                 break;
             case 400:
             case 405:
             case 406:
             case 403:
                 UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                                  "Proxy prevent this connection!");
+                                  _T("Proxy prevent this connection!"));
                 break;
             }
             return setError(s, uimsg);
@@ -1496,7 +1547,10 @@ private:
         int auth_result;
         unsigned char buf[256];
         unsigned char* ptr = buf;
-        char uimsg[MAX_UIMSG];
+        TCHAR uimsg[MAX_UIMSG];
+        u8 proxy_user = (const TCHAR *)proxy.user;
+        u8 proxy_pass = (const TCHAR *)proxy.pass;
+        u8 realhostU8 = (const TCHAR *)realhost;
         *ptr++ = SOCKS5_VERSION;
         if (proxy.user != NULL && proxy.pass != NULL) {
             *ptr++ = 2; // support 2 auth methods : SOCKS5_AUTH_NOAUTH, SOCKS5_AUTH_USERPASS
@@ -1512,9 +1566,8 @@ private:
             return SOCKET_ERROR;
 
         if (buf[0] != SOCKS5_VERSION || buf[1] == SOCKS5_REJECT) {
-            char uimsg[MAX_UIMSG];
             UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                              "Proxy prevent this connection!");
+                              _T("Proxy prevent this connection!"));
             return setError(s, uimsg);
         }
         auth_method = buf[1];
@@ -1529,19 +1582,19 @@ private:
             /* make authentication packet */
             ptr = buf;
             *ptr++ = SOCKS5_AUTH_SUBNEGOVER;
-            len = proxy.user.length();
+            len = strlen(proxy_user);
             *ptr++ = len;
-            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), proxy.user);
+            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), proxy_user);
             ptr += len;
-            len = proxy.pass.length();
+            len = strlen(proxy_pass);
             *ptr++ = len;
-            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), proxy.pass);
+            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), proxy_pass);
             ptr += len;
 
             /* send it and get answer */
-            if (sendToSocket(s, buf, ptr - buf) == SOCKET_ERROR) 
+            if (sendToSocket(s, buf, ptr - buf) == SOCKET_ERROR)
                 return SOCKET_ERROR;
-            if (recieveFromSocket(s, buf, 2) == SOCKET_ERROR) 
+            if (recieveFromSocket(s, buf, 2) == SOCKET_ERROR)
                 return SOCKET_ERROR;
 
             /* check status */
@@ -1549,14 +1602,14 @@ private:
             break;
         default:
             UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                              "Proxy prevent this connection!");
+                              _T("Proxy prevent this connection!"));
             return setError(s, uimsg);
         }
         if (auth_result == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }else if (auth_result != 0) {
             UTIL_get_lang_msg("MSG_PROXY_UNAUTHORIZED", uimsg, sizeof(uimsg),
-                              "Proxy authorization failed!");
+                              _T("Proxy authorization failed!"));
             return setError(s, uimsg);
         }
         /* request to connect */
@@ -1567,7 +1620,7 @@ private:
         struct addrinfo hints, *res = NULL;
         if (resolve != RESOLVE_REMOTE) {
             memset(&hints, 0, sizeof(hints));
-            getaddrinfo(realhost, NULL, &hints, &res);
+            getaddrinfo(realhostU8, NULL, &hints, &res);
         }
         if (res) {
             switch (res->ai_family) {
@@ -1584,6 +1637,7 @@ private:
               default:
                 freeaddrinfo(res);
                 WSASetLastError(WSAECONNREFUSED);
+
                 return SOCKET_ERROR;
                 break;
             }
@@ -1595,9 +1649,9 @@ private:
         }
         else {
             *ptr++ = SOCKS5_ATYP_DOMAINNAME;
-            len = strlen(realhost);
+            len = strlen(realhostU8);
             *ptr++ = len;
-            memcpy(ptr, realhost, len);
+            memcpy(ptr, realhostU8, len);
             ptr += len;
         }
         *ptr++ = realport >> 8;     /* DST.PORT */
@@ -1608,7 +1662,7 @@ private:
             return SOCKET_ERROR;
         if (buf[0] != SOCKS5_VERSION || buf[1] != SOCKS5_REP_SUCCEEDED) {   /* check reply code */
             UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                              "Proxy prevent this connection!");
+                              _T("Proxy prevent this connection!"));
             return setError(s, uimsg);
         }
         // buf[2] is reserved
@@ -1647,8 +1701,8 @@ private:
 
     int begin_relay_socks4(ProxyInfo& proxy, String realhost, unsigned short realport, SOCKET s) {
         unsigned char buf[256], *ptr;
-
-        /* make connect request packet 
+        u8 realhostU8 = (const TCHAR *)realhost;
+        /* make connect request packet
            protocol v4:
              VN:1, CD:1, PORT:2, ADDR:4, USER:n, NULL:1
            protocol v4a:
@@ -1661,15 +1715,15 @@ private:
         *ptr++ = realport & 0xFF;
         in_addr addr;
         addr.s_addr = INADDR_NONE;
-        char ch = realhost.charAt(0);
+        char ch = *(const char *)realhostU8;
         if ('0' <= ch && ch <= '9') {
-            addr.s_addr = inet_addr(realhost);
+            addr.s_addr = inet_addr(realhostU8);
         }
         if (addr.s_addr != INADDR_NONE) {
             memcpy(ptr, &addr, sizeof addr);
             ptr += sizeof addr;
         }else{
-            struct hostent* entry = resolve != RESOLVE_REMOTE ? gethostbyname(realhost) : NULL;
+            struct hostent* entry = resolve != RESOLVE_REMOTE ? gethostbyname(realhostU8) : NULL;
             if (entry != NULL && entry->h_addrtype == AF_INET && entry->h_length == sizeof (in_addr)) {
                 addr.s_addr = INADDR_LOOPBACK;
                 memcpy(ptr, entry->h_addr_list[0], entry->h_length);
@@ -1687,15 +1741,16 @@ private:
         }
         /* username */
         if (proxy.user != NULL) {
-            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), proxy.user);
+            u8 proxy_user = (const TCHAR *)proxy.user;
+            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), proxy_user);
             ptr += proxy.user.length() + 1;
         }else{
             *ptr++ = '\0';
         }
         if (addr.s_addr == INADDR_NONE) {
             /* destination host name (for protocol 4a) */
-            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), realhost);
-            ptr += strlen(realhost) + 1;
+            strcpy_s((char*) ptr, sizeof buf - (ptr - buf), realhostU8);
+            ptr += strlen(realhostU8) + 1;
         }
         /* send command and get response
            response is: VN:1, CD:1, PORT:2, ADDR:4 */
@@ -1705,42 +1760,45 @@ private:
         if (recieveFromSocket(s, buf, 8) == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
-        char uimsg[MAX_UIMSG];
-        uimsg[0] = NULL;
+        TCHAR uimsg[MAX_UIMSG];
+        uimsg[0] = 0;
         if (buf[0] != 0) {
-            UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                              "Proxy prevent this connection!");
+            UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, _countof(uimsg),
+                              _T("Proxy prevent this connection!"));
         }else if (buf[1] == SOCKS4_REP_IDENT_FAIL || buf[1] == SOCKS4_REP_USERID) {
-            UTIL_get_lang_msg("MSG_PROXY_UNAUTHORIZED", uimsg, sizeof(uimsg),
-                              "Proxy authorization failed!");
+            UTIL_get_lang_msg("MSG_PROXY_UNAUTHORIZED", uimsg, _countof(uimsg),
+                              _T("Proxy authorization failed!"));
         }else if (buf[1] != SOCKS4_REP_SUCCEEDED) {
-            UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                              "Proxy prevent this connection!");
+            UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, _countof(uimsg),
+                              _T("Proxy prevent this connection!"));
         }
-        if (uimsg[0] != NULL) {
+        if (uimsg[0] != 0) {
             return setError(s, uimsg);
         }
-    
+
         /* Conguraturation, connected via SOCKS4 server! */
         return 0;
     }
 
     int begin_relay_telnet(ProxyInfo& proxy, String realhost, unsigned short realport, SOCKET s) {
         int err = 0;
-        char uimsg[MAX_UIMSG];
+        TCHAR uimsg[MAX_UIMSG];
+        u8 realhostU8 = (const TCHAR *)realhost;
+        u8 proxy_user = (const TCHAR *)proxy.user;
+        u8 proxy_pass = (const TCHAR *)proxy.pass;
 
         while (!err) {
             switch (wait_for_prompt(s, prompt_table, countof(prompt_table), 10)) {
             case 0: /* Hostname prompt */
-                if (sendToSocketFormat(s, strchr(realhost,':')?"[%s]:%d\n":"%s:%d\n", (const char *)realhost, realport) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, strchr(realhostU8,':')?"[%s]:%d\n":"%s:%d\n", (const char *)realhostU8, realport) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 1: /* Username prompt */
-                if (sendToSocketFormat(s, "%s\n", (const char *)proxy.user) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, "%s\n", (const char *)proxy_user) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 2: /* Password prompt */
-                if (sendToSocketFormat(s, "%s\n", (const char *)proxy.pass) == SOCKET_ERROR)
+                if (sendToSocketFormat(s, "%s\n", (const char *)proxy_pass) == SOCKET_ERROR)
                     return SOCKET_ERROR;
                 break;
             case 3: /* Established message */
@@ -1752,11 +1810,11 @@ private:
             }
         }
         UTIL_get_lang_msg("MSG_PROXY_BAD_REQUEST", uimsg, sizeof(uimsg),
-                          "Proxy prevent this connection!");
+                          _T("Proxy prevent this connection!"));
         return setError(s, uimsg);
     }
 
-    int setError(SOCKET s, char *p) {
+    int setError(SOCKET s, TCHAR *p) {
         if (*p != NULL)
             showMessage(p);
         HWND window;
@@ -1771,7 +1829,7 @@ private:
         WSASetLastError(WSAECONNREFUSED);
         return SOCKET_ERROR;
     }
-    void showMessage(char *p) {
+    void showMessage(TCHAR *p) {
         if (shower != NULL) {
             shower->showMessage(p);
         }
@@ -1814,7 +1872,7 @@ private:                                                   \
             struct sockaddr_in* in = (struct sockaddr_in*) name;
             info = connectioninfolist.get(in->sin_addr);
             if (info == NULL && defaultProxy.type != ProxyInfo::TYPE_NONE) {
-                info = new ConnectionInfo(defaultProxy, inet_ntoa(in->sin_addr));
+                info = new ConnectionInfo(defaultProxy, String((tc)inet_ntoa(in->sin_addr)));
                 holder = info;
             }
         }
@@ -1824,8 +1882,8 @@ private:                                                   \
             if (info == NULL && defaultProxy.type != ProxyInfo::TYPE_NONE) {
                 DWORD bufflen = 64;
                 char* buff = new char[64];
-                WSAAddressToString((struct sockaddr*)name, sizeof(struct sockaddr_in6), NULL, buff, &bufflen);
-                info = new ConnectionInfo(defaultProxy, buff);
+                WSAAddressToStringA((struct sockaddr*)name, sizeof(struct sockaddr_in6), NULL, buff, &bufflen);
+                info = new ConnectionInfo(defaultProxy, String((tc)buff));
                 holder = info;
             }
         }
@@ -1833,7 +1891,7 @@ private:                                                   \
             if (info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
                 info = NULL;
             }else{
-                const char* hostname;
+                u8 hostname;
                 if (info->proxy.type == ProxyInfo::TYPE_SSL) {
                     hostname = info->realhost;
                 }else{
@@ -1918,147 +1976,147 @@ private:                                                   \
                     return SOCKET_ERROR;
                 }
                 SSLSocket* ssl = new SSLSocket();
-                if (!ssl->connect(s, info->realhost)) {
+                if (!ssl->connect(s, (u8)info->realhost)) {
                     shutdown(s, SD_BOTH);
                     int error_code = ssl->get_verify_result();
-                    char uimsg[MAX_UIMSG];
+                    TCHAR uimsg[MAX_UIMSG];
                     delete ssl;
                     switch (error_code) {
                         case IDS_UNABLE_TO_GET_ISSUER_CERT:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_GET_ISSUER_CERT", uimsg, sizeof(uimsg),
-                                              "Unable to get Issuer Certificate");
+                                              _T("Unable to get Issuer Certificate"));
                             break;
                         case IDS_UNABLE_TO_GET_CRL:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_GET_CRL", uimsg, sizeof(uimsg),
-                                              "Unable to get Certificate CRL");
+                                              _T("Unable to get Certificate CRL"));
                             break;
                         case IDS_UNABLE_TO_DECRYPT_CERT_SIGNATURE:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_DECRYPT_CERT_SIGNATURE", uimsg, sizeof(uimsg),
-                                              "Unable to decrypt Certificate's Signature");
+                                              _T("Unable to decrypt Certificate's Signature"));
                             break;
                         case IDS_UNABLE_TO_DECRYPT_CRL_SIGNATURE:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_DECRYPT_CRL_SIGNATURE", uimsg, sizeof(uimsg),
-                                              "Unable to decrypt CRL's Signature");
+                                              _T("Unable to decrypt CRL's Signature"));
                             break;
                         case IDS_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY", uimsg, sizeof(uimsg),
-                                              "Unable to decode Issuer Public Key");
+                                              _T("Unable to decode Issuer Public Key"));
                             break;
                         case IDS_CERT_SIGNATURE_FAILURE:
                             UTIL_get_lang_msg("MSG_CERT_SIGNATURE_FAILURE", uimsg, sizeof(uimsg),
-                                              "Certificate Signature failure");
+                                              _T("Certificate Signature failure"));
                             break;
                         case IDS_CRL_SIGNATURE_FAILURE:
                             UTIL_get_lang_msg("MSG_CRL_SIGNATURE_FAILURE", uimsg, sizeof(uimsg),
-                                              "CRL Signature failure");
+                                              _T("CRL Signature failure"));
                             break;
                         case IDS_CERT_NOT_YET_VALID:
                             UTIL_get_lang_msg("MSG_CERT_NOT_YET_VALID", uimsg, sizeof(uimsg),
-                                              "Certificate is not yet valid");
+                                              _T("Certificate is not yet valid"));
                             break;
                         case IDS_CERT_HAS_EXPIRED:
                             UTIL_get_lang_msg("MSG_CERT_HAS_EXPIRED", uimsg, sizeof(uimsg),
-                                              "Certificate has expired");
+                                              _T("Certificate has expired"));
                             break;
                         case IDS_CRL_NOT_YET_VALID:
                             UTIL_get_lang_msg("MSG_CRL_NOT_YET_VALID", uimsg, sizeof(uimsg),
-                                              "CRL is not yet valid");
+                                              _T("CRL is not yet valid"));
                             break;
                         case IDS_CRL_HAS_EXPIRED:
                             UTIL_get_lang_msg("MSG_CRL_HAS_EXPIRED", uimsg, sizeof(uimsg),
-                                              "CRL has expired");
+                                              _T("CRL has expired"));
                             break;
                         case IDS_ERROR_IN_CERT_NOT_BEFORE_FIELD:
                             UTIL_get_lang_msg("MSG_ERROR_IN_CERT_NOT_BEFORE_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in Certificate's notBefore field");
+                                              _T("Format error in Certificate's notBefore field"));
                             break;
                         case IDS_ERROR_IN_CERT_NOT_AFTER_FIELD:
                             UTIL_get_lang_msg("MSG_ERROR_IN_CERT_NOT_AFTER_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in Certificate's notAfter field");
+                                              _T("Format error in Certificate's notAfter field"));
                             break;
                         case IDS_ERROR_IN_CRL_LAST_UPDATE_FIELD:
                             UTIL_get_lang_msg("MSG_ERROR_IN_CRL_LAST_UPDATE_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in CRL's lastUpdate field");
+                                              _T("Format error in CRL's lastUpdate field"));
                             break;
                         case IDS_ERROR_IN_CRL_NEXT_UPDATE_FIELD:
                             UTIL_get_lang_msg("MSG_ERROR_IN_CRL_NEXT_UPDATE_FIELD", uimsg, sizeof(uimsg),
-                                              "Format error in CRL's nextUpdate field");
+                                              _T("Format error in CRL's nextUpdate field"));
                             break;
                         case IDS_OUT_OF_MEM:
                             UTIL_get_lang_msg("MSG_OUT_OF_MEM", uimsg, sizeof(uimsg),
-                                              "Out of memory");
+                                              _T("Out of memory"));
                             break;
                         case IDS_DEPTH_ZERO_SELF_SIGNED_CERT:
                             UTIL_get_lang_msg("MSG_DEPTH_ZERO_SELF_SIGNED_CERT", uimsg, sizeof(uimsg),
-                                              "Self-signed Certificate");
+                                              _T("Self-signed Certificate"));
                             break;
                         case IDS_SELF_SIGNED_CERT_IN_CHAIN:
                             UTIL_get_lang_msg("MSG_SELF_SIGNED_CERT_IN_CHAIN", uimsg, sizeof(uimsg),
-                                              "Self-signed Certificate found in Certificate chain");
+                                              _T("Self-signed Certificate found in Certificate chain"));
                             break;
                         case IDS_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_GET_ISSUER_CERT_LOCALLY", uimsg, sizeof(uimsg),
-                                              "Unable to get Local Issuer Certificate");
+                                              _T("Unable to get Local Issuer Certificate"));
                             break;
                         case IDS_UNABLE_TO_VERIFY_LEAF_SIGNATURE:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_VERIFY_LEAF_SIGNATURE", uimsg, sizeof(uimsg),
-                                              "Unable to verify the first Certificate");
+                                              _T("Unable to verify the first Certificate"));
                             break;
                         case IDS_CERT_CHAIN_TOO_LONG:
                             UTIL_get_lang_msg("MSG_CERT_CHAIN_TOO_LONG", uimsg, sizeof(uimsg),
-                                              "Certificate chain too long");
+                                              _T("Certificate chain too long"));
                             break;
                         case IDS_CERT_REVOKED:
                             UTIL_get_lang_msg("MSG_CERT_REVOKED", uimsg, sizeof(uimsg),
-                                              "Certificate revoked");
+                                              _T("Certificate revoked"));
                             break;
                         case IDS_INVALID_CA:
                             UTIL_get_lang_msg("MSG_INVALID_CA", uimsg, sizeof(uimsg),
-                                              "Invalid CA Certificate");
+                                              _T("Invalid CA Certificate"));
                             break;
                         case IDS_PATH_LENGTH_EXCEEDED:
                             UTIL_get_lang_msg("MSG_PATH_LENGTH_EXCEEDED", uimsg, sizeof(uimsg),
-                                              "Path length constraint exceeded");
+                                              _T("Path length constraint exceeded"));
                             break;
                         case IDS_INVALID_PURPOSE:
                             UTIL_get_lang_msg("MSG_INVALID_PURPOSE", uimsg, sizeof(uimsg),
-                                              "Unsupported Certificate purpose");
+                                              _T("Unsupported Certificate purpose"));
                             break;
                         case IDS_CERT_UNTRUSTED:
                             UTIL_get_lang_msg("MSG_CERT_UNTRUSTED", uimsg, sizeof(uimsg),
-                                              "Certificate not trusted");
+                                              _T("Certificate not trusted"));
                             break;
                         case IDS_CERT_REJECTED:
                             UTIL_get_lang_msg("MSG_CERT_REJECTED", uimsg, sizeof(uimsg),
-                                              "Certificate rejected");
+                                              _T("Certificate rejected"));
                             break;
                         case IDS_SUBJECT_ISSUER_MISMATCH:
                             UTIL_get_lang_msg("MSG_SUBJECT_ISSUER_MISMATCH", uimsg, sizeof(uimsg),
-                                              "Subject Issuer mismatch");
+                                              _T("Subject Issuer mismatch"));
                             break;
                         case IDS_AKID_SKID_MISMATCH:
                             UTIL_get_lang_msg("MSG_AKID_SKID_MISMATCH", uimsg, sizeof(uimsg),
-                                              "Authority and Subject Key Identifier mismatch");
+                                              _T("Authority and Subject Key Identifier mismatch"));
                             break;
                         case IDS_AKID_ISSUER_SERIAL_MISMATCH:
                             UTIL_get_lang_msg("MSG_AKID_ISSUER_SERIAL_MISMATCH", uimsg, sizeof(uimsg),
-                                              "Authority and Issuer Serial Number mismatch");
+                                              _T("Authority and Issuer Serial Number mismatch"));
                             break;
                         case IDS_KEYUSAGE_NO_CERTSIGN:
                             UTIL_get_lang_msg("MSG_KEYUSAGE_NO_CERTSIGN", uimsg, sizeof(uimsg),
-                                              "Key usage does not include Certificate signing");
+                                              _T("Key usage does not include Certificate signing"));
                             break;
                         case IDS_APPLICATION_VERIFICATION:
                             UTIL_get_lang_msg("MSG_APPLICATION_VERIFICATION", uimsg, sizeof(uimsg),
-                                              "Application verification failure");
+                                              _T("Application verification failure"));
                             break;
                         case IDS_UNMATCH_COMMON_NAME:
                             UTIL_get_lang_msg("MSG_UNMATCH_COMMON_NAME", uimsg, sizeof(uimsg),
-                                              "Unmatch Common Name");
+                                              _T("Unmatch Common Name"));
                             break;
                         case IDS_UNABLE_TO_GET_COMMON_NAME:
                             UTIL_get_lang_msg("MSG_UNABLE_TO_GET_COMMON_NAME", uimsg, sizeof(uimsg),
-                                              "Unable to get Common Name");
+                                              _T("Unable to get Common Name"));
                             break;
                         default:
                             uimsg[0] = NULL;
@@ -2073,10 +2131,10 @@ private:                                                   \
     }
 
     DECLARE_HOOKAPI(struct hostent*, gethostbyname, (const char* hostname), (hostname)) {
-        ConnectionInfo* info = connectioninfolist.find(hostname);
+        ConnectionInfo* info = connectioninfolist.find((tc)hostname);
         if (info != NULL) {
             if (info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
-                hostname = info->realhost;
+                hostname = (u8)info->realhost;
             }else{
                 if (info->proxy.type == ProxyInfo::TYPE_SSL
                     || info->proxy.type == ProxyInfo::TYPE_HTTP_SSL
@@ -2089,7 +2147,8 @@ private:                                                   \
                     }
                 }
                 if (info->buffer == NULL) {
-                    int bufferLength = sizeof (DUMMYHOSTENT) + strlen(info->realhost);
+                    u8 realhostU8 = (const TCHAR *)info->realhost;
+                    int bufferLength = sizeof (DUMMYHOSTENT) + strlen(realhostU8);
                     info->buffer = new char[bufferLength];
                     info->fillBuffer(info->buffer, bufferLength);
                 }
@@ -2100,7 +2159,7 @@ private:                                                   \
     }
 
     DECLARE_HOOKAPI(HANDLE, WSAAsyncGetHostByName, (HWND window, UINT message, const char* hostname, char* buffer, int bufferLength), (window, message, hostname, buffer, bufferLength)) {
-        ConnectionInfo* info = connectioninfolist.find(hostname);
+        ConnectionInfo* info = connectioninfolist.find((tc)hostname);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
             return ORIG_WSAAsyncGetHostByName(window, message, hostname, buffer, bufferLength);
         }
@@ -2115,7 +2174,8 @@ private:                                                   \
             }
         }
         HANDLE handle = connectioninfolist.getTask(info);
-        int len = sizeof (DUMMYHOSTENT) + strlen(hostname);
+        u8 hostnameU8 = hostname;
+        int len = sizeof (DUMMYHOSTENT) + strlen(hostnameU8);
         if (bufferLength < len) {
             ::PostMessage(window, message, (WPARAM) handle, MAKELPARAM(len, WSAENOBUFS));
             ::WSASetLastError(WSAENOBUFS);
@@ -2127,7 +2187,7 @@ private:                                                   \
     }
 
     DECLARE_HOOKAPI(HANDLE, WSAAsyncGetAddrInfo, (HWND window, UINT message, const char* hostname, const char* portname, struct addrinfo* hints, struct addrinfo** res), (window, message, hostname, portname, hints, res)) {
-        ConnectionInfo* info = connectioninfolist.find(hostname);
+        ConnectionInfo* info = connectioninfolist.find((tc)hostname);
         if (info == NULL || info->proxy.type == ProxyInfo::TYPE_NONE_FORCE) {
             return ORIG_WSAAsyncGetAddrInfo(window, message, hostname, portname, hints, res);
         }
@@ -2142,7 +2202,8 @@ private:                                                   \
             }
         }
         HANDLE handle = connectioninfolist.getTask(info);
-        int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostname) + 1;
+        u8 hostnameU8 = hostname;
+        int bufferLength = sizeof (DUMMYHOSTENT) + strlen(hostnameU8) + 1;
         info->buffer = new char[bufferLength];
         info->fillBuffer(info->buffer, bufferLength, portname, hints->ai_family);
         DUMMYHOSTENT* d = (DUMMYHOSTENT*)info->buffer;
@@ -2225,7 +2286,7 @@ private:                                                   \
     int aicount;
 
     ProxyWSockHook():shower(NULL), owner(NULL), resource_module(GetInstanceHandle()), timeout(0), aicount(0) {
-        HMODULE ws2_32 = ::GetModuleHandle("ws2_32.dll");
+        HMODULE ws2_32 = ::GetModuleHandle(_T("ws2_32.dll"));
         LOADAPI(connect)
         LOADAPI(gethostbyname)
         LOADAPI(WSAAsyncGetHostByName)
@@ -2245,54 +2306,54 @@ private:                                                   \
     }
     void _load(IniFile& ini) {
         String temp;
-        temp = ini.getString("ProxyType");
+        temp = ini.getString(_T("ProxyType"));
         if (temp != NULL) {
             defaultProxy.type = ProxyInfo::parseType(temp);
             if (defaultProxy.type != ProxyInfo::TYPE_NONE) {
-                defaultProxy.host = ini.getString("ProxyHost");
+                defaultProxy.host = ini.getString(_T("ProxyHost"));
                 if (defaultProxy.host == NULL || defaultProxy.type == ProxyInfo::TYPE_NONE_FORCE) {
                     defaultProxy.type = ProxyInfo::TYPE_NONE;
                 }else{
-                    defaultProxy.port = (unsigned short) ini.getInteger("ProxyPort");
-                    defaultProxy.user = ini.getString("ProxyUser");
+                    defaultProxy.port = (unsigned short) ini.getInteger(_T("ProxyPort"));
+                    defaultProxy.user = ini.getString(_T("ProxyUser"));
                     if (defaultProxy.user != NULL)
-                        defaultProxy.pass = ini.getString("ProxyPass");
+                        defaultProxy.pass = ini.getString(_T("ProxyPass"));
                 }
             }
         }
 
-        timeout = ini.getInteger("ConnectionTimeout", 10);
+        timeout = ini.getInteger(_T("ConnectionTimeout"), 10);
 
-        temp = ini.getString("SocksResolve");
-        if (temp.equalsIgnoreCase("remote")) {
+        temp = ini.getString(_T("SocksResolve"));
+        if (temp.equalsIgnoreCase(_T("remote"))) {
             resolve = RESOLVE_REMOTE;
-        }else if (temp.equalsIgnoreCase("local")) {
+        }else if (temp.equalsIgnoreCase(_T("local"))) {
             resolve = RESOLVE_LOCAL;
         }else{
             resolve = RESOLVE_AUTO;
         }
 
-        prompt_table[0] = ini.getString("TelnetHostnamePrompt", ">> Host name: ");
-        prompt_table[1] = ini.getString("TelnetUsernamePrompt", "Username:");
-        prompt_table[2] = ini.getString("TelnetPasswordPrompt", "Password:");
-        prompt_table[3] = ini.getString("TelnetConnectedMessage", "-- Connected to ");
-        prompt_table[4] = ini.getString("TelnetErrorMessage", "!!!!!!!!");
+        prompt_table[0] = ini.getString(_T("TelnetHostnamePrompt"), _T(">> Host name: "));
+        prompt_table[1] = ini.getString(_T("TelnetUsernamePrompt"), _T("Username:"));
+        prompt_table[2] = ini.getString(_T("TelnetPasswordPrompt"), _T("Password:"));
+        prompt_table[3] = ini.getString(_T("TelnetConnectedMessage"), _T("-- Connected to "));
+        prompt_table[4] = ini.getString(_T("TelnetErrorMessage"), _T("!!!!!!!!"));
 
-        logfile = ini.getString("DebugLog");
+        logfile = ini.getString(_T("DebugLog"));
         Logger::open(logfile);
     }
     void _save(IniFile& ini) {
-        const char* type = NULL;
-        const char* host = NULL;
-        const char* port = NULL;
-        const char* user = NULL;
-        const char* pass = NULL;
+        const TCHAR* type = NULL;
+        const TCHAR* host = NULL;
+        const TCHAR* port = NULL;
+        const TCHAR* user = NULL;
+        const TCHAR* pass = NULL;
         if (defaultProxy.type != ProxyInfo::TYPE_NONE && defaultProxy.type != ProxyInfo::TYPE_NONE_FORCE && defaultProxy.host != NULL) {
             type = ProxyInfo::getTypeName(defaultProxy.type);
             host = defaultProxy.host;
             if (defaultProxy.port != 0) {
-                char* buffer = (char*) alloca(6);
-                _itoa_s(defaultProxy.port, buffer, 6, 10);
+                TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * 6);
+                _itot_s(defaultProxy.port, buffer, 6, 10);
                 port = buffer;
             }
             if (defaultProxy.user != NULL) {
@@ -2302,34 +2363,34 @@ private:                                                   \
                 }
             }
         }
-        ini.setString("ProxyType",  type);
-        ini.setString("ProxyHost",  host);
-        ini.setString("ProxyPort",  port);
-        ini.setString("ProxyUser",  user);
-        ini.setString("ProxyPass",  pass);
+        ini.setString(_T("ProxyType"),  type);
+        ini.setString(_T("ProxyHost"),  host);
+        ini.setString(_T("ProxyPort"),  port);
+        ini.setString(_T("ProxyUser"),  user);
+        ini.setString(_T("ProxyPass"),  pass);
 
-        ini.setInteger("ConnectionTimeout", timeout);
+        ini.setInteger(_T("ConnectionTimeout"), timeout);
 
         switch (resolve) {
         case RESOLVE_REMOTE:
-            type = "remote";
+            type = _T("remote");
             break;
         case RESOLVE_LOCAL:
-            type = "local";
+            type = _T("local");
             break;
         default:
-            type = "auto";
+            type = _T("auto");
             break;
         }
-        ini.setString("SocksResolve", type);
+        ini.setString(_T("SocksResolve"), type);
 
-        ini.setString("TelnetHostnamePrompt",   prompt_table[0]);
-        ini.setString("TelnetUsernamePrompt",   prompt_table[1]);
-        ini.setString("TelnetPasswordPrompt",   prompt_table[2]);
-        ini.setString("TelnetConnectedMessage", prompt_table[3]);
-        ini.setString("TelnetErrorMessage",     prompt_table[4]);
+        ini.setString(_T("TelnetHostnamePrompt"),   prompt_table[0]);
+        ini.setString(_T("TelnetUsernamePrompt"),   prompt_table[1]);
+        ini.setString(_T("TelnetPasswordPrompt"),   prompt_table[2]);
+        ini.setString(_T("TelnetConnectedMessage"), prompt_table[3]);
+        ini.setString(_T("TelnetErrorMessage"),     prompt_table[4]);
 
-        ini.setString("DebugLog", logfile);
+        ini.setString(_T("DebugLog"), logfile);
     }
 public:
     static void setOwner(HWND owner) {
@@ -2408,11 +2469,11 @@ public:
     static String generateURL() {
         return instance().defaultProxy.generateURL();
     }
-        static String parseURL(const char* url, BOOL prefix) {
+    static String parseURL(const char* url, BOOL prefix) {
         ProxyInfo proxy;
-        String realhost = ProxyInfo::parse(url, proxy);
+        String realhost = ProxyInfo::parse((tc)url, proxy);
         if (realhost != NULL) {
-            if (realhost.indexOf("://") != -1 && !prefix) {
+            if (realhost.indexOf(_T("://")) != -1 && !prefix) {
                 proxy.type = proxy.TYPE_NONE;
             }
             if (realhost.length() == 0) {

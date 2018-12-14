@@ -38,9 +38,9 @@ inline void OutputDebugStringF(const char* format, ...) {
 	char buffer[1025];
 	va_list arglist;
 	va_start(arglist, format);
-	wvsprintf(buffer, format, arglist);
+	wvsprintfA(buffer, format, arglist);
 	va_end(arglist);
-	OutputDebugString(buffer);
+	OutputDebugStringA(buffer);
 }
 
 #define YCLTRACE(s)                      OutputDebugString(s)
@@ -53,12 +53,12 @@ inline void OutputDebugStringF(const char* format, ...) {
 inline bool YclAssert(bool condition, const char* message) {
 	if (!condition) {
 		char buffer[1025];
-		wsprintf(buffer, "Assertion Failed!!\n\n"
+		wsprintfA(buffer, "Assertion Failed!!\n\n"
 						 "  %s\n\n"
 						 "if ABORT button pushed then exit this program,\n"
 						 "if RETRY button pushed then enter debug mode,\n"
 						 "and if IGNORE button pushed then continue program.", message);
-		switch (MessageBox(NULL, buffer, "YEBISUYA Class Library", MB_ABORTRETRYIGNORE | MB_ICONWARNING)) {
+		switch (MessageBoxA(NULL, buffer, "YEBISUYA Class Library", MB_ABORTRETRYIGNORE | MB_ICONWARNING)) {
 		case IDABORT:
 			ExitProcess(-1);
 			break;

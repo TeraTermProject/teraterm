@@ -46,8 +46,8 @@ public:
 	static String toString(unsigned long value, int base, bool negative) {
 		if (base < 2 || base > 36)
 			return NULL;
-		char buffer[64];
-		char* p = buffer + countof(buffer);
+		TCHAR buffer[64];
+		TCHAR* p = buffer + countof(buffer);
 		*--p = '\0';
 		if (value == 0) {
 			*--p = '0';

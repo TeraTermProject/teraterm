@@ -18,7 +18,7 @@ namespace yebisuya {
 
 class StringUtil {
 private:
-	static int hexadecimal(char c) {
+	static int hexadecimal(TCHAR c) {
 		if ('0' <= c && c <= '9') {
 			return c - '0';
 		}else if ('A' <= c && c <= 'F') {
@@ -29,15 +29,15 @@ private:
 			return -1;
 		}
 	}
-	static int octet(char c) {
+	static int octet(TCHAR c) {
 		return '0' <= c && c <= '7' ? c - '0' : -1;
 	}
-	static const char* ESCAPE_CHARS() {
-		static const char string[] = "abfnrtv";
+	static const TCHAR* ESCAPE_CHARS() {
+		static const TCHAR string[] = _T("abfnrtv");
 		return string;
 	}
-	static const char* CONTROL_CHARS() {
-		static const char string[] = "\a\b\f\n\r\t\v";
+	static const TCHAR* CONTROL_CHARS() {
+		static const TCHAR string[] = _T("\a\b\f\n\r\t\v");
 		return string;
 	}
 public:
@@ -60,12 +60,12 @@ public:
 	static bool escape(StringBuffer& buffer, String string, int offset, int length) {
 		if (string == NULL)
 			return false;
-		const char* start = string;
+		const TCHAR* start = string;
 		start += offset;
-		const char* p = start;
-		const char* end = start + length;
+		const TCHAR* p = start;
+		const TCHAR* end = start + length;
 		while (p < end && *p != '\0') {
-			char ch = *p;
+			TCHAR ch = *p;
 			if ('\0' < ch && ch < ' ' || ch == '\'' || ch == '"' || ch == '?' || ch == '\\') {
 				bool useOctet;
 				if (ch < ' ') {
@@ -95,12 +95,14 @@ public:
 				}
 				start = ++p;
 			}else{
+#if !defined(UNICODE)
 				if (String::isLeadByte(ch))
 					p++;
+#endif
 				p++;
 			}
 		}
-		if (start == (const char*) string) {
+		if (start == (const TCHAR*) string) {
 			return false;
 		}
 		buffer.append(start);
@@ -126,17 +128,17 @@ public:
 	static bool unescape(StringBuffer& buffer, String string, int offset, int length) {
 		if (string == NULL)
 			return false;
-		const char* start = string;
+		const TCHAR* start = string;
 		start += offset;
-		const char* p = start;
-		const char* end = start + length;
+		const TCHAR* p = start;
+		const TCHAR* end = start + length;
 		while (p < end && *p != '\0') {
 			if (*p == '\\') {
 				if (p > start) {
 					buffer.append(start, p - start);
 					start = p;
 				}
-				char ch = '\0';
+				TCHAR ch = '\0';
 				switch (*++p) {
 				case '\'':
 				case '"':
@@ -188,13 +190,15 @@ public:
 					start = p;
 				}
 			}else{
+#if !defined(UNICODE)
 				if (String::isLeadByte(*p)) {
 					p++;
 				}
+#endif
 				p++;
 			}
 		}
-		if (start == (const char*) string) {
+		if (start == (const TCHAR*) string) {
 			return false;
 		}
 		buffer.append(start);

@@ -14,6 +14,10 @@
 #include <YCL/Window.h>
 #include <YCL/Hashtable.h>
 
+#include "dlglib.h"
+
+#define	DIALOGBOX_REPLACE	1
+
 namespace yebisuya {
 
 class Dialog : virtual public Window {
@@ -65,10 +69,10 @@ public:
 		int value = ::GetDlgItemInt(*this, id, &succeeded, valueSigned);
 		return succeeded ? value : defaultValue;
 	}
-	bool SetDlgItemText(int id, const char* text) {
+	bool SetDlgItemText(int id, const TCHAR* text) {
 		return ::SetDlgItemText(*this, id, text) != FALSE;
 	}
-	int GetDlgItemText(int id, char* buffer, size_t length)const {
+	int GetDlgItemText(int id, TCHAR* buffer, size_t length)const {
 		return ::GetDlgItemText(*this, id, buffer, length);
 	}
 	String GetDlgItemText(int id)const {
@@ -78,7 +82,11 @@ public:
 		return ::SendDlgItemMessage(*this, id, message, wparam, lparam);
 	}
 	bool EndDialog(int result) {
+#if defined(DIALOGBOX_REPLACE)
+		return ::TTEndDialog(*this, result) != FALSE;
+#else
 		return ::EndDialog(*this, result) != FALSE;
+#endif
 	}
 	bool MapDialogRect(RECT& rect)const {
 		return ::MapDialogRect(*this, &rect) != FALSE;
@@ -109,7 +117,11 @@ public:
 	}
 	int open(HINSTANCE instance, int resourceId, HWND owner = NULL) {
 		YCLVERIFY(prepareOpen(this) == NULL, "Another dialog has been opening yet.");
+#if defined(DIALOGBOX_REPLACE)
+		return ::TTDialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, (DLGPROC)DialogProc, NULL);
+#else
 		return ::DialogBoxParam(instance, MAKEINTRESOURCE(resourceId), owner, (DLGPROC)DialogProc, NULL);
+#endif
 	}
 protected:
 	virtual bool dispatch(int message, int wparam, long lparam) {

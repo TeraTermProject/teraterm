@@ -21,13 +21,13 @@ public:
 	int getLineCount()const {
 		return SendMessage(EM_GETLINECOUNT);
 	}
-	int getLine(int line, char* buffer, int length)const {
+	int getLine(int line, TCHAR* buffer, int length)const {
 		*((int*) buffer) = length;
 		return SendMessage(EM_GETLINE, line, (LPARAM) buffer);
 	}
 	String getLine(int line)const {
 		int length = lineLength(line);
-		char* buffer = (char*) alloca(length + 1);
+		TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * (length + 1));
 		getLine(line, buffer, length + 1);
 		return buffer;
 	}

@@ -19,84 +19,84 @@ namespace yebisuya {
 
 class FileVersion {
 private:
-        static const char* ROOT() {
-                static const char string[] = "\\";
-                return string;
-        }
-        static const char* TRANS() {
-                static const char string[] = "\\VarFileInfo\\Translation";
-                return string;
-        }
-        static const char* STRINGBLOCK() {
-                static const char string[] = "\\StringFileInfo\\%08X\\%s";
-                return string;
-        }
-
-	static const char* COMMENTS() {
-	        static const char string[] = "Comments";
-	        return string;
+	static const TCHAR* ROOT() {
+		static const TCHAR string[] = _T("\\");
+		return string;
 	}
-	static const char* COMPANYNAME() {
-	        static const char string[] = "CompanyName";
-	        return string;
+	static const TCHAR* TRANS() {
+		static const TCHAR string[] = _T("\\VarFileInfo\\Translation");
+		return string;
 	}
-	static const char* FILEDESCRIPTION() {
-	        static const char string[] = "FileDescription";
-	        return string;
-	}
-	static const char* FILEVERSION() {
-	        static const char string[] = "FileVersion";
-	        return string;
-	}
-	static const char* INTERNALNAME() {
-	        static const char string[] = "InternalName";
-	        return string;
-	}
-	static const char* LEGALCOPYRIGHT() {
-	        static const char string[] = "LegalCopyright";
-	        return string;
-	}
-	static const char* LEGALTRADEMARKS() {
-	        static const char string[] = "LegalTrademarks";
-	        return string;
-	}
-	static const char* ORIGINALFILENAME() {
-	        static const char string[] = "OriginalFilename";
-	        return string;
-	}
-	static const char* PRIVATEBUILD() {
-	        static const char string[] = "PrivateBuild";
-	        return string;
-	}
-	static const char* PRODUCTNAME() {
-	        static const char string[] = "ProductName";
-	        return string;
-	}
-	static const char* PRODUCTVERSION() {
-	        static const char string[] = "ProductVersion";
-	        return string;
-	}
-	static const char* SPECIALBUILD() {
-	        static const char string[] = "SpecialBuild";
-	        return string;
+	static const TCHAR* STRINGBLOCK() {
+		static const TCHAR string[] = _T("\\StringFileInfo\\%08X\\%s");
+		return string;
 	}
 
-	char* info;
+	static const TCHAR* COMMENTS() {
+		static const TCHAR string[] = _T("Comments");
+		return string;
+	}
+	static const TCHAR* COMPANYNAME() {
+		static const TCHAR string[] = _T("CompanyName");
+		return string;
+	}
+	static const TCHAR* FILEDESCRIPTION() {
+		static const TCHAR string[] = _T("FileDescription");
+		return string;
+	}
+	static const TCHAR* FILEVERSION() {
+		static const TCHAR string[] = _T("FileVersion");
+		return string;
+	}
+	static const TCHAR* INTERNALNAME() {
+		static const TCHAR string[] = _T("InternalName");
+		return string;
+	}
+	static const TCHAR* LEGALCOPYRIGHT() {
+		static const TCHAR string[] = _T("LegalCopyright");
+		return string;
+	}
+	static const TCHAR* LEGALTRADEMARKS() {
+		static const TCHAR string[] = _T("LegalTrademarks");
+		return string;
+	}
+	static const TCHAR* ORIGINALFILENAME() {
+		static const TCHAR string[] = _T("OriginalFilename");
+		return string;
+	}
+	static const TCHAR* PRIVATEBUILD() {
+		static const TCHAR string[] = _T("PrivateBuild");
+		return string;
+	}
+	static const TCHAR* PRODUCTNAME() {
+		static const TCHAR string[] = _T("ProductName");
+		return string;
+	}
+	static const TCHAR* PRODUCTVERSION() {
+		static const TCHAR string[] = _T("ProductVersion");
+		return string;
+	}
+	static const TCHAR* SPECIALBUILD() {
+		static const TCHAR string[] = _T("SpecialBuild");
+		return string;
+	}
+
+	TCHAR* info;
 	mutable LPWORD trans;
 	mutable UINT transSize;
 	mutable VS_FIXEDFILEINFO* fixedInfo;
 
 	void init(HINSTANCE instance) {
-		char buffer[MAX_PATH];
+		TCHAR buffer[MAX_PATH];
 		::GetModuleFileName(instance, buffer, countof(buffer));
 		init(buffer);
 	}
-	void init(const char* filename) {
+	void init(const TCHAR* filename) {
 		DWORD handle;
-		DWORD size = ::GetFileVersionInfoSize((char*) filename, &handle);
+		DWORD size = ::GetFileVersionInfoSize(filename, &handle);
 		if (size != 0){
-			info = new char[size];
-			if (!::GetFileVersionInfo((char*) filename, handle, size, info)) {
+			info = new TCHAR[size];
+			if (!::GetFileVersionInfo(filename, handle, size, info)) {
 				delete[] info;
 				info = NULL;
 			}
@@ -105,14 +105,14 @@ private:
 	bool validateFixedFileInfo()const {
 		if (fixedInfo == NULL){
 			UINT size;
-			if (!::VerQueryValue((void*) (const void*) info, (char*) ROOT(), (LPVOID*) &fixedInfo, &size))
+			if (!::VerQueryValue((void*) (const void*) info, ROOT(), (LPVOID*) &fixedInfo, &size))
 				return false;
 		}
 		return true;
 	}
 	bool validateTranslation()const {
 		if (trans == NULL){
-			if (!::VerQueryValue((void*) (const void*) info, (char*) TRANS(), (LPVOID*) &trans, &transSize))
+			if (!::VerQueryValue((void*) (const void*) info, TRANS(), (LPVOID*) &trans, &transSize))
 				return false;
 		}
 		return true;
@@ -124,7 +124,7 @@ public:
 	FileVersion(HINSTANCE hInstance):info(NULL), fixedInfo(NULL), trans(NULL), transSize(0) {
 		init(hInstance);
 	}
-	FileVersion(const char* filename):info(NULL), fixedInfo(NULL), trans(NULL), transSize(0) {
+	FileVersion(const TCHAR* filename):info(NULL), fixedInfo(NULL), trans(NULL), transSize(0) {
 		init(filename);
 	}
 	~FileVersion() {
@@ -152,51 +152,51 @@ public:
 	int getCharset(int index = 0)const {
 		return validateTranslation() ? MAKELONG(trans[index * 2 + 1], trans[index * 2]) : 0;
 	}
-	const char* getString(int charset, const char* blockName)const {
-		char buffer[64];
+	const TCHAR* getString(int charset, const TCHAR* blockName)const {
+		TCHAR buffer[64];
 		wsprintf(buffer, STRINGBLOCK(), charset, blockName);
 		UINT size;
-		const char* string;
+		const TCHAR* string;
 		return ::VerQueryValue((void*) (const void*) info, buffer, (LPVOID*) &string, &size) ? string : NULL;
 	}
-	const char* getString(const char* blockName)const {
+	const TCHAR* getString(const TCHAR* blockName)const {
 		return getString(getCharset(), blockName);
 	}
 
-	const char* getComments()const {
+	const TCHAR* getComments()const {
 		return getString(COMMENTS());
 	}
-	const char* getCompanyName()const {
+	const TCHAR* getCompanyName()const {
 		return getString(COMPANYNAME());
 	}
-	const char* getFileDescription()const {
+	const TCHAR* getFileDescription()const {
 		return getString(FILEDESCRIPTION());
 	}
-	const char* getFileVersion()const {
+	const TCHAR* getFileVersion()const {
 		return getString(FILEVERSION());
 	}
-	const char* getInternalName()const {
+	const TCHAR* getInternalName()const {
 		return getString(INTERNALNAME());
 	}
-	const char* getLegalCopyright()const {
+	const TCHAR* getLegalCopyright()const {
 		return getString(LEGALCOPYRIGHT());
 	}
-	const char* getLegalTrademarks()const {
+	const TCHAR* getLegalTrademarks()const {
 		return getString(LEGALTRADEMARKS());
 	}
-	const char* getOriginalFilename()const {
+	const TCHAR* getOriginalFilename()const {
 		return getString(ORIGINALFILENAME());
 	}
-	const char* getPrivateBuild()const {
+	const TCHAR* getPrivateBuild()const {
 		return getString(PRIVATEBUILD());
 	}
-	const char* getProductName()const {
+	const TCHAR* getProductName()const {
 		return getString(PRODUCTNAME());
 	}
-	const char* getProductVersion()const {
+	const TCHAR* getProductVersion()const {
 		return getString(PRODUCTVERSION());
 	}
-	const char* getSpecialBuild()const {
+	const TCHAR* getSpecialBuild()const {
 		return getString(SPECIALBUILD());
 	}
 

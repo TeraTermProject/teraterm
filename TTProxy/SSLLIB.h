@@ -11,14 +11,14 @@
 rettype apiname arglist {                                     \
     static rettype (*func) arglist =                          \
        (rettype (*) arglist)                                  \
-       GetProcAddress(GetModuleHandle(#module), #apiname);    \
+       GetProcAddress(GetModuleHandleA(#module), #apiname);    \
     return (*func) args;                                      \
 }
 #define DECLARE_MODULE_API_v(module, apiname, arglist, args) \
     void apiname arglist {                                   \
     static void (*func) arglist =                            \
        (void (*) arglist)                                    \
-       GetProcAddress(GetModuleHandle(#module), #apiname);   \
+       GetProcAddress(GetModuleHandleA(#module), #apiname);   \
     (*func) args;                                            \
 }
 

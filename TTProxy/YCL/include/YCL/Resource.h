@@ -10,15 +10,15 @@
 #endif // _MSC_VER >= 1000
 
 #include <YCL/common.h>
-
 #include <YCL/String.h>
+#include "codeconv.h"
 
 namespace yebisuya {
 
 class Resource {
 public:
 	static String loadString(HINSTANCE instance, UINT id, int bufsize) {
-		char* buffer = (char*) alloca(bufsize);
+		TCHAR* buffer = (TCHAR*) alloca(sizeof(TCHAR) * bufsize);
 		int length = loadString(instance, id, buffer, bufsize);
 		if (length >= bufsize - 1)
 			return NULL;
@@ -28,10 +28,10 @@ public:
 	}
 
 public:
-	static int loadString(UINT id, char* buffer, int bufsize) {
+	static int loadString(UINT id, TCHAR* buffer, int bufsize) {
 		return loadString(GetInstanceHandle(), id, buffer, bufsize);
 	}
-	static int loadString(HINSTANCE instance, UINT id, char* buffer, int bufsize) {
+	static int loadString(HINSTANCE instance, UINT id, TCHAR* buffer, int bufsize) {
 		return LoadString(instance, id, buffer, bufsize);
 	}
 	static String loadString(int id) {
@@ -54,10 +54,10 @@ public:
 		return loadIcon(GetInstanceHandle(), id);
 	}
 	static HICON loadIcon(HINSTANCE instance, int id) {
-		return loadIcon(instance, MAKEINTRESOURCE(id));
+		return loadIcon(instance, MAKEINTRESOURCEA(id));
 	}
 	static HICON loadIcon(HINSTANCE instance, const char* id) {
-		return ::LoadIcon(instance, id);
+		return ::LoadIcon(instance, (tc)id);
 	}
 
 	static HICON loadIcon(int id, int cx, int cy) {
@@ -67,7 +67,7 @@ public:
 		return loadIcon(GetInstanceHandle(), id, cx, cy);
 	}
 	static HICON loadIcon(HINSTANCE instance, int id, int cx, int cy) {
-		return loadIcon(instance, MAKEINTRESOURCE(id), cx, cy);
+		return loadIcon(instance, MAKEINTRESOURCEA(id), cx, cy);
 	}
 	static HICON loadIcon(HINSTANCE instance, const char* id, int cx, int cy) {
 		return loadIcon(instance, id, cx, cy, LR_DEFAULTCOLOR | LR_SHARED);
@@ -79,10 +79,10 @@ public:
 		return loadIcon(GetInstanceHandle(), id, cx, cy, flags);
 	}
 	static HICON loadIcon(HINSTANCE instance, int id, int cx, int cy, int flags) {
-		return loadIcon(instance, MAKEINTRESOURCE(id), cx, cy, flags);
+		return loadIcon(instance, MAKEINTRESOURCEA(id), cx, cy, flags);
 	}
 	static HICON loadIcon(HINSTANCE instance, const char* id, int cx, int cy, int flags) {
-		return (HICON) ::LoadImage(instance, id, IMAGE_ICON, cx, cy, flags);
+		return (HICON) ::LoadImage(instance, (tc)id, IMAGE_ICON, cx, cy, flags);
 	}
 
 	static HCURSOR loadCursor(int id) {
@@ -92,10 +92,10 @@ public:
 		return loadCursor(GetInstanceHandle(), id);
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, int id) {
-		return loadCursor(instance, MAKEINTRESOURCE(id));
+		return loadCursor(instance, MAKEINTRESOURCEA(id));
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, const char* id) {
-		return ::LoadCursor(instance, id);
+		return ::LoadCursor(instance, (tc)id);
 	}
 
 	static HCURSOR loadCursor(int id, int cx, int cy) {
@@ -105,7 +105,7 @@ public:
 		return loadCursor(GetInstanceHandle(), id, cx, cy);
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, int id, int cx, int cy) {
-		return loadCursor(instance, MAKEINTRESOURCE(id), cx, cy);
+		return loadCursor(instance, MAKEINTRESOURCEA(id), cx, cy);
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, const char* id, int cx, int cy) {
 		return loadCursor(instance, id, cx, cy, LR_DEFAULTCOLOR | LR_SHARED);
@@ -117,10 +117,10 @@ public:
 		return loadCursor(GetInstanceHandle(), id, cx, cy, flags);
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, int id, int cx, int cy, int flags) {
-		return loadCursor(instance, MAKEINTRESOURCE(id), cx, cy, flags);
+		return loadCursor(instance, MAKEINTRESOURCEA(id), cx, cy, flags);
 	}
 	static HCURSOR loadCursor(HINSTANCE instance, const char* id, int cx, int cy, int flags) {
-		return (HCURSOR) ::LoadImage(instance, id, IMAGE_CURSOR, cx, cy, flags);
+		return (HCURSOR) ::LoadImage(instance, (tc)id, IMAGE_CURSOR, cx, cy, flags);
 	}
 
 	static HMENU loadMenu(int id) {
@@ -130,10 +130,10 @@ public:
 		return loadMenu(GetInstanceHandle(), id);
 	}
 	static HMENU loadMenu(HINSTANCE instance, int id) {
-		return loadMenu(instance, MAKEINTRESOURCE(id));
+		return loadMenu(instance, MAKEINTRESOURCEA(id));
 	}
 	static HMENU loadMenu(HINSTANCE instance, const char* id) {
-		return ::LoadMenu(instance, id);
+		return ::LoadMenu(instance, (tc)id);
 	}
 };
 

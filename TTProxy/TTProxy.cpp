@@ -1,7 +1,7 @@
 // ttx.cpp : DLL アプリケーション用のエントリ ポイントを定義します。
 //
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "resource.h"
 
@@ -18,6 +18,7 @@ namespace yebisuya {
 }
 
 extern "C" __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
+	(void)reserved;
 	switch (reason) {
 	case DLL_PROCESS_ATTACH:
 		myInstance = instance;
