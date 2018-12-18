@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2005-2017 TeraTerm Project
  * All rights reserved.
@@ -32,30 +32,35 @@
 #include "teraterm.h"
 #include <string.h>
 #include <stdlib.h>
+#include <crtdbg.h>
 #include "ttmparse.h"
 #include "ttlib.h"
-#include "win16api.h"
+#include "fileread.h"
 
 #include "ttmbuff.h"
+
+#ifdef _DEBUG
+#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
+#endif
 
 int EndWhileFlag;
 int BreakFlag;
 BOOL ContinueFlag;
 
-#define MAXBUFFLEN 2147483647
+#define MAXBUFFLEN 2147483647	// 0x7FFF_FFFFâ€¬
 
 #define MAXNESTLEVEL 10
 
-#define MAXFILENAME 128   // .ttlƒtƒ@ƒCƒ‹–¼‚ÌÅ‘åƒTƒCƒY
+#define MAXFILENAME 128   // .ttlãƒ•ã‚¡ã‚¤ãƒ«åã®æœ€å¤§ã‚µã‚¤ã‚º
 
 static int INest;
-static HANDLE BuffHandle[MAXNESTLEVEL];
-static CHAR BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // ŠeŠK‘w‚Ì.ttlƒtƒ@ƒCƒ‹–¼
+static CHAR BuffHandleFileName[MAXNESTLEVEL][MAXFILENAME];  // å„éšŽå±¤ã®.ttlãƒ•ã‚¡ã‚¤ãƒ«å
 static PCHAR Buff[MAXNESTLEVEL];
 static BINT BuffLen[MAXNESTLEVEL];
 static BINT BuffPtr[MAXNESTLEVEL];
 
-// sî•ñ”z—ñ
+// è¡Œæƒ…å ±é…åˆ—
 #define MAX_LINENO 100000
 static BINT *BuffLineNo[MAXNESTLEVEL];
 static BINT BuffLineNoMaxIndex[MAXNESTLEVEL];
@@ -100,12 +105,12 @@ char *GetLineBuffer(void)
 	return (p);
 }
 
-// ƒ}ƒNƒƒEƒBƒ“ƒhƒE‚É•\Ž¦‚·‚éƒRƒ}ƒ“ƒh‚©‚Ç‚¤‚©”»•Ê‚·‚é (2006.2.24 yutaka)
+// ãƒžã‚¯ãƒ­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«è¡¨ç¤ºã™ã‚‹ã‚³ãƒžãƒ³ãƒ‰ã‹ã©ã†ã‹åˆ¤åˆ¥ã™ã‚‹ (2006.2.24 yutaka)
 int IsUpdateMacroCommand(void)
 {
 	char *p = GetLineBuffer();
 
-	// Œ´‘¥‚Æ‚µ‚ÄƒEƒFƒCƒgEƒXƒŠ[ƒvŒnƒRƒ}ƒ“ƒh‚ð‘ÎÛ‚Æ‚·‚é
+	// åŽŸå‰‡ã¨ã—ã¦ã‚¦ã‚§ã‚¤ãƒˆãƒ»ã‚¹ãƒªãƒ¼ãƒ—ç³»ã‚³ãƒžãƒ³ãƒ‰ã‚’å¯¾è±¡ã¨ã™ã‚‹
 	if (_strnicmp(p, "wait", 4) == 0)
 		return 1;
 
@@ -119,127 +124,77 @@ int IsUpdateMacroCommand(void)
 }
 
 
-// ƒ}ƒNƒƒtƒ@ƒCƒ‹‚Ìæ“ª‚É‚ ‚é BOM ‚ðœ‹Ž‚·‚éB
-static void TrimUnicodeBOM(CHAR *pbuf, BINT *plen)
-{
-	BYTE *buf = pbuf;
-	BINT len = *plen;
-
-	// UTF-8 BOM
-	if (len > 3) {
-		if (buf[0] == 0xEF && buf[1] == 0xBB && buf[2] == 0xBF) {
-			memmove_s(&buf[0], len, &buf[3], len - 3);
-			*plen = len - 3;
-		}
-	}
-}
-
-
 BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 {
-	HANDLE F;
-	int dummy_read = 0;
 	char basename[MAX_PATH];
-	unsigned int i, n;
+	size_t Len;
 
 	if ((FileName[0]==0) || (IBuff>MAXNESTLEVEL-1)) {
 		return FALSE;
 	}
-	if (BuffHandle[IBuff]!=0) {
-		return FALSE;
-	}
 
-	// include‚É¬Œ÷‚µ‚½ƒtƒ@ƒCƒ‹‚©‚çAƒtƒ@ƒCƒ‹–¼‚ð‹L˜^‚·‚éB
-	// ƒ}ƒNƒ‚ÌƒGƒ‰[ƒ_ƒCƒAƒƒO‚ÅAƒtƒ@ƒCƒ‹–¼‚ð•\Ž¦‚µ‚½‚¢‚½‚ßB
+	// includeã«æˆåŠŸã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã€ãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¨˜éŒ²ã™ã‚‹ã€‚
+	// ãƒžã‚¯ãƒ­ã®ã‚¨ãƒ©ãƒ¼ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã§ã€ãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¡¨ç¤ºã—ãŸã„ãŸã‚ã€‚
 	// (2013.9.8 yutaka)
-	if (GetFileTitle(FileName, basename, sizeof(basename)) != 0) 
+	if (GetFileTitleA(FileName, basename, sizeof(basename)) != 0)
 		strncpy_s(basename, sizeof(basename), FileName, _TRUNCATE);
 	strncpy_s(&BuffHandleFileName[IBuff][0], MAXFILENAME, basename, _TRUNCATE);
 
 	BuffPtr[IBuff] = 0;
 
-	// get file length
-	BuffLen[IBuff] = GetFSize(FileName);
-#if 1
-	// include‚ÅŽw’è‚³‚ê‚½ƒ}ƒNƒƒtƒ@ƒCƒ‹‚ª‹ó‚Ìê‡‚ÉƒGƒ‰[‚É‚Í‚µ‚È‚¢B(2007.6.8 yutaka)
-	if (BuffLen[IBuff]==0) {
-		// GlobalLock()‚Ìˆø”‚ªƒ[ƒ‚¾‚Æ NULL ‚ª•Ô‚Á‚Ä‚­‚é‚Ì‚ÅAƒ_ƒ~[‚Å‹ó”’‚ð“ü‚ê‚éB
-		BuffLen[IBuff] = 2;
-		dummy_read = 1;
-	}
-#endif
-	if (BuffLen[IBuff]>MAXBUFFLEN) {
+	Buff[IBuff] = LoadFileAA(FileName, &Len);
+//	Buff[IBuff] = LoadFileU8A(FileName, &Len);
+	if (Buff[IBuff] == NULL) {
+		BuffLen[IBuff] = 0;
 		return FALSE;
 	}
-
-	if (BuffLineNo[IBuff] == NULL) {
-		BuffLineNo[IBuff] = malloc(MAX_LINENO * sizeof(BINT));
-	}
-
-	F = _lopen(FileName,OF_READ);
-	if (F == INVALID_HANDLE_VALUE) {
+	if (Len>MAXBUFFLEN) {
 		return FALSE;
 	}
-	BuffHandle[IBuff] = GlobalAlloc(GMEM_MOVEABLE, BuffLen[IBuff]);
-	if (BuffHandle[IBuff]!=NULL) {
-		Buff[IBuff] = GlobalLock(BuffHandle[IBuff]);
-		if (Buff[IBuff]!=NULL) {
-			_lread(F, Buff[IBuff], BuffLen[IBuff]);
-			if (dummy_read == 1) {
-				Buff[IBuff][0] = ' ';
-				Buff[IBuff][1] = '\0';
-			}
-			_lclose(F);
+	BuffLen[IBuff] = Len;
 
-			// for UTF-8 BOM
-			// (2015.5.15 yutaka)
-			TrimUnicodeBOM(Buff[IBuff], &BuffLen[IBuff]);
+	// è¡Œç•ªå·é…åˆ—ã‚’ä½œã‚‹ã€‚ã“ã‚Œã«ã‚ˆã‚Šã€ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰è¡Œç•ªå·ã¸ã®å¤‰æ›ãŒ
+	// O(N)->O(logN)ã§æ¤œç´¢ã§ãã‚‹ã‚ˆã†ã«ãªã‚‹ã€‚
+	// (2014.1.18 yutaka)
+	{
+		unsigned int i, n;
+		n = 0;
+		if (BuffLineNo[IBuff] == NULL) {
+			BuffLineNo[IBuff] = malloc(MAX_LINENO * sizeof(BINT));
+		}
+		BuffLineNo[IBuff][n] = 0;
+		for (i = 0 ; i < BuffLen[IBuff] ; i++) {
+			if (Buff[IBuff][i] == 0x0A) {
+				if (i == BuffLen[IBuff] - 1) {
+					// ãƒãƒƒãƒ•ã‚¡ã®æœ€å¾ŒãŒæ”¹è¡Œã‚³ãƒ¼ãƒ‰ã ã£ãŸå ´åˆã€ã‚‚ã†æ¬¡ã®è¡Œç•ªå·ã¯å­˜åœ¨ã—ãªã„ã€‚
 
-			// s”Ô†”z—ñ‚ðì‚éB‚±‚ê‚É‚æ‚èAƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚çs”Ô†‚Ö‚Ì•ÏŠ·‚ª
-			// O(N)->O(logN)‚ÅŒŸõ‚Å‚«‚é‚æ‚¤‚É‚È‚éB
-			// (2014.1.18 yutaka)
-			n = 0;
-			BuffLineNo[IBuff][n] = 0;
-			for (i = 0 ; i < BuffLen[IBuff] ; i++) {
-				if (Buff[IBuff][i] == 0x0A) {
-					if (i == BuffLen[IBuff] - 1) {
-						// ƒoƒbƒtƒ@‚ÌÅŒã‚ª‰üsƒR[ƒh‚¾‚Á‚½ê‡A‚à‚¤ŽŸ‚Ìs”Ô†‚Í‘¶Ý‚µ‚È‚¢B
-
+				} else {
+					if (n < MAX_LINENO - 1) {
+						n++;
+						BuffLineNo[IBuff][n] = i + 1;
 					} else {
-						if (n < MAX_LINENO - 1) {
-							n++;
-							BuffLineNo[IBuff][n] = i + 1;
-						} else {
-							// Out of memory
+						// Out of memory
 
-						}
 					}
 				}
 			}
-			BuffLineNoMaxIndex[IBuff] = n + 1;
+		}
 
-			GlobalUnlock(BuffHandle[IBuff]);
-			return TRUE;
-		}
-		else {
-			GlobalFree(BuffHandle[IBuff]);
-			BuffHandle[IBuff] = 0;
-		}
+		BuffLineNoMaxIndex[IBuff] = n + 1;
 	}
-	_lclose(F);
 
-	return FALSE;
+	return TRUE;
 }
 
 
-// Œ»ÝŽÀs’†‚Ìƒ}ƒNƒƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹–¼‚ð•Ô‚·
+// ç¾åœ¨å®Ÿè¡Œä¸­ã®ãƒžã‚¯ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¿”ã™
 char *GetMacroFileName(void)
 {
 	return &BuffHandleFileName[INest][0];
 }
 
 
-// Œ»ÝŽÀs’†‚Ìƒ}ƒNƒƒtƒ@ƒCƒ‹‚Ìs”Ô†‚ð•Ô‚· (2005.7.18 yutaka)
+// ç¾åœ¨å®Ÿè¡Œä¸­ã®ãƒžã‚¯ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã®è¡Œç•ªå·ã‚’è¿”ã™ (2005.7.18 yutaka)
 static int getCurrentLineNumber(BINT curpos, BINT *lineno, BINT linenomax)
 {
 	BINT i, no;
@@ -251,7 +206,7 @@ static int getCurrentLineNumber(BINT curpos, BINT *lineno, BINT linenomax)
 			break;
 		}
 	}
-	// ÅŒã‚Ìs‚ðƒp[ƒX‚µ‚½ÛAs”Ô†‚ð•Ô‚¹‚Ä‚¢‚È‚©‚Á‚½–â‘è‚ðC³‚µ‚½B
+	// æœ€å¾Œã®è¡Œã‚’ãƒ‘ãƒ¼ã‚¹ã—ãŸéš›ã€è¡Œç•ªå·ã‚’è¿”ã›ã¦ã„ãªã‹ã£ãŸå•é¡Œã‚’ä¿®æ­£ã—ãŸã€‚
 	// (2014.7.6 yutaka)
 	if (no == 0 && i == linenomax) {
 		no = linenomax;
@@ -267,7 +222,6 @@ BOOL GetRawLine()
 	BYTE b;
 
 	LineStart = BuffPtr[INest];
-	Buff[INest] = GlobalLock(BuffHandle[INest]);
 	if (Buff[INest]==NULL) return FALSE;
 
 	if (BuffPtr[INest]<BuffLen[INest])
@@ -278,12 +232,12 @@ BOOL GetRawLine()
 	while ((BuffPtr[INest]<BuffLen[INest]) &&
 		((b>=0x20) || (b==0x09)))
 	{
-		// LineBuff[]‚Ìƒoƒbƒtƒ@ƒTƒCƒY‚ð’´‚¦‚éê‡‚ÍƒGƒ‰[‚Æ‚·‚éB
-		// ‚½‚¾‚µAƒ}ƒNƒ‚ª‚¢‚«‚È‚èI—¹‚·‚é‚Ì‚Åƒ_ƒCƒAƒƒO‚ð•\Ž¦‚·‚é‚æ‚¤‚É‚µ‚½‚Ù‚¤‚ª
-		// ‚¢‚¢‚©‚à‚µ‚ê‚È‚¢B
+		// LineBuff[]ã®ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã‚’è¶…ãˆã‚‹å ´åˆã¯ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹ã€‚
+		// ãŸã ã—ã€ãƒžã‚¯ãƒ­ãŒã„ããªã‚Šçµ‚äº†ã™ã‚‹ã®ã§ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹ã‚ˆã†ã«ã—ãŸã»ã†ãŒ
+		// ã„ã„ã‹ã‚‚ã—ã‚Œãªã„ã€‚
 		// (2007.6.6 yutaka)
-		// ƒoƒbƒtƒ@ƒTƒCƒY‚ÉŽû‚Ü‚é”ÍˆÍ‚ÅƒRƒs[‚·‚éB
-		// break ‚·‚é‚Æ‚ ‚Ó‚ê‚½•ª‚ªŽŸ‚Ìs‚Æ‚µ‚Äˆµ‚í‚ê‚é‚Ì‚Å break ‚µ‚È‚¢B
+		// ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã«åŽã¾ã‚‹ç¯„å›²ã§ã‚³ãƒ”ãƒ¼ã™ã‚‹ã€‚
+		// break ã™ã‚‹ã¨ã‚ãµã‚ŒãŸåˆ†ãŒæ¬¡ã®è¡Œã¨ã—ã¦æ‰±ã‚ã‚Œã‚‹ã®ã§ break ã—ãªã„ã€‚
 		// (2007.6.9 maya)
 		if (i < MaxLineLen-1) {
 			LineBuff[i] = b;
@@ -298,8 +252,8 @@ BOOL GetRawLine()
 	LineParsePtr = 0;
 
 	// current line number (2005.7.18 yutaka)
-	// ƒoƒbƒtƒ@‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚ç‚‘¬‚És”Ô†‚ðˆø‚¯‚é‚æ‚¤‚É‚µ‚½B(2014.1.18 yutaka)
-	LineNo = getCurrentLineNumber(BuffPtr[INest], BuffLineNo[INest], BuffLineNoMaxIndex[INest]); 
+	// ãƒãƒƒãƒ•ã‚¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰é«˜é€Ÿã«è¡Œç•ªå·ã‚’å¼•ã‘ã‚‹ã‚ˆã†ã«ã—ãŸã€‚(2014.1.18 yutaka)
+	LineNo = getCurrentLineNumber(BuffPtr[INest], BuffLineNo[INest], BuffLineNoMaxIndex[INest]);
 
 	while ((BuffPtr[INest]<BuffLen[INest]) &&
 		(b<0x20) && (b!=0x09))
@@ -308,7 +262,6 @@ BOOL GetRawLine()
 		if (BuffPtr[INest]<BuffLen[INest])
 			b = (Buff[INest])[BuffPtr[INest]];
 	}
-	GlobalUnlock(BuffHandle[INest]);
 	return ((LineLen>0) || (BuffPtr[INest]<BuffLen[INest]));
 }
 
@@ -343,7 +296,6 @@ BOOL RegisterLabels(int IBuff)
 	TVarId VarId;
 	TStrVal tmp;
 
-	Buff[IBuff] = GlobalLock(BuffHandle[IBuff]);
 	if (Buff[IBuff]==NULL) {
 		return FALSE;
 	}
@@ -372,7 +324,7 @@ BOOL RegisterLabels(int IBuff)
 		    LinePtr--;
 		}
 
-		/* ŽŸ‚Ìs‚ÖˆÚ‚·‘O‚ÉACŒ¾ŒêƒRƒƒ“ƒg‚ð’T‚·‚½‚ßAs––‚Ü‚ÅƒXƒLƒƒƒ“‚·‚éB*/
+		/* æ¬¡ã®è¡Œã¸ç§»ã™å‰ã«ã€Cè¨€èªžã‚³ãƒ¡ãƒ³ãƒˆã‚’æŽ¢ã™ãŸã‚ã€è¡Œæœ«ã¾ã§ã‚¹ã‚­ãƒ£ãƒ³ã™ã‚‹ã€‚*/
 		while ((b=GetFirstChar()) != 0) {
 			if (b=='"' || b=='\'' || b=='#') {
 				LinePtr--;
@@ -391,7 +343,6 @@ BOOL RegisterLabels(int IBuff)
 
 	BuffPtr[IBuff] = 0;
 	InitLineNo(); // (2005.7.18 yutaka)
-	GlobalUnlock(BuffHandle[IBuff]);
 	return TRUE;
 }
 
@@ -404,7 +355,7 @@ BOOL InitBuff(PCHAR FileName)
 	EndWhileFlag = 0;
 	BreakFlag = 0;
 	for (i=0 ; i<=MAXNESTLEVEL-1 ; i++) {
-		BuffHandle[i] = 0;
+		Buff[i] = NULL;
 	}
 	INest = 0;
 	if (! LoadMacroFile(FileName, INest)) {
@@ -422,14 +373,8 @@ void CloseBuff(int IBuff)
 
 	DelLabVar((WORD)IBuff);
 	for (i=IBuff ; i<=MAXNESTLEVEL-1 ; i++) {
-		if (BuffHandle[i]!=NULL) {
-			GlobalUnlock(BuffHandle[i]);
-			GlobalFree(BuffHandle[i]);
-		}
-		BuffHandle[i] = NULL;
-
 		free(BuffLineNo[i]);
-		/* ƒ|ƒCƒ“ƒ^‚Ì‰Šú‰»˜R‚ê‚ðC³‚µ‚½B4.81‚Å‚ÌƒfƒOƒŒ[ƒhB
+		/* ãƒã‚¤ãƒ³ã‚¿ã®åˆæœŸåŒ–æ¼ã‚Œã‚’ä¿®æ­£ã—ãŸã€‚4.81ã§ã®ãƒ‡ã‚°ãƒ¬ãƒ¼ãƒ‰ã€‚
 		 * (2014.3.4 yutaka)
 		 */
 		BuffLineNo[i] = NULL;

@@ -1,0 +1,4 @@
+;; -*- coding: cp932 -*-
+
+messagebox "code cp932" "check code ttl"
+messagebox "‚±‚ñ‚É‚¿‚Í" "check code ttl"
