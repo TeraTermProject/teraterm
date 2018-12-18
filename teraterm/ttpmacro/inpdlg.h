@@ -34,15 +34,18 @@
 class CInpDlg : public TTCDialog
 {
 public:
-	CInpDlg(PCHAR Input, PCHAR Text, PCHAR Title,
-	        PCHAR Default, BOOL Paswd,
+	CInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Title,
+	        const TCHAR *Default, BOOL Paswd,
 	        int x, int y);
 	INT_PTR DoModal();
 
 private:
 	enum { IDD = IDD_INPDLG };
 
-	PCHAR InputStr, TextStr, TitleStr, DefaultStr;
+	TCHAR *InputStr;
+	const TCHAR *TextStr;
+	const TCHAR *TitleStr;
+	const TCHAR *DefaultStr;
 	BOOL PaswdFlag;
 	int PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW, EW, EH;
 	SIZE s;

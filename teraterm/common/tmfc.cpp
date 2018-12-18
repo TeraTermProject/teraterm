@@ -178,6 +178,13 @@ void TTCWnd::SetWindowTextT(const TCHAR *str)
 	::SetWindowText(m_hWnd, str);
 }
 
+#if defined(UNICODE)
+void TTCWnd::SetWindowTextW(const wchar_t *str)
+{
+	::SetWindowTextW(m_hWnd, str);
+}
+#endif
+
 void TTCWnd::SetWindowTextA(const char *str)
 {
 	::SetWindowTextA(m_hWnd, str);

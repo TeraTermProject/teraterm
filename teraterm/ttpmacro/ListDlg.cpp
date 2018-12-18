@@ -29,6 +29,7 @@
 // ListDlg.cpp : 実装ファイル
 //
 
+#include <tchar.h>
 #include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"
@@ -37,15 +38,13 @@
 #include "tttypes.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
+#include "ttmacro.h"
 
 #include "ListDlg.h"
 
-extern HINSTANCE GetInstance();
-extern HWND GetHWND();
-
 // CListDlg ダイアログ
 
-CListDlg::CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected, int x, int y)
+CListDlg::CListDlg(const TCHAR *Text, const TCHAR *Caption, const TCHAR **Lists, int Selected, int x, int y)
 {
 	m_Text = Text;
 	m_Caption = Caption;
@@ -68,7 +67,7 @@ BOOL CListDlg::OnInitDialog()
 		{ IDOK, "BTN_YES" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	char **p;
+	const TCHAR **p;
 	int ListMaxWidth = 0;
 	int ListWidth;
 	int ListCount = 0;
@@ -86,7 +85,7 @@ BOOL CListDlg::OnInitDialog()
 	while (*p) {
 		SIZE size;
 		SendDlgItemMessage(IDC_LISTBOX, LB_ADDSTRING, 0, (LPARAM)(*p));
-		GetTextExtentPoint32(DC, *p, strlen(*p), &size);
+		GetTextExtentPoint32(DC, *p, _tcslen(*p), &size);
 		ListWidth = size.cx;
 		if (ListWidth > ListMaxWidth) {
 			ListMaxWidth = ListWidth;

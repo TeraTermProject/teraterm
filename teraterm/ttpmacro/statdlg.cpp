@@ -51,7 +51,7 @@ END_MESSAGE_MAP()
 
 extern HINSTANCE GetInstance();
 
-BOOL CStatDlg::Create(PCHAR Text, PCHAR Title, int x, int y)
+BOOL CStatDlg::Create(const TCHAR *Text, const TCHAR *Title, int x, int y)
 {
 	TextStr = Text;
 	TitleStr = Title;
@@ -62,7 +62,7 @@ BOOL CStatDlg::Create(PCHAR Text, PCHAR Title, int x, int y)
 	return TTCDialog::Create(hInst, GetDesktopWindow(), CStatDlg::IDD);
 }
 
-void CStatDlg::Update(PCHAR Text, PCHAR Title, int x, int y)
+void CStatDlg::Update(const TCHAR *Text, const TCHAR *Title, int x, int y)
 {
 	RECT R;
 

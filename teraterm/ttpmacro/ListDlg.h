@@ -31,15 +31,15 @@
 class CListDlg : public TTCDialog
 {
 public:
-	CListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected, int x, int y);
+	CListDlg(const TCHAR *Text, const TCHAR *Caption, const TCHAR **Lists, int Selected, int x, int y);
 	INT_PTR DoModal();
 	int m_SelectItem;
 
 private:
 	enum { IDD = IDD_LISTDLG };
-	PCHAR m_Text;
-	PCHAR m_Caption;
-	CHAR **m_Lists;
+	const TCHAR *m_Text;
+	const TCHAR *m_Caption;
+	const TCHAR **m_Lists;
 	int m_Selected;
 	int PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW, LW, LH;
 	SIZE s;

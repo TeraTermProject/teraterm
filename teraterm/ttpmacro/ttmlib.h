@@ -35,7 +35,7 @@ extern "C" {
 
 extern char UILanguageFile[MAX_PATH];
 
-void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s);
+void CalcTextExtent(HDC DC, const TCHAR *Text, LPSIZE s);
 void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize);	// TODO name
 void TTMGetDir(PCHAR Dir, int destlen);
 void TTMSetDir(PCHAR Dir);

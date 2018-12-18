@@ -38,15 +38,13 @@
 #include "tmfc.h"
 #include "dlglib.h"
 #include "ttmdlg.h"
+#include "ttmacro.h"
 
 #include "msgdlg.h"
 
-extern HINSTANCE GetInstance();
-extern HWND GetHWND();
-
 // CMsgDlg dialog
 
-CMsgDlg::CMsgDlg(PCHAR Text, PCHAR Title, BOOL YesNo,
+CMsgDlg::CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo,
                  int x, int y)
 {
 	TextStr = Text;

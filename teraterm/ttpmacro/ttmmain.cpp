@@ -32,6 +32,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <stdio.h>
+#include <tchar.h>
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmdlg.h"
@@ -49,6 +50,7 @@
 #include "wait4all.h"
 
 #include "tmfc.h"
+#include "codeconv.h"
 
 extern HINSTANCE GetInstance();
 
@@ -280,7 +282,7 @@ BOOL CCtrlWindow::OnInitDialog()
 	HDC TmpDC;
 	int CRTWidth, CRTHeight;
 	RECT Rect;
-	char Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
+	TCHAR Temp[MAX_PATH + 8]; // MAX_PATH + "MACRO - "(8)
 	BOOL IOption, VOption;
 	int CmdShow;
 	int fuLoad = LR_DEFAULTCOLOR;
@@ -335,8 +337,8 @@ BOOL CCtrlWindow::OnInitDialog()
 	// wait4all
 	register_macro_window(GetSafeHwnd());
 #endif
-	strncpy_s(Temp, sizeof(Temp), "MACRO - ", _TRUNCATE);
-	strncat_s(Temp, sizeof(Temp), ShortName, _TRUNCATE);
+	_tcsncpy_s(Temp, _countof(Temp), _T("MACRO - "), _TRUNCATE);
+	_tcsncat_s(Temp, _countof(Temp), (tc)ShortName, _TRUNCATE);
 	SetWindowText(Temp);
 
 	// send the initialization signal to TT
@@ -393,16 +395,16 @@ BOOL CCtrlWindow::OnCancel( )
 
 BOOL CCtrlWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	char uimsg[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
 
 	switch (LOWORD(wParam)) {
 	case IDC_CTRLPAUSESTART:
 		if (Pause) {
-			get_lang_msg("BTN_PAUSE", uimsg, sizeof(uimsg),  "Pau&se", UILanguageFile);
+			get_lang_msgT("BTN_PAUSE", uimsg, _countof(uimsg),  _T("Pau&se"), UILanguageFile);
 			SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
 		}
 		else {
-			get_lang_msg("BTN_START", uimsg, sizeof(uimsg),  "&Start", UILanguageFile);
+			get_lang_msgT("BTN_START", uimsg, _countof(uimsg),  _T("&Start"), UILanguageFile);
 			SetDlgItemText(IDC_CTRLPAUSESTART, uimsg);
 		}
 		Pause = ! Pause;
@@ -448,7 +450,7 @@ void CCtrlWindow::OnPaint()
 {
 	PAINTSTRUCT ps;
 	HDC dc;
-	char buf[128];
+	TCHAR buf[128];
 
 	dc = BeginPaint(&ps);
 
@@ -456,8 +458,8 @@ void CCtrlWindow::OnPaint()
 	// added line buffer (2005.7.22 yutaka)
 	// added MACRO filename (2013.9.8 yutaka)
 	// ファイル名の末尾は省略表示とする。(2014.12.30 yutaka)
-	SetDlgItemText(IDC_FILENAME, GetMacroFileName());
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, ":%d:%s", GetLineNo(), GetLineBuffer());
+	SetDlgItemText(IDC_FILENAME, (tc)GetMacroFileName());
+	_sntprintf_s(buf, _countof(buf), _TRUNCATE, _T(":%d:%s"), GetLineNo(), (const TCHAR *)(tc)GetLineBuffer());
 	SetDlgItemText(IDC_LINENO, buf);
 
 	if (::IsIconic(m_hWnd)) {

@@ -36,6 +36,7 @@
 #include "ttmparse.h"
 #include "ttlib.h"
 #include "fileread.h"
+#include "fileread.h"
 
 #include "ttmbuff.h"
 
@@ -142,8 +143,8 @@ BOOL LoadMacroFile(PCHAR FileName, int IBuff)
 
 	BuffPtr[IBuff] = 0;
 
-	Buff[IBuff] = LoadFileAA(FileName, &Len);
-//	Buff[IBuff] = LoadFileU8A(FileName, &Len);
+//	Buff[IBuff] = LoadFileAA(FileName, &Len);
+	Buff[IBuff] = LoadFileU8A(FileName, &Len);
 	if (Buff[IBuff] == NULL) {
 		BuffLen[IBuff] = 0;
 		return FALSE;

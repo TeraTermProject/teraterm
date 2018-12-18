@@ -34,13 +34,14 @@
 class CMsgDlg : public TTCDialog
 {
 public:
-	CMsgDlg(PCHAR Text, PCHAR Title, BOOL YesNo, int x, int y);
+	CMsgDlg(const TCHAR *Text, const TCHAR *Title, BOOL YesNo, int x, int y);
 	INT_PTR DoModal();
 
 private:
 	enum { IDD = IDD_MSGDLG };
 
-	PCHAR TextStr, TitleStr;
+	const TCHAR *TextStr;
+	const TCHAR *TitleStr;
 	BOOL YesNoFlag;
 	int  PosX, PosY, init_WW, WW, WH, TW, TH, BH, BW;
 	SIZE s;

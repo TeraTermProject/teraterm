@@ -29,6 +29,9 @@
 
 /* TTMACRO.EXE, Tera Term Language interpreter */
 
+#undef UNICODE
+#undef _UNICODE
+
 #include "teraterm.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -68,6 +71,7 @@
 #include <iptypes.h>
 #include <iphlpapi.h>
 #include "win16api.h"
+#include "ttl_gui.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -448,6 +452,7 @@ WORD TTLCall()
 	return Err;
 }
 
+#if 0
 // add 'clipb2var' (2006.9.17 maya)
 WORD TTLClipb2Var()
 {
@@ -575,7 +580,9 @@ WORD TTLClipb2Var()
 
 	return Err;
 }
+#endif
 
+#if 0
 // add 'var2clipb' (2006.9.17 maya)
 WORD TTLVar2Clipb()
 {
@@ -621,6 +628,7 @@ WORD TTLVar2Clipb()
 
 	return Err;
 }
+#endif
 
 WORD TTLCloseSBox()
 {
@@ -1511,6 +1519,7 @@ WORD TTLFileMarkPtr()
 	return Err;
 }
 
+#if 0
 // add 'filenamebox' (2007.9.13 maya)
 WORD TTLFilenameBox()
 {
@@ -1570,6 +1579,7 @@ WORD TTLFilenameBox()
 	}
 	return Err;
 }
+#endif
 
 WORD TTLFileOpen()
 {
@@ -2576,7 +2586,7 @@ WORD TTLGetIPv6Addr()
 	return Err;
 }
 
-
+#if 0
 WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2;
@@ -2620,6 +2630,7 @@ WORD TTLGetPassword()
 	SetResult(result);  // 成功可否を設定する。
 	return Err;
 }
+#endif
 
 // setpassword 'password.dat' 'mypassword' passowrd
 WORD TTLSetPassword()
@@ -3039,6 +3050,7 @@ WORD TTLInclude()
 	return Err;
 }
 
+#if 0
 WORD TTLInputBox(BOOL Paswd)
 {
 	TStrVal Str1, Str2, Str3;
@@ -3084,6 +3096,7 @@ WORD TTLInputBox(BOOL Paswd)
 		OpenInpDlg(StrVarPtr(VarId),Str1,Str2,Str3,Paswd);
 	return Err;
 }
+#endif
 
 WORD TTLInt2Str()
 {
@@ -3394,6 +3407,7 @@ WORD TTLDirname()
 	return Err;
 }
 
+#if 0
 WORD TTLDirnameBox()
 {
 	TStrVal Title;
@@ -3558,6 +3572,7 @@ WORD TTLMessageBox()
 	MessageCommand(IdMsgBox, &Err);
 	return Err;
 }
+#endif
 
 WORD TTLNext()
 {

@@ -29,6 +29,9 @@
 
 // TTMACRO.EXE, DDE routines
 
+#undef UNICODE
+#undef _UNICODE
+
 #include "teraterm.h"
 #include <stdio.h>
 #include <stdlib.h>

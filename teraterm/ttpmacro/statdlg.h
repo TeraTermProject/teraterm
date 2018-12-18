@@ -32,12 +32,13 @@
 class CStatDlg : public TTCDialog
 {
 public:
-	BOOL Create(PCHAR Text, PCHAR Title, int x, int y);
-	void Update(PCHAR Text, PCHAR Title, int x, int y);
+	BOOL Create(const TCHAR *Text, const TCHAR *Title, int x, int y);
+	void Update(const TCHAR *Text, const TCHAR *Title, int x, int y);
 	void Bringup();
 	enum { IDD = IDD_STATDLG };
 private:
-	PCHAR TextStr, TitleStr;
+	const TCHAR *TextStr;
+	const TCHAR *TitleStr;
 	int  PosX, PosY, init_WW, WW, WH, TW, TH;
 	SIZE s;
 //	HFONT DlgFont;

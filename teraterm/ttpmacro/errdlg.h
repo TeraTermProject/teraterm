@@ -35,17 +35,18 @@
 class CErrDlg : public TTCDialog
 {
 public:
-	CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName);
+	CErrDlg(const TCHAR *Msg, const TCHAR *Line, int x, int y, int lineno, int start, int end, const TCHAR *FileName);
 	INT_PTR DoModal();
 
 private:
 	enum { IDD = IDD_ERRDLG };
 
-	PCHAR MsgStr, LineStr;
+	const TCHAR *MsgStr;
+	const TCHAR *LineStr;
 	int PosX, PosY;
 	int LineNo;
 	int StartPos, EndPos;
-	PCHAR MacroFileName;
+	const TCHAR *MacroFileName;
 
 	virtual BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wp, LPARAM lp);

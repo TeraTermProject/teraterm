@@ -34,11 +34,12 @@
 #include <string.h>
 #include <direct.h>
 #include <shlobj.h>
+#include <tchar.h>
 
 static char CurrentDir[MAXPATHLEN];
 
 typedef struct {
-	char *name;
+	const char *name;
 	int csidl;
 } SpFolder;
 
@@ -62,10 +63,10 @@ static SpFolder spfolders[] = {
 	{ NULL,                -1}
 };
 
-void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s)
+void CalcTextExtent(HDC DC, const TCHAR *Text, LPSIZE s)
 {
   int W, H, i, i0;
-  char Temp[512];
+  TCHAR Temp[512];
   DWORD dwExt;
 
   W = 0;
@@ -77,14 +78,14 @@ void CalcTextExtent(HDC DC, PCHAR Text, LPSIZE s)
 	   (Text[i]!=0x0d) &&
 	   (Text[i]!=0x0a))
       i++;
-    memcpy(Temp,&Text[i0],i-i0);
+    memcpy(Temp,&Text[i0],sizeof(TCHAR) * (i-i0));
     Temp[i-i0] = 0;
     if (Temp[0]==0)
     {
      Temp[0] = 0x20;
      Temp[1] = 0;
     }
-    dwExt = GetTabbedTextExtent(DC,Temp,strlen(Temp),0,NULL);
+    dwExt = GetTabbedTextExtent(DC,Temp,_tcslen(Temp),0,NULL);
     s->cx = LOWORD(dwExt);
     s->cy = HIWORD(dwExt);
     if (s->cx > W) W = s->cx;
@@ -158,7 +159,7 @@ int DoGetSpecialFolder(int CSIDL, PCHAR dest, int dest_len)
 		return 0;
 	}
 
-	SHGetPathFromIDList(pidl, Path);
+	SHGetPathFromIDListA(pidl, Path);
 	CoTaskMemFree(pidl);
 
 	strncpy_s(dest, dest_len, Path, _TRUNCATE);
@@ -227,7 +228,7 @@ void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize)
 	if (Font) {
 		prevFont = (HFONT)SelectObject(TmpDC, Font);
 	}
-	CalcTextExtent(TmpDC, (PCHAR)Text, textSize);
+	CalcTextExtent(TmpDC, Text, textSize);
 	if (Font && prevFont != NULL) {
 		SelectObject(TmpDC, prevFont);
 	}
@@ -236,9 +237,9 @@ void CalcTextExtent2(HWND hWnd, HFONT Font, const TCHAR *Text, LPSIZE textSize)
 
 int MessageBoxHaltScript(HWND hWnd, const char *UILanguageFile)
 {
-	char uimsg[MAX_UIMSG];
-	char uimsg2[MAX_UIMSG];
-	get_lang_msg("MSG_MACRO_CONF", uimsg, sizeof(uimsg), "MACRO: confirmation", UILanguageFile);
-	get_lang_msg("MSG_MACRO_HALT_SCRIPT", uimsg2, sizeof(uimsg2), "Are you sure that you want to halt this macro script?", UILanguageFile);
+	TCHAR uimsg[MAX_UIMSG];
+	TCHAR uimsg2[MAX_UIMSG];
+	get_lang_msgT("MSG_MACRO_CONF", uimsg, _countof(uimsg), _T("MACRO: confirmation"), UILanguageFile);
+	get_lang_msgT("MSG_MACRO_HALT_SCRIPT", uimsg2, _countof(uimsg2), _T("Are you sure that you want to halt this macro script?"), UILanguageFile);
 	return MessageBox(hWnd, uimsg2, uimsg, MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
 }

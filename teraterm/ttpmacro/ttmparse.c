@@ -37,6 +37,7 @@
 #include "ttmdlg.h"
 #include "ttmparse.h"
 #include "ttmbuff.h"
+#include "codeconv.h"
 
 #ifdef _DEBUG
 
@@ -126,6 +127,7 @@ void EndVar()
 	GlobalFree(HStrBuff);
 }
 
+#if 0	// ttl_gui.cÇ…Ç∆ÇËÇ†Ç¶Ç∏éùÇ¡ÇƒÇ¢Ç¡ÇΩ
 void DispErr(WORD Err)
 {
 	char Msg[41];
@@ -166,9 +168,10 @@ void DispErr(WORD Err)
 
 	filename = GetMacroFileName();
 
-	i = OpenErrDlg(Msg, LineBuff, no, start, end, filename);
+	i = OpenErrDlg((tc)Msg, (tc)LineBuff, no, start, end, (tc)filename);
 	if (i==IDOK) TTLStatus = IdTTLEnd;
 }
+#endif
 
 void LockVar()
 {

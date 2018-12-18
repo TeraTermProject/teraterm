@@ -51,3 +51,6 @@ public:
 	DECLARE_MESSAGE_MAP()
 };
 #endif
+
+HINSTANCE GetInstance();
+HWND GetHWND();

@@ -49,6 +49,9 @@ public:
 	LRESULT SendMessage(UINT msg, WPARAM wp, LPARAM lp);
 	void ShowWindow(int nCmdShow);
 	void SetWindowTextT(const TCHAR *str);
+#if defined(UNICODE)
+	void SetWindowTextW(const wchar_t *str);
+#endif
 	void SetWindowTextA(const char *str);
 	LONG_PTR SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong);
 	LONG_PTR GetWindowLongPtr(int nIndex);

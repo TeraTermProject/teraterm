@@ -14,6 +14,10 @@ if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
 endif ()
 
+if(USE_UNICODE_API)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
@@ -33,6 +37,8 @@ set(COMMON_SRC
   ../common/compat_win.cpp
   ../common/win16api.h
   ../common/win16api.c
+  ../common/codeconv.h
+  ../common/codeconv.cpp
   )
 
 source_group(
@@ -56,6 +62,7 @@ set(SRC
   statdlg.h
   ttl.c
   ttl.h
+  ttl_gui.cpp
   ttm_res.h
   ttmacro.cpp
   ttmacro.h
@@ -80,6 +87,8 @@ set(SRC
   wait4all.h
   ttpmacro.rc
   ttm-version.rc
+  fileread.h
+  fileread.cpp
   ${COMMON_SRC}
   )
 
@@ -93,8 +102,6 @@ link_directories(
   ${ONIGURUMA_LIBRARY_DIRS}
   ${SFMT_LIBRARY_DIRS}
   )
-
-set(CMAKE_MFC_FLAG 1)
 
 if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:iphlpapi.dll /DELAYLOAD:user32.dll")

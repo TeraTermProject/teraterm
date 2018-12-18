@@ -33,6 +33,7 @@
 #include <direct.h>
 #include <commdlg.h>
 #include <crtdbg.h>
+#include <tchar.h>
 
 #include "teraterm.h"
 #include "ttm_res.h"
@@ -46,6 +47,7 @@
 #include "ListDlg.h"
 #include "ttmlib.h"
 #include "ttmdlg.h"
+#include "ttmacro.h"
 
 #ifdef _DEBUG
 #define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
@@ -55,9 +57,6 @@
 #define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
-
-extern HINSTANCE GetInstance();
-extern HWND GetHWND();
 
 char HomeDir[MAXPATHLEN];
 char FileName[MAX_PATH];
@@ -81,7 +80,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	PCHAR start, cur, next;
 
 	// Get home directory
-	if (GetModuleFileName(GetInstance(), FileName,sizeof(FileName)) == 0) {
+	if (GetModuleFileNameA(GetInstance(), FileName,sizeof(FileName)) == 0) {
 		return;
 	}
 	ExtractDirName(FileName,HomeDir);
@@ -93,7 +92,7 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 	SleepFlag = FALSE;
 	*IOption = FALSE;
 	*VOption = FALSE;
-	Param = GetCommandLine();
+	Param = GetCommandLineA();
 
 	ParamsSize = 50;
 	Params = (char **)malloc(sizeof(char*) * ParamsSize);
@@ -172,36 +171,54 @@ void ParseParam(PBOOL IOption, PBOOL VOption)
 
 BOOL GetFileName(HWND HWin)
 {
-	char FNFilter[31];
+	TCHAR FNFilter[64];
 	OPENFILENAME FNameRec;
-	char uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
+#if defined(UNICODE)
+	TCHAR FileNameT[MAX_PATH];
+#endif
 
 	if (FileName[0]!=0) {
 		return FALSE;
 	}
+#if defined(UNICODE)
+	MultiByteToWideChar(CP_ACP, 0,
+						FileName, -1, FileNameT, _countof(FileNameT));
+#endif
 
-	memset(FNFilter, 0, sizeof(FNFilter));
 	memset(&FNameRec, 0, sizeof(OPENFILENAME));
-	get_lang_msg("FILEDLG_OPEN_MACRO_FILTER", uimsg, sizeof(uimsg), "Macro files (*.ttl)\\0*.ttl\\0\\0", UILanguageFile);
-	memcpy(FNFilter, uimsg, sizeof(FNFilter));
+	get_lang_msgT("FILEDLG_OPEN_MACRO_FILTER_", FNFilter, _countof(FNFilter),
+				  _T("Macro files (*.ttl)\\0*.ttl\\0all\\0*.*\\0\\0"), UILanguageFile);
 
 	// sizeof(OPENFILENAME) では Windows98/NT で終了してしまうため (2006.8.14 maya)
 	FNameRec.lStructSize = get_OPENFILENAME_SIZE();
 	FNameRec.hwndOwner	 = HWin;
 	FNameRec.lpstrFilter	 = FNFilter;
 	FNameRec.nFilterIndex  = 1;
+#if defined(UNICODE)
+	FNameRec.lpstrFile  = FileNameT;
+	FNameRec.nMaxFile  = _countof(FileNameT);
+#else
 	FNameRec.lpstrFile  = FileName;
 	FNameRec.nMaxFile  = sizeof(FileName);
+#endif
 	// 以前読み込んだ .ttl ファイルのパスを記憶できるように、初期ディレクトリを固定にしない。
 	// (2008.4.7 yutaka)
 #if 0
 	FNameRec.lpstrInitialDir = HomeDir;
 #endif
 	FNameRec.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	FNameRec.lpstrDefExt = "TTL";
-	get_lang_msg("FILEDLG_OPEN_MACRO_TITLE", uimsg2, sizeof(uimsg2), "MACRO: Open macro", UILanguageFile);
-	FNameRec.lpstrTitle = uimsg2;
+	FNameRec.lpstrDefExt = _T("TTL");
+	get_lang_msgT("FILEDLG_OPEN_MACRO_TITLE",
+				  uimsg, _countof(uimsg), _T("MACRO: Open macro"), UILanguageFile);
+	FNameRec.lpstrTitle = uimsg;
 	if (GetOpenFileName(&FNameRec)) {
+#if defined(UNICODE)
+		WideCharToMultiByte(CP_ACP, 0,
+							FileNameT, -1,
+							FileName, _countof(FileName),
+							NULL, NULL);
+#endif
 		strncpy_s(ShortName, sizeof(ShortName), &(FileName[FNameRec.nFileOffset]), _TRUNCATE);
 	}
 	else {
@@ -226,26 +243,26 @@ void SetDlgPos(int x, int y)
 	}
 }
 
-void OpenInpDlg(PCHAR Buff, PCHAR Text, PCHAR Caption,
-                PCHAR Default, BOOL Paswd)
+void OpenInpDlg(TCHAR *Input, const TCHAR *Text, const TCHAR *Caption,
+                const TCHAR *Default, BOOL Paswd)
 {
-	CInpDlg InpDlg(Buff,Text,Caption,Default,Paswd,DlgPosX,DlgPosY);
+	CInpDlg InpDlg(Input,Text,Caption,Default,Paswd,DlgPosX,DlgPosY);
 	InpDlg.DoModal();
 }
 
-int OpenErrDlg(PCHAR Msg, PCHAR Line, int lineno, int start, int end, PCHAR FileName)
+int OpenErrDlg(const TCHAR *Msg, const TCHAR *Line, int lineno, int start, int end, const TCHAR *FileName)
 {
 	CErrDlg ErrDlg(Msg,Line,DlgPosX,DlgPosY, lineno, start, end, FileName);
 	return ErrDlg.DoModal();
 }
 
-int OpenMsgDlg(PCHAR Text, PCHAR Caption, BOOL YesNo)
+int OpenMsgDlg(const TCHAR *Text, const TCHAR *Caption, BOOL YesNo)
 {
 	CMsgDlg MsgDlg(Text,Caption,YesNo,DlgPosX,DlgPosY);
 	return MsgDlg.DoModal();
 }
 
-void OpenStatDlg(PCHAR Text, PCHAR Caption)
+void OpenStatDlg(const TCHAR *Text, const TCHAR *Caption)
 {
 	if (StatDlg==NULL) {
 		StatDlg = new CStatDlg();
@@ -279,7 +296,7 @@ void BringupStatDlg()
  * @retval -1		cancelボタン
  * @retval -2		closeボタン
  */
-int OpenListDlg(PCHAR Text, PCHAR Caption, CHAR **Lists, int Selected)
+int OpenListDlg(const TCHAR *Text, const TCHAR *Caption, const TCHAR **Lists, int Selected)
 {
 	HINSTANCE hInst = GetInstance();
 	HWND hWnd = GetHWND();

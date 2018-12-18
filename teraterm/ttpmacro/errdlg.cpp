@@ -31,6 +31,7 @@
 
 #include <windowsx.h>
 #include <stdio.h>
+#include <tchar.h>
 #include "tmfc.h"
 #include "teraterm.h"
 #include "ttlib.h"
@@ -45,13 +46,11 @@
 #include "ttmparse.h"
 #include "htmlhelp.h"
 #include "dlglib.h"
-
-extern HINSTANCE GetInstance();
-extern HWND GetHWND();
+#include "ttmacro.h"
 
 // CErrDlg dialog
 
-CErrDlg::CErrDlg(PCHAR Msg, PCHAR Line, int x, int y, int lineno, int start, int end, PCHAR FileName)
+CErrDlg::CErrDlg(const TCHAR *Msg, const TCHAR *Line, int x, int y, int lineno, int start, int end, const TCHAR *FileName)
 {
 	MsgStr = Msg;
 	LineStr = Line;
@@ -79,7 +78,7 @@ BOOL CErrDlg::OnInitDialog()
 	};
 	RECT R;
 	HDC TmpDC;
-	char buf[MaxLineLen*2], buf2[10];
+	TCHAR buf[MaxLineLen*2], buf2[10];
 	int i, len;
 
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), UILanguageFile);
@@ -89,22 +88,22 @@ BOOL CErrDlg::OnInitDialog()
 	// 行番号を先頭につける。
 	// ファイル名もつける。
 	// エラー箇所に印をつける。
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s:%d:", MacroFileName, LineNo);
+	_sntprintf_s(buf, _countof(buf), _TRUNCATE, _T("%s:%d:"), MacroFileName, LineNo);
 	SetDlgItemText(IDC_ERRLINE, buf);
 
-	len = strlen(LineStr);
+	len = _tcslen(LineStr);
 	buf[0] = 0;
 	for (i = 0 ; i < len ; i++) {
 		if (i == StartPos)
-			strncat_s(buf, sizeof(buf), "<<<", _TRUNCATE);
+			_tcsncat_s(buf, _countof(buf), _T("<<<"), _TRUNCATE);
 		if (i == EndPos)
-			strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
+			_tcsncat_s(buf, _countof(buf), _T(">>>"), _TRUNCATE);
 		buf2[0] = LineStr[i];
 		buf2[1] = 0;
-		strncat_s(buf, sizeof(buf), buf2, _TRUNCATE);
+		_tcsncat_s(buf, _countof(buf), buf2, _TRUNCATE);
 	}
 	if (EndPos == len)
-		strncat_s(buf, sizeof(buf), ">>>", _TRUNCATE);
+		_tcsncat_s(buf, _countof(buf), _T(">>>"), _TRUNCATE);
 	SetDlgItemText(IDC_EDIT_ERRLINE, buf);
 
 	if (PosX<=GetMonitorLeftmost(PosX, PosY)-100) {

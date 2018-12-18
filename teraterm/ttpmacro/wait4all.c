@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <tchar.h>
 #include "wait4all.h"
 #include "ttlib.h"
 
@@ -40,7 +41,7 @@
 static int function_disable = 1;  
 
 // 共有メモリフォーマット拡張時は、以下の名称を変更すること。
-#define TTM_FILEMAPNAME "ttm_memfilemap_1"
+#define TTM_FILEMAPNAME _T("ttm_memfilemap_1")
 
 // 共有メモリのフォーマット
 typedef struct {
@@ -61,7 +62,7 @@ static int mindex = -1;
 static BOOL QuoteFlag;
 
 // 排他制御
-#define MUTEX_NAME "Mutex Object for macro shmem"
+#define MUTEX_NAME _T("Mutex Object for macro shmem")
 static HANDLE hMutex = NULL;
 
 // 共有メモリインデックス
@@ -79,7 +80,7 @@ int is_wait4all_enabled(void)
 static int open_macro_shmem(void)
 {
 	HMap = CreateFileMapping(
-		(HANDLE) 0xFFFFFFFF, NULL, PAGE_READWRITE,
+		INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
 		0, sizeof(TMacroShmem), TTM_FILEMAPNAME);
 	if (HMap == NULL)
 		return FALSE;
