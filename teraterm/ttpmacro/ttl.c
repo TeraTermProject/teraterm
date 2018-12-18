@@ -3447,11 +3447,13 @@ WORD TTLDirnameBox()
 	return Err;
 }
 
+#if 0
 #define IdMsgBox 1
 #define IdYesNoBox 2
 #define IdStatusBox 3
 #define IdListBox 4
 #define LISTBOX_ITEM_NUM 10
+#endif
 
 int MessageCommand(int BoxId, LPWORD Err)
 {

@@ -90,7 +90,8 @@ DllExport void get_lang_msgU8(const char *key, PCHAR buf, int buf_len, const cha
 DllExport void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 #endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile);
-DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
+DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
+DllExport BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg);
 DllExport void OutputDebugPrintf(const char *fmt, ...);
 DllExport BOOL is_NT4();
 int get_OPENFILENAME_SIZE();
@@ -127,8 +128,10 @@ BOOL GetPositionOnWindow(
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
 #if defined(_UNICODE)
+#define doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
 #else
+#define doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolder(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
 #endif
 

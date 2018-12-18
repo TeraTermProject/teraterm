@@ -235,11 +235,10 @@ WORD TTLFilenameBox()
 	BOOL SaveFlag = FALSE;
 	TStrVal InitDir = "";
 	tc InitDirT;
-	BOOL ret;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
-	tc Str1T = Str1;
+	tc Str1T = tc::fromUtf8(Str1);
 
 	if (Err!=0) return Err;
 
@@ -262,20 +261,15 @@ WORD TTLFilenameBox()
 
 	SetInputStr("");
 	if (CheckVar("inputstr", &ValType, &VarId) && (ValType==TypString)) {
-#if defined(UNICODE)
 		TCHAR filename[MaxStrLen];
-#endif
+		filename[0] = 0;
 		memset(&ofn, 0, sizeof(OPENFILENAME));
-		ofn.lStructSize     = sizeof(OPENFILENAME);
+		//ofn.lStructSize     = sizeof(OPENFILENAME);
+		ofn.lStructSize     = OPENFILENAME_SIZE_VERSION_400;		// TODO
 		ofn.hwndOwner       = GetHWND();
 		ofn.lpstrTitle      = Str1T;
-#if defined(UNICODE)
 		ofn.lpstrFile       = filename;
 		ofn.nMaxFile        = _countof(filename);
-#else
-		ofn.lpstrFile       = StrVarPtr(VarId);
-		ofn.nMaxFile        = MaxStrLen;
-#endif
 		get_lang_msgT("FILEDLG_ALL_FILTER", uimsg, _countof(uimsg), _T("All(*.*)\\0*.*\\0\\0"), UILanguageFile);
 		ofn.lpstrFilter     = uimsg;
 		ofn.lpstrInitialDir = NULL;
@@ -283,6 +277,7 @@ WORD TTLFilenameBox()
 			ofn.lpstrInitialDir = InitDirT;
 		}
 		BringupWindow(GetHWND());
+		BOOL ret;
 		if (SaveFlag) {
 			ofn.Flags = OFN_OVERWRITEPROMPT;
 			ret = GetSaveFileName(&ofn);
@@ -291,13 +286,11 @@ WORD TTLFilenameBox()
 			ret = GetOpenFileName(&ofn);
 		}
 
-#if defined(UNICODE)
+		const char *filenameU8 = ToU8T(filename);
 		char *dest = StrVarPtr(VarId);
-		::WideCharToMultiByte(CP_ACP, 0, 
-							  filename, MaxStrLen,
-							  dest, MaxStrLen,
-							  NULL,NULL);
-#endif
+		strcpy(dest, filenameU8);
+		free((void *)filenameU8);
+
 		SetResult(ret);
 	}
 	return Err;
@@ -308,7 +301,6 @@ WORD TTLDirnameBox()
 	TStrVal Title;
 	WORD Err, ValType;
 	TVarId VarId;
-	char buf[MAX_PATH];
 	TStrVal InitDir = "";
 	BOOL ret;
 
@@ -330,8 +322,11 @@ WORD TTLDirnameBox()
 	if (CheckVar("inputstr", &ValType, &VarId) &&
 	    (ValType == TypString)) {
 		BringupWindow(GetHWND());
-		if (doSelectFolder(GetHWND(), buf, sizeof(buf), InitDir, Title)) {
-			SetInputStr(buf);
+		TCHAR buf[MAX_PATH];
+		if (doSelectFolderT(GetHWND(), buf, _countof(buf), tc::fromUtf8(InitDir), tc::fromUtf8(Title))) {
+			const char *bufU8 = ToU8T(buf);
+			SetInputStr((PCHAR)bufU8);
+			free((void *)bufU8);
 			ret = 1;
 		}
 		else {
@@ -414,7 +409,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 			TVarId VarId2;
 			VarId2 = GetStrVarFromArray(VarId, i, Err);
 			if (*Err!=0) return -1;
-			s[i] = ToTcharA(StrVarPtr(VarId2));
+			s[i] = ToTcharU8(StrVarPtr(VarId2));
 		}
 		if (s[0] == NULL) {
 			*Err = ErrSyntax;
@@ -533,10 +528,9 @@ WORD TTLGetPassword()
 	if (Temp[0]==0) // password not exist
 	{
 #if defined(UNICODE)
-		tc Str2T = Str2;
 		TCHAR input_string[MaxStrLen];
-		OpenInpDlg(input_string, Str2T, _T("Enter password"), _T(""), TRUE);
-		WideCharToMultiByte(CP_ACP, 0,
+		OpenInpDlg(input_string, tc::fromUtf8(Str2), _T("Enter password"), _T(""), TRUE);
+		WideCharToMultiByte(CP_UTF8, 0,
 							input_string, -1,
 							Temp2, _countof(Temp2),
 							NULL, NULL);
@@ -603,13 +597,10 @@ WORD TTLInputBox(BOOL Paswd)
 	SetInputStr("");
 	if (CheckVar("inputstr",&ValType,&VarId) && (ValType==TypString)) {
 #if defined(UNICODE)
-		tc Str1T = Str1;
-		tc Str2T = Str2;
-		tc Str3T = Str3;
 		TCHAR input_string[MaxStrLen];
-		OpenInpDlg(input_string,Str1T,Str2T,Str3T,Paswd);
+		OpenInpDlg(input_string,tc::fromUtf8(Str1),tc::fromUtf8(Str2),tc::fromUtf8(Str3),Paswd);
 		char *output = StrVarPtr(VarId);
-		WideCharToMultiByte(CP_ACP, 0,
+		WideCharToMultiByte(CP_UTF8, 0,
 							input_string, -1,
 							output, MaxStrLen,
 							NULL, NULL);
