@@ -72,6 +72,7 @@
 #include <iphlpapi.h>
 #include "win16api.h"
 #include "ttl_gui.h"
+#include "codeconv.h"
 
 #define TTERMCOMMAND "TTERMPRO /D="
 #define CYGTERMCOMMAND "cyglaunch -o /D="
@@ -4053,7 +4054,13 @@ WORD TTLSend()
 		if (GetString(Str,&Err))
 		{
 			if (Err!=0) return Err;
+#if 0
 			DDEOut(Str);
+#else
+			const char *StrU8 = ToCharU8(Str);
+			DDEOut(Str);
+			free((void *)Str);
+#endif
 		}
 		else if (GetExpression(&ValType,&Val,&Err))
 		{
