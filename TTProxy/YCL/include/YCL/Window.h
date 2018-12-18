@@ -204,15 +204,15 @@ public:
 	bool GetScrollInfo(int type, SCROLLINFO& info)const {
 		return ::GetScrollInfo(window, type, &info) != FALSE;
 	}
-	long SetLayeredWindowAttributes(long reserved, int parameters, long attribute) {
+	long SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags) {
 		static const char USER32[] = "user32.dll";
 		static const char APINAME[] = "SetLayeredWindowAttributes";
-		static DWORD (WINAPI* api)(HWND, DWORD, BYTE, DWORD)
-			= (DWORD (WINAPI*)(HWND, DWORD, BYTE, DWORD)) ::GetProcAddress(::GetModuleHandle(USER32), APINAME);
-		return api != NULL ? (*api)(window, reserved, parameters, attribute) : 0;
+		static BOOL (WINAPI* api)(HWND, COLORREF, BYTE, DWORD)
+			= (BOOL (WINAPI*)(HWND, COLORREF, BYTE, DWORD)) ::GetProcAddress(::GetModuleHandleA(USER32), APINAME);
+		return api != NULL ? (*api)(window, crKey, bAlpha, dwFlags) : 0;
 	}
-	long SetLayeredWindowAttributes(int parameters, long attribute) {
-		return SetLayeredWindowAttributes(0, parameters, attribute);
+	long SetLayeredWindowAttributes(BYTE bAlpha, DWORD dwFlags) {
+		return SetLayeredWindowAttributes(0, bAlpha, dwFlags);
 	}
 	HWND SetClipboardViewer() {
 		return ::SetClipboardViewer(window);
@@ -311,7 +311,7 @@ public:
 #ifndef WS_EX_LAYERED
 #define WS_EX_LAYERED 0x80000
 #endif
-	void setAlpha(int alpha) {
+	void setAlpha(BYTE alpha) {
 		long exStyle = getExStyle();
 		if ((exStyle & WS_EX_LAYERED) == 0)
 			setExStyle(exStyle | WS_EX_LAYERED);
