@@ -29,9 +29,6 @@
 
 /* TTMACRO.EXE, Tera Term Language interpreter */
 
-#undef UNICODE
-#undef _UNICODE
-
 #include "teraterm.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -56,6 +53,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <share.h>
+#include "codeconv.h"
 
 // for _findXXXX() functions
 #include <io.h>
@@ -842,6 +840,7 @@ WORD TTLDoChecksum(enum checksum_type type)
 	WORD Err;
 	TVarId VarId;
 	DWORD cksum;
+	unsigned char *p;
 
 	Err = 0;
 	GetIntVar(&VarId, &Err);
@@ -850,22 +849,23 @@ WORD TTLDoChecksum(enum checksum_type type)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
+	p = (unsigned char *)Str;
 
 	switch (type) {
 		case CHECKSUM8:
-			cksum = checksum8(strlen(Str), Str);
+			cksum = checksum8(strlen(Str), p);
 			break;
 		case CHECKSUM16:
-			cksum = checksum16(strlen(Str), Str);
+			cksum = checksum16(strlen(Str), p);
 			break;
 		case CHECKSUM32:
-			cksum = checksum32(strlen(Str), Str);
+			cksum = checksum32(strlen(Str), p);
 			break;
 		case CRC16:
-			cksum = crc16(strlen(Str), Str);
+			cksum = crc16(strlen(Str), p);
 			break;
 		case CRC32:
-			cksum = crc32(strlen(Str), Str);
+			cksum = crc32(strlen(Str), p);
 			break;
 		default:
 			cksum = 0;
@@ -896,7 +896,7 @@ WORD TTLDoChecksumFile(enum checksum_type type)
 	if (Err!=0) return Err;
 	if (Str[0]==0) return Err;
 
-	fh = CreateFile(Str,GENERIC_READ,0,NULL,OPEN_EXISTING,
+	fh = CreateFile(tc::fromUtf8(Str),GENERIC_READ,0,NULL,OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,NULL); /* ファイルオープン */
 	if (fh == INVALID_HANDLE_VALUE) {
 		result = -1;
@@ -974,9 +974,9 @@ WORD TTLDelPassword()
 	GetAbsPath(Str,sizeof(Str));
 	if (! DoesFileExist(Str)) return Err;
 	if (Str2[0]==0) // delete all password
-		WritePrivateProfileString("Password",NULL,NULL,Str);
+		WritePrivateProfileString(_T("Password"),NULL,NULL,(tc)Str);
 	else            // delete password specified by Str2
-		WritePrivateProfileString("Password",Str2,NULL,Str);
+		WritePrivateProfileString(_T("Password"),(tc)Str2,NULL,(tc)Str);
 	return Err;
 }
 
@@ -1195,7 +1195,8 @@ WORD TTLExec()
 {
 	TStrVal Str,Str2, CurDir;
 	int mode = SW_SHOW;
-	int wait = 0, ret;
+	int wait = 0;
+	DWORD ret;
 	WORD Err;
 	STARTUPINFO sui;
 	PROCESS_INFORMATION pi;
@@ -1244,10 +1245,13 @@ WORD TTLExec()
 	sui.cb = sizeof(STARTUPINFO);
 	sui.wShowWindow = mode;
 	sui.dwFlags = STARTF_USESHOWWINDOW;
+	tc StrT = tc::fromUtf8(Str);
+	tc CurDirT = tc::fromUtf8(CurDir);
+	LPTSTR StrT_NC = (TCHAR *)(const TCHAR *)StrT;
 	if (CurDir[0] == 0)
-		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
+		bRet = CreateProcess(NULL, StrT_NC, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, NULL, &sui, &pi);
 	else
-		bRet = CreateProcess(NULL, Str, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDir, &sui, &pi);
+		bRet = CreateProcess(NULL, StrT_NC, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, CurDirT, &sui, &pi);
 	// TODO: check bRet
 	if (wait) {
 		WaitForSingleObject(pi.hProcess, INFINITE);
@@ -1294,7 +1298,8 @@ WORD TTLExpandEnv()
 {
 	WORD Err;
 	TVarId VarId;
-	TStrVal deststr, srcptr;
+	TStrVal srcptr;
+	TCHAR deststr[MaxStrLen];
 
 	Err = 0;
 	GetStrVar(&VarId, &Err);
@@ -1309,13 +1314,15 @@ WORD TTLExpandEnv()
 		}
 
 		// ファイルパスに環境変数が含まれているならば、展開する。
-		ExpandEnvironmentStrings(srcptr, deststr, MaxStrLen);
-		SetStrVal(VarId, deststr);
+		tc srcptrT = tc::fromUtf8(srcptr);
+		ExpandEnvironmentStrings(srcptrT, deststr, MaxStrLen);
+		SetStrVal(VarId, (char *)(const char *)(u8)deststr);
 	}
 	else { // expandenv strvar
 		// ファイルパスに環境変数が含まれているならば、展開する。
-		ExpandEnvironmentStrings(StrVarPtr(VarId), deststr, MaxStrLen);
-		SetStrVal(VarId, deststr);
+		tc VarIdT = StrVarPtr(VarId);
+		ExpandEnvironmentStrings(VarIdT, deststr, MaxStrLen);
+		SetStrVal(VarId, (char *)(const char *)(u8)deststr);
 	}
 
 	return Err;
@@ -1425,7 +1432,7 @@ WORD TTLFileCopy()
 	}
 	if (_stricmp(FName1,FName2)==0) return Err;
 
-	CopyFile(FName1,FName2,FALSE);
+	CopyFile((tc)FName1,(tc)FName2,FALSE);
 	SetResult(0);
 	return Err;
 }
@@ -1640,6 +1647,7 @@ WORD TTLFileLock()
 {
 	WORD Err;
 	int FH;
+	int timeoutI;
 	DWORD timeout;
 	int result;
 	BOOL ret;
@@ -1649,11 +1657,12 @@ WORD TTLFileLock()
 	GetIntVal(&FH,&Err);
 	if (Err!=0) return Err;
 
-	timeout = -1;  // 無限大
+	timeoutI = -1;  // 無限大
 	if (CheckParameterGiven()) {
-		GetIntVal(&timeout, &Err);
+		GetIntVal(&timeoutI, &Err);
 		if (Err!=0) return Err;
 	}
+	timeout = timeoutI * 1000;
 
 	result = 1;  // error
 	dwStart = GetTickCount();
@@ -1664,7 +1673,7 @@ WORD TTLFileLock()
 			break;
 		}
 		Sleep(1);
-	} while (GetTickCount() - dwStart < (timeout*1000));
+	} while (GetTickCount() - dwStart < timeout);
 
 	SetResult(result);
 	return Err;
@@ -2265,7 +2274,7 @@ WORD TTLFolderCreate()
 		return Err;
 	}
 
-	if (CreateDirectory(FName, NULL) == 0) {
+	if (CreateDirectory((tc)FName, NULL) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2294,7 +2303,7 @@ WORD TTLFolderDelete()
 		return Err;
 	}
 
-	if (RemoveDirectory(FName) == 0) {
+	if (RemoveDirectory((tc)FName) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2414,7 +2423,7 @@ WORD TTLGetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	SetResult(GetFileAttributes(Filename));
+	SetResult(GetFileAttributes((tc)Filename));
 
 	return Err;
 }
@@ -2664,7 +2673,7 @@ WORD TTLSetPassword()
 	// パスワードを暗号化する。
 	Encrypt(VarStr, Temp);
 
-	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0) 
+	if (WritePrivateProfileString(_T("Password"), (tc)KeyStr, (tc)Temp, (tc)FileNameStr) != 0) 
 		result = 1;  /* success */
 
 	SetResult(result);  // 成功可否を設定する。
@@ -2675,7 +2684,7 @@ WORD TTLSetPassword()
 WORD TTLIsPassword()
 {
 	TStrVal FileNameStr, KeyStr;
-	char Temp[512];
+	TCHAR Temp[512];
 	WORD Err;
 	int result = 0; 
 
@@ -2695,8 +2704,8 @@ WORD TTLIsPassword()
 	GetAbsPath(FileNameStr, sizeof(FileNameStr));
 
 	Temp[0] = 0;
-	GetPrivateProfileString("Password", KeyStr,"",
-	                        Temp, sizeof(Temp), FileNameStr);
+	GetPrivateProfileString(_T("Password"), (tc)KeyStr, _T(""),
+	                        Temp, _countof(Temp), (tc)FileNameStr);
 	if (Temp[0] == 0) { // password not exist
 		result = 0; 
 	} else {
@@ -2839,12 +2848,13 @@ WORD TTLGetTTDir()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	if (GetModuleFileName(NULL, Temp, sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(NULL, Temp, _countof(Temp)) == 0) {
 		SetStrVal(VarId,"");
 		SetResult(0);
 		return Err;
 	}
 	ExtractDirName(Temp, HomeDir);
+	u8 HomeDirU8 = HomeDir;
 	SetStrVal(VarId,HomeDir);
 	SetResult(1);
 
@@ -4378,7 +4388,7 @@ WORD TTLSetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	if (SetFileAttributes(Filename, attributes) == 0) {
+	if (SetFileAttributes(tc::fromUtf8(Filename), attributes) == 0) {
 		SetResult(0);
 	}
 	else {
@@ -4504,12 +4514,12 @@ WORD TTLSprintf(int getvar)
 	//                       width------------------
 	//                                     precision--------------------
 
-	r = onig_new(&reg, pattern, pattern + strlen(pattern),
+	r = onig_new(&reg, pattern, pattern + strlen((char *)pattern),
 	             ONIG_OPTION_NONE, ONIG_ENCODING_ASCII, ONIG_SYNTAX_DEFAULT,
 	             &einfo);
 	if (r != ONIG_NORMAL) {
 		char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-		onig_error_code_to_str(s, r, &einfo);
+		onig_error_code_to_str((OnigUChar *)s, r, &einfo);
 		fprintf(stderr, "ERROR: %s\n", s);
 		SetResult(-1);
 		goto exit2;
@@ -4943,7 +4953,7 @@ WORD TTLStrScan()
 {
 	WORD Err;
 	TStrVal Str1, Str2;
-	char *p;
+	unsigned char *p;
 
 	Err = 0;
 	GetStrVal(Str1,&Err);
@@ -4957,8 +4967,8 @@ WORD TTLStrScan()
 		return Err;
 	}
 
-	if ((p = _mbsstr(Str1, Str2)) != NULL) {
-		SetResult(p - Str1 + 1);
+	if ((p = _mbsstr((unsigned char *)Str1, (unsigned char *)Str2)) != NULL) {
+		SetResult(p - (unsigned char *)Str1 + 1);
 	}
 	else {
 		SetResult(0);

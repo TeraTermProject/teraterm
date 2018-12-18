@@ -48,7 +48,6 @@ source_group(
   )
 
 set(SRC
-  #
   ttm_res.h
   errdlg.cpp
   errdlg.h
@@ -60,7 +59,7 @@ set(SRC
   msgdlg.h
   statdlg.cpp
   statdlg.h
-  ttl.c
+  ttl.cpp
   ttl.h
   ttl_gui.cpp
   ttm_res.h
