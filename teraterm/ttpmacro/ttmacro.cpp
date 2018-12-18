@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2006-2017 TeraTerm Project
  * All rights reserved.
@@ -44,6 +44,7 @@
 #include "compat_win.h"
 #include "ttmdlg.h"
 #include "tmfc.h"
+#include "dlglib.h"
 
 #ifdef _DEBUG
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -63,14 +64,14 @@ static void init()
 	pSetDllDir setDllDir;
 	pSetDefDllDir setDefDllDir;
 
-	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
+	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
-			// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍAŒŸõƒpƒX‚ğ %WINDOWS%\system32 ‚Ì‚İ‚Éİ’è‚·‚é
+			// SetDefaultDllDirectories() ãŒä½¿ãˆã‚‹å ´åˆã¯ã€æ¤œç´¢ãƒ‘ã‚¹ã‚’ %WINDOWS%\system32 ã®ã¿ã«è¨­å®šã™ã‚‹
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
 		}
 		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() ‚ªg‚¦‚È‚­‚Ä‚àASetDllDirectory() ‚ªg‚¦‚éê‡‚Í
-			// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚¾‚¯‚Å‚àŒŸõƒpƒX‚©‚ç‚Í‚¸‚µ‚Ä‚¨‚­B
+			// SetDefaultDllDirectories() ãŒä½¿ãˆãªãã¦ã‚‚ã€SetDllDirectory() ãŒä½¿ãˆã‚‹å ´åˆã¯
+			// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã ã‘ã§ã‚‚æ¤œç´¢ãƒ‘ã‚¹ã‹ã‚‰ã¯ãšã—ã¦ãŠãã€‚
 			(*setDllDir)("");
 		}
 	}
@@ -119,7 +120,50 @@ HWND GetHWND()
 
 /////////////////////////////////////////////////////////////////////////////
 
+static void SetDialogFont()
+{
+	LOGFONTA logfont;
+	BOOL result;
 
+	// æ˜ç¤ºçš„ã«æŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ãã‚Œã«å¾“ã†
+	result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
+
+	// æ˜ç¤ºã•ã‚Œã¦ã„ãªã„å ´åˆ
+	if (result == FALSE) {
+		// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã«æ²¿ã£ãŸè¨­å®šã‚’è¡Œã†
+		// https://msdn.microsoft.com/ja-jp/library/windows/desktop/aa511282.aspx
+		if (IsWindowsVistaOrLater()) {
+			// Windows Vistaä»¥é™ Segoe UI
+			strcpy(logfont.lfFaceName, "Segoe UI");
+			logfont.lfCharSet = 0;
+			logfont.lfHeight = -9;
+			logfont.lfWidth = 0;
+		} else if (IsWindows2000OrLater()) {
+			// WindowsÂ®XP ãŠã‚ˆã³ Windows 2000 ã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã™ã‚‹å ´åˆã¯ã€
+			// 8 ãƒã‚¤ãƒ³ãƒˆ MS Shell Dlg 2 æ“¬ä¼¼ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã—ã¾ã™ã€‚
+			// ã“ã®ãƒ•ã‚©ãƒ³ãƒˆã¯ Tahoma ã«ãƒãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã¾ã™ã€‚
+			strcpy(logfont.lfFaceName, "MS Shell Dlg 2");
+			logfont.lfCharSet = 0;
+			logfont.lfHeight = -8;
+			logfont.lfWidth = 0;
+		} else {
+			// ä»¥å‰ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã™ã‚‹å ´åˆã¯
+			// 8 ãƒã‚¤ãƒ³ãƒˆ MS Shell Dlg æ“¬ä¼¼ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã—ã¾ã™
+			// MS Sans Serif ã«ãã‚Œãã‚Œãƒãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã¾ã™
+			strcpy(logfont.lfFaceName, "MS Shell Dlg");
+			logfont.lfCharSet = 0;
+			logfont.lfHeight = -8;
+			logfont.lfWidth = 0;
+		}
+		result = TRUE;
+	}
+
+	if (result) {
+		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	} else {
+		TTSetDlgFont(NULL, 0, 0);
+	}
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
@@ -136,6 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	init();
 //	InitCommonControls();
 	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
+	SetDialogFont();
 
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow();
@@ -154,9 +199,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		bool message_processed = false;
 		if (m_pMainWnd->m_hAccel != NULL) {
 			if (!MetaKey(ts.MetaKey)) {
-				// matakey‚ª‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
+				// matakeyãŒæŠ¼ã•ã‚Œã¦ã„ãªã„
 				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
-					// ƒAƒNƒZƒ‰ƒŒ[ƒ^[ƒL[‚ğˆ—‚µ‚½
+					// ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ãƒ¼ã‚­ãƒ¼ã‚’å‡¦ç†ã—ãŸ
 					message_processed = true;
 				}
 			}
@@ -164,7 +209,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 
 		if (IsDialogMessage(hWnd, &msg) != 0) {
-			/* ˆ—‚³‚ê‚½*/
+			/* å‡¦ç†ã•ã‚ŒãŸ*/
 		} else {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -177,16 +222,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 
 		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
-			// ƒƒbƒZ[ƒW‚ª‚È‚¢
+			// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„
 			if (!OnIdle(lCount)) {
-				// idle•s—v
-				if (SleepTick < 500) {	// Å‘å 501ms–¢–
+				// idleä¸è¦
+				if (SleepTick < 500) {	// æœ€å¤§ 501msæœªæº€
 					SleepTick += 2;
 				}
 				lCount = 0;
 				Sleep(SleepTick);
 			} else {
-				// —vidle
+				// è¦idle
 				SleepTick = 0;
 				lCount++;
 			}
@@ -195,7 +240,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	
 	//////////////////////////////////////////////////////////////////////
 
-	// TODO ‚·‚Å‚É•Â‚¶‚ç‚ê‚Ä‚¢‚éA‚±‚Ìˆ—•s—v?
+	// TODO ã™ã§ã«é–‰ã˜ã‚‰ã‚Œã¦ã„ã‚‹ã€ã“ã®å‡¦ç†ä¸è¦?
 	if (pCCtrlWindow) {
 		pCCtrlWindow->DestroyWindow();
 	}
