@@ -93,8 +93,7 @@ int ExitCode = 0;
 static intptr_t DirHandle[NumDirHandle] = {-1,-1, -1, -1, -1, -1, -1, -1};
 /* for "FileMarkPtr" and "FileSeekBack" commands */
 #define NumFHandle 16
-//static HANDLE FHandle[NumFHandle];
-static HANDLE FHandle_[NumFHandle];
+static HANDLE FHandle[NumFHandle];
 static long FPointer[NumFHandle];
 
 // forward declaration
@@ -103,8 +102,8 @@ int ExecCmnd();
 static void HandleInit()
 {
 	int i;
-	for (i=0; i<_countof(FHandle_); i++) {
-		FHandle_[i] = INVALID_HANDLE_VALUE;
+	for (i=0; i<_countof(FHandle); i++) {
+		FHandle[i] = INVALID_HANDLE_VALUE;
 	}
 }
 
@@ -118,9 +117,10 @@ static int HandlePut(HANDLE FH)
 	if (FH == INVALID_HANDLE_VALUE) {
 		return -1;
 	}
-	for (i=0; i<_countof(FHandle_); i++) {
-		if (FHandle_[i] == INVALID_HANDLE_VALUE) {
-			FHandle_[i] = FH;
+	for (i=0; i<_countof(FHandle); i++) {
+		if (FHandle[i] == INVALID_HANDLE_VALUE) {
+			FHandle[i] = FH;
+			FPointer[i] = 0;
 			return i;
 		}
 	}
@@ -129,15 +129,15 @@ static int HandlePut(HANDLE FH)
 
 static HANDLE HandleGet(int fhi)
 {
-	if (fhi < 0 || _countof(FHandle_) < fhi) {
+	if (fhi < 0 || _countof(FHandle) < fhi) {
 		return INVALID_HANDLE_VALUE;
 	}
-	return FHandle_[fhi];
+	return FHandle[fhi];
 }
 
 static void HandleFree(int fhi)
 {
-	FHandle_[fhi] = INVALID_HANDLE_VALUE;
+	FHandle[fhi] = INVALID_HANDLE_VALUE;
 }
 
 BOOL InitTTL(HWND HWin)

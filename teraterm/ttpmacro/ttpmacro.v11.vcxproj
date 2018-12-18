@@ -126,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="errdlg.cpp" />
+    <ClCompile Include="fileread.cpp" />
     <ClCompile Include="inpdlg.cpp" />
     <ClCompile Include="ListDlg.cpp" />
     <ClCompile Include="msgdlg.cpp" />
