@@ -320,6 +320,10 @@
 				RelativePath="ttmparse.h"
 				>
 			</File>
+			<File
+				RelativePath="..\common\win16api.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
