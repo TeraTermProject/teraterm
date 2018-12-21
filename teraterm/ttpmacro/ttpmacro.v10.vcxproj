@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\codeconv.cpp" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="errdlg.cpp" />
     <ClCompile Include="fileread.cpp" />
@@ -146,7 +147,9 @@
     <ClCompile Include="wait4all.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\codeconv.h" />
     <ClInclude Include="errdlg.h" />
+    <ClInclude Include="fileread.h" />
     <ClInclude Include="inpdlg.h" />
     <ClInclude Include="ListDlg.h" />
     <ClInclude Include="msgdlg.h" />

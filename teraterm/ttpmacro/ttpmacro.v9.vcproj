@@ -203,6 +203,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath="..\common\codeconv.cpp"
+				>
+			</File>
+			<File
 				RelativePath="errdlg.cpp"
 				>
 			</File>
@@ -244,7 +248,15 @@
 			Filter="h;hpp;hxx;hm;inl;fi;fd"
 			>
 			<File
+				RelativePath="..\common\codeconv.h"
+				>
+			</File>
+			<File
 				RelativePath="errdlg.h"
+				>
+			</File>
+			<File
+				RelativePath="fileread.h"
 				>
 			</File>
 			<File
