@@ -505,7 +505,7 @@ extern "C" void DispErr(WORD Err)
 WORD TTLGetPassword()
 {
 	TStrVal Str, Str2, Temp2;
-	char Temp[512];
+	TCHAR Temp[512];
 	WORD Err;
 	TVarId VarId;
 	int result = 0;  /* failure */
@@ -523,8 +523,8 @@ WORD TTLGetPassword()
 
 	GetAbsPath(Str,sizeof(Str));
 
-	GetPrivateProfileStringA("Password",Str2,"",
-							 Temp,sizeof(Temp), Str);
+	GetPrivateProfileString(_T("Password"),(tc)Str2,_T(""),
+							Temp,_countof(Temp), tc::fromUtf8(Str));
 	if (Temp[0]==0) // password not exist
 	{
 #if defined(UNICODE)
@@ -538,14 +538,16 @@ WORD TTLGetPassword()
 		OpenInpDlg(Temp2, Str2, _T("Enter password"), _T(""), TRUE);
 #endif
 		if (Temp2[0]!=0) {
-			Encrypt(Temp2,Temp);
-			if (WritePrivateProfileStringA("Password",Str2,Temp, Str) != 0) {
+			char TempA[512];
+			Encrypt(Temp2, TempA);
+			if (WritePrivateProfileString(_T("Password"), (tc)Str2, (tc)TempA, tc::fromUtf8(Str)) != 0) {
 				result = 1;  /* success */
 			}
 		}
 	}
 	else {// password exist
-		Decrypt(Temp,Temp2);
+		u8 TempU8 = Temp;
+		Decrypt((PCHAR)(const char *)TempU8,Temp2);
 		result = 1;  /* success */
 	}
 

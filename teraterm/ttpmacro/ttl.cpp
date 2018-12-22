@@ -99,6 +99,15 @@ static intptr_t DirHandle[NumDirHandle] = {-1,-1, -1, -1, -1, -1, -1, -1};
 static HANDLE FHandle[NumFHandle];
 static long FPointer[NumFHandle];
 
+#if 0
+#define _lcreat(p1,p2)		x_win16_lcreat(p1,p2)
+#define	_lopen(p1,p2)		x_win16_lopen(p1,p2)
+#define _lclose(p1)			x_win16_lclose(p1)
+#define _lread(p1,p2,p3)	x_win16_lread(p1,p2,p3)
+#define _lwrite(p1,p2,p3)	x_win16_lwrite(p1,p2,p3)
+#define	_llseek(p1,p2,p3)	x_win16_llseek(p1,p2,p3)
+#endif
+
 // forward declaration
 int ExecCmnd();
 
@@ -972,11 +981,12 @@ WORD TTLDelPassword()
 	if (Str[0]==0) return Err;
 
 	GetAbsPath(Str,sizeof(Str));
-	if (! DoesFileExist(Str)) return Err;
+	tc StrU8 = tc::fromUtf8(Str);
+	if (_taccess(StrU8, 0) != 0) return Err;
 	if (Str2[0]==0) // delete all password
-		WritePrivateProfileString(_T("Password"),NULL,NULL,(tc)Str);
+		WritePrivateProfileString(_T("Password"),NULL,NULL,StrU8);
 	else            // delete password specified by Str2
-		WritePrivateProfileString(_T("Password"),(tc)Str2,NULL,(tc)Str);
+		WritePrivateProfileString(_T("Password"),(tc)Str2,NULL,StrU8);
 	return Err;
 }
 
@@ -1340,7 +1350,7 @@ WORD TTLFileClose()
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
-	_lclose(FH);
+	CloseHandle(FH);
 	HandleFree(fhi);
 	return Err;
 }
@@ -1351,7 +1361,6 @@ WORD TTLFileConcat()
 	HANDLE FH1, FH2;
 	int c;
 	TStrVal FName1, FName2;
-	BYTE buf[1024];
 
 	Err = 0;
 	GetStrVal(FName1,&Err);
@@ -1379,26 +1388,33 @@ WORD TTLFileConcat()
 		return Err;
 	}
 
-	FH1 = _lopen(FName1,OF_WRITE);
+	FH1 = CreateFile(tc::fromUtf8(FName1),
+					 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+					 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH1 == INVALID_HANDLE_VALUE)
-		FH1 = _lcreat(FName1,0);
+		FH1 = CreateFile(tc::fromUtf8(FName1),
+						 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+						 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH1 == INVALID_HANDLE_VALUE) {
 		SetResult(3);
 		return Err;
 	}
 	_llseek(FH1,0,2);
 
-	FH2 = _lopen(FName2,OF_READ);
+	FH2 = CreateFile(tc::fromUtf8(FName2),
+					 GENERIC_READ, FILE_SHARE_READ, NULL,
+					 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH2 != INVALID_HANDLE_VALUE)
 	{
+		BYTE buf[1024];
 		do {
 			c = _lread(FH2,&(buf[0]),sizeof(buf));
 			if (c>0)
 				_lwrite(FH1,&(buf[0]),c);
 		} while (c >= sizeof(buf));
-		_lclose(FH2);
+		CloseHandle(FH2);
 	}
-	_lclose(FH1);
+	CloseHandle(FH1);
 
 	SetResult(0);
 	return Err;
@@ -1432,7 +1448,7 @@ WORD TTLFileCopy()
 	}
 	if (_stricmp(FName1,FName2)==0) return Err;
 
-	CopyFile((tc)FName1,(tc)FName2,FALSE);
+	CopyFile(tc::fromUtf8(FName1),tc::fromUtf8(FName2),FALSE);
 	SetResult(0);
 	return Err;
 }
@@ -1461,7 +1477,9 @@ WORD TTLFileCreate()
 		SetResult(-1);
 		return Err;
 	}
-	FH = _lcreat(FName,0);
+	FH = CreateFile(tc::fromUtf8(FName),
+					GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+					CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetResult(2);
 	}
@@ -1471,7 +1489,7 @@ WORD TTLFileCreate()
 	fhi = HandlePut(FH);
 	SetIntVal(VarId, fhi);
 	if (fhi == -1) {
-		_lclose(FH);
+		CloseHandle(FH);
 	}
 	return Err;
 }
@@ -1495,8 +1513,8 @@ WORD TTLFileDelete()
 		SetResult(-1);
 		return Err;
 	}
-	
-	if (remove(FName) != 0) {
+
+	if (_tremove(tc::fromUtf8(FName)) != 0) {
 		SetResult(-1);
 	}
 	else {
@@ -1616,14 +1634,21 @@ WORD TTLFileOpen()
 		return Err;
 	}
 
+	tc FNameT = tc::fromUtf8(FName);
 	if (ReadonlyFlag) {
-		FH = _lopen(FName,OF_READ);
+		FH = CreateFile(FNameT,
+						GENERIC_READ, FILE_SHARE_READ, NULL,
+						OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	else {
-		FH = _lopen(FName,OF_READWRITE);
+		FH = CreateFile(FNameT,
+						GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
+						OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
 	if (FH == INVALID_HANDLE_VALUE)
-		FH = _lcreat(FName,0);
+		FH = CreateFile(FNameT,
+						GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+						CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
 		return ErrCantOpen;
@@ -1679,7 +1704,7 @@ WORD TTLFileLock()
 	return Err;
 }
 
-// Format: fileunlock <file handle> 
+// Format: fileunlock <file handle>
 // (2012.4.19 yutaka)
 WORD TTLFileUnLock()
 {
@@ -1797,7 +1822,7 @@ WORD TTLFileRead()
 		{
 			Str[i] = b;
 		}
-	} 
+	}
 
 	if (EndFile)
 		SetResult(1);
@@ -1840,8 +1865,8 @@ WORD TTLFileRename()
 		SetResult(-2);
 		return Err;
 	}
-	if (rename(FName1,FName2) != 0) {
-		// リネームに失敗したら、エラーで返す。
+	if (_trename(tc::fromUtf8(FName1), tc::fromUtf8(FName2)) != 0) {
+			// リネームに失敗したら、エラーで返す。
 		SetResult(-3);
 		return Err;
 	}
@@ -1863,7 +1888,7 @@ WORD TTLFileSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	if (DoesFileExist(FName))
+	if (_taccess(tc::fromUtf8(FName), 0) == 0)
 		SetResult(1);
 	else
 		SetResult(0);
@@ -1927,18 +1952,18 @@ WORD TTLFileStat()
 		goto end;
 	}
 
-	ret = _stat(FName, &st);
+	ret = _tstat(tc::fromUtf8(FName), &st);
 	if (ret != 0) {
 		goto end;
 	}
 
-	if (CheckParameterGiven()) { 
+	if (CheckParameterGiven()) {
 		GetIntVar(&SizeVarId,&Err);
 		if (Err!=0) return Err;
 		SetIntVal(SizeVarId, st.st_size);
 	}
 
-	if (CheckParameterGiven()) { 
+	if (CheckParameterGiven()) {
 		GetStrVar(&TimeVarId,&Err);
 		if (Err!=0) return Err;
 		tmp = localtime(&st.st_mtime);
@@ -1946,7 +1971,7 @@ WORD TTLFileStat()
 		SetStrVal(TimeVarId, TimeStr);
 	}
 
-	if (CheckParameterGiven()) { 
+	if (CheckParameterGiven()) {
 		GetStrVar(&DrvVarId,&Err);
 		if (Err!=0) return Err;
 		_snprintf_s(DrvStr, sizeof(DrvStr), _TRUNCATE, "%c", st.st_dev + 'A');
@@ -2050,7 +2075,7 @@ WORD TTLFileStrSeek2()
 		// ファイルの1バイト目がヒットすると、ファイルポインタが突き破って
 		// INVALID_SET_FILE_POINTER になるので、
 		// ゼロオフセットになるように調整する。(2008.10.10 yutaka)
-		if (pos == INVALID_SET_FILE_POINTER) 
+		if (pos == INVALID_SET_FILE_POINTER)
 			_llseek(FH, 0, 0);
 		SetResult(1);
 	} else {
@@ -2080,7 +2105,7 @@ WORD TTLFileTruncate()
 		goto end;
 	}
 
-	if (CheckParameterGiven()) { 
+	if (CheckParameterGiven()) {
 		GetIntVal(&TruncByte,&Err);
 		if (Err!=0) return Err;
 	} else {
@@ -2089,16 +2114,16 @@ WORD TTLFileTruncate()
 	}
 
 	// ファイルを指定したサイズで切り詰める。
-   ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
-   if (ret != 0) {
+	ret = _tsopen_s( &fh, tc::fromUtf8(FName), _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
+	if (ret != 0) {
 		Err = ErrCantOpen;
 		goto end;
-   }
-   ret = _chsize_s(fh, TruncByte);
-   if (ret != 0) {
+	}
+	ret = _chsize_s(fh, TruncByte);
+	if (ret != 0) {
 		Err = ErrInvalidCtl;
 		goto end;
-   }
+	}
 
 	result = 0;
 	Err = 0;
@@ -2180,7 +2205,7 @@ WORD TTLFindFirst()
 	WORD Err;
 	TStrVal Dir;
 	int i;
-	struct _finddata_t data;
+	struct _tfinddata64_t data;
 
 	Err = 0;
 	GetIntVar(&DH,&Err);
@@ -2198,9 +2223,9 @@ WORD TTLFindFirst()
 		i++;
 	if (i<NumDirHandle)
 	{
-		DirHandle[i] = _findfirst(Dir,&data);
+		DirHandle[i] = _tfindfirst64(tc::fromUtf8(Dir),&data);
 		if (DirHandle[i]!=-1L)
-			SetStrVal(Name,data.name);
+			SetStrVal(Name, (char *)(const char *)(u8)data.name);
 		else
 			i = -1;
 	}
@@ -2223,7 +2248,7 @@ WORD TTLFindNext()
 	TVarId Name;
 	WORD Err;
 	int DH;
-	struct _finddata_t data;
+	struct _tfinddata64_t data;
 
 	Err = 0;
 	GetIntVal(&DH,&Err);
@@ -2234,9 +2259,9 @@ WORD TTLFindNext()
 
 	if ((DH>=0) && (DH<NumDirHandle) &&
 	    (DirHandle[DH]!=-1L) &&
-	    (_findnext(DirHandle[DH],&data)==0))
+	    (_tfindnext64(DirHandle[DH],&data)==0))
 	{
-		SetStrVal(Name,data.name);
+		SetStrVal(Name,(char *)(const char *)(u8)data.name);
 		SetResult(1);
 	}
 	else {
@@ -2274,7 +2299,7 @@ WORD TTLFolderCreate()
 		return Err;
 	}
 
-	if (CreateDirectory((tc)FName, NULL) == 0) {
+	if (CreateDirectory(tc::fromUtf8(FName), NULL) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2303,7 +2328,7 @@ WORD TTLFolderDelete()
 		return Err;
 	}
 
-	if (RemoveDirectory((tc)FName) == 0) {
+	if (RemoveDirectory(tc::fromUtf8(FName)) == 0) {
 		SetResult(2);
 	}
 	else {
@@ -2325,7 +2350,7 @@ WORD TTLFolderSearch()
 	if (Err!=0) return Err;
 
 	GetAbsPath(FName,sizeof(FName));
-	if (DoesFolderExist(FName)) {
+	if (_taccess(tc::fromUtf8(FName), 0) == 0) {
 		SetResult(1);
 	}
 	else {
@@ -2423,7 +2448,8 @@ WORD TTLGetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	SetResult(GetFileAttributes((tc)Filename));
+	GetAbsPath(Filename, sizeof(Filename));		// @@ TODO
+	SetResult(GetFileAttributes(tc::fromUtf8(Filename)));
 
 	return Err;
 }
@@ -2485,7 +2511,7 @@ WORD TTLGetIPv4Addr()
 	if (WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, info, sizeof(info), &socknum, NULL, NULL) != SOCKET_ERROR) {
 		n = socknum / sizeof(info[0]);
 		for (i = 0 ; i < n ; i++) {
-			if ((info[i].iiFlags & IFF_UP) == 0) 
+			if ((info[i].iiFlags & IFF_UP) == 0)
 				continue;
 			if ((info[i].iiFlags & IFF_LOOPBACK) != 0)
 				continue;
@@ -2662,7 +2688,7 @@ WORD TTLSetPassword()
 	if (Err!=0) return Err;
 
 	// 文字列が空の場合はエラーとする。
-	if (FileNameStr[0]==0 || 
+	if (FileNameStr[0]==0 ||
 	    KeyStr[0]==0 ||
 	    VarStr[0]==0)   // "getpassword"同様、空パスワードも許可しない。
 		Err = ErrSyntax;
@@ -2673,7 +2699,7 @@ WORD TTLSetPassword()
 	// パスワードを暗号化する。
 	Encrypt(VarStr, Temp);
 
-	if (WritePrivateProfileString(_T("Password"), (tc)KeyStr, (tc)Temp, (tc)FileNameStr) != 0) 
+	if (WritePrivateProfileString(_T("Password"), (tc)KeyStr, (tc)Temp, tc::fromUtf8(FileNameStr)) != 0)
 		result = 1;  /* success */
 
 	SetResult(result);  // 成功可否を設定する。
@@ -2686,7 +2712,7 @@ WORD TTLIsPassword()
 	TStrVal FileNameStr, KeyStr;
 	TCHAR Temp[512];
 	WORD Err;
-	int result = 0; 
+	int result = 0;
 
 	Err = 0;
 	GetStrVal(FileNameStr, &Err);   // ファイル名
@@ -2696,7 +2722,7 @@ WORD TTLIsPassword()
 	if (Err!=0) return Err;
 
 	// 文字列が空の場合はエラーとする。
-	if (FileNameStr[0]==0 || 
+	if (FileNameStr[0]==0 ||
 	    KeyStr[0]==0)
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
@@ -2705,11 +2731,11 @@ WORD TTLIsPassword()
 
 	Temp[0] = 0;
 	GetPrivateProfileString(_T("Password"), (tc)KeyStr, _T(""),
-	                        Temp, _countof(Temp), (tc)FileNameStr);
+	                        Temp, _countof(Temp), tc::fromUtf8(FileNameStr));
 	if (Temp[0] == 0) { // password not exist
-		result = 0; 
+		result = 0;
 	} else {
-		result = 1; 
+		result = 1;
 	}
 
 	SetResult(result);  // 成功可否を設定する。
@@ -2750,7 +2776,7 @@ WORD TTLGetTime(WORD mode)
 	char *format;
 	BOOL set_result;
 	const char *tz = NULL;
-	char tz_copy[128]; 
+	char tz_copy[128];
 
 	// Save timezone
 	tz = getenv("TZ");
@@ -3135,7 +3161,7 @@ WORD TTLInt2Str()
 // logrotate rotate num
 // logrotate halt
 //
-WORD TTLLogRotate() 
+WORD TTLLogRotate()
 {
 	WORD Err;
 	char Str[MaxStrLen];
@@ -3191,7 +3217,7 @@ WORD TTLLogRotate()
 	} else if (strcmp(Str, "halt") == 0) {
 		Err = 0;
 		_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s", Str);
-	} 
+	}
 	if (Err!=0) return Err;
 
 	SetFile(buf);
@@ -3200,7 +3226,7 @@ WORD TTLLogRotate()
 	return Err;
 }
 
-WORD TTLLogInfo() 
+WORD TTLLogInfo()
 {
 	WORD Err;
 	TVarId VarId;
@@ -3545,7 +3571,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 			return -1;
 		}
 
-		// return 
+		// return
 		//   0以上: 選択項目
 		//   -1: キャンセル
 		//	 -2: close
@@ -3640,7 +3666,7 @@ WORD TTLMilliPause()
 
 // add 'random' command
 // SYNOPSIS: random <intvar> <value>
-// DESCRIPTION: 
+// DESCRIPTION:
 // This command generates the random value from 0 to <value> and
 // stores the value to <intvar>.
 // (2006.2.11 yutaka)
@@ -4160,7 +4186,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 					}
 					strncat_s(buff, bufflen, tmp, _TRUNCATE);
 					break;
-				case TypString: 
+				case TypString:
 					AddBroadcastString(buff, bufflen, StrVarPtr((TVarId)Val));
 					break;
 				default:
@@ -4388,6 +4414,7 @@ WORD TTLSetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
+	GetAbsPath(Filename, sizeof(Filename));		// @@ TODO
 	if (SetFileAttributes(tc::fromUtf8(Filename), attributes) == 0) {
 		SetResult(0);
 	}
@@ -4936,7 +4963,7 @@ WORD TTLStrMatch()
 
 	ret = FindRegexStringOne(Str2, strlen(Str2), Str1, strlen(Str1));
 	if (ret > 0) { // matched
-		result = ret; 
+		result = ret;
 	} else {
 		result = 0;
 	}
@@ -5048,7 +5075,7 @@ static void remove_string(char *str, int index, int len)
 			 <-->len
 	   XXXXXX****YYY
 	        ^index(np)
-			     ^np+len 
+			     ^np+len
 				 <-->srclen - len - index
 		    ↓
 	   XXXXXXYYY
@@ -5220,16 +5247,16 @@ WORD TTLStrTrim()
 
 	// 文字列の先頭から検索する
 	for (i = 0 ; i < srclen ; i++) {
-		if (table[srcptr[i]] == 0) 
+		if (table[srcptr[i]] == 0)
 			break;
 	}
 	// 削除されない有効な文字列の始まり。
 	// すべて削除対象となる場合は、start == srclen 。
-	start = i;  
+	start = i;
 
 	// 文字列の末尾から検索する
 	for (i = srclen - 1 ; i >= 0 ; i--) {
-		if (table[srcptr[i]] == 0) 
+		if (table[srcptr[i]] == 0)
 			break;
 	}
 	// 削除されない有効な文字列の終わり。
@@ -5303,7 +5330,7 @@ WORD TTLStrSplit()
 		tok[i] = strtok_s(NULL, delimchars, &last);
 		if (tok[i] == NULL)
 			break;
-	} 
+	}
 #else
 	/* strtokを使うと、連続した区切りが1つに丸められるため、自前でポインタを
 	 * たどる。ただし、区切り文字は1つのみとする。
@@ -5314,7 +5341,7 @@ WORD TTLStrSplit()
 		if (i >= maxvar)
 			goto end;
 	}
-	
+
 	for (p = strtok_s(p, delimchars, &last); p != NULL ; p = strtok_s(NULL, delimchars, &last) ) {
 		tok[i++] = p;
 		if (i >= maxvar)
@@ -5617,7 +5644,7 @@ WORD TTLWait4all(BOOL Ln)
 
 // 'waitregex'(wait regular expression): wait command with regular expression
 //
-// This command has almost same function of 'wait' command. Additionally 'waitregex' can search 
+// This command has almost same function of 'wait' command. Additionally 'waitregex' can search
 // the keyword with regular expression. Tera Term uses a regex library that is called 'Oniguruma'.
 // cf. http://www.geocities.jp/kosako3/oniguruma/
 //
@@ -5881,7 +5908,7 @@ WORD TTLYmodemSend()
 	return SendCmnd(CmdYmodemSend,IdTTLWaitCmndResult);
 }
 
-// SYNOPSIS: 
+// SYNOPSIS:
 //   scpsend "c:\usr\sample.chm" "doc/sample.chm"
 //   scpsend "c:\usr\sample.chm"
 WORD TTLScpSend()
@@ -5913,7 +5940,7 @@ WORD TTLScpSend()
 	return SendCmnd(CmdScpSend, 0);
 }
 
-// SYNOPSIS: 
+// SYNOPSIS:
 //   scprecv "foo.txt"
 //   scprecv "src/foo.txt" "c:\foo.txt"
 WORD TTLScpRecv()
@@ -6040,7 +6067,7 @@ int ExecCmnd()
 		return Err;
 	}
 
-	if (Result) 
+	if (Result)
 		switch (WId) {
 		case RsvBasename:
 			Err = TTLBasename(); break;
@@ -6499,7 +6526,7 @@ int ExecCmnd()
 						else
 							E = NewStrVar(Cmnd,StrVarPtr((TVarId)Val));
 						break;
-					default: 
+					default:
 						E = FALSE;
 					}
 					if (! E) Err = ErrTooManyVar;

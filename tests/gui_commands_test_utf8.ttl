@@ -2,15 +2,15 @@
 ;;; test gui commands
 ;;;
 ;
-;call test_messagebox
-;call test_errordialogbox
-;call test_yesnobox
-;call test_inputbox
-;call test_passwordbox
-;call test_statusbox
-;call test_macrodialogbox
-;call test_listbox
-;call test_filenamebox
+call test_messagebox
+call test_errordialogbox
+call test_yesnobox
+call test_inputbox
+call test_passwordbox
+call test_statusbox
+call test_macrodialogbox
+call test_listbox
+call test_filenamebox
 call test_dirnamebox
 messagebox "finish all tests" "test"
 end
