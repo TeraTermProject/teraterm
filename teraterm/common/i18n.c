@@ -52,27 +52,33 @@ DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int b
 	RestoreNewLine(buf);
 }
 
+// TODO: バッファ不足時の動作
 DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
 {
+	int r;
 #if defined(UNICODE)
 	wchar_t tmp[MAX_UIMSG];
 	wchar_t defW[MAX_UIMSG];
-	MultiByteToWideChar(CP_UTF8, 0, def, -1, defW, _countof(defW));
+	r = MultiByteToWideChar(CP_UTF8, 0, def, -1, defW, _countof(defW));
+	assert(r != 0);
 	GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
-	WideCharToMultiByte(CP_UTF8, 0,
-						tmp, _countof(tmp),
-						buf, buf_len,
-						NULL, NULL);
+	r = WideCharToMultiByte(CP_UTF8, 0,
+							tmp, -1,
+							buf, buf_len,
+							NULL, NULL);
+	assert(r != 0);
 #else
 	// ANSI -> Wide -> utf8
 	char strA[MAX_UIMSG];
 	wchar_t strW[MAX_UIMSG];
 	GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
-	MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
-	WideCharToMultiByte(CP_UTF8, 0,
-						strW, -1,
-						buf, buf_len,
-						NULL, NULL);
+	r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
+	assert(r != 0);
+	r = WideCharToMultiByte(CP_UTF8, 0,
+							strW, -1,
+							buf, buf_len,
+							NULL, NULL);
+	assert(r != 0);
 #endif
 }
 
@@ -112,13 +118,15 @@ void SetI18DlgStrs(const char *section, HWND hDlgWnd,
 		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
 		if (uimsg[0] != _T('\0')) {
 			const int nIDDlgItem = infos[i].nIDDlgItem;
+			BOOL r;
 			if (nIDDlgItem == 0) {
-				SetWindowText(hDlgWnd, uimsg);
+				r = SetWindowText(hDlgWnd, uimsg);
+				assert(r != 0);
 			} else {
-				BOOL r;
 				r = SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
-				assert(r != 0); (void)r;
+				assert(r != 0);
 			}
+			(void)r;
 		}
 	}
 }
