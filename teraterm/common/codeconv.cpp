@@ -384,6 +384,7 @@ tc tc::fromUtf8(const char *strU8)
 {
 	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
 	tc _tc = strW;
+	free((void *)strW);
 	return _tc;
 }
 

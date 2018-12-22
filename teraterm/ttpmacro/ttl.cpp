@@ -2091,8 +2091,8 @@ WORD TTLFileTruncate()
 	TStrVal FName;
 	int result = -1;
 	int TruncByte;
-	int fh = -1;
 	int ret;
+	FILE *fp;
 
 	Err = 0;
 	GetStrVal(FName,&Err);
@@ -2114,26 +2114,22 @@ WORD TTLFileTruncate()
 	}
 
 	// ファイルを指定したサイズで切り詰める。
-	ret = _tsopen_s( &fh, tc::fromUtf8(FName), _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
-	if (ret != 0) {
+	fp = _tfopen(tc::fromUtf8(FName), _T("rb+"));
+	if (fp == NULL) {
 		Err = ErrCantOpen;
 		goto end;
 	}
-	ret = _chsize_s(fh, TruncByte);
+	ret = _chsize_s(_fileno(fp), TruncByte);
 	if (ret != 0) {
 		Err = ErrInvalidCtl;
 		goto end;
 	}
+	fclose(fp);
 
 	result = 0;
 	Err = 0;
-
 end:
 	SetResult(result);
-
-	if (fh != -1)
-		_close(fh);
-
 	return Err;
 }
 

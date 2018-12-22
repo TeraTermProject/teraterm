@@ -8,7 +8,7 @@
 ;call test_filestat
 ;call test_find
 ;call test_folder
-call test_password
+;call test_password
 messagebox "finish all tests" "test_file.ttl"
 end
 
@@ -73,6 +73,9 @@ filecopy fname_1 fname_3
 if result <> 0 messagebox "filecopy error" "test_file.ttl"
 filetruncate fname_1 1024
 if result <> 0 messagebox "filetruncate error" "test_file.ttl"
+filestat fname_1 size
+if result = -1 messagebox "filestat error" "test_file.ttl"
+if size <> 1024 messagebox "file size?" "test_file.ttl"
 messagebox "checkfiles 3" "test_file.ttl"
 filedelete fname_1
 if result <> 0 messagebox "filedelete error" "test_file.ttl"
@@ -81,6 +84,7 @@ if result <> 0 messagebox "filedelete error" "test_file.ttl"
 filedelete fname_3
 if result <> 0 messagebox "filedelete error" "test_file.ttl"
 messagebox "checkfiles 4" "test_file.ttl"
+return
 
 ;;;
 ;;; filesearch
