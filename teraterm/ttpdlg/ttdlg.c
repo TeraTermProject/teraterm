@@ -36,7 +36,9 @@
 #include <io.h>
 #include <direct.h>
 #include <commdlg.h>
-#include <Dlgs.h>
+#include <dlgs.h>
+#include <tchar.h>
+#include <crtdbg.h>
 #include "tttypes.h"
 #include "ttlib.h"
 #include "dlglib.h"
@@ -50,12 +52,16 @@
 #undef ONIG_EXTERN
 
 #include <winsock2.h>
-static char * ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
-
 #undef EFFECT_ENABLED	// エフェクトの有効可否
 #undef TEXTURE_ENABLED	// テクスチャの有効可否
 
 #include "compat_w95.h"
+
+#ifdef _DEBUG
+#define calloc(c, s)  _calloc_dbg((c), (s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
+#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 static HANDLE hInst;
 
@@ -72,6 +78,7 @@ static HFONT DlgWinlistFont;
 
 char UILanguageFile[MAX_PATH];
 
+static const char *ProtocolFamilyList[] = { "UNSPEC", "IPv6", "IPv4", NULL };
 static PCHAR NLListRcv[] = {"CR","CR+LF", "LF", "AUTO", NULL};
 static PCHAR NLList[] = {"CR","CR+LF", "LF", NULL};
 static PCHAR TermList[] =
@@ -2931,20 +2938,11 @@ static char **LangUIList = NULL;
 #define LANG_PATH "lang"
 #define LANG_EXT ".lng"
 
-static int make_sel_lang_ui(char *HomeDir)
+// メモリフリー
+static void free_lang_ui_list()
 {
-	int    i;
-	int    file_num;
-	char   fullpath[1024];
-	HANDLE hFind;
-	WIN32_FIND_DATA fd;
-	char **p;
-
-	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, LANG_PATH, LANG_EXT);
-
-	// メモリフリー
 	if (LangUIList) {
-		p = LangUIList;
+		char **p = LangUIList;
 		while (*p) {
 			free(*p);
 			p++;
@@ -2952,6 +2950,19 @@ static int make_sel_lang_ui(char *HomeDir)
 		free(LangUIList);
 		LangUIList = NULL;
 	}
+}
+
+static int make_sel_lang_ui(char *HomeDir)
+{
+	int    i;
+	int    file_num;
+	char   fullpath[1024];
+	HANDLE hFind;
+	WIN32_FIND_DATA fd;
+
+	free_lang_ui_list();
+
+	_snprintf_s(fullpath, sizeof(fullpath), _TRUNCATE, "%s\\%s\\*%s", HomeDir, LANG_PATH, LANG_EXT);
 
 	file_num = 0;
 	hFind = FindFirstFile(fullpath,&fd);
@@ -3160,6 +3171,11 @@ BOOL CALLBACK GenDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				case IDC_GENHELP:
 					PostMessage(GetParent(Dialog),WM_USER_DLGHELP2,0,0);
 			}
+			break;
+
+		case WM_DESTROY:
+			free_lang_ui_list();
+			break;
 	}
 	return FALSE;
 }
