@@ -37,7 +37,7 @@ HANDLE win16_lopen(const char *FileName, int iReadWrite)
 		// write
 		handle = CreateFileA(FileName,
 							 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-							 CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		break;
 	case OF_READWRITE:
 		// read/write (teratermではttpmacro/ttl.c内の1箇所のみで使用されている

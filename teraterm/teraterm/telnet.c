@@ -41,6 +41,7 @@
 
 #include "telnet.h"
 #include "tt_res.h"
+#include "win16api.h"
 
 int TelStatus;
 
@@ -62,7 +63,7 @@ typedef struct {
 	BOOL SubOptIAC;
 	BOOL ChangeWinSize;
 	POINT WinSize;
-	int LogFile;
+	HANDLE LogFile;
 } TelRec;
 typedef TelRec *PTelRec;
 
