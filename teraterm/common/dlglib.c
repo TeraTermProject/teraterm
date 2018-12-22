@@ -128,17 +128,17 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	// 20MB以上のファイルをアップロードしようとすると、buffer overflowで
 	// 落ちる問題への対処。(2005.3.18 yutaka)
 	// cf. http://sourceforge.jp/tracker/index.php?func=detail&aid=5713&group_id=1412&atid=5333
-	double Num; 
-	TCHAR NumStr[10]; 
+	double Num;
+	TCHAR NumStr[10];
 
 	if (b==0) {
-		Num = 100.0; 
+		Num = 100.0;
 	}
 	else {
-		Num = 100.0 * (double)a / (double)b; 
+		Num = 100.0 * (double)a / (double)b;
 	}
-	_sntprintf_s(NumStr, _countof(NumStr),_TRUNCATE,_T("%3.1f%%"),Num); 
-	SetDlgItemText(HDlg, id_Item, NumStr); 
+	_sntprintf_s(NumStr, _countof(NumStr),_TRUNCATE,_T("%3.1f%%"),Num);
+	SetDlgItemText(HDlg, id_Item, NumStr);
 
 	if (id_Progress != 0 && p != NULL && *p >= 0 && (double)*p < Num) {
 		*p = (int)Num;
@@ -167,7 +167,7 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 
 	rate = bytes / elapsed;
 	if (rate < 1200) {
-		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%dBytes/s)"), elapsed / 60, elapsed % 60, rate); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%dBytes/s)"), elapsed / 60, elapsed % 60, rate);
 	}
 	else if (rate < 1200000) {
 		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dKB/s)"), elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
@@ -373,44 +373,4 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 	data->ComboBox = ComboBox;
 	SetWindowLongPtr(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
-}
-
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
-{
-	int i;
-	assert(hDlgWnd != NULL);
-	assert(infoCount > 0);
-	for (i = 0 ; i < infoCount; i++) {
-		const char *key = infos[i].key;
-		TCHAR uimsg[MAX_UIMSG];
-		get_lang_msgT(key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
-		if (uimsg[0] != _T('\0')) {
-			const int nIDDlgItem = infos[i].nIDDlgItem;
-			if (nIDDlgItem == 0) {
-				SetWindowText(hDlgWnd, uimsg);
-			} else {
-				BOOL r;
-				r = SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
-				assert(r != 0); (void)r;
-			}
-		}
-	}
-}
-
-void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
-{
-	int i;
-	for (i = 0; i < infoCount; i++) {
-		const int nIDDlgItem = infos[i].nIDDlgItem;
-		const char *key = infos[i].key;
-		TCHAR uimsg[MAX_UIMSG];
-		get_lang_msgT(key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
-		if (uimsg[0] != '\0') {
-			if (nIDDlgItem < 1000) {
-				ModifyMenu(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
-			} else {
-				ModifyMenu(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
-			}
-		}
-	}
 }

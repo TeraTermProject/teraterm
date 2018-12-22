@@ -1773,7 +1773,7 @@ static BOOL CALLBACK hosts_add_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
-		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_UNKNOWNHOST_TITLE", pvar, uimsg);
@@ -1963,7 +1963,7 @@ static BOOL CALLBACK hosts_replace_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
-		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTKEY_TITLE", pvar, uimsg);
@@ -2151,7 +2151,7 @@ static BOOL CALLBACK hosts_add2_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
 		// 追加・置き換えとも init_hosts_dlg を呼んでいるので、その前にセットする必要がある
-		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_DIFFERENTTYPEKEY_TITLE", pvar, uimsg);

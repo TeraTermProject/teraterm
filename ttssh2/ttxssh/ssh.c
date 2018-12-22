@@ -7498,7 +7498,7 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 			DlgChgPassFont = NULL;
 		}
 #endif
-		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		UTIL_get_lang_msg("DLG_PASSCHG_TITLE", pvar, uimsg)

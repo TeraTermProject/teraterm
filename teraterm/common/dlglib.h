@@ -30,6 +30,7 @@
 #pragma once
 
 #include <windows.h>
+#include "i18n.h"
 
  /* Routines for dialog boxes */
 #ifdef __cplusplus
@@ -49,12 +50,6 @@ void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
-typedef struct {
-	int nIDDlgItem;
-	const char *key;
-} DlgTextInfo;
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
-void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 
 #if defined(_UNICODE)
 #define SetDropDownListT(p1, p2, p3, p4)	SetDropDownListW(p1, p2, p3, p4)

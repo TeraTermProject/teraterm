@@ -101,8 +101,6 @@ static char b64dec_table[] = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
-static const char *lang_section = "Tera Term";
-
 void b64encode(PCHAR d, int dsize, PCHAR s, int len)
 {
 	unsigned int b = 0;
@@ -1014,31 +1012,26 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	strncpy_s(buf, buflen, Temp, _TRUNCATE);
 }
 
-void set_lang_section(const char *section)
-{
-	lang_section = section;
-}
-
 #if defined(UNICODE)
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
 {
-	GetI18nStrW(lang_section, key, buf, buf_len, def, iniFile);
+	GetI18nStrW("Tera Term", key, buf, buf_len, def, iniFile);
 }
 #endif
 
 void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
-	GetI18nStr(lang_section, key, buf, buf_len, def, iniFile);
+	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
 }
 
 void get_lang_msgU8(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
-	GetI18nStrU8(lang_section, key, buf, buf_len, def, iniFile);
+	GetI18nStrU8("Tera Term", key, buf, buf_len, def, iniFile);
 }
 
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile)
 {
-	if (GetI18nLogfont(lang_section, key, logfont,
+	if (GetI18nLogfont("Tera Term", key, logfont,
 	                   GetDeviceCaps(GetDC(dlg),LOGPIXELSY),
 	                   iniFile) == FALSE) {
 		return FALSE;
@@ -1885,4 +1878,14 @@ BOOL GetPositionOnWindow(
 	}
 
 	return TRUE;
+}
+
+void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+{
+	SetI18DlgStrs("Tera Term", hDlgWnd, infos, infoCount, UILanguageFile);
+}
+
+void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+{
+	SetI18MenuStrs("Tera Term", hMenu, infos, infoCount, UILanguageFile);
 }

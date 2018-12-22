@@ -830,7 +830,7 @@ private:
             }
 
             HWND hWnd = (HWND)this;
-            SetDlgTexts(hWnd, text_info, _countof(text_info), UILanguageFile);
+			SetI18DlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 #if 0
             GetWindowText(uitmp, sizeof(uitmp));
             UTIL_get_lang_msg("DLG_OTHER_TITLE", uimsg, sizeof(uimsg), uitmp);
@@ -1037,7 +1037,7 @@ private:
 //              { IDCANCEL, "BTN_CANCEL" },
             };
             HWND hWnd = (HWND)this;
-            SetDlgTexts(hWnd, text_info, _countof(text_info), UILanguageFile);
+			SetI18DlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 #if 0
             GetWindowText(uitmp, sizeof(uitmp));
             UTIL_get_lang_msgT("DLG_SETUP_TITLE", uimsg, sizeof(uimsg), uitmp);

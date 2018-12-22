@@ -233,7 +233,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	TCHAR uimsg[MAX_UIMSG];
 	int default_method = pvar->session_settings.DefaultAuthMethod;
 
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 	GetWindowText(dlg, uimsg, _countof(uimsg));
 	UTIL_get_lang_msgT("DLG_AUTH_TITLE", pvar, uimsg);
@@ -1164,7 +1164,7 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_DISCONNECT" },
 	};
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_TIS_TITLE", pvar, uimsg);
@@ -1331,7 +1331,7 @@ static void init_default_auth_dlg(PTInstVar pvar, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_AUTHSETUP_TITLE", pvar, uimsg);

@@ -527,7 +527,7 @@ static void init_fwd_dlg(PTInstVar pvar, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_FWD_TITLE", pvar, uimsg);
@@ -846,7 +846,7 @@ static void init_fwd_edit_dlg(PTInstVar pvar, FWDRequestSpec *spec, HWND dlg)
 		{ IDOK, "BTN_OK" },
 		{ IDCANCEL, "BTN_CANCEL" },
 	};
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 #if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));

@@ -31,6 +31,8 @@
 
 #pragma once
 
+#include "i18n.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,7 +85,6 @@ void WINAPI GetDefaultFName(const char *home, const char *file, char *dest, int 
 void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
-DllExport void set_lang_section(const char *section);
 DllExport void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 DllExport void get_lang_msgU8(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 #if defined(UNICODE)
@@ -127,11 +128,14 @@ BOOL GetPositionOnWindow(
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
+void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+
 #if defined(_UNICODE)
-#define doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)
+#define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
 #else
-#define doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolder(p1, p2, p3, p4, p5)
+#define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolder(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
 #endif
 

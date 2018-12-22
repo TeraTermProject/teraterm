@@ -316,18 +316,18 @@ BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf)
 
 void UTIL_get_lang_msgA(const char *key, char *buf, size_t buf_len, const char *def, const char *iniFile)
 {
-	get_lang_msg(key, buf, buf_len, def, iniFile);
+	GetI18nStr("TTSSH", key, buf, buf_len, def, iniFile);
 }
 
 void UTIL_get_lang_msgU8(const char *key, char *buf, size_t buf_len, const char *def, const char *iniFile)
 {
-	get_lang_msgU8(key, buf, buf_len, def, iniFile);
+	GetI18nStrU8("TTSSH", key, buf, buf_len, def, iniFile);
 }
 
 #if defined(_UNICODE)
 void UTIL_get_lang_msgW(const char *key, wchar_t *buf, size_t buf_len, const wchar_t *def, const char *iniFile)
 {
-	get_lang_msgW(key, buf, buf_len, def, iniFile);
+	GetI18nStrW("TTSSH", key, buf, buf_len, def, iniFile);
 }
 #endif
 

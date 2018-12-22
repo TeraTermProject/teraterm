@@ -515,7 +515,8 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 			DlgFont = NULL;
 		}
 #endif
-		SetDlgTexts(dlg, TextInfos, _countof(TextInfos), pvar->ts->UILanguageFile);
+		SetI18DlgStrs("TTXRecurringCommand",
+					  dlg, TextInfos, _countof(TextInfos), pvar->ts->UILanguageFile);
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
 		GetI18nStr(SECTION, "DLG_TITLE", pvar->ts->UIMsg, sizeof(pvar->ts->UIMsg), uimsg, pvar->ts->UILanguageFile);

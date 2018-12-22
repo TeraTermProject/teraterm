@@ -27,6 +27,10 @@
  */
 
 #include "i18n.h"
+#include "ttlib.h"
+
+#include <assert.h>
+#include <tchar.h>
 
 #if defined(UNICODE)
 DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
@@ -93,4 +97,48 @@ DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA log
 	logfont->lfWidth = 0;
 
 	return TRUE;
+}
+
+DllExport
+void SetI18DlgStrs(const char *section, HWND hDlgWnd,
+				   const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+{
+	size_t i;
+	assert(hDlgWnd != NULL);
+	assert(infoCount > 0);
+	for (i = 0 ; i < infoCount; i++) {
+		const char *key = infos[i].key;
+		TCHAR uimsg[MAX_UIMSG];
+		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		if (uimsg[0] != _T('\0')) {
+			const int nIDDlgItem = infos[i].nIDDlgItem;
+			if (nIDDlgItem == 0) {
+				SetWindowText(hDlgWnd, uimsg);
+			} else {
+				BOOL r;
+				r = SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+				assert(r != 0); (void)r;
+			}
+		}
+	}
+}
+
+DllExport
+void SetI18MenuStrs(const char *section, HMENU hMenu,
+					const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+{
+	size_t i;
+	for (i = 0; i < infoCount; i++) {
+		const int nIDDlgItem = infos[i].nIDDlgItem;
+		const char *key = infos[i].key;
+		TCHAR uimsg[MAX_UIMSG];
+		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		if (uimsg[0] != '\0') {
+			if (nIDDlgItem < 1000) {
+				ModifyMenu(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
+			} else {
+				ModifyMenu(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+			}
+		}
+	}
 }

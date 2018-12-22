@@ -17,7 +17,8 @@
 #include	"winmisc.h"
 #include	"resource.h"
 
-#include "compat_w95.h"
+#include	"compat_w95.h"
+#include	"ttlib.h"
 
 // UTF-8 TeraTermでは、デフォルトインストール先を下記に変更した。(2004.12.2 yutaka)
 // さらに、デフォルトインストール先はカレントディレクトリに変更。(2004.12.14 yutaka)

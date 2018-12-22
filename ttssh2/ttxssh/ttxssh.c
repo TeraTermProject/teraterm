@@ -1355,7 +1355,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 		GetHNRec = (PGetHNRec) lParam;
 		SetWindowLongPtr(dlg, DWLP_USER, lParam);
 
-		SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+		SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 #if 0
 		GetWindowText(dlg, uimsg, sizeof(uimsg));
@@ -2487,7 +2487,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 		{ IDC_FP_HASH_ALG, "DLG_ABOUT_FP_HASH_ALGORITHM" },
 		{ IDOK, "BTN_OK" },
 	};
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
 	UTIL_get_lang_msg("DLG_ABOUT_TITLE", pvar, uimsg);
@@ -2834,7 +2834,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 		{ IDC_HOSTKEY_ROTATION_STATIC, "DLG_SSHSETUP_HOSTKEY_ROTATION" },
 	};
-	SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+	SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 
 #if 0
 	GetWindowText(dlg, uimsg, sizeof(uimsg));
@@ -4521,7 +4521,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 				{ IDC_BCRYPT_KDF_CHECK, "DLG_KEYGEN_BCRYPT_KDF" },
 				{ IDC_BCRYPT_KDF_ROUNDS_LABEL, "DLG_KEYGEN_BCRYPT_ROUNDS" },
 			};
-			SetDlgTexts(dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
+			SetI18DlgStrs("TTSSH", dlg, text_info, _countof(text_info), pvar->ts->UILanguageFile);
 #if 0
 			GetWindowText(dlg, uimsg, sizeof(uimsg));
 			UTIL_get_lang_msg("DLG_KEYGEN_TITLE", pvar, uimsg);
@@ -5730,7 +5730,6 @@ BOOL WINAPI DllMain(HANDLE hInstance,
 #endif
 		DoCover_IsDebuggerPresent();
 		DisableThreadLibraryCalls(hInstance);
-		set_lang_section("TTSSH");
 		hInst = hInstance;
 		pvar = &InstVar;
 		__mem_mapping =

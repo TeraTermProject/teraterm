@@ -19,12 +19,14 @@ source_group(
 set(SRC
   resource.h
   registry.cpp
-  ttpmenu.cpp
   winmisc.cpp
+  ttpmenu.h
+  ttpmenu.cpp
+  #
+  ttpmenu.rc
   left.ico
   right.ico
   teraterm.ico
-  ttpmenu.rc
   )
 
 
