@@ -345,13 +345,10 @@ tc::tc(const wchar_t *strW)
 	assign(strW);
 }
 
-#if 0
-tc::tc(const wchar_t *strW, int code_page)
+tc::tc(const tc &obj)
 {
-	tstr_ = NULL;
-	assign(strW, code_page);
+	copy(obj);
 }
-#endif
 
 #if defined(MOVE_CONSTRUCTOR_ENABLE)
 tc::tc(tc &&obj) noexcept
@@ -379,6 +376,20 @@ tc& tc::operator=(const wchar_t *strW)
 	assign(strW);
 	return *this;
 }
+
+tc &tc::operator=(const tc &obj)
+{
+	copy(obj);
+	return *this;
+}
+
+#if defined(MOVE_CONSTRUCTOR_ENABLE)
+tc& tc::operator=(tc &&obj) noexcept
+{
+	move(obj);
+	return *this;
+}
+#endif
 
 tc tc::fromUtf8(const char *strU8)
 {
