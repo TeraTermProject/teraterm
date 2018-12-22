@@ -30,6 +30,9 @@ public:
 		return window;
 	}
 
+	HWND GetHWND() const {
+		return window;
+	}
 	long GetWindowLongPtr(int index)const {
 		return ::GetWindowLongPtr(window, index);
 	}

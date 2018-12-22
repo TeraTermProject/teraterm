@@ -2999,7 +2999,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 	for (i = 0; pvar->settings.HostKeyOrder[i] != 0; i++) {
 		int index = pvar->settings.HostKeyOrder[i] - '0';
 		char *name = NULL;
-		char b[64];
+		char b[128];
 
 		if (index == 0)	{
 			UTIL_get_lang_msgU8("DLG_SSHSETUP_HOST_KEY_BORDER", b, _countof(b),
@@ -3012,7 +3012,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 		if (name != NULL) {
 			const TCHAR *strT = ToTcharU8(name);
-			SendMessage(hostkeyControl, LB_ADDSTRING, 0, (LPARAM) name);
+			SendMessage(hostkeyControl, LB_ADDSTRING, 0, (LPARAM)strT);
 			free((void *)strT);
 		}
 	}
@@ -3037,7 +3037,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 		if (name != NULL) {
 			const TCHAR *strT = ToTcharU8(name);
-			SendMessage(macControl, LB_ADDSTRING, 0, (LPARAM) name);
+			SendMessage(macControl, LB_ADDSTRING, 0, (LPARAM)strT);
 			free((void *)strT);
 		}
 	}
@@ -3062,7 +3062,7 @@ static void init_setup_dlg(PTInstVar pvar, HWND dlg)
 
 		if (name != NULL) {
 			const TCHAR *strT = ToTcharU8(name);
-			SendMessageA(compControl, LB_ADDSTRING, 0, (LPARAM) name);
+			SendMessage(compControl, LB_ADDSTRING, 0, (LPARAM)strT);
 			free((void *)strT);
 		}
 	}

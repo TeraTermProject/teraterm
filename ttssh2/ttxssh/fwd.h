@@ -100,9 +100,9 @@ typedef enum {
 typedef struct {
   FWDType type;
   int from_port;
-  char from_port_name[32];
+  char from_port_name[64];
   int to_port;
-  char to_port_name[32];
+  char to_port_name[64];
   char to_host[256];
   char bind_address[256];
   int x11_screen;

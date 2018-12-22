@@ -830,6 +830,7 @@ private:
             }
 
             HWND hWnd = (HWND)this;
+			hWnd = GetHWND();
 			SetI18DlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 #if 0
             GetWindowText(uitmp, sizeof(uitmp));
@@ -1036,7 +1037,8 @@ private:
 //              { IDOK, "BTN_OK" },
 //              { IDCANCEL, "BTN_CANCEL" },
             };
-            HWND hWnd = (HWND)this;
+			HWND hWnd = HWND(this);		// ‚¤‚Ü‚­“®‚©‚È‚¢?
+			hWnd = GetHWND();
 			SetI18DlgStrs("TTProxy", hWnd, text_info, _countof(text_info), UILanguageFile);
 #if 0
             GetWindowText(uitmp, sizeof(uitmp));
