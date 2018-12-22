@@ -241,8 +241,6 @@ BEGIN
     LTEXT           "Version",IDC_TT_VERSION,39,12,127,8
     RTEXT           "Author:",IDC_AUTHOR_LABEL,5,106,28,8
     LTEXT           "https://ttssh2.osdn.jp/",IDC_AUTHOR_URL,36,106,128,8,SS_NOTIFY | WS_TABSTOP
-//    RTEXT           "Forum:",IDC_FORUM_LABEL,8,115,25,8
-//    LTEXT           "http://logmett.com/support-forums",IDC_FORUM_URL,36,115,136,8,SS_NOTIFY | WS_TABSTOP
     LTEXT           "Oniguruma: ",IDC_ONIGURUMA_LABEL,39,35,114,8
     LTEXT           "Built using Microsoft Visual C++",IDC_BUILDTOOL,5,87,205,10
     LTEXT           "Build time: ",IDC_BUILDTIME,5,97,205,8
@@ -256,7 +254,7 @@ BEGIN
     CONTROL         "Default &port:",IDC_GENPORT_LABEL,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,14,10,57,11
     COMBOBOX        IDC_GENPORT,96,9,52,58,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "&Language:",IDC_GENLANGLABEL,14,26,39,11,NOT WS_VISIBLE
-    COMBOBOX        IDC_GENLANG,78,25,70,45,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_GENLANG,78,25,70,93,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Language&UI:",IDC_GENLANGUI_LABEL,14,42,44,8
     COMBOBOX        IDC_GENLANG_UI,58,41,90,72,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,13,61,32,14,WS_GROUP
@@ -446,14 +444,4 @@ END
 #endif    // âpåÍ (ïƒçë) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
 

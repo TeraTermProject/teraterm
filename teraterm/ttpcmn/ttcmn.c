@@ -31,9 +31,6 @@
 #define _WIN32_IE 0x501
 #endif
 
-#undef UNICODE
-#undef _UNICODE
-
 /* TTCMN.DLL, main */
 #include <direct.h>
 #include <string.h>
@@ -70,8 +67,8 @@ static HINSTANCE hInst;
 static PMap pm;
 
 static HANDLE HMap = NULL;
-#define VTCLASSNAME "VTWin32"
-#define TEKCLASSNAME "TEKWin32"
+#define VTCLASSNAME _T("VTWin32")
+#define TEKCLASSNAME _T("TEKWin32")
 
 
 enum window_style {
@@ -115,7 +112,7 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 	// if (FirstInstance) { の部分から移動 (2008.3.13 maya)
 	// 起動時には、共有メモリの HomeDir と SetupFName は空になる
 	/* Get home directory */
-	if (GetModuleFileName(hInst,Temp,sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(hInst,Temp,sizeof(Temp)) == 0) {
 		return TRUE;
 	}
 	ExtractDirName(Temp, ts->HomeDir);
@@ -139,17 +136,17 @@ BOOL WINAPI StartTeraTerm(PTTSet ts)
 // (2012.4.30 yutaka)
 void WINAPI RestartTeraTerm(HWND hwnd, PTTSet ts)
 {
-	char path[1024];
+	TCHAR path[1024];
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
-	char uimsg[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
 	int ret;
 
-	get_lang_msg("MSG_TT_TAKE_EFFECT", uimsg, sizeof(uimsg),
-		"This option takes effect the next time a session is started.\n"
-		"Are you sure that you want to relaunch Tera Term?"
-		, ts->UILanguageFile);
-	ret = MessageBox(hwnd, uimsg, "Tera Term: Configuration Warning", MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
+	get_lang_msgT("MSG_TT_TAKE_EFFECT", uimsg, _countof(uimsg),
+				  _T("This option takes effect the next time a session is started.\n")
+				  _T( "Are you sure that you want to relaunch Tera Term?"),
+				  ts->UILanguageFile);
+	ret = MessageBox(hwnd, uimsg, _T("Tera Term: Configuration Warning"), MB_YESNO | MB_ICONEXCLAMATION | MB_DEFBUTTON2);
 	if (ret != IDYES)
 		return;
 
@@ -943,8 +940,9 @@ char GetWindowTypeChar(HWND Hw, HWND HWin)
 void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VTFlag)
 {
 	int i;
-	char Temp[MAXPATHLEN];
+	TCHAR Temp[MAXPATHLEN];
 	HWND Hw;
+	TCHAR uimsg[MAX_UIMSG];
 
 	// delete all items in Window menu
 	i = GetMenuItemCount(menu);
@@ -957,15 +955,15 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 	i = 0;
 	while (i<pm->NWin) {
 		Hw = pm->WinList[i]; // get window handle
-		if ((GetClassName(Hw,Temp,sizeof(Temp))>0) &&
-		    ((strcmp(Temp,VTCLASSNAME)==0) ||
-		     (strcmp(Temp,TEKCLASSNAME)==0))) {
+		if ((GetClassName(Hw,Temp,_countof(Temp))>0) &&
+		    ((_tcscmp(Temp,VTCLASSNAME)==0) ||
+		     (_tcscmp(Temp,TEKCLASSNAME)==0))) {
 			Temp[0] = '&';
 			Temp[1] = (char)(0x31 + i);
 			Temp[2] = ' ';
 			Temp[3] = GetWindowTypeChar(Hw, NULL);
 			Temp[4] = ' ';
-			GetWindowText(Hw,&Temp[5],sizeof(Temp)-6);
+			GetWindowText(Hw,&Temp[5],_countof(Temp)-6);
 			AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_1+i,Temp);
 			i++;
 			if (i>8) {
@@ -976,53 +974,53 @@ void WINAPI SetWinMenu(HMENU menu, PCHAR buf, int buflen, PCHAR langFile, int VT
 			UnregWin(Hw);
 		}
 	}
-	get_lang_msg("MENU_WINDOW_WINDOW", buf, buflen, "&Window", langFile);
+	get_lang_msgT("MENU_WINDOW_WINDOW", uimsg, _countof(uimsg), _T("&Window"), langFile);
 	if (VTFlag == 1) {
 		AppendMenu(menu, MF_SEPARATOR, 0, NULL);
-		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_WINDOW, buf);
+		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_WINDOW_WINDOW, uimsg);
 
-		get_lang_msg("MENU_WINDOW_MINIMIZEALL", buf, buflen, "&Minimize All", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, buf);
+		get_lang_msgT("MENU_WINDOW_MINIMIZEALL", uimsg, _countof(uimsg), _T("&Minimize All"), langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_MINIMIZEALL, uimsg);
 
-		get_lang_msg("MENU_WINDOW_RESTOREALL", buf, buflen, "&Restore All", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, buf);
+		get_lang_msgT("MENU_WINDOW_RESTOREALL", uimsg, _countof(uimsg), _T("&Restore All"), langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_RESTOREALL, uimsg);
 
-		get_lang_msg("MENU_WINDOW_CASCADE", buf, buflen, "&Cascade", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, buf);
+		get_lang_msgT("MENU_WINDOW_CASCADE", uimsg, _countof(uimsg), _T("&Cascade"), langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_CASCADEALL, uimsg);
 
-		get_lang_msg("MENU_WINDOW_STACKED", buf, buflen, "&Stacked", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, buf);
+		get_lang_msgT("MENU_WINDOW_STACKED", uimsg, _countof(uimsg), _T("&Stacked"), langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_STACKED, uimsg);
 
-		get_lang_msg("MENU_WINDOW_SIDEBYSIDE", buf, buflen, "Side &by Side", langFile);
-		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, buf);
+		get_lang_msgT("MENU_WINDOW_SIDEBYSIDE", uimsg, _countof(uimsg), _T("Side &by Side"), langFile);
+		AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_SIDEBYSIDE, uimsg);
 
 		if (pm->WinUndoFlag) {
 			if (pm->WinUndoStyle == WIN_CASCADE)
-				get_lang_msg("MENU_WINDOW_CASCADE_UNDO", buf, buflen, "&Undo - Cascade", langFile);
+				get_lang_msgT("MENU_WINDOW_CASCADE_UNDO", uimsg, _countof(uimsg), _T("&Undo - Cascade"), langFile);
 			else if (pm->WinUndoStyle == WIN_STACKED)
-				get_lang_msg("MENU_WINDOW_STACKED_UNDO", buf, buflen, "&Undo - Stacked", langFile);
+				get_lang_msgT("MENU_WINDOW_STACKED_UNDO", uimsg, _countof(uimsg), _T("&Undo - Stacked"), langFile);
 			else
-				get_lang_msg("MENU_WINDOW_SIDEBYSIDE_UNDO", buf, buflen, "&Undo - Side by Side", langFile);
-			AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, buf);
+				get_lang_msgT("MENU_WINDOW_SIDEBYSIDE_UNDO", uimsg, _countof(uimsg), _T("&Undo - Side by Side"), langFile);
+			AppendMenu(menu, MF_ENABLED | MF_STRING, ID_WINDOW_UNDO, uimsg);
 		}
 
 	}
 	else {
-		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, buf);
+		AppendMenu(menu,MF_ENABLED | MF_STRING,ID_TEKWINDOW_WINDOW, uimsg);
 	}
 }
 
 void WINAPI SetWinList(HWND HWin, HWND HDlg, int IList)
 {
 	int i;
-	char Temp[MAXPATHLEN];
+	TCHAR Temp[MAXPATHLEN];
 	HWND Hw;
 
 	for (i=0; i<pm->NWin; i++) {
 		Hw = pm->WinList[i]; // get window handle
 		if ((GetClassName(Hw,Temp,sizeof(Temp))>0) &&
-		    ((strcmp(Temp,VTCLASSNAME)==0) ||
-		     (strcmp(Temp,TEKCLASSNAME)==0))) {
+		    ((_tcscmp(Temp,VTCLASSNAME)==0) ||
+		     (_tcscmp(Temp,TEKCLASSNAME)==0))) {
 			Temp[0] = GetWindowTypeChar(Hw, HWin);
 			Temp[1] = ' ';
 			GetWindowText(Hw,&Temp[2],sizeof(Temp)-3);
@@ -1166,28 +1164,31 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
 	HWND HWin;
-	char HelpFN[MAX_PATH];
-//	char UILanguageFile[MAX_PATH];
-	char uimsg[MAX_UIMSG];
+	TCHAR HelpFN[MAX_PATH];
+	TCHAR uimsg[MAX_UIMSG];
+	const TCHAR *HomeDirT;
 
 	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(NULL,Temp,sizeof(Temp)) == 0) {
 		return;
 	}
 	ExtractDirName(Temp, HomeDir);
+	HomeDirT = ToTcharA(HomeDir);
 
-//	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
-	get_lang_msg("HELPFILE", uimsg, sizeof(uimsg), "teraterm.chm", UILanguageFile);
+	get_lang_msgT("HELPFILE", uimsg, _countof(uimsg),
+				  _T("teraterm.chm"), UILanguageFile);
 
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
 	HWin = GetDesktopWindow();
-	_snprintf_s(HelpFN, sizeof(HelpFN), _TRUNCATE, "%s\\%s", HomeDir, uimsg);
+	_sntprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, _T("%s\\%s"), (TCHAR *)HomeDirT, uimsg);
 	if (HtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-		char buf[MAX_PATH];
-		get_lang_msg("MSG_OPENHELP_ERROR", uimsg, sizeof(uimsg), "Can't open HTML help file(%s).", UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, uimsg, HelpFN);
-		MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
+		TCHAR buf[MAX_PATH];
+		get_lang_msgT("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
+					  _T("Can't open HTML help file(%s)."), UILanguageFile);
+		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
+		MessageBox(HWin, buf, _T("Tera Term: HTML help"), MB_OK | MB_ICONERROR);
 	}
+	free((void *)HomeDirT);
 }
 
 HWND WINAPI GetNthWin(int n)
@@ -2276,13 +2277,13 @@ static void ListupSerialPort(LPWORD ComPortTable, int comports, char **ComPortDe
 			printf("%s\n", szMessage);
 #endif
 
-			if (_strnicmp(szPortName, "COM", 3) == 0) {  // COMポートドライバを発見
-				int port = atoi(&szPortName[3]);
+			if (_tcsnicmp(szPortName, _T("COM"), 3) == 0) {  // COMポートドライバを発見
+				int port = _ttoi(&szPortName[3]);
 				int i;
 
 				for (i = 0 ; i < comports ; i++) {
 					if (ComPortTable[i] == port) {  // 接続を確認
-						ComPortDesc[i] = _strdup(szFriendlyName);
+						ComPortDesc[i] = (char *)ToCharT(szFriendlyName);
 						break;
 					}
 				}
@@ -2306,17 +2307,17 @@ int WINAPI DetectComPorts(LPWORD ComPortTable, int ComPortMax, char **ComPortDes
 	int     i, j, min;
 	WORD    s;
 
-	if (((h = GetModuleHandle("kernel32.dll")) != NULL) &&
+	if (((h = GetModuleHandleA("kernel32.dll")) != NULL) &&
 	    (GetProcAddress(h, "QueryDosDeviceA") != NULL) &&
 	    (QueryDosDevice(NULL, devicesBuff, 65535) != 0)) {
 		p = devicesBuff;
 		while (*p != '\0') {
-			if (strncmp(p, "COM", 3) == 0 && p[3] != '\0') {
-				ComPortTable[comports++] = atoi(p+3);
+			if (_tcsncmp(p, _T("COM"), 3) == 0 && p[3] != '\0') {
+				ComPortTable[comports++] = _ttoi(p+3);
 				if (comports >= ComPortMax)
 					break;
 			}
-			p += (strlen(p)+1);
+			p += (_tcslen(p)+1);
 		}
 
 		for (i=0; i<comports-1; i++) {
@@ -2358,7 +2359,7 @@ int WINAPI CheckComPort(WORD ComPort)
 {
 	HMODULE h;
 	TCHAR   devicesBuff[65535];
-	char    com_str[64];
+	TCHAR    com_str[64];
 	BOOL bRet;
 	GUID ClassGuid[1];
 	DWORD dwRequiredSize;
@@ -2366,9 +2367,9 @@ int WINAPI CheckComPort(WORD ComPort)
 	SP_DEVINFO_DATA DeviceInfoData;
 	int found = 0;
 
-	_snprintf_s(com_str, sizeof(com_str), _TRUNCATE, "COM%d", ComPort);
+	_sntprintf_s(com_str, _countof(com_str), _TRUNCATE, _T("COM%d"), ComPort);
 
-	if (((h = GetModuleHandle("kernel32.dll")) == NULL) | (GetProcAddress(h, "QueryDosDeviceA") == NULL) ) {
+	if (((h = GetModuleHandleA("kernel32.dll")) == NULL) | (GetProcAddress(h, "QueryDosDeviceA") == NULL) ) {
 		/* ERROR */
 		return -1;
 	}
@@ -2409,7 +2410,7 @@ int WINAPI CheckComPort(WORD ComPort)
 				dwReqSize = sizeof(szPortName);
 				lRet = RegQueryValueEx(hKey, _T("PortName"), 0, &dwType, (LPBYTE)& szPortName, &dwReqSize);
 				RegCloseKey(hKey);
-				if (_stricmp(szPortName, com_str) == 0) {
+				if (_tcsicmp(szPortName, com_str) == 0) {
 					found = TRUE;
 					break;
 				}
@@ -2438,7 +2439,7 @@ static BOOL OpenSharedMemory(BOOL *first_instance_)
 		BOOL first_instance;
 		TMap *map;
 		_snprintf_s(tmp, sizeof(tmp), _TRUNCATE, i == 0 ? "%s" : "%s_%d", TT_FILEMAPNAME, i);
-		hMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
+		hMap = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
 								 0, sizeof(TMap), tmp);
 		if (hMap == NULL) {
 			return FALSE;

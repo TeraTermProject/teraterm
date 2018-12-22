@@ -52,8 +52,6 @@
 #define SetDlgItemText SetDlgItemTextA
 #undef MessageBox
 #define MessageBox MessageBoxA
-#undef SendDlgItemMessage
-#define SendDlgItemMessage SendDlgItemMessageA
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -240,30 +238,31 @@ void CSequencePropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", ts.UIMsg, sizeof(ts.UIMsg), "overwrite", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", ts.UIMsg, sizeof(ts.UIMsg), "ahead", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", ts.UIMsg, sizeof(ts.UIMsg), "last", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	TCHAR uimsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OFF", uimsg, _countof(uimsg), _T("off"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_OVERWRITE", uimsg, _countof(uimsg), _T("overwrite"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_AHEAD", uimsg, _countof(uimsg), _T("ahead"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_ACCEPT_TITLE_CHANGING_LAST", uimsg, _countof(uimsg), _T("last"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_ACCEPT_TITLE_CHANGING, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
-	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", ts.UIMsg, sizeof(ts.UIMsg), "ignore", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", ts.UIMsg, sizeof(ts.UIMsg), "accept", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", ts.UIMsg, sizeof(ts.UIMsg), "empty", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_TITLE_REPORT_IGNORE", uimsg, _countof(uimsg), _T("ignore"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_TITLE_REPORT_ACCEPT", uimsg, _countof(uimsg), _T("accept"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_TITLE_REPORT_EMPTY", uimsg, _countof(uimsg), _T("empty"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_TITLE_REPORT, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
-	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", ts.UIMsg, sizeof(ts.UIMsg), "off", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", ts.UIMsg, sizeof(ts.UIMsg), "write only", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", ts.UIMsg, sizeof(ts.UIMsg), "read only", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", ts.UIMsg, sizeof(ts.UIMsg), "read/write", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_OFF", uimsg, _countof(uimsg), _T("off"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_WRITE", uimsg, _countof(uimsg), _T("write only"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_READ", uimsg, _countof(uimsg), _T("read only"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_SEQUENCE_CLIPBOARD_ACCESS_ON", uimsg, _countof(uimsg), _T("read/write"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_CLIPBOARD_ACCESS, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
 	// (1)IDC_ACCEPT_MOUSE_EVENT_TRACKING
 	SetCheck(IDC_ACCEPT_MOUSE_EVENT_TRACKING, ts.MouseEventTracking);
@@ -643,14 +642,19 @@ void CVisualPropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT", ts.UIMsg, sizeof(ts.UIMsg), "Default", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED", ts.UIMsg, sizeof(ts.UIMsg), "Non-Antialiased", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED", ts.UIMsg, sizeof(ts.UIMsg), "Antialiased", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE", ts.UIMsg, sizeof(ts.UIMsg), "ClearType", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	TCHAR uimsg[MAX_UIMSG];
+	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_DEFAULT",
+				  uimsg, _countof(uimsg), _T("Default"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_NONANTIALIASED",
+				  uimsg, _countof(uimsg), _T("Non-Antialiased"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_ANTIALIASED",
+				  uimsg, _countof(uimsg), _T("Antialiased"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
+	get_lang_msgT("DLG_TAB_VISUAL_FONT_QUALITY_CLEARTYPE",
+				  uimsg, _countof(uimsg), _T("ClearType"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
 	// (1)AlphaBlend
 	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendActive);
@@ -1084,14 +1088,15 @@ void CLogPropPageDlg::OnInitDialog()
 	};
 	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts.UILanguageFile);
 
-	get_lang_msg("DLG_FOPT_TIMESTAMP_LOCAL", ts.UIMsg, sizeof(ts.UIMsg), "Local Time", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_FOPT_TIMESTAMP_UTC", ts.UIMsg, sizeof(ts.UIMsg), "UTC", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", ts.UIMsg, sizeof(ts.UIMsg), "Elapsed Time (Logging)", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
-	get_lang_msg("DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", ts.UIMsg, sizeof(ts.UIMsg), "Elapsed Time (Connection)", ts.UILanguageFile);
-	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
+	TCHAR UIMsg[MAX_UIMSG];
+	get_lang_msgT("DLG_FOPT_TIMESTAMP_LOCAL", UIMsg, _countof(UIMsg), _T("Local Time"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
+	get_lang_msgT("DLG_FOPT_TIMESTAMP_UTC", UIMsg, _countof(UIMsg), _T("UTC"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
+	get_lang_msgT("DLG_FOPT_TIMESTAMP_ELAPSED_LOGGING", UIMsg, _countof(UIMsg), _T("Elapsed Time (Logging)"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
+	get_lang_msgT("DLG_FOPT_TIMESTAMP_ELAPSED_CONNECTION", UIMsg, _countof(UIMsg), _T("Elapsed Time (Connection)"), ts.UILanguageFile);
+	SendDlgItemMessage(IDC_OPT_TIMESTAMP_TYPE, CB_ADDSTRING, 0, (LPARAM)UIMsg);
 
 
 	// Viewlog Editor path (2005.1.29 yutaka)
@@ -1110,7 +1115,7 @@ void CLogPropPageDlg::OnInitDialog()
 	SetCheck(IDC_LOG_ROTATE, ts.LogRotate != ROTATE_NONE);
 
 	for (int i = 0 ; i < LOG_ROTATE_SIZETYPE_NUM ; i++) {
-		SendDlgItemMessage(IDC_ROTATE_SIZE_TYPE, CB_ADDSTRING, 0, (LPARAM)LogRotateSizeType[i]);
+		SendDlgItemMessageA(IDC_ROTATE_SIZE_TYPE, CB_ADDSTRING, 0, (LPARAM)LogRotateSizeType[i]);
 	}
 	int TmpLogRotateSize = ts.LogRotateSize;
 	for (int i = 0 ; i < ts.LogRotateSizeType ; i++)
