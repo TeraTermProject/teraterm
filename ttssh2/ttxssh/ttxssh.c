@@ -1740,7 +1740,7 @@ hostssh_enabled:
 				SIZE s;
 				for (i=0; i<count; i++) {
 					len = SendMessage(hostcom, CB_GETLBTEXTLEN, i, 0);
-					lbl = (char *)calloc(len+1, sizeof(char));
+					lbl = (char *)calloc(len+1, sizeof(TCHAR));
 					SendMessage(hostcom, CB_GETLBTEXT, i, (LPARAM)lbl);
 					GetTextExtentPoint32A(TmpDC, lbl, len, &s);
 					if (s.cx > max_len)
