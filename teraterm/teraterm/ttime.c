@@ -29,6 +29,9 @@
 /* Tera Term */
 /* TERATERM.EXE, IME interface */
 
+#undef UNICODE
+#undef _UNICODE
+
 #include "teraterm.h"
 #include "tttypes.h"
 #include <stdlib.h>

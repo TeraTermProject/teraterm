@@ -3176,7 +3176,8 @@ LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 			memset(comp, 0, sizeof(comp));
 			hIMC = ImmGetContext(HVTWin);
 			if (hIMC) {
-				ret = ImmGetCompositionString(hIMC, GCS_COMPSTR, comp, sizeof(comp));
+				// TODO いきなりインポートしている
+				ret = ImmGetCompositionStringA(hIMC, GCS_COMPSTR, comp, sizeof(comp));
 				if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
 					memset(comp, 0, sizeof(comp));
 				}
