@@ -1529,13 +1529,24 @@ BOOL HasBalloonTipSupport()
 #endif
 
 // OPENFILENAMEA.lStructSize ‚É‘ã“ü‚·‚é’l
-DWORD get_OPENFILENAME_SIZE()
+DWORD get_OPENFILENAME_SIZEA()
 {
 	if (IsWindows2000OrLater()) {
 		return sizeof(OPENFILENAMEA);
 	}
 	return OPENFILENAME_SIZE_VERSION_400A;
 }
+
+#if defined(UNICODE)
+// OPENFILENAMEW.lStructSize ‚É‘ã“ü‚·‚é’l
+DWORD get_OPENFILENAME_SIZEW()
+{
+	if (IsWindows2000OrLater()) {
+		return sizeof(OPENFILENAMEW);
+	}
+	return OPENFILENAME_SIZE_VERSION_400W;
+}
+#endif
 
 // convert table for KanjiCodeID and ListID
 // cf. KanjiList,KanjiListSend

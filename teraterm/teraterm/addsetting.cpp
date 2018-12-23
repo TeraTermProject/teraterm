@@ -501,7 +501,7 @@ BOOL CCopypastePropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				OPENFILENAMEA ofn;
 
 				memset(&ofn, 0, sizeof(ofn));
-				ofn.lStructSize = get_OPENFILENAME_SIZE();
+				ofn.lStructSize = get_OPENFILENAME_SIZEA();
 				ofn.hwndOwner = GetSafeHwnd();
 				get_lang_msg("FILEDLG_SELECT_CONFIRM_STRING_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
 				             "txt(*.txt)\\0*.txt\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);
@@ -826,7 +826,7 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 				memset(&ofn, 0, sizeof(ofn));
 				memset(szFile, 0, sizeof(szFile));
-				ofn.lStructSize = get_OPENFILENAME_SIZE();
+				ofn.lStructSize = get_OPENFILENAME_SIZEA();
 				ofn.hwndOwner = m_pSheet->m_hWnd;
 				ofn.lpstrFilter = "Image Files(*.jpg;*.jpeg;*.bmp)\0*.jpg;*.jpeg;*.bmp\0All Files(*.*)\0*.*\0";
 				ofn.lpstrFile = szFile;
@@ -1192,7 +1192,7 @@ BOOL CLogPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 				OPENFILENAMEA ofn;
 
 				ZeroMemory(&ofn, sizeof(ofn));
-				ofn.lStructSize = get_OPENFILENAME_SIZE();
+				ofn.lStructSize = get_OPENFILENAME_SIZEA();
 				ofn.hwndOwner = GetSafeHwnd();
 				get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
 				             "exe(*.exe)\\0*.exe\\0all(*.*)\\0*.*\\0\\0", ts.UILanguageFile);

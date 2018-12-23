@@ -96,8 +96,9 @@ DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *de
 DllExport BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg);
 #endif
 DllExport void OutputDebugPrintf(const char *fmt, ...);
+DllExport DWORD get_OPENFILENAME_SIZEA();
+DllExport DWORD get_OPENFILENAME_SIZEW();
 DllExport BOOL is_NT4();
-DllExport DWORD get_OPENFILENAME_SIZE();
 DllExport BOOL IsWindows95();
 DllExport BOOL IsWindowsMe();
 DllExport BOOL IsWindowsNT4();
@@ -136,9 +137,11 @@ void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const
 #if defined(_UNICODE)
 #define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolderW(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
+#define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEW()
 #else
 #define	doSelectFolderT(p1, p2, p3, p4, p5) doSelectFolder(p1, p2, p3, p4, p5)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
+#define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 #endif
 
 #ifdef __cplusplus

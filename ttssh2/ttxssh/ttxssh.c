@@ -4149,7 +4149,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			OPENFILENAMEA ofn;
 
 			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = get_OPENFILENAME_SIZE();
+			ofn.lStructSize = get_OPENFILENAME_SIZEA();
 			ofn.hwndOwner = dlg;
 #if 0
 			get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
