@@ -92,7 +92,9 @@ DllExport void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const w
 #endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONTA logfont, HFONT *font, const char *iniFile);
 DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
+#if defined(UNICODE)
 DllExport BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg);
+#endif
 DllExport void OutputDebugPrintf(const char *fmt, ...);
 DllExport BOOL is_NT4();
 int get_OPENFILENAME_SIZE();

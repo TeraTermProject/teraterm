@@ -69,13 +69,19 @@ public:
 	// for controls
 	HWND GetDlgItem(int id);
 	LRESULT SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp);
+#if defined(UNICODE)
 	LRESULT SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp);
+#endif
 	LRESULT SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp);
 	void GetDlgItemTextT(int id, TCHAR *buf, size_t size);
+#if defined(UNICODE)
 	void GetDlgItemTextW(int id, wchar_t *buf, size_t size);
+#endif
 	void GetDlgItemTextA(int id, char *buf, size_t size);
 	void SetDlgItemTextT(int id, const TCHAR *str);
+#if defined(UNICODE)
 	void SetDlgItemTextW(int id, const wchar_t *str);
+#endif
 	void SetDlgItemTextA(int id, const char *str);
 	void SetDlgItemNum(int id, LONG Num);
 	void SetCheck(int id, int nCheck);

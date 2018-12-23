@@ -68,10 +68,12 @@ LRESULT TTCWnd::SendDlgItemMessageT(int id, UINT msg, WPARAM wp, LPARAM lp)
 	return ::SendDlgItemMessage(m_hWnd, id, msg, wp, lp);
 }
 
+#if defined(UNICODE)
 LRESULT TTCWnd::SendDlgItemMessageW(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
 	return ::SendDlgItemMessageW(m_hWnd, id, msg, wp, lp);
 }
+#endif
 
 LRESULT TTCWnd::SendDlgItemMessageA(int id, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -83,10 +85,12 @@ void TTCWnd::GetDlgItemTextT(int id, TCHAR *buf, size_t size)
 	::GetDlgItemText(m_hWnd, id, buf, (int)size);
 }
 
+#if defined(UNICODE)
 void TTCWnd::GetDlgItemTextW(int id, wchar_t *buf, size_t size)
 {
 	::GetDlgItemTextW(m_hWnd, id, buf, (int)size);
 }
+#endif
 
 void TTCWnd::GetDlgItemTextA(int id, char *buf, size_t size)
 {
@@ -98,10 +102,12 @@ void TTCWnd::SetDlgItemTextT(int id, const TCHAR *str)
 	::SetDlgItemText(m_hWnd, id, str);
 }
 
+#if defined(UNICODE)
 void TTCWnd::SetDlgItemTextW(int id, const wchar_t *str)
 {
 	::SetDlgItemTextW(m_hWnd, id, str);
 }
+#endif
 
 void TTCWnd::SetDlgItemTextA(int id, const char *str)
 {
@@ -535,7 +541,7 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 		dlgproc = nullptr;
 	}
 	pseudoPtr = this;
-	HWND hWnd = ::CreateDialogIndirectParamW(
+	HWND hWnd = ::CreateDialogIndirectParam(
 		hInstance, lpTemplate, hParent,
 		dlgproc, (LPARAM)this);
 	pseudoPtr = nullptr;

@@ -1099,6 +1099,7 @@ BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const c
 	return ret;
 }
 
+#if defined(UNICODE)
 BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg)
 {
 	BROWSEINFOW     bi;
@@ -1142,6 +1143,7 @@ BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, 
 
 	return ret;
 }
+#endif
 
 void OutputDebugPrintf(const char *fmt, ...) {
 	char tmp[1024];
