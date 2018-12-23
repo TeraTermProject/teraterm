@@ -33,6 +33,7 @@
 #include "key.h"
 #include "dlglib.h"
 #include "codeconv.h"
+#include "ttlib.h"
 
 #include <io.h>
 #include <fcntl.h>
@@ -433,7 +434,7 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	TCHAR uimsg[MAX_UIMSG];
 
 	ZeroMemory(&params, sizeof(params));
-	params.lStructSize = sizeof(OPENFILENAME);
+	params.lStructSize = get_OPENFILENAME_SIZE();
 	params.hwndOwner = parent;
 	// フィルタの追加 (2004.12.19 yutaka)
 	// 3ファイルフィルタの追加 (2005.4.26 yutaka)

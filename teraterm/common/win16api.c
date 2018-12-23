@@ -1,12 +1,11 @@
-ï»¿
 #include <windows.h>
 #include <assert.h>
 
 /**
- *	@param[in]	iAttribute	teratermã§ã¯0ã—ã‹ä½¿ç”¨ã—ãªã„
+ *	@param[in]	iAttribute	teraterm‚Å‚Í0‚µ‚©g—p‚µ‚È‚¢
  *	@retval 	handle
- *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) ã‚ªãƒ¼ãƒ—ãƒ³ã§ããªã‹ã£ãŸ
- *				(å®Ÿéš›ã®APIã¯HFILE_ERROR((HFILE)-1)ã‚’è¿”ã™)
+ *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) ƒI[ƒvƒ“‚Å‚«‚È‚©‚Á‚½
+ *				(ÀÛ‚ÌAPI‚ÍHFILE_ERROR((HFILE)-1)‚ğ•Ô‚·)
  */
 HANDLE win16_lcreat(const char *FileName, int iAttribute)
 {
@@ -20,8 +19,8 @@ HANDLE win16_lcreat(const char *FileName, int iAttribute)
 
 /**
  *	@retval 	handle
- *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) ã‚ªãƒ¼ãƒ—ãƒ³ã§ããªã‹ã£ãŸ
- *				(å®Ÿéš›ã®APIã¯HFILE_ERROR((HFILE)-1)ã‚’è¿”ã™)
+ *	@retval 	INVALID_HANDLE_VALUE((HANDLE)(LONG_PTR)-1) ƒI[ƒvƒ“‚Å‚«‚È‚©‚Á‚½
+ *				(ÀÛ‚ÌAPI‚ÍHFILE_ERROR((HFILE)-1)‚ğ•Ô‚·)
  */
 HANDLE win16_lopen(const char *FileName, int iReadWrite)
 {
@@ -40,7 +39,7 @@ HANDLE win16_lopen(const char *FileName, int iReadWrite)
 							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		break;
 	case OF_READWRITE:
-		// read/write (teratermã§ã¯ttpmacro/ttl.cå†…ã®1ç®‡æ‰€ã®ã¿ã§ä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹
+		// read/write (teraterm‚Å‚Íttpmacro/ttl.c“à‚Ì1‰ÓŠ‚Ì‚İ‚Åg—p‚³‚ê‚Ä‚¢‚é
 		handle = CreateFileA(FileName,
 							 GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
 							 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -54,8 +53,8 @@ HANDLE win16_lopen(const char *FileName, int iReadWrite)
 }
 
 /**
- *	@retval ãªã—
- *			(å®Ÿéš›ã®APIã¯ã‚ªãƒ¼ãƒ—ãƒ³ã—ã¦ã„ãŸHFILEã‚’è¿”ã™)
+ *	@retval ‚È‚µ
+ *			(ÀÛ‚ÌAPI‚ÍƒI[ƒvƒ“‚µ‚Ä‚¢‚½HFILE‚ğ•Ô‚·)
  */
 void win16_lclose(HANDLE hFile)
 {
@@ -63,7 +62,7 @@ void win16_lclose(HANDLE hFile)
 }
 
 /**
- *	@retval èª­ã¿è¾¼ã¿ãƒã‚¤ãƒˆæ•°
+ *	@retval “Ç‚İ‚İƒoƒCƒg”
  */
 UINT win16_lread(HANDLE hFile, LPVOID lpBuffer, UINT uBytes)
 {
@@ -76,7 +75,7 @@ UINT win16_lread(HANDLE hFile, LPVOID lpBuffer, UINT uBytes)
 }
 
 /**
- *	@retval æ›¸ãè¾¼ã¿ãƒã‚¤ãƒˆæ•°
+ *	@retval ‘‚«‚İƒoƒCƒg”
  */
 UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
 {
@@ -93,9 +92,9 @@ UINT win16_lwrite(HANDLE hFile, const char*buf, UINT length)
  *				@arg 0(FILE_BEGIN)
  *				@arg 1(FILE_CURRENT)
  *				@arg 2(FILE_END)
- *	@retval ãƒ•ã‚¡ã‚¤ãƒ«ä½ç½®
- *	@retval HFILE_ERROR((HFILE)-1)	ã‚¨ãƒ©ãƒ¼
- *	@retval INVALID_SET_FILE_POINTER((DWORD)-1) ã‚¨ãƒ©ãƒ¼
+ *	@retval ƒtƒ@ƒCƒ‹ˆÊ’u
+ *	@retval HFILE_ERROR((HFILE)-1)	ƒGƒ‰[
+ *	@retval INVALID_SET_FILE_POINTER((DWORD)-1) ƒGƒ‰[
  */
 LONG win16_llseek(HANDLE hFile, LONG lOffset, int iOrigin)
 {
