@@ -384,7 +384,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	case ID_MENU_REPLAY:
 		if (!pvar->enable) {
 			memset(&ofn, 0, sizeof(ofn));
-			ofn.lStructSize = sizeof(ofn);
+			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = hWin;
 			ofn.lpstrFilter = "ttyrec(*.tty)\0*.tty\0All files(*.*)\0*.*\0\0";
 			ofn.lpstrFile = pvar->openfn;

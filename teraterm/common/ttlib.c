@@ -1425,13 +1425,17 @@ BOOL HasBalloonTipSupport()
 	return IsWindows2000OrLater() || IsWindowsMe();
 }
 
-int get_OPENFILENAME_SIZE()
+#if !defined(OPENFILENAME_SIZE_VERSION_400A)
+#define OPENFILENAME_SIZE_VERSION_400A 76
+#endif
+
+// OPENFILENAMEA.lStructSize ‚É‘ã“ü‚·‚é’l
+DWORD get_OPENFILENAME_SIZE()
 {
 	if (IsWindows2000OrLater()) {
-		return sizeof(OPENFILENAME);
+		return sizeof(OPENFILENAMEA);
 	}
-	//return OPENFILENAME_SIZE_VERSION_400;
-	return 76;
+	return OPENFILENAME_SIZE_VERSION_400A;
 }
 
 // convert table for KanjiCodeID and ListID

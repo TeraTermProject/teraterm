@@ -1547,7 +1547,7 @@ WORD TTLFilenameBox()
 	if (CheckVar("inputstr", &ValType, &VarId) &&
 	    (ValType==TypString)) {
 		memset(&ofn, 0, sizeof(OPENFILENAME));
-		ofn.lStructSize     = sizeof(OPENFILENAME);
+		ofn.lStructSize     = get_OPENFILENAME_SIZE();
 		ofn.hwndOwner       = HMainWin;
 		ofn.lpstrTitle      = Str1;
 		ofn.lpstrFile       = StrVarPtr(VarId);

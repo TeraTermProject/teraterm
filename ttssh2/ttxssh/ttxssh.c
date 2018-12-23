@@ -3222,7 +3222,7 @@ static int get_keys_file_name(HWND parent, char *buf, int bufsize,
 	OPENFILENAME params;
 	char fullname_buf[2048] = "ssh_known_hosts";
 
-	params.lStructSize = sizeof(OPENFILENAME);
+	params.lStructSize = get_OPENFILENAME_SIZE();
 	params.hwndOwner = parent;
 	params.lpstrFilter = NULL;
 	params.lpstrCustomFilter = NULL;
@@ -3940,7 +3940,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			OPENFILENAME ofn;
 
 			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = sizeof(OPENFILENAME);
+			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = dlg;
 #if 0
 			get_lang_msg("FILEDLG_SELECT_LOGVIEW_APP_FILTER", ts.UIMsg, sizeof(ts.UIMsg),
@@ -4652,7 +4652,7 @@ static BOOL CALLBACK TTXKeyGenerator(HWND dlg, UINT msg, WPARAM wParam,
 
 			// saving file dialog
 			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = sizeof(ofn);
+			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = dlg;
 			switch (public_key.type) {
 			case KEY_RSA1:
@@ -4868,7 +4868,7 @@ public_error:
 
 			// saving file dialog
 			ZeroMemory(&ofn, sizeof(ofn));
-			ofn.lStructSize = sizeof(ofn);
+			ofn.lStructSize = get_OPENFILENAME_SIZE();
 			ofn.hwndOwner = dlg;
 			switch (private_key.type) {
 			case KEY_RSA1:

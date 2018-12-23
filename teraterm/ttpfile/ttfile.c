@@ -93,7 +93,7 @@ BOOL PASCAL GetSetupFname(HWND HWin, WORD FuncId, PTTSet ts)
 	/* OPENFILENAME record */
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 
-	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFile   = Name;
 	ofn.nMaxFile    = sizeof(Name);
@@ -485,7 +485,7 @@ BOOL WINAPI GetTransFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPLONG Option)
 
 	ExtractFileName(fv->FullName, FileName ,sizeof(FileName));
 	strncpy_s(fv->FullName, sizeof(fv->FullName), FileName, _TRUNCATE);
-	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = fv->HMainWin;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -714,7 +714,7 @@ BOOL WINAPI GetMultiFname(PFileVar fv, PCHAR CurDir, WORD FuncId, LPWORD Option)
 	memcpy(pf, uimsg, sizeof(FNFilter) - (pf - FNFilter + 2));
 
 	memset(&ofn, 0, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = fv->HMainWin;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
@@ -1144,7 +1144,7 @@ BOOL WINAPI GetXFname(HWND HWin, BOOL Receive, LPLONG Option, PFileVar fv, PCHAR
 	// \0\0 で終わる必要があるので 2 バイト
 	memcpy(pf, uimsg, sizeof(FNFilter) - (pf - FNFilter + 2));
 
-	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.lStructSize = get_OPENFILENAME_SIZE();
 	ofn.hwndOwner   = HWin;
 	ofn.lpstrFilter = FNFilter;
 	ofn.nFilterIndex = 1;
