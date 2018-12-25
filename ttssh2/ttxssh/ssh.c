@@ -6778,7 +6778,12 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	// ディスパッチルーチンの再設定
 	do_SSH2_dispatch_setup_for_transfer(pvar);
 
-	if (!pvar->nosession) {
+	if (pvar->nosession) {
+		// start forwarding
+		FWD_prep_forwarding(pvar);
+		FWD_enter_interactive_mode(pvar);
+	}
+	else {
 		// チャネル設定
 		// FWD_prep_forwarding()でshell IDを使うので、先に設定を持ってくる。(2005.7.3 yutaka)
 		// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
