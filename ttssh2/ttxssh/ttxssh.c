@@ -1880,6 +1880,8 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 					strncpy_s(pvar->subsystem_name,
 					          sizeof(pvar->subsystem_name),
 					          option + 15, _TRUNCATE);
+				} else if (strcmp(option + 4, "-nosession") == 0) {
+					pvar->nosession = TRUE;
 
 				// /ssh1 と /ssh2 オプションの新規追加 (2006.9.16 maya)
 				} else if (strcmp(option + 4, "1") == 0) {

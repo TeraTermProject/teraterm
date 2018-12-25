@@ -328,6 +328,8 @@ typedef struct _TInstVar {
 
 	BOOL use_subsystem;
 	char subsystem_name[256];
+
+	BOOL nosession;
 } TInstVar;
 
 // バージョンに合わせて自動変更される。 例: TTSSH_2-81_TS_data
