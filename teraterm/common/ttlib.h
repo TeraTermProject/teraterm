@@ -71,7 +71,6 @@ void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniF
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
 void OutputDebugPrintf(char *fmt, ...);
-BOOL is_NT4();
 DWORD get_OPENFILENAME_SIZE();
 BOOL IsWindows95();
 BOOL IsWindowsMe();

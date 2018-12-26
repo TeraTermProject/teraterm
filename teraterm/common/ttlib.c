@@ -1334,11 +1334,6 @@ BOOL IsWindowsMe()
 // OSが WindowsNT4.0 かどうかを判別する。
 BOOL IsWindowsNT4()
 {
-	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
-}
-
-BOOL is_NT4()
-{
 	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
 	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
 	// 無条件に FALSE を返してもよいかもしれない。

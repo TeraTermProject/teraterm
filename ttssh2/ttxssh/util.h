@@ -87,6 +87,4 @@ BOOL UTIL_is_sock_deeply_buffered(UTILSockWriteBuf *buf);
 void UTIL_get_lang_msg(PCHAR key, PTInstVar pvar, PCHAR def);
 int UTIL_get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, PTInstVar pvar);
 
-BOOL is_NT4();
-
 #endif
