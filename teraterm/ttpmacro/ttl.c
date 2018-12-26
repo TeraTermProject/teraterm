@@ -2403,6 +2403,7 @@ WORD TTLGetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
+	GetAbsPath(Filename, sizeof(Filename));
 	SetResult(GetFileAttributes(Filename));
 
 	return Err;
