@@ -1,0 +1,205 @@
+;;;
+;;; file commands
+;;;
+call test_macrodir
+call test_open
+call test_filecommands
+call test_filesearch
+call test_filestat
+call test_find
+call test_folder
+call test_password
+messagebox "finish all tests" "test_file.ttl"
+end
+
+
+;;;
+;;; test folder
+;;;
+:test_macrodir
+:retry
+getdir macro_dir
+dirnamebox "test_file.ttl folder for test" macro_dir
+s = "folder for test:\n"
+strspecial s
+strconcat s macro_dir
+yesnobox s "test_file.ttl"
+if result == 0 goto retry
+setdir macro_dir
+return
+
+;;;
+;;; test fileopen
+;;;
+:test_open
+filenamebox 'èëÇ´çûÇ›ÉtÉ@ÉCÉã' 1
+if result == 0 goto test_open
+fname = inputstr
+fileopen fh fname 1 1
+if fh <> -1 messagebox "check fileopen" "test_file.ttl"
+fileopen fh fname 1
+filewrite fh "test hello"#13#10
+filewriteln fh "test hello"#13#10
+fileclose fh
+filedelete fname
+return
+
+;;;
+;;; fileopen (create)
+;;; filewrite
+;;; filewriteln
+;;; fileclose
+;;; filerename
+;;; filecreate
+;;; filedelete
+;;; filecopy
+;;; fileconcat
+;;;
+:test_filecommands
+fname_1 = "01_hello.txt"
+fileopen fh fname_1 1
+filewrite fh "test1 hello"#13#10
+fileclose fh
+fname_2 = "02_hello.txt"
+filerename fname_1 fname_2
+if result <> 0 messagebox "filerename error" "test_file.ttl"
+filecreate fh fname_1
+filewriteln fh "test2 hello"
+fileclose fh
+messagebox "checkfiles 1" "test_file.ttl"
+fileconcat fname_1 fname_2
+messagebox "checkfiles 2" "test_file.ttl"
+
+if result <> 0 messagebox "fileconcat error" "test_file.ttl"
+fname_3 = "03_hello.txt"
+filecopy fname_1 fname_3
+if result <> 0 messagebox "filecopy error" "test_file.ttl"
+filetruncate fname_1 1024
+if result <> 0 messagebox "filetruncate error" "test_file.ttl"
+filestat fname_1 size
+if result = -1 messagebox "filestat error" "test_file.ttl"
+if size <> 1024 messagebox "file size?" "test_file.ttl"
+messagebox "checkfiles 3" "test_file.ttl"
+filedelete fname_1
+if result <> 0 messagebox "filedelete error" "test_file.ttl"
+filedelete fname_2
+if result <> 0 messagebox "filedelete error" "test_file.ttl"
+filedelete fname_3
+if result <> 0 messagebox "filedelete error" "test_file.ttl"
+messagebox "checkfiles 4" "test_file.ttl"
+return
+
+;;;
+;;; filesearch
+;;;
+:test_filesearch
+fname = "hello world.bin"
+filesearch fname
+if result = 1 messagebox "check filesearch 1" "test_file.ttl"
+fileopen fh fname 1
+if fh = -1 messagebox "check fileopen" "test_file.ttl"
+filewriteln fh "this is hello world"
+fileclose fh
+filesearch fname
+if result = 0 messagebox "check filesearch 2" "test_file.ttl"
+filedelete fname
+filesearch fname
+if result = 1 messagebox "check filesearch 3" "test_file.ttl"
+return
+
+;;;
+;;; filestat
+;;;
+:test_filestat
+fname = "stat_test.bin"
+filetruncate fname 10240
+filestat fname size
+if result = -1 messagebox "check filestat 1" "test_file.ttl"
+if size <> 10240 messagebox "check filestat 2" "test_file.ttl"
+filedelete fname
+return
+
+;;;
+;;; findfirst
+;;; findnext
+;;; findclose
+;;;
+:test_find
+n = 0
+filelist = ""
+findfirst dh "*.ttl" filename
+if result = 1 then
+	while result
+		strconcat filelist filename
+		strconcat filelist "\n"
+		n = n + 1
+		findnext dh filename
+	endwhile
+endif
+findclose dh
+strspecial filelist
+messagebox filelist "test_file.ttl"
+return
+
+;;;
+;;; foldercreate
+;;; folderdelete
+;;; foldersearch
+;;; setfileattr
+;;; getfileattr
+;;;
+:test_folder
+dname = "folder_aa"
+foldersearch dname
+if result == 1 messagebox "check foldersearch 1" "test_file.ttl"
+foldercreate "folder_aa"
+fname = "folder_aa/test.txt"
+filecreate fh fname
+filewriteln fh "hello"
+fileclose fh
+getfileattr fname
+if result == -1 messagebox "check getfileattr" "test_file.ttl"
+foldersearch dname
+if result == 0 messagebox "check foldersearch 2" "test_file.ttl"
+folderdelete dname
+if result == 0 messagebox "check folderdelete 1" "test_file.ttl"
+setfileattr fname $1
+if result == 0 messagebox "check setfileattr 1" "test_file.ttl"
+setfileattr fname $80
+if result == 0 messagebox "check setfileattr 2" "test_file.ttl"
+filedelete fname
+folderdelete dname
+if result <> 0 messagebox "check folderdelete 2" "test_file.ttl"
+foldersearch dname
+if result == 1 messagebox "check foldersearch 3" "test_file.ttl"
+return
+
+;;;
+;;; setpassword
+;;; getpassword
+;;; ispassword
+;;; delpassword
+;;;
+:test_password
+pwfile = "password.txt"
+filedelete pwfile
+pw1 = "password"
+setpassword pwfile "password1" pw1
+if result == 0 messagebox "check setpassword 1" "test_file.ttl"
+getpassword pwfile "password1" pw2
+if result == 0 messagebox "check getpassword 2" "test_file.ttl"
+strcompare pw1 pw2
+if result <> 0 messagebox "check setpassword 3" "test_file.ttl"
+getpassword pwfile "password2" pw1
+if result == 0 messagebox "check getpassword 4" "test_file.ttl"
+getpassword pwfile "password2" pw2
+if result == 0 messagebox "check getpassword 5" "test_file.ttl"
+strcompare pw1 pw2
+if result <> 0 messagebox "check setpassword 6" "test_file.ttl"
+ispassword pwfile "password2"
+if result <> 1 messagebox "check ispassword 7" "test_file.ttl"
+delpassword pwfile "password2"
+ispassword pwfile "password2"
+if result <> 0 messagebox "check ispassword 8" "test_file.ttl"
+filedelete pwfile
+return

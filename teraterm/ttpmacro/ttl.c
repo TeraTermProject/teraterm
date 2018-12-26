@@ -1603,9 +1603,9 @@ WORD TTLFileOpen()
 	}
 	else {
 		FH = _lopen(FName,OF_READWRITE);
+		if (FH == INVALID_HANDLE_VALUE)
+			FH = _lcreat(FName,0);
 	}
-	if (FH == INVALID_HANDLE_VALUE)
-		FH = _lcreat(FName,0);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
 		return ErrCantOpen;
