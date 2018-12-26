@@ -72,7 +72,7 @@ int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char
 BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
 void OutputDebugPrintf(char *fmt, ...);
 BOOL is_NT4();
-DllExport DWORD get_OPENFILENAME_SIZE();
+DWORD get_OPENFILENAME_SIZE();
 BOOL IsWindows95();
 BOOL IsWindowsMe();
 BOOL IsWindowsNT4();

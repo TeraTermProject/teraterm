@@ -89,3 +89,4 @@ EXPORTS
   parse_port @90
   parse_port_from_buf @91
   service_name @92
+  get_OPENFILENAME_SIZE @93
