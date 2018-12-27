@@ -1433,11 +1433,6 @@ BOOL IsWindowsMe()
 // OSが WindowsNT4.0 かどうかを判別する。
 BOOL IsWindowsNT4()
 {
-	return IsWindowsVer(VER_PLATFORM_WIN32_NT, 4, 0);
-}
-
-BOOL is_NT4()
-{
 	// VS2013以上だと GetVersionEx() が警告となるため、VerifyVersionInfo() を使う。
 	// しかし、VS2013でビルドしたプログラムは、そもそも NT4.0 では動作しないため、
 	// 無条件に FALSE を返してもよいかもしれない。
@@ -1524,17 +1519,20 @@ BOOL HasBalloonTipSupport()
 	return IsWindows2000OrLater() || IsWindowsMe();
 }
 
-#if !defined(OPENFILENAME_SIZE_VERSION_400A)
-#define OPENFILENAME_SIZE_VERSION_400A 76
-#endif
-
 // OPENFILENAMEA.lStructSize に代入する値
 DWORD get_OPENFILENAME_SIZEA()
 {
+#if (_WIN32_WINNT >= 0x0500)
+#if !defined(OPENFILENAME_SIZE_VERSION_400A)
+#define OPENFILENAME_SIZE_VERSION_400A 76
+#endif
 	if (IsWindows2000OrLater()) {
 		return sizeof(OPENFILENAMEA);
 	}
 	return OPENFILENAME_SIZE_VERSION_400A;
+#else
+	return sizeof(OPENFILENAMEA);
+#endif
 }
 
 #if defined(UNICODE)

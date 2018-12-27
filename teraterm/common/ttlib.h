@@ -98,7 +98,6 @@ DllExport BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wcha
 DllExport void OutputDebugPrintf(const char *fmt, ...);
 DllExport DWORD get_OPENFILENAME_SIZEA();
 DllExport DWORD get_OPENFILENAME_SIZEW();
-DllExport BOOL is_NT4();
 DllExport BOOL IsWindows95();
 DllExport BOOL IsWindowsMe();
 DllExport BOOL IsWindowsNT4();

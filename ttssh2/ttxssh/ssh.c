@@ -2923,6 +2923,7 @@ void SSH_init(PTInstVar pvar)
 	pvar->tryed_ssh2_authlist = FALSE;
 	pvar->agentfwd_enable = FALSE;
 	pvar->use_subsystem = FALSE;
+	pvar->nosession = FALSE;
 
 }
 
@@ -3417,6 +3418,7 @@ void SSH_end(PTInstVar pvar)
 	            &pvar->ssh_state.postdecompress_inbuflen);
 	pvar->agentfwd_enable = FALSE;
 	pvar->use_subsystem = FALSE;
+	pvar->nosession = FALSE;
 
 	// support of "Compression delayed" (2006.6.23 maya)
 	if (pvar->ssh_state.compressing ||
@@ -6902,16 +6904,25 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	// 認証OK
 	pvar->userauth_success = 1;
 
-	// チャネル設定
-	// FWD_prep_forwarding()でshell IDを使うので、先に設定を持ってくる。(2005.7.3 yutaka)
-	// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
-	// changed window size from 32KB to 128KB. (2007.10.29 maya)
-	if (pvar->use_subsystem) {
-		c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
+	// ディスパッチルーチンの再設定
+	do_SSH2_dispatch_setup_for_transfer(pvar);
+
+	if (pvar->nosession) {
+		// start forwarding
+		FWD_prep_forwarding(pvar);
+		FWD_enter_interactive_mode(pvar);
 	}
 	else {
-		c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SHELL, -1);
-	}
+		// チャネル設定
+		// FWD_prep_forwarding()でshell IDを使うので、先に設定を持ってくる。(2005.7.3 yutaka)
+		// changed window size from 64KB to 32KB. (2006.3.6 yutaka)
+		// changed window size from 32KB to 128KB. (2007.10.29 maya)
+		if (pvar->use_subsystem) {
+			c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SUBSYSTEM_GEN, -1);
+		}
+		else {
+			c = ssh2_channel_new(CHAN_SES_WINDOW_DEFAULT, CHAN_SES_PACKET_DEFAULT, TYPE_SHELL, -1);
+		}
 
 	if (c == NULL) {
 		char uimsg[MAX_UIMSG];
@@ -6924,28 +6935,26 @@ static BOOL handle_SSH2_userauth_success(PTInstVar pvar)
 	// シェルのIDを取っておく
 	pvar->shell_id = c->self_id;
 
-	// ディスパッチルーチンの再設定
-	do_SSH2_dispatch_setup_for_transfer(pvar);
+		// シェルオープン
+		msg = buffer_init();
+		if (msg == NULL) {
+			// TODO: error check
+			logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
+			return FALSE;
+		}
+		s = "session";
+		buffer_put_string(msg, s, strlen(s));  // ctype
+		buffer_put_int(msg, c->self_id);  // self(channel number)
+		buffer_put_int(msg, c->local_window);  // local_window
+		buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
+		len = buffer_len(msg);
+		outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
+		memcpy(outmsg, buffer_ptr (msg), len);
+		finish_send_packet(pvar);
+		buffer_free(msg);
 
-	// シェルオープン
-	msg = buffer_init();
-	if (msg == NULL) {
-		// TODO: error check
-		logputs(LOG_LEVEL_ERROR, __FUNCTION__ ": buffer_init returns NULL.");
-		return FALSE;
+		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at handle_SSH2_userauth_success().");
 	}
-	s = "session";
-	buffer_put_string(msg, s, strlen(s));  // ctype
-	buffer_put_int(msg, c->self_id);  // self(channel number)
-	buffer_put_int(msg, c->local_window);  // local_window
-	buffer_put_int(msg, c->local_maxpacket);  // local_maxpacket
-	len = buffer_len(msg);
-	outmsg = begin_send_packet(pvar, SSH2_MSG_CHANNEL_OPEN, len);
-	memcpy(outmsg, buffer_ptr (msg), len);
-	finish_send_packet(pvar);
-	buffer_free(msg);
-
-	logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_CHANNEL_OPEN was sent at handle_SSH2_userauth_success().");
 
 	// ハートビート・スレッドの開始 (2004.12.11 yutaka)
 	start_ssh_heartbeat_thread(pvar);

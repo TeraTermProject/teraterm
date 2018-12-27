@@ -1644,11 +1644,11 @@ WORD TTLFileOpen()
 		FH = CreateFile(FNameT,
 						GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE, NULL,
 						OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (FH == INVALID_HANDLE_VALUE)
+			FH = CreateFile(FNameT,
+							GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+							CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
-	if (FH == INVALID_HANDLE_VALUE)
-		FH = CreateFile(FNameT,
-						GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-						CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (FH == INVALID_HANDLE_VALUE) {
 		SetIntVal(VarId, -1);
 		return ErrCantOpen;
@@ -2444,7 +2444,7 @@ WORD TTLGetFileAttr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	GetAbsPath(Filename, sizeof(Filename));		// @@ TODO
+	GetAbsPath(Filename, sizeof(Filename));
 	SetResult(GetFileAttributes(tc::fromUtf8(Filename)));
 
 	return Err;
