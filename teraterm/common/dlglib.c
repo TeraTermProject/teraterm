@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2008-2018 TeraTerm Project
  * All rights reserved.
@@ -30,7 +30,7 @@
 /* Routines for dialog boxes */
 #include "dlglib.h"
 
-#include "i18n.h"		// for MAX_UIMSG
+#include "i18n.h"
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>
@@ -125,8 +125,8 @@ void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat) {
 
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *p)
 {
-	// 20MBˆÈã‚Ìƒtƒ@ƒCƒ‹‚ğƒAƒbƒvƒ[ƒh‚µ‚æ‚¤‚Æ‚·‚é‚ÆAbuffer overflow‚Å
-	// —‚¿‚é–â‘è‚Ö‚Ì‘ÎˆB(2005.3.18 yutaka)
+	// 20MBä»¥ä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã—ã‚ˆã†ã¨ã™ã‚‹ã¨ã€buffer overflowã§
+	// è½ã¡ã‚‹å•é¡Œã¸ã®å¯¾å‡¦ã€‚(2005.3.18 yutaka)
 	// cf. http://sourceforge.jp/tracker/index.php?func=detail&aid=5713&group_id=1412&atid=5333
 	double Num;
 	TCHAR NumStr[10];
@@ -228,11 +228,11 @@ typedef struct {
 	BOOL ComboBox;
 } EditSubclassData;
 
-// C-n/C-p ‚Ì‚½‚ß‚ÉƒTƒuƒNƒ‰ƒX‰» (2007.9.4 maya)
-// C-p/C-n/C-b/C-f/C-a/C-e ‚ğƒTƒ|[ƒg (2007.9.5 maya)
-// C-d/C-k ‚ğƒTƒ|[ƒg (2007.10.3 yutaka)
-// ƒhƒƒbƒvƒ_ƒEƒ“‚Ì’†‚ÌƒGƒfƒBƒbƒgƒRƒ“ƒgƒ[ƒ‹‚ğ
-// ƒTƒuƒNƒ‰ƒX‰»‚·‚é‚½‚ß‚ÌƒEƒCƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
+// C-n/C-p ã®ãŸã‚ã«ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ– (2007.9.4 maya)
+// C-p/C-n/C-b/C-f/C-a/C-e ã‚’ã‚µãƒãƒ¼ãƒˆ (2007.9.5 maya)
+// C-d/C-k ã‚’ã‚µãƒãƒ¼ãƒˆ (2007.10.3 yutaka)
+// ãƒ‰ãƒ­ãƒƒãƒ—ãƒ€ã‚¦ãƒ³ã®ä¸­ã®ã‚¨ãƒ‡ã‚£ãƒƒãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’
+// ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–ã™ã‚‹ãŸã‚ã®ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
 static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
 {
@@ -244,7 +244,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	char *str, *orgstr;
 
 	switch (msg) {
-		// ƒL[‚ª‰Ÿ‚³‚ê‚½‚Ì‚ğŒŸ’m‚·‚é
+		// ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã®ã‚’æ¤œçŸ¥ã™ã‚‹
 		case WM_KEYDOWN:
 			if (GetKeyState(VK_CONTROL) < 0) {
 				switch (wParam) {
@@ -296,17 +296,17 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						if (str != NULL) {
 							len = GetWindowTextA(dlg, str, (int)max);
 							if (select >= 0 && select < len) {
-								if (wParam == 0x44) { // ƒJ[ƒ\ƒ‹”z‰º‚Ì•¶š‚Ì‚İ‚ğíœ‚·‚é
+								if (wParam == 0x44) { // ã‚«ãƒ¼ã‚½ãƒ«é…ä¸‹ã®æ–‡å­—ã®ã¿ã‚’å‰Šé™¤ã™ã‚‹
 									memmove(&str[select], &str[select + 1], len - select - 1);
 									str[len - 1] = '\0';
 
-								} else if (wParam == 0x4b) { // ƒJ[ƒ\ƒ‹‚©‚çs––‚Ü‚Åíœ‚·‚é
+								} else if (wParam == 0x4b) { // ã‚«ãƒ¼ã‚½ãƒ«ã‹ã‚‰è¡Œæœ«ã¾ã§å‰Šé™¤ã™ã‚‹
 									str[select] = '\0';
 
 								}
 							}
 
-							if (wParam == 0x55) { // ƒJ[ƒ\ƒ‹‚æ‚è¶‘¤‚ğ‚·‚×‚ÄÁ‚·
+							if (wParam == 0x55) { // ã‚«ãƒ¼ã‚½ãƒ«ã‚ˆã‚Šå·¦å´ã‚’ã™ã¹ã¦æ¶ˆã™
 								if (select >= len) {
 									str[0] = '\0';
 								} else {
@@ -325,7 +325,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 			}
 			break;
 
-		// ã‚ÌƒL[‚ğ‰Ÿ‚µ‚½Œ‹‰Ê‘—‚ç‚ê‚é•¶š‚Å‰¹‚ª–Â‚é‚Ì‚ÅÌ‚Ä‚é
+		// ä¸Šã®ã‚­ãƒ¼ã‚’æŠ¼ã—ãŸçµæœé€ã‚‰ã‚Œã‚‹æ–‡å­—ã§éŸ³ãŒé³´ã‚‹ã®ã§æ¨ã¦ã‚‹
 		case WM_CHAR:
 			switch (wParam) {
 				case 0x01:
@@ -361,7 +361,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 	return Result;
 }
 
-// C-n/C-p ‚Ì‚½‚ß‚ÉƒTƒuƒNƒ‰ƒX‰»
+// C-n/C-p ã®ãŸã‚ã«ã‚µãƒ–ã‚¯ãƒ©ã‚¹åŒ–
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 {
 	EditSubclassData *data;
@@ -375,4 +375,206 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 	data->ComboBox = ComboBox;
 	SetWindowLongPtr(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
+}
+
+typedef struct {
+	BOOL found;
+	const TCHAR *face;
+	BYTE charset;
+} IsExistFontInfo;
+
+int CALLBACK IsExistFontSub(
+	ENUMLOGFONT* lpelf, NEWTEXTMETRIC* lpntm,
+	int nFontType, LPARAM lParam)
+{
+	IsExistFontInfo *info = (IsExistFontInfo *)lParam;
+	(void)lpntm;
+	if (nFontType != DEVICE_FONTTYPE &&
+		_tcsicmp(lpelf->elfLogFont.lfFaceName, info->face) == 0 &&
+		lpelf->elfLogFont.lfCharSet == info->charset)
+	{
+		info->found = TRUE;
+		return 0;
+	}
+	return 1;
+}
+
+/**
+ *	ãƒ•ã‚©ãƒ³ãƒˆãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã•ã‚Œã¦ã„ã‚‹ã‹èª¿ã¹ã‚‹
+ */
+BOOL IsExistFont(const TCHAR *face, BYTE charset, BOOL strict)
+{
+	HDC hDC = GetDC(NULL);
+	LOGFONT lf;
+	IsExistFontInfo info;
+	(void)face;
+	(void)charset;
+	memset(&lf, 0, sizeof(lf));
+	lf.lfCharSet = strict ? DEFAULT_CHARSET : charset;
+	// â†‘DEFAULT_CHARSETã¨ã™ã‚‹ã¨ãƒ•ã‚©ãƒ³ãƒˆãƒªãƒ³ã‚¯ã‚‚æœ‰åŠ¹ã«ãªã‚‹ã‚ˆã†ã 
+	lf.lfPitchAndFamily = 0;
+	info.found = FALSE;
+	info.face = face;
+	info.charset = charset;
+	EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)IsExistFontSub, (LPARAM)&info, 0);
+	ReleaseDC(NULL, hDC);
+	return info.found;
+}
+
+/**
+ *	ä½¿ç”¨ã™ã‚‹CharSetã‚’å–å¾—ã™ã‚‹
+ */
+DWORD GetCharSet()
+{
+	DWORD codepage;
+	CHARSETINFO charset_info;
+	BOOL result;
+
+#if 0
+	TCHAR codepage_str[16];
+	int ri = GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IDEFAULTANSICODEPAGE,
+						  (LPSTR)&codepage_str, _countof(codepage_str));
+	if (ri == 0) {
+		return 0;
+	}
+	codepage = _ttoi(codepage_str);
+#else
+	codepage = GetACP();
+#endif
+
+	result = TranslateCharsetInfo((DWORD *)codepage, &charset_info, TCI_SRCCODEPAGE);
+	assert(result == TRUE);
+	if (result == FALSE) {
+		return SHIFTJIS_CHARSET;
+	}
+
+	return charset_info.ciCharset;
+}
+
+/**
+ *	ä½¿ç”¨ã™ã‚‹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆã®å€™è£œ
+ */
+typedef struct {
+	const TCHAR *face;
+	LONG height;
+} DialogFontLists;
+
+DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
+{
+	DWORD char_set = GetCharSet();
+	switch (char_set) {
+	case SHIFTJIS_CHARSET: {
+		static const DialogFontLists list[] = {
+			{ _T("Yu Gothic UI"), -9 },
+			{ _T("Meiryo UI"), -9 }, 	// Vistaä»¥é™
+			{ _T("MS UI Gothic"), -9 },	// 98ä»¥é™
+			{ _T("ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯"), -9 },	// Windows 3.1ä»¥é™
+			0
+		};
+		*candidate_list = list;
+		return char_set;
+	}
+	case HANGUL_CHARSET: {
+		// Korean
+		static const DialogFontLists list[] = {
+			{ _T("ë‹ì›€"), -9 },
+			{ _T("êµ´ë¦¼"), -10 },
+			0
+		};
+		*candidate_list = list;
+		return char_set;
+	}
+	case GB2312_CHARSET: {
+		// Simplified Chinese
+		static const DialogFontLists list[] = {
+			{ _T("å¾®è½¯é›…é»‘") , -8 },
+			{ _T("å¾®è½¯é›…é»‘") , -10 },
+			0
+		};
+		*candidate_list = list;
+		return char_set;
+	}
+	case CHINESEBIG5_CHARSET: {
+		// Traditional Chinese
+		static const DialogFontLists list[] = {
+			{ _T("ç´°æ˜é«”") , -8 },
+			{ _T("æ–°ç´°æ˜é«”") , -10 },
+			0
+		};
+		*candidate_list = list;
+		return char_set;
+	}
+	default: {
+		static const DialogFontLists list[] = {
+			{ _T("Tahoma"), -8 },
+			0
+		};
+		*candidate_list = list;
+		return char_set;
+	}
+	}
+}
+
+/**
+ *	ä½¿ç”¨ã™ã‚‹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ•ã‚©ãƒ³ãƒˆã‚’æ±ºå®šã™ã‚‹
+ */
+void SetDialogFont(const char *section, const char *UILanguageFile)
+{
+	// æ˜ç¤ºçš„ã«æŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ãã‚Œã«å¾“ã†
+	{
+		BOOL result = FALSE;
+		LOGFONTA logfont;
+		if (section != NULL) {
+			result = GetI18nLogfont(section, "DLG_FONT", &logfont, 72, UILanguageFile);
+		}
+		if (result == FALSE) {
+			result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
+		}
+		if (result == TRUE) {
+#if defined(UNICODE)
+			wchar_t face[LF_FACESIZE];
+			mbstowcs(face, logfont.lfFaceName, LF_FACESIZE);		// TODO MultiByteToWideChar()ã‚’ä½¿ã†
+			if (IsExistFont(face, logfont.lfCharSet, FALSE)) {
+				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+				return;
+			}
+#else
+			if (IsExistFont(logfont.lfFaceName, logfont.lfCharSet, FALSE)) {
+				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+				return;
+			}
+#endif
+			// TODO ãƒ•ã‚©ãƒ³ãƒˆãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã¨ãã®å‡¦ç†
+			//	messagebox()å‡ºã—ã¦ä¸‹ã¸ç¶šããŒå¦¥å½“ã‹?
+		}
+	}
+
+	// å®Ÿéš›ã«å­˜åœ¨ã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã™ã‚‹
+	{
+		DWORD charset;
+		const DialogFontLists *list;
+		charset = GetDialogFontCandidate(&list);
+		while(list->face != NULL) {
+			if (IsExistFont(list->face, charset, TRUE)) {
+				TTSetDlgFont(list->face, list->height, charset);
+				return;
+			}
+		}
+	}
+
+	// messageboxã®ãƒ•ã‚©ãƒ³ãƒˆã‚’é¸æŠ
+	{
+		NONCLIENTMETRICS nci;
+		int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
+		BOOL r;
+		const LOGFONT *logfont;
+
+		memset(&nci, 0, sizeof(nci));
+		nci.cbSize = st_size;
+		r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+		assert(r == TRUE);
+		logfont = &nci.lfStatusFont;
+
+		TTSetDlgFont(logfont->lfFaceName, /*logfont->lfHeight*/ -9, logfont->lfCharSet);
+	}
 }

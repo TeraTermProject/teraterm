@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
@@ -58,8 +58,8 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
 #endif
 
 ////////////////////////////////////////
-void TTSetDlgFont(const char *face, int height, int charset);
-//void TTSetDlgFont(const wchar_t *face, int height, int charset);
+void TTSetDlgFontA(const char *face, int height, int charset);
+void TTSetDlgFontW(const wchar_t *face, int height, int charset);
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
 DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName);
 DLGTEMPLATE *TTGetNewDlgTemplate(
@@ -88,6 +88,13 @@ INT_PTR TTDialogBox(
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
+void SetDialogFont(const char *section, const char *UILanguageFile);
+
+#if defined(_UNICODE)
+#define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontW(p1,p2,p3)
+#else
+#define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontA(p1,p2,p3)
+#endif
 
 #ifdef __cplusplus
 }

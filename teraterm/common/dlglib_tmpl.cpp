@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
  *
@@ -115,20 +115,20 @@ static size_t CopySzOrOrd(const WORD *src, WORD *dest)
 {
 	size_t size;
 	if (*src == 0x0000) {
-		// 0x0000 ã®ã¨ãã€ãªã«ã‚‚ãªã„
+		// 0x0000 ‚Ì‚Æ‚«A‚È‚É‚à‚È‚¢
 		if (dest != NULL) {
 			*dest = *src;
 		}
 		size = 1;
 	} else if (*src == 0xffff) {
-		// 0xffff ã®ã¨ãã€1WORDã®ãƒ‡ãƒ¼ã‚¿
+		// 0xffff ‚Ì‚Æ‚«A1WORD‚Ìƒf[ƒ^
 		if (dest != NULL) {
 			*dest++ = *src++;
 			*dest++ = *src++;
 		}
 		size = 2;
 	} else {
-		// ä»¥å¤–ã¯wchar_tã®æ–‡å­—åˆ—
+		// ˆÈŠO‚Íwchar_t‚Ì•¶š—ñ
 		return CopySz(src, dest);
 	}
 	return size;
@@ -169,10 +169,10 @@ static size_t CopyDlgItem(const WORD *src, WORD *dest)
 }
 
 /**
- *	drc		ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒªã‚½ãƒ¼ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿
- *	dest	ã‚³ãƒ”ãƒ¼å…ˆ(NULLã®ã¨ãã‚³ãƒ”ãƒ¼ã—ãªã„)
- *	logfont	è¨­å®šã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆæƒ…å ±(ãŸã ã—ã€dest_vãŒNULLã®æ™‚ã¯å–å¾—)
- *			NULLã®ã¨ãè¨­å®š,å–å¾—ã—ãªã„
+ *	drc		ƒ_ƒCƒAƒƒOƒŠƒ\[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+ *	dest	ƒRƒs[æ(NULL‚Ì‚Æ‚«ƒRƒs[‚µ‚È‚¢)
+ *	logfont	İ’è‚·‚éƒtƒHƒ“ƒgî•ñ(‚½‚¾‚µAdest_v‚ªNULL‚Ì‚Íæ“¾)
+ *			NULL‚Ì‚Æ‚«İ’è,æ“¾‚µ‚È‚¢
  */
 static size_t CopyDlgTemplate(
 	const WORD *src_v,
@@ -202,7 +202,7 @@ static size_t CopyDlgTemplate(
 	size_t dsize = 0;
 	if (dlg->style & DS_SETFONT) {
 		if (dest == NULL) {
-			// å–å¾—
+			// æ“¾
 			if (logfont != NULL) {
 				memset(logfont, 0, sizeof(*logfont));
 				logfont->lfHeight = -(*src++);
@@ -213,7 +213,7 @@ static size_t CopyDlgTemplate(
 			}
 			size += t + 1;
 		} else {
-			// ã‚»ãƒƒãƒˆ
+			// ƒZƒbƒg
 			if (logfont != NULL) {
 				*dest++ = (WORD)(-logfont->lfHeight);
 				src += 1;
@@ -282,10 +282,10 @@ static size_t CopyDlgItemEx(const WORD *src, WORD *dest)
 }
 
 /**
- *	drc_v	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒªã‚½ãƒ¼ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿
- *	dest_v	ã‚³ãƒ”ãƒ¼å…ˆ(NULLã®ã¨ãã‚³ãƒ”ãƒ¼ã—ãªã„)
- *	logfont	è¨­å®šã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆæƒ…å ±(ãŸã ã—ã€dest_vãŒNULLã®æ™‚ã¯å–å¾—)
- *			NULLã®ã¨ãè¨­å®š,å–å¾—ã—ãªã„
+ *	drc_v	ƒ_ƒCƒAƒƒOƒŠƒ\[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+ *	dest_v	ƒRƒs[æ(NULL‚Ì‚Æ‚«ƒRƒs[‚µ‚È‚¢)
+ *	logfont	İ’è‚·‚éƒtƒHƒ“ƒgî•ñ(‚½‚¾‚µAdest_v‚ªNULL‚Ì‚Íæ“¾)
+ *			NULL‚Ì‚Æ‚«İ’è,æ“¾‚µ‚È‚¢
  */
 static size_t CopyDlgTemplateEx(
 	const DLGTEMPLATE *src_v,
@@ -319,7 +319,7 @@ static size_t CopyDlgTemplateEx(
 	size_t dsize = 0;
 	if (dlg->style & DS_SETFONT) {
 		if (dest == NULL) {
-			// å–å¾—
+			// æ“¾
 			if (logfont != NULL) {
 				memset(logfont, 0, sizeof(*logfont));
 				logfont->lfHeight = -(*src++);
@@ -336,7 +336,7 @@ static size_t CopyDlgTemplateEx(
 			}
 			size += t + 3;
 		} else {
-			// ã‚»ãƒƒãƒˆ
+			// ƒZƒbƒg
 			if (logfont != NULL) {
 				*dest++ = (WORD)(-logfont->lfHeight);
 				*dest++ = (WORD)logfont->lfWeight;
@@ -395,7 +395,7 @@ static DLGTEMPLATE *GetDlgTemplate(
 		size_t size_namediff =
 			wcslen(FontFaceName) - wcslen(logfont.lfFaceName);
 		size_namediff *= sizeof(WCHAR);
-		size_namediff += 3;		// ãƒ†ã‚­ã‚¹ãƒˆã€ãƒ•ã‚©ãƒ³ãƒˆåé•·ã§alignãŒå¤‰åŒ–ã™ã‚‹
+		size_namediff += 3;		// ƒeƒLƒXƒgAƒtƒHƒ“ƒg–¼’·‚Åalign‚ª•Ï‰»‚·‚é
 		size_t new_size_forcast = prev_size + size_namediff;
 		new_size_forcast = (new_size_forcast + 3) & ~3;
 		dest = (DLGTEMPLATE *)malloc(new_size_forcast);
@@ -440,7 +440,7 @@ static wchar_t FontFaceName[LF_FACESIZE];
 static LONG FontHeight;
 static BYTE FontCharSet;
 
-void TTSetDlgFont(const wchar_t *face, int height, int charset)
+void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 {
 	if (face != NULL) {
 		wcscpy_s(FontFaceName, face);
@@ -451,10 +451,10 @@ void TTSetDlgFont(const wchar_t *face, int height, int charset)
 	FontCharSet = (BYTE)charset;
 }
 
-void TTSetDlgFont(const char *face, int height, int charset)
+void TTSetDlgFontA(const char *face, int height, int charset)
 {
 	if (face != NULL) {
-		mbstowcs(FontFaceName, face, LF_FACESIZE);		// TODO MultiByteToWideChar()ã‚’ä½¿ã†
+		mbstowcs(FontFaceName, face, LF_FACESIZE);		// TODO MultiByteToWideChar()‚ğg‚¤
 	} else {
 		FontFaceName[0] = L'\0';
 	}
@@ -485,9 +485,9 @@ DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName)
 }
 
 /*
- *	ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®ã‚¯ãƒ©ã‚¹åå–å¾—
- *	@retval		ã‚¯ãƒ©ã‚¹æ–‡å­—åˆ—
- *	@retval		NULL ã‚¯ãƒ©ã‚¹ãªã—
+ *	ƒ_ƒCƒAƒƒOƒeƒ“ƒvƒŒ[ƒg‚ÌƒNƒ‰ƒX–¼æ“¾
+ *	@retval		ƒNƒ‰ƒX•¶š—ñ
+ *	@retval		NULL ƒNƒ‰ƒX‚È‚µ
  */
 const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl)
 {

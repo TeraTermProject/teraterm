@@ -1,14 +1,14 @@
 ;;;
 ;;; file commands
 ;;;
-;call test_macrodir
-;call test_open
-;call test_filecommands
-;call test_filesearch
-;call test_filestat
-;call test_find
-;call test_folder
-;call test_password
+call test_macrodir
+call test_open
+call test_filecommands
+call test_filesearch
+call test_filestat
+call test_find
+call test_folder
+call test_password
 messagebox "finish all tests" "test_file.ttl"
 end
 
@@ -19,8 +19,8 @@ end
 :test_macrodir
 :retry
 getdir macro_dir
-dirnamebox "test_file.ttl folder for test/テストで使用するフォルダ" macro_dir
-s = "folder for test:\nテストで使用するフォルダ:\n"
+dirnamebox "test_file.ttl folder for test" macro_dir
+s = "folder for test:\n"
 strspecial s
 strconcat s macro_dir
 yesnobox s "test_file.ttl"
@@ -32,13 +32,16 @@ return
 ;;; test fileopen
 ;;;
 :test_open
-filenamebox '書き込みファイル' 1
+filenamebox '�������݃t�@�C��' 1
 if result == 0 goto test_open
 fname = inputstr
+fileopen fh fname 1 1
+if fh <> -1 messagebox "check fileopen" "test_file.ttl"
 fileopen fh fname 1
-filewrite fh "testこんにちは안녕하세요"#13#10
-filewriteln fh "testこんにちは안녕하세요"#13#10
+filewrite fh "test hello"#13#10
+filewriteln fh "test hello"#13#10
 fileclose fh
+filedelete fname
 return
 
 ;;;
@@ -53,22 +56,22 @@ return
 ;;; fileconcat
 ;;;
 :test_filecommands
-fname_1 = "00こんにちは.txt"
+fname_1 = "01_hello.txt"
 fileopen fh fname_1 1
-filewrite fh "test1 こんにちは안녕하세요"#13#10
+filewrite fh "test1 hello"#13#10
 fileclose fh
-fname_2 = "00مرحبا هناك.txt"
+fname_2 = "02_hello.txt"
 filerename fname_1 fname_2
 if result <> 0 messagebox "filerename error" "test_file.ttl"
 filecreate fh fname_1
-filewriteln fh "test2 こんにちは안녕하세요"
+filewriteln fh "test2 hello"
 fileclose fh
 messagebox "checkfiles 1" "test_file.ttl"
 fileconcat fname_1 fname_2
 messagebox "checkfiles 2" "test_file.ttl"
 
 if result <> 0 messagebox "fileconcat error" "test_file.ttl"
-fname_3 = "00привет там.txt"
+fname_3 = "03_hello.txt"
 filecopy fname_1 fname_3
 if result <> 0 messagebox "filecopy error" "test_file.ttl"
 filetruncate fname_1 1024
@@ -90,11 +93,11 @@ return
 ;;; filesearch
 ;;;
 :test_filesearch
-fname = "hello ワールド.bin"
+fname = "hello world.bin"
 filesearch fname
 if result = 1 messagebox "check filesearch 1" "test_file.ttl"
-;;fileopen fh fname 1 1	;@@@@ TODO read only でファイルが生成できてしまう
 fileopen fh fname 1
+if fh = -1 messagebox "check fileopen" "test_file.ttl"
 filewriteln fh "this is hello world"
 fileclose fh
 filesearch fname
@@ -108,7 +111,7 @@ return
 ;;; filestat
 ;;;
 :test_filestat
-fname = "statテスト.bin"
+fname = "stat_test.bin"
 filetruncate fname 10240
 filestat fname size
 if result = -1 messagebox "check filestat 1" "test_file.ttl"
@@ -146,13 +149,13 @@ return
 ;;; getfileattr
 ;;;
 :test_folder
-dname = "フォルダمجلدaa"
+dname = "folder_aa"
 foldersearch dname
 if result == 1 messagebox "check foldersearch 1" "test_file.ttl"
-foldercreate "フォルダمجلدaa"
-fname = "フォルダمجلدaa/test.txt"
+foldercreate "folder_aa"
+fname = "folder_aa/test.txt"
 filecreate fh fname
-filewriteln fh "こんにちは"
+filewriteln fh "hello"
 fileclose fh
 getfileattr fname
 if result == -1 messagebox "check getfileattr" "test_file.ttl"
@@ -178,7 +181,7 @@ return
 ;;; delpassword
 ;;;
 :test_password
-pwfile = "パスワード.txt"
+pwfile = "password.txt"
 filedelete pwfile
 pw1 = "password"
 setpassword pwfile "password1" pw1

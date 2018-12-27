@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2006-2018 TeraTerm Project
  * All rights reserved.
@@ -61,12 +61,12 @@ static void init()
 
 	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
-			// SetDefaultDllDirectories() ãŒä½¿ãˆã‚‹å ´åˆã¯ã€æ¤œç´¢ãƒ‘ã‚¹ã‚’ %WINDOWS%\system32 ã®ã¿ã«è¨­å®šã™ã‚‹
+			// SetDefaultDllDirectories() ‚ªg‚¦‚éê‡‚ÍAŒŸõƒpƒX‚ğ %WINDOWS%\system32 ‚Ì‚İ‚Éİ’è‚·‚é
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
 		}
 		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() ãŒä½¿ãˆãªãã¦ã‚‚ã€SetDllDirectory() ãŒä½¿ãˆã‚‹å ´åˆã¯
-			// ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã ã‘ã§ã‚‚æ¤œç´¢ãƒ‘ã‚¹ã‹ã‚‰ã¯ãšã—ã¦ãŠãã€‚
+			// SetDefaultDllDirectories() ‚ªg‚¦‚È‚­‚Ä‚àASetDllDirectory() ‚ªg‚¦‚éê‡‚Í
+			// ƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚¾‚¯‚Å‚àŒŸõƒpƒX‚©‚ç‚Í‚¸‚µ‚Ä‚¨‚­B
 			(*setDllDir)("");
 		}
 	}
@@ -116,17 +116,17 @@ static BOOL OnIdle(LONG lCount)
 				switch (ActiveWin) {
 				case IdVT:
 					Change =  ((CVTWindow*)pVTWin)->Parse();
-					// TEK windowã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ä¸­ã« pause ã‚’ä½¿ã†ã¨ã€CPUä½¿ç”¨ç‡100%ã¨ãªã‚‹
-					// ç¾è±¡ã¸ã®æš«å®šå¯¾å‡¦ã€‚(2006.2.6 yutaka)
-					// å¾…ã¡æ™‚é–“ã‚’ãªãã—ã€ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚¹ã‚¤ãƒƒãƒã ã‘ã«ã™ã‚‹ã€‚(2006.3.20 yutaka)
+					// TEK window‚ÌƒAƒNƒeƒBƒu’†‚É pause ‚ğg‚¤‚ÆACPUg—p—¦100%‚Æ‚È‚é
+					// Œ»Û‚Ö‚Ìb’è‘ÎˆB(2006.2.6 yutaka)
+					// ‘Ò‚¿ŠÔ‚ğ‚È‚­‚µAƒRƒ“ƒeƒLƒXƒgƒXƒCƒbƒ`‚¾‚¯‚É‚·‚éB(2006.3.20 yutaka)
 					Sleep(0);
 					break;
 
 				case IdTEK:
 					if (pTEKWin != NULL) {
 						Change = ((CTEKWindow*)pTEKWin)->Parse();
-						// TEK windowã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ä¸­ã« pause ã‚’ä½¿ã†ã¨ã€CPUä½¿ç”¨ç‡100%ã¨ãªã‚‹
-						// ç¾è±¡ã¸ã®æš«å®šå¯¾å‡¦ã€‚(2006.2.6 yutaka)
+						// TEK window‚ÌƒAƒNƒeƒBƒu’†‚É pause ‚ğg‚¤‚ÆACPUg—p—¦100%‚Æ‚È‚é
+						// Œ»Û‚Ö‚Ìb’è‘ÎˆB(2006.2.6 yutaka)
 						Sleep(1);
 					}
 					else {
@@ -182,10 +182,10 @@ static BOOL OnIdle(LONG lCount)
 
 		/* Receiver */
 		if (DDELog && cv.DCount >0) {
-			// ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ãŒã¾ã DDEã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¸é€ã‚‰ã‚Œã¦ã„ãªã„å ´åˆã¯ã€
-			// TCPãƒ‘ã‚±ãƒƒãƒˆã®å—ä¿¡ã‚’è¡Œã‚ãªã„ã€‚
-			// é€£ç¶šã—ã¦å—ä¿¡ã‚’è¡Œã†ã¨ã€ãƒ­ã‚°ãƒãƒƒãƒ•ã‚¡ãŒãƒ©ã‚¦ãƒ³ãƒ‰ãƒ­ãƒ“ãƒ³ã«ã‚ˆã‚Šæœªé€ä¿¡ã®ãƒ‡ãƒ¼ã‚¿ã‚’
-			// ä¸Šæ›¸ãã—ã¦ã—ã¾ã†å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚(2007.6.14 yutaka)
+			// ƒƒOƒoƒbƒtƒ@‚ª‚Ü‚¾DDEƒNƒ‰ƒCƒAƒ“ƒg‚Ö‘—‚ç‚ê‚Ä‚¢‚È‚¢ê‡‚ÍA
+			// TCPƒpƒPƒbƒg‚ÌóM‚ğs‚í‚È‚¢B
+			// ˜A‘±‚µ‚ÄóM‚ğs‚¤‚ÆAƒƒOƒoƒbƒtƒ@‚ªƒ‰ƒEƒ“ƒhƒƒrƒ“‚É‚æ‚è–¢‘—M‚Ìƒf[ƒ^‚ğ
+			// ã‘‚«‚µ‚Ä‚µ‚Ü‚¤‰Â”\«‚ª‚ ‚éB(2007.6.14 yutaka)
 
 		} else {
 			CommReceive(&cv);
@@ -220,51 +220,6 @@ HWND GetHWND()
 	return main_window;
 }
 
-static void SetDialogFont()
-{
-	LOGFONTA logfont;
-	BOOL result;
-
-	// æ˜ç¤ºçš„ã«æŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ãã‚Œã«å¾“ã†
-	result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, ts.UILanguageFile);
-
-	// æ˜ç¤ºã•ã‚Œã¦ã„ãªã„å ´åˆ
-	if (result == FALSE) {
-		// ã‚¬ã‚¤ãƒ‰ãƒ©ã‚¤ãƒ³ã«æ²¿ã£ãŸè¨­å®šã‚’è¡Œã†
-		// https://msdn.microsoft.com/ja-jp/library/windows/desktop/aa511282.aspx
-		if (IsWindowsVistaOrLater()) {
-			// Windows Vistaä»¥é™ Segoe UI
-			strcpy(logfont.lfFaceName, "Segoe UI");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -9;
-			logfont.lfWidth = 0;
-		} else if (IsWindows2000OrLater()) {
-			// WindowsÂ®XP ãŠã‚ˆã³ Windows 2000 ã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã™ã‚‹å ´åˆã¯ã€
-			// 8 ãƒã‚¤ãƒ³ãƒˆ MS Shell Dlg 2 æ“¬ä¼¼ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã—ã¾ã™ã€‚
-			// ã“ã®ãƒ•ã‚©ãƒ³ãƒˆã¯ Tahoma ã«ãƒãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã¾ã™ã€‚
-			strcpy(logfont.lfFaceName, "MS Shell Dlg 2");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -8;
-			logfont.lfWidth = 0;
-		} else {
-			// ä»¥å‰ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã™ã‚‹å ´åˆã¯
-			// 8 ãƒã‚¤ãƒ³ãƒˆ MS Shell Dlg æ“¬ä¼¼ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã—ã¾ã™
-			// MS Sans Serif ã«ãã‚Œãã‚Œãƒãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã¾ã™
-			strcpy(logfont.lfFaceName, "MS Shell Dlg");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -8;
-			logfont.lfWidth = 0;
-		}
-		result = TRUE;
-	}
-
-	if (result) {
-		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-	} else {
-		TTSetDlgFont(NULL, 0, 0);
-	}
-}
-
 static HWND hModalWnd;
 
 void AddModalHandle(HWND hWnd)
@@ -291,7 +246,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
-	SetDialogFont();
+	SetDialogFont(NULL, ts.UILanguageFile);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
@@ -305,9 +260,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 
 		if (m_pMainWnd->m_hAccel != NULL) {
 			if (!MetaKey(ts.MetaKey)) {
-				// matakeyãŒæŠ¼ã•ã‚Œã¦ã„ãªã„
+				// matakey‚ª‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢
 				if (TranslateAccelerator(m_pMainWnd->m_hWnd , m_pMainWnd->m_hAccel, &msg)) {
-					// ã‚¢ã‚¯ã‚»ãƒ©ãƒ¬ãƒ¼ã‚¿ãƒ¼ã‚­ãƒ¼ã‚’å‡¦ç†ã—ãŸ
+					// ƒAƒNƒZƒ‰ƒŒ[ƒ^[ƒL[‚ğˆ—‚µ‚½
 					message_processed = true;
 				}
 			}
@@ -319,16 +274,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 		}
 
 		while (!PeekMessage(&msg, NULL, NULL, NULL, PM_NOREMOVE)) {
-			// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„
+			// ƒƒbƒZ[ƒW‚ª‚È‚¢
 			if (!OnIdle(lCount)) {
-				// idleä¸è¦
-				if (SleepTick < 500) {	// æœ€å¤§ 501msæœªæº€
+				// idle•s—v
+				if (SleepTick < 500) {	// Å‘å 501ms–¢–
 					SleepTick += 2;
 				}
 				lCount = 0;
 				Sleep(SleepTick);
 			} else {
-				// è¦idle
+				// —vidle
 				SleepTick = 0;
 				lCount++;
 			}
