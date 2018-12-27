@@ -612,7 +612,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=&Закрытый ключ хоста:
 DLG_AUTHSETUP_CHECKAUTH=&Проверять до входа, включены ли методы аутентификации (SSH2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=Выбрать файл с закрытым ключом RSA/DSA/ECDSA/ED25519
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=Вы должны указать файл, содержащий закрытый ключ RSA/DSA/ECDSA/ED25519.
 MSG_READKEY_ERROR=Ошибка чтения файла закрытого ключа SSH2\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Ошибка аутентификации Rhosts, потому, что метод не был установлен по умолчанию.\nДля использования аутентификации Rhosts в TTSSH, вы должны установить его по умолчанию путем перезагрузки\nTTSSH и выбрать "SSH Authentication..." в меню инсталляции перед подключением.

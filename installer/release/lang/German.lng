@@ -612,7 +612,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=rhosts-Schlüssel:
 DLG_AUTHSETUP_CHECKAUTH=Prüfe die Authentifizierungsmethoden vor dem Logins (SSH2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=DSA/RSA/ECDSA/ED25519-Schlüssel auswählen
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=Bitte einen DSA/RSA/ECDSA/ED25519-Schlüssel auswählen.
 MSG_READKEY_ERROR=Lesefehler des DSA/RSA/ECDSA/ED25519-Schlüssels\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts authentication will probably fail because it was not the default authentication method.\nTo use Rhosts authentication in TTSSH, you need to set it to be the default by restarting\nTTSSH and selecting "SSH Authentication..." from the Setup menubefore connecting.

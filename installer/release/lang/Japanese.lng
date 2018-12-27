@@ -608,7 +608,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=ホスト鍵(&F):
 DLG_AUTHSETUP_CHECKAUTH=ログイン前にサーバで有効な認証方式を確認する (SSH2)(&C)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA/ECDSA/ED25519秘密鍵ファイルの選択
-FILEDLG_OPEN_PRIVATEKEY_FILTER=秘密鍵ファイル\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0すべてのファイル(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=秘密鍵ファイル\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEMファイル(*.pem)\0*.pem\0すべてのファイル(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=RSA/DSA/ECDSA/ED25519秘密鍵の含まれるファイルを指定してください
 MSG_READKEY_ERROR=SSH2秘密鍵の読み込みに失敗しました\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts 認証は標準の認証方式ではないため, 認証に失敗するかもしれません.\nRhosts 認証をTTSSH で使用するには, Rhosts 認証を標準に設定後TTSSH を再起動し, 接続前に設定メニューから"SSH 認証..." を選択して下さい.

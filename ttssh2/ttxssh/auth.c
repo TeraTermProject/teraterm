@@ -379,7 +379,7 @@ static int get_key_file_name(HWND parent, char *buf, int bufsize, PTInstVar pvar
 	// フィルタの追加 (2004.12.19 yutaka)
 	// 3ファイルフィルタの追加 (2005.4.26 yutaka)
 	UTIL_get_lang_msg("FILEDLG_OPEN_PRIVATEKEY_FILTER", pvar,
-	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0id_ed25519(SSH2)\\0id_ed25519\\0PuTTY(*.ppk)\\0*.ppk\\0all(*.*)\\0*.*\\0\\0");
+	                  "identity files\\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\\0identity(RSA1)\\0identity\\0id_rsa(SSH2)\\0id_rsa\\0id_dsa(SSH2)\\0id_dsa\\0id_ecdsa(SSH2)\\0id_ecdsa\\0id_ed25519(SSH2)\\0id_ed25519\\0PuTTY(*.ppk)\\0*.ppk\\0PEM files(*.pem)\\0*.pem\\0all(*.*)\\0*.*\\0\\0");
 	memcpy(filter, pvar->ts->UIMsg, sizeof(filter));
 	params.lpstrFilter = filter;
 	params.lpstrCustomFilter = NULL;

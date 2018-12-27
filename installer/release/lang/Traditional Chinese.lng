@@ -612,7 +612,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=主機密鑰文件(&F)：
 DLG_AUTHSETUP_CHECKAUTH=登錄前檢查已經啟用的認證方式(SSH2)(&C)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=選擇 RSA/DSA/ECDSA/ED25519 密鑰文件
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=請選擇一個包含 RSA/DSA/ECDSA/ED25519 密鑰的文件。
 MSG_READKEY_ERROR=RSA/DSA/ECDSA/ED25519 密鑰讀取錯誤\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=rhosts文件的身份認證可能會失敗，因為它不是默認的身份認證方法。\n要在TTSSH中使用rhosts認證，你需要通過重啟TTSSH，從設定選單選擇「SSH 認證...」，將它設定為默認，然後再連接。
