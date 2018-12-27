@@ -207,51 +207,6 @@ static void uninit_TTSSH(PTInstVar pvar)
 	ssh_heartbeat_lock_finalize();
 }
 
-static void _SetDialogFont(const char *UILanguageFile)
-{
-	LOGFONTA logfont;
-	BOOL result;
-
-	// 明示的に指定されている場合はそれに従う
-	result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
-
-	// 明示されていない場合
-	if (result == FALSE) {
-		// ガイドラインに沿った設定を行う
-		// https://msdn.microsoft.com/ja-jp/library/windows/desktop/aa511282.aspx
-		if (IsWindowsVistaOrLater()) {
-			// Windows Vista以降 Segoe UI
-			strcpy(logfont.lfFaceName, "Segoe UI");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -9;
-			logfont.lfWidth = 0;
-		} else if (IsWindows2000OrLater()) {
-			// WindowsXP および Windows 2000 をターゲットとする場合は、
-			// 8 ポイント MS Shell Dlg 2 擬似フォントを使用します。
-			// このフォントは Tahoma にマッピングされます。
-			strcpy(logfont.lfFaceName, "MS Shell Dlg 2");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -8;
-			logfont.lfWidth = 0;
-		} else {
-			// 以前のバージョンをターゲットとする場合は
-			// 8 ポイント MS Shell Dlg 擬似フォントを使用します
-			// MS Sans Serif にそれぞれマッピングされます
-			strcpy(logfont.lfFaceName, "MS Shell Dlg");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -8;
-			logfont.lfWidth = 0;
-		}
-		result = TRUE;
-	}
-
-	if (result) {
-		TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-	} else {
-		TTSetDlgFont(NULL, 0, 0);
-	}
-}
-
 static void PASCAL TTXInit(PTTSet ts, PComVar cv)
 {
 	pvar->settings = *pvar->ts_SSH;
@@ -262,7 +217,7 @@ static void PASCAL TTXInit(PTTSet ts, PComVar cv)
 	pvar->err_msg = NULL;
 
 	init_TTSSH(pvar);
-	_SetDialogFont(ts->UILanguageFile);
+	SetDialogFont("TTSSH", ts->UILanguageFile);
 }
 
 static void normalize_generic_order(char *buf, char default_strings[], int default_strings_len)
@@ -280,7 +235,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 	}
 
 	// 指定された文字列を走査し、許可されていない文字、重複する文字は削除する。
-	// 
+	//
 	// ex. (i=5 の文字を削除する)
 	// i=012345
 	//   >:=9<87;A@?B3026(\0)
@@ -288,7 +243,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 	//         <------------>
 	//       ↓
 	//   >:=9<7;A@?B3026(\0)
-	//         
+	//
 	for (i = 0; buf[i] != 0; i++) {
 		int num = buf[i] - '0';
 
@@ -308,7 +263,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 	}
 
 	// 指定されていない文字があれば、disabled lineの直前に挿入する。
-	// 
+	//
 	// ex. (Zを挿入する)
 	//                k
 	//   >:=9<87;A@?B3026(\0)
@@ -318,7 +273,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 	//   >:=9<87;A@?B30026(\0)
 	//       ↓        k
 	//   >:=9<87;A@?B3Z026(\0)
-	//       
+	//
 	for (j = 0; j < default_strings_len && default_strings[j] != 0; j++) {
 		int num = default_strings[j];
 
@@ -1582,7 +1537,7 @@ static BOOL CALLBACK TTXHostDlg(HWND dlg, UINT msg, WPARAM wParam,
 			DlgHostFont = NULL;
 		}
 #endif
-		
+
 		// SetFocus()でフォーカスをあわせた場合、FALSEを返す必要がある。
 		// TRUEを返すと、TABSTOP対象の一番はじめのコントロールが選ばれる。
 		// (2004.11.23 yutaka)
@@ -1898,7 +1853,7 @@ static void PASCAL TTXParseParam(PCHAR param, PTTSet ts, PCHAR DDETopic) {
 	}
 
 	cur = start;
-	while (next = GetParam(option, opt_len, cur)) {	
+	while (next = GetParam(option, opt_len, cur)) {
 		DequoteParam(option, opt_len, option);
 		action = OPTION_NONE;
 
@@ -2533,7 +2488,7 @@ static void init_about_dlg(PTInstVar pvar, HWND dlg)
 static WNDPROC g_defAboutDlgEditWndProc;  // Edit Controlのサブクラス化用
 static int g_deltaSumAboutDlg = 0;        // マウスホイールのDelta累積用
 
-static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
+static LRESULT CALLBACK AboutDlgEditWindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	WORD keys;
 	short delta;
@@ -3688,8 +3643,8 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
-	unsigned char *ed25519_sk; 
-	unsigned char *ed25519_pk; 
+	unsigned char *ed25519_sk;
+	unsigned char *ed25519_pk;
 	ssh_keytype type;
 } ssh_private_key_t;
 
@@ -3699,8 +3654,8 @@ typedef struct {
 	RSA *rsa;
 	DSA *dsa;
 	EC_KEY *ecdsa;
-	unsigned char *ed25519_sk; 
-	unsigned char *ed25519_pk; 
+	unsigned char *ed25519_sk;
+	unsigned char *ed25519_pk;
 	ssh_keytype type;
 } ssh_public_key_t;
 
@@ -3765,7 +3720,7 @@ static BOOL generate_ssh_key(ssh_keytype type, int bits, void (*cbfunc)(int, int
 		public_key.rsa = pub;
 		break;
 	}
-	
+
 	case KEY_DSA:
 	{
 		DSA *priv = NULL;
@@ -4123,7 +4078,7 @@ static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
 			_snprintf_s(recvdir, sizeof(recvdir), _TRUNCATE, "%s", pvar->ts->FileDir);
 		}
 		SetDlgItemTextA(dlg, IDC_RECVFILE_TO, recvdir);
-	
+
 #ifdef SFTP_DEBUG
 		ShowWindow(GetDlgItem(dlg, IDC_SFTP_TEST), SW_SHOW);
 #endif
@@ -4350,7 +4305,7 @@ static void init_password_control(HWND dlg, int item)
 	buffer_t *kdf = NULL;
 	buffer_t *encoded = NULL;
 	buffer_t *blob = NULL;
-	int blocksize, keylen, ivlen, authlen, i, n; 
+	int blocksize, keylen, ivlen, authlen, i, n;
 	unsigned char *key = NULL, salt[SALT_LEN];
 	char *kdfname = KDFNAME;
 	EVP_CIPHER_CTX cipher_ctx;
@@ -4392,7 +4347,7 @@ static void init_password_control(HWND dlg, int item)
 	// 暗号化の準備
 	// TODO: OpenSSH 6.5では -Z オプションで、暗号化アルゴリズムを指定可能だが、
 	// ここでは"AES256-CBC"に固定とする。
-	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT, 
+	cipher_init_SSH2(&cipher_ctx, key, keylen, key + keylen, ivlen, CIPHER_ENCRYPT,
 		get_cipher_EVP_CIPHER(cipher), 0, 0, pvar);
 	SecureZeroMemory(key, keylen + ivlen);
 	free(key);
@@ -5285,7 +5240,7 @@ error:;
 			} else if (private_key.type == KEY_ED25519) { // SSH2 ED25519
 				save_bcrypt_private_key(buf, filename, comment, dlg, pvar, rounds);
 
-			} else { // SSH2 RSA, DSA, ECDSA			
+			} else { // SSH2 RSA, DSA, ECDSA
 				int len;
 				FILE *fp;
 				const EVP_CIPHER *cipher;
@@ -5312,7 +5267,7 @@ error:;
 					MessageBox(dlg, uimsg1, uimsg2, MB_OK | MB_ICONEXCLAMATION);
 					break;
 				}
- 
+
 				switch (key_type) {
 				case KEY_RSA: // RSA
 					ret = PEM_write_RSAPrivateKey(fp, private_key.rsa, cipher, buf, len, NULL, NULL);
@@ -5459,7 +5414,7 @@ static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd)
 static void _dquote_string(char *str, char *dst, int dst_len)
 {
 	int i, len, n;
-	
+
 	len = strlen(str);
 	n = 0;
 	for (i = 0 ; i < len ; i++) {

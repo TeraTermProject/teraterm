@@ -31,6 +31,8 @@
 
 #include <stdio.h>
 #include <crtdbg.h>
+#include <windows.h>
+#include <commctrl.h>
 #include "teraterm.h"
 #include "ttm_res.h"
 #include "ttmmain.h"
@@ -120,56 +122,11 @@ HWND GetHWND()
 
 /////////////////////////////////////////////////////////////////////////////
 
-static void SetDialogFont()
-{
-	LOGFONTA logfont;
-	BOOL result;
-
-	// 明示的に指定されている場合はそれに従う
-	result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
-
-	// 明示されていない場合
-	if (result == FALSE) {
-		// ガイドラインに沿った設定を行う
-		// https://msdn.microsoft.com/ja-jp/library/windows/desktop/aa511282.aspx
-		if (IsWindowsVistaOrLater()) {
-			// Windows Vista以降 Segoe UI
-			strcpy(logfont.lfFaceName, "Segoe UI");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -9;
-			logfont.lfWidth = 0;
-		} else if (IsWindows2000OrLater()) {
-			// WindowsXP および Windows 2000 をターゲットとする場合は、
-			// 8 ポイント MS Shell Dlg 2 擬似フォントを使用します。
-			// このフォントは Tahoma にマッピングされます。
-			strcpy(logfont.lfFaceName, "MS Shell Dlg 2");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -8;
-			logfont.lfWidth = 0;
-		} else {
-			// 以前のバージョンをターゲットとする場合は
-			// 8 ポイント MS Shell Dlg 擬似フォントを使用します
-			// MS Sans Serif にそれぞれマッピングされます
-			strcpy(logfont.lfFaceName, "MS Shell Dlg");
-			logfont.lfCharSet = 0;
-			logfont.lfHeight = -8;
-			logfont.lfWidth = 0;
-		}
-		result = TRUE;
-	}
-
-	if (result) {
-		TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
-	} else {
-		TTSetDlgFont(NULL, 0, 0);
-	}
-}
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
                    LPSTR lpszCmdLine, int nCmdShow)
 {
 	hInst = hInstance;
-	static HMODULE HTTSET = NULL;
+//	static HMODULE HTTSET = NULL;
 	LONG lCount = 0;
 	DWORD SleepTick = 1;
 
@@ -178,16 +135,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 #endif
 
 	init();
-//	InitCommonControls();
+	InitCommonControls();
 	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
-	SetDialogFont();
+	SetDialogFont(NULL, UILanguageFile);
 
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow();
 	pCCtrlWindow->Create();
 //	pCCtrlWindow->ShowWindow(SW_SHOW);
-//	tmpWnd->ShowWindow(SW_SHOW);
-	Busy = FALSE;  
+	Busy = FALSE;
 
 	HWND hWnd = pCCtrlWindow->GetSafeHwnd();
 	CtrlWnd = hWnd;
@@ -237,7 +193,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	// TODO すでに閉じられている、この処理不要?
@@ -247,4 +203,3 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	pCCtrlWindow = NULL;
 	return ExitCode;
 }
-

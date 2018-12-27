@@ -1,4 +1,4 @@
-﻿/*
+﻿/* -*- coding: utf-8-with-signature -*-	// TODO 文字コード
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2008-2018 TeraTerm Project
  * All rights reserved.
@@ -94,7 +94,7 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
 	*R = 0;
 	for (i = FirstId ; i <= LastId ; i++) {
 		if (SendDlgItemMessage(HDlg, i, BM_GETCHECK, 0, 0) != 0) {
-			*R = i - FirstId + 1;
+			*R = (WORD)(i - FirstId + 1);
 			return;
 		}
 	}
@@ -533,7 +533,7 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 		if (result == TRUE) {
 #if defined(UNICODE)
 			wchar_t face[LF_FACESIZE];
-			mbstowcs(face, logfont.lfFaceName, LF_FACESIZE);		// TODO MultiByteToWideChar()を使う
+			MultiByteToWideChar(CP_ACP, 0, logfont.lfFaceName, -1, face, LF_FACESIZE);
 			if (IsExistFont(face, logfont.lfCharSet, FALSE)) {
 				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 				return;
@@ -555,7 +555,7 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 		const DialogFontLists *list;
 		charset = GetDialogFontCandidate(&list);
 		while(list->face != NULL) {
-			if (IsExistFont(list->face, charset, TRUE)) {
+			if (IsExistFont(list->face, (BYTE)charset, TRUE)) {
 				TTSetDlgFont(list->face, list->height, charset);
 				return;
 			}

@@ -454,7 +454,7 @@ void TTSetDlgFontW(const wchar_t *face, int height, int charset)
 void TTSetDlgFontA(const char *face, int height, int charset)
 {
 	if (face != NULL) {
-		mbstowcs(FontFaceName, face, LF_FACESIZE);		// TODO MultiByteToWideChar()‚ðŽg‚¤
+		MultiByteToWideChar(CP_ACP, 0, face, -1, FontFaceName, LF_FACESIZE);
 	} else {
 		FontFaceName[0] = L'\0';
 	}
