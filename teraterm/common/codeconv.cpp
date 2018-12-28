@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 2018 TeraTerm Project
  * All rights reserved.
  *
@@ -39,12 +39,12 @@
 #endif
 
 /**
- *	wchar_tæ–‡å­—åˆ—ã‚’ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã¸å¤‰æ›
- *	@param[in]	*wstr_ptr	wchar_tæ–‡å­—åˆ—
- *	@param[in]	wstr_len	wchar_tæ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•)
- *	@param[in]	code_page	å¤‰æ›å…ˆã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
- *	@param[out]	*mb_len_	mbæ–‡å­—åˆ—é•·(NULLã®ã¨ãå†…éƒ¨ã‚¨ãƒ©ãƒ¼)
- *	@retval		mbæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *	wchar_t•¶š—ñ‚ğƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚Ö•ÏŠ·
+ *	@param[in]	*wstr_ptr	wchar_t•¶š—ñ
+ *	@param[in]	wstr_len	wchar_t•¶š—ñ’·(0‚Ì‚Æ‚«©“®)
+ *	@param[in]	code_page	•ÏŠ·æƒR[ƒhƒy[ƒW
+ *	@param[out]	*mb_len_	mb•¶š—ñ’·(NULL‚Ì‚Æ‚«“à•”ƒGƒ‰[)
+ *	@retval		mb•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
  */
 char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_)
 {
@@ -82,12 +82,12 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 }
 
 /**
- *	ãƒãƒ«ãƒãƒã‚¤ãƒˆæ–‡å­—åˆ—ã‚’wchar_tæ–‡å­—åˆ—ã¸å¤‰æ›
- *	@param[in]	*str_ptr	mb(char)æ–‡å­—åˆ—
- *	@param[in]	str_len		mb(char)æ–‡å­—åˆ—é•·(0ã®ã¨ãè‡ªå‹•)
- *	@param[in]	code_page	å¤‰æ›å…ˆã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸
- *	@param[out]	*w_len_		wchar_tæ–‡å­—åˆ—é•·
- *	@retval		mbæ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿(NULLã®æ™‚å¤‰æ›ã‚¨ãƒ©ãƒ¼)
+ *	ƒ}ƒ‹ƒ`ƒoƒCƒg•¶š—ñ‚ğwchar_t•¶š—ñ‚Ö•ÏŠ·
+ *	@param[in]	*str_ptr	mb(char)•¶š—ñ
+ *	@param[in]	str_len		mb(char)•¶š—ñ’·(0‚Ì‚Æ‚«©“®)
+ *	@param[in]	code_page	•ÏŠ·æƒR[ƒhƒy[ƒW
+ *	@param[out]	*w_len_		wchar_t•¶š—ñ’·
+ *	@retval		mb•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^(NULL‚Ì•ÏŠ·ƒGƒ‰[)
  */
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_)
 {
@@ -400,8 +400,8 @@ tc tc::fromUtf8(const char *strU8)
 	return _tc;
 }
 
-// voidãªã—ãŒä¸€èˆ¬çš„ã¨æ€ã‚ã‚Œã‚‹ãŒã€
-// VS2005ã§ãƒªãƒ³ã‚¯ã‚¨ãƒ©ãƒ¼ãŒå‡ºã¦ã—ã¾ã†ãŸã‚ void è¿½åŠ 
+// void‚È‚µ‚ªˆê”Ê“I‚Æv‚í‚ê‚é‚ªA
+// VS2005‚ÅƒŠƒ“ƒNƒGƒ‰[‚ªo‚Ä‚µ‚Ü‚¤‚½‚ß void ’Ç‰Á
 tc::operator const TCHAR *(void) const
 {
 	return cstr();

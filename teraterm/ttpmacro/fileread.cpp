@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 2018 TeraTerm Project
  * All rights reserved.
  *
@@ -41,10 +41,10 @@ typedef unsigned char uint8_t;
 #endif
 
 /**
- *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ¢ãƒªã«èª­ã¿è¾¼ã‚€
- *	@param[out]	*_len	ã‚µã‚¤ã‚º(æœ€å¾Œã«ä»˜åŠ ã•ã‚Œã‚‹"\0\0"ã‚’å«ã‚€)
- *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¸­èº«ã¸ã®ãƒã‚¤ãƒ³ã‚¿(ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨)
- *				NULL=ã‚¨ãƒ©ãƒ¼
+ *	ƒtƒ@ƒCƒ‹‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚Ş
+ *	@param[out]	*_len	ƒTƒCƒY(ÅŒã‚É•t‰Á‚³‚ê‚é"\0\0"‚ğŠÜ‚Ş)
+ *	@retval		ƒtƒ@ƒCƒ‹‚Ì’†g‚Ö‚Ìƒ|ƒCƒ“ƒ^(g—pŒãfree()‚·‚é‚±‚Æ)
+ *				NULL=ƒGƒ‰[
  */
 static void *LoadRawFile(FILE *fp, size_t *_len)
 {
@@ -55,7 +55,7 @@ static void *LoadRawFile(FILE *fp, size_t *_len)
 	size_t len = (size_t)pos;
 	char *buf = (char *)malloc(len + 2);
 	buf[len] = 0;
-	buf[len+1] = 0;		// UTF-16å¯¾ç­–
+	buf[len+1] = 0;		// UTF-16‘Îô
 	fread(buf, 1, len, fp);
 	len += 2;
 	*_len = len;
@@ -63,13 +63,13 @@ static void *LoadRawFile(FILE *fp, size_t *_len)
 }
 
 /**
- *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ¢ãƒªã«èª­ã¿è¾¼ã‚€
- *	ä¸­èº«ã¯UTF-8ã«å¤‰æ›ã•ã‚Œã‚‹
- *	ãƒ•ã‚¡ã‚¤ãƒ«ã®æœ€å¾Œã¯ '\0'ã§ã‚¿ãƒ¼ãƒŸãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹
+ *	ƒtƒ@ƒCƒ‹‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚Ş
+ *	’†g‚ÍUTF-8‚É•ÏŠ·‚³‚ê‚é
+ *	ƒtƒ@ƒCƒ‹‚ÌÅŒã‚Í '\0'‚Åƒ^[ƒ~ƒl[ƒg‚³‚ê‚Ä‚¢‚é
  *
- *	@param[out]	*_len	ã‚µã‚¤ã‚º(æœ€å¾Œã«ä»˜åŠ ã•ã‚Œã‚‹"\0"ã‚’å«ã‚€)
- *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¸­èº«ã¸ã®ãƒã‚¤ãƒ³ã‚¿(ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨)
- *				NULL=ã‚¨ãƒ©ãƒ¼
+ *	@param[out]	*_len	ƒTƒCƒY(ÅŒã‚É•t‰Á‚³‚ê‚é"\0"‚ğŠÜ‚Ş)
+ *	@retval		ƒtƒ@ƒCƒ‹‚Ì’†g‚Ö‚Ìƒ|ƒCƒ“ƒ^(g—pŒãfree()‚·‚é‚±‚Æ)
+ *				NULL=ƒGƒ‰[
  */
 char *LoadFileU8(FILE *fp, size_t *_len)
 {
@@ -122,17 +122,17 @@ char *LoadFileU8(FILE *fp, size_t *_len)
 		}
 	}
 
-	*_len = strlen((char *)buf)+1;	// æ”¹ã‚ã¦é•·ã•ã‚’è¨ˆã‚‹
+	*_len = strlen((char *)buf)+1;	// ‰ü‚ß‚Ä’·‚³‚ğŒv‚é
 	return (char *)buf;
 }
 
 /**
- *	ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ¢ãƒªã«èª­ã¿è¾¼ã‚€
- *	ä¸­èº«ã¯UTF-8ã«å¤‰æ›ã•ã‚Œã‚‹
+ *	ƒtƒ@ƒCƒ‹‚ğƒƒ‚ƒŠ‚É“Ç‚İ‚Ş
+ *	’†g‚ÍUTF-8‚É•ÏŠ·‚³‚ê‚é
  *
- *	@param[out]	*_len	ã‚µã‚¤ã‚º(æœ€å¾Œã«ä»˜åŠ ã•ã‚Œã‚‹"\0"ã‚’å«ã‚€)
- *	@retval		ãƒ•ã‚¡ã‚¤ãƒ«ã®ä¸­èº«ã¸ã®ãƒã‚¤ãƒ³ã‚¿(ä½¿ç”¨å¾Œfree()ã™ã‚‹ã“ã¨)
- *				NULL=ã‚¨ãƒ©ãƒ¼
+ *	@param[out]	*_len	ƒTƒCƒY(ÅŒã‚É•t‰Á‚³‚ê‚é"\0"‚ğŠÜ‚Ş)
+ *	@retval		ƒtƒ@ƒCƒ‹‚Ì’†g‚Ö‚Ìƒ|ƒCƒ“ƒ^(g—pŒãfree()‚·‚é‚±‚Æ)
+ *				NULL=ƒGƒ‰[
  */
 char *LoadFileU8A(const char *FileName, size_t *_len)
 {

@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
@@ -108,8 +108,8 @@ static void HandleInit()
 }
 
 /**
- *	@retval	ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ³ãƒ‰ãƒ«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹(0ï½)
- *			-1ã®ã¨ãã‚¨ãƒ©ãƒ¼
+ *	@retval	ƒtƒ@ƒCƒ‹ƒnƒ“ƒhƒ‹ƒCƒ“ƒfƒbƒNƒX(0`)
+ *			-1‚Ì‚Æ‚«ƒGƒ‰[
  */
 static int HandlePut(HANDLE FH)
 {
@@ -156,7 +156,7 @@ BOOL InitTTL(HWND HWin)
 	// System variables
 	NewIntVar("result",0);
 	NewIntVar("timeout",0);
-	NewIntVar("mtimeout",0);    // ãƒŸãƒªç§’å˜ä½ã®ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆç”¨ (2009.1.23 maya)
+	NewIntVar("mtimeout",0);    // ƒ~ƒŠ•b’PˆÊ‚Ìƒ^ƒCƒ€ƒAƒEƒg—p (2009.1.23 maya)
 	NewStrVar("inputstr","");
 	NewStrVar("matchstr","");   // for 'waitregex' command (2005.10.7 yutaka)
 	NewStrVar("groupmatchstr1","");   // for 'waitregex' command (2005.10.15 yutaka)
@@ -172,9 +172,9 @@ BOOL InitTTL(HWND HWin)
 	if (ParamCnt == 0) {
 		ParamCnt++;
 	}
-	NewIntVar("paramcnt",ParamCnt);  // ãƒ•ã‚¡ã‚¤ãƒ«åã‚‚å«ã‚€å¼•æ•°ã®å€‹æ•° (2012.4.10 yutaka)
+	NewIntVar("paramcnt",ParamCnt);  // ƒtƒ@ƒCƒ‹–¼‚àŠÜ‚Şˆø”‚ÌŒÂ” (2012.4.10 yutaka)
 
-	// æ—§å½¢å¼ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š (param1 ã€œ param9)
+	// ‹ŒŒ`®‚Ìƒpƒ‰ƒ[ƒ^İ’è (param1 ` param9)
 	NewStrVar("param1", ShortName);
 	if (Params) {
 		for (i=2; i<=9; i++) {
@@ -188,7 +188,7 @@ BOOL InitTTL(HWND HWin)
 		}
 	}
 
-	// æ–°å½¢å¼ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š (params[1ã€œParamCnt])
+	// VŒ`®‚Ìƒpƒ‰ƒ[ƒ^İ’è (params[1`ParamCnt])
 	if (NewStrAryVar("params", ParamCnt+1) == 0) {
 		Err = 0;
 		GetStrAryVarByName(&ParamsVarId, "params", &Err);
@@ -792,7 +792,7 @@ static unsigned int checksum8(int n, unsigned char c[])
 static unsigned int crc16(int n, unsigned char c[])
 {
 #define CRC16POLY1  0x1021U  /* x^{16}+x^{12}+x^5+1 */
-#define CRC16POLY2  0x8408U  /* å·¦å³é€†è»¢ */
+#define CRC16POLY2  0x8408U  /* ¶‰E‹t“] */
 
 	int i, j;
 	unsigned long r;
@@ -812,7 +812,7 @@ static unsigned long crc32(int n, unsigned char c[])
 #define CRC32POLY1 0x04C11DB7UL
 	/* x^{32}+x^{26}+x^{23}+x^{22}+x^{16}+x^{12}+x^{11]+
 	   x^{10}+x^8+x^7+x^5+x^4+x^2+x^1+1 */
-#define CRC32POLY2 0xEDB88320UL  /* å·¦å³é€†è»¢ */
+#define CRC32POLY2 0xEDB88320UL  /* ¶‰E‹t“] */
 	int i, j;
 	unsigned long r;
 
@@ -826,7 +826,7 @@ static unsigned long crc32(int n, unsigned char c[])
 	return r ^ 0xFFFFFFFFUL;
 }
 
-// ãƒã‚§ãƒƒã‚¯ã‚µãƒ ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ãƒ»å…±é€šãƒ«ãƒ¼ãƒãƒ³
+// ƒ`ƒFƒbƒNƒTƒ€ƒAƒ‹ƒSƒŠƒYƒ€E‹¤’Êƒ‹[ƒ`ƒ“
 WORD TTLDoChecksum(enum checksum_type type)
 {
 	TStrVal Str;
@@ -888,19 +888,19 @@ WORD TTLDoChecksumFile(enum checksum_type type)
 	if (Str[0]==0) return Err;
 
 	fh = CreateFile(Str,GENERIC_READ,0,NULL,OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,NULL); /* ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ */
+		FILE_ATTRIBUTE_NORMAL,NULL); /* ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“ */
 	if (fh == INVALID_HANDLE_VALUE) {
 		result = -1;
 		goto error;
 	}
-	/* ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒãƒ”ãƒ³ã‚°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä½œæˆ */
+	/* ƒtƒ@ƒCƒ‹ƒ}ƒbƒsƒ“ƒOƒIƒuƒWƒFƒNƒgì¬ */
 	hMap = CreateFileMapping(fh,NULL,PAGE_READONLY,0,0,NULL);
 	if (hMap == NULL) {
 		result = -1;
 		goto error;
 	}
 
-	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒƒãƒ—ã—ã€å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’lpBufã«å–å¾— */
+	/* ƒtƒ@ƒCƒ‹‚ğƒ}ƒbƒv‚µAæ“ªƒAƒhƒŒƒX‚ğlpBuf‚Éæ“¾ */
 	lpBuf = (LPBYTE)MapViewOfFile(hMap,FILE_MAP_READ,0,0,0);
 	if (lpBuf == NULL) {
 		result = -1;
@@ -1299,12 +1299,12 @@ WORD TTLExpandEnv()
 			return Err;
 		}
 
-		// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã«ç’°å¢ƒå¤‰æ•°ãŒå«ã¾ã‚Œã¦ã„ã‚‹ãªã‚‰ã°ã€å±•é–‹ã™ã‚‹ã€‚
+		// ƒtƒ@ƒCƒ‹ƒpƒX‚ÉŠÂ‹«•Ï”‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚È‚ç‚ÎA“WŠJ‚·‚éB
 		ExpandEnvironmentStrings(srcptr, deststr, MaxStrLen);
 		SetStrVal(VarId, deststr);
 	}
 	else { // expandenv strvar
-		// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã«ç’°å¢ƒå¤‰æ•°ãŒå«ã¾ã‚Œã¦ã„ã‚‹ãªã‚‰ã°ã€å±•é–‹ã™ã‚‹ã€‚
+		// ƒtƒ@ƒCƒ‹ƒpƒX‚ÉŠÂ‹«•Ï”‚ªŠÜ‚Ü‚ê‚Ä‚¢‚é‚È‚ç‚ÎA“WŠJ‚·‚éB
 		ExpandEnvironmentStrings(StrVarPtr(VarId), deststr, MaxStrLen);
 		SetStrVal(VarId, deststr);
 	}
@@ -1638,7 +1638,7 @@ WORD TTLFileLock()
 	GetIntVal(&FH,&Err);
 	if (Err!=0) return Err;
 
-	timeout = -1;  // ç„¡é™å¤§
+	timeout = -1;  // –³ŒÀ‘å
 	if (CheckParameterGiven()) {
 		GetIntVal(&timeout, &Err);
 		if (Err!=0) return Err;
@@ -1648,7 +1648,7 @@ WORD TTLFileLock()
 	dwStart = GetTickCount();
 	do {
 		ret = LockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
-		if (ret != 0) { // ãƒ­ãƒƒã‚¯æˆåŠŸ
+		if (ret != 0) { // ƒƒbƒN¬Œ÷
 			result = 0;  // success
 			break;
 		}
@@ -1674,7 +1674,7 @@ WORD TTLFileUnLock()
 	if (Err!=0) return Err;
 
 	ret = UnlockFile((HANDLE)FH, 0, 0, (DWORD)-1, (DWORD)-1);
-	if (ret != 0) { // ã‚¢ãƒ³ãƒ­ãƒƒã‚¯æˆåŠŸ
+	if (ret != 0) { // ƒAƒ“ƒƒbƒN¬Œ÷
 		SetResult(0);
 	} else {
 		SetResult(1);
@@ -1739,8 +1739,8 @@ WORD TTLFileReadln()
 
 
 // Format: fileread <file handle> <read byte> <strvar>
-// æŒ‡å®šã—ãŸãƒã‚¤ãƒˆæ•°ã ã‘ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€ã€‚
-// ãŸã ã—ã€<read byte>ã¯ 1ã€œ255 ã¾ã§ã€‚
+// w’è‚µ‚½ƒoƒCƒg”‚¾‚¯ƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚ŞB
+// ‚½‚¾‚µA<read byte>‚Í 1`255 ‚Ü‚ÅB
 // (2006.11.1 yutaka)
 WORD TTLFileRead()
 {
@@ -1749,7 +1749,7 @@ WORD TTLFileRead()
 	int fhi;
 	HANDLE FH;
 	int i, c;
-	int ReadByte;   // èª­ã¿è¾¼ã‚€ãƒã‚¤ãƒˆæ•°
+	int ReadByte;   // “Ç‚İ‚ŞƒoƒCƒg”
 	TStrVal Str;
 	BOOL EndFile, EndLine;
 	BYTE b;
@@ -1761,7 +1761,7 @@ WORD TTLFileRead()
 	GetStrVar(&VarId,&Err);
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
-	if ((Err==0) && (ReadByte < 1 || ReadByte > MaxStrLen-1))  // ç¯„å›²ãƒã‚§ãƒƒã‚¯
+	if ((Err==0) && (ReadByte < 1 || ReadByte > MaxStrLen-1))  // ”ÍˆÍƒ`ƒFƒbƒN
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
@@ -1821,7 +1821,7 @@ WORD TTLFileRename()
 		return Err;
 	}
 	if (rename(FName1,FName2) != 0) {
-		// ãƒªãƒãƒ¼ãƒ ã«å¤±æ•—ã—ãŸã‚‰ã€ã‚¨ãƒ©ãƒ¼ã§è¿”ã™ã€‚
+		// ƒŠƒl[ƒ€‚É¸”s‚µ‚½‚çAƒGƒ‰[‚Å•Ô‚·B
 		SetResult(-3);
 		return Err;
 	}
@@ -2027,9 +2027,9 @@ WORD TTLFileStrSeek2()
 		}
 	} while (!Last && (i!=Len));
 	if (i==Len) {
-		// ãƒ•ã‚¡ã‚¤ãƒ«ã®1ãƒã‚¤ãƒˆç›®ãŒãƒ’ãƒƒãƒˆã™ã‚‹ã¨ã€ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ãŒçªãç ´ã£ã¦
-		// INVALID_SET_FILE_POINTER ã«ãªã‚‹ã®ã§ã€
-		// ã‚¼ãƒ­ã‚ªãƒ•ã‚»ãƒƒãƒˆã«ãªã‚‹ã‚ˆã†ã«èª¿æ•´ã™ã‚‹ã€‚(2008.10.10 yutaka)
+		// ƒtƒ@ƒCƒ‹‚Ì1ƒoƒCƒg–Ú‚ªƒqƒbƒg‚·‚é‚ÆAƒtƒ@ƒCƒ‹ƒ|ƒCƒ“ƒ^‚ª“Ë‚«”j‚Á‚Ä
+		// INVALID_SET_FILE_POINTER ‚É‚È‚é‚Ì‚ÅA
+		// ƒ[ƒƒIƒtƒZƒbƒg‚É‚È‚é‚æ‚¤‚É’²®‚·‚éB(2008.10.10 yutaka)
 		if (pos == INVALID_SET_FILE_POINTER) 
 			_llseek(FH, 0, 0);
 		SetResult(1);
@@ -2068,7 +2068,7 @@ WORD TTLFileTruncate()
 		goto end;
 	}
 
-	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã—ãŸã‚µã‚¤ã‚ºã§åˆ‡ã‚Šè©°ã‚ã‚‹ã€‚
+	// ƒtƒ@ƒCƒ‹‚ğw’è‚µ‚½ƒTƒCƒY‚ÅØ‚è‹l‚ß‚éB
    ret = _sopen_s( &fh, FName, _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE );
    if (ret != 0) {
 		Err = ErrCantOpen;
@@ -2453,7 +2453,7 @@ WORD TTLGetIPv4Addr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// è‡ªåˆ†è‡ªèº«ã®å…¨IPv4ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚
+	// ©•ª©g‚Ì‘SIPv4ƒAƒhƒŒƒX‚ğæ“¾‚·‚éB
 	if (WSAStartup(MAKEWORD(2,2), &ws) != 0) {
 		SetResult(-1);
 		SetIntVal(VarId2, 0);
@@ -2492,7 +2492,7 @@ WORD TTLGetIPv4Addr()
 }
 
 
-// IPv6ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹ã€‚
+// IPv6ƒAƒhƒŒƒX‚ğ•¶š—ñ‚É•ÏŠ·‚·‚éB
 static void myInetNtop(int Family, char *pAddr, char *pStringBuf, size_t StringBufSize)
 {
 	int i;
@@ -2527,14 +2527,14 @@ WORD TTLGetIPv6Addr()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// GetAdaptersAddresses ãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã„ OS ã¯ã“ã“ã§ return
+	// GetAdaptersAddresses ‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚È‚¢ OS ‚Í‚±‚±‚Å return
 	if (!HasGetAdaptersAddresses()) {
 		SetResult(-1);
 		SetIntVal(VarId2, 0);
 		return Err;
 	}
 
-	// è‡ªåˆ†è‡ªèº«ã®å…¨IPv6ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚
+	// ©•ª©g‚Ì‘SIPv6ƒAƒhƒŒƒX‚ğæ“¾‚·‚éB
 	arysize = GetStrAryVarSize(VarId);
 	num = 0;
 	result = 1;
@@ -2618,7 +2618,7 @@ WORD TTLGetPassword()
 
 	SetStrVal(VarId,Temp2);
 
-	SetResult(result);  // æˆåŠŸå¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
+	SetResult(result);  // ¬Œ÷‰Â”Û‚ğİ’è‚·‚éB
 	return Err;
 }
 
@@ -2633,30 +2633,30 @@ WORD TTLSetPassword()
 	int result = 0;  /* failure */
 
 	Err = 0;
-	GetStrVal(FileNameStr, &Err);   // ãƒ•ã‚¡ã‚¤ãƒ«å
-	GetStrVal(KeyStr, &Err);  // ã‚­ãƒ¼å
+	GetStrVal(FileNameStr, &Err);   // ƒtƒ@ƒCƒ‹–¼
+	GetStrVal(KeyStr, &Err);  // ƒL[–¼
 	GetStrVar(&VarId, &Err);
-	VarStr = StrVarPtr(VarId);  // å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	VarStr = StrVarPtr(VarId);  // •Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// æ–‡å­—åˆ—ãŒç©ºã®å ´åˆã¯ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹ã€‚
+	// •¶š—ñ‚ª‹ó‚Ìê‡‚ÍƒGƒ‰[‚Æ‚·‚éB
 	if (FileNameStr[0]==0 || 
 	    KeyStr[0]==0 ||
-	    VarStr[0]==0)   // "getpassword"åŒæ§˜ã€ç©ºãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚‚è¨±å¯ã—ãªã„ã€‚
+	    VarStr[0]==0)   // "getpassword"“¯—lA‹óƒpƒXƒ[ƒh‚à‹–‰Â‚µ‚È‚¢B
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
 	GetAbsPath(FileNameStr, sizeof(FileNameStr));
 
-	// ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’æš—å·åŒ–ã™ã‚‹ã€‚
+	// ƒpƒXƒ[ƒh‚ğˆÃ†‰»‚·‚éB
 	Encrypt(VarStr, Temp);
 
 	if (WritePrivateProfileString("Password", KeyStr, Temp, FileNameStr) != 0) 
 		result = 1;  /* success */
 
-	SetResult(result);  // æˆåŠŸå¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
+	SetResult(result);  // ¬Œ÷‰Â”Û‚ğİ’è‚·‚éB
 	return Err;
 }
 
@@ -2669,13 +2669,13 @@ WORD TTLIsPassword()
 	int result = 0; 
 
 	Err = 0;
-	GetStrVal(FileNameStr, &Err);   // ãƒ•ã‚¡ã‚¤ãƒ«å
-	GetStrVal(KeyStr, &Err);  // ã‚­ãƒ¼å
+	GetStrVal(FileNameStr, &Err);   // ƒtƒ@ƒCƒ‹–¼
+	GetStrVal(KeyStr, &Err);  // ƒL[–¼
 	if ((Err==0) && (GetFirstChar()!=0))
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// æ–‡å­—åˆ—ãŒç©ºã®å ´åˆã¯ã‚¨ãƒ©ãƒ¼ã¨ã™ã‚‹ã€‚
+	// •¶š—ñ‚ª‹ó‚Ìê‡‚ÍƒGƒ‰[‚Æ‚·‚éB
 	if (FileNameStr[0]==0 || 
 	    KeyStr[0]==0)
 		Err = ErrSyntax;
@@ -2692,7 +2692,7 @@ WORD TTLIsPassword()
 		result = 1; 
 	}
 
-	SetResult(result);  // æˆåŠŸå¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
+	SetResult(result);  // ¬Œ÷‰Â”Û‚ğİ’è‚·‚éB
 	return Err;
 }
 
@@ -2752,7 +2752,7 @@ WORD TTLGetTime(WORD mode)
 		}
 		set_result = TRUE;
 
-		// ã‚¿ã‚¤ãƒ ã‚¾ãƒ¼ãƒ³ã®æŒ‡å®šãŒã‚ã‚Œã°ã€localtime()ã«å½±éŸ¿ã•ã›ã‚‹ã€‚(2012.5.2 yutaka)
+		// ƒ^ƒCƒ€ƒ][ƒ“‚Ìw’è‚ª‚ ‚ê‚ÎAlocaltime()‚É‰e‹¿‚³‚¹‚éB(2012.5.2 yutaka)
 		if (CheckParameterGiven()) {
 			GetStrVal(tzStr, &Err);
 			if (Err!=0) return Err;
@@ -2840,7 +2840,7 @@ WORD TTLGetTTDir()
 	return Err;
 }
 
-// COMãƒãƒ¼ãƒˆã‹ã‚‰ãƒ¬ã‚¸ã‚¹ã‚¿å€¤ã‚’èª­ã‚€ã€‚
+// COMƒ|[ƒg‚©‚çƒŒƒWƒXƒ^’l‚ğ“Ç‚ŞB
 // (2015.1.8 yutaka)
 WORD TTLGetModemStatus()
 {
@@ -2872,9 +2872,9 @@ WORD TTLGetModemStatus()
 }
 
 //
-// Tera Term ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³å–å¾— & æ¯”è¼ƒ
-// ãƒãƒ¼ã‚¸ãƒ§ãƒ³ç•ªå·ã¯ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã«æ±ºå®šã™ã‚‹ã€‚
-// (ç¾åœ¨ã¯å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã¯å‚ç…§ã—ãªã„)
+// Tera Term ‚Ìƒo[ƒWƒ‡ƒ“æ“¾ & ”äŠr
+// ƒo[ƒWƒ‡ƒ“”Ô†‚ÍƒRƒ“ƒpƒCƒ‹‚ÉŒˆ’è‚·‚éB
+// (Œ»İ‚ÍÀsƒtƒ@ƒCƒ‹‚Ìƒo[ƒWƒ‡ƒ“î•ñ‚ÍQÆ‚µ‚È‚¢)
 //
 WORD TTLGetVer()
 {
@@ -3127,7 +3127,7 @@ WORD TTLLogRotate()
 	if (Err!=0) return Err;
 
 	Err = ErrSyntax;
-	if (strcmp(Str, "size") == 0) {   // ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆã‚µã‚¤ã‚º
+	if (strcmp(Str, "size") == 0) {   // ƒ[ƒe[ƒgƒTƒCƒY
 		if (CheckParameterGiven()) {
 			Err = 0;
 			size = 0;
@@ -3154,7 +3154,7 @@ WORD TTLLogRotate()
 				_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%s %u", Str, size);
 		}
 
-	} else if (strcmp(Str, "rotate") == 0) {  // ãƒ­ãƒ¼ãƒ†ãƒ¼ãƒˆã®ä¸–ä»£æ•°
+	} else if (strcmp(Str, "rotate") == 0) {  // ƒ[ƒe[ƒg‚Ì¢‘ã”
 		if (CheckParameterGiven()) {
 			Err = 0;
 			num = 0;
@@ -3323,12 +3323,12 @@ static void basedirname(char *fullpath, char *dest_base, int base_len, char *des
 	_splitpath_s(fullpath, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
 	strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
 	strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
-	DeleteSlash(dirname); // æœ«å°¾ã® \ ã‚’å–ã‚Šé™¤ã
+	DeleteSlash(dirname); // ––”ö‚Ì \ ‚ğæ‚èœ‚­
 	if (strlen(fname) == 0 && strlen(ext) == 0) {
 		_splitpath_s(dirname, drive, sizeof(drive), dir, sizeof(dir), fname, sizeof(fname), ext, sizeof(ext));
 		strncpy_s(dirname, sizeof(dirname), drive, _TRUNCATE);
 		strncat_s(dirname, sizeof(dirname), dir, _TRUNCATE);
-		DeleteSlash(dirname); // æœ«å°¾ã® \ ã‚’å–ã‚Šé™¤ã
+		DeleteSlash(dirname); // ––”ö‚Ì \ ‚ğæ‚èœ‚­
 		strncpy_s(basename, sizeof(basename), fname, _TRUNCATE);
 		strncat_s(basename, sizeof(basename), ext, _TRUNCATE);
 	}
@@ -3471,14 +3471,14 @@ int MessageCommand(int BoxId, LPWORD Err)
 
 	if (BoxId==IdMsgBox) {
 		ret = OpenMsgDlg(Str1,Str2,FALSE);
-		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã¨ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
+		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é‚ÆAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
 		// (2008.8.5 yutaka)
 		if (ret == IDCANCEL) {
 			TTLStatus = IdTTLEnd;
 		}
 	} else if (BoxId==IdYesNoBox) {
 		ret = OpenMsgDlg(Str1,Str2,TRUE);
-		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã¨ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
+		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é‚ÆAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
 		// (2008.8.6 yutaka)
 		if (ret == IDCLOSE) {
 			TTLStatus = IdTTLEnd;
@@ -3489,7 +3489,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 		OpenStatDlg(Str1,Str2);
 
 	} else if (BoxId==IdListBox) {
-		//  ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®é¸æŠè‚¢ã‚’å–å¾—ã™ã‚‹ã€‚
+		//  ƒŠƒXƒgƒ{ƒbƒNƒX‚Ì‘I‘ğˆ‚ğæ“¾‚·‚éB
 		GetStrAryVar(&VarId, Err);
 
 		if (CheckParameterGiven()) {
@@ -3520,8 +3520,8 @@ int MessageCommand(int BoxId, LPWORD Err)
 		}
 
 		// return 
-		//   0ä»¥ä¸Š: é¸æŠé …ç›®
-		//   -1: ã‚­ãƒ£ãƒ³ã‚»ãƒ«
+		//   0ˆÈã: ‘I‘ğ€–Ú
+		//   -1: ƒLƒƒƒ“ƒZƒ‹
 		ret = OpenListDlg(Str1, Str2, s, sel);
 
 		for (i = 0 ; i < ary_size ; i++) {
@@ -3535,7 +3535,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 	return 0;
 }
 
-// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹
+// ƒŠƒXƒgƒ{ƒbƒNƒX
 // (2013.3.13 yutaka)
 WORD TTLListBox()
 {
@@ -4051,8 +4051,8 @@ WORD TTLSend()
 }
 
 /*
- * src ã«å«ã¾ã‚Œã‚‹ 0x01 ã‚’ 0x01 0x02 ã«ç½®ãæ›ãˆã¦ dst ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹ã€‚
- * TStrVal ã«ã¯ 0x00 ãŒå«ã¾ã‚Œã‚‹äº‹ãŒç„¡ã„(çµ‚ç«¯ã¨åŒºåˆ¥ã§ããªã„)ã®ã§ 0x00 ã¯è€ƒæ…®ã™ã‚‹å¿…è¦ãªã—ã€‚
+ * src ‚ÉŠÜ‚Ü‚ê‚é 0x01 ‚ğ 0x01 0x02 ‚É’u‚«Š·‚¦‚Ä dst ‚ÉƒRƒs[‚·‚éB
+ * TStrVal ‚É‚Í 0x00 ‚ªŠÜ‚Ü‚ê‚é–‚ª–³‚¢(I’[‚Æ‹æ•Ê‚Å‚«‚È‚¢)‚Ì‚Å 0x00 ‚Íl—¶‚·‚é•K—v‚È‚µB
  */
 static void AddBroadcastString(char *dst, int dstlen, char *src)
 {
@@ -4064,7 +4064,7 @@ static void AddBroadcastString(char *dst, int dstlen, char *src)
 
 	while (*src != 0 && dstlen > 1) {
 		if (*src == 0x01) {
-			// 0x01 ã‚’æ ¼ç´ã™ã‚‹ã«ã¯ 0x01 0x02 ã®2ãƒã‚¤ãƒˆ + NUL çµ‚ç«¯ç”¨ã®1ãƒã‚¤ãƒˆãŒå¿…è¦
+			// 0x01 ‚ğŠi”[‚·‚é‚É‚Í 0x01 0x02 ‚Ì2ƒoƒCƒg + NUL I’[—p‚Ì1ƒoƒCƒg‚ª•K—v
 			if (dstlen < 3) {
 				break;
 			}
@@ -4082,13 +4082,13 @@ static void AddBroadcastString(char *dst, int dstlen, char *src)
 }
 
 /*
- * TTLSendBroadcast / TTLSendMulticast ã®ä¸‹è«‹ã‘
+ * TTLSendBroadcast / TTLSendMulticast ‚Ì‰º¿‚¯
  *
- * å„ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’é€£çµã—ãŸæ–‡å­—åˆ—ã‚’ buff ã«æ ¼ç´ã—ã¦è¿”ã™ã€‚
- * crlf ãŒ TRUE ã®æ™‚ã¯å„ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®é–“ã« "\n" ã‚’æŒŸã‚€ã€‚(è¦æ¤œè¨)
+ * Šeƒpƒ‰ƒ[ƒ^‚ğ˜AŒ‹‚µ‚½•¶š—ñ‚ğ buff ‚ÉŠi”[‚µ‚Ä•Ô‚·B
+ * crlf ‚ª TRUE ‚Ì‚ÍŠeƒpƒ‰ƒ[ƒ^‚ÌŠÔ‚É "\n" ‚ğ‹²‚ŞB(—vŒŸ“¢)
  *
- * ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãŒ String ã®å ´åˆã¯ãã®ã¾ã¾ã€Integer ã®å ´åˆã¯ ASCII ã‚³ãƒ¼ãƒ‰ã¨ã¿ãªã—ã¦ãã®æ–‡å­—ã‚’é€ã‚‹ã€‚
- * Tera Term å´ã§ã¯ send ç­‰ã¨å…±é€šã®ãƒ«ãƒ¼ãƒãƒ³ãŒä½¿ã‚ã‚Œã‚‹ç‚ºã€DDE é€šä¿¡ã®ç‚ºã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’è¡Œã†å¿…è¦æœ‰ã‚Šã€‚
+ * ƒpƒ‰ƒ[ƒ^‚ª String ‚Ìê‡‚Í‚»‚Ì‚Ü‚ÜAInteger ‚Ìê‡‚Í ASCII ƒR[ƒh‚Æ‚İ‚È‚µ‚Ä‚»‚Ì•¶š‚ğ‘—‚éB
+ * Tera Term ‘¤‚Å‚Í send “™‚Æ‹¤’Ê‚Ìƒ‹[ƒ`ƒ“‚ªg‚í‚ê‚éˆ×ADDE ’ÊM‚Ìˆ×‚ÌƒGƒ“ƒR[ƒh‚ğs‚¤•K—v—L‚èB
  *   0x00 -> 0x01 0x01
  *   0x01 -> 0x01 0x02
  */
@@ -4139,7 +4139,7 @@ static WORD GetBroadcastString(char *buff, int bufflen, BOOL crlf)
 	return 0;
 }
 
-// sendbroadcast / sendlnbroadcast ã®äºŒã¤ã‹ã‚‰åˆ©ç”¨ (crlfã®å€¤ã§å‹•ä½œã‚’å¤‰ãˆã‚‹)
+// sendbroadcast / sendlnbroadcast ‚Ì“ñ‚Â‚©‚ç—˜—p (crlf‚Ì’l‚Å“®ì‚ğ•Ï‚¦‚é)
 static WORD TTLSendBroadcast(BOOL crlf)
 {
 	TStrVal buf;
@@ -4168,7 +4168,7 @@ WORD TTLSetMulticastName()
 	return SendCmnd(CmdSetMulticastName, 0);
 }
 
-// sendmulticast / sendlnmulticast ã®äºŒã¤ã‹ã‚‰åˆ©ç”¨ (crlfã®å€¤ã§å‹•ä½œã‚’å¤‰ãˆã‚‹)
+// sendmulticast / sendlnmulticast ‚Ì“ñ‚Â‚©‚ç—˜—p (crlf‚Ì’l‚Å“®ì‚ğ•Ï‚¦‚é)
 WORD TTLSendMulticast(BOOL crlf)
 {
 	TStrVal buf, Str;
@@ -4177,7 +4177,7 @@ WORD TTLSendMulticast(BOOL crlf)
 	if (! Linked)
 		return ErrLinkFirst;
 
-	// ãƒãƒ«ãƒã‚­ãƒ£ã‚¹ãƒˆè­˜åˆ¥ç”¨ã®åå‰ã‚’å–å¾—ã™ã‚‹ã€‚
+	// ƒ}ƒ‹ƒ`ƒLƒƒƒXƒg¯•Ê—p‚Ì–¼‘O‚ğæ“¾‚·‚éB
 	Err = 0;
 	GetStrVal(Str,&Err);
 	if (Err!=0) return Err;
@@ -4508,9 +4508,9 @@ WORD TTLSprintf(int getvar)
 						memset(subFmt, 0, sizeof(subFmt));
 					}
 					else {
-						// ä¸€ã¤æ‰‹å‰ã¾ã§ã‚’ãã®ã¾ã¾ buf ã«æ ¼ç´
+						// ˆê‚Âè‘O‚Ü‚Å‚ğ‚»‚Ì‚Ü‚Ü buf ‚ÉŠi”[
 						strncat_s(buf, sizeof(buf), subFmt, _TRUNCATE);
-						// ä»•åˆ‡ã‚Šç›´ã—
+						// dØ‚è’¼‚µ
 						memset(subFmt, 0, sizeof(subFmt));
 						strncat_s(subFmt, sizeof(subFmt), p, 1);
 					}
@@ -4541,7 +4541,7 @@ WORD TTLSprintf(int getvar)
 						type = STRING;
 					}
 
-					// "%" ã¨ *p ã®é–“ãŒæ­£ã—ã„ã‹ãƒã‚§ãƒƒã‚¯
+					// "%" ‚Æ *p ‚ÌŠÔ‚ª³‚µ‚¢‚©ƒ`ƒFƒbƒN
 					str = (UChar* )subFmt;
 					end   = str + strlen(subFmt);
 					start = str;
@@ -4556,7 +4556,7 @@ WORD TTLSprintf(int getvar)
 
 					strncat_s(subFmt, sizeof(subFmt), p, 1);
 
-					// width, precision ãŒ * ã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯
+					// width, precision ‚ª * ‚©‚Ç‚¤‚©ƒ`ƒFƒbƒN
 					width_asterisk = precision_asterisk = 0;
 					if (region->num_regs != 3) {
 						SetResult(-1);
@@ -4585,7 +4585,7 @@ WORD TTLSprintf(int getvar)
 					}
 					free(match_str);
 
-					// * ã«å¯¾å¿œã™ã‚‹å¼•æ•°ã‚’å–å¾—
+					// * ‚É‘Î‰‚·‚éˆø”‚ğæ“¾
 					if (width_asterisk) {
 						TmpErr = 0;
 						GetIntVal(&NumWidth, &TmpErr);
@@ -4606,7 +4606,7 @@ WORD TTLSprintf(int getvar)
 					}
 
 					if (type == STRING || type == DOUBLE) {
-						// æ–‡å­—åˆ—ã¨ã—ã¦èª­ã‚ã‚‹ã‹ãƒˆãƒ©ã‚¤
+						// •¶š—ñ‚Æ‚µ‚Ä“Ç‚ß‚é‚©ƒgƒ‰ƒC
 						TmpErr = 0;
 						GetStrVal(Str, &TmpErr);
 						if (TmpErr == 0) {
@@ -4646,7 +4646,7 @@ WORD TTLSprintf(int getvar)
 						}
 					}
 					else {
-						// æ•°å€¤ã¨ã—ã¦èª­ã‚ã‚‹ã‹ãƒˆãƒ©ã‚¤
+						// ”’l‚Æ‚µ‚Ä“Ç‚ß‚é‚©ƒgƒ‰ƒC
 						TmpErr = 0;
 						GetIntVal(&Num, &TmpErr);
 						if (TmpErr == 0) {
@@ -4698,8 +4698,8 @@ WORD TTLSprintf(int getvar)
 		SetStrVal(VarId, buf);
 	}
 	else {
-		// ãƒãƒƒãƒã—ãŸè¡Œã‚’ inputstr ã¸æ ¼ç´ã™ã‚‹
-		SetInputStr(buf);  // ã“ã“ã§ãƒãƒƒãƒ•ã‚¡ãŒã‚¯ãƒªã‚¢ã•ã‚Œã‚‹
+		// ƒ}ƒbƒ`‚µ‚½s‚ğ inputstr ‚ÖŠi”[‚·‚é
+		SetInputStr(buf);  // ‚±‚±‚Åƒoƒbƒtƒ@‚ªƒNƒŠƒA‚³‚ê‚é
 	}
 	SetResult(0);
 
@@ -4764,15 +4764,15 @@ WORD TTLStr2Int()
 
 	if (Err!=0) return Err;
 
-	// Cè¨€èªã§ã¯16é€²ã¯0xã§å§‹ã¾ã‚‹ãŒã€TTLä»•æ§˜ã§ã¯ $ ã§å§‹ã¾ã‚‹ãŸã‚ã€å¾Œè€…ã‚‚ã‚µãƒãƒ¼ãƒˆã™ã‚‹ã€‚
+	// CŒ¾Œê‚Å‚Í16i‚Í0x‚Ån‚Ü‚é‚ªATTLd—l‚Å‚Í $ ‚Ån‚Ü‚é‚½‚ßAŒãÒ‚àƒTƒ|[ƒg‚·‚éB
 	if (Str[0] == '$') {
 		memmove_s(Str + 2, sizeof(Str) - 2, Str + 1, strlen(Str));
 		Str[0] = '0';
 		Str[1] = 'x';
 	}
 
-	// '%d'ã‹ã‚‰'%i'ã¸å¤‰æ›´ã«ã‚ˆã‚Šã€10é€²ä»¥å¤–ã®æ•°å€¤ã‚’å¤‰æ›ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚ (2007.5.1 yutaka)
-	// ä¸‹ä½äº’æ›æ€§ã®ãŸã‚10é€²ã¨16é€²ã®ã¿ã®ã‚µãƒãƒ¼ãƒˆã¨ã™ã‚‹ã€‚(2007.5.2 yutaka)
+	// '%d'‚©‚ç'%i'‚Ö•ÏX‚É‚æ‚èA10iˆÈŠO‚Ì”’l‚ğ•ÏŠ·‚Å‚«‚é‚æ‚¤‚É‚·‚éB (2007.5.1 yutaka)
+	// ‰ºˆÊŒİŠ·«‚Ì‚½‚ß10i‚Æ16i‚Ì‚İ‚ÌƒTƒ|[ƒg‚Æ‚·‚éB(2007.5.2 yutaka)
 	// 10 : decimal
 	// 0x10, $10: hex
 	if (Str[0] == '0' && tolower(Str[1]) == 'x') {
@@ -4878,10 +4878,10 @@ WORD TTLStrLen()
 }
 
 /*
-  æ›¸å¼: strmatch <æ–‡å­—åˆ—> <æ­£è¦è¡¨ç¾>
-  <æ–‡å­—åˆ—>ã«<æ­£è¦è¡¨ç¾>ãŒãƒãƒƒãƒã™ã‚‹ã‹èª¿ã¹ã‚‹ã‚³ãƒãƒ³ãƒ‰(awkã®matché–¢æ•°ç›¸å½“)ã€‚
-  resultã«ã¯ã€ãƒãƒƒãƒã—ãŸä½ç½®ã‚’ã‚»ãƒƒãƒˆ(ãƒãƒƒãƒã—ãªã„å ´åˆã¯0)ã€‚
-  ãƒãƒƒãƒã—ãŸå ´åˆã¯ã€waitregexã¨åŒæ§˜ã«matchstr,groupmatchstr1-9ã‚’ã‚»ãƒƒãƒˆã€‚
+  ‘®: strmatch <•¶š—ñ> <³‹K•\Œ»>
+  <•¶š—ñ>‚É<³‹K•\Œ»>‚ªƒ}ƒbƒ`‚·‚é‚©’²‚×‚éƒRƒ}ƒ“ƒh(awk‚ÌmatchŠÖ”‘Š“–)B
+  result‚É‚ÍAƒ}ƒbƒ`‚µ‚½ˆÊ’u‚ğƒZƒbƒg(ƒ}ƒbƒ`‚µ‚È‚¢ê‡‚Í0)B
+  ƒ}ƒbƒ`‚µ‚½ê‡‚ÍAwaitregex‚Æ“¯—l‚Ématchstr,groupmatchstr1-9‚ğƒZƒbƒgB
  */
 WORD TTLStrMatch()
 {
@@ -4903,7 +4903,7 @@ WORD TTLStrMatch()
 		result = 0;
 	}
 
-	// FindRegexStringOneã®ä¸­ã§UnlockVar()ã•ã‚Œã¦ã—ã¾ã†ã®ã§ã€LockVar()ã—ãªãŠã™ã€‚
+	// FindRegexStringOne‚Ì’†‚ÅUnlockVar()‚³‚ê‚Ä‚µ‚Ü‚¤‚Ì‚ÅALockVar()‚µ‚È‚¨‚·B
 	LockVar();
 
 	SetResult(result);
@@ -4947,11 +4947,11 @@ static void insert_string(char *str, int index, char *addstr)
 	srclen = strlen(str);
 	addlen = strlen(addstr);
 
-	// ã¾ãšã¯æŒ¿å…¥ã•ã‚Œã‚‹ç®‡æ‰€ä»¥é™ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã€å¾Œã‚ã«ç§»å‹•ã™ã‚‹ã€‚
+	// ‚Ü‚¸‚Í‘}“ü‚³‚ê‚é‰ÓŠˆÈ~‚Ìƒf[ƒ^‚ğAŒã‚ë‚ÉˆÚ“®‚·‚éB
 	np = str + (index - 1);
 	memmove_s(np + addlen, MaxStrLen, np, srclen - (index - 1));
 
-	// æ–‡å­—åˆ—ã‚’æŒ¿å…¥ã™ã‚‹
+	// •¶š—ñ‚ğ‘}“ü‚·‚é
 	memcpy(np, addstr, addlen);
 
 	// null-terminate
@@ -4991,7 +4991,7 @@ WORD TTLStrInsert()
 	return Err;
 }
 
-// æ–‡å­—åˆ— str ã® index æ–‡å­—ç›®ï¼ˆ1ã‚ªãƒªã‚¸ãƒ³ï¼‰ã‹ã‚‰ len æ–‡å­—å‰Šé™¤ã™ã‚‹
+// •¶š—ñ str ‚Ì index •¶š–Úi1ƒIƒŠƒWƒ“j‚©‚ç len •¶šíœ‚·‚é
 static void remove_string(char *str, int index, int len)
 {
 	char *np;
@@ -5012,7 +5012,7 @@ static void remove_string(char *str, int index, int len)
 	        ^index(np)
 			     ^np+len 
 				 <-->srclen - len - index
-		    â†“
+		    «
 	   XXXXXXYYY
 	 */
 
@@ -5088,18 +5088,18 @@ WORD TTLStrReplace()
 
 	oldlen = strlen(oldstr);
 
-	// strptræ–‡å­—åˆ—ã® pos æ–‡å­—ç›®ä»¥é™ã«ãŠã„ã¦ã€oldstr ã‚’æ¢ã™ã€‚
+	// strptr•¶š—ñ‚Ì pos •¶š–ÚˆÈ~‚É‚¨‚¢‚ÄAoldstr ‚ğ’T‚·B
 	p = tmpstr + pos;
 	ret = FindRegexStringOne(oldstr, oldlen, p, strlen(p));
-	// FindRegexStringOneã®ä¸­ã§UnlockVar()ã•ã‚Œã¦ã—ã¾ã†ã®ã§ã€LockVar()ã—ãªãŠã™ã€‚
+	// FindRegexStringOne‚Ì’†‚ÅUnlockVar()‚³‚ê‚Ä‚µ‚Ü‚¤‚Ì‚ÅALockVar()‚µ‚È‚¨‚·B
 	LockVar();
 	if (ret == 0) {
-		// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã¯ã€"0"ã§æˆ»ã‚‹ã€‚
+		// Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚ÍA"0"‚Å–ß‚éB
 		result = 0;
 		goto error;
 	}
 	else if (ret < 0) {
-		// æ­£ã—ããªã„æ­£è¦è¡¨ç¾ç­‰ã§ã‚¨ãƒ©ãƒ¼ã®å ´åˆã¯ -1 ã‚’è¿”ã™
+		// ³‚µ‚­‚È‚¢³‹K•\Œ»“™‚ÅƒGƒ‰[‚Ìê‡‚Í -1 ‚ğ•Ô‚·
 		result = -1;
 		goto error;
 	}
@@ -5174,34 +5174,34 @@ WORD TTLStrTrim()
 	srcptr = StrVarPtr(VarId);
 	srclen = strlen(srcptr);
 
-	// å‰Šé™¤ã™ã‚‹æ–‡å­—ã®ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä½œã‚‹ã€‚
+	// íœ‚·‚é•¶š‚Ìƒe[ƒuƒ‹‚ğì‚éB
 	memset(table, 0, sizeof(table));
 	for (p = trimchars; *p ; p++) {
 		table[*p] = 1;
 	}
 
-	// æ–‡å­—åˆ—ã®å…ˆé ­ã‹ã‚‰æ¤œç´¢ã™ã‚‹
+	// •¶š—ñ‚Ìæ“ª‚©‚çŒŸõ‚·‚é
 	for (i = 0 ; i < srclen ; i++) {
 		if (table[srcptr[i]] == 0) 
 			break;
 	}
-	// å‰Šé™¤ã•ã‚Œãªã„æœ‰åŠ¹ãªæ–‡å­—åˆ—ã®å§‹ã¾ã‚Šã€‚
-	// ã™ã¹ã¦å‰Šé™¤å¯¾è±¡ã¨ãªã‚‹å ´åˆã¯ã€start == srclen ã€‚
+	// íœ‚³‚ê‚È‚¢—LŒø‚È•¶š—ñ‚Ìn‚Ü‚èB
+	// ‚·‚×‚Äíœ‘ÎÛ‚Æ‚È‚éê‡‚ÍAstart == srclen B
 	start = i;  
 
-	// æ–‡å­—åˆ—ã®æœ«å°¾ã‹ã‚‰æ¤œç´¢ã™ã‚‹
+	// •¶š—ñ‚Ì––”ö‚©‚çŒŸõ‚·‚é
 	for (i = srclen - 1 ; i >= 0 ; i--) {
 		if (table[srcptr[i]] == 0) 
 			break;
 	}
-	// å‰Šé™¤ã•ã‚Œãªã„æœ‰åŠ¹ãªæ–‡å­—åˆ—ã®çµ‚ã‚ã‚Šã€‚
-	// ã™ã¹ã¦å‰Šé™¤å¯¾è±¡ã¨ãªã‚‹å ´åˆã¯ã€end == -1 ã€‚
+	// íœ‚³‚ê‚È‚¢—LŒø‚È•¶š—ñ‚ÌI‚í‚èB
+	// ‚·‚×‚Äíœ‘ÎÛ‚Æ‚È‚éê‡‚ÍAend == -1 B
 	end = i;
 
-	// æœ«å°¾ã‚’å‰Šã‚‹
+	// ––”ö‚ğí‚é
 	srcptr[end + 1] = '\0';
 
-	// æ¬¡ã«ã€å…ˆé ­ã‹ã‚‰å‰Šã‚‹ã€‚
+	// Ÿ‚ÉAæ“ª‚©‚çí‚éB
 	remove_string(srcptr, 1, start);
 
 	return Err;
@@ -5229,7 +5229,7 @@ WORD TTLStrSplit()
 			// TODO array
 #if 0
 			Err = 0;
-			// Parameter ã‹ã‚‰ array ã‚’å—ã‘å–ã‚‹
+			// Parameter ‚©‚ç array ‚ğó‚¯æ‚é
 			if (Err==0) {
 				ary = TRUE;
 			}
@@ -5248,16 +5248,16 @@ WORD TTLStrSplit()
 	if (!ary && (maxvar < 1 || maxvar > MAXVARNUM) )
 		return ErrSyntax;
 
-	// ãƒ‡ãƒªãƒŸã‚¿ã¯1æ–‡å­—ã®ã¿ã¨ã™ã‚‹ã€‚
+	// ƒfƒŠƒ~ƒ^‚Í1•¶š‚Ì‚İ‚Æ‚·‚éB
 	len = strlen(delimchars);
 	if (len != 1)
 		return ErrSyntax;
 
 	srclen = strlen(src);
-	strcpy_s(buf, MaxStrLen, src);  /* ç ´å£Šã•ã‚Œã¦ã‚‚ã„ã„ã‚ˆã†ã«ã€ã‚³ãƒ”ãƒ¼ãƒãƒƒãƒ•ã‚¡ã‚’ä½¿ã†ã€‚*/
+	strcpy_s(buf, MaxStrLen, src);  /* ”j‰ó‚³‚ê‚Ä‚à‚¢‚¢‚æ‚¤‚ÉAƒRƒs[ƒoƒbƒtƒ@‚ğg‚¤B*/
 
 #if 0
-	// ãƒˆãƒ¼ã‚¯ãƒ³ã®åˆ‡ã‚Šå‡ºã—ã‚’è¡Œã†ã€‚
+	// ƒg[ƒNƒ“‚ÌØ‚èo‚µ‚ğs‚¤B
 	memset(tok, 0, sizeof(tok));
 #if 0
 	tok[0] = strtok_s(srcptr, delimchars, &last);
@@ -5267,8 +5267,8 @@ WORD TTLStrSplit()
 			break;
 	} 
 #else
-	/* strtokã‚’ä½¿ã†ã¨ã€é€£ç¶šã—ãŸåŒºåˆ‡ã‚ŠãŒ1ã¤ã«ä¸¸ã‚ã‚‰ã‚Œã‚‹ãŸã‚ã€è‡ªå‰ã§ãƒã‚¤ãƒ³ã‚¿ã‚’
-	 * ãŸã©ã‚‹ã€‚ãŸã ã—ã€åŒºåˆ‡ã‚Šæ–‡å­—ã¯1ã¤ã®ã¿ã¨ã™ã‚‹ã€‚
+	/* strtok‚ğg‚¤‚ÆA˜A‘±‚µ‚½‹æØ‚è‚ª1‚Â‚ÉŠÛ‚ß‚ç‚ê‚é‚½‚ßA©‘O‚Åƒ|ƒCƒ“ƒ^‚ğ
+	 * ‚½‚Ç‚éB‚½‚¾‚µA‹æØ‚è•¶š‚Í1‚Â‚Ì‚İ‚Æ‚·‚éB
 	 */
 	i = 0;
 	for (p = buf; *p == delimchars[0] ; p++) {
@@ -5296,11 +5296,11 @@ WORD TTLStrSplit()
 		p = buf;
 		count = 1;
 		tok[count-1] = p;
-		for (i=0; i < srclen && count < maxvar + omit; i++) { // count çœç•¥æ™‚ã«ã¯ã€è¶…éåˆ†ã‚’æ¨ã¦ã‚‹ãŸã‚ 1 ã¤ä½™åˆ†ã«é€²ã‚ã‚‹
+		for (i=0; i < srclen && count < maxvar + omit; i++) { // count È—ª‚É‚ÍA’´‰ß•ª‚ğÌ‚Ä‚é‚½‚ß 1 ‚Â—]•ª‚Éi‚ß‚é
 			if (*p == *delimchars) {
 				*p = '\0';
 				count++;
-				if (count <= MAXVARNUM) { // tok ã®è¦ç´ æ•°ã‚’è¶…ãˆã¦ä»£å…¥ã—ãªã„ã‚ˆã†ã«ã™ã‚‹(count çœç•¥æ™‚ã®ãŸã‚)
+				if (count <= MAXVARNUM) { // tok ‚Ì—v‘f”‚ğ’´‚¦‚Ä‘ã“ü‚µ‚È‚¢‚æ‚¤‚É‚·‚é(count È—ª‚Ì‚½‚ß)
 					tok[count-1] = p+1;
 				}
 			}
@@ -5310,7 +5310,7 @@ WORD TTLStrSplit()
 #endif
 
 //end:
-	// çµæœã®æ ¼ç´
+	// Œ‹‰Ê‚ÌŠi”[
 	for (i = 1 ; i <= count ; i++) {
 		SetGroupMatchStr(i, tok[i-1]);
 	}
@@ -5345,7 +5345,7 @@ WORD TTLStrJoin()
 			// TODO array
 #if 0
 			Err = 0;
-			// Parameter ã‹ã‚‰ array ã‚’å—ã‘å–ã‚‹
+			// Parameter ‚©‚ç array ‚ğó‚¯æ‚é
 			if (Err==0) {
 				ary = TRUE;
 			}
@@ -5489,9 +5489,9 @@ WORD TTLUptime()
 		Err = ErrSyntax;
 	if (Err!=0) return Err;
 
-	// Windows OSãŒèµ·å‹•ã—ã¦ã‹ã‚‰ã®çµŒéæ™‚é–“ï¼ˆãƒŸãƒªç§’ï¼‰ã‚’å–å¾—ã™ã‚‹ã€‚ãŸã ã—ã€49æ—¥ã‚’çµŒéã™ã‚‹ã¨ã€0ã«æˆ»ã‚‹ã€‚
-	// GetTickCount64() API(Vistaä»¥é™)ã‚’ä½¿ã†ã¨ã€ã‚ªãƒ¼ãƒãƒ¼ãƒ•ãƒ­ãƒ¼ã—ãªããªã‚‹ãŒã€ãã‚‚ãã‚‚Tera Termã§ã¯
-	// 64bitå¤‰æ•°ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„ã®ã§ã€æ„å‘³ãŒãªã„ã€‚
+	// Windows OS‚ª‹N“®‚µ‚Ä‚©‚ç‚ÌŒo‰ßŠÔiƒ~ƒŠ•bj‚ğæ“¾‚·‚éB‚½‚¾‚µA49“ú‚ğŒo‰ß‚·‚é‚ÆA0‚É–ß‚éB
+	// GetTickCount64() API(VistaˆÈ~)‚ğg‚¤‚ÆAƒI[ƒo[ƒtƒ[‚µ‚È‚­‚È‚é‚ªA‚»‚à‚»‚àTera Term‚Å‚Í
+	// 64bit•Ï”‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢‚Ì‚ÅAˆÓ–¡‚ª‚È‚¢B
 	tick = GetTickCount();
 
 	SetIntVal(VarId, tick);
@@ -6437,7 +6437,7 @@ int ExecCmnd()
 							if (StrConst)
 								SetStrVal(VarId,Str);
 							else
-							// StrVarPtr ã®è¿”ã‚Šå€¤ãŒ TStrVal ã®ãƒã‚¤ãƒ³ã‚¿ã§ã‚ã‚‹ã“ã¨ã‚’æœŸå¾…ã—ã¦ã‚µã‚¤ã‚ºã‚’å›ºå®š
+							// StrVarPtr ‚Ì•Ô‚è’l‚ª TStrVal ‚Ìƒ|ƒCƒ“ƒ^‚Å‚ ‚é‚±‚Æ‚ğŠú‘Ò‚µ‚ÄƒTƒCƒY‚ğŒÅ’è
 							// (2007.6.23 maya)
 								strncpy_s(StrVarPtr(VarId),MaxStrLen,StrVarPtr((TVarId)Val),_TRUNCATE);
 						break;
@@ -6497,7 +6497,7 @@ void Exec()
 	UnlockVar();
 }
 
-// æ­£è¦è¡¨ç¾ã§ãƒãƒƒãƒã—ãŸæ–‡å­—åˆ—ã‚’è¨˜éŒ²ã™ã‚‹
+// ³‹K•\Œ»‚Åƒ}ƒbƒ`‚µ‚½•¶š—ñ‚ğ‹L˜^‚·‚é
 // (2005.10.7 yutaka)
 void SetMatchStr(PCHAR Str)
 {
@@ -6509,7 +6509,7 @@ void SetMatchStr(PCHAR Str)
 		SetStrVal(VarId,Str);
 }
 
-// æ­£è¦è¡¨ç¾ã§ã‚°ãƒ«ãƒ¼ãƒ—ãƒãƒƒãƒã—ãŸæ–‡å­—åˆ—ã‚’è¨˜éŒ²ã™ã‚‹
+// ³‹K•\Œ»‚ÅƒOƒ‹[ƒvƒ}ƒbƒ`‚µ‚½•¶š—ñ‚ğ‹L˜^‚·‚é
 // (2005.10.15 yutaka)
 void SetGroupMatchStr(int no, PCHAR Str)
 {

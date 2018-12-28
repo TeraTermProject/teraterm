@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
  *
@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 /* TERATERM.EXE, drag and drop dialog */
 #include "dnddlg.h"
 
@@ -106,7 +106,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 		// target file
 		SetDlgItemText(hDlgWnd, IDC_FILENAME_EDIT, Param->TargetFilename);
-			
+
 		// checkbox
 		CheckRadioButton(hDlgWnd, IDC_SCP_RADIO, IDC_PASTE_RADIO,
 						 (Param->DropType == DROP_TYPE_SEND_FILE ||
@@ -117,7 +117,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		// SCP
 		SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)Param->ScpSendDirPtr);
 		if (!Param->ScpEnable) {
-			// ç„¡åŠ¹åŒ–
+			// –³Œø‰»
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_RADIO), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH_LABEL), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_PATH), FALSE);
@@ -130,7 +130,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			SendMessage(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 		}
 		if (!Param->SendfileEnable) {
-			// ç„¡åŠ¹åŒ–
+			// –³Œø‰»
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SENDFILE_RADIO), FALSE);
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_BINARY_CHECK), FALSE);
 		}
@@ -139,7 +139,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		if (Param->DropTypePaste & DROP_TYPE_PASTE_ESCAPE) {
 			SendMessage(GetDlgItem(hDlgWnd, IDC_ESCAPE_CHECK), BM_SETCHECK, BST_CHECKED, 0);
 		}
-		CheckRadioButton(hDlgWnd, IDC_SPACE_RADIO, IDC_NEWLINE_RADIO, 
+		CheckRadioButton(hDlgWnd, IDC_SPACE_RADIO, IDC_NEWLINE_RADIO,
 						 Param->DropTypePaste & DROP_TYPE_PASTE_NEWLINE?
 						 IDC_NEWLINE_RADIO : IDC_SPACE_RADIO);
 		if (Param->RemaingFileCount < 2) {
@@ -168,20 +168,20 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 		// focus to "SCP dest textbox" or "Cancel"
 		if (Param->ScpEnable) {
-			// "SCP" æœ‰åŠ¹æ™‚ã¯ Cancel ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã€æœ€çµ‚çš„ã« SCP PATH ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒ
-			// å½“ãŸã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
+			// "SCP" —LŒøŽž‚Í Cancel ‚ÉƒtƒH[ƒJƒX‚ð“–‚ÄAÅI“I‚É SCP PATH ‚ÉƒtƒH[ƒJƒX‚ª
+			// “–‚½‚é‚æ‚¤‚É‚·‚éB
 			SetFocus(GetDlgItem(hDlgWnd, IDC_SCP_RADIO));
 		} else {
-			// ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã®åˆæœŸçŠ¶æ…‹ã‚’ Cancel ã«ã™ã‚‹ç‚ºã€ã“ã®æ™‚ç‚¹ã§ã¯ IDOK ã«
-			// ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹ã€‚å¾Œã§ WM_NEXTDLGCTL ã§ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒæ¬¡ã®ãƒœã‚¿ãƒ³ã«ãªã‚‹ã€‚
+			// ƒtƒH[ƒJƒX‚Ì‰Šúó‘Ô‚ð Cancel ‚É‚·‚éˆ×A‚±‚ÌŽž“_‚Å‚Í IDOK ‚É
+			// ƒtƒH[ƒJƒX‚ð“–‚Ä‚éBŒã‚Å WM_NEXTDLGCTL ‚ÅƒtƒH[ƒJƒX‚ªŽŸ‚Ìƒ{ƒ^ƒ“‚É‚È‚éB
 			SetFocus(GetDlgItem(hDlgWnd, IDOK));
 		}
-		// ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’æ¬¡ã®ãƒœã‚¿ãƒ³ã«ç§»ã™
-		// SetFocus() ã§ç›´æŽ¥ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å½“ã¦ã‚‹ã¨ã‚¿ãƒ–ã‚­ãƒ¼ã®å‹•ä½œç­‰ã«å•é¡ŒãŒå‡ºã‚‹ãŸã‚ã€
-		// ã“ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ä½µç”¨ã™ã‚‹
+		// ƒtƒH[ƒJƒX‚ðŽŸ‚Ìƒ{ƒ^ƒ“‚ÉˆÚ‚·
+		// SetFocus() ‚Å’¼ÚƒtƒH[ƒJƒX‚ð“–‚Ä‚é‚Æƒ^ƒuƒL[‚Ì“®ì“™‚É–â‘è‚ªo‚é‚½‚ßA
+		// ‚±‚ÌƒƒbƒZ[ƒW‚ð•¹—p‚·‚é
 		PostMessage(hDlgWnd, WM_NEXTDLGCTL, 0, 0L);
 
-		// TRUEã«ã™ã‚‹ã¨ãƒœã‚¿ãƒ³ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒå½“ãŸã‚‰ãªã„ã€‚
+		// TRUE‚É‚·‚é‚Æƒ{ƒ^ƒ“‚ÉƒtƒH[ƒJƒX‚ª“–‚½‚ç‚È‚¢B
 		return FALSE;
 	}
 
@@ -228,13 +228,13 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 					(IsDlgButtonChecked(hDlgWnd, IDC_NEWLINE_RADIO) == BST_CHECKED) ?
 					DROP_TYPE_PASTE_NEWLINE : 0;
 			}
-			DlgData->Param->DoSameProcess = 
+			DlgData->Param->DoSameProcess =
 				(IsDlgButtonChecked(hDlgWnd, IDC_SAME_PROCESS_CHECK) == BST_CHECKED) ?
 				true : false;
 			DlgData->Param->DoSameProcessNextDrop =
 				(IsDlgButtonChecked(hDlgWnd, IDC_SAME_PROCESS_NEXTDROP_CHECK) == BST_CHECKED) ?
 				true : false;
-			DlgData->Param->DoNotShowDialog = 
+			DlgData->Param->DoNotShowDialog =
 				(IsDlgButtonChecked(hDlgWnd, IDC_DONTSHOW_CHECK) == BST_CHECKED) ?
 				true : false;
 		}
