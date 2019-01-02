@@ -50,8 +50,6 @@
 #define GetDlgItemText GetDlgItemTextA
 #undef SetDlgItemText
 #define SetDlgItemText SetDlgItemTextA
-#undef MessageBox
-#define MessageBox MessageBoxA
 
 const mouse_cursor_t MouseCursor[] = {
 	{"ARROW", IDC_ARROW},
@@ -1121,7 +1119,7 @@ void CLogPropPageDlg::OnInitDialog()
 	for (int i = 0 ; i < ts.LogRotateSizeType ; i++)
 		TmpLogRotateSize /= 1024;
 	SetDlgItemInt(IDC_ROTATE_SIZE, TmpLogRotateSize, FALSE);
-	SendDlgItemMessage(IDC_ROTATE_SIZE_TYPE, CB_SELECTSTRING, -1, (LPARAM)GetLogRotateSizeType(ts.LogRotateSizeType));
+	SendDlgItemMessageA(IDC_ROTATE_SIZE_TYPE, CB_SELECTSTRING, -1, (LPARAM)GetLogRotateSizeType(ts.LogRotateSizeType));
 	SetDlgItemInt(IDC_ROTATE_STEP, ts.LogRotateStep, FALSE);
 	if (ts.LogRotate == ROTATE_NONE) {
 		EnableDlgItem(IDC_ROTATE_SIZE_TEXT, FALSE);
@@ -1275,7 +1273,8 @@ void CLogPropPageDlg::OnOK()
 	char buf[80], buf2[80];
 	time_t time_local;
 	struct tm *tm_local;
-	char uimsg[MAX_UIMSG];
+	TCHAR uimsg[MAX_UIMSG];
+	TCHAR uimsg2[MAX_UIMSG];
 
 	// Viewlog Editor path (2005.1.29 yutaka)
 	GetDlgItemText(IDC_VIEWLOG_EDITOR, ts.ViewlogEditor, _countof(ts.ViewlogEditor));
@@ -1283,10 +1282,10 @@ void CLogPropPageDlg::OnOK()
 	// Log Default File Name (2006.8.28 maya)
 	GetDlgItemTextA(IDC_DEFAULTNAME_EDITOR, buf, sizeof(buf));
 	if (isInvalidStrftimeChar(buf)) {
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_LOGFILE_INVALID_CHAR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Invalid character is included in log file name.", ts.UILanguageFile);
-		MessageBoxA(ts.UIMsg, uimsg, MB_ICONEXCLAMATION);
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_LOGFILE_INVALID_CHAR_ERROR", uimsg2, _countof(uimsg2),
+		              _T("Invalid character is included in log file name."), ts.UILanguageFile);
+		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
 		return;
 	}
 
@@ -1295,17 +1294,17 @@ void CLogPropPageDlg::OnOK()
 	tm_local = localtime(&time_local);
 	// Žž•¶Žš—ñ‚É•ÏŠ·
 	if (strlen(buf) != 0 && strftime(buf2, sizeof(buf2), buf, tm_local) == 0) {
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_LOGFILE_TOOLONG_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "The log file name is too long.", ts.UILanguageFile);
-		MessageBox(ts.UIMsg, uimsg, MB_ICONEXCLAMATION);
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_LOGFILE_TOOLONG_ERROR", uimsg2, _countof(uimsg2),
+					  _T("The log file name is too long."), ts.UILanguageFile);
+		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
 		return;
 	}
 	if (isInvalidFileNameChar(buf2)) {
-		get_lang_msg("MSG_ERROR", uimsg, sizeof(uimsg), "ERROR", ts.UILanguageFile);
-		get_lang_msg("MSG_LOGFILE_INVALID_CHAR_ERROR", ts.UIMsg, sizeof(ts.UIMsg),
-		             "Invalid character is included in log file name.", ts.UILanguageFile);
-		MessageBox(ts.UIMsg, uimsg, MB_ICONEXCLAMATION);
+		get_lang_msgT("MSG_ERROR", uimsg, _countof(uimsg), _T("ERROR"), ts.UILanguageFile);
+		get_lang_msgT("MSG_LOGFILE_INVALID_CHAR_ERROR", uimsg2, _countof(uimsg2),
+					  _T("Invalid character is included in log file name."), ts.UILanguageFile);
+		MessageBox(uimsg2, uimsg, MB_ICONEXCLAMATION);
 		return;
 	}
 	strncpy_s(ts.LogDefaultName, sizeof(ts.LogDefaultName), buf, _TRUNCATE);

@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 2018 TeraTerm Project
  * All rights reserved.
  *
@@ -37,7 +37,7 @@
 #include "dlglib.h"
 #include "ttlib.h"
 
-// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®æ›¸ãæ›ãˆã‚’è¡Œã†
+// ƒeƒ“ƒvƒŒ[ƒg‚Ì‘‚«Š·‚¦‚ğs‚¤
 #define REWRITE_TEMPLATE
 
 #if (defined(_MSC_VER) && (_MSC_VER <= 1500)) || \
@@ -243,6 +243,13 @@ int TTCWnd::MessageBoxA(const char *lpText, const char *lpCaption, UINT uType)
 	return ::MessageBoxA(m_hWnd, lpText, lpCaption, uType);
 }
 
+#if defined(UNICODE)
+int TTCWnd::MessageBoxW(const wchar_t *lpText, const wchar_t *lpCaption, UINT uType)
+{
+	return ::MessageBoxW(m_hWnd, lpText, lpCaption, uType);
+}
+#endif
+
 BOOL TTCWnd::GetWindowRect(RECT *R)
 {
 	return ::GetWindowRect(m_hWnd, R);
@@ -301,11 +308,11 @@ TTCDialog::~TTCDialog()
 }
 
 /**
- * ãƒ€ã‚¤ã‚¢ãƒ­ã‚°åˆæœŸåŒ–
- * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
- * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
+ * ƒ_ƒCƒAƒƒO‰Šú‰»
+ * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
+ * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
  *
- * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
  *		TTCDialog::DlgProc(msg=WM_INITDIALOG)
  */
 BOOL TTCDialog::OnInitDialog()
@@ -314,11 +321,11 @@ BOOL TTCDialog::OnInitDialog()
 }
 
 /**
- * OKãƒœã‚¿ãƒ³
- * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
- * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
+ * OKƒ{ƒ^ƒ“
+ * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
+ * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
  *
- * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
  *		TTCDialog::OnCommand()
  */
 BOOL TTCDialog::OnOK()
@@ -328,11 +335,11 @@ BOOL TTCDialog::OnOK()
 }
 
 /**
- * CANCELãƒœã‚¿ãƒ³
- * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
- * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
+ * CANCELƒ{ƒ^ƒ“
+ * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
+ * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
  *
- * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
  *		TTCDialog::OnCommand()
  */
 BOOL TTCDialog::OnCancel()
@@ -347,11 +354,11 @@ BOOL TTCDialog::OnCommand(WPARAM wp, LPARAM lp)
 }
 
 /**
- * WM_CLOSEãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
- * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
- * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
+ * WM_CLOSEƒƒbƒZ[ƒWˆ—
+ * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
+ * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
  *
- * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
  *		TTCDialog::OnCancel()
  */
 BOOL TTCDialog::OnClose()
@@ -360,11 +367,11 @@ BOOL TTCDialog::OnClose()
 }
 
 /**
- * WM_NCDESTROYãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
- * @retval	TRUE	å‡¦ç†ãŒè¡Œã‚ã‚ŒãŸ(æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œãªã„)
- * @retval	FALSE	æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã¯å‘¼ã³å‡ºã•ã‚Œã‚‹
+ * WM_NCDESTROYƒƒbƒZ[ƒWˆ—
+ * @retval	TRUE	ˆ—‚ªs‚í‚ê‚½(Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚È‚¢)
+ * @retval	FALSE	Ÿ‚ÌƒƒbƒZ[ƒWˆ—‚ÍŒÄ‚Ño‚³‚ê‚é
  *
- * æ¬¡ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+ * Ÿ‚ÌƒƒbƒZ[ƒWˆ—
  *		TTCDialog::DlgProc()
  */
 BOOL TTCDialog::PostNcDestroy()
@@ -373,9 +380,9 @@ BOOL TTCDialog::PostNcDestroy()
 }
 
 /*
- * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
- * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
- * @retval	ãã®ä»–	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«ã‚ˆã£ã¦ç•°ãªã‚‹ã“ã¨ãŒã‚ã‚‹
+ * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
+ * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
+ * @retval	‚»‚Ì‘¼	ƒƒbƒZ[ƒW‚É‚æ‚Á‚ÄˆÙ‚È‚é‚±‚Æ‚ª‚ ‚é
  */
 LRESULT TTCDialog::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -386,8 +393,8 @@ LRESULT TTCDialog::DlgProc(UINT msg, WPARAM wp, LPARAM lp)
 }
 
 /*
- * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
- * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
+ * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
+ * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
  */
 LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -420,11 +427,11 @@ LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 		Processed = PostNcDestroy();
 		break;
 	case WM_CLOSE:
-		// CLOSEãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸæ™‚ã€
+		// CLOSEƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½A
 		Processed = OnClose();
 		if (Processed == FALSE) {
-			//	ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã•ã‚Œã¦ã„ãªã‘ã‚Œã°
-			//	dialogãªã‚‰OnCancel()ãŒç™ºç”Ÿã™ã‚‹
+			//	ƒI[ƒo[ƒ‰ƒCƒh‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î
+			//	dialog‚È‚çOnCancel()‚ª”­¶‚·‚é
 			Processed = OnCancel();
 		}
 		break;
@@ -434,11 +441,11 @@ LRESULT TTCDialog::DlgProcBase(UINT msg, WPARAM wp, LPARAM lp)
 	}
 
 	if (Processed == TRUE) {
-		// å‡¦ç†ã—ãŸ
+		// ˆ—‚µ‚½
 		return TRUE;
 	}
 
-	// æœ€å¾Œã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+	// ÅŒã‚ÌƒƒbƒZ[ƒWˆ—
 	return DlgProc(msg, wp, lp);
 }
 
@@ -473,11 +480,11 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
 		Processed = PostNcDestroy();
 		break;
 	case WM_CLOSE:
-		// CLOSEãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸæ™‚ã€
+		// CLOSEƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½A
 		Processed = OnClose();
 		if (Processed == FALSE) {
-			//	ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã•ã‚Œã¦ã„ãªã‘ã‚Œã°
-			//	dialogãªã‚‰OnCancel()ãŒç™ºç”Ÿã™ã‚‹
+			//	ƒI[ƒo[ƒ‰ƒCƒh‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î
+			//	dialog‚È‚çOnCancel()‚ª”­¶‚·‚é
 			Processed = OnCancel();
 		}
 		break;
@@ -487,12 +494,12 @@ LRESULT TTCDialog::WndProcBase(UINT msg, WPARAM wp, LPARAM lp)
 	}
 
 	if (Processed == TRUE) {
-		// å‡¦ç†ã—ãŸ
+		// ˆ—‚µ‚½
 		return TRUE;
 	}
 
-	// DlgProcã‚’ã‚ªãƒ¼ãƒãƒ©ã‚¤ãƒ‰ã™ã‚‹ã®ã§ã¯ãªãã€
-	// DefWindowProcã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ã™ã‚‹ã“ã¨
+	// DlgProc‚ğƒI[ƒoƒ‰ƒCƒh‚·‚é‚Ì‚Å‚Í‚È‚­A
+	// DefWindowProc‚ğƒI[ƒo[ƒ‰ƒCƒh‚·‚é‚±‚Æ
 	return DefWindowProc(msg, wp, lp);
 }
 
@@ -558,15 +565,15 @@ BOOL TTCDialog::Create(HINSTANCE hInstance, HWND hParent, int idd)
 	m_hWnd = hWnd;
 	m_hInst = hInstance;
 //	::EnableWindow(hParent,FALSE);
-//	::ShowWindow(hWnd, SW_SHOW);		// TODO å¤–ã§ã‚„ã‚‹ã®ãŒè‰¯ã•ãã†
+//	::ShowWindow(hWnd, SW_SHOW);		// TODO ŠO‚Å‚â‚é‚Ì‚ª—Ç‚³‚»‚¤
 //	::EnableWindow(m_hWnd,TRUE);
 
 	return TRUE;
 }
 
 /*
- * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
- * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
+ * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
+ * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
  */
 LRESULT CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -586,8 +593,8 @@ LRESULT CALLBACK TTCDialog::DlgProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM l
 }
 
 /*
- * @retval	TRUE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãŸæ™‚
- * @retval	FALSE	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†ã—ãªã‹ã£ãŸæ™‚
+ * @retval	TRUE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚½
+ * @retval	FALSE	ƒƒbƒZ[ƒW‚ğˆ—‚µ‚È‚©‚Á‚½
  */
 LRESULT CALLBACK TTCDialog::WndProcStub(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -711,7 +718,7 @@ TTCPropertySheet::TTCPropertySheet(HINSTANCE hInstance, LPCTSTR pszCaption, HWND
 	m_psh.dwFlags = PSH_DEFAULT | PSH_NOAPPLYNOW | PSH_USECALLBACK;	// | PSH_MODELESS
 	if (pszCaption != nullptr) {
 		m_psh.pszCaption = pszCaption;
-		//m_psh.dwFlags |= PSH_PROPTITLE;		// ã€Œã®ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ãƒ¼ã€ãŒè¿½åŠ ã•ã‚Œã‚‹?
+		//m_psh.dwFlags |= PSH_PROPTITLE;		// u‚ÌƒvƒƒpƒeƒB[v‚ª’Ç‰Á‚³‚ê‚é?
 	}
 	m_psh.hwndParent = hParentWnd;
 	m_psh.pfnCallback = PropSheetProc;
@@ -727,9 +734,9 @@ INT_PTR TTCPropertySheet::DoModal()
 	gTTCPS = this;
 	return PropertySheet(&m_psh);
 
-	// ãƒ¢ãƒ¼ãƒ€ãƒ¬ã‚¹ã«ã™ã‚‹ã¨ã‚¿ãƒ–ã®å‹•ããŒãŠã‹ã—ã„
+	// ƒ‚[ƒ_ƒŒƒX‚É‚·‚é‚Æƒ^ƒu‚Ì“®‚«‚ª‚¨‚©‚µ‚¢
 #if 0
-	// ãƒ¢ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+	// ƒ‚[ƒhƒŒƒXƒ_ƒCƒAƒƒOƒ{ƒbƒNƒX‚Ìê‡‚ÍƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
 	m_hWnd = (HWND)::PropertySheet(&m_psh);
 //	ShowWindow(m_hWnd, SW_SHOW);
 
@@ -751,12 +758,12 @@ INT_PTR TTCPropertySheet::DoModal()
 		if ((hDlgWnd == Msg.hwnd) ||
 			::SendMessage(hDlgWnd, PSM_ISDIALOGMESSAGE, nullptr, (LPARAM)&Msg))
 		{
-			// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä»¥å¤–ã®å‡¦ç†
+			// ƒ_ƒCƒAƒƒOˆÈŠO‚Ìˆ—
 			::TranslateMessage(&Msg);
 			::DispatchMessage(&Msg);
 		}
 		if (!SendMessage(hDlgWnd, PSM_GETCURRENTPAGEHWND, 0, 0)) {
-			// ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ãƒ¼ã‚·ãƒ¼ãƒˆçµ‚äº†
+			// ƒvƒƒpƒeƒB[ƒV[ƒgI—¹
 			break;
 		}
 	}
@@ -770,7 +777,7 @@ int CALLBACK TTCPropertySheet::PropSheetProc(HWND hWnd, UINT msg, LPARAM lp)
 	case PSCB_PRECREATE:
 	{
 #if defined(REWRITE_TEMPLATE)
-		// ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã®å†…å®¹ã‚’æ›¸ãæ›ãˆã‚‹ å±é™º
+		// ƒeƒ“ƒvƒŒ[ƒg‚Ì“à—e‚ğ‘‚«Š·‚¦‚é ŠëŒ¯
 		// http://home.att.ne.jp/banana/akatsuki/doc/atlwtl/atlwtl15-01/index.html
 		size_t PrevTemplSize;
 		size_t NewTemplSize;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2018 TeraTerm Project
  * All rights reserved.
  *
@@ -59,6 +59,9 @@ public:
 	void ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0);
 	int MessageBoxT(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 	int MessageBoxA(const char * lpText, const char *lpCaption, UINT uType);
+#if defined(UNICODE)
+	int MessageBoxW(const wchar_t * lpText, const wchar_t *lpCaption, UINT uType);
+#endif
 	//virtual LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	BOOL GetWindowRect(RECT *R);
