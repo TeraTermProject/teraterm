@@ -612,7 +612,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=Fichier clé privée hôte:
 DLG_AUTHSETUP_CHECKAUTH=Vérifier la méthode d'authentification autorisée avant la connexion (SSH2)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=Choisir le fichier contenant la clé privée RSA/DSA/ECDSA/ED25519
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=Vous devez spécifier un fichier contenant la clé privée RSA/DSA/ECDSA/ED25519.
 MSG_READKEY_ERROR=Erreur de lecture du fichier de clé privée SSH2\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=L'authentification Rhosts va probablement échouer car ce n'est pas la méthode d'authentification par défaut.\nPour utiliser l'authentification Rhosts avec TTSSH, il faut la paramétrer par défaut en redémarrant\nTTSSH et en sélectionnant "Authentification SSH..." dans le menu de configuration avant de vous connecter.

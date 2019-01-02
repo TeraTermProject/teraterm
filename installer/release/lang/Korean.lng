@@ -612,7 +612,7 @@ DLG_AUTHSETUP_HOST_PRIVATEKEY=호스트 개인키(&F):
 DLG_AUTHSETUP_CHECKAUTH=로그인 전에 활성화된 인증 방법을 확인(SSH2)(&C)
 
 FILEDLG_OPEN_PRIVATEKEY_TITLE=RSA/DSA/ECDSA/ED25519 개인키 파일을 선택하세요
-FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0all(*.*)\0*.*\0\0
+FILEDLG_OPEN_PRIVATEKEY_FILTER=identity files\0identity;id_rsa;id_dsa;id_ecdsa;id_ed25519;*.ppk;*.pem\0identity(RSA1)\0identity\0id_rsa(SSH2)\0id_rsa\0id_dsa(SSH2)\0id_dsa\0id_ecdsa(SSH2)\0id_ecdsa\0id_ed25519(SSH2)\0id_ed25519\0PuTTY(*.ppk)\0*.ppk\0PEM files(*.pem)\0*.pem\0all(*.*)\0*.*\0\0
 MSG_KEYSPECIFY_ERROR=RSA/DSA/ECDSA/ED25519 개인키를 포함한 파일을 지정해야만 합니다.
 MSG_READKEY_ERROR=SSH2 개인키 파일 읽기 오류\n%s
 MSG_RHOSTS_NOTDEFAULT_ERROR=Rhosts가 기본 인증방법이 아니어서 인증이 실패할 것입니다.\nTTSSH에서 Rhosts 인증을 사용하기 위해, 연결하기 전 설정 메뉴의 "SSH 인증..."에서\n기본값이 되도록 선택하고 TTSSH를 재시작해야 합니다.
