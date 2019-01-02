@@ -424,6 +424,7 @@ BOOL IsExistFont(const TCHAR *face, BYTE charset, BOOL strict)
 /**
  *	使用するCharSetを取得する
  */
+#if 0
 DWORD GetCharSet()
 {
 	DWORD codepage;
@@ -450,10 +451,12 @@ DWORD GetCharSet()
 
 	return charset_info.ciCharset;
 }
+#endif
 
 /**
  *	使用するダイアログフォントの候補
  */
+#if 0
 typedef struct {
 	const TCHAR *face;
 	LONG height;
@@ -508,14 +511,13 @@ const DialogFontLists *GetDialogFontCandidate(BYTE char_set)
 	}
 	}
 }
+#endif
 
 /**
  *	使用するダイアログフォントを決定する
  */
 void SetDialogFont(const char *section, const char *UILanguageFile)
 {
-	BYTE char_set = SYMBOL_CHARSET;	// symbolを使うことはないだろう
-
 	// 明示的に指定されている場合はそれに従う
 	{
 		static const char *dlg_font_keys[] = {
@@ -528,7 +530,7 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 		int i;
 		if (section != NULL) {
 			for (i = 0; i < _countof(dlg_font_keys); i++) {
-				result = GetI18nLogfont(section, "DLG_FONT", &logfont, 72, UILanguageFile);
+				result = GetI18nLogfont(section, dlg_font_keys[i], &logfont, 72, UILanguageFile);
 				if (result == TRUE) {
 					break;
 				}
@@ -536,7 +538,7 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 		}
 		if (result == FALSE) {
 			for (i = 0; i < _countof(dlg_font_keys); i++) {
-				result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
+				result = GetI18nLogfont("Tera Term", dlg_font_keys[i], &logfont, 72, UILanguageFile);
 				if (result == TRUE) {
 					break;
 				}
@@ -556,28 +558,9 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 				return;
 			}
 #endif
-
-			// 使用したかったフォントのCharSetを取得
-			char_set = logfont.lfCharSet;
-			// TODO フォントが見つからなかったときの処理
-			//	messagebox()出して下へ続くが妥当か?
-		}
-	}
-
-	// 実際に存在するフォントを使用する
-	{
-		if (char_set == SYMBOL_CHARSET) {
-			// 未設定の場合
-			char_set = GetCharSet();
-		}
-		const DialogFontLists *list = GetDialogFontCandidate(char_set);
-		while(list->face != NULL) {
-			if (IsExistFont(list->face, char_set, TRUE)) {
-				// 候補内に存在するフォントが存在した
-				TTSetDlgFont(list->face, list->height, char_set);
-				return;
-			}
-			list++;
+			// フォントが見つからなかったとき、
+			// 文字化けで正しく表示されない事態となる
+			// messagebox()のフォントをとりあえず選択しておく
 		}
 	}
 

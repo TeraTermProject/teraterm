@@ -32,6 +32,11 @@ void UTIL_get_lang_msgU8(const char *key, char *buf, int buf_len, const char *de
     GetI18nStrU8("TTProxy", key, buf, buf_len, def, UILanguageFile);
 }
 
+void UTIL_set_dialog_font()
+{
+	SetDialogFont("TTProxy", UILanguageFile);
+}
+
 #if 0
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font)
 {
@@ -968,6 +973,7 @@ private:
         String ErrorMessage;
 
         int open(HWND owner) {
+			UTIL_set_dialog_font();
             return Dialog::open(instance().resource_module, IDD_OPTION_SETTING, owner);
         }
     };
@@ -1250,6 +1256,7 @@ private:
         }
 
         int open(HWND owner) {
+			UTIL_set_dialog_font();
             return Dialog::open(instance().resource_module, IDD_SETTING, owner);
         }
     };
@@ -1316,6 +1323,7 @@ private:
         }
     public :
         int open(HWND owner) {
+			UTIL_set_dialog_font();
             return Dialog::open(instance().resource_module, IDD_ABOUTDIALOG, owner);
         }
     };
@@ -2425,7 +2433,8 @@ public:
     static bool setupDialog(HWND owner) {
         SettingDialog dlg;
         dlg.proxy = instance().defaultProxy;
-        if (dlg.open(owner) == IDOK) {
+		UTIL_set_dialog_font();
+		if (dlg.open(owner) == IDOK) {
             instance().defaultProxy = dlg.proxy;
             return true;
         }
@@ -2433,6 +2442,7 @@ public:
     }
     static bool aboutDialog(HWND owner) {
         AboutDialog dlg;
+		UTIL_set_dialog_font();
         if (dlg.open(owner) == IDOK) {
             return true;
         }

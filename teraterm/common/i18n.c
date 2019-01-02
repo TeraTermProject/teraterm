@@ -82,12 +82,32 @@ DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int
 #endif
 }
 
+static void GetMessageBoxFontName(char *FontName)
+{
+	NONCLIENTMETRICSA nci;
+#if(WINVER >= 0x0600)
+	int st_size = offsetof(NONCLIENTMETRICSA, iPaddedBorderWidth);
+#else
+	int st_size = sizeof(NONCLIENTMETRICSA);
+#endif
+	BOOL r;
+	const LOGFONTA *logfont;
+
+	memset(&nci, 0, sizeof(nci));
+	nci.cbSize = st_size;
+	r = SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+	assert(r == TRUE);
+	logfont = &nci.lfStatusFont;
+
+	strcpy(FontName, logfont->lfFaceName);
+}
 
 DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
 {
 	static char tmp[MAX_UIMSG];
 	static char font[LF_FACESIZE];
 	int hight, charset;
+	assert(iniFile[0] != '\0');
 	GetPrivateProfileStringA(section, key, "", tmp, MAX_UIMSG, iniFile);
 	if (tmp[0] == '\0') {
 		return FALSE;
@@ -97,7 +117,12 @@ DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA log
 	GetNthNum(tmp, 2, &hight);
 	GetNthNum(tmp, 3, &charset);
 
-	strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
+	memset(logfont, 0, sizeof(*logfont));
+	if (font[0] == '\0') {
+		GetMessageBoxFontName(logfont->lfFaceName);
+	} else {
+		strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
+	}
 	logfont->lfCharSet = (BYTE)charset;
 	logfont->lfHeight = MulDiv(hight, -ppi, 72);
 	logfont->lfWidth = 0;
