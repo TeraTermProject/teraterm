@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 2006-2018 TeraTerm Project
  * All rights reserved.
  *
@@ -52,7 +52,7 @@ DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int b
 	RestoreNewLine(buf);
 }
 
-// TODO: ãƒãƒƒãƒ•ã‚¡ä¸è¶³æ™‚ã®å‹•ä½œ
+// TODO: ƒoƒbƒtƒ@•s‘«‚Ì“®ì
 DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
 {
 	int r;
@@ -88,8 +88,8 @@ DllExport int GetI18nLogfont(const char *section, const char *key, PLOGFONTA log
 	static char tmp[MAX_UIMSG];
 	static char font[LF_FACESIZE];
 	int hight, charset;
-	GetPrivateProfileStringA(section, key, "-", tmp, MAX_UIMSG, iniFile);
-	if (strcmp(tmp, "-") == 0) {
+	GetPrivateProfileStringA(section, key, "", tmp, MAX_UIMSG, iniFile);
+	if (tmp[0] == '\0') {
 		return FALSE;
 	}
 

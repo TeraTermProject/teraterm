@@ -459,9 +459,8 @@ typedef struct {
 	LONG height;
 } DialogFontLists;
 
-DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
+const DialogFontLists *GetDialogFontCandidate(BYTE char_set)
 {
-	DWORD char_set = GetCharSet();
 	switch (char_set) {
 	case SHIFTJIS_CHARSET: {
 		static const DialogFontLists list[] = {
@@ -471,8 +470,7 @@ DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
 			{ _T("ＭＳ ゴシック"), -9 },	// Windows 3.1以降
 			0
 		};
-		*candidate_list = list;
-		return char_set;
+		return list;
 	}
 	case HANGUL_CHARSET: {
 		// Korean
@@ -481,8 +479,7 @@ DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
 			{ _T("굴림"), -10 },
 			0
 		};
-		*candidate_list = list;
-		return char_set;
+		return list;
 	}
 	case GB2312_CHARSET: {
 		// Simplified Chinese
@@ -491,8 +488,7 @@ DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
 			{ _T("微软雅黑") , -10 },
 			0
 		};
-		*candidate_list = list;
-		return char_set;
+		return list;
 	}
 	case CHINESEBIG5_CHARSET: {
 		// Traditional Chinese
@@ -501,16 +497,14 @@ DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
 			{ _T("新細明體") , -10 },
 			0
 		};
-		*candidate_list = list;
-		return char_set;
+		return list;
 	}
 	default: {
 		static const DialogFontLists list[] = {
 			{ _T("Tahoma"), -8 },
 			0
 		};
-		*candidate_list = list;
-		return char_set;
+		return list;
 	}
 	}
 }
@@ -520,15 +514,33 @@ DWORD GetDialogFontCandidate(const DialogFontLists **candidate_list)
  */
 void SetDialogFont(const char *section, const char *UILanguageFile)
 {
+	BYTE char_set = SYMBOL_CHARSET;	// symbolを使うことはないだろう
+
 	// 明示的に指定されている場合はそれに従う
 	{
+		static const char *dlg_font_keys[] = {
+			"DLG_FONT",
+			"DLG_TAHOMA_FONT",
+			"DLG_SYSTEM_FONT",
+		};
 		BOOL result = FALSE;
 		LOGFONTA logfont;
+		int i;
 		if (section != NULL) {
-			result = GetI18nLogfont(section, "DLG_FONT", &logfont, 72, UILanguageFile);
+			for (i = 0; i < _countof(dlg_font_keys); i++) {
+				result = GetI18nLogfont(section, "DLG_FONT", &logfont, 72, UILanguageFile);
+				if (result == TRUE) {
+					break;
+				}
+			}
 		}
 		if (result == FALSE) {
-			result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
+			for (i = 0; i < _countof(dlg_font_keys); i++) {
+				result = GetI18nLogfont("Tera Term", "DLG_FONT", &logfont, 72, UILanguageFile);
+				if (result == TRUE) {
+					break;
+				}
+			}
 		}
 		if (result == TRUE) {
 #if defined(UNICODE)
@@ -544,6 +556,9 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 				return;
 			}
 #endif
+
+			// 使用したかったフォントのCharSetを取得
+			char_set = logfont.lfCharSet;
 			// TODO フォントが見つからなかったときの処理
 			//	messagebox()出して下へ続くが妥当か?
 		}
@@ -551,14 +566,18 @@ void SetDialogFont(const char *section, const char *UILanguageFile)
 
 	// 実際に存在するフォントを使用する
 	{
-		DWORD charset;
-		const DialogFontLists *list;
-		charset = GetDialogFontCandidate(&list);
+		if (char_set == SYMBOL_CHARSET) {
+			// 未設定の場合
+			char_set = GetCharSet();
+		}
+		const DialogFontLists *list = GetDialogFontCandidate(char_set);
 		while(list->face != NULL) {
-			if (IsExistFont(list->face, (BYTE)charset, TRUE)) {
-				TTSetDlgFont(list->face, list->height, charset);
+			if (IsExistFont(list->face, char_set, TRUE)) {
+				// 候補内に存在するフォントが存在した
+				TTSetDlgFont(list->face, list->height, char_set);
 				return;
 			}
+			list++;
 		}
 	}
 

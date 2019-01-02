@@ -32,6 +32,7 @@ void UTIL_get_lang_msgU8(const char *key, char *buf, int buf_len, const char *de
     GetI18nStrU8("TTProxy", key, buf, buf_len, def, UILanguageFile);
 }
 
+#if 0
 int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font)
 {
     if (GetI18nLogfont("TTProxy", key, logfont,
@@ -46,6 +47,7 @@ int UTIL_get_lang_font(const char *key, HWND dlg, PLOGFONTA logfont, HFONT *font
 
     return TRUE;
 }
+#endif
 
 class ProxyWSockHook {
 public:
@@ -741,7 +743,7 @@ private:
         Window conn;
         Window erro;
         Window log;
-        HFONT DlgFont;
+//        HFONT DlgFont;
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND && wParam == MAKEWPARAM(IDC_REFER, BN_CLICKED)) {
@@ -793,11 +795,12 @@ private:
             };
             TCHAR uimsg[MAX_UIMSG];
 //			TCHAR uitmp[MAX_UIMSG];
-            LOGFONTA logfont;
-            HFONT font;
+//            LOGFONTA logfont;
+//            HFONT font;
 
             Dialog::onInitDialog();
 
+#if 0
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
             GetObject(font, sizeof(logfont), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
@@ -828,6 +831,7 @@ private:
             else {
                 DlgFont = NULL;
             }
+#endif
 
             HWND hWnd = (HWND)this;
 			hWnd = GetHWND();
@@ -937,15 +941,19 @@ private:
 
             logfile = log.GetWindowTextLength() > 0 ? log.GetWindowText() : NULL;
 
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onOK();
         }
         virtual void onCancel() {
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onCancel();
         }
     public:
@@ -974,7 +982,7 @@ private:
         EditBoxCtrl  user;
         EditBoxCtrl  pass;
         bool lock;
-        HFONT DlgFont;
+//        HFONT DlgFont;
     protected:
         virtual bool dispatch(int message, int wParam, long lParam) {
             if (message == WM_COMMAND) {
@@ -997,11 +1005,12 @@ private:
         virtual bool onInitDialog() {
             TCHAR uimsg[MAX_UIMSG];
 //			TCHAR uitmp[MAX_UIMSG];
-            LOGFONTA logfont;
-            HFONT font;
+//            LOGFONTA logfont;
+//            HFONT font;
 
             Dialog::onInitDialog();
 
+#if 0
             font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
             GetObject(font, sizeof(logfont), &logfont);
             if (UTIL_get_lang_font("DLG_TAHOMA_FONT", HWND(), &logfont, &DlgFont)) {
@@ -1024,7 +1033,7 @@ private:
             else {
                 DlgFont = NULL;
             }
-
+#endif
             const static DlgTextInfo text_info[] = {
                 { 0, "DLG_SETUP_TITLE" },
                 { IDC_URL_LABEL, "DLG_SETUP_URL" },
@@ -1131,15 +1140,19 @@ private:
                     return;
                 }
             }
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onOK();
         }
         virtual void onCancel() {
+#if 0
             if (DlgFont != NULL) {
                 DeleteObject(DlgFont);
             }
+#endif
             Dialog::onCancel();
         }
         void onOptions() {
@@ -1251,6 +1264,7 @@ private:
             const TCHAR *ver;
             int n, a, b, c, d, len;
             TCHAR uimsg[MAX_UIMSG], uimsg2[MAX_UIMSG], uimsg3[MAX_UIMSG];
+#if 0
             LOGFONTA logfont;
             HFONT font;
 
@@ -1263,6 +1277,7 @@ private:
             else {
                 DlgFont = NULL;
             }
+#endif
 
             GetWindowText(uimsg2, _countof(uimsg2));
             UTIL_get_lang_msg("DLG_ABOUT_TITLE", uimsg, _countof(uimsg), uimsg2);
