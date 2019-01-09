@@ -711,7 +711,7 @@ FILEDLG_SAVE_PUBLICKEY_RSA1_FILTER=SSH1 RSA key(identity.pub)\0identity.pub\0All
 FILEDLG_SAVE_PUBLICKEY_RSA_FILTER=SSH2 RSA key(id_rsa.pub)\0id_rsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_DSA_FILTER=SSH2 DSA key(id_dsa.pub)\0id_dsa.pub\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PUBLICKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa.pub)\0id_ecdsa.pub\0All Files(*.*)\0*.*\0\0
-FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\\0id_ed25519.pub\\0All Files(*.*)\\0*.*\\0\\0
+FILEDLG_SAVE_PUBLICKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519.pub)\0id_ed25519.pub\0All Files(*.*)\0*.*\0\0
 MSG_SAVE_KEY_OPENFILE_ERROR=Impossible d'ouvrir fichier de clé
 MSG_SAVE_KEY_WRITEFILE_ERROR=Impossible d'écrire fichier de clé
 MSG_SAVE_PRIVATE_KEY_MISMATCH_ERROR=Les deux phrases secrètes sont différentes.
@@ -721,7 +721,7 @@ FILEDLG_SAVE_PRIVATEKEY_RSA1_FILTER=SSH1 RSA key(identity)\0identity\0All Files(
 FILEDLG_SAVE_PRIVATEKEY_RSA_FILTER=SSH2 RSA key(id_rsa)\0id_rsa\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_DSA_FILTER=SSH2 DSA key(id_dsa)\0id_dsa\0All Files(*.*)\0*.*\0\0
 FILEDLG_SAVE_PRIVATEKEY_ECDSA_FILTER=SSH2 ECDSA key(id_ecdsa)\0id_ecdsa\0All Files(*.*)\0*.*\0\0
-FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\\0id_ed25519\\0All Files(*.*)\\0*.*\\0\\0
+FILEDLG_SAVE_PRIVATEKEY_ED25519_FILTER=SSH2 ED25519 key(id_ed25519)\0id_ed25519\0All Files(*.*)\0*.*\0\0
 
 ; dlg setup
 DLG_SSHSETUP_TITLE=TTSSH: Configuration
