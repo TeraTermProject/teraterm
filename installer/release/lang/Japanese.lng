@@ -1,8 +1,8 @@
 ; Updated by TeraTerm Project (2018-08-28)
 
 [Tera Term]
-DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
-DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+;DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
+;DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
 
 MENU_FILE=ファイル(&F)
 MENU_FILE_NEW=新しい接続(&N)...\tAlt+N
@@ -535,9 +535,9 @@ MSG_INI_WRITE_ERROR=iniファイルに書き込みができません
 
 [TTSSH]
 ; font
-DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
-DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
-DLG_ABOUT_FONT=ＭＳ ゴシック,9,128
+;DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
+;DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+;DLG_ABOUT_FONT=ＭＳ ゴシック,9,128
 
 ; menu
 MENU_ABOUT=&TTSSHについて...
@@ -925,7 +925,7 @@ BTN_NO=いいえ(&N)
 
 
 [TTProxy]
-DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+;DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
 
 MENU_SETUP=プロキシ(&P)...
 MENU_ABOUT=TT&Proxyについて...
@@ -1112,7 +1112,7 @@ MENU_ALWAYSONTOP=常に最前面に表示(&A)
 
 
 [TTXRecurringCommand]
-DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
+;DLG_TAHOMA_FONT=ＭＳ Ｐゴシック,9,128
 
 MENU_SETUP_RECURRING=繰り返しコマンド(&U)
 MENU_CONTROL_RECURRING=繰り返しコマンド(&U)

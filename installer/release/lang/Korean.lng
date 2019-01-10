@@ -2,8 +2,8 @@
 ; Last translated (Korean language) by Daehong Kim (2013-07-25)
 
 [Tera Term]
-DLG_SYSTEM_FONT=굴림,10,128
-DLG_TAHOMA_FONT=돋움,9,128
+;DLG_SYSTEM_FONT=굴림,10,128
+;DLG_TAHOMA_FONT=돋움,9,128
 
 MENU_FILE=메뉴(&F)
 MENU_FILE_NEW=새로 만들기(&N)...\tAlt+N
@@ -534,9 +534,9 @@ MSG_INI_WRITE_ERROR=ini 파일을 저장할 수 없습니다.
 
 [TTSSH]
 ; font
-DLG_SYSTEM_FONT=굴림,10,128
-DLG_TAHOMA_FONT=돋움,9,128
-DLG_ABOUT_FONT=Courier New,8,0
+;DLG_SYSTEM_FONT=굴림,10,128
+;DLG_TAHOMA_FONT=돋움,9,128
+;DLG_ABOUT_FONT=Courier New,8,0
 
 ; menu
 MENU_ABOUT=TTSSH에 대하여...(&T)
@@ -927,7 +927,7 @@ BTN_NO=&No
 
 
 [TTProxy]
-DLG_TAHOMA_FONT=Tahoma,8,0
+;DLG_TAHOMA_FONT=Tahoma,8,0
 
 MENU_SETUP=&Proxy...
 MENU_ABOUT=TTProxy에 대하여...(&P)
@@ -1114,7 +1114,7 @@ MENU_ALWAYSONTOP=항상 위(&A)
 
 
 [TTXRecurringCommand]
-DLG_TAHOMA_FONT=Tahoma,8,0
+;DLG_TAHOMA_FONT=Tahoma,8,0
 
 MENU_SETUP_RECURRING=되풀이 명령(&U)
 MENU_CONTROL_RECURRING=되풀이 명령(&U)
