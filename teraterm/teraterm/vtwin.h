@@ -197,6 +197,7 @@ protected:
 	afx_msg void OnSetupTerminal();
 	afx_msg void OnSetupWindow();
 	afx_msg void OnSetupFont();
+	afx_msg void OnSetupDlgFont();
 	afx_msg void OnSetupKeyboard();
 	afx_msg void OnSetupSerialPort();
 	afx_msg void OnSetupTCPIP();

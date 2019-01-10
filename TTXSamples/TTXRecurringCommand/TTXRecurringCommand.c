@@ -605,7 +605,7 @@ static LRESULT CALLBACK RecurringCommandSetting(HWND dlg, UINT msg, WPARAM wPara
 static int PASCAL TTXProcessCommand(HWND hWin, WORD cmd) {
 	switch (cmd) {
 	  case ID_MENU_SETUP:
-		SetDialogFont("TTXRecurringCommand", pvar->ts->UILanguageFile);
+		SetDialogFont(pvar->ts->SetupFName, pvar->ts->UILanguageFile, "TTXRecurringCommand");
 		switch (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_SETUP_RECURRINGCOMMAND),
 		                       hWin, RecurringCommandSetting, (LPARAM)NULL)) {
 		  case IDOK:

@@ -34,7 +34,7 @@ void UTIL_get_lang_msgU8(const char *key, char *buf, int buf_len, const char *de
 
 void UTIL_set_dialog_font()
 {
-	SetDialogFont("TTProxy", UILanguageFile);
+	SetDialogFont(NULL, UILanguageFile, "TTProxy");
 }
 
 #if 0

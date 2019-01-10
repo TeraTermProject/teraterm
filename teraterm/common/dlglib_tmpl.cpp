@@ -163,7 +163,7 @@ static size_t CopyDlgItem(const WORD *src, WORD *dest)
 		}
 		src += extraCount;
 	}
-	
+
 	size = (size + 1) & ~1;
 	return size;
 }
@@ -205,7 +205,7 @@ static size_t CopyDlgTemplate(
 			// 取得
 			if (logfont != NULL) {
 				memset(logfont, 0, sizeof(*logfont));
-				logfont->lfHeight = -(*src++);
+				logfont->lfHeight = *src++;
 				t = CopySz(src, (WORD *)(&logfont->lfFaceName[0]));
 			} else {
 				src++;
@@ -215,7 +215,7 @@ static size_t CopyDlgTemplate(
 		} else {
 			// セット
 			if (logfont != NULL) {
-				*dest++ = (WORD)(-logfont->lfHeight);
+				*dest++ = (WORD)logfont->lfHeight;
 				src += 1;
 				t = CopySz((WORD *)(&logfont->lfFaceName[0]), dest);
 				dest += t;
@@ -276,7 +276,7 @@ static size_t CopyDlgItemEx(const WORD *src, WORD *dest)
 		}
 		src += extraCount;
 	}
-	
+
 	size = (size + 1) & ~1;
 	return size;
 }
@@ -322,7 +322,7 @@ static size_t CopyDlgTemplateEx(
 			// 取得
 			if (logfont != NULL) {
 				memset(logfont, 0, sizeof(*logfont));
-				logfont->lfHeight = -(*src++);
+				logfont->lfHeight = *src++;
 				logfont->lfWeight = *src++;
 				logfont->lfItalic = *((BYTE *)src);
 				logfont->lfCharSet = *(((BYTE *)src)+1);
@@ -338,7 +338,7 @@ static size_t CopyDlgTemplateEx(
 		} else {
 			// セット
 			if (logfont != NULL) {
-				*dest++ = (WORD)(-logfont->lfHeight);
+				*dest++ = (WORD)logfont->lfHeight;
 				*dest++ = (WORD)logfont->lfWeight;
 				*((BYTE *)dest) = logfont->lfItalic;
 				*(((BYTE *)dest)+1) = logfont->lfCharSet;

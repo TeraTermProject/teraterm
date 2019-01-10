@@ -997,14 +997,14 @@ static void init_hosts_dlg(PTInstVar pvar, HWND dlg)
 	}
 	{
 		const TCHAR *hostname = ToTcharU8(pvar->hosts_state.prefetched_hostname);
-		_tcsncpy_s(buf2 + i, sizeof(buf2) - i,
+		_tcsncpy_s(buf2 + i, _countof(buf2) - i,
 				   hostname, _TRUNCATE);
 		free((void *)hostname);
 	}
 	j = i + _tcslen(buf2 + i);
 	for (; buf[i] == '#'; i++) {
 	}
-	_tcsncpy_s(buf2 + j, sizeof(buf2) - j, buf + i, _TRUNCATE);
+	_tcsncpy_s(buf2 + j, _countof(buf2) - j, buf + i, _TRUNCATE);
 
 	SetDlgItemText(dlg, IDC_HOSTWARNING, buf2);
 

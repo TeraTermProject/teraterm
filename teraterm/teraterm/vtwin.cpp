@@ -105,10 +105,12 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #define CreateProcessT CreateProcessW
 #define GetStartupInfoT GetStartupInfoW
 #define STARTUPINFOT STARTUPINFOW
+#define SetDlgItemTextT SetDlgItemTextW
 #else
 #define CreateProcessT CreateProcessA
 #define GetStartupInfoT GetStartupInfoA
 #define STARTUPINFOT STARTUPINFOA
+#define SetDlgItemTextT SetDlgItemTextA
 #endif
 
 #ifdef _DEBUG
@@ -1236,10 +1238,12 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_EDIT_SELECTSCREEN, "MENU_EDIT_SELECTSCREEN" },
 		{ ID_EDIT_SELECTALL, "MENU_EDIT_SELECTALL" },
 	};
-	static const DlgTextInfo SetupMenuTextInfo1[] = {
+	static const DlgTextInfo SetupMenuTextInfo[] = {
 		{ ID_SETUP_TERMINAL, "MENU_SETUP_TERMINAL" },
 		{ ID_SETUP_WINDOW, "MENU_SETUP_WINDOW" },
+		{ 2, "MENU_SETUP_FONT" },
 		{ ID_SETUP_FONT, "MENU_SETUP_FONT" },
+		{ ID_SETUP_DLG_FONT, "MENU_SETUP_DLG_FONT" },
 		{ ID_SETUP_KEYBOARD, "MENU_SETUP_KEYBOARD" },
 		{ ID_SETUP_SERIALPORT, "MENU_SETUP_SERIALPORT" },
 		{ ID_SETUP_TCPIP, "MENU_SETUP_TCPIP" },
@@ -1250,7 +1254,7 @@ void CVTWindow::InitMenu(HMENU *Menu)
 		{ ID_OPEN_SETUP, "MENU_SETUP_OPENSETUP" },
 		{ ID_SETUP_LOADKEYMAP, "MENU_SETUP_LOADKEYMAP" },
 	};
-	static const DlgTextInfo ControlMenuTextInfo1[] = {
+	static const DlgTextInfo ControlMenuTextInfo[] = {
 		{ ID_CONTROL_RESETTERMINAL, "MENU_CONTROL_RESET" },
 		{ ID_CONTROL_RESETREMOTETITLE, "MENU_CONTROL_RESETTITLE" },
 		{ ID_CONTROL_AREYOUTHERE, "MENU_CONTROL_AREYOUTHERE" },
@@ -1298,8 +1302,8 @@ void CVTWindow::InitMenu(HMENU *Menu)
 
 	SetDlgMenuTexts(FileMenu, FileMenuTextInfo, _countof(FileMenuTextInfo), ts.UILanguageFile);
 	SetDlgMenuTexts(hMenu, EditMenuTextInfo, _countof(EditMenuTextInfo), ts.UILanguageFile);
-	SetDlgMenuTexts(hMenu, SetupMenuTextInfo1, _countof(SetupMenuTextInfo1), ts.UILanguageFile);
-	SetDlgMenuTexts(hMenu, ControlMenuTextInfo1, _countof(ControlMenuTextInfo1), ts.UILanguageFile);
+	SetDlgMenuTexts(SetupMenu, SetupMenuTextInfo, _countof(SetupMenuTextInfo), ts.UILanguageFile);
+	SetDlgMenuTexts(hMenu, ControlMenuTextInfo, _countof(ControlMenuTextInfo), ts.UILanguageFile);
 	SetDlgMenuTexts(hMenu, HelpMenuTextInfo, _countof(HelpMenuTextInfo), ts.UILanguageFile);
 
 	TTXModifyMenu(hMenu); /* TTPLUG */
@@ -4491,6 +4495,51 @@ void CVTWindow::OnSetupFont()
 	DispSetupFontDlg();
 }
 
+static BOOL CALLBACK TFontHook(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	if (Message == WM_INITDIALOG) {
+		TCHAR uimsg[MAX_UIMSG];
+		get_lang_msgT("DLG_CHOOSEFONT_STC6", uimsg, _countof(uimsg),
+					  _T("\"Font style\" selection here won't affect actual font appearance."), ts.UILanguageFile);
+		SetDlgItemTextT(Dialog, stc6, uimsg);
+	}
+	return FALSE;
+}
+
+void CVTWindow::OnSetupDlgFont()
+{
+	LOGFONTA LogFont;
+	CHOOSEFONTA cf;
+	BOOL result;
+	result = GetI18nLogfont("Tera Term", "DlgFont", &LogFont, 0, ts.SetupFName);
+	if (result == FALSE) {
+		memset(&LogFont, 0, sizeof(LogFont));
+	}
+
+	memset(&cf, 0, sizeof(cf));
+	cf.lStructSize = sizeof(cf);
+	cf.hwndOwner = HVTWin;
+	cf.lpLogFont = &LogFont;
+	cf.Flags =
+		CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
+		CF_SHOWHELP | CF_NOVERTFONTS |
+		CF_ENABLEHOOK;
+	if (ts.ListHiddenFonts) {
+		cf.Flags |= CF_INACTIVEFONTS;
+	}
+	cf.lpfnHook = (LPCFHOOKPROC)(&TFontHook);
+	cf.nFontType = REGULAR_FONTTYPE;
+	cf.hInstance = hInst;
+	HelpId = HlpSetupFont;
+	result = ChooseFontA(&cf);
+	if (result) {
+		char Temp[80];
+		_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%s,%d,%d",
+					LogFont.lfFaceName, LogFont.lfHeight, LogFont.lfCharSet);
+		WritePrivateProfileStringA("Tera Term", "DlgFont", Temp, ts.SetupFName);
+	}
+}
+
 void CVTWindow::OnSetupKeyboard()
 {
 	BOOL Ok;
@@ -6265,6 +6314,7 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 		case ID_SETUP_TERMINAL: OnSetupTerminal(); break;
 		case ID_SETUP_WINDOW: OnSetupWindow(); break;
 		case ID_SETUP_FONT: OnSetupFont(); break;
+		case ID_SETUP_DLG_FONT: OnSetupDlgFont(); break;
 		case ID_SETUP_KEYBOARD: OnSetupKeyboard(); break;
 		case ID_SETUP_SERIALPORT: OnSetupSerialPort(); break;
 		case ID_SETUP_TCPIP: OnSetupTCPIP(); break;

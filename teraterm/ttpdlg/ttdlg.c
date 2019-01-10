@@ -80,6 +80,7 @@
 
 //static HANDLE hInst;
 extern HANDLE hInst;
+extern TTTSet ts;
 
 static char UILanguageFile[MAX_PATH];
 
@@ -2777,7 +2778,7 @@ DllExport BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 		i = IDD_TERMDLG;
 	}
 
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(i),
@@ -2786,7 +2787,7 @@ DllExport BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_WINDLG),
@@ -2795,7 +2796,7 @@ DllExport BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_KEYBDLG),
@@ -2804,7 +2805,7 @@ DllExport BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_SERIALDLG),
@@ -2813,7 +2814,7 @@ DllExport BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_TCPIPDLG),
@@ -2822,7 +2823,7 @@ DllExport BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_HOSTDLG),
@@ -2831,7 +2832,7 @@ DllExport BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec)
 
 DllExport BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_DIRDLG),
@@ -2840,7 +2841,7 @@ DllExport BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir)
 
 DllExport BOOL WINAPI _AboutDialog(HWND WndParent)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBox(hInst,
 		                MAKEINTRESOURCE(IDD_ABOUTDLG),
@@ -2897,8 +2898,8 @@ DllExport BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet 
 	CHOOSEFONTA cf;
 	BOOL Ok;
 
-	memset(&cf, 0, sizeof(CHOOSEFONT));
-	cf.lStructSize = sizeof(CHOOSEFONT);
+	memset(&cf, 0, sizeof(cf));
+	cf.lStructSize = sizeof(cf);
 	cf.hwndOwner = WndParent;
 	cf.lpLogFont = LogFont;
 	cf.Flags = CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT |
@@ -2917,7 +2918,7 @@ DllExport BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet 
 
 DllExport BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts->SetupFName, UILanguageFile, NULL);
 	return
 		(BOOL)DialogBoxParam(hInst,
 		                     MAKEINTRESOURCE(IDD_GENDLG),
@@ -2926,7 +2927,7 @@ DllExport BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts)
 
 DllExport BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close)
 {
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(ts.SetupFName, UILanguageFile, NULL);
 	*Close = FALSE;
 	return
 		(BOOL)DialogBoxParam(hInst,

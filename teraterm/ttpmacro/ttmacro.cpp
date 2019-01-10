@@ -137,7 +137,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	init();
 	InitCommonControls();
 	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
-	SetDialogFont(NULL, UILanguageFile);
+	SetDialogFont(NULL, UILanguageFile, NULL);
 
 	Busy = TRUE;
 	pCCtrlWindow = new CCtrlWindow();

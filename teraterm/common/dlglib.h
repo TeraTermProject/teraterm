@@ -88,7 +88,7 @@ INT_PTR TTDialogBox(
 	LPCTSTR lpTemplateName,
 	HWND hWndParent,
 	DLGPROC lpDialogFunc);
-void SetDialogFont(const char *section, const char *UILanguageFile);
+void SetDialogFont(const char *SetupFName, const char *UILanguageFile, const char *Section);
 
 #if defined(_UNICODE)
 #define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontW(p1,p2,p3)

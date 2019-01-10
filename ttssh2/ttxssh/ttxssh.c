@@ -1715,7 +1715,7 @@ hostssh_enabled:
 
 static void UTIL_SetDialogFont()
 {
-	SetDialogFont("TTSSH", pvar->ts->UILanguageFile);
+	SetDialogFont(pvar->ts->SetupFName, pvar->ts->UILanguageFile, "TTSSH");
 }
 
 static BOOL PASCAL TTXGetHostName(HWND parent, PGetHNRec rec)

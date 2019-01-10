@@ -582,7 +582,11 @@ BEGIN
     BEGIN
         MENUITEM "&Terminal...",                ID_SETUP_TERMINAL
         MENUITEM "&Window...",                  ID_SETUP_WINDOW
-        MENUITEM "&Font...",                    ID_SETUP_FONT
+		POPUP "&Font"
+        BEGIN
+			MENUITEM "&Font...",                ID_SETUP_FONT
+			MENUITEM "&Dialog Font...",         ID_SETUP_DLG_FONT
+		END
         MENUITEM "&Keyboard...",                ID_SETUP_KEYBOARD
         MENUITEM "S&erial port...",             ID_SETUP_SERIALPORT
         MENUITEM "T&CP/IP...",                  ID_SETUP_TCPIP

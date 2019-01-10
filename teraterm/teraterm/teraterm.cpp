@@ -246,7 +246,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInst,
 	CVTWindow *m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
 	main_window = m_pMainWnd->m_hWnd;
-	SetDialogFont(NULL, ts.UILanguageFile);
+	SetDialogFont(ts.SetupFName, ts.UILanguageFile, NULL);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
