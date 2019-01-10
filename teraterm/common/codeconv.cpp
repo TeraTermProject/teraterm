@@ -90,8 +90,11 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
  */
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_)
 {
-	const DWORD flags = MB_ERR_INVALID_CHARS;
-	wchar_t *wstr_ptr;
+	DWORD flags = MB_ERR_INVALID_CHARS;
+	if (code_page == CP_UTF8) {
+		// CP_UTF8 When this is set, dwFlags must be zero.
+		flags = 0;
+	}
 	if (w_len_ != NULL) {
 		*w_len_ = 0;
 	}
@@ -104,7 +107,7 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 	if (len == 0) {
 		return NULL;
 	}
-	wstr_ptr = (wchar_t *)malloc(len*sizeof(wchar_t));
+	wchar_t *wstr_ptr = (wchar_t *)malloc(len*sizeof(wchar_t));
 	if (wstr_ptr == NULL) {
 		return NULL;
 	}
@@ -121,13 +124,11 @@ wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page
 	return wstr_ptr;
 }
 
-//#if defined(UNICODE)
 const char *ToCharW(const wchar_t *strW)
 {
 	const char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
 	return strA;
 }
-//#endif
 
 const char *ToCharA(const char *strA)
 {
@@ -137,40 +138,29 @@ const char *ToCharA(const char *strA)
 const char *ToCharU8(const char *strU8)
 {
 	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
+	if (strW == NULL) {
+		return NULL;
+	}
 	const char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
 	free((void *)strW);
 	return strA;
 }
 
-const TCHAR *ToTcharA(const char *strA)
+const wchar_t *ToWcharA(const char *strA)
 {
-#if defined(UNICODE)
 	wchar_t *strW = _MultiByteToWideChar(strA, 0, CP_ACP, NULL);
 	return strW;
-#else
-	return ToCharA(strA);
-#endif
 }
 
-const TCHAR *ToTcharW(const wchar_t *strW)
+const wchar_t *ToWcharW(const wchar_t *strW)
 {
-#if defined(UNICODE)
 	return _wcsdup(strW);
-#else
-	return ToCharW(strW);
-#endif
 }
 
-const TCHAR *ToTcharU8(const char *strU8)
+const wchar_t *ToWcharU8(const char *strU8)
 {
 	const wchar_t *strW = _MultiByteToWideChar(strU8, 0, CP_UTF8, NULL);
-#if defined(UNICODE)
 	return strW;
-#else
-	const char *strA = _WideCharToMultiByte(strW, 0, CP_ACP, NULL);
-	free((void *)strW);
-	return strA;
-#endif
 }
 
 const char *ToU8W(const wchar_t *strW)
