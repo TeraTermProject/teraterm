@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
@@ -263,9 +263,8 @@ WORD TTLFilenameBox()
 	if (CheckVar("inputstr", &ValType, &VarId) && (ValType==TypString)) {
 		TCHAR filename[MaxStrLen];
 		filename[0] = 0;
-		memset(&ofn, 0, sizeof(OPENFILENAME));
-		//ofn.lStructSize     = sizeof(OPENFILENAME);
-		ofn.lStructSize     = OPENFILENAME_SIZE_VERSION_400;		// TODO
+		memset(&ofn, 0, sizeof(ofn));
+		ofn.lStructSize     = get_OPENFILENAME_SIZE();
 		ofn.hwndOwner       = GetHWND();
 		ofn.lpstrTitle      = Str1T;
 		ofn.lpstrFile       = filename;
@@ -367,14 +366,14 @@ int MessageCommand(int BoxId, LPWORD Err)
 
 	if (BoxId==IdMsgBox) {
 		ret = OpenMsgDlg(tc::fromUtf8(Str1),tc::fromUtf8(Str2),FALSE);
-		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã¨ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
+		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é‚ÆAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
 		// (2008.8.5 yutaka)
 		if (ret == IDCANCEL) {
 			TTLStatus = IdTTLEnd;
 		}
 	} else if (BoxId==IdYesNoBox) {
 		ret = OpenMsgDlg(tc::fromUtf8(Str1),tc::fromUtf8(Str2),TRUE);
-		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã¨ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
+		// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é‚ÆAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
 		// (2008.8.6 yutaka)
 		if (ret == IDCLOSE) {
 			TTLStatus = IdTTLEnd;
@@ -385,7 +384,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 		OpenStatDlg(tc::fromUtf8(Str1),tc::fromUtf8(Str2));
 
 	} else if (BoxId==IdListBox) {
-		//  ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®é¸æŠè‚¢ã‚’å–å¾—ã™ã‚‹ã€‚
+		//  ƒŠƒXƒgƒ{ƒbƒNƒX‚Ì‘I‘ğˆ‚ğæ“¾‚·‚éB
 		GetStrAryVar(&VarId, Err);
 
 		if (CheckParameterGiven()) {
@@ -417,8 +416,8 @@ int MessageCommand(int BoxId, LPWORD Err)
 		}
 
 		// return 
-		//   0ä»¥ä¸Š: é¸æŠé …ç›®
-		//   -1: ã‚­ãƒ£ãƒ³ã‚»ãƒ«
+		//   0ˆÈã: ‘I‘ğ€–Ú
+		//   -1: ƒLƒƒƒ“ƒZƒ‹
 		//	 -2: close
 		ret = OpenListDlg(tc::fromUtf8(Str1), tc::fromUtf8(Str2), s, sel);
 
@@ -427,7 +426,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 		}
 		free(s);
 
-		// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹ã®é–‰ã˜ã‚‹ãƒœã‚¿ãƒ³(&ç¢ºèªãƒ€ã‚¤ã‚¢ãƒ­ã‚°)ã§ã€ãƒã‚¯ãƒ­ã®çµ‚äº†ã¨ã™ã‚‹ã€‚
+		// ƒŠƒXƒgƒ{ƒbƒNƒX‚Ì•Â‚¶‚éƒ{ƒ^ƒ“(&Šm”Fƒ_ƒCƒAƒƒO)‚ÅAƒ}ƒNƒ‚ÌI—¹‚Æ‚·‚éB
 		if (ret == -2) {
 			TTLStatus = IdTTLEnd;
 		}
@@ -437,7 +436,7 @@ int MessageCommand(int BoxId, LPWORD Err)
 	return 0;
 }
 
-// ãƒªã‚¹ãƒˆãƒœãƒƒã‚¯ã‚¹
+// ƒŠƒXƒgƒ{ƒbƒNƒX
 // (2013.3.13 yutaka)
 WORD TTLListBox()
 {
@@ -457,7 +456,7 @@ WORD TTLMessageBox()
 	return Err;
 }
 
-/* ttmparse.cã‹ã‚‰ç§»å‹• */
+/* ttmparse.c‚©‚çˆÚ“® */
 extern "C" void DispErr(WORD Err)
 {
 	const TCHAR *Msg;
@@ -553,7 +552,7 @@ WORD TTLGetPassword()
 
 	SetStrVal(VarId,Temp2);
 
-	SetResult(result);  // æˆåŠŸå¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
+	SetResult(result);  // ¬Œ÷‰Â”Û‚ğİ’è‚·‚éB
 	return Err;
 }
 

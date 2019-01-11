@@ -21,6 +21,7 @@ using namespace yebisuya;
 #include "dlglib.h"
 
 extern char UILanguageFile[MAX_PATH];
+extern char *SetupFName;
 
 void UTIL_get_lang_msg(const char *key, TCHAR *buf, int buf_len, const TCHAR *def)
 {
@@ -34,7 +35,7 @@ void UTIL_get_lang_msgU8(const char *key, char *buf, int buf_len, const char *de
 
 void UTIL_set_dialog_font()
 {
-	SetDialogFont(NULL, UILanguageFile, "TTProxy");
+	SetDialogFont(SetupFName, UILanguageFile, "TTProxy");
 }
 
 #if 0
@@ -755,7 +756,8 @@ private:
                 TCHAR buffer[1024];
                 TCHAR uimsg[MAX_UIMSG];
                 OPENFILENAME ofn;
-                ofn.lStructSize = sizeof(ofn);
+				memset(&ofn, 0, sizeof(ofn));
+                ofn.lStructSize = get_OPENFILENAME_SIZE();
                 ofn.lpstrFile = buffer;
                 ofn.nMaxFile = countof(buffer);
                 ofn.Flags = OFN_LONGNAMES | OFN_NONETWORKBUTTON | OFN_PATHMUSTEXIST | OFN_NOREADONLYRETURN | OFN_HIDEREADONLY;

@@ -4057,8 +4057,7 @@ int uuencode(unsigned char *src, int srclen, unsigned char *target, int targsize
 //
 // SCP dialog
 //
-static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam,
-                                     LPARAM lParam)
+static BOOL CALLBACK TTXScpDialog(HWND dlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static char sendfile[MAX_PATH] = "";
 	static char sendfiledir[MAX_PATH] = "";

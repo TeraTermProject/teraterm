@@ -10,6 +10,7 @@ using namespace yebisuya;
 
 extern "C" __declspec(dllexport) BOOL WINAPI TTXBind(WORD Version, TTXExports* exports);
 
+char *SetupFName;
 char UILanguageFile[MAX_PATH];
 
 class TTProxy : public DynamicLinkLibrary<TTProxy> {
@@ -198,6 +199,7 @@ private:
 		return FALSE;
 	}
 	static void WINAPI TTXInit(PTTSet ts, PComVar cv) {
+		SetupFName = ts->SetupFName;
 		getInstance().ts = ts;
 		getInstance().cv = cv;
 
