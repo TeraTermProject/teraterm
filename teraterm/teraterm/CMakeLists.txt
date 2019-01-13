@@ -131,6 +131,8 @@ set(SRC
   ttutil.c
   ttutil.h
   #
+  teraterm.manifest
+  #
   ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
   #
   ${COMMON_SRC}
