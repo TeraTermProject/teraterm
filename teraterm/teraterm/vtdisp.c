@@ -3738,27 +3738,41 @@ void UpdateBGBrush() {
   }
 }
 
-void DispShowWindow(int mode) {
+void DispShowWindow(int mode)
+{
 	switch (mode) {
-	  case WINDOW_MINIMIZE:
+	case WINDOW_MINIMIZE:
 		ShowWindow(HVTWin, SW_MINIMIZE);
 		break;
-	  case WINDOW_MAXIMIZE:
+	case WINDOW_MAXIMIZE:
 		ShowWindow(HVTWin, SW_MAXIMIZE);
 		break;
-	  case WINDOW_RESTORE:
+	case WINDOW_RESTORE:
 		ShowWindow(HVTWin, SW_RESTORE);
 		break;
-	  case WINDOW_RAISE:
-		SetWindowPos(HVTWin, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	case WINDOW_RAISE: {
+		//何も起きないことあり
+		//  SetWindowPos(HVTWin, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+//#define RAISE_AND_GET_FORCUS
+#if defined(RAISE_AND_GET_FORCUS)
+		//フォーカスを奪う
+		SetForegroundWindow(HVTWin);
+#else
+		//フォーカスは奪わず最上面に来る
+		BringWindowToTop(HVTWin);
+		if (GetForegroundWindow() != HVTWin) {
+			FlashWindow(HVTWin, TRUE);
+		}
+#endif
+	}
 		break;
-	  case WINDOW_LOWER:
+	case WINDOW_LOWER:
 		SetWindowPos(HVTWin, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 		break;
-	  case WINDOW_REFRESH:
+	case WINDOW_REFRESH:
 		InvalidateRect(HVTWin, NULL, FALSE);
 		break;
-	  case WINDOW_TOGGLE_MAXIMIZE:
+	case WINDOW_TOGGLE_MAXIMIZE:
 		if (IsZoomed(HVTWin)) {
 			ShowWindow(HVTWin, SW_RESTORE);
 		}
