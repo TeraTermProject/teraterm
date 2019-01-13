@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2018 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -2448,6 +2448,24 @@ BOOL CVTWindow::OnMouseWheel(
 	pt.y = pts.y;
 
 	int line, i;
+
+	if (pSetLayeredWindowAttributes != NULL) {
+		BOOL InTitleBar;
+		POINT point = pt;
+		GetPositionOnWindow(HVTWin, &point,
+							NULL, NULL, &InTitleBar);
+		if (InTitleBar) {
+			int delta = zDelta < 0 ? -1 : 1;
+			int newAlpha = Alpha;
+			newAlpha += delta * ts.MouseWheelScrollLine;
+			if (newAlpha > 255)
+				newAlpha = 255;
+			else if (newAlpha < 0)
+				newAlpha = 0;
+			SetWindowAlpha(newAlpha);
+			return TRUE;
+		}
+	}
 
 	::ScreenToClient(HVTWin, &pt);
 

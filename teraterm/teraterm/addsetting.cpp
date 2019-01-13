@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TeraTerm Project
+ * Copyright (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -655,9 +655,9 @@ void CVisualPropPageDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)uimsg);
 
 	// (1)AlphaBlend
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendActive);
+
 	SetDlgItemNum(IDC_ALPHA_BLEND_ACTIVE, ts.AlphaBlendActive);
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendInactive);
+
 	SetDlgItemNum(IDC_ALPHA_BLEND_INACTIVE, ts.AlphaBlendInactive);
 
 	// (2)[BG] BGEnable
