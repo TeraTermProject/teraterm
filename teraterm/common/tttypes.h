@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2018 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -549,8 +549,9 @@ struct tttset {
 	COLORREF ANSIColor[16];
 	/* protocol used in connect() */
 	int ProtocolFamily;
-  char MouseCursorName[16];
-	int AlphaBlend;
+	char MouseCursorName[16];
+	BYTE AlphaBlendActive;
+	BYTE AlphaBlendInactive;
 	char CygwinDirectory[MAX_PATH];
 #define DEFAULT_LOCALE "japanese"
 	char Locale[80];

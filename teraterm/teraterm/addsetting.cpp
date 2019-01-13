@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TeraTerm Project
+ * Copyright (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -906,8 +906,10 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
 	GetObject(font, sizeof(LOGFONT), &logfont);
 	if (get_lang_font("DLG_TAHOMA_FONT", GetSafeHwnd(), &logfont, &DlgVisualFont, ts.UILanguageFile)) {
-		SendDlgItemMessage(IDC_ALPHABLEND, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_ALPHA_BLEND, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
+		SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
+		SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
+		SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
+		SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
 		SendDlgItemMessage(IDC_ETERM_LOOKFEEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_MOUSE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
 		SendDlgItemMessage(IDC_MOUSE_CURSOR, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE,0));
@@ -1001,8 +1003,10 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	SendDlgItemMessage(IDC_FONT_QUALITY, CB_ADDSTRING, 0, (LPARAM)ts.UIMsg);
 
 	// (1)AlphaBlend
-	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlend);
-	SetDlgItemText(IDC_ALPHA_BLEND, buf);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendActive);
+	SetDlgItemText(IDC_ALPHA_BLEND_ACTIVE, buf);
+	_snprintf_s(buf, sizeof(buf), _TRUNCATE, "%d", ts.AlphaBlendInactive);
+	SetDlgItemText(IDC_ALPHA_BLEND_INACTIVE, buf);
 
 	// (2)[BG] BGEnable
 	btn = (CButton *)GetDlgItem(IDC_ETERM_LOOKFEEL);
@@ -1043,11 +1047,11 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	}
 
 	// (3)Mouse cursor type
-	listbox = (CListBox *)GetDlgItem(IDC_MOUSE_CURSOR);
+	cmb = (CComboBox *)GetDlgItem(IDC_MOUSE_CURSOR);
 	for (i = 0 ; MouseCursor[i].name ; i++) {
-		listbox->InsertString(i, MouseCursor[i].name);
+		cmb->InsertString(i, MouseCursor[i].name);
 	}
-	listbox->SelectString(0, ts.MouseCursorName);
+	cmb->SelectString(0, ts.MouseCursorName);
 
 	// (4)Font quality
 	cmb = (CComboBox *)GetDlgItem(IDC_FONT_QUALITY);
@@ -1104,7 +1108,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	btn->SetCheck((ts.FontFlag&FF_URLUNDERLINE) != 0);
 
 	// ダイアログにフォーカスを当てる
-	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND));
+	::SetFocus(::GetDlgItem(GetSafeHwnd(), IDC_ALPHA_BLEND_ACTIVE));
 
 	return FALSE;
 }
@@ -1280,22 +1284,27 @@ BOOL CVisualPropPageDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 
 void CVisualPropPageDlg::OnOK()
 {
-	CListBox *listbox;
 	CButton *btn;
 	CComboBox *cmb;
 	int sel;
-	int beforeAlphaBlend;
 	char buf[MAXPATHLEN];
 	COLORREF TmpColor;
 	int flag_changed = 0;
 
 	// (1)
-	beforeAlphaBlend = ts.AlphaBlend;
-	GetDlgItemText(IDC_ALPHA_BLEND, buf, sizeof(buf));
+	GetDlgItemText(IDC_ALPHA_BLEND_ACTIVE, buf, sizeof(buf));
 	if (isdigit(buf[0])) {
-		ts.AlphaBlend = atoi(buf);
-		ts.AlphaBlend = max(0, ts.AlphaBlend);
-		ts.AlphaBlend = min(255, ts.AlphaBlend);
+		int i = atoi(buf);
+		ts.AlphaBlendActive =
+			(i < 0) ? 0 :
+			(i > 255) ? 255 : i;
+	}
+	GetDlgItemText(IDC_ALPHA_BLEND_INACTIVE, buf, sizeof(buf));
+	if (isdigit(buf[0])) {
+		int i = atoi(buf);
+		ts.AlphaBlendInactive =
+			(i < 0) ? 0 :
+			(i > 255) ? 255 : i;
 	}
 
 	// (2)
@@ -1321,8 +1330,8 @@ void CVisualPropPageDlg::OnOK()
 	}
 
 	// (3)
-	listbox = (CListBox *)GetDlgItem(IDC_MOUSE_CURSOR);
-	sel = listbox->GetCurSel();
+	cmb = (CComboBox *)GetDlgItem(IDC_MOUSE_CURSOR);
+	sel = cmb->GetCurSel();
 	if (sel >= 0 && sel < MOUSE_CURSOR_MAX) {
 		strncpy_s(ts.MouseCursorName, sizeof(ts.MouseCursorName), MouseCursor[sel].name, _TRUNCATE);
 	}
@@ -1400,17 +1409,6 @@ void CVisualPropPageDlg::OnOK()
 	btn = (CButton *)GetDlgItem(IDC_URL_UNDERLINE);
 	if (((ts.FontFlag & FF_URLUNDERLINE) != 0) != btn->GetCheck()) {
 		ts.FontFlag ^= FF_URLUNDERLINE;
-	}
-
-	// 2006/03/11 by 337 : Alpha値も即時変更
-	// Layered窓になっていない場合は効果が無い
-	if (ts.EtermLookfeel.BGUseAlphaBlendAPI) {
-		// 起動時に半透明レイヤにしていない場合でも、即座に半透明となるようにする。(2006.4.1 yutaka)
-		//MySetLayeredWindowAttributes(HVTWin, 0, (ts.AlphaBlend > 255) ? 255: ts.AlphaBlend, LWA_ALPHA);
-		// 値が変更されたときのみ設定を反映する。(2007.10.19 maya)
-		if (ts.AlphaBlend != beforeAlphaBlend) {
-			SetWindowStyle(&ts);
-		}
 	}
 
 	if (flag_changed) {

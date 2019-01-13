@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
+ * Copyright (C) 1994-1999 T. Teranishi
  * (C) 2006-2017 TeraTerm Project
  * All rights reserved.
  *
@@ -98,6 +98,9 @@ void PASCAL DequoteParam(PCHAR dest, int dest_len, PCHAR src);
 void PASCAL DeleteComment(PCHAR dest, int dest_size, PCHAR src);
 
 void split_buffer(char *buffer, int delimiter, char **head, char **body);
+BOOL GetPositionOnWindow(
+	HWND hWnd, const POINT *point,
+	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 

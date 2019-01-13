@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1717,4 +1717,69 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body)
 	}
 
 	*body = p1;
+}
+
+/**
+ *	ウィンドウ上の位置を取得する
+ *	@Param[in]		hWnd
+ *	@Param[in]		point		位置(x,y)
+ *	@Param[in,out]	InWindow	ウィンドウ上
+ *	@Param[in,out]	InClient	クライアント領域上
+ *	@Param[in,out]	InTitleBar	タイトルバー上
+ *	@retval			FALSE		無効なhWnd
+ */
+BOOL GetPositionOnWindow(
+	HWND hWnd, const POINT *point,
+	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar)
+{
+	const int x = point->x;
+	const int y = point->y;
+	RECT winRect;
+	RECT clientRect;
+
+	if (InWindow != NULL) *InWindow = FALSE;
+	if (InClient != NULL) *InClient = FALSE;
+	if (InTitleBar != NULL) *InTitleBar = FALSE;
+
+	if (!GetWindowRect(hWnd, &winRect)) {
+		return FALSE;
+	}
+
+	if ((x < winRect.left) || (winRect.right < x) ||
+		(y < winRect.top) || (winRect.bottom < y))
+	{
+		return TRUE;
+	}
+	if (InWindow != NULL) *InWindow = TRUE;
+
+	{
+		POINT pos;
+		GetClientRect(hWnd, &clientRect);
+		pos.x = clientRect.left;
+		pos.y = clientRect.top;
+		ClientToScreen(hWnd, &pos);
+		clientRect.left = pos.x;
+		clientRect.top = pos.y;
+
+		pos.x = clientRect.right;
+		pos.y = clientRect.bottom;
+		ClientToScreen(hWnd, &pos);
+		clientRect.right = pos.x;
+		clientRect.bottom = pos.y;
+	}
+
+	if ((clientRect.left <= x) && (x < clientRect.right) &&
+		(clientRect.top <= y) && (y < clientRect.bottom))
+	{
+		if (InClient != NULL) *InClient = TRUE;
+		if (InTitleBar != NULL) *InTitleBar = FALSE;
+		return TRUE;
+	}
+	if (InClient != NULL) *InClient = FALSE;
+
+	if (InTitleBar != NULL) {
+		*InTitleBar = (y < clientRect.top) ? TRUE : FALSE;
+	}
+
+	return TRUE;
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2018 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -259,11 +259,12 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
+typedef BOOL(WINAPI *_SetLayeredWindowAttributes)(HWND, COLORREF, BYTE, DWORD);
+static _SetLayeredWindowAttributes g_pSetLayeredWindowAttributes = NULL;
+
+static void MySetLayeredWindowAttributes_init()
 {
-	typedef BOOL (WINAPI *func)(HWND,COLORREF,BYTE,DWORD);
 	static HMODULE g_hmodUser32 = NULL;
-	static func g_pSetLayeredWindowAttributes = NULL;
 	char user32_dll[MAX_PATH];
 
 	GetSystemDirectory(user32_dll, sizeof(user32_dll));
@@ -271,13 +272,16 @@ static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha,
 	if (g_hmodUser32 == NULL) {
 		g_hmodUser32 = LoadLibrary(user32_dll);
 		if (g_hmodUser32 == NULL) {
-			return FALSE;
+			return;
 		}
 
 		g_pSetLayeredWindowAttributes =
-			(func)GetProcAddress(g_hmodUser32, "SetLayeredWindowAttributes");
+			(_SetLayeredWindowAttributes)GetProcAddress(g_hmodUser32, "SetLayeredWindowAttributes");
 	}
+}
 
+static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
+{
 	if (g_pSetLayeredWindowAttributes == NULL) {
 		return FALSE;
 	}
@@ -312,32 +316,33 @@ void SetMouseCursor(char *cursor)
 	}
 }
 
-
-void SetWindowStyle(TTTSet *ts)
+/**
+ * @param[in]	alpha	0-255
+ */
+void CVTWindow::SetWindowAlpha(BYTE alpha)
 {
-	LONG_PTR lp;
-
-	SetMouseCursor(ts->MouseCursorName);
+	if (Alpha == alpha) {
+		return;	// 変化なしなら何もしない
+	}
+	LONG_PTR lp = ::GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
+	if (lp == 0) {
+		return;
+	}
 
 	// 2006/03/16 by 337: BGUseAlphaBlendAPIがOnならばLayered属性とする
 	//if (ts->EtermLookfeel.BGUseAlphaBlendAPI) {
 	// アルファ値が255の場合、画面のちらつきを抑えるため何もしないこととする。(2006.4.1 yutaka)
 	// 呼び出し元で、値が変更されたときのみ設定を反映する。(2007.10.19 maya)
-	if (ts->AlphaBlend < 255) {
-		lp = GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
-		if (lp != 0) {
-			SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
-			MySetLayeredWindowAttributes(HVTWin, 0, ts->AlphaBlend, LWA_ALPHA);
-		}
+	if (alpha < 255) {
+		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
+		MySetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
 	}
-	// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
 	else {
-		lp = GetWindowLongPtr(HVTWin, GWL_EXSTYLE);
-		if (lp != 0) {
-			SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
-			RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
-		}
+		// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
+		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp & ~WS_EX_LAYERED);
+		::RedrawWindow(HVTWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME);
 	}
+	Alpha = alpha;
 }
 
 void RegDeviceNotify(HWND hWnd)
@@ -779,6 +784,8 @@ CVTWindow::CVTWindow()
 	Hold = FALSE;
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
+	Alpha = 255;
+	MySetLayeredWindowAttributes_init();
 
 	/* Initialize scroll buffer */
 	InitBuffer();
@@ -838,6 +845,7 @@ CVTWindow::CVTWindow()
 	SerialNo = RegWin(HVTWin,NULL);
 
 	logfile_lock_initialize();
+	SetMouseCursor(ts.MouseCursorName);
 	// ロケールの設定
 	// wctomb のため
 	setlocale(LC_ALL, ts.Locale);
@@ -913,7 +921,7 @@ CVTWindow::CVTWindow()
 	if (ts.Minimize>0) {
 		CmdShow = SW_SHOWMINIMIZED;
 	}
-	SetWindowStyle(&ts);
+	SetWindowAlpha(ts.AlphaBlendActive);
 	ShowWindow(CmdShow);
 	ChangeCaret();
 
@@ -1644,7 +1652,7 @@ void CVTWindow::ResetSetup()
 	//
 	// AlphaBlend を即時反映できるようにする。
 	// (2016.12.24 yutaka)
-	SetWindowStyle(&ts);
+	SetWindowAlpha(ts.AlphaBlendActive);
 #else
 	DispApplyANSIColor();
 #endif
@@ -1877,6 +1885,11 @@ BOOL CVTWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 void CVTWindow::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 {
 	DispSetActive(nState!=WA_INACTIVE);
+	if (nState == WA_INACTIVE) {
+		SetWindowAlpha(ts.AlphaBlendInactive);
+	} else {
+		SetWindowAlpha(ts.AlphaBlendActive);
+	}
 }
 
 void CVTWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -2569,6 +2582,24 @@ BOOL CVTWindow::OnMouseWheel(
 )
 {
 	int line, i;
+
+	if (g_pSetLayeredWindowAttributes != NULL) {
+		BOOL InTitleBar;
+		POINT point = pt;
+		GetPositionOnWindow(HVTWin, &point,
+							NULL, NULL, &InTitleBar);
+		if (InTitleBar) {
+			int delta = zDelta < 0 ? -1 : 1;
+			int newAlpha = Alpha;
+			newAlpha += delta * ts.MouseWheelScrollLine;
+			if (newAlpha > 255)
+				newAlpha = 255;
+			else if (newAlpha < 0)
+				newAlpha = 0;
+			SetWindowAlpha(newAlpha);
+			return TRUE;
+		}
+	}
 
 	::ScreenToClient(HVTWin, &pt);
 
