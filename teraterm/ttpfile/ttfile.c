@@ -884,9 +884,11 @@ void WINAPI SetFileVar(PFileVar fv)
 {
 	int i;
 	char uimsg[MAX_UIMSG];
+	char c;
 
 	GetFileNamePos(fv->FullName,&(fv->DirLen),&i);
-	if (fv->FullName[fv->DirLen]=='\\') fv->DirLen++;
+	c = fv->FullName[fv->DirLen];
+	if (c=='\\'||c=='/') fv->DirLen++;
 	strncpy_s(fv->DlgCaption, sizeof(fv->DlgCaption),"Tera Term: ", _TRUNCATE);
 	switch (fv->OpId) {
 	case OpLog:
