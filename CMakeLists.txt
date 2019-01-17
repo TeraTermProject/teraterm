@@ -1,4 +1,4 @@
-﻿
+
 cmake_minimum_required(VERSION 3.6)
 
 project(teraterm_all)
@@ -32,9 +32,10 @@ if(MSVC)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
   endif()
 elseif(MINGW)
-  set(C_CXX_COMMON_FLAGS "")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter -static -ffunction-sections -fdata-sections ${C_ONLY_FLAGS} ${C_CXX_COMMON_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -static -ffunction-sections -fdata-sections ${C_CXX_COMMON_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0a00")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_WIN32_WINNT=0x0a00")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter -static -ffunction-sections -fdata-sections ${C_ONLY_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -static -ffunction-sections -fdata-sections")
   if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static-libstdc++")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")

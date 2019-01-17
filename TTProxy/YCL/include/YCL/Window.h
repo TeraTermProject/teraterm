@@ -54,10 +54,10 @@ public:
 	bool SetWindowText(const TCHAR* text) {
 		return ::SetWindowText(window, text) != FALSE;
 	}
-	long SendMessage(int message, int wparam = 0, long lparam = 0)const {
+	long SendMessage(UINT message, WPARAM wparam = 0, LPARAM lparam = 0)const {
 		return ::SendMessage(window, message, wparam, lparam);
 	}
-	long PostMessage(int message, int wparam = 0, long lparam = 0)const {
+	long PostMessage(UINT message, WPARAM wparam = 0, LPARAM lparam = 0)const {
 		return ::PostMessage(window, message, wparam, lparam);
 	}
 	HWND GetParent()const {

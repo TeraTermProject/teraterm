@@ -32,7 +32,7 @@
 #undef _UNICODE
 #include "teraterm.h"
 #include "ttwsk.h"
-#include <Wspiapi.h>
+#include <wspiapi.h>
 #include "WSAAsyncGetAddrInfo.h"
 
 static HANDLE HWinsock = NULL;

@@ -1,4 +1,4 @@
-﻿*.obj
+*.obj
 *.db
 *.exe
 *.dll
@@ -11,9 +11,12 @@
 *.log
 *.tlog
 *.aps
+*.ncb
 .vs/
 **/Debug/*
 **/Release/*
+**/*.Debug/*
+**/*.Release/*
 *.vcxproj.user
 *.c~
 *.cpp~
@@ -25,3 +28,4 @@ GTAGS
 **/build*/*
 *.vcproj.*.user
 teraterm/ttpdlg/svnversion.h
+HTML/

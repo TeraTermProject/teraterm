@@ -81,7 +81,6 @@ CTEKWindow::CTEKWindow()
 	}
 
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-//	wc.lpfnWndProc = (WNDPROC)AfxWndProc;
 	wc.lpfnWndProc = (WNDPROC)ProcStub;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -202,7 +201,7 @@ void CTEKWindow::InitMenu(HMENU *Menu)
 		WinMenu = CreatePopupMenu();
 		get_lang_msgT("TEKMENU_WINDOW", uimsg, _countof(uimsg), _T("&Window"), ts.UILanguageFile);
 		::InsertMenu(*Menu,4,MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-		             (int)WinMenu, uimsg);
+		             (UINT_PTR)WinMenu, uimsg);
 	}
 }
 
@@ -411,24 +410,24 @@ void CTEKWindow::OnLButtonDown(UINT nFlags, POINTS point)
 		PopupBase = CreatePopupMenu();
 		get_lang_msgT("MENU_CONTROL", uimsg, _countof(uimsg), _T("&File"), ts.UILanguageFile);
 		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT)GetSubMenu(PopupMenu,0), uimsg);
+		           (UINT_PTR)GetSubMenu(PopupMenu,0), uimsg);
 		get_lang_msgT("TEKMENU_EDIT", uimsg, _countof(uimsg), _T("&Edit"), ts.UILanguageFile);
 		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT)EditMenu, uimsg);
+		           (UINT_PTR)EditMenu, uimsg);
 		get_lang_msgT("TEKMENU_SETUP", uimsg, _countof(uimsg), _T("&Setup"), ts.UILanguageFile);
 		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT)GetSubMenu(PopupMenu,2), uimsg);
+		           (UINT_PTR)GetSubMenu(PopupMenu,2), uimsg);
 		get_lang_msgT("TEKMENU_VTWIN", uimsg, _countof(uimsg), _T("VT-Wind&ow"), ts.UILanguageFile);
 		AppendMenu(PopupBase, MF_STRING | MF_ENABLED,
 		           ID_TEKVTWIN, uimsg);
 		if (WinMenu!=NULL) {
 			get_lang_msgT("TEKMENU_WINDOW", uimsg, _countof(uimsg), _T("&Window"), ts.UILanguageFile);
 			AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-			           (UINT)WinMenu, uimsg);
+			           (UINT_PTR)WinMenu, uimsg);
 		}
 		get_lang_msgT("TEKMENU_HELP", uimsg, _countof(uimsg), _T("&Help"), ts.UILanguageFile);
 		AppendMenu(PopupBase, MF_STRING | MF_ENABLED | MF_POPUP,
-		           (UINT)GetSubMenu(PopupMenu,4), uimsg);
+		           (UINT_PTR)GetSubMenu(PopupMenu,4), uimsg);
 		::ClientToScreen(tk.HWin, &p);
 		TrackPopupMenu(PopupBase,TPM_LEFTALIGN | TPM_LEFTBUTTON,
 		               p.x,p.y,0,tk.HWin,NULL);
@@ -486,7 +485,6 @@ void CTEKWindow::OnMove(int x, int y)
 void CTEKWindow::OnPaint()
 {
 	PAINTSTRUCT ps;
-//	CDC *cdc;
 	HDC PaintDC;
 
 	PaintDC = BeginPaint(&ps);
@@ -654,7 +652,7 @@ LRESULT CTEKWindow::OnChangeMenu(WPARAM wParam, LPARAM lParam)
 			get_lang_msgT("TEKMENU_WINDOW", uimsg, _countof(uimsg), _T("&Window"), ts.UILanguageFile);
 			::InsertMenu(MainMenu,4,
 			             MF_STRING | MF_ENABLED | MF_POPUP | MF_BYPOSITION,
-			             (int)WinMenu, uimsg);
+			             (UINT_PTR)WinMenu, uimsg);
 		}
 		else {
 			RemoveMenu(MainMenu,4,MF_BYPOSITION);

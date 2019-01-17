@@ -135,7 +135,7 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 				HDC hdc = CreateCompatibleDC(NULL);
 
 				SelectObject(hdc, tip_font);
-				GetTextExtentPoint32(hdc, str, _tcslen(str), &sz);
+				GetTextExtentPoint32(hdc, str, (int)_tcslen(str), &sz);
 
 				SetWindowPos(hWnd, NULL, 0, 0, sz.cx + 6, sz.cy + 6,
 				             SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
@@ -210,7 +210,7 @@ void UpdateSizeTip(HWND src, int cx, int cy)
 		/* calculate the tip's size */
 
 		hdc = CreateCompatibleDC(NULL);
-		GetTextExtentPoint32(hdc, str, _tcslen(str), &sz);
+		GetTextExtentPoint32(hdc, str, (int)_tcslen(str), &sz);
 		DeleteDC(hdc);
 
 		GetWindowRect(src, &wr);
