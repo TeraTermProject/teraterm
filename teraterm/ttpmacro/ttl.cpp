@@ -4089,9 +4089,9 @@ WORD TTLSend()
 #if 0
 			DDEOut(Str);
 #else
-			const char *StrU8 = ToCharU8(Str);
-			DDEOut(Str);
-			free((void *)Str);
+			const char *StrA = ToCharU8(Str);
+			DDEOut((PCHAR)StrA);
+			free((void *)StrA);
 #endif
 		}
 		else if (GetExpression(&ValType,&Val,&Err))

@@ -856,7 +856,7 @@ int Wait4all()
 	}
 }
 
-
+// @param	FN	ファイル名(utf-8)
 void SetFile(PCHAR FN)
 {
 	char Cmd[1 + MaxStrLen];
@@ -871,6 +871,7 @@ void SetFile(PCHAR FN)
 }
 
 // add (2008.1.3 yutaka)
+// @param	FN	ファイル名(utf-8)
 void SetSecondFile(PCHAR FN)
 {
 	char Cmd[1 + MaxStrLen];

@@ -47,6 +47,7 @@
 #include "ttdde.h"
 #include "ttddecmnd.h"
 #include "commlib.h"
+#include "codeconv.h"
 
 #include "vtwin.h"
 
@@ -77,10 +78,13 @@ static BOOL SyncMode = FALSE;
 static BOOL SyncRecv;
 static LONG SyncFreeSpace;
 
-static char ParamFileName[MaxStrLen];
+static char ParamFileName[MaxStrLen];		// ANSI
+static char ParamFileNameU8[MaxStrLen];
+static TCHAR ParamFileNameT[MaxStrLen];
 static WORD ParamBinaryFlag;
 static WORD ParamXmodemOpt;
-static char ParamSecondFileName[MaxStrLen];
+static char ParamSecondFileName[MaxStrLen];	// ANSI
+static char ParamSecondFileNameU8[MaxStrLen];
 
 static BOOL AutoLogClose = FALSE;
 
@@ -426,9 +430,18 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		if (cv.Ready)
 			SetDdeComReady(1);
 		break;
-	case CmdSetFile:
-		strncpy_s(ParamFileName, sizeof(ParamFileName),&(Command[1]), _TRUNCATE);
+	case CmdSetFile: {
+		const TCHAR *FileNameT;
+		const char *FileNameA;
+		strncpy_s(ParamFileNameU8, sizeof(ParamFileNameU8),&(Command[1]), _TRUNCATE);
+		FileNameT = ToTcharU8(ParamFileNameU8);
+		_tcsncpy_s(ParamFileNameT, _countof(ParamFileNameT), FileNameT, _TRUNCATE);
+		free((void*)FileNameT);
+		FileNameA = ToCharU8(ParamFileNameU8);
+		strncpy_s(ParamFileName, _countof(ParamFileName), FileNameA, _TRUNCATE);
+		free((void*)FileNameA);
 		break;
+	}
 	case CmdSetBinary:
 		ParamBinaryFlag = Command[1] & 1;
 		break;
@@ -861,10 +874,16 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 		break;
 
-	case CmdSetSecondFile:  // add 'scpsend' (2008.1.3 yutaka)
-		memset(ParamSecondFileName, 0, sizeof(ParamSecondFileName));
-		strncpy_s(ParamSecondFileName, sizeof(ParamSecondFileName),&(Command[1]), _TRUNCATE);
+	case CmdSetSecondFile: {
+		// add 'scpsend' (2008.1.3 yutaka)
+		const char *FileNameA;
+		memset(ParamSecondFileNameU8, 0, sizeof(ParamSecondFileNameU8));
+		strncpy_s(ParamSecondFileNameU8, sizeof(ParamSecondFileNameU8),&(Command[1]), _TRUNCATE);
+		FileNameA = ToCharU8(ParamSecondFileNameU8);
+		strncpy_s(ParamSecondFileName, _countof(ParamSecondFileName), FileNameA, _TRUNCATE);
+		free((void*)FileNameA);
 		break;
+	}
 
 	case CmdScpSend:  // add 'scpsend' (2008.1.1 yutaka)
 		{
@@ -874,7 +893,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		char msg[128];
 
 		if (func == NULL) {
-			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
+			if ( ((h = GetModuleHandleA("ttxssh.dll")) == NULL) ) {
 				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 				goto scp_send_error;
 			}
@@ -892,7 +911,7 @@ static HDDEDATA AcceptExecute(HSZ TopicHSz, HDDEDATA Data)
 		}
 
 scp_send_error:
-		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
+		MessageBoxA(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
 		return DDE_FNOTPROCESSED;
 		}
 		break;
@@ -905,7 +924,7 @@ scp_send_error:
 		char msg[128];
 
 		if (func == NULL) {
-			if ( ((h = GetModuleHandle("ttxssh.dll")) == NULL) ) {
+			if ( ((h = GetModuleHandleA("ttxssh.dll")) == NULL) ) {
 				_snprintf_s(msg, sizeof(msg), _TRUNCATE, "GetModuleHandle(\"ttxssh.dll\")) %d", GetLastError());
 				goto scp_rcv_error;
 			}
@@ -923,7 +942,7 @@ scp_send_error:
 		}
 
 scp_rcv_error:
-		MessageBox(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
+		MessageBoxA(NULL, msg, "Tera Term: scpsend command error", MB_OK | MB_ICONERROR);
 		return DDE_FNOTPROCESSED;
 		}
 		break;
@@ -1161,10 +1180,10 @@ BOOL InitDDE()
 
 	if (DdeInitialize(&Inst,(PFNCALLBACK)DdeCallbackProc,0,0) == DMLERR_NO_ERROR)
 	{
-		Service= DdeCreateStringHandle(Inst, ServiceName, CP_WINANSI);
-		Topic  = DdeCreateStringHandle(Inst, TopicName, CP_WINANSI);
-		Item   = DdeCreateStringHandle(Inst, ItemName, CP_WINANSI);
-		Item2  = DdeCreateStringHandle(Inst, ItemName2, CP_WINANSI);
+		Service= DdeCreateStringHandleA(Inst, ServiceName, CP_WINANSI);
+		Topic  = DdeCreateStringHandleA(Inst, TopicName, CP_WINANSI);
+		Item   = DdeCreateStringHandleA(Inst, ItemName, CP_WINANSI);
+		Item2  = DdeCreateStringHandleA(Inst, ItemName2, CP_WINANSI);
 
 		Ok = DdeNameService(Inst, Service, 0, DNS_REGISTER) != 0;
 	}
@@ -1275,7 +1294,7 @@ void RunMacro(PCHAR FName, BOOL Startup)
 	PROCESS_INFORMATION pi;
 	int i;
 	char Cmnd[MAX_PATH+36]; // "TTPMACRO /D="(12) + TopicName(20) + " "(1) + MAX_PATH + " /S"(3)
-	STARTUPINFO si;
+	STARTUPINFOA si;
 	DWORD pri = NORMAL_PRIORITY_CLASS;
 
 	// Control menuからのマクロ呼び出しで、すでにマクロ起動中の場合、
@@ -1322,10 +1341,10 @@ void RunMacro(PCHAR FName, BOOL Startup)
 
 	ZeroMemory(&si, sizeof(si));
 	ZeroMemory(&pi, sizeof(pi));
-	GetStartupInfo(&si);
+	GetStartupInfoA(&si);
 	si.wShowWindow = SW_MINIMIZE;
 
-	if (CreateProcess(
+	if (CreateProcessA(
 		NULL,
 		Cmnd,
 		NULL,
