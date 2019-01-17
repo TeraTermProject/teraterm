@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2004-2017 TeraTerm Project
  * All rights reserved.
@@ -27,9 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//#ifndef _WIN32_IE
-//#define _WIN32_IE 0x501
-//#endif
 #undef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500	// 2000
 //#define _WIN32_WINNT 0x0501	// XP
@@ -45,7 +42,7 @@
 #include "ttftypes.h"
 #include "ttcommon.h"
 
-// Notify Icon 関連
+// Notify Icon �֘A
 static HICON CustomIcon = NULL;
 
 typedef struct {

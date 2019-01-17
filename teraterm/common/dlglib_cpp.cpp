@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * (C) 2005-2018 TeraTerm Project
  * All rights reserved.
  *
@@ -31,7 +31,7 @@
 #include <windows.h>
 #include "dlglib.h"
 
-// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ¢ãƒ¼ãƒ€ãƒ«çŠ¶æ…‹ã®æ™‚ã€OnIdle()ã‚’å®Ÿè¡Œã™ã‚‹
+// ƒ_ƒCƒAƒƒOƒ‚[ƒ_ƒ‹ó‘Ô‚ÌAOnIdle()‚ğÀs‚·‚é
 //#define ENABLE_CALL_IDLE_MODAL	1
 
 extern BOOL CallOnIdle(LONG lCount);
@@ -56,26 +56,26 @@ static int TTDoModal(HWND hDlgWnd)
 	for (;;)
 	{
 		if (!IsWindow(hDlgWnd)) {
-			// ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãŒé–‰ã˜ã‚‰ã‚ŒãŸ
+			// ƒEƒCƒ“ƒhƒE‚ª•Â‚¶‚ç‚ê‚½
 			return IDCANCEL;
 		}
 #if defined(_DEBUG)
 		if (!IsWindowVisible(hDlgWnd)) {
-			// èª¤ã£ã¦EndDialog()ãŒä½¿ã‚ã‚ŒãŸ? -> TTEndDialog()ã‚’ä½¿ã†ã“ã¨
+			// Œë‚Á‚ÄEndDialog()‚ªg‚í‚ê‚½? -> TTEndDialog()‚ğg‚¤‚±‚Æ
 			::ShowWindow(hDlgWnd, SW_SHOWNORMAL);
 		}
 #endif
 		if (data->EndDialogFlag) {
-			// TTEndDialog()ãŒå‘¼ã°ã‚ŒãŸ
+			// TTEndDialog()‚ªŒÄ‚Î‚ê‚½
 			return data->DlgResult;
 		}
 
 		if(!::PeekMessage(&Msg, NULL, NULL, NULL, PM_NOREMOVE))
 		{
-			// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒãªã„
-			// OnIdel() ã‚’å‡¦ç†ã™ã‚‹
+			// ƒƒbƒZ[ƒW‚ª‚È‚¢
+			// OnIdel() ‚ğˆ—‚·‚é
 			if (!CallOnIdle(lIdleCount++)) {
-				// Idleå‡¦ç†ãŒãªããªã£ãŸ
+				// Idleˆ—‚ª‚È‚­‚È‚Á‚½
 				lIdleCount = 0;
 				Sleep(10);
 			}
@@ -83,7 +83,7 @@ static int TTDoModal(HWND hDlgWnd)
 		}
 		else
 		{
-			// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒã‚ã‚‹
+			// ƒƒbƒZ[ƒW‚ª‚ ‚é
 
 			// pump message
 			BOOL quit = !::GetMessage(&Msg, NULL, NULL, NULL);
@@ -94,14 +94,14 @@ static int TTDoModal(HWND hDlgWnd)
 			}
 
 			if (!::IsDialogMessage(hDlgWnd, &Msg)) {
-				// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ä»¥å¤–ã®å‡¦ç†
+				// ƒ_ƒCƒAƒƒOˆÈŠO‚Ìˆ—
 				::TranslateMessage(&Msg);
 				::DispatchMessage(&Msg);
 			}
 		}
 	}
 
-	// ã“ã“ã«ã¯æ¥ãªã„
+	// ‚±‚±‚É‚Í—ˆ‚È‚¢
 	return IDOK;
 }
 #endif
@@ -118,10 +118,10 @@ static INT_PTR CALLBACK TTDialogProc(
 	}
 
 	if (data == NULL) {
-		// WM_INITDIALOGã‚ˆã‚Šã‚‚å‰ã¯è¨­å®šã•ã‚Œã¦ã„ãªã„
+		// WM_INITDIALOG‚æ‚è‚à‘O‚Íİ’è‚³‚ê‚Ä‚¢‚È‚¢
 		data = TTDialogTmpData;
 	} else {
-		// TTEndDialog()ãŒå‘¼ã°ã‚ŒãŸã¨ãã€DWLP_USER ãŒå‚ç…§ã§ããªã„
+		// TTEndDialog()‚ªŒÄ‚Î‚ê‚½‚Æ‚«ADWLP_USER ‚ªQÆ‚Å‚«‚È‚¢
 		TTDialogTmpData = data;
 	}
 
@@ -142,7 +142,7 @@ static INT_PTR CALLBACK TTDialogProc(
 }
 
 /**
- *	EndDialog() äº’æ›é–¢æ•°
+ *	EndDialog() ŒİŠ·ŠÖ”
  */
 BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult)
 {
@@ -157,14 +157,14 @@ BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult)
 }
 
 /**
- *	CreateDialogIndirectParam() äº’æ›é–¢æ•°
+ *	CreateDialogIndirectParam() ŒİŠ·ŠÖ”
  */
 HWND TTCreateDialogIndirectParam(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
-	HWND hWndParent,			// ã‚ªãƒ¼ãƒŠãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
-	DLGPROC lpDialogFunc,		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã¸ã®ãƒã‚¤ãƒ³ã‚¿
-	LPARAM lParamInit)			// åˆæœŸåŒ–å€¤
+	HWND hWndParent,			// ƒI[ƒi[ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
+	DLGPROC lpDialogFunc,		// ƒ_ƒCƒAƒƒOƒ{ƒbƒNƒXƒvƒƒV[ƒWƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	LPARAM lParamInit)			// ‰Šú‰»’l
 {
 	TTDialogData *data = (TTDialogData *)malloc(sizeof(TTDialogData));
 	data->OrigProc = lpDialogFunc;
@@ -184,7 +184,7 @@ HWND TTCreateDialogIndirectParam(
 }
 
 /**
- *	CreateDialog() äº’æ›é–¢æ•°
+ *	CreateDialog() ŒİŠ·ŠÖ”
  */
 HWND TTCreateDialog(
 	HINSTANCE hInstance,
@@ -197,15 +197,15 @@ HWND TTCreateDialog(
 }
 
 /**
- *	DialogBoxParam() äº’æ›é–¢æ•°
- *		EndDialog()ã§ã¯ãªãã€TTEndDialog()ã‚’ä½¿ç”¨ã™ã‚‹ã“ã¨
+ *	DialogBoxParam() ŒİŠ·ŠÖ”
+ *		EndDialog()‚Å‚Í‚È‚­ATTEndDialog()‚ğg—p‚·‚é‚±‚Æ
  */
 INT_PTR TTDialogBoxParam(
 	HINSTANCE hInstance,
 	LPCTSTR lpTemplateName,
-	HWND hWndParent,			// ã‚ªãƒ¼ãƒŠãƒ¼ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
-	DLGPROC lpDialogFunc,		// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒœãƒƒã‚¯ã‚¹ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã¸ã®ãƒã‚¤ãƒ³ã‚¿
-	LPARAM lParamInit)			// åˆæœŸåŒ–å€¤
+	HWND hWndParent,			// ƒI[ƒi[ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
+	DLGPROC lpDialogFunc,		// ƒ_ƒCƒAƒƒOƒ{ƒbƒNƒXƒvƒƒV[ƒWƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	LPARAM lParamInit)			// ‰Šú‰»’l
 {
 #if ENABLE_CALL_IDLE_MODAL
 	HWND hDlgWnd = TTCreateDialogIndirectParam(
@@ -227,8 +227,8 @@ INT_PTR TTDialogBoxParam(
 }
 
 /**
- *	DialogBoxParam() äº’æ›é–¢æ•°
- *		EndDialog()ã§ã¯ãªãã€TTEndDialog()ã‚’ä½¿ç”¨ã™ã‚‹ã“ã¨
+ *	DialogBoxParam() ŒİŠ·ŠÖ”
+ *		EndDialog()‚Å‚Í‚È‚­ATTEndDialog()‚ğg—p‚·‚é‚±‚Æ
  */
 INT_PTR TTDialogBox(
 	HINSTANCE hInstance,

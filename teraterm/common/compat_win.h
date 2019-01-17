@@ -1,4 +1,4 @@
-Ôªø/*
+/*
  * (C) 2018 TeraTerm Project
  * All rights reserved.
  *
@@ -48,7 +48,7 @@ DECLARE_HANDLE(DPI_AWARENESS_CONTEXT);
 #endif
 
 #if 0
-// BLENDFUNCTION„Å®Âêå‰∏Ä
+// BLENDFUNCTIONÇ∆ìØàÍ
 typedef struct _BGBLENDFUNCTION
 {
     BYTE     BlendOp;
