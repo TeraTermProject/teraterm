@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 TeraTerm Project
+ * Copyright (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,11 @@
 #define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
 #define free(p)       _free_dbg((p), _NORMAL_BLOCK)
 #endif
+
+int CP932ToWideChar(const char *cp932_ptr, int cp932_len, wchar_t *wstr_ptr, int wstr_len)
+{
+	return MultiByteToWideChar(932, 0, cp932_ptr, cp932_len, wstr_ptr, wstr_len);
+}
 
 /**
  *	wchar_t文字列をマルチバイト文字列へ変換

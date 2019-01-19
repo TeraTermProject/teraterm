@@ -2879,7 +2879,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
 	Count = 6;
 #endif
 
-	setlocale(LC_ALL, ts.Locale);
+	setlocale(LC_ALL, ts.Locale);	// TODO コード変換ここでする?,無効化されたコード
 
 	ch = Buff[Count];
 	Buff[Count] = 0;

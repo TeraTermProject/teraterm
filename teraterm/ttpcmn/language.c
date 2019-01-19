@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@
 #include <mbstring.h>
 #include <locale.h>
 
+#include "codeconv.h"
 #include "sjis2uni.map"
 
 unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
@@ -70,19 +71,18 @@ unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 	unsigned int c, c1, c2, c3;
 	unsigned char *ptr, buf[3];
 	unsigned short cset;
+	unsigned char KCode_h;
 	int len = 0;
 
 	*byte = 2;
 
 	// CP932‚©‚çUTF-16LE‚Ö•ÏŠ·‚·‚é
-	setlocale(LC_ALL, locale);
-
-	buf[0] = KCode >> 8;
-	if (buf[0] > 0) {
-		len++;
+	KCode_h = (unsigned char)(KCode >> 8);
+	if (KCode_h != 0) {
+		buf[len++] = KCode_h;
 	}
 	buf[len++] = KCode & 0xff;
-	ret = mbtowc(&wchar, buf, len);
+	ret = CP932ToWideChar(buf, len, &wchar, 1);
 	if (ret <= 0) { // •ÏŠ·Ž¸”s
 		cset = 0;
 		if (_stricmp(locale, DEFAULT_LOCALE) == 0) {

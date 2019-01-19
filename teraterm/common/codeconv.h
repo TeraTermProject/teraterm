@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 TeraTerm Project
+ * Copyright (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,9 +34,15 @@
 extern "C" {
 #endif
 
+// MultiByteToWideChar() wrappers
+//	CP932(shift-jis) to wchar(UTF-16)
+int CP932ToWideChar(const char *cp932_ptr, int cp932_len, wchar_t *wstr_ptr, int wstr_len);
+
+// API wrappers
 char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_);
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_);
 
+// convinience funcs  (for windows api params)
 const char *ToCharA(const char *strA);
 const char *ToCharW(const wchar_t *strW);
 const char *ToCharU8(const char *strU8);

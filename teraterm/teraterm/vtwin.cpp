@@ -2041,7 +2041,6 @@ void CVTWindow::OnDestroy()
 static void EscapeFilename(const char *src, char *dest)
 {
 #define ESCAPE_CHARS	" ;&()$!`'[]{}#^~"
-	setlocale(LC_ALL, ts.Locale);
 	const char *s = src;
 	char *d = dest;
 	while (*s) {
