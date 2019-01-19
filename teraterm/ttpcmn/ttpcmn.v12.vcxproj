@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\codeconv.cpp" />
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="language.c" />
