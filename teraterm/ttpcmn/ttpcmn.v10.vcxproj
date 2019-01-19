@@ -122,6 +122,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\codeconv.cpp" />
     <ClCompile Include="..\common\i18n.c" />
     <ClCompile Include="language.c" />
     <ClCompile Include="..\common\servicenames.c" />
