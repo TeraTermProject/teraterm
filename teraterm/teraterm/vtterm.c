@@ -381,6 +381,8 @@ void ResetCharSet()
 	cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
+
+	setlocale(LC_ALL, ts.Locale);
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
