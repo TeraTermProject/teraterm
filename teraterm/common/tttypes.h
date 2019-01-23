@@ -552,6 +552,7 @@ struct tttset {
 	char MouseCursorName[16];
 	BYTE AlphaBlendActive;
 	BYTE AlphaBlendInactive;
+	BYTE reserve_0[2];				// –¢Žg—p
 	char CygwinDirectory[MAX_PATH];
 #define DEFAULT_LOCALE "japanese"
 	char Locale[80];
