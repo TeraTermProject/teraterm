@@ -34,6 +34,7 @@
 #include <mbstring.h>
 #include <locale.h>
 
+#include "language.h"
 #include "codeconv.h"
 #include "sjis2uni.map"
 
@@ -63,29 +64,29 @@ unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
 	return (result);
 }
 
-unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
+// 内部コード(CodePage)をUTF8へ変換する
+unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, int CodePage)
 {
 	wchar_t wchar;
 	int ret;
-	unsigned int code = KCode;
+	unsigned int code;
 	unsigned int c, c1, c2, c3;
-	unsigned char *ptr, buf[3];
-	unsigned short cset;
+	unsigned char buf[3];
 	unsigned char KCode_h;
 	int len = 0;
 
-	*byte = 2;
-
-	// CP932からUTF-16LEへ変換する
+	// 内部コード(CodePage)からUTF-16LEへ変換する
 	KCode_h = (unsigned char)(KCode >> 8);
 	if (KCode_h != 0) {
 		buf[len++] = KCode_h;
 	}
 	buf[len++] = KCode & 0xff;
-	ret = CP932ToWideChar(buf, len, &wchar, 1);
-	if (ret <= 0) { // 変換失敗
-		cset = 0;
-		if (_stricmp(locale, DEFAULT_LOCALE) == 0) {
+	ret = MultiByteToWideChar(CodePage, MB_ERR_INVALID_CHARS, buf, len, &wchar, 1);
+	if (ret <= 0) {
+		// 変換失敗
+		unsigned short cset = 0;
+		if (CodePage == 932) {
+			// CP932
 			cset = ConvertUnicode(KCode, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
 		}
 		if (cset == 0) {
@@ -94,27 +95,32 @@ unsigned int PASCAL SJIS2UTF8(WORD KCode, int *byte, char *locale)
 			c = cset;
 		}
 	} else {
-		ptr = (unsigned char *)&wchar;
-		c = ((ptr[1] << 8) | ptr[0]);
+		c = (unsigned int)wchar;
 	}
 
 	// UTF-16LEからUTF-8へ変換する
-	if (0x00000000 <= c && c <= 0x0000007f) {
+	if (c <= 0x0000007f) {
+		// 0x00000000 <= c <= 0x0000007f
 		code = (c & 0xff);
 		*byte = 1;
 
-	} else if (0x00000080 <= c && c <= 0x000007ff) {
+	} else if (c <= 0x000007ff) {
+		// 0x00000080 <= c <= 0x000007ff
 		c1 = ((c >> 6) & 0x1f) | 0xc0;
 		c2 = (c & 0x3f) | 0x80;
 		code = (c1 << 8) | c2;
 		*byte = 2;
 
-	} else if (0x00000800 <= c && c <= 0x0000ffff) {
+	} else if (c <= 0x0000ffff) {
+		// 0x00000800 <= c <= 0x0000ffff
 		c1 = ((c >> 12) & 0xf) | 0xe0;
 		c2 = ((c >> 6) & 0x3f) | 0x80;
 		c3 = ((c) & 0x3f) | 0x80;
 		code = (c1 << 16) | (c2 << 8) | c3;
 		*byte = 3;
+	} else {
+		code = KCode;
+		*byte = 2;
 	}
 
 	return (code);

@@ -90,7 +90,7 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
  *	マルチバイト文字列をwchar_t文字列へ変換
  *	@param[in]	*str_ptr	mb(char)文字列
  *	@param[in]	str_len		mb(char)文字列長(0のとき自動)
- *	@param[in]	code_page	変換先コードページ
+ *	@param[in]	code_page	変換元コードページ
  *	@param[out]	*w_len_		wchar_t文字列長
  *	@retval		mb文字列へのポインタ(NULLの時変換エラー)
  */

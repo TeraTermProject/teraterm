@@ -5414,7 +5414,6 @@ static void ParseASCII(BYTE b)
 //
 #include "uni2sjis.map"
 #include "unisym2decsp.map"
-extern unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax);
 
 
 //
