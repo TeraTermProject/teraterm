@@ -30,7 +30,7 @@
 /*
  * Map of Unicode Symbols to Dec Special Characters
  */
-static codemap_t mapUnicodeSymbolToDecSp[] = {
+static const codemap_t mapUnicodeSymbolToDecSp[] = {
 	/*
 	 * Latin-1 supplement
 	 *   http://www.unicode.org/charts/PDF/U0080.pdf

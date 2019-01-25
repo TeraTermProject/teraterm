@@ -38,7 +38,7 @@
 #include "codeconv.h"
 #include "sjis2uni.map"
 
-unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax)
+unsigned short ConvertUnicode(unsigned short code, const codemap_t *table, int tmax)
 {
 	int low, mid, high;
 	unsigned short result;
@@ -188,7 +188,7 @@ WORD PASCAL JIS2SJIS(WORD KCode)
 
 /* Russian charset conversion table by Andrey Nikiforov 19971114 */
 /* Updated by NAGATA Shinya 20111228 */
-static BYTE cpconv[4][4][128] =
+static const BYTE cpconv[4][4][128] =
 {
 #if 0
 // 1251 -> 1251 = dummy

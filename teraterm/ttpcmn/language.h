@@ -41,7 +41,7 @@ WORD PASCAL SJIS2EUC(WORD KCode);
 WORD PASCAL JIS2SJIS(WORD KCode);
 BYTE PASCAL RussConv(int cin, int cout, BYTE b);
 void PASCAL RussConvStr(int cin, int cout, PCHAR Str, int count);
-unsigned short ConvertUnicode(unsigned short code, codemap_t *table, int tmax);
+unsigned short ConvertUnicode(unsigned short code, const codemap_t *table, int tmax);
 
 #ifdef __cplusplus
 }

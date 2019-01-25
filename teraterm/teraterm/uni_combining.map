@@ -35,7 +35,7 @@ typedef struct combining_map {
  * cf. http://developer.apple.com/technotes/tn/tn1150table.html
  *
  */
-static combining_map_t mapCombiningToPrecomposed[] = {
+static const combining_map_t mapCombiningToPrecomposed[] = {
 	 {0x00C0,   0x0041, 0x0300},
 	 {0x00C1,   0x0041, 0x0301},
 	 {0x00C2,   0x0041, 0x0302},
