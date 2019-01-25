@@ -36,6 +36,8 @@
 #include <mbstring.h>
 #include <locale.h>
 #include <ctype.h>
+#include <crtdbg.h>
+#include <tchar.h>
 
 #include "buffer.h"
 #include "ttwinman.h"
@@ -50,8 +52,17 @@
 #include "telnet.h"
 #include "ttime.h"
 #include "clipboar.h"
+#include "../ttpcmn/language.h"
 
 #include "vtterm.h"
+
+#ifdef _DEBUG
+#define malloc(l)     _malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define realloc(p, l) _realloc_dbg((p), (l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)       _free_dbg((p), _NORMAL_BLOCK)
+#define strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define _strdup(s)	  _strdup_dbg((s), _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
 
 void ParseFirst(BYTE b);
 
@@ -342,6 +353,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 void ResetCharSet()
 {
+	char *result;
 	if (ts.Language==IdJapanese) {
 		Gn[0] = IdASCII;
 		Gn[1] = IdKatakana;
@@ -382,7 +394,16 @@ void ResetCharSet()
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
 
-	setlocale(LC_ALL, ts.Locale);
+	// ロケールの設定
+	// wctomb のため
+	result = setlocale(LC_ALL, ts.Locale);
+    if (result == NULL) {
+		// おかしなLocale文字列がセットされている?
+		// defaultをセットしておく
+		strcpy(ts.Locale, DEFAULT_LOCALE);
+		result = setlocale(LC_ALL, ts.Locale);
+	}
+	ts.CodePage = atoi(strrchr(result, '.')+1);
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)

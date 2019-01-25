@@ -1591,11 +1591,6 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	                        Temp, sizeof(Temp), FName);
 	strncpy_s(ts->Locale, sizeof(ts->Locale), Temp, _TRUNCATE);
 
-	// CodePage
-	ts->CodePage =
-		GetPrivateProfileInt(Section, "CodePage ", DEFAULT_CODEPAGE,
-		                     FName);
-
 	// UI language message file
 	GetPrivateProfileString(Section, "UILanguageFile", "lang\\Default.lng",
 	                        Temp, sizeof(Temp), FName);
@@ -2302,8 +2297,6 @@ void PASCAL WriteIniFile(PCHAR FName, PTTSet ts)
 	WritePrivateProfileString(Section, "ViewlogEditor", ts->ViewlogEditor,
 	                          FName);
 	WritePrivateProfileString(Section, "Locale", ts->Locale, FName);
-	_snprintf_s(Temp, sizeof(Temp), _TRUNCATE, "%d", ts->CodePage);
-	WritePrivateProfileString(Section, "CodePage", Temp, FName);
 
 	// ANSI color(2004.9.5 yutaka)
 	Temp[0] = '\0';
