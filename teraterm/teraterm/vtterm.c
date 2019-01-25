@@ -52,6 +52,7 @@
 #include "telnet.h"
 #include "ttime.h"
 #include "clipboar.h"
+#include "../ttpcmn/language.h"
 #include "codeconv.h"
 
 #include "vtterm.h"
@@ -353,6 +354,7 @@ void ResetTerminal() /*reset variables but don't update screen */
 
 void ResetCharSet()
 {
+	char *result;
 	if (ts.Language==IdJapanese) {
 		Gn[0] = IdASCII;
 		Gn[1] = IdKatakana;
@@ -392,6 +394,17 @@ void ResetCharSet()
 	cv.JIS7KatakanaSend = ts.JIS7KatakanaSend;
 	cv.KanjiIn = ts.KanjiIn;
 	cv.KanjiOut = ts.KanjiOut;
+
+	// ロケールの設定
+	// wctomb のため
+	result = setlocale(LC_ALL, ts.Locale);
+    if (result == NULL) {
+		// おかしなLocale文字列がセットされている?
+		// defaultをセットしておく
+		strcpy(ts.Locale, DEFAULT_LOCALE);
+		result = setlocale(LC_ALL, ts.Locale);
+	}
+	ts.CodePage = atoi(strrchr(result, '.')+1);
 }
 
 void ResetKeypadMode(BOOL DisabledModeOnly)
@@ -5415,7 +5428,7 @@ static void ParseASCII(BYTE b)
 #include "uni_combining.map"
 
 static unsigned short GetPrecomposedChar(int start_index, unsigned short first_code, unsigned short code,
-										 const combining_map_t table[], int tmax)
+										 const combining_map_t *table, int tmax)
 {
 	unsigned short result = 0;
 	int i;
@@ -5434,7 +5447,7 @@ static unsigned short GetPrecomposedChar(int start_index, unsigned short first_c
 	return (result);
 }
 
-static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map_t table[], int tmax)
+static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map_t *table, int tmax)
 {
 	int low, mid, high;
 	int index = -1;
