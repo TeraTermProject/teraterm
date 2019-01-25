@@ -4,13 +4,6 @@ set_target_properties(
   ttpcmn
   PROPERTIES FOLDER teraterm)
 
-if(0)
-  add_subdirectory(ttpdlg)
-  set_target_properties(
-	ttpdlg
-	PROPERTIES FOLDER teraterm)
-endif()
-
 add_subdirectory(ttpfile)
 set_target_properties(
   ttpfile
@@ -40,6 +33,3 @@ add_subdirectory(keycode)
 set_target_properties(
   keycode
   PROPERTIES FOLDER teraterm)
-
-# ttpdlg内でconfig時 svnversion.h を生成
-#add_subdirectory(svnrev)

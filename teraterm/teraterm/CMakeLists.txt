@@ -1,4 +1,4 @@
-project(teraterm)
+﻿project(teraterm)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
@@ -182,7 +182,7 @@ target_link_libraries(
   ttpfile
   ttpset
   ttptek
-#  ttpdlg
+  #  ttpdlg
   optimized onig
   debug onigd
   #
@@ -199,20 +199,14 @@ target_link_libraries(
 add_dependencies(
   teraterm
   ttpcmn
-#  ttpdlg
   ttpfile
   ttpset
   ttptek
   )
 
-## svnversion.h
-if(EXISTS ${CMAKE_SOURCE_DIR}/.svn)
-  INCLUDE(FindSubversion)
-endif()
-if(Subversion_FOUND)
-  Subversion_WC_INFO(${CMAKE_SOURCE_DIR} TT)
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "#define SVNVERSION ${TT_WC_REVISION}\n")
-  message("rev.${TT_WC_REVISION}")
-else()
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h "#undef SVNVERSION\n")
+configure_file(
+  svnversion.h.in
+  svnversion.h @ONLY)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../ttpdlg/svnversion.h")
+  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/../ttpdlg/svnversion.h")
 endif()

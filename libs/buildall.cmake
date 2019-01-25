@@ -1,7 +1,7 @@
-﻿# cmake -DCMAKE_GENERATOR="Vsual Studio 15 2017" -P buildall.cmake 
+﻿# cmake -DCMAKE_GENERATOR="Vsual Studio 15 2017" -P buildall.cmake
+# cmake -DCMAKE_GENERATOR="Unix Makefiles" -P buildall.cmake -DCMAKE_TOOLCHAIN_FILE=../mingw.toolchain.cmake
 
 if("${CMAKE_GENERATOR}" STREQUAL "")
-  #set(CMAKE_GENERATOR "Visual Studio 15 2017")
   message(FATAL_ERROR "set CMAKE_GENERATOR!")
 endif()
 
