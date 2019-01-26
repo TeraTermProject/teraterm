@@ -4092,9 +4092,9 @@ void IgnoreString(BYTE b)
 	utf8_stat = CheckUTF8Seq(b, utf8_stat);
 }
 
-void RequestStatusString(unsigned char *StrBuff, int StrLen)	// DECRQSS
+static void RequestStatusString(const unsigned char *StrBuff, int StrLen)	// DECRQSS
 {
-	unsigned char RepStr[256];
+	char RepStr[256];
 	int len = 0;
 	int tmp = 0;
 
@@ -4277,7 +4277,7 @@ int toHexStr(unsigned char *buff, int buffsize, unsigned char *str)
 	return copylen;
 }
 
-int TermcapString(unsigned char *buff, int buffsize, unsigned char *capname)
+static int TermcapString(unsigned char *buff, int buffsize, unsigned char *capname)
 {
 	int len = 0, l;
 	unsigned char *capval = NULL;
@@ -4317,7 +4317,7 @@ int TermcapString(unsigned char *buff, int buffsize, unsigned char *capname)
 	return len;
 }
 
-void RequestTermcapString(unsigned char *StrBuff, int StrLen)	// xterm experimental
+static void RequestTermcapString(unsigned char *StrBuff, int StrLen)	// xterm experimental
 {
 	unsigned char RepStr[256];
 	unsigned char CapName[16];
@@ -4389,7 +4389,7 @@ void RequestTermcapString(unsigned char *StrBuff, int StrLen)	// xterm experimen
 	SendDCSstr(RepStr, replen);
 }
 
-void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
+static void ParseDCS(BYTE Cmd, unsigned char *StrBuff, int len) {
 	switch (ICount) {
 	  case 0:
 		break;
@@ -5469,52 +5469,50 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 	return (index);
 }
 
-
+// unicode(UTF-16,wchar_t)をバッファへ書き込む
 static void UnicodeToCP932(unsigned int code)
 {
+	wchar_t wchar = (wchar_t)code;
 	int ret;
-	char mbchar[32];
-	unsigned char wchar[32];
-	unsigned short cset = 0;
+	char mbchar[2];
+	unsigned short cset;
 
-	wchar[0] = code & 0xff;
-	wchar[1] = (code >> 8) & 0xff;
-
+	// UnicodeからDEC特殊文字へのマッピング
 	if (ts.UnicodeDecSpMapping) {
-		cset = ConvertUnicode(code, mapUnicodeSymbolToDecSp, MAPSIZE(mapUnicodeSymbolToDecSp));
-	}
-	if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
-		PutDecSp(cset & 0xff);
-	}
-	else {
-		// Unicode -> CP932
-		ret = wctomb(mbchar, ((wchar_t *)wchar)[0]);
-		switch (ret) {
-		  case -1:
-			if (_stricmp(ts.Locale, DEFAULT_LOCALE) == 0) {
-				// U+301Cなどは変換できない。Unicode -> Shift_JISへ変換してみる。
-				cset = ConvertUnicode(code, mapUnicodeToSJIS, MAPSIZE(mapUnicodeToSJIS));
-				if (cset != 0) {
-					Kanji = cset & 0xff00;
-					PutKanji(cset & 0x00ff);
-				}
-			}
-
-			if (cset == 0) {
-				PutChar('?');
-				if (ts.UnknownUnicodeCharaAsWide) {
-					PutChar('?');
-				}
-			}
-			break;
-		  case 1:
-			PutChar(mbchar[0]);
-			break;
-		  default:
-			Kanji = mbchar[0] << 8;
-			PutKanji(mbchar[1]);
-			break;
+		cset = ConvertUnicode(wchar, mapUnicodeSymbolToDecSp, MAPSIZE(mapUnicodeSymbolToDecSp));
+		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+			PutDecSp(cset & 0xff);
+			return;
 		}
+	}
+
+	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
+	ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	switch (ret) {
+	case 0:
+		if (ts.CodePage == 932) {
+			// CP932
+			// U+301Cなどは変換できない。Unicode -> Shift_JISへ変換してみる。
+			cset = ConvertUnicode(code, mapUnicodeToSJIS, MAPSIZE(mapUnicodeToSJIS));
+			if (cset != 0) {
+				Kanji = cset & 0xff00;
+				PutKanji(cset & 0x00ff);
+			}
+		}
+
+		PutChar('?');
+		if (ts.UnknownUnicodeCharaAsWide) {
+			PutChar('?');
+		}
+		break;
+	case 1:
+		PutChar(mbchar[0]);
+		break;
+	case 2:
+	default:
+		Kanji = mbchar[0] << 8;
+		PutKanji(mbchar[1]);
+		break;
 	}
 }
 
