@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,6 +70,13 @@ static HANDLE HMap = NULL;
 #define VTCLASSNAME _T("VTWin32")
 #define TEKCLASSNAME _T("TEKWin32")
 
+#ifdef UNICODE
+static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+#define HTMLHELP_API_NAME	"HtmlHelpW"
+#else
+static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+#define HTMLHELP_API_NAME	"HtmlHelpA"
+#endif
 
 enum window_style {
 	WIN_CASCADE,
@@ -1166,10 +1173,13 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	HWND HWin;
 	TCHAR HelpFN[MAX_PATH];
 	TCHAR uimsg[MAX_UIMSG];
+	TCHAR dllName[MAX_PATH];
 	const TCHAR *HomeDirT;
+	const TCHAR *errorFile;
+	TCHAR buf[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileNameA(NULL,Temp,sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(NULL,Temp,_countof(Temp)) == 0) {
 		return;
 	}
 	ExtractDirName(Temp, HomeDir);
@@ -1178,16 +1188,37 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	get_lang_msgT("HELPFILE", uimsg, _countof(uimsg),
 				  _T("teraterm.chm"), UILanguageFile);
 
+	if (pHtmlHelp == NULL) {
+		HINSTANCE hDll;
+		GetSystemDirectory(dllName, _countof(dllName));
+		_tcscat_s(dllName, _countof(dllName), _T("\\hhctrl.ocx"));
+		hDll = LoadLibrary(dllName);
+		if (hDll == NULL) {
+			errorFile = dllName;
+			goto error;
+		}
+		pHtmlHelp = (void *)GetProcAddress(hDll, HTMLHELP_API_NAME);
+		if (pHtmlHelp == NULL) {
+			errorFile = dllName;
+			goto error;
+		}
+	}
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
 	HWin = GetDesktopWindow();
 	_sntprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, _T("%s\\%s"), (TCHAR *)HomeDirT, uimsg);
-	if (HtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-		TCHAR buf[MAX_PATH];
-		get_lang_msgT("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
-					  _T("Can't open HTML help file(%s)."), UILanguageFile);
-		_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
-		MessageBox(HWin, buf, _T("Tera Term: HTML help"), MB_OK | MB_ICONERROR);
+	if (pHtmlHelp != NULL && pHtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
+		errorFile = HelpFN;
+		goto error;
 	}
+	goto finish;
+
+error:
+	get_lang_msgT("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
+				  _T("Can't open HTML help file(%s)."), UILanguageFile);
+	_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
+	MessageBox(HWin, buf, _T("Tera Term: HTML help"), MB_OK | MB_ICONERROR);
+
+finish:
 	free((void *)HomeDirT);
 }
 
