@@ -43,7 +43,7 @@
 #include "tt_res.h"
 #include "tekwin.h"
 #include "ttlib.h"
-#include "htmlhelp.h"
+#include <htmlhelp.h>
 #include "dlglib.h"
 #include <tchar.h>
 

@@ -80,7 +80,7 @@
 #include "sizetip.h"
 #include "dnddlg.h"
 #include "tekwin.h"
-#include "htmlhelp.h"
+#include <htmlhelp.h>
 #include "compat_win.h"
 
 #include "initguid.h"

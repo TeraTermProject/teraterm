@@ -113,12 +113,6 @@ if (MSVC)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:dnsapi.dll")
 endif()
 
-if(MINGW)
-  link_directories(
-	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
-	)
-endif()
-
 add_library(
   ttxssh SHARED
   ${SRC}

@@ -1,4 +1,4 @@
-﻿project(ttpcmn)
+project(ttpcmn)
 
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
@@ -56,12 +56,6 @@ include_directories(
   .
   )
 
-if(MINGW)
-  link_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
-	)
-endif()
-  
 add_library(
   ttpcmn
   SHARED
@@ -84,5 +78,4 @@ target_link_libraries(
   ttpcmn
   ole32
   setupapi
-  htmlhelp
   )

@@ -1,4 +1,4 @@
-﻿project(ttpset)
+project(ttpset)
 
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
@@ -35,12 +35,6 @@ set(SRC
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../common
   )
-
-if(MINGW)
-  link_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
-	)
-endif()
 
 add_library(
   ttpset SHARED

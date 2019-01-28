@@ -1,4 +1,4 @@
-﻿project(ttpdlg)
+project(ttpdlg)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
@@ -52,16 +52,9 @@ include_directories(
   ${ONIGURUMA_INCLUDE_DIRS}
   )
 
-if(MINGW)
-  link_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
-	${ONIGURUMA_LIBRARY_DIRS}
-	)
-else()
-  link_directories(
-	${ONIGURUMA_LIBRARY_DIRS}
-	)
-endif()
+link_directories(
+  ${ONIGURUMA_LIBRARY_DIRS}
+  )
 
 add_library(
   ttpdlg SHARED

@@ -1,4 +1,4 @@
-﻿project(TTXttyrec)
+project(TTXttyrec)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
@@ -6,12 +6,6 @@ include_directories(
   ../../teraterm/teraterm
   ../../teraterm/common
   )
-
-if(MINGW)
-  link_directories(
-	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
-	)
-endif()
 
 add_library(
   TTXttyplay SHARED

@@ -1,4 +1,4 @@
-﻿project(ttxkanjimenu)
+project(ttxkanjimenu)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
@@ -18,12 +18,6 @@ include_directories(
   ../libs/openssl/inc32
   .
   )
-
-if(MINGW)
-  link_directories(
-	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
-	)
-endif()
 
 add_library(
   ttxkanjimenu SHARED

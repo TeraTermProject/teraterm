@@ -1,4 +1,4 @@
-﻿project(ttptek)
+project(ttptek)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
@@ -51,12 +51,6 @@ link_directories(
   ${SFMT_LIBRARY_DIRS}
   )
 
-if(MINGW)
-  link_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
-	)
-endif()
-
 add_library(
   ttptek SHARED
   ${SRC}
@@ -77,7 +71,6 @@ target_link_libraries(
   optimized sfmt
   #
   iphlpapi
-  htmlhelp
   gdi32
   )
 

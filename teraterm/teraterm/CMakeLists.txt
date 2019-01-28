@@ -158,12 +158,6 @@ if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:imagehlp.dll /DELAYLOAD:user32.dll /DELAYLOAD:shell32.dll")
 endif()
 
-if(MINGW)
-  link_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../htmlhelp
-	)
-endif()
-
 add_executable(
   teraterm WIN32
   ${SRC}

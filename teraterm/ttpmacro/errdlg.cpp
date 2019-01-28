@@ -44,7 +44,7 @@
 #include "errdlg.h"
 #include "ttmlib.h"
 #include "ttmparse.h"
-#include "htmlhelp.h"
+#include <htmlhelp.h>
 #include "dlglib.h"
 #include "ttmacro.h"
 

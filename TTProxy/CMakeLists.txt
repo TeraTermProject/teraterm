@@ -1,4 +1,4 @@
-﻿project(ttproxy)
+project(ttproxy)
 
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
@@ -86,12 +86,6 @@ include_directories(
   ${OPENSSL_INCLUDE_DIRS}
   .
   )
-
-if(MINGW)
-  link_directories(
-	${CMAKE_SOURCE_DIR}/teraterm/htmlhelp
-	)
-endif()
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-uTTXBind@8")
 
