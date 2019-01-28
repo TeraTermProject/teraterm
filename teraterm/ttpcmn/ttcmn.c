@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,7 @@
 
 #include "compat_w95.h"
 #include "tt_res.h"
+#include "codeconv.h"
 
 // TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
 // TMap(とそのメンバ)の更新時は旧バージョンとの同時起動の為に変える必要があるが
@@ -62,9 +63,16 @@ static HINSTANCE hInst;
 static PMap pm;
 
 static HANDLE HMap = NULL;
-#define VTCLASSNAME "VTWin32"
-#define TEKCLASSNAME "TEKWin32"
+#define VTCLASSNAME _T("VTWin32")
+#define TEKCLASSNAME _T("TEKWin32")
 
+#ifdef UNICODE
+static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCWSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+#define HTMLHELP_API_NAME	"HtmlHelpW"
+#else
+static HWND(WINAPI *pHtmlHelp)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwData);
+#define HTMLHELP_API_NAME	"HtmlHelpA"
+#endif
 
 enum window_style {
 	WIN_CASCADE,
@@ -1158,28 +1166,55 @@ void WINAPI OpenHelp(UINT Command, DWORD Data, char *UILanguageFile)
 	char HomeDir[MAX_PATH];
 	char Temp[MAX_PATH];
 	HWND HWin;
-	char HelpFN[MAX_PATH];
-//	char UILanguageFile[MAX_PATH];
-	char uimsg[MAX_UIMSG];
+	TCHAR HelpFN[MAX_PATH];
+	TCHAR uimsg[MAX_UIMSG];
+	TCHAR dllName[MAX_PATH];
+	const TCHAR *HomeDirT;
+	const TCHAR *errorFile;
+	TCHAR buf[MAX_PATH];
 
 	/* Get home directory */
-	if (GetModuleFileName(NULL,Temp,sizeof(Temp)) == 0) {
+	if (GetModuleFileNameA(NULL,Temp,_countof(Temp)) == 0) {
 		return;
 	}
 	ExtractDirName(Temp, HomeDir);
+	HomeDirT = ToTcharA(HomeDir);
 
-//	GetUILanguageFile(UILanguageFile, sizeof(UILanguageFile));
-	get_lang_msg("HELPFILE", uimsg, sizeof(uimsg), "teraterm.chm", UILanguageFile);
+	get_lang_msgT("HELPFILE", uimsg, _countof(uimsg),
+				  _T("teraterm.chm"), UILanguageFile);
 
+	if (pHtmlHelp == NULL) {
+		HINSTANCE hDll;
+		GetSystemDirectory(dllName, _countof(dllName));
+		_tcscat_s(dllName, _countof(dllName), _T("\\hhctrl.ocx"));
+		hDll = LoadLibrary(dllName);
+		if (hDll == NULL) {
+			errorFile = dllName;
+			goto error;
+		}
+		pHtmlHelp = (void *)GetProcAddress(hDll, HTMLHELP_API_NAME);
+		if (pHtmlHelp == NULL) {
+			errorFile = dllName;
+			goto error;
+		}
+	}
 	// ヘルプのオーナーは常にデスクトップになる (2007.5.12 maya)
 	HWin = GetDesktopWindow();
-	_snprintf_s(HelpFN, sizeof(HelpFN), _TRUNCATE, "%s\\%s", HomeDir, uimsg);
-	if (HtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
-		char buf[MAX_PATH];
-		get_lang_msg("MSG_OPENHELP_ERROR", uimsg, sizeof(uimsg), "Can't open HTML help file(%s).", UILanguageFile);
-		_snprintf_s(buf, sizeof(buf), _TRUNCATE, uimsg, HelpFN);
-		MessageBox(HWin, buf, "Tera Term: HTML help", MB_OK | MB_ICONERROR);
+	_sntprintf_s(HelpFN, _countof(HelpFN), _TRUNCATE, _T("%s\\%s"), (TCHAR *)HomeDirT, uimsg);
+	if (pHtmlHelp != NULL && pHtmlHelp(HWin, HelpFN, Command, Data) == NULL && Command != HH_CLOSE_ALL) {
+		errorFile = HelpFN;
+		goto error;
 	}
+	goto finish;
+
+error:
+	get_lang_msgT("MSG_OPENHELP_ERROR", uimsg, _countof(uimsg),
+				  _T("Can't open HTML help file(%s)."), UILanguageFile);
+	_sntprintf_s(buf, _countof(buf), _TRUNCATE, uimsg, HelpFN);
+	MessageBox(HWin, buf, _T("Tera Term: HTML help"), MB_OK | MB_ICONERROR);
+
+finish:
+	free((void *)HomeDirT);
 }
 
 HWND WINAPI GetNthWin(int n)

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1999 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,6 +68,9 @@ void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
 void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile);
+#if defined(UNICODE)
+void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
+#endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
 BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
 void OutputDebugPrintf(char *fmt, ...);
@@ -104,6 +107,11 @@ BOOL GetPositionOnWindow(
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
+#if defined(_UNICODE)
+#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
+#else
+#define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
+#endif
 #ifdef __cplusplus
 }
 #endif
