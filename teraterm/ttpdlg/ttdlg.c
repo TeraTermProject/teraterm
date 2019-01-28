@@ -122,7 +122,7 @@ static const char *BaudList[] =
 	 "230400", "460800", "921600", NULL};
 
 
-static BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfosCom[] = {
 		{ 0, "DLG_TERM_TITLE" },
@@ -519,7 +519,7 @@ static void RestoreVar(HWND Dialog, PTTSet ts, int *IAttr, int *IOffset)
 	}
 }
 
-static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_WIN_TITLE" },
@@ -1029,7 +1029,7 @@ static BOOL CALLBACK WinDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-static BOOL CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK KeybDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_KEYB_TITLE" },
@@ -1113,7 +1113,7 @@ static const char *ParityList[] = {"none", "odd", "even", "mark", "space", NULL}
 static const char *StopList[] = {"1 bit", "1.5 bit", "2 bit", NULL};
 static const char *FlowList[] = {"Xon/Xoff","hardware","none",NULL};
 
-static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_SERIAL_TITLE" },
@@ -1261,7 +1261,7 @@ static BOOL CALLBACK SerialDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM 
 	return FALSE;
 }
 
-static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_TCPIP_TITLE" },
@@ -1497,7 +1497,7 @@ static BOOL CALLBACK TCPIPDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM l
 	return FALSE;
 }
 
-static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_HOST_TITLE" },
@@ -1725,7 +1725,7 @@ static BOOL CALLBACK HostDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lP
 	return FALSE;
 }
 
-static BOOL CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK DirDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_DIR_TITLE" },
@@ -2150,7 +2150,7 @@ static void GetCompilerInfo(char *buf, size_t buf_size)
 }
 #endif
 
-static BOOL CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK AboutDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_ABOUT_TITLE" },

@@ -1019,7 +1019,7 @@ typedef struct {
 	BOOL Open;
 	WORD PortType;
 	WORD ComPort;
-	unsigned int s; /* SOCKET */
+	UINT_PTR s; /* SOCKET */
 	WORD RetryCount;
 	HANDLE ComID;
 	BOOL CanSend, RRQ;

@@ -747,8 +747,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 }
 
 BOOL autologin_sent_none;
-static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                   LPARAM lParam)
+static INT_PTR CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+									  LPARAM lParam)
 {
 	const int IDC_TIMER1 = 300; // 自動ログインが有効なとき
 	const int IDC_TIMER2 = 301; // サポートされているメソッドを自動チェック(CheckAuthListFirst)
@@ -1213,8 +1213,8 @@ static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
 	return TRUE;
 }
 
-static BOOL CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
-                                  LPARAM lParam)
+static INT_PTR CALLBACK TIS_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
+									 LPARAM lParam)
 {
 	PTInstVar pvar;
 //	LOGFONT logfont;
@@ -1455,8 +1455,8 @@ static BOOL end_default_auth_dlg(PTInstVar pvar, HWND dlg)
 	return TRUE;
 }
 
-static BOOL CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
-										   WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK default_auth_dlg_proc(HWND dlg, UINT msg,
+											  WPARAM wParam, LPARAM lParam)
 {
 	PTInstVar pvar;
 //	LOGFONT logfont;
