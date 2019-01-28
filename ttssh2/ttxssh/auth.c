@@ -487,6 +487,8 @@ static void choose_host_RSA_key_file(HWND dlg, PTInstVar pvar)
 
 static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 {
+	char uimsg[MAX_UIMSG];
+
 	int method = SSH_AUTH_PASSWORD;
 	char *password =
 		alloc_control_text(GetDlgItem(dlg, IDC_SSHPASSWORD));
@@ -514,11 +516,10 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		keyfile[0] = 0;
 		GetDlgItemText(dlg, file_ctl_ID, keyfile, sizeof(keyfile));
 		if (keyfile[0] == 0) {
-			char buf[1024];
-			UTIL_get_lang_msgU8("MSG_KEYSPECIFY_ERROR", buf, _countof(buf),
+			UTIL_get_lang_msgU8("MSG_KEYSPECIFY_ERROR", uimsg, _countof(uimsg),
 								"You must specify a file containing the RSA/DSA/ECDSA/ED25519 private key.",
 							   pvar->ts->UILanguageFile);
-			notify_nonfatal_error(pvar, buf);
+			notify_nonfatal_error(pvar, uimsg);
 			SetFocus(GetDlgItem(dlg, file_ctl_ID));
 			destroy_malloced_string(&password);
 			return FALSE;
@@ -586,7 +587,7 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 				}
 				default:
 				{
-					char uimsg[1024];
+					char buf[1024];
 
 					// ファイルが開けた場合はファイル形式が不明でも読み込んでみる
 					if (fp != NULL) {
@@ -602,7 +603,8 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 					UTIL_get_lang_msgU8("MSG_READKEY_ERROR", uimsg, _countof(uimsg),
 										"read error SSH2 private key file\r\n%s",
 										pvar->ts->UILanguageFile);
-					notify_nonfatal_error(pvar, uimsg);
+					_snprintf_s(buf, sizeof(buf), _TRUNCATE, uimsg, errmsg);
+					notify_nonfatal_error(pvar, buf);
 					// ここに来たということは SSH2 秘密鍵ファイルが開けないので
 					// 鍵ファイルの選択ボタンにフォーカスを移す
 					SetFocus(GetDlgItem(dlg, IDC_CHOOSERSAFILE));
@@ -613,9 +615,10 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 
 			if (key_pair == NULL) { // read error
 				char buf[1024];
-				UTIL_get_lang_msgU8("MSG_READKEY_ERROR", buf, _countof(buf),
+				UTIL_get_lang_msgU8("MSG_READKEY_ERROR", uimsg, _countof(uimsg),
 									"read error SSH2 private key file\r\n%s",
 									pvar->ts->UILanguageFile);
+				_snprintf_s(buf, sizeof(buf), _TRUNCATE, uimsg, errmsg);
 				notify_nonfatal_error(pvar, buf);
 				// パスフレーズが鍵と一致しなかった場合はIDC_SSHPASSWORDにフォーカスを移す (2006.10.29 yasuhide)
 				if (invalid_passphrase) {
@@ -649,10 +652,9 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 			pvar->pageant_keylistlen = putty_get_ssh2_keylist(&pvar->pageant_key);
 		}
 		if (pvar->pageant_keylistlen == 0) {
-			char buf[1024];
-			UTIL_get_lang_msgU8("MSG_PAGEANT_NOTFOUND", buf, _countof(buf),
+			UTIL_get_lang_msgU8("MSG_PAGEANT_NOTFOUND", uimsg, _countof(uimsg),
 								"Can't find Pageant.", pvar->ts->UILanguageFile);
-			notify_nonfatal_error(pvar, buf);
+			notify_nonfatal_error(pvar, uimsg);
 
 			return FALSE;
 		}
@@ -661,11 +663,9 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 		// 鍵の数
 		pvar->pageant_keycount = get_uint32_MSBfirst(pvar->pageant_curkey);
 		if (pvar->pageant_keycount == 0) {
-			char buf[1024];
-			UTIL_get_lang_msgU8("MSG_PAGEANT_NOKEY", buf, _countof(buf),
-								"Pageant has no valid key.",
-								pvar->ts->UILanguageFile);
-			notify_nonfatal_error(pvar, buf);
+			UTIL_get_lang_msgU8("MSG_PAGEANT_NOKEY", uimsg, _countof(uimsg),
+								"Pageant has no valid key.", pvar->ts->UILanguageFile);
+			notify_nonfatal_error(pvar, uimsg);
 
 			return FALSE;
 		}
@@ -700,7 +700,6 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	}
 	if (method == SSH_AUTH_RHOSTS || method == SSH_AUTH_RHOSTS_RSA) {
 		if (pvar->session_settings.DefaultAuthMethod != SSH_AUTH_RHOSTS) {
-			char uimsg[MAX_UIMSG];
 			UTIL_get_lang_msgU8("MSG_RHOSTS_NOTDEFAULT_ERROR", uimsg, _countof(uimsg),
 								"Rhosts authentication will probably fail because it was not "
 								"the default authentication method.\n"
