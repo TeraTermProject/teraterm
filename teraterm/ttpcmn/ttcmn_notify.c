@@ -79,7 +79,7 @@ void WINAPI CreateNotifyIcon(PComVar cv)
 		CommonNotifyData *CmnNotifyData = &CmnNotifyDataPool;
 #endif
 		NOTIFYICONDATA *notify_icon;
-		memset(CmnNotifyData, 0, sizeof(CmnNotifyData));
+		memset(CmnNotifyData, 0, sizeof(* CmnNotifyData));
 		cv->CmnNotifyData = CmnNotifyData;
 
 		notify_icon = &CmnNotifyData->notify_icon;
