@@ -1571,7 +1571,7 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 //
 // MBCSから各種漢字コードへ変換して出力する。
 //
-int TextOutMBCS(PComVar cv, PCHAR B, int C)
+static int TextOutMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen, OutLen;
 	WORD K;
@@ -1932,7 +1932,7 @@ int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int WINAPI TextEchoMBCS(PComVar cv, PCHAR B, int C)
+static int WINAPI TextEchoMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;

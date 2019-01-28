@@ -5497,6 +5497,7 @@ static void UnicodeToCP932(unsigned int code)
 			if (cset != 0) {
 				Kanji = cset & 0xff00;
 				PutKanji(cset & 0x00ff);
+				return;
 			}
 		}
 
