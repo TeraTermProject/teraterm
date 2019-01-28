@@ -1,4 +1,4 @@
-project(keycode)
+﻿project(keycode)
 
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})

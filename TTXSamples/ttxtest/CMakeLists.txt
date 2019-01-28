@@ -1,4 +1,4 @@
-project(TTXtest)
+﻿project(TTXtest)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
