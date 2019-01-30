@@ -1,4 +1,4 @@
-project(ttpcmn)
+﻿project(ttpcmn)
 
 if (MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
@@ -56,6 +56,10 @@ include_directories(
   .
   )
 
+if (MSVC)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:setupapi.dll /DELAYLOAD:user32.dll")
+endif()
+
 add_library(
   ttpcmn
   SHARED
@@ -78,4 +82,5 @@ target_link_libraries(
   ttpcmn
   ole32
   setupapi
+  delayimp
   )
