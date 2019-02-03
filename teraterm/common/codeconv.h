@@ -34,9 +34,14 @@
 extern "C" {
 #endif
 
+
+// 1char
+size_t UTF32ToUTF8(unsigned int u32, char *u8_ptr, size_t u8_len);
+size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, unsigned int *u32_);
+
 // MultiByteToWideChar() wrappers
-//	CP932(shift-jis) to wchar(UTF-16)
-int CP932ToWideChar(const char *cp932_ptr, int cp932_len, wchar_t *wstr_ptr, int wstr_len);
+int WideCharToUTF8(const wchar_t *wstr_ptr, int wstr_len, char *u8_ptr, int u8_len);
+int UTF8ToWideChar(const char *u8_ptr, int u8_len, wchar_t *wstr_ptr, int wstr_len);
 
 // API wrappers
 char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_page, size_t *mb_len_);
