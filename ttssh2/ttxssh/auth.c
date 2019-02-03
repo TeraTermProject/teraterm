@@ -151,7 +151,7 @@ static void init_auth_machine_banner(PTInstVar pvar, HWND dlg)
 #if defined(UNICODE)
 	{
 		wchar_t hostnameW[128];
-		MultiByteToWideChar(CP_UTF8, 0, hostname, -1, hostnameW, _countof(hostnameW));
+		UTF8ToWideChar(hostname, -1, hostnameW, _countof(hostnameW));
 		_sntprintf_s(buf, _countof(buf), _TRUNCATE, buf2, hostnameW);
 	}
 #else

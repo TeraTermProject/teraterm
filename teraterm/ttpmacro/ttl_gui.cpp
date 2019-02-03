@@ -529,10 +529,8 @@ WORD TTLGetPassword()
 #if defined(UNICODE)
 		TCHAR input_string[MaxStrLen];
 		OpenInpDlg(input_string, tc::fromUtf8(Str2), _T("Enter password"), _T(""), TRUE);
-		WideCharToMultiByte(CP_UTF8, 0,
-							input_string, -1,
-							Temp2, _countof(Temp2),
-							NULL, NULL);
+		WideCharToUTF8(input_string, -1,
+					   Temp2, _countof(Temp2));
 #else
 		OpenInpDlg(Temp2, Str2, _T("Enter password"), _T(""), TRUE);
 #endif
@@ -601,10 +599,8 @@ WORD TTLInputBox(BOOL Paswd)
 		TCHAR input_string[MaxStrLen];
 		OpenInpDlg(input_string,tc::fromUtf8(Str1),tc::fromUtf8(Str2),tc::fromUtf8(Str3),Paswd);
 		char *output = StrVarPtr(VarId);
-		WideCharToMultiByte(CP_UTF8, 0,
-							input_string, -1,
-							output, MaxStrLen,
-							NULL, NULL);
+		WideCharToUTF8(input_string, -1,
+					   output, MaxStrLen);
 #else
 		OpenInpDlg(StrVarPtr(VarId),Str1,Str2,Str3,Paswd);
 #endif

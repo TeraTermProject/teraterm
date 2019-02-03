@@ -1,4 +1,4 @@
-project(ttptek)
+﻿project(ttptek)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
@@ -22,6 +22,8 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h
+  ../common/codeconv.h
+  ../common/codeconv.cpp
   )
 
 source_group(

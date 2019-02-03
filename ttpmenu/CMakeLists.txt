@@ -3,11 +3,12 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
-  ../teraterm/common/ttlib.c
-  ../teraterm/common/i18n.c
-  # TODO ↑ in dll
   ../teraterm/common/ttlib.h
+  ../teraterm/common/ttlib.c
   ../teraterm/common/i18n.h
+  ../teraterm/common/i18n.c
+  ../teraterm/common/codeconv.h
+  ../teraterm/common/codeconv.cpp
   )
 
 source_group(

@@ -28,6 +28,7 @@
 
 #include "i18n.h"
 #include "ttlib.h"
+#include "codeconv.h"
 
 #include <assert.h>
 #include <tchar.h>
@@ -59,13 +60,10 @@ DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int
 #if defined(UNICODE)
 	wchar_t tmp[MAX_UIMSG];
 	wchar_t defW[MAX_UIMSG];
-	r = MultiByteToWideChar(CP_UTF8, 0, def, -1, defW, _countof(defW));
+	r = UTF8ToWideChar(def, -1, defW, _countof(defW));
 	assert(r != 0);
 	GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
-	r = WideCharToMultiByte(CP_UTF8, 0,
-							tmp, -1,
-							buf, buf_len,
-							NULL, NULL);
+	r = WideCharToUTF8(tmp, -1, buf, buf_len);
 	assert(r != 0);
 #else
 	// ANSI -> Wide -> utf8
@@ -74,10 +72,7 @@ DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int
 	GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
 	r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
 	assert(r != 0);
-	r = WideCharToMultiByte(CP_UTF8, 0,
-							strW, -1,
-							buf, buf_len,
-							NULL, NULL);
+	r = WideCharToUTF8(strW, -1, buf, buf_len);
 	assert(r != 0);
 #endif
 }
