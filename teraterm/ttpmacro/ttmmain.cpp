@@ -465,7 +465,7 @@ void CCtrlWindow::OnPaint()
 	if (::IsIconic(m_hWnd)) {
 		int OldMapMode = GetMapMode(dc);
 		SetMapMode(dc, MM_TEXT);
-		SendMessage(WM_ICONERASEBKGND,(UINT)dc, 0);	// TODO
+		SendMessage(WM_ICONERASEBKGND,(WPARAM)dc, 0);
 		DrawIcon(dc, 0, 0, m_hIcon);
 		SetMapMode(dc, OldMapMode);
 	}

@@ -63,7 +63,7 @@ set(DOWN_DIR "${CMAKE_SOURCE_DIR}/download/openssl")
 
 set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/openssl/src_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/openssl_${TOOLSET}")
-if(${CMAKE_GENERATOR} MATCHES "Win64")
+if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32"))
   set(EXTRACT_DIR "${EXTRACT_DIR}_x64")
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
 endif()
@@ -234,22 +234,34 @@ if((${CMAKE_GENERATOR} MATCHES "Visual Studio") OR
   endif()
 else()
   ######################################## MinGW
-  if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
-	find_program(
-	  MAKE make
-	  )
-  else()
+  execute_process(
+	COMMAND "uname" -s
+	OUTPUT_VARIABLE ov)
+  string(REGEX MATCH "[A-Za-z0-9]+" UNAME_S ${ov})
+  if("${UNAME_S}" STREQUAL "CYGWIN")
 	find_program(
 	  MAKE make.exe
 	  HINTS c:/cygwin/usr/bin
 	  HINTS c:/cygwin64/usr/bin
 	  )
+  elseif(("${UNAME_S}" STREQUAL "MINGW32") OR ("${UNAME_S}" STREQUAL "MINGW64"))
+	find_program(
+	  MAKE make
+	  )
+  elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+	find_program(
+	  MAKE make
+	  )
+  else()
+	message(FATAL_ERROR "unsported")
   endif()
   set(ENV{PATH} "/usr/bin;/bin")
-  if("$ENV{MSYSTEM}" MATCHES "MINGW32")
+  if("${UNAME_S}" STREQUAL "MINGW32")
 	set(CMAKE_C_COMPILER "cc")
 	set(PATH "/mingw32/bin:/usr/local/bin:/usr/bin:/bin")
-	message("compiler ${CMAKE_C_COMPILER} ${CMAKE_CXX_COMPILER}")
+  elseif("${UNAME_S}" STREQUAL "MINGW64")
+	set(CMAKE_C_COMPILER "cc")
+	set(PATH "/mingw64/bin:/usr/local/bin:/usr/bin:/bin")
   else()
 	include(${CMAKE_SOURCE_DIR}/../mingw.toolchain.cmake)
 	set(ENV{PREFIX} i686-w64-mingw32)
@@ -258,8 +270,13 @@ else()
 	set(ENV{RANLIB} "i686-w64-mingw32-ranlib")
 	set(PATH "/usr/bin:/bin")
   endif()
+  if("${UNAME_S}" STREQUAL "MINGW64")
+	set(CONFIG_NAME "mingw64")
+  else()
+	set(CONFIG_NAME "mingw")
+  endif()
   execute_process(
-	COMMAND ${CMAKE_COMMAND} -E env "PATH=/usr/bin:/bin" ${PERL} ./Configure mingw --prefix=${INSTALL_DIR}
+	COMMAND ${CMAKE_COMMAND} -E env "PATH=/usr/bin:/bin" ${PERL} ./Configure ${CONFIG_NAME} --prefix=${INSTALL_DIR}
 	WORKING_DIRECTORY ${SRC_DIR}
 	RESULT_VARIABLE rv
 	)

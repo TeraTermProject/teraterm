@@ -33,10 +33,10 @@ public:
 	HWND GetHWND() const {
 		return window;
 	}
-	long GetWindowLongPtr(int index)const {
+	LONG_PTR GetWindowLongPtr(int index)const {
 		return ::GetWindowLongPtr(window, index);
 	}
-	long SetWindowLongPtr(int index, long data) {
+	LONG_PTR SetWindowLongPtr(int index, long data) {
 		return ::SetWindowLongPtr(window, index, data);
 	}
 	int GetWindowTextLength()const {
@@ -54,7 +54,7 @@ public:
 	bool SetWindowText(const TCHAR* text) {
 		return ::SetWindowText(window, text) != FALSE;
 	}
-	long SendMessage(UINT message, WPARAM wparam = 0, LPARAM lparam = 0)const {
+	LRESULT SendMessage(UINT message, WPARAM wparam = 0, LPARAM lparam = 0)const {
 		return ::SendMessage(window, message, wparam, lparam);
 	}
 	long PostMessage(UINT message, WPARAM wparam = 0, LPARAM lparam = 0)const {
@@ -239,11 +239,11 @@ public:
 		}
 		return MessageBox(message, top.GetWindowText(), type);
 	}
-	long GetClassLong(int index)const {
-		return ::GetClassLong(window, index);
+	ULONG_PTR GetClassLong(int index)const {
+		return ::GetClassLongPtr(window, index);
 	}
-	long SetClassLong(int index, long data) {
-		return ::SetClassLong(window, index, data);
+	ULONG_PTR SetClassLong(int index, long data) {
+		return ::SetClassLongPtr(window, index, data);
 	}
 
 	bool create(long exStyle, const char* classname, const char* title, long style, const RECT& rect, HWND parent, HMENU menu, void* param = NULL) {

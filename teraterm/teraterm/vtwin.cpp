@@ -5563,7 +5563,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 			hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 			hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
 			OrigBroadcastEditProc = (WNDPROC)GetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC);
-			SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
+			SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 			// デフォルトはon。残りはdisable。
 			SendMessage(GetDlgItem(hWnd, IDC_REALTIME_CHECK), BM_SETCHECK, BST_CHECKED, 0);  // default on
 			EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
@@ -5639,7 +5639,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					hwndBroadcast = GetDlgItem(hWnd, IDC_COMMAND_EDIT);
 					hwndBroadcastEdit = GetWindow(hwndBroadcast, GW_CHILD);
 					OrigBroadcastEditProc = (WNDPROC)GetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC);
-					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)BroadcastEditProc);
+					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)BroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), FALSE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), FALSE);
@@ -5650,7 +5650,7 @@ static LRESULT CALLBACK BroadcastCommandDlgProc(HWND hWnd, UINT msg, WPARAM wp, 
 					EnableWindow(GetDlgItem(hWnd, IDC_LIST), TRUE);  // true
 				} else {
 					// restore old handler
-					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
+					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 
 					EnableWindow(GetDlgItem(hWnd, IDC_HISTORY_CHECK), TRUE);
 					EnableWindow(GetDlgItem(hWnd, IDC_RADIO_CRLF), TRUE);
@@ -5725,7 +5725,7 @@ skip:;
 					// モードレスダイアログは一度生成されると、アプリケーションが終了するまで
 					// 破棄されないので、以下の「ウィンドウプロシージャ戻し」は不要と思われる。(yutaka)
 #if 0
-					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG)OrigBroadcastEditProc);
+					SetWindowLongPtr(hwndBroadcastEdit, GWLP_WNDPROC, (LONG_PTR)OrigBroadcastEditProc);
 #endif
 
 					//EndDialog(hDlgWnd, IDOK);

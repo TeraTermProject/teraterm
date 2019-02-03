@@ -317,7 +317,7 @@ BOOL AddTooltip(int idControl)
 	ti.cbSize	= sizeof(TOOLINFO);
 	ti.uFlags	= TTF_IDISHWND; 
 	ti.hwnd		= g_hWndMenu; 
-	ti.uId		= (UINT) ::GetDlgItem(g_hWndMenu, idControl); 
+	ti.uId		= (UINT_PTR)::GetDlgItem(g_hWndMenu, idControl); 
 	ti.hinst	= 0; 
 	ti.lpszText	= LPSTR_TEXTCALLBACK;
 
@@ -1416,7 +1416,7 @@ BOOL InitMenu(void)
 		ModifyMenu(g_hConfigMenu, ID_HOTKEY, MF_BYCOMMAND, ID_HOTKEY, uimsg);
 
 		UTIL_get_lang_msg("MENU_EXEC", uimsg, sizeof(uimsg), "Execute", UILanguageFile);
-		::ModifyMenu(g_hSubMenu, ID_EXEC, MF_BYCOMMAND | MF_POPUP, (UINT) g_hListMenu, (LPCTSTR) uimsg);
+		::ModifyMenu(g_hSubMenu, ID_EXEC, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)g_hListMenu, (LPCTSTR) uimsg);
 	}
 
 	return TRUE;

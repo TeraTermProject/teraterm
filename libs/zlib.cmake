@@ -20,7 +20,7 @@ if(("${CMAKE_BUILD_TYPE}" STREQUAL "") AND ("${CMAKE_CONFIGURATION_TYPE}" STREQU
 	  -P zlib.cmake
 	  )
 	return()
-  elseif("$ENV{MSYSTEM}" MATCHES "MINGW32")
+  elseif("$ENV{MSYSTEM}" MATCHES "MINGW")
 	# mingw on msys2
 	if("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	  set(CMAKE_BUILD_TYPE Release)
@@ -63,7 +63,7 @@ set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src")
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/build/zlib/src/${SRC_DIR_BASE}")
 set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build/zlib/build_${TOOLSET}")
 set(INSTALL_DIR "${CMAKE_SOURCE_DIR}/zlib_${TOOLSET}")
-if("${CMAKE_GENERATOR}" MATCHES "Win64")
+if(("${CMAKE_GENERATOR}" MATCHES "Win64") OR ("$ENV{MSYSTEM_CHOST}" STREQUAL "x86_64-w64-mingw32"))
   set(BUILD_DIR "${BUILD_DIR}_x64")
   set(INSTALL_DIR "${INSTALL_DIR}_x64")
 endif()

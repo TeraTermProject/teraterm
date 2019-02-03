@@ -83,8 +83,8 @@ void SetRB(HWND HDlg, int R, int FirstId, int LastId)
 	}
 	HControl = GetDlgItem(HDlg, FirstId + R - 1);
 	SendMessage(HControl, BM_SETCHECK, 1, 0);
-	Style = GetClassLong(HControl, GCL_STYLE);
-	SetClassLong(HControl, GCL_STYLE, Style | WS_TABSTOP);
+	Style = GetClassLongPtr(HControl, GCL_STYLE);
+	SetClassLongPtr(HControl, GCL_STYLE, Style | WS_TABSTOP);
 }
 
 void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)

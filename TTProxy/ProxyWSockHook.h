@@ -102,8 +102,8 @@ private:
                     event = 0;
                 }
             }
-            operator int()const {
-                return window == NULL && message == 0 && event == 0 ? 0 : (int) window;
+            operator HWND() const {
+                return window == NULL && message == 0 && event == 0 ? 0 : window;
             }
         };
         Hashtable<SOCKET, AsyncSelectInfo> table;
@@ -655,9 +655,9 @@ private:
             return (HANDLE) -info->addr.S_un.S_un_b.s_b4;
         }
         ConnectionInfo* get(HANDLE task) {
-            if ((DWORD) task >= 0)
+            if ((DWORD)(uintptr_t)task >= 0)
                 return NULL;
-            return get((int) -((long) task) - 1);
+            return get((int) -((long)(uintptr_t)task) - 1);
         }
         ConnectionInfo* get(in_addr addr) {
             if (addr.S_un.S_un_b.s_b1 != 0 || addr.S_un.S_un_b.s_b2 != 0 || addr.S_un.S_un_b.s_b3 != 0)
