@@ -623,16 +623,17 @@ void PutChar(BYTE b)
 		CharAttrTmp.Attr |= ts.EnableContinuedLineCopy ? AttrLineContinued : 0;
 	}
 
-//	if (cv.HLogBuf!=0) Log1Byte(b);
-// (2005.2.20 yutaka)
-	if (ts.LogTypePlainText) {
-		if (__isascii(b) && !isprint(b)) {
-			// ASCII文字で、非表示な文字はログ採取しない。
+	if (cv.HLogBuf !=0) {
+		// (2005.2.20 yutaka)
+		if (ts.LogTypePlainText) {
+			if (__isascii(b) && !isprint(b)) {
+				// ASCII文字で、非表示な文字はログ採取しない。
+			} else {
+				Log1Byte(b);
+			}
 		} else {
-			if (cv.HLogBuf!=0) Log1Byte(b);
+			Log1Byte(b);
 		}
-	} else {
-		if (cv.HLogBuf!=0) Log1Byte(b);
 	}
 
 	Wrap = FALSE;
