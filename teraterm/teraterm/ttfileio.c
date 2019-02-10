@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TeraTerm Project
+ * Copyright (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ void InitFileIO(int ConnType)
   else {
 	PWriteFile = WriteFile;
   }
-  PCreateFile = CreateFile;
+  PCreateFile = CreateFileA;
   PCloseFile = CloseHandle;
   return;
 }

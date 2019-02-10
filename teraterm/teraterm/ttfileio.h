@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2017 TeraTerm Project
+ * Copyright (C) 2008-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ typedef BOOL (WINAPI *TWriteFile)
   (HANDLE FHandle, LPCVOID Buff, DWORD WriteSize, LPDWORD WriteBytes,
    LPOVERLAPPED WriteOverLap);
 typedef HANDLE (WINAPI *TCreateFile)
-  (LPCTSTR FName, DWORD AcMode, DWORD ShMode, LPSECURITY_ATTRIBUTES SecAttr,
+  (LPCSTR FName, DWORD AcMode, DWORD ShMode, LPSECURITY_ATTRIBUTES SecAttr,
    DWORD CreateDisposition, DWORD FileAttr, HANDLE Template);
 typedef BOOL (WINAPI *TCloseFile)
   (HANDLE FHandle);
