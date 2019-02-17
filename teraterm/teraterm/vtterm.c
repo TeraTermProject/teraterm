@@ -5519,11 +5519,11 @@ static void UnicodeToCP932(unsigned int code)
 }
 
 // UTF-8で受信データを処理する
-BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
+static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 {
-	static BYTE buf[3];
+	static BYTE buf[4];
 	static int count = 0;
 	static int can_combining = 0;
 	static unsigned int first_code;
@@ -5586,7 +5586,7 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 		return TRUE;
 	}
 
-	if ((buf[0] & 0xe0) == 0xe0 &&
+	if ((buf[0] & 0xf0) == 0xe0 &&
 		(buf[1] & 0xc0) == 0x80 &&
 		(buf[2] & 0xc0) == 0x80) { // 3バイトコードの場合
 
@@ -5643,12 +5643,31 @@ BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 skip:
 		count = 0;
 
+	}
+
+	if (count < 4) {
+		return TRUE;
+	}
+
+	if ((buf[0] & 0xf1) == 0xf0 &&
+		(buf[1] & 0xc0) == 0x80 &&
+		(buf[2] & 0xc0) == 0x80 &&
+		(buf[2] & 0xc0) == 0x80)
+	{	// 4バイトコードの場合
+		code = ((buf[0] & 0x07) << 18);
+		code |= ((buf[1] & 0x3f) << 12);
+		code |= ((buf[2] & 0x3f) << 6);
+		code |= (buf[3] & 0x3f);
+
+		UnicodeToCP932(code);
+		count = 0;
+		return TRUE;
 	} else {
 		ParseASCII(buf[0]);
 		ParseASCII(buf[1]);
 		ParseASCII(buf[2]);
+		ParseASCII(buf[3]);
 		count = 0;
-
 	}
 
 	return TRUE;
