@@ -7405,9 +7405,10 @@ static BOOL CALLBACK passwd_change_dialog(HWND dlg, UINT msg, WPARAM wParam, LPA
 				return FALSE;
 			}
 
-			if (old_passwd[0] == 0 || new_passwd[0] == 0) {
+			if (new_passwd[0] == 0) {
 				// ダイアログを開いてすぐに Return を押してしまった時の対策の為、
-				// とりあえず空パスワードをはじいておく。
+				// とりあえず新パスワードが空の場合をはじいておく。
+				// c.f. Ticket: #38970
 				return FALSE;
 			}
 
