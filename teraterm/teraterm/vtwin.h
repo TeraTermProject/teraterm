@@ -135,6 +135,7 @@ protected:
 	afx_msg LONG OnEnterSizeMove(UINT wParam, LONG lParam);
 	afx_msg LONG  OnExitSizeMove(UINT wParam, LONG lParam);
 //-->
+	afx_msg LRESULT OnIMEStartComposition(WPARAM wParam, LPARAM lParam);
 	afx_msg LONG OnIMEComposition(UINT wParam, LONG lParam);
 	afx_msg LONG OnIMEInputChange(UINT wParam, LONG lParam);
 	afx_msg LONG OnIMENotify(UINT wParam, LONG lParam);

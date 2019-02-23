@@ -127,6 +127,8 @@ extern int NumOfLines, NumOfColumns;
 extern int PageStart, BuffEnd;
 extern TCharAttr DefCharAttr;
 
+extern BOOL IMEstat;
+
 #define SCROLL_BOTTOM	1
 #define SCROLL_LINEDOWN	2
 #define SCROLL_LINEUP	3

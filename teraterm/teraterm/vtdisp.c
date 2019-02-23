@@ -110,6 +110,7 @@ static int Dx[TermWidthMax];
 // caret variables
 static int CaretStatus;
 static BOOL CaretEnabled = TRUE;
+BOOL IMEstat;		/* IME Status  TRUE=IME ON */
 
 // ---- device context and status flags
 static HDC VTDC = NULL; /* Device context for VT window */
@@ -2208,40 +2209,31 @@ void UpdateCaretPosition(BOOL enforce)
 void CaretOn()
 // Turn on the cursor
 {
-	int CaretX, CaretY, H;
-	HIMC hImc;
-	HBITMAP color;
-	int ime_on;
-
 	if (ts.KillFocusCursor == 0 && !Active)
 		return;
-
-	/* IMEのon/off状態を見て、カーソルの色を変更する。
-	 * WM_INPUTLANGCHANGE, WM_IME_NOTIFY ではカーソルの再描画のみ行う。
-	 * (2010.5.20 yutaka)
-	 */
-	hImc = ImmGetContext(HVTWin);
-	ime_on = ImmGetOpenStatus(hImc);
-	ImmReleaseContext(HVTWin, hImc);
-	if ((ts.WindowFlag & WF_IMECURSORCHANGE) != 0 && ime_on) {
-		color = (HBITMAP)1;
-	} else {
-		color = NULL;
-	}
-
-	CaretX = (CursorX-WinOrgX)*FontWidth;
-	CaretY = (CursorY-WinOrgY)*FontHeight;
-
-	if ((ts.Language==IdJapanese || ts.Language==IdKorean || ts.Language==IdUtf8) &&
-	    CanUseIME() && (ts.IMEInline>0))
-	{
-		/* set IME conversion window pos. & font */
-		SetConversionWindow(HVTWin,CaretX,CaretY);
-	}
 
 	if (! CaretEnabled) return;
 
 	if (Active) {
+		int CaretX, CaretY, H;
+		HBITMAP color;
+
+		/* IMEのon/off状態を見て、カーソルの色を変更する。
+		 * WM_INPUTLANGCHANGE, WM_IME_NOTIFY ではカーソルの再描画のみ行う。
+		 * (2010.5.20 yutaka)
+		 */
+		if ((ts.WindowFlag & WF_IMECURSORCHANGE) == 0) {
+			color = 0;
+		} else {
+			if (IMEstat) {
+				color = (HBITMAP)1;
+			} else {
+				color = 0;
+			}
+		}
+
+		CaretX = (CursorX-WinOrgX)*FontWidth;
+		CaretY = (CursorY-WinOrgY)*FontHeight;
 		if (ts.CursorShape!=IdVCur) {
 			if (ts.CursorShape==IdHCur) {
 				CaretY = CaretY+FontHeight-CurWidth;

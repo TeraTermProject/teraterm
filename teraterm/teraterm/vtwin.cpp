@@ -159,6 +159,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_WM_TIMER()
 	ON_WM_VSCROLL()
 	ON_WM_DEVICECHANGE()
+	ON_MESSAGE(WM_IME_STARTCOMPOSITION,OnIMEStartComposition)
 	ON_MESSAGE(WM_IME_COMPOSITION,OnIMEComposition)
 	ON_MESSAGE(WM_INPUTLANGCHANGE,OnIMEInputChange)
 	ON_MESSAGE(WM_IME_NOTIFY,OnIMENotify)
@@ -3229,7 +3230,17 @@ LONG CVTWindow::OnExitSizeMove(UINT wParam, LONG lParam)
 }
 //-->
 
-LONG CVTWindow::OnIMEComposition(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
+{
+	// 位置を通知する
+	int CaretX = (CursorX-WinOrgX)*FontWidth;
+	int CaretY = (CursorY-WinOrgY)*FontHeight;
+	SetConversionWindow(HVTWin,CaretX,CaretY);
+
+	return CFrameWnd::DefWindowProc(WM_IME_STARTCOMPOSITION,wParam,lParam);
+}
+
+LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 {
 	HGLOBAL hstr;
 	//LPSTR lpstr;
@@ -3297,6 +3308,15 @@ LONG CVTWindow::OnIMEInputChange(UINT wParam, LONG lParam)
 LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 {
 	if (wParam == IMN_SETOPENSTATUS) {
+		// IMEのOn/Offを取得する
+		IMEstat = GetIMEOpenStatus();
+
+		// 状態を表示するIMEのために位置を通知する
+		int CaretX = (CursorX-WinOrgX)*FontWidth;
+		int CaretY = (CursorY-WinOrgY)*FontHeight;
+		SetConversionWindow(HVTWin,CaretX,CaretY);
+
+		// 描画
 		ChangeCaret();
 	}
 

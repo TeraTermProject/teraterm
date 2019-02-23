@@ -248,6 +248,7 @@ BOOL GetIMEOpenStatus()
 	HIMC hIMC;
 	BOOL stat;
 
+	if (HIMEDLL==NULL) return FALSE;
 	hIMC = (*PImmGetContext)(HVTWin);
 	stat = (*PImmGetOpenStatus)(hIMC);
 	(*PImmReleaseContext)(HVTWin, hIMC);
@@ -259,6 +260,7 @@ BOOL GetIMEOpenStatus()
 void SetIMEOpenStatus(BOOL stat) {
 	HIMC hIMC;
 
+	if (HIMEDLL==NULL) return;
 	hIMC = (*PImmGetContext)(HVTWin);
 	(*PImmSetOpenStatus)(hIMC, stat);
 	(*PImmReleaseContext)(HVTWin, hIMC);

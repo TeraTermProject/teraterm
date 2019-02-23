@@ -197,15 +197,12 @@ static BYTE NewKeyStr[FuncKeyStrMax];
 static int NewKeyId, NewKeyLen;
 
 /* Mouse Report */
-int MouseReportMode;
-int MouseReportExtMode;
-unsigned int DecLocatorFlag;
-int LastX, LastY;
-int ButtonStat;
-int FilterTop, FilterBottom, FilterLeft, FilterRight;
-
-/* IME Status */
-BOOL IMEstat;
+static int MouseReportMode;
+static int MouseReportExtMode;
+static unsigned int DecLocatorFlag;
+static int LastX, LastY;
+static int ButtonStat;
+static int FilterTop, FilterBottom, FilterLeft, FilterRight;
 
 /* Beep over-used */
 static DWORD BeepStartTime = 0;
