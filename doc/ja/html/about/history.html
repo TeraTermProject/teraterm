@@ -33,11 +33,18 @@
 
 <h3 id="teraterm_4.102">2019.xx.xx (Ver 4.102)</h3>
 <ul class="history">
-  <!-- li>変更
+  <li>変更
     <ul>
-      <li></li>
+      <li>VT ウィンドウの透過設定を、アクティブ/非アクティブ時の各々で別の値を設定できるようにした。</li>
+      <li>タイトルバー上でマウスホイールを操作することで透過設定を一時的に変更できるようにした。</li>
+      <li>VT ウィンドウの内部処理を高速化した。</li>
+      <li>UTF-8 で 4 バイトになる文字のデコードを正しく行うようにした。(<a href="https://osdn.net/projects/ttssh2/ticket/17228">Ticket #17228</a>)</li>
+      <li><a href="../macro/command/getfileattr.html">getfileattr</a> マクロコマンドで、他のコマンドと同様にカレントフォルダを基準とするようにした。</li>
+      <li><a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで、読み取り専用モード時、ファイルがない場合エラーとなるようにした。</li>
+	  <li>透過が on だと Windows10 で落ちる問題を修正した。(<a href="https://osdn.net/projects/ttssh2/ticket/38785">Ticket #38785</a>, <a href="https://osdn.net/projects/ttssh2/ticket/38655">Ticket #38655</a>)</li>
+	  <li>マクロファイルのエンコーディングとして UTF-8, UTF-16(with BOM)に対応した。</li>
     </ul>
-  </li -->
+  </li>
 
   <!-- li>バグ修正
     <ul>

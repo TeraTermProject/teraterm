@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<TITLE>TTLファイル</TITLE>
+<META http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="../../style.css" type="text/css">
+</HEAD>
+<BODY>
+
+<h1>エンコーディング</h1>
+
+<p>
+Tera Term 4.102より、Unicode(UTF-8, UTF-16BE, UTF-16LE) に対応しました。
+
+<p>
+従来はANSI CodePageとして処理していました。
+
+<h2>サポートするエンコーディング</h2>
+
+<table>
+  <tr>
+	<th>encode</th>
+    <th>support</th>
+  </tr>
+  <tr>
+    <td>従来どおり(ANSI CodePage)</td>
+	<td>Support</td>
+  </tr>
+  <tr>
+    <td>UTF-8 (with BOM)</td>
+	<td>Support<td>
+  </tr>
+  <tr>
+    <td>UTF-8 (without BOM)</td>
+	<td>Support<td>
+  </tr>
+  <tr>
+	<td>UTF-16BE (without BOM)</td>
+	<td>Not support<td>
+  </tr>
+  <tr>
+	<td>UTF-16LE (without BOM)</td>
+	<td>Not support<td>
+  </tr>
+  <tr>
+	<td>UTF-16 (with BE BOM)</td>
+	<td>Support<td>
+  </tr>
+  <tr>
+	<td>UTF-16 (with LE BOM)</td>
+	<td>Support<td>
+  </tr>
+  <tr>
+	<td>UTF-16 (without BOM = UTF-16BE)</td>
+	<td>Not support<td>
+  </tr>
+</table>
+
+<h2>エンコーディングの判定</h2>
+
+Tera Termは次のように判定します。
+
+<ul>
+  <li>BOMがある場合<br>
+	BOMの種別からUTF-8, UTF-16BE, UTF-16LEを判定して読み込み
+  <li>BOMがない場合
+	<ul>
+	  <li>UTF-8として読み込み
+	  <li>デコードできなかった場合はCP_ACP(4.102以前と同じ)として読み込み
+	</ul>
+</li>
+</body>
+</html>
