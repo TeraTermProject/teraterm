@@ -167,8 +167,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_TERMKOUT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_LOCALE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-					SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-					SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				}
 				else if (ts->Language==IdRussian) {
 					SendDlgItemMessage(Dialog, IDC_TERMRUSSCHARSET, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
@@ -186,8 +184,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 					SendDlgItemMessage(Dialog, IDC_TERMKANJISEND, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_LOCALE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 					SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-					SendDlgItemMessage(Dialog, IDC_CODEPAGE_LABEL, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
-					SendDlgItemMessage(Dialog, IDC_CODEPAGE_EDIT, WM_SETFONT, (WPARAM)DlgTermFont, MAKELPARAM(TRUE,0));
 				}
 			}
 			else {
@@ -258,9 +254,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg2, sizeof(uimsg2));
 				get_lang_msg("DLG_TERM_LOCALE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 				SetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg);
-				GetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg2, sizeof(uimsg2));
-				get_lang_msg("DLG_TERM_CODEPAGE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-				SetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg);
 			}
 			else if ( ts->Language==IdRussian ) {
 				GetDlgItemText(Dialog, IDC_TERMRUSSCHARSET, uimsg2, sizeof(uimsg2));
@@ -286,9 +279,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg2, sizeof(uimsg2));
 				get_lang_msg("DLG_TERM_LOCALE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
 				SetDlgItemText(Dialog, IDC_LOCALE_LABEL, uimsg);
-				GetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg2, sizeof(uimsg2));
-				get_lang_msg("DLG_TERM_CODEPAGE", uimsg, sizeof(uimsg), uimsg2, UILanguageFile);
-				SetDlgItemText(Dialog, IDC_CODEPAGE_LABEL, uimsg);
 			}
 
 			SetDlgItemInt(Dialog,IDC_TERMWIDTH,ts->TerminalWidth,FALSE);
@@ -356,8 +346,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				// ロケール用テキストボックス
 				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
-
-				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
 			}
 			else if (ts->Language==IdRussian) {
 				SetDropDownList(Dialog,IDC_TERMRUSSHOST,RussList,ts->RussHost);
@@ -371,8 +359,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				// ロケール用テキストボックス
 				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
-
-				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
 			}
 			else if (ts->Language==IdUtf8) {
 				SetDropDownList(Dialog, IDC_TERMKANJI, Utf8List, KanjiCode2List(ts->Language,ts->KanjiCode));
@@ -381,8 +367,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 				// ロケール用テキストボックス
 				SetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale);
 				SendDlgItemMessage(Dialog, IDC_LOCALE_EDIT, EM_LIMITTEXT, sizeof(ts->Locale), 0);
-
-				SetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, ts->CodePage, FALSE);
 			}
 			return TRUE;
 
@@ -444,8 +428,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						GetRB(Dialog,&ts->AutoWinSwitch,IDC_TERMAUTOSWITCH,IDC_TERMAUTOSWITCH);
 
 						if (ts->Language==IdJapanese) {
-							BOOL ret;
-
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
 								ts->KanjiCode = w;
 							}
@@ -462,7 +444,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							}
 
 							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
-							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
 						}
 						else if (ts->Language==IdRussian) {
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMRUSSHOST)) > 0) {
@@ -477,8 +458,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 						}
 						else if (ts->Language==IdKorean || // HKS
 						         ts->Language==IdUtf8) {
-							BOOL ret;
-
 							if ((w = (WORD)GetCurSel(Dialog, IDC_TERMKANJI)) > 0) {
 								ts->KanjiCode = List2KanjiCode(ts->Language, w);
 							}
@@ -492,7 +471,6 @@ BOOL CALLBACK TermDlg(HWND Dialog, UINT Message, WPARAM wParam, LPARAM lParam)
 							ts->KanjiOut = 0;
 
 							GetDlgItemText(Dialog, IDC_LOCALE_EDIT, ts->Locale, sizeof(ts->Locale));
-							ts->CodePage = GetDlgItemInt(Dialog, IDC_CODEPAGE_EDIT, &ret, FALSE);
 						}
 
 					}

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-08-28)
+; Updated by TeraTerm Project (2019-02-26)
 
 [Tera Term]
 DLG_SYSTEM_FONT=ＭＳ Ｐゴシック,12,128
@@ -394,7 +394,6 @@ DLG_TERM_KANASEND=半角カナ(&D)
 DLG_TERM_KIN=漢字イン(&N):
 DLG_TERM_KOUT=漢字アウト(&O):
 DLG_TERM_LOCALE=ロケール(&C):
-DLG_TERM_CODEPAGE=言語コード(&P):
 DLG_TERM_RUSSCHARSET=文字セット
 DLG_TERM_RUSSHOST=ホスト(&O):
 DLG_TERM_RUSSCLIENT=クライアント(&C):

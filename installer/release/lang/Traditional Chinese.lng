@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-08-27)
+; Updated by TeraTerm Project (2019-02-26)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -395,7 +395,6 @@ DLG_TERM_KANASEND=Half-wi&dth 假名
 DLG_TERM_KIN=中文輸入(&N)：
 DLG_TERM_KOUT=中文輸出(&O)：
 DLG_TERM_LOCALE=地區(&C)：
-DLG_TERM_CODEPAGE=編碼(&P)：
 DLG_TERM_RUSSCHARSET=字符集
 DLG_TERM_RUSSHOST=主機端(&O)：
 DLG_TERM_RUSSCLIENT=客戶端(&C)：

@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-08-27)
+; Updated by TeraTerm Project (2019-02-26)
 ; Last translated (French language) by Francois MOCQ (2010-07-21)
 
 [Tera Term]
@@ -395,7 +395,6 @@ DLG_TERM_KANASEND=Half-wi&dth kana
 DLG_TERM_KIN=Kanji-i&n:
 DLG_TERM_KOUT=Kanji-&out:
 DLG_TERM_LOCALE=lo&cal:
-DLG_TERM_CODEPAGE=Page de Code:
 DLG_TERM_RUSSCHARSET=Jeu de caractères
 DLG_TERM_RUSSHOST=Hôte:
 DLG_TERM_RUSSCLIENT=&Client:
