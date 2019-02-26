@@ -18,55 +18,55 @@
     </p>
 
     <dl>
-      <dt>Key type</dt>
+      <dt id="type">Key type</dt>
       <dd>Specify the type of key to generate.
         <dl>
-          <dt>RSA1</dt>
+          <dt id="rsa1">RSA1</dt>
           <dd>Generate SSH1 RSA key.</dd>
 
-          <dt>RSA</dt>
+          <dt id="rsa">RSA</dt>
           <dd>Generate SSH2 RSA key.</dd>
 
-          <dt>DSA</dt>
+          <dt id="dsa">DSA</dt>
           <dd>Generate SSH2 DSA key.<br />
           The DSA key does not have 1024 bits is invalid, so the key can not be generated because the key will not be used for some servers.<br />
           If the key bits is over 1024, the security level can not be stronger. Please use the RSA and ECDSA key algorithm if your security level is higher.</dd>
 
-          <dt>ECDSA-256</dt>
+          <dt id="ecdsa256">ECDSA-256</dt>
           <dd>Generate SSH2 ECDSA(256bit) key.</dd>
 
-          <dt>ECDSA-384</dt>
+          <dt id="ecdsa384">ECDSA-384</dt>
           <dd>Generate SSH2 ECDSA(384bit) key.</dd>
 
-          <dt>ECDSA-521</dt>
+          <dt id="ecdsa521">ECDSA-521</dt>
           <dd>Generate SSH2 ECDSA(521bit) key.</dd>
           
-          <dt>ED25519</dt>
+          <dt id="ed25519">ED25519</dt>
           <dd>Generate SSH2 ED25519 key.</dd>
         </dl>
       </dd>
 
-      <dt>Key Bits</dt>
+      <dt id="bits">Key Bits</dt>
       <dd>Specify the key length to generate. </dd>
 
-      <dt>bcrypt KDF</dt>
+      <dt id="kdf">bcrypt KDF</dt>
       <dd>Specify the bcrypt KDF format of the private key.</dd>
 
-      <dt>Generate</dt>
+      <dt id="generate">Generate</dt>
       <dd>Generate the key.</dd>
 
-      <dt>Key passphrase</dt>
+      <dt id="passphrase">Key passphrase</dt>
       <dd>Specify passphrase of private key.</dd>
 
-      <dt>Confirm passphrase</dt>
+      <dt id="confirm_pass">Confirm passphrase</dt>
       <dd>Confirm passphrase of private key.
           Please input the same passphrase as Key passphrase.
       </dd>
 
-      <dt>Save public key</dt>
+      <dt id="save_public">Save public key</dt>
       <dd>Save public key.<dd>
 
-      <dt>Save private key</dt>
+      <dt id="save_private">Save private key</dt>
       <dd>Save private key<br />
       The private key is encrypted by the AES-128 algorithm. 
       The key is encrypted by the 3DES into the Tera Term 4.76(TTSSH 2.63) before.</dd>
