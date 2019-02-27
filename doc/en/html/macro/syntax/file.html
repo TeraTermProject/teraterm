@@ -11,13 +11,13 @@
 
 <h1>Encoding</h1>
 
-<!--p>
-Tera Term 4.102より、Unicode(UTF-8, UTF-16BE, UTF-16LE) に対応しました。
+<p>
+The Unicode(UTF-8, UTF-16BE, UTF-16LE) can be supported from Tera Term 4.102.
 
 <p>
-従来はANSI CodePageとして処理していました。
+The TTL file was processed as ANSI CodePage in previous version.
 
-<h2>サポートするエンコーディング</h2>
+<h2>Supporting encoding</h2>
 
 <table>
   <tr>
@@ -25,7 +25,7 @@ Tera Term 4.102より、Unicode(UTF-8, UTF-16BE, UTF-16LE) に対応しました。
     <th>support</th>
   </tr>
   <tr>
-    <td>従来どおり(ANSI CodePage)</td>
+    <td>Usually(ANSI CodePage)</td>
 	<td>Support</td>
   </tr>
   <tr>
@@ -58,18 +58,18 @@ Tera Term 4.102より、Unicode(UTF-8, UTF-16BE, UTF-16LE) に対応しました。
   </tr>
 </table>
 
-<h2>エンコーディングの判定</h2>
+<h2>Encoding determination</h2>
 
-Tera Termは次のように判定します。
+Tera Term determines the encoding as follows.
 
 <ul>
-  <li>BOMがある場合<br>
-	BOMの種別からUTF-8, UTF-16BE, UTF-16LEを判定して読み込み
-  <li>BOMがない場合
+  <li>When BOM exists<br>
+	Tera Term determines one of UTF-8, UTF-16BE and UTF-16LE from BOM type, next reading the file.</li>
+  <li>When BOM does not exist</li>
 	<ul>
-	  <li>UTF-8として読み込み
-	  <li>デコードできなかった場合はCP_ACP(4.102以前と同じ)として読み込み
+	  <li>Reading the file as UTF-8.</li>
+	  <li>Reading the file as CP_ACP(same as before 4.102) when the file can not be decoded.</li>
 	</ul>
-</li-->
+</li>
 </body>
 </html>

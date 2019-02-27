@@ -34,21 +34,21 @@
 <h3 id="teraterm_4.102">2019.xx.xx (Ver 4.102)</h3>
 <ul class="history">
   <li>Changes
-    <!--ul>
-      <li>VT ウィンドウの透過設定を、アクティブ/非アクティブ時の各々で別の値を設定できるようにした。</li>
-      <li>アクティブな VT ウィンドウのタイトルバー上でマウスホイールを操作することで、ウィンドウの透過値を一時的に変更できるようにした。</li>
-      <li>VT ウィンドウの内部処理を高速化した。</li>
-      <li>UTF-8 で 4 バイトになる文字を（表示できないが）正しくデコードするようにし、文字化けする範囲が最小限になるようにした。</li>
-      <li>"<a href="../menu/setup-terminal.html">Terminal setup[端末の設定]</a>" ダイアログの言語コード(CodePage)設定を削除した。(<a href="../usage/unicode.html">Unicode設定</a>)</li>
-      <li>マクロファイルのエンコーディングとして UTF-8, UTF-16(with BOM)に対応した。</li>
-      <li><a href="../macro/command/getfileattr.html">getfileattr</a> マクロコマンドで、他のコマンドと同様にカレントフォルダを基準とするようにした。</li>
-      <li><a href="../macro/command/fileopen.html">fileopen</a> マクロコマンドで、読み取り専用モード時にファイルがない場合はエラーとなるようにした。</li>
-    </ul-->
+    <ul>
+      <li>The AlphaBlend VT window can be configured as a different value for each active and inative.</li>
+      <li>The value of transparency can be temporarily changed by moving the mouse wheel on the title bar of the active VT window.</li>
+      <li>The internal implemention of the VT window was speeded up.</li>
+      <li>UTF-8: Four bytes character can not be shown yet but can be decoded, the impact range of character corruption was be minimized.</li>
+      <li>The language code(CodePage) of the "<a href="../menu/setup-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
+      <li>MACRO: The macro file can support UTF-8 and UTF-16(with BOM) encoding.</li>
+      <li>MACRO: The <a href="../macro/command/getfileattr.html">getfileattr</a> command can be based on the current directory same as other command.</li>
+      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
+    </ul>
   </li>
 
   <li>Bug fixes
     <ul>
-      <!--li>ウィンドウの透過設定が有効だと Windows 10 で落ちる問題に対応した。</li-->
+      <li>When the AlphaBlend window is enabled, an application fault occurs on Windows 10.</li>
     </ul>
   </li>
 
