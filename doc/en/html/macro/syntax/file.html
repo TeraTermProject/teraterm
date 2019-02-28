@@ -12,64 +12,71 @@
 <h1>Encoding</h1>
 
 <p>
-The Unicode(UTF-8, UTF-16BE, UTF-16LE) can be supported from Tera Term 4.102.
+The Unicode (UTF-8, UTF-16BE, UTF-16LE) can be supported from Tera Term 4.102.
+</p>
 
 <p>
 The TTL file was processed as ANSI CodePage in previous version.
+</p>
 
 <h2>Supporting encoding</h2>
 
 <table>
   <tr>
-	<th>encode</th>
+    <th>encoding</th>
     <th>support</th>
   </tr>
   <tr>
-    <td>Usually(ANSI CodePage)</td>
-	<td>Support</td>
+    <td>Usually (ANSI CodePage)</td>
+    <td>Support</td>
   </tr>
   <tr>
     <td>UTF-8 (with BOM)</td>
-	<td>Support<td>
+    <td>Support<td>
   </tr>
   <tr>
     <td>UTF-8 (without BOM)</td>
-	<td>Support<td>
+    <td>Support<td>
   </tr>
   <tr>
-	<td>UTF-16BE (without BOM)</td>
-	<td>Not support<td>
+    <td>UTF-16BE (without BOM)</td>
+    <td>Not support<td>
   </tr>
   <tr>
-	<td>UTF-16LE (without BOM)</td>
-	<td>Not support<td>
+    <td>UTF-16LE (without BOM)</td>
+    <td>Not support<td>
   </tr>
   <tr>
-	<td>UTF-16 (with BE BOM)</td>
-	<td>Support<td>
+    <td>UTF-16 (with BE BOM)</td>
+    <td>Support<td>
   </tr>
   <tr>
-	<td>UTF-16 (with LE BOM)</td>
-	<td>Support<td>
+    <td>UTF-16 (with LE BOM)</td>
+    <td>Support<td>
   </tr>
   <tr>
-	<td>UTF-16 (without BOM = UTF-16BE)</td>
-	<td>Not support<td>
+    <td>UTF-16 (without BOM = UTF-16BE)</td>
+    <td>Not support<td>
   </tr>
 </table>
 
 <h2>Encoding determination</h2>
 
+<p>
 Tera Term determines the encoding as follows.
+</p>
 
-<ul>
-  <li>When BOM exists<br>
-	Tera Term determines one of UTF-8, UTF-16BE and UTF-16LE from BOM type, next reading the file.</li>
-  <li>When BOM does not exist</li>
-	<ul>
-	  <li>Reading the file as UTF-8.</li>
-	  <li>Reading the file as CP_ACP(same as before 4.102) when the file can not be decoded.</li>
-	</ul>
-</li>
+<dl>
+  <dt>When BOM exists</dt>
+  <dd>Tera Term determines one of UTF-8, UTF-16BE and UTF-16LE from BOM type, next reading the file.</dd>
+
+  <dt>When BOM does not exist</dt>
+  <dd>
+    <ul>
+      <li>Reading the file as UTF-8.</li>
+      <li>Reading the file as CP_ACP (same as before 4.102) when the file can not be decoded as UTF-8.</li>
+    </ul>
+  </dd>
+</dl>
 </body>
 </html>
