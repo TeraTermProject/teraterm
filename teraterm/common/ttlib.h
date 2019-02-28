@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1994-1999 T. Teranishi
+ * Copyright (C) 1994-1998 T. Teranishi
  * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
