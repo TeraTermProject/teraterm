@@ -34,7 +34,7 @@ BEGIN
     LTEXT           "Tera Term Secure Shell extension, ",IDC_TTSSH_VERSION,6,7,220,15
     ICON            "",IDC_TTSSH_ICON,248,7,20,20
     LTEXT           "Compatible with SSH protocol version 1.5 and 2.0",IDC_SSHVERSIONS,6,23,206,11
-    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2018 TeraTerm Project",IDC_INCLUDES,6,36,262,34
+    LTEXT           "Includes:\r\nTTSSH 1.5.4, (C) 1998-2001 Robert O'Callahan roc+tt@cs.cmu.edu\r\nIPv6 extention version 0.81, (C) 2000-2003 Jun-ya KATO kato@win6.jp\r\nSSH2 support, (C) 2004-2019 TeraTerm Project",IDC_INCLUDES,6,36,262,34
     LTEXT           "OpenSSL:",IDC_OPENSSL_VERSION,6,69,175,8
     LTEXT           "zlib:",IDC_ZLIB_VERSION,6,78,175,8
     LTEXT           "PuTTY:",IDC_PUTTY_VERSION,6,87,175,8

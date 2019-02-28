@@ -26,7 +26,7 @@ BEGIN
             VALUE "FileDescription", "Tera Term Dialog Routines"
             VALUE "FileVersion", TT_RES_VERSION_STR
             VALUE "InternalName", "TTPDLG"
-            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2018 TeraTerm Project"
+            VALUE "LegalCopyright", "Copyright (C) 1994-1998 T. Teranishi, (C) 2004-2019 TeraTerm Project"
             VALUE "OriginalFilename", "TTPDLG.dll"
             VALUE "ProductName", "Tera Term"
             VALUE "ProductVersion", TT_RES_VERSION_STR

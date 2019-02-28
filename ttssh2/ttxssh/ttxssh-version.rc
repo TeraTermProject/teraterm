@@ -26,7 +26,7 @@ BEGIN
             VALUE "FileDescription", "Tera Term Secure Shell Extension"
             VALUE "FileVersion", TTSSH_RES_VERSION_STR
             VALUE "InternalName", "TTXSSH"
-            VALUE "LegalCopyright", "(C)1998-2001 Robert O'Callahan, (C) 2000-2003 Jun-ya KATO, (C) 2004-2018 TeraTerm Project"
+            VALUE "LegalCopyright", "(C)1998-2001 Robert O'Callahan, (C) 2000-2003 Jun-ya KATO, (C) 2004-2019 TeraTerm Project"
             VALUE "OriginalFilename", "TTXSSH.dll"
             VALUE "ProductName", "TTSSH"
             VALUE "ProductVersion", TTSSH_RES_VERSION_STR
