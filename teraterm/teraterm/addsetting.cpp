@@ -906,6 +906,7 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
 	GetObject(font, sizeof(LOGFONT), &logfont);
 	if (get_lang_font("DLG_TAHOMA_FONT", GetSafeHwnd(), &logfont, &DlgVisualFont, ts.UILanguageFile)) {
+		SendDlgItemMessage(IDC_ALPHABLEND, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
 		SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
 		SendDlgItemMessage(IDC_ALPHA_BLEND_INACTIVE, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
 		SendDlgItemMessage(IDC_ALPHA_BLEND_ACTIVE_LABEL, WM_SETFONT, (WPARAM)DlgVisualFont, MAKELPARAM(TRUE, 0));
@@ -944,6 +945,12 @@ BOOL CVisualPropPageDlg::OnInitDialog()
 	GetDlgItemText(IDC_ALPHABLEND, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_ALPHA", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ALPHABLEND, ts.UIMsg);
+	GetDlgItemText(IDC_ALPHA_BLEND_ACTIVE_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_ALPHA_ACTIVE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ALPHA_BLEND_ACTIVE_LABEL, ts.UIMsg);
+	GetDlgItemText(IDC_ALPHA_BLEND_INACTIVE_LABEL, uimsg, sizeof(uimsg));
+	get_lang_msg("DLG_TAB_VISUAL_ALPHA_INACTIVE", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
+	SetDlgItemText(IDC_ALPHA_BLEND_INACTIVE_LABEL, ts.UIMsg);
 	GetDlgItemText(IDC_ETERM_LOOKFEEL, uimsg, sizeof(uimsg));
 	get_lang_msg("DLG_TAB_VISUAL_ETERM", ts.UIMsg, sizeof(ts.UIMsg), uimsg, ts.UILanguageFile);
 	SetDlgItemText(IDC_ETERM_LOOKFEEL, ts.UIMsg);

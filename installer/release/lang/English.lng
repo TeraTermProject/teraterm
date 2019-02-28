@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-02-26)
+; Updated by TeraTerm Project (2019-02-28)
 
 [Tera Term]
 DLG_SYSTEM_FONT=System,14,0
@@ -224,7 +224,9 @@ DLG_TAB_COPYPASTE_DELIMITER=Del&imiter characters
 DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
-DLG_TAB_VISUAL_ALPHA=&Alpha blend
+DLG_TAB_VISUAL_ALPHA=Window Transparency
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Eterm lookfeel(*)
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness

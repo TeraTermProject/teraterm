@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-02-26)
+; Updated by TeraTerm Project (2019-02-28)
 ; Last translated (Traditional Chinese language) by kikiqqp (2014-09-20)
 
 [Tera Term]
@@ -225,7 +225,9 @@ DLG_TAB_COPYPASTE_DELIMITER=分隔符(&I)
 DLG_TAB_COPYPASTE_PASTEDELAY=貼上時隔行延時(&A)
 DLG_TAB_COPYPASTE_PASTEDELAY2=毫秒
 
-DLG_TAB_VISUAL_ALPHA=透明度(&A)
+DLG_TAB_VISUAL_ALPHA=透明度
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Eterm 風格 (*)
 DLG_TAB_VISUAL_BGIMG=背景圖像(&I)
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness

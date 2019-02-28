@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2019-02-26)
+; Updated by TeraTerm Project (2019-02-28)
 ; Last translated (German language) by Frederik Schwarzer (2010-05-17)
 
 [Tera Term]
@@ -226,6 +226,8 @@ DLG_TAB_COPYPASTE_PASTEDELAY=P&aste delay per line
 DLG_TAB_COPYPASTE_PASTEDELAY2=ms
 
 DLG_TAB_VISUAL_ALPHA=&Transparenz
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Eterm-Aussehen(*)
 DLG_TAB_VISUAL_BGIMG=Background &Image
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=Image Brigh&tness
