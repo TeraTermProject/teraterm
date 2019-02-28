@@ -1566,7 +1566,7 @@ void PASCAL ReadIniFile(PCHAR FName, PTTSet ts)
 	ts->AlphaBlendInactive = max(0, ts->AlphaBlendInactive);
 	ts->AlphaBlendInactive = min(255, ts->AlphaBlendInactive);
 	ts->AlphaBlendActive =
-		GetPrivateProfileInt(Section, "AlphaBlendActive", 255, FName);
+		GetPrivateProfileInt(Section, "AlphaBlendActive", ts->AlphaBlendInactive, FName);
 	ts->AlphaBlendActive = max(0, ts->AlphaBlendActive);
 	ts->AlphaBlendActive = min(255, ts->AlphaBlendActive);
 
