@@ -264,6 +264,7 @@ static void normalize_generic_order(char *buf, char default_strings[], int defau
 
 		if (!listed[num]) {
 			buf[i] = num + '0';
+			listed[num] = 1;
 			i++;
 		}
 	}
