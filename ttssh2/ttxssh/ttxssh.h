@@ -141,7 +141,7 @@ typedef struct _TS_SSH {
 	   cipher. The first digit is the most preferred cipher, and so on.
 	   The digit SSH_CIPHER_NONE signifies that any ciphers after it are
 	   disabled. */
-	char CipherOrder[SSH_CIPHER_MAX+1];
+	char CipherOrder[SSH_CIPHER_MAX+2];
 
 	char KnownHostsFiles[2048];
 	int DefaultAuthMethod;
