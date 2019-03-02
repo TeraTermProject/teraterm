@@ -45,15 +45,19 @@
 #include "tekwin.h"
 #include "ttdde.h"
 #include "keyboard.h"
+#include "dllutil.h"
+#include "compat_win.h"
 
 #include "teraapp.h"
 
 #include "compat_w95.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
+#if 0
+//#ifdef _DEBUG
+//#define new DEBUG_NEW
+//#undef THIS_FILE
+//static char THIS_FILE[] = __FILE__;
+#define new ::new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #endif
 
 BEGIN_MESSAGE_MAP(CTeraApp, CWinApp)
@@ -61,26 +65,93 @@ BEGIN_MESSAGE_MAP(CTeraApp, CWinApp)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-CTeraApp::CTeraApp()
+typedef struct {
+	const TCHAR *FaceName;
+	bool found;
+} EnumFontInfo;
+
+static int CALLBACK EnumFontExProc(
+	ENUMLOGFONT* lpelf, NEWTEXTMETRIC* lpntm,
+	int nFontType, LPARAM lParam)
 {
-	typedef BOOL (WINAPI *pSetDllDir)(LPCSTR);
-	typedef BOOL (WINAPI *pSetDefDllDir)(DWORD);
+	EnumFontInfo *info = (EnumFontInfo *)lParam;
+	if (nFontType == DEVICE_FONTTYPE) {
+		// 接続されたデバイス(プリンタなど)内のフォント
+		return 1;
+	}
+	const TCHAR *FaceName = lpelf->elfLogFont.lfFaceName;
+	if (_tcscmp(info->FaceName, FaceName) == 0) {
+		info->found = true;
+		return 0;
+	}
+	return 1;
+}
 
-	HMODULE module;
-	pSetDllDir setDllDir;
-	pSetDefDllDir setDefDllDir;
+BOOL isExistFont(const TCHAR *FaceName)
+{
+	HDC hDC = GetDC(NULL);
+	LOGFONT lf;
+	memset(&lf, 0, sizeof(lf));
+	lf.lfCharSet = DEFAULT_CHARSET;// SHIFTJIS_CHARSET;
+	lf.lfPitchAndFamily = 0;
 
-	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
-		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
-			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
-			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
+	EnumFontInfo info;
+	info.FaceName = FaceName;
+	info.found = false;
+	EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)EnumFontExProc, (LPARAM)&info, 0);
+	ReleaseDC(NULL, hDC);
+	return info.found;
+}
+
+static BOOL AddFontFlag;
+static TCHAR TSpecialFont[MAX_PATH];
+
+static void LoadSpecialFont()
+{
+	if (!isExistFont(_T("Tera Special"))) {
+		int r;
+
+		if (GetModuleFileName(NULL, TSpecialFont,_countof(TSpecialFont)) == 0) {
+			AddFontFlag = FALSE;
+			return;
 		}
-		else if ((setDllDir = (pSetDllDir)GetProcAddress(module, "SetDllDirectoryA")) != NULL) {
-			// SetDefaultDllDirectories() が使えなくても、SetDllDirectory() が使える場合は
-			// カレントディレクトリだけでも検索パスからはずしておく。
-			(*setDllDir)("");
+		*_tcsrchr(TSpecialFont, _T('\\')) = 0;
+		_tcscat_s(TSpecialFont, _T("\\TSPECIAL1.TTF"));
+
+		if (pAddFontResourceEx != NULL) {
+			// teraterm.exeのみで有効なフォントとなる。
+			// removeしなくても終了するとOSからなくなる
+			r = pAddFontResourceEx(TSpecialFont, FR_PRIVATE, NULL);
+		} else {
+			// システム全体で使えるフォントとなる
+			// removeしないとOSが掴んだままとなる
+			r = AddFontResource(TSpecialFont);
+		}
+		if (r != 0) {
+			AddFontFlag = TRUE;
 		}
 	}
+}
+
+static void UnloadSpecialFont()
+{
+	if (AddFontFlag) {
+		if (pRemoveFontResourceEx != NULL) {
+			pRemoveFontResourceEx(TSpecialFont, FR_PRIVATE, NULL);
+		} else {
+			RemoveFontResource(TSpecialFont);
+		}
+	}
+}
+
+CTeraApp::CTeraApp()
+{
+#ifdef _DEBUG
+	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	DLLInit();
+	WinCompatInit();
 }
 
 // CTeraApp instance
@@ -93,6 +164,7 @@ CTeraApp theApp;
 // CTeraApp initialization
 BOOL CTeraApp::InitInstance()
 {
+	LoadSpecialFont();
 	hInst = m_hInstance;
 	m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
@@ -101,6 +173,8 @@ BOOL CTeraApp::InitInstance()
 
 int CTeraApp::ExitInstance()
 {
+	UnloadSpecialFont();
+	DLLExit();
 	return CWinApp::ExitInstance();
 }
 

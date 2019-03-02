@@ -389,6 +389,14 @@
 				RelativePath="..\common\win16api.c"
 				>
 			</File>
+			<File
+				RelativePath="..\common\compat_win.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\dllutil.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

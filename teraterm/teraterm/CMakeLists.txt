@@ -26,7 +26,11 @@ set(COMMON_SRC
   ../common/win16api.c
   ../common/codemap.h
   ../common/compat_w95.h
+  ../common/compat_win.h
+  ../common/compat_win.cpp
   ../common/i18n.h
+  ../common/dllutil.cpp
+  ../common/dllutil.h
   ../ttpcmn/language.h
   )
 

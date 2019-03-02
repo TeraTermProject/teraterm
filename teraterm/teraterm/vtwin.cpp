@@ -78,6 +78,7 @@
 #include "winjump.h"
 #include "sizetip.h"
 #include "dnddlg.h"
+#include "compat_win.h"
 
 #include "initguid.h"
 //#include "Usbiodef.h"
@@ -260,38 +261,6 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-typedef BOOL(WINAPI *_SetLayeredWindowAttributes)(HWND, COLORREF, BYTE, DWORD);
-static _SetLayeredWindowAttributes g_pSetLayeredWindowAttributes = NULL;
-
-static void MySetLayeredWindowAttributes_init()
-{
-	static HMODULE g_hmodUser32 = NULL;
-	char user32_dll[MAX_PATH];
-
-	GetSystemDirectory(user32_dll, sizeof(user32_dll));
-	strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
-	if (g_hmodUser32 == NULL) {
-		g_hmodUser32 = LoadLibrary(user32_dll);
-		if (g_hmodUser32 == NULL) {
-			return;
-		}
-
-		g_pSetLayeredWindowAttributes =
-			(_SetLayeredWindowAttributes)GetProcAddress(g_hmodUser32, "SetLayeredWindowAttributes");
-	}
-}
-
-static BOOL MySetLayeredWindowAttributes(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
-{
-	if (g_pSetLayeredWindowAttributes == NULL) {
-		return FALSE;
-	}
-
-	return g_pSetLayeredWindowAttributes(hwnd, crKey,
-	                                     bAlpha, dwFlags);
-}
-
-
 // Tera Term起動時とURL文字列mouse over時に呼ばれる (2005.4.2 yutaka)
 void SetMouseCursor(char *cursor)
 {
@@ -322,6 +291,9 @@ void SetMouseCursor(char *cursor)
  */
 void CVTWindow::SetWindowAlpha(BYTE alpha)
 {
+	if (pSetLayeredWindowAttributes == NULL) {
+		return;	// レイヤードウインドウのサポートなし
+	}
 	if (Alpha == alpha) {
 		return;	// 変化なしなら何もしない
 	}
@@ -336,7 +308,7 @@ void CVTWindow::SetWindowAlpha(BYTE alpha)
 	// 呼び出し元で、値が変更されたときのみ設定を反映する。(2007.10.19 maya)
 	if (alpha < 255) {
 		::SetWindowLongPtr(HVTWin, GWL_EXSTYLE, lp | WS_EX_LAYERED);
-		MySetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
+		pSetLayeredWindowAttributes(HVTWin, 0, alpha, LWA_ALPHA);
 	}
 	else {
 		// アルファ値が 255 の場合、透明化属性を削除して再描画する。(2007.10.22 maya)
@@ -684,10 +656,6 @@ CVTWindow::CVTWindow()
 	int fuLoad = LR_DEFAULTCOLOR;
 	BOOL isFirstInstance;
 
-#ifdef _DEBUG
-  ::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-
 	// 例外ハンドラのフック (2007.9.30 yutaka)
 	SetUnhandledExceptionFilter(ApplicationFaultHandler);
 
@@ -786,7 +754,6 @@ CVTWindow::CVTWindow()
 	FirstPaint = TRUE;
 	ScrollLock = FALSE;  // 初期値は無効 (2006.11.14 yutaka)
 	Alpha = 255;
-	MySetLayeredWindowAttributes_init();
 
 	/* Initialize scroll buffer */
 	InitBuffer();
@@ -2583,7 +2550,7 @@ BOOL CVTWindow::OnMouseWheel(
 {
 	int line, i;
 
-	if (g_pSetLayeredWindowAttributes != NULL) {
+	if (pSetLayeredWindowAttributes != NULL) {
 		BOOL InTitleBar;
 		POINT point = pt;
 		GetPositionOnWindow(HVTWin, &point,

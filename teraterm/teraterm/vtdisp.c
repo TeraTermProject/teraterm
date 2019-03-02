@@ -36,6 +36,7 @@
 #include "ttime.h"
 #include "ttdialog.h"
 #include "ttcommon.h"
+#include "compat_win.h"
 
 #include "vtdisp.h"
 
@@ -192,16 +193,7 @@ typedef struct tagWallpaperInfo
   int  pattern;
 }WallpaperInfo;
 
-typedef struct _BGBLENDFUNCTION
-{
-    BYTE     BlendOp;
-    BYTE     BlendFlags;
-    BYTE     SourceConstantAlpha;
-    BYTE     AlphaFormat;
-}BGBLENDFUNCTION;
-
-BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BGBLENDFUNCTION);
-BOOL (WINAPI *BGEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
+static BOOL (WINAPI *BGAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 
 static HBITMAP GetBitmapHandle(char *File);
 
@@ -530,7 +522,7 @@ BOOL SaveBitmapFile(char *nameFile,unsigned char *pbuf,BITMAPINFO *pbmi)
   return TRUE;
 }
 
-BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BGBLENDFUNCTION bf)
+static BOOL WINAPI AlphaBlendWithoutAPI(HDC hdcDest,int dx,int dy,int width,int height,HDC hdcSrc,int sx,int sy,int sw,int sh,BLENDFUNCTION bf)
 {
   HDC hdcDestWork,hdcSrcWork;
   int i,invAlpha,alpha;
@@ -1204,9 +1196,9 @@ void BGLoadWallpaper(HDC hdcDest,BGSrc *src)
   lws.src        = src;
   lws.hdcDest    = hdcDest;
 
-  if(BGEnumDisplayMonitors)
+  if(pEnumDisplayMonitors != NULL)
   {
-    (*BGEnumDisplayMonitors)(NULL,NULL,BGLoadWallpaperEnumFunc,(LPARAM)&lws);
+    (*pEnumDisplayMonitors)(NULL,NULL,BGLoadWallpaperEnumFunc,(LPARAM)&lws);
   }else{
     RECT rectMonitor;
 
@@ -1273,7 +1265,7 @@ void BGSetupPrimary(BOOL forceSetup)
 
   if(!BGInSizeMove)
   {
-    BGBLENDFUNCTION bf;
+    BLENDFUNCTION bf;
     HDC hdcSrc = NULL;
 
     //îwåi HDC
@@ -1473,7 +1465,6 @@ void BGDestruct(void)
 void BGInitialize(void)
 {
   char path[MAX_PATH],config_file[MAX_PATH],tempPath[MAX_PATH];
-  char msimg32_dll[MAX_PATH],user32_dll[MAX_PATH];
 
   // VTColor Çì«Ç›çûÇ›
   BGVTColor[0] = ts.VTColor[0];
@@ -1619,21 +1610,15 @@ void BGInitialize(void)
 
   // AlphaBlend ÇÃÉAÉhÉåÉXÇì«Ç›çûÇ›
   if(BGUseAlphaBlendAPI) {
-    GetSystemDirectory(msimg32_dll, sizeof(msimg32_dll));
-    strncat_s(msimg32_dll, sizeof(msimg32_dll), "\\msimg32.dll", _TRUNCATE);
-    (FARPROC)BGAlphaBlend = GetProcAddressWithDllName(msimg32_dll,"AlphaBlend");
+	if(pAlphaBlend != NULL)
+	  BGAlphaBlend = pAlphaBlend;
+	else
+	  BGAlphaBlend = AlphaBlendWithoutAPI;
   }
   else {
     BGAlphaBlend = NULL;
   }
 
-  if(!BGAlphaBlend)
-    BGAlphaBlend = AlphaBlendWithoutAPI;
-
-  //EnumDisplayMonitors ÇíTÇ∑
-  GetSystemDirectory(user32_dll, sizeof(user32_dll));
-  strncat_s(user32_dll, sizeof(user32_dll), "\\user32.dll", _TRUNCATE);
-  (FARPROC)BGEnumDisplayMonitors = GetProcAddressWithDllName(user32_dll,"EnumDisplayMonitors");
 }
 
 void BGExchangeColor() {
@@ -2810,7 +2795,7 @@ void DispStr(PCHAR Buff, int Count, int Y, int* X)
     {
       if(BGReverseTextAlpha < 255)
       {
-        BGBLENDFUNCTION bf;
+        BLENDFUNCTION bf;
         HBRUSH hbr;
 
         hbr = CreateSolidBrush(GetBkColor(hdcBGBuffer));
