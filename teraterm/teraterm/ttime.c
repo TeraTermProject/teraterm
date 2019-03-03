@@ -186,15 +186,20 @@ void SetConversionWindow(HWND HWin, int X, int Y)
   else
     cf.dwStyle = CFS_DEFAULT;
   (*PImmSetCompositionWindow)(hIMC,&cf);
-
-  // Set font for the conversion window
-  (*PImmSetCompositionFont)(hIMC,&lfIME);
   (*PImmReleaseContext)(HVTWin,hIMC);
 }
 
-void SetConversionLogFont(PLOGFONT lf)
+void SetConversionLogFont(HWND HWin, PLOGFONT lf)
 {
+  HIMC	hIMC;
+  if (HIMEDLL == NULL) return;
+
   memcpy(&lfIME,lf,sizeof(LOGFONT));
+
+  hIMC = (*PImmGetContext)(HVTWin);
+  // Set font for the conversion window
+  (*PImmSetCompositionFont)(hIMC,&lfIME);
+  (*PImmReleaseContext)(HVTWin,hIMC);
 }
 
 HGLOBAL GetConvString(UINT wParam, LPARAM lParam)

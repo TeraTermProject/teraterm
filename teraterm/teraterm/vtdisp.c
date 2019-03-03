@@ -1981,7 +1981,7 @@ void ChangeFont()
   VTFont[0] = CreateFontIndirect(&VTlf);
 
   /* set IME font */
-  SetConversionLogFont(&VTlf);
+  SetConversionLogFont(HVTWin, &VTlf);
 
   TmpDC = GetDC(HVTWin);
 
@@ -2063,7 +2063,7 @@ void ResetIME()
 		if (ts.UseIME>0)
 		{
 			if (ts.IMEInline>0)
-				SetConversionLogFont(&VTlf);
+				SetConversionLogFont(HVTWin, &VTlf);
 			else
 				SetConversionWindow(HVTWin,-1,0);
 		}
@@ -2219,6 +2219,15 @@ void CaretOn()
 
 		CaretX = (CursorX-WinOrgX)*FontWidth;
 		CaretY = (CursorY-WinOrgY)*FontHeight;
+
+		if (IMEstat) {
+			// IME ON の場合のみの処理
+			// 文字入力を開始(変換ウィンドウが表示されている)状態で
+			// ホストからのエコーを受信してcaret位置が変化した場合、
+			// 変換ウィンドウの位置を更新する必要がある
+			SetConversionWindow(HVTWin,CaretX,CaretY);
+		}
+
 		if (ts.CursorShape!=IdVCur) {
 			if (ts.CursorShape==IdHCur) {
 				CaretY = CaretY+FontHeight-CurWidth;

@@ -38,7 +38,7 @@ BOOL LoadIME();
 void FreeIME();
 BOOL CanUseIME();
 void SetConversionWindow(HWND HWin, int X, int Y);
-void SetConversionLogFont(PLOGFONT lf);
+void SetConversionLogFont(HWND HWin, PLOGFONT lf);
 BOOL GetIMEOpenStatus(void);
 void SetIMEOpenStatus(BOOL stat);
 
