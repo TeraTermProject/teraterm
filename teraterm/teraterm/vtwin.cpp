@@ -161,6 +161,7 @@ BEGIN_MESSAGE_MAP(CVTWindow, CFrameWnd)
 	ON_WM_VSCROLL()
 	ON_WM_DEVICECHANGE()
 	ON_MESSAGE(WM_IME_STARTCOMPOSITION,OnIMEStartComposition)
+	ON_MESSAGE(WM_IME_ENDCOMPOSITION,OnIMEEndComposition)
 	ON_MESSAGE(WM_IME_COMPOSITION,OnIMEComposition)
 	ON_MESSAGE(WM_INPUTLANGCHANGE,OnIMEInputChange)
 	ON_MESSAGE(WM_IME_NOTIFY,OnIMENotify)
@@ -3199,12 +3200,20 @@ LONG CVTWindow::OnExitSizeMove(UINT wParam, LONG lParam)
 
 LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 {
+	IMEShowingCandidate = TRUE;
+
 	// 位置を通知する
 	int CaretX = (CursorX-WinOrgX)*FontWidth;
 	int CaretY = (CursorY-WinOrgY)*FontHeight;
 	SetConversionWindow(HVTWin,CaretX,CaretY);
 
 	return CFrameWnd::DefWindowProc(WM_IME_STARTCOMPOSITION,wParam,lParam);
+}
+
+LRESULT CVTWindow::OnIMEEndComposition(WPARAM wParam, LPARAM lParam)
+{
+	IMEShowingCandidate = FALSE;
+	return CFrameWnd::DefWindowProc(WM_IME_ENDCOMPOSITION,wParam,lParam);
 }
 
 LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
@@ -3274,7 +3283,10 @@ LONG CVTWindow::OnIMEInputChange(UINT wParam, LONG lParam)
 
 LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 {
-	if (wParam == IMN_SETOPENSTATUS) {
+	switch (wParam) {
+	case IMN_SETOPENSTATUS: {
+		// 入力コンテキストの開閉状態が更新される(IME On/OFF)
+
 		// IMEのOn/Offを取得する
 		IMEstat = GetIMEOpenStatus();
 
@@ -3285,6 +3297,30 @@ LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 
 		// 描画
 		ChangeCaret();
+
+		break;
+	}
+
+	// 候補ウィンドウの表示状況通知
+	// IME_OPENCANDIDATE / IMN_CLOSECANDIDATE サポート状況
+	//
+	//  IME								status
+	//  --------------------------------+----------
+	//  MS IME 日本語(Windows 10 1809)	suport
+	//  Google 日本語入力(2.24.3250.0)	not support
+	//
+	// WM_IME_STARTCOMPOSITION, WM_IME_ENDCOMPOSITIONのみで判定可能だが
+	// 念の為このメッセージも処理する
+	case IMN_OPENCANDIDATE:
+		// 候補ウィンドウを開こうとしている
+		IMEShowingCandidate = TRUE;
+		break;
+	case IMN_CLOSECANDIDATE:
+		// 候補ウィンドウを閉じようとしている
+		IMEShowingCandidate = FALSE;
+		break;
+	default:
+		break;
 	}
 
 	return CFrameWnd::DefWindowProc(WM_IME_NOTIFY,wParam,lParam);
