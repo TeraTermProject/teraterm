@@ -5486,6 +5486,10 @@ static void UnicodeToCP932(unsigned int code)
 
 	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
 	ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	if (ret == 1 && mbchar[0] == '?' && code != '?') {
+		// 変換できなかったとき、ret=1, '?' を返してくる
+		ret = 0;
+	}
 	switch (ret) {
 	case 0:
 		if (ts.CodePage == 932) {
