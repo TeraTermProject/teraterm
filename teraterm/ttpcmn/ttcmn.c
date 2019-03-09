@@ -1589,7 +1589,7 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 	unsigned int code;
 	int outlen;
 
-	code = MBCPToUTF32(K, CodePage);
+	code = MBCP_UTF32(K, CodePage);
 	if (code == 0) {
 		// •ÏŠ·Ž¸”s
 		code = 0xfffd; // U+FFFD: Replacement Character

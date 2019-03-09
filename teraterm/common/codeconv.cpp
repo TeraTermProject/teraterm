@@ -96,7 +96,7 @@ static int IsLowSurrogate(wchar_t u16)
 /**
  * CP932文字(Shift_JIS) 1文字からUTF-32へ変換する
  * @param[in]		cp932		CP932文字
- * @retval			変換したUTF-32文字数
+ * @retval			変換したUTF-32文字
  *					0=エラー(変換できなかった)
  */
 unsigned int CP932ToUTF32(unsigned short cp932)
@@ -161,30 +161,33 @@ unsigned short UTF32ToDecSp(unsigned int u32)
 
 /**
  *	code page の mulit byte 文字を UTF-32へ変換する
- *	@param KCode	マルチバイトの文字コード(0x0000-0xffff)
- *	@param CoePage	マルチバイトのコードページ
- *	@retval			unicode(UTF-32文字コード)
+ *	@param mb_code		マルチバイトの文字コード(0x0000-0xffff)
+ *	@param code_page	マルチバイトのコードページ
+ *	@retval				unicode(UTF-32文字コード)
  */
-unsigned int MBCPToUTF32(unsigned short KCode, int CodePage)
+unsigned int MBCP_UTF32(unsigned short mb_code, int code_page)
 {
 	unsigned int c;
 
-	if (CodePage == 932) {
-		c = CP932ToUTF32(KCode);
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
+	if (code_page == 932) {
+		c = CP932ToUTF32(mb_code);
 	} else {
-		char buf[3];
+		char buf[2];
 		wchar_t wchar;
 		int ret;
 		int len = 0;
-		if (KCode < 0x100) {
-			buf[0] = KCode & 0xff;
+		if (mb_code < 0x100) {
+			buf[0] = mb_code & 0xff;
 			len = 1;
 		} else {
-			buf[0] = KCode >> 8;
-			buf[1] = KCode & 0xff;
+			buf[0] = mb_code >> 8;
+			buf[1] = mb_code & 0xff;
 			len = 2;
 		}
-		ret = MultiByteToWideChar(CodePage, MB_ERR_INVALID_CHARS, buf, len, &wchar, 1);
+		ret = MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, buf, len, &wchar, 1);
 		if (ret <= 0) {
 			c = 0;
 		} else {
@@ -386,6 +389,51 @@ size_t UTF16ToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, unsigned int *u32)
 }
 
 /**
+ *	マルチバイト文字(code_page) からunicode(UTF-32)を1文字取り出す
+ *	@retval	0	文字として扱えない(文字コードがおかしい)
+ *	@retval	1	1キャラクタで1文字として扱える
+ *	@retval	2	2キャラクタで1文字として扱える
+ */
+size_t MBCPToUTF32(const char *mb_ptr, size_t mb_len, int code_page, unsigned int *u32)
+{
+	size_t input_len;
+	wchar_t u16_str[2];
+	size_t u16_len;
+
+	assert(mb_ptr != NULL);
+	if (mb_len == 0) {
+		*u32 = 0;
+		return 0;
+	}
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
+
+	input_len = 1;
+	while(1) {
+		u16_len = ::MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS,
+										mb_ptr, (int)input_len,
+										u16_str, 2);
+		if (u16_len != 0) {
+			size_t r = UTF16ToUTF32(u16_str, u16_len, u32);
+			assert(r != 0);
+			if (r == 0) {
+				// ないはず
+				return 0;
+			} else {
+				return input_len;
+			}
+		}
+
+		input_len++;
+		if (input_len > mb_len) {
+			*u32 = 0;
+			return 0;
+		}
+	}
+}
+
+/**
  * UTF-32文字 から UTF-8 へ変換する
  * @param[in]		u32		変換するUTF-32
  * @param[in,out]	u8_ptr	変換後UTF-8文字列出力先(NULLのとき出力しない)
@@ -397,7 +445,7 @@ size_t UTF32ToUTF8(uint32_t u32, char *u8_ptr_, size_t u8_len)
 {
 	size_t out_len = 0;
 	uint8_t *u8_ptr = (uint8_t *)u8_ptr_;
-	if (u8_ptr != NULL) {
+	if (u8_ptr == NULL) {
 		u8_len = 4;
 	}
 

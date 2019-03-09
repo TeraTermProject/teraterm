@@ -34,16 +34,17 @@
 extern "C" {
 #endif
 
-
 // simple code convert
 unsigned int CP932ToUTF32(unsigned short cp932);
 unsigned short UTF32ToDecSp(unsigned int u32);
-unsigned int MBCPToUTF32(unsigned short KCode, int CodePage);
+unsigned int MBCP_UTF32(unsigned short mb_code, int code_page);
 unsigned short UTF32_CP932(unsigned int u32);
 
 // 1char ToUTF32
 size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, unsigned int *u32_);
 size_t UTF16ToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, unsigned int *u32);
+size_t MBCPToUTF32(const char *mb_ptr, size_t mb_len, int code_page, unsigned int *u32);
+
 // 1char UTF32To
 size_t UTF32ToUTF16(unsigned int u32, wchar_t *wstr_ptr, size_t wstr_len);
 size_t UTF32ToUTF8(unsigned int u32, char *u8_ptr, size_t u8_len);
