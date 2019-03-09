@@ -52,7 +52,8 @@
 #include "telnet.h"
 #include "ttime.h"
 #include "clipboar.h"
-#include "../ttpcmn/language.h"
+#include "codeconv.h"
+#include "codeconv.h"
 
 #include "vtterm.h"
 
@@ -5408,13 +5409,6 @@ static void ParseASCII(BYTE b)
 }
 
 //
-// UTF-8
-//
-#include "uni2sjis.map"
-#include "unisym2decsp.map"
-
-
-//
 // Unicode Combining Character Support
 //
 #include "uni_combining.map"
@@ -5467,17 +5461,22 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 	return (index);
 }
 
-// unicode(UTF-16,wchar_t)をバッファへ書き込む
+// unicode(UTF-32,wchar_t)をバッファへ書き込む
 static void UnicodeToCP932(unsigned int code)
 {
-	wchar_t wchar = (wchar_t)code;
+	wchar_t wchar;
 	int ret;
 	char mbchar[2];
 	unsigned short cset;
 
+	if (code >= 0x10000) {
+		goto unknown;
+	}
+	wchar = (wchar_t)code;
+
 	// UnicodeからDEC特殊文字へのマッピング
 	if (ts.UnicodeDecSpMapping) {
-		cset = ConvertUnicode(wchar, mapUnicodeSymbolToDecSp, MAPSIZE(mapUnicodeSymbolToDecSp));
+		cset = UTF32ToDecSp(wchar);
 		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
 			PutDecSp(cset & 0xff);
 			return;
@@ -5485,24 +5484,31 @@ static void UnicodeToCP932(unsigned int code)
 	}
 
 	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
-	ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	if (ts.CodePage == 932) {
+		ret = (int)UTF16ToCP932(&wchar, 1, &cset);
+		if (ret == 0) {
+			// 変換できなかった
+			;
+		} else if (cset < 0x100) {
+			// 1byte文字
+			mbchar[0] = (char)cset;
+			ret = 1;
+		} else {
+			// 2byte文字
+			mbchar[0] = (char)(cset >> 8);
+			mbchar[1] = (char)(cset & 0xff);
+			ret = 2;
+		}
+	} else {
+		ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	}
 	if (ret == 1 && mbchar[0] == '?' && code != '?') {
 		// 変換できなかったとき、ret=1, '?' を返してくる
 		ret = 0;
 	}
 	switch (ret) {
 	case 0:
-		if (ts.CodePage == 932) {
-			// CP932
-			// U+301Cなどは変換できない。Unicode -> Shift_JISへ変換してみる。
-			cset = ConvertUnicode(code, mapUnicodeToSJIS, MAPSIZE(mapUnicodeToSJIS));
-			if (cset != 0) {
-				Kanji = cset & 0xff00;
-				PutKanji(cset & 0x00ff);
-				return;
-			}
-		}
-
+	unknown:
 		PutChar('?');
 		if (ts.UnknownUnicodeCharaAsWide) {
 			PutChar('?');

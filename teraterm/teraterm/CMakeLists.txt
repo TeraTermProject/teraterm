@@ -31,7 +31,12 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/dllutil.cpp
   ../common/dllutil.h
-  ../ttpcmn/language.h
+  ../common/codeconv.h
+  ../common/codeconv.cpp
+  #
+  ../teraterm/unisym2decsp.map
+  ../teraterm/uni2sjis.map
+  ../ttpcmn/sjis2uni.map
   )
 
 source_group(
@@ -102,8 +107,6 @@ set(SRC
   WSAAsyncGetAddrInfo.c
   WSAAsyncGetAddrInfo.h
   #
-  uni2sjis.map
-  unisym2decsp.map
   uni_combining.map
   #
   teraterm.manifest

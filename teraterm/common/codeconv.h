@@ -35,12 +35,24 @@ extern "C" {
 #endif
 
 
-// 1char
-size_t UTF32ToUTF8(unsigned int u32, char *u8_ptr, size_t u8_len);
+// simple code convert
+unsigned int CP932ToUTF32(unsigned short cp932);
+unsigned short UTF32ToDecSp(unsigned int u32);
+unsigned int MBCPToUTF32(unsigned short KCode, int CodePage);
+unsigned short UTF32_CP932(unsigned int u32);
+
+// 1char ToUTF32
 size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, unsigned int *u32_);
+size_t UTF16ToUTF32(const wchar_t *wstr_ptr, size_t wstr_len, unsigned int *u32);
+// 1char UTF32To
+size_t UTF32ToUTF16(unsigned int u32, wchar_t *wstr_ptr, size_t wstr_len);
+size_t UTF32ToUTF8(unsigned int u32, char *u8_ptr, size_t u8_len);
+size_t UTF32ToCP932(unsigned int u32, char *mb_ptr, size_t mb_len);
+size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len);
 
 // MultiByteToWideChar() wrappers
-int WideCharToUTF8(const wchar_t *wstr_ptr, int wstr_len, char *u8_ptr, int u8_len);
+void WideCharToUTF8(const wchar_t *wstr_ptr, size_t *wstr_len, char *u8_ptr, size_t *u8_len);
+void WideCharToCP932(const wchar_t *wstr_ptr, size_t *wstr_len, char *cp932_ptr, size_t *cp932_len);
 int UTF8ToWideChar(const char *u8_ptr, int u8_len, wchar_t *wstr_ptr, int wstr_len);
 
 // API wrappers
