@@ -5461,22 +5461,16 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 	return (index);
 }
 
-// unicode(UTF-32,wchar_t)をバッファへ書き込む
+// unicode(UTF-32)をバッファ(t.CodePage)へ書き込む
 static void UnicodeToCP932(unsigned int code)
 {
-	wchar_t wchar;
-	int ret;
+	size_t mblen;
 	char mbchar[2];
-	unsigned short cset;
-
-	if (code >= 0x10000) {
-		goto unknown;
-	}
-	wchar = (wchar_t)code;
 
 	// UnicodeからDEC特殊文字へのマッピング
 	if (ts.UnicodeDecSpMapping) {
-		cset = UTF32ToDecSp(wchar);
+		unsigned short cset;
+		cset = UTF32ToDecSp(code);
 		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
 			PutDecSp(cset & 0xff);
 			return;
@@ -5484,31 +5478,18 @@ static void UnicodeToCP932(unsigned int code)
 	}
 
 	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
-	if (ts.CodePage == 932) {
-		ret = (int)UTF16ToCP932(&wchar, 1, &cset);
-		if (ret == 0) {
-			// 変換できなかった
-			;
-		} else if (cset < 0x100) {
-			// 1byte文字
-			mbchar[0] = (char)cset;
-			ret = 1;
-		} else {
-			// 2byte文字
-			mbchar[0] = (char)(cset >> 8);
-			mbchar[1] = (char)(cset & 0xff);
-			ret = 2;
-		}
-	} else {
-		ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	mblen = UTF32ToMBCP(code, ts.CodePage, mbchar, 2);
+#if 1	// U+203e OVERLINE 特別処理
+	if (code == 0x203e && ts.CodePage == 932) {
+		// U+203eは0x7e'~'に変換される
+		// 無理やり漢字出力する
+		mbchar[0] = 0;			// この0のため、クリップボードに文字列がうまく入らない
+		mbchar[1] = 0x7e;
+		mblen = 2;
 	}
-	if (ret == 1 && mbchar[0] == '?' && code != '?') {
-		// 変換できなかったとき、ret=1, '?' を返してくる
-		ret = 0;
-	}
-	switch (ret) {
+#endif
+	switch (mblen) {
 	case 0:
-	unknown:
 		PutChar('?');
 		if (ts.UnknownUnicodeCharaAsWide) {
 			PutChar('?');

@@ -1582,42 +1582,6 @@ int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-// 内部コード(CodePage)をUTF-32(UTF-16LE)へ変換する
-static unsigned int SJIS2UTF32(WORD KCode, int CodePage)
-{
-	unsigned int c;
-
-	// 内部コード(CodePage)からUTF-16LEへ変換する
-	if (CodePage == 932) {
-		c = CP932ToUTF32(KCode);
-	} else {
-		unsigned char buf[3];
-		wchar_t wchar;
-		int ret;
-		int len = 0;
-		if (KCode < 0x100) {
-			buf[0] = KCode & 0xff;
-			len = 1;
-		} else {
-			buf[0] = KCode >> 8;
-			buf[1] = KCode & 0xff;
-			len = 2;
-		}
-		ret = MultiByteToWideChar(CodePage, MB_ERR_INVALID_CHARS, buf, len, &wchar, 1);
-		if (ret <= 0) {
-			c = 0;
-		} else {
-			c = (unsigned int)wchar;
-		}
-	}
-	if (c <= 0) {
-		// 変換失敗
-		c = 0xfffd; // U+FFFD: Replacement Character
-	}
-
-	return c;
-}
-
 // 内部コード(CodePage)をUTF-8へ出力する
 static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 {
@@ -1625,7 +1589,11 @@ static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 	unsigned int code;
 	int outlen;
 
-	code = SJIS2UTF32(K, CodePage);
+	code = MBCPToUTF32(K, CodePage);
+	if (code == 0) {
+		// 変換失敗
+		code = 0xfffd; // U+FFFD: Replacement Character
+	}
 	outlen = UTF32ToUTF8(code, TempStr, 4);
 	return outlen;
 }
