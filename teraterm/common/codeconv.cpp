@@ -94,37 +94,70 @@ static int IsLowSurrogate(wchar_t u16)
 }
 
 /**
- *	1文字として扱うために、必要なキャラクタ数を得る
- *	@retval	0	文字として扱えない(文字コードがおかしい)
- *	@retval	1	1キャラクタで1文字として扱える
- *	@retval	2	2キャラクタで1文字として扱える
+ * CP932文字(Shift_JIS) 1文字からUTF-32へ変換する
+ * @param[in]		cp932		CP932文字
+ * @retval			変換したUTF-32文字数
+ *					0=エラー(変換できなかった)
  */
-#if 0
-static size_t UTF16GetCharCount(const wchar_t *wstr_ptr, size_t wstr_len)
+unsigned int CP932ToUTF32(unsigned short cp932)
 {
-	wchar_t u16;
-	assert(wstr_ptr != NULL);
-	if (wstr_len == 0) {
-		return 0;
+#include "../ttpcmn/sjis2uni.map"		// mapSJISToUnicode[]
+	wchar_t wchar;
+	int ret;
+	unsigned int u32;
+	unsigned char buf[2];
+	int len = 0;
+
+#if defined(PRIORITY_CP932_TABLE)
+	u32 = _ConvertUnicode(cp932, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
+	if (u32 != 0) {
+		return u32;
 	}
-	u16 = *wstr_ptr++;
-	if (IsHighSurrogate(u16)) {
-		if (wstr_len >= 2) {
-			const wchar_t u16_lo = *wstr_ptr++;
-			if (IsLowSurrogate(u16_lo)) {
-				return 2;
-			} else {
-				return 0;
-			}
-		} else {
-			return 0;
-		}
-	} else if (IsLowSurrogate(u16)) {
-		return 0;
-	}
-	return 1;
-}
 #endif
+	if (cp932 < 0x100) {
+		buf[0] = cp932 & 0xff;
+		len = 1;
+	} else {
+		buf[0] = cp932 >> 8;
+		buf[1] = cp932 & 0xff;
+		len = 2;
+	}
+	ret = MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, (char *)buf, len, &wchar, 1);
+	if (ret <= 0) {
+		// MultiByteToWideChar()が変換失敗
+#if !defined(PRIORITY_CP932_TABLE)
+		u32 = _ConvertUnicode(cp932, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
+		// テーブルにもなかった場合 c = 0(変換失敗時)
+#else
+		u32 = 0;
+#endif
+	} else {
+		u32 = (unsigned int)wchar;
+	}
+
+	return u32;
+}
+
+/**
+ * UnicodeからDEC特殊文字へ変換
+ * @param	u32			UTF-32文字コード
+ * @return	下位8bit	DEC特殊文字コード
+ *			上位8bit	文字コード種別 (1,2,4)
+ *						file://../../doc/ja/html/setup/teraterm-term.html 参照
+ *			0			変換できなかった
+ */
+unsigned short UTF32ToDecSp(unsigned int u32)
+{
+#include "../teraterm/unisym2decsp.map"		// mapUnicodeSymbolToDecSp[]
+	unsigned short cset;
+	if (u32 > 0x10000) {
+		cset = 0;
+	} else {
+		const unsigned short u16 = (unsigned short)u32;
+		cset = _ConvertUnicode(u16, mapUnicodeSymbolToDecSp, _countof(mapUnicodeSymbolToDecSp));
+	}
+	return cset;
+}
 
 /**
  *	code page の mulit byte 文字を UTF-32へ変換する
@@ -159,6 +192,158 @@ unsigned int MBCPToUTF32(unsigned short KCode, int CodePage)
 		}
 	}
 	return c;
+}
+
+/**
+ * UTF-32文字をCP932文字(Shift_JIS) 1文字へ変換する
+ * @retval		使用したCP932文字
+ *				0=エラー(変換できなかった)
+ */
+unsigned short UTF32_CP932(unsigned int u32)
+{
+#include "../teraterm/uni2sjis.map"		// mapUnicodeToSJIS[]
+	char mbstr[2];
+	unsigned short mb;
+	DWORD mblen;
+	wchar_t u16_str[2];
+	size_t u16_len;
+
+	if (u32 < 0x80) {
+		return (unsigned short)u32;
+	}
+
+#if defined(PRIORITY_CP932_TABLE)
+	if (u32 < 0x10000) {
+		wchar_t u16 = (wchar_t)u32;
+		// Tera Termの変換テーブルで Unicode -> Shift_JISへ変換
+		mb = _ConvertUnicode(u16, mapUnicodeToSJIS, _countof(mapUnicodeToSJIS));
+		if (mb != 0) {
+			// 変換できた
+			return mb;
+		}
+	}
+#endif
+	u16_len = UTF32ToUTF16(u32, u16_str, 2);
+	if (u16_len == 0) {
+		return 0;
+	}
+	mblen = WideCharToMultiByte(932, 0, u16_str, (int)u16_len, mbstr, 2, NULL, NULL);
+	switch (mblen) {
+	case 0:
+	case 1:
+	default:
+		if (mblen == 0 || mbstr[0] == '?') {
+			goto next_convert;
+		} else {
+			mb = (unsigned char)mbstr[0];
+			return mb;
+		}
+	case 2:
+		if (mbstr[0] == '?' && mbstr[1] == '?') {
+			// 2byte出力 && "??" の場合は変換できなかった
+			goto next_convert;
+		}
+		mb = (((unsigned char)mbstr[0]) << 8) | (unsigned char)mbstr[1];
+		return mb;
+	}
+
+next_convert:
+#if !defined(PRIORITY_CP932_TABLE)
+	if (u32 < 0x10000) {
+		wchar_t u16 = (wchar_t)u32;
+		// Tera Termの変換テーブルで Unicode -> Shift_JISへ変換
+		mb = _ConvertUnicode(u16, mapUnicodeToSJIS, _countof(mapUnicodeToSJIS));
+		if (mb != 0) {
+			// 変換できた
+			return mb;
+		}
+	}
+#endif
+	return 0;
+}
+
+/**
+ * UTF-8文字列からUTF-32を1文字取り出す
+ * @param[in]	u8_ptr	UTF-8文字列へのポインタ
+ * @param[in]	u8_len	UTF-8文字列長さ
+ * @param[out]	u32		変換したUTF-32文字
+ * @retval		使用したUTF-8文字数(byte数）
+ *				0=エラー(変換できなかった)
+ */
+size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, uint32_t *u32_)
+{
+	uint8_t *u8_ptr = (uint8_t *)u8_ptr_;
+	uint32_t u32;
+	size_t u8_in;
+	const uint8_t c1 = *u8_ptr++;
+    if (c1 <= 0x7f) {
+		// 1byte
+		if (u8_len >= 1) {
+			u32 = (uint32_t)c1;
+			u8_in = 1;
+		} else {
+			goto error;
+		}
+	} else if (0xc2 <= c1 && c1 <= 0xdf) {
+		// 2byte
+		if (u8_len >= 2) {
+			const uint8_t c2 = *u8_ptr++;
+			if (((c1 & 0x1e) != 0) &&
+				((c2 & 0xc0) == 0x80))
+			{
+				u32 = (uint32_t)((c1 & 0x1f) << 6) + (c2 & 0x3f);
+				u8_in = 2;
+			} else {
+				goto error;
+			}
+		} else {
+			goto error;
+		}
+	} else if (0xe0 <= c1 && c1 <= 0xef) {
+		// 3byte
+		if (u8_len >= 3) {
+			const uint8_t c2 = *u8_ptr++;
+			const uint8_t c3 = *u8_ptr++;
+			if ((((c1 & 0x0f) != 0) || ((c2 & 0x20) != 0)) &&
+				((c2 & 0xc0) == 0x80) &&
+				((c3 & 0xc0) == 0x80) )
+			{
+				u32 = (uint32_t)((c1 & 0x0f) << 12) + ((c2 & 0x3f) << 6);
+				u32 += (c3 & 0x3f);
+				u8_in = 3;
+			} else {
+				goto error;
+			}
+		} else {
+			goto error;
+		}
+	} else if (0xf0 <= c1 && c1 <= 0xf7 && u8_len >= 4) {
+		// 4byte
+		if (u8_len >= 4) {
+			const uint8_t c2 = *u8_ptr++;
+			const uint8_t c3 = *u8_ptr++;
+			const uint8_t c4 = *u8_ptr++;
+			if ((((c1 & 0x07) != 0) || ((c2 & 0x30) != 0)) &&
+				((c2 & 0xc0) == 0x80) &&
+				((c3 & 0xc0) == 0x80) &&
+				((c4 & 0xc0) == 0x80) )
+			{
+				u32 = (uint32_t)((c1 & 0x07) << 18) + ((c2 & 0x3f) << 12);
+				u32 += ((c3 & 0x3f) << 6) + (c4 & 0x3f);
+				u8_in = 4;
+			} else {
+				goto error;
+			}
+		} else {
+			goto error;
+		}
+    } else {
+	error:
+		u32 = 0;
+		u8_in = 0;
+	}
+	*u32_ = u32;
+	return u8_in;
 }
 
 /**
@@ -261,90 +446,6 @@ size_t UTF32ToUTF8(uint32_t u32, char *u8_ptr_, size_t u8_len)
 }
 
 /**
- * UTF-8文字列からUTF-32を1文字取り出す
- * @param[in]	u8_ptr	UTF-8文字列へのポインタ
- * @param[in]	u8_len	UTF-8文字列長さ
- * @param[out]	u32		変換したUTF-32文字
- * @retval		使用したUTF-8文字数(byte数）
- *				0=エラー(変換できなかった)
- */
-size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, uint32_t *u32_)
-{
-	uint8_t *u8_ptr = (uint8_t *)u8_ptr_;
-	uint32_t u32;
-	size_t u8_in;
-	const uint8_t c1 = *u8_ptr++;
-    if (c1 <= 0x7f) {
-		// 1byte
-		if (u8_len >= 1) {
-			u32 = (uint32_t)c1;
-			u8_in = 1;
-		} else {
-			goto error;
-		}
-	} else if (0xc2 <= c1 && c1 <= 0xdf) {
-		// 2byte
-		if (u8_len >= 2) {
-			const uint8_t c2 = *u8_ptr++;
-			if (((c1 & 0x1e) != 0) &&
-				((c2 & 0xc0) == 0x80))
-			{
-				u32 = (uint32_t)((c1 & 0x1f) << 6) + (c2 & 0x3f);
-				u8_in = 2;
-			} else {
-				goto error;
-			}
-		} else {
-			goto error;
-		}
-	} else if (0xe0 <= c1 && c1 <= 0xef) {
-		// 3byte
-		if (u8_len >= 3) {
-			const uint8_t c2 = *u8_ptr++;
-			const uint8_t c3 = *u8_ptr++;
-			if ((((c1 & 0x0f) != 0) || ((c2 & 0x20) != 0)) &&
-				((c2 & 0xc0) == 0x80) &&
-				((c3 & 0xc0) == 0x80) )
-			{
-				u32 = (uint32_t)((c1 & 0x0f) << 12) + ((c2 & 0x3f) << 6);
-				u32 += (c3 & 0x3f);
-				u8_in = 3;
-			} else {
-				goto error;
-			}
-		} else {
-			goto error;
-		}
-	} else if (0xf0 <= c1 && c1 <= 0xf7 && u8_len >= 4) {
-		// 4byte
-		if (u8_len >= 4) {
-			const uint8_t c2 = *u8_ptr++;
-			const uint8_t c3 = *u8_ptr++;
-			const uint8_t c4 = *u8_ptr++;
-			if ((((c1 & 0x07) != 0) || ((c2 & 0x30) != 0)) &&
-				((c2 & 0xc0) == 0x80) &&
-				((c3 & 0xc0) == 0x80) &&
-				((c4 & 0xc0) == 0x80) )
-			{
-				u32 = (uint32_t)((c1 & 0x07) << 18) + ((c2 & 0x3f) << 12);
-				u32 += ((c3 & 0x3f) << 6) + (c4 & 0x3f);
-				u8_in = 4;
-			} else {
-				goto error;
-			}
-		} else {
-			goto error;
-		}
-    } else {
-	error:
-		u32 = 0;
-		u8_in = 0;
-	}
-	*u32_ = u32;
-	return u8_in;
-}
-
-/**
  * UTF-32 から UTF-16 へ変換する
  * @param[in]		u32			変換するUTF-32
  * @param[in,out]	wstr_ptr	変換後UTF-16文字列出力先(NULLのとき出力しない)
@@ -379,140 +480,6 @@ size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
 		u16_out = 0;
 	}
 	return u16_out;
-}
-
-/**
- * UTF-32文字をCP932文字(Shift_JIS) 1文字へ変換する
- * @retval		使用したCP932文字
- *				0=エラー(変換できなかった)
- */
-unsigned short UTF32_CP932(unsigned int u32)
-{
-#include "../teraterm/uni2sjis.map"		// mapUnicodeToSJIS[]
-	char mbstr[2];
-	unsigned short mb;
-	DWORD mblen;
-	wchar_t u16_str[2];
-	size_t u16_len;
-
-	if (u32 < 0x80) {
-		return (unsigned short)u32;
-	}
-
-#if defined(PRIORITY_CP932_TABLE)
-	if (u32 < 0x10000) {
-		wchar_t u16 = (wchar_t)u32;
-		// Tera Termの変換テーブルで Unicode -> Shift_JISへ変換
-		mb = _ConvertUnicode(u16, mapUnicodeToSJIS, _countof(mapUnicodeToSJIS));
-		if (mb != 0) {
-			// 変換できた
-			return mb;
-		}
-	}
-#endif
-	u16_len = UTF32ToUTF16(u32, u16_str, 2);
-	if (u16_len == 0) {
-		return 0;
-	}
-	mblen = WideCharToMultiByte(932, 0, u16_str, (int)u16_len, mbstr, 2, NULL, NULL);
-	switch (mblen) {
-	case 0:
-	case 1:
-	default:
-		if (mblen == 0 || mbstr[0] == '?') {
-			goto next_convert;
-		} else {
-			mb = (unsigned char)mbstr[0];
-			return mb;
-		}
-	case 2:
-		if (mbstr[0] == '?' && mbstr[1] == '?') {
-			// 2byte出力 && "??" の場合は変換できなかった
-			goto next_convert;
-		}
-		mb = (((unsigned char)mbstr[0]) << 8) | (unsigned char)mbstr[1];
-		return mb;
-	}
-
-next_convert:
-#if !defined(PRIORITY_CP932_TABLE)
-	if (u32 < 0x10000) {
-		wchar_t u16 = (wchar_t)u32;
-		// Tera Termの変換テーブルで Unicode -> Shift_JISへ変換
-		mb = _ConvertUnicode(u16, mapUnicodeToSJIS, _countof(mapUnicodeToSJIS));
-		if (mb != 0) {
-			// 変換できた
-			return mb;
-		}
-	}
-#endif
-	return 0;
-}
-
-/**
- * CP932文字(Shift_JIS) 1文字からUTF-32へ変換する
- * @param[in]		cp932		CP932文字
- * @retval			変換したUTF-32文字数
- *					0=エラー(変換できなかった)
- */
-unsigned int CP932ToUTF32(unsigned short cp932)
-{
-#include "../ttpcmn/sjis2uni.map"		// mapSJISToUnicode[]
-	wchar_t wchar;
-	int ret;
-	unsigned int u32;
-	unsigned char buf[2];
-	int len = 0;
-
-#if defined(PRIORITY_CP932_TABLE)
-	u32 = _ConvertUnicode(cp932, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
-	if (u32 != 0) {
-		return u32;
-	}
-#endif
-	if (cp932 < 0x100) {
-		buf[0] = cp932 & 0xff;
-		len = 1;
-	} else {
-		buf[0] = cp932 >> 8;
-		buf[1] = cp932 & 0xff;
-		len = 2;
-	}
-	ret = MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, (char *)buf, len, &wchar, 1);
-	if (ret <= 0) {
-		// MultiByteToWideChar()が変換失敗
-#if !defined(PRIORITY_CP932_TABLE)
-		u32 = _ConvertUnicode(cp932, mapSJISToUnicode, sizeof(mapSJISToUnicode)/sizeof(mapSJISToUnicode[0]));
-		// テーブルにもなかった場合 c = 0(変換失敗時)
-#else
-		u32 = 0;
-#endif
-	} else {
-		u32 = (unsigned int)wchar;
-	}
-
-	return u32;
-}
-
-/**
- * UnicodeからDEC特殊文字へ変換
- * @param	u32			UTF-32文字コード
- * @return	下位8bit	DEC特殊文字コード
- *			上位8bit	文字コード種別 (1,2,4)
- *						file://../../doc/ja/html/setup/teraterm-term.html 参照
- *			0			変換できなかった
- */
-unsigned short UTF32ToDecSp(unsigned int u32)
-{
-#include "../teraterm/unisym2decsp.map"		// mapUnicodeSymbolToDecSp[]
-	unsigned short cset;
-	if (u32 > 0x10000) {
-		cset = 0;
-	} else {
-		const unsigned short u16 = (unsigned short)u32;
-		cset = _ConvertUnicode(u16, mapUnicodeSymbolToDecSp, _countof(mapUnicodeSymbolToDecSp));
-	}
-	return cset;
 }
 
 /**
@@ -556,8 +523,20 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 	return cp932_out;
 }
 
+/**
+ * UTF-32 から MultiByte文字(code_page) へ変換する
+ * @param[in]		u32			変換元UTF-32
+ * @param[in]		code_page	変換先codepage
+ * @param[in,out]	mb_ptr		変換先文字列出力先(NULLのとき出力しない)
+ * @param[in]		mb_len		CP932出力先文字数(文字数,sizeof(wchar_t)*wstr_len bytes)
+ * @retval			出力したCP932文字数(byte数)
+ *					0=エラー(変換できなかった)
+ */
 size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 {
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
 	if (code_page == 932) {
 		return UTF32ToCP932(u32, mb_ptr, mb_len);
 	} else {
@@ -568,7 +547,7 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 			return 0;
 		}
 		mb_len = WideCharToMultiByte(code_page, 0, u16_str, u16_len, mb_ptr, mb_len, NULL, NULL);
-		if (u32 != '?' && mb_len == 1 && mb_ptr[0] == '?') {
+		if (mb_ptr != NULL && u32 != '?' && mb_len == 1 && mb_ptr[0] == '?') {
 			// 変換できなかったとき、戻り値=1, 文字[0]='?' を返してくる
 			mb_len = 0;
 		}
@@ -577,7 +556,7 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 }
 
 /**
- *	wchar_t(UTF-16)文字列をマルチバイトに変換する
+ *	wchar_t(UTF-16)文字列をマルチバイト文字列に変換する
  *
  *	@param[in]		*wstr_ptr	wchar_t文字列
  *	@param[in,out]	*wstr_len	wchar_t文字列長
@@ -667,15 +646,16 @@ void WideCharToUTF8(const wchar_t *wstr_ptr, size_t *wstr_len, char *u8_ptr, siz
 
 void WideCharToCP932(const wchar_t *wstr_ptr, size_t *wstr_len, char *cp932_ptr, size_t *cp932_len)
 {
-	WideCharToMB(wstr_ptr, wstr_len,
-				 cp932_ptr, cp932_len,
-				 UTF32ToCP932);
+	WideCharToMB(wstr_ptr, wstr_len, cp932_ptr, cp932_len, UTF32ToCP932);
 }
 
 void WideCharToMBCP(const wchar_t *wstr_ptr, size_t *wstr_len, char *mb_ptr, size_t *mb_len,
-				  int code_page)
+					int code_page)
 {
 	size_t (*utf32_to_mb)(uint32_t u32, char *mb_ptr, size_t mb_len);
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
 	switch (code_page) {
 	case CP_UTF8:
 		utf32_to_mb = UTF32ToUTF8;
@@ -763,6 +743,9 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 {
 	const DWORD flags = 0;
 	char *mb_ptr;
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
 	if (mb_len_ != NULL) {
 		*mb_len_ = 0;
 	}
@@ -823,6 +806,9 @@ char *_WideCharToMultiByte(const wchar_t *wstr_ptr, size_t wstr_len, int code_pa
 wchar_t *_MultiByteToWideChar(const char *str_ptr, size_t str_len, int code_page, size_t *w_len_)
 {
 	DWORD flags = MB_ERR_INVALID_CHARS;
+	if (code_page == CP_ACP) {
+		code_page = (int)GetACP();
+	}
 	if (code_page == CP_UTF8) {
 		// CP_UTF8 When this is set, dwFlags must be zero.
 		flags = 0;
