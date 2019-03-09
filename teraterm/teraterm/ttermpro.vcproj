@@ -397,6 +397,10 @@
 				RelativePath="..\common\dllutil.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\common\codeconv.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
