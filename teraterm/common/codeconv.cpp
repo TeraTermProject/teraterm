@@ -558,18 +558,22 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 
 size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 {
-	wchar_t u16_str[2];
-	size_t u16_len;
-	u16_len = UTF32ToUTF16(u32, u16_str, 2);
-	if (u16_len == 0) {
-		return 0;
+	if (code_page == 932) {
+		return UTF32ToCP932(u32, mb_ptr, mb_len);
+	} else {
+		wchar_t u16_str[2];
+		size_t u16_len;
+		u16_len = UTF32ToUTF16(u32, u16_str, 2);
+		if (u16_len == 0) {
+			return 0;
+		}
+		mb_len = WideCharToMultiByte(code_page, 0, u16_str, u16_len, mb_ptr, mb_len, NULL, NULL);
+		if (u32 != '?' && mb_len == 1 && mb_ptr[0] == '?') {
+			// 変換できなかったとき、戻り値=1, 文字[0]='?' を返してくる
+			mb_len = 0;
+		}
+		return mb_len;
 	}
-	mb_len = WideCharToMultiByte(code_page, 0, u16_str, u16_len, mb_ptr, mb_len, NULL, NULL);
-	if (mb_len == 1 && mb_ptr[0] == '?' && u32 != '?') {
-		// 変換できなかったとき、戻り値=1, 文字[0]='?' を返してくる
-		mb_len = 0;
-	}
-	return mb_len;
 }
 
 /**
