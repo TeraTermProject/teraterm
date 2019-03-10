@@ -1,4 +1,4 @@
-project(ttproxy)
+﻿project(ttproxy)
 
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)

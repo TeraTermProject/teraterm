@@ -1,4 +1,4 @@
-project(ttpdlg)
+﻿project(ttpdlg)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 

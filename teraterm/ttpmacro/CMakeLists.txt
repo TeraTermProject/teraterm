@@ -1,4 +1,4 @@
-project(ttpmacro)
+﻿project(ttpmacro)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
