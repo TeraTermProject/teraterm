@@ -15,6 +15,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../libs/lib_openssl.cmake)
 
 set(COMMON_SRC
   ../teraterm/common/ttlib.h
+  ../teraterm/common/ttlib.c
   ../teraterm/common/i18n.h
   ../teraterm/common/ttplugin.h
   ../teraterm/common/tttypes.h
@@ -96,12 +97,14 @@ add_library(
   ${YCL_SRC}
   )
 
-set_target_properties(
-  ttproxy
-  PROPERTIES
-  PREFIX ""
-  OUTPUT_NAME "TTXProxy"
-  )
+if(MINGW)
+  set_target_properties(
+    ttproxy
+    PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "TTXProxy"
+    )
+endif()
 
 target_link_libraries(
   ttproxy
@@ -112,5 +115,3 @@ target_link_libraries(
   gdi32
   comdlg32
   )
-
-

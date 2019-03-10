@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2019 TeraTerm Project
+ * (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,50 +26,41 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, TTDLG interface */
-#include "teraterm.h"
-#include "tttypes.h"
-#include "ttplug.h" /* TTPLUG */
-#include "ttdlg.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "ttdialog.h"
-#include "ttwinman.h"
+typedef enum {
+	DLL_GET_MODULE_HANDLE,
+	DLL_LOAD_LIBRARY_SYSTEM,
+	DLL_LOAD_LIBRARY_CURRENT,
+} DLLLoadFlag;
 
-PSetupTerminal SetupTerminal;
-PSetupWin SetupWin;
-PSetupKeyboard SetupKeyboard;
-PSetupSerialPort SetupSerialPort;
-PSetupTCPIP SetupTCPIP;
-PGetHostName GetHostName;
-PChangeDirectory ChangeDirectory;
-PAboutDialog AboutDialog;
-PChooseFontDlg ChooseFontDlg;
-PSetupGeneral SetupGeneral;
-PWindowWindow WindowWindow;
-PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
+typedef enum {
+	DLL_ACCEPT_NOT_EXIST,
+	DLL_ERROR_NOT_EXIST,
+} DLLFuncFlag;
 
-BOOL LoadTTDLG()
-{
-	SetupTerminal = _SetupTerminal;
-	SetupWin = _SetupWin;
-	SetupKeyboard = _SetupKeyboard;
-	SetupSerialPort = _SetupSerialPort;
-	SetupTCPIP = _SetupTCPIP;
-	GetHostName = _GetHostName;
-	ChangeDirectory = _ChangeDirectory;
-	AboutDialog = _AboutDialog;
-	ChooseFontDlg = _ChooseFontDlg;
-	SetupGeneral = _SetupGeneral;
-	WindowWindow = _WindowWindow;
-	TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
+typedef struct {
+	const char *ApiName;
+	void **func;
+} APIInfo;
 
-	TTDLGSetUILanguageFile(ts.UILanguageFile);
-	TTXGetUIHooks(); /* TTPLUG */
+typedef struct {
+	const TCHAR *DllName;
+	DLLLoadFlag LoadFlag;
+	DLLFuncFlag FuncFlag;
+	const APIInfo *APIInfoPtr;
+} DllInfo;
 
-	return TRUE;
+void DLLInit();
+void DLLExit();
+void DLLGetApiAddressFromLists(const DllInfo *dllInfos);
+DWORD DLLGetApiAddressFromList(const TCHAR *dllPath, DLLLoadFlag LoadFlag,
+							   DLLFuncFlag FuncFlag, const APIInfo *ApiInfo);
+DWORD DLLGetApiAddress(const TCHAR *dllPath, DLLLoadFlag LoadFlag,
+					   const char *ApiName, void **pFunc);
+
+#ifdef __cplusplus
 }
-
-BOOL FreeTTDLG()
-{
-	return TRUE;
-}
+#endif

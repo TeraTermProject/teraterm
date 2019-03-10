@@ -52,7 +52,8 @@
 #include "telnet.h"
 #include "ttime.h"
 #include "clipboar.h"
-#include "../ttpcmn/language.h"
+#include "codeconv.h"
+#include "codeconv.h"
 #include "codeconv.h"
 
 #include "vtterm.h"
@@ -5522,7 +5523,6 @@ static void UnicodeToCP932(unsigned int code)
 {
 	int ret;
 	char mbchar[2];
-	unsigned short cset;
 
 	// UnicodeからDEC特殊文字へのマッピング
 	if (ts.UnicodeDecSpMapping) {
@@ -5534,19 +5534,18 @@ static void UnicodeToCP932(unsigned int code)
 	}
 
 	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
-	if (ts.CodePage == 932) {
-		ret = (int)UTF32ToCP932(code, mbchar, 2);
-	} else {
-		if (code >= 0x10000) {
-			goto unknown;
-		}
-		wchar_t wchar;
-		wchar = (wchar_t)code;
-		ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	mblen = UTF32ToMBCP(code, ts.CodePage, mbchar, 2);
+#if 1	// U+203e OVERLINE 特別処理
+	if (code == 0x203e && ts.CodePage == 932) {
+		// U+203eは0x7e'~'に変換される
+		// 無理やり漢字出力する
+		mbchar[0] = 0;			// この0のため、クリップボードに文字列がうまく入らない
+		mbchar[1] = 0x7e;
+		mblen = 2;
 	}
-	switch (ret) {
+#endif
+	switch (mblen) {
 	case 0:
-	unknown:
 		PutChar('?');
 		if (ts.UnknownUnicodeCharaAsWide) {
 			PutChar('?');

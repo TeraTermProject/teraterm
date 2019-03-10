@@ -3,17 +3,6 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 
-if (MSVC)
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE          ${CMAKE_C_FLAGS_RELEASE})
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_C_FLAGS_RELWITHDEBINFO})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS_MINSIZEREL})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-endif ()
-
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
@@ -21,6 +10,11 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
+  ../common/teraterm.h
+  ../common/ttcommon.h
+  ../common/ttddecmnd.h
+  ../common/tttypes.h
+  ../common/tt-version.h
   ../common/i18n.c
   ../common/i18n.h
   ../common/ttlib.c
@@ -39,6 +33,7 @@ set(COMMON_SRC
   ../common/win16api.c
   ../common/codeconv.h
   ../common/codeconv.cpp
+  ../common/dllutil.cpp
   )
 
 source_group(

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2005-2018 TeraTerm Project
+ * (C) 2005-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -113,7 +113,8 @@ static int Dx[TermWidthMax];
 // caret variables
 static int CaretStatus;
 static BOOL CaretEnabled = TRUE;
-BOOL IMEstat;		/* IME Status  TRUE=IME ON */
+BOOL IMEstat;				/* IME Status  TRUE=IME ON */
+BOOL IMEShowingCandidate;	/* 候補ウィンドウ表示状況 TRUE=表示中 */
 
 // ---- device context and status flags
 static HDC VTDC = NULL; /* Device context for VT window */
@@ -1577,14 +1578,15 @@ void BGInitialize(void)
 
   // AlphaBlend のアドレスを読み込み
   if(BGUseAlphaBlendAPI) {
-	BGAlphaBlend = pAlphaBlend;
+	if(pAlphaBlend != NULL)
+	  BGAlphaBlend = pAlphaBlend;
+	else
+	  BGAlphaBlend = AlphaBlendWithoutAPI;
   }
   else {
     BGAlphaBlend = NULL;
   }
 
-  if(!BGAlphaBlend)
-    BGAlphaBlend = AlphaBlendWithoutAPI;
 }
 
 void BGExchangeColor() {
@@ -2196,6 +2198,15 @@ void CaretOn()
 
 		CaretX = (CursorX-WinOrgX)*FontWidth;
 		CaretY = (CursorY-WinOrgY)*FontHeight;
+
+		if (IMEstat && IMEShowingCandidate) {
+			// IME ON && 候補ウィンドウ表示中の場合のみの処理
+			// 候補ウィンドウが表示されている状態で
+			// ホストからのエコーを受信してcaret位置が変化した場合、
+			// 変換ウィンドウの位置を更新する必要がある
+			SetConversionWindow(HVTWin,CaretX,CaretY);
+		}
+
 		if (ts.CursorShape!=IdVCur) {
 			if (ts.CursorShape==IdHCur) {
 				CaretY = CaretY+FontHeight-CurWidth;

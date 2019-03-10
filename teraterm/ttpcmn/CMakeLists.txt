@@ -1,16 +1,5 @@
 ﻿project(ttpcmn)
 
-if (MSVC)
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_MINSIZEREL       ${CMAKE_C_FLAGS_MINSIZEREL})
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE          ${CMAKE_C_FLAGS_RELEASE})
-    string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELWITHDEBINFO   ${CMAKE_C_FLAGS_RELWITHDEBINFO})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS_MINSIZEREL})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
-    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-endif ()
-
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
@@ -57,7 +46,8 @@ include_directories(
   )
 
 if (MSVC)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DELAYLOAD:setupapi.dll /DELAYLOAD:user32.dll")
+  set(CMAKE_SHARED_LINKER_FLAGS
+    "${CMAKE_SHARED_LINKER_FLAGS} /DELAYLOAD:setupapi.dll /DELAYLOAD:user32.dll")
 endif()
 
 add_library(
@@ -72,10 +62,10 @@ target_compile_definitions(
   )
 if(MINGW)
   set_target_properties(
-	ttpcmn
-	PROPERTIES PREFIX ""
-	SUFFIX ".dll"
-	)
+    ttpcmn
+    PROPERTIES PREFIX ""
+    SUFFIX ".dll"
+    )
 endif()
 
 target_link_libraries(

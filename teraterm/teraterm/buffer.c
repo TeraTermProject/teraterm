@@ -2410,7 +2410,7 @@ void BuffUpdateRect
 				TempAttr = CurAttr;
 				TempSel = CurSel;
 			}
-#if 1
+#if 0
 			{
 				OutputDebugPrintf("(%d,%d)[%d],%d\n", i, j - PageStart, count, CurAttr.Attr);
 				bufA[lenA] = 0;

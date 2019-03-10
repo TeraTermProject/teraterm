@@ -47,21 +47,23 @@ DECLARE_HANDLE(DPI_AWARENESS_CONTEXT);
 #define WM_DPICHANGED                   0x02E0
 #endif
 
-#if 0
-// BLENDFUNCTION‚Æ“¯ˆê
-typedef struct _BGBLENDFUNCTION
-{
-    BYTE     BlendOp;
-    BYTE     BlendFlags;
-    BYTE     SourceConstantAlpha;
-    BYTE     AlphaFormat;
-}BGBLENDFUNCTION;
-#endif
 extern BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 extern BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 extern DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 extern UINT (WINAPI *pGetDpiForWindow)(HWND hwnd);
 extern BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
+extern int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
+extern int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
+extern BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
+extern BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
+
+#ifdef UNICODE
+#define pAddFontResourceEx		pAddFontResourceExW
+#define pRemoveFontResourceEx	pRemoveFontResourceExW
+#else
+#define pAddFontResourceEx		pAddFontResourceExA
+#define pRemoveFontResourceEx	pRemoveFontResourceExA
+#endif // !UNICODE
 
 void WinCompatInit();
 

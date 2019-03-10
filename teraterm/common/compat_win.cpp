@@ -1,5 +1,5 @@
 /*
- * (C) 2018 TeraTerm Project
+ * (C) 2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,42 +28,47 @@
 
 /* compat_win */
 
+#include <windows.h>
+#include <tchar.h>
 #include "compat_win.h"
 
-HINSTANCE hDll_msimg32;
-HMODULE hDll_user32;
+#include "dllutil.h"
 
 BOOL (WINAPI *pAlphaBlend)(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 BOOL (WINAPI *pEnumDisplayMonitors)(HDC,LPCRECT,MONITORENUMPROC,LPARAM);
 DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext);
 UINT (WINAPI *pGetDpiForWindow)(HWND hwnd);
 BOOL (WINAPI *pSetLayeredWindowAttributes)(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
-
-typedef struct {
-	const char *ApiName;
-	void **func;
-} APIInfo;
-
-typedef struct {
-	const char *DllName;
-	HINSTANCE *hDll;
-	const APIInfo *APIInfoPtr;
-	size_t APIInfoCount;
-} DllInfo;
+int (WINAPI *pAddFontResourceExA)(LPCSTR name, DWORD fl, PVOID res);
+int (WINAPI *pAddFontResourceExW)(LPCWSTR name, DWORD fl, PVOID res);
+BOOL (WINAPI *pRemoveFontResourceExA)(LPCSTR name, DWORD fl, PVOID pdv);
+BOOL (WINAPI *pRemoveFontResourceExW)(LPCWSTR name, DWORD fl, PVOID pdv);
 
 static const APIInfo Lists_user32[] = {
 	{ "SetLayeredWindowAttributes", (void **)&pSetLayeredWindowAttributes },
 	{ "SetThreadDpiAwarenessContext", (void **)&pSetThreadDpiAwarenessContext },
-	{ "GetDpiForWindow", (void **)&pGetDpiForWindow }
+	{ "GetDpiForWindow", (void **)&pGetDpiForWindow },
+	{ NULL },
 };
-	
+
 static const APIInfo Lists_msimg32[] = {
 	{ "AlphaBlend", (void **)&pAlphaBlend },
+	{ NULL },
 };
-	
+
+static const APIInfo Lists_gdi32[] = {
+	{ "AddFontResourceExA", (void **)&pAddFontResourceExA },
+	{ "RemoveFontResourceExA", (void **)&pRemoveFontResourceExA },
+	{ "AddFontResourceExW", (void **)&pAddFontResourceExW },
+	{ "RemoveFontResourceExW", (void **)&pRemoveFontResourceExW },
+	{ NULL },
+};
+
 static const DllInfo DllInfos[] = {
-	{ "user32.dll", &hDll_user32, Lists_user32, _countof(Lists_user32) },
-	{ "msimg32.dll", &hDll_msimg32, Lists_msimg32, _countof(Lists_msimg32) },
+	{ _T("user32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_user32 },
+	{ _T("msimg32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_msimg32 },
+	{ _T("gdi32.dll"), DLL_LOAD_LIBRARY_SYSTEM, DLL_ACCEPT_NOT_EXIST, Lists_gdi32 },
+	{ NULL },
 };
 
 void WinCompatInit()
@@ -72,24 +77,5 @@ void WinCompatInit()
 	if (done) return;
 	done = TRUE;
 
-	for (size_t i = 0; i < _countof(DllInfos); i++) {
-		const DllInfo *pDllInfo = &DllInfos[i];
-
-		char dllName[MAX_PATH];
-		GetSystemDirectoryA(dllName, sizeof(dllName));
-		strcat_s(dllName, sizeof(dllName), "/");
-		strcat_s(dllName, sizeof(dllName), pDllInfo->DllName);
-
-		HINSTANCE hDll = LoadLibraryA(dllName);
-		*pDllInfo->hDll = hDll;
-
-		if (hDll != NULL) {
-			const APIInfo *pApiInfo = pDllInfo->APIInfoPtr;
-			for (size_t j = 0; j < pDllInfo->APIInfoCount; j++) {
-				void **func = pApiInfo->func;
-				*func = (void *)GetProcAddress(hDll, pApiInfo->ApiName);
-				pApiInfo++;
-			}
-		}
-	}
+	DLLGetApiAddressFromLists(DllInfos);
 }

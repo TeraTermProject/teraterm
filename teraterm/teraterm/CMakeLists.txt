@@ -35,6 +35,8 @@ set(COMMON_SRC
   ../common/win16api.h
   ../common/win16api.c
   ../common/dlglib_tmpl.cpp
+  ../common/codemap.h
+  ../common/compat_w95.h
   ../common/compat_win.cpp
   ../common/compat_win.h
   ../common/tmfc.cpp
@@ -44,7 +46,8 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/win16api.h
   ../common/win16api.c
-  ../ttpcmn/language.h
+  ../common/dllutil.cpp
+  ../common/dllutil.h
   ../common/codeconv.h
   ../common/codeconv.cpp
   #
@@ -118,6 +121,7 @@ set(SRC
   ttplug.h
   ttsetup.c
   ttsetup.h
+  tt-version.rc
   ttwinman.c
   ttwinman.h
   ttwsk.c
@@ -177,7 +181,6 @@ set_target_properties(
 
 target_link_libraries(
   teraterm
-  ${UNICOWS_LIB}
   ttpcmn
   ttpfile
   ttpset
