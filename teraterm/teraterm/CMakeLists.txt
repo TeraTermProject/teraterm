@@ -3,22 +3,18 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_SFMT.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/lib_oniguruma.cmake)
 
-if (MSVC)
-  string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_DEBUG            ${CMAKE_C_FLAGS_DEBUG})
-  string(REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE          ${CMAKE_C_FLAGS_RELEASE})
-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
-endif ()
-
+# UNICODE API を使用して文字描画を行う
+#	- 内部文字コードを unicodeとする
+#	- unicode api時のみ有効
+#	- 描画に ExtTextOutW() API を使用する
+option(USE_UNICODE_API_FOR_DISPLAY "unicode" ON)
 
 if(USE_UNICODE_API)
   add_definitions(-DUNICODE -D_UNICODE)
+  if(USE_UNICODE_API_FOR_DISPLAY)
+	add_definitions(-DUNICODE_DISPLAY=1)
+  endif()
 endif()
-if(LINK_UNICOWS)
-#  set(UNICOWS_LIB "${CMAKE_SOURCE_DIR}/libs/unicows_mingw/liblibunicows.a")
-  set(UNICOWS_LIB "${CMAKE_SOURCE_DIR}/libs/libunicows-1.1.2-msvc6/unicows.lib")
-endif()
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/")
 
 set(COMMON_SRC
@@ -26,6 +22,7 @@ set(COMMON_SRC
   ../common/ttcommon.h
   ../common/ttddecmnd.h
   ../common/tttypes.h
+  ../common/tektypes.h
   ../common/ttftypes.h
   ../common/ttplugin.h
   ../common/tt-version.h
@@ -35,6 +32,8 @@ set(COMMON_SRC
   ../common/dlglib.c
   ../common/dlglib_cpp.cpp
   ../common/dlglib.h
+  ../common/win16api.h
+  ../common/win16api.c
   ../common/dlglib_tmpl.cpp
   ../common/compat_win.cpp
   ../common/compat_win.h
@@ -45,8 +44,13 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/win16api.h
   ../common/win16api.c
+  ../ttpcmn/language.h
   ../common/codeconv.h
   ../common/codeconv.cpp
+  #
+  ../teraterm/uni2sjis.map
+  ../ttpcmn/sjis2uni.map
+  ../teraterm/unisym2decsp.map
   )
 
 source_group(
@@ -130,6 +134,8 @@ set(SRC
   WSAAsyncGetAddrInfo.h
   ttutil.c
   ttutil.h
+  #
+  uni_combining.map
   #
   teraterm.manifest
   #

@@ -96,6 +96,7 @@ DllExport BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *de
 DllExport BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, const wchar_t *msg);
 #endif
 DllExport void OutputDebugPrintf(const char *fmt, ...);
+DllExport void OutputDebugPrintfW(const wchar_t *fmt, ...);
 DllExport DWORD get_OPENFILENAME_SIZEA();
 DllExport DWORD get_OPENFILENAME_SIZEW();
 DllExport BOOL IsWindows95();

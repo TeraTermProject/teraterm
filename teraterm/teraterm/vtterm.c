@@ -662,7 +662,8 @@ void PutChar(BYTE b)
 	else
 		CharAttrTmp.Attr |= CharAttr.Attr;
 
-	BuffPutChar(b, CharAttrTmp, InsertMode);
+	//BuffPutChar(b, CharAttrTmp, InsertMode);
+	BuffPutUnicode(b, CharAttrTmp, InsertMode);
 
 	if (CursorX == CursorRightM || CursorX >= NumOfColumns-1) {
 		UpdateStr();
@@ -849,7 +850,7 @@ void PutDebugChar(BYTE b)
 	}
 }
 
-void PrnParseControl(BYTE b) // printer mode
+static void PrnParseControl(BYTE b) // printer mode
 {
 	switch (b) {
 	case NUL:
@@ -898,7 +899,7 @@ void PrnParseControl(BYTE b) // printer mode
 	WriteToPrnFile(b, TRUE);
 }
 
-void ParseControl(BYTE b)
+static void ParseControl(BYTE b)
 {
 	if (PrinterMode) { // printer mode
 		PrnParseControl(b);
@@ -5467,6 +5468,56 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 }
 
 // unicode(UTF-32,wchar_t)をバッファへ書き込む
+// TODO @@
+#if defined(UNICODE_DISPLAY)
+// 内部コード unicode版
+static void UnicodeToCP932(unsigned int code)
+{
+	unsigned short cset;
+
+	TCharAttr CharAttrTmp;
+	CharAttrTmp = CharAttr;
+	if (code <= US) {
+		// C0
+		ParseControl(code);
+#if 0
+	} else if ((0x80<=code) && (code<=0x9F)) {
+		// C1
+		ParseControl(code);
+	} else if (code < 0x20) {
+		PutChar(code);
+#endif
+#if 0
+	} else if (code <= 0xff) {
+		PutChar(code);
+#endif
+	} else {
+		// UnicodeからDEC特殊文字へのマッピング
+		if (ts.UnicodeDecSpMapping) {
+			cset = UTF32ToDecSp(code);
+			if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
+				code = cset & 0xff;
+				CharAttrTmp.Attr |= AttrSpecial;
+			}
+		}
+
+		BuffPutUnicode(code, CharAttrTmp, InsertMode);
+		if (CursorX == CursorRightM || CursorX >= NumOfColumns - 1) {
+			UpdateStr();
+			Wrap = AutoWrapMode;
+		}
+		else {
+			if (code >= 0x80) {
+				MoveRight();
+			}
+			MoveRight();
+		}
+	}
+}
+
+#else
+
+// 従来版
 static void UnicodeToCP932(unsigned int code)
 {
 	int ret;
@@ -5512,9 +5563,28 @@ static void UnicodeToCP932(unsigned int code)
 	}
 }
 
+#endif
+
+// UTF-8で受信データを処理する
+
+static BOOL ParseFirstUTF8Sub(BYTE b)
+{
+	if (b<=US)
+		ParseControl(b);
+	else if ((b>=0x20) && (b<=0x7E))
+		PutChar(b);
+	else if ((b>=0x80) && (b<=0x9F))
+		ParseControl(b);
+	else if (b>=0xA0)
+		PutChar(b);
+	return TRUE;
+}
+
+
 // UTF-8で受信データを処理する
 // returns TRUE if b is processed
 //  (actually allways returns TRUE)
+// TODO:@@
 static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 {
 	static BYTE buf[4];
@@ -5540,10 +5610,14 @@ static BOOL ParseFirstUTF8(BYTE b, int proc_combining)
 			}
 
 			if (count == 1) {
-				ParseASCII(buf[0]);
-			}
-			ParseASCII(b);
+				ParseFirstUTF8Sub(buf[0]);
+				//ParseASCII(buf[0]);
 
+			}
+			//ParseASCII(b);
+
+			ParseFirstUTF8Sub(b);
+			//UnicodeToCP932(b);
 			count = 0;  // reset counter
 			return TRUE;
 		}

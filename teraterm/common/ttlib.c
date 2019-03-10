@@ -1145,12 +1145,24 @@ BOOL doSelectFolderW(HWND hWnd, wchar_t *path, int pathlen, const wchar_t *def, 
 }
 #endif
 
-void OutputDebugPrintf(const char *fmt, ...) {
+void OutputDebugPrintf(const char *fmt, ...)
+{
 	char tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
 	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
+	va_end(arg);
 	OutputDebugStringA(tmp);
+}
+
+void OutputDebugPrintfW(const wchar_t *fmt, ...)
+{
+	wchar_t tmp[1024];
+	va_list arg;
+	va_start(arg, fmt);
+	_vsnwprintf(tmp, _countof(tmp), fmt, arg);
+	va_end(arg);
+	OutputDebugStringW(tmp);
 }
 
 #if (_MSC_VER < 1800)
