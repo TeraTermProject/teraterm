@@ -38,11 +38,10 @@ BOOL LoadIME();
 void FreeIME();
 BOOL CanUseIME();
 void SetConversionWindow(HWND HWin, int X, int Y);
-void SetConversionLogFont(PLOGFONTA lf);
+void SetConversionLogFont(HWND HWin, PLOGFONTA lf);
 BOOL GetIMEOpenStatus(void);
 void SetIMEOpenStatus(BOOL stat);
-
-HGLOBAL GetConvString(UINT wParam, LPARAM lParam);
+const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len);
 
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F
