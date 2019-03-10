@@ -1931,6 +1931,109 @@ int WINAPI CommTextOut(PComVar cv, PCHAR B, int C)
  */
 int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
 {
+#if 1
+	if (cv->KanjiCodeSend == IdUTF8 || cv->Language == IdUtf8) {
+		int i, TempLen;
+		char TempStr[12];
+		wchar_t d;
+		BOOL Full;
+
+		Full = FALSE;
+		i = 0;
+		while (! Full && (i < C)) {
+			TempLen = 0;
+			d = B[i];
+
+			if (d==CR) {
+				TempStr[TempLen++] = 0x0d;
+				if (cv->CRSend==IdCRLF) {
+					TempStr[TempLen++] = 0x0a;
+				}
+				else if ((cv->CRSend ==IdCR) &&
+						 cv->TelFlag && ! cv->TelBinSend) {
+					TempStr[TempLen++] = 0;
+				}
+				else if (cv->CRSend == IdLF) {
+					TempStr[TempLen-1] = 0x0a;
+				}
+				if (cv->TelLineMode) {
+					cv->Flush = TRUE;
+				}
+			}
+			else if (d== BS) {
+				if (cv->TelLineMode) {
+					if (cv->FlushLen < cv->LineModeBuffCount) {
+						cv->LineModeBuffCount--;
+					}
+				}
+				else {
+					TempStr[TempLen++] = BS;
+				}
+			}
+			else if (d==0x15) { // ctrl-u
+				if (cv->TelLineMode) {
+					cv->LineModeBuffCount = cv->FlushLen;
+				}
+				else {
+					TempStr[TempLen++] = 0x15;
+				}
+			}
+			else if (d>=0x80) {
+				unsigned int u32;
+				size_t u16_len = UTF16ToUTF32(&B[i], C - i, &u32);
+				if (u16_len == 0) {
+					// デコードできない文字
+					TempStr[0] = '?';
+					TempLen = 1;
+					i++;
+				} else {
+					size_t utf8_len = sizeof(TempStr);
+					utf8_len = UTF32ToUTF8(u32, TempStr, utf8_len);
+					TempLen += utf8_len;
+					i += u16_len;
+				}
+			}
+
+			if (cv->TelLineMode) {
+				if (TempLen > 0) {
+					Full = OutBuffSize - cv->LineModeBuffCount - TempLen < 0;
+					if (!Full) {
+						memcpy(&(cv->LineModeBuff[cv->LineModeBuffCount]), TempStr, TempLen);
+						cv->LineModeBuffCount += TempLen;
+						if (cv->Flush) {
+							cv->FlushLen = cv->LineModeBuffCount;
+						}
+					} else {
+						// !?
+						assert(FALSE);
+					}
+				}
+				if (cv->FlushLen > 0) {
+					int OutLen = CommRawOut(cv, cv->LineModeBuff, cv->FlushLen);
+					cv->FlushLen -= OutLen;
+					cv->LineModeBuffCount -= OutLen;
+					memmove(cv->LineModeBuff, &(cv->LineModeBuff[OutLen]), cv->LineModeBuffCount);
+				}
+				cv->Flush = FALSE;
+			}
+			else {
+				if (TempLen > 0) {
+					Full = OutBuffSize -cv->OutBuffCount -TempLen < 0;
+					if (! Full) {
+						CommRawOut(cv,TempStr,TempLen);
+					} else {
+						// !?
+						assert(FALSE);
+					}
+				}
+			}
+
+		} // end of "while {}"
+
+		return i;
+	}
+#endif
+
 	int CodePage = *cv->CodePage;
 	size_t mb_len;
 	int r;
