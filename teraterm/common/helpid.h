@@ -217,6 +217,7 @@
 #define HlpMacroAssoc                   90003
 #define HlpMacroSyntax                  91000
 #define HlpMacroSyntaxType              91001
+#define HlpMacroSyntaxFile              91007
 #define HlpMacroSyntaxFormat            91002
 #define HlpMacroSyntaxIdent             91003
 #define HlpMacroSyntaxVar               91004

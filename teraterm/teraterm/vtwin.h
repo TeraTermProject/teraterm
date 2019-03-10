@@ -135,6 +135,7 @@ protected:
 	afx_msg LRESULT OnEnterSizeMove(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnExitSizeMove(WPARAM wParam, LPARAM lParam);
 //-->
+	afx_msg LRESULT OnIMEStartComposition(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnIMEComposition(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnIMEInputChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnIMENotify(WPARAM wParam, LPARAM lParam);

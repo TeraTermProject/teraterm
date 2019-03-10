@@ -182,6 +182,7 @@ HlpMacroExec=html\macro\howtorun.html
 HlpMacroCommandline=html\macro\commandline.html
 HlpMacroAssoc=html\macro\howtoassoc.html
 HlpMacroSyntax=html\macro\syntax\index.html
+HlpMacroSyntaxFile=html\macro\syntax\file.html
 HlpMacroSyntaxType=html\macro\syntax\types.html
 HlpMacroSyntaxFormat=html\macro\syntax\formats.html
 HlpMacroSyntaxIdent=html\macro\syntax\identifiers.html

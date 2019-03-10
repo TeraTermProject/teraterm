@@ -18,56 +18,56 @@
     </p>
 
     <dl>
-      <dt>Key type</dt>
+      <dt id="type">Key type</dt>
       <dd>生成する鍵の種類を指定します。
         <dl>
-          <dt>RSA1</dt>
+          <dt id="rsa1">RSA1</dt>
           <dd>SSH1用 RSA鍵を生成します。</dd>
 
-          <dt>RSA</dt>
+          <dt id="rsa">RSA</dt>
           <dd>SSH2用 RSA鍵を生成します。</dd>
 
-          <dt>DSA</dt>
+          <dt id="dsa">DSA</dt>
           <dd>SSH2用 DSA鍵を生成します。<br />
           鍵長が1024ビット以外のDSA鍵は、SSHプロトコルとして非正規の鍵であり、サーバによっては使えない可能性がありますので作成できません。<br />
           DSA鍵の鍵長を1024ビットより大きくしても、セキュリティを高める事にはなりません。 より強度の高い鍵を使いたい場合は、RSA鍵やECDSA鍵を使用して下さい。</dd>
 
-          <dt>ECDSA-256</dt>
+          <dt id="ecdsa256">ECDSA-256</dt>
           <dd>SSH2用 ECDSA(256bit)鍵を生成します。</dd>
 
-          <dt>ECDSA-384</dt>
+          <dt id="ecdsa384">ECDSA-384</dt>
           <dd>SSH2用 ECDSA(384bit)鍵を生成します。</dd>
 
-          <dt>ECDSA-521</dt>
+          <dt id="ecdsa521">ECDSA-521</dt>
           <dd>SSH2用 ECDSA(521bit)鍵を生成します。</dd>
 
-          <dt>ED25519</dt>
+          <dt id="ed25519">ED25519</dt>
           <dd>SSH2用 ED25519鍵を生成します。</dd>
         </dl>
       </dd>
 
-      <dt>Key Bits</dt>
+      <dt id="bits">Key Bits</dt>
       <dd>生成する鍵の鍵長を指定します。</dd>
 
-      <dt>bcrypt KDF</dt>
+      <dt id="kdf">bcrypt KDF</dt>
       <dd>秘密鍵フォーマットとして bcrypt KDF を指定します。</dd>
 
-      <dt>Generate</dt>
+      <dt id="generate">Generate</dt>
       <dd>鍵を生成します。</dd>
 
-      <dt>Key passphrase</dt>
+      <dt id="passphrase">Key passphrase</dt>
       <dd>生成した秘密鍵に付けるパスフレーズを指定します。</dd>
 
-      <dt>Confirm passphrase</dt>
+      <dt id="confirm_pass">Confirm passphrase</dt>
       <dd>
         秘密鍵に付けるパスフレーズの確認をします。
         Key passphraseと同じものを入力してください。
       </dd>
 
-      <dt>Save public key</dt>
+      <dt id="save_pulic">Save public key</dt>
       <dd>生成した公開鍵を保存します。</dd>
 
-      <dt>Save private key</dt>
+      <dt id="save_private">Save private key</dt>
       <dd>生成した秘密鍵を保存します。<br />
       秘密鍵は AES-128 で暗号化されます。(Tera Term 4.76(TTSSH 2.63) までは 3DES で暗号化されました)</dd>
     <dl>

@@ -31,23 +31,40 @@
 
 <h2 id="teraterm">Tera Term</h2>
 
-<h3 id="teraterm_4.102">2019.xx.xx (Ver 4.102)</h3>
+<h3 id="teraterm_4.103">2019.xx.xx (Ver 4.103)</h3>
 <ul class="history">
-  <!-- li>Changes
+  <li>Misc
     <ul>
-      <li></li>
+      <li>upgraded TTSSH to <a href="#ttssh_2.89">2.89</a>.</li>
     </ul>
-  </li -->
+  </li>
+</ul>
 
-  <!-- li>Bug fixes
+<h3 id="teraterm_4.102">2019.02.28 (Ver 4.102)</h3>
+<ul class="history">
+  <li>Changes
     <ul>
-      <li></li>
+      <li>The AlphaBlend VT window can be configured as a different value for each active and inative.</li>
+      <li>The value of transparency can be temporarily changed by moving the mouse wheel on the title bar of the VT window.</li>
+      <li>The internal implemention of the VT window was speeded up.</li>
+      <li>UTF-8: Four bytes character can not be shown yet but can be decoded, the impact range of character corruption was be minimized.</li>
+      <li>The language code(CodePage) of the "<a href="../menu/setup-terminal.html">Terminal ([Setup] menu)</a>" dialog(<a href="../usage/unicode.html">Unicode usage</a>).</li>
+      <li>MACRO: The macro file can support UTF-8 and UTF-16(with BOM) encoding.</li>
+      <li>MACRO: The <a href="../macro/command/getfileattr.html">getfileattr</a> command can be based on the current directory same as other command.</li>
+      <li>MARCO: The <a href="../macro/command/fileopen.html">fileopen</a> command can cause an error when a file is not found with read only mode.</li>
     </ul>
-  </li -->
+  </li>
+
+  <li>Bug fixes
+    <ul>
+      <li>When the AlphaBlend window is enabled, an application fault occurs on Windows 10.</li>
+    </ul>
+  </li>
 
   <li>Misc
     <ul>
       <li>upgraded TTSSH to <a href="#ttssh_2.88">2.88</a>.</li>
+      <li>upgraded Oniguruma to 6.9.1.</li>
     </ul>
   </li>
 </ul>
@@ -3084,11 +3101,33 @@ SYNOPSIS:
 
 <h2 id="ttssh">TTSSH</h2>
 
-<h3 id="ttssh_2.88">2019.xx.xx (Ver 2.88)</h3>
+<h3 id="ttssh_2.89">2019.xx.xx (Ver 2.89)</h3>
+<ul class="history">
+  <li>Bug fixes
+    <ul>
+      <li>garbage data is added to the CipherOrder and MacOrder settings when saving settings.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ttssh_2.88">2019.02.28 (Ver 2.88)</h3>
 <ul class="history">
   <li>Changes
     <ul>
       <li>added <a href="../commandline/ttssh.html#ssh-N">/ssh-N commandline option</a> to disable a shell session when starting a connection.</li>
+      <li>Default state of <a href="../menu/setup-sshkeygenerator.html#kdf">bcrypt KDF checkbox</a> on <a href="../menu/setup-sshkeygenerator.html">SSH Key generator dialog</a> is changed to on.</li>
+    </ul>
+  </li>
+
+  <li>Bug fixes
+    <ul>
+      <li>Can't change password on SSH Change Password dialog when old password is empty string.</li>
+    </ul>
+  </li>
+
+  <li>Misc
+    <ul>
+      <li>upgraded OpenSSL to 1.0.2r.</li>
     </ul>
   </li>
 </ul>

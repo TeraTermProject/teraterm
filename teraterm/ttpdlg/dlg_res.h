@@ -120,11 +120,7 @@
 #define IDC_HOSTTCPPROTOCOLLABEL        1019
 #define IDC_HOSTTCPPROTOCOL             1020
 #define IDC_LOCALE_BOX                  1022
-#define IDC_EDIT1                       1024
 #define IDC_LOCALE_EDIT                 1024
-#define IDC_CODEPAGE_LABEL              1025
-#define IDC_EDIT2                       1026
-#define IDC_CODEPAGE_EDIT               1026
 #define IDC_TT_VERSION                  1027
 #define IDC_AUTHOR_URL                  1028
 #define IDC_FORUM_LABEL                 1029

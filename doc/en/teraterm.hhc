@@ -620,6 +620,11 @@
 			</OBJECT>
 		<UL>
 			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="TTL file">
+				<param name="Local" value="html\macro\syntax\file.html">
+				<param name="ImageNumber" value="11">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
 				<param name="Name" value="Types">
 				<param name="Local" value="html\macro\syntax\types.html">
 				<param name="ImageNumber" value="11">

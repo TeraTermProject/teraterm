@@ -1,4 +1,4 @@
-; Updated by TeraTerm Project (2018-08-27)
+; Updated by TeraTerm Project (2019-02-28)
 ; Last translated (Russian language) by Ryumik Sergey (2017-07-19)
 
 [Tera Term]
@@ -226,6 +226,8 @@ DLG_TAB_COPYPASTE_PASTEDELAY=&Вставить задержку
 DLG_TAB_COPYPASTE_PASTEDELAY2=мс
 
 DLG_TAB_VISUAL_ALPHA=&Прозрачный
+DLG_TAB_VISUAL_ALPHA_ACTIVE=&Active
+DLG_TAB_VISUAL_ALPHA_INACTIVE=Ina&ctive
 DLG_TAB_VISUAL_ETERM=&Стиль Eterm (*)
 DLG_TAB_VISUAL_BGIMG=&Фоновый рисунок
 DLG_TAB_VISUAL_BGIMG_BRIGHTNESS=&Яркость изображения
@@ -395,7 +397,6 @@ DLG_TERM_KANASEND=Half-wi&dth kana
 DLG_TERM_KIN=Kanji-i&n:
 DLG_TERM_KOUT=Kanji-&out:
 DLG_TERM_LOCALE=&Расположение:
-DLG_TERM_CODEPAGE=&Кодовая стр.:
 DLG_TERM_RUSSCHARSET=Кодировка
 DLG_TERM_RUSSHOST=&Хост:
 DLG_TERM_RUSSCLIENT=&Клиент:

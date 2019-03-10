@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="shift_jis"?>
+
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
@@ -72,10 +73,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_s.lib SFMT.lib iphlpapi.lib"
+				AdditionalDependencies="nafxcw.lib LIBCMT.lib onig_s.lib SFMT.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
+				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -161,10 +163,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="onig_sd.lib SFMTd.lib iphlpapi.lib"
+				AdditionalDependencies="nafxcwd.lib LIBCMTD.lib onig_sd.lib SFMTd.lib iphlpapi.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(SolutionDir)..\libs\oniguruma\src;$(SolutionDir)..\libs\SFMT;$(OutDir)"
+				IgnoreDefaultLibraryNames="nafxcw.lib;LIBCMT.lib"
 				DelayLoadDLLs="iphlpapi.dll;user32.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
