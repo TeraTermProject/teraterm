@@ -90,8 +90,10 @@ DllExport int WINAPI CommRawOut(PComVar cv, PCHAR B, int C);
 DllExport int WINAPI CommBinaryOut(PComVar cv, PCHAR B, int C);
 DllExport int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
 DllExport int WINAPI CommTextOut(PComVar cv, PCHAR B, int C);
+DllExport int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C);
 DllExport int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C);
 DllExport int WINAPI CommTextEcho(PComVar cv, PCHAR B, int C);
+DllExport int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C);
 
 DllExport void WINAPI CreateNotifyIcon(PComVar cv);
 DllExport void WINAPI DeleteNotifyIcon(PComVar cv);

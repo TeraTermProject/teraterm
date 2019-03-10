@@ -40,6 +40,7 @@
 #include <setupapi.h>
 #include <locale.h>
 #include <htmlhelp.h>
+#include <assert.h>
 
 #define DllExport __declspec(dllexport) 
 #include "language.h"
@@ -1587,31 +1588,26 @@ int WINAPI CommBinaryBuffOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
+// 内部コード(CodePage)をUTF-8へ出力する
 static int OutputTextUTF8(WORD K, char *TempStr, PComVar cv)
 {
+	int CodePage = *cv->CodePage;
 	unsigned int code;
 	int outlen;
-	int TempLen = 0;
 
-	code = SJIS2UTF8(K, &outlen, *cv->CodePage);
-	switch (outlen) {
-	  case 4:
-		TempStr[TempLen++] = (code >> 24) & 0xff;
-	  case 3:
-		TempStr[TempLen++] = (code >> 16) & 0xff;
-	  case 2:
-		TempStr[TempLen++] = (code >> 8) & 0xff;
-	  case 1:
-		TempStr[TempLen++] = code & 0xff;
+	code = MBCP_UTF32(K, CodePage);
+	if (code == 0) {
+		// 変換失敗
+		code = 0xfffd; // U+FFFD: Replacement Character
 	}
-
-	return TempLen;
+	outlen = UTF32ToUTF8(code, TempStr, 4);
+	return outlen;
 }
 
 //
 // MBCSから各種漢字コードへ変換して出力する。
 //
-int TextOutMBCS(PComVar cv, PCHAR B, int C)
+static int TextOutMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen, OutLen;
 	WORD K;
@@ -1928,6 +1924,42 @@ int WINAPI CommTextOut(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
+/**
+ * CommTextOut() の wchar_t 版
+ * 今の所IMEからしか使っていないため
+ * 制御コード系は未テスト
+ */
+int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
+{
+	int CodePage = *cv->CodePage;
+	size_t mb_len;
+	int r;
+	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
+	if (mb_str == NULL) {
+		r = 0;
+	} else {
+		r = CommTextOut(cv, mb_str, mb_len);
+		free(mb_str);
+	}
+	return r;
+}
+
+// TODO: UTF-16から直接変換して出力する
+int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C)
+{
+	int CodePage = *cv->CodePage;
+	size_t mb_len;
+	int r;
+	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
+	if (mb_str == NULL) {
+		r = 0;
+	} else {
+		r = CommTextEcho(cv, mb_str, mb_len);
+		free(mb_str);
+	}
+	return r;
+}
+
 int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 {
 	int a, i, Len;
@@ -1972,7 +2004,7 @@ int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)
 	return i;
 }
 
-int WINAPI TextEchoMBCS(PComVar cv, PCHAR B, int C)
+static int WINAPI TextEchoMBCS(PComVar cv, PCHAR B, int C)
 {
 	int i, TempLen;
 	WORD K;

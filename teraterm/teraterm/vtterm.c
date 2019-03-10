@@ -5414,13 +5414,6 @@ static void ParseASCII(BYTE b)
 }
 
 //
-// UTF-8
-//
-#include "uni2sjis.map"
-#include "unisym2decsp.map"
-
-
-//
 // Unicode Combining Character Support
 //
 #include "uni_combining.map"
@@ -5473,17 +5466,16 @@ static int GetIndexOfCombiningFirstCode(unsigned short code, const combining_map
 	return (index);
 }
 
-// unicode(UTF-16,wchar_t)をバッファへ書き込む
+// unicode(UTF-32,wchar_t)をバッファへ書き込む
 static void UnicodeToCP932(unsigned int code)
 {
-	wchar_t wchar = (wchar_t)code;
 	int ret;
 	char mbchar[2];
 	unsigned short cset;
 
 	// UnicodeからDEC特殊文字へのマッピング
 	if (ts.UnicodeDecSpMapping) {
-		cset = ConvertUnicode(wchar, mapUnicodeSymbolToDecSp, MAPSIZE(mapUnicodeSymbolToDecSp));
+		cset = UTF32ToDecSp(code);
 		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
 			PutDecSp(cset & 0xff);
 			return;
@@ -5491,20 +5483,19 @@ static void UnicodeToCP932(unsigned int code)
 	}
 
 	// Unicode -> 内部コード(ts.CodePage)へ変換して出力
-	ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	if (ts.CodePage == 932) {
+		ret = (int)UTF32ToCP932(code, mbchar, 2);
+	} else {
+		if (code >= 0x10000) {
+			goto unknown;
+		}
+		wchar_t wchar;
+		wchar = (wchar_t)code;
+		ret = WideCharToMultiByte(ts.CodePage, 0, &wchar, 1, mbchar, 2, NULL, NULL);
+	}
 	switch (ret) {
 	case 0:
-		if (ts.CodePage == 932) {
-			// CP932
-			// U+301Cなどは変換できない。Unicode -> Shift_JISへ変換してみる。
-			cset = ConvertUnicode(code, mapUnicodeToSJIS, MAPSIZE(mapUnicodeToSJIS));
-			if (cset != 0) {
-				Kanji = cset & 0xff00;
-				PutKanji(cset & 0x00ff);
-				return;
-			}
-		}
-
+	unknown:
 		PutChar('?');
 		if (ts.UnknownUnicodeCharaAsWide) {
 			PutChar('?');

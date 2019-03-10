@@ -1958,7 +1958,7 @@ void ChangeFont()
   VTFont[0] = CreateFontIndirect(&VTlf);
 
   /* set IME font */
-  SetConversionLogFont(&VTlf);
+  SetConversionLogFont(HVTWin, &VTlf);
 
   SelectObject(TmpDC, VTFont[0]);
   GetTextMetrics(TmpDC, &Metrics);
@@ -2039,7 +2039,7 @@ void ResetIME()
 			if (ts.IMEInline>0) {
 				LOGFONTA VTlf;
 				SetLogFont(&VTlf);
-				SetConversionLogFont(&VTlf);
+				SetConversionLogFont(HVTWin, &VTlf);
 			}
 			else
 				SetConversionWindow(HVTWin,-1,0);

@@ -3097,7 +3097,6 @@ LRESULT CVTWindow::OnExitSizeMove(WPARAM wParam, LPARAM lParam)
 }
 //-->
 
-
 LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 {
 	// ˆÊ’u‚ð’Ê’m‚·‚é
@@ -3110,58 +3109,29 @@ LRESULT CVTWindow::OnIMEStartComposition(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 {
-	HGLOBAL hstr;
-	//LPSTR lpstr;
-	wchar_t *lpstr;
-	int Len;
-	char *mbstr;
-	int mlen;
-
 	if (CanUseIME()) {
-		hstr = GetConvString(wParam, lParam);
-	}
-	else {
-		hstr = NULL;
-	}
-
-	if (hstr!=NULL) {
-		//lpstr = (LPSTR)GlobalLock(hstr);
-		lpstr = (wchar_t *)GlobalLock(hstr);
-		if (lpstr!=NULL) {
-			mlen = wcstombs(NULL, lpstr, 0);
-			mbstr = (char *)malloc(sizeof(char) * (mlen + 1));
-			if (mbstr == NULL) {
-				goto skip;
-			}
-			Len = wcstombs(mbstr, lpstr, mlen + 1);
-
-			// add this string into text buffer of application
-			Len = strlen(mbstr);
-			if (Len==1) {
-				switch (mbstr[0]) {
+		size_t len;
+		const wchar_t *lpstr = GetConvString(HVTWin, wParam, lParam, &len);
+		if (lpstr != NULL) {
+			if (len == 1 && ControlKey()) {
+				const static wchar_t code_ctrl_space = 0;
+				const static wchar_t code_ctrl_backslash = 0x1c;
+				switch(*lpstr) {
 				case 0x20:
-					if (ControlKey()) {
-						mbstr[0] = 0; /* Ctrl-Space */
-					}
+					lpstr = &code_ctrl_space;
 					break;
 				case 0x5c: // Ctrl-\ support for NEC-PC98
-					if (ControlKey()) {
-						mbstr[0] = 0x1c;
-					}
+					lpstr = &code_ctrl_backslash;
 					break;
 				}
 			}
 			if (ts.LocalEcho>0) {
-				CommTextEcho(&cv,mbstr,Len);
+				CommTextEchoW(&cv,lpstr,len);
 			}
-			CommTextOut(&cv,mbstr,Len);
-
-			free(mbstr);
-			GlobalUnlock(hstr);
+			CommTextOutW(&cv,lpstr,len);
+			free((void *)lpstr);
+			return 0;
 		}
-skip:
-		GlobalFree(hstr);
-		return 0;
 	}
 	return CFrameWnd::DefWindowProc(WM_IME_COMPOSITION,wParam,lParam);
 }
@@ -6228,6 +6198,9 @@ LRESULT CVTWindow::Proc(UINT msg, WPARAM wp, LPARAM lp)
 	case WM_DEVICECHANGE:
 		OnDeviceChange((UINT)wp, (DWORD_PTR)lp);
 		DefWindowProc(msg, wp, lp);
+		break;
+	case WM_IME_STARTCOMPOSITION :
+		OnIMEStartComposition(wp, lp);
 		break;
 	case WM_IME_COMPOSITION:
 		OnIMEComposition(wp, lp);

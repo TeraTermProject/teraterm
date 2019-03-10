@@ -56,14 +56,15 @@ DllExport void GetI18nStr(const char *section, const char *key, PCHAR buf, int b
 // TODO: バッファ不足時の動作
 DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
 {
-	int r;
+	size_t r;
 #if defined(UNICODE)
 	wchar_t tmp[MAX_UIMSG];
 	wchar_t defW[MAX_UIMSG];
 	r = UTF8ToWideChar(def, -1, defW, _countof(defW));
 	assert(r != 0);
 	GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
-	r = WideCharToUTF8(tmp, -1, buf, buf_len);
+	r = buf_len;
+	WideCharToUTF8(tmp, NULL, buf, &r);
 	assert(r != 0);
 #else
 	// ANSI -> Wide -> utf8
@@ -72,7 +73,8 @@ DllExport void GetI18nStrU8(const char *section, const char *key, char *buf, int
 	GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
 	r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
 	assert(r != 0);
-	r = WideCharToUTF8(strW, -1, buf, buf_len);
+	r = buf_len;
+	WideCharToUTF8(strW, NULL, buf, &r);
 	assert(r != 0);
 #endif
 }

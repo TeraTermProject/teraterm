@@ -32,7 +32,6 @@
 #pragma once
 
 #include <windows.h>	// for WINAPI
-#include "codemap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,13 +42,11 @@ extern "C" {
 #endif
 
 /* proto types */
-DllExport unsigned int WINAPI SJIS2UTF8(WORD KCode, int *byte, int CodePage);
 DllExport WORD WINAPI SJIS2JIS(WORD KCode);
 DllExport WORD WINAPI SJIS2EUC(WORD KCode);
 DllExport WORD WINAPI JIS2SJIS(WORD KCode);
 DllExport BYTE WINAPI RussConv(int cin, int cout, BYTE b);
 DllExport void WINAPI RussConvStr(int cin, int cout, PCHAR Str, int count);
-DllExport unsigned short ConvertUnicode(unsigned short code, const codemap_t *table, int tmax);
 
 #ifdef __cplusplus
 }
