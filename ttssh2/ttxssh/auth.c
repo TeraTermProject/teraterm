@@ -1112,6 +1112,10 @@ static void init_TIS_dlg(PTInstVar pvar, HWND dlg)
 					   pvar->auth_state.TIS_prompt);
 		destroy_malloced_string(&pvar->auth_state.TIS_prompt);
 	}
+
+	if (pvar->auth_state.echo) {
+		SendMessage(GetDlgItem(dlg, IDC_SSHPASSWORD), EM_SETPASSWORDCHAR, 0, 0);
+	}
 }
 
 static BOOL end_TIS_dlg(PTInstVar pvar, HWND dlg)
@@ -1443,6 +1447,7 @@ void AUTH_init(PTInstVar pvar)
 	pvar->auth_state.user = NULL;
 	pvar->auth_state.flags = 0;
 	pvar->auth_state.TIS_prompt = NULL;
+	pvar->auth_state.echo = 0;
 	pvar->auth_state.supported_types = 0;
 	pvar->auth_state.cur_cred.method = SSH_AUTH_NONE;
 	pvar->auth_state.cur_cred.password = NULL;
@@ -1457,7 +1462,7 @@ void AUTH_set_generic_mode(PTInstVar pvar)
 	destroy_malloced_string(&pvar->auth_state.TIS_prompt);
 }
 
-void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len)
+void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len, int echo)
 {
 	if (pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
 		pvar->auth_state.mode = TIS_AUTH_MODE;
@@ -1466,6 +1471,7 @@ void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len)
 		pvar->auth_state.TIS_prompt = malloc(len + 1);
 		memcpy(pvar->auth_state.TIS_prompt, prompt, len);
 		pvar->auth_state.TIS_prompt[len] = 0;
+		pvar->auth_state.echo = echo;
 	} else {
 		AUTH_set_generic_mode(pvar);
 	}

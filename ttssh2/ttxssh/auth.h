@@ -56,13 +56,14 @@ typedef struct {
 
   AuthMode mode;
   char *TIS_prompt;
+  int echo;
 } AUTHState;
 
 void AUTH_init(PTInstVar pvar);
 char *AUTH_get_user_name(PTInstVar pvar);
 int AUTH_set_supported_auth_types(PTInstVar pvar, int types);
 void AUTH_set_generic_mode(PTInstVar pvar);
-void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len);
+void AUTH_set_TIS_mode(PTInstVar pvar, char *prompt, int len, int echo);
 void AUTH_advance_to_next_cred(PTInstVar pvar);
 void AUTH_do_cred_dialog(PTInstVar pvar);
 void AUTH_do_default_cred_dialog(PTInstVar pvar);

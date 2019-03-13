@@ -1452,7 +1452,7 @@ static BOOL handle_TIS_challenge(PTInstVar pvar)
 		if (grab_payload(pvar, len)) {
 			logputs(LOG_LEVEL_VERBOSE, "Received TIS challenge");
 
-			AUTH_set_TIS_mode(pvar, pvar->ssh_state.payload + 4, len);
+			AUTH_set_TIS_mode(pvar, pvar->ssh_state.payload + 4, len, 0);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			try_send_credentials(pvar);
@@ -7200,7 +7200,7 @@ BOOL handle_SSH2_userauth_inforeq(PTInstVar pvar)
 		// keyboard-interactive method (2005.3.12 yutaka)
 		if (pvar->keyboard_interactive_password_input == 0 &&
 			pvar->auth_state.cur_cred.method == SSH_AUTH_TIS) {
-			AUTH_set_TIS_mode(pvar, prompt, slen);
+			AUTH_set_TIS_mode(pvar, prompt, slen, echo);
 			AUTH_advance_to_next_cred(pvar);
 			pvar->ssh_state.status_flags &= ~STATUS_DONT_SEND_CREDENTIALS;
 			//try_send_credentials(pvar);
