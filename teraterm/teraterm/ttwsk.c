@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 
 #include "teraterm.h"
 #include "ttwsk.h"
+#include <wspiapi.h>
 #include "WSAAsyncGetAddrInfo.h"
 
 static HANDLE HWinsock = NULL;

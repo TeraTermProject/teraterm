@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1998-2001, Robert O'Callahan
- * (C) 2004-2017 TeraTerm Project
+ * (C) 2004-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,7 @@ See LICENSE.TXT for the license.
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <wspiapi.h>
 /* actual body of in6addr_any and in6addr_loopback is disappeared?? */
 #undef IN6_IS_ADDR_LOOPBACK
 #define IN6_IS_ADDR_LOOPBACK(a)         \
