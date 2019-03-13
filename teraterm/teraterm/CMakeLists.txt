@@ -167,7 +167,6 @@ target_link_libraries(
   imm32
   imagehlp
   delayimp
-  oleaut32
   uuid
   )
 
