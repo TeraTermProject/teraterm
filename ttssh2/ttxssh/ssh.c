@@ -7325,7 +7325,7 @@ BOOL handle_SSH2_userauth_pkok(PTInstVar pvar)
 		finish_send_packet(pvar);
 		buffer_free(msg);
 
-		logputs(LOG_LEVEL_VERBOSE, "SSH2_MSG_USERAUTH_REQUEST was sent at handle_SSH2_userauth_inforeq().");
+		logputs(LOG_LEVEL_VERBOSE, __FUNCTION__ ": sending SSH2_MSG_USERAUTH_REQUEST method=publickey");
 
 		pvar->pageant_keyfinal = TRUE;
 
