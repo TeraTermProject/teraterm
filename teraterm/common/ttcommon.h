@@ -76,8 +76,10 @@ int PASCAL CommRawOut(PComVar cv, PCHAR B, int C);
 int PASCAL CommBinaryOut(PComVar cv, PCHAR B, int C);
 int PASCAL CommBinaryBuffOut(PComVar cv, PCHAR B, int C);
 int PASCAL CommTextOut(PComVar cv, PCHAR B, int C);
+int PASCAL CommTextOutW(PComVar cv, const wchar_t *B, int C);
 int PASCAL CommBinaryEcho(PComVar cv, PCHAR B, int C);
 int PASCAL CommTextEcho(PComVar cv, PCHAR B, int C);
+int PASCAL CommTextEchoW(PComVar cv, const wchar_t *B, int C);
 
 void PASCAL CreateNotifyIcon(PComVar cv);
 void PASCAL DeleteNotifyIcon(PComVar cv);

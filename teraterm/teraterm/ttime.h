@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,11 +38,12 @@ BOOL LoadIME();
 void FreeIME();
 BOOL CanUseIME();
 void SetConversionWindow(HWND HWin, int X, int Y);
-void SetConversionLogFont(HWND HWin, PLOGFONT lf);
+void SetConversionLogFont(HWND HWin, PLOGFONTA lf);
 BOOL GetIMEOpenStatus(void);
 void SetIMEOpenStatus(BOOL stat);
 
-HGLOBAL GetConvString(UINT wParam, LPARAM lParam);
+const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len);
+LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns);
 
 #ifndef WM_IME_COMPOSITION
 #define WM_IME_COMPOSITION              0x010F

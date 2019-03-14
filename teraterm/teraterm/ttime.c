@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,17 +29,24 @@
 /* Tera Term */
 /* TERATERM.EXE, IME interface */
 
-#include "teraterm.h"
-#include "tttypes.h"
+#undef UNICODE
+#undef _UNICODE
+
+#include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <imm.h>
 
-#include "ttwinman.h"
-#include "ttcommon.h"
-
 #include "ttime.h"
 #include "ttlib.h"
+
+#if 1
+#include "teraterm.h"
+#include "tttypes.h"
+#include "ttwinman.h"
+#include "ttcommon.h"
+#include "buffer.h"		// for BuffGetCurrentLineData()
+#endif
 
 #ifndef _IMM_
   #define _IMM_
@@ -55,8 +62,8 @@
 
 #define GCS_RESULTSTR 0x0800
 
-typedef LONG (WINAPI *TImmGetCompositionString)
-	(HIMC, DWORD, LPVOID, DWORD);
+typedef LONG (WINAPI *TImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
+typedef LONG (WINAPI *TImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
 typedef HIMC (WINAPI *TImmGetContext)(HWND);
 typedef BOOL (WINAPI *TImmReleaseContext)(HWND, HIMC);
 typedef BOOL (WINAPI *TImmSetCompositionFont)(HIMC, LPLOGFONTA);
@@ -64,7 +71,8 @@ typedef BOOL (WINAPI *TImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
 typedef BOOL (WINAPI *TImmGetOpenStatus)(HIMC);
 typedef BOOL (WINAPI *TImmSetOpenStatus)(HIMC, BOOL);
 
-static TImmGetCompositionString PImmGetCompositionString;
+static TImmGetCompositionStringW PImmGetCompositionStringW;
+static TImmGetCompositionStringA PImmGetCompositionStringA;
 static TImmGetContext PImmGetContext;
 static TImmReleaseContext PImmReleaseContext;
 static TImmSetCompositionFont PImmSetCompositionFont;
@@ -74,8 +82,29 @@ static TImmSetOpenStatus PImmSetOpenStatus;
 
 
 static HANDLE HIMEDLL = NULL;
-static LOGFONT lfIME;
+static LOGFONTA lfIME;
 
+#if 1
+static void show_message()
+{
+  char uimsg[MAX_UIMSG];
+    get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
+    get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
+    MessageBoxA(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
+    WritePrivateProfileStringA("Tera Term","IME","off",ts.SetupFName);
+    ts.UseIME = 0;
+#if 0
+    tempts = (PTTSet)malloc(sizeof(TTTSet));
+    if (tempts!=NULL)
+    {
+		GetDefaultSet(tempts);
+		tempts->UseIME = 0;
+		ChangeDefaultSet(tempts,NULL);
+		free(tempts);
+    }
+#endif
+}
+#endif
 
 BOOL LoadIME()
 {
@@ -83,38 +112,27 @@ BOOL LoadIME()
 #if 0
   PTTSet tempts;
 #endif
-  char uimsg[MAX_UIMSG];
   char imm32_dll[MAX_PATH];
 
   if (HIMEDLL != NULL) return TRUE;
-  GetSystemDirectory(imm32_dll, sizeof(imm32_dll));
+  GetSystemDirectoryA(imm32_dll, sizeof(imm32_dll));
   strncat_s(imm32_dll, sizeof(imm32_dll), "\\imm32.dll", _TRUNCATE);
-  HIMEDLL = LoadLibrary(imm32_dll);
+  HIMEDLL = LoadLibraryA(imm32_dll);
   if (HIMEDLL == NULL)
   {
-    get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
-    get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
-    MessageBox(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
-    WritePrivateProfileString("Tera Term","IME","off",ts.SetupFName);
-    ts.UseIME = 0;
-#if 0
-    tempts = (PTTSet)malloc(sizeof(TTTSet));
-    if (tempts!=NULL)
-    {
-      GetDefaultSet(tempts);
-      tempts->UseIME = 0;
-      ChangeDefaultSet(tempts,NULL);
-      free(tempts);
-    }
-#endif
+	  show_message();
     return FALSE;
   }
 
   Err = FALSE;
 
-  PImmGetCompositionString = (TImmGetCompositionString)GetProcAddress(
+  PImmGetCompositionStringW = (TImmGetCompositionStringW)GetProcAddress(
+    HIMEDLL, "ImmGetCompositionStringW");
+  if (PImmGetCompositionStringW==NULL) Err = TRUE;
+
+  PImmGetCompositionStringA = (TImmGetCompositionStringA)GetProcAddress(
     HIMEDLL, "ImmGetCompositionStringA");
-  if (PImmGetCompositionString==NULL) Err = TRUE;
+  if (PImmGetCompositionStringA==NULL) Err = TRUE;
 
   PImmGetContext = (TImmGetContext)GetProcAddress(
     HIMEDLL, "ImmGetContext");
@@ -202,50 +220,53 @@ void SetConversionLogFont(HWND HWin, PLOGFONT lf)
   (*PImmReleaseContext)(HVTWin,hIMC);
 }
 
-HGLOBAL GetConvString(UINT wParam, LPARAM lParam)
+/*
+ *	@param[in,out]	*len	wchar_t文字数
+ *	@reterun		変換wchar_t文字列へのポインタ
+ *					NULLの場合変換確定していない(またはエラー)
+ *					文字列は使用後free()すること
+ */
+const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len)
 {
-	HIMC hIMC;
-	HGLOBAL hstr = NULL;
-	//LPSTR lpstr;
 	wchar_t *lpstr;
-	DWORD dwSize;
 
+	*len = 0;
 	if (HIMEDLL==NULL) return NULL;
-	hIMC = (*PImmGetContext)(HVTWin);
-	if (hIMC==0) return NULL;
 
-	if ((lParam & GCS_RESULTSTR)==0)
-		goto skip;
+	if ((lParam & GCS_RESULTSTR) != 0) {
+		HIMC hIMC;
+		LONG size;
 
-	// Get the size of the result string.
-	//dwSize = (*PImmGetCompositionString)(hIMC, GCS_RESULTSTR, NULL, 0);
-	dwSize = ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
-	dwSize += sizeof(WCHAR);
-	hstr = GlobalAlloc(GHND,dwSize);
-	if (hstr != NULL)
-	{
-//		lpstr = (LPSTR)GlobalLock(hstr);
-		lpstr = GlobalLock(hstr);
-		if (lpstr != NULL)
-		{
-#if 0
-			// Get the result strings that is generated by IME into lpstr.
-			(*PImmGetCompositionString)
-				(hIMC, GCS_RESULTSTR, lpstr, dwSize);
-#else
-			ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, lpstr, dwSize);
-#endif
-			GlobalUnlock(hstr);
+		hIMC = (*PImmGetContext)(hWnd);
+		if (hIMC==0) return NULL;
+
+		// Get the size of the result string.
+		//		注意 ImmGetCompositionStringW() の戻り値は byte 数
+		size = PImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
+		if (size <= 0) {
+			lpstr = NULL;		// エラー
+		} else {
+			lpstr = malloc(size + sizeof(WCHAR));
+			if (lpstr != NULL)
+			{
+				size = PImmGetCompositionStringW(hIMC, GCS_RESULTSTR, lpstr, size);
+				if (size <= 0) {
+					free(lpstr);
+					lpstr = NULL;
+				} else {
+					*len = size/2;
+					lpstr[(size/2)] = 0;	// ターミネートする
+				}
+			}
 		}
-		else {
-			GlobalFree(hstr);
-			hstr = NULL;
-		}
+
+		(*PImmReleaseContext)(hWnd, hIMC);
+
+	} else {
+		lpstr = NULL;
 	}
 
-skip:
-	(*PImmReleaseContext)(HVTWin, hIMC);
-	return hstr;
+	return lpstr;
 }
 
 BOOL GetIMEOpenStatus()
@@ -269,4 +290,68 @@ void SetIMEOpenStatus(BOOL stat) {
 	hIMC = (*PImmGetContext)(HVTWin);
 	(*PImmSetOpenStatus)(hIMC, stat);
 	(*PImmReleaseContext)(HVTWin, hIMC);
+}
+
+// IMEの前後参照変換機能への対応
+// MSからちゃんと仕様が提示されていないので、アドホックにやるしかないらしい。
+// cf. http://d.hatena.ne.jp/topiyama/20070703
+//     http://ice.hotmint.com/putty/#DOWNLOAD
+//     http://27213143.at.webry.info/201202/article_2.html
+//     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
+// (2012.5.9 yutaka)
+LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns)
+{
+	static int complen, newsize;
+	static char comp[512];
+	int size, ret;
+	char buf[512], newbuf[1024];
+	HIMC hIMC;
+
+	// "IME=off"の場合は、何もしない。
+	size = NumOfColumns + 1;   // カーソルがある行の長さ+null
+
+	if (lParam == 0) {  // 1回目の呼び出し
+		// バッファのサイズを返すのみ。
+		// ATOK2012では常に complen=0 となる。
+		complen = 0;
+		memset(comp, 0, sizeof(comp));
+		hIMC = PImmGetContext(HVTWin);
+		if (hIMC) {
+			ret = PImmGetCompositionStringA(hIMC, GCS_COMPSTR, comp, sizeof(comp));
+			if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
+				memset(comp, 0, sizeof(comp));
+			}
+			complen = strlen(comp);  // w/o null
+			PImmReleaseContext(HVTWin, hIMC);
+		}
+		newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
+
+	} else {  // 2回目の呼び出し
+		//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
+		RECONVERTSTRING *pReconv   = (RECONVERTSTRING*)lParam;
+		char*  pszParagraph        = (char*)pReconv + sizeof(RECONVERTSTRING);
+		int cx;
+
+		cx = BuffGetCurrentLineData(buf, sizeof(buf));
+
+		// カーソル位置に変換文字列を挿入する。
+		memset(newbuf, 0, sizeof(newbuf));
+		memcpy(newbuf, buf, cx);
+		memcpy(newbuf + cx, comp, complen);
+		memcpy(newbuf + cx + complen, buf + cx, size - cx);
+		newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
+
+		pReconv->dwSize            = sizeof(RECONVERTSTRING);
+		pReconv->dwVersion         = 0;
+		pReconv->dwStrLen          = newsize - 1;
+		pReconv->dwStrOffset       = sizeof(RECONVERTSTRING);
+		pReconv->dwCompStrLen      = complen;
+		pReconv->dwCompStrOffset   = cx;
+		pReconv->dwTargetStrLen    = complen;
+		pReconv->dwTargetStrOffset = cx;
+
+		memcpy(pszParagraph, newbuf, newsize);
+		//OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
+	}
+	return (sizeof(RECONVERTSTRING) + newsize);
 }

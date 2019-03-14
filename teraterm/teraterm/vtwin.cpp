@@ -3218,70 +3218,41 @@ LRESULT CVTWindow::OnIMEEndComposition(WPARAM wParam, LPARAM lParam)
 
 LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 {
-	HGLOBAL hstr;
-	//LPSTR lpstr;
-	wchar_t *lpstr;
-	int Len;
-	char *mbstr;
-	int mlen;
-
 	if (CanUseIME()) {
-		hstr = GetConvString(wParam, lParam);
-	}
-	else {
-		hstr = NULL;
-	}
-
-	if (hstr!=NULL) {
-		//lpstr = (LPSTR)GlobalLock(hstr);
-		lpstr = (wchar_t *)GlobalLock(hstr);
-		if (lpstr!=NULL) {
-			mlen = wcstombs(NULL, lpstr, 0);
-			mbstr = (char *)malloc(sizeof(char) * (mlen + 1));
-			if (mbstr == NULL) {
-				goto skip;
-			}
-			Len = wcstombs(mbstr, lpstr, mlen + 1);
-
-			// add this string into text buffer of application
-			Len = strlen(mbstr);
-			if (Len==1) {
-				switch (mbstr[0]) {
+		size_t len;
+		const wchar_t *lpstr = GetConvString(HVTWin, wParam, lParam, &len);
+		if (lpstr != NULL) {
+			if (len == 1 && ControlKey()) {
+				const static wchar_t code_ctrl_space = 0;
+				const static wchar_t code_ctrl_backslash = 0x1c;
+				switch(*lpstr) {
 				case 0x20:
-					if (ControlKey()) {
-						mbstr[0] = 0; /* Ctrl-Space */
-					}
+					lpstr = &code_ctrl_space;
 					break;
 				case 0x5c: // Ctrl-\ support for NEC-PC98
-					if (ControlKey()) {
-						mbstr[0] = 0x1c;
-					}
+					lpstr = &code_ctrl_backslash;
 					break;
 				}
 			}
 			if (ts.LocalEcho>0) {
-				CommTextEcho(&cv,mbstr,Len);
+				CommTextEchoW(&cv,lpstr,len);
 			}
-			CommTextOut(&cv,mbstr,Len);
-
-			free(mbstr);
-			GlobalUnlock(hstr);
+			CommTextOutW(&cv,lpstr,len);
+			free((void *)lpstr);
+			return 0;
 		}
-skip:
-		GlobalFree(hstr);
-		return 0;
 	}
 	return CFrameWnd::DefWindowProc(WM_IME_COMPOSITION,wParam,lParam);
 }
 
-LONG CVTWindow::OnIMEInputChange(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMEInputChange(WPARAM wParam, LPARAM lParam)
 {
 	ChangeCaret();
 
 	return CFrameWnd::DefWindowProc(WM_INPUTLANGCHANGE,wParam,lParam);
 }
 
-LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 {
 	switch (wParam) {
 	case IMN_SETOPENSTATUS: {
@@ -3326,72 +3297,17 @@ LONG CVTWindow::OnIMENotify(UINT wParam, LONG lParam)
 	return CFrameWnd::DefWindowProc(WM_IME_NOTIFY,wParam,lParam);
 }
 
-// IMEの前後参照変換機能への対応
-// MSからちゃんと仕様が提示されていないので、アドホックにやるしかないらしい。
-// cf. http://d.hatena.ne.jp/topiyama/20070703
-//     http://ice.hotmint.com/putty/#DOWNLOAD
-//     http://27213143.at.webry.info/201202/article_2.html
-//     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
-// (2012.5.9 yutaka)
-LONG CVTWindow::OnIMERequest(UINT wParam, LONG lParam)
+LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 {
-	static int complen, newsize;
-	static char comp[512];
-	int size, ret;
-	char buf[512], newbuf[1024];
-	HIMC hIMC;
-
 	// "IME=off"の場合は、何もしない。
-	if (ts.UseIME > 0 &&
-		wParam == IMR_DOCUMENTFEED) {
-		size = NumOfColumns + 1;   // カーソルがある行の長さ+null
-
-		if (lParam == 0) {  // 1回目の呼び出し
-			// バッファのサイズを返すのみ。
-			// ATOK2012では常に complen=0 となる。
-			complen = 0;
-			memset(comp, 0, sizeof(comp));
-			hIMC = ImmGetContext(HVTWin);
-			if (hIMC) {
-				ret = ImmGetCompositionString(hIMC, GCS_COMPSTR, comp, sizeof(comp));
-				if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
-					memset(comp, 0, sizeof(comp));
-				}
-				complen = strlen(comp);  // w/o null
-				ImmReleaseContext(HVTWin, hIMC);
-			}
-			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-
-		} else {  // 2回目の呼び出し
-			//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
-			RECONVERTSTRING *pReconv   = (RECONVERTSTRING*)lParam;
-			char*  pszParagraph        = (char*)pReconv + sizeof(RECONVERTSTRING);
-			int cx;
-
-			cx = BuffGetCurrentLineData(buf, sizeof(buf));
-
-			// カーソル位置に変換文字列を挿入する。
-			memset(newbuf, 0, sizeof(newbuf));
-			memcpy(newbuf, buf, cx);
-			memcpy(newbuf + cx, comp, complen);
-			memcpy(newbuf + cx + complen, buf + cx, size - cx);
-			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-
-			pReconv->dwSize            = sizeof(RECONVERTSTRING);
-			pReconv->dwVersion         = 0;
-			pReconv->dwStrLen          = newsize - 1;
-			pReconv->dwStrOffset       = sizeof(RECONVERTSTRING);
-			pReconv->dwCompStrLen      = complen;
-			pReconv->dwCompStrOffset   = cx;
-			pReconv->dwTargetStrLen    = complen;
-			pReconv->dwTargetStrOffset = cx;
-
-			memcpy(pszParagraph, newbuf, newsize);
-			//OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
+	if (ts.UseIME > 0) {
+		switch(wParam) {
+		case IMR_DOCUMENTFEED:
+			return ReplyIMERequestDocumentfeed(lParam, NumOfColumns);
+		default:
+			break;
 		}
-		return (sizeof(RECONVERTSTRING) + newsize);
 	}
-
 	return CFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
 }
 

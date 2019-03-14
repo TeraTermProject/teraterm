@@ -48,6 +48,7 @@
 
 #include "compat_w95.h"
 #include "tt_res.h"
+#include "ttcommon.h"
 #include "codeconv.h"
 
 // TMap を格納するファイルマッピングオブジェクト(共有メモリ)の名前
@@ -1916,6 +1917,38 @@ int WINAPI CommTextOut(PComVar cv, PCHAR B, int C)
 	} // end of while {}
 
 	return i;
+}
+
+// TODO: UTF-16から直接変換して出力する
+int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
+{
+	int CodePage = *cv->CodePage;
+	size_t mb_len;
+	int r;
+	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
+	if (mb_str == NULL) {
+		r = 0;
+	} else {
+		r = CommTextOut(cv, mb_str, mb_len);
+		free(mb_str);
+	}
+	return r;
+}
+
+// TODO: UTF-16から直接変換して出力する
+int WINAPI CommTextEchoW(PComVar cv, const wchar_t *B, int C)
+{
+	int CodePage = *cv->CodePage;
+	size_t mb_len;
+	int r;
+	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
+	if (mb_str == NULL) {
+		r = 0;
+	} else {
+		r = CommTextEcho(cv, mb_str, mb_len);
+		free(mb_str);
+	}
+	return r;
 }
 
 int WINAPI CommBinaryEcho(PComVar cv, PCHAR B, int C)

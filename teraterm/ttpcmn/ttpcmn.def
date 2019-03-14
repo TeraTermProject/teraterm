@@ -23,8 +23,10 @@ EXPORTS
   CommBinaryOut @24
   CommBinaryBuffOut @52
   CommTextOut @25
+  CommTextOutW
   CommBinaryEcho @26
   CommTextEcho @27
+  CommTextEchoW
   DetectComPorts @42
   GetDefaultFName @47
   ExtractFileName @48
