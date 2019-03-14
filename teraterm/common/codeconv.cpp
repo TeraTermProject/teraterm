@@ -320,7 +320,7 @@ size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, uint32_t *u32_)
 		} else {
 			goto error;
 		}
-	} else if (0xf0 <= c1 && c1 <= 0xf7 && u8_len >= 4) {
+	} else if (0xf0 <= c1 && c1 <= 0xf7) {
 		// 4byte
 		if (u8_len >= 4) {
 			const uint8_t c2 = *u8_ptr++;
@@ -504,6 +504,12 @@ size_t UTF32ToUTF8(uint32_t u32, char *u8_ptr_, size_t u8_len)
 size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
 {
 	size_t u16_out;
+	if (wstr_ptr == NULL) {
+		wstr_len = 2;
+	}
+	if (wstr_len == 0) {
+		return 0;
+	}
 	if (u32 < 0x10000) {
 		if (wstr_len >= 1) {
 			if (wstr_ptr != NULL) {
@@ -542,8 +548,18 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 {
 	uint16_t cp932;
 	size_t cp932_out;
-	if (u32 == 0) {
+	if (mb_ptr == NULL) {
+		mb_len = 2;		// 2byteあれば足りるはず
+	}
+	if (mb_len == 0) {
+		// 出力先サイズが0
 		return 0;
+	}
+	if (u32 == 0) {
+		if (mb_ptr != NULL) {
+			*mb_ptr = 0;
+		}
+		return 1;
 	}
 	cp932 = UTF32_CP932(u32);
 	if (cp932 == 0) {
@@ -616,7 +632,7 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
  *
  *	@param[in]		*wstr_ptr	wchar_t文字列
  *	@param[in,out]	*wstr_len	wchar_t文字列長
- *								NULLまたは0のとき自動、L'\0'でターミネートすること)
+ *								NULLまたは0のとき自動(L'\0'でターミネートすること)
  *								NULL以外のとき入力した文字数を返す
  *	@param[in]		*mb_ptr		変換した文字列を収納するポインタ
  *								(NULLのとき変換せずに文字数をカウントする)
@@ -650,42 +666,24 @@ static void WideCharToMB(const wchar_t *wstr_ptr, size_t *wstr_len_,
 	}
 
 	while(mb_len > 0 && wstr_len > 0) {
-		const wchar_t u16 = *wstr_ptr++;
 		size_t mb_out;
-		wstr_len--;
-		wstr_in++;
-		if (u16 != 0) {
-			uint32_t u32 = u16;
-			// サロゲート high?
-			if (IsHighSurrogate(u16)) {
-				if (wstr_len >= 1) {
-					const wchar_t u16_lo = *wstr_ptr++;
-					wstr_len--;
-					wstr_in++;
-					// サロゲート low?
-					if (IsLowSurrogate(u16_lo)) {
-						// サロゲートペア デコード
-						u32 = 0x10000 + (u16 - 0xd800) * 0x400 + (u16_lo - 0xdc00);
-					} else {
-						goto unknown_code;
-					}
-				} else {
-					goto unknown_code;
-				}
-			}
-			mb_out = UTF32ToMB(u32, mb_ptr, mb_len);
-			if (mb_out == 0) {
-			unknown_code:
-				if (mb_ptr != NULL) {
-					// 変換できなかった場合
-					*mb_ptr = '?';
-				}
-				mb_out = 1;
-			}
-		} else {
-			// '\0'
+		uint32_t u32;
+		size_t wb_in = UTF16ToUTF32(wstr_ptr, wstr_len, &u32);
+		if (wb_in == 0) {
+			wstr_len -= 1;
+			wstr_in += 1;
+			wstr_ptr++;
+			goto unknown_code;
+		}
+		wstr_len -= wb_in;
+		wstr_in += wb_in;
+		wstr_ptr += wb_in;
+		mb_out = UTF32ToMB(u32, mb_ptr, mb_len);
+		if (mb_out == 0) {
+		unknown_code:
 			if (mb_ptr != NULL) {
-				*mb_ptr = 0;
+				// 変換できなかった場合
+				*mb_ptr = '?';
 			}
 			mb_out = 1;
 		}

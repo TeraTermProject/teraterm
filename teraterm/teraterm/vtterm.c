@@ -53,7 +53,6 @@
 #include "ttime.h"
 #include "clipboar.h"
 #include "codeconv.h"
-#include "codeconv.h"
 
 #include "vtterm.h"
 
