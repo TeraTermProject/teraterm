@@ -3226,22 +3226,23 @@ LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 		size_t len;
 		const wchar_t *lpstr = GetConvString(HVTWin, wParam, lParam, &len);
 		if (lpstr != NULL) {
+			const wchar_t *output_wstr = lpstr;
 			if (len == 1 && ControlKey()) {
 				const static wchar_t code_ctrl_space = 0;
 				const static wchar_t code_ctrl_backslash = 0x1c;
 				switch(*lpstr) {
 				case 0x20:
-					lpstr = &code_ctrl_space;
+					output_wstr = &code_ctrl_space;
 					break;
 				case 0x5c: // Ctrl-\ support for NEC-PC98
-					lpstr = &code_ctrl_backslash;
+					output_wstr = &code_ctrl_backslash;
 					break;
 				}
 			}
 			if (ts.LocalEcho>0) {
-				CommTextEchoW(&cv,lpstr,len);
+				CommTextEchoW(&cv,output_wstr,len);
 			}
-			CommTextOutW(&cv,lpstr,len);
+			CommTextOutW(&cv,output_wstr,len);
 			free((void *)lpstr);
 			return 0;
 		}

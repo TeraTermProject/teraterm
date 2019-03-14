@@ -34,9 +34,9 @@ extern "C" {
 #endif
 
 /* proto types */
-BOOL LoadIME();
+BOOL LoadIME(void);
 void FreeIME(HWND hWnd);
-BOOL CanUseIME();
+BOOL CanUseIME(void);
 void SetConversionWindow(HWND HWnd, int X, int Y);
 void SetConversionLogFont(HWND HWnd, PLOGFONTA lf);
 BOOL GetIMEOpenStatus(HWND hWnd);

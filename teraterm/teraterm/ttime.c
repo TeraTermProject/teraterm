@@ -45,7 +45,8 @@
 #include "buffer.h"		// for BuffGetCurrentLineData()
 #endif
 
-#if 0	// #ifndef _IMM_
+// imm.h が include できれば _IMM_ が define される → このブロック不要?
+#ifndef _IMM_
   #define _IMM_
 
   typedef DWORD HIMC;
@@ -81,32 +82,7 @@ static TImmSetOpenStatus PImmSetOpenStatus;
 static HANDLE HIMEDLL = NULL;
 static LOGFONTA lfIME;
 
-#if 1
-static void show_message()
-{
-#if 0
-  PTTSet tempts;
-#endif
-  char uimsg[MAX_UIMSG];
-    get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
-    get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
-    MessageBoxA(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
-    WritePrivateProfileStringA("Tera Term","IME","off",ts.SetupFName);
-    ts.UseIME = 0;
-#if 0
-    tempts = (PTTSet)malloc(sizeof(TTTSet));
-    if (tempts!=NULL)
-    {
-		GetDefaultSet(tempts);
-		tempts->UseIME = 0;
-		ChangeDefaultSet(tempts,NULL);
-		free(tempts);
-    }
-#endif
-}
-#endif
-
-BOOL LoadIME()
+BOOL LoadIME(void)
 {
   BOOL Err;
   char imm32_dll[MAX_PATH];
@@ -117,7 +93,6 @@ BOOL LoadIME()
   HIMEDLL = LoadLibraryA(imm32_dll);
   if (HIMEDLL == NULL)
   {
-	  show_message();
     return FALSE;
   }
 
@@ -179,7 +154,7 @@ void FreeIME(HWND hWnd)
   FreeLibrary(HTemp);
 }
 
-BOOL CanUseIME()
+BOOL CanUseIME(void)
 {
   return (HIMEDLL != NULL);
 }
@@ -280,7 +255,8 @@ BOOL GetIMEOpenStatus(HWND hWnd)
 
 }
 
-void SetIMEOpenStatus(HWND hWnd, BOOL stat) {
+void SetIMEOpenStatus(HWND hWnd, BOOL stat)
+{
 	HIMC hIMC;
 
 	if (HIMEDLL==NULL) return;
