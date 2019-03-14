@@ -29,9 +29,6 @@
 /* Tera Term */
 /* TERATERM.EXE, IME interface */
 
-#undef UNICODE
-#undef _UNICODE
-
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +45,7 @@
 #include "buffer.h"		// for BuffGetCurrentLineData()
 #endif
 
-#ifndef _IMM_
+#if 0	// #ifndef _IMM_
   #define _IMM_
 
   typedef DWORD HIMC;
@@ -58,9 +55,9 @@
     POINT ptCurrentPos;
     RECT  rcArea;
   } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, *LPCOMPOSITIONFORM;
-#endif //_IMM_
 
 #define GCS_RESULTSTR 0x0800
+#endif //_IMM_
 
 typedef LONG (WINAPI *TImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
 typedef LONG (WINAPI *TImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
@@ -87,6 +84,9 @@ static LOGFONTA lfIME;
 #if 1
 static void show_message()
 {
+#if 0
+  PTTSet tempts;
+#endif
   char uimsg[MAX_UIMSG];
     get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
     get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
@@ -109,9 +109,6 @@ static void show_message()
 BOOL LoadIME()
 {
   BOOL Err;
-#if 0
-  PTTSet tempts;
-#endif
   char imm32_dll[MAX_PATH];
 
   if (HIMEDLL != NULL) return TRUE;
@@ -168,7 +165,7 @@ BOOL LoadIME()
     return TRUE;
 }
 
-void FreeIME()
+void FreeIME(HWND hWnd)
 {
   HANDLE HTemp;
 
@@ -177,7 +174,7 @@ void FreeIME()
   HIMEDLL = NULL;
 
   /* position of conv. window -> default */
-  SetConversionWindow(HVTWin,-1,0);
+  SetConversionWindow(hWnd,-1,0);
   Sleep(1); // for safety
   FreeLibrary(HTemp);
 }
@@ -187,14 +184,14 @@ BOOL CanUseIME()
   return (HIMEDLL != NULL);
 }
 
-void SetConversionWindow(HWND HWin, int X, int Y)
+void SetConversionWindow(HWND HWnd, int X, int Y)
 {
   HIMC	hIMC;
   COMPOSITIONFORM cf;
 
   if (HIMEDLL == NULL) return;
 // Adjust the position of conversion window
-  hIMC = (*PImmGetContext)(HVTWin);
+  hIMC = (*PImmGetContext)(HWnd);
   if (X>=0)
   {
     cf.dwStyle = CFS_POINT;
@@ -204,20 +201,20 @@ void SetConversionWindow(HWND HWin, int X, int Y)
   else
     cf.dwStyle = CFS_DEFAULT;
   (*PImmSetCompositionWindow)(hIMC,&cf);
-  (*PImmReleaseContext)(HVTWin,hIMC);
+  (*PImmReleaseContext)(HWnd,hIMC);
 }
 
-void SetConversionLogFont(HWND HWin, PLOGFONT lf)
+void SetConversionLogFont(HWND HWnd, PLOGFONTA lf)
 {
   HIMC	hIMC;
   if (HIMEDLL == NULL) return;
 
   memcpy(&lfIME,lf,sizeof(LOGFONT));
 
-  hIMC = (*PImmGetContext)(HVTWin);
+  hIMC = (*PImmGetContext)(HWnd);
   // Set font for the conversion window
   (*PImmSetCompositionFont)(hIMC,&lfIME);
-  (*PImmReleaseContext)(HVTWin,hIMC);
+  (*PImmReleaseContext)(HWnd,hIMC);
 }
 
 /*
@@ -269,27 +266,27 @@ const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len)
 	return lpstr;
 }
 
-BOOL GetIMEOpenStatus()
+BOOL GetIMEOpenStatus(HWND hWnd)
 {
 	HIMC hIMC;
 	BOOL stat;
 
 	if (HIMEDLL==NULL) return FALSE;
-	hIMC = (*PImmGetContext)(HVTWin);
+	hIMC = (*PImmGetContext)(hWnd);
 	stat = (*PImmGetOpenStatus)(hIMC);
-	(*PImmReleaseContext)(HVTWin, hIMC);
+	(*PImmReleaseContext)(hWnd, hIMC);
 
 	return stat;
 
 }
 
-void SetIMEOpenStatus(BOOL stat) {
+void SetIMEOpenStatus(HWND hWnd, BOOL stat) {
 	HIMC hIMC;
 
 	if (HIMEDLL==NULL) return;
-	hIMC = (*PImmGetContext)(HVTWin);
+	hIMC = (*PImmGetContext)(hWnd);
 	(*PImmSetOpenStatus)(hIMC, stat);
-	(*PImmReleaseContext)(HVTWin, hIMC);
+	(*PImmReleaseContext)(hWnd, hIMC);
 }
 
 // IMEの前後参照変換機能への対応
@@ -299,13 +296,14 @@ void SetIMEOpenStatus(BOOL stat) {
 //     http://27213143.at.webry.info/201202/article_2.html
 //     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
 // (2012.5.9 yutaka)
-LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns)
+LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam, int NumOfColumns)
 {
 	static int complen, newsize;
 	static char comp[512];
 	int size, ret;
 	char buf[512], newbuf[1024];
 	HIMC hIMC;
+	int cx;
 
 	// "IME=off"の場合は、何もしない。
 	size = NumOfColumns + 1;   // カーソルがある行の長さ+null
@@ -315,14 +313,14 @@ LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns)
 		// ATOK2012では常に complen=0 となる。
 		complen = 0;
 		memset(comp, 0, sizeof(comp));
-		hIMC = PImmGetContext(HVTWin);
+		hIMC = PImmGetContext(hWnd);
 		if (hIMC) {
 			ret = PImmGetCompositionStringA(hIMC, GCS_COMPSTR, comp, sizeof(comp));
 			if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
 				memset(comp, 0, sizeof(comp));
 			}
 			complen = strlen(comp);  // w/o null
-			PImmReleaseContext(HVTWin, hIMC);
+			PImmReleaseContext(hWnd, hIMC);
 		}
 		newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
 
@@ -330,7 +328,6 @@ LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns)
 		//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
 		RECONVERTSTRING *pReconv   = (RECONVERTSTRING*)lParam;
 		char*  pszParagraph        = (char*)pReconv + sizeof(RECONVERTSTRING);
-		int cx;
 
 		cx = BuffGetCurrentLineData(buf, sizeof(buf));
 
@@ -351,7 +348,14 @@ LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns)
 		pReconv->dwTargetStrOffset = cx;
 
 		memcpy(pszParagraph, newbuf, newsize);
-		//OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
 	}
+
+#if 0
+	OutputDebugPrintf("WM_IME_REQUEST,IMR_DOCUMENTFEED size %d\n", newsize);
+	if (lParam == 1) {
+		OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
+	}
+#endif
+
 	return (sizeof(RECONVERTSTRING) + newsize);
 }

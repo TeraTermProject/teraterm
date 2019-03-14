@@ -118,6 +118,10 @@ static int AutoDisconnectedPort = -1;
 // 本体は addsetting.cpp
 extern mouse_cursor_t MouseCursor[];
 
+#ifndef WM_IME_COMPOSITION
+#define WM_IME_COMPOSITION              0x010F
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
 
@@ -1984,7 +1988,7 @@ void CVTWindow::OnDestroy()
 
 	OpenHelp(HH_CLOSE_ALL, 0, ts.UILanguageFile);
 
-	FreeIME();
+	FreeIME(HVTWin);
 	FreeTTSET();
 	do { }
 	while (FreeTTDLG());
@@ -3259,7 +3263,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		// 入力コンテキストの開閉状態が更新される(IME On/OFF)
 
 		// IMEのOn/Offを取得する
-		IMEstat = GetIMEOpenStatus();
+		IMEstat = GetIMEOpenStatus(HVTWin);
 
 		// 状態を表示するIMEのために位置を通知する
 		int CaretX = (CursorX-WinOrgX)*FontWidth;
@@ -3303,7 +3307,7 @@ LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 	if (ts.UseIME > 0) {
 		switch(wParam) {
 		case IMR_DOCUMENTFEED:
-			return ReplyIMERequestDocumentfeed(lParam, NumOfColumns);
+			return ReplyIMERequestDocumentfeed(HVTWin, lParam, NumOfColumns);
 		default:
 			break;
 		}

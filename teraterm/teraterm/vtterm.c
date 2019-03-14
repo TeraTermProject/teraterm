@@ -2644,19 +2644,19 @@ void CSLT(BYTE b)
 	switch (b) {
 	  case 'r':
 		if (CanUseIME()) {
-			SetIMEOpenStatus(IMEstat);
+			SetIMEOpenStatus(HVTWin, IMEstat);
 		}
 		break;
 
 	  case 's':
 		if (CanUseIME()) {
-			IMEstat = GetIMEOpenStatus();
+			IMEstat = GetIMEOpenStatus(HVTWin);
 		}
 		break;
 
 	  case 't':
 		if (CanUseIME()) {
-			SetIMEOpenStatus(Param[1] == 1);
+			SetIMEOpenStatus(HVTWin, Param[1] == 1);
 		}
 		break;
 	}

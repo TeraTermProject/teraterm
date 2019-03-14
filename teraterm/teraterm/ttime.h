@@ -35,19 +35,14 @@ extern "C" {
 
 /* proto types */
 BOOL LoadIME();
-void FreeIME();
+void FreeIME(HWND hWnd);
 BOOL CanUseIME();
-void SetConversionWindow(HWND HWin, int X, int Y);
-void SetConversionLogFont(HWND HWin, PLOGFONTA lf);
-BOOL GetIMEOpenStatus(void);
-void SetIMEOpenStatus(BOOL stat);
-
+void SetConversionWindow(HWND HWnd, int X, int Y);
+void SetConversionLogFont(HWND HWnd, PLOGFONTA lf);
+BOOL GetIMEOpenStatus(HWND hWnd);
+void SetIMEOpenStatus(HWND hWnd, BOOL stat);
 const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len);
-LRESULT ReplyIMERequestDocumentfeed(LPARAM lParam, int NumOfColumns);
-
-#ifndef WM_IME_COMPOSITION
-#define WM_IME_COMPOSITION              0x010F
-#endif
+LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam, int NumOfColumns);
 
 #ifdef __cplusplus
 }

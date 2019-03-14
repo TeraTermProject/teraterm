@@ -2057,7 +2057,7 @@ void ResetIME()
 	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
 	{
 		if (ts.UseIME==0)
-			FreeIME();
+			FreeIME(HVTWin);
 		else if (! LoadIME())
 			ts.UseIME = 0;
 
@@ -2070,7 +2070,7 @@ void ResetIME()
 		}
 	}
 	else
-		FreeIME();
+		FreeIME(HVTWin);
 
 	if (IsCaretOn()) CaretOn();
 }
