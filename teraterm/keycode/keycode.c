@@ -32,9 +32,10 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <tchar.h>
 
 #include "kc_res.h"
-#define ClassName "KeyCodeWin32"
+#define ClassName _T("KeyCodeWin32")
 
 #include "compat_w95.h"
 
@@ -64,7 +65,7 @@ int PASCAL WinMain(HINSTANCE hInstance,
 
 	DoCover_IsDebuggerPresent();
 
-	if ((module = GetModuleHandle("kernel32.dll")) != NULL) {
+	if ((module = GetModuleHandleA("kernel32.dll")) != NULL) {
 		if ((setDefDllDir = (pSetDefDllDir)GetProcAddress(module, "SetDefaultDllDirectories")) != NULL) {
 			// SetDefaultDllDirectories() が使える場合は、検索パスを %WINDOWS%\system32 のみに設定する
 			(*setDefDllDir)((DWORD)0x00000800); // LOAD_LIBRARY_SEARCH_SYSTEM32
@@ -93,7 +94,7 @@ int PASCAL WinMain(HINSTANCE hInstance,
 	ghInstance = hInstance;
 
 	hWnd = CreateWindow(ClassName,
-	                    "Key code for Tera Term",
+	                    _T("Key code for Tera Term"),
 	                    WS_OVERLAPPEDWINDOW,
 	                    CW_USEDEFAULT,
 	                    CW_USEDEFAULT,
@@ -174,10 +175,10 @@ void PaintProc(HWND hWnd)
 
 	if (KeyDown) {
 		_snprintf_s(OutStr,sizeof(OutStr),_TRUNCATE,"Key code is %u.",Scan);
-		TextOut(hDC,10,10,OutStr,strlen(OutStr));
+		TextOutA(hDC,10,10,OutStr,strlen(OutStr));
 	}
 	else {
-		TextOut(hDC,10,10,"Push any key.",13);
+		TextOutA(hDC,10,10,"Push any key.",13);
 	}
 
 	EndPaint(hWnd, &ps);
