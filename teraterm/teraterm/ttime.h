@@ -41,8 +41,14 @@ void SetConversionWindow(HWND HWnd, int X, int Y);
 void SetConversionLogFont(HWND HWnd, PLOGFONTA lf);
 BOOL GetIMEOpenStatus(HWND hWnd);
 void SetIMEOpenStatus(HWND hWnd, BOOL stat);
-const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len);
-LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam, int NumOfColumns);
+const wchar_t *GetConvStringW(HWND hWnd, LPARAM lParam, size_t *len);
+//const char *GetConvStringA(HWND hWnd, LPARAM lParam, size_t *len);
+void *CreateReconvStringStW(HWND hWnd,
+							const wchar_t *str_ptr, size_t str_count,
+							size_t cx, size_t *st_size_);
+void *CreateReconvStringStA(HWND hWnd,
+							const char *str_ptr, size_t str_count,
+							size_t cx, size_t *st_size_);
 
 #ifdef __cplusplus
 }

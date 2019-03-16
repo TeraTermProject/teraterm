@@ -71,6 +71,7 @@
 #include <windowsx.h>
 #include <imm.h>
 #include <Dbt.h>
+#include <assert.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -3224,7 +3225,7 @@ LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 {
 	if (CanUseIME()) {
 		size_t len;
-		const wchar_t *lpstr = GetConvString(HVTWin, wParam, lParam, &len);
+		const wchar_t *lpstr = GetConvStringW(HVTWin, lParam, &len);
 		if (lpstr != NULL) {
 			const wchar_t *output_wstr = lpstr;
 			if (len == 1 && ControlKey()) {
@@ -3302,13 +3303,74 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 	return CFrameWnd::DefWindowProc(WM_IME_NOTIFY,wParam,lParam);
 }
 
+static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
+{
+	static RECONVERTSTRING *pReconvPtrSave;		// TODO leak
+	static size_t ReconvSizeSave;
+	LRESULT result;
+
+	if (lParam == 0)
+	{  // 1回目の呼び出し サイズだけを返す
+		char buf[512];			// 参照文字列を受け取るバッファ
+		size_t str_len_count;
+		int cx;
+		assert(IsWindowUnicode(hWnd) == FALSE);
+
+		// 参照文字列取得、1行取り出す
+		{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
+			int x;
+			int len;
+			cx = BuffGetCurrentLineData(buf, sizeof(buf));
+			len = cx;
+			for (x=cx; x < NumOfColumns; x++) {
+				const char c = buf[x];
+				if (c != 0 && c != 0x20) {
+					len = x+1;
+				}
+			}
+			str_len_count = len;
+		}
+
+		// IMEに返す構造体を作成する
+		if (pReconvPtrSave != NULL) {
+			free(pReconvPtrSave);
+		}
+		pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStA(
+			hWnd, buf, str_len_count, cx, &ReconvSizeSave);
+
+		// 1回目はサイズだけを返す
+		result = ReconvSizeSave;
+	}
+	else {
+		// 2回目の呼び出し 構造体を渡す
+		if (pReconvPtrSave != NULL) {
+			RECONVERTSTRING *pReconv = (RECONVERTSTRING*)lParam;
+			memcpy(pReconv, pReconvPtrSave, ReconvSizeSave);
+			result = ReconvSizeSave;
+			free(pReconvPtrSave);
+			pReconvPtrSave = NULL;
+			ReconvSizeSave = 0;
+		} else {
+			// 3回目?
+			result = 0;
+		}
+	}
+
+#if 0
+	OutputDebugPrintf("WM_IME_REQUEST,IMR_DOCUMENTFEED lp=%p LRESULT %d\n",
+		lParam, result);
+#endif
+
+	return result;
+}
+
 LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
 {
 	// "IME=off"の場合は、何もしない。
 	if (ts.UseIME > 0) {
 		switch(wParam) {
 		case IMR_DOCUMENTFEED:
-			return ReplyIMERequestDocumentfeed(HVTWin, lParam, NumOfColumns);
+			return ReplyIMERequestDocumentfeed(HVTWin, lParam);
 		default:
 			break;
 		}

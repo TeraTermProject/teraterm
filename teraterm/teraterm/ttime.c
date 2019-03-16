@@ -33,16 +33,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <imm.h>
+#include <crtdbg.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include "ttime.h"
-#include "ttlib.h"
 
-#if 1
-#include "teraterm.h"
-#include "tttypes.h"
-#include "ttwinman.h"
-#include "ttcommon.h"
-#include "buffer.h"		// for BuffGetCurrentLineData()
+#ifdef _DEBUG
+#define malloc(l)	_malloc_dbg((l), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define calloc(l,n)	_calloc_dbg((l), (n), _NORMAL_BLOCK, __FILE__, __LINE__)
+#define free(p)		_free_dbg((p), _NORMAL_BLOCK)
 #endif
 
 // imm.h が include できれば _IMM_ が define される → このブロック不要?
@@ -59,6 +59,8 @@
 
 #define GCS_RESULTSTR 0x0800
 #endif //_IMM_
+
+// #define ENABLE_DUMP	1
 
 typedef LONG (WINAPI *TImmGetCompositionStringA)(HIMC, DWORD, LPVOID, DWORD);
 typedef LONG (WINAPI *TImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
@@ -88,56 +90,57 @@ BOOL LoadIME(void)
   char imm32_dll[MAX_PATH];
 
   if (HIMEDLL != NULL) return TRUE;
+
   GetSystemDirectoryA(imm32_dll, sizeof(imm32_dll));
   strncat_s(imm32_dll, sizeof(imm32_dll), "\\imm32.dll", _TRUNCATE);
   HIMEDLL = LoadLibraryA(imm32_dll);
   if (HIMEDLL == NULL)
   {
-    return FALSE;
+	return FALSE;
   }
 
   Err = FALSE;
 
   PImmGetCompositionStringW = (TImmGetCompositionStringW)GetProcAddress(
-    HIMEDLL, "ImmGetCompositionStringW");
+	HIMEDLL, "ImmGetCompositionStringW");
   if (PImmGetCompositionStringW==NULL) Err = TRUE;
 
   PImmGetCompositionStringA = (TImmGetCompositionStringA)GetProcAddress(
-    HIMEDLL, "ImmGetCompositionStringA");
+	HIMEDLL, "ImmGetCompositionStringA");
   if (PImmGetCompositionStringA==NULL) Err = TRUE;
 
   PImmGetContext = (TImmGetContext)GetProcAddress(
-    HIMEDLL, "ImmGetContext");
+	HIMEDLL, "ImmGetContext");
   if (PImmGetContext==NULL) Err = TRUE;
 
   PImmReleaseContext = (TImmReleaseContext)GetProcAddress(
-    HIMEDLL, "ImmReleaseContext");
+	HIMEDLL, "ImmReleaseContext");
   if (PImmReleaseContext==NULL) Err = TRUE;
 
   PImmSetCompositionFont = (TImmSetCompositionFont)GetProcAddress(
-    HIMEDLL, "ImmSetCompositionFontA");
+	HIMEDLL, "ImmSetCompositionFontA");
   if (PImmSetCompositionFont==NULL) Err = TRUE;
 
   PImmSetCompositionWindow = (TImmSetCompositionWindow)GetProcAddress(
-    HIMEDLL, "ImmSetCompositionWindow");
+	HIMEDLL, "ImmSetCompositionWindow");
   if (PImmSetCompositionWindow==NULL) Err = TRUE;
 
   PImmGetOpenStatus = (TImmGetOpenStatus)GetProcAddress(
-    HIMEDLL, "ImmGetOpenStatus");
+	HIMEDLL, "ImmGetOpenStatus");
   if (PImmGetOpenStatus==NULL) Err = TRUE;
 
   PImmSetOpenStatus = (TImmSetOpenStatus)GetProcAddress(
-    HIMEDLL, "ImmSetOpenStatus");
+	HIMEDLL, "ImmSetOpenStatus");
   if (PImmSetOpenStatus==NULL) Err = TRUE;
 
   if ( Err )
   {
-    FreeLibrary(HIMEDLL);
-    HIMEDLL = NULL;
-    return FALSE;
+	FreeLibrary(HIMEDLL);
+	HIMEDLL = NULL;
+	return FALSE;
   }
-  else
-    return TRUE;
+
+  return TRUE;
 }
 
 void FreeIME(HWND hWnd)
@@ -169,12 +172,12 @@ void SetConversionWindow(HWND HWnd, int X, int Y)
   hIMC = (*PImmGetContext)(HWnd);
   if (X>=0)
   {
-    cf.dwStyle = CFS_POINT;
-    cf.ptCurrentPos.x = X;
-    cf.ptCurrentPos.y = Y;
+	cf.dwStyle = CFS_POINT;
+	cf.ptCurrentPos.x = X;
+	cf.ptCurrentPos.y = Y;
   }
   else
-    cf.dwStyle = CFS_DEFAULT;
+	cf.dwStyle = CFS_DEFAULT;
   (*PImmSetCompositionWindow)(hIMC,&cf);
   (*PImmReleaseContext)(HWnd,hIMC);
 }
@@ -192,48 +195,123 @@ void SetConversionLogFont(HWND HWnd, PLOGFONTA lf)
   (*PImmReleaseContext)(HWnd,hIMC);
 }
 
+// 内部用
+static const char *GetConvStringA_i(HWND hWnd, DWORD index, size_t *len)
+{
+	HIMC hIMC;
+	LONG size;
+	char *lpstr;
+
+	hIMC = (*PImmGetContext)(hWnd);
+	if (hIMC==0)
+		goto error_2;
+
+	// Get the size of the result string.
+	//		注意 ImmGetCompositionStringA() の戻り値は byte 数
+	size = PImmGetCompositionStringA(hIMC, index, NULL, 0);
+	if (size <= 0)
+		goto error_1;
+
+	lpstr = malloc(size + sizeof(char));
+	if (lpstr == NULL)
+		goto error_1;
+
+	size = PImmGetCompositionStringA(hIMC, index, lpstr, size);
+	if (size <= 0) {
+		free(lpstr);
+		goto error_1;
+	}
+
+	*len = size;
+	lpstr[size] = 0;	// ターミネートする
+
+	(*PImmReleaseContext)(hWnd, hIMC);
+	return lpstr;
+
+error_1:
+	(*PImmReleaseContext)(hWnd, hIMC);
+error_2:
+	*len = 0;
+	return NULL;
+}
+
+// 内部用 wchar_t版
+static const wchar_t *GetConvStringW_i(HWND hWnd, DWORD index, size_t *len)
+{
+	HIMC hIMC;
+	LONG size;
+	wchar_t *lpstr;
+
+	hIMC = (*PImmGetContext)(hWnd);
+	if (hIMC==0)
+		goto error_2;
+
+	// Get the size of the result string.
+	//		注意 ImmGetCompositionStringW() の戻り値は byte 数
+	size = PImmGetCompositionStringW(hIMC, index, NULL, 0);
+	if (size <= 0)
+		goto error_1;
+
+	lpstr = malloc(size + sizeof(wchar_t));
+	if (lpstr == NULL)
+		goto error_1;
+
+	size = PImmGetCompositionStringW(hIMC, index, lpstr, size);
+	if (size <= 0) {
+		free(lpstr);
+		goto error_1;
+	}
+
+	*len = size/2;
+	lpstr[(size/2)] = 0;	// ターミネートする
+
+	(*PImmReleaseContext)(hWnd, hIMC);
+	return lpstr;
+
+error_1:
+	(*PImmReleaseContext)(hWnd, hIMC);
+error_2:
+	*len = 0;
+	return NULL;
+}
+
 /*
- *	@param[in,out]	*len	wchar_t文字数
- *	@reterun		変換wchar_t文字列へのポインタ
+ *	@param[out]		*len	wchar_t文字数('\0'は含まない)
+ *	@retval			変換wchar_t文字列へのポインタ
  *					NULLの場合変換確定していない(またはエラー)
  *					文字列は使用後free()すること
  */
-const wchar_t *GetConvString(HWND hWnd, UINT wParam, LPARAM lParam, size_t *len)
+const wchar_t *GetConvStringW(HWND hWnd, LPARAM lParam, size_t *len)
 {
-	wchar_t *lpstr;
+	const wchar_t *lpstr;
 
 	*len = 0;
 	if (HIMEDLL==NULL) return NULL;
 
 	if ((lParam & GCS_RESULTSTR) != 0) {
-		HIMC hIMC;
-		LONG size;
+		lpstr = GetConvStringW_i(hWnd, GCS_RESULTSTR, len);
+	} else {
+		lpstr = NULL;
+	}
 
-		hIMC = (*PImmGetContext)(hWnd);
-		if (hIMC==0) return NULL;
+	return lpstr;
+}
 
-		// Get the size of the result string.
-		//		注意 ImmGetCompositionStringW() の戻り値は byte 数
-		size = PImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
-		if (size <= 0) {
-			lpstr = NULL;		// エラー
-		} else {
-			lpstr = malloc(size + sizeof(WCHAR));
-			if (lpstr != NULL)
-			{
-				size = PImmGetCompositionStringW(hIMC, GCS_RESULTSTR, lpstr, size);
-				if (size <= 0) {
-					free(lpstr);
-					lpstr = NULL;
-				} else {
-					*len = size/2;
-					lpstr[(size/2)] = 0;	// ターミネートする
-				}
-			}
-		}
+/*
+ *	@param[out]		*len	文字数('\0'は含まない)
+ *	@retval			変換文字列へのポインタ
+ *					NULLの場合変換確定していない(またはエラー)
+ *					文字列は使用後free()すること
+ */
+const char *GetConvStringA(HWND hWnd, LPARAM lParam, size_t *len)
+{
+	const char *lpstr;
 
-		(*PImmReleaseContext)(hWnd, hIMC);
+	*len = 0;
+	if (HIMEDLL==NULL) return NULL;
 
+	if ((lParam & GCS_RESULTSTR) != 0) {
+		lpstr = GetConvStringA_i(hWnd, GCS_RESULTSTR, len);
 	} else {
 		lpstr = NULL;
 	}
@@ -252,7 +330,6 @@ BOOL GetIMEOpenStatus(HWND hWnd)
 	(*PImmReleaseContext)(hWnd, hIMC);
 
 	return stat;
-
 }
 
 void SetIMEOpenStatus(HWND hWnd, BOOL stat)
@@ -265,73 +342,182 @@ void SetIMEOpenStatus(HWND hWnd, BOOL stat)
 	(*PImmReleaseContext)(hWnd, hIMC);
 }
 
+#if defined(ENABLE_DUMP)
+static void DumpReconvStringSt(RECONVERTSTRING *pReconv, BOOL unicode)
+{
+	if (unicode) {
+		wchar_t tmp[1024];
+		_snwprintf(tmp, _countof(tmp),
+				   L"Str %d,%d CompStr %d,%d TargeteStr %d,%d '%s'\n",
+				   pReconv->dwStrLen,
+				   pReconv->dwStrOffset,
+				   pReconv->dwCompStrLen,
+				   pReconv->dwCompStrOffset,
+				   pReconv->dwTargetStrLen,
+				   pReconv->dwTargetStrOffset,
+				   (wchar_t *)(((char *)pReconv) + pReconv->dwStrOffset)
+			);
+		OutputDebugStringW(tmp);
+	} else {
+		char tmp[1024];
+		_snprintf(tmp, sizeof(tmp),
+				  "Str %d,%d CompStr %d,%d TargeteStr %d,%d '%s'\n",
+				  pReconv->dwStrLen,
+				  pReconv->dwStrOffset,
+				  pReconv->dwCompStrLen,
+				  pReconv->dwCompStrOffset,
+				  pReconv->dwTargetStrLen,
+				  pReconv->dwTargetStrOffset,
+				  (((char *)pReconv) + pReconv->dwStrOffset)
+			);
+		OutputDebugStringA(tmp);
+	}
+}
+#endif
+
 // IMEの前後参照変換機能への対応
 // MSからちゃんと仕様が提示されていないので、アドホックにやるしかないらしい。
 // cf. http://d.hatena.ne.jp/topiyama/20070703
-//     http://ice.hotmint.com/putty/#DOWNLOAD
-//     http://27213143.at.webry.info/201202/article_2.html
-//     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
+//	   http://ice.hotmint.com/putty/#DOWNLOAD
+//	   http://27213143.at.webry.info/201202/article_2.html
+//	   http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
 // (2012.5.9 yutaka)
-LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam, int NumOfColumns)
+/**
+ * IMEの前後参照変換機能用構造体を作成する
+ *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED の応答に使う
+ *		ANSIかUnicodeウィンドウによって参照文字列を変更すること
+ * unicode		TRUEのときunicode
+ * str_ptr		参照文字列へのポインタ
+ * str_count	参照文字列の文字数(charならbytes数,wchar_tならwchar_t数)
+ * cx			カーソル位置(char/wchar_t単位)
+ * st_size		生成した構造体のサイズ
+ * 戻り値		構造体へのポインタ
+ *				不要になったら free()すること
+ */
+static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
+								  const void *str_ptr, size_t str_count,
+								  size_t cx, size_t *st_size_)
 {
-	static int complen, newsize;
-	static char comp[512];
-	int size, ret;
-	char buf[512], newbuf[1024];
-	HIMC hIMC;
-	int cx;
+	static int new_str_len_bytes;
+	static int new_buf_len_bytes;
+	int new_str_len_count;
+	int str_len_bytes;
+	size_t str_len_count;
+	int cx_bytes;
+	RECONVERTSTRING *pReconv;
+	const void *comp_ptr;
+	size_t complen_count;
+	size_t complen_bytes;
+	const void *buf;
+	size_t st_size;
 
-	// "IME=off"の場合は、何もしない。
-	size = NumOfColumns + 1;   // カーソルがある行の長さ+null
+	buf = str_ptr;
+	str_len_count = str_count;
 
-	if (lParam == 0) {  // 1回目の呼び出し
-		// バッファのサイズを返すのみ。
-		// ATOK2012では常に complen=0 となる。
-		complen = 0;
-		memset(comp, 0, sizeof(comp));
-		hIMC = PImmGetContext(hWnd);
-		if (hIMC) {
-			ret = PImmGetCompositionStringA(hIMC, GCS_COMPSTR, comp, sizeof(comp));
-			if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
-				memset(comp, 0, sizeof(comp));
-			}
-			complen = strlen(comp);  // w/o null
-			PImmReleaseContext(hWnd, hIMC);
-		}
-		newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-
-	} else {  // 2回目の呼び出し
-		//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
-		RECONVERTSTRING *pReconv   = (RECONVERTSTRING*)lParam;
-		char*  pszParagraph        = (char*)pReconv + sizeof(RECONVERTSTRING);
-
-		cx = BuffGetCurrentLineData(buf, sizeof(buf));
-
-		// カーソル位置に変換文字列を挿入する。
-		memset(newbuf, 0, sizeof(newbuf));
-		memcpy(newbuf, buf, cx);
-		memcpy(newbuf + cx, comp, complen);
-		memcpy(newbuf + cx + complen, buf + cx, size - cx);
-		newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-
-		pReconv->dwSize            = sizeof(RECONVERTSTRING);
-		pReconv->dwVersion         = 0;
-		pReconv->dwStrLen          = newsize - 1;
-		pReconv->dwStrOffset       = sizeof(RECONVERTSTRING);
-		pReconv->dwCompStrLen      = complen;
-		pReconv->dwCompStrOffset   = cx;
-		pReconv->dwTargetStrLen    = complen;
-		pReconv->dwTargetStrOffset = cx;
-
-		memcpy(pszParagraph, newbuf, newsize);
+	if(unicode) {
+		str_len_bytes = str_len_count * sizeof(wchar_t);
+		cx_bytes = cx * sizeof(wchar_t);
+	} else {
+		str_len_bytes = str_len_count;
+		cx_bytes = cx;
 	}
 
-#if 0
-	OutputDebugPrintf("WM_IME_REQUEST,IMR_DOCUMENTFEED size %d\n", newsize);
-	if (lParam == 1) {
-		OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
+	// 変換中候補文字列を取得
+	// ATOK2012では常に complen_count=0 となる。
+	if (!unicode) {
+		const char *comp_strA;
+		comp_strA = GetConvStringA_i(hWnd, GCS_COMPSTR, &complen_count);
+		complen_bytes = complen_count;
+		comp_ptr = comp_strA;
+	} else {
+		const wchar_t *comp_strW;
+		comp_strW = GetConvStringW_i(hWnd,GCS_COMPSTR,	&complen_count);
+		complen_bytes = complen_count * sizeof(wchar_t);
+		comp_ptr = comp_strW;
 	}
+
+	// 変換文字も含めた全体の長さ(including null)
+	if (!unicode) {
+		new_str_len_bytes = str_len_bytes + complen_bytes;
+		new_buf_len_bytes = new_str_len_bytes + 1;
+		new_str_len_count = new_str_len_bytes;
+	} else {
+		new_str_len_bytes = str_len_bytes + complen_bytes;
+		new_buf_len_bytes = new_str_len_bytes + sizeof(wchar_t);
+		new_str_len_count = new_str_len_bytes / sizeof(wchar_t);
+	}
+
+	st_size = sizeof(RECONVERTSTRING) + new_buf_len_bytes;
+	pReconv = calloc(1, st_size);
+
+	// Lenは文字数(char/wchar_t単位)
+	// Offsetはbyte単位
+//	pReconv->dwSize				= sizeof(RECONVERTSTRING);
+	pReconv->dwSize				= sizeof(RECONVERTSTRING) + new_buf_len_bytes;
+	pReconv->dwVersion			= 0;
+	pReconv->dwStrLen			= new_str_len_count;
+	pReconv->dwStrOffset		= sizeof(RECONVERTSTRING);
+	pReconv->dwCompStrLen		= complen_count;
+	pReconv->dwCompStrOffset	= cx_bytes;
+	pReconv->dwTargetStrLen		= complen_count;		// = dwCompStrOffset
+	pReconv->dwTargetStrOffset	= cx_bytes;				// = dwTargetStrLen
+
+	// RECONVERTSTRINGの後ろに
+	// 参照文字列をコピー+カーソル位置に変文字列を挿入
+	char *newbuf = (char *)pReconv + sizeof(RECONVERTSTRING);
+	if (comp_ptr != NULL) {
+		memcpy(newbuf, buf, cx_bytes);
+		newbuf += cx_bytes;
+		memcpy(newbuf, comp_ptr, complen_bytes);
+		newbuf += complen_bytes;
+		memcpy(newbuf, (char *)buf + cx_bytes, str_len_bytes - cx_bytes);
+		free((void *)comp_ptr);
+		comp_ptr = NULL;
+	} else {
+		memcpy(newbuf, buf, str_len_bytes);
+	}
+#if defined(ENABLE_DUMP)
+	DumpReconvStringSt(pReconv, unicode);
 #endif
 
-	return (sizeof(RECONVERTSTRING) + newsize);
+	*st_size_ = st_size;
+	return pReconv;
+}
+
+/**
+ * IMEの前後参照変換機能用構造体を作成する
+ * ANSIウィンドウ用
+ *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED の応答に使う
+ * str_ptr		参照文字列へのポインタ
+ * str_count	参照文字列の文字数(char数,bytes数)
+ * cx			カーソル位置(char単位)
+ * st_size		生成した構造体のサイズ(byte)
+ * 戻り値		構造体へのポインタ
+ *				不要になったら free()すること
+ */
+void *CreateReconvStringStA(
+	HWND hWnd, const char *str_ptr, size_t str_count,
+	size_t cx, size_t *st_size_)
+{
+	assert(IsWindowUnicode(hWnd) == FALSE);
+	return CreateReconvStringSt(hWnd, FALSE, str_ptr, str_count, cx, st_size_);
+}
+
+/**
+ * IMEの前後参照変換機能用構造体を作成する
+ * unicodeウィンドウ用
+ *		msg == WM_IME_REQUEST,wParam == IMR_DOCUMENTFEED の応答に使う
+ * str_ptr		参照文字列へのポインタ
+ * str_count	参照文字列の文字数(wchar_t数)
+ * cx			カーソル位置(wchar_t単位)
+ * st_size		生成した構造体のサイズ(byte)
+ * 戻り値		構造体へのポインタ
+ *				不要になったら free()すること
+ */
+void *CreateReconvStringStW(
+	HWND hWnd, const wchar_t *str_ptr, size_t str_count,
+	size_t cx, size_t *st_size_)
+{
+	assert(IsWindowUnicode(hWnd) == TRUE);
+	return CreateReconvStringSt(hWnd, TRUE, str_ptr, str_count, cx, st_size_);
 }
