@@ -2034,17 +2034,19 @@ int WINAPI CommTextOutW(PComVar cv, const wchar_t *B, int C)
 	}
 #endif
 
-	int CodePage = *cv->CodePage;
-	size_t mb_len;
-	int r;
-	char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
-	if (mb_str == NULL) {
-		r = 0;
-	} else {
-		r = CommTextOut(cv, mb_str, mb_len);
-		free(mb_str);
+	{
+		int CodePage = *cv->CodePage;
+		size_t mb_len;
+		int r;
+		char *mb_str = _WideCharToMultiByte(B, C, CodePage, &mb_len);
+		if (mb_str == NULL) {
+			r = 0;
+		} else {
+			r = CommTextOut(cv, mb_str, mb_len);
+			free(mb_str);
+		}
+		return r;
 	}
-	return r;
 }
 
 // TODO: UTF-16‚©‚ç’¼Ú•ÏŠ·‚µ‚Äo—Í‚·‚é

@@ -2376,9 +2376,10 @@ void BuffUpdateRect
 			CurAttr.Back = AttrBuffBG[TmpPtr+i];
 			CurSel = CheckSelect(i,j);
 			{
+				wchar_t wc;
 				bufA[lenA] = CodeBuff[TmpPtr + i];
 				lenA++;
-				wchar_t wc = CodeBuffW[TmpPtr + i];
+				wc = CodeBuffW[TmpPtr + i];
 				if (wc != 0) {
 					bufW[lenW] = wc;
 					lenW++;
@@ -2394,9 +2395,10 @@ void BuffUpdateRect
 			        (i+count<NumOfColumns) &&
 			        ((AttrBuff[TmpPtr+i+count-1] & AttrKanji) != 0) ) {
 				{
+					wchar_t wc;
 					bufA[lenA] = CodeBuff[TmpPtr + i + count];
 					lenA++;
-					wchar_t wc = CodeBuffW[TmpPtr + i + count];
+					wc = CodeBuffW[TmpPtr + i + count];
 					if (wc != 0) {
 						bufW[lenW] = wc;
 						lenW++;
