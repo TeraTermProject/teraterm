@@ -305,6 +305,7 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 
 	if (Busy == 0) {
 		if (IsUpdateTerm()) {
+			UpdateTerm();
 			Busy++;
 		}
 	}

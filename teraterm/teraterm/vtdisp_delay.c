@@ -88,8 +88,8 @@ void DispUpdateScroll()
 {
 	OutputDebugPrintf("DispUpdateScroll\n");
 	UpdateInfo.Type = WHOLE_TERM;
-	UpdateInfo.NewOrgX += NewOrgX;
-	UpdateInfo.NewOrgY += NewOrgY;
+	UpdateInfo.NewOrgX = NewOrgX;
+	UpdateInfo.NewOrgY = NewOrgY;
 	dScroll = 0;
 }
 
@@ -157,7 +157,7 @@ void UpdateTerm()
 		InvalidateRect(HVTWin, NULL, FALSE);
 	} else
 #endif
-	if (UpdateInfo.Type == WHOLE_TERM) {
+	if (UpdateInfo.Type == WHOLE_TERM || NewOrgY != WinOrgY) {
 		if ((now - UpdateInfo.UpdateTick) < DISPLAY_INTERVAL) {
 			return;
 		}
@@ -169,6 +169,8 @@ void UpdateTerm()
 
 	WinOrgX = NewOrgX;
 	WinOrgY = NewOrgY;
+	UpdateInfo.NewOrgX = 0;
+	UpdateInfo.NewOrgY = 0;
 	UpdateInfo.UpdateTick = now;
 	UpdateInfo.Type = NONE;
 
