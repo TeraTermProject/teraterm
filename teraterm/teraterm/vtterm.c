@@ -54,8 +54,6 @@
 #include "clipboar.h"
 #include "codeconv.h"
 
-#include "vtdisp_delay.h"
-
 #include "vtterm.h"
 
 #ifdef _DEBUG
@@ -5750,12 +5748,7 @@ int VTParse()
 
 	c = CommRead1Byte(&cv,&b);
 
-	if (c==0) {
-		if (IsUpdateTerm()) {
-			UpdateTerm();
-		}
-		return 0;
-	}
+	if (c==0) return 0;
 
 	CaretOff();
 	UpdateCaretPosition(FALSE);	// 非アクティブの場合のみ再描画する
@@ -5814,9 +5807,7 @@ int VTParse()
 			c = CommRead1Byte(&cv,&b);
 	}
 
-	if (IsUpdateTerm()) {
-		UpdateTerm();
-	}
+	BuffUpdateScroll();
 
 	BuffSetCaretWidth();
 	UnlockBuffer();

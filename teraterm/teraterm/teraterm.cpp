@@ -47,7 +47,6 @@
 #include "keyboard.h"
 #include "dllutil.h"
 #include "compat_win.h"
-#include "vtdisp_delay.h"
 
 #include "teraapp.h"
 
@@ -301,13 +300,6 @@ BOOL CTeraApp::OnIdle(LONG lCount)
 	}
 	else {
 		Busy--;
-	}
-
-	if (Busy == 0) {
-		if (IsUpdateTerm()) {
-			UpdateTerm();
-			Busy++;
-		}
 	}
 
 	return (Busy>0);
