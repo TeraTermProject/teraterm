@@ -13,8 +13,11 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# _WIN32_WINNT_WIN10 0x0a00
-set(_WIN32_WINNT "0x0a00")
+set(_WIN32_WINNT "0x0a00")      # _WIN32_WINNT_WIN10    Windows 10
+#set(_WIN32_WINNT "0x0501")     # _WIN32_WINNT_WINXP    Windows XP ↑build ok
+#set(_WIN32_WINNT "0x0500")     # _WIN32_WINNT_WIN2K    Windows 2000 ↓build ng
+#set(_WIN32_WINNT "0x0400")     # _WIN32_WINNT_NT4      Windows NT 4.0(95)
+message("_WIN32_WINNT=${_WIN32_WINNT}")
 if(MSVC)
   # https://www.leeholmes.com/blog/2017/02/27/differences-between-visual-studio-2012-2013-and-2015/
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_WIN32_WINNT=${_WIN32_WINNT}")
