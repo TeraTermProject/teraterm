@@ -2032,9 +2032,15 @@ void ResetIME()
 	if ((ts.Language==IdJapanese) || (ts.Language==IdKorean) || (ts.Language==IdUtf8)) //HKS
 	{
 		if (ts.UseIME==0)
-			FreeIME();
-		else if (! LoadIME())
+			FreeIME(HVTWin);
+		else if (! LoadIME()) {
+			char uimsg[MAX_UIMSG];
+			get_lang_msg("MSG_TT_ERROR", uimsg, sizeof(uimsg),  "Tera Term: Error", ts.UILanguageFile);
+			get_lang_msg("MSG_USE_IME_ERROR", ts.UIMsg, sizeof(ts.UIMsg), "Can't use IME", ts.UILanguageFile);
+			MessageBoxA(0,ts.UIMsg,uimsg,MB_ICONEXCLAMATION);
+			WritePrivateProfileStringA("Tera Term","IME","off",ts.SetupFName);
 			ts.UseIME = 0;
+		}
 
 		if (ts.UseIME>0)
 		{
@@ -2048,7 +2054,7 @@ void ResetIME()
 		}
 	}
 	else
-		FreeIME();
+		FreeIME(HVTWin);
 
 	if (IsCaretOn()) CaretOn();
 }

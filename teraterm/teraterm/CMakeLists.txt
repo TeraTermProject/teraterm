@@ -192,10 +192,8 @@ target_link_libraries(
   gdi32
   comctl32
   ws2_32
-  imm32
   imagehlp
   delayimp
-  oleaut32
   uuid
   )
 

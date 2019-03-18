@@ -72,6 +72,7 @@
 #include <windowsx.h>
 #include <imm.h>
 #include <dbt.h>
+#include <assert.h>
 
 #include "tt_res.h"
 #include "vtwin.h"
@@ -135,6 +136,10 @@ static BOOL IgnoreRelease = FALSE;
 static HDEVNOTIFY hDevNotify = NULL;
 
 static int AutoDisconnectedPort = -1;
+
+#ifndef WM_IME_COMPOSITION
+#define WM_IME_COMPOSITION              0x010F
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CVTWindow
@@ -1858,7 +1863,7 @@ void CVTWindow::OnDestroy()
 
 	OpenHelp(HH_CLOSE_ALL, 0, ts.UILanguageFile);
 
-	FreeIME();
+	FreeIME(HVTWin);
 	FreeTTSET();
 #if 0	// freeに失敗するまでfreeし続ける
 	do { }
@@ -3120,24 +3125,25 @@ LRESULT CVTWindow::OnIMEComposition(WPARAM wParam, LPARAM lParam)
 {
 	if (CanUseIME()) {
 		size_t len;
-		const wchar_t *lpstr = GetConvString(HVTWin, wParam, lParam, &len);
+		const wchar_t *lpstr = GetConvStringW(HVTWin, lParam, &len);
 		if (lpstr != NULL) {
+			const wchar_t *output_wstr = lpstr;
 			if (len == 1 && ControlKey()) {
 				const static wchar_t code_ctrl_space = 0;
 				const static wchar_t code_ctrl_backslash = 0x1c;
 				switch(*lpstr) {
 				case 0x20:
-					lpstr = &code_ctrl_space;
+					output_wstr = &code_ctrl_space;
 					break;
 				case 0x5c: // Ctrl-\ support for NEC-PC98
-					lpstr = &code_ctrl_backslash;
+					output_wstr = &code_ctrl_backslash;
 					break;
 				}
 			}
 			if (ts.LocalEcho>0) {
-				CommTextEchoW(&cv,lpstr,len);
+				CommTextEchoW(&cv,output_wstr,len);
 			}
-			CommTextOutW(&cv,lpstr,len);
+			CommTextOutW(&cv,output_wstr,len);
 			free((void *)lpstr);
 			return 0;
 		}
@@ -3159,7 +3165,7 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 		// 入力コンテキストの開閉状態が更新される(IME On/OFF)
 
 		// IMEのOn/Offを取得する
-		IMEstat = GetIMEOpenStatus();
+		IMEstat = GetIMEOpenStatus(HVTWin);
 
 		// 状態を表示するIMEのために位置を通知する
 		int CaretX = (CursorX-WinOrgX)*FontWidth;
@@ -3197,73 +3203,78 @@ LRESULT CVTWindow::OnIMENotify(WPARAM wParam, LPARAM lParam)
 	return CFrameWnd::DefWindowProc(WM_IME_NOTIFY,wParam,lParam);
 }
 
-// IMEの前後参照変換機能への対応
-// MSからちゃんと仕様が提示されていないので、アドホックにやるしかないらしい。
-// cf. http://d.hatena.ne.jp/topiyama/20070703
-//     http://ice.hotmint.com/putty/#DOWNLOAD
-//     http://27213143.at.webry.info/201202/article_2.html
-//     http://webcache.googleusercontent.com/search?q=cache:WzlX3ouMscIJ:anago.2ch.net/test/read.cgi/software/1325573999/82+IMR_DOCUMENTFEED&cd=13&hl=ja&ct=clnk&gl=jp
-// (2012.5.9 yutaka)
-LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
+static LRESULT ReplyIMERequestDocumentfeed(HWND hWnd, LPARAM lParam)
 {
-	static int complen, newsize;
-	static char comp[512];
-	int size, ret;
-	char buf[512], newbuf[1024];
-	HIMC hIMC;
+	static RECONVERTSTRING *pReconvPtrSave;		// TODO leak
+	static size_t ReconvSizeSave;
+	LRESULT result;
 
-	// "IME=off"の場合は、何もしない。
-	if (ts.UseIME > 0 &&
-		wParam == IMR_DOCUMENTFEED) {
-		size = NumOfColumns + 1;   // カーソルがある行の長さ+null
+	if (lParam == 0)
+	{  // 1回目の呼び出し サイズだけを返す
+		char buf[512];			// 参照文字列を受け取るバッファ
+		size_t str_len_count;
+		int cx;
+		assert(IsWindowUnicode(hWnd) == FALSE);
 
-		if (lParam == 0) {  // 1回目の呼び出し
-			// バッファのサイズを返すのみ。
-			// ATOK2012では常に complen=0 となる。
-			complen = 0;
-			memset(comp, 0, sizeof(comp));
-			hIMC = ImmGetContext(HVTWin);
-			if (hIMC) {
-				// TODO いきなりインポートしている
-				ret = ImmGetCompositionStringA(hIMC, GCS_COMPSTR, comp, sizeof(comp));
-				if (ret == IMM_ERROR_NODATA || ret == IMM_ERROR_GENERAL) {
-					memset(comp, 0, sizeof(comp));
-				}
-				complen = strlen(comp);  // w/o null
-				ImmReleaseContext(HVTWin, hIMC);
-			}
-			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-
-		} else {  // 2回目の呼び出し
-			//lParam を RECONVERTSTRING と 文字列格納バッファに使用する
-			RECONVERTSTRING *pReconv   = (RECONVERTSTRING*)lParam;
-			char*  pszParagraph        = (char*)pReconv + sizeof(RECONVERTSTRING);
-			int cx;
-
+		// 参照文字列取得、1行取り出す
+		{	// カーソルから後ろ、スペース以外が見つかったところを行末とする
+			int x;
+			int len;
 			cx = BuffGetCurrentLineData(buf, sizeof(buf));
-
-			// カーソル位置に変換文字列を挿入する。
-			memset(newbuf, 0, sizeof(newbuf));
-			memcpy(newbuf, buf, cx);
-			memcpy(newbuf + cx, comp, complen);
-			memcpy(newbuf + cx + complen, buf + cx, size - cx);
-			newsize = size + complen;  // 変換文字も含めた全体の長さ(including null)
-
-			pReconv->dwSize            = sizeof(RECONVERTSTRING);
-			pReconv->dwVersion         = 0;
-			pReconv->dwStrLen          = newsize - 1;
-			pReconv->dwStrOffset       = sizeof(RECONVERTSTRING);
-			pReconv->dwCompStrLen      = complen;
-			pReconv->dwCompStrOffset   = cx;
-			pReconv->dwTargetStrLen    = complen;
-			pReconv->dwTargetStrOffset = cx;
-
-			memcpy(pszParagraph, newbuf, newsize);
-			//OutputDebugPrintf("cx %d buf [%d:%s] -> [%d:%s]\n", cx, size, buf, newsize, newbuf);
+			len = cx;
+			for (x=cx; x < NumOfColumns; x++) {
+				const char c = buf[x];
+				if (c != 0 && c != 0x20) {
+					len = x+1;
+				}
+			}
+			str_len_count = len;
 		}
-		return (sizeof(RECONVERTSTRING) + newsize);
+
+		// IMEに返す構造体を作成する
+		if (pReconvPtrSave != NULL) {
+			free(pReconvPtrSave);
+		}
+		pReconvPtrSave = (RECONVERTSTRING *)CreateReconvStringStA(
+			hWnd, buf, str_len_count, cx, &ReconvSizeSave);
+
+		// 1回目はサイズだけを返す
+		result = ReconvSizeSave;
+	}
+	else {
+		// 2回目の呼び出し 構造体を渡す
+		if (pReconvPtrSave != NULL) {
+			RECONVERTSTRING *pReconv = (RECONVERTSTRING*)lParam;
+			memcpy(pReconv, pReconvPtrSave, ReconvSizeSave);
+			result = ReconvSizeSave;
+			free(pReconvPtrSave);
+			pReconvPtrSave = NULL;
+			ReconvSizeSave = 0;
+		} else {
+			// 3回目?
+			result = 0;
+		}
 	}
 
+#if 0
+	OutputDebugPrintf("WM_IME_REQUEST,IMR_DOCUMENTFEED lp=%p LRESULT %d\n",
+		lParam, result);
+#endif
+
+	return result;
+}
+
+LRESULT CVTWindow::OnIMERequest(WPARAM wParam, LPARAM lParam)
+{
+	// "IME=off"の場合は、何もしない。
+	if (ts.UseIME > 0) {
+		switch(wParam) {
+		case IMR_DOCUMENTFEED:
+			return ReplyIMERequestDocumentfeed(HVTWin, lParam);
+		default:
+			break;
+		}
+	}
 	return CFrameWnd::DefWindowProc(WM_IME_REQUEST,wParam,lParam);
 }
 

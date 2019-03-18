@@ -169,16 +169,16 @@ void PaintProc(HWND hWnd)
 {
 	PAINTSTRUCT ps;
 	HDC hDC;
-	TCHAR OutStr[30];
+	char OutStr[30];
 
 	hDC = BeginPaint(hWnd, &ps);
 
 	if (KeyDown) {
-		_sntprintf_s(OutStr,_countof(OutStr),_TRUNCATE, _T("Key code is %u.") ,Scan);
-		TextOut(hDC,10,10,OutStr,_tcslen(OutStr));
+		_snprintf_s(OutStr,sizeof(OutStr),_TRUNCATE,"Key code is %u.",Scan);
+		TextOutA(hDC,10,10,OutStr,strlen(OutStr));
 	}
 	else {
-		TextOut(hDC,10,10,_T("Push any key."),13);
+		TextOutA(hDC,10,10,"Push any key.",13);
 	}
 
 	EndPaint(hWnd, &ps);

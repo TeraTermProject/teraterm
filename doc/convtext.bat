@@ -17,6 +17,5 @@ set REF_J=ja\html\reference
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_E%\zlib-LICENSE.txt      -l unix
 %ZLIBCP% -i ..\libs\zlib\README         -o %REF_J%\zlib-LICENSE.txt      -l unix
 
-sed -e '1s/^\xef\xbb\xbf//' < ja/html/reference/build_with_cmake.md > ja/html/reference/build_with_cmake_without_bom.md
-perl Markdown_1.0.1/Markdown.pl ja/html/reference/build_with_cmake_without_bom.md > ja/html/reference/build_with_cmake_utf8.html
+perl -pe 'tr/\x{feff}//d' ja/html/reference/build_with_cmake.md | perl Markdown_1.0.1/Markdown.pl > ja/html/reference/build_with_cmake_utf8.html
 %TOSJIS% -i ja/html/reference/build_with_cmake_utf8.html -o ja/html/reference/build_with_cmake.html  -c utf8

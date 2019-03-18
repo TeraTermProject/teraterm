@@ -122,7 +122,7 @@ unsigned int CP932ToUTF32(unsigned short cp932)
 		buf[1] = cp932 & 0xff;
 		len = 2;
 	}
-	ret = MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, (char *)buf, len, &wchar, 1);
+	ret = ::MultiByteToWideChar(932, MB_ERR_INVALID_CHARS, (char *)buf, len, &wchar, 1);
 	if (ret <= 0) {
 		// MultiByteToWideChar()が変換失敗
 #if !defined(PRIORITY_CP932_TABLE)
@@ -164,6 +164,7 @@ unsigned short UTF32ToDecSp(unsigned int u32)
  *	@param mb_code		マルチバイトの文字コード(0x0000-0xffff)
  *	@param code_page	マルチバイトのコードページ
  *	@retval				unicode(UTF-32文字コード)
+ *						0=エラー(変換できなかった)
  */
 unsigned int MBCP_UTF32(unsigned short mb_code, int code_page)
 {
@@ -187,7 +188,7 @@ unsigned int MBCP_UTF32(unsigned short mb_code, int code_page)
 			buf[1] = mb_code & 0xff;
 			len = 2;
 		}
-		ret = MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, buf, len, &wchar, 1);
+		ret = ::MultiByteToWideChar(code_page, MB_ERR_INVALID_CHARS, buf, len, &wchar, 1);
 		if (ret <= 0) {
 			c = 0;
 		} else {
@@ -210,6 +211,7 @@ unsigned short UTF32_CP932(unsigned int u32)
 	DWORD mblen;
 	wchar_t u16_str[2];
 	size_t u16_len;
+	BOOL use_default_char;
 
 	if (u32 < 0x80) {
 		return (unsigned short)u32;
@@ -230,22 +232,20 @@ unsigned short UTF32_CP932(unsigned int u32)
 	if (u16_len == 0) {
 		return 0;
 	}
-	mblen = WideCharToMultiByte(932, 0, u16_str, (int)u16_len, mbstr, 2, NULL, NULL);
+	use_default_char = FALSE;
+	mblen = ::WideCharToMultiByte(932, 0, u16_str, (int)u16_len, mbstr, 2, NULL, &use_default_char);
+	if (use_default_char) {
+		// 変換できず、既定の文字を使った
+		goto next_convert;
+	}
 	switch (mblen) {
 	case 0:
+		// 変換失敗
+		goto next_convert;
 	case 1:
-	default:
-		if (mblen == 0 || mbstr[0] == '?') {
-			goto next_convert;
-		} else {
-			mb = (unsigned char)mbstr[0];
-			return mb;
-		}
+		mb = (unsigned char)mbstr[0];
+		return mb;
 	case 2:
-		if (mbstr[0] == '?' && mbstr[1] == '?') {
-			// 2byte出力 && "??" の場合は変換できなかった
-			goto next_convert;
-		}
 		mb = (((unsigned char)mbstr[0]) << 8) | (unsigned char)mbstr[1];
 		return mb;
 	}
@@ -320,7 +320,7 @@ size_t UTF8ToUTF32(const char *u8_ptr_, size_t u8_len, uint32_t *u32_)
 		} else {
 			goto error;
 		}
-	} else if (0xf0 <= c1 && c1 <= 0xf7 && u8_len >= 4) {
+	} else if (0xf0 <= c1 && c1 <= 0xf7) {
 		// 4byte
 		if (u8_len >= 4) {
 			const uint8_t c2 = *u8_ptr++;
@@ -504,6 +504,12 @@ size_t UTF32ToUTF8(uint32_t u32, char *u8_ptr_, size_t u8_len)
 size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
 {
 	size_t u16_out;
+	if (wstr_ptr == NULL) {
+		wstr_len = 2;
+	}
+	if (wstr_len == 0) {
+		return 0;
+	}
 	if (u32 < 0x10000) {
 		if (wstr_len >= 1) {
 			if (wstr_ptr != NULL) {
@@ -540,9 +546,24 @@ size_t UTF32ToUTF16(uint32_t u32, wchar_t *wstr_ptr, size_t wstr_len)
  */
 size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
 {
+	uint16_t cp932;
 	size_t cp932_out;
-	const uint16_t cp932 = UTF32_CP932(u32);
-	if (cp932 == 0 && u32 != 0) {
+	if (mb_ptr == NULL) {
+		mb_len = 2;		// 2byteあれば足りるはず
+	}
+	if (mb_len == 0) {
+		// 出力先サイズが0
+		return 0;
+	}
+	if (u32 == 0) {
+		if (mb_ptr != NULL) {
+			*mb_ptr = 0;
+		}
+		return 1;
+	}
+	cp932 = UTF32_CP932(u32);
+	if (cp932 == 0) {
+		// 変換できなかった
 		return 0;
 	}
 	if (mb_ptr == NULL) {
@@ -577,7 +598,7 @@ size_t UTF32ToCP932(uint32_t u32, char *mb_ptr, size_t mb_len)
  * @param[in]		code_page	変換先codepage
  * @param[in,out]	mb_ptr		変換先文字列出力先(NULLのとき出力しない)
  * @param[in]		mb_len		CP932出力先文字数(文字数,sizeof(wchar_t)*wstr_len bytes)
- * @retval			出力したCP932文字数(byte数)
+ * @retval			出力したmultibyte文字数(byte数)
  *					0=エラー(変換できなかった)
  */
 size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
@@ -588,16 +609,18 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 	if (code_page == 932) {
 		return UTF32ToCP932(u32, mb_ptr, mb_len);
 	} else {
+		BOOL use_default_char;
 		wchar_t u16_str[2];
 		size_t u16_len;
 		u16_len = UTF32ToUTF16(u32, u16_str, 2);
 		if (u16_len == 0) {
 			return 0;
 		}
-		mb_len = WideCharToMultiByte(code_page, 0, u16_str, u16_len, mb_ptr, mb_len, NULL, NULL);
-		if (mb_ptr != NULL && u32 != '?' && mb_len == 1 && mb_ptr[0] == '?') {
-			// 変換できなかったとき、戻り値=1, 文字[0]='?' を返してくる
-			mb_len = 0;
+		use_default_char = FALSE;
+		mb_len = ::WideCharToMultiByte(code_page, 0, u16_str, u16_len, mb_ptr, mb_len, NULL, &use_default_char);
+		if (use_default_char) {
+			// 変換できず、既定の文字を使った
+			return 0;
 		}
 		return mb_len;
 	}
@@ -605,10 +628,11 @@ size_t UTF32ToMBCP(unsigned int u32, int code_page, char *mb_ptr, size_t mb_len)
 
 /**
  *	wchar_t(UTF-16)文字列をマルチバイト文字列に変換する
+ *	変換できない文字は '?' で出力する
  *
  *	@param[in]		*wstr_ptr	wchar_t文字列
  *	@param[in,out]	*wstr_len	wchar_t文字列長
- *								NULLまたは0のとき自動、L'\0'でターミネートすること)
+ *								NULLまたは0のとき自動(L'\0'でターミネートすること)
  *								NULL以外のとき入力した文字数を返す
  *	@param[in]		*mb_ptr		変換した文字列を収納するポインタ
  *								(NULLのとき変換せずに文字数をカウントする)
@@ -642,34 +666,24 @@ static void WideCharToMB(const wchar_t *wstr_ptr, size_t *wstr_len_,
 	}
 
 	while(mb_len > 0 && wstr_len > 0) {
-		const wchar_t u16 = *wstr_ptr++;
-		uint32_t u32 = u16;
 		size_t mb_out;
-		wstr_len--;
-		wstr_in++;
-		// サロゲート high?
-		if (IsHighSurrogate(u16)) {
-			if (wstr_len >= 1) {
-				const wchar_t u16_lo = *wstr_ptr++;
-				wstr_len--;
-				wstr_in++;
-				// サロゲート low?
-				if (IsLowSurrogate(u16_lo)) {
-					// サロゲートペア デコード
-					u32 = 0x10000 + (u16 - 0xd800) * 0x400 + (u16_lo - 0xdc00);
-				} else {
-					goto unknown_code;
-				}
-			} else {
-				goto unknown_code;
-			}
+		uint32_t u32;
+		size_t wb_in = UTF16ToUTF32(wstr_ptr, wstr_len, &u32);
+		if (wb_in == 0) {
+			wstr_len -= 1;
+			wstr_in += 1;
+			wstr_ptr++;
+			goto unknown_code;
 		}
+		wstr_len -= wb_in;
+		wstr_in += wb_in;
+		wstr_ptr += wb_in;
 		mb_out = UTF32ToMB(u32, mb_ptr, mb_len);
 		if (mb_out == 0) {
 		unknown_code:
 			if (mb_ptr != NULL) {
 				// 変換できなかった場合
-				*mb_ptr++ = '?';
+				*mb_ptr = '?';
 			}
 			mb_out = 1;
 		}
@@ -739,10 +753,16 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 	while(wstr_len > 0 && u8_len > 0) {
 		uint32_t u32;
 		size_t u16_out;
-		size_t u8_in = UTF8ToUTF32(u8_ptr, u8_len, &u32);
-		if (u8_in == 0) {
-			u32 = '?';
+		size_t u8_in;
+		if (*u8_ptr == 0) {
+			u32 = 0;
 			u8_in = 1;
+		} else {
+			u8_in = UTF8ToUTF32(u8_ptr, u8_len, &u32);
+			if (u8_in == 0) {
+				u32 = '?';
+				u8_in = 1;
+			}
 		}
 		u8_ptr += u8_in;
 		u8_len -= u8_in;
@@ -779,6 +799,8 @@ int UTF8ToWideChar(const char *u8_ptr, int u8_len_, wchar_t *wstr_ptr, int wstr_
 
 /**
  *	wchar_t文字列をマルチバイト文字列へ変換
+ *	変換できない文字は '?' で出力する
+ *
  *	@param[in]	*wstr_ptr	wchar_t文字列
  *	@param[in]	wstr_len	wchar_t文字列長(0のとき自動、自動のときはL'\0'でターミネートすること)
  *	@param[in]	code_page	変換先コードページ

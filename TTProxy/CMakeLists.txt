@@ -97,14 +97,12 @@ add_library(
   ${YCL_SRC}
   )
 
-if(MINGW)
-  set_target_properties(
-    ttproxy
-    PROPERTIES
-    PREFIX ""
-    OUTPUT_NAME "TTXProxy"
-    )
-endif()
+set_target_properties(
+  ttproxy
+  PROPERTIES
+  PREFIX ""
+  OUTPUT_NAME "TTXProxy"
+  )
 
 target_link_libraries(
   ttproxy
