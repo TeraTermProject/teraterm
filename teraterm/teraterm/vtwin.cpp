@@ -94,6 +94,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 static char THIS_FILE[] = __FILE__;
 #endif
 
+extern "C" void BuffUpdateRect2(int XStart, int YStart, int XEnd, int YEnd);
+
 // ウィンドウ最大化ボタンを有効にする (2005.1.15 yutaka)
 #define WINDOW_MAXMIMUM_ENABLED 1
 
@@ -2655,7 +2657,7 @@ void CVTWindow::OnPaint()
 
 	PaintWindow(PaintDC,ps.rcPaint,ps.fErase, &Xs,&Ys,&Xe,&Ye);
 	LockBuffer();
-	BuffUpdateRect(Xs,Ys,Xe,Ye);
+	BuffUpdateRect2(Xs,Ys,Xe,Ye);
 	UnlockBuffer();
 	DispEndPaint();
 
