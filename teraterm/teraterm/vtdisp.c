@@ -80,7 +80,7 @@ static const BYTE DefaultColorTable[256][3] = {
   {168,168,168}, {178,178,178}, {188,188,188}, {198,198,198}, {208,208,208}, {218,218,218}, {228,228,228}, {238,238,238}   // 248 - 255
 };
 
-int WinWidth, WinHeight;
+int WinWidth, WinHeight;								// 画面に表示されている文字数
 static BOOL Active = FALSE;
 static BOOL CompletelyVisible;
 HFONT VTFont[AttrFontMask+1];
@@ -95,10 +95,12 @@ int CursorX, CursorY;
 RECT VirtualScreen;
 
 // --- scrolling status flags
-int WinOrgX, WinOrgY, NewOrgX, NewOrgY;
+int WinOrgX, WinOrgY;		// 現在の表示位置
+int NewOrgX, NewOrgY;		// 更新後の表示位置
+int ScrollBarVPos;			// スクロールバーの位置
 
-int NumOfLines, NumOfColumns;
-int PageStart, BuffEnd;
+int NumOfLines, NumOfColumns;	// バッファリングしている文字数
+int PageStart, BuffEnd;			// 表示しているバッファ内の位置
 
 static BOOL CursorOnDBCS = FALSE;
 static LOGFONT VTlf;
@@ -130,7 +132,7 @@ TCharAttr DefCharAttr = {
 
 // scrolling
 static int ScrollCount = 0;
-static int dScroll = 0;
+int dScroll = 0;
 static int SRegionTop;
 static int SRegionBottom;
 
@@ -3179,6 +3181,7 @@ void DispCountScroll(int n)
   if (ScrollCount>=ts.ScrollThreshold) DispUpdateScroll();
 }
 
+#if 0
 void DispUpdateScroll()
 {
   int d;
@@ -3284,6 +3287,7 @@ void DispUpdateScroll()
 
   if (IsCaretOn()) CaretOn();
 }
+#endif
 
 void DispScrollHomePos()
 {

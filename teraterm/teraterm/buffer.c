@@ -88,7 +88,7 @@ static POINT SelectStart, SelectEnd, SelectEndOld;
 static BOOL BoxSelect;
 static POINT DblClkStart, DblClkEnd;
 
-static int StrChangeStart, StrChangeCount;
+int StrChangeStart, StrChangeCount;
 
 static BOOL SeveralPageSelect;  // add (2005.5.15 yutaka)
 
@@ -1900,6 +1900,7 @@ void BuffPutChar(BYTE b, TCharAttr Attr, BOOL Insert)
 			StrChangeStart = CursorX;
 		}
 		StrChangeCount++;
+		UpdateStr();
 	}
 }
 
@@ -2024,7 +2025,7 @@ BOOL CheckSelect(int x, int y)
 	}
 }
 
-void BuffUpdateRect
+void BuffUpdateRect2
   (int XStart, int YStart, int XEnd, int YEnd)
 // Display text in a rectangular region in the screen
 //   XStart: x position of the upper-left corner (screen cordinate)
@@ -2121,6 +2122,7 @@ void BuffUpdateRect
 	}
 }
 
+#if 0
 void UpdateStr()
 // Display not-yet-displayed string
 {
@@ -2175,6 +2177,7 @@ void UpdateStr()
 
 	StrChangeCount = 0;
 }
+#endif
 
 #if 0
 void UpdateStrUnicode(void)
