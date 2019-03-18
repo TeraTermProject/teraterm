@@ -53,8 +53,6 @@
 #include "ttime.h"
 #include "clipboar.h"
 #include "codeconv.h"
-#include "codeconv.h"
-#include "codeconv.h"
 
 #include "vtterm.h"
 
@@ -5521,11 +5519,12 @@ static void UnicodeToCP932(unsigned int code)
 // 従来版
 static void UnicodeToCP932(unsigned int code)
 {
-	int ret;
+	size_t mblen;
 	char mbchar[2];
 
 	// UnicodeからDEC特殊文字へのマッピング
 	if (ts.UnicodeDecSpMapping) {
+		unsigned short cset;
 		cset = UTF32ToDecSp(code);
 		if (((cset >> 8) & ts.UnicodeDecSpMapping) != 0) {
 			PutDecSp(cset & 0xff);
