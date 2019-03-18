@@ -5,6 +5,7 @@
 // infos when generated
 #cmakedefine MSVC
 #cmakedefine MINGW
+#cmakedefine USE_UNICODE_API
 // CMAKE_GENERATOR
 //  @CMAKE_GENERATOR@
 // CMAKE_COMMAND
