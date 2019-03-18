@@ -24,6 +24,8 @@
 
 // この位置にヘッダーを挿入してください
 #include <winsock2.h>
+#include <ws2tcpip.h>
+#include <wspiapi.h>
 
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
