@@ -430,6 +430,10 @@
 				RelativePath="..\common\win16api.h"
 				>
 			</File>
+			<File
+				RelativePath="vtdisp_delay.c"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
