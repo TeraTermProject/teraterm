@@ -410,6 +410,7 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 	size_t complen_bytes;
 	const void *buf;
 	size_t st_size;
+	char *newbuf;
 
 	buf = str_ptr;
 	str_len_count = str_count;
@@ -464,7 +465,7 @@ static void *CreateReconvStringSt(HWND hWnd, BOOL unicode,
 
 	// RECONVERTSTRINGの後ろに
 	// 参照文字列をコピー+カーソル位置に変文字列を挿入
-	char *newbuf = (char *)pReconv + sizeof(RECONVERTSTRING);
+	newbuf = (char *)pReconv + sizeof(RECONVERTSTRING);
 	if (comp_ptr != NULL) {
 		memcpy(newbuf, buf, cx_bytes);
 		newbuf += cx_bytes;
