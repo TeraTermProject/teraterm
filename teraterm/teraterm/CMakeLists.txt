@@ -98,6 +98,8 @@ set(SRC
   ttwsk.h
   vtdisp.c
   vtdisp.h
+  vtdisp_delay.c
+  vtdisp_delay.h
   vtterm.c
   vtterm.h
   vtwin.cpp
