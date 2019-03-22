@@ -130,37 +130,40 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="addsetting.cpp" />
-    <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="..\common\dlglib.c" />
-    <ClCompile Include="filesys.cpp" />
-    <ClCompile Include="ftdlg.cpp" />
-    <ClCompile Include="prnabort.cpp" />
-    <ClCompile Include="protodlg.cpp" />
     <ClCompile Include="..\common\stdafx.cpp" />
-    <ClCompile Include="tekwin.cpp" />
-    <ClCompile Include="teraprn.cpp" />
-    <ClCompile Include="teraterm.cpp" />
-    <ClCompile Include="vtwin.cpp" />
+    <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\win16api.c" />
+    <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
+    <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
     <ClCompile Include="commlib.c" />
     <ClCompile Include="dnddlg.cpp" />
+    <ClCompile Include="filesys.cpp" />
+    <ClCompile Include="ftdlg.cpp" />
     <ClCompile Include="keyboard.c" />
     <ClCompile Include="sizetip.c" />
+    <ClCompile Include="prnabort.cpp" />
+    <ClCompile Include="protodlg.cpp" />
     <ClCompile Include="teklib.c" />
+    <ClCompile Include="tekwin.cpp" />
     <ClCompile Include="telnet.c" />
+    <ClCompile Include="teraprn.cpp" />
+    <ClCompile Include="teraterm.cpp" />
     <ClCompile Include="ttdde.c" />
     <ClCompile Include="ttdialog.c" />
     <ClCompile Include="ttfileio.c" />
     <ClCompile Include="ttime.c" />
-    <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="ttplug.c" />
     <ClCompile Include="ttsetup.c" />
     <ClCompile Include="ttwinman.c" />
     <ClCompile Include="ttwsk.c" />
     <ClCompile Include="vtdisp.c" />
     <ClCompile Include="vtterm.c" />
+    <ClCompile Include="vtwin.cpp" />
     <ClCompile Include="winjump.c" />
     <ClCompile Include="WSAAsyncGetAddrInfo.c" />
   </ItemGroup>

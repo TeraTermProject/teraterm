@@ -136,6 +136,9 @@
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
     <ClCompile Include="..\common\win16api.c" />
+    <ClCompile Include="..\common\codeconv.cpp" />
+    <ClCompile Include="..\common\dllutil.cpp" />
+    <ClCompile Include="..\common\compat_win.cpp" />
     <ClCompile Include="addsetting.cpp" />
     <ClCompile Include="buffer.c" />
     <ClCompile Include="clipboar.c" />
