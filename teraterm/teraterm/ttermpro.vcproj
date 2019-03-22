@@ -401,6 +401,10 @@
 				RelativePath="..\common\codeconv.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\common\tipwin.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

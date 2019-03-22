@@ -33,6 +33,8 @@ set(COMMON_SRC
   ../common/dllutil.h
   ../common/codeconv.h
   ../common/codeconv.cpp
+  ../common/tipwin.h
+  ../common/tipwin.cpp
   #
   ../teraterm/unisym2decsp.map
   ../teraterm/uni2sjis.map

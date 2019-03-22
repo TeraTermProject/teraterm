@@ -41,6 +41,7 @@
 #include "resource.h"
 #include "keyfiles.h"
 #include "libputty.h"
+#include "tipwin.h"
 
 #define AUTH_START_USER_AUTH_ON_ERROR_END 1
 
@@ -64,6 +65,7 @@ static int auth_types_to_control_IDs[] = {
 	IDC_SSHUSERHOSTS, IDC_SSHUSETIS, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, IDC_SSHUSEPAGEANT, -1
 };
+static TipWin *tipwin;
 
 LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
                                    WPARAM wParam, LPARAM lParam)
@@ -71,12 +73,39 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 	switch (msg) {
 	case WM_CHAR:
 		if ((GetKeyState(VK_CONTROL) & 0x8000) != 0) {
-			char chars[] = { (char) wParam, 0 };
+			TCHAR chars[] = { (TCHAR) wParam, 0 };
 
 			SendMessage(control, EM_REPLACESEL, (WPARAM) TRUE,
-			            (LPARAM) (char *) chars);
+			            (LPARAM) (TCHAR *) chars);
+
+			if (tipwin == NULL) {
+				TCHAR *s;
+				if (wParam == 'V' - 'A' + 1) {
+					s = _T("制御文字を入力しています")
+						_T("\n")
+						_T("クリップボードからの貼り付けのショートカットはCTRL+Insertです");
+				} else {
+					s = _T("制御文字を入力しています");
+				}
+				RECT rect;
+				GetWindowRect(control, &rect);
+				tipwin = TipWinCreate(control, rect.left, rect.bottom, s);
+			}
+
 			return 0;
+		} else {
+			if (tipwin != NULL) {
+				TipWinDestroy(tipwin);
+				tipwin = NULL;
+			}
 		}
+		break;
+	case WM_NCDESTROY:
+		if (tipwin != NULL) {
+			TipWinDestroy(tipwin);
+			tipwin = NULL;
+		}
+		break;
 	}
 
 	return CallWindowProc((WNDPROC) GetWindowLong(control, GWL_USERDATA),
@@ -106,6 +135,7 @@ static void set_auth_options_status(HWND dlg, int controlID)
 
 	EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), (!TIS_enabled && !PAGEANT_enabled));
 	EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), (!TIS_enabled && !PAGEANT_enabled));
+	EnableWindow(GetDlgItem(dlg, IDC_FROM_CLIPBOARD), (!TIS_enabled && !PAGEANT_enabled));
 
 	for (i = IDC_CHOOSERSAFILE; i <= IDC_RSAFILENAME; i++) {
 		EnableWindow(GetDlgItem(dlg, i), RSA_enabled);
@@ -286,6 +316,7 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 		if (pvar->ssh2_autologin == 1) {
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
 			EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORDCAPTION), FALSE);
+			EnableWindow(GetDlgItem(dlg, IDC_FROM_CLIPBOARD), FALSE);
 		}
 	}
 
@@ -312,12 +343,14 @@ static void init_auth_dlg(PTInstVar pvar, HWND dlg)
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_TIS) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSETIS);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
+		EnableWindow(GetDlgItem(dlg, IDC_FROM_CLIPBOARD), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
 
 	// /auth=pageant を追加
 	} else if (pvar->ssh2_authmethod == SSH_AUTH_PAGEANT) {
 		CheckRadioButton(dlg, IDC_SSHUSEPASSWORD, MAX_AUTH_CONTROL, IDC_SSHUSEPAGEANT);
 		EnableWindow(GetDlgItem(dlg, IDC_SSHPASSWORD), FALSE);
+		EnableWindow(GetDlgItem(dlg, IDC_FROM_CLIPBOARD), FALSE);
 		SetDlgItemText(dlg, IDC_SSHPASSWORD, "");
 
 	} else {
@@ -676,6 +709,46 @@ static BOOL end_auth_dlg(PTInstVar pvar, HWND dlg)
 	return TRUE;
 }
 
+/**
+ *	クリップボードからANSI文字列を取得する
+ *	文字列長が必要なときはstrlen()すること
+ *	@param	hWnd
+ *	@param	emtpy	TRUEのときクリップボードを空にする
+ *	@retval	文字列へのポインタ 使用後free()すること
+ *			文字がない(またはエラー時)はNULL
+ */
+char *GetClipboardTextA(HWND hWnd, BOOL empty)
+{
+	HGLOBAL hGlobal;
+	const char *lpStr;
+	size_t length;
+	char *pool;
+
+    OpenClipboard(hWnd);
+    hGlobal = (HGLOBAL)GetClipboardData(CF_TEXT);
+    if (hGlobal == NULL) {
+        CloseClipboard();
+		return NULL;
+    }
+    lpStr = (const char *)GlobalLock(hGlobal);
+	length = GlobalSize(hGlobal);
+	if (length == 0) {
+		pool = NULL;
+	} else {
+		pool = (char *)malloc(length + 1);	// +1 for terminator
+		memcpy(pool, lpStr, length);
+		pool[length] = '\0';
+	}
+	GlobalUnlock(hGlobal);
+	if (empty) {
+		EmptyClipboard();
+	}
+	CloseClipboard();
+
+	return pool;
+}
+
+
 BOOL autologin_sent_none;
 static BOOL CALLBACK auth_dlg_proc(HWND dlg, UINT msg, WPARAM wParam,
                                    LPARAM lParam)
@@ -928,6 +1001,17 @@ canceled:
 			// このセッションにのみ反映される (2008.12.4 maya)
 			pvar->session_settings.ForwardAgent = IsDlgButtonChecked(dlg, IDC_FORWARD_AGENT);
 			return TRUE;
+
+		case IDC_FROM_CLIPBOARD: {
+			char *clipboard = GetClipboardTextA(dlg, TRUE);
+			if (clipboard != NULL) {
+				SetDlgItemTextA(dlg, IDC_SSHPASSWORD, clipboard);
+				free(clipboard);
+				SendMessage(dlg, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(dlg, IDOK), TRUE);
+				return FALSE;
+			}
+			return TRUE;
+		}
 
 		default:
 			return FALSE;

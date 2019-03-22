@@ -18,6 +18,8 @@ set(COMMON_SRC
   ../../teraterm/common/servicenames.h
   ../../teraterm/common/codeconv.cpp
   ../../teraterm/common/codeconv.h
+  ../../teraterm/common/tipwin.cpp
+  ../../teraterm/common/tipwin.h
   )
 
 source_group(
