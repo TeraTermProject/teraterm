@@ -80,6 +80,7 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 
 			if (tipwin == NULL) {
 				TCHAR *s;
+				RECT rect;
 				if (wParam == 'V' - 'A' + 1) {
 					s = _T("§Œä•¶š‚ğ“ü—Í‚µ‚Ä‚¢‚Ü‚·")
 						_T("\n")
@@ -87,7 +88,6 @@ LRESULT CALLBACK password_wnd_proc(HWND control, UINT msg,
 				} else {
 					s = _T("§Œä•¶š‚ğ“ü—Í‚µ‚Ä‚¢‚Ü‚·");
 				}
-				RECT rect;
 				GetWindowRect(control, &rect);
 				tipwin = TipWinCreate(control, rect.left, rect.bottom, s);
 			}
