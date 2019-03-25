@@ -51,6 +51,7 @@
 #include "teraapp.h"
 
 #include "compat_w95.h"
+#include "dlglib.h"
 
 #if 0
 //#ifdef _DEBUG
@@ -65,50 +66,12 @@ BEGIN_MESSAGE_MAP(CTeraApp, CWinApp)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-typedef struct {
-	const TCHAR *FaceName;
-	bool found;
-} EnumFontInfo;
-
-static int CALLBACK EnumFontExProc(
-	ENUMLOGFONT* lpelf, NEWTEXTMETRIC* lpntm,
-	int nFontType, LPARAM lParam)
-{
-	EnumFontInfo *info = (EnumFontInfo *)lParam;
-	if (nFontType == DEVICE_FONTTYPE) {
-		// 接続されたデバイス(プリンタなど)内のフォント
-		return 1;
-	}
-	const TCHAR *FaceName = lpelf->elfLogFont.lfFaceName;
-	if (_tcscmp(info->FaceName, FaceName) == 0) {
-		info->found = true;
-		return 0;
-	}
-	return 1;
-}
-
-BOOL isExistFont(const TCHAR *FaceName)
-{
-	HDC hDC = GetDC(NULL);
-	LOGFONT lf;
-	memset(&lf, 0, sizeof(lf));
-	lf.lfCharSet = DEFAULT_CHARSET;// SHIFTJIS_CHARSET;
-	lf.lfPitchAndFamily = 0;
-
-	EnumFontInfo info;
-	info.FaceName = FaceName;
-	info.found = false;
-	EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)EnumFontExProc, (LPARAM)&info, 0);
-	ReleaseDC(NULL, hDC);
-	return info.found;
-}
-
 static BOOL AddFontFlag;
 static TCHAR TSpecialFont[MAX_PATH];
 
 static void LoadSpecialFont()
 {
-	if (!isExistFont(_T("Tera Special"))) {
+	if (!IsExistFontA("Tera Special", SYMBOL_CHARSET, TRUE)) {
 		int r;
 
 		if (GetModuleFileName(NULL, TSpecialFont,_countof(TSpecialFont)) == 0) {
@@ -144,14 +107,24 @@ static void UnloadSpecialFont()
 	}
 }
 
-CTeraApp::CTeraApp()
+static void init()
 {
 #ifdef _DEBUG
 	::_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-
 	DLLInit();
 	WinCompatInit();
+#if 1
+	if (pSetThreadDpiAwarenessContext) {
+		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+	}
+#endif
+	LoadSpecialFont();
+}
+
+CTeraApp::CTeraApp()
+{
+	init();
 }
 
 // CTeraApp instance
@@ -164,10 +137,12 @@ CTeraApp theApp;
 // CTeraApp initialization
 BOOL CTeraApp::InitInstance()
 {
-	LoadSpecialFont();
 	hInst = m_hInstance;
 	m_pMainWnd = new CVTWindow();
 	pVTWin = m_pMainWnd;
+	// [Tera Term]セクションのDlgFont=がない場合は
+	// [TTSH]セクションのフォント設定を使用する
+	SetDialogFont(ts.SetupFName, ts.UILanguageFile, "TTSSH");
 	return TRUE;
 }
 

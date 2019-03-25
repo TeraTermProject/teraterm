@@ -28,11 +28,15 @@
  */
 
 /* Routines for dialog boxes */
-#include <windows.h>
 #include "dlglib.h"
-#include "i18n.h"		// for MAX_UIMSG
+
+#include "i18n.h"
+#include <windows.h>
+#include <assert.h>
 #include <stdio.h>
 #include <commctrl.h>
+#include <tchar.h>
+#include "ttlib.h"	// for get_lang_font()
 
 void EnableDlgItem(HWND HDlg, int FirstId, int LastId)
 {
@@ -80,8 +84,8 @@ void SetRB(HWND HDlg, int R, int FirstId, int LastId)
 	}
 	HControl = GetDlgItem(HDlg, FirstId + R - 1);
 	SendMessage(HControl, BM_SETCHECK, 1, 0);
-	Style = GetClassLong(HControl, GCL_STYLE);
-	SetClassLong(HControl, GCL_STYLE, Style | WS_TABSTOP);
+	Style = GetClassLongPtr(HControl, GCL_STYLE);
+	SetClassLongPtr(HControl, GCL_STYLE, Style | WS_TABSTOP);
 }
 
 void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
@@ -91,7 +95,7 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
 	*R = 0;
 	for (i = FirstId ; i <= LastId ; i++) {
 		if (SendDlgItemMessage(HDlg, i, BM_GETCHECK, 0, 0) != 0) {
-			*R = i - FirstId + 1;
+			*R = (WORD)(i - FirstId + 1);
 			return;
 		}
 	}
@@ -99,10 +103,10 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId)
 
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num)
 {
-	char Temp[16];
+	TCHAR Temp[16];
 
 	/* In Win16, SetDlgItemInt can not be used to display long integer. */
-	_snprintf_s(Temp,sizeof(Temp),_TRUNCATE,"%d",Num);
+	_sntprintf_s(Temp, _countof(Temp), _TRUNCATE, _T("%d"), Num);
 	SetDlgItemText(HDlg,id_Item,Temp);
 }
 
@@ -125,17 +129,17 @@ void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int 
 	// 20MB以上のファイルをアップロードしようとすると、buffer overflowで
 	// 落ちる問題への対処。(2005.3.18 yutaka)
 	// cf. http://sourceforge.jp/tracker/index.php?func=detail&aid=5713&group_id=1412&atid=5333
-	double Num; 
-	char NumStr[10]; 
+	double Num;
+	TCHAR NumStr[10];
 
 	if (b==0) {
-		Num = 100.0; 
+		Num = 100.0;
 	}
 	else {
-		Num = 100.0 * (double)a / (double)b; 
+		Num = 100.0 * (double)a / (double)b;
 	}
-	_snprintf_s(NumStr,sizeof(NumStr),_TRUNCATE,"%3.1f%%",Num); 
-	SetDlgItemText(HDlg, id_Item, NumStr); 
+	_sntprintf_s(NumStr, _countof(NumStr),_TRUNCATE,_T("%3.1f%%"),Num);
+	SetDlgItemText(HDlg, id_Item, NumStr);
 
 	if (id_Progress != 0 && p != NULL && *p >= 0 && (double)*p < Num) {
 		*p = (int)Num;
@@ -147,13 +151,13 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 {
 	static int prev_elapsed;
 	int elapsed, rate;
-	char buff[64];
+	TCHAR buff[64];
 
 	elapsed = (GetTickCount() - stime) / 1000;
 
 	if (elapsed == 0) {
 		prev_elapsed = 0;
-		SetDlgItemText(HDlg, id_Item, "0:00");
+		SetDlgItemText(HDlg, id_Item, _T("0:00"));
 		return;
 	}
 
@@ -164,34 +168,49 @@ void SetDlgTime(HWND HDlg, int id_Item, DWORD stime, int bytes)
 
 	rate = bytes / elapsed;
 	if (rate < 1200) {
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%dBytes/s)", elapsed / 60, elapsed % 60, rate); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%dBytes/s)"), elapsed / 60, elapsed % 60, rate);
 	}
 	else if (rate < 1200000) {
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%d.%02dKB/s)", elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dKB/s)"), elapsed / 60, elapsed % 60, rate / 1000, rate / 10 % 100);
 	}
 	else {
-		_snprintf_s(buff, sizeof(buff), _TRUNCATE, "%d:%02d (%d.%02dMB/s)", elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100); 
+		_sntprintf_s(buff, _countof(buff), _TRUNCATE, _T("%d:%02d (%d.%02dMB/s)"), elapsed / 60, elapsed % 60, rate / (1000 * 1000), rate / 10000 % 100);
 	}
 
 	SetDlgItemText(HDlg, id_Item, buff);
 }
 
-void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR **List, int nsel)
+void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel)
 {
 	int i;
 
 	i = 0;
 	while (List[i] != NULL) {
-		SendDlgItemMessage(HDlg, Id_Item, CB_ADDSTRING,
-		                   0, (LPARAM)List[i]);
+		SendDlgItemMessageA(HDlg, Id_Item, CB_ADDSTRING,
+							0, (LPARAM)List[i]);
 		i++;
 	}
 	SendDlgItemMessage(HDlg, Id_Item, CB_SETCURSEL,nsel-1,0);
 }
 
+#if defined(UNICODE)
+void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel)
+{
+	int i;
+
+	i = 0;
+	while (List[i] != NULL) {
+		SendDlgItemMessageW(HDlg, Id_Item, CB_ADDSTRING,
+							0, (LPARAM)List[i]);
+		i++;
+	}
+	SendDlgItemMessage(HDlg, Id_Item, CB_SETCURSEL,nsel-1,0);
+}
+#endif
+
 LONG GetCurSel(HWND HDlg, int Id_Item)
 {
-	LONG n;
+	LRESULT n;
 
 	n = SendDlgItemMessage(HDlg, Id_Item, CB_GETCURSEL, 0, 0);
 	if (n==CB_ERR) {
@@ -201,7 +220,7 @@ LONG GetCurSel(HWND HDlg, int Id_Item)
 		n++;
 	}
 
-	return n;
+	return (LONG)n;
 }
 
 typedef struct {
@@ -218,9 +237,11 @@ typedef struct {
 static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
                                          WPARAM wParam, LPARAM lParam)
 {
-	EditSubclassData *data = (EditSubclassData *)GetWindowLong(dlg, GWLP_USERDATA);
+	EditSubclassData *data = (EditSubclassData *)GetWindowLongPtr(dlg, GWLP_USERDATA);
 	LRESULT Result;
-	int  max, select, len;
+	LRESULT select;
+	LRESULT max;
+	int len;
 	char *str, *orgstr;
 
 	switch (msg) {
@@ -274,7 +295,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 						max++; // '\0'
 						orgstr = str = (char *)malloc(max);
 						if (str != NULL) {
-							len = GetWindowText(dlg, str, max);
+							len = GetWindowTextA(dlg, str, (int)max);
 							if (select >= 0 && select < len) {
 								if (wParam == 0x44) { // カーソル配下の文字のみを削除する
 									memmove(&str[select], &str[select + 1], len - select - 1);
@@ -295,7 +316,7 @@ static LRESULT CALLBACK HostnameEditProc(HWND dlg, UINT msg,
 								select = 0;
 							}
 
-							SetWindowText(dlg, str);
+							SetWindowTextA(dlg, str);
 							SendMessage(dlg, EM_SETSEL, select, select);
 							free(orgstr);
 							return 0;
@@ -350,28 +371,153 @@ void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox)
 		hWndEdit = GetWindow(hWndEdit, GW_CHILD);
 	}
 	data = (EditSubclassData *)malloc(sizeof(EditSubclassData));
-	data->OrigProc = (WNDPROC)GetWindowLong(hWndEdit, GWLP_WNDPROC);
-	data->OrigUser = (LONG_PTR)GetWindowLong(hWndEdit, GWLP_USERDATA);
+	data->OrigProc = (WNDPROC)GetWindowLongPtr(hWndEdit, GWLP_WNDPROC);
+	data->OrigUser = (LONG_PTR)GetWindowLongPtr(hWndEdit, GWLP_USERDATA);
 	data->ComboBox = ComboBox;
-	SetWindowLongPtr(hWndEdit, GWL_WNDPROC, (LONG_PTR)HostnameEditProc);
+	SetWindowLongPtr(hWndEdit, GWLP_WNDPROC, (LONG_PTR)HostnameEditProc);
 	SetWindowLongPtr(hWndEdit, GWLP_USERDATA, (LONG_PTR)data);
 }
 
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+typedef struct {
+	BOOL found;
+	const char *face;
+	BYTE charset;
+} IsExistFontInfoA;
+
+int CALLBACK IsExistFontSubA(
+	ENUMLOGFONTA* lpelf, NEWTEXTMETRICA* lpntm,
+	int nFontType, LPARAM lParam)
 {
-	int i;
-	for (i = 0 ; i < infoCount; i++) {
-		char *key = infos[i].key;
-		char uimsg[MAX_UIMSG];
-		get_lang_msg(key, uimsg, sizeof(uimsg), "", UILanguageFile);
-		if (uimsg[0] != '\0') {
-			const int nIDDlgItem = infos[i].nIDDlgItem;
-			if (nIDDlgItem == 0) {
-				SetWindowText(hDlgWnd, uimsg);
-			} else {
-				SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+	IsExistFontInfoA *info = (IsExistFontInfoA *)lParam;
+	(void)lpntm;
+	if (nFontType != DEVICE_FONTTYPE &&
+		_stricmp(lpelf->elfLogFont.lfFaceName, info->face) == 0 &&
+		lpelf->elfLogFont.lfCharSet == info->charset)
+	{
+		info->found = TRUE;
+		return 0;
+	}
+	return 1;
+}
+
+/**
+ *	IsExistFont
+ *	フォントが存在しているかチェックする
+ *
+ *	@param[in]	face		フォント名(ファイル名ではない)
+ *	@param[in]	charset		SHIFTJIS_CHARSETなど
+ *	@param[in]	strict		TRUE	フォントリンクは検索に含めない
+ *							FALSE	フォントリンクも検索に含める
+ *	@retval		FALSE		フォントはしない
+ *	@retval		TRUE		フォントは存在する
+ *
+ *	strict = FALSE時、存在しないフォントでも表示できるならTRUEが返る
+ */
+BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict)
+{
+	HDC hDC = GetDC(NULL);
+	LOGFONTA lf;
+	IsExistFontInfoA info;
+	memset(&lf, 0, sizeof(lf));
+	lf.lfCharSet = !strict ? DEFAULT_CHARSET : charset;
+	// ↑DEFAULT_CHARSETとするとフォントリンクも有効になるようだ
+	lf.lfPitchAndFamily = 0;
+	info.found = FALSE;
+	info.face = face;
+	info.charset = charset;
+	EnumFontFamiliesExA(hDC, &lf, (FONTENUMPROCA)IsExistFontSubA, (LPARAM)&info, 0);
+	ReleaseDC(NULL, hDC);
+	return info.found;
+}
+
+/**
+ *	ダイアログフォントを取得する
+ *	エラーは発生しない
+ */
+void GetMessageboxFont(LOGFONT *logfont)
+{
+	NONCLIENTMETRICS nci;
+	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
+	BOOL r;
+
+	memset(&nci, 0, sizeof(nci));
+	nci.cbSize = st_size;
+	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+	assert(r == TRUE);
+	*logfont = nci.lfStatusFont;
+}
+
+/**
+ *	使用するダイアログフォントを決定する
+ */
+void SetDialogFont(const char *SetupFName,
+				   const char *UILanguageFile, const char *Section)
+{
+	// teraterm.iniの指定
+	if (SetupFName != NULL) {
+		LOGFONTA logfont;
+		BOOL result;
+		result = GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
+		if (result == TRUE) {
+			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE);
+			if (result == TRUE) {
+				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+				return;
 			}
 		}
+	}
+
+	// .lngの指定
+	if (UILanguageFile != NULL) {
+		static const char *dlg_font_keys[] = {
+			"DLG_FONT",
+			"DLG_TAHOMA_FONT",
+			"DLG_SYSTEM_FONT",
+		};
+		BOOL result = FALSE;
+		LOGFONTA logfont;
+		size_t i;
+		if (Section != NULL) {
+			for (i = 0; i < _countof(dlg_font_keys); i++) {
+				result = GetI18nLogfont(Section, dlg_font_keys[i], &logfont, 0, UILanguageFile);
+				if (result == FALSE) {
+					continue;
+				}
+				if (logfont.lfFaceName[0] == '\0') {
+					break;
+				}
+				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+					break;
+				}
+			}
+		}
+		if (result == FALSE) {
+			for (i = 0; i < _countof(dlg_font_keys); i++) {
+				result = GetI18nLogfont("Tera Term", dlg_font_keys[i], &logfont, 0, UILanguageFile);
+				if (result == FALSE) {
+					continue;
+				}
+				if (logfont.lfFaceName[0] == '\0') {
+					break;
+				}
+				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+					break;
+				}
+			}
+		}
+		if (result == TRUE) {
+			TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+			return;
+		}
+	}
+
+	// ini,lngで指定されたフォントが見つからなかったとき、
+	// 文字化けで正しく表示されない事態となる
+	// messagebox()のフォントをとりあえず選択しておく
+	{
+		LOGFONT logfont;
+		GetMessageboxFont(&logfont);
+		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
 	}
 }
 

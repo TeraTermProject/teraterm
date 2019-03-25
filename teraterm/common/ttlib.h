@@ -29,6 +29,10 @@
 
 /* useful routines */
 
+#pragma once
+
+#include "i18n.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +40,7 @@ extern "C" {
 BOOL GetFileNamePos(PCHAR PathName, int far *DirLen, int far *FNPos);
 BOOL ExtractFileName(PCHAR PathName, PCHAR FileName, int destlen);
 BOOL ExtractDirName(PCHAR PathName, PCHAR DirName);
-void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt);
+void FitFileName(PCHAR FileName, int destlen, const char *DefExt);
 void AppendSlash(PCHAR Path, int destlen);
 void DeleteSlash(PCHAR Path);
 void Str2Hex(PCHAR Str, PCHAR Hex, int Len, int MaxHexLen, BOOL ConvSP);
@@ -63,18 +67,18 @@ BOOL GetNthString(PCHAR Source, int Nth, int Size, PCHAR Dest);
 void GetNthNum(PCHAR Source, int Nth, int far *Num);
 int GetNthNum2(PCHAR Source, int Nth, int defval);
 void GetDownloadFolder(char *dest, int destlen);
-void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen);
+void GetDefaultFName(const char *home, const char *file, char *dest, int destlen);
 void GetDefaultSetupFName(char *home, char *dest, int destlen);
 void GetUILanguageFile(char *buf, int buflen);
 void GetOnOffEntryInifile(char *entry, char *buf, int buflen);
-void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile);
+void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
 #if defined(UNICODE)
 void get_lang_msgW(const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
 #endif
 int get_lang_font(PCHAR key, HWND dlg, PLOGFONT logfont, HFONT *font, const char *iniFile);
-BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg);
-void OutputDebugPrintf(char *fmt, ...);
-DWORD get_OPENFILENAME_SIZE();
+BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg);
+void OutputDebugPrintf(const char *fmt, ...);
+DWORD get_OPENFILENAME_SIZEA();
 BOOL IsWindows95();
 BOOL IsWindowsMe();
 BOOL IsWindowsNT4();
@@ -107,10 +111,13 @@ BOOL GetPositionOnWindow(
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
+void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
 #if defined(_UNICODE)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
+#define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEW()
 #else
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msg(p1, p2, p3, p4, p5)
+#define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEA()
 #endif
 #ifdef __cplusplus
 }

@@ -11,7 +11,10 @@ set(COMMON_SRC
   ../common/i18n.h
   ../common/ttlib.c
   ../common/ttlib.h
+  ../common/codeconv.h
+  ../common/codeconv.cpp
   )
+
 source_group(
   "common"
   FILES
@@ -25,7 +28,7 @@ set(SRC
   ttptek.def
   ttptek.rc
   ttptek-version.rc
-#  tttek.h
+  tttek.h
   tttek.c
   ${COMMON_SRC}
   )
@@ -56,8 +59,8 @@ endif()
 target_link_libraries(
   ttptek
   ttpcmn
-  debug sfmtd.lib
-  optimized sfmt.lib
+  debug sfmtd
+  optimized sfmt
   #
   iphlpapi
   gdi32

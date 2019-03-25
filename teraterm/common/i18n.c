@@ -27,31 +27,129 @@
  */
 
 #include "i18n.h"
+#include "ttlib.h"
+#include "codeconv.h"
 
-void WINAPI GetI18nStr(PCHAR section, PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile)
+#include <assert.h>
+#include <tchar.h>
+
+#if defined(UNICODE)
+DllExport void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile)
 {
-	GetPrivateProfileString(section, key, def, buf, buf_len, iniFile);
+	wchar_t sectionW[64];
+	wchar_t keyW[128];
+	wchar_t iniFileW[MAX_PATH];
+	MultiByteToWideChar(CP_ACP, 0, section, -1, sectionW, _countof(sectionW));
+	MultiByteToWideChar(CP_ACP, 0, key, -1, keyW, _countof(keyW));
+	MultiByteToWideChar(CP_ACP, 0, iniFile, -1, iniFileW, _countof(iniFileW));
+	GetPrivateProfileStringW(sectionW, keyW, def, buf, buf_len, iniFileW);
+	RestoreNewLineW(buf);
+}
+#endif
+
+void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
+{
+	GetPrivateProfileStringA(section, key, def, buf, buf_len, iniFile);
 	RestoreNewLine(buf);
 }
 
-int WINAPI GetI18nLogfont(PCHAR section, PCHAR key, PLOGFONT logfont, int ppi, const char *iniFile)
+// TODO: バッファ不足時の動作
+void GetI18nStrU8(const char *section, const char *key, char *buf, int buf_len, const char *def, const char *iniFile)
 {
-	static char tmp[MAX_UIMSG];
-	static char font[LF_FACESIZE];
-	int hight, charset;
-	GetPrivateProfileString(section, key, "-", tmp, MAX_UIMSG, iniFile);
-	if (strcmp(tmp, "-") == 0) {
+	size_t r;
+#if defined(UNICODE)
+	wchar_t tmp[MAX_UIMSG];
+	wchar_t defW[MAX_UIMSG];
+	r = UTF8ToWideChar(def, -1, defW, _countof(defW));
+	assert(r != 0);
+	GetI18nStrW(section, key, tmp, _countof(tmp), defW, iniFile);
+	r = buf_len;
+	WideCharToUTF8(tmp, NULL, buf, &r);
+	assert(r != 0);
+#else
+	// ANSI -> Wide -> utf8
+	char strA[MAX_UIMSG];
+	wchar_t strW[MAX_UIMSG];
+	GetI18nStr(section, key, strA, _countof(strA), def, iniFile);
+	r = MultiByteToWideChar(CP_ACP, 0, strA, -1, strW, _countof(strW));
+	assert(r != 0);
+	r = buf_len;
+	WideCharToUTF8(strW, NULL, buf, &r);
+	assert(r != 0);
+#endif
+}
+
+int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile)
+{
+	char tmp[MAX_UIMSG];
+	char font[LF_FACESIZE];
+	int height, charset;
+	assert(iniFile[0] != '\0');
+	memset(logfont, 0, sizeof(*logfont));
+
+	GetPrivateProfileStringA(section, key, "", tmp, MAX_UIMSG, iniFile);
+	if (tmp[0] == '\0') {
 		return FALSE;
 	}
 
 	GetNthString(tmp, 1, LF_FACESIZE-1, font);
-	GetNthNum(tmp, 2, &hight);
+	GetNthNum(tmp, 2, &height);
 	GetNthNum(tmp, 3, &charset);
 
-	strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
-	logfont->lfCharSet = charset;
-	logfont->lfHeight = MulDiv(hight, -ppi, 72);
+	if (font[0] != '\0') {
+		strncpy_s(logfont->lfFaceName, sizeof(logfont->lfFaceName), font, _TRUNCATE);
+	}
+	logfont->lfCharSet = (BYTE)charset;
+	if (ppi != 0) {
+		logfont->lfHeight = MulDiv(height, -ppi, 72);
+	} else {
+		logfont->lfHeight = height;
+	}
 	logfont->lfWidth = 0;
 
 	return TRUE;
+}
+
+void SetI18DlgStrs(const char *section, HWND hDlgWnd,
+				   const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+{
+	size_t i;
+	assert(hDlgWnd != NULL);
+	assert(infoCount > 0);
+	for (i = 0 ; i < infoCount; i++) {
+		const char *key = infos[i].key;
+		TCHAR uimsg[MAX_UIMSG];
+		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		if (uimsg[0] != _T('\0')) {
+			const int nIDDlgItem = infos[i].nIDDlgItem;
+			BOOL r;
+			if (nIDDlgItem == 0) {
+				r = SetWindowText(hDlgWnd, uimsg);
+				assert(r != 0);
+			} else {
+				r = SetDlgItemText(hDlgWnd, nIDDlgItem, uimsg);
+				assert(r != 0);
+			}
+			(void)r;
+		}
+	}
+}
+
+void SetI18MenuStrs(const char *section, HMENU hMenu,
+					const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile)
+{
+	size_t i;
+	for (i = 0; i < infoCount; i++) {
+		const int nIDDlgItem = infos[i].nIDDlgItem;
+		const char *key = infos[i].key;
+		TCHAR uimsg[MAX_UIMSG];
+		GetI18nStrT(section, key, uimsg, sizeof(uimsg), _T(""), UILanguageFile);
+		if (uimsg[0] != '\0') {
+			if (nIDDlgItem < 1000) {
+				ModifyMenu(hMenu, nIDDlgItem, MF_BYPOSITION, nIDDlgItem, uimsg);
+			} else {
+				ModifyMenu(hMenu, nIDDlgItem, MF_BYCOMMAND, nIDDlgItem, uimsg);
+			}
+		}
+	}
 }

@@ -36,9 +36,14 @@
 #include <string.h>
 
 #include "ttcommon.h"
-#include "tekesc.h"
 
 #include "compat_w95.h"
+
+#undef DllExport
+#define DllExport __declspec(dllexport) 
+
+#include "tekesc.h"
+#include "tttek.h"
 
 static HANDLE hInst;
 

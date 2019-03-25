@@ -19,6 +19,8 @@ set(COMMON_SRC
   ../teraterm/common/codeconv.cpp
   ../teraterm/common/dlglib.h
   ../teraterm/common/dlglib.c
+  ../teraterm/common/dlglib_cpp.cpp
+  ../teraterm/common/dlglib_tmpl.cpp
   ../teraterm/teraterm/ttdialog.h
   ../teraterm/teraterm/ttfileio.h
   ../teraterm/teraterm/ttsetup.h

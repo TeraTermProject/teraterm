@@ -35,7 +35,11 @@
 #include <math.h>
 #include <string.h>
 
+#undef DllExport
+#define DllExport __declspec(dllexport) 
+
 #include "tekesc.h"
+#include "tttek.h"
 
 void Log1Byte(PComVar cv, BYTE b)
 {

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2006-2018 TeraTerm Project
+ * Copyright (C) 1994-1998 T. Teranishi
+ * (C) 2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,40 +27,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __I18N_H
-#define __I18N_H
+/* TTTEK.DLL, TEK escape sequences */
 
-#include <windows.h>
-
-#define MAX_UIMSG	1024
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct {
-	int nIDDlgItem;
-	const char *key;
-} DlgTextInfo;
-
-#if defined(UNICODE)
-void GetI18nStrW(const char *section, const char *key, wchar_t *buf, int buf_len, const wchar_t *def, const char *iniFile);
-#endif
-void GetI18nStr(const char *section, const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile);
-int GetI18nLogfont(const char *section, const char *key, PLOGFONTA logfont, int ppi, const char *iniFile);
-void SetI18DlgStrs(const char *section, HWND hDlgWnd,
-							 const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
-void SetI18MenuStrs(const char *section, HMENU hMenu,
-							  const DlgTextInfo *infos, size_t infoCount, const char *UILanguageFile);
-
-#if defined(_UNICODE)
-#define	GetI18nStrT(p1, p2, p3, p4, p5, p6) GetI18nStrW(p1, p2, p3, p4, p5, p6)
-#else
-#define	GetI18nStrT(p1, p2, p3, p4, p5, p6) GetI18nStr(p1, p2, p3, p4, p5, p6)
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+DllExport void WINAPI TEKInit(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKChangeCaret(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKDestroyCaret(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKResizeWindow(PTEKVar tk, PTTSet ts, int W, int H);
+DllExport int WINAPI TEKParse(PTEKVar tk, PTTSet ts, PComVar cv);
+DllExport void WINAPI TEKReportGIN(PTEKVar tk, PTTSet ts, PComVar cv, BYTE KeyCode);
+DllExport void WINAPI TEKPaint(PTEKVar tk, PTTSet ts, HDC PaintDC, PAINTSTRUCT *PaintInfo);
+DllExport void WINAPI TEKWMLButtonDown(PTEKVar tk, PTTSet ts, PComVar cv, POINT pos);
+DllExport void WINAPI TEKWMLButtonUp(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKWMMouseMove(PTEKVar tk, PTTSet ts, POINT p);
+DllExport void WINAPI TEKWMSize(PTEKVar tk, PTTSet ts, int W, int H, int cx, int cy);
+DllExport void WINAPI TEKCMCopy(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKCMCopyScreen(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKPrint(PTEKVar tk, PTTSet ts, HDC PrintDC, BOOL SelFlag);
+DllExport void WINAPI TEKClearScreen(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKSetupFont(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKResetWin(PTEKVar tk, PTTSet ts, WORD EmuOld);
+DllExport void WINAPI TEKRestoreSetup(PTEKVar tk, PTTSet ts);
+DllExport void WINAPI TEKEnd(PTEKVar tk);

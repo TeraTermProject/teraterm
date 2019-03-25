@@ -162,7 +162,7 @@ DWORD DLLGetApiAddress(const TCHAR *dllPath, DLLLoadFlag LoadFlag,
 		*pFunc = NULL;
 		return ERROR_FILE_NOT_FOUND;
 	} else {
-		*pFunc = GetProcAddress(hDll, ApiName);
+		*pFunc = (void *)GetProcAddress(hDll, ApiName);
 		if (*pFunc == NULL) {
 			return ERROR_PROC_NOT_FOUND;
 		}

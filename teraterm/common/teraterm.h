@@ -70,6 +70,7 @@ Visual C++ 14.0 (Visual Studio 2015) 1900
 #define USE_NORMAL_BGCOLOR
 
 #include "i18n.h"
+#include "ttlib.h"
 
 #define MAXPATHLEN 256
 /* version 2.3 */

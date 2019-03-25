@@ -27,7 +27,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Routines for dialog boxes */
+#pragma once
+
+#include <windows.h>
+#include "i18n.h"
+
+ /* Routines for dialog boxes */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,17 +45,58 @@ void GetRB(HWND HDlg, LPWORD R, int FirstId, int LastId);
 void SetDlgNum(HWND HDlg, int id_Item, LONG Num);
 void SetDlgPercent(HWND HDlg, int id_Item, int id_Progress, LONG a, LONG b, int *prog);
 void SetDlgTime(HWND HDlg, int id_Item, DWORD elapsed, int bytes);
-void SetDropDownList(HWND HDlg, int Id_Item, const TCHAR **List, int nsel);
+void SetDropDownList(HWND HDlg, int Id_Item, const char *List[], int nsel);
+void SetDropDownListW(HWND HDlg, int Id_Item, const wchar_t *List[], int nsel);
 LONG GetCurSel(HWND HDlg, int Id_Item);
 void InitDlgProgress(HWND HDlg, int id_Progress, int *CurProgStat);
 void SetEditboxSubclass(HWND hDlg, int nID, BOOL ComboBox);
-typedef struct {
-	int nIDDlgItem;
-	char *key;
-} DlgTextInfo;
-void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+
+#if defined(_UNICODE)
+#define SetDropDownListT(p1, p2, p3, p4)	SetDropDownListW(p1, p2, p3, p4)
+#else
+#define SetDropDownListT(p1, p2, p3, p4)	SetDropDownList(p1, p2, p3, p4)
+#endif
+
+void TTSetDlgFontA(const char *face, int height, int charset);
+void TTSetDlgFontW(const wchar_t *face, int height, int charset);
+const wchar_t *TTGetClassName(const DLGTEMPLATE *DlgTempl);
+DLGTEMPLATE *TTGetDlgTemplate(HINSTANCE hInst, LPCTSTR lpTemplateName);
+DLGTEMPLATE *TTGetNewDlgTemplate(
+	HINSTANCE hInst, const DLGTEMPLATE *src,
+	size_t *PrevTemplSize, size_t *NewTemplSize);
+BOOL TTEndDialog(HWND hDlgWnd, INT_PTR nResult);
+HWND TTCreateDialogIndirectParam(
+	HINSTANCE hInstance,
+	LPCDLGTEMPLATE lpTemplate,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc,
+	LPARAM lParamInit);
+HWND TTCreateDialog(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc);
+INT_PTR TTDialogBoxParam(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc,
+	LPARAM lParamInit);
+INT_PTR TTDialogBox(
+	HINSTANCE hInstance,
+	LPCTSTR lpTemplateName,
+	HWND hWndParent,
+	DLGPROC lpDialogFunc);
+void SetDialogFont(const char *SetupFName, const char *UILanguageFile, const char *Section);
 HFONT SetDlgFonts(HWND hDlg, const int nIDDlgItems[], int nIDDlgItemCount,
 				  const char *UILanguageFile, PCHAR key);
+BOOL IsExistFontA(const char *face, BYTE charset, BOOL strict);
+
+#if defined(_UNICODE)
+#define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontW(p1,p2,p3)
+#else
+#define TTSetDlgFont(p1,p2,p3)	TTSetDlgFontA(p1,p2,p3)
+#endif
 
 #ifdef __cplusplus
 }

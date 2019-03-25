@@ -33,6 +33,7 @@
 #include "tttypes.h"
 #include <mbstring.h>
 #include <locale.h>
+#include "codemap.h"
 
 #include "language.h"
 

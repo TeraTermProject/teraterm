@@ -90,4 +90,7 @@ EXPORTS
   parse_port @90
   parse_port_from_buf @91
   service_name @92
-  get_OPENFILENAME_SIZE @93
+  get_OPENFILENAME_SIZEA @93
+
+  SetI18DlgStrs
+  SetI18MenuStrs

@@ -34,6 +34,7 @@
 #include "tttypes.h"
 #include "ttftypes.h"
 #include "ttlib.h"
+#include "dlglib.h"
 #include "protodlg.h"
 
 #ifdef _DEBUG

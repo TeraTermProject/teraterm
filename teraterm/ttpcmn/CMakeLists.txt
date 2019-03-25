@@ -57,6 +57,10 @@ add_library(
   ${SRC}
   )
 
+target_compile_definitions(
+  ttpcmn
+  PRIVATE -DTTPCMN_DLL
+  )
 if(MINGW)
   set_target_properties(
     ttpcmn

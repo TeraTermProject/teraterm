@@ -275,7 +275,7 @@ BOOL ExtractDirName(PCHAR PathName, PCHAR DirName)
 
 /* fit a filename to the windows-filename format */
 /* FileName must contain filename part only. */
-void FitFileName(PCHAR FileName, int destlen, PCHAR DefExt)
+void FitFileName(PCHAR FileName, int destlen, const char *DefExt)
 {
 	int i, j, NumOfDots;
 	char Temp[MAX_PATH];
@@ -880,7 +880,7 @@ void GetDownloadFolder(char *dest, int destlen)
 	}
 }
 
-void WINAPI GetDefaultFName(char *home, char *file, char *dest, int destlen)
+void GetDefaultFName(const char *home, const char *file, char *dest, int destlen)
 {
 	// My Documents に file がある場合、
 	// それを読み込むようにした。(2007.2.18 maya)
@@ -971,7 +971,7 @@ void GetOnOffEntryInifile(char *entry, char *buf, int buflen)
 	strncpy_s(buf, buflen, Temp, _TRUNCATE);
 }
 
-void get_lang_msg(PCHAR key, PCHAR buf, int buf_len, PCHAR def, const char *iniFile)
+void get_lang_msg(const char *key, PCHAR buf, int buf_len, const char *def, const char *iniFile)
 {
 	GetI18nStr("Tera Term", key, buf, buf_len, def, iniFile);
 }
@@ -1002,9 +1002,9 @@ int CALLBACK setDefaultFolder(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData
 	return 0;
 }
 
-BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
+BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, const char *def, const char *msg)
 {
-	BROWSEINFO      bi;
+	BROWSEINFOA     bi;
 	LPITEMIDLIST    pidlRoot;      // ブラウズのルートPIDL
 	LPITEMIDLIST    pidlBrowse;    // ユーザーが選択したPIDL
 	char buf[MAX_PATH];
@@ -1046,12 +1046,24 @@ BOOL doSelectFolder(HWND hWnd, char *path, int pathlen, char *def, char *msg)
 	return ret;
 }
 
-void OutputDebugPrintf(char *fmt, ...) {
+void OutputDebugPrintf(const char *fmt, ...)
+{
 	char tmp[1024];
 	va_list arg;
 	va_start(arg, fmt);
 	_vsnprintf(tmp, sizeof(tmp), fmt, arg);
-	OutputDebugString(tmp);
+	va_end(arg);
+	OutputDebugStringA(tmp);
+}
+
+void OutputDebugPrintfW(const wchar_t *fmt, ...)
+{
+	wchar_t tmp[1024];
+	va_list arg;
+	va_start(arg, fmt);
+	_vsnwprintf(tmp, _countof(tmp), fmt, arg);
+	va_end(arg);
+	OutputDebugStringW(tmp);
 }
 
 #if (_MSC_VER < 1800)
@@ -1782,4 +1794,14 @@ BOOL GetPositionOnWindow(
 	}
 
 	return TRUE;
+}
+
+void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+{
+	SetI18DlgStrs("Tera Term", hDlgWnd, infos, infoCount, UILanguageFile);
+}
+
+void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
+{
+	SetI18MenuStrs("Tera Term", hMenu, infos, infoCount, UILanguageFile);
 }
