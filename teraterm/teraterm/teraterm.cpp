@@ -114,7 +114,7 @@ static void init()
 #endif
 	DLLInit();
 	WinCompatInit();
-#if 1
+#if defined(DPIAWARENESS)
 	if (pSetThreadDpiAwarenessContext) {
 		pSetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	}

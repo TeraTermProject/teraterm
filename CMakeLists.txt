@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(teraterm_all)
 
+option(ENABLE_DPIAWARENESS "Dpiawareness" ON)
 option(ENABLE_TTXSAMPLES "TTXSamples" ON)
 option(USE_UNICODE_API "unicode" OFF)
 
