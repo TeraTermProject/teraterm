@@ -39,7 +39,7 @@
 #include "dlglib.h"
 
 struct DrapDropDlgParam {
-	const char *TargetFilename;
+	const TCHAR *TargetFilename;
 	enum drop_type DropType;
 	unsigned char DropTypePaste;
 	bool ScpEnable;
@@ -56,23 +56,11 @@ struct DrapDropDlgParam {
 };
 
 struct DrapDropDlgData {
-	HFONT hNewFont;
 	DrapDropDlgParam *Param;
 };
 
 static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-	static const int FontIDs[] = {
-		IDC_FILENAME_EDIT,
-		IDC_DAD_STATIC,
-		IDC_SCP_RADIO, IDC_SENDFILE_RADIO, IDC_PASTE_RADIO,
-		IDC_SCP_PATH_LABEL, IDC_SCP_PATH, IDC_SCP_PATH_NOTE,
-		IDC_BINARY_CHECK,
-		IDC_ESCAPE_CHECK, IDC_NEWLINE_RADIO, IDC_SPACE_RADIO,
-		IDC_SAME_PROCESS_CHECK, IDC_SAME_PROCESS_NEXTDROP_CHECK, IDC_DONTSHOW_CHECK,
-		IDC_DAD_NOTE,
-		IDOK, IDCANCEL,
-	};
 	static const DlgTextInfo TextInfos[] = {
 		{ 0, "DLG_DANDD_TITLE" },
 		{ IDC_DAD_STATIC, "DLG_DANDD_TEXT" },
@@ -101,7 +89,6 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		SetWindowLongPtr(hDlgWnd, DWLP_USER, (LONG_PTR)DlgData);
 		DrapDropDlgParam *Param = (DrapDropDlgParam *)lp;
 		DlgData->Param = Param;
-		DlgData->hNewFont = SetDlgFonts(hDlgWnd, FontIDs, _countof(FontIDs), Param->UILanguageFile, NULL);
 		SetDlgTexts(hDlgWnd, TextInfos, _countof(TextInfos), Param->UILanguageFile);
 
 		// target file
@@ -115,7 +102,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 						 IDC_SCP_RADIO);
 
 		// SCP
-		SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_SETTEXT, 0, (LPARAM)Param->ScpSendDirPtr);
+		SetDlgItemTextA(hDlgWnd, IDC_SCP_PATH, Param->ScpSendDirPtr);
 		if (!Param->ScpEnable) {
 			// 無効化
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SCP_RADIO), FALSE);
@@ -149,10 +136,10 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 		// Do this for the next %d files
 		char orgmsg[MAX_UIMSG];
-		GetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
+		GetDlgItemTextA(hDlgWnd, IDC_SAME_PROCESS_CHECK, orgmsg, sizeof(orgmsg));
 		char uimsg[MAX_UIMSG];
 		_snprintf_s(uimsg, sizeof(uimsg), _TRUNCATE, orgmsg, Param->RemaingFileCount - 1);
-		SetDlgItemText(hDlgWnd, IDC_SAME_PROCESS_CHECK, uimsg);
+		SetDlgItemTextA(hDlgWnd, IDC_SAME_PROCESS_CHECK, uimsg);
 		if (Param->RemaingFileCount < 2) {
 			EnableWindow(GetDlgItem(hDlgWnd, IDC_SAME_PROCESS_CHECK), FALSE);
 		}
@@ -167,19 +154,16 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 		}
 
 		// focus to "SCP dest textbox" or "Cancel"
-		if (Param->ScpEnable) {
-			// "SCP" 有効時は Cancel にフォーカスを当て、最終的に SCP PATH にフォーカスが
-			// 当たるようにする。
-			SetFocus(GetDlgItem(hDlgWnd, IDC_SCP_RADIO));
-		} else {
-			// フォーカスの初期状態を Cancel にする為、この時点では IDOK に
-			// フォーカスを当てる。後で WM_NEXTDLGCTL でフォーカスが次のボタンになる。
-			SetFocus(GetDlgItem(hDlgWnd, IDOK));
+		{
+			int focus_id;
+			if (Param->ScpEnable) {
+				focus_id = IDC_SCP_PATH;
+			} else {
+				focus_id = IDCANCEL;
+			}
+			PostMessage(hDlgWnd, WM_NEXTDLGCTL,
+						(WPARAM)GetDlgItem(hDlgWnd, focus_id), TRUE);
 		}
-		// フォーカスを次のボタンに移す
-		// SetFocus() で直接フォーカスを当てるとタブキーの動作等に問題が出るため、
-		// このメッセージを併用する
-		PostMessage(hDlgWnd, WM_NEXTDLGCTL, 0, 0L);
 
 		// TRUEにするとボタンにフォーカスが当たらない。
 		return FALSE;
@@ -209,9 +193,8 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			if (IsDlgButtonChecked(hDlgWnd, IDC_SCP_RADIO) == BST_CHECKED) {
 				// SCP
 				DlgData->Param->DropType = DROP_TYPE_SCP;
-				SendMessage(GetDlgItem(hDlgWnd, IDC_SCP_PATH), WM_GETTEXT,
-							(WPARAM)DlgData->Param->ScpSendDirSize,
-							(LPARAM)DlgData->Param->ScpSendDirPtr);
+				GetDlgItemTextA(hDlgWnd, IDC_SCP_PATH,
+								DlgData->Param->ScpSendDirPtr, DlgData->Param->ScpSendDirSize);
 			} else if (IsDlgButtonChecked(hDlgWnd, IDC_SENDFILE_RADIO) == BST_CHECKED) {
 				// Send File
 				DlgData->Param->DropType =
@@ -242,16 +225,12 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 			DlgData->Param->DropType = DROP_TYPE_CANCEL;
 		}
 		if (wID == IDOK || wID == IDCANCEL) {
-			EndDialog(hDlgWnd, wID);
+			TTEndDialog(hDlgWnd, wID);
 			break;
 		}
 		return FALSE;
 	}
 	case WM_NCDESTROY:
-		if (DlgData->hNewFont != NULL) {
-			DeleteObject(DlgData->hNewFont);
-			DlgData->hNewFont = NULL;
-		}
 		free(DlgData);
 		break;
 
@@ -263,7 +242,7 @@ static LRESULT CALLBACK OnDragDropDlgProc(HWND hDlgWnd, UINT msg, WPARAM wp, LPA
 
 enum drop_type ShowDropDialogBox(
 	HINSTANCE hInstance, HWND hWndParent,
-	const char *TargetFilename,
+	const TCHAR *TargetFilename,
 	enum drop_type DefaultDropType,
 	int RemaingFileCount,
 	bool EnableSCP,
@@ -288,7 +267,7 @@ enum drop_type ShowDropDialogBox(
 	Param.ScpSendDirSize = _countof(pts->ScpSendDir);
 	Param.UILanguageFile = pts->UILanguageFile;
 
-	int ret = DialogBoxParam(
+	int ret = TTDialogBoxParam(
 		hInstance, MAKEINTRESOURCE(IDD_DAD_DIALOG),
 		hWndParent, (DLGPROC)OnDragDropDlgProc,
 		(LPARAM)&Param);

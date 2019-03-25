@@ -42,7 +42,7 @@ enum drop_type {
 
 enum drop_type ShowDropDialogBox(
 	HINSTANCE hInstance, HWND hWndParent,
-	const char *TargetFilename,
+	const TCHAR *TargetFilename,
 	enum drop_type DefaultDropType,
 	int RemaingFileCount,
 	bool EnableSCP,
