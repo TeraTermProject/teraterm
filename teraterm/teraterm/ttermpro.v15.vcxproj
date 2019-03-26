@@ -137,8 +137,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\dlglib.c" />
+    <ClCompile Include="..\common\dlglib_cpp.cpp" />
+    <ClCompile Include="..\common\dlglib_tmpl.cpp" />
     <ClCompile Include="..\common\stdafx.cpp" />
     <ClCompile Include="..\common\ttlib.c" />
+    <ClCompile Include="..\common\tipwin.cpp" />
     <ClCompile Include="..\common\win16api.c" />
     <ClCompile Include="..\common\codeconv.cpp" />
     <ClCompile Include="..\common\dllutil.cpp" />
