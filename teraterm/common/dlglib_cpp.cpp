@@ -30,6 +30,7 @@
 
 #include <windows.h>
 #include "dlglib.h"
+#include "ttlib.h"
 
 // ダイアログモーダル状態の時、OnIdle()を実行する
 //#define ENABLE_CALL_IDLE_MODAL	1
@@ -239,4 +240,78 @@ INT_PTR TTDialogBox(
 	return TTDialogBoxParam(
 		hInstance, lpTemplateName,
 		hWndParent, lpDialogFunc, (LPARAM)NULL);
+}
+
+/**
+ *	使用するダイアログフォントを決定する
+ */
+void SetDialogFont(const char *SetupFName,
+				   const char *UILanguageFile, const char *Section)
+{
+	// teraterm.iniの指定
+	if (SetupFName != NULL) {
+		LOGFONTA logfont;
+		BOOL result;
+		result = GetI18nLogfont("Tera Term", "DlgFont", &logfont, 0, SetupFName);
+		if (result == TRUE) {
+			result = IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE);
+			if (result == TRUE) {
+				TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+				return;
+			}
+		}
+	}
+
+	// .lngの指定
+	if (UILanguageFile != NULL) {
+		static const char *dlg_font_keys[] = {
+			"DLG_FONT",
+			"DLG_TAHOMA_FONT",
+			"DLG_SYSTEM_FONT",
+		};
+		BOOL result = FALSE;
+		LOGFONTA logfont;
+		size_t i;
+		if (Section != NULL) {
+			for (i = 0; i < _countof(dlg_font_keys); i++) {
+				result = GetI18nLogfont(Section, dlg_font_keys[i], &logfont, 0, UILanguageFile);
+				if (result == FALSE) {
+					continue;
+				}
+				if (logfont.lfFaceName[0] == '\0') {
+					break;
+				}
+				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+					break;
+				}
+			}
+		}
+		if (result == FALSE) {
+			for (i = 0; i < _countof(dlg_font_keys); i++) {
+				result = GetI18nLogfont("Tera Term", dlg_font_keys[i], &logfont, 0, UILanguageFile);
+				if (result == FALSE) {
+					continue;
+				}
+				if (logfont.lfFaceName[0] == '\0') {
+					break;
+				}
+				if (IsExistFontA(logfont.lfFaceName, logfont.lfCharSet, TRUE)) {
+					break;
+				}
+			}
+		}
+		if (result == TRUE) {
+			TTSetDlgFontA(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+			return;
+		}
+	}
+
+	// ini,lngで指定されたフォントが見つからなかったとき、
+	// 文字化けで正しく表示されない事態となる
+	// messagebox()のフォントをとりあえず選択しておく
+	{
+		LOGFONT logfont;
+		GetMessageboxFont(&logfont);
+		TTSetDlgFont(logfont.lfFaceName, logfont.lfHeight, logfont.lfCharSet);
+	}
 }

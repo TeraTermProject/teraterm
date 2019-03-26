@@ -108,6 +108,7 @@ void split_buffer(char *buffer, int delimiter, char **head, char **body);
 BOOL GetPositionOnWindow(
 	HWND hWnd, const POINT *point,
 	BOOL *InWindow, BOOL *InClient, BOOL *InTitleBar);
+void GetMessageboxFont(LOGFONTA *logfont);
 
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 

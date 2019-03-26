@@ -58,8 +58,9 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
-#include <commctrl.h>	// for CCSIZEOF_STRUCT()
 #include <assert.h>
+
+#include "ttlib.h"		// for GetMessageboxFont()
 
 #include "TipWin.h"
 
@@ -188,20 +189,6 @@ static LRESULT CALLBACK SizeTipWndProc(HWND hWnd, UINT nMsg,
 	}
 
 	return DefWindowProc(hWnd, nMsg, wParam, lParam);
-}
-
-// todo: dlglib.cÇ…ìØìôÇ»ÉRÅ[ÉhÇ†ÇË
-void GetMessageboxFont(LOGFONT *logfont)
-{
-	NONCLIENTMETRICS nci;
-	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
-	BOOL r;
-
-	memset(&nci, 0, sizeof(nci));
-	nci.cbSize = st_size;
-	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
-	assert(r == TRUE);
-	*logfont = nci.lfStatusFont;
 }
 
 static void register_class(HINSTANCE hInst)

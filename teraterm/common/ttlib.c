@@ -28,18 +28,19 @@
  */
 
 /* misc. routines  */
-#include "teraterm.h"
+
 #include <sys/stat.h>
 #include <sys/utime.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
-#include "tttypes.h"
 #include <shlobj.h>
 #include <ctype.h>
+#include <mbctype.h>	// for _ismbblead
+#include <assert.h>
 
-// for _ismbblead
-#include <mbctype.h>
+#include "teraterm.h"
+#include "tttypes.h"
 
 /* OS version with GetVersionEx(*1)
 
@@ -1804,4 +1805,21 @@ void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const ch
 void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile)
 {
 	SetI18MenuStrs("Tera Term", hMenu, infos, infoCount, UILanguageFile);
+}
+
+/**
+ *	ダイアログフォントを取得する
+ *	エラーは発生しない
+ */
+void GetMessageboxFont(LOGFONT *logfont)
+{
+	NONCLIENTMETRICS nci;
+	const int st_size = CCSIZEOF_STRUCT(NONCLIENTMETRICS, lfMessageFont);
+	BOOL r;
+
+	memset(&nci, 0, sizeof(nci));
+	nci.cbSize = st_size;
+	r = SystemParametersInfo(SPI_GETNONCLIENTMETRICS, st_size, &nci, 0);
+	assert(r == TRUE);
+	*logfont = nci.lfStatusFont;
 }
