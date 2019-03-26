@@ -8,8 +8,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keycode", "keycode\keycode.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpcmn", "ttpcmn\ttpcmn.v15.vcxproj", "{118E0D32-5553-4F73-9927-E873C1C500E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpdlg", "ttpdlg\ttpdlg.v15.vcxproj", "{47CB840D-85C8-460F-9101-BEB54BEF9D56}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpfile", "ttpfile\ttpfile.v15.vcxproj", "{311F2B21-AEC4-4384-8209-BB83B54749B4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ttpmacro", "ttpmacro\ttpmacro.v15.vcxproj", "{BA519362-A2C2-4B1A-905B-F00791F9038A}"
@@ -38,10 +36,6 @@ Global
 		{118E0D32-5553-4F73-9927-E873C1C500E4}.Debug|Win32.Build.0 = Debug|Win32
 		{118E0D32-5553-4F73-9927-E873C1C500E4}.Release|Win32.ActiveCfg = Release|Win32
 		{118E0D32-5553-4F73-9927-E873C1C500E4}.Release|Win32.Build.0 = Release|Win32
-		{47CB840D-85C8-460F-9101-BEB54BEF9D56}.Debug|Win32.ActiveCfg = Debug|Win32
-		{47CB840D-85C8-460F-9101-BEB54BEF9D56}.Debug|Win32.Build.0 = Debug|Win32
-		{47CB840D-85C8-460F-9101-BEB54BEF9D56}.Release|Win32.ActiveCfg = Release|Win32
-		{47CB840D-85C8-460F-9101-BEB54BEF9D56}.Release|Win32.Build.0 = Release|Win32
 		{311F2B21-AEC4-4384-8209-BB83B54749B4}.Debug|Win32.ActiveCfg = Debug|Win32
 		{311F2B21-AEC4-4384-8209-BB83B54749B4}.Debug|Win32.Build.0 = Debug|Win32
 		{311F2B21-AEC4-4384-8209-BB83B54749B4}.Release|Win32.ActiveCfg = Release|Win32

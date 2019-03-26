@@ -193,10 +193,6 @@
       <Project>{118e0d32-5553-4f73-9927-e873c1c500e4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ttpdlg\ttpdlg.v12.vcxproj">
-      <Project>{47cb840d-85c8-460f-9101-beb54bef9d56}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\ttpfile\ttpfile.v12.vcxproj">
       <Project>{311f2b21-aec4-4384-8209-bb83b54749b4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\teraterm\common\tipwin.cpp" />
     <ClCompile Include="..\..\teraterm\teraterm\WSAAsyncGetAddrInfo.c" />
     <ClCompile Include="..\matcher\matcher.c" />
     <ClCompile Include="arc4random.c" />
