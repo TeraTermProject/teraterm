@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2019 TeraTerm Project
+ * (C) 2018-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,51 +26,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* TERATERM.EXE, TTDLG interface */
 #include "teraterm.h"
 #include "tttypes.h"
-#include "ttplug.h" /* TTPLUG */
-#include "ttdlg.h"
 
-#include "ttdialog.h"
-#include "ttwinman.h"
-
-PSetupTerminal SetupTerminal;
-PSetupWin SetupWin;
-PSetupKeyboard SetupKeyboard;
-PSetupSerialPort SetupSerialPort;
-PSetupTCPIP SetupTCPIP;
-PGetHostName GetHostName;
-PChangeDirectory ChangeDirectory;
-PAboutDialog AboutDialog;
-PChooseFontDlg ChooseFontDlg;
-PSetupGeneral SetupGeneral;
-PWindowWindow WindowWindow;
-PTTDLGSetUILanguageFile TTDLGSetUILanguageFile;
-
-BOOL LoadTTDLG()
-{
-	SetupTerminal = _SetupTerminal;
-	SetupWin = _SetupWin;
-	SetupKeyboard = _SetupKeyboard;
-	SetupSerialPort = _SetupSerialPort;
-	SetupTCPIP = _SetupTCPIP;
-	GetHostName = _GetHostName;
-	ChangeDirectory = _ChangeDirectory;
-	AboutDialog = _AboutDialog;
-	ChooseFontDlg = _ChooseFontDlg;
-	SetupGeneral = _SetupGeneral;
-	WindowWindow = _WindowWindow;
-	TTDLGSetUILanguageFile = _TTDLGSetUILanguageFile;
-
-	TTDLGSetUILanguageFile(ts.UILanguageFile);
-	TTXGetUIHooks(); /* TTPLUG */
-
-	return TRUE;
-}
-
-BOOL FreeTTDLG()
-{
-	return TRUE;
-}
-
+BOOL WINAPI _SetupTerminal(HWND WndParent, PTTSet ts);
+BOOL WINAPI _SetupWin(HWND WndParent, PTTSet ts);
+BOOL WINAPI _SetupKeyboard(HWND WndParent, PTTSet ts);
+BOOL WINAPI _SetupSerialPort(HWND WndParent, PTTSet ts);
+BOOL WINAPI _SetupTCPIP(HWND WndParent, PTTSet ts);
+BOOL WINAPI _GetHostName(HWND WndParent, PGetHNRec GetHNRec);
+BOOL WINAPI _ChangeDirectory(HWND WndParent, PCHAR CurDir);
+BOOL WINAPI _AboutDialog(HWND WndParent);
+BOOL WINAPI _ChooseFontDlg(HWND WndParent, LPLOGFONTA LogFont, PTTSet ts);
+BOOL WINAPI _SetupGeneral(HWND WndParent, PTTSet ts);
+BOOL WINAPI _WindowWindow(HWND WndParent, PBOOL Close);
+BOOL WINAPI _TTDLGSetUILanguageFile(char *file);

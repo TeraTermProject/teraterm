@@ -86,3 +86,12 @@ add_subdirectory(TTXKanjiMenu)
 if(${ENABLE_TTXSAMPLES})
   add_subdirectory(TTXSamples)
 endif()
+
+####
+# ソースツリー内に生成ファイルが存在していたら削除する
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
+  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/teraterm/ttpdlg/svnversion.h")
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
+  file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/ttssh2/ttxssh/puttyversion.h")
+endif()

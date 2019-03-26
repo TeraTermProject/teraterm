@@ -1991,8 +1991,10 @@ void CVTWindow::OnDestroy()
 
 	FreeIME(HVTWin);
 	FreeTTSET();
+#if 0	// free‚ÉŽ¸”s‚·‚é‚Ü‚Åfree‚µ‘±‚¯‚é
 	do { }
 	while (FreeTTDLG());
+#endif
 
 	do { }
 	while (FreeTTFILE());

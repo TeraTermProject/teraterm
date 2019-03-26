@@ -53,6 +53,19 @@ source_group(
   ${COMMON_SRC}
   )
 
+set(TTDLG_SRC
+  ../ttpdlg/dlg_res.h
+  ../ttpdlg/ttdlg.c
+  ../ttpdlg/ttdlg.h
+  ../ttpdlg/ttpdlg.rc
+  )
+
+source_group(
+  "ttdlg"
+  FILES
+  ${TTDLG_SRC}
+  )
+
 set(SRC
   addsetting.cpp
   addsetting.h
@@ -119,12 +132,17 @@ set(SRC
   #
   teraterm.manifest
   #
+  svnversion.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svnversion.h
+  #
   ${COMMON_SRC}
+  ${TTDLG_SRC}
   )
 
 include_directories(
   ../common
   ../ttpfile
+  ../ttpdlg
   ${SFMT_INCLUDE_DIRS}
   ${ONIGURUMA_INCLUDE_DIRS}
   .
@@ -158,7 +176,6 @@ set_target_properties(
 target_link_libraries(
   teraterm
   ttpcmn
-  ttpdlg
   ttpfile
   ttpset
   ttptek
@@ -180,11 +197,14 @@ target_link_libraries(
 add_dependencies(
   teraterm
   ttpcmn
-  ttpdlg
   ttpfile
   ttpset
   ttptek
   )
+
+configure_file(
+  svnversion.h.in
+  svnversion.h @ONLY)
 
 # copy .lng files
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
@@ -241,3 +261,8 @@ if(${CMAKE_GENERATOR} MATCHES "Visual Studio 15 2017")
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$(Configuration)/lang/Traditional Chinese.lng"
     )
 endif()
+
+####
+configure_file(
+  svnversion.h.in
+  svnversion.h @ONLY)
