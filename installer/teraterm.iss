@@ -67,7 +67,6 @@ Name: {app}\lang; Components: TeraTerm
 [Files]
 Source: ..\teraterm\release\ttermpro.exe; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpcmn.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
-Source: ..\teraterm\release\ttpdlg.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpfile.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttpset.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
 Source: ..\teraterm\release\ttptek.dll; DestDir: {app}; Components: TeraTerm; Flags: ignoreversion
@@ -963,6 +962,7 @@ Name: {app}\copyfont.bat; Type: files
 Name: {app}\copyfont.pif; Type: files
 Name: {app}\libeay.txt; Type: files
 Name: {app}\cygterm+-x86_64\cyglaunch.exe; Type: files
+Name: {app}\ttpdlg.dll; Type: files
 
 [UninstallDelete]
 Name: {app}\cygterm.exe; Type: files
