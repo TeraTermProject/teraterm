@@ -117,6 +117,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\teraterm\common\codeconv.cpp" />
     <ClCompile Include="..\teraterm\common\i18n.c" />
     <ClCompile Include="..\teraterm\common\ttlib.c" />
     <ClCompile Include="registry.cpp">
@@ -139,7 +140,10 @@
     <Image Include="ttpmenu.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\teraterm\common\codeconv.h" />
+    <ClInclude Include="..\teraterm\common\i18n.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ttpmenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ttpmenu.rc" />
