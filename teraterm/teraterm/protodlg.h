@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2018 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,39 +28,25 @@
  */
 
 /* TERATERM.EXE, file-transfer-protocol dialog box */
+#include "tmfc.h"
+#include "tttypes.h"
 
 // CProtoDlg dialog
-class CProtoDlg : public CDialog
+class CProtoDlg : public TTCDialog
 {
-private:
-  PFileVar fv;
-#ifndef NO_I18N
-	HFONT DlgFont;
-#endif
 
 public:
-#ifndef NO_I18N
-	BOOL Create(PFileVar pfv, PTTSet pts);
-#else
-	BOOL Create(PFileVar pfv);
-#endif
+	BOOL Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PTTSet pts);
 
-	//{{AFX_DATA(CProtoDlg)
 	enum { IDD = IDD_PROTDLG };
-	//}}AFX_DATA
-
-	//{{AFX_VIRTUAL(CProtoDlg)
-	protected:
-	virtual void OnCancel( );
-	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	virtual void PostNcDestroy();
-	//}}AFX_VIRTUAL
-
 protected:
-
-	//{{AFX_MSG(CProtoDlg)
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	virtual BOOL OnCancel();
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+	virtual BOOL OnInitDialog();
+	virtual BOOL PostNcDestroy();
+private:
+	PFileVar fv;
+	TTTSet *m_pts;
 };
 
 typedef CProtoDlg *PProtoDlg;

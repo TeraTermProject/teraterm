@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2007-2017 TeraTerm Project
+ * (C) 2007-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,15 @@
  */
 
 /* TERATERM.EXE, file transfer dialog box */
-#include "stdafx.h"
+#include <stdio.h>
+#include <windows.h>
+#include <commctrl.h>
+#include <tchar.h>
 #include "teraterm.h"
 #include "tttypes.h"
 #include "ttftypes.h"
 #include "ttlib.h"
+#include "dlglib.h"
 #include "tt_res.h"
 #include "ftdlg.h"
 
@@ -45,15 +49,9 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg dialog
 
-BEGIN_MESSAGE_MAP(CFileTransDlg, CDialog)
-	//{{AFX_MSG_MAP(CFileTransDlg)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
+BOOL CFileTransDlg::Create(HINSTANCE hInstance, HWND hParent, PFileVar pfv, PComVar pcv, PTTSet pts)
 {
 	BOOL Ok;
-	WNDCLASS wc;
 	int fuLoad = LR_DEFAULTCOLOR;
 	HWND hwnd;
 
@@ -61,28 +59,14 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	cv = pcv;
 	cv->FilePause &= ~fv->OpId;
 	ts = pts;
-	LOGFONT logfont;
-	HFONT font;
-
-	wc.style = CS_PARENTDC;
-	wc.lpfnWndProc = AfxWndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = DLGWINDOWEXTRA;
-	wc.hInstance = AfxGetInstanceHandle();
-	wc.hIcon = NULL;
-	wc.hCursor = LoadCursor(NULL,IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "FTDlg32";
-	RegisterClass(&wc);
 
 	Pause = FALSE;
-	hwnd = GetForegroundWindow()->GetSafeHwnd();
+	hwnd = GetForegroundWindow();
 	if (fv->OpId == OpLog) { // parent window is desktop
-		Ok = CDialog::Create(CFileTransDlg::IDD, GetDesktopWindow());
+		Ok = TTCDialog::Create(hInstance, GetDesktopWindow(), CFileTransDlg::IDD);
 	}
 	else { // parent window is VT window
-		Ok = CDialog::Create(CFileTransDlg::IDD, NULL);
+		Ok = TTCDialog::Create(hInstance, NULL, CFileTransDlg::IDD);
 	}
 
 	if (!fv->HideDialog) {
@@ -99,22 +83,6 @@ BOOL CFileTransDlg::Create(PFileVar pfv, PComVar pcv, PTTSet pts)
 	}
 
 	fv->HWin = GetSafeHwnd();
-
-	font = (HFONT)SendMessage(WM_GETFONT, 0, 0);
-	GetObject(font, sizeof(LOGFONT), &logfont);
-	if (get_lang_font("DLG_SYSTEM_FONT", fv->HWin, &logfont, &DlgFont, ts->UILanguageFile)) {
-		SendDlgItemMessage(IDC_TRANS_FILENAME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSFNAME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_FULLPATH_LABEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_EDIT_FULLPATH, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANS_TRANS, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSBYTES, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANS_ELAPSED, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANS_ETIME, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSPAUSESTART, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDCANCEL, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-		SendDlgItemMessage(IDC_TRANSHELP, WM_SETFONT, (WPARAM)DlgFont, MAKELPARAM(TRUE,0));
-	}
 
 	return Ok;
 }
@@ -182,9 +150,21 @@ void CFileTransDlg::RefreshNum()
 
 /////////////////////////////////////////////////////////////////////////////
 // CFileTransDlg message handler
+#define AddModalHandle(p1)		// TODO
+#define	RemoveModalHandle(p1)
 
 BOOL CFileTransDlg::OnInitDialog()
 {
+	static const DlgTextInfo TextInfos[] = {
+		{ IDC_TRANS_FILENAME, "DLG_FILETRANS_FILENAME" },
+		{ IDC_FULLPATH_LABEL, "DLG_FILETRANS_FULLPATH" },
+		{ IDC_TRANS_TRANS, "DLG_FILETRANS_TRNAS" },
+		{ IDC_TRANS_ELAPSED, "DLG_FILETRANS_ELAPSED" },
+		{ IDCANCEL, "DLG_FILETRANS_CLOSE" },
+		{ IDC_TRANSPAUSESTART, "DLG_FILETRANS_PAUSE" },
+		{ IDC_TRANSHELP, "BTN_HELP" },
+	};
+
 	int fuLoad = LR_DEFAULTCOLOR;
 
 	if (fv->HideDialog) {
@@ -202,27 +182,32 @@ BOOL CFileTransDlg::OnInitDialog()
 	// ログファイルはフルパス表示にする(2004.8.6 yutaka)
 	SetDlgItemText(IDC_EDIT_FULLPATH, &(fv->FullName[0]));
 
+	SetDlgTexts(m_hWnd, TextInfos, _countof(TextInfos), ts->UILanguageFile);
+
 	if (IsWindowsNT4()) {
 		fuLoad = LR_VGACOLOR;
 	}
-	SmallIcon = LoadImage(AfxGetInstanceHandle(),
-		MAKEINTRESOURCE(IDI_TTERM),
-		IMAGE_ICON, 16, 16, fuLoad);
+	SmallIcon = LoadImage(m_hInst,
+						  MAKEINTRESOURCE(IDI_TTERM),
+						  IMAGE_ICON, 16, 16, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_SMALL,
-		(LPARAM)SmallIcon);
+				  (LPARAM)SmallIcon);
 
-	BigIcon = LoadImage(AfxGetInstanceHandle(),
-			MAKEINTRESOURCE(IDI_TTERM),
-			IMAGE_ICON, 0, 0, fuLoad);
+	BigIcon = LoadImage(m_hInst,
+						MAKEINTRESOURCE(IDI_TTERM),
+						IMAGE_ICON, 0, 0, fuLoad);
 	::PostMessage(GetSafeHwnd(), WM_SETICON, ICON_BIG,
-		(LPARAM)BigIcon);
+				  (LPARAM)BigIcon);
 
-	return 1;
+	AddModalHandle(m_hWnd);
+
+	return TRUE;
 }
 
-void CFileTransDlg::OnCancel( )
+BOOL CFileTransDlg::OnCancel( )
 {
 	::PostMessage(fv->HMainWin,WM_USER_FTCANCEL,fv->OpId,0);
+	return TRUE;
 }
 
 BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -238,21 +223,15 @@ BOOL CFileTransDlg::OnCommand(WPARAM wParam, LPARAM lParam)
 			::PostMessage(fv->HMainWin,WM_USER_DLGHELP2,0,0);
 			return TRUE;
 		default:
-			return (CDialog::OnCommand(wParam,lParam));
+			return (TTCDialog::OnCommand(wParam,lParam));
 	}
 }
 
-void CFileTransDlg::PostNcDestroy()
+BOOL CFileTransDlg::PostNcDestroy()
 {
 	// logopenとlogcloseを繰り返すと、GDIリソースリークとなる問題を修正した。
-	//   - CreateFontIndirect()で作成した論理フォントを削除する。
 	//   - LoadImage()によるアイコンリソースを解放する。
 	// (2016.10.5 yutaka)
-	if (DlgFont) {
-		DeleteObject(DlgFont);
-		DlgFont = NULL;
-	}
-
 	if (SmallIcon) {
 		DestroyIcon((HICON)SmallIcon);
 		SmallIcon = NULL;
@@ -263,10 +242,8 @@ void CFileTransDlg::PostNcDestroy()
 		BigIcon = NULL;
 	}
 
-	delete this;
-}
+	RemoveModalHandle(m_hWnd);
 
-LRESULT CFileTransDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	return DefDlgProc(GetSafeHwnd(),message,wParam,lParam);
+	delete this;
+	return TRUE;
 }
