@@ -113,6 +113,8 @@ void GetMessageboxFont(LOGFONTA *logfont);
 #define CheckFlag(var, flag)	(((var) & (flag)) != 0)
 
 void SetDlgTexts(HWND hDlgWnd, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+void SetDlgMenuTexts(HMENU hMenu, const DlgTextInfo *infos, int infoCount, const char *UILanguageFile);
+
 #if defined(_UNICODE)
 #define	get_lang_msgT(p1, p2, p3, p4, p5) get_lang_msgW(p1, p2, p3, p4, p5)
 #define	get_OPENFILENAME_SIZE() get_OPENFILENAME_SIZEW()

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 1994-1998 T. Teranishi
- * (C) 2006-2017 TeraTerm Project
+ * (C) 2006-2019 TeraTerm Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,17 +31,13 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CTEKWindow
-
-class CTEKWindow : public CFrameWnd
+#include "tmfc.h"
+class CTEKWindow : public TTCFrameWnd
 {
 private:
   TTEKVar tk;
-#ifndef NO_I18N
   HMENU MainMenu, EditMenu, WinMenu,
     FileMenu, SetupMenu, HelpMenu;
-#else
-  HMENU MainMenu, EditMenu, WinMenu;
-#endif
 
 public:
 	CTEKWindow();
@@ -61,33 +57,34 @@ public:
 
 protected:
 	//{{AFX_MSG(CTEKWindow)
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
+#define afx_msg
+	afx_msg void OnActivate(UINT nState, HWND pWndOther, BOOL bMinimized);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnDestroy();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO *lpMMI);
-	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
+	afx_msg void OnInitMenuPopup(HMENU hPopupMenu, UINT nIndex, BOOL bSysMenu);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMButtonUp(UINT nFlags, CPoint point);
-	afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnKillFocus(HWND hNewWnd);
+	afx_msg void OnLButtonDown(UINT nFlags, POINTS point);
+	afx_msg void OnLButtonUp(UINT nFlags, POINTS point);
+	afx_msg void OnMButtonUp(UINT nFlags, POINTS point);
+	afx_msg int OnMouseActivate(HWND hDesktopWnd, UINT nHitTest, UINT message);
+	afx_msg void OnMouseMove(UINT nFlags, POINTS point);
 	afx_msg void OnMove(int x, int y);
 	afx_msg void OnPaint();
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	afx_msg void OnRButtonUp(UINT nFlags, POINTS point);
+	afx_msg void OnSetFocus(HWND hOldWnd);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg LONG OnAccelCommand(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeMenu(UINT wParam, LONG lParam);
-	afx_msg LONG OnChangeTBar(UINT wParam, LONG lParam);
-	afx_msg LONG OnDlgHelp(UINT wParam, LONG lParam);
-	afx_msg LONG OnGetSerialNo(UINT wParam, LONG lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg LRESULT OnAccelCommand(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeMenu(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnChangeTBar(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDlgHelp(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnGetSerialNo(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnFilePrint();
 	afx_msg void OnFileExit();
 	afx_msg void OnEditCopy();
@@ -103,5 +100,7 @@ protected:
 	afx_msg void OnHelpUsing();
 	afx_msg void OnHelpAbout();
 	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+//	DECLARE_MESSAGE_MAP()
+#undef afx_msg
+	virtual LRESULT Proc(UINT msg, WPARAM wp, LPARAM lp);
 };

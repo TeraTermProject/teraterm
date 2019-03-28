@@ -49,7 +49,6 @@
 #include "filesys.h"
 #include "telnet.h"
 #include "tektypes.h"
-#include "tekwin.h"
 #include "ttdde.h"
 #include "ttlib.h"
 #include "helpid.h"
@@ -79,6 +78,7 @@
 #include "winjump.h"
 #include "sizetip.h"
 #include "dnddlg.h"
+#include "tekwin.h"
 #include "compat_win.h"
 
 #include "initguid.h"
